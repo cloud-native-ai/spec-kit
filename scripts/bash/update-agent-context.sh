@@ -482,6 +482,17 @@ update_agent_file() {
     
     log_info "Updating $agent_name context file: $target_file"
     
+    # Check if target_file is a symbolic link and resolve it to the actual file
+    if [[ -L "$target_file" ]]; then
+        local resolved_file
+        resolved_file=$(readlink -f "$target_file") || {
+            log_error "Failed to resolve symbolic link: $target_file"
+            return 1
+        }
+        log_info "Resolved symbolic link $target_file to $resolved_file"
+        target_file="$resolved_file"
+    fi
+
     local project_name
     project_name=$(basename "$REPO_ROOT")
     local current_date

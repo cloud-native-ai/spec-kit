@@ -55,6 +55,9 @@ import truststore
 ssl_context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 client = httpx.Client(verify=ssl_context)
 
+# Get the directory where this module is located
+MODULE_DIR = Path(__file__).parent.resolve()
+
 def _github_token(cli_token: str | None = None) -> str | None:
     """Return sanitized GitHub token (cli arg takes precedence) or None."""
     return ((cli_token or os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN") or "").strip()) or None
@@ -245,6 +248,235 @@ class StepTracker:
             tree.add(line)
         return tree
 
+def has_local_templates() -> bool:
+    """Check if local templates are available in the installed package."""
+    required_dirs = ["memory", "scripts", "templates"]
+    return all((MODULE_DIR / dir_name).exists() for dir_name in required_dirs)
+
+
+def rewrite_paths(content: str) -> str:
+    """Rewrite paths in content to use .specify/ prefix."""
+    import re
+    content = re.sub(r'(/?)memory/', r'.specify/memory/', content)
+    content = re.sub(r'(/?)scripts/', r'.specify/scripts/', content)
+    content = re.sub(r'(/?)templates/', r'.specify/templates/', content)
+    return content
+
+
+def generate_commands(agent: str, ext: str, arg_format: str, output_dir: Path, script_variant: str) -> None:
+    """Generate command files from templates for the specified agent."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    commands_dir = MODULE_DIR / "templates" / "commands"
+    if not commands_dir.exists():
+        return
+
+    for template_file in commands_dir.glob("*.md"):
+        if not template_file.is_file():
+            continue
+
+        name = template_file.stem
+
+        # Read template content
+        with open(template_file, 'r', encoding='utf-8') as f:
+            file_content = f.read()
+
+        # Normalize line endings
+        file_content = file_content.replace('\r\n', '\n').replace('\r', '\n')
+
+        # Extract description from YAML frontmatter
+        import re
+        description_match = re.search(r'description:\s*["\']?([^"\']+)["\']?', file_content)
+        description = description_match.group(1) if description_match else f"Command for {name}"
+
+        # Extract script command for the script variant
+        script_match = re.search(rf'^\s*{script_variant}:\s*(.+)$', file_content, re.MULTILINE)
+        script_command = script_match.group(1).strip() if script_match else "(Missing script command)"
+
+        # Replace {ARGS} placeholder in script command
+        script_command = script_command.replace("{ARGS}", arg_format)
+
+        # Extract body (everything after the frontmatter)
+        parts = file_content.split('---')
+        if len(parts) >= 3:
+            body = '---'.join(parts[2:]).strip()
+        else:
+            body = file_content.strip()
+
+        # Replace placeholders
+        body = body.replace("{SCRIPT}", script_command)
+        body = body.replace("__AGENT__", agent)
+
+        # Remove scripts: and agent_scripts: sections from frontmatter
+        # This is complex, so we'll keep the original frontmatter but remove those sections
+        lines = file_content.split('\n')
+        new_lines = []
+        in_frontmatter = False
+        skip_scripts_section = False
+
+        for line in lines:
+            if line.strip() == '---':
+                new_lines.append(line)
+                in_frontmatter = not in_frontmatter
+                continue
+
+            if in_frontmatter:
+                if line.strip().startswith('scripts:') or line.strip().startswith('agent_scripts:'):
+                    skip_scripts_section = True
+                    continue
+                if skip_scripts_section and line.strip() and not line.startswith(' '):
+                    skip_scripts_section = False
+
+                if skip_scripts_section:
+                    continue
+
+            new_lines.append(line)
+
+        # Reconstruct content without scripts sections
+        cleaned_content = '\n'.join(new_lines)
+        body_parts = cleaned_content.split('---')
+        if len(body_parts) >= 3:
+            body = '---'.join(body_parts[2:]).strip()
+        else:
+            body = cleaned_content.strip()
+
+        # Apply path rewrites
+        body = rewrite_paths(body)
+
+        # Write the command file based on format
+        output_path = output_dir / f"speckit.{name}.{ext}"
+        if ext == "toml":
+            toml_content = f'description = "{description}"\n\n' + 'prompt = """\n' + body + '\n"""\n'
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(toml_content)
+        else:
+            # For "prompt.md" and "md" just write the body
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(body)
+
+
+def copy_local_templates(project_path: Path, ai_assistant: str, script_type: str, is_current_dir: bool = False, tracker: StepTracker | None = None) -> Path:
+    """Copy local templates to create a new project.
+    Returns project_path.
+    """
+    if tracker:
+        tracker.add("local-templates", "Using local templates")
+        tracker.start("local-templates", "checking template structure")
+
+    # Create project directory only if not using current directory
+    if not is_current_dir:
+        project_path.mkdir(parents=True)
+
+    try:
+        # Create the .specify directory structure that the original template expects
+        specify_dir = project_path / ".specify"
+        specify_dir.mkdir(exist_ok=True)
+
+        # Copy memory directory
+        if (MODULE_DIR / "memory").exists():
+            if tracker:
+                tracker.start("local-templates", "copying memory files")
+            shutil.copytree(MODULE_DIR / "memory", specify_dir / "memory", dirs_exist_ok=True)
+
+        # Copy scripts directory
+        if (MODULE_DIR / "scripts").exists():
+            if tracker:
+                tracker.start("local-templates", "copying scripts")
+            shutil.copytree(MODULE_DIR / "scripts", specify_dir / "scripts", dirs_exist_ok=True)
+
+            # Handle script type filtering if needed
+            if script_type == "sh":
+                # Keep only bash scripts, remove powershell if they exist in a separate structure
+                ps_dir = specify_dir / "scripts" / "powershell"
+                if ps_dir.exists():
+                    shutil.rmtree(ps_dir)
+            elif script_type == "ps":
+                # Keep only powershell scripts
+                bash_dir = specify_dir / "scripts" / "bash"
+                if bash_dir.exists():
+                    shutil.rmtree(bash_dir)
+
+        # Copy templates directory (excluding commands which will be handled specially)
+        if (MODULE_DIR / "templates").exists():
+            if tracker:
+                tracker.start("local-templates", "copying templates")
+            # Copy all templates except commands directory
+            for item in (MODULE_DIR / "templates").iterdir():
+                if item.name != "commands":
+                    if item.is_dir():
+                        shutil.copytree(item, specify_dir / "templates" / item.name, dirs_exist_ok=True)
+                    else:
+                        specify_dir.mkdir(parents=True, exist_ok=True)
+                        (specify_dir / "templates").mkdir(exist_ok=True)
+                        shutil.copy2(item, specify_dir / "templates" / item.name)
+
+        # Handle AI assistant specific command files using the same logic as release script
+        if (MODULE_DIR / "templates" / "commands").exists():
+            if tracker:
+                tracker.start("local-templates", f"generating {ai_assistant} commands")
+
+            # Map AI assistant to their command directory and format (same as release script)
+            if ai_assistant == "claude":
+                generate_commands("claude", "md", "$ARGUMENTS", project_path / ".claude" / "commands", script_type)
+            elif ai_assistant == "gemini":
+                generate_commands("gemini", "toml", "{{args}}", project_path / ".gemini" / "commands", script_type)
+            elif ai_assistant == "copilot":
+                generate_commands("copilot", "prompt.md", "$ARGUMENTS", project_path / ".github" / "prompts", script_type)
+                # Create VS Code workspace settings
+                vscode_dir = project_path / ".vscode"
+                vscode_dir.mkdir(exist_ok=True)
+                vscode_settings = MODULE_DIR / "templates" / "vscode-settings.json"
+                if vscode_settings.exists():
+                    shutil.copy2(vscode_settings, vscode_dir / "settings.json")
+            elif ai_assistant == "cursor-agent":
+                generate_commands("cursor", "md", "$ARGUMENTS", project_path / ".cursor" / "commands", script_type)
+            elif ai_assistant == "qwen":
+                generate_commands("qwen", "toml", "{{args}}", project_path / ".qwen" / "commands", script_type)
+            elif ai_assistant == "opencode":
+                generate_commands("opencode", "md", "$ARGUMENTS", project_path / ".opencode" / "command", script_type)
+            elif ai_assistant == "codex":
+                generate_commands("codex", "md", "$ARGUMENTS", project_path / ".codex" / "prompts", script_type)
+            elif ai_assistant == "windsurf":
+                generate_commands("windsurf", "md", "$ARGUMENTS", project_path / ".windsurf" / "workflows", script_type)
+            elif ai_assistant == "kilocode":
+                generate_commands("kilocode", "md", "$ARGUMENTS", project_path / ".kilocode" / "workflows", script_type)
+            elif ai_assistant == "auggie":
+                generate_commands("auggie", "md", "$ARGUMENTS", project_path / ".augment" / "commands", script_type)
+            elif ai_assistant == "roo":
+                generate_commands("roo", "md", "$ARGUMENTS", project_path / ".roo" / "commands", script_type)
+            elif ai_assistant == "q":
+                generate_commands("q", "md", "$ARGUMENTS", project_path / ".amazonq" / "prompts", script_type)
+            else:
+                # Fallback: copy commands to .specify/templates/commands
+                shutil.copytree(MODULE_DIR / "templates" / "commands", specify_dir / "templates" / "commands", dirs_exist_ok=True)
+
+        # Also copy any root-level files that might be in the original project structure
+        root_files = ["README.md", ".gitignore", "spec-driven.md", "LICENSE"]
+        for file_name in root_files:
+            # Look for these files in the parent directory of the module (src/specify_cli -> .. -> spec-kit root)
+            src_file = MODULE_DIR.parent.parent / file_name
+            if src_file.exists():
+                shutil.copy2(src_file, project_path / file_name)
+            else:
+                # If not found in development structure, check if they exist at module level (installed package)
+                src_file = MODULE_DIR / file_name
+                if src_file.exists():
+                    shutil.copy2(src_file, project_path / file_name)
+
+        if tracker:
+            tracker.complete("local-templates", "templates copied successfully")
+
+    except Exception as e:
+        if tracker:
+            tracker.error("local-templates", str(e))
+        else:
+            console.print(f"[red]Error copying local templates:[/red] {e}")
+        # Clean up project directory if created and not current directory
+        if not is_current_dir and project_path.exists():
+            shutil.rmtree(project_path)
+        raise typer.Exit(1)
+
+    return project_path
 def get_key():
     """Get a single keypress in a cross-platform way using readchar."""
     key = readchar.readkey()
