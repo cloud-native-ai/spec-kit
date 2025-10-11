@@ -497,7 +497,7 @@ def get_key():
 
     return key
 
-def select_with_arrows(options: dict, prompt_text: str = "Select an option", default_key: str = None) -> str:
+def select_with_arrows(options: dict, prompt_text: str = "Select an option", default_key: Optional[str] = None) -> str:
     """
     Interactive selection using arrow keys with Rich Live display.
     
@@ -631,7 +631,7 @@ def run_command(cmd: list[str], check_return: bool = True, capture: bool = False
             raise
         return None
 
-def check_tool(tool: str, tracker: StepTracker = None) -> bool:
+def check_tool(tool: str, tracker: Optional[StepTracker] = None) -> bool:
     """Check if a tool is installed. Optionally update tracker.
     
     Args:
@@ -662,7 +662,7 @@ def check_tool(tool: str, tracker: StepTracker = None) -> bool:
     
     return found
 
-def is_git_repo(path: Path = None) -> bool:
+def is_git_repo(path: Optional[Path] = None) -> bool:
     """Check if the specified path is inside a git repository."""
     if path is None:
         path = Path.cwd()
@@ -692,8 +692,8 @@ def init_git_repo(project_path: Path, quiet: bool = False) -> Tuple[bool, Option
     Returns:
         Tuple of (success: bool, error_message: Optional[str])
     """
+    original_cwd = Path.cwd()
     try:
-        original_cwd = Path.cwd()
         os.chdir(project_path)
         if not quiet:
             console.print("[cyan]Initializing git repository...[/cyan]")
@@ -717,7 +717,7 @@ def init_git_repo(project_path: Path, quiet: bool = False) -> Tuple[bool, Option
     finally:
         os.chdir(original_cwd)
 
-def download_template_from_github(ai_assistant: str, download_dir: Path, *, script_type: str = "sh", verbose: bool = True, show_progress: bool = True, client: httpx.Client = None, debug: bool = False, github_token: str = None) -> Tuple[Path, dict]:
+def download_template_from_github(ai_assistant: str, download_dir: Path, *, script_type: str = "sh", verbose: bool = True, show_progress: bool = True, client: Optional[httpx.Client] = None, debug: bool = False, github_token: Optional[str] = None) -> Tuple[Path, dict]:
     repo_owner = "github"
     repo_name = "spec-kit"
     if client is None:
@@ -827,7 +827,7 @@ def download_template_from_github(ai_assistant: str, download_dir: Path, *, scri
     }
     return zip_path, metadata
 
-def download_and_extract_template(project_path: Path, ai_assistant: str, script_type: str, is_current_dir: bool = False, *, verbose: bool = True, tracker: StepTracker | None = None, client: httpx.Client = None, debug: bool = False, github_token: str = None) -> Path:
+def download_and_extract_template(project_path: Path, ai_assistant: str, script_type: str, is_current_dir: bool = False, *, verbose: bool = True, tracker: Optional[StepTracker] = None, client: Optional[httpx.Client] = None, debug: bool = False, github_token: Optional[str] = None) -> Path:
     """Download the latest release and extract it to create a new project.
     Returns project_path. Uses tracker if provided (with keys: fetch, download, extract, cleanup)
     """
@@ -1019,7 +1019,7 @@ def ensure_executable_scripts(project_path: Path, tracker: StepTracker | None = 
 
 @app.command()
 def init(
-    project_name: str = typer.Argument(None, help="Name for your new project directory (optional if using --here, or use '.' for current directory)"),
+    project_name: Optional[str] = typer.Argument(None, help="Name for your new project directory (optional if using --here, or use '.' for current directory)"),
     ai_assistant: str = typer.Option(None, "--ai", help="AI assistant to use: claude, gemini, copilot, cursor-agent, qwen, opencode, codex, windsurf, kilocode, auggie, codebuddy, or q"),
     script_type: str = typer.Option(None, "--script", help="Script type to use: sh or ps"),
     ignore_agent_tools: bool = typer.Option(False, "--ignore-agent-tools", help="Skip checks for AI agent tools like Claude Code"),
@@ -1036,7 +1036,7 @@ def init(
     This command will:
     1. Check that required tools are installed (git is optional)
     2. Let you choose your AI assistant
-    3. Download the appropriate template from GitHub
+    3. Use local templates if available, otherwise download from GitHub
     4. Extract the template to a new project directory or current directory
     5. Initialize a fresh git repository (if not --no-git and no existing repo)
     6. Optionally set up AI assistant commands
@@ -1085,6 +1085,8 @@ def init(
                     console.print("[yellow]Operation cancelled[/yellow]")
                     raise typer.Exit(0)
     else:
+        # project_name is not None here due to validation above
+        assert project_name is not None
         project_path = Path(project_name).resolve()
         if project_path.exists():
             error_panel = Panel(
@@ -1168,7 +1170,7 @@ def init(
 
     tracker = StepTracker("Initialize Specify Project")
 
-    sys._specify_tracker_active = True
+    setattr(sys, "_specify_tracker_active", True)
 
     tracker.add("precheck", "Check required tools")
     tracker.complete("precheck", "ok")
@@ -1177,6 +1179,7 @@ def init(
     tracker.add("script-select", "Select script type")
     tracker.complete("script-select", selected_script)
     for key, label in [
+        ("local-check", "Check for local templates"),
         ("fetch", "Fetch latest release"),
         ("download", "Download template"),
         ("extract", "Extract template"),
@@ -1199,7 +1202,23 @@ def init(
             local_ssl_context = ssl_context if verify else False
             local_client = httpx.Client(verify=local_ssl_context)
 
-            download_and_extract_template(project_path, selected_ai, selected_script, here, verbose=False, tracker=tracker, client=local_client, debug=debug, github_token=github_token)
+            # First, check if local templates are available
+            if has_local_templates():
+                if tracker:
+                    tracker.complete("local-check", "found - using local templates")
+                elif debug:
+                    console.print("[cyan]Local templates found - using installed templates instead of downloading from GitHub[/cyan]")
+                
+                # Use local templates
+                copy_local_templates(project_path, selected_ai, selected_script, here, tracker)
+            else:
+                if tracker:
+                    tracker.skip("local-check", "not found - will download from GitHub")
+                elif debug:
+                    console.print("[yellow]Local templates not found - downloading from GitHub[/yellow]")
+                
+                # Local templates not available, fall back to GitHub download
+                download_and_extract_template(project_path, selected_ai, selected_script, here, verbose=False, tracker=tracker, client=local_client, debug=debug, github_token=github_token)
 
             ensure_executable_scripts(project_path, tracker=tracker)
 
