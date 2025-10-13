@@ -296,17 +296,6 @@ def generate_commands(agent: str, ext: str, arg_format: str, output_dir: Path, s
         # Replace {ARGS} placeholder in script command
         script_command = script_command.replace("{ARGS}", arg_format)
 
-        # Extract body (everything after the frontmatter)
-        parts = file_content.split('---')
-        if len(parts) >= 3:
-            body = '---'.join(parts[2:]).strip()
-        else:
-            body = file_content.strip()
-
-        # Replace placeholders
-        body = body.replace("{SCRIPT}", script_command)
-        body = body.replace("__AGENT__", agent)
-
         # Remove scripts: and agent_scripts: sections from frontmatter
         # This is complex, so we'll keep the original frontmatter but remove those sections
         lines = file_content.split('\n')
@@ -334,11 +323,17 @@ def generate_commands(agent: str, ext: str, arg_format: str, output_dir: Path, s
 
         # Reconstruct content without scripts sections
         cleaned_content = '\n'.join(new_lines)
+        
+        # Extract body (everything after the frontmatter)
         body_parts = cleaned_content.split('---')
         if len(body_parts) >= 3:
             body = '---'.join(body_parts[2:]).strip()
         else:
             body = cleaned_content.strip()
+
+        # Replace placeholders in the final body
+        body = body.replace("{SCRIPT}", script_command)
+        body = body.replace("__AGENT__", agent)
 
         # Apply path rewrites
         body = rewrite_paths(body)
