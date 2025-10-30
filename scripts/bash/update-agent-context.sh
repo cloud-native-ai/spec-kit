@@ -52,6 +52,9 @@ set -o pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
+# Ensure UTF-8 locale for better Unicode parsing and output
+ensure_utf8_locale || true
+
 # Get all paths and variables from common functions
 eval $(get_feature_paths)
 
