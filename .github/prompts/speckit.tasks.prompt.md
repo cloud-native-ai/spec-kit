@@ -1,7 +1,3 @@
----
-description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
----
-
 ## User Input
 
 ```text
@@ -67,7 +63,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Independent test criteria for each story
    - Suggested MVP scope (typically just User Story 1)
 
-Context for task generation: $ARGUMENTS
+Context for task generation: {ARGS}
 
 The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.
 

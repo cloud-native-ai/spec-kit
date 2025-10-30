@@ -35,7 +35,7 @@
 #    - Creates default Claude file if no agent files exist
 #
 # Usage: ./update-agent-context.sh [agent_type]
-# Agent types: claude|gemini|copilot|cursor-agent|qwen|opencode|codex|windsurf|kilocode|auggie|q
+# Agent types: claude|gemini|copilot|cursor|qwen|opencode|codex|windsurf|kilocode|auggie|q
 # Leave empty to update all existing agent files
 
 set -e
@@ -51,6 +51,9 @@ set -o pipefail
 # Get script directory and load common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
+
+# Ensure UTF-8 locale for better Unicode parsing and output
+ensure_utf8_locale || true
 
 # Get all paths and variables from common functions
 eval $(get_feature_paths)
@@ -482,6 +485,17 @@ update_agent_file() {
     
     log_info "Updating $agent_name context file: $target_file"
     
+    # Check if target_file is a symbolic link and resolve it to the actual file
+    if [[ -L "$target_file" ]]; then
+        local resolved_file
+        resolved_file=$(readlink -f "$target_file") || {
+            log_error "Failed to resolve symbolic link: $target_file"
+            return 1
+        }
+        log_info "Resolved symbolic link $target_file to $resolved_file"
+        target_file="$resolved_file"
+    fi
+
     local project_name
     project_name=$(basename "$REPO_ROOT")
     local current_date
@@ -558,7 +572,7 @@ update_specific_agent() {
         copilot)
             update_agent_file "$COPILOT_FILE" "GitHub Copilot"
             ;;
-        cursor-agent)
+        cursor)
             update_agent_file "$CURSOR_FILE" "Cursor IDE"
             ;;
         qwen)
@@ -590,7 +604,7 @@ update_specific_agent() {
             ;;
         *)
             log_error "Unknown agent type '$agent_type'"
-            log_error "Expected: claude|gemini|copilot|cursor-agent|qwen|opencode|codex|windsurf|kilocode|auggie|roo|q"
+            log_error "Expected: claude|gemini|copilot|cursor|qwen|opencode|codex|windsurf|kilocode|auggie|roo|q"
             exit 1
             ;;
     esac
@@ -684,7 +698,7 @@ print_summary() {
     
     echo
 
-    log_info "Usage: $0 [claude|gemini|copilot|cursor-agent|qwen|opencode|codex|windsurf|kilocode|auggie|codebuddy|q]"
+    log_info "Usage: $0 [claude|gemini|copilot|cursor|qwen|opencode|codex|windsurf|kilocode|auggie|codebuddy|q]"
 }
 
 #==============================================================================

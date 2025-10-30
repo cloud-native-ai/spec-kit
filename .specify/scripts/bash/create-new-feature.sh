@@ -2,6 +2,15 @@
 
 set -e
 
+# Load common helpers for Unicode support and shared functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/common.sh" ]; then
+    # shellcheck source=/dev/null
+    source "$SCRIPT_DIR/common.sh"
+    # Ensure UTF-8 locale for better Unicode handling
+    ensure_utf8_locale || true
+fi
+
 JSON_MODE=false
 ARGS=()
 for arg in "$@"; do
@@ -67,8 +76,15 @@ fi
 NEXT=$((HIGHEST + 1))
 FEATURE_NUM=$(printf "%03d" "$NEXT")
 
-BRANCH_NAME=$(echo "$FEATURE_DESCRIPTION" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/-\+/-/g' | sed 's/^-//' | sed 's/-$//')
-WORDS=$(echo "$BRANCH_NAME" | tr '-' '\n' | grep -v '^$' | head -3 | tr '\n' '-' | sed 's/-$//')
+# Create a Unicode-aware slug from feature description
+if command -v slugify_unicode >/dev/null 2>&1; then
+    SLUG=$(slugify_unicode "$FEATURE_DESCRIPTION")
+else
+    # Fallback if common.sh wasn't sourced for some reason
+    SLUG=$(echo "$FEATURE_DESCRIPTION" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/-\+/-/g; s/^-//; s/-$//' | sed 's/^$/feature/')
+fi
+# Keep only the first three segments to keep branch names short
+WORDS=$(echo "$SLUG" | tr '-' '\n' | grep -v '^$' | head -3 | tr '\n' '-' | sed 's/-$//')
 BRANCH_NAME="${FEATURE_NUM}-${WORDS}"
 
 if [ "$HAS_GIT" = true ]; then

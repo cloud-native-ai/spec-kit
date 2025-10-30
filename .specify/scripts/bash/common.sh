@@ -1,6 +1,69 @@
 #!/usr/bin/env bash
 # Common functions and variables for all scripts
 
+# Ensure the script runs in a UTF-8 locale to better support Unicode processing
+ensure_utf8_locale() {
+    # If current locale isn't UTF-8, try to switch to a UTF-8-capable one
+    if ! locale 2>/dev/null | grep -qi 'utf-8'; then
+        if locale -a 2>/dev/null | grep -qi '^C\.utf8\|^C\.UTF-8$'; then
+            export LC_ALL=C.UTF-8
+            export LANG=C.UTF-8
+        elif locale -a 2>/dev/null | grep -qi '^en_US\.utf8\|^en_US\.UTF-8$'; then
+            export LC_ALL=en_US.UTF-8
+            export LANG=en_US.UTF-8
+        fi
+    fi
+}
+
+# Unicode-aware slugify: keep letters and digits from all languages, replace others with '-'
+# Usage: slugify_unicode "Some 标题 示例"  -> some-标题-示例
+slugify_unicode() {
+    # Prefer Python 3 for robust Unicode handling; fall back to Perl; then to basic sed
+    if command -v python3 >/dev/null 2>&1; then
+        python3 - "$@" <<'PY'
+import sys
+def slugify(s: str) -> str:
+    s = s.strip()
+    out = []
+    prev_hyphen = False
+    for ch in s:
+        if ch.isalnum():
+            out.append(ch.lower())
+            prev_hyphen = False
+        else:
+            if not prev_hyphen:
+                out.append('-')
+                prev_hyphen = True
+    result = ''.join(out).strip('-')
+    return result or 'feature'
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        text = ' '.join(sys.argv[1:])
+    else:
+        text = sys.stdin.read()
+    print(slugify(text))
+PY
+        return $?
+    elif command -v perl >/dev/null 2>&1; then
+        # Perl with Unicode properties
+        perl -CSD -Mutf8 -e '
+            binmode STDIN,  ":utf8"; binmode STDOUT, ":utf8"; 
+            local $/; 
+            my $s = @ARGV ? join(" ", @ARGV) : <STDIN>; 
+            $s =~ s/[^\p{L}\p{N}]+/-/g; 
+            $s =~ s/^-+|-+$//g; 
+            $s = length($s) ? lc($s) : "feature"; 
+            print $s; 
+        ' -- "$@"
+        return $?
+    else
+        # Fallback (ASCII only)
+        echo "$*" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/-\+/-/g; s/^-//; s/-$//' | sed 's/^$/feature/'
+        return $?
+    fi
+}
+
 # Get repository root, with fallback for non-git repositories
 get_repo_root() {
     if git rev-parse --show-toplevel >/dev/null 2>&1; then

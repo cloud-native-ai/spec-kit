@@ -1,7 +1,3 @@
----
-description: Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md, and tasks.md after task generation.
----
-
 ## User Input
 
 ```text
@@ -181,4 +177,4 @@ Ask the user: "Would you like me to suggest concrete remediation edits for the t
 
 ## Context
 
-$ARGUMENTS
+{ARGS}

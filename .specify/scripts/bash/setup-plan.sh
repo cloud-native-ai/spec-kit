@@ -27,6 +27,9 @@ done
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
+# Ensure UTF-8 locale for better Unicode handling
+ensure_utf8_locale || true
+
 # Get all paths and variables from common functions
 eval $(get_feature_paths)
 
