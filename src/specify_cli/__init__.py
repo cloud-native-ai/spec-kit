@@ -132,7 +132,7 @@ AGENT_CONFIG = {
     "codebuddy": {
         "name": "CodeBuddy",
         "folder": ".codebuddy/",
-        "install_url": "https://www.codebuddy.ai",
+        "install_url": "https://www.codebuddy.ai/cli",
         "requires_cli": True,
     },
     "roo": {
@@ -145,6 +145,12 @@ AGENT_CONFIG = {
         "name": "Amazon Q Developer CLI",
         "folder": ".amazonq/",
         "install_url": "https://aws.amazon.com/developer/learning/q-developer-cli/",
+        "requires_cli": True,
+    },
+    "amp": {
+        "name": "Amp",
+        "folder": ".agents/",
+        "install_url": "https://ampcode.com/manual#install",
         "requires_cli": True,
     },
 }
@@ -492,7 +498,7 @@ def get_key():
 
     return key
 
-def select_with_arrows(options: dict, prompt_text: str = "Select an option", default_key: Optional[str] = None) -> str:
+def select_with_arrows(options: dict, prompt_text: str = "Select an option", default_key: str = None) -> str:
     """
     Interactive selection using arrow keys with Rich Live display.
     
@@ -626,7 +632,7 @@ def run_command(cmd: list[str], check_return: bool = True, capture: bool = False
             raise
         return None
 
-def check_tool(tool: str, tracker: Optional[StepTracker] = None) -> bool:
+def check_tool(tool: str, tracker: StepTracker = None) -> bool:
     """Check if a tool is installed. Optionally update tracker.
     
     Args:
@@ -657,7 +663,7 @@ def check_tool(tool: str, tracker: Optional[StepTracker] = None) -> bool:
     
     return found
 
-def is_git_repo(path: Optional[Path] = None) -> bool:
+def is_git_repo(path: Path = None) -> bool:
     """Check if the specified path is inside a git repository."""
     if path is None:
         path = Path.cwd()
@@ -687,8 +693,8 @@ def init_git_repo(project_path: Path, quiet: bool = False) -> Tuple[bool, Option
     Returns:
         Tuple of (success: bool, error_message: Optional[str])
     """
-    original_cwd = Path.cwd()
     try:
+        original_cwd = Path.cwd()
         os.chdir(project_path)
         if not quiet:
             console.print("[cyan]Initializing git repository...[/cyan]")
@@ -822,7 +828,7 @@ def download_template_from_github(ai_assistant: str, download_dir: Path, *, scri
     }
     return zip_path, metadata
 
-def download_and_extract_template(project_path: Path, ai_assistant: str, script_type: str, is_current_dir: bool = False, *, verbose: bool = True, tracker: Optional[StepTracker] = None, client: Optional[httpx.Client] = None, debug: bool = False, github_token: Optional[str] = None) -> Path:
+def download_and_extract_template(project_path: Path, ai_assistant: str, script_type: str, is_current_dir: bool = False, *, verbose: bool = True, tracker: StepTracker | None = None, client: httpx.Client = None, debug: bool = False, github_token: str = None) -> Path:
     """Download the latest release and extract it to create a new project.
     Returns project_path. Uses tracker if provided (with keys: fetch, download, extract, cleanup)
     """
@@ -903,7 +909,11 @@ def download_and_extract_template(project_path: Path, ai_assistant: str, script_
                                         rel_path = sub_item.relative_to(item)
                                         dest_file = dest_path / rel_path
                                         dest_file.parent.mkdir(parents=True, exist_ok=True)
-                                        shutil.copy2(sub_item, dest_file)
+                                        # Special handling for .vscode/settings.json - merge instead of overwrite
+                                        if dest_file.name == "settings.json" and dest_file.parent.name == ".vscode":
+                                            handle_vscode_settings(sub_item, dest_file, rel_path, verbose, tracker)
+                                        else:
+                                            shutil.copy2(sub_item, dest_file)
                             else:
                                 shutil.copytree(item, dest_path)
                         else:
@@ -1014,8 +1024,8 @@ def ensure_executable_scripts(project_path: Path, tracker: StepTracker | None = 
 
 @app.command()
 def init(
-    project_name: Optional[str] = typer.Argument(None, help="Name for your new project directory (optional if using --here, or use '.' for current directory)"),
-    ai_assistant: str = typer.Option(None, "--ai", help="AI assistant to use: claude, gemini, copilot, cursor-agent, qwen, opencode, codex, windsurf, kilocode, auggie, codebuddy, or q"),
+    project_name: str = typer.Argument(None, help="Name for your new project directory (optional if using --here, or use '.' for current directory)"),
+    ai_assistant: str = typer.Option(None, "--ai", help="AI assistant to use: claude, gemini, copilot, cursor-agent, qwen, opencode, codex, windsurf, kilocode, auggie, codebuddy, amp, or q"),
     script_type: str = typer.Option(None, "--script", help="Script type to use: sh or ps"),
     ignore_agent_tools: bool = typer.Option(False, "--ignore-agent-tools", help="Skip checks for AI agent tools like Claude Code"),
     no_git: bool = typer.Option(False, "--no-git", help="Skip git repository initialization"),
@@ -1339,18 +1349,25 @@ def check():
 
     tracker.add("git", "Git version control")
     git_ok = check_tool("git", tracker=tracker)
-    
+
     agent_results = {}
     for agent_key, agent_config in AGENT_CONFIG.items():
         agent_name = agent_config["name"]
-        
+        requires_cli = agent_config["requires_cli"]
+
         tracker.add(agent_key, agent_name)
-        agent_results[agent_key] = check_tool(agent_key, tracker=tracker)
-    
+
+        if requires_cli:
+            agent_results[agent_key] = check_tool(agent_key, tracker=tracker)
+        else:
+            # IDE-based agent - skip CLI check and mark as optional
+            tracker.skip(agent_key, "IDE-based, no CLI check")
+            agent_results[agent_key] = False  # Don't count IDE agents as "found"
+
     # Check VS Code variants (not in agent config)
     tracker.add("code", "Visual Studio Code")
     code_ok = check_tool("code", tracker=tracker)
-    
+
     tracker.add("code-insiders", "Visual Studio Code Insiders")
     code_insiders_ok = check_tool("code-insiders", tracker=tracker)
 
@@ -1369,3 +1386,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
