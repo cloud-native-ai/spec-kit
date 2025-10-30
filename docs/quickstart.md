@@ -15,7 +15,6 @@ uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME
 ```
 
 Pick script type explicitly (optional):
-
 ```bash
 uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --script ps  # Force PowerShell
 uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --script sh  # Force POSIX shell
@@ -105,7 +104,7 @@ to be doing that are obvious from reading this. Because I don't know if there's 
 Finally, implement the solution:
 
 ```text
-implement specs/002-create-taskify/plan.md
+implement .specify/specs/002-create-taskify/plan.md
 ```
 
 ## Key Principles
