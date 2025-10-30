@@ -55,6 +55,9 @@ import truststore
 ssl_context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 client = httpx.Client(verify=ssl_context)
 
+# Get the directory where this module is located
+MODULE_DIR = Path(__file__).parent.resolve()
+
 def _github_token(cli_token: str | None = None) -> str | None:
     """Return sanitized GitHub token (cli arg takes precedence) or None."""
     return ((cli_token or os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN") or "").strip()) or None
@@ -129,7 +132,7 @@ AGENT_CONFIG = {
     "codebuddy": {
         "name": "CodeBuddy",
         "folder": ".codebuddy/",
-        "install_url": "https://www.codebuddy.ai/cli",
+        "install_url": "https://www.codebuddy.ai",
         "requires_cli": True,
     },
     "roo": {
@@ -142,12 +145,6 @@ AGENT_CONFIG = {
         "name": "Amazon Q Developer CLI",
         "folder": ".amazonq/",
         "install_url": "https://aws.amazon.com/developer/learning/q-developer-cli/",
-        "requires_cli": True,
-    },
-    "amp": {
-        "name": "Amp",
-        "folder": ".agents/",
-        "install_url": "https://ampcode.com/manual#install",
         "requires_cli": True,
     },
 }
@@ -251,6 +248,230 @@ class StepTracker:
             tree.add(line)
         return tree
 
+def has_local_templates() -> bool:
+    """Check if local templates are available in the installed package."""
+    required_dirs = ["memory", "scripts", "templates"]
+    return all((MODULE_DIR / dir_name).exists() for dir_name in required_dirs)
+
+
+def rewrite_paths(content: str) -> str:
+    """Rewrite paths in content to use .specify/ prefix."""
+    import re
+    content = re.sub(r'(/?)memory/', r'.specify/memory/', content)
+    content = re.sub(r'(/?)scripts/', r'.specify/scripts/', content)
+    content = re.sub(r'(/?)templates/', r'.specify/templates/', content)
+    return content
+
+
+def generate_commands(agent: str, ext: str, arg_format: str, output_dir: Path, script_variant: str) -> None:
+    """Generate command files from templates for the specified agent."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    commands_dir = MODULE_DIR / "templates" / "commands"
+    if not commands_dir.exists():
+        return
+
+    for template_file in commands_dir.glob("*.md"):
+        if not template_file.is_file():
+            continue
+
+        name = template_file.stem
+
+        # Read template content
+        with open(template_file, 'r', encoding='utf-8') as f:
+            file_content = f.read()
+
+        # Normalize line endings
+        file_content = file_content.replace('\r\n', '\n').replace('\r', '\n')
+
+        # Extract description from YAML frontmatter
+        import re
+        description_match = re.search(r'description:\s*["\']?([^"\']+)["\']?', file_content)
+        description = description_match.group(1) if description_match else f"Command for {name}"
+
+        # Extract script command for the script variant
+        script_match = re.search(rf'^\s*{script_variant}:\s*(.+)$', file_content, re.MULTILINE)
+        script_command = script_match.group(1).strip() if script_match else "(Missing script command)"
+
+        # Replace {ARGS} placeholder in script command
+        script_command = script_command.replace("{ARGS}", arg_format)
+
+        # Remove scripts: and agent_scripts: sections from frontmatter
+        # This is complex, so we'll keep the original frontmatter but remove those sections
+        lines = file_content.split('\n')
+        new_lines = []
+        in_frontmatter = False
+        skip_scripts_section = False
+
+        for line in lines:
+            if line.strip() == '---':
+                new_lines.append(line)
+                in_frontmatter = not in_frontmatter
+                continue
+
+            if in_frontmatter:
+                if line.strip().startswith('scripts:') or line.strip().startswith('agent_scripts:'):
+                    skip_scripts_section = True
+                    continue
+                if skip_scripts_section and line.strip() and not line.startswith(' '):
+                    skip_scripts_section = False
+
+                if skip_scripts_section:
+                    continue
+
+            new_lines.append(line)
+
+        # Reconstruct content without scripts sections
+        cleaned_content = '\n'.join(new_lines)
+        
+        # Extract body (everything after the frontmatter)
+        body_parts = cleaned_content.split('---')
+        if len(body_parts) >= 3:
+            body = '---'.join(body_parts[2:]).strip()
+        else:
+            body = cleaned_content.strip()
+
+        # Replace placeholders in the final body
+        body = body.replace("{SCRIPT}", script_command)
+        body = body.replace("__AGENT__", agent)
+
+        # Apply path rewrites
+        body = rewrite_paths(body)
+
+        # Write the command file based on format
+        output_path = output_dir / f"speckit.{name}.{ext}"
+        if ext == "toml":
+            toml_content = f'description = "{description}"\n\n' + 'prompt = """\n' + body + '\n"""\n'
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(toml_content)
+        else:
+            # For "prompt.md" and "md" just write the body
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(body)
+
+
+def copy_local_templates(project_path: Path, ai_assistant: str, script_type: str, is_current_dir: bool = False, tracker: StepTracker | None = None) -> Path:
+    """Copy local templates to create a new project.
+    Returns project_path.
+    """
+    if tracker:
+        tracker.add("local-templates", "Using local templates")
+        tracker.start("local-templates", "checking template structure")
+
+    # Create project directory only if not using current directory
+    if not is_current_dir:
+        project_path.mkdir(parents=True)
+
+    try:
+        # Create the .specify directory structure that the original template expects
+        specify_dir = project_path / ".specify"
+        specify_dir.mkdir(exist_ok=True)
+
+        # Copy memory directory
+        if (MODULE_DIR / "memory").exists():
+            if tracker:
+                tracker.start("local-templates", "copying memory files")
+            shutil.copytree(MODULE_DIR / "memory", specify_dir / "memory", dirs_exist_ok=True)
+
+        # Copy scripts directory
+        if (MODULE_DIR / "scripts").exists():
+            if tracker:
+                tracker.start("local-templates", "copying scripts")
+            shutil.copytree(MODULE_DIR / "scripts", specify_dir / "scripts", dirs_exist_ok=True)
+
+            # Handle script type filtering if needed
+            if script_type == "sh":
+                # Keep only bash scripts, remove powershell if they exist in a separate structure
+                ps_dir = specify_dir / "scripts" / "powershell"
+                if ps_dir.exists():
+                    shutil.rmtree(ps_dir)
+            elif script_type == "ps":
+                # Keep only powershell scripts
+                bash_dir = specify_dir / "scripts" / "bash"
+                if bash_dir.exists():
+                    shutil.rmtree(bash_dir)
+
+        # Copy templates directory (excluding commands which will be handled specially)
+        if (MODULE_DIR / "templates").exists():
+            if tracker:
+                tracker.start("local-templates", "copying templates")
+            # Copy all templates except commands directory
+            for item in (MODULE_DIR / "templates").iterdir():
+                if item.name != "commands":
+                    if item.is_dir():
+                        shutil.copytree(item, specify_dir / "templates" / item.name, dirs_exist_ok=True)
+                    else:
+                        specify_dir.mkdir(parents=True, exist_ok=True)
+                        (specify_dir / "templates").mkdir(exist_ok=True)
+                        shutil.copy2(item, specify_dir / "templates" / item.name)
+
+        # Handle AI assistant specific command files using the same logic as release script
+        if (MODULE_DIR / "templates" / "commands").exists():
+            if tracker:
+                tracker.start("local-templates", f"generating {ai_assistant} commands")
+
+            # Map AI assistant to their command directory and format (same as release script)
+            if ai_assistant == "claude":
+                generate_commands("claude", "md", "$ARGUMENTS", project_path / ".claude" / "commands", script_type)
+            elif ai_assistant == "gemini":
+                generate_commands("gemini", "toml", "{{args}}", project_path / ".gemini" / "commands", script_type)
+            elif ai_assistant == "copilot":
+                generate_commands("copilot", "prompt.md", "$ARGUMENTS", project_path / ".github" / "prompts", script_type)
+                # Create VS Code workspace settings
+                vscode_dir = project_path / ".vscode"
+                vscode_dir.mkdir(exist_ok=True)
+                vscode_settings = MODULE_DIR / "templates" / "vscode-settings.json"
+                if vscode_settings.exists():
+                    shutil.copy2(vscode_settings, vscode_dir / "settings.json")
+            elif ai_assistant == "cursor-agent":
+                generate_commands("cursor", "md", "$ARGUMENTS", project_path / ".cursor" / "commands", script_type)
+            elif ai_assistant == "qwen":
+                generate_commands("qwen", "toml", "{{args}}", project_path / ".qwen" / "commands", script_type)
+            elif ai_assistant == "opencode":
+                generate_commands("opencode", "md", "$ARGUMENTS", project_path / ".opencode" / "command", script_type)
+            elif ai_assistant == "codex":
+                generate_commands("codex", "md", "$ARGUMENTS", project_path / ".codex" / "prompts", script_type)
+            elif ai_assistant == "windsurf":
+                generate_commands("windsurf", "md", "$ARGUMENTS", project_path / ".windsurf" / "workflows", script_type)
+            elif ai_assistant == "kilocode":
+                generate_commands("kilocode", "md", "$ARGUMENTS", project_path / ".kilocode" / "workflows", script_type)
+            elif ai_assistant == "auggie":
+                generate_commands("auggie", "md", "$ARGUMENTS", project_path / ".augment" / "commands", script_type)
+            elif ai_assistant == "roo":
+                generate_commands("roo", "md", "$ARGUMENTS", project_path / ".roo" / "commands", script_type)
+            elif ai_assistant == "q":
+                generate_commands("q", "md", "$ARGUMENTS", project_path / ".amazonq" / "prompts", script_type)
+            else:
+                # Fallback: copy commands to .specify/templates/commands
+                shutil.copytree(MODULE_DIR / "templates" / "commands", specify_dir / "templates" / "commands", dirs_exist_ok=True)
+
+        # Also copy any root-level files that might be in the original project structure
+        root_files = ["README.md", ".gitignore", "spec-driven.md", "LICENSE"]
+        for file_name in root_files:
+            # Look for these files in the parent directory of the module (src/specify_cli -> .. -> spec-kit root)
+            src_file = MODULE_DIR.parent.parent / file_name
+            if src_file.exists():
+                shutil.copy2(src_file, project_path / file_name)
+            else:
+                # If not found in development structure, check if they exist at module level (installed package)
+                src_file = MODULE_DIR / file_name
+                if src_file.exists():
+                    shutil.copy2(src_file, project_path / file_name)
+
+        if tracker:
+            tracker.complete("local-templates", "templates copied successfully")
+
+    except Exception as e:
+        if tracker:
+            tracker.error("local-templates", str(e))
+        else:
+            console.print(f"[red]Error copying local templates:[/red] {e}")
+        # Clean up project directory if created and not current directory
+        if not is_current_dir and project_path.exists():
+            shutil.rmtree(project_path)
+        raise typer.Exit(1)
+
+    return project_path
 def get_key():
     """Get a single keypress in a cross-platform way using readchar."""
     key = readchar.readkey()
@@ -271,7 +492,7 @@ def get_key():
 
     return key
 
-def select_with_arrows(options: dict, prompt_text: str = "Select an option", default_key: str = None) -> str:
+def select_with_arrows(options: dict, prompt_text: str = "Select an option", default_key: Optional[str] = None) -> str:
     """
     Interactive selection using arrow keys with Rich Live display.
     
@@ -405,7 +626,7 @@ def run_command(cmd: list[str], check_return: bool = True, capture: bool = False
             raise
         return None
 
-def check_tool(tool: str, tracker: StepTracker = None) -> bool:
+def check_tool(tool: str, tracker: Optional[StepTracker] = None) -> bool:
     """Check if a tool is installed. Optionally update tracker.
     
     Args:
@@ -436,7 +657,7 @@ def check_tool(tool: str, tracker: StepTracker = None) -> bool:
     
     return found
 
-def is_git_repo(path: Path = None) -> bool:
+def is_git_repo(path: Optional[Path] = None) -> bool:
     """Check if the specified path is inside a git repository."""
     if path is None:
         path = Path.cwd()
@@ -466,8 +687,8 @@ def init_git_repo(project_path: Path, quiet: bool = False) -> Tuple[bool, Option
     Returns:
         Tuple of (success: bool, error_message: Optional[str])
     """
+    original_cwd = Path.cwd()
     try:
-        original_cwd = Path.cwd()
         os.chdir(project_path)
         if not quiet:
             console.print("[cyan]Initializing git repository...[/cyan]")
@@ -491,74 +712,7 @@ def init_git_repo(project_path: Path, quiet: bool = False) -> Tuple[bool, Option
     finally:
         os.chdir(original_cwd)
 
-def handle_vscode_settings(sub_item, dest_file, rel_path, verbose=False, tracker=None) -> None:
-    """Handle merging or copying of .vscode/settings.json files."""
-    def log(message, color="green"):
-        if verbose and not tracker:
-            console.print(f"[{color}]{message}[/] {rel_path}")
-
-    try:
-        with open(sub_item, 'r', encoding='utf-8') as f:
-            new_settings = json.load(f)
-
-        if dest_file.exists():
-            merged = merge_json_files(dest_file, new_settings, verbose=verbose and not tracker)
-            with open(dest_file, 'w', encoding='utf-8') as f:
-                json.dump(merged, f, indent=4)
-                f.write('\n')
-            log("Merged:", "green")
-        else:
-            shutil.copy2(sub_item, dest_file)
-            log("Copied (no existing settings.json):", "blue")
-
-    except Exception as e:
-        log(f"Warning: Could not merge, copying instead: {e}", "yellow")
-        shutil.copy2(sub_item, dest_file)
-
-def merge_json_files(existing_path: Path, new_content: dict, verbose: bool = False) -> dict:
-    """Merge new JSON content into existing JSON file.
-
-    Performs a deep merge where:
-    - New keys are added
-    - Existing keys are preserved unless overwritten by new content
-    - Nested dictionaries are merged recursively
-    - Lists and other values are replaced (not merged)
-
-    Args:
-        existing_path: Path to existing JSON file
-        new_content: New JSON content to merge in
-        verbose: Whether to print merge details
-
-    Returns:
-        Merged JSON content as dict
-    """
-    try:
-        with open(existing_path, 'r', encoding='utf-8') as f:
-            existing_content = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        # If file doesn't exist or is invalid, just use new content
-        return new_content
-
-    def deep_merge(base: dict, update: dict) -> dict:
-        """Recursively merge update dict into base dict."""
-        result = base.copy()
-        for key, value in update.items():
-            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
-                # Recursively merge nested dictionaries
-                result[key] = deep_merge(result[key], value)
-            else:
-                # Add new key or replace existing value
-                result[key] = value
-        return result
-
-    merged = deep_merge(existing_content, new_content)
-
-    if verbose:
-        console.print(f"[cyan]Merged JSON file:[/cyan] {existing_path.name}")
-
-    return merged
-
-def download_template_from_github(ai_assistant: str, download_dir: Path, *, script_type: str = "sh", verbose: bool = True, show_progress: bool = True, client: httpx.Client = None, debug: bool = False, github_token: str = None) -> Tuple[Path, dict]:
+def download_template_from_github(ai_assistant: str, download_dir: Path, *, script_type: str = "sh", verbose: bool = True, show_progress: bool = True, client: Optional[httpx.Client] = None, debug: bool = False, github_token: Optional[str] = None) -> Tuple[Path, dict]:
     repo_owner = "github"
     repo_name = "spec-kit"
     if client is None:
@@ -668,7 +822,7 @@ def download_template_from_github(ai_assistant: str, download_dir: Path, *, scri
     }
     return zip_path, metadata
 
-def download_and_extract_template(project_path: Path, ai_assistant: str, script_type: str, is_current_dir: bool = False, *, verbose: bool = True, tracker: StepTracker | None = None, client: httpx.Client = None, debug: bool = False, github_token: str = None) -> Path:
+def download_and_extract_template(project_path: Path, ai_assistant: str, script_type: str, is_current_dir: bool = False, *, verbose: bool = True, tracker: Optional[StepTracker] = None, client: Optional[httpx.Client] = None, debug: bool = False, github_token: Optional[str] = None) -> Path:
     """Download the latest release and extract it to create a new project.
     Returns project_path. Uses tracker if provided (with keys: fetch, download, extract, cleanup)
     """
@@ -749,11 +903,7 @@ def download_and_extract_template(project_path: Path, ai_assistant: str, script_
                                         rel_path = sub_item.relative_to(item)
                                         dest_file = dest_path / rel_path
                                         dest_file.parent.mkdir(parents=True, exist_ok=True)
-                                        # Special handling for .vscode/settings.json - merge instead of overwrite
-                                        if dest_file.name == "settings.json" and dest_file.parent.name == ".vscode":
-                                            handle_vscode_settings(sub_item, dest_file, rel_path, verbose, tracker)
-                                        else:
-                                            shutil.copy2(sub_item, dest_file)
+                                        shutil.copy2(sub_item, dest_file)
                             else:
                                 shutil.copytree(item, dest_path)
                         else:
@@ -864,8 +1014,8 @@ def ensure_executable_scripts(project_path: Path, tracker: StepTracker | None = 
 
 @app.command()
 def init(
-    project_name: str = typer.Argument(None, help="Name for your new project directory (optional if using --here, or use '.' for current directory)"),
-    ai_assistant: str = typer.Option(None, "--ai", help="AI assistant to use: claude, gemini, copilot, cursor-agent, qwen, opencode, codex, windsurf, kilocode, auggie, codebuddy, amp, or q"),
+    project_name: Optional[str] = typer.Argument(None, help="Name for your new project directory (optional if using --here, or use '.' for current directory)"),
+    ai_assistant: str = typer.Option(None, "--ai", help="AI assistant to use: claude, gemini, copilot, cursor-agent, qwen, opencode, codex, windsurf, kilocode, auggie, codebuddy, or q"),
     script_type: str = typer.Option(None, "--script", help="Script type to use: sh or ps"),
     ignore_agent_tools: bool = typer.Option(False, "--ignore-agent-tools", help="Skip checks for AI agent tools like Claude Code"),
     no_git: bool = typer.Option(False, "--no-git", help="Skip git repository initialization"),
@@ -881,7 +1031,7 @@ def init(
     This command will:
     1. Check that required tools are installed (git is optional)
     2. Let you choose your AI assistant
-    3. Download the appropriate template from GitHub
+    3. Use local templates if available, otherwise download from GitHub
     4. Extract the template to a new project directory or current directory
     5. Initialize a fresh git repository (if not --no-git and no existing repo)
     6. Optionally set up AI assistant commands
@@ -930,6 +1080,8 @@ def init(
                     console.print("[yellow]Operation cancelled[/yellow]")
                     raise typer.Exit(0)
     else:
+        # project_name is not None here due to validation above
+        assert project_name is not None
         project_path = Path(project_name).resolve()
         if project_path.exists():
             error_panel = Panel(
@@ -1013,7 +1165,7 @@ def init(
 
     tracker = StepTracker("Initialize Specify Project")
 
-    sys._specify_tracker_active = True
+    setattr(sys, "_specify_tracker_active", True)
 
     tracker.add("precheck", "Check required tools")
     tracker.complete("precheck", "ok")
@@ -1022,6 +1174,7 @@ def init(
     tracker.add("script-select", "Select script type")
     tracker.complete("script-select", selected_script)
     for key, label in [
+        ("local-check", "Check for local templates"),
         ("fetch", "Fetch latest release"),
         ("download", "Download template"),
         ("extract", "Extract template"),
@@ -1044,7 +1197,23 @@ def init(
             local_ssl_context = ssl_context if verify else False
             local_client = httpx.Client(verify=local_ssl_context)
 
-            download_and_extract_template(project_path, selected_ai, selected_script, here, verbose=False, tracker=tracker, client=local_client, debug=debug, github_token=github_token)
+            # First, check if local templates are available
+            if has_local_templates():
+                if tracker:
+                    tracker.complete("local-check", "found - using local templates")
+                elif debug:
+                    console.print("[cyan]Local templates found - using installed templates instead of downloading from GitHub[/cyan]")
+                
+                # Use local templates
+                copy_local_templates(project_path, selected_ai, selected_script, here, tracker)
+            else:
+                if tracker:
+                    tracker.skip("local-check", "not found - will download from GitHub")
+                elif debug:
+                    console.print("[yellow]Local templates not found - downloading from GitHub[/yellow]")
+                
+                # Local templates not available, fall back to GitHub download
+                download_and_extract_template(project_path, selected_ai, selected_script, here, verbose=False, tracker=tracker, client=local_client, debug=debug, github_token=github_token)
 
             ensure_executable_scripts(project_path, tracker=tracker)
 
@@ -1170,25 +1339,18 @@ def check():
 
     tracker.add("git", "Git version control")
     git_ok = check_tool("git", tracker=tracker)
-
+    
     agent_results = {}
     for agent_key, agent_config in AGENT_CONFIG.items():
         agent_name = agent_config["name"]
-        requires_cli = agent_config["requires_cli"]
-
+        
         tracker.add(agent_key, agent_name)
-
-        if requires_cli:
-            agent_results[agent_key] = check_tool(agent_key, tracker=tracker)
-        else:
-            # IDE-based agent - skip CLI check and mark as optional
-            tracker.skip(agent_key, "IDE-based, no CLI check")
-            agent_results[agent_key] = False  # Don't count IDE agents as "found"
-
+        agent_results[agent_key] = check_tool(agent_key, tracker=tracker)
+    
     # Check VS Code variants (not in agent config)
     tracker.add("code", "Visual Studio Code")
     code_ok = check_tool("code", tracker=tracker)
-
+    
     tracker.add("code-insiders", "Visual Studio Code Insiders")
     code_insiders_ok = check_tool("code-insiders", tracker=tracker)
 
@@ -1207,4 +1369,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
