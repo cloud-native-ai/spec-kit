@@ -11,6 +11,17 @@ if [ -f "$SCRIPT_DIR/common.sh" ]; then
     ensure_utf8_locale || true
 fi
 
+# Fallback: if common.sh wasn't sourced or locale still isn't UTF-8, set a UTF-8 locale
+if ! locale 2>/dev/null | grep -qi 'utf-8'; then
+    if locale -a 2>/dev/null | grep -qi '^C\.utf8\|^C\.UTF-8$'; then
+        export LC_ALL=C.UTF-8
+        export LANG=C.UTF-8
+    elif locale -a 2>/dev/null | grep -qi '^en_US\.utf8\|^en_US\.UTF-8$'; then
+        export LC_ALL=en_US.UTF-8
+        export LANG=en_US.UTF-8
+    fi
+fi
+
 JSON_MODE=false
 SHORT_NAME=""
 ARGS=()
@@ -190,7 +201,15 @@ if [ ${#BRANCH_NAME} -gt $MAX_BRANCH_LENGTH ]; then
 fi
 
 if [ "$HAS_GIT" = true ]; then
-    git checkout -b "$BRANCH_NAME"
+    # In JSON mode, prevent any git messages from polluting output
+    if $JSON_MODE; then
+        if ! git checkout -b "$BRANCH_NAME" >/dev/null 2>&1; then
+            >&2 echo "[specify] Error: Failed to create and switch to branch '$BRANCH_NAME'"
+            exit 1
+        fi
+    else
+        git checkout -b "$BRANCH_NAME"
+    fi
 else
     >&2 echo "[specify] Warning: Git repository not detected; skipped branch creation for $BRANCH_NAME"
 fi
