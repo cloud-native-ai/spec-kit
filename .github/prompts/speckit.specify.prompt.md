@@ -24,14 +24,31 @@ Given that feature description, do this:
      - "Create a dashboard for analytics" → "analytics-dashboard"
      - "Fix payment processing timeout bug" → "fix-payment-timeout"
 
-2. Run the script `.specify/scripts/bash/create-new-feature.sh --json "$ARGUMENTS"` from repo root **with the short-name argument** and parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
+2. From repo root, run the script using a safe heredoc handoff for the JSON argument to prevent shell parsing issues. Write the raw user input to a temp file via heredoc, then pass its contents to `--json`, and include the short-name argument. Parse the script's JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
 
    **IMPORTANT**:
 
-   - Append the short-name argument to the `.specify/scripts/bash/create-new-feature.sh --json "$ARGUMENTS"` command with the 2-4 word short name you created in step 1. Keep the feature description as the final argument.
-   - Bash example: `--short-name "your-generated-short-name" "Feature description here"`
-   - PowerShell example: `-ShortName "your-generated-short-name" "Feature description here"`
-   - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot")
+    - Use heredoc to avoid shell interpreting special characters in the JSON argument:
+       - Create a temp file and write the user input verbatim using a single-quoted heredoc delimiter (prevents expansion):
+       
+          ```bash
+          TMP_FILE=$(mktemp)
+          cat >"$TMP_FILE" <<'EOF'
+          $ARGUMENTS
+          EOF
+          ```
+       - Invoke the script, passing JSON via command substitution and appending the short-name and the original feature description as the final argument:
+       
+          ```bash
+          .specify/scripts/bash/create-new-feature.sh \
+             --json "$(cat "$TMP_FILE")" \
+             --short-name "your-generated-short-name" \
+             "Feature description here"
+          rm -f "$TMP_FILE"
+          ```
+    - Keep the feature description as the final argument (unchanged from previous behavior).
+    - PowerShell users can continue to use: `-ShortName "your-generated-short-name" "Feature description here"`
+    - Avoid inlining JSON directly in the shell; the heredoc approach above prevents failures when input contains quotes, backslashes, newlines, or other special characters.
    - You must only ever run this script once
    - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for
 

@@ -68,8 +68,22 @@ generate_commands() {
       in_agent_scripts && /^[a-zA-Z]/ { in_agent_scripts=0 }
     ')
     
-    # Replace {SCRIPT} placeholder with the script command
-    body=$(printf '%s\n' "$file_content" | sed "s|{SCRIPT}|${script_command}|g")
+    # If this is the specify command for bash variant (sh), rewrite the {SCRIPT} placeholder
+    # to use a heredoc based safe JSON handoff to avoid shell interpretation of special chars.
+    # We only transform for the 'specify' template and only for the bash (sh) variant.
+    if [[ "$name" == "specify" && "$script_variant" == "sh" ]]; then
+      # Original script_command includes: scripts/bash/create-new-feature.sh --json "{ARGS}"
+      # We instead present a multi-line snippet that writes $ARGUMENTS (later substituted)
+      # into a temp file via single-quoted heredoc, then feeds it safely to the script.
+      # Keep the rest of the instructional flow unchanged; only {SCRIPT} expands to this block.
+      # NOTE: We intentionally do NOT append --short-name here because the instructions in the
+      # template explain adding it separately. The user will insert --short-name after the --json argument.
+      # The {ARGS} token will later be replaced (e.g. $ARGUMENTS or {{args}}) after this substitution.
+      script_command=$'TMP_FILE=$(mktemp)\ncat >"$TMP_FILE" <<\'EOF\'\n{ARGS}\nEOF\nscripts/bash/create-new-feature.sh --json "$(cat "$TMP_FILE")"\nrm -f "$TMP_FILE"'
+    fi
+
+  # Defer {SCRIPT} replacement to avoid sed issues with multiline content; store raw content now.
+  body=$(printf '%s\n' "$file_content")
     
     # Replace {AGENT_SCRIPT} placeholder with the agent script command if found
     if [[ -n $agent_script_command ]]; then
@@ -86,8 +100,10 @@ generate_commands() {
       { print }
     ')
     
-    # Apply other substitutions
-    body=$(printf '%s\n' "$body" | sed "s/{ARGS}/$arg_format/g" | sed "s/__AGENT__/$agent/g" | rewrite_paths)
+  # Apply {SCRIPT} placeholder replacement using bash parameter expansion (safe for multiline)
+  body=${body//\{SCRIPT\}/$script_command}
+  # Apply other substitutions ({ARGS}, __AGENT__, path rewrites)
+  body=$(printf '%s\n' "$body" | sed "s/{ARGS}/$arg_format/g" | sed "s/__AGENT__/$agent/g" | rewrite_paths)
     
     case $ext in
       toml)
