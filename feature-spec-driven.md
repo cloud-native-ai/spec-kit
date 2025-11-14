@@ -1,12 +1,3 @@
-好的，已收到您的指令。我将严格以您提供的原始文档（`spec-driven.md`）为基础，并参考您给出的 `F-SDD` 流程设计，对生成的 **Feature-Centric Specification-Driven Development (F-SDD)** 文档进行内容校验和补充。
-
-我的目标是：
-1.  **保持风格一致**：确保新文档的语言、结构和术语与 `spec-driven.md` 完全一致。
-2.  **内容校验**：检查现有 F-SDD 文档中是否有与 `spec-driven.md` 内容相悖或不一致的地方。
-3.  **精准补充**：将您设计的详细流程步骤无缝、自然地融入原文，使其看起来像是原作者撰写的扩展内容。
-
----
-
 # Feature-Centric Specification-Driven Development (F-SDD)
 
 ## The Power Inversion, Centered on Features
