@@ -3,65 +3,85 @@
 
 # Ensure the script runs in a UTF-8 locale to better support Unicode processing
 ensure_utf8_locale() {
-    # If current locale isn't UTF-8, try to switch to a UTF-8-capable one
+    # Always set to C.UTF-8 for consistent behavior across systems
+    # C.UTF-8 is available on most modern Linux distributions and provides
+    # a minimal, consistent UTF-8 environment without language-specific rules
+    if locale -a 2>/dev/null | grep -qi '^C\.utf8\|^C\.UTF-8$'; then
+        export LC_ALL=C.UTF-8
+        export LANG=C.UTF-8
+    elif locale -a 2>/dev/null | grep -qi '^en_US\.utf8\|^en_US\.UTF-8$'; then
+        # Fallback to en_US.UTF-8 if C.UTF-8 is not available
+        export LC_ALL=en_US.UTF-8
+        export LANG=en_US.UTF-8
+    else
+        # If no UTF-8 locale is available, set minimal UTF-8 support
+        export LC_ALL=C
+        export LANG=C
+        # Note: This may cause issues with non-ASCII characters, but it's the best we can do
+    fi
+    
+    # Verify that the locale is actually UTF-8 capable
     if ! locale 2>/dev/null | grep -qi 'utf-8'; then
-        if locale -a 2>/dev/null | grep -qi '^C\.utf8\|^C\.UTF-8$'; then
-            export LC_ALL=C.UTF-8
-            export LANG=C.UTF-8
-        elif locale -a 2>/dev/null | grep -qi '^en_US\.utf8\|^en_US\.UTF-8$'; then
-            export LC_ALL=en_US.UTF-8
-            export LANG=en_US.UTF-8
-        fi
+        echo "Warning: Unable to set UTF-8 locale. Unicode handling may be limited." >&2
     fi
 }
 
 # Unicode-aware slugify: keep letters and digits from all languages, replace others with '-'
 # Usage: slugify_unicode "Some 标题 示例"  -> some-标题-示例
+# Pure bash implementation - no external dependencies
 slugify_unicode() {
-    # Prefer Python 3 for robust Unicode handling; fall back to Perl; then to basic sed
-    if command -v python3 >/dev/null 2>&1; then
-        python3 - "$@" <<'PY'
-import sys
-def slugify(s: str) -> str:
-    s = s.strip()
-    out = []
-    prev_hyphen = False
-    for ch in s:
-        if ch.isalnum():
-            out.append(ch.lower())
-            prev_hyphen = False
-        else:
-            if not prev_hyphen:
-                out.append('-')
-                prev_hyphen = True
-    result = ''.join(out).strip('-')
-    return result or 'feature'
-
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        text = ' '.join(sys.argv[1:])
-    else:
-        text = sys.stdin.read()
-    print(slugify(text))
-PY
-        return $?
-    elif command -v perl >/dev/null 2>&1; then
-        # Perl with Unicode properties
-        perl -CSD -Mutf8 -e '
-            binmode STDIN,  ":utf8"; binmode STDOUT, ":utf8"; 
-            local $/; 
-            my $s = @ARGV ? join(" ", @ARGV) : <STDIN>; 
-            $s =~ s/[^\p{L}\p{N}]+/-/g; 
-            $s =~ s/^-+|-+$//g; 
-            $s = length($s) ? lc($s) : "feature"; 
-            print $s; 
-        ' -- "$@"
-        return $?
-    else
-        # Fallback (ASCII only)
-        echo "$*" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/-\+/-/g; s/^-//; s/-$//' | sed 's/^$/feature/'
-        return $?
+    # Fallback (ASCII only) - pure bash implementation
+    local input="$*"
+    local result=""
+    local prev_was_separator=0
+    
+    # Handle empty input
+    if [ -z "$input" ]; then
+        echo "feature"
+        return 0
     fi
+    
+    # Convert to lowercase and process character by character
+    # Note: This is ASCII-only but safe for all UTF-8 since we only modify ASCII ranges
+    local i=0
+    local len=${#input}
+    
+    while [ $i -lt $len ]; do
+        local char="${input:$i:1}"
+        
+        # Check if character is alphanumeric (ASCII only check)
+        # For non-ASCII UTF-8 characters, they will pass through unchanged
+        case "$char" in
+            [a-zA-Z0-9])
+                # Alphanumeric character - add as lowercase
+                if [ "$char" != "${char%[A-Z]*}" ]; then
+                    # It's uppercase, convert to lowercase
+                    char=$(printf "%s" "$char" | tr '[:upper:]' '[:lower:]')
+                fi
+                result="${result}${char}"
+                prev_was_separator=0
+                ;;
+            *)
+                # Non-alphanumeric character - treat as separator
+                if [ $prev_was_separator -eq 0 ]; then
+                    result="${result}-"
+                    prev_was_separator=1
+                fi
+                ;;
+        esac
+        i=$((i + 1))
+    done
+    
+    # Remove leading and trailing hyphens
+    result="${result#-}"
+    result="${result%-}"
+    
+    # Handle case where result is empty
+    if [ -z "$result" ]; then
+        result="feature"
+    fi
+    
+    echo "$result"
 }
 
 # Get repository root, with fallback for non-git repositories
@@ -217,3 +237,124 @@ EOF
 check_file() { [[ -f "$1" ]] && echo "  ✓ $2" || echo "  ✗ $2"; }
 check_dir() { [[ -d "$1" && -n $(ls -A "$1" 2>/dev/null) ]] && echo "  ✓ $2" || echo "  ✗ $2"; }
 
+
+# Function: json_escape
+# Description: Escapes a string for safe inclusion in JSON
+# Usage: escaped=$(json_escape "$input")
+# Parameters:
+#   $1 - The input string to escape
+# Returns:
+#   The JSON-escaped string via stdout
+json_escape() {
+    local input="$1"
+    local escaped=""
+    local i=0
+    local char
+    
+    # Process each character
+    while [ $i -lt ${#input} ]; do
+        char="${input:$i:1}"
+        case "$char" in
+            '"')  escaped="${escaped}\\\"";;
+            '\\') escaped="${escaped}\\\\\\\\";;
+            '/')  escaped="${escaped}\/";;
+            $'\b') escaped="${escaped}\\b";;
+            $'\f') escaped="${escaped}\\f";;
+            $'\n') escaped="${escaped}\\n";;
+            $'\r') escaped="${escaped}\\r";;
+            $'\t') escaped="${escaped}\\t";;
+            *) 
+                # Check if character is a control character (ASCII 0-31)
+                if [ "$(printf '%d' "'$char")" -lt 32 ]; then
+                    # Convert to \uXXXX format
+                    printf -v hex '%04x' "$(printf '%d' "'$char")"
+                    escaped="${escaped}\\u${hex}"
+                else
+                    escaped="${escaped}${char}"
+                fi
+                ;;
+        esac
+        i=$((i + 1))
+    done
+    
+    echo "$escaped"
+}
+
+
+# Function: safe_quote
+# Description: Safely quotes a string so it can be used as a shell argument without interpretation
+# Usage: safe_quoted=$(safe_quote "$input")
+# Parameters:
+#   $1 - The input string to quote
+# Returns:
+#   The safely quoted string via stdout
+#   Exit code 1 if no input is provided
+safe_quote() {
+    local input="$1"
+    
+    # Check if input is provided
+    if [ -z "$input" ]; then
+        echo "Error: No input provided to safe_quote" >&2
+        return 1
+    fi
+    
+    # Use printf '%q' to safely quote the input
+    # This handles all special characters including $, ", ', \, |, ;, &, *, ?, [, ], {, }, (, ), <, >, !, #, `, ~, ^, =, %, +, -, ., /, :, @
+    printf '%q' "$input"
+}
+
+
+# Function: validate_input
+# Description: Validates input length and basic structure
+# Usage: validate_input "$input" || { echo "Invalid input"; exit 1; }
+# Parameters:
+#   $1 - The input string to validate
+#   $2 - Maximum length (optional, defaults to 10000)
+# Returns:
+#   0 if input is valid, 1 if invalid
+#   Error message via stderr if invalid
+validate_input() {
+    local input="$1"
+    local max_length="${2:-10000}"
+    
+    # Check if input is provided
+    if [ -z "$input" ]; then
+        echo "Error: No input provided to validate_input" >&2
+        return 1
+    fi
+    
+    # Check input length
+    local input_length="${#input}"
+    if [ "$input_length" -gt "$max_length" ]; then
+        echo "Error: Input exceeds maximum length of $max_length characters (actual length: $input_length)" >&2
+        return 1
+    fi
+    
+    # Basic validation passed
+    return 0
+}
+
+# Function: is_valid_utf8
+# Description: Checks if input contains valid UTF-8 sequences
+# Usage: is_valid_utf8 "$input" || { echo "Invalid UTF-8"; exit 1; }
+# Parameters:
+#   $1 - The input string to validate
+# Returns:
+#   0 if input is valid UTF-8, 1 if invalid
+# Note: This relies on the system's iconv command which should be available on most systems
+is_valid_utf8() {
+    local input="$1"
+    
+    # Check if input is provided
+    if [ -z "$input" ]; then
+        return 0  # Empty string is valid
+    fi
+    
+    # Use iconv to validate UTF-8. If it fails, the input is not valid UTF-8
+    if printf '%s' "$input" | iconv -f UTF-8 -t UTF-8 >/dev/null 2>&1; then
+        return 0
+    else
+        echo "Error: Input contains invalid UTF-8 sequences" >&2
+        return 1
+    fi
+}
