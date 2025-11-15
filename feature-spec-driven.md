@@ -24,53 +24,53 @@ The F-SDD workflow begins with a high-level idea or a collection of user stories
 
 This phase establishes the project's foundational rules and creates an initial map of its potential capabilities.
 
-#### ## 1. `/constitution` (Establishing the Project Constitution)
+#### ## 1. `/speckit.constitution` (Establishing the Project Constitution)
 *   **Purpose**: Define the immutable architectural and quality principles that will govern all future development.
-*   **Process**: Execute the `/constitution` command. An AI agent analyzes the project type and organizational best practices to generate a `constitution.md`.
+*   **Process**: Execute the `/speckit.constitution` command. An AI agent analyzes the project type and organizational best practices to generate a `constitution.md`.
 *   **Output**: A `constitution.md` file containing non-negotiable rules like "Library-First Principle," "Test-First Imperative," and "Simplicity Gates." This acts as the system's DNA, ensuring consistency across all features.
 
-#### ## 2. `/features` (Generating the Initial Feature List)
+#### ## 2. `/speckit.feature` (Generating the Initial Feature List)
 *   **Purpose**: Create a structured inventory of the project's core capabilities based on high-level goals or existing context.
-*   **Process**: Execute the `/features` command. An AI agent scans any available input (e.g., product vision, initial requirements) and proposes a preliminary set of features.
+*   **Process**: Execute the `/speckit.feature` command. An AI agent scans any available input (e.g., product vision, initial requirements) and proposes a preliminary set of features.
 *   **Output**: A `features.md` file listing all identified features with IDs, names, and brief descriptions. This document serves as the master index for all development work.
 
 ### # Development Phase
 
 This phase is a repeatable cycle for delivering individual features. Each feature progresses through a series of AI-assisted commands.
 
-#### ## 3. `/specify` (Creating the Feature Specification)
+#### ## 3. `/speckit.specify` (Creating the Feature Specification)
 *   **Purpose**: Transform a user story or requirement into a complete, structured specification for a single feature.
-*   **Process**: Execute the `/new_feature` command with a feature description. The AI creates a dedicated branch and populates it with a `feature-spec.md` template.
+*   **Process**: Execute the `/speckit.new_feature` command with a feature description. The AI creates a dedicated branch and populates it with a `feature-spec.md` template.
 *   **Output**: A `feature-spec.md` file in a feature-specific directory (e.g., `specs/001-user-login/feature-spec.md`) containing user stories, acceptance criteria, and `[NEEDS CLARIFICATION]` markers for ambiguities.
 
-#### ## 4. `/clarify` (Refining the Spec and Linking to Feature)
+#### ## 4. `/speckit.clarify` (Refining the Spec and Linking to Feature)
 *   **Purpose**: Resolve ambiguities in the specification and formally link it to the master feature list.
 *   **Process**: The team reviews the `feature-spec.md`, answers clarification questions, and removes `[NEEDS CLARIFICATION]` markers. Upon approval, the corresponding entry in `features.md` is updated to reference this `feature-spec.md` and its status is changed (e.g., from "Proposed" to "Specified").
 *   **Output**: A finalized `feature-spec.md` and an updated `features.md` with bidirectional links, establishing full traceability.
 
-#### ## 5. `/plan` (Generating the Implementation Plan)
+#### ## 5. `/speckit.plan` (Generating the Implementation Plan)
 *   **Purpose**: Translate the approved specification into a concrete, actionable technical blueprint.
-*   **Process**: Execute the `/generate_plan` command. The AI reads the `feature-spec.md`, consults the `constitution.md`, and generates an `implementation-plan.md`.
+*   **Process**: Execute the `/speckit.generate_plan` command. The AI reads the `feature-spec.md`, consults the `constitution.md`, and generates an `implementation-plan.md`.
 *   **Output**: An `implementation-plan.md` file containing technology choices with rationale, data models, API contracts (`contracts/`), research findings (`research.md`), and a quickstart validation guide. This plan enforces constitutional gates (e.g., Simplicity Gate).
 
-#### ## 6. `/tasks` (Deriving Executable Tasks)
+#### ## 6. `/speckit.tasks` (Deriving Executable Tasks)
 *   **Purpose**: Break down the implementation plan into a granular, executable task list.
-*   **Process**: The AI analyzes the `implementation-plan.md`, `data-model.md`, and `contracts/` to derive specific actions. *(Note: As per the original document, this step is implied in the `/generate_plan` command's output of detailed documents, but not a separate command. We treat the creation of `tasks.md` as part of the plan's derivation.)*
+*   **Process**: The AI analyzes the `implementation-plan.md`, `data-model.md`, and `contracts/` to derive specific actions. *(Note: As per the original document, this step is implied in the `/speckit.generate_plan` command's output of detailed documents, but not a separate command. We treat the creation of `tasks.md` as part of the plan's derivation.)*
 *   **Output**: A `tasks.md` file (or equivalent task list within the plan) listing atomic tasks, marking independent ones `[P]` for parallelization, ready for a Task Agent to execute.
 
-#### ## 7. `/analyze` (Task Confirmation)
+#### ## 7. `/speckit.analyze` (Task Confirmation)
 *   **Purpose**: Ensure the generated task list is correct, complete, and aligned with the specification before execution.
 *   **Process**: A human developer reviews the `tasks.md` and `implementation-plan.md`, verifies its alignment with the `feature-spec.md`, and approves it for execution.
 *   **Output**: A confirmed task list, signaling the start of automated implementation.
 
-#### ## 8. `/implement` (AI-Assisted Development)
+#### ## 8. `/speckit.implement` (AI-Assisted Development)
 *   **Purpose**: Generate code, tests, and other artifacts by executing the approved tasks.
 *   **Process**: A Task Agent processes the `tasks.md`, generating code one task at a time. All changes are made in the feature branch.
 *   **Output**: Code commits that implement the feature according to the spec and plan.
 
-#### ## 9. `/checklist` (Final Verification and Feature Update)
+#### ## 9. `/speckit.checklist` (Final Verification and Feature Update)
 *   **Purpose**: Perform a final quality check and update the feature's status in the master list.
-*   **Process**: Run the `/checklist` command. An AI agent performs consistency checks, SAST scanning, and ensures all tests pass. The human team performs final validation. Once passed, the `features.md` is updated to mark the feature as "Implemented" or "Ready for Review."
+*   **Process**: Run the `/speckit.checklist` command. An AI agent performs consistency checks, SAST scanning, and ensures all tests pass. The human team performs final validation. Once passed, the `features.md` is updated to mark the feature as "Implemented" or "Ready for Review."
 *   **Output**: Verified code, test reports, and an updated `features.md` reflecting the latest state of the project.
 
 ## Why F-SDD Matters Now
@@ -112,7 +112,7 @@ At the heart of F-SDD lies the `constitution.md`, a set of immutable principles 
 *   **Articles VII & VIII: Simplicity and Anti-Abstraction**: Combat over-engineering with explicit gates in the `plan.md`.
 *   **Article IX: Integration-First Testing**: Prioritize real environments over mocks.
 
-These articles are enforced automatically by the `/generate_plan` command, transforming AI from a code generator into an architectural partner.
+These articles are enforced automatically by the `/speckit.generate_plan` command, transforming AI from a code generator into an architectural partner.
 
 ## The Transformation
 
