@@ -7,6 +7,23 @@ All notable changes to the Specify CLI and templates are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.21] - 2025-11-17
+
+### Added
+
+- **New `/speckit.feature` command**: Implements Feature-Centric Specification-Driven Development (F-SDD) by creating and managing a project-level feature index (`features.md` file)
+  - Generates feature entries with sequential IDs (001, 002, etc.), names, descriptions, and status
+  - Integrates with existing SDD workflow (`/speckit.specify`, `/speckit.plan`, etc.)
+  - Serves as single source of truth for all project capabilities and their implementation state
+  - Automatically updates feature status and metadata as features progress through their lifecycle
+  - Based on the F-SDD methodology described in `feature-spec-driven.md`
+
+### Fixed
+
+- **Fixed `/speckit.specify` command script format**: Updated the heredoc format in the command template to use the correct `cat << 'EOF' | .specify/scripts/bash/create-new-feature.sh --json` syntax as specified in the documentation
+  - Resolves issue where the script placeholder was not generating the proper heredoc structure
+  - Ensures proper escaping and argument passing for complex feature descriptions
+
 ## [0.0.20] - 2025-10-14
 
 ### Added

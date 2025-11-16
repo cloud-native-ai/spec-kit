@@ -2,10 +2,10 @@
 description: Create or update the feature specification from a natural language feature description.
 scripts:
   sh: |
-    cat <'EOF' | scripts/bash/create-new-feature.sh --json
+    cat << 'EOF' | .specify/scripts/bash/create-new-feature.sh --json
     $ARGUMENTS
     EOF
-  ps: scripts/powershell/create-new-feature.ps1 -Json "{ARGUMENTS}"
+  ps: .specify/scripts/powershell/create-new-feature.ps1 -Json "{ARGUMENTS}"
 ---
 
 ## User Input
@@ -34,11 +34,11 @@ Given that feature description, do this:
      - "Create a dashboard for analytics" → "analytics-dashboard"
      - "Fix payment processing timeout bug" → "fix-payment-timeout"
 
-2. Run the script `{SCRIPT}` from repo root and include the short-name argument. Parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
+2. Run the script `cat << 'EOF' | .specify/scripts/bash/create-new-feature.sh --json` from repo root and include the short-name argument. Parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
 
    **IMPORTANT**:
 
-   - For Bash, `{SCRIPT}` expands to a heredoc-based, safe JSON handoff that writes the raw user input to stdin and passes its contents to `{SCRIPT} --json`. This avoids shell parsing issues with quotes, backslashes, and newlines.
+   - For Bash, this expands to a heredoc-based, safe JSON handoff that writes the raw user input to stdin and passes its contents to `.specify/scripts/bash/create-new-feature.sh --json`. This avoids shell parsing issues with quotes, backslashes, and newlines.
    - Append the short-name argument you created in step 1, and keep the feature description as the final argument.
    - PowerShell continues to use: `-ShortName "your-generated-short-name" "Feature description here"`.
    - You must only ever run this script once.

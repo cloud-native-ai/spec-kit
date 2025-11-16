@@ -8,7 +8,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-The text the user typed after `/speckit.specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `{ARGS}` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
+The text the user typed after `/speckit.specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `{ARGUMENTS}` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
 Given that feature description, do this:
 
@@ -24,23 +24,15 @@ Given that feature description, do this:
      - "Create a dashboard for analytics" → "analytics-dashboard"
      - "Fix payment processing timeout bug" → "fix-payment-timeout"
 
-2. From repo root, run the script using the new heredoc-based pipe format from specify.md. Parse the script's JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
+2. Run the script `|` from repo root and include the short-name argument. Parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
 
    **IMPORTANT**:
 
-    - Use the exact format from specify.md to avoid shell interpreting special characters in the JSON argument:
-
-       ```bash
-       cat <'EOF' | scripts/bash/create-new-feature.sh --json
-       $ARGUMENTS
-       EOF
-       ```
-
-    - Append the short-name argument you created in step 1, and keep the feature description as the final argument.
-    - PowerShell users can continue to use: `-ShortName "your-generated-short-name" "Feature description here"`
-    - The heredoc approach prevents failures when input contains quotes, backslashes, newlines, or other special characters.
-    - You must only ever run this script once
-    - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for
+   - For Bash, `|` expands to a heredoc-based, safe JSON handoff that writes the raw user input to stdin and passes its contents to `| --json`. This avoids shell parsing issues with quotes, backslashes, and newlines.
+   - Append the short-name argument you created in step 1, and keep the feature description as the final argument.
+   - PowerShell continues to use: `-ShortName "your-generated-short-name" "Feature description here"`.
+   - You must only ever run this script once.
+   - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for.
 
 3. Load `.specify/templates/spec-template.md` to understand required sections.
 

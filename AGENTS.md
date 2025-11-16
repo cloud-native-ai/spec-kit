@@ -392,3 +392,7 @@ When adding new agents:
 ---
 
 *This documentation should be updated whenever new agents are added to maintain accuracy and completeness.*
+
+## Recent Changes
+- 002-test-fixed-specify: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+- 002-test-fixed-specify: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]

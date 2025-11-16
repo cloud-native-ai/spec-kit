@@ -56,12 +56,12 @@ while [ $i -le $# ]; do
             echo ""
             echo "Behavior:"
             echo "  - If feature_description is provided as argument, creates a new feature specification"
-            echo "  - If no arguments provided but input is available on stdin, executes the stdin content as a command"
+            echo "  - If no arguments provided but input is available on stdin, creates a new feature specification from stdin content"
             echo ""
             echo "Examples:"
             echo "  $0 'Add user authentication system' --short-name 'user-auth'"
             echo "  $0 'Implement OAuth2 integration for API'"
-            echo "  echo 'echo \"Price is \$100\"' | $0 --json"
+            echo "  echo 'Price is \$100' | $0 --json"
             exit 0
             ;;
         *) 
@@ -72,6 +72,14 @@ while [ $i -le $# ]; do
 done
 
 FEATURE_DESCRIPTION="${ARGS[*]}"
+
+# If no command line arguments provided, read from stdin
+if [ -z "$FEATURE_DESCRIPTION" ]; then
+    if [ ! -t 0 ]; then
+        # stdin is not a terminal, read from it
+        FEATURE_DESCRIPTION=$(cat)
+    fi
+fi
 
 if [ -z "$FEATURE_DESCRIPTION" ]; then
     echo "Usage: $0 [--json] [--short-name <name>] <feature_description>" >&2
