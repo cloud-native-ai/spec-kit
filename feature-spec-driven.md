@@ -1,5 +1,67 @@
 # Feature-Centric Specification-Driven Development (F-SDD)
 
+## The Evolution of SDD
+
+While SDD establishes the core principle that **code serves specifications**, Feature-Centric Specification-Driven Development (F-SDD) builds upon this foundation by introducing a crucial new dimension: the **feature**.
+
+### Requirement vs. Feature: Two Sides of the Same Coin
+
+It's essential to understand the relationship between *requirements* and *features*:
+*   **Requirements**: These are the external demands or expectations placed on the system. They originate from users, stakeholders, or business goals and answer the question: "What should the system be able to do?"
+*   **Features**: These are the internal, realized capabilities of the system. They are the concrete, implemented answers to the requirements and answer the question: "What can the system actually do?"
+
+In essence, **requirements drive the creation and evolution of features, and features are the tangible embodiment of requirements**. F-SDD formalizes this relationship, making features the primary management unit for delivering value.
+
+### The F-SDD Workflow: SDD + Feature as the Organizing Principle
+
+F-SDD is not a replacement for SDD; it is its natural evolution. The core SDD commands (`/speckit.specify`, `/speckit.plan`, `/speckit.tasks`, etc.) remain the engine of development. F-SDD adds a lightweight layer of feature-centric semantics on top of this powerful engine.
+
+The workflow introduces just **one new command** to the SDD process:
+
+#### ## 1. `/speckit.feature` (Generating the Feature Index)
+*   **Purpose**: Create or update a project-level feature index based on high-level goals or existing context.
+*   **Process**: Execute `/speckit.feature`. The AI generates or updates feature entries (including ID, name, brief description) based on product vision, requirement refinement, and other inputs, but subsequent specifications, plans, and tasks still follow the standard SDD process.
+*   **Output**: A `features.md` file that records identified features and their basic information; this is the only new command output in F-SDD compared to pure SDD.
+
+### Integrating Features into the SDD Loop
+
+Once the feature index is established, the standard SDD workflow is executed, but now each step is explicitly tied to a specific feature. This creates a clear, traceable lineage from business intent (feature) to technical execution (specification) to working software (code).
+
+The development phase is an SDD cycle with "feature semantics". That is to say:
+
+*   **The SDD Chain Remains**: `/speckit.specify` → `/speckit.plan` → `/speckit.tasks` → `/speckit.analyze` → `/speckit.implement` → `/speckit.checklist`
+*   **The Feature Layer is Added**: Every artifact and action is explicitly linked to a feature ID, and the `features.md` file is updated at key points in the process.
+
+This integration happens seamlessly within the existing commands:
+
+1.  **`/speckit.specify` (Specifying by Feature)**  
+    - **Behavior**: Starting from user stories or requirements, generate a standard `spec.md` and place it under `.specify/specs/<feature-id>/`; branch naming can also include `<feature-id>` for tracking.  
+    - **Feature Integration**: When specifications are created/updated, write metadata such as specification path, key acceptance criteria, etc., to the corresponding feature entry.
+
+2.  **`/speckit.plan` & `/speckit.tasks` (Planning and Tasking by Feature)**  
+    - All generated documents (`plan.md`, `data-model.md`, `tasks.md`, etc.) are stamped with the feature ID.
+    - Tasks are prefixed with the feature ID for clear scoping.
+
+3.  **`/speckit.analyze` (Feature-Consistency Review)**  
+    - Confirms that the tasks fully cover the feature's acceptance criteria.
+    - **Updates the feature's status** in `features.md` (e.g., from `Draft` to `Planned`) and logs key risks or open questions.
+
+4.  **`/speckit.implement` (Implementing by Feature)**  
+    - Code, tests, and documentation are generated within a feature-branched context.
+    - Commit messages and code comments reference the feature ID for full traceability.
+
+5.  **`/speckit.checklist` (Final Gate + Feature Status Update)**  
+    - Performs all standard SDD quality checks (consistency, static analysis, security scans, tests).
+    - **Updates the `features.md` entry** to reflect the final state (e.g., `Implemented` or `Ready for Review`) and can link to test reports.
+
+Through this approach, F-SDD provides a powerful framework for managing scope, ensuring traceability, and aligning technical work with business value—all without introducing any new "implementation" commands. The feature is simply a semantic label that threads through the entire, proven SDD process.
+
+*   `/speckit.feature`: Manages the "what" and the current state of features.
+*   SDD Commands: Handle the "how" of specifying, planning, and implementing each feature.
+*   `/speckit.analyze` & `/speckit.checklist`: Act as the synchronization points, ensuring the `features.md` index always reflects the true state of the system.
+
+# Feature-Centric Specification-Driven Development (F-SDD)
+
 ## The Power Inversion, Centered on Features
 
 For decades, code has been king. Specifications served code—they were the scaffolding we built and then discarded once the "real work" of coding began. We wrote PRDs to guide development, created design docs to inform implementation, drew diagrams to visualize architecture. But these were always subordinate to the code itself. Code was truth.
@@ -18,7 +80,7 @@ In this new world, maintaining software means evolving specifications, which are
 
 ## The F-SDD Workflow in Practice
 
-The F-SDD workflow begins with a high-level idea or a collection of user stories. It immediately structures this chaos into a manageable form by focusing on features first, then detailing them with specifications.
+The F-SDD workflow reuses SDD commands and artifacts as much as possible, adding only one `/speckit.feature` command at the entry level to maintain the feature index; all other feature tracking, status updates, and validation are handled through existing commands.
 
 ### # Preparation Phase
 
@@ -29,49 +91,49 @@ This phase establishes the project's foundational rules and creates an initial m
 *   **Process**: Execute the `/speckit.constitution` command. An AI agent analyzes the project type and organizational best practices to generate a `constitution.md`.
 *   **Output**: A `constitution.md` file containing non-negotiable rules like "Library-First Principle," "Test-First Imperative," and "Simplicity Gates." This acts as the system's DNA, ensuring consistency across all features.
 
-#### ## 2. `/speckit.feature` (Generating the Initial Feature List)
-*   **Purpose**: Create a structured inventory of the project's core capabilities based on high-level goals or existing context.
-*   **Process**: Execute the `/speckit.feature` command. An AI agent scans any available input (e.g., product vision, initial requirements) and proposes a preliminary set of features.
-*   **Output**: A `features.md` file listing all identified features with IDs, names, and brief descriptions. This document serves as the master index for all development work.
+#### ## 2. `/speckit.feature` (Generating the Feature Index)
+*   **Purpose**: Create or update a project-level feature index based on high-level goals or existing context.
+*   **Process**: Execute `/speckit.feature`. The AI generates or updates feature entries (including ID, name, brief description) based on product vision, requirement refinement, and other inputs, but subsequent specifications, plans, and tasks still follow the standard SDD process.
+*   **Output**: A `features.md` file that records identified features and their basic information; this is the only new command output in F-SDD compared to pure SDD.
 
 ### # Development Phase
 
-This phase is a repeatable cycle for delivering individual features. Each feature progresses through a series of AI-assisted commands.
+This phase is essentially an SDD cycle with "feature semantics". That is to say:
 
-#### ## 3. `/speckit.specify` (Creating the Feature Specification)
-*   **Purpose**: Transform a user story or requirement into a complete, structured specification for a single feature.
-*   **Process**: Execute the `/speckit.new_feature` command with a feature description. The AI creates a dedicated branch and populates it with a `feature-spec.md` template.
-*   **Output**: A `feature-spec.md` file in a feature-specific directory (e.g., `specs/001-user-login/feature-spec.md`) containing user stories, acceptance criteria, and `[NEEDS CLARIFICATION]` markers for ambiguities.
+*   Still use the SDD main chain: `/speckit.specify` → `/speckit.plan` → `/speckit.tasks` → `/speckit.analyze` → `/speckit.implement` → `/speckit.checklist`;
+*   The only requirement is to explicitly carry the feature ID at each step and update `features.md` at appropriate stages.
 
-#### ## 4. `/speckit.clarify` (Refining the Spec and Linking to Feature)
-*   **Purpose**: Resolve ambiguities in the specification and formally link it to the master feature list.
-*   **Process**: The team reviews the `feature-spec.md`, answers clarification questions, and removes `[NEEDS CLARIFICATION]` markers. Upon approval, the corresponding entry in `features.md` is updated to reference this `feature-spec.md` and its status is changed (e.g., from "Proposed" to "Specified").
-*   **Output**: A finalized `feature-spec.md` and an updated `features.md` with bidirectional links, establishing full traceability.
+The entire development phase can be understood as the following lightweight "overlay":
 
-#### ## 5. `/speckit.plan` (Generating the Implementation Plan)
-*   **Purpose**: Translate the approved specification into a concrete, actionable technical blueprint.
-*   **Process**: Execute the `/speckit.generate_plan` command. The AI reads the `feature-spec.md`, consults the `constitution.md`, and generates an `implementation-plan.md`.
-*   **Output**: An `implementation-plan.md` file containing technology choices with rationale, data models, API contracts (`contracts/`), research findings (`research.md`), and a quickstart validation guide. This plan enforces constitutional gates (e.g., Simplicity Gate).
+1. **`/speckit.specify` (Creating specifications by feature)**  
+    - **Behavior**: Starting from user stories or requirements, generate a standard `spec.md` and place it under `.specify/specs/<feature-id>/`; branch naming can also include `<feature-id>` for tracking.  
+    - **Feature Integration**: When specifications are created/updated, write metadata such as specification path, key acceptance criteria, etc., to the corresponding feature entry, but no new commands are needed.
 
-#### ## 6. `/speckit.tasks` (Deriving Executable Tasks)
-*   **Purpose**: Break down the implementation plan into a granular, executable task list.
-*   **Process**: The AI analyzes the `implementation-plan.md`, `data-model.md`, and `contracts/` to derive specific actions. *(Note: As per the original document, this step is implied in the `/speckit.generate_plan` command's output of detailed documents, but not a separate command. We treat the creation of `tasks.md` as part of the plan's derivation.)*
-*   **Output**: A `tasks.md` file (or equivalent task list within the plan) listing atomic tasks, marking independent ones `[P]` for parallelization, ready for a Task Agent to execute.
+2. **`/speckit.plan` (Generating implementation plans by feature)**  
+    - **Behavior**: Generate documents such as `plan.md`, `data-model.md`, `contracts/`, `quickstart.md`, etc., based on `spec.md` and `constitution.md`, which completely follows the existing SDD behavior.  
+    - **Feature Integration**: All generated documents note the feature ID in the title or metadata, making it convenient to reference and navigate in `features.md` later.
 
-#### ## 7. `/speckit.analyze` (Task Confirmation)
-*   **Purpose**: Ensure the generated task list is correct, complete, and aligned with the specification before execution.
-*   **Process**: A human developer reviews the `tasks.md` and `implementation-plan.md`, verifies its alignment with the `feature-spec.md`, and approves it for execution.
-*   **Output**: A confirmed task list, signaling the start of automated implementation.
+3. **`/speckit.tasks` (Deriving tasks by feature)**  
+    - **Behavior**: Derive `tasks.md` from `plan.md` and related documents, still following SDD's conventions for task granularity and parallel markers (`[P]`).  
+    - **Feature Integration**: Include the feature ID in task titles or tags, so that task execution and traceability naturally align with a specific feature.
 
-#### ## 8. `/speckit.implement` (AI-Assisted Development)
-*   **Purpose**: Generate code, tests, and other artifacts by executing the approved tasks.
-*   **Process**: A Task Agent processes the `tasks.md`, generating code one task at a time. All changes are made in the feature branch.
-*   **Output**: Code commits that implement the feature according to the spec and plan.
+4. **`/speckit.analyze` (Consistency review of tasks and features)**  
+    - **Behavior**: Humans and AI together check whether `tasks.md` and `plan.md` cover all acceptance criteria of `spec.md`, this is the existing "task confirmation" step in SDD.  
+    - **Feature Integration**: In this step, the feature's status can be updated from something like "Draft/Proposed" to "Planned/Ready", and key risks, open questions can be written back to `features.md`, without needing additional feature commands.
 
-#### ## 9. `/speckit.checklist` (Final Verification and Feature Update)
-*   **Purpose**: Perform a final quality check and update the feature's status in the master list.
-*   **Process**: Run the `/speckit.checklist` command. An AI agent performs consistency checks, SAST scanning, and ensures all tests pass. The human team performs final validation. Once passed, the `features.md` is updated to mark the feature as "Implemented" or "Ready for Review."
-*   **Output**: Verified code, test reports, and an updated `features.md` reflecting the latest state of the project.
+5. **`/speckit.implement` (Executing tasks by feature)**  
+    - **Behavior**: Task Agent or developers execute according to `tasks.md`, implementing code, tests, and documentation updates.  
+    - **Feature Integration**: As long as branch naming, directory structure, and commit messages continuously carry the feature ID, you can directly reach the specific implementation from `features.md`.
+
+6. **`/speckit.checklist` (Final quality gate + feature status update)**  
+    - **Behavior**: Execute existing checklist logic: consistency checks, static analysis, security scans, test runs, etc.  
+    - **Feature Integration**: In the same command, update the status of the corresponding feature in `features.md` based on check results (e.g., `Planned` → `Implemented` or `Ready for Review`), and can append links to test reports, known limitations, etc.
+
+Through this approach, F-SDD does not introduce new "implementation class" commands, but treats features as a semantic label that runs through the entire SDD process:
+
+*   `/speckit.feature`: Responsible for "what features exist" and their current approximate status;
+*   SDD commands: Responsible for "how this feature is being specified, planned, decomposed, and implemented";
+*   `/speckit.analyze` and `/speckit.checklist`: On top of their original responsibilities, they also maintain feature status and metadata, making `features.md` the true single entry point for feature views.
 
 ## Why F-SDD Matters Now
 

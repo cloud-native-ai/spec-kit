@@ -69,17 +69,11 @@ generate_commands() {
     ')
     
     # If this is the specify command for bash variant (sh), rewrite the {SCRIPT} placeholder
-    # to use a heredoc based safe JSON handoff to avoid shell interpretation of special chars.
+    # to use the new heredoc-based pipe format from specify.md: cat <'EOF' | scripts/bash/create-new-feature.sh --json $ARGUMENTS EOF
     # We only transform for the 'specify' template and only for the bash (sh) variant.
     if [[ "$name" == "specify" && "$script_variant" == "sh" ]]; then
-      # Original script_command includes: scripts/bash/create-new-feature.sh --json "{ARGS}"
-      # We instead present a multi-line snippet that writes $ARGUMENTS (later substituted)
-      # into a temp file via single-quoted heredoc, then feeds it safely to the script.
-      # Keep the rest of the instructional flow unchanged; only {SCRIPT} expands to this block.
-      # NOTE: We intentionally do NOT append --short-name here because the instructions in the
-      # template explain adding it separately. The user will insert --short-name after the --json argument.
-      # The {ARGS} token will later be replaced (e.g. $ARGUMENTS or {{args}}) after this substitution.
-      script_command=$'TMP_FILE=$(mktemp)\ncat >"$TMP_FILE" <<\'EOF\'\n{ARGS}\nEOF\nscripts/bash/create-new-feature.sh --json "$(cat "$TMP_FILE")"\nrm -f "$TMP_FILE"'
+      # Use the exact format from specify.md: cat <'EOF' | scripts/bash/create-new-feature.sh --json {ARGS} EOF
+      script_command="cat <'EOF' | scripts/bash/create-new-feature.sh --json\n{ARGS}\nEOF"
     fi
 
   # Defer {SCRIPT} replacement to avoid sed issues with multiline content; store raw content now.
