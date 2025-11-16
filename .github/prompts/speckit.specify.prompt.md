@@ -29,18 +29,18 @@ Given that feature description, do this:
    **IMPORTANT**:
 
     - Use the exact format from specify.md to avoid shell interpreting special characters in the JSON argument:
-       
+
        ```bash
        cat <'EOF' | scripts/bash/create-new-feature.sh --json
        $ARGUMENTS
        EOF
        ```
-       
+
     - Append the short-name argument you created in step 1, and keep the feature description as the final argument.
     - PowerShell users can continue to use: `-ShortName "your-generated-short-name" "Feature description here"`
     - The heredoc approach prevents failures when input contains quotes, backslashes, newlines, or other special characters.
-   - You must only ever run this script once
-   - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for
+    - You must only ever run this script once
+    - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for
 
 3. Load `.specify/templates/spec-template.md` to understand required sections.
 
