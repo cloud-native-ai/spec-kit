@@ -1,115 +1,100 @@
-# Feature Specification: [FEATURE NAME]
+# Feature Specification: Development Feature Management
 
-**Feature Branch**: `[###-feature-name]`  
-**Created**: [DATE]  
+**Feature Branch**: `001-feature-management-development`  
+**Created**: November 17, 2025  
 **Status**: Draft  
-**Input**: User description: "$ARGUMENTS"
+**Input**: User description: `实现/speckit.feature命令并且修复/speckit.specify命令的问题：/speckit.feature命令就按照feature-spec-driven.md文档中设计的结构进行实现，复/speckit.specify的问题主要体现在speckit.specify.prompt.md中，当时使用模版和脚本生成的描述“2. Run the script | from repo root and include the short-name argument. Parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute。”是不准确的，预期应该生成"cat < 'EOF'\n xxx \nEOF| .specify/scripts/bash/create-new-feature.sh xxx"格式的脚本`
+
+## Clarifications
+
+### Session 2025-11-17
+
+- Q: What is the exact expected format and structure for the `features.md` feature index file? → Markdown table format with columns for ID, Name, Description, Status, Spec Path, and Last Updated
+- Q: How should the system handle concurrent updates to the same feature entry in features.md? → Require manual resolution through git merge conflicts when concurrent edits happen
+- Q: What are the specific performance requirements for the /speckit.feature command when dealing with large feature sets (100+ features)? → Under 5 seconds for up to 100 features
+- Q: Should the feature index (features.md) be automatically committed to git when updated by SDD commands, or should users handle commits manually? → Automatically stage changes to features.md but let users commit manually with their own messages
+- Q: What are the exact status transitions allowed in the feature lifecycle, and what triggers each transition? → Draft → Planned → Implemented → Ready for Review - Transitions triggered by /speckit.specify, /speckit.plan, /speckit.implement, and /speckit.checklist respectively
 
 ## User Scenarios & Testing *(mandatory)*
 
-<!--
-  IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
-  Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
-  you should still have a viable MVP (Minimum Viable Product) that delivers value.
-  
-  Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
-  Think of each story as a standalone slice of functionality that can be:
-  - Developed independently
-  - Tested independently
-  - Deployed independently
-  - Demonstrated to users independently
--->
+### User Story 1 - Create and Manage Feature Index (Priority: P1)
 
-### User Story 1 - [Brief Title] (Priority: P1)
+As a spec-kit project maintainer, I want to be able to generate and maintain a project-level feature index that tracks all features with their IDs, names, descriptions, and current status, so that I can have a single source of truth for all project capabilities and their implementation state.
 
-[Describe this user journey in plain language]
+**Why this priority**: This is the foundational capability that enables the entire F-SDD workflow. Without a feature index, there's no way to track features systematically, making it impossible to implement feature-centric development.
 
-**Why this priority**: [Explain the value and why it has this priority level]
-
-**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
+**Independent Test**: Can be fully tested by running `/speckit.feature` command and verifying that a `features.md` file is created/updated with proper feature entries, and that subsequent SDD commands properly integrate with the feature index.
 
 **Acceptance Scenarios**:
 
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
-2. **Given** [initial state], **When** [action], **Then** [expected outcome]
+1. **Given** a new spec-kit project with no existing features, **When** I run `/speckit.feature`, **Then** a `features.md` file is created with a proper header and empty feature list in Markdown table format with columns for ID, Name, Description, Status, Spec Path, and Last Updated
+2. **Given** an existing spec-kit project with some implemented features, **When** I run `/speckit.feature` with new feature descriptions, **Then** the `features.md` file is updated with new feature entries including ID, name, description, and status in the specified Markdown table format
 
 ---
 
-### User Story 2 - [Brief Title] (Priority: P2)
+### User Story 2 - Integrate Feature Management with SDD Commands (Priority: P2)
 
-[Describe this user journey in plain language]
+As a developer using spec-kit, I want all existing SDD commands (`/speckit.specify`, `/speckit.plan`, `/speckit.tasks`, etc.) to automatically integrate with the feature index by linking artifacts to feature IDs and updating feature status, so that I can maintain full traceability from business intent to implementation.
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**Why this priority**: This integration is what makes F-SDD practical and valuable. Without it, the feature index would be disconnected from the actual development workflow, reducing its utility.
 
-**Independent Test**: [Describe how this can be tested independently]
+**Independent Test**: Can be tested by creating a specification with `/speckit.specify` and verifying that the generated artifacts are properly linked to a feature ID and that the feature status in `features.md` is updated appropriately.
 
 **Acceptance Scenarios**:
 
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+1. **Given** a feature entry in `features.md` with status "Draft", **When** I run `/speckit.specify` for that feature, **Then** the generated `spec.md` is placed under `.specify/specs/<feature-id>/` and the feature status is updated to "Planned"
+2. **Given** a completed implementation from `/speckit.implement`, **When** I run `/speckit.checklist`, **Then** the corresponding feature status in `features.md` is updated to "Ready for Review"
 
 ---
 
-### User Story 3 - [Brief Title] (Priority: P3)
+### User Story 3 - Support Feature Status Tracking and Metadata (Priority: P3)
 
-[Describe this user journey in plain language]
+As a project manager, I want to be able to track the current status of each feature (Draft, Planned, Implemented, etc.) and view associated metadata like specification paths, key acceptance criteria, and implementation details, so that I can monitor project progress and make informed decisions.
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**Why this priority**: Status tracking provides visibility into project progress and helps with planning and resource allocation. It's essential for maintaining an accurate view of what's been delivered versus what's planned.
 
-**Independent Test**: [Describe how this can be tested independently]
+**Independent Test**: Can be tested by examining the `features.md` file after various SDD command executions and verifying that feature status and metadata are correctly updated and maintained.
 
 **Acceptance Scenarios**:
 
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+1. **Given** a feature in "Draft" status, **When** the implementation plan is created via `/speckit.plan`, **Then** the feature status is updated to "Implemented" and metadata like plan path is recorded
+2. **Given** a feature with completed implementation, **When** quality checks pass via `/speckit.checklist`, **Then** the feature status is updated to "Ready for Review" with links to test reports and other relevant metadata
 
 ---
-
-[Add more user stories as needed, each with an assigned priority]
 
 ### Edge Cases
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right edge cases.
--->
-
-- What happens when [boundary condition]?
-- How does system handle [error scenario]?
+- Concurrent updates to the same feature entry will be handled through git merge conflicts requiring manual resolution
+- System will handle feature entries that reference non-existent specification files by marking them as orphaned but preserving the entry
+- When a feature specification is deleted but the feature entry remains in `features.md`, the system will flag it as orphaned but not automatically remove it
 
 ## Requirements *(mandatory)*
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right functional requirements.
--->
-
 ### Functional Requirements
 
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
-
-*Example of marking unclear requirements:*
-
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-001**: System MUST provide a `/speckit.feature` command that creates or updates a `features.md` file with feature entries containing ID, name, description, and status in Markdown table format with columns: ID, Name, Description, Status, Spec Path, Last Updated
+- **FR-002**: System MUST automatically generate sequential feature IDs (001, 002, 003, etc.) for new features
+- **FR-003**: System MUST integrate all existing SDD commands (`/speckit.specify`, `/speckit.plan`, `/speckit.tasks`, `/speckit.analyze`, `/speckit.implement`, `/speckit.checklist`) with feature tracking by linking artifacts to feature IDs
+- **FR-004**: System MUST automatically update feature status in `features.md` based on SDD command execution with the following lifecycle: Draft → Planned (via /speckit.specify) → Implemented (via /speckit.plan and /speckit.implement) → Ready for Review (via /speckit.checklist)
+- **FR-005**: System MUST store metadata about each feature including specification path, key acceptance criteria, and implementation details in the features.md table
+- **FR-006**: System MUST place specification files under `.specify/specs/<feature-id>/` directory structure when using `/speckit.specify`
+- **FR-007**: System MUST support feature branching with semantic branch names that include feature IDs for tracking
+- **FR-008**: System MUST ensure that `features.md` serves as the single entry point for feature views and navigation
+- **FR-009**: System MUST automatically commit all changes to features.md with generated commit messages when updated by SDD commands
+- **FR-010**: System MUST complete /speckit.feature command execution in under 5 seconds for up to 100 features
 
 ### Key Entities *(include if feature involves data)*
 
-- **[Entity 1]**: [What it represents, key attributes without implementation]
-- **[Entity 2]**: [What it represents, relationships to other entities]
+- **Feature**: Represents a capability or functionality of the system with attributes: ID (sequential number), name (2-4 words), description (brief summary), status (Draft/Planned/Implemented/Ready for Review), metadata (specification path, acceptance criteria, implementation details)
+- **FeatureIndex**: The `features.md` file that contains all feature entries in Markdown table format and serves as the central registry for project capabilities
 
 ## Success Criteria *(mandatory)*
 
-<!--
-  ACTION REQUIRED: Define measurable success criteria.
-  These must be technology-agnostic and measurable.
--->
-
 ### Measurable Outcomes
 
-- **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
-- **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
-- **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
-- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+- **SC-001**: Users can create a complete feature index with `/speckit.feature` command in under 5 seconds for up to 100 features
+- **SC-002**: All SDD commands automatically integrate with feature tracking without requiring additional user input
+- **SC-003**: Feature status in `features.md` accurately reflects the current implementation state 100% of the time with the defined lifecycle: Draft → Planned → Implemented → Ready for Review
+- **SC-004**: 95% of users report that feature tracking improves their ability to understand project scope and progress
+- **SC-005**: Feature index reduces time spent on status meetings by 50% through improved visibility
+- **SC-006**: All feature index updates are automatically committed to git with appropriate commit messages

@@ -90,3 +90,101 @@
 - 1,000 users: May require re-architecture too soon
 - 100,000+ users: Significant over-engineering for initial release
 - Vertical scaling only: Creates single points of failure
+
+# Research Findings: Feature Management Implementation
+
+## Decision: Script Format for SDD Commands
+
+**Decision**: The current heredoc script format in specify.md template is correct and should be maintained.
+
+**Rationale**: The current script format `cat << 'EOF' | .specify/scripts/bash/create-new-feature.sh --json` properly handles user input with quotes, backslashes, and newlines by passing the raw input via stdin to the script. This avoids shell parsing issues that would occur with direct argument passing.
+
+The confusion in the feature specification appears to be about the documentation description rather than the actual implementation. The current implementation correctly uses the heredoc approach, which is the industry standard for safely passing multi-line input to shell scripts.
+
+**Alternatives considered**: 
+- Direct argument passing: Would break with complex user input containing quotes or special characters
+- Environment variables: Limited by length and platform differences  
+- Temporary files: Adds complexity and cleanup requirements
+- Here-string (`<<<`): Less portable across different shell implementations
+
+## Decision: Feature Index Structure and Management
+
+**Decision**: Implement feature index as a Markdown table in `features.md` with columns for ID, Name, Description, Status, Spec Path, and Last Updated.
+
+**Rationale**: The feature specification explicitly requires a "Markdown table format with columns for ID, Name, Description, Status, Spec Path, and Last Updated". This provides:
+- Human-readable format that works well with git diffs
+- Easy parsing for automation scripts
+- Standard Markdown that renders well in GitHub and other platforms
+- Clear structure that supports the required metadata
+
+The current `create-feature-index.sh` script uses a list format, but needs to be updated to use a proper Markdown table format as specified.
+
+**Alternatives considered**:
+- YAML/JSON format: Less human-readable and harder to review in pull requests
+- Separate files per feature: More complex to maintain and navigate
+- Database storage: Breaks the file-based, git-friendly workflow
+- CSV format: Less readable and doesn't support rich text descriptions
+
+## Decision: Feature ID Generation and Status Management
+
+**Decision**: Use sequential three-digit feature IDs (001, 002, 003, etc.) with automatic status transitions: Draft → Planned → Implemented → Ready for Review.
+
+**Rationale**: Sequential IDs provide a simple, predictable numbering system that works well with git branches and directory naming. The status lifecycle aligns with the SDD workflow:
+- Draft: Initial feature entry created by `/speckit.feature`
+- Planned: Status after `/speckit.specify` creates specification
+- Implemented: Status after `/speckit.plan` and `/speckit.implement` complete
+- Ready for Review: Status after `/speckit.checklist` validates implementation
+
+**Alternatives considered**:
+- UUIDs: Overly complex and not human-friendly
+- Date-based IDs: Less predictable and harder to reference
+- Manual ID assignment: Error-prone and inconsistent
+- Flat status model: Less granular than the four-stage lifecycle
+
+## Decision: Integration with Existing SDD Workflow
+
+**Decision**: Modify all existing SDD command templates to automatically detect feature context and update `features.md`.
+
+**Rationale**: The feature specification requires that "all existing SDD commands automatically integrate with feature tracking without requiring additional user input". This means:
+- `/speckit.specify` should update status to "Planned" and record spec path
+- `/speckit.plan` should update status to "Implemented" 
+- `/speckit.implement` should maintain "Implemented" status
+- `/speckit.checklist` should update status to "Ready for Review"
+
+This requires updating the command templates to include logic that checks for `features.md`, parses the current feature ID from branch/directory, and updates the corresponding table row.
+
+**Alternatives considered**:
+- Separate integration commands: Would require additional user steps
+- Post-processing hooks: More complex to implement reliably
+- Manual updates: Defeats the automation purpose
+- Centralized coordination service: Over-engineering for this use case
+
+## Decision: Git Integration and Concurrency
+
+**Decision**: Automatically stage `features.md` changes but let users commit manually; handle concurrent updates through git merge conflicts.
+
+**Rationale**: The feature specification explicitly states: "Automatically stage changes to features.md but let users commit manually with their own messages" and "Concurrent updates to the same feature entry will be handled through git merge conflicts requiring manual resolution".
+
+This approach provides the right balance of automation (staging) and user control (commit messages), while leveraging git's built-in conflict resolution for concurrent edits.
+
+**Alternatives considered**:
+- Automatic commits: Less flexible for users who want custom commit messages
+- Lock files: Complex to implement and maintain across distributed environments
+- Database-style transactions: Not compatible with the git-based workflow
+- Merge conflict prevention: Impossible to guarantee in distributed development
+
+## Decision: Performance Implementation
+
+**Decision**: Optimize file parsing and writing to ensure `/speckit.feature` completes in under 5 seconds for 100 features.
+
+**Rationale**: The performance requirement is achievable with efficient file I/O and minimal processing. Key optimizations:
+- Stream parsing of Markdown table instead of loading entire file into memory
+- Efficient regex patterns for table row extraction and updates
+- Minimal file writes (single atomic write per update)
+- Avoid unnecessary file system operations
+
+**Alternatives considered**:
+- Caching: Unnecessary overhead for this scale
+- Database backend: Breaks the simple file-based model
+- Background processing: Adds complexity without significant benefit
+- Incremental updates: Already handled by efficient file operations

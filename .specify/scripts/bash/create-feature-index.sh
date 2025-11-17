@@ -106,9 +106,9 @@ FEATURES_FILE="$REPO_ROOT/features.md"
 find_highest_feature_number() {
     local highest=0
     if [ -f "$FEATURES_FILE" ]; then
-        # Look for existing feature numbers in features.md
+        # Look for existing feature numbers in features.md table
         while IFS= read -r line; do
-            if [[ "$line" =~ Feature\ ([0-9]+): ]]; then
+            if [[ "$line" =~ ^\|\ *([0-9]{3})\ *\| ]]; then
                 local num="${BASH_REMATCH[1]}"
                 num=$((10#$num))
                 if [ "$num" -gt "$highest" ]; then
@@ -136,79 +136,136 @@ find_highest_feature_number() {
 # Function to generate a clean feature name from description
 generate_feature_name() {
     local description="$1"
-    # Convert to lowercase and clean up
-    echo "$description" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/ /g' | tr -s ' ' | sed 's/^ //;s/ $//' | tr ' ' '-'
+    # Convert to lowercase and clean up, limit to 4 words
+    echo "$description" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/ /g' | tr -s ' ' | sed 's/^ //;s/ $//' | cut -d' ' -f1-4
 }
 
-# Create or update the features.md file
+# Function to check if a feature already exists in the table
+feature_exists() {
+    local description="$1"
+    if [ -f "$FEATURES_FILE" ]; then
+        # Escape special characters for grep
+        local escaped_desc=$(echo "$description" | sed 's/[]\/$*.^[]/\\&/g')
+        if grep -q "|.*|.*|.*$escaped_desc.*|.*|" "$FEATURES_FILE" 2>/dev/null; then
+            return 0  # Feature exists
+        fi
+    fi
+    return 1  # Feature doesn't exist
+}
+
+# Create or update the features.md file in Markdown table format
 create_feature_index() {
     local description="$1"
     local highest_num=$(find_highest_feature_number)
     local current_num=$((highest_num + 1))
     
+    # Check if this feature already exists
+    if feature_exists "$description"; then
+        # Feature already exists, just update the date
+        local today=$(date '+%Y-%m-%d')
+        sed -i "s/Last Updated: .*/Last Updated: $today/" "$FEATURES_FILE"
+        
+        # Count existing features
+        local total_features=$(grep -c "^| [0-9][0-9][0-9] |" "$FEATURES_FILE" || echo "0")
+        
+        if $JSON_MODE; then
+            printf '{"FEATURES_FILE":"%s","TOTAL_FEATURES":%d}\n' "$FEATURES_FILE" "$total_features"
+        else
+            echo "FEATURES_FILE: $FEATURES_FILE"
+            echo "TOTAL_FEATURES: $total_features"
+            echo "Feature index updated successfully"
+        fi
+        return
+    fi
+    
     # Read existing content if file exists
     local existing_content=""
     local existing_features=()
+    local table_header=""
+    local table_separator=""
+    
     if [ -f "$FEATURES_FILE" ]; then
         existing_content=$(cat "$FEATURES_FILE")
-        # Extract existing feature entries
-        while IFS= read -r line; do
-            if [[ "$line" =~ ^###\ Feature\ ([0-9]+): ]]; then
-                existing_features+=("${BASH_REMATCH[1]}")
-            fi
-        done < "$FEATURES_FILE"
+        
+        # Check if we have a table already
+        if echo "$existing_content" | grep -q "^| ID | Name | Description | Status | Spec Path | Last Updated |$"; then
+            # Extract content before table
+            local header_content=$(echo "$existing_content" | sed -n '1,/^| ID | Name | Description | Status | Spec Path | Last Updated |$/p' | head -n -1)
+            
+            # Extract table header and separator
+            table_header="| ID | Name | Description | Status | Spec Path | Last Updated |"
+            table_separator="|----|------|-------------|--------|-----------|--------------|"
+            
+            # Extract existing table rows
+            local table_content=$(echo "$existing_content" | sed -n '/^| ID | Name | Description | Status | Spec Path | Last Updated |$/,/^$/p' | tail -n +3 | head -n -1)
+            
+            # Store existing features
+            while IFS= read -r line; do
+                if [[ "$line" =~ ^\|\ [0-9]{3}\ \| ]]; then
+                    existing_features+=("$line")
+                fi
+            done <<< "$table_content"
+        else
+            # No table exists, use all content as header
+            header_content="$existing_content"
+            table_header="| ID | Name | Description | Status | Spec Path | Last Updated |"
+            table_separator="|----|------|-------------|--------|-----------|--------------|"
+        fi
+    else
+        # Create default header if file doesn't exist
+        header_content="# Project Feature Index
+
+**Last Updated**: $(date '+%B %d, %Y')
+**Total Features**: 0
+
+## Features
+
+"
+        table_header="| ID | Name | Description | Status | Spec Path | Last Updated |"
+        table_separator="|----|------|-------------|--------|-----------|--------------|"
     fi
     
     # Generate new content
-    local new_content="# Project Feature Index
-
-**Last Updated**: $(date '+%B %d, %Y')
-**Total Features**: TBD
-
-## Features
+    local new_content="$header_content"
+    new_content="${new_content}${table_header}
+${table_separator}
 "
     
-    # Add existing features first (but only the feature entries, not the header)
-    if [ -n "$existing_content" ]; then
-        # Extract content after "## Features" header
-        if [[ "$existing_content" == *"## Features"* ]]; then
-            local features_content=$(echo "$existing_content" | sed -n '/^## Features$/,$p' | tail -n +2)
-            if [ -n "$features_content" ] && [ "$features_content" != "## Features" ]; then
-                new_content="$new_content$features_content"
-            fi
-        fi
-    fi
+    # Add existing features
+    for feature in "${existing_features[@]}"; do
+        new_content="${new_content}${feature}
+"
+    done
     
     # Add new feature from input
     if [ -n "$description" ]; then
         local feature_name=$(generate_feature_name "$description")
         local feature_id=$(printf "%03d" "$current_num")
+        local today=$(date '+%Y-%m-%d')
         
-        # Check if this feature already exists (by description similarity)
-        local exists=false
-        if [ -f "$FEATURES_FILE" ]; then
-            if grep -q "$description" "$FEATURES_FILE" 2>/dev/null; then
-                exists=true
-            fi
-        fi
-        
-        if [ "$exists" = false ]; then
-            new_content="$new_content
-### Feature $feature_id: $(echo "$description" | cut -c1-50)$( [ ${#description} -gt 50 ] && echo "..." || echo "")
-- **Status**: Draft
-- **Description**: $description
-- **Specification**: (Not yet created)
-- **Key Acceptance Criteria**: (To be defined in specification)
+        # Add new feature row
+        new_content="${new_content}| ${feature_id} | ${feature_name} | ${description} | Draft | (Not yet created) | ${today} |
 "
-            current_num=$((current_num + 1))
-        fi
+        current_num=$((current_num + 1))
     fi
     
-    # Update total features count
-    local total_features=$(echo "$new_content" | grep -c "^### Feature ")
-    new_content=$(echo "$new_content" | sed "s/Total Features: TBD/Total Features: $total_features/")
+    # Add empty line at the end
+    new_content="${new_content}
+"
+    
+    # Update total features count and last updated date
+    local total_features=$(echo "$new_content" | grep -c "^| [0-9][0-9][0-9] |")
+    local today=$(date '+%Y-%m-%d')
+    new_content=$(echo "$new_content" | sed "s/Total Features: [0-9]*/Total Features: $total_features/")
+    new_content=$(echo "$new_content" | sed "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $today/")
+    new_content=$(echo "$new_content" | sed "s/Last Updated: [A-Z][a-z]* [0-9]\{1,2\}, [0-9]\{4\}/Last Updated: $(date '+%B %d, %Y')/")
     
     echo "$new_content" > "$FEATURES_FILE"
+    
+    # Automatically stage changes if git is available
+    if [ "$HAS_GIT" = true ] && command -v git >/dev/null 2>&1; then
+        git add "$FEATURES_FILE" >/dev/null 2>&1 || true
+    fi
     
     if $JSON_MODE; then
         printf '{"FEATURES_FILE":"%s","TOTAL_FEATURES":%d}\n' "$FEATURES_FILE" "$total_features"
@@ -230,14 +287,31 @@ if [ -z "$FEATURE_DESCRIPTIONS" ]; then
 
 ## Features
 
+| ID | Name | Description | Status | Spec Path | Last Updated |
+|----|------|-------------|--------|-----------|--------------|
+
 " > "$FEATURES_FILE"
+    else
+        # Update last updated date
+        sed -i "s/Last Updated: .*/Last Updated: $(date '+%B %d, %Y')/" "$FEATURES_FILE"
+    fi
+    
+    # Count existing features
+    local total_features=0
+    if [ -f "$FEATURES_FILE" ]; then
+        total_features=$(grep -c "^| [0-9][0-9][0-9] |" "$FEATURES_FILE" || echo "0")
+    fi
+    
+    # Automatically stage changes if git is available
+    if [ "$HAS_GIT" = true ] && command -v git >/dev/null 2>&1; then
+        git add "$FEATURES_FILE" >/dev/null 2>&1 || true
     fi
     
     if $JSON_MODE; then
-        printf '{"FEATURES_FILE":"%s","TOTAL_FEATURES":0}\n' "$FEATURES_FILE"
+        printf '{"FEATURES_FILE":"%s","TOTAL_FEATURES":%d}\n' "$FEATURES_FILE" "$total_features"
     else
         echo "FEATURES_FILE: $FEATURES_FILE"
-        echo "TOTAL_FEATURES: 0"
+        echo "TOTAL_FEATURES: $total_features"
         echo "Feature index initialized (no new features added)"
     fi
 else

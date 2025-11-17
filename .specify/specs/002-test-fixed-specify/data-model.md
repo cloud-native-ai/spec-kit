@@ -1,92 +1,89 @@
-# Data Model
+# Data Model: Feature Management
 
-## Entities
+## Feature Entity
 
-### User
-**Description**: Represents a registered user in the system
+Represents a single capability or functionality in the system.
 
-**Fields**:
-- `id`: UUID (Primary Key)
-- `email`: string, unique, validated format
-- `password_hash`: string, bcrypt hashed
-- `first_name`: string, optional
-- `last_name`: string, optional
-- `created_at`: timestamp, UTC
-- `updated_at`: timestamp, UTC
-- `last_login`: timestamp, UTC, nullable
-- `is_active`: boolean, default true
-- `email_verified`: boolean, default false
-- `data_retention_until`: timestamp, UTC (24 months from last activity)
+### Attributes
 
-**Validation Rules**:
-- Email must be valid format and unique
-- Password must be at least 8 characters
-- First/last name limited to 100 characters each
+| Attribute | Type | Description | Validation Rules |
+|-----------|------|-------------|------------------|
+| `id` | string | Sequential three-digit identifier (e.g., "001", "002") | Must be exactly 3 digits, sequential based on existing features |
+| `name` | string | Short name (2-4 words) describing the feature | 2-50 characters, alphanumeric + spaces/hyphens only |
+| `description` | string | Brief summary of the feature's purpose and scope | 10-500 characters, required |
+| `status` | enum | Current implementation status | Must be one of: "Draft", "Planned", "Implemented", "Ready for Review" |
+| `spec_path` | string | Path to specification file | Must be relative path starting with `.specify/specs/`, or "(Not yet created)" |
+| `last_updated` | timestamp | When the feature entry was last modified | ISO 8601 format (YYYY-MM-DD) |
 
-### OAuthProvider
-**Description**: Links users to their OAuth providers
+### State Transitions
 
-**Fields**:
-- `id`: UUID (Primary Key)
-- `user_id`: UUID, foreign key to User.id
-- `provider`: string (google, github, etc.)
-- `provider_user_id`: string, unique per provider
-- `access_token`: string, encrypted
-- `refresh_token`: string, encrypted, nullable
-- `expires_at`: timestamp, UTC, nullable
-- `created_at`: timestamp, UTC
-- `updated_at`: timestamp, UTC
+The `status` attribute follows a strict lifecycle:
 
-**Validation Rules**:
-- Combination of (user_id, provider) must be unique
-- Provider must be from allowed list
+```
+Draft → Planned → Implemented → Ready for Review
+```
 
-### Session
-**Description**: Tracks user sessions for authentication
+- **Draft**: Initial state when feature is created via `/speckit.feature`
+- **Planned**: Set by `/speckit.specify` when specification is created
+- **Implemented**: Set by `/speckit.plan` and maintained by `/speckit.implement`
+- **Ready for Review**: Set by `/speckit.checklist` when quality checks pass
 
-**Fields**:
-- `id`: UUID (Primary Key)
-- `user_id`: UUID, foreign key to User.id
-- `token`: string, unique, JWT format
-- `ip_address`: string, nullable
-- `user_agent`: string, nullable
-- `created_at`: timestamp, UTC
-- `expires_at`: timestamp, UTC
-- `is_revoked`: boolean, default false
+### Relationships
 
-**Validation Rules**:
-- Token must be unique
-- expires_at must be after created_at
+- **FeatureIndex**: Each Feature belongs to exactly one FeatureIndex (the `features.md` file)
 
-## Relationships
+## FeatureIndex Entity
 
-- **User** → **OAuthProvider** (One-to-Many): A user can have multiple OAuth provider links
-- **User** → **Session** (One-to-Many): A user can have multiple active sessions
-- **OAuthProvider** → **User** (Many-to-One): Each OAuth provider link belongs to one user
-- **Session** → **User** (Many-to-One): Each session belongs to one user
+Represents the project-level registry of all features.
 
-## State Transitions
+### Attributes
 
-### User States
-- **Created**: User registered but email not verified
-- **Active**: Email verified and account active
-- **Suspended**: Account temporarily disabled (admin action)
-- **Deleted**: Account marked for deletion (soft delete)
+| Attribute | Type | Description | Validation Rules |
+|-----------|------|-------------|------------------|
+| `last_updated` | timestamp | When the index was last modified | ISO 8601 format (YYYY-MM-DD) |
+| `total_features` | integer | Total number of features in the index | Must match actual count of Feature entries |
+| `features` | array<Feature> | Collection of all Feature entities | Must contain all features in the project |
 
-### Session States
-- **Active**: Valid session within expiration time
-- **Expired**: Session past expiration time
-- **Revoked**: Session explicitly invalidated by user or admin
+### Relationships
 
-## Indexes
+- **Feature**: Contains zero or more Feature entities
 
-- **Users**: email (unique), created_at, data_retention_until
-- **OAuthProviders**: user_id, provider_user_id (unique compound)
-- **Sessions**: user_id, token (unique), expires_at, is_revoked
+## Data Storage Format
 
-## Constraints
+The data model is persisted in a Markdown table format in `features.md`:
 
-- Soft delete pattern: Users are never hard-deleted, only marked as deleted
-- Data retention: Records automatically purged after data_retention_until timestamp
-- Referential integrity: All foreign key relationships enforced at database level
-- Unique constraints: Email uniqueness, OAuth provider combinations, session tokens
+```markdown
+# Project Feature Index
+
+**Last Updated**: November 17, 2025
+**Total Features**: 2
+
+## Features
+
+| ID | Name | Description | Status | Spec Path | Last Updated |
+|----|------|-------------|--------|-----------|--------------|
+| 001 | User Authentication | Add email/password and OAuth2 login | Planned | .specify/specs/001-user-auth/spec.md | 2025-11-17 |
+| 002 | Payment Processing | Implement credit card and PayPal payments | Draft | (Not yet created) | 2025-11-17 |
+```
+
+### Validation Rules for Storage Format
+
+1. **Table Header**: Must contain exactly the columns: ID, Name, Description, Status, Spec Path, Last Updated
+2. **ID Format**: Must be exactly 3 digits with leading zeros (001, 002, ..., 999)
+3. **Status Values**: Must be one of the four allowed values
+4. **Spec Path**: Must either be "(Not yet created)" or a valid relative path starting with `.specify/specs/`
+5. **Last Updated**: Must be in YYYY-MM-DD format
+6. **Total Features**: Must match the actual number of table rows
+
+## Orphaned Feature Handling
+
+When a feature specification file is deleted but the feature entry remains in `features.md`:
+- The entry is marked as "orphaned" but not automatically removed
+- The `spec_path` field shows "(Orphaned - spec file deleted)"
+- Status remains unchanged to preserve historical tracking
+
+## Concurrency Handling
+
+- Multiple processes writing to `features.md` simultaneously will cause git merge conflicts
+- Users must manually resolve conflicts during git merge operations
+- No locking mechanism is implemented (rely on git's built-in conflict detection)

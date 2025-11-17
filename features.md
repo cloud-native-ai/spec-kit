@@ -1,12 +1,8 @@
 # Project Feature Index
 
 **Last Updated**: November 17, 2025
-**Total Features**: TBD
+**Total Features**: 0
 
-## Features
-
-### Feature 002: test heredoc feature command
-- **Status**: Draft
-- **Description**: test heredoc feature command
-- **Specification**: (Not yet created)
-- **Key Acceptance Criteria**: (To be defined in specification)
+## Features| ID | Name | Description | Status | Spec Path | Last Updated |
+|----|------|-------------|--------|-----------|--------------|
+| 004 | add user authentication system | Add user authentication system | Draft | (Not yet created) | 2025-11-17 |

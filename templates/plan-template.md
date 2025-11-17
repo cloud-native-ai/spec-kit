@@ -31,7 +31,16 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+**Core Principles Compliance**:
+
+- **Library-First**: Feature implemented as standalone library component
+- **CLI Interface**: Text-based interface with JSON/human-readable output
+- **Test-First**: Comprehensive tests written before implementation
+- **Integration Testing**: Contract tests for all external interfaces
+- **Observability**: Structured logging and clear error messages
+- **Simplicity**: Minimal project structure, no unnecessary abstractions
+
+**Gates Status**: [✅ All gates pass / ❌ Specific gate failures with justification]
 
 ## Project Structure
 

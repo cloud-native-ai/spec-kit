@@ -1,100 +1,82 @@
-# Implementation Plan: User Authentication System
+# Implementation Plan: Feature Management and Specify Command Fixes
 
-**Branch**: `002-test-fixed-specify` | **Date**: November 17, 2025 | **Spec**: /.specify/specs/002-test-fixed-specify/spec.md
+**Branch**: `002-test-fixed-specify` | **Date**: November 17, 2025 | **Spec**: [.specify/specs/002-test-fixed-specify/spec.md](.specify/specs/002-test-fixed-specify/spec.md)
 **Input**: Feature specification from `/.specify/specs/002-test-fixed-specify/spec.md`
-
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-Implement a secure user authentication system supporting both email/password and OAuth2 (Google, GitHub) authentication methods. The system will provide REST API endpoints for user registration, login/logout, profile management, and session handling. Data will be stored in PostgreSQL with proper validation, encryption, and GDPR-compliant data retention policies.
+Implement the `/speckit.feature` command to create and manage a project-level feature index in Markdown table format, and ensure all existing SDD commands automatically integrate with feature tracking. The `/speckit.specify` command script format is already correct and requires no changes - the issue was in the documentation description, not the implementation.
 
 ## Technical Context
 
 **Language/Version**: Python 3.11  
-**Primary Dependencies**: FastAPI, SQLAlchemy, Pydantic, bcrypt, python-jose  
-**Storage**: PostgreSQL  
-**Testing**: pytest  
-**Target Platform**: Linux server with Docker containerization  
-**Project Type**: single  
-**Performance Goals**: 1000 concurrent users, p95 response time under 200ms  
-**Constraints**: Data retention for 24 months, GDPR compliance, <200MB memory usage  
-**Scale/Scope**: Design for 10,000 active users with horizontal scaling capability
+**Primary Dependencies**: typer, rich, httpx[socks], platformdirs, readchar, truststore>=0.10.4  
+**Storage**: File system (features.md, .specify/specs/ directories)  
+**Testing**: pytest (standard Python testing framework)  
+**Target Platform**: Cross-platform (Linux, Windows, macOS)  
+**Project Type**: CLI tool (single project structure)  
+**Performance Goals**: /speckit.feature command completes in under 5 seconds for up to 100 features  
+**Constraints**: Must integrate with existing SDD workflow, maintain backward compatibility, automatically stage changes but let users commit manually  
+**Scale/Scope**: Handle up to 100 features in feature index, support sequential feature IDs (001-999)
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-### Gate 1: Library-First Principle
-✅ **PASSED**: Authentication functionality will be implemented as a standalone library within the src/ directory, making it reusable and independently testable.
+**Core Principles Compliance**:
 
-### Gate 2: CLI Interface Principle  
-✅ **PASSED**: The authentication service will expose core functionality via CLI commands for user management, token generation, and system maintenance.
+- **Library-First**: Feature management implemented as core functionality within existing specify-cli library
+- **CLI Interface**: New `/speckit.feature` command provides text-based interface with JSON/human-readable output
+- **Test-First**: All changes require comprehensive unit and integration tests before implementation
+- **Integration Testing**: Feature index integration with all SDD commands requires contract tests
+- **Observability**: Commands provide clear output and error messages for debugging
+- **Simplicity**: File-based approach maintains simplicity while adding feature tracking capability
 
-### Gate 3: Test-First Principle (NON-NEGOTIABLE)
-✅ **PASSED**: Comprehensive test suite planned with unit, contract, and integration tests. TDD workflow will be followed during implementation.
-
-### Gate 4: Integration Testing Principle
-✅ **PASSED**: Contract tests will validate API specifications, integration tests will verify database interactions and OAuth flows.
-
-### Gate 5: Observability Principle
-✅ **PASSED**: Structured logging will be implemented for all authentication events, security incidents, and error conditions.
-
-### Gate 6: Simplicity Principle
-✅ **PASSED**: Design follows YAGNI principles - only implementing required authentication methods (email/password + OAuth) without over-engineering.
+**Gates Status**: ✅ All gates pass - implementation aligns with constitution principles
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-.specify/specs/[###-feature]/
+.specify/specs/002-test-fixed-specify/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output (/speckit.plan command)
 ├── data-model.md        # Phase 1 output (/speckit.plan command)
 ├── quickstart.md        # Phase 1 output (/speckit.plan command)
 ├── contracts/           # Phase 1 output (/speckit.plan command)
+│   ├── feature-command.md
+│   ├── specify-command.md  
+│   └── sdd-integration-contract.md
 └── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 ```
 
 ### Source Code (repository root)
 
 ```text
+# Single project (DEFAULT)
 src/
 ├── models/
-│   ├── __init__.py
-│   ├── user.py
-│   └── session.py
 ├── services/
-│   ├── __init__.py
-│   ├── auth.py
-│   ├── oauth.py
-│   └── user_service.py
-├── api/
-│   ├── __init__.py
-│   ├── auth_routes.py
-│   └── user_routes.py
-├── core/
-│   ├── __init__.py
-│   ├── config.py
-│   ├── security.py
-│   └── database.py
-└── main.py
+├── cli/
+└── lib/
 
 tests/
 ├── contract/
-│   ├── test_auth_contract.py
-│   └── test_user_contract.py
 ├── integration/
-│   ├── test_auth_integration.py
-│   └── test_user_integration.py
 └── unit/
-    ├── models/
-    ├── services/
-    └── core/
+
+# Additional directories for feature management
+.specify/scripts/bash/    # Feature index and integration scripts
+.specify/scripts/powershell/  # PowerShell equivalents
+templates/commands/       # Updated command templates with integration logic
 ```
 
-**Structure Decision**: Selected single project structure as this is a focused authentication microservice that doesn't require separate frontend/backend separation. The modular organization allows for clear separation of concerns while maintaining simplicity.
+**Structure Decision**: Maintain existing single-project structure. Feature management functionality will be implemented by:
+1. Updating command templates in `templates/commands/` to include feature integration logic
+2. Enhancing existing scripts in `.specify/scripts/` to support Markdown table format
+3. Adding new scripts for feature index management if needed
+4. Updating test suites to cover new functionality
 
 ## Complexity Tracking
 
@@ -102,5 +84,30 @@ tests/
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| None | Implementation follows constitution principles | N/A |
+
+## Implementation Phases
+
+### Phase 1: Feature Index Implementation
+- Update `create-feature-index.sh` script to generate Markdown table format
+- Implement sequential feature ID generation (001, 002, etc.)
+- Add automatic git staging for `features.md` changes
+- Create PowerShell equivalent script
+
+### Phase 2: SDD Command Integration  
+- Update all command templates (`specify.md`, `plan.md`, `tasks.md`, `implement.md`, `checklist.md`)
+- Add feature context detection logic to extract feature ID from branch/directory
+- Implement status transition updates in `features.md`
+- Add error handling and fallback behavior for existing projects
+
+### Phase 3: Testing and Validation
+- Create contract tests for feature index format and integration
+- Add unit tests for feature ID generation and status transitions
+- Implement integration tests covering full SDD workflow with feature tracking
+- Validate performance requirements (5 seconds for 100 features)
+
+### Phase 4: Documentation and User Experience
+- Update command templates with clear integration documentation
+- Create quickstart guide for feature management workflow
+- Ensure error messages are helpful and actionable
+- Validate backward compatibility with existing projects

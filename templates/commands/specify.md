@@ -2,10 +2,47 @@
 description: Create or update the feature specification from a natural language feature description.
 scripts:
   sh: |
+    # Feature tracking integration
+    if [ -f "features.md" ]; then
+        # Extract feature ID from branch name if available
+        if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
+            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            if [[ "$CURRENT_BRANCH" =~ ^([0-9]{3})- ]]; then
+                FEATURE_ID="${BASH_REMATCH[1]}"
+                # Update feature status to "Planned" and set spec path
+                TODAY=$(date '+%Y-%m-%d')
+                SPEC_PATH=".specify/specs/$CURRENT_BRANCH/spec.md"
+                sed -i "s/| ${FEATURE_ID} | \([^|]*\) | \([^|]*\) | Draft | (Not yet created) | [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} | |/| ${FEATURE_ID} | \1 | \2 | Planned | ${SPEC_PATH} | ${TODAY} | /" features.md
+                # Stage the changes
+                git add features.md >/dev/null 2>&1 || true
+            fi
+        fi
+    fi
     cat << 'EOF' | .specify/scripts/bash/create-new-feature.sh --json
     $ARGUMENTS
     EOF
-  ps: .specify/scripts/powershell/create-new-feature.ps1 -Json "{ARGUMENTS}"
+  ps: |
+    # Feature tracking integration
+    if (Test-Path "features.md") {
+        # Extract feature ID from branch name if available
+        try {
+            $currentBranch = git rev-parse --abbrev-ref HEAD 2>$null
+            if ($currentBranch -match "^(\d{3})-") {
+                $featureId = $matches[1]
+                # Update feature status to "Planned" and set spec path
+                $today = (Get-Date).ToString("yyyy-MM-dd")
+                $specPath = ".specify/specs/$currentBranch/spec.md"
+                $content = Get-Content "features.md"
+                $content = $content -replace "\|\s*$featureId\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*Draft\s*\|\s*$$Not yet created$$\s*\|\s*\d{4}-\d{2}-\d{2}\s*\|", "| $featureId | `$1 | `$2 | Planned | $specPath | $today |"
+                Set-Content -Path "features.md" -Value ($content -join "`n")
+                # Stage the changes
+                try { git add features.md 2>$null } catch { }
+            }
+        } catch {
+            # Ignore git errors
+        }
+    }
+    .specify/scripts/powershell/create-new-feature.ps1 -Json "{ARGUMENTS}"
 ---
 
 ## User Input
@@ -169,6 +206,21 @@ Given that feature description, do this:
 7. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/speckit.clarify` or `/speckit.plan`).
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
+
+## Feature Integration
+
+The `/speckit.specify` command automatically integrates with the feature tracking system:
+
+- If a `features.md` file exists in the project root, the command will:
+  - Detect the current feature branch (format: `###-feature-name`)
+  - Extract the feature ID from the branch name
+  - Update the corresponding feature entry in `features.md`:
+    - Change status from "Draft" to "Planned"
+    - Set the specification path to the newly created spec file
+    - Update the "Last Updated" date
+  - Automatically stage the changes to `features.md` for git commit
+
+This integration ensures that all feature specifications are properly tracked and linked to their corresponding entries in the project's feature index.
 
 ## General Guidelines
 

@@ -49,11 +49,11 @@ $featuresFile = Join-Path $repoRoot "features.md"
 function Find-HighestFeatureNumber {
     $highest = 0
     
-    # Check existing features.md
+    # Check existing features.md table
     if (Test-Path $featuresFile) {
         $content = Get-Content $featuresFile
         foreach ($line in $content) {
-            if ($line -match "### Feature (\d+):") {
+            if ($line -match "^\|\s*(\d{3})\s*\|") {
                 $num = [int]$matches[1]
                 if ($num -gt $highest) { $highest = $num }
             }
@@ -78,10 +78,45 @@ function Find-HighestFeatureNumber {
 # Function to generate a clean feature name from description
 function Generate-FeatureName {
     param([string]$Description)
-    return ($Description.ToLower() -replace "[^a-z0-9]", " " -replace "\s+", " ").Trim() -replace " ", "-"
+    # Convert to lowercase and clean up, limit to 4 words
+    return ($Description.ToLower() -replace "[^a-z0-9]", " " -replace "\s+", " ").Trim() -split " " | Select-Object -First 4 | Join-String -Separator " "
 }
 
-# Create or update the features.md file
+# Function to extract existing features from the table
+function Extract-ExistingFeatures {
+    if (Test-Path $featuresFile) {
+        $content = Get-Content $featuresFile
+        $inTable = $false
+        $features = @()
+        
+        foreach ($line in $content) {
+            if ($line -match "^\|\s*ID\s*\|\s*Name\s*\|\s*Description\s*\|\s*Status\s*\|\s*Spec Path\s*\|\s*Last Updated\s*\|$") {
+                $inTable = $true
+                continue
+            }
+            
+            if ($inTable) {
+                if ($line -match "^\|\s*\d{3}\s*\|") {
+                    $features += $line
+                } elseif ($line -match "^\s*$" -or $line -match "^\|[-\s\|]*\|$") {
+                    # Skip empty lines and separator lines
+                    continue
+                } elseif ($line -match "^\|") {
+                    # Still in table, but not a feature row
+                    continue
+                } else {
+                    # End of table
+                    break
+                }
+            }
+        }
+        
+        return $features
+    }
+    return @()
+}
+
+# Create or update the features.md file in Markdown table format
 function Create-FeatureIndex {
     param([string]$Description)
     
@@ -89,72 +124,143 @@ function Create-FeatureIndex {
     $currentNum = $highestNum + 1
     
     # Read existing content if file exists
-    $existingContent = ""
+    $existingHeader = ""
     $existingFeatures = @()
+    $existingFooter = ""
+    
     if (Test-Path $featuresFile) {
-        $existingContent = Get-Content $featuresFile -Raw
-        # Extract existing feature entries
-        $lines = $existingContent -split "`n"
-        foreach ($line in $lines) {
-            if ($line -match "^### Feature (\d+):") {
-                $existingFeatures += $matches[1]
+        $content = Get-Content $featuresFile
+        $headerEnd = -1
+        $tableStart = -1
+        $tableEnd = -1
+        
+        # Find header end (before table)
+        for ($i = 0; $i -lt $content.Length; $i++) {
+            if ($content[$i] -match "^\|\s*ID\s*\|\s*Name\s*\|\s*Description\s*\|\s*Status\s*\|\s*Spec Path\s*\|\s*Last Updated\s*\|$") {
+                $headerEnd = $i - 1
+                $tableStart = $i
+                break
+            }
+        }
+        
+        if ($headerEnd -ge 0) {
+            $existingHeader = $content[0..$headerEnd] -join "`n"
+        } else {
+            # No table found, use all content as header
+            $existingHeader = ($content -join "`n") + "`n"
+        }
+        
+        # Extract existing features
+        $existingFeatures = Extract-ExistingFeatures
+        
+        # Find table end and footer
+        if ($tableStart -ge 0) {
+            $tableEnd = $tableStart
+            for ($i = $tableStart + 1; $i -lt $content.Length; $i++) {
+                if ($content[$i] -match "^\|\s*\d{3}\s*\|") {
+                    $tableEnd = $i
+                } elseif ($content[$i] -match "^\s*$" -or $content[$i] -match "^\|[-\s\|]*\|$") {
+                    # Skip empty lines and separator lines
+                    continue
+                } elseif ($content[$i] -match "^\|") {
+                    # Still in table
+                    $tableEnd = $i
+                } else {
+                    # End of table, rest is footer
+                    $existingFooter = ($content[$i..($content.Length - 1)] -join "`n").Trim()
+                    break
+                }
+            }
+        }
+    } else {
+        # Create default header if file doesn't exist
+        $existingHeader = "# Project Feature Index
+
+**Last Updated**: $((Get-Date).ToString("MMMM dd, yyyy"))
+**Total Features**: 0
+
+## Features
+
+"
+    }
+    
+    # Generate new content
+    $newContent = $existingHeader
+    
+    # Add table header if this is a new file or if existing file doesn't have table
+    $hasTable = $false
+    if (Test-Path $featuresFile) {
+        $content = Get-Content $featuresFile
+        foreach ($line in $content) {
+            if ($line -match "^\|\s*ID\s*\|\s*Name\s*\|\s*Description\s*\|\s*Status\s*\|\s*Spec Path\s*\|\s*Last Updated\s*\|$") {
+                $hasTable = $true
+                break
             }
         }
     }
     
-    # Generate new content
-    $newContent = "# Project Feature Index
-
-**Last Updated**: $((Get-Date).ToString("MMMM dd, yyyy"))
-**Total Features**: TBD
-
-## Features
+    if (-not $hasTable) {
+        $newContent += "| ID | Name | Description | Status | Spec Path | Last Updated |
+|----|------|-------------|--------|-----------|--------------|
 "
+    } elseif (-not (Test-Path $featuresFile)) {
+        $newContent += "| ID | Name | Description | Status | Spec Path | Last Updated |
+|----|------|-------------|--------|-----------|--------------|
+"
+    }
     
-    # Add existing features first (but only the feature entries, not the header)
-    if ($existingContent -ne "") {
-        if ($existingContent -match "(?s)## Features.*") {
-            $featuresSection = $matches[0]
-            # Remove the header line and keep only the content
-            $featuresContent = ($featuresSection -split "`n" | Select-Object -Skip 1) -join "`n"
-            if ($featuresContent.Trim() -ne "") {
-                $newContent += $featuresContent
-            }
-        }
+    # Add existing features
+    if ($existingFeatures.Count -gt 0) {
+        $newContent += ($existingFeatures -join "`n") + "`n"
     }
     
     # Add new feature from input
     if ($Description -and $Description.Trim() -ne "") {
         $featureName = Generate-FeatureName $Description
         $featureId = "{0:d3}" -f $currentNum
+        $today = (Get-Date).ToString("yyyy-MM-dd")
         
         # Check if this feature already exists
         $exists = $false
         if (Test-Path $featuresFile) {
-            if (Select-String -Path $featuresFile -Pattern ([regex]::Escape($Description)) -Quiet) {
+            $content = Get-Content $featuresFile
+            $escapedDesc = $Description -replace '[^a-zA-Z0-9]', '.'
+            if ($content -match $escapedDesc) {
                 $exists = $true
             }
         }
         
         if (-not $exists) {
-            $truncatedDesc = if ($Description.Length -gt 50) { $Description.Substring(0, 50) + "..." } else { $Description }
-            $newContent += "
-
-### Feature $featureId: $truncatedDesc
-- **Status**: Draft
-- **Description**: $Description
-- **Specification**: (Not yet created)
-- **Key Acceptance Criteria**: (To be defined in specification)
+            # Add new feature row
+            $newContent += "| $featureId | $featureName | $Description | Draft | (Not yet created) | $today |
 "
             $currentNum++
         }
     }
     
-    # Update total features count
-    $totalFeatures = ([regex]::Matches($newContent, "^### Feature ")).Count
-    $newContent = $newContent -replace "Total Features: TBD", "Total Features: $totalFeatures"
+    # Add footer if it exists
+    if ($existingFooter -ne "") {
+        $newContent += "`n$existingFooter"
+    }
+    
+    # Update total features count and last updated date
+    $totalFeatures = ($newContent | Select-String -Pattern "^\|\s*\d{3}\s*\|" -AllMatches).Matches.Count
+    $today = (Get-Date).ToString("yyyy-MM-dd")
+    $newContent = $newContent -replace "Total Features: \d+", "Total Features: $totalFeatures"
+    $newContent = $newContent -replace "Last Updated: \d{4}-\d{2}-\d{2}", "Last Updated: $today"
+    $newContent = $newContent -replace "Last Updated: [A-Z][a-z]* \d{1,2}, \d{4}", "Last Updated: $((Get-Date).ToString("MMMM dd, yyyy"))"
     
     Set-Content -Path $featuresFile -Value $newContent -Encoding UTF8
+    
+    # Automatically stage changes if git is available
+    try {
+        $gitPath = Get-Command git -ErrorAction SilentlyContinue
+        if ($gitPath) {
+            git add $featuresFile 2>$null
+        }
+    } catch {
+        # Ignore git errors
+    }
     
     if ($Json) {
         Write-Output (@{FEATURES_FILE=$featuresFile; TOTAL_FEATURES=$totalFeatures} | ConvertTo-Json)
@@ -176,12 +282,37 @@ if (-not $FeatureDescription) {
 
 ## Features
 
+| ID | Name | Description | Status | Spec Path | Last Updated |
+|----|------|-------------|--------|-----------|--------------|
+
 "
         Set-Content -Path $featuresFile -Value $emptyContent -Encoding UTF8
+    } else {
+        # Update last updated date
+        $content = Get-Content $featuresFile
+        $content = $content -replace "Last Updated: .*", "Last Updated: $((Get-Date).ToString("MMMM dd, yyyy"))"
+        Set-Content -Path $featuresFile -Value ($content -join "`n") -Encoding UTF8
+    }
+    
+    # Count existing features
+    $totalFeatures = 0
+    if (Test-Path $featuresFile) {
+        $content = Get-Content $featuresFile
+        $totalFeatures = ($content | Where-Object { $_ -match "^\|\s*\d{3}\s*\|" }).Count
+    }
+    
+    # Automatically stage changes if git is available
+    try {
+        $gitPath = Get-Command git -ErrorAction SilentlyContinue
+        if ($gitPath) {
+            git add $featuresFile 2>$null
+        }
+    } catch {
+        # Ignore git errors
     }
     
     if ($Json) {
-        Write-Output (@{FEATURES_FILE=$featuresFile; TOTAL_FEATURES=0} | ConvertTo-Json)
+        Write-Output (@{FEATURES_FILE=$featuresFile; TOTAL_FEATURES=$totalFeatures} | ConvertTo-Json)
     } else {
         Write-Host "FEATURES_FILE: $featuresFile"
         Write-Host "TOTAL_FEATURES: 0"

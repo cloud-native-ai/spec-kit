@@ -1,8 +1,38 @@
 ---
 description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
 scripts:
-  sh: scripts/bash/check-prerequisites.sh --json
-  ps: scripts/powershell/check-prerequisites.ps1 -Json
+  sh: |
+    # Feature tracking integration
+    if [ -f "features.md" ]; then
+        # Extract feature ID from current directory if available
+        CURRENT_DIR=$(pwd)
+        if [[ "$CURRENT_DIR" =~ /\.specify/[^/]+/([0-9]{3})- ]]; then
+            FEATURE_ID="${BASH_REMATCH[1]}"
+            # Update feature status to "Implemented" (if not already)
+            TODAY=$(date '+%Y-%m-%d')
+            sed -i "s/| ${FEATURE_ID} | \([^|]*\) | \([^|]*\) | Planned | \([^|]*\) | [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} | |/| ${FEATURE_ID} | \1 | \2 | Implemented | \3 | ${TODAY} | /" features.md
+            # Stage the changes
+            git add features.md >/dev/null 2>&1 || true
+        fi
+    fi
+    scripts/bash/check-prerequisites.sh --json
+  ps: |
+    # Feature tracking integration
+    if (Test-Path "features.md") {
+        # Extract feature ID from current directory if available
+        $currentDir = (Get-Location).Path
+        if ($currentDir -match "\.specify[^\\]+\\(\d{3})-") {
+            $featureId = $matches[1]
+            # Update feature status to "Implemented" (if not already)
+            $today = (Get-Date).ToString("yyyy-MM-dd")
+            $content = Get-Content "features.md"
+            $content = $content -replace "\|\s*$featureId\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*Planned\s*\|\s*([^|]*)\s*\|\s*\d{4}-\d{2}-\d{2}\s*\|", "| $featureId | `$1 | `$2 | Implemented | `$3 | $today |"
+            Set-Content -Path "features.md" -Value ($content -join "`n")
+            # Stage the changes
+            try { git add features.md 2>$null } catch { }
+        }
+    }
+    scripts/powershell/check-prerequisites.ps1 -Json
 ---
 
 ## User Input
@@ -57,6 +87,21 @@ You **MUST** consider the user input before proceeding (if not empty).
 Context for task generation: {ARGS}
 
 The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.
+
+## Feature Integration
+
+The `/speckit.tasks` command automatically integrates with the feature tracking system:
+
+- If a `features.md` file exists in the project root, the command will:
+  - Detect the current feature directory (format: `.specify/specs/###-feature-name/`)
+  - Extract the feature ID from the directory name
+  - Update the corresponding feature entry in `features.md`:
+    - Ensure status is "Implemented" (maintains status from planning phase)
+    - Keep the specification path unchanged
+    - Update the "Last Updated" date
+  - Automatically stage the changes to `features.md` for git commit
+
+This integration ensures that all feature task generation activities are properly tracked and linked to their corresponding entries in the project's feature index.
 
 ## Task Generation Rules
 

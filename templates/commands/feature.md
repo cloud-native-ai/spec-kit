@@ -34,7 +34,7 @@ Given that input, do this:
    - Set initial status to "Draft" for new features
 
 3. **Create or update the feature index file**:
-   - Generate a `features.md` file in the project root with proper header and feature entries
+   - Generate a `features.md` file in the project root with proper header and feature entries in Markdown table format
    - Ensure the file serves as the single entry point for feature views
    - Include metadata like feature ID, name, description, status, and relevant links
 
@@ -58,24 +58,29 @@ The `features.md` file should follow this structure:
 
 ## Features
 
-### Feature 001: [Feature Name]
-- **Status**: Draft
-- **Description**: [Brief description of the feature]
-- **Specification**: `.specify/specs/001-[branch-name]/spec.md` (if exists)
-- **Key Acceptance Criteria**: [List key criteria from spec if available]
-
-### Feature 002: [Feature Name]
-- **Status**: Planned
-- **Description**: [Brief description of the feature]
-- **Specification**: `.specify/specs/002-[branch-name]/spec.md`
-- **Key Acceptance Criteria**: [List key criteria from spec if available]
+| ID | Name | Description | Status | Spec Path | Last Updated |
+|----|------|-------------|--------|-----------|--------------|
+| 001 | [Feature Name] | [Brief description of the feature] | Draft | (Not yet created) | YYYY-MM-DD |
+| 002 | [Feature Name] | [Brief description of the feature] | Planned | .specify/specs/002-[branch-name]/spec.md | YYYY-MM-DD |
 
 [... additional features ...]
 ```
 
+### Table Column Definitions
+
+| Column | Description |
+|--------|-------------|
+| ID | Sequential three-digit feature identifier (001, 002, etc.) |
+| Name | Short feature name (2-4 words) describing the feature |
+| Description | Brief summary of the feature's purpose and scope |
+| Status | Current implementation status (Draft, Planned, Implemented, Ready for Review) |
+| Spec Path | Path to specification file or "(Not yet created)" if not yet created |
+| Last Updated | When the feature entry was last modified (YYYY-MM-DD format) |
+
 ## Success Criteria
 
-- Feature index file is created or updated successfully
+- Feature index file is created or updated successfully in proper Markdown table format
 - All feature entries have proper IDs, names, descriptions, and status
 - File serves as single source of truth for project features
 - Integration points are ready for SDD command updates
+- Changes are automatically staged in git for user to commit

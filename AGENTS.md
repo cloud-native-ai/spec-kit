@@ -394,5 +394,9 @@ When adding new agents:
 *This documentation should be updated whenever new agents are added to maintain accuracy and completeness.*
 
 ## Recent Changes
+- 002-test-fixed-specify: Added Python 3.11 + typer, rich, httpx[socks], platformdirs, readchar, truststore>=0.10.4
+- 002-test-fixed-specify: Added Python 3.11 + typer, rich, httpx[socks], platformdirs, readchar, truststore>=0.10.4
 - 002-test-fixed-specify: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
-- 002-test-fixed-specify: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+
+## Active Technologies
+- Python 3.11 + typer, rich, httpx[socks], platformdirs, readchar, truststore>=0.10.4 (002-test-fixed-specify)

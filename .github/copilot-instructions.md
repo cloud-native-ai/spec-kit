@@ -161,8 +161,10 @@
 > 维护者提示：若修改 `src/specify_cli/__init__.py` 涉及 Agent 配置与行为，请同步提升 `pyproject.toml` 版本并更新 `CHANGELOG.md`（见 AGENTS.md “General practices”）。
 
 ## Recent Changes
+- 002-test-fixed-specify: Added Python 3.11 + typer, rich, httpx[socks], platformdirs, readchar, truststore>=0.10.4
 - 002-test-fixed-specify: Added Python 3.11 + FastAPI, SQLAlchemy, Pydantic, bcrypt, python-jose
 - 002-test-fixed-specify: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 
 ## Active Technologies
-- Python 3.11 + FastAPI, SQLAlchemy, Pydantic, bcrypt, python-jose (002-test-fixed-specify)
+- Python 3.11 + typer, rich, httpx[socks], platformdirs, readchar, truststore>=0.10.4 (002-test-fixed-specify)
+- File system (features.md, .specify/specs/ directories) (002-test-fixed-specify)

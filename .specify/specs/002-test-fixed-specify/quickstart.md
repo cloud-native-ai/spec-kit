@@ -1,140 +1,138 @@
-# Quick Start Guide
+# Quickstart: Feature Management Workflow
+
+## Overview
+
+This quickstart guide demonstrates the complete feature management workflow using the new `/speckit.feature` command and integrated SDD commands.
 
 ## Prerequisites
 
-- Python 3.11 or higher
-- PostgreSQL 14 or higher
-- Docker and Docker Compose (optional, for containerized deployment)
+- Specify CLI installed (`specify init` completed)
+- Git installed and configured
+- AI assistant with slash command support (Copilot, Claude, etc.)
 
-## Local Development Setup
+## Step 1: Create Feature Index
 
-### 1. Clone the repository
+Start by creating your project's feature index:
+
 ```bash
-git clone https://github.com/your-org/your-project.git
-cd your-project
+/speckit.feature "Add user authentication system"
 ```
 
-### 2. Create a virtual environment
+This creates `features.md` with your first feature:
+
+```markdown
+# Project Feature Index
+
+**Last Updated**: November 17, 2025
+**Total Features**: 1
+
+## Features
+
+| ID | Name | Description | Status | Spec Path | Last Updated |
+|----|------|-------------|--------|-----------|--------------|
+| 001 | user authentication system | Add user authentication system | Draft | (Not yet created) | 2025-11-17 |
+```
+
+The change is automatically staged in git. Commit with your own message:
+
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+git commit -m "Add user authentication feature to index"
 ```
 
-### 3. Install dependencies
+## Step 2: Create Specification
+
+Create a detailed specification for your feature:
+
 ```bash
-pip install -r requirements.txt
+/speckit.specify "Add email/password login with OAuth2 support for Google and GitHub"
 ```
 
-### 4. Set up environment variables
-Create a `.env` file in the project root:
-```env
-DATABASE_URL=postgresql://username:password@localhost:5432/your_database
-SECRET_KEY=your-secret-key-here
-JWT_EXPIRATION_MINUTES=60
-OAUTH_GOOGLE_CLIENT_ID=your-google-client-id
-OAUTH_GITHUB_CLIENT_ID=your-github-client-id
-```
+This:
+- Creates branch `001-user-authentication-system`
+- Generates `.specify/specs/001-user-authentication-system/spec.md`
+- Updates `features.md` status to "Planned" and records spec path
+- Automatically stages the `features.md` change
 
-### 5. Initialize the database
+Commit the specification:
+
 ```bash
-# Run database migrations
-python -m alembic upgrade head
-
-# Or if using raw SQL setup
-psql -f scripts/init_db.sql
+git add .
+git commit -m "Specify user authentication requirements"
 ```
 
-### 6. Start the development server
+## Step 3: Create Implementation Plan
+
+Generate an implementation plan:
+
 ```bash
-uvicorn src.main:app --reload --port 8000
+/speckit.plan
 ```
 
-## Core User Journeys
+This:
+- Creates `.specify/specs/001-user-authentication-system/plan.md`
+- Updates `features.md` status to "Implemented"
+- Automatically stages the `features.md` change
 
-### Register a new user
+## Step 4: Generate Tasks
+
+Create actionable tasks:
+
 ```bash
-curl -X POST http://localhost:8000/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "securePassword123",
-    "first_name": "John",
-    "last_name": "Doe"
-  }'
+/speckit.tasks
 ```
 
-### Log in with email/password
+This:
+- Creates `.specify/specs/001-user-authentication-system/tasks.md`
+- Maintains "Implemented" status in `features.md`
+- Automatically stages the `features.md` change
+
+## Step 5: Implement Feature
+
+Execute the implementation:
+
 ```bash
-curl -X POST http://localhost:8000/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "securePassword123"
-  }'
+/speckit.implement
 ```
 
-### Get current user profile (requires authentication)
+This:
+- Implements the feature based on tasks
+- Maintains "Implemented" status in `features.md`
+- Automatically stages the `features.md` change
+
+## Step 6: Validate with Checklist
+
+Validate the implementation:
+
 ```bash
-curl -X GET http://localhost:8000/v1/users/me \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+/speckit.checklist
 ```
 
-### Update user profile
+This:
+- Creates quality checklist and runs validation
+- Updates `features.md` status to "Ready for Review"
+- Automatically stages the `features.md` change
+
+## Concurrent Feature Management
+
+You can manage multiple features simultaneously:
+
 ```bash
-curl -X PATCH http://localhost:8000/v1/users/me \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "first_name": "Jane"
-  }'
+/speckit.feature "Implement payment processing with credit cards"
+/speckit.feature "Create admin dashboard for user management"
 ```
 
-### Log out (invalidate session)
-```bash
-curl -X POST http://localhost:8000/v1/auth/logout \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
-```
+Each feature gets a sequential ID (002, 003, etc.) and can progress independently through the SDD workflow.
 
-## Testing
+## Handling Merge Conflicts
 
-Run all tests:
-```bash
-pytest
-```
+If multiple team members update the same feature entry simultaneously, git will create a merge conflict in `features.md`. Resolve the conflict manually during the merge process - this is the expected behavior for concurrent updates.
 
-Run unit tests only:
-```bash
-pytest tests/unit/
-```
+## Performance Expectations
 
-Run contract tests:
-```bash
-pytest tests/contract/
-```
+- Feature index creation/update: < 1 second for typical usage
+- SDD command integration overhead: < 200ms per command
+- Maximum supported features: 100 features with < 5 second total execution time
 
-## Key Implementation Details
+## Backward Compatibility
 
-- **Authentication**: JWT tokens with 60-minute expiration
-- **Password Security**: bcrypt hashing with salt
-- **Database**: PostgreSQL with connection pooling
-- **API Documentation**: Automatic OpenAPI docs at `/docs`
-- **Error Handling**: Standardized error responses with error codes
-- **Validation**: Pydantic models for request/response validation
-
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | Required |
-| `SECRET_KEY` | JWT signing secret | Required |
-| `JWT_EXPIRATION_MINUTES` | Token expiration time | 60 |
-| `OAUTH_GOOGLE_CLIENT_ID` | Google OAuth client ID | Optional |
-| `OAUTH_GITHUB_CLIENT_ID` | GitHub OAuth client ID | Optional |
-
-## Next Steps
-
-1. Implement email verification workflow
-2. Add password reset functionality
-3. Set up monitoring and logging
-4. Configure production deployment
-5. Add rate limiting for authentication endpoints
+Existing projects without `features.md` continue to work exactly as before. Feature tracking is only enabled when `features.md` exists in the project root.
