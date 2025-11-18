@@ -23,7 +23,7 @@ The text the user typed after `/speckit.feature` in the triggering message **is*
 Given that input, do this:
 
 1. **Analyze existing context**: 
-   - Check if a `features.md` file already exists in the project root
+   - Check if a `.specify/memory/features.md` file already exists
    - If it exists, parse the current feature entries
    - If it doesn't exist, prepare to create a new feature index
 
@@ -34,7 +34,7 @@ Given that input, do this:
    - Set initial status to "Draft" for new features
 
 3. **Create or update the feature index file**:
-   - Generate a `features.md` file in the project root with proper header and feature entries in Markdown table format
+   - Generate a `.specify/memory/features.md` file with proper header and feature entries in Markdown table format
    - Ensure the file serves as the single entry point for feature views
    - Include metadata like feature ID, name, description, status, and relevant links
 
@@ -48,7 +48,7 @@ Given that input, do this:
 
 ## Feature Index Structure
 
-The `features.md` file should follow this structure:
+The `.specify/memory/features.md` file should follow this structure:
 
 ```markdown
 # Project Feature Index

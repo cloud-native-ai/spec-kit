@@ -18,7 +18,7 @@ Start by creating your project's feature index:
 /speckit.feature "Add user authentication system"
 ```
 
-This creates `features.md` with your first feature:
+This creates `.specify/memory/features.md` with your first feature:
 
 ```markdown
 # Project Feature Index
@@ -50,8 +50,8 @@ Create a detailed specification for your feature:
 This:
 - Creates branch `001-user-authentication-system`
 - Generates `.specify/specs/001-user-authentication-system/spec.md`
-- Updates `features.md` status to "Planned" and records spec path
-- Automatically stages the `features.md` change
+- Updates `.specify/memory/features.md` status to "Planned" and records spec path
+- Automatically stages the `.specify/memory/features.md` change
 
 Commit the specification:
 
@@ -70,8 +70,8 @@ Generate an implementation plan:
 
 This:
 - Creates `.specify/specs/001-user-authentication-system/plan.md`
-- Updates `features.md` status to "Implemented"
-- Automatically stages the `features.md` change
+- Updates `.specify/memory/features.md` status to "Implemented"
+- Automatically stages the `.specify/memory/features.md` change
 
 ## Step 4: Generate Tasks
 
@@ -83,8 +83,8 @@ Create actionable tasks:
 
 This:
 - Creates `.specify/specs/001-user-authentication-system/tasks.md`
-- Maintains "Implemented" status in `features.md`
-- Automatically stages the `features.md` change
+- Maintains "Implemented" status in `.specify/memory/features.md`
+- Automatically stages the `.specify/memory/features.md` change
 
 ## Step 5: Implement Feature
 
@@ -96,8 +96,8 @@ Execute the implementation:
 
 This:
 - Implements the feature based on tasks
-- Maintains "Implemented" status in `features.md`
-- Automatically stages the `features.md` change
+- Maintains "Implemented" status in `.specify/memory/features.md`
+- Automatically stages the `.specify/memory/features.md` change
 
 ## Step 6: Validate with Checklist
 
@@ -109,8 +109,8 @@ Validate the implementation:
 
 This:
 - Creates quality checklist and runs validation
-- Updates `features.md` status to "Ready for Review"
-- Automatically stages the `features.md` change
+- Updates `.specify/memory/features.md` status to "Ready for Review"
+- Automatically stages the `.specify/memory/features.md` change
 
 ## Concurrent Feature Management
 
@@ -125,7 +125,7 @@ Each feature gets a sequential ID (002, 003, etc.) and can progress independentl
 
 ## Handling Merge Conflicts
 
-If multiple team members update the same feature entry simultaneously, git will create a merge conflict in `features.md`. Resolve the conflict manually during the merge process - this is the expected behavior for concurrent updates.
+If multiple team members update the same feature entry simultaneously, git will create a merge conflict in `.specify/memory/features.md`. Resolve the conflict manually during the merge process - this is the expected behavior for concurrent updates.
 
 ## Performance Expectations
 
@@ -135,4 +135,4 @@ If multiple team members update the same feature entry simultaneously, git will 
 
 ## Backward Compatibility
 
-Existing projects without `features.md` continue to work exactly as before. Feature tracking is only enabled when `features.md` exists in the project root.
+Existing projects without `.specify/memory/features.md` continue to work exactly as before. Feature tracking is only enabled when `.specify/memory/features.md` exists in the project.

@@ -23,9 +23,9 @@
 
 **Purpose**: Project initialization and basic structure for feature management
 
-- [ ] T001 Create feature management directory structure in .specify/scripts/
-- [ ] T002 Initialize feature management scripts with basic functionality
-- [ ] T003 [P] Configure feature management documentation templates
+- [X] T001 Create feature management directory structure in .specify/scripts/
+- [X] T002 Initialize feature management scripts with basic functionality
+- [X] T003 [P] Configure feature management documentation templates
 
 ---
 
@@ -35,12 +35,12 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Implement feature ID generation logic for sequential IDs (001, 002, etc.)
-- [ ] T005 [P] Implement feature index parsing and validation for Markdown table format
-- [ ] T006 [P] Implement feature status transition logic (Draft → Planned → Implemented → Ready for Review)
-- [ ] T007 Create feature context detection utility for branch/directory parsing
-- [ ] T008 Implement git staging integration for features.md changes
-- [ ] T009 Setup error handling and logging for feature management operations
+- [X] T004 Implement feature ID generation logic for sequential IDs (001, 002, etc.)
+- [X] T005 [P] Implement feature index parsing and validation for Markdown table format
+- [X] T006 [P] Implement feature status transition logic (Draft → Planned → Implemented → Ready for Review)
+- [X] T007 Create feature context detection utility for branch/directory parsing
+- [X] T008 Implement git staging integration for features.md changes
+- [X] T009 Setup error handling and logging for feature management operations
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -56,22 +56,22 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Contract test for /speckit.feature command output format in tests/contract/test_feature_command.py
-- [ ] T011 [P] [US1] Integration test for feature index creation with empty input in tests/integration/test_feature_index_empty.py
-- [ ] T012 [P] [US1] Integration test for feature index update with feature description in tests/integration/test_feature_index_update.py
-- [ ] T013 [US1] Unit test for sequential feature ID generation in tests/unit/test_feature_id_generation.py
-- [ ] T014 [US1] Unit test for Markdown table format validation in tests/unit/test_markdown_table_format.py
+- [X] T010 [P] [US1] Contract test for /speckit.feature command output format in tests/contract/test_feature_command.py
+- [X] T011 [P] [US1] Integration test for feature index creation with empty input in tests/integration/test_feature_index_empty.py
+- [X] T012 [P] [US1] Integration test for feature index update with feature description in tests/integration/test_feature_index_update.py
+- [X] T013 [US1] Unit test for sequential feature ID generation in tests/unit/test_feature_id_generation.py
+- [X] T014 [US1] Unit test for Markdown table format validation in tests/unit/test_markdown_table_format.py
 
 ### Implementation for User Story 1
 
-- [ ] T015 [P] [US1] Create create-feature-index.sh script in .specify/scripts/bash/create-feature-index.sh
-- [ ] T016 [P] [US1] Create create-feature-index.ps1 script in .specify/scripts/powershell/create-feature-index.ps1
-- [ ] T017 [US1] Implement feature index Markdown table generation logic in .specify/scripts/bash/create-feature-index.sh
-- [ ] T018 [US1] Implement sequential feature ID assignment logic in .specify/scripts/bash/create-feature-index.sh
-- [ ] T019 [US1] Implement automatic git staging for features.md changes in .specify/scripts/bash/create-feature-index.sh
-- [ ] T020 [US1] Update feature command template in templates/commands/feature.md
-- [ ] T021 [US1] Add performance optimization for 100+ features support in .specify/scripts/bash/create-feature-index.sh
-- [ ] T022 [US1] Implement orphaned feature handling logic in .specify/scripts/bash/create-feature-index.sh
+- [X] T015 [P] [US1] Create create-feature-index.sh script in .specify/scripts/bash/create-feature-index.sh
+- [X] T016 [P] [US1] Create create-feature-index.ps1 script in .specify/scripts/powershell/create-feature-index.ps1
+- [X] T017 [US1] Implement feature index Markdown table generation logic in .specify/scripts/bash/create-feature-index.sh
+- [X] T018 [US1] Implement sequential feature ID assignment logic in .specify/scripts/bash/create-feature-index.sh
+- [X] T019 [US1] Implement automatic git staging for features.md changes in .specify/scripts/bash/create-feature-index.sh
+- [X] T020 [US1] Update feature command template in templates/commands/feature.md
+- [X] T021 [US1] Add performance optimization for 100+ features support in .specify/scripts/bash/create-feature-index.sh
+- [X] T022 [US1] Implement orphaned feature handling logic in .specify/scripts/bash/create-feature-index.sh
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -94,11 +94,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T029 [P] [US2] Update specify command template with feature integration logic in templates/commands/specify.md
-- [ ] T030 [P] [US2] Update plan command template with feature integration logic in templates/commands/plan.md
-- [ ] T031 [P] [US2] Update tasks command template with feature integration logic in templates/commands/tasks.md
-- [ ] T032 [P] [US2] Update implement command template with feature integration logic in templates/commands/implement.md
-- [ ] T033 [P] [US2] Update checklist command template with feature integration logic in templates/commands/checklist.md
+- [X] T029 [P] [US2] Update specify command template with feature integration logic in templates/commands/specify.md
+- [X] T030 [P] [US2] Update plan command template with feature integration logic in templates/commands/plan.md
+- [X] T031 [P] [US2] Update tasks command template with feature integration logic in templates/commands/tasks.md
+- [X] T032 [P] [US2] Update implement command template with feature integration logic in templates/commands/implement.md
+- [X] T033 [P] [US2] Update checklist command template with feature integration logic in templates/commands/checklist.md
 - [ ] T034 [US2] Implement feature context detection in SDD command integration scripts
 - [ ] T035 [US2] Implement status transition updates for all SDD commands in integration scripts
 - [ ] T036 [US2] Add error handling and fallback behavior for existing projects without features.md

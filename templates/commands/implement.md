@@ -3,33 +3,33 @@ description: Execute the implementation plan by processing and executing all tas
 scripts:
   sh: |
     # Feature tracking integration
-    if [ -f "features.md" ]; then
+    if [ -f ".specify/memory/features.md" ]; then
         # Extract feature ID from current directory if available
         CURRENT_DIR=$(pwd)
         if [[ "$CURRENT_DIR" =~ /\.specify/[^/]+/([0-9]{3})- ]]; then
             FEATURE_ID="${BASH_REMATCH[1]}"
             # Update feature status to "Implemented" (if not already)
             TODAY=$(date '+%Y-%m-%d')
-            sed -i "s/| ${FEATURE_ID} | \([^|]*\) | \([^|]*\) | Planned | \([^|]*\) | [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} | |/| ${FEATURE_ID} | \1 | \2 | Implemented | \3 | ${TODAY} | /" features.md
+            sed -i "s/| ${FEATURE_ID} | \([^|]*\) | \([^|]*\) | Planned | \([^|]*\) | [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} | |/| ${FEATURE_ID} | \1 | \2 | Implemented | \3 | ${TODAY} | /" .specify/memory/features.md
             # Stage the changes
-            git add features.md >/dev/null 2>&1 || true
+            git add .specify/memory/features.md >/dev/null 2>&1 || true
         fi
     fi
     scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
   ps: |
     # Feature tracking integration
-    if (Test-Path "features.md") {
+    if (Test-Path ".specify/memory/features.md") {
         # Extract feature ID from current directory if available
         $currentDir = (Get-Location).Path
         if ($currentDir -match "\.specify[^\\]+\\(\d{3})-") {
             $featureId = $matches[1]
             # Update feature status to "Implemented" (if not already)
             $today = (Get-Date).ToString("yyyy-MM-dd")
-            $content = Get-Content "features.md"
+            $content = Get-Content ".specify/memory/features.md"
             $content = $content -replace "\|\s*$featureId\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*Planned\s*\|\s*([^|]*)\s*\|\s*\d{4}-\d{2}-\d{2}\s*\|", "| $featureId | `$1 | `$2 | Implemented | `$3 | $today |"
-            Set-Content -Path "features.md" -Value ($content -join "`n")
+            Set-Content -Path ".specify/memory/features.md" -Value ($content -join "`n")
             # Stage the changes
-            try { git add features.md 2>$null } catch { }
+            try { git add .specify/memory/features.md 2>$null } catch { }
         }
     }
     scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
@@ -168,14 +168,14 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 The `/speckit.implement` command automatically integrates with the feature tracking system:
 
-- If a `features.md` file exists in the project root, the command will:
+- If a `.specify/memory/features.md` file exists, the command will:
   - Detect the current feature directory (format: `.specify/specs/###-feature-name/`)
   - Extract the feature ID from the directory name
-  - Update the corresponding feature entry in `features.md`:
+  - Update the corresponding feature entry in `.specify/memory/features.md`:
     - Ensure status remains "Implemented" (maintains status from planning phase)
     - Keep the specification path unchanged
     - Update the "Last Updated" date
-  - Automatically stage the changes to `features.md` for git commit
+  - Automatically stage the changes to `.specify/memory/features.md` for git commit
 
 This integration ensures that all feature implementation activities are properly tracked and linked to their corresponding entries in the project's feature index.
 

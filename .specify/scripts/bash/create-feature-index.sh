@@ -23,7 +23,6 @@ if ! locale 2>/dev/null | grep -qi 'utf-8'; then
 fi
 
 JSON_MODE=false
-FEATURE_DESCRIPTIONS=""
 i=1
 while [ $i -le $# ]; do
     arg="${!i}"
@@ -32,40 +31,34 @@ while [ $i -le $# ]; do
             JSON_MODE=true 
             ;;
         --help|-h) 
-            echo "Usage: $0 [--json] [<feature_descriptions>]"
+            echo "Usage: $0 [--json]"
             echo ""
             echo "Options:"
             echo "  --json              Output in JSON format"
             echo "  --help, -h          Show this help message"
             echo ""
             echo "Behavior:"
-            echo "  - Creates or updates a features.md file in the project root"
-            echo "  - Generates feature entries from input descriptions"
-            echo "  - Integrates with existing SDD workflow"
+            echo "  - Creates or updates .specify/memory/features.md with feature index in Markdown table format"
+            echo "  - Reads feature descriptions from stdin if available"
+            echo "  - Automatically stages .specify/memory/features.md changes with git"
             echo ""
             echo "Examples:"
-            echo "  $0 'Add user authentication system'"
-            echo "  echo 'Implement OAuth2 integration for API' | $0 --json"
+            echo "  echo 'Add user authentication system' | $0 --json"
+            echo "  $0"
             exit 0
             ;;
         *) 
-            # Collect all remaining arguments as the feature description
-            if [ -z "$FEATURE_DESCRIPTIONS" ]; then
-                FEATURE_DESCRIPTIONS="$arg"
-            else
-                FEATURE_DESCRIPTIONS="$FEATURE_DESCRIPTIONS $arg"
-            fi
+            # Ignore unknown arguments for now
             ;;
     esac
     i=$((i + 1))
 done
 
-# If no command line arguments provided, read from stdin
-if [ -z "$FEATURE_DESCRIPTIONS" ]; then
-    if [ ! -t 0 ]; then
-        # stdin is not a terminal, read from it
-        FEATURE_DESCRIPTIONS=$(cat)
-    fi
+# Read feature descriptions from stdin if available
+FEATURE_DESCRIPTIONS=""
+if [ ! -t 0 ]; then
+    # stdin is not a terminal, read from it
+    FEATURE_DESCRIPTIONS=$(cat)
 fi
 
 # Function to find the repository root by searching for existing project markers
@@ -100,221 +93,268 @@ fi
 
 cd "$REPO_ROOT"
 
-FEATURES_FILE="$REPO_ROOT/features.md"
+# Create .specify/memory directory if it doesn't exist
+MEMORY_DIR="$REPO_ROOT/.specify/memory"
+mkdir -p "$MEMORY_DIR"
+FEATURES_FILE="$MEMORY_DIR/features.md"
 
-# Function to find the highest existing feature number
-find_highest_feature_number() {
-    local highest=0
-    if [ -f "$FEATURES_FILE" ]; then
-        # Look for existing feature numbers in features.md table
-        while IFS= read -r line; do
-            if [[ "$line" =~ ^\|\ *([0-9]{3})\ *\| ]]; then
-                local num="${BASH_REMATCH[1]}"
-                num=$((10#$num))
-                if [ "$num" -gt "$highest" ]; then
-                    highest=$num
-                fi
+# Function to get current date in YYYY-MM-DD format
+get_current_date() {
+    if command -v date >/dev/null 2>&1; then
+        date -I 2>/dev/null || date +%Y-%m-%d
+    else
+        # Fallback for systems without date -I
+        printf '%(%Y-%m-%d)T\n' -1 2>/dev/null || echo "Unknown date"
+    fi
+}
+
+# Function to generate a short name from feature description
+generate_short_name() {
+    local description="$1"
+    
+    # Common stop words to filter out
+    local stop_words="^(i|a|an|the|to|for|of|in|on|at|by|with|from|is|are|was|were|be|been|being|have|has|had|do|does|did|will|would|should|could|can|may|might|must|shall|this|that|these|those|my|your|our|their|want|need|add|get|set)$"
+    
+    # Convert to lowercase and split into words
+    local clean_name=$(echo "$description" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/ /g')
+    
+    # Filter words: remove stop words and words shorter than 3 chars (unless they're uppercase acronyms in original)
+    local meaningful_words=()
+    for word in $clean_name; do
+        # Skip empty words
+        [ -z "$word" ] && continue
+        
+        # Keep words that are NOT stop words AND (length >= 3 OR are potential acronyms)
+        if ! echo "$word" | grep -qiE "$stop_words"; then
+            if [ ${#word} -ge 3 ]; then
+                meaningful_words+=("$word")
+            elif echo "$description" | grep -q "\b${word^^}\b"; then
+                # Keep short words if they appear as uppercase in original (likely acronyms)
+                meaningful_words+=("$word")
             fi
-        done < "$FEATURES_FILE"
+        fi
+    done
+    
+    # If we have meaningful words, use first 2-4 of them
+    if [ ${#meaningful_words[@]} -gt 0 ]; then
+        local max_words=4
+        if [ ${#meaningful_words[@]} -lt 4 ]; then max_words=${#meaningful_words[@]}; fi
+        
+        local result=""
+        local count=0
+        for word in "${meaningful_words[@]}"; do
+            if [ $count -ge $max_words ]; then break; fi
+            if [ $count -gt 0 ]; then result="$result "; fi
+            result="$result$word"
+            count=$((count + 1))
+        done
+        echo "$result"
+    else
+        # Fallback to first 4 words of original description
+        echo "$description" | cut -d' ' -f1-4
+    fi
+}
+
+# Function to parse existing features from features.md
+parse_existing_features() {
+    local features_file="$1"
+    local -n existing_features_ref=$2
+    local -n next_id_ref=$3
+    
+    if [ ! -f "$features_file" ]; then
+        existing_features_ref=()
+        next_id_ref=1
+        return 0
     fi
     
-    # Also check existing spec directories
-    SPECS_DIR="$REPO_ROOT/.specify/specs"
-    if [ -d "$SPECS_DIR" ]; then
-        for dir in "$SPECS_DIR"/*; do
-            [ -d "$dir" ] || continue
-            dirname=$(basename "$dir")
-            number=$(echo "$dirname" | grep -o '^[0-9]\+' || echo "0")
-            number=$((10#$number))
-            if [ "$number" -gt "$highest" ]; then highest=$number; fi
+    # Check if file has the expected table format
+    if ! grep -q "| ID | Name | Description | Status | Spec Path | Last Updated |" "$features_file" 2>/dev/null; then
+        existing_features_ref=()
+        next_id_ref=1
+        return 0
+    fi
+    
+    # Parse existing features from table
+    local line_num=0
+    local in_table=false
+    local highest_id=0
+    local features=()
+    
+    while IFS= read -r line; do
+        line_num=$((line_num + 1))
+        
+        # Check for table header
+        if echo "$line" | grep -q "| ID | Name | Description | Status | Spec Path | Last Updated |"; then
+            in_table=true
+            continue
+        fi
+        
+        # Check for table separator
+        if $in_table && echo "$line" | grep -q "|----|"; then
+            continue
+        fi
+        
+        # Parse table rows
+        if $in_table && echo "$line" | grep -q "^[[:space:]]*|[[:space:]]*[0-9][0-9][0-9][[:space:]]*|"; then
+            # Extract ID (first column after |)
+            local id=$(echo "$line" | sed 's/^[[:space:]]*|//; s/|.*$//' | tr -d '[:space:]')
+            local name=$(echo "$line" | cut -d'|' -f3 | tr -d '[:space:]')
+            local description=$(echo "$line" | cut -d'|' -f4)
+            local status=$(echo "$line" | cut -d'|' -f5 | tr -d '[:space:]')
+            local spec_path=$(echo "$line" | cut -d'|' -f6)
+            local last_updated=$(echo "$line" | cut -d'|' -f7 | tr -d '[:space:]')
+            
+            # Clean up fields
+            description=$(echo "$description" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+            spec_path=$(echo "$spec_path" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+            
+            # Store feature
+            features+=("$id|$name|$description|$status|$spec_path|$last_updated")
+            
+            # Track highest ID
+            if [ "$id" -gt "$highest_id" ] 2>/dev/null; then
+                highest_id=$id
+            fi
+        fi
+        
+        # End of table if we hit a non-table line after being in table
+        if $in_table && ! echo "$line" | grep -q "^[[:space:]]*|"; then
+            in_table=false
+        fi
+    done < "$features_file"
+    
+    existing_features_ref=("${features[@]}")
+    next_id_ref=$((highest_id + 1))
+}
+
+# Function to find spec path for a feature
+find_spec_path() {
+    local feature_id="$1"
+    local repo_root="$2"
+    local specs_dir="$repo_root/.specify/specs"
+    
+    if [ -d "$specs_dir" ]; then
+        # Look for directory matching the feature ID pattern
+        for dir in "$specs_dir"/"$feature_id"-*; do
+            if [ -d "$dir" ]; then
+                spec_file="$dir/spec.md"
+                if [ -f "$spec_file" ]; then
+                    # Return relative path
+                    echo "${dir#$repo_root/}/spec.md"
+                    return 0
+                fi
+            fi
         done
     fi
     
-    echo "$highest"
+    echo "(Not yet created)"
 }
 
-# Function to generate a clean feature name from description
-generate_feature_name() {
-    local description="$1"
-    # Convert to lowercase and clean up, limit to 4 words
-    echo "$description" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/ /g' | tr -s ' ' | sed 's/^ //;s/ $//' | cut -d' ' -f1-4
-}
-
-# Function to check if a feature already exists in the table
-feature_exists() {
-    local description="$1"
-    if [ -f "$FEATURES_FILE" ]; then
-        # Escape special characters for grep
-        local escaped_desc=$(echo "$description" | sed 's/[]\/$*.^[]/\\&/g')
-        if grep -q "|.*|.*|.*$escaped_desc.*|.*|" "$FEATURES_FILE" 2>/dev/null; then
-            return 0  # Feature exists
-        fi
-    fi
-    return 1  # Feature doesn't exist
-}
-
-# Create or update the features.md file in Markdown table format
-create_feature_index() {
-    local description="$1"
-    local highest_num=$(find_highest_feature_number)
-    local current_num=$((highest_num + 1))
-    
-    # Check if this feature already exists
-    if feature_exists "$description"; then
-        # Feature already exists, just update the date
-        local today=$(date '+%Y-%m-%d')
-        sed -i "s/Last Updated: .*/Last Updated: $today/" "$FEATURES_FILE"
-        
-        # Count existing features
-        local total_features=$(grep -c "^| [0-9][0-9][0-9] |" "$FEATURES_FILE" || echo "0")
-        
-        if $JSON_MODE; then
-            printf '{"FEATURES_FILE":"%s","TOTAL_FEATURES":%d}\n' "$FEATURES_FILE" "$total_features"
-        else
-            echo "FEATURES_FILE: $FEATURES_FILE"
-            echo "TOTAL_FEATURES: $total_features"
-            echo "Feature index updated successfully"
-        fi
-        return
-    fi
-    
-    # Read existing content if file exists
-    local existing_content=""
-    local existing_features=()
-    local table_header=""
-    local table_separator=""
-    
-    if [ -f "$FEATURES_FILE" ]; then
-        existing_content=$(cat "$FEATURES_FILE")
-        
-        # Check if we have a table already
-        if echo "$existing_content" | grep -q "^| ID | Name | Description | Status | Spec Path | Last Updated |$"; then
-            # Extract content before table
-            local header_content=$(echo "$existing_content" | sed -n '1,/^| ID | Name | Description | Status | Spec Path | Last Updated |$/p' | head -n -1)
-            
-            # Extract table header and separator
-            table_header="| ID | Name | Description | Status | Spec Path | Last Updated |"
-            table_separator="|----|------|-------------|--------|-----------|--------------|"
-            
-            # Extract existing table rows
-            local table_content=$(echo "$existing_content" | sed -n '/^| ID | Name | Description | Status | Spec Path | Last Updated |$/,/^$/p' | tail -n +3 | head -n -1)
-            
-            # Store existing features
-            while IFS= read -r line; do
-                if [[ "$line" =~ ^\|\ [0-9]{3}\ \| ]]; then
-                    existing_features+=("$line")
-                fi
-            done <<< "$table_content"
-        else
-            # No table exists, use all content as header
-            header_content="$existing_content"
-            table_header="| ID | Name | Description | Status | Spec Path | Last Updated |"
-            table_separator="|----|------|-------------|--------|-----------|--------------|"
-        fi
+# Function to determine feature status based on spec path
+determine_status() {
+    local spec_path="$1"
+    if [ "$spec_path" = "(Not yet created)" ]; then
+        echo "Draft"
     else
-        # Create default header if file doesn't exist
-        header_content="# Project Feature Index
-
-**Last Updated**: $(date '+%B %d, %Y')
-**Total Features**: 0
-
-## Features
-
-"
-        table_header="| ID | Name | Description | Status | Spec Path | Last Updated |"
-        table_separator="|----|------|-------------|--------|-----------|--------------|"
+        echo "Planned"
     fi
+}
+
+# Function to update orphaned features
+update_orphaned_features() {
+    local -n features_ref=$1
+    local repo_root="$2"
+    local specs_dir="$repo_root/.specify/specs"
     
-    # Generate new content
-    local new_content="$header_content"
-    new_content="${new_content}${table_header}
-${table_separator}
-"
-    
-    # Add existing features
-    for feature in "${existing_features[@]}"; do
-        new_content="${new_content}${feature}
-"
+    local updated_features=()
+    for feature in "${features_ref[@]}"; do
+        IFS='|' read -r id name description status spec_path last_updated <<< "$feature"
+        
+        # Check if spec path exists and is valid
+        if [ "$spec_path" != "(Not yet created)" ] && [ "$spec_path" != "(Orphaned - spec file deleted)" ]; then
+            full_spec_path="$repo_root/$spec_path"
+            if [ ! -f "$full_spec_path" ]; then
+                # Spec file doesn't exist - mark as orphaned
+                spec_path="(Orphaned - spec file deleted)"
+            fi
+        fi
+        
+        updated_features+=("$id|$name|$description|$status|$spec_path|$last_updated")
     done
     
-    # Add new feature from input
-    if [ -n "$description" ]; then
-        local feature_name=$(generate_feature_name "$description")
-        local feature_id=$(printf "%03d" "$current_num")
-        local today=$(date '+%Y-%m-%d')
-        
-        # Add new feature row
-        new_content="${new_content}| ${feature_id} | ${feature_name} | ${description} | Draft | (Not yet created) | ${today} |
-"
-        current_num=$((current_num + 1))
-    fi
-    
-    # Add empty line at the end
-    new_content="${new_content}
-"
-    
-    # Update total features count and last updated date
-    local total_features=$(echo "$new_content" | grep -c "^| [0-9][0-9][0-9] |")
-    local today=$(date '+%Y-%m-%d')
-    new_content=$(echo "$new_content" | sed "s/Total Features: [0-9]*/Total Features: $total_features/")
-    new_content=$(echo "$new_content" | sed "s/Last Updated: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Last Updated: $today/")
-    new_content=$(echo "$new_content" | sed "s/Last Updated: [A-Z][a-z]* [0-9]\{1,2\}, [0-9]\{4\}/Last Updated: $(date '+%B %d, %Y')/")
-    
-    echo "$new_content" > "$FEATURES_FILE"
-    
-    # Automatically stage changes if git is available
-    if [ "$HAS_GIT" = true ] && command -v git >/dev/null 2>&1; then
-        git add "$FEATURES_FILE" >/dev/null 2>&1 || true
-    fi
-    
-    if $JSON_MODE; then
-        printf '{"FEATURES_FILE":"%s","TOTAL_FEATURES":%d}\n' "$FEATURES_FILE" "$total_features"
-    else
-        echo "FEATURES_FILE: $FEATURES_FILE"
-        echo "TOTAL_FEATURES: $total_features"
-        echo "Feature index created/updated successfully"
-    fi
+    features_ref=("${updated_features[@]}")
 }
 
-# Main execution
-if [ -z "$FEATURE_DESCRIPTIONS" ]; then
-    # No input provided, just ensure features.md exists or create empty one
-    if [ ! -f "$FEATURES_FILE" ]; then
-        echo "# Project Feature Index
+# Parse existing features
+declare -a existing_features
+next_id=1
+parse_existing_features "$FEATURES_FILE" existing_features next_id
 
-**Last Updated**: $(date '+%B %d, %Y')
-**Total Features**: 0
+# Update orphaned features
+update_orphaned_features existing_features "$REPO_ROOT"
 
-## Features
+# Process new feature descriptions
+new_features=()
+if [ -n "$FEATURE_DESCRIPTIONS" ]; then
+    # Split input by newlines (handle multiple features)
+    while IFS= read -r description; do
+        [ -z "$description" ] && continue
+        
+        # Generate short name
+        short_name=$(generate_short_name "$description")
+        
+        # Find or create feature ID
+        feature_id=$(printf "%03d" "$next_id")
+        next_id=$((next_id + 1))
+        
+        # Determine spec path and status
+        spec_path=$(find_spec_path "$feature_id" "$REPO_ROOT")
+        status=$(determine_status "$spec_path")
+        last_updated=$(get_current_date)
+        
+        new_features+=("$feature_id|$short_name|$description|$status|$spec_path|$last_updated")
+    done <<< "$FEATURE_DESCRIPTIONS"
+fi
 
-| ID | Name | Description | Status | Spec Path | Last Updated |
-|----|------|-------------|--------|-----------|--------------|
+# Combine existing and new features
+all_features=("${existing_features[@]}" "${new_features[@]}")
 
-" > "$FEATURES_FILE"
-    else
-        # Update last updated date
-        sed -i "s/Last Updated: .*/Last Updated: $(date '+%B %d, %Y')/" "$FEATURES_FILE"
-    fi
+# Sort features by ID
+IFS=$'\n' sorted_features=($(sort -t'|' -k1,1n <<<"${all_features[*]}"))
+unset IFS
+
+# Write updated features.md
+{
+    echo "# Project Feature Index"
+    echo ""
+    current_date=$(get_current_date)
+    total_features=${#sorted_features[@]}
+    echo "**Last Updated**: $current_date"
+    echo "**Total Features**: $total_features"
+    echo ""
+    echo "## Features"
+    echo ""
+    echo "| ID | Name | Description | Status | Spec Path | Last Updated |"
+    echo "|----|------|-------------|--------|-----------|--------------|"
     
-    # Count existing features
-    local total_features=0
-    if [ -f "$FEATURES_FILE" ]; then
-        total_features=$(grep -c "^| [0-9][0-9][0-9] |" "$FEATURES_FILE" || echo "0")
+    for feature in "${sorted_features[@]}"; do
+        IFS='|' read -r id name description status spec_path last_updated <<< "$feature"
+        echo "| $id | $name | $description | $status | $spec_path | $last_updated |"
+    done
+} > "$FEATURES_FILE"
+
+# Automatically stage the changes if git is available
+if [ "$HAS_GIT" = true ]; then
+    if command -v git >/dev/null 2>&1; then
+        git add "$FEATURES_FILE" 2>/dev/null || true
     fi
-    
-    # Automatically stage changes if git is available
-    if [ "$HAS_GIT" = true ] && command -v git >/dev/null 2>&1; then
-        git add "$FEATURES_FILE" >/dev/null 2>&1 || true
-    fi
-    
-    if $JSON_MODE; then
-        printf '{"FEATURES_FILE":"%s","TOTAL_FEATURES":%d}\n' "$FEATURES_FILE" "$total_features"
-    else
-        echo "FEATURES_FILE: $FEATURES_FILE"
-        echo "TOTAL_FEATURES: $total_features"
-        echo "Feature index initialized (no new features added)"
-    fi
+fi
+
+# Output results
+if $JSON_MODE; then
+    printf '{"FEATURES_FILE":"%s","TOTAL_FEATURES":%d}\n' "$FEATURES_FILE" "$total_features"
 else
-    # Process the feature description
-    create_feature_index "$FEATURE_DESCRIPTIONS"
+    echo "FEATURES_FILE: $FEATURES_FILE"
+    echo "TOTAL_FEATURES: $total_features"
+    echo "Feature index created/updated successfully"
 fi
