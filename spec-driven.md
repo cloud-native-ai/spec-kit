@@ -72,7 +72,16 @@ The key is treating specifications as the source of truth, with code as the gene
 
 ## Streamlining SDD with Commands
 
-The SDD methodology is significantly enhanced through three powerful commands that automate the specification → planning → tasking workflow:
+The SDD methodology is significantly enhanced through four powerful commands that automate the specification → planning → tasking workflow, with an additional command for feature management:
+
+### The `/speckit.feature` Command
+
+This command provides centralized feature management for SDD projects:
+
+1. **Feature Index Creation**: Creates or updates a project-level feature index (`features.md`) in Markdown table format
+2. **Sequential ID Assignment**: Automatically assigns sequential three-digit feature IDs (001, 002, 003, etc.)
+3. **Status Tracking**: Maintains feature status through the SDD lifecycle (Draft → Planned → Implemented → Ready for Review)
+4. **Integration with SDD**: Automatically links all subsequent SDD commands to feature entries for traceability
 
 ### The `/speckit.specify` Command
 
@@ -82,6 +91,7 @@ This command transforms a simple feature description (the user-prompt) into a co
 2. **Branch Creation**: Generates a semantic branch name from your description and creates it automatically
 3. **Template-Based Generation**: Copies and customizes the feature specification template with your requirements
 4. **Directory Structure**: Creates the proper `.specify/specs/[branch-name]/` structure for all related documents
+5. **Feature Integration**: Updates the feature index status to "Planned" and records the specification path
 
 ### The `/speckit.plan` Command
 
@@ -92,6 +102,7 @@ Once a feature specification exists, this command creates a comprehensive implem
 3. **Technical Translation**: Converts business requirements into technical architecture and implementation details
 4. **Detailed Documentation**: Generates supporting documents for data models, API contracts, and test scenarios
 5. **Quickstart Validation**: Produces a quickstart guide capturing key validation scenarios
+6. **Feature Integration**: Updates the feature index status to "Implemented"
 
 ### The `/speckit.tasks` Command
 
@@ -101,6 +112,7 @@ After a plan is created, this command analyzes the plan and related design docum
 2. **Task Derivation**: Converts contracts, entities, and scenarios into specific tasks
 3. **Parallelization**: Marks independent tasks `[P]` and outlines safe parallel groups
 4. **Output**: Writes `tasks.md` in the feature directory, ready for execution by a Task agent
+5. **Feature Integration**: Maintains feature index status and metadata
 
 ### Example: Building a Chat Feature
 
@@ -120,18 +132,30 @@ Total: ~12 hours of documentation work
 **SDD with Commands Approach:**
 
 ```bash
-# Step 1: Create the feature specification (5 minutes)
+# Step 1: Create the feature index entry (1 minute)
+/speckit.feature Real-time chat system with message history and user presence
+
+# This automatically:
+# - Creates or updates .specify/memory/features.md with a feature entry
+# - Assigns a feature ID (e.g., 003) based on existing features
+# - Sets initial status to "Draft"
+
+# Step 2: Create the feature specification (5 minutes)
 /speckit.specify Real-time chat system with message history and user presence
 
 # This automatically:
 # - Creates branch "003-chat-system"
 # - Generates .specify/specs/003-chat-system/spec.md
 # - Populates it with structured requirements
+# - Updates features.md status to "Planned" and records spec path
 
-# Step 2: Generate implementation plan (5 minutes)
+# Step 3: Generate implementation plan (5 minutes)
 /speckit.plan WebSocket for real-time messaging, PostgreSQL for history, Redis for presence
 
-# Step 3: Generate executable tasks (5 minutes)
+# This automatically:
+# - Updates features.md status to "Implemented"
+
+# Step 4: Generate executable tasks (5 minutes)
 /speckit.tasks
 
 # This automatically creates:
@@ -143,13 +167,14 @@ Total: ~12 hours of documentation work
 # - .specify/specs/003-chat-system/tasks.md (Task list derived from the plan)
 ```
 
-In 15 minutes, you have:
+In 16 minutes, you have:
 
 - A complete feature specification with user stories and acceptance criteria
 - A detailed implementation plan with technology choices and rationale
 - API contracts and data models ready for code generation
 - Comprehensive test scenarios for both automated and manual testing
 - All documents properly versioned in a feature branch
+- A centralized feature index (`features.md`) tracking all project features and their status
 
 ### The Power of Structured Automation
 
