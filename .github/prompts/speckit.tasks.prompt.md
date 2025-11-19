@@ -8,7 +8,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. **Setup**: Run `.specify/scripts/bash/check-prerequisites.sh --json` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+1. **Setup**: Run `|` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **Load design documents**: Read from FEATURE_DIR:
    - **Required**: plan.md (tech stack, libraries, structure), spec.md (user stories with priorities)
@@ -50,6 +50,21 @@ You **MUST** consider the user input before proceeding (if not empty).
 Context for task generation: {ARGS}
 
 The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.
+
+## Feature Integration
+
+The `/speckit.tasks` command automatically integrates with the feature tracking system:
+
+- If a `.specify.specify/memory/features.md` file exists, the command will:
+  - Detect the current feature directory (format: `.specify/specs/###-feature-name/`)
+  - Extract the feature ID from the directory name
+  - Update the corresponding feature entry in `.specify.specify/memory/features.md`:
+    - Ensure status is "Implemented" (maintains status from planning phase)
+    - Keep the specification path unchanged
+    - Update the "Last Updated" date
+  - Automatically stage the changes to `.specify.specify/memory/features.md` for git commit
+
+This integration ensures that all feature task generation activities are properly tracked and linked to their corresponding entries in the project's feature index.
 
 ## Task Generation Rules
 

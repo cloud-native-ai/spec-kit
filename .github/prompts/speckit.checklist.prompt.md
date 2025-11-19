@@ -29,7 +29,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Execution Steps
 
-1. **Setup**: Run `.specify/scripts/bash/check-prerequisites.sh --json` from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS list.
+1. **Setup**: Run `|` from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS list.
    - All file paths must be absolute.
    - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
@@ -206,6 +206,21 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Depth level
    - Actor/timing
    - Any explicit user-specified must-have items incorporated
+
+## Feature Integration
+
+The `/speckit.checklist` command automatically integrates with the feature tracking system:
+
+- If a `.specify.specify/memory/features.md` file exists, the command will:
+  - Detect the current feature directory (format: `.specify/specs/###-feature-name/`)
+  - Extract the feature ID from the directory name
+  - Update the corresponding feature entry in `.specify.specify/memory/features.md`:
+    - Change status from "Implemented" to "Ready for Review"
+    - Keep the specification path unchanged
+    - Update the "Last Updated" date
+  - Automatically stage the changes to `.specify.specify/memory/features.md` for git commit
+
+This integration ensures that all feature checklist activities are properly tracked and linked to their corresponding entries in the project's feature index.
 
 **Important**: Each `/speckit.checklist` command invocation creates a checklist file using short, descriptive names unless file already exists. This allows:
 

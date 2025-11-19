@@ -1,11 +1,5 @@
 ---
-description: Create or update the project-level feature index based on high-level goals or existing context.
-scripts:
-  sh: |
-    cat << 'EOF' | .specify/scripts/bash/create-feature-index.sh --json
-    $ARGUMENTS
-    EOF
-  ps: .specify/scripts/powershell/create-feature-index.ps1 -Json "{ARGUMENTS}"
+description: Create or update the project-level feature index from interactive or provided feature inputs, ensuring all placeholders are filled and the template is properly instantiated
 ---
 
 ## User Input
@@ -18,69 +12,58 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-The text the user typed after `/speckit.feature` in the triggering message **is** the feature description or high-level goals. Assume you always have it available in this conversation even if `{ARGUMENTS}` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
+You are updating the project feature index at `/memory/features.md`. This file is a TEMPLATE containing placeholder tokens in square brackets (e.g. `[PROJECT_NAME]`, `[FEATURE_COUNT]`). Your job is to (a) collect/derive concrete values, (b) fill the template precisely, and (c) ensure proper feature entry formatting.
 
-Given that input, do this:
+Follow this execution flow:
 
-1. **Analyze existing context**: 
-   - Check if a `.specify/memory/features.md` file already exists
-   - If it exists, parse the current feature entries
-   - If it doesn't exist, prepare to create a new feature index
+1. Load the existing feature index template at `/memory/features.md`.
+   - Identify every placeholder token of the form `[ALL_CAPS_IDENTIFIER]`.
+   - **IMPORTANT**: The user might provide new features, updates to existing features, or general project context. Parse the input accordingly.
 
-2. **Generate or update feature entries**:
-   - Extract key concepts from the input description
-   - Create feature entries with ID, name (2-4 words), brief description, and initial status
-   - Use sequential feature IDs (001, 002, 003, etc.) based on existing features
-   - Set initial status to "Draft" for new features
+2. Collect/derive values for placeholders:
+   - If user input (conversation) supplies feature descriptions or project context, use it to generate/update features.
+   - Otherwise infer from existing repo context (README, docs, existing spec directories if present).
+   - For dates: `LAST_UPDATED_DATE` and individual feature `FEATURE_LAST_UPDATED` should be today's date (YYYY-MM-DD format).
+   - `FEATURE_COUNT` should reflect the actual number of features after processing user input.
+   - `PROJECT_NAME` should be derived from repository name, README title, or user input.
 
-3. **Create or update the feature index file**:
-   - Generate a `.specify/memory/features.md` file with proper header and feature entries in Markdown table format
-   - Ensure the file serves as the single entry point for feature views
-   - Include metadata like feature ID, name, description, status, and relevant links
+3. Process feature entries:
+   - Parse any existing feature entries from `.specify/specs/` directories if they exist
+   - Generate new feature entries from user input with sequential IDs (001, 002, etc.)
+   - Each feature entry must include: ID, Name (2-4 words), Description, Status, Spec Path, Last Updated
+   - Status options: Draft, Planned, Implemented, Ready for Review, Completed
+   - Spec Path should point to actual spec file path or "(Not yet created)" for new features
 
-4. **Integration with SDD workflow**:
-   - Ensure that subsequent SDD commands (`/speckit.specify`, `/speckit.plan`, etc.) can reference feature IDs
-   - Prepare the feature index to be updated by other SDD commands as features progress through their lifecycle
+4. Draft the updated feature index content:
+   - Replace every placeholder with concrete text (no bracketed tokens left)
+   - Format `[FEATURE_ENTRIES]` as a proper Markdown table with all feature entries
+   - Preserve heading hierarchy and remove template instruction comments once replaced
+   - Ensure table columns match the defined format exactly
 
-5. **Return completion status** with feature index file path and readiness for SDD commands.
+5. Validation before final output:
+   - No remaining unexplained bracket tokens
+   - All dates in ISO format YYYY-MM-DD
+   - Feature IDs are sequential three-digit numbers
+   - Status values are from the allowed set
+   - Table structure is valid Markdown
 
-**NOTE**: The `/speckit.feature` command only manages the feature index. All specification, planning, and implementation still follow the standard SDD process using existing commands.
+6. Write the completed feature index back to `/memory/features.md` (overwrite).
 
-## Feature Index Structure
+7. Output a final summary to the user with:
+   - Number of features processed/created
+   - Any new feature IDs generated
+   - Suggested commit message (e.g., `docs: update feature index with new entries`)
 
-The `.specify/memory/features.md` file should follow this structure:
+Formatting & Style Requirements:
 
-```markdown
-# Project Feature Index
+- Use Markdown headings exactly as in the template
+- Table must have proper alignment with header row
+- Keep a single blank line between sections
+- Avoid trailing whitespace
+- Feature names should be concise (2-4 words maximum)
 
-**Last Updated**: [DATE]
-**Total Features**: [COUNT]
+If the user supplies partial updates (e.g., only one new feature), merge with existing features and update accordingly.
 
-## Features
+If critical info missing (e.g., project name unknown), use repository name or insert reasonable default.
 
-| ID | Name | Description | Status | Spec Path | Last Updated |
-|----|------|-------------|--------|-----------|--------------|
-| 001 | [Feature Name] | [Brief description of the feature] | Draft | (Not yet created) | YYYY-MM-DD |
-| 002 | [Feature Name] | [Brief description of the feature] | Planned | .specify/specs/002-[branch-name]/spec.md | YYYY-MM-DD |
-
-[... additional features ...]
-```
-
-### Table Column Definitions
-
-| Column | Description |
-|--------|-------------|
-| ID | Sequential three-digit feature identifier (001, 002, etc.) |
-| Name | Short feature name (2-4 words) describing the feature |
-| Description | Brief summary of the feature's purpose and scope |
-| Status | Current implementation status (Draft, Planned, Implemented, Ready for Review) |
-| Spec Path | Path to specification file or "(Not yet created)" if not yet created |
-| Last Updated | When the feature entry was last modified (YYYY-MM-DD format) |
-
-## Success Criteria
-
-- Feature index file is created or updated successfully in proper Markdown table format
-- All feature entries have proper IDs, names, descriptions, and status
-- File serves as single source of truth for project features
-- Integration points are ready for SDD command updates
-- Changes are automatically staged in git for user to commit
+Do not create a new template; always operate on the existing `/memory/features.md` file.

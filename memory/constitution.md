@@ -1,45 +1,46 @@
-<!-- 
-Sync Impact Report:
-- Version change: template → 1.0.0
-- Added all core principles from SDD methodology
-- Added security, performance, and workflow sections
-- Templates requiring updates: ✅ All templates align with new constitution
-- Follow-up TODOs: None - all placeholders replaced with concrete principles
--->
-
-# Spec Kit Constitution
+# [PROJECT_NAME] Constitution
+<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
 
 ## Core Principles
 
-### I. Library-First Principle
-Every feature in Spec Kit MUST begin its existence as a standalone library. No feature shall be implemented directly within application code without first being abstracted into a reusable library component. Libraries must be self-contained, independently testable, and well-documented. Each library must have a clear, singular purpose—no organizational-only or wrapper libraries are permitted.
+### [PRINCIPLE_1_NAME]
+<!-- Example: I. Library-First -->
+[PRINCIPLE_1_DESCRIPTION]
+<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### [PRINCIPLE_2_NAME]
+<!-- Example: II. CLI Interface -->
+[PRINCIPLE_2_DESCRIPTION]
+<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### [PRINCIPLE_3_NAME]
+<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
+[PRINCIPLE_3_DESCRIPTION]
+<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
 
-### II. CLI Interface Mandate
-Every library MUST expose its functionality through a command-line interface. All CLI interfaces MUST: accept text as input (via stdin, arguments, or files), produce text as output (via stdout), send errors and warnings to stderr, and support both human-readable and JSON formats for structured data exchange. This ensures observability, testability, and integration capability.
+### [PRINCIPLE_4_NAME]
+<!-- Example: IV. Integration Testing -->
+[PRINCIPLE_4_DESCRIPTION]
+<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### [PRINCIPLE_5_NAME]
+<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
+[PRINCIPLE_5_DESCRIPTION]
+<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
 
-### III. Test-First Imperative (NON-NEGOTIABLE)
-This is NON-NEGOTIABLE: All implementation MUST follow strict Test-Driven Development. No implementation code shall be written before: (1) Unit tests are written, (2) Tests are validated and approved by the user, (3) Tests are confirmed to FAIL (Red phase). Only then can implementation proceed to make tests pass (Green phase), followed by refactoring (Refactor phase). This Red-Green-Refactor cycle is strictly enforced.
+## [SECTION_2_NAME]
+<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 
-### IV. Integration Testing Requirements
-Integration tests are mandatory for: new library contract tests, contract changes, inter-service communication, shared schemas, and any functionality that interacts with external systems. Tests MUST use realistic environments: prefer real databases over mocks, use actual service instances over stubs, and validate end-to-end workflows. Contract tests must be written and validated before implementation begins.
+[SECTION_2_CONTENT]
+<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
 
-### V. Observability, Versioning & Simplicity
-Text I/O ensures debuggability and structured logging is required for all operations. Versioning follows MAJOR.MINOR.PATCH semantic versioning: MAJOR for backward incompatible changes, MINOR for new features, PATCH for bug fixes. Start simple and apply YAGNI principles—no future-proofing or speculative features. Complexity must be explicitly justified and documented.
+## [SECTION_3_NAME]
+<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
 
-## Security Requirements
-
-All code MUST follow secure coding practices. Input validation is required for all external inputs. Dependencies must be regularly audited for vulnerabilities. Sensitive data must be handled according to security best practices. All network communications must use secure protocols (TLS/SSL). Security considerations must be documented in implementation plans.
-
-## Performance Standards
-
-All implementations must meet defined performance requirements. Performance testing is required for features with explicit performance criteria. Optimizations should be data-driven and validated through benchmarking. Resource usage (CPU, memory, network) must be monitored and documented. Performance degradation must be prevented through regression testing.
-
-## Development Workflow
-
-All development follows the Spec-Driven Development (SDD) workflow: constitution → specification → plan → tasks → implementation → validation. Code reviews must verify compliance with constitutional principles. All changes must be made through feature branches with descriptive names. Pull requests must include comprehensive test coverage and documentation updates. Automated quality gates must pass before merging.
+[SECTION_3_CONTENT]
+<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
 
 ## Governance
+<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-This constitution supersedes all other development practices and guidelines. All pull requests and code reviews MUST verify compliance with these principles. Amendments to this constitution require: explicit documentation of the rationale for change, review and approval by project maintainers, and a backwards compatibility assessment. Complexity must be justified against the simplicity principle. Use the SDD methodology and templates for runtime development guidance.
+[GOVERNANCE_RULES]
+<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
 
-**Version**: 1.0.0 | **Ratified**: 2025-11-17 | **Last Amended**: 2025-11-17
+**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
