@@ -1,5 +1,13 @@
 # GitHub Copilot 指令集开发指南（Spec Kit 项目）
 
+**🚨 🚨 🚨 CRITICAL CONTEXT - PAY EXTREME ATTENTION 🚨 🚨 🚨**
+
+**>> 当前项目是 spec-kit 的源代码项目。 <<**  
+**>> 这个项目本身也使用 spec-kit 辅助开发。 <<**  
+**>> 当前项目中存在两套 spec-kit 的相关文件：一套是作为 spec-kit 用户（主要在 `.specify` 目录和 `.github/prompts` 目录中），一套是作为 spec-kit 开发者（主要在 `src`、`templates`、`scripts` 等目录中）。 <<**  
+**>> 在执行代码修改的时候要注意区分这两者。 <<**  
+**>> 本地的修改应该只局限于作为 spec-kit 开发者的代码，MUST NOT 修改作为 spec-kit 用户的相关代码。 <<**
+
 作为 Spec Kit 项目的开发者，本文档指导我们如何为 GitHub Copilot 设计和维护 AI 指令集，以支持 Spec-Driven Development（SDD，规格驱动开发）工作流。
 
 ---

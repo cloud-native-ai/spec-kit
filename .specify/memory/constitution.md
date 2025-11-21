@@ -23,6 +23,14 @@ Sync Impact Report:
 
 # Spec Kit Constitution
 
+**🚨 🚨 🚨 CRITICAL CONTEXT - PAY EXTREME ATTENTION 🚨 🚨 🚨**
+
+**>> 1. This project is the source code for spec-kit. <<**  
+**>> 2. This project itself uses spec-kit for development. <<**  
+**>> 3. There are two sets of spec-kit related files in this project: one set as a spec-kit USER (mainly in `.specify` directory and `.github/prompts` directory), and one set as a spec-kit DEVELOPER (mainly in `src`, `templates`, `scripts`, etc.). <<**  
+**>> 4. Be careful to distinguish between these two when modifying code. <<**  
+**>> 5. Local modifications should be limited to the code as a spec-kit developer, and MUST NOT modify the code related to spec-kit user. <<**
+
 ## Core Principles
 
 ### I. Library-First Principle

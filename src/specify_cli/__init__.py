@@ -285,9 +285,11 @@ def rewrite_paths(content: str) -> str:
     """Rewrite paths in content to use .specify/ prefix."""
     import re
 
-    content = re.sub(r"(/?)memory/", r".specify/memory/", content)
-    content = re.sub(r"(/?)scripts/", r".specify/scripts/", content)
-    content = re.sub(r"(/?)templates/", r".specify/templates/", content)
+    # Only rewrite paths that don't already start with .specify/
+    # Use negative lookbehind to ensure we don't match paths that already have .specify/
+    content = re.sub(r"(?<!\.specify/)memory/", r".specify/memory/", content)
+    content = re.sub(r"(?<!\.specify/)scripts/", r".specify/scripts/", content)
+    content = re.sub(r"(?<!\.specify/)templates/", r".specify/templates/", content)
     return content
 
 
