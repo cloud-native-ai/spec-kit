@@ -67,8 +67,7 @@ tests/
 └── unit/
 
 # Additional directories for feature management
-.specify/scripts/bash/    # Feature index and integration scripts
-.specify/scripts/powershell/  # PowerShell equivalents
+.specify/scripts/bash/  # Bash scripts
 templates/commands/       # Updated command templates with integration logic
 ```
 
@@ -92,7 +91,7 @@ templates/commands/       # Updated command templates with integration logic
 - Update `create-feature-index.sh` script to generate Markdown table format
 - Implement sequential feature ID generation (001, 002, etc.)
 - Add automatic git staging for `feature-index.md` changes
-- Create PowerShell equivalent script
+- Create Bash equivalent script
 
 ### Phase 2: SDD Command Integration  
 - Update all command templates (`specify.md`, `plan.md`, `tasks.md`, `implement.md`, `checklist.md`)

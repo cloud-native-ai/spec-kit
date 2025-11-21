@@ -29,28 +29,6 @@ scripts:
     cat << 'EOF' | .specify/scripts/bash/create-new-feature.sh --json
     $ARGUMENTS
     EOF
-  ps: |
-    # Feature tracking integration
-    if (Test-Path ".specify/memory/feature-index.md") {
-        # Extract feature ID from branch name if available
-        try {
-            $currentBranch = git rev-parse --abbrev-ref HEAD 2>$null
-            if ($currentBranch -match "^(\d{3})-") {
-                $featureId = $matches[1]
-                # Update feature status to "Planned" and set spec path
-                $today = (Get-Date).ToString("yyyy-MM-dd")
-                $specPath = ".specify/specs/$currentBranch/spec.md"
-                $content = Get-Content ".specify/memory/feature-index.md"
-                $content = $content -replace "\|\s*$featureId\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*Draft\s*\|\s*$$Not yet created$$\s*\|\s*\d{4}-\d{2}-\d{2}\s*\|", "| $featureId | `$1 | `$2 | Planned | $specPath | $today |"
-                Set-Content -Path ".specify/memory/feature-index.md" -Value ($content -join "`n")
-                # Stage the changes
-                try { git add .specify/memory/feature-index.md 2>$null } catch { }
-            }
-        } catch {
-            # Ignore git errors
-        }
-    }
-    .specify/scripts/powershell/create-new-feature.ps1 -Json "{ARGUMENTS}"
 ---
 
 ## User Input
@@ -99,7 +77,6 @@ Given that feature description, do this:
    d. Run the script `{SCRIPT}` with the calculated number and short-name:
       - Pass `--number N+1` and `--short-name "your-short-name"` along with the feature description
       - Bash example: `{SCRIPT} --json --number 5 --short-name "user-auth" "Add user authentication"`
-      - PowerShell example: `{SCRIPT} -Json -Number 5 -ShortName "user-auth" "Add user authentication"`
    
 2. Run the script `cat << 'EOF' | .specify/scripts/bash/create-new-feature.sh --json` from repo root and include the short-name argument. Parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
 
@@ -107,7 +84,6 @@ Given that feature description, do this:
 
    - For Bash, this expands to a heredoc-based, safe JSON handoff that writes the raw user input to stdin and passes its contents to `.specify/scripts/bash/create-new-feature.sh --json`. This avoids shell parsing issues with quotes, backslashes, and newlines.
    - Append the short-name argument you created in step 1, and keep the feature description as the final argument.
-   - PowerShell continues to use: `-ShortName "your-generated-short-name" "Feature description here"`.
    - You must only ever run this script once.
    - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for.
    - Check all three sources (remote branches, local branches, specs directories) to find the highest number

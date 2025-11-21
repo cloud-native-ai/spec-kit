@@ -16,7 +16,7 @@
 ## Path Conventions
 
 - **Single project**: `src/`, `tests/` at repository root
-- **Scripts**: `.specify/scripts/bash/`, `.specify/scripts/powershell/`
+- **Scripts**: `.specify/scripts/bash/`
 - **Templates**: `templates/commands/`
 
 ## Phase 1: Setup (Shared Infrastructure)
@@ -65,7 +65,6 @@
 ### Implementation for User Story 1
 
 - [X] T015 [P] [US1] Create create-feature-index.sh script in .specify/scripts/bash/create-feature-index.sh
-- [X] T016 [P] [US1] Create create-feature-index.ps1 script in .specify/scripts/powershell/create-feature-index.ps1
 - [X] T017 [US1] Implement feature index Markdown table generation logic in .specify/scripts/bash/create-feature-index.sh
 - [X] T018 [US1] Implement sequential feature ID assignment logic in .specify/scripts/bash/create-feature-index.sh
 - [X] T019 [US1] Implement automatic git staging for feature-index.md changes in .specify/scripts/bash/create-feature-index.sh
@@ -196,7 +195,6 @@ Task: "Integration test for feature index update with feature description in tes
 
 # Launch feature index script creation and updates together:
 Task: "Create create-feature-index.sh script in .specify/scripts/bash/create-feature-index.sh"
-Task: "Create create-feature-index.ps1 script in .specify/scripts/powershell/create-feature-index.ps1"
 Task: "Update feature command template in templates/commands/feature.md"
 ```
 

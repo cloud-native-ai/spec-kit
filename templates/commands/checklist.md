@@ -16,23 +16,6 @@ scripts:
         fi
     fi
     scripts/bash/check-prerequisites.sh --json
-  ps: |
-    # Feature tracking integration
-    if (Test-Path ".specify/memory/feature-index.md") {
-        # Extract feature ID from current directory if available
-        $currentDir = (Get-Location).Path
-        if ($currentDir -match "\.specify[^\\]+\\(\d{3})-") {
-            $featureId = $matches[1]
-            # Update feature status to "Ready for Review"
-            $today = (Get-Date).ToString("yyyy-MM-dd")
-            $content = Get-Content ".specify/memory/feature-index.md"
-            $content = $content -replace "\|\s*$featureId\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*Implemented\s*\|\s*([^|]*)\s*\|\s*\d{4}-\d{2}-\d{2}\s*\|", "| $featureId | `$1 | `$2 | Ready for Review | `$3 | $today |"
-            Set-Content -Path ".specify/memory/feature-index.md" -Value ($content -join "`n")
-            # Stage the changes
-            try { git add .specify/memory/feature-index.md 2>$null } catch { }
-        }
-    }
-    scripts/powershell/check-prerequisites.ps1 -Json
 ---
 
 ## Checklist Purpose: "Unit Tests for English"

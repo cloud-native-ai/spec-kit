@@ -265,9 +265,6 @@ If you use `--no-git`, you'll need to manage feature directories manually:
 ```bash
 # Bash/Zsh
 export SPECIFY_FEATURE="001-my-feature"
-
-# PowerShell
-$env:SPECIFY_FEATURE = "001-my-feature"
 ```
 
 This tells Spec Kit which feature directory to use when creating specs, plans, and tasks.
@@ -411,7 +408,7 @@ Once you've run `specify init`, the slash commands (like `/speckit.specify`, `/s
 
 4. **For some agents**, you may need to reload the workspace or clear cache
 
-**Related issue:** If Copilot can't open local files or uses PowerShell commands unexpectedly, this is typically an IDE context issue, not related to `specify`. Try:
+**Related issue:** If Copilot can't open local files, this is typically an IDE context issue, not related to `specify`. Try:
 - Restarting VS Code
 - Checking file permissions
 - Ensuring the workspace folder is properly opened

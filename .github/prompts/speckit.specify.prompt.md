@@ -30,7 +30,6 @@ Given that feature description, do this:
 
    - For Bash, this expands to a heredoc-based, safe JSON handoff that writes the raw user input to stdin and passes its contents to `.specify/scripts/bash/create-new-feature.sh --json`. This avoids shell parsing issues with quotes, backslashes, and newlines.
    - Append the short-name argument you created in step 1, and keep the feature description as the final argument.
-   - PowerShell continues to use: `-ShortName "your-generated-short-name" "Feature description here"`.
    - You must only ever run this script once.
    - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for.
 

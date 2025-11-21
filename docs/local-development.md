@@ -2,7 +2,7 @@
 
 This guide shows how to iterate on the `specify` CLI locally without publishing a release or committing to `main` first.
 
-> Scripts now have both Bash (`.sh`) and PowerShell (`.ps1`) variants. The CLI auto-selects based on OS unless you pass `--script sh|ps`.
+> Scripts now have Bash (`.sh`) variants. The CLI auto-selects based on OS unless you pass `--script sh`.
 
 ## 1. Clone and Switch Branches
 
@@ -23,12 +23,6 @@ python -m src.specify_cli --help
 python -m src.specify_cli init demo-project --ai claude --ignore-agent-tools --script sh
 ```
 
-If you prefer invoking the script file style (uses shebang):
-
-```bash
-python src/specify_cli/__init__.py init demo-project --script ps
-```
-
 ## 3. Use Editable Install (Isolated Environment)
 
 Create an isolated environment using `uv` so dependencies resolve exactly like end users get them:
@@ -36,7 +30,7 @@ Create an isolated environment using `uv` so dependencies resolve exactly like e
 ```bash
 # Create & activate virtual env (uv auto-manages .venv)
 uv venv
-source .venv/bin/activate  # or on Windows PowerShell: .venv\Scripts\Activate.ps1
+source .venv/bin/activate
 
 # Install project in editable mode
 uv pip install -e .
@@ -95,8 +89,6 @@ After running an `init`, check that shell scripts are executable on POSIX system
 ls -l scripts | grep .sh
 # Expect owner execute bit (e.g. -rwxr-xr-x)
 ```
-
-On Windows you will instead use the `.ps1` scripts (no chmod needed).
 
 ## 6. Run Lint / Basic Checks (Add Your Own)
 

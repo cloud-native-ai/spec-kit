@@ -169,7 +169,7 @@ AGENT_CONFIG = {
     },
 }
 
-SCRIPT_TYPE_CHOICES = {"sh": "POSIX Shell (bash/zsh)", "ps": "PowerShell"}
+SCRIPT_TYPE_CHOICES = {"sh": "POSIX Shell (bash/zsh)"}
 
 CLAUDE_LOCAL_PATH = Path.home() / ".claude" / "local" / "claude"
 
@@ -474,16 +474,8 @@ def copy_local_templates(
             )
 
             # Handle script type filtering if needed
-            if script_type == "sh":
-                # Keep only bash scripts, remove powershell if they exist in a separate structure
-                ps_dir = specify_dir / "scripts" / "powershell"
-                if ps_dir.exists():
-                    shutil.rmtree(ps_dir)
-            elif script_type == "ps":
-                # Keep only powershell scripts
-                bash_dir = specify_dir / "scripts" / "bash"
-                if bash_dir.exists():
-                    shutil.rmtree(bash_dir)
+            # Only bash scripts are supported now
+            pass
 
         # Copy templates directory (excluding commands which will be handled specially)
         if (MODULE_DIR / "templates").exists():
