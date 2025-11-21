@@ -49,7 +49,7 @@
 | `templates/commands/checklist.md` | `.github/prompts/speckit.checklist.prompt.md` |
 | `templates/commands/clarify.md` | `.github/prompts/speckit.clarify.prompt.md` |
 | `templates/commands/constitution.md` | `.github/prompts/speckit.constitution.prompt.md` |
-| `templates/commands/features.md` | `.github/prompts/speckit.features.prompt.md` |
+| `templates/commands/feature-index.md` | `.github/prompts/speckit.features.prompt.md` |
 | `templates/commands/implement.md` | `.github/prompts/speckit.implement.prompt.md` |
 | `templates/commands/plan.md` | `.github/prompts/speckit.plan.prompt.md` |
 | `templates/commands/specify.md` | `.github/prompts/speckit.specify.prompt.md` |

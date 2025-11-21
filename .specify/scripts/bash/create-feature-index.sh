@@ -38,9 +38,9 @@ while [ $i -le $# ]; do
             echo "  --help, -h          Show this help message"
             echo ""
             echo "Behavior:"
-            echo "  - Creates or updates .specify/memory/features.md with feature index in Markdown table format"
+            echo "  - Creates or updates .specify/memory/feature-index.md with feature index in Markdown table format"
             echo "  - Reads feature descriptions from stdin if available"
-            echo "  - Automatically stages .specify/memory/features.md changes with git"
+            echo "  - Automatically stages .specify/memory/feature-index.md changes with git"
             echo ""
             echo "Examples:"
             echo "  echo 'Add user authentication system' | $0 --json"
@@ -96,7 +96,7 @@ cd "$REPO_ROOT"
 # Create .specify/memory directory if it doesn't exist
 MEMORY_DIR="$REPO_ROOT/.specify/memory"
 mkdir -p "$MEMORY_DIR"
-FEATURES_FILE="$MEMORY_DIR/features.md"
+FEATURES_FILE="$MEMORY_DIR/feature-index.md"
 
 # Function to get current date in YYYY-MM-DD format
 get_current_date() {
@@ -155,7 +155,7 @@ generate_short_name() {
     fi
 }
 
-# Function to parse existing features from features.md
+# Function to parse existing features from feature-index.md
 parse_existing_features() {
     local features_file="$1"
     local -n existing_features_ref=$2
@@ -323,7 +323,7 @@ all_features=("${existing_features[@]}" "${new_features[@]}")
 IFS=$'\n' sorted_features=($(sort -t'|' -k1,1n <<<"${all_features[*]}"))
 unset IFS
 
-# Write updated features.md
+# Write updated feature-index.md
 {
     echo "# Project Feature Index"
     echo ""

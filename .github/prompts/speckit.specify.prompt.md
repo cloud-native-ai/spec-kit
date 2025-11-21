@@ -164,14 +164,14 @@ Given that feature description, do this:
 
 The `/speckit.specify` command automatically integrates with the feature tracking system:
 
-- If a `.specify/memory/features.md` file exists, the command will:
+- If a `.specify/memory/feature-index.md` file exists, the command will:
   - Detect the current feature branch (format: `###-feature-name`)
   - Extract the feature ID from the branch name
-  - Update the corresponding feature entry in `.specify/memory/features.md`:
+  - Update the corresponding feature entry in `.specify/memory/feature-index.md`:
     - Change status from "Draft" to "Planned"
     - Set the specification path to the newly created spec file
     - Update the "Last Updated" date
-  - Automatically stage the changes to `.specify/memory/features.md` for git commit
+  - Automatically stage the changes to `.specify/memory/feature-index.md` for git commit
 
 This integration ensures that all feature specifications are properly tracked and linked to their corresponding entries in the project's feature index.
 

@@ -11,7 +11,7 @@ Implement the `/speckit.feature` command to create and manage a project-level fe
 
 **Language/Version**: Python 3.11  
 **Primary Dependencies**: typer, rich, httpx[socks], platformdirs, readchar, truststore>=0.10.4  
-**Storage**: File system (features.md, .specify/specs/ directories)  
+**Storage**: File system (feature-index.md, .specify/specs/ directories)  
 **Testing**: pytest (standard Python testing framework)  
 **Target Platform**: Cross-platform (Linux, Windows, macOS)  
 **Project Type**: CLI tool (single project structure)  
@@ -91,13 +91,13 @@ templates/commands/       # Updated command templates with integration logic
 ### Phase 1: Feature Index Implementation
 - Update `create-feature-index.sh` script to generate Markdown table format
 - Implement sequential feature ID generation (001, 002, etc.)
-- Add automatic git staging for `features.md` changes
+- Add automatic git staging for `feature-index.md` changes
 - Create PowerShell equivalent script
 
 ### Phase 2: SDD Command Integration  
 - Update all command templates (`specify.md`, `plan.md`, `tasks.md`, `implement.md`, `checklist.md`)
 - Add feature context detection logic to extract feature ID from branch/directory
-- Implement status transition updates in `features.md`
+- Implement status transition updates in `feature-index.md`
 - Add error handling and fallback behavior for existing projects
 
 ### Phase 3: Testing and Validation

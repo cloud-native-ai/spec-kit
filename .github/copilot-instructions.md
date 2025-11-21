@@ -167,4 +167,4 @@
 
 ## Active Technologies
 - Python 3.11 + typer, rich, httpx[socks], platformdirs, readchar, truststore>=0.10.4 (002-test-fixed-specify)
-- File system (features.md, .specify/specs/ directories) (002-test-fixed-specify)
+- File system (feature-index.md, .specify/specs/ directories) (002-test-fixed-specify)

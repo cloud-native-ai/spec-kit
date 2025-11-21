@@ -109,7 +109,7 @@ The confusion in the feature specification appears to be about the documentation
 
 ## Decision: Feature Index Structure and Management
 
-**Decision**: Implement feature index as a Markdown table in `features.md` with columns for ID, Name, Description, Status, Spec Path, and Last Updated.
+**Decision**: Implement feature index as a Markdown table in `feature-index.md` with columns for ID, Name, Description, Status, Spec Path, and Last Updated.
 
 **Rationale**: The feature specification explicitly requires a "Markdown table format with columns for ID, Name, Description, Status, Spec Path, and Last Updated". This provides:
 - Human-readable format that works well with git diffs
@@ -143,7 +143,7 @@ The current `create-feature-index.sh` script uses a list format, but needs to be
 
 ## Decision: Integration with Existing SDD Workflow
 
-**Decision**: Modify all existing SDD command templates to automatically detect feature context and update `features.md`.
+**Decision**: Modify all existing SDD command templates to automatically detect feature context and update `feature-index.md`.
 
 **Rationale**: The feature specification requires that "all existing SDD commands automatically integrate with feature tracking without requiring additional user input". This means:
 - `/speckit.specify` should update status to "Planned" and record spec path
@@ -151,7 +151,7 @@ The current `create-feature-index.sh` script uses a list format, but needs to be
 - `/speckit.implement` should maintain "Implemented" status
 - `/speckit.checklist` should update status to "Ready for Review"
 
-This requires updating the command templates to include logic that checks for `features.md`, parses the current feature ID from branch/directory, and updates the corresponding table row.
+This requires updating the command templates to include logic that checks for `feature-index.md`, parses the current feature ID from branch/directory, and updates the corresponding table row.
 
 **Alternatives considered**:
 - Separate integration commands: Would require additional user steps
@@ -161,9 +161,9 @@ This requires updating the command templates to include logic that checks for `f
 
 ## Decision: Git Integration and Concurrency
 
-**Decision**: Automatically stage `features.md` changes but let users commit manually; handle concurrent updates through git merge conflicts.
+**Decision**: Automatically stage `feature-index.md` changes but let users commit manually; handle concurrent updates through git merge conflicts.
 
-**Rationale**: The feature specification explicitly states: "Automatically stage changes to features.md but let users commit manually with their own messages" and "Concurrent updates to the same feature entry will be handled through git merge conflicts requiring manual resolution".
+**Rationale**: The feature specification explicitly states: "Automatically stage changes to feature-index.md but let users commit manually with their own messages" and "Concurrent updates to the same feature entry will be handled through git merge conflicts requiring manual resolution".
 
 This approach provides the right balance of automation (staging) and user control (commit messages), while leveraging git's built-in conflict resolution for concurrent edits.
 

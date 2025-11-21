@@ -33,52 +33,27 @@ import subprocess
 import sys
 import tempfile
 import zipfile
-from pathlib import Path
-from typing import Optional, Tuple
-
-import httpx
 
 # For cross-platform keyboard input
-import readchar
-import truststore
-import typer
-from rich.align import Align
-from rich.console import Console
-from rich.live import Live
-from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich.table import Table
-from rich.text import Text
-from rich.tree import Tree
-from typer.core import TyperGroup
-import os
-import subprocess
-import sys
-import zipfile
-import tempfile
-import shutil
-import shlex
-import json
-from pathlib import Path
-from typing import Optional, Tuple
-
-import typer
-import httpx
-from rich.console import Console
-from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich.text import Text
-from rich.live import Live
-from rich.align import Align
-from rich.table import Table
-from rich.tree import Tree
-from typer.core import TyperGroup
-
-# For cross-platform keyboard input
-import readchar
-import ssl
-import truststore
 from datetime import datetime, timezone
+from pathlib import Path
+from typing import Optional, Tuple
+
+import httpx
+
+# For cross-platform keyboard input
+import readchar
+import truststore
+import typer
+from rich.align import Align
+from rich.console import Console
+from rich.live import Live
+from rich.panel import Panel
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.table import Table
+from rich.text import Text
+from rich.tree import Tree
+from typer.core import TyperGroup
 
 ssl_context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 client = httpx.Client(verify=ssl_context)
@@ -464,7 +439,7 @@ def copy_local_templates(
             memory_dest.mkdir(exist_ok=True)
 
             # Specific files to handle
-            memory_files = ["constitution.md", "features.md"]
+            memory_files = ["constitution.md", "feature-index.md"]
 
             for filename in memory_files:
                 src_file = memory_src / filename

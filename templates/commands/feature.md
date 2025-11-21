@@ -12,11 +12,11 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-You are updating the project feature index at `/memory/features.md`. This file is a TEMPLATE containing placeholder tokens in square brackets (e.g. `[PROJECT_NAME]`, `[FEATURE_COUNT]`). Your job is to (a) collect/derive concrete values, (b) fill the template precisely, and (c) ensure proper feature entry formatting.
+You are updating the project feature index at `/memory/feature-index.md`. This file is a TEMPLATE containing placeholder tokens in square brackets (e.g. `[PROJECT_NAME]`, `[FEATURE_COUNT]`). Your job is to (a) collect/derive concrete values, (b) fill the template precisely, and (c) ensure proper feature entry formatting.
 
 Follow this execution flow:
 
-1. Load the existing feature index template at `/memory/features.md`.
+1. Load the existing feature index template at `/memory/feature-index.md`.
    - Identify every placeholder token of the form `[ALL_CAPS_IDENTIFIER]`.
    - **IMPORTANT**: The user might provide new features, updates to existing features, or general project context. Parse the input accordingly.
 
@@ -47,7 +47,7 @@ Follow this execution flow:
    - Status values are from the allowed set
    - Table structure is valid Markdown
 
-6. Write the completed feature index back to `/memory/features.md` (overwrite).
+6. Write the completed feature index back to `/memory/feature-index.md` (overwrite).
 
 7. Output a final summary to the user with:
    - Number of features processed/created
@@ -66,4 +66,4 @@ If the user supplies partial updates (e.g., only one new feature), merge with ex
 
 If critical info missing (e.g., project name unknown), use repository name or insert reasonable default.
 
-Do not create a new template; always operate on the existing `/memory/features.md` file.
+Do not create a new template; always operate on the existing `/memory/feature-index.md` file.

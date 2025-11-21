@@ -1,7 +1,7 @@
 # Contract: /speckit.feature Command
 
 ## Purpose
-Create or update the project-level feature index (`features.md`) based on high-level goals or existing context.
+Create or update the project-level feature index (`feature-index.md`) based on high-level goals or existing context.
 
 ## Input
 
@@ -27,21 +27,21 @@ EOF
 ### Script Output (JSON mode)
 ```json
 {
-  "FEATURES_FILE": "/absolute/path/to/features.md",
+  "FEATURES_FILE": "/absolute/path/to/feature-index.md",
   "TOTAL_FEATURES": 2
 }
 ```
 
 ### Script Output (human-readable mode)
 ```
-FEATURES_FILE: /absolute/path/to/features.md
+FEATURES_FILE: /absolute/path/to/feature-index.md
 TOTAL_FEATURES: 2
 Feature index created/updated successfully
 ```
 
 ## Feature Index Format
 
-The `features.md` file must follow this exact Markdown table format:
+The `feature-index.md` file must follow this exact Markdown table format:
 
 ```markdown
 # Project Feature Index
@@ -71,7 +71,7 @@ The `features.md` file must follow this exact Markdown table format:
 ## Integration Points
 
 ### Git Integration
-- **Automatic staging**: Changes to `features.md` are automatically staged with `git add features.md`
+- **Automatic staging**: Changes to `feature-index.md` are automatically staged with `git add feature-index.md`
 - **Manual commits**: Users must manually commit with their own messages
 - **Conflict handling**: Concurrent updates handled via git merge conflicts
 

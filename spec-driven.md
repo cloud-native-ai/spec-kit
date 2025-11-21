@@ -72,13 +72,14 @@ The key is treating specifications as the source of truth, with code as the gene
 
 ## Streamlining SDD with Commands
 
-The SDD methodology is significantly enhanced through four powerful commands that automate the specification → planning → tasking workflow, with an additional command for feature management:
+The SDD methodology is significantly enhanced through four powerful commands that automate the specification → planning → tasking → implementation workflow, with an additional command for feature management:
 
 ### The `/speckit.feature` Command
 
 This command provides centralized feature management for SDD projects:
 
-1. **Feature Index Creation**: Creates or updates a project-level feature index (`features.md`) in Markdown table format
+1. **Feature Index Creation**: Creates or updates a project-level feature index (`feature-index.md`) in Markdown table format
+1. **Feature Documents Maintainance**: updates a project-level feature details document in (`features/`) folder
 2. **Sequential ID Assignment**: Automatically assigns sequential three-digit feature IDs (001, 002, 003, etc.)
 3. **Status Tracking**: Maintains feature status through the SDD lifecycle (Draft → Planned → Implemented → Ready for Review)
 4. **Integration with SDD**: Automatically links all subsequent SDD commands to feature entries for traceability
@@ -136,7 +137,7 @@ Total: ~12 hours of documentation work
 /speckit.feature Real-time chat system with message history and user presence
 
 # This automatically:
-# - Creates or updates .specify/memory/features.md with a feature entry
+# - Creates or updates .specify/memory/feature-index.md with a feature entry
 # - Assigns a feature ID (e.g., 003) based on existing features
 # - Sets initial status to "Draft"
 
@@ -147,13 +148,13 @@ Total: ~12 hours of documentation work
 # - Creates branch "003-chat-system"
 # - Generates .specify/specs/003-chat-system/spec.md
 # - Populates it with structured requirements
-# - Updates features.md status to "Planned" and records spec path
+# - Updates feature-index.md status to "Planned" and records spec path
 
 # Step 3: Generate implementation plan (5 minutes)
 /speckit.plan WebSocket for real-time messaging, PostgreSQL for history, Redis for presence
 
 # This automatically:
-# - Updates features.md status to "Implemented"
+# - Updates feature-index.md status to "Implemented"
 
 # Step 4: Generate executable tasks (5 minutes)
 /speckit.tasks
@@ -174,7 +175,7 @@ In 16 minutes, you have:
 - API contracts and data models ready for code generation
 - Comprehensive test scenarios for both automated and manual testing
 - All documents properly versioned in a feature branch
-- A centralized feature index (`features.md`) tracking all project features and their status
+- A centralized feature index (`feature-index.md`) tracking all project features and their status
 
 ### The Power of Structured Automation
 

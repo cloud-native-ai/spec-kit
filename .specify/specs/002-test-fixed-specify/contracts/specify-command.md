@@ -53,7 +53,7 @@ The `spec.md` file follows the standard specification template with these key se
 ## Integration Points
 
 ### Feature Index Integration
-- **Status Update**: Updates corresponding feature entry in `features.md` from "Draft" to "Planned"
+- **Status Update**: Updates corresponding feature entry in `feature-index.md` from "Draft" to "Planned"
 - **Spec Path**: Records the specification file path in the feature entry
 - **Feature ID**: Uses sequential ID based on existing features (001, 002, etc.)
 

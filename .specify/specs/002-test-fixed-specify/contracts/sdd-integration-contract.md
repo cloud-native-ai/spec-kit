@@ -9,8 +9,8 @@ All SDD commands must:
 
 1. **Detect Feature Context**: Determine if they are running in the context of a feature
 2. **Parse Feature ID**: Extract the feature ID from branch name or directory structure
-3. **Update Feature Index**: Modify the corresponding feature entry in `features.md`
-4. **Stage Changes**: Automatically stage `features.md` changes with `git add features.md`
+3. **Update Feature Index**: Modify the corresponding feature entry in `feature-index.md`
+4. **Stage Changes**: Automatically stage `feature-index.md` changes with `git add feature-index.md`
 
 ## Feature ID Detection
 
@@ -27,7 +27,7 @@ All SDD commands must:
 ### Fallback Behavior
 - If no feature context detected: Skip feature index updates
 - If feature ID invalid: Log warning but continue execution
-- If features.md doesn't exist: Skip updates (no feature tracking enabled)
+- If feature-index.md doesn't exist: Skip updates (no feature tracking enabled)
 
 ## Status Transition Matrix
 
@@ -45,17 +45,17 @@ Each SDD command template should include this integration logic:
 
 ```bash
 # Check if feature index exists
-if [ -f "features.md" ]; then
+if [ -f "feature-index.md" ]; then
     # Extract feature ID from branch or directory
     FEATURE_ID=$(extract_feature_id)
     
     if [ -n "$FEATURE_ID" ]; then
-        # Update feature status in features.md
+        # Update feature status in feature-index.md
         update_feature_status "$FEATURE_ID" "NEW_STATUS"
         
         # Stage the changes
         if command -v git >/dev/null 2>&1; then
-            git add features.md
+            git add feature-index.md
         fi
     fi
 fi
@@ -85,7 +85,7 @@ fi
 Each integration must be validated with:
 
 1. **Feature context detection**: Verify correct feature ID extraction
-2. **Status updates**: Verify correct status transitions in features.md
+2. **Status updates**: Verify correct status transitions in feature-index.md
 3. **Metadata updates**: Verify spec_path and other metadata is correctly recorded
 4. **Git integration**: Verify changes are properly staged
 5. **Error resilience**: Verify commands continue execution even if integration fails
@@ -93,5 +93,5 @@ Each integration must be validated with:
 ## Backward Compatibility
 
 - **Existing projects**: Commands work without feature index (no breaking changes)
-- **New projects**: Automatic feature tracking enabled when features.md exists
+- **New projects**: Automatic feature tracking enabled when feature-index.md exists
 - **Mixed usage**: Projects can enable/disable feature tracking at any time

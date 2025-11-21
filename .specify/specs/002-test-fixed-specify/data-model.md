@@ -30,7 +30,7 @@ Draft → Planned → Implemented → Ready for Review
 
 ### Relationships
 
-- **FeatureIndex**: Each Feature belongs to exactly one FeatureIndex (the `features.md` file)
+- **FeatureIndex**: Each Feature belongs to exactly one FeatureIndex (the `feature-index.md` file)
 
 ## FeatureIndex Entity
 
@@ -50,7 +50,7 @@ Represents the project-level registry of all features.
 
 ## Data Storage Format
 
-The data model is persisted in a Markdown table format in `features.md`:
+The data model is persisted in a Markdown table format in `feature-index.md`:
 
 ```markdown
 # Project Feature Index
@@ -77,13 +77,13 @@ The data model is persisted in a Markdown table format in `features.md`:
 
 ## Orphaned Feature Handling
 
-When a feature specification file is deleted but the feature entry remains in `features.md`:
+When a feature specification file is deleted but the feature entry remains in `feature-index.md`:
 - The entry is marked as "orphaned" but not automatically removed
 - The `spec_path` field shows "(Orphaned - spec file deleted)"
 - Status remains unchanged to preserve historical tracking
 
 ## Concurrency Handling
 
-- Multiple processes writing to `features.md` simultaneously will cause git merge conflicts
+- Multiple processes writing to `feature-index.md` simultaneously will cause git merge conflicts
 - Users must manually resolve conflicts during git merge operations
 - No locking mechanism is implemented (rely on git's built-in conflict detection)

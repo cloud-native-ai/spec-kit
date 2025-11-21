@@ -39,7 +39,7 @@
 - [X] T005 [P] Implement feature index parsing and validation for Markdown table format
 - [X] T006 [P] Implement feature status transition logic (Draft → Planned → Implemented → Ready for Review)
 - [X] T007 Create feature context detection utility for branch/directory parsing
-- [X] T008 Implement git staging integration for features.md changes
+- [X] T008 Implement git staging integration for feature-index.md changes
 - [X] T009 Setup error handling and logging for feature management operations
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
@@ -50,7 +50,7 @@
 
 **Goal**: Implement the `/speckit.feature` command to create and manage a project-level feature index in Markdown table format
 
-**Independent Test**: Can be fully tested by running `/speckit.feature` command and verifying that a `features.md` file is created/updated with proper feature entries in Markdown table format with columns: ID, Name, Description, Status, Spec Path, Last Updated
+**Independent Test**: Can be fully tested by running `/speckit.feature` command and verifying that a `feature-index.md` file is created/updated with proper feature entries in Markdown table format with columns: ID, Name, Description, Status, Spec Path, Last Updated
 
 ### Tests for User Story 1
 
@@ -68,7 +68,7 @@
 - [X] T016 [P] [US1] Create create-feature-index.ps1 script in .specify/scripts/powershell/create-feature-index.ps1
 - [X] T017 [US1] Implement feature index Markdown table generation logic in .specify/scripts/bash/create-feature-index.sh
 - [X] T018 [US1] Implement sequential feature ID assignment logic in .specify/scripts/bash/create-feature-index.sh
-- [X] T019 [US1] Implement automatic git staging for features.md changes in .specify/scripts/bash/create-feature-index.sh
+- [X] T019 [US1] Implement automatic git staging for feature-index.md changes in .specify/scripts/bash/create-feature-index.sh
 - [X] T020 [US1] Update feature command template in templates/commands/feature.md
 - [X] T021 [US1] Add performance optimization for 100+ features support in .specify/scripts/bash/create-feature-index.sh
 - [X] T022 [US1] Implement orphaned feature handling logic in .specify/scripts/bash/create-feature-index.sh
@@ -81,7 +81,7 @@
 
 **Goal**: Ensure all existing SDD commands automatically integrate with feature tracking by linking artifacts to feature IDs and updating feature status
 
-**Independent Test**: Can be tested by creating a specification with `/speckit.specify` and verifying that the generated artifacts are properly linked to a feature ID and that the feature status in `features.md` is updated appropriately
+**Independent Test**: Can be tested by creating a specification with `/speckit.specify` and verifying that the generated artifacts are properly linked to a feature ID and that the feature status in `feature-index.md` is updated appropriately
 
 ### Tests for User Story 2
 
@@ -101,7 +101,7 @@
 - [X] T033 [P] [US2] Update checklist command template with feature integration logic in templates/commands/checklist.md
 - [ ] T034 [US2] Implement feature context detection in SDD command integration scripts
 - [ ] T035 [US2] Implement status transition updates for all SDD commands in integration scripts
-- [ ] T036 [US2] Add error handling and fallback behavior for existing projects without features.md
+- [ ] T036 [US2] Add error handling and fallback behavior for existing projects without feature-index.md
 - [ ] T037 [US2] Implement backward compatibility layer for existing projects
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
@@ -112,7 +112,7 @@
 
 **Goal**: Implement comprehensive feature status tracking and metadata management including specification paths, key acceptance criteria, and implementation details
 
-**Independent Test**: Can be tested by examining the `features.md` file after various SDD command executions and verifying that feature status and metadata are correctly updated and maintained
+**Independent Test**: Can be tested by examining the `feature-index.md` file after various SDD command executions and verifying that feature status and metadata are correctly updated and maintained
 
 ### Tests for User Story 3
 
