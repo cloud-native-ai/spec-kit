@@ -51,6 +51,34 @@ from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
 from typer.core import TyperGroup
+import os
+import subprocess
+import sys
+import zipfile
+import tempfile
+import shutil
+import shlex
+import json
+from pathlib import Path
+from typing import Optional, Tuple
+
+import typer
+import httpx
+from rich.console import Console
+from rich.panel import Panel
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.text import Text
+from rich.live import Live
+from rich.align import Align
+from rich.table import Table
+from rich.tree import Tree
+from typer.core import TyperGroup
+
+# For cross-platform keyboard input
+import readchar
+import ssl
+import truststore
+from datetime import datetime, timezone
 
 ssl_context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 client = httpx.Client(verify=ssl_context)
@@ -156,6 +184,12 @@ AGENT_CONFIG = {
         "name": "Amp",
         "folder": ".agents/",
         "install_url": "https://ampcode.com/manual#install",
+        "requires_cli": True,
+    },
+    "shai": {
+        "name": "SHAI",
+        "folder": ".shai/",
+        "install_url": "https://github.com/ovh/shai",
         "requires_cli": True,
     },
 }

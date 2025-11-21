@@ -7,22 +7,21 @@ All notable changes to the Specify CLI and templates are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.21] - 2025-11-17
+## [0.0.22] - 2025-11-07
 
-### Added
+- Support for VS Code/Copilot agents, and moving away from prompts to proper agents with hand-offs.
+- Move to use `AGENTS.md` for Copilot workloads, since it's already supported out-of-the-box.
+- Adds support for the version command. ([#486](https://github.com/github/spec-kit/issues/486))
+- Fixes potential bug with the `create-new-feature.ps1` script that ignores existing feature branches when determining next feature number ([#975](https://github.com/github/spec-kit/issues/975))
+- Add graceful fallback and logging for GitHub API rate-limiting during template fetch ([#970](https://github.com/github/spec-kit/issues/970))
 
-- **New `/speckit.feature` command**: Implements Feature-Centric Specification-Driven Development (F-SDD) by creating and managing a project-level feature index (`features.md` file)
-  - Generates feature entries with sequential IDs (001, 002, etc.), names, descriptions, and status
-  - Integrates with existing SDD workflow (`/speckit.specify`, `/speckit.plan`, etc.)
-  - Serves as single source of truth for all project capabilities and their implementation state
-  - Automatically updates feature status and metadata as features progress through their lifecycle
-  - Based on the F-SDD methodology described in `feature-spec-driven.md`
+## [0.0.21] - 2025-10-21
 
-### Fixed
-
-- **Fixed `/speckit.specify` command script format**: Updated the heredoc format in the command template to use the correct `cat << 'EOF' | .specify/scripts/bash/create-new-feature.sh --json` syntax as specified in the documentation
-  - Resolves issue where the script placeholder was not generating the proper heredoc structure
-  - Ensures proper escaping and argument passing for complex feature descriptions
+- Fixes [#975](https://github.com/github/spec-kit/issues/975) (thank you [@fgalarraga](https://github.com/fgalarraga)).
+- Adds support for Amp CLI.
+- Adds support for VS Code hand-offs and moves prompts to be full-fledged chat modes.
+- Adds support for `version` command (addresses [#811](https://github.com/github/spec-kit/issues/811) and [#486](https://github.com/github/spec-kit/issues/486), thank you [@mcasalaina](https://github.com/mcasalaina) and [@dentity007](https://github.com/dentity007)).
+- Adds support for rendering the rate limit errors from the CLI when encountered ([#970](https://github.com/github/spec-kit/issues/970), thank you [@psmman](https://github.com/psmman)).
 
 ## [0.0.20] - 2025-10-14
 
