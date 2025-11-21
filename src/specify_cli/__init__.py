@@ -24,7 +24,6 @@ Or install globally:
     specify init --here
 """
 
-import json
 import os
 import shlex
 import shutil
@@ -33,14 +32,11 @@ import subprocess
 import sys
 import tempfile
 import zipfile
-
 # For cross-platform keyboard input
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Tuple
 
 import httpx
-
 # For cross-platform keyboard input
 import readchar
 import truststore
