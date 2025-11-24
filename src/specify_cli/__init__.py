@@ -32,11 +32,13 @@ import subprocess
 import sys
 import tempfile
 import zipfile
+
 # For cross-platform keyboard input
 from pathlib import Path
 from typing import Optional, Tuple
 
 import httpx
+
 # For cross-platform keyboard input
 import readchar
 import truststore
@@ -1572,6 +1574,23 @@ def init(
                     debug=debug,
                     github_token=github_token,
                 )
+            # Ensure the features directory exists under .specify/memory for downstream workflows
+            features_dir = project_path / ".specify" / "memory" / "features"
+            try:
+                if tracker:
+                    tracker.start(
+                        "features-dir", "creating .specify/memory/features directory"
+                    )
+                features_dir.mkdir(parents=True, exist_ok=True)
+                if tracker:
+                    tracker.complete("features-dir", f"created {features_dir}")
+            except Exception as e:
+                if tracker:
+                    tracker.error("features-dir", str(e))
+                else:
+                    console.print(
+                        f"[yellow]Warning: could not create features directory:[/yellow] {e}"
+                    )
 
             ensure_executable_scripts(project_path, tracker=tracker)
 
