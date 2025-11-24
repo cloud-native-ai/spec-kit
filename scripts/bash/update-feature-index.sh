@@ -37,8 +37,8 @@ fi
 
 cd "$REPO_ROOT"
 
-FEATURE_INDEX="$REPO_ROOT/memory/feature-index.md"
-FEATURES_DIR="$REPO_ROOT/memory/features"
+FEATURE_INDEX="$REPO_ROOT/.specify/memory/feature-index.md"
+FEATURES_DIR="$REPO_ROOT/.specify/memory/features"
 SPECS_DIR="$REPO_ROOT/.specify/specs"
 
 # Ensure directories exist
