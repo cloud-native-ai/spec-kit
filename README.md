@@ -426,7 +426,7 @@ At this stage, your project folder contents should resemble the following:
     ├── scripts
     │  ├── check-prerequisites.sh
     │  ├── common.sh
-    │  ├── create-new-feature.sh
+    │  ├── create-new-spec.sh
     │  ├── setup-plan.sh
     │  └── update-claude-md.sh
     ├── specs
@@ -487,7 +487,7 @@ The output of this step will include a number of implementation detail documents
 ├── scripts
 │  ├── check-prerequisites.sh
 │  ├── common.sh
-│  ├── create-new-feature.sh
+│  ├── create-new-spec.sh
 │  ├── setup-plan.sh
 │  └── update-claude-md.sh
 ├── specs

@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for VS Code/Copilot agents, and moving away from prompts to proper agents with hand-offs.
 - Move to use `AGENTS.md` for Copilot workloads, since it's already supported out-of-the-box.
 - Adds support for the version command. ([#486](https://github.com/github/spec-kit/issues/486))
-- Fixes potential bug with the `create-new-feature.sh` script that ignores existing feature branches when determining next feature number ([#975](https://github.com/github/spec-kit/issues/975))
+- Fixes potential bug with the `create-new-spec.sh` script that ignores existing feature branches when determining next feature number ([#975](https://github.com/github/spec-kit/issues/975))
 - Add graceful fallback and logging for GitHub API rate-limiting during template fetch ([#970](https://github.com/github/spec-kit/issues/970))
 
 ## [0.0.21] - 2025-10-21
@@ -43,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Enhanced help documentation for `create-new-feature.sh` script with examples
+- Enhanced help documentation for `create-new-spec.sh` script with examples
 - Branch names now validated against GitHub's 244-byte limit with automatic truncation if needed
 
 ## [0.0.19] - 2025-10-10
