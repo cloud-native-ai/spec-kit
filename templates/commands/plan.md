@@ -23,7 +23,7 @@ scripts:
             git add .specify/memory/feature-index.md >/dev/null 2>&1 || true
         fi
     fi
-    scripts/bash/setup-plan.sh --json
+    scripts/bash/create-new-plan.sh --json
 agent_scripts:
   sh: scripts/bash/update-agent-context.sh __AGENT__
 ---

@@ -427,7 +427,7 @@ At this stage, your project folder contents should resemble the following:
     │  ├── check-prerequisites.sh
     │  ├── common.sh
     │  ├── create-new-spec.sh
-    │  ├── setup-plan.sh
+    │  ├── create-new-plan.sh
     │  └── update-claude-md.sh
     ├── specs
     │  └── 001-create-taskify
@@ -488,7 +488,7 @@ The output of this step will include a number of implementation detail documents
 │  ├── check-prerequisites.sh
 │  ├── common.sh
 │  ├── create-new-spec.sh
-│  ├── setup-plan.sh
+│  ├── create-new-plan.sh
 │  └── update-claude-md.sh
 ├── specs
 │  └── 001-create-taskify
