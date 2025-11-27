@@ -57,11 +57,23 @@ EOF
 ```
  --json --number 5 --short-name "user-auth" "Add user authentication"`
    
-2. Run the script `cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json` from repo root and include the short-name argument. Parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
+2. Run the script `
+```bash
+cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
+$ARGUMENTS
+EOF
+```
+` from repo root and include the short-name argument. Parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
 
    **IMPORTANT**:
 
-   - For Bash, this expands to a heredoc-based, safe JSON handoff that writes the raw user input to stdin and passes its contents to `.specify/scripts/bash/create-new-spec.sh --json`. This avoids shell parsing issues with quotes, backslashes, and newlines.
+   - For Bash, this expands to a heredoc-based, safe JSON handoff that writes the raw user input to stdin and passes its contents to `
+```bash
+cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
+$ARGUMENTS
+EOF
+```
+`. This avoids shell parsing issues with quotes, backslashes, and newlines.
    - Append the short-name argument you created in step 1, and keep the feature description as the final argument.
    - You must only ever run this script once.
    - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for.
