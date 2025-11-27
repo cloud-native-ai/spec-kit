@@ -41,7 +41,8 @@ Given that feature description, do this:
       - Find the highest number N
       - Use N+1 for the new branch number
    
-   d. Run the script `# Feature tracking integration
+   d. Run the script ````bash
+# Feature tracking integration
 if [ -f ".specify/memory/feature-index.md" ]; then
     # Extract feature ID from branch name if available
     if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
@@ -59,9 +60,11 @@ if [ -f ".specify/memory/feature-index.md" ]; then
 fi
 cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
 $ARGUMENTS
-EOF` with the calculated number and short-name:
+EOF
+```` with the calculated number and short-name:
       - Pass `--number N+1` and `--short-name "your-short-name"` along with the feature description
-      - Bash example: `# Feature tracking integration
+      - Bash example: ````bash
+# Feature tracking integration
 if [ -f ".specify/memory/feature-index.md" ]; then
     # Extract feature ID from branch name if available
     if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
@@ -79,7 +82,8 @@ if [ -f ".specify/memory/feature-index.md" ]; then
 fi
 cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
 $ARGUMENTS
-EOF --json --number 5 --short-name "user-auth" "Add user authentication"`
+EOF
+``` --json --number 5 --short-name "user-auth" "Add user authentication"`
    
 2. Run the script `cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json` from repo root and include the short-name argument. Parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
 

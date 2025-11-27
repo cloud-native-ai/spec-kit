@@ -8,7 +8,8 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. 从仓库根目录运行实现前置检查脚本 `# Feature tracking integration
+1. Run ````bash
+# Feature tracking integration
 if [ -f ".specify/memory/feature-index.md" ]; then
     # Extract feature ID from current directory if available
     CURRENT_DIR=$(pwd)
@@ -21,18 +22,8 @@ if [ -f ".specify/memory/feature-index.md" ]; then
         git add .specify/memory/feature-index.md >/dev/null 2>&1 || true
     fi
 fi
-.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`（当前为 `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`），并从其 **JSON 输出中解析 FEATURE_DIR 和 AVAILABLE_DOCS 列表**。具体约定：
-
-   - 脚本必须在 **仓库根目录** 执行，这样它才能通过 `.specify` 目录和 Git 分支正确推导当前特性上下文。
-   - 脚本的 `--json --require-tasks --include-tasks` 模式会输出形如：
-
-     ```json
-     {"FEATURE_DIR":"/abs/path/to/.specify/specs/001-some-feature","AVAILABLE_DOCS":["research.md","data-model.md","contracts/","quickstart.md","tasks.md"]}
-     ```
-
-   - FEATURE_DIR 由 `.specify/scripts/bash/common.sh` / `check-prerequisites.sh` 内的逻辑根据当前 Git 分支或目录结构解析（遵循 `.specify/specs/###-feature-name/` 约定）；**不得在 Agent 层面凭空构造或猜测**。
-   - AVAILABLE_DOCS 列表仅包含当前特性目录下**实际存在**的文档类型：`research.md`、`data-model.md`、`contracts/`、`quickstart.md`，以及在 `--include-tasks` 时的 `tasks.md`。这些名称对应的真实路径在 shell 侧均为绝对路径；在 Agent 层消费时，应基于 FEATURE_DIR 组合为绝对路径，而不是假设某个默认位置。
-   - 当需要演示 shell 级别调用示例且参数中包含单引号（如 `I'm Groot`）时，使用 `'I'\''m Groot'` 这样的转义形式，或优先使用双引号包裹（例如 `"I'm Groot"`）。
+.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
+```` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **Check checklists status** (if FEATURE_DIR/checklists/ exists):
    - Scan all checklist files in the checklists/ directory

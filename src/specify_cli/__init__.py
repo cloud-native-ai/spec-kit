@@ -374,7 +374,7 @@ def generate_commands(
                         block_lines.append(ln)
 
             script_command = (
-                "```bash\n" + "\n".join(block_lines).rstrip("\n") + "\n```"
+                "\n```bash\n" + "\n".join(block_lines).rstrip("\n") + "\n```\n"
                 if block_lines
                 else "(Missing script command)"
             )
