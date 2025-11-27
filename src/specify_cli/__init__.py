@@ -335,13 +335,59 @@ def generate_commands(
 
         # Extract script command for the script variant
         script_match = re.search(
-            rf"^\s*{script_variant}:\s*(.+)$", file_content, re.MULTILINE
+            rf"^\s*{script_variant}:\s*\|\s*$", file_content, re.MULTILINE
         )
-        script_command = (
-            script_match.group(1).strip()
-            if script_match
-            else "(Missing script command)"
-        )
+        if script_match:
+            # Multi-line block starting after the `sh: |` line until the next dedented key or frontmatter end
+            lines = file_content.split("\n")
+            start_idx: int | None = None
+            indent_prefix = ""
+            for i, line in enumerate(lines):
+                if re.match(rf"^\s*{script_variant}:\s*\|\s*$", line):
+                    start_idx = i + 1
+                    if start_idx < len(lines):
+                        indent_match = re.match(r"^(\s+)", lines[start_idx])
+                        indent_prefix = (
+                            indent_match.group(1) if indent_match else "    "
+                        )
+                    break
+
+            block_lines: list[str] = []
+            if start_idx is not None:
+                for j in range(start_idx, len(lines)):
+                    ln = lines[j]
+                    # Stop when we reach a new top-level/frontmatter key
+                    if ln.strip().startswith(
+                        (
+                            "description:",
+                            "scripts:",
+                            "agent_scripts:",
+                            "handoffs:",
+                            "---",
+                        )
+                    ) and not ln.startswith(indent_prefix):
+                        break
+                    # Only strip the leading indent corresponding to the block
+                    if indent_prefix and ln.startswith(indent_prefix):
+                        block_lines.append(ln[len(indent_prefix) :])
+                    else:
+                        block_lines.append(ln)
+
+            script_command = (
+                "\n".join(block_lines).rstrip("\n")
+                if block_lines
+                else "(Missing script command)"
+            )
+        else:
+            # Fallback: single-line form like `sh: some-command {ARGS}`
+            single_line_match = re.search(
+                rf"^\s*{script_variant}:\s*(.+)$", file_content, re.MULTILINE
+            )
+            script_command = (
+                single_line_match.group(1).strip()
+                if single_line_match
+                else "(Missing script command)"
+            )
 
         # Replace {ARGS} placeholder in script command
         script_command = script_command.replace("{ARGS}", arg_format)

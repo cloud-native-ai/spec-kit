@@ -1,6 +1,3 @@
-description: Create or update feature detail files (.specify/memory/features/<ID>.md) and the project-level feature index (.specify/memory/feature-index.md) from interactive or provided inputs, using the installed template at .specify/templates/feature-template.md
----
-
 ## User Input
 
 ```text

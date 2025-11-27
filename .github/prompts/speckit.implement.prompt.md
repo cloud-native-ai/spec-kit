@@ -8,27 +8,18 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. 从仓库根目录运行 `/speckit.implement` 命令，并解析当前的 FEATURE_DIR 和 AVAILABLE_DOCS 列表。具体约定如下：
+1. 从仓库根目录运行实现前置检查脚本 `|`（当前为 `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`），并从其 **JSON 输出中解析 FEATURE_DIR 和 AVAILABLE_DOCS 列表**。具体约定：
 
-   - **入口命令**：本 Agent 视角下的“命令”并不是实际 shell CLI，而是一次 speckit.implement 会话，它必须能够确定一个“当前特性目录（FEATURE_DIR）”和该目录下可用文档（AVAILABLE_DOCS）。
-   - **FEATURE_DIR 解析规则**：
-     1. 优先使用环境/上下文中已经确定的特性目录（如 IDE/Agent 已通过 `SPECIFY_FEATURE` 或其他方式指明 `.specify/specs/###-feature-name/`）。
-     2. 如果没有显式指定，则：
-        - 在仓库根目录下查找 `.specify/specs/` 目录；
-        - 如果只存在一个形如 `###-feature-name/` 的子目录，则将其作为 FEATURE_DIR；
-        - 如果存在多个候选目录，则**不要臆造选择**，而是向用户展示候选列表，并要求用户明确选择其一；
-        - 如果找不到任何符合规范的目录，则提示用户先通过 `/speckit.specify` 和 `/speckit.plan` 完成规格与计划，然后再运行 `/speckit.implement`。
-   - **AVAILABLE_DOCS 解析规则**：
-     - 在选定的 FEATURE_DIR 中，按约定路径检查以下文件是否存在，并构建绝对路径列表：
-       - `tasks.md`（必需）
-       - `plan.md`（必需）
-       - `data-model.md`（可选）
-       - `contracts/` 目录下的所有文件（可选）
-       - `research.md`（可选）
-       - `quickstart.md`（可选）
-       - `checklists/` 目录下的所有清单文件（若存在）
-     - 所有路径必须是**绝对路径**，不得使用相对路径或假定不存在的文件。
-   - 引号转义约定：对于包含单引号的参数（如 `I'm Groot`），在需要展示 shell 形式示例时，使用 `'I'\''m Groot'` 这样的转义形式，或优先使用双引号包裹（例如 `"I'm Groot"`）。
+   - 脚本必须在 **仓库根目录** 执行，这样它才能通过 `.specify` 目录和 Git 分支正确推导当前特性上下文。
+   - 脚本的 `--json --require-tasks --include-tasks` 模式会输出形如：
+
+     ```json
+     {"FEATURE_DIR":"/abs/path/to/.specify/specs/001-some-feature","AVAILABLE_DOCS":["research.md","data-model.md","contracts/","quickstart.md","tasks.md"]}
+     ```
+
+   - FEATURE_DIR 由 `.specify/scripts/bash/common.sh` / `check-prerequisites.sh` 内的逻辑根据当前 Git 分支或目录结构解析（遵循 `.specify/specs/###-feature-name/` 约定）；**不得在 Agent 层面凭空构造或猜测**。
+   - AVAILABLE_DOCS 列表仅包含当前特性目录下**实际存在**的文档类型：`research.md`、`data-model.md`、`contracts/`、`quickstart.md`，以及在 `--include-tasks` 时的 `tasks.md`。这些名称对应的真实路径在 shell 侧均为绝对路径；在 Agent 层消费时，应基于 FEATURE_DIR 组合为绝对路径，而不是假设某个默认位置。
+   - 当需要演示 shell 级别调用示例且参数中包含单引号（如 `I'm Groot`）时，使用 `'I'\''m Groot'` 这样的转义形式，或优先使用双引号包裹（例如 `"I'm Groot"`）。
 
 2. **Check checklists status** (if FEATURE_DIR/checklists/ exists):
    - Scan all checklist files in the checklists/ directory
