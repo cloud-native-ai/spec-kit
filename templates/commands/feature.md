@@ -1,4 +1,12 @@
+---
 description: Create or update feature detail files (memory/features/<ID>.md) and the project-level feature index (memory/feature-index.md) from interactive or provided inputs, using the installed template at .specify/templates/feature-template.md
+handoffs: 
+   - label: Update Feature Index
+      agent: speckit.feature
+      prompt: Refresh project feature summary and index based on the latest specs and plans.
+   - label: Build Specification
+      agent: speckit.specify
+      prompt: Implement the feature specification based on the updated feature index. I want to build...
 ---
 
 ## User Input
