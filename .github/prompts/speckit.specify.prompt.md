@@ -41,9 +41,45 @@ Given that feature description, do this:
       - Find the highest number N
       - Use N+1 for the new branch number
    
-   d. Run the script `|` with the calculated number and short-name:
+   d. Run the script `# Feature tracking integration
+if [ -f ".specify/memory/feature-index.md" ]; then
+    # Extract feature ID from branch name if available
+    if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
+        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        if [[ "$CURRENT_BRANCH" =~ ^([0-9]{3})- ]]; then
+            FEATURE_ID="${BASH_REMATCH[1]}"
+            # Update feature status to "Planned" and set spec path
+            TODAY=$(date '+%Y-%m-%d')
+            SPEC_PATH=".specify/specs/$CURRENT_BRANCH/spec.md"
+            sed -i "s/| ${FEATURE_ID} | \([^|]*\) | \([^|]*\) | Draft | (Not yet created) | [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} | |/| ${FEATURE_ID} | \1 | \2 | Planned | ${SPEC_PATH} | ${TODAY} | /" .specify/memory/feature-index.md
+            # Stage the changes
+            git add .specify/memory/feature-index.md >/dev/null 2>&1 || true
+        fi
+    fi
+fi
+cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
+$ARGUMENTS
+EOF` with the calculated number and short-name:
       - Pass `--number N+1` and `--short-name "your-short-name"` along with the feature description
-      - Bash example: `| --json --number 5 --short-name "user-auth" "Add user authentication"`
+      - Bash example: `# Feature tracking integration
+if [ -f ".specify/memory/feature-index.md" ]; then
+    # Extract feature ID from branch name if available
+    if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
+        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        if [[ "$CURRENT_BRANCH" =~ ^([0-9]{3})- ]]; then
+            FEATURE_ID="${BASH_REMATCH[1]}"
+            # Update feature status to "Planned" and set spec path
+            TODAY=$(date '+%Y-%m-%d')
+            SPEC_PATH=".specify/specs/$CURRENT_BRANCH/spec.md"
+            sed -i "s/| ${FEATURE_ID} | \([^|]*\) | \([^|]*\) | Draft | (Not yet created) | [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} | |/| ${FEATURE_ID} | \1 | \2 | Planned | ${SPEC_PATH} | ${TODAY} | /" .specify/memory/feature-index.md
+            # Stage the changes
+            git add .specify/memory/feature-index.md >/dev/null 2>&1 || true
+        fi
+    fi
+fi
+cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
+$ARGUMENTS
+EOF --json --number 5 --short-name "user-auth" "Add user authentication"`
    
 2. Run the script `cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json` from repo root and include the short-name argument. Parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
 

@@ -1,12 +1,92 @@
-### V. Testability and CI Discipline
-MUST ensure changes are testable and validated pre-merge.
+# [PROJECT_NAME] Constitution
+<!--
+This is a PRESET template containing a set of generic project principles
+and workflow guidelines. It is intended as a starting point only.
 
-- Unit tests for JSON transforms and utility logic are REQUIRED.
-- REQUIRED 范围仅指**不依赖外部系统的纯逻辑**（例如行拆分、JSON 解析、缓冲策略、内部转换工具等）；此类代码必须有可在本地独立运行的单元测试。
-- Contract/integration tests SHOULD cover connectors and critical paths **when feasible**：
-	- 对 SLS/Kafka/ClickHouse 等外部系统的真实网络交互，如果本地开发环境缺乏可用 API 或需要过于复杂的 Mock，可以在后续、接近生产环境时补充契约/集成测试；
-	- 在此情况下，应通过接口封装和单元测试验证输入/输出契约，并在计划/任务文档中明确记录该约束与后续补测计划。
-- Build, lint, and minimal smoke tests MUST pass in CI before deployment。
-- Sample data or fixtures SHOULD accompany new jobs for local validation.
+When adopting this constitution for a specific project, you MUST review,
+add, remove, or modify principles and sections to match the actual
+context, risk profile, and organizational policies of your project.
+Do not assume this template is sufficient without customization.
+-->
 
-Rationale: Prevents regressions and ensures repeatable delivery.
+## Core Principles
+
+### I. Library-First Design
+Every significant feature MUST begin as a cohesive, reusable library (module/package).
+Libraries MUST:
+- Be self-contained and independently testable.
+- Have a single, clearly documented responsibility.
+- Avoid being mere organizational/wrapper shells without real behavior.
+
+Rationale: encourages reuse, clear boundaries, and easier testing.
+
+### II. CLI & Text I/O Interface
+Each library SHOULD expose a command-line interface (CLI) for core operations.
+CLIs MUST:
+- Accept input via stdin/arguments/files using plain text or JSON.
+- Write normal results to stdout and errors to stderr.
+- Prefer JSON for machine consumption and human-readable text for operators.
+
+Rationale: standardizes integration, observability, and automation.
+
+### III. Test-First Development (NON-NEGOTIABLE)
+Implementation MUST follow a Test-Driven Development style for core logic:
+- Write or update tests BEFORE implementing new behavior.
+- Ensure tests FAIL first (Red), then implement to make them PASS (Green).
+- Refactor only with all tests passing (Refactor).
+
+At minimum:
+- Pure functions/utilities MUST have unit tests.
+- Critical flows MUST have automated regression coverage.
+
+Rationale: reduces regressions and clarifies intent.
+
+### IV. Integration & Contract Testing
+Integration/contract tests SHOULD cover:
+- Cross-service communication and external APIs.
+- Shared schemas or data contracts.
+- Critical end-to-end user journeys.
+
+When real dependencies are hard to run locally, abstract them behind interfaces
+and document follow-up contract tests in the plan/tasks.
+
+Rationale: validates real-world behavior beyond unit tests.
+
+### V. Observability, Versioning & Simplicity
+All components MUST be observable and versioned:
+- Use structured logs for important events and errors.
+- Prefer semantic versioning (MAJOR.MINOR.PATCH).
+- Document any breaking changes and migration notes.
+- Keep designs as simple as possible; avoid speculative features (YAGNI).
+
+Rationale: makes systems debuggable, upgradable, and maintainable.
+
+### VI. Continuous Integration & Quality Gates
+Changes MUST be safe to merge:
+- Linting, formatting, and basic tests MUST pass in CI.
+- A minimal smoke test or example run SHOULD be provided for new features.
+- New behavior MUST be reflected in specs/plan/tasks/docs where applicable.
+
+Rationale: ensures consistent quality and predictable releases.
+
+## [SECTION_2_NAME]
+<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+
+[SECTION_2_CONTENT]
+<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+
+## [SECTION_3_NAME]
+<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+
+[SECTION_3_CONTENT]
+<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+
+## Governance
+<!-- Projects SHOULD refine this to match their org/governance needs. -->
+
+[GOVERNANCE_RULES]
+<!-- Example: Constitution supersedes other guidelines; Amendments require proposal,
+review, and version bump; All PRs MUST check compliance with core principles. -->
+
+**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
+<!-- Example: Version: 1.0.0 | Ratified: 2025-01-01 | Last Amended: 2025-01-01 -->

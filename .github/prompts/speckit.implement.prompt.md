@@ -8,7 +8,20 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. 从仓库根目录运行实现前置检查脚本 `|`（当前为 `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`），并从其 **JSON 输出中解析 FEATURE_DIR 和 AVAILABLE_DOCS 列表**。具体约定：
+1. 从仓库根目录运行实现前置检查脚本 `# Feature tracking integration
+if [ -f ".specify/memory/feature-index.md" ]; then
+    # Extract feature ID from current directory if available
+    CURRENT_DIR=$(pwd)
+    if [[ "$CURRENT_DIR" =~ /\.specify/[^/]+/([0-9]{3})- ]]; then
+        FEATURE_ID="${BASH_REMATCH[1]}"
+        # Update feature status to "Implemented" (if not already)
+        TODAY=$(date '+%Y-%m-%d')
+        sed -i "s/| ${FEATURE_ID} | \([^|]*\) | \([^|]*\) | Planned | \([^|]*\) | [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} | |/| ${FEATURE_ID} | \1 | \2 | Implemented | \3 | ${TODAY} | /" .specify/memory/feature-index.md
+        # Stage the changes
+        git add .specify/memory/feature-index.md >/dev/null 2>&1 || true
+    fi
+fi
+.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`（当前为 `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`），并从其 **JSON 输出中解析 FEATURE_DIR 和 AVAILABLE_DOCS 列表**。具体约定：
 
    - 脚本必须在 **仓库根目录** 执行，这样它才能通过 `.specify` 目录和 Git 分支正确推导当前特性上下文。
    - 脚本的 `--json --require-tasks --include-tasks` 模式会输出形如：
