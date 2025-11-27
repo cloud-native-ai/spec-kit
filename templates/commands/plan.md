@@ -9,21 +9,7 @@ handoffs:
     agent: speckit.checklist
     prompt: Create a checklist for the following domain...
 scripts:
-  sh: |
-    # Feature tracking integration
-    if [ -f ".specify/memory/feature-index.md" ]; then
-        # Extract feature ID from current directory if available
-        CURRENT_DIR=$(pwd)
-        if [[ "$CURRENT_DIR" =~ /\.specify/[^/]+/([0-9]{3})- ]]; then
-            FEATURE_ID="${BASH_REMATCH[1]}"
-            # Update feature status to "Implemented"
-            TODAY=$(date '+%Y-%m-%d')
-            sed -i "s/| ${FEATURE_ID} | \([^|]*\) | \([^|]*\) | Planned | \([^|]*\) | [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} | |/| ${FEATURE_ID} | \1 | \2 | Implemented | \3 | ${TODAY} | /" .specify/memory/feature-index.md
-            # Stage the changes
-            git add .specify/memory/feature-index.md >/dev/null 2>&1 || true
-        fi
-    fi
-    scripts/bash/create-new-plan.sh --json
+  sh: scripts/bash/create-new-plan.sh --json
 agent_scripts:
   sh: scripts/bash/update-agent-context.sh __AGENT__
 ---

@@ -9,26 +9,10 @@ handoffs:
     prompt: Clarify specification requirements
     send: true
 scripts:
-  sh: |
-    # Feature tracking integration
-    if [ -f ".specify/memory/feature-index.md" ]; then
-        # Extract feature ID from branch name if available
-        if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
-            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-            if [[ "$CURRENT_BRANCH" =~ ^([0-9]{3})- ]]; then
-                FEATURE_ID="${BASH_REMATCH[1]}"
-                # Update feature status to "Planned" and set spec path
-                TODAY=$(date '+%Y-%m-%d')
-                SPEC_PATH=".specify/specs/$CURRENT_BRANCH/spec.md"
-                sed -i "s/| ${FEATURE_ID} | \([^|]*\) | \([^|]*\) | Draft | (Not yet created) | [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} | |/| ${FEATURE_ID} | \1 | \2 | Planned | ${SPEC_PATH} | ${TODAY} | /" .specify/memory/feature-index.md
-                # Stage the changes
-                git add .specify/memory/feature-index.md >/dev/null 2>&1 || true
-            fi
-        fi
-    fi
-    cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
-    $ARGUMENTS
-    EOF
+   sh: |
+     cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
+     $ARGUMENTS
+     EOF
 ---
 
 ## User Input
