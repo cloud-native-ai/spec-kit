@@ -4,6 +4,8 @@ scripts:
   sh: scripts/bash/check-prerequisites.sh --json
 ---
 
+> Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于当前 feature 的 spec/plan/tasks 自动推导合适的检查清单主题并生成 checklist；仅在 `$ARGUMENTS` 非空时，将其作为清单类型或关注点偏好一并考虑。
+
 ## Checklist Purpose: "Unit Tests for English"
 
 **CRITICAL CONCEPT**: Checklists are **UNIT TESTS FOR REQUIREMENTS WRITING** - they validate the quality, clarity, and completeness of requirements in a given domain.

@@ -4,6 +4,8 @@ scripts:
   sh: scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
 ---
 
+> Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文定义的完整分析流程执行，基于现有 spec/plan/tasks 与宪法做判断；仅在 `$ARGUMENTS` 非空时，将其作为额外分析聚焦点或过滤条件一并考虑。
+
 ## User Input
 
 ```text

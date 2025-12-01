@@ -9,6 +9,8 @@ handoffs:
       prompt: Implement the feature specification based on the updated constitution and feature index. I want to build...
 ---
 
+> Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于现有仓库与宪法内容执行更新与对齐；仅在 `$ARGUMENTS` 非空时，将其视为对原则/治理规则的显式补充或修改意向。
+
 ## User Input
 
 ```text

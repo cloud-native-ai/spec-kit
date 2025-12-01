@@ -15,6 +15,8 @@ scripts:
      EOF
 ---
 
+> Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，必须仍然按下文定义的完整流程执行，基于现有仓库与 feature 上下文做决策；仅在 `$ARGUMENTS` 非空时，将其作为额外约束或偏好一并考虑。
+
 ## User Input
 
 ```text
