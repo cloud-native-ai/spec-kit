@@ -65,7 +65,7 @@ Rationale: makes systems debuggable, upgradable, and maintainable.
 Changes MUST be safe to merge:
 - Linting, formatting, and basic tests MUST pass in CI.
 - A minimal smoke test or example run SHOULD be provided for new features.
-- New behavior MUST be reflected in specs/plan/tasks/docs where applicable.
+- New behavior MUST be reflected in .specify/specs/plan/tasks/docs where applicable.
 
 Rationale: ensures consistent quality and predictable releases.
 

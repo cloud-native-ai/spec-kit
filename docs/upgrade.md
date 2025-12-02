@@ -59,12 +59,12 @@ Running `specify init --here --force` will update:
 
 These files are **never touched** by the upgrade—the template packages don't even contain them:
 
-- ✅ **Your specifications** (`specs/001-my-feature/spec.md`, etc.) - **CONFIRMED SAFE**
-- ✅ **Your implementation plans** (`specs/001-my-feature/plan.md`, `tasks.md`, etc.) - **CONFIRMED SAFE**
+- ✅ **Your specifications** (`.specify/specs/001-my-feature/spec.md`, etc.) - **CONFIRMED SAFE**
+- ✅ **Your implementation plans** (`.specify/specs/001-my-feature/plan.md`, `tasks.md`, etc.) - **CONFIRMED SAFE**
 - ✅ **Your source code** - **CONFIRMED SAFE**
 - ✅ **Your git history** - **CONFIRMED SAFE**
 
-The `specs/` directory is completely excluded from template packages and will never be modified during upgrades.
+The `.specify/specs/` directory is completely excluded from template packages and will never be modified during upgrades.
 
 ### Update command
 
@@ -94,7 +94,7 @@ Proceed? [y/N]
 
 With `--force`, it skips the confirmation and proceeds immediately.
 
-**Important: Your `specs/` directory is always safe.** The `--force` flag only affects template files (commands, scripts, templates, memory). Your feature specifications, plans, and tasks in `specs/` are never included in upgrade packages and cannot be overwritten.
+**Important: Your `.specify/specs/` directory is always safe.** The `--force` flag only affects template files (commands, scripts, templates, memory). Your feature specifications, plans, and tasks in `.specify/specs/` are never included in upgrade packages and cannot be overwritten.
 
 ---
 
@@ -333,7 +333,7 @@ Only Spec Kit infrastructure files:
 
 **What stays untouched:**
 
-- Your `specs/` directory (specifications, plans, tasks)
+- Your `.specify/specs/` directory (specifications, plans, tasks)
 - Your source code files
 - Your `.git/` directory and git history
 - Any other files not part of Spec Kit templates
