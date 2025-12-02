@@ -13,7 +13,7 @@ scripts:
    sh: scripts/bash/check-prerequisites.sh --json
 ---
 
-> Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于当前 feature 的 `spec.md`、`plan.md` 等设计文档自动生成完整、可执行的 `tasks.md`；仅在 `$ARGUMENTS` 非空时，将其用作任务拆分风格或优先级的附加提示。 
+> Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于当前 feature 的 `spec.md`、`plan.md` 等设计文档自动生成完整、可执行的 `tasks.md`；仅在 `$ARGUMENTS` 非空时，将其用作任务拆分风格或优先级的附加提示。
 
 ## User Input
 

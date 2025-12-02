@@ -40,6 +40,8 @@ Use the `/speckit.plan` command to provide your tech stack and architecture choi
 
 Use `/speckit.tasks` to create an actionable task list, then ask your agent to implement the feature.
 
+After implementation, use `/speckit.review` to review the generated `spec.md`, `plan.md`, and `tasks.md` for the feature and summarize them into the long-lived feature memory files under `.specify/memory/features/`.
+
 ## Detailed Example: Building Taskify
 
 Here's a complete example of building a team productivity platform:

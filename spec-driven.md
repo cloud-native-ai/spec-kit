@@ -115,6 +115,17 @@ After a plan is created, this command analyzes the plan and related design docum
 4. **Output**: Writes `tasks.md` in the feature directory, ready for execution by a Task agent
 5. **Feature Integration**: Maintains feature index status and metadata
 
+### The `/speckit.review` Command
+
+This command is the final step of the SDD loop for a feature; it reviews the full set of artifacts produced along the way and consolidates them into the long-lived feature memory:
+
+1. **Artifact Review**: Loads the feature's `spec.md`, `plan.md`, `tasks.md`, and any supporting documents such as `data-model.md`, `contracts/`, `research.md`, and `quickstart.md` from `.specify/specs/[FEATURE_KEY]/`.
+2. **Synthesis**: Produces a concise, user- and system-level narrative that explains what the feature does, who it serves, and which constraints and integrations define its boundary.
+3. **Feature Memory Update**: Writes or updates a dedicated feature document in `.specify/memory/features/[FEATURE_KEY].md`, keeping prior context while refreshing the current definition and linking back to the latest spec/plan/tasks.
+4. **Index Integration**: Updates `.specify/memory/feature-index.md` so the feature entry points at the up-to-date memory file and records that review has been completed.
+
+Using `/speckit.review` after `/speckit.implement` keeps your feature index and long-term documentation in sync with the latest iteration of the SDD artifacts.
+
 ### Example: Building a Chat Feature
 
 Here's how these commands transform the traditional development workflow:
@@ -166,9 +177,17 @@ Total: ~12 hours of documentation work
 # - .specify/specs/003-chat-system/contracts/ (WebSocket events, REST endpoints)
 # - .specify/specs/003-chat-system/quickstart.md (Key validation scenarios)
 # - .specify/specs/003-chat-system/tasks.md (Task list derived from the plan)
+
+# Step 5: Review and consolidate feature documentation (5 minutes)
+/speckit.review
+
+# This automatically:
+# - Reviews all artifacts produced for the chat feature
+# - Consolidates them into a cohesive feature memory document
+# - Updates the feature index with the latest memory file
 ```
 
-In 16 minutes, you have:
+In 21 minutes, you have:
 
 - A complete feature specification with user stories and acceptance criteria
 - A detailed implementation plan with technology choices and rationale
@@ -176,6 +195,7 @@ In 16 minutes, you have:
 - Comprehensive test scenarios for both automated and manual testing
 - All documents properly versioned in a feature branch
 - A centralized feature index (`feature-index.md`) tracking all project features and their status
+- A consolidated feature memory document that serves as the single source of truth for the feature
 
 ### The Power of Structured Automation
 
