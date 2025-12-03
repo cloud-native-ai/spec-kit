@@ -217,15 +217,15 @@ EOF
 
 The `/speckit.specify` command must maintain a **many-specs to one-feature** relationship:
 
-- A **Feature** is a relatively large, long‑lived concept, described by `memory/features/<ID>.md` and indexed in `memory/feature-index.md`.
+- A **Feature** is a relatively large, long‑lived concept, described by `.specify/memory/features/<ID>.md` and indexed in `.specify/memory/feature-index.md`.
 - A **Spec** is a smaller, focused slice under a Feature; one Feature can (and typically will) own multiple Specs over time.
 
 When creating a new spec you MUST:
 
 1. Determine the target Feature for this spec **before** writing spec content.
 2. Use **both** of the following sources to resolve the Feature:
-    - `memory/feature-index.md` table entries
-    - `memory/features/*.md` detail files
+    - `.specify/memory/feature-index.md` table entries
+    - `.specify/memory/features/*.md` detail files
 3. Use the feature branch information (e.g. `SPECIFY_FEATURE` env, current git branch name, or the numeric prefix in `BRANCH_NAME`) as hints, but **do not** assume a strict `branch == feature` 1:1 mapping.
 
 ### Feature lookup rules
@@ -237,12 +237,12 @@ When `/speckit.specify` is invoked for a new spec:
     - Else, if current git branch matches `NNN-<slug>`, take `NNN` as the feature candidate.
     - Else, if `BRANCH_NAME` returned by `create-new-spec.sh` starts with `NNN-`, take `NNN` as the feature candidate.
 2. Cross‑check the candidate Feature ID against:
-    - `memory/features/NNN.md` (detail file exists)
-    - and/or a row with `ID == NNN` in `memory/feature-index.md`.
+    - `.specify/memory/features/NNN.md` (detail file exists)
+    - and/or a row with `ID == NNN` in `.specify/memory/feature-index.md`.
     - If found, **bind this new spec** to that Feature (do not create a new Feature).
 3. If no matching Feature can be found, you MUST create a new Feature:
-    - Instantiate `.specify/templates/feature-template.md` into `memory/features/<NEW_ID>.md` following `/speckit.feature` rules.
-    - Add / update the corresponding row in `memory/feature-index.md` with `Spec Path` pointing to the new spec file.
+    - Instantiate `.specify/templates/feature-template.md` into `.specify/memory/features/<NEW_ID>.md` following `/speckit.feature` rules.
+    - Add / update the corresponding row in `.specify/memory/feature-index.md` with `Spec Path` pointing to the new spec file.
 
 > Important: The same Feature (same `FEATURE_ID`) can appear in `Spec Path` multiple times over its lifetime as different specs are added; each spec path should reflect the concrete spec file path created for this run.
 
@@ -250,7 +250,7 @@ When `/speckit.specify` is invoked for a new spec:
 
 - When a new spec is created, always:
    - Ensure a corresponding Feature entry exists (create if missing using `.specify/templates/feature-template.md`).
-   - Update `memory/feature-index.md` for that Feature ID:
+   - Update `.specify/memory/feature-index.md` for that Feature ID:
       - Keep `Status` at least `Planned`.
       - Append or update the `Spec Path` column with the latest spec path (for simple index keep the most recent spec, for richer indices you may maintain a list if schema evolves).
       - Refresh the "Last Updated" date.

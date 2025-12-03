@@ -146,42 +146,6 @@ LAST_UPDATED_DATE=$(date +%Y-%m-%d)
 FEATURE_COUNT=$(count_features)
 FEATURE_ENTRIES=$(generate_feature_entries)
 
-# Function to generate spec-feature mapping table
-generate_spec_feature_mapping() {
-    local entries=""
-    local first=true
-
-    if [ -d "$SPECS_DIR" ]; then
-        for dir in $(find "$SPECS_DIR" -maxdepth 1 -type d -name "[0-9][0-9][0-9]-*" | sort -V); do
-            [ -d "$dir" ] || continue
-            local dirname
-            dirname=$(basename "$dir")
-
-            # Extract feature ID and take branch/spec name as-is
-            if [[ "$dirname" =~ ^([0-9]{3})-(.*) ]]; then
-                local fid="${BASH_REMATCH[1]}"
-                local branch_name="$dirname"
-                local spec_path=".specify/specs/$dirname/spec.md"
-
-                if [ "$first" = true ]; then
-                    entries="| $branch_name | $spec_path | $fid |"
-                    first=false
-                else
-                    entries="$entries"$'\n'"| $branch_name | $spec_path | $fid |"
-                fi
-            fi
-        done
-    fi
-
-    if [ -z "$entries" ]; then
-        entries="<!-- No specs found -->"
-    fi
-
-    echo "$entries"
-}
-
-SPEC_FEATURE_MAPPING=$(generate_spec_feature_mapping)
-
 # Create/update feature index
 cat > "$FEATURE_INDEX" << EOF
 # $PROJECT_NAME Feature Index
@@ -192,14 +156,6 @@ cat > "$FEATURE_INDEX" << EOF
 ## Features
 
 $FEATURE_ENTRIES
-
-## Spec–Feature Mapping
-
-This section lists all specs and the feature IDs they are currently associated with.
-
-| Spec Branch | Spec Path | Feature ID |
-|-------------|-----------|------------|
-$SPEC_FEATURE_MAPPING
 
 ## Feature Entry Format
 
