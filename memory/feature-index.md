@@ -7,6 +7,14 @@
 
 [FEATURE_ENTRIES]
 
+## Spec–Feature Mapping
+
+This section lists all specs and the feature IDs they are currently associated with.
+
+| Spec Branch | Spec Path | Feature ID |
+|-------------|-----------|------------|
+| [SPEC_BRANCH] | [SPEC_PATH] | [FEATURE_ID] |
+
 ## Feature Entry Format
 
 Each feature entry should follow this format in the table:

@@ -1,11 +1,21 @@
-# [PROJECT_NAME] Feature Index
+# Basic project initialization Feature Index
 
-**Last Updated**: [LAST_UPDATED_DATE]
-**Total Features**: [FEATURE_COUNT]
+**Last Updated**: 2025-12-03
+**Total Features**: 2
 
 ## Features
 
-[FEATURE_ENTRIES]
+| 001 | Test Feature Spec Linkage | Specification completed for feature 001 | Planned | .specify/specs/001-test-feature-spec-linkage/spec.md | 2025-12-03 |
+| 002 | Second Spec Same Feature | Specification completed for feature 002 | Planned | .specify/specs/002-second-spec-same-feature/spec.md | 2025-12-03 |
+
+## Spec–Feature Mapping
+
+This section lists all specs and the feature IDs they are currently associated with.
+
+| Spec Branch | Spec Path | Feature ID |
+|-------------|-----------|------------|
+| 001-test-feature-spec-linkage | .specify/specs/001-test-feature-spec-linkage/spec.md | 001 |
+| 002-second-spec-same-feature | .specify/specs/002-second-spec-same-feature/spec.md | 002 |
 
 ## Feature Entry Format
 
@@ -13,7 +23,7 @@ Each feature entry should follow this format in the table:
 
 | ID | Name | Description | Status | Spec Path | Last Updated |
 |----|------|-------------|--------|-----------|--------------|
-| [FEATURE_ID] | [FEATURE_NAME] | [FEATURE_DESCRIPTION] | [FEATURE_STATUS] | [SPEC_PATH] | [FEATURE_LAST_UPDATED] |
+| 001 | Feature Name | Brief description of the feature | Draft | .specify/specs/001-feature-name/spec.md | 2025-11-21 |
 
 ### Column Definitions
 
