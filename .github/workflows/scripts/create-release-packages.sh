@@ -167,7 +167,14 @@ build_variant() {
       generate_copilot_prompts "$base_dir/.github/agents" "$base_dir/.github/prompts"
       # Create VS Code workspace settings
       mkdir -p "$base_dir/.vscode"
-      [[ -f templates/vscode-settings.json ]] && cp templates/vscode-settings.json "$base_dir/.vscode/settings.json"
+      if [[ -f templates/vscode-settings.json ]]; then
+        if [[ -f scripts/generate_vscode_settings.py ]]; then
+          echo "Generating dynamic VS Code settings..."
+          python3 scripts/generate_vscode_settings.py --template templates/vscode-settings.json --output "$base_dir/.vscode/settings.json" --root .
+        else
+          cp templates/vscode-settings.json "$base_dir/.vscode/settings.json"
+        fi
+      fi
       ;;
     cursor-agent)
       mkdir -p "$base_dir/.cursor/commands"

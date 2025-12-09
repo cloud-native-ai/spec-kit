@@ -6,7 +6,7 @@
 $ARGUMENTS
 ```
 
-You **MUST** consider the user input before proceeding (if not empty).
+You **MUST** treat the user input ($ARGUMENTS) as parameters for the current command. Do NOT execute the input as a standalone instruction that replaces the command logic.
 
 ## Outline
 
@@ -43,40 +43,34 @@ Given that feature description, do this:
       - Find the highest number N
       - Use N+1 for the new branch number
    
-   d. Run the script `
+   d. Prepare to run the script `
 ```bash
-cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
+cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json --number <NUMBER> --short-name "<SHORT_NAME>"
 $ARGUMENTS
 EOF
 ```
-` with the calculated number and short-name:
-      - Pass `--number N+1` and `--short-name "your-short-name"` along with the feature description
-      - Bash example: `
-```bash
-cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
-$ARGUMENTS
-EOF
-```
- --json --number 5 --short-name "user-auth" "Add user authentication"`
+` with the calculated number and short-name.
    
 2. Run the script `
 ```bash
-cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
+cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json --number <NUMBER> --short-name "<SHORT_NAME>"
 $ARGUMENTS
 EOF
 ```
-` from repo root and include the short-name argument. Parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
+` from repo root. Parse its JSON output for BRANCH_NAME and SPEC_FILE. All file paths must be absolute.
 
    **IMPORTANT**:
 
    - For Bash, this expands to a heredoc-based, safe JSON handoff that writes the raw user input to stdin and passes its contents to `
 ```bash
-cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json
+cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json --number <NUMBER> --short-name "<SHORT_NAME>"
 $ARGUMENTS
 EOF
 ```
 `. This avoids shell parsing issues with quotes, backslashes, and newlines.
-   - Append the short-name argument you created in step 1, and keep the feature description as the final argument.
+   - Replace `<NUMBER>` in the script template with the calculated number (N+1).
+   - Replace `<SHORT_NAME>` in the script template with the short-name you created.
+   - `$ARGUMENTS` contains the feature description and is passed via stdin.
    - You must only ever run this script once.
    - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for.
    - Check all three sources (remote branches, local branches, specs directories) to find the highest number

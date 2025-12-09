@@ -5,7 +5,9 @@
 
 ## Features
 
-[FEATURE_ENTRIES]
+| ID | Name | Description | Status | Spec Path | Last Updated |
+|----|------|-------------|--------|-----------|--------------|
+| 003 | Dynamic VS Code Settings | Generate settings based on tech stack | Implemented | .specify/specs/003-dynamic-vscode-settings/spec.md | 2025-12-10 |
 
 ## Spec–Feature Mapping
 
