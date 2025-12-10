@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # /// script
-# requires-python = ">=3.11"
+# requires-python = ">=3.8"
 # dependencies = [
 #     "typer",
 #     "rich",
@@ -24,7 +24,9 @@ Or install globally:
     specify init --here
 """
 
+import json
 import os
+import re
 import shlex
 import shutil
 import ssl
@@ -33,15 +35,18 @@ import sys
 import tempfile
 import zipfile
 
+# Check Python version
+if sys.version_info < (3, 8):
+    sys.exit("Error: Specify CLI requires Python 3.8 or higher.")
+
 # For cross-platform keyboard input
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 import httpx
 
 # For cross-platform keyboard input
 import readchar
-import truststore
 import typer
 from rich.align import Align
 from rich.console import Console
@@ -53,21 +58,26 @@ from rich.text import Text
 from rich.tree import Tree
 from typer.core import TyperGroup
 
-ssl_context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+try:
+    import truststore
+    ssl_context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+except (ImportError, AttributeError):
+    ssl_context = ssl.create_default_context()
+
 client = httpx.Client(verify=ssl_context)
 
 # Get the directory where this module is located
 MODULE_DIR = Path(__file__).parent.resolve()
 
 
-def _github_token(cli_token: str | None = None) -> str | None:
+def _github_token(cli_token: Optional[str] = None) -> Optional[str]:
     """Return sanitized GitHub token (cli arg takes precedence) or None."""
     return (
         (cli_token or os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN") or "").strip()
     ) or None
 
 
-def _github_auth_headers(cli_token: str | None = None) -> dict:
+def _github_auth_headers(cli_token: Optional[str] = None) -> Dict:
     """Return Authorization header dict only when a non-empty token exists."""
     token = _github_token(cli_token)
     return {"Authorization": f"Bearer {token}"} if token else {}
@@ -282,10 +292,26 @@ class StepTracker:
         return tree
 
 
+def get_resource_path() -> Optional[Path]:
+    """
+    Get the path containing templates/memory/scripts.
+    Checks MODULE_DIR first (installed package), then repo root (local dev).
+    """
+    # Check installed package location
+    if (MODULE_DIR / "templates").exists():
+        return MODULE_DIR
+
+    # Check repo root (assuming src/specify_cli structure)
+    repo_root = MODULE_DIR.parent.parent
+    if (repo_root / "templates").exists():
+        return repo_root
+
+    return None
+
+
 def has_local_templates() -> bool:
-    """Check if local templates are available in the installed package."""
-    required_dirs = ["memory", "scripts", "templates"]
-    return all((MODULE_DIR / dir_name).exists() for dir_name in required_dirs)
+    """Check if local templates are available."""
+    return get_resource_path() is not None
 
 
 def rewrite_paths(content: str) -> str:
@@ -306,7 +332,11 @@ def generate_commands(
     """Generate command files from templates for the specified agent."""
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    commands_dir = MODULE_DIR / "templates" / "commands"
+    resource_path = get_resource_path()
+    if not resource_path:
+        return
+
+    commands_dir = resource_path / "templates" / "commands"
     if not commands_dir.exists():
         return
 
@@ -340,7 +370,7 @@ def generate_commands(
         if script_match:
             # Multi-line block starting after the `sh: |` line until the next dedented key or frontmatter end
             lines = file_content.split("\n")
-            start_idx: int | None = None
+            start_idx: Optional[int] = None
             indent_prefix = ""
             for i, line in enumerate(lines):
                 if re.match(rf"^\s*{script_variant}:\s*\|\s*$", line):
@@ -352,7 +382,7 @@ def generate_commands(
                         )
                     break
 
-            block_lines: list[str] = []
+            block_lines: List[str] = []
             if start_idx is not None:
                 for j in range(start_idx, len(lines)):
                     ln = lines[j]
@@ -453,16 +483,128 @@ def generate_commands(
                 f.write(body)
 
 
+def strip_comments(text: str) -> str:
+    """Removes C-style comments (// and /* */) from text."""
+
+    def replacer(match):
+        s = match.group(0)
+        if s.startswith("/"):
+            return " "
+        else:
+            return s
+
+    pattern = re.compile(
+        r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"',
+        re.DOTALL | re.MULTILINE,
+    )
+    return re.sub(pattern, replacer, text)
+
+
+def detect_tech_stack(root_dir: Path) -> Set[str]:
+    stack = set()
+    # Java
+    if (root_dir / "pom.xml").exists() or (root_dir / "build.gradle").exists():
+        stack.add("java")
+
+    # Python
+    if (
+        (root_dir / "pyproject.toml").exists()
+        or (root_dir / "requirements.txt").exists()
+        or (root_dir / "setup.py").exists()
+    ):
+        stack.add("python")
+
+    # Node/JS/TS
+    if (root_dir / "package.json").exists():
+        stack.add("javascript")
+        if (root_dir / "tsconfig.json").exists():
+            stack.add("typescript")
+
+    return stack
+
+
+def configure_vscode_settings(
+    project_path: Path, tracker: Optional[StepTracker] = None
+) -> None:
+    """Generate VS Code settings based on project context."""
+    template_path = project_path / ".specify" / "templates" / "vscode-settings.json"
+    output_path = project_path / ".vscode" / "settings.json"
+
+    if not template_path.exists():
+        # Try using existing settings file as template
+        if output_path.exists():
+            template_path = output_path
+        # Fallback to source template if not found in project (e.g. during local dev copy)
+        elif (resource_path := get_resource_path()) and (
+            resource_path / "templates" / "vscode-settings.json"
+        ).exists():
+            template_path = resource_path / "templates" / "vscode-settings.json"
+        else:
+            return
+
+    if tracker:
+        tracker.start("vscode-settings", "Configuring VS Code settings")
+
+    try:
+        # Load template
+        with open(template_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            json_content = strip_comments(content)
+            settings = json.loads(json_content)
+
+        # Analyze context
+        stack = detect_tech_stack(project_path)
+
+        # Apply settings
+        if "java" in stack:
+            settings.setdefault(
+                "java.configuration.updateBuildConfiguration", "automatic"
+            )
+            settings.setdefault(
+                "java.format.settings.url", ".vscode/java-formatter.xml"
+            )
+
+        if "python" in stack:
+            settings.setdefault("python.analysis.typeCheckingMode", "basic")
+            settings.setdefault("python.formatting.provider", "black")
+
+        if "typescript" in stack or "javascript" in stack:
+            settings.setdefault("editor.defaultFormatter", "esbenp.prettier-vscode")
+
+        # Ensure .vscode exists
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Write output
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(settings, f, indent=2, ensure_ascii=False)
+
+        if tracker:
+            tracker.complete(
+                "vscode-settings",
+                f"Updated for {', '.join(stack) if stack else 'generic'}",
+            )
+
+    except Exception as e:
+        if tracker:
+            tracker.error("vscode-settings", str(e))
+        else:
+            console.print(f"[red]Error configuring VS Code settings:[/red] {e}")
+
+
 def copy_local_templates(
     project_path: Path,
     ai_assistant: str,
     script_type: str,
     is_current_dir: bool = False,
-    tracker: StepTracker | None = None,
+    tracker: Optional[StepTracker] = None,
 ) -> Path:
     """Copy local templates to create a new project.
     Returns project_path.
     """
+    resource_path = get_resource_path()
+    if not resource_path:
+        raise RuntimeError("Local templates not found")
+
     if tracker:
         tracker.add("local-templates", "Using local templates")
         tracker.start("local-templates", "checking template structure")
@@ -477,8 +619,8 @@ def copy_local_templates(
         specify_dir.mkdir(exist_ok=True)
 
         # Copy memory directory
-        if (MODULE_DIR / "memory").exists():
-            memory_src = MODULE_DIR / "memory"
+        if (resource_path / "memory").exists():
+            memory_src = resource_path / "memory"
             memory_dest = specify_dir / "memory"
             memory_dest.mkdir(exist_ok=True)
 
@@ -510,11 +652,13 @@ def copy_local_templates(
                         )
 
         # Copy scripts directory
-        if (MODULE_DIR / "scripts").exists():
+        if (resource_path / "scripts").exists():
             if tracker:
                 tracker.start("local-templates", "copying scripts")
             shutil.copytree(
-                MODULE_DIR / "scripts", specify_dir / "scripts", dirs_exist_ok=True
+                resource_path / "scripts",
+                specify_dir / "scripts",
+                dirs_exist_ok=True,
             )
 
             # Handle script type filtering if needed
@@ -522,11 +666,11 @@ def copy_local_templates(
             pass
 
         # Copy templates directory (excluding commands which will be handled specially)
-        if (MODULE_DIR / "templates").exists():
+        if (resource_path / "templates").exists():
             if tracker:
                 tracker.start("local-templates", "copying templates")
             # Copy all templates except commands directory
-            for item in (MODULE_DIR / "templates").iterdir():
+            for item in (resource_path / "templates").iterdir():
                 if item.name != "commands":
                     if item.is_dir():
                         shutil.copytree(
@@ -540,7 +684,7 @@ def copy_local_templates(
                         shutil.copy2(item, specify_dir / "templates" / item.name)
 
         # Handle AI assistant specific command files using the same logic as release script
-        if (MODULE_DIR / "templates" / "commands").exists():
+        if (resource_path / "templates" / "commands").exists():
             if tracker:
                 tracker.start("local-templates", f"generating {ai_assistant} commands")
 
@@ -569,12 +713,7 @@ def copy_local_templates(
                     project_path / ".github" / "prompts",
                     script_type,
                 )
-                # Create VS Code workspace settings
-                vscode_dir = project_path / ".vscode"
-                vscode_dir.mkdir(exist_ok=True)
-                vscode_settings = MODULE_DIR / "templates" / "vscode-settings.json"
-                if vscode_settings.exists():
-                    shutil.copy2(vscode_settings, vscode_dir / "settings.json")
+                # VS Code settings are handled by configure_vscode_settings() later
             elif ai_assistant == "cursor-agent":
                 generate_commands(
                     "cursor",
@@ -707,7 +846,9 @@ def get_key():
 
 
 def select_with_arrows(
-    options: dict, prompt_text: str = "Select an option", default_key: str = None
+    options: Dict,
+    prompt_text: str = "Select an option",
+    default_key: Optional[str] = None,
 ) -> str:
     """
     Interactive selection using arrow keys with Rich Live display.
@@ -843,7 +984,7 @@ def callback(ctx: typer.Context):
 
 
 def run_command(
-    cmd: list[str],
+    cmd: List[str],
     check_return: bool = True,
     capture: bool = False,
     shell: bool = False,
@@ -868,7 +1009,7 @@ def run_command(
         return None
 
 
-def check_tool(tool: str, tracker: StepTracker = None) -> bool:
+def check_tool(tool: str, tracker: Optional[StepTracker] = None) -> bool:
     """Check if a tool is installed. Optionally update tracker.
 
     Args:
@@ -900,7 +1041,7 @@ def check_tool(tool: str, tracker: StepTracker = None) -> bool:
     return found
 
 
-def is_git_repo(path: Path = None) -> bool:
+def is_git_repo(path: Optional[Path] = None) -> bool:
     """Check if the specified path is inside a git repository."""
     if path is None:
         path = Path.cwd()
@@ -1105,8 +1246,8 @@ def download_and_extract_template(
     is_current_dir: bool = False,
     *,
     verbose: bool = True,
-    tracker: StepTracker | None = None,
-    client: httpx.Client = None,
+    tracker: Optional["StepTracker"] = None,
+    client: Optional[httpx.Client] = None,
     debug: bool = False,
     github_token: str = None,
 ) -> Path:
@@ -1295,7 +1436,7 @@ def download_and_extract_template(
 
 
 def ensure_executable_scripts(
-    project_path: Path, tracker: StepTracker | None = None
+    project_path: Path, tracker: Optional["StepTracker"] = None
 ) -> None:
     """Ensure POSIX .sh scripts under .specify/scripts (recursively) have execute bits (no-op on Windows)."""
     if os.name == "nt":
@@ -1303,7 +1444,7 @@ def ensure_executable_scripts(
     scripts_root = project_path / ".specify" / "scripts"
     if not scripts_root.is_dir():
         return
-    failures: list[str] = []
+    failures: List[str] = []
     updated = 0
     for script in scripts_root.rglob("*.sh"):
         try:
@@ -1571,6 +1712,7 @@ def init(
         ("chmod", "Ensure scripts executable"),
         ("cleanup", "Cleanup"),
         ("git", "Initialize git repository"),
+        ("vscode-settings", "Configure VS Code"),
         ("final", "Finalize"),
     ]:
         tracker.add(key, label)
@@ -1655,6 +1797,9 @@ def init(
                     tracker.skip("git", "git not available")
             else:
                 tracker.skip("git", "--no-git flag")
+
+            # Configure VS Code settings
+            configure_vscode_settings(project_path, tracker=tracker)
 
             tracker.complete("final", "project ready")
         except Exception as e:
