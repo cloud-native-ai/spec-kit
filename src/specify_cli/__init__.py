@@ -1536,11 +1536,14 @@ def init(
         "   2.1 [cyan]/speckit.constitution[/] - Establish project principles"
     )
     steps_lines.append(
-        "   2.2 [cyan]/speckit.specify[/] - Create baseline specification"
+        "   2.2 [cyan]/speckit.feature[/] - Manage feature lifecycle & index"
     )
-    steps_lines.append("   2.3 [cyan]/speckit.plan[/] - Create implementation plan")
-    steps_lines.append("   2.4 [cyan]/speckit.tasks[/] - Generate actionable tasks")
-    steps_lines.append("   2.5 [cyan]/speckit.implement[/] - Execute implementation")
+    steps_lines.append(
+        "   2.3 [cyan]/speckit.specify[/] - Create baseline specification"
+    )
+    steps_lines.append("   2.4 [cyan]/speckit.plan[/] - Create implementation plan")
+    steps_lines.append("   2.5 [cyan]/speckit.tasks[/] - Generate actionable tasks")
+    steps_lines.append("   2.6 [cyan]/speckit.implement[/] - Execute implementation")
 
     steps_panel = Panel(
         "\n".join(steps_lines), title="Next Steps", border_style="cyan", padding=(1, 2)
@@ -1554,6 +1557,7 @@ def init(
         "○ [cyan]/speckit.clarify[/] [bright_black](optional)[/bright_black] - Ask structured questions to de-risk ambiguous areas before planning (run before [cyan]/speckit.plan[/] if used)",
         "○ [cyan]/speckit.analyze[/] [bright_black](optional)[/bright_black] - Cross-artifact consistency & alignment report (after [cyan]/speckit.tasks[/], before [cyan]/speckit.implement[/])",
         "○ [cyan]/speckit.checklist[/] [bright_black](optional)[/bright_black] - Generate quality checklists to validate requirements completeness, clarity, and consistency (after [cyan]/speckit.plan[/])",
+        "○ [cyan]/speckit.review[/] [bright_black](optional)[/bright_black] - Review the full SDD artifact set for a feature and summarize it (after [cyan]/speckit.implement[/])",
     ]
     enhancements_panel = Panel(
         "\n".join(enhancement_lines),
