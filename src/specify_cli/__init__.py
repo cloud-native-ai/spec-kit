@@ -70,19 +70,6 @@ client = httpx.Client(verify=ssl_context)
 MODULE_DIR = Path(__file__).parent.resolve()
 
 
-def _github_token(cli_token: Optional[str] = None) -> Optional[str]:
-    """Return sanitized GitHub token (cli arg takes precedence) or None."""
-    return (
-        (cli_token or os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN") or "").strip()
-    ) or None
-
-
-def _github_auth_headers(cli_token: Optional[str] = None) -> Dict:
-    """Return Authorization header dict only when a non-empty token exists."""
-    token = _github_token(cli_token)
-    return {"Authorization": f"Bearer {token}"} if token else {}
-
-
 # Agent configuration with name, folder, install URL, and CLI tool requirement
 AGENT_CONFIG = {
     "copilot": {
@@ -1105,336 +1092,6 @@ def init_git_repo(
         os.chdir(original_cwd)
 
 
-def download_template_from_github(
-    ai_assistant: str,
-    download_dir: Path,
-    *,
-    script_type: str = "sh",
-    verbose: bool = True,
-    show_progress: bool = True,
-    client: Optional[httpx.Client] = None,
-    debug: bool = False,
-    github_token: Optional[str] = None,
-) -> Tuple[Path, dict]:
-    repo_owner = "github"
-    repo_name = "spec-kit"
-    if client is None:
-        client = httpx.Client(verify=ssl_context)
-
-    if verbose:
-        console.print("[cyan]Fetching latest release information...[/cyan]")
-    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
-
-    try:
-        response = client.get(
-            api_url,
-            timeout=30,
-            follow_redirects=True,
-            headers=_github_auth_headers(github_token),
-        )
-        status = response.status_code
-        if status != 200:
-            msg = f"GitHub API returned {status} for {api_url}"
-            if debug:
-                msg += f"\nResponse headers: {response.headers}\nBody (truncated 500): {response.text[:500]}"
-            raise RuntimeError(msg)
-        try:
-            release_data = response.json()
-        except ValueError as je:
-            raise RuntimeError(
-                f"Failed to parse release JSON: {je}\nRaw (truncated 400): {response.text[:400]}"
-            )
-    except Exception as e:
-        console.print("[red]Error fetching release information[/red]")
-        console.print(Panel(str(e), title="Fetch Error", border_style="red"))
-        raise typer.Exit(1)
-
-    assets = release_data.get("assets", [])
-    pattern = f"spec-kit-template-{ai_assistant}-{script_type}"
-    matching_assets = [
-        asset
-        for asset in assets
-        if pattern in asset["name"] and asset["name"].endswith(".zip")
-    ]
-
-    asset = matching_assets[0] if matching_assets else None
-
-    if asset is None:
-        console.print(
-            f"[red]No matching release asset found[/red] for [bold]{ai_assistant}[/bold] (expected pattern: [bold]{pattern}[/bold])"
-        )
-        asset_names = [a.get("name", "?") for a in assets]
-        console.print(
-            Panel(
-                "\n".join(asset_names) or "(no assets)",
-                title="Available Assets",
-                border_style="yellow",
-            )
-        )
-        raise typer.Exit(1)
-
-    download_url = asset["browser_download_url"]
-    filename = asset["name"]
-    file_size = asset["size"]
-
-    if verbose:
-        console.print(f"[cyan]Found template:[/cyan] {filename}")
-        console.print(f"[cyan]Size:[/cyan] {file_size:,} bytes")
-        console.print(f"[cyan]Release:[/cyan] {release_data['tag_name']}")
-
-    zip_path = download_dir / filename
-    if verbose:
-        console.print("[cyan]Downloading template...[/cyan]")
-
-    try:
-        with client.stream(
-            "GET",
-            download_url,
-            timeout=60,
-            follow_redirects=True,
-            headers=_github_auth_headers(github_token),
-        ) as response:
-            if response.status_code != 200:
-                body_sample = response.text[:400]
-                raise RuntimeError(
-                    f"Download failed with {response.status_code}\nHeaders: {response.headers}\nBody (truncated): {body_sample}"
-                )
-            total_size = int(response.headers.get("content-length", 0))
-            with open(zip_path, "wb") as f:
-                if total_size == 0:
-                    for chunk in response.iter_bytes(chunk_size=8192):
-                        f.write(chunk)
-                else:
-                    if show_progress:
-                        with Progress(
-                            SpinnerColumn(),
-                            TextColumn("[progress.description]{task.description}"),
-                            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-                            console=console,
-                        ) as progress:
-                            task = progress.add_task("Downloading...", total=total_size)
-                            downloaded = 0
-                            for chunk in response.iter_bytes(chunk_size=8192):
-                                f.write(chunk)
-                                downloaded += len(chunk)
-                                progress.update(task, completed=downloaded)
-                    else:
-                        for chunk in response.iter_bytes(chunk_size=8192):
-                            f.write(chunk)
-    except Exception as e:
-        console.print("[red]Error downloading template[/red]")
-        detail = str(e)
-        if zip_path.exists():
-            zip_path.unlink()
-        console.print(Panel(detail, title="Download Error", border_style="red"))
-        raise typer.Exit(1)
-    if verbose:
-        console.print(f"Downloaded: {filename}")
-    metadata = {
-        "filename": filename,
-        "size": file_size,
-        "release": release_data["tag_name"],
-        "asset_url": download_url,
-    }
-    return zip_path, metadata
-
-
-def download_and_extract_template(
-    project_path: Path,
-    ai_assistant: str,
-    script_type: str,
-    is_current_dir: bool = False,
-    *,
-    verbose: bool = True,
-    tracker: Optional["StepTracker"] = None,
-    client: Optional[httpx.Client] = None,
-    debug: bool = False,
-    github_token: str = None,
-) -> Path:
-    """Download the latest release and extract it to create a new project.
-    Returns project_path. Uses tracker if provided (with keys: fetch, download, extract, cleanup)
-    """
-    current_dir = Path.cwd()
-
-    if tracker:
-        tracker.start("fetch", "contacting GitHub API")
-    try:
-        zip_path, meta = download_template_from_github(
-            ai_assistant,
-            current_dir,
-            script_type=script_type,
-            verbose=verbose and tracker is None,
-            show_progress=(tracker is None),
-            client=client,
-            debug=debug,
-            github_token=github_token,
-        )
-        if tracker:
-            tracker.complete(
-                "fetch", f"release {meta['release']} ({meta['size']:,} bytes)"
-            )
-            tracker.add("download", "Download template")
-            tracker.complete("download", meta["filename"])
-    except Exception as e:
-        if tracker:
-            tracker.error("fetch", str(e))
-        else:
-            if verbose:
-                console.print(f"[red]Error downloading template:[/red] {e}")
-        raise
-
-    if tracker:
-        tracker.add("extract", "Extract template")
-        tracker.start("extract")
-    elif verbose:
-        console.print("Extracting template...")
-
-    try:
-        if not is_current_dir:
-            project_path.mkdir(parents=True)
-
-        with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            zip_contents = zip_ref.namelist()
-            if tracker:
-                tracker.start("zip-list")
-                tracker.complete("zip-list", f"{len(zip_contents)} entries")
-            elif verbose:
-                console.print(f"[cyan]ZIP contains {len(zip_contents)} items[/cyan]")
-
-            if is_current_dir:
-                with tempfile.TemporaryDirectory() as temp_dir:
-                    temp_path = Path(temp_dir)
-                    zip_ref.extractall(temp_path)
-
-                    extracted_items = list(temp_path.iterdir())
-                    if tracker:
-                        tracker.start("extracted-summary")
-                        tracker.complete(
-                            "extracted-summary", f"temp {len(extracted_items)} items"
-                        )
-                    elif verbose:
-                        console.print(
-                            f"[cyan]Extracted {len(extracted_items)} items to temp location[/cyan]"
-                        )
-
-                    source_dir = temp_path
-                    if len(extracted_items) == 1 and extracted_items[0].is_dir():
-                        source_dir = extracted_items[0]
-                        if tracker:
-                            tracker.add("flatten", "Flatten nested directory")
-                            tracker.complete("flatten")
-                        elif verbose:
-                            console.print(
-                                "[cyan]Found nested directory structure[/cyan]"
-                            )
-
-                    for item in source_dir.iterdir():
-                        dest_path = project_path / item.name
-                        if item.is_dir():
-                            if dest_path.exists():
-                                if verbose and not tracker:
-                                    console.print(
-                                        f"[yellow]Merging directory:[/yellow] {item.name}"
-                                    )
-                                for sub_item in item.rglob("*"):
-                                    if sub_item.is_file():
-                                        rel_path = sub_item.relative_to(item)
-                                        dest_file = dest_path / rel_path
-                                        dest_file.parent.mkdir(
-                                            parents=True, exist_ok=True
-                                        )
-                                        # Special handling for .vscode/settings.json - merge instead of overwrite
-                                        if (
-                                            dest_file.name == "settings.json"
-                                            and dest_file.parent.name == ".vscode"
-                                        ):
-                                            handle_vscode_settings(
-                                                sub_item,
-                                                dest_file,
-                                                rel_path,
-                                                verbose,
-                                                tracker,
-                                            )
-                                        else:
-                                            shutil.copy2(sub_item, dest_file)
-                            else:
-                                shutil.copytree(item, dest_path)
-                        else:
-                            if dest_path.exists() and verbose and not tracker:
-                                console.print(
-                                    f"[yellow]Overwriting file:[/yellow] {item.name}"
-                                )
-                            shutil.copy2(item, dest_path)
-                    if verbose and not tracker:
-                        console.print(
-                            "[cyan]Template files merged into current directory[/cyan]"
-                        )
-            else:
-                zip_ref.extractall(project_path)
-
-                extracted_items = list(project_path.iterdir())
-                if tracker:
-                    tracker.start("extracted-summary")
-                    tracker.complete(
-                        "extracted-summary", f"{len(extracted_items)} top-level items"
-                    )
-                elif verbose:
-                    console.print(
-                        f"[cyan]Extracted {len(extracted_items)} items to {project_path}:[/cyan]"
-                    )
-                    for item in extracted_items:
-                        console.print(
-                            f"  - {item.name} ({'dir' if item.is_dir() else 'file'})"
-                        )
-
-                if len(extracted_items) == 1 and extracted_items[0].is_dir():
-                    nested_dir = extracted_items[0]
-                    temp_move_dir = project_path.parent / f"{project_path.name}_temp"
-
-                    shutil.move(str(nested_dir), str(temp_move_dir))
-
-                    project_path.rmdir()
-
-                    shutil.move(str(temp_move_dir), str(project_path))
-                    if tracker:
-                        tracker.add("flatten", "Flatten nested directory")
-                        tracker.complete("flatten")
-                    elif verbose:
-                        console.print(
-                            "[cyan]Flattened nested directory structure[/cyan]"
-                        )
-
-    except Exception as e:
-        if tracker:
-            tracker.error("extract", str(e))
-        else:
-            if verbose:
-                console.print(f"[red]Error extracting template:[/red] {e}")
-                if debug:
-                    console.print(
-                        Panel(str(e), title="Extraction Error", border_style="red")
-                    )
-
-        if not is_current_dir and project_path.exists():
-            shutil.rmtree(project_path)
-        raise typer.Exit(1)
-    else:
-        if tracker:
-            tracker.complete("extract")
-    finally:
-        if tracker:
-            tracker.add("cleanup", "Remove temporary archive")
-
-        if zip_path.exists():
-            zip_path.unlink()
-            if tracker:
-                tracker.complete("cleanup")
-            elif verbose:
-                console.print(f"Cleaned up: {zip_path.name}")
-
-    return project_path
-
-
 def ensure_executable_scripts(
     project_path: Path, tracker: Optional["StepTracker"] = None
 ) -> None:
@@ -1530,11 +1187,6 @@ def init(
         "--debug",
         help="Show verbose diagnostic output for network and extraction failures",
     ),
-    github_token: str = typer.Option(
-        None,
-        "--github-token",
-        help="GitHub token to use for API requests (or set GH_TOKEN or GITHUB_TOKEN environment variable)",
-    ),
 ):
     """
     Initialize a new Specify project from the latest template.
@@ -1542,7 +1194,7 @@ def init(
     This command will:
     1. Check that required tools are installed (git is optional)
     2. Let you choose your AI assistant
-    3. Use local templates if available, otherwise download from GitHub
+    3. Use local templates (GitHub download is no longer supported)
     4. Extract the template to a new project directory or current directory
     5. Initialize a fresh git repository (if not --no-git and no existing repo)
     6. Optionally set up AI assistant commands
@@ -1744,24 +1396,11 @@ def init(
                 )
             else:
                 if tracker:
-                    tracker.skip("local-check", "not found - will download from GitHub")
-                elif debug:
-                    console.print(
-                        "[yellow]Local templates not found - downloading from GitHub[/yellow]"
-                    )
-
-                # Local templates not available, fall back to GitHub download
-                download_and_extract_template(
-                    project_path,
-                    selected_ai,
-                    selected_script,
-                    here,
-                    verbose=False,
-                    tracker=tracker,
-                    client=local_client,
-                    debug=debug,
-                    github_token=github_token,
-                )
+                    tracker.error("local-check", "not found")
+                
+                error_msg = "Local templates not found. GitHub download is no longer supported."
+                console.print(f"[red]Error:[/red] {error_msg}")
+                raise typer.Exit(1)
             # Ensure the features directory exists under .specify/memory for downstream workflows
             features_dir = project_path / ".specify" / "memory" / "features"
             try:

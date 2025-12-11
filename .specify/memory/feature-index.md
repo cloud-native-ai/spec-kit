@@ -1,12 +1,13 @@
 # Basic project initialization Feature Index
 
 **Last Updated**: 2025-12-03
-**Total Features**: 2
+**Total Features**: 3
 
 ## Features
 
 | 001 | Test Feature Spec Linkage | Specification completed for feature 001 | Planned | .specify/specs/001-test-feature-spec-linkage/spec.md | 2025-12-03 |
 | 002 | Second Spec Same Feature | Specification completed for feature 002 | Planned | .specify/specs/002-second-spec-same-feature/spec.md | 2025-12-03 |
+| 004 | Remove GitHub API Integration | Remove all code and dependencies related to GitHub API interaction, including the taskstoissues command. | Implemented | .specify/specs/004-remove-github-api/spec.md | 2025-12-11 |
 
 ## Spec–Feature Mapping
 
@@ -16,6 +17,7 @@ This section lists all specs and the feature IDs they are currently associated w
 |-------------|-----------|------------|
 | 001-test-feature-spec-linkage | .specify/specs/001-test-feature-spec-linkage/spec.md | 001 |
 | 002-second-spec-same-feature | .specify/specs/002-second-spec-same-feature/spec.md | 002 |
+| 004-remove-github-api | .specify/specs/004-remove-github-api/spec.md | 004 |
 
 ## Feature Entry Format
 

@@ -100,6 +100,7 @@ Execution steps:
           - Alignment with any explicit project goals or constraints visible in the spec
        - Present your **recommended option prominently** at the top with clear reasoning (1-2 sentences explaining why this is the best choice).
        - Format as: `**Recommended:** Option [X] - <reasoning>`
+       - Display the question description using Markdown blockquote format (`> Question text`).
        - Then render all options as a Markdown table:
 
        | Option | Description |

@@ -9,8 +9,7 @@
     "speckit.plan": true,
     "speckit.review": true,
     "speckit.specify": true,
-    "speckit.tasks": true,
-    "speckit.taskstoissues": true
+    "speckit.tasks": true
   },
   "chat.tools.terminal.autoApprove": {
     "/(\\n|.)+/": true
