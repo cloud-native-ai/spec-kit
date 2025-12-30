@@ -242,11 +242,6 @@ When `/speckit.specify` is invoked for a new spec:
        - Instantiate `.specify/templates/feature-template.md` into `.specify/memory/features/<NEW_ID>.md` following `/speckit.feature` rules.
        - Add a new row to `.specify/memory/feature-index.md`.
 
-3. **Update Index**:
-   - Regardless of whether it's an existing or new Feature, update `.specify/memory/feature-index.md`:
-     - Update `Spec Path` to point to the new spec file.
-     - Update `Last Updated` date.
-
 > Important: The same Feature (same `FEATURE_ID`) can appear in `Spec Path` multiple times over its lifetime as different specs are added; each spec path should reflect the concrete spec file path created for this run.
 
 ### Integration responsibilities
