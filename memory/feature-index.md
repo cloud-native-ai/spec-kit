@@ -5,9 +5,9 @@
 
 ## Features
 
-| ID | Name | Description | Status | Spec Path | Last Updated |
-|----|------|-------------|--------|-----------|--------------|
-| 003 | Dynamic VS Code Settings | Generate settings based on tech stack | Implemented | .specify/specs/003-dynamic-vscode-settings/spec.md | 2025-12-10 |
+| ID | Name | Description | Status | Feature Details | Last Updated |
+|----|------|-------------|--------|----------------|--------------|
+| 003 | Dynamic VS Code Settings | Generate settings based on tech stack | Implemented | .specify/memory/features/003.md | 2025-12-10 |
 
 ## Spec–Feature Mapping
 
@@ -21,9 +21,9 @@ This section lists all specs and the feature IDs they are currently associated w
 
 Each feature entry should follow this format in the table:
 
-| ID | Name | Description | Status | Spec Path | Last Updated |
-|----|------|-------------|--------|-----------|--------------|
-| [FEATURE_ID] | [FEATURE_NAME] | [FEATURE_DESCRIPTION] | [FEATURE_STATUS] | [SPEC_PATH] | [FEATURE_LAST_UPDATED] |
+| ID | Name | Description | Status | Feature Details | Last Updated |
+|----|------|-------------|--------|----------------|--------------|
+| [FEATURE_ID] | [FEATURE_NAME] | [FEATURE_DESCRIPTION] | [FEATURE_STATUS] | .specify/memory/features/[FEATURE_ID].md | [FEATURE_LAST_UPDATED] |
 
 ### Column Definitions
 
@@ -33,7 +33,7 @@ Each feature entry should follow this format in the table:
 | Name | Short feature name (2-4 words) describing the feature |
 | Description | Brief summary of the feature's purpose and scope |
 | Status | Current implementation status (Draft, Planned, Implemented, Ready for Review, Completed) |
-| Spec Path | Path to specification file or "(Not yet created)" if not yet created |
+| Feature Details | Path to feature detail file in .specify/memory/features/[FEATURE_ID].md |
 | Last Updated | When the feature entry was last modified (YYYY-MM-DD format) |
 
 ## Template Usage Instructions

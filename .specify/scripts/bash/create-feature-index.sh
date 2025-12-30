@@ -168,7 +168,7 @@ parse_existing_features() {
     fi
     
     # Check if file has the expected table format
-    if ! grep -q "| ID | Name | Description | Status | Spec Path | Last Updated |" "$features_file" 2>/dev/null; then
+    if ! grep -q "| ID | Name | Description | Status | Feature Details | Last Updated |" "$features_file" 2>/dev/null; then
         existing_features_ref=()
         next_id_ref=1
         return 0
@@ -184,7 +184,7 @@ parse_existing_features() {
         line_num=$((line_num + 1))
         
         # Check for table header
-        if echo "$line" | grep -q "| ID | Name | Description | Status | Spec Path | Last Updated |"; then
+        if echo "$line" | grep -q "| ID | Name | Description | Status | Feature Details | Last Updated |"; then
             in_table=true
             continue
         fi

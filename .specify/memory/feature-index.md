@@ -1,13 +1,13 @@
 # Basic project initialization Feature Index
 
-**Last Updated**: 2025-12-03
+**Last Updated**: 2025-12-30
 **Total Features**: 3
 
 ## Features
 
-| 001 | Test Feature Spec Linkage | Specification completed for feature 001 | Planned | .specify/specs/001-test-feature-spec-linkage/spec.md | 2025-12-03 |
-| 002 | Second Spec Same Feature | Specification completed for feature 002 | Planned | .specify/specs/002-second-spec-same-feature/spec.md | 2025-12-03 |
-| 004 | Remove GitHub API Integration | Remove all code and dependencies related to GitHub API interaction, including the taskstoissues command. | Implemented | .specify/specs/004-remove-github-api/spec.md | 2025-12-11 |
+| 001 | Test Feature Spec Linkage | Specification completed for feature 001 | Planned | .specify/memory/features/001.md | 2025-12-30 |
+| 002 | Second Spec Same Feature | Specification completed for feature 002 | Planned | .specify/memory/features/002.md | 2025-12-30 |
+| 004 | Remove GitHub API Integration | Remove all code and dependencies related to GitHub API interaction, including the taskstoissues command. | Implemented | .specify/memory/features/004.md | 2025-12-30 |
 
 ## Spec–Feature Mapping
 
@@ -23,9 +23,9 @@ This section lists all specs and the feature IDs they are currently associated w
 
 Each feature entry should follow this format in the table:
 
-| ID | Name | Description | Status | Spec Path | Last Updated |
-|----|------|-------------|--------|-----------|--------------|
-| 001 | Feature Name | Brief description of the feature | Draft | .specify/specs/001-feature-name/spec.md | 2025-11-21 |
+| ID | Name | Description | Status | Feature Details | Last Updated |
+|----|------|-------------|--------|----------------|--------------|
+| 001 | Feature Name | Brief description of the feature | Draft | .specify/memory/features/001.md | 2025-12-30 |
 
 ### Column Definitions
 
@@ -35,7 +35,7 @@ Each feature entry should follow this format in the table:
 | Name | Short feature name (2-4 words) describing the feature |
 | Description | Brief summary of the feature's purpose and scope |
 | Status | Current implementation status (Draft, Planned, Implemented, Ready for Review, Completed) |
-| Spec Path | Path to specification file or "(Not yet created)" if not yet created |
+| Feature Details | Path to feature detail file in .specify/memory/features/[FEATURE_ID].md |
 | Last Updated | When the feature entry was last modified (YYYY-MM-DD format) |
 
 ## Template Usage Instructions
