@@ -116,9 +116,9 @@ Use **`/speckit.tasks`** to create an actionable task list from your implementat
 /speckit.tasks
 ```
 
-### 6. Execute implementation
+### 6. Implement feature
 
-Use **`/speckit.implement`** to execute all tasks and build your feature according to the plan.
+Use **`/speckit.implement`** to implement all tasks and build your feature according to the plan.
 
 ```bash
 /speckit.implement
@@ -236,7 +236,7 @@ Essential commands for the Spec-Driven Development workflow:
 | `/speckit.specify`       | Define what you want to build (requirements and user stories)        |
 | `/speckit.plan`          | Create technical implementation plans with your chosen tech stack     |
 | `/speckit.tasks`         | Generate actionable task lists for implementation                     |
-| `/speckit.implement`     | Execute all tasks to build the feature according to the plan         |
+| `/speckit.implement`     | Implement all tasks to build the feature according to the plan       |
 
 #### Optional Commands
 
@@ -555,7 +555,7 @@ You can also ask Claude Code (if you have the [GitHub CLI](https://docs.github.c
 
 ### **STEP 6:** Generate task breakdown with /speckit.tasks
 
-With the implementation plan validated, you can now break down the plan into specific, actionable tasks that can be executed in the correct order. Use the `/speckit.tasks` command to automatically generate a detailed task breakdown from your implementation plan:
+With the implementation plan validated, you can now break down the plan into specific, actionable tasks that can be implemented in the correct order. Use the `/speckit.tasks` command to automatically generate a detailed task breakdown from your implementation plan:
 
 ```text
 /speckit.tasks
@@ -574,7 +574,7 @@ The generated tasks.md provides a clear roadmap for the `/speckit.implement` com
 
 ### **STEP 7:** Implementation
 
-Once ready, use the `/speckit.implement` command to execute your implementation plan:
+Once ready, use the `/speckit.implement` command to implement your implementation plan:
 
 ```text
 /speckit.implement
@@ -584,7 +584,7 @@ The `/speckit.implement` command will:
 
 - Validate that all prerequisites are in place (constitution, spec, plan, and tasks)
 - Parse the task breakdown from `tasks.md`
-- Execute tasks in the correct order, respecting dependencies and parallel execution markers
+- Implement tasks in the correct order, respecting dependencies and parallel execution markers
 - Follow the TDD approach defined in your task plan
 - Provide progress updates and handle errors appropriately
 

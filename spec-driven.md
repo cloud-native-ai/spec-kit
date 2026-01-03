@@ -112,7 +112,7 @@ After a plan is created, this command analyzes the plan and related design docum
 1. **Inputs**: Reads `plan.md` (required) and, if present, `data-model.md`, `contracts/`, and `research.md`
 2. **Task Derivation**: Converts contracts, entities, and scenarios into specific tasks
 3. **Parallelization**: Marks independent tasks `[P]` and outlines safe parallel groups
-4. **Output**: Writes `tasks.md` in the feature directory, ready for execution by a Task agent
+4. **Output**: Writes `tasks.md` in the feature directory, ready for implementation by the `/speckit.implement` command
 5. **Feature Integration**: Maintains feature index status and metadata
 
 ### The `/speckit.review` Command
