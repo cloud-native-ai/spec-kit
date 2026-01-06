@@ -60,6 +60,7 @@ from typer.core import TyperGroup
 
 try:
     import truststore
+
     ssl_context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 except (ImportError, AttributeError):
     ssl_context = ssl.create_default_context()
@@ -1397,8 +1398,10 @@ def init(
             else:
                 if tracker:
                     tracker.error("local-check", "not found")
-                
-                error_msg = "Local templates not found. GitHub download is no longer supported."
+
+                error_msg = (
+                    "Local templates not found. GitHub download is no longer supported."
+                )
                 console.print(f"[red]Error:[/red] {error_msg}")
                 raise typer.Exit(1)
             # Ensure the features directory exists under .specify/memory for downstream workflows
