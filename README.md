@@ -232,11 +232,13 @@ Essential commands for the Spec-Driven Development workflow:
 
 | Command                  | Description                                                           |
 |--------------------------|-----------------------------------------------------------------------|
+| `/speckit.feature`       | Create or update feature entries in the project feature index with sequential IDs |
 | `/speckit.constitution`  | Create or update project governing principles and development guidelines |
 | `/speckit.specify`       | Define what you want to build (requirements and user stories)        |
 | `/speckit.plan`          | Create technical implementation plans with your chosen tech stack     |
 | `/speckit.tasks`         | Generate actionable task lists for implementation                     |
 | `/speckit.implement`     | Implement all tasks to build the feature according to the plan       |
+| `/speckit.review`        | Review all artifacts and consolidate feature documentation into long-term memory |
 
 #### Optional Commands
 
@@ -247,6 +249,59 @@ Additional commands for enhanced quality and validation:
 | `/speckit.clarify`   | Clarify underspecified areas (recommended before `/speckit.plan`; formerly `/quizme`) |
 | `/speckit.analyze`   | Cross-artifact consistency & coverage analysis (run after `/speckit.tasks`, before `/speckit.implement`) |
 | `/speckit.checklist` | Generate custom quality checklists that validate requirements completeness, clarity, and consistency (like "unit tests for English") |
+
+### SDD Workflow Overview
+
+Spec-Driven Development follows a structured workflow that ensures high-quality, maintainable software. The commands work together in a specific sequence to guide you from idea to implementation:
+
+#### Core Workflow Sequence
+
+1. **Feature Registration** (`/speckit.feature`) - *Optional but recommended*
+   - Creates or updates entries in the project feature index
+   - Assigns sequential feature IDs (001, 002, etc.)
+   - Establishes feature tracking from the beginning
+
+2. **Constitution Setup** (`/speckit.constitution`)
+   - Defines project-wide principles and constraints
+   - Guides all subsequent technical decisions
+   - Ensures consistency across features
+
+3. **Specification Creation** (`/speckit.specify`)
+   - Transforms user requirements into structured specifications
+   - Focuses on **what** and **why**, not implementation details
+   - Creates user stories with acceptance criteria
+
+4. **Clarification** (`/speckit.clarify`) - *Recommended before planning*
+   - Identifies and resolves ambiguous requirements
+   - Ensures specifications are complete and testable
+   - Reduces rework during implementation
+
+5. **Implementation Planning** (`/speckit.plan`)
+   - Converts specifications into technical architecture
+   - Generates supporting documents (data models, contracts, research)
+   - Ensures alignment with project constitution
+
+6. **Task Generation** (`/speckit.tasks`)
+   - Breaks down plans into executable, prioritized tasks
+   - Organizes tasks by user story with clear dependencies
+   - Enables parallel development where possible
+
+7. **Implementation** (`/speckit.implement`)
+   - Executes tasks in the correct order
+   - Follows test-driven development practices
+   - Validates against acceptance criteria
+
+8. **Feature Review** (`/speckit.review`) - *Final step*
+   - Consolidates all artifacts into long-term feature documentation
+   - Updates feature index with implementation status
+   - Ensures knowledge retention for future maintenance
+
+#### Quality Assurance Commands
+
+- **Analysis** (`/speckit.analyze`) - Validates consistency across all artifacts
+- **Checklists** (`/speckit.checklist`) - Creates "unit tests for English" to validate requirement quality
+
+This workflow ensures that every feature is well-understood, properly planned, and systematically implemented while maintaining traceability from requirements to code.
 
 ### Environment Variables
 

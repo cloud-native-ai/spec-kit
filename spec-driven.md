@@ -81,7 +81,7 @@ This command provides centralized feature management for SDD projects:
 1. **Feature Index Creation**: Creates or updates a project-level feature index (`feature-index.md`) in Markdown table format
 1. **Feature Documents Maintainance**: updates a project-level feature details document in (`features/`) folder
 2. **Sequential ID Assignment**: Automatically assigns sequential three-digit feature IDs (001, 002, 003, etc.)
-3. **Status Tracking**: Maintains feature status through the SDD lifecycle (Draft → Planned → Implemented → Ready for Review)
+3. **Status Tracking**: Maintains feature status through the SDD lifecycle (Draft → Planned → Implemented → Ready for Review → Completed)
 4. **Integration with SDD**: Automatically links all subsequent SDD commands to feature entries for traceability
 
 ### The `/speckit.specify` Command
@@ -113,7 +113,6 @@ After a plan is created, this command analyzes the plan and related design docum
 2. **Task Derivation**: Converts contracts, entities, and scenarios into specific tasks
 3. **Parallelization**: Marks independent tasks `[P]` and outlines safe parallel groups
 4. **Output**: Writes `tasks.md` in the feature directory, ready for implementation by the `/speckit.implement` command
-5. **Feature Integration**: Maintains feature index status and metadata
 
 ### The `/speckit.review` Command
 
@@ -121,7 +120,7 @@ This command is the final step of the SDD loop for a feature; it reviews the ful
 
 1. **Artifact Review**: Loads the feature's `spec.md`, `plan.md`, `tasks.md`, and any supporting documents such as `data-model.md`, `contracts/`, `research.md`, and `quickstart.md` from `.specify/specs/[FEATURE_KEY]/`.
 2. **Synthesis**: Produces a concise, user- and system-level narrative that explains what the feature does, who it serves, and which constraints and integrations define its boundary.
-3. **Feature Memory Update**: Writes or updates a dedicated feature document in `.specify/memory/features/[FEATURE_KEY].md`, keeping prior context while refreshing the current definition and linking back to the latest spec/plan/tasks.
+3. **Feature Memory Update**: Writes or updates a dedicated feature document in `.specify/memory/features/[ID].md` (where [ID] is the three-digit feature ID like 001, 002, etc.), keeping prior context while refreshing the current definition and linking back to the latest spec/plan/tasks.
 4. **Index Integration**: Updates `.specify/memory/feature-index.md` so the feature entry points at the up-to-date memory file and records that review has been completed.
 
 Using `/speckit.review` after `/speckit.implement` keeps your feature index and long-term documentation in sync with the latest iteration of the SDD artifacts.
@@ -166,36 +165,44 @@ Total: ~12 hours of documentation work
 
 # This automatically:
 # - Updates feature-index.md status to "Implemented"
+# - Creates .specify/specs/003-chat-system/plan.md
+# - Generates supporting documents in .specify/specs/003-chat-system/
 
 # Step 4: Generate executable tasks (5 minutes)
 /speckit.tasks
 
 # This automatically creates:
-# - .specify/specs/003-chat-system/plan.md
-# - .specify/specs/003-chat-system/research.md (WebSocket library comparisons)
-# - .specify/specs/003-chat-system/data-model.md (Message and User schemas)
-# - .specify/specs/003-chat-system/contracts/ (WebSocket events, REST endpoints)
-# - .specify/specs/003-chat-system/quickstart.md (Key validation scenarios)
 # - .specify/specs/003-chat-system/tasks.md (Task list derived from the plan)
+# - Organizes tasks by user story priority with clear dependencies
 
-# Step 5: Review and consolidate feature documentation (5 minutes)
+# Step 5: Implement the tasks (time varies)
+/speckit.implement
+
+# This automatically:
+# - Executes tasks in the correct order
+# - Implements code, tests, and documentation
+# - Validates against acceptance criteria
+
+# Step 6: Review and consolidate feature documentation (5 minutes)
 /speckit.review
 
 # This automatically:
 # - Reviews all artifacts produced for the chat feature
-# - Consolidates them into a cohesive feature memory document
-# - Updates the feature index with the latest memory file
+# - Consolidates them into a cohesive feature memory document at .specify/memory/features/003.md
+# - Updates the feature index with the latest memory file and review status
 ```
 
-In 21 minutes, you have:
+In ~30 minutes, you have:
 
 - A complete feature specification with user stories and acceptance criteria
 - A detailed implementation plan with technology choices and rationale
 - API contracts and data models ready for code generation
 - Comprehensive test scenarios for both automated and manual testing
+- An executable task list organized by user story priority
+- Implemented code, tests, and documentation
 - All documents properly versioned in a feature branch
 - A centralized feature index (`feature-index.md`) tracking all project features and their status
-- A consolidated feature memory document that serves as the single source of truth for the feature
+- A consolidated feature memory document at `.specify/memory/features/[ID].md` that serves as the single source of truth for the feature
 
 ### The Power of Structured Automation
 
