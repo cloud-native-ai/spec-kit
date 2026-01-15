@@ -1,7 +1,7 @@
 ---
 description: Review the full SDD artifact set for a feature and summarize it into the feature memory.
 scripts:
-  sh: scripts/bash/check-prerequisites.sh --json --require-spec --include-plan --include-tasks
+  sh: scripts/bash/check-prerequisites.sh --json --require-spec --include-spec --include-plan --include-tasks
 ---
 
 > Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，必须仍然按下文定义的完整流程执行，基于当前 feature 的 spec/plan/tasks 等文档进行特性回顾与总结；仅在 `$ARGUMENTS` 非空时，将其视为对回顾重点或输出风格的附加约束。
