@@ -1,50 +1,92 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+- Version change: Template → 1.0.0
+- List of modified principles: Defined all core principles (Spec-Driven, Agent-First, Library/CLI, Test-First, Context).
+- Added sections: Technology Guidelines, Development Workflow.
+- Removed sections: N/A
+- Templates requiring updates:
+    - templates/plan-template.md (⚠ updated in this session)
+    - templates/tasks-template.md (⚠ updated in this session)
+    - templates/spec-template.md (✅ verified)
+- Follow-up TODOs: None.
+-->
+
+# Spec Kit Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Spec-Driven Architecture
+Development MUST flow from Specification to Implementation.
+- **Code is downstream of Specs**: No logic changes without a preceding spec update.
+- **Executable Specs**: Specifications should aim to be machine-readable or directly testable where possible.
+- **Why over How**: Document the intent and "why" before diving into the implementation details.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Rationale: Prevents "vibe coding" and ensures predictable, aligned outcomes.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Agent-First Design
+Artifacts MUST be optimized for both Human and AI consumption.
+- **Structured Context**: Use clear directory structures, index files, and consistent naming conventions.
+- **Explicit Intent**: Avoid ambiguity; be verbose if it adds clarity for an LLM context window.
+- **Self-Documenting**: Code and docs should explain themselves without external knowledge dependency.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Rationale: Enables AI agents (Copilot, etc.) to function as effective pair programmers.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Library-First & CLI-First
+Functionality MUST be encapsulated in reusable libraries with CLI interfaces.
+- **Library Core**: Core logic resides in isolated, testable Python packages/modules.
+- **CLI Exposure**: Every significant library feature MUST be exposed via a CLI (using `typer`) for easy composition and agent testing.
+- **Text I/O**: Prefer plain text or JSON inputs/outputs to facilitate piping and automation.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Rationale: Promotes modularity, reusability, and ease of automated testing/invocation.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Test-First Quality Gates
+Quality is non-negotiable and automated.
+- **TDD Flow**: Write tests/contracts before implementation.
+- **Red-Green-Refactor**: Strictly follow the cycle.
+- **Automated Gates**: Linting, type checking, and tests MUST pass before merging.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Rationale: Reduces regressions and enforces the "Quality" aspect of the project goals.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Context Preservation
+Maintain the integrity of the project's memory.
+- **Update Logs**: Keep `CHANGELOG.md` and feature indices up to date.
+- **Decision Records**: Major architectural decisions MUST be recorded in plans or specs.
+- **Single Source of Truth**: Identify and respect the authoritative source for any given piece of information.
+
+Rationale: Prevents knowledge loss and context drift over time.
+
+## Technology Guidelines
+
+**Language & Stack**:
+- Python 3.8+ (Core)
+- Typer (CLI)
+- Rich (Terminal UI)
+- Hatchling (Build System)
+
+**Dependencies**:
+- Keep dependency tree minimal.
+- Prefer standard library where reasonable.
+- Pin versions to avoid upstream breakages.
+
+## Development Workflow
+
+1.  **Specify**: Define the functionality and success criteria in `.specify/specs/`.
+2.  **Plan**: Create a technical plan mapping specs to code structures.
+3.  **Task**: Break down the plan into atomic, parallelizable tasks.
+4.  **Implement**: Execute tasks with TDD and commit frequently.
+5.  **Review**: Verify against the original Specification.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+**Authority**:
+This Constitution supersedes all other loose guidelines. Changes to these principles require a formal amendment and version bump.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Amendment Process**:
+1.  Propose change via PR.
+2.  Update version number (Semantic Versioning).
+3.  Update `Last Amended` date.
+
+**Compliance**:
+All Pull Requests and Agent interactions MUST verify compliance with these Core Principles.
+
+**Version**: 1.0.0 | **Ratified**: 2026-01-18 | **Last Amended**: 2026-01-18
