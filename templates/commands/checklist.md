@@ -1,5 +1,9 @@
 ---
 description: Generate a custom checklist for the current feature based on user requirements.
+handoffs:
+  - label: Back to Plan
+    agent: speckit.plan
+    prompt: Review the plan against the checklist
 scripts:
   sh: scripts/bash/check-prerequisites.sh --json
 ---
