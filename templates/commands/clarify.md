@@ -5,7 +5,7 @@ handoffs:
     agent: speckit.plan
     prompt: Create a plan for the spec. I am building with...
 scripts:
-   sh: scripts/bash/check-prerequisites.sh --json --paths-only
+   sh: scripts/bash/research-project.sh --json
 ---
 
 > Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于当前 `FEATURE_SPEC` 自动识别高价值模糊点并提问；仅在 `$ARGUMENTS` 非空时，将其作为澄清优先级或范围的附加信号一并考虑。
@@ -26,14 +26,20 @@ Note: This clarification workflow is expected to run (and be completed) BEFORE i
 
 Execution steps:
 
-1. Run `{SCRIPT}` from repo root **once** (combined `--json --paths-only` mode / `-Json -PathsOnly`). Parse minimal JSON payload fields:
+1. Run `{SCRIPT}` from repo root **once** (combined `--json` mode). Parse JSON payload fields:
    - `FEATURE_DIR`
    - `FEATURE_SPEC`
-   - (Optionally capture `IMPL_PLAN`, `TASKS` for future chained flows.)
+   - `AVAILABLE_DOCS`
+   - (Optionally capture `IMPL_PLAN` for future chained flows.)
    - If JSON parsing fails, abort and instruct user to re-run `/speckit.specify` or verify feature branch environment.
-   - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
-2. Load the current spec file. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
+2. **Preliminary Research & Context Loading**:
+   - Analyze the `AVAILABLE_DOCS` list from the script output.
+   - Read `FEATURE_SPEC`, `/memory/constitution.md`.
+   - **Check for answers in existing docs**: Before asking the user, check if any apparent ambiguities in the spec are already resolved in the project's documentation (`README.md`, `docs/`, `memory/`).
+   - If you find definitive answers in the docs, **auto-resolve** them by updating the spec directly (and noting "Resolved via [Doc Name]" in the update summary).
+
+3. Load the current spec file. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
 
    Functional Scope & Behavior:
    - Core user goals & success criteria
@@ -89,7 +95,8 @@ Execution steps:
    - Clarification would not materially change implementation or validation strategy
    - Information is better deferred to planning phase (note internally)
 
-3. Generate (internally) a prioritized queue of candidate clarification questions (maximum 5). Do NOT output them all at once. Apply these constraints:
+4. Generate (internally) a prioritized queue of candidate clarification questions (maximum 5). Do NOT output them all at once. Apply these constraints:
+    - **Filter via Research**: Ensure none of these questions are answered by the `research.md` file (if it exists) or the docs analyzed in step 2.
     - Maximum of 10 total questions across the whole session.
     - Each question must be answerable with EITHER:
        - A short multiple‑choice selection (2–5 distinct, mutually exclusive options), OR

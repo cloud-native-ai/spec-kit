@@ -46,7 +46,9 @@ You **MUST** treat the user input ($ARGUMENTS) as parameters for the current com
 
 4. **Generate/Update `research.md`**:
    - The file must be located at `SPECS_DIR/research.md`.
-   - If the file exists, append new findings or update existing sections.
+   - **Merge Strategy**:
+     - If the file exists, **APPEND** new findings to existing sections or create new sections. Do not overwrite existing valid research unless explicitly correcting it.
+     - Properly integrate new "Decisions" and "References" without duplicating existing entries.
    - If the file does not exist, create it with the structure below.
 
 ## Research Output Structure (`research.md`)
