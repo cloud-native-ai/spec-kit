@@ -32,6 +32,7 @@
 | `templates/commands/feature.md` | `.github/prompts/speckit.feature.prompt.md` |
 | `templates/commands/implement.md` | `.github/prompts/speckit.implement.prompt.md` |
 | `templates/commands/plan.md` | `.github/prompts/speckit.plan.prompt.md` |
+| `templates/commands/research.md` | `.github/prompts/speckit.research.prompt.md` |
 | `templates/commands/review.md` | `.github/prompts/speckit.review.prompt.md` |
 | `templates/commands/specify.md` | `.github/prompts/speckit.specify.prompt.md` |
 | `templates/commands/tasks.md` | `.github/prompts/speckit.tasks.prompt.md` |
