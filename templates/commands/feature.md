@@ -65,9 +65,15 @@ Your responsibilities:
 8. Write changes:
    - Save new/updated detail files.
    - Overwrite updated feature index.
-9. Output a summary:
+9. **同步更新项目根目录 README 的特性列表**：
+   - 读取 `memory/feature-index.md` 的表格内容并进行整理。
+   - 在 README 中生成或更新一个“特性列表”章节（按 README 现有风格与标题层级）。
+   - 输出内容必须为“功能性 Feature / 非功能性 Feature”两个小节，并基于索引内容分类汇总。
+   - 若 README 已存在该章节，则覆盖为最新内容；若不存在则追加并保持格式一致。
+10. Output a summary:
    - New feature IDs created.
    - Updated feature IDs (if any).
+   - README 特性列表是否已更新。
    - Suggested commit message (e.g. `feat: add feature 00X <slug>` or `docs: update feature index`).
 
 项目中的 Feature 分为**功能性 Feature**和**非功能性 Feature**两大类：
