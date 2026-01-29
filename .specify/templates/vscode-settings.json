@@ -6,8 +6,11 @@
     "speckit.constitution": true,
     "speckit.feature": true,
     "speckit.implement": true,
+    "speckit.instructions": true,
     "speckit.plan": true,
+    "speckit.research": true,
     "speckit.review": true,
+    "speckit.skills": true,
     "speckit.specify": true,
     "speckit.tasks": true
   },

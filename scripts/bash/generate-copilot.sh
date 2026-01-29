@@ -5,7 +5,9 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ -f "$SCRIPT_DIR/common.sh" ]; then
     source "$SCRIPT_DIR/common.sh"
-else
+fi
+
+if ! command -v log &> /dev/null; then
     function log() {
         echo "[$1] $2"
     }

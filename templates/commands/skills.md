@@ -1,3 +1,12 @@
+---
+description: Create or update an Agent Skill in .github/skills/
+scripts:
+  sh: |
+    cat << 'EOF' | .specify/scripts/bash/create-new-skill.sh --json --name "<SKILL_NAME>"
+    $ARGUMENTS
+    EOF
+---
+
 > Note: `$ARGUMENTS` 应包含 Skill 名称和简短描述。例如："testing - 用于运行单元测试的 Skill"
 
 ## User Input
@@ -19,7 +28,7 @@ Execution steps:
    - **Problem Definition**: Identify the specific gap or task this skill addresses.
    - **Prompt**: "What is the primary problem or repetitive task this skill will solve? (e.g., 'Consistently missing edge cases in API tests', 'Forgetting steps in the release process')"
    - Wait for user input.
-   - Run `.specify/scripts/bash/create-new-skill.sh --json --name "<SKILL_NAME>" --description "<DESCRIPTION>"` from repo root.
+   - Run the script `{SCRIPT}` from repo root, replacing `<SKILL_NAME>` with the extracted name. `$ARGUMENTS` will be passed to stdin.
    - Parse JSON payload fields: `SKILL_FILE`, `SKILL_DIR`, `SKILL_NAME`.
    - Load the content of `SKILL_FILE` into memory.
 

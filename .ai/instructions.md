@@ -28,3 +28,9 @@ The following table maps key project concepts to their definitive source of trut
 *   **Reading Files**: Use `read_file` for specific content. 
 *   **Search**: Use `grep_search` to find code usages or text patterns.
 *   **Terminal**: Use `run_in_terminal` for git operations, file moves, and running the `specify` CLI.
+
+## Tools
+<!-- TOOLS_PLACEHOLDER -->
+
+## Skills
+<!-- SKILLS_PLACEHOLDER -->

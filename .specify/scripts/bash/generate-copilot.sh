@@ -1,3 +1,18 @@
+#!/bin/bash
+set -e
+
+# Try to source common.sh for logging if available
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/common.sh" ]; then
+    source "$SCRIPT_DIR/common.sh"
+fi
+
+if ! command -v log &> /dev/null; then
+    function log() {
+        echo "[$1] $2"
+    }
+fi
+
 function copilot_generate_instructions() {
   # Create .copilotignore based on .gitignore
   if [ ! -f .copilotignore ]; then
@@ -13,7 +28,7 @@ function copilot_generate_instructions() {
     fi
 
     # Add additional patterns that should be ignored by Copilot
-    cat <<EOF >>.copilotignore
+    cat <<BLOCK >>.copilotignore
 
 # Additional patterns for Copilot indexing exclusion
 .clinerules/
@@ -21,97 +36,86 @@ function copilot_generate_instructions() {
 .lingma/
 .trae/
 .qoder/
-EOF
+BLOCK
   else
     log info ".copilotignore already exists, skipping"
   fi
 
   mkdir -p .ai
-  if [ ! -f .ai/instructions.md ]; then
-    cat <<'EOF' >.ai/instructions.md
-**IMPORTANT: This is a one-time initialization document. After completing the following initialization tasks, you must immediately replace this file's content with the project's specific guidance documentation.**
+  INSTRUCTIONS_FILE=".ai/instructions.md"
 
-Your task is to "onboard" this repository to a coding agent by adding a .ai/instructions.md file. It should contain information describing how the agent, seeing the repo for the first time, can work most efficiently.
+  if [ ! -f "$INSTRUCTIONS_FILE" ]; then
+    log info "Creating $INSTRUCTIONS_FILE template"
+    cat <<'TEMPLATE' >"$INSTRUCTIONS_FILE"
+# Project Instructions for AI Agents
 
-You will do this task only one time per repository, and doing a good job can SIGNIFICANTLY improve the quality of the agent's work, so take your time, think carefully, and search thoroughly before writing the instructions.
+## Project Overview
+[Brief summary of what the app does, its core value proposition, and key features based on README]
 
-## Goals
+## Documentation Map
+This project documentation is distributed across several key files. You MUST refer to these documents for specific details:
 
-- Document existing project structure and tech stack.
-- Ensure established practices are followed. 
-- Minimize bash command and build failures.
+| Document | Location | Purpose | Key Content |
+|----------|----------|---------|-------------|
+| **Constitution** | `memory/constitution.md` | Single source of truth for principles | Coding standards, architectural rules, constraints |
+| **Feature Index** | `memory/feature-index.md` | Feature roadmap status | List of active/planned/implemented features |
+| **Development** | `CONTRIBUTING.md` | Setup and Guidelines | Setup, testing, and pull request guidelines |
+| **Architecture** | `docs/index.md` | High-level architecture | Architecture and design documentation |
+| [Other Doc] | [Path] | [Purpose] | [Summary] |
 
-## Limitations
-- Instructions must be no longer than 2 pages.
-- Instructions should be broadly applicable to the entire project.
+> **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
 
-## Guidance
-
-Ensure you include the following:
-
-- A summary of what the app does.
-- The tech stack in use
-- Coding guidelines
-- Project structure
-- Existing tools and resources
-
-## Steps to follow
-
-- Perform a comprehensive inventory of the codebase. Search for and view:
-  - README.md, CONTRIBUTING.md, and all other documentation files.
-  - Search the codebase for indications of workarounds like 'HACK', 'TODO', etc.
-- All scripts, particularly those pertaining to build and repo or environment setup.
-- All project files.
-- All configuration and linting files.
-- Document any other steps or information that the agent can use to reduce time spent exploring or trying and failing to run bash commands.
-
-## Validation
-
-Use the newly created instructions file to implement a sample feature. Use the learnings from any failures or errors in building the new feature to further refine the instructions file.
+## Tech Stack & Resources
+[Detected tech stack from config files]
+- **Languages**: [e.g. Python 3.11+]
+- **Package Manager**: [e.g. uv]
+- **Frameworks**: [e.g. FastAPI, React]
+- **Key Directories**:
+  - `src/`: Source code
+  - `tests/`: Test suite
+  - [Other detected dirs]
 
 # MCP Tools Usage Guide
 
-## Tool: {{tool_name}}
-**Description Supplement**:
-{{tool_description}}
-- **When to use**: {{usage_scenario}}
-- **Precautions**: {{precautions}}
-- **Example**: {{usage_example}}
-
 ## Tool Selection Strategy
 - Prioritize using the `mcp_...` series of tools to query internal documents and code, rather than trying to guess.
-- Before getting Issue details, you must confirm the format of the Issue ID.
-EOF
+- Do not guess about architectural rules; verify them in the **Constitution**.
+
+## Tools
+<!-- TOOLS_PLACEHOLDER -->
+[Tools section will be populated by the skills command]
+
+## Skills
+<!-- SKILLS_PLACEHOLDER -->
+[Skills section will be populated by the skills command]
+TEMPLATE
+  else
+    log info "$INSTRUCTIONS_FILE already exists, skipping creation"
   fi
 
+  # Create symlinks for various AI agents
   mkdir -p .clinerules
-  pushd .clinerules
-  ln -sfv ../.ai/instructions.md project_rules.md
-  popd
+  # Use -f to force relink if exists but changes needed (ln -sfv handles this)
+  pushd .clinerules >/dev/null && ln -sfv ../.ai/instructions.md project_rules.md && popd >/dev/null
 
   mkdir -p .github
-  pushd .github
-  ln -sfv ../.ai/instructions.md copilot-instructions.md
-  popd
+  pushd .github >/dev/null && ln -sfv ../.ai/instructions.md copilot-instructions.md && popd >/dev/null
 
   mkdir -p .lingma/rules
-  pushd .lingma/rules
-  ln -sfv ../../.ai/instructions.md project_rule.md
-  popd
+  pushd .lingma/rules >/dev/null && ln -sfv ../../.ai/instructions.md project_rule.md && popd >/dev/null
 
   mkdir -p .trae/rules
-  pushd .trae/rules
-  ln -sfv ../../.ai/instructions.md project_rules.md
-  popd
+  pushd .trae/rules >/dev/null && ln -sfv ../../.ai/instructions.md project_rules.md && popd >/dev/null
 
   mkdir -p .qoder
-  pushd .qoder
-  ln -sfv ../.ai/instructions.md project_rules.md
-  popd
+  pushd .qoder >/dev/null && ln -sfv ../.ai/instructions.md project_rules.md && popd >/dev/null
 
-  ln -sf .ai/instructions.md QWEN.md
-  ln -sf .ai/instructions.md CLAUDE.md
-  ln -sf .ai/instructions.md IFLOW.md
+  # Helper symlinks in root
+  ln -sfT .ai/instructions.md QWEN.md
+  ln -sfT .ai/instructions.md CLAUDE.md
+  ln -sfT .ai/instructions.md IFLOW.md
+  
+  log info "Instructions generation and linking complete."
 }
 
 copilot_generate_instructions
