@@ -241,13 +241,6 @@ main() {
     # Execute Phase 1: Design & Contracts  
     handle_design_phase "$FEATURE_SPEC" "$DATA_MODEL" "$CONTRACTS_DIR" "$QUICKSTART"
     
-    # Update agent context (for bash agent)
-    AGENT_CONTEXT_SCRIPT="$SCRIPT_DIR/update-agent-context.sh"
-    if [[ -f "$AGENT_CONTEXT_SCRIPT" ]]; then
-        echo "Updating agent context..."
-        "$AGENT_CONTEXT_SCRIPT" "bash" || echo "Agent context update failed (non-fatal)"
-    fi
-    
     # Output results
     if $JSON_MODE; then
         printf '{"FEATURE_SPEC":"%s","IMPL_PLAN":"%s","SPECS_DIR":"%s","BRANCH":"%s","HAS_GIT":"%s","USER_INPUT":"%s"}\n' \

@@ -10,8 +10,6 @@ handoffs:
     prompt: Create a checklist for the following domain...
 scripts:
   sh: scripts/bash/create-new-plan.sh --json
-agent_scripts:
-  sh: scripts/bash/update-agent-context.sh __AGENT__
 ---
 
 > Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于当前 `FEATURE_SPEC` 与 `/memory/constitution.md` 生成或更新实施计划及相关设计产物。
