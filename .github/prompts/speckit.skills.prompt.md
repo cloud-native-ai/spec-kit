@@ -19,7 +19,13 @@ Execution steps:
    - **Problem Definition**: Identify the specific gap or task this skill addresses.
    - **Prompt**: "What is the primary problem or repetitive task this skill will solve? (e.g., 'Consistently missing edge cases in API tests', 'Forgetting steps in the release process')"
    - Wait for user input.
-   - Run `.specify/scripts/bash/create-new-skill.sh --json --name "<SKILL_NAME>" --description "<DESCRIPTION>"` from repo root.
+   - Run the script `
+```bash
+cat << 'EOF' | .specify/scripts/bash/create-new-skill.sh --json --name "<SKILL_NAME>"
+$ARGUMENTS
+EOF
+```
+` from repo root, replacing `<SKILL_NAME>` with the extracted name. `$ARGUMENTS` will be passed to stdin.
    - Parse JSON payload fields: `SKILL_FILE`, `SKILL_DIR`, `SKILL_NAME`.
    - Load the content of `SKILL_FILE` into memory.
 

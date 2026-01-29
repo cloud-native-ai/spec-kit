@@ -32,5 +32,25 @@ The following table maps key project concepts to their definitive source of trut
 ## Tools
 <!-- TOOLS_PLACEHOLDER -->
 
+{
+  "timestamp": "2026-01-29T16:41:54.266250",
+  "count": 2,
+  "servers": [
+    {
+      "url": "https://mcp.alibaba-inc.com/code/mcp",
+      "type": "http",
+      "name": "aone-open-platform-code",
+      "_source": "/root/.vscode-server-insiders/data/User/mcp.json"
+    },
+    {
+      "url": "https://mcp.alibaba-inc.com/aone-km/mcp",
+      "type": "http",
+      "name": "aone-open-platform-knowledge-base",
+      "_source": "/root/.vscode-server-insiders/data/User/mcp.json"
+    }
+  ],
+  "note": "This list represents configured MCP servers. 'tools' field populated for HTTP servers if reachable."
+}
+
 ## Skills
 <!-- SKILLS_PLACEHOLDER -->

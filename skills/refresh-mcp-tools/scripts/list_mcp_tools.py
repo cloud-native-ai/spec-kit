@@ -5,146 +5,153 @@ Reference implementation based on Plan B from original design docs.
 Extracts 'mcpServers' configuration from VS Code mcp.json files.
 """
 
+import asyncio
 import json
 import os
 import platform
 import re
 import sys
-import urllib.error
-import urllib.parse
-import urllib.request
+import traceback
+import uuid
 from pathlib import Path
 from typing import Any, Dict, List
 
+# Ensure mcp[cli] is installed
+try:
+    import httpx
+    from mcp import ClientSession
+    from mcp.client.sse import sse_client
+except ImportError:
+    print(
+        "Error: mcp library not found. Please install it with: pip3 install 'mcp[cli]'",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
-def fetch_mcp_tools(url: str, headers: Dict[str, str] = None) -> List[Dict[str, Any]]:
+
+async def fetch_tools_with_mcp(
+    url: str, headers: Dict[str, str], type: str = "sse"
+) -> List[Dict[str, Any]]:
     """
-    Attempt to fetch the list of tools from an MCP server.
-    Tries to establish an SSE connection first to discover the POST endpoint
-    (MCP Standard), then sends the JSON-RPC 'tools/list' request.
-    Falls back to direct POST if SSE handshake fails or isn't applicable.
+    Fetch tools using the MCP SDK's SSE client for SSE, or generic HTTP POST for http.
     """
     if not url.startswith(("http://", "https://")):
         return []
 
-    post_url = url
-    sse_response = None
-
-    # 1. Attempt SSE Handshake to find the correct POST endpoint
-    # Many MCP servers require an active SSE session and provide a dynamic POST URL.
     try:
-        sse_headers = {
-            "Accept": "text/event-stream",
-            "User-Agent": "mcp-tool-lister/1.0",
-            "Cache-Control": "no-cache",
-        }
-        if headers:
-            sse_headers.update(headers)
+        if type == "sse":
+            # Connect via SSE
+            async with sse_client(url, headers=headers) as (read, write):
+                async with ClientSession(read, write) as session:
+                    await session.initialize()
+                    result = await session.list_tools()
+                    tools_list = []
+                    for tool in result.tools:
+                        tools_list.append(
+                            {
+                                "name": tool.name,
+                                "description": tool.description,
+                                "inputSchema": tool.inputSchema,
+                            }
+                        )
+                    return tools_list
 
-        # Short timeout for discovery
-        req = urllib.request.Request(url, headers=sse_headers, method="GET")
-        response = urllib.request.urlopen(req, timeout=3)
+        elif type == "http":
+            # Stateless JSON-RPC over HTTP
+            # For servers that don't support SSE (returning 405 on GET), we must implement
+            # the MCP handshake manually over POST: initialize -> initialized -> tools/list
 
-        content_type = response.getheader("Content-Type", "")
-        if "text/event-stream" in content_type:
-            sse_response = response
-            # Read events to find "endpoint"
-            found_endpoint = None
-            current_event = None
+            # Ensure session ID is present for tracking
+            # But DO NOT send it for initialize if we want the server to create one (hypothesis)
+            session_id_header = headers.get("Mcp-Session-Id")
+            if not session_id_header:
+                session_id_header = str(uuid.uuid4())
+                headers["Mcp-Session-Id"] = session_id_header
 
-            # Read first few lines (safeguard against infinite stream)
-            for _ in range(50):
-                line = response.readline()
-                if not line:
-                    break
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                # 1. Initialize
+                # Try WITHOUT Mcp-Session-Id first for initialize.
+                init_headers = headers.copy()
+                if "Mcp-Session-Id" in init_headers:
+                    del init_headers["Mcp-Session-Id"]
 
-                line_str = line.decode("utf-8").strip()
-                if not line_str:
-                    continue
+                init_payload = {
+                    "jsonrpc": "2.0",
+                    "method": "initialize",
+                    "id": 1,
+                    "params": {
+                        "protocolVersion": "2024-11-05",
+                        "capabilities": {},
+                        "clientInfo": {"name": "spec-kit", "version": "1.0"},
+                    },
+                }
+                resp_init = await client.post(
+                    url, headers=init_headers, json=init_payload
+                )
 
-                if line_str.startswith("event:"):
-                    current_event = line_str.split(":", 1)[1].strip()
-                elif line_str.startswith("data:") and current_event == "endpoint":
-                    data = line_str.split(":", 1)[1].strip()
-                    found_endpoint = data
-                    break
+                # Check 400 or 404 here specially
+                if resp_init.status_code == 400 and "Mcp-Session-Id" in resp_init.text:
+                    # Fallback: The server requires header even for init.
+                    # But we know random uuid fails.
+                    # Only option: use the random one and hope it was a fluke?
+                    # No, 404 confirmed validation.
+                    # We reprint error and exit if this happens.
+                    pass
 
-            if found_endpoint:
-                # Resolve relative URL against original base
-                post_url = urllib.parse.urljoin(url, found_endpoint)
-        else:
-            # Not an SSE stream, close and assume direct POST
-            response.close()
+                resp_init.raise_for_status()
 
-    except Exception:
-        # If SSE handshake fails (e.g. 405 Method Not Allowed on GET),
-        # it might be a direct POST endpoint. Ignore error and proceed.
-        if sse_response:
-            try:
-                sse_response.close()
-            except:
-                pass
-        sse_response = None
+                # Capture session ID if returned in headers
+                if "Mcp-Session-Id" in resp_init.headers:
+                    headers["Mcp-Session-Id"] = resp_init.headers["Mcp-Session-Id"]
 
-    # 2. Send JSON-RPC Request to valid endpoint
-    # Strict payload as requested
-    payload = {
-        "jsonrpc": "2.0",
-        "method": "tools/list",
-        "id": 1,
-    }
+                # Check for protocol errors
+                init_data = resp_init.json()
+                if "error" in init_data:
+                    print(
+                        f"    [RPC Error during init] {init_data['error']}",
+                        file=sys.stderr,
+                    )
+                    # If "session not found" on init, it's fatal.
+                    return []
 
-    data = json.dumps(payload).encode("utf-8")
+                # 2. Initialized Notification
+                # Standard MCP requires this notification after successful initialize response
+                notify_payload = {
+                    "jsonrpc": "2.0",
+                    "method": "notifications/initialized",
+                    "params": {},
+                }
+                await client.post(url, headers=headers, json=notify_payload)
 
-    # Prepare headers
-    req_headers = {
-        "Content-Type": "application/json",
-        "User-Agent": "mcp-tool-lister/1.0",
-    }
-    if headers:
-        req_headers.update(headers)
+                # 3. List Tools
+                list_payload = {
+                    "jsonrpc": "2.0",
+                    "method": "tools/list",
+                    "id": 2,
+                    "params": {},
+                }
+                resp_tools = await client.post(url, headers=headers, json=list_payload)
+                resp_tools.raise_for_status()
 
-    try:
-        req = urllib.request.Request(
-            post_url, data=data, headers=req_headers, method="POST"
-        )
-        with urllib.request.urlopen(req, timeout=5) as response:
-            if response.status == 200:
-                resp_data = json.loads(response.read().decode("utf-8"))
+                data = resp_tools.json()
+                if "error" in data:
+                    print(f"    [RPC Error] {data['error']}", file=sys.stderr)
+                    return []
 
-                # Close SSE if we opened one, we don't need it anymore
-                # (Note: In a real client, we'd keep it open, but for listing tools, this suffices)
-                if sse_response:
-                    sse_response.close()
-
-                if "result" in resp_data and "tools" in resp_data["result"]:
-                    return resp_data["result"]["tools"]
-                if "error" in resp_data:
-                    print(f"    [RPC Error] {resp_data['error']}", file=sys.stderr)
-            else:
-                print(f"    [HTTP Error] Status: {response.status}", file=sys.stderr)
-
-    except urllib.error.URLError as e:
-        print(f"    [Connection Error] {e}", file=sys.stderr)
-        # Attempt to read error body if available (e.g. 400 Bad Request details)
-        if hasattr(e, "read"):
-            try:
-                err_body = e.read().decode("utf-8")
-                print(f"    [Server Message] {err_body}", file=sys.stderr)
-            except:
-                pass
+                if "result" in data and "tools" in data["result"]:
+                    tools = data["result"]["tools"]
+                    return tools
+                return []
 
     except Exception as e:
-        print(f"    [Error] {e}", file=sys.stderr)
+        print(f"    [Error] Failed to fetch tools: {e}", file=sys.stderr)
+        # traceback.print_exc() # Reduce noise
+        return []
 
-    finally:
-        if sse_response:
-            try:
-                sse_response.close()
-            except:
-                pass
-
-    return []
+    except Exception as e:
+        print(f"    [Error] Failed to fetch tools: {e}", file=sys.stderr)
+        traceback.print_exc()
+        return []
 
 
 def expand_path_variables(value: str) -> str:
@@ -293,14 +300,19 @@ def load_mcp_servers() -> List[Dict[str, Any]]:
     return mcp_servers
 
 
-def main():
+async def main():
+    # Check for mandatory MCP_AUTH
+    mcp_auth = os.environ.get("MCP_AUTH")
+    if not mcp_auth:
+        print("[Error] MCP_AUTH environment variable is not set.", file=sys.stderr)
+        sys.exit(1)
+
     servers = load_mcp_servers()
 
     # Enrich servers with tools
     print("\nFetching tools from available servers...", file=sys.stderr)
     for server in servers:
         # Check if server matches criteria for extraction (http/sse)
-        # Note: "type" is optional in some contexts but usually present.
         srv_type = server.get("type", "unknown")
         srv_url = server.get("url")
 
@@ -321,8 +333,14 @@ def main():
                     # Expand variables in values (e.g. ${env:MCP_TOKEN})
                     headers[k] = expand_path_variables(str(v))
 
-            tools = fetch_mcp_tools(srv_url, headers)
-            if tools is not None:
+            # Enforce Authorization header from env var
+            headers["Authorization"] = f"Bearer {mcp_auth}"
+            # Some servers require Mcp-Session-Id even for stateless calls
+            if "Mcp-Session-Id" not in headers:
+                headers["Mcp-Session-Id"] = str(uuid.uuid4())
+
+            tools = await fetch_tools_with_mcp(srv_url, headers, type=srv_type)
+            if tools:
                 server["tools"] = tools
                 server["tools_count"] = len(tools)
                 print(f"    -> Found {len(tools)} tools", file=sys.stderr)
@@ -357,4 +375,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
