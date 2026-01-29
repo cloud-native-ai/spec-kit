@@ -799,6 +799,24 @@ def copy_local_templates(
                 if src_file.exists():
                     shutil.copy2(src_file, project_path / file_name)
 
+        # Copy skills directory
+        if (resource_path / "skills").exists():
+            if tracker:
+                tracker.start("local-templates", "copying skills")
+
+            # Determine destination: Default to .github/skills as it is the Open Standard location
+            # User specifically requested this for Copilot, and it works for others too.
+            skills_dest = project_path / ".github" / "skills"
+            skills_dest.mkdir(parents=True, exist_ok=True)
+
+            shutil.copytree(
+                resource_path / "skills",
+                skills_dest,
+                dirs_exist_ok=True,
+            )
+            if tracker:
+                tracker.complete("local-templates", "skills copied")
+
     except Exception as e:
         if tracker:
             tracker.error("local-templates", str(e))

@@ -29,3 +29,4 @@ packages = ["src/specify_cli"]
 "memory" = "specify_cli/memory"
 "scripts" = "specify_cli/scripts"
 "templates" = "specify_cli/templates"
+"skills" = "specify_cli/skills"
