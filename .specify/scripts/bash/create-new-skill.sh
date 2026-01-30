@@ -81,8 +81,13 @@ if [ -z "$DESCRIPTION" ]; then
     DESCRIPTION="Skill for $SKILL_NAME"
 fi
 
-# Set root dir (assuming script is in .specify/scripts/bash)
-ROOT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+# Set root dir
+if git rev-parse --show-toplevel >/dev/null 2>&1; then
+    ROOT_DIR=$(git rev-parse --show-toplevel)
+else
+    # Fallback: assume script is in scripts/bash (depth 2)
+    ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+fi
 SKILLS_DIR="$ROOT_DIR/.github/skills"
 TARGET_DIR="$SKILLS_DIR/$SKILL_NAME"
 SKILL_FILE="$TARGET_DIR/SKILL.md"
