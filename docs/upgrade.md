@@ -50,7 +50,7 @@ When Spec Kit releases new features (like new slash commands or updated template
 
 Running `specify init --here --force` will update:
 
-- ✅ **Slash command files** (`.claude/commands/`, `.github/prompts/`, etc.)
+- ✅ **Slash command files** (`.github/prompts/`, etc.)
 - ✅ **Script files** (`.specify/scripts/`)
 - ✅ **Template files** (`.specify/templates/`)
 - ✅ **Shared memory files** (`.specify/memory/`) - **⚠️ See warnings below**
@@ -135,27 +135,13 @@ cp -r .specify/templates .specify/templates-backup
 # After upgrade, merge your changes back manually
 ```
 
-### 3. Duplicate slash commands (IDE-based agents)
+### 3. Duplicate slash commands
 
-Some IDE-based agents (like Kilo Code, Windsurf) may show **duplicate slash commands** after upgrading—both old and new versions appear.
+Some agents may show **duplicate slash commands** after upgrading—both old and new versions appear.
 
 **Solution:** Manually delete the old command files from your agent's folder.
 
-**Example for Kilo Code:**
-
-```bash
-# Navigate to the agent's commands folder
-cd .kilocode/rules/
-
-# List files and identify duplicates
-ls -la
-
-# Delete old versions (example filenames - yours may differ)
-rm speckit.specify-old.md
-rm speckit.plan-v1.md
-```
-
-Restart your IDE to refresh the command list.
+Restart your IDE or agent to refresh the command list.
 
 ---
 
@@ -192,37 +178,20 @@ mv /tmp/constitution-backup.md .specify/memory/constitution.md
 # Manually merge template changes if needed
 ```
 
-### Scenario 3: "I see duplicate slash commands in my IDE"
+### Scenario 3: "I see duplicate slash commands"
 
-This happens with IDE-based agents (Kilo Code, Windsurf, Roo Code, etc.).
-
-```bash
-# Find the agent folder (example: .kilocode/rules/)
-cd .kilocode/rules/
-
-# List all files
-ls -la
-
-# Delete old command files
-rm speckit.old-command-name.md
-
-# Restart your IDE
-```
-
-### Scenario 4: "I'm working on a project without Git"
-
-If you initialized your project with `--no-git`, you can still upgrade:
+This happens when old command files remain after an upgrade.
 
 ```bash
-# Manually back up files you customized
-cp .specify/memory/constitution.md /tmp/constitution-backup.md
+# Find your agent folder
+ls -la .github/prompts/
+ls -la .qwen/commands/
+ls -la .opencode/command/
 
-# Run upgrade
-specify init --here --force --ai copilot --no-git
-
-# Restore customizations
-mv /tmp/constitution-backup.md .specify/memory/constitution.md
+# Delete old command files you no longer need
 ```
+
+Restart your IDE or agent to refresh the command list.
 
 The `--no-git` flag skips git initialization but doesn't affect file updates.
 
@@ -282,14 +251,13 @@ This tells Spec Kit which feature directory to use when creating specs, plans, a
 **Fix:**
 
 1. **Restart your IDE/editor** completely (not just reload window)
-2. **For CLI-based agents**, verify files exist:
+2. **Verify files exist:**
    ```bash
-   ls -la .claude/commands/      # Claude Code
-   ls -la .gemini/commands/       # Gemini
-   ls -la .cursor/commands/       # Cursor
+   ls -la .github/prompts/
+   ls -la .qwen/commands/
+   ls -la .opencode/command/
    ```
 3. **Check agent-specific setup:**
-   - Codex requires `CODEX_HOME` environment variable
    - Some agents need workspace restart or cache clearing
 
 ### "I lost my constitution customizations"
@@ -321,12 +289,12 @@ This warning appears when you run `specify init --here` (or `specify init .`) in
 
 1. **The directory has existing content** - In the example, 25 files/folders
 2. **Files will be merged** - New template files will be added alongside your existing files
-3. **Some files may be overwritten** - If you already have Spec Kit files (`.claude/`, `.specify/`, etc.), they'll be replaced with the new versions
+3. **Some files may be overwritten** - If you already have Spec Kit files (`.github/`, `.qwen/`, `.opencode/`, `.specify/`, etc.), they'll be replaced with the new versions
 
 **What gets overwritten:**
 
 Only Spec Kit infrastructure files:
-- Agent command files (`.claude/commands/`, `.github/prompts/`, etc.)
+- Agent command files (`.github/prompts/`, `.qwen/commands/`, `.opencode/command/`)
 - Scripts in `.specify/scripts/`
 - Templates in `.specify/templates/`
 - Memory files in `.specify/memory/` (including constitution)
@@ -389,7 +357,7 @@ The `specify` CLI tool is used for:
 - **Upgrades:** `specify init --here --force` to update templates and commands
 - **Diagnostics:** `specify check` to verify tool installation
 
-Once you've run `specify init`, the slash commands (like `/speckit.specify`, `/speckit.plan`, etc.) are **permanently installed** in your project's agent folder (`.claude/`, `.github/prompts/`, etc.). Your AI assistant reads these command files directly—no need to run `specify` again.
+Once you've run `specify init`, the slash commands (like `/speckit.specify`, `/speckit.plan`, etc.) are **permanently installed** in your project's agent folder (`.github/prompts/`, `.qwen/commands/`, `.opencode/command/`). Your AI assistant reads these command files directly—no need to run `specify` again.
 
 **If your agent isn't recognizing slash commands:**
 
@@ -398,8 +366,11 @@ Once you've run `specify init`, the slash commands (like `/speckit.specify`, `/s
    # For GitHub Copilot
    ls -la .github/prompts/
 
-   # For Claude
-   ls -la .claude/commands/
+   # For Qwen
+   ls -la .qwen/commands/
+
+   # For opencode
+   ls -la .opencode/command/
    ```
 
 2. **Restart your IDE/editor completely** (not just reload window)

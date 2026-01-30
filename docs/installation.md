@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Linux/macOS** (or Windows)
-- AI coding agent: [Claude Code](https://www.anthropic.com/claude-code), [GitHub Copilot](https://code.visualstudio.com/), [Codebuddy CLI](https://www.codebuddy.ai/cli) or [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+- AI coding agent: [GitHub Copilot](https://code.visualstudio.com/), [Qwen Code](https://github.com/alibaba/Qwen), or [opencode](https://github.com/opencode)
 - [uv](https://docs.astral.sh/uv/) for package management
 - [Python 3.11+](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/downloads)
@@ -31,10 +31,9 @@ uvx --from git+https://github.com/github/spec-kit.git specify init --here
 You can proactively specify your AI agent during initialization:
 
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai claude
-uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai gemini
 uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai copilot
-uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai codebuddy
+uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai qwen
+uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai opencode
 ```
 
 ### Specify Script Type (Shell)
@@ -56,7 +55,7 @@ uvx --from git+https://github.com/github/spec-kit.git specify init <project_name
 If you prefer to get the templates without checking for the right tools:
 
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai claude --ignore-agent-tools
+uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai copilot --ignore-agent-tools
 ```
 
 ## Verification

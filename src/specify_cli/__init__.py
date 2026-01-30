@@ -79,24 +79,6 @@ AGENT_CONFIG = {
         "install_url": None,  # IDE-based, no CLI check needed
         "requires_cli": False,
     },
-    "claude": {
-        "name": "Claude Code",
-        "folder": ".claude/",
-        "install_url": "https://docs.anthropic.com/en/docs/claude-code/setup",
-        "requires_cli": True,
-    },
-    "gemini": {
-        "name": "Gemini CLI",
-        "folder": ".gemini/",
-        "install_url": "https://github.com/google-gemini/gemini-cli",
-        "requires_cli": True,
-    },
-    "cursor-agent": {
-        "name": "Cursor",
-        "folder": ".cursor/",
-        "install_url": None,  # IDE-based
-        "requires_cli": False,
-    },
     "qwen": {
         "name": "Qwen Code",
         "folder": ".qwen/",
@@ -109,65 +91,10 @@ AGENT_CONFIG = {
         "install_url": "https://opencode.ai",
         "requires_cli": True,
     },
-    "codex": {
-        "name": "Codex CLI",
-        "folder": ".codex/",
-        "install_url": "https://github.com/openai/codex",
-        "requires_cli": True,
-    },
-    "windsurf": {
-        "name": "Windsurf",
-        "folder": ".windsurf/",
-        "install_url": None,  # IDE-based
-        "requires_cli": False,
-    },
-    "kilocode": {
-        "name": "Kilo Code",
-        "folder": ".kilocode/",
-        "install_url": None,  # IDE-based
-        "requires_cli": False,
-    },
-    "auggie": {
-        "name": "Auggie CLI",
-        "folder": ".augment/",
-        "install_url": "https://docs.augmentcode.com/cli/setup-auggie/install-auggie-cli",
-        "requires_cli": True,
-    },
-    "codebuddy": {
-        "name": "CodeBuddy",
-        "folder": ".codebuddy/",
-        "install_url": "https://www.codebuddy.ai/cli",
-        "requires_cli": True,
-    },
-    "roo": {
-        "name": "Roo Code",
-        "folder": ".roo/",
-        "install_url": None,  # IDE-based
-        "requires_cli": False,
-    },
-    "q": {
-        "name": "Amazon Q Developer CLI",
-        "folder": ".amazonq/",
-        "install_url": "https://aws.amazon.com/developer/learning/q-developer-cli/",
-        "requires_cli": True,
-    },
-    "amp": {
-        "name": "Amp",
-        "folder": ".agents/",
-        "install_url": "https://ampcode.com/manual#install",
-        "requires_cli": True,
-    },
-    "shai": {
-        "name": "SHAI",
-        "folder": ".shai/",
-        "install_url": "https://github.com/ovh/shai",
-        "requires_cli": True,
-    },
 }
 
 SCRIPT_TYPE_CHOICES = {"sh": "POSIX Shell (bash/zsh)"}
 
-CLAUDE_LOCAL_PATH = Path.home() / ".claude" / "local" / "claude"
 
 BANNER = """
 ███████╗██████╗ ███████╗ ██████╗██╗███████╗██╗   ██╗
@@ -182,7 +109,7 @@ TAGLINE = "GitHub Spec Kit - Spec-Driven Development Toolkit"
 
 
 class StepTracker:
-    """Track and render hierarchical steps without emojis, similar to Claude Code tree output.
+    """Track and render hierarchical steps without emojis, similar to tree output.
     Supports live auto-refresh via an attached refresh callback.
     """
 
@@ -677,23 +604,7 @@ def copy_local_templates(
                 tracker.start("local-templates", f"generating {ai_assistant} commands")
 
             # Map AI assistant to their command directory and format (same as release script)
-            if ai_assistant == "claude":
-                generate_commands(
-                    "claude",
-                    "md",
-                    "$ARGUMENTS",
-                    project_path / ".claude" / "commands",
-                    script_type,
-                )
-            elif ai_assistant == "gemini":
-                generate_commands(
-                    "gemini",
-                    "toml",
-                    "{{args}}",
-                    project_path / ".gemini" / "commands",
-                    script_type,
-                )
-            elif ai_assistant == "copilot":
+            if ai_assistant == "copilot":
                 generate_commands(
                     "copilot",
                     "prompt.md",
@@ -702,14 +613,6 @@ def copy_local_templates(
                     script_type,
                 )
                 # VS Code settings are handled by configure_vscode_settings() later
-            elif ai_assistant == "cursor-agent":
-                generate_commands(
-                    "cursor",
-                    "md",
-                    "$ARGUMENTS",
-                    project_path / ".cursor" / "commands",
-                    script_type,
-                )
             elif ai_assistant == "qwen":
                 generate_commands(
                     "qwen",
@@ -724,58 +627,6 @@ def copy_local_templates(
                     "md",
                     "$ARGUMENTS",
                     project_path / ".opencode" / "command",
-                    script_type,
-                )
-            elif ai_assistant == "codex":
-                generate_commands(
-                    "codex",
-                    "md",
-                    "$ARGUMENTS",
-                    project_path / ".codex" / "prompts",
-                    script_type,
-                )
-                # For Codex, also copy the .env.example to .env
-                env_example = project_path / ".codex" / ".env.example"
-                if env_example.exists():
-                    shutil.copy2(env_example, project_path / ".env")
-            elif ai_assistant == "windsurf":
-                generate_commands(
-                    "windsurf",
-                    "md",
-                    "$ARGUMENTS",
-                    project_path / ".windsurf" / "workflows",
-                    script_type,
-                )
-            elif ai_assistant == "kilocode":
-                generate_commands(
-                    "kilocode",
-                    "md",
-                    "$ARGUMENTS",
-                    project_path / ".kilocode" / "workflows",
-                    script_type,
-                )
-            elif ai_assistant == "auggie":
-                generate_commands(
-                    "auggie",
-                    "md",
-                    "$ARGUMENTS",
-                    project_path / ".augment" / "commands",
-                    script_type,
-                )
-            elif ai_assistant == "roo":
-                generate_commands(
-                    "roo",
-                    "md",
-                    "$ARGUMENTS",
-                    project_path / ".roo" / "commands",
-                    script_type,
-                )
-            elif ai_assistant == "q":
-                generate_commands(
-                    "q",
-                    "md",
-                    "$ARGUMENTS",
-                    project_path / ".amazonq" / "prompts",
                     script_type,
                 )
             else:
@@ -1025,17 +876,6 @@ def check_tool(tool: str, tracker: Optional[StepTracker] = None) -> bool:
     Returns:
         True if tool is found, False otherwise
     """
-    # Special handling for Claude CLI after `claude migrate-installer`
-    # See: https://github.com/github/spec-kit/issues/123
-    # The migrate-installer command REMOVES the original executable from PATH
-    # and creates an alias at ~/.claude/local/claude instead
-    # This path should be prioritized over other claude executables in PATH
-    if tool == "claude":
-        if CLAUDE_LOCAL_PATH.exists() and CLAUDE_LOCAL_PATH.is_file():
-            if tracker:
-                tracker.complete(tool, "available")
-            return True
-
     found = shutil.which(tool) is not None
 
     if tracker:
@@ -1175,7 +1015,7 @@ def init(
     ai_assistant: str = typer.Option(
         None,
         "--ai",
-        help="AI assistant to use: claude, gemini, copilot, cursor-agent, qwen, opencode, codex, windsurf, kilocode, auggie, codebuddy, amp, or q",
+        help="AI assistant to use: copilot, qwen, or opencode",
     ),
     script_type: str = typer.Option(
         None, "--script", help="Script type to use: sh or ps"
@@ -1183,7 +1023,7 @@ def init(
     ignore_agent_tools: bool = typer.Option(
         False,
         "--ignore-agent-tools",
-        help="Skip checks for AI agent tools like Claude Code",
+        help="Skip checks for AI agent tools like Qwen CLI or opencode",
     ),
     no_git: bool = typer.Option(
         False, "--no-git", help="Skip git repository initialization"
@@ -1220,14 +1060,11 @@ def init(
 
     Examples:
         specify init my-project
-        specify init my-project --ai claude
         specify init my-project --ai copilot --no-git
         specify init --ignore-agent-tools my-project
-        specify init . --ai claude         # Initialize in current directory
+        specify init . --ai qwen           # Initialize in current directory
         specify init .                     # Initialize in current directory (interactive AI selection)
-        specify init --here --ai claude    # Alternative syntax for current directory
-        specify init --here --ai codex
-        specify init --here --ai codebuddy
+        specify init --here --ai opencode  # Alternative syntax for current directory
         specify init --here
         specify init --here --force  # Skip confirmation when current directory not empty
     """

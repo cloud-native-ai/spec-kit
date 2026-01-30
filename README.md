@@ -136,21 +136,9 @@ Want to see Spec Kit in action? Watch our [video overview](https://www.youtube.c
 
 | Agent                                                     | Support | Notes                                             |
 |-----------------------------------------------------------|---------|---------------------------------------------------|
-| [Claude Code](https://www.anthropic.com/claude-code)      | ✅ |                                                   |
 | [GitHub Copilot](https://code.visualstudio.com/)          | ✅ |                                                   |
-| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | ✅ |                                                   |
-| [Cursor](https://cursor.sh/)                              | ✅ |                                                   |
 | [Qwen Code](https://github.com/QwenLM/qwen-code)          | ✅ |                                                   |
 | [opencode](https://opencode.ai/)                          | ✅ |                                                   |
-| [Windsurf](https://windsurf.com/)                         | ✅ |                                                   |
-| [Kilo Code](https://github.com/Kilo-Org/kilocode)         | ✅ |                                                   |
-| [Auggie CLI](https://docs.augmentcode.com/cli/overview)   | ✅ |                                                   |
-| [CodeBuddy CLI](https://www.codebuddy.ai/cli)             | ✅ |                                                   |
-| [Roo Code](https://roocode.com/)                          | ✅ |                                                   |
-| [Codex CLI](https://github.com/openai/codex)              | ✅ |                                                   |
-| [Amazon Q Developer CLI](https://aws.amazon.com/developer/learning/q-developer-cli/) | ⚠️ | Amazon Q Developer CLI [does not support](https://github.com/aws/amazon-q-developer-cli/issues/3064) custom arguments for slash commands. |
-| [Amp](https://ampcode.com/) | ✅ | |
-| [SHAI (OVHcloud)](https://github.com/ovh/shai) | ✅ | |
 
 ## 🔧 Specify CLI Reference
 
@@ -161,16 +149,16 @@ The `specify` command supports the following options:
 | Command     | Description                                                    |
 |-------------|----------------------------------------------------------------|
 | `init`      | Initialize a new Specify project from the latest template      |
-| `check`     | Check for installed tools (`git`, `claude`, `gemini`, `code`/`code-insiders`, `cursor-agent`, `windsurf`, `qwen`, `opencode`, `codex`, `shai`) |
+| `check`     | Check for installed tools (`git`, `code`/`code-insiders`, `qwen`, `opencode`) |
 
 ### `specify init` Arguments & Options
 
 | Argument/Option        | Type     | Description                                                                  |
 |------------------------|----------|------------------------------------------------------------------------------|
 | `<project-name>`       | Argument | Name for your new project directory (optional if using `--here`, or use `.` for current directory) |
-| `--ai`                 | Option   | AI assistant to use: `claude`, `gemini`, `copilot`, `cursor-agent`, `qwen`, `opencode`, `codex`, `windsurf`, `kilocode`, `auggie`, `roo`, `codebuddy`, `amp`, `shai`, or `q` |
+| `--ai`                 | Option   | AI assistant to use: `copilot`, `qwen`, or `opencode` |
 | `--script`             | Option   | Script variant to use: `sh` (bash/zsh)                 |
-| `--ignore-agent-tools` | Flag     | Skip checks for AI agent tools like Claude Code                             |
+| `--ignore-agent-tools` | Flag     | Skip checks for AI agent tools like Qwen CLI                                |
 | `--no-git`             | Flag     | Skip git repository initialization                                          |
 | `--here`               | Flag     | Initialize project in the current directory instead of creating a new one   |
 | `--force`              | Flag     | Force merge/overwrite when initializing in current directory (skip confirmation) |
@@ -184,20 +172,15 @@ The `specify` command supports the following options:
 # Basic project initialization
 specify init my-project
 
-# Initialize with specific AI assistant
-specify init my-project --ai claude
+# Initialize with GitHub Copilot support
+specify init my-project --ai copilot
 
-# Initialize with Cursor support
-specify init my-project --ai cursor-agent
+# Initialize with Qwen support
+specify init my-project --ai qwen
 
-# Initialize with Windsurf support
-specify init my-project --ai windsurf
+# Initialize with OpenCode support
+specify init my-project --ai opencode
 
-# Initialize with Amp support
-specify init my-project --ai amp
-
-# Initialize with SHAI support
-specify init my-project --ai shai
 
 # Initialize in current directory
 specify init . --ai copilot
@@ -210,13 +193,13 @@ specify init . --force --ai copilot
 specify init --here --force --ai copilot
 
 # Skip git initialization
-specify init my-project --ai gemini --no-git
+specify init my-project --ai qwen --no-git
 
 # Enable debug output for troubleshooting
-specify init my-project --ai claude --debug
+specify init my-project --ai opencode --debug
 
 # Use GitHub token for API requests (helpful for corporate environments)
-specify init my-project --ai claude --github-token ghp_your_token_here
+specify init my-project --ai copilot --github-token ghp_your_token_here
 
 # Check system requirements
 specify check
@@ -397,36 +380,36 @@ specify init --here --force
 You will be prompted to select the AI agent you are using. You can also proactively specify it directly in the terminal:
 
 ```bash
-specify init <project_name> --ai claude
-specify init <project_name> --ai gemini
 specify init <project_name> --ai copilot
+specify init <project_name> --ai qwen
+specify init <project_name> --ai opencode
 
 # Or in current directory:
-specify init . --ai claude
-specify init . --ai codex
+specify init . --ai copilot
+specify init . --ai qwen
 
 # or use --here flag
-specify init --here --ai claude
-specify init --here --ai codex
+specify init --here --ai opencode
+specify init --here --ai copilot
 
 # Force merge into a non-empty current directory
-specify init . --force --ai claude
+specify init . --force --ai opencode
 
 # or
-specify init --here --force --ai claude
+specify init --here --force --ai copilot
 ```
 
-The CLI will check if you have Claude Code, Gemini CLI, Cursor CLI, Qwen CLI, opencode, Codex CLI, or Amazon Q Developer CLI installed. If you do not, or you prefer to get the templates without checking for the right tools, use `--ignore-agent-tools` with your command:
+The CLI will check if you have GitHub Copilot, Qwen CLI, or opencode installed. If you do not, or you prefer to get the templates without checking for the right tools, use `--ignore-agent-tools` with your command:
 
 ```bash
-specify init <project_name> --ai claude --ignore-agent-tools
+specify init <project_name> --ai copilot --ignore-agent-tools
 ```
 
 ### **STEP 1:** Establish project principles
 
-Go to the project folder and run your AI agent. In our example, we're using `claude`.
+Go to the project folder and run your AI agent. In our example, we're using `copilot`.
 
-![Bootstrapping Claude Code environment](./media/bootstrap-claude-code.gif)
+![Bootstrapping Copilot environment](./media/bootstrap-copilot.gif)
 
 You will know that things are configured correctly if you see the `/speckit.constitution`, `/speckit.specify`, `/speckit.plan`, `/speckit.tasks`, and `/speckit.implement` commands available.
 
@@ -466,7 +449,7 @@ see yours. You can edit any comments that you make, but you can't edit comments 
 delete any comments that you made, but you can't delete comments anybody else made.
 ```
 
-After this prompt is entered, you should see Claude Code kick off the planning and spec drafting process. Claude Code will also trigger some of the built-in scripts to set up the repository.
+After this prompt is entered, you should see your AI agent kick off the planning and spec drafting process. Your agent will also trigger some of the built-in scripts to set up the repository.
 
 Once this step is completed, you should have a new branch created (e.g., `001-create-taskify`), as well as a new specification in the `.specify/specs/001-create-taskify` directory.
 
@@ -483,7 +466,11 @@ At this stage, your project folder contents should resemble the following:
     │  ├── common.sh
     │  ├── create-new-spec.sh
     │  ├── create-new-plan.sh
-    │  └── update-claude-md.sh
+   │  ├── detect-feature-context.sh
+   │  ├── generate-copilot.sh
+   │  ├── implement-plan.sh
+   │  ├── research-project.sh
+   │  └── update-feature-index.sh
     ├── specs
     │  └── 001-create-taskify
     │      └── spec.md
@@ -514,13 +501,13 @@ tasks for each one randomly distributed into different states of completion. Mak
 one task in each stage of completion.
 ```
 
-You should also ask Claude Code to validate the **Review & Acceptance Checklist**, checking off the things that are validated/pass the requirements, and leave the ones that are not unchecked. The following prompt can be used:
+You should also ask your agent to validate the **Review & Acceptance Checklist**, checking off the things that are validated/pass the requirements, and leave the ones that are not unchecked. The following prompt can be used:
 
 ```text
 Read the review and acceptance checklist, and check off each item in the checklist if the feature spec meets the criteria. Leave it empty if it does not.
 ```
 
-It's important to use the interaction with Claude Code as an opportunity to clarify and ask questions around the specification - **do not treat its first attempt as final**.
+It's important to use the interaction with your agent as an opportunity to clarify and ask questions around the specification - **do not treat its first attempt as final**.
 
 ### **STEP 4:** Generate a plan
 
@@ -536,7 +523,6 @@ The output of this step will include a number of implementation detail documents
 
 ```text
 .
-├── CLAUDE.md
 ├── memory
 │  └── constitution.md
 ├── scripts
@@ -544,7 +530,11 @@ The output of this step will include a number of implementation detail documents
 │  ├── common.sh
 │  ├── create-new-spec.sh
 │  ├── create-new-plan.sh
-│  └── update-claude-md.sh
+│  ├── detect-feature-context.sh
+│  ├── generate-copilot.sh
+│  ├── implement-plan.sh
+│  ├── research-project.sh
+│  └── update-feature-index.sh
 ├── specs
 │  └── 001-create-taskify
 │      ├── contracts
@@ -556,15 +546,14 @@ The output of this step will include a number of implementation detail documents
 │      ├── research.md
 │      └── spec.md
 └── templates
-    ├── CLAUDE-template.md
     ├── plan-template.md
     ├── spec-template.md
     └── tasks-template.md
 ```
 
-Check the `research.md` document to ensure that the right tech stack is used, based on your instructions. You can ask Claude Code to refine it if any of the components stand out, or even have it check the locally-installed version of the platform/framework you want to use (e.g., .NET).
+Check the `research.md` document to ensure that the right tech stack is used, based on your instructions. You can ask your agent to refine it if any of the components stand out, or even have it check the locally-installed version of the platform/framework you want to use (e.g., .NET).
 
-Additionally, you might want to ask Claude Code to research details about the chosen tech stack if it's something that is rapidly changing (e.g., .NET Aspire, JS frameworks), with a prompt like this:
+Additionally, you might want to ask your agent to research details about the chosen tech stack if it's something that is rapidly changing (e.g., .NET Aspire, JS frameworks), with a prompt like this:
 
 ```text
 I want you to go through the implementation plan and implementation details, looking for areas that could
@@ -574,7 +563,7 @@ versions that we are going to be using in this Taskify application and spawn par
 any details using research from the web.
 ```
 
-During this process, you might find that Claude Code gets stuck researching the wrong thing - you can help nudge it in the right direction with a prompt like this:
+During this process, you might find that your agent gets stuck researching the wrong thing - you can help nudge it in the right direction with a prompt like this:
 
 ```text
 I think we need to break this down into a series of steps. First, identify a list of tasks
@@ -587,11 +576,11 @@ That's way too untargeted research. The research needs to help you solve a speci
 ```
 
 >[!NOTE]
->Claude Code might be over-eager and add components that you did not ask for. Ask it to clarify the rationale and the source of the change.
+>Your agent might be over-eager and add components that you did not ask for. Ask it to clarify the rationale and the source of the change.
 
-### **STEP 5:** Have Claude Code validate the plan
+### **STEP 5:** Have your agent validate the plan
 
-With the plan in place, you should have Claude Code run through it to make sure that there are no missing pieces. You can use a prompt like this:
+With the plan in place, you should have your agent run through it to make sure that there are no missing pieces. You can use a prompt like this:
 
 ```text
 Now I want you to go and audit the implementation plan and the implementation detail files.
@@ -601,12 +590,12 @@ when I look at the core implementation, it would be useful to reference the appr
 details where it can find the information as it walks through each step in the core implementation or in the refinement.
 ```
 
-This helps refine the implementation plan and helps you avoid potential blind spots that Claude Code missed in its planning cycle. Once the initial refinement pass is complete, ask Claude Code to go through the checklist once more before you can get to the implementation.
+This helps refine the implementation plan and helps you avoid potential blind spots that your agent missed in its planning cycle. Once the initial refinement pass is complete, ask your agent to go through the checklist once more before you can get to the implementation.
 
-You can also ask Claude Code (if you have the [GitHub CLI](https://docs.github.com/en/github-cli/github-cli) installed) to go ahead and create a pull request from your current branch to `main` with a detailed description, to make sure that the effort is properly tracked.
+You can also ask your agent (if you have the [GitHub CLI](https://docs.github.com/en/github-cli/github-cli) installed) to go ahead and create a pull request from your current branch to `main` with a detailed description, to make sure that the effort is properly tracked.
 
 >[!NOTE]
->Before you have the agent implement it, it's also worth prompting Claude Code to cross-check the details to see if there are any over-engineered pieces (remember - it can be over-eager). If over-engineered components or decisions exist, you can ask Claude Code to resolve them. Ensure that Claude Code follows the [constitution](memory/constitution.md) as the foundational piece that it must adhere to when establishing the plan.
+>Before you have the agent implement it, it's also worth prompting your agent to cross-check the details to see if there are any over-engineered pieces (remember - it can be over-eager). If over-engineered components or decisions exist, you can ask your agent to resolve them. Ensure that your agent follows the [constitution](memory/constitution.md) as the foundational piece that it must adhere to when establishing the plan.
 
 ### **STEP 6:** Generate task breakdown with /speckit.tasks
 
