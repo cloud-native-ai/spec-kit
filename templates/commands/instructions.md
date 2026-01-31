@@ -5,7 +5,7 @@ handoffs:
     agent: speckit.skills
     prompt: Scan project for available tools and skills to populate the instructions.
 scripts:
-  sh: scripts/bash/generate-copilot.sh
+  sh: scripts/bash/generate-instructions.sh
 ---
 
 > Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于现有仓库分析生成或更新 `.ai/instructions.md`。

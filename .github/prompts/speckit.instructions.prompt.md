@@ -10,7 +10,7 @@ You **MUST** analyze the content of `$ARGUMENTS` to determine if it contains spe
 
 ## Outline
 
-1. **Setup**: Run `.specify/scripts/bash/generate-copilot.sh` to ensure the basic directory structure, `.copilotignore`, and template `.ai/instructions.md` exist.
+1. **Setup**: Run `.specify/scripts/bash/generate-instructions.sh` to ensure the basic directory structure, `.copilotignore`, and template `.ai/instructions.md` exist.
    - This script handles the "heavy lifting" of creating directories, ignoring files, and establishing symlinks for various AI tools (`.clinerules`, `.github`, `.lingma`, etc.).
    - It will only create a template `.ai/instructions.md` if one does not exist.
 
