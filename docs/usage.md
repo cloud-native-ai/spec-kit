@@ -189,18 +189,18 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 - Ensures consistent feature naming and organization
 
 ### `speckit.skills`
-**Purpose**: Manage specialized skills and capabilities for extended functionality.
+**Purpose**: Manage specialized AI agent skills and capabilities.
 
 **Usage**:
 ```bash
-/speckit.skills [skill management action]
+/speckit.skills [argument]
 ```
 
 **Key Features**:
-- Extends Spec Kit capabilities with domain-specific skills
-- Manages skill definitions and implementations
-- Supports skill-based workflow customization
-- Enables community skill contributions
+- **Create**: `/speckit.skills "name - description"` creates a new skill directory with standard templates
+- **Refresh**: `/speckit.skills` (no args) scans and validates all installed skills
+- Enforces standard structure (`SKILL.md`, `scripts/`, `references/`)
+- Validates skill names and configurations
 
 ### `speckit.instructions`
 **Purpose**: Generate comprehensive usage instructions, maintenance guides, or system prompts. This command helps create documentation for humans or setup instructions for AI agents.

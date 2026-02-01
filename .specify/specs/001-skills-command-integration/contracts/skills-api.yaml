@@ -1,0 +1,138 @@
+openapi: 3.0.0
+info:
+  title: Speckit Skills Command API
+  description: API contract for the /speckit.skills command functionality
+  version: 1.0.0
+
+paths:
+  /skills:
+    get:
+      summary: Refresh all existing skills
+      description: Refresh all installed skills by synchronizing with speckit documentation
+      operationId: refreshSkills
+      responses:
+        '200':
+          description: Skills refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success, warning]
+                  message:
+                    type: string
+                  skills_refreshed:
+                    type: integer
+                  skills_created:
+                    type: integer
+        '500':
+          description: Internal error during refresh process
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [error]
+                  message:
+                    type: string
+
+    post:
+      summary: Create a new skill
+      description: Create a new skill with the specified name and description
+      operationId: createSkill
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+              properties:
+                name:
+                  type: string
+                  pattern: '^[a-zA-Z0-9_-]+$'
+                  description: Unique identifier for the skill
+                description:
+                  type: string
+                  description: Brief description of what the skill does
+      responses:
+        '201':
+          description: Skill created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  message:
+                    type: string
+                  skill_path:
+                    type: string
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [error]
+                  message:
+                    type: string
+                  validation_errors:
+                    type: array
+                    items:
+                      type: string
+        '409':
+          description: Skill name already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [error]
+                  message:
+                    type: string
+        '500':
+          description: Internal error during creation process
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [error]
+                  message:
+                    type: string
+
+components:
+  schemas:
+    Skill:
+      type: object
+      required:
+        - name
+        - description
+        - directory_path
+      properties:
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]+$'
+        description:
+          type: string
+        directory_path:
+          type: string
+        status:
+          type: string
+          enum: [active, archived, deprecated]

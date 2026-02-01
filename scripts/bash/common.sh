@@ -358,3 +358,61 @@ is_valid_utf8() {
         return 1
     fi
 }
+
+# --- Skill Management Functions ---
+
+# Validate skill name
+# Returns 0 if valid, 1 if invalid
+validate_skill_name() {
+    local name="$1"
+    if [[ ! "$name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+        return 1
+    fi
+    return 0
+}
+
+# Create standard skill directory structure
+# Usage: create_skill_structure "skill_path"
+create_skill_structure() {
+    local skill_path="$1"
+    
+    mkdir -p "$skill_path"
+    mkdir -p "$skill_path/scripts"
+    mkdir -p "$skill_path/references"
+    mkdir -p "$skill_path/assets"
+}
+
+# Report error
+# Usage: report_error "message" [json_mode]
+report_error() {
+    local message="$1"
+    local json_mode="${2:-false}"
+    
+    if [ "$json_mode" = true ]; then
+        # Escape quotes in message
+        local safe_msg="${message//\"/\\\"}"
+        echo "{\"status\": \"error\", \"message\": \"$safe_msg\"}"
+    else
+        echo "Error: $message" >&2
+    fi
+}
+
+# Report success
+# Usage: report_success "message" [data_fragment] [json_mode]
+# data_fragment should be valid JSON key-value pairs, e.g. '"path": "/foo"'
+report_success() {
+    local message="$1"
+    local data="$2"
+    local json_mode="${3:-false}"
+    
+    if [ "$json_mode" = true ]; then
+        local safe_msg="${message//\"/\\\"}"
+        if [ -n "$data" ]; then
+            echo "{\"status\": \"success\", \"message\": \"$safe_msg\", $data}"
+        else
+            echo "{\"status\": \"success\", \"message\": \"$safe_msg\"}"
+        fi
+    else
+        echo "$message"
+    fi
+}

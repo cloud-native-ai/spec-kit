@@ -28,6 +28,14 @@ DESCRIPTION=""
 
 CUSTOM_OUTPUT_DIR=""
 
+# Check for "Name - Description" format in first argument if it's not a flag
+if [[ "$1" != -* ]] && [[ "$1" == *" - "* ]]; then
+    # Extract name and description
+    SKILL_NAME="${1%% - *}"
+    DESCRIPTION="${1#* - }"
+    shift
+fi
+
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -79,7 +87,13 @@ fi
 
 # Validate inputs
 if [ -z "$SKILL_NAME" ]; then
-    echo "Error: Skill name is required. Use --name <name>" >&2
+    report_error "Skill name is required. Use --name <name> or 'speckit.skills name - desc'" "$JSON_MODE"
+    exit 1
+fi
+
+# Validate name
+if ! validate_skill_name "$SKILL_NAME"; then
+    report_error "Invalid skill name '$SKILL_NAME'. Use alphanumeric, hyphens, underscores only." "$JSON_MODE"
     exit 1
 fi
 
@@ -108,15 +122,12 @@ SKILL_FILE="$TARGET_DIR/SKILL.md"
 
 # Check if already exists
 if [ -d "$TARGET_DIR" ]; then
-    echo "Error: Skill directory already exists at $TARGET_DIR" >&2
+    report_error "Skill directory already exists at $TARGET_DIR" "$JSON_MODE"
     exit 1
 fi
 
 # Create directory structure
-mkdir -p "$TARGET_DIR"
-mkdir -p "$TARGET_DIR/scripts"
-mkdir -p "$TARGET_DIR/references"
-mkdir -p "$TARGET_DIR/assets"
+create_skill_structure "$TARGET_DIR"
 
 TEMPLATE_FILE="$ROOT_DIR/templates/skills-template.md"
 
@@ -162,13 +173,7 @@ python3 -c "import os, sys; content = os.environ.get('TEMPLATE_CONTENT', ''); pr
 
 if [ "$JSON_MODE" = true ]; then
     # Output JSON
-    # Simple JSON construction
-    echo "{"
-    echo "  \"SKILL_DIR\": \"$TARGET_DIR\","
-    echo "  \"SKILL_FILE\": \"$SKILL_FILE\","
-    echo "  \"SKILL_NAME\": \"$SKILL_NAME\","
-    echo "  \"CREATED\": true"
-    echo "}"
+    report_success "Skill created" "\"SKILL_DIR\": \"$TARGET_DIR\", \"SKILL_FILE\": \"$SKILL_FILE\", \"SKILL_NAME\": \"$SKILL_NAME\", \"CREATED\": true" "true"
 else
     echo "Skill created at: $SKILL_FILE"
     echo "  ├── SKILL.md"
