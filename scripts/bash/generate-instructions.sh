@@ -14,13 +14,23 @@ fi
 PROJECT_ROOT="$PWD"
 PROJECT_NAME="$(basename "$PROJECT_ROOT")"
 CURRENT_DATE="$(date +%Y-%m-%d)"
-TEMPLATE_FILE="templates/instructions-template.md"
+
+# Detect template path (User perspective vs Source perspective)
+if [ -f ".specify/templates/instructions-template.md" ]; then
+    TEMPLATE_FILE=".specify/templates/instructions-template.md"
+elif [ -f "templates/instructions-template.md" ]; then
+    TEMPLATE_FILE="templates/instructions-template.md"
+else
+    # Fallback to verify later
+    TEMPLATE_FILE="templates/instructions-template.md"
+fi
+
 TARGET_FILE=".ai/instructions.md"
 TARGET_DIR=".ai"
 
 # T005: Hard Fail
 if [ ! -f "$TEMPLATE_FILE" ]; then
-    log error "Template file not found at $TEMPLATE_FILE. Please create it or copy it from defaults."
+    log error "Template file not found at $TEMPLATE_FILE. Please create it or copy it from defaults. Checked locations: .specify/templates/instructions-template.md, templates/instructions-template.md"
     exit 1
 fi
 

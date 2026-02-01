@@ -129,7 +129,15 @@ fi
 # Create directory structure
 create_skill_structure "$TARGET_DIR"
 
-TEMPLATE_FILE="$ROOT_DIR/templates/skills-template.md"
+# Detect template path
+if [ -f "$ROOT_DIR/.specify/templates/skills-template.md" ]; then
+    TEMPLATE_FILE="$ROOT_DIR/.specify/templates/skills-template.md"
+elif [ -f "$ROOT_DIR/templates/skills-template.md" ]; then
+    TEMPLATE_FILE="$ROOT_DIR/templates/skills-template.md"
+else
+    # Fallback default
+    TEMPLATE_FILE="$ROOT_DIR/templates/skills-template.md"
+fi
 
 # Define fallback template content
 FALLBACK_TEMPLATE='---
