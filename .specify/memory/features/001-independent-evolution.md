@@ -37,7 +37,7 @@ Tasks generated. Ready for execution.
 - Specification: .specify/specs/001-cleanup-ai-support/spec.md
 - Plan: .specify/specs/001-cleanup-ai-support/plan.md
 - Tasks: .specify/specs/001-cleanup-ai-support/tasks.md
-- Feature Index: memory/feature-index.md
+- Feature Index: memory/features.md
 - Feature Detail: memory/features/001-independent-evolution.md
 
 ## Status Tracking

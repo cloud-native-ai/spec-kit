@@ -540,7 +540,7 @@ def copy_local_templates(
             memory_dest.mkdir(exist_ok=True)
 
             # Specific files to handle
-            memory_files = ["constitution.md", "feature-index.md"]
+            memory_files = ["constitution.md", "features.md"]
 
             for filename in memory_files:
                 src_file = memory_src / filename

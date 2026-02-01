@@ -175,7 +175,7 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 - Tracks constitutional changes and updates
 
 ### `speckit.feature`
-**Purpose**: Manage the feature registry (stored in `memory/feature-index.md`) and track feature evolution.
+**Purpose**: Manage the feature registry (stored in `memory/features.md`) and track feature evolution.
 
 **Usage**:
 ```bash

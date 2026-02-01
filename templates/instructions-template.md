@@ -11,7 +11,7 @@ This project documentation is distributed across several key files. You MUST ref
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
 | **Constitution** | `memory/constitution.md` | Single source of truth for principles | Coding standards, architectural rules, constraints |
-| **Feature Index** | `memory/feature-index.md` | Feature roadmap status | List of active/planned/implemented features |
+| **Feature Index** | `memory/features.md` | Feature roadmap status | List of active/planned/implemented features |
 | **Development** | `CONTRIBUTING.md` | Setup and Guidelines | Setup, testing, and pull request guidelines |
 | **Architecture** | `docs/index.md` | High-level architecture | Architecture and design documentation |
 | [Other Doc] | [Path] | [Purpose] | [Summary] |
@@ -32,9 +32,9 @@ This project documentation is distributed across several key files. You MUST ref
   - `tests/`: Test suite
   - [Other detected dirs]
 
-# Tool Usage Guide
+# Tool And Skills Usage Guide
 
-> **Note**: Tool details are injected into prompts by the agent when needed. This section is guidance only.
+> **Note**: Tool and Skills details are injected into prompts by the agent when needed. This section is guidance only.
 
 ## Suggested Tooling Scope (High-Level)
 - System/Linux CLI and shell context (env vars, functions, aliases)
@@ -45,10 +45,6 @@ This project documentation is distributed across several key files. You MUST ref
 - Prefer project scripts for repeatable tasks.
 - Use MCP tools for internal docs or code queries when available.
 - Verify architectural rules via the **Constitution** rather than assumptions.
-
-## Tools
-<!-- TOOLS_PLACEHOLDER -->
-[Tools section will be populated by the skills command]
 
 ## Skills
 <!-- SKILLS_PLACEHOLDER -->

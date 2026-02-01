@@ -78,7 +78,7 @@ The SDD methodology is significantly enhanced through four powerful commands tha
 
 This command provides centralized feature management for SDD projects:
 
-1. **Feature Index Creation**: Creates or updates a project-level feature index (`feature-index.md`) in Markdown table format
+1. **Feature Index Creation**: Creates or updates a project-level feature index (`features.md`) in Markdown table format
 1. **Feature Documents Maintainance**: updates a project-level feature details document in (`features/`) folder
 2. **Sequential ID Assignment**: Automatically assigns sequential three-digit feature IDs (001, 002, 003, etc.)
 3. **Status Tracking**: Maintains feature status through the SDD lifecycle (Draft → Planned → Implemented → Ready for Review → Completed)
@@ -121,7 +121,7 @@ This command is the final step of the SDD loop for a feature; it reviews the ful
 1. **Artifact Review**: Loads the feature's `spec.md`, `plan.md`, `tasks.md`, and any supporting documents such as `data-model.md`, `contracts/`, `research.md`, and `quickstart.md` from `.specify/specs/[FEATURE_KEY]/`.
 2. **Synthesis**: Produces a concise, user- and system-level narrative that explains what the feature does, who it serves, and which constraints and integrations define its boundary.
 3. **Feature Memory Update**: Writes or updates a dedicated feature document in `.specify/memory/features/[ID].md` (where [ID] is the three-digit feature ID like 001, 002, etc.), keeping prior context while refreshing the current definition and linking back to the latest spec/plan/tasks.
-4. **Index Integration**: Updates `.specify/memory/feature-index.md` so the feature entry points at the up-to-date memory file and records that review has been completed.
+4. **Index Integration**: Updates `.specify/memory/features.md` so the feature entry points at the up-to-date memory file and records that review has been completed.
 
 Using `/speckit.review` after `/speckit.implement` keeps your feature index and long-term documentation in sync with the latest iteration of the SDD artifacts.
 
@@ -147,7 +147,7 @@ Total: ~12 hours of documentation work
 /speckit.feature Real-time chat system with message history and user presence
 
 # This automatically:
-# - Creates or updates .specify/memory/feature-index.md with a feature entry
+# - Creates or updates .specify/memory/features.md with a feature entry
 # - Assigns a feature ID (e.g., 003) based on existing features
 # - Sets initial status to "Draft"
 
@@ -158,13 +158,13 @@ Total: ~12 hours of documentation work
 # - Creates branch "003-chat-system"
 # - Generates .specify/specs/003-chat-system/spec.md
 # - Populates it with structured requirements
-# - Updates feature-index.md status to "Planned" and records spec path
+# - Updates features.md status to "Planned" and records spec path
 
 # Step 3: Generate implementation plan (5 minutes)
 /speckit.plan WebSocket for real-time messaging, PostgreSQL for history, Redis for presence
 
 # This automatically:
-# - Updates feature-index.md status to "Implemented"
+# - Updates features.md status to "Implemented"
 # - Creates .specify/specs/003-chat-system/plan.md
 # - Generates supporting documents in .specify/specs/003-chat-system/
 
@@ -201,7 +201,7 @@ In ~30 minutes, you have:
 - An executable task list organized by user story priority
 - Implemented code, tests, and documentation
 - All documents properly versioned in a feature branch
-- A centralized feature index (`feature-index.md`) tracking all project features and their status
+- A centralized feature index (`features.md`) tracking all project features and their status
 - A consolidated feature memory document at `.specify/memory/features/[ID].md` that serves as the single source of truth for the feature
 
 ### The Power of Structured Automation

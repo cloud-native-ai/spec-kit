@@ -40,7 +40,7 @@ You **MUST** treat the user input ($ARGUMENTS) as parameters for the current com
 
 3. **Information Gathering & Analysis**:
    - **Project Architecture**: Understand how the new feature fits into existing system.
-   - **Feature Interdependencies**: check `.specify/memory/feature-index.md` and `.specify/memory/features/` for conflicts or reuse opportunities.
+   - **Feature Interdependencies**: check `.specify/memory/features.md` and `.specify/memory/features/` for conflicts or reuse opportunities.
    - **Unknown Resolution**: Address any defined "NEEDS CLARIFICATION" or questions from `$ARGUMENTS`.
    - **Technology Selection**: Verify best practices using the gathered context.
 

@@ -16,7 +16,7 @@ You **MUST** treat the user input ($ARGUMENTS) as parameters for the current com
 You are managing feature metadata in two artifacts:
 
 1. Feature Detail files: `.specify/memory/features/<ID>.md` generated from the installed template at `.specify/templates/feature-details-template.md` (source development template: `.specify/templates/feature-details-template.md`).
-2. Feature Index: `.specify/memory/feature-index.md` generated from the installed template at `.specify/templates/feature-index-template.md` (source development template: `.specify/templates/feature-index-template.md`).
+2. Feature Index: `.specify/memory/features.md` generated from the installed template at `.specify/templates/features-template.md` (source development template: `.specify/templates/features-template.md`).
 
 Your responsibilities:
 
@@ -50,7 +50,7 @@ Your responsibilities:
        - 在历史记录中定位该信息相关变更。
        - 提取变更涉及的功能点与质量属性，更新或新增 Feature。
     - 仅描述参数（不含具体信息）：
-       - 在 `.specify/memory/feature-index.md` 中定位可能需要更新的 Feature。
+       - 在 `.specify/memory/features.md` 中定位可能需要更新的 Feature。
        - 基于项目最新状态更新该 Feature 的描述、状态与关键变化。
 4. Determine next sequential `FEATURE_ID` (three digits) for any new features (scan existing `.specify/memory/features/*.md`).
 5. Instantiate the feature detail template for each new feature:
@@ -59,7 +59,7 @@ Your responsibilities:
    - Dates: `FEATURE_CREATED_DATE` and `FEATURE_LAST_UPDATED_DATE` = today (YYYY-MM-DD) unless updating existing.
    - Status must be one of: Draft | Planned | Implemented | Ready for Review | Completed.
 6. For updates to existing features: load the existing detail file, apply changes preserving unchanged sections.
-7. Update `.specify/memory/feature-index.md`:
+7. Update `.specify/memory/features.md`:
    - Ensure table lists all features with columns: ID | Name | Description | Status | Feature Details | Last Updated.
    - Regenerate `FEATURE_COUNT` and any other placeholders (if still a template) before finalizing.
 8. Validate:
@@ -71,7 +71,7 @@ Your responsibilities:
    - Save new/updated detail files.
    - Overwrite updated feature index.
 10. **同步更新项目根目录 README 的特性列表**：
-   - 读取 `.specify/memory/feature-index.md` 的表格内容并进行整理。
+   - 读取 `.specify/memory/features.md` 的表格内容并进行整理。
    - 在 README 中生成或更新一个“特性列表”章节（按 README 现有风格与标题层级）。
    - 输出内容必须为“功能性 Feature / 非功能性 Feature”两个小节，并基于索引内容分类汇总。
    - 若 README 已存在该章节，则覆盖为最新内容；若不存在则追加并保持格式一致。
@@ -106,7 +106,7 @@ Feature 是项目的核心框架，需要在 SDD 全流程中被反复审视与�
    - 新的 SPEC 可能引入新的 Feature。
    - 现有 Feature 可能需要合并、拆分、降级或删除。
    - 需要更新 Feature 的状态与“关键变化/实现影响”。
-- 在执行 `/speckit.specify`、`/speckit.plan`、`/speckit.tasks`、`/speckit.implement` 后，都应主动同步更新 `.specify/memory/features/*.md` 与 `.specify/memory/feature-index.md`（若有变化）。
+- 在执行 `/speckit.specify`、`/speckit.plan`、`/speckit.tasks`、`/speckit.implement` 后，都应主动同步更新 `.specify/memory/features/*.md` 与 `.specify/memory/features.md`（若有变化）。
 - 任何 Feature 变更都必须能追溯到对应的 Spec 或 Plan 依据（记录在 Feature 的“关键变化/备注”中）。
 
 ### Practical scanning hints（扫描配置文件的操作建议）

@@ -1,4 +1,4 @@
-# Agent Skills Spec
+# Agent Skills Specification
 
 This spec is now located at <https://agentskills.io/specification>
 

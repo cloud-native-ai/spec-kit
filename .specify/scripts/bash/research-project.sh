@@ -87,7 +87,7 @@ fi
 # 3. Memory (Constitution and Feature Index)
 if [ -d ".specify/memory" ]; then
     add_doc_path ".specify/memory/constitution.md"
-    add_doc_path ".specify/memory/feature-index.md"
+    add_doc_path ".specify/memory/features.md"
 fi
 
 # 4. Current Feature Spec (if likely planning)
