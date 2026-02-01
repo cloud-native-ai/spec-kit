@@ -33,11 +33,13 @@
 
 **Core Principles Compliance**:
 
-- **Spec-Driven**: Spec flow is Spec -> Plan -> Task -> Implement
-- **Agent-First**: Artifacts are structured for both Human and AI consumption
-- **Library/CLI-First**: Feature implemented as reusable library with CLI
-- **Test-First**: TDD flow followed, tests written before code
-- **Context Preservation**: Update logs and decision records maintained
+- **Specification-Driven Development**: Code serves specifications; specifications are executable and generate working systems
+- **Feature-Centric Development**: Feature Index is single source of truth; all phases re-evaluate Feature changes
+- **Intent-Driven Development**: Focus on "what" and "why" before "how"; use rich specifications with guardrails
+- **Test-First & Contract-Driven**: TDD flow followed; pure functions have unit tests; critical flows have regression coverage
+- **AI Agent Integration**: Only approved agents (GitHub Copilot, Qwen Code, opencode); configuration rejects unsupported providers
+- **Continuous Quality & Observability**: Structured logging; semantic versioning; CI quality gates; simple designs (YAGNI)
+- **SDD Workflow Compliance**: Follow spec → plan → tasks → implement workflow with proper validation at each phase
 
 **Gates Status**: [✅ All gates pass / ❌ Specific gate failures with justification]
 

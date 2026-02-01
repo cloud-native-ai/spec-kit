@@ -2,9 +2,13 @@
 
 Spec Kit is a Specification-Driven Development (SDD) CLI tool that helps developers adopt structured development practices. The tool provides a comprehensive workflow from feature specification to implementation, with built-in quality checks and validation.
 
+> **Important for Beginners**: Spec Kit involves two distinct types of interactions:
+> 1. **Terminal CLI** (`specify ...`): Used for project initialization and configuration. Run these in your system terminal.
+> 2. **AI Agent Commands** (`/speckit. ...`): Used for the development workflow. **Type these into your AI Assistant's chat interface (e.g., Copilot Chat), DO NOT run them in your terminal.**
+
 ## Command Overview
 
-Spec Kit provides the following core commands, each designed to support a specific phase of the SDD workflow:
+The following commands are **prompt instructions** for your AI Agent. Use them inside your AI chat interface, **not** in your terminal. Spec Kit provides the following core commands:
 
 | Command | Purpose | Typical Workflow Stage |
 |---------|---------|----------------------|
@@ -39,7 +43,7 @@ Spec Kit provides the following core commands, each designed to support a specif
 - Validates specification quality before proceeding
 - Limits clarifications to maximum 3 critical questions
 
-**Output**: Creates `spec.md` file in feature directory with complete specification.
+**Output**: Creates a new directory under `.specify/features/` (e.g., `.specify/features/001-login/`) and generates a `spec.md` file within it containing the complete specification.
 
 ### `speckit.clarify`
 **Purpose**: Resolve ambiguous or unclear requirements in existing specifications.
@@ -157,7 +161,7 @@ Spec Kit provides the following core commands, each designed to support a specif
 - Supports informed decision-making
 
 ### `speckit.constitution`
-**Purpose**: Manage and enforce the project's core principles and governance rules.
+**Purpose**: Manage and enforce the project's core principles and governance rules (stored in `memory/constitution.md`).
 
 **Usage**:
 ```bash
@@ -165,13 +169,13 @@ Spec Kit provides the following core commands, each designed to support a specif
 ```
 
 **Key Features**:
-- Maintains core project principles and constraints
+- Maintains core project principles and constraints in `memory/constitution.md`
 - Enforces non-negotiable rules across all artifacts
 - Provides constitutional guidance for decision-making
 - Tracks constitutional changes and updates
 
 ### `speckit.feature`
-**Purpose**: Manage the feature registry and track feature evolution.
+**Purpose**: Manage the feature registry (stored in `memory/feature-index.md`) and track feature evolution.
 
 **Usage**:
 ```bash
@@ -199,7 +203,7 @@ Spec Kit provides the following core commands, each designed to support a specif
 - Enables community skill contributions
 
 ### `speckit.instructions`
-**Purpose**: Generate comprehensive usage instructions and documentation.
+**Purpose**: Generate comprehensive usage instructions, maintenance guides, or system prompts. This command helps create documentation for humans or setup instructions for AI agents.
 
 **Usage**:
 ```bash
@@ -214,76 +218,83 @@ Spec Kit provides the following core commands, each designed to support a specif
 
 ## Workflow Integration
 
-The Spec Kit commands are designed to work together in a cohesive workflow:
-
-1. **Specification Phase**: `specify` → `clarify`
-2. **Planning Phase**: `plan` → `tasks`
-3. **Implementation Phase**: `implement`
-4. **Quality Assurance Phase**: `analyze` → `checklist` → `review`
-5. **Research & Governance**: `research` → `constitution` → `feature`
-6. **Extension & Documentation**: `skills` → `instructions`
-
-Each command validates prerequisites and ensures proper sequencing, preventing workflow violations and maintaining artifact consistency.
+The Spec Kit workflow consists of a **Core Lifecycle** for standardized development, supported by **Auxiliary Tools** that provide rigorous quality assurance and assistance when needed.
 
 ### Command Execution Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[specify]
-    B --> C{Clarification\nNeeded?}
-    C -->|Yes| D[clarify]
-    C -->|No| E[plan]
-    D --> E
-    E --> F[tasks]
-    F --> G[checklist]
-    G --> H{All Checklists\nComplete?}
-    H -->|No| I[Address Checklist\nItems]
-    H -->|Yes| J[implement]
-    I --> G
-    J --> K[analyze]
-    K --> L{Issues\nFound?}
-    L -->|Yes| M[Address\nIssues]
-    L -->|No| N[review]
-    M --> K
-    N --> O([End])
+    %% Setup Phase
+    subgraph Setup ["Step 0: Preparation"]
+        direction TB
+        S1["/speckit.constitution"]
+        S2["/speckit.instructions"]
+        S3["/speckit.skills"]
+    end
+
+    %% Core Flow
+    subgraph Core ["Core Development Lifecycle"]
+        direction TB
+        C1["1. /speckit.feature"]
+        C2["2. /speckit.specify"]
+        C3["3. /speckit.plan"]
+        C4["4. /speckit.tasks"]
+        C5["5. /speckit.implement"]
+    end
+
+    %% Flow Connectivity
+    Start([Start]) ====> Setup
+    Setup ====> C1
+    C1 ====> C2
+    C2 ====> C3
+    C3 ====> C4
+    C4 ====> C5
+    C5 ====> End([End])
+
+    %% Auxiliary / Optional Tools - Context sensitive placement
     
-    P[[research]] --> B
-    Q[[constitution]] --> B
-    R[[feature]] --> B
-    S[[skills]] --> T[[instructions]]
+    %% Research supports Specify
+    T_Res[["/speckit.research\n(Optional)"]] -.- C2
     
-    %% Dark theme optimized styles
-    classDef phase1 fill:#1e3a5f,stroke:#60a5fa,color:#e2e8f0,stroke-width:2px;
-    classDef phase2 fill:#3c1a5f,stroke:#c084fc,color:#e2e8f0,stroke-width:2px;
-    classDef phase3 fill:#1a3f2a,stroke:#4ade80,color:#e2e8f0,stroke-width:2px;
-    classDef phase4 fill:#4f2a1a,stroke:#f97316,color:#e2e8f0,stroke-width:2px;
-    classDef support fill:#2d3748,stroke:#a0aec0,color:#e2e8f0,stroke-width:1px,stroke-dasharray: 5 5;
+    %% Clarify repairs Specify
+    C2 -.- T_Clar[["/speckit.clarify\n(Ambiguity Resolver)"]] -.-> C2
+    
+    %% Checklist serves as a gate before Implement
+    C4 -.- T_Chk[["/speckit.checklist\n(QA Gate)"]] -.-> C5
+    
+    %% Analyze watches over the artifacts
+    C2 & C3 & C4 & C5 -.- T_Ana[["/speckit.analyze\n(Consistency Check)"]]
+    
+    %% Review validates the Implementation
+    C5 -.- T_Rev[["/speckit.review\n(Post-Impl Review)"]] -.-> End
+
+    %% Styling
+    classDef setup fill:#2d3748,stroke:#a0aec0,color:#e2e8f0,stroke-width:1px,stroke-dasharray: 5 5;
+    classDef core fill:#1e3a5f,stroke:#60a5fa,color:#e2e8f0,stroke-width:3px;
+    classDef aux fill:#4a5568,stroke:#cbd5e0,color:#f7fafc,stroke-width:1px,stroke-dasharray: 5 5;
     classDef startEnd fill:#166534,stroke:#4ade80,color:#ffffff,stroke-width:2px;
-    classDef decision fill:#4a5568,stroke:#cbd5e0,color:#f7fafc,stroke-width:2px;
     
-    class A,O startEnd
-    class B,D phase1
-    class C decision
-    class E,F phase2
-    class G,I,J phase3
-    class H decision
-    class K,M,N phase4
-    class L decision
-    class P,Q,R,S,T support
+    class Start,End startEnd
+    class S1,S2,S3 setup
+    class C1,C2,C3,C4,C5 core
+    class T_Res,T_Clar,T_Chk,T_Ana,T_Rev aux
 ```
 
-This flowchart illustrates the primary execution sequence of Spec Kit commands, with dark theme optimized styling:
+This flowchart distinguishes between the **Core Path** (solid arrows) and **Auxiliary Tools** (dashed lines):
 
-- **Green circles**: Start and End points (dark green background with white text)
-- **Dark blue rectangles**: Specification Phase (`specify`, `clarify`) with light text
-- **Dark purple rectangles**: Planning Phase (`plan`, `tasks`) with light text  
-- **Dark green rectangles**: Implementation Phase (`checklist`, `implement`) with light text
-- **Dark orange rectangles**: Quality Assurance Phase (`analyze`, `review`) with light text
-- **Dark gray dashed rectangles**: Support Commands (`research`, `constitution`, `feature`, `skills`, `instructions`)
-- **Light gray diamonds**: Decision points with white text for better contrast
-- **Styled arrows**: Clear flow direction with appropriate color contrast
-
-The dark theme styling uses deeper background colors with light text to ensure excellent readability in dark IDE environments while maintaining the visual distinction between different workflow phases.
+1.  **Preparation**: `/speckit.constitution`, `/speckit.instructions`, `/speckit.skills` (Run once or as needed).
+2.  **Core Lifecycle**:
+    *   `1. /speckit.feature`: Initialize feature context.
+    *   `2. /speckit.specify`: Define the specification.
+    *   `3. /speckit.plan`: Create the technical plan.
+    *   `4. /speckit.tasks`: Breakdown into tasks.
+    *   `5. /speckit.implement`: Execute code changes.
+3.  **Auxiliary Tools (Optional)**:
+    *   `/speckit.research`: Use during specification if external data is needed.
+    *   `/speckit.clarify`: Use if specification has `[NEEDS CLARIFICATION]` tags.
+    *   `/speckit.checklist`: Use to generate pre-implementation validation lists.
+    *   `/speckit.analyze`: Use at any stage to check for artifact consistency.
+    *   `/speckit.review`: Use after implementation to verify against spec/plan.
 
 ## Best Practices
 
