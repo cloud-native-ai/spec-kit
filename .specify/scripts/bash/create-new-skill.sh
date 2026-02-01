@@ -26,6 +26,16 @@ JSON_MODE=false
 SKILL_NAME=""
 DESCRIPTION=""
 
+CUSTOM_OUTPUT_DIR=""
+
+# Check for "Name - Description" format in first argument if it's not a flag
+if [[ "$1" != -* ]] && [[ "$1" == *" - "* ]]; then
+    # Extract name and description
+    SKILL_NAME="${1%% - *}"
+    DESCRIPTION="${1#* - }"
+    shift
+fi
+
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -38,8 +48,13 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
-    --description)
+    --description|--desc|-d)
       DESCRIPTION="$2"
+      shift
+      shift
+      ;;
+    --output-dir|-o)
+      CUSTOM_OUTPUT_DIR="$2"
       shift
       shift
       ;;
@@ -72,7 +87,13 @@ fi
 
 # Validate inputs
 if [ -z "$SKILL_NAME" ]; then
-    echo "Error: Skill name is required. Use --name <name>" >&2
+    report_error "Skill name is required. Use --name <name> or 'speckit.skills name - desc'" "$JSON_MODE"
+    exit 1
+fi
+
+# Validate name
+if ! validate_skill_name "$SKILL_NAME"; then
+    report_error "Invalid skill name '$SKILL_NAME'. Use alphanumeric, hyphens, underscores only." "$JSON_MODE"
     exit 1
 fi
 
@@ -88,37 +109,75 @@ else
     # Fallback: assume script is in scripts/bash (depth 2)
     ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 fi
-SKILLS_DIR="$ROOT_DIR/.github/skills"
+
+# Determine target directory
+if [ -n "$CUSTOM_OUTPUT_DIR" ]; then
+    SKILLS_DIR="$CUSTOM_OUTPUT_DIR"
+else
+    SKILLS_DIR="$ROOT_DIR/.github/skills"
+fi
+
 TARGET_DIR="$SKILLS_DIR/$SKILL_NAME"
 SKILL_FILE="$TARGET_DIR/SKILL.md"
 
+# Check if already exists
+if [ -d "$TARGET_DIR" ]; then
+    report_error "Skill directory already exists at $TARGET_DIR" "$JSON_MODE"
+    exit 1
+fi
+
 # Create directory structure
-mkdir -p "$TARGET_DIR"
-mkdir -p "$TARGET_DIR/scripts"
-mkdir -p "$TARGET_DIR/references"
-mkdir -p "$TARGET_DIR/assets"
+create_skill_structure "$TARGET_DIR"
 
 TEMPLATE_FILE="$ROOT_DIR/templates/skills-template.md"
 
-# Create SKILL.md if it doesn't exist
-if [ ! -f "$SKILL_FILE" ]; then
-    if [ -f "$TEMPLATE_FILE" ]; then
-        python3 -c "import sys; from pathlib import Path; template = Path(sys.argv[1]).read_text(encoding='utf-8'); content = template.replace('{{SKILL_NAME}}', sys.argv[2]).replace('{{DESCRIPTION}}', sys.argv[3]); sys.stdout.buffer.write(content.encode('utf-8'))" "$TEMPLATE_FILE" "$SKILL_NAME" "$DESCRIPTION" > "$SKILL_FILE"
-    else
-        echo "Error: Template file not found at $TEMPLATE_FILE" >&2
-        exit 1
-    fi
+# Define fallback template content
+FALLBACK_TEMPLATE='---
+name: {{SKILL_NAME}}
+description: |
+  {{DESCRIPTION}}
+---
+
+# {{SKILL_NAME}}
+
+## Overview
+{{DESCRIPTION}}
+
+## Workflow / Instructions
+1. [Step 1]
+2. [Step 2]
+
+## Available Tools & Resources
+
+### Scripts (`./scripts/`)
+- [Add scripts here]
+
+### References (`./references/`)
+- [Add references here]
+
+### Assets (`./assets/`)
+- [Add assets here]
+'
+
+# Create SKILL.md
+if [ -f "$TEMPLATE_FILE" ]; then
+    TEMPLATE_CONTENT=$(cat "$TEMPLATE_FILE")
+else
+    echo "Warning: Template file not found at $TEMPLATE_FILE. Using built-in fallback." >&2
+    TEMPLATE_CONTENT="$FALLBACK_TEMPLATE"
 fi
+
+export TEMPLATE_CONTENT
+# Use python for safe string replacement
+python3 -c "import os, sys; content = os.environ.get('TEMPLATE_CONTENT', ''); print(content.replace('{{SKILL_NAME}}', sys.argv[1]).replace('{{DESCRIPTION}}', sys.argv[2]))" "$SKILL_NAME" "$DESCRIPTION" > "$SKILL_FILE"
 
 if [ "$JSON_MODE" = true ]; then
     # Output JSON
-    # Simple JSON construction
-    echo "{"
-    echo "  \"SKILL_DIR\": \"$TARGET_DIR\","
-    echo "  \"SKILL_FILE\": \"$SKILL_FILE\","
-    echo "  \"SKILL_NAME\": \"$SKILL_NAME\","
-    echo "  \"CREATED\": true"
-    echo "}"
+    report_success "Skill created" "\"SKILL_DIR\": \"$TARGET_DIR\", \"SKILL_FILE\": \"$SKILL_FILE\", \"SKILL_NAME\": \"$SKILL_NAME\", \"CREATED\": true" "true"
 else
     echo "Skill created at: $SKILL_FILE"
+    echo "  ├── SKILL.md"
+    echo "  ├── scripts/"
+    echo "  ├── references/"
+    echo "  └── assets/"
 fi
