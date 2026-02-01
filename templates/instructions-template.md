@@ -46,6 +46,10 @@ This project documentation is distributed across several key files. You MUST ref
 - Use MCP tools for internal docs or code queries when available.
 - Verify architectural rules via the **Constitution** rather than assumptions.
 
+## Tools
+<!-- TOOLS_PLACEHOLDER -->
+[Tools section will be populated by the skills command]
+
 ## Skills
 <!-- SKILLS_PLACEHOLDER -->
 [Skills section will be populated by the skills command]
