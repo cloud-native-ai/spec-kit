@@ -1,4 +1,4 @@
-> Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于现有仓库分析生成或更新 `.ai/instructions.md`。
+> Note: `$ARGUMENTS` 为**可选补充输入**。`$ARGUMENTS` 是用户的输入，根据用户输入的不同整体的执行流程也会不同：如果 `$ARGUMENTS` 为空，则代表进行整体性的创建或更新；如果 `$ARGUMENTS` 有内容，则需要针对具体的部分内容进行更新或修改。
 
 ## User Input
 
@@ -6,7 +6,9 @@
 $ARGUMENTS
 ```
 
-You **MUST** analyze the content of `$ARGUMENTS` to determine if it contains specific project details, overriding preferences, or partial updates.
+You **MUST** analyze the content of `$ARGUMENTS` to determine the execution flow:
+- If `$ARGUMENTS` is empty: Perform a comprehensive creation or update of the instructions.
+- If `$ARGUMENTS` has content: Update or modify specific parts based on the provided input.
 
 ## Outline
 

@@ -64,8 +64,9 @@ extract_section_body() {
 
 # T007: Backup
 if [ -f "$TARGET_FILE" ]; then
-  log info "Backing up existing instructions to ${TARGET_FILE}.bak"
-  cp "$TARGET_FILE" "${TARGET_FILE}.bak"
+  BACKUP_FILE="${TARGET_FILE}-$(date '+%Y-%m-%d')"
+  log info "Backing up existing instructions to $BACKUP_FILE"
+  cp "$TARGET_FILE" "$BACKUP_FILE"
 
   log info "Performing Smart Fusion..."
 
@@ -75,7 +76,7 @@ if [ -f "$TARGET_FILE" ]; then
   render_template "$TEMPLATE_FILE" >"$TEMP_NEW"
 
   # 2. Extract "Project Overview" from OLD file (Preserve user context)
-  OLD_OVERVIEW=$(extract_section_body "${TARGET_FILE}.bak" "^## Project Overview")
+  OLD_OVERVIEW=$(extract_section_body "$BACKUP_FILE" "^## Project Overview")
 
   # 3. Construct the fused file
   if [ ! -z "$OLD_OVERVIEW" ] && [ "$OLD_OVERVIEW" != "" ]; then
