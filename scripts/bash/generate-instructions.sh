@@ -27,6 +27,19 @@ TARGET_DIR=".ai"
 
 mkdir -p "$TARGET_DIR"
 
+# Generate tools documentation
+TOOLS_DIR="$TARGET_DIR/tools"
+mkdir -p "$TOOLS_DIR"
+if [ -f "$SCRIPT_DIR/refresh-tools.sh" ]; then
+  log info "Generating tools documentation..."
+  "$SCRIPT_DIR/refresh-tools.sh" --mcp --format markdown > "$TOOLS_DIR/mcp.md"
+  "$SCRIPT_DIR/refresh-tools.sh" --system --format markdown > "$TOOLS_DIR/system.md"
+  "$SCRIPT_DIR/refresh-tools.sh" --shell --format markdown > "$TOOLS_DIR/shell.md"
+  "$SCRIPT_DIR/refresh-tools.sh" --project --format markdown > "$TOOLS_DIR/project.md"
+else
+  log warning "refresh-tools.sh not found, skipping tools documentation generation."
+fi
+
 SAFE_PROJECT_NAME=$(escape_sed "$PROJECT_NAME")
 SAFE_PROJECT_ROOT=$(escape_sed "$PROJECT_ROOT")
 SAFE_DATE=$(escape_sed "$CURRENT_DATE")

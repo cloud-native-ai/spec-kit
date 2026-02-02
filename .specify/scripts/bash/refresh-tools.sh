@@ -9,6 +9,8 @@ if [ -f "$SCRIPT_DIR/common.sh" ]; then
     source "$SCRIPT_DIR/common.sh"
     # Ensure UTF-8 locale for better Unicode handling
     ensure_utf8_locale || true
+else 
+    echo 
 fi
 
 # Set root dir
@@ -308,6 +310,7 @@ if [ -f "$MCP_SCRIPT" ]; then
     # Use the python from the virtualenv if active, or just python3
     MCP_LIST=$(python3 "$MCP_SCRIPT" 2>/dev/null || echo "[]")
 else
+
     MCP_LIST="[]"
 fi
 

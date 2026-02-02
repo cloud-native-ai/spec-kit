@@ -47,9 +47,15 @@ This project documentation is distributed across several key files. You MUST ref
 - Verify architectural rules via the **Constitution** rather than assumptions.
 
 ## Tools
+Project specific tools documentation can be found in `.ai/tools/`.
+- [MCP Tools](.ai/tools/mcp.md)
+- [System Tools](.ai/tools/system.md)
+- [Shell Tools](.ai/tools/shell.md)
+- [Project Scripts](.ai/tools/project.md)
+
 <!-- TOOLS_PLACEHOLDER -->
-[Tools section will be populated by the skills command]
 
 ## Skills
+Project specific skills documentation can be found in `.github/skills/`.
+
 <!-- SKILLS_PLACEHOLDER -->
-[Skills section will be populated by the skills command]

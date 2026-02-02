@@ -9,11 +9,11 @@ This project documentation is distributed across several key files. You MUST ref
 
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
-| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | Coding standards, architectural rules, constraints |
-| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | List of active/planned/implemented features |
+| **Constitution** | `memory/constitution.md` | Single source of truth for principles | Coding standards, architectural rules, constraints |
+| **Feature Index** | `memory/features.md` | Feature roadmap status | List of active/planned/implemented features |
+| **Development** | `CONTRIBUTING.md` | Setup and Guidelines | Setup, testing, and pull request guidelines |
 | **Architecture** | `docs/index.md` | High-level architecture | Architecture and design documentation |
-| **Quickstart** | `docs/quickstart.md` | Getting started | Setup steps and basic workflow |
-| **Installation** | `docs/installation.md` | Install guidance | Prerequisites and installation steps |
+| [Other Doc] | [Path] | [Purpose] | [Summary] |
 
 > **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
 
@@ -23,15 +23,13 @@ This project documentation is distributed across several key files. You MUST ref
 - **Last Updated**: 2026-02-02
 
 [Detected tech stack from config files]
-- **Languages**: Python 3.8+
-- **Package Manager**: pip (pyproject.toml; PEP 517/518)
-- **Build System**: hatchling
-- **Frameworks/Libraries**: Typer, Rich, HTTPX, MCP CLI
+- **Languages**: [e.g. Python 3.11+]
+- **Package Manager**: [e.g. uv]
+- **Frameworks**: [e.g. FastAPI, React]
 - **Key Directories**:
   - `src/`: Source code
-  - `scripts/`: Project scripts
-  - `docs/`: Documentation
-  - `.specify/`: Spec Kit user-installed assets for this repo
+  - `tests/`: Test suite
+  - [Other detected dirs]
 
 # Tool And Skills Usage Guide
 
@@ -48,9 +46,15 @@ This project documentation is distributed across several key files. You MUST ref
 - Verify architectural rules via the **Constitution** rather than assumptions.
 
 ## Tools
+Project specific tools documentation can be found in `.ai/tools/`.
+- [MCP Tools](.ai/tools/mcp.md)
+- [System Tools](.ai/tools/system.md)
+- [Shell Tools](.ai/tools/shell.md)
+- [Project Scripts](.ai/tools/project.md)
+
 <!-- TOOLS_PLACEHOLDER -->
-[Tools section will be populated by the skills command]
 
 ## Skills
+Project specific skills documentation can be found in `.github/skills/`.
+
 <!-- SKILLS_PLACEHOLDER -->
-[Skills section will be populated by the skills command]
