@@ -1,14 +1,12 @@
 ---
 description: Create Agent Skills
 scripts:
-   sh: |
-     cat << 'EOF' | .specify/scripts/bash/create-new-skill.sh --name "<SKILL_NAME>"
-     $ARGUMENTS
-     EOF
+   sh: scripts/bash/create-new-skill.sh --json $ARGUMENTS
 ---
 
 > Note: 
-> - Argument format `<name> - <description>`: Create a new skill (e.g., `testing - Skill for running unit tests`).
+> - Argument format: `<name> - <description>` (e.g., `testing - Unit testing utils`) 
+> - Or flags: `--name <name> --description <desc>`
 
 ## User Input
 
@@ -18,17 +16,35 @@ $ARGUMENTS
 
 ## Outline
 
-### Create New Skill
+Goal: Interactively guide the user to create a high-quality SpecKit Skill, ensuring all necessary components are properly structured and documented according to best practices.
 
-When `$ARGUMENTS` is provided (format "<name> - <description>"):
-1. Execute the `create-new-skill.sh --json "$ARGUMENTS"` script to parse input parameters.
-2. Create the new skill directory structure, including the `SKILL.md` file and resource directories (`scripts/`, `references/`, `assets/`).
-3. Return the created skill path (`SKILL_DIR`) and related information.
-4. Provide step-by-step guidance to help the user complete and refine the skill details.
-5. The newly created skill will be automatically included in the `.ai/instructions.md` file upon the next refresh.
+Execution Steps:
 
-## Error Handling
+1.  **Initialize Skill Structure**:
+    - Execute `{SCRIPT}` (which runs `create-new-skill.sh --json "$ARGUMENTS"`).
+    - Parse the JSON output to extract `SKILL_DIR`, `SKILL_NAME`, and `SKILL_DESCRIPTION`.
+    - If the script execution fails, explain the error to the user (e.g., invalid name format) and stop.
+    - Confirm the creation of the skill directory to the user.
 
-If the script execution returns an error (non-zero exit code or error status in JSON):
-- Explain the error reason to the user (e.g., invalid name format, skill name already exists).
-- Suggest the correct command format: `/speckit.skills "<name> - <description>"`
+2.  **Step 1: Understand the Goal (Interactive)**:
+    - Reference: [Understanding the Skill with Concrete Examples](#step-1-understanding-the-skill-with-concrete-examples).
+    - Engage with the user to clarify the skill's purpose if the description is brief.
+    - Ask for concrete usage examples (e.g., "What user query should trigger this skill?").
+
+3.  **Step 2: Plan Contents (Interactive)**:
+    - Reference: [Planning the Reusable Skill Contents](#step-2-planning-the-reusable-skill-contents).
+    - Based on the examples from Step 1, identify needed resources (Scripts, References, Assets).
+    - Analyze the identified needs against the [Anatomy of a Skill](#anatomy-of-a-skill) guidelines.
+    - Ask the user if they have existing files to include in the `scripts/`, `references/`, or `assets/` directories created in the new skill folder.
+
+4.  **Step 3: Edit and Refine (Interactive)**:
+    - Reference: [Edit the Skill](#step-4-edit-the-skill).
+    - Guide the user to edit `SKILL.md` in their editor. 
+    - Remind them to update the `description` in the frontmatter and the body instructions.
+    - If resources were identified in Step 2, guide the user to place them in the correct subdirectories and reference them in `SKILL.md`.
+
+5.  **Completion**:
+    - Summarize the created skill components.
+    - Verify that `SKILL.md` exists and has content.
+    - Mention the [packaging step](#step-5-packaging-a-skill) if they wish to distribute it (or just mention it's ready for local use).
+
