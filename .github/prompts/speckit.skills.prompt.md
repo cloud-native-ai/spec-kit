@@ -1,6 +1,6 @@
 > Note: 
-> - No arguments: Refresh installed skills from documentation.
-> - Argument `<name> - <description>`: Create a new skill (e.g. `testing - Skill for running unit tests`).
+> - Argument format: `<name> - <description>` (e.g., `testing - Unit testing utils`) 
+> - Or flags: `--name <name> --description <desc>`
 
 ## User Input
 
@@ -10,23 +10,34 @@ $ARGUMENTS
 
 ## Outline
 
-### Mode 1: Refresh Skills (No Arguments)
+Goal: Interactively guide the user to create a high-quality SpecKit Skill, ensuring all necessary components are properly structured and documented according to best practices.
 
-If \`$ARGUMENTS\` is empty:
-1. The script \`refresh-tools.sh\` has been executed to scan and refresh skills in \`.github/skills/\`.
-2. Check the JSON output for status and details.
-3. Report which skills were refreshed and if any missing skills were created.
+Execution Steps:
 
-### Mode 2: Create New Skill (With Arguments)
+1.  **Initialize Skill Structure**:
+    - Execute `.specify/scripts/bash/create-new-skill.sh --json $ARGUMENTS` (which runs `create-new-skill.sh --json "$ARGUMENTS"`).
+    - Parse the JSON output to extract `SKILL_DIR`, `SKILL_NAME`, and `SKILL_DESCRIPTION`.
+    - If the script execution fails, explain the error to the user (e.g., invalid name format) and stop.
+    - Confirm the creation of the skill directory to the user.
 
-If \`$ARGUMENTS\` is provided:
-1. The script \`create-new-skill.sh\` has been executed to parse the input and create the skill directory.
-2. Check the JSON output for the created skill path (\`SKILL_DIR\`).
-3. Report the completion of skill creation.
-4. Encourage the user to populate the \`SKILL.md\` and resource directories (\`.specify/scripts/\`, \`references/\`, \`assets/\`).
+2.  **Step 1: Understand the Goal (Interactive)**:
+    - Reference: [Understanding the Skill with Concrete Examples](#step-1-understanding-the-skill-with-concrete-examples).
+    - Engage with the user to clarify the skill's purpose if the description is brief.
+    - Ask for concrete usage examples (e.g., "What user query should trigger this skill?").
 
-## Error Handling
+3.  **Step 2: Plan Contents (Interactive)**:
+    - Reference: [Planning the Reusable Skill Contents](#step-2-planning-the-reusable-skill-contents).
+    - Based on the examples from Step 1, identify needed resources (Scripts, References, Assets).
+    - Analyze the identified needs against the [Anatomy of a Skill](#anatomy-of-a-skill) guidelines.
+    - Ask the user if they have existing files to include in the `.specify/scripts/`, `references/`, or `assets/` directories created in the new skill folder.
 
-If the script execution returned an error (non-zero exit code or error status in JSON):
-- Explain the error to the user (e.g., invalid name format, name already exists).
-- Suggest the correct format: \`/speckit.skills "<name> - <description>"\`
+4.  **Step 3: Edit and Refine (Interactive)**:
+    - Reference: [Edit the Skill](#step-4-edit-the-skill).
+    - Guide the user to edit `SKILL.md` in their editor. 
+    - Remind them to update the `description` in the frontmatter and the body instructions.
+    - If resources were identified in Step 2, guide the user to place them in the correct subdirectories and reference them in `SKILL.md`.
+
+5.  **Completion**:
+    - Summarize the created skill components.
+    - Verify that `SKILL.md` exists and has content.
+    - Mention the [packaging step](#step-5-packaging-a-skill) if they wish to distribute it (or just mention it's ready for local use).

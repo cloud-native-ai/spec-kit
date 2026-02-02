@@ -25,50 +25,97 @@ fi
 JSON_MODE=false
 SKILL_NAME=""
 DESCRIPTION=""
-
 CUSTOM_OUTPUT_DIR=""
+ARGS=()
 
-# Check for "Name - Description" format in first argument if it's not a flag
-if [[ "$1" != -* ]] && [[ "$1" == *" - "* ]]; then
-    # Extract name and description
-    SKILL_NAME="${1%% - *}"
-    DESCRIPTION="${1#* - }"
-    shift
+i=1
+while [ $i -le $# ]; do
+    arg="${!i}"
+    case "$arg" in
+        --json)
+            JSON_MODE=true
+            ;;
+        --name)
+            if [ $((i + 1)) -gt $# ]; then
+                echo "Error: --name requires a value" >&2
+                exit 1
+            fi
+            i=$((i + 1))
+            next_arg="${!i}"
+            if [[ "$next_arg" == --* ]]; then
+                echo "Error: --name requires a value" >&2
+                exit 1
+            fi
+            SKILL_NAME="$next_arg"
+            ;;
+        --description|--desc|-d)
+            if [ $((i + 1)) -gt $# ]; then
+                echo "Error: --description requires a value" >&2
+                exit 1
+            fi
+            i=$((i + 1))
+            next_arg="${!i}"
+            if [[ "$next_arg" == --* ]]; then
+                echo "Error: --description requires a value" >&2
+                exit 1
+            fi
+            DESCRIPTION="$next_arg"
+            ;;
+        --output-dir|-o)
+            if [ $((i + 1)) -gt $# ]; then
+                echo "Error: --output-dir requires a value" >&2
+                exit 1
+            fi
+            i=$((i + 1))
+            next_arg="${!i}"
+            if [[ "$next_arg" == --* ]]; then
+                echo "Error: --output-dir requires a value" >&2
+                exit 1
+            fi
+            CUSTOM_OUTPUT_DIR="$next_arg"
+            ;;
+        --help|-h)
+            echo "Usage: $0 [--json] [--name <name>] [--description <desc>] [--output-dir <dir>] [<skill_string>]"
+            echo ""
+            echo "Options:"
+            echo "  --json                  Output in JSON format"
+            echo "  --name <name>           Skill name"
+            echo "  --description, -d <desc> Skill description"
+            echo "  --output-dir, -o <dir>  Custom output directory"
+            echo "  --help, -h              Show this help message"
+            echo ""
+            echo "Behavior:"
+            echo "  - If skill_string is provided in format 'Name - Description', it parses name and description."
+            echo "  - Otherwise, positional arguments are treated as description if name is provided via flag."
+            echo ""
+            exit 0
+            ;;
+        *)
+            ARGS+=("$arg")
+            ;;
+    esac
+    i=$((i + 1))
+done
+
+POSITIONAL_INPUT="${ARGS[*]}"
+
+# Try to parse 'Name - Description' from positional input if name not set
+IS_NAME_DESC_FORMAT=false
+if [ -z "$SKILL_NAME" ] && [[ "$POSITIONAL_INPUT" == *" - "* ]]; then
+    SKILL_NAME="${POSITIONAL_INPUT%% - *}"
+    if [ -z "$DESCRIPTION" ]; then
+        DESCRIPTION="${POSITIONAL_INPUT#* - }"
+    fi
+    IS_NAME_DESC_FORMAT=true
 fi
 
-# Parse arguments
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    --json)
-      JSON_MODE=true
-      shift
-      ;;
-    --name)
-      SKILL_NAME="$2"
-      shift
-      shift
-      ;;
-    --description|--desc|-d)
-      DESCRIPTION="$2"
-      shift
-      shift
-      ;;
-    --output-dir|-o)
-      CUSTOM_OUTPUT_DIR="$2"
-      shift
-      shift
-      ;;
-    *)
-      # Accumulate other args as description if not set
-      if [ -z "$DESCRIPTION" ]; then
-          DESCRIPTION="$1"
-      else
-          DESCRIPTION="$DESCRIPTION $1"
-      fi
-      shift
-      ;;
-  esac
-done
+if [ "$IS_NAME_DESC_FORMAT" = false ] && [ -n "$POSITIONAL_INPUT" ]; then
+    if [ -z "$DESCRIPTION" ]; then
+        DESCRIPTION="$POSITIONAL_INPUT"
+    else
+        DESCRIPTION="$DESCRIPTION $POSITIONAL_INPUT"
+    fi
+fi
 
 # Read from stdin if available, regardless of arguments
 STDIN_INPUT=""
@@ -128,6 +175,17 @@ fi
 
 # Create directory structure
 create_skill_structure "$TARGET_DIR"
+
+# Create tools directory and populate it
+mkdir -p "$TARGET_DIR/tools"
+if [ -f "$SCRIPT_DIR/refresh-tools.sh" ]; then
+    "$SCRIPT_DIR/refresh-tools.sh" --mcp --format markdown > "$TARGET_DIR/tools/mcp.md"
+    "$SCRIPT_DIR/refresh-tools.sh" --system --format markdown > "$TARGET_DIR/tools/system.md"
+    "$SCRIPT_DIR/refresh-tools.sh" --shell --format markdown > "$TARGET_DIR/tools/shell.md"
+    "$SCRIPT_DIR/refresh-tools.sh" --project --format markdown > "$TARGET_DIR/tools/project.md"
+else
+    echo "Warning: refresh-tools.sh not found, skipping tools documentation generation." >&2
+fi
 
 # Detect template path
 if [ -f "$ROOT_DIR/.specify/templates/skills-template.md" ]; then
