@@ -35,6 +35,47 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Generate tools.md
+TOOLS_DOC="$ROOT_DIR/.specify/memory/tools.md"
+MCP_SCRIPT="$ROOT_DIR/.specify/scripts/python/list_mcp_tools.py"
+
+# Ensure directory exists
+mkdir -p "$(dirname "$TOOLS_DOC")"
+
+# Try to get MCP tools list, default to empty list on failure
+if [ -f "$MCP_SCRIPT" ]; then
+    # Use the python from the virtualenv if active, or just python3
+    MCP_LIST=$(python3 "$MCP_SCRIPT" 2>/dev/null || echo "[]")
+else
+    MCP_LIST="[]"
+fi
+
+if [ -z "$MCP_LIST" ]; then MCP_LIST="[]"; fi
+
+{
+    echo "# Helper Tools Index"
+    echo "This document indexes available tools for the agent."
+    echo ""
+    echo "## MCP Tools"
+    echo '```json'
+    # Format with jq if available, otherwise raw
+    if command -v jq >/dev/null 2>&1; then
+        echo "$MCP_LIST" | jq '.'
+    else
+        echo "$MCP_LIST"
+    fi
+    echo '```'
+    echo ""
+    echo "## System Binaries"
+    echo "Standard executables in PATH (checked via 'command -v' or 'which')."
+    echo ""
+    echo "## Shell Environment"
+    echo "Active environment variables and shell functions."
+    echo ""
+    echo "## Project Scripts"
+    echo "Automation scripts located in the project 'scripts/' directory."
+} > "$TOOLS_DOC"
+
 echo "Refreshing skills in $SKILLS_DIR..."
 
 # T008: Create directory if not exists
