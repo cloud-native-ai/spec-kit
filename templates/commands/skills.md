@@ -22,29 +22,48 @@ Execution Steps:
 
 1.  **Initialize Skill Structure**:
     - Execute `{SCRIPT}` (which runs `create-new-skill.sh --json "$ARGUMENTS"`).
-    - Parse the JSON output to extract `SKILL_DIR`, `SKILL_NAME`, and `SKILL_DESCRIPTION`.
-    - If the script execution fails, explain the error to the user (e.g., invalid name format) and stop.
-    - Confirm the creation of the skill directory to the user.
+    - Parse JSON output for `SKILL_DIR`, `SKILL_NAME`, `SKILL_DESCRIPTION`.
+    - Detect failure: If script errors, show clear reason and stop.
+    - Confirm success: "Created skill backbone at `SKILL_DIR`."
 
-2.  **Step 1: Understand the Goal (Interactive)**:
-    - Reference: [Understanding the Skill with Concrete Examples](#step-1-understanding-the-skill-with-concrete-examples).
-    - Engage with the user to clarify the skill's purpose if the description is brief.
-    - Ask for concrete usage examples (e.g., "What user query should trigger this skill?").
+2.  **Sequential Configuration Loop (Interactive)**:
+    - **Constraint**: Ask **EXACTLY ONE** question at a time. Wait for user response before proceeding.
+    - **Style**: Use "recommended" defaults to minimize typing (answer "yes" to accept).
 
-3.  **Step 2: Plan Contents (Interactive)**:
-    - Reference: [Planning the Reusable Skill Contents](#step-2-planning-the-reusable-skill-contents).
-    - Based on the examples from Step 1, identify needed resources (Scripts, References, Assets).
-    - Analyze the identified needs against the [Anatomy of a Skill](#anatomy-of-a-skill) guidelines.
-    - Ask the user if they have existing files to include in the `scripts/`, `references/`, or `assets/` directories created in the new skill folder.
+    **Q1: Clarify Triggers** (Skip if description provided is already specific, >10 words)
+    - Context: Skills need clear triggers to be selected by the agent.
+    - Question: "What specific user intent or query should trigger this skill?"
+    - **Suggested Answer**: Generate a specific trigger sentence based on `SKILL_NAME`.
+    - Format: `**Suggested:** <Sentence> - (Reply "yes" to accept or type your own)`
 
-4.  **Step 3: Edit and Refine (Interactive)**:
-    - Reference: [Edit the Skill](#step-4-edit-the-skill).
-    - Guide the user to edit `SKILL.md` in their editor. 
-    - Remind them to update the `description` in the frontmatter and the body instructions.
-    - If resources were identified in Step 2, guide the user to place them in the correct subdirectories and reference them in `SKILL.md`.
+    **Q2: Resource Strategy**
+    - Context: Decide which resource folder to prioritize.
+    - Question: "What creates the most value in this skill?"
+    - **Analysis**: Suggest an option based on Q1.
+    - Options Table:
+      | Opt | Resource Type | Best Usage |
+      |-----|---------------|------------|
+      | A | **Scripts** (`/scripts`) | Deterministic logic, API calls, data transformation |
+      | B | **References** (`/references`) | Schemas, API docs, large text context |
+      | C | **Assets** (`/assets`) | Templates, boilerplates, files to copy to user |
+      | D | **Instructions** (Pure) | Logic complex enough to handle with just prompt engineering |
+    - Format: Present options, highlight recommendation (`**Recommended:** Option A...`), ask for selection.
 
-5.  **Completion**:
-    - Summarize the created skill components.
-    - Verify that `SKILL.md` exists and has content.
-    - Mention the [packaging step](#step-5-packaging-a-skill) if they wish to distribute it (or just mention it's ready for local use).
+    **Q3: Content Source** (If Q2 is A, B, or C)
+    - Question: "Do you have existing files to import for this?"
+    - Options:
+      - **Yes**: "I'll guide you to copy them."
+      - **No**: "We will create a placeholder/template."
+
+3.  **Tailored Implementation**:
+    - Provide specific actions based on Q2 & Q3.
+    - **If Scripts**: "Create your script in `{SKILL_DIR}/scripts/`. Remember to make it executable."
+    - **If References**: "Add your markdown/text files to `{SKILL_DIR}/references/`."
+    - **If Assets**: "Place template files in `{SKILL_DIR}/assets/`."
+    - **Action**: Instruct user to open `{SKILL_DIR}/SKILL.md` and update the `description` field with the accepted answer from Q1.
+
+4.  **Completion**:
+    - Summarize what was created.
+    - Verify `SKILL.md` exists.
+    - Mention packaging: "When ready to share, run `scripts/package_skill.py {SKILL_DIR}`."
 
