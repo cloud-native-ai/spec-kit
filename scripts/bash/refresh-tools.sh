@@ -180,16 +180,30 @@ get_project_scripts_json() {
         local name
         name=$(basename "$file")
         local type="bash"
+        local description=""
+
         if [[ "$file" == *.py ]]; then
             type="python"
+            if command -v python3 >/dev/null 2>&1; then
+                description=$(python3 -c "import ast; print((ast.get_docstring(ast.parse(open('$file').read())) or '').split('\n')[0])" 2>/dev/null || true)
+            fi
+        else
+            # Get first non-shebang comment
+            description=$(grep '^#' "$file" | grep -v '^#!' | head -n 1 | sed 's/^#[[:space:]]*//')
         fi
+        
+        # Default description if empty
+        if [ -z "$description" ]; then
+            description="No description available"
+        fi
+
         if [ "$first" = true ]; then
             first=false
         else
             printf ','
         fi
-        printf '{"name":"%s","path":"%s","type":"%s"}' \
-            "$(json_escape "$name")" "$(json_escape "$rel_path")" "$(json_escape "$type")"
+        printf '{"name":"%s","path":"%s","type":"%s","description":"%s"}' \
+            "$(json_escape "$name")" "$(json_escape "$rel_path")" "$(json_escape "$type")" "$(json_escape "$description")"
     done < <(find "$scripts_dir" -type f \( -name "*.sh" -o -name "*.py" \) | sort)
     printf ']'
 }
@@ -280,8 +294,8 @@ print_project_scripts_markdown() {
     if command -v jq >/dev/null 2>&1; then
         echo "$json" | jq -r '
             if length > 0 then
-                "| Script | Path | Type |\n|---|---|---|",
-                (.[] | "| " + .name + " | " + .path + " | " + .type + " |")
+                "| Script | Description | Path | Type |\n|---|---|---|---|",
+                (.[] | "| " + .name + " | " + .description + " | " + .path + " | " + .type + " |")
             else
                 "No project scripts found."
             end'
