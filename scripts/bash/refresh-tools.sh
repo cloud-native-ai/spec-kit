@@ -82,11 +82,11 @@ TOOLS_DOC="$ROOT_DIR/.specify/memory/tools.md"
 
 json_escape() {
     local value="$1"
-    value=${value//\\/\\\\}
-    value=${value//"/\\"}
-    value=${value//$'\n'/\\n}
-    value=${value//$'\r'/\\r}
-    value=${value//$'\t'/\\t}
+    value="${value//\\/\\\\}"
+    value="${value//\"/\\\"}"
+    value="${value//$'\n'/\\n}"
+    value="${value//$'\r'/\\r}"
+    value="${value//$'\t'/\\t}"
     printf '%s' "$value"
 }
 
@@ -109,9 +109,18 @@ get_mcp_tools_json() {
 }
 
 get_system_binaries_json() {
+    local os_release=""
+    if [ -f /etc/os-release ]; then
+        os_release=$(cat /etc/os-release)
+    fi
+    local kernel
+    kernel=$(uname -a)
+
     local binaries=(git docker kubectl python3 python pip node npm hatch gh jq curl wget make)
+    
+    printf '{"os_release":"%s","kernel":"%s","binaries":[' "$(json_escape "$os_release")" "$(json_escape "$kernel")"
+
     local first=true
-    printf '['
     for b in "${binaries[@]}"; do
         local path
         path=$(command -v "$b" 2>/dev/null || true)
@@ -124,25 +133,33 @@ get_system_binaries_json() {
             printf '{"name":"%s","path":"%s"}' "$(json_escape "$b")" "$(json_escape "$path")"
         fi
     done
-    printf ']'
+    printf ']}'
 }
 
-get_shell_env_json() {
-    local keys=(SHELL TERM USER LANG PWD VIRTUAL_ENV SSH_CONNECTION EDITOR VISUAL)
+get_shell_function_json() {
     local first=true
-    printf '{'
-    for k in "${keys[@]}"; do
-        local value="${!k-}"
-        if [ -n "$value" ]; then
-            if [ "$first" = true ]; then
-                first=false
-            else
-                printf ','
-            fi
-            printf '"%s":"%s"' "$(json_escape "$k")" "$(json_escape "$value")"
+    printf '['
+    # Use compgen to list all functions
+    # define mapping to skip internal functions of this script
+    local skip_funcs="json_escape|get_mcp_tools_json|get_system_binaries_json|get_shell_function_json|get_project_scripts_json|print_mcp_tools_markdown|print_system_binaries_markdown|print_shell_function_markdown|print_project_scripts_markdown|ensure_utf8_locale|report_error|report_success|validate_skill_name|create_skill_structure"
+    
+    while IFS= read -r func; do
+        if [[ "$func" =~ ^($skip_funcs)$ ]]; then
+            continue
         fi
-    done
-    printf '}'
+        
+        # Get function definition (first line only, effectively the signature)
+        local def
+        def=$(declare -f "$func" | head -n 10)
+        
+        if [ "$first" = true ]; then
+            first=false
+        else
+            printf ','
+        fi
+        printf '{"name":"%s","definition":"%s"}' "$(json_escape "$func")" "$(json_escape "$def")"
+    done < <(compgen -A function | sort)
+    printf ']'
 }
 
 get_project_scripts_json() {
@@ -183,13 +200,24 @@ print_mcp_tools_markdown() {
     echo "## MCP Tools"
     if command -v jq >/dev/null 2>&1; then
         echo "$json" | jq -r '
+            def format_args:
+                if (.inputSchema and .inputSchema.properties and (.inputSchema.properties | length > 0)) then
+                    "\n  - Arguments:\n" +
+                    (.inputSchema.properties | to_entries | map("    - `" + .key + "` (" + (.value.type // "any") + ")" + (if .value.description then ": " + .value.description else "" end)) | join("\n"))
+                else
+                    ""
+                end;
+
             if type=="object" and .servers then
                 .servers[] | (
-                    "### " + (.name // "Unknown Server"),
-                    (.tools[]? | "- **" + (.name // "Unknown") + "**: " + (.description // "No description"))
+                    "### " + (.name // "Unknown Server") + "\n",
+                    (.tools[]? | 
+                        "- **" + (.name // "Unknown") + "**: " + (.description // "No description") + format_args
+                    )
                 )
             else
-                .[] | "- **" + (.name // "Unknown") + "**: " + (.description // "No description")
+                .[] | 
+                "- **" + (.name // "Unknown") + "**: " + (.description // "No description") + format_args
             end'
     else
         echo '```json'
@@ -200,67 +228,68 @@ print_mcp_tools_markdown() {
 }
 
 print_system_binaries_markdown() {
+    local json
+    json=$(get_system_binaries_json)
+    
     echo "## System Information"
-    if [ -f /etc/os-release ]; then
-        echo "### OS Release"
-        echo '```'
-        cat /etc/os-release
+    if command -v jq >/dev/null 2>&1; then
+        echo "$json" | jq -r '
+            if .os_release != "" then
+                "### OS Release\n```\n" + .os_release + "\n```\n"
+            else "" end,
+            "### Kernel\n`" + .kernel + "`\n",
+            "### System Binaries\n| Binary | Path |\n|---|---|",
+            (.binaries[] | "| " + .name + " | " + .path + " |")
+        '
+    else
+        # Fallback to json dump
+        echo '```json'
+        echo "$json"
         echo '```'
     fi
-
-    echo "### Kernel"
-    echo "\`$(uname -a)\`"
-    echo ""
-
-    local binaries=(git docker kubectl python3 python pip node npm hatch gh jq curl wget make)
-    echo "### System Binaries"
-    echo "| Binary | Path |"
-    echo "|---|---|"
-    for b in "${binaries[@]}"; do
-        local path
-        path=$(command -v "$b" 2>/dev/null || true)
-        if [ -n "$path" ]; then
-            echo "| $b | $path |"
-        fi
-    done
     echo ""
 }
 
-print_shell_env_markdown() {
-    local keys=(SHELL TERM USER LANG PWD VIRTUAL_ENV SSH_CONNECTION EDITOR VISUAL)
-    echo "## Shell Environment"
-    for k in "${keys[@]}"; do
-        local value="${!k-}"
-        if [ -n "$value" ]; then
-            echo "- **$k**: \`$value\`"
-        fi
-    done
+print_shell_function_markdown() {
+    local json
+    json=$(get_shell_function_json)
+    echo "## Shell Functions"
+    if command -v jq >/dev/null 2>&1; then
+        echo "$json" | jq -r '
+            if length > 0 then
+                .[] | ("### " + .name + "\n```bash\n" + .definition + "\n```\n")
+            else
+                "No custom shell functions found."
+            end'
+    else
+        echo '```json'
+        echo "$json"
+        echo '```'
+    fi
     echo ""
 }
 
 print_project_scripts_markdown() {
-    local scripts_dir=""
-    if [ -d "$ROOT_DIR/.specify/scripts" ]; then
-        scripts_dir="$ROOT_DIR/.specify/scripts"
-    elif [ -d "$ROOT_DIR/scripts" ]; then
-        scripts_dir="$ROOT_DIR/scripts"
-    else
+    local json
+    json=$(get_project_scripts_json)
+    if [ "$json" = "[]" ]; then
         return
     fi
-
+    
     echo "## Project Scripts"
-    echo "| Script | Path | Type |"
-    echo "|---|---|---|"
-    while IFS= read -r file; do
-        local rel_path="${file#$ROOT_DIR/}"
-        local name
-        name=$(basename "$file")
-        local type="bash"
-        if [[ "$file" == *.py ]]; then
-            type="python"
-        fi
-        echo "| $name | $rel_path | $type |"
-    done < <(find "$scripts_dir" -type f \( -name "*.sh" -o -name "*.py" \) | sort)
+    if command -v jq >/dev/null 2>&1; then
+        echo "$json" | jq -r '
+            if length > 0 then
+                "| Script | Path | Type |\n|---|---|---|",
+                (.[] | "| " + .name + " | " + .path + " | " + .type + " |")
+            else
+                "No project scripts found."
+            end'
+    else
+        echo '```json'
+        echo "$json"
+        echo '```'
+    fi
     echo ""
 }
 
@@ -274,7 +303,7 @@ if [ "$IS_QUERY_MODE" = true ]; then
             print_system_binaries_markdown
         fi
         if [ "$QUERY_SHELL" = true ]; then
-            print_shell_env_markdown
+            print_shell_function_markdown
         fi
         if [ "$QUERY_PROJECT" = true ]; then
             print_project_scripts_markdown
@@ -304,7 +333,7 @@ if [ "$IS_QUERY_MODE" = true ]; then
             else
                 printf ','
             fi
-            printf '"shell_environment":%s' "$(get_shell_env_json)"
+            printf '"shell_functions":%s' "$(get_shell_function_json)"
         fi
         if [ "$QUERY_PROJECT" = true ]; then
             if [ "$first" = true ]; then
@@ -354,12 +383,9 @@ if [ -z "$MCP_LIST" ]; then MCP_LIST="[]"; fi
     echo "## System Binaries"
     echo "Standard executables in PATH (checked via 'command -v' or 'which')."
     echo ""
-    echo "## Shell Environment"
-    echo "Active environment variables and shell functions."
+    echo "## Shell Functions"
+    echo "Custom shell functions defined in the active session."
     echo ""
     echo "## Project Scripts"
     echo "Automation scripts located in the project 'scripts/' directory."
 }
-
-
-
