@@ -13,7 +13,7 @@ $ARGUMENTS
 ### Mode 1: Refresh Skills (No Arguments)
 
 If \`$ARGUMENTS\` is empty:
-1. The script \`refresh-skills.sh\` has been executed to scan and refresh skills in \`.github/skills/\`.
+1. The script \`refresh-tools.sh\` has been executed to scan and refresh skills in \`.github/skills/\`.
 2. Check the JSON output for status and details.
 3. Report which skills were refreshed and if any missing skills were created.
 

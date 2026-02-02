@@ -416,3 +416,8 @@ report_success() {
         echo "$message"
     fi
 }
+
+# helper to escape for sed
+escape_sed() {
+    echo "$1" | sed 's/[\/&]/\\&/g'
+}
