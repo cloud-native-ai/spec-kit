@@ -1402,7 +1402,7 @@ def init(
         "",
         "○ [cyan]/speckit.clarify[/] [bright_black](optional)[/bright_black] - Ask structured questions to de-risk ambiguous areas before planning (run before [cyan]/speckit.plan[/] if used)",
         "○ [cyan]/speckit.analyze[/] [bright_black](optional)[/bright_black] - Cross-artifact consistency & alignment report (after [cyan]/speckit.tasks[/], before [cyan]/speckit.implement[/])",
-        "○ [cyan]/speckit.checklist[/] [bright_black](optional)[/bright_black] - Generate quality checklists to validate requirements completeness, clarity, and consistency (after [cyan]/speckit.plan[/])",
+        "○ [cyan]/speckit.checklist[/] [bright_black](optional)[/bright_black] - Generate quality checklists to validate Requirements (What) completeness, clarity, and consistency (after [cyan]/speckit.requirements[/]; optionally re-run after [cyan]/speckit.plan[/] for traceability)",
         "○ [cyan]/speckit.review[/] [bright_black](optional)[/bright_black] - Review the full SDD artifact set for a feature and summarize it (after [cyan]/speckit.implement[/])",
     ]
     enhancements_panel = Panel(
