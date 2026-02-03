@@ -1,9 +1,18 @@
 ---
 description: Generate a custom checklist for the current feature based on user requirements.
 handoffs:
-  - label: Back to Plan
-    agent: speckit.plan
-    prompt: Review the plan against the checklist
+   - label: Back to Plan
+      agent: speckit.plan
+      prompt: Review or adjust the plan to satisfy checklist items.
+      send: true
+   - label: Back to Tasks
+      agent: speckit.tasks
+      prompt: Update/regenerate tasks to include quality gates implied by the checklist.
+      send: true
+   - label: Implement Project
+      agent: speckit.implement
+      prompt: Proceed with implementation once checklist items are satisfied.
+      send: true
 scripts:
   sh: scripts/bash/check-prerequisites.sh --json
 ---
@@ -315,3 +324,14 @@ Sample items:
 - Correct: Validation of requirement quality
 - Wrong: "Does it do X?"
 - Correct: "Is X clearly specified?"
+
+## Handoffs
+
+**Before running this command**:
+
+- Run after you have a requirements specification (and ideally a plan/tasks) so the checklist can be grounded.
+
+**After running this command**:
+
+- If checklist items fail, iterate on `/speckit.plan` and/or `/speckit.tasks` until they pass.
+- Once checklist items are satisfied (or explicitly accepted as deferred), proceed to `/speckit.implement`.

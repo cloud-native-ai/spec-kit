@@ -1,12 +1,10 @@
 ---
-description: The feature command supports three modes—global refresh with no args, context-driven mining (e.g. git commit id), and description-only index locate/refresh—updating memory/features.md and .specify/memory/features/<ID>.md accordingly.
-handoffs: 
-   - label: Update Feature Index
-      agent: speckit.feature
-      prompt: Refresh project feature summary and index based on the latest specs and plans.
-   - label: Build Specification
-      agent: speckit.specify
-      prompt: Implement the feature specification based on the updated feature index. I want to build...
+description: Maintain and refresh the project feature registry (index + per-feature detail files) based on repo context.
+handoffs:
+  - label: Create / Update Requirements
+    agent: speckit.requirements
+    prompt: Create or update a requirements specification for the target feature.
+    send: true
 ---
 
 > Note: `$ARGUMENTS` is **optional**. This command supports three modes:
@@ -141,11 +139,14 @@ present (pick what exists in the repo):
 - Feature detail links MUST point to `.specify/memory/features/[FEATURE_ID].md`.
 - Do NOT modify `.specify/templates/feature-details-template.md`; only instantiate copies.
 
-## Follow Up
+## Handoffs
 
-- After running `spec → plan → tasks → implement`, review whether features should be added/merged/split
-  and sync `.specify/memory/features/*.md` accordingly.
-- Ensure feature changes remain traceable to the spec/plan evidence (record in “key changes/notes”).
-- Suggested commit message:
-  - `docs: refresh feature index`
-  - `feat: add feature 00X <slug>`
+**Before running this command**:
+
+- Run `/speckit.constitution` if you are changing governance rules that affect feature definitions.
+- Ensure you have enough repo context (README/docs) for feature mining or refresh.
+
+**After running this command**:
+
+- Typically proceed to `/speckit.requirements` to produce a requirements specification for a chosen feature.
+- If feature scope or naming changes, keep them traceable to the most recent spec/plan evidence.

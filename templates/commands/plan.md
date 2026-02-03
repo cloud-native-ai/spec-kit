@@ -1,6 +1,6 @@
 ---
 description: Implement the implementation planning workflow using the plan template to generate design artifacts.
-handoffs: 
+handoffs:
   - label: Create Tasks
     agent: speckit.tasks
     prompt: Break the plan into tasks
@@ -138,3 +138,15 @@ This integration ensures that all feature planning activities are properly track
 
 - Use absolute paths
 - ERROR on gate failures or unresolved clarifications
+
+## Handoffs
+
+**Before running this command**:
+
+- Ensure `/speckit.requirements` has produced a requirements specification.
+- If `requirements.md` contains any `[NEEDS CLARIFICATION]`, run `/speckit.clarify` first.
+
+**After running this command**:
+
+- Typically run `/speckit.tasks` to decompose the plan into an executable task list.
+- Optionally run `/speckit.checklist` to introduce domain-specific quality gates before implementation.

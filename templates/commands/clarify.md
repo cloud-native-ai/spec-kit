@@ -1,9 +1,10 @@
 ---
 description: Identify underspecified areas in the current feature spec by asking up to 5 highly targeted clarification questions and encoding answers back into the spec.
-handoffs: 
-  - label: Build Technical Plan
-    agent: speckit.plan
-    prompt: Create a plan for the spec. I am building with...
+handoffs:
+   - label: Build Technical Plan
+      agent: speckit.plan
+      prompt: Generate an implementation plan after ambiguities are resolved.
+      send: true
 scripts:
    sh: scripts/bash/research-project.sh --json
 ---
@@ -191,3 +192,13 @@ Behavior rules:
 - If quota reached with unresolved high-impact categories remaining, explicitly flag them under Deferred with rationale.
 
 Context for prioritization: {ARGS}
+
+## Handoffs
+
+**Before running this command**:
+
+- Run `/speckit.requirements` first to produce or update `requirements.md`.
+
+**After running this command**:
+
+- Proceed to `/speckit.plan` once key ambiguities are resolved.

@@ -1,5 +1,18 @@
 ---
 description: Review SDD process quality across artifacts and recommend improvements to speckit/SDD.
+handoffs:
+   - label: Analyze For Consistency
+      agent: speckit.analyze
+      prompt: Run a read-only consistency analysis to catch cross-artifact drift.
+      send: true
+   - label: Refine Requirements
+      agent: speckit.requirements
+      prompt: Refine the requirements specification based on review findings.
+      send: true
+   - label: Adjust Plan
+      agent: speckit.plan
+      prompt: Adjust the implementation plan based on review findings.
+      send: true
 scripts:
   sh: scripts/bash/check-prerequisites.sh --json --require-spec --include-spec --include-plan --include-tasks
 ---
@@ -79,3 +92,14 @@ Note: `/speckit.feature` manages the long-lived feature registry under `.specify
 6. `/speckit.review` – review SDD artifact quality and provide improvement suggestions for the workflow itself
 
 Use `/speckit.review` whenever you want to evaluate the **quality of the SDD process** and refine speckit/SDD practices based on the current artifact set.
+
+## Handoffs
+
+**Before running this command**:
+
+- Run after `/speckit.implement` so there is a complete artifact chain to review.
+
+**After running this command**:
+
+- Apply improvements by iterating on `/speckit.requirements` and/or `/speckit.plan`.
+- Optionally run `/speckit.analyze` to validate cross-artifact consistency after revisions.

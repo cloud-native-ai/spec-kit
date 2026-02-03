@@ -1,7 +1,12 @@
 ---
 description: Create Agent Skills
+handoffs:
+  - label: Update Instructions
+    agent: speckit.instructions
+    prompt: Update project instructions so the new skill is discoverable.
+    send: true
 scripts:
-   sh: scripts/bash/create-new-skill.sh --json $ARGUMENTS
+  sh: scripts/bash/create-new-skill.sh --json $ARGUMENTS
 ---
 
 > Note: 
@@ -66,4 +71,14 @@ Execution Steps:
     - Summarize what was created.
     - Verify `SKILL.md` exists.
     - Mention packaging: "When ready to share, run `scripts/package_skill.py {SKILL_DIR}`."
+
+## Handoffs
+
+**Before running this command**:
+
+- Use when you need to add a new reusable agent skill or refresh existing ones.
+
+**After running this command**:
+
+- Run `/speckit.instructions` so the project-level instructions reflect available skills.
 

@@ -12,19 +12,41 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 
 | Command | Purpose | Typical Workflow Stage |
 |---------|---------|----------------------|
-| `speckit.requirements` | Create/update the requirements specification | Specification |
-| `speckit.clarify` | Clarify ambiguous requirements | Specification |
-| `speckit.plan` | Generate implementation plans | Planning |
-| `speckit.tasks` | Break down plans into actionable tasks | Planning |
-| `speckit.implement` | Implement tasks with validation | Implementation |
-| `speckit.analyze` | Analyze consistency across artifacts | Quality Assurance |
-| `speckit.checklist` | Generate quality checklists | Quality Assurance |
-| `speckit.review` | Review implementations against specs | Quality Assurance |
-| `speckit.research` | Conduct technical research | Research |
-| `speckit.constitution` | Manage project constitution | Governance |
-| `speckit.feature` | Manage feature registry | Governance |
-| `speckit.skills` | Manage specialized skills | Extension |
-| `speckit.instructions` | Generate usage instructions | Documentation |
+| `/speckit.requirements` | Create/update the requirements specification | Specification |
+| `/speckit.clarify` | Clarify ambiguous requirements | Specification |
+| `/speckit.plan` | Generate implementation plans | Planning |
+| `/speckit.tasks` | Break down plans into actionable tasks | Planning |
+| `/speckit.implement` | Implement tasks with validation | Implementation |
+| `/speckit.analyze` | Analyze consistency across artifacts | Quality Assurance |
+| `/speckit.checklist` | Generate quality checklists | Quality Assurance |
+| `/speckit.review` | Review implementations against specs | Quality Assurance |
+| `/speckit.research` | Conduct technical research | Research |
+| `/speckit.constitution` | Manage project constitution | Governance |
+| `/speckit.feature` | Manage feature registry | Governance |
+| `/speckit.skills` | Manage specialized skills | Extension |
+| `/speckit.instructions` | Generate usage instructions | Documentation |
+
+## Command Relationships (Prerequisites & Next Steps)
+
+Spec Kit 的命令不是独立使用的。下面这张表用“常见前置 / 常见后续”的方式，把核心主路径、可选分支与返工环路明确下来。
+
+> 规则：如果 requirements/spec 中存在 `[NEEDS CLARIFICATION]`，优先走 `/speckit.clarify`；如果要进入实现阶段，建议先完成相关 checklist。
+
+| Command | Common prerequisites | Common next commands | Notes |
+|---------|----------------------|---------------------|-------|
+| `/speckit.instructions` | Repo available | `/speckit.skills` | 生成/更新 AI 指引与兼容链接，通常用于初始化或文档更新后同步。 |
+| `/speckit.skills` | (Optional) `/speckit.instructions` | (Depends) | 创建/刷新技能；不直接进入 core 生命周期，但会影响后续 agent 上下文。 |
+| `/speckit.constitution` | Repo available | `/speckit.feature`, `/speckit.requirements` | 修改治理规则后，应重新审视 feature 与 requirements。 |
+| `/speckit.feature` | (Optional) `/speckit.constitution` | `/speckit.requirements` | 建立/刷新长期 Feature 注册表，为规格与计划提供“主干”。 |
+| `/speckit.requirements` | (Optional) `/speckit.feature` | `/speckit.clarify`, `/speckit.plan` | 产出 requirements.md；若存在歧义标记，先 clarify 再 plan。 |
+| `/speckit.clarify` | `/speckit.requirements` | `/speckit.plan` | 解决关键歧义（并回写到 requirements.md），避免下游返工。 |
+| `/speckit.research` | `/speckit.requirements` (or) `/speckit.plan` | `/speckit.plan` | 缺信息/需要决策依据时使用；研究结论应反馈到 plan。 |
+| `/speckit.plan` | `/speckit.requirements` (clarify done if needed) | `/speckit.tasks`, `/speckit.checklist` | 产出 plan.md 及相关设计产物；下一步通常拆 tasks。 |
+| `/speckit.tasks` | `/speckit.plan` | `/speckit.analyze`, `/speckit.checklist`, `/speckit.implement` | 产出 tasks.md；可先 analyze 做一致性检查，再实现。 |
+| `/speckit.analyze` | `/speckit.tasks` | `/speckit.requirements`, `/speckit.plan`, `/speckit.tasks`, `/speckit.implement` | 严格只读；输出问题清单与修复建议，必要时先回到上游修订。 |
+| `/speckit.checklist` | `/speckit.requirements` (or) `/speckit.plan` (or) `/speckit.tasks` | `/speckit.plan`, `/speckit.implement` | 作为质量门槛：不通过则建议回到 plan/tasks 修订。 |
+| `/speckit.implement` | `/speckit.tasks` (and ideally checklists completed) | `/speckit.review` | 进入实现与验证；如缺 tasks，先回到 tasks。 |
+| `/speckit.review` | `/speckit.implement` | `/speckit.analyze`, `/speckit.requirements`, `/speckit.plan` | 复盘流程质量与改进建议；必要时回到上游迭代。 |
 
 ## Detailed Command Reference
 

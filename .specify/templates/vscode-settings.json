@@ -11,7 +11,7 @@
     "speckit.research": true,
     "speckit.review": true,
     "speckit.skills": true,
-    "speckit.specify": true,
+    "speckit.requirements": true,
     "speckit.tasks": true
   },
   "chat.tools.terminal.autoApprove": {

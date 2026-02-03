@@ -47,4 +47,13 @@ You **MUST** analyze the content of `$ARGUMENTS` to determine the execution flow
 5. **Report**:
    - Report the full path of the instructions file (`.ai/instructions.md`).
    - Confirm that symlinks for Copilot, Cline, Lingma, Trae, and Qoder have been established.
-   - **Next Step**: Recommend running `/speckit.skills` to automatically populate the Tools and Skills sections.
+
+## Handoffs
+
+**Before running this command**:
+
+- Run when you need to (re)generate project-wide AI instructions or compatibility symlinks.
+
+**After running this command**:
+
+- Run `/speckit.skills` to populate the Tools and Skills sections based on the project scan.

@@ -1,18 +1,19 @@
 ---
 description: Create or update the Requirements from a natural language feature description.
-handoffs: 
-  - label: Build Technical Plan
-    agent: speckit.plan
-    prompt: Create a plan for the spec. I am building with...
-  - label: Clarify Spec Requirements
-    agent: speckit.clarify
-    prompt: Clarify specification requirements
-    send: true
+handoffs:
+   - label: Clarify Requirements
+      agent: speckit.clarify
+      prompt: Resolve any underspecified areas in the requirements specification.
+      send: true
+   - label: Build Technical Plan
+      agent: speckit.plan
+      prompt: Generate an implementation plan based on the requirements specification.
+      send: true
 scripts:
    sh: |
-     cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json --number <NUMBER> --short-name "<SHORT_NAME>"
-     $ARGUMENTS
-     EOF
+      cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json --number <NUMBER> --short-name "<SHORT_NAME>"
+      $ARGUMENTS
+      EOF
 ---
 
 > Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，必须仍然按下文定义的完整流程执行，基于现有仓库与 feature 上下文做决策；仅在 `$ARGUMENTS` 非空时，将其作为额外约束或偏好一并考虑。
@@ -27,7 +28,7 @@ You **MUST** treat the user input ($ARGUMENTS) as parameters for the current com
 
 ## Outline
 
-The text the user typed after `/speckit.specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `{ARGS}` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
+The text the user typed after `/speckit.requirements` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `{ARGS}` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
 Given that feature description, do this:
 
@@ -208,7 +209,7 @@ Given that feature description, do this:
 
 ## Feature Integration
 
-The `/speckit.specify` command must maintain a **many-specs to one-feature** relationship:
+The `/speckit.requirements` command must maintain a **many-specs to one-feature** relationship:
 
 - A **Feature** is a relatively large, long‑lived concept, described by `memory/features/<ID>.md` and indexed in `memory/feature-index.md`.
 - A **Spec** is a smaller, focused slice under a Feature; one Feature can (and typically will) own multiple Specs over time.
@@ -233,7 +234,7 @@ When creating a new spec you MUST:
 
 ### Feature lookup rules
 
-When `/speckit.specify` is invoked for a new spec:
+When `/speckit.requirements` is invoked for a new spec:
 
 1. **Scan for existing Feature**:
    - **Search by Context**: Scan `memory/features/*.md` and `memory/feature-index.md` to see if an existing Feature matches the intent/scope of the new spec.
@@ -327,3 +328,14 @@ Success criteria must be:
 - "Database can handle 1000 TPS" (implementation detail, use user-facing metric)
 - "React components render efficiently" (framework-specific)
 - "Redis cache hit rate above 80%" (technology-specific)
+
+## Handoffs
+
+**Before running this command**:
+
+- (Optional) Run `/speckit.feature` to ensure the feature registry is up to date.
+
+**After running this command**:
+
+- If the spec contains any `[NEEDS CLARIFICATION]`, run `/speckit.clarify`.
+- Otherwise proceed to `/speckit.plan`.

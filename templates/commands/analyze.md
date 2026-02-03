@@ -1,6 +1,18 @@
 ---
 description: Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md, plan.md, and tasks.md after task generation.
 handoffs:
+  - label: Refine Requirements
+    agent: speckit.requirements
+    prompt: Refine the requirements specification to resolve analysis findings.
+    send: true
+  - label: Adjust Plan
+    agent: speckit.plan
+    prompt: Adjust the implementation plan to resolve analysis findings.
+    send: true
+  - label: Regenerate Tasks
+    agent: speckit.tasks
+    prompt: Regenerate tasks to cover gaps or fix inconsistencies.
+    send: true
   - label: Implement Project
     agent: speckit.implement
     prompt: Start the implementation in phases
@@ -191,3 +203,14 @@ Ask the user: "Would you like me to suggest concrete remediation edits for the t
 ## Context
 
 {ARGS}
+
+## Handoffs
+
+**Before running this command**:
+
+- Run `/speckit.tasks` first so there is a complete `tasks.md` to analyze.
+
+**After running this command**:
+
+- If CRITICAL/HIGH issues are found, apply fixes in `/speckit.requirements`, `/speckit.plan`, or `/speckit.tasks` (as appropriate) and re-run analysis.
+- If issues are acceptable or resolved, proceed to `/speckit.implement`.

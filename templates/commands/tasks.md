@@ -1,6 +1,6 @@
 ---
 description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
-handoffs: 
+handoffs:
   - label: Analyze For Consistency
     agent: speckit.analyze
     prompt: Run a project analysis for consistency
@@ -193,3 +193,15 @@ Every task MUST strictly follow this format:
   - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
   - Each phase should be a complete, independently testable increment
 - **Final Phase**: Polish & Cross-Cutting Concerns
+
+## Handoffs
+
+**Before running this command**:
+
+- Run `/speckit.plan` to produce a plan and design artifacts.
+
+**After running this command**:
+
+- Optionally run `/speckit.analyze` to check cross-artifact consistency before implementation.
+- Optionally run `/speckit.checklist` to create quality gates.
+- Then run `/speckit.implement` to execute the tasks phase-by-phase.

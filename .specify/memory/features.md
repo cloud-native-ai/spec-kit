@@ -1,11 +1,13 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-02-01
+**Last Updated**: 2026-02-03
 **Total Features**: 1
 
 ## Features
 
-| 001 | Skills Command Integration | Specification completed for feature 001 | Planned | .specify/specs/001-skills-command-integration/requirements.md | 2026-02-01 |
+| ID  | Name                  | Description                                                                 | Status  | Feature Details                | Last Updated |
+|-----|-----------------------|-----------------------------------------------------------------------------|---------|--------------------------------|-------------|
+| 001 | Unify Command Handoffs | Make command prerequisites and next steps explicit and consistent in docs. | Planned | .specify/memory/features/001.md | 2026-02-03 |
 
 ## Feature Entry Format
 
