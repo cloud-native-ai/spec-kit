@@ -12,7 +12,7 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 
 | Command | Purpose | Typical Workflow Stage |
 |---------|---------|----------------------|
-| `speckit.specify` | Create detailed feature specifications | Specification |
+| `speckit.requirements` | Create/update the requirements specification | Specification |
 | `speckit.clarify` | Clarify ambiguous requirements | Specification |
 | `speckit.plan` | Generate implementation plans | Planning |
 | `speckit.tasks` | Break down plans into actionable tasks | Planning |
@@ -28,25 +28,30 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 
 ## Detailed Command Reference
 
-### `speckit.specify`
-**Purpose**: Create comprehensive feature specifications that define WHAT needs to be built and WHY, without specifying HOW.
+### `speckit.requirements`
+**Purpose**: Create or update a **requirements specification** that defines WHAT needs to be built and WHY, without specifying HOW.
+
+**Conceptual distinction**:
+- **Feature** (`/speckit.feature`): a long-lived registry entry (ID/name/status) stored under `.specify/memory/`.
+- **Requirements**: the statements of need/constraints/acceptance criteria (the content).
+- **Specification**: the structured artifact that records those requirements. In Spec Kit, this is typically `.specify/specs/<REQUIREMENTS_KEY>/requirements.md` (the "requirements specification").
 
 **Usage**: 
 ```bash
-/speckit.specify [feature description]
+/speckit.requirements [feature description]
 ```
 
 **Key Features**:
-- Generates structured specifications with user scenarios, functional requirements, and success criteria
+- Generates a structured requirements specification with user scenarios, functional requirements, and success criteria
 - Automatically creates numbered branches and spec files
 - Integrates with feature registry for tracking
-- Validates specification quality before proceeding
+- Validates requirements-specification quality before proceeding
 - Limits clarifications to maximum 3 critical questions
 
-**Output**: Creates a new directory under `.specify/features/` (e.g., `.specify/features/001-login/`) and generates a `spec.md` file within it containing the complete specification.
+**Output**: Creates or updates `.specify/specs/<REQUIREMENTS_KEY>/requirements.md` plus related spec artifacts under the same directory.
 
 ### `speckit.clarify`
-**Purpose**: Resolve ambiguous or unclear requirements in existing specifications.
+**Purpose**: Resolve ambiguous or unclear requirements in an existing requirements specification (`requirements.md`).
 
 **Usage**:
 ```bash
@@ -56,11 +61,11 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 **Key Features**:
 - Identifies and resolves `[NEEDS CLARIFICATION]` markers in specs
 - Presents clear options for user decision
-- Updates specifications with resolved requirements
-- Maintains specification quality standards
+- Updates the requirements specification with resolved requirements
+- Maintains requirements-specification quality standards
 
 ### `speckit.plan`
-**Purpose**: Generate detailed implementation plans based on specifications.
+**Purpose**: Generate detailed implementation plans based on the requirements specification (`requirements.md`).
 
 **Usage**:
 ```bash
@@ -68,7 +73,7 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 ```
 
 **Key Features**:
-- Translates specifications into technical architecture decisions
+- Translates the requirements specification into technical architecture decisions
 - Defines data models, components, and integration points
 - Respects constitutional constraints
 - Creates phased implementation approach
@@ -100,7 +105,7 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 - Implements tasks according to plan and spec
 - Validates checklist completion before implementation
 - Provides progress tracking and status reporting
-- Ensures code quality and adherence to specifications
+- Ensures code quality and adherence to the requirements specification and plan
 
 ### `speckit.analyze`
 **Purpose**: Identify inconsistencies, duplications, and ambiguities across specification artifacts.
@@ -133,7 +138,7 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 - Prevents implementation of poorly-defined requirements
 
 ### `speckit.review`
-**Purpose**: Review implemented features against original specifications and plans.
+**Purpose**: Review implemented features against the original requirements specification (`requirements.md`) and plan.
 
 **Usage**:
 ```bash
@@ -141,13 +146,13 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 ```
 
 **Key Features**:
-- Validates implementation against specifications
+- Validates implementation against the requirements specification and plan
 - Checks for requirement coverage and compliance
 - Identifies gaps or deviations from original plan
 - Provides comprehensive review reports
 
 ### `speckit.research`
-**Purpose**: Conduct technical research to inform specification and implementation decisions.
+**Purpose**: Conduct technical research to inform requirements-specification and implementation decisions.
 
 **Usage**:
 ```bash
@@ -183,9 +188,9 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 ```
 
 **Key Features**:
-- Maintains centralized feature index
-- Tracks feature status and relationships
-- Supports feature lifecycle management
+- Maintains centralized feature index and per-feature memory documents
+- Tracks long-lived feature identity (ID/name/status) across iterations
+- Links to the current/most relevant spec artifacts produced by `/speckit.requirements`, `/speckit.plan`, and `/speckit.tasks`
 - Ensures consistent feature naming and organization
 
 ### `speckit.skills`
@@ -236,7 +241,7 @@ flowchart TD
     subgraph Core ["Core Development Lifecycle"]
         direction TB
         C1["1. /speckit.feature"]
-        C2["2. /speckit.specify"]
+        C2["2. /speckit.requirements"]
         C3["3. /speckit.plan"]
         C4["4. /speckit.tasks"]
         C5["5. /speckit.implement"]
@@ -284,8 +289,8 @@ This flowchart distinguishes between the **Core Path** (solid arrows) and **Auxi
 
 1.  **Preparation**: `/speckit.constitution`, `/speckit.instructions`, `/speckit.skills` (Run once or as needed).
 2.  **Core Lifecycle**:
-    *   `1. /speckit.feature`: Initialize feature context.
-    *   `2. /speckit.specify`: Define the specification.
+    *   `1. /speckit.feature`: Create/select a feature registry entry (long-lived ID/name/status).
+    *   `2. /speckit.requirements`: Create/update the requirements specification (WHAT/WHY) for that feature.
     *   `3. /speckit.plan`: Create the technical plan.
     *   `4. /speckit.tasks`: Breakdown into tasks.
     *   `5. /speckit.implement`: Execute code changes.
@@ -298,7 +303,7 @@ This flowchart distinguishes between the **Core Path** (solid arrows) and **Auxi
 
 ## Best Practices
 
-- Always run `speckit.specify` first to establish clear requirements
+- Always run `/speckit.requirements` to establish clear requirements before planning
 - Use `speckit.checklist` before implementation to ensure quality
 - Run `speckit.analyze` regularly to catch inconsistencies early
 - Keep specifications focused on WHAT and WHY, not HOW

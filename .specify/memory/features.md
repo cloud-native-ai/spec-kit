@@ -5,7 +5,7 @@
 
 ## Features
 
-| 001 | Skills Command Integration | Specification completed for feature 001 | Planned | .specify/specs/001-skills-command-integration/spec.md | 2026-02-01 |
+| 001 | Skills Command Integration | Specification completed for feature 001 | Planned | .specify/specs/001-skills-command-integration/requirements.md | 2026-02-01 |
 
 ## Feature Entry Format
 

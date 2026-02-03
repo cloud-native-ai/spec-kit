@@ -78,18 +78,24 @@ The SDD methodology is significantly enhanced through four powerful commands tha
 
 This command provides centralized feature management for SDD projects:
 
+In Spec Kit, a **feature** is a long-lived registry entry that represents a trackable unit of work (name, ID, status, and links). It lives under `.specify/memory/` (index + per-feature memory) and is meant to evolve across iterations.
+
 1. **Feature Index Creation**: Creates or updates a project-level feature index (`features.md`) in Markdown table format
 1. **Feature Documents Maintainance**: updates a project-level feature details document in (`features/`) folder
 2. **Sequential ID Assignment**: Automatically assigns sequential three-digit feature IDs (001, 002, 003, etc.)
 3. **Status Tracking**: Maintains feature status through the SDD lifecycle (Draft → Planned → Implemented → Ready for Review → Completed)
 4. **Integration with SDD**: Automatically links all subsequent SDD commands to feature entries for traceability
 
-### The `/speckit.specify` Command
+### The `/speckit.requirements` Command
 
-This command transforms a simple feature description (the user-prompt) into a complete, structured specification with automatic repository management:
+This command creates or updates a **requirements specification**: the detailed, versioned statement of WHAT and WHY (scenarios, constraints, and acceptance criteria) for a feature iteration.
 
-1. **Automatic Feature Numbering**: Scans existing specs to determine the next feature number (e.g., 001, 002, 003)
-2. **Branch Creation**: Generates a semantic branch name from your description and creates it automatically
+In Spec Kit, **requirements** are not the same thing as a feature entry: requirements live under `.specify/specs/<REQUIREMENTS_KEY>/requirements.md` and can iterate over time; the feature registry under `.specify/memory/` is the long-lived tracking and summary layer.
+
+This command transforms a simple feature prompt into a complete, structured specification with automatic repository management:
+
+1. **Feature Context Binding**: Uses the active feature (or derives one) and generates a stable `REQUIREMENTS_KEY` for scoping spec artifacts
+2. **Branch Creation**: Creates (or switches to) a semantic branch derived from the feature and prompt
 3. **Template-Based Generation**: Copies and customizes the feature specification template with your requirements
 4. **Directory Structure**: Creates the proper `.specify/specs/[branch-name]/` structure for all related documents
 5. **Feature Integration**: Updates the feature index status to "Planned" and records the specification path
@@ -118,7 +124,7 @@ After a plan is created, this command analyzes the plan and related design docum
 
 This command is the final step of the SDD loop for a feature; it reviews the full set of artifacts produced along the way and consolidates them into the long-lived feature memory:
 
-1. **Artifact Review**: Loads the feature's `spec.md`, `plan.md`, `tasks.md`, and any supporting documents such as `data-model.md`, `contracts/`, `research.md`, and `quickstart.md` from `.specify/specs/[FEATURE_KEY]/`.
+1. **Artifact Review**: Loads the feature's `requirements.md`, `plan.md`, `tasks.md`, and any supporting documents such as `data-model.md`, `contracts/`, `research.md`, and `quickstart.md` from `.specify/specs/[REQUIREMENTS_KEY]/`.
 2. **Synthesis**: Produces a concise, user- and system-level narrative that explains what the feature does, who it serves, and which constraints and integrations define its boundary.
 3. **Feature Memory Update**: Writes or updates a dedicated feature document in `.specify/memory/features/[ID].md` (where [ID] is the three-digit feature ID like 001, 002, etc.), keeping prior context while refreshing the current definition and linking back to the latest spec/plan/tasks.
 4. **Index Integration**: Updates `.specify/memory/features.md` so the feature entry points at the up-to-date memory file and records that review has been completed.
@@ -152,11 +158,12 @@ Total: ~12 hours of documentation work
 # - Sets initial status to "Draft"
 
 # Step 2: Create the feature specification (5 minutes)
-/speckit.specify Real-time chat system with message history and user presence
+/speckit.requirements Real-time chat system with message history and user presence
 
 # This automatically:
-# - Creates branch "003-chat-system"
-# - Generates .specify/specs/003-chat-system/spec.md
+# - Creates (or reuses) a requirements key (often derived from the feature)
+# - Creates a working branch (e.g., "003-chat-system")
+# - Generates .specify/specs/<REQUIREMENTS_KEY>/requirements.md
 # - Populates it with structured requirements
 # - Updates features.md status to "Planned" and records spec path
 

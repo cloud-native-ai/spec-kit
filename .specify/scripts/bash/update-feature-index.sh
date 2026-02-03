@@ -93,7 +93,7 @@ generate_feature_entries() {
                 feature_name=$(echo "$feature_name" | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1')
                 
                 # Get spec path
-                local spec_path=".specify/specs/$dirname/spec.md"
+                local spec_path=".specify/specs/$dirname/requirements.md"
                 if [ ! -f "$spec_path" ]; then
                     spec_path="(Not yet created)"
                 fi

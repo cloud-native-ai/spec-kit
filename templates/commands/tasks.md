@@ -18,7 +18,7 @@ scripts:
 > - **任务大纲**：用户提供的高层次任务分解或结构
 > - **额外任务条目**：具体的任务项，需要整合到生成的任务列表中
 > 
-> 当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于当前 feature 的 `spec.md`、`plan.md` 等设计文档自动生成完整、可执行的 `tasks.md`。
+> 当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于当前 feature 的 `requirements.md`、`plan.md` 等设计文档自动生成完整、可执行的 `tasks.md`。
 
 ## User Input Analysis & Processing
 
@@ -47,17 +47,17 @@ You **MUST** first analyze the content and structure of `$ARGUMENTS` to determin
 
 ## Outline
 
-1. **Setup**: Run `{SCRIPT}` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+1. **Setup**: Run `{SCRIPT}` from repo root and parse REQUIREMENTS_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
-2. **Load design documents**: Read from FEATURE_DIR:
-   - **Required**: plan.md (tech stack, libraries, structure), spec.md (user stories with priorities)
+2. **Load design documents**: Read from REQUIREMENTS_DIR:
+   - **Required**: plan.md (tech stack, libraries, structure), requirements.md (user stories with priorities)
    - **Optional**: data-model.md (entities), contracts/ (API endpoints), research.md (decisions), quickstart.md (test scenarios)
    - Note: Not all projects have all documents. Generate tasks based on what's available.
 
 3. **Generate task list workflow**:
    - **Analyze $ARGUMENTS input type**: Determine if input contains background context, task outline, or additional task items
    - Load plan.md and extract tech stack, libraries, project structure
-   - Load spec.md and extract user stories with their priorities (P1, P2, P3, etc.)
+   - Load requirements.md and extract user stories with their priorities (P1, P2, P3, etc.)
    - If data-model.md exists: Extract entities and map to user stories
    - If contracts/ exists: Map endpoints to user stories
    - If research.md exists: Extract decisions for setup tasks
@@ -74,7 +74,7 @@ You **MUST** first analyze the content and structure of `$ARGUMENTS` to determin
    - Correct feature name from plan.md
    - Phase 1: Setup tasks (project initialization)
    - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
-   - Phase 3+: One phase per user story (in priority order from spec.md)
+   - Phase 3+: One phase per user story (in priority order from requirements.md)
    - Each phase includes: story goal, independent test criteria, tests (if requested), implementation tasks
    - Final Phase: Polish & cross-cutting concerns
    - All tasks must follow the strict checklist format (see Task Generation Rules below)
@@ -92,7 +92,7 @@ You **MUST** first analyze the content and structure of `$ARGUMENTS` to determin
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
 
 Context for task generation: 
-- Design documents from FEATURE_DIR: {AVAILABLE_DOCS}
+- Design documents from REQUIREMENTS_DIR: {AVAILABLE_DOCS}
 - User input analysis result: {ARGUMENTS_ANALYSIS_RESULT}
 - Input type handling strategy: {INPUT_HANDLING_STRATEGY}
 
@@ -142,7 +142,7 @@ Every task MUST strictly follow this format:
 2. **Task ID**: Sequential number (T001, T002, T003...) in execution order
 3. **[P] marker**: Include ONLY if task is parallelizable (different files, no dependencies on incomplete tasks)
 4. **[Story] label**: REQUIRED for user story phase tasks only
-   - Format: [US1], [US2], [US3], etc. (maps to user stories from spec.md)
+   - Format: [US1], [US2], [US3], etc. (maps to user stories from requirements.md)
    - Setup phase: NO story label
    - Foundational phase: NO story label  
    - User Story phases: MUST have story label
@@ -162,7 +162,7 @@ Every task MUST strictly follow this format:
 
 ### Task Organization
 
-1. **From User Stories (spec.md)** - PRIMARY ORGANIZATION:
+1. **From User Stories (requirements.md)** - PRIMARY ORGANIZATION:
    - Each user story (P1, P2, P3...) gets its own phase
    - Map all related components to their story:
      - Models needed for that story

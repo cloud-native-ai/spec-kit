@@ -33,6 +33,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
 import httpx
+
 # For cross-platform keyboard input
 import readchar
 import typer
@@ -1384,7 +1385,7 @@ def init(
         "   2.2 [cyan]/speckit.feature[/] - Manage feature lifecycle & index"
     )
     steps_lines.append(
-        "   2.3 [cyan]/speckit.specify[/] - Create baseline specification"
+        "   2.3 [cyan]/speckit.requirements[/] - Create baseline specification"
     )
     steps_lines.append("   2.4 [cyan]/speckit.plan[/] - Create implementation plan")
     steps_lines.append("   2.5 [cyan]/speckit.tasks[/] - Generate actionable tasks")

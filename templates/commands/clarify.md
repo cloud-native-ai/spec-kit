@@ -27,7 +27,7 @@ Note: This clarification workflow is expected to run (and be completed) BEFORE i
 Execution steps:
 
 1. Run `{SCRIPT}` from repo root **once** (combined `--json` mode). Parse JSON payload fields:
-   - `FEATURE_DIR`
+   - `REQUIREMENTS_DIR`
    - `FEATURE_SPEC`
    - `AVAILABLE_DOCS`
    - (Optionally capture `IMPL_PLAN` for future chained flows.)

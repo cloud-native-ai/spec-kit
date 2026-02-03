@@ -1,7 +1,7 @@
 # Implementation Plan: [SPEC]
 
 **Branch**: `[###-spec-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Specification from `.specify/specs/[###-spec-name]/spec.md`
+**Input**: Specification from `.specify/specs/[###-spec-name]/requirements.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 

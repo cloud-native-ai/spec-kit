@@ -10,7 +10,7 @@
 - [安装指南](docs/installation.md)
 - [升级指南](docs/upgrade.md)
 - [Spec-Driven Development 方法论](docs/speckit/spec-driven.md)
-- [技能系统](docs/skills/spec.md)
+- [技能系统](docs/skills/requirements.md)
 
 ## 🔧 核心功能
 

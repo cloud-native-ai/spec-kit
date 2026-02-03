@@ -20,12 +20,14 @@ Pick script type explicitly (optional):
 uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --script sh  # Force POSIX shell
 ```
 
-### 2. Create the Spec
+### 2. Create the Requirements
 
-Use the `/speckit.specify` command to describe what you want to build. Focus on the **what** and **why**, not the tech stack.
+Use the `/speckit.requirements` command to create the **requirements specification** (WHAT and WHY). Focus on the **what** and **why**, not the tech stack.
+
+Note: `/speckit.feature` is separate—it manages the long-lived feature registry (ID, name, status) under `.specify/memory/`. It’s common to run `/speckit.feature ...` once to register/select a feature, then run `/speckit.requirements ...` to generate the detailed spec for that feature.
 
 ```bash
-/speckit.specify Build an application that can help me organize my photos in separate photo albums. Albums are grouped by date and can be re-organized by dragging and dropping on the main page. Albums are never in other nested albums. Within each album, photos are previewed in a tile-like interface.
+/speckit.requirements Build an application that can help me organize my photos in separate photo albums. Albums are grouped by date and can be re-organized by dragging and dropping on the main page. Albums are never in other nested albums. Within each album, photos are previewed in a tile-like interface.
 ```
 
 ### 3. Create a Technical Implementation Plan
@@ -40,13 +42,13 @@ Use the `/speckit.plan` command to provide your tech stack and architecture choi
 
 Use `/speckit.tasks` to create an actionable task list, then ask your agent to implement the feature.
 
-After implementation, use `/speckit.review` to review the generated `spec.md`, `plan.md`, and `tasks.md` for the feature and summarize them into the long-lived feature memory files under `.specify/memory/features/`.
+After implementation, use `/speckit.review` to review the generated `requirements.md`, `plan.md`, and `tasks.md` for the feature and summarize them into the long-lived feature memory files under `.specify/memory/features/`.
 
 ## Detailed Example: Building Taskify
 
 Here's a complete example of building a team productivity platform:
 
-### Step 1: Define Requirements with `/speckit.specify`
+### Step 1: Define Requirements with `/speckit.requirements`
 
 ```text
 Develop Taskify, a team productivity platform. It should allow users to create projects, add team members,
@@ -67,9 +69,9 @@ see yours. You can edit any comments that you make, but you can't edit comments 
 delete any comments that you made, but you can't delete comments anybody else made.
 ```
 
-### Step 2: Refine the Specification
+### Step 2: Refine the Requirements Specification
 
-After the initial specification is created, clarify any missing requirements:
+After the initial requirements specification (`requirements.md`) is created, clarify any missing requirements:
 
 ```text
 For each sample project or project that you create there should be a variable number of tasks between 5 and 15
@@ -77,7 +79,7 @@ tasks for each one randomly distributed into different states of completion. Mak
 one task in each stage of completion.
 ```
 
-Also validate the specification checklist:
+Also validate the requirements-specification checklist:
 
 ```text
 Read the review and acceptance checklist, and check off each item in the checklist if the feature spec meets the criteria. Leave it empty if it does not.
@@ -113,7 +115,7 @@ implement .specify/specs/002-create-taskify/plan.md
 
 - **Be explicit** about what you're building and why
 - **Don't focus on tech stack** during specification phase
-- **Iterate and refine** your specifications before implementation
+- **Iterate and refine** your requirements specification before implementation
 - **Validate** the plan before coding begins
 - **Let the AI agent handle** the implementation details
 

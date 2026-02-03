@@ -102,11 +102,13 @@ Your responsibilities:
 
 Feature 是项目的核心框架，需要在 SDD 全流程中被反复审视与更新：
 
+注意：这里的 **Feature** 指 `.specify/memory/features*` 中的长期条目（ID/名称/状态/链接）；而 `/speckit.requirements` 生成的是某个 Feature 在某次迭代中的**需求规格**（`requirements.md`，侧重 WHAT/WHY 与验收标准）。两者粒度与生命周期不同，但需要互相链接以保证可追溯性。
+
 - 在 `spec → plan → tasks → implement` 的每个阶段，必须回顾**Feature 列表与 Feature 详情**：
    - 新的 SPEC 可能引入新的 Feature。
    - 现有 Feature 可能需要合并、拆分、降级或删除。
    - 需要更新 Feature 的状态与“关键变化/实现影响”。
-- 在执行 `/speckit.specify`、`/speckit.plan`、`/speckit.tasks`、`/speckit.implement` 后，都应主动同步更新 `.specify/memory/features/*.md` 与 `.specify/memory/features.md`（若有变化）。
+- 在执行 `/speckit.requirements`、`/speckit.plan`、`/speckit.tasks`、`/speckit.implement` 后，都应主动同步更新 `.specify/memory/features/*.md` 与 `.specify/memory/features.md`（若有变化）。
 - 任何 Feature 变更都必须能追溯到对应的 Spec 或 Plan 依据（记录在 Feature 的“关键变化/备注”中）。
 
 ### Practical scanning hints（扫描配置文件的操作建议）
