@@ -70,7 +70,7 @@ You **MUST** treat the user input ($ARGUMENTS) as parameters for the current com
 This command is intended to be used **after** `/speckit.implement` has completed for a feature. The typical end-to-end flow is:
 
 1. `/speckit.feature` – register or select a feature entry
-2. `/speckit.specify` – create or update the specification
+2. `/speckit.requirements` – create or update the specification
 3. `/speckit.plan` – produce the technical implementation plan
 4. `/speckit.tasks` – derive an executable task list
 5. `/speckit.implement` – implement tasks and complete the implementation

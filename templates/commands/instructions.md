@@ -29,8 +29,8 @@ You **MUST** analyze the content of `$ARGUMENTS` to determine the execution flow
 2. **Analyze Project Context**:
    - Read `README.md` to understand the project's purpose and existing features.
    - Inspect configuration files (`pyproject.toml`, `package.json`, `pom.xml`, `Makefile`, etc.) to determine the tech stack.
-   - Check `memory/constitution.md` (if exists) to identify any mandated project rules.
-   - Check `memory/features.md` (if exists) for feature status reference.
+   - Check `.specify/memory/constitution.md` (if exists) to identify any mandated project rules.
+   - Check `.specify/memory/features.md` (if exists) for feature status reference.
    - **Check `.specify/` Directory**: When referencing the `.specify/` directory (if exists), **ONLY** consider the one in the **project root**. Ignore any `.specify/` directories found inside subdirectories or submodules (as they belong to other projects).
 
 3. **Update Instructions Content**:

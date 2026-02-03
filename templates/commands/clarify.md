@@ -31,12 +31,12 @@ Execution steps:
    - `FEATURE_SPEC`
    - `AVAILABLE_DOCS`
    - (Optionally capture `IMPL_PLAN` for future chained flows.)
-   - If JSON parsing fails, abort and instruct user to re-run `/speckit.specify` or verify feature branch environment.
+   - If JSON parsing fails, abort and instruct user to re-run `/speckit.requirements` or verify feature branch environment.
 
 2. **Preliminary Research & Context Loading**:
    - Analyze the `AVAILABLE_DOCS` list from the script output.
-   - Read `FEATURE_SPEC`, `/memory/constitution.md`.
-   - **Check for answers in existing docs**: Before asking the user, check if any apparent ambiguities in the spec are already resolved in the project's documentation (`README.md`, `docs/`, `memory/`).
+   - Read `FEATURE_SPEC`, `.specify/memory/constitution.md`.
+   - **Check for answers in existing docs**: Before asking the user, check if any apparent ambiguities in the spec are already resolved in the project's documentation (`README.md`, `docs/`, `.specify/memory/`).
    - If you find definitive answers in the docs, **auto-resolve** them by updating the spec directly (and noting "Resolved via [Doc Name]" in the update summary).
 
 3. Load the current spec file. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
@@ -183,7 +183,7 @@ Execution steps:
 Behavior rules:
 
 - If no meaningful ambiguities found (or all potential questions would be low-impact), respond: "No critical ambiguities detected worth formal clarification." and suggest proceeding.
-- If spec file missing, instruct user to run `/speckit.specify` first (do not create a new spec here).
+- If spec file missing, instruct user to run `/speckit.requirements` first (do not create a new spec here).
 - Never exceed 5 total asked questions (clarification retries for a single question do not count as new questions).
 - Avoid speculative tech stack questions unless the absence blocks functional clarity.
 - Respect user early termination signals ("stop", "done", "proceed").

@@ -72,7 +72,7 @@ Follow this execution flow:
    - Dates ISO format YYYY-MM-DD.
    - Principles are declarative, testable, and free of vague language ("should" → replace with MUST/SHOULD rationale where appropriate).
 
-7. Write the completed constitution back to `/memory/constitution.md` (overwrite).
+7. Write the completed constitution back to `.specify/memory/constitution.md` (overwrite).
 
 8. Output a final summary to the user with:
    - New version and bump rationale.
@@ -90,4 +90,4 @@ If the user supplies partial updates (e.g., only one principle revision), still 
 
 If critical info missing (e.g., ratification date truly unknown), insert `TODO(<FIELD_NAME>): explanation` and include in the Sync Impact Report under deferred items.
 
-Do not create a new template; always operate on the existing `/memory/constitution.md` file.
+Do not create a new template; always operate on the existing `.specify/memory/constitution.md` file.

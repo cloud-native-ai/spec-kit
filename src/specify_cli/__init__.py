@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
-# /// script
-# requires-python = ">=3.8"
-# dependencies = [
-#     "typer",
-#     "rich",
-#     "platformdirs",
-#     "readchar",
-#     "httpx",
-# ]
-# ///
+
 """
 Specify CLI - Setup tool for Specify projects
 
@@ -32,8 +23,6 @@ import shutil
 import ssl
 import subprocess
 import sys
-import tempfile
-import zipfile
 
 # Check Python version
 if sys.version_info < (3, 8):
@@ -41,10 +30,9 @@ if sys.version_info < (3, 8):
 
 # For cross-platform keyboard input
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import Dict, List, Optional, Set, Tuple
 
 import httpx
-
 # For cross-platform keyboard input
 import readchar
 import typer
@@ -52,7 +40,6 @@ from rich.align import Align
 from rich.console import Console
 from rich.live import Live
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree

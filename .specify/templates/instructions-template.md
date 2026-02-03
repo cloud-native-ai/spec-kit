@@ -10,8 +10,8 @@ This project documentation is distributed across several key files. You MUST ref
 
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
-| **Constitution** | `memory/constitution.md` | Single source of truth for principles | Coding standards, architectural rules, constraints |
-| **Feature Index** | `memory/features.md` | Feature roadmap status | List of active/planned/implemented features |
+| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | Coding standards, architectural rules, constraints |
+| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | List of active/planned/implemented features |
 | **Development** | `CONTRIBUTING.md` | Setup and Guidelines | Setup, testing, and pull request guidelines |
 | **Architecture** | `docs/index.md` | High-level architecture | Architecture and design documentation |
 | [Other Doc] | [Path] | [Purpose] | [Summary] |

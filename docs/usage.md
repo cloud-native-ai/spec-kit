@@ -161,7 +161,7 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 - Supports informed decision-making
 
 ### `speckit.constitution`
-**Purpose**: Manage and enforce the project's core principles and governance rules (stored in `memory/constitution.md`).
+**Purpose**: Manage and enforce the project's core principles and governance rules (stored in `.specify/memory/constitution.md`).
 
 **Usage**:
 ```bash
@@ -169,13 +169,13 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 ```
 
 **Key Features**:
-- Maintains core project principles and constraints in `memory/constitution.md`
+- Maintains core project principles and constraints in `.specify/memory/constitution.md`
 - Enforces non-negotiable rules across all artifacts
 - Provides constitutional guidance for decision-making
 - Tracks constitutional changes and updates
 
 ### `speckit.feature`
-**Purpose**: Manage the feature registry (stored in `memory/features.md`) and track feature evolution.
+**Purpose**: Manage the feature registry (stored in `.specify/memory/features.md`) and track feature evolution.
 
 **Usage**:
 ```bash

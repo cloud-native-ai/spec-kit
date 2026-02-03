@@ -12,7 +12,7 @@ scripts:
   sh: scripts/bash/create-new-plan.sh --json
 ---
 
-> Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于当前 `FEATURE_SPEC` 与 `/memory/constitution.md` 生成或更新实施计划及相关设计产物。
+> Note: `$ARGUMENTS` 为**可选补充输入**。当本次调用未提供任何 `$ARGUMENTS` 时，仍须按下文流程基于当前 `FEATURE_SPEC` 与 `.specify/memory/constitution.md` 生成或更新实施计划及相关设计产物。
 
 ## User Input Analysis and Processing
 
@@ -49,7 +49,7 @@ You **MUST** treat the user input ($ARGUMENTS) as parameters for the current com
    - Determine if it contains background information, planning outline, or specific constraints
    - Apply appropriate processing strategy based on content type
 
-3. **Load context**: Read FEATURE_SPEC, `/memory/constitution.md`, and processed `$ARGUMENTS` context. Load IMPL_PLAN template (already copied).
+3. **Load context**: Read FEATURE_SPEC, `.specify/memory/constitution.md`, and processed `$ARGUMENTS` context. Load IMPL_PLAN template (already copied).
    - Check if `SPECS_DIR/research.md` exists. If so, read it.
    - **Crucial**: You MUST also read and analyze the project's **existing documentation** (`README.md`, `docs/`) and **feature memory** (`.specify/memory/`) to ensure the plan aligns with the system's architecture and evolution.
 
