@@ -29,7 +29,7 @@ You **MUST** treat the user input ($ARGUMENTS) as parameters for the current com
 
 2. **Load Context**: 
    - Read `FEATURE_SPEC`.
-   - Read `/.specify/memory/constitution.md`.
+   - Read `.specify/memory/constitution.md`.
    - **Crucial**: Based on `AVAILABLE_DOCS` and the feature requirements, read and analyze relevant files from the project documentation. DO NOT rely only on memory; check `README.md` and key docs found in the list.
 
 3. **Information Gathering & Analysis**:

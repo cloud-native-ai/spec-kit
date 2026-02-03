@@ -25,7 +25,7 @@ Execution steps:
 
 2. **Preliminary Research & Context Loading**:
    - Analyze the `AVAILABLE_DOCS` list from the script output.
-   - Read `FEATURE_SPEC`, `/.specify/memory/constitution.md`.
+   - Read `FEATURE_SPEC`, `.specify/memory/constitution.md`.
    - **Check for answers in existing docs**: Before asking the user, check if any apparent ambiguities in the spec are already resolved in the project's documentation (`README.md`, `docs/`, `.specify/memory/`).
    - If you find definitive answers in the docs, **auto-resolve** them by updating the spec directly (and noting "Resolved via [Doc Name]" in the update summary).
 

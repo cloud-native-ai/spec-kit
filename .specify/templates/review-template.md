@@ -1,10 +1,8 @@
 <!--
-  SOURCE TEMPLATE (development path): templates/review-template.md
-  INSTALLED TEMPLATE (runtime path): .specify/templates/review-template.md
   Do NOT remove placeholder tokens. Each [TOKEN] must be replaced when generating a concrete review report.
 -->
 
-# SDD Process Review Report: [FEATURE_NAME]
+# Specification-Driven Development (SDD) Process Review Report: [REQUIREMENT NAME]
 
 **Feature ID**: [FEATURE_ID]  
 **Branch / Spec Key**: [REQUIREMENTS_KEY]  

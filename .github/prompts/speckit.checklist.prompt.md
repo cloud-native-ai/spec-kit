@@ -74,7 +74,7 @@ You **MUST** treat the user input ($ARGUMENTS) as parameters for the current com
    - Infer any missing context from spec/plan/tasks (do NOT hallucinate)
 
 4. **Load feature context**: Read from REQUIREMENTS_DIR:
-   - requirements.md: Feature requirements and scope
+   - requirements.md: requirements and scope
    - plan.md (if exists): Technical details, dependencies
    - tasks.md (if exists): Implementation tasks
 
