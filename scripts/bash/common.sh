@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Common functions and variables for all scripts
 
+source ~/.bashrc
+
 # Ensure the script runs in a UTF-8 locale to better support Unicode processing
 ensure_utf8_locale() {
     # Always set to C.UTF-8 for consistent behavior across systems
@@ -420,4 +422,59 @@ report_success() {
 # helper to escape for sed
 escape_sed() {
     echo "$1" | sed 's/[\/&]/\\&/g'
+}
+
+# --- Gitignore Helpers ---
+
+# Check if a pattern exists in .gitignore (exact match)
+# Usage: gitignore_has_pattern "pattern" "/path/to/.gitignore"
+gitignore_has_pattern() {
+    local pattern="$1"
+    local gitignore_file="$2"
+
+    if [ -z "$pattern" ] || [ -z "$gitignore_file" ]; then
+        return 1
+    fi
+
+    if [ ! -f "$gitignore_file" ]; then
+        return 1
+    fi
+
+    grep -Fxq "$pattern" "$gitignore_file"
+}
+
+# Ensure .gitignore exists
+# Usage: ensure_gitignore_exists "/path/to/.gitignore"
+ensure_gitignore_exists() {
+    local gitignore_file="$1"
+
+    if [ -z "$gitignore_file" ]; then
+        return 1
+    fi
+
+    if [ ! -f "$gitignore_file" ]; then
+        mkdir -p "$(dirname "$gitignore_file")"
+        touch "$gitignore_file"
+    fi
+}
+
+# Add a pattern to .gitignore if it doesn't already exist
+# Usage: add_gitignore_pattern "pattern" ["/path/to/.gitignore"]
+add_gitignore_pattern() {
+    local pattern="$1"
+    local gitignore_file="${2:-$(get_repo_root)/.gitignore}"
+
+    if [ -z "$pattern" ]; then
+        return 1
+    fi
+
+    ensure_gitignore_exists "$gitignore_file"
+
+    if ! gitignore_has_pattern "$pattern" "$gitignore_file"; then
+        # Ensure a blank line before appending when file is not empty and doesn't end with newline
+        if [ -s "$gitignore_file" ] && [ -n "$(tail -c 1 "$gitignore_file")" ]; then
+            printf '\n' >>"$gitignore_file"
+        fi
+        printf '%s\n' "$pattern" >>"$gitignore_file"
+    fi
 }

@@ -183,6 +183,15 @@ if [ -f "$SCRIPT_DIR/refresh-tools.sh" ]; then
     "$SCRIPT_DIR/refresh-tools.sh" --system --format markdown > "$TARGET_DIR/tools/system.md"
     "$SCRIPT_DIR/refresh-tools.sh" --shell --format markdown > "$TARGET_DIR/tools/shell.md"
     "$SCRIPT_DIR/refresh-tools.sh" --project --format markdown > "$TARGET_DIR/tools/project.md"
+
+    # Add generated tools docs to .gitignore
+    REPO_ROOT="$(get_repo_root)"
+    if [[ "$TARGET_DIR" == "$REPO_ROOT/"* ]]; then
+        REL_TARGET_DIR="${TARGET_DIR#$REPO_ROOT/}"
+        add_gitignore_pattern "$REL_TARGET_DIR/tools/*.md" "$REPO_ROOT/.gitignore"
+    else
+        add_gitignore_pattern "$TARGET_DIR/tools/*.md" "$REPO_ROOT/.gitignore"
+    fi
 else
     echo "Warning: refresh-tools.sh not found, skipping tools documentation generation." >&2
 fi

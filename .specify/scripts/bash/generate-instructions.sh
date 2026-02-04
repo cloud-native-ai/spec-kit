@@ -14,6 +14,7 @@ fi
 PROJECT_ROOT="$PWD"
 PROJECT_NAME="$(basename "$PROJECT_ROOT")"
 CURRENT_DATE="$(date +%Y-%m-%d)"
+REPO_ROOT="$(get_repo_root)"
 
 TEMPLATE_FILE=".specify/templates/instructions-template.md"
 # Detect template path (User perspective vs Source perspective)
@@ -36,6 +37,7 @@ if [ -f "$SCRIPT_DIR/refresh-tools.sh" ]; then
   "$SCRIPT_DIR/refresh-tools.sh" --system --format markdown > "$TOOLS_DIR/system.md"
   "$SCRIPT_DIR/refresh-tools.sh" --shell --format markdown > "$TOOLS_DIR/shell.md"
   "$SCRIPT_DIR/refresh-tools.sh" --project --format markdown > "$TOOLS_DIR/project.md"
+  add_gitignore_pattern ".ai/tools/*.md" "$REPO_ROOT/.gitignore"
 else
   log warning "refresh-tools.sh not found, skipping tools documentation generation."
 fi
