@@ -59,4 +59,3 @@ Execution Steps:
 4.  **Completion**:
     - Summarize what was created.
     - Verify `SKILL.md` exists.
-    - Mention packaging: "When ready to share, run `.specify/scripts/package_skill.py {SKILL_DIR}`."
