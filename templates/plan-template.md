@@ -108,6 +108,7 @@ directories captured above]
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
+> If no violations, explicitly write "N/A" and remove the table.
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|

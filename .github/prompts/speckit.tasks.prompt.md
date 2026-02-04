@@ -134,6 +134,11 @@ Every task MUST strictly follow this format:
    - Polish phase: NO story label
 5. **Description**: Clear action with exact file path
 
+### Manual Verification (RECOMMENDED)
+
+- If validation steps are manual (e.g., quickstart.md, CLI smoke tests, UI flows), add explicit manual QA tasks per user story.
+- Keep these separate from automated test tasks and label them with the same [US#] for traceability.
+
 **Examples**:
 
 - ✅ CORRECT: `- [ ] T001 Create project structure per implementation plan`
