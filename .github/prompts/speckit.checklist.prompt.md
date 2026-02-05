@@ -4,7 +4,7 @@
 
 - **Requirement（需求 / What）**：从利益相关者视角描述系统必须满足的目标、能力与验收条件（价值与约束）。
 - **Specification（规格 / How）**：从设计/实现视角描述“如何实现需求”的方案与约束（如 plan.md、tasks.md、contracts/）。
-- **Feature（特性）**：一个以价值与范围为中心的**需求分组单位**，包含一组 Requirements（What），并驱动后续 Specifications（How）的产出。
+- **Feature（特性）**：一个以价值与范围为中心的**需求分组单位**（概念/计划阶段常用），包含一组 Requirements（What），并驱动后续 Specifications（How）的产出。
 
 > 记忆法：Requirement = 目标（What），Specification = 方案（How）。本命令产出的 checklist 是“需求写作的单元测试”，不是实现验证。
 
@@ -320,3 +320,14 @@ Sample items:
 - Correct: Validation of requirement quality
 - Wrong: "Does it do X?"
 - Correct: "Is X clearly specified?"
+
+## Handoffs
+
+**Before running this command**:
+
+- Run after you have a requirements specification (and ideally a plan/tasks) so the checklist can be grounded.
+
+**After running this command**:
+
+- If checklist items fail, iterate on `/speckit.plan` and/or `/speckit.tasks` until they pass.
+- Once checklist items are satisfied (or explicitly accepted as deferred), proceed to `/speckit.implement`.

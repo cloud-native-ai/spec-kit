@@ -161,3 +161,15 @@ In addition, **implement 阶段必须复核 Feature 列表**：
 This integration ensures that all feature implementation activities are properly tracked and linked to their corresponding entries in the project's feature index.
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit.tasks` first to regenerate the task list.
+
+## Handoffs
+
+**Before running this command**:
+
+- Run `/speckit.tasks` to ensure a complete, ordered `tasks.md` exists.
+- If checklists exist under `checklists/`, complete them or explicitly decide to proceed with known risks.
+
+**After running this command**:
+
+- Run `/speckit.review` to evaluate SDD process quality and propose workflow improvements.
+- Optionally run `/speckit.analyze` to catch any spec/plan/tasks drift introduced during implementation.

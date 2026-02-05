@@ -70,3 +70,13 @@ You **MUST** treat the user input ($ARGUMENTS) as parameters for the current com
 ```
 
 5. **Stop and report**: Report the path of the generated `research.md` and summarize key findings.
+
+## Handoffs
+
+**Before running this command**:
+
+- Run when the plan/spec has open questions that require evidence or repo context confirmation.
+
+**After running this command**:
+
+- Proceed to `/speckit.plan` (or re-run it) to encode research decisions into the technical plan.

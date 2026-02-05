@@ -50,6 +50,7 @@ You **MUST** treat the user input ($ARGUMENTS) as parameters for the current com
       - Filling **process-focused** observations: artifact quality, traceability, handoff quality, and workflow integrity.
       - Adding **improvement suggestions for speckit and SDD** (templates, prompts, checks, and workflow practices).
       - Respecting the heading and section structure defined in the template.
+      - Ensure the report ends with: “Please share the contents of this document with the spec-kit framework developers.”
    3. Write the instantiated report to `REQUIREMENTS_DIR/review.md` (i.e. `.specify/specs/[REQUIREMENTS_KEY]/review.md`). If a report already exists, either overwrite it or merge intelligently according to project convention (by default, overwrite with the latest run).
 
 5. **Report summary back to the user**:
@@ -73,3 +74,14 @@ Note: `/speckit.feature` manages the long-lived feature registry under `.specify
 6. `/speckit.review` – review SDD artifact quality and provide improvement suggestions for the workflow itself
 
 Use `/speckit.review` whenever you want to evaluate the **quality of the SDD process** and refine speckit/SDD practices based on the current artifact set.
+
+## Handoffs
+
+**Before running this command**:
+
+- Run after `/speckit.implement` so there is a complete artifact chain to review.
+
+**After running this command**:
+
+- Apply improvements by iterating on `/speckit.requirements` and/or `/speckit.plan`.
+- Optionally run `/speckit.analyze` to validate cross-artifact consistency after revisions.

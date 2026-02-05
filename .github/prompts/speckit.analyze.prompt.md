@@ -180,3 +180,14 @@ Ask the user: "Would you like me to suggest concrete remediation edits for the t
 ## Context
 
 {ARGS}
+
+## Handoffs
+
+**Before running this command**:
+
+- Run `/speckit.tasks` first so there is a complete `tasks.md` to analyze.
+
+**After running this command**:
+
+- If CRITICAL/HIGH issues are found, apply fixes in `/speckit.requirements`, `/speckit.plan`, or `/speckit.tasks` (as appropriate) and re-run analysis.
+- If issues are acceptable or resolved, proceed to `/speckit.implement`.

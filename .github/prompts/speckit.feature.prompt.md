@@ -130,11 +130,14 @@ present (pick what exists in the repo):
 - Feature detail links MUST point to `.specify/memory/features/[FEATURE_ID].md`.
 - Do NOT modify `.specify/templates/feature-details-template.md`; only instantiate copies.
 
-## Follow Up
+## Handoffs
 
-- After running `spec → plan → tasks → implement`, review whether features should be added/merged/split
-  and sync `.specify/memory/features/*.md` accordingly.
-- Ensure feature changes remain traceable to the spec/plan evidence (record in “key changes/notes”).
-- Suggested commit message:
-  - `docs: refresh feature index`
-  - `feat: add feature 00X <slug>`
+**Before running this command**:
+
+- Run `/speckit.constitution` if you are changing governance rules that affect feature definitions.
+- Ensure you have enough repo context (README/docs) for feature mining or refresh.
+
+**After running this command**:
+
+- Typically proceed to `/speckit.requirements` to produce a requirements specification for a chosen feature.
+- If feature scope or naming changes, keep them traceable to the most recent spec/plan evidence.

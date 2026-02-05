@@ -181,3 +181,13 @@ Behavior rules:
 - If quota reached with unresolved high-impact categories remaining, explicitly flag them under Deferred with rationale.
 
 Context for prioritization: {ARGS}
+
+## Handoffs
+
+**Before running this command**:
+
+- Run `/speckit.requirements` first to produce or update `requirements.md`.
+
+**After running this command**:
+
+- Proceed to `/speckit.plan` once key ambiguities are resolved.

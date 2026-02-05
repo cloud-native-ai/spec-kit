@@ -134,11 +134,6 @@ Every task MUST strictly follow this format:
    - Polish phase: NO story label
 5. **Description**: Clear action with exact file path
 
-### Manual Verification (RECOMMENDED)
-
-- If validation steps are manual (e.g., quickstart.md, CLI smoke tests, UI flows), add explicit manual QA tasks per user story.
-- Keep these separate from automated test tasks and label them with the same [US#] for traceability.
-
 **Examples**:
 
 - ✅ CORRECT: `- [ ] T001 Create project structure per implementation plan`
@@ -183,3 +178,15 @@ Every task MUST strictly follow this format:
   - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
   - Each phase should be a complete, independently testable increment
 - **Final Phase**: Polish & Cross-Cutting Concerns
+
+## Handoffs
+
+**Before running this command**:
+
+- Run `/speckit.plan` to produce a plan and design artifacts.
+
+**After running this command**:
+
+- Optionally run `/speckit.analyze` to check cross-artifact consistency before implementation.
+- Optionally run `/speckit.checklist` to create quality gates.
+- Then run `/speckit.implement` to execute the tasks phase-by-phase.
