@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Common functions and variables for all scripts
 
+source ~/.bashrc
+
 # Ensure the script runs in a UTF-8 locale to better support Unicode processing
 ensure_utf8_locale() {
     # Always set to C.UTF-8 for consistent behavior across systems
@@ -475,14 +477,4 @@ add_gitignore_pattern() {
         fi
         printf '%s\n' "$pattern" >>"$gitignore_file"
     fi
-}
-
-json_escape() {
-    local value="$1"
-    value="${value//\\/\\\\}"
-    value="${value//\"/\\\"}"
-    value="${value//$'\n'/\\n}"
-    value="${value//$'\r'/\\r}"
-    value="${value//$'\t'/\\t}"
-    printf '%s' "$value"
 }

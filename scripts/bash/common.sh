@@ -3,31 +3,6 @@
 
 source ~/.bashrc
 
-# Ensure the script runs in a UTF-8 locale to better support Unicode processing
-ensure_utf8_locale() {
-    # Always set to C.UTF-8 for consistent behavior across systems
-    # C.UTF-8 is available on most modern Linux distributions and provides
-    # a minimal, consistent UTF-8 environment without language-specific rules
-    if locale -a 2>/dev/null | grep -qi '^C\.utf8\|^C\.UTF-8$'; then
-        export LC_ALL=C.UTF-8
-        export LANG=C.UTF-8
-    elif locale -a 2>/dev/null | grep -qi '^en_US\.utf8\|^en_US\.UTF-8$'; then
-        # Fallback to en_US.UTF-8 if C.UTF-8 is not available
-        export LC_ALL=en_US.UTF-8
-        export LANG=en_US.UTF-8
-    else
-        # If no UTF-8 locale is available, set minimal UTF-8 support
-        export LC_ALL=C
-        export LANG=C
-        # Note: This may cause issues with non-ASCII characters, but it's the best we can do
-    fi
-    
-    # Verify that the locale is actually UTF-8 capable
-    if ! locale 2>/dev/null | grep -qi 'utf-8'; then
-        echo "Warning: Unable to set UTF-8 locale. Unicode handling may be limited." >&2
-    fi
-}
-
 # Unicode-aware slugify: keep letters and digits from all languages, replace others with '-'
 # Usage: slugify_unicode "Some 标题 示例"  -> some-标题-示例
 # Pure bash implementation - no external dependencies
