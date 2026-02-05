@@ -39,7 +39,7 @@ async def fetch_tools_with_mcp(
         return []
 
     try:
-        if type == "sse":
+        if type == "sse" or type == "streamable-http":
             # Connect via SSE
             async with sse_client(url, headers=headers) as (read, write):
                 async with ClientSession(read, write) as session:
@@ -319,6 +319,7 @@ async def main():
         if srv_url and srv_type in (
             "http",
             "sse",
+            "streamable-http",
         ):  # Assuming 'http' type uses JSON-RPC over HTTP
             print(
                 f"  Probing {server.get('name', 'unnamed')} ({srv_url})...",
@@ -352,6 +353,8 @@ async def main():
                 f"  Skipping stdio server {server.get('name', 'unnamed')}: Cannot list tools via script",
                 file=sys.stderr,
             )
+        else:
+            raise Exception("unsupport service type: "+ srv_type)
 
     output = {
         "timestamp": __import__("datetime").datetime.now().isoformat(),
