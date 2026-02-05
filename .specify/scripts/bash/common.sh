@@ -1,126 +1,8 @@
 #!/usr/bin/env bash
 # Common functions and variables for all scripts
 
-# source ~/.bashrc
-
-# Unicode-aware slugify: keep letters and digits from all languages, replace others with '-'
-# Usage: slugify_unicode "Some 标题 示例"  -> some-标题-示例
-# Pure bash implementation - no external dependencies
-slugify_unicode() {
-    # Fallback (ASCII only) - pure bash implementation
-    local input="$*"
-    local result=""
-    local prev_was_separator=0
-    
-    # Handle empty input
-    if [ -z "$input" ]; then
-        echo "feature"
-        return 0
-    fi
-    
-    # Convert to lowercase and process character by character
-    # Note: This is ASCII-only but safe for all UTF-8 since we only modify ASCII ranges
-    local i=0
-    local len=${#input}
-    
-    while [ $i -lt $len ]; do
-        local char="${input:$i:1}"
-        
-        # Check if character is alphanumeric (ASCII only check)
-        # For non-ASCII UTF-8 characters, they will pass through unchanged
-        case "$char" in
-            [a-zA-Z0-9])
-                # Alphanumeric character - add as lowercase
-                if [ "$char" != "${char%[A-Z]*}" ]; then
-                    # It's uppercase, convert to lowercase
-                    char=$(printf "%s" "$char" | tr '[:upper:]' '[:lower:]')
-                fi
-                result="${result}${char}"
-                prev_was_separator=0
-                ;;
-            *)
-                # Non-alphanumeric character - treat as separator
-                if [ $prev_was_separator -eq 0 ]; then
-                    result="${result}-"
-                    prev_was_separator=1
-                fi
-                ;;
-        esac
-        i=$((i + 1))
-    done
-    
-    # Remove leading and trailing hyphens
-    result="${result#-}"
-    result="${result%-}"
-    
-    # Handle case where result is empty
-    if [ -z "$result" ]; then
-        result="feature"
-    fi
-    
-    echo "$result"
-}
-
-# Get repository root, with fallback for non-git repositories
-get_repo_root() {
-    if git rev-parse --show-toplevel >/dev/null 2>&1; then
-        git rev-parse --show-toplevel
-    else
-        # Fall back to script location for non-git repos
-        local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-        (cd "$script_dir/../../.." && pwd)
-    fi
-}
-
-# Get current branch, with fallback for non-git repositories
-get_current_branch() {
-    # First check if SPECIFY_FEATURE environment variable is set
-    if [[ -n "${SPECIFY_FEATURE:-}" ]]; then
-        echo "$SPECIFY_FEATURE"
-        return
-    fi
-
-    # Then check git if available
-    if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
-        git rev-parse --abbrev-ref HEAD
-        return
-    fi
-
-    # For non-git repos, try to find the latest feature directory
-    local repo_root=$(get_repo_root)
-    local specs_dir="$repo_root/.specify/specs"
-
-    if [[ -d "$specs_dir" ]]; then
-        local latest_feature=""
-        local highest=0
-
-        for dir in "$specs_dir"/*; do
-            if [[ -d "$dir" ]]; then
-                local dirname=$(basename "$dir")
-                if [[ "$dirname" =~ ^([0-9]{3})- ]]; then
-                    local number=${BASH_REMATCH[1]}
-                    number=$((10#$number))
-                    if [[ "$number" -gt "$highest" ]]; then
-                        highest=$number
-                        latest_feature=$dirname
-                    fi
-                fi
-            fi
-        done
-
-        if [[ -n "$latest_feature" ]]; then
-            echo "$latest_feature"
-            return
-        fi
-    fi
-
-    echo "main"  # Final fallback
-}
-
-# Check if we have git available
-has_git() {
-    git rev-parse --show-toplevel >/dev/null 2>&1
-}
+# Source .bashrc but ignore errors (e.g. from bash_completion)
+source ~/.bashrc || true
 
 check_feature_branch() {
     local branch="$1"
@@ -185,8 +67,8 @@ find_feature_dir_by_prefix() {
 }
 
 get_feature_paths() {
-    local repo_root=$(get_repo_root)
-    local current_branch=$(get_current_branch)
+    local repo_root=$(git_repo_root)
+    local current_branch=$(git_current_branch)
     local has_git_repo="false"
 
     if has_git; then
@@ -213,50 +95,6 @@ EOF
 
 check_file() { [[ -f "$1" ]] && echo "  ✓ $2" || echo "  ✗ $2"; }
 check_dir() { [[ -d "$1" && -n $(ls -A "$1" 2>/dev/null) ]] && echo "  ✓ $2" || echo "  ✗ $2"; }
-
-
-# Function: json_escape
-# Description: Escapes a string for safe inclusion in JSON
-# Usage: escaped=$(json_escape "$input")
-# Parameters:
-#   $1 - The input string to escape
-# Returns:
-#   The JSON-escaped string via stdout
-json_escape() {
-    local input="$1"
-    local escaped=""
-    local i=0
-    local char
-    
-    # Process each character
-    while [ $i -lt ${#input} ]; do
-        char="${input:$i:1}"
-        case "$char" in
-            '"')  escaped="${escaped}\\\"";;
-            '\\') escaped="${escaped}\\\\\\\\";;
-            '/')  escaped="${escaped}\/";;
-            $'\b') escaped="${escaped}\\b";;
-            $'\f') escaped="${escaped}\\f";;
-            $'\n') escaped="${escaped}\\n";;
-            $'\r') escaped="${escaped}\\r";;
-            $'\t') escaped="${escaped}\\t";;
-            *) 
-                # Check if character is a control character (ASCII 0-31)
-                if [ "$(printf '%d' "'$char")" -lt 32 ]; then
-                    # Convert to \uXXXX format
-                    printf -v hex '%04x' "$(printf '%d' "'$char")"
-                    escaped="${escaped}\\u${hex}"
-                else
-                    escaped="${escaped}${char}"
-                fi
-                ;;
-        esac
-        i=$((i + 1))
-    done
-    
-    echo "$escaped"
-}
-
 
 # Function: safe_quote
 # Description: Safely quotes a string so it can be used as a shell argument without interpretation
@@ -391,65 +229,5 @@ report_success() {
         fi
     else
         echo "$message"
-    fi
-}
-
-# helper to escape for sed
-escape_sed() {
-    echo "$1" | sed 's/[\/&]/\\&/g'
-}
-
-# --- Gitignore Helpers ---
-
-# Check if a pattern exists in .gitignore (exact match)
-# Usage: gitignore_has_pattern "pattern" "/path/to/.gitignore"
-gitignore_has_pattern() {
-    local pattern="$1"
-    local gitignore_file="$2"
-
-    if [ -z "$pattern" ] || [ -z "$gitignore_file" ]; then
-        return 1
-    fi
-
-    if [ ! -f "$gitignore_file" ]; then
-        return 1
-    fi
-
-    grep -Fxq "$pattern" "$gitignore_file"
-}
-
-# Ensure .gitignore exists
-# Usage: ensure_gitignore_exists "/path/to/.gitignore"
-ensure_gitignore_exists() {
-    local gitignore_file="$1"
-
-    if [ -z "$gitignore_file" ]; then
-        return 1
-    fi
-
-    if [ ! -f "$gitignore_file" ]; then
-        mkdir -p "$(dirname "$gitignore_file")"
-        touch "$gitignore_file"
-    fi
-}
-
-# Add a pattern to .gitignore if it doesn't already exist
-# Usage: add_gitignore_pattern "pattern" ["/path/to/.gitignore"]
-add_gitignore_pattern() {
-    local pattern="$1"
-    local gitignore_file="${2:-$(get_repo_root)/.gitignore}"
-
-    if [ -z "$pattern" ]; then
-        return 1
-    fi
-
-    ensure_gitignore_exists "$gitignore_file"
-
-    if ! gitignore_has_pattern "$pattern" "$gitignore_file"; then
-        # Ensure a blank line before appending when file is not empty and doesn't end with newline
-        if [ -s "$gitignore_file" ] && [ -n "$(tail -c 1 "$gitignore_file")" ]; then
-            printf '\n' >>"$gitignore_file"
-        fi
-        printf '%s\n' "$pattern" >>"$gitignore_file"
     fi
 }

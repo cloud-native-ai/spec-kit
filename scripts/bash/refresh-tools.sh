@@ -118,25 +118,19 @@ get_system_binaries_json() {
 get_shell_function_json() {
   local first=true
   printf '['
-  # Use compgen to list all functions
-  # define mapping to skip internal functions of this script
-  local skip_funcs="json_escape|get_mcp_tools_json|get_system_binaries_json|get_shell_function_json|get_project_scripts_json|print_mcp_tools_markdown|print_system_binaries_markdown|print_shell_function_markdown|print_project_scripts_markdown|ensure_utf8_locale|report_error|report_success|validate_skill_name|create_skill_structure"
 
   while IFS= read -r func; do
-    if [[ $func =~ ^($skip_funcs)$ ]]; then
+    # Filter out functions starting with "_"
+    if [[ $func == _* ]]; then
       continue
     fi
-
-    # Get function definition (first line only, effectively the signature)
-    local def
-    def=$(declare -f "$func" | head -n 10)
 
     if [ "$first" = true ]; then
       first=false
     else
       printf ','
     fi
-    printf '{"name":"%s","definition":"%s"}' "$(json_escape "$func")" "$(json_escape "$def")"
+    printf '{"name":"%s"}' "$(json_escape "$func")"
   done < <(compgen -A function | sort)
   printf ']'
 }
@@ -188,11 +182,9 @@ get_project_scripts_json() {
 }
 
 print_mcp_tools_markdown() {
-  local json
-  json=$(get_mcp_tools_json)
   echo "## MCP Tools"
   if command -v jq >/dev/null 2>&1; then
-    echo "$json" | jq -r '
+    get_mcp_tools_json | jq -r '
             def format_args:
                 if (.inputSchema and .inputSchema.properties and (.inputSchema.properties | length > 0)) then
                     "\n  - Arguments:\n" +
@@ -214,19 +206,16 @@ print_mcp_tools_markdown() {
             end'
   else
     echo '```json'
-    echo "$json"
+    get_mcp_tools_json
     echo '```'
   fi
   echo ""
 }
 
 print_system_binaries_markdown() {
-  local json
-  json=$(get_system_binaries_json)
-
   echo "## System Information"
   if command -v jq >/dev/null 2>&1; then
-    echo "$json" | jq -r '
+    get_system_binaries_json | jq -r '
             if .os_release != "" then
                 "### OS Release\n```\n" + .os_release + "\n```\n"
             else "" end,
@@ -237,18 +226,16 @@ print_system_binaries_markdown() {
   else
     # Fallback to json dump
     echo '```json'
-    echo "$json"
+    get_system_binaries_json
     echo '```'
   fi
   echo ""
 }
 
 print_shell_function_markdown() {
-  local json
-  json=$(get_shell_function_json)
   echo "## Shell Functions"
   if command -v jq >/dev/null 2>&1; then
-    echo "$json" | jq -r '
+    get_shell_function_json | jq -r '
             if length > 0 then
                 .[] | ("### " + .name + "\n```bash\n" + .definition + "\n```\n")
             else
@@ -256,7 +243,7 @@ print_shell_function_markdown() {
             end'
   else
     echo '```json'
-    echo "$json"
+    get_shell_function_json
     echo '```'
   fi
   echo ""

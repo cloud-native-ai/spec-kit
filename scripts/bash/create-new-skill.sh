@@ -164,12 +164,12 @@ refresh_tools_for_target() {
         "$SCRIPT_DIR/refresh-tools.sh" --project --format markdown > "$tools_dir/project.md"
 
         # Add generated tools docs to .gitignore
-        REPO_ROOT="$(get_repo_root)"
+        REPO_ROOT="$(git_repo_root)"
         if [[ "$TARGET_DIR" == "$REPO_ROOT/"* ]]; then
             REL_TARGET_DIR="${TARGET_DIR#$REPO_ROOT/}"
-            add_gitignore_pattern "$REL_TARGET_DIR/tools/*.md" "$REPO_ROOT/.gitignore"
+            gitignore_add_pattern "$REL_TARGET_DIR/tools/*.md" "$REPO_ROOT/.gitignore"
         else
-            add_gitignore_pattern "$TARGET_DIR/tools/*.md" "$REPO_ROOT/.gitignore"
+            gitignore_add_pattern "$TARGET_DIR/tools/*.md" "$REPO_ROOT/.gitignore"
         fi
     else
         echo "Warning: refresh-tools.sh not found, skipping tools documentation generation." >&2
