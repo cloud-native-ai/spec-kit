@@ -43,7 +43,10 @@ This project documentation is distributed across several key files. You MUST ref
 - Prefer project scripts for repeatable tasks.
 - Use MCP tools for internal docs or code queries when available.
 - Verify architectural rules via the **Constitution** rather than assumptions.
+
+## Dependency
 - **Shell Functions**: Common functions (like `json_escape` in `profile.d/04_format.sh`) are defined in `cws-lib-bash`. Before implementing a new shell function, search `$CWS_LIB_BASH_HOME`.
+- **Python Library**: Python library using `cws-lib-python`. Before implemneting a new python function, search `$CWS_LIB_PYTHON_HOME`
 
 ## Tools
 Project specific tools documentation can be found in `.ai/tools/`.

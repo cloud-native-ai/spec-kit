@@ -1,10 +1,13 @@
 #!/bin/bash
 set -e
 
-# Source common for logging
+# Load common helpers for Unicode support and shared functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ -f "$SCRIPT_DIR/common.sh" ]; then
-  source "$SCRIPT_DIR/common.sh"
+    # shellcheck source=/dev/null
+    source "$SCRIPT_DIR/common.sh"
+    # Ensure UTF-8 locale for better Unicode handling
+    ensure_utf8_locale || true
 fi
 
 if ! command -v log &>/dev/null; then
