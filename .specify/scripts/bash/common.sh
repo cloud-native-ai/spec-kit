@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Common functions and variables for all scripts
 
-source ~/.bashrc
+# source ~/.bashrc
 
 # Unicode-aware slugify: keep letters and digits from all languages, replace others with '-'
 # Usage: slugify_unicode "Some 标题 示例"  -> some-标题-示例

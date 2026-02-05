@@ -1,15 +1,15 @@
 <!--
 Sync Impact Report
-- Version change: N/A → 1.0.0
-- Modified principles: Added comprehensive Spec-Driven Development principles
-- Added sections: Spec-Driven Development Workflow, AI Agent Integration, Feature Governance
-- Removed sections: Generic template sections replaced with project-specific content
-- Templates requiring updates: 
-  ✅ templates/plan-template.md - Updated to align with SDD workflow
-  ✅ templates/spec-template.md - Updated to include SDD requirements
-  ✅ templates/tasks-template.md - Updated to reflect feature-centric task types
-  ✅ templates/commands/*.md - Verified alignment with generic guidance
-- Follow-up TODOs: None - all placeholders resolved
+- Version change: 1.0.0 → 1.0.1
+- Modified principles: None (validation refresh only)
+- Added sections: None
+- Removed sections: None
+- Templates requiring updates:
+  ✅ templates/plan-template.md - Confirmed alignment with current principles
+  ✅ templates/spec-template.md - Confirmed alignment with current principles
+  ✅ templates/tasks-template.md - Confirmed alignment with current principles
+  ✅ templates/commands/*.md - Confirmed alignment with current principles
+- Follow-up TODOs: None
 -->
 
 # Spec Kit Constitution
@@ -133,4 +133,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-01-30
+**Version**: 1.0.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-02-05

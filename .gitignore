@@ -44,5 +44,5 @@ env/
 .genreleases/
 *.zip
 sdd-*/
-.github/skills/test-skill/tools/*.md
-.github/skills/test-refresh-only-skill/tools/*.md
+
+.ai/tools/*.md
