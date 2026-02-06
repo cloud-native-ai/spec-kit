@@ -33,8 +33,8 @@
 
 **Core Principles Compliance**:
 
+- **Feature-Centric Development**: Feature Index is single source of truth; all phases re-evaluate Feature changes.
 - **Specification-Driven Development**: Code serves specifications; specifications are executable and generate working systems
-- **Feature-Centric Development**: Feature Index is single source of truth; all phases re-evaluate Feature changes
 - **Intent-Driven Development**: Focus on "what" and "why" before "how"; use rich specifications with guardrails
 - **Test-First & Contract-Driven**: TDD flow followed; pure functions have unit tests; critical flows have regression coverage
 - **AI Agent Integration**: Only approved agents (GitHub Copilot, Qwen Code, opencode); configuration rejects unsupported providers
