@@ -54,7 +54,7 @@ Follow this execution flow:
 
 4. Consistency propagation checklist (convert prior checklist into active validations):
    - Read `/templates/plan-template.md` and ensure any "Constitution Check" or rules align with updated principles.
-   - Read `/templates/spec-template.md` for scope/requirements alignment—update if constitution adds/removes mandatory sections or constraints.
+   - Read `/templates/requirements-template.md` for scope/requirements alignment—update if constitution adds/removes mandatory sections or constraints.
    - Read `/templates/tasks-template.md` and ensure task categorization reflects new or removed principle-driven task types (e.g., observability, versioning, testing discipline).
    - Read any runtime guidance docs (e.g., `README.md`, `docs/quickstart.md`, or agent-specific guidance files if present). Update references to principles changed.
 

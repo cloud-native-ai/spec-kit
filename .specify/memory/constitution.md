@@ -6,7 +6,7 @@ Sync Impact Report
 - Removed sections: None
 - Templates requiring updates:
   ✅ templates/plan-template.md - Confirmed alignment with current principles
-  ✅ templates/spec-template.md - Confirmed alignment with current principles
+  ✅ templates/requirements-template.md - Confirmed alignment with current principles
   ✅ templates/tasks-template.md - Confirmed alignment with current principles
   ✅ templates/commands/*.md - Confirmed alignment with current principles
 - Follow-up TODOs: None
