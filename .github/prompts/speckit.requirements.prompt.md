@@ -45,7 +45,7 @@ Given that feature description, do this:
    
    d. Prepare to run the script `
 ```bash
-cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json --number <NUMBER> --short-name "<SHORT_NAME>"
+cat << 'EOF' | .specify/scripts/bash/create-new-spec.sh --json --short-name "<SHORT_NAME>"
 $ARGUMENTS
 EOF
 ```
