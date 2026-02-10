@@ -206,11 +206,6 @@ def get_resource_path() -> Optional[Path]:
     if (MODULE_DIR / "templates").exists():
         return MODULE_DIR
 
-    # Check repo root (assuming src/specify_cli structure)
-    repo_root = MODULE_DIR.parent.parent
-    if (repo_root / "templates").exists():
-        return repo_root
-
     return None
 
 
@@ -242,10 +237,30 @@ def generate_commands(
         return
 
     commands_dir = resource_path / "templates" / "commands"
-    if not commands_dir.exists():
+    template_files: List[Path] = []
+    seen_stems: Set[str] = set()
+
+    if commands_dir.exists():
+        for template_file in commands_dir.glob("*.md"):
+            if template_file.is_file() and template_file.stem not in seen_stems:
+                template_files.append(template_file)
+                seen_stems.add(template_file.stem)
+
+    # Fallback to repo templates if available (helps in local dev when package templates lag)
+    repo_commands_dir = MODULE_DIR.parent.parent / "templates" / "commands"
+    if (
+        repo_commands_dir.exists()
+        and repo_commands_dir.resolve() != commands_dir.resolve()
+    ):
+        for template_file in repo_commands_dir.glob("*.md"):
+            if template_file.is_file() and template_file.stem not in seen_stems:
+                template_files.append(template_file)
+                seen_stems.add(template_file.stem)
+
+    if not template_files:
         return
 
-    for template_file in commands_dir.glob("*.md"):
+    for template_file in template_files:
         if not template_file.is_file():
             continue
 
@@ -1405,7 +1420,11 @@ def init(
         "○ [cyan]/speckit.clarify[/] [bright_black](optional)[/bright_black] - Ask structured questions to de-risk ambiguous areas before planning (run before [cyan]/speckit.plan[/] if used)",
         "○ [cyan]/speckit.analyze[/] [bright_black](optional)[/bright_black] - Cross-artifact consistency & alignment report (after [cyan]/speckit.tasks[/], before [cyan]/speckit.implement[/])",
         "○ [cyan]/speckit.checklist[/] [bright_black](optional)[/bright_black] - Generate quality checklists to validate Requirements (What) completeness, clarity, and consistency (after [cyan]/speckit.requirements[/]; optionally re-run after [cyan]/speckit.plan[/] for traceability)",
+        "○ [cyan]/speckit.research[/] [bright_black](optional)[/bright_black] - In-depth research and analysis to support the implementation plan",
         "○ [cyan]/speckit.review[/] [bright_black](optional)[/bright_black] - Review the full SDD artifact set for a feature and summarize it (after [cyan]/speckit.implement[/])",
+        "○ [cyan]/speckit.mcpcall[/] [bright_black](optional)[/bright_black] - Identify and execute a specific MCP tool; maintain a local tool record",
+        "○ [cyan]/speckit.skills[/] [bright_black](optional)[/bright_black] - Create agent skills and project skill scaffolding",
+        "○ [cyan]/speckit.instructions[/] [bright_black](optional)[/bright_black] - Generate or update project AI instructions and compatibility symlinks",
     ]
     enhancements_panel = Panel(
         "\n".join(enhancement_lines),
