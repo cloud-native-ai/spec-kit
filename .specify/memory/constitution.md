@@ -1,14 +1,12 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 → 1.0.1
-- Modified principles: None (validation refresh only)
+- Version change: 1.0.1 (No change)
+- Modified principles: None
 - Added sections: None
 - Removed sections: None
 - Templates requiring updates:
-  ✅ templates/plan-template.md - Confirmed alignment with current principles
-  ✅ templates/requirements-template.md - Confirmed alignment with current principles
-  ✅ templates/tasks-template.md - Confirmed alignment with current principles
-  ✅ templates/commands/*.md - Confirmed alignment with current principles
+  ✅ templates/plan-template.md - Aligned
+  ⚠ templates/tasks-template.md - References Principle V for TDD (should be IV)
 - Follow-up TODOs: None
 -->
 

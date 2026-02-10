@@ -25,6 +25,32 @@
 - [Qwen Code](https://github.com/QwenLM/qwen-code)
 - [opencode](https://opencode.ai/)
 
+## Feature List
+
+### Functional Features
+
+- **Unify Command Handoffs**: Make command prerequisites and next steps explicit. (Status: Planned)
+- **Analyze Command**: Analyze project context and code structure. (Status: Completed)
+- **Checklist Command**: Verify project alignment with constitution. (Status: Completed)
+- **Clarify Command**: Resolve ambiguities in specifications. (Status: Completed)
+- **Constitution Command**: Manage project governance and principles. (Status: Completed)
+- **Feature Command**: Manage feature lifecycle and metadata. (Status: Completed)
+- **Implement Command**: Generate code from tasks and plans. (Status: Completed)
+- **Instructions Command**: Generate prompts for AI agents. (Status: Completed)
+- **Plan Command**: Create implementation plans from specs. (Status: Completed)
+- **Requirements Command**: Define requirements and specifications. (Status: Completed)
+- **Research Command**: Gather context and dependencies. (Status: Completed)
+- **Review Command**: Review implementation against rules. (Status: Completed)
+- **Skills Command**: Manage extensible skills/tools. (Status: Completed)
+- **Tasks Command**: Break down plans into atomic tasks. (Status: Completed)
+
+### Non-functional Features
+
+- **CLI Interface**: Rich terminal interface using Typer.
+- **MCP Support**: Integration with Model Context Protocol.
+- **Template Engine**: Markdown-based template system.
+- **Configuration Management**: Project configuration via pyproject.toml.
+
 ## 📦 安装
 
 详细安装说明请参阅 [安装指南](docs/installation.md)。
