@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MCP Tool Record",
+  "type": "object",
+  "required": ["name", "server", "description", "status", "last_updated"],
+  "properties": {
+    "name": {"type": "string", "minLength": 1},
+    "server": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "enum": ["Draft", "Verified", "Deprecated"]},
+    "last_updated": {"type": "string", "format": "date"},
+    "parameters": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/parameter"}
+    },
+    "returns": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/return"}
+    },
+    "usage_notes": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "examples": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/example"}
+    }
+  },
+  "definitions": {
+    "parameter": {
+      "type": "object",
+      "required": ["name", "type", "required", "description"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "type": {"type": "string", "minLength": 1},
+        "required": {"type": "boolean"},
+        "description": {"type": "string", "minLength": 1},
+        "default": {"type": ["string", "null"]}
+      }
+    },
+    "return": {
+      "type": "object",
+      "required": ["name", "type", "description"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "type": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1}
+      }
+    },
+    "example": {
+      "type": "object",
+      "required": ["input", "output"],
+      "properties": {
+        "input": {"type": "object"},
+        "output": {"type": "object"}
+      }
+    }
+  }
+}

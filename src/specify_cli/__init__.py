@@ -200,6 +200,8 @@ def get_resource_path() -> Optional[Path]:
     Get the path containing templates/memory/scripts.
     Checks MODULE_DIR first (installed package), then repo root (local dev).
     """
+    # NOTE: MCP tool templates (templates/mcptool-template.md and templates/commands/mcpcall.md)
+    # follow the same resolution path as other templates and are copied into .specify/templates.
     # Check installed package location
     if (MODULE_DIR / "templates").exists():
         return MODULE_DIR
