@@ -156,7 +156,7 @@ You **MUST** treat the user input ($ARGUMENTS) as parameters for the current com
 The `/speckit.implement` command automatically integrates with the feature tracking system:
 
 - If a `.specify/memory/features.md` file exists, the command will:
-  - Detect the current feature directory (format: `.specify/specs/###-feature-name/`)
+  - Detect the current feature directory (format: `.specify/specs/[REQUIREMENTS_KEY]/`)
   - Extract the feature ID from the directory name
   - Update the corresponding feature entry in `.specify/memory/features.md`:
     - Ensure status remains "Implemented" (maintains status from planning phase)
