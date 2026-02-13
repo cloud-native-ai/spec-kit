@@ -33,9 +33,14 @@ Execution steps:
 4. **Collect parameters step by step**
    - Parse the required parameters from the MCP tool record.
    - Prompt the user for each parameter one by one.
-   - After all parameters are collected, execute the MCP tool according to the record.
 
-5. **Ask about output formatting**
+5. **Summarize and confirm execution**
+   - At the end of the command, print the MCP tool basic info and the collected parameter list in a single summary.
+   - Ask the user whether to execute.
+   - If the user inputs `yes`, execute the MCP tool.
+   - If the user inputs any other value, apply the user’s input to update the generated MCP document or the parameter list, then continue the flow.
+
+6. **Ask about output formatting**
    - Ask whether the MCP output should be formatted as JSON, Markdown, HTML, or another format.
    - Apply the selected format to the response.
 
@@ -44,3 +49,4 @@ Execution steps:
 - Create or update `.specify/memory/tools/<mcp tool name>.md`.
 - The record must include MCP Server, tool description, parameters, and returns.
 - The generated prompt must be detailed enough for LLM-driven MCP invocation.
+- Before execution, always print one summary with the MCP tool basic info and collected parameters, then request confirmation.

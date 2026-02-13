@@ -56,4 +56,4 @@
 - **Verification Status**: [unverified | verified]
 - **Notes**: [Any additional context]
 
-调用本文档描述的mcp工具
+使用[MCP TOOL PARAMETERS]调用[MCP TOOL NAME]工具
