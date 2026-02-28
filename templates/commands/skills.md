@@ -24,6 +24,11 @@ $ARGUMENTS
 
 Goal: Interactively guide the user to create a high-quality SpecKit Skill, ensuring all necessary components are properly structured and documented.
 
+Primary workflow:
+1. Extract reusable workflow from the current conversation
+2. Clarify only when the workflow is still unclear
+3. Iterate draft → review weak points → refine until finalized
+
 ## Specification
 
 ### Anatomy of a Skill
@@ -202,7 +207,38 @@ AI Agent reads REDLINING.md or OOXML.md only when the user needs those features.
 - **Avoid deeply nested references** - Keep references one level deep from SKILL.md. All reference files should link directly from SKILL.md.
 - **Structure longer reference files** - For files longer than 100 lines, include a table of contents at the top so AI Agent can see the full scope when previewing.
 
-### Skill Planning & Strategy
+### Skill Planning & Strategy (Official Workflow Aligned)
+
+#### Step A: Extract from Conversation First
+
+Before asking new questions, review the current conversation history and extract a reusable workflow whenever possible.
+
+Extract at minimum:
+
+- The step-by-step process being followed
+- Decision points and branching logic
+- Quality criteria or completion checks
+
+If a clear workflow can be extracted, use it as the default draft baseline and only ask follow-up questions for missing or high-risk gaps.
+
+#### Step B: Clarify if Needed
+
+If no clear workflow emerges from conversation context, ask focused clarification questions to establish a minimal working workflow:
+
+- What outcome should this skill produce?
+- Is this workspace-scoped or personal?
+- Should this be a quick checklist or a full multi-step workflow?
+
+Use one question at a time and prefer recommended defaults.
+
+#### Step C: Iterate
+
+Iterative loop:
+
+1. Draft the skill and save it
+2. Identify the most ambiguous/weak parts and ask targeted follow-ups
+3. Refine and repeat until stable
+4. Finalize by summarizing outputs, example prompts, and suggested related customizations
 
 #### Understanding the Skill with Concrete Examples
 
@@ -288,50 +324,55 @@ Write instructions for using the skill and its bundled resources.
         - Parse `SKILL_DIR`, `SKILL_NAME`, `SKILL_DESCRIPTION`.
         - Confirm success: "Created skill backbone at `SKILL_DIR`."
 
-2.  **Sequential Configuration Loop (Interactive)**:
+2.  **Extract from Conversation (Default Path)**:
+    - Review current conversation history first.
+    - Extract and draft:
+      - Reusable step-by-step process
+      - Decision points and branching logic
+      - Quality criteria / completion checks
+    - If extraction is strong enough, proceed directly to draft without broad discovery questions.
+
+3.  **Clarify if Needed (Fallback Path)**:
+    - Trigger this only when extraction is weak, ambiguous, or missing key decisions.
     - **Constraint**: Ask **EXACTLY ONE** question at a time. Wait for user response before proceeding.
-    - **Style**: Use "recommended" defaults determined by analysis to minimize typing (answer "yes" to accept).
+    - Preferred clarifications:
+      - Outcome: "What concrete result should this skill produce?"
+      - Scope: "Workspace-scoped or personal?"
+      - Format: "Quick checklist or full multi-step workflow?"
+    - Then refine trigger description and constraints as needed:
+      - Trigger intent/keywords/scenarios (for frontmatter `description`)
+      - Critical rules/constraints (compliance/prohibitions/specific libraries)
 
-    **Q1: Clarify Triggers (The "When")**
-    - *Context*: This description acts as the router for the agent. It must be specific enough to differentiate this skill from others.
-    - *Question*: "What specific user intent, keywords, or scenarios should trigger this skill? (e.g., 'Use when the user asks to analyze a PDF invoice' vs 'Use for general PDF reading')."
-    - **Analysis**: Suggest a refined, scenario-based description if the initial input was vague.
+4.  **Iterative Drafting & Refinement**:
+    - Draft/update `SKILL.md` and save.
+    - Identify the most ambiguous or weak parts.
+    - Ask targeted follow-up questions only for those weak parts.
+    - Repeat until the skill is coherent and actionable.
 
-    **Q2: Content Definition (The "What" and "How")**
-    - *Context*: Gather information to populate the core sections of `SKILL.md`.
-    - **Step 2a (Outcome)**: Ask: "What is the concrete result or deliverable of this skill? (e.g., A specific file format, a report, a system change)."
-    - **Step 2b (Workflow)**: Ask: "What are the high-level steps to achieve this? (e.g., 1. Validate input, 2. Process data, 3. Write output)."
-    - **Step 2c (Constraints)**: Ask: "Are there any critical constraints or rules? (e.g., Compliance requirements, prohibited actions, specific libraries)."
-
-    **Q3: Resource Strategy & Verification (The "With")**
-    - *Context*: Identify and verify the necessary resources (Scripts, References, Assets) based on the Q2 responses.
-    - *Auto-Detection Logic*:
+5.  **Tailored Implementation**:
+    - **Update SKILL.md Details**:
+      - Replace `{{DESCRIPTION}}` in frontmatter with finalized trigger description.
+      - Fill `## Overview` with finalized outcome.
+      - Fill `## Workflow / Instructions` with extracted/refined process.
+      - If constraints exist, append a `## Constraints` section or integrate into workflow.
+      - *Note*: If `## Applicable Scenarios` (or the legacy `## 适用场景`) section exists in the template, verify if it adds value beyond the Frontmatter. If not, remove it to reduce context.
+    - **Scaffold Resources**:
+      - Detect and confirm resource strategy, then create placeholders in `scripts/`, `references/`, or `assets/` with context-aware comments.
+      - Detection hints:
         - Logic/Automation/API calls -> **Scripts**
         - Documentation/Schema/Policy -> **References**
         - Templates/Boilerplate -> **Assets**
         - System Commands -> **Tools**
-    - *Action*: Present the **Detected Strategy** to the user.
-    - *Question*: "Based on your requirements, I've identified the following potential resources. Please verify if they are correct and permitted:"
-       - *Display*: List detected resources with rationale (e.g., "[X] Scripts: Detected 'API call' in workflow").
-    - *Interaction*: Allow user to confirm (Yes) or Modify.
-
-3.  **Tailored Implementation**:
-    - **Update SKILL.md Details**:
-      - Replace `{{DESCRIPTION}}` in frontmatter with result from Q1.
-      - Fill `## Overview` with result from Q2a.
-      - Fill `## Workflow / Instructions` with result from Q2b.
-      - If Q2c Constraints exist, append a `## Constraints` section or integrate into Workflow.
-      - *Note*: If `## Applicable Scenarios` (or the legacy `## 适用场景`) section exists in the template, verify if it adds value beyond the Frontmatter. If not, remove it to reduce context.
-    - **Scaffold Resources**:
-      - Based on Q3 confirmation, create placeholder files in `scripts/`, `references/`, or `assets/` with context-aware comments. (e.g., `scripts/placeholder.py` with "# TODO: Implement API call logic").
     - **Update Links**:
       - Update the `## Available Tools & Resources` section in `SKILL.md` to link to the newly created scaffold files (e.g., add `- [Rotate Script](scripts/rotate_pdf.py)` under `### Scripts`).
     - **Import Files**:
       - Ask: "Do you have existing files to import for these resources?"
       - If yes, guide user to copy them to the valid paths.
 
-4.  **Completion**:
-    - Summarize the skill structure created.
+6.  **Completion**:
+    - Summarize what the skill produces and the structure created.
+    - Suggest example prompts to try the skill.
+    - Propose related customizations to create next.
     - Output the link to `SKILL.md`.
 
 ## Continuous Improvement

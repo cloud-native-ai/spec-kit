@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  title: Speckit Agents Command Contract
+  version: 1.0.0
+  description: |
+    API-style contract used to validate `/speckit.agents` command behavior.
+    This is a design contract for command semantics, not a public network service.
+servers:
+  - url: https://local.speckit.invalid
+paths:
+  /agents:
+    post:
+      summary: Create agent definition
+      operationId: createAgent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAgentRequest'
+      responses:
+        '201':
+          description: Agent created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentResponse'
+        '409':
+          description: Contradictory constraints unresolved
+        '422':
+          description: Invalid YAML/frontmatter or unsupported provider reference
+  /agents/{agentName}:
+    put:
+      summary: Update or overwrite existing agent
+      operationId: updateAgent
+      parameters:
+        - in: path
+          name: agentName
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAgentRequest'
+      responses:
+        '200':
+          description: Agent overwritten successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentResponse'
+        '404':
+          description: Agent not found
+        '409':
+          description: Contradictory constraints unresolved
+  /agents/infer:
+    post:
+      summary: Infer agent intent from context
+      operationId: inferAgentIntent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InferIntentRequest'
+      responses:
+        '200':
+          description: Inference completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InferIntentResponse'
+  /agents/validate:
+    post:
+      summary: Validate agent content and constraints
+      operationId: validateAgent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateAgentRequest'
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+components:
+  schemas:
+    CreateAgentRequest:
+      type: object
+      required:
+        - displayName
+        - description
+        - roleScope
+      properties:
+        displayName:
+          type: string
+        description:
+          type: string
+        roleScope:
+          type: string
+        tools:
+          type: array
+          items:
+            type: string
+        providerReferences:
+          type: array
+          items:
+            type: string
+    UpdateAgentRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateAgentRequest'
+        - type: object
+          properties:
+            overwrite:
+              type: boolean
+              enum: [true]
+              description: Overwrite is required by current clarified behavior.
+    InferIntentRequest:
+      type: object
+      properties:
+        conversationContext:
+          type: string
+        repositorySignals:
+          type: array
+          items:
+            type: string
+    InferIntentResponse:
+      type: object
+      required:
+        - confidence
+        - action
+      properties:
+        confidence:
+          type: string
+          enum: [high, medium, low]
+        inferredIntent:
+          type: string
+        action:
+          type: string
+          enum: [create, ask_user_intent]
+    ValidateAgentRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+    ValidationResponse:
+      type: object
+      required:
+        - valid
+      properties:
+        valid:
+          type: boolean
+        errors:
+          type: array
+          items:
+            type: string
+    AgentResponse:
+      type: object
+      required:
+        - agentName
+        - path
+        - status
+      properties:
+        agentName:
+          type: string
+        path:
+          type: string
+        status:
+          type: string
+          enum: [created, updated]

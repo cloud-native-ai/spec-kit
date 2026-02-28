@@ -1,7 +1,7 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-02-10
-**Total Features**: 18
+**Last Updated**: 2026-02-28
+**Total Features**: 19
 
 ## Features
 
@@ -25,6 +25,7 @@
 | 016 | MCP Support | Integration with Model Context Protocol. | Implemented | .specify/memory/features/016.md | .specify/specs/002-mcp-tool-call/requirements.md | 2026-02-10 |
 | 017 | Template Engine | Markdown-based template system. | Completed | .specify/memory/features/017.md | - | 2026-02-10 |
 | 018 | Configuration Management | Project configuration via pyproject.toml. | Completed | .specify/memory/features/018.md | - | 2026-02-10 |
+| 019 | Agents Command | Create or refine custom AI agents (.agent.md) for workspace-specific workflows. | Implemented | .specify/memory/features/019.md | .specify/specs/003-speckit-agents-command/requirements.md | 2026-02-28 |
 
 ## Feature Entry Format
 

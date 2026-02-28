@@ -23,6 +23,7 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 | `/speckit.research` | Conduct technical research | Research |
 | `/speckit.constitution` | Manage project constitution | Governance |
 | `/speckit.feature` | Manage feature registry | Governance |
+| `/speckit.agents` | Create/refine custom agents | Extension |
 | `/speckit.skills` | Manage specialized skills | Extension |
 | `/speckit.instructions` | Generate usage instructions | Documentation |
 
@@ -228,6 +229,20 @@ Spec Kit 的命令不是独立使用的。下面这张表用“常见前置 / �
 - **Refresh**: `/speckit.skills` (no args) scans and validates all installed skills
 - Enforces standard structure (`SKILL.md`, `scripts/`, `references/`)
 - Validates skill names and configurations
+
+### `speckit.agents`
+**Purpose**: Create or refine custom AI agents for focused workflows using `.agent.md` files.
+
+**Usage**:
+```bash
+/speckit.agents [agent intent or constraints]
+```
+
+**Key Features**:
+- Creates or updates workspace-scoped agents in `.github/agents/`
+- Defines clear trigger descriptions for agent selection and subagent routing
+- Enforces minimal, role-appropriate tool permissions
+- Produces deterministic role/workflow/output guidance for each agent
 
 ### `speckit.instructions`
 **Purpose**: Generate comprehensive usage instructions, maintenance guides, or system prompts. This command helps create documentation for humans or setup instructions for AI agents.

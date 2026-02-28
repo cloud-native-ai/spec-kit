@@ -46,3 +46,4 @@ env/
 sdd-*/
 
 .ai/tools/*.md
+tmp/

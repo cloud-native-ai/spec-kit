@@ -31,6 +31,7 @@
 
 - **Unify Command Handoffs**: Make command prerequisites and next steps explicit. (Status: Planned)
 - **Analyze Command**: Analyze project context and code structure. (Status: Completed)
+- **Agents Command**: Create and refine custom AI agents (.agent.md). (Status: Completed)
 - **Checklist Command**: Verify project alignment with constitution. (Status: Completed)
 - **Clarify Command**: Resolve ambiguities in specifications. (Status: Completed)
 - **Constitution Command**: Manage project governance and principles. (Status: Completed)
