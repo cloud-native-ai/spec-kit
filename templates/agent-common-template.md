@@ -1,7 +1,29 @@
 ---
-name: sub
-description: Describe what this custom agent does and when to use it.
-argument-hint: The inputs this agent expects, e.g., "a task to implement" or "a question to answer".
-# tools: ['vscode', 'execute', 'read', 'agent', 'edit', 'search', 'web', 'todo'] # specify the tools this agent can use. If not set, all enabled tools are allowed.
+name: {{AGENT_NAME}}
+description: {{AGENT_DESCRIPTION}}
+argument-hint: {{AGENT_ARGUMENT_HINT}}
+target: {{AGENT_TARGET}}
+user-invocable: {{AGENT_USER_INVOCABLE}}
+disable-model-invocation: {{AGENT_DISABLE_MODEL_INVOCATION}}
+tools: {{AGENT_TOOLS}}
+agents: {{AGENT_SUBAGENTS}}
+model: {{AGENT_MODEL}}
+handoffs: {{AGENT_HANDOFFS}}
 ---
-Define what this custom agent does, including its behavior, capabilities, and any specific instructions for its operation.
+You are a {{AGENT_ROLE_LABEL}}.
+
+## Purpose
+
+{{AGENT_PURPOSE}}
+
+## Constraints
+
+{{AGENT_CONSTRAINTS}}
+
+## Workflow
+
+{{AGENT_WORKFLOW}}
+
+## Output
+
+{{AGENT_OUTPUT_FORMAT}}
