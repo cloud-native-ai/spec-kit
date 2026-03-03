@@ -21,12 +21,8 @@ def _group_tools_by_server() -> Dict[str, List[dict]]:
     return tools_by_server
 
 
-def main() -> int:
-    # Preserve previous behavior: require MCP_AUTH when present in environment
-    if not os.environ.get("MCP_AUTH"):
-        print("[Error] MCP_AUTH environment variable is not set.", file=sys.stderr)
-        return 1
-
+def get_mcp_payload() -> dict:
+    """Build MCP server/tool payload."""
     servers = get_all_mcp_servers()
     tools_by_server = _group_tools_by_server()
 
@@ -38,16 +34,29 @@ def main() -> int:
         server_data["tools_count"] = len(server_tools)
         servers_payload.append(server_data)
 
-    output = {
+    return {
         "timestamp": datetime.now().isoformat(),
         "count": len(servers_payload),
         "servers": servers_payload,
         "note": "This list represents configured MCP servers. 'tools' field populated for HTTP servers if reachable.",
     }
 
+
+def main() -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="List MCP servers and tools")
+    parser.parse_args()
+
+    # Preserve previous behavior: require MCP_AUTH when present in environment
+    if not os.environ.get("MCP_AUTH"):
+        print("[Error] MCP_AUTH environment variable is not set.", file=sys.stderr)
+        return 1
+
+    output = get_mcp_payload()
     print(json.dumps(output, indent=2, ensure_ascii=False))
 
-    if not servers_payload:
+    if not output.get("servers"):
         print(
             "\nNo MCP servers found in standard VS Code configuration paths.",
             file=sys.stderr,

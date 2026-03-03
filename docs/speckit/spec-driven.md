@@ -120,6 +120,16 @@ After a plan is created, this command analyzes the plan and related design docum
 3. **Parallelization**: Marks independent tasks `[P]` and outlines safe parallel groups
 4. **Output**: Writes `tasks.md` in the feature directory, ready for implementation by the `/speckit.implement` command
 
+### The `/speckit.tools` Command
+
+This command makes hidden tool calls explicit and reusable across MCP/System/Shell/Project ecosystems:
+
+1. **Unified Discovery**: Discovers candidate tools across four sources with one normalized view
+2. **Record Reuse**: Reuses `.specify/memory/tools/<tool-name>.md` if it already exists and is complete
+3. **Guided Completion**: Prompts for missing fields and validates ToolRecord completeness before invocation
+4. **Execution Gate**: Shows one preview summary and requires explicit user confirmation before any execution
+5. **Alias Support**: Supports alias/rename mapping so stable human-friendly names can be reused in later calls
+
 ### The `/speckit.review` Command
 
 This command is the final step of the SDD loop for a feature; it reviews the full set of artifacts produced along the way and consolidates them into the long-lived feature memory:

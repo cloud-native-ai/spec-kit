@@ -1,0 +1,324 @@
+openapi: 3.0.3
+info:
+  title: Speckit Tools Command Contract
+  version: 1.0.0
+  description: |
+    API-style command contract for `/speckit.tools` behavior.
+    This contract models command semantics and validation flow, not a public network API.
+servers:
+  - url: https://local.speckit.invalid
+paths:
+  /tools/discover:
+    post:
+      summary: Discover tools across supported source types
+      operationId: discoverTools
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscoverToolsRequest'
+      responses:
+        '200':
+          description: Tool candidates discovered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoverToolsResponse'
+  /tools/records/{toolName}:
+    get:
+      summary: Get existing tool record by tool name
+      operationId: getToolRecord
+      parameters:
+        - in: path
+          name: toolName
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tool record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolRecord'
+        '404':
+          description: Tool record not found
+    put:
+      summary: Create or update a tool record
+      operationId: upsertToolRecord
+      parameters:
+        - in: path
+          name: toolName
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertToolRecordRequest'
+      responses:
+        '200':
+          description: Tool record updated
+        '201':
+          description: Tool record created
+        '409':
+          description: Name conflict cannot be auto-resolved
+        '422':
+          description: Record content invalid
+  /tools/disambiguate:
+    post:
+      summary: Resolve same-name collisions across different source types
+      operationId: disambiguateTool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisambiguateRequest'
+      responses:
+        '200':
+          description: Single target selected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolSourceDescriptor'
+        '409':
+          description: User selection required
+  /tools/preview:
+    post:
+      summary: Preview invocation summary before execution
+      operationId: previewInvocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreviewRequest'
+      responses:
+        '200':
+          description: Invocation preview generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResponse'
+  /tools/invoke:
+    post:
+      summary: Invoke tool only when explicitly confirmed
+      operationId: invokeTool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeToolRequest'
+      responses:
+        '200':
+          description: Invocation executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeToolResponse'
+        '400':
+          description: Invocation denied because confirmation missing
+        '500':
+          description: Invocation failed
+  /tools/aliases:
+    post:
+      summary: Create alias or rename mapping for a tool record
+      operationId: createAlias
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAliasRequest'
+      responses:
+        '201':
+          description: Alias created
+        '409':
+          description: Alias conflicts with existing name
+components:
+  schemas:
+    DiscoverToolsRequest:
+      type: object
+      properties:
+        keyword:
+          type: string
+        sourceTypes:
+          type: array
+          items:
+            type: string
+            enum: [mcp, system, shell, project]
+    DiscoverToolsResponse:
+      type: object
+      required:
+        - candidates
+      properties:
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolSourceDescriptor'
+    ToolSourceDescriptor:
+      type: object
+      required:
+        - sourceType
+        - sourceName
+        - canonicalName
+      properties:
+        sourceType:
+          type: string
+          enum: [mcp, system, shell, project]
+        sourceName:
+          type: string
+        canonicalName:
+          type: string
+        displayName:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+    ToolArgument:
+      type: object
+      required:
+        - name
+        - type
+        - required
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        required:
+          type: boolean
+        description:
+          type: string
+        default:
+          type: string
+          nullable: true
+    ToolReturnField:
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+    ToolRecord:
+      type: object
+      required:
+        - name
+        - toolType
+        - sourceIdentifier
+        - description
+      properties:
+        name:
+          type: string
+        toolType:
+          type: string
+          enum: [mcp, system, shell, project]
+        sourceIdentifier:
+          type: string
+        description:
+          type: string
+        arguments:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolArgument'
+        returns:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolReturnField'
+        status:
+          type: string
+          enum: [Draft, Verified, Deprecated]
+        lastUpdated:
+          type: string
+          format: date
+    UpsertToolRecordRequest:
+      type: object
+      required:
+        - record
+      properties:
+        record:
+          $ref: '#/components/schemas/ToolRecord'
+    DisambiguateRequest:
+      type: object
+      required:
+        - requestedName
+        - candidates
+      properties:
+        requestedName:
+          type: string
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolSourceDescriptor'
+        selectedSourceType:
+          type: string
+          enum: [mcp, system, shell, project]
+    PreviewRequest:
+      type: object
+      required:
+        - toolRecord
+      properties:
+        toolRecord:
+          $ref: '#/components/schemas/ToolRecord'
+        argumentValues:
+          type: object
+          additionalProperties: true
+    PreviewResponse:
+      type: object
+      required:
+        - summary
+      properties:
+        summary:
+          type: string
+        requiresConfirmation:
+          type: boolean
+          enum: [true]
+    InvokeToolRequest:
+      type: object
+      required:
+        - toolRecord
+        - confirmed
+      properties:
+        toolRecord:
+          $ref: '#/components/schemas/ToolRecord'
+        argumentValues:
+          type: object
+          additionalProperties: true
+        confirmed:
+          type: boolean
+    InvokeToolResponse:
+      type: object
+      required:
+        - status
+        - resultSummary
+      properties:
+        status:
+          type: string
+          enum: [success, failed, cancelled]
+        resultSummary:
+          type: string
+        output:
+          type: object
+          additionalProperties: true
+    CreateAliasRequest:
+      type: object
+      required:
+        - canonicalName
+        - alias
+      properties:
+        canonicalName:
+          type: string
+        alias:
+          type: string
+        note:
+          type: string

@@ -1420,7 +1420,7 @@ def init(
         "○ [cyan]/speckit.checklist[/] [bright_black](optional)[/bright_black] - Generate quality checklists to validate Requirements (What) completeness, clarity, and consistency (after [cyan]/speckit.requirements[/]; optionally re-run after [cyan]/speckit.plan[/] for traceability)",
         "○ [cyan]/speckit.research[/] [bright_black](optional)[/bright_black] - In-depth research and analysis to support the implementation plan",
         "○ [cyan]/speckit.review[/] [bright_black](optional)[/bright_black] - Review the full SDD artifact set for a feature and summarize it (after [cyan]/speckit.implement[/])",
-        "○ [cyan]/speckit.mcpcall[/] [bright_black](optional)[/bright_black] - Identify and execute a specific MCP tool; maintain a local tool record",
+        "○ [cyan]/speckit.tools[/] [bright_black](optional)[/bright_black] - Explicitly describe and invoke a tool with reusable local records",
         "○ [cyan]/speckit.skills[/] [bright_black](optional)[/bright_black] - Create agent skills and project skill scaffolding",
         "○ [cyan]/speckit.instructions[/] [bright_black](optional)[/bright_black] - Generate or update project AI instructions and compatibility symlinks",
     ]

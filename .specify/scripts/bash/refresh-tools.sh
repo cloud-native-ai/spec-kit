@@ -72,6 +72,13 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [ "$QUERY_MCP" = false ] && [ "$QUERY_SYSTEM" = false ] && [ "$QUERY_SHELL" = false ] && [ "$QUERY_PROJECT" = false ]; then
+  QUERY_MCP=true
+  QUERY_SYSTEM=true
+  QUERY_SHELL=true
+  QUERY_PROJECT=true
+fi
+
 # Generate tools list script path
 MCP_SCRIPT="$ROOT_DIR/.specify/scripts/python/list_mcp_tools.py"
 # Fallback to local script if not found in .specify
@@ -237,7 +244,8 @@ print_shell_function_markdown() {
   if command -v jq >/dev/null 2>&1; then
     get_shell_function_json | jq -r '
             if length > 0 then
-                .[] | ("### " + .name + "\n```bash\n" + .definition + "\n```\n")
+                "| Function |\n|---|",
+                (.[] | "| " + .name + " |")
             else
                 "No custom shell functions found."
             end'
@@ -247,6 +255,141 @@ print_shell_function_markdown() {
     echo '```'
   fi
   echo ""
+}
+
+print_unified_json() {
+  local mcp_json="[]"
+  local system_json='{"binaries":[]}'
+  local shell_json="[]"
+  local project_json="[]"
+
+  if [ "$QUERY_MCP" = true ]; then
+    mcp_json="$(get_mcp_tools_json)"
+  fi
+  if [ "$QUERY_SYSTEM" = true ]; then
+    system_json="$(get_system_binaries_json)"
+  fi
+  if [ "$QUERY_SHELL" = true ]; then
+    shell_json="$(get_shell_function_json)"
+  fi
+  if [ "$QUERY_PROJECT" = true ]; then
+    project_json="$(get_project_scripts_json)"
+  fi
+
+MCP_JSON="$mcp_json" SYSTEM_JSON="$system_json" SHELL_JSON="$shell_json" PROJECT_JSON="$project_json" QUERY_MCP="$QUERY_MCP" QUERY_SYSTEM="$QUERY_SYSTEM" QUERY_SHELL="$QUERY_SHELL" QUERY_PROJECT="$QUERY_PROJECT" python3 <<'PY'
+import json
+import os
+
+
+def load_json(name, fallback):
+    raw = os.environ.get(name, "")
+    if not raw:
+        return fallback
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        return fallback
+
+
+query_mcp = os.environ.get("QUERY_MCP") == "true"
+query_system = os.environ.get("QUERY_SYSTEM") == "true"
+query_shell = os.environ.get("QUERY_SHELL") == "true"
+query_project = os.environ.get("QUERY_PROJECT") == "true"
+
+mcp = load_json("MCP_JSON", [])
+system = load_json("SYSTEM_JSON", {"binaries": []})
+shell = load_json("SHELL_JSON", [])
+project = load_json("PROJECT_JSON", [])
+
+tools = []
+
+if query_mcp:
+    if isinstance(mcp, dict) and isinstance(mcp.get("servers"), list):
+        for server in mcp["servers"]:
+            source_name = server.get("name", "mcp")
+            for tool in server.get("tools", []) or []:
+                canonical_name = tool.get("name", "")
+                if not canonical_name:
+                    continue
+                tools.append({
+                    "sourceType": "mcp",
+                    "sourceName": source_name,
+                    "canonicalName": canonical_name,
+                    "displayName": canonical_name,
+                    "metadata": {
+                        "description": tool.get("description", ""),
+                        "inputSchema": tool.get("inputSchema", {}),
+                    },
+                })
+    elif isinstance(mcp, list):
+        for tool in mcp:
+            canonical_name = tool.get("name", "")
+            if not canonical_name:
+                continue
+            tools.append({
+                "sourceType": "mcp",
+                "sourceName": tool.get("server", "mcp"),
+                "canonicalName": canonical_name,
+                "displayName": canonical_name,
+                "metadata": {
+                    "description": tool.get("description", ""),
+                    "inputSchema": tool.get("inputSchema", {}),
+                },
+            })
+
+if query_system:
+    for item in system.get("binaries", []):
+        canonical_name = item.get("name", "")
+        if not canonical_name:
+            continue
+        tools.append({
+            "sourceType": "system",
+            "sourceName": "local-system",
+            "canonicalName": canonical_name,
+            "displayName": canonical_name,
+            "metadata": {"path": item.get("path", "")},
+        })
+
+if query_shell:
+    for item in shell:
+        canonical_name = item.get("name", "")
+        if not canonical_name:
+            continue
+        tools.append({
+            "sourceType": "shell",
+            "sourceName": "current-shell",
+            "canonicalName": canonical_name,
+            "displayName": canonical_name,
+            "metadata": {},
+        })
+
+if query_project:
+    for item in project:
+        canonical_name = item.get("name", "")
+        if not canonical_name:
+            continue
+        tools.append({
+            "sourceType": "project",
+            "sourceName": "workspace-scripts",
+            "canonicalName": canonical_name,
+            "displayName": canonical_name,
+            "metadata": {
+                "path": item.get("path", ""),
+                "type": item.get("type", ""),
+                "description": item.get("description", ""),
+            },
+        })
+
+payload = {
+    "tools": tools,
+    "mcp_tools": mcp if query_mcp else [],
+    "system_binaries": system if query_system else {"binaries": []},
+    "shell_functions": shell if query_shell else [],
+    "project_scripts": project if query_project else [],
+}
+
+print(json.dumps(payload, ensure_ascii=False))
+PY
 }
 
 print_project_scripts_markdown() {
@@ -287,39 +430,5 @@ if [ "$OUTPUT_FORMAT" = "markdown" ]; then
     print_project_scripts_markdown
   fi
 else
-  first=true
-  printf '{'
-  if [ "$QUERY_MCP" = true ]; then
-    if [ "$first" = true ]; then
-      first=false
-    else
-      printf ','
-    fi
-    printf '"mcp_tools":%s' "$(get_mcp_tools_json)"
-  fi
-  if [ "$QUERY_SYSTEM" = true ]; then
-    if [ "$first" = true ]; then
-      first=false
-    else
-      printf ','
-    fi
-    printf '"system_binaries":%s' "$(get_system_binaries_json)"
-  fi
-  if [ "$QUERY_SHELL" = true ]; then
-    if [ "$first" = true ]; then
-      first=false
-    else
-      printf ','
-    fi
-    printf '"shell_functions":%s' "$(get_shell_function_json)"
-  fi
-  if [ "$QUERY_PROJECT" = true ]; then
-    if [ "$first" = true ]; then
-      first=false
-    else
-      printf ','
-    fi
-    printf '"project_scripts":%s' "$(get_project_scripts_json)"
-  fi
-  printf '}'
+  print_unified_json
 fi

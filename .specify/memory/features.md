@@ -1,6 +1,6 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-02-28
+**Last Updated**: 2026-03-03
 **Total Features**: 19
 
 ## Features
@@ -22,7 +22,7 @@
 | 013 | Skills Command | Manage extensible skills/tools. | Completed | .specify/memory/features/013.md | - | 2026-02-10 |
 | 014 | Tasks Command | Break down plans into atomic tasks. | Completed | .specify/memory/features/014.md | - | 2026-02-10 |
 | 015 | CLI Interface | Rich terminal interface using Typer. | Completed | .specify/memory/features/015.md | - | 2026-02-10 |
-| 016 | MCP Support | Integration with Model Context Protocol. | Implemented | .specify/memory/features/016.md | .specify/specs/002-mcp-tool-call/requirements.md | 2026-02-10 |
+| 016 | MCP Support | Integration with Model Context Protocol. | Implemented | .specify/memory/features/016.md | .specify/specs/004-speckit-tools-command/requirements.md | 2026-03-03 |
 | 017 | Template Engine | Markdown-based template system. | Completed | .specify/memory/features/017.md | - | 2026-02-10 |
 | 018 | Configuration Management | Project configuration via pyproject.toml. | Completed | .specify/memory/features/018.md | - | 2026-02-10 |
 | 019 | Agents Command | Create or refine custom AI agents (.agent.md) for workspace-specific workflows. | Implemented | .specify/memory/features/019.md | .specify/specs/003-speckit-agents-command/requirements.md | 2026-02-28 |
