@@ -6,7 +6,7 @@ handoffs:
     prompt: Generate an implementation plan for /speckit.tools
     send: false
 scripts:
-  sh: scripts/bash/refresh-tools.sh --mcp --system --shell --project
+  sh: scripts/bash/create-new-tools.sh --json --name $ARGUMENTS --action find
 ---
 
 > Note: `$ARGUMENTS` is **optional**. If empty, continue with discovery + interactive disambiguation. If provided, treat it as hint(s) for target tool, source type, alias preference, or execution priority.
@@ -40,9 +40,13 @@ Execution steps:
    - Parse `$ARGUMENTS` to extract tool name or intent.
    - If missing, present interactive selection from available tools.
 
-2. **Discover tools via JSON**
-   - Run `scripts/bash/refresh-tools.sh --mcp --system --shell --project` to get JSON output.
-   - Parse JSON and map tool to its source type (`mcp-call`, `project-script`, `system-binary`, `shell-function`).
+2. **Discover tools via script**
+   - Run `{SCRIPT}` to get JSON output with tool information.
+   - Parse JSON response and check status:
+     - `status: "found"` → Tool exists, extract tool details
+     - `status: "not_found"` → Tool not found, proceed to create
+     - `status: "multiple_matches"` → Present options to user for disambiguation
+   - Map tool to its source type (`mcp-call`, `project-script`, `system-binary`, `shell-function`).
 
 3. **Resolve naming and conflicts**
    - Check exact name, alias match, and fuzzy candidates.
