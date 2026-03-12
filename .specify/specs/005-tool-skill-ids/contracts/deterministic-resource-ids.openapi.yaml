@@ -1,0 +1,207 @@
+openapi: 3.1.0
+info:
+  title: Deterministic Tool and Skill IDs Contract
+  version: 1.0.0
+  description: >-
+    Behavioral contract for generating, persisting, and resolving deterministic
+    resource identifiers for /speckit.tools and /speckit.skills.
+servers:
+  - url: https://speckit.local
+paths:
+  /resource-ids/generate:
+    post:
+      summary: Generate and persist a canonical resource ID for a tool or skill artifact
+      operationId: generateResourceId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateResourceIdRequest'
+      responses:
+        '200':
+          description: Resource ID generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateResourceIdResponse'
+        '400':
+          description: Input invalid or artifact path cannot be canonicalized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /resource-ids/resolve:
+    post:
+      summary: Resolve a tool or skill using a canonical ID with optional fallback metadata
+      operationId: resolveResourceId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveResourceRequest'
+      responses:
+        '200':
+          description: Resource resolved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolveResourceResponse'
+        '404':
+          description: Resource ID is stale or does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Resource ID conflicts with provided text or type expectation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictResponse'
+  /resource-ids/backfill:
+    post:
+      summary: Backfill a missing resource ID for an existing historical artifact
+      operationId: backfillResourceId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackfillResourceIdRequest'
+      responses:
+        '200':
+          description: Historical artifact updated with a canonical ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateResourceIdResponse'
+        '404':
+          description: Historical artifact no longer exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    GenerateResourceIdRequest:
+      type: object
+      required:
+        - resourceType
+        - artifactPath
+      properties:
+        resourceType:
+          type: string
+          enum: [tool, skill]
+        artifactPath:
+          type: string
+          description: Absolute or workspace-relative path to the persisted artifact
+        displayLabel:
+          type: string
+        persistenceTarget:
+          type: string
+          description: File that should be updated with the generated ID
+    GenerateResourceIdResponse:
+      type: object
+      required:
+        - resourceType
+        - resourceId
+        - canonicalPath
+        - persistenceTarget
+      properties:
+        resourceType:
+          type: string
+          enum: [tool, skill]
+        resourceId:
+          type: string
+        canonicalPath:
+          type: string
+        persistenceTarget:
+          type: string
+        message:
+          type: string
+    ResolveResourceRequest:
+      type: object
+      properties:
+        resourceId:
+          type: string
+        naturalLanguageHint:
+          type: string
+        expectedType:
+          type: string
+          enum: [tool, skill]
+      anyOf:
+        - required: [resourceId]
+        - required: [naturalLanguageHint]
+    ResolveResourceResponse:
+      type: object
+      required:
+        - resultType
+        - resolvedType
+        - resolvedPath
+        - message
+      properties:
+        resultType:
+          type: string
+          enum: [resolved, fallback]
+        resolvedType:
+          type: string
+          enum: [tool, skill]
+        resolvedId:
+          type: string
+        resolvedPath:
+          type: string
+        fallbackUsed:
+          type: boolean
+        message:
+          type: string
+    BackfillResourceIdRequest:
+      type: object
+      required:
+        - resourceType
+        - persistenceTarget
+      properties:
+        resourceType:
+          type: string
+          enum: [tool, skill]
+        persistenceTarget:
+          type: string
+        artifactPath:
+          type: string
+    ConflictResponse:
+      type: object
+      required:
+        - resultType
+        - message
+        - conflictReason
+      properties:
+        resultType:
+          type: string
+          enum: [conflict]
+        conflictReason:
+          type: string
+          enum: [type-mismatch, path-mismatch, hint-conflict]
+        message:
+          type: string
+        expectedType:
+          type: string
+        resolvedType:
+          type: string
+        resourceId:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+        - resultType
+        - message
+        - errorCode
+      properties:
+        resultType:
+          type: string
+          enum: [error]
+        errorCode:
+          type: string
+          enum: [invalid-path, out-of-workspace, not-found, stale-id, invalid-type]
+        message:
+          type: string

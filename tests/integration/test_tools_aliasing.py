@@ -1,7 +1,11 @@
 import pytest
 
-from scripts.python.tool_models import ToolRecord
-from scripts.python.tool_record_utils import add_alias, rename_record, resolve_alias
+from tests.script_api import tools_utils
+
+ToolRecord = tools_utils.ToolRecord
+add_alias = tools_utils.add_alias
+rename_record = tools_utils.rename_record
+resolve_alias = tools_utils.resolve_alias
 
 
 def test_tool_aliasing_workflow_resolves_alias_to_canonical_record():

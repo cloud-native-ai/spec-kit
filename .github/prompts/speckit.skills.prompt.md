@@ -11,7 +11,7 @@ $ARGUMENTS
 
 ## Outline
 
-目标：在当前对话上下文中，帮助用户创建或整理高质量 SpecKit Skill，确保结构规范、触发清晰、资源可复用。
+目标：在当前对话上下文中，帮助用户创建或整理高质量 SpecKit Skill，确保结构规范、触发清晰、资源可复用，并生成可复用的确定性 `skill_id`。
 
 主流程：
 1. 优先从现有对话提炼可复用工作流
@@ -28,7 +28,7 @@ $ARGUMENTS
 <skill-name>/
 ├── SKILL.md            # 必需
 ├── tools/              # 工具说明（可选）
-├── .specify/scripts/            # 可执行脚本（可选）
+├── scripts/            # 可执行脚本（可选）
 ├── references/         # 按需加载的参考资料（可选）
 └── assets/             # 输出使用的静态资源（可选）
 ```
@@ -60,6 +60,7 @@ $ARGUMENTS
 - `disable-model-invocation`
 
 说明：本项目默认以 `name` 与 `description` 作为核心触发元数据；仅在确有需要时再引入可选字段。
+建议新增：`skill_id`（确定性 ID，值为工作区相对路径）。
 
 #### Body
 
@@ -68,6 +69,7 @@ Body 只写执行说明，不写冗余背景。应包含：
 - 结果目标
 - 关键步骤（可执行、可检查）
 - 资源引用（使用相对路径，如 `./.specify/scripts/x.py`）
+- 资源引用（使用相对路径，如 `./scripts/x.py`）
 
 ### 4) 资源目录使用准则
 
@@ -80,7 +82,7 @@ Body 只写执行说明，不写冗余背景。应包含：
 - [Shell Tools](tools/shell.md)
 - [Project Scripts](tools/project.md)
 
-#### `.specify/scripts/`
+#### `scripts/`
 
 用于重复率高、需要确定性的任务（Python/Bash 等）。
 
@@ -105,7 +107,7 @@ Body 只写执行说明，不写冗余背景。应包含：
 
 1. 发现阶段：读取 `name` + `description`
 2. 命中后：读取 `SKILL.md` 正文
-3. 需要时：再读取 `.specify/scripts/`、`references/`、`assets/`
+3. 需要时：再读取 `scripts/`、`references/`、`assets/`
 
 约束：
 
@@ -174,33 +176,38 @@ Skill 仅保留执行任务所需内容，不增加无关文档：
 1. **Initialize / Refresh**
    - 执行 `.specify/scripts/bash/create-new-skill.sh --json $ARGUMENTS` 创建或刷新结构，并解析 JSON 输出。
    - 若输出含 `"status": "refreshed"`：展示脚本消息并停止。
-   - 若输出含 `"SKILL_DIR"`：解析 `SKILL_DIR`、`SKILL_NAME`、`SKILL_DESCRIPTION`，确认创建成功。
+   - 若输出含 `"SKILL_DIR"`：解析 `SKILL_DIR`、`SKILL_NAME`、`SKILL_DESCRIPTION`、`SKILL_ID`，确认创建成功。
 
-2. **Extract from Conversation (Default)**
+2. **ID-first reuse**
+   - 如果输入提供 `skill_id`，先按 ID 精确定位。
+   - `skill_id` 缺失或失效时再回退自然语言发现。
+   - `skill_id` 与文本提示冲突时必须报错并停止自动继续。
+
+3. **Extract from Conversation (Default)**
    - 先复用当前对话，提炼流程、分支与验收标准。
 
-3. **Clarify if Needed (Fallback)**
+4. **Clarify if Needed (Fallback)**
    - 仅在提炼不足时触发。
    - 约束：每轮只问 1 个问题，等待用户答复后继续。
 
-4. **Draft & Refine**
+5. **Draft & Refine**
    - 持续更新 `SKILL.md`，围绕薄弱点小步修订，直到可执行。
 
-5. **Tailored Implementation**
+6. **Tailored Implementation**
    - 更新 frontmatter `{{DESCRIPTION}}` 与正文关键章节（如 `## Overview`、`## Workflow / Instructions`、`## Constraints`）。
    - 若模板中 `## Applicable Scenarios` / `## 适用场景` 与 frontmatter 重复且无增量价值，可删除。
    - 按需脚手架资源：
-     - 自动化逻辑/API 调用 → `.specify/scripts/`
+   - 自动化逻辑/API 调用 → `scripts/`
      - 文档/Schema/策略 → `references/`
      - 模板/样板工程 → `assets/`
      - 工具说明 → `tools/`
    - 更新 `SKILL.md` 的资源链接，并询问用户是否导入已有文件。
 
-6. **Completion**
+7. **Completion**
    - 总结 Skill 能力与目录结构。
    - 给出示例提示词。
    - 给出下一步可选定制项。
-   - 输出 `SKILL.md` 路径。
+   - 输出 `SKILL.md` 路径与 `skill_id`。
 
 ## Slash Behavior Notes
 

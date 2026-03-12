@@ -3,6 +3,7 @@
 **Tool Name**: [TOOL NAME]  
 **Tool Type**: `mcp-call`  
 **Source Identifier**: [MCP SERVER NAME]  
+**Tool ID**: [TOOL ID]  
 **Aliases**: [comma-separated aliases, optional]  
 **Status**: [Draft | Verified | Deprecated]  
 **Last Updated**: [YYYY-MM-DD]
@@ -10,6 +11,11 @@
 ## Description
 
 [Short, user-friendly description of what this tool does and when to use it]
+
+## Resource ID
+
+- Canonical ID: `[RESOURCE ID]`
+- Canonical Path: `[CANONICAL PATH]`
 
 ## Parameters
 

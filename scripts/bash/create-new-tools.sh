@@ -130,6 +130,41 @@ fi
 # Set tools memory directory
 TOOLS_MEMORY_DIR="$ROOT_DIR/.specify/memory/tools"
 
+to_workspace_relative() {
+    local path="$1"
+    python3 - "$ROOT_DIR" "$path" << 'PYEOF'
+from pathlib import Path
+import sys
+
+root = Path(sys.argv[1]).resolve()
+target = Path(sys.argv[2]).resolve()
+print(target.relative_to(root).as_posix())
+PYEOF
+}
+
+format_tool_id() {
+    local canonical_path="$1"
+    echo "<TOOL:${canonical_path}>"
+}
+
+ensure_tool_id_in_record() {
+    local record_file="$1"
+    local tool_id="$2"
+
+    if grep -q '^\*\*Tool ID\*\*:' "$record_file"; then
+        return 0
+    fi
+
+    awk -v id="$tool_id" '
+        {
+            print $0
+            if ($0 ~ /^\*\*Source Identifier\*\*:/) {
+                print "**Tool ID**: " id
+            }
+        }
+    ' "$record_file" > "$record_file.tmp" && mv "$record_file.tmp" "$record_file"
+}
+
 # Validate tool type if provided
 validate_tool_type() {
     local type="$1"
@@ -374,6 +409,10 @@ create_tool_record() {
     fi
     
     local record_file="$TOOLS_MEMORY_DIR/${tool_name}.md"
+    local canonical_path
+    canonical_path=$(to_workspace_relative "$record_file")
+    local tool_id
+    tool_id=$(format_tool_id "$canonical_path")
     local date_today
     date_today=$(date +%Y-%m-%d)
     
@@ -381,11 +420,14 @@ create_tool_record() {
     sed -e "s/\[TOOL NAME\]/$tool_name/g" \
         -e "s/\[TOOL TYPE\]/$tool_type/g" \
         -e "s/\[SOURCE IDENTIFIER\]/$source_identifier/g" \
+        -e "s|\[TOOL ID\]|$tool_id|g" \
+        -e "s|\[RESOURCE ID\]|$tool_id|g" \
+        -e "s|\[CANONICAL PATH\]|$canonical_path|g" \
         -e "s/\[YYYY-MM-DD\]/$date_today/g" \
         -e "s/\[Short, user-friendly description of what .* and when to use it\]/$description/g" \
         "$template_file" > "$record_file"
     
-    echo "$record_file"
+    echo "$record_file|$canonical_path|$tool_id"
 }
 
 # List all available tools
@@ -485,12 +527,11 @@ case "$ACTION" in
         # Find tool in JSON data
         find_result=$(echo "$json_data" | find_tool_in_json "$TOOL_NAME")
         
-        if [ "$JSON_MODE" = true ]; then
+        if [ "$ACTION" = "find" ]; then
             echo "$find_result"
-        else
-            echo "$find_result"
+            exit 0
         fi
-        
+
         # Check if we need to create a new record
         if [ "$ACTION" = "create" ]; then
             status=$(echo "$find_result" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))")
@@ -507,18 +548,37 @@ case "$ACTION" in
                 source_identifier="$TOOL_NAME"
                 description="Tool for $TOOL_NAME"
                 
-                record_file=$(create_tool_record "$TOOL_NAME" "$TOOL_TYPE" "$source_identifier" "$description")
+                creation_output=$(create_tool_record "$TOOL_NAME" "$TOOL_TYPE" "$source_identifier" "$description")
+                record_file="${creation_output%%|*}"
+                rest="${creation_output#*|}"
+                canonical_path="${rest%%|*}"
+                tool_id="${rest#*|}"
                 
                 if [ "$JSON_MODE" = true ]; then
-                    echo "{\"status\": \"created\", \"record_file\": \"$record_file\"}"
+                    echo "{\"status\": \"created\", \"record_file\": \"$record_file\", \"canonical_path\": \"$canonical_path\", \"tool_id\": \"$tool_id\"}"
                 else
                     echo "Created tool record: $record_file"
+                    echo "tool_id: $tool_id"
                 fi
             elif [ "$status" = "found" ] || [ "$status" = "multiple_matches" ]; then
+                resolved_tool_name=$(echo "$find_result" | python3 -c "import sys,json; data=json.load(sys.stdin); print((data.get('tool') or {}).get('name',''))" 2>/dev/null || true)
+                if [ -z "$resolved_tool_name" ]; then
+                    resolved_tool_name="$TOOL_NAME"
+                fi
+
+                record_file="$TOOLS_MEMORY_DIR/${resolved_tool_name}.md"
+                canonical_path=".specify/memory/tools/${resolved_tool_name}.md"
+                tool_id=$(format_tool_id "$canonical_path")
+
+                if [ -f "$record_file" ]; then
+                    ensure_tool_id_in_record "$record_file" "$tool_id"
+                fi
+
                 if [ "$JSON_MODE" = true ]; then
-                    echo "{\"status\": \"exists\", \"message\": \"Tool record already exists or multiple matches found\"}"
+                    echo "{\"status\": \"exists\", \"message\": \"Tool record already exists or multiple matches found\", \"record_file\": \"$record_file\", \"canonical_path\": \"$canonical_path\", \"tool_id\": \"$tool_id\"}"
                 else
                     echo "Tool already exists or multiple matches found. Use --type to disambiguate."
+                    echo "tool_id: $tool_id"
                 fi
             fi
         fi

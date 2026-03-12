@@ -29,21 +29,15 @@ fi
 
 SPECIFY_PY_DIR="$ROOT_DIR/.specify/scripts/python"
 
-if [ -f "$SPECIFY_PY_DIR/list_mcp_tools.py" ] \
-  && [ -f "$SPECIFY_PY_DIR/list_system_tools.py" ] \
-  && [ -f "$SPECIFY_PY_DIR/list_shell_tools.py" ] \
-  && [ -f "$SPECIFY_PY_DIR/list_project_tools.py" ]; then
+if [ -f "$SPECIFY_PY_DIR/tools-utils.py" ]; then
   PY_SCRIPTS_DIR="$SPECIFY_PY_DIR"
 else
   PY_SCRIPTS_DIR="$ROOT_DIR/scripts/python"
 fi
 
-MCP_SCRIPT="$PY_SCRIPTS_DIR/list_mcp_tools.py"
-SYSTEM_SCRIPT="$PY_SCRIPTS_DIR/list_system_tools.py"
-SHELL_SCRIPT="$PY_SCRIPTS_DIR/list_shell_tools.py"
-PROJECT_SCRIPT="$PY_SCRIPTS_DIR/list_project_tools.py"
+TOOLS_UTILS_SCRIPT="$PY_SCRIPTS_DIR/tools-utils.py"
 
-for required in "$MCP_SCRIPT" "$SYSTEM_SCRIPT" "$SHELL_SCRIPT" "$PROJECT_SCRIPT"; do
+for required in "$TOOLS_UTILS_SCRIPT"; do
   if [ ! -f "$required" ]; then
     echo "Required script not found: $required"
     exit 1
@@ -90,19 +84,19 @@ if [ "$QUERY_MCP" = false ] && [ "$QUERY_SYSTEM" = false ] && [ "$QUERY_SHELL" =
 fi
 
 get_mcp_tools_json() {
-  python3 "$MCP_SCRIPT" 2>/dev/null || echo "[]"
+  python3 "$TOOLS_UTILS_SCRIPT" --action list --type mcp 2>/dev/null || echo "[]"
 }
 
 get_system_binaries_json() {
-  python3 "$SYSTEM_SCRIPT" 2>/dev/null || echo '{"binaries":[]}'
+  python3 "$TOOLS_UTILS_SCRIPT" --action list --type system 2>/dev/null || echo '{"binaries":[]}'
 }
 
 get_shell_function_json() {
-  python3 "$SHELL_SCRIPT" --functions-only 2>/dev/null || echo "[]"
+  python3 "$TOOLS_UTILS_SCRIPT" --action list --type shell --functions-only 2>/dev/null || echo "[]"
 }
 
 get_project_scripts_json() {
-  python3 "$PROJECT_SCRIPT" --root-dir "$ROOT_DIR" 2>/dev/null || echo "[]"
+  python3 "$TOOLS_UTILS_SCRIPT" --action list --type project --root-dir "$ROOT_DIR" 2>/dev/null || echo "[]"
 }
 
 if [ "$QUERY_MCP" = true ]; then

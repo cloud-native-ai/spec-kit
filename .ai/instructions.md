@@ -68,3 +68,9 @@ Project specific tools documentation can be found in `.ai/tools/`.
 
 ## Skills
 Project specific skills documentation can be found in `.github/skills/`.
+
+## Python Script Isolation Rule
+- `scripts/python/` 目录下的每个 Python 脚本必须是**自包含**的，可独立执行。
+- 每个脚本必须提供 `main()` 入口，并通过 `if __name__ == "__main__": main()` 启动。
+- `scripts/python/` 目录内脚本之间禁止互相 `import`（禁止 `from scripts.python...` / `import scripts.python...`）。
+- 如果多个脚本需要相同能力，允许在各脚本内最小化重复实现，优先保证独立性和可执行性。

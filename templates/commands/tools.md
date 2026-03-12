@@ -22,6 +22,7 @@ You **MUST** treat `$ARGUMENTS` as command parameters, not as a replacement of t
 ## Outline
 
 Goal: Resolve one target tool, ensure a complete ToolRecord exists at `.specify/memory/tools/<tool-name>.md`, show execution preview, and execute only after explicit confirmation.
+Goal extension: every creation/refresh/discovery path MUST produce and persist a deterministic `tool_id` (canonical workspace-relative record path).
 
 ### Tool Type Standardization
 
@@ -56,33 +57,41 @@ Execution steps:
    - Primary location: `.specify/memory/tools/<tool-name>.md`.
    - If existing record is complete, reuse directly.
    - If missing or incomplete, create/update from `templates/tool-*-template.md` with generalized ToolRecord fields:
-     - Tool Name / Tool Type / Source Identifier / Description / Status / Last Updated
+     - Tool Name / Tool Type / Source Identifier / Tool ID / Description / Status / Last Updated
      - Parameters / Returns / Aliases
+   - `tool_id` MUST be generated from the canonical path `.specify/memory/tools/<tool-name>.md` and persisted to the record.
 
-5. **Validate record before invocation**
+5. **ID-first resolution**
+   - If input contains a `tool_id`, resolve by ID before fuzzy discovery.
+   - If `tool_id` is missing or invalid, fall back to existing fuzzy discovery.
+   - If `tool_id` and natural-language hint conflict, stop and return an explicit conflict error.
+
+6. **Validate record before invocation**
    - Required fields: `name`, `tool_type`, `source_identifier`, `description`.
    - `tool_type` must be one of `mcp-call|project-script|system-binary|shell-function`.
    - If status is `Verified`, Parameters and Returns cannot both be empty.
    - If invalid, guide user to fill missing fields and re-validate.
 
-6. **Collect and sanitize parameters**
+7. **Collect and sanitize parameters**
    - Collect required parameters one by one.
    - Apply minimal sanitization/escaping rules based on source type.
    - Produce one compact preview summary: source, tool, arguments, expected return shape.
 
-7. **Explicit confirmation gate**
+8. **Explicit confirmation gate**
    - Ask: `Proceed with execution? (yes/no)`.
    - `yes` → execute tool.
    - otherwise → mark session as cancelled and do not execute.
 
-8. **Report session result and persist artifacts**
+9. **Report session result and persist artifacts**
    - Write/update tool record.
+   - Backfill missing `tool_id` for historical records touched during refresh.
    - Record invocation session status (`success|failed|cancelled`) with summary.
    - If user asks to rename/alias, update record aliases and ensure uniqueness.
 
 ## Output Requirements
 
 - Tool records are stored in `.specify/memory/tools/` as `.md` files.
+- Command output must include `tool_id` and canonical path whenever a tool is selected.
 - Execution must not happen before user confirmation.
 - Conflict scenarios must be resolved before invocation.
 - Existing complete records should be reused to avoid repeated discovery.

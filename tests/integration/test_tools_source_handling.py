@@ -1,4 +1,6 @@
-from scripts.python.tool_models import ToolRecord
+from tests.script_api import tools_utils
+
+ToolRecord = tools_utils.ToolRecord
 
 
 def test_source_specific_tool_records_validate_for_all_supported_types():

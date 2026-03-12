@@ -1,7 +1,10 @@
 from pathlib import Path
 
-from scripts.python.tool_models import ToolRecord
-from scripts.python.tool_record_utils import load_record, save_record
+from tests.script_api import tools_utils
+
+ToolRecord = tools_utils.ToolRecord
+load_record = tools_utils.load_record
+save_record = tools_utils.save_record
 
 
 def test_get_record_contract_returns_existing_record(tmp_path: Path):
@@ -17,4 +20,4 @@ def test_get_record_contract_returns_existing_record(tmp_path: Path):
     loaded = load_record(tools_dir, "git-status")
     assert loaded is not None
     assert loaded.name == "git-status"
-    assert loaded.tool_type == "system"
+    assert loaded.tool_type in {"system", "system-binary"}

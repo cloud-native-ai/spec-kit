@@ -1,4 +1,7 @@
-from scripts.python.tool_models import ToolInvocationSession, ToolRecord
+from tests.script_api import tools_utils
+
+ToolInvocationSession = tools_utils.ToolInvocationSession
+ToolRecord = tools_utils.ToolRecord
 
 
 def test_tool_record_requires_core_fields():

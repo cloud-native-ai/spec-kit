@@ -129,6 +129,8 @@ This command makes hidden tool calls explicit and reusable across MCP/System/She
 3. **Guided Completion**: Prompts for missing fields and validates ToolRecord completeness before invocation
 4. **Execution Gate**: Shows one preview summary and requires explicit user confirmation before any execution
 5. **Alias Support**: Supports alias/rename mapping so stable human-friendly names can be reused in later calls
+6. **Deterministic IDs**: Persists canonical `tool_id` (workspace-relative record path) and uses ID-first resolution in follow-up flows
+7. **Safe Fallback**: Falls back to fuzzy discovery only when ID is missing/invalid, and blocks on ID-vs-hint conflicts
 
 ### The `/speckit.review` Command
 

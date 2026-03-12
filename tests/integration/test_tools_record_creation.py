@@ -1,7 +1,11 @@
 from pathlib import Path
 
-from scripts.python.tool_models import ToolArgument, ToolRecord
-from scripts.python.tool_record_utils import load_record, save_record
+from tests.script_api import tools_utils
+
+ToolArgument = tools_utils.ToolArgument
+ToolRecord = tools_utils.ToolRecord
+load_record = tools_utils.load_record
+save_record = tools_utils.save_record
 
 
 def test_record_creation_and_reuse_flow(tmp_path: Path):
@@ -27,3 +31,4 @@ def test_record_creation_and_reuse_flow(tmp_path: Path):
     assert reused is not None
     assert reused.name == record.name
     assert reused.source_identifier == record.source_identifier
+    assert reused.tool_id == "<TOOL:.specify/memory/tools/kubectl-get-pods.md>"
