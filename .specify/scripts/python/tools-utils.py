@@ -9,9 +9,266 @@ import os
 import platform
 import shutil
 import subprocess
-from datetime import datetime
+from dataclasses import dataclass, field
+from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+
+_ALLOWED_TOOL_TYPES = {
+    "mcp",
+    "system",
+    "shell",
+    "project",
+    "mcp-call",
+    "system-binary",
+    "shell-function",
+    "project-script",
+}
+
+
+@dataclass
+class ToolArgument:
+    name: str
+    type: str
+    required: bool
+    description: str
+    default: Optional[str] = None
+
+
+@dataclass
+class ToolRecord:
+    name: str
+    tool_type: str
+    source_identifier: str
+    description: str
+    status: str = "Draft"
+    aliases: List[str] = field(default_factory=list)
+    arguments: List[ToolArgument] = field(default_factory=list)
+    returns: List[dict] = field(default_factory=list)
+    tool_id: Optional[str] = None
+    last_updated: str = field(default_factory=lambda: date.today().isoformat())
+
+    def validate(self) -> List[str]:
+        errors: List[str] = []
+
+        if not self.name or not self.name.strip():
+            errors.append("name is required")
+        if self.tool_type not in _ALLOWED_TOOL_TYPES:
+            errors.append(
+                "tool_type must be one of mcp/system/shell/project or "
+                "mcp-call/system-binary/shell-function/project-script"
+            )
+        if not self.source_identifier or not self.source_identifier.strip():
+            errors.append("source_identifier is required")
+        if not self.description or not self.description.strip():
+            errors.append("description is required")
+
+        if self.status.lower() == "verified" and not self.arguments and not self.returns:
+            errors.append("Verified record must include arguments or returns")
+
+        return errors
+
+
+@dataclass
+class ToolInvocationSession:
+    requested_name: str
+    resolved_name: str
+    resolved_type: str
+    used_existing_record: bool
+    disambiguation_required: bool
+    user_confirmed_execution: bool
+    result_status: str
+    result_summary: str
+
+    def validate(self) -> List[str]:
+        errors: List[str] = []
+        if self.resolved_type not in _ALLOWED_TOOL_TYPES:
+            errors.append("resolved_type must be a supported tool type")
+        if not self.user_confirmed_execution and self.result_status != "cancelled":
+            errors.append(
+                "result_status must be cancelled when user_confirmed_execution is false"
+            )
+        return errors
+
+
+class ResourceIdError(ValueError):
+    def __init__(self, code: str, message: str):
+        super().__init__(message)
+        self.code = code
+
+
+def _normalize_workspace_path(path: str | Path, workspace_root: str | Path) -> str:
+    root = Path(workspace_root).resolve()
+    target = Path(path)
+    if not target.is_absolute():
+        target = root / target
+    target = target.resolve()
+    try:
+        return target.relative_to(root).as_posix()
+    except ValueError as exc:
+        raise ResourceIdError("out-of-workspace", "Path is outside workspace") from exc
+
+
+def _generate_tool_id(artifact_path: str | Path, workspace_root: str | Path) -> str:
+    canonical = _normalize_workspace_path(artifact_path, workspace_root)
+    return f"<TOOL:{canonical}>"
+
+
+def _record_path(tools_dir: Path, name: str) -> Path:
+    return tools_dir / f"{name}.md"
+
+
+def _normalize_tool_type(tool_type: str) -> str:
+    mapping = {
+        "mcp": "mcp-call",
+        "system": "system-binary",
+        "shell": "shell-function",
+        "project": "project-script",
+    }
+    return mapping.get(tool_type, tool_type)
+
+
+def save_record(tools_dir: Path, record: Any) -> Path:
+    tools_dir.mkdir(parents=True, exist_ok=True)
+    record.last_updated = date.today().isoformat()
+    if not record.tool_id:
+        record_file = _record_path(tools_dir, record.name)
+        root = tools_dir
+        while root.name != ".specify" and root.parent != root:
+            root = root.parent
+        workspace_root = root.parent if root.name == ".specify" else tools_dir.parents[2]
+        record.tool_id = _generate_tool_id(record_file, workspace_root)
+
+    record_file = _record_path(tools_dir, record.name)
+    lines = [
+        f"# Tool Record: {record.name}",
+        "",
+        f"**Tool Name**: {record.name}",
+        f"**Tool Type**: `{_normalize_tool_type(record.tool_type)}`",
+        f"**Source Identifier**: {record.source_identifier}",
+        f"**Tool ID**: {record.tool_id}",
+        f"**Aliases**: {', '.join(record.aliases) if record.aliases else ''}",
+        f"**Status**: {record.status}",
+        f"**Last Updated**: {record.last_updated}",
+        "",
+        "## Description",
+        "",
+        record.description,
+        "",
+        "## Parameters",
+    ]
+
+    if record.arguments:
+        lines.extend(
+            [
+                "",
+                "| Name | Type | Required | Description | Default |",
+                "|------|------|----------|-------------|---------|",
+            ]
+        )
+        for argument in record.arguments:
+            lines.append(
+                "| {name} | {type_} | {required} | {description} | {default} |".format(
+                    name=argument.name,
+                    type_=argument.type,
+                    required="yes" if argument.required else "no",
+                    description=argument.description,
+                    default=argument.default or "",
+                )
+            )
+    else:
+        lines.extend(["", "- None"])
+
+    lines.extend(["", "## Returns", "", "- None"])
+    record_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return record_file
+
+
+def load_record(tools_dir: Path, name: str) -> Optional[ToolRecord]:
+    record_file = _record_path(tools_dir, name)
+    if not record_file.exists():
+        return None
+
+    content = record_file.read_text(encoding="utf-8")
+    fields = {}
+    for line in content.splitlines():
+        if line.startswith("**") and "**:" in line:
+            key, value = line.split("**:", 1)
+            normalized_key = key.replace("**", "").strip().lower().replace(" ", "_")
+            fields[normalized_key] = value.strip().strip("`")
+
+    description = ""
+    if "## Description" in content:
+        description_block = content.split("## Description", 1)[1]
+        if "## Parameters" in description_block:
+            description = description_block.split("## Parameters", 1)[0].strip()
+
+    aliases = [a.strip() for a in fields.get("aliases", "").split(",") if a.strip()]
+
+    record = ToolRecord(
+        name=fields.get("tool_name", name),
+        tool_type=fields.get("tool_type", ""),
+        source_identifier=fields.get("source_identifier", ""),
+        description=description,
+        status=fields.get("status", "Draft"),
+        aliases=aliases,
+        tool_id=fields.get("tool_id") or None,
+        arguments=[],
+    )
+    return record
+
+
+def add_alias(record: Any, alias: str) -> None:
+    cleaned = alias.strip()
+    if cleaned and cleaned not in record.aliases and cleaned != record.name:
+        record.aliases.append(cleaned)
+
+
+def resolve_alias(name_or_alias: str, records: Iterable[Any]) -> Tuple[Optional[Any], Optional[str]]:
+    for record in records:
+        if record.name == name_or_alias:
+            return record, None
+        if name_or_alias in record.aliases:
+            return record, name_or_alias
+    return None, None
+
+
+def rename_record(
+    tools_dir: Path,
+    record: Any,
+    new_name: str,
+    existing_records: Iterable[Any],
+) -> Any:
+    for existing in existing_records:
+        if existing.name == new_name and existing.name != record.name:
+            raise ValueError(f"Record name conflict: {new_name}")
+
+    old_path = _record_path(tools_dir, record.name)
+    record.name = new_name
+    new_path = _record_path(tools_dir, record.name)
+
+    if old_path.exists():
+        old_path.rename(new_path)
+    return record
+
+
+def backfill_tool_id(record_file: Path, workspace_root: Path) -> Optional[str]:
+    content = record_file.read_text(encoding="utf-8")
+    if "**Tool ID**:" in content:
+        return None
+
+    tool_id = _generate_tool_id(record_file, workspace_root)
+    lines = content.splitlines()
+    updated = []
+    inserted = False
+    for line in lines:
+        updated.append(line)
+        if line.startswith("**Source Identifier**:") and not inserted:
+            updated.append(f"**Tool ID**: {tool_id}")
+            inserted = True
+
+    record_file.write_text("\n".join(updated) + "\n", encoding="utf-8")
+    return tool_id
 
 
 def _group_tools_by_server() -> Dict[str, List[dict]]:
@@ -218,10 +475,24 @@ def get_system_info() -> Dict[str, Any]:
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Unified tools utilities")
-    parser.add_argument("--action", required=True, choices=["list"])
+    parser.add_argument(
+        "--action",
+        required=True,
+        choices=["list", "model-validate-record", "record-backfill", "record-load"],
+    )
     parser.add_argument("--type", choices=["mcp", "system", "shell", "project"], default=None)
     parser.add_argument("--functions-only", action="store_true")
     parser.add_argument("--root-dir", default=".")
+
+    parser.add_argument("--name", default=None)
+    parser.add_argument("--tool-type", default=None)
+    parser.add_argument("--source-identifier", default=None)
+    parser.add_argument("--description", default=None)
+
+    parser.add_argument("--record-file", default=None)
+    parser.add_argument("--workspace-root", default=None)
+    parser.add_argument("--tools-dir", default=None)
+
     return parser
 
 
@@ -257,6 +528,35 @@ def main() -> int:
             return 0
 
         parser.error("--action list requires --type")
+
+    if args.action == "model-validate-record":
+        if not all([args.name, args.tool_type, args.source_identifier, args.description]):
+            parser.error("model-validate-record requires --name --tool-type --source-identifier --description")
+        record = ToolRecord(
+            name=args.name,
+            tool_type=args.tool_type,
+            source_identifier=args.source_identifier,
+            description=args.description,
+        )
+        print(json.dumps({"errors": record.validate()}))
+        return 0
+
+    if args.action == "record-backfill":
+        if not args.record_file or not args.workspace_root:
+            parser.error("record-backfill requires --record-file --workspace-root")
+        value = backfill_tool_id(Path(args.record_file), Path(args.workspace_root))
+        print(value or "")
+        return 0
+
+    if args.action == "record-load":
+        if not args.tools_dir or not args.name:
+            parser.error("record-load requires --tools-dir --name")
+        record = load_record(Path(args.tools_dir), args.name)
+        if record is None:
+            print("")
+        else:
+            print(record.name)
+        return 0
 
     parser.error("Unknown action")
     return 2

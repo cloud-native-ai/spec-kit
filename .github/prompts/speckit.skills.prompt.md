@@ -11,7 +11,7 @@ $ARGUMENTS
 
 ## Outline
 
-目标：在当前对话上下文中，帮助用户创建或整理高质量 SpecKit Skill，确保结构规范、触发清晰、资源可复用，并生成可复用的确定性 `skill_id`。
+目标：在当前对话上下文中，帮助用户创建或整理高质量 SpecKit Skill，确保结构规范、触发清晰、资源可复用，并为每个技能生成可复用的确定性 `skill_id`。
 
 主流程：
 1. 优先从现有对话提炼可复用工作流
@@ -28,7 +28,7 @@ $ARGUMENTS
 <skill-name>/
 ├── SKILL.md            # 必需
 ├── tools/              # 工具说明（可选）
-├── scripts/            # 可执行脚本（可选）
+├── .specify/scripts/            # 可执行脚本（可选）
 ├── references/         # 按需加载的参考资料（可选）
 └── assets/             # 输出使用的静态资源（可选）
 ```
@@ -60,7 +60,6 @@ $ARGUMENTS
 - `disable-model-invocation`
 
 说明：本项目默认以 `name` 与 `description` 作为核心触发元数据；仅在确有需要时再引入可选字段。
-建议新增：`skill_id`（确定性 ID，值为工作区相对路径）。
 
 #### Body
 
@@ -69,7 +68,6 @@ Body 只写执行说明，不写冗余背景。应包含：
 - 结果目标
 - 关键步骤（可执行、可检查）
 - 资源引用（使用相对路径，如 `./.specify/scripts/x.py`）
-- 资源引用（使用相对路径，如 `./scripts/x.py`）
 
 ### 4) 资源目录使用准则
 
@@ -82,7 +80,7 @@ Body 只写执行说明，不写冗余背景。应包含：
 - [Shell Tools](tools/shell.md)
 - [Project Scripts](tools/project.md)
 
-#### `scripts/`
+#### `.specify/scripts/`
 
 用于重复率高、需要确定性的任务（Python/Bash 等）。
 
@@ -107,7 +105,7 @@ Body 只写执行说明，不写冗余背景。应包含：
 
 1. 发现阶段：读取 `name` + `description`
 2. 命中后：读取 `SKILL.md` 正文
-3. 需要时：再读取 `scripts/`、`references/`、`assets/`
+3. 需要时：再读取 `.specify/scripts/`、`references/`、`assets/`
 
 约束：
 
@@ -177,11 +175,12 @@ Skill 仅保留执行任务所需内容，不增加无关文档：
    - 执行 `.specify/scripts/bash/create-new-skill.sh --json $ARGUMENTS` 创建或刷新结构，并解析 JSON 输出。
    - 若输出含 `"status": "refreshed"`：展示脚本消息并停止。
    - 若输出含 `"SKILL_DIR"`：解析 `SKILL_DIR`、`SKILL_NAME`、`SKILL_DESCRIPTION`、`SKILL_ID`，确认创建成功。
+   - `SKILL_ID` 必须是 `.github/skills/<skill-name>/SKILL.md` 的工作区相对路径。
 
 2. **ID-first reuse**
-   - 如果输入提供 `skill_id`，先按 ID 精确定位。
-   - `skill_id` 缺失或失效时再回退自然语言发现。
-   - `skill_id` 与文本提示冲突时必须报错并停止自动继续。
+   - 如果输入中提供 `skill_id`，先按 ID 精确定位 skill。
+   - 仅在 `skill_id` 缺失或失效时回退到自然语言发现。
+   - 当 `skill_id` 与文本提示冲突时，必须显式报错并停止自动继续。
 
 3. **Extract from Conversation (Default)**
    - 先复用当前对话，提炼流程、分支与验收标准。
@@ -197,7 +196,7 @@ Skill 仅保留执行任务所需内容，不增加无关文档：
    - 更新 frontmatter `{{DESCRIPTION}}` 与正文关键章节（如 `## Overview`、`## Workflow / Instructions`、`## Constraints`）。
    - 若模板中 `## Applicable Scenarios` / `## 适用场景` 与 frontmatter 重复且无增量价值，可删除。
    - 按需脚手架资源：
-   - 自动化逻辑/API 调用 → `scripts/`
+     - 自动化逻辑/API 调用 → `.specify/scripts/`
      - 文档/Schema/策略 → `references/`
      - 模板/样板工程 → `assets/`
      - 工具说明 → `tools/`

@@ -11,7 +11,7 @@ You **MUST** treat `$ARGUMENTS` as command parameters, not as a replacement of t
 ## Outline
 
 Goal: Resolve one target tool, ensure a complete ToolRecord exists at `.specify/memory/tools/<tool-name>.md`, show execution preview, and execute only after explicit confirmation.
-Goal extension: every creation/refresh/discovery path MUST generate and persist deterministic `tool_id` (canonical workspace-relative record path).
+Goal extension: every creation/refresh/discovery path MUST produce and persist a deterministic `tool_id` (canonical workspace-relative record path).
 
 ### Tool Type Standardization
 
@@ -30,9 +30,13 @@ Execution steps:
    - Parse `$ARGUMENTS` to extract tool name or intent.
    - If missing, present interactive selection from available tools.
 
-2. **Discover tools via JSON**
-   - Run `.specify/scripts/bash/refresh-tools.sh --mcp --system --shell --project` to get JSON output.
-   - Parse JSON and map tool to its source type (`mcp-call`, `project-script`, `system-binary`, `shell-function`).
+2. **Discover tools via script**
+   - Run `.specify/scripts/bash/create-new-tools.sh --json --name $ARGUMENTS --action find` to get JSON output with tool information.
+   - Parse JSON response and check status:
+     - `status: "found"` → Tool exists, extract tool details
+     - `status: "not_found"` → Tool not found, proceed to create
+     - `status: "multiple_matches"` → Present options to user for disambiguation
+   - Map tool to its source type (`mcp-call`, `project-script`, `system-binary`, `shell-function`).
 
 3. **Resolve naming and conflicts**
    - Check exact name, alias match, and fuzzy candidates.
@@ -44,12 +48,12 @@ Execution steps:
    - If missing or incomplete, create/update from `.specify/templates/tool-*-template.md` with generalized ToolRecord fields:
      - Tool Name / Tool Type / Source Identifier / Tool ID / Description / Status / Last Updated
      - Parameters / Returns / Aliases
-   - `tool_id` MUST be derived from `.specify/memory/tools/<tool-name>.md` and persisted.
+   - `tool_id` MUST be generated from the canonical path `.specify/memory/tools/<tool-name>.md` and persisted to the record.
 
 5. **ID-first resolution**
-   - If `tool_id` is provided, resolve by ID first.
-   - Fall back to fuzzy discovery only when `tool_id` is missing or invalid.
-   - If ID and text hint conflict, stop with explicit conflict error.
+   - If input contains a `tool_id`, resolve by ID before fuzzy discovery.
+   - If `tool_id` is missing or invalid, fall back to existing fuzzy discovery.
+   - If `tool_id` and natural-language hint conflict, stop and return an explicit conflict error.
 
 6. **Validate record before invocation**
    - Required fields: `name`, `tool_type`, `source_identifier`, `description`.
@@ -69,7 +73,7 @@ Execution steps:
 
 9. **Report session result and persist artifacts**
    - Write/update tool record.
-   - Backfill missing `tool_id` for historical records touched by refresh/reuse.
+   - Backfill missing `tool_id` for historical records touched during refresh.
    - Record invocation session status (`success|failed|cancelled`) with summary.
    - If user asks to rename/alias, update record aliases and ensure uniqueness.
 
