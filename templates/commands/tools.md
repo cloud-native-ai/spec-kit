@@ -1,5 +1,5 @@
 ---
-description: Explicitly describe and invoke a tool via reusable local records across MCP/System/Shell/Project sources.
+description: Define/find a tool via reusable local records across MCP/System/Shell/Project sources, then invoke only after explicit confirmation.
 handoffs:
   - label: Create Plan
     agent: speckit.plan
@@ -10,6 +10,12 @@ scripts:
 ---
 
 > Note: `$ARGUMENTS` is **optional**. If empty, continue with discovery + interactive disambiguation. If provided, treat it as hint(s) for target tool, source type, alias preference, or execution priority.
+>
+> Intent interpretation rule:
+>
+> - Natural-language `$ARGUMENTS` describes the **tool capability to define/create or locate**, not an instruction to immediately execute that real-world action.
+> - Example: `/speckit.tools 下载钉钉文档到本地markdown文件` means “create/find a tool whose purpose is 下载钉钉文档到本地markdown文件”, **not** “immediately download the document now”.
+> - Actual tool invocation is allowed only after target tool resolution + parameter confirmation + explicit `Proceed with execution? (yes/no)` consent.
 
 ## User Input
 
@@ -38,7 +44,8 @@ In `refresh-tools.sh`, discovery MUST use JSON mode only when calling each Pytho
 Execution steps:
 
 1. **Identify target tool basic info**
-   - Parse `$ARGUMENTS` to extract tool name or intent.
+   - Parse `$ARGUMENTS` to extract **tool-definition intent** (tool name/capability description), not immediate runtime action.
+   - If user input is a verb phrase (e.g., “下载…/同步…/生成…”), interpret it as candidate tool purpose and continue create/find flow first.
    - If missing, present interactive selection from available tools.
 
 2. **Discover tools via script**
