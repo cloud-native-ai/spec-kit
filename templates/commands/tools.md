@@ -95,6 +95,12 @@ Execution steps:
    - Record invocation session status (`success|failed|cancelled`) with summary.
    - If user asks to rename/alias, update record aliases and ensure uniqueness.
 
+10. **Register `tool_id` in instructions template**
+   - After a tool is selected or created, add one structured list entry to the `## Resource Registry` → `### Tools` subsection in `.ai/instructions.md`, using field names aligned with the selected `templates/tool-*-template.md` file.
+   - Each entry must include at least `Tool Name`, `Tool ID`, `Tool Type`, `Source Identifier`, `Description`, and `Canonical Path`; include `Aliases`, `Status`, `Last Updated`, and `Resource ID` when available.
+   - Keep the Tools list sorted and deduplicated, and remove `- None yet.` once at least one real tool entry exists.
+   - Use the exact persisted `tool_id` value so future `/speckit.instructions` runs inherit the same registry.
+
 ## Output Requirements
 
 - Tool records are stored in `.specify/memory/tools/` as `.md` files.
