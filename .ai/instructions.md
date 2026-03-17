@@ -7,6 +7,10 @@
 - **Agents**：依赖 LLM 独立运行的智能体。Agent 可以结合上下文进行推理，并调用不同的 Skills 与 Tools，端到端完成多样化任务。
 - **Skills**：用于特定任务的一组指令、脚本和资源，GitHub Copilot 可在相关场景下加载并执行。A skill is a directory containing at minimum a `SKILL.md` file.
 - **Tools**：在 Agent 和 Skills 中可调用的、用于执行具体动作的工具集合，包含但不限于 MCP、Shell 函数、系统命令、项目脚本文件等。
+- **Feature vs Requirement**：
+  - **Feature**（功能）：长期存在的注册表条目，位于 `.specify/memory/features/`，有唯一 ID（如 001）、名称、状态和描述。一个 Feature 代表一个可追踪的功能单元，可跨多次迭代演进。
+  - **Requirement**（需求/规范）：针对 Feature 的具体迭代实现，位于 `.specify/specs/<REQUIREMENTS_KEY>/requirements.md`。Branch name（如 `003-speckit-agents-command`）中的 ID 是 Requirement ID，不是 Feature ID。
+  - **关系**：一个 Feature 可以有多个 Requirement 迭代。Requirement 是 Feature 在某次具体开发周期中的规范化表达和实现计划。
 
 三者关系：Agent 负责理解目标与编排执行；Skills 提供可复用的任务能力包；Tools 提供可被调用的底层执行能力。
 
