@@ -18,12 +18,15 @@
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
 | **Constitution** | `.specify/memory/constitution.md` | 规则与约束的唯一来源 | 核心原则、质量与工作流规范 |
-| **Feature Index** | `.specify/memory/features.md` | 功能主索引 | Feature 状态与关联文件 |
+| **Feature Index** | `.specify/memory/features.md` | 功能主索引 | Feature 状态与关联文件（19 个特性） |
 | **Readme** | `README.md` | 项目概览 | 功能列表与入口链接 |
-| **Usage** | `docs/usage.md` | 命令与流程 | `/speckit.*` 使用方式与前后置关系 |
+| **Usage** | `docs/usage.md` | 命令与流程 | `/speckit.*` 使用方式、前置/后续关系 |
 | **Quickstart** | `docs/quickstart.md` | 上手流程 | 4 步流程与示例 |
 | **Installation** | `docs/installation.md` | 环境与安装 | uvx + Python 安装方式 |
 | **SDD Method** | `docs/speckit/spec-driven.md` | 方法论 | SDD 理念与流程细节 |
+| **Skills** | `docs/skills/requirements.md` | 技能系统 | 技能开发与管理规范 |
+| **Tools** | `docs/tools/` | 工具文档 | Tools 系统使用说明 |
+| **Agents** | `docs/agents/` | 智能体文档 | AI Agent 配置与使用 |
 
 > **Directive**: 回答问题或写代码前，先查以上相关文档。
 
@@ -48,12 +51,16 @@
 - **CLI Framework**: Typer + Rich
 - **HTTP**: httpx (含 socks)
 - **Package/Runner**: uv/uvx
+- **MCP**: mcp[cli]>=1.0.0 (Model Context Protocol)
 - **Key Directories**:
   - `src/specify_cli/`: CLI 入口与命令生成逻辑（`specify`）
   - `templates/`: 规范/计划/任务/命令模板
   - `.specify/`: 生成后的项目结构（memory/specs/scripts/templates）
-  - `scripts/`: Bash/Python 辅助脚本
+  - `scripts/`: Bash/Python 辅助脚本（`.specify/scripts/bash/` 和 `.specify/scripts/python/`）
   - `docs/`: 使用与方法论文档
+  - `tests/`: 单元测试与集成测试（contracts/）
+  - `.ai/`: AI 工具与指令文件（instructions.md, tools/）
+  - `.github/`: GitHub 配置与 skills（skills/）
 
 # Tool And Skills Usage Guide
 > **Note**: Tool and Skills details are injected into prompts by the agent when needed. This section is guidance only.
@@ -62,19 +69,41 @@
 - 优先使用 `.specify/scripts/` 与 `scripts/` 中的脚本完成可重复操作。
 - `/speckit.*` 属于 AI 聊天命令，不要在终端执行（见 docs/usage.md）。
 - 架构/规则以 Constitution 为准。
+- 使用 `tools-utils.py` 和 `skills-utils.py` 进行工具和技能的发现与管理。
+- 所有 Python 脚本必须自包含且可独立执行（见 Python Script Isolation Rule）。
 
 ## Tools
 Project specific tools documentation can be found in `.ai/tools/`.
-- [MCP Tools](.ai/tools/mcp.md)
-- [System Tools](.ai/tools/system.md)
-- [Shell Tools](.ai/tools/shell.md)
-- [Project Scripts](.ai/tools/project.md)
+- [MCP Tools](.ai/tools/mcp.md) - Model Context Protocol 工具集成
+- [System Tools](.ai/tools/system.md) - 系统二进制与命令
+- [Shell Tools](.ai/tools/shell.md) - Shell 函数库（2698+ 行）
+- [Project Scripts](.ai/tools/project.md) - 项目脚本与工具
+
+> **Note**: Tools 详细信息通过 `/speckit.skills` 命令动态注入到上下文中。
 
 ## Skills
-Project specific skills documentation can be found in `.github/skills/`.
+Project specific skills documentation can be found in `.github/skills/` and `docs/skills/`.
+- Skills 是可复用的任务能力包，包含指令、脚本和资源
+- 每个 Skill 至少包含一个 `SKILL.md` 文件
+- 使用 `/speckit.skills` 命令管理和刷新技能
+- Skills 详情通过命令动态注入到上下文中
 
 ## Python Script Isolation Rule
 - `scripts/python/` 目录下的每个 Python 脚本必须是**自包含**的，可独立执行。
 - 每个脚本必须提供 `main()` 入口，并通过 `if __name__ == "__main__": main()` 启动。
 - `scripts/python/` 目录内脚本之间禁止互相 `import`（禁止 `from scripts.python...` / `import scripts.python...`）。
 - 如果多个脚本需要相同能力，允许在各脚本内最小化重复实现，优先保证独立性和可执行性。
+
+## AI Tool Compatibility
+- **Supported Agents**: GitHub Copilot, Qwen Code, opencode
+- **Symlinks**: `CLAUDE.md`, `IFLOW.md`, `QWEN.md`, `.cursorrules` all point to `.ai/instructions.md`
+- **Ignore Files**: `.copilotignore` excludes AI tool directories (`.clinerules/`, `.github/`, `.lingma/`, `.trae/`, `.qoder/`)
+- **Instructions Refresh**: Run `/speckit.instructions` to regenerate this file and update symlinks
+
+## Build & Test Commands
+- **Install CLI**: `uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME>`
+- **Run Tests**: `pytest tests/` (unit and integration tests in `tests/contracts/`)
+- **Build Package**: `hatchling build` (configured in `pyproject.toml`)
+- **Script Execution**: All scripts in `scripts/bash/` and `scripts/python/` are self-contained and executable
+
+> **Important**: `/speckit.*` commands are AI chat instructions, NOT terminal commands. Always use them in your AI assistant's chat interface.

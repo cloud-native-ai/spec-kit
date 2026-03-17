@@ -46,6 +46,14 @@ Escalation rules:
   - `tests/`: Test suite
   - [Other detected dirs]
 
+# Tool And Skills Usage Guide
+> **Note**: Tool and Skills details are injected into prompts by the agent when needed. This section is guidance only.
+
+## Suggested Tooling Scope (High-Level)
+- Prefer scripts under `.specify/scripts/` and `scripts/` for repeatable operations.
+- `/speckit.*` commands are chat instructions, not terminal commands.
+- Treat Constitution as the authority for architecture and workflow constraints.
+
 ## Resource Registry
 Use this machine-maintained section to track reusable resource identifiers created by SpecKit commands. Keep entries deduplicated and sorted when updating this file. Record each resource as a single row in the corresponding horizontal Markdown table, and keep column names aligned with the corresponding agent/skill/tool templates. When no records exist, keep a single row with `None yet.` in the first column and `-` in the remaining columns.
 
