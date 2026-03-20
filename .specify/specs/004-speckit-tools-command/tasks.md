@@ -30,7 +30,7 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [x] T004 Evolve mcpcall.md template to tools.md with unified four-source support (MCP/System/Shell/Project)
+- [x] T004 Standardize tools.md template with unified four-source support (MCP/System/Shell/Project)
 - [x] T005 [P] Update refresh-tools.sh script to support unified JSON output format for all tool sources
 - [x] T006 [P] Implement tool record validation logic based on ToolRecord schema from data-model.md
 - [x] T007 Create base ToolInvocationSession handler for tracking command sessions

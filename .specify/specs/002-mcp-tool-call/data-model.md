@@ -40,7 +40,7 @@
   - output: object
 
 ### McpCallSession
-- **Description**: 一次 `/speckit.mcpcall` 调用会话。
+- **Description**: 一次 `/speckit.tools`（MCP 工具场景）调用会话。
 - **Fields**:
   - tool_name: string
   - used_record: boolean

@@ -1,5 +1,7 @@
 # Implementation Plan: MCP Tool Call Command
 
+> Archived Note: 本计划基于历史 MCP-only 能力，当前命令入口已统一为 `/speckit.tools`。
+
 **Branch**: `002-mcp-tool-call` | **Date**: 2026-02-10 | **Spec**: [.specify/specs/002-mcp-tool-call/requirements.md](.specify/specs/002-mcp-tool-call/requirements.md)
 **Input**: Specification from `.specify/specs/002-mcp-tool-call/requirements.md`
 
@@ -7,7 +9,7 @@
 
 ## Summary
 
-为 `/speckit.mcpcall` 提供完整的实现规划：新增 MCP 工具记录模板与命令模板，定义工具发现与交互补全流程，并在本地 `.specify/memory/tools/` 形成可复用的工具记录，同时生成数据模型、合约与快速验证步骤。
+为 MCP 工具调用场景提供完整实现规划：新增 MCP 工具记录模板与命令模板，定义工具发现与交互补全流程，并在本地 `.specify/memory/tools/` 形成可复用的工具记录，同时生成数据模型、合约与快速验证步骤（当前入口为 `/speckit.tools`）。
 
 ## Technical Context
 
@@ -44,7 +46,7 @@
 **Additional Constraints from Input**:
 
 - 必须新增 `templates/mcptool-template.md` 作为 MCP 工具记录模板
-- 必须新增 `templates/commands/mcpcall.md` 并参考 `templates/commands/clarify.md` 的结构
+- 必须新增/维护 `templates/commands/tools.md` 并参考 `templates/commands/clarify.md` 的结构
 
 **Gates Status**: ✅ All gates pass
 
@@ -75,17 +77,11 @@
 src/
 └── specify_cli/
   ├── __init__.py
-  ├── commands/
-  │   └── mcpcall.py
-  └── templates/
-    ├── mcptool-template.md
-    └── commands/
-      └── mcpcall.md
 
 templates/
 ├── mcptool-template.md
 └── commands/
-  └── mcpcall.md
+  └── tools.md
 
 .specify/memory/
 └── tools/
@@ -136,7 +132,7 @@ N/A
 ## Phase 2: Implementation Planning
 
 1. 新增 `templates/mcptool-template.md` 作为 MCP 工具记录模板。
-2. 新增 `templates/commands/mcpcall.md`，沿用 `templates/commands/clarify.md` 的结构，补充 MCP 工具发现与交互补全流程。
-3. 在 CLI 中注册 `/speckit.mcpcall` 命令入口，绑定模板与流程实现。
+2. 维护 `templates/commands/tools.md`，沿用 `templates/commands/clarify.md` 的结构，补充 MCP 工具发现与交互补全流程。
+3. 在 CLI 中通过 `/speckit.tools` 命令入口承载该流程实现。
 4. 实现 MCP 工具发现逻辑与本地记录读写（`.specify/memory/tools/`）。
 5. 添加合约测试与关键流程测试，验证记录结构与调用行为。

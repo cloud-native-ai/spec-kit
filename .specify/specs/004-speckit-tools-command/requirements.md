@@ -3,7 +3,7 @@
 **Requirement Branch**: `004-speckit-tools-command`  
 **Created**: 2026-03-02  
 **Status**: Draft  
-**Input**: User description: "将/speckit.mcpcall命令重命名/speckit.tools，这个命令的主要作用是将AI Agent对tool的调用进行显式的说明。默认情况下agent调用哪些工具都是封装在agent内部的，而templates/commands/mcpcall.md的作用就是将一个mcp tools显式的输出到.specify/memory/tools/<mcp tool name>.md文档中，供AI Agent的用户查看、封装和重命名等。将/speckit.tools进行泛化，使之不仅仅只支持mcp tool"
+**Input**: User description: "将旧的 MCP-only 命令体系统一到 /speckit.tools，这个命令的主要作用是将 AI Agent 对 tool 的调用进行显式说明。默认情况下 agent 调用哪些工具都是封装在 agent 内部的，而 templates/commands/tools.md 的作用就是将工具显式输出到 .specify/memory/tools/<tool name>.md 文档中，供 AI Agent 用户查看、封装和重命名等。将 /speckit.tools 进行泛化，使之不仅仅只支持 MCP tool。"
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -86,7 +86,7 @@
 
 ### Functional Requirements
 
-- **FR-001**: 系统 MUST 将命令入口从 `/speckit.mcpcall` 统一为 `/speckit.tools`，并在命令说明中明确该命令用于显式说明工具调用。
+- **FR-001**: 系统 MUST 使用 `/speckit.tools` 作为唯一命令入口，并在命令说明中明确该命令用于显式说明工具调用。
 - **FR-002**: 系统 MUST 允许用户通过 `/speckit.tools` 指定目标工具，并支持在信息不足时引导用户从可发现工具列表中选择。
 - **FR-003**: 系统 MUST 支持至少四类工具来源：MCP tools、System binaries、Shell functions、Project scripts。
 - **FR-004**: 系统 MUST 为任意受支持工具类型生成或更新标准化工具记录文件，存储于 `.specify/memory/tools/<tool name>.md`。
@@ -105,7 +105,7 @@
 
 ### Assumptions
 
-- 默认保留历史 `/speckit.mcpcall` 文档能力的核心语义，但对外主命令以 `/speckit.tools` 为准。
+- 默认保留历史 MCP-only 文档能力的核心语义，但对外命令统一以 `/speckit.tools` 为准。
 - 工具记录路径仍统一保存在 `.specify/memory/tools/` 下，文件命名遵循项目现有约定。
 - 当工具可被自动发现时，用户无需手动输入底层技术细节。
 - 若用户未确认执行，则本次会话仅更新记录，不触发工具调用。

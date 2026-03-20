@@ -7,7 +7,7 @@
 
 ## Summary
 
-将原 `/speckit.mcpcall` 升级为 `/speckit.tools`，并将“显式工具说明+记录+确认调用”能力从 MCP-only 泛化为 MCP/System/Shell/Project 四类工具。方案基于现有模板命令体系与 `scripts/bash/refresh-tools.sh` 的多来源发现能力，统一输出工具记录到 `.specify/memory/tools/`，并保持与现有 feature memory 及 SDD 流程一致。
+将历史 MCP-only 命令能力统一为 `/speckit.tools`，并将“显式工具说明+记录+确认调用”能力从 MCP-only 泛化为 MCP/System/Shell/Project 四类工具。方案基于现有模板命令体系与 `scripts/bash/refresh-tools.sh` 的多来源发现能力，统一输出工具记录到 `.specify/memory/tools/`，并保持与现有 feature memory 及 SDD 流程一致。
 
 ## Technical Context
 
@@ -44,7 +44,7 @@
 **Additional Constraints from Input**:
 
 - 本次未提供额外 `$ARGUMENTS` 约束，按 `requirements.md` 与项目既有文档执行。
-- 命令重命名必须体现为 `/speckit.tools`，并保留历史 mcpcall 场景的可迁移语义。
+- 命令统一必须体现为 `/speckit.tools`，并保留历史 MCP-only 场景的可迁移语义。
 - 泛化必须覆盖 MCP 之外的 system/shell/project tools。
 
 **Gates Status**: ✅ All gates pass
@@ -82,8 +82,7 @@ src/
 
 templates/
 ├── commands/
-│   ├── mcpcall.md
-│   └── tools.md (target)
+│   └── tools.md
 └── mcptool-template.md
 
 scripts/
@@ -175,7 +174,7 @@ N/A
 
 ## Phase 2: Implementation Planning
 
-1. 将命令文档入口从 `templates/commands/mcpcall.md` 演进到 `templates/commands/tools.md`，并保留兼容迁移说明。
+1. 将命令文档入口统一到 `templates/commands/tools.md`，并保留兼容迁移说明。
 2. 统一工具发现流程：聚合 MCP/System/Shell/Project 四类来源，并标准化为统一候选模型。
 3. 建立工具记录读写策略：优先复用 `.specify/memory/tools/<tool-name>.md`，缺失时交互补全再写入。
 4. 增加冲突消歧与执行前确认步骤：处理同名来源冲突、命名冲突与未确认执行。

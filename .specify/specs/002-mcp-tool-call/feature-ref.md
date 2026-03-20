@@ -7,7 +7,7 @@
 ## Related Templates
 
 - [templates/mcptool-template.md](templates/mcptool-template.md)
-- [templates/commands/mcpcall.md](templates/commands/mcpcall.md)
+- [templates/commands/tools.md](templates/commands/tools.md)
 - [templates/commands/clarify.md](templates/commands/clarify.md)
 
 ## Related Memory

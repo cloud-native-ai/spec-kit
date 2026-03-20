@@ -4,7 +4,7 @@
 
 ## Goal
 
-验证 `/speckit.mcpcall` 的基本流程：自动发现、交互补全、记录复用与调用输出。
+验证 `/speckit.tools`（MCP 场景）的基本流程：自动发现、交互补全、记录复用与调用输出。
 
 ## Scenarios
 
