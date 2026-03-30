@@ -1,0 +1,248 @@
+openapi: 3.1.0
+info:
+  title: Spec Kit Qoder Support Contract
+  version: 0.1.0
+  summary: Contract for initialization, validation, refresh, and support-surface audit when Qoder is a supported assistant.
+servers:
+  - url: https://spec-kit.local/contracts
+paths:
+  /assistants:
+    get:
+      summary: List supported assistants exposed to users.
+      operationId: listSupportedAssistants
+      responses:
+        '200':
+          description: Supported assistants returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [assistants]
+                properties:
+                  assistants:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SupportedAssistant'
+  /projects/init:
+    post:
+      summary: Initialize a project with a selected assistant.
+      operationId: initializeProject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectInitRequest'
+      responses:
+        '201':
+          description: Project initialized and assistant assets generated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectInitResult'
+        '400':
+          description: Unsupported or invalid assistant selection.
+        '409':
+          description: Selected assistant cannot be provisioned with required assets.
+        '424':
+          description: Required assistant CLI missing and validation was not ignored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationFailure'
+  /assistants/qoder/validate:
+    post:
+      summary: Validate the local Qoder CLI prerequisite.
+      operationId: validateQoderCli
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ignoreAgentTools]
+              properties:
+                ignoreAgentTools:
+                  type: boolean
+      responses:
+        '200':
+          description: Validation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResult'
+  /projects/{projectPath}/assistants/qoder/refresh:
+    post:
+      summary: Refresh or regenerate Qoder assets in an existing project.
+      operationId: refreshQoderAssets
+      parameters:
+        - in: path
+          name: projectPath
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Qoder assets refreshed without modifying unrelated assistant assets.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResult'
+        '409':
+          description: Refresh would overwrite unrelated assistant assets or cannot preserve workspace state.
+  /audits/qoder-support:
+    post:
+      summary: Audit support-surface consistency for Qoder across docs, templates, and release outputs.
+      operationId: auditQoderSupportSurfaces
+      responses:
+        '200':
+          description: Audit completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportAuditResult'
+components:
+  schemas:
+    SupportedAssistant:
+      type: object
+      required:
+        - key
+        - displayName
+        - assistantType
+        - commandDirectory
+        - approved
+      properties:
+        key:
+          type: string
+          enum: [copilot, qwen, opencode, qoder]
+        displayName:
+          type: string
+        assistantType:
+          type: string
+          enum: [ide, cli]
+        commandDirectory:
+          type: string
+        installUrl:
+          type: string
+          format: uri
+        approved:
+          type: boolean
+    ProjectInitRequest:
+      type: object
+      required:
+        - projectMode
+        - assistantKey
+        - ignoreAgentTools
+      properties:
+        projectMode:
+          type: string
+          enum: [new-project, existing-directory]
+        assistantKey:
+          type: string
+          enum: [copilot, qwen, opencode, qoder]
+        ignoreAgentTools:
+          type: boolean
+        scriptVariant:
+          type: string
+          enum: [sh]
+          default: sh
+    ProjectInitResult:
+      type: object
+      required:
+        - assistantKey
+        - generatedAssets
+        - supportSurfacesUpdated
+      properties:
+        assistantKey:
+          type: string
+          enum: [qoder]
+        generatedAssets:
+          type: array
+          items:
+            type: string
+        supportSurfacesUpdated:
+          type: array
+          items:
+            type: string
+    ValidationResult:
+      type: object
+      required:
+        - assistantKey
+        - status
+      properties:
+        assistantKey:
+          type: string
+          enum: [qoder]
+        status:
+          type: string
+          enum: [available, missing, ignored]
+        cliCommand:
+          type: string
+          enum: [qoder]
+        installUrl:
+          type: string
+          format: uri
+    ValidationFailure:
+      type: object
+      required:
+        - assistantKey
+        - missingCommand
+        - installUrl
+        - nextStep
+      properties:
+        assistantKey:
+          type: string
+          enum: [qoder]
+        missingCommand:
+          type: string
+          enum: [qoder]
+        installUrl:
+          type: string
+          format: uri
+        nextStep:
+          type: string
+    RefreshResult:
+      type: object
+      required:
+        - assistantKey
+        - updatedAssets
+        - untouchedAssistantRoots
+      properties:
+        assistantKey:
+          type: string
+          enum: [qoder]
+        updatedAssets:
+          type: array
+          items:
+            type: string
+        untouchedAssistantRoots:
+          type: array
+          items:
+            type: string
+    SupportAuditResult:
+      type: object
+      required:
+        - assistantKey
+        - status
+        - auditedSurfaces
+      properties:
+        assistantKey:
+          type: string
+          enum: [qoder]
+        status:
+          type: string
+          enum: [pass, fail]
+        auditedSurfaces:
+          type: array
+          items:
+            type: object
+            required: [surfaceId, location, consistent]
+            properties:
+              surfaceId:
+                type: string
+              location:
+                type: string
+              consistent:
+                type: boolean
+              notes:
+                type: string

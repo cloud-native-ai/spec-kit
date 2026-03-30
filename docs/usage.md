@@ -27,6 +27,15 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 | `/speckit.skills` | Manage specialized skills | Extension |
 | `/speckit.instructions` | Generate usage instructions | Documentation |
 
+## Qoder Maintenance Workflow
+
+For Qoder projects, use the same lifecycle as other supported assistants:
+
+1. Initialize with `specify init <project> --ai qoder` (or `specify init . --ai qoder` for existing directories).
+2. If Qoder CLI is not installed yet, either install it from `https://qoder.com/cli` or use `--ignore-agent-tools` to skip the tool check.
+3. Refresh cross-agent instruction links after template updates by running the project instruction refresh flow (which invokes `scripts/bash/generate-instructions.sh`).
+4. Re-run `/speckit.review` before release to verify Qoder support remains consistent with other assistant surfaces.
+
 ## Command Relationships (Prerequisites & Next Steps)
 
 Spec Kit 的命令不是独立使用的。下面这张表用“常见前置 / 常见后续”的方式，把核心主路径、可选分支与返工环路明确下来。

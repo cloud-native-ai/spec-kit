@@ -79,6 +79,12 @@ AGENT_CONFIG = {
         "install_url": "https://opencode.ai",
         "requires_cli": True,
     },
+    "qoder": {
+        "name": "Qoder CLI",
+        "folder": ".qoder/",
+        "install_url": "https://qoder.com/cli",
+        "requires_cli": True,
+    },
 }
 
 SCRIPT_TYPE_CHOICES = {"sh": "POSIX Shell (bash/zsh)"}
@@ -632,6 +638,14 @@ def copy_local_templates(
                     project_path / ".opencode" / "command",
                     script_type,
                 )
+            elif ai_assistant == "qoder":
+                generate_commands(
+                    "qoder",
+                    "md",
+                    "$ARGUMENTS",
+                    project_path / ".qoder" / "commands",
+                    script_type,
+                )
             else:
                 # Fallback: copy commands to .specify/templates/commands
                 shutil.copytree(
@@ -1018,7 +1032,7 @@ def init(
     ai_assistant: str = typer.Option(
         None,
         "--ai",
-        help="AI assistant to use: copilot, qwen, or opencode",
+        help="AI assistant to use: copilot, qwen, opencode, or qoder",
     ),
     script_type: str = typer.Option(
         None, "--script", help="Script type to use: sh or ps"
@@ -1026,7 +1040,7 @@ def init(
     ignore_agent_tools: bool = typer.Option(
         False,
         "--ignore-agent-tools",
-        help="Skip checks for AI agent tools like Qwen CLI or opencode",
+        help="Skip checks for AI agent tools like Qwen CLI, opencode, or Qoder CLI",
     ),
     no_git: bool = typer.Option(
         False, "--no-git", help="Skip git repository initialization"
@@ -1066,6 +1080,7 @@ def init(
         specify init my-project --ai copilot --no-git
         specify init --ignore-agent-tools my-project
         specify init . --ai qwen           # Initialize in current directory
+        specify init . --ai qoder          # Initialize in current directory with Qoder
         specify init .                     # Initialize in current directory (interactive AI selection)
         specify init --here --ai opencode  # Alternative syntax for current directory
         specify init --here

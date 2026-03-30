@@ -168,5 +168,6 @@ popd >/dev/null
 ln -sf .ai/instructions.md QWEN.md
 ln -sf .ai/instructions.md CLAUDE.md
 ln -sf .ai/instructions.md IFLOW.md
+ln -sf .ai/instructions.md QODER.md
 
 log success "Instructions generated/updated at $TARGET_FILE"

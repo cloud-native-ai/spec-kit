@@ -46,6 +46,10 @@ Escalation rules:
   - `tests/`: Test suite
   - [Other detected dirs]
 
+## AI Tool Compatibility
+- **Supported Agents**: GitHub Copilot, Qwen Code, opencode, Qoder
+- **Instructions Refresh**: Run `/speckit.instructions` to regenerate this file and compatibility symlinks.
+
 ## Resource Registry
 Use this machine-maintained section to track reusable resource identifiers created by SpecKit commands. Keep entries deduplicated and sorted when updating this file. Record each resource as a single row in the corresponding horizontal Markdown table, and keep column names aligned with the corresponding agent/skill/tool templates. When no records exist, keep a single row with `None yet.` in the first column and `-` in the remaining columns.
 

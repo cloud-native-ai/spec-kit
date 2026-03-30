@@ -53,7 +53,7 @@ Rationale: Reduces regressions, clarifies intent, and validates real-world behav
 
 ### V. AI Agent Integration Standards
 AI agent integration MUST follow strict guidelines:
-- Only support officially approved AI agents: GitHub Copilot, Qwen Code, and opencode
+- Only support officially approved AI agents: GitHub Copilot, Qwen Code, opencode, and Qoder
 - Configuration parsing MUST reject unsupported providers
 - Agent capabilities MUST be leveraged for specification interpretation and implementation generation
 - Heavy reliance on advanced AI model capabilities for specification understanding is expected

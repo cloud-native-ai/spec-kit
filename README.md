@@ -24,6 +24,7 @@
 - [GitHub Copilot](https://code.visualstudio.com/)
 - [Qwen Code](https://github.com/QwenLM/qwen-code)
 - [opencode](https://opencode.ai/)
+- [Qoder](https://qoder.com/cli)
 
 ## Feature List
 
