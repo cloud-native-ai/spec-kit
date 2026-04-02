@@ -28,7 +28,7 @@ Tool naming and categorization MUST use the following four canonical types:
 3. `system-binary`: binary tools in the current runtime environment (on Linux, typically tools like `find`, `grep`, etc.).
 4. `shell-function`: functions defined in the current shell session (e.g., bash functions loaded at session startup via `~/.bashrc`).
 
-In `refresh-tools.sh`, discovery MUST use JSON mode only when calling each Python discovery script. Then combine discovered JSON data with `.specify/templates/tool-*.md` template files (current repository pattern: `.specify/templates/tool-*-template.md`) to generate Markdown tool description documents.
+In `refresh-tools.sh`, discovery MUST use JSON mode only when calling each Python discovery script. Persist the discovered payloads as source-specific JSON manifests so downstream prompts and scripts consume a single canonical JSON format.
 
 Execution steps:
 

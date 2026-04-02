@@ -73,11 +73,11 @@
 - 所有 Python 脚本必须自包含且可独立执行（见 Python Script Isolation Rule）。
 
 ## Tools
-Project specific tools documentation can be found in `.ai/tools/`.
-- [MCP Tools](.ai/tools/mcp.md) - Model Context Protocol 工具集成
-- [System Tools](.ai/tools/system.md) - 系统二进制与命令
-- [Shell Tools](.ai/tools/shell.md) - Shell 函数库（2698+ 行）
-- [Project Scripts](.ai/tools/project.md) - 项目脚本与工具
+Project specific tool manifests can be found in `.ai/tools/`.
+- [MCP Tools JSON](.ai/tools/mcp.json) - Model Context Protocol 工具清单
+- [System Tools JSON](.ai/tools/system.json) - 系统二进制与命令清单
+- [Shell Tools JSON](.ai/tools/shell.json) - Shell 函数清单
+- [Project Scripts JSON](.ai/tools/project.json) - 项目脚本与工具清单
 
 > **Note**: Tools 详细信息通过 `/speckit.skills` 命令动态注入到上下文中。
 

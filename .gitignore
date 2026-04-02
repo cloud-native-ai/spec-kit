@@ -47,5 +47,5 @@ Thumbs.db
 *.zip
 sdd-*/
 
-.ai/tools/*.md
+.ai/tools/*
 tmp/

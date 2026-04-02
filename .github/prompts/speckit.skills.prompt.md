@@ -73,12 +73,12 @@ Body 只写执行说明，不写冗余背景。应包含：
 
 #### `tools/`
 
-项目工具说明来自 `tools/`（由 `refresh-tools.sh` 生成）：
+项目工具清单来自 `tools/`（由 `refresh-tools.sh` 生成 JSON）：
 
-- [MCP Tools](tools/mcp.md)
-- [System Tools](tools/system.md)
-- [Shell Tools](tools/shell.md)
-- [Project Scripts](tools/project.md)
+- [MCP Tools JSON](tools/mcp.json)
+- [System Tools JSON](tools/system.json)
+- [Shell Tools JSON](tools/shell.json)
+- [Project Scripts JSON](tools/project.json)
 
 #### `.specify/scripts/`
 
