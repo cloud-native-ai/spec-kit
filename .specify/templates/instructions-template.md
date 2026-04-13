@@ -46,6 +46,14 @@ Escalation rules:
   - `tests/`: Test suite
   - [Other detected dirs]
 
+# Tool And Skills Usage Guide
+> **Note**: Tool and Skills details are injected into prompts by the agent when needed. This section is guidance only.
+
+## Suggested Tooling Scope (High-Level)
+- Prefer scripts under `.specify/scripts/` and `scripts/` for repeatable operations.
+- `/speckit.*` commands are chat instructions, not terminal commands.
+- Treat Constitution as the authority for architecture and workflow constraints.
+
 ## AI Tool Compatibility
 - **Supported Agents**: GitHub Copilot, Qwen Code, opencode, Qoder
 - **Instructions Refresh**: Run `/speckit.instructions` to regenerate this file and compatibility symlinks.
