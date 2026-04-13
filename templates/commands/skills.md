@@ -20,6 +20,11 @@ scripts:
 $ARGUMENTS
 ```
 
+需要根据用户的输入提取SKILL核心的两个元素：name 和 description
+
+1. *name*: 一个简单命令的英文单词组合，不应该包含特殊字符，只包含字母、数字和'-'、'_'等编程中常用的变量名格式
+2. *description*: 一段关于SKILL的功能描述和一个触发SKILL的关键词列表，例如：This skill can xxx. Use this when the user mentions [ "key word 1", "key word 3", ... ].
+
 ## Outline
 
 目标：在当前对话上下文中，帮助用户创建或整理高质量 SpecKit Skill，确保结构规范、触发清晰、资源可复用，并为每个技能生成可复用的确定性 `skill_id`。
