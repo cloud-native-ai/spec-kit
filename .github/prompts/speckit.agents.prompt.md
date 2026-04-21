@@ -112,7 +112,7 @@ Execution flow:
 12. **Generate and register `agent_id`**
    - After the agent file is validated and saved, generate a deterministic `agent_id` from the canonical workspace-relative path `.github/agents/<agent-name>.agent.md`.
    - Treat this canonical path string as the agent identifier unless the project later introduces a stricter `agent_id` schema.
-   - Update the `## Resource Registry` → `### Agents` subsection in `.ai/instructions.md` by adding one structured list entry for the new agent, using the field names defined in the agent template.
+  - Update the `## Resource Registry` → `### Agents` subsection in `.specify/instructions.md` by adding one structured list entry for the new agent, using the field names defined in the agent template.
    - Example:
      - `Agent Name: Code Reviewer`
        - `Agent ID: .github/agents/code-reviewer.agent.md`

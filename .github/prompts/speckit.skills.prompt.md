@@ -232,7 +232,7 @@ Skill 仅保留执行任务所需内容，不增加无关文档：
 - **Canonical ID（`skill_id`）**：`.github/skills/<name>/SKILL.md` 的工作区相对路径。
 - **Canonical Path**：`${SKILL_ROOT}/SKILL.md` 的工作区相对路径。
 
-将以下信息写入 `.ai/instructions.md` 的 `## Resource Registry` → `### Skills` 小节：
+将以下信息写入 `.specify/instructions.md` 的 `## Resource Registry` → `### Skills` 小节：
 
 - `Skill Name`
 - `Skill ID`

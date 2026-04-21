@@ -36,20 +36,21 @@ Skills 存储在带有 `SKILL.md` 文件的目录中。
 
 ### 存储位置
 
-*   **项目级 Skills**（推荐）：存储在工作区的 `.github/skills/` 目录下。
+*   **项目级 Skills**（推荐）：主副本存储在工作区的 `.specify/skills/` 目录下。
+*   **GitHub 兼容入口**：`.github/skills/` 仅作为兼容入口映射到主副本，不承载主内容。
 *   **用户级 Skills**（推荐）：存储在用户配置文件的 `~/.copilot/skills/` 目录下。
 
 ### 目录结构
 
 每个 Skill 应有自己的子目录。例如，创建一个名为 `webapp-testing` 的 Skill：
 
-1.  创建目录 `.github/skills/webapp-testing/`
+1.  创建目录 `.specify/skills/webapp-testing/`
 2.  在其中创建 `SKILL.md` 文件。
 3.  （可选）添加脚本、模板或示例文件。
 
 结构示例：
 ```text
-.github/skills/webapp-testing/
+.specify/skills/webapp-testing/
 ├── SKILL.md           # 定义 Skill 行为和元数据
 ├── test-template.js   # 模板文件
 └── examples/          # 示例场景

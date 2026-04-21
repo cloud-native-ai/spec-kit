@@ -92,6 +92,7 @@ Spec-Driven Development 强调以下原则：
 - **AI 智能代理集成**：支持多种 AI 编码助手
 - **结构化工作流**：从需求到实现的完整开发流程
 - **可扩展技能系统**：支持自定义技能与工具，并通过 `/speckit.skills` 进行管理
+- **技能安装布局统一**：项目级 skill 主副本统一落在 `.specify/skills/`，`.github/skills/` 作为兼容入口
 
 ## 🤖 支持的 AI 代理
 

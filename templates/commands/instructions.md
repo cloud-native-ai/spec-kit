@@ -18,7 +18,7 @@ You **MUST** analyze the user input in `$ARGUMENTS`, infer the user's intent, an
 
 The user input may include:
 
-1. Requested section-level updates for `.ai/instructions.md`.
+1. Requested section-level updates for `.specify/instructions.md`.
 2. Supplemental context to refine project guidance.
 3. Constraints that require preserving or excluding specific content ranges.
 
@@ -32,7 +32,7 @@ When processing the user input:
 
 ## Overview
 
-Analyze this repository and generate or update `.ai/instructions.md` to guide AI coding agents.
+Analyze this repository and generate or update `.specify/instructions.md` to guide AI coding agents.
 
 Focus on capturing *discoverable, project-specific* knowledge that makes a fresh AI instance immediately productive, including:
 - The “big picture” architecture that requires reading multiple files to understand (major components, boundaries, data flows, and the rationale behind key structure)
@@ -48,16 +48,16 @@ Find essential knowledge that helps an AI agent be immediately productive:
 - Potential pitfalls or common development environment issues
 - Key files/directories that exemplify patterns
 
-Content guidelines for `.ai/instructions.md`:
+Content guidelines for `.specify/instructions.md`:
 
-- If `.ai/instructions.md` already exists, merge intelligently: preserve valuable content and update only what is outdated
+- If `.specify/instructions.md` already exists, merge intelligently: preserve valuable content and update only what is outdated
 - Keep it concise and actionable (~20–50 lines) using Markdown structure
 - Use concrete examples from this repo when describing patterns
 - Avoid generic advice; document only this project’s specific approaches
 - Document only what you can observe in the codebase (not aspirational practices)
 - Reference key files/directories that exemplify important patterns
 
-After updating `.ai/instructions.md`, ask the user for feedback on anything unclear or incomplete so you can iterate.
+After updating `.specify/instructions.md`, ask the user for feedback on anything unclear or incomplete so you can iterate.
 
 ## Update Strategy
 
@@ -72,7 +72,7 @@ When `$ARGUMENTS` has content (partial update), modify only requested sections a
 
 Classify failures before deciding to stop:
 - **Critical (must stop and report)**:
-   - `.ai/instructions.md` cannot be created or written.
+   - `.specify/instructions.md` cannot be created or written.
    - Required root metadata exists but is unreadable (for example `.specify/memory/constitution.md`).
    - Permission denied on required paths.
 - **Warning (continue with fallback)**:
@@ -87,9 +87,9 @@ Fallback behavior:
 
 ## Actions
 
-1. **Setup**: Run `{SCRIPT}` to ensure the basic directory structure, `.copilotignore`, and template `.ai/instructions.md` exist.
+1. **Setup**: Run `{SCRIPT}` to ensure the basic directory structure, `.copilotignore`, and template `.specify/instructions.md` exist.
    - This script handles the "heavy lifting" of creating directories, ignoring files, and establishing symlinks for various AI tools (`.clinerules`, `.github`, `.lingma`, etc.).
-   - It will only create a template `.ai/instructions.md` if one does not exist.
+   - It will only create a template `.specify/instructions.md` if one does not exist.
    - If the script returns non-zero, apply the **Error Handling** rules above instead of failing immediately.
 
 2. **Analyze Project Context**:
@@ -100,7 +100,7 @@ Fallback behavior:
    - **Check `.specify/` Directory**: When referencing the `.specify/` directory (if exists), **ONLY** consider the one in the **project root** (same level as `README.md`/`pyproject.toml`). Ignore any `.specify/` directories found inside subdirectories or submodules (as they belong to other projects).
 
 3. **Update Instructions Content**:
-   - Read the content of `.ai/instructions.md` (whether newly created or existing).
+   - Read the content of `.specify/instructions.md` (whether newly created or existing).
    - **Fill Placeholders**: Replace any bracketed placeholders (e.g., `[Brief summary...]`, `[Detected tech stack...]`) with concrete details derived from your analysis.
    - **Update Documentation Map**: Ensure the table correctly points to existing documentation files in the repository.
    - **Preserve Sections**: Do NOT remove or overwrite the `## Tools` and `## Skills` managed ranges. Keep marker comments intact:
@@ -114,7 +114,7 @@ Fallback behavior:
    - Verify that the resulting instructions clearly describe the project to a fresh AI instance.
 
 5. **Report**:
-   - Report the full path of the instructions file (`.ai/instructions.md`).
+   - Report the full path of the instructions file (`.specify/instructions.md`).
    - Confirm that symlinks for Copilot, Cline, Lingma, Trae, and Qoder have been established (or explicitly report warning/fallback actions if setup script partially failed).
 
 ## Handoffs

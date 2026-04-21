@@ -26,8 +26,8 @@ if [ ! -f ".specify/templates/instructions-template.md" ]; then
   exit 1
 fi
 
-TARGET_FILE=".ai/instructions.md"
-TARGET_DIR=".ai"
+TARGET_FILE=".specify/instructions.md"
+TARGET_DIR=".specify"
 
 mkdir -p "$TARGET_DIR"
 
@@ -40,7 +40,7 @@ if [ -f "$SCRIPT_DIR/refresh-tools.sh" ]; then
   "$SCRIPT_DIR/refresh-tools.sh" --system --json > "$TOOLS_DIR/system.json"
   "$SCRIPT_DIR/refresh-tools.sh" --shell --json > "$TOOLS_DIR/shell.json"
   "$SCRIPT_DIR/refresh-tools.sh" --project --json > "$TOOLS_DIR/project.json"
-  gitignore_add_pattern ".ai/tools/*.json" "$REPO_ROOT/.gitignore"
+  gitignore_add_pattern ".specify/tools/*.json" "$REPO_ROOT/.gitignore"
 else
   log warning "refresh-tools.sh not found, skipping tool JSON manifest generation."
 fi
@@ -137,37 +137,38 @@ log info "Updating symlinks for AI tools..."
 # .clinerules
 mkdir -p .clinerules
 pushd .clinerules >/dev/null
-ln -sf ../.ai/instructions.md project_rules.md
+ln -sf ../.specify/instructions.md project_rules.md
 popd >/dev/null
 
 # .github
 mkdir -p .github
 pushd .github >/dev/null
-ln -sf ../.ai/instructions.md copilot-instructions.md
+ln -sf ../.specify/instructions.md copilot-instructions.md
 popd >/dev/null
 
 # .lingma
 mkdir -p .lingma/rules
 pushd .lingma/rules >/dev/null
-ln -sf ../../.ai/instructions.md project_rule.md
+ln -sf ../../.specify/instructions.md project_rule.md
 popd >/dev/null
 
 # .trae
 mkdir -p .trae/rules
 pushd .trae/rules >/dev/null
-ln -sf ../../.ai/instructions.md project_rules.md
+ln -sf ../../.specify/instructions.md project_rules.md
 popd >/dev/null
 
 # .qoder
 mkdir -p .qoder
 pushd .qoder >/dev/null
-ln -sf ../.ai/instructions.md project_rules.md
+ln -sf ../.specify/instructions.md project_rules.md
 popd >/dev/null
 
 # Root level links
-ln -sf .ai/instructions.md QWEN.md
-ln -sf .ai/instructions.md CLAUDE.md
-ln -sf .ai/instructions.md IFLOW.md
-ln -sf .ai/instructions.md QODER.md
+ln -sf .specify/instructions.md QWEN.md
+ln -sf .specify/instructions.md CLAUDE.md
+ln -sf .specify/instructions.md IFLOW.md
+ln -sf .specify/instructions.md QODER.md
+ln -sf .specify/instructions.md .cursorrules
 
 log success "Instructions generated/updated at $TARGET_FILE"

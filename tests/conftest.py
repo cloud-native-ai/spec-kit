@@ -26,7 +26,7 @@ def qoder_support_surface_files(repo_root: Path) -> list[Path]:
     return [
         repo_root / "README.md",
         repo_root / "docs" / "installation.md",
-        repo_root / ".ai" / "instructions.md",
+        repo_root / ".specify" / "instructions.md",
         repo_root / "templates" / "plan-template.md",
         repo_root / "templates" / "commands" / "agents.md",
     ]

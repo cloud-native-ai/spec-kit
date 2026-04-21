@@ -12,7 +12,7 @@ def test_packaging_keeps_template_and_script_resources_for_qoder_assets():
 def test_public_docs_and_instructions_are_qoder_consistent():
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     install = (ROOT / "docs" / "installation.md").read_text(encoding="utf-8")
-    instructions = (ROOT / ".ai" / "instructions.md").read_text(encoding="utf-8")
+    instructions = (ROOT / ".specify" / "instructions.md").read_text(encoding="utf-8")
 
     assert "Qoder" in readme
     assert "https://qoder.com/cli" in install

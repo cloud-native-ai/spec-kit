@@ -70,7 +70,7 @@ add_doc_path() {
     if [[ "$path" == "CLAUDE.md" ]] || \
        [[ "$path" == "QWEN.md" ]] || \
        [[ "$path" == ".github/copilot-instructions.md" ]] || \
-       [[ "$path" == ".ai/instructions.md" ]]; then
+         [[ "$path" == ".specify/instructions.md" ]]; then
        return
     fi
     

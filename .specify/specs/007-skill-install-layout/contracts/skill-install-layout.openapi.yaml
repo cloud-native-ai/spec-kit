@@ -1,0 +1,254 @@
+openapi: 3.0.3
+info:
+  title: Skill Install Layout Contract
+  version: 0.1.0
+  description: >-
+    Contract for project-level skill installation layout migration to
+    .specify/skills with compatibility entrypoints.
+servers:
+  - url: https://speckit.local
+paths:
+  /skills/{skillName}/install:
+    post:
+      summary: Install or refresh one skill using canonical primary path
+      operationId: installSkill
+      parameters:
+        - in: path
+          name: skillName
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstallSkillRequest'
+      responses:
+        '200':
+          description: Install completed (success or partial-success)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallOutcome'
+        '409':
+          description: Conflict detected on primary path or compatibility entry path
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /skills/{skillName}/migrate-legacy:
+    post:
+      summary: Migrate legacy .github/skills real directory to .specify/skills
+      operationId: migrateLegacySkillLayout
+      parameters:
+        - in: path
+          name: skillName
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MigrateLegacyRequest'
+      responses:
+        '200':
+          description: Migration completed or partially completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallOutcome'
+        '422':
+          description: Backup failed or migration preconditions are not satisfied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /skills/{skillName}/entrypoints:
+    post:
+      summary: Ensure compatibility entrypoints for supported tools
+      operationId: ensureEntryPoints
+      parameters:
+        - in: path
+          name: skillName
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnsureEntrypointsRequest'
+      responses:
+        '200':
+          description: Entrypoints evaluated and created/skipped/failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  skillName:
+                    type: string
+                  entrypoints:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CompatibilityEntryPoint'
+        '409':
+          description: Existing file/dir/link conflicts with requested entrypoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    InstallSkillRequest:
+      type: object
+      properties:
+        enabledTools:
+          type: array
+          items:
+            type: string
+        allowPlaceholderFallback:
+          type: boolean
+          default: true
+      additionalProperties: false
+    MigrateLegacyRequest:
+      type: object
+      properties:
+        legacyPath:
+          type: string
+          example: .github/skills/my-skill
+        backupRequired:
+          type: boolean
+          default: true
+      additionalProperties: false
+    EnsureEntrypointsRequest:
+      type: object
+      required:
+        - enabledTools
+      properties:
+        enabledTools:
+          type: array
+          items:
+            type: string
+        allowPlaceholderFallback:
+          type: boolean
+          default: true
+      additionalProperties: false
+    CompatibilityEntryPoint:
+      type: object
+      required:
+        - toolKey
+        - entryPath
+        - targetPrimaryPath
+        - entryMode
+        - status
+      properties:
+        toolKey:
+          type: string
+        entryPath:
+          type: string
+        targetPrimaryPath:
+          type: string
+          example: .specify/skills/my-skill
+        entryMode:
+          type: string
+          enum: [symlink, placeholder]
+        status:
+          type: string
+          enum: [created, skipped, failed, conflict]
+        reason:
+          type: string
+    BackupArtifact:
+      type: object
+      required:
+        - sourcePath
+        - status
+      properties:
+        sourcePath:
+          type: string
+        backupPath:
+          type: string
+        status:
+          type: string
+          enum: [created, failed]
+        message:
+          type: string
+    MigrationSession:
+      type: object
+      required:
+        - skillName
+        - legacyPath
+        - primaryCopyPath
+        - sessionState
+      properties:
+        skillName:
+          type: string
+        legacyPath:
+          type: string
+        primaryCopyPath:
+          type: string
+        backup:
+          $ref: '#/components/schemas/BackupArtifact'
+        deleteLegacyAttempted:
+          type: boolean
+        deleteLegacyStatus:
+          type: string
+          enum: [deleted, skipped, failed]
+        sessionState:
+          type: string
+          enum: [completed, partial, manual-required]
+    InstallOutcome:
+      type: object
+      required:
+        - operation
+        - skillName
+        - primaryCopyStatus
+        - entrypoints
+        - overallStatus
+      properties:
+        operation:
+          type: string
+          enum: [install, refresh, migrate]
+        skillName:
+          type: string
+        primaryCopyStatus:
+          type: string
+          enum: [created, reused, failed]
+        entrypoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompatibilityEntryPoint'
+        migration:
+          $ref: '#/components/schemas/MigrationSession'
+        overallStatus:
+          type: string
+          enum: [success, partial-success, failed]
+        messages:
+          type: array
+          items:
+            type: string
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - conflict-primary-path
+            - conflict-entry-path
+            - unsupported-tool
+            - backup-failed
+            - symlink-not-supported
+            - permission-denied
+            - invalid-state
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true

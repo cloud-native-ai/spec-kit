@@ -53,7 +53,8 @@ ${SKILL_ROOT}/
 
 **存放位置**：`SKILL_ROOT` 可位于以下任一路径（项目级或个人级）：
 
-- `.github/skills/<name>/`
+- `.specify/skills/<name>/`（项目级主目录）
+- `.github/skills/<name>/`（兼容入口，不承载主副本）
 - `.agents/skills/<name>/`
 - `.claude/skills/<name>/`
 - `~/.copilot/skills/<name>/`
@@ -240,10 +241,10 @@ scripts/bash/refresh-tools.sh --json
 
 生成 `SKILL.md` 的 Resource ID 并持久化：
 
-- **Canonical ID（`skill_id`）**：`.github/skills/<name>/SKILL.md` 的工作区相对路径。
+- **Canonical ID（`skill_id`）**：`.specify/skills/<name>/SKILL.md` 的工作区相对路径。
 - **Canonical Path**：`${SKILL_ROOT}/SKILL.md` 的工作区相对路径。
 
-将以下信息写入 `.ai/instructions.md` 的 `## Resource Registry` → `### Skills` 小节：
+将以下信息写入 `.specify/instructions.md` 的 `## Resource Registry` → `### Skills` 小节：
 
 - `Skill Name`
 - `Skill ID`
