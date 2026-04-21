@@ -199,3 +199,11 @@ Detailed prompt templates at [module-analysis-guide.md](references/module-analys
 | [module-analysis-guide.md](references/module-analysis-guide.md) | Module analysis methods, completeness standard, subagent prompt templates |
 | [git-analysis-guide.md](references/git-analysis-guide.md) | Commit/tag/branch history analysis and architectural evolution signals |
 | [deployment-analysis-guide.md](references/deployment-analysis-guide.md) | Runtime topology, packaging, delivery pipeline, and operability analysis |
+
+## Report Output Location
+
+After completing all analysis phases, the final analysis report must be written to `analysis-project.md` in the workspace root. This is the deliverable file that users will consume.
+
+```
+$WORK_DIR/analysis-project.md
+```

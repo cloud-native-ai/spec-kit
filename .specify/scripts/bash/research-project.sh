@@ -69,7 +69,7 @@ add_doc_path() {
     # Exclusion list
     if [[ "$path" == "CLAUDE.md" ]] || \
        [[ "$path" == "QWEN.md" ]] || \
-         [[ "$path" == ".github/copilot-instructions.md" ]] || \
+       [[ "$path" == ".github/copilot-instructions.md" ]] || \
          [[ "$path" == ".specify/instructions.md" ]]; then
        return
     fi

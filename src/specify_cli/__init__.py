@@ -537,6 +537,26 @@ def copy_local_templates(
     if not is_current_dir:
         project_path.mkdir(parents=True)
 
+    def ensure_agent_skills_symlink(root_path: Path, agent_dir_name: str) -> None:
+        agent_dir = root_path / agent_dir_name
+        agent_dir.mkdir(parents=True, exist_ok=True)
+
+        specify_skills = root_path / ".specify" / "skills"
+        agent_skills = agent_dir / "skills"
+
+        if agent_skills.is_symlink():
+            try:
+                if agent_skills.resolve() == specify_skills.resolve():
+                    return
+            except OSError:
+                pass
+            agent_skills.unlink(missing_ok=True)
+
+        if agent_skills.exists():
+            return
+
+        agent_skills.symlink_to(specify_skills, target_is_directory=True)
+
     try:
         # Create the .specify directory structure that the original template expects
         specify_dir = project_path / ".specify"
@@ -672,9 +692,7 @@ def copy_local_templates(
             if tracker:
                 tracker.start("local-templates", "copying skills")
 
-            # Determine destination: Default to .github/skills as it is the Open Standard location
-            # User specifically requested this for Copilot, and it works for others too.
-            skills_dest = project_path / ".github" / "skills"
+            skills_dest = project_path / ".specify" / "skills"
             skills_dest.mkdir(parents=True, exist_ok=True)
 
             shutil.copytree(
@@ -684,6 +702,24 @@ def copy_local_templates(
             )
             if tracker:
                 tracker.complete("local-templates", "skills copied")
+
+        if ai_assistant == "copilot":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .github/skills to .specify/skills"
+                )
+            ensure_agent_skills_symlink(project_path, ".github")
+            if tracker:
+                tracker.complete("local-templates", ".github/skills symlink ready")
+
+        if ai_assistant == "qoder":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .qoder/skills to .specify/skills"
+                )
+            ensure_agent_skills_symlink(project_path, ".qoder")
+            if tracker:
+                tracker.complete("local-templates", ".qoder/skills symlink ready")
 
     except Exception as e:
         if tracker:

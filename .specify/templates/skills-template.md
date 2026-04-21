@@ -17,7 +17,7 @@ Briefly describe what this skill does. (Conciseness is key!)
 
 ## Resource ID
 - Canonical ID: `{{SKILL_ID}}`
-- Canonical Path: `.github/skills/{{SKILL_NAME}}/SKILL.md`
+- Canonical Path: `.specify/skills/{{SKILL_NAME}}/SKILL.md`
 
 ## Available Tools & Resources
 
