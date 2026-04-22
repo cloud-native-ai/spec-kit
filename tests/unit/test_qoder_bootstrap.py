@@ -41,4 +41,5 @@ def test_copy_local_templates_qoder_symlinks_skills_to_specify(
     qoder_skills = project_path / ".qoder" / "skills"
     assert qoder_skills.exists()
     assert qoder_skills.is_symlink()
+    assert qoder_skills.readlink() == Path("../.specify/skills")
     assert qoder_skills.resolve() == (project_path / ".specify" / "skills").resolve()

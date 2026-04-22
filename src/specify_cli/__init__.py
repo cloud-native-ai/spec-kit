@@ -543,6 +543,7 @@ def copy_local_templates(
 
         specify_skills = root_path / ".specify" / "skills"
         agent_skills = agent_dir / "skills"
+        relative_target = Path(os.path.relpath(specify_skills, start=agent_dir))
 
         if agent_skills.is_symlink():
             try:
@@ -555,7 +556,7 @@ def copy_local_templates(
         if agent_skills.exists():
             return
 
-        agent_skills.symlink_to(specify_skills, target_is_directory=True)
+        agent_skills.symlink_to(relative_target, target_is_directory=True)
 
     try:
         # Create the .specify directory structure that the original template expects

@@ -25,6 +25,7 @@ def test_copy_local_templates_copilot_uses_github_prompts_and_symlinked_skills(
     github_skills = project_path / ".github" / "skills"
     assert github_skills.exists()
     assert github_skills.is_symlink()
+    assert github_skills.readlink() == Path("../.specify/skills")
     assert github_skills.resolve() == (project_path / ".specify" / "skills").resolve()
 
 
