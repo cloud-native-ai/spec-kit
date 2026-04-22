@@ -43,3 +43,24 @@ def test_copy_local_templates_qoder_symlinks_skills_to_specify(
     assert qoder_skills.is_symlink()
     assert qoder_skills.readlink() == Path("../.specify/skills")
     assert qoder_skills.resolve() == (project_path / ".specify" / "skills").resolve()
+
+
+def test_copy_local_templates_qoder_migrates_existing_qoder_skills(
+    monkeypatch, tmp_path: Path, qoder_minimal_resource_path: Path
+):
+    monkeypatch.setattr(
+        "specify_cli.get_resource_path", lambda: qoder_minimal_resource_path
+    )
+
+    project_path = tmp_path / "demo"
+    (project_path / ".qoder" / "skills" / "legacy").mkdir(parents=True)
+    (project_path / ".qoder" / "skills" / "legacy" / "note.txt").write_text(
+        "legacy", encoding="utf-8"
+    )
+
+    copy_local_templates(project_path, "qoder", "sh", is_current_dir=True)
+
+    assert (project_path / ".specify" / "skills" / "legacy" / "note.txt").exists()
+    qoder_skills = project_path / ".qoder" / "skills"
+    assert qoder_skills.is_symlink()
+    assert qoder_skills.readlink() == Path("../.specify/skills")

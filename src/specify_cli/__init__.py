@@ -542,6 +542,7 @@ def copy_local_templates(
         agent_dir.mkdir(parents=True, exist_ok=True)
 
         specify_skills = root_path / ".specify" / "skills"
+        specify_skills.mkdir(parents=True, exist_ok=True)
         agent_skills = agent_dir / "skills"
         relative_target = Path(os.path.relpath(specify_skills, start=agent_dir))
 
@@ -551,10 +552,20 @@ def copy_local_templates(
                     return
             except OSError:
                 pass
+            try:
+                linked_path = agent_skills.resolve()
+                if linked_path.exists() and linked_path.is_dir():
+                    shutil.copytree(linked_path, specify_skills, dirs_exist_ok=True)
+            except OSError:
+                pass
             agent_skills.unlink(missing_ok=True)
 
         if agent_skills.exists():
-            return
+            if agent_skills.is_dir():
+                shutil.copytree(agent_skills, specify_skills, dirs_exist_ok=True)
+                shutil.rmtree(agent_skills)
+            else:
+                return
 
         agent_skills.symlink_to(relative_target, target_is_directory=True)
 

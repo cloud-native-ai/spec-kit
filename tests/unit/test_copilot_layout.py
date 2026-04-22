@@ -41,3 +41,24 @@ def test_copy_local_templates_non_copilot_does_not_create_github(
 
     assert (project_path / ".specify" / "skills").exists()
     assert not (project_path / ".github").exists()
+
+
+def test_copy_local_templates_copilot_migrates_existing_github_skills(
+    monkeypatch, tmp_path: Path, qoder_minimal_resource_path: Path
+):
+    monkeypatch.setattr(
+        "specify_cli.get_resource_path", lambda: qoder_minimal_resource_path
+    )
+
+    project_path = tmp_path / "demo"
+    (project_path / ".github" / "skills" / "legacy").mkdir(parents=True)
+    (project_path / ".github" / "skills" / "legacy" / "note.txt").write_text(
+        "legacy", encoding="utf-8"
+    )
+
+    copy_local_templates(project_path, "copilot", "sh", is_current_dir=True)
+
+    assert (project_path / ".specify" / "skills" / "legacy" / "note.txt").exists()
+    github_skills = project_path / ".github" / "skills"
+    assert github_skills.is_symlink()
+    assert github_skills.readlink() == Path("../.specify/skills")
