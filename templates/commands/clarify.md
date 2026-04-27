@@ -5,8 +5,10 @@ handoffs:
       agent: speckit.plan
       prompt: Generate an implementation plan after ambiguities are resolved.
       send: true
+skills:
+   - analysis-project
 scripts:
-   sh: scripts/bash/research-project.sh --json
+   sh: skills/analysis-project/scripts/research-project.sh --json
 ---
 
 ## User Input

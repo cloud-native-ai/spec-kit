@@ -26,7 +26,7 @@ Note: This clarification workflow is expected to run (and be completed) BEFORE i
 
 Execution steps:
 
-1. Run `.specify/scripts/bash/research-project.sh --json` from repo root **once** (combined `--json` mode). Parse JSON payload fields:
+1. Run `.specify/skills/analysis-project/scripts/research-project.sh --json` from repo root **once** (combined `--json` mode). Parse JSON payload fields:
    - `REQUIREMENTS_DIR`
    - `FEATURE_SPEC`
    - `AVAILABLE_DOCS`
