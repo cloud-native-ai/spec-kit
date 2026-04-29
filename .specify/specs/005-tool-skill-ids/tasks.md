@@ -41,7 +41,7 @@
 
 ---
 
-## Phase 3: User Story 1 - 生成可精确引用的唯一标识 (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Generate Precisely Referenceable Unique Identifiers (Priority: P1) 🎯 MVP
 
 **Goal**: Make `/speckit.tools` and `/speckit.skills` return and persist a deterministic canonical ID whenever they create, discover, or refresh a target artifact.
 
@@ -69,7 +69,7 @@
 
 ---
 
-## Phase 4: User Story 2 - 用唯一标识进行后续定位 (Priority: P2)
+## Phase 4: User Story 2 - Use Unique Identifiers for Subsequent Lookup (Priority: P2)
 
 **Goal**: Allow later commands, documents, and conversations to resolve the same tool or skill directly from the previously returned identifier.
 
@@ -96,7 +96,7 @@
 
 ---
 
-## Phase 5: User Story 3 - 在模糊匹配与精确定位之间平滑切换 (Priority: P3)
+## Phase 5: User Story 3 - Smooth Switching Between Fuzzy Matching and Precise Lookup (Priority: P3)
 
 **Goal**: Preserve current natural-language discovery while making ID-based resolution the preferred path and stopping on conflicts.
 

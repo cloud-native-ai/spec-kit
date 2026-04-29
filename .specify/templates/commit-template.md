@@ -19,7 +19,7 @@ The rendered `{msg}` **MUST** be exactly one line:
 - `[SCOPE]`: Scope of impact (prefer feature/spec key, e.g., `NNN-short-name`)
 - `[SUBJECT]`: One-line summary (imperative/verb-first, ≤72 chars preferred)
 
-可选（用于生成 `[SCOPE]` / `[SUBJECT]` 的上下文字段）：
+Optional context fields (for generating `[SCOPE]` / `[SUBJECT]`):
 
 - `[BRANCH]`: Current branch name (e.g., `feat/123-login-reset`)
 - `[REQUIREMENTS_KEY]`: spec directory key (e.g., `123-login-reset`)
@@ -28,7 +28,7 @@ The rendered `{msg}` **MUST** be exactly one line:
 
 ## Allowed types
 
-优先从以下集合中选择一个：
+Choose one from the following set as priority:
 
 - `feat`: New/implemented user-visible capability (typically includes `src/` or runtime logic changes)
 - `fix`: Bug fix
@@ -48,7 +48,7 @@ The rendered `{msg}` **MUST** be exactly one line:
 
 - Use imperative / verb-first: Implement/Add/Fix/Update/Refactor… (be concise and consistent)
 - Avoid trailing period
-- 避免含糊表达：例如 “update stuff / misc changes”
+- Avoid vague expressions: e.g., "update stuff / misc changes"
 - Prefer aligning subject with `[FEATURE_TITLE]` or spec document semantics
 
 ## Recommended patterns

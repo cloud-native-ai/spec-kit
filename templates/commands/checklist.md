@@ -152,8 +152,8 @@ When processing the user input:
    **HOW TO WRITE CHECKLIST ITEMS - "Unit Tests for English"**:
 
    **Common confusion to avoid** (spec masquerading as requirement):
-   - ❌ "系统必须使用 Redis 缓存" → 这是 Specification（How），除非 requirements 明确约束技术选型
-   - ✅ "系统需在 1000 并发下保持亚秒级响应" → 这是 Requirement（What），可由不同实现方案满足
+   - ❌ "System must use Redis cache" → This is Specification (How), unless requirements explicitly constrain technology choices
+   - ✅ "System must maintain sub-second response under 1000 concurrent users" → This is Requirement (What), can be satisfied by different implementations
 
    ❌ **WRONG** (Testing implementation):
    - "Verify landing page displays 3 episode cards"

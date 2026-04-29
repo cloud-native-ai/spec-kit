@@ -3,7 +3,7 @@
 **Requirement Branch**: `003-speckit-agents-command`  
 **Created**: 2026-02-27  
 **Status**: Draft  
-**Input**: User description: "创建一个新的/speckit.agents命令"
+**Input**: User description: "Create a new /speckit.agents command"
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -103,11 +103,11 @@ As a project maintainer, I want the system to validate that created agents meet 
 
 ### Session 2026-02-27
 
-- Q: 当目标 `.github/agents/<name>.agent.md` 已存在且新需求指向同名代理时，系统应采用哪种默认行为？ → A: Always overwrite existing file.
-- Q: 当用户不传参数且系统基于上下文推断 agent 意图时，若推断置信度不足，默认应如何处理？ → A: Stop and ask for one-sentence intent.
-- Q: 当用户输入中出现互相冲突的约束时，系统默认应如何决策？ → A: Prioritize latest explicit input; if still conflicting, stop and request correction.
-- Q: 当 `.github/agents/` 目录不存在时，`/speckit.agents` 默认应如何处理？ → A: Automatically create directory and continue.
-- Q: 当用户未明确指定 `tools` 权限时，`/speckit.agents` 默认应采用哪种权限策略？ → A: Use least-privilege default tools required by workflow.
+- Q: When the target `.github/agents/<name>.agent.md` already exists and new requirements point to an agent with the same name, what default behavior should the system adopt? → A: Always overwrite existing file.
+- Q: When the user provides no arguments and the system infers agent intent based on context, if inference confidence is insufficient, what should be the default handling? → A: Stop and ask for one-sentence intent.
+- Q: [CN] → A: Prioritize latest explicit input; if still conflicting, stop and request correction.
+- Q: [CN] `.github/agents/` [CN]`/speckit.agents` [CN] → A: Automatically create directory and continue.
+- Q: [CN] `tools` [CN]`/speckit.agents` [CN] → A: Use least-privilege default tools required by workflow.
 
 <!-- 
 This section will be populated by /speckit.clarify command with questions and answers.

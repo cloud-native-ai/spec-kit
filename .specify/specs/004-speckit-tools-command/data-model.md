@@ -5,29 +5,29 @@
 ## Entities
 
 ### ToolRecord
-- **Description**: 存放在 `.specify/memory/tools/<tool-name>.md` 的统一工具记录文档。
+- **Description**: Unified tool record document stored at `.specify/memory/tools/<tool-name>.md`.
 - **Fields**:
-  - name: string（必填，工具名称）
-  - tool_type: string（必填，`mcp` | `system` | `shell` | `project`）
-  - source_identifier: string（必填，来源唯一标识，如 server/tool/path）
-  - description: string（必填，用途说明）
-  - arguments: array<ToolArgument>（可空）
-  - returns: array<ToolReturnField>（可空）
-  - aliases: array<ToolAlias>（可空）
-  - status: string（Draft | Verified | Deprecated）
-  - last_updated: date（YYYY-MM-DD）
+  - name: string (required, tool name)
+  - tool_type: string (required, `mcp` | `system` | `shell` | `project`)
+  - source_identifier: string[CN] server/tool/path[CN]
+  - description: string[CN]
+  - arguments: array<ToolArgument>[CN]
+  - returns: array<ToolReturnField>[CN]
+  - aliases: array<ToolAlias>[CN]
+  - status: string[CN]Draft | Verified | Deprecated[CN]
+  - last_updated: date[CN]YYYY-MM-DD[CN]
 
 ### ToolSourceDescriptor
-- **Description**: 一条可发现工具来源的标准化描述。
+- **Description**: [CN]
 - **Fields**:
-  - source_type: string（`mcp` | `system` | `shell` | `project`）
-  - source_name: string（来源名称，如 mcp server 名）
-  - canonical_name: string（工具原始名称）
-  - display_name: string（可展示名称）
-  - metadata: object（来源附加信息）
+  - source_type: string[CN]`mcp` | `system` | `shell` | `project`[CN]
+  - source_name: string[CN] mcp server [CN]
+  - canonical_name: string[CN]
+  - display_name: string[CN]
+  - metadata: object[CN]
 
 ### ToolArgument
-- **Description**: 工具参数定义。
+- **Description**: [CN]
 - **Fields**:
   - name: string
   - type: string
@@ -36,21 +36,21 @@
   - default: string | null
 
 ### ToolReturnField
-- **Description**: 工具返回结构中的字段定义。
+- **Description**: [CN]
 - **Fields**:
   - name: string
   - type: string
   - description: string
 
 ### ToolAlias
-- **Description**: 用户对工具记录的封装或重命名映射。
+- **Description**: [CN]
 - **Fields**:
   - alias: string
   - canonical_name: string
   - note: string | null
 
 ### ToolInvocationSession
-- **Description**: 一次 `/speckit.tools` 命令会话。
+- **Description**: [CN] `/speckit.tools` [CN]
 - **Fields**:
   - requested_name: string
   - resolved_name: string
@@ -58,14 +58,14 @@
   - used_existing_record: boolean
   - disambiguation_required: boolean
   - user_confirmed_execution: boolean
-  - result_status: string（success | cancelled | failed）
+  - result_status: string[CN]success | cancelled | failed[CN]
   - result_summary: string
   - executed_at: datetime
 
 ## Validation Rules
 
-- ToolRecord 必须包含 `name`、`tool_type`、`source_identifier`、`description`。
-- `tool_type` 必须属于受支持四类之一。
-- 当 `status=Verified` 时，`arguments` 与 `returns` 字段不得全部缺失。
-- ToolAlias 的 `alias` 在同一工具记录命名空间内必须唯一。
-- ToolInvocationSession 在 `user_confirmed_execution=false` 时，`result_status` 只能为 `cancelled`。
+- ToolRecord [CN] `name`[CN]`tool_type`[CN]`source_identifier`[CN]`description`[CN]
+- `tool_type` [CN]
+- [CN] `status=Verified` [CN]`arguments` [CN] `returns` [CN]
+- ToolAlias [CN] `alias` [CN]
+- ToolInvocationSession [CN] `user_confirmed_execution=false` [CN]`result_status` [CN] `cancelled`[CN]

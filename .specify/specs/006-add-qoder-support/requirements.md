@@ -3,7 +3,7 @@
 **Requirement Branch**: `006-add-qoder-support`  
 **Created**: 2026-03-29  
 **Status**: Draft  
-**Input**: User description: "在spec-kit项目中添加对qoder的支持，可以使用./tmp目录中来自上游的patch作为核心实现。"
+**Input**: User description: "Add support for Qoder in the spec-kit project, using patches from upstream in the ./tmp directory as the core implementation."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -20,58 +20,58 @@
   - Demonstrated to users independently
 -->
 
-### User Story 1 - 在初始化时选择 Qoder (Priority: P1)
+### User Story 1 - Select Qoder During Initialization (Priority: P1)
 
-作为准备使用 Spec Kit 的开发者，我希望在初始化新项目或现有项目时可以直接选择 Qoder 作为 AI 助手，这样我无需手工补齐命令文件、说明文档或额外配置，就能马上开始使用 Qoder 工作流。
+As a developer preparing to use Spec Kit, I want to directly select Qoder as my AI assistant when initializing a new or existing project, so I can immediately start using the Qoder workflow without manually supplementing command files, documentation, or additional configuration.
 
-**Why this priority**: 这是用户感知最直接的主流程。如果初始化阶段不能正确支持 Qoder，后续文档、校验和发布能力都无法形成完整价值闭环。
+**Why this priority**: [CN] Qoder[CN]
 
-**Independent Test**: 通过一次选择 Qoder 的项目初始化流程即可独立验证；若生成结果中已包含完整的 Qoder 使用资产与说明，并且用户无需手工复制文件，则该故事成立。
+**Independent Test**: [CN] Qoder [CN] Qoder [CN]
 
 **Acceptance Scenarios**:
 
-1. **Given** 用户准备初始化一个新的 Spec Kit 项目，**When** 用户选择 Qoder 作为目标 AI 助手，**Then** 系统应在生成结果中包含 Qoder 所需的项目内命令资产与使用说明。
-2. **Given** 用户在现有目录中初始化项目并选择 Qoder，**When** 初始化完成，**Then** 系统应保留原有项目内容并补齐 Qoder 所需资产，而不要求用户额外手工创建这些内容。
+1. **Given** [CN] Spec Kit [CN]**When** [CN] Qoder [CN] AI [CN]**Then** [CN] Qoder [CN]
+2. **Given** [CN] Qoder[CN]**When** [CN]**Then** [CN] Qoder [CN]
 
 ---
 
-### User Story 2 - 校验与更新现有 Qoder 项目 (Priority: P2)
+### User Story 2 - [CN] Qoder [CN] (Priority: P2)
 
-作为已经在使用或维护 Spec Kit 项目的开发者，我希望系统能够识别、校验并刷新与 Qoder 相关的项目资产，这样我可以在升级模板或补齐缺失内容时保持项目一致性，而不影响其他 AI 助手的配置。
+[CN] Spec Kit [CN] Qoder [CN] AI [CN]
 
-**Why this priority**: 初始化之后，真实项目更常见的需求是升级、刷新和校验。如果 Qoder 只能“首次创建”，却不能“持续维护”，支持就不完整。
+**Why this priority**: [CN] Qoder [CN]“[CN]”[CN]“[CN]”[CN]
 
-**Independent Test**: 在一个已包含或部分包含 Qoder 资产的项目中执行一次校验或刷新流程，验证系统是否能识别缺失、给出指引并更新 Qoder 相关内容且不改坏其他助手资产。
+**Independent Test**: [CN] Qoder [CN] Qoder [CN]
 
 **Acceptance Scenarios**:
 
-1. **Given** 一个项目已经包含 Qoder 相关资产，**When** 维护者执行刷新或更新流程，**Then** 系统应更新 Qoder 相关内容并保持其他助手资产不变。
-2. **Given** 用户选择 Qoder 且启用了助手工具校验，**When** 本地缺少对应 CLI，**Then** 系统应明确指出缺失依赖并给出下一步操作指引。
+1. **Given** [CN] Qoder [CN]**When** [CN]**Then** [CN] Qoder [CN]
+2. **Given** [CN] Qoder [CN]**When** [CN] CLI[CN]**Then** [CN]
 
 ---
 
-### User Story 3 - 文档与发布产物保持一致 (Priority: P3)
+### User Story 3 - [CN] (Priority: P3)
 
-作为项目维护者，我希望面向用户的文档、帮助信息和分发产物都一致地展示 Qoder 支持状态，这样用户看到的能力说明、下载到的模板内容和实际行为不会相互矛盾。
+[CN] Qoder [CN]
 
-**Why this priority**: 一致的说明和分发结果可以减少误导与支持成本。即使核心流程已可用，如果文档、校验和分发产物不一致，用户仍会遭遇失败或困惑。
+**Why this priority**: [CN]
 
-**Independent Test**: 对一次候选发布执行文档与分发检查，验证帮助输出、能力列表和模板分发结果是否都包含一致的 Qoder 支持信息。
+**Independent Test**: [CN] Qoder [CN]
 
 **Acceptance Scenarios**:
 
-1. **Given** 用户查看支持的 AI 助手列表，**When** 用户查阅项目文档或命令帮助，**Then** 其看到的 Qoder 名称、可用性和获取指引应保持一致。
-2. **Given** 维护者生成面向用户的模板分发产物，**When** 用户下载对应产物，**Then** 该产物应包含与 Qoder 支持声明一致的内容。
+1. **Given** [CN] AI [CN]**When** [CN]**Then** [CN] Qoder [CN]
+2. **Given** [CN]**When** [CN]**Then** [CN] Qoder [CN]
 
 ---
 
 ### Edge Cases
 
-- 当用户选择 Qoder，但当前流程缺少必要的 Qoder 资产时，系统应在同一次操作中明确失败原因，而不是生成一个看似成功但实际不可用的项目。
-- 当用户启用助手工具校验且本地未安装 Qoder CLI 时，系统应给出清晰的安装或绕过校验指引。
-- 当项目同时包含多个 AI 助手资产时，刷新 Qoder 相关内容不应覆盖或破坏其他助手的已有文件。
-- 当文档、帮助输出和分发产物中存在命名或链接不一致时，系统应将其视为发布前必须解决的一致性问题。
-- 当用户在现有目录初始化并已存在部分 Qoder 文件时，系统应更新缺失或过期内容，而不是要求用户先手工清理目录。
+- [CN] Qoder[CN] Qoder [CN]
+- [CN] Qoder CLI [CN]
+- [CN] AI [CN] Qoder [CN]
+- [CN]
+- [CN] Qoder [CN]
 
 ## Requirements *(mandatory)*
 
@@ -125,7 +125,7 @@
 
 ### Session 2026-03-29
 
-- Q: 本次 Qoder 支持是否应当同时把项目治理/批准助手范围更新为包含 Qoder？ → A: 是，本次需求包含治理对齐；Qoder 作为正式批准的受支持助手交付。
+- Q: [CN] Qoder [CN]/[CN] Qoder[CN] → A: [CN]Qoder [CN]
 
 <!-- 
 This section will be populated by /speckit.clarify command with questions and answers.

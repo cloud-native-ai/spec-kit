@@ -124,10 +124,10 @@ In addition, **The tasks phase MUST review the Feature list**:
 
 - Task breakdown may expose new Features or indicate that old Features are no longer applicable.
 - Ensure functional/non-functional Feature classification remains consistent.
-- 若发现 Feature 变更，必须同步更新：
+- If changes are discovered, the following must be updated synchronously:
    - `.specify/memory/features/<ID>.md`
    - `.specify/memory/features.md`
-- 在 Feature 详情中记录任务拆分带来的“关键变化/备注”。
+- Record the "key changes / notes" brought by the task breakdown in the Feature detail.
 
 This integration ensures that all feature task generation activities are properly tracked and linked to their corresponding entries in the project's feature index.
 

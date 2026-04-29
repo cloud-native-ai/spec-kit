@@ -2,60 +2,60 @@
 
 ## Overview
 
-本 feature 不引入数据库，但需要明确文件型配置与发布一致性对象，作为后续 tasks、实现与测试的共享语言。
+This feature does not introduce a database, but requires clear file-based configuration and release consistency objects as a shared language for subsequent tasks, implementation, and testing.
 
 ## Entities
 
 ### 1. `SupportedAssistant`
 
-表示一个可被 `specify init` 选择并被公开文档承认的助手定义。
+Represents an assistant definition that can be selected by `specify init` and recognized by public documentation.
 
 | Field | Type | Required | Description |
 |------|------|----------|-------------|
-| `key` | string | yes | 机器标识，如 `copilot`、`qwen`、`opencode`、`qoder` |
-| `display_name` | string | yes | 用户可见名称，如 `Qoder CLI` |
-| `assistant_type` | enum | yes | `ide` 或 `cli` |
-| `folder` | string | yes | 助手根目录，如 `.qoder/` |
-| `command_dir` | string | yes | 命令文件输出目录，如 `.qoder/commands/` |
-| `command_extension` | string | yes | 命令文件扩展名，如 `md` |
-| `argument_format` | string | yes | 模板参数占位格式，如 `$ARGUMENTS` |
-| `install_url` | string/null | yes | CLI 安装指引链接；IDE 型助手可为空 |
-| `requires_cli` | boolean | yes | 是否必须检查本地 CLI |
-| `approved` | boolean | yes | 是否在治理白名单与公开支持列表中正式获批 |
+| `key` | string | yes | Machine identifier, e.g., `copilot`, `qwen`, `opencode`, `qoder` |
+| `display_name` | string | yes | [CN] `Qoder CLI` |
+| `assistant_type` | enum | yes | `ide` [CN] `cli` |
+| `folder` | string | yes | [CN] `.qoder/` |
+| `command_dir` | string | yes | [CN] `.qoder/commands/` |
+| `command_extension` | string | yes | [CN] `md` |
+| `argument_format` | string | yes | [CN] `$ARGUMENTS` |
+| `install_url` | string/null | yes | CLI [CN]IDE [CN] |
+| `requires_cli` | boolean | yes | [CN] CLI |
+| `approved` | boolean | yes | [CN] |
 
 **Validation Rules**:
-- `key` 必须唯一。
-- `approved=true` 的助手必须同时出现在宪法、README/安装文档、CLI 帮助与模板白名单中。
-- `assistant_type=cli` 时，`install_url` 与 `requires_cli` 必须可用。
+- `key` [CN]
+- `approved=true` [CN]README/[CN]CLI [CN]
+- `assistant_type=cli` [CN]`install_url` [CN] `requires_cli` [CN]
 
 ### 2. `AssistantAssetSet`
 
-表示某个助手在用户项目中可用的最小资产集合。
+[CN]
 
 | Field | Type | Required | Description |
 |------|------|----------|-------------|
-| `assistant_key` | string | yes | 关联 `SupportedAssistant.key` |
-| `project_rules_path` | string | no | 助手说明/上下文File path，如 `.qoder/project_rules.md` |
-| `command_paths` | array<string> | yes | 生成的命令文件列表 |
-| `generated_on_init` | boolean | yes | 是否在初始化时生成 |
-| `generated_on_refresh` | boolean | yes | 是否在刷新时更新 |
-| `scope` | enum | yes | `new-project` 或 `existing-directory` 或 `both` |
+| `assistant_key` | string | yes | [CN] `SupportedAssistant.key` |
+| `project_rules_path` | string | no | [CN]/[CN]File path[CN] `.qoder/project_rules.md` |
+| `command_paths` | array<string> | yes | [CN] |
+| `generated_on_init` | boolean | yes | [CN] |
+| `generated_on_refresh` | boolean | yes | [CN] |
+| `scope` | enum | yes | `new-project` [CN] `existing-directory` [CN] `both` |
 
 **Validation Rules**:
-- `assistant_key=qoder` 时，`command_paths` 必须位于 `.qoder/commands/`。
-- `generated_on_refresh=true` 时，不得要求先删除其他助手目录。
+- `assistant_key=qoder` [CN]`command_paths` [CN] `.qoder/commands/`[CN]
+- `generated_on_refresh=true` [CN]
 
 ### 3. `AssistantValidationRule`
 
-表示某个助手在初始化或检查时的依赖校验规则。
+[CN]
 
 | Field | Type | Required | Description |
 |------|------|----------|-------------|
-| `assistant_key` | string | yes | 关联助手 |
-| `cli_command` | string | no | 需检查的二进制，如 `qoder` |
-| `skip_flag` | string | yes | 允许跳过校验的 flag，当前统一为 `--ignore-agent-tools` |
-| `failure_message_template` | string | yes | 缺少依赖时显示的错误文案模板 |
-| `install_url` | string | no | 错误提示中使用的安装链接 |
+| `assistant_key` | string | yes | [CN] |
+| `cli_command` | string | no | [CN] `qoder` |
+| `skip_flag` | string | yes | [CN] flag[CN] `--ignore-agent-tools` |
+| `failure_message_template` | string | yes | [CN] |
+| `install_url` | string | no | [CN] |
 
 **State Transitions**:
 - `unchecked` → `available`
@@ -64,33 +64,33 @@
 
 ### 4. `SupportSurface`
 
-表示任何会公开宣称助手支持状态的用户可见面。
+[CN]
 
 | Field | Type | Required | Description |
 |------|------|----------|-------------|
-| `surface_id` | string | yes | 唯一标识，如 `readme-supported-agents` |
-| `surface_type` | enum | yes | `cli-help`、`documentation`、`template`、`script-output`、`release-output` |
-| `location` | string | yes | File path或生成目标 |
-| `must_include_assistants` | array<string> | yes | 该表面必须列出的助手 key |
-| `must_include_install_guidance` | boolean | yes | 是否必须提供安装/获取信息 |
-| `release_blocking` | boolean | yes | 不一致是否构成发布阻塞 |
+| `surface_id` | string | yes | [CN] `readme-supported-agents` |
+| `surface_type` | enum | yes | `cli-help`[CN]`documentation`[CN]`template`[CN]`script-output`[CN]`release-output` |
+| `location` | string | yes | File path[CN] |
+| `must_include_assistants` | array<string> | yes | [CN] key |
+| `must_include_install_guidance` | boolean | yes | [CN]/[CN] |
+| `release_blocking` | boolean | yes | [CN] |
 
 **Validation Rules**:
-- 对 Qoder 相关表面，`release_blocking` 必须为 `true`。
-- 若表面列出支持助手，则命名与链接必须与 `SupportedAssistant` 一致。
+- [CN] Qoder [CN]`release_blocking` [CN] `true`[CN]
+- [CN] `SupportedAssistant` [CN]
 
 ### 5. `DistributionVariant`
 
-表示一个发布或分发模板变体。
+[CN]
 
 | Field | Type | Required | Description |
 |------|------|----------|-------------|
-| `variant_id` | string | yes | 如 `spec-kit-template-qoder-sh` |
-| `assistant_key` | string | yes | 关联助手 |
-| `script_variant` | enum | yes | `sh`（当前仓库主路径） |
-| `artifact_type` | enum | yes | `wheel-resource`、`template-archive`、`generated-project` |
-| `expected_assets` | array<string> | yes | 该变体应包含的关键文件/目录 |
-| `audit_status` | enum | yes | `pending`、`generated`、`verified`、`failed` |
+| `variant_id` | string | yes | [CN] `spec-kit-template-qoder-sh` |
+| `assistant_key` | string | yes | [CN] |
+| `script_variant` | enum | yes | `sh`[CN] |
+| `artifact_type` | enum | yes | `wheel-resource`[CN]`template-archive`[CN]`generated-project` |
+| `expected_assets` | array<string> | yes | [CN]/[CN] |
+| `audit_status` | enum | yes | `pending`[CN]`generated`[CN]`verified`[CN]`failed` |
 
 **State Transitions**:
 - `pending` → `generated`
@@ -106,8 +106,8 @@
 
 ## Derived Rules for Qoder
 
-1. `SupportedAssistant(key=qoder).approved` 必须为 `true` 才算 feature 完成。
-2. `AssistantValidationRule(assistant_key=qoder).skip_flag` 必须是 `--ignore-agent-tools`。
-3. `AssistantAssetSet(assistant_key=qoder)` 必须覆盖 `new-project` 与 `existing-directory`。
-4. 所有列出支持助手的 `SupportSurface` 必须同步包含 `qoder`，否则视为发布阻塞缺陷。
-5. 至少一个 `DistributionVariant` 必须能证明 Qoder 相关模板资产进入标准分发流程。
+1. `SupportedAssistant(key=qoder).approved` [CN] `true` [CN] feature [CN]
+2. `AssistantValidationRule(assistant_key=qoder).skip_flag` [CN] `--ignore-agent-tools`[CN]
+3. `AssistantAssetSet(assistant_key=qoder)` [CN] `new-project` [CN] `existing-directory`[CN]
+4. [CN] `SupportSurface` [CN] `qoder`[CN]
+5. [CN] `DistributionVariant` [CN] Qoder [CN]

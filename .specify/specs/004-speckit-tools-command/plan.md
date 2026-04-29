@@ -7,7 +7,7 @@
 
 ## Summary
 
-将历史 MCP-only 命令能力统一为 `/speckit.tools`，并将“显式工具说明+记录+确认调用”能力从 MCP-only 泛化为 MCP/System/Shell/Project 四类工具。方案基于现有模板命令体系与 `scripts/bash/refresh-tools.sh` 的多来源发现能力，统一输出工具记录到 `.specify/memory/tools/`，并保持与现有 feature memory 及 SDD 流程一致。
+[CN] MCP-only [CN] `/speckit.tools`[CN]“[CN]+[CN]+[CN]”[CN] MCP-only [CN] MCP/System/Shell/Project [CN] `scripts/bash/refresh-tools.sh` [CN] `.specify/memory/tools/`[CN] feature memory [CN] SDD [CN]
 
 ## Technical Context
 
@@ -17,15 +17,15 @@
   the iteration process.
 -->
 
-**Language/Version**: Python 3.11+（项目文档建议），兼容项目声明 Python >=3.8  
-**Primary Dependencies**: Typer、Rich、httpx（含 socks）、项目现有 Bash 脚本体系  
-**Storage**: 本地文件系统（`.specify/memory/tools/*.md`）  
-**Testing**: pytest（命令模板/脚本行为测试与契约一致性校验）  
-**Target Platform**: Linux/macOS/Windows 的 CLI 使用场景  
-**Project Type**: single（CLI + templates + scripts）  
-**Performance Goals**: 95% 已记录工具调用在 20 秒内完成“读取记录→参数确认→执行/取消”；工具来源列举在 5 秒内完成  
-**Constraints**: 不破坏现有 `/speckit.*` 命令工作流；保持 `.specify/memory/tools/` 兼容；仅支持批准的 AI agent 生态（Copilot/Qwen/opencode）  
-**Scale/Scope**: 单仓库内数十到百级工具条目（MCP/System/Shell/Project）管理与调用说明
+**Language/Version**: Python 3.11+ (project docs recommendation), compatible with project declaration Python >=3.8  
+**Primary Dependencies**: Typer, Rich, httpx (with socks), existing project Bash script system  
+**Storage**: [CN]`.specify/memory/tools/*.md`[CN]  
+**Testing**: pytest[CN]/[CN]  
+**Target Platform**: Linux/macOS/Windows [CN] CLI [CN]  
+**Project Type**: single[CN]CLI + templates + scripts[CN]  
+**Performance Goals**: 95% [CN] 20 [CN]“[CN]→[CN]→[CN]/[CN]”[CN] 5 [CN]  
+**Constraints**: [CN] `/speckit.*` [CN] `.specify/memory/tools/` [CN] AI agent [CN]Copilot/Qwen/opencode[CN]  
+**Scale/Scope**: [CN]MCP/System/Shell/Project[CN]
 
 ## Constitution Check
 
@@ -43,9 +43,9 @@
 
 **Additional Constraints from Input**:
 
-- 本次未提供额外 `$ARGUMENTS` 约束，按 `requirements.md` 与项目既有文档执行。
-- 命令统一必须体现为 `/speckit.tools`，并保留历史 MCP-only 场景的可迁移语义。
-- 泛化必须覆盖 MCP 之外的 system/shell/project tools。
+- [CN] `$ARGUMENTS` [CN] `requirements.md` [CN]
+- [CN] `/speckit.tools`[CN] MCP-only [CN]
+- [CN] MCP [CN] system/shell/project tools[CN]
 
 **Gates Status**: ✅ All gates pass
 
@@ -130,7 +130,7 @@ api/
 
 ```
 
-**Structure Decision**: 采用单项目 CLI 结构，不新增独立服务。核心变更落在命令模板、工具发现脚本协同与 memory 文档资产结构，保证与现有 `src/`、`templates/`、`scripts/` 目录风格一致。
+**Structure Decision**: [CN] CLI [CN] memory [CN] `src/`[CN]`templates/`[CN]`scripts/` [CN]
 
 ## Complexity Tracking
 
@@ -141,42 +141,42 @@ N/A
 
 ## Phase 0: Research Review & Context
 
-- `SPECS_DIR/research.md` 不存在；已基于 `README.md`、`docs/`、`.specify/memory/features.md` 与 `features/*.md` 完成上下文补全。
-- 关键技术决策已明确：复用现有 `refresh-tools.sh` 作为多来源工具发现基座，并保持工具记录路径与格式兼容。
-- 不存在阻塞性的 NEEDS CLARIFICATION；可直接进入设计阶段。
+- `SPECS_DIR/research.md` [CN] `README.md`[CN]`docs/`[CN]`.specify/memory/features.md` [CN] `features/*.md` [CN]
+- [CN] `refresh-tools.sh` [CN]
+- [CN] NEEDS CLARIFICATION[CN]
 
 ## Phase 1: Design & Contracts
 
 ### Data Model
 
-- 生成 `.specify/specs/004-speckit-tools-command/data-model.md`，定义 `ToolRecord`、`ToolSourceDescriptor`、`ToolInvocationSession`、`ToolAlias` 等实体。
+- [CN] `.specify/specs/004-speckit-tools-command/data-model.md`[CN] `ToolRecord`[CN]`ToolSourceDescriptor`[CN]`ToolInvocationSession`[CN]`ToolAlias` [CN]
 
 ### Contracts
 
-- 生成 `.specify/specs/004-speckit-tools-command/contracts/tools-command.openapi.yaml`。
-- 以 API-style 合约描述 `/speckit.tools` 的发现、补全、预览确认、执行与重命名行为。
+- [CN] `.specify/specs/004-speckit-tools-command/contracts/tools-command.openapi.yaml`[CN]
+- [CN] API-style [CN] `/speckit.tools` [CN]
 
 ### Quickstart
 
-- 生成 `.specify/specs/004-speckit-tools-command/quickstart.md`，覆盖 MCP 与非 MCP 来源、冲突消歧、记录复用与重命名。
+- [CN] `.specify/specs/004-speckit-tools-command/quickstart.md`[CN] MCP [CN] MCP [CN]
 
 ## Constitution Check (Post-Design Re-check)
 
-- **Feature-Centric Development**: 继续沿用 Feature 016，不新增重复 Feature。
-- **Specification-Driven Development**: 所有设计均可追溯到 FR-001~FR-010 与 SC-001~SC-005。
-- **Intent-Driven Development**: 计划围绕“显式说明工具调用”用户价值，未提前落入实现细节。
-- **Test-First & Contract-Driven**: 已先定义契约与数据模型，后续 tasks 将按 contract/integration 优先拆解。
-- **AI Agent Integration**: 与批准 agent 生态一致，不引入未批准 provider。
-- **Continuous Quality & Observability**: 结果输出与错误说明可核验，保留简化设计（YAGNI）。
-- **SDD Workflow Compliance**: 满足 spec → plan 产物要求，下一步进入 `/speckit.tasks`。
+- **Feature-Centric Development**: [CN] Feature 016[CN] Feature[CN]
+- **Specification-Driven Development**: [CN] FR-001~FR-010 [CN] SC-001~SC-005[CN]
+- **Intent-Driven Development**: [CN]“[CN]”[CN]
+- **Test-First & Contract-Driven**: [CN] tasks [CN] contract/integration [CN]
+- **AI Agent Integration**: [CN] agent [CN] provider[CN]
+- **Continuous Quality & Observability**: [CN]YAGNI[CN]
+- **SDD Workflow Compliance**: [CN] spec → plan [CN] `/speckit.tasks`[CN]
 
 **Post-Design Gates Status**: ✅ All gates pass
 
 ## Phase 2: Implementation Planning
 
-1. 将命令文档入口统一到 `templates/commands/tools.md`，并保留兼容迁移说明。
-2. 统一工具发现流程：聚合 MCP/System/Shell/Project 四类来源，并标准化为统一候选模型。
-3. 建立工具记录读写策略：优先复用 `.specify/memory/tools/<tool-name>.md`，缺失时交互补全再写入。
-4. 增加冲突消歧与执行前确认步骤：处理同名来源冲突、命名冲突与未确认执行。
-5. 对记录封装与重命名能力定义稳定规则，确保可检索、可复用、可追踪。
-6. 按契约生成后续任务（contract → integration → unit），并补充回归验证路径。
+1. [CN] `templates/commands/tools.md`[CN]
+2. [CN] MCP/System/Shell/Project [CN]
+3. [CN] `.specify/memory/tools/<tool-name>.md`[CN]
+4. [CN]
+5. [CN]
+6. [CN]contract → integration → unit[CN]

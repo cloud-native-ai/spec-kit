@@ -64,4 +64,4 @@
 - **Verification Status**: [unverified | verified]
 - **Notes**: [Any additional context]
 
-使用[TOOL PARAMETERS]调用[TOOL NAME]工具
+Invoke tool [TOOL NAME] with [TOOL PARAMETERS]

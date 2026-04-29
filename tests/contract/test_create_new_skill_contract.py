@@ -17,7 +17,7 @@ def test_create_new_skill_generates_json_tool_manifests():
                 "--json",
                 "--output-dir",
                 str(output_dir),
-                "git-workflow-sync - 同步上游代码到目标分支",
+                "git-workflow-sync - Sync upstream code to target branch",
             ],
             cwd=root,
             stdin=subprocess.DEVNULL,

@@ -236,8 +236,8 @@ Spec Kit commands are not meant to be used in isolation. The table below clarifi
 **Key Features**:
 - **Create**: `/speckit.skills "name - description"` creates a new skill directory with standard templates
 - **Refresh**: `/speckit.skills` (no args) scans and validates all installed skills
-- **Deterministic ID**: 每个 skill 会生成并持久化 `skill_id`（默认是 `.specify/skills/<name>/SKILL.md` 的工作区相对路径）
-- **ID-first Reuse**: 后续引用优先按 `skill_id` 精确定位，失效后才回退到模糊发现
+- **Deterministic ID**: Each skill generates and persists a `skill_id` (default: workspace-relative path of `.specify/skills/<name>/SKILL.md`)
+- **ID-first Reuse**: Subsequent references prioritize precise lookup by `skill_id`, falling back to fuzzy discovery only on failure
 - Enforces standard structure (`SKILL.md`, `scripts/`, `references/`)
 - Validates skill names and configurations
 
@@ -250,12 +250,12 @@ Spec Kit commands are not meant to be used in isolation. The table below clarifi
 ```
 
 **Key Features**:
-- **Intent-first Interpretation**: 自然语言参数默认解释为“要创建/定位的工具能力”，而不是立即执行该动作
-- **Example**: `/speckit.tools 下载钉钉文档到本地markdown文件` 表示创建/定位一个“下载钉钉文档到本地markdown文件”的工具，不是立刻下载
-- **Deterministic ID**: 每个工具记录都会生成并持久化 `tool_id`（默认是 `.specify/memory/tools/<name>.md` 的工作区相对路径）
-- **ID-first Resolution**: 若传入 `tool_id`，优先精确解析；仅在缺失或失效时回退模糊发现
-- **Conflict Guard**: `tool_id` 与自然语言提示冲突时显式报错，避免误触发
-- **Record Reuse**: 复用并回填历史记录中的缺失 `tool_id`
+- **Intent-first Interpretation**: Natural language arguments are interpreted by default as “tool capability to create/locate”, not as immediate execution of that action
+- **Example**: `/speckit.tools download DingTalk docs to local markdown` means create/locate a tool for “downloading DingTalk docs to local markdown files”, not downloading immediately
+- **Deterministic ID**: Each tool record generates and persists a `tool_id` (default: workspace-relative path of `.specify/memory/tools/<name>.md`)
+- **ID-first Resolution**: If a `tool_id` is provided, prioritize precise resolution; fall back to fuzzy discovery only when missing or invalid
+- **Conflict Guard**: Explicit error when `tool_id` conflicts with natural language hints, preventing false triggers
+- **Record Reuse**: Reuse and backfill missing `tool_id` in historical records
 
 ### `speckit.agents`
 **Purpose**: Create or refine custom AI agents for focused workflows using `.agent.md` files.

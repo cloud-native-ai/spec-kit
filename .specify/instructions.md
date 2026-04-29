@@ -51,42 +51,42 @@ Escalation rules:
 > - **Spec-Kit User** (runtime): references generated files in `.specify/`, `.github/`
 > - **Spec-Kit Developer** (development): modifies source code in `scripts/`, `skills/`, `src/`, `templates/`, etc.
 
-| 角色视角 | 路径示例 | 说明 |
+| Role Perspective | Path Example | Description |
 |---------|---------|------|
 | **User** | `.specify/scripts/bash/generate-instructions.sh` | User-referenced generated files |
 | **Developer** | `scripts/bash/generate-instructions.sh` | Developer-modifiable source code |
 | **User** | `.specify/skills/analysis-project/SKILL.md` | User-referenced skill master copy |
 | **Developer** | `skills/analysis-project/SKILL.md` | Developer-modifiable skill source code
-| **User** | `.specify/memory/constitution.md` | 使用者引用的项目宪法 |
-| **Developer** | `memory/constitution.md` | 开发者维护的宪法源文件 |
+| **User** | `.specify/memory/constitution.md` | User-referenced project constitution |
+| **Developer** | `memory/constitution.md` | Developer-maintained constitution source file |
 
 | Directory | Purpose |
 |-----------|---------|
-| `src/specify_cli/` | Python CLI 源代码 (Typer 应用) |
-| `scripts/bash/` | Shell 脚本 (generate-instructions, create-new-*, implement-plan 等) |
-| `scripts/python/` | Python 辅助脚本 (skills-utils, tools-utils) |
-| `templates/` | Markdown 模板 (requirements, plan, tasks, checklist 等) |
-| `templates/commands/` | `/speckit.*` 命令的 prompt 模板 |
-| `skills/` | 技能源代码 (analysis-project 等) |
-| `memory/` | constitution.md, features.md 源文件 |
-| `tests/` | 测试套件 (unit, integration, contract) |
-| `docs/` | 项目文档 (installation, quickstart, usage, spec-driven 等) |
-| `.specify/` | **使用者视角**: 生成后的Working directory (scripts, skills, memory, specs) |
-| `.github/prompts/` | `/speckit.*` 命令 prompt 文件 (symlink 目标) |
-| `draft/skills/` | 待开发的技能草案 |
+| `src/specify_cli/` | Python CLI source code (Typer application) |
+| `scripts/bash/` | Shell scripts (generate-instructions, create-new-*, implement-plan, etc.) |
+| `scripts/python/` | Python helper scripts (skills-utils, tools-utils) |
+| `templates/` | Markdown templates (requirements, plan, tasks, checklist, etc.) |
+| `templates/commands/` | Prompt templates for `/speckit.*` commands |
+| `skills/` | Skill source code (analysis-project, etc.) |
+| `memory/` | constitution.md, features.md source files |
+| `tests/` | Test suite (unit, integration, contract) |
+| `docs/` | Project documentation (installation, quickstart, usage, spec-driven, etc.) |
+| `.specify/` | **User perspective**: Generated working directory (scripts, skills, memory, specs) |
+| `.github/prompts/` | Prompt files for `/speckit.*` commands (symlink targets) |
+| `draft/skills/` | Draft skills pending development |
 
 # Tool And Skills Usage Guide
 > **Note**: Tool and Skills details are injected into prompts by the agent when needed. This section is guidance only.
 
 ## Suggested Tooling Scope (High-Level)
-- **Developer 视角**: 修改 `scripts/bash/`、`scripts/python/` 中的源代码脚本
-- **User 视角**: 执行 `.specify/scripts/bash/`、`.specify/scripts/python/` 中的生成后脚本
+- **Developer perspective**: modify source scripts in `scripts/bash/`, `scripts/python/`
+- **User perspective**: execute generated scripts in `.specify/scripts/bash/`, `.specify/scripts/python/`
 - `/speckit.*` commands are chat instructions (via `.github/prompts/`), not terminal commands.
 - Treat Constitution (`.specify/memory/constitution.md`) as the authority for architecture and workflow constraints.
 - **Build**: `uv build` (Hatchling)
 - **Install (dev)**: `uv pip install -e .`
-- **Test**: `pytest tests/` (含 unit, integration, contract 测试)
-- **CLI 入口**: `specify` 命令 (由 `pyproject.toml` 的 `[project.scripts]` 注册)
+- **Test**: `pytest tests/` (includes unit, integration, contract tests)
+- **CLI entry**: `specify` command (registered by `[project.scripts]` in `pyproject.toml`)
 
 ## AI Tool Compatibility
 - **Supported Agents**: GitHub Copilot, Qwen Code, opencode, Qoder

@@ -1,6 +1,6 @@
 # Implementation Plan: MCP Tool Call Command
 
-> Archived Note: 本计划基于历史 MCP-only 能力，当前命令入口已统一为 `/speckit.tools`。
+> Archived Note: This plan is based on historical MCP-only capabilities. The current command entry point has been unified as `/speckit.tools`.
 
 **Branch**: `002-mcp-tool-call` | **Date**: 2026-02-10 | **Spec**: [.specify/specs/002-mcp-tool-call/requirements.md](.specify/specs/002-mcp-tool-call/requirements.md)
 **Input**: Specification from `.specify/specs/002-mcp-tool-call/requirements.md`
@@ -9,7 +9,7 @@
 
 ## Summary
 
-为 MCP 工具调用场景提供完整实现规划：新增 MCP 工具记录模板与命令模板，定义工具发现与交互补全流程，并在本地 `.specify/memory/tools/` 形成可复用的工具记录，同时生成数据模型、合约与快速验证步骤（当前入口为 `/speckit.tools`）。
+Provide a complete implementation plan for MCP tool invocation scenarios: add MCP tool record templates and command templates, define tool discovery and interactive completion workflows, form reusable tool records in the local `.specify/memory/tools/` directory, and generate data models, contracts, and quick validation steps (current entry point is `/speckit.tools`).
 
 ## Technical Context
 
@@ -21,13 +21,13 @@
 
 **Language/Version**: Python >= 3.8  
 **Primary Dependencies**: Typer, Rich, httpx[socks], mcp[cli], platformdirs, readchar  
-**Storage**: 本地文件系统（`.specify/memory/tools/`）  
-**Testing**: pytest（计划引入，用于命令行为与合约校验）  
-**Target Platform**: 跨平台 CLI（Linux/macOS/Windows）
-**Project Type**: single（CLI 工具）  
-**Performance Goals**: 本地元数据读取与渲染 ≤ 2 秒；工具发现与清单渲染 ≤ 5 秒  
-**Constraints**: 复用现有 CLI 与模板体系；不引入新持久化存储；交互步骤必须可跳过并可复用  
-**Scale/Scope**: 多个 MCP Server，单次展示/管理数十个 MCP 工具
+**Storage**: Local file system (`.specify/memory/tools/`)  
+**Testing**: pytest[CN]  
+**Target Platform**: [CN] CLI[CN]Linux/macOS/Windows[CN]
+**Project Type**: single[CN]CLI [CN]  
+**Performance Goals**: [CN] ≤ 2 [CN] ≤ 5 [CN]  
+**Constraints**: [CN] CLI [CN]  
+**Scale/Scope**: [CN] MCP Server[CN]/[CN] MCP [CN]
 
 ## Constitution Check
 
@@ -45,8 +45,8 @@
 
 **Additional Constraints from Input**:
 
-- 必须新增 `templates/mcptool-template.md` 作为 MCP 工具记录模板
-- 必须新增/维护 `templates/commands/tools.md` 并参考 `templates/commands/clarify.md` 的结构
+- [CN] `templates/mcptool-template.md` [CN] MCP [CN]
+- [CN]/[CN] `templates/commands/tools.md` [CN] `templates/commands/clarify.md` [CN]
 
 **Gates Status**: ✅ All gates pass
 
@@ -92,7 +92,7 @@ tests/
   └── test_mcpcall_contracts.py
 ```
 
-**Structure Decision**: 单项目 CLI 结构，命令实现放在 `src/specify_cli/commands/`，模板放在 `templates/` 并复制到运行时上下文。
+**Structure Decision**: [CN] CLI [CN] `src/specify_cli/commands/`[CN] `templates/` [CN]
 
 ## Complexity Tracking
 
@@ -103,36 +103,36 @@ N/A
 
 ## Phase 0: Research Review & Context
 
-- 未发现 `research.md`，已使用现有文档与 Feature Memory 完成技术上下文决策。
-- 无需额外研究即可进入设计阶段。
+- [CN] `research.md`[CN] Feature Memory [CN]
+- [CN]
 
 ## Phase 1: Design & Contracts
 
 ### Data Model
 
-- 生成 `.specify/specs/002-mcp-tool-call/data-model.md`，覆盖 MCP Tool 记录、Server、参数与调用会话等实体。
+- [CN] `.specify/specs/002-mcp-tool-call/data-model.md`[CN] MCP Tool [CN]Server[CN]
 
 ### Contracts
 
-- 生成 `contracts/mcptool-record.schema.json` 描述工具记录结构。
-- 生成 `contracts/mcpcall-input.schema.json` 描述命令输入结构。
+- [CN] `contracts/mcptool-record.schema.json` [CN]
+- [CN] `contracts/mcpcall-input.schema.json` [CN]
 
 ### Quickstart
 
-- 生成 `.specify/specs/002-mcp-tool-call/quickstart.md`，提供本地验证步骤。
+- [CN] `.specify/specs/002-mcp-tool-call/quickstart.md`[CN]
 
 ### Feature Reference
 
-- 生成 `.specify/specs/002-mcp-tool-call/feature-ref.md`，链接本次 spec/plan 与相关模板。
+- [CN] `.specify/specs/002-mcp-tool-call/feature-ref.md`[CN] spec/plan [CN]
 
 ### Agent Context Update
 
-- 运行 `.specify/scripts/bash/generate-instructions.sh` 更新 `.ai/instructions.md` 与工具文档。
+- [CN] `.specify/scripts/bash/generate-instructions.sh` [CN] `.ai/instructions.md` [CN]
 
 ## Phase 2: Implementation Planning
 
-1. 新增 `templates/mcptool-template.md` 作为 MCP 工具记录模板。
-2. 维护 `templates/commands/tools.md`，沿用 `templates/commands/clarify.md` 的结构，补充 MCP 工具发现与交互补全流程。
-3. 在 CLI 中通过 `/speckit.tools` 命令入口承载该流程实现。
-4. 实现 MCP 工具发现逻辑与本地记录读写（`.specify/memory/tools/`）。
-5. 添加合约测试与关键流程测试，验证记录结构与调用行为。
+1. [CN] `templates/mcptool-template.md` [CN] MCP [CN]
+2. [CN] `templates/commands/tools.md`[CN] `templates/commands/clarify.md` [CN] MCP [CN]
+3. [CN] CLI [CN] `/speckit.tools` [CN]
+4. [CN] MCP [CN]`.specify/memory/tools/`[CN]
+5. [CN]

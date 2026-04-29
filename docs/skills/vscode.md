@@ -100,4 +100,4 @@ Skills use a Progressive Disclosure mechanism, loading content only when needed:
 *   **Security**: Exercise caution when adding scripts and avoid hardcoding sensitive information.
 
 ---
-更多信息请参考 Agent Skills 开放标准：[agentskills.io](https://agentskills.io)。
+For more information, refer to the Agent Skills open standard: [agentskills.io](https://agentskills.io).

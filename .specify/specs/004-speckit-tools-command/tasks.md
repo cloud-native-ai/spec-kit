@@ -41,7 +41,7 @@
 
 ---
 
-## Phase 3: User Story 1 - 显式说明并调用工具 (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Explicitly Describe and Invoke Tools (Priority: P1) 🎯 MVP
 
 **Goal**: Enable users to explicitly specify a tool and view its executable information before AI Agent invocation
 
@@ -71,7 +71,7 @@
 
 ---
 
-## Phase 4: User Story 2 - 复用与封装工具记录 (Priority: P2)
+## Phase 4: User Story 2 - Reuse and Encapsulate Tool Records (Priority: P2)
 
 **Goal**: Enable reuse of existing tool records and support encapsulation/renaming capabilities
 
@@ -97,7 +97,7 @@
 
 ---
 
-## Phase 5: User Story 3 - 泛化到多类工具生态 (Priority: P3)
+## Phase 5: User Story 3 - Generalize to Multi-Type Tool Ecosystem (Priority: P3)
 
 **Goal**: Support unified tool visibility and invocation across MCP, System, Shell, and Project tool types
 
@@ -129,7 +129,7 @@
 **Purpose**: Handle complex scenarios like name conflicts, missing records, and edge cases
 
 - [x] T031 [P] Implement same-name collision resolution across different source types
-- [x] T032 [P] Add validation for incomplete tool records requiring补全 process
+- [x] T032 [P] Add validation for incomplete tool records requiring[CN] process
 - [x] T033 Handle tool record naming conflicts during renaming operations
 - [x] T034 Implement graceful fallback for unavailable/disconnected MCP servers
 

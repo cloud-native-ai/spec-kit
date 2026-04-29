@@ -71,7 +71,7 @@ Rationale: ensures consistent quality and predictable releases.
 
 ### VII. Feature-Centric Development
 Feature is the long-term core framework of the project:
-- Feature 列表必须保持为项目的“单一事实来源”。
+- The Feature list MUST remain the "single source of truth" for the project.
 - Every phase of spec → plan → tasks → implement MUST review Feature additions/merges/splits/deletions.
 - Feature changes MUST be traceable to corresponding spec/plan evidence and recorded in the Feature detail.
 
