@@ -1,10 +1,10 @@
 ## Terminology: Requirement vs Specification vs Feature
 
 - **Requirement (What)**: Describes the goals, capabilities, and acceptance criteria the system must satisfy from a stakeholder perspective (value and constraints).
-- **Specification (How)**: Describes the plan and constraints for "how to implement the requirement" from a design/implementation perspective (e.g., plan.md, tasks.md, contracts/).
-- **Feature**: A **requirement grouping unit** centered on value and scope (commonly used in concept/planning phases), containing a set of Requirements (What) and driving subsequent Specifications (How).
+- **Specification (How)**: Describes the solutions and constraints for "how to implement the requirements" from a design/implementation perspective (e.g., plan.md, tasks.md, contracts/).
+- **Feature**: A **requirements grouping unit** centered on value and scope (commonly used in concept/planning phases), containing a set of Requirements (What) and driving subsequent Specifications (How).
 
-> Mnemonic: Requirement = Goal (What), Specification = Plan (How). The checklist produced by this command is a "unit test for requirements writing", not implementation verification.
+> Mnemonic: Requirement = Goal (What), Specification = Solution (How). The checklist produced by this command is a "unit test for requirements writing", not implementation verification.
 
 ## Checklist Purpose: "Unit Tests for English"
 
@@ -133,8 +133,8 @@ When processing the user input:
    **HOW TO WRITE CHECKLIST ITEMS - "Unit Tests for English"**:
 
    **Common confusion to avoid** (spec masquerading as requirement):
-   - ❌ "The system must use Redis cache" → This is a Specification (How), unless requirements explicitly constrain the tech stack
-   - ✅ "The system must maintain sub-second response under 1000 concurrent users" → This is a Requirement (What), achievable by different implementation approaches
+   - ❌ "System must use Redis cache" → This is Specification (How), unless requirements explicitly constrain technology choices
+   - ✅ "System must maintain sub-second response under 1000 concurrent users" → This is Requirement (What), can be satisfied by different implementations
 
    ❌ **WRONG** (Testing implementation):
    - "Verify landing page displays 3 episode cards"

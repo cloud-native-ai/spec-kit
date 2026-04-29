@@ -7,15 +7,14 @@ This project documentation is distributed across several key files. You MUST ref
 
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
-| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | 7 core principles, SDD workflow, feature governance |
-| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | 20 features with lifecycle tracking |
-| **Readme** | `README.md` | Project overview | SDD methodology, AI agent support, feature list |
-| **Installation** | `docs/installation.md` | Setup guide | Installation steps and prerequisites |
-| **Quick Start** | `docs/quickstart.md` | Getting started | First-use workflow and commands |
-| **Usage** | `docs/usage.md` | Command reference | `/speckit.*` command usage patterns |
-| **Spec-Driven Dev** | `docs/spec-driven.md` | Methodology | SDD principles and workflow |
-| **Skills Spec** | `docs/skills/specification.md` | Skills architecture | Skill structure and conventions |
-| **Upstream** | `docs/upstream.md` | Origin project | github/spec-kit relationship |
+| **Constitution** | `.specify/memory/constitution.md` | Governance & principles | SDD principles, Feature-centric dev, AI agent standards, quality gates |
+| **Feature Index** | `.specify/memory/features.md` | Feature roadmap & status | 20 features with IDs, statuses, spec paths, lifecycle tracking |
+| **Readme** | `README.md` | Project overview | Philosophy, core features, supported AI agents, research goals |
+| **Quick Start** | `docs/quickstart.md` | Onboarding guide | 4-step process, example workflows, command usage |
+| **Installation** | `docs/installation.md` | Setup instructions | Prerequisites, init commands, AI agent selection, script type selection |
+| **Usage Guide** | `docs/usage.md` | Command reference | Full `/speckit.*` command table, relationships, prerequisites/next steps |
+| **SDD Methodology** | `docs/spec-driven.md` | Conceptual foundation | Power inversion, SDD workflow, core principles |
+| **Skills Docs** | `docs/skills/` | Skill authoring guides | Specification, troubleshooting, VS Code integration |
 
 > **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
 
@@ -34,59 +33,66 @@ Escalation rules:
 - If the issue is low-risk and the fix is obvious: proceed with the correction and mention it briefly.
 
 ## Tech Stack & Resources
-- **Project Name**: spec-kit (specify-cli)
+- **Project Name**: spec-kit
 - **Root Path**: /storage/project/cloud-native-ai/spec-kit
-- **Version**: 0.0.22
-
-### Detected Tech Stack
-- **Language**: Python ≥3.8
-- **Package Manager**: `uv` (preferred) / `pip`
-- **Build System**: Hatchling (`pyproject.toml`)
+- **Language**: Python 3.8+ (docs recommend 3.11+)
+- **Package Manager**: uv (with `pyproject.toml`)
+- **Build System**: hatchling
 - **CLI Framework**: Typer + Rich (terminal UI)
-- **Dependencies**: httpx[socks], platformdirs, readchar, mcp[cli]≥1.0.0, truststore≥0.10.4
-- **Entry Point**: `specify = specify_cli:main`
+- **HTTP Client**: httpx (with optional SOCKS proxy support)
+- **Testing**: pytest with Typer `CliRunner` for CLI integration tests
+- **Key Directories**:
+  - `src/specify_cli/` — Single-module CLI application (`__init__.py` is the entry point)
+  - `tests/` — Organized as `unit/`, `integration/`, `contract/`; fixtures in `fixtures/`
+  - `.specify/` — Core SDD runtime: `memory/` (constitution, features), `templates/`, `scripts/`, `skills/`, `tools/`, `specs/`
+  - `scripts/bash/` — 12 shell scripts for the SDD workflow (create plans, refresh tools, generate instructions, etc.)
+  - `scripts/python/` — `skills-utils.py` and `tools-utils.py` (shared Python utilities)
+  - `templates/` — Project-level Markdown templates for plan, tasks, requirements, checklist, review, etc.
+  - `skills/` — Installed skill definitions (e.g., `analysis-project/`)
+  - `draft/skills/` — Draft/unpublished skill prototypes
+  - `docs/` — User-facing documentation (quickstart, installation, usage, SDD methodology)
 
-### Key Directories (Developer vs User Perspective)
-> ⚠️ **Critical Distinction**: This project uses spec-kit to develop spec-kit itself. Two roles coexist:
-> - **Spec-Kit User** (runtime): references generated files in `.specify/`, `.github/`
-> - **Spec-Kit Developer** (development): modifies source code in `scripts/`, `skills/`, `src/`, `templates/`, etc.
+### Build & Test Commands
 
-| Role Perspective | Path Example | Description |
-|---------|---------|------|
-| **User** | `.specify/scripts/bash/generate-instructions.sh` | User-referenced generated files |
-| **Developer** | `scripts/bash/generate-instructions.sh` | Developer-modifiable source code |
-| **User** | `.specify/skills/analysis-project/SKILL.md` | User-referenced skill master copy |
-| **Developer** | `skills/analysis-project/SKILL.md` | Developer-modifiable skill source code
-| **User** | `.specify/memory/constitution.md` | User-referenced project constitution |
-| **Developer** | `memory/constitution.md` | Developer-maintained constitution source file |
+```bash
+# Install in development mode
+uv pip install -e .
 
-| Directory | Purpose |
-|-----------|---------|
-| `src/specify_cli/` | Python CLI source code (Typer application) |
-| `scripts/bash/` | Shell scripts (generate-instructions, create-new-*, implement-plan, etc.) |
-| `scripts/python/` | Python helper scripts (skills-utils, tools-utils) |
-| `templates/` | Markdown templates (requirements, plan, tasks, checklist, etc.) |
-| `templates/commands/` | Prompt templates for `/speckit.*` commands |
-| `skills/` | Skill source code (analysis-project, etc.) |
-| `memory/` | constitution.md, features.md source files |
-| `tests/` | Test suite (unit, integration, contract) |
-| `docs/` | Project documentation (installation, quickstart, usage, spec-driven, etc.) |
-| `.specify/` | **User perspective**: Generated working directory (scripts, skills, memory, specs) |
-| `.github/prompts/` | Prompt files for `/speckit.*` commands (symlink targets) |
-| `draft/skills/` | Draft skills pending development |
+# Run all tests
+pytest tests/ -v
+
+# Run a specific test module
+pytest tests/unit/test_tool_record.py -v
+
+# Run contract tests only
+pytest tests/contract/ -v
+
+# Check syntax errors (no-op; rely on pytest + Pylance)
+# No linter/formatter is configured in this repo — quality enforced via CI/constitution gates
+
+# Run the CLI (installed mode)
+specify init <project-name>
+
+# Run the CLI (without install, via uvx)
+uvx --from git+https://github.com/github/spec-kit.git specify init <project-name>
+```
+
+### Project Conventions
+
+- **Single-module CLI**: All CLI logic lives in `src/specify_cli/__init__.py`. No sub-packages. The `app` Typer instance is the sole entry point.
+- **Template-driven codegen**: The CLI copies files from `templates/` and populates placeholders. Templates are Markdown with bracket tokens like `[PROJECT_NAME]`.
+- **Agent compatibility**: Supports Copilot, Qwen, opencode, and Qoder. Each agent has a config entry with `folder`, `install_url`, `requires_cli`.
+- **Shell scripts as workflow engine**: The 12 scripts under `scripts/bash/` implement the SDD phases. Scripts auto-detect OS and select `.sh` by default.
+- **Test organization**: `contract/` tests validate template outputs and tool manifests; `unit/` tests isolated helpers; `integration/` tests end-to-end flows (e.g., Qoder distribution).
+- **No Makefile**: All automation is driven through shell scripts and pytest, not Make.
 
 # Tool And Skills Usage Guide
 > **Note**: Tool and Skills details are injected into prompts by the agent when needed. This section is guidance only.
 
 ## Suggested Tooling Scope (High-Level)
-- **Developer perspective**: modify source scripts in `scripts/bash/`, `scripts/python/`
-- **User perspective**: execute generated scripts in `.specify/scripts/bash/`, `.specify/scripts/python/`
-- `/speckit.*` commands are chat instructions (via `.github/prompts/`), not terminal commands.
-- Treat Constitution (`.specify/memory/constitution.md`) as the authority for architecture and workflow constraints.
-- **Build**: `uv build` (Hatchling)
-- **Install (dev)**: `uv pip install -e .`
-- **Test**: `pytest tests/` (includes unit, integration, contract tests)
-- **CLI entry**: `specify` command (registered by `[project.scripts]` in `pyproject.toml`)
+- Prefer scripts under `.specify/scripts/` and `scripts/` for repeatable operations.
+- `/speckit.*` commands are chat instructions, not terminal commands.
+- Treat Constitution as the authority for architecture and workflow constraints.
 
 ## AI Tool Compatibility
 - **Supported Agents**: GitHub Copilot, Qwen Code, opencode, Qoder

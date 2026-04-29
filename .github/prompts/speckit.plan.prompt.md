@@ -64,10 +64,10 @@ In addition, **the plan phase MUST review the Feature list**:
 
 - Check whether this plan introduces new Features or deprecates/merges existing Features.
 - Ensure functional/non-functional Feature classification remains consistent.
-- If changes exist, synchronize updates to:
+- If there are changes, the following must be updated synchronously:
    - `.specify/memory/features/<ID>.md`
    - `.specify/memory/features.md`
-- Record "key changes/notes" corresponding to this plan in the Feature details.
+- Record the "key changes / notes" corresponding to this plan in the Feature detail.
 
 This integration ensures that all feature planning activities are properly tracked and linked to their corresponding entries in the project's feature index.
 

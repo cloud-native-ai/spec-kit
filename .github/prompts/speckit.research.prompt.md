@@ -20,7 +20,7 @@ When processing the user input:
 
 ## Outline
 
-1. **Setup**: Run `.specify/skills/analysis-project/scripts/research-project.sh --json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH, and **AVAILABLE_DOCS**. The `research.md` file will be located in `SPECS_DIR`.
+1. **Setup**: Run `skills/analysis-project/.specify/scripts/research-project.sh --json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH, and **AVAILABLE_DOCS**. The `research.md` file will be located in `SPECS_DIR`.
    - **Review Output**: Analyze the `AVAILABLE_DOCS` list provided in the JSON output to identify potentially relevant documentation.
 
 2. **Load Context**: 

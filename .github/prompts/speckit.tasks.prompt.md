@@ -8,9 +8,9 @@ You **MUST** analyze the user input in `$ARGUMENTS`, infer the user's intent, an
 
 The user input may include:
 
-1. Background information: Context, constraints, or business background.
+1. Background info: Context, constraints, or business background.
 2. Task outline: Phase breakdown or high-level task structure.
-3. Additional task items: Executable task items to be merged into the final task list.
+3. Additional task entries: Executable task items to merge into the final task list.
 
 When processing the user input:
 
@@ -22,20 +22,20 @@ When processing the user input:
 
 ### Input Type Detection and Handling Strategy
 
-1. **Background Information Type**: If `$ARGUMENTS` primarily contains descriptive text, business context, constraints, or unstructured information
+1. **Background Info Type**: If `$ARGUMENTS` primarily contains descriptive text, business context, constraints, or unstructured information
    - Integrate this information as context into the task generation process
    - Reference or reflect these constraints in relevant task descriptions
    - Do not directly convert into specific task entries
 
-2. **Task Outline Type**: If `$ARGUMENTS` contains structured task decomposition, phase breakdown, or high-level task organization
+2. **Task Outline Type**: If `$ARGUMENTS` contains structured task breakdowns, phase divisions, or high-level task organization
    - Use the outline structure as the primary framework for task organization
-   - Fill in specific implementation details and file paths based on the outline
+   - Fill in concrete implementation details and file paths based on the outline
    - Ensure generated tasks follow the specified structure and order
 
-3. **Additional Task Items Type**: If `$ARGUMENTS` contains specific, executable task items (usually in list form)
-   - Parse and standardize these task entries, ensuring conformance to task format specifications
+3. **Additional Task Entries Type**: If `$ARGUMENTS` contains specific, executable task items (typically in list form)
+   - Parse and standardize these task entries to conform to task format specifications
    - Integrate them into the corresponding user story phases or foundational tasks
-   - Maintain task ID continuity and dependency correctness
+   - Maintain task ID continuity and correct dependency relationships
 
 You **MUST** first analyze the content and structure of `$ARGUMENTS` to determine its type, then apply the appropriate handling strategy.
 
@@ -105,14 +105,14 @@ The `/speckit.tasks` command automatically integrates with the feature tracking 
     - Update the "Last Updated" date
   - Automatically stage the changes to `.specify/memory/features.md` for git commit
 
-In addition, **the tasks phase MUST review the Feature list**:
+In addition, **The tasks phase MUST review the Feature list**:
 
-- Task decomposition may expose new Features or indicate old Features are no longer applicable.
+- Task breakdown may expose new Features or indicate that old Features are no longer applicable.
 - Ensure functional/non-functional Feature classification remains consistent.
-- If Feature changes are discovered, synchronize updates to:
+- If changes are discovered, the following must be updated synchronously:
    - `.specify/memory/features/<ID>.md`
    - `.specify/memory/features.md`
-- Record "key changes/notes" brought by task decomposition in the Feature details.
+- Record the "key changes / notes" brought by the task breakdown in the Feature detail.
 
 This integration ensures that all feature task generation activities are properly tracked and linked to their corresponding entries in the project's feature index.
 

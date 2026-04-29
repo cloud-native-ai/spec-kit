@@ -241,15 +241,15 @@ When creating a new spec you MUST:
     - `.specify/memory/features/*.md` detail files
 3. Use the feature branch information (e.g. `SPECIFY_FEATURE` env, current git branch name, or the numeric prefix in `BRANCH_NAME`) as hints, but **do not** assume a strict `branch == feature` 1:1 mapping.
 
-### Feature Continuous Evolution Requirements (Spec Phase)
+### Feature Continuous Evolution Requirements (spec phase)
 
-- Before generating or updating a spec, you must review the **Feature list and Feature details**:
-   - A new SPEC may introduce new Features, or make existing Features obsolete/replaced.
-   - Must maintain the classification consistency of **functional Features** and **non-functional Features**.
-- Any Feature addition/merge/split/deletion must synchronize updates to:
+- Before generating or updating a spec, the **Feature list and Feature details** MUST be reviewed:
+   - A new SPEC may introduce a new Feature, or make an existing Feature obsolete/replaced.
+   - The classification consistency of **functional Features** and **non-functional Features** MUST be preserved.
+- Any Feature addition/merge/split/deletion MUST synchronously update:
    - `.specify/memory/features/<ID>.md`
    - `.specify/memory/feature-index.md`
-- Feature changes must record the source (evidence from the corresponding spec), written in the Feature details as "key changes/notes".
+- Feature changes must record the source (evidence from the corresponding spec), written as "key changes / notes" in the Feature detail.
 
 ### Feature lookup rules
 

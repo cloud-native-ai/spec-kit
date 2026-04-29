@@ -27,9 +27,9 @@ When processing the user input:
 Goal: Create or update one reusable custom agent at `.github/agents/<name>.agent.md` that can be invoked directly or as a subagent.
 
 Supported agent types:
-- `Knowledge`: Read-only Q&A and explanation, no changes
+- `Knowledge`: Read-only Q&A and explanation, no modifications
 - `Plan`: Solution research and multi-step planning, no implementation
-- `Research`: Fast retrieval and context exploration subagent
+- `Research`: Quick search and context exploration sub-agent
 - `Common`: General-purpose agent when none of the above match (default fallback)
 
 Execution flow:
@@ -55,15 +55,15 @@ Execution flow:
 
 4. **Classify agent type (mandatory)**
   - Analyze intent, constraints, and expected workflow, then classify into one of:
-    - `Knowledge`: The user's primary goal is "explain, answer questions, locate, clarify", with explicit read-only requirement
-    - `Plan`: The user's primary goal is "break down, plan, design steps", without direct coding
+    - `Knowledge`: The user's primary goal is "explain, troubleshoot, locate, describe" with an explicit read-only requirement
+    - `Plan`: The user's primary goal is "break down, plan, design steps" without direct coding
     - `Research`: The user's primary goal is "quickly gather evidence, find files/symbols, form research conclusions"
-    - `Common`: None of the above match or mixed requirements cannot be classified into a single category
-  - If classification confidence is insufficient, first raise minimal clarification questions before classifying
+    - `Common`: Use when none of the above match or requirements are too mixed to classify into a single type
+  - If classification confidence is insufficient, ask a minimal clarifying question before classifying
 
 5. **Confirm type with user (mandatory)**
-  - Before generating the file, must show the user "identified type + 1 line rationale + template path to be used", and request confirmation.
-  - Only enter the generation flow after user confirmation; if the user rejects, return to step 4 to reclassify.
+  - Before generating the file, you must show the user "identified type + 1-line rationale + template path to be used" and request confirmation.
+  - Only proceed to generation after user confirmation; if user disagrees, return to step 4 to reclassify.
 
 6. **Clarify if Needed**
    - If no clear specialization emerges from the conversation, ask concise clarifying questions:

@@ -9,79 +9,111 @@
 $ARGUMENTS
 ```
 
-You need to extract the two core elements of a SKILL from the user's input: name and description.
+You **MUST** analyze the user input in `$ARGUMENTS` to extract the two core elements of a Skill: `name` and `description`.
 
-1. *name*: A simple English word combination that should not contain special characters, only letters, digits, '-', '_' and other common programming identifier characters.
-2. *description*: A functional description of the SKILL and a list of keywords that trigger the SKILL, e.g.: This skill can xxx. Use this when the user mentions [ "key word 1", "key word 3", ... ].
+1. *name*: A concise command-like identifier using only letters, digits, hyphens (`-`), and underscores (`_`). Must follow standard programming variable naming conventions and contain no special characters.
+2. *description*: A brief statement of what the Skill does, followed by a list of trigger keywords. Format: `This skill can <capability>. Use this when the user mentions [ "keyword1", "keyword2", ... ]`.
+
+### Input Classification & Processing Strategy
+
+**Check the user input**: Determine whether `$ARGUMENTS` is empty or contains only whitespace.
+
+- **Case A: User provided input**  
+  Extract `name` and `description` from the input following the rules above, then proceed to [Step 1](#step-1-determine-skill_root-and-metadata).
+
+- **Case B: User provided no input (empty arguments)**  
+  This **MUST** be interpreted as: **create a Skill from the current conversation history**. Execute the following:
+
+  1. **Review the conversation history**: Analyze the current session's user–AI interactions to identify:
+     - Recurring task patterns or workflows
+     - Explicit user intent such as "save as a skill", "create a skill", "solidify this workflow"
+     - Multi-step operations with clear reuse value
+     - Domain-specific expertise or decision logic
+
+  2. **Distill a reusable workflow**: Extract from the conversation:
+     - Core task objective (what it does)
+     - Key execution steps (how to do it)
+     - Trigger conditions and keywords (when to use it)
+     - Required tools, scripts, or resources (what it needs)
+
+  3. **Generate Skill metadata**: Based on the distilled results, produce:
+     - `name`: A concise English identifier (e.g., `data-validation`, `api-testing`)
+     - `description`: A capability summary plus trigger keyword list
+
+  4. **Minimal clarification**: If critical information cannot be determined from the conversation, ask **only one question at a time**. Prioritize:
+     - "I noticed we discussed [topic] — would you like to turn this workflow into a Skill?"
+     - "What is the primary output or goal of this Skill?"
+
+  5. **Confirm and proceed**: Once the user confirms, continue with [Step 1](#step-1-determine-skill-root-and-metadata) through the full workflow.
 
 ## Outline
 
-Goal: In the current conversation context, help users create or refine high-quality SpecKit Skills, ensuring proper structure, clear triggers, reusable resources, and generating a reusable deterministic `skill_id` for each skill.
+Goal: Help users create or refine high-quality SpecKit Skills within the current conversation context, ensuring structured specifications, clear triggers, reusable resources, and a deterministic reusable `skill_id` for each skill.
 
-Main flow:
-1. First, extract reusable workflows from the existing conversation
-2. Ask minimal clarifications only when necessary (one question at a time)
-3. Iteratively refine `SKILL.md` and supporting resources until directly usable
+Main workflow:
+1. Prioritize distilling reusable workflows from the current conversation
+2. Only ask minimal clarifying questions when necessary (one question at a time)
+3. Iteratively refine `SKILL.md` and supporting resources until ready for use
 
 ## Skill Specification
 
-### 1) SKILL_ROOT and Base Structure
+### 1) SKILL_ROOT and Basic Structure
 
-**SKILL_ROOT** is the root directory where the Skill resides. The main body of a Skill is `${SKILL_ROOT}/SKILL.md`, and all other resource directories are resolved relative to `SKILL_ROOT`.
+**SKILL_ROOT** is the root directory where a Skill resides. The main body of a Skill is `${SKILL_ROOT}/SKILL.md`, and all other resource directories are resolved relative to `SKILL_ROOT`.
 
 Typical structure:
 
 ```
 ${SKILL_ROOT}/
-├── SKILL.md            # Required, Skill body
+├── SKILL.md            # Required, Skill main body
 ├── tools/              # Tool descriptions (relative to SKILL_ROOT, optional)
 ├── .specify/scripts/            # Executable scripts (relative to SKILL_ROOT, optional)
-├── references/         # On-demand reference materials (relative to SKILL_ROOT, optional)
-└── assets/             # Static resources used for output (relative to SKILL_ROOT, optional)
+├── references/         # Reference materials loaded on demand (relative to SKILL_ROOT, optional)
+└── assets/             # Static assets for outputs (relative to SKILL_ROOT, optional)
 ```
 
 **Storage location**: `SKILL_ROOT` can be in any of the following paths (project-level or personal-level):
 
-- `.specify/skills/<name>/` (project-level main directory)
-- `.github/skills/<name>/` (compatibility entry, does not host the primary copy)
+- `.specify/skills/<name>/` (project-level primary directory)
+- `.github/skills/<name>/` (compatibility entry, does not host primary copy)
 - `.agents/skills/<name>/`
 - `.claude/skills/<name>/`
 - `~/.copilot/skills/<name>/`
 - `~/.agents/skills/<name>/`
 - `~/.claude/skills/<name>/`
 
-All subsequent resource references use paths relative to `SKILL_ROOT` (recommended `./.specify/scripts/x.py` format).
+All subsequent resource references use paths relative to `SKILL_ROOT` (prefer `./.specify/scripts/x.py` form).
 
 ### 2) `SKILL.md` Specification
 
 #### Frontmatter
 
-Must contain at minimum:
+Minimum required:
 
-- `name` (required, should match the directory name)
+- `name` (required, recommended to match directory name)
 - `description` (required, describes "what it does + when to trigger")
 
-Optional (as needed, following official behavior):
+Optional (on demand, following official behavior):
 
 - `argument-hint`
 - `user-invocable`
 - `disable-model-invocation`
 
-Note: This project defaults to using `name` and `description` as core trigger metadata; introduce optional fields only when truly needed.
+Note: This project defaults to `name` and `description` as core trigger metadata; only introduce optional fields when truly needed.
 
 #### Body
 
-Body should only contain execution instructions, not redundant background. Must include:
+Body contains only execution instructions, no redundant background. Must include:
 
-- Outcome goals
+- Result goal
 - Key steps (executable, checkable)
-- Resource references (using relative paths, e.g., `./.specify/scripts/x.py`)
+- Resource references (use relative paths, e.g., `./.specify/scripts/x.py`)
 
 ### 3) Resource Directory Usage Guidelines
 
 #### `tools/`
 
-The `tools/` directory under the Skill root describes the tools available for this Skill. Project-level tool listings come from the JSON generated by `.specify/scripts/bash/refresh-tools.sh`: 
+The `tools/` directory under the Skill root describes the tools available to this Skill. Project-level tool manifests come from the JSON generated by `.specify/scripts/bash/refresh-tools.sh`:
 
 - [MCP Tools JSON](tools/mcp.json)
 - [System Tools JSON](tools/system.json)
@@ -92,79 +124,79 @@ The `tools/` directory under the Skill root describes the tools available for th
 
 Used for high-repetition, deterministic tasks (Python/Bash, etc.).
 
-- Use when: writing similar logic repeatedly, or operations prone to errors need reliable reproducibility
-- Value: saves tokens, executable, reusable
+- Applicable: Writing repetitive logic, or operations that are error-prone and need stable reproducibility
+- Value: Saves tokens, executable, reusable
 
 #### `references/`
 
-Used for on-demand documentation knowledge (e.g., schemas, APIs, policies).
+Used for on-demand document knowledge (e.g., schemas, APIs, policies).
 
-- Use when: large amount of information, but not needed every time
-- Principle: details go in `references/`, keep only navigation and core workflow in `SKILL.md`
-- Large file recommendation: provide search hints in `SKILL.md`; add a table of contents for reference files over 100 lines
+- Applicable: High information volume but not needed every time
+- Principle: Put details in `references/`, keep `SKILL.md` only for navigation and core workflow
+- Large file recommendation: Provide search hints in `SKILL.md`; add a table of contents for reference files exceeding 100 lines
 
 #### `assets/`
 
-Used for resources that outputs depend on but don't need to enter the context (templates, images, fonts, boilerplate projects, etc.).
+Used for resources needed by outputs but unnecessary in context (templates, images, fonts, boilerplate projects, etc.).
 
 ### 4) Context Loading and Size Control
 
 Use progressive loading:
 
-1. Discovery phase: read `name` + `description`
-2. After matching: read `SKILL.md` body
-3. When needed: then read `.specify/scripts/`, `references/`, `assets/`
+1. Discovery phase: Read `name` + `description`
+2. After match: Read `SKILL.md` body
+3. When needed: Then read `.specify/scripts/`, `references/`, `assets/`
 
 Constraints:
 
 - `SKILL.md` recommended < 500 lines
-- Reference chain ideally one level deep (from `SKILL.md` directly to resource)
-- Resource paths uniformly use relative paths (recommended `./`)
+- Reference chain should be at most one level (from `SKILL.md` directly to resource)
+- Resource paths use relative paths uniformly (prefer `./`)
 
-### 5) Things NOT to Include in a Skill
+### 5) Content NOT to Include in a Skill
 
-Skills only keep content needed to execute tasks; do not add unrelated documents:
+A Skill only retains content needed for task execution; do not add unrelated documents:
 
 - `README.md`
 - `INSTALLATION_GUIDE.md`
 - `QUICK_REFERENCE.md`
 - `CHANGELOG.md`
-- Other process review/testing log type supplementary documents
+- Other process review / test record appendices
 
 ## Design Principles
 
-### 1) Control Freedom Appropriately
+### 1) Manage Degrees of Freedom
 
-- High freedom: Text-based strategy, suitable for multi-path problems
-- Medium freedom: Pseudocode/parameterized scripts, suitable when there's a main path but configurability is needed
-- Low freedom: Fixed scripts/fixed steps, suitable for high-risk error-prone operations
+- High freedom: Text strategies, suitable for multi-path problems
+- Medium freedom: Pseudocode / parameterized scripts, suitable when there's a primary path but configurability needed
+- Low freedom: Fixed scripts / fixed steps, suitable for high-risk error-prone operations
 
 ### 2) Discoverable Descriptions
 
-`description` must include keywords and trigger scenarios, avoid vague descriptions.
+`description` must include keywords and trigger scenarios; avoid vague descriptions.
 
 ### 3) Anti-Patterns
 
-- Vague descriptions that cannot be triggered
+- Vague descriptions that fail to trigger
 - `SKILL.md` too large without splitting
 - Directory name inconsistent with `name`
 - Missing executable steps
 
 ## Planning Strategy (Official Workflow Aligned)
 
-### Step A: Extract First, Then Ask
+### Step A: Distill First, Then Ask
 
-First extract from the current conversation:
+First distill from the current conversation:
 
 - Reusable steps
 - Decision branches
 - Quality checkpoints
 
-If extraction is sufficient, proceed directly to draft.
+If distillation is sufficient, proceed directly to draft.
 
 ### Step B: Clarify When Necessary
 
-Only ask when key information is insufficient, and **one question at a time**. Prioritize:
+Only ask when critical information is missing, and **one question at a time**. Prioritize:
 
 - What is the target output?
 - Is the scope workspace or personal?
@@ -174,66 +206,66 @@ Only ask when key information is insufficient, and **one question at a time**. P
 
 1. Draft and save
 2. Identify the weakest point
-3. Ask targeted follow-up questions and revise
-4. Produce a usable version (with example prompts and follow-up customization suggestions)
+3. Ask a targeted question and revise
+4. Produce a usable version (including example prompts and follow-up customization suggestions)
 
 ## Execution Steps
 
-The core process for creating a Skill is as follows:
+The core workflow for creating a Skill is as follows:
 
 ### Step 1: Determine SKILL_ROOT and Metadata
 
 Parse `skill name` and `description` from user input:
 
-- **skill name** is used to determine the `SKILL_ROOT` path. For example, when `name = "testing"` and using the project-level storage location, `SKILL_ROOT = .github/skills/testing/`.
-- **description** is used to describe "what it does + when to trigger", must include keywords and trigger scenarios, avoid vague descriptions (see Design Principles point 2).
+- **skill name** determines the `SKILL_ROOT` path. For example, with `name = "testing"` and a project-level storage location, `SKILL_ROOT = .github/skills/testing/`.
+- **description** describes "what it does + when to trigger" and must include keywords and trigger scenarios; avoid vague descriptions (see Design Principles point 2).
 
 If input information is insufficient, proceed to Step 3 for clarification.
 
-### Step 2: Get Available Tools Information
+### Step 2: Obtain Available Tools Information
 
-Execute scripts to obtain the tool inventory available in the current project/workspace, providing a basis for subsequent Skill resource orchestration:
+Run the script to get the tools available in the current project/workspace, providing a basis for the Skill's resource orchestration:
 
 - Run `refresh-tools.sh` (or equivalent) to refresh and output JSON.
-- Reference tool inventory categories:
+- Reference tool manifest categories:
   - **MCP Tools** → [mcp.json](tools/mcp.json)
   - **System Tools** → [system.json](tools/system.json)
   - **Shell Tools** → [shell.json](tools/shell.json)
   - **Project Scripts** → [project.json](tools/project.json)
 
-You can use the following command to get the tool inventory:
+Use the following command to get the tool manifest as needed:
 
 ```bash
 .specify/scripts/bash/refresh-tools.sh --json
 ```
 
-After obtaining the tool list, filter available tools aligned with Skill goals as a reference for tool references in `SKILL.md`.
+After obtaining the tool list, filter available tools against Skill goals as reference for tool references in `SKILL.md`.
 
-### Step 3: Gradually Clarify Skill Details
+### Step 3: Incrementally Clarify Skill Details
 
-Supplement information needed by `SKILL.md` through questioning. **Ask only one question per round**, wait for the user's response before continuing.
+Fill in the information needed for `SKILL.md` through questioning. **Ask only one question per round**, waiting for user response before continuing.
 
 Prioritize:
 
 - **Target output**: What should the Skill ultimately produce?
 - **Applicable scenarios**: Under what trigger conditions should this Skill be loaded?
-- **Resource requirements**: Are scripts, reference materials, templates, or fixed toolchains needed?
+- **Resource needs**: Are scripts, references, templates, or a fixed toolchain needed?
 
 Iteratively revise `SKILL.md` until:
 
 1. Frontmatter is complete (`name`, `description`)
-2. Body contains clear, executable steps
-3. Resource directories (`tools/`, `.specify/scripts/`, `references/`, `assets/`) are in place as needed
+2. Body contains clear executable steps
+3. Resource directories (`tools/`, `.specify/scripts/`, `references/`, `assets/`) are ready as needed
 4. All resource links use paths relative to `SKILL_ROOT`
 
 ### Step 4: Register Resource ID and Write to Instructions
 
-Generate and persist the Resource ID for `SKILL.md`:
+Generate the Resource ID for `SKILL.md` and persist it:
 
-- **Canonical ID (`skill_id`)**: The workspace-relative path of `.specify/skills/<name>/SKILL.md`.
-- **Canonical Path**: The workspace-relative path of `${SKILL_ROOT}/SKILL.md`.
+- **Canonical ID (`skill_id`)**: Workspace-relative path of `.specify/skills/<name>/SKILL.md`.
+- **Canonical Path**: Workspace-relative path of `${SKILL_ROOT}/SKILL.md`.
 
-Write the following information to the `## Resource Registry` → `### Skills` subsection in `.specify/instructions.md`:
+Write the following into the `## Resource Registry` → `### Skills` section of `.specify/instructions.md`:
 
 - `Skill Name`
 - `Skill ID`
@@ -243,28 +275,28 @@ Write the following information to the `## Resource Registry` → `### Skills` s
 Constraints:
 
 - Entry field names reference `.specify/templates/skills-template.md`.
-- Do not write duplicate entries when the same `skill_id` already exists.
-- Keep the list sorted and deduplicated; after real entries exist, remove `- None yet.`.
+- Do not write duplicate entries for the same `skill_id`.
+- Keep the list sorted and deduplicated; remove `- None yet.` once real entries exist.
 
 ### Completion
 
 - Summarize Skill capabilities and directory structure.
 - Provide example prompts.
-- Give next optional customization items.
-- Output `SKILL.md` path (i.e., `SKILL_ROOT/SKILL.md`) and `skill_id`.
+- Suggest optional next-step customizations.
+- Output the `SKILL.md` path (i.e., `SKILL_ROOT/SKILL.md`) and `skill_id`.
 
 ## Slash Behavior Notes
 
-The behavior of skills in the `/` menu is controlled by frontmatter:
+Skill behavior in the `/` menu is controlled by frontmatter:
 
-- Default: manually invocable + auto-triggerable
-- `user-invocable: false`: not manually invocable, but auto-triggerable
-- `disable-model-invocation: true`: manually invocable, but not auto-triggerable
-- Both set: both disabled
+- Default: Manually invocable + auto-triggerable
+- `user-invocable: false`: Not manually invocable but auto-triggerable
+- `disable-model-invocation: true`: Manually invocable but not auto-triggerable
+- Both set simultaneously: Both disabled
 
 ## Continuous Improvement
 
-1. Validate skill with real tasks
+1. Validate the skill with real tasks
 2. Record pain points and inefficient steps
 3. Revise `SKILL.md` or resource directories
 4. Validate again, forming a stable iteration

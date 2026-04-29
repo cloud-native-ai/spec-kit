@@ -159,14 +159,14 @@ The `/speckit.implement` command automatically integrates with the feature track
     - Update the "Last Updated" date
   - Automatically stage the changes to `.specify/memory/features.md` for git commit
 
-In addition, **the implement phase MUST review the Feature list**:
+In addition, the **implement phase must re-validate the Feature list**:
 
 - Implementation results may introduce new Features, weaken/replace existing Features, or require Feature deletion.
-- Ensure functional/non-functional Feature classification remains consistent.
-- If changes exist, synchronize updates to:
+- Ensure functional/non-functional Feature categorization remains consistent.
+- If there are changes, the following must be updated synchronously:
   - `.specify/memory/features/<ID>.md`
   - `.specify/memory/features.md`
-- Record "key changes/notes" brought by implementation in the Feature details.
+- Record the "key changes/notes" brought by implementation in Feature details.
 
 This integration ensures that all feature implementation activities are properly tracked and linked to their corresponding entries in the project's feature index.
 
@@ -192,27 +192,27 @@ After implementation and validation are complete, generate a directly executable
 git add -A && git commit -m "{msg}"
 ```
 
-### Commit Message Generation Method (Template-Based)
+### Commit Message Generation (based on template)
 
-1. **Load commit message template**:
+1. **Load the commit message template**:
    - Preferred: `.specify/templates/commit-template.md`
    - Fallback: `.specify/templates/commit-template.md`
 
-2. **Collect context needed to render the template** (prefer reusing REQUIREMENTS_DIR parsed earlier):
+2. **Collect the context needed to render the template** (reuse the previously resolved REQUIREMENTS_DIR when available):
    - `[BRANCH]`: `git rev-parse --abbrev-ref HEAD`
-   - `[REQUIREMENTS_KEY]`: Derived from the `REQUIREMENTS_DIR` directory name (e.g., `.specify/specs/NNN-short-name/` → `NNN-short-name`)
+   - `[REQUIREMENTS_KEY]`: Derive from the `REQUIREMENTS_DIR` directory name (e.g., `.specify/specs/NNN-short-name/` → `NNN-short-name`)
    - `[FEATURE_TITLE]`: Prefer reading the title or Feature name from `REQUIREMENTS_DIR/requirements.md`
-   - `[TYPE]`: Choose based on the main focus of this change (feat/fix/docs/test/chore)
+   - `[TYPE]`: Choose based on the primary nature of the current change (feat/fix/docs/test/chore)
    - `[SCOPE]`: Prefer `[REQUIREMENTS_KEY]`, otherwise derive from `[BRANCH]`
-   - `[SUBJECT]`: One-line summary, semantically consistent with spec documents and implementation content
+   - `[SUBJECT]`: One-line summary, must be semantically consistent with spec documents and implementation content
 
-3. **Render `{msg}` from the template**, and generate the full command:
+3. **Render `{msg}` using the template** and generate the full command:
    - `git add -A && git commit -m "{msg}"`
 
-### Interaction Requirements (Must Execute)
+### Interaction Requirements (must execute)
 
-1. Display the generated `{msg}` and full command as-is to the user.
-2. Explicitly prompt the user:
-  - Execute the commit now? (yes/no)
-  - To rewrite the message, reply with the desired message first, then generate the command.
-3. **Only execute the command when the user explicitly replies yes/proceed/continue**; otherwise stay at the prompt and display stage.
+1. Display the generated `{msg}` and full command verbatim to the user.
+2. Clearly prompt the user:
+   - Execute the commit now? (yes/no)
+   - If you want to rewrite the message, reply with the desired message first, then the command will be regenerated.
+3. **Only execute the command when the user explicitly replies yes/proceed/continue**; otherwise stop at the prompt and display stage.
