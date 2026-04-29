@@ -38,25 +38,25 @@ For Qoder projects, use the same lifecycle as other supported assistants:
 
 ## Command Relationships (Prerequisites & Next Steps)
 
-Spec Kit 的命令不是独立使用的。下面这张表用“常见前置 / 常见后续”的方式，把核心主路径、可选分支与返工环路明确下来。
+Spec Kit commands are not meant to be used in isolation. The table below clarifies the core main path, optional branches, and rework loops using a "common prerequisites / common next steps" approach.
 
-> 规则：如果 requirements/spec 中存在 `[NEEDS CLARIFICATION]`，优先走 `/speckit.clarify`；如果要进入实现阶段，建议先完成相关 checklist。
+> Rule: If `[NEEDS CLARIFICATION]` markers exist in requirements/specs, prioritize `/speckit.clarify`; before entering the implementation phase, it is recommended to complete the relevant checklists first.
 
 | Command | Common prerequisites | Common next commands | Notes |
 |---------|----------------------|---------------------|-------|
-| `/speckit.instructions` | Repo available | `/speckit.skills` | 生成/更新 AI 指引与兼容链接，通常用于初始化或文档更新后同步。 |
-| `/speckit.skills` | (Optional) `/speckit.instructions` | (Depends) | 创建/刷新技能；不直接进入 core 生命周期，但会影响后续 agent 上下文。 |
-| `/speckit.constitution` | Repo available | `/speckit.feature`, `/speckit.requirements` | 修改治理规则后，应重新审视 feature 与 requirements。 |
-| `/speckit.feature` | (Optional) `/speckit.constitution` | `/speckit.requirements` | 建立/刷新长期 Feature 注册表，为规格与计划提供“主干”。 |
-| `/speckit.requirements` | (Optional) `/speckit.feature` | `/speckit.clarify`, `/speckit.plan` | 产出 requirements.md；若存在歧义标记，先 clarify 再 plan。 |
-| `/speckit.clarify` | `/speckit.requirements` | `/speckit.plan` | 解决关键歧义（并回写到 requirements.md），避免下游返工。 |
-| `/speckit.research` | `/speckit.requirements` (or) `/speckit.plan` | `/speckit.plan` | 缺信息/需要决策依据时使用；研究结论应反馈到 plan。 |
-| `/speckit.plan` | `/speckit.requirements` (clarify done if needed) | `/speckit.tasks`, `/speckit.checklist` | 产出 plan.md 及相关设计产物；下一步通常拆 tasks。 |
-| `/speckit.tasks` | `/speckit.plan` | `/speckit.analyze`, `/speckit.checklist`, `/speckit.implement` | 产出 tasks.md；可先 analyze 做一致性检查，再实现。 |
-| `/speckit.analyze` | `/speckit.tasks` | `/speckit.requirements`, `/speckit.plan`, `/speckit.tasks`, `/speckit.implement` | 严格只读；输出问题清单与修复建议，必要时先回到上游修订。 |
-| `/speckit.checklist` | `/speckit.requirements` (or) `/speckit.plan` (or) `/speckit.tasks` | `/speckit.plan`, `/speckit.implement` | 作为质量门槛：不通过则建议回到 plan/tasks 修订。 |
-| `/speckit.implement` | `/speckit.tasks` (and ideally checklists completed) | `/speckit.review` | 进入实现与验证；如缺 tasks，先回到 tasks。 |
-| `/speckit.review` | `/speckit.implement` | `/speckit.analyze`, `/speckit.requirements`, `/speckit.plan` | 复盘流程质量与改进建议；必要时回到上游迭代。 |
+| `/speckit.instructions` | Repo available | `/speckit.skills` | Generate/update AI instructions and compatibility links, typically used for initialization or syncing after documentation updates. |
+| `/speckit.skills` | (Optional) `/speckit.instructions` | (Depends) | Create/refresh skills; does not directly enter the core lifecycle but affects subsequent agent context. |
+| `/speckit.constitution` | Repo available | `/speckit.feature`, `/speckit.requirements` | After modifying governance rules, features and requirements should be re-evaluated. |
+| `/speckit.feature` | (Optional) `/speckit.constitution` | `/speckit.requirements` | Establish/refresh the long-term Feature registry, providing a "backbone" for specs and plans. |
+| `/speckit.requirements` | (Optional) `/speckit.feature` | `/speckit.clarify`, `/speckit.plan` | Produces requirements.md; if ambiguity markers exist, clarify first then plan. |
+| `/speckit.clarify` | `/speckit.requirements` | `/speckit.plan` | Resolve key ambiguities (and write back to requirements.md) to avoid downstream rework. |
+| `/speckit.research` | `/speckit.requirements` (or) `/speckit.plan` | `/speckit.plan` | Use when information is missing or decision basis is needed; research conclusions should feed back to the plan. |
+| `/speckit.plan` | `/speckit.requirements` (clarify done if needed) | `/speckit.tasks`, `/speckit.checklist` | Produces plan.md and related design artifacts; next step is typically breaking down into tasks. |
+| `/speckit.tasks` | `/speckit.plan` | `/speckit.analyze`, `/speckit.checklist`, `/speckit.implement` | Produces tasks.md; can run analyze first for consistency checks before implementing. |
+| `/speckit.analyze` | `/speckit.tasks` | `/speckit.requirements`, `/speckit.plan`, `/speckit.tasks`, `/speckit.implement` | Strictly read-only; outputs issue list and fix recommendations, return to upstream revisions when necessary. |
+| `/speckit.checklist` | `/speckit.requirements` (or) `/speckit.plan` (or) `/speckit.tasks` | `/speckit.plan`, `/speckit.implement` | Serves as a quality gate: if it does not pass, it is recommended to return to plan/tasks for revision. |
+| `/speckit.implement` | `/speckit.tasks` (and ideally checklists completed) | `/speckit.review` | Enter implementation and validation; if tasks are missing, return to tasks first. |
+| `/speckit.review` | `/speckit.implement` | `/speckit.analyze`, `/speckit.requirements`, `/speckit.plan` | Review process quality and improvement suggestions; return to upstream iteration when necessary. |
 
 ## Detailed Command Reference
 

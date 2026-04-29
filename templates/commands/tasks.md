@@ -23,9 +23,9 @@ You **MUST** analyze the user input in `$ARGUMENTS`, infer the user's intent, an
 
 The user input may include:
 
-1. 背景信息：上下文、约束条件或业务背景。
-2. 任务大纲：阶段划分或高层任务结构。
-3. 额外任务条目：可执行任务项，需要合并进最终任务清单。
+1. Background info: Context, constraints, or business background.
+2. Task outline: Phase breakdown or high-level task structure.
+3. Additional task entries: Executable task items to merge into the final task list.
 
 When processing the user input:
 
@@ -37,20 +37,20 @@ When processing the user input:
 
 ### Input Type Detection and Handling Strategy
 
-1. **背景信息类型**：如果 `$ARGUMENTS` 主要包含描述性文本、业务上下文、约束条件或非结构化信息
-   - 将这些信息作为上下文整合到任务生成过程中
-   - 在相关任务描述中引用或体现这些约束条件
-   - 不直接转换为具体任务条目
+1. **Background Info Type**: If `$ARGUMENTS` primarily contains descriptive text, business context, constraints, or unstructured information
+   - Integrate this information as context into the task generation process
+   - Reference or reflect these constraints in relevant task descriptions
+   - Do not directly convert into specific task entries
 
-2. **任务大纲类型**：如果 `$ARGUMENTS` 包含结构化的任务分解、阶段划分或高层次任务组织
-   - 将大纲结构作为任务组织的主要框架
-   - 基于大纲填充具体的实现细节和文件路径
-   - 确保生成的任务遵循指定的结构和顺序
+2. **Task Outline Type**: If `$ARGUMENTS` contains structured task breakdowns, phase divisions, or high-level task organization
+   - Use the outline structure as the primary framework for task organization
+   - Fill in concrete implementation details and file paths based on the outline
+   - Ensure generated tasks follow the specified structure and order
 
-3. **额外任务条目类型**：如果 `$ARGUMENTS` 包含具体的、可执行的任务项（通常以列表形式）
-   - 解析并标准化这些任务条目，确保符合任务格式规范
-   - 将其整合到相应的用户故事阶段或基础任务中
-   - 维护任务ID的连续性和依赖关系的正确性
+3. **Additional Task Entries Type**: If `$ARGUMENTS` contains specific, executable task items (typically in list form)
+   - Parse and standardize these task entries to conform to task format specifications
+   - Integrate them into the corresponding user story phases or foundational tasks
+   - Maintain task ID continuity and correct dependency relationships
 
 You **MUST** first analyze the content and structure of `$ARGUMENTS` to determine its type, then apply the appropriate handling strategy.
 

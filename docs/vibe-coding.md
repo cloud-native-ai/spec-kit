@@ -1,456 +1,456 @@
-# Vibe Coding 开发说明
+# Vibe Coding Development Guide
 
-> **文档类型**: 开发指南  
-> **适用范围**: Spec Kit 项目与 AI 原生开发范式  
-> **核心主题**: 智能体、技能、工具的架构设计与实践
+> **Document Type**: Development Guide  
+> **Scope**: Spec Kit Project & AI-Native Development Paradigm  
+> **Core Topics**: Architecture design and practice of Agents, Skills, and Tools
 
 ---
 
-## 一、核心概念
+## 1. Core Concepts
 
-### 1.1 三大核心构件
+### 1.1 Three Core Building Blocks
 
-AI 原生开发范式建立在三个分层解耦的核心构件之上：
+The AI-native development paradigm is built upon three layered, decoupled core building blocks:
 
 ```
 ┌─────────────────┐
-│    智能体       │  ← 顶层：任务规划与决策
+│    Agent        │  ← Top Layer: Task Planning & Decision-Making
 │    (Agent)      │
 ├─────────────────┤
-│    技能         │  ← 中层：领域知识与行为准则
+│    Skill        │  ← Middle Layer: Domain Knowledge & Behavior Guidelines
 │    (Skill)      │
 ├─────────────────┤
-│    工具         │  ← 底层：原子化操作执行
+│    Tool         │  ← Bottom Layer: Atomic Operation Execution
 │    (Tool)       │
 └─────────────────┘
 ```
 
 ---
 
-### 1.2 智能体 (Agent)
+### 1.2 Agent
 
-**定义**: 以 LLM 为核心大脑的自主/半自主系统，负责任务的规划与编排。
+**Definition**: An autonomous/semi-autonomous system with an LLM as its core brain, responsible for task planning and orchestration.
 
-**核心职责**:
-- 接收开发者的高层次目标
-- 进行意图解析与任务分解
-- 制定分步骤执行计划
-- 选择并调用技能与工具
-- 监控执行过程并动态调整策略
+**Core Responsibilities**:
+- Receive high-level goals from developers
+- Perform intent parsing and task decomposition
+- Formulate step-by-step execution plans
+- Select and invoke skills and tools
+- Monitor execution progress and dynamically adjust strategies
 
-**关键能力**:
-- ✅ 上下文推理
-- ✅ 任务规划与编排
-- ✅ 决策与工具选择
-- ✅ 多步任务协调
+**Key Capabilities**:
+- ✅ Contextual reasoning
+- ✅ Task planning and orchestration
+- ✅ Decision-making and tool selection
+- ✅ Multi-step task coordination
 
-**示例场景**: 
-GitHub Copilot Agent Mode 理解用户意图，决定调用哪些技能和工具来完成端到端功能实现。
+**Example Scenario**: 
+GitHub Copilot Agent Mode understands user intent and decides which skills and tools to invoke to complete end-to-end feature implementation.
 
 ---
 
-### 1.3 技能 (Skill)
+### 1.3 Skill
 
-**定义**: 面向特定任务、包含指令与资源的可复用能力包，通常以包含 `SKILL.md` 的目录形式存在。
+**Definition**: A reusable capability package oriented toward specific tasks, containing instructions and resources, typically existing as a directory with a `SKILL.md` file.
 
-**目录结构**:
+**Directory Structure**:
 ```
 skills/
 └── my-skill/
-    ├── SKILL.md          # 必需：技能说明文件
-    ├── scripts/          # 可选：辅助脚本
-    └── reference/        # 可选：参考资料
+    ├── SKILL.md          # Required: Skill description file
+    ├── scripts/          # Optional: Helper scripts
+    └── reference/        # Optional: Reference materials
 ```
 
-**核心职责**:
-- 提供专业领域的知识
-- 定义行为规范和操作指引
-- 约束智能体在特定场景下的行为
+**Core Responsibilities**:
+- Provide specialized domain knowledge
+- Define behavioral norms and operational guidelines
+- Constrain agent behavior in specific scenarios
 
-**关键特征**:
-- ✅ **可复用**: 一次定义，多次使用
-- ✅ **声明式**: 通过 `SKILL.md` 声明规则
-- ✅ **封装性**: 封装特定领域知识
-- ✅ **可控性**: 增强 AI 行为的可预测性
+**Key Characteristics**:
+- ✅ **Reusable**: Define once, use many times
+- ✅ **Declarative**: Declare rules via `SKILL.md`
+- ✅ **Encapsulated**: Encapsulate domain-specific knowledge
+- ✅ **Controllable**: Enhance predictability of AI behavior
 
-**作用**: 
-将隐性的开发经验显性化，形成团队共享的知识资产，确保 AI 生成的代码质量和一致性。
-
----
-
-### 1.4 工具 (Tool)
-
-**定义**: 能够被调用以执行具体动作的底层功能集合，是智能体与外部环境交互的接口。
-
-**表现形式**:
-- Shell 函数与系统命令
-- MCP (Model Context Protocol) 服务器提供的服务
-- 代码解释器
-- API 调用接口
-
-**核心职责**:
-- 执行原子化的工程操作
-- 文件读写、API 调用
-- 系统命令执行
-- Git 操作、测试运行等
-
-**关键特征**:
-- ✅ **原子性**: 单一职责，功能明确
-- ✅ **功能性**: 直接产生可观测结果
-- ✅ **可编程**: 可被智能体调用
-- ✅ **执行单元**: 智能体计划的最终落地
+**Purpose**: 
+Externalize implicit development experience into shared team knowledge assets, ensuring AI-generated code quality and consistency.
 
 ---
 
-### 1.5 构件对比速查
+### 1.4 Tool
 
-| 构件 | 定位 | 职责 | 特征 |
+**Definition**: A collection of low-level functions that can be invoked to perform specific actions, serving as the interface between agents and the external environment.
+
+**Manifestations**:
+- Shell functions and system commands
+- Services provided by MCP (Model Context Protocol) servers
+- Code interpreters
+- API call interfaces
+
+**Core Responsibilities**:
+- Execute atomic engineering operations
+- File read/write, API calls
+- System command execution
+- Git operations, test execution, etc.
+
+**Key Characteristics**:
+- ✅ **Atomic**: Single responsibility, clear functionality
+- ✅ **Functional**: Directly produces observable results
+- ✅ **Programmable**: Callable by agents
+- ✅ **Execution Unit**: The final landing point of agent plans
+
+---
+
+### 1.5 Quick Comparison of Building Blocks
+
+| Building Block | Role | Responsibility | Characteristics |
 | :--- | :--- | :--- | :--- |
-| **智能体** | 指挥官 | 任务规划、决策、编排 | 推理、规划、决策 |
-| **技能** | 策略库 | 提供规范、指引、约束 | 可复用、声明式 |
-| **工具** | 执行器 | 执行具体操作 | 原子性、功能性 |
+| **Agent** | Commander | Task planning, decision-making, orchestration | Reasoning, planning, decision-making |
+| **Skill** | Strategy Library | Provide norms, guidelines, constraints | Reusable, declarative |
+| **Tool** | Executor | Execute concrete operations | Atomic, functional |
 
 ---
 
-## 二、交互机制与职责边界
+## 2. Interaction Mechanisms & Responsibility Boundaries
 
-### 2.1 交互流程
+### 2.1 Interaction Flow
 
 ```
-开发者意图 → 智能体解析 → 任务规划 → 技能加载 → 工具调用 → 执行反馈 → 结果验证
+Developer Intent → Agent Parsing → Task Planning → Skill Loading → Tool Invocation → Execution Feedback → Result Validation
 ```
 
-**详细流程**:
+**Detailed Flow**:
 
-1. **意图输入**: 开发者向智能体提出高层次目标（可能是模糊的）
-2. **意图解析**: 智能体结合上下文解析、澄清和细化目标
-3. **任务规划**: 制定详细的分步骤执行计划
-4. **技能匹配**: 识别需要特定领域知识的子任务，加载对应技能
-5. **工具调用**: 将计划转化为具体的工具调用
-6. **执行反馈**: 工具执行后返回结果（成功/失败/输出）
-7. **迭代优化**: 智能体根据结果评估并调整后续计划
-
----
-
-### 2.2 职责边界
-
-#### 智能体 vs 技能
-
-| 维度 | 智能体 | 技能 |
-| :--- | :--- | :--- |
-| **职责** | 宏观的"做什么"和"怎么做" | 微观的"应该怎样做"和"不能做什么" |
-| **特性** | 动态的、自适应的决策引擎 | 相对静态的、可复用的知识配置文件 |
-| **关注点** | 任务整体规划和调度 | 特定任务的行为准则和约束 |
-
-#### 技能 vs 工具
-
-| 维度 | 技能 | 工具 |
-| :--- | :--- | :--- |
-| **职责** | 高级的、基于规则的指令集 | 单一的、原子的功能函数 |
-| **复杂度** | 可能包含多个步骤 | 单一操作 |
-| **关系** | 可能调用多个工具协同完成任务 | 被技能或智能体调用 |
-
-**示例**: 
-"部署微服务"技能可能依次调用：
-1. 构建 Docker 镜像（工具 1）
-2. 推送镜像至仓库（工具 2）
-3. 在 Kubernetes 上部署（工具 3）
-
-#### 智能体 vs 工具
-
-| 维度 | 智能体 | 工具 |
-| :--- | :--- | :--- |
-| **职责** | 决策权：何时、为何、调用哪个工具 | 执行：忠实执行指令，无自主决策 |
-| **管理** | 通过 MCP 等协议管理和发现工具 | 不直接暴露所有工具给 LLM |
-| **目标** | 确保安全性与可控性 | 专注执行效率 |
+1. **Intent Input**: Developer presents a high-level goal to the agent (which may be vague)
+2. **Intent Parsing**: Agent combines context to parse, clarify, and refine the goal
+3. **Task Planning**: Formulate a detailed step-by-step execution plan
+4. **Skill Matching**: Identify subtasks requiring domain-specific knowledge, load corresponding skills
+5. **Tool Invocation**: Translate the plan into concrete tool calls
+6. **Execution Feedback**: Tools return results after execution (success/failure/output)
+7. **Iterative Optimization**: Agent evaluates results and adjusts subsequent plans accordingly
 
 ---
 
-## 三、MCP 协议的核心作用
+### 2.2 Responsibility Boundaries
 
-### 3.1 什么是 MCP
+#### Agent vs Skill
 
-**MCP (Model Context Protocol)** 是专为解决工具访问问题设计的开放标准协议，定位为 AI 生态系统的"连接器"和"标准化器"。
+| Dimension | Agent | Skill |
+| :--- | :--- | :--- |
+| **Responsibility** | Macro-level "what to do" and "how to do it" | Micro-level "how it should be done" and "what must not be done" |
+| **Nature** | Dynamic, adaptive decision engine | Relatively static, reusable knowledge configuration file |
+| **Focus** | Overall task planning and scheduling | Behavioral norms and constraints for specific tasks |
 
-**核心目标**: 
-像 USB-C 之于电子设备，提供统一接口，让智能体能够"即插即用"地访问不同工具和服务。
+#### Skill vs Tool
+
+| Dimension | Skill | Tool |
+| :--- | :--- | :--- |
+| **Responsibility** | High-level, rule-based instruction set | Single, atomic functional unit |
+| **Complexity** | May involve multiple steps | Single operation |
+| **Relationship** | May invoke multiple tools to collaboratively complete tasks | Invoked by skills or agents |
+
+**Example**: 
+The "Deploy Microservice" skill may invoke in sequence:
+1. Build Docker image (Tool 1)
+2. Push image to registry (Tool 2)
+3. Deploy on Kubernetes (Tool 3)
+
+#### Agent vs Tool
+
+| Dimension | Agent | Tool |
+| :--- | :--- | :--- |
+| **Responsibility** | Decision authority: when, why, which tool to invoke | Execution: faithfully execute instructions, no autonomous decisions |
+| **Management** | Discover and manage tools via protocols like MCP | Not all tools directly exposed to LLM |
+| **Goal** | Ensure security and controllability | Focus on execution efficiency |
 
 ---
 
-### 3.2 MCP 架构模型
+## 3. The Core Role of the MCP Protocol
+
+### 3.1 What is MCP
+
+**MCP (Model Context Protocol)** is an open standard protocol designed specifically to solve the tool access problem, positioned as the "connector" and "standardizer" of the AI ecosystem.
+
+**Core Goal**: 
+Like USB-C for electronic devices, provide a unified interface so agents can "plug and play" access to different tools and services.
+
+---
+
+### 3.2 MCP Architecture Model
 
 ```
 ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
 │     Host     │ ←→ │    Client    │ ←→ │    Server    │
-│  (IDE/编辑器) │    │ (IDE 内组件)  │    │ (工具服务)   │
+│ (IDE/Editor) │    │ (IDE Component)│   │ (Tool Service)│
 └──────────────┘    └──────────────┘    └──────────────┘
 ```
 
-**技术规格**:
-- **消息格式**: JSON-RPC 2.0
-- **消息类型**: 请求 (Request)、响应 (Response)、通知 (Notification)
-- **生命周期**: 初始化 → 操作 → 关闭
+**Technical Specifications**:
+- **Message Format**: JSON-RPC 2.0
+- **Message Types**: Request, Response, Notification
+- **Lifecycle**: Initialization → Operation → Shutdown
 
 ---
 
-### 3.3 MCP 的核心价值
+### 3.3 Core Value of MCP
 
-#### ✅ 高度解耦与互操作性
-- 技能和工具与特定开发环境（VS Code、Cursor 等）解耦
-- 遵循 MCP 标准的技能可在任何支持 MCP 的 IDE 中运行
-- 增强技能的可移植性和生态系统可扩展性
+#### ✅ High Decoupling & Interoperability
+- Skills and tools are decoupled from specific development environments (VS Code, Cursor, etc.)
+- MCP-compliant skills can run in any MCP-supporting IDE
+- Enhances skill portability and ecosystem extensibility
 
-#### ✅ 安全与权限管理
-- **能力协商机制**: 连接时声明并协商支持的功能集
-  - 可访问的文件系统路径 (roots)
-  - 可用的工具列表 (tools)
-  - 可读取的资源 (resources)
-- **最小权限原则**: 防止权限滥用导致的数据破坏风险
+#### ✅ Security & Permission Management
+- **Capability Negotiation**: Declare and negotiate supported feature sets upon connection
+  - Accessible filesystem paths (roots)
+  - Available tool list (tools)
+  - Readable resources (resources)
+- **Principle of Least Privilege**: Prevent data corruption risks from privilege abuse
 
-#### ✅ 标准化工具发现与调用
-- 内置 `tools/list` 和 `tools/call` 标准方法
-- 智能体动态发现和调用远程/本地工具
-- 无需硬编码工具详细信息
-- 支持复杂分布式多智能体系统
+#### ✅ Standardized Tool Discovery & Invocation
+- Built-in `tools/list` and `tools/call` standard methods
+- Agents dynamically discover and invoke remote/local tools
+- No need to hardcode tool details
+- Supports complex distributed multi-agent systems
 
-#### ✅ 生态系统催化剂
-- GitHub Copilot 成功得益于 MCP 支持
-- 围绕 MCP Server 的市场正在形成
-- 开发者可方便发现、安装和分享专业技能
+#### ✅ Ecosystem Catalyst
+- GitHub Copilot's success benefits from MCP support
+- A marketplace around MCP Servers is forming
+- Developers can easily discover, install, and share specialized skills
 
 ---
 
-## 四、从 Vibe Coding 到 Agentic Engineering
+## 4. From Vibe Coding to Agentic Engineering
 
-### 4.1 演进路径对比
+### 4.1 Evolution Path Comparison
 
-| 维度 | Vibe Coding | Agentic Engineering |
+| Dimension | Vibe Coding | Agentic Engineering |
 | :--- | :--- | :--- |
-| **开发者角色** | 提示者、导演、副驾驶 | 架构师、项目经理、监督员 |
-| **交互模式** | 紧密迭代的"目标满足循环" | 目标委托与监控 |
-| **任务范围** | 组件级（函数、UI 元素、脚本） | 特征级/应用级（端到端功能、系统迁移） |
-| **工具使用** | 代码生成，其他工具手动触发 | 智能体自主系统性交互 |
-| **自动化程度** | 半自动，高度人机协作 | 高度自动化 |
+| **Developer Role** | Prompter, director, co-pilot | Architect, project manager, supervisor |
+| **Interaction Mode** | Tightly iterative "goal satisfaction loop" | Goal delegation and monitoring |
+| **Task Scope** | Component-level (functions, UI elements, scripts) | Feature-level/app-level (end-to-end functionality, system migration) |
+| **Tool Usage** | Code generation, other tools triggered manually | Agents autonomously and systematically interact |
+| **Automation Level** | Semi-automated, high human-machine collaboration | Highly automated |
 
 ---
 
-### 4.2 Vibe Coding 特点
+### 4.2 Characteristics of Vibe Coding
 
-**优势**:
-- ✅ 降低 AI 编程门槛
-- ✅ 培养开发者与 AI 协作直觉
-- ✅ 加速开发进程
-- ✅ 适合快速原型制作和创意探索
+**Advantages**:
+- ✅ Lowers the barrier to AI programming
+- ✅ Cultivates developer intuition for AI collaboration
+- ✅ Accelerates development progress
+- ✅ Suitable for rapid prototyping and creative exploration
 
-**局限**:
-- ❌ 开发者高度参与，耗时较多
-- ❌ 任务范围有限
-- ❌ 工具使用需要手动管理
-
----
-
-### 4.3 Agentic Engineering 特点
-
-**核心转变**:
-- 开发者不再关心具体实现细节
-- 将复杂高阶目标委托给 AI 智能体
-- 监督和验证智能体执行过程和产出
-
-**能力范围**:
-- ✅ 端到端功能实现
-- ✅ 复杂跨文件重构
-- ✅ 系统迁移
-- ✅ CI/CD 流水线全面自动化
+**Limitations**:
+- ❌ High developer involvement, time-consuming
+- ❌ Limited task scope
+- ❌ Tool usage requires manual management
 
 ---
 
-### 4.4 方法论的桥梁作用
+### 4.3 Characteristics of Agentic Engineering
 
-本文提出的方法论（明确定义智能体、技能、工具及其交互关系）是从 Vibe Coding 走向 Agentic Engineering 的**必经之路**:
+**Core Transformation**:
+- Developers no longer concern themselves with specific implementation details
+- Delegate complex high-level goals to AI agents
+- Supervise and validate agent execution process and outputs
+
+**Capability Scope**:
+- ✅ End-to-end feature implementation
+- ✅ Complex cross-file refactoring
+- ✅ System migration
+- ✅ Comprehensive CI/CD pipeline automation
+
+---
+
+### 4.4 The Methodological Bridge
+
+The methodology presented in this document (clearly defining agents, skills, tools, and their interactions) is the **necessary path** from Vibe Coding to Agentic Engineering:
 
 ```
-Vibe Coding → [结构化方法论] → Agentic Engineering
+Vibe Coding → [Structured Methodology] → Agentic Engineering
               ↓
-        保留自主性
-        提供可控性
-        确保安全性
+        Preserve autonomy
+        Provide controllability
+        Ensure security
 ```
 
-**核心价值**:
-- 为智能体的自主性提供坚实基础
-- 确保智能体在预设规则和约束内行为
-- 实现自主性与可控性的平衡
+**Core Value**:
+- Provide a solid foundation for agent autonomy
+- Ensure agents behave within preset rules and constraints
+- Achieve balance between autonomy and controllability
 
 ---
 
-## 五、核心设计原则
+## 5. Core Design Principles
 
-### 5.1 分层解耦原则
+### 5.1 Layered Decoupling Principle
 
-**要求**: 严格区分智能体（指挥）、技能（策略）和工具（执行）三层
+**Requirement**: Strictly separate the three layers of Agent (command), Skill (strategy), and Tool (execution)
 
-**目标**: 
-- 保持各自职责单一且独立
-- 避免功能冗余和耦合
-- 提高系统可维护性
-
----
-
-### 5.2 标准化优先原则
-
-**要求**: 优先采用 MCP 作为智能体与外部环境交互的默认通信标准
-
-**目标**:
-- 确保技能和工具的开放性
-- 确保互操作性
-- 避免陷入特定平台的封闭生态
+**Goal**: 
+- Keep each layer's responsibilities singular and independent
+- Avoid functional redundancy and coupling
+- Improve system maintainability
 
 ---
 
-### 5.3 声明式优于命令式原则
+### 5.2 Standardization-First Principle
 
-**要求**: 使用技能（特别是 `SKILL.md` 文件）这种声明式方式定义行为规范
+**Requirement**: Prioritize MCP as the default communication standard for agent interaction with the external environment
 
-**优势**:
-- ✅ 显著提高复用性
-- ✅ 提高可靠性
-- ✅ 提高可维护性
-- ✅ 避免在 prompt 中穷尽所有细节
-
----
-
-### 5.4 安全第一原则
-
-**要求**: 
-- 充分利用 MCP 的能力协商机制
-- 利用 GitHub Copilot CLI 的工具许可控制
-- 始终贯彻最小权限原则
-
-**目标**: 防范潜在的安全风险
+**Goal**:
+- Ensure the openness of skills and tools
+- Ensure interoperability
+- Avoid vendor lock-in to specific platforms
 
 ---
 
-### 5.5 迭代与反馈原则
+### 5.3 Declarative Over Imperative Principle
 
-**要求**: 
-- 接受 AI 生成过程的非确定性本质
-- 建立快速验证（如自动化测试）和反馈闭环
-- 持续收集执行结果数据
+**Requirement**: Use skills (specifically `SKILL.md` files) as a declarative way to define behavioral norms
 
-**目标**: 优化智能体的计划能力和技能的指令有效性
-
----
-
-## 六、实践指南
-
-### 6.1 定义智能体角色
-
-**行动**: 根据项目需求创建不同类型的智能体
-
-**示例**:
-- 🎯 **架构师智能体**: 专注于高阶规划
-- 💻 **程序员智能体**: 专注于代码生成
-- 🧪 **测试智能体**: 专注于测试用例编写和执行
-
-**价值**: 实现开发流程的专业化分工，提升任务执行效率和质量
+**Advantages**:
+- ✅ Significantly improved reusability
+- ✅ Improved reliability
+- ✅ Improved maintainability
+- ✅ Avoid exhausting all details in prompts
 
 ---
 
-### 6.2 构建领域专用的技能库
+### 5.4 Security-First Principle
 
-**行动**: 围绕团队技术栈、编码规范、内部 API 和业务逻辑创建技能
+**Requirement**: 
+- Fully leverage MCP's capability negotiation mechanism
+- Utilize GitHub Copilot CLI's tool permission controls
+- Always adhere to the principle of least privilege
 
-**位置**: `.github/skills/` 目录
-
-**要求**: 每个技能都应有一个详尽的 `SKILL.md`，包含：
-- 目的说明
-- 输入参数
-- 预期输出
-- 使用示例
-
-**价值**: 
-- 将隐性知识显性化
-- 确保 AI 行为的一致性和可控性
-- 提高代码质量
+**Goal**: Guard against potential security risks
 
 ---
 
-### 6.3 积极拥抱 MCP 服务器生态
+### 5.5 Iteration & Feedback Principle
 
-**行动**:
-- 使用现有的 MCP 服务器（如 GitHub MCP Server）
-- 鼓励团队开发自己的 MCP 服务器
+**Requirement**: 
+- Accept the non-deterministic nature of AI generation processes
+- Establish rapid validation (e.g., automated testing) and feedback loops
+- Continuously collect execution result data
 
-**封装内容**:
-- 内部 Shell 脚本
-- Nushell 模块
-- 自定义工具
-
-**价值**: 
-- 扩展智能体的能力边界
-- 打破平台壁垒
-- 构建开放、可插拔的生态系统
+**Goal**: Optimize agent planning capabilities and skill instruction effectiveness
 
 ---
 
-### 6.4 将传统 DevOps 流程 AI 化
+## 6. Practice Guide
 
-**行动**:
-1. 将 CI/CD 流程（构建、测试、部署）拆解成原子化工具
-2. 为每个工具链环节编写对应的技能
-3. 创建能够自主完成发布全流程的"运维智能体"
+### 6.1 Define Agent Roles
 
-**价值**:
-- 实现软件交付流程的高度自动化
-- 减少人工干预
-- 加快发布速度
+**Action**: Create different types of agents based on project needs
 
----
+**Examples**:
+- 🎯 **Architect Agent**: Focuses on high-level planning
+- 💻 **Developer Agent**: Focuses on code generation
+- 🧪 **Test Agent**: Focuses on writing and executing test cases
 
-### 6.5 系统化记录与复盘会话
-
-**行动**: 记录每次 AI 交互的完整上下文
-
-**记录内容**:
-- 生成的计划
-- 检查点
-- 工具调用历史
-- 执行结果
-
-**价值**:
-- 调试和追溯问题的宝贵依据
-- 积累经验
-- 训练更优智能体的原始数据来源
+**Value**: Achieve specialized division of labor in the development workflow, improving task execution efficiency and quality
 
 ---
 
-### 6.6 实践指南速查
+### 6.2 Build Domain-Specific Skill Libraries
 
-| 指南 | 具体行动 | 目标与价值 |
+**Action**: Create skills around team tech stacks, coding standards, internal APIs, and business logic
+
+**Location**: `.github/skills/` directory
+
+**Requirement**: Each skill should have a detailed `SKILL.md` containing:
+- Purpose description
+- Input parameters
+- Expected output
+- Usage examples
+
+**Value**: 
+- Externalize implicit knowledge
+- Ensure consistency and controllability of AI behavior
+- Improve code quality
+
+---
+
+### 6.3 Actively Embrace the MCP Server Ecosystem
+
+**Action**:
+- Use existing MCP servers (e.g., GitHub MCP Server)
+- Encourage teams to develop their own MCP servers
+
+**What to Encapsulate**:
+- Internal shell scripts
+- Nushell modules
+- Custom tools
+
+**Value**: 
+- Expand the capability boundaries of agents
+- Break platform barriers
+- Build an open, pluggable ecosystem
+
+---
+
+### 6.4 AI-Enable Traditional DevOps Processes
+
+**Action**:
+1. Decompose CI/CD processes (build, test, deploy) into atomic tools
+2. Write corresponding skills for each toolchain segment
+3. Create "Ops Agents" capable of autonomously completing full release workflows
+
+**Value**:
+- Achieve high automation in software delivery workflows
+- Reduce manual intervention
+- Accelerate release velocity
+
+---
+
+### 6.5 Systematically Record & Review Sessions
+
+**Action**: Record the complete context of every AI interaction
+
+**What to Record**:
+- Generated plans
+- Checkpoints
+- Tool invocation history
+- Execution results
+
+**Value**:
+- Valuable basis for debugging and tracing issues
+- Accumulate experience
+- Raw data source for training better agents
+
+---
+
+### 6.6 Practice Guide Quick Reference
+
+| Guide | Specific Action | Goal & Value |
 | :--- | :--- | :--- |
-| **定义智能体角色** | 创建"架构师"、"程序员"、"测试工程师"等智能体 | 专业化分工，提升效率 |
-| **构建技能库** | 在 `.github/skills/` 创建技能包 | 确保一致性和可控性 |
-| **拓展 MCP 生态** | 使用和开发 MCP Server | 扩展能力边界 |
-| **AI 化 DevOps** | 拆解 CI/CD 为原子化工具 | 高度自动化 |
-| **记录会话** | 记录完整交互上下文 | 积累优化数据 |
+| **Define Agent Roles** | Create "Architect", "Developer", "Test Engineer" agents | Specialized division of labor, improved efficiency |
+| **Build Skill Library** | Create skill packages in `.github/skills/` | Ensure consistency and controllability |
+| **Expand MCP Ecosystem** | Use and develop MCP Servers | Expand capability boundaries |
+| **AI-Enable DevOps** | Decompose CI/CD into atomic tools | High automation |
+| **Record Sessions** | Record complete interaction context | Accumulate optimization data |
 
 ---
 
-## 七、总结
+## 7. Summary
 
-通过系统性地定义和解析**智能体**、**技能**与**工具**三大核心构件，并遵循核心设计原则与实践指南，开发者能够构建出一套稳健、高效且安全的 AI 原生开发范式。
+By systematically defining and analyzing the three core building blocks of **Agent**, **Skill**, and **Tool**, and following the core design principles and practice guides, developers can build a robust, efficient, and secure AI-native development paradigm.
 
-**方法论的核心贡献**:
-1. ✅ 解决了当前 AI 编程面临的诸多挑战
-2. ✅ 为软件开发的未来描绘了清晰蓝图
-3. ✅ 推动行业从手工作坊模式迈向工业化、智能化生产新纪元
+**Core Contributions of the Methodology**:
+1. ✅ Addresses many challenges facing AI programming today
+2. ✅ Paints a clear blueprint for the future of software development
+3. ✅ Drives the industry from artisanal workshop models toward industrialized, intelligent production
 
-**最终目标**: 
-将开发者的注意力从低层次的语法和算法实现，转移到更高层次的目标定义、流程编排和质量保障上。
+**Ultimate Goal**: 
+Shift developers' attention from low-level syntax and algorithm implementation to higher-level goal definition, workflow orchestration, and quality assurance.
 
 ---
 
-> **相关文档**:
-> - [Spec-Driven 开发方法](./spec-driven.md)
+> **Related Documents**:
+> - [Spec-Driven Development](./spec-driven.md)
 > - [Constitution](../../memory/constitution.md)
 > - [Feature Index](../../memory/features.md)

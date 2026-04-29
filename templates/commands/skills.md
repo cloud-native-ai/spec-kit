@@ -20,79 +20,111 @@ scripts:
 $ARGUMENTS
 ```
 
-需要根据用户的输入提取SKILL核心的两个元素：name 和 description
+You **MUST** analyze the user input in `$ARGUMENTS` to extract the two core elements of a Skill: `name` and `description`.
 
-1. *name*: 一个简单命令的英文单词组合，不应该包含特殊字符，只包含字母、数字和'-'、'_'等编程中常用的变量名格式
-2. *description*: 一段关于SKILL的功能描述和一个触发SKILL的关键词列表，例如：This skill can xxx. Use this when the user mentions [ "key word 1", "key word 3", ... ].
+1. *name*: A concise command-like identifier using only letters, digits, hyphens (`-`), and underscores (`_`). Must follow standard programming variable naming conventions and contain no special characters.
+2. *description*: A brief statement of what the Skill does, followed by a list of trigger keywords. Format: `This skill can <capability>. Use this when the user mentions [ "keyword1", "keyword2", ... ]`.
+
+### Input Classification & Processing Strategy
+
+**Check the user input**: Determine whether `$ARGUMENTS` is empty or contains only whitespace.
+
+- **Case A: User provided input**  
+  Extract `name` and `description` from the input following the rules above, then proceed to [Step 1](#step-1-determine-skill_root-and-metadata).
+
+- **Case B: User provided no input (empty arguments)**  
+  This **MUST** be interpreted as: **create a Skill from the current conversation history**. Execute the following:
+
+  1. **Review the conversation history**: Analyze the current session's user–AI interactions to identify:
+     - Recurring task patterns or workflows
+     - Explicit user intent such as "save as a skill", "create a skill", "solidify this workflow"
+     - Multi-step operations with clear reuse value
+     - Domain-specific expertise or decision logic
+
+  2. **Distill a reusable workflow**: Extract from the conversation:
+     - Core task objective (what it does)
+     - Key execution steps (how to do it)
+     - Trigger conditions and keywords (when to use it)
+     - Required tools, scripts, or resources (what it needs)
+
+  3. **Generate Skill metadata**: Based on the distilled results, produce:
+     - `name`: A concise English identifier (e.g., `data-validation`, `api-testing`)
+     - `description`: A capability summary plus trigger keyword list
+
+  4. **Minimal clarification**: If critical information cannot be determined from the conversation, ask **only one question at a time**. Prioritize:
+     - "I noticed we discussed [topic] — would you like to turn this workflow into a Skill?"
+     - "What is the primary output or goal of this Skill?"
+
+  5. **Confirm and proceed**: Once the user confirms, continue with [Step 1](#step-1-determine-skill-root-and-metadata) through the full workflow.
 
 ## Outline
 
-目标：在当前对话上下文中，帮助用户创建或整理高质量 SpecKit Skill，确保结构规范、触发清晰、资源可复用，并为每个技能生成可复用的确定性 `skill_id`。
+Goal: Help users create or refine high-quality SpecKit Skills within the current conversation context, ensuring structured specifications, clear triggers, reusable resources, and a deterministic reusable `skill_id` for each skill.
 
-主流程：
-1. 优先从现有对话提炼可复用工作流
-2. 仅在必要时做最小澄清（一次一个问题）
-3. 迭代完善 `SKILL.md` 与配套资源，直到可直接使用
+Main workflow:
+1. Prioritize distilling reusable workflows from the current conversation
+2. Only ask minimal clarifying questions when necessary (one question at a time)
+3. Iteratively refine `SKILL.md` and supporting resources until ready for use
 
 ## Skill Specification
 
-### 1) SKILL_ROOT 与基础结构
+### 1) SKILL_ROOT and Basic Structure
 
-**SKILL_ROOT** 是 Skill 所在的根目录。一个 Skill 的主体为 `${SKILL_ROOT}/SKILL.md`，其余资源目录均相对于 `SKILL_ROOT` 解析。
+**SKILL_ROOT** is the root directory where a Skill resides. The main body of a Skill is `${SKILL_ROOT}/SKILL.md`, and all other resource directories are resolved relative to `SKILL_ROOT`.
 
-典型结构：
+Typical structure:
 
 ```
 ${SKILL_ROOT}/
-├── SKILL.md            # 必需，Skill 主体
-├── tools/              # 工具说明（相对 SKILL_ROOT，可选）
-├── scripts/            # 可执行脚本（相对 SKILL_ROOT，可选）
-├── references/         # 按需加载的参考资料（相对 SKILL_ROOT，可选）
-└── assets/             # 输出使用的静态资源（相对 SKILL_ROOT，可选）
+├── SKILL.md            # Required, Skill main body
+├── tools/              # Tool descriptions (relative to SKILL_ROOT, optional)
+├── scripts/            # Executable scripts (relative to SKILL_ROOT, optional)
+├── references/         # Reference materials loaded on demand (relative to SKILL_ROOT, optional)
+└── assets/             # Static assets for outputs (relative to SKILL_ROOT, optional)
 ```
 
-**存放位置**：`SKILL_ROOT` 可位于以下任一路径（项目级或个人级）：
+**Storage location**: `SKILL_ROOT` can be in any of the following paths (project-level or personal-level):
 
-- `.specify/skills/<name>/`（项目级主目录）
-- `.github/skills/<name>/`（兼容入口，不承载主副本）
+- `.specify/skills/<name>/` (project-level primary directory)
+- `.github/skills/<name>/` (compatibility entry, does not host primary copy)
 - `.agents/skills/<name>/`
 - `.claude/skills/<name>/`
 - `~/.copilot/skills/<name>/`
 - `~/.agents/skills/<name>/`
 - `~/.claude/skills/<name>/`
 
-后续所有资源引用统一使用相对于 `SKILL_ROOT` 的路径（推荐 `./scripts/x.py` 形式）。
+All subsequent resource references use paths relative to `SKILL_ROOT` (prefer `./scripts/x.py` form).
 
-### 2) `SKILL.md` 规范
+### 2) `SKILL.md` Specification
 
 #### Frontmatter
 
-最少包含：
+Minimum required:
 
-- `name`（必需，建议与目录名一致）
-- `description`（必需，描述“做什么 + 何时触发”）
+- `name` (required, recommended to match directory name)
+- `description` (required, describes "what it does + when to trigger")
 
-可选（按需，遵循官方行为）：
+Optional (on demand, following official behavior):
 
 - `argument-hint`
 - `user-invocable`
 - `disable-model-invocation`
 
-说明：本项目默认以 `name` 与 `description` 作为核心触发元数据；仅在确有需要时再引入可选字段。
+Note: This project defaults to `name` and `description` as core trigger metadata; only introduce optional fields when truly needed.
 
 #### Body
 
-Body 只写执行说明，不写冗余背景。应包含：
+Body contains only execution instructions, no redundant background. Must include:
 
-- 结果目标
-- 关键步骤（可执行、可检查）
-- 资源引用（使用相对路径，如 `./scripts/x.py`）
+- Result goal
+- Key steps (executable, checkable)
+- Resource references (use relative paths, e.g., `./scripts/x.py`)
 
-### 3) 资源目录使用准则
+### 3) Resource Directory Usage Guidelines
 
 #### `tools/`
 
-Skill 根目录下的 `tools/` 用于说明本 Skill 可用的工具。项目级工具清单来自 `scripts/bash/refresh-tools.sh` 生成的 JSON：
+The `tools/` directory under the Skill root describes the tools available to this Skill. Project-level tool manifests come from the JSON generated by `scripts/bash/refresh-tools.sh`:
 
 - [MCP Tools JSON](tools/mcp.json)
 - [System Tools JSON](tools/system.json)
@@ -101,181 +133,181 @@ Skill 根目录下的 `tools/` 用于说明本 Skill 可用的工具。项目级
 
 #### `scripts/`
 
-用于重复率高、需要确定性的任务（Python/Bash 等）。
+Used for high-repetition, deterministic tasks (Python/Bash, etc.).
 
-- 适用：重复写同类逻辑、或操作易错需稳定复现
-- 价值：省 token、可执行、可复用
+- Applicable: Writing repetitive logic, or operations that are error-prone and need stable reproducibility
+- Value: Saves tokens, executable, reusable
 
 #### `references/`
 
-用于按需加载的文档知识（如 schema、API、策略）。
+Used for on-demand document knowledge (e.g., schemas, APIs, policies).
 
-- 适用：信息量大、但非每次都需要
-- 原则：细节放 `references/`，`SKILL.md` 只保留导航和核心流程
-- 大文件建议：在 `SKILL.md` 提供检索提示；参考文件超过 100 行建议加目录
+- Applicable: High information volume but not needed every time
+- Principle: Put details in `references/`, keep `SKILL.md` only for navigation and core workflow
+- Large file recommendation: Provide search hints in `SKILL.md`; add a table of contents for reference files exceeding 100 lines
 
 #### `assets/`
 
-用于输出物依赖但不必进入上下文的资源（模板、图片、字体、样板工程等）。
+Used for resources needed by outputs but unnecessary in context (templates, images, fonts, boilerplate projects, etc.).
 
-### 4) 上下文加载与体量控制
+### 4) Context Loading and Size Control
 
-采用渐进加载：
+Use progressive loading:
 
-1. 发现阶段：读取 `name` + `description`
-2. 命中后：读取 `SKILL.md` 正文
-3. 需要时：再读取 `scripts/`、`references/`、`assets/`
+1. Discovery phase: Read `name` + `description`
+2. After match: Read `SKILL.md` body
+3. When needed: Then read `scripts/`, `references/`, `assets/`
 
-约束：
+Constraints:
 
-- `SKILL.md` 建议 < 500 行
-- 引用链尽量一层（从 `SKILL.md` 直达资源）
-- 资源路径统一使用相对路径（建议 `./`）
+- `SKILL.md` recommended < 500 lines
+- Reference chain should be at most one level (from `SKILL.md` directly to resource)
+- Resource paths use relative paths uniformly (prefer `./`)
 
-### 5) 不要放入 Skill 的内容
+### 5) Content NOT to Include in a Skill
 
-Skill 仅保留执行任务所需内容，不增加无关文档：
+A Skill only retains content needed for task execution; do not add unrelated documents:
 
 - `README.md`
 - `INSTALLATION_GUIDE.md`
 - `QUICK_REFERENCE.md`
 - `CHANGELOG.md`
-- 其他流程回顾/测试记录类附加文档
+- Other process review / test record appendices
 
 ## Design Principles
 
-### 1) 合理控制自由度
+### 1) Manage Degrees of Freedom
 
-- 高自由度：文本策略，适合多路径问题
-- 中自由度：伪代码/参数化脚本，适合有主路径但可配置
-- 低自由度：固定脚本/固定步骤，适合高风险易错操作
+- High freedom: Text strategies, suitable for multi-path problems
+- Medium freedom: Pseudocode / parameterized scripts, suitable when there's a primary path but configurability needed
+- Low freedom: Fixed scripts / fixed steps, suitable for high-risk error-prone operations
 
-### 2) 描述可发现
+### 2) Discoverable Descriptions
 
-`description` 必须包含关键词与触发场景，避免模糊描述。
+`description` must include keywords and trigger scenarios; avoid vague descriptions.
 
-### 3) 反模式
+### 3) Anti-Patterns
 
-- 描述空泛，无法触发
-- `SKILL.md` 过大且不拆分
-- 目录名与 `name` 不一致
-- 缺少可执行步骤
+- Vague descriptions that fail to trigger
+- `SKILL.md` too large without splitting
+- Directory name inconsistent with `name`
+- Missing executable steps
 
 ## Planning Strategy (Official Workflow Aligned)
 
-### Step A: 先提炼，再提问
+### Step A: Distill First, Then Ask
 
-先从当前对话提炼：
+First distill from the current conversation:
 
-- 可复用步骤
-- 决策分支
-- 质量检查点
+- Reusable steps
+- Decision branches
+- Quality checkpoints
 
-若提炼充分，直接进入草稿。
+If distillation is sufficient, proceed directly to draft.
 
-### Step B: 必要时澄清
+### Step B: Clarify When Necessary
 
-仅当关键信息不足时提问，且**一次只问一个问题**。优先问：
+Only ask when critical information is missing, and **one question at a time**. Prioritize:
 
-- 目标产出是什么？
-- 作用域是 workspace 还是 personal？
-- 需要 checklist 还是完整多步骤流程？
+- What is the target output?
+- Is the scope workspace or personal?
+- Is a checklist or a complete multi-step workflow needed?
 
-### Step C: 迭代收敛
+### Step C: Iterate to Convergence
 
-1. 起草并保存
-2. 找出最薄弱点
-3. 定向追问并修订
-4. 产出可用版本（含示例提示词与后续定制建议）
+1. Draft and save
+2. Identify the weakest point
+3. Ask a targeted question and revise
+4. Produce a usable version (including example prompts and follow-up customization suggestions)
 
 ## Execution Steps
 
-创建一个 Skill 的核心流程如下：
+The core workflow for creating a Skill is as follows:
 
-### Step 1: 确定 SKILL_ROOT 与元数据
+### Step 1: Determine SKILL_ROOT and Metadata
 
-从用户输入（User Input）解析 `skill name` 与 `description`：
+Parse `skill name` and `description` from user input:
 
-- **skill name** 用于确定 `SKILL_ROOT` 路径。例如 `name = "testing"` 且选用项目级存放位置时，`SKILL_ROOT = .github/skills/testing/`。
-- **description** 用于描述"做什么 + 何时触发"，必须包含关键词与触发场景，避免模糊描述（参见 Design Principles 第 2 点）。
+- **skill name** determines the `SKILL_ROOT` path. For example, with `name = "testing"` and a project-level storage location, `SKILL_ROOT = .github/skills/testing/`.
+- **description** describes "what it does + when to trigger" and must include keywords and trigger scenarios; avoid vague descriptions (see Design Principles point 2).
 
-若输入信息不足，进入 Step 3 的提问环节补充。
+If input information is insufficient, proceed to Step 3 for clarification.
 
-### Step 2: 获取可用 Tools 信息
+### Step 2: Obtain Available Tools Information
 
-执行脚本获取当前项目/工作区可用的工具清单，为后续 Skill 的资源编排提供依据：
+Run the script to get the tools available in the current project/workspace, providing a basis for the Skill's resource orchestration:
 
-- 运行 `refresh-tools.sh`（或等价方式）刷新并输出 JSON。
-- 参考工具清单分类：
+- Run `refresh-tools.sh` (or equivalent) to refresh and output JSON.
+- Reference tool manifest categories:
   - **MCP Tools** → [mcp.json](tools/mcp.json)
   - **System Tools** → [system.json](tools/system.json)
   - **Shell Tools** → [shell.json](tools/shell.json)
   - **Project Scripts** → [project.json](tools/project.json)
 
-可根据需要调用以下命令获取工具清单：
+Use the following command to get the tool manifest as needed:
 
 ```bash
 scripts/bash/refresh-tools.sh --json
 ```
 
-获取到工具列表后，结合 Skill 目标筛选可用工具，作为 `SKILL.md` 中工具引用的参考。
+After obtaining the tool list, filter available tools against Skill goals as reference for tool references in `SKILL.md`.
 
-### Step 3: 逐步明确 Skill 细节
+### Step 3: Incrementally Clarify Skill Details
 
-通过提问方式补充 `SKILL.md` 所需信息。**每轮只问一个问题**，等待用户答复后继续。
+Fill in the information needed for `SKILL.md` through questioning. **Ask only one question per round**, waiting for user response before continuing.
 
-优先问：
+Prioritize:
 
-- **目标产出**：Skill 最终要产出什么？
-- **适用场景**：在什么触发条件下应该加载此 Skill？
-- **资源需求**：是否需要脚本、参考资料、模板或固定工具链？
+- **Target output**: What should the Skill ultimately produce?
+- **Applicable scenarios**: Under what trigger conditions should this Skill be loaded?
+- **Resource needs**: Are scripts, references, templates, or a fixed toolchain needed?
 
-迭代修订 `SKILL.md` 直至：
+Iteratively revise `SKILL.md` until:
 
-1. Frontmatter 完整（`name`、`description`）
-2. Body 包含清晰可执行步骤
-3. 资源目录（`tools/`、`scripts/`、`references/`、`assets/`）按需就位
-4. 所有资源链接使用相对 `SKILL_ROOT` 的路径
+1. Frontmatter is complete (`name`, `description`)
+2. Body contains clear executable steps
+3. Resource directories (`tools/`, `scripts/`, `references/`, `assets/`) are ready as needed
+4. All resource links use paths relative to `SKILL_ROOT`
 
-### Step 4: 注册 Resource ID 与写入 Instructions
+### Step 4: Register Resource ID and Write to Instructions
 
-生成 `SKILL.md` 的 Resource ID 并持久化：
+Generate the Resource ID for `SKILL.md` and persist it:
 
-- **Canonical ID（`skill_id`）**：`.specify/skills/<name>/SKILL.md` 的工作区相对路径。
-- **Canonical Path**：`${SKILL_ROOT}/SKILL.md` 的工作区相对路径。
+- **Canonical ID (`skill_id`)**: Workspace-relative path of `.specify/skills/<name>/SKILL.md`.
+- **Canonical Path**: Workspace-relative path of `${SKILL_ROOT}/SKILL.md`.
 
-将以下信息写入 `.specify/instructions.md` 的 `## Resource Registry` → `### Skills` 小节：
+Write the following into the `## Resource Registry` → `### Skills` section of `.specify/instructions.md`:
 
 - `Skill Name`
 - `Skill ID`
 - `Description`
 - `Canonical Path`
 
-约束：
+Constraints:
 
-- 条目字段名称参考 `templates/skills-template.md`。
-- 同一 `skill_id` 已存在时不得重复写入。
-- 列表保持排序与去重；存在真实条目后，移除 `- None yet.`。
+- Entry field names reference `templates/skills-template.md`.
+- Do not write duplicate entries for the same `skill_id`.
+- Keep the list sorted and deduplicated; remove `- None yet.` once real entries exist.
 
 ### Completion
 
-- 总结 Skill 能力与目录结构。
-- 给出示例提示词。
-- 给出下一步可选定制项。
-- 输出 `SKILL.md` 路径（即 `SKILL_ROOT/SKILL.md`）与 `skill_id`。
+- Summarize Skill capabilities and directory structure.
+- Provide example prompts.
+- Suggest optional next-step customizations.
+- Output the `SKILL.md` path (i.e., `SKILL_ROOT/SKILL.md`) and `skill_id`.
 
 ## Slash Behavior Notes
 
-技能在 `/` 菜单中的表现受 frontmatter 控制：
+Skill behavior in the `/` menu is controlled by frontmatter:
 
-- 默认：可手动调用 + 可自动触发
-- `user-invocable: false`：不可手动调用，但可自动触发
-- `disable-model-invocation: true`：可手动调用，但不自动触发
-- 两者同时设置：都禁用
+- Default: Manually invocable + auto-triggerable
+- `user-invocable: false`: Not manually invocable but auto-triggerable
+- `disable-model-invocation: true`: Manually invocable but not auto-triggerable
+- Both set simultaneously: Both disabled
 
 ## Continuous Improvement
 
-1. 用真实任务验证 skill
-2. 记录卡点与低效步骤
-3. 回改 `SKILL.md` 或资源目录
-4. 再次验证，形成稳定迭代
+1. Validate the skill with real tasks
+2. Record pain points and inefficient steps
+3. Revise `SKILL.md` or resource directories
+4. Validate again, forming a stable iteration

@@ -1,103 +1,103 @@
-# 在 VS Code Copilot 中使用 Agent Skills
+# Using Agent Skills in VS Code Copilot
 
-Agent Skills 是一组指令、脚本和资源，GitHub Copilot 可以在相关时加载这些内容以执行专门的任务。Agent Skills 是一个开放标准，适用于多种 AI 代理，包括 VS Code 中的 GitHub Copilot、GitHub Copilot CLI 和 GitHub Copilot 编码代理。
+Agent Skills are collections of instructions, scripts, and resources that GitHub Copilot can load when relevant to perform specialized tasks. Agent Skills is an open standard applicable to multiple AI agents, including GitHub Copilot in VS Code, GitHub Copilot CLI, and GitHub Copilot coding agents.
 
-与主要定义编码准则的自定义指令（Custom Instructions）不同，Skills 启用了包含脚本、示例和其他资源的专门功能和工作流。您创建的 Skills 是可移植的，并且可以在任何兼容 Skills 的代理中工作。
+Unlike Custom Instructions, which primarily define coding guidelines, Skills enable specialized capabilities and workflows that include scripts, examples, and other resources. The Skills you create are portable and work across any Skills-compatible agent.
 
-## 核心优势
+## Core Advantages
 
-*   **Copilot 专项化**：为特定领域的任务定制能力，无需重复上下文。
-*   **减少重复**：一次创建，在所有对话中自动使用。
-*   **能力组合**：组合多个 Skill 以构建复杂的工作流。
-*   **高效加载**：仅在需要时将相关内容加载到上下文中。
+*   **Copilot Specialization**: Tailor capabilities for domain-specific tasks without repeating context.
+*   **Reduce Repetition**: Create once and automatically use across all conversations.
+*   **Capability Composition**: Combine multiple Skills to build complex workflows.
+*   **Efficient Loading**: Only relevant content is loaded into context when needed.
 
-> **注意**：VS Code 中的 Agent Skills 支持目前处于预览阶段。可能需要启用 `chat.useAgentSkills` 设置才能使用。
+> **Note**: Agent Skills support in VS Code is currently in preview. You may need to enable the `chat.useAgentSkills` setting to use them.
 
-## Agent Skills 与自定义指令 (Custom Instructions)
+## Agent Skills vs. Custom Instructions
 
-虽然两者都能定制 Copilot 的行为，但用途不同：
+Both can customize Copilot's behavior, but serve different purposes:
 
-| 特性 | Agent Skills | Custom Instructions |
+| Feature | Agent Skills | Custom Instructions |
 | :--- | :--- | :--- |
-| **目的** | 教授专门的能力和工作流 | 定义编码标准和准则 |
-| **可移植性** | 跨 VS Code, Copilot CLI, Copilot Agent 通用 | 仅限 VS Code 和 GitHub.com |
-| **内容** | 指令、脚本、示例和资源 | 仅指令 |
-| **范围** | 任务特定，按需加载 | 始终应用（或通过 glob 模式应用） |
-| **标准** | 开放标准 (agentskills.io) | VS Code 专用 |
+| **Purpose** | Teach specialized capabilities and workflows | Define coding standards and guidelines |
+| **Portability** | Universal across VS Code, Copilot CLI, Copilot Agent | VS Code and GitHub.com only |
+| **Content** | Instructions, scripts, examples, and resources | Instructions only |
+| **Scope** | Task-specific, loaded on demand | Always applied (or via glob patterns) |
+| **Standard** | Open standard (agentskills.io) | VS Code-specific |
 
-**使用场景对比：**
+**Usage Comparison:**
 
-*   **Agent Skills**：创建可重用的能力（如测试、部署流程），包含辅助脚本或示例。
-*   **Custom Instructions**：定义项目特定的代码风格、框架约定或提交信息格式。
+*   **Agent Skills**: Create reusable capabilities (e.g., testing, deployment workflows) with supporting scripts or examples.
+*   **Custom Instructions**: Define project-specific code style, framework conventions, or commit message formats.
 
-## 创建 Skill
+## Creating Skills
 
-Skills 存储在带有 `SKILL.md` 文件的目录中。
+Skills are stored in directories with a `SKILL.md` file.
 
-### 存储位置
+### Storage Locations
 
-*   **项目级 Skills**（推荐）：主副本存储在工作区的 `.specify/skills/` 目录下。
-*   **GitHub 兼容入口**：`.github/skills/` 仅作为兼容入口映射到主副本，不承载主内容。
-*   **用户级 Skills**（推荐）：存储在用户配置文件的 `~/.copilot/skills/` 目录下。
+*   **Project-Level Skills** (Recommended): The primary copy is stored in the workspace's `.specify/skills/` directory.
+*   **GitHub-Compatible Entry Point**: `.github/skills/` serves only as a compatibility entry point mapped to the primary copy and does not host primary content.
+*   **User-Level Skills** (Recommended): Stored in the `~/.copilot/skills/` directory of the user profile.
 
-### 目录结构
+### Directory Structure
 
-每个 Skill 应有自己的子目录。例如，创建一个名为 `webapp-testing` 的 Skill：
+Each Skill should have its own subdirectory. For example, to create a Skill called `webapp-testing`:
 
-1.  创建目录 `.specify/skills/webapp-testing/`
-2.  在其中创建 `SKILL.md` 文件。
-3.  （可选）添加脚本、模板或示例文件。
+1.  Create directory `.specify/skills/webapp-testing/`
+2.  Create the `SKILL.md` file within it.
+3.  (Optional) Add scripts, templates, or example files.
 
-结构示例：
+Example structure:
 ```text
 .specify/skills/webapp-testing/
-├── SKILL.md           # 定义 Skill 行为和元数据
-├── test-template.js   # 模板文件
-└── examples/          # 示例场景
+├── SKILL.md           # Defines Skill behavior and metadata
+├── test-template.js   # Template file
+└── examples/          # Example scenarios
 ```
 
-### SKILL.md 文件格式
+### SKILL.md File Format
 
-`SKILL.md` 是包含 YAML frontmatter 的 Markdown 文件。
+`SKILL.md` is a Markdown file with YAML frontmatter.
 
-**头部 (Frontmatter)**
+**Frontmatter**
 
 ```yaml
 ---
 name: skill-name
-description: 关于该 Skill 做什么以及何时使用的描述
+description: Description of what the Skill does and when to use it
 ---
 ```
 
-*   `name` (必填): 唯一标识符，小写，使用连字符（如 `webapp-testing`）。
-*   `description` (必填): 描述 Skill 的功能和使用场景。Copilot 依据此描述决定何时加载该 Skill。
+*   `name` (Required): Unique identifier, lowercase, using hyphens (e.g., `webapp-testing`).
+*   `description` (Required): Describes the Skill's functionality and usage scenarios. Copilot uses this description to decide when to load the Skill.
 
-**正文 (Body)**
+**Body**
 
-包含 Copilot 使用该 Skill 时应遵循的详细指令、准则和示例。
+Contains detailed instructions, guidelines, and examples for Copilot to follow when using the Skill.
 
 ```markdown
 # Skill Instructions
 
-在此处编写详细的指令...
+Write detailed instructions here...
 
-您可以引用目录内的文件，例如：[测试脚本](./test-template.js)。
+You can reference files within the directory, e.g.: [Test Script](./test-template.js).
 ```
 
-## Copilot 如何使用 Skills
+## How Copilot Uses Skills
 
-Skills 使用渐进式披露（Progressive Disclosure）机制，仅在需要时加载内容：
+Skills use a Progressive Disclosure mechanism, loading content only when needed:
 
-1.  **Skill 发现**：Copilot 读取所有可用 Skills 的名称和描述。
-2.  **指令加载**：当用户请求与 Skill 描述匹配时，Copilot 加载 `SKILL.md` 的正文。
-3.  **资源访问**：仅当 Copilot 需要引用辅助文件（脚本、示例）时，才会读取这些文件。
+1.  **Skill Discovery**: Copilot reads the names and descriptions of all available Skills.
+2.  **Instruction Loading**: When a user request matches a Skill description, Copilot loads the body of `SKILL.md`.
+3.  **Resource Access**: Copilot reads supporting files (scripts, examples) only when it needs to reference them.
 
-## 最佳实践
+## Best Practices
 
-*   **保持专注**：为不同的工作流创建独立的 Skill，而不是一个巨大的万能 Skill。
-*   **清晰的描述**：描述对于 Copilot 判断何时调用 Skill 至关重要。
-*   **使用示例**：在 `SKILL.md` 中包含输入输出示例。
-*   **安全性**：在添加脚本时要谨慎，避免硬编码敏感信息。
+*   **Stay Focused**: Create separate Skills for different workflows rather than one massive all-in-one Skill.
+*   **Clear Descriptions**: Descriptions are critical for Copilot to determine when to invoke a Skill.
+*   **Use Examples**: Include input/output examples in `SKILL.md`.
+*   **Security**: Exercise caution when adding scripts and avoid hardcoding sensitive information.
 
 ---
 更多信息请参考 Agent Skills 开放标准：[agentskills.io](https://agentskills.io)。

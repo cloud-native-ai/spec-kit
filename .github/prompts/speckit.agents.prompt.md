@@ -27,10 +27,10 @@ When processing the user input:
 Goal: Create or update one reusable custom agent at `.github/agents/<name>.agent.md` that can be invoked directly or as a subagent.
 
 Supported agent types:
-- `Knowledge`: 只读问答与解释，不做变更
-- `Plan`: 方案研究与多步骤计划，不做实现
-- `Research`: 快速检索与上下文探索子代理
-- `Common`: 未命中以上类型时的通用代理（默认兜底）
+- `Knowledge`: Read-only Q&A and explanation, no changes
+- `Plan`: Solution research and multi-step planning, no implementation
+- `Research`: Fast retrieval and context exploration subagent
+- `Common`: General-purpose agent when none of the above match (default fallback)
 
 Execution flow:
 
@@ -55,15 +55,15 @@ Execution flow:
 
 4. **Classify agent type (mandatory)**
   - Analyze intent, constraints, and expected workflow, then classify into one of:
-    - `Knowledge`: 用户主要目标是“解释、答疑、定位、说明”，且明确要求只读
-    - `Plan`: 用户主要目标是“拆解、规划、设计步骤”，且不直接编码
-    - `Research`: 用户主要目标是“快速搜集证据、查找文件/符号、形成调研结论”
-    - `Common`: 以上均不匹配或混合需求无法单类归纳时使用
-  - 若分类置信度不足，先提出最少澄清问题再分类
+    - `Knowledge`: The user's primary goal is "explain, answer questions, locate, clarify", with explicit read-only requirement
+    - `Plan`: The user's primary goal is "break down, plan, design steps", without direct coding
+    - `Research`: The user's primary goal is "quickly gather evidence, find files/symbols, form research conclusions"
+    - `Common`: None of the above match or mixed requirements cannot be classified into a single category
+  - If classification confidence is insufficient, first raise minimal clarification questions before classifying
 
 5. **Confirm type with user (mandatory)**
-  - 在生成文件前，必须向用户展示“识别出的类型 + 1 行理由 + 将使用的模板路径”，并请求确认。
-  - 仅在用户确认后进入生成流程；若用户否定，回到步骤 4 重新分类。
+  - Before generating the file, must show the user "identified type + 1 line rationale + template path to be used", and request confirmation.
+  - Only enter the generation flow after user confirmation; if the user rejects, return to step 4 to reclassify.
 
 6. **Clarify if Needed**
    - If no clear specialization emerges from the conversation, ask concise clarifying questions:

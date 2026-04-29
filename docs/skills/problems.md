@@ -1,213 +1,213 @@
-# Agent Skills 使用过程中的问题分析与解决方案
+# Problem Analysis & Solutions for Agent Skills Usage
 
-本文档按照"主要问题"、"根本原因"、"解决方案"三个层面，对 Agent Skills 使用过程中遇到的问题进行系统性分析和拆解。
+This document systematically analyzes and breaks down problems encountered during Agent Skills usage across three layers: "Main Problem", "Root Cause", and "Solution".
 
-## 1. Skill 触发控制问题
+## 1. Skill Triggering Control Issues
 
-### 1.1 问题一：该触发时未触发
+### 1.1 Problem 1: Failure to Trigger When Needed
 
-**主要问题**  
-LLM 在应该使用 Skill 的场景下选择忽略 Skill，而是采用其他方法（如直接查询数据、进行探索性操作等）。
+**Main Problem**  
+LLMs ignore Skills in scenarios where they should use them, opting instead for alternative approaches (e.g., directly querying data, performing exploratory operations, etc.).
 
-**具体表现**：
-- 用户请求与 Skill 描述完全匹配，但 LLM 不调用 Skill
-- LLM 优先进行文件读取、配置检查等探索性操作
-- 典型案例：用户请求「用 Gitlab 跑测试」，但 LLM 不使用对应的测试 Skill
+**Specific Manifestations**:
+- User requests perfectly match Skill descriptions, but the LLM does not invoke the Skill
+- LLM prioritizes exploratory operations like file reading and configuration checks
+- Typical case: User requests "Run tests with GitLab", but the LLM does not use the corresponding test Skill
 
-**根本原因分析**：
-1. **决策权归属问题**：最终决策权在 LLM 手中，系统只能"建议"而不能"强制"
-2. **推荐机制局限性**：即使有 【Skill Hint】、关键词打分、Rerank 语义排序，LLM 仍可能选择不采纳
-3. **灵活性与控制的矛盾**：强制加载会破坏 Agent 的灵活性，但不强制就需接受 LLM 的"任性"
-4. **行业普遍现象**：据行业反馈，Skill 触发率通常低于 10%
+**Root Cause Analysis**:
+1. **Decision Authority Issue**: Final decision power lies with the LLM; the system can only "suggest" but not "enforce"
+2. **Recommendation Mechanism Limitations**: Even with [Skill Hint], keyword scoring, and Rerank semantic sorting, the LLM may still choose not to adopt recommendations
+3. **Flexibility vs Control Tension**: Forced loading would undermine agent flexibility, but without enforcement, LLM "willfulness" must be accepted
+4. **Industry-Wide Phenomenon**: According to industry feedback, Skill trigger rates are typically below 10%
 
-**解决方案**：
-- **增强推荐机制**：【Skill Hint】在每轮请求时主动提示
-- **优化匹配算法**：结合关键词打分 + Rerank 模型重排序（使用 qwen3-rerank）
-- **保留 LLM 决策权**：不强制调用，维持系统灵活性
-- **技能描述优化**：要求 description 写明具体场景，增加 keywords 字段和 scene 字段
+**Solutions**:
+- **Enhanced Recommendation Mechanism**: [Skill Hint] proactively prompts on every request round
+- **Optimized Matching Algorithm**: Combine keyword scoring + Rerank model re-ranking (using qwen3-rerank)
+- **Preserve LLM Decision Authority**: Do not force invocation, maintain system flexibility
+- **Skill Description Optimization**: Require descriptions to specify concrete scenarios, add keywords and scene fields
 
-### 1.2 问题二：不该触发时误触发
+### 1.2 Problem 2: False Triggering When Not Needed
 
-**主要问题**  
-在不合适的场景下触发了 Skill，导致简单问题被复杂化。
+**Main Problem**  
+Skills are triggered in inappropriate scenarios, causing simple problems to become overly complicated.
 
-**具体表现**：
-- 用户仅询问简单的数据查询（如「QPS 是多少」）
-- LLM 却加载了复杂的根因分析 Skill
-- 执行不必要的复杂流程
+**Specific Manifestations**:
+- User only asks a simple data query (e.g., "What's the QPS?")
+- LLM loads a complex root cause analysis Skill instead
+- Unnecessary complex workflows are executed
 
-**根本原因分析**：
-1. **Skill 描述过于宽泛**：description 写得太过笼统，导致匹配范围过广
-2. **缺乏查询类型识别**：系统无法区分清单类查询和复杂分析需求
-3. **匹配算法精度不足**：无法准确判断用户意图的复杂度
+**Root Cause Analysis**:
+1. **Overly Broad Skill Descriptions**: Descriptions are too generic, leading to excessively wide matching scope
+2. **Lack of Query Type Recognition**: System cannot distinguish between checklist-style queries and complex analysis needs
+3. **Insufficient Matching Algorithm Precision**: Cannot accurately judge the complexity of user intent
 
-**解决方案**：
-- **查询类型识别**：识别清单类查询，直接跳过 Skill 推荐
-- **加载后校验**：Skill 加载后检查 description 与用户问题的匹配度，不匹配则放弃
-- **描述规范化**：要求 Skill description 明确使用场景和触发条件
+**Solutions**:
+- **Query Type Recognition**: Identify checklist-style queries and skip Skill recommendations directly
+- **Post-Load Validation**: After Skill loading, check the match between the description and the user's question; discard if mismatched
+- **Description Standardization**: Require Skill descriptions to clearly state usage scenarios and trigger conditions
 
-### 1.3 问题三：Skill 选择错误
+### 1.3 Problem 3: Incorrect Skill Selection
 
-**主要问题**  
-在多个可用 Skill 中选择了不匹配的 Skill，或者选择的不是最优的Skill。
+**Main Problem**  
+Among multiple available Skills, the wrong Skill is selected, or the selected Skill is suboptimal.
 
-**具体表现**：
-- `根因分析` 和 `问题解决` 选择混淆
-- LLM 的选择与预期不一致
+**Specific Manifestations**:
+- Confusion between `root cause analysis` and `problem resolution` selection
+- LLM selection does not match expectations
 
-**根本原因分析**：
-1. **Skill 边界模糊**：随着 Skill 数量增加，功能边界越来越不清晰
-2. **描述重叠**：多个 Skill 的 description 存在功能重叠或者LLM无法区分Skill描述中的差别
-3. **缺乏明确的使用指导**：没有清晰的决策树来指导 Skill 选择
+**Root Cause Analysis**:
+1. **Blurry Skill Boundaries**: As Skill count increases, functional boundaries become increasingly unclear
+2. **Description Overlap**: Multiple Skills have overlapping functionality in their descriptions, or the LLM cannot distinguish differences in Skill descriptions
+3. **Lack of Clear Usage Guidance**: No clear decision tree to guide Skill selection
 
-**解决方案**：
-- **Skill 分层设计**：将大 Skill 拆分为小的、可组合的「原子 Skill」
-- **明确边界定义**：在 Skill description 中明确使用场景和与其他 Skill 的关系
-- **增加决策辅助**：提供 Skill 选择的决策树或规则引擎
+**Solutions**:
+- **Skill Layered Design**: Break large Skills into small, composable "atomic Skills"
+- **Clear Boundary Definition**: Explicitly state usage scenarios and relationships with other Skills in Skill descriptions
+- **Add Decision Assistance**: Provide decision trees or rule engines for Skill selection
 
-## 2. Skill 执行质量问题
+## 2. Skill Execution Quality Issues
 
-### 2.1 问题四：不按流程执行
+### 2.1 Problem 4: Not Following the Defined Process
 
-**主要问题**  
-即使 Skill 成功加载，LLM 也不严格按照 Skill 定义的流程执行。
+**Main Problem**  
+Even when a Skill is successfully loaded, the LLM does not strictly follow the process defined by the Skill.
 
-**具体表现**：
-- 跳过「查历史」步骤直接查数据（省事但丢失历史经验）
-- 查到列表后不分析详情就下结论（如「有 50 条慢 Trace」但不分析任何一条）
-- 流程执行不完整，遗漏关键步骤
+**Specific Manifestations**:
+- Skipping the "check history" step and directly querying data (saves effort but loses historical experience)
+- After finding a list, drawing conclusions without analyzing details (e.g., "50 slow traces" found but none analyzed)
+- Incomplete process execution, missing critical steps
 
-**根本原因分析**：
-1. **Prompt 本质限制**：Skill 本质是 Prompt，而 LLM 对 Prompt 的遵循度本身不是 100%。
-2. **效率与完整性的权衡**：LLM 可能为了效率而跳过某些步骤
-3. **缺乏执行监控**：没有机制确保每个步骤都被正确执行
+**Root Cause Analysis**:
+1. **Inherent Prompt Limitations**: Skills are essentially prompts, and LLM adherence to prompts is inherently not 100%
+2. **Efficiency vs. Completeness Trade-off**: LLMs may skip certain steps for efficiency
+3. **Lack of Execution Monitoring**: No mechanism to ensure every step is correctly executed
 
-**解决方案**：
-- **阶段化设计**：每一阶段有清晰的动作、目标和成功/失败衡量标准
-- **强制检查点**：在关键步骤设置强制检查点，确保必要步骤不被跳过
-- **执行日志记录**：记录每个步骤的执行情况，便于后续分析和优化
+**Solutions**:
+- **Phased Design**: Each phase has clear actions, goals, and success/failure metrics
+- **Mandatory Checkpoints**: Set mandatory checkpoints at critical steps to ensure essential steps are not skipped
+- **Execution Logging**: Record the execution status of each step for subsequent analysis and optimization
 
-### 2.2 问题五：结论缺乏依据
+### 2.2 Problem 5: Conclusions Lack Substantiation
 
-**主要问题**  
-LLM 按照 Skill 流程执行，但最终结论缺乏数据支撑或逻辑依据。
+**Main Problem**  
+The LLM follows the Skill process but final conclusions lack data support or logical basis.
 
-**具体表现**：
-- 流程走完但结论仍是「可能是 xxx」等模糊表述
-- 结论与收集的数据不一致
-- 报告数据齐全但根因定位错误
+**Specific Manifestations**:
+- Process completed but conclusions remain vague formulations like "might be xxx"
+- Conclusions inconsistent with collected data
+- Reports have complete data but root cause identification is wrong
 
-**根本原因分析**：
-1. **LLM 推理局限性**：LLM 容易在证据不足时用语言技巧将不确定包装成确定
-2. **缺乏事实验证机制**：无法验证结论的事实正确性
-3. **审核机制不足**：现有审核只能检查形式完整性，无法判断结论正确性
+**Root Cause Analysis**:
+1. **LLM Reasoning Limitations**: LLMs tend to use linguistic tricks to package uncertainty as certainty when evidence is insufficient
+2. **Lack of Fact Verification Mechanism**: Cannot verify the factual correctness of conclusions
+3. **Insufficient Review Mechanism**: Existing reviews can only check formal completeness, not conclusion correctness
 
-**解决方案**：
-- **硬性约束**：在 Skill 正文中明确要求「结论必须有数据佐证」
-- **结构化报告**：通过 `格式要求` 定义必须包含的报告结构
-- **前置审核**：通过 `审核工具` 在输出前进行审核
-- **Red Flags 机制**：识别并阻止典型的推理错误模式
+**Solutions**:
+- **Hard Constraints**: Explicitly require in Skill body that "conclusions must be supported by data"
+- **Structured Reports**: Define required report structure through `format requirements`
+- **Pre-Output Review**: Review via `review tool` before output
+- **Red Flags Mechanism**: Identify and block typical reasoning error patterns
 
-## 3. 架构与系统层面问题
+## 3. Architecture & System-Level Issues
 
-### 3.1 问题六：审核机制有效性不足
+### 3.1 Problem 6: Ineffective Review Mechanism
 
-**主要问题**  
-"LLM 审 LLM" 的审核机制存在先天缺陷，无法有效保证输出质量。
+**Main Problem**  
+The "LLM reviewing LLM" review mechanism has inherent flaws and cannot effectively guarantee output quality.
 
-**具体表现**：
-- 审核通过的报告可能存在根因定位错误
-- 审核模型只能检查形式完整性，无法判断事实正确性
-- 审核标准依赖 LLM 的理解和遵循
+**Specific Manifestations**:
+- Reports passing review may have incorrect root cause identification
+- Review models can only check formal completeness, not factual correctness
+- Review standards depend on LLM understanding and adherence
 
-**根本原因分析**：
-1. **能力不对等**：审核模型能力弱于主模型，可能漏判
-2. **同质化问题**：本质上仍是 LLM 审 LLM，存在相同的认知局限
-3. **事实验证缺失**：缺乏外部知识库或真实数据来验证结论的正确性
+**Root Cause Analysis**:
+1. **Capability Asymmetry**: Review models are weaker than primary models and may miss issues
+2. **Homogeneity Problem**: It's still essentially LLM reviewing LLM, with the same cognitive limitations
+3. **Missing Fact Verification**: Lack of external knowledge bases or real data to verify conclusion correctness
 
-**解决方案**：
-- **多模型审核**：引入不同能力等级的模型进行分层审核
-- **规则引擎补充**：结合基于规则的审核机制，减少对 LLM 的完全依赖
-- **事后验证机制**：建立用户反馈和真实效果的收集机制，用于持续优化
+**Solutions**:
+- **Multi-Model Review**: Introduce models of different capability tiers for layered review
+- **Rule Engine Supplement**: Combine rule-based review mechanisms to reduce complete dependence on LLMs
+- **Post-Hoc Verification**: Establish user feedback and real-world effectiveness collection mechanisms for continuous optimization
 
-### 3.2 问题七：系统复杂度与维护成本
+### 3.2 Problem 7: System Complexity & Maintenance Cost
 
-**主要问题**  
-为解决各种问题而增加的多层控制机制导致系统复杂度急剧上升。
+**Main Problem**  
+Multi-layer control mechanisms added to solve various problems cause system complexity to escalate sharply.
 
-**具体表现**：
-- 调试时难以定位问题所在（不知道是哪层的问题）
-- 修改一个组件可能影响其他组件
-- 缺乏系统性的调试工具
+**Specific Manifestations**:
+- Difficult to locate problems during debugging (unclear which layer is at fault)
+- Modifying one component may affect others
+- Lack of systematic debugging tools
 
-**根本原因分析**：
-1. **工程补救模型缺陷**：用工程手段试图弥补模型本身的缺陷
-2. **组件耦合度高**：各层控制机制之间存在复杂的依赖关系
-3. **缺乏模块化设计**：系统架构不够清晰，组件边界不明确
+**Root Cause Analysis**:
+1. **Engineering Patchwork for Model Deficiencies**: Using engineering approaches to try compensating for model deficiencies
+2. **High Component Coupling**: Complex dependency relationships exist between layers of control mechanisms
+3. **Lack of Modular Design**: System architecture is not clear enough, component boundaries are ambiguous
 
-**解决方案**：
-- **模块化重构**：将系统拆分为独立的、低耦合的模块
-- **标准化接口**：定义清晰的组件间接口和数据流
-- **系统性调试工具**：开发专门的调试工具，支持端到端的问题追踪
+**Solutions**:
+- **Modular Refactoring**: Decompose the system into independent, low-coupling modules
+- **Standardized Interfaces**: Define clear inter-component interfaces and data flows
+- **Systematic Debugging Tools**: Develop specialized debugging tools supporting end-to-end issue tracing
 
-### 3.3 问题八：缺乏量化评估机制
+### 3.3 Problem 8: Lack of Quantitative Evaluation Mechanism
 
-**主要问题**  
-无法通过量化数据来评估和优化 Skill 的效果。
+**Main Problem**  
+Cannot evaluate and optimize Skill effectiveness through quantitative data.
 
-**具体表现**：
-- 不知道 Skill 的触发率、执行完成率
-- 无法比较使用 Skill 和不使用 Skill 的质量差异
-- 优化依赖主观感受而非客观数据
+**Specific Manifestations**:
+- Unknown Skill trigger rates and execution completion rates
+- Cannot compare quality differences between using and not using Skills
+- Optimization relies on subjective perception rather than objective data
 
-**根本原因分析**：
-1. **基础设施缺失**：缺乏 A/B 测试和数据收集的基础设施
-2. **评估指标不明确**：没有定义清晰的评估指标和方法
-3. **反馈闭环缺失**：缺少用户反馈和真实效果的收集机制
+**Root Cause Analysis**:
+1. **Missing Infrastructure**: Lack of A/B testing and data collection infrastructure
+2. **Unclear Evaluation Metrics**: No clearly defined evaluation metrics and methods
+3. **Missing Feedback Loop**: Lack of user feedback and real-world effectiveness collection mechanisms
 
-**解决方案**：
-- **建立监控体系**：实现 Skill 使用情况的全面监控
-- **A/B 测试框架**：构建支持 A/B 测试的实验框架
-- **用户反馈机制**：建立用户反馈和效果评估的闭环
+**Solutions**:
+- **Establish Monitoring System**: Implement comprehensive monitoring of Skill usage
+- **A/B Testing Framework**: Build an experimentation framework supporting A/B testing
+- **User Feedback Mechanism**: Establish a closed loop for user feedback and effectiveness evaluation
 
-## 4. 开发与维护成本问题
+## 4. Development & Maintenance Cost Issues
 
-### 4.1 问题九：Skill 编写门槛过高
+### 4.1 Problem 9: Skill Authoring Barrier Too High
 
-**主要问题**  
-编写高质量的 Skill 需要同时具备领域专业知识和 Prompt 工程能力。
+**Main Problem**  
+Writing high-quality Skills requires both domain expertise and prompt engineering skills simultaneously.
 
-**具体表现**：
-- 领域专家写的 Skill 太抽象，LLM 无法执行
-- Prompt 工程师写的 Skill 流程可能不符合领域最佳实践
-- 两种能力的交集很小，导致 Skill 质量参差不齐
+**Specific Manifestations**:
+- Skills written by domain experts are too abstract for LLMs to execute
+- Skills written by prompt engineers may not follow domain best practices
+- The intersection of both skill sets is small, leading to uneven Skill quality
 
-**根本原因分析**：
-1. **跨领域能力要求**：需要同时掌握领域知识和 LLM 交互技巧
-2. **缺乏标准化模板**：没有统一的 Skill 编写规范和模板
-3. **经验积累不足**：团队在 Skill 编写方面的经验有限
+**Root Cause Analysis**:
+1. **Cross-Domain Capability Requirements**: Must master both domain knowledge and LLM interaction techniques
+2. **Lack of Standardized Templates**: No unified Skill authoring specifications and templates
+3. **Insufficient Experience Accumulation**: Team has limited experience in Skill authoring
 
-**解决方案**：
-- **协作开发模式**：建立领域专家和 Prompt 工程师的协作开发流程
-- **标准化模板**：提供详细的 Skill 编写模板和最佳实践指南
-- **技能库建设**：积累和复用高质量的 Skill 模式
+**Solutions**:
+- **Collaborative Development Model**: Establish a collaborative development workflow between domain experts and prompt engineers
+- **Standardized Templates**: Provide detailed Skill authoring templates and best practice guides
+- **Skill Library Construction**: Accumulate and reuse high-quality Skill patterns
 
-### 4.2 问题十：Skill 冲突与维护困难
+### 4.2 Problem 10: Skill Conflicts & Maintenance Difficulty
 
-**主要问题**  
-随着 Skill 数量增加，维护和管理变得越来越困难。
+**Main Problem**  
+As Skill count increases, maintenance and management become increasingly difficult.
 
-**具体表现**：
-- Skill 之间存在功能重叠和冲突
-- 调试和定位问题非常困难
-- 修改一个 Skill 可能影响其他相关 Skill
+**Specific Manifestations**:
+- Functional overlap and conflicts exist between Skills
+- Debugging and issue localization are very difficult
+- Modifying one Skill may affect other related Skills
 
-**根本原因分析**：
-1. **缺乏整体规划**：Skill 开发缺乏统一的架构规划
-2. **版本管理缺失**：没有完善的 Skill 版本管理和依赖管理
-3. **测试覆盖不足**：缺乏全面的测试用例来验证 Skill 的正确性
+**Root Cause Analysis**:
+1. **Lack of Holistic Planning**: Skill development lacks unified architectural planning
+2. **Missing Version Management**: No comprehensive Skill version management and dependency management
+3. **Insufficient Test Coverage**: Lack of comprehensive test cases to validate Skill correctness
 
-**解决方案**：
-- **架构治理**：建立 Skill 架构治理机制，明确 Skill 的职责边界
-- **版本管理**：实现 Skill 的版本管理和依赖管理
-- **自动化测试**：建立完善的自动化测试体系
+**Solutions**:
+- **Architecture Governance**: Establish Skill architecture governance mechanisms, clarify Skill responsibility boundaries
+- **Version Management**: Implement Skill version management and dependency management
+- **Automated Testing**: Establish a comprehensive automated testing system

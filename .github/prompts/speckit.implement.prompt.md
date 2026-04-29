@@ -159,14 +159,14 @@ The `/speckit.implement` command automatically integrates with the feature track
     - Update the "Last Updated" date
   - Automatically stage the changes to `.specify/memory/features.md` for git commit
 
-In addition, **implement 阶段必须复核 Feature 列表**：
+In addition, **the implement phase MUST review the Feature list**:
 
-- 实现结果可能引入新的 Feature、削弱/替代已有 Feature 或需要删除 Feature。
-- 确保功能性/非功能性 Feature 分类保持一致。
-- 若有变更，必须同步更新：
+- Implementation results may introduce new Features, weaken/replace existing Features, or require Feature deletion.
+- Ensure functional/non-functional Feature classification remains consistent.
+- If changes exist, synchronize updates to:
   - `.specify/memory/features/<ID>.md`
   - `.specify/memory/features.md`
-- 在 Feature 详情中记录实现带来的“关键变化/备注”。
+- Record "key changes/notes" brought by implementation in the Feature details.
 
 This integration ensures that all feature implementation activities are properly tracked and linked to their corresponding entries in the project's feature index.
 
@@ -186,33 +186,33 @@ Note: This command assumes a complete task breakdown exists in tasks.md. If task
 
 ## Optional: Generate a Git Commit Command
 
-在实现与校验完成后，生成一条可直接执行的提交命令：
+After implementation and validation are complete, generate a directly executable commit command:
 
 ```sh
 git add -A && git commit -m "{msg}"
 ```
 
-### Commit Message 生成方式（基于模版）
+### Commit Message Generation Method (Template-Based)
 
-1. **加载 commit message 模版**：
-   - 优先：`.specify/templates/commit-template.md`
-   - 兜底：`.specify/templates/commit-template.md`
+1. **Load commit message template**:
+   - Preferred: `.specify/templates/commit-template.md`
+   - Fallback: `.specify/templates/commit-template.md`
 
-2. **收集渲染模版所需上下文**（优先复用前文已解析出的 REQUIREMENTS_DIR）：
-   - `[BRANCH]`：`git rev-parse --abbrev-ref HEAD`
-   - `[REQUIREMENTS_KEY]`：从 `REQUIREMENTS_DIR` 目录名推导（形如 `.specify/specs/NNN-short-name/` → `NNN-short-name`）
-   - `[FEATURE_TITLE]`：优先读取 `REQUIREMENTS_DIR/requirements.md` 的标题或 Feature 名称
-   - `[TYPE]`：基于本次变更主要落点选择（feat/fix/docs/test/chore）
-   - `[SCOPE]`：优先用 `[REQUIREMENTS_KEY]`，否则从 `[BRANCH]` 推导
-   - `[SUBJECT]`：一句话摘要，需与 spec 文档与实现内容语义一致
+2. **Collect context needed to render the template** (prefer reusing REQUIREMENTS_DIR parsed earlier):
+   - `[BRANCH]`: `git rev-parse --abbrev-ref HEAD`
+   - `[REQUIREMENTS_KEY]`: Derived from the `REQUIREMENTS_DIR` directory name (e.g., `.specify/specs/NNN-short-name/` → `NNN-short-name`)
+   - `[FEATURE_TITLE]`: Prefer reading the title or Feature name from `REQUIREMENTS_DIR/requirements.md`
+   - `[TYPE]`: Choose based on the main focus of this change (feat/fix/docs/test/chore)
+   - `[SCOPE]`: Prefer `[REQUIREMENTS_KEY]`, otherwise derive from `[BRANCH]`
+   - `[SUBJECT]`: One-line summary, semantically consistent with spec documents and implementation content
 
-3. **按模版渲染生成 `{msg}`**，并生成完整命令：
+3. **Render `{msg}` from the template**, and generate the full command:
    - `git add -A && git commit -m "{msg}"`
 
-### 交互要求（必须执行）
+### Interaction Requirements (Must Execute)
 
-1. 将生成的 `{msg}` 与完整命令原样展示给用户。
-2. 明确提示用户：
-  - 是否现在执行提交动作？（yes/no）
-  - 如需改写 message，可先回复期望的 message，再生成命令。
-3. **仅当用户明确回复 yes/proceed/continue 时**，才执行该命令；否则只停留在提示与展示阶段。
+1. Display the generated `{msg}` and full command as-is to the user.
+2. Explicitly prompt the user:
+  - Execute the commit now? (yes/no)
+  - To rewrite the message, reply with the desired message first, then generate the command.
+3. **Only execute the command when the user explicitly replies yes/proceed/continue**; otherwise stay at the prompt and display stage.
