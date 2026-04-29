@@ -19,11 +19,11 @@ scripts:
 
 ## Terminology: Requirement vs Specification vs Feature
 
-- **Requirement（需求 / What）**：从利益相关者视角描述系统必须满足的目标、能力与验收条件（价值与约束）。
-- **Specification（规格 / How）**：从设计/实现视角描述“如何实现需求”的方案与约束（如 plan.md、tasks.md、contracts/）。
-- **Feature（特性）**：一个以价值与范围为中心的**需求分组单位**（概念/计划阶段常用），包含一组 Requirements（What），并驱动后续 Specifications（How）的产出。
+- **Requirement (What)**: Describes the goals, capabilities, and acceptance criteria the system must satisfy from a stakeholder perspective (value and constraints).
+- **Specification (How)**: Describes the solutions and constraints for "how to implement the requirements" from a design/implementation perspective (e.g., plan.md, tasks.md, contracts/).
+- **Feature**: A **requirements grouping unit** centered on value and scope (commonly used in concept/planning phases), containing a set of Requirements (What) and driving subsequent Specifications (How).
 
-> 记忆法：Requirement = 目标（What），Specification = 方案（How）。本命令产出的 checklist 是“需求写作的单元测试”，不是实现验证。
+> Mnemonic: Requirement = Goal (What), Specification = Solution (How). The checklist produced by this command is a "unit test for requirements writing", not implementation verification.
 
 ## Checklist Purpose: "Unit Tests for English"
 
