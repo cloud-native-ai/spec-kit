@@ -42,7 +42,7 @@ Execution steps:
 
 1. **Identify target tool basic info**
    - Parse `$ARGUMENTS` to extract **tool-definition intent** (tool name/capability description), not immediate runtime action.
-   - If user input is a verb phrase (e.g., “下载…/同步…/生成…”), interpret it as candidate tool purpose and continue create/find flow first.
+   - If user input is a verb phrase (e.g., “download.../sync.../generate...”), interpret it as candidate tool purpose and continue create/find flow first.
    - If missing, present interactive selection from available tools.
 
 2. **Discover tools via script**

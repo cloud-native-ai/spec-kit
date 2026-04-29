@@ -38,7 +38,7 @@
 **Additional Constraints from Input**:
 
 - 用户已明确要求“唯一标识”优先解决 tool 与 skill 的触发不确定性问题。
-- 用户建议使用相对文件路径作为唯一标识，本次计划采纳为 canonical 方案。
+- 用户建议使用相对File path作为唯一标识，本次计划采纳为 canonical 方案。
 - 唯一标识必须能在后续文档或对话中复用，而不仅仅出现在创建当次输出中。
 
 **Gates Status**: ✅ All gates pass

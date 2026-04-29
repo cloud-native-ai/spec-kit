@@ -120,10 +120,10 @@ The `/speckit.tasks` command automatically integrates with the feature tracking 
     - Update the "Last Updated" date
   - Automatically stage the changes to `.specify/memory/features.md` for git commit
 
-In addition, **tasks 阶段必须复核 Feature 列表**：
+In addition, **The tasks phase MUST review the Feature list**:
 
-- 任务拆分可能暴露新的 Feature 或提示旧 Feature 不再适用。
-- 确保功能性/非功能性 Feature 分类保持一致。
+- Task breakdown may expose new Features or indicate that old Features are no longer applicable.
+- Ensure functional/non-functional Feature classification remains consistent.
 - 若发现 Feature 变更，必须同步更新：
    - `.specify/memory/features/<ID>.md`
    - `.specify/memory/features.md`

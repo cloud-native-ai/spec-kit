@@ -160,6 +160,6 @@ Task: "T013 [P] [US1] 更新生成模板约束 in templates/commands/agents.md"
 
 ## Notes
 
-- 所有任务均遵循 `- [ ] Txxx [P] [USx] 描述 + 文件路径` 格式。
+- 所有任务均遵循 `- [ ] Txxx [P] [USx] 描述 + File path` 格式。
 - `[P]` 仅用于不同文件或无未完成依赖的任务。
 - 每个用户故事都包含独立验收标准，支持分阶段交付。

@@ -24,7 +24,7 @@
 
 - **[P]**: Can run in parallel (different files, no blocking dependencies)
 - **[Story]**: User story label (`[US1]`, `[US2]`, `[US3]`) for story phases only
-- 每个任务描述都包含明确文件路径
+- 每个任务描述都包含明确File path
 
 ## Phase 1: Setup (Shared Infrastructure)
 
@@ -230,6 +230,6 @@ Task: T026 [US2] Mirror tool support profile planner in .specify/scripts/python/
 
 ## Notes
 
-- 所有任务均遵循 `- [ ] T### [P?] [US?] 描述 + 文件路径` 规范
+- 所有任务均遵循 `- [ ] T### [P?] [US?] 描述 + File path` 规范
 - 本次任务拆分未引入新 Feature，也未淘汰既有 Feature；Feature 013 仍为唯一归属
 - 建议 MVP 范围：Phase 1 + Phase 2 + Phase 3

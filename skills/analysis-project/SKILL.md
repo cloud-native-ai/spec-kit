@@ -1,6 +1,6 @@
 ---
 name: analysis-project
-description: Deep analysis of current project with professional architecture reports. Use when the user mentions "分析项目", "分析仓库", "源码分析", "架构分析", "代码分析", "学习这个项目", "研究这个框架"
+description: Deep analysis of current project with professional architecture reports. Use when the user mentions "analyze project", "analyze repository", "source code analysis", "architecture analysis", "code analysis", "study this project", "research this framework"
 ---
 
 # Project Deep Analysis Skill

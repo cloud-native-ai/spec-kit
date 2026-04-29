@@ -15,23 +15,23 @@ This document indexes available tools for the agent.
       "tools": [
         {
           "name": "list_groups",
-          "description": "查询用户有权限的分组列表，支持搜索和分页功能",
+          "description": "Query the list of groups the user has permission to access, with search and pagination support",
           "inputSchema": {
             "type": "object",
             "properties": {
               "search": {
                 "type": "string",
-                "description": "搜索词"
+                "description": "Search term"
               },
               "page": {
                 "type": "integer",
                 "format": "int64",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",
                 "format": "int64",
-                "description": "每一页大小，默认20"
+                "description": "Page size, default is 20"
               }
             },
             "required": []
@@ -40,7 +40,7 @@ This document indexes available tools for the agent.
         },
         {
           "name": "merge_branch",
-          "description": "合并分支到目标分支",
+          "description": "Merge branch into target branch",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -50,15 +50,15 @@ This document indexes available tools for the agent.
               },
               "sourceRef": {
                 "type": "string",
-                "description": "待合并引用名称"
+                "description": "Source ref name to merge"
               },
               "targetBranch": {
                 "type": "string",
-                "description": "目标分支名称"
+                "description": "Target branch name"
               },
               "mergeType": {
                 "type": "string",
-                "description": "合并类型，支持的类型有：NO_FF、FAST_FORWARD_ONLY、FAST_FORWARD、SQUASH、REBASE"
+                "description": "Merge type, supported types: NO_FF, FAST_FORWARD_ONLY, FAST_FORWARD, SQUASH, REBASE"
               },
               "mergeMessage": {
                 "type": "string",
@@ -66,11 +66,11 @@ This document indexes available tools for the agent.
               },
               "authorName": {
                 "type": "string",
-                "description": "作者名称"
+                "description": "Author name"
               },
               "authorEmail": {
                 "type": "string",
-                "description": "作者邮箱"
+                "description": "Author email"
               }
             },
             "required": [
@@ -86,7 +86,7 @@ This document indexes available tools for the agent.
         },
         {
           "name": "get_repo_security_level",
-          "description": "批量获取仓库代码安全等级。安全等级分为：C1（公开代码）可对外开源，无敏感信息或知识产权风险；C2（内部代码）对外闭源，不涉及核心敏感业务逻辑；C3（核心代码）对外闭源，包含核心敏感业务、数据、知识产权或基础设施相关，不可使用外部AI模型进行代码操作",
+          "description": "Batch retrieve repository code security levels. Security levels: C1 (Public Code) can be open-sourced externally, no sensitive info or IP risk; C2 (Internal Code) closed-source externally, does not involve core sensitive business logic; C3 (Core Code) closed-source externally, contains core sensitive business, data, IP or infrastructure, must not use external AI models for code operations",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -133,17 +133,17 @@ This document indexes available tools for the agent.
               },
               "search": {
                 "type": "string",
-                "description": "搜索词"
+                "description": "Search term"
               },
               "page": {
                 "type": "integer",
                 "format": "int64",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",
                 "format": "int64",
-                "description": "每一页大小，默认20"
+                "description": "Page size, default is 20"
               }
             },
             "required": [
@@ -229,11 +229,11 @@ This document indexes available tools for the agent.
               },
               "oldFilePath": {
                 "type": "string",
-                "description": "旧文件路径"
+                "description": "旧File path"
               },
               "newFilePath": {
                 "type": "string",
-                "description": "新文件路径"
+                "description": "新File path"
               }
             },
             "required": [
@@ -288,7 +288,7 @@ This document indexes available tools for the agent.
               },
               "filePath": {
                 "type": "string",
-                "description": "文件路径"
+                "description": "File path"
               },
               "startLine": {
                 "type": "integer",
@@ -325,7 +325,7 @@ This document indexes available tools for the agent.
               },
               "filePath": {
                 "type": "string",
-                "description": "文件路径"
+                "description": "File path"
               },
               "startLine": {
                 "type": "integer",
@@ -388,7 +388,7 @@ This document indexes available tools for the agent.
               },
               "path": {
                 "type": "string",
-                "description": "文件路径，可选，用于获取特定文件的提交历史"
+                "description": "File path，可选，用于获取特定文件的提交历史"
               },
               "since": {
                 "type": "string",
@@ -546,7 +546,7 @@ This document indexes available tools for the agent.
               },
               "filePath": {
                 "type": "string",
-                "description": "文件路径"
+                "description": "File path"
               },
               "sizeLimit": {
                 "type": "integer",
@@ -765,7 +765,7 @@ This document indexes available tools for the agent.
         },
         {
           "name": "list_repo_merge_requests_created_by_me",
-          "description": "查询我创建的代码仓库代码评审MR列表，可以根据仓库ID，搜索词，代码评审状态等查询代码评审列表",
+          "description": "查询我创建的代码仓库代码评审MR列表，可以根据仓库ID，Search term，代码评审状态等查询代码评审列表",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -775,7 +775,7 @@ This document indexes available tools for the agent.
               },
               "search": {
                 "type": "string",
-                "description": "搜索词"
+                "description": "Search term"
               },
               "state": {
                 "type": "string",
@@ -792,7 +792,7 @@ This document indexes available tools for the agent.
               "page": {
                 "type": "integer",
                 "format": "int64",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",
@@ -808,13 +808,13 @@ This document indexes available tools for the agent.
         },
         {
           "name": "list_merge_requests_reviewed_by_me",
-          "description": "全局查询我评审的代码评审MR列表，可以根据搜索词，代码评审状态等查询代码评审列表",
+          "description": "全局查询我评审的代码评审MR列表，可以根据Search term，代码评审状态等查询代码评审列表",
           "inputSchema": {
             "type": "object",
             "properties": {
               "search": {
                 "type": "string",
-                "description": "搜索词"
+                "description": "Search term"
               },
               "state": {
                 "type": "string",
@@ -827,7 +827,7 @@ This document indexes available tools for the agent.
               "page": {
                 "type": "integer",
                 "format": "int64",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",
@@ -841,7 +841,7 @@ This document indexes available tools for the agent.
         },
         {
           "name": "list_repo_merge_requests_reviewed_by_me",
-          "description": "查询我评审的代码仓库代码评审MR列表，可以根据仓库ID，搜索词，代码评审状态等查询代码评审列表",
+          "description": "查询我评审的代码仓库代码评审MR列表，可以根据仓库ID，Search term，代码评审状态等查询代码评审列表",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -851,7 +851,7 @@ This document indexes available tools for the agent.
               },
               "search": {
                 "type": "string",
-                "description": "搜索词"
+                "description": "Search term"
               },
               "state": {
                 "type": "string",
@@ -868,7 +868,7 @@ This document indexes available tools for the agent.
               "page": {
                 "type": "integer",
                 "format": "int64",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",
@@ -884,13 +884,13 @@ This document indexes available tools for the agent.
         },
         {
           "name": "list_merge_requests_created_by_me",
-          "description": "全局查询我创建的代码评审MR列表，可以根据搜索词，代码评审状态等查询代码评审列表",
+          "description": "全局查询我创建的代码评审MR列表，可以根据Search term，代码评审状态等查询代码评审列表",
           "inputSchema": {
             "type": "object",
             "properties": {
               "search": {
                 "type": "string",
-                "description": "搜索词"
+                "description": "Search term"
               },
               "state": {
                 "type": "string",
@@ -903,7 +903,7 @@ This document indexes available tools for the agent.
               "page": {
                 "type": "integer",
                 "format": "int64",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",
@@ -940,7 +940,7 @@ This document indexes available tools for the agent.
               },
               "path": {
                 "type": "string",
-                "description": "变更文件路径"
+                "description": "变更File path"
               },
               "startLine": {
                 "type": "integer",
@@ -1100,7 +1100,7 @@ This document indexes available tools for the agent.
         },
         {
           "name": "list_repo_merge_requests",
-          "description": "查询代码仓库代码评审MR列表，可以根据仓库ID，搜索词，代码评审状态等查询代码评审列表",
+          "description": "查询代码仓库代码评审MR列表，可以根据仓库ID，Search term，代码评审状态等查询代码评审列表",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -1110,7 +1110,7 @@ This document indexes available tools for the agent.
               },
               "search": {
                 "type": "string",
-                "description": "搜索词"
+                "description": "Search term"
               },
               "state": {
                 "type": "string",
@@ -1127,7 +1127,7 @@ This document indexes available tools for the agent.
               "page": {
                 "type": "integer",
                 "format": "int64",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",
@@ -1185,7 +1185,7 @@ This document indexes available tools for the agent.
               },
               "path": {
                 "type": "string",
-                "description": "变更文件路径"
+                "description": "变更File path"
               },
               "line": {
                 "type": "integer",
@@ -1221,7 +1221,7 @@ This document indexes available tools for the agent.
               "page": {
                 "type": "integer",
                 "format": "int64",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",
@@ -1409,7 +1409,7 @@ This document indexes available tools for the agent.
               "page": {
                 "type": "integer",
                 "format": "int64",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",
@@ -1500,7 +1500,7 @@ This document indexes available tools for the agent.
               "page": {
                 "type": "integer",
                 "format": "int32",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",
@@ -1535,7 +1535,7 @@ This document indexes available tools for the agent.
               "page": {
                 "type": "integer",
                 "format": "int32",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",
@@ -1570,7 +1570,7 @@ This document indexes available tools for the agent.
               "page": {
                 "type": "integer",
                 "format": "int32",
-                "description": "页码，默认为1"
+                "description": "Page number, default is 1"
               },
               "pageSize": {
                 "type": "integer",

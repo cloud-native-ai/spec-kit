@@ -3,7 +3,7 @@
 **Requirement Branch**: `005-tool-skill-ids`  
 **Created**: 2026-03-10  
 **Status**: Draft  
-**Input**: User description: "为tools和skills增加唯一标识。如docs/skills/problems.md文档中所描述的，当前应用skill和tool的主要问题是”触发“，skill和tool都使用自然语言的模糊匹配方式进行触发，存在大量的不确定性。我希望在/speckit.tools和/speckit.skills命令中能够在调用对应的create-new-*.sh脚本后生成一个唯一标识（建议使用相对文件路径），这个唯一标识可以在随后的文档或对话中用来定位一个具体的tool或skill。"
+**Input**: User description: "为tools和skills增加唯一标识。如docs/skills/problems.md文档中所描述的，当前应用skill和tool的主要问题是”触发“，skill和tool都使用自然语言的模糊匹配方式进行触发，存在大量的不确定性。我希望在/speckit.tools和/speckit.skills命令中能够在调用对应的create-new-*.sh脚本后生成一个唯一标识（建议使用相对File path），这个唯一标识可以在随后的文档或对话中用来定位一个具体的tool或skill。"
 
 ## User Scenarios & Testing *(mandatory)*
 

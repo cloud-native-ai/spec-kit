@@ -35,7 +35,7 @@
 | Field | Type | Required | Description |
 |------|------|----------|-------------|
 | `assistant_key` | string | yes | 关联 `SupportedAssistant.key` |
-| `project_rules_path` | string | no | 助手说明/上下文文件路径，如 `.qoder/project_rules.md` |
+| `project_rules_path` | string | no | 助手说明/上下文File path，如 `.qoder/project_rules.md` |
 | `command_paths` | array<string> | yes | 生成的命令文件列表 |
 | `generated_on_init` | boolean | yes | 是否在初始化时生成 |
 | `generated_on_refresh` | boolean | yes | 是否在刷新时更新 |
@@ -70,7 +70,7 @@
 |------|------|----------|-------------|
 | `surface_id` | string | yes | 唯一标识，如 `readme-supported-agents` |
 | `surface_type` | enum | yes | `cli-help`、`documentation`、`template`、`script-output`、`release-output` |
-| `location` | string | yes | 文件路径或生成目标 |
+| `location` | string | yes | File path或生成目标 |
 | `must_include_assistants` | array<string> | yes | 该表面必须列出的助手 key |
 | `must_include_install_guidance` | boolean | yes | 是否必须提供安装/获取信息 |
 | `release_blocking` | boolean | yes | 不一致是否构成发布阻塞 |
