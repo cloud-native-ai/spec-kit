@@ -72,10 +72,13 @@ Follow this execution flow:
    - If user input (conversation) supplies a value, use it.
    - Otherwise infer from existing repo context (README, docs, prior constitution versions if embedded).
    - For governance dates: `RATIFICATION_DATE` is the original adoption date (if unknown ask or mark TODO), `LAST_AMENDED_DATE` is today if changes are made, otherwise keep previous.
-   - `CONSTITUTION_VERSION` must increment according to semantic versioning rules:
-     - MAJOR: Backward incompatible governance/principle removals or redefinitions.
-     - MINOR: New principle/section added or materially expanded guidance.
-     - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
+   - `CONSTITUTION_VERSION` must use the `x.y.z.ddd` format and increment according to the following rules:
+     - **MAJOR (x)**: Rewrite-level changes — complete restructuring of principles, backward incompatible governance removals or fundamental redefinitions. Bump: `x+1.0.0.0`
+     - **MINOR (y)**: Core section modifications — adding/removing/renaming principles, materially expanding or contracting principle scope. Bump: `x.y+1.0.0`
+     - **PATCH (z)**: Descriptive refinements — clarifications, wording improvements, typo fixes, non-semantic adjustments to existing principles. Bump: `x.y.z+1.0`
+     - **DAILY (ddd)**: Every update — this counter increments on EVERY constitution update regardless of the change magnitude. Bump: `x.y.z.ddd+1`
+     - When x, y, or z increments, the `ddd` counter resets to `0` and then increments to `1` (e.g., `1.2.3.15` → minor bump → `1.3.0.1`).
+     - When only ddd increments, x, y, z remain unchanged (e.g., `1.2.3.15` → daily bump → `1.2.3.16`).
    - If version bump type ambiguous, propose reasoning before finalizing.
 
 3. Draft the updated constitution content:
@@ -103,32 +106,25 @@ Follow this execution flow:
      with the specific file path, line range (if determinable), and what needs manual review.
 
 5. Produce a Sync Impact Report (prepend as an HTML comment at top of the constitution file after update):
-   - Version change: old → new
+   - Version change: old → new (with bump type: MAJOR / MINOR / PATCH / DAILY)
    - List of modified principles (old title → new title if renamed)
    - Added sections
    - Removed sections
    - Templates requiring updates (✅ updated / ⚠ pending) with file paths
    - Follow-up TODOs if any placeholders intentionally deferred.
 
-6. Idempotency safeguard:
-   - Compare the proposed constitution content with the existing `constitution.md` content.
-   - If no semantic change is detected (ignoring whitespace, date-only updates, and the Sync Impact Report):
-     - Do NOT increment the version.
-     - Inform the user that the constitution is already up to date with the proposed changes.
-     - Terminate without writing the file.
-
-7. Validation before final output:
+6. Validation before final output:
    - No remaining unexplained bracket tokens.
-   - Version line matches report.
+   - Version line matches report and follows `x.y.z.ddd` format.
    - Dates ISO format YYYY-MM-DD.
    - Principles are declarative, testable, and free of vague language ("should" → replace with MUST/SHOULD rationale where appropriate).
 
-8. Write the completed constitution back to `.specify/memory/constitution.md` (overwrite).
+7. Write the completed constitution back to `.specify/memory/constitution.md` (overwrite).
 
-9. Output a final summary to the user with:
-   - New version and bump rationale.
+8. Output a final summary to the user with:
+   - New version (`x.y.z.ddd`) and bump rationale (MAJOR / MINOR / PATCH / DAILY).
    - Any files flagged for manual follow-up.
-   - Suggested commit message (e.g., `docs: amend constitution to vX.Y.Z (principle additions + governance update)`).
+   - Suggested commit message (e.g., `docs: amend constitution to vX.Y.Z.DDD (principle additions + governance update)`).
 
 Formatting & Style Requirements:
 
