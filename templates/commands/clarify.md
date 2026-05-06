@@ -1,14 +1,22 @@
 ---
-description: Identify underspecified areas in the current feature spec by asking up to 5 highly targeted clarification questions and encoding answers back into the spec.
+description: "Identify underspecified areas in the current feature artifacts and encode answers back into the phase target (pre-plan requirements.md, post-plan plan.md, post-tasks tasks.md)."
 handoffs:
-   - label: Build Technical Plan
-      agent: speckit.plan
-      prompt: Generate an implementation plan after ambiguities are resolved.
-      send: true
+  - label: Build Technical Plan
+    agent: speckit.plan
+    prompt: Generate an implementation plan after ambiguities are resolved.
+    send: true
+  - label: Create Tasks
+    agent: speckit.tasks
+    prompt: Break the plan into tasks after ambiguities are resolved.
+    send: true
+  - label: Implement Project
+    agent: speckit.implement
+    prompt: Start the implementation after tasks are clarified.
+    send: true
 skills:
-   - analysis-project
+  - analysis-project
 scripts:
-   sh: skills/analysis-project/scripts/research-project.sh --json
+  sh: scripts/bash/check-prerequisites.sh --json --paths-only
 ---
 
 ## User Input
@@ -33,183 +41,336 @@ When processing the user input:
 
 ## Outline
 
-Goal: Detect and reduce ambiguity or missing decision points in the active feature specification and record the clarifications directly in the spec file.
+Goal: Detect and reduce ambiguity or missing decision points in the current phase's primary artifact and record the clarifications directly in that file.
 
-Note: This clarification workflow is expected to run (and be completed) BEFORE invoking `/speckit.plan`. If the user explicitly states they are skipping clarification (e.g., exploratory spike), you may proceed, but must warn that downstream rework risk increases.
+This command supports **three phases** of the SDD lifecycle. It automatically detects the current phase and adapts its target, taxonomy, and integration behavior accordingly.
 
-Execution steps:
+### Phase 0: Phase Detection & Context Setup
 
-1. Run `{SCRIPT}` from repo root **once** (combined `--json` mode). Parse JSON payload fields:
+1. **Run `{SCRIPT}` from repo root once** and parse JSON payload fields:
+   - `REPO_ROOT`
+   - `BRANCH`
+   - `REQUIREMENT_ID`
    - `REQUIREMENTS_DIR`
    - `FEATURE_SPEC`
-   - `AVAILABLE_DOCS`
-   - (Optionally capture `IMPL_PLAN` for future chained flows.)
-   - If JSON parsing fails, abort and instruct user to re-run `/speckit.requirements` or verify feature branch environment.
+   - `IMPL_PLAN`
+   - `TASKS`
 
-2. **Preliminary Research & Context Loading**:
-   - Analyze the `AVAILABLE_DOCS` list from the script output.
-   - Read `FEATURE_SPEC`, `.specify/memory/constitution.md`.
-   - **Check for answers in existing docs**: Before asking the user, check if any apparent ambiguities in the spec are already resolved in the project's documentation (`README.md`, `docs/`, `.specify/memory/`).
-   - If you find definitive answers in the docs, **auto-resolve** them by updating the spec directly (and noting "Resolved via [Doc Name]" in the update summary).
+2. **Determine current phase** by checking file existence in `REQUIREMENTS_DIR`:
 
-3. Load the current spec file. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
+   | Phase | Trigger Condition | Mode | Target File | Handoff |
+   |-------|------------------|------|-------------|---------|
+   | **A: Post-Requirements** | `plan.md` does NOT exist | `requirements` | `{REQUIREMENTS_DIR}/requirements.md` | `/speckit.plan` |
+   | **B: Post-Plan** | `plan.md` exists AND `tasks.md` does NOT exist | `plan` | `{REQUIREMENTS_DIR}/plan.md` | `/speckit.tasks` |
+   | **C: Post-Tasks** | `tasks.md` exists | `tasks` | `{REQUIREMENTS_DIR}/tasks.md` | `/speckit.implement` |
 
-   Feature Linkage:
-   - `Related Feature` section has concrete `Feature ID` and `Feature Name`
-   - The requirement-to-feature relationship is explicit and internally consistent
+   - If none of the above (no `requirements.md` found at all), abort and instruct user to run `/speckit.requirements` first.
+   - Log the detected mode clearly: `**Mode: [A/B/C] — clarifying [target file basename]**`.
 
-   Functional Scope & Behavior:
-   - Core user goals & success criteria
-   - Explicit out-of-scope declarations
-   - User roles / personas differentiation
+3. **Load context** — common across all modes:
+   - Read `.specify/memory/constitution.md`.
+   - Read `README.md` and relevant files under `docs/`.
+   - Read `.specify/memory/features.md` and any relevant files under `.specify/memory/features/`.
+   - If `{REQUIREMENTS_DIR}/research.md` exists, read it.
 
-   Domain & Data Model:
-   - Entities, attributes, relationships
-   - Identity & uniqueness rules
-   - Lifecycle/state transitions
-   - Data volume / scale assumptions
+4. **Load mode-specific context** (see each mode's section below for details).
 
-   Interaction & UX Flow:
-   - Critical user journeys / sequences
-   - Error/empty/loading states
-   - Accessibility or localization notes
+---
 
-   Non-Functional Quality Attributes:
-   - Performance (latency, throughput targets)
-   - Scalability (horizontal/vertical, limits)
-   - Reliability & availability (uptime, recovery expectations)
-   - Observability (logging, metrics, tracing signals)
-   - Security & privacy (authN/Z, data protection, threat assumptions)
-   - Compliance / regulatory constraints (if any)
+### Mode A: Post-Requirements (Target: `requirements.md`)
 
-   Integration & External Dependencies:
-   - External services/APIs and failure modes
-   - Data import/export formats
-   - Protocol/versioning assumptions
+**Additional context to load**: `{REQUIREMENTS_DIR}/requirements.md`.
 
-   Edge Cases & Failure Handling:
-   - Negative scenarios
-   - Rate limiting / throttling
-   - Conflict resolution (e.g., concurrent edits)
+**Taxonomy & Coverage Scan**: Load the spec. For each category below, mark status (Clear / Partial / Missing). Produce an internal coverage map — do not output raw map unless no questions will be asked.
 
-   Constraints & Tradeoffs:
-   - Technical constraints (language, storage, hosting)
-   - Explicit tradeoffs or rejected alternatives
+Feature Linkage:
+- `Related Feature` section has concrete `Feature ID` and `Feature Name`
+- The requirement-to-feature relationship is explicit and internally consistent
 
-   Terminology & Consistency:
-   - Canonical glossary terms
-   - Avoided synonyms / deprecated terms
+Functional Scope & Behavior:
+- Core user goals & success criteria
+- Explicit out-of-scope declarations
+- User roles / personas differentiation
 
-   Completion Signals:
-   - Acceptance criteria testability
-   - Measurable Definition of Done style indicators
+Domain & Data Model:
+- Entities, attributes, relationships
+- Identity & uniqueness rules
+- Lifecycle/state transitions
+- Data volume / scale assumptions
 
-   Misc / Placeholders:
-   - TODO markers / unresolved decisions
-   - Ambiguous adjectives ("robust", "intuitive") lacking quantification
+Interaction & UX Flow:
+- Critical user journeys / sequences
+- Error/empty/loading states
+- Accessibility or localization notes
 
-   For each category with Partial or Missing status, add a candidate question opportunity unless:
-   - Clarification would not materially change implementation or validation strategy
-   - Information is better deferred to planning phase (note internally)
+Non-Functional Quality Attributes:
+- Performance (latency, throughput targets)
+- Scalability (horizontal/vertical, limits)
+- Reliability & availability (uptime, recovery expectations)
+- Observability (logging, metrics, tracing signals)
+- Security & privacy (authN/Z, data protection, threat assumptions)
+- Compliance / regulatory constraints (if any)
 
-   If the spec contains `Feature ID: Need clarification` or `Feature Name: Need clarification`, treat Feature Linkage as a high-priority clarification candidate.
+Integration & External Dependencies:
+- External services/APIs and failure modes
+- Data import/export formats
+- Protocol/versioning assumptions
 
-4. Generate (internally) a prioritized queue of candidate clarification questions (maximum 5). Do NOT output them all at once. Apply these constraints:
-    - **Filter via Research**: Ensure none of these questions are answered by the `research.md` file (if it exists) or the docs analyzed in step 2.
-    - Maximum of 10 total questions across the whole session.
-    - Each question must be answerable with EITHER:
-       - A short multiple‑choice selection (2–5 distinct, mutually exclusive options), OR
-       - A one-word / short‑phrase answer (explicitly constrain: "Answer in <=5 words").
-    - Only include questions whose answers materially impact architecture, data modeling, task decomposition, test design, UX behavior, operational readiness, or compliance validation.
-    - Ensure category coverage balance: attempt to cover the highest impact unresolved categories first; avoid asking two low-impact questions when a single high-impact area (e.g., security posture) is unresolved.
-    - Exclude questions already answered, trivial stylistic preferences, or plan-level execution details (unless blocking correctness).
-    - Favor clarifications that reduce downstream rework risk or prevent misaligned acceptance tests.
-    - If more than 5 categories remain unresolved, select the top 5 by (Impact * Uncertainty) heuristic.
+Edge Cases & Failure Handling:
+- Negative scenarios
+- Rate limiting / throttling
+- Conflict resolution (e.g., concurrent edits)
 
-4. Sequential questioning loop (interactive):
+Constraints & Tradeoffs:
+- Technical constraints (language, storage, hosting)
+- Explicit tradeoffs or rejected alternatives
+
+Terminology & Consistency:
+- Canonical glossary terms
+- Avoided synonyms / deprecated terms
+
+Completion Signals:
+- Acceptance criteria testability
+- Measurable Definition of Done style indicators
+
+Misc / Placeholders:
+- TODO markers / unresolved decisions
+- Ambiguous adjectives ("robust", "intuitive") lacking quantification
+
+For each category with Partial or Missing status, add a candidate question opportunity unless:
+- Clarification would not materially change implementation or validation strategy
+- Information is better deferred to planning phase (note internally)
+
+If the spec contains `Feature ID: Need clarification` or `Feature Name: Need clarification`, treat Feature Linkage as a high-priority clarification candidate.
+
+**Mode A Integration Rules** (apply after each accepted answer):
+
+- Maintain in-memory representation of `requirements.md`.
+- For the first integrated answer: ensure `## Clarifications` exists (create after the highest-level overview section if missing). Under it, create `### Session YYYY-MM-DD` subheading for today.
+- Append: `- Q: <question> → A: <final answer>`.
+- Then apply to the most appropriate section:
+  - Feature linkage → Update `Related Feature` with `Feature ID` and `Feature Name`.
+  - Functional ambiguity → Update/add bullet in Functional Requirements.
+  - User interaction → Update User Stories or Actors subsection.
+  - Data shape → Update Data Model (fields, types, relationships).
+  - Non-functional → Add/modify measurable criteria in Non-Functional / Quality Attributes.
+  - Edge case → Add bullet under Edge Cases / Error Handling.
+  - Terminology → Normalize across spec; note `(formerly "X")` once if needed.
+- If invalidates earlier ambiguous statement, replace it (no duplicates).
+- Save `requirements.md` after EACH integration.
+
+---
+
+### Mode B: Post-Plan (Target: `plan.md`)
+
+**Additional context to load**: `{REQUIREMENTS_DIR}/requirements.md`, `{REQUIREMENTS_DIR}/plan.md`, `{REQUIREMENTS_DIR}/data-model.md` (if exists), `{REQUIREMENTS_DIR}/contracts/` (if exists), `{REQUIREMENTS_DIR}/quickstart.md` (if exists).
+
+**Taxonomy & Coverage Scan**: Load `plan.md`. For each category below, mark status (Clear / Partial / Missing).
+
+Technical Context Completeness:
+- Language/Version, Primary Dependencies, Storage, Testing, Target Platform are all resolved (not "NEEDS CLARIFICATION")
+- Project Type is specified
+- Performance Goals, Constraints, Scale/Scope have concrete values
+
+Constitution Check:
+- All Core Principles have explicit compliance status
+- Gates Status is determined (all pass, or specific violations with justification)
+- Any complexity tracking violations have full justifications
+
+Project Structure:
+- Documentation tree and Source Code tree are both filled in
+- Structure Decision explicitly states the chosen layout
+- Deleted unused options; paths reflect real directories
+
+Requirements Coverage:
+- Each user story from `requirements.md` maps to at least one design artifact (data-model entity, contract endpoint, or quickstart scenario)
+- No orphan user stories in requirements that have zero design coverage
+- No design artifacts that correspond to no user story (unjustified scope creep)
+
+Data Model Alignment:
+- Every entity in `data-model.md` has corresponding requirements grounding (FR or user story)
+- Entity relationships match requirement narratives
+- Validation rules reflect functional requirements
+
+API Contract Alignment:
+- Each endpoint in `contracts/` maps to at least one user story or functional requirement
+- HTTP methods, paths, request/response schemas are fully specified
+- Error response codes correspond to edge cases identified in requirements
+
+Consistency & Cross-Artifact Gaps:
+- Terminology in `plan.md` matches `requirements.md` (same entity names, actor names)
+- `research.md` decisions are reflected in Technical Context (if research exists)
+- `quickstart.md` scenarios align with user stories from requirements
+- `NEEDS CLARIFICATION` markers exist anywhere in plan artifacts
+
+Feasibility & Risk:
+- Selected tech stack is compatible with constitution constraints
+- Scale/Scope assumptions are realistic given Performance Goals
+- External dependency failure modes are acknowledged
+
+**Mode B Integration Rules** (apply after each accepted answer):
+
+- Maintain in-memory representation of `plan.md` (read cross-referenced artifacts for validation, but do not edit them directly).
+- For the first integrated answer: ensure `## Clarifications` exists in `plan.md` (create after the Summary section if missing). Under it, create `### Session YYYY-MM-DD` subheading.
+- Append: `- Q: <question> → A: <final answer>`.
+- Then apply to the most appropriate location:
+  - Technical Context unknowns → Resolve "NEEDS CLARIFICATION" fields in the Technical Context table.
+  - Constitution Gate → Update Gates Status with resolution.
+  - Structure gaps → Fill in missing paths or update Structure Decision.
+   - Data model gap → Record the resolved decision in `plan.md` and recommend re-running `/speckit.plan` if `data-model.md` needs regeneration.
+   - Contract gap → Record the resolved endpoint/API decision in `plan.md` and recommend re-running `/speckit.plan` if `contracts/` need regeneration.
+  - Terminology drift → Normalize term in `plan.md`; cross-check `requirements.md` if needed.
+  - Feasibility risk → Add mitigation note in Constraints or Complexity Tracking.
+- Save `plan.md` after EACH integration. If generated cross-artifacts (e.g., `data-model.md`, `contracts/`, `quickstart.md`) need updates, note that explicitly in the clarification bullet and tell the user they should re-run `/speckit.plan` for full regeneration.
+- Do NOT modify `requirements.md` in this mode; the requirements are frozen once planning begins.
+
+---
+
+### Mode C: Post-Tasks (Target: `tasks.md`)
+
+**Additional context to load**: `{REQUIREMENTS_DIR}/plan.md`, `{REQUIREMENTS_DIR}/requirements.md`, `{REQUIREMENTS_DIR}/tasks.md`, `{REQUIREMENTS_DIR}/data-model.md` (if exists), `{REQUIREMENTS_DIR}/contracts/` (if exists).
+
+**Taxonomy & Coverage Scan**: Load `tasks.md`. For each category below, mark status (Clear / Partial / Missing).
+
+Story Coverage & Prioritization:
+- Every user story from `requirements.md` has a corresponding Phase in `tasks.md`
+- Story priorities (P1, P2, P3) from requirements are preserved in task ordering
+- MVP scope (User Story 1 / P1) is clearly identifiable and independently testable
+
+Task Completeness Per Story:
+- Each user story phase includes: goal, independent test criteria, tests (mandatory for US1), and implementation tasks
+- Test tasks precede implementation tasks (TDD order)
+- Implementation tasks cover models, services, endpoints, and error handling for that story
+- Verification/manual QA tasks are present where automated tests are insufficient
+
+Dependency Correctness:
+- Setup (Phase 1) tasks have no story dependencies
+- Foundational (Phase 2) tasks are correctly marked as blocking prerequisites
+- All user story implementation tasks depend on Foundational completion
+- Intra-story task ordering respects actual code dependencies (e.g., Service after Model)
+- Parallel markers [P] are correctly applied (different files, no shared state)
+
+File Path Validity:
+- All task file paths resolve within the project structure defined in `plan.md`
+- No paths reference non-existent directories or files without creation instructions
+- Test file paths mirror implementation paths appropriately
+
+Definition of Done:
+- DoD checklist is filled (not template placeholder text)
+- DoD items are measurable and verifiable
+- DoD aligns with Constitution quality gates
+
+Format Compliance:
+- All tasks follow `[ID] [P?] [Story] Description` format
+- Task IDs are sequential and unique
+- No template sample tasks remain (e.g., "Create [Entity1] model")
+
+Phase Dependencies & Parallelization:
+- Phase Dependencies section correctly reflects actual blocking relationships
+- Parallel execution examples are realistic and note shared prerequisites
+- Implementation strategy section provides clear MVP-first guidance
+
+**Mode C Integration Rules** (apply after each accepted answer):
+
+- Maintain in-memory representation of `tasks.md`.
+- For the first integrated answer: ensure `## Clarifications` exists in `tasks.md` (create after the Prerequisites/Input section if missing). Under it, create `### Session YYYY-MM-DD` subheading.
+- Append: `- Q: <question> → A: <final answer>`.
+- Then apply to the most appropriate location:
+  - Missing story → Add a new Phase for that user story with goal, test criteria, and placeholder tasks; flag for user to re-run `/speckit.tasks` for full expansion.
+  - Task completeness → Add missing tasks (models, services, endpoints, tests) within the relevant Phase.
+  - Dependency ordering → Reorder tasks or update [P] markers within the Phase.
+  - Incorrect file paths → Correct the path in the task description.
+  - DoD gaps → Fill missing DoD checklist items.
+  - Format violation → Normalize task format.
+  - Parallelization → Update parallel execution examples or add [P] markers.
+- Save `tasks.md` after EACH integration.
+- Do NOT modify `requirements.md` or `plan.md` in this mode; upstream artifacts are considered settled.
+
+---
+
+### Shared: Question Generation & Interactive Loop (All Modes)
+
+1. **Generate prioritized queue** (internally) of candidate questions from the active mode's taxonomy. Maximum 5. Do NOT output all at once. Constraints:
+    - **Filter via Research**: Skip questions answered by `research.md` or already-analyzed docs.
+    - Maximum 10 total questions across the session.
+    - Each question must be answerable with EITHER a short multiple-choice (2–5 mutually exclusive options) OR a ≤5-word short-phrase answer.
+    - Only include questions whose answers materially impact downstream artifacts or validation.
+    - Balance category coverage; favor high-impact unresolved categories first.
+    - Exclude trivial style preferences or execution details that don't block correctness.
+    - Favor clarifications that reduce downstream rework risk.
+
+2. **Sequential questioning loop**:
     - Present EXACTLY ONE question at a time.
-    - For multiple‑choice questions:
-       - **Analyze all options** and determine the **most suitable option** based on:
-          - Best practices for the project type
-          - Common patterns in similar implementations
-          - Risk reduction (security, performance, maintainability)
-          - Alignment with any explicit project goals or constraints visible in the spec
-       - Present your **recommended option prominently** at the top with clear reasoning (1-2 sentences explaining why this is the best choice).
-       - Format as: `**Recommended:** Option [X] - <reasoning>`
-       - Display the question description using Markdown blockquote format (`> Question text`).
-       - Then render all options as a Markdown table:
+    - For **multiple-choice**:
+       - Analyze all options; determine **most suitable option** based on best practices, common patterns, risk reduction, and alignment with project goals.
+       - Format: `**Recommended:** Option [X] - <1-2 sentence reasoning>`
+       - Display question in Markdown blockquote: `> Question text`
+       - Render options as a table:
 
-       | Option | Description |
-       |--------|-------------|
-       | A | <Option A description> |
-       | B | <Option B description> |
-       | C | <Option C description> (add D/E as needed up to 5) |
-       | Short | Provide a different short answer (<=5 words) (Include only if free-form alternative is appropriate) |
+          | Option | Description |
+          |--------|-------------|
+          | A | <Option A> |
+          | B | <Option B> |
+          | C | <Option C> (up to E) |
+          | Short | Provide a different short answer (<=5 words) |
 
-       - After the table, add: `You can reply with the option letter (e.g., "A"), accept the recommendation by saying "yes" or "recommended", or provide your own short answer.`
-    - For short‑answer style (no meaningful discrete options):
-       - Provide your **suggested answer** based on best practices and context.
-       - Format as: `**Suggested:** <your proposed answer> - <brief reasoning>`
-       - Then output: `Format: Short answer (<=5 words). You can accept the suggestion by saying "yes" or "suggested", or provide your own answer.`
-    - After the user answers:
-       - If the user replies with "yes", "recommended", or "suggested", use your previously stated recommendation/suggestion as the answer.
-       - Otherwise, validate the answer maps to one option or fits the <=5 word constraint.
-       - If ambiguous, ask for a quick disambiguation (count still belongs to same question; do not advance).
-       - Once satisfactory, record it in working memory (do not yet write to disk) and move to the next queued question.
-    - Stop asking further questions when:
-       - All critical ambiguities resolved early (remaining queued items become unnecessary), OR
-       - User signals completion ("done", "good", "no more"), OR
-       - You reach 5 asked questions.
-    - Never reveal future queued questions in advance.
-    - If no valid questions exist at start, immediately report no critical ambiguities.
+       - After the table: `You can reply with the option letter (e.g., "A"), accept the recommendation by saying "yes" or "recommended", or provide your own short answer.`
+    - For **short-answer** (no discrete options):
+       - Format: `**Suggested:** <proposed answer> - <brief reasoning>`
+       - Then: `Format: Short answer (<=5 words). You can accept the suggestion by saying "yes" or "suggested", or provide your own answer.`
+    - After user answers:
+       - "yes" / "recommended" / "suggested" → use your stated recommendation/suggestion.
+       - Otherwise, validate answer maps to an option or fits ≤5 words.
+       - If ambiguous, ask for quick disambiguation (same question, doesn't count as new).
+       - Once satisfactory, record in memory and move to next queued question.
+    - Stop when: all critical ambiguities resolved, user signals completion ("done", "good", "no more"), or 5 questions reached.
+    - Never reveal future queued questions.
+    - If no valid questions at start, report no critical ambiguities immediately.
 
-5. Integration after EACH accepted answer (incremental update approach):
-    - Maintain in-memory representation of the spec (loaded once at start) plus the raw file contents.
-    - For the first integrated answer in this session:
-       - Ensure a `## Clarifications` section exists (create it just after the highest-level contextual/overview section per the spec template if missing).
-       - Under it, create (if not present) a `### Session YYYY-MM-DD` subheading for today.
-    - Append a bullet line immediately after acceptance: `- Q: <question> → A: <final answer>`.
-    - Then immediately apply the clarification to the most appropriate section(s):
-         - Feature linkage ambiguity → Update the `Related Feature` section with the resolved `Feature ID` and `Feature Name`.
-       - Functional ambiguity → Update or add a bullet in Functional Requirements.
-       - User interaction / actor distinction → Update User Stories or Actors subsection (if present) with clarified role, constraint, or scenario.
-       - Data shape / entities → Update Data Model (add fields, types, relationships) preserving ordering; note added constraints succinctly.
-       - Non-functional constraint → Add/modify measurable criteria in Non-Functional / Quality Attributes section (convert vague adjective to metric or explicit target).
-       - Edge case / negative flow → Add a new bullet under Edge Cases / Error Handling (or create such subsection if template provides placeholder for it).
-       - Terminology conflict → Normalize term across spec; retain original only if necessary by adding `(formerly referred to as "X")` once.
-    - If the clarification invalidates an earlier ambiguous statement, replace that statement instead of duplicating; leave no obsolete contradictory text.
-    - Save the spec file AFTER each integration to minimize risk of context loss (atomic overwrite).
-    - Preserve formatting: do not reorder unrelated sections; keep heading hierarchy intact.
-    - Keep each inserted clarification minimal and testable (avoid narrative drift).
+3. **Integration** — use the active mode's Integration Rules.
 
-6. Validation (performed after EACH write plus final pass):
-   - Clarifications session contains exactly one bullet per accepted answer (no duplicates).
-   - Total asked (accepted) questions ≤ 5.
-   - Updated sections contain no lingering vague placeholders the new answer was meant to resolve.
-   - No contradictory earlier statement remains (scan for now-invalid alternative choices removed).
-   - Markdown structure valid; only allowed new headings: `## Clarifications`, `### Session YYYY-MM-DD`.
-   - Terminology consistency: same canonical term used across all updated sections.
+4. **Validation** (after EACH write + final pass):
+    - Clarifications session has exactly one bullet per accepted answer (no duplicates).
+    - Total accepted questions ≤ 5.
+    - Updated sections contain no lingering vague placeholders the answer was meant to resolve.
+    - No contradictory earlier statement remains.
+    - Markdown structure valid; only new headings: `## Clarifications`, `### Session YYYY-MM-DD`.
+    - Terminology consistency within and across artifacts (per mode boundaries).
 
-7. Write the updated spec back to `FEATURE_SPEC`.
+5. **Final Write**: Save the target file.
 
-8. Report completion (after questioning loop ends or early termination):
-   - Number of questions asked & answered.
-   - Path to updated spec.
-   - Sections touched (list names).
-   - Coverage summary table listing each taxonomy category with Status: Resolved (was Partial/Missing and addressed), Deferred (exceeds question quota or better suited for planning), Clear (already sufficient), Outstanding (still Partial/Missing but low impact).
-   - If any Outstanding or Deferred remain, recommend whether to proceed to `/speckit.plan` or run `/speckit.clarify` again later post-plan.
-   - Suggested next command.
+### Report (All Modes)
+
+After the questioning loop ends (or early termination):
+
+- Operating mode (A/B/C) and target file path.
+- Number of questions asked & answered.
+- Sections touched (list names).
+- Coverage summary table listing each taxonomy category from the active mode with Status: Resolved, Deferred (exceeds quota), Clear, or Outstanding (low impact).
+- If Outstanding/Deferred remain, recommend whether to proceed to the mode's handoff command or re-run `/speckit.clarify`.
+- Explicitly state the **suggested next command**:
+   - Mode A → `/speckit.plan`
+   - Mode B → `/speckit.tasks`
+   - Mode C → `/speckit.implement`
+
+---
 
 Behavior rules:
 
 - If no meaningful ambiguities found (or all potential questions would be low-impact), respond: "No critical ambiguities detected worth formal clarification." and suggest proceeding.
-- If `Related Feature` still contains `Need clarification`, do not treat the spec as fully clarified.
-- If spec file missing, instruct user to run `/speckit.requirements` first (do not create a new spec here).
+- In Mode A, if `Related Feature` still contains `Need clarification`, do not treat `requirements.md` as fully clarified.
+- If target file is missing, report the missing prerequisite and suggest the command that creates it:
+   - Missing `requirements.md` → `/speckit.requirements`
+   - Missing `plan.md` when requested by user context → `/speckit.plan`
+   - Missing `tasks.md` when requested by user context → `/speckit.tasks`
 - Never exceed 5 total asked questions (clarification retries for a single question do not count as new questions).
-- Avoid speculative tech stack questions unless the absence blocks functional clarity.
+- Avoid speculative questions unless absence blocks correctness in the current mode.
 - Respect user early termination signals ("stop", "done", "proceed").
 - If no questions asked due to full coverage, output a compact coverage summary (all categories Clear) then suggest advancing.
 - If quota reached with unresolved high-impact categories remaining, explicitly flag them under Deferred with rationale.
+- Do not silently modify upstream artifacts in later modes:
+   - Mode B targets `plan.md`; do not edit `requirements.md`.
+   - Mode C targets `tasks.md`; do not edit `requirements.md` or `plan.md`.
 
 Context for prioritization: {ARGS}
 
@@ -217,8 +378,12 @@ Context for prioritization: {ARGS}
 
 **Before running this command**:
 
-- Run `/speckit.requirements` first to produce or update `requirements.md`.
+- At minimum, run `/speckit.requirements` first to produce `requirements.md`.
+- If `plan.md` exists, this command clarifies planning outputs instead of requirements.
+- If `tasks.md` exists, this command clarifies implementation task outputs instead of planning outputs.
 
 **After running this command**:
 
-- Proceed to `/speckit.plan` once key ambiguities are resolved.
+- Mode A (`requirements.md`) → proceed to `/speckit.plan`.
+- Mode B (`plan.md`) → proceed to `/speckit.tasks`.
+- Mode C (`tasks.md`) → proceed to `/speckit.implement`.
