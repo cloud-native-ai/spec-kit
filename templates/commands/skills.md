@@ -114,11 +114,13 @@ Note: This project defaults to `name` and `description` as core trigger metadata
 
 #### Body
 
-Body contains only execution instructions, no redundant background. Must include:
+**Overall Principle**: The `SKILL.md` document should not contain exhaustive details. Any large detailed information (such as complex schemas, extensive context, or long configurations) MUST be placed in a separate document within the `references/` directory. `SKILL.md` should only keep a clear reference to that document.
+
+Body contains only execution instructions and core workflow, no redundant background. Must include:
 
 - Result goal
 - Key steps (executable, checkable)
-- Resource references (use relative paths, e.g., `./scripts/x.py`)
+- Resource references (use relative paths, e.g., `./scripts/x.py`, `./references/details.md`)
 
 ### 3) Resource Directory Usage Guidelines
 
@@ -140,10 +142,10 @@ Used for high-repetition, deterministic tasks (Python/Bash, etc.).
 
 #### `references/`
 
-Used for on-demand document knowledge (e.g., schemas, APIs, policies).
+Used for on-demand document knowledge (e.g., schemas, APIs, policies, extensive background information).
 
 - Applicable: High information volume but not needed every time
-- Principle: Put details in `references/`, keep `SKILL.md` only for navigation and core workflow
+- Principle (as stated in Body): Put all details in `references/`, keep `SKILL.md` only for navigation and core workflow orchestration. `SKILL.md` holds just a reference/link to these detailed documents.
 - Large file recommendation: Provide search hints in `SKILL.md`; add a table of contents for reference files exceeding 100 lines
 
 #### `assets/`
