@@ -30,7 +30,10 @@ You **MUST** analyze the user input in `$ARGUMENTS` to extract the two core elem
 **Check the user input**: Determine whether `$ARGUMENTS` is empty or contains only whitespace.
 
 - **Case A: User provided input**  
-  Extract `name` and `description` from the input following the rules above, then proceed to [Step 1](#step-1-determine-skill_root-and-metadata).
+  Extract `name` and `description` from the input following the rules above.
+  - If the input contains only a valid `name` and `.specify/skills/<name>/SKILL.md` already exists, interpret this as **refine or refresh the existing Skill**. Reuse the existing frontmatter description unless the current conversation provides a better one.
+  - If the input contains only a valid `name` and the Skill does not exist, derive a description from the current conversation when possible; otherwise ask one targeted clarification question.
+  Then proceed to [Step 1](#step-1-determine-skill_root-and-metadata).
 
 - **Case B: User provided no input (empty arguments)**  
   This **MUST** be interpreted as: **create a Skill from the current conversation history**. Execute the following:
@@ -230,7 +233,7 @@ The core workflow for creating a Skill is as follows:
 
 Parse `skill name` and `description` from user input:
 
-- **skill name** determines the `SKILL_ROOT` path. For example, with `name = "testing"` and a project-level storage location, `SKILL_ROOT = .github/skills/testing/`.
+- **skill name** determines the `SKILL_ROOT` path. For example, with `name = "testing"` and a project-level storage location, `SKILL_ROOT = .specify/skills/testing/`.
 - **description** describes "what it does + when to trigger" and must include keywords and trigger scenarios; avoid vague descriptions (see Design Principles point 2).
 
 If input information is insufficient, proceed to Step 3 for clarification.
@@ -249,7 +252,7 @@ Run the script to get the tools available in the current project/workspace, prov
 Use the following command to get the tool manifest as needed:
 
 ```bash
-scripts/bash/refresh-tools.sh --json
+scripts/bash/refresh-tools.sh --mcp --system --shell --project --json
 ```
 
 After obtaining the tool list, filter available tools against Skill goals as reference for tool references in `SKILL.md`.
