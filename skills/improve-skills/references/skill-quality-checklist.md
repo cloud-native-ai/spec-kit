@@ -5,9 +5,12 @@ Use this checklist when improving a Skill after a real execution. The focus is e
 ## Execution Feedback Collection
 
 - Target Skill and execution window are clear.
+- For self-improvement of `improve-skills`, the reviewed window is the latest improvement loop and duplicate lessons are not re-added without new evidence.
+- The canonical `.specify/skills/<name>/SKILL.md` was re-read before editing if recent edits, formatters, or refresh scripts may have changed it.
 - User feedback, corrections, and requested behavior changes are captured.
 - Tool failures, test failures, terminal errors, or validation gaps are captured when relevant.
-- Changed files and manual fixes from the execution are reviewed.
+- Changed files and manual fixes from the execution are reviewed, with generated manifests separated from hand-edited Skill files.
+- Timestamp-only generated manifest diffs are identified as validation churn, not behavior change.
 - Facts are separated from assumptions or general preferences.
 
 ## Feedback Organization
@@ -16,7 +19,7 @@ Use this checklist when improving a Skill after a real execution. The focus is e
 - Each issue has a likely cause in the current Skill instructions or resources.
 - Each issue has a desired next-run behavior.
 - Issues are grouped by failure mode: trigger/discovery, scope inference, missing context, wrong tool choice, unsafe step, unclear output, validation gap, or resource/reference issue.
-- One-off environment noise is excluded unless the Skill should handle it in future runs.
+- One-off environment noise is excluded unless the Skill should handle it in future runs; successful fallback warnings are tracked as validation notes, not root causes.
 
 ## Root-Cause-Driven Improvement
 
@@ -61,8 +64,9 @@ Use this checklist when improving a Skill after a real execution. The focus is e
 ## Compatibility and Registry
 
 - `.specify/skills/<name>/` is the primary copy.
-- `.github/skills/<name>` is a compatibility entrypoint, preferably a symlink or placeholder, not an independent divergent copy.
+- `.github/skills/<name>` is a compatibility entrypoint, preferably a symlink or placeholder, not an independent divergent copy; a directory-level `.github/skills -> ../.specify/skills` symlink is also valid.
 - `.specify/instructions.md` has one deduplicated Skills registry row per canonical `skill_id`.
+- If `skill_id` metadata is added or corrected, the Skills registry row is checked and updated in the same improvement loop.
 - Registry rows are sorted and no `None yet.` placeholder remains once real entries exist.
 - `/speckit.skills` prompt sources use `./scripts/` for Skill-owned scripts and call `refresh-tools.sh` with explicit source flags before `--json`.
 
@@ -75,3 +79,5 @@ Report results with:
 3. Skill changes made
 4. Validation results
 5. Feedback still needing another execution
+
+Before reporting validation results, confirm that compound commands did not hide later checks. If output is partial, rerun missing checks individually.

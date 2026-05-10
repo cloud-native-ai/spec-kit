@@ -120,6 +120,7 @@ Use this machine-maintained section to track reusable resource identifiers creat
 <!-- Record each skill as one table row with the columns below. -->
 | Skill Name | Skill ID | Description | Argument Hint | User Invocable | Disable Model Invocation | Canonical Path |
 |------------|----------|-------------|---------------|----------------|--------------------------|----------------|
+| analysis-project | <SKILL:.specify/skills/analysis-project/SKILL.md> | Deep analysis of current project with professional architecture reports. Use when the user mentions "analyze project", "analyze repository", "source code analysis", "architecture analysis", "code analysis", "study this project", "research this framework" | - | - | - | .specify/skills/analysis-project/SKILL.md |
 | improve-skills | <SKILL:.specify/skills/improve-skills/SKILL.md> | This skill can continuously improve an existing Skill from actual execution history, user feedback, failure cases, and observed inefficiencies. Use this when the user mentions ["improve skills after use", "skill execution feedback", "refine SKILL.md", "skill retrospective", "skill iteration", "技能执行反馈", "基于执行问题优化skill", "持续改进Skill"] | - | - | - | .specify/skills/improve-skills/SKILL.md |
 <!-- SKILLS_REGISTRY_END -->
 

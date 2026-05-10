@@ -16,18 +16,21 @@ Continuously improve an existing SpecKit Skill using evidence from real executio
    - If the user names a Skill, improve only that Skill.
    - If the user says “this Skill”, infer the target from the active file or recent conversation.
    - Treat `.specify/skills/<name>/SKILL.md` as the canonical source of truth; use `.github/skills/<name>` only as a compatibility entrypoint.
+   - Re-read the canonical `SKILL.md` before editing, especially when the system reports recent user or formatter changes, or when a refresh/script may have modified metadata.
    - Define the execution window to review: current conversation, last Skill run, failed command output, user correction, test failure, or recent edits.
+   - When improving `improve-skills` itself, use the most recent improvement loop as the execution window and avoid reapplying the same lesson unless new evidence shows the previous fix was insufficient.
 
 2. **Collect execution history and feedback**
    - Gather concrete evidence before editing: user feedback, steps that were confusing, tool failures, wrong assumptions, repeated manual fixes, validation gaps, and changed files from the execution.
    - Include terminal/test outputs and error messages when they explain what went wrong.
+   - Review changed files as evidence, but classify generated validation artifacts such as `tools/*.json` separately from hand-edited Skill instructions.
    - Separate facts from interpretation. Do not optimize from generic best-practice principles when no execution evidence supports the change.
    - If evidence is insufficient, ask one targeted question about what failed, what was inefficient, or what should happen differently next time.
 
 3. **Organize the evidence into improvement items**
    - Group observations by failure mode: trigger/discovery, scope inference, missing context, wrong tool choice, unsafe step, unclear output, validation gap, or resource/reference issue.
    - For each item, record: observed symptom, likely cause in the current Skill instructions, desired next behavior, and the file section to change.
-   - Discard one-off environment noise unless the Skill should explicitly handle it in future runs.
+   - Discard one-off environment noise unless the Skill should explicitly handle it in future runs. If a refresh command exits successfully with a fallback after an optional source warning, record it as a validation note rather than a root cause.
 
 4. **Analyze root causes and choose minimal changes**
    - Prefer changing the step that caused the observed problem over adding broad new rules.
@@ -43,8 +46,11 @@ Continuously improve an existing SpecKit Skill using evidence from real executio
 
 6. **Validate the improvement loop**
    - Re-read the changed Skill and verify that each edit maps to an observed execution issue.
-   - Check frontmatter, resource paths, line count, compatibility entry, and registry row when metadata changed.
+   - Check frontmatter, resource paths, line count, compatibility entry, and registry row when metadata changed. If `skill_id` is added or corrected, ensure `.specify/instructions.md` has one deduplicated Skills registry row for the canonical Skill.
+   - Accept a directory-level `.github/skills -> ../.specify/skills` symlink as a valid compatibility entrypoint; do not require a separate per-Skill symlink when the directory symlink already exposes the Skill.
    - When project scripts are available, refresh Skill tool manifests with `.specify/scripts/bash/create-new-skill.sh --refresh-only --name <name> --json` or `.specify/scripts/bash/refresh-tools.sh --mcp --system --shell --project --json` as appropriate.
+   - If a combined validation command returns only partial output or omits later checks, rerun the missing checks individually before concluding validation passed.
+   - After refresh, distinguish intended generated manifests from instruction changes in the final report, and mention non-blocking source warnings separately. If generated manifests changed only in timestamps, call that out as low-signal validation churn rather than behavior change.
    - Do not document `.specify/scripts/` as a Skill-owned resource directory; Skill-owned executable resources belong in `./scripts/`.
 
 7. **Report the feedback-driven changes**
