@@ -18,7 +18,7 @@ Create a high-quality Spec Kit Skill from explicit user input or by distilling r
 
 Parse `skill name` and `description` from the user input:
 
-- **skill name**: A concise command-like identifier using only letters, digits, hyphens (`-`), and underscores (`_`). Must follow standard naming conventions.
+- **skill name**: A concise command-like identifier matching the project script validator: letters, digits, hyphens (`-`), and underscores (`_`) only. When inventing a name, prefer lowercase kebab-case (for example, `api-testing`) unless the user explicitly needs another valid form.
 - **description**: A capability summary plus trigger keyword list. Format: `This skill can <capability>. Use this when the user mentions [ "keyword1", "keyword2", ... ]`.
 
 If the input contains only a valid name and the Skill already exists (`.specify/skills/<name>/SKILL.md`), redirect to `improve-skills` rather than creating a duplicate.
@@ -97,6 +97,8 @@ ${SKILL_ROOT}/
 └── assets/             # Static assets for outputs (optional)
 ```
 
+The project creation script may create standard empty resource directories and a `tools/` manifest directory during scaffolding or refresh. Treat those as acceptable generated structure; only fail validation for unrelated documentation files, broken links, or resource directories whose checked-in contents are not needed by the Skill.
+
 #### Progressive Disclosure
 
 1. Discovery: Read `name` + `description`
@@ -147,7 +149,7 @@ Run quality checks before reporting completion. See [the quality checklist](./re
 Minimum checks:
 - [ ] Frontmatter: `name` matches directory, `description` has triggers
 - [ ] Body: clear steps, no vague placeholders
-- [ ] Resources: relative paths, no broken links
+- [ ] Resources: relative paths, no broken links; standard generated resource directories are acceptable
 - [ ] Registry: one deduplicated row in `.specify/instructions.md`
 - [ ] Size: `SKILL.md` < 500 lines
 - [ ] No unrelated documentation files

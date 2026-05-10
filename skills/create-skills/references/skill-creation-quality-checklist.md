@@ -20,7 +20,7 @@ Use this checklist to validate a newly created Skill before reporting completion
 ## Resource Organization
 
 - [ ] Resource paths use relative form (e.g., `./scripts/x.py`, `./references/details.md`)
-- [ ] `tools/`, `scripts/`, `references/`, `assets/` directories only exist when needed
+- [ ] `tools/`, `scripts/`, `references/`, `assets/` contents are relevant when checked in; empty standard directories or generated tool manifests from project scripts are acceptable
 - [ ] No unrelated documents (README.md, CHANGELOG.md, INSTALLATION_GUIDE.md)
 
 ## Registry & Discoverability
@@ -32,7 +32,7 @@ Use this checklist to validate a newly created Skill before reporting completion
 ## Anti-Pattern Prevention
 
 - [ ] Description is not vague (includes trigger keywords)
-- [ ] Skill name follows the `[a-z0-9]+(-[a-z0-9]+)*` pattern
+- [ ] Skill name matches the project validator (`[A-Za-z0-9_-]+`); newly invented names prefer lowercase kebab-case (`[a-z0-9]+(-[a-z0-9]+)*`)
 - [ ] `SKILL.md` is not oversized (under 500 lines)
 - [ ] Steps are executable (not just context/background)
 - [ ] Resource paths are consistent and point to existing files
