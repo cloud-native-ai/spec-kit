@@ -1,0 +1,148 @@
+openapi: 3.1.0
+info:
+  title: Create Skills Workflow Contract
+  version: 0.1.0
+  description: |
+    Contract for the `/speckit.skills` orchestration surface after extracting
+    new Skill creation guidance into the `create-skills` Skill.
+paths:
+  /skills/route:
+    post:
+      summary: Classify a skills command request and choose the delegation target
+      operationId: routeSkillsRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userInput
+              properties:
+                userInput:
+                  type: string
+                  description: Raw arguments or conversation-derived intent supplied to `/speckit.skills`.
+                targetSkillName:
+                  type: string
+                  description: Parsed or inferred target Skill name when available.
+                targetExists:
+                  type: boolean
+                  description: Whether the target Skill already has an existing SKILL.md.
+      responses:
+        '200':
+          description: Delegation decision
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - delegationTarget
+                  - reason
+                properties:
+                  delegationTarget:
+                    type: string
+                    enum:
+                      - create-skills
+                      - improve-skills
+                  reason:
+                    type: string
+                  requiredFollowups:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Input cannot be classified without clarification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClarificationNeeded'
+  /skills/create:
+    post:
+      summary: Create a new Skill using the dedicated create-skills capability
+      operationId: createSkillFromCapability
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - skillName
+                - descriptionSource
+              properties:
+                skillName:
+                  type: string
+                  pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+                description:
+                  type: string
+                descriptionSource:
+                  type: string
+                  enum:
+                    - explicit-input
+                    - conversation-history
+                requestedScope:
+                  type: string
+                  enum:
+                    - project
+                    - personal
+                  default: project
+      responses:
+        '201':
+          description: Skill created or drafted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - skillName
+                  - skillFile
+                  - validationStatus
+                properties:
+                  skillName:
+                    type: string
+                  skillFile:
+                    type: string
+                    description: Workspace-relative path to the created SKILL.md.
+                  skillId:
+                    type: string
+                  validationStatus:
+                    type: string
+                    enum:
+                      - passed
+                      - warnings
+                  examples:
+                    type: array
+                    items:
+                      type: string
+        '409':
+          description: Target Skill already exists and must be routed to improve-skills
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - delegationTarget
+                  - reason
+                properties:
+                  delegationTarget:
+                    type: string
+                    const: improve-skills
+                  reason:
+                    type: string
+components:
+  schemas:
+    ClarificationNeeded:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          description: Single targeted clarification question needed before proceeding.
+        field:
+          type: string
+          enum:
+            - skillName
+            - description
+            - scope
+            - outputGoal

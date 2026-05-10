@@ -79,7 +79,7 @@ Use this machine-maintained section to track reusable resource identifiers creat
 <!-- Record each skill as one table row with the columns below. -->
 | Skill Name | Skill ID | Description | Argument Hint | User Invocable | Disable Model Invocation | Canonical Path |
 |------------|----------|-------------|---------------|----------------|--------------------------|----------------|
-| None yet. | - | - | - | - | - | - |
+| create-skills | <SKILL:.specify/skills/create-skills/SKILL.md> | This skill can create new Spec Kit Skills from user input or conversation history. Use this when the user mentions ["create a skill", "new skill", "make a skill", "skill creation", "添加技能", "创建skill", "新建skill"] | - | - | - | .specify/skills/create-skills/SKILL.md |
 <!-- SKILLS_REGISTRY_END -->
 
 ### Tools
