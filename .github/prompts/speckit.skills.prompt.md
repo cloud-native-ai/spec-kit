@@ -19,10 +19,10 @@ You **MUST** analyze the user input in `$ARGUMENTS` to extract the two core elem
 **Check the user input**: Determine whether `$ARGUMENTS` is empty or contains only whitespace.
 
 - **Case A: User provided input**  
-   Extract `name` and `description` from the input following the rules above.
-   - If the input contains only a valid `name` and `.specify/skills/<name>/SKILL.md` already exists, interpret this as **refine or refresh the existing Skill**. Reuse the existing frontmatter description unless the current conversation provides a better one.
-   - If the input contains only a valid `name` and the Skill does not exist, derive a description from the current conversation when possible; otherwise ask one targeted clarification question.
-   Then proceed to [Step 1](#step-1-determine-skill_root-and-metadata).
+  Extract `name` and `description` from the input following the rules above.
+  - If the input contains only a valid `name` and `.specify/skills/<name>/SKILL.md` already exists, interpret this as **refine or refresh the existing Skill**. Reuse the existing frontmatter description unless the current conversation provides a better one.
+  - If the input contains only a valid `name` and the Skill does not exist, derive a description from the current conversation when possible; otherwise ask one targeted clarification question.
+  Then proceed to [Step 1](#step-1-determine-skill_root-and-metadata).
 
 - **Case B: User provided no input (empty arguments)**  
   This **MUST** be interpreted as: **create a Skill from the current conversation history**. Execute the following:
@@ -70,7 +70,7 @@ Typical structure:
 ${SKILL_ROOT}/
 ├── SKILL.md            # Required, Skill main body
 ├── tools/              # Tool descriptions (relative to SKILL_ROOT, optional)
-├── scripts/            # Executable scripts (relative to SKILL_ROOT, optional)
+├── .specify/scripts/            # Executable scripts (relative to SKILL_ROOT, optional)
 ├── references/         # Reference materials loaded on demand (relative to SKILL_ROOT, optional)
 └── assets/             # Static assets for outputs (relative to SKILL_ROOT, optional)
 ```
@@ -85,7 +85,7 @@ ${SKILL_ROOT}/
 - `~/.agents/skills/<name>/`
 - `~/.claude/skills/<name>/`
 
-All subsequent resource references use paths relative to `SKILL_ROOT` (prefer `./scripts/x.py` form).
+All subsequent resource references use paths relative to `SKILL_ROOT` (prefer `./.specify/scripts/x.py` form).
 
 ### 2) `SKILL.md` Specification
 
@@ -106,11 +106,13 @@ Note: This project defaults to `name` and `description` as core trigger metadata
 
 #### Body
 
-Body contains only execution instructions, no redundant background. Must include:
+**Overall Principle**: The `SKILL.md` document should not contain exhaustive details. Any large detailed information (such as complex schemas, extensive context, or long configurations) MUST be placed in a separate document within the `references/` directory. `SKILL.md` should only keep a clear reference to that document.
+
+Body contains only execution instructions and core workflow, no redundant background. Must include:
 
 - Result goal
 - Key steps (executable, checkable)
-- Resource references (use relative paths, e.g., `./scripts/x.py`, `./references/details.md`)
+- Resource references (use relative paths, e.g., `./.specify/scripts/x.py`, `./references/details.md`)
 
 ### 3) Resource Directory Usage Guidelines
 
@@ -123,7 +125,7 @@ The `tools/` directory under the Skill root describes the tools available to thi
 - [Shell Tools JSON](tools/shell.json)
 - [Project Scripts JSON](tools/project.json)
 
-#### `scripts/`
+#### `.specify/scripts/`
 
 Used for high-repetition, deterministic tasks (Python/Bash, etc.).
 
@@ -132,10 +134,10 @@ Used for high-repetition, deterministic tasks (Python/Bash, etc.).
 
 #### `references/`
 
-Used for on-demand document knowledge (e.g., schemas, APIs, policies).
+Used for on-demand document knowledge (e.g., schemas, APIs, policies, extensive background information).
 
 - Applicable: High information volume but not needed every time
-- Principle: Put details in `references/`, keep `SKILL.md` only for navigation and core workflow
+- Principle (as stated in Body): Put all details in `references/`, keep `SKILL.md` only for navigation and core workflow orchestration. `SKILL.md` holds just a reference/link to these detailed documents.
 - Large file recommendation: Provide search hints in `SKILL.md`; add a table of contents for reference files exceeding 100 lines
 
 #### `assets/`
@@ -148,7 +150,7 @@ Use progressive loading:
 
 1. Discovery phase: Read `name` + `description`
 2. After match: Read `SKILL.md` body
-3. When needed: Then read `scripts/`, `references/`, `assets/`
+3. When needed: Then read `.specify/scripts/`, `references/`, `assets/`
 
 Constraints:
 
@@ -258,7 +260,7 @@ Iteratively revise `SKILL.md` until:
 
 1. Frontmatter is complete (`name`, `description`)
 2. Body contains clear executable steps
-3. Resource directories (`tools/`, `scripts/`, `references/`, `assets/`) are ready as needed
+3. Resource directories (`tools/`, `.specify/scripts/`, `references/`, `assets/`) are ready as needed
 4. All resource links use paths relative to `SKILL_ROOT`
 
 ### Step 4: Register Resource ID and Write to Instructions
