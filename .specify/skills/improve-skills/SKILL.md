@@ -1,6 +1,6 @@
 ---
 name: improve-skills
-description: This skill can continuously improve an existing Skill from actual execution history, user feedback, failure cases, and observed inefficiencies. Use this when the user mentions ["improve skills after use", "skill execution feedback", "refine SKILL.md", "skill retrospective", "skill iteration", "技能执行反馈", "基于执行问题优化skill", "持续改进Skill"]
+description: This skill continuously improves one local Skill from a user-provided Skill description, execution history, user feedback, failure cases, and observed inefficiencies. Use this when the user mentions ["improve skills after use", "skill execution feedback", "refine SKILL.md", "skill retrospective", "skill iteration", "技能执行反馈", "基于执行问题优化skill", "持续改进Skill"]
 skill_id: "<SKILL:.specify/skills/improve-skills/SKILL.md>"
 ---
 
@@ -8,31 +8,45 @@ skill_id: "<SKILL:.specify/skills/improve-skills/SKILL.md>"
 
 ## Goal
 
-Continuously improve an existing SpecKit Skill using evidence from real executions. The expected result is a focused Skill update that fixes observed problems, captures reusable lessons, and makes the next execution more reliable.
+Continuously improve one existing local SpecKit Skill from a user-provided Skill description and evidence from real executions. The expected result is a focused Skill update that fixes observed problems, captures reusable lessons, and makes the next execution more reliable.
+
+## Input Contract
+
+The input is a description of the Skill to improve. It must be interpreted as follows:
+
+- **Target identifier**: identify exactly one local Skill by `skill_id`, frontmatter `name`, canonical path, or Skill directory name. If multiple Skills match or no local Skill can be found, ask one targeted clarification before editing.
+- **Optimization direction**: extract the requested direction when present, such as fixing execution failures, improving efficiency, clarifying inputs/outputs, correcting tool usage, or strengthening validation. If no direction is present, infer it only from concrete execution history and user feedback.
+- **User emphasis**: treat details in the user's description as high-priority evidence. Analyze them explicitly even when broader execution history suggests additional improvements.
 
 ## Workflow
 
-1. **Identify the target Skill and execution window**
-   - If the user names a Skill, improve only that Skill.
-   - If the user says “this Skill”, infer the target from the active file or recent conversation.
+1. **Identify the target Skill, optimization direction, and execution window**
+   - Parse the user's Skill description for a `skill_id`, frontmatter `name`, canonical path, or Skill directory name; improve only that local Skill.
+   - If the user says “this Skill”, infer the target from the active file or recent conversation, then verify it resolves to exactly one local Skill.
+   - Extract the requested optimization direction when present and carry it through evidence collection, analysis, edits, validation, and reporting.
    - Treat `.specify/skills/<name>/SKILL.md` as the canonical source of truth; use `.github/skills/<name>` only as a compatibility entrypoint.
    - Re-read the canonical `SKILL.md` before editing, especially when the system reports recent user or formatter changes, or when a refresh/script may have modified metadata.
    - Define the execution window to review: current conversation, last Skill run, failed command output, user correction, test failure, or recent edits.
    - When improving `improve-skills` itself, use the most recent improvement loop as the execution window and avoid reapplying the same lesson unless new evidence shows the previous fix was insufficient.
 
-2. **Collect execution history and feedback**
+2. **Measure execution effectiveness from history**
    - Gather concrete evidence before editing: user feedback, steps that were confusing, tool failures, wrong assumptions, repeated manual fixes, validation gaps, and changed files from the execution.
    - Include terminal/test outputs and error messages when they explain what went wrong.
    - Review changed files as evidence, but classify generated validation artifacts such as `tools/*.json` separately from hand-edited Skill instructions.
+   - Measure the target Skill against the requested or inferred optimization goal: whether it could be invoked, whether its expected input format was accepted, whether the workflow produced the expected output, how many avoidable manual/tool steps occurred, and whether validation caught the issue.
+   - Identify the execution-flow steps that did not meet expectations, including broken command-line parameters, mismatched expected formats, missing prerequisites, ambiguous target resolution, inefficient tool choices, repeated searches, or unnecessary user handoffs.
    - Separate facts from interpretation. Do not optimize from generic best-practice principles when no execution evidence supports the change.
    - If evidence is insufficient, ask one targeted question about what failed, what was inefficient, or what should happen differently next time.
 
-3. **Organize the evidence into improvement items**
+3. **Analyze user-provided emphasis and organize improvement items**
+   - Give the user's stated optimization direction a dedicated analysis pass: confirm which parts are already satisfied, which parts are missing, and which edits will directly address the request.
    - Group observations by failure mode: trigger/discovery, scope inference, missing context, wrong tool choice, unsafe step, unclear output, validation gap, or resource/reference issue.
    - For each item, record: observed symptom, likely cause in the current Skill instructions, desired next behavior, and the file section to change.
    - Discard one-off environment noise unless the Skill should explicitly handle it in future runs. If a refresh command exits successfully with a fallback after an optional source warning, record it as a validation note rather than a root cause.
 
-4. **Analyze root causes and choose minimal changes**
+4. **Correct the root causes with minimal changes**
+   - For complete execution failures, fix the instruction that caused non-execution first, such as wrong command-line arguments, nonexistent paths, invalid expected file formats, incompatible metadata, or missing prerequisite checks.
+   - For successful but inefficient executions, replace the inefficient step with a more direct method, deterministic script, narrower search, better evidence filter, or clearer decision branch.
    - Prefer changing the step that caused the observed problem over adding broad new rules.
    - Convert repeated user corrections into explicit decision branches.
    - Convert repeated manual checks into checklist items or deterministic scripts when appropriate.
