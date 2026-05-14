@@ -55,7 +55,7 @@ Escalation rules:
 - Treat Constitution as the authority for architecture and workflow constraints.
 
 ## AI Tool Compatibility
-- **Supported Agents**: GitHub Copilot, Qwen Code, opencode, Qoder
+- **Supported Agents**: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder
 - **Instructions Refresh**: Run `/speckit.instructions` to regenerate this file and compatibility symlinks.
 
 ## Spec Kit Runtime & Symlink Model

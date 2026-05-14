@@ -1,0 +1,321 @@
+openapi: 3.1.0
+info:
+  title: Spec Kit Claude Code Support Contract
+  version: 0.1.0
+  summary: Contract for assistant selection, validation, asset generation, refresh, and audit when Claude Code is supported.
+servers:
+  - url: https://spec-kit.local/contracts
+paths:
+  /assistants:
+    get:
+      summary: List supported assistants exposed to users.
+      operationId: listSupportedAssistants
+      responses:
+        '200':
+          description: Supported assistants returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [assistants]
+                properties:
+                  assistants:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SupportedAssistant'
+  /projects/init:
+    post:
+      summary: Initialize a project with a selected assistant.
+      operationId: initializeProject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectInitRequest'
+      responses:
+        '201':
+          description: Project initialized and assistant assets generated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectInitResult'
+        '400':
+          description: Unsupported or invalid assistant selection.
+        '409':
+          description: Selected assistant cannot be provisioned with required assets or would overwrite protected custom content.
+        '424':
+          description: Required assistant tool missing and validation was not ignored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationFailure'
+  /assistants/claude/validate:
+    post:
+      summary: Validate the local Claude Code prerequisite.
+      operationId: validateClaudeCode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ignoreAgentTools]
+              properties:
+                ignoreAgentTools:
+                  type: boolean
+      responses:
+        '200':
+          description: Validation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResult'
+  /projects/{projectPath}/assistants/claude/refresh:
+    post:
+      summary: Refresh or regenerate Claude Code assets in an existing project.
+      operationId: refreshClaudeCodeAssets
+      parameters:
+        - in: path
+          name: projectPath
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preserveUserContent:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          description: Claude Code assets refreshed without modifying unrelated assistant assets.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResult'
+        '409':
+          description: Refresh cannot safely preserve customized Claude Code content.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictResult'
+  /audits/claude-code-support:
+    post:
+      summary: Audit support-surface consistency for Claude Code across governance, docs, templates, CLI help, generated assets, and release outputs.
+      operationId: auditClaudeCodeSupportSurfaces
+      responses:
+        '200':
+          description: Audit completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportAuditResult'
+  /assistants/claude/commands/coverage:
+    get:
+      summary: Compare canonical Spec Kit workflow commands with generated Claude Code command coverage.
+      operationId: getClaudeCommandCoverage
+      responses:
+        '200':
+          description: Command coverage returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandCoverageResult'
+components:
+  schemas:
+    SupportedAssistant:
+      type: object
+      required:
+        - key
+        - displayName
+        - assistantType
+        - approved
+      properties:
+        key:
+          type: string
+          enum: [copilot, qwen, opencode, qoder, claude]
+        displayName:
+          type: string
+        assistantType:
+          type: string
+          enum: [ide, cli]
+        folder:
+          type: string
+        installUrl:
+          type: string
+          format: uri
+        requiresCli:
+          type: boolean
+        approved:
+          type: boolean
+    ProjectInitRequest:
+      type: object
+      required:
+        - projectMode
+        - assistantKey
+        - ignoreAgentTools
+      properties:
+        projectMode:
+          type: string
+          enum: [new-project, existing-directory]
+        assistantKey:
+          type: string
+          enum: [claude]
+        ignoreAgentTools:
+          type: boolean
+        scriptVariant:
+          type: string
+          enum: [sh]
+          default: sh
+    ProjectInitResult:
+      type: object
+      required:
+        - assistantKey
+        - generatedAssets
+        - commandCoverage
+        - ignorePolicyStatus
+      properties:
+        assistantKey:
+          type: string
+          enum: [claude]
+        generatedAssets:
+          type: array
+          items:
+            type: string
+        commandCoverage:
+          $ref: '#/components/schemas/CommandCoverageResult'
+        ignorePolicyStatus:
+          type: string
+          enum: [verified, failed]
+    ValidationResult:
+      type: object
+      required:
+        - assistantKey
+        - status
+      properties:
+        assistantKey:
+          type: string
+          enum: [claude]
+        status:
+          type: string
+          enum: [available, missing, ignored]
+        cliCommand:
+          type: string
+        installUrl:
+          type: string
+          format: uri
+    ValidationFailure:
+      type: object
+      required:
+        - assistantKey
+        - missingCommand
+        - installUrl
+        - nextStep
+      properties:
+        assistantKey:
+          type: string
+          enum: [claude]
+        missingCommand:
+          type: string
+        installUrl:
+          type: string
+          format: uri
+        nextStep:
+          type: string
+    RefreshResult:
+      type: object
+      required:
+        - assistantKey
+        - updatedAssets
+        - untouchedAssistantRoots
+        - preservedCustomContent
+      properties:
+        assistantKey:
+          type: string
+          enum: [claude]
+        updatedAssets:
+          type: array
+          items:
+            type: string
+        untouchedAssistantRoots:
+          type: array
+          items:
+            type: string
+        preservedCustomContent:
+          type: boolean
+    ConflictResult:
+      type: object
+      required:
+        - assistantKey
+        - conflictedAssets
+        - resolutionRequired
+      properties:
+        assistantKey:
+          type: string
+          enum: [claude]
+        conflictedAssets:
+          type: array
+          items:
+            type: string
+        resolutionRequired:
+          type: string
+    SupportAuditResult:
+      type: object
+      required:
+        - assistantKey
+        - status
+        - auditedSurfaces
+      properties:
+        assistantKey:
+          type: string
+          enum: [claude]
+        status:
+          type: string
+          enum: [pass, fail]
+        auditedSurfaces:
+          type: array
+          items:
+            type: object
+            required: [surfaceId, location, consistent, releaseBlocking]
+            properties:
+              surfaceId:
+                type: string
+              location:
+                type: string
+              consistent:
+                type: boolean
+              releaseBlocking:
+                type: boolean
+              notes:
+                type: string
+    CommandCoverageResult:
+      type: object
+      required:
+        - assistantKey
+        - canonicalCommandCount
+        - generatedCommandCount
+        - coveragePercent
+        - missingCommands
+      properties:
+        assistantKey:
+          type: string
+          enum: [claude]
+        canonicalCommandCount:
+          type: integer
+          minimum: 0
+        generatedCommandCount:
+          type: integer
+          minimum: 0
+        coveragePercent:
+          type: number
+          minimum: 0
+          maximum: 100
+        missingCommands:
+          type: array
+          items:
+            type: string

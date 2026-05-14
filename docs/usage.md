@@ -36,6 +36,15 @@ For Qoder projects, use the same lifecycle as other supported assistants:
 3. Refresh cross-agent instruction links after template updates by running the project instruction refresh flow (which invokes `scripts/bash/generate-instructions.sh`).
 4. Re-run `/speckit.review` before release to verify Qoder support remains consistent with other assistant surfaces.
 
+## Claude Code Maintenance Workflow
+
+For Claude Code projects, follow the same lifecycle as other supported assistants:
+
+1. Initialize with `specify init <project> --ai claude` (or `specify init . --ai claude` for existing directories).
+2. If Claude Code is not available locally, install from `https://www.anthropic.com/claude-code` or use `--ignore-agent-tools` to skip the tool check.
+3. Refresh cross-agent instruction links after template updates by running the project instruction refresh flow (which invokes `scripts/bash/generate-instructions.sh`).
+4. Re-run `/speckit.review` before release to verify Claude Code support remains consistent with other assistant surfaces.
+
 ## Command Relationships (Prerequisites & Next Steps)
 
 Spec Kit commands are not meant to be used in isolation. The table below clarifies the core main path, optional branches, and rework loops using a "common prerequisites / common next steps" approach.

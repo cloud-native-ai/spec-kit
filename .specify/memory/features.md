@@ -1,7 +1,7 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-05-11
-**Total Features**: 20
+**Last Updated**: 2026-05-14
+**Total Features**: 21
 
 ## Features
 
@@ -27,6 +27,7 @@
 | 018 | Configuration Management | Project configuration via pyproject.toml. | Completed | .specify/memory/features/018.md | - | 2026-02-10 |
 | 019 | Agents Command | Create or refine custom AI agents (.agent.md) for workspace-specific workflows. | Implemented | .specify/memory/features/019.md | .specify/specs/003-speckit-agents-command/requirements.md | 2026-02-28 |
 | 020 | Qoder Support | Add Qoder as a supported CLI assistant across initialization, validation, documentation, and release distribution. | Implemented | .specify/memory/features/020.md | .specify/specs/006-add-qoder-support/requirements.md | 2026-03-30 |
+| 021 | Claude Code Support | Add Claude Code as a first-class assistant with custom commands and Claude Code-specific configuration assets. | Implemented | .specify/memory/features/021.md | .specify/specs/009-claude-code-support/requirements.md | 2026-05-14 |
 
 ## Feature Entry Format
 

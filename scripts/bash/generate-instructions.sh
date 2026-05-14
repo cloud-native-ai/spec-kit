@@ -164,6 +164,12 @@ pushd .qoder >/dev/null
 ln -sf ../.specify/instructions.md project_rules.md
 popd >/dev/null
 
+# .claude
+mkdir -p .claude
+pushd .claude >/dev/null
+ln -sf ../.specify/instructions.md project_rules.md
+popd >/dev/null
+
 # Root level links
 ln -sf .specify/instructions.md QWEN.md
 ln -sf .specify/instructions.md CLAUDE.md

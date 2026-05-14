@@ -61,6 +61,12 @@ MODULE_DIR = Path(__file__).parent.resolve()
 
 # Agent configuration with name, folder, install URL, and CLI tool requirement
 AGENT_CONFIG = {
+    "claude": {
+        "name": "Claude Code",
+        "folder": ".claude/",
+        "install_url": "https://www.anthropic.com/claude-code",
+        "requires_cli": True,
+    },
     "copilot": {
         "name": "GitHub Copilot",
         "folder": ".github/",
@@ -678,6 +684,14 @@ def copy_local_templates(
                     project_path / ".qoder" / "commands",
                     script_type,
                 )
+            elif ai_assistant == "claude":
+                generate_commands(
+                    "claude",
+                    "md",
+                    "$ARGUMENTS",
+                    project_path / ".claude" / "commands",
+                    script_type,
+                )
             else:
                 # Fallback: copy commands to .specify/templates/commands
                 shutil.copytree(
@@ -698,6 +712,15 @@ def copy_local_templates(
                 src_file = MODULE_DIR / file_name
                 if src_file.exists():
                     shutil.copy2(src_file, project_path / file_name)
+
+        if ai_assistant == "claude":
+            claudeignore_template = resource_path / "templates" / "claudeignore-template"
+            if not claudeignore_template.exists():
+                fallback_template = MODULE_DIR.parent.parent / "templates" / "claudeignore-template"
+                if fallback_template.exists():
+                    claudeignore_template = fallback_template
+            if claudeignore_template.exists():
+                shutil.copy2(claudeignore_template, project_path / ".claudeignore")
 
         # Copy skills directory
         if (resource_path / "skills").exists():
@@ -732,6 +755,15 @@ def copy_local_templates(
             ensure_agent_skills_symlink(project_path, ".qoder")
             if tracker:
                 tracker.complete("local-templates", ".qoder/skills symlink ready")
+
+        if ai_assistant == "claude":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .claude/skills to .specify/skills"
+                )
+            ensure_agent_skills_symlink(project_path, ".claude")
+            if tracker:
+                tracker.complete("local-templates", ".claude/skills symlink ready")
 
     except Exception as e:
         if tracker:
@@ -1080,7 +1112,7 @@ def init(
     ai_assistant: str = typer.Option(
         None,
         "--ai",
-        help="AI assistant to use: copilot, qwen, opencode, or qoder",
+        help="AI assistant to use: claude, copilot, qwen, opencode, or qoder",
     ),
     script_type: str = typer.Option(
         None, "--script", help="Script type to use: sh or ps"
@@ -1088,7 +1120,7 @@ def init(
     ignore_agent_tools: bool = typer.Option(
         False,
         "--ignore-agent-tools",
-        help="Skip checks for AI agent tools like Qwen CLI, opencode, or Qoder CLI",
+        help="Skip checks for AI agent tools like Claude Code, Qwen CLI, opencode, or Qoder CLI",
     ),
     no_git: bool = typer.Option(
         False, "--no-git", help="Skip git repository initialization"
@@ -1127,6 +1159,7 @@ def init(
         specify init my-project
         specify init my-project --ai copilot --no-git
         specify init --ignore-agent-tools my-project
+        specify init . --ai claude         # Initialize in current directory with Claude Code
         specify init . --ai qwen           # Initialize in current directory
         specify init . --ai qoder          # Initialize in current directory with Qoder
         specify init .                     # Initialize in current directory (interactive AI selection)
@@ -1451,6 +1484,12 @@ def init(
 
         steps_lines.append(
             f"{step_num}. Set [cyan]CODEX_HOME[/cyan] environment variable before running Codex: [cyan]{cmd}[/cyan]"
+        )
+        step_num += 1
+
+    if selected_ai == "claude":
+        steps_lines.append(
+            f"{step_num}. Claude Code commands are in [cyan].claude/commands/[/cyan] and ignore rules are in [cyan].claudeignore[/cyan]"
         )
         step_num += 1
 

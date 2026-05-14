@@ -20,6 +20,12 @@ Pick script type explicitly (optional):
 uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --script sh  # Force POSIX shell
 ```
 
+Pick assistant explicitly (optional):
+
+```bash
+uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai claude
+```
+
 ### 2. Create the Requirements
 
 Use the `/speckit.requirements` command to create the **requirements specification** (WHAT and WHY). Focus on the **what** and **why**, not the tech stack.
