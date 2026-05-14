@@ -96,7 +96,7 @@ Execution flow:
     - Invocation mode (`user-invocable`, `disable-model-invocation`, subagent behavior)
     - Placeholder value map used for template rendering (name/description/tools/model/handoffs/role/workflow/output)
    - Keep tools minimal. Avoid broad permissions unless explicitly needed.
-  - **Approved providers only**: GitHub Copilot, Qwen Code, opencode, Qoder
+  - **Approved providers only**: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder
 
 9. **Iterate**
    1. Draft the agent file and save it.
@@ -195,7 +195,7 @@ handoffs: []
 
 ### Model Guidance
 
-- Prefer approved providers only: GitHub Copilot, Qwen Code, opencode, Qoder.
+- Prefer approved providers only: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder.
 - `model` may be a string or an ordered array for fallback.
 - If user asks for unsupported providers/models, block save and request correction.
 
@@ -226,7 +226,7 @@ Rules:
 
 ## Constraints and Validation
 
-- **Approved providers**: Only GitHub Copilot, Qwen Code, opencode, and Qoder are allowed
+- **Approved providers**: Only Claude Code, GitHub Copilot, Qwen Code, opencode, and Qoder are allowed
 - **Least privilege**: Default to minimal tool permissions when unspecified
 - **Overwrite behavior**: Same-name updates completely replace existing agent files
 - **Validation gates**: Invalid YAML, unsupported providers, or unresolved conflicts prevent saving

@@ -96,6 +96,7 @@ The research and practice focus areas of this project include:
 
 ## 🤖 Supported AI Agents
 
+- [Claude Code](https://www.anthropic.com/claude-code)
 - [GitHub Copilot](https://code.visualstudio.com/)
 - [Qwen Code](https://github.com/QwenLM/qwen-code)
 - [opencode](https://opencode.ai/)

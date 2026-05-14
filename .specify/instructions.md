@@ -50,11 +50,9 @@ Escalation rules:
 - Prefer scripts under `.specify/scripts/` and `scripts/` for repeatable operations.
 - `/speckit.*` commands are chat instructions, not terminal commands.
 - Treat Constitution as the authority for architecture and workflow constraints.
-- Use `/speckit.*` commands as explicit orchestration entry points for Skills when a workflow benefits from a predictable trigger. Commands define when to run a workflow; Skills provide reusable execution knowledge.
-- For `/speckit.skills`, delegate Skill creation behavior to a dedicated `create-skills` Skill when the target Skill does not exist, and delegate existing Skill refinement to `improve-skills` when the target Skill already exists. Keep command templates focused on routing, validation, and handoffs rather than embedding all Skill-authoring guidance inline.
 
 ## AI Tool Compatibility
-- **Supported Agents**: GitHub Copilot, Qwen Code, opencode, Qoder
+- **Supported Agents**: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder
 - **Instructions Refresh**: Run `/speckit.instructions` to regenerate this file and compatibility symlinks.
 
 ## Spec Kit Runtime & Symlink Model
@@ -79,7 +77,7 @@ Use this machine-maintained section to track reusable resource identifiers creat
 <!-- Record each skill as one table row with the columns below. -->
 | Skill Name | Skill ID | Description | Argument Hint | User Invocable | Disable Model Invocation | Canonical Path |
 |------------|----------|-------------|---------------|----------------|--------------------------|----------------|
-| create-skills | <SKILL:.specify/skills/create-skills/SKILL.md> | This skill can create new Spec Kit Skills from user input or conversation history. Use this when the user mentions ["create a skill", "new skill", "make a skill", "skill creation", "添加技能", "创建skill", "新建skill"] | - | - | - | .specify/skills/create-skills/SKILL.md |
+| None yet. | - | - | - | - | - | - |
 <!-- SKILLS_REGISTRY_END -->
 
 ### Tools
