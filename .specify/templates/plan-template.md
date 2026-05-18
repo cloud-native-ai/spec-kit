@@ -1,13 +1,13 @@
-# Implementation Plan: [SPEC]
+# Implementation Plan: [FEATURE]
 
-**Branch**: `[###-spec-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Specification from `.specify/specs/[REQUIREMENTS_KEY]/requirements.md`
+**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-[Extract from spec: primary requirement + technical approach from research]
+[Extract from feature spec: primary requirement + technical approach from research]
 
 ## Technical Context
 
@@ -31,42 +31,31 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-**Core Principles Compliance**:
-
-- **Feature-Centric Development**: Feature Index is single source of truth; all phases re-evaluate Feature changes.
-- **Specification-Driven Development**: Code serves specifications; specifications are executable and generate working systems
-- **Intent-Driven Development**: Focus on "what" and "why" before "how"; use rich specifications with guardrails
-- **Test-First & Contract-Driven**: TDD flow followed; pure functions have unit tests; critical flows have regression coverage
-- **AI Agent Integration**: Only approved agents (Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder); configuration rejects unsupported providers
-- **Continuous Quality & Observability**: Structured logging; semantic versioning; CI quality gates; simple designs (YAGNI)
-- **SDD Workflow Compliance**: Follow spec → plan → tasks → implement workflow with proper validation at each phase
-
-**Gates Status**: [✅ All gates pass / ❌ Specific gate failures with justification]
+[Gates determined based on constitution file]
 
 ## Project Structure
 
-### Documentation (this spec)
+### Documentation (this feature)
 
-```text
-.specify/specs/[REQUIREMENTS_KEY]/
+```
+specs/[###-feature]/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output (/speckit.plan command)
 ├── data-model.md        # Phase 1 output (/speckit.plan command)
 ├── quickstart.md        # Phase 1 output (/speckit.plan command)
 ├── contracts/           # Phase 1 output (/speckit.plan command)
-├── feature-ref.md       # Phase 1 output (/speckit.plan command)
 └── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 ```
 
 ### Source Code (repository root)
 <!--
   ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this spec. Delete unused options and expand the chosen structure with
+  for this feature. Delete unused options and expand the chosen structure with
   real paths (e.g., apps/admin, packages/something). The delivered plan must
   not include Option labels.
 -->
 
-```text
+```
 # [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
 src/
 ├── models/
@@ -107,8 +96,7 @@ directories captured above]
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
-> If no violations, explicitly write "N/A" and remove the table.
+*Fill ONLY if Constitution Check has violations that must be justified*
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|

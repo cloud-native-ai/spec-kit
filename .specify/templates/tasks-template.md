@@ -1,43 +1,22 @@
 ---
-
 description: "Task list template for feature implementation"
 ---
 
-# Tasks: [REQUIREMENT NAME]
+# Tasks: [FEATURE NAME]
 
-**Requirement ID**: [REQUIREMENT_ID] (from branch name, e.g., 003)
-**Requirement Key**: [REQUIREMENTS_KEY] (e.g., 003-speckit-agents-command)
-**Related Feature**: [FEATURE_ID] [FEATURE_NAME] (from .specify/memory/features.md)
-**Input**: Design documents from `.specify/specs/[REQUIREMENTS_KEY]/`
-**Prerequisites**: plan.md (required), requirements.md (required for user stories), research.md, data-model.md, contracts/
+**Input**: Design documents from `/specs/[###-feature-name]/`
+**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are MANDATORY per Constitution Principle V (Test-Driven Development (TDD) for Interactivity).
+**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
-## Definition of Done (DoD)
-
-<!--
-  ACTION REQUIRED: Define the completion criteria that apply to all tasks in this document.
-  These criteria ensure consistent understanding of what "done" means across the team.
--->
-
-- [ ] Code implemented according to specification
-- [ ] All automated tests pass (unit, integration, contract)
-- [ ] Manual verification completed where applicable
-- [ ] Documentation updated (inline comments, README, etc.)
-- [ ] Code reviewed and approved
-- [ ] Changes validated against success criteria from requirements.md
-
 ## Format: `[ID] [P?] [Story] Description`
-
 - **[P]**: Can run in parallel (different files, no dependencies)
 - **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
 - Include exact file paths in descriptions
-- **Verification tasks**: Add explicit manual QA/verification tasks when they are separate from automated tests
 
 ## Path Conventions
-
 - **Single project**: `src/`, `tests/` at repository root
 - **Web app**: `backend/src/`, `frontend/src/`
 - **Mobile**: `api/src/`, `ios/src/` or `android/src/`
@@ -48,7 +27,7 @@ description: "Task list template for feature implementation"
   IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
   
   The /speckit.tasks command MUST replace these with actual tasks based on:
-  - User stories from requirements.md (with their priorities P1, P2, P3...)
+  - User stories from spec.md (with their priorities P1, P2, P3...)
   - Feature requirements from plan.md
   - Entities from data-model.md
   - Endpoints from contracts/
@@ -97,16 +76,12 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 1 (MANDATORY) ⚠️
+### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
 
-> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
+**NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
 - [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
-
-### Manual Verification for User Story 1 (if required)
-
-- [ ] T011A [US1] Manual QA: validate [user journey] using quickstart.md steps
 
 ### Implementation for User Story 1
 
@@ -132,10 +107,6 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
 
-### Manual Verification for User Story 2 (if required)
-
-- [ ] T019A [US2] Manual QA: validate [user journey] using quickstart.md steps
-
 ### Implementation for User Story 2
 
 - [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
@@ -157,10 +128,6 @@ Examples of foundational tasks (adjust based on your project):
 
 - [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
-
-### Manual Verification for User Story 3 (if required)
-
-- [ ] T025A [US3] Manual QA: validate [user journey] using quickstart.md steps
 
 ### Implementation for User Story 3
 
@@ -186,7 +153,6 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
 - [ ] TXXX Security hardening
 - [ ] TXXX Run quickstart.md validation
-- [ ] TXXX Manual QA sweep for critical paths
 
 ---
 
@@ -280,3 +246,5 @@ With multiple developers:
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+
+
