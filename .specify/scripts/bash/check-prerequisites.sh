@@ -9,9 +9,6 @@
 #
 # OPTIONS:
 #   --json              Output in JSON format
-#   --require-spec      Require requirements.md to exist (for review/spec phases)
-#   --include-spec      Include requirements.md in AVAILABLE_DOCS list
-#   --include-plan      Include plan.md in AVAILABLE_DOCS list
 #   --require-tasks     Require tasks.md to exist (for implementation phase)
 #   --include-tasks     Include tasks.md in AVAILABLE_DOCS list
 #   --paths-only        Only output path variables (no validation)
@@ -24,19 +21,34 @@
 
 set -e
 
+# Load common helpers for Unicode support and shared functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/common.sh" ]; then
+    # shellcheck source=/dev/null
+    source "$SCRIPT_DIR/common.sh"
+    # Ensure UTF-8 locale for better Unicode handling
+    ensure_utf8_locale || true
+fi
+
 # Parse command line arguments
 JSON_MODE=false
+REQUIRE_TASKS=false
+INCLUDE_TASKS=false
 REQUIRE_SPEC=false
 INCLUDE_SPEC=false
 INCLUDE_PLAN=false
-REQUIRE_TASKS=false
-INCLUDE_TASKS=false
 PATHS_ONLY=false
 
 for arg in "$@"; do
     case "$arg" in
         --json)
             JSON_MODE=true
+            ;;
+        --require-tasks)
+            REQUIRE_TASKS=true
+            ;;
+        --include-tasks)
+            INCLUDE_TASKS=true
             ;;
         --require-spec)
             REQUIRE_SPEC=true
@@ -46,12 +58,6 @@ for arg in "$@"; do
             ;;
         --include-plan)
             INCLUDE_PLAN=true
-            ;;
-        --require-tasks)
-            REQUIRE_TASKS=true
-            ;;
-        --include-tasks)
-            INCLUDE_TASKS=true
             ;;
         --paths-only)
             PATHS_ONLY=true
@@ -64,11 +70,11 @@ Consolidated prerequisite checking for Spec-Driven Development workflow.
 
 OPTIONS:
   --json              Output in JSON format
-    --require-spec      Require requirements.md to exist (for review/spec phases)
-    --include-spec      Include requirements.md in AVAILABLE_DOCS list
-    --include-plan      Include plan.md in AVAILABLE_DOCS list
   --require-tasks     Require tasks.md to exist (for implementation phase)
   --include-tasks     Include tasks.md in AVAILABLE_DOCS list
+  --require-spec      Require requirements.md to exist
+  --include-spec      Include requirements.md in AVAILABLE_DOCS list
+  --include-plan      Include plan.md in AVAILABLE_DOCS list
   --paths-only        Only output path variables (no prerequisite validation)
   --help, -h          Show this help message
 
@@ -78,9 +84,6 @@ EXAMPLES:
   
   # Check implementation prerequisites (plan.md + tasks.md required)
   ./check-prerequisites.sh --json --require-tasks --include-tasks
-
-    # Check review prerequisites (requirements.md + plan.md + tasks.md)
-    ./check-prerequisites.sh --json --require-spec --include-spec --include-plan --include-tasks
   
   # Get feature paths only (no validation)
   ./check-prerequisites.sh --paths-only
@@ -96,19 +99,21 @@ EOF
 done
 
 # Source common functions
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
+
+# Ensure UTF-8 locale for better Unicode handling across tools
+ensure_utf8_locale || true
 
 # Get feature paths and validate branch
 eval $(get_feature_paths)
 check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || exit 1
 
-# Normalize canonical naming used by current SDD prompts.
-REQUIREMENTS_DIR="${REQUIREMENTS_DIR:-$FEATURE_DIR}"
-
-# Extract REQUIREMENT_ID from branch name (requirement/spec key, not Feature ID).
+# Extract REQUIREMENT_ID from branch name (NOT feature name)
+# Branch name format: NNN-requirement-name (e.g., 003-speckit-agents-command)
+# This is the requirement/spec key, NOT the feature name
 REQUIREMENT_ID=""
-if [[ "$CURRENT_BRANCH" =~ ^([0-9]+)- ]]; then
+if [[ $CURRENT_BRANCH =~ ^([0-9]+)- ]]; then
     REQUIREMENT_ID="${BASH_REMATCH[1]}"
 fi
 
@@ -124,14 +129,15 @@ fi
 if $PATHS_ONLY; then
     if $JSON_MODE; then
         # Minimal JSON paths payload (no validation performed)
-        printf '{"REPO_ROOT":"%s","BRANCH":"%s","REQUIREMENT_ID":"%s","REQUIREMENTS_DIR":"%s","FEATURE_DIR":"%s","FEATURE_ID":"%s","FEATURE_NAME":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s"}\n' \
-            "$REPO_ROOT" "$CURRENT_BRANCH" "$REQUIREMENT_ID" "$REQUIREMENTS_DIR" "$FEATURE_DIR" "$FEATURE_ID" "$FEATURE_NAME" "$FEATURE_SPEC" "$IMPL_PLAN" "$TASKS"
+        # Note: REQUIREMENT_ID is extracted from branch name, not FEATURE_ID
+        # Feature metadata must be retrieved from .specify/memory/features.md
+        printf '{"REPO_ROOT":"%s","BRANCH":"%s","REQUIREMENT_ID":"%s","REQUIREMENTS_DIR":"%s","FEATURE_ID":"%s","FEATURE_NAME":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s"}\n' \
+            "$REPO_ROOT" "$CURRENT_BRANCH" "$REQUIREMENT_ID" "$REQUIREMENTS_DIR" "$FEATURE_ID" "$FEATURE_NAME" "$FEATURE_SPEC" "$IMPL_PLAN" "$TASKS"
     else
         echo "REPO_ROOT: $REPO_ROOT"
         echo "BRANCH: $CURRENT_BRANCH"
         echo "REQUIREMENT_ID: $REQUIREMENT_ID"
         echo "REQUIREMENTS_DIR: $REQUIREMENTS_DIR"
-        echo "FEATURE_DIR: $FEATURE_DIR"
         echo "FEATURE_ID: $FEATURE_ID"
         echo "FEATURE_NAME: $FEATURE_NAME"
         echo "FEATURE_SPEC: $FEATURE_SPEC"
@@ -144,10 +150,11 @@ fi
 # Validate required directories and files
 if [[ ! -d "$REQUIREMENTS_DIR" ]]; then
     echo "ERROR: Feature directory not found: $REQUIREMENTS_DIR" >&2
-    echo "Run /speckit.specify first to create the feature structure." >&2
+    echo "Run /speckit.requirements first to create the feature structure." >&2
     exit 1
 fi
 
+# Check for requirements.md if required
 if $REQUIRE_SPEC && [[ ! -f "$FEATURE_SPEC" ]]; then
     echo "ERROR: requirements.md not found in $REQUIREMENTS_DIR" >&2
     echo "Run /speckit.requirements first to create the specification." >&2
@@ -170,10 +177,12 @@ fi
 # Build list of available documents
 docs=()
 
+# Include requirements.md if requested and it exists
 if $INCLUDE_SPEC && [[ -f "$FEATURE_SPEC" ]]; then
     docs+=("requirements.md")
 fi
 
+# Include plan.md if requested and it exists
 if $INCLUDE_PLAN && [[ -f "$IMPL_PLAN" ]]; then
     docs+=("plan.md")
 fi
@@ -204,12 +213,11 @@ if $JSON_MODE; then
         json_docs="[${json_docs%,}]"
     fi
     
-    printf '{"REQUIREMENTS_DIR":"%s","FEATURE_DIR":"%s","REQUIREMENT_ID":"%s","FEATURE_ID":"%s","FEATURE_NAME":"%s","AVAILABLE_DOCS":%s}\n' \
-        "$REQUIREMENTS_DIR" "$FEATURE_DIR" "$REQUIREMENT_ID" "$FEATURE_ID" "$FEATURE_NAME" "$json_docs"
+    printf '{"REQUIREMENTS_DIR":"%s","REQUIREMENT_ID":"%s","FEATURE_ID":"%s","FEATURE_NAME":"%s","AVAILABLE_DOCS":%s}\n' \
+        "$REQUIREMENTS_DIR" "$REQUIREMENT_ID" "$FEATURE_ID" "$FEATURE_NAME" "$json_docs"
 else
     # Text output
     echo "REQUIREMENTS_DIR:$REQUIREMENTS_DIR"
-    echo "FEATURE_DIR:$FEATURE_DIR"
     echo "REQUIREMENT_ID:$REQUIREMENT_ID"
     echo "FEATURE_ID:$FEATURE_ID"
     echo "FEATURE_NAME:$FEATURE_NAME"

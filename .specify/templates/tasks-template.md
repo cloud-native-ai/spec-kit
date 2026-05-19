@@ -1,4 +1,5 @@
 ---
+
 description: "Task list template for feature implementation"
 ---
 
@@ -14,12 +15,29 @@ description: "Task list template for feature implementation"
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+## Definition of Done (DoD)
+
+<!--
+  ACTION REQUIRED: Define the completion criteria that apply to all tasks in this document.
+  These criteria ensure consistent understanding of what "done" means across the team.
+-->
+
+- [ ] Code implemented according to specification
+- [ ] All automated tests pass (unit, integration, contract)
+- [ ] Manual verification completed where applicable
+- [ ] Documentation updated (inline comments, README, etc.)
+- [ ] Code reviewed and approved
+- [ ] Changes validated against success criteria from requirements.md
+
 ## Format: `[ID] [P?] [Story] Description`
+
 - **[P]**: Can run in parallel (different files, no dependencies)
 - **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
 - Include exact file paths in descriptions
+- **Verification tasks**: Add explicit manual QA/verification tasks when they are separate from automated tests
 
 ## Path Conventions
+
 - **Single project**: `src/`, `tests/` at repository root
 - **Web app**: `backend/src/`, `frontend/src/`
 - **Mobile**: `api/src/`, `ios/src/` or `android/src/`
@@ -81,10 +99,14 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 1 (MANDATORY) ⚠️
 
-**NOTE: Write these tests FIRST, ensure they FAIL before implementation**
+> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
 - [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+
+### Manual Verification for User Story 1 (if required)
+
+- [ ] T011A [US1] Manual QA: validate [user journey] using quickstart.md steps
 
 ### Implementation for User Story 1
 
@@ -110,6 +132,10 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
 
+### Manual Verification for User Story 2 (if required)
+
+- [ ] T019A [US2] Manual QA: validate [user journey] using quickstart.md steps
+
 ### Implementation for User Story 2
 
 - [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
@@ -132,6 +158,10 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
 
+### Manual Verification for User Story 3 (if required)
+
+- [ ] T025A [US3] Manual QA: validate [user journey] using quickstart.md steps
+
 ### Implementation for User Story 3
 
 - [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
@@ -153,9 +183,10 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX [P] Documentation updates in docs/
 - [ ] TXXX Code cleanup and refactoring
 - [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests in tests/unit/
+- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
 - [ ] TXXX Security hardening
 - [ ] TXXX Run quickstart.md validation
+- [ ] TXXX Manual QA sweep for critical paths
 
 ---
 
@@ -249,5 +280,3 @@ With multiple developers:
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
-
-
