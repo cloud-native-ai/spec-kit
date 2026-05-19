@@ -1,0 +1,383 @@
+openapi: 3.1.0
+info:
+  title: Spec Kit AI Tools Support Contract
+  version: 0.1.0
+  summary: Contract for official assistant discovery, initialization, coexistence refresh, core preservation, and support-surface audits.
+servers:
+  - url: https://spec-kit.local/contracts
+paths:
+  /assistants:
+    get:
+      summary: List official AI assistants and their expected asset profiles.
+      operationId: listOfficialAssistants
+      responses:
+        '200':
+          description: Official assistant support profiles returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [assistants]
+                properties:
+                  assistants:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AssistantSupportProfile'
+  /projects/init:
+    post:
+      summary: Initialize a new project with one or more official AI assistants.
+      operationId: initializeProjectWithAssistants
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectInitRequest'
+      responses:
+        '201':
+          description: Project initialized and requested assistant assets generated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitializationResultSummary'
+        '400':
+          description: Unsupported assistant selection or invalid project mode.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '409':
+          description: Initialization would overwrite protected core or customized tool-specific content.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictResult'
+        '424':
+          description: Required local assistant tool is missing and validation was not skipped.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationFailure'
+  /projects/{projectPath}/assistants:
+    post:
+      summary: Add or refresh assistant support in an existing Spec Kit workspace.
+      operationId: addOrRefreshAssistants
+      parameters:
+        - in: path
+          name: projectPath
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistantRefreshRequest'
+      responses:
+        '200':
+          description: Existing workspace updated without overwriting initialized core files.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitializationResultSummary'
+        '404':
+          description: Existing Spec Kit workspace was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '409':
+          description: Refresh cannot safely preserve customized content.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictResult'
+  /projects/{projectPath}/core-assets/preservation-check:
+    post:
+      summary: Check whether existing core `.specify` assets will be reused, created, or blocked before assistant refresh.
+      operationId: checkCoreAssetPreservation
+      parameters:
+        - in: path
+          name: projectPath
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Preservation check completed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [coreAssets, safeToProceed]
+                properties:
+                  safeToProceed:
+                    type: boolean
+                  coreAssets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CoreWorkspaceAsset'
+  /assistants/{assistantKey}/commands/coverage:
+    get:
+      summary: Compare canonical Spec Kit command templates with generated command coverage for one assistant.
+      operationId: getAssistantCommandCoverage
+      parameters:
+        - in: path
+          name: assistantKey
+          required: true
+          schema:
+            $ref: '#/components/schemas/AssistantKey'
+      responses:
+        '200':
+          description: Command coverage returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandCoverageResult'
+  /audits/ai-tools-support:
+    post:
+      summary: Audit support-surface consistency across official assistants, docs, templates, generated assets, tests, and package resources.
+      operationId: auditAiToolsSupportSurfaces
+      responses:
+        '200':
+          description: Audit completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportAuditResult'
+components:
+  schemas:
+    AssistantKey:
+      type: string
+      enum: [copilot, claude, qwen, opencode, qoder]
+    AssistantSupportProfile:
+      type: object
+      required:
+        - key
+        - displayName
+        - assistantType
+        - rootFolder
+        - commandDirectory
+        - commandFormat
+        - requiresCli
+        - officiallySupported
+      properties:
+        key:
+          $ref: '#/components/schemas/AssistantKey'
+        displayName:
+          type: string
+        assistantType:
+          type: string
+          enum: [ide, cli]
+        rootFolder:
+          type: string
+        commandDirectory:
+          type: string
+        commandFormat:
+          type: string
+        installUrl:
+          type: string
+          format: uri
+        requiresCli:
+          type: boolean
+        officiallySupported:
+          type: boolean
+    ProjectInitRequest:
+      type: object
+      required: [projectMode, assistantKeys, ignoreAgentTools, preserveExistingCore]
+      properties:
+        projectMode:
+          type: string
+          enum: [new-project, existing-workspace]
+        assistantKeys:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AssistantKey'
+        ignoreAgentTools:
+          type: boolean
+        preserveExistingCore:
+          type: boolean
+          default: true
+        scriptVariant:
+          type: string
+          enum: [sh]
+          default: sh
+    AssistantRefreshRequest:
+      type: object
+      required: [assistantKeys, preserveExistingCore, preserveToolCustomizations]
+      properties:
+        assistantKeys:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AssistantKey'
+        preserveExistingCore:
+          type: boolean
+          default: true
+        preserveToolCustomizations:
+          type: boolean
+          default: true
+        ignoreAgentTools:
+          type: boolean
+          default: false
+    CoreWorkspaceAsset:
+      type: object
+      required: [path, assetCategory, initialized, preservationPolicy, plannedAction]
+      properties:
+        path:
+          type: string
+        assetCategory:
+          type: string
+          enum: [memory, script, template, instruction, skill, tool, spec]
+        sourceTemplate:
+          type: string
+        initialized:
+          type: boolean
+        userModified:
+          type: string
+          enum: [yes, no, unknown]
+        preservationPolicy:
+          type: string
+          enum: [preserve, create-if-missing, link, explicit-overwrite-only]
+        plannedAction:
+          type: string
+          enum: [create, reuse, skip, preserve, block]
+    InitializationResultSummary:
+      type: object
+      required:
+        - configuredAssistants
+        - created
+        - reused
+        - skipped
+        - preserved
+        - conflicts
+        - attentionRequired
+        - status
+      properties:
+        configuredAssistants:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssistantKey'
+        created:
+          type: array
+          items:
+            type: string
+        reused:
+          type: array
+          items:
+            type: string
+        skipped:
+          type: array
+          items:
+            type: string
+        preserved:
+          type: array
+          items:
+            type: string
+        conflicts:
+          type: array
+          items:
+            type: string
+        attentionRequired:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [completed, completed-with-warnings, blocked, failed]
+    CommandCoverageResult:
+      type: object
+      required: [assistantKey, canonicalCommandCount, generatedCommandCount, missingCommands, excludedCommands, complete]
+      properties:
+        assistantKey:
+          $ref: '#/components/schemas/AssistantKey'
+        canonicalCommandCount:
+          type: integer
+          minimum: 0
+        generatedCommandCount:
+          type: integer
+          minimum: 0
+        missingCommands:
+          type: array
+          items:
+            type: string
+        excludedCommands:
+          type: array
+          items:
+            type: object
+            required: [commandName, reason]
+            properties:
+              commandName:
+                type: string
+              reason:
+                type: string
+        complete:
+          type: boolean
+    SupportAuditResult:
+      type: object
+      required: [expectedAssistants, surfaces, releaseReady]
+      properties:
+        expectedAssistants:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssistantKey'
+        surfaces:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupportSurfaceAudit'
+        releaseReady:
+          type: boolean
+    SupportSurfaceAudit:
+      type: object
+      required: [surfaceId, surfaceType, location, expectedAssistants, observedAssistants, consistent, releaseBlocking]
+      properties:
+        surfaceId:
+          type: string
+        surfaceType:
+          type: string
+          enum: [cli-help, documentation, template, script, package, test, generated-asset, governance]
+        location:
+          type: string
+        expectedAssistants:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssistantKey'
+        observedAssistants:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssistantKey'
+        consistent:
+          type: boolean
+        releaseBlocking:
+          type: boolean
+    ValidationFailure:
+      type: object
+      required: [assistantKey, missingCommand, installUrl, nextStep]
+      properties:
+        assistantKey:
+          $ref: '#/components/schemas/AssistantKey'
+        missingCommand:
+          type: string
+        installUrl:
+          type: string
+          format: uri
+        nextStep:
+          type: string
+    ConflictResult:
+      type: object
+      required: [conflictedAssets, resolutionRequired]
+      properties:
+        conflictedAssets:
+          type: array
+          items:
+            type: string
+        resolutionRequired:
+          type: string
+    ErrorResult:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string

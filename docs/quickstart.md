@@ -23,7 +23,11 @@ uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME
 Pick assistant explicitly (optional):
 
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai claude
+uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai copilot  # GitHub Copilot
+uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai claude   # Claude Code
+uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai qwen     # Qwen Code
+uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai opencode # opencode
+uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai qoder    # Qoder
 ```
 
 ### 2. Create the Requirements

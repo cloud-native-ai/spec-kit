@@ -1,7 +1,7 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-05-14
-**Total Features**: 21
+**Last Updated**: 2026-05-19
+**Total Features**: 22
 
 ## Features
 
@@ -28,6 +28,7 @@
 | 019 | Agents Command | Create or refine custom AI agents (.agent.md) for workspace-specific workflows. | Implemented | .specify/memory/features/019.md | .specify/specs/003-speckit-agents-command/requirements.md | 2026-02-28 |
 | 020 | Qoder Support | Add Qoder as a supported CLI assistant across initialization, validation, documentation, and release distribution. | Implemented | .specify/memory/features/020.md | .specify/specs/006-add-qoder-support/requirements.md | 2026-03-30 |
 | 021 | Claude Code Support | Add Claude Code as a first-class assistant with custom commands and Claude Code-specific configuration assets. | Implemented | .specify/memory/features/021.md | .specify/specs/009-claude-code-support/requirements.md | 2026-05-14 |
+| 022 | AI Tools Support | Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files. | Implemented | .specify/memory/features/022.md | .specify/specs/011-ai-tools-support/requirements.md | 2026-05-19 |
 
 ## Feature Entry Format
 

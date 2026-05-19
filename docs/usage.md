@@ -27,6 +27,33 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 | `/speckit.skills` | Manage specialized skills | Extension |
 | `/speckit.instructions` | Generate usage instructions | Documentation |
 
+## GitHub Copilot Maintenance Workflow
+
+For GitHub Copilot projects, follow the same lifecycle as other supported assistants:
+
+1. Initialize with `specify init <project> --ai copilot` (or `specify init . --ai copilot` for existing directories).
+2. GitHub Copilot is IDE-based and does not require a separate CLI check.
+3. Refresh cross-agent instruction links after template updates by running the project instruction refresh flow (which invokes `scripts/bash/generate-instructions.sh`).
+4. Re-run `/speckit.review` before release to verify Copilot support remains consistent with other assistant surfaces.
+
+## Qwen Code Maintenance Workflow
+
+For Qwen Code projects, follow the same lifecycle as other supported assistants:
+
+1. Initialize with `specify init <project> --ai qwen` (or `specify init . --ai qwen` for existing directories).
+2. If Qwen Code is not available locally, install from `https://github.com/QwenLM/qwen-code` or use `--ignore-agent-tools` to skip the tool check.
+3. Refresh cross-agent instruction links after template updates by running the project instruction refresh flow (which invokes `scripts/bash/generate-instructions.sh`).
+4. Re-run `/speckit.review` before release to verify Qwen Code support remains consistent with other assistant surfaces.
+
+## opencode Maintenance Workflow
+
+For opencode projects, follow the same lifecycle as other supported assistants:
+
+1. Initialize with `specify init <project> --ai opencode` (or `specify init . --ai opencode` for existing directories).
+2. If opencode is not available locally, install from `https://opencode.ai/` or use `--ignore-agent-tools` to skip the tool check.
+3. Refresh cross-agent instruction links after template updates by running the project instruction refresh flow (which invokes `scripts/bash/generate-instructions.sh`).
+4. Re-run `/speckit.review` before release to verify opencode support remains consistent with other assistant surfaces.
+
 ## Qoder Maintenance Workflow
 
 For Qoder projects, use the same lifecycle as other supported assistants:

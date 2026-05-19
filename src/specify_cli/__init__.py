@@ -93,6 +93,243 @@ AGENT_CONFIG = {
     },
 }
 
+# ---------------------------------------------------------------------------
+# Assistant support profile helpers (Feature 022)
+# ---------------------------------------------------------------------------
+
+# Official assistant keys – the canonical list for this feature.
+_OFFICIAL_ASSISTANT_KEYS = ["copilot", "claude", "qwen", "opencode", "qoder"]
+
+# Assistant → command output directory mapping (relative to project root)
+_ASSISTANT_COMMAND_DIRS = {
+    "copilot": ".github/prompts",
+    "claude": ".claude/commands",
+    "qwen": ".qwen/commands",
+    "opencode": ".opencode/command",
+    "qoder": ".qoder/commands",
+}
+
+# Assistant → file extension for generated command files
+_ASSISTANT_EXTENSIONS = {
+    "copilot": "prompt.md",
+    "claude": "md",
+    "qwen": "toml",
+    "opencode": "md",
+    "qoder": "md",
+}
+
+# Assistant → argument format placeholder
+_ASSISTANT_ARG_FORMATS = {
+    "copilot": "$ARGUMENTS",
+    "claude": "$ARGUMENTS",
+    "qwen": "{{args}}",
+    "opencode": "$ARGUMENTS",
+    "qoder": "$ARGUMENTS",
+}
+
+# Skills symlink assistants (those that need .<agent>/skills → .specify/skills link)
+_SKILLS_SYMLINK_ASSISTANTS = {"copilot", "qoder", "claude", "qwen", "opencode"}
+
+
+def get_official_assistants() -> List[str]:
+    """Return the ordered list of officially supported assistant keys."""
+    return list(_OFFICIAL_ASSISTANT_KEYS)
+
+
+def get_assistant_profile(key: str) -> dict:
+    """Return the full assistant profile dict or raise KeyError."""
+    profile = dict(AGENT_CONFIG[key])
+    profile.setdefault("key", key)
+    profile.setdefault("command_directory", _ASSISTANT_COMMAND_DIRS.get(key, ""))
+    profile.setdefault("command_format", _ASSISTANT_EXTENSIONS.get(key, "md"))
+    profile.setdefault("arg_format", _ASSISTANT_ARG_FORMATS.get(key, "$ARGUMENTS"))
+    profile["officially_supported"] = key in _OFFICIAL_ASSISTANT_KEYS
+    return profile
+
+
+class InitializationResultSummary:
+    """Structured summary of an initialization or refresh operation."""
+
+    def __init__(self):
+        self.created: List[str] = []
+        self.reused: List[str] = []
+        self.skipped: List[str] = []
+        self.preserved: List[str] = []
+        self.conflicts: List[str] = []
+        self.attention_required: List[str] = []
+        self.configured_assistants: List[str] = []
+
+    def add_created(self, *paths: str):
+        self.created.extend(paths)
+
+    def add_reused(self, *paths: str):
+        self.reused.extend(paths)
+
+    def add_skipped(self, *paths: str):
+        self.skipped.extend(paths)
+
+    def add_preserved(self, *paths: str):
+        self.preserved.extend(paths)
+
+    def add_conflict(self, *paths: str):
+        self.conflicts.extend(paths)
+
+    def add_attention(self, *msgs: str):
+        self.attention_required.extend(msgs)
+
+    def set_configured_assistants(self, assistants: List[str]):
+        self.configured_assistants = list(assistants)
+
+    def is_empty(self) -> bool:
+        """Return True when no operation touched any asset."""
+        return not any(
+            [
+                self.created,
+                self.reused,
+                self.skipped,
+                self.preserved,
+                self.conflicts,
+                self.attention_required,
+            ]
+        )
+
+    def to_dict(self) -> dict:
+        return {
+            "created": list(self.created),
+            "reused": list(self.reused),
+            "skipped": list(self.skipped),
+            "preserved": list(self.preserved),
+            "conflicts": list(self.conflicts),
+            "attention_required": list(self.attention_required),
+            "configured_assistants": list(self.configured_assistants),
+        }
+
+    def render_rich(self) -> str:
+        """Return a rich-formatted summary string suitable for console output."""
+        lines = []
+        if self.created:
+            lines.append(f"[green]Created:[/green] {', '.join(self.created)}")
+        if self.reused:
+            lines.append(f"[dim]Reused:[/dim] {', '.join(self.reused)}")
+        if self.skipped:
+            lines.append(f"[yellow]Skipped:[/yellow] {', '.join(self.skipped)}")
+        if self.preserved:
+            lines.append(f"[cyan]Preserved:[/cyan] {', '.join(self.preserved)}")
+        if self.conflicts:
+            lines.append(f"[red]Conflicts:[/red] {', '.join(self.conflicts)}")
+        if self.attention_required:
+            lines.append(
+                f"[yellow]Attention required:[/yellow] {'; '.join(self.attention_required)}"
+            )
+        if self.configured_assistants:
+            lines.append(
+                f"[green]Configured assistants:[/green] {', '.join(self.configured_assistants)}"
+            )
+        return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Core workspace asset preservation helpers
+# ---------------------------------------------------------------------------
+
+# Paths under project/.specify/ that constitute the shared core and should
+# be preserved when they already exist.
+_CORE_SPECIFY_ASSETS = [
+    ".specify/memory",
+    ".specify/templates",
+    ".specify/scripts",
+    ".specify/skills",
+    ".specify/instructions.md",
+]
+
+
+def core_asset_relpaths() -> List[str]:
+    """Return the list of relative paths considered core workspace assets."""
+    return list(_CORE_SPECIFY_ASSETS)
+
+
+def is_core_asset_initialized(project_path: Path, rel_path: str) -> bool:
+    """Return True if the core asset already exists in the workspace."""
+    return (project_path / rel_path).exists()
+
+
+def detect_initialized_core_assets(project_path: Path) -> List[str]:
+    """Return the list of core asset relpaths that already exist."""
+    return [
+        p for p in _CORE_SPECIFY_ASSETS if is_core_asset_initialized(project_path, p)
+    ]
+
+
+def detect_configured_assistants(project_path: Path) -> List[str]:
+    """Detect which assistants appear to be configured in the workspace."""
+    configured = []
+    for key in _OFFICIAL_ASSISTANT_KEYS:
+        profile = get_assistant_profile(key)
+        folder = profile.get("folder", "")
+        if folder and (project_path / folder).exists():
+            configured.append(key)
+    return configured
+
+
+# ---------------------------------------------------------------------------
+# Assistant command coverage helpers
+# ---------------------------------------------------------------------------
+
+
+def get_canonical_command_stems() -> List[str]:
+    """Return the sorted list of canonical command template stems found on disk."""
+    resource_path = get_resource_path()
+    if not resource_path:
+        return []
+    commands_dir = resource_path / "templates" / "commands"
+    if not commands_dir.exists():
+        return []
+    return sorted(f.stem for f in commands_dir.glob("*.md") if f.is_file())
+
+
+def get_assistant_generated_commands(
+    project_path: Path, assistant_key: str
+) -> List[str]:
+    """Return the sorted list of generated speckit.* command stems for an assistant."""
+    dir_rel = _ASSISTANT_COMMAND_DIRS.get(assistant_key, "")
+    if not dir_rel:
+        return []
+    output_dir = project_path / dir_rel
+    if not output_dir.exists():
+        return []
+    stems = set()
+    for f in output_dir.iterdir():
+        if f.is_file() and f.name.startswith("speckit."):
+            stem = f.name.replace("speckit.", "", 1)
+            # Strip extension
+            for ext in [".prompt.md", ".md", ".toml"]:
+                if stem.endswith(ext):
+                    stem = stem[: -len(ext)]
+                    break
+            stems.add(stem)
+    return sorted(stems)
+
+
+def compute_command_coverage(project_path: Path, assistant_key: str) -> dict:
+    """Return {canonical, generated, missing, coverage_pct} for an assistant."""
+    canonical = get_canonical_command_stems()
+    generated = get_assistant_generated_commands(project_path, assistant_key)
+    generated_set = set(generated)
+    canonical_set = set(canonical)
+    missing = sorted(canonical_set - generated_set)
+    coverage_pct = (
+        round(100.0 * len(canonical_set & generated_set) / len(canonical_set), 1)
+        if canonical_set
+        else 100.0
+    )
+    return {
+        "canonical": canonical,
+        "generated": generated,
+        "missing": missing,
+        "coverage_pct": coverage_pct,
+    }
+
+
 SCRIPT_TYPE_CHOICES = {"sh": "POSIX Shell (bash/zsh)"}
 
 
@@ -541,7 +778,7 @@ def copy_local_templates(
 
     # Create project directory only if not using current directory
     if not is_current_dir:
-        project_path.mkdir(parents=True)
+        project_path.mkdir(parents=True, exist_ok=True)
 
     def ensure_agent_skills_symlink(root_path: Path, agent_dir_name: str) -> None:
         agent_dir = root_path / agent_dir_name
@@ -714,9 +951,13 @@ def copy_local_templates(
                     shutil.copy2(src_file, project_path / file_name)
 
         if ai_assistant == "claude":
-            claudeignore_template = resource_path / "templates" / "claudeignore-template"
+            claudeignore_template = (
+                resource_path / "templates" / "claudeignore-template"
+            )
             if not claudeignore_template.exists():
-                fallback_template = MODULE_DIR.parent.parent / "templates" / "claudeignore-template"
+                fallback_template = (
+                    MODULE_DIR.parent.parent / "templates" / "claudeignore-template"
+                )
                 if fallback_template.exists():
                     claudeignore_template = fallback_template
             if claudeignore_template.exists():
@@ -764,6 +1005,24 @@ def copy_local_templates(
             ensure_agent_skills_symlink(project_path, ".claude")
             if tracker:
                 tracker.complete("local-templates", ".claude/skills symlink ready")
+
+        if ai_assistant == "qwen":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .qwen/skills to .specify/skills"
+                )
+            ensure_agent_skills_symlink(project_path, ".qwen")
+            if tracker:
+                tracker.complete("local-templates", ".qwen/skills symlink ready")
+
+        if ai_assistant == "opencode":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .opencode/skills to .specify/skills"
+                )
+            ensure_agent_skills_symlink(project_path, ".opencode")
+            if tracker:
+                tracker.complete("local-templates", ".opencode/skills symlink ready")
 
     except Exception as e:
         if tracker:

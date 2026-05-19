@@ -1,6 +1,26 @@
 #!/usr/bin/env bash
 # Common functions and variables for all scripts
 
+ensure_utf8_locale() {
+    if locale 2>/dev/null | grep -qi 'utf-8'; then
+        return 0
+    fi
+
+    if locale -a 2>/dev/null | grep -qi '^C\.utf8\|^C\.UTF-8$'; then
+        export LC_ALL=C.UTF-8
+        export LANG=C.UTF-8
+        return 0
+    fi
+
+    if locale -a 2>/dev/null | grep -qi '^en_US\.utf8\|^en_US\.UTF-8$'; then
+        export LC_ALL=en_US.UTF-8
+        export LANG=en_US.UTF-8
+        return 0
+    fi
+
+    return 1
+}
+
 # Get repository root, with fallback for non-git repositories
 get_repo_root() {
     if git rev-parse --show-toplevel >/dev/null 2>&1; then
@@ -81,7 +101,7 @@ check_feature_branch() {
     return 0
 }
 
-get_feature_dir() { echo "$1/specs/$2"; }
+get_feature_dir() { echo "$1/.specify/specs/$2"; }
 
 get_feature_paths() {
     local repo_root=$(get_repo_root)
@@ -93,13 +113,20 @@ get_feature_paths() {
     fi
     
     local feature_dir=$(get_feature_dir "$repo_root" "$current_branch")
+    local requirement_id=""
+
+    if [[ "$current_branch" =~ ^([0-9]+)- ]]; then
+        requirement_id="${BASH_REMATCH[1]}"
+    fi
     
     cat <<EOF
 REPO_ROOT='$repo_root'
 CURRENT_BRANCH='$current_branch'
+REQUIREMENT_ID='$requirement_id'
 HAS_GIT='$has_git_repo'
 FEATURE_DIR='$feature_dir'
-FEATURE_SPEC='$feature_dir/spec.md'
+REQUIREMENTS_DIR='$feature_dir'
+FEATURE_SPEC='$feature_dir/requirements.md'
 IMPL_PLAN='$feature_dir/plan.md'
 TASKS='$feature_dir/tasks.md'
 RESEARCH='$feature_dir/research.md'

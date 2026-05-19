@@ -1,50 +1,134 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: 1.0.1 (No change)
+- Modified principles: None
+- Added sections: None
+- Removed sections: None
+- Templates requiring updates:
+  ✅ templates/plan-template.md - Aligned
+  ⚠ templates/tasks-template.md - References Principle V for TDD (should be IV)
+- Follow-up TODOs: None
+-->
+
+# Spec Kit Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Specification-Driven Development (SDD) as Foundation
+Specifications are the primary source of truth and MUST drive all implementation:
+- Code serves specifications, not the other way around
+- Specifications MUST be executable and generate working systems
+- Every technical decision MUST trace back to specific requirements in the specification
+- Specifications MUST evolve continuously based on feedback, operational reality, and changing requirements
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Rationale: Eliminates the gap between specification and implementation, ensuring systematic alignment and maintainable software.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Feature-Centric Development
+Features are the long-term backbone of the project:
+- The Feature Index MUST serve as the single source of truth for all project capabilities
+- Every spec → plan → tasks → implement step MUST re-evaluate Feature additions, removals, merges, or splits
+- Feature changes MUST be traceable to corresponding spec/plan evidence and recorded in Feature details
+- Features MUST be versioned and their evolution tracked systematically
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Rationale: Ensures project evolution remains focused on delivering value through well-defined, trackable features.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Intent-Driven Development
+Development intent MUST be expressed clearly in natural language and design artifacts:
+- Focus on the "what" and "why" before the "how"
+- Use rich specifications with guardrails and organizational principles
+- Multi-step refinement is preferred over one-shot code generation
+- Critical thinking and creativity are amplified through structured processes
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Rationale: Enables higher-level collaboration and ensures implementations align with business and user needs.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Test-First & Contract-Driven Implementation
+Implementation MUST follow rigorous quality standards:
+- Write or update tests BEFORE implementing new behavior (Red-Green-Refactor)
+- Pure functions/utilities MUST have unit tests
+- Critical flows MUST have automated regression coverage
+- Integration/contract tests MUST cover cross-service communication and external APIs
+- Acceptance scenarios from specifications become automated tests
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Rationale: Reduces regressions, clarifies intent, and validates real-world behavior beyond unit tests.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. AI Agent Integration Standards
+AI agent integration MUST follow strict guidelines:
+- Only support officially approved AI agents: Claude Code, GitHub Copilot, Qwen Code, opencode, and Qoder
+- Configuration parsing MUST reject unsupported providers
+- Agent capabilities MUST be leveraged for specification interpretation and implementation generation
+- Heavy reliance on advanced AI model capabilities for specification understanding is expected
+
+Rationale: Ensures consistent, secure, and maintainable AI integration while focusing on target tools.
+
+### VI. Continuous Quality & Observability
+All components MUST be observable, versioned, and maintainable:
+- Use structured logs for important events and errors
+- Prefer semantic versioning (MAJOR.MINOR.PATCH) for all components
+- Document breaking changes and migration notes
+- Keep designs as simple as possible; avoid speculative features (YAGNI)
+- Linting, formatting, and basic tests MUST pass in CI
+- New behavior MUST be reflected in specs/plan/tasks/docs where applicable
+
+Rationale: Makes systems debuggable, upgradable, maintainable, and ensures consistent quality.
+
+### VII. Specification-Plan-Task-Implementation Workflow
+The SDD workflow MUST be followed rigorously:
+- **Specification Phase**: Define comprehensive requirements, acceptance criteria, and constraints
+- **Planning Phase**: Map requirements to technical decisions with documented rationale
+- **Task Breakdown Phase**: Create actionable, atomic tasks from implementation plans
+- **Implementation Phase**: Execute tasks according to plans, generating code from specifications
+- Each phase MUST validate against the Feature Index and update it as needed
+
+Rationale: Provides systematic structure for transforming specifications into working systems while maintaining traceability.
+
+## Spec-Driven Development Workflow
+
+### Research & Context Gathering
+- Research agents MUST gather critical context during specification creation
+- Investigate library compatibility, performance benchmarks, and security implications
+- Organizational constraints MUST be discovered and applied automatically
+- Company standards (database, authentication, deployment policies) integrate seamlessly into specifications
+
+### Specification Evolution
+- Specifications evolve continuously through iterative dialogue with AI
+- AI asks clarifying questions, identifies edge cases, and defines precise acceptance criteria
+- Domain concepts become data models, user stories become API endpoints
+- Production metrics and incidents update specifications for next regeneration
+
+### Implementation Plan Generation
+- Implementation plans map requirements to technical decisions
+- Every technology choice has documented rationale
+- Every architectural decision traces back to specific requirements
+- Consistency validation continuously improves quality throughout the process
+
+## Feature Governance
+
+### Feature Lifecycle Management
+- **Draft**: Feature defined, spec in progress
+- **Planned**: Spec approved, implementation scheduled  
+- **Implemented**: Code changes merged to feature branch
+- **Ready for Review**: PR open, tests passing
+- **Completed**: Merged to main, deployed
+
+### Feature Documentation Requirements
+- Each Feature MUST have a detailed Feature Detail document
+- Feature Detail MUST include Overview, Key Changes, Implementation Notes, and Related Files
+- Feature Index MUST be updated with status changes and last updated timestamps
+- Total Features count MUST be maintained accurately
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This Constitution supersedes all other guidelines and documentation. All development activities MUST comply with these principles.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Amendment Procedure**: 
+- Amendments require formal proposal, team review, and version bump
+- Major changes (backwards incompatible) require MAJOR version increment
+- New principles or materially expanded guidance require MINOR version increment  
+- Clarifications, wording fixes, and non-semantic refinements require PATCH version increment
+
+**Compliance Review**: 
+- All pull requests MUST check compliance with core principles
+- Feature changes MUST be validated against the Feature Index
+- Specification quality MUST be verified before implementation begins
+
+**Version**: 1.0.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-02-05
