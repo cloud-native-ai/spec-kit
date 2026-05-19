@@ -2,7 +2,7 @@
 
 **Requirement Branch**: `011-ai-tools-support`  
 **Created**: 2026-05-18  
-**Status**: Draft  
+**Status**: Implemented  
 **Input**: User description: "完善所有的AI工具的支持，当前的流程主要是以支持vscode中的github copilot工具为主的，当使用其他AI工具的时候，对应的init命令中缺少必要的框架代码。同时需要支持多个工具共存，在执行init命令的时候如果.specify目录已经存在并且其中的核心文件已经初始化过了，新工具就不应该使用template去覆盖更新过的文件，而是直接使用现有的文件。"
 
 ## Related Feature *(mandatory)*

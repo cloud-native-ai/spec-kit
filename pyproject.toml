@@ -30,3 +30,10 @@ packages = ["src/specify_cli"]
 "scripts" = "specify_cli/scripts"
 "templates" = "specify_cli/templates"
 "skills" = "specify_cli/skills"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "contract: contract and external-surface validation tests",
+    "integration: integration tests using filesystem or fixture workspaces",
+]

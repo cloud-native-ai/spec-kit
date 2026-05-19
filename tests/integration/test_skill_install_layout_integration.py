@@ -4,6 +4,17 @@ import subprocess
 import uuid
 from pathlib import Path
 
+import pytest
+
+
+def _github_skills_is_global_symlink(root: Path) -> bool:
+    github_skills = root / ".github" / "skills"
+    primary_skills = root / ".specify" / "skills"
+    return (
+        github_skills.is_symlink()
+        and github_skills.resolve() == primary_skills.resolve()
+    )
+
 
 def _run_create_skill(
     root: Path, skill_name: str, check: bool = True, env: dict | None = None
@@ -91,8 +102,12 @@ def test_placeholder_fallback_mode_can_be_forced():
         )
         payload = json.loads(result.stdout)
 
-        assert payload["entrypoint_github_mode"] == "placeholder"
-        assert (github_entry / "README.md").exists()
+        if _github_skills_is_global_symlink(root):
+            assert payload["entrypoint_github_mode"] == "symlink"
+            assert payload["entrypoint_github_reason"] == "parent-already-linked"
+        else:
+            assert payload["entrypoint_github_mode"] == "placeholder"
+            assert (github_entry / "README.md").exists()
     finally:
         shutil.rmtree(primary_dir, ignore_errors=True)
         if github_entry.is_symlink() or github_entry.is_file():
@@ -106,6 +121,11 @@ def test_legacy_directory_migrates_to_primary_copy():
     skill_name = f"layout-migrate-{uuid.uuid4().hex[:8]}"
     legacy_dir = root / ".github" / "skills" / skill_name
     primary_dir = root / ".specify" / "skills" / skill_name
+
+    if _github_skills_is_global_symlink(root):
+        pytest.skip(
+            "legacy per-skill migration is not applicable when .github/skills is a global symlink"
+        )
 
     try:
         primary_dir.mkdir(parents=True, exist_ok=False)

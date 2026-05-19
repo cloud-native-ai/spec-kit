@@ -199,6 +199,19 @@ create_github_entrypoint() {
 
     mkdir -p "$(dirname "$entry_path")"
 
+    if [ -L "$ROOT_DIR/.github/skills" ]; then
+        local parent_real=""
+        local primary_parent_real=""
+        parent_real=$(realpath -m "$ROOT_DIR/.github/skills" 2>/dev/null || true)
+        primary_parent_real=$(realpath -m "$(dirname "$primary_path")" 2>/dev/null || true)
+        if [ -n "$parent_real" ] && [ "$parent_real" = "$primary_parent_real" ]; then
+            GITHUB_ENTRY_STATUS="skipped"
+            GITHUB_ENTRY_MODE="symlink"
+            GITHUB_ENTRY_REASON="parent-already-linked"
+            return 0
+        fi
+    fi
+
     if [ -L "$entry_path" ]; then
         local link_target=""
         link_target=$(readlink "$entry_path" 2>/dev/null || true)

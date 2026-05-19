@@ -148,12 +148,12 @@
 - [X] T057 [P] Update Feature 022 implementation notes and related files in `.specify/memory/features/022.md`
 - [X] T058 [P] Ensure Feature 022 status and latest date remain synchronized in `.specify/memory/features.md`
 - [X] T059 Run focused pytest suites for AI tools support in `tests/contract/test_ai_tools_support_contract.py`, `tests/unit/test_ai_tools_support_matrix.py`, and `tests/integration/test_ai_tools_init_all_assistants.py`
-- [ ] T060 Run preservation and coexistence pytest suites in `tests/integration/test_ai_tools_core_preservation.py`, `tests/integration/test_ai_tools_multi_assistant_coexistence.py`, and `tests/integration/test_ai_tools_refresh_isolation.py`
-- [ ] T061 Run script-path regression tests in `tests/contract/test_specify_script_paths.py`
-- [ ] T062 Run full repository test suite using `pyproject.toml` project configuration
-- [ ] T063 Review `.specify/specs/011-ai-tools-support/requirements.md`, `.specify/specs/011-ai-tools-support/plan.md`, and `.specify/specs/011-ai-tools-support/tasks.md` for cross-artifact consistency
-- [ ] T064 Confirm no generated assistant asset duplicates canonical `.specify` workflow content in `.specify/specs/011-ai-tools-support/quickstart.md`
-- [ ] T065 [P] Update task template constitution references so test-first/TDD guidance points to Constitution Principle IV and verify mirrored task templates remain consistent in `templates/tasks-template.md` and `.specify/templates/tasks-template.md`
+- [X] T060 Run preservation and coexistence pytest suites in `tests/integration/test_ai_tools_core_preservation.py`, `tests/integration/test_ai_tools_multi_assistant_coexistence.py`, and `tests/integration/test_ai_tools_refresh_isolation.py`
+- [X] T061 Run script-path regression tests in `tests/contract/test_specify_script_paths.py`
+- [X] T062 Run full repository test suite using `pyproject.toml` project configuration
+- [X] T063 Review `.specify/specs/011-ai-tools-support/requirements.md`, `.specify/specs/011-ai-tools-support/plan.md`, and `.specify/specs/011-ai-tools-support/tasks.md` for cross-artifact consistency
+- [X] T064 Confirm no generated assistant asset duplicates canonical `.specify` workflow content in `.specify/specs/011-ai-tools-support/quickstart.md`
+- [X] T065 [P] Update task template constitution references so test-first/TDD guidance points to Constitution Principle IV and verify mirrored task templates remain consistent in `templates/tasks-template.md` and `.specify/templates/tasks-template.md`
 
 ---
 

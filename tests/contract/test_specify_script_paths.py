@@ -5,6 +5,7 @@ Verifies that shell scripts resolve spec paths consistently across the
 """
 
 import re
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -63,3 +64,40 @@ class TestSpecifyScriptPaths:
         assert ".specify/specs" in content, (
             "Missing .specify/specs reference in scripts/bash/common.sh"
         )
+
+    def test_review_prerequisite_flags_are_supported(self):
+        """The review prompt flags must be accepted by check-prerequisites.sh."""
+        result = subprocess.run(
+            [
+                "bash",
+                ".specify/scripts/bash/check-prerequisites.sh",
+                "--json",
+                "--require-spec",
+                "--include-spec",
+                "--include-plan",
+                "--include-tasks",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert "REQUIREMENTS_DIR" in result.stdout
+        assert "FEATURE_ID" in result.stdout
+        assert "FEATURE_NAME" in result.stdout
+        assert "requirements.md" in result.stdout
+        assert "plan.md" in result.stdout
+        assert "tasks.md" in result.stdout
+
+    def test_review_prerequisite_flags_show_in_help(self):
+        """The help output should document review-compatible flags."""
+        result = subprocess.run(
+            ["bash", ".specify/scripts/bash/check-prerequisites.sh", "--help"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert "--require-spec" in result.stdout
+        assert "--include-spec" in result.stdout
+        assert "--include-plan" in result.stdout
