@@ -1,12 +1,13 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.1 (No change)
+- Version change: 1.0.1 → 1.0.1.1 (DAILY; format migration to x.y.z.ddd, no principle changes)
 - Modified principles: None
 - Added sections: None
 - Removed sections: None
 - Templates requiring updates:
-  ✅ templates/plan-template.md - Aligned
-  ⚠ templates/tasks-template.md - References Principle V for TDD (should be IV)
+  ✅ templates/plan-template.md - Aligned (7 principles map 1:1)
+  ✅ templates/tasks-template.md - Aligned (correctly references Principle IV)
+  ✅ templates/requirements-template.md - No principle-number references; no sync needed
 - Follow-up TODOs: None
 -->
 
@@ -131,4 +132,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.0.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-02-05
+**Version**: 1.0.1.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-05-23

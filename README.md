@@ -108,7 +108,6 @@ The research and practice focus areas of this project include:
 
 - **Unify Command Handoffs**: Make command prerequisites and next steps explicit. (Status: Planned)
 - **Analyze Command**: Analyze project context and code structure. (Status: Completed)
-- **Agents Command**: Create and refine custom AI agents (.agent.md). (Status: Completed)
 - **Checklist Command**: Verify project alignment with constitution. (Status: Completed)
 - **Clarify Command**: Resolve ambiguities in specifications. (Status: Completed)
 - **Constitution Command**: Manage project governance and principles. (Status: Completed)
@@ -119,15 +118,19 @@ The research and practice focus areas of this project include:
 - **Requirements Command**: Define requirements and specifications. (Status: Completed)
 - **Research Command**: Gather context and dependencies. (Status: Completed)
 - **Review Command**: Review implementation against rules. (Status: Completed)
-- **Skills Command**: Manage extensible skills/tools. (Status: Completed)
+- **Skills Command**: Manage extensible skills/tools. (Status: Implemented)
 - **Tasks Command**: Break down plans into atomic tasks. (Status: Completed)
+- **Agents Command**: Create or refine custom AI agents (.agent.md) for workspace-specific workflows. (Status: Implemented)
+- **Qoder Support**: Add Qoder as a supported CLI assistant across initialization, validation, documentation, and release distribution. (Status: Implemented)
+- **Claude Code Support**: Add Claude Code as a first-class assistant with custom commands and Claude Code-specific configuration assets. (Status: Implemented)
+- **AI Tools Support**: Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files. (Status: Implemented)
 
 ### Non-functional Features
 
-- **CLI Interface**: Rich terminal interface using Typer.
-- **MCP Support**: Integration with Model Context Protocol.
-- **Template Engine**: Markdown-based template system.
-- **Configuration Management**: Project configuration via pyproject.toml.
+- **CLI Interface**: Rich terminal interface using Typer. (Status: Completed)
+- **MCP Support**: Integration with Model Context Protocol. (Status: Implemented)
+- **Template Engine**: Markdown-based template system. (Status: Completed)
+- **Configuration Management**: Project configuration via pyproject.toml. (Status: Completed)
 
 ## 📦 Installation
 
