@@ -36,7 +36,6 @@ TOOLS_DIR="$TARGET_DIR/tools"
 mkdir -p "$TOOLS_DIR"
 if [ -f "$SCRIPT_DIR/refresh-tools.sh" ]; then
   log info "Generating tool JSON manifests..."
-  "$SCRIPT_DIR/refresh-tools.sh" --mcp --json > "$TOOLS_DIR/mcp.json"
   "$SCRIPT_DIR/refresh-tools.sh" --system --json > "$TOOLS_DIR/system.json"
   "$SCRIPT_DIR/refresh-tools.sh" --shell --json > "$TOOLS_DIR/shell.json"
   "$SCRIPT_DIR/refresh-tools.sh" --project --json > "$TOOLS_DIR/project.json"

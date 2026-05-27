@@ -314,7 +314,7 @@ flowchart TD
 
 #### 发现流程
 
-`refresh-tools.sh` 将 MCP、系统二进制、Shell 函数、项目脚本统一成 JSON 工具库存：[scripts/bash/refresh-tools.sh](scripts/bash/refresh-tools.sh#L151-L272)。这使 `/speckit.tools` 能把“找工具”从临时认知变成可持久化记录。
+`refresh-tools.sh` 将系统二进制、Shell 函数、项目脚本统一成 JSON 工具库存：[scripts/bash/refresh-tools.sh](scripts/bash/refresh-tools.sh)。这使 `/speckit.tools` 能把"找工具"从临时认知变成可持久化记录。
 
 ---
 

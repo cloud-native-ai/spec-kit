@@ -29,12 +29,11 @@ Goal extension: every creation/refresh/discovery path MUST produce and persist a
 
 ### Tool Type Standardization
 
-Tool naming and categorization MUST use the following four canonical types:
+Tool naming and categorization MUST use the following three canonical types:
 
-1. `mcp-call`: invoke MCP services.
-2. `project-script`: scripts inside the current project, typically custom project-specific capabilities.
-3. `system-binary`: binary tools in the current runtime environment (on Linux, typically tools like `find`, `grep`, etc.).
-4. `shell-function`: functions defined in the current shell session (e.g., bash functions loaded at session startup via `~/.bashrc`).
+1. `project-script`: scripts inside the current project, typically custom project-specific capabilities.
+2. `system-binary`: binary tools in the current runtime environment (on Linux, typically tools like `find`, `grep`, etc.).
+3. `shell-function`: functions defined in the current shell session (e.g., bash functions loaded at session startup via `~/.bashrc`).
 
 In `refresh-tools.sh`, discovery MUST use JSON mode only when calling each Python discovery script. Persist the discovered payloads as source-specific JSON manifests so downstream prompts and scripts consume a single canonical JSON format.
 
@@ -51,7 +50,7 @@ Execution steps:
      - `status: "found"` → Tool exists, extract tool details
      - `status: "not_found"` → Tool not found, proceed to create
      - `status: "multiple_matches"` → Present options to user for disambiguation
-   - Map tool to its source type (`mcp-call`, `project-script`, `system-binary`, `shell-function`).
+   - Map tool to its source type (`project-script`, `system-binary`, `shell-function`).
 
 3. **Resolve naming and conflicts**
    - Check exact name, alias match, and fuzzy candidates.
@@ -72,7 +71,7 @@ Execution steps:
 
 6. **Validate record before invocation**
    - Required fields: `name`, `tool_type`, `source_identifier`, `description`.
-   - `tool_type` must be one of `mcp-call|project-script|system-binary|shell-function`.
+   - `tool_type` must be one of `project-script|system-binary|shell-function`.
    - If status is `Verified`, Parameters and Returns cannot both be empty.
    - If invalid, guide user to fill missing fields and re-validate.
 

@@ -49,11 +49,10 @@ Storage location options (`SKILL_ROOT`):
 Run the script to get tools available in the current project:
 
 ```bash
-scripts/bash/refresh-tools.sh --mcp --system --shell --project --json
+scripts/bash/refresh-tools.sh --system --shell --project --json
 ```
 
 Reference tool manifest categories:
-- **MCP Tools** → `tools/mcp.json`
 - **System Tools** → `tools/system.json`
 - **Shell Tools** → `tools/shell.json`
 - **Project Scripts** → `tools/project.json`

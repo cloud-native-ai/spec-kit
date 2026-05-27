@@ -4,7 +4,7 @@ ToolRecord = tools_utils.ToolRecord
 
 
 def test_source_specific_tool_records_validate_for_all_supported_types():
-    source_types = ["mcp", "system", "shell", "project"]
+    source_types = ["system", "shell", "project"]
     records = [
         ToolRecord(
             name=f"demo-{source_type}",

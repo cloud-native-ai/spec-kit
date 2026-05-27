@@ -108,7 +108,6 @@ refresh_tools_for_target() {
     mkdir -p "$tools_dir"
 
     if [ -f "$SCRIPT_DIR/refresh-tools.sh" ]; then
-        "$SCRIPT_DIR/refresh-tools.sh" --mcp --json > "$tools_dir/mcp.json"
         "$SCRIPT_DIR/refresh-tools.sh" --system --json > "$tools_dir/system.json"
         "$SCRIPT_DIR/refresh-tools.sh" --shell --json > "$tools_dir/shell.json"
         "$SCRIPT_DIR/refresh-tools.sh" --project --json > "$tools_dir/project.json"

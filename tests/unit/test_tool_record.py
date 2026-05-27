@@ -20,7 +20,7 @@ def test_tool_record_requires_core_fields():
 def test_verified_tool_record_requires_arguments_or_returns():
     record = ToolRecord(
         name="valid-tool",
-        tool_type="mcp",
+        tool_type="shell",
         source_identifier="server/tool",
         description="valid",
         status="Verified",
@@ -33,7 +33,7 @@ def test_invocation_session_cancellation_rule():
     session = ToolInvocationSession(
         requested_name="tool",
         resolved_name="tool",
-        resolved_type="mcp",
+        resolved_type="shell",
         used_existing_record=True,
         disambiguation_required=False,
         user_confirmed_execution=False,
