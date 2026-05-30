@@ -1,11 +1,11 @@
 ---
-name: thought-experiment-verifier
+name: think-skills
 description: |
   This skill can mentally simulate a Skill or prompt to verify likely execution behavior without real side effects. Use this when the user mentions ["thought experiment", "mental dry run", "simulate a skill", "simulate a prompt", "pretend to run", "dry-run prompt", "verify prompt logic", "验证技能执行效果", "思想实验", "不要真的执行"].
-skill_id: "<SKILL:.specify/skills/thought-experiment-verifier/SKILL.md>"
+skill_id: "<SKILL:.specify/skills/think-skills/SKILL.md>"
 ---
 
-# thought-experiment-verifier
+# think-skills
 
 ## Goal
 
@@ -104,8 +104,8 @@ Verify the likely behavior of another Skill, prompt, workflow, or instruction se
 - Prompt fragments and reusable templates: `./references/prompt-templates.md`
 
 ## Resource ID
-- Canonical ID: `<SKILL:.specify/skills/thought-experiment-verifier/SKILL.md>`
-- Canonical Path: `.specify/skills/thought-experiment-verifier/SKILL.md`
+- Canonical ID: `<SKILL:.specify/skills/think-skills/SKILL.md>`
+- Canonical Path: `.specify/skills/think-skills/SKILL.md`
 
 ## Available Tools & Resources
 
