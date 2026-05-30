@@ -281,8 +281,6 @@ Phase Dependencies & Parallelization:
     - Present EXACTLY ONE question at a time.
     - For **multiple-choice**:
        - Analyze all options; determine **most suitable option** based on best practices, common patterns, risk reduction, and alignment with project goals.
-       - Format: `**Recommended:** Option [X] - <1-2 sentence reasoning>`
-       - Display question in Markdown blockquote: `> Question text`
        - Render options as a table:
 
           | Option | Description |
@@ -291,7 +289,9 @@ Phase Dependencies & Parallelization:
           | B | <Option B> |
           | C | <Option C> (up to E) |
           | Short | Provide a different short answer (<=5 words) |
-
+          
+       - Format: `**Recommended:** Option [X] - <1-2 sentence reasoning>`
+       - Display question in Markdown blockquote: `> Question text`
        - After the table: `You can reply with the option letter (e.g., "A"), accept the recommendation by saying "yes" or "recommended", or provide your own short answer.`
     - For **short-answer** (no discrete options):
        - Format: `**Suggested:** <proposed answer> - <brief reasoning>`
