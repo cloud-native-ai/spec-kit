@@ -43,6 +43,10 @@ The input is a description of the Skill to improve. It must be interpreted as fo
    - Group observations by failure mode: trigger/discovery, scope inference, missing context, wrong tool choice, unsafe step, unclear output, validation gap, or resource/reference issue.
    - For each item, record: observed symptom, likely cause in the current Skill instructions, desired next behavior, and the file section to change.
    - Discard one-off environment noise unless the Skill should explicitly handle it in future runs. If a refresh command exits successfully with a fallback after an optional source warning, record it as a validation note rather than a root cause.
+   - **Legacy path idioms**: when the Skill under review still uses any of the following, flag them as migration candidates and apply the Migration Mapping table from `templates/commands/skills.md` (`## Migration Mapping`):
+     - Bare relative paths such as `./scripts/init.sh` or `./references/checklist.md` → rewrite as `${SKILL_HOME}/...`.
+     - `${SKILL_ROOT}/X` references → rewrite as `${SKILL_HOME}/X`.
+     - Agent-specific install paths embedded in prose (e.g., `~/.copilot/skills/<name>/...`, hard-coded `.specify/skills/<name>/...`) → rewrite as `${SKILL_HOME}/...`.
 
 4. **Correct the root causes with minimal changes**
    - For complete execution failures, fix the instruction that caused non-execution first, such as wrong command-line arguments, nonexistent paths, invalid expected file formats, incompatible metadata, or missing prerequisite checks.

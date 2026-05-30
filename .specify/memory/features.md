@@ -1,6 +1,6 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-05-23
+**Last Updated**: 2026-05-30
 **Total Features**: 22
 
 ## Features
@@ -19,7 +19,7 @@
 | 010 | Requirements Command | Define requirements and specifications. | Completed | .specify/memory/features/010.md | - | 2026-02-10 |
 | 011 | Research Command | Gather context and dependencies. | Completed | .specify/memory/features/011.md | - | 2026-02-10 |
 | 012 | Review Command | Review implementation against rules. | Completed | .specify/memory/features/012.md | - | 2026-02-10 |
-| 013 | Skills Command | Manage extensible skills/tools. | Implemented | .specify/memory/features/013.md | .specify/specs/008-create-skills-skill/requirements.md | 2026-05-11 |
+| 013 | Skills Command | Manage extensible skills/tools. | Implemented | .specify/memory/features/013.md | .specify/specs/012-skill-home-workdir/requirements.md | 2026-05-30 |
 | 014 | Tasks Command | Break down plans into atomic tasks. | Completed | .specify/memory/features/014.md | - | 2026-02-10 |
 | 015 | CLI Interface | Rich terminal interface using Typer. | Completed | .specify/memory/features/015.md | - | 2026-02-10 |
 | 016 | MCP Support | Integration with Model Context Protocol. | Implemented | .specify/memory/features/016.md | .specify/specs/004-speckit-tools-command/requirements.md | 2026-03-19 |

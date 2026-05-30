@@ -1,0 +1,242 @@
+openapi: 3.1.0
+info:
+  title: SKILL_HOME / SKILL_WORKDIR Template Convention Contract
+  version: 0.1.0
+  description: |
+    Structural contract for the documentation artifacts updated by the
+    012-skill-home-workdir iteration. Modelled as an OpenAPI "validate"
+    operation following the precedent set by
+    .specify/specs/008-create-skills-skill/contracts/create-skills-workflow.openapi.yaml.
+
+    The contract describes the assertions a CI test (planned target:
+    tests/contract/test_skill_home_workdir_template.py) must verify
+    against the four in-scope documents and the two consistency-check
+    documents. A passing validation is the source of truth for SC-002,
+    SC-005, and SC-006.
+
+paths:
+  /template/validate:
+    post:
+      summary: Validate the updated template + Skills against the path-convention contract
+      operationId: validateTemplateAssets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - repoRoot
+              properties:
+                repoRoot:
+                  type: string
+                  description: Absolute path to the Spec Kit repository root.
+                editedFiles:
+                  type: array
+                  description: Optional override; defaults to the four canonical edit targets.
+                  items:
+                    type: string
+                  default:
+                    - templates/commands/skills.md
+                    - skills/create-skills/SKILL.md
+                    - skills/improve-skills/SKILL.md
+                    - .specify/skills/create-skills/SKILL.md
+                    - .specify/skills/improve-skills/SKILL.md
+      responses:
+        '200':
+          description: All assertions pass.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationReport'
+        '422':
+          description: One or more assertions failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationFailure'
+
+components:
+  schemas:
+    ValidationReport:
+      type: object
+      required:
+        - templateAssertions
+        - createSkillsAssertions
+        - improveSkillsAssertions
+        - mirrorConsistency
+        - residualSkillRootCheck
+      properties:
+        templateAssertions:
+          $ref: '#/components/schemas/TemplateAssertions'
+        createSkillsAssertions:
+          $ref: '#/components/schemas/CreateSkillsAssertions'
+        improveSkillsAssertions:
+          $ref: '#/components/schemas/ImproveSkillsAssertions'
+        mirrorConsistency:
+          $ref: '#/components/schemas/MirrorConsistency'
+        residualSkillRootCheck:
+          $ref: '#/components/schemas/ResidualSkillRootCheck'
+
+    TemplateAssertions:
+      type: object
+      description: Assertions on templates/commands/skills.md (the primary edit target).
+      required:
+        - hasPathConventionsSection
+        - hasComputationIdiomsSection
+        - hasPairedExample
+        - hasMigrationMapping
+        - hasNonShellAgentsClause
+        - hasNestedInvocationsClause
+        - definesSkillHome
+        - definesSkillWorkdir
+        - containsNormativeScriptIdiom
+      properties:
+        hasPathConventionsSection:
+          type: boolean
+          description: Heading "Path Conventions" (or equivalent) is present.
+        hasComputationIdiomsSection:
+          type: boolean
+          description: Section documenting the script-side and conceptual idioms.
+        hasPairedExample:
+          type: boolean
+          description: At least one example script reads via ${SKILL_HOME} and writes via ${SKILL_WORKDIR} in the same snippet (FR-006).
+        hasMigrationMapping:
+          type: object
+          required:
+            - present
+            - rowCount
+            - coversBareRelative
+            - coversSkillRoot
+            - coversAgentSpecificPaths
+          properties:
+            present:
+              type: boolean
+            rowCount:
+              type: integer
+              minimum: 3
+            coversBareRelative:
+              type: boolean
+              description: At least one row maps ./X → ${SKILL_HOME}/X.
+            coversSkillRoot:
+              type: boolean
+              description: At least one row maps ${SKILL_ROOT}/X → ${SKILL_HOME}/X.
+            coversAgentSpecificPaths:
+              type: boolean
+              description: At least one row maps a hard-coded agent install path (e.g., ~/.copilot/skills/...) → ${SKILL_HOME}/X.
+        hasNonShellAgentsClause:
+          type: boolean
+          description: One sentence explicitly tells non-shell agents to resolve the variables semantically (FR-013).
+        hasNestedInvocationsClause:
+          type: boolean
+          description: |
+            Explicit rule that Skill scripts calling other Skill scripts MUST
+            `unset SKILL_HOME` (so the callee recomputes) and MUST NOT unset
+            `SKILL_WORKDIR` (so the user's working directory anchors across
+            the chain). Resolves the "Nested invocations" edge case from
+            requirements.md while preserving the Q3 runtime-export-precedence
+            design for top-level agent runtimes.
+        definesSkillHome:
+          type: boolean
+          description: ${SKILL_HOME} is defined with the meaning from data-model.md entity 1.
+        definesSkillWorkdir:
+          type: boolean
+          description: ${SKILL_WORKDIR} is defined with the meaning from data-model.md entity 2.
+        containsNormativeScriptIdiom:
+          type: object
+          required:
+            - skillHomeFallback
+            - skillWorkdirFallback
+          properties:
+            skillHomeFallback:
+              type: string
+              description: Exact substring match for the FR-016 idiom for SKILL_HOME.
+              example: 'SKILL_HOME="${SKILL_HOME:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd -P)}"'
+            skillWorkdirFallback:
+              type: string
+              description: Exact substring match for the FR-016 idiom for SKILL_WORKDIR.
+              example: 'SKILL_WORKDIR="${SKILL_WORKDIR:-$(pwd -P)}"'
+
+    CreateSkillsAssertions:
+      type: object
+      description: Assertions on skills/create-skills/SKILL.md (and its mirror).
+      required:
+        - skillRootOccurrences
+        - skillHomeOccurrences
+        - hasSkillHomeAdoptionGuidance
+        - hasSkillWorkdirAdoptionGuidance
+      properties:
+        skillRootOccurrences:
+          type: integer
+          enum: [0]
+          description: Zero residual SKILL_ROOT references (SC-006).
+        skillHomeOccurrences:
+          type: integer
+          minimum: 1
+        hasSkillHomeAdoptionGuidance:
+          type: boolean
+          description: The "Determine SKILL_HOME and metadata" section instructs new Skills to write Skill-owned resources as ${SKILL_HOME}/...
+        hasSkillWorkdirAdoptionGuidance:
+          type: boolean
+          description: The same section also instructs new Skills to write user-facing inputs/outputs as ${SKILL_WORKDIR}/...
+
+    ImproveSkillsAssertions:
+      type: object
+      description: Assertions on skills/improve-skills/SKILL.md (and its mirror).
+      required:
+        - hasLegacyIdiomDetectionClause
+      properties:
+        hasLegacyIdiomDetectionClause:
+          type: boolean
+          description: Workflow text explicitly lists ./X, ${SKILL_ROOT}/X, and agent-specific install paths as migration candidates when improving a Skill (FR-010).
+
+    MirrorConsistency:
+      type: object
+      description: skills/<name>/SKILL.md must be byte-equivalent to .specify/skills/<name>/SKILL.md for the two in-scope Skills.
+      required:
+        - createSkillsInSync
+        - improveSkillsInSync
+      properties:
+        createSkillsInSync:
+          type: boolean
+        improveSkillsInSync:
+          type: boolean
+
+    ResidualSkillRootCheck:
+      type: object
+      description: Consistency grep over the wider documentation surface (FR-015).
+      required:
+        - claudeMdReferences
+        - instructionsMdReferences
+      properties:
+        claudeMdReferences:
+          type: integer
+          enum: [0]
+          description: CLAUDE.md (symlink to .specify/instructions.md) contains no SKILL_ROOT references.
+        instructionsMdReferences:
+          type: integer
+          enum: [0]
+          description: .specify/instructions.md contains no SKILL_ROOT references.
+
+    ValidationFailure:
+      type: object
+      required:
+        - failures
+      properties:
+        failures:
+          type: array
+          items:
+            type: object
+            required:
+              - filePath
+              - assertion
+              - reason
+            properties:
+              filePath:
+                type: string
+              assertion:
+                type: string
+                description: Name of the failed assertion (matches a field in ValidationReport).
+              reason:
+                type: string
+                description: Human-readable explanation suitable for a CI error message.

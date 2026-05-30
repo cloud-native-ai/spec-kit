@@ -34,15 +34,20 @@ Distill a reusable Skill from the current conversation history:
 3. **Generate Skill metadata**: Produce a concise English `name` (e.g., `data-validation`, `api-testing`) and a `description` with capability summary plus trigger keywords.
 4. **Minimal clarification**: If critical information cannot be determined, ask **only one question at a time**. Prioritize: target output, scope (project vs personal), checklist vs multi-step workflow.
 
-### 2. Determine SKILL_ROOT and metadata
+### 2. Determine SKILL_HOME and metadata
 
-- **skill name** determines `SKILL_ROOT`. Example: `name = "testing"` → `SKILL_ROOT = .specify/skills/testing/` (project-level).
+- **skill name** determines `SKILL_HOME`. Example: `name = "testing"` → `SKILL_HOME = .specify/skills/testing/` (project-level).
 - **description** must include keywords and trigger scenarios; avoid vague descriptions.
 
-Storage location options (`SKILL_ROOT`):
+Storage location options (`SKILL_HOME`):
 - `.specify/skills/<name>/` — project-level primary (preferred)
 - `.github/skills/<name>/` — compatibility entry (symlink, not primary)
 - `~/.copilot/skills/<name>/` — personal-level
+
+When authoring the new Skill, follow the path conventions from `templates/commands/skills.md` (`## Path Conventions`):
+
+- Use `${SKILL_HOME}/<relative-path>` for every Skill-owned resource reference (scripts, references, assets).
+- Use `${SKILL_WORKDIR}/<relative-path>` for every runtime/user-facing path the new Skill reads or writes (inputs in the user's project, outputs delivered to the user).
 
 ### 3. Obtain available tools information
 
@@ -88,7 +93,7 @@ Optional frontmatter (on demand):
 #### Resource Directory Layout
 
 ```
-${SKILL_ROOT}/
+${SKILL_HOME}/
 ├── SKILL.md            # Required, Skill main body
 ├── tools/              # Tool descriptions (optional)
 ├── scripts/            # Executable scripts (optional)

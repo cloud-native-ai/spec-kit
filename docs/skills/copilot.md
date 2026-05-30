@@ -1,4 +1,4 @@
-# Using Agent Skills in VS Code Copilot
+# Using Agent Skills in Vscode Github Copilot
 
 Agent Skills are collections of instructions, scripts, and resources that GitHub Copilot can load when relevant to perform specialized tasks. Agent Skills is an open standard applicable to multiple AI agents, including GitHub Copilot in VS Code, GitHub Copilot CLI, and GitHub Copilot coding agents.
 
