@@ -31,17 +31,32 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-**Core Principles Compliance**:
+<!--
+  ACTION REQUIRED for /speckit.plan:
+  Do NOT hard-code principle names here. Instead, read `.specify/memory/constitution.md`,
+  enumerate every heading matching `### <roman-or-arabic-numeral>. <name>` (e.g.
+  `### I. Template-First Architecture`, `### IV. Test-First Development`), and render
+  ONE row in the table below per principle in the exact order they appear in the
+  constitution. Include the principle's NON-NEGOTIABLE / MANDATORY annotation verbatim
+  when present. This avoids the drift documented in the constitution's Sync Impact Report.
 
-- **Feature-Centric Development**: Feature Index is single source of truth; all phases re-evaluate Feature changes.
-- **Specification-Driven Development**: Code serves specifications; specifications are executable and generate working systems
-- **Intent-Driven Development**: Focus on "what" and "why" before "how"; use rich specifications with guardrails
-- **Test-First & Contract-Driven**: TDD flow followed; pure functions have unit tests; critical flows have regression coverage
-- **AI Agent Integration**: Only approved agents (Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder); configuration rejects unsupported providers
-- **Continuous Quality & Observability**: Structured logging; semantic versioning; CI quality gates; simple designs (YAGNI)
-- **SDD Workflow Compliance**: Follow spec → plan → tasks → implement workflow with proper validation at each phase
+  Each row must contain:
+  - Principle (verbatim heading without the leading `### N.`)
+  - Compliance ("✅ Pass" / "❌ Fail" / "⚠ Partial — see Complexity Tracking")
+  - Evidence (one-line citation pointing at the design artefact that demonstrates compliance)
+-->
 
-**Gates Status**: [✅ All gates pass / ❌ Specific gate failures with justification]
+**Core Principles Compliance** (rendered from `.specify/memory/constitution.md`):
+
+| # | Principle | Compliance | Evidence |
+|---|-----------|------------|----------|
+| I | [PRINCIPLE_1_NAME] [NON-NEGOTIABLE?] | ✅ Pass / ❌ Fail / ⚠ Partial | [one-line evidence: file or section] |
+| II | [PRINCIPLE_2_NAME] [NON-NEGOTIABLE?] | ✅ Pass / ❌ Fail / ⚠ Partial | [...] |
+| ... | [continue for every principle declared in constitution.md] | | |
+
+**Gates Status**: [✅ All gates pass / ❌ Specific gate failures with justification — list failing principle numbers and link to Complexity Tracking row]
+
+**Re-check after Phase 1**: [Date and short note when the post-design re-check was run; copy the same table refreshed against the design artefacts]
 
 ## Project Structure
 
@@ -60,50 +75,34 @@
 
 ### Source Code (repository root)
 <!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this spec. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
+  ACTION REQUIRED:
+  Document ONLY the directories actually changed or created by THIS spec, with a
+  one-line purpose per directory. Do NOT invent a generic layout, and do NOT paste
+  a "Single project / Web / Mobile" stub if it does not reflect this project.
+
+  Examples of valid shapes (see `.specify/templates/examples/structure-*.md` if
+  shipped, otherwise infer from the repo):
+    - Single application:           src/, tests/
+    - Web app:                      backend/, frontend/
+    - Mobile + API:                 api/, ios/ or android/
+    - Library / SDK:                src/<package>/, examples/, tests/
+    - Monorepo:                     packages/<name>/, apps/<name>/
+    - Container-image factory:      images/, script/snippets/, script/build/
+    - Code generator / framework:   templates/, scripts/, src/<package>/
+
+  If your project does not match any of these, document what is true. The goal is
+  evidence-faithful structure, not adherence to a fixed taxonomy.
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+[REPLACE THIS BLOCK with the real directories changed by this spec, one line per dir,
+ each followed by `# <one-line purpose>`. Keep it terse — do not enumerate every file.]
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: [Name the shape this spec actually lands in (e.g. "extends the
+existing container-image factory by adding two new snippets under
+`script/snippets/docker/config/users/` and weaving them into 19 daemon images") and
+reference the real directories captured above. Explicitly note any new top-level dir.]
 
 ## Complexity Tracking
 

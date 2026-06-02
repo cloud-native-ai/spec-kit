@@ -49,7 +49,12 @@ When processing the user input:
    - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
      - Incorporate relevant background information from `$ARGUMENTS`
      - Incorporate findings from `research.md` if available
-   - Fill Constitution Check section from constitution
+   - Fill Constitution Check section by **dynamically deriving** the principle table from `.specify/memory/constitution.md`:
+     1. Parse every heading matching `### <numeral>. <name>` (Roman or Arabic) in the order they appear.
+     2. Preserve any `(NON-NEGOTIABLE)` / `(MANDATORY)` annotation verbatim in the row label.
+     3. Emit one row in the Constitution Check table per principle — DO NOT use a hard-coded list, and DO NOT inherit stale principles left over from a previous spec's plan.md.
+     4. Mark each row Pass / Fail / Partial based on the design artefacts (`requirements.md`, `data-model.md`, `contracts/`, `tasks.md`).
+     5. Any Fail or Partial row MUST have a matching entry under Complexity Tracking with justification.
      - Include any additional constraints from `$ARGUMENTS`
    - Evaluate gates (ERROR if violations unjustified)
    - If `$ARGUMENTS` contains a planning outline:
@@ -69,7 +74,7 @@ The `/speckit.plan` command automatically integrates with the feature tracking s
   - Detect the current feature directory (format: `.specify/specs/[REQUIREMENTS_KEY]/`)
   - Extract the feature ID from the directory name
   - Update the corresponding feature entry in `.specify/memory/features.md`:
-    - Change status from "Planned" to "Implemented"
+    - Advance status `Draft → Planned` per the canonical state machine in `.specify/templates/feature-details-template.md` § "Canonical Status State Machine". `/speckit.plan` MUST NOT land status `Implemented` — that transition is owned by `/speckit.implement`.
     - Keep the specification path unchanged
     - Update the "Last Updated" date
   - Automatically stage the changes to `.specify/memory/features.md` for git commit

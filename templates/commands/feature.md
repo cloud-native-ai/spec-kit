@@ -104,7 +104,11 @@ Features are classified into two types:
 6. Update `.specify/memory/features.md`
    - Ensure the table lists all features with columns:
      `ID | Name | Description | Status | Feature Details | Last Updated`.
-   - Regenerate `FEATURE_COUNT` (and any other placeholders) if present.
+   - **Auto-derive `FEATURE_COUNT`**: After mutating the table (add / remove / rename a row), recompute `Total Features` from the data-row count of the table. Do NOT carry over the previous count. Reference shell check (any equivalent acceptable):
+     ```sh
+     awk -F'|' '/^\| [0-9]{3} \|/ {n++} END{print n}' .specify/memory/features.md
+     ```
+     The recomputed value MUST match the line `**Total Features**: <N>`. This eliminates the prior hand-maintained-count drift.
 
 7. Sync the root README feature list
    - Read the table in `.specify/memory/features.md`.
