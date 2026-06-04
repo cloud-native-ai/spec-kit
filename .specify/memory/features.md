@@ -1,7 +1,7 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-05-30
-**Total Features**: 22
+**Last Updated**: 2026-06-05
+**Total Features**: 26
 
 ## Features
 
@@ -19,16 +19,20 @@
 | 010 | Requirements Command | Define requirements and specifications. | Completed | .specify/memory/features/010.md | - | 2026-02-10 |
 | 011 | Research Command | Gather context and dependencies. | Completed | .specify/memory/features/011.md | - | 2026-02-10 |
 | 012 | Review Command | Review implementation against rules. | Completed | .specify/memory/features/012.md | - | 2026-02-10 |
-| 013 | Skills Command | Manage extensible skills/tools. | Implemented | .specify/memory/features/013.md | .specify/specs/012-skill-home-workdir/requirements.md | 2026-05-30 |
+| 013 | Skills Command | Manage extensible skills/tools. | Implemented | .specify/memory/features/013.md | .specify/specs/012-skill-home-workdir/requirements.md | 2026-06-05 |
 | 014 | Tasks Command | Break down plans into atomic tasks. | Completed | .specify/memory/features/014.md | - | 2026-02-10 |
 | 015 | CLI Interface | Rich terminal interface using Typer. | Completed | .specify/memory/features/015.md | - | 2026-02-10 |
-| 016 | MCP Support | Integration with Model Context Protocol. | Implemented | .specify/memory/features/016.md | .specify/specs/004-speckit-tools-command/requirements.md | 2026-03-19 |
+| 016 | Tools Command | Unified tool discovery and management across System, Shell, and Project sources. | Implemented | .specify/memory/features/016.md | .specify/specs/004-speckit-tools-command/requirements.md | 2026-06-05 |
 | 017 | Template Engine | Markdown-based template system. | Completed | .specify/memory/features/017.md | - | 2026-02-10 |
 | 018 | Configuration Management | Project configuration via pyproject.toml. | Completed | .specify/memory/features/018.md | - | 2026-02-10 |
 | 019 | Agents Command | Create or refine custom AI agents (.agent.md) for workspace-specific workflows. | Implemented | .specify/memory/features/019.md | .specify/specs/003-speckit-agents-command/requirements.md | 2026-02-28 |
 | 020 | Qoder Support | Add Qoder as a supported CLI assistant across initialization, validation, documentation, and release distribution. | Implemented | .specify/memory/features/020.md | .specify/specs/006-add-qoder-support/requirements.md | 2026-03-30 |
 | 021 | Claude Code Support | Add Claude Code as a first-class assistant with custom commands and Claude Code-specific configuration assets. | Implemented | .specify/memory/features/021.md | .specify/specs/009-claude-code-support/requirements.md | 2026-05-14 |
 | 022 | AI Tools Support | Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files. | Implemented | .specify/memory/features/022.md | .specify/specs/011-ai-tools-support/requirements.md | 2026-05-19 |
+| 023 | CI/CD Pipeline | Automated testing, linting, and package publishing via GitHub Actions workflows. | Draft | .specify/memory/features/023.md | - | 2026-06-05 |
+| 024 | Code Quality Tooling | Automated linting, formatting, and static analysis configuration for consistent code style. | Draft | .specify/memory/features/024.md | - | 2026-06-05 |
+| 025 | Shell Completion | Tab-completion support for the specify CLI across bash, zsh, and fish shells. | Draft | .specify/memory/features/025.md | - | 2026-06-05 |
+| 026 | Dependency Security | Automated dependency vulnerability scanning and supply chain security for the published package. | Draft | .specify/memory/features/026.md | - | 2026-06-05 |
 
 ## Feature Entry Format
 

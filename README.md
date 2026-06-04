@@ -124,13 +124,17 @@ The research and practice focus areas of this project include:
 - **Qoder Support**: Add Qoder as a supported CLI assistant across initialization, validation, documentation, and release distribution. (Status: Implemented)
 - **Claude Code Support**: Add Claude Code as a first-class assistant with custom commands and Claude Code-specific configuration assets. (Status: Implemented)
 - **AI Tools Support**: Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files. (Status: Implemented)
+- **Shell Completion**: Tab-completion support for the specify CLI across bash, zsh, and fish shells. (Status: Draft)
 
 ### Non-functional Features
 
 - **CLI Interface**: Rich terminal interface using Typer. (Status: Completed)
-- **MCP Support**: Integration with Model Context Protocol. (Status: Implemented)
+- **Tools Command**: Unified tool discovery and management across System, Shell, and Project sources. (Status: Implemented)
 - **Template Engine**: Markdown-based template system. (Status: Completed)
 - **Configuration Management**: Project configuration via pyproject.toml. (Status: Completed)
+- **CI/CD Pipeline**: Automated testing, linting, and package publishing via GitHub Actions workflows. (Status: Draft)
+- **Code Quality Tooling**: Automated linting, formatting, and static analysis for consistent code style. (Status: Draft)
+- **Dependency Security**: Automated dependency vulnerability scanning and supply chain security. (Status: Draft)
 
 ## 📦 Installation
 
