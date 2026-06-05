@@ -65,7 +65,6 @@ Apply this checklist verbatim to every existing Skill before user-requested refi
      ```
      ${SKILL_HOME}/
      ├── SKILL.md         # required
-     ├── tools/           # auto-generated tool manifests
      ├── scripts/         # executable scripts (optional)
      ├── references/      # on-demand reference docs (optional)
      └── assets/          # output templates / static assets (optional)
@@ -99,10 +98,7 @@ Apply this checklist verbatim to every existing Skill before user-requested refi
 5. **Registry consistency**
    - `.specify/instructions.md` `### Skills` table contains exactly one deduplicated row for the canonical `skill_id`. Add the row if missing; remove duplicates if present.
 
-6. **Tool manifests**
-   - Run `scripts/bash/create-new-skill.sh --refresh-only --name <name> --json` to regenerate `${SKILL_HOME}/tools/{system,shell,project}.json` and ensure `skill_id` exists in the frontmatter.
-
-7. **Hygiene**
+6. **Hygiene**
    - SKILL.md stays under 500 lines; oversize content moves to `${SKILL_HOME}/references/`.
    - Remove unrelated docs that should not live inside the Skill (`README.md`, `INSTALLATION_GUIDE.md`, `CHANGELOG.md`, process logs).
    - Reference chain depth is at most one level (SKILL.md → resource).
@@ -119,7 +115,7 @@ After the delegated Skill completes:
 - Report:
   - The created or updated paths, `skill_id`, and any registry edits.
   - Which modernization checklist items required edits vs. were already compliant (existing Skills only).
-  - Follow-up actions (e.g., run `/speckit.instructions`, refresh tool manifests, exercise the Skill once).
+  - Follow-up actions (e.g., run `/speckit.instructions`, exercise the Skill once).
 
 ## Path Conventions
 

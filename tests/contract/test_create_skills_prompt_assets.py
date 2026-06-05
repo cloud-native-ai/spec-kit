@@ -203,7 +203,7 @@ def test_create_skills_covers_conversation_history():
 def test_create_skills_uses_relative_resource_paths():
     """Skill references resources with relative paths (./ prefix)."""
     text = _text_of(SKILL_FILE)
-    rel_patterns = ["./references/", "./scripts/", "./assets/", "./tools/"]
+    rel_patterns = ["./references/", "./scripts/", "./assets/"]
     found = sum(1 for p in rel_patterns if p in text)
     assert found >= 1, f"Expected at least one relative resource path in Skill, found {found}"
 

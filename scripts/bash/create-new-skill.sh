@@ -102,18 +102,6 @@ format_skill_id() {
     echo "<SKILL:${canonical_path}>"
 }
 
-refresh_tools_for_target() {
-    local target_dir="$1"
-    local tools_dir="$target_dir/tools"
-    mkdir -p "$tools_dir"
-
-    if [ -f "$SCRIPT_DIR/refresh-tools.sh" ]; then
-        "$SCRIPT_DIR/refresh-tools.sh" --system --json > "$tools_dir/system.json"
-        "$SCRIPT_DIR/refresh-tools.sh" --shell --json > "$tools_dir/shell.json"
-        "$SCRIPT_DIR/refresh-tools.sh" --project --json > "$tools_dir/project.json"
-    fi
-}
-
 ensure_skill_id_in_file() {
     local skill_file="$1"
     local skill_id="$2"
@@ -329,7 +317,6 @@ if [ "$REFRESH_ONLY" = true ]; then
             report_error "Skill directory not found at $target" "$JSON_MODE"
             exit 1
         fi
-        refresh_tools_for_target "$target"
         skill_file="$target/SKILL.md"
         if [ -f "$skill_file" ]; then
             canonical_path=$(to_workspace_relative "$skill_file")
@@ -339,7 +326,6 @@ if [ "$REFRESH_ONLY" = true ]; then
     else
         for skill_dir in "$SKILLS_DIR"/*; do
             if [ -d "$skill_dir" ]; then
-                refresh_tools_for_target "$skill_dir"
                 skill_file="$skill_dir/SKILL.md"
                 if [ -f "$skill_file" ]; then
                     canonical_path=$(to_workspace_relative "$skill_file")
@@ -350,7 +336,7 @@ if [ "$REFRESH_ONLY" = true ]; then
         done
     fi
 
-    emit_json "refreshed" "Skill tools refreshed" "\"skills_dir\":\"$SKILLS_DIR\""
+    emit_json "refreshed" "Skill metadata refreshed" "\"skills_dir\":\"$SKILLS_DIR\""
     exit 0
 fi
 
@@ -376,7 +362,6 @@ if [ -z "$CUSTOM_OUTPUT_DIR" ] && supports_github_entrypoint; then
 fi
 
 if [ -d "$TARGET_DIR" ]; then
-    refresh_tools_for_target "$TARGET_DIR"
     canonical_path=$(to_workspace_relative "$SKILL_FILE")
     skill_id=$(format_skill_id "$canonical_path")
     ensure_skill_id_in_file "$SKILL_FILE" "$skill_id"
@@ -412,7 +397,6 @@ if [ -d "$TARGET_DIR" ]; then
 fi
 
 create_skill_structure "$TARGET_DIR"
-refresh_tools_for_target "$TARGET_DIR"
 
 if [ -f "$ROOT_DIR/.specify/templates/skills-template.md" ]; then
     TEMPLATE_FILE="$ROOT_DIR/.specify/templates/skills-template.md"

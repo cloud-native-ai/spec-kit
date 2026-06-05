@@ -1,0 +1,72 @@
+# Structural Contract: Portable Skill Creation
+#
+# This is a structural contract (not a REST API contract) that defines
+# the expected shape of files after the portable-skill-creation changes.
+# Assertions are implemented in tests/contract/test_portable_skill_creation.py.
+
+contract:
+  name: portable-skill-creation
+  version: "1.0.0"
+  description: >
+    Defines absence constraints for tool-manifest references across
+    skill creation templates, workflows, and scripts.
+
+assertions:
+  # FR-001, FR-002: create-skills/SKILL.md has no tool-discovery step
+  - id: no-tool-discovery-step
+    target: skills/create-skills/SKILL.md
+    condition: >
+      File MUST NOT contain the heading "### 3. Obtain available tools information"
+      or any reference to "refresh-tools.sh" in workflow steps.
+    forbidden_patterns:
+      - "refresh-tools.sh"
+      - "tools/system.json"
+      - "tools/shell.json"
+      - "tools/project.json"
+      - "Obtain available tools information"
+
+  # FR-003: skills-template.md has no tool boilerplate
+  - id: no-tool-template-boilerplate
+    target: templates/skills-template.md
+    condition: >
+      File MUST NOT contain a "Tools" subsection under resources
+      or references to tool manifest refresh commands.
+    forbidden_patterns:
+      - "### Tools"
+      - "refresh-tools.sh"
+      - "tools/system.json"
+      - "tools/shell.json"
+      - "tools/project.json"
+
+  # FR-005, FR-006: orchestration template updated
+  - id: no-mandatory-tool-manifests
+    target: templates/commands/skills.md
+    condition: >
+      Modernization checklist MUST NOT include a mandatory "Tool manifests" step
+      that requires running refresh-tools.sh.
+    forbidden_patterns:
+      - "refresh-tools.sh"
+      # Note: "tools/" may still appear in legacy/optional context
+
+  # FR-007: script has no refresh_tools_for_target
+  - id: no-refresh-tools-in-script
+    target: scripts/bash/create-new-skill.sh
+    condition: >
+      Script MUST NOT define or call refresh_tools_for_target().
+    forbidden_patterns:
+      - "refresh_tools_for_target"
+
+  # FR-009: mirror parity
+  - id: mirror-parity
+    target_a: skills/create-skills/SKILL.md
+    target_b: .specify/skills/create-skills/SKILL.md
+    condition: Files MUST be byte-identical.
+
+  # FR-011: quality checklist updated
+  - id: no-tool-manifest-in-checklist
+    target: skills/create-skills/references/skill-creation-quality-checklist.md
+    condition: >
+      Checklist MUST NOT reference tool manifests as a validation item.
+    forbidden_patterns:
+      - "tool manifests"
+      - "tools/system.json"

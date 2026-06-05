@@ -49,22 +49,7 @@ When authoring the new Skill, follow the path conventions from `templates/comman
 - Use `${SKILL_HOME}/<relative-path>` for every Skill-owned resource reference (scripts, references, assets).
 - Use `${SKILL_WORKDIR}/<relative-path>` for every runtime/user-facing path the new Skill reads or writes (inputs in the user's project, outputs delivered to the user).
 
-### 3. Obtain available tools information
-
-Run the script to get tools available in the current project:
-
-```bash
-scripts/bash/refresh-tools.sh --system --shell --project --json
-```
-
-Reference tool manifest categories:
-- **System Tools** → `tools/system.json`
-- **Shell Tools** → `tools/shell.json`
-- **Project Scripts** → `tools/project.json`
-
-Filter available tools against Skill goals for inclusion in `SKILL.md` tool references.
-
-### 4. Structure the Skill
+### 3. Structure the Skill
 
 #### SKILL.md Specification
 
@@ -95,13 +80,12 @@ Optional frontmatter (on demand):
 ```
 ${SKILL_HOME}/
 ├── SKILL.md            # Required, Skill main body
-├── tools/              # Tool descriptions (optional)
 ├── scripts/            # Executable scripts (optional)
 ├── references/         # Reference materials loaded on demand (optional)
 └── assets/             # Static assets for outputs (optional)
 ```
 
-The project creation script may create standard empty resource directories and a `tools/` manifest directory during scaffolding or refresh. Treat those as acceptable generated structure; only fail validation for unrelated documentation files, broken links, or resource directories whose checked-in contents are not needed by the Skill.
+The project creation script may create standard empty resource directories during scaffolding. Treat those as acceptable generated structure; only fail validation for unrelated documentation files, broken links, or resource directories whose checked-in contents are not needed by the Skill.
 
 #### Progressive Disclosure
 
@@ -118,7 +102,7 @@ Constraints:
 
 Do not add unrelated documents: `README.md`, `INSTALLATION_GUIDE.md`, `QUICK_REFERENCE.md`, `CHANGELOG.md`, process logs, or full retrospectives.
 
-### 5. Incrementally clarify details
+### 4. Incrementally clarify details
 
 Ask **only one question per round**, waiting for user response. Prioritize:
 - Target output: What should the Skill produce?
@@ -131,7 +115,7 @@ Iterate until:
 3. Resource directories are ready as needed
 4. All resource links use relative paths
 
-### 6. Register the Skill
+### 5. Register the Skill
 
 Generate the Resource ID and persist:
 
@@ -146,7 +130,7 @@ Constraints:
 - Keep the list sorted and deduplicated
 - Remove `None yet.` once real entries exist
 
-### 7. Validate the Skill
+### 6. Validate the Skill
 
 Run quality checks before reporting completion. See [the quality checklist](./references/skill-creation-quality-checklist.md) for the full validation workflow.
 
@@ -158,7 +142,7 @@ Minimum checks:
 - [ ] Size: `SKILL.md` < 500 lines
 - [ ] No unrelated documentation files
 
-### 8. Report completion
+### 7. Report completion
 
 Summarize:
 - Skill capabilities and directory structure

@@ -55,6 +55,7 @@ The input is a description of the Skill to improve. It must be interpreted as fo
    - Convert repeated user corrections into explicit decision branches.
    - Convert repeated manual checks into checklist items or deterministic scripts when appropriate.
    - Move detailed lessons to `./references/` only when they are useful but not needed every run.
+   - **Slim `SKILL.md` toward contract-only content**: when an edit touches `SKILL.md`, also evaluate whether existing sections should be moved out per [`./references/skill-slimming-principles.md`](./references/skill-slimming-principles.md). The body is a contract — frontmatter, resource index, workflow skeleton, strict requirements, and conventions — not a manual. How-to checklists, error tables, command-pair comparisons, environment-detection scripts, install commands, and intra-domain routing tables belong in references; replace them with a one-sentence pointer + anchor link. Always **delete-and-absorb** (copy the substantive content into the target reference in the same edit), never delete-and-drop. Defer environment-level recovery (auto-install, shell switching, OS branching) to the user — surface the error and fix command, then stop.
 
 5. **Update the Skill for the next execution**
    - Edit `SKILL.md` to make the improved behavior executable and checkable.
@@ -66,9 +67,7 @@ The input is a description of the Skill to improve. It must be interpreted as fo
    - Re-read the changed Skill and verify that each edit maps to an observed execution issue.
    - Check frontmatter, resource paths, line count, compatibility entry, and registry row when metadata changed. If `skill_id` is added or corrected, ensure `.specify/instructions.md` has one deduplicated Skills registry row for the canonical Skill.
    - Accept a directory-level `.github/skills -> ../.specify/skills` symlink as a valid compatibility entrypoint; do not require a separate per-Skill symlink when the directory symlink already exposes the Skill.
-   - When project scripts are available, refresh Skill tool manifests with `.specify/scripts/bash/create-new-skill.sh --refresh-only --name <name> --json` or `.specify/scripts/bash/refresh-tools.sh --system --shell --project --json` as appropriate.
    - If a combined validation command returns only partial output or omits later checks, rerun the missing checks individually before concluding validation passed.
-   - After refresh, distinguish intended generated manifests from instruction changes in the final report, and mention non-blocking source warnings separately. If generated manifests changed only in timestamps, call that out as low-signal validation churn rather than behavior change.
    - Do not document `.specify/scripts/` as a Skill-owned resource directory; Skill-owned executable resources belong in `./scripts/`.
 
 7. **Report the feedback-driven changes**
