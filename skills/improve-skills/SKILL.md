@@ -55,6 +55,7 @@ The input is a description of the Skill to improve. It must be interpreted as fo
    - Convert repeated user corrections into explicit decision branches.
    - Convert repeated manual checks into checklist items or deterministic scripts when appropriate.
    - Move detailed lessons to `./references/` only when they are useful but not needed every run.
+   - **Slim `SKILL.md` toward contract-only content**: when an edit touches `SKILL.md`, also evaluate whether existing sections should be moved out per [`./references/skill-slimming-principles.md`](./references/skill-slimming-principles.md). The body is a contract — frontmatter, resource index, workflow skeleton, strict requirements, and conventions — not a manual. How-to checklists, error tables, command-pair comparisons, environment-detection scripts, install commands, and intra-domain routing tables belong in references; replace them with a one-sentence pointer + anchor link. Always **delete-and-absorb** (copy the substantive content into the target reference in the same edit), never delete-and-drop. Defer environment-level recovery (auto-install, shell switching, OS branching) to the user — surface the error and fix command, then stop.
 
 5. **Update the Skill for the next execution**
    - Edit `SKILL.md` to make the improved behavior executable and checkable.
