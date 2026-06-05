@@ -70,9 +70,18 @@ Features are also classified by temporal origin:
 
 ## Actions
 
-0. Determine the `PROJECT_TYPE` (MUST do first)
+0. Determine the `PROJECT_TYPE` and `DELIVERY_MODEL` (MUST do first)
    - Infer from repo structure, README/docs, build config, and common layouts.
    - Output an explicit `PROJECT_TYPE` and cite the key evidence (e.g. file names / directories).
+   - Also determine the `DELIVERY_MODEL` — how the project's artifacts are consumed:
+     - **Runtime code**: compiled/interpreted programs that execute at runtime (services, CLIs, libraries).
+     - **Document/prompt artifacts**: templates, prompts, markdown, or configuration files consumed by
+       other tools (AI agents, documentation systems, build pipelines).
+     - **Hybrid**: both runtime code and document artifacts are primary deliverables.
+   - The `DELIVERY_MODEL` directly constrains which DFX categories and future features are relevant.
+     Document-artifact projects should focus on content quality, structural consistency, distribution,
+     and cross-consumer compatibility — NOT runtime concerns like CI/CD pipelines, shell completion,
+     performance profiling, or dependency scanning unless there is a substantial runtime component.
 
 1. Determine the input mode (MUST do first)
    - No arguments → global generate/refresh.
@@ -88,12 +97,29 @@ Features are also classified by temporal origin:
      - Other: derive primary capabilities from repo evidence.
    - For non-functional features, derive a broad set from the repo’s current state.
 
-3. Discover **future** features via DFX gap analysis
-   - Compare the current feature list against the **DFX Catalog** below, filtered by `PROJECT_TYPE` applicability.
+3. Discover **future** features via project-intrinsic gap analysis
+   - **Prioritize project-intrinsic features first**: features that directly improve the project’s core
+     value delivery. Ask: "What would make this project’s primary artifacts better, more consistent, or
+     easier to evolve?" These always take priority over DFX infrastructure features.
+   - For `DELIVERY_MODEL = document/prompt artifacts`, focus on:
+     - Content structural quality (template validation, schema enforcement).
+     - Cross-consumer compatibility (multi-agent portability, format consistency).
+     - Artifact lifecycle (versioning, migration, evolution across releases).
+     - Authoring experience (contributor tooling, preview, testing against consumers).
+   - For `DELIVERY_MODEL = runtime code`, the DFX Catalog below is more applicable.
+   - **Avoid over-design**: do NOT propose DFX features that assume a runtime deployment model when the
+     project’s primary artifacts are documents/prompts. Specifically:
+     - A prompt/template framework does NOT need CI/CD pipelines, shell completion, performance profiling,
+       observability stacks, or dependency security scanning unless it has substantial runtime code.
+     - Only propose DFX features when the project clearly operates in that domain.
+   - Compare the current feature list against the **DFX Catalog** below, filtered by BOTH `PROJECT_TYPE`
+     applicability AND `DELIVERY_MODEL` relevance.
    - For each DFX category, check whether the project already has evidence of the capability
-     (config files, code patterns, dependencies, CI workflows). If not, propose it as a future feature.
-   - Also check `PROJECT_TYPE`-specific functional gaps:
-     - CLI: shell completion, plugin/extension system, offline mode, i18n/l10n.
+     (config files, code patterns, dependencies, CI workflows). If not, AND the category is relevant
+     to the delivery model, propose it as a future feature.
+   - Also check `PROJECT_TYPE`-specific functional gaps (only those relevant to `DELIVERY_MODEL`):
+     - CLI (runtime): shell completion, plugin/extension system, offline mode, i18n/l10n.
+     - CLI (document-artifact): template quality, workspace versioning, cross-tool distribution.
      - Library/SDK: type stubs / declaration files, versioning / changelog, migration guides.
      - Framework: hot reload / dev experience, generator / scaffolding, convention-over-configuration defaults.
      - Microservice: API versioning, rate limiting, circuit breaker, service mesh integration.
@@ -105,7 +131,7 @@ Features are also classified by temporal origin:
      the capability, and `Implementation Notes` with relevant constraints (e.g. "requires Python ≥ 3.10
      for `truststore`").
    - Do NOT propose features that are obviously out of scope for the project’s purpose or scale.
-     Use judgment: a single-file script does not need distributed tracing.
+     Use judgment: a prompt template toolkit does not need CI/CD pipelines or shell completion.
 
 4. Apply updates based on the input mode
    - Global mode: scan the repository, infer missing features, refresh all relevant files, **then** run

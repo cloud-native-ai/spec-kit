@@ -1,7 +1,7 @@
 # 🌱 Spec Kit Feature Index
 
 **Last Updated**: 2026-06-05
-**Total Features**: 26
+**Total Features**: 24
 
 ## Features
 
@@ -29,10 +29,8 @@
 | 020 | Qoder Support | Add Qoder as a supported CLI assistant across initialization, validation, documentation, and release distribution. | Implemented | .specify/memory/features/020.md | .specify/specs/006-add-qoder-support/requirements.md | 2026-03-30 |
 | 021 | Claude Code Support | Add Claude Code as a first-class assistant with custom commands and Claude Code-specific configuration assets. | Implemented | .specify/memory/features/021.md | .specify/specs/009-claude-code-support/requirements.md | 2026-05-14 |
 | 022 | AI Tools Support | Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files. | Implemented | .specify/memory/features/022.md | .specify/specs/011-ai-tools-support/requirements.md | 2026-05-19 |
-| 023 | CI/CD Pipeline | Automated testing, linting, and package publishing via GitHub Actions workflows. | Draft | .specify/memory/features/023.md | - | 2026-06-05 |
-| 024 | Code Quality Tooling | Automated linting, formatting, and static analysis configuration for consistent code style. | Draft | .specify/memory/features/024.md | - | 2026-06-05 |
-| 025 | Shell Completion | Tab-completion support for the specify CLI across bash, zsh, and fish shells. | Draft | .specify/memory/features/025.md | - | 2026-06-05 |
-| 026 | Dependency Security | Automated dependency vulnerability scanning and supply chain security for the published package. | Draft | .specify/memory/features/026.md | - | 2026-06-05 |
+| 023 | Prompt Template Quality | Structural validation and consistency enforcement across all command and skill templates. | Draft | .specify/memory/features/023.md | - | 2026-06-05 |
+| 024 | Specification Workspace Versioning | Version management and migration support for .specify/ workspace structure across CLI releases. | Draft | .specify/memory/features/024.md | - | 2026-06-05 |
 
 ## Feature Entry Format
 
