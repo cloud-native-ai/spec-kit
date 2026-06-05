@@ -177,8 +177,19 @@ When processing the user input:
    - Confirm the implementation follows the technical plan
    - Report final status with summary of completed work
 
-10. **Populate the Verification Log** (`REQUIREMENTS_DIR/verification.log`):
+10. **Pre-Status-Flip Gate** (MANDATORY before advancing Feature status to Implemented):
+
+    This gate enforces the Status State Machine contract. Execute these checks IN ORDER before any status transition:
+
+    1. **Convert deferred tasks**: For every `[ ]` task that was intentionally skipped (requires resources unavailable in this run), convert it to `[~]` with an inline `<!-- deferred: <reason> -->` comment. Do NOT leave deferred work as `[ ]`.
+    2. **Zero open-task check**: Run `grep -cE '^\- \[ \]' tasks.md`. If the result is NOT 0, the gate FAILS — refuse to advance status. Either complete the remaining tasks or convert them to `[~]` with justification.
+    3. **Verification log completeness**: Confirm that `verification.log` has a `SC-NNN_status=` row for EVERY Success Criterion declared in `requirements.md`. Each status must be one of: `pass`, `fail`, `partial`, `deferred`, `unknown`. If any SC row is missing, add it before advancing.
+    4. **Deferred task registry**: If any tasks are `[~]`, verify that `deferred_tasks=` in `verification.log` lists their IDs (comma-separated) and `deferred_reason_summary=` is filled.
+    5. **Only if ALL checks pass**: Advance the feature status `Planned → Implemented` per the Feature Integration section below.
+
+11. **Populate the Verification Log** (`REQUIREMENTS_DIR/verification.log`):
     - If the file does not exist, instantiate it from `.specify/templates/verification-log-template.md`.
+    - **Seeding (at run start)**: Copy the template, replace `[REQUIREMENTS_KEY]` with the actual key, then enumerate EVERY `SC-NNN` declared in `requirements.md` and emit empty `SC-NNN_status=` / `SC-NNN_value=` / `SC-NNN_note=` rows. This ensures no SC is accidentally omitted.
     - Record the baseline block ONCE at the start of the run (capture `baseline_commit` from `git rev-parse HEAD` before any edits, plus any metric counters needed to evaluate Success Criteria from `requirements.md`).
     - At the end of the run, populate the post-change block, set one `SC-NNN_status=` row per Success Criterion, and list deferred task IDs in `deferred_tasks=`.
     - Do NOT invent a new ad-hoc format — use the template's keys verbatim so `/speckit.review` and CI can parse the result mechanically.

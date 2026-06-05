@@ -6,12 +6,22 @@
   + per-SC rows) so that /speckit.review, /speckit.analyze, and CI can derive
   pass-rates programmatically without grepping prose.
 
+  SEEDING INSTRUCTION:
+  At the start of the /speckit.implement run, copy this template into the spec
+  directory and perform these replacements:
+  1. Replace [REQUIREMENTS_KEY] with the actual key (e.g. "008-supervisord-stdout-logs").
+  2. Parse requirements.md for all Success Criteria (SC-001, SC-002, ..., SC-NNN).
+  3. Emit one complete three-field block (SC-NNN_status= / SC-NNN_value= / SC-NNN_note=)
+     for EVERY SC found. Do NOT leave the generic "SC-001 / SC-002" placeholders.
+  This prevents ad-hoc formats and ensures every SC is tracked from the start.
+
   Conventions:
   - One key=value per line. Values are free text unless schema below says otherwise.
   - Lines starting with `#` are comments.
   - SC rows MUST follow `SC-NNN_<field>=<value>` with fields {status, value, note}.
   - `status` is one of: pass | fail | partial | deferred | unknown.
   - When a metric is numeric, also record the raw measurement via `SC-NNN_value=`.
+  - When status=deferred, ALSO include SC-NNN_deferred_reason= explaining what would unblock.
 -->
 
 # -- Baseline (recorded once, BEFORE any /speckit.implement work changes the tree) --

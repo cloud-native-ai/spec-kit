@@ -123,6 +123,19 @@ This integration ensures that all feature planning activities are properly track
 
 **Output**: data-model.md, /contracts/*, quickstart.md file
 
+### Post-Generation Quality Gate: Contract Artifact Cleanup
+
+After generating all Phase 1 artifacts (especially contract documents under `contracts/`), perform a mandatory review pass:
+
+1. Scan each generated contract artifact for **internal deliberation markers** — phrases that indicate stream-of-consciousness reasoning leaked into the specification:
+   - "Wait —", "Actually,", "On second thought", "Let me reconsider", "re-reading:", "Hmm,", "I think", "I realize", "To be clear:", "For the avoidance of doubt" (when followed by reasoning rather than a declarative statement)
+2. For each instance found, **rewrite as a declarative statement**. Contract documents must read as specifications, not conversation transcripts. The reader should see conclusions, not the path to them.
+3. Verify each contract artifact contains only:
+   - Declarative interface definitions (inputs, outputs, constraints)
+   - Normative rules (MUST, MUST NOT, SHOULD)
+   - Concrete examples or schemas
+   - No first-person reasoning, no self-correction prose, no exploratory narration
+
 ## Key rules
 
 - Use absolute paths

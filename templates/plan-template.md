@@ -65,13 +65,24 @@
 ```text
 .specify/specs/[REQUIREMENTS_KEY]/
 ├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
+├── research.md          # Phase 0 output (/speckit.plan command) — see note below
 ├── data-model.md        # Phase 1 output (/speckit.plan command)
 ├── quickstart.md        # Phase 1 output (/speckit.plan command)
 ├── contracts/           # Phase 1 output (/speckit.plan command)
 ├── feature-ref.md       # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+├── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+└── verification.log     # Implementation output (/speckit.implement command)
 ```
+
+<!--
+  research.md conditional guidance:
+  Produce `research.md` as a standalone file when Phase 0 research exceeds ~50 lines
+  or involves external source evaluation (API docs, vendor comparisons, benchmark data).
+  When Phase 0 findings are brief (< 50 lines) and fully resolvable from internal
+  investigation (project docs, constitution, existing code), inline them into plan.md
+  under the `## Phase 0: Research Review` heading and note in this tree:
+  "No standalone research.md — findings inlined below."
+-->
 
 ### Source Code (repository root)
 <!--

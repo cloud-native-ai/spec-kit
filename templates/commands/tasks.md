@@ -92,7 +92,9 @@ You **MUST** first analyze the content and structure of `$ARGUMENTS` to determin
    - Parallel execution examples per story
    - Implementation strategy section (MVP first, incremental delivery)
 
-5. **Report**: Output path to generated tasks.md and summary:
+5. **Validate DoD format**: Before writing the final file, verify that the `## Definition of Done` section uses ONLY the `- DoD-N:` prefix format. No line in this section may match `^\- \[[ xX~]\]` (checkbox syntax is reserved for task rows). If any DoD items were accidentally written with checkboxes, rewrite them using the `- DoD-N:` prefix.
+
+6. **Report**: Output path to generated tasks.md and summary:
    - Total task count
    - Task count per user story
    - Parallel opportunities identified

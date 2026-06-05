@@ -28,6 +28,18 @@ description: "Task list template for feature implementation"
 
   DoD rows use the `- DoD-N:` prefix instead, with an explicit `Status:` line at the end
   of this section tracking overall DoD state. Add/remove `DoD-N` rows freely.
+
+  CORRECT examples:
+    - DoD-1: Code implemented according to specification
+    - DoD-2: All automated tests pass (unit, integration, contract)
+
+  INCORRECT examples (NEVER use these in the DoD section):
+    - [x] Code implemented according to specification    ← WRONG: checkbox syntax
+    - [ ] All automated tests pass                       ← WRONG: checkbox syntax
+
+  LINT CHECK: If any line between `## Definition of Done` and the next `##` heading
+  matches the regex `^\- \[[ xX~]\]`, the format rule is violated and the file must
+  be corrected before proceeding.
 -->
 
 - DoD-1: Code implemented according to specification
