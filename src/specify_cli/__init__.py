@@ -239,6 +239,7 @@ _CORE_SPECIFY_ASSETS = [
     ".specify/templates",
     ".specify/scripts",
     ".specify/skills",
+    ".specify/agents",
     ".specify/instructions.md",
 ]
 
@@ -758,6 +759,46 @@ def configure_vscode_settings(
             console.print(f"[red]Error configuring VS Code settings:[/red] {e}")
 
 
+def ensure_specify_symlink(
+    root_path: Path, agent_dir_name: str, specify_subdir: str
+) -> None:
+    """Create a directory-level symlink from <agent_dir>/<specify_subdir> to .specify/<specify_subdir>.
+
+    Handles migration of existing regular directories and stale symlinks.
+    Works for both skills and agents (and any future .specify/ subdirectory).
+    """
+    agent_dir = root_path / agent_dir_name
+    agent_dir.mkdir(parents=True, exist_ok=True)
+
+    specify_target = root_path / ".specify" / specify_subdir
+    specify_target.mkdir(parents=True, exist_ok=True)
+    link_path = agent_dir / specify_subdir
+    relative_target = Path(os.path.relpath(specify_target, start=agent_dir))
+
+    if link_path.is_symlink():
+        try:
+            if link_path.resolve() == specify_target.resolve():
+                return
+        except OSError:
+            pass
+        try:
+            linked_path = link_path.resolve()
+            if linked_path.exists() and linked_path.is_dir():
+                shutil.copytree(linked_path, specify_target, dirs_exist_ok=True)
+        except OSError:
+            pass
+        link_path.unlink(missing_ok=True)
+
+    if link_path.exists():
+        if link_path.is_dir():
+            shutil.copytree(link_path, specify_target, dirs_exist_ok=True)
+            shutil.rmtree(link_path)
+        else:
+            return
+
+    link_path.symlink_to(relative_target, target_is_directory=True)
+
+
 def copy_local_templates(
     project_path: Path,
     ai_assistant: str,
@@ -779,38 +820,6 @@ def copy_local_templates(
     # Create project directory only if not using current directory
     if not is_current_dir:
         project_path.mkdir(parents=True, exist_ok=True)
-
-    def ensure_agent_skills_symlink(root_path: Path, agent_dir_name: str) -> None:
-        agent_dir = root_path / agent_dir_name
-        agent_dir.mkdir(parents=True, exist_ok=True)
-
-        specify_skills = root_path / ".specify" / "skills"
-        specify_skills.mkdir(parents=True, exist_ok=True)
-        agent_skills = agent_dir / "skills"
-        relative_target = Path(os.path.relpath(specify_skills, start=agent_dir))
-
-        if agent_skills.is_symlink():
-            try:
-                if agent_skills.resolve() == specify_skills.resolve():
-                    return
-            except OSError:
-                pass
-            try:
-                linked_path = agent_skills.resolve()
-                if linked_path.exists() and linked_path.is_dir():
-                    shutil.copytree(linked_path, specify_skills, dirs_exist_ok=True)
-            except OSError:
-                pass
-            agent_skills.unlink(missing_ok=True)
-
-        if agent_skills.exists():
-            if agent_skills.is_dir():
-                shutil.copytree(agent_skills, specify_skills, dirs_exist_ok=True)
-                shutil.rmtree(agent_skills)
-            else:
-                return
-
-        agent_skills.symlink_to(relative_target, target_is_directory=True)
 
     try:
         # Create the .specify directory structure that the original template expects
@@ -979,12 +988,28 @@ def copy_local_templates(
             if tracker:
                 tracker.complete("local-templates", "skills copied")
 
+        # Copy agents directory
+        if (resource_path / "agents").exists():
+            if tracker:
+                tracker.start("local-templates", "copying agents")
+
+            agents_dest = project_path / ".specify" / "agents"
+            agents_dest.mkdir(parents=True, exist_ok=True)
+
+            shutil.copytree(
+                resource_path / "agents",
+                agents_dest,
+                dirs_exist_ok=True,
+            )
+            if tracker:
+                tracker.complete("local-templates", "agents copied")
+
         if ai_assistant == "copilot":
             if tracker:
                 tracker.start(
                     "local-templates", "linking .github/skills to .specify/skills"
                 )
-            ensure_agent_skills_symlink(project_path, ".github")
+            ensure_specify_symlink(project_path, ".github", "skills")
             if tracker:
                 tracker.complete("local-templates", ".github/skills symlink ready")
 
@@ -993,7 +1018,7 @@ def copy_local_templates(
                 tracker.start(
                     "local-templates", "linking .qoder/skills to .specify/skills"
                 )
-            ensure_agent_skills_symlink(project_path, ".qoder")
+            ensure_specify_symlink(project_path, ".qoder", "skills")
             if tracker:
                 tracker.complete("local-templates", ".qoder/skills symlink ready")
 
@@ -1002,7 +1027,7 @@ def copy_local_templates(
                 tracker.start(
                     "local-templates", "linking .claude/skills to .specify/skills"
                 )
-            ensure_agent_skills_symlink(project_path, ".claude")
+            ensure_specify_symlink(project_path, ".claude", "skills")
             if tracker:
                 tracker.complete("local-templates", ".claude/skills symlink ready")
 
@@ -1011,7 +1036,7 @@ def copy_local_templates(
                 tracker.start(
                     "local-templates", "linking .qwen/skills to .specify/skills"
                 )
-            ensure_agent_skills_symlink(project_path, ".qwen")
+            ensure_specify_symlink(project_path, ".qwen", "skills")
             if tracker:
                 tracker.complete("local-templates", ".qwen/skills symlink ready")
 
@@ -1020,9 +1045,46 @@ def copy_local_templates(
                 tracker.start(
                     "local-templates", "linking .opencode/skills to .specify/skills"
                 )
-            ensure_agent_skills_symlink(project_path, ".opencode")
+            ensure_specify_symlink(project_path, ".opencode", "skills")
             if tracker:
                 tracker.complete("local-templates", ".opencode/skills symlink ready")
+
+        # Agent directory symlinks (parallel to skills symlinks above)
+        if ai_assistant in ("copilot", "claude"):
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .github/agents to .specify/agents"
+                )
+            ensure_specify_symlink(project_path, ".github", "agents")
+            if tracker:
+                tracker.complete("local-templates", ".github/agents symlink ready")
+
+        if ai_assistant == "qoder":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .qoder/agents to .specify/agents"
+                )
+            ensure_specify_symlink(project_path, ".qoder", "agents")
+            if tracker:
+                tracker.complete("local-templates", ".qoder/agents symlink ready")
+
+        if ai_assistant == "qwen":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .qwen/agents to .specify/agents"
+                )
+            ensure_specify_symlink(project_path, ".qwen", "agents")
+            if tracker:
+                tracker.complete("local-templates", ".qwen/agents symlink ready")
+
+        if ai_assistant == "opencode":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .opencode/agents to .specify/agents"
+                )
+            ensure_specify_symlink(project_path, ".opencode", "agents")
+            if tracker:
+                tracker.complete("local-templates", ".opencode/agents symlink ready")
 
     except Exception as e:
         if tracker:

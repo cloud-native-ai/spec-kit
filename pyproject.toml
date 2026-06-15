@@ -30,6 +30,7 @@ packages = ["src/specify_cli"]
 "scripts" = "specify_cli/scripts"
 "templates" = "specify_cli/templates"
 "skills" = "specify_cli/skills"
+"agents" = "specify_cli/agents"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,0 +1,104 @@
+# Agent Directory Contract
+# Defines the filesystem contract for the agent framework.
+# This is not an HTTP API — it's a filesystem structure contract.
+
+contract: agents-directory
+version: "1.0"
+description: >
+  Filesystem structure and symlink contract for the Spec Kit
+  agent framework. Defines canonical paths, symlink targets,
+  and behavioral invariants.
+
+canonical_directory: .specify/agents/
+
+required_structure:
+  agents_dir:
+    path: .specify/agents/
+    type: directory
+    created_by: "specify init or /speckit.agents"
+
+  agent_file:
+    path: ".specify/agents/{name}.agent.md"
+    type: file
+    format: "YAML frontmatter + Markdown body"
+    naming: kebab-case
+    required_frontmatter:
+      - description
+    optional_frontmatter:
+      - name
+      - tools
+      - model
+      - argument-hint
+      - agents
+      - user-invocable
+      - disable-model-invocation
+      - handoffs
+
+  references_dir:
+    path: .specify/agents/references/
+    type: directory
+    shared: true
+    description: "Shared across all agents; files referenced by relative path from .agent.md"
+
+  workspace_files:
+    - path: .specify/agents/AGENTS.md
+      purpose: "Agent index"
+      created_by: "/speckit.agents (first run)"
+    - path: .specify/agents/MEMORY.md
+      purpose: "Persistent shared context"
+      created_by: "/speckit.agents (first run)"
+    - path: .specify/agents/SOUL.md
+      purpose: "Project identity and principles"
+      created_by: "/speckit.agents (first run)"
+    - path: .specify/agents/USER.md
+      purpose: "User context and preferences"
+      created_by: "/speckit.agents (first run)"
+
+symlink_bridges:
+  - tool: "claude-code"
+    source: .github/agents/
+    target: .specify/agents/
+    type: directory
+    notes: "Shared with VS Code Copilot"
+
+  - tool: "copilot"
+    source: .github/agents/
+    target: .specify/agents/
+    type: directory
+    notes: "Shared with Claude Code"
+
+  - tool: "qoder"
+    source: .qoder/agents/
+    target: .specify/agents/
+    type: directory
+
+  - tool: "qwen"
+    source: .qwen/agents/
+    target: .specify/agents/
+    type: directory
+
+  - tool: "opencode"
+    source: .opencode/agents/
+    target: .specify/agents/
+    type: directory
+
+behavioral_invariants:
+  - id: INV-001
+    rule: "All agent .agent.md files are authored exclusively in .specify/agents/"
+    violation: "Writing directly to tool-specific directories bypasses the canonical source"
+
+  - id: INV-002
+    rule: "Symlinks use relative paths to .specify/agents/"
+    violation: "Absolute paths break when the repo is moved or cloned"
+
+  - id: INV-003
+    rule: "specify init never overwrites existing user-created agents"
+    violation: "Overwriting would destroy user customizations"
+
+  - id: INV-004
+    rule: "Existing regular directory at symlink source is migrated before replacement"
+    violation: "Replacing without migration would lose existing agent files"
+
+  - id: INV-005
+    rule: "Workspace files are created by /speckit.agents, not by specify init"
+    violation: "Init should only install bundled agents, not generate empty workspace scaffolds"
