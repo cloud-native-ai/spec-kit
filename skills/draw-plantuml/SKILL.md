@@ -85,6 +85,13 @@ After drafting PlantUML code, **MUST** apply the standard style configuration de
    skinparam monochrome true
    skinparam shadowing false
    skinparam roundCorner 20
+   skinparam dpi 300
+   scale 2
+   skinparam defaultFontSize 14
+   skinparam defaultFontName "Arial, Helvetica, sans-serif"
+   skinparam padding 8
+   skinparam ArrowThickness 2
+   skinparam BorderThickness 2
    skinparam svgDimensionStyle false
    skinparam svgLinkTarget _blank
    ```
@@ -95,7 +102,7 @@ After drafting PlantUML code, **MUST** apply the standard style configuration de
 3. Verify placement: all style declarations must appear **after** `@startuml` and **before** any element definitions
 4. Verify no conflicts: ensure no duplicate or overriding `skinparam` declarations exist in the diagram body
 
-This ensures all output diagrams have a consistent, document-friendly visual style (monochrome, no shadow, rounded corners, SVG-optimized).
+This ensures all output diagrams have a consistent, document-friendly visual style (monochrome, no shadow, rounded corners), rendered at 300 DPI with 2x scale for maximum resolution and crispness in both SVG and PNG output.
 
 ### Step 5: Write Accompanying Text
 
@@ -108,7 +115,7 @@ For each diagram, prepare the following descriptive content (to be included in t
 
 ### Step 6: Render PlantUML to SVG/PNG
 
-After drafting and styling all PlantUML code, render each diagram into an SVG (preferred) or PNG image file using the PlantUML rendering service.
+After drafting and styling all PlantUML code, render each diagram into an SVG (preferred) or PNG image file using the PlantUML rendering service. All diagrams must be rendered at the highest possible quality — the style block in Step 4 already ensures `skinparam dpi 300` and `scale 2` are embedded in the PlantUML source, producing high-resolution output for both formats.
 
 **Rendering Service:**
 - SVG endpoint: `http://workspace.code-workspace.cloud:39156/plantuml/svg`
@@ -116,17 +123,31 @@ After drafting and styling all PlantUML code, render each diagram into an SVG (p
 
 **Method:** HTTP POST with `Content-Type: text/plain`, body is the raw PlantUML text (including `@startuml` / `@enduml`).
 
+**Quality guarantees (built into the PlantUML source via Step 4 style block):**
+- `skinparam dpi 300` — PNG rendered at 300 DPI, ensuring high pixel density; SVG rasterized fallback also benefits
+- `scale 2` — diagram geometry doubled in size, increasing element spacing and detail precision
+- `skinparam defaultFontSize 14` — text remains legible at 2x scale
+- `skinparam ArrowThickness 2` / `BorderThickness 2` — lines stay visually clear after scaling
+- `skinparam svgDimensionStyle false` — SVG uses `viewBox` (no fixed width/height), enabling lossless CSS scaling
+
 **Procedure for each diagram:**
 1. Save the PlantUML source text to a temporary `.puml` file (e.g., `diagram-01.puml`)
 2. Use `curl` to POST the file content and save the response:
    ```bash
+   # SVG (preferred — vector, infinitely scalable, no quality loss on zoom)
    curl -s -X POST -H "Content-Type: text/plain" --data-binary @diagram-01.puml \
      "http://workspace.code-workspace.cloud:39156/plantuml/svg" -o diagram-01.svg
    ```
-3. Verify the output is a valid SVG/PNG (`file diagram-01.svg` should show SVG/XML content)
-4. Name files descriptively: `{nn}-{short-title}.svg` (e.g., `01-system-overview.svg`)
+   ```bash
+   # PNG (high-res 300 DPI via skinparam dpi 300 + scale 2)
+   curl -s -X POST -H "Content-Type: text/plain" --data-binary @diagram-01.puml \
+     "http://workspace.code-workspace.cloud:39156/plantuml/png" -o diagram-01.png
+   ```
+3. Verify the output is a valid SVG/PNG (`file diagram-01.svg` should show SVG/XML content; `file diagram-01.png` should show PNG with large dimensions)
+4. Name files descriptively: `{nn}-{short-title}.svg` or `{nn}-{short-title}.png` (e.g., `01-system-overview.svg`)
+5. **For PNG output**: verify image dimensions with `identify diagram-01.png` or `file diagram-01.png` — expect dimensions significantly larger than default (typically 2000px+ width) due to `scale 2` and 300 DPI
 
-**Prefer SVG** for scalability and crisp rendering; use PNG only when the user explicitly requests it.
+**Prefer SVG** for scalability and crisp rendering at any zoom level; use PNG when the user explicitly requests it or when the target platform does not support SVG. Both formats are rendered at maximum quality by the style configuration.
 
 ### Step 7: Assemble Final HTML Document
 
@@ -230,11 +251,14 @@ Before delivering the final document, verify:
 - [ ] All PlantUML source files (`.puml`) have matching `@startuml` / `@enduml`
 - [ ] Each diagram has been successfully rendered to SVG/PNG via the PlantUML server
 - [ ] SVG/PNG files are valid (verified with `file` command)
+- [ ] PNG files have high dimensions (2000px+ width), confirming `dpi 300` and `scale 2` took effect
+- [ ] SVG files use `viewBox` without fixed width/height (confirm `svgDimensionStyle false` is active)
 - [ ] HTML references all diagram images with correct relative paths
 - [ ] Each diagram uses the correct UML type for its purpose
 - [ ] No diagram exceeds 15 elements (split if larger)
 - [ ] Text explanations reference specific elements in the diagram
 - [ ] `skinparam` provides consistent visual style across all diagrams
+- [ ] High-quality rendering params (`dpi 300`, `scale 2`, `ArrowThickness 2`, `BorderThickness 2`) present in all diagrams
 - [ ] Aliases and labels are human-readable (not code identifiers)
 - [ ] Document has a clear narrative flow from overview to details
 - [ ] Relationship labels are present and describe the interaction (e.g., "uses via HTTP", not just "uses")
