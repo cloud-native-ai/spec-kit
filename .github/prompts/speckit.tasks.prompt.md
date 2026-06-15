@@ -77,7 +77,9 @@ You **MUST** first analyze the content and structure of `$ARGUMENTS` to determin
    - Parallel execution examples per story
    - Implementation strategy section (MVP first, incremental delivery)
 
-5. **Report**: Output path to generated tasks.md and summary:
+5. **Validate DoD format**: Before writing the final file, verify that the `## Definition of Done` section uses ONLY the `- DoD-N:` prefix format. No line in this section may match `^\- \[[ xX~]\]` (checkbox syntax is reserved for task rows). If any DoD items were accidentally written with checkboxes, rewrite them using the `- DoD-N:` prefix.
+
+6. **Report**: Output path to generated tasks.md and summary:
    - Total task count
    - Task count per user story
    - Parallel opportunities identified
@@ -120,7 +122,22 @@ This integration ensures that all feature task generation activities are properl
 
 **CRITICAL**: Tasks MUST be organized by user story to enable independent implementation and testing.
 
-**Tests are OPTIONAL**: Only generate test tasks if explicitly requested in the feature specification or if user requests TDD approach.
+**Tests are Constitution-driven (NOT a fixed default)**: Before generating tasks, parse `.specify/memory/constitution.md` and detect any principle whose name or body contains `MUST`, `MANDATORY`, `NON-NEGOTIABLE`, `Test-First`, `TDD`, or `Contract-Driven`.
+
+- **Tests default ON** if any such principle exists, OR if the feature specification / `$ARGUMENTS` explicitly requests TDD. In ON mode you MUST emit test tasks (contract, unit, integration as applicable) per user story BEFORE the corresponding implementation tasks. If the constitution defines distinct testing layers (e.g. Layer-1 generator unit tests + Layer-2 build/smoke validation), emit tasks for EVERY layer it mandates.
+- **Tests default OFF** only when no test-mandating principle is found AND the spec is silent on TDD.
+
+At the top of the generated `tasks.md`, you MUST print a one-line banner declaring which mode was chosen and cite the constitution principle (or absence thereof) that drove the decision. Example:
+
+```text
+**Tests Mode**: ON (Constitution Principle IV "Test-First Development" is NON-NEGOTIABLE; Layer-1 unit + Layer-2 validation required)
+```
+
+or
+
+```text
+**Tests Mode**: OFF (constitution.md declares no test-mandating principle; spec did not request TDD)
+```
 
 ### Checklist Format (REQUIRED)
 

@@ -24,7 +24,7 @@ When processing the user input:
 
 ## Outline
 
-Goal: Create or update one reusable custom agent at `.github/agents/<name>.agent.md` that can be invoked directly or as a subagent.
+Goal: Create or update one reusable custom agent at `.specify/agents/<name>.agent.md` (canonical location) that can be invoked directly or as a subagent. Tool-specific directories (`.github/agents/`, `.qoder/agents/`, etc.) are directory-level symlinks to `.specify/agents/` — do NOT write directly to them.
 
 Supported agent types:
 - `Knowledge`: Read-only Q&A and explanation, no modifications
@@ -35,12 +35,21 @@ Supported agent types:
 Execution flow:
 
 1. **Agent File Management**
-   - Target path: `.github/agents/<agent-name>.agent.md` (kebab-case naming)
-   - Auto-create `.github/agents/` directory if missing
+   - Target path: `.specify/agents/<agent-name>.agent.md` (kebab-case naming)
+   - Auto-create `.specify/agents/` directory if missing
    - **Overwrite existing**: Same-name agent updates completely overwrite the existing file
    - **File validation**: Must pass YAML/frontmatter syntax validation before write
 
-2. **Extract from Conversation**
+2. **Workspace File Scaffolding** (first-run only)
+   - Check if `.specify/agents/AGENTS.md` exists. If not, create all four workspace files:
+     - `AGENTS.md`: Agent index with table header (Name, Description, Path, Status)
+     - `MEMORY.md`: Empty scaffold for persistent context shared across agent invocations
+     - `SOUL.md`: Empty scaffold for project identity and principles agents should internalize
+     - `USER.md`: Empty scaffold for user context, preferences, and working style
+   - Do NOT overwrite if any of these files already exist
+   - These files live in `.specify/agents/` alongside agent `.agent.md` files
+
+3. **Extract from Conversation**
    - First, review the conversation history.
    - If the user has been using the agent in a specialized way (e.g., restricting tools, following a specific persona, focusing on certain file types), generalize that into a custom agent.
    - Extract and document:
@@ -48,12 +57,12 @@ Execution flow:
      - Tool preferences (which to use, which to avoid)
      - The domain or job scope
 
-3. **Determine agent intent and scope**
+4. **Determine agent intent and scope**
    - **With arguments**: Use provided `$ARGUMENTS` as explicit intent
    - **Without arguments**: Infer from conversation/repository context and the extracted specialization
    - **Low-confidence inference**: If confidence is low, stop generation and request one-sentence user intent
 
-4. **Classify agent type (mandatory)**
+5. **Classify agent type (mandatory)**
   - Analyze intent, constraints, and expected workflow, then classify into one of:
     - `Knowledge`: The user's primary goal is "explain, troubleshoot, locate, describe" with an explicit read-only requirement
     - `Plan`: The user's primary goal is "break down, plan, design steps" without direct coding
@@ -61,24 +70,24 @@ Execution flow:
     - `Common`: Use when none of the above match or requirements are too mixed to classify into a single type
   - If classification confidence is insufficient, ask a minimal clarifying question before classifying
 
-5. **Confirm type with user (mandatory)**
+6. **Confirm type with user (mandatory)**
   - Before generating the file, you must show the user "identified type + 1-line rationale + template path to be used" and request confirmation.
   - Only proceed to generation after user confirmation; if user disagrees, return to step 4 to reclassify.
 
-6. **Clarify if Needed**
+7. **Clarify if Needed**
    - If no clear specialization emerges from the conversation, ask concise clarifying questions:
      - Job to perform
      - When to invoke this agent instead of default
      - Tool restrictions (allow/deny)
 
-7. **Select base template by type (mandatory)**
+8. **Select base template by type (mandatory)**
   - `Knowledge` → `.specify/templates/agent-knowledge-template.md`
   - `Plan` → `.specify/templates/agent-plan-template.md`
   - `Research` → `.specify/templates/agent-research-template.md`
   - `Common` → `.specify/templates/agent-common-template.md`
   - Use placeholder substitution to fill the selected template. Do NOT handcraft from scratch unless the template is missing.
 
-8. **Define agent shape before writing**
+9. **Define agent shape before writing**
    - Produce:
     - Agent file name (kebab-case)
     - Agent display name
@@ -86,21 +95,24 @@ Execution flow:
     - **Least-privilege tool set**: If no tools specified, derive minimal required set using Copilot tool aliases
     - Invocation mode (`user-invocable`, `disable-model-invocation`, subagent behavior)
     - Placeholder value map used for template rendering (name/description/tools/model/handoffs/role/workflow/output)
+    - **Reference files**: Identify any domain knowledge, guidelines, or prompt fragments that should be stored in `.specify/agents/references/`. Before creating a new reference file, check if an equivalent file already exists in `references/` and reuse it. Use generic naming for shared references (e.g., `coding-standards.md`) and agent-prefixed naming for agent-specific references (e.g., `code-reviewer-guidelines.md`).
    - Keep tools minimal. Avoid broad permissions unless explicitly needed.
   - **Approved providers only**: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder
 
-9. **Iterate**
+10. **Iterate**
    1. Draft the agent file and save it.
    2. Identify the most ambiguous or weak parts and ask targeted follow-up questions.
    3. After finalization, summarize what the agent does, provide example prompts to try it, and propose related customizations to create next.
 
-10. **Create or update `.agent.md`**
+11. **Create or update `.agent.md`**
+   - Write to `.specify/agents/<agent-name>.agent.md` (canonical location)
    - Required structure:
      - YAML frontmatter with meaningful `description`
      - Body sections for role, constraints, workflow, and output format
+   - If agent references external knowledge, write reference files to `.specify/agents/references/` and include relative paths in the agent body
    - Ensure the role is narrow and testable (single responsibility).
 
-11. **Quality checks and frontmatter requirements**
+12. **Quality checks and frontmatter requirements**
    - **Required frontmatter fields**:
      - `description`: Clear trigger description for agent selection
    - **Supported/Recommended frontmatter fields**:
@@ -121,18 +133,22 @@ Execution flow:
        - Unresolved contradictions block save and request user correction
      - Verify instructions are specific enough for deterministic behavior
 
-12. **Generate and register `agent_id`**
-   - After the agent file is validated and saved, generate a deterministic `agent_id` from the canonical workspace-relative path `.github/agents/<agent-name>.agent.md`.
+13. **Generate and register `agent_id`**
+   - After the agent file is validated and saved, generate a deterministic `agent_id` from the canonical workspace-relative path `.specify/agents/<agent-name>.agent.md`.
    - Treat this canonical path string as the agent identifier unless the project later introduces a stricter `agent_id` schema.
   - Update the `## Resource Registry` → `### Agents` subsection in `.specify/instructions.md` by adding one structured list entry for the new agent, using the field names defined in the agent template.
    - Example:
      - `Agent Name: Code Reviewer`
-       - `Agent ID: .github/agents/code-reviewer.agent.md`
+       - `Agent ID: .specify/agents/code-reviewer.agent.md`
        - `Description: Reviews Python code for correctness and maintainability`
-       - `Canonical Path: .github/agents/code-reviewer.agent.md`
+       - `Canonical Path: .specify/agents/code-reviewer.agent.md`
    - Keep the Agents list sorted, deduplicated, and remove `- None yet.` once real entries exist.
 
-13. **Report and next actions**
+14. **Verify symlink discoverability**
+   - After saving the agent, verify that directory-level symlinks exist from tool-specific directories (e.g., `.github/agents/`, `.qoder/agents/`) to `.specify/agents/`.
+   - These symlinks are created by `specify init`, not by this command. If missing, advise the user to re-run `specify init` or manually create the symlink.
+
+15. **Report and next actions**
    - Report created/updated file path.
    - Report generated `agent_id`.
    - Report selected `agent type` and source template path.
@@ -155,9 +171,14 @@ Execution flow:
 
 ### Valid File Locations
 
-- Workspace scope: `.github/agents/*.agent.md`
+- Canonical (workspace) scope: `.specify/agents/*.agent.md`
+- Tool-specific paths are **directory-level symlinks** to `.specify/agents/`:
+  - `.github/agents/` → `.specify/agents/` (Claude Code, VS Code Copilot)
+  - `.qoder/agents/` → `.specify/agents/` (Qoder)
+  - `.qwen/agents/` → `.specify/agents/` (Qwen)
+  - `.opencode/agents/` → `.specify/agents/` (opencode)
 - Profile scope: `<profile>/agents/*.agent.md`
-- This command defaults to **workspace scope** unless the user explicitly asks for profile scope.
+- This command ALWAYS writes to `.specify/agents/` (canonical location). Tool-specific directories are read-only symlinks.
 
 ### Frontmatter Baseline
 

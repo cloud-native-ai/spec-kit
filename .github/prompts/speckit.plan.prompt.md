@@ -35,7 +35,12 @@ When processing the user input:
    - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
      - Incorporate relevant background information from `$ARGUMENTS`
      - Incorporate findings from `research.md` if available
-   - Fill Constitution Check section from constitution
+   - Fill Constitution Check section by **dynamically deriving** the principle table from `.specify/memory/constitution.md`:
+     1. Parse every heading matching `### <numeral>. <name>` (Roman or Arabic) in the order they appear.
+     2. Preserve any `(NON-NEGOTIABLE)` / `(MANDATORY)` annotation verbatim in the row label.
+     3. Emit one row in the Constitution Check table per principle — DO NOT use a hard-coded list, and DO NOT inherit stale principles left over from a previous spec's plan.md.
+     4. Mark each row Pass / Fail / Partial based on the design artefacts (`requirements.md`, `data-model.md`, `contracts/`, `tasks.md`).
+     5. Any Fail or Partial row MUST have a matching entry under Complexity Tracking with justification.
      - Include any additional constraints from `$ARGUMENTS`
    - Evaluate gates (ERROR if violations unjustified)
    - If `$ARGUMENTS` contains a planning outline:
@@ -55,7 +60,7 @@ The `/speckit.plan` command automatically integrates with the feature tracking s
   - Detect the current feature directory (format: `.specify/specs/[REQUIREMENTS_KEY]/`)
   - Extract the feature ID from the directory name
   - Update the corresponding feature entry in `.specify/memory/features.md`:
-    - Change status from "Planned" to "Implemented"
+    - Advance status `Draft → Planned` per the canonical state machine in `.specify/templates/feature-details-template.md` § "Canonical Status State Machine". `/speckit.plan` MUST NOT land status `Implemented` — that transition is owned by `/speckit.implement`.
     - Keep the specification path unchanged
     - Update the "Last Updated" date
   - Automatically stage the changes to `.specify/memory/features.md` for git commit
@@ -103,6 +108,19 @@ This integration ensures that all feature planning activities are properly track
    - Output OpenAPI/GraphQL schema to `/contracts/`
 
 **Output**: data-model.md, /contracts/*, quickstart.md file
+
+### Post-Generation Quality Gate: Contract Artifact Cleanup
+
+After generating all Phase 1 artifacts (especially contract documents under `contracts/`), perform a mandatory review pass:
+
+1. Scan each generated contract artifact for **internal deliberation markers** — phrases that indicate stream-of-consciousness reasoning leaked into the specification:
+   - "Wait —", "Actually,", "On second thought", "Let me reconsider", "re-reading:", "Hmm,", "I think", "I realize", "To be clear:", "For the avoidance of doubt" (when followed by reasoning rather than a declarative statement)
+2. For each instance found, **rewrite as a declarative statement**. Contract documents must read as specifications, not conversation transcripts. The reader should see conclusions, not the path to them.
+3. Verify each contract artifact contains only:
+   - Declarative interface definitions (inputs, outputs, constraints)
+   - Normative rules (MUST, MUST NOT, SHOULD)
+   - Concrete examples or schemas
+   - No first-person reasoning, no self-correction prose, no exploratory narration
 
 ## Key rules
 

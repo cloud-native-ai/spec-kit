@@ -34,12 +34,7 @@ SKILL_HOME="${SKILL_HOME:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd -P
 SKILL_WORKDIR="${SKILL_WORKDIR:-$(pwd -P)}"
 ```
 
-## Available Tools & Resources
-
-### Tools (`${SKILL_HOME}/tools/`)
-- Tool manifests (auto-generated). Refresh with:
-  - `scripts/bash/create-new-skill.sh --refresh-only --name {{SKILL_NAME}} --json`
-  - or `scripts/bash/refresh-tools.sh --system --shell --project --json`
+## Resources
 
 ### Scripts (`${SKILL_HOME}/scripts/`)
 - No scripts currently. (Add executable scripts here for deterministic tasks.)

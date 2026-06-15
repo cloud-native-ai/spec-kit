@@ -49,10 +49,23 @@ Use this checklist when improving a Skill after a real execution. The focus is e
 - The first section states the result goal.
 - Steps are ordered, executable, and checkable.
 - Decision branches tell the agent what to do when scope is partial, broad, or ambiguous.
-- A single existing Skill name as input is handled as “refine this Skill”, not as a missing-description failure.
+- A single existing Skill name as input is handled as "refine this Skill", not as a missing-description failure.
 - History collection, evidence organization, root-cause analysis, Skill update, and validation appear as an explicit loop.
 - The body contains operational instructions, not general background.
 - The main `SKILL.md` stays below 500 lines.
+
+## SKILL.md Slimming
+
+- `SKILL.md` contains only contract content: frontmatter, resource index, workflow skeleton (step heading + one-sentence goal + anchor link), strict requirements, and conventions.
+- No how-to checklist longer than 10 lines lives in `SKILL.md`; it is in a reference.
+- No error table (symptom / cause / fix) lives in `SKILL.md`; it is in a reference.
+- No code block longer than 5 lines lives in `SKILL.md` (except workflow diagrams).
+- No install / bootstrap commands appear in `SKILL.md`.
+- No environment-detection / OS-branching logic appears in workflow steps.
+- Each removed section has been **absorbed** into the target reference in the same edit (not dropped silently).
+- Each remaining pointer in `SKILL.md` has a valid anchor link to the reference that now holds the detail.
+- No two locations explain the same topic; one is the source of truth, others link to it.
+- After slimming, a grep for removed slugs/filenames returns 0 dangling references.
 
 ## Resources
 
