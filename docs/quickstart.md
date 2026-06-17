@@ -1,136 +1,264 @@
 # Quick Start Guide
 
-This guide will help you get started with Spec-Driven Development using Spec Kit.
+This guide walks you through the complete Spec Kit workflow in three phases: **Setup**, **Customize**, and **Develop**.
 
-> NEW: All automation scripts now provide Bash (`.sh`) variants. The `specify` CLI auto-selects based on OS unless you pass `--script sh`.
+## Phase 1: Setup
 
-## The 4-Step Process
+### Install and Initialize
 
-### 1. Install Specify
-
-Initialize your project depending on the coding agent you're using:
+Initialize your project with the `specify` CLI:
 
 ```bash
 uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME>
 ```
 
-Pick script type explicitly (optional):
+Or initialize in the current directory:
 
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --script sh  # Force POSIX shell
+uvx --from git+https://github.com/github/spec-kit.git specify init .
 ```
 
-Pick assistant explicitly (optional):
+Specify your AI assistant explicitly (optional):
 
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai copilot  # GitHub Copilot
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai claude   # Claude Code
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai qwen     # Qwen Code
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai opencode # opencode
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --ai qoder    # Qoder
+specify init <PROJECT_NAME> --ai copilot   # GitHub Copilot
+specify init <PROJECT_NAME> --ai claude    # Claude Code
+specify init <PROJECT_NAME> --ai qwen     # Qwen Code
+specify init <PROJECT_NAME> --ai opencode  # opencode
+specify init <PROJECT_NAME> --ai qoder    # Qoder
 ```
 
-### 2. Create the Requirements
+### What `specify init` Creates
 
-Use the `/speckit.requirements` command to create the **requirements specification** (WHAT and WHY). Focus on the **what** and **why**, not the tech stack.
+After initialization, your project has a `.specify/` directory with the following structure:
 
-Note: `/speckit.feature` is separate—it manages the long-lived feature registry (ID, name, status) under `.specify/memory/`. It’s common to run `/speckit.feature ...` once to register/select a feature, then run `/speckit.requirements ...` to generate the detailed spec for that feature.
+```text
+.specify/
+├── instructions.md          # AI agent instructions (symlinked to CLAUDE.md, etc.)
+├── memory/                  # Project memory (constitution, features, knowledge)
+│   ├── constitution.md      # Core principles and governance rules
+│   └── features.md          # Feature index
+├── templates/               # Spec/plan/task templates
+├── scripts/                 # Automation scripts (bash)
+├── skills/                  # Installed skills (analysis, draw, create-skills, etc.)
+├── agents/                  # Agent workspace (bundled + generated agents)
+│   ├── code-reviewer.agent.md  # Pre-installed agent
+│   └── references/          # Shared reference materials for agents
+└── specs/                   # Feature specifications (created per feature)
+```
+
+Symlinks are created for your AI tool:
+- `.github/agents/` → `.specify/agents/` (Copilot, Claude Code)
+- `.qoder/agents/` → `.specify/agents/` (Qoder)
+- `.qwen/agents/` → `.specify/agents/` (Qwen Code)
+- `.opencode/agents/` → `.specify/agents/` (opencode)
+
+The same symlink model applies to skills directories.
+
+### Generate Role-Based Agents
+
+After initialization, run `/speckit.agents` (no arguments) to generate six development workflow agents tailored to your project:
+
+```text
+/speckit.agents
+```
+
+This generates:
+
+| Agent | File | Role |
+|-------|------|------|
+| Requirements Analyst | `requirements-analyst.agent.md` | Clarifies and structures requirements from stakeholder input |
+| System Designer | `system-designer.agent.md` | Designs system-level architecture and implementation approaches |
+| Module Designer | `module-designer.agent.md` | Designs detailed implementations within specific modules |
+| Test Engineer | `test-engineer.agent.md` | Designs and executes acceptance tests |
+| QA Engineer | `qa-engineer.agent.md` | Validates system quality against design and requirements |
+| Knowledge Manager | `knowledge-manager.agent.md` | Maintains documentation and project knowledge |
+
+Each agent is populated with your project's actual context (tech stack, directory structure, constitution, features).
+
+---
+
+## Phase 2: Customize (Optional)
+
+You can use the built-in agents and skills as-is, or create custom ones for your project's specific needs.
+
+### Create Custom Agents
+
+Use the `create-agent` skill to define new role-based agent templates:
+
+```text
+/create-agent A security auditor who reviews code changes for OWASP vulnerabilities
+```
+
+Use the `improve-agent` skill to refine agents based on usage feedback:
+
+```text
+/improve-agent The requirements-analyst agent should ask more targeted questions about data privacy
+```
+
+### Create Custom Skills
+
+Use the `create-skills` skill to define new reusable workflows:
+
+```text
+/create-skills api-testing - Validates API endpoints against OpenAPI specifications
+```
+
+Use the `improve-skills` skill to iterate on existing skills:
+
+```text
+/improve-skills The draw-plantuml skill should support C4 model diagrams
+```
+
+### Pre-installed Skills
+
+Spec Kit ships with these skills ready to use:
+
+- `analysis-project` — Deep architecture analysis reports
+- `draw-plantuml` — System architecture diagrams via PlantUML
+- `draw-echarts` — Data visualizations via Apache ECharts
+- `draw-d3js` — Interactive D3.js visualizations
+- `create-skills` / `improve-skills` — Skill lifecycle management
+- `create-agent` / `improve-agent` — Agent template lifecycle management
+- `think-skills` — Dry-run simulation of skills
+
+---
+
+## Phase 3: Develop
+
+Use the standard Spec Kit development workflow. Agents and skills assist naturally at each stage — they are auxiliary aids, not required dependencies.
+
+### The SDD Workflow
+
+```text
+/speckit.feature → /speckit.requirements → /speckit.clarify → /speckit.plan → /speckit.tasks → /speckit.implement → /speckit.review
+```
+
+### Step 1: Define Requirements
+
+```text
+/speckit.requirements Build a task management app with Kanban boards, drag-and-drop, and user assignment
+```
+
+The `@requirements-analyst` agent can help translate business language into structured requirements when you need interactive clarification.
+
+### Step 2: Clarify Ambiguities
+
+```text
+/speckit.clarify
+```
+
+Resolves `[NEEDS CLARIFICATION]` markers and binds the spec to a Feature.
+
+### Step 3: Create Technical Plan
+
+```text
+/speckit.plan Use React with TypeScript, PostgreSQL, and REST APIs
+```
+
+The `@system-designer` agent can help evaluate architectural trade-offs from a holistic project perspective.
+
+### Step 4: Break Down into Tasks
+
+```text
+/speckit.tasks
+```
+
+### Step 5: Implement
+
+```text
+/speckit.implement
+```
+
+The `@module-designer` and `@test-engineer` agents can assist with module-level design and test-first development during implementation.
+
+### Step 6: Review
+
+```text
+/speckit.review
+```
+
+The `@qa-engineer` agent can help validate that the implementation satisfies both the architectural design and the original requirements.
+
+### Auxiliary Commands
+
+These commands support the core workflow at any stage:
+
+| Command | When to Use |
+|---------|-------------|
+| `/speckit.research` | Need external data to inform requirements or planning |
+| `/speckit.clarify` | Specifications have unresolved ambiguities |
+| `/speckit.checklist` | Need quality gates before implementation |
+| `/speckit.analyze` | Check cross-artifact consistency at any stage |
+| `/speckit.constitution` | Update project governance principles |
+| `/speckit.instructions` | Refresh AI agent instructions after changes |
+
+---
+
+## Example: Building Taskify
+
+Here's a complete walkthrough using the three-phase model.
+
+### Phase 1: Setup
 
 ```bash
-/speckit.requirements Build an application that can help me organize my photos in separate photo albums. Albums are grouped by date and can be re-organized by dragging and dropping on the main page. Albums are never in other nested albums. Within each album, photos are previewed in a tile-like interface.
+uvx --from git+https://github.com/github/spec-kit.git specify init taskify --ai copilot
 ```
 
-### 3. Create a Technical Implementation Plan
-
-Use the `/speckit.plan` command to provide your tech stack and architecture choices.
-
-```bash
-/speckit.plan The application uses Vite with minimal number of libraries. Use vanilla HTML, CSS, and JavaScript as much as possible. Images are not uploaded anywhere and metadata is stored in a local SQLite database.
-```
-
-### 4. Break Down and Implement
-
-Use `/speckit.tasks` to create an actionable task list, then ask your agent to implement the feature.
-
-After implementation, use `/speckit.review` to review the generated `requirements.md`, `plan.md`, and `tasks.md` for the feature and summarize them into the long-lived feature memory files under `.specify/memory/features/`.
-
-## Detailed Example: Building Taskify
-
-Here's a complete example of building a team productivity platform:
-
-### Step 1: Define Requirements with `/speckit.requirements`
+Then generate role-based agents:
 
 ```text
-Develop Taskify, a team productivity platform. It should allow users to create projects, add team members,
-assign tasks, comment and move tasks between boards in Kanban style. In this initial phase for this feature,
-let's call it "Create Taskify," let's have multiple users but the users will be declared ahead of time, predefined.
-I want five users in two different categories, one product manager and four engineers. Let's create three
-different sample projects. Let's have the standard Kanban columns for the status of each task, such as "To Do,"
-"In Progress," "In Review," and "Done." There will be no login for this application as this is just the very
-first testing thing to ensure that our basic features are set up. For each task in the UI for a task card,
-you should be able to change the current status of the task between the different columns in the Kanban work board.
-You should be able to leave an unlimited number of comments for a particular card. You should be able to, from that task
-card, assign one of the valid users. When you first launch Taskify, it's going to give you a list of the five users to pick
-from. There will be no password required. When you click on a user, you go into the main view, which displays the list of
-projects. When you click on a project, you open the Kanban board for that project. You're going to see the columns.
-You'll be able to drag and drop cards back and forth between different columns. You will see any cards that are
-assigned to you, the currently logged in user, in a different color from all the other ones, so you can quickly
-see yours. You can edit any comments that you make, but you can't edit comments that other people made. You can
-delete any comments that you made, but you can't delete comments anybody else made.
+/speckit.agents
 ```
 
-### Step 2: Refine the Requirements Specification
+### Phase 2: Skip (use defaults)
 
-After the initial requirements specification (`requirements.md`) is created, clarify any missing requirements:
+The built-in agents and skills are sufficient for this project.
+
+### Phase 3: Develop
+
+**Define requirements:**
 
 ```text
-For each sample project or project that you create there should be a variable number of tasks between 5 and 15
-tasks for each one randomly distributed into different states of completion. Make sure that there's at least
-one task in each stage of completion.
+/speckit.requirements Develop Taskify, a team productivity platform with Kanban boards. Users can create projects, add team members, assign tasks, comment, and drag-and-drop tasks between status columns. Start with 5 predefined users (1 PM, 4 engineers), 3 sample projects, standard Kanban columns (To Do, In Progress, In Review, Done). No login required for initial testing.
 ```
 
-Also validate the requirements-specification checklist:
+**Refine and clarify:**
 
 ```text
-Read the review and acceptance checklist, and check off each item in the checklist if the feature spec meets the criteria. Leave it empty if it does not.
+For each project, create 5-15 tasks randomly distributed across columns, with at least one task per column.
 ```
 
-### Step 3: Generate Technical Plan with `/speckit.plan`
-
-Be specific about your tech stack and technical requirements:
+**Generate technical plan:**
 
 ```text
-We are going to generate this using .NET Aspire, using Postgres as the database. The frontend should use
-Blazor server with drag-and-drop task boards, real-time updates. There should be a REST API created with a projects API,
-tasks API, and a notifications API.
+/speckit.plan Use .NET Aspire with Postgres, Blazor Server frontend with drag-and-drop, REST APIs for projects, tasks, and notifications.
 ```
 
-### Step 4: Validate and Implement
-
-Have your AI agent audit the implementation plan:
+**Break down and implement:**
 
 ```text
-Now I want you to go and audit the implementation plan and the implementation detail files.
-Read through it with an eye on determining whether or not there is a sequence of tasks that you need
-to be doing that are obvious from reading this. Because I don't know if there's enough here.
+/speckit.tasks
+/speckit.implement
 ```
 
-Finally, implement the solution:
+**Review:**
 
 ```text
-implement .specify/specs/002-create-taskify/plan.md
+/speckit.review
 ```
 
 ## Key Principles
 
 - **Be explicit** about what you're building and why
-- **Don't focus on tech stack** during specification phase
-- **Iterate and refine** your requirements specification before implementation
+- **Don't focus on tech stack** during the specification phase
+- **Iterate and refine** requirements before implementation
 - **Validate** the plan before coding begins
-- **Let the AI agent handle** the implementation details
+- **Use agents as consultants** — invoke them for their role perspective, not as required gatekeepers
+- **Use skills for repeatability** — codify workflows you run more than once
 
 ## Next Steps
 
-- Read the complete methodology for in-depth guidance
-- Check out more examples in the repository
-- Explore the source code on GitHub
+- [Usage Guide](usage.md) — Full command reference and workflow details
+- [Spec-Driven Development](spec-driven.md) — Methodology deep-dive
+- [Installation Guide](installation.md) — Detailed setup options

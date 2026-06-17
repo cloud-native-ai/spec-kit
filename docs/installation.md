@@ -62,13 +62,22 @@ uvx --from git+https://github.com/github/spec-kit.git specify init <project_name
 
 ## Verification
 
-After initialization, you should see the following commands available in your AI agent:
+After initialization, you should see the following structure and commands:
 
-- `/speckit.requirements` - Create/update the requirements specification (WHAT/WHY) for a feature
-- `/speckit.plan` - Generate implementation plans  
-- `/speckit.tasks` - Break down into actionable tasks
+**Directory structure**:
+- `.specify/scripts/` — Automation scripts (`.sh`)
+- `.specify/templates/` — Spec/plan/task templates
+- `.specify/skills/` — Installed skills (symlinked to tool-specific paths)
+- `.specify/agents/` — Agent workspace with bundled agents (symlinked to `.github/agents/`, `.qoder/agents/`, etc.)
+- `.specify/memory/` — Project memory (constitution, features)
 
-The `.specify/scripts` directory will contain `.sh` scripts.
+**Core commands available in your AI agent**:
+- `/speckit.requirements` — Create/update the requirements specification (WHAT/WHY) for a feature
+- `/speckit.plan` — Generate implementation plans  
+- `/speckit.tasks` — Break down into actionable tasks
+- `/speckit.implement` — Execute tasks with validation
+
+**Next step**: Run `/speckit.agents` (no arguments) in your AI agent to generate six role-based development workflow agents tailored to your project's context.
 
 ## Troubleshooting
 

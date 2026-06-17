@@ -23,8 +23,9 @@ The following commands are **prompt instructions** for your AI Agent. Use them i
 | `/speckit.research` | Conduct technical research | Research |
 | `/speckit.constitution` | Manage project constitution | Governance |
 | `/speckit.feature` | Manage feature registry | Governance |
-| `/speckit.agents` | Create/refine custom agents | Extension |
+| `/speckit.agents` | Generate role-based agents or create custom agents | Extension |
 | `/speckit.skills` | Manage specialized skills | Extension |
+| `/speckit.tools` | Define/discover reusable tools | Extension |
 | `/speckit.instructions` | Generate usage instructions | Documentation |
 
 ## GitHub Copilot Maintenance Workflow
@@ -294,18 +295,34 @@ Spec Kit commands are not meant to be used in isolation. The table below clarifi
 - **Record Reuse**: Reuse and backfill missing `tool_id` in historical records
 
 ### `speckit.agents`
-**Purpose**: Create or refine custom AI agents for focused workflows using `.agent.md` files.
+**Purpose**: Generate role-based development workflow agents or create custom agents using `.agent.md` files.
 
 **Usage**:
 ```bash
-/speckit.agents [agent intent or constraints]
+/speckit.agents                          # Mode A: Generate all six role-based agents
+/speckit.agents [agent intent]           # Mode B: Create a custom agent
 ```
 
-**Key Features**:
-- Creates or updates workspace-scoped agents in `.github/agents/`
-- Defines clear trigger descriptions for agent selection and subagent routing
-- Enforces minimal, role-appropriate tool permissions
-- Produces deterministic role/workflow/output guidance for each agent
+**Mode A — Role-Based Generation** (no arguments):
+Generates six software development workflow agents from role templates, populated with the current project's context:
+
+| Agent | Role |
+|-------|------|
+| Requirements Analyst | Clarifies and structures requirements from stakeholder input |
+| System Designer | Designs system-level architecture and implementation approaches |
+| Module Designer | Designs detailed implementations within specific modules |
+| Test Engineer | Designs and executes acceptance tests |
+| QA Engineer | Validates system quality against design and requirements |
+| Knowledge Manager | Maintains documentation and project knowledge |
+
+Each agent is written to `.specify/agents/` (canonical location). Tool-specific directories (`.github/agents/`, `.qoder/agents/`, etc.) are directory-level symlinks. If a role-based agent was customized by the user, a `.bak` backup is created before regeneration.
+
+**Mode B — Custom Agent Creation** (with arguments):
+Creates or updates a single custom agent based on user-provided intent. Existing role-based agents are preserved.
+
+**Companion Skills**:
+- `create-agent` — Create new role-based agent templates in `templates/`
+- `improve-agent` — Iteratively improve agent templates from execution feedback
 
 ### `speckit.instructions`
 **Purpose**: Generate comprehensive usage instructions, maintenance guides, or system prompts. This command helps create documentation for humans or setup instructions for AI agents.
@@ -329,16 +346,24 @@ The Spec Kit workflow consists of a **Core Lifecycle** for standardized developm
 
 ```mermaid
 flowchart TD
-    %% Setup Phase
-    subgraph Setup ["Step 0: Preparation"]
+    %% Phase 1: Setup
+    subgraph Phase1 ["Phase 1: Setup"]
         direction TB
-        S1["/speckit.constitution"]
-        S2["/speckit.instructions"]
-        S3["/speckit.skills"]
+        P1_1["specify init"]
+        P1_2["/speckit.constitution"]
+        P1_3["/speckit.instructions"]
     end
 
-    %% Core Flow
-    subgraph Core ["Core Development Lifecycle"]
+    %% Phase 2: Customize (Optional)
+    subgraph Phase2 ["Phase 2: Customize (Optional)"]
+        direction TB
+        P2_1["/speckit.agents\n(generate role agents)"]
+        P2_2["/speckit.skills\n(refresh skills)"]
+        P2_3["create-agent / create-skills\n(custom definitions)"]
+    end
+
+    %% Phase 3: Core Development
+    subgraph Phase3 ["Phase 3: Core Development Lifecycle"]
         direction TB
         C1["1. /speckit.feature"]
         C2["2. /speckit.requirements"]
@@ -348,64 +373,70 @@ flowchart TD
     end
 
     %% Flow Connectivity
-    Start([Start]) ====> Setup
-    Setup ====> C1
+    Start([Start]) ====> Phase1
+    Phase1 ====> Phase2
+    Phase2 ====> C1
     C1 ====> C2
     C2 ====> C3
     C3 ====> C4
     C4 ====> C5
     C5 ====> End([End])
 
-    %% Auxiliary / Optional Tools - Context sensitive placement
-    
-    %% Research supports Specify
+    %% Auxiliary Tools
     T_Res[["/speckit.research\n(Optional)"]] -.- C2
-    
-    %% Clarify repairs Specify
     C2 -.- T_Clar[["/speckit.clarify\n(Ambiguity Resolver)"]] -.-> C2
-    
-    %% Checklist serves as a gate before Implement
     C4 -.- T_Chk[["/speckit.checklist\n(QA Gate)"]] -.-> C5
-    
-    %% Analyze watches over the artifacts
     C2 & C3 & C4 & C5 -.- T_Ana[["/speckit.analyze\n(Consistency Check)"]]
-    
-    %% Review validates the Implementation
     C5 -.- T_Rev[["/speckit.review\n(Post-Impl Review)"]] -.-> End
+
+    %% Agent assistance (dashed, advisory)
+    A1[["@requirements-analyst"]] -.- C2
+    A2[["@system-designer"]] -.- C3
+    A3[["@module-designer\n@test-engineer"]] -.- C5
+    A4[["@qa-engineer"]] -.- T_Rev
 
     %% Styling
     classDef setup fill:#2d3748,stroke:#a0aec0,color:#e2e8f0,stroke-width:1px,stroke-dasharray: 5 5;
+    classDef customize fill:#3b3052,stroke:#a78bfa,color:#e2e8f0,stroke-width:1px,stroke-dasharray: 5 5;
     classDef core fill:#1e3a5f,stroke:#60a5fa,color:#e2e8f0,stroke-width:3px;
     classDef aux fill:#4a5568,stroke:#cbd5e0,color:#f7fafc,stroke-width:1px,stroke-dasharray: 5 5;
+    classDef agent fill:#1a3a2a,stroke:#4ade80,color:#d1fae5,stroke-width:1px,stroke-dasharray: 3 3;
     classDef startEnd fill:#166534,stroke:#4ade80,color:#ffffff,stroke-width:2px;
-    
+
     class Start,End startEnd
-    class S1,S2,S3 setup
+    class P1_1,P1_2,P1_3 setup
+    class P2_1,P2_2,P2_3 customize
     class C1,C2,C3,C4,C5 core
     class T_Res,T_Clar,T_Chk,T_Ana,T_Rev aux
+    class A1,A2,A3,A4 agent
 ```
 
-This flowchart distinguishes between the **Core Path** (solid arrows) and **Auxiliary Tools** (dashed lines):
+This flowchart shows three phases with role-based agents as auxiliary aids:
 
-1.  **Preparation**: `/speckit.constitution`, `/speckit.instructions`, `/speckit.skills` (Run once or as needed).
-2.  **Core Lifecycle**:
-    *   `1. /speckit.feature`: Create/select a feature registry entry (long-lived ID/name/status).
-    *   `2. /speckit.requirements`: Create/update the requirements specification (WHAT/WHY) for that feature.
-    *   `3. /speckit.plan`: Create the technical plan.
-    *   `4. /speckit.tasks`: Breakdown into tasks.
-    *   `5. /speckit.implement`: Execute code changes.
-3.  **Auxiliary Tools (Optional)**:
+1.  **Phase 1 — Setup**: Run `specify init` to create the `.specify/` structure, then optionally run `/speckit.constitution` and `/speckit.instructions`.
+2.  **Phase 2 — Customize (Optional)**: Run `/speckit.agents` to generate role-based agents for your project. Use `create-agent` or `create-skills` to define custom agents or skills. Or skip this phase and use the defaults.
+3.  **Phase 3 — Core Development Lifecycle**:
+    *   `1. /speckit.feature`: Create/select a feature registry entry.
+    *   `2. /speckit.requirements`: Create/update the requirements specification (WHAT/WHY). The `@requirements-analyst` agent can help translate business language.
+    *   `3. /speckit.plan`: Create the technical plan. The `@system-designer` agent can help evaluate architectural trade-offs.
+    *   `4. /speckit.tasks`: Break down into actionable tasks.
+    *   `5. /speckit.implement`: Execute code changes. The `@module-designer` and `@test-engineer` agents can assist with design and testing.
+4.  **Auxiliary Tools (Optional)**:
     *   `/speckit.research`: Use during specification if external data is needed.
     *   `/speckit.clarify`: Use if specification has `[NEEDS CLARIFICATION]` tags.
     *   `/speckit.checklist`: Use to generate pre-implementation validation lists.
     *   `/speckit.analyze`: Use at any stage to check for artifact consistency.
-    *   `/speckit.review`: Use after implementation to verify against spec/plan.
+    *   `/speckit.review`: Use after implementation to verify against spec/plan. The `@qa-engineer` agent can validate systemic quality.
 
 ## Best Practices
 
 - Always run `/speckit.requirements` to establish clear requirements before planning
-- Use `speckit.checklist` before implementation to ensure quality
-- Run `speckit.analyze` regularly to catch inconsistencies early
+- Use `/speckit.checklist` before implementation to ensure quality
+- Run `/speckit.analyze` regularly to catch inconsistencies early
 - Keep specifications focused on WHAT and WHY, not HOW
 - Limit clarifications to critical decisions only
 - Maintain constitutional compliance throughout the workflow
+- Run `/speckit.agents` after `specify init` to generate project-aware role agents
+- Use agents as consultants for their role perspective, not as required gatekeepers
+- Use `create-agent` and `improve-agent` to evolve agent templates based on real usage feedback
+- Use `create-skills` and `improve-skills` to codify workflows you run more than once
