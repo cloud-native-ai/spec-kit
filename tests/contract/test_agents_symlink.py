@@ -44,11 +44,11 @@ class TestAgentsSymlinkCreation:
 
     def test_agent_visible_through_symlink(self, tmp_path):
         (tmp_path / ".specify" / "agents").mkdir(parents=True)
-        (tmp_path / ".specify" / "agents" / "code-reviewer.agent.md").write_text("agent content")
+        (tmp_path / ".specify" / "agents" / "my-agent.agent.md").write_text("agent content")
 
         ensure_specify_symlink(tmp_path, ".github", "agents")
 
-        via_symlink = tmp_path / ".github" / "agents" / "code-reviewer.agent.md"
+        via_symlink = tmp_path / ".github" / "agents" / "my-agent.agent.md"
         assert via_symlink.exists()
         assert via_symlink.read_text() == "agent content"
 

@@ -25,7 +25,6 @@ class TestInitAgentsCopy:
 
         shutil.copytree(agents_source, dest, dirs_exist_ok=True)
 
-        assert (dest / "code-reviewer.agent.md").exists()
         assert (dest / "references").is_dir()
 
     def test_references_directory_preserved(self, tmp_path, agents_source):
@@ -45,7 +44,6 @@ class TestInitAgentsCopy:
         ensure_specify_symlink(tmp_path, ".github", "agents")
 
         assert (tmp_path / ".github" / "agents").is_symlink()
-        assert (tmp_path / ".github" / "agents" / "code-reviewer.agent.md").exists()
 
 
 @pytest.mark.integration
@@ -68,7 +66,6 @@ class TestInitAgentsPreservation:
         shutil.copytree(agents_source, dest, dirs_exist_ok=True)
 
         assert (dest / "my-custom-agent.agent.md").read_text() == "user content"
-        assert (dest / "code-reviewer.agent.md").exists()
 
     def test_bundled_and_user_agents_coexist(self, tmp_path, agents_source):
         dest = tmp_path / ".specify" / "agents"
@@ -80,4 +77,3 @@ class TestInitAgentsPreservation:
         agent_files = list(dest.glob("*.agent.md"))
         names = {f.name for f in agent_files}
         assert "user-agent.agent.md" in names
-        assert "code-reviewer.agent.md" in names

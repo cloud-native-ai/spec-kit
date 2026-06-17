@@ -30,8 +30,13 @@ My core duties:
 2. **Analyze** the affected module's current state — code structure, existing patterns, dependencies
 3. **Design** the detailed implementation — functions, classes, data structures within the module
 4. **Implement** the changes following existing code conventions and patterns
-5. **Verify** the implementation respects all interface contracts (input/output formats, error handling)
-6. **Document** any module-internal decisions that affect future maintainability
+5. **Review** the implementation for correctness, maintainability, and adherence to project standards:
+   - Check for logic errors, edge cases, and error handling gaps
+   - Evaluate naming clarity, function length, coupling, and duplication
+   - Verify consistency with surrounding code and project patterns
+   - Prioritize correctness bugs over style concerns
+6. **Verify** the implementation respects all interface contracts (input/output formats, error handling)
+7. **Document** any module-internal decisions that affect future maintainability
 
 ## Upstream (Inputs)
 
@@ -46,6 +51,7 @@ My core duties:
 Implementation deliverable with:
 - **Module Scope**: Which module(s) were modified and why
 - **Changes Made**: Summary of code changes with file paths
+- **Code Review**: Findings from self-review organized by severity (bug > correctness > maintainability > style), with file:line references
 - **Interface Compliance**: How the implementation satisfies each interface contract
 - **Internal Design Notes**: Key implementation decisions within the module
 - **Testing Hints**: Suggested test scenarios based on the implementation's behavior

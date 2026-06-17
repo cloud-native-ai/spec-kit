@@ -84,7 +84,7 @@ Generate all six software development workflow agents from role templates in `te
    - If content differs (user has customized it), create a `.bak` copy and warn the user
    - If content is identical, overwrite silently
 
-4. **Agent preservation (FR-008)**: Only create/update files matching the six role slugs listed above. Skip all other existing agents (e.g., `code-reviewer.agent.md`).
+4. **Agent preservation (FR-008)**: Only create/update files matching the six role slugs listed above. Skip all other existing agents (e.g., `my-custom-agent.agent.md`).
 
 5. **Write all six agents** to `.specify/agents/`
 
@@ -141,7 +141,7 @@ Execution flow:
     - **Least-privilege tool set**: If no tools specified, derive minimal required set using Copilot tool aliases
     - Invocation mode (`user-invocable`, `disable-model-invocation`, subagent behavior)
     - Placeholder value map used for template rendering (name/description/tools/model/handoffs/role/workflow/output)
-    - **Reference files**: Identify any domain knowledge, guidelines, or prompt fragments that should be stored in `.specify/agents/references/`. Before creating a new reference file, check if an equivalent file already exists in `references/` and reuse it. Use generic naming for shared references (e.g., `coding-standards.md`) and agent-prefixed naming for agent-specific references (e.g., `code-reviewer-guidelines.md`).
+    - **Reference files**: Identify any domain knowledge, guidelines, or prompt fragments that should be stored in `.specify/agents/references/`. Before creating a new reference file, check if an equivalent file already exists in `references/` and reuse it. Use generic naming for shared references (e.g., `coding-standards.md`) and agent-prefixed naming for agent-specific references (e.g., `security-auditor-guidelines.md`).
    - Keep tools minimal. Avoid broad permissions unless explicitly needed.
   - **Approved providers only**: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder
 
@@ -184,10 +184,10 @@ Execution flow:
    - Treat this canonical path string as the agent identifier unless the project later introduces a stricter `agent_id` schema.
   - Update the `## Resource Registry` → `### Agents` subsection in `.specify/instructions.md` by adding one structured list entry for the new agent, using the field names defined in the agent template.
    - Example:
-     - `Agent Name: Code Reviewer`
-       - `Agent ID: .specify/agents/code-reviewer.agent.md`
-       - `Description: Reviews Python code for correctness and maintainability`
-       - `Canonical Path: .specify/agents/code-reviewer.agent.md`
+     - `Agent Name: Security Auditor`
+       - `Agent ID: .specify/agents/security-auditor.agent.md`
+       - `Description: Audits code for security vulnerabilities and compliance`
+       - `Canonical Path: .specify/agents/security-auditor.agent.md`
    - Keep the Agents list sorted, deduplicated, and remove `- None yet.` once real entries exist.
 
 11. **Verify symlink discoverability**
@@ -199,7 +199,7 @@ Execution flow:
    - Report generated `agent_id`.
    - Report selected `agent type` and source template path.
    - Provide 2-3 example prompts that should trigger the agent.
-     - "Create a code reviewer agent for Python files"
+     - "Create a security auditor agent for Python files"
      - "Build an agent that can analyze security vulnerabilities"
      - "Make an agent for generating documentation from code"
    - Suggest running `/speckit.instructions` if discovery metadata should be refreshed.
