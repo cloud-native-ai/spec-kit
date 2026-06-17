@@ -41,11 +41,12 @@ Every creation/modification path MUST produce and persist a deterministic `tool_
 
 ### Tool Type Standardization
 
-Tool naming and categorization MUST use the following three canonical types:
+Tool naming and categorization MUST use the following three canonical types, each with a distinct availability scope:
 
-1. `project-script`: scripts inside the current project, typically custom project-specific capabilities.
-2. `system-binary`: binary tools in the current runtime environment (e.g., `find`, `grep`, `jq`).
-3. `shell-function`: functions defined in the current shell session (e.g., bash functions loaded via `~/.bashrc`).
+1. `project-script` — **Project-level scope**. Scripts bundled with the current project (e.g., `scripts/bash/*.sh`, `.specify/scripts/`). Available only within the project workspace; not accessible outside the project root. Source Identifier is a path relative to the project root.
+2. `system-binary` — **System-level scope**. Executable binaries or scripts installed system-wide via the OS package manager, language-level package manager, or manual placement in `PATH` (e.g., `/usr/bin/jq`, `/usr/local/bin/docker`). Available to all users and sessions on the machine, but may be tied to a specific OS distribution or package ecosystem — a binary on Ubuntu may not exist on Alpine or macOS.
+3. `shell-function` — **Shell-session-level scope**. Predefined functions loaded into the current shell context via `source` or `.` from dotfiles (`~/.bashrc`, `~/.zshrc`) or project-local activation scripts (`.envrc`). Available only in the current shell session; disappears when the session ends or when a new shell is started without sourcing the definition file.
+4. `webhook` — **Network-level scope**. Remote operations triggered by sending an HTTP request to a web server endpoint (e.g., `https://ci.example.com/api/trigger-build`). Not tied to a specific machine, project, or shell session — available wherever HTTP connectivity and valid credentials exist. Depends on network reachability, server uptime, and authentication.
 
 ### Behavioral Rules Format
 
@@ -94,7 +95,7 @@ Execution steps:
    - **CRITICAL**: The following mandatory fields MUST be provided by the user. You MUST NOT auto-populate these from your built-in knowledge about the tool, even for well-known utilities like `curl`, `grep`, or `jq`.
    - Collect from the user:
      - **Tool Name**: The name the user wants to use for this tool.
-     - **Tool Type**: One of `project-script`, `system-binary`, `shell-function`.
+     - **Tool Type**: One of `project-script`, `system-binary`, `shell-function`, `webhook`.
      - **Source Identifier**: The script path (relative to project root), binary path, or function name.
      - **Description**: The user's own description of what this tool does in their project context.
    - After collecting mandatory fields, prompt the user for optional **Behavioral Rules**:

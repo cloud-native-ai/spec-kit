@@ -53,7 +53,7 @@ def test_define_tool_missing_source_identifier_returns_422():
 
 
 def test_tool_type_accepts_only_canonical_values():
-    for valid_type in ("project-script", "system-binary", "shell-function"):
+    for valid_type in ("project-script", "system-binary", "shell-function", "webhook"):
         record = ToolRecord(
             name="test-tool",
             tool_type=valid_type,

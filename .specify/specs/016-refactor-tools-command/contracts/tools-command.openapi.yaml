@@ -233,7 +233,7 @@ components:
           description: User-provided tool name
         tool_type:
           type: string
-          enum: [project-script, system-binary, shell-function]
+          enum: [project-script, system-binary, shell-function, webhook]
         source_identifier:
           type: string
           description: Script path, binary path, or function name
@@ -269,7 +269,7 @@ components:
           type: string
         tool_type:
           type: string
-          enum: [project-script, system-binary, shell-function]
+          enum: [project-script, system-binary, shell-function, webhook]
         behavioral_rules:
           type: array
           items:
@@ -302,7 +302,7 @@ components:
           type: string
         tool_type:
           type: string
-          enum: [project-script, system-binary, shell-function]
+          enum: [project-script, system-binary, shell-function, webhook]
         source_identifier:
           type: string
         tool_id:
@@ -413,7 +413,7 @@ components:
           type: array
           items:
             type: string
-            enum: [project-script, system-binary, shell-function]
+            enum: [project-script, system-binary, shell-function, webhook]
           description: Limit discovery to specific source types
 
     DiscoveryDraft:
@@ -423,7 +423,7 @@ components:
           type: string
         proposed_type:
           type: string
-          enum: [project-script, system-binary, shell-function]
+          enum: [project-script, system-binary, shell-function, webhook]
         proposed_source:
           type: string
         proposed_description:

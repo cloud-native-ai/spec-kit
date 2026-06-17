@@ -19,12 +19,14 @@ _ALLOWED_TOOL_TYPES = {
     "system-binary",
     "shell-function",
     "project-script",
+    "webhook",
 }
 
 _CANONICAL_TOOL_TYPES = {
     "system-binary",
     "shell-function",
     "project-script",
+    "webhook",
 }
 
 _BEHAVIORAL_RULE_KEYWORDS = {"MUST", "MUST NOT", "SHOULD", "SHOULD NOT"}

@@ -9,6 +9,13 @@
 **Discovery Origin**: [manual-entry | discovery-assisted | imported]  
 **Last Updated**: [YYYY-MM-DD]
 
+## Scope
+
+**Availability**: Project-level — available only within the current project workspace.  
+**Typical Sources**: Scripts bundled with the project (e.g., `scripts/bash/*.sh`, `scripts/python/*.py`, `.specify/scripts/`).  
+**Portability**: Tied to the project repository; not available outside the project root. Moving to a different machine requires cloning or copying the project.  
+**Source Identifier Convention**: Path relative to the project root (e.g., `scripts/bash/build-docs.sh`).
+
 ## Description
 
 [Short, user-friendly description of what this script does and when to use it]

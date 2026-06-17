@@ -9,6 +9,13 @@
 **Discovery Origin**: [manual-entry | discovery-assisted | imported]  
 **Last Updated**: [YYYY-MM-DD]
 
+## Scope
+
+**Availability**: System-level — available system-wide to all users and sessions via the `PATH`.  
+**Typical Sources**: Executable binaries or scripts installed by the OS package manager (apt, yum, brew, etc.), language-level package managers (pip, npm -g, cargo install), or placed manually in `/usr/bin/`, `/usr/local/bin/`, etc.  
+**Portability**: May be tied to a specific OS distribution or package ecosystem. A binary available on Ubuntu may not exist on Alpine or macOS, and vice versa. Version and feature sets can differ across distributions.  
+**Source Identifier Convention**: Absolute path to the binary (e.g., `/usr/bin/jq`) or the command name if unique in `PATH` (e.g., `jq`), discoverable via `which` or `shutil.which`.
+
 ## Description
 
 [Short, user-friendly description of what this binary does and when to use it]

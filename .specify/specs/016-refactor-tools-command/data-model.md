@@ -10,7 +10,7 @@
 - **Grounding**: FR-001, FR-002, FR-003, FR-004, FR-006, FR-010; User Story 1
 - **Fields**:
   - name: string (required) — user-provided tool name; MUST NOT be auto-populated from LLM knowledge (FR-002)
-  - tool_type: string (required) — one of `project-script`, `system-binary`, `shell-function` (FR-007)
+  - tool_type: string (required) — one of `project-script`, `system-binary`, `shell-function`, `webhook` (FR-007)
   - source_identifier: string (required) — script path, binary path, or function name (FR-002)
   - tool_id: string (required) — deterministic identifier derived from canonical file path `.specify/memory/tools/<tool-name>.md` (FR-004)
   - description: string (required) — user-provided purpose statement; MUST NOT be auto-populated from LLM knowledge (FR-002)
@@ -94,7 +94,7 @@
 ## Validation Rules
 
 - A ToolDefinitionRecord MUST have non-empty `name`, `tool_type`, `source_identifier`, and `description` before transitioning to `Verified` status (FR-006).
-- `tool_type` MUST be one of `project-script`, `system-binary`, `shell-function` (FR-007).
+- `tool_type` MUST be one of `project-script`, `system-binary`, `shell-function`, `webhook` (FR-007).
 - When `status` is `Verified`, the record MUST have at least one of `parameters` or `returns` populated.
 - Each BehavioralRule `keyword` MUST be one of `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`.
 - Tool aliases MUST be unique across all records — no two records may share the same alias (FR-011).

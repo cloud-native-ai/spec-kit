@@ -102,7 +102,7 @@ As a Spec Kit user, I want to view the complete definition of any registered too
 - **FR-004**: Tool definition records MUST be persisted as structured markdown files at `.specify/memory/tools/<tool-name>.md` with a deterministic `tool_id` derived from the canonical file path.
 - **FR-005**: When modifying an existing tool definition, the system MUST perform field-level updates — changed fields are updated, unchanged fields are preserved, and no fields are re-inferred from LLM knowledge.
 - **FR-006**: The system MUST validate that all mandatory fields (name, type, source identifier, description) are present and non-empty before marking a tool definition as "Verified".
-- **FR-007**: Tool type MUST be one of three canonical values: `project-script`, `system-binary`, or `shell-function`.
+- **FR-007**: Tool type MUST be one of four canonical values: `project-script`, `system-binary`, `shell-function`, or `webhook`.
 - **FR-008**: Before any tool invocation, the system MUST display a complete preview showing the resolved command, parameters, behavioral constraints, and expected output shape, and MUST NOT proceed until the user provides explicit confirmation.
 - **FR-009**: The system MUST register each created or updated tool in the Resource Registry (Tools subsection) of `.specify/instructions.md`, keeping entries sorted and deduplicated.
 - **FR-010**: When the AI agent encounters a tool that has a definition record, it MUST use the persisted definition — including behavioral rules and parameter specifications — as the authoritative source, not its own training knowledge about the tool.
@@ -151,6 +151,7 @@ As a Spec Kit user, I want to view the complete definition of any registered too
 | `STR-003` | "system-binary" | FR-007, tool type validation |
 | `STR-004` | "shell-function" | FR-007, tool type validation |
 | `STR-005` | "Verified" | FR-006, tool status after validation |
+| `STR-006` | "webhook" | FR-007, tool type validation |
 
 ## Clarifications
 
