@@ -127,7 +127,7 @@ The research and practice focus areas of this project include:
 ### Non-functional Features
 
 - **CLI Interface**: Rich terminal interface using Typer. (Status: Completed)
-- **Tools Command**: Unified tool discovery and management across System, Shell, and Project sources. (Status: Implemented)
+- **Tools Command**: Definition-first tool management with explicit behavioral rules. (Status: Planned)
 - **Template Engine**: Markdown-based template system. (Status: Completed)
 - **Configuration Management**: Project configuration via pyproject.toml. (Status: Completed)
 - **Prompt Template Quality**: Structural validation and consistency enforcement across all command and skill templates. (Status: Draft)

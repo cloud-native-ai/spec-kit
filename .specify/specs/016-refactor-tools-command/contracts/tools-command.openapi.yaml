@@ -1,0 +1,539 @@
+openapi: 3.0.3
+info:
+  title: Speckit Tools Command Contract — Definition-First Model
+  version: 2.0.0
+  description: |
+    Command contract for the refactored `/speckit.tools` behavior.
+    Models the definition-first tool management flow: define, modify, view, discover-assist,
+    preview, and invoke. This contract describes command semantics and validation rules,
+    not a public network API.
+
+    Changes from v1.0.0 (spec 004):
+    - Primary action is now tool definition (create/modify), not discovery.
+    - Added Behavioral Rules to tool records.
+    - Discovery repositioned as draft-bootstrapping assistant.
+    - MCP tool type removed.
+servers:
+  - url: https://local.speckit.invalid
+
+paths:
+  /tools/define:
+    post:
+      summary: Create a new tool definition record
+      description: |
+        Primary action of /speckit.tools. Creates a new ToolDefinitionRecord at
+        .specify/memory/tools/<tool-name>.md with user-provided mandatory fields.
+        Mandatory fields (name, tool_type, source_identifier, description) MUST be
+        provided by the user — not auto-populated from LLM knowledge.
+      operationId: defineNewTool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DefineToolRequest'
+      responses:
+        '201':
+          description: Tool definition record created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolDefinitionRecord'
+        '409':
+          description: Tool name already exists — use modify or disambiguate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+        '422':
+          description: Mandatory fields missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /tools/records/{toolName}:
+    get:
+      summary: View a tool definition record
+      description: |
+        Retrieves the complete tool definition including behavioral rules.
+        Maps to User Story 4.
+      operationId: getToolDefinition
+      parameters:
+        - in: path
+          name: toolName
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tool definition found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolDefinitionRecord'
+        '404':
+          description: No tool definition exists for this name
+
+    patch:
+      summary: Modify an existing tool definition record
+      description: |
+        Field-level update of an existing ToolDefinitionRecord. Changed fields are
+        updated; unchanged fields are preserved. No fields are re-inferred from
+        LLM knowledge during modification.
+      operationId: modifyToolDefinition
+      parameters:
+        - in: path
+          name: toolName
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyToolRequest'
+      responses:
+        '200':
+          description: Tool definition updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolDefinitionRecord'
+        '404':
+          description: Tool definition not found
+        '422':
+          description: Update would leave mandatory fields empty
+
+  /tools/records:
+    get:
+      summary: List all registered tool definitions
+      description: |
+        Returns a summary list of all tool definitions in .specify/memory/tools/.
+        Each entry includes name, type, and one-line description.
+      operationId: listToolDefinitions
+      responses:
+        '200':
+          description: List of tool definitions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolDefinitionList'
+
+  /tools/discover-draft:
+    post:
+      summary: Run discovery to bootstrap a draft tool definition
+      description: |
+        Secondary action — used when no tool definition exists and the user
+        accepts the offer to scan the system. Returns a DiscoveryDraft that
+        MUST be reviewed and confirmed by the user before persisting.
+      operationId: discoverDraft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscoverDraftRequest'
+      responses:
+        '200':
+          description: Discovery draft proposed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoveryDraft'
+        '404':
+          description: No matching tool found in system scan
+
+  /tools/preview:
+    post:
+      summary: Generate invocation preview for user confirmation
+      description: |
+        Resolves the full command, parameters, behavioral constraints, and
+        expected output shape. Returns a preview that the user must confirm
+        before execution proceeds.
+      operationId: previewInvocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreviewRequest'
+      responses:
+        '200':
+          description: Preview generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvocationPreview'
+        '404':
+          description: Tool definition not found
+        '422':
+          description: Tool definition incomplete — cannot preview
+
+  /tools/invoke:
+    post:
+      summary: Execute a tool after user confirmation
+      description: |
+        Executes the tool exactly as previewed. Requires explicit user confirmation.
+        The tool is invoked with no additional parameters or modifications beyond
+        what was shown in the preview.
+      operationId: invokeTool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeRequest'
+      responses:
+        '200':
+          description: Tool executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvocationResult'
+        '403':
+          description: User did not confirm execution
+        '422':
+          description: Tool definition not verified
+
+  /tools/disambiguate:
+    post:
+      summary: Resolve name conflicts across tool types
+      description: |
+        When the same tool name exists under different tool types,
+        requires the user to select which definition to use.
+      operationId: disambiguateTool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisambiguateRequest'
+      responses:
+        '200':
+          description: Disambiguation resolved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolDefinitionRecord'
+
+components:
+  schemas:
+    DefineToolRequest:
+      type: object
+      required:
+        - name
+        - tool_type
+        - source_identifier
+        - description
+      properties:
+        name:
+          type: string
+          description: User-provided tool name
+        tool_type:
+          type: string
+          enum: [project-script, system-binary, shell-function]
+        source_identifier:
+          type: string
+          description: Script path, binary path, or function name
+        description:
+          type: string
+          description: User-provided purpose statement
+        behavioral_rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/BehavioralRule'
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolParameter'
+        returns:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolReturnField'
+        aliases:
+          type: array
+          items:
+            type: string
+
+    ModifyToolRequest:
+      type: object
+      description: |
+        Partial update — only supplied fields are modified. Omitted fields
+        are preserved as-is. No field is re-inferred from LLM knowledge.
+      properties:
+        description:
+          type: string
+        source_identifier:
+          type: string
+        tool_type:
+          type: string
+          enum: [project-script, system-binary, shell-function]
+        behavioral_rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/BehavioralRule'
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolParameter'
+        returns:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolReturnField'
+        aliases:
+          type: array
+          items:
+            type: string
+
+    ToolDefinitionRecord:
+      type: object
+      required:
+        - name
+        - tool_type
+        - source_identifier
+        - tool_id
+        - description
+        - status
+        - last_updated
+      properties:
+        name:
+          type: string
+        tool_type:
+          type: string
+          enum: [project-script, system-binary, shell-function]
+        source_identifier:
+          type: string
+        tool_id:
+          type: string
+          description: Canonical path .specify/memory/tools/<tool-name>.md
+        description:
+          type: string
+        behavioral_rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/BehavioralRule'
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolParameter'
+        returns:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolReturnField'
+        aliases:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [Draft, Verified, Deprecated]
+        last_updated:
+          type: string
+          format: date
+        discovery_origin:
+          type: string
+          enum: [manual-entry, discovery-assisted, imported]
+
+    BehavioralRule:
+      type: object
+      required:
+        - keyword
+        - constraint_text
+      properties:
+        keyword:
+          type: string
+          enum: [MUST, MUST NOT, SHOULD, SHOULD NOT]
+          description: RFC 2119 obligation keyword
+        constraint_text:
+          type: string
+          description: Free-form constraint description
+
+    ToolParameter:
+      type: object
+      required:
+        - name
+        - type
+        - required
+        - description
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        required:
+          type: boolean
+        description:
+          type: string
+        default:
+          type: string
+          nullable: true
+
+    ToolReturnField:
+      type: object
+      required:
+        - name
+        - type
+        - description
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+
+    ToolDefinitionList:
+      type: object
+      properties:
+        tools:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              tool_type:
+                type: string
+              description:
+                type: string
+              status:
+                type: string
+
+    DiscoverDraftRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: Tool name or capability description to search for
+        source_types:
+          type: array
+          items:
+            type: string
+            enum: [project-script, system-binary, shell-function]
+          description: Limit discovery to specific source types
+
+    DiscoveryDraft:
+      type: object
+      properties:
+        proposed_name:
+          type: string
+        proposed_type:
+          type: string
+          enum: [project-script, system-binary, shell-function]
+        proposed_source:
+          type: string
+        proposed_description:
+          type: string
+        confidence:
+          type: string
+          enum: [high, medium, low]
+        draft_label:
+          type: string
+          default: "Draft — pending user confirmation"
+
+    PreviewRequest:
+      type: object
+      required:
+        - tool_name
+        - parameters
+      properties:
+        tool_name:
+          type: string
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+
+    InvocationPreview:
+      type: object
+      properties:
+        tool_name:
+          type: string
+        tool_id:
+          type: string
+        resolved_command:
+          type: string
+        resolved_parameters:
+          type: object
+          additionalProperties:
+            type: string
+        applicable_behavioral_rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/BehavioralRule'
+        expected_output_shape:
+          type: string
+        confirmation_prompt:
+          type: string
+          default: "Proceed with execution? (yes/no)"
+
+    InvokeRequest:
+      type: object
+      required:
+        - tool_name
+        - user_confirmed
+      properties:
+        tool_name:
+          type: string
+        user_confirmed:
+          type: boolean
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+
+    InvocationResult:
+      type: object
+      properties:
+        tool_name:
+          type: string
+        tool_id:
+          type: string
+        result_status:
+          type: string
+          enum: [success, failed, cancelled]
+        result_summary:
+          type: string
+
+    ConflictError:
+      type: object
+      properties:
+        message:
+          type: string
+        existing_tool_type:
+          type: string
+        conflicting_tool_type:
+          type: string
+
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+        missing_fields:
+          type: array
+          items:
+            type: string
+
+    DisambiguateRequest:
+      type: object
+      required:
+        - tool_name
+      properties:
+        tool_name:
+          type: string
+        candidates:
+          type: array
+          items:
+            type: object
+            properties:
+              tool_type:
+                type: string
+              source_identifier:
+                type: string
+              description:
+                type: string
