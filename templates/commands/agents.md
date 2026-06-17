@@ -33,13 +33,70 @@ When processing the user input:
 
 ## Outline
 
-Goal: Create or update one reusable custom agent at `.specify/agents/<name>.agent.md` (canonical location) that can be invoked directly or as a subagent. Tool-specific directories (`.github/agents/`, `.qoder/agents/`, etc.) are directory-level symlinks to `.specify/agents/` — do NOT write directly to them.
+Goal: Generate role-based development workflow agents or create custom agents at `.specify/agents/<name>.agent.md` (canonical location). Tool-specific directories (`.github/agents/`, `.qoder/agents/`, etc.) are directory-level symlinks to `.specify/agents/` — do NOT write directly to them.
 
-Supported agent types:
-- `Knowledge`: Read-only Q&A and explanation, no modifications
-- `Plan`: Solution research and multi-step planning, no implementation
-- `Research`: Quick search and context exploration sub-agent
-- `Common`: General-purpose agent when none of the above match (default fallback)
+### Execution Mode Selection
+
+**The command operates in TWO modes based on `$ARGUMENTS`**:
+
+- **Mode A — Role-Based Generation** (when `$ARGUMENTS` is empty): Generate all six predefined role-based agents from templates, populated with the current project's context.
+- **Mode B — Custom Agent Creation** (when `$ARGUMENTS` is not empty): Create or update a single custom agent based on user-provided intent.
+
+---
+
+### Mode A: Role-Based Agent Generation (no arguments)
+
+Generate all six software development workflow agents from role templates in `templates/agent-role-*-template.md`.
+
+**Role templates**:
+
+| Role | Template | Generated File |
+|------|----------|----------------|
+| Requirements Analyst | `templates/agent-role-requirements-analyst-template.md` | `requirements-analyst.agent.md` |
+| System Designer | `templates/agent-role-system-designer-template.md` | `system-designer.agent.md` |
+| Module Designer | `templates/agent-role-module-designer-template.md` | `module-designer.agent.md` |
+| Test Engineer | `templates/agent-role-test-engineer-template.md` | `test-engineer.agent.md` |
+| QA Engineer | `templates/agent-role-qa-engineer-template.md` | `qa-engineer.agent.md` |
+| Knowledge Manager | `templates/agent-role-knowledge-manager-template.md` | `knowledge-manager.agent.md` |
+
+**Mode A execution flow**:
+
+1. **Gather project context** by reading:
+   - `README.md` or `pyproject.toml` → `{{PROJECT_NAME}}`
+   - `pyproject.toml` dependencies / `package.json` → `{{TECH_STACK}}`
+   - Directory tree analysis → `{{PROJECT_STRUCTURE}}`
+   - Source directory scan → `{{MODULE_LIST}}`
+   - `.specify/memory/constitution.md` → `{{CONSTITUTION_PRINCIPLES}}`
+   - `.specify/memory/features.md` → `{{FEATURE_INDEX}}`
+   - `.specify/specs/` listing → `{{SPECS_DIR}}`
+   - Test configuration → `{{TESTING_FRAMEWORK}}`
+   - `docs/` listing → `{{DOCS_DIR}}`
+   - If a context source is unavailable, use a sensible default noting the absence.
+
+2. **For each role template**, resolve all `{{PLACEHOLDER}}` variables with gathered context and set concrete frontmatter values:
+   - `{{AGENT_NAME}}` → role display name (e.g., "Requirements Analyst")
+   - `{{AGENT_DESCRIPTION}}` → role-appropriate trigger description
+   - `{{ROLE_NAME}}` → role display name
+
+3. **Backup detection (FR-008a)**: Before writing each generated agent:
+   - Check if `.specify/agents/<slug>.agent.md` already exists
+   - If it exists, compare content against what would be generated
+   - If content differs (user has customized it), create a `.bak` copy and warn the user
+   - If content is identical, overwrite silently
+
+4. **Agent preservation (FR-008)**: Only create/update files matching the six role slugs listed above. Skip all other existing agents (e.g., `code-reviewer.agent.md`).
+
+5. **Write all six agents** to `.specify/agents/`
+
+6. **Workspace scaffolding**: If `.specify/agents/AGENTS.md` does not exist, create workspace files (AGENTS.md, MEMORY.md, SOUL.md, USER.md) per the scaffolding rules below.
+
+7. **Report**: List all generated agents, note any backups created, and suggest running `/speckit.instructions` to refresh discovery metadata.
+
+---
+
+### Mode B: Custom Agent Creation (with arguments)
+
+Create or update a single custom agent based on user-provided intent in `$ARGUMENTS`.
 
 Execution flow:
 
@@ -67,36 +124,16 @@ Execution flow:
      - The domain or job scope
 
 4. **Determine agent intent and scope**
-   - **With arguments**: Use provided `$ARGUMENTS` as explicit intent
-   - **Without arguments**: Infer from conversation/repository context and the extracted specialization
-   - **Low-confidence inference**: If confidence is low, stop generation and request one-sentence user intent
+   - Use provided `$ARGUMENTS` as explicit intent
+   - If intent or classification confidence is low, ask concise clarification questions before generation
 
-5. **Classify agent type (mandatory)**
-  - Analyze intent, constraints, and expected workflow, then classify into one of:
-    - `Knowledge`: The user's primary goal is "explain, troubleshoot, locate, describe" with an explicit read-only requirement
-    - `Plan`: The user's primary goal is "break down, plan, design steps" without direct coding
-    - `Research`: The user's primary goal is "quickly gather evidence, find files/symbols, form research conclusions"
-    - `Common`: Use when none of the above match or requirements are too mixed to classify into a single type
-  - If classification confidence is insufficient, ask a minimal clarifying question before classifying
-
-6. **Confirm type with user (mandatory)**
-  - Before generating the file, you must show the user "identified type + 1-line rationale + template path to be used" and request confirmation.
-  - Only proceed to generation after user confirmation; if user disagrees, return to step 4 to reclassify.
-
-7. **Clarify if Needed**
+5. **Clarify if Needed**
    - If no clear specialization emerges from the conversation, ask concise clarifying questions:
      - Job to perform
      - When to invoke this agent instead of default
      - Tool restrictions (allow/deny)
 
-8. **Select base template by type (mandatory)**
-  - `Knowledge` → `templates/agent-knowledge-template.md`
-  - `Plan` → `templates/agent-plan-template.md`
-  - `Research` → `templates/agent-research-template.md`
-  - `Common` → `templates/agent-common-template.md`
-  - Use placeholder substitution to fill the selected template. Do NOT handcraft from scratch unless the template is missing.
-
-9. **Define agent shape before writing**
+6. **Define agent shape before writing**
    - Produce:
     - Agent file name (kebab-case)
     - Agent display name
@@ -108,12 +145,12 @@ Execution flow:
    - Keep tools minimal. Avoid broad permissions unless explicitly needed.
   - **Approved providers only**: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder
 
-10. **Iterate**
+7. **Iterate**
    1. Draft the agent file and save it.
    2. Identify the most ambiguous or weak parts and ask targeted follow-up questions.
    3. After finalization, summarize what the agent does, provide example prompts to try it, and propose related customizations to create next.
 
-11. **Create or update `.agent.md`**
+8. **Create or update `.agent.md`**
    - Write to `.specify/agents/<agent-name>.agent.md` (canonical location)
    - Required structure:
      - YAML frontmatter with meaningful `description`
@@ -121,7 +158,7 @@ Execution flow:
    - If agent references external knowledge, write reference files to `.specify/agents/references/` and include relative paths in the agent body
    - Ensure the role is narrow and testable (single responsibility).
 
-12. **Quality checks and frontmatter requirements**
+9. **Quality checks and frontmatter requirements**
    - **Required frontmatter fields**:
      - `description`: Clear trigger description for agent selection
    - **Supported/Recommended frontmatter fields**:
@@ -142,7 +179,7 @@ Execution flow:
        - Unresolved contradictions block save and request user correction
      - Verify instructions are specific enough for deterministic behavior
 
-13. **Generate and register `agent_id`**
+10. **Generate and register `agent_id`**
    - After the agent file is validated and saved, generate a deterministic `agent_id` from the canonical workspace-relative path `.specify/agents/<agent-name>.agent.md`.
    - Treat this canonical path string as the agent identifier unless the project later introduces a stricter `agent_id` schema.
   - Update the `## Resource Registry` → `### Agents` subsection in `.specify/instructions.md` by adding one structured list entry for the new agent, using the field names defined in the agent template.
@@ -153,11 +190,11 @@ Execution flow:
        - `Canonical Path: .specify/agents/code-reviewer.agent.md`
    - Keep the Agents list sorted, deduplicated, and remove `- None yet.` once real entries exist.
 
-14. **Verify symlink discoverability**
+11. **Verify symlink discoverability**
    - After saving the agent, verify that directory-level symlinks exist from tool-specific directories (e.g., `.github/agents/`, `.qoder/agents/`) to `.specify/agents/`.
    - These symlinks are created by `specify init`, not by this command. If missing, advise the user to re-run `specify init` or manually create the symlink.
 
-15. **Report and next actions**
+12. **Report and next actions**
    - Report created/updated file path.
    - Report generated `agent_id`.
    - Report selected `agent type` and source template path.
