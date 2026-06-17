@@ -94,6 +94,8 @@ Spec Kit commands are not meant to be used in isolation. The table below clarifi
 | `/speckit.checklist` | `/speckit.requirements` (or) `/speckit.plan` (or) `/speckit.tasks` | `/speckit.plan`, `/speckit.implement` | Serves as a quality gate: if it does not pass, it is recommended to return to plan/tasks for revision. |
 | `/speckit.implement` | `/speckit.tasks` (and ideally checklists completed) | `/speckit.review` | Enter implementation and validation; if tasks are missing, return to tasks first. |
 | `/speckit.review` | `/speckit.implement` | `/speckit.analyze`, `/speckit.requirements`, `/speckit.plan` | Review process quality and improvement suggestions; return to upstream iteration when necessary. |
+| `/speckit.agents` | `specify init` (project initialized) | `/speckit.instructions` | No args: generate six role-based agents from templates. With args: create a custom agent. Run after init or when project context changes. |
+| `/speckit.tools` | (Optional) Repo available | (Depends) | Define/discover reusable tools from System/Shell/Project sources with persistent records. |
 
 ## Detailed Command Reference
 

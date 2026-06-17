@@ -71,11 +71,25 @@ After initialization, you should see the following structure and commands:
 - `.specify/agents/` — Agent workspace with bundled agents (symlinked to `.github/agents/`, `.qoder/agents/`, etc.)
 - `.specify/memory/` — Project memory (constitution, features)
 
-**Core commands available in your AI agent**:
-- `/speckit.requirements` — Create/update the requirements specification (WHAT/WHY) for a feature
-- `/speckit.plan` — Generate implementation plans  
-- `/speckit.tasks` — Break down into actionable tasks
-- `/speckit.implement` — Execute tasks with validation
+**All 15 commands available in your AI agent**:
+
+| Command | Purpose |
+|---------|---------|
+| `/speckit.constitution` | Establish project governance principles |
+| `/speckit.feature` | Manage feature lifecycle and registry |
+| `/speckit.requirements` | Create/update the requirements specification (WHAT/WHY) |
+| `/speckit.clarify` | Resolve ambiguities in specifications |
+| `/speckit.research` | Conduct technical research to inform decisions |
+| `/speckit.plan` | Generate implementation plans from specs |
+| `/speckit.tasks` | Break down plans into actionable tasks |
+| `/speckit.checklist` | Generate quality gate checklists |
+| `/speckit.analyze` | Cross-artifact consistency checks |
+| `/speckit.implement` | Execute tasks with built-in validation |
+| `/speckit.review` | Review implementation against specs and plan |
+| `/speckit.agents` | Generate role-based agents or create custom agents |
+| `/speckit.skills` | Create or refresh project skills |
+| `/speckit.tools` | Define or discover reusable tools |
+| `/speckit.instructions` | Generate/update AI agent instructions and symlinks |
 
 **Next step**: Run `/speckit.agents` (no arguments) in your AI agent to generate six role-based development workflow agents tailored to your project's context.
 

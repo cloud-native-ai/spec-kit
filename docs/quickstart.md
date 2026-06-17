@@ -191,6 +191,10 @@ These commands support the core workflow at any stage:
 | `/speckit.checklist` | Need quality gates before implementation |
 | `/speckit.analyze` | Check cross-artifact consistency at any stage |
 | `/speckit.constitution` | Update project governance principles |
+| `/speckit.feature` | Manage the long-lived feature registry (ID, name, status) |
+| `/speckit.agents` | Generate role-based agents or create custom agents |
+| `/speckit.skills` | Create or refresh project skills |
+| `/speckit.tools` | Define or discover reusable tools from multiple sources |
 | `/speckit.instructions` | Refresh AI agent instructions after changes |
 
 ---
