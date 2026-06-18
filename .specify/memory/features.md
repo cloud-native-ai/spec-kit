@@ -1,6 +1,6 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-06-17
+**Last Updated**: 2026-06-18
 **Total Features**: 24
 
 ## Features
@@ -19,7 +19,7 @@
 | 010 | Requirements Command | Define requirements and specifications. | Completed | .specify/memory/features/010.md | - | 2026-02-10 |
 | 011 | Research Command | Gather context and dependencies. | Completed | .specify/memory/features/011.md | - | 2026-02-10 |
 | 012 | Review Command | Review implementation against rules. | Completed | .specify/memory/features/012.md | - | 2026-02-10 |
-| 013 | Skills Command | Manage extensible skills/tools. | Implemented | .specify/memory/features/013.md | .specify/specs/013-portable-skill-creation/requirements.md | 2026-06-05 |
+| 013 | Skills Command | Manage extensible skills/tools. | Implemented | .specify/memory/features/013.md | .specify/specs/017-consolidate-draft-skills/requirements.md | 2026-06-18 |
 | 014 | Tasks Command | Break down plans into atomic tasks. | Completed | .specify/memory/features/014.md | - | 2026-02-10 |
 | 015 | CLI Interface | Rich terminal interface using Typer. | Completed | .specify/memory/features/015.md | - | 2026-02-10 |
 | 016 | Tools Command | Definition-first tool management: create, modify, and invoke tools with explicit behavioral rules, replacing discovery-driven approach. | Implemented | .specify/memory/features/016.md | .specify/specs/016-refactor-tools-command/requirements.md | 2026-06-17 (deferred: T022,T042,T043,T046) |
