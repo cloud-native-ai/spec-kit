@@ -7,18 +7,14 @@ This project documentation is distributed across several key files. You MUST ref
 
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
-| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | 7 core principles (SDD foundation, Feature-Centric, Intent-Driven, Test-First, AI Agent Integration, Quality/Observability, SDD Workflow) and governance rules |
-| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | 22 features tracking /speckit.* commands, AI tool support (Claude/Qoder/Qwen/opencode/Copilot), MCP, skills, and core capabilities |
-| **Feature Details** | `.specify/memory/features/<ID>.md` | Per-feature deep dives | Overview, key changes, implementation notes, status criteria |
-| **Readme** | `README.md` | Project entry point | Spec-Driven Development overview, supported AI agents, feature list, installation pointer |
-| **Installation** | `docs/installation.md` | How to install the CLI | Setup steps for the `specify` CLI |
-| **Quickstart** | `docs/quickstart.md` | First-run walkthrough | End-to-end /speckit.* workflow example |
-| **Usage Guide** | `docs/usage.md` | Day-to-day command usage | Detailed command reference and patterns |
-| **SDD Methodology** | `docs/spec-driven.md` | Why specs drive implementation | Principles behind Spec-Driven Development |
-| **Vibe Coding** | `docs/vibe-coding.md` | Iterative AI-assisted style guide | When and how to combine specs with exploratory coding |
-| **Upstream** | `docs/upstream.md` | Relationship to github/spec-kit | Divergence points and sync model |
-| **Security** | `docs/security.md` | Security considerations | Threat surface and handling guidance |
-| **Skills Docs** | `docs/skills/` | Skills system reference | Specification, troubleshooting, VS Code integration |
+| **Constitution** | `.specify/memory/constitution.md` | Governance & principles | SDD principles, Feature-centric dev, AI agent standards, quality gates |
+| **Feature Index** | `.specify/memory/features.md` | Feature roadmap & status | 20 features with IDs, statuses, spec paths, lifecycle tracking |
+| **Readme** | `README.md` | Project overview | Philosophy, core features, supported AI agents, research goals |
+| **Quick Start** | `docs/quickstart.md` | Onboarding guide | 4-step process, example workflows, command usage |
+| **Installation** | `docs/installation.md` | Setup instructions | Prerequisites, init commands, AI agent selection, script type selection |
+| **Usage Guide** | `docs/usage.md` | Command reference | Full `/speckit.*` command table, relationships, prerequisites/next steps |
+| **SDD Methodology** | `docs/spec-driven.md` | Conceptual foundation | Power inversion, SDD workflow, core principles |
+| **Skills Docs** | `docs/skills/` | Skill authoring guides | Specification, troubleshooting, VS Code integration |
 
 > **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
 
@@ -37,21 +33,58 @@ Escalation rules:
 - If the issue is low-risk and the fix is obvious: proceed with the correction and mention it briefly.
 
 ## Tech Stack & Resources
-- **Project Name**: spec-kit (distributed as `specify-cli`)
-- **Root Path**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
-- **Languages**: Python `>=3.8` (per `pyproject.toml`)
-- **Build / Packaging**: `hatchling` (PEP 517). Recommended install via `uv tool install` or `pipx`; runtime is published as `specify-cli` with entrypoint `specify = "specify_cli:main"`.
-- **Runtime Dependencies**: `typer` (CLI framework), `rich` (TTY rendering), `httpx[socks]` (HTTP for template/release fetch), `platformdirs`, `readchar`, `truststore` (Python ≥ 3.10).
-- **Test Framework**: `pytest` with markers `contract` and `integration` (see `pyproject.toml` → `[tool.pytest.ini_options]`). Run with `pytest` or `pytest -m contract` / `pytest -m integration`.
+- **Project Name**: spec-kit
+- **Root Path**: /storage/project/cloud-native-ai/spec-kit
+- **Language**: Python 3.8+ (docs recommend 3.11+)
+- **Package Manager**: uv (with `pyproject.toml`)
+- **Build System**: hatchling
+- **CLI Framework**: Typer + Rich (terminal UI)
+- **HTTP Client**: httpx (with optional SOCKS proxy support)
+- **Testing**: pytest with Typer `CliRunner` for CLI integration tests
 - **Key Directories**:
-  - `src/specify_cli/`: single-module CLI implementation (`__init__.py`, ~1.8k LOC; Typer commands live here).
-  - `templates/`: Source-of-truth templates packaged into the wheel (constitution, plan, requirements, tasks, agent variants, `commands/` for /speckit.* prompts, plus tool/skill templates).
-  - `scripts/bash/` and `scripts/python/`: Repeatable workflow scripts mirrored from `.specify/scripts/`. Use these for shell automation; never call `/speckit.*` as a shell command.
-  - `skills/`: Installed Spec Kit skills (analysis-project, create-skills, improve-skills, draw-d3js, draw-echarts, draw-plantuml). Mirrored to `.specify/skills/` via package install; `.github/skills/` is a compatibility symlink.
-  - `tests/`: `contract/`, `contracts/`, `integration/`, `unit/`, with shared `conftest.py`, `fixtures/`, `script_api.py`.
-  - `memory/`: Default in-package memory shipped with the CLI; the canonical project memory lives at `.specify/memory/` (constitution, features, features/<ID>.md).
-  - `docs/`: User-facing documentation (see Documentation Map above).
-  - `.specify/`: Project runtime — `instructions.md` (this file), `memory/`, `skills/`, `scripts/`, `specs/<NNN-feature-slug>/`, `templates/`. Treat as the canonical workspace; ignore any `.specify/` inside subdirectories.
+  - `src/specify_cli/` — Single-module CLI application (`__init__.py` is the entry point)
+  - `tests/` — Organized as `unit/`, `integration/`, `contract/`; fixtures in `fixtures/`
+  - `.specify/` — Core SDD runtime: `memory/` (constitution, features), `templates/`, `scripts/`, `skills/`, `tools/`, `specs/`
+  - `scripts/bash/` — 12 shell scripts for the SDD workflow (create plans, refresh tools, generate instructions, etc.)
+  - `scripts/python/` — `skills-utils.py` and `tools-utils.py` (shared Python utilities)
+  - `templates/` — Project-level Markdown templates for plan, tasks, requirements, checklist, review, etc.
+  - `skills/` — Installed skill definitions (e.g., `analysis-project/`)
+  - `draft/skills/` — Draft/unpublished skill prototypes
+  - `docs/` — User-facing documentation (quickstart, installation, usage, SDD methodology)
+
+### Build & Test Commands
+
+```bash
+# Install in development mode
+uv pip install -e .
+
+# Run all tests
+pytest tests/ -v
+
+# Run a specific test module
+pytest tests/unit/test_tool_record.py -v
+
+# Run contract tests only
+pytest tests/contract/ -v
+
+# Check syntax errors (no-op; rely on pytest + Pylance)
+# No linter/formatter is configured in this repo — quality enforced via CI/constitution gates
+
+# Run the CLI (installed mode)
+specify init <project-name>
+
+# Run the CLI (without install, via uvx)
+uvx --from git+https://github.com/github/spec-kit.git specify init <project-name>
+```
+
+### Project Conventions
+
+- **Single-module CLI**: All CLI logic lives in `src/specify_cli/__init__.py`. No sub-packages. The `app` Typer instance is the sole entry point.
+- **Template-driven codegen**: The CLI copies files from `templates/` and populates placeholders. Templates are Markdown with bracket tokens like `[PROJECT_NAME]`.
+- **Agent compatibility**: Supports Copilot, Qwen, opencode, and Qoder. Each agent has a config entry with `folder`, `install_url`, `requires_cli`.
+- **Shell scripts as workflow engine**: The 12 scripts under `scripts/bash/` implement the SDD phases. Scripts auto-detect OS and select `.sh` by default.
+- **Test organization**: `contract/` tests validate template outputs and tool manifests; `unit/` tests isolated helpers; `integration/` tests end-to-end flows (e.g., Qoder distribution).
+- **No Makefile**: All automation is driven through shell scripts and pytest, not Make.
 
 # Tool And Skills Usage Guide
 > **Note**: Tool and Skills details are injected into prompts by the agent when needed. This section is guidance only.
@@ -62,11 +95,11 @@ Escalation rules:
 - Treat Constitution as the authority for architecture and workflow constraints.
 
 ## AI Tool Compatibility
-- **Supported Agents**: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder
+- **Supported Agents**: GitHub Copilot, Qwen Code, opencode, Qoder
 - **Instructions Refresh**: Run `/speckit.instructions` to regenerate this file and compatibility symlinks.
 
 ## Spec Kit Runtime & Symlink Model
-- **Canonical instructions file**: `.specify/instructions.md` is the single source of truth for project-level AI instructions. Compatibility files such as `.github/copilot-instructions.md`, `.qoder/project_rules.md`, `QWEN.md`, `CLAUDE.md`, and `QODER.md` are symlinks to this file.
+- **Canonical instructions file**: `.specify/instructions.md` is the single source of truth for project-level AI instructions. Compatibility files such as `.github/copilot-instructions.md`, `.clinerules/project_rules.md`, `.lingma/rules/project_rule.md`, `.trae/rules/project_rules.md`, `.qoder/project_rules.md`, `.cursorrules`, `QWEN.md`, `CLAUDE.md`, `IFLOW.md`, and `QODER.md` are symlinks to this file.
 - **Canonical skills directory**: `.specify/skills/` is the primary location for installed Spec Kit skills. `.github/skills` is a compatibility symlink to `.specify/skills/` for tools that discover skills under `.github/skills`.
 - **Do not duplicate symlink targets**: Treat these compatibility paths as aliases, not independent source files or directories. When reading or editing instructions and skills, prefer the canonical `.specify/...` paths and avoid applying the same change separately through each symlink.
 - **Regeneration behavior**: `/speckit.instructions` refreshes the instructions content and recreates compatibility symlinks. If a compatibility path appears to contain the same content as `.specify/instructions.md` or `.specify/skills/`, verify whether it is a symlink before treating it as a separate file.
@@ -87,7 +120,8 @@ Use this machine-maintained section to track reusable resource identifiers creat
 <!-- Record each skill as one table row with the columns below. -->
 | Skill Name | Skill ID | Description | Argument Hint | User Invocable | Disable Model Invocation | Canonical Path |
 |------------|----------|-------------|---------------|----------------|--------------------------|----------------|
-| None yet. | - | - | - | - | - | - |
+| analysis-project | <SKILL:.specify/skills/analysis-project/SKILL.md> | Deep analysis of current project with professional architecture reports. Use when the user mentions "analyze project", "analyze repository", "source code analysis", "architecture analysis", "code analysis", "study this project", "research this framework" | - | - | - | .specify/skills/analysis-project/SKILL.md |
+| improve-skills | <SKILL:.specify/skills/improve-skills/SKILL.md> | This skill can continuously improve an existing Skill from actual execution history, user feedback, failure cases, and observed inefficiencies. Use this when the user mentions ["improve skills after use", "skill execution feedback", "refine SKILL.md", "skill retrospective", "skill iteration", "技能执行反馈", "基于执行问题优化skill", "持续改进Skill"] | - | - | - | .specify/skills/improve-skills/SKILL.md |
 <!-- SKILLS_REGISTRY_END -->
 
 ### Tools

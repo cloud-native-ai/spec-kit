@@ -42,13 +42,12 @@ Thumbs.db
 .env.local
 .env*
 *.lock
+tmp/
 
 # Spec Kit-specific files
 .genreleases/
 *.zip
 sdd-*/
 
-.specify/tools/*
-.specify/instructions.md-*
-tmp/
-.specify/tools/*.json
+.specify/tools/
+.migration-backups/
