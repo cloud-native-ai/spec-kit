@@ -18,6 +18,7 @@ This project documentation is distributed across several key files. You MUST ref
 | **Vibe Coding** | `docs/vibe-coding.md` | Iterative AI-assisted style guide | When and how to combine specs with exploratory coding |
 | **Upstream** | `docs/upstream.md` | Relationship to github/spec-kit | Divergence points and sync model |
 | **Security** | `docs/security.md` | Security considerations | Threat surface and handling guidance |
+| **Git Workflow** | `docs/git-workflow.md` | 分支同步机制与操作文件 | 三层分支模型、rebase 同步流程、推送策略、安全底线 |
 | **Skills Docs** | `docs/skills/` | Skills system reference | Specification, troubleshooting, VS Code integration |
 
 > **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
@@ -87,7 +88,7 @@ Use this machine-maintained section to track reusable resource identifiers creat
 <!-- Record each skill as one table row with the columns below. -->
 | Skill Name | Skill ID | Description | Argument Hint | User Invocable | Disable Model Invocation | Canonical Path |
 |------------|----------|-------------|---------------|----------------|--------------------------|----------------|
-| None yet. | - | - | - | - | - | - |
+| git-workflow | <SKILL:.specify/skills/git-workflow/SKILL.md> | Three-tier Git development workflow setup and maintenance. Dynamically discovers or defines trunk/pre-release/dev branch names, creates and maintains docs/git-workflow.md as single source of truth. Covers rebase sync, conflict resolution, and safe push strategies. | - | true | false | .specify/skills/git-workflow/SKILL.md |
 <!-- SKILLS_REGISTRY_END -->
 
 ### Tools
