@@ -1,0 +1,315 @@
+openapi: 3.1.0
+info:
+  title: CLI Priority AI Tool Support
+  version: 1.0.0
+  description: |
+    Contract specification for tiered AI tool support in Spec Kit.
+    Covers Codex CLI onboarding, tier classification, capability matrix auditing,
+    and initialization result summaries for all 6 supported tools.
+    Bound to Feature 022 (AI Tools Support).
+
+paths:
+  /assistants:
+    get:
+      summary: List all officially supported AI assistants with tier classification
+      operationId: listAssistants
+      tags: [Assistants]
+      responses:
+        '200':
+          description: List of assistant profiles with tier information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssistantProfile'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /assistants/{key}:
+    get:
+      summary: Get a single assistant profile by key
+      operationId: getAssistant
+      tags: [Assistants]
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [claude, codex, copilot, opencode, qoder, qwen]
+          description: Canonical assistant identifier
+      responses:
+        '200':
+          description: Assistant profile with full metadata including tier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistantProfile'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /assistants/tiers:
+    get:
+      summary: Get tier classification for all assistants
+      operationId: getAssistantTiers
+      tags: [Tiers]
+      responses:
+        '200':
+          description: Mapping of assistant key to tier level
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tiers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TierEntry'
+
+  /projects/init:
+    post:
+      summary: Initialize a project with a specified AI assistant
+      operationId: initProject
+      tags: [Initialization]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [assistant]
+              properties:
+                assistant:
+                  type: string
+                  enum: [claude, codex, copilot, opencode, qoder, qwen]
+                  default: copilot
+                projectPath:
+                  type: string
+                  description: Absolute path to project directory
+                ignoreAgentTools:
+                  type: boolean
+                  default: false
+                  description: Skip CLI installation verification
+                scriptType:
+                  type: string
+                  enum: [sh, ps]
+                  description: Script variant for workflow scripts
+      responses:
+        '200':
+          description: Project initialized successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitializationResultSummary'
+        '400':
+          description: Invalid assistant key or conflicting project state
+        '409':
+          description: Project directory already exists and --force not specified
+
+  /assistants/audit:
+    get:
+      summary: Run capability matrix audit for all or a specific tool
+      operationId: auditCapabilityMatrix
+      tags: [Audit]
+      parameters:
+        - name: tool
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [claude, codex, copilot, opencode, qoder, qwen]
+          description: If specified, audit only this tool; otherwise audit all
+        - name: projectPath
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Absolute path to the project to audit
+      responses:
+        '200':
+          description: Capability matrix audit results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilityMatrixResult'
+        '404':
+          description: Project path not found
+
+components:
+  schemas:
+    AssistantProfile:
+      type: object
+      required:
+        - key
+        - name
+        - folder
+        - requires_cli
+        - officially_supported
+        - command_directory
+        - command_format
+        - arg_format
+        - tier
+      properties:
+        key:
+          type: string
+          enum: [claude, codex, copilot, opencode, qoder, qwen]
+          description: Canonical identifier matching AGENT_CONFIG key
+        name:
+          type: string
+          description: Display name (e.g., "Codex CLI")
+        folder:
+          type: string
+          description: Project-level config directory (e.g., ".codex/")
+        install_url:
+          type: string
+          nullable: true
+          description: Installation URL; null for IDE-based tools
+        requires_cli:
+          type: boolean
+          description: Whether CLI installation check is needed
+        officially_supported:
+          type: boolean
+          description: Whether the tool is in _OFFICIAL_ASSISTANT_KEYS
+        command_directory:
+          type: string
+          description: Where generated command templates are written
+        command_format:
+          type: string
+          description: File extension for command files
+        arg_format:
+          type: string
+          description: Argument placeholder format
+        tier:
+          type: string
+          enum: [tier1, tier2]
+          description: Support priority tier
+        skills_symlink:
+          type: boolean
+          description: Whether skills symlink is needed
+
+    TierEntry:
+      type: object
+      required: [tool_key, tier]
+      properties:
+        tool_key:
+          type: string
+          enum: [claude, codex, copilot, opencode, qoder, qwen]
+        tier:
+          type: string
+          enum: [tier1, tier2]
+
+    InitializationResultSummary:
+      type: object
+      required:
+        - created
+        - reused
+        - skipped
+        - preserved
+        - conflicts
+        - attention_required
+        - configured_assistants
+      properties:
+        created:
+          type: array
+          items:
+            type: string
+          description: List of created asset paths
+        reused:
+          type: array
+          items:
+            type: string
+          description: List of reused (pre-existing) asset paths
+        skipped:
+          type: array
+          items:
+            type: string
+          description: List of skipped assets
+        preserved:
+          type: array
+          items:
+            type: string
+          description: List of preserved (not overwritten) core assets
+        conflicts:
+          type: array
+          items:
+            type: string
+          description: List of conflicting paths
+        attention_required:
+          type: array
+          items:
+            type: string
+          description: List of attention messages (e.g., CLI not detected)
+        configured_assistants:
+          type: array
+          items:
+            type: string
+          description: List of configured assistant keys
+        assistant_tiers:
+          type: object
+          additionalProperties:
+            type: string
+            enum: [tier1, tier2]
+          description: Map of assistant key to tier (new field in this spec)
+
+    CapabilityMatrixResult:
+      type: object
+      required: [entries, summary]
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/CapabilityMatrixEntry'
+        summary:
+          type: object
+          properties:
+            total_tools:
+              type: integer
+            total_dimensions:
+              type: integer
+            tier1_pass_rate:
+              type: number
+              format: float
+              description: Percentage of Tier 1 dimensions that pass (target: 100%)
+            tier2_pass_rate:
+              type: number
+              format: float
+              description: Percentage of Tier 2 dimensions that pass
+
+    CapabilityMatrixEntry:
+      type: object
+      required: [tool_key, dimension, status]
+      properties:
+        tool_key:
+          type: string
+          enum: [claude, codex, copilot, opencode, qoder, qwen]
+        dimension:
+          type: string
+          enum: [initialization, command_templates, instructions, ignore_config, skills_symlink, refresh_protection]
+        status:
+          type: string
+          enum: [pass, fail, missing]
+        evidence:
+          type: string
+          description: File path or description proving the status
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Assistant not found"
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string

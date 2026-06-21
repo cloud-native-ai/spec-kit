@@ -9,7 +9,7 @@ from typing import List, Optional
 
 import pytest
 
-_OFFICIAL_ASSISTANTS = ["copilot", "claude", "qwen", "opencode", "qoder"]
+_OFFICIAL_ASSISTANTS = ["claude", "codex", "qoder", "copilot", "opencode", "qwen"]
 
 
 def official_assistants() -> List[str]:
@@ -63,6 +63,11 @@ def make_resource_with_skills(
 
     # templates/claudeignore-template
     (root / "templates" / "claudeignore-template").write_text(
+        "node_modules/\n", encoding="utf-8"
+    )
+
+    # templates/codexignore-template
+    (root / "templates" / "codexignore-template").write_text(
         "node_modules/\n", encoding="utf-8"
     )
 

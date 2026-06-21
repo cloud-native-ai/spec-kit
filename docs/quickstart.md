@@ -25,11 +25,12 @@ uvx --from git+https://github.com/github/spec-kit.git specify init .
 Specify your AI assistant explicitly (optional):
 
 ```bash
-specify init <PROJECT_NAME> --ai copilot   # GitHub Copilot
-specify init <PROJECT_NAME> --ai claude    # Claude Code
-specify init <PROJECT_NAME> --ai qwen     # Qwen Code
-specify init <PROJECT_NAME> --ai opencode  # opencode
-specify init <PROJECT_NAME> --ai qoder    # Qoder
+specify init <PROJECT_NAME> --ai claude    # Claude Code (Tier 1)
+specify init <PROJECT_NAME> --ai codex    # Codex CLI (Tier 1)
+specify init <PROJECT_NAME> --ai qoder    # Qoder CLI (Tier 1)
+specify init <PROJECT_NAME> --ai copilot   # GitHub Copilot (Tier 1)
+specify init <PROJECT_NAME> --ai opencode  # opencode (Tier 1)
+specify init <PROJECT_NAME> --ai qwen     # Qwen Code (Tier 2)
 ```
 
 ### What `specify init` Creates
@@ -341,7 +342,7 @@ Each supported AI assistant follows the same lifecycle pattern:
 3. Refresh cross-agent instruction links after template updates by running `/speckit.instructions`
 4. Re-run `/speckit.review` before release to verify support remains consistent across assistants
 
-Supported tools: `copilot`, `claude`, `qwen`, `opencode`, `qoder`.
+Supported tools (Tier 1): `claude`, `codex`, `qoder`, `copilot`, `opencode`; (Tier 2): `qwen`.
 
 ---
 

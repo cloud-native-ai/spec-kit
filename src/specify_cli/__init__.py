@@ -91,6 +91,12 @@ AGENT_CONFIG = {
         "install_url": "https://qoder.com/cli",
         "requires_cli": True,
     },
+    "codex": {
+        "name": "Codex CLI",
+        "folder": ".codex/",
+        "install_url": "https://github.com/openai/codex",
+        "requires_cli": True,
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -98,7 +104,7 @@ AGENT_CONFIG = {
 # ---------------------------------------------------------------------------
 
 # Official assistant keys – the canonical list for this feature.
-_OFFICIAL_ASSISTANT_KEYS = ["copilot", "claude", "qwen", "opencode", "qoder"]
+_OFFICIAL_ASSISTANT_KEYS = ["claude", "codex", "qoder", "copilot", "opencode", "qwen"]
 
 # Assistant → command output directory mapping (relative to project root)
 _ASSISTANT_COMMAND_DIRS = {
@@ -107,6 +113,7 @@ _ASSISTANT_COMMAND_DIRS = {
     "qwen": ".qwen/commands",
     "opencode": ".opencode/command",
     "qoder": ".qoder/commands",
+    "codex": ".codex/commands",
 }
 
 # Assistant → file extension for generated command files
@@ -116,6 +123,7 @@ _ASSISTANT_EXTENSIONS = {
     "qwen": "toml",
     "opencode": "md",
     "qoder": "md",
+    "codex": "md",
 }
 
 # Assistant → argument format placeholder
@@ -125,10 +133,21 @@ _ASSISTANT_ARG_FORMATS = {
     "qwen": "{{args}}",
     "opencode": "$ARGUMENTS",
     "qoder": "$ARGUMENTS",
+    "codex": "$ARGUMENTS",
 }
 
 # Skills symlink assistants (those that need .<agent>/skills → .specify/skills link)
-_SKILLS_SYMLINK_ASSISTANTS = {"copilot", "qoder", "claude", "qwen", "opencode"}
+_SKILLS_SYMLINK_ASSISTANTS = {"copilot", "qoder", "claude", "qwen", "opencode", "codex"}
+
+# Assistant → support tier classification
+_ASSISTANT_TIERS = {
+    "claude": "tier1",
+    "codex": "tier1",
+    "qoder": "tier1",
+    "copilot": "tier1",
+    "opencode": "tier1",
+    "qwen": "tier2",
+}
 
 
 def get_official_assistants() -> List[str]:
@@ -144,6 +163,8 @@ def get_assistant_profile(key: str) -> dict:
     profile.setdefault("command_format", _ASSISTANT_EXTENSIONS.get(key, "md"))
     profile.setdefault("arg_format", _ASSISTANT_ARG_FORMATS.get(key, "$ARGUMENTS"))
     profile["officially_supported"] = key in _OFFICIAL_ASSISTANT_KEYS
+    profile["tier"] = _ASSISTANT_TIERS.get(key, "tier2")
+    profile["skills_symlink"] = key in _SKILLS_SYMLINK_ASSISTANTS
     return profile
 
 
@@ -158,6 +179,7 @@ class InitializationResultSummary:
         self.conflicts: List[str] = []
         self.attention_required: List[str] = []
         self.configured_assistants: List[str] = []
+        self.assistant_tiers: Dict[str, str] = {}
 
     def add_created(self, *paths: str):
         self.created.extend(paths)
@@ -179,6 +201,7 @@ class InitializationResultSummary:
 
     def set_configured_assistants(self, assistants: List[str]):
         self.configured_assistants = list(assistants)
+        self.assistant_tiers = {k: _ASSISTANT_TIERS.get(k, "tier2") for k in assistants}
 
     def is_empty(self) -> bool:
         """Return True when no operation touched any asset."""
@@ -202,6 +225,7 @@ class InitializationResultSummary:
             "conflicts": list(self.conflicts),
             "attention_required": list(self.attention_required),
             "configured_assistants": list(self.configured_assistants),
+            "assistant_tiers": dict(self.assistant_tiers),
         }
 
     def render_rich(self) -> str:
@@ -222,8 +246,13 @@ class InitializationResultSummary:
                 f"[yellow]Attention required:[/yellow] {'; '.join(self.attention_required)}"
             )
         if self.configured_assistants:
+            labeled = []
+            for a in self.configured_assistants:
+                tier = self.assistant_tiers.get(a, "")
+                label = f" (Tier 1)" if tier == "tier1" else f" (Tier 2)" if tier == "tier2" else ""
+                labeled.append(f"{a}{label}")
             lines.append(
-                f"[green]Configured assistants:[/green] {', '.join(self.configured_assistants)}"
+                f"[green]Configured assistants:[/green] {', '.join(labeled)}"
             )
         return "\n".join(lines)
 
@@ -328,6 +357,132 @@ def compute_command_coverage(project_path: Path, assistant_key: str) -> dict:
         "generated": generated,
         "missing": missing,
         "coverage_pct": coverage_pct,
+    }
+
+
+_CAPABILITY_DIMENSIONS = [
+    "initialization",
+    "command_templates",
+    "instructions",
+    "ignore_config",
+    "skills_symlink",
+    "refresh_protection",
+]
+
+_IGNORE_FILE_MAP = {
+    "claude": ".claudeignore",
+    "codex": ".codexignore",
+}
+
+_INSTRUCTIONS_FILE_MAP = {
+    "claude": "CLAUDE.md",
+    "codex": "AGENTS.md",
+    "qoder": "QODER.md",
+    "qwen": "QWEN.md",
+    "copilot": ".github/copilot-instructions.md",
+    "opencode": ".opencode/instructions.md",
+}
+
+
+def _check_initialization(project_path: Path, tool_key: str) -> str:
+    profile = get_assistant_profile(tool_key)
+    folder = profile.get("folder", "")
+    if folder and (project_path / folder).exists():
+        return "pass"
+    return "fail"
+
+
+def _check_command_templates(project_path: Path, tool_key: str) -> str:
+    coverage = compute_command_coverage(project_path, tool_key)
+    if coverage["coverage_pct"] == 100.0:
+        return "pass"
+    return "fail"
+
+
+def _check_instructions(project_path: Path, tool_key: str) -> str:
+    instr_file = _INSTRUCTIONS_FILE_MAP.get(tool_key)
+    if not instr_file:
+        return "missing"
+    if (project_path / instr_file).exists():
+        return "pass"
+    return "fail"
+
+
+def _check_ignore_config(project_path: Path, tool_key: str) -> str:
+    ignore_file = _IGNORE_FILE_MAP.get(tool_key)
+    if not ignore_file:
+        return "missing"
+    if (project_path / ignore_file).exists():
+        return "pass"
+    return "fail"
+
+
+def _check_skills_symlink(project_path: Path, tool_key: str) -> str:
+    if tool_key not in _SKILLS_SYMLINK_ASSISTANTS:
+        return "missing"
+    profile = get_assistant_profile(tool_key)
+    folder = profile.get("folder", "")
+    if not folder:
+        return "fail"
+    skills_path = project_path / folder / "skills"
+    if skills_path.exists():
+        return "pass"
+    return "fail"
+
+
+def _check_refresh_protection(project_path: Path, tool_key: str) -> str:
+    specify_dir = project_path / ".specify"
+    if not specify_dir.exists():
+        return "missing"
+    core_assets = detect_initialized_core_assets(project_path)
+    if core_assets:
+        return "pass"
+    return "fail"
+
+
+_DIMENSION_CHECKERS = {
+    "initialization": _check_initialization,
+    "command_templates": _check_command_templates,
+    "instructions": _check_instructions,
+    "ignore_config": _check_ignore_config,
+    "skills_symlink": _check_skills_symlink,
+    "refresh_protection": _check_refresh_protection,
+}
+
+
+def audit_tool_dimension(project_path: Path, tool_key: str, dimension: str) -> str:
+    checker = _DIMENSION_CHECKERS.get(dimension)
+    if not checker:
+        return "missing"
+    return checker(project_path, tool_key)
+
+
+def audit_capability_matrix(project_path: Path) -> dict:
+    entries = []
+    for tool_key in _OFFICIAL_ASSISTANT_KEYS:
+        for dimension in _CAPABILITY_DIMENSIONS:
+            status = audit_tool_dimension(project_path, tool_key, dimension)
+            entries.append({
+                "tool_key": tool_key,
+                "dimension": dimension,
+                "status": status,
+            })
+
+    tier1_entries = [e for e in entries if _ASSISTANT_TIERS.get(e["tool_key"]) == "tier1"]
+    tier2_entries = [e for e in entries if _ASSISTANT_TIERS.get(e["tool_key"]) == "tier2"]
+
+    tier1_pass = sum(1 for e in tier1_entries if e["status"] == "pass")
+    tier2_pass = sum(1 for e in tier2_entries if e["status"] == "pass")
+
+    tier1_rate = round(100.0 * tier1_pass / len(tier1_entries), 1) if tier1_entries else 0.0
+    tier2_rate = round(100.0 * tier2_pass / len(tier2_entries), 1) if tier2_entries else 0.0
+
+    return {
+        "entries": entries,
+        "summary": {
+            "tier1_pass_rate": tier1_rate,
+            "tier2_pass_rate": tier2_rate,
+        },
     }
 
 
@@ -938,6 +1093,14 @@ def copy_local_templates(
                     project_path / ".claude" / "commands",
                     script_type,
                 )
+            elif ai_assistant == "codex":
+                generate_commands(
+                    "codex",
+                    "md",
+                    "$ARGUMENTS",
+                    project_path / ".codex" / "commands",
+                    script_type,
+                )
             else:
                 # Fallback: copy commands to .specify/templates/commands
                 shutil.copytree(
@@ -971,6 +1134,19 @@ def copy_local_templates(
                     claudeignore_template = fallback_template
             if claudeignore_template.exists():
                 shutil.copy2(claudeignore_template, project_path / ".claudeignore")
+
+        if ai_assistant == "codex":
+            codexignore_template = (
+                resource_path / "templates" / "codexignore-template"
+            )
+            if not codexignore_template.exists():
+                fallback_template = (
+                    MODULE_DIR.parent.parent / "templates" / "codexignore-template"
+                )
+                if fallback_template.exists():
+                    codexignore_template = fallback_template
+            if codexignore_template.exists():
+                shutil.copy2(codexignore_template, project_path / ".codexignore")
 
         # Copy skills directory
         if (resource_path / "skills").exists():
@@ -1048,6 +1224,15 @@ def copy_local_templates(
             ensure_specify_symlink(project_path, ".opencode", "skills")
             if tracker:
                 tracker.complete("local-templates", ".opencode/skills symlink ready")
+
+        if ai_assistant == "codex":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .codex/skills to .specify/skills"
+                )
+            ensure_specify_symlink(project_path, ".codex", "skills")
+            if tracker:
+                tracker.complete("local-templates", ".codex/skills symlink ready")
 
         # Agent directory symlinks (parallel to skills symlinks above)
         if ai_assistant in ("copilot", "claude"):
@@ -1433,7 +1618,7 @@ def init(
     ai_assistant: str = typer.Option(
         None,
         "--ai",
-        help="AI assistant to use: claude, copilot, qwen, opencode, or qoder",
+        help="AI assistant to use: claude, codex, qoder, copilot, opencode (Tier 1), or qwen (Tier 2)",
     ),
     script_type: str = typer.Option(
         None, "--script", help="Script type to use: sh or ps"
@@ -1441,7 +1626,7 @@ def init(
     ignore_agent_tools: bool = typer.Option(
         False,
         "--ignore-agent-tools",
-        help="Skip checks for AI agent tools like Claude Code, Qwen CLI, opencode, or Qoder CLI",
+        help="Skip checks for AI agent tools like Claude Code, Codex CLI, Qoder CLI, opencode, or Qwen CLI",
     ),
     no_git: bool = typer.Option(
         False, "--no-git", help="Skip git repository initialization"

@@ -36,22 +36,23 @@ class TestAssistantProfileUniqueness:
             f"Duplicate display names detected: {names}"
         )
 
-    def test_five_official_assistants(self):
-        """The official list must contain exactly 5 assistants."""
-        assert len(_OFFICIAL_ASSISTANT_KEYS) == 5
+    def test_six_official_assistants(self):
+        """The official list must contain exactly 6 assistants."""
+        assert len(_OFFICIAL_ASSISTANT_KEYS) == 6
         assert set(_OFFICIAL_ASSISTANT_KEYS) == {
             "copilot",
             "claude",
             "qwen",
             "opencode",
             "qoder",
+            "codex",
         }
 
     def test_get_official_assistants_returns_correct_list(self):
         """get_official_assistants() returns the canonical ordered list."""
         result = get_official_assistants()
         assert result == _OFFICIAL_ASSISTANT_KEYS
-        assert len(result) == 5
+        assert len(result) == 6
 
 
 class TestAssistantProfile:

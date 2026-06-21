@@ -150,7 +150,7 @@ components:
   schemas:
     AssistantKey:
       type: string
-      enum: [copilot, claude, qwen, opencode, qoder]
+      enum: [claude, codex, qoder, copilot, opencode, qwen]
     AssistantSupportProfile:
       type: object
       required:

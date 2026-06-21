@@ -1,6 +1,6 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.1 → 1.0.1.1 (DAILY; format migration to x.y.z.ddd, no principle changes)
+- Version change: 1.1.0 ← 1.0.1.1 (MINOR; Principle V amended to add Codex CLI and tier classification)
 - Modified principles: None
 - Added sections: None
 - Removed sections: None
@@ -54,7 +54,8 @@ Rationale: Reduces regressions, clarifies intent, and validates real-world behav
 
 ### V. AI Agent Integration Standards
 AI agent integration MUST follow strict guidelines:
-- Only support officially approved AI agents: Claude Code, GitHub Copilot, Qwen Code, opencode, and Qoder
+- Only support officially approved AI agents: Claude Code, Codex CLI, GitHub Copilot, Qwen Code, opencode, and Qoder
+- Tiered support classification: Tier 1 (priority support with deepest integration) — Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode; Tier 2 (standard support) — Qwen Code
 - Configuration parsing MUST reject unsupported providers
 - Agent capabilities MUST be leveraged for specification interpretation and implementation generation
 - Heavy reliance on advanced AI model capabilities for specification understanding is expected
@@ -132,4 +133,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.0.1.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-05-23
+**Version**: 1.1.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-06-21

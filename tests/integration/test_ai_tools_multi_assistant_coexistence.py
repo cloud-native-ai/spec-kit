@@ -44,8 +44,8 @@ class TestMultiAssistantCoexistence:
         assert (project / ".specify" / "skills").is_dir()
         assert (project / ".specify" / "templates").is_dir()
 
-    def test_five_assistants_can_coexist(self, monkeypatch, tmp_path: Path):
-        """All five official assistants should coexist in one workspace."""
+    def test_six_assistants_can_coexist(self, monkeypatch, tmp_path: Path):
+        """All six official assistants should coexist in one workspace."""
         resource_root = tmp_path / "resource"
         from fixtures.ai_tools_support import make_resource_with_skills
 
@@ -54,22 +54,23 @@ class TestMultiAssistantCoexistence:
 
         from specify_cli import _OFFICIAL_ASSISTANT_KEYS, copy_local_templates
 
-        project = tmp_path / "all5"
+        project = tmp_path / "all6"
         first = _OFFICIAL_ASSISTANT_KEYS[0]
         copy_local_templates(project, first, "sh")
 
         for assistant in _OFFICIAL_ASSISTANT_KEYS[1:]:
             copy_local_templates(project, assistant, "sh", is_current_dir=True)
 
-        # All five roots must exist
+        # All six roots must exist
+        profile = {
+            "copilot": ".github/",
+            "claude": ".claude/",
+            "qwen": ".qwen/",
+            "opencode": ".opencode/",
+            "qoder": ".qoder/",
+            "codex": ".codex/",
+        }
         for assistant in _OFFICIAL_ASSISTANT_KEYS:
-            profile = {
-                "copilot": ".github/",
-                "claude": ".claude/",
-                "qwen": ".qwen/",
-                "opencode": ".opencode/",
-                "qoder": ".qoder/",
-            }
             root_dir = project / profile[assistant]
             assert root_dir.is_dir(), f"{assistant} root {profile[assistant]} missing"
 

@@ -40,7 +40,7 @@ class TestCliHelpConsistency:
     def test_official_assistant_count_is_consistent(self):
         """get_official_assistants() must return the expected count."""
         assistants = get_official_assistants()
-        assert len(assistants) == 5
+        assert len(assistants) == 6
         assert set(assistants) == set(_OFFICIAL_ASSISTANT_KEYS)
 
     def test_cli_help_would_mention_all_assistants(self):

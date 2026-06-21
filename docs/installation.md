@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Linux/macOS** (or Windows)
-- AI coding agent: [Claude Code](https://www.anthropic.com/claude-code), [GitHub Copilot](https://code.visualstudio.com/), [Qwen Code](https://github.com/alibaba/Qwen), [opencode](https://github.com/opencode), or [Qoder](https://qoder.com/cli)
+- AI coding agent (Tier 1): [Claude Code](https://www.anthropic.com/claude-code), [Codex CLI](https://github.com/openai/codex), [Qoder CLI](https://qoder.com/cli), [GitHub Copilot](https://code.visualstudio.com/), or [opencode](https://opencode.ai/); (Tier 2): [Qwen Code](https://github.com/QwenLM/qwen-code)
 - [uv](https://docs.astral.sh/uv/) for package management
 - [Python 3.11+](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/downloads)
@@ -31,11 +31,12 @@ uvx --from git+https://github.com/github/spec-kit.git specify init --here
 You can proactively specify your AI agent during initialization:
 
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai copilot
 uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai claude
-uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai qwen
-uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai opencode
+uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai codex
 uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai qoder
+uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai copilot
+uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai opencode
+uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai qwen
 ```
 
 ### Specify Script Type (Shell)

@@ -38,11 +38,17 @@ Unlike the traditional approach of "write code first, treat specs as reference o
 
 ## 🤖 Supported AI Agents
 
+### Tier 1 (Priority Support)
+
 - [Claude Code](https://www.anthropic.com/claude-code)
+- [Codex CLI](https://github.com/openai/codex)
+- [Qoder CLI](https://qoder.com/cli)
 - [GitHub Copilot](https://code.visualstudio.com/)
-- [Qwen Code](https://github.com/QwenLM/qwen-code)
 - [opencode](https://opencode.ai/)
-- [Qoder](https://qoder.com/cli)
+
+### Tier 2 (Standard Support)
+
+- [Qwen Code](https://github.com/QwenLM/qwen-code)
 
 ## Feature List
 

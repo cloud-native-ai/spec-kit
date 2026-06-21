@@ -78,7 +78,7 @@ class TestAssistantSchemas:
             assert cat in text, f"Missing summary category '{cat}' in contract"
 
     def test_official_assistant_enum_is_complete(self):
-        """Verify all 5 official assistants are referenced in the contract."""
+        """Verify all 6 official assistants are referenced in the contract."""
         text = _contract_text()
-        for assistant in ["copilot", "claude", "qwen", "opencode", "qoder"]:
+        for assistant in ["copilot", "claude", "qwen", "opencode", "qoder", "codex"]:
             assert assistant in text, f"Assistant '{assistant}' not found in contract"

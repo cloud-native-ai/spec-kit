@@ -1,6 +1,6 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-06-18
+**Last Updated**: 2026-06-21
 **Total Features**: 24
 
 ## Features
@@ -28,7 +28,7 @@
 | 019 | Agents Command | Create or refine custom AI agents (.agent.md) for workspace-specific workflows. | Implemented | .specify/memory/features/019.md | .specify/specs/015-role-based-agents/requirements.md | 2026-06-17  |
 | 020 | Qoder Support | Add Qoder as a supported CLI assistant across initialization, validation, documentation, and release distribution. | Implemented | .specify/memory/features/020.md | .specify/specs/006-add-qoder-support/requirements.md | 2026-03-30 |
 | 021 | Claude Code Support | Add Claude Code as a first-class assistant with custom commands and Claude Code-specific configuration assets. | Implemented | .specify/memory/features/021.md | .specify/specs/009-claude-code-support/requirements.md | 2026-05-14 |
-| 022 | AI Tools Support | Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files. | Implemented | .specify/memory/features/022.md | .specify/specs/011-ai-tools-support/requirements.md | 2026-05-19 |
+| 022 | AI Tools Support | Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files. | Implemented | .specify/memory/features/022.md | .specify/specs/018-cli-priority-support/requirements.md | 2026-06-21 (deferred: T042,T052,T068) |
 | 023 | Prompt Template Quality | Structural validation and consistency enforcement across all command and skill templates. | Draft | .specify/memory/features/023.md | - | 2026-06-05 |
 | 024 | Specification Workspace Versioning | Version management and migration support for .specify/ workspace structure across CLI releases. | Draft | .specify/memory/features/024.md | - | 2026-06-05 |
 

@@ -90,6 +90,30 @@ def claude_minimal_resource_path(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
+def codex_minimal_resource_path(tmp_path: Path) -> Path:
+    resource_root = tmp_path / "resource"
+    (resource_root / "templates" / "commands").mkdir(parents=True)
+    (resource_root / "templates" / "commands" / "requirements.md").write_text(
+        "# [COMMAND_NAME]\n\nAgent: [AGENT_NAME]\nArgs: [ARGUMENTS]",
+        encoding="utf-8",
+    )
+    (resource_root / "templates" / "codexignore-template").write_text(
+        "__pycache__/\n.venv/\n!.specify/specs/\n",
+        encoding="utf-8",
+    )
+    (resource_root / "memory").mkdir(parents=True)
+    (resource_root / "memory" / "constitution.md").write_text(
+        "# Constitution", encoding="utf-8"
+    )
+    (resource_root / "memory" / "features.md").write_text(
+        "# Features", encoding="utf-8"
+    )
+    (resource_root / "scripts").mkdir(parents=True)
+    (resource_root / "skills").mkdir(parents=True)
+    return resource_root
+
+
+@pytest.fixture
 def ai_tools_resource_path(tmp_path: Path) -> Path:
     """Create a comprehensive resource root for AI tools support tests."""
     from fixtures.ai_tools_support import make_resource_with_skills
