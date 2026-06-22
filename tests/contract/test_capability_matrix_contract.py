@@ -1,16 +1,15 @@
 """Contract test for capability matrix audit (T030).
 
-Asserts audit_capability_matrix returns entries for 6 tools x 6 dimensions.
+Asserts audit_capability_matrix returns entries for all official tools x dimensions.
 """
-
-import pytest
 
 from pathlib import Path
 
+import pytest
+
 from specify_cli import (
-    _OFFICIAL_ASSISTANT_KEYS,
-    _ASSISTANT_TIERS,
     _CAPABILITY_DIMENSIONS,
+    _OFFICIAL_ASSISTANT_KEYS,
     audit_capability_matrix,
     copy_local_templates,
 )
@@ -43,6 +42,18 @@ def test_audit_entries_have_required_fields(tmp_path: Path):
         assert "dimension" in entry
         assert "status" in entry
         assert entry["status"] in ("pass", "fail", "missing")
+
+
+def test_audit_contains_hermes_and_iflow_for_all_dimensions(tmp_path: Path):
+    project = tmp_path / "audit_project"
+    project.mkdir()
+    result = audit_capability_matrix(project)
+
+    hermes_entries = [e for e in result["entries"] if e["tool_key"] == "hermes"]
+    iflow_entries = [e for e in result["entries"] if e["tool_key"] == "iflow"]
+
+    assert len(hermes_entries) == len(_CAPABILITY_DIMENSIONS)
+    assert len(iflow_entries) == len(_CAPABILITY_DIMENSIONS)
 
 
 def test_audit_initialized_project_has_some_passes(

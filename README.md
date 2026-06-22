@@ -49,6 +49,8 @@ Unlike the traditional approach of "write code first, treat specs as reference o
 ### Tier 2 (Standard Support)
 
 - [Qwen Code](https://github.com/QwenLM/qwen-code)
+- Hermes Agent
+- iFlow
 
 ## Feature List
 

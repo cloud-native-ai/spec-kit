@@ -9,7 +9,16 @@ from typing import List, Optional
 
 import pytest
 
-_OFFICIAL_ASSISTANTS = ["claude", "codex", "qoder", "copilot", "opencode", "qwen"]
+_OFFICIAL_ASSISTANTS = [
+    "claude",
+    "codex",
+    "qoder",
+    "copilot",
+    "opencode",
+    "qwen",
+    "hermes",
+    "iflow",
+]
 
 
 def official_assistants() -> List[str]:
@@ -54,7 +63,7 @@ def make_resource_with_skills(
         parents=True, exist_ok=True
     )
     (root / "templates" / "instructions-template.md").write_text(
-        "# Instructions\n\nSupported agents: copilot, claude, qwen, opencode, qoder\n",
+        "# Instructions\n\nSupported agents: copilot, claude, qwen, opencode, qoder, codex, hermes, iflow\n",
         encoding="utf-8",
     )
 
@@ -75,7 +84,7 @@ def make_resource_with_skills(
     memory_dir = root / "memory"
     memory_dir.mkdir(parents=True, exist_ok=True)
     (memory_dir / "constitution.md").write_text(
-        "# Constitution\n\nSupported: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder\n",
+        "# Constitution\n\nSupported: Claude Code, Codex CLI, GitHub Copilot, Qwen Code, Hermes Agent, iFlow, opencode, Qoder\n",
         encoding="utf-8",
     )
     (memory_dir / "features.md").write_text(

@@ -4,11 +4,11 @@ Asserts _OFFICIAL_ASSISTANT_KEYS lists Tier 1 tools before qwen,
 and README mentions tiers.
 """
 
-import pytest
-
 from pathlib import Path
 
-from specify_cli import _OFFICIAL_ASSISTANT_KEYS, _ASSISTANT_TIERS
+import pytest
+
+from specify_cli import _ASSISTANT_TIERS, _OFFICIAL_ASSISTANT_KEYS
 
 pytestmark = pytest.mark.contract
 
@@ -24,7 +24,20 @@ def test_tier1_tools_before_qwen_in_keys():
 
 
 def test_qwen_is_last_in_official_keys():
-    assert _OFFICIAL_ASSISTANT_KEYS[-1] == "qwen"
+    assert _OFFICIAL_ASSISTANT_KEYS == [
+        "claude",
+        "codex",
+        "qoder",
+        "copilot",
+        "opencode",
+        "qwen",
+        "hermes",
+        "iflow",
+    ]
+
+
+def test_official_assistant_count_is_eight():
+    assert len(_OFFICIAL_ASSISTANT_KEYS) == 8
 
 
 def test_readme_mentions_tier():
@@ -32,3 +45,5 @@ def test_readme_mentions_tier():
     assert "Tier 1" in readme
     assert "Tier 2" in readme
     assert "Codex CLI" in readme
+    assert "Hermes Agent" in readme
+    assert "iFlow" in readme

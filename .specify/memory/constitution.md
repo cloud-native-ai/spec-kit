@@ -54,8 +54,8 @@ Rationale: Reduces regressions, clarifies intent, and validates real-world behav
 
 ### V. AI Agent Integration Standards
 AI agent integration MUST follow strict guidelines:
-- Only support officially approved AI agents: Claude Code, Codex CLI, GitHub Copilot, Qwen Code, opencode, and Qoder
-- Tiered support classification: Tier 1 (priority support with deepest integration) — Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode; Tier 2 (standard support) — Qwen Code
+- Only support officially approved AI agents: Claude Code, Codex CLI, GitHub Copilot, Qwen Code, Hermes Agent, iFlow, opencode, and Qoder
+- Tiered support classification: Tier 1 (priority support with deepest integration) — Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode; Tier 2 (standard support) — Qwen Code, Hermes Agent, iFlow
 - Configuration parsing MUST reject unsupported providers
 - Agent capabilities MUST be leveraged for specification interpretation and implementation generation
 - Heavy reliance on advanced AI model capabilities for specification understanding is expected
@@ -133,4 +133,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.1.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-06-21
+**Version**: 1.2.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-06-22

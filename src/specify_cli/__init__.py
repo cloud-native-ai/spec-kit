@@ -79,6 +79,18 @@ AGENT_CONFIG = {
         "install_url": "https://github.com/QwenLM/qwen-code",
         "requires_cli": True,
     },
+    "hermes": {
+        "name": "Hermes Agent",
+        "folder": ".hermes/",
+        "install_url": None,
+        "requires_cli": True,
+    },
+    "iflow": {
+        "name": "iFlow",
+        "folder": ".iflow/",
+        "install_url": None,
+        "requires_cli": True,
+    },
     "opencode": {
         "name": "opencode",
         "folder": ".opencode/",
@@ -104,13 +116,24 @@ AGENT_CONFIG = {
 # ---------------------------------------------------------------------------
 
 # Official assistant keys – the canonical list for this feature.
-_OFFICIAL_ASSISTANT_KEYS = ["claude", "codex", "qoder", "copilot", "opencode", "qwen"]
+_OFFICIAL_ASSISTANT_KEYS = [
+    "claude",
+    "codex",
+    "qoder",
+    "copilot",
+    "opencode",
+    "qwen",
+    "hermes",
+    "iflow",
+]
 
 # Assistant → command output directory mapping (relative to project root)
 _ASSISTANT_COMMAND_DIRS = {
     "copilot": ".github/prompts",
     "claude": ".claude/commands",
     "qwen": ".qwen/commands",
+    "hermes": ".hermes/commands",
+    "iflow": ".iflow/commands",
     "opencode": ".opencode/command",
     "qoder": ".qoder/commands",
     "codex": ".codex/commands",
@@ -121,6 +144,8 @@ _ASSISTANT_EXTENSIONS = {
     "copilot": "prompt.md",
     "claude": "md",
     "qwen": "toml",
+    "hermes": "md",
+    "iflow": "md",
     "opencode": "md",
     "qoder": "md",
     "codex": "md",
@@ -131,13 +156,24 @@ _ASSISTANT_ARG_FORMATS = {
     "copilot": "$ARGUMENTS",
     "claude": "$ARGUMENTS",
     "qwen": "{{args}}",
+    "hermes": "$ARGUMENTS",
+    "iflow": "$ARGUMENTS",
     "opencode": "$ARGUMENTS",
     "qoder": "$ARGUMENTS",
     "codex": "$ARGUMENTS",
 }
 
 # Skills symlink assistants (those that need .<agent>/skills → .specify/skills link)
-_SKILLS_SYMLINK_ASSISTANTS = {"copilot", "qoder", "claude", "qwen", "opencode", "codex"}
+_SKILLS_SYMLINK_ASSISTANTS = {
+    "copilot",
+    "qoder",
+    "claude",
+    "qwen",
+    "hermes",
+    "iflow",
+    "opencode",
+    "codex",
+}
 
 # Assistant → support tier classification
 _ASSISTANT_TIERS = {
@@ -147,6 +183,8 @@ _ASSISTANT_TIERS = {
     "copilot": "tier1",
     "opencode": "tier1",
     "qwen": "tier2",
+    "hermes": "tier2",
+    "iflow": "tier2",
 }
 
 
@@ -249,11 +287,15 @@ class InitializationResultSummary:
             labeled = []
             for a in self.configured_assistants:
                 tier = self.assistant_tiers.get(a, "")
-                label = f" (Tier 1)" if tier == "tier1" else f" (Tier 2)" if tier == "tier2" else ""
+                label = (
+                    " (Tier 1)"
+                    if tier == "tier1"
+                    else " (Tier 2)"
+                    if tier == "tier2"
+                    else ""
+                )
                 labeled.append(f"{a}{label}")
-            lines.append(
-                f"[green]Configured assistants:[/green] {', '.join(labeled)}"
-            )
+            lines.append(f"[green]Configured assistants:[/green] {', '.join(labeled)}")
         return "\n".join(lines)
 
 
@@ -379,6 +421,8 @@ _INSTRUCTIONS_FILE_MAP = {
     "codex": "AGENTS.md",
     "qoder": "QODER.md",
     "qwen": "QWEN.md",
+    "hermes": "HERMES.md",
+    "iflow": "IFLOW.md",
     "copilot": ".github/copilot-instructions.md",
     "opencode": ".opencode/instructions.md",
 }
@@ -462,20 +506,30 @@ def audit_capability_matrix(project_path: Path) -> dict:
     for tool_key in _OFFICIAL_ASSISTANT_KEYS:
         for dimension in _CAPABILITY_DIMENSIONS:
             status = audit_tool_dimension(project_path, tool_key, dimension)
-            entries.append({
-                "tool_key": tool_key,
-                "dimension": dimension,
-                "status": status,
-            })
+            entries.append(
+                {
+                    "tool_key": tool_key,
+                    "dimension": dimension,
+                    "status": status,
+                }
+            )
 
-    tier1_entries = [e for e in entries if _ASSISTANT_TIERS.get(e["tool_key"]) == "tier1"]
-    tier2_entries = [e for e in entries if _ASSISTANT_TIERS.get(e["tool_key"]) == "tier2"]
+    tier1_entries = [
+        e for e in entries if _ASSISTANT_TIERS.get(e["tool_key"]) == "tier1"
+    ]
+    tier2_entries = [
+        e for e in entries if _ASSISTANT_TIERS.get(e["tool_key"]) == "tier2"
+    ]
 
     tier1_pass = sum(1 for e in tier1_entries if e["status"] == "pass")
     tier2_pass = sum(1 for e in tier2_entries if e["status"] == "pass")
 
-    tier1_rate = round(100.0 * tier1_pass / len(tier1_entries), 1) if tier1_entries else 0.0
-    tier2_rate = round(100.0 * tier2_pass / len(tier2_entries), 1) if tier2_entries else 0.0
+    tier1_rate = (
+        round(100.0 * tier1_pass / len(tier1_entries), 1) if tier1_entries else 0.0
+    )
+    tier2_rate = (
+        round(100.0 * tier2_pass / len(tier2_entries), 1) if tier2_entries else 0.0
+    )
 
     return {
         "entries": entries,
@@ -1101,6 +1155,22 @@ def copy_local_templates(
                     project_path / ".codex" / "commands",
                     script_type,
                 )
+            elif ai_assistant == "hermes":
+                generate_commands(
+                    "hermes",
+                    "md",
+                    "$ARGUMENTS",
+                    project_path / ".hermes" / "commands",
+                    script_type,
+                )
+            elif ai_assistant == "iflow":
+                generate_commands(
+                    "iflow",
+                    "md",
+                    "$ARGUMENTS",
+                    project_path / ".iflow" / "commands",
+                    script_type,
+                )
             else:
                 # Fallback: copy commands to .specify/templates/commands
                 shutil.copytree(
@@ -1136,9 +1206,7 @@ def copy_local_templates(
                 shutil.copy2(claudeignore_template, project_path / ".claudeignore")
 
         if ai_assistant == "codex":
-            codexignore_template = (
-                resource_path / "templates" / "codexignore-template"
-            )
+            codexignore_template = resource_path / "templates" / "codexignore-template"
             if not codexignore_template.exists():
                 fallback_template = (
                     MODULE_DIR.parent.parent / "templates" / "codexignore-template"
@@ -1234,6 +1302,24 @@ def copy_local_templates(
             if tracker:
                 tracker.complete("local-templates", ".codex/skills symlink ready")
 
+        if ai_assistant == "hermes":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .hermes/skills to .specify/skills"
+                )
+            ensure_specify_symlink(project_path, ".hermes", "skills")
+            if tracker:
+                tracker.complete("local-templates", ".hermes/skills symlink ready")
+
+        if ai_assistant == "iflow":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .iflow/skills to .specify/skills"
+                )
+            ensure_specify_symlink(project_path, ".iflow", "skills")
+            if tracker:
+                tracker.complete("local-templates", ".iflow/skills symlink ready")
+
         # Agent directory symlinks (parallel to skills symlinks above)
         if ai_assistant in ("copilot", "claude"):
             if tracker:
@@ -1270,6 +1356,24 @@ def copy_local_templates(
             ensure_specify_symlink(project_path, ".opencode", "agents")
             if tracker:
                 tracker.complete("local-templates", ".opencode/agents symlink ready")
+
+        if ai_assistant == "hermes":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .hermes/agents to .specify/agents"
+                )
+            ensure_specify_symlink(project_path, ".hermes", "agents")
+            if tracker:
+                tracker.complete("local-templates", ".hermes/agents symlink ready")
+
+        if ai_assistant == "iflow":
+            if tracker:
+                tracker.start(
+                    "local-templates", "linking .iflow/agents to .specify/agents"
+                )
+            ensure_specify_symlink(project_path, ".iflow", "agents")
+            if tracker:
+                tracker.complete("local-templates", ".iflow/agents symlink ready")
 
     except Exception as e:
         if tracker:
@@ -1618,7 +1722,7 @@ def init(
     ai_assistant: str = typer.Option(
         None,
         "--ai",
-        help="AI assistant to use: claude, codex, qoder, copilot, opencode (Tier 1), or qwen (Tier 2)",
+        help="AI assistant to use: claude, codex, qoder, copilot, opencode (Tier 1), or qwen, hermes, iflow (Tier 2)",
     ),
     script_type: str = typer.Option(
         None, "--script", help="Script type to use: sh or ps"
@@ -1626,7 +1730,7 @@ def init(
     ignore_agent_tools: bool = typer.Option(
         False,
         "--ignore-agent-tools",
-        help="Skip checks for AI agent tools like Claude Code, Codex CLI, Qoder CLI, opencode, or Qwen CLI",
+        help="Skip checks for AI agent tools like Claude Code, Codex CLI, Qoder CLI, opencode, Qwen CLI, Hermes Agent, or iFlow",
     ),
     no_git: bool = typer.Option(
         False, "--no-git", help="Skip git repository initialization"
@@ -1666,6 +1770,8 @@ def init(
         specify init my-project --ai copilot --no-git
         specify init --ignore-agent-tools my-project
         specify init . --ai claude         # Initialize in current directory with Claude Code
+        specify init . --ai hermes         # Initialize in current directory with Hermes Agent
+        specify init . --ai iflow          # Initialize in current directory with iFlow
         specify init . --ai qwen           # Initialize in current directory
         specify init . --ai qoder          # Initialize in current directory with Qoder
         specify init .                     # Initialize in current directory (interactive AI selection)
@@ -1760,7 +1866,9 @@ def init(
         selected_ai = ai_assistant
     else:
         # Create options dict for selection (agent_key: display_name)
-        ai_choices = {key: config["name"] for key, config in AGENT_CONFIG.items()}
+        ai_choices = {
+            key: AGENT_CONFIG[key]["name"] for key in _OFFICIAL_ASSISTANT_KEYS
+        }
         selected_ai = select_with_arrows(
             ai_choices, "Choose your AI assistant:", "copilot"
         )

@@ -25,6 +25,9 @@ def _extensions_for(assistant: str) -> list:
         "qwen": ".toml",
         "opencode": ".md",
         "qoder": ".md",
+        "codex": ".md",
+        "hermes": ".md",
+        "iflow": ".md",
     }
     return [ext_map.get(assistant, ".md")]
 

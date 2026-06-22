@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pytest
 
+from specify_cli import _OFFICIAL_ASSISTANT_KEYS
+
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACT = (
     ROOT
@@ -78,7 +80,21 @@ class TestAssistantSchemas:
             assert cat in text, f"Missing summary category '{cat}' in contract"
 
     def test_official_assistant_enum_is_complete(self):
-        """Verify all 6 official assistants are referenced in the contract."""
+        """Verify all official assistants are referenced in the contract."""
         text = _contract_text()
-        for assistant in ["copilot", "claude", "qwen", "opencode", "qoder", "codex"]:
+        for assistant in [
+            "copilot",
+            "claude",
+            "qwen",
+            "opencode",
+            "qoder",
+            "codex",
+        ]:
             assert assistant in text, f"Assistant '{assistant}' not found in contract"
+
+
+class TestOfficialAssistantCount:
+    def test_official_assistant_count_is_eight(self):
+        assert len(_OFFICIAL_ASSISTANT_KEYS) == 8
+        assert "hermes" in _OFFICIAL_ASSISTANT_KEYS
+        assert "iflow" in _OFFICIAL_ASSISTANT_KEYS
