@@ -168,7 +168,7 @@ If any validation failed during execution, the agent will have reported the fail
 
 - **Malformed blocks**: If a TODO block is missing its closing fence, the command reports the file and approximate line number, then excludes it from execution. Fix the fence syntax and re-run.
 
-- **More than 10 blocks**: The command batches them into groups of 10 and asks for confirmation per batch (`confirm batch 1`, `confirm batch 2`, etc.). This prevents overwhelming the agent with too many simultaneous changes.
+- **More than 10 blocks**: The command batches them into batches of at most 5 groups each and asks for confirmation per batch (`confirm batch 1`, `confirm batch 2`, etc.). This prevents overwhelming the agent with too many simultaneous changes.
 
 - **Destructive or out-of-scope TODOs**: If a TODO block appears to request destructive operations (e.g., `rm -rf /`, dropping production databases) or secret-exposing changes, the command rejects the item and explains why. Edit the TODO to be more specific or break it into safer steps.
 

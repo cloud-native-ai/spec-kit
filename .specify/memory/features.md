@@ -1,6 +1,6 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-06-22
+**Last Updated**: 2026-06-23
 **Total Features**: 25
 
 ## Features
@@ -31,7 +31,7 @@
 | 022 | AI Tools Support | Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files. | Planned | .specify/memory/features/022.md | .specify/specs/019-tier2-hermes-iflow/requirements.md | 2026-06-22 (deferred: T042,T052,T068) |
 | 023 | Prompt Template Quality | Structural validation and consistency enforcement across all command and skill templates. | Draft | .specify/memory/features/023.md | - | 2026-06-05 |
 | 024 | Specification Workspace Versioning | Version management and migration support for .specify/ workspace structure across CLI releases. | Draft | .specify/memory/features/024.md | - | 2026-06-05 |
-| 025 | Todo Command | Discover marked TODO blocks in text files and turn them into reviewable execution plans. | Planned | .specify/memory/features/025.md | .specify/specs/020-speckit-todo-command/requirements.md | 2026-06-23 |
+| 025 | Todo Command | Discover marked TODO blocks in text files and turn them into reviewable execution plans. | Implemented | .specify/memory/features/025.md | .specify/specs/020-speckit-todo-command/requirements.md | 2026-06-23 |
 
 ## Feature Entry Format
 

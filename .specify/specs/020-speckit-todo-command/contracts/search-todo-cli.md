@@ -256,7 +256,7 @@ This contract does **not** cover:
 
 - **Prompt-layer veto**: The safety gate that rejects TODO blocks requesting destructive, secret-exposing, or out-of-scope operations is enforced by the chat prompt (`speckit.todo.prompt.md`), not by `search-todo.sh`.
 - **Work-group clustering**: Grouping related TODO blocks into thematic units is performed by the agent consuming the JSON output, not by the scanner.
-- **Batching logic**: Splitting TODO groups into sequential execution batches (when valid count > 10) is handled at the prompt/agent layer per FR-011.
+- **Batching logic**: Splitting TODO groups into sequential execution batches (when valid count > 10) is handled at the prompt/agent layer per FR-013.
 - **Auto-execution**: The command presents a reviewable plan and awaits user confirmation; execution orchestration is outside the scanner's scope.
 - **Workspace mutation**: The scanner is read-only; it does not modify source files.
 - **Multi-workspace scanning**: Only one workspace root is supported per invocation.

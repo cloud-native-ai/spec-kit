@@ -87,6 +87,7 @@ A Spec Kit user needs predictable behavior when no TODO blocks are present durin
 - **FR-010**: In insertion mode, the command MUST insert a conforming SPECKIT TODO block at the specified location using the format specified in FR-004.
 - **FR-011**: In insertion mode, the command MUST preserve surrounding file content and MUST NOT modify any content other than inserting the new TODO block.
 - **FR-012**: In collection mode, the command MUST provide a clear no-op result when no valid marked TODO blocks are found.
+- **FR-013**: When more than 10 valid TODO blocks are discovered in a single scan, the command MUST split the resulting groups into batches of at most 5 groups per batch and present each batch sequentially for review and confirmation before execution.
 
 ### Key Entities
 

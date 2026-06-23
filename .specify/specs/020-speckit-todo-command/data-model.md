@@ -14,7 +14,7 @@
 - **MalformedBlock** — a diagnostic record for a fence that could not be cleanly parsed (unclosed, nested, or unparseable); excluded from automatic planning.
 - **TodoGroup** — a logical cluster of one or more `TodoBlock`s that share an affinity (same file, same heading, or same topic) and are planned/executed together.
 - **TodoPlan** — the top-level reviewable artifact produced by one run of `/speckit.todo`: a scan summary plus an ordered sequence of `ExecutionBatch`es.
-- **ExecutionBatch** — a bounded, sequential unit of review and execution containing up to 5 `TodoGroup`s (per FR-011) with a well-defined lifecycle status.
+- **ExecutionBatch** — a bounded, sequential unit of review and execution containing up to 5 `TodoGroup`s (per FR-013) with a well-defined lifecycle status.
 
 ---
 
@@ -88,7 +88,7 @@ Validation rules:
 
 - `sum(len(batch.groups) for batch in batches) == len(plan's TodoGroup set)`. Every group is scheduled exactly once.
 - `total_blocks` MUST equal the sum of `len(group.blocks)` across all groups referenced by the plan's batches.
-- When `total_blocks > 10`, the plan MUST contain more than one batch (FR-011).
+- When `total_blocks > 10`, the plan MUST contain more than one batch (FR-013).
 
 ### 5. ExecutionBatch
 
@@ -97,7 +97,7 @@ A bounded, reviewable unit of execution within a `TodoPlan`.
 | Field                        | Type                      | Constraints                                                                 |
 |------------------------------|---------------------------|-----------------------------------------------------------------------------|
 | `batch_number`               | integer                   | **Required.** 1-based position within the parent plan's `batches` array.    |
-| `groups`                     | array of `TodoGroup.group_id` | **Required, non-empty.** Max **5** entries per batch (FR-011).            |
+| `groups`                     | array of `TodoGroup.group_id` | **Required, non-empty.** Max **5** entries per batch (FR-013).            |
 | `status`                     | enum                      | **Required.** One of: `planned`, `confirmed`, `executing`, `done`, `deferred`, `rejected`. |
 | `confirmation_received_at`   | ISO-8601 timestamp \| null| MUST be set when `status ∈ {confirmed, executing, done}`; MUST be null while `status == planned`. |
 | `execution_log`              | string                    | **Required.** The post-execution output trail. Empty string until the batch has been executed. |
@@ -116,7 +116,7 @@ Validation rules:
 - An **ExecutionBatch** references many **TodoGroup**s via `groups`. A group is referenced by exactly one batch within a given plan.
 - A **TodoGroup** contains many **TodoBlock**s via `blocks`. A block belongs to exactly one group within a given plan.
 - A **TodoBlock** and a **MalformedBlock** are disjoint outcomes for the same source-level construct: a single fenced marker produces exactly one of the two, never both.
-- A batch is bounded to at most 5 groups (FR-011); groups themselves have no size cap but the batching rule is triggered by the total valid-block count exceeding 10.
+- A batch is bounded to at most 5 groups (FR-013); groups themselves have no size cap but the batching rule is triggered by the total valid-block count exceeding 10.
 
 ---
 
@@ -157,7 +157,7 @@ Cross-entity integrity rules that MUST hold for any well-formed `TodoPlan` insta
 4. **Group-existence invariant.** Every `TodoGroup.group_id` referenced by any `ExecutionBatch.groups` MUST exist in the plan's `TodoGroup` set.
 5. **Batch-count invariant.** `sum(len(batch.groups) for batch in batches) == len(plan's TodoGroup set)`.
 6. **Block-count invariant.** `plan.total_blocks == sum(len(group.blocks) for group in plan's groups)`.
-7. **Batch-size invariant.** `len(batch.groups) <= 5` for every `ExecutionBatch` (FR-011).
+7. **Batch-size invariant.** `len(batch.groups) <= 5` for every `ExecutionBatch` (FR-013).
 8. **Batching-trigger invariant.** When `plan.total_blocks > 10`, `len(plan.batches) > 1`.
 9. **Batch-number invariant.** The set of `batch_number` values across a plan's batches is exactly `{1, 2, …, len(plan.batches)}`.
 10. **Workspace-bounds invariant.** Every `TodoBlock.source_file` and every `MalformedBlock.source_file` resolves to a path contained within `plan.workspace_root`. No path escapes upward.
