@@ -1,0 +1,7 @@
+# Test fixtures for /speckit.todo command
+# Each subdirectory represents a different test scenario:
+# - valid/          : Workspace with properly formatted SPECKIT TODO blocks
+# - malformed/      : Workspace with broken/incomplete TODO blocks
+# - empty/          : Workspace with no TODO blocks
+# - negative/       : Workspace with non-SPECKIT TODO comments (should be ignored)
+# - oversized/      : Workspace with >10 TODO blocks (tests batching)

@@ -1,0 +1,5 @@
+# Test binary content
+This file contains some non-UTF8 bytes to simulate binary content
+Normal text here
+\x00\x01\x02\xFF\xFE\xFD
+More text after binary

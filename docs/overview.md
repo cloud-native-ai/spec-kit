@@ -277,7 +277,7 @@ flowchart TD
 
 #### 风险
 
-`scripts/bash/common.sh` 顶部依赖 `CWS_LIB_BASH_HOME` 和 `CWS_LIB_PYTHON_HOME`，缺失会直接失败：[scripts/bash/common.sh](scripts/bash/common.sh#L4-L40)。这与公开安装文档中强调 `uvx` 和通用环境的叙述存在张力：[docs/installation.md](docs/installation.md#L13-L26)。如果这是企业内扩展，需要在文档中明确；如果面向开源使用，应将 CWS 依赖降级为可选。
+`scripts/bash/common.sh` 顶部依赖 `CWS_LIB_BASH_HOME`，缺失会直接失败：[scripts/bash/common.sh](scripts/bash/common.sh#L4-L40)。这与公开安装文档中强调 `uvx` 和通用环境的叙述存在张力：[docs/installation.md](docs/installation.md#L13-L26)。如果这是企业内扩展，需要在文档中明确；如果面向开源使用，应将 CWS 依赖降级为可选。
 
 ---
 
