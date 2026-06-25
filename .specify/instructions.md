@@ -88,7 +88,7 @@ Use this machine-maintained section to track reusable resource identifiers creat
 <!-- Record each skill as one table row with the columns below. -->
 | Skill Name | Skill ID | Description | Argument Hint | User Invocable | Disable Model Invocation | Canonical Path |
 |------------|----------|-------------|---------------|----------------|--------------------------|----------------|
-| git-workflow | <SKILL:.specify/skills/git-workflow/SKILL.md> | Three-tier Git development workflow setup and maintenance. Dynamically discovers or defines trunk/pre-release/dev branch names, creates and maintains docs/git-workflow.md as single source of truth. Covers rebase sync, conflict resolution, and safe push strategies. | - | true | false | .specify/skills/git-workflow/SKILL.md |
+| git-workflow | <SKILL:.specify/skills/git-workflow/SKILL.md> | Three-tier Git workflow management (trunk/pre-release/dev). Three modes: Setup (establish workflow), Maintain (health check), Execute (run git operations). Uses docs/git-workflow.md as single source of truth. | - | true | false | .specify/skills/git-workflow/SKILL.md |
 <!-- SKILLS_REGISTRY_END -->
 
 ### Tools

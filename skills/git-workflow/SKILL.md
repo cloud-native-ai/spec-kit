@@ -1,7 +1,7 @@
 ---
 name: git-workflow
 description: |
-  This skill helps users establish and maintain a three-tier Git development workflow (trunk / pre-release / development branches). It dynamically discovers or defines branch names, then creates and maintains a `docs/git-workflow.md` document as the single source of truth. It provides pre-checks, rebase synchronization, conflict resolution, and safe push strategies. Use this when the user mentions ["git workflow", "branch sync", "rebase sync", "分支同步", "git rebase", "force-with-lease", "发布流程", "分支策略", "主干分支", "预发分支", "开发分支", "three-tier git", "git workflow setup", "创建git工作流"]
+  Three-tier Git workflow management skill that dynamically discovers or defines branch names (trunk/pre-release/dev) and maintains `docs/git-workflow.md` as the single source of truth. Supports three modes: Setup (interactive branch naming + creation), Maintain (structure/sync health check), Execute (rebase sync, merge, and safe push). Covers pre-checks, rebase synchronization, conflict resolution, and force-with-lease push strategies. Use this when the user mentions ["git workflow", "branch sync", "rebase sync", "分支同步", "git rebase", "force-with-lease", "发布流程", "分支策略", "主干分支", "预发分支", "开发分支", "three-tier git", "git workflow setup", "创建git工作流", "工作流维护", "workflow health check", "工作流检查"]
 skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 ---
 
@@ -9,118 +9,202 @@ skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 
 ## Overview
 
-This skill helps teams establish and maintain a **三层 Git 开发工作流**：
+三层 Git 开发工作流管理技能，根据项目状态和用户输入自动选择运行模式：
 
-| 角色代号 | 含义 | 说明 |
-|----------|------|------|
+| 模式 | 触发条件 | 功能 |
+|------|----------|------|
+| **Setup** | `docs/git-workflow.md` 不存在 | 建立工作流：确认分支名、创建分支、生成配置文档 |
+| **Maintain** | 文档存在 且 无操作参数 | 维护工作流：检查分支结构与文档一致性，输出健康报告 |
+| **Execute** | 文档存在 且 有操作参数 | 执行工作流：按工作流规范执行具体 git 操作 |
+
+### 分支角色
+
+| 角色 | 含义 | 说明 |
+|------|------|------|
 | **`MAIN`** | 主干分支 | 上游主干，只接收已通过版本验证的代码 |
 | **`PRE`** | 预发分支 | 预发发布分支，用于版本集成与环境验证 |
 | **`DEV`** | 开发分支 | 本地开发分支，所有新改动先在此开发与自测 |
 
-> **关键**：分支名称因项目而异（如 `master` / `xuanji/prepub` / `xuanji/hanzhi`，或 `main` / `staging` / `dev`）。本技能在执行时**动态确认**实际分支名，将其记录到 `${SKILL_WORKDIR}/docs/git-workflow.md`，后续操作以该文档为准。
+> **重要**：分支名称因项目而异（如 `master` / `xuanji/prepub` / `xuanji/hanzhi`，或 `main` / `staging` / `dev`）。本技能在执行时**动态确认**实际分支名，将其记录到 `${SKILL_WORKDIR}/docs/git-workflow.md`，后续操作以该文档为准。
 
-核心链路（使用角色代号）：
-
-```
-代码同步链路：MAIN -> PRE -> DEV
-代码合入链路：MAIN <- PRE <- DEV
-```
-
-固定 rebase 关系：
-
-1. `PRE` 基于 `MAIN` rebase。
-2. `DEV` 基于 `PRE` rebase。
-
-## Workflow / Instructions
-
-### Phase 0: 确定场景并加载/创建分支配置
-
-#### 0.1 判断场景
-
-检查 `${SKILL_WORKDIR}/docs/git-workflow.md` 是否已存在：
-
-- **文档已存在** → 读取已记录的分支名，进入 Phase A（直接使用已记录配置）。
-- **文档不存在** → 进入 Phase B（创建工作流，确定分支名）。
-
-#### Phase A: 成熟项目 — 直接使用已记录配置
-
-从 `docs/git-workflow.md` 的 frontmatter 读取分支映射：
+核心链路（角色代号）：
 
 ```
-MAIN = (文档中记录的主干分支名)
-PRE  = (文档中记录的预发分支名)
-DEV  = (文档中记录的开发分支名)
+代码同步：MAIN -> PRE -> DEV
+代码合入：MAIN <- PRE <- DEV
 ```
 
-确认信息无误后，跳转至 **Phase 1: 执行分支同步**。
+固定 rebase 关系：`PRE` 基于 `MAIN` rebase；`DEV` 基于 `PRE` rebase。
 
-#### Phase B: 新项目或简单项目 — 逐步建立工作流
+---
 
-**Step B1：检测现有分支**
+## Workflow
+
+### Phase 0: 模式判定
+
+1. 检查 `${SKILL_WORKDIR}/docs/git-workflow.md` 是否存在。
+2. 检查用户是否传入了操作参数（具体的 git 操作指令）。
+
+| 文档存在 | 有操作参数 | 进入模式 |
+|----------|------------|----------|
+| 否 | — | Mode 1: Setup |
+| 是 | 否 | Mode 2: Maintain |
+| 是 | 是 | Mode 3: Execute |
+
+---
+
+### Mode 1: Setup — 建立工作流
+
+当 `${SKILL_WORKDIR}/docs/git-workflow.md` 不存在时进入。
+
+#### 1.1 检测现有分支
 
 ```bash
 git branch -a --format='%(refname:short)'
 ```
 
-**Step B2：交互式确认分支名**
+#### 1.2 交互式确认分支名
 
 逐一向用户确认（每次只问一个问题）：
 
-1. **主干分支名 `MAIN`**：
+1. **主干分支 `MAIN`**：
    - 从远端分支中推荐最常见的候选（`main`、`master`），询问用户选择或自定义。
-   - 问题示例："检测到远端有 `origin/main` 和 `origin/master`，哪个是您的主干分支？"
+   - 示例：「检测到远端有 `origin/main` 和 `origin/master`，哪个是您的主干分支？」
+2. **预发分支 `PRE`**：
+   - 询问是否存在预发分支，若存在请用户提供名称；若不存在，建议一个命名规范（如 `staging`、`release`、`prepub`）。
+   - 示例：「项目的预发分支叫什么？如果还没有，建议命名为 `staging`。」
+3. **开发分支 `DEV`**：
+   - 同上逻辑，推荐命名（如 `dev`、`develop`）。
 
-2. **预发分支名 `PRE`**：
-   - 询问是否存在预发分支，若存在请用户提供名称；若不存在，建议一个命名规范（如 `release`、`prepub`、`staging`）。
-   - 问题示例："项目的预发分支叫什么？如果还没有，建议命名为 `staging`。"
-
-3. **开发分支名 `DEV`**：
-   - 同上逻辑，推荐命名（如 `dev`、`develop`、`hanzhi`）。
-
-**Step B3：创建缺失分支（如需）**
+#### 1.3 创建缺失分支
 
 若用户确认需要新建某个层级分支：
 
 ```bash
-# 基于 MAIN 创建 PRE
 git checkout -b <PRE> origin/<MAIN>
 git push -u origin <PRE>
 
-# 基于 PRE 创建 DEV
 git checkout -b <DEV> origin/<PRE>
 git push -u origin <DEV>
 ```
 
-**Step B4：生成 `docs/git-workflow.md`**
+#### 1.4 生成 `docs/git-workflow.md`
 
 读取模板 `${SKILL_HOME}/assets/git-workflow-template.md`，替换 `<MAIN>` / `<PRE>` / `<DEV>` 为实际分支名，写入 `${SKILL_WORKDIR}/docs/git-workflow.md`。
 
-### Phase 1: 执行分支同步
+#### 1.5 更新 instructions 文档
 
-> 以下所有命令中，`<MAIN>` / `<PRE>` / `<DEV>` 由 Phase 0 确定的实际分支名替换。
+在归口 instructions 文档的 Documentation Map 中添加引用行：
 
-#### Step 1: 前置校验（必须先过）
+```markdown
+| **Git Workflow** | `docs/git-workflow.md` | 分支同步机制与操作文件 | 三层分支模型、rebase 同步流程、推送策略、安全底线 |
+```
+
+目标文档查找优先级：见 `${SKILL_HOME}/references/instructions-lookup.md`。
+
+---
+
+### Mode 2: Maintain — 维护工作流
+
+当 `${SKILL_WORKDIR}/docs/git-workflow.md` 存在且用户未传入操作参数时进入。
+
+#### 2.1 加载配置
+
+从 `${SKILL_WORKDIR}/docs/git-workflow.md` frontmatter 读取分支映射：
+
+```yaml
+MAIN = main_branch 字段值
+PRE  = pre_branch 字段值
+DEV  = dev_branch 字段值
+```
+
+#### 2.2 分支结构检查
+
+```bash
+git fetch origin
+git branch -a --format='%(refname:short)'
+git for-each-ref --format='%(refname:short) -> %(upstream:short)' refs/heads/<MAIN> refs/heads/<PRE> refs/heads/<DEV>
+```
+
+检查项：
+
+- `MAIN`、`PRE`、`DEV` 分支是否存在于本地和远端
+- 分支 tracking 关系是否正确
+
+#### 2.3 同步状态检查
+
+```bash
+git rev-list --left-right --count origin/<MAIN>...origin/<PRE>
+git rev-list --left-right --count origin/<PRE>...origin/<DEV>
+git rev-list --left-right --count origin/<MAIN>...origin/<DEV>
+```
+
+#### 2.4 文档一致性检查
+
+- `docs/git-workflow.md` 中记录的分支名与实际分支是否一致
+- frontmatter 格式完整（`main_branch`、`pre_branch`、`dev_branch`、`last_updated`）
+- instructions 文档中是否包含 Git Workflow 引用行
+
+#### 2.5 输出维护报告
+
+```markdown
+## 工作流维护报告
+
+### 分支结构
+- MAIN (<name>): ✅ 正常 / ❌ 问题描述
+- PRE  (<name>): ✅ 正常 / ❌ 问题描述
+- DEV  (<name>): ✅ 正常 / ❌ 问题描述
+
+### 同步状态
+- MAIN → PRE: ahead N / behind M （是否需要同步）
+- PRE  → DEV: ahead N / behind M （是否需要同步）
+
+### 文档一致性
+- docs/git-workflow.md: ✅ / ❌ 问题描述
+- instructions 引用: ✅ / ❌
+
+### 建议操作
+- （列出需要执行的操作，如有）
+```
+
+---
+
+### Mode 3: Execute — 执行工作流
+
+当 `${SKILL_WORKDIR}/docs/git-workflow.md` 存在且用户传入了具体操作参数时进入。
+
+#### 3.1 加载配置
+
+同 Mode 2 Step 2.1，从 frontmatter 读取 `MAIN` / `PRE` / `DEV` 分支名。
+
+#### 3.2 前置校验
 
 ```bash
 git fetch origin
 git status --short --branch
-git for-each-ref --format='%(refname:short) -> %(upstream:short)' refs/heads/<MAIN> refs/heads/<PRE> refs/heads/<DEV>
 ```
 
-若工作区不干净：
+若工作区不干净，向用户建议：
 
 ```bash
-# 方式1：推荐，提交本地改动
-git add .
-git commit -m "chore: save local work before sync"
+# 方式 1：推荐 — 提交本地改动
+git add . && git commit -m "chore: save local work before sync"
 
-# 方式2：临时保存（含未跟踪文件）
-git stash push -u -m "pre-sync-<date>"
+# 方式 2：临时保存（含未跟踪文件）
+git stash push -u -m "pre-sync-$(date +%Y%m%d)"
 ```
 
-> **Gate**：`git status --short` 必须为空，才能进入下一步。
+> **Gate**：`git status --short` 必须为空，才能继续执行。
 
-#### Step 2: 同步 `MAIN -> PRE`
+#### 3.3 解析并执行操作
+
+根据用户指令匹配预定义操作：
+
+##### 操作 A: 代码同步（MAIN → PRE → DEV）
+
+触发词：同步、sync、拉取上游更新
+
+**A1. 同步 MAIN → PRE**
 
 ```bash
 git checkout <PRE>
@@ -130,14 +214,10 @@ git rev-list --left-right --count origin/<PRE>...<PRE>
 ```
 
 推送策略：
+- 仅 ahead（`0 N`）：`git push origin <PRE>`
+- ahead + behind（`M N`，M>0）：确认团队同步窗口 → `git push --force-with-lease origin <PRE>`
 
-- **仅 ahead（`0 N`）**：`git push origin <PRE>`
-- **ahead + behind（`M N` 且 `M>0, N>0`）**：
-  1. 在团队同步窗口执行；
-  2. 通知所有基于 `<PRE>` 开发的同学先暂停拉取；
-  3. 使用：`git push --force-with-lease origin <PRE>`
-
-#### Step 3: 同步 `PRE -> DEV`
+**A2. 同步 PRE → DEV**
 
 ```bash
 git checkout <DEV>
@@ -146,49 +226,65 @@ git rebase origin/<PRE>
 git rev-list --left-right --count origin/<DEV>...<DEV>
 ```
 
-若出现 `skipped previously applied commit`：
-
-1. 记录 commit id；
-2. 继续完成 rebase；
-3. 执行差异核对：
+推送策略同 A1。若出现 `skipped previously applied commit`，记录 commit id，继续 rebase，执行差异核对：
 
 ```bash
 git log --left-right --cherry-pick --oneline origin/<DEV>...<DEV>
 ```
 
-推送策略与 Step 2 相同：`0 N` 正常 push，`M N` 团队确认后 `git push --force-with-lease origin <DEV>`。
-
-#### Step 4: 恢复临时保存（若使用过 stash）
+**A3. 恢复临时保存**（若使用过 stash）
 
 ```bash
-git stash list
-git stash pop
+git stash list && git stash pop
 ```
 
-### Phase 2: 开发、提测、发布
+##### 操作 B: 提交到预发（DEV → PRE）
 
-1. 新修改只进 `<DEV>`，完成本地验证（至少 `lint + test + build`）。
-2. 发起 PR `<DEV> -> <PRE>`，在预发做版本测试。
-3. 版本测试通过后，发起 PR `<PRE> -> <MAIN>`。
+触发词：提交到预发、合入预发、merge to pre、提测
 
-> 规范链路：`DEV`（开发）→ `PRE`（版本测试）→ `MAIN`（最终合入）
+建议通过 PR 流程：`<DEV> → <PRE>`。
 
-### Phase 3: 冲突与异常处理
-
-**rebase 冲突：**
+或直接合入（需用户确认）：
 
 ```bash
-git add <冲突文件>
-git rebase --continue
+git checkout <PRE>
+git pull --rebase origin <PRE>
+git merge <DEV> --no-ff -m "merge: <DEV> into <PRE>"
 ```
 
-**放弃本次 rebase：**
+##### 操作 C: 提交到主干（PRE → MAIN）
+
+触发词：提交到主干、合入主干、merge to main、发布
+
+> **安全检查**：禁止跳过 `<PRE>` 直接把 `<DEV>` 合入 `<MAIN>`。
+
+建议通过 PR 流程：`<PRE> → <MAIN>`。
+
+或直接合入（需用户确认）：
 
 ```bash
-git rebase --abort
+git checkout <MAIN>
+git pull --rebase origin <MAIN>
+git merge <PRE> --no-ff -m "merge: <PRE> into <MAIN>"
 ```
 
-## Security / 发布分支安全底线
+##### 操作 D: 基于指定分支 rebase
+
+触发词：rebase、变基
+
+```bash
+git checkout <target-branch>
+git pull --rebase origin <target-branch>
+git rebase origin/<base-branch>
+```
+
+##### 操作 E: 自定义操作
+
+对于无法匹配预定义操作的用户指令，根据 `docs/git-workflow.md` 中的规范理解用户意图，拆解为安全的 git 操作序列。遵守 Security 章节的安全底线。
+
+---
+
+## Security / 安全底线
 
 1. `<MAIN>` 禁止直接 push 未审查代码。
 2. 禁止跳过 `<PRE>` 直接把 `<DEV>` 合入 `<MAIN>`。
@@ -197,47 +293,19 @@ git rebase --abort
 
 ## Known Issues & Mitigations
 
-| 异常现象 | 根因分析 | 应对策略 |
-|----------|----------|----------|
-| `git checkout` 报错，本地改动会被覆盖 | 工作区不干净 | 执行 Phase 1 Step 1 前置校验后再切换分支 |
-| rebase 后变为 `M N`（双向分叉） | 共享分支 rebase 重写提交历史 | 使用 `--force-with-lease` 受控推送，走团队同步窗口 |
-| rebase 过程出现 `skipped previously applied commit` | 分支存在重复补丁或历史漂移 | 记录 commit id，继续 rebase，执行 `git log --left-right --cherry-pick` 差异核对 |
+| 异常现象 | 根因 | 应对策略 |
+|----------|------|----------|
+| `git checkout` 报错，本地改动会被覆盖 | 工作区不干净 | 先完成前置校验再切换分支 |
+| rebase 后变为 `M N`（双向分叉） | 共享分支 rebase 重写历史 | `--force-with-lease` 受控推送，走团队同步窗口 |
+| `skipped previously applied commit` | 分支存在重复补丁或历史漂移 | 记录 commit id，继续 rebase，`git log --left-right --cherry-pick` 差异核对 |
+
+---
 
 ## docs/git-workflow.md 文档维护
 
-### 创建
-
-- 在 Phase B 完成后，使用模板 `${SKILL_HOME}/assets/git-workflow-template.md` 生成 `${SKILL_WORKDIR}/docs/git-workflow.md`。
-- 文档 frontmatter 记录了三个分支的实际名称，作为后续同步操作的唯一数据源。
-
-### 更新
-
-- 若项目分支改名或重构，更新 `docs/git-workflow.md` frontmatter 中的分支映射，后续操作自动适配。
-- 若同步流程有新增经验或异常处理经验，追加到文档的"Known Issues"章节。
-- 更新完成后在文档末尾更新 `last_updated` 日期。
-
-### instructions.md 引用
-
-技能执行后，需要在归口 instructions 文档的 Documentation Map 中添加引用行：
-
-```markdown
-| **Git Workflow** | `docs/git-workflow.md` | 分支同步机制与操作文件 | 三层分支模型、rebase 同步流程、推送策略、安全底线 |
-```
-
-目标 instructions 文档的判断逻辑：
-
-1. 优先检查 `${SKILL_WORKDIR}/.specify/instructions.md` 是否存在。若存在，则更新该文件的 Documentation Map 表格。
-2. 若 `.specify/instructions.md` 不存在，则检测当前支持的 AI 工具对应的 instructions 文档，在第一个找到的文件中更新 Documentation Map：
-
-| 工具 | 兼容性 instructions 文件 |
-|------|--------------------------|
-| GitHub Copilot | `${SKILL_WORKDIR}/.github/copilot-instructions.md` |
-| Claude Code | `${SKILL_WORKDIR}/CLAUDE.md` |
-| Qwen Code | `${SKILL_WORKDIR}/QWEN.md` |
-| Qoder | `${SKILL_WORKDIR}/QODER.md` 或 `${SKILL_WORKDIR}/.qoder/project_rules.md` |
-| opencode | `${SKILL_WORKDIR}/AGENTS.md` |
-
-> 若以上文件均不存在，则创建 `${SKILL_WORKDIR}/.specify/instructions.md` 并写入引用行。
+- **创建**：Mode 1 Setup 完成后，使用 `${SKILL_HOME}/assets/git-workflow-template.md` 生成。
+- **更新**：分支改名时更新 frontmatter 映射；新增异常经验追加到 Known Issues 章节；更新 `last_updated` 日期。
+- **数据源**：`docs/git-workflow.md` frontmatter 是后续所有操作的唯一分支名数据源。
 
 ## Resource ID
 
@@ -246,19 +314,13 @@ git rebase --abort
 
 ## Path Conventions
 
-This Skill follows the canonical path conventions:
-
-- Use `${SKILL_HOME}/<relative-path>` for every Skill-owned resource reference (scripts, references, assets).
-- Use `${SKILL_WORKDIR}/<relative-path>` for every runtime/user-facing path this Skill reads from or writes to (inputs in the user's project, outputs delivered to the user).
-- Never conflate the two; never embed agent-specific install paths.
+- `${SKILL_HOME}/<relative-path>` — Skill-owned resources (scripts, references, assets).
+- `${SKILL_WORKDIR}/<relative-path>` — runtime/user-facing paths.
 
 ## Resources
 
-### Scripts (`${SKILL_HOME}/scripts/`)
-- No scripts currently.
-
 ### References (`${SKILL_HOME}/references/`)
-- No references currently.
+- `instructions-lookup.md` — instructions 文档查找优先级表。
 
 ### Assets (`${SKILL_HOME}/assets/`)
-- `git-workflow-template.md` — `docs/git-workflow.md` 的生成模板，包含参数化占位符 `<MAIN>` / `<PRE>` / `<DEV>`。
+- `git-workflow-template.md` — `docs/git-workflow.md` 生成模板，含 `<MAIN>` / `<PRE>` / `<DEV>` 占位符。
