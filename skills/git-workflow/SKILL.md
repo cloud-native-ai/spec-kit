@@ -268,11 +268,13 @@ git stash push -u -m "pre-sync-$(date +%Y%m%d)"
 
 **核心逻辑**：
 
-1. **前置**：切换到目标分支后，先清理可能残留的旧标签（`git tag -d _gitexcludes_pre_sync`），再读取 `.gitexcludes` 并 `git tag _gitexcludes_pre_sync HEAD` 保存当前状态。
+1. **前置**：切换到目标分支后，先清理可能残留的旧标签（`git tag -d _gitexcludes_pre_sync`），再读取 `.gitexcludes` 并 `git tag _gitexcludes_pre_sync HEAD` 保存当前状态。**打印被保护文件清单供用户确认。**
 2. **执行**：正常执行 rebase 或 merge。
-3. **后置**：从保存点恢复 `.gitexcludes` 匹配的所有文件（含 `.gitexcludes` 本身），**移除 tag 中不存在但被 sync 新引入的文件**，若有变更则提交，清理临时标签。
+3. **后置**：从保存点恢复 `.gitexcludes` 匹配的所有文件（含 `.gitexcludes` 本身），移除 tag 中不存在但被 sync 新引入的文件，**逐项打印恢复/移除结果**，若有变更则提交，清理临时标签。
 
-> **设计原则**：谁接收代码（目标分支），谁的 `.gitexcludes` 说了算。方向无关。
+> **设计原则**：
+> - 谁接收代码（目标分支），谁的 `.gitexcludes` 说了算。方向无关。
+> - `.gitexcludes` 本身是固定排除项，各分支内容可不同，永不被其他分支覆盖。
 
 #### 3.4 解析并执行操作
 
@@ -442,7 +444,8 @@ git ls-files -- $(cat .gitexcludes | grep -v '^#' | grep -v '^$' | tr '\n' ' ')
 3. 禁止 `git push -f`，仅允许 `git push --force-with-lease`。
 4. 对共享分支执行强推前，必须完成"通知 + 同步窗口 + 回滚预案"。
 5. 同步/合并后必须验证 `.gitexcludes` 匹配的路径未被意外修改。
-6. `.gitexcludes` 文件本身始终被隐含保护，不会被其他分支版本覆盖。
+6. `.gitexcludes` 文件本身是**固定排除项**，各分支独立维护，永不被其他分支版本覆盖。
+7. 排除子程序的前置和后置必须打印明确的文件清单，供用户确认哪些文件被保护/移除。
 
 ## Known Issues & Mitigations
 
