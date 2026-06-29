@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash .specify/scripts/bash/generate-instructions.sh)",
+      "Bash(echo \"---exit $?---\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(.venv/bin/pytest tests/contract/test_refresh_tools_markdown.py tests/contract/test_tools_cross_source.py tests/contract/test_tools_discover.py tests/unit/test_tool_record.py tests/integration/test_tools_source_handling.py -x -v)",
+      "Bash(.venv/bin/python -m pytest tests/contract/test_refresh_tools_markdown.py tests/contract/test_tools_cross_source.py tests/contract/test_tools_discover.py tests/unit/test_tool_record.py tests/integration/test_tools_source_handling.py -x -v)",
+      "Bash(command -v pytest)",
+      "Bash(python3 -m pytest --version)",
+      "Bash(uv run *)",
+      "Bash(pipx run *)",
+      "Bash(.venv/bin/pip install *)",
+      "Bash(.venv/bin/python -m pytest tests/contract/test_refresh_tools_markdown.py tests/contract/test_tools_cross_source.py tests/contract/test_tools_discover.py tests/unit/test_tool_record.py tests/integration/test_tools_source_handling.py -v)",
+      "Bash(.venv/bin/python -m pytest tests/ --ignore=tests/contract/test_skill_creation_validation.py -q)",
+      "Bash(.venv/bin/python -m pytest tests/ -q)",
+      "Bash(.venv/bin/python -m pytest tests/integration/test_skill_install_layout_integration.py -v)",
+      "Bash(.specify/scripts/bash/create-new-skill.sh --json 'layout-placeholder-test123 - integration scenario')",
+      "Bash(echo \"exit: $?\")",
+      "Bash(git stash *)",
+      "Bash(.specify/scripts/bash/create-new-skill.sh --json 'layout-placeholder-test456 - integration scenario')",
+      "Bash(git fetch *)",
+      "Bash(git ls-remote *)",
+      "Bash(grep *)"
+    ]
+  }
+}

@@ -634,5 +634,5 @@ deactivate Gateway
 3. **Add labels to relationships**: `A --> B : uses via HTTP` is self-documenting
 4. **Use `note` for non-obvious details**: protocol, port, SLA, etc.
 5. **Split large diagrams**: If a diagram exceeds 15 elements, split into overview + drill-down
-6. **Maximize rendering quality**: Always include `skinparam dpi 300` and `scale 2` in the style block (see `plantuml-style.md`); this ensures PNG is 300 DPI high-resolution and SVG geometry has sufficient detail. Combined with `ArrowThickness 2` and `BorderThickness 2`, diagrams remain crisp when zoomed or scaled.
+6. **Maximize rendering quality**: Always include `skinparam dpi 300` and `scale 4` in the style block (see `plantuml-style.md`); this ensures SVG viewBox ≥ 3840×2160 (4K UHD) and PNG ≥ 4096px. Combined with `ArrowThickness 2` and `BorderThickness 2`, diagrams remain crisp when zoomed or scaled. Use [render-plantuml.sh](../scripts/render-plantuml.sh) to automatically inject the style block and render.
 7. **For detailed how-to per diagram type**: See `references/howto/` — each guide provides step-by-step instructions with complete examples

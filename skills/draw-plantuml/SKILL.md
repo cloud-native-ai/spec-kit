@@ -81,12 +81,11 @@ After drafting PlantUML code, **MUST** apply the standard style configuration de
 
 1. Insert the **base style block** immediately after `@startuml` (before any diagram content):
    ```plantuml
-   top to bottom direction
    skinparam monochrome true
    skinparam shadowing false
    skinparam roundCorner 20
    skinparam dpi 300
-   scale 2
+   scale 4
    skinparam defaultFontSize 14
    skinparam defaultFontName "Arial, Helvetica, sans-serif"
    skinparam padding 8
@@ -95,6 +94,7 @@ After drafting PlantUML code, **MUST** apply the standard style configuration de
    skinparam svgDimensionStyle false
    skinparam svgLinkTarget _blank
    ```
+   For **class/component/deployment diagrams** only, also add `top to bottom direction` as the first line. Do NOT add it for sequence/activity/state/use-case diagrams.
 2. If the diagram contains `actor` elements or is a Use Case Diagram, additionally add:
    ```plantuml
    skinparam actorStyle awesome
@@ -102,7 +102,7 @@ After drafting PlantUML code, **MUST** apply the standard style configuration de
 3. Verify placement: all style declarations must appear **after** `@startuml` and **before** any element definitions
 4. Verify no conflicts: ensure no duplicate or overriding `skinparam` declarations exist in the diagram body
 
-This ensures all output diagrams have a consistent, document-friendly visual style (monochrome, no shadow, rounded corners), rendered at 300 DPI with 2x scale for maximum resolution and crispness in both SVG and PNG output.
+This ensures all output diagrams have a consistent, document-friendly visual style (monochrome, no shadow, rounded corners), rendered at 300 DPI with 4x scale — SVG viewBox ≥ 3840×2160 (4K UHD), PNG ≥ 4096px — exceeding typical high-resolution displays.
 
 ### Step 5: Write Accompanying Text
 
@@ -115,39 +115,32 @@ For each diagram, prepare the following descriptive content (to be included in t
 
 ### Step 6: Render PlantUML to SVG/PNG
 
-After drafting and styling all PlantUML code, render each diagram into an SVG (preferred) or PNG image file using the PlantUML rendering service. All diagrams must be rendered at the highest possible quality — the style block in Step 4 already ensures `skinparam dpi 300` and `scale 2` are embedded in the PlantUML source, producing high-resolution output for both formats.
+After drafting and styling all PlantUML code, render each diagram into SVG (preferred) and PNG using the rendering script.
 
-**Rendering Service:**
-- SVG endpoint: `http://workspace.code-workspace.cloud:39156/plantuml/svg`
-- PNG endpoint: `http://workspace.code-workspace.cloud:39156/plantuml/png`
+**Rendering script:** [scripts/render-plantuml.sh](scripts/render-plantuml.sh)
 
-**Method:** HTTP POST with `Content-Type: text/plain`, body is the raw PlantUML text (including `@startuml` / `@enduml`).
-
-**Quality guarantees (built into the PlantUML source via Step 4 style block):**
-- `skinparam dpi 300` — PNG rendered at 300 DPI, ensuring high pixel density; SVG rasterized fallback also benefits
-- `scale 2` — diagram geometry doubled in size, increasing element spacing and detail precision
-- `skinparam defaultFontSize 14` — text remains legible at 2x scale
-- `skinparam ArrowThickness 2` / `BorderThickness 2` — lines stay visually clear after scaling
-- `skinparam svgDimensionStyle false` — SVG uses `viewBox` (no fixed width/height), enabling lossless CSS scaling
+The script automatically:
+- Injects the standard style block (`scale 4` + `dpi 300`) if missing, or overrides existing `scale` to 4
+- Renders to both SVG (vector, lossless) and PNG (high-res 300 DPI)
+- Saves `.puml` source alongside output files
 
 **Procedure for each diagram:**
-1. Save the PlantUML source text to a temporary `.puml` file (e.g., `diagram-01.puml`)
-2. Use `curl` to POST the file content and save the response:
-   ```bash
-   # SVG (preferred — vector, infinitely scalable, no quality loss on zoom)
-   curl -s -X POST -H "Content-Type: text/plain" --data-binary @diagram-01.puml \
-     "http://workspace.code-workspace.cloud:39156/plantuml/svg" -o diagram-01.svg
-   ```
-   ```bash
-   # PNG (high-res 300 DPI via skinparam dpi 300 + scale 2)
-   curl -s -X POST -H "Content-Type: text/plain" --data-binary @diagram-01.puml \
-     "http://workspace.code-workspace.cloud:39156/plantuml/png" -o diagram-01.png
-   ```
-3. Verify the output is a valid SVG/PNG (`file diagram-01.svg` should show SVG/XML content; `file diagram-01.png` should show PNG with large dimensions)
-4. Name files descriptively: `{nn}-{short-title}.svg` or `{nn}-{short-title}.png` (e.g., `01-system-overview.svg`)
-5. **For PNG output**: verify image dimensions with `identify diagram-01.png` or `file diagram-01.png` — expect dimensions significantly larger than default (typically 2000px+ width) due to `scale 2` and 300 DPI
+```bash
+bash ${SKILL_HOME}/scripts/render-plantuml.sh diagram-01.puml output_dir 01-system-overview
+```
 
-**Prefer SVG** for scalability and crisp rendering at any zoom level; use PNG when the user explicitly requests it or when the target platform does not support SVG. Both formats are rendered at maximum quality by the style configuration.
+**Output files** (in `output_dir`):
+- `01-system-overview.puml` — PlantUML source with style block applied
+- `01-system-overview.svg` — SVG (preferred, vector, infinitely scalable)
+- `01-system-overview.png` — PNG (300 DPI, high-resolution)
+
+**Verification:**
+1. Check the script output reports valid dimensions (SVG viewBox should be ≥ 3840 on at least one axis for medium diagrams)
+2. Verify SVG file is valid XML: `file diagram-01.svg` should show "SVG document"
+3. Verify PNG file: `file diagram-01.png` should show "PNG image data" with large dimensions
+4. Name files descriptively: `{nn}-{short-title}` (e.g., `01-system-overview`)
+
+**Prefer SVG** for scalability and crisp rendering at any zoom level; use PNG when the user explicitly requests it or when the target platform does not support SVG.
 
 ### Step 7: Assemble Final HTML Document
 
@@ -207,7 +200,7 @@ Combine all rendered diagrams and text into a **single HTML document** that disp
 ## Output Requirements
 
 - Output as a **single HTML document** (`.html` file) with rendered SVG/PNG diagrams
-- Diagrams MUST be rendered via the PlantUML server (`http://workspace.code-workspace.cloud:39156/plantuml/svg`) — do NOT embed raw PlantUML text in the final output
+- Diagrams MUST be rendered via the [render-plantuml.sh](scripts/render-plantuml.sh) script (which calls the PlantUML server internally) — do NOT embed raw PlantUML text in the final output
 - SVG/PNG image files saved alongside the HTML in the same output directory
 - HTML references images via relative paths (e.g., `<img src="01-overview.svg" />`)
 - For single-diagram outputs, inline SVG embedding is acceptable as an alternative
@@ -251,14 +244,14 @@ Before delivering the final document, verify:
 - [ ] All PlantUML source files (`.puml`) have matching `@startuml` / `@enduml`
 - [ ] Each diagram has been successfully rendered to SVG/PNG via the PlantUML server
 - [ ] SVG/PNG files are valid (verified with `file` command)
-- [ ] PNG files have high dimensions (2000px+ width), confirming `dpi 300` and `scale 2` took effect
+- [ ] PNG files have high dimensions (2000px+ width), confirming `dpi 300` and `scale 4` took effect
 - [ ] SVG files use `viewBox` without fixed width/height (confirm `svgDimensionStyle false` is active)
 - [ ] HTML references all diagram images with correct relative paths
 - [ ] Each diagram uses the correct UML type for its purpose
 - [ ] No diagram exceeds 15 elements (split if larger)
 - [ ] Text explanations reference specific elements in the diagram
 - [ ] `skinparam` provides consistent visual style across all diagrams
-- [ ] High-quality rendering params (`dpi 300`, `scale 2`, `ArrowThickness 2`, `BorderThickness 2`) present in all diagrams
+- [ ] High-quality rendering params (`dpi 300`, `scale 4`, `ArrowThickness 2`, `BorderThickness 2`) present in all diagrams
 - [ ] Aliases and labels are human-readable (not code identifiers)
 - [ ] Document has a clear narrative flow from overview to details
 - [ ] Relationship labels are present and describe the interaction (e.g., "uses via HTTP", not just "uses")
