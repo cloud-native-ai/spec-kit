@@ -102,7 +102,7 @@ After drafting PlantUML code, **MUST** apply the standard style configuration de
 3. Verify placement: all style declarations must appear **after** `@startuml` and **before** any element definitions
 4. Verify no conflicts: ensure no duplicate or overriding `skinparam` declarations exist in the diagram body
 
-This ensures all output diagrams have a consistent, document-friendly visual style (monochrome, no shadow, rounded corners), rendered at 300 DPI with 4x scale — SVG viewBox ≥ 3840×2160 (4K UHD), PNG ≥ 4096px — exceeding typical high-resolution displays.
+**注意：** `.puml` 源文件统一使用 `scale 4 + dpi 300`（面向 SVG 最高质量）。PNG 渲染由 `render-plantuml.sh` 脚本**自动计算**合适的 scale/dpi 参数，确保 PNG 输出 ≤ 4095×4095（低于 PlantUML Server 硬上限 4096）。无需手动为 PNG 调整样式。
 
 ### Step 5: Write Accompanying Text
 
@@ -119,10 +119,13 @@ After drafting and styling all PlantUML code, render each diagram into SVG (pref
 
 **Rendering script:** [scripts/render-plantuml.sh](scripts/render-plantuml.sh)
 
-The script automatically:
-- Injects the standard style block (`scale 4` + `dpi 300`) if missing, or overrides existing `scale` to 4
-- Renders to both SVG (vector, lossless) and PNG (high-res 300 DPI)
-- Saves `.puml` source alongside output files
+The script implements **SVG/PNG 双策略渲染**：
+- **SVG**：始终使用 `scale 4 + dpi 300`（矢量格式，无尺寸限制，无损缩放）
+- **PNG**：自适应计算 scale/dpi，确保输出 ≤ 4095×4095（低于 PlantUML Server 硬上限 4096）
+  - 从 SVG viewBox 推算图表实际大小
+  - 自动选择最大化质量且不超限的 scale + dpi 组合
+  - 渲染后验证 PNG 非空白（文件大小合理性检查）
+  - 若检测到空白输出，自动降级重试
 
 **Procedure for each diagram:**
 ```bash
@@ -130,17 +133,20 @@ bash ${SKILL_HOME}/scripts/render-plantuml.sh diagram-01.puml output_dir 01-syst
 ```
 
 **Output files** (in `output_dir`):
-- `01-system-overview.puml` — PlantUML source with style block applied
+- `01-system-overview.puml` — PlantUML source with SVG style block applied (scale 4)
 - `01-system-overview.svg` — SVG (preferred, vector, infinitely scalable)
-- `01-system-overview.png` — PNG (300 DPI, high-resolution)
+- `01-system-overview.png` — PNG (adaptive resolution, ≤ 4095×4095)
 
 **Verification:**
 1. Check the script output reports valid dimensions (SVG viewBox should be ≥ 3840 on at least one axis for medium diagrams)
 2. Verify SVG file is valid XML: `file diagram-01.svg` should show "SVG document"
-3. Verify PNG file: `file diagram-01.png` should show "PNG image data" with large dimensions
-4. Name files descriptively: `{nn}-{short-title}` (e.g., `01-system-overview`)
+3. Verify PNG file: `file diagram-01.png` should show "PNG image data" with dimensions ≤ 4095 on both axes
+4. Verify PNG is not blank: file size should be > 100KB for 4000+ pixel images (blank 4096×4096 ≈ 60KB)
+5. Name files descriptively: `{nn}-{short-title}` (e.g., `01-system-overview`)
 
 **Prefer SVG** for scalability and crisp rendering at any zoom level; use PNG when the user explicitly requests it or when the target platform does not support SVG.
+
+**PNG 限制说明：** PlantUML Server 对 PNG 有 4096×4096 硬上限。当图表元素过多（>15）时，PNG 质量可能受限。此时应强制使用 SVG。
 
 ### Step 7: Assemble Final HTML Document
 
@@ -242,16 +248,19 @@ Original reference materials on UML theory, PlantUML tools, modeling methodology
 
 Before delivering the final document, verify:
 - [ ] All PlantUML source files (`.puml`) have matching `@startuml` / `@enduml`
-- [ ] Each diagram has been successfully rendered to SVG/PNG via the PlantUML server
-- [ ] SVG/PNG files are valid (verified with `file` command)
-- [ ] PNG files have high dimensions (2000px+ width), confirming `dpi 300` and `scale 4` took effect
+- [ ] Each diagram has been successfully rendered to SVG/PNG via `render-plantuml.sh`
+- [ ] SVG files are valid XML (verified with `file` command)
 - [ ] SVG files use `viewBox` without fixed width/height (confirm `svgDimensionStyle false` is active)
+- [ ] SVG viewBox ≥ 3840 on at least one axis（confirm `scale 4 + dpi 300` took effect）
+- [ ] PNG files dimensions ≤ 4095×4095（不触发 Server 4096 硬上限）
+- [ ] PNG files are NOT blank: file size > 100KB for large images（4096×4096 且 <100KB = 空白）
+- [ ] PNG output confirmed by script "Rendering Complete" without WARNING
 - [ ] HTML references all diagram images with correct relative paths
 - [ ] Each diagram uses the correct UML type for its purpose
 - [ ] No diagram exceeds 15 elements (split if larger)
 - [ ] Text explanations reference specific elements in the diagram
 - [ ] `skinparam` provides consistent visual style across all diagrams
-- [ ] High-quality rendering params (`dpi 300`, `scale 4`, `ArrowThickness 2`, `BorderThickness 2`) present in all diagrams
+- [ ] `.puml` source contains `scale 4 + dpi 300`（SVG 质量保证）
 - [ ] Aliases and labels are human-readable (not code identifiers)
 - [ ] Document has a clear narrative flow from overview to details
 - [ ] Relationship labels are present and describe the interaction (e.g., "uses via HTTP", not just "uses")
