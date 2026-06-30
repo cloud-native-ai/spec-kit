@@ -164,13 +164,31 @@ main() {
 
   mkdir -p "$output_dir"
 
+  # ── Guard: prevent input/output path collision ──
+  # When output_dir/prefix.puml resolves to the same file as input,
+  # inject_style's shell redirection would truncate the input before reading.
+  # Fix: copy input to a temp file and use that as the source.
+  local real_input
+  real_input=$(cd "$(dirname "$input")" && pwd)/$(basename "$input")
+  local real_output
+  real_output=$(cd "$output_dir" && pwd)/${prefix}.puml
+
+  local effective_input="$input"
+  local _input_tmp=""
+  if [[ "$real_input" == "$real_output" ]]; then
+    _input_tmp=$(mktemp "${output_dir}/${prefix}.src.XXXXXX.puml")
+    cp "$input" "$_input_tmp"
+    effective_input="$_input_tmp"
+    log "Input/output path collision detected; using temp copy: ${_input_tmp}"
+  fi
+
   local puml="${output_dir}/${prefix}.puml"
   local svg="${output_dir}/${prefix}.svg"
   local png="${output_dir}/${prefix}.png"
   local png_puml="${output_dir}/${prefix}.png.tmp.puml"
 
   # ── Step 1: Render SVG (always at max quality) ──
-  inject_style "$input" "$puml" "$SVG_SCALE" "$SVG_DPI"
+  inject_style "$effective_input" "$puml" "$SVG_SCALE" "$SVG_DPI"
   log "SVG style applied (scale=${SVG_SCALE}, dpi=${SVG_DPI})"
 
   log "Rendering SVG..."
@@ -189,7 +207,7 @@ main() {
   log "PNG adaptive params: scale=${png_scale}, dpi=${png_dpi} (target ≤ ${PNG_MAX}px)"
 
   # ── Step 3: Render PNG with adaptive parameters ──
-  inject_style "$input" "$png_puml" "$png_scale" "$png_dpi"
+  inject_style "$effective_input" "$png_puml" "$png_scale" "$png_dpi"
 
   log "Rendering PNG..."
   if ! curl -sf -X POST -H "Content-Type: text/plain" \
@@ -207,7 +225,7 @@ main() {
     # Fallback: scale 1, dpi 150
     local fallback_scale=1
     local fallback_dpi=150
-    inject_style "$input" "$png_puml" "$fallback_scale" "$fallback_dpi"
+    inject_style "$effective_input" "$png_puml" "$fallback_scale" "$fallback_dpi"
     log "PNG fallback: scale=${fallback_scale}, dpi=${fallback_dpi}"
 
     curl -sf -X POST -H "Content-Type: text/plain" \
@@ -219,6 +237,7 @@ main() {
   fi
 
   rm -f "$png_puml"
+  [[ -n "$_input_tmp" ]] && rm -f "$_input_tmp"
 
   # ── Step 5: Report results ──
   local svg_vb png_dim png_size

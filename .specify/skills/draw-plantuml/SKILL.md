@@ -23,7 +23,7 @@ Every diagram must follow standard UML diagram types. Avoid ad-hoc "boxes and ar
 The markdown text should tell a story: start with system context, then drill into components and their interactions. Diagrams and text complement each other — text explains *why*, diagrams show *what*.
 
 ### 3. PlantUML Best Practices
-For PlantUML-specific conventions (syntax, styling, element types, relationship notation), see [plantuml-guide.md](references/plantuml-guide.md). Key principles: use `skinparam` for consistent styling, keep diagrams ≤15 elements, use meaningful labels.
+For PlantUML-specific conventions (syntax, styling, element types, relationship notation), see [plantuml-guide.md](references/plantuml-guide.md). For layout optimization, content organization, and collaboration conventions, see [plantuml-best-practices.md](references/plantuml-best-practices.md). Key principles: use `skinparam` for consistent styling, keep diagrams ≤7 core elements (≤15 hard limit), control layout via direction keywords and grouping, use meaningful labels.
 
 ## Workflow
 
@@ -71,9 +71,17 @@ Based on the how-to guide and the user's system information:
 1. Identify the key elements (participants/nodes/components/classes/etc.) from the user's description
 2. Define the relationships between them (dependencies, messages, transitions, etc.)
 3. Write PlantUML code with `@startuml` / `@enduml` wrapping
-4. Keep each diagram focused: ≤15 elements; split into multiple diagrams if larger
+4. Keep each diagram focused: ≤7 core elements (acceptable ≤12, hard limit 15); split into multiple diagrams if larger
+5. **Apply layout best practices**: use direction keywords (`-right->`, `-down->`), group related elements (`together{}`), and declare elements before relationships
+6. **Keep labels short (≤10 chars)**: element names and relationship labels must not exceed 10 characters; use `note` elements for supplementary details
 
 For PlantUML syntax details (element types, relationship notation, styling, patterns), reference [plantuml-guide.md](references/plantuml-guide.md). The guide includes a **Quick Syntax Reference by Diagram Type** table covering all 7 diagram types.
+
+**MUST** also follow [plantuml-best-practices.md](references/plantuml-best-practices.md) for:
+- Layout optimization (§1): direction control, hidden connections, grouping, spacing
+- Content organization (§2): single responsibility, C4 layered splitting, element ordering
+- Visual highlighting (§3): **label length ≤10 chars**, note placement, alias readability
+- Per-diagram-type layout guidance (§5): recommended direction and layout focus for each UML type
 
 ### Step 4: Apply Standard Style
 
@@ -81,12 +89,11 @@ After drafting PlantUML code, **MUST** apply the standard style configuration de
 
 1. Insert the **base style block** immediately after `@startuml` (before any diagram content):
    ```plantuml
-   top to bottom direction
    skinparam monochrome true
    skinparam shadowing false
    skinparam roundCorner 20
    skinparam dpi 300
-   scale 2
+   scale 4
    skinparam defaultFontSize 14
    skinparam defaultFontName "Arial, Helvetica, sans-serif"
    skinparam padding 8
@@ -95,6 +102,7 @@ After drafting PlantUML code, **MUST** apply the standard style configuration de
    skinparam svgDimensionStyle false
    skinparam svgLinkTarget _blank
    ```
+   For **class/component/deployment diagrams** only, also add `top to bottom direction` as the first line. Do NOT add it for sequence/activity/state/use-case diagrams.
 2. If the diagram contains `actor` elements or is a Use Case Diagram, additionally add:
    ```plantuml
    skinparam actorStyle awesome
@@ -102,7 +110,7 @@ After drafting PlantUML code, **MUST** apply the standard style configuration de
 3. Verify placement: all style declarations must appear **after** `@startuml` and **before** any element definitions
 4. Verify no conflicts: ensure no duplicate or overriding `skinparam` declarations exist in the diagram body
 
-This ensures all output diagrams have a consistent, document-friendly visual style (monochrome, no shadow, rounded corners), rendered at 300 DPI with 2x scale for maximum resolution and crispness in both SVG and PNG output.
+**注意：** `.puml` 源文件统一使用 `scale 4 + dpi 300`（面向 SVG 最高质量）。PNG 渲染由 `render-plantuml.sh` 脚本**自动计算**合适的 scale/dpi 参数，确保 PNG 输出 ≤ 4095×4095（低于 PlantUML Server 硬上限 4096）。无需手动为 PNG 调整样式。
 
 ### Step 5: Write Accompanying Text
 
@@ -115,39 +123,38 @@ For each diagram, prepare the following descriptive content (to be included in t
 
 ### Step 6: Render PlantUML to SVG/PNG
 
-After drafting and styling all PlantUML code, render each diagram into an SVG (preferred) or PNG image file using the PlantUML rendering service. All diagrams must be rendered at the highest possible quality — the style block in Step 4 already ensures `skinparam dpi 300` and `scale 2` are embedded in the PlantUML source, producing high-resolution output for both formats.
+After drafting and styling all PlantUML code, render each diagram into SVG (preferred) and PNG using the rendering script.
 
-**Rendering Service:**
-- SVG endpoint: `http://workspace.code-workspace.cloud:39156/plantuml/svg`
-- PNG endpoint: `http://workspace.code-workspace.cloud:39156/plantuml/png`
+**Rendering script:** [scripts/render-plantuml.sh](scripts/render-plantuml.sh)
 
-**Method:** HTTP POST with `Content-Type: text/plain`, body is the raw PlantUML text (including `@startuml` / `@enduml`).
-
-**Quality guarantees (built into the PlantUML source via Step 4 style block):**
-- `skinparam dpi 300` — PNG rendered at 300 DPI, ensuring high pixel density; SVG rasterized fallback also benefits
-- `scale 2` — diagram geometry doubled in size, increasing element spacing and detail precision
-- `skinparam defaultFontSize 14` — text remains legible at 2x scale
-- `skinparam ArrowThickness 2` / `BorderThickness 2` — lines stay visually clear after scaling
-- `skinparam svgDimensionStyle false` — SVG uses `viewBox` (no fixed width/height), enabling lossless CSS scaling
+The script implements **SVG/PNG 双策略渲染**：
+- **SVG**：始终使用 `scale 4 + dpi 300`（矢量格式，无尺寸限制，无损缩放）
+- **PNG**：自适应计算 scale/dpi，确保输出 ≤ 4095×4095（低于 PlantUML Server 硬上限 4096）
+  - 从 SVG viewBox 推算图表实际大小
+  - 自动选择最大化质量且不超限的 scale + dpi 组合
+  - 渲染后验证 PNG 非空白（文件大小合理性检查）
+  - 若检测到空白输出，自动降级重试
 
 **Procedure for each diagram:**
-1. Save the PlantUML source text to a temporary `.puml` file (e.g., `diagram-01.puml`)
-2. Use `curl` to POST the file content and save the response:
-   ```bash
-   # SVG (preferred — vector, infinitely scalable, no quality loss on zoom)
-   curl -s -X POST -H "Content-Type: text/plain" --data-binary @diagram-01.puml \
-     "http://workspace.code-workspace.cloud:39156/plantuml/svg" -o diagram-01.svg
-   ```
-   ```bash
-   # PNG (high-res 300 DPI via skinparam dpi 300 + scale 2)
-   curl -s -X POST -H "Content-Type: text/plain" --data-binary @diagram-01.puml \
-     "http://workspace.code-workspace.cloud:39156/plantuml/png" -o diagram-01.png
-   ```
-3. Verify the output is a valid SVG/PNG (`file diagram-01.svg` should show SVG/XML content; `file diagram-01.png` should show PNG with large dimensions)
-4. Name files descriptively: `{nn}-{short-title}.svg` or `{nn}-{short-title}.png` (e.g., `01-system-overview.svg`)
-5. **For PNG output**: verify image dimensions with `identify diagram-01.png` or `file diagram-01.png` — expect dimensions significantly larger than default (typically 2000px+ width) due to `scale 2` and 300 DPI
+```bash
+bash ${SKILL_HOME}/scripts/render-plantuml.sh diagram-01.puml output_dir 01-system-overview
+```
 
-**Prefer SVG** for scalability and crisp rendering at any zoom level; use PNG when the user explicitly requests it or when the target platform does not support SVG. Both formats are rendered at maximum quality by the style configuration.
+**Output files** (in `output_dir`):
+- `01-system-overview.puml` — PlantUML source with SVG style block applied (scale 4)
+- `01-system-overview.svg` — SVG (preferred, vector, infinitely scalable)
+- `01-system-overview.png` — PNG (adaptive resolution, ≤ 4095×4095)
+
+**Verification:**
+1. Check the script output reports valid dimensions (SVG viewBox should be ≥ 3840 on at least one axis for medium diagrams)
+2. Verify SVG file is valid XML: `file diagram-01.svg` should show "SVG document"
+3. Verify PNG file: `file diagram-01.png` should show "PNG image data" with dimensions ≤ 4095 on both axes
+4. Verify PNG is not blank: file size should be > 100KB for 4000+ pixel images (blank 4096×4096 ≈ 60KB)
+5. Name files descriptively: `{nn}-{short-title}` (e.g., `01-system-overview`)
+
+**Prefer SVG** for scalability and crisp rendering at any zoom level; use PNG when the user explicitly requests it or when the target platform does not support SVG.
+
+**PNG 限制说明：** PlantUML Server 对 PNG 有 4096×4096 硬上限。当图表元素过多（>15）时，PNG 质量可能受限。此时应强制使用 SVG。
 
 ### Step 7: Assemble Final HTML Document
 
@@ -207,7 +214,7 @@ Combine all rendered diagrams and text into a **single HTML document** that disp
 ## Output Requirements
 
 - Output as a **single HTML document** (`.html` file) with rendered SVG/PNG diagrams
-- Diagrams MUST be rendered via the PlantUML server (`http://workspace.code-workspace.cloud:39156/plantuml/svg`) — do NOT embed raw PlantUML text in the final output
+- Diagrams MUST be rendered via the [render-plantuml.sh](scripts/render-plantuml.sh) script (which calls the PlantUML server internally) — do NOT embed raw PlantUML text in the final output
 - SVG/PNG image files saved alongside the HTML in the same output directory
 - HTML references images via relative paths (e.g., `<img src="01-overview.svg" />`)
 - For single-diagram outputs, inline SVG embedding is acceptable as an alternative
@@ -239,6 +246,7 @@ Step-by-step guides organized by diagram type and PlantUML syntax. Start here fo
 | Document | Content |
 |----------|---------|  
 | [plantuml-guide.md](references/plantuml-guide.md) | Complete PlantUML syntax reference for architecture diagrams: all supported diagram types, element types, relationship syntax, skinparam customization, and common patterns |
+| [plantuml-best-practices.md](references/plantuml-best-practices.md) | Layout optimization, content organization, collaboration conventions, and per-diagram-type layout guidance. **MUST read during Step 3** |
 | [plantuml-official-docs.md](references/plantuml-official-docs.md) | PlantUML official documentation and advanced features. Load on-demand for syntax edge cases or less common diagram types |
 
 ### Source Documents (`references/document/`)
@@ -249,17 +257,21 @@ Original reference materials on UML theory, PlantUML tools, modeling methodology
 
 Before delivering the final document, verify:
 - [ ] All PlantUML source files (`.puml`) have matching `@startuml` / `@enduml`
-- [ ] Each diagram has been successfully rendered to SVG/PNG via the PlantUML server
-- [ ] SVG/PNG files are valid (verified with `file` command)
-- [ ] PNG files have high dimensions (2000px+ width), confirming `dpi 300` and `scale 2` took effect
+- [ ] Each diagram has been successfully rendered to SVG/PNG via `render-plantuml.sh`
+- [ ] SVG files are valid XML (verified with `file` command)
 - [ ] SVG files use `viewBox` without fixed width/height (confirm `svgDimensionStyle false` is active)
+- [ ] SVG viewBox ≥ 3840 on at least one axis（confirm `scale 4 + dpi 300` took effect）
+- [ ] PNG files dimensions ≤ 4095×4095（不触发 Server 4096 硬上限）
+- [ ] PNG files are NOT blank: file size > 100KB for large images（4096×4096 且 <100KB = 空白）
+- [ ] PNG output confirmed by script "Rendering Complete" without WARNING
 - [ ] HTML references all diagram images with correct relative paths
 - [ ] Each diagram uses the correct UML type for its purpose
-- [ ] No diagram exceeds 15 elements (split if larger)
+- [ ] No diagram exceeds 7 core elements (acceptable ≤12; hard limit 15); split if larger
 - [ ] Text explanations reference specific elements in the diagram
 - [ ] `skinparam` provides consistent visual style across all diagrams
-- [ ] High-quality rendering params (`dpi 300`, `scale 2`, `ArrowThickness 2`, `BorderThickness 2`) present in all diagrams
+- [ ] `.puml` source contains `scale 4 + dpi 300`（SVG 质量保证）
 - [ ] Aliases and labels are human-readable (not code identifiers)
+- [ ] All element names and relationship labels ≤10 characters; longer descriptions use `note` elements
 - [ ] Document has a clear narrative flow from overview to details
 - [ ] Relationship labels are present and describe the interaction (e.g., "uses via HTTP", not just "uses")
 - [ ] No orphan elements (every element has at least one relationship)

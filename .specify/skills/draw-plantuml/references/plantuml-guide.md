@@ -633,6 +633,9 @@ deactivate Gateway
 2. **Keep aliases meaningful**: `[OrderService] as OS` is better than `[C1]`
 3. **Add labels to relationships**: `A --> B : uses via HTTP` is self-documenting
 4. **Use `note` for non-obvious details**: protocol, port, SLA, etc.
-5. **Split large diagrams**: If a diagram exceeds 15 elements, split into overview + drill-down
-6. **Maximize rendering quality**: Always include `skinparam dpi 300` and `scale 2` in the style block (see `plantuml-style.md`); this ensures PNG is 300 DPI high-resolution and SVG geometry has sufficient detail. Combined with `ArrowThickness 2` and `BorderThickness 2`, diagrams remain crisp when zoomed or scaled.
+5. **Split large diagrams**: If a diagram exceeds 7 core elements, split into overview + drill-down (hard limit 15)
+6. **Maximize rendering quality**: Always include `skinparam dpi 300` and `scale 4` in the style block (see `plantuml-style.md`); this ensures SVG viewBox ≥ 3840×2160 (4K UHD) and PNG ≥ 4096px. Combined with `ArrowThickness 2` and `BorderThickness 2`, diagrams remain crisp when zoomed or scaled. Use [render-plantuml.sh](../scripts/render-plantuml.sh) to automatically inject the style block and render.
 7. **For detailed how-to per diagram type**: See `references/howto/` — each guide provides step-by-step instructions with complete examples
+8. **Control layout actively**: Use direction keywords (`-right->`, `-down->`), hidden connections (`-[hidden]->`), and `together{}` grouping to prevent auto-layout from scattering related elements. See [plantuml-best-practices.md](./plantuml-best-practices.md) §1 for full details.
+9. **Declare elements before relationships**: First list all participants/components/classes, then define connections — this makes source code scannable and produces more predictable layouts.
+10. **Adjust spacing for dense diagrams**: Use `skinparam nodesep 40` and `skinparam ranksep 60` when elements overlap. See [plantuml-best-practices.md](./plantuml-best-practices.md) §1.4 for recommended values by complexity level.

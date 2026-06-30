@@ -2,23 +2,29 @@
 
 本文件定义 draw-plantuml 技能生成的所有 PlantUML 图表必须遵循的统一样式规范。在 Step 3 编写完 PlantUML 代码后，**必须**按照本配置对样式进行校验和调整。
 
+**渲染方式**：使用 [render-plantuml.sh](../scripts/render-plantuml.sh) 脚本渲染。脚本实现 SVG/PNG 双策略：
+- **SVG**：注入 `scale 4 + dpi 300`（矢量无损，viewBox ≥ 3840×2160）
+- **PNG**：自适应计算 scale/dpi，确保输出 ≤ 4095×4095（低于 Server 硬上限 4096）
+
 ## 基础样式模板（所有图表类型通用）
 
 以下配置项必须插入在 `@startuml` 之后、图表内容之前：
 
+> **注意**：`top to bottom direction` 仅适用于类图/组件图/部署图。时序图、活动图、状态机图、用例图请使用各自默认方向或 `left to right direction`（用例图），不要强行添加方向指令。渲染脚本 `render-plantuml.sh` 不会注入方向指令，由作者根据图表类型自行决定。
+
 ```plantuml
 @startuml
-' === 布局方向 ===
-top to bottom direction
+' === 布局方向（仅类图/组件图/部署图适用，其他图类型请省略） ===
+' top to bottom direction
 
 ' === 通用样式 ===
 skinparam monochrome true
 skinparam shadowing false
 skinparam roundCorner 20
 
-' === 高质量渲染（PNG/SVG 通用） ===
+' === 高质量渲染（面向 SVG；PNG 由脚本自适应调整） ===
 skinparam dpi 300
-scale 2
+scale 4
 skinparam defaultFontSize 14
 skinparam defaultFontName "Arial, Helvetica, sans-serif"
 skinparam padding 8
@@ -42,17 +48,36 @@ skinparam svgLinkTarget _blank
 skinparam actorStyle awesome
 ```
 
+## SVG/PNG 双策略说明
+
+| 格式 | 策略 | 参数 | 输出尺寸 | 适用场景 |
+|------|------|------|----------|----------|
+| **SVG** | 最大质量 | `scale 4 + dpi 300` | viewBox ≥ 3840×2160 (4K UHD) | 所有图表（首选格式） |
+| **PNG** | 自适应 | 脚本计算 | ≤ 4095×4095 | 用户明确要求/平台不支持 SVG |
+
+**PNG 自适应算法：**
+1. 先渲染 SVG，获取 viewBox 尺寸
+2. 从 viewBox 推算图表 base size（= viewBox / SVG_SCALE）
+3. 计算最大 scale 使 `base_size × scale ≤ 4095`
+4. 若 scale < 1，则固定 scale=1 并降低 DPI：`dpi = 4095 × 300 / base_size`
+5. 渲染后验证：若 PNG = 4096×4096 且文件 < 100KB → 判定空白，降级重试
+
+**PlantUML Server PNG 硬上限：**
+- 输出尺寸硬上限：4096×4096（任何参数都无法超越）
+- 当 `scale × dpi × 图表尺寸` 导致内部渲染缓冲区溢出时，Server **静默返回空白 PNG**
+- 本技能使用 4095 作为目标上限，确保安全距离
+
 ## 配置项说明
 
 | 配置项 | 作用 | 适用范围 |
 |--------|------|----------|
-| `top to bottom direction` | 图的方向从上到下，保持阅读顺序一致 | 所有图表 |
+| `top to bottom direction` | 图的方向从上到下，保持阅读顺序一致。**仅类图/组件图/部署图适用**，时序图/活动图/状态机/用例图不要添加 | 类图、组件图、部署图 |
 | `skinparam monochrome true` | 黑白单色输出，适合文档和打印 | 所有图表 |
 | `skinparam shadowing false` | 去除阴影效果，保持视觉简洁 | 所有图表 |
 | `skinparam roundCorner 20` | 统一圆角半径为 20px | 所有图表 |
-| `skinparam dpi 300` | PNG 渲染使用 300 DPI，保证高像素密度，缩放后仍清晰 | 所有图表（主要影响 PNG） |
-| `scale 2` | 图表整体放大 2 倍，增加元素间距和细节精度 | 所有图表 |
-| `skinparam defaultFontSize 14` | 默认字体 14pt，配合 scale 2 保证文字可读性 | 所有图表 |
+| `skinparam dpi 300` | SVG 高密度渲染；PNG 由脚本按需调整 | 所有图表（.puml 源文件） |
+| `scale 4` | SVG viewBox 放大 4 倍（≥ 3840×2160）；PNG 由脚本按需缩减 | 所有图表（.puml 源文件） |
+| `skinparam defaultFontSize 14` | 默认字体 14pt，配合 scale 4 保证文字可读性 | 所有图表 |
 | `skinparam defaultFontName "Arial, ..."` | 使用无衬线字体，渲染清晰抗锯齿 | 所有图表 |
 | `skinparam padding 8` | 元素内边距 8px，避免内容拥挤贴边 | 所有图表 |
 | `skinparam ArrowThickness 2` | 箭头线条加粗为 2px，配合放大后保持视觉清晰 | 所有图表 |
@@ -65,10 +90,16 @@ skinparam actorStyle awesome
 
 在完成 PlantUML 代码后，逐项检查：
 
-1. **布局方向**：确认 `top to bottom direction` 在 `@startuml` 之后的第一行（注释除外）
+1. **布局方向**：确认 `top to bottom direction` 仅在类图/组件图/部署图中使用（其他图类型不应出现此指令）
 2. **通用 skinparam**：确认 5 项通用 skinparam 全部存在且值正确
-3. **高质量渲染 skinparam**：确认 `dpi 300`、`scale 2`、`defaultFontSize 14`、`defaultFontName`、`padding 8`、`ArrowThickness 2`、`BorderThickness 2` 全部存在
+3. **高质量渲染 skinparam**：确认 `dpi 300`、`scale 4`、`defaultFontSize 14`、`defaultFontName`、`padding 8`、`ArrowThickness 2`、`BorderThickness 2` 全部存在
 4. **SVG 优化 skinparam**：确认 `svgDimensionStyle false` 和 `svgLinkTarget _blank` 存在
 5. **条件 skinparam**：如图表含 actor 或为用例图，确认 `actorStyle awesome` 已添加
 6. **位置**：所有样式配置必须在 `@startuml` 之后、图表元素定义之前
 7. **无冲突**：确认图表内容中没有覆盖上述 skinparam 的重复声明
+8. **PNG 安全**：确认渲染脚本输出无 WARNING（表示 PNG 未触发 4096 硬上限）
+
+## 扩展阅读
+
+- **布局优化与内容组织最佳实践**：参见 [plantuml-best-practices.md](./plantuml-best-practices.md)
+- **间距调整**：`skinparam nodesep` / `skinparam ranksep` 参数说明见最佳实践文档 §1.4

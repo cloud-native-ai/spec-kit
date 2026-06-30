@@ -23,7 +23,7 @@ Every diagram must follow standard UML diagram types. Avoid ad-hoc "boxes and ar
 The markdown text should tell a story: start with system context, then drill into components and their interactions. Diagrams and text complement each other — text explains *why*, diagrams show *what*.
 
 ### 3. PlantUML Best Practices
-For PlantUML-specific conventions (syntax, styling, element types, relationship notation), see [plantuml-guide.md](references/plantuml-guide.md). Key principles: use `skinparam` for consistent styling, keep diagrams ≤15 elements, use meaningful labels.
+For PlantUML-specific conventions (syntax, styling, element types, relationship notation), see [plantuml-guide.md](references/plantuml-guide.md). For layout optimization, content organization, and collaboration conventions, see [plantuml-best-practices.md](references/plantuml-best-practices.md). Key principles: use `skinparam` for consistent styling, keep diagrams ≤7 core elements (≤15 hard limit), control layout via direction keywords and grouping, use meaningful labels.
 
 ## Workflow
 
@@ -71,9 +71,17 @@ Based on the how-to guide and the user's system information:
 1. Identify the key elements (participants/nodes/components/classes/etc.) from the user's description
 2. Define the relationships between them (dependencies, messages, transitions, etc.)
 3. Write PlantUML code with `@startuml` / `@enduml` wrapping
-4. Keep each diagram focused: ≤15 elements; split into multiple diagrams if larger
+4. Keep each diagram focused: ≤7 core elements (acceptable ≤12, hard limit 15); split into multiple diagrams if larger
+5. **Apply layout best practices**: use direction keywords (`-right->`, `-down->`), group related elements (`together{}`), and declare elements before relationships
+6. **Keep labels short (≤10 chars)**: element names and relationship labels must not exceed 10 characters; use `note` elements for supplementary details
 
 For PlantUML syntax details (element types, relationship notation, styling, patterns), reference [plantuml-guide.md](references/plantuml-guide.md). The guide includes a **Quick Syntax Reference by Diagram Type** table covering all 7 diagram types.
+
+**MUST** also follow [plantuml-best-practices.md](references/plantuml-best-practices.md) for:
+- Layout optimization (§1): direction control, hidden connections, grouping, spacing
+- Content organization (§2): single responsibility, C4 layered splitting, element ordering
+- Visual highlighting (§3): **label length ≤10 chars**, note placement, alias readability
+- Per-diagram-type layout guidance (§5): recommended direction and layout focus for each UML type
 
 ### Step 4: Apply Standard Style
 
@@ -238,6 +246,7 @@ Step-by-step guides organized by diagram type and PlantUML syntax. Start here fo
 | Document | Content |
 |----------|---------|  
 | [plantuml-guide.md](references/plantuml-guide.md) | Complete PlantUML syntax reference for architecture diagrams: all supported diagram types, element types, relationship syntax, skinparam customization, and common patterns |
+| [plantuml-best-practices.md](references/plantuml-best-practices.md) | Layout optimization, content organization, collaboration conventions, and per-diagram-type layout guidance. **MUST read during Step 3** |
 | [plantuml-official-docs.md](references/plantuml-official-docs.md) | PlantUML official documentation and advanced features. Load on-demand for syntax edge cases or less common diagram types |
 
 ### Source Documents (`references/document/`)
@@ -257,11 +266,12 @@ Before delivering the final document, verify:
 - [ ] PNG output confirmed by script "Rendering Complete" without WARNING
 - [ ] HTML references all diagram images with correct relative paths
 - [ ] Each diagram uses the correct UML type for its purpose
-- [ ] No diagram exceeds 15 elements (split if larger)
+- [ ] No diagram exceeds 7 core elements (acceptable ≤12; hard limit 15); split if larger
 - [ ] Text explanations reference specific elements in the diagram
 - [ ] `skinparam` provides consistent visual style across all diagrams
 - [ ] `.puml` source contains `scale 4 + dpi 300`（SVG 质量保证）
 - [ ] Aliases and labels are human-readable (not code identifiers)
+- [ ] All element names and relationship labels ≤10 characters; longer descriptions use `note` elements
 - [ ] Document has a clear narrative flow from overview to details
 - [ ] Relationship labels are present and describe the interaction (e.g., "uses via HTTP", not just "uses")
 - [ ] No orphan elements (every element has at least one relationship)
