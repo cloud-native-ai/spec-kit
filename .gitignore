@@ -43,6 +43,7 @@ Thumbs.db
 .env*
 *.lock
 tmp/
+output/
 
 # Spec Kit-specific files
 .genreleases/
