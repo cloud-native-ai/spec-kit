@@ -167,7 +167,7 @@ When processing the user input:
    - Provide clear error messages with context for debugging
    - Suggest next steps if implementation cannot proceed
    - **IMPORTANT** For completed tasks, mark the task as `[X]` in `tasks.md`.
-   - **Deferred tasks are first-class**: if a task cannot be executed in this run because it requires a resource the runtime does not have (real docker daemon, external system access, multi-day backfill, manual sign-off), DO NOT silently leave it `[ ]`. Mark it `[~]` and add a one-line `<!-- deferred: <reason> -->` HTML comment on the row. Also append its ID to `deferred_tasks=` in `verification.log`. The run summary at the end MUST contain a `## Deferred Tasks` block listing every `[~]` row and its reason.
+   - **Deferred tasks are first-class**: if a task cannot be executed in this run because it requires a resource the runtime does not have (real docker daemon, external system access, multi-day backfill, manual sign-off), DO NOT silently leave it `[ ]`. Mark it `[~]` and add a one-line `<!-- deferred: <reason> -->` HTML comment on the row. Also append its ID to `deferred_tasks=` in `verification.md`. The run summary at the end MUST contain a `## Deferred Tasks` block listing every `[~]` row and its reason.
    - Failure ≠ deferral: a task that genuinely tried and errored stays `[ ]` and the run halts (unless [P]); only intentional handoffs become `[~]`.
 
 9. Completion validation:
@@ -183,11 +183,11 @@ When processing the user input:
 
     1. **Convert deferred tasks**: For every `[ ]` task that was intentionally skipped (requires resources unavailable in this run), convert it to `[~]` with an inline `<!-- deferred: <reason> -->` comment. Do NOT leave deferred work as `[ ]`.
     2. **Zero open-task check**: Run `grep -cE '^\- \[ \]' tasks.md`. If the result is NOT 0, the gate FAILS — refuse to advance status. Either complete the remaining tasks or convert them to `[~]` with justification.
-    3. **Verification log completeness**: Confirm that `verification.log` has a `SC-NNN_status=` row for EVERY Success Criterion declared in `requirements.md`. Each status must be one of: `pass`, `fail`, `partial`, `deferred`, `unknown`. If any SC row is missing, add it before advancing.
-    4. **Deferred task registry**: If any tasks are `[~]`, verify that `deferred_tasks=` in `verification.log` lists their IDs (comma-separated) and `deferred_reason_summary=` is filled.
+    3. **Verification log completeness**: Confirm that `verification.md` has a `SC-NNN_status=` row for EVERY Success Criterion declared in `requirements.md`. Each status must be one of: `pass`, `fail`, `partial`, `deferred`, `unknown`. If any SC row is missing, add it before advancing.
+    4. **Deferred task registry**: If any tasks are `[~]`, verify that `deferred_tasks=` in `verification.md` lists their IDs (comma-separated) and `deferred_reason_summary=` is filled.
     5. **Only if ALL checks pass**: Advance the feature status `Planned → Implemented` per the Feature Integration section below.
 
-11. **Populate the Verification Log** (`REQUIREMENTS_DIR/verification.log`):
+11. **Populate the Verification Log** (`REQUIREMENTS_DIR/verification.md`):
     - If the file does not exist, instantiate it from `.specify/templates/verification-log-template.md`.
     - **Seeding (at run start)**: Copy the template, replace `[REQUIREMENTS_KEY]` with the actual key, then enumerate EVERY `SC-NNN` declared in `requirements.md` and emit empty `SC-NNN_status=` / `SC-NNN_value=` / `SC-NNN_note=` rows. This ensures no SC is accidentally omitted.
     - Record the baseline block ONCE at the start of the run (capture `baseline_commit` from `git rev-parse HEAD` before any edits, plus any metric counters needed to evaluate Success Criteria from `requirements.md`).
@@ -203,7 +203,7 @@ The `/speckit.implement` command automatically integrates with the feature track
   - Extract the feature ID from the directory name
   - Update the corresponding feature entry in `.specify/memory/features.md`:
     - Advance status `Planned → Implemented` per the canonical state machine in `.specify/templates/feature-details-template.md` § "Canonical Status State Machine". This transition is the responsibility of `/speckit.implement`, NOT `/speckit.plan`.
-    - DoD for the transition: `tasks.md` has zero `[ ]` rows (every task is `[X]` or `[~]`) AND every Success Criterion in `requirements.md` has a `SC-NNN_status=pass|deferred` row in `verification.log`.
+    - DoD for the transition: `tasks.md` has zero `[ ]` rows (every task is `[X]` or `[~]`) AND every Success Criterion in `requirements.md` has a `SC-NNN_status=pass|deferred` row in `verification.md`.
     - If ANY task is `[~]` deferred, append ` (deferred: T<comma-list>)` to the row's `Last Updated` cell to keep the deferral visible at index level.
     - Keep the specification path unchanged
     - Update the "Last Updated" date

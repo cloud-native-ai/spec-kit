@@ -49,10 +49,10 @@ Execute implementation tasks defined in `tasks.md`, with built-in quality valida
 8. **Pre-status-flip gate** — Before advancing feature status to `Implemented`:
    - Converts intentionally skipped tasks to `[~]` with justification
    - Verifies zero `[ ]` tasks remain
-   - Confirms `verification.log` has a status row for every success criterion
+   - Confirms `verification.md` has a status row for every success criterion
    - Checks deferred task registry completeness
 
-9. **Verification log** — Populates `verification.log` from the template:
+9. **Verification log** — Populates `verification.md` from the template:
    - Records baseline commit at run start
    - Fills post-change metrics and success criterion statuses at run end
 
@@ -65,7 +65,7 @@ Execute implementation tasks defined in `tasks.md`, with built-in quality valida
 | Artifact | Location |
 |----------|----------|
 | Updated task list | `.specify/specs/<key>/tasks.md` |
-| Verification log | `.specify/specs/<key>/verification.log` |
+| Verification log | `.specify/specs/<key>/verification.md` |
 | Waiver record (if applicable) | `.specify/specs/<key>/waivers.md` |
 | Implementation code | As specified in task file paths |
 

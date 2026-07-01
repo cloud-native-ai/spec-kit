@@ -71,7 +71,7 @@ This spec establishes a tiered AI tool support model within Spec Kit: five CLI t
 ├── contracts/           # Phase 1 output (/speckit.plan command)
 │   └── cli-priority-support.openapi.yaml
 ├── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
-└── verification.log     # Implementation output (/speckit.implement command)
+└── verification.md     # Implementation output (/speckit.implement command)
 ```
 
 No standalone research.md — Phase 0 findings inlined below. All context was resolvable from internal investigation (project docs, constitution, existing source code).

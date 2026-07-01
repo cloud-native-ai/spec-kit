@@ -143,8 +143,8 @@
 - [X] T051 [P] Add/refresh quickstart verification notes for todo workflow in `docs/quickstart.md`
 - [X] T052 Update feature detail notes after task breakdown in `.specify/memory/features/025.md`
 - [X] T053 Update feature index status/date for feature 025 in `.specify/memory/features.md`
-- [X] T054 Run targeted test commands for todo contract/integration suites and record results in `.specify/specs/020-speckit-todo-command/verification.log`
-- [X] T055 Re-run consistency review and record deferred items (if any) in `.specify/specs/020-speckit-todo-command/verification.log`
+- [X] T054 Run targeted test commands for todo contract/integration suites and record results in `.specify/specs/020-speckit-todo-command/verification.md`
+- [X] T055 Re-run consistency review and record deferred items (if any) in `.specify/specs/020-speckit-todo-command/verification.md`
 
 ---
 
