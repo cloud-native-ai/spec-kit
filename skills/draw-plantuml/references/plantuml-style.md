@@ -1,6 +1,6 @@
 # PlantUML 标准样式配置
 
-本文件定义 draw-plantuml 技能生成的所有 PlantUML 图表必须遵循的统一样式规范。在 Step 3 编写完 PlantUML 代码后，**必须**按照本配置对样式进行校验和调整。
+本文件定义 draw-plantuml 技能生成的所有 PlantUML 图表必须遵循的统一样式规范。在 Step 4 编写完 PlantUML 代码后，**必须**按照本配置对样式进行校验和调整。
 
 **渲染方式**：使用 [render-plantuml.sh](../scripts/render-plantuml.sh) 脚本渲染。脚本实现 SVG/PNG 双策略：
 - **SVG**：注入 `scale 4 + dpi 300`（矢量无损，viewBox ≥ 3840×2160）

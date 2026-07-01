@@ -64,7 +64,48 @@ Each how-to guide provides:
 
 For additional PlantUML syntax details, also reference [plantuml-guide.md](references/plantuml-guide.md).
 
-### Step 3: Draft PlantUML Code
+### Step 3: Semantic Layout Planning
+
+Before writing PlantUML code, analyze the semantic relationships between components to determine their natural positions. This prevents layout issues by establishing a semantically-grounded spatial arrangement upfront.
+
+#### 3.1 Identify Component Roles
+
+Classify each component:
+
+| Role | Description | Typical Position |
+|------|-------------|------------------|
+| **Hub (中心端)** | Central component that many others connect to | Center-top |
+| **Edge (节点端)** | Components connecting to the hub in 1:many pattern | Below the hub |
+| **Peer (对等端)** | Same-level, similar function | Side-by-side (`together {}`) |
+| **Entry (入口)** | External access point | Left edge or top |
+| **Sink (汇聚端)** | Data destination, storage, external service | Right edge or bottom |
+| **External (外部)** | Outside the system boundary | Outside main frame |
+
+#### 3.2 Map Relationships to Layout
+
+| Relationship Pattern | Layout Rule | PlantUML Technique |
+|---------------------|-------------|-------------------|
+| **1:many (hub-spoke)** | Hub above, edges below | Hub in upper frame; edges in lower frames |
+| **Peer (同级)** | Side-by-side | `together {}` block |
+| **Chain (链式)** | Sequential flow | Default arrow `-->` |
+| **Hierarchical (层次)** | Parent above children | Nested containers |
+
+#### 3.3 Draft Position Map
+
+Sketch a rough position map before writing code. Example for Kubernetes:
+
+```
+[External: Users] → [Entry: Ingress → Service]
+                              ↓ ClusterIP
+[Hub: Control Plane]   [Edge: Node 1]  [Edge: Node 2]  → [Sink: PV]
+(Sched, CM → API → etcd) (kubelet, Pod)  (kubelet, Pod)
+                              ↓ pull
+                       [Sink: Registry]
+```
+
+The position map determines: layout direction, element declaration order, `together{}` groupings, and nesting structure.
+
+### Step 4: Draft PlantUML Code
 
 Based on the how-to guide and the user's system information:
 
@@ -83,7 +124,7 @@ For PlantUML syntax details (element types, relationship notation, styling, patt
 - Visual highlighting (§3): **label length ≤10 chars**, note placement, alias readability
 - Per-diagram-type layout guidance (§5): recommended direction and layout focus for each UML type
 
-### Step 4: Apply Standard Style
+### Step 5: Apply Standard Style
 
 After drafting PlantUML code, **MUST** apply the standard style configuration defined in [plantuml-style.md](references/plantuml-style.md). For each diagram:
 
@@ -112,7 +153,7 @@ After drafting PlantUML code, **MUST** apply the standard style configuration de
 
 **注意：** `.puml` 源文件统一使用 `scale 4 + dpi 300`（面向 SVG 最高质量）。PNG 渲染由 `render-plantuml.sh` 脚本**自动计算**合适的 scale/dpi 参数，确保 PNG 输出 ≤ 4095×4095（低于 PlantUML Server 硬上限 4096）。无需手动为 PNG 调整样式。
 
-### Step 5: Write Accompanying Text
+### Step 6: Write Accompanying Text
 
 For each diagram, prepare the following descriptive content (to be included in the final HTML):
 1. **Diagram Title** (will become H2/H3 heading in HTML)
@@ -121,7 +162,7 @@ For each diagram, prepare the following descriptive content (to be included in t
 4. **Explanation**: Key points for each key element and relationship
 5. **Design Rationale**: Why this structure/interaction pattern was chosen (if applicable)
 
-### Step 6: Render PlantUML to SVG/PNG
+### Step 7: Render PlantUML to SVG/PNG
 
 After drafting and styling all PlantUML code, render each diagram into SVG (preferred) and PNG using the rendering script.
 
@@ -156,7 +197,7 @@ bash ${SKILL_HOME}/scripts/render-plantuml.sh diagram-01.puml output_dir 01-syst
 
 **PNG 限制说明：** PlantUML Server 对 PNG 有 4096×4096 硬上限。当图表元素过多（>15）时，PNG 质量可能受限。此时应强制使用 SVG。
 
-### Step 7: Assemble Final HTML Document
+### Step 8: Assemble Final HTML Document
 
 Combine all rendered diagrams and text into a **single HTML document** that displays the architecture with embedded SVG/PNG images (not raw PlantUML code).
 
@@ -246,7 +287,7 @@ Step-by-step guides organized by diagram type and PlantUML syntax. Start here fo
 | Document | Content |
 |----------|---------|  
 | [plantuml-guide.md](references/plantuml-guide.md) | Complete PlantUML syntax reference for architecture diagrams: all supported diagram types, element types, relationship syntax, skinparam customization, and common patterns |
-| [plantuml-best-practices.md](references/plantuml-best-practices.md) | Layout optimization, content organization, collaboration conventions, and per-diagram-type layout guidance. **MUST read during Step 3** |
+| [plantuml-best-practices.md](references/plantuml-best-practices.md) | Layout optimization, content organization, collaboration conventions, and per-diagram-type layout guidance. **MUST read during Step 4** |
 | [plantuml-official-docs.md](references/plantuml-official-docs.md) | PlantUML official documentation and advanced features. Load on-demand for syntax edge cases or less common diagram types |
 
 ### Source Documents (`references/document/`)
