@@ -91,6 +91,52 @@ You are a **<Role Name>** for the {{PROJECT_NAME}} project.
 - Role instructions MUST be written in first-person professional identity
 - This skill operates on templates in `templates/`, NOT on generated agents in `.specify/agents/`
 
+## Triad Mode (EEI Pattern)
+
+Use this mode when the user wants to create an agent that iteratively improves its output through an **Executor-Evaluator-Improver** loop (the "EEI triad").
+
+### When to Use
+
+Trigger on phrases: "create triad", "EEI agent", "iterative quality", "executor evaluator improver", or any request for a self-refining agent that scores and re-drafts its own output.
+
+### How It Works
+
+Instead of producing a single role template, Triad Mode creates **three sub-role agents** plus an **orchestration prompt** that wires them into a loop:
+
+1. **Executor** -- performs the core task and produces a draft artifact.
+2. **Evaluator** -- scores the draft against weighted dimensions, emits a structured rubric, and decides pass/fail against a threshold.
+3. **Improver** -- reads the rubric, rewrites the artifact to address low-scoring dimensions, and feeds the revision back to the Evaluator.
+
+The orchestration prompt drives the loop: Executor -> Evaluator -> (if below threshold) Improver -> Evaluator -> ... until the threshold is met or a max-iteration cap is reached.
+
+### Required Inputs
+
+| Input | Description |
+|-------|-------------|
+| **Task description** | What the Executor should produce (e.g., "generate an API spec") |
+| **Scoring dimensions + weights** | Named quality axes and their relative weights (e.g., correctness 0.4, completeness 0.3, clarity 0.3) |
+| **Threshold** | Minimum weighted score (0-1) for the Evaluator to accept the artifact |
+| **Environment paths** | Project root, templates dir, output dir |
+| **Workspace paths** | Where intermediate artifacts and rubrics are written |
+
+### Template Files
+
+All four templates live in `templates/`:
+
+- `agent-subrole-executor-template.md`
+- `agent-subrole-evaluator-template.md`
+- `agent-subrole-improver-template.md`
+- `agent-triad-orchestration-template.md`
+
+The skill populates placeholders and writes the generated files to `.specify/agents/`.
+
+### Triad Workflow (within this skill)
+
+1. Collect required inputs (prompt or infer from conversation).
+2. Validate that all four subrole templates exist in `templates/`.
+3. Generate three sub-role agent files and one orchestration prompt.
+4. Report the created file paths and suggest a test invocation.
+
 ## Agent-Specific Configuration
 
 ### Step 1: Identify Executing Agent

@@ -6,7 +6,8 @@ description: |
   Use when the user mentions "架构图", "architecture diagram", "UML图", "plantuml", "系统架构图", "画架构", "设计图", "组件图", "部署图", "时序图", "类图", "包图", "系统设计",
   "流程图", "状态图", "活动图", "用例图", "状态机图", "模块图", "交互图",
   "sequence diagram", "class diagram", "component diagram", "deployment diagram",
-  "activity diagram", "state diagram", "use case diagram", "package diagram"
+  "activity diagram", "state diagram", "use case diagram", "package diagram",
+  "复刻图", "图片重绘", "图片转UML", "replicate diagram", "redraw", "image to UML"
 skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 ---
 
@@ -27,7 +28,46 @@ For PlantUML-specific conventions (syntax, styling, element types, relationship 
 
 ## Workflow
 
-This skill is designed to draw UML diagrams based on existing information (user descriptions, code, documents) and add corresponding text explanations. Follow the steps below in order.
+This skill is designed to draw UML diagrams based on existing information (user descriptions, code, documents, images) and add corresponding text explanations. Follow the steps below in order — **Step 0 (semantic analysis) MUST run before any diagram type selection**.
+
+### Step 0: Semantic Analysis & Intent Understanding
+
+**MUST** first analyze the user's input to understand the drawing intent before selecting a diagram type. Read [00-semantic-analysis.md](references/howto/00-semantic-analysis.md) for the detailed methodology.
+
+#### 0.1 Classify User Intent
+
+Identify the input type:
+
+| Intent Type | Detection Signals | Action |
+|------------|-------------------|--------|
+| **Direct description** | User provides a clear text description of system/components/flow | Extract elements and relationships directly |
+| **Image replication** | User references an image file ("复刻***.jpg", "重绘***.png", "replicate this image") | Read and analyze the image, extract visual elements |
+| **Vague/ambiguous** | Short, unclear, or missing key details (e.g., "画个系统图") | Identify gaps, ask clarifying questions |
+| **Code-based** | User provides source code to visualize | Analyze code structure, extract classes/modules/flows |
+
+#### 0.2 Extract Drawing Content
+
+Based on the intent type, extract:
+- **System boundary**: What's inside vs. outside the system
+- **Core elements**: Components, actors, classes, nodes, states
+- **Relationships**: Dependencies, messages, transitions, associations
+- **Scope**: Single diagram vs. multi-diagram (C4 levels)
+
+For **image replication** requests, **MUST** use `Read` tool to read the referenced image file and extract: diagram type, elements, relationships, layout, and grouping structure.
+
+#### 0.3 Gap Analysis & Interactive Confirmation
+
+If any required information is missing or ambiguous, **MUST** use `AskUserQuestion` to clarify before proceeding to Step 1. Key gaps to check:
+
+- [ ] System scope and boundary clearly defined?
+- [ ] All key elements identified?
+- [ ] Relationships between elements clear?
+- [ ] Diagram purpose明确 (architecture overview vs. detailed interaction)?
+- [ ] Detail level appropriate (sketch vs. blueprint)?
+
+When gaps are found, ask at most **one round** of questions (≤4 questions). After confirmation, output a brief intent summary, then proceed to Step 1.
+
+**Only proceed to Step 1 when** the drawing intent is fully understood — either from the user's original description or after interactive clarification.
 
 ### Step 1: Choose Diagram Type
 
@@ -272,6 +312,7 @@ Step-by-step guides organized by diagram type and PlantUML syntax. Start here fo
 
 | # | Document | Content |
 |---|----------|---------|
+| 0 | [00-semantic-analysis.md](references/howto/00-semantic-analysis.md) | Semantic analysis and intent understanding — classify input type, extract content, gap analysis, interactive confirmation before diagram type selection |
 | 1 | [01-choose-diagram-type.md](references/howto/01-choose-diagram-type.md) | How to select the right UML diagram type based on user description, development phase, and system type |
 | 2 | [02-class-diagram.md](references/howto/02-class-diagram.md) | How to draw Class Diagrams — class definition, 6 relationship types with PlantUML syntax, packages, GRASP design principles |
 | 3 | [03-component-diagram.md](references/howto/03-component-diagram.md) | How to draw Component Diagrams — layered architecture, microservice patterns, interface and dependency modeling |
@@ -297,6 +338,8 @@ Original reference materials on UML theory, PlantUML tools, modeling methodology
 ## Quality Checklist
 
 Before delivering the final document, verify:
+- [ ] User's drawing intent fully understood (via analysis or interactive Q&A in Step 0)
+- [ ] All image-referenced content extracted and mapped to UML elements (if applicable)
 - [ ] All PlantUML source files (`.puml`) have matching `@startuml` / `@enduml`
 - [ ] Each diagram has been successfully rendered to SVG/PNG via `render-plantuml.sh`
 - [ ] SVG files are valid XML (verified with `file` command)

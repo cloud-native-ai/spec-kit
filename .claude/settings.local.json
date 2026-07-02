@@ -22,7 +22,8 @@
       "Bash(.specify/scripts/bash/create-new-skill.sh --json 'layout-placeholder-test456 - integration scenario')",
       "Bash(git fetch *)",
       "Bash(git ls-remote *)",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "Bash(bash *)"
     ]
   }
 }

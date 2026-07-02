@@ -78,6 +78,40 @@ For each issue, determine whether the root cause is in:
 - Handoff chain consistency with other role templates MUST be maintained
 - Prefer minimal changes that fix the observed problem over broad rewrites
 
+## Triad Refinement
+
+Use this workflow when an EEI triad (Executor-Evaluator-Improver) has been running and the user wants to improve sub-role templates based on iteration results.
+
+### What Can Be Refined
+
+- **Executor template**: task interpretation, output format, tool usage patterns
+- **Evaluator template**: scoring rubric, acceptance thresholds, dimension weights
+- **Improver template**: change strategy, diff granularity, convergence behavior
+- **Orchestration prompt**: iteration cap, early-stop criteria, handoff sequencing
+
+### Input
+
+Provide iteration history that includes score progression across rounds and change logs showing what the improver modified at each step. A stalled or oscillating score curve is the clearest signal that one sub-role needs attention.
+
+### Process
+
+1. **Plot the score trajectory** -- identify plateaus, regressions, or oscillations.
+2. **Attribute underperformance** -- map each anomaly to the responsible sub-role:
+   - Scores plateau early --> Improver generates shallow patches; strengthen its change strategy.
+   - Scores oscillate --> Evaluator criteria are ambiguous; tighten rubric definitions.
+   - First-round score is very low --> Executor misinterprets the task; clarify its identity/responsibilities.
+3. **Draft targeted template edits** using the same minimal-change principle from Step 4 above.
+4. **Re-run one iteration** with the updated templates to confirm the fix before committing.
+
+### Examples
+
+| Symptom | Likely Cause | Template Fix |
+|---------|-------------|--------------|
+| Evaluator misses correctness bugs | Scoring rubric lacks a correctness dimension | Add explicit correctness criteria with weight |
+| Improver rewrites instead of patching | Change strategy section too broad | Constrain to diff-level edits, add "preserve working code" rule |
+| Executor ignores tool constraints | Identity section missing tool policy | Add tool-usage guardrails to responsibilities |
+| Scores converge then regress | Improver over-optimizes one dimension | Add multi-dimension balance check to improver workflow |
+
 ## Agent-Specific Configuration
 
 ### Step 1: Identify Executing Agent
