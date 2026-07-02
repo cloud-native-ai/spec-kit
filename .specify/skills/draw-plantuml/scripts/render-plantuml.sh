@@ -31,7 +31,7 @@ warn() { printf '[render-plantuml] WARNING: %s\n' "$*" >&2; }
 strip_style() {
   local input="$1"
   sed -E \
-    -e '/^[[:space:]]*skinparam[[:space:]]+(monochrome|shadowing|roundCorner|dpi|defaultFontSize|defaultFontName|padding|ArrowThickness|BorderThickness|svgDimensionStyle|svgLinkTarget|actorStyle)/d' \
+    -e '/^[[:space:]]*skinparam[[:space:]]+(monochrome|shadowing|roundCorner|dpi|defaultFontSize|defaultFontName|padding|ArrowThickness|BorderThickness|svgDimensionStyle|svgLinkTarget|actorStyle)[[:space:]]/d' \
     -e '/^[[:space:]]*scale[[:space:]]/d' \
     "$input"
 }
@@ -41,8 +41,15 @@ inject_style() {
   local input="$1" output="$2" scale="$3" dpi="$4"
   local style_tmp="${output}.style.tmp"
 
+  # Detect if source uses color markup — skip monochrome if so
+  local use_mono="true"
+  if grep -qE '<color:|<font color|skinparam monochrome false' "$input" 2>/dev/null; then
+    use_mono=""
+    log "Color markup detected — skipping monochrome"
+  fi
+
   cat <<EOF > "$style_tmp"
-skinparam monochrome true
+${use_mono:+skinparam monochrome true}
 skinparam shadowing false
 skinparam roundCorner 20
 skinparam dpi ${dpi}

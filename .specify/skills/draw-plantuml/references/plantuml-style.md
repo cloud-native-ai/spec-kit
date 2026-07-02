@@ -18,7 +18,6 @@
 ' top to bottom direction
 
 ' === 通用样式 ===
-skinparam monochrome true
 skinparam shadowing false
 skinparam roundCorner 20
 
@@ -38,6 +37,32 @@ skinparam svgLinkTarget _blank
 ' ... 图表内容 ...
 @enduml
 ```
+
+## 色彩模式选择（Monochrome vs Color）
+
+在基础样式模板之后，根据图表需求选择色彩模式：
+
+### 单色模式（默认，适合大多数技术文档）
+
+在通用样式之后追加：
+
+```plantuml
+' === 单色模式（默认） ===
+skinparam monochrome true
+```
+
+适用场景：标准技术文档、打印输出、不需要颜色强调的架构图。
+
+### 彩色模式（需要颜色强调时使用）
+
+**不添加** `skinparam monochrome true`，保持 PlantUML 默认彩色渲染。
+
+适用场景：
+- 需要使用 `<color:red>文字</color>` 或 `<font color=red>文字</font>` 进行颜色强调
+- 区域（zone）需要不同颜色的边框或背景
+- 品牌色彩或视觉重点需要保留
+
+**重要警告**：`skinparam monochrome true` 会将**所有**颜色转换为灰度，包括通过 `<color:red>` 或 `<font color=red>` 设置的内联颜色。如果图表需要任何彩色元素，**必须省略**该设置。
 
 ## 条件样式（按图表类型启用）
 
@@ -72,7 +97,7 @@ skinparam actorStyle awesome
 | 配置项 | 作用 | 适用范围 |
 |--------|------|----------|
 | `top to bottom direction` | 图的方向从上到下，保持阅读顺序一致。**仅类图/组件图/部署图适用**，时序图/活动图/状态机/用例图不要添加 | 类图、组件图、部署图 |
-| `skinparam monochrome true` | 黑白单色输出，适合文档和打印 | 所有图表 |
+| `skinparam monochrome true` | 黑白单色输出，适合文档和打印。**可选**：需要彩色元素时省略此项（见"色彩模式选择"） | 按需启用 |
 | `skinparam shadowing false` | 去除阴影效果，保持视觉简洁 | 所有图表 |
 | `skinparam roundCorner 20` | 统一圆角半径为 20px | 所有图表 |
 | `skinparam dpi 300` | SVG 高密度渲染；PNG 由脚本按需调整 | 所有图表（.puml 源文件） |
@@ -91,7 +116,7 @@ skinparam actorStyle awesome
 在完成 PlantUML 代码后，逐项检查：
 
 1. **布局方向**：确认 `top to bottom direction` 仅在类图/组件图/部署图中使用（其他图类型不应出现此指令）
-2. **通用 skinparam**：确认 5 项通用 skinparam 全部存在且值正确
+2. **通用 skinparam**：确认通用 skinparam（shadowing、roundCorner）全部存在且值正确；确认色彩模式选择正确（单色图加 `monochrome true`，彩色图省略）
 3. **高质量渲染 skinparam**：确认 `dpi 300`、`scale 4`、`defaultFontSize 14`、`defaultFontName`、`padding 8`、`ArrowThickness 2`、`BorderThickness 2` 全部存在
 4. **SVG 优化 skinparam**：确认 `svgDimensionStyle false` 和 `svgLinkTarget _blank` 存在
 5. **条件 skinparam**：如图表含 actor 或为用例图，确认 `actorStyle awesome` 已添加

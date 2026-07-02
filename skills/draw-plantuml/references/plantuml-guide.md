@@ -1,19 +1,19 @@
-# PlantUML Syntax Reference for Architecture Diagrams
+# PlantUML 架构图语法参考
 
-Quick reference for drawing architecture diagrams with PlantUML. Covers all 7 diagram types: Component, Deployment, Sequence, Class/Package, Use Case, Activity, and State Machine.
+绘制架构图的快速参考。覆盖全部 7 种图表类型：组件图、部署图、时序图、类图/包图、用例图、活动图和状态机图。
 
-## General Rules
+## 通用规则
 
-- Every diagram starts with `@startuml` and ends with `@enduml`
-- Use `skinparam` at the top for consistent styling
-- Comments: use `'` (single quote) for line comments
-- Multi-line titles: `title` keyword, supports `\n` for newlines
+- 每张图以 `@startuml` 开始，以 `@enduml` 结束
+- 使用 `skinparam` 在顶部进行统一样式设置
+- 注释：使用 `'`（单引号）进行行注释
+- 多行标题：`title` 关键字，支持 `\n` 换行
 
-## 1. Component Diagram
+## 1. 组件图
 
-Purpose: Show system modular decomposition — components, interfaces, and their dependencies.
+用途：展示系统的模块化分解——组件、接口及其依赖关系。
 
-### Elements
+### 元素
 
 ```plantuml
 @startuml
@@ -37,7 +37,7 @@ actor "User/Role" as alias
 @enduml
 ```
 
-### Relationships
+### 关系
 
 ```plantuml
 @startuml
@@ -57,7 +57,7 @@ A -[hidden]-> B  ' hidden line for layout
 @enduml
 ```
 
-### Styling
+### 样式
 
 ```plantuml
 @startuml
@@ -80,11 +80,11 @@ skinparam ArrowColor #666666
 @enduml
 ```
 
-## 2. Deployment Diagram
+## 2. 部署图
 
-Purpose: Show physical deployment topology — nodes, artifacts, and communication paths.
+用途：展示物理部署拓扑——节点、制品和通信路径。
 
-### Elements
+### 元素
 
 ```plantuml
 @startuml
@@ -113,7 +113,7 @@ stack "Stack" {
 @enduml
 ```
 
-### Communication
+### 通信
 
 ```plantuml
 @startuml
@@ -127,7 +127,7 @@ node1 -[#red]-> node2 : critical path
 @enduml
 ```
 
-### Styling
+### 样式
 
 ```plantuml
 @startuml
@@ -151,11 +151,11 @@ skinparam frame {
 @enduml
 ```
 
-## 3. Sequence Diagram
+## 3. 时序图
 
-Purpose: Show interaction flow between components over time.
+用途：展示组件间随时间变化的交互流程。
 
-### Participants
+### 参与者
 
 ```plantuml
 @startuml
@@ -173,7 +173,7 @@ participant A order 20
 @enduml
 ```
 
-### Messages
+### 消息
 
 ```plantuml
 @startuml
@@ -209,7 +209,7 @@ end
 @enduml
 ```
 
-### Activation / Lifeline
+### 激活/生命线
 
 ```plantuml
 @startuml
@@ -233,7 +233,7 @@ note over A, B : shared note
 @enduml
 ```
 
-### Styling
+### 样式
 
 ```plantuml
 @startuml
@@ -254,11 +254,11 @@ skinparam SequenceLifeLineBorderColor #999999
 @enduml
 ```
 
-## 4. Class / Package Diagram
+## 4. 类图/包图
 
-Purpose: Show code-level module/package structure and class relationships.
+用途：展示代码级别的模块/包结构和类关系。
 
-### Packages
+### 包
 
 ```plantuml
 @startuml
@@ -277,7 +277,7 @@ com.example.order --> com.example.payment : depends on
 @enduml
 ```
 
-### Classes & Interfaces
+### 类与接口
 
 ```plantuml
 @startuml
@@ -311,7 +311,7 @@ enum OrderStatus {
 @enduml
 ```
 
-### Relationships
+### 关系
 
 ```plantuml
 @startuml
@@ -328,7 +328,7 @@ classA "1..*" --> "1" classB : belongs to
 @enduml
 ```
 
-### Styling
+### 样式
 
 ```plantuml
 @startuml
@@ -357,11 +357,11 @@ skinparam ArrowColor #555555
 @enduml
 ```
 
-## 5. Use Case Diagram
+## 5. 用例图
 
-Purpose: Show system functions from user perspective — actors, use cases, and their relationships.
+用途：从用户视角展示系统功能——角色、用例及其关系。
 
-### Elements
+### 元素
 
 ```plantuml
 @startuml
@@ -401,7 +401,7 @@ fuzzy --|> search
 @enduml
 ```
 
-### Styling
+### 样式
 
 ```plantuml
 @startuml
@@ -420,11 +420,11 @@ skinparam rectangle {
 @enduml
 ```
 
-## 6. Activity Diagram
+## 6. 活动图
 
-Purpose: Show business process or workflow — control flow, decisions, forks/joins, and swimlanes.
+用途：展示业务流程或工作流——控制流、决策、分叉/汇合和泳道。
 
-### Elements
+### 元素
 
 ```plantuml
 @startuml
@@ -450,7 +450,7 @@ stop
 @enduml
 ```
 
-### Swimlanes
+### 泳道
 
 ```plantuml
 @startuml
@@ -468,7 +468,7 @@ stop
 @enduml
 ```
 
-### Styling
+### 样式
 
 ```plantuml
 @startuml
@@ -484,11 +484,11 @@ skinparam swimlane {
 @enduml
 ```
 
-## 7. State Machine Diagram
+## 7. 状态机图
 
-Purpose: Show object lifecycle — states, transitions, events, guards, and actions.
+用途：展示对象生命周期——状态、转换、事件、守卫和动作。
 
-### Elements
+### 元素
 
 ```plantuml
 @startuml
@@ -520,7 +520,7 @@ state Active {
 @enduml
 ```
 
-### Styling
+### 样式
 
 ```plantuml
 @startuml
@@ -533,21 +533,21 @@ skinparam ArrowColor #555555
 @enduml
 ```
 
-## Quick Syntax Reference by Diagram Type
+## 按图表类型的快速语法参考
 
-| Diagram | Key Elements | Relationship Syntax |
-|---------|-------------|-------------------|
-| **Component** | `component [Name]`, `package "Name" {}`, `interface "Name"` | `-->` dependency |
-| **Deployment** | `node "Name" {}`, `database "Name"`, `cloud "Name"` | `-->` with protocol label |
-| **Sequence** | `participant "Name"`, `actor "Name"`, `database "Name"` | `->` sync, `-->>` async, `activate`/`deactivate` |
-| **Class/Package** | `class`, `interface`, `enum`, `package {}` | `--|>` inherit, `*--` compose, `o--` aggregate, `..>` depend |
-| **Use Case** | `actor "Name"`, `usecase`, `rectangle "边界" {}` | `-->` associate, `..>` include, `.>` extend, `--|>` generalize |
-| **Activity** | `start`/`stop`, `:action;`, `if/else`, `fork/end fork` | `->` control flow, `|泳道|` swimlane |
-| **State Machine** | `[*]`, `state "Name"`, composite state `{}`, `--` concurrent | `-->` transition with `event [guard] / action` |
+| 图表 | 关键元素 | 关系语法 |
+|------|---------|---------|
+| **组件图** | `component [Name]`, `package "Name" {}`, `interface "Name"` | `-->` 依赖 |
+| **部署图** | `node "Name" {}`, `database "Name"`, `cloud "Name"` | `-->` 带协议标签 |
+| **时序图** | `participant "Name"`, `actor "Name"`, `database "Name"` | `->` 同步, `-->>` 异步, `activate`/`deactivate` |
+| **类图/包图** | `class`, `interface`, `enum`, `package {}` | `--|>` 继承, `*--` 组合, `o--` 聚合, `..>` 依赖 |
+| **用例图** | `actor "Name"`, `usecase`, `rectangle "边界" {}` | `-->` 关联, `..>` 包含, `.>` 扩展, `--|>` 泛化 |
+| **活动图** | `start`/`stop`, `:action;`, `if/else`, `fork/end fork` | `->` 控制流, `\|泳道\|` 泳道 |
+| **状态机图** | `[*]`, `state "Name"`, 组合状态 `{}`, `--` 并发 | `-->` 带事件 `[guard] / action` 转换 |
 
-## Common Patterns
+## 常见模式
 
-### Layered Architecture (Component)
+### 分层架构（组件图）
 
 ```plantuml
 @startuml
@@ -579,7 +579,7 @@ user --> mysql
 @enduml
 ```
 
-### Microservice Architecture (Component + Deployment)
+### 微服务架构（组件图 + 部署图）
 
 ```plantuml
 @startuml
@@ -600,7 +600,7 @@ svcB --> db : read
 @enduml
 ```
 
-### Request Lifecycle (Sequence)
+### 请求生命周期（时序图）
 
 ```plantuml
 @startuml
@@ -627,15 +627,15 @@ deactivate Gateway
 @enduml
 ```
 
-## Tips
+## 技巧
 
-1. **Use `skinparam` consistently**: Copy the same skinparam block across all diagrams in one document
-2. **Keep aliases meaningful**: `[OrderService] as OS` is better than `[C1]`
-3. **Add labels to relationships**: `A --> B : uses via HTTP` is self-documenting
-4. **Use `note` for non-obvious details**: protocol, port, SLA, etc.
-5. **Split large diagrams**: If a diagram exceeds 7 core elements, split into overview + drill-down (hard limit 15)
-6. **Maximize rendering quality**: Always include `skinparam dpi 300` and `scale 4` in the style block (see `plantuml-style.md`); this ensures SVG viewBox ≥ 3840×2160 (4K UHD) and PNG ≥ 4096px. Combined with `ArrowThickness 2` and `BorderThickness 2`, diagrams remain crisp when zoomed or scaled. Use [render-plantuml.sh](../scripts/render-plantuml.sh) to automatically inject the style block and render.
-7. **For detailed how-to per diagram type**: See `references/howto/` — each guide provides step-by-step instructions with complete examples
-8. **Control layout actively**: Use direction keywords (`-right->`, `-down->`), hidden connections (`-[hidden]->`), and `together{}` grouping to prevent auto-layout from scattering related elements. See [plantuml-best-practices.md](./plantuml-best-practices.md) §1 for full details.
-9. **Declare elements before relationships**: First list all participants/components/classes, then define connections — this makes source code scannable and produces more predictable layouts.
-10. **Adjust spacing for dense diagrams**: Use `skinparam nodesep 40` and `skinparam ranksep 60` when elements overlap. See [plantuml-best-practices.md](./plantuml-best-practices.md) §1.4 for recommended values by complexity level.
+1. **统一使用 `skinparam`**：在同一文档的所有图表中复制相同的 skinparam 块
+2. **别名要有意义**：`[OrderService] as OS` 优于 `[C1]`
+3. **给关系添加标签**：`A --> B : uses via HTTP` 具有自文档性
+4. **使用 `note` 补充非显而易见的细节**：协议、端口、SLA 等
+5. **拆分大图**：如果一张图超过 7 个核心元素，拆分为概览图 + 下钻图（硬上限 15）
+6. **最大化渲染质量**：始终在样式块中包含 `skinparam dpi 300` 和 `scale 4`（参见 `plantuml-style.md`）；这确保 SVG viewBox ≥ 3840×2160（4K UHD）且 PNG ≥ 4096px。配合 `ArrowThickness 2` 和 `BorderThickness 2`，图表在缩放时保持清晰。使用 [render-plantuml.sh](../scripts/render-plantuml.sh) 自动注入样式块并渲染。
+7. **按图表类型的详细操作指南**：参见 `references/howto/`——每个指南提供分步说明和完整示例
+8. **主动控制布局**：使用方向关键字（`-right->`、`-down->`）、隐藏连接（`-[hidden]->`）和 `together{}` 分组，防止自动布局打散相关元素。详见 [plantuml-best-practices.md](./plantuml-best-practices.md) §1。
+9. **先声明元素再声明关系**：先列出所有参与者/组件/类，再定义连接——这使源代码可扫描且产生更可预测的布局。
+10. **为密集图表调整间距**：元素重叠时使用 `skinparam nodesep 40` 和 `skinparam ranksep 60`。按复杂度级别的推荐值见 [plantuml-best-practices.md](./plantuml-best-practices.md) §1.4。

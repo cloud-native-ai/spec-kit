@@ -257,6 +257,56 @@ participant InventoryService
 PaymentService -> InventoryService : 扣减库存
 ```
 
+### 2.5 标签精简与富文本注释补充
+
+> **组件文本描述能力有限时，用富文本注释补充。** 这是一条适用于所有图类型的通用规则，在 Step 4 草拟代码时**必须遵守**。
+
+#### 核心规则：标签 ≤10 字符 + note 补充
+
+元素名称/标签不超过 10 个字符。当短标签无法充分描述元素职责时，使用 `note` 元素补充详细说明。
+
+**为什么要限制标签长度**：过长的元素标签会导致框体过宽、自动换行不可预测、认知负荷增加。
+
+```plantuml
+' ✗ 差：元素标签过长，导致框体过宽
+component [用户订单管理服务主模块] as OrderMain
+participant "用户认证与授权服务中心" as Auth
+
+' ✓ 好：简短标签 + note 补充说明
+component [订单服务] as Order
+participant "认证中心" as Auth
+
+note right of Order
+  包含订单创建、取消、
+  退款、状态查询等子模块
+end note
+```
+
+#### 关系线标签同样适用
+
+```plantuml
+' ✗ 差
+A -> B : 发送异步HTTP请求并携带JWT令牌
+
+' ✓ 好
+A -> B : 异步调用
+note on link
+  HTTP POST + JWT Bearer
+end note
+```
+
+#### note 语法速查
+
+| 场景 | 语法 | 说明 |
+|------|------|------|
+| 元素旁注释 | `note right of X` / `note left of` / `note top of` / `note bottom of` | 定位在元素指定方向 |
+| 多行注释 | `note right of X` ... `end note` | 多段说明文字 |
+| 浮动注释 | `note "text" as N` + `N .. X` | 独立放置，用虚线连接 |
+| 关系线注释 | `note on link` ... `end note` | 附加在箭头连线上 |
+| 简短箭头标签 | `A -> B : 简短文字` | ≤10 字符，直接在箭头上 |
+
+> **详细注释模式和示例见 [§3.2–3.3](#32-注释策略)。**
+
 ---
 
 ## 三、视觉高亮与注释
@@ -277,6 +327,8 @@ client -[#FF8C00]-> fallback : 降级处理
 > **注意**：本技能默认使用 `skinparam monochrome true`（黑白模式）。如需彩色高亮，需移除 monochrome 设置或改为 `skinparam monochrome false`，并在 SKILL.md 步骤中说明选择理由。
 
 ### 3.2 注释策略
+
+> 核心规则见 [§2.5 标签精简与富文本注释补充](#25-标签精简与富文本注释补充)。本节提供注释写作的详细模式和示例。
 
 注释紧贴关联元素，精简高效：
 
@@ -301,6 +353,8 @@ end note
 ```
 
 ### 3.3 元素标签长度控制（≤ 10 字符）
+
+> 核心规则和示例见 [§2.5 标签精简与富文本注释补充](#25-标签精简与富文本注释补充)。本节补充常见反模式。
 
 **核心规则**：元素名称/标签不超过 10 个字符。超过时替换为更简短的描述，必要说明通过 `note` 元素补充。
 
