@@ -52,6 +52,10 @@ Goal: Generate role-based development workflow agents or create custom agents at
 - **Mode A — Role-Based Generation** (when `$ARGUMENTS` is empty): Generate all six predefined role-based agents from templates, populated with the current project's context.
 - **Mode B — Custom Agent Creation** (when `$ARGUMENTS` is not empty): Create or update a single custom agent based on user-provided intent.
 
+### Delegation Model (authoring engine = the skills)
+
+This command does **not** render templates inline. Both modes **delegate** the actual authoring to the general-purpose `create-agent` skill (and `improve-agent` for updates) — the single authoring engine (see `.specify/specs/022-eei-agent-triad/contracts/agent-authoring-contract.md`). The command's own responsibilities are: gather project context, build the `AgentAuthoringRequest`, handle backup/preservation (FR-008/008a), verify symlink discoverability, and update the registry. The step-by-step procedures below are the contract the command hands to `create-agent`; execute them **by invoking that skill**, not by re-implementing rendering here (contract R1).
+
 ---
 
 ### Mode A: Role-Based Agent Generation (no arguments)
@@ -83,7 +87,7 @@ Generate all six software development workflow agents from role templates in `.s
    - `docs/` listing → `{{DOCS_DIR}}`
    - If a context source is unavailable, use a sensible default noting the absence.
 
-2. **For each role template**, resolve all `{{PLACEHOLDER}}` variables with gathered context and set concrete frontmatter values:
+2. **For each role template**, invoke the `create-agent` skill with an `AgentAuthoringRequest` of `kind: supervisor` (roles are supervisors by default per spec 022 OQ-1 — the template's `supervisor:` / `role-scope:` frontmatter drives this; pass `kind: role` only if a role opts out with `supervisor: false`). `create-agent` resolves all `{{PLACEHOLDER}}` variables with the gathered context, inlines the `agent-supervision-delegation.md` snippet bound to the role, and sets concrete frontmatter values:
    - `{{AGENT_NAME}}` → role display name (e.g., "Requirements Analyst")
    - `{{AGENT_DESCRIPTION}}` → role-appropriate trigger description
    - `{{ROLE_NAME}}` → role display name
@@ -107,6 +111,8 @@ Generate all six software development workflow agents from role templates in `.s
 ### Mode B: Custom Agent Creation (with arguments)
 
 Create or update a single custom agent based on user-provided intent in `$ARGUMENTS`.
+
+**Delegation**: Route the authoring to the `create-agent` skill with `kind: custom` for new agents, or to the `improve-agent` skill when the intent is to refine an existing agent (it classifies the target — role · sub-role · orchestration · supervision snippet · custom — and routes accordingly). If the user requests an EEI triad or a role supervisor, pass `kind: triad` or `kind: supervisor` instead. The command builds the `AgentAuthoringRequest` and retains the responsibilities below (file management, scaffolding, registry, symlinks).
 
 Execution flow:
 

@@ -80,7 +80,12 @@ Use this machine-maintained section to track reusable resource identifiers creat
 <!-- Record each agent as one table row with the columns below. -->
 | Agent Name | Agent ID | Description | Argument Hint | Target | User Invocable | Disable Model Invocation | Tools | Agents | Model | Handoffs | Canonical Path |
 |------------|----------|-------------|---------------|--------|----------------|--------------------------|-------|--------|-------|----------|----------------|
-| None yet. | - | - | - | - | - | - | - | - | - | - | - |
+| Requirements Analyst | .specify/agents/requirements-analyst.agent.md | Analyzes and clarifies requirements, translating business needs into structured specifications | - | requirements-analyst | true | false | - | - | - | system-designer | .specify/agents/requirements-analyst.agent.md |
+| System Designer | .specify/agents/system-designer.agent.md | Designs system-level architecture and implementation approaches from requirements | - | system-designer | true | false | - | - | - | module-designer, qa-engineer | .specify/agents/system-designer.agent.md |
+| Module Designer | .specify/agents/module-designer.agent.md | Designs and implements detailed module-level changes within interface boundaries | - | module-designer | true | false | - | - | - | test-engineer | .specify/agents/module-designer.agent.md |
+| Test Engineer | .specify/agents/test-engineer.agent.md | Designs, writes, and executes tests validating implementations against specifications | - | test-engineer | true | false | - | - | - | module-designer, qa-engineer | .specify/agents/test-engineer.agent.md |
+| QA Engineer | .specify/agents/qa-engineer.agent.md | Validates integrated system quality against architecture and requirements | - | qa-engineer | true | false | - | - | - | requirements-analyst | .specify/agents/qa-engineer.agent.md |
+| Knowledge Manager | .specify/agents/knowledge-manager.agent.md | Manages project documentation, decision records, and knowledge assets | - | knowledge-manager | true | false | - | - | - | all-roles | .specify/agents/knowledge-manager.agent.md |
 <!-- AGENTS_REGISTRY_END -->
 
 ### Skills
