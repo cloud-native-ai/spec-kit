@@ -50,6 +50,22 @@ SC-006_note=Evaluator template explicitly forbids referencing executor prompt; c
 deferred_tasks=T008,T013
 deferred_reason_summary=Automated contract/integration test tasks (pytest) deferred — this is a template/prompt feature with no runtime code to unit-test; validation is via template structure checks and the documented reference session rather than pytest suites
 
+# -- Amendment (2026-07-02): Supervisor + General-Skill Refactor --
+
+amendment_date=2026-07-02
+amendment_baseline_commit=0bf2a9a8811097b170ece5df01be897a5c14813e
+amendment_tasks_completed=T032-T057
+amendment_deferred_tasks=none
+amendment_scope=Role agents become role-scoped supervisors (default-on, OQ-1); shared supervision snippet composed by create-agent (OQ-2); create-agent/improve-agent generalized to a capability matrix (role/supervisor/triad/custom); /speckit.agents delegates to the skills (contract R1). Runtime parity verified (T055): all edited templates/skills mirrored to .specify/, command mirrored to .claude/commands/speckit.agents.md.
+
+# SC re-evaluation after amendment (SCs unchanged; requirements.md not modified)
+SC-004_amendment_status=pass
+SC-004_amendment_note=Composability strengthened — all 6 role templates now carry supervisor+role-scope metadata and compose with the single-source delegation snippet (T056)
+SC-005_amendment_status=pass
+SC-005_amendment_note=Traceability preserved; improver change-log format unchanged, now reachable via generalized improve-agent
+SC-006_amendment_status=pass
+SC-006_amendment_note=Context isolation unchanged; supervision snippet reiterates fresh-subagent + no-shared-state rules
+
 # -- Free-form notes --
 
-notes=This feature codifies a proven pattern (K8s diagram optimization, 49→91 over 17 rounds) into reusable templates. The "implementation" is template/prompt engineering, not runtime code. Contract/integration tests (T008, T013) that assumed a pytest runtime are deferred as not applicable; template validity is verified structurally (YAML frontmatter + required sections present).
+notes=This feature codifies a proven pattern (K8s diagram optimization, 49→91 over 17 rounds) into reusable templates. The "implementation" is template/prompt engineering, not runtime code. Contract/integration tests (T008, T013) that assumed a pytest runtime are deferred as not applicable; template validity is verified structurally (YAML frontmatter + required sections present). The 2026-07-02 amendment (T032–T057) unifies the role-based and EEI dimensions: role agents are supervisors by default, create-agent/improve-agent are general-purpose, and /speckit.agents delegates to them. All amendment tasks structurally validated; no new deferrals.

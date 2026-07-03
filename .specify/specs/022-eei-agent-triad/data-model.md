@@ -102,6 +102,34 @@ Ordered log of all iterations.
 | converged | boolean | Whether the threshold was met |
 | total_duration | string | Total time across all iterations |
 
+### RoleSupervisor *(added by Plan Amendment 2026-07-02)*
+
+A role-based agent that can act as an orchestrator, dynamically spawning a role-scoped EEI triad for quality-gated deliverables. Produced by `create-agent` (Supervisor capability) and generated via `/speckit.agents`.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| role_slug | string | The role this supervisor embodies (e.g., `system-designer`) |
+| supervisor | boolean | Whether the delegation loop is active (`supervisor: true` in frontmatter) or dormant |
+| role_scope | string | The domain binding passed to the triad (`{{ROLE_SCOPE}}`) — constrains the executor's task and the evaluator's default dimensions to the role |
+| default_dimensions | Dimension[] | Role-appropriate default scoring dimensions the supervisor uses unless overridden per task |
+| triad | Triad \| null | The embedded triad configuration; null when `supervisor` is false |
+
+### AgentAuthoringRequest *(added by Plan Amendment 2026-07-02)*
+
+The input `/speckit.agents` passes to `create-agent`/`improve-agent` when delegating authoring (contract in `contracts/agent-authoring-contract.md`).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| kind | enum | `role` \| `supervisor` \| `triad` \| `custom` |
+| role_slug | string | Target role (for `role`/`supervisor`) |
+| task | string | Task description (for `supervisor`/`triad`) |
+| scoring_dimensions | Dimension[] | Weighted quality axes (for `supervisor`/`triad`) |
+| threshold | number | Acceptance threshold |
+| max_iterations | number | Loop cap (default 20) |
+| environment_paths | string[] | Reference paths the executor reads |
+| workspace_paths | string[] | Paths the improver may edit |
+| project_context | object | Gathered `{{PLACEHOLDER}}` values from the command |
+
 ## Relationships
 
 ```
@@ -112,6 +140,9 @@ ScoringConfig 1--* Dimension
 IterationHistory 1--* Iteration
 Iteration 1--* DimensionScore
 Iteration 0--* Change
+RoleSupervisor 0..1--1 Triad  (optional embedded triad; amendment)
+RoleSupervisor 1--* Dimension (default_dimensions; amendment)
+AgentAuthoringRequest 1--1 RoleSupervisor|Triad  (request produces one artifact; amendment)
 ```
 
 ## State Transitions

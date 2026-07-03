@@ -1,6 +1,6 @@
 ---
 name: improve-agent
-description: This skill iteratively improves existing role-based agent templates from execution feedback, user corrections, and behavioral observations. Use this when the user mentions ["improve agent", "refine agent", "fix agent", "agent feedback", "agent not working", "优化agent", "改进agent", "agent执行反馈"]
+description: General-purpose skill to improve any Spec Kit agent artifact — role template, supervisor, EEI sub-role, orchestration prompt, supervision snippet, or custom agent — from execution feedback, user corrections, and behavioral observations. Use this when the user mentions ["improve agent", "refine agent", "fix agent", "agent feedback", "agent not working", "优化agent", "改进agent", "agent执行反馈"]
 skill_id: "<SKILL:.specify/skills/improve-agent/SKILL.md>"
 ---
 
@@ -8,15 +8,34 @@ skill_id: "<SKILL:.specify/skills/improve-agent/SKILL.md>"
 
 ## Goal
 
-Improve an existing role-based agent template in `templates/` based on evidence from real usage — user feedback, failure cases, behavioral drift, or observed inefficiencies. The result is a targeted update to the template that fixes the identified issues while preserving the established template structure.
+Improve **any existing agent artifact** based on evidence from real usage — user feedback, failure cases, behavioral drift, or observed inefficiencies. Targets are not limited to role templates: this skill refines role templates, EEI sub-role templates, orchestration prompts, the shared supervision snippet, and generated custom agents. The result is a targeted update that fixes the identified issues while preserving the artifact's established structure.
 
 ## Input Contract
 
 The input is a description of the agent to improve and what went wrong or could be better. Parse:
 
-- **Target identifier**: Identify the agent template by role name, slug, or file path. Must resolve to exactly one `templates/agent-role-*-template.md` file.
+- **Target identifier**: Resolve to exactly one artifact of a supported kind (see § Target Classification):
+  - `templates/agent-role-*-template.md` (role)
+  - `templates/agent-subrole-*-template.md` (EEI sub-role)
+  - `templates/agent-triad-orchestration-template.md` (orchestration prompt)
+  - `templates/agent-supervision-delegation.md` (shared supervision snippet — edits here propagate to ALL supervisors)
+  - `.specify/agents/*.agent.md` (a generated custom agent)
 - **Improvement direction**: What specifically needs to change — extracted from user feedback, observed failures, or behavioral drift.
 - **Evidence**: Concrete examples of the problem (conversation excerpts, incorrect outputs, missing behaviors).
+
+## Target Classification
+
+Before the workflow, classify the target and route to the matching refinement rules:
+
+| Target kind | Match | Route to |
+|-------------|-------|----------|
+| role | `agent-role-*-template.md` | Workflow steps 1–6 (root-cause on the six mandatory sections) |
+| sub-role | `agent-subrole-{executor,evaluator,improver}-template.md` | § Triad Refinement (per-sub-role fixes) |
+| orchestration | `agent-triad-orchestration-template.md` | § Triad Refinement (loop/threshold/handoff fixes) |
+| supervision snippet | `agent-supervision-delegation.md` | Workflow steps 3–5; WARN that changes affect every supervisor (single source) |
+| custom | `.specify/agents/*.agent.md` | Workflow steps 1–6 against the generated file's own structure |
+
+If the identifier matches multiple kinds or none, ask one clarifying question.
 
 ## Workflow
 

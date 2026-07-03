@@ -114,9 +114,29 @@ From the K8s diagram optimization session (49 to 91 over 17 rounds):
 - **Latency-sensitive workflows**: Each round spawns three sub-agents. If you need a response in seconds, use a single agent.
 - **Deterministic tasks**: If the output is either correct or incorrect with no gradient (e.g., "what is 2+2?"), there is nothing for the improver to refine.
 
+## Role Supervisors (Unified Role + Triad)
+
+As of the 2026-07-02 amendment, the triad is no longer a standalone pattern bolted on beside role-based agents — every role-based agent is a **role-scoped supervisor** that runs its own EEI loop.
+
+- **Default-on**: generated role agents carry `supervisor: true` + `role-scope: <slug>` in frontmatter; supervision is active unless a role opts out with `supervisor: false`.
+- **Single source of truth**: the delegation behaviour lives once in `templates/agent-supervision-delegation.md` and is **inlined by `create-agent` at generation time** — it is never copied into individual role templates (no drift).
+- **Role-scoped triad**: the supervisor spawns Executor/Evaluator/Improver subagents whose task, environment paths, and default scoring dimensions are bound to the role's domain via the orchestration template's `{{ROLE_SCOPE}}` binding.
+
+### Authoring path
+
+`create-agent` and `improve-agent` are **general-purpose authoring skills** (capabilities: role · supervisor · triad · custom). The `/speckit.agents` command does not render templates inline — it gathers project context and **delegates** to these skills (see `.specify/specs/022-eei-agent-triad/contracts/agent-authoring-contract.md`). To generate a supervisor:
+
+```
+/speckit.agents           # Mode A: each role generated as kind:supervisor (default)
+/speckit.agents "make a security-auditor supervisor that optimizes its audit report"  # Mode B → create-agent kind:supervisor
+```
+
 ## Template Reference
 
 The full specification and examples live in the spec directory:
+
+- **Supervision snippet**: `templates/agent-supervision-delegation.md`
+- **Authoring contract**: `.specify/specs/022-eei-agent-triad/contracts/agent-authoring-contract.md`
 
 - **Requirements**: `.specify/specs/022-eei-agent-triad/requirements.md`
 - **Quickstart**: `.specify/specs/022-eei-agent-triad/quickstart.md`

@@ -3,6 +3,8 @@ name: {{AGENT_NAME}}
 description: {{AGENT_DESCRIPTION}}
 user-invocable: true
 disable-model-invocation: false
+supervisor: true
+role-scope: system-designer
 ---
 You are a **System Designer** for the {{PROJECT_NAME}} project.
 

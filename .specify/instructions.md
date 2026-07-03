@@ -88,6 +88,7 @@ Use this machine-maintained section to track reusable resource identifiers creat
 <!-- Record each skill as one table row with the columns below. -->
 | Skill Name | Skill ID | Description | Argument Hint | User Invocable | Disable Model Invocation | Canonical Path |
 |------------|----------|-------------|---------------|----------------|--------------------------|----------------|
+| git-submodule-edit | <SKILL:.specify/skills/git-submodule-edit/SKILL.md> | Edit and commit code inside a git submodule from the parent project under disciplined rules: edits happen on a branch named after the parent project (traceable upstream), and every submodule-pointer bump validated in the parent is recorded in a ledger (submodule-edits.md). | - | true | false | .specify/skills/git-submodule-edit/SKILL.md |
 | git-workflow | <SKILL:.specify/skills/git-workflow/SKILL.md> | Three-tier Git workflow management (trunk/pre-release/dev). Three modes: Setup (establish workflow), Maintain (health check), Execute (run git operations). Uses docs/git-workflow.md as single source of truth. | - | true | false | .specify/skills/git-workflow/SKILL.md |
 <!-- SKILLS_REGISTRY_END -->
 

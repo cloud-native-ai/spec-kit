@@ -1,6 +1,6 @@
 ---
 name: improve-agent
-description: This skill iteratively improves existing role-based agent templates from execution feedback, user corrections, and behavioral observations. Use this when the user mentions ["improve agent", "refine agent", "fix agent", "agent feedback", "agent not working", "优化agent", "改进agent", "agent执行反馈"]
+description: General-purpose skill to improve any Spec Kit agent artifact — role template, supervisor, EEI sub-role, orchestration prompt, supervision snippet, or custom agent — from execution feedback, user corrections, and behavioral observations. Use this when the user mentions ["improve agent", "refine agent", "fix agent", "agent feedback", "agent not working", "优化agent", "改进agent", "agent执行反馈"]
 skill_id: "<SKILL:.specify/skills/improve-agent/SKILL.md>"
 ---
 
@@ -8,15 +8,34 @@ skill_id: "<SKILL:.specify/skills/improve-agent/SKILL.md>"
 
 ## Goal
 
-Improve an existing role-based agent template in `templates/` based on evidence from real usage — user feedback, failure cases, behavioral drift, or observed inefficiencies. The result is a targeted update to the template that fixes the identified issues while preserving the established template structure.
+Improve **any existing agent artifact** based on evidence from real usage — user feedback, failure cases, behavioral drift, or observed inefficiencies. Targets are not limited to role templates: this skill refines role templates, EEI sub-role templates, orchestration prompts, the shared supervision snippet, and generated custom agents. The result is a targeted update that fixes the identified issues while preserving the artifact's established structure.
 
 ## Input Contract
 
 The input is a description of the agent to improve and what went wrong or could be better. Parse:
 
-- **Target identifier**: Identify the agent template by role name, slug, or file path. Must resolve to exactly one `templates/agent-role-*-template.md` file.
+- **Target identifier**: Resolve to exactly one artifact of a supported kind (see § Target Classification):
+  - `templates/agent-role-*-template.md` (role)
+  - `templates/agent-subrole-*-template.md` (EEI sub-role)
+  - `templates/agent-triad-orchestration-template.md` (orchestration prompt)
+  - `templates/agent-supervision-delegation.md` (shared supervision snippet — edits here propagate to ALL supervisors)
+  - `.specify/agents/*.agent.md` (a generated custom agent)
 - **Improvement direction**: What specifically needs to change — extracted from user feedback, observed failures, or behavioral drift.
 - **Evidence**: Concrete examples of the problem (conversation excerpts, incorrect outputs, missing behaviors).
+
+## Target Classification
+
+Before the workflow, classify the target and route to the matching refinement rules:
+
+| Target kind | Match | Route to |
+|-------------|-------|----------|
+| role | `agent-role-*-template.md` | Workflow steps 1–6 (root-cause on the six mandatory sections) |
+| sub-role | `agent-subrole-{executor,evaluator,improver}-template.md` | § Triad Refinement (per-sub-role fixes) |
+| orchestration | `agent-triad-orchestration-template.md` | § Triad Refinement (loop/threshold/handoff fixes) |
+| supervision snippet | `agent-supervision-delegation.md` | Workflow steps 3–5; WARN that changes affect every supervisor (single source) |
+| custom | `.specify/agents/*.agent.md` | Workflow steps 1–6 against the generated file's own structure |
+
+If the identifier matches multiple kinds or none, ask one clarifying question.
 
 ## Workflow
 
@@ -77,6 +96,40 @@ For each issue, determine whether the root cause is in:
 - The established template structure (six mandatory sections) MUST be preserved
 - Handoff chain consistency with other role templates MUST be maintained
 - Prefer minimal changes that fix the observed problem over broad rewrites
+
+## Triad Refinement
+
+Use this workflow when an EEI triad (Executor-Evaluator-Improver) has been running and the user wants to improve sub-role templates based on iteration results.
+
+### What Can Be Refined
+
+- **Executor template**: task interpretation, output format, tool usage patterns
+- **Evaluator template**: scoring rubric, acceptance thresholds, dimension weights
+- **Improver template**: change strategy, diff granularity, convergence behavior
+- **Orchestration prompt**: iteration cap, early-stop criteria, handoff sequencing
+
+### Input
+
+Provide iteration history that includes score progression across rounds and change logs showing what the improver modified at each step. A stalled or oscillating score curve is the clearest signal that one sub-role needs attention.
+
+### Process
+
+1. **Plot the score trajectory** -- identify plateaus, regressions, or oscillations.
+2. **Attribute underperformance** -- map each anomaly to the responsible sub-role:
+   - Scores plateau early --> Improver generates shallow patches; strengthen its change strategy.
+   - Scores oscillate --> Evaluator criteria are ambiguous; tighten rubric definitions.
+   - First-round score is very low --> Executor misinterprets the task; clarify its identity/responsibilities.
+3. **Draft targeted template edits** using the same minimal-change principle from Step 4 above.
+4. **Re-run one iteration** with the updated templates to confirm the fix before committing.
+
+### Examples
+
+| Symptom | Likely Cause | Template Fix |
+|---------|-------------|--------------|
+| Evaluator misses correctness bugs | Scoring rubric lacks a correctness dimension | Add explicit correctness criteria with weight |
+| Improver rewrites instead of patching | Change strategy section too broad | Constrain to diff-level edits, add "preserve working code" rule |
+| Executor ignores tool constraints | Identity section missing tool policy | Add tool-usage guardrails to responsibilities |
+| Scores converge then regress | Improver over-optimizes one dimension | Add multi-dimension balance check to improver workflow |
 
 ## Agent-Specific Configuration
 

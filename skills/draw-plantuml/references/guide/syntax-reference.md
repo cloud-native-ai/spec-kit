@@ -634,8 +634,8 @@ deactivate Gateway
 3. **给关系添加标签**：`A --> B : uses via HTTP` 具有自文档性
 4. **使用 `note` 补充非显而易见的细节**：协议、端口、SLA 等
 5. **拆分大图**：如果一张图超过 7 个核心元素，拆分为概览图 + 下钻图（硬上限 15）
-6. **最大化渲染质量**：始终在样式块中包含 `skinparam dpi 300` 和 `scale 4`（参见 `plantuml-style.md`）；这确保 SVG viewBox ≥ 3840×2160（4K UHD）且 PNG ≥ 4096px。配合 `ArrowThickness 2` 和 `BorderThickness 2`，图表在缩放时保持清晰。使用 [render-plantuml.sh](../scripts/render-plantuml.sh) 自动注入样式块并渲染。
-7. **按图表类型的详细操作指南**：参见 `references/howto/`——每个指南提供分步说明和完整示例
-8. **主动控制布局**：使用方向关键字（`-right->`、`-down->`）、隐藏连接（`-[hidden]->`）和 `together{}` 分组，防止自动布局打散相关元素。详见 [plantuml-best-practices.md](./plantuml-best-practices.md) §1。
+6. **最大化渲染质量**：始终在样式块中包含 `skinparam dpi 300` 和 `scale 4`（参见 [style.md](./style.md)）；这确保 SVG viewBox ≥ 3840×2160（4K UHD）且 PNG ≥ 4096px。配合 `ArrowThickness 2` 和 `BorderThickness 2`，图表在缩放时保持清晰。使用 [render-plantuml.sh](../../scripts/render-plantuml.sh) 自动注入样式块并渲染。
+7. **按图表类型的详细操作指南**：参见 [howto/](../howto/)——每个指南提供分步说明和完整示例
+8. **主动控制布局**：使用方向关键字（`-right->`、`-down->`）、隐藏连接（`-[hidden]->`）和 `together{}` 分组，防止自动布局打散相关元素。详见 [layout.md](./layout.md) §二。
 9. **先声明元素再声明关系**：先列出所有参与者/组件/类，再定义连接——这使源代码可扫描且产生更可预测的布局。
-10. **为密集图表调整间距**：元素重叠时使用 `skinparam nodesep 40` 和 `skinparam ranksep 60`。按复杂度级别的推荐值见 [plantuml-best-practices.md](./plantuml-best-practices.md) §1.4。
+10. **为密集图表调整间距**：元素重叠时使用 `skinparam nodesep 40` 和 `skinparam ranksep 60`。按复杂度级别的推荐值见 [layout.md](./layout.md) §二.4。

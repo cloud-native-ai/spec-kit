@@ -1,12 +1,12 @@
-# PlantUML 标准样式配置
+# PlantUML 样式指南
 
-本文件定义 draw-plantuml 技能生成的所有 PlantUML 图表必须遵循的统一样式规范。在 Step 4 编写完 PlantUML 代码后，**必须**按照本配置对样式进行校验和调整。
+本文件定义 draw-plantuml 技能生成的所有 PlantUML 图表必须遵循的统一样式规范。在 Step 7 应用标准样式时，**必须**按照本配置对样式进行校验和调整。
 
-**渲染方式**：使用 [render-plantuml.sh](../scripts/render-plantuml.sh) 脚本渲染。脚本实现 SVG/PNG 双策略：
+**渲染方式**：使用 [render-plantuml.sh](../../scripts/render-plantuml.sh) 脚本渲染。脚本实现 SVG/PNG 双策略：
 - **SVG**：注入 `scale 4 + dpi 300`（矢量无损，viewBox ≥ 3840×2160）
 - **PNG**：自适应计算 scale/dpi，确保输出 ≤ 4095×4095（低于 Server 硬上限 4096）
 
-## 基础样式模板（所有图表类型通用）
+## 一、基础样式模板（所有图表类型通用）
 
 以下配置项必须插入在 `@startuml` 之后、图表内容之前：
 
@@ -38,7 +38,7 @@ skinparam svgLinkTarget _blank
 @enduml
 ```
 
-## 色彩模式选择（Monochrome vs Color）
+## 二、色彩模式选择（Monochrome vs Color）
 
 在基础样式模板之后，根据图表需求选择色彩模式：
 
@@ -64,7 +64,22 @@ skinparam monochrome true
 
 **重要警告**：`skinparam monochrome true` 会将**所有**颜色转换为灰度，包括通过 `<color:red>` 或 `<font color=red>` 设置的内联颜色。如果图表需要任何彩色元素，**必须省略**该设置。
 
-## 条件样式（按图表类型启用）
+## 三、关键路径着色
+
+用颜色区分核心流程与异常分支（在需要彩色输出时使用，与 monochrome 模式互斥）：
+
+```plantuml
+' 正常流程保持默认色
+client -> server : 正常请求
+
+' 异常/关键路径用颜色突出
+client -[#FF0000]-> server : 超时重试
+client -[#FF8C00]-> fallback : 降级处理
+```
+
+> **注意**：本技能默认使用 `skinparam monochrome true`（黑白模式）。如需彩色高亮，需移除 monochrome 设置或改为 `skinparam monochrome false`，并在 SKILL.md 步骤中说明选择理由。
+
+## 四、条件样式（按图表类型启用）
 
 当图表包含 `actor` 或属于用例图（Use Case Diagram）时，在通用样式之后额外追加：
 
@@ -73,7 +88,7 @@ skinparam monochrome true
 skinparam actorStyle awesome
 ```
 
-## SVG/PNG 双策略说明
+## 五、SVG/PNG 双策略说明
 
 | 格式 | 策略 | 参数 | 输出尺寸 | 适用场景 |
 |------|------|------|----------|----------|
@@ -92,7 +107,7 @@ skinparam actorStyle awesome
 - 当 `scale × dpi × 图表尺寸` 导致内部渲染缓冲区溢出时，Server **静默返回空白 PNG**
 - 本技能使用 4095 作为目标上限，确保安全距离
 
-## 配置项说明
+## 六、配置项说明
 
 | 配置项 | 作用 | 适用范围 |
 |--------|------|----------|
@@ -111,7 +126,7 @@ skinparam actorStyle awesome
 | `skinparam svgLinkTarget _blank` | SVG 中的超链接在新窗口打开 | 所有图表（SVG） |
 | `skinparam actorStyle awesome` | Actor 使用 FontAwesome 风格图标 | 仅用例图/含 actor 的图 |
 
-## 样式校验要点
+## 七、样式校验要点
 
 在完成 PlantUML 代码后，逐项检查：
 
@@ -126,5 +141,6 @@ skinparam actorStyle awesome
 
 ## 扩展阅读
 
-- **布局优化与内容组织最佳实践**：参见 [plantuml-best-practices.md](./plantuml-best-practices.md)
-- **间距调整**：`skinparam nodesep` / `skinparam ranksep` 参数说明见最佳实践文档 §1.4
+- **布局优化技巧**：参见 [layout.md](./layout.md)
+- **内容组织与标签规则**：参见 [content.md](./content.md)
+- **间距调整**：`skinparam nodesep` / `skinparam ranksep` 参数说明见 [layout.md](./layout.md) §二.4

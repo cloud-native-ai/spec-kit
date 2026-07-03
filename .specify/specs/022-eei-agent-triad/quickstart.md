@@ -88,6 +88,37 @@ Round 3: Code refined → Review scores 92 → DONE!
 **Evaluator**: Score on completeness (40%), clarity (30%), accuracy (30%)  
 **Improver**: Update writing guidelines and topic context  
 
+## Scenario 4: Generate a Supervisor Role Agent via `/speckit.agents` *(Plan Amendment 2026-07-02)*
+
+This scenario shows the unified flow: `/speckit.agents` delegates to the general-purpose `create-agent` skill to produce a **role agent that supervises its own EEI triad**.
+
+### Flow
+
+```
+/speckit.agents "make the system-designer a supervisor that optimizes its architecture output"
+      │
+      ├─ command gathers project context ({{PROJECT_NAME}}, {{TECH_STACK}}, ...)
+      ├─ command builds an AgentAuthoringRequest { kind: supervisor, role_slug: system-designer, ... }
+      └─ command CALLS create-agent (Supervisor capability)
+              │
+              ├─ composes agent-role-system-designer-template.md
+              │   + shared "Supervision & EEI Delegation" section (ROLE_SCOPE = system-designer)
+              ├─ writes .specify/agents/system-designer.agent.md
+              └─ returns AuthoringResult (artifact paths + registry entry)
+```
+
+### Result
+
+The generated `system-designer.agent.md`, when invoked on a quality-gated task, acts as an orchestrator: it spawns Executor (drafts the architecture), Evaluator (scores on role-default dimensions), and Improver subagents from the existing `agent-subrole-*` templates and loops until threshold — all scoped to the System Designer's domain.
+
+### Refining it later
+
+```
+/speckit.agents  →  improve-agent { target: system-designer, direction: "scores plateau at 70" }
+```
+
+`improve-agent` classifies the target, plots the trajectory, and applies a minimal fix to the responsible layer (see `improve-agent` Triad Refinement rules).
+
 ## Key Principles
 
 1. **Context isolation**: Each sub-agent gets a fresh context per invocation — no shared memory
@@ -105,3 +136,28 @@ After running a triad loop, verify:
 - [ ] No evaluator output references the executor's internal prompt (context isolation)
 - [ ] All improver changes are traceable (file diffs logged)
 - [ ] The executor re-read updated environment files each iteration (not cached)
+
+## Amendment Validation Checklist (Supervisor + General-Skill Refactor)
+
+Structural validation for the 2026-07-02 amendment (no runtime code — verified by inspecting the templates/skills/command):
+
+**G1 — Role supervisors (T036)**
+- [ ] Each of the 6 `templates/agent-role-*-template.md` carries `supervisor: true` (default-on, OQ-1) and a `role-scope:` matching its slug
+- [ ] The shared section lives ONLY in `templates/agent-supervision-delegation.md` (not copied into role templates, OQ-2)
+- [ ] `templates/agent-triad-orchestration-template.md` exposes a `{{ROLE_SCOPE}}` binding
+
+**G2 — Generalized create-agent (T043)**
+- [ ] `skills/create-agent/SKILL.md` Goal reads as general authoring (not "role-based only")
+- [ ] A capability matrix covers role · supervisor · triad · custom
+- [ ] The Supervisor capability inlines `agent-supervision-delegation.md` and binds `{{ROLE_SCOPE}}`
+- [ ] Every `AgentAuthoringRequest` field from `contracts/agent-authoring-contract.md` is consumed
+
+**G3 — Generalized improve-agent (T047)**
+- [ ] `skills/improve-agent/SKILL.md` target resolution covers role · sub-role · orchestration · custom `.agent.md`
+- [ ] A classify-then-route step precedes the refinement workflows
+
+**G4 — Command delegates (T049)**
+- [ ] `templates/commands/agents.md` Mode A builds an `AgentAuthoringRequest` and calls `create-agent`
+- [ ] Mode B delegates custom creation to `create-agent` and updates to `improve-agent`
+- [ ] No inline template-rendering block remains in either mode (contract R1)
+- [ ] Runtime command `.claude/commands/speckit.agents.md` matches `templates/commands/agents.md`

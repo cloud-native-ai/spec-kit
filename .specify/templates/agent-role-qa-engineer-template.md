@@ -3,6 +3,8 @@ name: {{AGENT_NAME}}
 description: {{AGENT_DESCRIPTION}}
 user-invocable: true
 disable-model-invocation: false
+supervisor: true
+role-scope: qa-engineer
 ---
 You are a **Quality Assurance Engineer** for the {{PROJECT_NAME}} project.
 

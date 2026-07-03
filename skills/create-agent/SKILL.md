@@ -1,6 +1,6 @@
 ---
 name: create-agent
-description: This skill creates new role-based agent templates for the Spec Kit agent system. Use this when the user mentions ["create an agent", "new agent", "add agent role", "agent template", "创建agent", "新建agent", "添加角色"]
+description: General-purpose authoring skill for Spec Kit agents — creates role, supervisor (role + embedded EEI triad), triad sub-role, or custom agents. Use this when the user mentions ["create an agent", "new agent", "add agent role", "agent template", "supervisor agent", "EEI triad", "创建agent", "新建agent", "添加角色"]
 skill_id: "<SKILL:.specify/skills/create-agent/SKILL.md>"
 ---
 
@@ -8,7 +8,24 @@ skill_id: "<SKILL:.specify/skills/create-agent/SKILL.md>"
 
 ## Goal
 
-Create a new role-based agent template in `templates/` that can be used by `/speckit.agents` to generate project-aware agents. The template follows the established role-based structure with Identity & Responsibilities, Project Context, Workflow, Upstream/Downstream, and Output Format sections.
+Author **any agent artifact** for the Spec Kit agent system — a role template, a role-scoped **supervisor** (role + embedded EEI triad), an EEI **triad** (three sub-role agents + orchestration prompt), or a **custom** `.agent.md`. This skill is the single authoring engine invoked by `/speckit.agents`; the command gathers project context and delegates here rather than rendering templates inline.
+
+## Capability Matrix
+
+Select the capability from the request `kind` (or infer from user intent):
+
+| kind | Produces | Source templates | Primary section |
+|------|----------|------------------|-----------------|
+| `role` | One role-based agent (six mandatory sections) | `templates/agent-role-*-template.md` | Workflow steps 1–5 below |
+| `supervisor` | A role agent that runs its own EEI loop | role template + `agent-supervision-delegation.md` inlined | § Supervisor Capability |
+| `triad` | 3 sub-role agents + orchestration prompt | `agent-subrole-*` + `agent-triad-orchestration-template.md` | § Triad Mode (EEI Pattern) |
+| `custom` | A single narrow custom `.agent.md` | free-form per intent | `/speckit.agents` Mode B flow |
+
+All capabilities share the same validate + report tail (Workflow steps 4–5) and the Agent-Specific Configuration handling below.
+
+## AgentAuthoringRequest Intake
+
+When invoked by `/speckit.agents`, accept the `AgentAuthoringRequest` defined in `.specify/specs/022-eei-agent-triad/contracts/agent-authoring-contract.md` and consume every field: `kind`, `role_slug`, `task`, `scoring_dimensions[]`, `threshold`, `max_iterations`, `environment_paths[]`, `workspace_paths[]`, `project_context`. Missing optional fields fall back to role/triad defaults (threshold from role, `max_iterations`=20). Return an `AuthoringResult` (`artifact_paths`, `kind`, `status`, `registry_entry`).
 
 ## Workflow
 
@@ -136,6 +153,24 @@ The skill populates placeholders and writes the generated files to `.specify/age
 2. Validate that all four subrole templates exist in `templates/`.
 3. Generate three sub-role agent files and one orchestration prompt.
 4. Report the created file paths and suggest a test invocation.
+
+## Supervisor Capability
+
+Use this capability (`kind: supervisor`) to author a **role-scoped supervisor** — a role agent that, for quality-gated deliverables, orchestrates its own EEI loop. Per the amendment decisions: supervision is **active by default** (OQ-1) and the delegation section is **composed at generation, not copied into role templates** (OQ-2).
+
+### How it works
+
+1. Load the role template `templates/agent-role-<role_slug>-template.md` (it carries `supervisor: true` and `role-scope: <role_slug>` in frontmatter).
+2. **Inline the single-source snippet** `templates/agent-supervision-delegation.md` into the generated agent body, resolving its placeholders:
+   - `{{ROLE_SCOPE}}` → `role_slug`
+   - `{{ROLE_NAME}}` → role display name
+   - `{{ROLE_DIMENSIONS}}` → the request's `scoring_dimensions` (or role-appropriate defaults if omitted)
+3. Preserve `supervisor: true` in the generated frontmatter (honor `supervisor: false` only if the request explicitly opts out).
+4. Write the generated agent to `.specify/agents/<role_slug>.agent.md` and run the shared validate + report tail.
+
+### Rule
+
+Never copy the delegation section text into `templates/agent-role-*-template.md`; edit it only in `templates/agent-supervision-delegation.md` so all supervisors stay in sync (single source of truth).
 
 ## Agent-Specific Configuration
 
