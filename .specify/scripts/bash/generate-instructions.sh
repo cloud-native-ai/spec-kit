@@ -169,5 +169,6 @@ popd >/dev/null
 ln -sf .specify/instructions.md QWEN.md
 ln -sf .specify/instructions.md CLAUDE.md
 ln -sf .specify/instructions.md QODER.md
+ln -sf .specify/instructions.md AGENTS.md
 
 log success "Instructions generated/updated at $TARGET_FILE"

@@ -57,6 +57,7 @@ The canonical file is `.specify/instructions.md`. Compatibility files are symlin
 | `.github/copilot-instructions.md` | GitHub Copilot |
 | `QWEN.md` | Qwen Code |
 | `QODER.md` | Qoder |
+| `AGENTS.md` | Qoder (base rule), Codex |
 
 ## Output Artifacts
 

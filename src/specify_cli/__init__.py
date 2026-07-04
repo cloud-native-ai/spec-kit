@@ -419,7 +419,7 @@ _IGNORE_FILE_MAP = {
 _INSTRUCTIONS_FILE_MAP = {
     "claude": "CLAUDE.md",
     "codex": "AGENTS.md",
-    "qoder": "QODER.md",
+    "qoder": "AGENTS.md",
     "qwen": "QWEN.md",
     "hermes": "HERMES.md",
     "iflow": "IFLOW.md",
