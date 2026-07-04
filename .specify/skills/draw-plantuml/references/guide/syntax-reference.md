@@ -533,6 +533,123 @@ skinparam ArrowColor #555555
 @enduml
 ```
 
+## 8. 专项图表（WBS / 甘特图 / 思维导图 / JSON / YAML）
+
+以下 5 种为**非 UML** 专项图，各自用独立的 `@start.../@end...` 包裹，**不用** `skinparam`，靠原生配色与各自的 `<style>` 块控制外观。此处为紧凑速查，完整说明见 [howto/](../howto/) 13~17。
+
+### 8.1 WBS（工作分解结构）
+
+`@startwbs ... @endwbs`。`*` 个数表示深度（OrgMode）；或用 `+`/`-`（算术记法）同时表达深度与方向（`+` 右、`-` 左）。`<`/`>` 切换分支方向，`_` 去框，`[#色]` 内联着色，`<<类名>>` 引用样式类。
+
+```plantuml
+@startwbs
+<style>
+wbsDiagram {
+  LineColor #4A90A4
+  RoundCorner 8
+  .phase { BackgroundColor #DDEEFF }
+}
+</style>
+* 项目交付 <<phase>>
+** 需求与设计
+*** 需求调研
+** 后端开发
+****> 下单流程
+***< 库存服务
+***_ 无框说明节点
+@endwbs
+```
+
+### 8.2 甘特图（Gantt）
+
+`@startgantt ... @endgantt`。核心：`Project starts YYYY-MM-DD` 基准；`[任务] requires N days`（`lasts`/`needs` 等价）；依赖 `starts at [A]'s end` / `then [B]`；里程碑 `[M] happens at [X]'s end`；进度 `is N% complete`；着色 `is colored in 前景/边框`；分隔符 `-- 阶段 --`；今日线 `today is N days after start and is colored in #AAF`；工作日 `saturday are closed`、`YYYY-MM-DD is closed`；刻度 `printscale daily|weekly` / `projectscale monthly|quarterly|yearly`（可加 `zoom N`）。
+
+```plantuml
+@startgantt
+printscale weekly
+Project starts 2026-03-02
+saturday are closed
+sunday are closed
+today is 35 days after start and is colored in #AAD4FF
+-- 设计阶段 --
+[需求分析] as [REQ] requires 8 days
+[REQ] is 100% complete and is colored in GreenYellow/Green
+-- 开发阶段 --
+[后端开发] as [BE] starts at [REQ]'s end and requires 20 days
+[BE] is 60% complete and is colored in Lavender/RoyalBlue
+[设计评审] happens at [REQ]'s end
+@endgantt
+```
+
+### 8.3 思维导图（MindMap）
+
+`@startmindmap ... @endmindmap`。`*` 深度（OrgMode）或 `+`/`-`（右/左分置）；`left side`/`right side` 切换后续分支方向；`top to bottom direction` 改整体方向；`_` 去框，`[#色]` 内联着色，`<<类名>>` 样式类，`**:...;` 多行节点。样式作用域为 `mindmapDiagram`。
+
+```plantuml
+@startmindmap
+<style>
+mindmapDiagram {
+  node { RoundCorner 12 }
+  rootNode { BackgroundColor #2C3E50; FontColor white; FontStyle bold }
+  .arch { BackgroundColor #D5F5E3 }
+}
+</style>
+* 成长路线
+**[#FDEBD0] 编程语言
+***_ Java
+left side
+** 系统架构 <<arch>>
+*** 微服务
+@endmindmap
+```
+
+### 8.4 JSON
+
+`@startjson ... @endjson`，中间直接粘贴合法 JSON。高亮：`#highlight "键"`，路径分隔符只有 `/`，数组下标用加引号的数字（如 `"电话" / "0" / "号码"`，从 0 开始），行尾 `<<类名>>` 套用高亮类。样式作用域 `jsonDiagram`，含 `node`（含 `separator`）、`arrow`、`highlight` 三个子块。
+
+```plantuml
+@startjson
+<style>
+jsonDiagram {
+  node { BackGroundColor #FDFDFD; FontName "Noto Sans SC"; RoundCorner 8 }
+  highlight { BackGroundColor #FFE082; FontColor #7A4F01; FontStyle bold }
+  .warn { BackGroundColor #EF5350  FontColor white }
+}
+</style>
+#highlight "服务名称"
+#highlight "数据库" / "从库列表" / "0" / "地址" <<warn>>
+{
+  "服务名称": "订单服务",
+  "副本数": 3,
+  "端口": [8080, 9090],
+  "数据库": { "从库列表": [ { "地址": "10.0.1.6:3306" } ] }
+}
+@endjson
+```
+
+### 8.5 YAML
+
+`@startyaml ... @endyaml`，中间直接粘贴 YAML（空格缩进）。高亮用注释行 `# highlight "键"`，路径 `"父键" / "子键"`（每段带引号），只命中键。样式作用域 `yamlDiagram`，含 `node`（含 `separator`）、`arrow`、`highlight`；渲染脚本对 `@startyaml` 保留原生配色。
+
+```plantuml
+@startyaml
+<style>
+yamlDiagram {
+  node { BackGroundColor #F8FAFC; FontColor #1E293B; RoundCorner 8 }
+  highlight { BackGroundColor #FDE68A; FontColor #7C2D12; FontStyle bold }
+}
+</style>
+# highlight "spec" / "容器"
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  副本数: 3
+  容器:
+    - 名称: app
+      镜像: order-service:2.3.1
+@endyaml
+```
+
 ## 按图表类型的快速语法参考
 
 | 图表 | 关键元素 | 关系语法 |
@@ -544,6 +661,11 @@ skinparam ArrowColor #555555
 | **用例图** | `actor "Name"`, `usecase`, `rectangle "边界" {}` | `-->` 关联, `..>` 包含, `.>` 扩展, `--|>` 泛化 |
 | **活动图** | `start`/`stop`, `:action;`, `if/else`, `fork/end fork` | `->` 控制流, `\|泳道\|` 泳道 |
 | **状态机图** | `[*]`, `state "Name"`, 组合状态 `{}`, `--` 并发 | `-->` 带事件 `[guard] / action` 转换 |
+| **WBS 图** | `@startwbs`, `*`/`**` 深度或 `+`/`-` 方向, `[#色]`, `<<类名>>` | `<`/`>` 切换方向, `_` 去框（见 [howto/13](../howto/13-wbs-diagram.md)） |
+| **甘特图** | `@startgantt`, `Project starts`, `[任务] requires N days`, `-- 阶段 --` | `starts at [A]'s end`, `then`, `happens at`（见 [howto/14](../howto/14-gantt-diagram.md)） |
+| **思维导图** | `@startmindmap`, `*`/`+`/`-` 深度与方向, `left side`, `[#色]`, `<<类名>>` | `_` 去框, `**:...;` 多行（见 [howto/15](../howto/15-mindmap-diagram.md)） |
+| **JSON 图** | `@startjson` + 合法 JSON, `#highlight "键"`, `<style> jsonDiagram` | 路径 `"键" / "0" / "子键"`（见 [howto/16](../howto/16-json-diagram.md)） |
+| **YAML 图** | `@startyaml` + YAML, `# highlight "键"`, `<style> yamlDiagram` | 路径 `"父" / "子"`, 只命中键（见 [howto/17](../howto/17-yaml-diagram.md)） |
 
 ## 常见模式
 

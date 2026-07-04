@@ -139,6 +139,72 @@ skinparam actorStyle awesome
 7. **无冲突**：确认图表内容中没有覆盖上述 skinparam 的重复声明
 8. **PNG 安全**：确认渲染脚本输出无 WARNING（表示 PNG 未触发 4096 硬上限）
 
+## 八、专项图表的样式（非 UML）
+
+WBS、甘特图、思维导图、JSON、YAML 这 5 种专项图**不是** UML 图，**不适用**本文前七节的单色 `skinparam` 规范：它们不接受 `skinparam monochrome true`、`skinparam dpi/scale` 等通用配置，而是使用**原生配色** + 各自的 `<style>` 块 + 内联着色指令。
+
+- **不要注入单色 skinparam**：这些图靠颜色传达状态/分类/高亮，强制单色会丢失信息。渲染脚本 [render-plantuml.sh](../../scripts/render-plantuml.sh) 已对 `@startwbs` / `@startgantt` / `@startmindmap` / `@startjson` / `@startyaml` **自动跳过单色处理**，保留原生配色，无需手动干预。
+- **各图的样式载体**：
+  - **WBS** → `<style> wbsDiagram { ... }` + 内联 `[#色]` + `<<类名>>`
+  - **思维导图** → `<style> mindmapDiagram { ... }` + 内联 `[#色]` + `<<类名>>`
+  - **甘特图** → 内联 `is colored in 前景/边框`、`today ... is colored in #色`、`YYYY-MM-DD is colored in 色`（甘特图**无** `<style>` 作用域）
+  - **JSON** → `<style> jsonDiagram { node / arrow / highlight }` + `#highlight ... <<类名>>`
+  - **YAML** → `<style> yamlDiagram { node / arrow / highlight }` + `# highlight ... <<类名>>`
+- **配色原则同 UML**：颜色服务于信息（状态/分类/重点），全图控制在 3~4 种以内，浅背景 + 深文字保证对比度，中文务必设 `FontName "Noto Sans SC"`（JSON/YAML）避免方块字。
+
+### WBS `<style>` 示例
+
+```plantuml
+<style>
+wbsDiagram {
+  LineColor #4A90A4
+  RoundCorner 8
+  .phase { BackgroundColor #DDEEFF }
+  .risk  { BackgroundColor #FFDDDD }
+  boxless { FontColor #555555 }
+}
+</style>
+```
+
+### 思维导图 `<style>` 示例
+
+```plantuml
+<style>
+mindmapDiagram {
+  node { RoundCorner 12; Padding 8 }
+  rootNode { BackgroundColor #2C3E50; FontColor white; FontStyle bold }
+  .arch { BackgroundColor #D5F5E3; LineColor #27AE60 }
+}
+</style>
+```
+
+### JSON `<style>` 示例
+
+```plantuml
+<style>
+jsonDiagram {
+  node { BackGroundColor #FDFDFD; LineColor #6B7A8F; FontName "Noto Sans SC"; FontColor #2E3B4E; RoundCorner 8 }
+  arrow { LineColor #6B7A8F }
+  highlight { BackGroundColor #FFE082; FontColor #7A4F01; FontStyle bold }
+  .warn { BackGroundColor #EF5350  FontColor white }
+}
+</style>
+```
+
+### YAML `<style>` 示例
+
+```plantuml
+<style>
+yamlDiagram {
+  node { BackGroundColor #F8FAFC; LineColor #94A3B8; FontColor #1E293B; RoundCorner 8 }
+  arrow { LineColor #94A3B8 }
+  highlight { BackGroundColor #FDE68A; FontColor #7C2D12; FontStyle bold }
+}
+</style>
+```
+
+> 完整语法与逐项说明见 [syntax-reference.md](./syntax-reference.md) §8 及 [howto/](../howto/) 13~17。
+
 ## 扩展阅读
 
 - **布局优化技巧**：参见 [layout.md](./layout.md)

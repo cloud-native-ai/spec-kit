@@ -9,11 +9,21 @@
 # internal rendering buffer exceeds this, it silently returns a blank image.
 # This script targets PNG_MAX (4095) to stay safely below the cap.
 #
+# Two rendering backends (auto-selected):
+#   • server — POST to a PlantUML server (PLANTUML_SERVER). Preferred when reachable.
+#   • local  — a local PlantUML jar (PLANTUML_JAR or a well-known path) via `java`.
+#             Works fully offline. Required diagram types that need Graphviz
+#             (class/component/deployment/sequence/state/usecase/activity/package)
+#             still need `dot` on PATH; WBS/Gantt/MindMap/JSON/YAML do not.
+# Backend selection: PLANTUML_BACKEND=server|local|auto (default auto).
+#   auto → probe the server; on failure fall back to the local jar if present.
+#
 # Usage: render-plantuml.sh <input.puml> [output_dir] [output_prefix]
 
 set -euo pipefail
 
 PLANTUML_SERVER="${PLANTUML_SERVER:-http://workspace.code-workspace.cloud:39156/plantuml}"
+PLANTUML_BACKEND="${PLANTUML_BACKEND:-auto}"   # server | local | auto
 SVG_SCALE=4        # SVG: maximum quality (vector, no size limit)
 SVG_DPI=300
 PNG_MAX=4095       # PNG: target max dimension (< server hard cap 4096)
@@ -23,6 +33,81 @@ PNG_BLANK_THRESHOLD=100000  # PNG file size below this for 4096×4096 = likely b
 
 log() { printf '[render-plantuml] %s\n' "$*" >&2; }
 warn() { printf '[render-plantuml] WARNING: %s\n' "$*" >&2; }
+
+# ── Backend resolution ────────────────────────────────────────────────────────
+
+# Resolve a local PlantUML jar path. Order: $PLANTUML_JAR, well-known locations.
+resolve_jar() {
+  if [[ -n "${PLANTUML_JAR:-}" ]] && [[ -f "$PLANTUML_JAR" ]]; then
+    echo "$PLANTUML_JAR"; return 0
+  fi
+  local cand
+  for cand in \
+    "$HOME/.local/share/plantuml/plantuml.jar" \
+    "/usr/local/share/plantuml/plantuml.jar" \
+    "/opt/plantuml/plantuml.jar" \
+    "/tmp/plantuml.jar"; do
+    [[ -f "$cand" ]] && { echo "$cand"; return 0; }
+  done
+  return 1
+}
+
+# Probe whether the PlantUML server can render (POST a trivial diagram).
+server_reachable() {
+  local probe='@startuml
+a->b
+@enduml'
+  curl -sf -m 6 -X POST -H "Content-Type: text/plain" \
+    --data-binary "$probe" "${PLANTUML_SERVER}/svg" -o /dev/null 2>/dev/null
+}
+
+# Decide which backend to use. Echoes "server" or "local"; exits on neither.
+select_backend() {
+  local jar; jar="$(resolve_jar || true)"
+  case "$PLANTUML_BACKEND" in
+    server) echo "server" ;;
+    local)
+      [[ -n "$jar" ]] || { warn "PLANTUML_BACKEND=local but no jar found"; exit 1; }
+      echo "local" ;;
+    auto|*)
+      if server_reachable; then
+        echo "server"
+      elif [[ -n "$jar" ]]; then
+        warn "Server unreachable; using local jar: ${jar}"
+        echo "local"
+      else
+        warn "PlantUML server unreachable and no local jar found."
+        warn "Set PLANTUML_JAR=/path/to/plantuml.jar or start a server."
+        exit 1
+      fi ;;
+  esac
+}
+
+# Render a styled .puml to a target format via the chosen backend.
+# render_diagram <styled_puml> <out_file> <svg|png>
+render_diagram() {
+  local styled="$1" out="$2" fmt="$3"
+  if [[ "$BACKEND" == "local" ]]; then
+    local outdir; outdir="$(cd "$(dirname "$out")" && pwd)"
+    local base; base="$(basename "$styled")"; base="${base%.puml}"
+    # PlantUML writes <base>.<ext> into -o dir; capture stderr for diagnostics.
+    # PLANTUML_LIMIT_SIZE lifts the default 4096px cap so high-scale/high-dpi
+    # renders are not silently clamped (local jar has no server-side limit).
+    if ! java -Djava.awt.headless=true -DPLANTUML_LIMIT_SIZE="${PLANTUML_LIMIT_SIZE:-16384}" \
+          -jar "$JAR" "-t${fmt}" -charset UTF-8 \
+          -o "$outdir" "$styled" >/dev/null 2>"${out}.jarlog"; then
+      warn "Local jar rendering failed (${fmt}):"; sed 's/^/[jar] /' "${out}.jarlog" >&2 || true
+      rm -f "${out}.jarlog"; return 1
+    fi
+    rm -f "${out}.jarlog"
+    local produced="${outdir}/${base}.${fmt}"
+    [[ "$produced" != "$out" ]] && mv -f "$produced" "$out"
+    [[ -f "$out" ]]
+  else
+    curl -sf -X POST -H "Content-Type: text/plain" \
+      --data-binary "@${styled}" "${PLANTUML_SERVER}/${fmt}" -o "$out"
+  fi
+}
 
 # ── Style injection ───────────────────────────────────────────────────────────
 
@@ -36,10 +121,22 @@ strip_style() {
     "$input"
 }
 
-# Inject style block with given scale and dpi after @startuml.
+# Inject style block with given scale and dpi after the diagram's @start tag.
 inject_style() {
   local input="$1" output="$2" scale="$3" dpi="$4"
   local style_tmp="${output}.style.tmp"
+
+  # Detect the actual start tag (@startuml / @startwbs / @startgantt / ...).
+  # The style block must be inserted right after it, not hardcoded to @startuml.
+  local start_tag
+  start_tag=$(grep -m1 -oiE '^[[:space:]]*@start[a-z]+' "$input" 2>/dev/null | tr -d '[:space:]')
+  [[ -z "$start_tag" ]] && start_tag="@startuml"
+
+  # Is this a specialty (non-UML) diagram?
+  local specialty=""
+  if [[ "$start_tag" =~ ^@start(wbs|gantt|mindmap|json|yaml|salt)$ ]]; then
+    specialty="true"
+  fi
 
   # Detect if source uses color markup — skip monochrome if so
   local use_mono="true"
@@ -48,7 +145,20 @@ inject_style() {
     log "Color markup detected — skipping monochrome"
   fi
 
-  cat <<EOF > "$style_tmp"
+  if [[ -n "$specialty" ]]; then
+    # Specialty diagrams (WBS/Gantt/MindMap/JSON/YAML/Salt) rely on native
+    # coloring and their own <style> blocks. Inject only scale + dpi (so the
+    # image is rendered large & crisp instead of raw 1:1) + a CJK-capable font.
+    # Do NOT force monochrome or UML skinparams here.
+    log "Specialty diagram (${start_tag}) — minimal style: scale=${scale}, dpi=${dpi}"
+    cat <<EOF > "$style_tmp"
+skinparam dpi ${dpi}
+scale ${scale}
+skinparam shadowing false
+skinparam defaultFontName "Noto Sans SC, Arial, Helvetica, sans-serif"
+EOF
+  else
+    cat <<EOF > "$style_tmp"
 ${use_mono:+skinparam monochrome true}
 skinparam shadowing false
 skinparam roundCorner 20
@@ -62,8 +172,10 @@ skinparam BorderThickness 2
 skinparam svgDimensionStyle false
 skinparam svgLinkTarget _blank
 EOF
+  fi
 
-  strip_style "$input" | sed "/^@startuml/r ${style_tmp}" > "$output"
+  # Insert the style block after the (single) @start line, whatever its type.
+  strip_style "$input" | sed "/^[[:space:]]*@start[a-zA-Z]/r ${style_tmp}" > "$output"
   rm -f "$style_tmp"
 }
 
@@ -171,6 +283,15 @@ main() {
 
   mkdir -p "$output_dir"
 
+  # ── Select rendering backend (server or local jar) ──
+  BACKEND="$(select_backend)"
+  if [[ "$BACKEND" == "local" ]]; then
+    JAR="$(resolve_jar)"
+    log "Backend: local jar (${JAR})"
+  else
+    log "Backend: server (${PLANTUML_SERVER})"
+  fi
+
   # ── Guard: prevent input/output path collision ──
   # When output_dir/prefix.puml resolves to the same file as input,
   # inject_style's shell redirection would truncate the input before reading.
@@ -199,8 +320,7 @@ main() {
   log "SVG style applied (scale=${SVG_SCALE}, dpi=${SVG_DPI})"
 
   log "Rendering SVG..."
-  if ! curl -sf -X POST -H "Content-Type: text/plain" \
-    --data-binary "@${puml}" "${PLANTUML_SERVER}/svg" -o "$svg"; then
+  if ! render_diagram "$puml" "$svg" svg; then
     warn "SVG rendering failed"
     rm -f "$png_puml"
     exit 1
@@ -217,8 +337,7 @@ main() {
   inject_style "$effective_input" "$png_puml" "$png_scale" "$png_dpi"
 
   log "Rendering PNG..."
-  if ! curl -sf -X POST -H "Content-Type: text/plain" \
-    --data-binary "@${png_puml}" "${PLANTUML_SERVER}/png" -o "$png"; then
+  if ! render_diagram "$png_puml" "$png" png; then
     warn "PNG rendering failed"
     rm -f "$png_puml"
     exit 1
@@ -235,8 +354,7 @@ main() {
     inject_style "$effective_input" "$png_puml" "$fallback_scale" "$fallback_dpi"
     log "PNG fallback: scale=${fallback_scale}, dpi=${fallback_dpi}"
 
-    curl -sf -X POST -H "Content-Type: text/plain" \
-      --data-binary "@${png_puml}" "${PLANTUML_SERVER}/png" -o "$png" || true
+    render_diagram "$png_puml" "$png" png || true
 
     if ! validate_png "$png"; then
       warn "PNG fallback also produced invalid output. PNG may be incomplete."

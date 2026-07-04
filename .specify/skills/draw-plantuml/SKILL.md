@@ -3,10 +3,13 @@ name: draw-plantuml
 description: |
   Draw system architecture diagrams with PlantUML, render to SVG/PNG via PlantUML server, and output as HTML with rendered images.
   Use standard UML semantics (Component, Deployment, Sequence, Class/Package) to describe system architecture.
+  Also supports five non-UML specialty diagrams: WBS (工作分解结构), Gantt (甘特图), MindMap (思维导图), JSON 数据可视化, YAML 显示效果图.
   Use when the user mentions "架构图", "architecture diagram", "UML图", "plantuml", "系统架构图", "画架构", "设计图", "组件图", "部署图", "时序图", "类图", "包图", "系统设计",
   "流程图", "状态图", "活动图", "用例图", "状态机图", "模块图", "交互图",
   "sequence diagram", "class diagram", "component diagram", "deployment diagram",
   "activity diagram", "state diagram", "use case diagram", "package diagram",
+  "工作分解结构", "WBS", "甘特图", "gantt", "项目计划图", "进度图", "思维导图", "mindmap", "脑图",
+  "JSON可视化", "JSON数据图", "json diagram", "YAML可视化", "YAML显示", "yaml diagram", "配置可视化", "数据结构图",
   "复刻图", "图片重绘", "图片转UML", "replicate diagram", "redraw", "image to UML"
 skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 ---
@@ -17,9 +20,10 @@ skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 
 ## 核心原则
 
-- **UML 语义，而非随意方框**：每张图必须遵循标准 UML 图表类型，使用正确的 UML 元素和关系
+- **UML 语义，而非随意方框**：UML 类图表必须遵循标准 UML 图表类型，使用正确的 UML 元素和关系
 - **架构优先的叙事**：图和文字互补——文字解释*为什么*，图展示*什么*
-- **统一样式**：使用 `skinparam` 保持统一样式，每张图核心元素 ≤7 个（硬上限 ≤15）
+- **统一样式**：使用 `skinparam` / `<style>` 保持统一样式，UML 图每张核心元素 ≤7 个（硬上限 ≤15）
+- **专项图表遵循其原生语义**：WBS/甘特图/思维导图/JSON/YAML 五类非 UML 图表使用各自的原生语法（`@startwbs`/`@startgantt`/`@startmindmap`/`@startjson`/`@startyaml`）与原生配色，不套用 UML 的 skinparam 单色规则
 
 ## 工作流
 
@@ -72,6 +76,20 @@ skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 使用渲染脚本将 PlantUML 代码渲染为 SVG/PNG 图片。读取生成的图片，与最初用户输入的要求进行匹配比对，发现差异时微调代码并重新渲染，最终组装为 HTML 文档输出。
 
 → 渲染、验证和输出指南参见 [12-rendering-and-output.md](references/howto/12-rendering-and-output.md)
+
+## 专项图表（非 UML）
+
+除 8 种标准 UML 图表外，本技能还支持 5 种专项图表。它们不遵循 UML 语义，各自有独立语法与原生配色。当用户意图属于以下场景时，在 Step 2 直接选用对应专项图表，并阅读其操作指南：
+
+| 专项图表 | 适用场景 | 起止标记 | 操作指南 |
+|---------|---------|---------|---------|
+| **WBS 工作分解结构** | 项目/交付物层级分解 | `@startwbs`/`@endwbs` | [13-wbs-diagram.md](references/howto/13-wbs-diagram.md) |
+| **甘特图 Gantt** | 项目进度、任务依赖、里程碑 | `@startgantt`/`@endgantt` | [14-gantt-diagram.md](references/howto/14-gantt-diagram.md) |
+| **思维导图 MindMap** | 知识梳理、发散规划 | `@startmindmap`/`@endmindmap` | [15-mindmap-diagram.md](references/howto/15-mindmap-diagram.md) |
+| **JSON 数据可视化** | 展示 JSON 数据结构 | `@startjson`/`@endjson` | [16-json-diagram.md](references/howto/16-json-diagram.md) |
+| **YAML 显示效果图** | 展示 YAML 配置结构 | `@startyaml`/`@endyaml` | [17-yaml-diagram.md](references/howto/17-yaml-diagram.md) |
+
+> 专项图表的渲染同样走 Step 8 的渲染脚本；无需 Graphviz（`dot`）即可渲染。样式与美观要点见各操作指南的「布局与美观技巧」小节。
 
 ## 输出要求
 

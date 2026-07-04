@@ -6,6 +6,39 @@
 
 ## 一、渲染 PlantUML 为 SVG/PNG
 
+### 1.0 渲染后端与环境准备（首次使用必读）
+
+渲染脚本 `render-plantuml.sh` 支持两种后端，通过 `PLANTUML_BACKEND` 选择（默认 `auto`）：
+
+| 后端 | 触发条件 | 依赖 | 说明 |
+|------|---------|------|------|
+| **server** | `PLANTUML_SERVER` 可达 | 一个 PlantUML 服务器 | 首选；脚本 POST 源码到 `/svg`、`/png` |
+| **local** | 服务器不可达且找到本地 jar | `java` + PlantUML jar（+ CJK 字体） | 完全离线；专项图（WBS/甘特/思维导图/JSON/YAML）无需 Graphviz |
+
+`auto` 会先探测服务器，不可达时自动回退到本地 jar。
+
+**离线（本地 jar）环境准备**——要复现本技能内「推荐测试图」的同等质量成图，需一次性准备：
+
+```bash
+# 1) PlantUML jar（放到脚本会自动搜索的任一路径）
+#    搜索顺序：$PLANTUML_JAR → ~/.local/share/plantuml/plantuml.jar
+#             → /usr/local/share/plantuml/plantuml.jar → /opt/plantuml/plantuml.jar → /tmp/plantuml.jar
+mkdir -p ~/.local/share/plantuml
+curl -sL "https://repo1.maven.org/maven2/net/sourceforge/plantuml/plantuml/1.2026.6/plantuml-1.2026.6.jar" \
+  -o ~/.local/share/plantuml/plantuml.jar      # Maven Central 比 GitHub CDN 稳定
+
+# 2) 中文（CJK）字体——否则中文渲染成豆腐块 □□□
+mkdir -p ~/.local/share/fonts
+curl -sL "https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf" \
+  -o ~/.local/share/fonts/NotoSansSC-Regular.otf   # jsdelivr 能正确解析 LFS，github raw 会截断
+fc-cache -f ~/.local/share/fonts
+
+# 3) UML 类图（类/组件/时序/状态等）本地渲染还需 Graphviz：
+#    sudo dnf install -y graphviz   （专项 5 图不需要）
+```
+
+> 可用 `PLANTUML_BACKEND=local` 强制本地渲染，`PLANTUML_JAR=/path/to.jar` 指定 jar，`PLANTUML_LIMIT_SIZE=16384` 调整像素上限。
+
 ### 1.1 渲染脚本
 
 使用渲染脚本将每张图渲染为 SVG（首选）和 PNG：

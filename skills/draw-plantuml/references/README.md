@@ -35,6 +35,13 @@ references/
 | 10 | [10-layout-planning.md](howto/10-layout-planning.md) | Step 4 | 布局规划——多区域复杂布局、布局故障排除、CJK 渲染问题 |
 | 11 | [11-code-generation.md](howto/11-code-generation.md) | Step 6 | 代码生成——草拟流程、标签与注释规则（≤10 字符 + note）、配套文字准备 |
 | 12 | [12-rendering-and-output.md](howto/12-rendering-and-output.md) | Step 8 | 渲染、匹配验证与输出——SVG/PNG 渲染、HTML 组装、质量检查清单 |
+| 13 | [13-wbs-diagram.md](howto/13-wbs-diagram.md) | 专项 | WBS 工作分解结构——层级分解、左右方向、无框节点、算术记法、`<style>` 配色 |
+| 14 | [14-gantt-diagram.md](howto/14-gantt-diagram.md) | 专项 | 甘特图——任务/工期/依赖、里程碑、完成度、颜色、分隔符、工作日历、今日标记、时间刻度 |
+| 15 | [15-mindmap-diagram.md](howto/15-mindmap-diagram.md) | 专项 | 思维导图——OrgMode/Markdown/算术三套写法、左右分支、无框节点、`<style>` 与命名样式类 |
+| 16 | [16-json-diagram.md](howto/16-json-diagram.md) | 专项 | JSON 数据可视化——对象/数组/嵌套渲染、`#highlight` 路径高亮、`jsonDiagram` `<style>` |
+| 17 | [17-yaml-diagram.md](howto/17-yaml-diagram.md) | 专项 | YAML 显示效果——嵌套映射/列表渲染、`# highlight` 路径高亮、`yamlDiagram` `<style>` |
+
+> **专项图表（非 UML）**：13–17 覆盖 WBS/甘特图/思维导图/JSON/YAML 五种非 UML 图表，使用各自原生语法，无需 Graphviz。
 
 ---
 
@@ -68,6 +75,11 @@ UML 理论、PlantUML 语法参考、官方文档和建模方法论的原始参�
 | [09-grasp-principles.md](document/09-grasp-principles.md) | GRASP 设计模式——信息专家、创建者、控制器、低耦合、高内聚等 |
 | [10-architecture-diagram.md](document/10-architecture-diagram.md) | 架构图设计——架构视图、C4 模型、视图视角 |
 | [00-plantuml-overview.md](document/00-plantuml-overview.md) | PlantUML 官方文档——支持的图表类型、时序图详细语法、类图/活动图/组件图基本语法、布局引擎选项、输出格式 |
+| [11-wbs-diagram.md](document/11-wbs-diagram.md) | WBS 官方文档缓存——OrgMode/算术语法、方向、无框节点、多行、颜色与 `<style>` |
+| [12-gantt-diagram.md](document/12-gantt-diagram.md) | 甘特图官方文档缓存——任务/依赖/里程碑/日历/着色/刻度/资源等完整语法 |
+| [13-mindmap-diagram.md](document/13-mindmap-diagram.md) | 思维导图官方文档缓存——OrgMode/Markdown/算术语法、左右分支、无框、`<style>` |
+| [14-json-diagram.md](document/14-json-diagram.md) | JSON 可视化官方文档缓存——数据类型渲染、`#highlight`、`jsonDiagram` `<style>`、混合图 |
+| [15-yaml-diagram.md](document/15-yaml-diagram.md) | YAML 可视化官方文档缓存——嵌套/列表渲染、`# highlight`、`yamlDiagram` `<style>` |
 
 ---
 
@@ -78,6 +90,7 @@ UML 理论、PlantUML 语法参考、官方文档和建模方法论的原始参�
 | 如何分析用户输入 | [howto/00-semantic-analysis.md](howto/00-semantic-analysis.md) |
 | 该选哪种 UML 图 | [howto/01-choose-diagram-type.md](howto/01-choose-diagram-type.md) |
 | 某种图怎么画 | [howto/02–09](howto/) 对应图表类型 |
+| 专项图怎么画（WBS/甘特/思维导图/JSON/YAML） | [howto/13–17](howto/) 对应专项图表 |
 | 布局怎么规划 | [howto/10-layout-planning.md](howto/10-layout-planning.md) + [guide/layout.md](guide/layout.md) §一 |
 | 标签和注释怎么写 | [howto/11-code-generation.md](howto/11-code-generation.md) §二 + [guide/content.md](guide/content.md) §1.5 |
 | 样式怎么配 | [guide/style.md](guide/style.md) |
