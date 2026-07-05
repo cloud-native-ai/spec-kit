@@ -90,6 +90,34 @@ Chrome browser through MCP tool calls. No script files needed.
 For the complete tool reference, operation patterns, and best practices, see
 [references/mcp-browser-tools.md](./references/mcp-browser-tools.md).
 
+**Building or debugging the bridge itself?** If you are implementing or operating the
+WebSocket ↔ Chrome-extension connection behind an MCP browser connector (not just
+calling its tools), see [references/extension-bridge-patterns.md](./references/extension-bridge-patterns.md)
+for reliability patterns: request/response correlation with per-request timeouts and
+error codes, dual WS+app-level heartbeat with zombie eviction, reconnect backoff,
+the three-layer MV3 service-worker keepalive (ping/alarms/offscreen), CDP
+attach/detach auto-recovery, and mock-based reliability testing.
+
+### Driving a real, logged-in Chrome (external WebSocket bridge)
+
+When you need the user's **actual** Chrome — real profile, real login state, a specific
+installed extension — instead of Playwright's Chrome-for-Testing, use the skill's
+bundled **external, dev-only** WebSocket bridge at `${SKILL_HOME}/scripts/bridge/`. It
+is a relay server + a minimal MV3 companion extension + a controller client, driven over
+`ws://127.0.0.1`. Nothing is embedded in the product extension under test.
+
+```bash
+cd ${SKILL_HOME}/scripts/bridge && npm install
+node server.js                                   # relay on 127.0.0.1:8777
+# load ./extension/ as an unpacked extension in the target Chrome, then:
+node bridge-cli.js navigate '{"url":"https://example.com"}'
+node bridge-cli.js evaluate '{"expression":"document.title"}'
+```
+
+See [scripts/bridge/README.md](./scripts/bridge/README.md) for the full command
+reference, the `client.js` API, and the security model (localhost-only, `BRIDGE_TOKEN`,
+never shipped). For headless/automated E2E, prefer Tier 3 Playwright instead.
+
 **Key advantages**:
 - Operates the user's real desktop Chrome — full extension and profile support
 - Interactive — no script files to write and manage
@@ -200,7 +228,8 @@ This Skill follows the canonical path conventions:
 |-----------|----------|
 | `${SKILL_HOME}/scripts/js/` | `run.js` universal executor, `package.json`, `lib/helpers.js` |
 | `${SKILL_HOME}/scripts/python/` | `with_server.py` server lifecycle manager |
-| `${SKILL_HOME}/references/` | `playwright-api.md`, `playwright-patterns.md`, `mcp-browser-tools.md`, `claude-code-guide.md`, `copilot-guide.md`, `qoder-guide.md` |
+| `${SKILL_HOME}/scripts/bridge/` | External dev-only WebSocket bridge: `server.js` relay, `client.js`/`bridge-cli.js` controller, `extension/` MV3 companion, `README.md` |
+| `${SKILL_HOME}/references/` | `playwright-api.md`, `playwright-patterns.md`, `mcp-browser-tools.md`, `extension-bridge-patterns.md`, `claude-code-guide.md`, `copilot-guide.md`, `qoder-guide.md` |
 | `${SKILL_HOME}/examples/` | Python example scripts (element discovery, static HTML, console logging) |
 
 ## Dependencies
