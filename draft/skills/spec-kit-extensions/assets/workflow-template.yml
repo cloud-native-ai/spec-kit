@@ -1,0 +1,107 @@
+# Workflow manifest template
+# Copy to  workflow.yml  and customize. Adapted from upstream
+# main:workflows/speckit/workflow.yml and main:workflows/README.md.
+#
+# A workflow orchestrates a resumable pipeline of steps. Run with:
+#   specify workflow run ./workflow.yml --input spec="..."
+# State persists to .specify/workflows/runs/<run_id>/ so runs can resume.
+
+schema_version: "1.0"
+
+workflow:
+  # CUSTOMIZE: lowercase workflow id.
+  id: "my-workflow"
+
+  # CUSTOMIZE: human-readable name.
+  name: "My SDD Pipeline"
+
+  # CUSTOMIZE: semantic version.
+  version: "1.0.0"
+
+  # CUSTOMIZE: author.
+  author: "Your Name"
+
+  # CUSTOMIZE: what this pipeline does.
+  description: "Runs specify -> plan -> tasks -> implement with review gates"
+
+requires:
+  # CUSTOMIZE: minimum Spec Kit version. 0.8.5+ resolves integration:"auto".
+  speckit_version: ">=0.8.5"
+
+  # OPTIONAL: advisory (non-exhaustive) integration compatibility hint.
+  integrations:
+    any: ["claude", "copilot", "gemini", "opencode"]
+
+# Typed inputs, coerced from CLI --input strings.
+inputs:
+  spec:
+    type: string
+    required: true
+    prompt: "Describe what you want to build"
+  integration:
+    type: string
+    default: "auto"        # 'auto' uses the project's initialized integration
+    prompt: "Integration to use (claude, copilot, gemini; or 'auto')"
+  scope:
+    type: string
+    default: "full"
+    enum: ["full", "backend-only", "frontend-only"]
+
+# Ordered steps. 'command' is the default type; others set 'type:'.
+steps:
+  # command step (default) — invoke a speckit.* command.
+  - id: specify
+    command: speckit.specify
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "{{ inputs.spec }}"
+
+  # gate step — pause for human review; resume with 'specify workflow resume'.
+  - id: review-spec
+    type: gate
+    message: "Review the generated spec before planning."
+    options: [approve, reject]
+    on_reject: abort            # abort (default) | skip | retry
+
+  - id: plan
+    command: speckit.plan
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "{{ inputs.spec }}"
+
+  # if step — conditional branching on an expression.
+  - id: check-scope
+    type: if
+    condition: "{{ inputs.scope == 'full' }}"
+    then:
+      - id: full-tasks
+        command: speckit.tasks
+        integration: "{{ inputs.integration }}"
+        input:
+          args: "{{ inputs.spec }}"
+    else:
+      - id: quick-tasks
+        command: speckit.tasks
+        integration: "{{ inputs.integration }}"
+        input:
+          args: "{{ inputs.spec }}"
+
+  - id: review-plan
+    type: gate
+    message: "Review before implementation."
+    options: [approve, reject]
+    on_reject: abort
+
+  - id: implement
+    command: speckit.implement
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "{{ inputs.spec }}"
+
+  # Other step types you can add:
+  #  - type: prompt    (inline prompt to an integration)
+  #  - type: shell     (run a shell command; captures output.exit_code/stdout)
+  #  - type: init      (bootstrap a project, like 'specify init')
+  #  - type: switch    (multi-branch dispatch on an expression value)
+  #  - type: while / do-while  (loops with condition + max_iterations)
+  #  - type: fan-out / fan-in  (per-item dispatch + aggregation)

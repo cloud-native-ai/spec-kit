@@ -1,0 +1,107 @@
+# Extension manifest template
+# Copy to  extension.yml  and customize. Adapted from upstream
+# main:extensions/template/extension.yml and main:extensions/git/extension.yml.
+#
+# An extension adds NEW namespaced commands, config files, and lifecycle hooks
+# on top of core Spec Kit. It is installed under .specify/extensions/<id>/.
+
+schema_version: "1.0"
+
+extension:
+  # CUSTOMIZE: lowercase, hyphen-separated. Becomes the command namespace root.
+  id: "my-extension"
+
+  # CUSTOMIZE: human-readable name.
+  name: "My Extension"
+
+  # CUSTOMIZE: semantic version X.Y.Z (bump on release).
+  version: "1.0.0"
+
+  # CUSTOMIZE: brief description, under 200 characters.
+  description: "Brief description of what your extension does"
+
+  # CUSTOMIZE: your name or organization.
+  author: "Your Name"
+
+  # CUSTOMIZE: GitHub repository URL (create before publishing).
+  repository: "https://github.com/your-org/spec-kit-my-extension"
+
+  # REVIEW: MIT recommended for open source.
+  license: "MIT"
+
+  # OPTIONAL: homepage (can equal repository).
+  homepage: "https://github.com/your-org/spec-kit-my-extension"
+
+  # OPTIONAL: category — docs | code | process | integration | visibility
+  # category: "process"
+
+  # OPTIONAL: effect — read-only | read-write (does it modify project files?)
+  # effect: "read-write"
+
+# Requirements for this extension.
+requires:
+  # CUSTOMIZE: minimum Spec Kit version (>=X.Y.Z, or range >=X.Y.Z,<Y.0.0).
+  speckit_version: ">=0.1.0"
+
+  # OPTIONAL: external tools (MCP servers / binaries). Remove if none.
+  # required: false means the extension degrades gracefully when absent.
+  tools:
+    - name: "example-mcp-server"
+      version: ">=1.0.0"
+      required: true
+
+# Commands this extension provides.
+provides:
+  commands:
+    # Command names MUST follow  speckit.<ext-id>.<cmd>  (3+ dot segments).
+    - name: "speckit.my-extension.example"
+      file: "commands/example.md"
+      description: "Example command that demonstrates functionality"
+      aliases: ["speckit.my-extension.example-short"]   # optional
+
+    # ADD MORE: copy the block above for each command.
+    # - name: "speckit.my-extension.another"
+    #   file: "commands/another.md"
+    #   description: "Another command"
+
+  # OPTIONAL: config file templates materialized into the project.
+  config:
+    - name: "my-extension-config.yml"    # filename created in the project
+      template: "config-template.yml"    # source template in the extension
+      description: "Extension configuration"
+      required: true                     # false if config is optional
+
+# OPTIONAL: hooks run a command around an SDD phase. Remove if none.
+# Keys: before_<phase> / after_<phase>. Phases: constitution, specify, clarify,
+# plan, tasks, implement, checklist, analyze, taskstoissues.
+hooks:
+  after_tasks:
+    command: "speckit.my-extension.example"
+    optional: true                       # true = prompt first; false = auto-run
+    prompt: "Run example command?"
+    description: "Demonstrates hook functionality"
+    condition: null                      # reserved for future conditional execution
+
+  # AUTO-RUN example (no prompt):
+  # before_specify:
+  #   command: "speckit.my-extension.setup"
+  #   optional: false
+  #   description: "Runs automatically before specification"
+
+  # MULTIPLE commands on one event — use a list; order with priority (lowest first):
+  # after_plan:
+  #   - command: "speckit.my-extension.verify"
+  #     priority: 5
+  #   - command: "speckit.my-extension.report"
+  #     priority: 10
+
+# CUSTOMIZE: 2-5 tags for catalog discovery.
+tags:
+  - "example"
+  - "template"
+
+# OPTIONAL: default settings merged with the user's config.
+defaults:
+  feature:
+    enabled: true
+    auto_sync: false

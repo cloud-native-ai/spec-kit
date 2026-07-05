@@ -1,0 +1,89 @@
+# Preset manifest template
+# Copy to  preset.yml  and customize. Adapted from upstream
+# main:presets/lean/preset.yml and main:presets/README.md.
+#
+# A preset OVERRIDES existing templates / commands / scripts via a runtime
+# resolution stack. Installed under .specify/presets/<id>/ with a --priority
+# (lower number = higher precedence). Presets stack and can compose.
+
+schema_version: "1.0"
+
+preset:
+  # CUSTOMIZE: lowercase, hyphen-separated preset id.
+  id: "my-preset"
+
+  # CUSTOMIZE: human-readable name.
+  name: "My Preset"
+
+  # CUSTOMIZE: semantic version X.Y.Z.
+  version: "1.0.0"
+
+  # CUSTOMIZE: brief description.
+  description: "What this preset customizes and why"
+
+  # CUSTOMIZE: your name or organization.
+  author: "Your Name"
+
+  # OPTIONAL: repository URL.
+  repository: "https://github.com/your-org/spec-kit-my-preset"
+
+  # REVIEW: license.
+  license: "MIT"
+
+requires:
+  # CUSTOMIZE: minimum Spec Kit version.
+  speckit_version: ">=0.6.0"
+
+# The 'templates' list holds template, command, AND script overrides.
+provides:
+  templates:
+    # 1) TEMPLATE override, full replace (default strategy).
+    - type: "template"
+      name: "spec-template"                 # target artifact in the stack
+      file: "templates/spec-template.md"    # your content
+      description: "Custom spec template"
+      # strategy: "replace"                 # default; may be omitted
+
+    # 2) TEMPLATE compose — PREPEND content before the lower-priority template.
+    - type: "template"
+      name: "plan-template"
+      file: "templates/plan-header.md"
+      description: "Prepend a header to the core plan template"
+      strategy: "prepend"
+
+    # 3) TEMPLATE compose — APPEND content after the lower-priority template.
+    - type: "template"
+      name: "tasks-template"
+      file: "templates/tasks-footer.md"
+      description: "Append a footer to the core tasks template"
+      strategy: "append"
+
+    # 4) TEMPLATE compose — WRAP: file contains {CORE_TEMPLATE} placeholder,
+    #    replaced with the lower-priority content.
+    - type: "template"
+      name: "checklist-template"
+      file: "templates/checklist-wrapper.md"
+      description: "Wrap the core checklist with pre/post sections"
+      strategy: "wrap"
+
+    # 5) COMMAND override — set 'replaces' to the command name. Registered into
+    #    agent dirs at install time. Extension commands (speckit.<ext>.<cmd>)
+    #    are skipped unless the extension is installed.
+    - type: "command"
+      name: "speckit.specify"
+      file: "commands/speckit.specify.md"
+      description: "Custom specify command"
+      replaces: "speckit.specify"
+      # strategy: "replace"   # commands also support prepend | append | wrap
+
+    # 6) SCRIPT override — scripts support only 'replace' (default) and 'wrap'
+    #    (wrap uses the $CORE_SCRIPT placeholder).
+    # - type: "script"
+    #   name: "create-new-feature"
+    #   file: "scripts/create-new-feature.sh"
+    #   strategy: "wrap"
+
+# CUSTOMIZE: tags for catalog discovery.
+tags:
+  - "example"
+  - "workflow"
