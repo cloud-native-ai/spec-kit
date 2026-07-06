@@ -51,13 +51,24 @@ async function main() {
     throw new Error(`Extension manifest not found at ${EXTENSION_PATH}/manifest.json. Run 'pnpm build:devel' first.`);
   }
 
-  // Launch browser with extension
+  // Clean up stale Chrome processes that may hold the profile lock
+  try {
+    require('child_process').execSync('pkill -f "Google Chrome for Testing" 2>/dev/null || true', { timeout: 5000 });
+    require('child_process').execSync('sleep 2');
+    console.log('[0/7] Chrome processes cleaned');
+  } catch { /* pkill non-zero is safe */ }
+
+  // Launch browser with extension — focus-free args prevent desktop focus stealing
   const context = await chromium.launchPersistentContext(USER_DATA_DIR, {
     channel: 'chromium',    // Chrome for Testing — supports --load-extension
     headless: false,        // Extensions require headed mode
     args: [
       `--disable-extensions-except=${EXTENSION_PATH}`,
       `--load-extension=${EXTENSION_PATH}`,
+      '--window-position=-32000,-32000',  // off-screen — no desktop focus stealing
+      '--window-size=1280,720',            // limit window size
+      '--no-default-browser-check',        // suppress default-browser prompt
+      '--no-first-run',                    // suppress first-run wizard
     ],
   });
   console.log('[1/7] Browser started with extension loaded');

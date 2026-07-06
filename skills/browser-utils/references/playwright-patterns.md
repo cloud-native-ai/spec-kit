@@ -228,6 +228,153 @@ with sync_playwright() as p:
 
 ---
 
+## Focus-Free Automation
+
+When running Playwright in headed mode (`headless: false`), the browser window
+steals OS-level desktop focus on every launch, tab switch, and `bringToFront()`
+call. This disrupts the user's active work (typing, clicking, coding). Synthetic
+keyboard/mouse events (`page.keyboard.press()`, `page.mouse.click()`) also enter
+the OS input queue and can interfere with the user's active input flow.
+
+### Launch Args to Prevent Focus Stealing
+
+Add these Chromium flags to every headed `launchPersistentContext` or `launch`
+call:
+
+```javascript
+const browser = await chromium.launch({
+  headless: false,
+  args: [
+    '--window-position=-32000,-32000',  // move window off-screen
+    '--window-size=1280,720',            // limit window size
+    '--no-default-browser-check',        // suppress default-browser prompt
+    '--no-first-run',                    // suppress first-run wizard
+  ],
+});
+```
+
+For `launchPersistentContext` (required for extension testing):
+
+```javascript
+const context = await chromium.launchPersistentContext(userDataDir, {
+  channel: 'chromium',
+  headless: false,
+  args: [
+    `--disable-extensions-except=${extensionPath}`,
+    `--load-extension=${extensionPath}`,
+    '--window-position=-32000,-32000',
+    '--window-size=1280,720',
+    '--no-default-browser-check',
+    '--no-first-run',
+  ],
+});
+```
+
+### CDP-Based Operations (No Focus Required)
+
+Prefer CDP sessions for operations that normally require window focus:
+
+```javascript
+// Screenshot without focusing the tab — CDP does not need an active window
+async function cdpScreenshot(page, outPath) {
+  const client = await page.context().newCDPSession(page);
+  const { data } = await client.send('Page.captureScreenshot', { format: 'png' });
+  require('fs').writeFileSync(outPath, Buffer.from(data, 'base64'));
+  await client.detach();
+}
+
+// Bring tab to front without OS-level focus change
+async function cdpBringToFront(page) {
+  const client = await page.context().newCDPSession(page);
+  await client.send('Page.bringToFront');
+  await client.detach();
+}
+```
+
+### Avoid Synthetic Input
+
+| Instead of | Use | Reason |
+|------------|-----|--------|
+| `page.keyboard.press('Control+Shift+F')` | `sw.evaluate()` to dispatch the handler directly | Synthetic keys enter the OS input queue and can disrupt the user's active typing. Also, `chrome.commands.onCommand` ignores synthetic keys. |
+| `page.mouse.click(x, y)` | `page.click(selector)` or `page.locator(selector).click()` | Coordinate-based clicks are fragile and the mouse event propagates to the OS. Selector-based clicks are scoped to the page DOM. |
+| `page.mouse.move(x, y)` | `page.hover(selector)` | Same reason — avoid raw mouse movement. |
+| `page.evaluate(() => document.activeElement.blur())` | `page.evaluate(() => document.activeElement?.blur())` | Safe programmatic blur without OS focus change. |
+
+### Rule of Thumb
+
+If an action can be expressed as `page.evaluate()`, `page.fill()`,
+`page.click(selector)`, or a service-worker `sw.evaluate()` call, use that
+instead of `page.keyboard.*` or `page.mouse.*`. The programmatic path is both
+more reliable (no focus dependency) and less disruptive (no OS input queue
+pollution).
+
+---
+
+## Prerequisite Service Checks
+
+Before launching browser tests that depend on local services (STS endpoints,
+dev servers, API stubs), verify availability. A missing dependency causes
+cascading failures that are hard to diagnose from browser console errors alone.
+
+### Pattern: curl-based pre-check
+
+```javascript
+const { execSync } = require('child_process');
+
+function checkService(name, url, expectedStatus = 200) {
+  try {
+    const result = execSync(`curl -s -o /dev/null -w '%{http_code}' ${url}`, {
+      timeout: 5000,
+      encoding: 'utf-8',
+    }).trim();
+    if (result === String(expectedStatus) || (expectedStatus === 200 && result === '000' && url.startsWith('http://127.0.0.1'))) {
+      // HTTP 000 with localhost means connection refused — treat as failure
+      if (result === '000') {
+        throw new Error(`${name} not reachable at ${url} (connection refused)`);
+      }
+      console.log(`[PREREQ] ${name}: OK (${result})`);
+    } else {
+      throw new Error(`${name} returned ${result}, expected ${expectedStatus}`);
+    }
+  } catch (e) {
+    throw new Error(`[PREREQ FAILED] ${name}: ${e.message}. Start the service and retry.`);
+  }
+}
+
+// Usage before browser launch:
+checkService('STS endpoint', 'http://127.0.0.1:8900/api/v1/aliyun/sts');
+checkService('Dev server', 'http://localhost:3001');
+```
+
+### Pattern: Chrome process cleanup
+
+When reusing an existing Chrome profile, stale Chrome processes can lock the
+profile and prevent `launchPersistentContext` from starting:
+
+```javascript
+const { execSync } = require('child_process');
+
+function cleanupChromeProcesses() {
+  try {
+    // Kill Chrome for Testing processes that may hold the profile lock
+    execSync('pkill -f "Google Chrome for Testing" 2>/dev/null || true', {
+      timeout: 5000,
+      encoding: 'utf-8',
+    });
+    // Wait for processes to fully exit and release locks
+    setTimeout(() => {}, 2000);
+  } catch (e) {
+    // pkill exits non-zero if no processes found — safe to ignore
+  }
+  console.log('[CLEANUP] Chrome processes cleaned');
+}
+
+// Call before launchPersistentContext when reusing a profile
+cleanupChromeProcesses();
+```
+
+---
+
 ## Cross-Language Patterns
 
 ### Taking Screenshots

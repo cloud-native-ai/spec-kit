@@ -205,6 +205,9 @@ Python examples, see [references/playwright-patterns.md](./references/playwright
 6. **Tier 2: Always snapshot before acting** — uids from stale snapshots are invalid after page changes
 7. **Wait strategies over fixed timeouts** — use `waitForSelector`, `waitForURL`, `waitForLoadState` (Tier 3) or `wait_for` (Tier 2) instead of arbitrary sleeps
 8. **Error handling** — always use try-catch for robust automation; screenshot on error for debugging
+9. **Avoid desktop focus stealing** — when running headed (Tier 3), add `--window-position=-32000,-32000` to move the browser window off-screen so it does not steal focus from the user's active work. Prefer CDP-based operations (`Page.captureScreenshot`, `Page.bringToFront`) over Playwright's `page.screenshot()` and `page.bringToFront()` which may trigger OS-level focus changes.
+10. **Avoid simulated input that interferes with the user** — do not use `page.keyboard.press()`, `page.mouse.click()`, or `page.mouse.move()` for actions that can be triggered programmatically instead. Prefer `page.evaluate()`, `page.fill()`, `page.click()` on specific selectors, or service-worker-level message dispatch. Synthetic keyboard/mouse events reach the OS input queue and can disrupt the user's active typing or click flow. This is especially critical for extension E2E where `chrome.commands.onCommand` cannot be triggered by synthetic keys anyway (see extension-e2e-test skill).
+11. **Check prerequisite services** — before launching tests that depend on local services (STS endpoints, dev servers, API stubs), verify availability with a quick `curl` or TCP check. A missing dependency causes cascading failures that are hard to diagnose.
 
 ## Conventions
 
@@ -213,6 +216,7 @@ Python examples, see [references/playwright-patterns.md](./references/playwright
 - **slowMo (Tier 3)**: Use `slowMo: 100` to make actions visible and easier to follow
 - **Custom headers (Tier 3)**: Use `PW_HEADER_NAME`/`PW_HEADER_VALUE` env vars to identify automated traffic
 - **Console output**: Use `console.log()` (JS) or `print()` (Python) to track progress
+- **Focus-free launch args (Tier 3)**: Add these Chromium args to every headed launch to prevent desktop focus stealing: `--window-position=-32000,-32000`, `--window-size=1280,720`, `--no-default-browser-check`, `--no-first-run`. See [references/playwright-patterns.md](./references/playwright-patterns.md) § Focus-Free Automation for the full pattern.
 
 ## Path Conventions
 

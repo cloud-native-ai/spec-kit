@@ -57,6 +57,26 @@ Verify the following before starting:
    cd .specify/skills/browser-utils/scripts/js && npm run setup
    ```
 
+4. **Dependency services running** — if the test uses real network (STS endpoints,
+   dev servers, API stubs), verify each is reachable before launching the browser.
+   A missing STS service, for example, causes OSS operations to fail with cryptic
+   `AxiosError: Network Error` messages that are hard to trace back to the root cause.
+   ```bash
+   # Quick check — exit code 0 means the service is up
+   curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8900/api/v1/aliyun/sts
+   ```
+   For a reusable Node.js pattern (with clear error messages), see
+   [references/playwright-extension-patterns.md](./references/playwright-extension-patterns.md)
+   § Prerequisite Service Checks.
+
+5. **Chrome profile not locked** — when reusing an existing Chrome user data
+   directory (e.g., for login state), stale Chrome for Testing processes can hold
+   a profile lock and prevent `launchPersistentContext` from starting. Kill them
+   before launch:
+   ```bash
+   pkill -f "Google Chrome for Testing" 2>/dev/null; sleep 2
+   ```
+
 ### Step 2: Determine Test Scope
 
 Identify which extension surfaces to test based on user request:
@@ -82,7 +102,7 @@ Identify which extension surfaces to test based on user request:
 Write a Playwright test script to `/tmp/extension-e2e-test-*.js` following the
 extension testing patterns. The script must:
 
-1. **Launch persistent context** with extension loaded:
+1. **Launch persistent context** with extension loaded (include focus-free args):
    ```javascript
    const pathToExtension = '${SKILL_WORKDIR}/dist';
    const userDataDir = '/tmp/extension-e2e-profile';
@@ -93,6 +113,10 @@ extension testing patterns. The script must:
      args: [
        `--disable-extensions-except=${pathToExtension}`,
        `--load-extension=${pathToExtension}`,
+       '--window-position=-32000,-32000',  // off-screen — no desktop focus stealing
+       '--window-size=1280,720',
+       '--no-default-browser-check',
+       '--no-first-run',
      ],
    });
    ```
@@ -203,6 +227,22 @@ const context = await chromium.launchPersistentContext(userDataDir, {
 10. **Push logic down to fast unit tests** — only cover in Playwright E2E what needs a
     real page/SW. Test message-protocol/handler logic as `node --test` unit tests with
     mocked `chrome.*` APIs. Assert on stable **error codes**, not message-text.
+11. **Add focus-free launch args** — always include `--window-position=-32000,-32000`,
+    `--window-size=1280,720`, `--no-default-browser-check`, `--no-first-run` in the
+    `args` array. This prevents the headed browser from stealing desktop focus and
+    disrupting the user's active work. See [browser-utils patterns](../browser-utils/references/playwright-patterns.md)
+    § Focus-Free Automation for CDP-based alternatives to focus-dependent APIs.
+12. **Avoid synthetic keyboard/mouse input** — never use `page.keyboard.press()` or
+    `page.mouse.click()` in extension tests. Synthetic keys do not fire
+    `chrome.commands.onCommand` (see §6 of the patterns doc), and synthetic mouse
+    events pollute the OS input queue. Use `sw.evaluate()`, `page.evaluate()`, or
+    `page.click(selector)` instead.
+13. **Check prerequisite services before launch** — if the test uses real STS, API,
+    or dev-server endpoints, verify each is reachable with `curl` before launching
+    the browser. A missing service produces cascading failures (network errors,
+    empty OSS writes) that are hard to trace.
+14. **Clean up stale Chrome processes** — when reusing a profile, kill any existing
+    Chrome for Testing processes first to avoid profile-lock failures.
 
 ## Path Conventions
 
@@ -222,7 +262,13 @@ Additionally, this skill references the browser-utils skill's executor:
 ### References (`${SKILL_HOME}/references/`)
 - [playwright-extension-patterns.md](./references/playwright-extension-patterns.md) —
   Complete code patterns for each extension surface (service worker, popup, options,
-  content scripts, keyboard commands, Chrome Storage).
+  content scripts, keyboard commands, Chrome Storage), plus:
+  §12 Prerequisite Service Checks (curl-based pre-launch checks, Chrome process cleanup),
+  §13 Focus-Free Extension Testing (off-screen launch args, CDP screenshots, synthetic
+  input avoidance),
+  §14 On-Demand Script Injection Verification (console-log-based verification for
+  `chrome.scripting.executeScript` injected scripts),
+  §15 Network Request Tracking (dual-listener with URL filtering, error noise filtering).
 - [mv3-reliability-and-cdp.md](./references/mv3-reliability-and-cdp.md) —
   MV3 service-worker lifecycle & keepalive, waking a suspended SW, CDP via
   `newCDPSession`, MAIN-world console capture, timeout tiers, the two-layer

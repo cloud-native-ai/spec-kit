@@ -17,6 +17,10 @@ All patterns assume the extension is loaded via `launchPersistentContext` with
 9. [CDP Session — bringToFront](#9-cdp-session--bringtofront)
 10. [Login State Reuse](#10-login-state-reuse)
 11. [Network Mocking (Read-only Safety)](#11-network-mocking-read-only-safety)
+12. [Prerequisite Service Checks](#12-prerequisite-service-checks)
+13. [Focus-Free Extension Testing](#13-focus-free-extension-testing)
+14. [On-Demand Script Injection Verification](#14-on-demand-script-injection-verification)
+15. [Network Request Tracking](#15-network-request-tracking)
 
 ---
 
@@ -529,6 +533,290 @@ async function mockInternalNetwork(context) {
 
 ---
 
+## 12. Prerequisite Service Checks
+
+When a test uses real network endpoints (STS token services, dev servers, API
+stubs), verify availability before launching the browser. A missing dependency
+produces cascading failures — network errors, empty OSS writes, aborted data
+fetches — that are hard to trace back to the root cause from browser console
+output alone.
+
+### Pattern: pre-launch curl check
+
+```javascript
+const { execSync } = require('child_process');
+
+function checkService(name, url) {
+  try {
+    const code = execSync(`curl -s -o /dev/null -w '%{http_code}' ${url}`, {
+      timeout: 5000,
+      encoding: 'utf-8',
+    }).trim();
+    if (code === '000') {
+      throw new Error(`connection refused — is ${name} running at ${url}?`);
+    }
+    if (code !== '200') {
+      throw new Error(`${name} returned HTTP ${code}`);
+    }
+    console.log(`[PREREQ] ${name}: OK`);
+  } catch (e) {
+    throw new Error(`[PREREQ FAILED] ${name}: ${e.message}`);
+  }
+}
+
+// Before launching the browser:
+checkService('STS endpoint', 'http://127.0.0.1:8900/api/v1/aliyun/sts');
+```
+
+### Pattern: Chrome process cleanup
+
+When reusing an existing Chrome profile, stale processes can hold a lock:
+
+```javascript
+const { execSync } = require('child_process');
+
+function cleanupChromeProcesses() {
+  try {
+    execSync('pkill -f "Google Chrome for Testing" 2>/dev/null || true', {
+      timeout: 5000,
+    });
+  } catch { /* pkill exits non-zero if no match — safe */ }
+  // Wait for the OS to release the profile lock
+  require('child_process').execSync('sleep 2');
+  console.log('[CLEANUP] Chrome processes cleaned');
+}
+
+cleanupChromeProcesses();
+```
+
+---
+
+## 13. Focus-Free Extension Testing
+
+Extension E2E tests require `headless: false` (service workers and popups do
+not work in headless mode). But a headed browser steals desktop focus on every
+launch and tab switch, disrupting the user's active work.
+
+### Launch args
+
+Always add these Chromium flags to `launchPersistentContext`:
+
+```javascript
+args: [
+  `--disable-extensions-except=${pathToExtension}`,
+  `--load-extension=${pathToExtension}`,
+  '--window-position=-32000,-32000',  // move window off-screen
+  '--window-size=1280,720',            // limit window size
+  '--no-default-browser-check',        // suppress default-browser prompt
+  '--no-first-run',                    // suppress first-run wizard
+],
+```
+
+### CDP screenshots (no focus required)
+
+`page.screenshot()` may require the tab to be visible/focused. Use CDP instead:
+
+```javascript
+async function cdpScreenshot(page, outPath) {
+  const client = await page.context().newCDPSession(page);
+  const { data } = await client.send('Page.captureScreenshot', { format: 'png' });
+  require('fs').writeFileSync(outPath, Buffer.from(data, 'base64'));
+  await client.detach();
+}
+```
+
+### Tab switching without OS focus change
+
+Use CDP `Page.bringToFront` instead of `page.bringToFront()`:
+
+```javascript
+async function cdpBringToFront(page) {
+  const client = await page.context().newCDPSession(page);
+  await client.send('Page.bringToFront');
+  await client.detach();
+}
+```
+
+### Avoid synthetic input
+
+Never use `page.keyboard.press()` or `page.mouse.*()` in extension tests:
+
+- `page.keyboard.press()` sends keys to the OS input queue, disrupting the
+  user's active typing. It also does **not** trigger `chrome.commands.onCommand`
+  (see §6).
+- `page.mouse.click(x, y)` and `page.mouse.move()` are coordinate-based and
+  fragile; the mouse event propagates to the OS.
+
+Instead, use:
+
+| Action | Replacement |
+|--------|-------------|
+| Trigger a keyboard command | `sw.evaluate()` to dispatch the handler (§6a) or replay the message (§6b) |
+| Click a button in popup | `popupPage.click('button:has-text("...")')` or `popupPage.locator('button').click()` |
+| Fill a form field | `page.fill(selector, value)` |
+| Execute page logic | `page.evaluate(() => { ... })` |
+
+---
+
+## 14. On-Demand Script Injection Verification
+
+This project's per-platform scripts (`asiops.js`, `aone.js`, `qianzhou.js`, etc.)
+are **not** declared in `manifest.json` `content_scripts`. The service worker
+injects them on demand via `chrome.scripting.executeScript` when a command fires.
+
+### Pattern: inject and verify via console logs
+
+Content scripts run in an isolated world — `page.evaluate()` cannot access their
+variables. Verify injection by listening for the content script's init log:
+
+```javascript
+async function injectAndVerify(context, scriptName, initLogPattern) {
+  let [sw] = context.serviceWorkers();
+  if (!sw) sw = await context.waitForEvent('serviceworker', { timeout: 10000 });
+
+  const [activeTab] = await sw.evaluate(async () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    return [tab.id];
+  });
+
+  // Collect console messages BEFORE injection
+  const page = context.pages().find(p => p.url().includes('alibaba-inc.com'))
+    || context.pages()[0];
+  const consoleMessages = [];
+  page.on('console', (msg) => consoleMessages.push(msg.text()));
+
+  // Inject the script via the service worker
+  await sw.evaluate(async (tabId, file) => {
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: [file],
+    });
+  }, activeTab, `static/js/${scriptName}`);
+
+  // Wait for the init log to appear
+  await page.waitForTimeout(2000);
+  const found = consoleMessages.some(text => initLogPattern.test(text));
+  if (!found) {
+    throw new Error(`${scriptName} init log not found. Messages: ${consoleMessages.join(', ')}`);
+  }
+  console.log(`[INJECT] ${scriptName} verified via console log`);
+  return true;
+}
+
+// Usage:
+await injectAndVerify(context, 'asiops.js', /ASI.?Ops.*initialized|content script loaded/i);
+```
+
+### Pattern: trigger data fetch via SW message replay
+
+Instead of simulating a keyboard command (which doesn't work, see §6), replay
+the exact message the service worker would send:
+
+```javascript
+async function triggerDataFetch(context, ossConfig, fetchTypes) {
+  let [sw] = context.serviceWorkers();
+  if (!sw) sw = await context.waitForEvent('serviceworker', { timeout: 10000 });
+
+  await sw.evaluate(async (config, types) => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    await chrome.tabs.sendMessage(tab.id, {
+      type: 'FETCH_ASIOPS_DATA',
+      from: 'BACKGROUND',
+      to: 'CONTENT_SCRIPT',
+      attachment: {
+        ossConfig: config,
+        fetchTypes: types,
+        selectedWorkloadIds: [],
+      },
+    });
+  }, ossConfig, fetchTypes);
+
+  console.log('[TRIGGER] Data fetch message dispatched');
+}
+
+// Usage:
+await triggerDataFetch(context, {
+  region: 'oss-cn-hangzhou',
+  bucket: 'code-workspace-cn-hangzhou-data-4bdc7f55',
+  stsUrl: 'http://127.0.0.1:8900/api/v1/aliyun/sts',
+}, ['ACCOUNT', 'PRODUCT']);
+```
+
+---
+
+## 15. Network Request Tracking
+
+For real-network E2E tests (not mocked), track requests and responses separately
+to verify the full data flow: STS → OSS cache check → API fetch → OSS write.
+
+### Pattern: dual-listener with URL filtering
+
+```javascript
+function setupNetworkTracking(context) {
+  const requests = [];
+  const responses = [];
+
+  context.on('request', (req) => {
+    const url = req.url();
+    if (url.includes('127.0.0.1:8900') ||
+        url.includes('aliyuncs.com') ||
+        url.includes('alibaba-inc.com')) {
+      requests.push({ url, method: req.method(), resourceType: req.resourceType() });
+    }
+  });
+
+  context.on('response', async (res) => {
+    const url = res.url();
+    if (url.includes('127.0.0.1:8900') ||
+        url.includes('aliyuncs.com') ||
+        url.includes('alibaba-inc.com')) {
+      responses.push({ url, status: res.status(), method: res.request().method() });
+    }
+  });
+
+  return { requests, responses };
+}
+
+// Usage:
+const { requests, responses } = setupNetworkTracking(context);
+// ... run test ...
+console.log('STS requests:', requests.filter(r => r.url.includes('127.0.0.1:8900')));
+console.log('OSS GETs:', responses.filter(r => r.url.includes('aliyuncs.com') && r.method === 'GET'));
+console.log('OSS PUTs:', responses.filter(r => r.url.includes('aliyuncs.com') && r.method === 'PUT'));
+console.log('API calls:', responses.filter(r => r.url.includes('alibaba-inc.com/api/')));
+```
+
+### Pattern: error filtering
+
+Pages on internal platforms load third-party monitoring scripts (alicdn.com,
+arms.aliyun.com) that generate console errors unrelated to the extension. Filter
+them out when counting "critical errors":
+
+```javascript
+function isCriticalError(msg) {
+  const text = msg.text();
+  // Filter out known noise from platform monitoring scripts
+  if (text.includes('alicdn.com') ||
+      text.includes('arms.aliyun.com') ||
+      text.includes('retcode') ||
+      text.includes('goldlog')) {
+    return false;
+  }
+  // Filter out OSS 404 — cache miss is expected, not an error
+  if (text.includes('404') && text.includes('aliyuncs.com')) {
+    return false;
+  }
+  return msg.type() === 'error';
+}
+
+const criticalErrors = allConsoleMessages.filter(isCriticalError);
+if (criticalErrors.length > 0) {
+  console.log('Critical errors:', criticalErrors.map(e => e.text()));
+}
+```
+
+---
+
 ## Troubleshooting
 
 ### Extension not loaded
@@ -559,3 +847,49 @@ async function mockInternalNetwork(context) {
   Wait for page load to complete before checking for injection.
 - Content scripts execute in an isolated world — `page.evaluate()` cannot access
   their variables directly. Look for DOM side effects instead.
+
+### STS / dependency service errors
+
+- `AxiosError: Network Error` from a content script usually means a local STS
+  endpoint is not running. Check with `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8900/api/v1/aliyun/sts`
+  before launching the browser.
+- HTTP `000` from `curl` means connection refused — the service is not running.
+  Start it (e.g., `aliyun_sts_service` or `cws_daemon`) and re-check.
+- If STS returns 200 but OSS operations still fail, verify the STS response
+  format: it must contain `ak`, `sk`, `token`, and `expiration` fields.
+
+### Browser steals desktop focus
+
+- Add `--window-position=-32000,-32000` to move the browser window off-screen.
+- Add `--no-default-browser-check --no-first-run` to suppress first-run dialogs.
+- Use CDP `Page.captureScreenshot` instead of `page.screenshot()` — CDP does
+  not require the tab to be visible/focused.
+- Use CDP `Page.bringToFront` instead of `page.bringToFront()` — the Playwright
+  version triggers an OS-level focus change.
+- Never use `page.keyboard.press()` or `page.mouse.*()` — these send events to
+  the OS input queue and disrupt the user's active typing/clicking. Use
+  `sw.evaluate()` or `page.click(selector)` instead.
+
+### Chrome profile lock failure
+
+- Error: `ProcessSingleton` or `Profile is in use` — stale Chrome for Testing
+  processes are holding the profile lock.
+- Fix: `pkill -f "Google Chrome for Testing" 2>/dev/null; sleep 2` before launch.
+
+### OSS 404 errors in console
+
+- OSS `GET` returning 404 is **expected** when the cache is empty (cache miss).
+  The extension then fetches from the API and writes to OSS via PUT.
+- Do not count OSS 404 responses as test failures. Filter them out in your
+  error-counting logic (see §15 Network Request Tracking).
+
+### On-demand script injection not visible
+
+- Per-platform scripts (`asiops.js`, `aone.js`, etc.) are not in `manifest.json`
+  `content_scripts`. They are injected via `chrome.scripting.executeScript`
+  when a command fires.
+- `page.evaluate(() => window.ASIOPS_SCRIPT_INITIALIZED)` will return `undefined`
+  from MAIN world — the variable exists only in the content script's isolated
+  world.
+- Verify injection by listening for the content script's init console log
+  (see §14 On-Demand Script Injection Verification).
