@@ -1,3 +1,6 @@
+description = "Scan workspace for SPECKIT TODO blocks and generate reviewable execution plans, or insert new TODO blocks at specified locations."
+
+prompt = """
 ## User Input
 
 ```text
@@ -161,3 +164,4 @@ Report:
 **After running this command**:
 - Run `/speckit.implement` to execute generated plans if they align with a feature spec.
 - Run `/speckit.review` to validate execution results.
+"""

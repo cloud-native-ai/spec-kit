@@ -1,3 +1,18 @@
+---
+description: Scan workspace for SPECKIT TODO blocks and generate reviewable execution plans, or insert new TODO blocks at specified locations.
+handoffs:
+  - label: Implement Plan
+    agent: speckit.implement
+    prompt: Start implementing the generated TODO plan
+    send: true
+  - label: Review Results
+    agent: speckit.review
+    prompt: Review the TODO plan execution results
+    send: true
+scripts:
+  sh: scripts/bash/search-todo.sh --json
+---
+
 ## User Input
 
 ```text
@@ -14,7 +29,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/reference
 
 ### Step 1: Run Scanner
 
-Execute `.specify/scripts/bash/search-todo.sh --json` from repo root. The script outputs JSON to stdout:
+Execute `{SCRIPT}` from repo root. The script outputs JSON to stdout:
 
 ```json
 {
