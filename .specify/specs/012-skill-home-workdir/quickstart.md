@@ -91,7 +91,7 @@ Pick any line in your `SKILL.md` that still uses a legacy idiom and rewrite it u
 |--------|---------|
 | `./scripts/init.sh` | `${SKILL_HOME}/scripts/init.sh` |
 | `${SKILL_ROOT}/references/spec.md` | `${SKILL_HOME}/references/spec.md` |
-| `~/.copilot/skills/my-skill/assets/x.png` | `${SKILL_HOME}/assets/x.png` |
+| `${HOME}/.copilot/skills/my-skill/assets/x.png` | `${SKILL_HOME}/assets/x.png` |
 
 Re-run Step 2 to confirm the rewritten Skill behaves identically (this is the SC-004 regression check at the per-Skill level).
 

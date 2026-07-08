@@ -73,7 +73,7 @@ done
 
 ### 凭证存储
 
-凭证按团队(group_login)索引，统一存储在 `~/.yoho-yuque/credentials.json`：
+凭证按团队(group_login)索引，统一存储在 `${HOME}/.yoho-yuque/credentials.json`：
 
 ```json
 {

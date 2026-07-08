@@ -21,17 +21,17 @@
 
 ```bash
 # 1) PlantUML jar（放到脚本会自动搜索的任一路径）
-#    搜索顺序：$PLANTUML_JAR → ~/.local/share/plantuml/plantuml.jar
+#    搜索顺序：$PLANTUML_JAR → ${HOME}/.local/share/plantuml/plantuml.jar
 #             → /usr/local/share/plantuml/plantuml.jar → /opt/plantuml/plantuml.jar → /tmp/plantuml.jar
-mkdir -p ~/.local/share/plantuml
+mkdir -p ${HOME}/.local/share/plantuml
 curl -sL "https://repo1.maven.org/maven2/net/sourceforge/plantuml/plantuml/1.2026.6/plantuml-1.2026.6.jar" \
-  -o ~/.local/share/plantuml/plantuml.jar      # Maven Central 比 GitHub CDN 稳定
+  -o ${HOME}/.local/share/plantuml/plantuml.jar      # Maven Central 比 GitHub CDN 稳定
 
 # 2) 中文（CJK）字体——否则中文渲染成豆腐块 □□□
-mkdir -p ~/.local/share/fonts
+mkdir -p ${HOME}/.local/share/fonts
 curl -sL "https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf" \
-  -o ~/.local/share/fonts/NotoSansSC-Regular.otf   # jsdelivr 能正确解析 LFS，github raw 会截断
-fc-cache -f ~/.local/share/fonts
+  -o ${HOME}/.local/share/fonts/NotoSansSC-Regular.otf   # jsdelivr 能正确解析 LFS，github raw 会截断
+fc-cache -f ${HOME}/.local/share/fonts
 
 # 3) UML 类图（类/组件/时序/状态等）本地渲染还需 Graphviz：
 #    sudo dnf install -y graphviz   （专项 5 图不需要）

@@ -105,7 +105,7 @@ distribution unit; extensions/presets/bundles remain the inner composition mecha
 Precedence (highest → lowest):
   managed-settings.json   (enterprise, non-overridable)
   .specify/settings.json  (project)
-  ~/.specify/settings.json (user)
+  ${HOME}/.specify/settings.json (user)
   packaged defaults
 ```
 

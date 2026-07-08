@@ -59,7 +59,7 @@ claw-code-agent is a **zero-dependency Python reimplementation of the Claude Cod
 
 ### 7. Sub-agent definitions as data (allow/deny tool lists, model, one-shot, isolation)
 - **Idea**: Built-in agent *types* (explore, general-purpose, verification, plan, etc.) declared as `AgentDefinition` dataclasses with `when_to_use`, per-agent `model`, `tools` allow-list, `disallowed_tools` deny-list, `one_shot`, `max_turns`, `isolation`, and `initial_prompt`. A default deny-set removes dangerous tools from all children.
-- **Source evidence**: `/cws_work/claw-code-agent/src/builtin_agents.py` (`AgentDefinition` lines 22-49; `ALL_AGENT_DISALLOWED_TOOLS` 54-58; explore/plan deny-sets 60+). Discovery from `~/.claude/agents` + `./.claude/agents` noted in PARITY §1 lines 117-120.
+- **Source evidence**: `/cws_work/claw-code-agent/src/builtin_agents.py` (`AgentDefinition` lines 22-49; `ALL_AGENT_DISALLOWED_TOOLS` 54-58; explore/plan deny-sets 60+). Discovery from `${HOME}/.claude/agents` + `./.claude/agents` noted in PARITY §1 lines 117-120.
 - **Why it helps**: spec-kit has role-based agents as markdown; this gives a structured, permission-scoped agent schema and a delegation model (topological dependency batching, PARITY §1 lines 47-55) — useful for the "workflow/process" pillar (e.g., planner → implementer → reviewer with scoped tools).
 - **Maps to spec-kit as**: agent (schema) + template.
 - **Value**: M — **Effort**: M.

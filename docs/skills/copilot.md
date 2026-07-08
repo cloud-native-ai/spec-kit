@@ -38,7 +38,7 @@ Skills are stored in directories with a `SKILL.md` file.
 
 *   **Project-Level Skills** (Recommended): The primary copy is stored in the workspace's `.specify/skills/` directory.
 *   **GitHub-Compatible Entry Point**: `.github/skills/` serves only as a compatibility entry point mapped to the primary copy and does not host primary content.
-*   **User-Level Skills** (Recommended): Stored in the `~/.copilot/skills/` directory of the user profile.
+*   **User-Level Skills** (Recommended): Stored in the `${HOME}/.copilot/skills/` directory of the user profile.
 
 ### Directory Structure
 

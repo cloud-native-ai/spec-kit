@@ -19,7 +19,7 @@
 | **improve-skills** | 通用目标——「**该如何优化任意一个技能**」（方法论层面） |
 | **browser-utils** | 定制目标——「**该如何正确地用浏览器执行前端相关任务**」（工程实践层面） |
 
-**基准测试任务（executor 执行）**：复用 `~/data/chrome/agent` 这个含登录态的 Chrome
+**基准测试任务（executor 执行）**：复用 `${HOME}/data/chrome/agent` 这个含登录态的 Chrome
 data 目录与 profile，遍历内部 SPA `http://xuan-ji.alibaba-inc.com`，抓取全部功能模块，
 输出设计文档 `/Users/liuqiming.lqm/project/kangaroo-xuanji/xuanji-ui/docs/legacy.md`。
 
@@ -137,13 +137,13 @@ logged-in browser to traverse/refine the design doc docs/legacy.md.
 You are Tier 3, Mode 2 (real Chrome profile).
 
 ## Environment
-- Login-state profile: ~/data/chrome/agent (preflight it's free; ALWAYS close context
+- Login-state profile: ${HOME}/data/chrome/agent (preflight it's free; ALWAYS close context
   in finally to release the single-instance lock).
 - App root: http://xuan-ji.alibaba-inc.com/dashboard/#/ (hash SPA).
 - Runner: .../scripts/js/run.js (install-integrity preflight first).
 
 ## Mode 2 launch recipe (proven)
-launchPersistentContext(~/data/chrome/agent, { headless:false, channel:'chrome',
+launchPersistentContext(${HOME}/data/chrome/agent, { headless:false, channel:'chrome',
   ignoreDefaultArgs:['--use-mock-keychain'], viewport:{...} })
 - After first nav, assert URL is NOT login*.alibaba-inc.com.
 
@@ -196,7 +196,7 @@ block. Round N must be >= previous (monotonic non-decreasing).
 
 ### 前置准备
 - 确认 `.specify/skills/` 为权威源；`skills/` 为独立分发副本（85 文件 vs 14 追踪文件）。
-- 确认 Chrome profile `~/data/chrome/agent` 空闲（0 进程、无 singleton 锁）。
+- 确认 Chrome profile `${HOME}/data/chrome/agent` 空闲（0 进程、无 singleton 锁）。
 - 建立固定 rubric（`/tmp/skill-iter/RUBRIC.md`）与评分日志（`/tmp/skill-iter/scores.md`）。
 
 ### Round 1 — 打基线（TOTAL = 79）

@@ -341,4 +341,4 @@ specify workflow catalog list
 | Config file | Scope |
 |-------------|-------|
 | `.specify/workflow-catalogs.yml` | Project catalog stack. |
-| `~/.specify/workflow-catalogs.yml` | User catalog stack. |
+| `${HOME}/.specify/workflow-catalogs.yml` | User catalog stack. |

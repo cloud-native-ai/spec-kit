@@ -14,7 +14,7 @@
 
 ### User Story 1 - Author writes skill-resource paths once, runs everywhere (Priority: P1)
 
-A skill author writing or improving a Skill needs to reference internal resources — scripts under `scripts/`, references under `references/`, and assets under `assets/` — without knowing how a particular agent (Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder, or future agents) installs the Skill on disk. The author writes path references using a single, well-defined variable that always resolves to the Skill's real on-disk root, regardless of whether the agent stores Skills under `.specify/skills/`, `.github/skills/`, `~/.copilot/skills/`, an agent-specific path, or a symlinked compatibility entry.
+A skill author writing or improving a Skill needs to reference internal resources — scripts under `scripts/`, references under `references/`, and assets under `assets/` — without knowing how a particular agent (Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder, or future agents) installs the Skill on disk. The author writes path references using a single, well-defined variable that always resolves to the Skill's real on-disk root, regardless of whether the agent stores Skills under `.specify/skills/`, `.github/skills/`, `${HOME}/.copilot/skills/`, an agent-specific path, or a symlinked compatibility entry.
 
 **Why this priority**: This is the core problem the user raised. Without it, Skill instructions either (a) bake in a specific install layout and break when an agent uses a different one, or (b) rely on relative paths that drift when the Skill is invoked from outside its directory. P1 because every existing and future Skill depends on it.
 
@@ -23,7 +23,7 @@ A skill author writing or improving a Skill needs to reference internal resource
 **Acceptance Scenarios**:
 
 1. **Given** a Skill author is writing a SKILL.md, **When** they need to reference `scripts/init.sh` inside the same Skill, **Then** the orchestration template instructs them to write `${SKILL_HOME}/scripts/init.sh` and explains that SKILL_HOME is the resolved real directory of SKILL.md (computed as `dirname $(readlink -f SKILL.md)` in shell contexts).
-2. **Given** the same Skill is installed under `.specify/skills/foo/` on one agent and under `~/.copilot/skills/foo/` on another, **When** the Skill is invoked on either agent, **Then** `${SKILL_HOME}` resolves to the correct absolute directory in each agent and all Skill-resource references work without modification.
+2. **Given** the same Skill is installed under `.specify/skills/foo/` on one agent and under `${HOME}/.copilot/skills/foo/` on another, **When** the Skill is invoked on either agent, **Then** `${SKILL_HOME}` resolves to the correct absolute directory in each agent and all Skill-resource references work without modification.
 3. **Given** a Skill is reached through a symlink (e.g., `.github/skills/foo` → `.specify/skills/foo`), **When** the Skill resolves `${SKILL_HOME}`, **Then** the value is the real target directory (not the symlink path), so resource lookups stay stable across compatibility entries.
 
 ---

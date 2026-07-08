@@ -151,7 +151,7 @@ Three first-class entities and one supporting structure:
    - `usage_rule`: every user-facing path (inputs/outputs in the user's project) goes through `${SKILL_WORKDIR}/...`
 
 3. **MigrationMappingEntry** (table row):
-   - `legacy_pattern`: e.g., `./X`, `${SKILL_ROOT}/X`, `~/.copilot/skills/<name>/X`
+   - `legacy_pattern`: e.g., `./X`, `${SKILL_ROOT}/X`, `${HOME}/.copilot/skills/<name>/X`
    - `new_pattern`: corresponding `${SKILL_HOME}/X` form
    - `example_before` / `example_after`: concrete one-line examples
    - At least 3 rows present (covers FR-011 / SC-005)

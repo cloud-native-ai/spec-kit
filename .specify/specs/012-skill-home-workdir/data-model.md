@@ -39,7 +39,7 @@ This iteration is documentation-only — there is no persisted data, no API requ
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `legacy_pattern` | string | Pre-convention path idiom (e.g., `./scripts/init.sh`, `${SKILL_ROOT}/references/x.md`, `~/.copilot/skills/foo/assets/y.md`). |
+| `legacy_pattern` | string | Pre-convention path idiom (e.g., `./scripts/init.sh`, `${SKILL_ROOT}/references/x.md`, `${HOME}/.copilot/skills/foo/assets/y.md`). |
 | `new_pattern` | string | Equivalent `${SKILL_HOME}/...` form. |
 | `example_before` | string | One concrete line of the legacy form, copy-pasteable. |
 | `example_after` | string | The corresponding rewritten line. |

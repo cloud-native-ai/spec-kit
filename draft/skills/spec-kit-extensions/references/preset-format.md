@@ -217,4 +217,4 @@ specify preset catalog add https://example.com/catalog.json --name my-org --inst
 | Config file | Scope |
 |-------------|-------|
 | `.specify/preset-catalogs.yml` | Project catalog stack. |
-| `~/.specify/preset-catalogs.yml` | User catalog stack. |
+| `${HOME}/.specify/preset-catalogs.yml` | User catalog stack. |

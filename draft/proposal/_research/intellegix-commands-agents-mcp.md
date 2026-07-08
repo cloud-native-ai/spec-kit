@@ -1,6 +1,6 @@
 # Mining Report: intellegix-code-agent-toolkit → spec-kit
 
-Source: `/cws_work/intellegix-code-agent-toolkit` (branch not git-inspected; a modular Claude Code global config `~/.claude`-style repo).
+Source: `/cws_work/intellegix-code-agent-toolkit` (branch not git-inspected; a modular Claude Code global config `${HOME}/.claude`-style repo).
 Target: `/cws_work/spec-kit` (specify-cli, Spec-Driven Development CLI).
 Lens: ideas for a universal agent-coding framework unifying skills + commands + workflows + scripts, with focus on command breadth, agent patterns, MCP integration, and portfolio governance.
 

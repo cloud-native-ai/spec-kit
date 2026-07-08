@@ -59,7 +59,7 @@ Single-project layout (per plan.md). Edit targets:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [X] T002 In `tests/contract/test_skill_home_workdir_template.py`, add module-level constants enumerating the required template section headings (per `data-model.md` entity 4: `Path Conventions`, `Computation Idioms`, `Paired Example`, `Migration Mapping`, `Non-shell Agents`) and the canonical migration mapping rows the template must contain (the three legacy idiom kinds: `./X → ${SKILL_HOME}/X`, `${SKILL_ROOT}/X → ${SKILL_HOME}/X`, `~/.copilot/skills/<name>/X → ${SKILL_HOME}/X`).
+- [X] T002 In `tests/contract/test_skill_home_workdir_template.py`, add module-level constants enumerating the required template section headings (per `data-model.md` entity 4: `Path Conventions`, `Computation Idioms`, `Paired Example`, `Migration Mapping`, `Non-shell Agents`) and the canonical migration mapping rows the template must contain (the three legacy idiom kinds: `./X → ${SKILL_HOME}/X`, `${SKILL_ROOT}/X → ${SKILL_HOME}/X`, `${HOME}/.copilot/skills/<name>/X → ${SKILL_HOME}/X`).
 
 **Checkpoint**: Test fixtures ready — US1/US2/US3 assertion tasks can now write story-specific tests against shared constants.
 
@@ -131,8 +131,8 @@ Single-project layout (per plan.md). Edit targets:
 
 ### Implementation for User Story 3
 
-- [X] T012 [US3] In `templates/commands/skills.md`, add a `## Migration Mapping` section containing a markdown table with at least three rows mapping legacy → new patterns (`./X` → `${SKILL_HOME}/X`; `${SKILL_ROOT}/X` → `${SKILL_HOME}/X`; agent-specific install path such as `~/.copilot/skills/<name>/X` → `${SKILL_HOME}/X`), each row including a concrete one-line `example_before` and `example_after` per `data-model.md` entity 3 (covers FR-011, SC-005).
-- [X] T013 [P] [US3] In `skills/improve-skills/SKILL.md`, within Workflow step 2 ("Measure execution effectiveness from history") or step 3 ("Analyze user-provided emphasis and organize improvement items"), add a "Legacy path idioms" detection bullet listing `./X`, `${SKILL_ROOT}/X`, and hard-coded agent-specific install paths (e.g., `~/.copilot/skills/<name>/...`) as migration candidates whenever a Skill is being improved; cross-reference the Migration Mapping table in `templates/commands/skills.md` (covers FR-010).
+- [X] T012 [US3] In `templates/commands/skills.md`, add a `## Migration Mapping` section containing a markdown table with at least three rows mapping legacy → new patterns (`./X` → `${SKILL_HOME}/X`; `${SKILL_ROOT}/X` → `${SKILL_HOME}/X`; agent-specific install path such as `${HOME}/.copilot/skills/<name>/X` → `${SKILL_HOME}/X`), each row including a concrete one-line `example_before` and `example_after` per `data-model.md` entity 3 (covers FR-011, SC-005).
+- [X] T013 [P] [US3] In `skills/improve-skills/SKILL.md`, within Workflow step 2 ("Measure execution effectiveness from history") or step 3 ("Analyze user-provided emphasis and organize improvement items"), add a "Legacy path idioms" detection bullet listing `./X`, `${SKILL_ROOT}/X`, and hard-coded agent-specific install paths (e.g., `${HOME}/.copilot/skills/<name>/...`) as migration candidates whenever a Skill is being improved; cross-reference the Migration Mapping table in `templates/commands/skills.md` (covers FR-010).
 - [X] T014 [US3] Update `.specify/skills/improve-skills/SKILL.md` so its content is byte-equivalent to the post-T013 `skills/improve-skills/SKILL.md`. Depends on T013.
 - [X] T015 [US3] Run `pytest -m contract tests/contract/test_skill_home_workdir_template.py -v` and confirm every US3 assertion from T011 now passes; US1+US2 assertions must remain green. — Confirmed: 20 passed (1 sentinel + 10 US1 + 3 US2 + 6 US3).
 

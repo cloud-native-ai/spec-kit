@@ -30,7 +30,7 @@ Define, modify, view, or invoke reusable tools with persistent records and expli
 |------|-------|---------|
 | `project-script` | Project-level | `scripts/bash/deploy.sh` |
 | `system-binary` | System-level | `/usr/bin/jq`, `/usr/local/bin/docker` |
-| `shell-function` | Shell-session-level | Functions from `~/.bashrc` |
+| `shell-function` | Shell-session-level | Functions from `${HOME}/.bashrc` |
 | `webhook` | Network-level | `https://ci.example.com/api/trigger-build` |
 
 ## Execution Flow
