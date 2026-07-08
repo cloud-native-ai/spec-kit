@@ -1,4 +1,23 @@
-description = "Implement the implementation planning workflow using the plan template to generate design artifacts."
+description = "Implement the implementation planning workflow using the plan template to generate design artifacts.
+handoffs:
+  - label: Create Tasks
+    agent: speckit.tasks
+    prompt: Break the plan into tasks
+    send: true
+  - label: Create Checklist
+    agent: speckit.checklist
+    prompt: Create a checklist for the following domain...
+scripts:
+  sh: scripts/bash/create-new-plan.sh --json
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You **MUST** analyze the user input in `$ARGUMENTS`, infer the user"
 
 prompt = """
 ## User Input

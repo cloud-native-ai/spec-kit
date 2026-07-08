@@ -1,4 +1,19 @@
-description = "Generate or update project instructions and compatibility symlinks, ensuring a consistent AI context across tools."
+description = "Generate or update project instructions and compatibility symlinks, ensuring a consistent AI context across tools.
+handoffs:
+  - label: Scan Skills
+    agent: speckit.skills
+    prompt: Scan project for available tools and skills to populate the instructions.
+scripts:
+  sh: scripts/bash/generate-instructions.sh
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You **MUST** analyze the user input in `$ARGUMENTS`, infer the user"
 
 prompt = """
 ## User Input

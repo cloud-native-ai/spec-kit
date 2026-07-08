@@ -1,4 +1,16 @@
-description = "Create or update the Requirements from a natural language feature description."
+description = "Create or update the Requirements from a natural language feature description.
+handoffs:
+   - label: Clarify Requirements
+     agent: speckit.clarify
+     prompt: Resolve any underspecified areas in the requirements specification.
+     send: true
+   - label: Build Technical Plan
+     agent: speckit.plan
+     prompt: Generate an implementation plan based on the requirements specification.
+     send: true
+scripts:
+   sh: |
+      cat << "
 
 prompt = """
 ## User Input

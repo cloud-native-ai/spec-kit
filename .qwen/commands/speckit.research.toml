@@ -1,4 +1,22 @@
-description = "Conduct in-depth research and analysis to support the implementation plan."
+description = "Conduct in-depth research and analysis to support the implementation plan.
+handoffs:
+   - label: Build / Update Plan
+      agent: speckit.plan
+      prompt: Incorporate research findings into the implementation plan.
+      send: true
+skills:
+   - analysis-project
+scripts:
+  sh: skills/analysis-project/scripts/research-project.sh --json
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You **MUST** analyze the user input in `$ARGUMENTS`, infer the user"
 
 prompt = """
 ## User Input

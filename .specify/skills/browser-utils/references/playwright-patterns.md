@@ -8,6 +8,28 @@ For the complete Playwright API reference, see [playwright-api.md](./playwright-
 
 ---
 
+## Preflight: verify the Playwright install actually resolves
+
+`npm run setup` (or a prior `npm install`) can leave a **partial/corrupt** `node_modules`
+that only fails at *runtime*, not at install time. The classic symptom is a missing
+`playwright-core/lib/` producing `Cannot find module './lib/bootstrap'` the first time a
+script requires Playwright. A file existing is not proof it loads.
+
+Run this integrity check before the first script of a session — it repairs itself if the
+require fails:
+
+```bash
+cd ${SKILL_HOME}/scripts/js
+node -e "require('playwright'); console.log('playwright OK')" \
+  || { echo 'playwright broken — reinstalling'; rm -rf node_modules/playwright* && npm install; }
+```
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `Cannot find module './lib/bootstrap'` (or similar) on first `require('playwright')` | Partial/corrupt `node_modules` (interrupted install, bad cache) | `rm -rf node_modules/playwright* && npm install` (or re-run `npm run setup`) |
+
+---
+
 ## Run Modes (Tier 3)
 
 Tier 3 has two mutually exclusive run modes. Pick the mode **before writing a script**
@@ -100,6 +122,591 @@ const TARGET_URL = 'https://internal.example.com/dashboard';
 > yourself with `--remote-debugging-port=<port>` and attach via
 > `chromium.connectOverCDP('http://127.0.0.1:<port>')`, which coexists with a manually
 > opened window. Confirm this approach with the user first.
+
+---
+
+## SPA Site Traversal & Module Extraction (Tier 3)
+
+Use this pattern to **map every functional module of a single-page app** (left-nav +
+hash routes) and produce a structured design doc: for each module, its route, label,
+purpose, and key UI elements (tables/columns, filters, action buttons, charts, metrics).
+
+It combines with a Run Mode: an internal/authenticated SPA needs **Mode 2** (real Chrome
+profile), a localhost SPA uses **Mode 1**. The traversal logic below is identical for both.
+
+### Design principles (why this shape)
+
+- **One context, one page, reused across all routes.** Launch the browser/context
+  **once**, navigate every route in the same tab, and close the context **once** in a
+  `finally`. Do NOT relaunch per route: in Mode 2 each relaunch re-acquires the profile
+  singleton lock (slow, and hands off to any stray window). Reusing one context also
+  keeps SSO/session cookies warm.
+- **Incremental, resumable output.** A 20+ module SPA is a long run; a crash mid-way must
+  not lose progress. Persist a checkpoint after every module and append to the design doc
+  as you go — never buffer the whole site in memory and write once at the end.
+- **Hash routes are not real navigations.** `#/...` changes fire no `load` event and
+  `networkidle` may never settle (polling widgets). Wait on the *route + content* changing,
+  with bounded fallbacks — see the wait helper below.
+- **Extract only after dynamic content settles — and scroll the iframe to force it.** Much of
+  a real ops SPA is Grafana/Kibana dashboards in same-origin iframes whose panels mount *after*
+  the route settles AND only when scrolled into view (lazy render). A page reads "(0 panels)"
+  if you extract too early or never scroll the frame. `settleDynamicContent` (Step 2.5) scrolls
+  each dashboard frame top→bottom to mount every panel, then polls the panel count to stability;
+  tab bodies and expandable rows mount on activation and are revealed the same pass. Always run
+  it between `gotoRoute` and `extractModule`. Per the scope split, iframe pages are documented to
+  dashboard level only (src, title, panel groups, variable NAMES) — not component level.
+- **Prove login state, don't assume it.** A Mode-2 crawl that silently lands on the SSO
+  page catalogues the login form 50× and looks "complete". Assert the first navigation did
+  NOT land on a login host (Step 0) and fail fast, and record a run log so the run is
+  reproducible and self-documenting.
+- **Every module gets a PURPOSE + a screenshot.** The doc's job is to explain *what each
+  module is for*, not just list its widgets. Synthesize a one-line purpose per module and
+  capture a per-module screenshot as evidence — treat a failed screenshot as a recorded
+  problem, not a silent skip.
+
+### Step 0 — Assert login state & open a run log (reproducibility)
+
+Do this **once, right after the first navigation**, before enumerating. It converts a
+silent "crawled the login page" failure into an immediate stop, and records the Mode-2
+preflight result + landing URL so the run self-documents (D1/D2).
+
+```javascript
+const fs = require('fs');                   // (declare once at the top of your script)
+const RUN_LOG = '/tmp/spa-run-log.json';   // preflight + landing URL + per-module evidence
+
+// Fail fast if the profile did NOT carry login state. Otherwise a Mode-2 crawl silently
+// catalogues the SSO login form for every route and still reports "complete".
+function assertNotOnLogin(page) {
+  const url = page.url();
+  if (/login[^/]*\.alibaba-inc\.com|passport|\/login(\b|\/|\?)|\/sso(\b|\/)/i.test(url)) {
+    throw new Error(
+      `Login state NOT loaded — landed on a login page: ${url}\n` +
+      `Re-check Mode 2 preflight: profile free? channel:'chrome'? ` +
+      `ignoreDefaultArgs:['--use-mock-keychain']?`);
+  }
+  return url;
+}
+
+// runInfo carries whatever the bash preflight found (profile path, "profile free" result).
+function openRunLog(runInfo) {
+  const log = { startedAt: new Date().toISOString(), ...runInfo, modules: [] };
+  fs.writeFileSync(RUN_LOG, JSON.stringify(log, null, 2));
+  return log;
+}
+function saveRunLog(log) { fs.writeFileSync(RUN_LOG, JSON.stringify(log, null, 2)); }
+
+// Usage (after the context is launched via Mode 1/Mode 2 and ONE page exists):
+//   await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+//   await settleDynamicContent(page, { timeout: 8000 });         // Step 2.5
+//   const landingUrl = assertNotOnLogin(page);                   // throws → stop now
+//   const runLog = openRunLog({ mode: 'mode2', profile: USER_DATA_DIR,
+//                               profileFreePreflight: true, baseUrl, landingUrl });
+```
+
+Record the bash profile-preflight result (from the Mode 2 recipe above) into `runInfo` so
+the log states, in one place, that the profile was free and the page was authenticated.
+
+### Step 1 — Enumerate all routes (BFS over the left-nav)
+
+Expand every collapsible nav group first (group headers often render submenus only when
+open), then collect every leaf link. Leaves have a real hash href; group toggles do not.
+
+```javascript
+// Expand all collapsible menu groups, then collect leaf routes.
+async function enumerateRoutes(page, navSelector = 'nav, .ant-menu, aside') {
+  // Repeatedly click ONLY still-closed group headers until no new ones appear (BFS by depth).
+  // CRITICAL: select closed groups only. `.ant-menu-submenu-title` matches every submenu
+  // header regardless of state, so clicking it blindly each pass TOGGLES already-open groups
+  // shut again — the classic bug that makes enumeration return 0 leaves. Gate on open-state:
+  // an open Ant submenu carries `.ant-menu-submenu-open` on its wrapper, and aria toggles
+  // expose `aria-expanded="true"`. Re-evaluate every pass because opening a group reveals
+  // nested groups that only become clickable on the next pass.
+  for (let pass = 0; pass < 8; pass++) {
+    const toggles = await page.locator(
+      `${navSelector} [aria-expanded="false"], ` +
+      `${navSelector} .ant-menu-submenu:not(.ant-menu-submenu-open) > .ant-menu-submenu-title`
+    ).all();
+    if (toggles.length === 0) break;
+    let clicked = 0;
+    for (const t of toggles) {
+      try { await t.click({ timeout: 1000 }); clicked++; await page.waitForTimeout(150); }
+      catch { /* not clickable / detached this pass */ }
+    }
+    if (clicked === 0) break;
+  }
+  // Collect leaf links: anchors with a hash route, deduped, preserving nav order.
+  const routes = await page.$$eval(`${navSelector} a[href*="#/"]`, (as) => {
+    const seen = new Set();
+    const out = [];
+    for (const a of as) {
+      const href = a.getAttribute('href') || '';
+      const m = href.match(/#\/[^\s?]*/);
+      if (!m) continue;
+      const route = m[0];
+      if (seen.has(route)) continue;
+      seen.add(route);
+      out.push({ route, label: (a.textContent || '').trim() });
+    }
+    return out;
+  });
+  return routes; // [{ route: '#/common_info/view', label: '公共信息' }, ...]
+}
+```
+
+If the nav is not standard anchors (e.g. clickable `<li>` with JS-driven routing), fall
+back to clicking each nav item and reading `page.url()` after the route settles; build the
+route list from the observed URLs.
+
+### Step 2 — Robust SPA route wait
+
+```javascript
+// Navigate to a hash route in the SAME page and wait for the view to actually change.
+async function gotoRoute(page, baseUrl, route, contentSelector = 'main, .ant-pro-page-container, #root > div') {
+  const before = page.url();
+  await page.evaluate((h) => { window.location.hash = h.replace(/^#/, ''); }, route);
+  // 1) hash actually changed
+  await page.waitForFunction((prev) => location.href !== prev, before, { timeout: 8000 }).catch(() => {});
+  // 2) content container present + a brief settle for lazy chunks
+  await page.waitForSelector(contentSelector, { timeout: 8000 }).catch(() => {});
+  await page.waitForLoadState('networkidle', { timeout: 6000 }).catch(() => {}); // bounded — polling apps never idle
+  await page.waitForTimeout(400); // final settle for animations / async table loads
+}
+```
+
+### Step 2.5 — Settle dynamic content before extracting (panels, tabs, rows)
+
+`gotoRoute` only proves the *route* changed and the outer shell exists. Grafana panels,
+tab bodies, and expandable rows mount **later**; extracting now yields the "(0 panels)"
+empty-shell result that hollowed out round 1. Run this between `gotoRoute` and
+`extractModule`.
+
+```javascript
+// Wait until dynamic content actually rendered, then reveal hidden tabs/rows so
+// extractModule sees the whole module — not just the default tab's empty shell.
+async function settleDynamicContent(page, { timeout = 15000 } = {}) {
+  // (a) Grafana/dashboard panels render in same-origin iframes AFTER the route settles —
+  // and Grafana LAZY-renders panels only when they scroll into the iframe's viewport. So a
+  // plain count poll stabilizes at "only what fits the viewport" (often 0) → the persistent
+  // "(0 panels)" bug. Fix: for each dashboard frame, scroll it top→bottom each pass to force
+  // every panel to mount, then poll the count until it is > 0 AND stable across two passes.
+  // Panel elements across old + current Grafana (scenes use data-viz-panel-key; newer builds
+  // tag each header `data-testid Panel header <title>`).
+  const panelSel = '.panel-container, [data-panelid], [data-viz-panel-key], .react-grid-item, ' +
+                   '[data-testid^="data-testid Panel header"]';
+  // A frame is a dashboard host if its URL looks like Grafana/Kibana OR it actually contains
+  // panels (some embeds use a neutral src) — probe both so we don't skip scrolling.
+  const dashFrames = async () => {
+    const out = [];
+    for (const f of page.frames()) {
+      if (f === page.mainFrame()) continue;
+      if (/grafana|dashboard|kibana|d-solo|\/d\//i.test(f.url())) { out.push(f); continue; }
+      try { if (await f.locator(panelSel).count() > 0) out.push(f); } catch { /* cross-origin */ }
+    }
+    return out;
+  };
+  const countPanels = async () => {
+    let total = 0;
+    for (const frame of page.frames()) {
+      try { total += await frame.locator(panelSel).count(); } catch { /* cross-origin */ }
+    }
+    return total;
+  };
+  // Scroll every dashboard frame's own window top→bottom in steps so lazy panels mount.
+  // Runs INSIDE the frame context (frame.evaluate), so window == the iframe's window.
+  const scrollDashFrames = async (frames) => {
+    for (const frame of frames) {
+      try {
+        await frame.evaluate(async () => {
+          const doc = document.scrollingElement || document.documentElement;
+          const step = Math.max(300, Math.floor(window.innerHeight * 0.8));
+          for (let y = 0; y <= doc.scrollHeight; y += step) {
+            window.scrollTo(0, y);
+            await new Promise((r) => setTimeout(r, 150)); // let lazy panels mount
+          }
+          window.scrollTo(0, 0); // back to top so the screenshot shows the dashboard head
+        });
+      } catch { /* cross-origin or detached — skip */ }
+    }
+  };
+  const frames0 = await dashFrames();
+  const hasDashboardFrame = frames0.length > 0;
+  const deadline = Date.now() + timeout;
+  let prev = -1, stable = 0;
+  while (Date.now() < deadline) {
+    if (hasDashboardFrame) await scrollDashFrames(await dashFrames()); // re-resolve: frames can reload
+    const n = await countPanels();
+    // A page with no dashboard iframe at all → nothing to wait for; leave promptly.
+    if (n === 0 && !hasDashboardFrame && Date.now() - (deadline - timeout) > 1500) break;
+    if (n > 0 && n === prev) { if (++stable >= 2) break; } else { stable = 0; }
+    prev = n;
+    await page.waitForTimeout(500);
+  }
+  // (b) Panels/tables often show a spinner first — wait for known loaders to clear.
+  for (const frame of page.frames()) {
+    await frame.locator('.panel-loading, [aria-label="Panel loading bar"], ' +
+        '[data-testid="Panel loading bar"], .ant-spin-spinning, .ant-skeleton')
+      .first().waitFor({ state: 'hidden', timeout: 3000 }).catch(() => {});
+  }
+  // (c) Reveal inactive tabs and collapsed rows so their content mounts before extraction.
+  await revealTabsAndRows(page);
+}
+
+// Click through inactive tabs and expandable table rows so their content is in the DOM.
+async function revealTabsAndRows(page) {
+  const tabs = await page.locator('.ant-tabs-tab:not(.ant-tabs-tab-active), [role="tab"]:not([aria-selected="true"])').all();
+  for (const tab of tabs.slice(0, 12)) {
+    await tab.click({ timeout: 800 }).catch(() => {});
+    await page.waitForTimeout(200);
+  }
+  const rowToggles = await page.locator('.ant-table-row-expand-icon-collapsed, [aria-label="Expand row"]').all();
+  for (const r of rowToggles.slice(0, 20)) {
+    await r.click({ timeout: 500 }).catch(() => {});
+  }
+}
+
+// Ant Design <Select> options are NOT in the DOM until the dropdown is opened — the listbox
+// renders in a detached portal on click. So `extractDoc` (which reads the static DOM) can
+// only ever see a select's PLACEHOLDER, never its options. This is the general shape of
+// *interaction-gated* content: to document it you must trigger the interaction. Open each
+// select, read the portal options, then Escape to close. Bounded (few selects, capped
+// options) so it stays cheap on a 50-module crawl. Runs at the Playwright level (needs real
+// clicks), so call it from extractModule — NOT from inside page.evaluate.
+async function readSelectOptions(page, { maxSelects = 8, maxOptions = 60 } = {}) {
+  const selects = await page.locator('.ant-select:not(.ant-select-disabled)').all();
+  const out = [];
+  for (const sel of selects.slice(0, maxSelects)) {
+    let placeholder = '';
+    try {
+      placeholder = ((await sel.locator('.ant-select-selection-placeholder, .ant-select-selection-item')
+        .first().textContent({ timeout: 500 })) || '').trim();
+    } catch { /* no visible label */ }
+    let options = [];
+    try {
+      await sel.click({ timeout: 800 });
+      await page.waitForTimeout(250); // portal mount + async option load
+      options = await page.locator(
+        '.ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-content'
+      ).allTextContents();
+      options = [...new Set(options.map((o) => o.trim()).filter(Boolean))].slice(0, maxOptions);
+      await page.keyboard.press('Escape'); // close before touching the next select
+    } catch { await page.keyboard.press('Escape').catch(() => {}); }
+    if (placeholder || options.length) out.push({ placeholder, options });
+  }
+  return out; // [{ placeholder: '请选择集群', options: ['acs-egs_...', ...] }, ...]
+}
+```
+
+> Returning to the first tab after the reveal pass is usually unnecessary for extraction
+> (all tab bodies are now in the DOM), but call `page.locator('.ant-tabs-tab').first().click()`
+> before the screenshot if you want the default view captured.
+
+### Step 3 — Extract each module's structure (main document **and** iframes)
+
+Real SPAs frequently render the actual content inside an **iframe** (dashboards embedded
+from Grafana/Kibana, external systems, doc portals). Extracting only the top document
+misses the substance of those pages — in practice a large share of modules are iframe
+hosts whose top-level DOM is nearly empty. So `extractModule` runs the same extraction on
+the main frame **and** every child frame: for **same-origin** frames it reads the inner
+DOM; for **cross-origin** frames only the `src` URL is observable (browser security), so
+record that. `frame.evaluate()` throws on cross-origin access — catch it and fall back to
+the URL.
+
+```javascript
+async function extractModule(page) {
+  // Extraction body — runs inside ANY frame's document context and returns its structure.
+  const extractDoc = () => {
+    const txt = (el) => (el?.textContent || '').trim().replace(/\s+/g, ' ');
+    const many = (sel) => Array.from(document.querySelectorAll(sel)).map(txt).filter(Boolean);
+    // Interaction-widget noise: Ant InputNumber up/down arrows expose "Increase/Decrease
+    // Value" as <button>s; Grafana dashboard chrome adds "Add panel"/"Share"/etc. These are
+    // not app affordances — drop them so the button list reflects real user actions.
+    const BTN_NOISE = /^(increase|decrease) value$|^(add panel|add row|add library panel|share|save dashboard|exit edit mode|search dashboards)$/i;
+    // Tables: column headers
+    const tables = Array.from(document.querySelectorAll('table, .ant-table')).slice(0, 10).map((t) => ({
+      columns: Array.from(t.querySelectorAll('th, .ant-table-cell[role="columnheader"]'))
+        .map((h) => txt(h)).filter(Boolean).slice(0, 40),
+    })).filter((t) => t.columns.length);
+    return {
+      title: document.title,
+      headings: [...many('h1'), ...many('h2'), ...many('h3')].slice(0, 20),
+      breadcrumb: many('.ant-breadcrumb a, .ant-breadcrumb span').slice(0, 10),
+      filters: [
+        ...Array.from(document.querySelectorAll('input')).map((i) => i.placeholder).filter(Boolean),
+        ...many('.ant-form-item-label label'),
+        ...many('.ant-select-selection-placeholder'),
+      ].slice(0, 40),
+      buttons: [...new Set(many('button, .ant-btn'))].filter((b) => b && !BTN_NOISE.test(b)).slice(0, 40),
+      // Tab labels — distinguish multi-view pages and feed the purpose line.
+      tabs: [...new Set(many('.ant-tabs-tab, [role="tab"]'))].slice(0, 20),
+      tables,
+      charts: document.querySelectorAll('canvas, svg.recharts-surface, .echarts-for-react').length,
+      metrics: many('.ant-statistic, .ant-card-head-title, .ant-descriptions-item').slice(0, 30),
+      // Grafana-embedded dashboards: capture panel-GROUP (row) titles AND individual panel
+      // titles, deduped, across old + current Grafana. Row titles: `.dashboard-row__title`
+      // (old). Panel titles: `.panel-title` (old) and, on current scenes-based Grafana, each
+      // header is tagged `data-testid="data-testid Panel header <title>"` — strip the prefix
+      // to recover the title. This is why 16/26 dashboards read "(0 panels)": the old
+      // row-title-only selector matches nothing on panel-only dashboards / current Grafana.
+      panels: [...new Set([
+        ...many('.dashboard-row__title, [aria-label="Dashboard row title"], ' +
+                '[data-testid="data-testid dashboard row title"]'),
+        ...many('.panel-title, h2.panel-title, [class*="panel-title"]'),
+        ...Array.from(document.querySelectorAll('[data-testid^="data-testid Panel header"]'))
+          .map((el) => (el.getAttribute('aria-label') || el.textContent || '')
+            .replace(/^data-testid Panel header\s*/i, '').trim()).filter(Boolean),
+      ])].filter(Boolean).slice(0, 120),
+      // Template-variable NAMES (labels), NOT the stale selected values. Grafana DOM DRIFTS:
+      // current builds render each variable label as
+      // `data-testid="data-testid Dashboard template variables submenu Label <name>"`;
+      // older builds use `.template-variable label` / `.gf-form-label`. Read the LABEL text
+      // (variable name like "cluster"/"namespace") — reading the combobox value instead was
+      // the round-2 bug (values mislabeled as names). Enumerating each variable's option list
+      // needs a click (interaction-gated) — see the note under Step 3; names are enough here.
+      variables: [...new Set([
+        ...Array.from(document.querySelectorAll(
+          '[data-testid^="data-testid Dashboard template variables submenu Label"], ' +
+          '[data-testid^="data-testid template variable"] label'))
+          .map((el) => (el.getAttribute('aria-label') || el.textContent || '')
+            .replace(/^data-testid.*Label\s*/i, '').trim()).filter(Boolean),
+        ...many('.template-variable .template-variable__label, .gf-form-label--variable, ' +
+                '.submenu-item > label'),
+      ])].filter(Boolean).slice(0, 60),
+    };
+  };
+
+  const main = await page.evaluate(extractDoc);
+  // Interaction-gated: Ant Select options only exist once the dropdown is opened, so they
+  // can't come from the evaluate() above — capture them with real clicks and attach here.
+  main.selects = await readSelectOptions(page);
+
+  // Walk every child frame; drill same-origin inner DOM, record cross-origin src only.
+  const frames = [];
+  for (const frame of page.frames()) {
+    if (frame === page.mainFrame()) continue;
+    const src = frame.url();
+    if (!src || src === 'about:blank') continue;
+    let inner = null;
+    try {
+      inner = await frame.evaluate(extractDoc);   // throws for cross-origin → caught below
+    } catch {
+      inner = null;                               // cross-origin: only src is observable
+    }
+    frames.push({ src, sameOrigin: !!inner, inner });
+  }
+  return { ...main, frames };
+}
+```
+
+> **Grafana panels & variables — the two round-2 failure modes and how this code fixes them.**
+> (1) *Panels read "(0 panels)".* Two causes, both handled: panels lazy-render only when
+> scrolled into view (so `settleDynamicContent` now scrolls each dashboard frame top→bottom
+> to force them to mount before the count poll), and the old row-title-only `panels` selector
+> matched nothing on panel-only / current-Grafana dashboards (so `extractDoc.panels` now also
+> reads `.panel-title` and current scenes' `data-testid Panel header <title>`). If panels are
+> still empty on a dashboard you can see, raise `settleDynamicContent`'s `timeout` and confirm
+> the frame is same-origin (cross-origin frames expose only `src`). (2) *Variables captured as
+> stale values, not names.* `extractDoc.variables` now reads the variable LABEL text
+> (`…submenu Label <name>`), giving names like "cluster"/"namespace". Grafana DOM drifts
+> between versions, so treat `variables: []` on a page you *know* has a variable bar as a
+> selector-drift signal, not "no variables". To read each variable's full option list (not
+> just names), click the variable combobox open and read `[role="option"]` — the same
+> interaction-gated pattern as `readSelectOptions`; per the scope split (iframe pages need only
+> src, title, panel groups, and variable NAMES) this deeper capture is optional.
+
+### Step 4 — Drive the traversal with a resumable checkpoint
+
+```javascript
+// (fs and RUN_LOG helpers from Step 0 are reused here — declare fs only once.)
+const CHECKPOINT = '/tmp/spa-traversal.json';   // {visited, pending, data}
+const DESIGN_DOC = '/tmp/spa-design-doc.md';    // append-as-you-go output
+
+function loadCheckpoint() {
+  try { return JSON.parse(fs.readFileSync(CHECKPOINT, 'utf8')); } catch { return null; }
+}
+function saveCheckpoint(cp) { fs.writeFileSync(CHECKPOINT, JSON.stringify(cp, null, 2)); }
+
+// One-line PURPOSE per module, synthesized deterministically (no LLM call) from the module's
+// DISTINCTIVE signals rather than a mechanical breadcrumb+template string (the round-2 defect
+// was boilerplate like "A › B — browse 1 table(s), 2 chart(s)"). Lead with the primary entity
+// (heading/title), then the signals that actually differentiate this page from its siblings:
+// real table COLUMN names (what data it is about), real action-button VERBS (what you can do),
+// TAB names (which sub-views), and embedded dashboard panel titles. Everything is pulled from
+// concrete DOM text, so two different pages produce two different sentences.
+function synthesizePurpose(route, label, info) {
+  // Primary entity: the most specific human name for the page.
+  const entity = (info.headings && info.headings[0]) || info.title || label ||
+                 (info.breadcrumb || []).filter(Boolean).slice(-1)[0] || route;
+  const bits = [];
+  // Embedded dashboard: name its panels (the distinctive part), not just "monitor dashboards".
+  const panels = (info.frames || []).flatMap((f) => (f.inner && f.inner.panels) || []);
+  const dashFrame = panels.length ||
+    (info.frames || []).some((f) => /grafana|dashboard|kibana/i.test(f.src || ''));
+  if (dashFrame) bits.push(panels.length ? `dashboard: ${panels.slice(0, 4).join(', ')}` : 'embedded dashboard');
+  // Distinctive columns — the single strongest "what is this page about" signal.
+  const cols = [...new Set((info.tables || []).flatMap((t) => t.columns || [])
+    .map((c) => (c || '').trim()).filter((c) => c && c.length <= 14))].slice(0, 4);
+  if (cols.length) bits.push(`lists ${cols.join('/')}`);
+  // Real action verbs present on buttons — what the user can DO here.
+  const actions = [...new Set((info.buttons || []).filter((b) =>
+    /新增|新建|创建|添加|注册|导入|导出|下发|发布|部署|扩容|缩容|重启|回滚|删除|编辑|配置|审批|巡检|同步|approve|create|add|new|import|export|deploy|delete|edit|config|restart|rollback|scale/i
+      .test(b)))].slice(0, 3);
+  if (actions.length) bits.push(`actions: ${actions.join('/')}`);
+  // Multiple tabs → name them so multi-view pages are distinguishable.
+  const tabs = [...new Set((info.tabs || []).map((t) => (t || '').trim()).filter(Boolean))].slice(0, 4);
+  if (tabs.length > 1) bits.push(`tabs: ${tabs.join('/')}`);
+  // Fall back to charts/metrics only when nothing more distinctive was found.
+  if (!bits.length) {
+    if (info.charts) bits.push(`${info.charts} chart(s)`);
+    else if (info.metrics && info.metrics.length) bits.push(`shows ${info.metrics.slice(0, 3).join('/')}`);
+  }
+  return bits.length ? `${entity} — ${bits.join('; ')}` : entity;
+}
+
+function appendModuleDoc(route, label, info) {
+  const lines = [
+    `\n## ${label || route}  \n\`${route}\``,
+    `- **Purpose**: ${synthesizePurpose(route, label, info)}`,
+    info.headings.length ? `- **Headings**: ${info.headings.join(' / ')}` : '',
+    info.filters.length ? `- **Filters/Inputs**: ${info.filters.join(', ')}` : '',
+    info.selects?.length ? info.selects.map((s) =>
+      `- **Select "${s.placeholder || '(unlabeled)'}"**: ${s.options.length ? s.options.join(', ') : '(no static options)'}`).join('\n') : '',
+    info.buttons.length ? `- **Actions**: ${info.buttons.join(', ')}` : '',
+    info.tables.length ? info.tables.map((t, i) => `- **Table ${i + 1} columns**: ${t.columns.join(', ')}`).join('\n') : '',
+    info.charts ? `- **Charts**: ${info.charts}` : '',
+    info.metrics.length ? `- **Metrics/Cards**: ${info.metrics.join(', ')}` : '',
+  ];
+  // Embedded iframes — the real content of dashboard/external-system modules.
+  for (const f of info.frames || []) {
+    lines.push(`- **Embedded iframe**: ${f.src}${f.sameOrigin ? '' : ' (cross-origin — src only)'}`);
+    const inner = f.inner;
+    if (inner) {
+      if (inner.title) lines.push(`  - Title: ${inner.title}`);
+      if (inner.panels?.length) lines.push(`  - Panels: ${inner.panels.join('; ')}`);
+      if (inner.variables?.length) lines.push(`  - Variables: ${inner.variables.join(', ')}`);
+      if (inner.tables?.length) lines.push(`  - Table columns: ${inner.tables.map((t) => t.columns.join(' | ')).join(' || ')}`);
+    }
+  }
+  fs.appendFileSync(DESIGN_DOC, lines.filter(Boolean).join('\n') + '\n');
+}
+
+// Main flow (context already launched via Mode 1 or Mode 2 above; ONE page reused).
+// runInfo = { mode, profile, profileFreePreflight } from the bash Mode-2 preflight.
+async function traverse(page, baseUrl, runInfo = {}) {
+  // Step 0 — prove login state ONCE, then open the run log (reproducibility).
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await settleDynamicContent(page, { timeout: 8000 });
+  const landingUrl = assertNotOnLogin(page);   // throws & stops before wasting a full crawl
+  const runLog = openRunLog({ ...runInfo, baseUrl, landingUrl });
+
+  let cp = loadCheckpoint();
+  if (!cp) {
+    const routes = await enumerateRoutes(page);
+    cp = { visited: [], pending: routes, data: {} };
+    saveCheckpoint(cp);
+    if (!fs.existsSync(DESIGN_DOC)) fs.writeFileSync(DESIGN_DOC, `# SPA Design Doc — ${baseUrl}\n`);
+    runLog.routeCount = routes.length; saveRunLog(runLog);
+  }
+  while (cp.pending.length) {
+    const { route, label } = cp.pending[0];
+    try {
+      await gotoRoute(page, baseUrl, route);
+      await settleDynamicContent(page);        // Step 2.5 — wait for panels/tabs/rows
+      assertNotOnLogin(page);                   // a route may bounce to login if a token lapsed
+      const info = await extractModule(page);
+      // Enforced per-module screenshot: record the path, or the failure — never a silent skip.
+      const shot = `/tmp/module-${cp.visited.length}.png`;
+      let screenshot = shot;
+      try { await page.screenshot({ path: shot, fullPage: true }); }
+      catch (se) { screenshot = null; console.error(`  ⚠ screenshot failed for ${route}: ${se.message}`); }
+      appendModuleDoc(route, label, info);
+      cp.data[route] = { label, info, screenshot };
+      runLog.modules.push({ route, label, screenshot, purpose: synthesizePurpose(route, label, info) });
+      console.log(`✓ ${cp.visited.length + 1}: ${label} ${route}${screenshot ? '' : ' (NO SCREENSHOT)'}`);
+    } catch (e) {
+      console.error(`✗ ${route}: ${e.message}`); // record failure, keep going
+      cp.data[route] = { label, error: e.message };
+      runLog.modules.push({ route, label, error: e.message });
+    }
+    cp.visited.push(cp.pending.shift());
+    saveCheckpoint(cp); // persist after EVERY module → crash-safe, resumable
+    saveRunLog(runLog);
+  }
+  runLog.finishedAt = new Date().toISOString();
+  runLog.missingScreenshots = runLog.modules.filter((m) => !m.error && !m.screenshot).length;
+  saveRunLog(runLog);
+  console.log(`Done: ${cp.visited.length} modules → ${DESIGN_DOC} (run log: ${RUN_LOG})`);
+}
+```
+
+### Assembling into one runnable script (Step 0 → 4, no missing references)
+
+The snippets above are the pieces of a single `/tmp/spa-traverse.js`. Concatenate them into
+ONE file in this order and it runs end-to-end — every helper is a `function`/`async function`
+declaration, so declarations hoist and inter-helper call order does not matter; only these
+three things must be right:
+
+1. **Header (once, at top):**
+   ```javascript
+   const { chromium } = require('playwright');
+   const fs = require('fs');
+   const os = require('os');           // Mode 2 only (userDataDir path)
+   const path = require('path');       // Mode 2 only
+   const RUN_LOG = '/tmp/spa-run-log.json';
+   const CHECKPOINT = '/tmp/spa-traversal.json';
+   const DESIGN_DOC = '/tmp/spa-design-doc.md';
+   const TARGET_URL = '...';            // Mode 1: dev server; Mode 2: authenticated URL
+   ```
+   Declare `fs` and the three path constants **exactly once** (they appear in Step 0 and
+   Step 4 snippets — do not paste both copies).
+2. **All helper declarations**, in any order (hoisted): `assertNotOnLogin`, `openRunLog`,
+   `saveRunLog` (Step 0); `enumerateRoutes` (Step 1); `gotoRoute` (Step 2); `revealTabsAndRows`,
+   `readSelectOptions`, `settleDynamicContent` (Step 2.5); `extractModule` (Step 3);
+   `loadCheckpoint`, `saveCheckpoint`, `synthesizePurpose`, `appendModuleDoc`, `traverse`
+   (Step 4). Call graph that must resolve: `settleDynamicContent → revealTabsAndRows`;
+   `extractModule → readSelectOptions`; `appendModuleDoc`/`traverse → synthesizePurpose`;
+   `traverse → assertNotOnLogin, openRunLog, saveRunLog, enumerateRoutes, gotoRoute,
+   settleDynamicContent, extractModule, appendModuleDoc, loadCheckpoint, saveCheckpoint`.
+   All are defined above, so the assembled file has no dangling reference.
+3. **IIFE at the very end** — launch the context (Mode 1 `chromium.launch()` or Mode 2
+   `chromium.launchPersistentContext(...)`), reuse ONE page, call `traverse`, close in `finally`:
+   ```javascript
+   (async () => {
+     let context;
+     try {
+       context = await chromium.launch({ headless: false }); // or Mode 2 persistent context
+       const page = context.pages()[0] || (await context.newPage());
+       await traverse(page, TARGET_URL, { mode: 'mode1' }); // runInfo from bash preflight
+     } catch (e) { console.error('FATAL:', e.message); }
+     finally { if (context) await context.close(); } // release singleton lock (Mode 2)
+   })();
+   ```
+   Run it via the universal runner: `cd ${SKILL_HOME}/scripts/js && node run.js /tmp/spa-traverse.js`
+   (the runner injects `chromium`, but re-`require`ing it as above is harmless and keeps the file
+   self-contained). For a long crawl, background it per the § "Long crawls" note below.
+
+**Resuming**: on re-run, `loadCheckpoint()` returns the saved state and the loop continues
+from `pending` — already-visited modules are skipped and the design doc is extended, not
+overwritten. Delete `/tmp/spa-traversal.json` to force a full re-crawl.
+
+**Long crawls (50+ modules)**: a full-site crawl runs for many minutes. macOS bash has **no
+`timeout` command** (that's GNU coreutils), so do NOT wrap the run in `timeout 600 …` — it
+errors `command not found` and the crawl never starts. Instead run the script in the
+background and tail its progress; the resumable checkpoint means a killed run loses nothing:
+
+```bash
+cd ${SKILL_HOME}/scripts/js && nohup node run.js /tmp/spa-traverse.js > /tmp/spa-crawl.log 2>&1 &
+tail -f /tmp/spa-crawl.log          # watch "✓ N: <label>" lines; Ctrl-C stops tail, not the crawl
+```
+
+**Coverage report**: at the end, `cp.data` holds every route keyed by hash; count entries
+with `error` to report which modules failed vs succeeded, and diff `visited` against a fresh
+`enumerateRoutes()` to catch nav items that only appear after login/permission loads.
+
+**Run log / reproducibility**: `/tmp/spa-run-log.json` records the Mode-2 preflight result
+(`profileFreePreflight`), the authenticated `landingUrl` (proving the crawl was NOT on a
+login page), the route count, and per-module `{ purpose, screenshot | error }`. Use
+`missingScreenshots === 0` and a non-login `landingUrl` as the two self-checks that the run
+is trustworthy before writing up the design doc.
 
 ---
 

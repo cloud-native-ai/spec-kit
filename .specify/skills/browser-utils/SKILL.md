@@ -149,6 +149,15 @@ For the complete Playwright API reference, see
 cd ${SKILL_HOME}/scripts/js && npm run setup
 ```
 
+Before the first script of a session, verify the install actually **loads** (a
+partial/corrupt `node_modules` passes `install` but throws `Cannot find module
+'./lib/bootstrap'` at runtime). This one-liner self-repairs:
+```bash
+cd ${SKILL_HOME}/scripts/js && node -e "require('playwright'); console.log('playwright OK')" \
+  || { rm -rf node_modules/playwright* && npm install; }
+```
+See [references/playwright-patterns.md § Preflight: verify the Playwright install](./references/playwright-patterns.md#preflight-verify-the-playwright-install-actually-resolves).
+
 **Python** (one-time):
 ```bash
 pip install playwright && playwright install chromium
@@ -195,7 +204,7 @@ Python examples, see [references/playwright-patterns.md](./references/playwright
 1. **Detect agent type FIRST** — always run the Strategy Selection decision tree before any browser work
 2. **Tier 3: Select run mode FIRST** — before writing any script, decide Mode 1 (clean test browser) vs Mode 2 (real Chrome profile) per § Run Mode Selection. The two modes use different binaries and launch options; picking wrong fails silently.
 3. **Tier 3: Confirm the mode when login state is ambiguous** — if it is unclear whether the target needs an existing login, or the user references a Chrome profile/`userDataDir`, ask the user to confirm Mode 2 (and which profile) before launching a real profile.
-4. **Tier 3 Mode 2: Preflight the profile** — the target `userDataDir` must have no running Chrome (singleton lock) or launch is silently handed off to the existing window and exits ("正在现有的浏览器会话中打开"). Verify no process holds the profile before launching; if one does, ask the user to close it.
+4. **Tier 3 Mode 2: Preflight and release the profile** — the target `userDataDir` must have no running Chrome (singleton lock) or launch is silently handed off to the existing window and exits ("正在现有的浏览器会话中打开"). Verify no process holds the profile before launching; if one does, ask the user to close it. Always close the context in a `finally` block so the singleton lock is released for the next run and the user's own Chrome.
 5. **Tier 3: Detect servers FIRST** — for localhost testing (Mode 1), always run `detectDevServers()` before writing test code
 6. **Write scripts to `/tmp`** — never write test files to the skill directory or user's project (`/tmp/playwright-test-*.js`)
 7. **Parameterize URLs** — put detected/provided URL in a `TARGET_URL` constant at the top of every script
@@ -203,6 +212,7 @@ Python examples, see [references/playwright-patterns.md](./references/playwright
 9. **Tier 2: Always snapshot before acting** — uids from stale snapshots are invalid after page changes
 10. **Wait strategies over fixed timeouts** — use `waitForSelector`, `waitForURL`, `waitForLoadState` (Tier 3) or `wait_for` (Tier 2) instead of arbitrary sleeps
 11. **Error handling** — always use try-catch for robust automation; screenshot on error for debugging
+12. **Tier 3 SPA traversal: settle dynamic content, prove login, screenshot every module** — before extracting a module, wait for lazy content (Grafana panels / tab bodies / expandable rows) to actually render — never extract an empty "(0 panels)" shell; assert the first navigation did NOT land on a login page (fail fast) and record a run log; capture a per-module screenshot and a one-line PURPOSE, treating a failed screenshot as a recorded problem, not a silent skip. See [references/playwright-patterns.md § SPA Site Traversal & Module Extraction](./references/playwright-patterns.md#spa-site-traversal--module-extraction-tier-3)
 
 ## Conventions
 
@@ -211,6 +221,7 @@ Python examples, see [references/playwright-patterns.md](./references/playwright
 - **slowMo (Tier 3)**: Use `slowMo: 100` to make actions visible and easier to follow
 - **Custom headers (Tier 3)**: Use `PW_HEADER_NAME`/`PW_HEADER_VALUE` env vars to identify automated traffic
 - **Console output**: Use `console.log()` (JS) or `print()` (Python) to track progress
+- **Full-site enumeration (Tier 3)**: To map every module of an SPA (left-nav + hash routes) into a design doc, use one reused context, resumable checkpoints, and per-module extraction — see [references/playwright-patterns.md § SPA Site Traversal & Module Extraction](./references/playwright-patterns.md#spa-site-traversal--module-extraction-tier-3)
 
 ## Path Conventions
 

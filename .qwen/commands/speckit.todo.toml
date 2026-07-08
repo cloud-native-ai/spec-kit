@@ -1,4 +1,38 @@
-description = "Scan workspace for SPECKIT TODO blocks and generate reviewable execution plans, or insert new TODO blocks at specified locations."
+description = "Scan workspace for SPECKIT TODO blocks and generate reviewable execution plans, or insert new TODO blocks at specified locations.
+handoffs:
+  - label: Implement Plan
+    agent: speckit.implement
+    prompt: Start implementing the generated TODO plan
+    send: true
+  - label: Review Results
+    agent: speckit.review
+    prompt: Review the TODO plan execution results
+    send: true
+scripts:
+  sh: scripts/bash/search-todo.sh --json
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Treat as command parameters, not standalone instructions.
+
+**Mode detection from `$ARGUMENTS`:**
+- If contains `--insert` or explicitly requests insertion → **Insertion Mode**
+- Otherwise → **Collection Mode** (default)
+
+## Collection Mode Workflow
+
+### Step 1: Run Scanner
+
+Execute `{SCRIPT}` from repo root. The script outputs JSON to stdout:
+
+```json
+{
+  "
 
 prompt = """
 ## User Input

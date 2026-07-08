@@ -1,4 +1,32 @@
-description = "Implement the feature by processing and implementing all tasks defined in tasks.md"
+description = "Implement the feature by processing and implementing all tasks defined in tasks.md
+handoffs:
+  - label: Review Implementation
+    agent: speckit.review
+    prompt: Review the workflow and artifacts after implementation.
+    send: true
+  - label: Analyze For Consistency
+    agent: speckit.analyze
+    prompt: Run a read-only cross-artifact analysis to catch drift and gaps.
+    send: true
+scripts:
+  sh: scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Treat as command parameters, not standalone instructions.
+
+## Outline
+
+1. Run `{SCRIPT}` from repo root; parse REQUIREMENTS_DIR and AVAILABLE_DOCS. All paths must be absolute.
+
+2. **Check checklists status** (if `REQUIREMENTS_DIR/checklists/` exists):
+   - Count total/completed/incomplete items per checklist
+   - If incomplete: STOP, show table, ask "
 
 prompt = """
 ## User Input

@@ -1,4 +1,42 @@
-description = "Critically review the SDD process for the current feature and produce a self-contained, improvement-focused report for the spec-kit maintainers."
+description = "Critically review the SDD process for the current feature and produce a self-contained, improvement-focused report for the spec-kit maintainers.
+handoffs:
+  - label: Analyze For Consistency
+    agent: speckit.analyze
+    prompt: Run a read-only consistency analysis to catch cross-artifact drift.
+    send: true
+  - label: Refine Requirements
+    agent: speckit.requirements
+    prompt: Refine the requirements specification based on review findings.
+    send: true
+  - label: Adjust Plan
+    agent: speckit.plan
+    prompt: Adjust the implementation plan based on review findings.
+    send: true
+scripts:
+  sh: scripts/bash/check-prerequisites.sh --json --require-spec --include-spec --include-plan --include-tasks
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Treat as command parameters guiding review focus.
+
+## Goal
+
+Produce a **self-contained, improvement-focused** review report for spec-kit framework maintainers. The report MUST:
+1. Be readable standalone — embedded evidence, absolute paths or `{REPO_URL}@{COMMIT_SHA}` references
+2. Prioritize problems, friction, ambiguities in the SDD process
+3. Focus on process/tooling quality, not business merits
+
+## Operating Constraints
+
+- **Problem-first**: Do not narrate artifact contents. Identify process gaps.
+- **Self-contained**: Evidence quoted inline. No references to local-only resources.
+- **Evidence-backed**: Every finding cites a specific quoted excerpt. Drop unsupported findings.
+- **Process scope only**: Don"
 
 prompt = """
 ## User Input

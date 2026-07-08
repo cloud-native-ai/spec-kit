@@ -1,4 +1,68 @@
-description = "Create Agent Skills"
+description = "Create Agent Skills
+handoffs:
+  - label: Update Instructions
+    agent: speckit.instructions
+    prompt: Update project instructions so the new skill is discoverable.
+    send: true
+scripts:
+  sh: scripts/bash/create-new-skill.sh --json $ARGUMENTS
+---
+
+> `/speckit.skills` is the orchestration entrypoint for Skill management. It delegates to `create-skills` (new) or `improve-skills` (existing, with mandatory spec-compliance modernization pass first).
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Extract target Skill name (concise command-like identifier: letters, digits, hyphens, underscores).
+
+## Orchestration Workflow
+
+### Step 1: Parse target Skill
+
+- If user names a Skill explicitly → use that name
+- If empty → infer from conversation or ask one targeted question
+
+### Step 2: Check existence
+
+Check `.specify/skills/<name>/SKILL.md` exists (canonical source).
+
+### Step 3: Route
+
+**If NOT exists** → delegate to `create-skills` skill:
+- Read `skills/create-skills/SKILL.md` for full workflow
+- New Skill MUST conform to current spec (directory layout, frontmatter, `${SKILL_HOME}`/`${SKILL_WORKDIR}` conventions)
+- Use `templates/skills-template.md` as starting point
+
+**If EXISTS** → delegate to `improve-skills` skill with two-phase pass:
+1. **Phase A — Spec-compliance modernization** (mandatory before any optimization):
+   - Canonical path: `.specify/skills/<name>/SKILL.md`
+   - Directory structure: `SKILL.md`, `scripts/`, `references/`, `assets/`
+   - Frontmatter: `name`, `description` (with triggers), `skill_id`
+   - Path conventions: `${SKILL_HOME}/` for Skill-owned resources, `${SKILL_WORKDIR}/` for runtime paths
+   - Legacy idiom migration: `./X` → `${SKILL_HOME}/X`, `${SKILL_ROOT}/X` → `${SKILL_HOME}/X`
+   - Registry: one deduplicated row in `.specify/instructions.md` `### Skills`
+   - Hygiene: SKILL.md under 500 lines; oversize → `references/`
+
+2. **Phase B — User-requested refinement**: Standard `improve-skills` workflow.
+
+For detailed path conventions (`${SKILL_HOME}` / `${SKILL_WORKDIR}` semantics, computation idioms, nested invocations), see `skills/create-skills/SKILL.md`.
+
+### Step 4: Validate and report
+
+- Confirm frontmatter valid (`name`, `description`, `skill_id`)
+- Verify canonical path matches `.specify/skills/<name>/SKILL.md`
+- Verify Skills registry includes deduplicated row
+- Report: paths, skill_id, registry edits, modernization results
+
+For agent-specific operational guidance, see `skills/sdd-workflow/references/agent-configuration.md`.
+
+## Handoffs
+
+**After**: Run `/speckit.instructions` to update discovery metadata.
+"
 
 prompt = """
 > `/speckit.skills` is the orchestration entrypoint for Skill management. It delegates to `create-skills` (new) or `improve-skills` (existing, with mandatory spec-compliance modernization pass first).

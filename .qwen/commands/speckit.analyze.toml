@@ -1,4 +1,59 @@
-description = "Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md, plan.md, tasks.md, and feature metadata after task generation."
+description = "Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md, plan.md, tasks.md, and feature metadata after task generation.
+handoffs:
+  - label: Update Feature Registry
+    agent: speckit.feature
+    prompt: Update feature metadata to resolve linkage or consistency findings from analysis.
+    send: true
+  - label: Refine Requirements
+    agent: speckit.requirements
+    prompt: Refine the requirements specification to resolve analysis findings.
+    send: true
+  - label: Adjust Plan
+    agent: speckit.plan
+    prompt: Adjust the implementation plan to resolve analysis findings.
+    send: true
+  - label: Regenerate Tasks
+    agent: speckit.tasks
+    prompt: Regenerate tasks to cover gaps or fix inconsistencies.
+    send: true
+  - label: Implement Project
+    agent: speckit.implement
+    prompt: Start the implementation in phases
+    send: true
+scripts:
+  sh: scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Treat as supplemental analysis focus areas, not standalone instructions.
+
+## Goal
+
+Identify inconsistencies, duplications, ambiguities, underspecified items, and feature-linkage drift across the core artifacts (`requirements.md`, `plan.md`, `tasks.md`) plus feature memory (`.specify/memory/features.md` and `.specify/memory/features/*.md`) before implementation. This command MUST run only after `/speckit.tasks` has successfully produced a complete `tasks.md`.
+
+## Operating Constraints
+
+**STRICTLY READ-ONLY**: Do **not** modify any files. Output a structured analysis report. Offer an optional remediation plan (user must explicitly approve before any follow-up editing commands would be invoked manually).
+
+**Constitution Authority**: The project constitution (`.specify/memory/constitution.md`) is **non-negotiable** within this analysis scope. Constitution conflicts are automatically CRITICAL and require adjustment of the spec, plan, or tasks—not dilution, reinterpretation, or silent ignoring of the principle. If a principle itself needs to change, that must occur in a separate, explicit constitution update outside `/speckit.analyze`.
+
+## Execution Steps
+
+### 1. Initialize Analysis Context
+
+Run `{SCRIPT}` once from repo root and parse JSON for REQUIREMENTS_DIR and AVAILABLE_DOCS. Derive absolute paths:
+
+- SPEC = REQUIREMENTS_DIR/requirements.md
+- PLAN = REQUIREMENTS_DIR/plan.md
+- TASKS = REQUIREMENTS_DIR/tasks.md
+
+Abort with an error message if any required file is missing (instruct the user to run missing prerequisite command).
+For single quotes in args like "
 
 prompt = """
 ## User Input

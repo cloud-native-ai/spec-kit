@@ -1,4 +1,32 @@
-description = "Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync."
+description = "Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
+handoffs:
+   - label: Refresh Feature Registry
+      agent: speckit.feature
+      prompt: Refresh project feature index and per-feature detail files based on the updated constitution.
+      send: true
+   - label: Create / Update Requirements
+      agent: speckit.requirements
+      prompt: Create or update a requirements specification under the updated constitutional rules.
+      send: true
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Treat as governance principles, amendment intentions, or supplemental context.
+
+## Outline
+
+You are updating the project constitution at `/.specify/memory/constitution.md`. This file is a TEMPLATE containing placeholder tokens in square brackets (e.g. `[PROJECT_NAME]`, `[PRINCIPLE_1_NAME]`). Your job is to (a) collect/derive concrete values, (b) fill the template precisely, and (c) propagate any amendments across dependent artifacts.
+
+### Pre-flight: Project Context Inference
+
+Before processing the template, scan the project to understand its actual context:
+
+- Read `README.md` to determine the project"
 
 prompt = """
 ## User Input

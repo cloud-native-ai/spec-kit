@@ -1,4 +1,30 @@
-description = "Generate a requirements-quality checklist for the current feature (Feature as requirement-level scope)."
+description = "Generate a requirements-quality checklist for the current feature (Feature as requirement-level scope).
+handoffs:
+   - label: Back to Plan
+     agent: speckit.plan
+     prompt: Review or adjust the plan to satisfy checklist items.
+     send: true
+   - label: Back to Tasks
+     agent: speckit.tasks
+     prompt: Update/regenerate tasks to include quality gates implied by the checklist.
+     send: true
+   - label: Implement Project
+     agent: speckit.implement
+     prompt: Proceed with implementation once checklist items are satisfied.
+     send: true
+scripts:
+  sh: scripts/bash/check-prerequisites.sh --json
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Treat as command parameters, not standalone instructions.
+
+## Checklist Purpose: "
 
 prompt = """
 ## User Input

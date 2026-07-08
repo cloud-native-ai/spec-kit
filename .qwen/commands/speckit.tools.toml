@@ -1,4 +1,72 @@
-description = "Define, modify, view, or invoke a tool via reusable local records with explicit behavioral rules. Definition is the primary action — discovery assists only when bootstrapping a new record."
+description = "Define, modify, view, or invoke a tool via reusable local records with explicit behavioral rules. Definition is the primary action — discovery assists only when bootstrapping a new record.
+handoffs:
+  - label: Create Plan
+    agent: speckit.plan
+    prompt: Generate an implementation plan for /speckit.tools
+    send: false
+scripts:
+  sh: scripts/bash/create-new-tools.sh --json --name $ARGUMENTS --action find
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). If empty, display list of all registered tools. If `tool_id` and natural-language hint conflict, stop and request correction.
+
+## Outline
+
+Goal: Definition-first tool management. Create, modify, view, or invoke tools with explicit behavioral rules that override LLM built-in knowledge.
+
+For detailed tool type semantics, behavioral rules format, edge cases, and invocation preview format, see `skills/sdd-workflow/references/tool-definitions.md`.
+
+### Execution Steps
+
+1. **Determine intent**: Parse `$ARGUMENTS` → classify as: **define** | **modify** | **view** | **invoke** | **list**.
+
+2. **Resolve existing record**: Check `.specify/memory/tools/<tool-name>.md`. Check alias matches.
+
+3. **Route by intent and record state**:
+
+   | Intent | Record Exists | Action |
+   |--------|--------------|--------|
+   | define | No | → Collect mandatory fields |
+   | define | Yes | → Inform user; offer modify or view |
+   | modify | Yes | → Field-level update |
+   | modify | No | → Error: use define intent |
+   | view | Yes | → Display full definition |
+   | view | No | → Error: no definition found |
+   | invoke | Yes + Verified | → Preview and confirm |
+   | invoke | Yes + Draft | → Error: complete definition first |
+   | invoke | No | → Error: define first |
+   | list | — | → Show summary table |
+
+4. **Create new tool** (define intent, no record):
+   - **CRITICAL**: Mandatory fields MUST be provided by user. Do NOT auto-populate from built-in knowledge.
+   - Collect: Tool Name, Tool Type (`project-script`|`system-binary`|`shell-function`|`webhook`), Source Identifier, Description
+   - Optionally collect: Behavioral Rules (RFC 2119 format), Parameters, Returns, Aliases
+   - If only name provided: offer discovery via `{SCRIPT}` to bootstrap draft
+   - Validate → set status (`Draft` or `Verified`) → persist at `.specify/memory/tools/<name>.md`
+   - Generate `tool_id` from canonical path
+
+5. **Modify**: Load record → apply field-level updates only → re-validate → persist.
+
+6. **Invoke**: Load record → display preview (command, params, rules, expected output) → `Proceed? (yes/no)` → execute only on explicit yes.
+
+7. **Register**: Add/update entry in `.specify/instructions.md` `## Resource Registry` → `### Tools`.
+
+8. **View/List**: Display full definition or summary table of all tools.
+
+For agent-specific operational guidance, see `skills/sdd-workflow/references/agent-configuration.md`.
+
+## Handoffs
+
+**Before**: Use when you need to externalize and reuse tool records with strict behavioral rules.
+
+**After**: Tool records are available for agent permissions wiring and `/speckit.instructions` registry.
+"
 
 prompt = """
 ## User Input
