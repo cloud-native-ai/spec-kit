@@ -42,11 +42,71 @@ Playwright's bundled Chromium / Chrome for Testing, fresh ephemeral context, def
 login state — every run starts clean. This is the `chromium.launch()` used by every
 example below (Basic Page Test, Responsive, Form Filling, etc.).
 
+The whole recipe is: `chromium.launch()` → `newPage()` → `goto` → assert something →
+`screenshot` to `/tmp` → `close()` in a `finally`. Two copy-run quickstarts follow — a
+localhost/dev-server one and a self-contained `file://` one that needs zero external
+dependencies (no dev server, no network), so Mode 1 itself can be validated in one command.
+
+**Quickstart A — localhost / dev server.** Detect the server first, then drive it:
+
+```bash
+# 1) find the running dev server (SKILL.md § JavaScript Workflow):
+cd ${SKILL_HOME}/scripts/js && node -e "require('./lib/helpers').detectDevServers().then(s => console.log(JSON.stringify(s)))"
+# 2) put the URL in TARGET_URL below, then: cd ${SKILL_HOME}/scripts/js && node run.js /tmp/playwright-mode1-localhost.js
+```
+
 ```javascript
-const browser = await chromium.launch({ headless: false });
-const page = await browser.newPage();
-// ... test the app; nothing persists between runs
-await browser.close();
+// /tmp/playwright-mode1-localhost.js
+const { chromium } = require('playwright');
+
+// From detectDevServers() above. One server → use it; several → ask the user.
+const TARGET_URL = 'http://localhost:3001';
+
+(async () => {
+  const browser = await chromium.launch({ headless: false }); // bundled Chromium, mock keychain kept
+  try {
+    const page = await browser.newPage();
+    await page.goto(TARGET_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    const title = await page.title();
+    console.log('Title:', title);
+    if (!title) throw new Error('empty <title> — dev server not serving the app?');
+    await page.screenshot({ path: '/tmp/mode1-localhost.png', fullPage: true });
+    console.log('OK → /tmp/mode1-localhost.png');
+  } finally {
+    await browser.close(); // nothing persists — next run starts clean
+  }
+})();
+```
+
+**Quickstart B — self-contained `file://` (zero dependencies).** Use this to confirm the
+Mode 1 toolchain works before pointing it at a real app — it writes a trivial HTML fixture
+and asserts against it, so it passes with no dev server and no network access:
+
+```javascript
+// /tmp/playwright-mode1-selftest.js  — run: cd ${SKILL_HOME}/scripts/js && node run.js /tmp/playwright-mode1-selftest.js
+const { chromium } = require('playwright');
+const fs = require('fs');
+
+// Write a trivial fixture and drive it via file:// — validates Mode 1 end-to-end.
+const FIXTURE = '/tmp/mode1-fixture.html';
+fs.writeFileSync(FIXTURE,
+  '<!doctype html><html><head><title>Mode 1 OK</title></head>' +
+  '<body><h1 id="hello">clean browser works</h1></body></html>');
+
+(async () => {
+  const browser = await chromium.launch({ headless: false });
+  try {
+    const page = await browser.newPage();
+    await page.goto('file://' + FIXTURE, { waitUntil: 'domcontentloaded' });
+    const text = (await page.textContent('#hello')) || '';
+    console.log('Read from page:', text);
+    if (text.trim() !== 'clean browser works') throw new Error('assertion failed: ' + text);
+    await page.screenshot({ path: '/tmp/mode1-selftest.png', fullPage: true });
+    console.log('Mode 1 self-test PASSED → /tmp/mode1-selftest.png');
+  } finally {
+    await browser.close();
+  }
+})();
 ```
 
 ### Mode 2 — Real Chrome Profile (reuse login state)
@@ -426,6 +486,47 @@ async function extractModule(page) {
       columns: Array.from(t.querySelectorAll('th, .ant-table-cell[role="columnheader"]'))
         .map((h) => txt(h)).filter(Boolean).slice(0, 40),
     })).filter((t) => t.columns.length);
+    // ---- Grafana panels: AUTHORITATIVE count + header-scoped titles + legit-empty detection ----
+    const PANEL_EL = '.panel-container, [data-panelid], [data-viz-panel-key], ' +
+                     '.react-grid-item, [data-testid^="data-testid Panel header"]';
+    // Ground truth = number of panel ELEMENTS in the DOM. Grafana's row-header "(N panels)"
+    // text is the COLLAPSED-state count and reads 0 while a row is collapsed — it looks
+    // authoritative but is wrong, so NEVER surface it as the panel count. Count elements.
+    const panelCount = document.querySelectorAll(PANEL_EL).length;
+    const stripCount = (s) => (s || '').replace(/\s*\(\s*\d+\s*panels?\s*\)\s*$/i, '').trim();
+    // Row-GROUP titles, with the misleading "(N panels)" collapsed count stripped off.
+    const panelGroups = [...new Set(
+      many('.dashboard-row__title, [aria-label="Dashboard row title"], ' +
+           '[data-testid="data-testid dashboard row title"]').map(stripCount))]
+      .filter(Boolean).slice(0, 60);
+    // Individual panel titles — scoped to the HEADER/title node ONLY. On current Grafana
+    // "scenes" builds the clean title is NOT in textContent (it concatenates the panel body,
+    // e.g. "告警数61189") and NOT in `aria-label` (null); the class is emotion-hashed
+    // (`css-…-panel-title`, so exact `.panel-title` matches 0). The RELIABLE source is the
+    // header element's `data-testid` ATTRIBUTE VALUE: `data-testid="data-testid Panel header
+    // <title>"` — read the attribute and strip the prefix. Fall back to `h6[class*="panel-title"]`
+    // (hashed class) / old-Grafana `.panel-title-text`, reading the title node's own text only.
+    const cleanTitle = (s) => (s || '').trim().replace(/\s+/g, ' ');
+    const stripHdr = (s) => cleanTitle((s || '').replace(/^data-testid Panel header\s*/i, ''));
+    const panels = [...new Set([
+      // Primary: the header's data-testid ATTRIBUTE value (not textContent, not aria-label).
+      ...Array.from(document.querySelectorAll('[data-testid^="data-testid Panel header"]'))
+        .map((el) => stripHdr(el.getAttribute('data-testid'))),
+      // Fallback: hashed-class title node (h6[class*="panel-title"]) or old-Grafana span,
+      // reading the title node's OWN text only — never the panel body.
+      ...Array.from(document.querySelectorAll('h6[class*="panel-title"], .panel-title')).map((el) => {
+        const t = el.querySelector('.panel-title-text');           // old-Grafana title span
+        return cleanTitle(t ? t.textContent
+          : (el.childNodes[0] && el.childNodes[0].textContent) || ''); // own text node, not body
+      }),
+    ])].filter((s) => s && s.length <= 60).slice(0, 120);
+    // Legit zero-panel cases — so "0 panels" is not misread as extraction failure. A dashboard
+    // FOLDER view lists boards (no panels of its own); a board can redirect to a secondary
+    // login; a removed board renders "Not found". Detect and label these explicitly.
+    let dashboardState = null;
+    if (/\/dashboards\/f\//i.test(location.href)) dashboardState = 'folder-view (dashboard list, no panels)';
+    else if (/\/login(\b|\/|\?)/i.test(location.href)) dashboardState = 'login-redirect (needs secondary auth)';
+    else if (/not\s*found/i.test(document.title)) dashboardState = 'not-found (dashboard removed)';
     return {
       title: document.title,
       headings: [...many('h1'), ...many('h2'), ...many('h3')].slice(0, 20),
@@ -441,20 +542,13 @@ async function extractModule(page) {
       tables,
       charts: document.querySelectorAll('canvas, svg.recharts-surface, .echarts-for-react').length,
       metrics: many('.ant-statistic, .ant-card-head-title, .ant-descriptions-item').slice(0, 30),
-      // Grafana-embedded dashboards: capture panel-GROUP (row) titles AND individual panel
-      // titles, deduped, across old + current Grafana. Row titles: `.dashboard-row__title`
-      // (old). Panel titles: `.panel-title` (old) and, on current scenes-based Grafana, each
-      // header is tagged `data-testid="data-testid Panel header <title>"` — strip the prefix
-      // to recover the title. This is why 16/26 dashboards read "(0 panels)": the old
-      // row-title-only selector matches nothing on panel-only dashboards / current Grafana.
-      panels: [...new Set([
-        ...many('.dashboard-row__title, [aria-label="Dashboard row title"], ' +
-                '[data-testid="data-testid dashboard row title"]'),
-        ...many('.panel-title, h2.panel-title, [class*="panel-title"]'),
-        ...Array.from(document.querySelectorAll('[data-testid^="data-testid Panel header"]'))
-          .map((el) => (el.getAttribute('aria-label') || el.textContent || '')
-            .replace(/^data-testid Panel header\s*/i, '').trim()).filter(Boolean),
-      ])].filter(Boolean).slice(0, 120),
+      // Grafana-embedded dashboards (computed above): `panelCount` is the AUTHORITATIVE
+      // DOM element count; `panelGroups` are row titles (misleading "(N panels)" stripped);
+      // `panels` are header-scoped panel titles; `dashboardState` flags legit-empty boards.
+      panelCount,
+      panelGroups,
+      panels,
+      dashboardState,
       // Template-variable NAMES (labels), NOT the stale selected values. Grafana DOM DRIFTS:
       // current builds render each variable label as
       // `data-testid="data-testid Dashboard template variables submenu Label <name>"`;
@@ -497,21 +591,37 @@ async function extractModule(page) {
 }
 ```
 
-> **Grafana panels & variables — the two round-2 failure modes and how this code fixes them.**
-> (1) *Panels read "(0 panels)".* Two causes, both handled: panels lazy-render only when
-> scrolled into view (so `settleDynamicContent` now scrolls each dashboard frame top→bottom
-> to force them to mount before the count poll), and the old row-title-only `panels` selector
-> matched nothing on panel-only / current-Grafana dashboards (so `extractDoc.panels` now also
-> reads `.panel-title` and current scenes' `data-testid Panel header <title>`). If panels are
-> still empty on a dashboard you can see, raise `settleDynamicContent`'s `timeout` and confirm
-> the frame is same-origin (cross-origin frames expose only `src`). (2) *Variables captured as
-> stale values, not names.* `extractDoc.variables` now reads the variable LABEL text
-> (`…submenu Label <name>`), giving names like "cluster"/"namespace". Grafana DOM drifts
-> between versions, so treat `variables: []` on a page you *know* has a variable bar as a
-> selector-drift signal, not "no variables". To read each variable's full option list (not
-> just names), click the variable combobox open and read `[role="option"]` — the same
-> interaction-gated pattern as `readSelectOptions`; per the scope split (iframe pages need only
-> src, title, panel groups, and variable NAMES) this deeper capture is optional.
+> **Grafana panels & variables — the failure modes and how this code fixes them.**
+> (1) *Panels read "(0 panels)".* Three causes, all handled: (a) panels lazy-render only when
+> scrolled into view — `settleDynamicContent` scrolls each dashboard frame top→bottom to mount
+> them before counting; (b) the old row-title-only `panels` selector matched nothing on
+> panel-only / current-Grafana dashboards — `extractDoc.panels` now reads `.panel-title` and
+> current scenes' `data-testid Panel header <title>`; (c) **the number Grafana prints in the
+> row header — "(N panels)" — is the COLLAPSED-state count and reads 0 while a row is
+> collapsed.** It looks authoritative but is wrong, so `extractDoc` no longer surfaces it:
+> `panelCount` is the count of real panel ELEMENTS (`PANEL_EL`) and is the ground truth;
+> `panelGroups` keeps the row *names* only, with the misleading `(N panels)` suffix stripped.
+> If panels are still empty on a dashboard you can see, raise `settleDynamicContent`'s
+> `timeout` and confirm the frame is same-origin (cross-origin frames expose only `src`).
+> (2) *Panel titles came out huge / garbled* (e.g. `告警数61189`, a title jammed onto a stat
+> value or a whole table body). Root cause on current Grafana **scenes** builds: the clean
+> title is NOT text and NOT an attribute you'd expect — `textContent` concatenates the panel
+> BODY, `aria-label` is null, and the class is emotion-hashed (`css-…-panel-title`, so exact
+> `.panel-title` matches 0). The ONE reliable source is the header's **`data-testid` ATTRIBUTE
+> value** (`data-testid="data-testid Panel header <title>"`). Fix: `extractDoc.panels` reads
+> `el.getAttribute('data-testid')` and strips the `data-testid Panel header ` prefix (primary),
+> then falls back to `h6[class*="panel-title"]` / old-Grafana `.panel-title-text`, always the
+> title node's OWN text only — never the panel body. Do not "fix" this by widening the length
+> filter (a backstop, not the fix) or by reading textContent; read the data-testid attribute. (3) *A genuinely empty dashboard vs a failed extraction.* `dashboardState`
+> flags the three legit zero-panel cases (folder view `/dashboards/f/`, `/login` redirect,
+> "Not found" title) so they are reported as empty-by-design, not counted as extraction bugs.
+> (4) *Variables captured as stale values, not names.* `extractDoc.variables` reads the
+> variable LABEL text (`…submenu Label <name>`), giving names like "cluster"/"namespace".
+> Grafana DOM drifts between versions, so treat `variables: []` on a page you *know* has a
+> variable bar as a selector-drift signal, not "no variables". To read each variable's full
+> option list, click the combobox open and read `[role="option"]` (the interaction-gated
+> pattern from `readSelectOptions`); per the scope split (iframe pages need only src, title,
+> panel groups, and variable NAMES) this deeper capture is optional.
 
 ### Step 4 — Drive the traversal with a resumable checkpoint
 
@@ -581,8 +691,12 @@ function appendModuleDoc(route, label, info) {
     const inner = f.inner;
     if (inner) {
       if (inner.title) lines.push(`  - Title: ${inner.title}`);
-      if (inner.panels?.length) lines.push(`  - Panels: ${inner.panels.join('; ')}`);
+      // panelCount (DOM element count) is authoritative — emit it, not any row-header "(N panels)".
+      if (inner.panelCount) lines.push(`  - Panel count (DOM, authoritative): ${inner.panelCount}`);
+      if (inner.panelGroups?.length) lines.push(`  - Panel groups: ${inner.panelGroups.join('; ')}`);
+      if (inner.panels?.length) lines.push(`  - Panel titles: ${inner.panels.join('; ')}`);
       if (inner.variables?.length) lines.push(`  - Variables: ${inner.variables.join(', ')}`);
+      if (!inner.panelCount && inner.dashboardState) lines.push(`  - Dashboard state: ${inner.dashboardState}`);
       if (inner.tables?.length) lines.push(`  - Table columns: ${inner.tables.map((t) => t.columns.join(' | ')).join(' || ')}`);
     }
   }

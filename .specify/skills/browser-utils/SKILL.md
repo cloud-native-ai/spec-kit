@@ -212,7 +212,7 @@ Python examples, see [references/playwright-patterns.md](./references/playwright
 9. **Tier 2: Always snapshot before acting** — uids from stale snapshots are invalid after page changes
 10. **Wait strategies over fixed timeouts** — use `waitForSelector`, `waitForURL`, `waitForLoadState` (Tier 3) or `wait_for` (Tier 2) instead of arbitrary sleeps
 11. **Error handling** — always use try-catch for robust automation; screenshot on error for debugging
-12. **Tier 3 SPA traversal: settle dynamic content, prove login, screenshot every module** — before extracting a module, wait for lazy content (Grafana panels / tab bodies / expandable rows) to actually render — never extract an empty "(0 panels)" shell; assert the first navigation did NOT land on a login page (fail fast) and record a run log; capture a per-module screenshot and a one-line PURPOSE, treating a failed screenshot as a recorded problem, not a silent skip. See [references/playwright-patterns.md § SPA Site Traversal & Module Extraction](./references/playwright-patterns.md#spa-site-traversal--module-extraction-tier-3)
+12. **Tier 3 SPA traversal: settle dynamic content, prove login, screenshot every module** — before extracting a module, wait for lazy content (Grafana panels / tab bodies / expandable rows) to actually render — never extract an empty "(0 panels)" shell; count real panel ELEMENTS as the authoritative panel count (a framework's own "(N panels)" row-header label is a collapsed-state artifact — do not surface it) and scope panel/field titles to the header node so table/stat bodies are not swallowed; assert the first navigation did NOT land on a login page (fail fast) and record a run log; capture a per-module screenshot and a one-line PURPOSE, treating a failed screenshot as a recorded problem, not a silent skip. See [references/playwright-patterns.md § SPA Site Traversal & Module Extraction](./references/playwright-patterns.md#spa-site-traversal--module-extraction-tier-3)
 
 ## Conventions
 
@@ -263,9 +263,8 @@ Before executing this skill's workflow, identify which AI agent you are:
 | **Codex CLI** | `.codex/` directory exists |
 | **Hermes Agent** | `.hermes/` directory exists |
 | **iFlow** | `.iflow/` directory exists |
-| **Wukong/Real** | System prompt mentions built-in browser; agent has native browser tools |
 
-If you cannot identify your agent, skip Step 2 and proceed with Tier 3 (Playwright).
+If you cannot identify your agent, skip Step 2 and proceed with the standard workflow.
 
 ### Step 2: Load Agent-Specific Guidance
 
