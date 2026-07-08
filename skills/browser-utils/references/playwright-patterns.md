@@ -8,6 +8,101 @@ For the complete Playwright API reference, see [playwright-api.md](./playwright-
 
 ---
 
+## Run Modes (Tier 3)
+
+Tier 3 has two mutually exclusive run modes. Pick the mode **before writing a script**
+(see SKILL.md § Run Mode Selection). This section is the launch recipe for each.
+
+### Mode 1 — Clean Test Browser (default)
+
+Playwright's bundled Chromium / Chrome for Testing, fresh ephemeral context, default
+`--use-mock-keychain`. Use for frontend/localhost automation and E2E testing. No real
+login state — every run starts clean. This is the `chromium.launch()` used by every
+example below (Basic Page Test, Responsive, Form Filling, etc.).
+
+```javascript
+const browser = await chromium.launch({ headless: false });
+const page = await browser.newPage();
+// ... test the app; nothing persists between runs
+await browser.close();
+```
+
+### Mode 2 — Real Chrome Profile (reuse login state)
+
+Drives the **real Google Chrome** against an existing user-data-dir so its cookies and
+localStorage (logins) are reused. Required to reach authenticated/internal sites.
+
+Three conditions must ALL hold, or login state silently fails:
+
+1. **Profile not in use** — Chrome is single-instance per profile. If a Chrome is
+   already running on `userDataDir`, the launch is handed off to that window and the
+   controllable process exits immediately (`正在现有的浏览器会话中打开`). Preflight it.
+2. **`channel: 'chrome'`** — must be the real Google Chrome binary, not bundled
+   Chromium/Chrome for Testing. Cookies are encrypted with a macOS Keychain "Safe
+   Storage" key that is *per-app*; a different binary cannot decrypt them.
+3. **`ignoreDefaultArgs: ['--use-mock-keychain']`** — Playwright injects
+   `--use-mock-keychain` by default, which bypasses the real keychain. Drop it so
+   Chrome uses the real key that decrypts the profile's cookies.
+
+**Preflight (bash) — verify the profile is free before launching:**
+
+```bash
+USER_DATA_DIR="$HOME/data/chrome/agent"   # the target profile
+# Any process holding the profile? (non-empty ⇒ ask the user to close it)
+ps aux | grep -F "user-data-dir=$USER_DATA_DIR" | grep -v grep
+# Stale singleton lock present? (informational)
+ls -la "$USER_DATA_DIR" | grep -i singleton
+```
+
+**Launch recipe (JavaScript):**
+
+```javascript
+// /tmp/playwright-test-profile.js
+const { chromium } = require('playwright');
+const os = require('os');
+const path = require('path');
+
+const USER_DATA_DIR = path.join(os.homedir(), 'data/chrome/agent');
+const TARGET_URL = 'https://internal.example.com/dashboard';
+
+(async () => {
+  let context;
+  try {
+    context = await chromium.launchPersistentContext(USER_DATA_DIR, {
+      headless: false,
+      channel: 'chrome',                              // real Chrome → keychain key matches
+      ignoreDefaultArgs: ['--use-mock-keychain'],     // use the REAL keychain to decrypt cookies
+      viewport: { width: 1440, height: 900 },
+      args: ['--no-first-run', '--no-default-browser-check'],
+    });
+    const page = context.pages()[0] || (await context.newPage());
+    await page.goto(TARGET_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+    console.log('Final URL:', page.url());            // if it ends on a login page, login state did NOT load
+    await page.screenshot({ path: '/tmp/profile-page.png', fullPage: true });
+  } catch (e) {
+    console.error('ERROR:', e.message);
+  } finally {
+    if (context) await context.close();
+  }
+})();
+```
+
+**Failure-symptom table:**
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `Target page, context or browser has been closed` + `正在现有的浏览器会话中打开` | A Chrome is already running on the profile | Close it (preflight #1), then relaunch |
+| Page redirects to the SSO/login page despite a logged-in profile | Bundled Chromium used, or `--use-mock-keychain` kept | Add `channel: 'chrome'` **and** `ignoreDefaultArgs: ['--use-mock-keychain']` |
+| `kill EPERM` in browser logs on close | Handoff process couldn't be killed (side effect of #1) | Same as the handoff row — free the profile first |
+
+> If the profile is in use and cannot be closed, an alternative is to launch Chrome
+> yourself with `--remote-debugging-port=<port>` and attach via
+> `chromium.connectOverCDP('http://127.0.0.1:<port>')`, which coexists with a manually
+> opened window. Confirm this approach with the user first.
+
+---
+
 ## JavaScript Patterns
 
 ### Basic Page Test
@@ -225,153 +320,6 @@ with sync_playwright() as p:
 2. **Identify selectors** from inspection results
 
 3. **Execute actions** using discovered selectors
-
----
-
-## Focus-Free Automation
-
-When running Playwright in headed mode (`headless: false`), the browser window
-steals OS-level desktop focus on every launch, tab switch, and `bringToFront()`
-call. This disrupts the user's active work (typing, clicking, coding). Synthetic
-keyboard/mouse events (`page.keyboard.press()`, `page.mouse.click()`) also enter
-the OS input queue and can interfere with the user's active input flow.
-
-### Launch Args to Prevent Focus Stealing
-
-Add these Chromium flags to every headed `launchPersistentContext` or `launch`
-call:
-
-```javascript
-const browser = await chromium.launch({
-  headless: false,
-  args: [
-    '--window-position=-32000,-32000',  // move window off-screen
-    '--window-size=1280,720',            // limit window size
-    '--no-default-browser-check',        // suppress default-browser prompt
-    '--no-first-run',                    // suppress first-run wizard
-  ],
-});
-```
-
-For `launchPersistentContext` (required for extension testing):
-
-```javascript
-const context = await chromium.launchPersistentContext(userDataDir, {
-  channel: 'chromium',
-  headless: false,
-  args: [
-    `--disable-extensions-except=${extensionPath}`,
-    `--load-extension=${extensionPath}`,
-    '--window-position=-32000,-32000',
-    '--window-size=1280,720',
-    '--no-default-browser-check',
-    '--no-first-run',
-  ],
-});
-```
-
-### CDP-Based Operations (No Focus Required)
-
-Prefer CDP sessions for operations that normally require window focus:
-
-```javascript
-// Screenshot without focusing the tab — CDP does not need an active window
-async function cdpScreenshot(page, outPath) {
-  const client = await page.context().newCDPSession(page);
-  const { data } = await client.send('Page.captureScreenshot', { format: 'png' });
-  require('fs').writeFileSync(outPath, Buffer.from(data, 'base64'));
-  await client.detach();
-}
-
-// Bring tab to front without OS-level focus change
-async function cdpBringToFront(page) {
-  const client = await page.context().newCDPSession(page);
-  await client.send('Page.bringToFront');
-  await client.detach();
-}
-```
-
-### Avoid Synthetic Input
-
-| Instead of | Use | Reason |
-|------------|-----|--------|
-| `page.keyboard.press('Control+Shift+F')` | `sw.evaluate()` to dispatch the handler directly | Synthetic keys enter the OS input queue and can disrupt the user's active typing. Also, `chrome.commands.onCommand` ignores synthetic keys. |
-| `page.mouse.click(x, y)` | `page.click(selector)` or `page.locator(selector).click()` | Coordinate-based clicks are fragile and the mouse event propagates to the OS. Selector-based clicks are scoped to the page DOM. |
-| `page.mouse.move(x, y)` | `page.hover(selector)` | Same reason — avoid raw mouse movement. |
-| `page.evaluate(() => document.activeElement.blur())` | `page.evaluate(() => document.activeElement?.blur())` | Safe programmatic blur without OS focus change. |
-
-### Rule of Thumb
-
-If an action can be expressed as `page.evaluate()`, `page.fill()`,
-`page.click(selector)`, or a service-worker `sw.evaluate()` call, use that
-instead of `page.keyboard.*` or `page.mouse.*`. The programmatic path is both
-more reliable (no focus dependency) and less disruptive (no OS input queue
-pollution).
-
----
-
-## Prerequisite Service Checks
-
-Before launching browser tests that depend on local services (STS endpoints,
-dev servers, API stubs), verify availability. A missing dependency causes
-cascading failures that are hard to diagnose from browser console errors alone.
-
-### Pattern: curl-based pre-check
-
-```javascript
-const { execSync } = require('child_process');
-
-function checkService(name, url, expectedStatus = 200) {
-  try {
-    const result = execSync(`curl -s -o /dev/null -w '%{http_code}' ${url}`, {
-      timeout: 5000,
-      encoding: 'utf-8',
-    }).trim();
-    if (result === String(expectedStatus) || (expectedStatus === 200 && result === '000' && url.startsWith('http://127.0.0.1'))) {
-      // HTTP 000 with localhost means connection refused — treat as failure
-      if (result === '000') {
-        throw new Error(`${name} not reachable at ${url} (connection refused)`);
-      }
-      console.log(`[PREREQ] ${name}: OK (${result})`);
-    } else {
-      throw new Error(`${name} returned ${result}, expected ${expectedStatus}`);
-    }
-  } catch (e) {
-    throw new Error(`[PREREQ FAILED] ${name}: ${e.message}. Start the service and retry.`);
-  }
-}
-
-// Usage before browser launch:
-checkService('STS endpoint', 'http://127.0.0.1:8900/api/v1/aliyun/sts');
-checkService('Dev server', 'http://localhost:3001');
-```
-
-### Pattern: Chrome process cleanup
-
-When reusing an existing Chrome profile, stale Chrome processes can lock the
-profile and prevent `launchPersistentContext` from starting:
-
-```javascript
-const { execSync } = require('child_process');
-
-function cleanupChromeProcesses() {
-  try {
-    // Kill Chrome for Testing processes that may hold the profile lock
-    execSync('pkill -f "Google Chrome for Testing" 2>/dev/null || true', {
-      timeout: 5000,
-      encoding: 'utf-8',
-    });
-    // Wait for processes to fully exit and release locks
-    setTimeout(() => {}, 2000);
-  } catch (e) {
-    // pkill exits non-zero if no processes found — safe to ignore
-  }
-  console.log('[CLEANUP] Chrome processes cleaned');
-}
-
-// Call before launchPersistentContext when reusing a profile
-cleanupChromeProcesses();
-```
 
 ---
 

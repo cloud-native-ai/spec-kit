@@ -8,6 +8,101 @@ For the complete Playwright API reference, see [playwright-api.md](./playwright-
 
 ---
 
+## Run Modes (Tier 3)
+
+Tier 3 has two mutually exclusive run modes. Pick the mode **before writing a script**
+(see SKILL.md § Run Mode Selection). This section is the launch recipe for each.
+
+### Mode 1 — Clean Test Browser (default)
+
+Playwright's bundled Chromium / Chrome for Testing, fresh ephemeral context, default
+`--use-mock-keychain`. Use for frontend/localhost automation and E2E testing. No real
+login state — every run starts clean. This is the `chromium.launch()` used by every
+example below (Basic Page Test, Responsive, Form Filling, etc.).
+
+```javascript
+const browser = await chromium.launch({ headless: false });
+const page = await browser.newPage();
+// ... test the app; nothing persists between runs
+await browser.close();
+```
+
+### Mode 2 — Real Chrome Profile (reuse login state)
+
+Drives the **real Google Chrome** against an existing user-data-dir so its cookies and
+localStorage (logins) are reused. Required to reach authenticated/internal sites.
+
+Three conditions must ALL hold, or login state silently fails:
+
+1. **Profile not in use** — Chrome is single-instance per profile. If a Chrome is
+   already running on `userDataDir`, the launch is handed off to that window and the
+   controllable process exits immediately (`正在现有的浏览器会话中打开`). Preflight it.
+2. **`channel: 'chrome'`** — must be the real Google Chrome binary, not bundled
+   Chromium/Chrome for Testing. Cookies are encrypted with a macOS Keychain "Safe
+   Storage" key that is *per-app*; a different binary cannot decrypt them.
+3. **`ignoreDefaultArgs: ['--use-mock-keychain']`** — Playwright injects
+   `--use-mock-keychain` by default, which bypasses the real keychain. Drop it so
+   Chrome uses the real key that decrypts the profile's cookies.
+
+**Preflight (bash) — verify the profile is free before launching:**
+
+```bash
+USER_DATA_DIR="$HOME/data/chrome/agent"   # the target profile
+# Any process holding the profile? (non-empty ⇒ ask the user to close it)
+ps aux | grep -F "user-data-dir=$USER_DATA_DIR" | grep -v grep
+# Stale singleton lock present? (informational)
+ls -la "$USER_DATA_DIR" | grep -i singleton
+```
+
+**Launch recipe (JavaScript):**
+
+```javascript
+// /tmp/playwright-test-profile.js
+const { chromium } = require('playwright');
+const os = require('os');
+const path = require('path');
+
+const USER_DATA_DIR = path.join(os.homedir(), 'data/chrome/agent');
+const TARGET_URL = 'https://internal.example.com/dashboard';
+
+(async () => {
+  let context;
+  try {
+    context = await chromium.launchPersistentContext(USER_DATA_DIR, {
+      headless: false,
+      channel: 'chrome',                              // real Chrome → keychain key matches
+      ignoreDefaultArgs: ['--use-mock-keychain'],     // use the REAL keychain to decrypt cookies
+      viewport: { width: 1440, height: 900 },
+      args: ['--no-first-run', '--no-default-browser-check'],
+    });
+    const page = context.pages()[0] || (await context.newPage());
+    await page.goto(TARGET_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+    console.log('Final URL:', page.url());            // if it ends on a login page, login state did NOT load
+    await page.screenshot({ path: '/tmp/profile-page.png', fullPage: true });
+  } catch (e) {
+    console.error('ERROR:', e.message);
+  } finally {
+    if (context) await context.close();
+  }
+})();
+```
+
+**Failure-symptom table:**
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `Target page, context or browser has been closed` + `正在现有的浏览器会话中打开` | A Chrome is already running on the profile | Close it (preflight #1), then relaunch |
+| Page redirects to the SSO/login page despite a logged-in profile | Bundled Chromium used, or `--use-mock-keychain` kept | Add `channel: 'chrome'` **and** `ignoreDefaultArgs: ['--use-mock-keychain']` |
+| `kill EPERM` in browser logs on close | Handoff process couldn't be killed (side effect of #1) | Same as the handoff row — free the profile first |
+
+> If the profile is in use and cannot be closed, an alternative is to launch Chrome
+> yourself with `--remote-debugging-port=<port>` and attach via
+> `chromium.connectOverCDP('http://127.0.0.1:<port>')`, which coexists with a manually
+> opened window. Confirm this approach with the user first.
+
+---
+
 ## JavaScript Patterns
 
 ### Basic Page Test

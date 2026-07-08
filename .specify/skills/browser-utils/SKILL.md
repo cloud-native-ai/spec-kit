@@ -107,6 +107,29 @@ For the complete tool reference, operation patterns, and best practices, see
 When neither Tier 1 nor Tier 2 is available, use Playwright to drive a Chromium
 browser via JavaScript or Python scripts.
 
+### Run Mode Selection (choose FIRST, before writing any script)
+
+Tier 3 has **two mutually exclusive run modes**. Decide which one applies before
+writing code — they use different browser binaries and launch options, and picking
+the wrong one silently fails (e.g. a real logged-in site redirects to its login page).
+
+| | **Mode 1 — Clean Test Browser** | **Mode 2 — Real Chrome Profile** |
+|---|---|---|
+| Purpose | Frontend/localhost automation & E2E testing | Reach sites that need an existing login state |
+| Browser | Playwright's bundled Chromium / Chrome for Testing | Real Google Chrome (`channel: 'chrome'`) |
+| Launch | `chromium.launch()` (fresh ephemeral context) | `chromium.launchPersistentContext(userDataDir, …)` |
+| Keychain | Default `--use-mock-keychain` (kept) | `ignoreDefaultArgs: ['--use-mock-keychain']` (real keychain) |
+| Login state | None (clean slate each run) | Reuses cookies/localStorage from the profile |
+
+**Selection rule** (apply in order):
+1. Target is `localhost`/a dev server, or the task is testing the user's own frontend → **Mode 1** (default).
+2. Task needs an authenticated/internal site, OR the user supplies a Chrome `userDataDir`/profile → **Mode 2**.
+3. If it is ambiguous whether login state is required, **ask the user to confirm the mode before launching** (see Strict Requirement #3).
+
+Mode 2 has strict preconditions (profile must not be in use; real Chrome; real
+keychain). For the full launch recipe, preflight checks, and failure-symptom table,
+see [references/playwright-patterns.md § Run Modes (Tier 3)](./references/playwright-patterns.md#run-modes-tier-3).
+
 **JavaScript path**: Write Playwright scripts to `/tmp`, execute via the universal
 runner `${SKILL_HOME}/scripts/js/run.js`.
 
@@ -170,13 +193,16 @@ Python examples, see [references/playwright-patterns.md](./references/playwright
 ## Strict Requirements
 
 1. **Detect agent type FIRST** — always run the Strategy Selection decision tree before any browser work
-2. **Tier 3: Detect servers FIRST** — for localhost testing, always run `detectDevServers()` before writing test code
-3. **Write scripts to `/tmp`** — never write test files to the skill directory or user's project (`/tmp/playwright-test-*.js`)
-4. **Parameterize URLs** — put detected/provided URL in a `TARGET_URL` constant at the top of every script
-5. **Visible browser by default (Tier 3)** — use `headless: false` unless user explicitly requests headless mode
-6. **Tier 2: Always snapshot before acting** — uids from stale snapshots are invalid after page changes
-7. **Wait strategies over fixed timeouts** — use `waitForSelector`, `waitForURL`, `waitForLoadState` (Tier 3) or `wait_for` (Tier 2) instead of arbitrary sleeps
-8. **Error handling** — always use try-catch for robust automation; screenshot on error for debugging
+2. **Tier 3: Select run mode FIRST** — before writing any script, decide Mode 1 (clean test browser) vs Mode 2 (real Chrome profile) per § Run Mode Selection. The two modes use different binaries and launch options; picking wrong fails silently.
+3. **Tier 3: Confirm the mode when login state is ambiguous** — if it is unclear whether the target needs an existing login, or the user references a Chrome profile/`userDataDir`, ask the user to confirm Mode 2 (and which profile) before launching a real profile.
+4. **Tier 3 Mode 2: Preflight the profile** — the target `userDataDir` must have no running Chrome (singleton lock) or launch is silently handed off to the existing window and exits ("正在现有的浏览器会话中打开"). Verify no process holds the profile before launching; if one does, ask the user to close it.
+5. **Tier 3: Detect servers FIRST** — for localhost testing (Mode 1), always run `detectDevServers()` before writing test code
+6. **Write scripts to `/tmp`** — never write test files to the skill directory or user's project (`/tmp/playwright-test-*.js`)
+7. **Parameterize URLs** — put detected/provided URL in a `TARGET_URL` constant at the top of every script
+8. **Visible browser by default (Tier 3)** — use `headless: false` unless user explicitly requests headless mode
+9. **Tier 2: Always snapshot before acting** — uids from stale snapshots are invalid after page changes
+10. **Wait strategies over fixed timeouts** — use `waitForSelector`, `waitForURL`, `waitForLoadState` (Tier 3) or `wait_for` (Tier 2) instead of arbitrary sleeps
+11. **Error handling** — always use try-catch for robust automation; screenshot on error for debugging
 
 ## Conventions
 
