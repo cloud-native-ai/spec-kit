@@ -52,3 +52,7 @@ sdd-*/
 
 .specify/tools/
 .migration-backups/
+
+# Node / Playwright skill runtime artifacts
+node_modules/
+**/.temp-execution-*.js
