@@ -23,6 +23,33 @@ Requirements Analyst → System Designer → Module Designer → Test Engineer �
                                                               Knowledge Manager (all roles)
 ```
 
+## Multi-Agent Orchestration Modes
+
+All orchestration is accessed through the unified `/speckit.agents` command, which uses intent recognition to automatically route to the correct pattern via the `organize-agents` skill.
+
+### Parallel Dispatch
+- **Use when**: Multiple independent tasks can be executed simultaneously
+- **Pattern**: Territory isolation → Parallel dispatch → Result aggregation
+- **Trigger**: `/speckit.agents` with intent signals like "并行", "parallel", "同时执行"
+
+### Serial Chain
+- **Use when**: Tasks have sequential dependencies (stage N output feeds stage N+1)
+- **Pattern**: DAG definition → Topological execution → Progress tracking
+- **Trigger**: `/speckit.agents` with intent signals like "串行", "pipeline", "阶段"
+
+### Team Loop
+- **Use when**: Complex deliverables need iterative quality improvement by a team
+- **Pattern**: Supervisor + Meta-Coordinator + Workers → Self-iterating quality loop
+- **Trigger**: `/speckit.agents` with intent signals like "团队", "闭环", "自迭代"
+
+### Decision Guide
+| Scenario | Recommended Mode |
+|----------|------------------|
+| Independent tasks, no shared state | Parallel Dispatch |
+| Sequential phases with dependencies | Serial Chain |
+| Quality-critical, needs iteration | Team Loop |
+| Mix of independent + dependent | Serial Chain with parallel stages |
+
 ## Notes
 
 - All role agents are **supervisors** by default (`supervisor: true`), capable of orchestrating EEI (Executor-Evaluator-Improver) loops.

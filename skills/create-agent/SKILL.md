@@ -16,10 +16,12 @@ Select the capability from the request `kind` (or infer from user intent):
 
 | kind | Produces | Source templates | Primary section |
 |------|----------|------------------|-----------------|
-| `role` | One role-based agent (six mandatory sections) | `templates/agent-role-*-template.md` | Workflow steps 1–5 below |
-| `supervisor` | A role agent that runs its own EEI loop | role template + `agent-supervision-delegation.md` inlined | § Supervisor Capability |
-| `triad` | 3 sub-role agents + orchestration prompt | `agent-subrole-*` + `agent-triad-orchestration-template.md` | § Triad Mode (EEI Pattern) |
+| `role` | One role-based agent (six mandatory sections) | `skills/create-agent/templates/agent-role-*-template.md` | Workflow steps 1–5 below |
+| `supervisor` | A role agent that runs its own EEI loop | role template + `skills/create-agent/templates/agent-supervision-delegation.md` inlined | § Supervisor Capability |
+| `triad` | 3 sub-role agents + orchestration prompt | `skills/create-agent/templates/agent-subrole-*` + `agent-triad-orchestration-template.md` | § Triad Mode (EEI Pattern) |
 | `custom` | A single narrow custom `.agent.md` | free-form per intent | `/speckit.agents` Mode B flow |
+| `coordinator` | A Meta-Coordinator agent for team task decomposition and orchestration | `skills/create-agent/templates/agent-role-meta-coordinator-template.md` | § Coordinator Mode |
+| `team-supervisor` | A Team Supervisor agent for quality gating and iteration control | `skills/create-agent/templates/agent-team-supervisor-template.md` | § Team Supervisor Mode |
 
 All capabilities share the same validate + report tail (Workflow steps 4–5) and the Agent-Specific Configuration handling below.
 
@@ -50,13 +52,13 @@ Analyze the conversation history and project context to infer a useful role:
 
 ### 2. Validate against existing templates
 
-- Check `templates/agent-role-*-template.md` for existing roles
+- Check `skills/create-agent/templates/agent-role-*-template.md` for existing roles
 - If a similar role exists, suggest updating it via `improve-agent` instead
 - Ensure the new role does not overlap significantly with the six preset roles
 
 ### 3. Create the template file
 
-Write `templates/agent-role-<slug>-template.md` following the established structure:
+Write `skills/create-agent/templates/agent-role-<slug>-template.md` following the established structure:
 
 ```markdown
 ---
@@ -106,7 +108,7 @@ You are a **<Role Name>** for the {{PROJECT_NAME}} project.
 - Templates MUST use only approved `{{PLACEHOLDER}}` variables
 - The `tools` field MUST be omitted from YAML frontmatter
 - Role instructions MUST be written in first-person professional identity
-- This skill operates on templates in `templates/`, NOT on generated agents in `.specify/agents/`
+- This skill operates on templates in `skills/create-agent/templates/`, NOT on generated agents in `.specify/agents/`
 
 ## Triad Mode (EEI Pattern)
 
@@ -138,7 +140,7 @@ The orchestration prompt drives the loop: Executor -> Evaluator -> (if below thr
 
 ### Template Files
 
-All four templates live in `templates/`:
+All four templates live in `skills/create-agent/templates/`:
 
 - `agent-subrole-executor-template.md`
 - `agent-subrole-evaluator-template.md`
@@ -150,7 +152,7 @@ The skill populates placeholders and writes the generated files to `.specify/age
 ### Triad Workflow (within this skill)
 
 1. Collect required inputs (prompt or infer from conversation).
-2. Validate that all four subrole templates exist in `templates/`.
+2. Validate that all four subrole templates exist in `skills/create-agent/templates/`.
 3. Generate three sub-role agent files and one orchestration prompt.
 4. Report the created file paths and suggest a test invocation.
 
@@ -160,8 +162,8 @@ Use this capability (`kind: supervisor`) to author a **role-scoped supervisor** 
 
 ### How it works
 
-1. Load the role template `templates/agent-role-<role_slug>-template.md` (it carries `supervisor: true` and `role-scope: <role_slug>` in frontmatter).
-2. **Inline the single-source snippet** `templates/agent-supervision-delegation.md` into the generated agent body, resolving its placeholders:
+1. Load the role template `skills/create-agent/templates/agent-role-<role_slug>-template.md` (it carries `supervisor: true` and `role-scope: <role_slug>` in frontmatter).
+2. **Inline the single-source snippet** `skills/create-agent/templates/agent-supervision-delegation.md` into the generated agent body, resolving its placeholders:
    - `{{ROLE_SCOPE}}` → `role_slug`
    - `{{ROLE_NAME}}` → role display name
    - `{{ROLE_DIMENSIONS}}` → the request's `scoring_dimensions` (or role-appropriate defaults if omitted)
@@ -170,7 +172,7 @@ Use this capability (`kind: supervisor`) to author a **role-scoped supervisor** 
 
 ### Rule
 
-Never copy the delegation section text into `templates/agent-role-*-template.md`; edit it only in `templates/agent-supervision-delegation.md` so all supervisors stay in sync (single source of truth).
+Never copy the delegation section text into `skills/create-agent/templates/agent-role-*-template.md`; edit it only in `skills/create-agent/templates/agent-supervision-delegation.md` so all supervisors stay in sync (single source of truth).
 
 ## Agent-Specific Configuration
 
@@ -232,3 +234,56 @@ The feedback document MUST contain:
 ```
 
 Only generate feedback when a genuine agent-specific obstacle was encountered.
+
+## Coordinator Mode
+
+Use this mode (`kind: coordinator`) to author a **Meta-Coordinator agent** — responsible for team-level task decomposition, worker dispatch, and result aggregation across multiple agents.
+
+### When to Use
+
+Trigger on phrases: "create coordinator", "meta agent", "team coordinator", "orchestration agent", or any request for an agent that decomposes goals into sub-tasks and dispatches them to worker agents.
+
+### How It Works
+
+1. Collect the **team goal** (what the coordinated effort should achieve).
+2. Identify the **worker agent list** (which agents will execute sub-tasks).
+3. Determine the **dispatch strategy**: `parallel` (all at once), `serial` (sequenced), or `mixed` (DAG with some parallel stages).
+4. Load `skills/create-agent/templates/agent-role-meta-coordinator-template.md` and populate placeholders.
+5. Write the generated coordinator to `.specify/agents/<goal-slug>-coordinator.agent.md`.
+6. Run the shared validate + report tail (Workflow steps 4–5).
+
+### Required Inputs
+
+| Input | Description |
+|-------|-------------|
+| **Team goal** | High-level objective the coordinator will decompose (e.g., "implement feature X") |
+| **Worker agent list** | Agents available for dispatch (e.g., module-designer, test-engineer) |
+| **Dispatch strategy** | One of `parallel`, `serial`, or `mixed` |
+| **Territory definitions** | (Optional) File/directory ownership per worker to prevent conflicts |
+
+## Team Supervisor Mode
+
+Use this mode (`kind: team-supervisor`) to author a **Team Supervisor agent** — responsible for quality gating, iteration control, and convergence detection across a team of collaborating agents.
+
+### When to Use
+
+Trigger on phrases: "create team supervisor", "quality gate agent", "iteration supervisor", "team quality control", or any request for an agent that evaluates team output quality and drives iterative improvement.
+
+### How It Works
+
+1. Collect the **quality dimensions and weights** (what to evaluate and relative importance).
+2. Define the **threshold** (minimum acceptable weighted score).
+3. Set **max_iterations** (iteration cap to prevent infinite loops).
+4. Set **regression_limit** (max consecutive score drops before aborting).
+5. Load `skills/create-agent/templates/agent-team-supervisor-template.md` and populate placeholders.
+6. Write the generated supervisor to `.specify/agents/<team-slug>-supervisor.agent.md`.
+7. Run the shared validate + report tail (Workflow steps 4–5).
+
+### Required Inputs
+
+| Input | Description |
+|-------|-------------|
+| **Quality dimensions + weights** | Named axes and weights (e.g., correctness 0.4, completeness 0.3, clarity 0.3) |
+| **Threshold** | Minimum weighted score (0–1) for acceptance |
+| **max_iterations** | Maximum loop iterations before forced stop (default: 5) |
+| **regression_limit** | Max consecutive score decreases before abort (default: 2) |

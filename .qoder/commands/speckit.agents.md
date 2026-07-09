@@ -1,3 +1,96 @@
+# /speckit.agents
+
+## Overview
+
+Agent 系统的统一入口。识别用户意图，协调 create-agent 和 organize-agents 技能完成所有 Agent 相关操作。
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Process `$ARGUMENTS` to determine intent. If empty, default to Mode C (批量生成). If intent unclear, ask one concise clarification question.
+
+## Intent Recognition（意图识别）
+
+分析用户输入，判断属于以下哪种操作模式：
+
+| 用户意图信号 | 操作模式 | 调用路径 |
+|-------------|---------|---------|
+| "创建agent"、"新agent"、"添加角色" | 创建单个 Agent | create-agent |
+| "改进agent"、"优化agent" | 改进 Agent | improve-agent |
+| "并行"、"同时执行"、"独立任务" | 并行编排 | create-agent → organize-agents (parallel) |
+| "阶段"、"串行"、"依次"、"pipeline" | 串行编排 | create-agent → organize-agents (serial) |
+| "团队"、"闭环"、"自迭代"、"持续优化" | 团队闭环 | create-agent → organize-agents (team-loop) |
+| "生成所有角色"、无参数调用 | 批量生成 | create-agent × 6 roles |
+
+## Execution Flow
+
+### Mode A: 单 Agent 操作（创建/改进）
+
+1. 识别意图为创建或改进
+2. 收集项目上下文（README、技术栈、规范）
+3. 调用 create-agent 或 improve-agent 技能
+4. 报告结果
+
+### Mode B: 多 Agent 编排（并行/串行/团队）
+
+1. 识别意图为编排模式（parallel/serial/team-loop）
+2. 收集项目上下文
+3. 调用 create-agent 为每个所需角色创建 Agent 配置
+4. 调用 organize-agents 技能，指定编排模式
+5. 执行编排（派遣/链式/循环）
+6. 报告结果
+
+### Mode C: 批量生成（默认/无参）
+
+1. 收集项目上下文（README, pyproject.toml, constitution, features, specs）
+2. 为 6 个预置角色调用 create-agent (kind: supervisor):
+   - Requirements Analyst
+   - System Designer
+   - Module Designer
+   - Test Engineer
+   - QA Engineer
+   - Knowledge Manager
+3. Backup existing if customized (FR-008a)
+4. Preserve non-role agents (FR-008)
+5. Write to `.specify/agents/`
+6. Scaffold workspace files if needed (AGENTS.md, MEMORY.md, SOUL.md, USER.md)
+7. 报告结果
+
+## Delegation Model
+
+This command does NOT render templates inline. It delegates to:
+- **create-agent** skill — for all agent creation (role, supervisor, triad, custom, coordinator, team-supervisor)
+- **improve-agent** skill — for updating existing agents
+- **organize-agents** skill — for multi-agent orchestration (parallel/serial/team-loop)
+
+## Authoring Rules
+
+- Focus on **what** and **when to call** the agent
+- Concise, explicit instructions over narrative
+- Single responsibility per agent
+- Least-privilege tool set
+- Approved providers: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder
+
+## Valid File Locations
+
+- Canonical: `.specify/agents/*.agent.md`
+- Symlinks (read-only): `.github/agents/`, `.qoder/agents/`, `.qwen/agents/`, `.opencode/agents/`
+
+## Validation
+
+- YAML frontmatter must be valid
+- Reject unsupported provider references
+- Tool list must match workflow needs
+- Unresolved contradictions block save
+
+## Handoffs
+
+**Before**: Optional `/speckit.skills` if agent depends on new skill. Optional `/speckit.tools` for tool records.
+
+**After**: Run `/speckit.instructions` to sync discoverability.
 > Compatibility: Follow VS Code Copilot custom agent format for `.agent.md` files.
 
 ## User Input
