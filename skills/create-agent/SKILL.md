@@ -8,7 +8,19 @@ skill_id: "<SKILL:.specify/skills/create-agent/SKILL.md>"
 
 ## Goal
 
-Author **any agent artifact** for the Spec Kit agent system — a role template, a role-scoped **supervisor** (role + embedded EEI triad), an EEI **triad** (three sub-role agents + orchestration prompt), or a **custom** `.agent.md`. This skill is the single authoring engine invoked by `/speckit.agents`; the command gathers project context and delegates here rather than rendering templates inline.
+Author **any agent artifact** for the Spec Kit agent system — a role template, a role-scoped **supervisor** (role + embedded EEI triad), an EEI **triad** (three stage agents + orchestration prompt), or a **custom** `.agent.md`. This skill is the single authoring engine invoked by `/speckit.agents`; the command gathers project context and delegates here rather than rendering templates inline.
+
+## Conceptual Model (Role × Stage × Type + Team/Loop)
+
+Every agent is described by three orthogonal dimensions and organized into a Team/Loop:
+
+- **Role** — the responsibility/perspective; maps to exactly one `agent-role-<role>-template.md`.
+- **Stage** — one of `executor`, `evaluator`, `optimizer` (canonical names; the deprecated dimension name "SubRole" and stage name "improver" are removed).
+- **Type** — `Worker` or `Meta`, **derived from Stage** (Type-follows-Stage): executor→Worker, evaluator→Meta, optimizer→Meta.
+- **Team** (static) — a Role×Stage matrix; **Loop** (dynamic) — the runtime iteration across stages.
+- **Team Supervisor** — the single **Meta role** (Meta at all stages, never performs real project tasks). It is the merge of the former Meta-Coordinator (coordination) and Team Supervisor (quality gate); there is no separate Meta-Coordinator.
+
+Canonical template home: `skills/create-agent/templates/` (installed mirror: `.specify/skills/create-agent/templates/`).
 
 ## Capability Matrix
 
@@ -18,10 +30,9 @@ Select the capability from the request `kind` (or infer from user intent):
 |------|----------|------------------|-----------------|
 | `role` | One role-based agent (six mandatory sections) | `skills/create-agent/templates/agent-role-*-template.md` | Workflow steps 1–5 below |
 | `supervisor` | A role agent that runs its own EEI loop | role template + `skills/create-agent/templates/agent-supervision-delegation.md` inlined | § Supervisor Capability |
-| `triad` | 3 sub-role agents + orchestration prompt | `skills/create-agent/templates/agent-subrole-*` + `agent-triad-orchestration-template.md` | § Triad Mode (EEI Pattern) |
+| `triad` | 3 stage agents (executor/evaluator/optimizer) + orchestration prompt | `skills/create-agent/templates/agent-stage-*` + `agent-triad-orchestration-template.md` | § Triad Mode (EEI Pattern) |
 | `custom` | A single narrow custom `.agent.md` | free-form per intent | `/speckit.agents` Mode B flow |
-| `coordinator` | A Meta-Coordinator agent for team task decomposition and orchestration | `skills/create-agent/templates/agent-role-meta-coordinator-template.md` | § Coordinator Mode |
-| `team-supervisor` | A Team Supervisor agent for quality gating and iteration control | `skills/create-agent/templates/agent-team-supervisor-template.md` | § Team Supervisor Mode |
+| `team-supervisor` | The merged Team Supervisor (Meta role): task decomposition + quality gating + iteration control | `skills/create-agent/templates/agent-role-team-supervisor-template.md` | § Team Supervisor Mode |
 
 All capabilities share the same validate + report tail (Workflow steps 4–5) and the Agent-Specific Configuration handling below.
 
@@ -110,23 +121,42 @@ You are a **<Role Name>** for the {{PROJECT_NAME}} project.
 - Role instructions MUST be written in first-person professional identity
 - This skill operates on templates in `skills/create-agent/templates/`, NOT on generated agents in `.specify/agents/`
 
+## Agent Lifecycle (temporary vs persistent)
+
+Every agent this skill can produce has one of two lifecycles. Choose the lifecycle before generating files.
+
+| Lifecycle | Where it lives | When to use | Tool config |
+|-----------|----------------|-------------|-------------|
+| **temporary** | Context-only — never written to disk | A worker/stage agent spawned for a single Loop or orchestration run; discarded when the run ends | None; it exists only in the orchestrator's context (FR-011) |
+| **persistent** | `.specify/agents/<slug>.agent.md` (the canonical store) | A reusable role, supervisor, or triad the project keeps across sessions | Linked into every officially supported tool's agent config directory on initialization (FR-010/012) |
+
+**Persistent generation rules**:
+
+- Write the generated agent to `.specify/agents/<slug>.agent.md` (canonical, single source of truth).
+- On initialization the CLI (re)creates a directory symlink from each officially supported tool's agent config dir to `.specify/agents/` — e.g. `.qoder/agents → ../.specify/agents`, plus `.github/agents`, `.qwen/agents`, `.opencode/agents`, `.hermes/agents`, `.iflow/agents` — consistent with Feature 022 multi-tool support (FR-012, A4). Never write tool-specific copies; the symlinks keep every tool in sync.
+- Record the agent in `.specify/agents/AGENTS.md` so it is discoverable.
+
+**Temporary generation rules**:
+
+- Do NOT write the agent under `.specify/agents/` and do NOT create tool config links. The orchestrator (Team Supervisor) instantiates it from a stage/role template into its own context for the duration of the Loop only (FR-011).
+
 ## Triad Mode (EEI Pattern)
 
-Use this mode when the user wants to create an agent that iteratively improves its output through an **Executor-Evaluator-Improver** loop (the "EEI triad").
+Use this mode when the user wants to create an agent that iteratively improves its output through an **Executor-Evaluator-Optimizer** loop (the "EEI triad").
 
 ### When to Use
 
-Trigger on phrases: "create triad", "EEI agent", "iterative quality", "executor evaluator improver", or any request for a self-refining agent that scores and re-drafts its own output.
+Trigger on phrases: "create triad", "EEI agent", "iterative quality", "executor evaluator optimizer", or any request for a self-refining agent that scores and re-drafts its own output.
 
 ### How It Works
 
-Instead of producing a single role template, Triad Mode creates **three sub-role agents** plus an **orchestration prompt** that wires them into a loop:
+Instead of producing a single role template, Triad Mode creates **three stage agents** plus an **orchestration prompt** that wires them into a loop:
 
-1. **Executor** -- performs the core task and produces a draft artifact.
-2. **Evaluator** -- scores the draft against weighted dimensions, emits a structured rubric, and decides pass/fail against a threshold.
-3. **Improver** -- reads the rubric, rewrites the artifact to address low-scoring dimensions, and feeds the revision back to the Evaluator.
+1. **Executor** (stage `executor`, Worker) -- performs the core task and produces a draft artifact.
+2. **Evaluator** (stage `evaluator`, Meta) -- scores the draft against weighted dimensions, emits a structured rubric, and decides pass/fail against a threshold.
+3. **Optimizer** (stage `optimizer`, Meta) -- reads the rubric, rewrites the artifact to address low-scoring dimensions, and feeds the revision back to the Evaluator.
 
-The orchestration prompt drives the loop: Executor -> Evaluator -> (if below threshold) Improver -> Evaluator -> ... until the threshold is met or a max-iteration cap is reached.
+The orchestration prompt drives the loop: Executor -> Evaluator -> (if below threshold) Optimizer -> Evaluator -> ... until the threshold is met or a max-iteration cap is reached.
 
 ### Required Inputs
 
@@ -142,9 +172,9 @@ The orchestration prompt drives the loop: Executor -> Evaluator -> (if below thr
 
 All four templates live in `skills/create-agent/templates/`:
 
-- `agent-subrole-executor-template.md`
-- `agent-subrole-evaluator-template.md`
-- `agent-subrole-improver-template.md`
+- `agent-stage-executor-template.md`
+- `agent-stage-evaluator-template.md`
+- `agent-stage-optimizer-template.md`
 - `agent-triad-orchestration-template.md`
 
 The skill populates placeholders and writes the generated files to `.specify/agents/`.
@@ -152,8 +182,8 @@ The skill populates placeholders and writes the generated files to `.specify/age
 ### Triad Workflow (within this skill)
 
 1. Collect required inputs (prompt or infer from conversation).
-2. Validate that all four subrole templates exist in `skills/create-agent/templates/`.
-3. Generate three sub-role agent files and one orchestration prompt.
+2. Validate that all four stage templates exist in `skills/create-agent/templates/`.
+3. Generate three stage agent files and one orchestration prompt.
 4. Report the created file paths and suggest a test invocation.
 
 ## Supervisor Capability
@@ -235,47 +265,21 @@ The feedback document MUST contain:
 
 Only generate feedback when a genuine agent-specific obstacle was encountered.
 
-## Coordinator Mode
-
-Use this mode (`kind: coordinator`) to author a **Meta-Coordinator agent** — responsible for team-level task decomposition, worker dispatch, and result aggregation across multiple agents.
-
-### When to Use
-
-Trigger on phrases: "create coordinator", "meta agent", "team coordinator", "orchestration agent", or any request for an agent that decomposes goals into sub-tasks and dispatches them to worker agents.
-
-### How It Works
-
-1. Collect the **team goal** (what the coordinated effort should achieve).
-2. Identify the **worker agent list** (which agents will execute sub-tasks).
-3. Determine the **dispatch strategy**: `parallel` (all at once), `serial` (sequenced), or `mixed` (DAG with some parallel stages).
-4. Load `skills/create-agent/templates/agent-role-meta-coordinator-template.md` and populate placeholders.
-5. Write the generated coordinator to `.specify/agents/<goal-slug>-coordinator.agent.md`.
-6. Run the shared validate + report tail (Workflow steps 4–5).
-
-### Required Inputs
-
-| Input | Description |
-|-------|-------------|
-| **Team goal** | High-level objective the coordinator will decompose (e.g., "implement feature X") |
-| **Worker agent list** | Agents available for dispatch (e.g., module-designer, test-engineer) |
-| **Dispatch strategy** | One of `parallel`, `serial`, or `mixed` |
-| **Territory definitions** | (Optional) File/directory ownership per worker to prevent conflicts |
-
 ## Team Supervisor Mode
 
-Use this mode (`kind: team-supervisor`) to author a **Team Supervisor agent** — responsible for quality gating, iteration control, and convergence detection across a team of collaborating agents.
+Use this mode (`kind: team-supervisor`) to author the merged **Team Supervisor** — the single **Meta role** that unifies task decomposition + worker dispatch (formerly the Meta-Coordinator) with quality gating, iteration control, and convergence detection. There is no separate coordinator mode; both responsibilities live in this one Meta role.
 
 ### When to Use
 
-Trigger on phrases: "create team supervisor", "quality gate agent", "iteration supervisor", "team quality control", or any request for an agent that evaluates team output quality and drives iterative improvement.
+Trigger on phrases: "create team supervisor", "team coordinator", "orchestration agent", "quality gate agent", "iteration supervisor", "team quality control", or any request for an agent that decomposes goals, dispatches workers, evaluates team output, and drives iterative improvement.
 
 ### How It Works
 
-1. Collect the **quality dimensions and weights** (what to evaluate and relative importance).
-2. Define the **threshold** (minimum acceptable weighted score).
-3. Set **max_iterations** (iteration cap to prevent infinite loops).
-4. Set **regression_limit** (max consecutive score drops before aborting).
-5. Load `skills/create-agent/templates/agent-team-supervisor-template.md` and populate placeholders.
+1. Collect the **team goal** and the **quality dimensions and weights** (what to build and how to score it).
+2. Identify the **worker agent list** (which agents will execute sub-tasks) and the **dispatch strategy**: `parallel` (all at once), `serial` (sequenced), or `mixed` (DAG with some parallel stages).
+3. Define the **threshold** (minimum acceptable weighted score).
+4. Set **max_iterations** (iteration cap to prevent infinite loops) and **regression_limit** (max consecutive score drops before aborting).
+5. Load `skills/create-agent/templates/agent-role-team-supervisor-template.md` and populate placeholders.
 6. Write the generated supervisor to `.specify/agents/<team-slug>-supervisor.agent.md`.
 7. Run the shared validate + report tail (Workflow steps 4–5).
 
@@ -283,7 +287,11 @@ Trigger on phrases: "create team supervisor", "quality gate agent", "iteration s
 
 | Input | Description |
 |-------|-------------|
+| **Team goal** | High-level objective the supervisor will decompose (e.g., "implement feature X") |
+| **Worker agent list** | Agents available for dispatch (e.g., module-designer, test-engineer) |
+| **Dispatch strategy** | One of `parallel`, `serial`, or `mixed` |
 | **Quality dimensions + weights** | Named axes and weights (e.g., correctness 0.4, completeness 0.3, clarity 0.3) |
 | **Threshold** | Minimum weighted score (0–1) for acceptance |
 | **max_iterations** | Maximum loop iterations before forced stop (default: 5) |
 | **regression_limit** | Max consecutive score decreases before abort (default: 2) |
+| **Territory definitions** | (Optional) File/directory ownership per worker to prevent conflicts |

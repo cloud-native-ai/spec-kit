@@ -39,7 +39,7 @@ All orchestration is accessed through the unified `/speckit.agents` command, whi
 
 ### Team Loop
 - **Use when**: Complex deliverables need iterative quality improvement by a team
-- **Pattern**: Supervisor + Meta-Coordinator + Workers → Self-iterating quality loop
+- **Pattern**: Team Supervisor (Meta role, coordination + quality gate) + Workers → Self-iterating quality loop (two layers; the former separate Meta-Coordinator is merged into the Team Supervisor)
 - **Trigger**: `/speckit.agents` with intent signals like "团队", "闭环", "自迭代"
 
 ### Decision Guide
@@ -52,6 +52,6 @@ All orchestration is accessed through the unified `/speckit.agents` command, whi
 
 ## Notes
 
-- All role agents are **supervisors** by default (`supervisor: true`), capable of orchestrating EEI (Executor-Evaluator-Improver) loops.
+- All role agents are **supervisors** by default (`supervisor: true`), capable of orchestrating EEI (Executor-Evaluator-Optimizer) loops.
 - Tool-specific directories (`.github/agents/`, `.qoder/agents/`, `.qwen/agents/`, `.opencode/agents/`) are symlinks to `.specify/agents/`.
 - Run `/speckit.instructions` to refresh discovery metadata after adding or updating agents.

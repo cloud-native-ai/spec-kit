@@ -2,14 +2,14 @@
 
 ## Scenario Description
 
-Two independent modules (`auth` and `payments`) are developed in parallel by separate worker agents, orchestrated by a Meta-Coordinator.
+Two independent modules (`auth` and `payments`) are developed in parallel by separate worker agents, orchestrated by the **Team Supervisor** (Meta role). Each worker runs at the `executor` stage (Type: Worker); the Team Supervisor is Meta at all stages.
 
 ## Setup
 
 ### Team Configuration
 
 ```yaml
-coordinator: meta-coordinator
+supervisor: team-supervisor          # Meta role (coordination merged in)
 workers:
   - id: worker-auth
     agent: module-designer
@@ -29,12 +29,12 @@ dispatch_strategy: parallel
 ## Expected Behavior
 
 ### Phase 1: Territory Division
-1. Coordinator reads the feature spec and identifies two independent modules.
-2. Coordinator assigns exclusive territories to each worker.
-3. Coordinator verifies no territory overlap exists.
+1. Team Supervisor reads the feature spec and identifies two independent modules.
+2. Team Supervisor assigns exclusive territories to each worker.
+3. Team Supervisor verifies no territory overlap exists.
 
 ### Phase 2: Parallel Dispatch
-1. Coordinator dispatches both workers simultaneously.
+1. Team Supervisor dispatches both workers simultaneously.
 2. Each worker receives: its territory definition, the feature spec subset, and shared type references.
 3. Workers begin execution independently.
 
@@ -44,9 +44,9 @@ dispatch_strategy: parallel
 3. Neither worker touches the other's territory or shared files.
 
 ### Phase 4: Aggregation
-1. Coordinator collects completion signals from both workers.
-2. Coordinator reads each worker's output summary from handoff files.
-3. Coordinator produces a unified progress report.
+1. Team Supervisor collects completion signals from both workers.
+2. Team Supervisor reads each worker's output summary from handoff files.
+3. Team Supervisor produces a unified progress report.
 
 ## Verification Points
 
@@ -61,13 +61,13 @@ dispatch_strategy: parallel
 - [ ] Both modules compile independently
 
 ### V3: Progress Report Accuracy
-- [ ] Coordinator report lists both workers and their status
+- [ ] Team Supervisor report lists both workers and their status
 - [ ] Timing data shows parallel (overlapping) execution, not sequential
 - [ ] Final report includes file counts and test pass rates per worker
 
 ### V4: Error Handling
 - [ ] If one worker fails, the other continues to completion
-- [ ] Coordinator correctly reports partial success
+- [ ] Team Supervisor correctly reports partial success
 - [ ] Failed worker's territory is flagged for retry
 
 ## Success Criteria

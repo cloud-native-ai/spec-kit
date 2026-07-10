@@ -4,6 +4,8 @@
 
 A feature request flows through a 4-stage serial pipeline: Requirements → Design → Implementation → Testing. Each stage depends on the output of the previous stage, communicated via file handshake.
 
+**Model alignment**: this is a **serial Loop** across four Worker roles (requirements-analyst, system-designer, module-designer, test-engineer). Each agent runs at the `executor` stage (Type: Worker); no Meta role is required for a pure serial chain (a Team Supervisor may optionally gate quality between stages).
+
 ## Setup
 
 ### Workflow Definition

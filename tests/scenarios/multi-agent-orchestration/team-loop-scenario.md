@@ -2,7 +2,7 @@
 
 ## Scenario Description
 
-An API specification is iteratively refined by a team of three workers (Writer, Reviewer, Improver) under the supervision of a Team Supervisor, until quality threshold is met or max iterations are exhausted.
+An API specification is iteratively refined by a team of three workers (Writer, Reviewer, Optimizer) under the supervision of a Team Supervisor, until quality threshold is met or max iterations are exhausted. The team has **two layers**: the Team Supervisor (Meta role — coordination + quality gate) and the Workers.
 
 ## Setup
 
@@ -11,13 +11,11 @@ An API specification is iteratively refined by a team of three workers (Writer, 
 ```yaml
 team:
   supervisor:
-    agent: team-supervisor
+    agent: team-supervisor          # Meta role: coordination + quality gate (merged)
+    dispatch_strategy: serial
     threshold: 0.85
     max_iterations: 5
     regression_limit: 2
-  coordinator:
-    agent: meta-coordinator
-    dispatch_strategy: serial
   workers:
     - id: writer
       agent: module-designer
@@ -25,7 +23,7 @@ team:
     - id: reviewer
       agent: qa-engineer
       role: "Score the specification against quality dimensions"
-    - id: improver
+    - id: optimizer
       agent: module-designer
       role: "Rewrite low-scoring sections based on review feedback"
 ```
@@ -61,13 +59,13 @@ quality_dimensions:
 4. Score 0.61 < threshold 0.85 → **continue**.
 
 ### Iteration 2: First Improvement
-1. **Improver** reads review feedback, rewrites low-scoring sections (completeness, correctness).
+1. **Optimizer** reads review feedback, rewrites low-scoring sections (completeness, correctness).
 2. **Reviewer** re-scores: correctness=0.8, completeness=0.75, clarity=0.8, consistency=0.85.
 3. **Supervisor** calculates: 0.8×0.4 + 0.75×0.3 + 0.8×0.2 + 0.85×0.1 = 0.79.
 4. Score 0.79 < threshold 0.85 → **continue**. Score increased (no regression).
 
 ### Iteration 3: Final Refinement
-1. **Improver** addresses remaining gaps (completeness edge cases, correctness validation).
+1. **Optimizer** addresses remaining gaps (completeness edge cases, correctness validation).
 2. **Reviewer** re-scores: correctness=0.9, completeness=0.9, clarity=0.85, consistency=0.9.
 3. **Supervisor** calculates: 0.9×0.4 + 0.9×0.3 + 0.85×0.2 + 0.9×0.1 = 0.89.
 4. Score 0.89 ≥ threshold 0.85 → **ACCEPT**.
@@ -89,14 +87,14 @@ quality_dimensions:
 ### V3: Role Execution Correctness
 - [ ] Writer only executes in iteration 1 (initial draft)
 - [ ] Reviewer executes every iteration (scoring)
-- [ ] Improver executes in iterations 2+ (never iteration 1)
+- [ ] Optimizer executes in iterations 2+ (never iteration 1)
 - [ ] Supervisor makes accept/reject decision after each review
 
 ### V4: Final Report Accuracy
 - [ ] Final report includes: accepted artifact path, final scores, iteration count
 - [ ] Report lists improvement delta (final score - initial score)
 - [ ] Report includes total token/cost estimate for the full loop
-- [ ] Accepted artifact matches the last Improver output (not an earlier version)
+- [ ] Accepted artifact matches the last Optimizer output (not an earlier version)
 
 ### V5: Edge Cases
 
@@ -107,7 +105,7 @@ quality_dimensions:
 
 #### Single-Iteration Pass
 - [ ] If writer's initial draft scores ≥ threshold: loop exits after iteration 1
-- [ ] No improver is invoked; report correctly states "passed on first attempt"
+- [ ] No optimizer is invoked; report correctly states "passed on first attempt"
 
 ## Success Criteria
 

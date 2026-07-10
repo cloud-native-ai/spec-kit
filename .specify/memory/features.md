@@ -1,6 +1,6 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-06-23
+**Last Updated**: 2026-07-10
 **Total Features**: 25
 
 ## Features
@@ -25,7 +25,7 @@
 | 016 | Tools Command | Definition-first tool management: create, modify, and invoke tools with explicit behavioral rules, replacing discovery-driven approach. | Implemented | .specify/memory/features/016.md | .specify/specs/016-refactor-tools-command/requirements.md | 2026-06-17 (deferred: T022,T042,T043,T046) |
 | 017 | Template Engine | Markdown-based template system. | Completed | .specify/memory/features/017.md | - | 2026-02-10 |
 | 018 | Configuration Management | Project configuration via pyproject.toml. | Completed | .specify/memory/features/018.md | - | 2026-02-10 |
-| 019 | Agents Command | Create or refine custom AI agents (.agent.md) for workspace-specific workflows. Includes EEI (Executor-Evaluator-Improver) triad pattern for iterative quality optimization. | Implemented | .specify/memory/features/019.md | .specify/specs/022-eei-agent-triad/requirements.md | 2026-07-02 (deferred: T008,T013; amendment implemented: supervisor + general-skill refactor, T032-T057) |
+| 019 | Agents Command | Create or refine custom AI agents (.agent.md) for workspace-specific workflows. Includes EEI (Executor-Evaluator-Optimizer) triad pattern for iterative quality optimization. | Implemented | .specify/memory/features/019.md | .specify/specs/023-agent-framework-redesign/requirements.md | 2026-07-10 (spec 023 agent-framework-redesign implemented: Role/Stage/Type + Team/Loop model, terminology unification, supervisor merge, template canonicalization) |
 | 020 | Qoder Support | Add Qoder as a supported CLI assistant across initialization, validation, documentation, and release distribution. | Implemented | .specify/memory/features/020.md | .specify/specs/006-add-qoder-support/requirements.md | 2026-03-30 |
 | 021 | Claude Code Support | Add Claude Code as a first-class assistant with custom commands and Claude Code-specific configuration assets. | Implemented | .specify/memory/features/021.md | .specify/specs/009-claude-code-support/requirements.md | 2026-05-14 |
 | 022 | AI Tools Support | Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files. | Implemented | .specify/memory/features/022.md | .specify/specs/021-agent-specific-config/requirements.md | 2026-06-25 |
