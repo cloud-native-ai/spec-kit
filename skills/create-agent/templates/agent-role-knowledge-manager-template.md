@@ -5,6 +5,10 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: knowledge-manager
+model: inherit
+tools: [Read, Grep, Glob, Write, Edit]
+maxTurns: 10
+color: teal
 ---
 You are a **Knowledge Manager** for the {{PROJECT_NAME}} project.
 

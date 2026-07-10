@@ -33,7 +33,7 @@ organize, or execute command. Its contract:
    *authoring* (create/refine) or *orchestration* (organize/execute)?
 2. **Authoring** → check whether `.specify/agents/<name>.agent.md` exists: absent →
    `create-agent`; present → `improve-agent`. Build the `AgentAuthoringRequest`, handle
-   backup/preservation, write to `.specify/agents/`, verify symlinks, update the registry.
+   backup/preservation, write to `.specify/agents/`, verify per-file symlinks.
 3. **Orchestration** → identify the topology (parallel / serial / team-loop) and delegate
    to `organize-agents`, which selects the matching orchestration template.
 4. **Ambiguous / unsupported** → do **not** guess silently. Report the recognized
@@ -73,7 +73,7 @@ Key rules:
 - It operates on **templates**, not on generated agents in `.specify/agents/`.
 - It accepts an `AgentAuthoringRequest` (`kind`, `role_slug`, `task`, `scoring_dimensions[]`,
   `threshold`, `max_iterations`, environment/workspace paths, `project_context`) and returns
-  an `AuthoringResult` (`artifact_paths`, `kind`, `status`, `registry_entry`).
+  an `AuthoringResult` (`artifact_paths`, `kind`, `status`).
 
 ### `improve-agent` — refinement engine
 
@@ -112,15 +112,16 @@ Every agent `create-agent` can produce has one of two lifecycles; choose it befo
 | Lifecycle | Where it lives | When to use | Tool config |
 |-----------|----------------|-------------|-------------|
 | **temporary** | Context-only — never written to disk | A worker/stage agent spawned for a single Loop or orchestration run; discarded when the run ends | None; exists only in the orchestrator's context (FR-011) |
-| **persistent** | `.specify/agents/<slug>.agent.md` (canonical store) | A reusable role, supervisor, or triad kept across sessions | Linked into every supported tool's agent dir on init (FR-010/012) |
+| **persistent** | `.specify/agents/<slug>.agent.md` (canonical store) | A reusable role, supervisor, or triad kept across sessions | Per-file symlinked into every supported tool's agent dir on init (FR-010/012) |
 
 **Persistent generation rules:**
 - Write to `.specify/agents/<slug>.agent.md` (single source of truth).
-- On initialization the CLI (re)creates a directory symlink from each supported tool's agent
-  dir to `.specify/agents/` — e.g. `.qoder/agents → .specify/agents`, plus `.github/agents`,
-  `.qwen/agents`, `.opencode/agents` (and `.hermes/agents`, `.iflow/agents` where supported).
-  Never write tool-specific copies; symlinks keep every tool in sync.
-- Record the agent in `.specify/agents/AGENTS.md` so it is discoverable.
+- On initialization the CLI (re)creates a **per-file** symlink for each `.specify/agents/*.agent.md`
+  inside each supported tool's agent dir — e.g. `.qoder/agents/<slug>.agent.md → ../../.specify/agents/<slug>.agent.md`,
+  plus `.github/agents`, `.qwen/agents`, `.opencode/agents` (and `.hermes/agents`, `.iflow/agents`
+  where supported). Each tool `agents/` is a real directory of links; never write tool-specific
+  copies of framework agents.
+- Agents are discovered by globbing `.specify/agents/*.agent.md` (frontmatter `name`/`description`); there is no separate registry file.
 
 ## Tool integration & provider whitelist
 
@@ -134,14 +135,19 @@ Every agent `create-agent` can produce has one of two lifecycles; choose it befo
 
   ```yaml
   ---
+  name: "<required: unique identifier>"
   description: "<required: trigger words + when to use>"
-  tools: ["read", "search"]
+  tools: [Read, Grep, Glob]
+  model: inherit
+  maxTurns: 12
   ---
   ```
 
-  Supported fields: `name`, `tools`, `model`, `argument-hint`, `agents`, `user-invocable`,
-  `disable-model-invocation`, `handoffs`. Validation rejects invalid YAML, unsupported
-  providers, and unresolved contradictions.
+  Supported fields: `name` (required), `description` (required), `tools`, `disallowedTools`,
+  `model` (`inherit`/`auto`/`lite`/`performance`), `maxTurns`, `timeoutMins`, `skills`,
+  `mcpServers`, `permissionMode`, `background`, `isolation`, `color`, plus the framework fields
+  `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`. Validation rejects
+  invalid YAML, unsupported providers, and unresolved contradictions.
 
 ## Handoffs
 

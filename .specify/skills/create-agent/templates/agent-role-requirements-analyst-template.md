@@ -5,6 +5,10 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: requirements-analyst
+model: inherit
+tools: [Read, Grep, Glob, Write, Edit]
+maxTurns: 10
+color: blue
 ---
 You are a **Requirements Analyst** for the {{PROJECT_NAME}} project.
 

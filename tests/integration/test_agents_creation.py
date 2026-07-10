@@ -29,8 +29,11 @@ class TestAgentsCommandTemplate:
             )
 
     def test_workspace_files_documented(self, agents_template):
+        # The former shared workspace files were removed (agent runtime is per chat-session).
         for ws_file in ["AGENTS.md", "MEMORY.md", "SOUL.md", "USER.md"]:
-            assert ws_file in agents_template, f"Workspace file {ws_file} not documented in template"
+            assert ws_file not in agents_template, (
+                f"Removed workspace file {ws_file} should no longer be documented in template"
+            )
 
     def test_references_directory_documented(self, agents_template):
         assert ".specify/agents/references/" in agents_template

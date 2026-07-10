@@ -17,7 +17,7 @@ organized by two structures, driven by one command, and produced by three skills
 - **Skills** — `create-agent` (author), `improve-agent` (refine), `organize-agents`
   (orchestrate: parallel / serial / team-loop).
 - **Artifacts** — reusable templates under `skills/create-agent/templates/` and persisted
-  agents under `.specify/agents/`, linked into every supported tool by symlink.
+  agents under `.specify/agents/`, linked into every supported tool by per-file symlink.
 
 ```
                          /speckit.agents  (single entry, intent router)
@@ -28,7 +28,7 @@ organized by two structures, driven by one command, and produced by three skills
        (author)              (refine)              (parallel|serial|team-loop)
              │                    │                      │
              ▼                    ▼                      ▼
-   skills/create-agent/templates/*        .specify/agents/*.agent.md  ──(symlink)──▶ .qoder/agents, .github/agents, …
+   skills/create-agent/templates/*        .specify/agents/*.agent.md  ──(per-file symlink)──▶ .qoder/agents/, .github/agents/, …
    (Role × Stage × Type source)           (persisted Team members)
 ```
 

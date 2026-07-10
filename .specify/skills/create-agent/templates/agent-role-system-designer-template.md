@@ -5,6 +5,10 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: system-designer
+model: inherit
+tools: [Read, Grep, Glob, Write, Edit]
+maxTurns: 12
+color: purple
 ---
 You are a **System Designer** for the {{PROJECT_NAME}} project.
 

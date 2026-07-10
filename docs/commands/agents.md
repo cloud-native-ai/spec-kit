@@ -73,16 +73,17 @@ With no explicit intent, `/speckit.agents` generates the seven role-based workfl
 | Artifact | Location |
 |----------|----------|
 | Agent files | `.specify/agents/<name>.agent.md` |
-| Workspace files | `.specify/agents/AGENTS.md`, `MEMORY.md`, `SOUL.md`, `USER.md` |
+| Shared assets | `.specify/agents/references/` |
 
 ## Symlink Model
 
-Tool-specific directories are **directory-level symlinks** to `.specify/agents/` (never write to them directly):
+Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/` (never write framework agents into them directly):
 
-- `.github/agents/` → `.specify/agents/` (Copilot, Claude Code)
-- `.qoder/agents/` → `.specify/agents/` (Qoder)
-- `.qwen/agents/` → `.specify/agents/` (Qwen Code)
-- `.opencode/agents/` → `.specify/agents/` (opencode)
+- `.github/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Copilot, Claude Code)
+- `.qoder/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qoder)
+- `.qwen/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qwen Code)
+- `.opencode/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (opencode)
+- (and `.hermes/agents/`, `.iflow/agents/` where supported)
 
 ## Companion Skills
 
@@ -140,7 +141,7 @@ Generates seven software development workflow agents from role templates, popula
 
 5. **Write agents** — All seven agents written to `.specify/agents/` (canonical location).
 
-6. **Workspace scaffolding** — Creates `AGENTS.md`, `MEMORY.md`, `SOUL.md`, `USER.md` if first run.
+6. **Discovery** — Agents are discovered by globbing `.specify/agents/*.agent.md`; no separate registry/workspace files are created.
 
 7. **Report** — Lists generated agents, notes any backups, suggests running `/speckit.instructions`.
 
@@ -171,15 +172,16 @@ Creates or updates a single custom agent based on user-provided intent.
 | Artifact | Location |
 |----------|----------|
 | Agent files | `.specify/agents/<name>.agent.md` |
-| Workspace files | `.specify/agents/AGENTS.md`, `MEMORY.md`, `SOUL.md`, `USER.md` |
+| Shared assets | `.specify/agents/references/` |
 
 ## Symlink Model
 
-Tool-specific directories are **directory-level symlinks** to `.specify/agents/`:
-- `.github/agents/` → `.specify/agents/` (Copilot, Claude Code)
-- `.qoder/agents/` → `.specify/agents/` (Qoder)
-- `.qwen/agents/` → `.specify/agents/` (Qwen Code)
-- `.opencode/agents/` → `.specify/agents/` (opencode)
+Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/`:
+- `.github/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Copilot, Claude Code)
+- `.qoder/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qoder)
+- `.qwen/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qwen Code)
+- `.opencode/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (opencode)
+- (and `.hermes/agents/`, `.iflow/agents/` where supported)
 
 ## Companion Skills
 

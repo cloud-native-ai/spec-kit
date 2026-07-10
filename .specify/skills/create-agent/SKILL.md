@@ -38,7 +38,7 @@ All capabilities share the same validate + report tail (Workflow steps 4–5) an
 
 ## AgentAuthoringRequest Intake
 
-When invoked by `/speckit.agents`, accept the `AgentAuthoringRequest` defined in `.specify/specs/022-eei-agent-triad/contracts/agent-authoring-contract.md` and consume every field: `kind`, `role_slug`, `task`, `scoring_dimensions[]`, `threshold`, `max_iterations`, `environment_paths[]`, `workspace_paths[]`, `project_context`. Missing optional fields fall back to role/triad defaults (threshold from role, `max_iterations`=20). Return an `AuthoringResult` (`artifact_paths`, `kind`, `status`, `registry_entry`).
+When invoked by `/speckit.agents`, accept the `AgentAuthoringRequest` defined in `.specify/specs/022-eei-agent-triad/contracts/agent-authoring-contract.md` and consume every field: `kind`, `role_slug`, `task`, `scoring_dimensions[]`, `threshold`, `max_iterations`, `environment_paths[]`, `workspace_paths[]`, `project_context`. Missing optional fields fall back to role/triad defaults (threshold from role, `max_iterations`=20). Return an `AuthoringResult` (`artifact_paths`, `kind`, `status`).
 
 ## Workflow
 
@@ -65,7 +65,7 @@ Analyze the conversation history and project context to infer a useful role:
 
 - Check `skills/create-agent/templates/agent-role-*-template.md` for existing roles
 - If a similar role exists, suggest updating it via `improve-agent` instead
-- Ensure the new role does not overlap significantly with the six preset roles
+- Ensure the new role does not overlap significantly with the seven preset roles
 
 ### 3. Create the template file
 
@@ -77,6 +77,12 @@ name: {{AGENT_NAME}}
 description: {{AGENT_DESCRIPTION}}
 user-invocable: true
 disable-model-invocation: false
+supervisor: true
+role-scope: <slug>
+model: inherit
+tools: [Read, Grep, Glob, Write, Edit]
+maxTurns: 12
+color: blue
 ---
 You are a **<Role Name>** for the {{PROJECT_NAME}} project.
 
@@ -102,7 +108,7 @@ You are a **<Role Name>** for the {{PROJECT_NAME}} project.
 ### 4. Validate the template
 
 - Verify YAML frontmatter has required fields (name, description, user-invocable)
-- Verify `tools` field is omitted (inherits platform defaults)
+- Verify Qoder-compatible fields are present (`model`, `tools`, `maxTurns`); pick role-appropriate `tools`/`maxTurns`/`color`
 - Verify all six mandatory sections are present
 - Verify only approved `{{PLACEHOLDER}}` variables are used
 - Verify upstream/downstream references are consistent with existing role chain
@@ -117,7 +123,7 @@ You are a **<Role Name>** for the {{PROJECT_NAME}} project.
 
 - Templates MUST follow the established role-based structure (six mandatory sections)
 - Templates MUST use only approved `{{PLACEHOLDER}}` variables
-- The `tools` field MUST be omitted from YAML frontmatter
+- Frontmatter uses Qoder-compatible fields — `model` (default `inherit`, respects the chat-session runtime), `tools`/`disallowedTools`, `maxTurns`/`timeoutMins`, `skills`/`mcpServers`, `permissionMode`, `background`, `isolation`, `color`. Only `name` and `description` are strictly required; set `model`/`tools`/`maxTurns` for every role and leave the rest unset unless needed.
 - Role instructions MUST be written in first-person professional identity
 - This skill operates on templates in `skills/create-agent/templates/`, NOT on generated agents in `.specify/agents/`
 
@@ -128,13 +134,13 @@ Every agent this skill can produce has one of two lifecycles. Choose the lifecyc
 | Lifecycle | Where it lives | When to use | Tool config |
 |-----------|----------------|-------------|-------------|
 | **temporary** | Context-only — never written to disk | A worker/stage agent spawned for a single Loop or orchestration run; discarded when the run ends | None; it exists only in the orchestrator's context (FR-011) |
-| **persistent** | `.specify/agents/<slug>.agent.md` (the canonical store) | A reusable role, supervisor, or triad the project keeps across sessions | Linked into every officially supported tool's agent config directory on initialization (FR-010/012) |
+| **persistent** | `.specify/agents/<slug>.agent.md` (the canonical store) | A reusable role, supervisor, or triad the project keeps across sessions | Per-file symlinked into every officially supported tool's agent config directory on initialization (FR-010/012) |
 
 **Persistent generation rules**:
 
 - Write the generated agent to `.specify/agents/<slug>.agent.md` (canonical, single source of truth).
-- On initialization the CLI (re)creates a directory symlink from each officially supported tool's agent config dir to `.specify/agents/` — e.g. `.qoder/agents → ../.specify/agents`, plus `.github/agents`, `.qwen/agents`, `.opencode/agents`, `.hermes/agents`, `.iflow/agents` — consistent with Feature 022 multi-tool support (FR-012, A4). Never write tool-specific copies; the symlinks keep every tool in sync.
-- Record the agent in `.specify/agents/AGENTS.md` so it is discoverable.
+- On initialization the CLI (re)creates a **per-file** symlink for each `.specify/agents/*.agent.md` inside every officially supported tool's agent config dir — e.g. `.qoder/agents/<slug>.agent.md → ../../.specify/agents/<slug>.agent.md`, plus `.github/agents`, `.qwen/agents`, `.opencode/agents`, `.hermes/agents`, `.iflow/agents`. Each tool `agents/` is a real directory of per-file links (so tools may add their own overrides beside the framework links); never write tool-specific copies of framework agents.
+- Agents are discovered by globbing `.specify/agents/*.agent.md` and reading each file's frontmatter `name`/`description`; no separate registry file is maintained.
 
 **Temporary generation rules**:
 

@@ -5,6 +5,10 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: test-engineer
+model: inherit
+tools: [Read, Grep, Glob, Bash, Write, Edit]
+maxTurns: 15
+color: yellow
 ---
 You are a **Test Engineer** for the {{PROJECT_NAME}} project.
 

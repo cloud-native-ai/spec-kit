@@ -4,7 +4,9 @@ import re
 import pytest
 from pathlib import Path
 
-TEMPLATES_DIR = Path(__file__).resolve().parents[2] / "templates"
+TEMPLATES_DIR = (
+    Path(__file__).resolve().parents[2] / "skills" / "create-agent" / "templates"
+)
 
 ROLE_SLUGS = [
     "requirements-analyst",
@@ -63,12 +65,14 @@ class TestRoleTemplateExistence:
         assert "user-invocable:" in frontmatter
 
     @pytest.mark.parametrize("slug", ROLE_SLUGS)
-    def test_template_omits_tools_field(self, slug):
+    def test_template_has_qoder_frontmatter(self, slug):
+        """Role templates carry Qoder-compatible frontmatter (model/tools/maxTurns)."""
         path = TEMPLATES_DIR / f"agent-role-{slug}-template.md"
         content = path.read_text()
         parts = content.split("---", 2)
         frontmatter = parts[1]
-        assert "tools:" not in frontmatter, f"{slug}: tools field must be omitted (FR-009a)"
+        for field in ("model:", "tools:", "maxTurns:"):
+            assert field in frontmatter, f"{slug}: missing Qoder frontmatter field '{field}'"
 
 
 @pytest.mark.contract

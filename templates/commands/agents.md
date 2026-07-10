@@ -36,7 +36,7 @@ Agents are expressed with the **Role × Stage × Type** model, organized statica
 **Routing flow**:
 
 1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: is this *authoring* (create/refine) or *orchestration* (organize/execute)?
-2. **Authoring** → check `.specify/agents/<name>.agent.md` existence: absent → `create-agent`; present → `improve-agent`. Build the `AgentAuthoringRequest`, handle backup/preservation, write to `.specify/agents/`, verify symlinks, update registry.
+2. **Authoring** → check `.specify/agents/<name>.agent.md` existence: absent → `create-agent`; present → `improve-agent`. Build the `AgentAuthoringRequest`, handle backup/preservation, write to `.specify/agents/`, verify per-file symlinks.
 3. **Orchestration** → identify topology (parallel / serial / team-loop) and delegate to `organize-agents`, which selects the matching orchestration template.
 4. **Ambiguous / unsupported** → see below.
 
@@ -60,7 +60,7 @@ The Team closed-loop has **two layers**: Team Supervisor (Meta role) + Workers. 
 ### Lifecycle: Temporary vs Persistent
 
 - **Temporary** agents live only in conversation context and are NOT written to the agent directory.
-- **Persistent** agents are written under `.specify/agents/` and made available to **all officially supported tools** on initialization (e.g. `.qoder/agents` → `.specify/agents`).
+- **Persistent** agents are written under `.specify/agents/` and made available to **all officially supported tools** on initialization via per-file symlinks (e.g. `.qoder/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md`).
 
 ### Authoring Rules
 
@@ -74,18 +74,21 @@ The Team closed-loop has **two layers**: Team Supervisor (Meta role) + Workers. 
 
 ```yaml
 ---
+name: "<required: unique identifier>"
 description: "<required: trigger words + when to use>"
-tools: ["read", "search"]
+tools: [Read, Grep, Glob]
+model: inherit
+maxTurns: 12
 ---
 ```
 
-Supported fields: `name`, `tools`, `model`, `argument-hint`, `agents`, `user-invocable`, `disable-model-invocation`, `handoffs`.
+Supported fields: `name` (required), `description` (required), `tools`, `disallowedTools`, `model` (`inherit`/`auto`/`lite`/`performance`), `maxTurns`, `timeoutMins`, `skills`, `mcpServers`, `permissionMode`, `background`, `isolation`, `color`, plus the framework fields `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`.
 
 ### Valid File Locations
 
-- Canonical: `.specify/agents/*.agent.md`
-- Canonical (workspace) scope: shared workspace files `AGENTS.md`, `MEMORY.md`, `SOUL.md`, `USER.md`, and shared assets under `.specify/agents/references/`
-- Symlinks (read-only): `.github/agents/`, `.qoder/agents/`, `.qwen/agents/`, `.opencode/agents/`
+- Canonical: `.specify/agents/*.agent.md` (single source of truth; discovered by globbing this pattern and reading each file's frontmatter `name`/`description`)
+- Shared assets under `.specify/agents/references/`
+- Per-file symlinks (read-only): `.github/agents/`, `.qoder/agents/`, `.qwen/agents/`, `.opencode/agents/`, `.hermes/agents/`, `.iflow/agents/`
 
 ### Validation
 

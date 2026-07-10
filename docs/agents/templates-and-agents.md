@@ -80,7 +80,10 @@ as a preset row in the registry.
 Each generated role agent (example: `requirements-analyst.agent.md`) contains:
 
 - **Frontmatter**: `name`, `description`, `user-invocable`, `disable-model-invocation`,
-  `supervisor: true`, `role-scope: <slug>`.
+  `supervisor: true`, `role-scope: <slug>`, plus Qoder-compatible fields `model` (default
+  `inherit`), `tools`, `maxTurns`, and `color`. Optional Qoder fields (`disallowedTools`,
+  `timeoutMins`, `skills`, `mcpServers`, `permissionMode`, `background`, `isolation`) are
+  available but unset by default.
 - **Role / Stage / Type** section — states the role's Type and its per-stage Type
   (`executor` Worker · `evaluator` Meta · `optimizer` Meta), and its place in the Team/Loop.
 - The **six mandatory sections** (Identity, Project Context, Workflow, Upstream, Downstream,
@@ -88,10 +91,11 @@ Each generated role agent (example: `requirements-analyst.agent.md`) contains:
 - **Supervision & EEI Delegation** section — composed from the single-source snippet; declares
   the role-scoped EEI triad, role-default scoring dimensions and weights, and delegation rules.
 
-## Registry: `AGENTS.md`
+## Discovery & the role workflow chain
 
-`.specify/agents/AGENTS.md` is the discoverable registry. It records the active agents table,
-the **role workflow chain**:
+There is **no separate registry file**. Agents are discovered by globbing
+`.specify/agents/*.agent.md` and reading each file's frontmatter `name`/`description`.
+The seven preset roles form this workflow chain:
 
 ```
 Requirements Analyst → System Designer → Module Designer → Test Engineer → QA Engineer
@@ -103,31 +107,55 @@ Requirements Analyst → System Designer → Module Designer → Test Engineer �
 
 UX Analyst is a cross-cutting design-phase Worker covering **all** user surfaces (front-end/GUI, CLI, commands, skills); it feeds UX specifications and interaction contracts to the System Designer and Module Designer.
 
-…and the three orchestration modes with their decision guide. After adding or updating agents,
-run `/speckit.instructions` to refresh discovery metadata.
+After adding or updating agents, run `/speckit.instructions` to refresh discovery metadata.
+
+## Qoder expert crosswalk
+
+Spec Kit's SDD roles and Qoder's built-in expert team are **different taxonomies**. The SDD
+roles keep their own names and are made available to Qoder as per-file symlinks **alongside**
+Qoder's built-ins (they do not force-override built-ins). The nearest mapping is:
+
+| Qoder built-in | Responsibility | SDD role (nearest) | Coverage |
+|---|---|---|---|
+| Lead Agent (not customizable) | understand / decompose / coordinate | Team Supervisor | Conceptual match (Lead Agent itself cannot be replaced) |
+| Researcher | investigate, code location | Requirements Analyst | Partial (RA adds a code-investigation facet) |
+| Full-Stack Engineer | front/back-end implementation | Module Designer | Full |
+| QA | run tests & builds | QA Engineer | Full |
+| Code Reviewer | code review | — | Gap |
+| UI Operator | browser/UI verification | — (UX Analyst is design, not runtime verification) | Gap |
+| Debug Engineer | fault diagnosis | — | Gap |
+| — | — | UX Analyst / System Designer / Test Engineer / Knowledge Manager | SDD-only (no Qoder equivalent) |
+
+The three gaps (Code Reviewer, UI Operator, Debug Engineer) have no direct SDD equivalent;
+author them on demand via `/speckit.agents` if needed. To actually **override** a Qoder
+built-in, create a file in `.qoder/agents/` whose frontmatter `name` exactly matches the
+built-in expert's name (per Qoder's priority mechanism).
 
 ## Directory & symlink model
 
 `.specify/agents/` is the **only** place agents are authored. Every supported tool's agent
-directory is a **directory symlink** to it — never write to the tool directories directly.
+directory is a **real directory** populated with **per-file symlinks** back to it — one link
+per `*.agent.md`. Never write framework agents into the tool directories directly.
 
 ```
 .specify/agents/                 ← canonical source of truth (author here)
-   ├── AGENTS.md                  ← registry
    ├── requirements-analyst.agent.md
    ├── system-designer.agent.md
    └── … (+ references/ shared assets)
 
-.qoder/agents    ─┐
-.github/agents   ─┤
-.qwen/agents     ─┼─▶ symlink ─▶ .specify/agents/
-.opencode/agents ─┘
+.qoder/agents/    (real dir)  ── <slug>.agent.md ─▶ ../../.specify/agents/<slug>.agent.md
+.github/agents/   (real dir)  ── (per-file symlinks, same scheme)
+.qwen/agents/     (real dir)  ── (per-file symlinks, same scheme)
+.opencode/agents/ (real dir)  ── (per-file symlinks, same scheme)
    (and .hermes/agents, .iflow/agents where supported)
 ```
 
-The CLI (re)creates these symlinks on initialization, keeping every tool in sync from the one
-canonical store. Workspace-scoped shared files (`AGENTS.md`, `MEMORY.md`, `SOUL.md`, `USER.md`,
-and `.specify/agents/references/`) live alongside the agents in the canonical scope.
+The CLI (re)creates these per-file links on initialization, migrating any legacy
+whole-directory symlink to the per-file model. Because each tool `agents/` is a real
+directory, a tool can add its own agent files (e.g. Qoder overrides) beside the framework
+links. Only `.specify/agents/references/` remains a shared-assets store in the canonical
+scope; the former `AGENTS.md`/`MEMORY.md`/`SOUL.md`/`USER.md` shared files have been removed
+(agent runtime context is per chat-session, so they served no purpose).
 
 ## Traceability
 

@@ -5,6 +5,10 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: team-supervisor
+model: inherit
+tools: [Read, Grep, Glob, Bash, Write, Edit]
+maxTurns: 20
+color: red
 ---
 You are the **Team Supervisor** for the {{PROJECT_NAME}} project.
 

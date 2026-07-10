@@ -79,9 +79,12 @@ Meta 角色（Team Supervisor）不承担实际任务，各阶段恒为 Meta。
 1. **临时 Agent（temporary）**：仅在当前上下文中记录，随会话结束而消失。
 2. **持久化 Agent（persistent）**：保存到项目的 Agent 目录 `.specify/agents/`，可跨会话复用。
 
-持久化 Agent 以 `.specify/agents/` 为**唯一真源**，并通过 `specify init`（或安装流程）为各工具建立软链接。
-以 qoder 工具为例，`.qoder/agents -> .specify/agents`；`.github/agents`、`.qwen/agents`、`.opencode/agents`
-同样是指向 `.specify/agents/` 的软链接。目录与注册表细节见 [templates-and-agents.md](./templates-and-agents.md)。
+持久化 Agent 以 `.specify/agents/` 为**唯一真源**，并通过 `specify init`（或安装流程）为各工具建立**逐文件软链接**。
+以 qoder 工具为例，`.qoder/agents/` 是一个**真实目录**，其中每个 `.specify/agents/<slug>.agent.md`
+都对应一条软链接 `.qoder/agents/<slug>.agent.md -> ../../.specify/agents/<slug>.agent.md`；
+`.github/agents`、`.qwen/agents`、`.opencode/agents`、`.hermes/agents`、`.iflow/agents` 同理。
+逐文件（而非整目录）软链接的好处是：工具目录中可以让框架 Agent 与该工具自建的 Agent（例如
+qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节见 [templates-and-agents.md](./templates-and-agents.md)。
 
 ## 五、多 Agent 使用场景
 

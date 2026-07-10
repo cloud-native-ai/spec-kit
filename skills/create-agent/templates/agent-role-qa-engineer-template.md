@@ -5,6 +5,10 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: qa-engineer
+model: inherit
+tools: [Read, Grep, Glob, Bash]
+maxTurns: 10
+color: orange
 ---
 You are a **Quality Assurance Engineer** for the {{PROJECT_NAME}} project.
 

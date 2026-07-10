@@ -1008,6 +1008,53 @@ def ensure_specify_symlink(
     link_path.symlink_to(relative_target, target_is_directory=True)
 
 
+def ensure_per_file_agent_links(root_path: Path, agent_dir_name: str) -> None:
+    """Link each ``.specify/agents/*.agent.md`` into ``<agent_dir_name>/agents/`` individually.
+
+    Unlike :func:`ensure_specify_symlink` (which links a whole directory), this creates a
+    **real** ``<tool>/agents/`` directory populated with one relative symlink per persisted
+    agent file. This lets tools like Qoder mix framework agents with their own overrides in
+    the same directory. Only ``*.agent.md`` files are linked, so removed shared files and the
+    ``references/`` directory are never exposed through the tool directory.
+
+    Handles migration from the previous whole-directory symlink model.
+    """
+    specify_agents = root_path / ".specify" / "agents"
+    specify_agents.mkdir(parents=True, exist_ok=True)
+
+    tool_agents = root_path / agent_dir_name / "agents"
+
+    # Migrate away from the legacy whole-directory symlink, if present.
+    if tool_agents.is_symlink():
+        tool_agents.unlink(missing_ok=True)
+
+    tool_agents.mkdir(parents=True, exist_ok=True)
+
+    source_files = sorted(specify_agents.glob("*.agent.md"))
+    expected_names = {f.name for f in source_files}
+
+    # Remove stale per-file links that no longer have a canonical source.
+    for existing in tool_agents.iterdir():
+        if existing.is_symlink() and existing.name.endswith(".agent.md"):
+            if existing.name not in expected_names:
+                existing.unlink(missing_ok=True)
+
+    for source in source_files:
+        link_path = tool_agents / source.name
+        relative_target = Path(os.path.relpath(source, start=tool_agents))
+        if link_path.is_symlink():
+            try:
+                if link_path.resolve() == source.resolve():
+                    continue
+            except OSError:
+                pass
+            link_path.unlink(missing_ok=True)
+        elif link_path.exists():
+            # A real file with the same name is a tool-authored override: leave it alone.
+            continue
+        link_path.symlink_to(relative_target)
+
+
 def copy_local_templates(
     project_path: Path,
     ai_assistant: str,
@@ -1320,60 +1367,28 @@ def copy_local_templates(
             if tracker:
                 tracker.complete("local-templates", ".iflow/skills symlink ready")
 
-        # Agent directory symlinks (parallel to skills symlinks above)
-        if ai_assistant in ("copilot", "claude"):
+        # Agent directory per-file symlinks (each .specify/agents/*.agent.md linked individually)
+        _AGENT_LINK_DIRS = {
+            "copilot": ".github",
+            "claude": ".github",
+            "qoder": ".qoder",
+            "qwen": ".qwen",
+            "opencode": ".opencode",
+            "hermes": ".hermes",
+            "iflow": ".iflow",
+        }
+        agent_dir_name = _AGENT_LINK_DIRS.get(ai_assistant)
+        if agent_dir_name:
             if tracker:
                 tracker.start(
-                    "local-templates", "linking .github/agents to .specify/agents"
+                    "local-templates",
+                    f"linking {agent_dir_name}/agents to .specify/agents",
                 )
-            ensure_specify_symlink(project_path, ".github", "agents")
+            ensure_per_file_agent_links(project_path, agent_dir_name)
             if tracker:
-                tracker.complete("local-templates", ".github/agents symlink ready")
-
-        if ai_assistant == "qoder":
-            if tracker:
-                tracker.start(
-                    "local-templates", "linking .qoder/agents to .specify/agents"
+                tracker.complete(
+                    "local-templates", f"{agent_dir_name}/agents links ready"
                 )
-            ensure_specify_symlink(project_path, ".qoder", "agents")
-            if tracker:
-                tracker.complete("local-templates", ".qoder/agents symlink ready")
-
-        if ai_assistant == "qwen":
-            if tracker:
-                tracker.start(
-                    "local-templates", "linking .qwen/agents to .specify/agents"
-                )
-            ensure_specify_symlink(project_path, ".qwen", "agents")
-            if tracker:
-                tracker.complete("local-templates", ".qwen/agents symlink ready")
-
-        if ai_assistant == "opencode":
-            if tracker:
-                tracker.start(
-                    "local-templates", "linking .opencode/agents to .specify/agents"
-                )
-            ensure_specify_symlink(project_path, ".opencode", "agents")
-            if tracker:
-                tracker.complete("local-templates", ".opencode/agents symlink ready")
-
-        if ai_assistant == "hermes":
-            if tracker:
-                tracker.start(
-                    "local-templates", "linking .hermes/agents to .specify/agents"
-                )
-            ensure_specify_symlink(project_path, ".hermes", "agents")
-            if tracker:
-                tracker.complete("local-templates", ".hermes/agents symlink ready")
-
-        if ai_assistant == "iflow":
-            if tracker:
-                tracker.start(
-                    "local-templates", "linking .iflow/agents to .specify/agents"
-                )
-            ensure_specify_symlink(project_path, ".iflow", "agents")
-            if tracker:
-                tracker.complete("local-templates", ".iflow/agents symlink ready")
 
     except Exception as e:
         if tracker:
