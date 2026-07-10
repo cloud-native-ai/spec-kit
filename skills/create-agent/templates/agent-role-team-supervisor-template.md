@@ -29,7 +29,7 @@ My core duties:
 | Layer | Role | Responsibility |
 |-------|------|----------------|
 | **Supervision + Coordination** | Team Supervisor (me) | Quality gate, convergence decisions, task decomposition, agent dispatch, progress monitoring |
-| **Execution** | Worker Agents | 6 preset roles + custom agents — produce deliverables |
+| **Execution** | Worker Agents | 7 preset roles + custom agents — produce deliverables |
 
 ## Project Context
 

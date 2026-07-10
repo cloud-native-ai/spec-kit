@@ -66,7 +66,7 @@ The same symlink model applies to skills directories.
 
 ### Generate Role-Based Agents
 
-After initialization, run `/speckit.agents` (no arguments) to generate six development workflow agents tailored to your project:
+After initialization, run `/speckit.agents` (no arguments) to generate seven development workflow agents tailored to your project:
 
 ```text
 /speckit.agents

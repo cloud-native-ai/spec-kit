@@ -2,7 +2,9 @@
 
 A quality optimization pattern for AI agent workflows. Instead of running a task once and accepting the result, the triad iteratively improves output until a measurable quality threshold is met.
 
-> **Model alignment (Role × Stage × Type)**: the triad is a **Loop** over three **Stages** of a single Role — `executor` (Type **Worker**), `evaluator` (Type **Meta**), and `optimizer` (Type **Meta**). The orchestrator is the **Team Supervisor** (Meta role). The `optimizer` stage was formerly called "Improver"; the term is renamed here for consistency with `design.md`.
+> **Model alignment (Role × Stage × Type)**: the triad is a **Loop** over three **Stages** of a single Role — `executor` (Type **Worker**), `evaluator` (Type **Meta**), and `optimizer` (Type **Meta**). The orchestrator is the **Team Supervisor** (Meta role). The `optimizer` stage was formerly called "Improver"; the term is renamed here for consistency with [design.md](./design.md).
+>
+> **Where this fits**: this document details the *quality Loop* itself. For the concept model see [design.md](./design.md); for the templates that back the triad see [templates-and-agents.md](./templates-and-agents.md); for how the triad relates to the team-loop topology see [multi-agent-orchestration.md](./multi-agent-orchestration.md).
 
 ## Pattern Overview
 
@@ -135,12 +137,13 @@ As of the 2026-07-02 amendment, the triad is no longer a standalone pattern bolt
 
 ## Template Reference
 
-The full specification and examples live in the spec directory:
+Canonical templates (author/edit here — see [templates-and-agents.md](./templates-and-agents.md)):
 
-- **Supervision snippet**: `skills/create-agent/templates/agent-supervision-delegation.md`
-- **Authoring contract**: `.specify/specs/022-eei-agent-triad/contracts/agent-authoring-contract.md`
+- **Stage templates**: `skills/create-agent/templates/agent-stage-{executor,evaluator,optimizer}-template.md`
+- **Triad orchestration**: `skills/create-agent/templates/agent-triad-orchestration-template.md`
+- **Supervision snippet** (single source): `skills/create-agent/templates/agent-supervision-delegation.md`
 
-- **Requirements**: `.specify/specs/022-eei-agent-triad/requirements.md`
-- **Quickstart**: `.specify/specs/022-eei-agent-triad/quickstart.md`
-- **Tasks**: `.specify/specs/022-eei-agent-triad/tasks.md`
-- **Plan**: `.specify/specs/022-eei-agent-triad/plan.md`
+Normative specs:
+
+- **Current framework**: `.specify/specs/023-agent-framework-redesign/` — `contracts/conceptual-model-contract.md`, `data-model.md`
+- **Triad origin** (historical): `.specify/specs/022-eei-agent-triad/` — `contracts/agent-authoring-contract.md`, `contracts/triad-protocol.md`, `requirements.md`, `quickstart.md`, `plan.md`

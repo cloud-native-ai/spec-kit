@@ -56,11 +56,12 @@ The Team closed-loop has **two layers**: Team Supervisor (Meta role) + Workers. 
 
 ## Role-Based Generation
 
-With no explicit intent, `/speckit.agents` generates the six role-based workflow agents, populated with the current project's context:
+With no explicit intent, `/speckit.agents` generates the seven role-based workflow agents, populated with the current project's context:
 
 | Agent | File | Role |
 |-------|------|------|
 | Requirements Analyst | `requirements-analyst.agent.md` | Clarifies and structures requirements from stakeholder input |
+| UX Analyst | `ux-analyst.agent.md` | Analyzes and optimizes all user interfaces — front-end/GUI, CLI, commands, and skills |
 | System Designer | `system-designer.agent.md` | Designs system-level architecture and implementation approaches |
 | Module Designer | `module-designer.agent.md` | Designs detailed implementations within specific modules |
 | Test Engineer | `test-engineer.agent.md` | Designs and executes acceptance tests |
@@ -109,17 +110,18 @@ Generate role-based development workflow agents or create custom agents using `.
 ## Syntax
 
 ```text
-/speckit.agents                    # Mode A: Generate all six role-based agents
+/speckit.agents                    # Mode A: Generate all seven role-based agents
 /speckit.agents [agent intent]     # Mode B: Create a custom agent
 ```
 
 ## Mode A: Role-Based Generation (no arguments)
 
-Generates six software development workflow agents from role templates, populated with the current project's actual context.
+Generates seven software development workflow agents from role templates, populated with the current project's actual context.
 
 | Agent | File | Role |
 |-------|------|------|
 | Requirements Analyst | `requirements-analyst.agent.md` | Clarifies and structures requirements from stakeholder input |
+| UX Analyst | `ux-analyst.agent.md` | Analyzes and optimizes all user interfaces — front-end/GUI, CLI, commands, and skills |
 | System Designer | `system-designer.agent.md` | Designs system-level architecture and implementation approaches |
 | Module Designer | `module-designer.agent.md` | Designs detailed implementations within specific modules |
 | Test Engineer | `test-engineer.agent.md` | Designs and executes acceptance tests |
@@ -134,9 +136,9 @@ Generates six software development workflow agents from role templates, populate
 
 3. **Backup detection** — If an agent file already exists and has been customized, creates a `.bak` copy before overwriting.
 
-4. **Agent preservation** — Only creates/updates the six role-based agent files. Leaves all other existing agents untouched.
+4. **Agent preservation** — Only creates/updates the seven role-based agent files. Leaves all other existing agents untouched.
 
-5. **Write agents** — All six agents written to `.specify/agents/` (canonical location).
+5. **Write agents** — All seven agents written to `.specify/agents/` (canonical location).
 
 6. **Workspace scaffolding** — Creates `AGENTS.md`, `MEMORY.md`, `SOUL.md`, `USER.md` if first run.
 

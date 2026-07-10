@@ -9,6 +9,7 @@ COMMANDS_DIR = TEMPLATES_DIR / "commands"
 
 ROLE_SLUGS = [
     "requirements-analyst",
+    "ux-analyst",
     "system-designer",
     "module-designer",
     "test-engineer",

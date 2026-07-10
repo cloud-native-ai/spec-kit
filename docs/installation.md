@@ -94,7 +94,7 @@ After initialization, you should see the following structure and commands:
 | `/speckit.tools` | Define or discover reusable tools |
 | `/speckit.instructions` | Generate/update AI agent instructions and symlinks |
 
-**Next step**: Run `/speckit.agents` (no arguments) in your AI agent to generate six role-based development workflow agents tailored to your project's context.
+**Next step**: Run `/speckit.agents` (no arguments) in your AI agent to generate seven role-based development workflow agents tailored to your project's context.
 
 ## Troubleshooting
 

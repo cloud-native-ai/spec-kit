@@ -1,43 +1,52 @@
-# Agent 改造方案
+# Agent 框架设计（概念模型）
 
-当前的 Agent 框架有些混乱，本文档作为当前框架 Agent 的优化方案，按「问题 → 预期结果 → 实现细节」的顺序组织。
+> 本文档是 Spec Kit **Agent 框架的权威概念模型与设计说明**，描述的是当前**已实现**的机制
+> （spec `023-agent-framework-redesign`，Feature 019 *Agents Command*）。
+> 它由早期的《Agent 改造方案》重写而来：早期文档以「问题 → 预期结果 → 实现细节」的提案形式
+> 组织，本文档则以实现结果为准，保留必要的迁移背景以供追溯。阅读顺序建议：先读本文档，再看
+> [command-and-skills.md](./command-and-skills.md) 与 [templates-and-agents.md](./templates-and-agents.md)。
 
-## 一、当前 Agent 实现的问题
+## 一、设计动机
 
-当前 Agent 实现的主要问题是 **Agent 的定义比较混乱**，具体表现为以下几个概念相互交织、边界不清：
+早期 Agent 实现的核心问题是 **Agent 的定义混乱**——若干概念相互交织、边界不清：
 
-1. **角色（Role）定义不清**：Agent 从角色的角度定义了自身承担的职责，以及在处理问题时看问题的视角，但这一层没有被清晰地抽象出来。
-2. **阶段（Stage）与角色混淆**：同一角色的 Agent 在执行过程中存在不同的阶段 Stage，Stage 包含三种情况——执行者、评估者和优化者，对应当前模板目录中的三种 Stage，但 Stage 和 Role 的关系没有理顺。
-3. **团队（Team）静态结构缺失**：多个 Agent 在静态结构上组成一个 Team，其中还有一个 Supervisor 角色，负责整体评估 Team 的运行情况；当它判断 Team 当前表现不佳时，需要暂停整个团队的运作并进行整体优化。这一静态组织结构当前没有被清晰表达。
-4. **循环（Loop）动态结构缺失**：多 Agent 在动态结构上形成一个 Loop 结构，每一个 Loop 都有多个执行阶段，每一种角色的 Agent 在不同阶段扮演不同角色，或由多个 Agent 扮演不同的 Stage。这一动态运行机制当前也缺乏统一定义。
-5. **模板分散**：各式各样的 `templates/agent-*` 模板散落在模板目录，未与 create-agent 技能形成整体。
+1. **角色（Role）未抽象**：Agent 承担的职责与看待问题的视角没有被清晰地独立出来。
+2. **阶段（Stage）与角色混淆**：同一角色在执行中存在执行者、评估者、优化者三种阶段，但 Stage 与 Role 的关系没有理顺。
+3. **团队（Team）静态结构缺失**：多个 Agent 在静态结构上组成团队（含一个负责整体评估的 Supervisor），这一组织结构未被表达。
+4. **循环（Loop）动态结构缺失**：多 Agent 在运行时形成迭代循环，每个循环含多个阶段，缺乏统一定义。
+5. **模板分散**：`templates/agent-*` 模板散落在顶层模板目录，未与 create-agent 技能形成整体。
 
-## 二、预期结果
+当前实现针对以上问题给出了统一的概念模型与落地结构，下面各节即为**最终结果**。
 
-改造后，Agent 相关能力应满足以下目标：
+## 二、概念模型：三维属性 + 两种结构
 
-1. **唯一入口**：`/speckit.agents` 作为所有 Agent 相关操作的唯一命令入口，不新增其他命令。命令的核心是识别用户意图，然后根据分析结果进行 Agent 的创建、编排和执行。
-2. **清晰的概念模型**：一个 Agent 应由三个属性维度描述，再叠加两种组织结构——
-   - **Role（角色）**：定义 Agent 承担的职责和看问题的视角。
-   - **Stage（阶段）**：同一角色在执行中的三种阶段——执行者、评估者、优化者。
-   - **Type（类型）**：Role 和 Stage 之外的第三个维度，区分 **Worker Agent（工作 Agent）** 和 **Meta Agent（元 Agent）**。Worker Agent 处理项目中的实际任务；Meta Agent 负责优化和处理其他 Agent（Supervisor 就是一种 Meta Agent）。
-   - **Team（团队，静态结构）**：多个 Agent 在静态结构上组成的团队，含负责整体评估的 Supervisor。
-   - **Loop（循环，动态结构）**：多 Agent 在动态结构上形成的循环，每个 Loop 含多个执行阶段。
-3. **两类 Agent 生命周期**：
-   - **临时 Agent**：在上下文中进行记录即可。
-   - **持久化 Agent**：持久化到项目对应的 Agent 目录。
-4. **支持三类多 Agent 使用场景**：
-   - 多个 Agent 并行操作，通过并行度提升效率。
-   - 多个 Agent 串行操作，每个 Agent 负责一个阶段性工作，互相配合完成复杂而长期的任务。
-   - 多个 Agent 组织成一个团队，构成闭环可自迭代的系统（含实际工作 Agent、元 Agent、Supervisor 三类）。
-5. **模板归位**：将各式各样的 `templates/agent-*` 模板迁移到 `skills/create-agent/templates` 目录，作为 create-agent 技能的一部分。
-6. **术语统一**：统一 Agent 相关术语——废弃 SubRole 概念，统一使用 **Stage**；将 improver 统一改为 **optimizer**。
+一个 **Agent** 由三个正交的属性维度完整描述，再叠加两种组织结构：
 
-### 团队的二维矩阵表达（Team 视图）
+### 2.1 三个属性维度
 
-一个 Team 可用一张二维表格描述：**每一行代表一个 Agent（按 Role 划分）**，**每一列代表工作过程中的一个 Stage**，**整张表格整体代表一个团队**。行列交叉的单元格用 **Worker** / **Meta** 表示该 Agent 在对应阶段的 Type 属性。
+1. **Role（角色）**：定义 Agent 承担的职责以及看问题的视角。共有 **7 个 Worker 角色 + 1 个 Meta 角色**（见下表）。
+2. **Stage（阶段）**：同一角色在执行过程中的三种阶段——**执行者（executor）**、**评估者（evaluator）**、**优化者（optimizer）**。
+3. **Type（类型）**：区分 **Worker Agent（工作 Agent）** 与 **Meta Agent（元 Agent）**：
+   - **Worker Agent**：处理项目中的实际任务；
+   - **Meta Agent**：优化和处理其他 Agent（Team Supervisor 就是一种 Meta Agent，负责监控整个团队与其他 Agent 的表现）。
 
-下表的角色及阶段均来自 `skills/create-agent/templates` 中定义的角色模板（`agent-role-*`）与阶段（Stage）模板（历史上曾命名 `agent-subrole-*`，现已重命名为 `agent-stage-*`）：
+**Type-follows-Stage（类型由阶段决定）**：Type 不是独立选择的，而是由 Stage 推导——
+Worker 角色处于 **执行者** 阶段时为 Worker，处于 **评估者 / 优化者** 阶段时切换为 Meta；
+Meta 角色（Team Supervisor）不承担实际任务，各阶段恒为 Meta。
+
+### 2.2 两种组织结构
+
+- **Team（团队，静态结构）**：多个 Agent 在静态结构上组成的团队，可用一张 Role×Stage 二维矩阵表达（见 §三），含一个负责整体评估与协调的 Team Supervisor。
+- **Loop（循环，动态结构）**：多 Agent 在运行时形成的迭代循环，每个循环跨越多个 Stage；同一角色在不同阶段扮演不同 Type，或由多个 Agent 分别承担不同 Stage。Loop 的运行机制见 [eei-triad-pattern.md](./eei-triad-pattern.md)。
+
+## 三、Team 的二维矩阵表达
+
+一个 Team 可用一张二维表格描述：**每一行代表一个 Agent（按 Role 划分）**，
+**每一列代表工作过程中的一个 Stage**，**整张表格整体代表一个团队**。
+行列交叉的单元格用 **Worker** / **Meta** 表示该 Agent 在对应阶段的 Type 属性。
+
+下表的角色与阶段均来自 `skills/create-agent/templates/` 中的角色模板（`agent-role-*`）
+与阶段模板（`agent-stage-*`）：
 
 | Agent 角色（Role） \ Stage | 执行者（Executor） | 评估者（Evaluator） | 优化者（Optimizer） |
 | --- | --- | --- | --- |
@@ -52,77 +61,83 @@
 
 说明：
 
-- **行 = Role**：每个 Agent 占一行，对应模板中的一个 `agent-role-*` 角色。前七个为 Worker 角色，最后一个 **团队监督者（Team Supervisor）** 为 Meta 角色——它由原「元协调器（Meta-Coordinator）」与「团队监督者（Team Supervisor）」合并而来，统一承担任务协调与团队监督职责。
-- **列 = Stage**：对应模板中的三个 Stage——执行者（executor）、评估者（evaluator）、优化者（optimizer）。
-- **单元格 = Type**：Worker 角色在执行者阶段为 **Worker**，在评估者/优化者阶段切换为 **Meta**；Meta 角色（Team Supervisor）不承担实际任务执行，各阶段均为 **Meta**。
+- **行 = Role**：每个 Agent 占一行。前 7 行为 **Worker 角色**，最后一行 **团队监督者（Team Supervisor）** 为**唯一的 Meta 角色**——它由原「元协调器（Meta-Coordinator）」与「团队监督者（Team Supervisor）」**合并**而来，统一承担任务协调与团队监督职责；框架中不再存在独立的 Meta-Coordinator。
+- **列 = Stage**：对应三个阶段——执行者（executor）、评估者（evaluator）、优化者（optimizer）。
+- **单元格 = Type**：遵循 Type-follows-Stage——Worker 角色在执行者阶段为 **Worker**，在评估者/优化者阶段为 **Meta**；Team Supervisor 各阶段均为 **Meta**。
 
-## 三、实现细节
+> **关于 UX Analyst**：用户体验分析师（UX Analyst）是内置的第 7 个 Worker 角色，负责分析与优化
+> **所有用户接口**——不仅是前端 / GUI 页面，也包括命令行（CLI）设计，以及 `/command` 与 skill 等
+> 与用户交互的部分。它以需求为输入、并评审既有接口，向 System Designer 与 Module Designer 输出
+> 跨全部用户界面（前端、CLI、命令、技能）的 UX 规范与交互契约。
+>
+> 早期重设计 spec（023）曾依据决策 **D1** 将其暂缓（deferred）；该决策现已被本次实现取代——
+> UX Analyst 已作为内置角色落地：模板 `agent-role-ux-analyst-template.md` 与持久化 Agent
+> `.specify/agents/ux-analyst.agent.md` 均已提供。
 
-### 3.1 核心结构
+## 四、Agent 的两种生命周期
 
-- `templates/commands/agents.md`：`/speckit.agents` 命令的实现。
-- `skills/create-agent` 技能：根据模板创建 agent。
-- `skills/improve-agent` 技能：优化 agent。
+1. **临时 Agent（temporary）**：仅在当前上下文中记录，随会话结束而消失。
+2. **持久化 Agent（persistent）**：保存到项目的 Agent 目录 `.specify/agents/`，可跨会话复用。
 
-### 3.2 Agent 的结构化描述（三个属性维度）
+持久化 Agent 以 `.specify/agents/` 为**唯一真源**，并通过 `specify init`（或安装流程）为各工具建立软链接。
+以 qoder 工具为例，`.qoder/agents -> .specify/agents`；`.github/agents`、`.qwen/agents`、`.opencode/agents`
+同样是指向 `.specify/agents/` 的软链接。目录与注册表细节见 [templates-and-agents.md](./templates-and-agents.md)。
 
-定义一个 Agent 时，应从三个正交的属性维度进行描述：
+## 五、多 Agent 使用场景
 
-1. **Role（角色）**：定义 Agent 承担的职责以及看问题的视角。
-2. **Stage（阶段）**：同一角色在执行过程中的三种 Stage——执行者、评估者、优化者。
-3. **Type（类型）**：区分 **Worker Agent（工作 Agent）** 和 **Meta Agent（元 Agent）**：
-   - **Worker Agent**：处理项目中的实际任务。
-   - **Meta Agent**：优化和处理其他 Agent。Supervisor Agent 就是一种 Meta Agent，其作用是监控整个团队的运作情况和其他 Agent 的表现。
+框架支持三类多 Agent 协作拓扑，全部经由 `organize-agents` 技能落地（操作细节见
+[multi-agent-orchestration.md](./multi-agent-orchestration.md)）：
 
-**Type 与 Stage 的关联**：在一个迭代流程中，同一个 Agent 的 type 会随阶段切换——处于**执行者**阶段时它是 Worker Agent，处于**评估者**和**优化者**阶段时它是 Meta Agent。
+1. **并行操作（Parallel Dispatch）**：多个 Agent 并行执行，通过并行度提升效率（领域隔离 → 并行派发 → 结果聚合）。
+2. **串行操作（Serial Chain）**：多个 Agent 串行执行，每个 Agent 负责一个阶段性工作，互相配合完成复杂而长期的任务（阶段 N 的产物作为阶段 N+1 的输入）。
+3. **团队闭环（Team Loop）**：多个 Agent 组织成一个团队，构成闭环可自迭代的系统。该系统为**两层结构**：
+   - **监督 + 协调层**：Team Supervisor（Meta 角色）——质量门禁、收敛决策、任务分解、Agent 派发、进度监控；
+   - **执行层**：Worker Agents（7 个预置角色 + 自定义 Agent）——产出交付物。
 
-### 3.3 speckit.agents 命令工作流程
+## 六、实现结构
 
-`/speckit.agents` 作为唯一命令入口，工作流程如下：
+### 6.1 唯一命令入口
 
-1. **识别用户意图**：根据用户输入首先进行意图识别。
-2. **设计团队结构**：识别到用户意图后，根据分析结果设计整体 Agent 团队的结构。
-3. **调用 create-agent 技能**：根据模板创建对应工具的 agent 配置。
-4. **调用 organize-agents 技能**：将这些 agent 组织（编排）起来。
+`/speckit.agents` 是所有 Agent 相关操作的**唯一命令入口**，不新增其他命令。其职责是
+**识别用户意图 → 委派给对应技能**，本身不内联渲染模板。工作流程：
 
-命令实现的基本结构可概括为：1）识别用户意图；2）调用 create-agent 技能创建对应工具的 agent 配置；3）调用 organize-agents 技能将 agent 组织起来。
+1. **识别用户意图**：分析用户输入，判断是创作、优化还是编排。
+2. **设计/确定团队结构**：根据意图确定所需角色与协作拓扑。
+3. **调用 `create-agent` 技能**：按模板创建对应工具的 Agent 配置。
+4. **调用 `organize-agents` 技能**：将这些 Agent 按 parallel / serial / team-loop 编排起来。
 
-### 3.4 Agent 的两种类型与持久化
+命令与路由细节见 [command-and-skills.md](./command-and-skills.md)。
 
-Agent 分为两种：
+### 6.2 三个技能
 
-1. **临时 Agent**：在上下文中进行记录即可。
-2. **持久化 Agent**：需要在项目对应的 Agent 目录中进行持久化。
+- **`create-agent`**：创作引擎——按 `Role × Stage × Type` 从模板生成 role / supervisor / triad / custom / team-supervisor 等 Agent。
+- **`improve-agent`**：优化引擎——基于真实使用反馈精炼任意 Agent 制品（角色模板 / 阶段模板 / 编排提示 / 监督片段 / 自定义 Agent）。
+- **`organize-agents`**：编排引擎——实现并行、串行、团队闭环三种拓扑。
 
-持久化的 Agent 需要保存到项目对应的目录 `.specify/agents` 中，然后再根据具体使用的工具情况，通过 `specify init` 命令进行对应工具的配置。针对 qoder 工具（当前使用的工具），是通过 `.qoder/agents -> .specify/agents` 的软链接来实现的。
+### 6.3 模板归位
 
-### 3.5 多 Agent 使用场景
+所有 `agent-*` 模板已从顶层模板目录迁移至 **`skills/create-agent/templates/`**，作为 create-agent 技能的一部分；
+安装时镜像到 `.specify/skills/create-agent/templates/`。完整模板目录见 [templates-and-agents.md](./templates-and-agents.md)。
 
-常用的多 Agent 场景有三类：
+## 七、术语统一（规范化）
 
-1. **并行操作**：多个 Agent 并行执行，主要为了通过并行度提高效率。
-2. **串行操作**：多个 Agent 串行执行，每个 Agent 负责一个阶段性工作，互相配合完成一个复杂而长期的任务。
-3. **团队闭环**：多个 Agent 组织成一个团队，最终构成一个闭环可自迭代的系统。此场景下 agent 分为三类：
-   - 实际工作的 Agent；
-   - 优化技能和其他 Agent 的「元 Agent」；
-   - 负责评估和打分的 Supervisor Agent。
+术语统一是本框架消除概念混乱的关键步骤。**当前唯一被接受的术语**如下（旧术语仅在迁移说明中作为历史上下文出现）：
 
-### 3.6 调研任务
+1. **废弃 SubRole，统一使用 Stage**：同一角色在执行中的阶段统一称为 **Stage**，不再使用 SubRole / Subrole。
+2. **improver 统一为 optimizer**：优化者阶段的英文名统一为 **optimizer**（执行者 executor、评估者 evaluator 不变）。
+3. **Meta-Coordinator 合并入 Team Supervisor**：不再存在独立的 Meta-Coordinator，其协调职责并入唯一的 Meta 角色 Team Supervisor。
 
-针对上述目标，使用多 Agent 进行调研：`/cws_work/` 目录中的各个项目都是和 agent 相关的项目，其中有很多相关的最佳实践。除 `/cws_work/spec-kit` 目录外，需要为每个目录分配一个 agent 进行挖掘。调研结论需要和现有的 agent 相关机制进行融合，**不要创建新的命令**，所有 agent 相关操作都以 `speckit.agents` 命令作为唯一入口。
+历史迁移落地记录（供追溯）：
 
-### 3.7 模板迁移
+- `agent-subrole-*.md` 已重命名为 `agent-stage-*.md`；
+- `agent-subrole-improver-template.md` 已重命名为 `agent-stage-optimizer-template.md`，内部 `name`/`description` 中的 improver 同步改为 optimizer；
+- `skills/create-agent/SKILL.md`、各编排模板及 `tests/` 中的旧术语（subrole / improver）引用均已迁移。
 
-将各式各样的 `templates/agent-*` 模板，迁移到 `/cws_work/spec-kit/skills/create-agent/templates` 目录中，作为 create-agent 技能的一部分。
+> 守卫测试 `tests/unit/test_agent_deprecated_terms.py` 会持续扫描废弃术语，确保上述规范在所有 live 制品中长期成立。
 
-### 3.8 名词统一（术语规范化）
+## 八、可追溯性
 
-名词统一是本改造方案的一个重要步骤，用于消除当前概念混乱。统一规则如下：
-
-1. **废弃 SubRole，统一使用 Stage**：文档与后续实现中不再使用 SubRole / Subrole 这一描述，同一角色在执行过程中的阶段统一称为 **Stage**。
-2. **improver 统一为 optimizer**：优化者阶段的英文名统一从 improver 改为 **optimizer**（执行者 executor、评估者 evaluator 保持不变）。
-3. **落地记录**（术语统一已在后续实现中完成，历史步骤记录如下）：
-   - 模板目录下 `agent-subrole-*.md` 已重命名为 `agent-stage-*.md`；
-   - `agent-subrole-improver-template.md` 已重命名为 `agent-stage-optimizer-template.md`，内部 `name`/`description` 中的 improver 同步改为 optimizer；
-   - 已完成 `skills/create-agent/SKILL.md`、各编排模板及 `tests/` 中旧术语（subrole / improver）引用的迁移更新。
-
+本文档的规范来源为重设计 spec：`.specify/specs/023-agent-framework-redesign/`——
+参见 `requirements.md`、`data-model.md` 及
+`contracts/{conceptual-model,agents-command,template-migration}-contract.md`。
+决策记录见该 spec 的相关文档；其中 UX Analyst 暂缓的决策 **D1** 已被本次实现取代（UX Analyst 现为内置 Worker 角色）。

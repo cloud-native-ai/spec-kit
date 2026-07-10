@@ -19,6 +19,7 @@ from specify_cli import ensure_specify_symlink
 REPO_ROOT = Path(__file__).parent.parent.parent
 PERSISTED_ROLES = [
     "requirements-analyst",
+    "ux-analyst",
     "system-designer",
     "module-designer",
     "test-engineer",

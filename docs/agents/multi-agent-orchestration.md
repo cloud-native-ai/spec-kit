@@ -12,6 +12,8 @@ Spec Kit supports three orchestration patterns for coordinating multiple AI agen
 
 Each mode addresses a different collaboration topology. They can also be composed — e.g., a Serial Chain where individual stages internally use Parallel Dispatch.
 
+> All three modes are entered through the single `/speckit.agents` command and executed by the `organize-agents` skill (see [command-and-skills.md](./command-and-skills.md)). The **Team Loop** is a team-level application of the quality loop detailed in [eei-triad-pattern.md](./eei-triad-pattern.md); its two layers (Team Supervisor + Workers) and the merged Team Supervisor come from [design.md](./design.md).
+
 ---
 
 ## Decision Tree
@@ -327,3 +329,15 @@ Instead of passing full context between agents in prompts:
 - **Parallel Dispatch failure**: Re-dispatch only the failed worker; successful workers' output is preserved.
 - **Serial Chain failure**: Resume from the last successful stage (checkpoint artifacts enable this).
 - **Team Loop divergence**: Reset to the highest-scoring iteration's artifact and retry with adjusted dimensions.
+
+---
+
+## Related Documents & Traceability
+
+- Concept model (Role × Stage × Type, Team/Loop, merged Team Supervisor): [design.md](./design.md)
+- Command entry point, routing, and the `organize-agents` skill: [command-and-skills.md](./command-and-skills.md)
+- The per-role quality loop this builds on: [eei-triad-pattern.md](./eei-triad-pattern.md)
+- Orchestration templates and the agent registry: [templates-and-agents.md](./templates-and-agents.md)
+
+Normative source: `.specify/specs/023-agent-framework-redesign/` and the orchestration templates
+`skills/create-agent/templates/agent-{parallel,serial,triad}-orchestration-template.md`.

@@ -65,7 +65,7 @@ Analyze the conversation history and project context to infer a useful role:
 
 - Check `skills/create-agent/templates/agent-role-*-template.md` for existing roles
 - If a similar role exists, suggest updating it via `improve-agent` instead
-- Ensure the new role does not overlap significantly with the six preset roles
+- Ensure the new role does not overlap significantly with the seven preset roles
 
 ### 3. Create the template file
 

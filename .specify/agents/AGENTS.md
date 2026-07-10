@@ -7,6 +7,7 @@ This file tracks all agents in the Spec Kit workspace. Agents are stored as `.ag
 | Name | Description | Path | Status |
 |------|-------------|------|--------|
 | Requirements Analyst | Analyzes and clarifies requirements, translating business needs into structured specifications. | `.specify/agents/requirements-analyst.agent.md` | Active |
+| UX Analyst | Analyzes and optimizes all user interfaces — front-end/GUI, CLI design, and command/skill interaction surfaces. | `.specify/agents/ux-analyst.agent.md` | Active |
 | System Designer | Designs system-level architecture and implementation approaches from requirements. | `.specify/agents/system-designer.agent.md` | Active |
 | Module Designer | Designs and implements detailed module-level changes within interface boundaries. | `.specify/agents/module-designer.agent.md` | Active |
 | Test Engineer | Designs, writes, and executes tests validating implementations against specifications. | `.specify/agents/test-engineer.agent.md` | Active |
@@ -17,11 +18,13 @@ This file tracks all agents in the Spec Kit workspace. Agents are stored as `.ag
 
 ```
 Requirements Analyst → System Designer → Module Designer → Test Engineer → QA Engineer
-                                                         ↑                     ↓
-                                                         └── feedback loop ────┘
-                                                                                    ↓
-                                                              Knowledge Manager (all roles)
+                                  ↑      ↑                                  ↑                     ↓
+                     UX Analyst ──┘      └── (interaction contracts)        └── feedback loop ────┘
+                                                                                                   ↓
+                                                                         Knowledge Manager (all roles)
 ```
+
+UX Analyst is a cross-cutting design-phase Worker: it takes requirements (and reviews proposed interfaces), then feeds UX specifications and interaction contracts for **all** user surfaces (front-end/GUI, CLI, commands, skills) to the System Designer and Module Designer.
 
 ## Multi-Agent Orchestration Modes
 

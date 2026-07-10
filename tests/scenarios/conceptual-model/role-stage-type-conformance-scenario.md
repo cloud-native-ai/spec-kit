@@ -33,6 +33,7 @@ deprecated_terms_removed: [SubRole, Subrole, improver, "Meta-Coordinator (as a r
 ```yaml
 role_templates:
   - agent-role-requirements-analyst-template.md
+  - agent-role-ux-analyst-template.md
   - agent-role-system-designer-template.md
   - agent-role-module-designer-template.md
   - agent-role-test-engineer-template.md
