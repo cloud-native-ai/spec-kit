@@ -22,12 +22,9 @@ wheels/
 
 # Virtual environments
 venv/
-ENV/
-env/
-.venv
 .venv/
 
-# IDE
+# IDE / Editor
 .vscode/
 .idea/
 *.swp
@@ -38,8 +35,6 @@ Thumbs.db
 
 # Project specific
 *.log
-.env
-.env.local
 .env*
 *.lock
 tmp/
@@ -48,8 +43,6 @@ output/
 # Spec Kit-specific files
 .genreleases/
 *.zip
-sdd-*/
-
 .specify/tools/
 .migration-backups/
 
