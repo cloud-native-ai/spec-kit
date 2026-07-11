@@ -8,7 +8,7 @@ This project documentation is distributed across several key files. You MUST ref
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
 | **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | 7 core principles (SDD foundation, Feature-Centric, Intent-Driven, Test-First, AI Agent Integration, Quality/Observability, SDD Workflow) and governance rules |
-| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | 22 features tracking /speckit.* commands, AI tool support (Claude/Qoder/Qwen/opencode/Copilot), MCP, skills, and core capabilities |
+| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | 25 features tracking /speckit.* commands, AI tool support (Claude/Qoder/Qwen/opencode/Copilot), MCP, skills, and core capabilities |
 | **Feature Details** | `.specify/memory/features/<ID>.md` | Per-feature deep dives | Overview, key changes, implementation notes, status criteria |
 | **Readme** | `README.md` | Project entry point | Spec-Driven Development overview, supported AI agents, feature list, installation pointer |
 | **Installation** | `docs/installation.md` | How to install the CLI | Setup steps for the `specify` CLI |
@@ -40,20 +40,21 @@ Escalation rules:
 
 ## Tech Stack & Resources
 - **Project Name**: spec-kit (distributed as `specify-cli`)
-- **Root Path**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+- **Root Path**: /storage/project/cloud-native-ai/spec-kit
 - **Languages**: Python `>=3.8` (per `pyproject.toml`)
-- **Build / Packaging**: `hatchling` (PEP 517). Recommended install via `uv tool install` or `pipx`; runtime is published as `specify-cli` with entrypoint `specify = "specify_cli:main"`.
+- **Build / Packaging**: `hatchling` (PEP 517). Recommended install via `uv tool install` or `pipx`; runtime is published as `specify-cli` (version `0.0.22`) with entrypoint `specify = "specify_cli:main"`.
 - **Runtime Dependencies**: `typer` (CLI framework), `rich` (TTY rendering), `httpx[socks]` (HTTP for template/release fetch), `platformdirs`, `readchar`, `truststore` (Python ≥ 3.10).
 - **Test Framework**: `pytest` with markers `contract` and `integration` (see `pyproject.toml` → `[tool.pytest.ini_options]`). Run with `pytest` or `pytest -m contract` / `pytest -m integration`.
 - **Key Directories**:
-  - `src/specify_cli/`: single-module CLI implementation (`__init__.py`, ~1.8k LOC; Typer commands live here).
+  - `src/specify_cli/`: single-module CLI implementation (`__init__.py`; Typer commands live here).
   - `templates/`: Source-of-truth templates packaged into the wheel (constitution, plan, requirements, tasks, agent variants, `commands/` for /speckit.* prompts, plus tool/skill templates).
   - `scripts/bash/` and `scripts/python/`: Repeatable workflow scripts mirrored from `.specify/scripts/`. Use these for shell automation; never call `/speckit.*` as a shell command.
-  - `skills/`: Installed Spec Kit skills (analysis-project, create-skills, improve-skills, draw-d3js, draw-echarts, draw-plantuml). Mirrored to `.specify/skills/` via package install; `.github/skills/` is a compatibility symlink.
+  - `skills/`: Installed Spec Kit skills (17 total, e.g. analysis-project, create-agent, create-skills, improve-agent, improve-skills, organize-agents, sdd-workflow, think-skills, git-workflow, git-submodule-edit, browser-utils, database-utils, document-utils, draw-d3js, draw-echarts, draw-plantuml, extension-e2e-test). Mirrored to `.specify/skills/` via package install; `.github/skills/` is a compatibility symlink.
+  - `agents/`: Role-based agent definitions (`*.agent.md`) mirrored to `.specify/agents/`.
   - `tests/`: `contract/`, `contracts/`, `integration/`, `unit/`, with shared `conftest.py`, `fixtures/`, `script_api.py`.
   - `memory/`: Default in-package memory shipped with the CLI; the canonical project memory lives at `.specify/memory/` (constitution, features, features/<ID>.md).
   - `docs/`: User-facing documentation (see Documentation Map above).
-  - `.specify/`: Project runtime — `instructions.md` (this file), `memory/`, `skills/`, `scripts/`, `specs/<NNN-feature-slug>/`, `templates/`. Treat as the canonical workspace; ignore any `.specify/` inside subdirectories.
+  - `.specify/`: Project runtime — `instructions.md` (this file), `memory/`, `skills/`, `agents/`, `scripts/`, `specs/<NNN-feature-slug>/`, `templates/`. Treat as the canonical workspace; ignore any `.specify/` inside subdirectories.
 
 # Tool And Skills Usage Guide
 > **Note**: Tool and Skills details are injected into prompts by the agent when needed. This section is guidance only.

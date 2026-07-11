@@ -36,6 +36,8 @@ Agents are expressed with the **Role × Stage × Type** model, organized statica
 
 1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: is this *authoring* (create/refine) or *orchestration* (organize/execute)?
 2. **Authoring** → check `.specify/agents/<name>.agent.md` existence: absent → `create-agent`; present → `improve-agent`. Build the `AgentAuthoringRequest`, handle backup/preservation, write to `.specify/agents/`, verify per-file symlinks.
+   - **Confirm the authoring mode** before generating when the request is not unambiguous: offer `role`, `supervisor`, `triad`, `team-supervisor`, `custom` (narrow, general-purpose), or `project-custom` (project-bound). Do NOT guess the mode silently.
+   - **`project-custom`** produces an agent from `skills/create-agent/templates/agent-project-custom-template.md`. It MUST be marked with its bound project via the `project:` frontmatter field and MUST keep the `## Project Scope Guard` section, so it warns the user when later invoked in a different project. Its creation flow is intentionally flexible — no fixed section list beyond the guard.
 3. **Orchestration** → identify topology (parallel / serial / team-loop) and delegate to `organize-agents`, which selects the matching orchestration template.
 4. **Ambiguous / unsupported** → see below.
 
@@ -84,6 +86,8 @@ Agents are expressed with the **Role × Stage × Type** model, organized statica
 
 1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: is this *authoring* (create/refine) or *orchestration* (organize/execute)?
 2. **Authoring** → check `.specify/agents/<name>.agent.md` existence: absent → `create-agent`; present → `improve-agent`. Build the `AgentAuthoringRequest`, handle backup/preservation, write to `.specify/agents/`, verify per-file symlinks.
+   - **Confirm the authoring mode** before generating when the request is not unambiguous: offer `role`, `supervisor`, `triad`, `team-supervisor`, `custom` (narrow, general-purpose), or `project-custom` (project-bound). Do NOT guess the mode silently.
+   - **`project-custom`** produces an agent from `skills/create-agent/.specify/templates/agent-project-custom-template.md`. It MUST be marked with its bound project via the `project:` frontmatter field and MUST keep the `## Project Scope Guard` section, so it warns the user when later invoked in a different project. Its creation flow is intentionally flexible — no fixed section list beyond the guard.
 3. **Orchestration** → identify topology (parallel / serial / team-loop) and delegate to `organize-agents`, which selects the matching orchestration template.
 4. **Ambiguous / unsupported** → see below.
 
@@ -129,7 +133,7 @@ maxTurns: 12
 ---
 ```
 
-Supported fields: `name` (required), `description` (required), `tools`, `disallowedTools`, `model` (`auto`/`lite`/`efficient`/`performance`/`ultimate`), `maxTurns`, `timeoutMins`, `skills`, `mcpServers`, `permissionMode`, `background`, `isolation`, `color`, plus the framework fields `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`.
+Supported fields: `name` (required), `description` (required), `tools`, `disallowedTools`, `model` (`auto`/`lite`/`efficient`/`performance`/`ultimate`), `maxTurns`, `timeoutMins`, `skills`, `mcpServers`, `permissionMode`, `background`, `isolation`, `color`, plus the framework fields `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`, `project` (the last binds a `project-custom` agent to its project).
 
 ### Valid File Locations
 
