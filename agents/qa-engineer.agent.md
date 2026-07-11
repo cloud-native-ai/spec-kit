@@ -5,7 +5,7 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: qa-engineer
-model: inherit
+model: auto
 tools: [Read, Grep, Glob, Bash]
 maxTurns: 10
 color: orange

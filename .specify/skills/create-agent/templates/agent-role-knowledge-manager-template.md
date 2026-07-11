@@ -5,7 +5,7 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: knowledge-manager
-model: inherit
+model: auto
 tools: [Read, Grep, Glob, Write, Edit]
 maxTurns: 10
 color: teal

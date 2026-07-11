@@ -128,11 +128,11 @@ As of the 2026-07-02 amendment, the triad is no longer a standalone pattern bolt
 
 ### Authoring path
 
-`create-agent` and `improve-agent` are **general-purpose authoring skills** (capabilities: role · supervisor · triad · custom). The `/speckit.agents` command does not render templates inline — it gathers project context and **delegates** to these skills (see `.specify/specs/022-eei-agent-triad/contracts/agent-authoring-contract.md`). To generate a supervisor:
+`create-agent` and `improve-agent` are **general-purpose authoring skills** (capabilities: role · supervisor · triad · custom · project-custom · team-supervisor). The `/speckit.agents` command does not render templates inline — it gathers project context and **delegates** to these skills (see `.specify/specs/022-eei-agent-triad/contracts/agent-authoring-contract.md`). To generate a supervisor:
 
 ```
-/speckit.agents           # Mode A: each role generated as kind:supervisor (default)
-/speckit.agents "make a security-auditor supervisor that optimizes its audit report"  # Mode B → create-agent kind:supervisor
+/speckit.agents           # no intent: each role generated as kind:supervisor (default)
+/speckit.agents "make a security-auditor supervisor that optimizes its audit report"  # intent → create-agent kind:supervisor
 ```
 
 ## Template Reference

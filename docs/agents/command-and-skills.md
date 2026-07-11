@@ -63,7 +63,8 @@ templates under `skills/create-agent/templates/`:
 | `role` | One role-based agent (six mandatory sections) | `agent-role-*-template.md` |
 | `supervisor` | A role agent that runs its own EEI loop | role template + `agent-supervision-delegation.md` (inlined) |
 | `triad` | 3 stage agents (executor/evaluator/optimizer) + orchestration prompt | `agent-stage-*` + `agent-triad-orchestration-template.md` |
-| `custom` | A single narrow custom `.agent.md` | free-form per intent |
+| `custom` | A single narrow, general-purpose custom `.agent.md` (not project-bound) | free-form per intent |
+| `project-custom` | A project-bound custom agent (marks its project + carries a scope guard) | `agent-project-custom-template.md` |
 | `team-supervisor` | The merged Team Supervisor (Meta role) | `agent-role-team-supervisor-template.md` |
 
 Key rules:
@@ -138,13 +139,13 @@ Every agent `create-agent` can produce has one of two lifecycles; choose it befo
   name: "<required: unique identifier>"
   description: "<required: trigger words + when to use>"
   tools: [Read, Grep, Glob]
-  model: inherit
+  model: auto
   maxTurns: 12
   ---
   ```
 
   Supported fields: `name` (required), `description` (required), `tools`, `disallowedTools`,
-  `model` (`inherit`/`auto`/`lite`/`performance`), `maxTurns`, `timeoutMins`, `skills`,
+  `model` (`auto`/`lite`/`efficient`/`performance`/`ultimate`), `maxTurns`, `timeoutMins`, `skills`,
   `mcpServers`, `permissionMode`, `background`, `isolation`, `color`, plus the framework fields
   `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`. Validation rejects
   invalid YAML, unsupported providers, and unresolved contradictions.

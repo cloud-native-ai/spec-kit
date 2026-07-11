@@ -5,7 +5,7 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: requirements-analyst
-model: inherit
+model: auto
 tools: [Read, Grep, Glob, Write, Edit]
 maxTurns: 10
 color: blue

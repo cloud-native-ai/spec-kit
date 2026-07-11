@@ -5,7 +5,7 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: test-engineer
-model: inherit
+model: auto
 tools: [Read, Grep, Glob, Bash, Write, Edit]
 maxTurns: 15
 color: yellow

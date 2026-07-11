@@ -5,7 +5,7 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: system-designer
-model: inherit
+model: auto
 tools: [Read, Grep, Glob, Write, Edit]
 maxTurns: 12
 color: purple

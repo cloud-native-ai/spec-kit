@@ -68,12 +68,12 @@ The Team closed-loop has **two layers**: Team Supervisor (Meta role) + Workers. 
 name: "<required: unique identifier>"
 description: "<required: trigger words + when to use>"
 tools: [Read, Grep, Glob]
-model: inherit
+model: auto
 maxTurns: 12
 ---
 ```
 
-Supported fields: `name` (required), `description` (required), `tools`, `disallowedTools`, `model` (`inherit`/`auto`/`lite`/`performance`), `maxTurns`, `timeoutMins`, `skills`, `mcpServers`, `permissionMode`, `background`, `isolation`, `color`, plus the framework fields `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`.
+Supported fields: `name` (required), `description` (required), `tools`, `disallowedTools`, `model` (`auto`/`lite`/`efficient`/`performance`/`ultimate`), `maxTurns`, `timeoutMins`, `skills`, `mcpServers`, `permissionMode`, `background`, `isolation`, `color`, plus the framework fields `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`.
 
 ### Valid File Locations
 

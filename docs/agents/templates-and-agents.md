@@ -81,7 +81,7 @@ Each generated role agent (example: `requirements-analyst.agent.md`) contains:
 
 - **Frontmatter**: `name`, `description`, `user-invocable`, `disable-model-invocation`,
   `supervisor: true`, `role-scope: <slug>`, plus Qoder-compatible fields `model` (default
-  `inherit`), `tools`, `maxTurns`, and `color`. Optional Qoder fields (`disallowedTools`,
+  `auto`), `tools`, `maxTurns`, and `color`. Optional Qoder fields (`disallowedTools`,
   `timeoutMins`, `skills`, `mcpServers`, `permissionMode`, `background`, `isolation`) are
   available but unset by default.
 - **Role / Stage / Type** section — states the role's Type and its per-stage Type

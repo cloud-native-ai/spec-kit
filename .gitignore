@@ -49,3 +49,4 @@ output/
 # Node / Playwright skill runtime artifacts
 node_modules/
 **/.temp-execution-*.js
+.specify/tools/*.json

@@ -5,6 +5,130 @@ The single entry point for **all** agent operations — create, refine, organize
 ## When to Use
 
 - After `specify init` to generate project-aware role-based agents
+- When you need a custom agent for a specialized workflow (generic `custom`) or a **project-specific** agent tailored to one project (`project-custom`)
+- When you want to organize agents into a parallel, serial, or team-loop topology
+- When you want to execute a team or run a team closed-loop
+- When project context has changed and agents need to be refreshed
+
+## Conceptual Model
+
+Agents are expressed with the **Role × Stage × Type** model:
+
+- **Role** — the domain responsibility (e.g. Requirements Analyst, Team Supervisor)
+- **Stage** — the lifecycle stage the agent operates in (executor / evaluator / optimizer)
+- **Type** — follows the Stage (executor→Worker, evaluator→Meta, optimizer→Meta)
+
+Agents are organized statically as a **Team** (a Role×Stage matrix) and dynamically as a **Loop** (iterative refinement to a quality threshold).
+
+Not every agent fits the preset Role×Stage grid. When a project's needs fall outside it, author a **custom** agent (narrow, general-purpose) or a **project-custom** agent (bound to a single project). See [Authoring Modes](#authoring-modes).
+
+## Syntax
+
+```text
+/speckit.agents                    # infer intent from context (e.g. generate role-based agents)
+/speckit.agents [intent]           # natural-language intent → routed to the matching skill
+```
+
+## Intent Routing
+
+| Recognized intent | Capability | Skill |
+|-------------------|------------|-------|
+| Create a new agent | authoring | `create-agent` |
+| Refine / improve an existing agent | authoring | `improve-agent` |
+| Organize agents — parallel | orchestration | `organize-agents` |
+| Organize agents — serial chain | orchestration | `organize-agents` |
+| Execute a team / run a team closed-loop | orchestration | `organize-agents` |
+
+The command **delegates to skills** and never renders templates inline. On ambiguous or unsupported intent it reports the recognized capabilities (create / refine / organize / execute) and requests the missing intent — it never guesses silently.
+
+## Authoring Modes
+
+When creating an agent, `create-agent` supports several **modes** (`kind`). If the request does not clearly map to one, `/speckit.agents` **confirms which mode you want before generating** — it never guesses the mode silently:
+
+| Mode (`kind`) | Produces |
+|---------------|----------|
+| `role` | One of the seven preset role-based agents (or a new role) |
+| `supervisor` | A role agent that runs its own EEI loop |
+| `triad` | Three stage agents (executor/evaluator/optimizer) + orchestration prompt |
+| `team-supervisor` | The merged Team Supervisor (Meta role) |
+| `custom` | A single narrow, **general-purpose** custom agent (not bound to a project) |
+| `project-custom` | A **project-bound** custom agent for one specific project |
+
+### Project-Custom Agents
+
+Different projects often need very different agents, so `project-custom` creation follows a **flexible flow** (not a fixed sequence). Two things are always mandatory:
+
+- **Project marking** — the agent is generated from `skills/create-agent/templates/agent-project-custom-template.md` and MUST record its bound project in the `project:` frontmatter field.
+- **Project Scope Guard** — the agent keeps a `## Project Scope Guard` section that, at invocation, resolves the current project (from `.specify/instructions.md`, the constitution, or `README.md`) and compares it to the bound project. On a mismatch it warns the user prominently and requests explicit confirmation before proceeding, rather than running silently in a project it was not built for.
+
+Everything else (purpose, workflow, output format) is free-form and adapts to the project.
+
+## Collaboration Topologies
+
+- **parallel** — many agents dispatched together (single response, many delegations)
+- **serial** — an ordered chain where each stage's output feeds the next
+- **team closed-loop** — Worker agents + Meta agents + a single **Team Supervisor** iterate until a quality threshold is met
+
+The Team closed-loop has **two layers**: Team Supervisor (Meta role) + Workers. The former Meta-Coordinator has been **merged into the Team Supervisor**.
+
+## Lifecycle: Temporary vs Persistent
+
+| Lifecycle | Behavior |
+|-----------|----------|
+| Temporary | Lives only in conversation context; not written to the agent directory |
+| Persistent | Written under `.specify/agents/` and made available to all officially supported tools on initialization |
+
+## Role-Based Generation
+
+With no explicit intent, `/speckit.agents` generates the seven role-based workflow agents, populated with the current project's context:
+
+| Agent | File | Role |
+|-------|------|------|
+| Requirements Analyst | `requirements-analyst.agent.md` | Clarifies and structures requirements from stakeholder input |
+| UX Analyst | `ux-analyst.agent.md` | Analyzes and optimizes all user interfaces — front-end/GUI, CLI, commands, and skills |
+| System Designer | `system-designer.agent.md` | Designs system-level architecture and implementation approaches |
+| Module Designer | `module-designer.agent.md` | Designs detailed implementations within specific modules |
+| Test Engineer | `test-engineer.agent.md` | Designs and executes acceptance tests |
+| QA Engineer | `qa-engineer.agent.md` | Validates system quality against design and requirements |
+| Knowledge Manager | `knowledge-manager.agent.md` | Maintains documentation and project knowledge |
+
+## Output Artifacts
+
+| Artifact | Location |
+|----------|----------|
+| Agent files | `.specify/agents/<name>.agent.md` |
+| Shared assets | `.specify/agents/references/` |
+
+## Symlink Model
+
+Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/` (never write framework agents into them directly):
+
+- `.github/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Copilot, Claude Code)
+- `.qoder/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qoder)
+- `.qwen/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qwen Code)
+- `.opencode/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (opencode)
+- (and `.hermes/agents/`, `.iflow/agents/` where supported)
+
+## Companion Skills
+
+- `create-agent` — author new role-based, custom, or project-custom agents (canonical templates in `skills/create-agent/templates/`)
+- `improve-agent` — iteratively improve an existing agent from execution feedback
+- `organize-agents` — arrange and execute agents in parallel / serial / team-loop topologies
+
+## Prerequisites
+
+- `specify init` (project initialized)
+
+## Next Steps
+
+- Run [`/speckit.instructions`](instructions.md) to refresh discovery metadata
+# /speckit.agents
+
+The single entry point for **all** agent operations — create, refine, organize, and execute agents. No other agent-specific command exists; `/speckit.agents` recognizes your intent and routes it to the owning skill.
+
+## When to Use
+
+- After `specify init` to generate project-aware role-based agents
 - When you need a custom agent for a specialized workflow
 - When you want to organize agents into a parallel, serial, or team-loop topology
 - When you want to execute a team or run a team closed-loop

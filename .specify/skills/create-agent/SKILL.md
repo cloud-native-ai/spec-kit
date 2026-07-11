@@ -1,6 +1,6 @@
 ---
 name: create-agent
-description: General-purpose authoring skill for Spec Kit agents — creates role, supervisor (role + embedded EEI triad), triad sub-role, or custom agents. Use this when the user mentions ["create an agent", "new agent", "add agent role", "agent template", "supervisor agent", "EEI triad", "创建agent", "新建agent", "添加角色"]
+description: General-purpose authoring skill for Spec Kit agents — creates role, supervisor (role + embedded EEI triad), triad sub-role, custom, or project-specific (project-custom) agents. Use this when the user mentions ["create an agent", "new agent", "add agent role", "agent template", "supervisor agent", "EEI triad", "project-specific agent", "custom project agent", "创建agent", "新建agent", "添加角色", "项目自定义agent", "项目专属agent"]
 skill_id: "<SKILL:.specify/skills/create-agent/SKILL.md>"
 ---
 
@@ -31,8 +31,13 @@ Select the capability from the request `kind` (or infer from user intent):
 | `role` | One role-based agent (six mandatory sections) | `skills/create-agent/templates/agent-role-*-template.md` | Workflow steps 1–5 below |
 | `supervisor` | A role agent that runs its own EEI loop | role template + `skills/create-agent/templates/agent-supervision-delegation.md` inlined | § Supervisor Capability |
 | `triad` | 3 stage agents (executor/evaluator/optimizer) + orchestration prompt | `skills/create-agent/templates/agent-stage-*` + `agent-triad-orchestration-template.md` | § Triad Mode (EEI Pattern) |
-| `custom` | A single narrow custom `.agent.md` | free-form per intent | `/speckit.agents` Mode B flow |
+| `custom` | A single narrow, general-purpose custom `.agent.md` (not bound to a project) | free-form per intent | § Mode Confirmation |
+| `project-custom` | A project-bound custom agent that marks its project and guards against being run elsewhere | `skills/create-agent/templates/agent-project-custom-template.md` | § Project-Custom Capability |
 | `team-supervisor` | The merged Team Supervisor (Meta role): task decomposition + quality gating + iteration control | `skills/create-agent/templates/agent-role-team-supervisor-template.md` | § Team Supervisor Mode |
+
+### Mode Confirmation
+
+When a create request does not clearly map to a single `kind`, do **not** guess. Confirm with the user which authoring mode they want before generating — offer the choices explicitly: `role`, `supervisor`, `triad`, `team-supervisor`, `custom` (narrow, general-purpose), or `project-custom` (project-bound). This is the one confirmation gate shared by all authoring capabilities.
 
 All capabilities share the same validate + report tail (Workflow steps 4–5) and the Agent-Specific Configuration handling below.
 
@@ -79,7 +84,7 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 role-scope: <slug>
-model: inherit
+model: auto
 tools: [Read, Grep, Glob, Write, Edit]
 maxTurns: 12
 color: blue
@@ -123,9 +128,11 @@ You are a **<Role Name>** for the {{PROJECT_NAME}} project.
 
 - Templates MUST follow the established role-based structure (six mandatory sections)
 - Templates MUST use only approved `{{PLACEHOLDER}}` variables
-- Frontmatter uses Qoder-compatible fields — `model` (default `inherit`, respects the chat-session runtime), `tools`/`disallowedTools`, `maxTurns`/`timeoutMins`, `skills`/`mcpServers`, `permissionMode`, `background`, `isolation`, `color`. Only `name` and `description` are strictly required; set `model`/`tools`/`maxTurns` for every role and leave the rest unset unless needed.
+- Frontmatter uses Qoder-compatible fields — `model` (default `auto`, Qoder smart routing), `tools`/`disallowedTools`, `maxTurns`/`timeoutMins`, `skills`/`mcpServers`, `permissionMode`, `background`, `isolation`, `color`. Only `name` and `description` are strictly required; set `model`/`tools`/`maxTurns` for every role and leave the rest unset unless needed.
 - Role instructions MUST be written in first-person professional identity
 - This skill operates on templates in `skills/create-agent/templates/`, NOT on generated agents in `.specify/agents/`
+- `project-custom` agents MUST carry the `project:` frontmatter marker and the mandatory `## Project Scope Guard` section (see § Project-Custom Capability)
+- The full framework frontmatter field set is: `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`, `project` (the last used only by `project-custom` agents)
 
 ## Agent Lifecycle (temporary vs persistent)
 
@@ -209,6 +216,35 @@ Use this capability (`kind: supervisor`) to author a **role-scoped supervisor** 
 ### Rule
 
 Never copy the delegation section text into `skills/create-agent/templates/agent-role-*-template.md`; edit it only in `skills/create-agent/templates/agent-supervision-delegation.md` so all supervisors stay in sync (single source of truth).
+
+## Project-Custom Capability
+
+Use this capability (`kind: project-custom`) to author a **project-bound custom agent** — an agent that is specific to one project's terminology, assumptions, and workflows, and that should refuse to run silently elsewhere. This is the escape hatch for projects whose needs fall outside the seven preset roles and the generic `custom` kind.
+
+### When to Use
+
+Trigger on phrases: "project-specific agent", "custom project agent", "an agent just for this project", "项目自定义agent", "项目专属agent", or any request for an agent whose behavior is tailored to a single project rather than a reusable role.
+
+### Flexible (non-fixed) flow
+
+Unlike the role-based flow (Workflow steps 1–5), project-custom creation is **deliberately not a fixed sequence** — different projects need very different agents. Only two things are mandatory; everything else adapts to the project:
+
+1. **Confirm the mode** (see § Mode Confirmation) — verify the user wants `project-custom` and not `custom`/`role`.
+2. **Bind the project name** — resolve the current project name (from `.specify/instructions.md`, the constitution, or `README.md`) and record it in the `project:` frontmatter marker. The agent MUST be explicitly marked with its project name.
+3. **Draft freely** — fill Purpose / Workflow / Output Format (and add/remove sections) to fit the project; there is no required section list beyond the guard.
+4. **Preserve the guard** — keep the mandatory `## Project Scope Guard` section that detects a project mismatch at invocation and warns the user before proceeding.
+
+### How it works
+
+1. Load the scaffold `skills/create-agent/templates/agent-project-custom-template.md`.
+2. Resolve `{{PROJECT_NAME}}` to the bound project and `{{AGENT_NAME}}`/`{{AGENT_DESCRIPTION}}` from the user's intent.
+3. Fill the free-form body sections; delete the scaffold NOTE comment.
+4. Keep the `project:` frontmatter marker and the `## Project Scope Guard` section intact — these enable the mismatch warning behavior.
+5. Write the generated agent to `.specify/agents/<slug>.agent.md` and run the shared validate + report tail (Workflow steps 4–5).
+
+### Rule
+
+A project-custom agent MUST always carry both the `project:` frontmatter marker and the `## Project Scope Guard` section. When such an agent is invoked in a project other than the one it is bound to, it MUST warn the user and request explicit confirmation rather than silently executing.
 
 ## Agent-Specific Configuration
 
