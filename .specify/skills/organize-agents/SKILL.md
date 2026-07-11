@@ -281,7 +281,7 @@ TEAM SUPERVISOR (Meta role — Strategy + Coordination Layer)
      │
      ▼
 WORKER AGENTS (Execution Layer)
-  • requirements-analyst, system-designer
+  • requirements-analyst, ux-analyst, system-designer
   • module-designer, test-engineer
   • qa-engineer, knowledge-manager
 ```

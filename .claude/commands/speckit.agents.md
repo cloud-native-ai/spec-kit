@@ -6,72 +6,92 @@
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). If empty, infer agent intent from conversation/repo context. If intent unclear, ask concise clarification.
+Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). If empty, infer intent from conversation/repo context. If intent is ambiguous or unsupported, report capabilities and request the missing intent (do NOT guess silently).
 
 ## Outline
 
-Goal: Generate role-based agents or create custom agents at `.specify/agents/<name>.agent.md` (canonical location). Tool-specific directories are symlinks — do NOT write to them directly.
+`/speckit.agents` is the **single entry point** for every agent operation. There is no other agent-specific command. It recognizes intent, then routes to the owning skill. It delegates to skills and does **NOT** render templates inline.
 
-### Delegation Model
+Agents are expressed with the **Role × Stage × Type** model, organized statically as a **Team** (Role×Stage matrix) and dynamically as a **Loop**. Persistent agents are written to the canonical location `.specify/agents/<name>.agent.md`; tool-specific directories are symlinks — never write to them directly.
 
-This command does NOT render templates inline. Both modes delegate to `create-agent` skill (new agents) or `improve-agent` skill (updates). The command gathers context, builds the `AgentAuthoringRequest`, handles backup/preservation, verifies symlinks, and updates registry.
+### Intent → Capability Routing
 
-### Mode A: Role-Based Generation (no arguments)
+| Recognized intent | Capability | Delegates to skill |
+|-------------------|------------|--------------------|
+| Create a new agent | authoring | `create-agent` |
+| Refine / improve an existing agent | authoring | `improve-agent` |
+| Organize agents — parallel | orchestration | `organize-agents` |
+| Organize agents — serial chain | orchestration | `organize-agents` |
+| Execute a team / run a team closed-loop | orchestration | `organize-agents` |
 
-Generate all six role agents from templates in `.specify/templates/agent-role-*-template.md`:
+**Routing flow**:
 
-| Role | Template | Output |
-|------|----------|--------|
-| Requirements Analyst | `agent-role-requirements-analyst-template.md` | `requirements-analyst.agent.md` |
-| System Designer | `agent-role-system-designer-template.md` | `system-designer.agent.md` |
-| Module Designer | `agent-role-module-designer-template.md` | `module-designer.agent.md` |
-| Test Engineer | `agent-role-test-engineer-template.md` | `test-engineer.agent.md` |
-| QA Engineer | `agent-role-qa-engineer-template.md` | `qa-engineer.agent.md` |
-| Knowledge Manager | `agent-role-knowledge-manager-template.md` | `knowledge-manager.agent.md` |
+1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: is this *authoring* (create/refine) or *orchestration* (organize/execute)?
+2. **Authoring** → check `.specify/agents/<name>.agent.md` existence: absent → `create-agent`; present → `improve-agent`. Build the `AgentAuthoringRequest`, handle backup/preservation, write to `.specify/agents/`, verify per-file symlinks.
+3. **Orchestration** → identify topology (parallel / serial / team-loop) and delegate to `organize-agents`, which selects the matching orchestration template.
+4. **Ambiguous / unsupported** → see below.
 
-**Flow**: Gather project context (README, pyproject.toml, constitution, features, specs) → For each role, invoke `create-agent` skill with `kind: supervisor` → Backup existing if customized (FR-008a) → Preserve non-role agents (FR-008) → Write to `.specify/agents/` → Scaffold workspace files if needed (AGENTS.md, MEMORY.md, SOUL.md, USER.md) → Report.
+### Ambiguous or Unsupported Intent (FR-019)
 
-### Mode B: Custom Agent (with arguments)
+When intent cannot be resolved, the command MUST report the recognized capabilities and request the missing intent. It MUST NOT guess silently or fail without a message. Report this capability listing:
 
-Route to `create-agent` (new, `kind: custom`) or `improve-agent` (existing). For EEI triad pass `kind: triad`, for role supervisor pass `kind: supervisor`.
+- **create** — author a new agent (role-based or custom) → `create-agent`
+- **refine** — improve an existing agent → `improve-agent`
+- **organize** — arrange agents into a parallel, serial, or team-loop topology → `organize-agents`
+- **execute** — run a team or team closed-loop → `organize-agents`
 
-**Flow**: Determine intent → Check `.specify/agents/<name>.agent.md` existence → Extract from conversation (role, tools, domain) → Define agent shape (name, description, tools, model, handoffs) → Delegate to skill → Write file → Register `agent_id` in `.specify/instructions.md` → Verify symlinks → Report.
+### Collaboration Topologies (via `organize-agents`)
+
+- **parallel** — many agents dispatched together (single response, many delegations)
+- **serial** — an ordered chain where each stage's output feeds the next
+- **team closed-loop** — Worker agents + Meta agents + a single **Team Supervisor** iterate to a quality threshold
+
+The Team closed-loop has **two layers**: Team Supervisor (Meta role) + Workers. The former Meta-Coordinator is **merged into the Team Supervisor** — do not reference a separate Meta-Coordinator role.
+
+### Lifecycle: Temporary vs Persistent
+
+- **Temporary** agents live only in conversation context and are NOT written to the agent directory.
+- **Persistent** agents are written under `.specify/agents/` and made available to **all officially supported tools** on initialization via per-file symlinks (e.g. `.qoder/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md`).
 
 ### Authoring Rules
 
-- Focus on **what** and **when to call** the agent
+- Focus on **what** the agent does and **when to call** it
 - Concise, explicit instructions over narrative
 - Single responsibility per agent
 - Least-privilege tool set
-- Approved providers: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder
+- Approved providers: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder — reject anything else
 
 ### Frontmatter Baseline
 
 ```yaml
 ---
+name: "<required: unique identifier>"
 description: "<required: trigger words + when to use>"
-tools: ["read", "search"]
+tools: [Read, Grep, Glob]
+model: inherit
+maxTurns: 12
 ---
 ```
 
-Supported fields: `name`, `tools`, `model`, `argument-hint`, `agents`, `user-invocable`, `disable-model-invocation`, `handoffs`.
+Supported fields: `name` (required), `description` (required), `tools`, `disallowedTools`, `model` (`inherit`/`auto`/`lite`/`performance`), `maxTurns`, `timeoutMins`, `skills`, `mcpServers`, `permissionMode`, `background`, `isolation`, `color`, plus the framework fields `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`.
 
 ### Valid File Locations
 
-- Canonical: `.specify/agents/*.agent.md`
-- Symlinks (read-only): `.github/agents/`, `.qoder/agents/`, `.qwen/agents/`, `.opencode/agents/`
+- Canonical: `.specify/agents/*.agent.md` (single source of truth; discovered by globbing this pattern and reading each file's frontmatter `name`/`description`)
+- Shared assets under `.specify/agents/references/`
+- Per-file symlinks (read-only): `.github/agents/`, `.qoder/agents/`, `.qwen/agents/`, `.opencode/agents/`, `.hermes/agents/`, `.iflow/agents/`
 
 ### Validation
 
 - YAML frontmatter must be valid
-- Reject unsupported provider references
+- Reject unsupported provider references (Provider Whitelist)
 - Tool list must match workflow needs
 - Unresolved contradictions block save
 
-For agent-specific operational guidance, see `skills/sdd-workflow/references/agent-configuration.md`.
+For agent-specific operational guidance and the Role/Stage/Type + Team/Loop model, see `skills/create-agent/SKILL.md` and `skills/sdd-workflow/references/agent-configuration.md`.
 
 ## Handoffs
 
-**Before**: Optional `/speckit.skills` if agent depends on new skill. Optional `/speckit.tools` for tool records.
+**Before**: Optional `/speckit.skills` if an agent depends on a new skill. Optional `/speckit.tools` for tool records.
 
 **After**: Run `/speckit.instructions` to sync discoverability.
