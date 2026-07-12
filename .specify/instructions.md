@@ -19,6 +19,7 @@ This project documentation is distributed across several key files. You MUST ref
 | **Upstream** | `docs/upstream.md` | Relationship to github/spec-kit | Divergence points and sync model |
 | **Security** | `docs/security.md` | Security considerations | Threat surface and handling guidance |
 | **Git Workflow** | `docs/git-workflow.md` | 分支同步机制与操作文件 | 三层分支模型、rebase 同步流程、推送策略、安全底线 |
+| **Memory System** | `docs/skills/memory.md` | Dynamic memory-as-files layer | session/ (short-term) + knowledge/ (long-term) store, `memory-utils.py` engine, memory-record / memory-recall skills, Spec-Kit-only recording boundary |
 | **Skills Docs** | `docs/skills/` | Skills system reference | Specification, troubleshooting, VS Code integration |
 | **Agent Tools** | `docs/agent-tools/` | Supported agent tool reference | Per-tool overview, install, CLI usage, and official documentation links for every supported agent (Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode, Qwen Code, Hermes Agent, iFlow CLI) |
 
@@ -49,10 +50,10 @@ Escalation rules:
   - `src/specify_cli/`: single-module CLI implementation (`__init__.py`; Typer commands live here).
   - `templates/`: Source-of-truth templates packaged into the wheel (constitution, plan, requirements, tasks, agent variants, `commands/` for /speckit.* prompts, plus tool/skill templates).
   - `scripts/bash/` and `scripts/python/`: Repeatable workflow scripts mirrored from `.specify/scripts/`. Use these for shell automation; never call `/speckit.*` as a shell command.
-  - `skills/`: Installed Spec Kit skills (17 total, e.g. analysis-project, create-agent, create-skills, improve-agent, improve-skills, organize-agents, sdd-workflow, think-skills, git-workflow, git-submodule-edit, browser-utils, database-utils, document-utils, draw-d3js, draw-echarts, draw-plantuml, extension-e2e-test). Mirrored to `.specify/skills/` via package install; `.github/skills/` is a compatibility symlink.
+  - `skills/`: Installed Spec Kit skills (19 total, e.g. analysis-project, create-agent, create-skills, improve-agent, improve-skills, organize-agents, sdd-workflow, think-skills, git-workflow, git-submodule-edit, memory-record, memory-recall, browser-utils, database-utils, document-utils, draw-d3js, draw-echarts, draw-plantuml, extension-e2e-test). Mirrored to `.specify/skills/` via package install; `.github/skills/` is a compatibility symlink.
   - `agents/`: Role-based agent definitions (`*.agent.md`) mirrored to `.specify/agents/`.
   - `tests/`: `contract/`, `contracts/`, `integration/`, `unit/`, with shared `conftest.py`, `fixtures/`, `script_api.py`.
-  - `memory/`: Default in-package memory shipped with the CLI; the canonical project memory lives at `.specify/memory/` (constitution, features, features/<ID>.md).
+  - `memory/`: Default in-package memory shipped with the CLI; the canonical project memory lives at `.specify/memory/` (constitution, features, features/<ID>.md, plus the dynamic memory-as-files layer under `session/` and `knowledge/`).
   - `docs/`: User-facing documentation (see Documentation Map above).
   - `.specify/`: Project runtime — `instructions.md` (this file), `memory/`, `skills/`, `agents/`, `scripts/`, `specs/<NNN-feature-slug>/`, `templates/`. Treat as the canonical workspace; ignore any `.specify/` inside subdirectories.
 
@@ -98,6 +99,8 @@ Use this machine-maintained section to track reusable resource identifiers creat
 |------------|----------|-------------|---------------|----------------|--------------------------|----------------|
 | git-submodule-edit | <SKILL:.specify/skills/git-submodule-edit/SKILL.md> | Edit and commit code inside a git submodule from the parent project under disciplined rules: edits happen on a branch named after the parent project (traceable upstream), and every submodule-pointer bump validated in the parent is recorded in a ledger (submodule-edits.md). | - | true | false | .specify/skills/git-submodule-edit/SKILL.md |
 | git-workflow | <SKILL:.specify/skills/git-workflow/SKILL.md> | Three-tier Git workflow management (trunk/pre-release/dev). Three modes: Setup (establish workflow), Maintain (health check), Execute (run git operations). Uses docs/git-workflow.md as single source of truth. | - | true | false | .specify/skills/git-workflow/SKILL.md |
+| memory-recall | <SKILL:.specify/skills/memory-recall/SKILL.md> | Retrieve relevant prior memory before or during a Spec Kit task using a lightweight local file index (no vectors). Searches session/ (short-term) and knowledge/ (long-term) by keyword, tag, source, feature, and date. Pairs with memory-record. | - | true | false | .specify/skills/memory-recall/SKILL.md |
+| memory-record | <SKILL:.specify/skills/memory-record/SKILL.md> | Persist a durable, structured record of a Spec Kit conversation into project memory (memory-as-files). Writes short-term working notes to .specify/memory/session/ and long-term distilled knowledge to .specify/memory/knowledge/. Only records conversations driven by a Spec Kit command or skill. | - | true | false | .specify/skills/memory-record/SKILL.md |
 <!-- SKILLS_REGISTRY_END -->
 
 ### Tools

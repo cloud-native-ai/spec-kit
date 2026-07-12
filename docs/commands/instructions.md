@@ -21,24 +21,33 @@ Generate or update project instructions and compatibility symlinks, ensuring a c
 
 ## Execution Flow
 
-1. **Setup** — Runs `generate-instructions.sh` to ensure the basic directory structure, `.copilotignore`, and template `.specify/instructions.md` exist. Creates symlinks for supported AI tools.
+1. **Setup** — Runs `generate-instructions.sh` to ensure the basic directory structure, `.copilotignore`, and template `.specify/instructions.md` exist. Creates a timestamped backup (`.specify/instructions.md-<DATE>`), auto-fuses the old `## Project Overview`, and creates symlinks for supported AI tools.
 
-2. **Analyze project context**:
+2. **Preserve & decompose existing instructions** (only if instructions already existed):
+   - Reads the pre-run backup snapshot (never a file the run already overwrote)
+   - Semantically splits it into topic blocks (governance rules, conventions, registries, tribal knowledge, etc.) written to temp files under `.specify/tmp/instructions-preserve/`
+   - Classifies each block by provenance (`auto-generated` / `user-authored` / `mixed`) so hand-authored knowledge is flagged must-keep
+
+3. **Analyze project context**:
    - Reads `README.md` for project purpose and features
    - Inspects configuration files (`pyproject.toml`, `package.json`, etc.) for tech stack
    - Checks `.specify/memory/constitution.md` for mandated project rules
    - Checks `.specify/memory/features.md` for feature status
    - Only considers `.specify/` at the project root (ignores subdirectory instances)
 
-3. **Update instructions content**:
+4. **Update instructions content**:
    - Fills placeholders with concrete details from analysis
    - Updates Documentation Map with correct file references
    - Preserves Tools and Skills managed ranges (marker comments intact)
    - Incorporates user input for targeted sections
 
-4. **Validation** — Ensures well-formatted Markdown that clearly describes the project to a fresh AI instance.
+5. **Reintegrate preserved blocks** (only if step 2 ran):
+   - Merges each temp block back into the freshly generated file, reconciling matching sections and re-appending dropped ones
+   - Keeps `user-authored` content on conflict, verifies full coverage, then cleans up the temp directory (backup is retained)
 
-5. **Report** — Outputs the instructions file path and confirms symlink status for all supported AI tools.
+6. **Validation** — Ensures well-formatted Markdown that clearly describes the project to a fresh AI instance and that no `user-authored` content was lost.
+
+7. **Report** — Outputs the instructions file path, summarizes preserved/reconciled blocks, and confirms symlink status for all supported AI tools.
 
 ## Update Strategy
 

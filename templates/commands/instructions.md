@@ -51,6 +51,7 @@ Find essential knowledge that helps an AI agent be immediately productive:
 Content guidelines for `.specify/instructions.md`:
 
 - If `.specify/instructions.md` already exists, merge intelligently: preserve valuable content and update only what is outdated
+- **Non-destructive guarantee**: The existing instructions may contain accumulated, hand-authored knowledge that is NOT reproducible from a fresh codebase scan (e.g., custom governance rules, tribal knowledge, decision rationale, registries). This content **MUST NOT** be lost. The setup script only auto-preserves the `## Project Overview` section, so you **MUST** additionally decompose and reintegrate the rest (see the **Preserve & Decompose** and **Reintegrate** actions below).
 - Keep it concise and actionable (~20–50 lines) using Markdown structure
 - Use concrete examples from this repo when describing patterns
 - Avoid generic advice; document only this project’s specific approaches
@@ -90,16 +91,24 @@ Fallback behavior:
 1. **Setup**: Run `{SCRIPT}` to ensure the basic directory structure, `.copilotignore`, and template `.specify/instructions.md` exist.
    - This script handles the "heavy lifting" of creating directories, ignoring files, establishing symlinks for supported AI tools (`.github`, `.qoder`, `.claude`), and cleaning up deprecated tool artifacts (`.clinerules`, `.lingma`, `.trae`, etc.).
    - It will only create a template `.specify/instructions.md` if one does not exist.
+   - The script also creates a timestamped backup (`.specify/instructions.md-<DATE>`) and auto-fuses **only** the `## Project Overview` section from the old file into the new template. Every other section still needs explicit preservation via the next step.
    - If the script returns non-zero, apply the **Error Handling** rules above instead of failing immediately.
 
-2. **Analyze Project Context**:
+2. **Preserve & Decompose Existing Instructions** (skip entirely if no `.specify/instructions.md` existed before this run):
+   - **Locate the pre-run snapshot**: Use the timestamped backup the setup script produced (`.specify/instructions.md-<DATE>`). If the setup script did not run or produced no backup, first copy the current `.specify/instructions.md` to a snapshot before proceeding. NEVER decompose from a file the current run has already overwritten.
+   - **Semantic decomposition**: Read the snapshot and analyze it semantically (not line-by-line). Group its content into coherent description blocks by meaning/topic, for example: Project Overview, Documentation Map, custom governance rules, project-specific conventions, registries (Agents/Skills/Tools), tribal knowledge / decision rationale, and any other hand-authored notes.
+   - **Write blocks to temp files**: Create a working directory `.specify/tmp/instructions-preserve/` and write each block to its own file named `block-NN-<slug>.md` (zero-padded ordinal + short semantic slug). Each block file MUST retain its original Markdown heading(s) and body verbatim.
+   - **Classify each block** with a one-line front note recording: `origin-heading`, and `provenance: auto-generated | user-authored | mixed`. Blocks that are auto-derivable from a codebase scan (e.g., raw Tech Stack facts) may be marked `auto-generated`; anything that looks hand-authored or non-reproducible MUST be marked `user-authored` and treated as must-keep.
+   - Record the list of block files produced so the **Reintegrate** step can process them deterministically.
+
+3. **Analyze Project Context**:
    - Read `README.md` to understand the project's purpose and existing features.
    - Inspect configuration files (`pyproject.toml`, `package.json`, `pom.xml`, `Makefile`, etc.) to determine the tech stack.
    - Check `.specify/memory/constitution.md` (if exists) to identify any mandated project rules.
    - Check `.specify/memory/features.md` (if exists) for feature status reference.
    - **Check `.specify/` Directory**: When referencing the `.specify/` directory (if exists), **ONLY** consider the one in the **project root** (same level as `README.md`/`pyproject.toml`). Ignore any `.specify/` directories found inside subdirectories or submodules (as they belong to other projects).
 
-3. **Update Instructions Content**:
+4. **Update Instructions Content**:
    - Read the content of `.specify/instructions.md` (whether newly created or existing).
    - **Fill Placeholders**: Replace any bracketed placeholders (e.g., `[Brief summary...]`, `[Detected tech stack...]`) with concrete details derived from your analysis.
    - **Update Documentation Map**: Ensure the table correctly points to existing documentation files in the repository.
@@ -109,12 +118,24 @@ Fallback behavior:
      These ranges are reserved for the `skills` command.
    - **Incorporate User Input**: If `$ARGUMENTS` provided specific instructions or context, integrate them into the file.
 
-4. **Validation**:
+5. **Reintegrate Preserved Blocks** (skip if the **Preserve & Decompose** step was skipped):
+   - Iterate over every block file in `.specify/tmp/instructions-preserve/` in order.
+   - For each block, merge it back into the freshly generated `.specify/instructions.md`:
+     - If a section with the same heading exists in the new file, reconcile: keep the newer factual content, but re-inject any `user-authored` / `mixed` details that the fresh scan would otherwise have dropped.
+     - If the section no longer exists in the new file, re-append the block under an appropriate location (preserve custom/governance/registry blocks verbatim).
+     - Never duplicate content the setup script already auto-fused (e.g., `## Project Overview`); reconcile instead of appending a second copy.
+   - **Conflict policy**: When preserved `user-authored` content conflicts with newly generated content, keep the user-authored content and only update stale factual items (mirrors the **Update Strategy** conflict policy).
+   - **Coverage check**: Confirm every `user-authored` block is represented in the final file. If any is missing, add it before finishing.
+   - **Cleanup**: After a successful, verified merge, remove the `.specify/tmp/instructions-preserve/` working directory. Leave the timestamped `.specify/instructions.md-<DATE>` backup in place as the durable safety net.
+
+6. **Validation**:
    - Ensure the file is well-formatted Markdown.
    - Verify that the resulting instructions clearly describe the project to a fresh AI instance.
+   - Verify no `user-authored` content from the pre-run snapshot was silently lost.
 
-5. **Report**:
+7. **Report**:
    - Report the full path of the instructions file (`.specify/instructions.md`).
+   - If decomposition/reintegration ran, summarize how many blocks were preserved, reconciled, or re-appended, and confirm the temp directory was cleaned up.
    - Confirm that symlinks for Copilot, Qoder, and Claude have been established (or explicitly report warning/fallback actions if setup script partially failed).
 
 ## Handoffs
