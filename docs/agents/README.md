@@ -12,22 +12,24 @@ organized by two structures, driven by one command, and produced by three skills
 
 - **Model** — every agent is `Role × Stage × Type`, arranged statically as a **Team**
   (a Role×Stage matrix) and dynamically as a **Loop** (iteration across stages).
-- **Command** — `/speckit.agents` is the *single* entry point. It recognizes intent and
-  delegates; it never renders templates inline and adds no other agent-specific command.
-- **Skills** — `create-agent` (author), `improve-agent` (refine), `organize-agents`
-  (orchestrate: parallel / serial / team-loop).
+- **Command** — `/speckit.agents` is the *single* entry point for single-agent work. It
+  recognizes intent and delegates; it never renders templates inline. Multi-agent teams
+  (organizing / running several agents) live behind `/speckit.team`.
+- **Skills** — `create-agent` (author a single agent), `improve-agent` (refine a single
+  agent). Team orchestration (parallel / serial / team-loop) is owned by the team domain:
+  `create-team` and `improve-team` via `/speckit.team`.
 - **Artifacts** — reusable templates under `skills/create-agent/templates/` and persisted
   agents under `.specify/agents/`, linked into every supported tool by per-file symlink.
 
 ```
-                         /speckit.agents  (single entry, intent router)
-                                  │
-             ┌────────────────────┼─────────────────────┐
-             ▼                    ▼                      ▼
-       create-agent          improve-agent         organize-agents
-       (author)              (refine)              (parallel|serial|team-loop)
-             │                    │                      │
-             ▼                    ▼                      ▼
+         /speckit.agents  (single-agent entry)        /speckit.team  (team entry)
+                 │                                            │
+        ┌────────┴────────┐                          ┌────────┴────────┐
+        ▼                 ▼                          ▼                 ▼
+   create-agent      improve-agent               create-team      improve-team
+   (author)          (refine)                    (define|run:              (refine team:
+        │                 │                        parallel|serial|          stages/thresholds)
+        ▼                 ▼                        team-loop)
    skills/create-agent/templates/*        .specify/agents/*.agent.md  ──(per-file symlink)──▶ .qoder/agents/, .github/agents/, …
    (Role × Stage × Type source)           (persisted Team members)
 ```
@@ -40,7 +42,7 @@ organized by two structures, driven by one command, and produced by three skills
 | [command-and-skills.md](./command-and-skills.md) | The `/speckit.agents` single entry point, intent→capability routing, the three skills, the temporary/persistent lifecycle, and tool integration. |
 | [templates-and-agents.md](./templates-and-agents.md) | The canonical template catalog and naming scheme, the seven preset role agents + Team Supervisor, the `.specify/agents/` layout, and the `AGENTS.md` registry. |
 | [eei-triad-pattern.md](./eei-triad-pattern.md) | The Executor-Evaluator-Optimizer (EEI) quality loop and role-scoped supervisors. |
-| [multi-agent-orchestration.md](./multi-agent-orchestration.md) | Operational guide for the three collaboration topologies: parallel dispatch, serial chain, team loop. |
+| [multi-agent-orchestration.md](./multi-agent-orchestration.md) | Operational guide for the three collaboration topologies: parallel dispatch, serial chain, team loop — owned by the team domain (`/speckit.team`, `create-team`). |
 
 ## Core vocabulary (quick reference)
 

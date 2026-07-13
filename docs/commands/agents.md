@@ -1,13 +1,12 @@
 # /speckit.agents
 
-The single entry point for **all** agent operations — create, refine, organize, and execute agents. No other agent-specific command exists; `/speckit.agents` recognizes your intent and routes it to the owning skill.
+The single entry point for **single-agent** operations — create and refine one agent. `/speckit.agents` recognizes your intent and routes it to the owning skill. Organizing or running multiple agents as a team lives behind [`/speckit.team`](team.md).
 
 ## When to Use
 
 - After `specify init` to generate project-aware role-based agents
 - When you need a custom agent for a specialized workflow (generic `custom`) or a **project-specific** agent tailored to one project (`project-custom`)
-- When you want to organize agents into a parallel, serial, or team-loop topology
-- When you want to execute a team or run a team closed-loop
+- (To organize or run multiple agents as a team, use [`/speckit.team`](team.md) instead)
 - When project context has changed and agents need to be refreshed
 
 ## Conceptual Model
@@ -35,11 +34,9 @@ Not every agent fits the preset Role×Stage grid. When a project's needs fall ou
 |-------------------|------------|-------|
 | Create a new agent | authoring | `create-agent` |
 | Refine / improve an existing agent | authoring | `improve-agent` |
-| Organize agents — parallel | orchestration | `organize-agents` |
-| Organize agents — serial chain | orchestration | `organize-agents` |
-| Execute a team / run a team closed-loop | orchestration | `organize-agents` |
+| Organize / run a team of agents | out of scope | redirect to [`/speckit.team`](team.md) |
 
-The command **delegates to skills** and never renders templates inline. On ambiguous or unsupported intent it reports the recognized capabilities (create / refine / organize / execute) and requests the missing intent — it never guesses silently.
+The command **delegates to skills** and never renders templates inline. On ambiguous or unsupported intent it reports the recognized single-agent capabilities (create / refine) and requests the missing intent — it never guesses silently. Team requests are directed to [`/speckit.team`](team.md).
 
 ## Authoring Modes
 
@@ -49,8 +46,6 @@ When creating an agent, `create-agent` supports several **modes** (`kind`). If t
 |---------------|----------|
 | `role` | One of the seven preset role-based agents (or a new role) |
 | `supervisor` | A role agent that runs its own EEI loop |
-| `triad` | Three stage agents (executor/evaluator/optimizer) + orchestration prompt |
-| `team-supervisor` | The merged Team Supervisor (Meta role) |
 | `custom` | A single narrow, **general-purpose** custom agent (not bound to a project) |
 | `project-custom` | A **project-bound** custom agent for one specific project |
 
@@ -63,13 +58,9 @@ Different projects often need very different agents, so `project-custom` creatio
 
 Everything else (purpose, workflow, output format) is free-form and adapts to the project.
 
-## Collaboration Topologies
+## Team Operations
 
-- **parallel** — many agents dispatched together (single response, many delegations)
-- **serial** — an ordered chain where each stage's output feeds the next
-- **team closed-loop** — Worker agents + Meta agents + a single **Team Supervisor** iterate until a quality threshold is met
-
-The Team closed-loop has **two layers**: Team Supervisor (Meta role) + Workers. The former Meta-Coordinator has been **merged into the Team Supervisor**.
+Organizing and running multiple agents (parallel / serial / team closed-loop) is owned by [`/speckit.team`](team.md) and the `create-team` / `improve-team` skills — not by `/speckit.agents`.
 
 ## Lifecycle: Temporary vs Persistent
 
@@ -113,7 +104,7 @@ Each tool's `agents/` directory is a **real directory** of **per-file symlinks**
 
 - `create-agent` — author new role-based, custom, or project-custom agents (canonical templates in `skills/create-agent/templates/`)
 - `improve-agent` — iteratively improve an existing agent from execution feedback
-- `organize-agents` — arrange and execute agents in parallel / serial / team-loop topologies
+- Team orchestration (parallel / serial / team-loop) is owned by [`/speckit.team`](team.md) via the `create-team` / `improve-team` skills
 
 ## Prerequisites
 
@@ -124,14 +115,13 @@ Each tool's `agents/` directory is a **real directory** of **per-file symlinks**
 - Run [`/speckit.instructions`](instructions.md) to refresh discovery metadata
 # /speckit.agents
 
-The single entry point for **all** agent operations — create, refine, organize, and execute agents. No other agent-specific command exists; `/speckit.agents` recognizes your intent and routes it to the owning skill.
+The single entry point for **single-agent** operations — create and refine one agent. `/speckit.agents` recognizes your intent and routes it to the owning skill. Organizing or running multiple agents as a team lives behind [`/speckit.team`](team.md).
 
 ## When to Use
 
 - After `specify init` to generate project-aware role-based agents
 - When you need a custom agent for a specialized workflow
-- When you want to organize agents into a parallel, serial, or team-loop topology
-- When you want to execute a team or run a team closed-loop
+- (To organize or run multiple agents as a team, use [`/speckit.team`](team.md) instead)
 - When project context has changed and agents need to be refreshed
 
 ## Conceptual Model
@@ -157,19 +147,13 @@ Agents are organized statically as a **Team** (a Role×Stage matrix) and dynamic
 |-------------------|------------|-------|
 | Create a new agent | authoring | `create-agent` |
 | Refine / improve an existing agent | authoring | `improve-agent` |
-| Organize agents — parallel | orchestration | `organize-agents` |
-| Organize agents — serial chain | orchestration | `organize-agents` |
-| Execute a team / run a team closed-loop | orchestration | `organize-agents` |
+| Organize / run a team of agents | out of scope | redirect to [`/speckit.team`](team.md) |
 
-The command **delegates to skills** and never renders templates inline. On ambiguous or unsupported intent it reports the recognized capabilities (create / refine / organize / execute) and requests the missing intent — it never guesses silently.
+The command **delegates to skills** and never renders templates inline. On ambiguous or unsupported intent it reports the recognized single-agent capabilities (create / refine) and requests the missing intent — it never guesses silently. Team requests are directed to [`/speckit.team`](team.md).
 
-## Collaboration Topologies
+## Team Operations
 
-- **parallel** — many agents dispatched together (single response, many delegations)
-- **serial** — an ordered chain where each stage's output feeds the next
-- **team closed-loop** — Worker agents + Meta agents + a single **Team Supervisor** iterate until a quality threshold is met
-
-The Team closed-loop has **two layers**: Team Supervisor (Meta role) + Workers. The former Meta-Coordinator has been **merged into the Team Supervisor**.
+Organizing and running multiple agents (parallel / serial / team closed-loop) is owned by [`/speckit.team`](team.md) and the `create-team` / `improve-team` skills — not by `/speckit.agents`.
 
 ## Lifecycle: Temporary vs Persistent
 
@@ -213,7 +197,7 @@ Each tool's `agents/` directory is a **real directory** of **per-file symlinks**
 
 - `create-agent` — author new role-based or custom agents (canonical templates in `skills/create-agent/templates/`)
 - `improve-agent` — iteratively improve an existing agent from execution feedback
-- `organize-agents` — arrange and execute agents in parallel / serial / team-loop topologies
+- Team orchestration (parallel / serial / team-loop) is owned by [`/speckit.team`](team.md) via the `create-team` / `improve-team` skills
 
 ## Prerequisites
 

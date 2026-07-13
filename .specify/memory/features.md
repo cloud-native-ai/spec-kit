@@ -1,7 +1,7 @@
 # 🌱 Spec Kit Feature Index
 
 **Last Updated**: 2026-07-13
-**Total Features**: 26
+**Total Features**: 27
 
 ## Features
 
@@ -33,6 +33,7 @@
 | 024 | Specification Workspace Versioning | Version management and migration support for .specify/ workspace structure across CLI releases. | Draft | .specify/memory/features/024.md | - | 2026-06-05 |
 | 025 | Todo Command | Discover marked TODO blocks in text files and turn them into reviewable execution plans. | Implemented | .specify/memory/features/025.md | .specify/specs/020-speckit-todo-command/requirements.md | 2026-06-23 |
 | 026 | Agent Skill Enablement | Empower the 7 built-in role agents to prefer installed framework skills for role-relevant operations, since skills and agent definitions install together. | Implemented | .specify/memory/features/026.md | .specify/specs/025-agent-skill-enablement/requirements.md | 2026-07-13 (spec 025 implemented: skills: frontmatter + ## Skill Enablement section on all 7 role agents + create-agent templates; contract test_agent_skill_enablement.py green) |
+| 027 | Team Management | Dedicated team domain for multi-agent configuration: `/speckit.team` (create/modify/run) as the sole entry point, `create-team` (renamed from organize-agents) + `improve-team` skills, Conceptual Model extracted from create-agent, and single-agent vs team separation. | Implemented | .specify/memory/features/027.md | .specify/specs/026-agent-team-management/requirements.md | 2026-07-13 |
 
 ## Feature Entry Format
 

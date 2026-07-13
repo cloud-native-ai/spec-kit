@@ -1,14 +1,15 @@
 # Command & Skills
 
-This document describes the **operational surface** of the Agent framework: the single
-`/speckit.agents` command, how it recognizes intent and routes to skills, the three skills
-that do the real work, and the temporary/persistent agent lifecycle. For the underlying
-concept model see [design.md](./design.md).
+This document describes the **operational surface** of the Agent framework: the single-agent
+`/speckit.agents` command, how it recognizes intent and routes to skills, the single-agent
+authoring/refinement skills, and the temporary/persistent agent lifecycle. Multi-agent teams
+are owned by a separate command (`/speckit.team`) and the team skills (`create-team`,
+`improve-team`). For the underlying concept model see [design.md](./design.md).
 
-## The single entry point: `/speckit.agents`
+## The single-agent entry point: `/speckit.agents`
 
-`/speckit.agents` is the **only** agent-specific command. There is no separate create,
-organize, or execute command. Its contract:
+`/speckit.agents` is the **only** single-agent command. It creates or refines **one** agent;
+team operations (organize / run several agents) are directed to `/speckit.team`. Its contract:
 
 - It **recognizes intent**, then **routes to the owning skill**.
 - It **delegates** — it never renders templates inline.
@@ -23,35 +24,28 @@ organize, or execute command. Its contract:
 |-------------------|------------|--------------------|
 | Create a new agent | authoring | `create-agent` |
 | Refine / improve an existing agent | authoring | `improve-agent` |
-| Organize agents — parallel | orchestration | `organize-agents` |
-| Organize agents — serial chain | orchestration | `organize-agents` |
-| Execute a team / run a team closed-loop | orchestration | `organize-agents` |
+| Organize / run a team of agents | out of scope | redirect to `/speckit.team` |
 
 **Routing flow:**
 
 1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context — is this
-   *authoring* (create/refine) or *orchestration* (organize/execute)?
+   single-agent *authoring* (create/refine), or a *team* request?
 2. **Authoring** → check whether `.specify/agents/<name>.agent.md` exists: absent →
    `create-agent`; present → `improve-agent`. Build the `AgentAuthoringRequest`, handle
    backup/preservation, write to `.specify/agents/`, verify per-file symlinks.
-3. **Orchestration** → identify the topology (parallel / serial / team-loop) and delegate
-   to `organize-agents`, which selects the matching orchestration template.
-4. **Ambiguous / unsupported** → do **not** guess silently. Report the recognized
-   capabilities (create / refine / organize / execute) and request the missing intent (FR-019).
+3. **Team request** → do **not** handle it here; direct the user to `/speckit.team` and stop.
+4. **Ambiguous / unsupported** → do **not** guess silently. Report the recognized single-agent
+   capabilities (create / refine) and request the missing intent (FR-019).
 
-### Collaboration topologies (delegated to `organize-agents`)
+### Team topologies (owned by `/speckit.team`)
 
-- **parallel** — many agents dispatched together (single response, many delegations).
-- **serial** — an ordered chain where each stage's output feeds the next.
-- **team closed-loop** — Worker agents + a single **Team Supervisor** iterate to a quality
-  threshold. The loop has **two layers** (Team Supervisor + Workers); the
-  formerly separate Meta-Coordinator is merged into the Team Supervisor — no separate role.
+Organizing and running multiple agents (parallel / serial / team closed-loop) is owned by the
+team domain — the `create-team` skill via `/speckit.team`. Operational detail lives in
+[multi-agent-orchestration.md](./multi-agent-orchestration.md).
 
-Operational detail for all three lives in [multi-agent-orchestration.md](./multi-agent-orchestration.md).
+## The single-agent skills
 
-## The three skills
-
-`/speckit.agents` owns no logic of its own beyond routing; the work is done by three skills.
+`/speckit.agents` owns no logic of its own beyond routing; the work is done by two skills.
 
 ### `create-agent` — authoring engine
 
@@ -62,10 +56,8 @@ templates under `skills/create-agent/templates/`:
 |--------|----------|----------------------|
 | `role` | One role-based agent (six mandatory sections) | `agent-role-*-template.md` |
 | `supervisor` | A role agent that runs its own EEI loop | role template + `agent-supervision-delegation.md` (inlined) |
-| `triad` | 3 stage agents (executor/evaluator/optimizer) + orchestration prompt | `agent-stage-*` + `agent-triad-orchestration-template.md` |
 | `custom` | A single narrow, general-purpose custom `.agent.md` (not project-bound) | free-form per intent |
 | `project-custom` | A project-bound custom agent (marks its project + carries a scope guard) | `agent-project-custom-template.md` |
-| `team-supervisor` | The merged Team Supervisor (Meta role) | `agent-role-team-supervisor-template.md` |
 
 Key rules:
 - **Supervision is active by default** (`supervisor: true`); the delegation snippet is
@@ -84,27 +76,17 @@ cases, behavioral drift). It first classifies the target, then routes:
 | Target kind | Match | Route |
 |-------------|-------|-------|
 | role | `agent-role-*-template.md` | six-section root-cause workflow |
-| stage | `agent-stage-{executor,evaluator,optimizer}-template.md` | Triad Refinement (per-stage fixes) |
-| orchestration | `agent-triad-orchestration-template.md` | Triad Refinement (loop/threshold/handoff) |
 | supervision snippet | `agent-supervision-delegation.md` | steps 3–5; **warns** the edit affects every supervisor |
 | custom | `.specify/agents/*.agent.md` | six-section workflow against the generated file |
 
-Changes must be **evidence-based** and **minimal**, preserving established structure.
+Changes must be **evidence-based** and **minimal**, preserving established structure. To adjust
+a multi-agent **team** (stages, orchestration, thresholds), use `improve-team` via `/speckit.team`.
 
-### `organize-agents` — orchestration engine
-
-The single orchestration skill for all multi-agent coordination. It selects a pattern via a
-decision tree:
-
-1. Independent sub-tasks, no shared mutable state → **Parallel Dispatch**
-2. Strict sequence (output of A feeds B) → **Serial Chain**
-3. Deliverable needs iterative quality improvement by a team → **Team Loop**
-
-Shared hard constraints across patterns: territory validation before parallel dispatch,
-DAG (no-cycle) validation before serial chain, a mandatory max-iteration cap for team loops,
-**file-path-only handoff** (never paste content between agents), context isolation (each
-invocation is a fresh subagent), and idempotent execution. See
-[multi-agent-orchestration.md](./multi-agent-orchestration.md) for full protocols.
+> **Team orchestration**: organizing and running multiple agents is owned by the team domain —
+> the `create-team` skill via `/speckit.team`. It selects a pattern (Parallel Dispatch / Serial
+> Chain / Team Loop) via a decision tree and enforces territory validation, DAG (no-cycle)
+> validation, a mandatory max-iteration cap, file-path-only handoff, and context isolation.
+> See [multi-agent-orchestration.md](./multi-agent-orchestration.md) for full protocols.
 
 ## Agent lifecycle: temporary vs persistent
 
@@ -113,7 +95,7 @@ Every agent `create-agent` can produce has one of two lifecycles; choose it befo
 | Lifecycle | Where it lives | When to use | Tool config |
 |-----------|----------------|-------------|-------------|
 | **temporary** | Context-only — never written to disk | A worker/stage agent spawned for a single Loop or orchestration run; discarded when the run ends | None; exists only in the orchestrator's context (FR-011) |
-| **persistent** | `.specify/agents/<slug>.agent.md` (canonical store) | A reusable role, supervisor, or triad kept across sessions | Per-file symlinked into every supported tool's agent dir on init (FR-010/012) |
+| **persistent** | `.specify/agents/<slug>.agent.md` (canonical store) | A reusable role or supervisor kept across sessions | Per-file symlinked into every supported tool's agent dir on init (FR-010/012) |
 
 **Persistent generation rules:**
 - Write to `.specify/agents/<slug>.agent.md` (single source of truth).
@@ -161,7 +143,7 @@ they prefer a purpose-built framework skill over improvising the same operation.
    relevant to that role (e.g. `skills: [draw-plantuml, memory-recall, memory-record, think-skills]`).
    Slugs MUST resolve to an installed `.specify/skills/<slug>/SKILL.md`. Reference-only
    (`sdd-workflow`) and meta/framework-authoring skills (`create-agent`, `improve-agent`,
-   `create-skills`, `improve-skills`, `organize-agents`) are **non-declarable** and never appear
+   `create-skills`, `improve-skills`, `create-team`, `improve-team`) are **non-declarable** and never appear
    in a role agent's list.
 2. **A `## Skill Enablement` body section** — the shared preference protocol (single source of
    truth at `skills/create-agent/templates/agent-skill-enablement.md`, composed rather than
@@ -183,5 +165,6 @@ for tool records.
 ## Traceability
 
 Normative source: `.specify/specs/023-agent-framework-redesign/contracts/agents-command-contract.md`
-and the two skill contracts. See also `skills/create-agent/SKILL.md`,
-`skills/improve-agent/SKILL.md`, and `skills/organize-agents/SKILL.md`.
+and the skill contracts. See also `skills/create-agent/SKILL.md`,
+`skills/improve-agent/SKILL.md`, and the team skills `skills/create-team/SKILL.md`,
+`skills/improve-team/SKILL.md`.

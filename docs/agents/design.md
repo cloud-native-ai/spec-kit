@@ -88,7 +88,7 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 ## 五、多 Agent 使用场景
 
-框架支持三类多 Agent 协作拓扑，全部经由 `organize-agents` 技能落地（操作细节见
+框架支持三类多 Agent 协作拓扑，全部经由 `create-team` 技能（`/speckit.team` 命令）落地（操作细节见
 [multi-agent-orchestration.md](./multi-agent-orchestration.md)）：
 
 1. **并行操作（Parallel Dispatch）**：多个 Agent 并行执行，通过并行度提升效率（领域隔离 → 并行派发 → 结果聚合）。
@@ -99,23 +99,33 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 ## 六、实现结构
 
-### 6.1 唯一命令入口
+### 6.1 命令入口（单 Agent 与团队分离）
 
-`/speckit.agents` 是所有 Agent 相关操作的**唯一命令入口**，不新增其他命令。其职责是
-**识别用户意图 → 委派给对应技能**，本身不内联渲染模板。工作流程：
+单 Agent 与团队操作有各自的命令入口（Feature 027 团队管理引入的分离）：
 
-1. **识别用户意图**：分析用户输入，判断是创作、优化还是编排。
-2. **设计/确定团队结构**：根据意图确定所需角色与协作拓扑。
-3. **调用 `create-agent` 技能**：按模板创建对应工具的 Agent 配置。
-4. **调用 `organize-agents` 技能**：将这些 Agent 按 parallel / serial / team-loop 编排起来。
+- `/speckit.agents` 是**单 Agent** 操作的唯一入口——创作或优化**一个** Agent；不新增其他单 Agent 命令，本身不内联渲染模板。
+- `/speckit.team` 是**团队**操作的唯一入口——组织或运行多个 Agent（parallel / serial / team-loop）。
+
+单 Agent 命令工作流程：
+
+1. **识别用户意图**：分析用户输入，判断是创作还是优化单个 Agent。
+2. **调用 `create-agent` 技能**：按模板创建对应工具的 Agent 配置。
+3. **调用 `improve-agent` 技能**：基于反馈优化已有 Agent。
+4. **团队意图重定向**：若用户请求组织/运行多个 Agent，重定向至 `/speckit.team`，不在此处理。
 
 命令与路由细节见 [command-and-skills.md](./command-and-skills.md)。
 
-### 6.2 三个技能
+### 6.2 技能
 
-- **`create-agent`**：创作引擎——按 `Role × Stage × Type` 从模板生成 role / supervisor / triad / custom / team-supervisor 等 Agent。
-- **`improve-agent`**：优化引擎——基于真实使用反馈精炼任意 Agent 制品（角色模板 / 阶段模板 / 编排提示 / 监督片段 / 自定义 Agent）。
-- **`organize-agents`**：编排引擎——实现并行、串行、团队闭环三种拓扑。
+单 Agent 域（`/speckit.agents`）：
+
+- **`create-agent`**：创作引擎——按 `Role × Stage × Type` 从模板生成 role / supervisor / custom / project-custom 等**单个** Agent。
+- **`improve-agent`**：优化引擎——基于真实使用反馈精炼**单个** Agent 制品（角色模板 / 监督片段 / 自定义 Agent）。
+
+团队域（`/speckit.team`）：
+
+- **`create-team`**：团队引擎——定义并运行团队，实现并行、串行、团队闭环三种拓扑。
+- **`improve-team`**：团队优化引擎——基于运行反馈精炼团队结构（阶段 / 编排 / 阈值）。
 
 ### 6.3 模板归位
 
@@ -126,7 +136,7 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 技能与 Agent 定义同步安装，因此每个内置 Agent 都可调用任意已安装技能。七个内置角色 Agent 将这一能力**显式化、一致化**：优先使用与角色相关的框架技能，而非手工重复同类操作。每个角色 Agent 及其 `agent-role-*` 模板都声明两部分：
 
-- **`skills:` 前置字段**：该角色相关的已安装技能规范 slug 列表（如需求分析师 → `draw-plantuml`；模块设计师 → `analysis-project`）。仅引用类技能（`sdd-workflow`）与元/框架创作类技能（`create-agent`、`improve-agent`、`create-skills`、`improve-skills`、`organize-agents`）为**不可声明**，不出现在任何角色列表中。
+- **`skills:` 前置字段**：该角色相关的已安装技能规范 slug 列表（如需求分析师 → `draw-plantuml`；模块设计师 → `analysis-project`）。仅引用类技能（`sdd-workflow`）与元/框架创作类技能（`create-agent`、`improve-agent`、`create-skills`、`improve-skills`、`create-team`、`improve-team`）为**不可声明**，不出现在任何角色列表中。
 - **`## Skill Enablement` 正文小节**：共享的偏好协议（单一事实来源 `skills/create-agent/templates/agent-skill-enablement.md`，各 Agent 组合复用而非各自改写）+ 与 `skills:` 一致的 `| Skill | When to use |` 表格。协议要求：优先选用适用技能；多个适用时选最贴合角色者；无适用技能或技能不可用/失败时，直接完成操作并暴露失败。
 
 契约测试 `tests/contract/test_agent_skill_enablement.py` 校验该约定（每个 Agent ≥1 技能、引用均已安装、无不可声明 slug、小节存在、模板与 Agent 保持一致）。约定细节见 [command-and-skills.md](./command-and-skills.md)。

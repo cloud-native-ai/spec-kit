@@ -1,14 +1,69 @@
 ---
-name: organize-agents
-description: Organize multiple agents into collaborative patterns — parallel dispatch, serial chain, or self-iterating team loop. Use when the user mentions ["组织agent", "编排", "并行", "串行", "团队", "闭环", "pipeline", "parallel", "chain", "team loop", "多agent协作", "agent协同"]
-skill_id: "<SKILL:.specify/skills/organize-agents/SKILL.md>"
+name: create-team
+description: Create and run an agent team — organize multiple agents into a collaborative structure (parallel dispatch, serial chain, or self-iterating team loop), persist it as a reusable team, and execute it behind a preview→confirm gate. Use when the user mentions ["创建团队", "组织一个团队", "组建团队", "运行团队", "执行团队", "编排", "并行", "串行", "团队", "闭环", "new team", "build a team", "run team", "pipeline", "parallel", "chain", "team loop", "多agent协作", "agent协同"]
+skill_id: "<SKILL:.specify/skills/create-team/SKILL.md>"
 ---
 
-# organize-agents
+# create-team
 
 ## Goal
 
-Organize multiple Agents into **collaborative execution patterns** — parallel dispatch, serial chain, or self-iterating team loop. This is the single orchestration skill that handles all multi-agent coordination modes.
+Create and run an **agent team**: organize multiple Agents into a **collaborative structure** (static roster + dynamic execution pattern — parallel dispatch, serial chain, or self-iterating team loop), persist it as a reusable `.specify/teams/<slug>.team.md`, and **execute** it behind a preview→confirm gate. This skill owns both **defining** a team and **running** it, and is the single source of truth for the multi-agent Conceptual Model (see `references/conceptual-model.md`).
+
+## Conceptual Model
+
+The multi-agent Conceptual Model (Role × Stage × Type + Team/Loop, the Team Supervisor Meta role, and the static/dynamic structure split) is defined once, authoritatively, in `references/conceptual-model.md`. Read it before defining or running a team; do not re-define it elsewhere.
+
+## Team Definition & Persistence (create mode)
+
+Produce a team from a user goal and (unless one-shot) persist it as `.specify/teams/<slug>.team.md`.
+
+1. **Select the pattern** via the Pattern Selection decision tree below (independent → parallel; sequenced → serial; iterative-quality → team-loop).
+2. **Build the roster (static structure)** — a Role × Stage × Type matrix. If the user did not supply members, **propose** them from the goal: prefer existing agents under `.specify/agents/`, otherwise temporary stage/worker templates from `templates/`. A **team-loop team MUST include exactly one Team Supervisor** (Meta role).
+3. **Build the pattern config (dynamic structure)** — parallelism + territories (parallel), DAG `blockedBy` edges + file-path-only handoff (serial), or quality dimensions + threshold + max_iterations + regression_limit (team-loop).
+4. **Confirm** the proposed roster + pattern with the user, then persist the `Team` to `.specify/teams/<slug>.team.md` using the schema below (skip persistence only for an explicit one-shot run).
+
+### Persisted `.team.md` schema
+
+Stored at `.specify/teams/<slug>.team.md` (no per-tool symlink — framework-internal):
+
+```markdown
+---
+name: <display name>
+slug: <kebab-slug>
+description: <goal / purpose>
+pattern: parallel | serial | team-loop
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+members:
+  - agent: <slug-or-template-id>
+    role: <role>
+    lifecycle: persistent | temporary
+    # territory: [...]        # parallel
+    # blockedBy: [...]        # serial
+config:
+  # pattern-specific block (parallelism / DAG / loop settings)
+---
+
+## Static Structure
+<Role × Stage × Type matrix table for this team's roster>
+
+## Dynamic Structure
+<pattern description, parallelism/DAG/loop settings, and the execution flow diagram>
+```
+
+- `slug` MUST be unique within `.specify/teams/`; it also names the file.
+- `members` MUST resolve to `.specify/agents/<slug>.agent.md` or a temporary stage/worker template; unresolved members are surfaced as broken references.
+- `config` MUST match `pattern`.
+
+## Execution (run mode)
+
+`/speckit.team run <slug>` loads a persisted team and executes it behind the mandatory **preview → confirm → execute** gate:
+
+1. **Load** the team from `.specify/teams/<slug>.team.md`.
+2. **Render Static Structure** — the roster as a Role × Stage × Type matrix (agent, role, Worker/Meta, persistent/temporary).
+3. **Render Dynamic Structure** — the `pattern`, its parallelism/DAG/loop settings, and an execution flow diagram (textual/mermaid/PlantUML showing dispatch/handoff/loop edges).
+4. **Confirmation gate** — present both structures and require explicit user confirmation. On decline, stop without executing. On confirm, orchestrate per pattern using the engine defined in the pattern sections below, preserving the Hard Constraints (territory validation before parallel dispatch; DAG no-cycle before serial; mandatory max-iteration cap for team loops; file-path-only handoff; context isolation; idempotent execution).
 
 ## Pattern Selection (Decision Tree)
 
@@ -417,13 +472,13 @@ If the guide exists, apply agent-specific tool mappings for orchestration (e.g.,
 If you encounter an agent-specific obstacle, generate feedback at:
 
 ```
-.specify/memory/feedback/organize-agents-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
+.specify/memory/feedback/create-team-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
 ```
 
 ```markdown
 # Agent Execution Feedback
 
-**Source**: organize-agents
+**Source**: create-team
 **Agent**: <agent-slug>
 **Timestamp**: <ISO-8601>
 **Outcome**: <success | success-with-workaround | partial-failure | full-failure>

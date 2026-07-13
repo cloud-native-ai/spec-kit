@@ -1,0 +1,74 @@
+---
+description: Single entry point for all team operations — create, modify, and run agent teams via intent routing.
+handoffs:
+  - label: Update Instructions
+    agent: speckit.instructions
+    prompt: Refresh project instructions so newly created teams and team skills are discoverable.
+    send: false
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). If empty, infer intent from conversation/repo context. If intent is ambiguous or unsupported, report capabilities and request the missing intent (do NOT guess silently).
+
+## Outline
+
+`/speckit.team` is the **single entry point** for every **team** operation — the multi-agent analogue of `/speckit.agents`. It recognizes intent, then routes to the owning team skill. It delegates to skills and does **NOT** render templates inline. It MUST NOT serve single-agent authoring (that is `/speckit.agents`), and single-agent commands MUST NOT serve team operations.
+
+A **team** is a named, reusable multi-agent structure: a **static structure** (Role × Stage × Type roster) plus a **dynamic structure** (collaboration pattern — parallel / serial / team-loop — with its parallelism/DAG/iteration settings and execution flow). Persistent teams are stored at the canonical location `.specify/teams/<slug>.team.md`. The multi-agent Conceptual Model that underpins teams is defined once in `skills/create-team/references/conceptual-model.md`.
+
+### Modes → Capability Routing
+
+`/speckit.team` exposes **exactly three modes**:
+
+| Mode | Recognized intent | Delegates to skill |
+|------|-------------------|--------------------|
+| **create** | "创建团队", "组织一个团队", "组建团队", "new team", "build a team" | `create-team` |
+| **modify** | "修改团队", "调整团队", "优化 team", "improve/adjust team" | `improve-team` |
+| **run** | "运行团队", "执行团队", "run/execute team", "跑一遍" | `create-team` (execution path) |
+
+**Routing flow**:
+
+1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: classify as `create`, `modify`, or `run`.
+2. **create** → `create-team`: propose a roster (static structure) + pattern config (dynamic structure) from the goal; on confirmation persist `.specify/teams/<slug>.team.md` (or run one-shot without persisting).
+3. **modify** → `improve-team`: load the existing team, apply targeted, evidence-based, structure-preserving edits, re-persist, and bump `updated`.
+4. **run** → `create-team` execution path: follow the **preview → confirm → execute** gate below.
+5. **Ambiguous / unsupported** → see below.
+6. **modify / run targeting a team that does not exist** under `.specify/teams/` → report **"team not found"** and offer to `create` it.
+
+### Ambiguous or Unsupported Intent
+
+When intent cannot be resolved, the command MUST report the recognized capabilities and request the missing intent. It MUST NOT guess silently or fail without a message. Report this capability listing:
+
+- **create** — author a new team (static + dynamic structure) and persist it → `create-team`
+- **modify** — adjust/optimize an existing team → `improve-team`
+- **run** — render a team's structure and execute it after confirmation → `create-team`
+
+### Run Mode (preview → confirm → execute)
+
+The **run** mode MUST follow this sequence and MUST NOT execute before confirmation:
+
+1. **Load** the target team from `.specify/teams/<slug>.team.md`.
+2. **Render Static Structure** — the roster as a Role × Stage × Type matrix: each member agent, its role, its type (Worker/Meta), and its lifecycle (persistent/temporary).
+3. **Render Dynamic Structure** —
+   - the collaboration `pattern` (parallel / serial / team-loop);
+   - the **parallelism** (parallel: degree + territories; serial: DAG stage order; team-loop: threshold, max_iterations, regression_limit, quality dimensions);
+   - an **execution flow diagram** (textual / mermaid / PlantUML flow showing dispatch / handoff / loop edges).
+4. **Confirmation gate** — present both structures and ask the user to confirm. The team executes **only** on explicit confirmation.
+   - On confirm → orchestrate per the team's pattern (delegating to `create-team`'s execution engine): territory validation before parallel dispatch, DAG (no-cycle) validation before serial chain, mandatory max-iteration cap for team loops, file-path-only handoff.
+   - On decline → stop without executing; optionally suggest `modify`.
+
+### Persistence
+
+- Canonical store: `.specify/teams/<slug>.team.md` (Markdown + YAML frontmatter). No per-tool symlink — teams are a framework-internal concept.
+- Each persisted team carries frontmatter (`slug`, `name`, `description`, `pattern`, `members`, `config`, `created`, `updated`), a `## Static Structure` section, and a `## Dynamic Structure` section (see `skills/create-team/SKILL.md` and the data model).
+
+## Handoffs
+
+**Before**: Optional `/speckit.agents` to author or refine the single agents that will become team members.
+
+**After**: Run `/speckit.instructions` to sync discoverability of newly created teams and team skills.

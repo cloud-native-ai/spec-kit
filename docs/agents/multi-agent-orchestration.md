@@ -12,7 +12,7 @@ Spec Kit supports three orchestration patterns for coordinating multiple AI agen
 
 Each mode addresses a different collaboration topology. They can also be composed — e.g., a Serial Chain where individual stages internally use Parallel Dispatch.
 
-> All three modes are entered through the single `/speckit.agents` command and executed by the `organize-agents` skill (see [command-and-skills.md](./command-and-skills.md)). The **Team Loop** is a team-level application of the quality loop detailed in [eei-triad-pattern.md](./eei-triad-pattern.md); its two layers (Team Supervisor + Workers) and the merged Team Supervisor come from [design.md](./design.md).
+> All three modes are entered through the single `/speckit.team` command and executed by the `create-team` skill (see [command-and-skills.md](./command-and-skills.md)). The **Team Loop** is a team-level application of the quality loop detailed in [eei-triad-pattern.md](./eei-triad-pattern.md); its two layers (Team Supervisor + Workers) and the merged Team Supervisor come from [design.md](./design.md).
 
 ---
 
@@ -43,8 +43,8 @@ Use the following questions to select the right orchestration mode:
 
 ## Parallel Dispatch Guide
 
-**Entry**: `/speckit.agents` (intent: "并行", "parallel", "同时执行", "独立任务")
-**Key Skill**: `organize-agents` (parallel mode)
+**Entry**: `/speckit.team` (intent: "并行", "parallel", "同时执行", "独立任务")
+**Key Skill**: `create-team` (parallel mode)
 
 ### Territory Division Best Practices
 
@@ -94,8 +94,8 @@ shared_readonly: ["src/types/", "src/config/"]
 
 ## Serial Chain Guide
 
-**Entry**: `/speckit.agents` (intent: "阶段", "串行", "pipeline", "chain", "依次")
-**Key Skill**: `organize-agents` (serial mode)
+**Entry**: `/speckit.team` (intent: "阶段", "串行", "pipeline", "chain", "依次")
+**Key Skill**: `create-team` (serial mode)
 
 ### Workflow DAG Design Principles
 
@@ -168,8 +168,8 @@ Stage 4: Test Engineer
 
 ## Team Loop Guide
 
-**Entry**: `/speckit.agents` (intent: "团队", "闭环", "自迭代", "持续优化")
-**Key Skill**: `organize-agents` (team-loop mode)
+**Entry**: `/speckit.team` (intent: "团队", "闭环", "自迭代", "持续优化")
+**Key Skill**: `create-team` (team-loop mode)
 
 > **Model alignment (Role × Stage × Type)**: a Team Loop is a **Loop** over a **Team** (the Role×Stage matrix). It has exactly **two layers** — a single **Team Supervisor** (Meta role) and its **Workers** — with the `executor`/`evaluator`/`optimizer` stages running under the Supervisor's control. The former separate Meta-Coordinator layer is merged into the Team Supervisor.
 
@@ -335,7 +335,7 @@ Instead of passing full context between agents in prompts:
 ## Related Documents & Traceability
 
 - Concept model (Role × Stage × Type, Team/Loop, merged Team Supervisor): [design.md](./design.md)
-- Command entry point, routing, and the `organize-agents` skill: [command-and-skills.md](./command-and-skills.md)
+- Command entry point, routing, and the `create-team` skill: [command-and-skills.md](./command-and-skills.md)
 - The per-role quality loop this builds on: [eei-triad-pattern.md](./eei-triad-pattern.md)
 - Orchestration templates and the agent registry: [templates-and-agents.md](./templates-and-agents.md)
 

@@ -69,7 +69,7 @@ Determines whether `.specify/skills/<name>/SKILL.md` already exists.
 
 When a **new** skill is created, `/speckit.skills` wires it into the built-in role agents so they prefer it for role-relevant work (Feature 026 Skill Enablement convention):
 
-1. Skips non-declarable skills (reference-only/meta: `sdd-workflow`, `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `organize-agents`).
+1. Skips non-declarable skills (reference-only/meta: `sdd-workflow`, `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `create-team`, `improve-team`).
 2. Analyzes the 7 built-in role agents (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`) against the skill's capability and triggers.
 3. Proposes a `Agent | Skill | When to use` table and waits for confirmation.
 4. On confirm, adds the canonical slug to each matched agent's `skills:` frontmatter and a row to its `## Skill Enablement` table, in both `agents/<slug>.agent.md` and `.specify/agents/<slug>.agent.md`. Generator templates are not modified.

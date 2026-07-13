@@ -38,7 +38,8 @@ NON_DECLARABLE = {
     "improve-agent",
     "create-skills",
     "improve-skills",
-    "organize-agents",
+    "create-team",
+    "improve-team",
 }
 
 
