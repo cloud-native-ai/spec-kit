@@ -1,0 +1,65 @@
+@startuml
+
+skinparam shadowing false
+skinparam roundCorner 20
+skinparam dpi 300
+scale 4
+skinparam defaultFontSize 14
+skinparam defaultFontName "Arial, Helvetica, sans-serif"
+skinparam padding 8
+skinparam ArrowThickness 2
+skinparam BorderThickness 2
+skinparam svgDimensionStyle false
+skinparam svgLinkTarget _blank
+' Command Execution Flow — UML Activity Diagram
+' Semantic: Entry=start, Edge=activities (commands), partitions=phases (职责/阶段分组),
+'           notes=advisory agents & auxiliary commands (non-blocking aids), Sink=stop.
+' Color mode ON (phases need visual distinction) — monochrome explicitly disabled.
+
+skinparam nodesep 20
+skinparam ranksep 30
+
+start
+
+partition "Phase 1: Setup" #E8EEF7 {
+  :specify init;
+  :/speckit.constitution;
+  :/speckit.instructions;
+}
+
+partition "Phase 2: Customize (Optional)" #EFE8F7 {
+  :/speckit.agents;
+  note right
+    generate role agents
+    create-agent / create-skills
+    (custom definitions)
+  end note
+  :/speckit.skills;
+}
+
+partition "Phase 3: Core Development" #E8F3EC {
+  :1. /speckit.feature;
+  :2. /speckit.requirements;
+  note right
+    @requirements-analyst
+    /speckit.clarify (loop on ambiguity)
+    /speckit.research (optional)
+  end note
+  :3. /speckit.plan;
+  note right: @system-designer
+  :4. /speckit.tasks;
+  note right
+    /speckit.checklist (QA gate)
+    /speckit.analyze (consistency check)
+  end note
+  :5. /speckit.implement;
+  note right
+    @module-designer
+    @test-engineer
+  end note
+  :6. /speckit.review;
+  note right: @qa-engineer
+}
+
+stop
+@enduml

@@ -150,6 +150,30 @@ Every agent `create-agent` can produce has one of two lifecycles; choose it befo
   `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`. Validation rejects
   invalid YAML, unsupported providers, and unresolved contradictions.
 
+## Skill Enablement convention
+
+Because framework skills and agent definitions install together, every installed skill is
+invocable by every agent. The seven built-in role agents make this explicit and consistent so
+they prefer a purpose-built framework skill over improvising the same operation. Each role agent
+(and its `agent-role-*-template.md` generator) declares two things:
+
+1. **`skills:` frontmatter** — a YAML list of the canonical slugs of the installed skills
+   relevant to that role (e.g. `skills: [draw-plantuml, memory-recall, memory-record, think-skills]`).
+   Slugs MUST resolve to an installed `.specify/skills/<slug>/SKILL.md`. Reference-only
+   (`sdd-workflow`) and meta/framework-authoring skills (`create-agent`, `improve-agent`,
+   `create-skills`, `improve-skills`, `organize-agents`) are **non-declarable** and never appear
+   in a role agent's list.
+2. **A `## Skill Enablement` body section** — the shared preference protocol (single source of
+   truth at `skills/create-agent/templates/agent-skill-enablement.md`, composed rather than
+   reworded per agent) plus a `| Skill | When to use |` table whose skill set equals the
+   `skills:` list. The protocol directs the agent to prefer an applicable skill, choose the most
+   role-specific one when several apply, and degrade gracefully to direct execution (surfacing
+   the failure) when no skill applies or a skill is unavailable.
+
+The contract test `tests/contract/test_agent_skill_enablement.py` enforces this convention
+(≥1 declared skill per agent, all references installed, no non-declarable slugs, section present,
+and template parity).
+
 ## Handoffs
 
 After creating or updating agents, run `/speckit.instructions` to refresh discovery metadata.

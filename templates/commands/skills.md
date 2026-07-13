@@ -51,12 +51,25 @@ Check `.specify/skills/<name>/SKILL.md` exists (canonical source).
 
 For detailed path conventions (`${SKILL_HOME}` / `${SKILL_WORKDIR}` semantics, computation idioms, nested invocations), see `skills/create-skills/SKILL.md`.
 
-### Step 4: Validate and report
+### Step 4: Propagate to built-in agents (create path only)
+
+After a **new** Skill is created (skip on the `improve-skills` path), wire it into the built-in role agents so they prefer it for role-relevant work (Feature 026 Skill Enablement convention; see `docs/agents/command-and-skills.md`).
+
+1. **Guard**: skip if the new Skill is non-declarable (reference-only/meta: `sdd-workflow`, `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `organize-agents`). Normal user-created Skills proceed.
+2. **Analyze**: read the 7 built-in role agents from `.specify/agents/` (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`). Judge each agent's role (Identity & Responsibilities) against the new Skill's capability + trigger keywords.
+3. **Match**: select the agents whose role operations the Skill covers and draft a one-line "when to use" per match. If none match, report "no role-relevant agents" and skip edits (no forced use).
+4. **Propose**: present a `| Agent | Skill | When to use |` table and wait for user confirmation before editing.
+5. **Apply** (on confirm): for each matched agent, edit BOTH `agents/<slug>.agent.md` and `.specify/agents/<slug>.agent.md`:
+   - Append the canonical Skill slug to the `skills:` frontmatter list (dedup; preserve order and all other keys).
+   - Add a `| <skill> | <when-to-use> |` row to that agent's `## Skill Enablement` table.
+6. **Invariants**: use the canonical slug; it MUST resolve to an installed `.specify/skills/<slug>/SKILL.md`; never add a non-declarable slug; preserve all existing frontmatter. Generator templates (`agent-role-*-template.md`) are intentionally NOT updated (a later regeneration would drop the added Skill).
+
+### Step 5: Validate and report
 
 - Confirm frontmatter valid (`name`, `description`, `skill_id`)
 - Verify canonical path matches `.specify/skills/<name>/SKILL.md`
 - Verify Skills registry includes deduplicated row
-- Report: paths, skill_id, registry edits, modernization results
+- Report: paths, skill_id, registry edits, modernization results, and (create path) which built-in agents the Skill was propagated to
 
 For agent-specific operational guidance, see `skills/sdd-workflow/references/agent-configuration.md`.
 

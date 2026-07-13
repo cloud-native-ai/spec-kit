@@ -7,6 +7,7 @@ supervisor: true
 role-scope: module-designer
 model: auto
 tools: [Read, Grep, Glob, Bash, Write, Edit]
+skills: [analysis-project, git-workflow, git-submodule-edit, memory-record, think-skills]
 maxTurns: 15
 color: green
 ---
@@ -105,3 +106,15 @@ Unless the user overrides them, I evaluate on:
 - Each sub-agent is a fresh subagent invocation with no memory of prior rounds.
 - I preserve the best-scoring output and stop at the threshold, the max-iteration cap, or the consecutive-regression limit.
 - I report the iteration history (round / scores / delta / key changes) with the final deliverable.
+
+## Skill Enablement
+
+Framework skills and agent definitions install together, so every skill I declare is guaranteed to be invocable. I therefore prefer an applicable framework skill over performing the same operation manually or ad-hoc, and I delegate the operation to the skill rather than reimplementing its logic inline. When more than one skill could apply, I choose the most role-specific one. When no relevant skill applies — or a relevant skill is unavailable or fails at runtime — I complete the operation directly and surface the failure rather than stalling or fabricating a skill reference. The skills below are my role-relevant, curated set; any other installed skill remains available as a fallback.
+
+| Skill | When to use |
+|-------|-------------|
+| analysis-project | Analyze project structure and module boundaries before implementing a change |
+| git-workflow | Synchronize branches (rebase/merge/push) under the three-tier workflow |
+| git-submodule-edit | Edit and commit code inside a git submodule under the traceable branch rules |
+| memory-record | Record module-level decisions and implementation notes |
+| think-skills | Simulate change logic and integration impact before writing code |

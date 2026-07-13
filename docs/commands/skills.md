@@ -38,6 +38,7 @@ Determines whether `.specify/skills/<name>/SKILL.md` already exists.
 - Minimal clarification questions
 - Scaffolds SKILL.md structure, resource directories
 - Registers the skill and reports completion
+- **Propagates the skill to built-in agents**: analyzes the 7 built-in role agents, proposes which ones the new skill is role-relevant to, and (after confirmation) adds the skill to those agents' `skills:` frontmatter and `## Skill Enablement` table (see [Agent propagation](#agent-propagation-create-path))
 
 **If the skill ALREADY exists** → delegates to `improve-skills` with a two-phase pass:
 
@@ -62,6 +63,18 @@ Determines whether `.specify/skills/<name>/SKILL.md` already exists.
 - Verifies Skills registry in `.specify/instructions.md`
 - Reports created/updated paths, `skill_id`, and registry edits
 - Lists which modernization items required edits vs. were already compliant
+- (Create path) Lists which built-in agents the skill was propagated to
+
+## Agent propagation (create path)
+
+When a **new** skill is created, `/speckit.skills` wires it into the built-in role agents so they prefer it for role-relevant work (Feature 026 Skill Enablement convention):
+
+1. Skips non-declarable skills (reference-only/meta: `sdd-workflow`, `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `organize-agents`).
+2. Analyzes the 7 built-in role agents (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`) against the skill's capability and triggers.
+3. Proposes a `Agent | Skill | When to use` table and waits for confirmation.
+4. On confirm, adds the canonical slug to each matched agent's `skills:` frontmatter and a row to its `## Skill Enablement` table, in both `agents/<slug>.agent.md` and `.specify/agents/<slug>.agent.md`. Generator templates are not modified.
+
+If no agent is role-relevant, propagation is skipped (no forced use).
 
 ## Skill Directory Structure
 
@@ -87,6 +100,7 @@ Determines whether `.specify/skills/<name>/SKILL.md` already exists.
 | Skill definition | `.specify/skills/<name>/SKILL.md` |
 | Skill scripts | `.specify/skills/<name>/scripts/` |
 | Registry update | `.specify/instructions.md` → Skills section |
+| Agent skill enablement (create path) | `agents/<slug>.agent.md` + `.specify/agents/<slug>.agent.md` |
 
 ## Prerequisites
 

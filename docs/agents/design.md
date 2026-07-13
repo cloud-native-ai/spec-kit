@@ -122,6 +122,15 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 所有 `agent-*` 模板已从顶层模板目录迁移至 **`skills/create-agent/templates/`**，作为 create-agent 技能的一部分；
 安装时镜像到 `.specify/skills/create-agent/templates/`。完整模板目录见 [templates-and-agents.md](./templates-and-agents.md)。
 
+### 6.4 技能赋能（Skill Enablement）
+
+技能与 Agent 定义同步安装，因此每个内置 Agent 都可调用任意已安装技能。七个内置角色 Agent 将这一能力**显式化、一致化**：优先使用与角色相关的框架技能，而非手工重复同类操作。每个角色 Agent 及其 `agent-role-*` 模板都声明两部分：
+
+- **`skills:` 前置字段**：该角色相关的已安装技能规范 slug 列表（如需求分析师 → `draw-plantuml`；模块设计师 → `analysis-project`）。仅引用类技能（`sdd-workflow`）与元/框架创作类技能（`create-agent`、`improve-agent`、`create-skills`、`improve-skills`、`organize-agents`）为**不可声明**，不出现在任何角色列表中。
+- **`## Skill Enablement` 正文小节**：共享的偏好协议（单一事实来源 `skills/create-agent/templates/agent-skill-enablement.md`，各 Agent 组合复用而非各自改写）+ 与 `skills:` 一致的 `| Skill | When to use |` 表格。协议要求：优先选用适用技能；多个适用时选最贴合角色者；无适用技能或技能不可用/失败时，直接完成操作并暴露失败。
+
+契约测试 `tests/contract/test_agent_skill_enablement.py` 校验该约定（每个 Agent ≥1 技能、引用均已安装、无不可声明 slug、小节存在、模板与 Agent 保持一致）。约定细节见 [command-and-skills.md](./command-and-skills.md)。
+
 ## 七、术语统一（规范化）
 
 术语统一是本框架消除概念混乱的关键步骤。**当前唯一被接受的术语**如下（旧术语仅在迁移说明中作为历史上下文出现）：

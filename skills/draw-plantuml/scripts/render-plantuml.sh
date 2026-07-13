@@ -10,7 +10,10 @@
 # This script targets PNG_MAX (4095) to stay safely below the cap.
 #
 # Two rendering backends (auto-selected):
-#   • server — POST to a PlantUML server (PLANTUML_SERVER). Preferred when reachable.
+#   • server — GET encoded source from a PlantUML server (PLANTUML_SERVER).
+#              Uses the official PlantUML server protocol: the source is
+#              deflate + base64 encoded (via python3) and fetched from
+#              /svg/{enc} or /png/{enc}. Preferred when reachable.
 #   • local  — a local PlantUML jar (PLANTUML_JAR or a well-known path) via `java`.
 #             Works fully offline. Required diagram types that need Graphviz
 #             (class/component/deployment/sequence/state/usecase/activity/package)
@@ -22,7 +25,7 @@
 
 set -euo pipefail
 
-PLANTUML_SERVER="${PLANTUML_SERVER:-http://workspace.code-workspace.cloud:39156/plantuml}"
+PLANTUML_SERVER="${PLANTUML_SERVER:-http://xuanji-plantuml.aliyun-inc.com:9696/plantuml}"
 PLANTUML_BACKEND="${PLANTUML_BACKEND:-auto}"   # server | local | auto
 SVG_SCALE=4        # SVG: maximum quality (vector, no size limit)
 SVG_DPI=300
@@ -52,13 +55,39 @@ resolve_jar() {
   return 1
 }
 
-# Probe whether the PlantUML server can render (POST a trivial diagram).
+# Encode PlantUML source (read from stdin) using PlantUML's Deflate + custom
+# base64 alphabet, so it can be embedded in a GET URL against an official
+# PlantUML server (/svg/{enc}, /png/{enc}). Requires python3.
+plantuml_encode() {
+  python3 -c '
+import sys, zlib
+def e6(b):
+    if b < 10: return chr(48 + b)
+    b -= 10
+    if b < 26: return chr(65 + b)
+    b -= 26
+    if b < 26: return chr(97 + b)
+    b -= 26
+    return "-" if b == 0 else ("_" if b == 1 else "?")
+def a3(b1, b2, b3):
+    return (e6((b1 >> 2) & 0x3F) + e6(((b1 & 0x3) << 4 | b2 >> 4) & 0x3F)
+            + e6(((b2 & 0xF) << 2 | b3 >> 6) & 0x3F) + e6(b3 & 0x3F))
+d = sys.stdin.buffer.read()
+c = zlib.compressobj(9, zlib.DEFLATED, -15)
+comp = c.compress(d) + c.flush()
+out = []
+for i in range(0, len(comp), 3):
+    ch = comp[i:i+3]
+    out.append(a3(ch[0], ch[1] if len(ch) > 1 else 0, ch[2] if len(ch) > 2 else 0))
+sys.stdout.write("".join(out))
+'
+}
+
+# Probe whether the PlantUML server can render. Uses the official server
+# protocol: GET a known-good encoded trivial diagram and expect HTTP 2xx.
 server_reachable() {
-  local probe='@startuml
-a->b
-@enduml'
-  curl -sf -m 6 -X POST -H "Content-Type: text/plain" \
-    --data-binary "$probe" "${PLANTUML_SERVER}/svg" -o /dev/null 2>/dev/null
+  curl -sf -m 6 "${PLANTUML_SERVER}/svg/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000" \
+    -o /dev/null 2>/dev/null
 }
 
 # Decide which backend to use. Echoes "server" or "local"; exits on neither.
@@ -104,8 +133,12 @@ render_diagram() {
     [[ "$produced" != "$out" ]] && mv -f "$produced" "$out"
     [[ -f "$out" ]]
   else
-    curl -sf -X POST -H "Content-Type: text/plain" \
-      --data-binary "@${styled}" "${PLANTUML_SERVER}/${fmt}" -o "$out"
+    local enc
+    if ! enc="$(plantuml_encode < "$styled")" || [[ -z "$enc" ]]; then
+      warn "PlantUML source encoding failed (python3 required for server backend)"
+      return 1
+    fi
+    curl -sf -m 30 "${PLANTUML_SERVER}/${fmt}/${enc}" -o "$out"
   fi
 }
 
