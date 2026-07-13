@@ -60,6 +60,16 @@ Follow this execution flow:
    - Replace every placeholder with concrete text (no bracketed tokens left except intentionally retained template slots that the project has chosen not to define yet—explicitly justify any left).
    - Preserve heading hierarchy and comments can be removed once replaced unless they still add clarifying guidance.
    - Ensure each Principle section: succinct name line, paragraph (or bullet list) capturing non‑negotiable rules, explicit rationale if not obvious.
+   - **MUST include** a principle for "Documentation-First" that is ordered ABOVE any
+     Test-First / testing principle (i.e. it MUST appear before the testing principle in
+     the principle list) and mandates:
+     - The project maintains sufficiently detailed and accurate documentation to serve as
+       context for AI agents / large language models (project knowledge and background).
+     - Documentation does NOT capture implementation details; those belong in the code.
+     - Documents are split into smaller, cohesive documents when they grow too complex.
+     - Documents cross-reference one another so basic navigation works through internal links.
+     - Markdown documents maintain basic metadata (title, purpose/summary, status,
+       last-updated date, related links).
    - **MUST include** a principle for "Feature-centric development" that mandates:
      - Feature list is the long‑lived project backbone.
      - Every spec/plan/tasks/implement step must re‑evaluate Feature additions/removals.
