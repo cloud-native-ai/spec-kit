@@ -32,6 +32,8 @@ When processing the user input:
    - **Crucial**: You MUST also read and analyze the project's **existing documentation** (`README.md`, `docs/`) and **feature memory** (`.specify/memory/`) to ensure the plan aligns with the system's architecture and evolution.
 
 4. **Implement plan workflow**: Follow the structure in IMPL_PLAN template to:
+   - **Fill the template in place**: replace every `[PLACEHOLDER]` token in the copied IMPL_PLAN. Do **NOT** append a second copy of the template below your filled content (a duplicated `# Implementation Plan:` block with leftover placeholder tokens is a defect).
+   - Stamp the header line `**Requirement → Feature**: <REQUIREMENTS_KEY> → Feature <FEATURE_ID> <FEATURE_NAME>` so the requirement key and the bound feature ID are never confused, and reference the feature as `Feature <ID>` (never a bare number) throughout.
    - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
      - Incorporate relevant background information from `$ARGUMENTS`
      - Incorporate findings from `research.md` if available
@@ -50,7 +52,7 @@ When processing the user input:
    - Phase 1: Generate data-model.md, contracts/, quickstart.md
    - Re-evaluate Constitution Check post-design
 
-5. **Stop and report**: Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generated artifacts.
+5. **Plan integrity gate + stop and report**: Before finishing, verify the filled IMPL_PLAN contains (a) **no** residual `[UPPER_SNAKE_CASE]` placeholder tokens, (b) **exactly one** top-level `# Implementation Plan:` heading (no duplicated template body appended), and (c) the `**Requirement → Feature**` stamp. Fix the file if any check fails. Then report branch, IMPL_PLAN path, and generated artifacts.
 
 ## Feature Integration
 

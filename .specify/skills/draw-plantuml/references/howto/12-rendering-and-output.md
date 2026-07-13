@@ -12,10 +12,31 @@
 
 | 后端 | 触发条件 | 依赖 | 说明 |
 |------|---------|------|------|
-| **server** | `PLANTUML_SERVER` 可达 | 一个 PlantUML 服务器 | 首选；脚本 POST 源码到 `/svg`、`/png` |
+| **server** | `PLANTUML_SERVER` 可达 | 一个 PlantUML 服务器 + `python3` | 首选；脚本将源码做 Deflate+Base64 编码后 GET `/svg/{enc}`、`/png/{enc}`（官方 PlantUML server 协议） |
 | **local** | 服务器不可达且找到本地 jar | `java` + PlantUML jar（+ CJK 字体） | 完全离线；专项图（WBS/甘特/思维导图/JSON/YAML）无需 Graphviz |
 
 `auto` 会先探测服务器，不可达时自动回退到本地 jar。
+
+**默认远程服务器**——脚本默认使用自建的 PlantUML server 渲染表图：
+
+```
+http://xuanji-plantuml.aliyun-inc.com:9696/plantuml
+```
+
+如需指向其他服务器，设置 `PLANTUML_SERVER=<url>`（URL 以上下文路径结尾，不含 `/svg` 等后缀）。
+
+**自建远程服务器（Docker）**——上述默认服务器由以下 Docker 镜像在主机 `xuanji-plantuml.aliyun-inc.com` 上运行；如需自行部署，可复用相同命令：
+
+```bash
+img="reg.docker.alibaba-inc.com/xuanji-images/observability-plantuml:deploy-2026-07-13"
+docker pull ${img} && \
+docker run -d --name plantuml --restart unless-stopped \
+  -p 9696:9696 \
+  -p 8080:8080 \
+  ${img}
+```
+
+> 容器内 PlantUML server 监听 `9696`、上下文路径为 `/plantuml`，故渲染地址为 `http://<host>:9696/plantuml`。该镜像为官方 PlantUML server（1.2026.1），仅支持编码后 GET 渲染，不接受原始文本 POST——渲染脚本已按此协议实现。
 
 **离线（本地 jar）环境准备**——要复现本技能内「推荐测试图」的同等质量成图，需一次性准备：
 
@@ -41,7 +62,7 @@ fc-cache -f ${HOME}/.local/share/fonts
 
 ### 1.1 渲染脚本
 
-使用渲染脚本将每张图渲染为 SVG（首选）和 PNG：
+使用渲染脚本将每张图渲染为 PNG（首选）和 SVG：
 
 ```bash
 bash ${SKILL_HOME}/scripts/render-plantuml.sh diagram-01.puml output_dir 01-system-overview
@@ -55,8 +76,8 @@ bash ${SKILL_HOME}/scripts/render-plantuml.sh diagram-01.puml output_dir 01-syst
 
 | 格式 | 策略 | 参数 | 输出尺寸 | 适用场景 |
 |------|------|------|----------|----------|
-| **SVG** | 最大质量 | `scale 4 + dpi 300` | viewBox ≥ 3840×2160 (4K UHD) | 所有图表（首选格式） |
-| **PNG** | 自适应 | 脚本计算 | ≤ 4095×4095 | 用户明确要求/平台不支持 SVG |
+| **PNG** | 自适应 | 脚本计算 | ≤ 4095×4095 | **所有图表（默认首选格式）**——最美观，且在 Preview / Markdown 预览中可直接查看 |
+| **SVG** | 最大质量 | `scale 4 + dpi 300` | viewBox ≥ 3840×2160 (4K UHD) | 超宽/超大图（PNG 触及 4096px 上限时）或需任意无损缩放 |
 
 **PNG 自适应算法**：
 1. 先渲染 SVG，获取 viewBox 尺寸
@@ -71,8 +92,8 @@ bash ${SKILL_HOME}/scripts/render-plantuml.sh diagram-01.puml output_dir 01-syst
 
 在 `output_dir` 中生成：
 - `01-system-overview.puml` — 应用了 SVG 样式块的 PlantUML 源文件（scale 4）
-- `01-system-overview.svg` — SVG（首选，矢量，无限缩放）
-- `01-system-overview.png` — PNG（自适应分辨率，≤ 4095×4095）
+- `01-system-overview.png` — PNG（**首选**，自适应分辨率，≤ 4095×4095，最美观、Preview 可直接查看）
+- `01-system-overview.svg` — SVG（矢量、无限缩放；超宽/超大图或需无损缩放时备选）
 
 文件命名：`{nn}-{short-title}`（如 `01-system-overview`）
 
@@ -132,7 +153,7 @@ node ${SKILL_HOME}/scripts/svg-to-png-cjk.cjs <input.svg> <output-cjk.png> 2
 
 ## 四、组装最终 HTML 文档
 
-将所有渲染的图表和文字组合为**单个 HTML 文档**，展示架构图并嵌入 SVG/PNG 图片（而非原始 PlantUML 代码）。
+将所有渲染的图表和文字组合为**单个 HTML 文档**，展示架构图并嵌入渲染图片（**默认优先 PNG**，而非原始 PlantUML 代码）。
 
 ### 4.1 HTML 模板
 
@@ -163,7 +184,7 @@ node ${SKILL_HOME}/scripts/svg-to-png-cjk.cjs <input.svg> <output-cjk.png> 2
     <h3>[Diagram 1 Title]</h3>
     <p>[Context]</p>
     <div class="diagram">
-      <img src="01-diagram-name.svg" alt="[Diagram 1 Title]" />
+      <img src="01-diagram-name.png" alt="[Diagram 1 Title]" />
     </div>
     <div class="explanation">
       [Explanation + Rationale]
@@ -181,11 +202,11 @@ node ${SKILL_HOME}/scripts/svg-to-png-cjk.cjs <input.svg> <output-cjk.png> 2
 
 ### 4.2 HTML 组装规则
 
-- 使用**相对路径**引用 SVG/PNG 文件（图表和 HTML 在同一输出目录中）
-- 或只有一张图时，直接在 HTML 中内联嵌入 SVG 内容：`<svg>...</svg>`
+- 使用**相对路径**引用图片文件（图表和 HTML 在同一输出目录中）
+- **默认优先引用 PNG**（`<img src="….png" />`）——最美观，且在各类 Preview / Markdown 预览中可直接查看
+- 仅当图表过宽/过大（PNG 触及 4096px 上限）或需任意无损缩放时，改用 SVG；单图也可内联嵌入 `<svg>...</svg>`
 - 确保所有图片有有意义的 `alt` 属性
 - HTML 应自包含，可直接在浏览器中打开 `.html` 文件查看
-- 优先使用 SVG 以获得任意缩放级别的清晰渲染
 
 ---
 
@@ -194,7 +215,7 @@ node ${SKILL_HOME}/scripts/svg-to-png-cjk.cjs <input.svg> <output-cjk.png> 2
 - 输出为**单个 HTML 文档**（`.html` 文件），包含渲染的 SVG/PNG 图表
 - 图表**必须**通过 [render-plantuml.sh](../../scripts/render-plantuml.sh) 脚本渲染——最终输出中**不要**嵌入原始 PlantUML 文本
 - SVG/PNG 图片文件与 HTML 保存在同一输出目录中
-- HTML 通过相对路径引用图片（如 `<img src="01-overview.svg" />`）
+- HTML 通过相对路径引用图片，**默认优先 PNG**（如 `<img src="01-overview.png" />`）；超宽/超大图或需无损缩放时改用 SVG
 - 单图输出时，内联 SVG 嵌入可作为替代方案
 - PlantUML 源文件（`.puml`）也应保存以供未来编辑/重新生成
 - HTML 语义元素中的文字描述（标题、段落、列表）

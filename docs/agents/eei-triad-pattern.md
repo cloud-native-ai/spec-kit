@@ -139,8 +139,8 @@ As of the 2026-07-02 amendment, the triad is no longer a standalone pattern bolt
 
 Canonical templates (author/edit here — see [templates-and-agents.md](./templates-and-agents.md)):
 
-- **Stage templates**: `skills/create-agent/templates/agent-stage-{executor,evaluator,optimizer}-template.md`
-- **Triad orchestration**: `skills/create-agent/templates/agent-triad-orchestration-template.md`
+- **Stage templates**: `skills/create-team/templates/agent-stage-{executor,evaluator,optimizer}-template.md`
+- **Triad orchestration**: `skills/create-team/templates/agent-triad-orchestration-template.md`
 - **Supervision snippet** (single source): `skills/create-agent/templates/agent-supervision-delegation.md`
 
 Normative specs:

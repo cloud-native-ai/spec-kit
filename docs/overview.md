@@ -410,23 +410,23 @@ flowchart TD
 
 ## 8. 关键问题与改进建议
 
-### 8.1 高优先级：命令模板与脚本文件名疑似不一致
+### 8.1 ✅ 已修复：命令模板与脚本文件名不一致
 
-`templates/commands/requirements.md` 的脚本片段调用 `.specify/scripts/bash/create-new-requirement.sh`：[templates/commands/requirements.md](templates/commands/requirements.md#L8-L13)，但仓库实际脚本是 [scripts/bash/create-new-requirements.sh](scripts/bash/create-new-requirements.sh)。这会导致生成后的 `/speckit.requirements` 命令无法找到脚本。
+历史问题：`templates/commands/requirements.md` 的脚本片段曾调用单数 `create-new-requirement.sh`，但仓库实际脚本是 [scripts/bash/create-new-requirements.sh](scripts/bash/create-new-requirements.sh)（复数）。单数文件名从未真实存在，源于脚本重命名（`af64131`）时的笔误。
 
-**建议**：统一为复数文件名，并增加 contract test：遍历所有 command template 中的脚本路径，验证目标文件存在。
+**处理**：已统一为复数文件名（命令源模板、docs、5 个 agent 副本均已修正）。建议后续增加 contract test：遍历所有 command template 中的脚本路径，验证目标文件存在。
 
-### 8.2 高优先级：模板命名存在旧称残留
+### 8.2 ✅ 已修复：模板命名存在旧称残留
 
-requirements 命令要求加载 `templates/spec-template.md`：[templates/commands/requirements.md](templates/commands/requirements.md#L91-L96)，但实际需求模板为 [templates/requirements-template.md](templates/requirements-template.md)。这会诱导 Agent 查找不存在的模板。
+历史问题：requirements 命令曾要求加载 `templates/spec-template.md`，但该文件已在 `6248499` 中被重命名为 [templates/requirements-template.md](templates/requirements-template.md)，引用未同步更新，会诱导 Agent 查找不存在的模板。
 
-**建议**：统一术语为 requirements template；如需兼容上游 `spec-template.md`，应保留别名文件或在脚本层做兼容查找。
+**处理**：已统一术语为 requirements template（命令源模板、docs、5 个 agent 副本均已修正）。原遗留死脚本 `.specify/scripts/bash/create-new-feature.sh` 已删除，其工具注册表条目已同步清除。
 
-### 8.3 中优先级：instructions registry marker 命名漂移
+### 8.3 ✅ 已修复：instructions registry marker 命名漂移
 
-instructions 命令文档提到 `TOOLS_PLACEHOLDER_START` 等 marker：[templates/commands/instructions.md](templates/commands/instructions.md#L107-L110)，但实际 instructions 模板使用 `AGENTS_REGISTRY_START`、`SKILLS_REGISTRY_START`、`TOOLS_REGISTRY_START`：[templates/instructions-template.md](templates/instructions-template.md#L71-L92)。
+历史问题：instructions 命令文档曾提到 `TOOLS_PLACEHOLDER_START` 等 marker，但实际 instructions 模板使用 `AGENTS_REGISTRY_START`、`SKILLS_REGISTRY_START`、`TOOLS_REGISTRY_START`：[templates/instructions-template.md](templates/instructions-template.md#L71-L92)。
 
-**建议**：统一 marker 名称，并测试 instructions 生成流程不会丢失注册表内容。
+**处理**：已将 [templates/commands/instructions.md](templates/commands/instructions.md) 中的 marker 名称统一为 `*_REGISTRY_*`（含新增 Agents 注册表）。建议补充测试：instructions 生成流程不会丢失注册表内容。
 
 ### 8.4 中优先级：`implement-plan.sh` 引用了未定义的 `json_escape`
 

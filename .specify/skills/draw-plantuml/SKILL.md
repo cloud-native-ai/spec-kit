@@ -93,9 +93,10 @@ skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 
 ## 输出要求
 
-- 输出为单个 HTML 文档，包含渲染的 SVG/PNG 图表（不嵌入原始 PlantUML 文本）
-- 图表通过 [render-plantuml.sh](scripts/render-plantuml.sh) 渲染
-- SVG/PNG 与 HTML 保存在同一目录，HTML 通过相对路径引用图片
+- 输出为单个 HTML 文档，包含渲染的图表（不嵌入原始 PlantUML 文本）
+- 图表通过 [render-plantuml.sh](scripts/render-plantuml.sh) 渲染，同时产出 PNG 与 SVG
+- **默认优先选用 PNG 格式**引用/嵌入图片（最美观，且在 Preview / Markdown 预览中可直接查看）；仅当图表过宽/过大触及 PNG 4096px 上限或需任意无损缩放时改用 SVG
+- PNG/SVG 与 HTML 保存在同一目录，HTML 通过相对路径引用图片
 - PlantUML 源文件（`.puml`）保存以供未来编辑
 - 每张图至少包含标题、渲染图片和简要说明
 

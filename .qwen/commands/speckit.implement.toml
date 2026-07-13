@@ -63,8 +63,9 @@ Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/reference
    - Report after each completed task
    - Halt on non-parallel task failure; for [P] continue successful, report failed
    - Mark completed: `[X]`. Deferred (resource unavailable): `[~]` with `<!-- deferred: <reason> -->`. Never leave deferred work as `[ ]`.
+   - **Evidence-backed closure**: only mark `[X]` for work you have actually executed and verified. Each closure MUST be justified by concrete evidence (a passing test id, a command/grep result, or a diff of the named target file). Do NOT close a task whose named file was not changed.
 
-8. **Completion validation**: All tasks `[X]` or `[~]` (no `[ ]` remaining). Features match spec. Tests pass.
+8. **Completion validation**: All tasks `[X]` or `[~]` (no `[ ]` remaining). Features match spec. Tests pass. **Commit gate**: commit after each task or logical group; the spec dir MUST NOT be left *entirely* uncommitted when validation completes — an uncommitted implementation leaves no per-task audit trail and breaks `/speckit.review`'s git-based history reconstruction. Do not report the Definition of Done as "met" while the whole feature is uncommitted.
 
 9. **Pre-Status-Flip Gate** and **Verification Log**: Apply the full gate protocol from `skills/sdd-workflow/references/feature-integration.md` § Pre-Status-Flip Gate. Populate `REQUIREMENTS_DIR/verification.md` from `.specify/templates/verification-log-template.md`.
 

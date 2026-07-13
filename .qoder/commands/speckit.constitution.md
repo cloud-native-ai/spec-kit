@@ -1,6 +1,3 @@
----
-description: 
----
 ## User Input
 
 ```text

@@ -1,9 +1,10 @@
 # Implementation Plan: [SPEC]
 
 **Branch**: `[###-spec-name]` | **Date**: [DATE] | **Spec**: [link]
+**Requirement → Feature**: `[REQUIREMENTS_KEY]` → Feature [FEATURE_ID] [FEATURE_NAME]
 **Input**: Specification from `.specify/specs/[REQUIREMENTS_KEY]/requirements.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command, which **replaces** every `[PLACEHOLDER]` token in place — it MUST NOT append a second copy of this template below the filled content. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 

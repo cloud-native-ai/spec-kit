@@ -112,10 +112,11 @@ Fallback behavior:
    - Read the content of `.specify/instructions.md` (whether newly created or existing).
    - **Fill Placeholders**: Replace any bracketed placeholders (e.g., `[Brief summary...]`, `[Detected tech stack...]`) with concrete details derived from your analysis.
    - **Update Documentation Map**: Ensure the table correctly points to existing documentation files in the repository.
-   - **Preserve Sections**: Do NOT remove or overwrite the `## Tools` and `## Skills` managed ranges. Keep marker comments intact:
-     - `<!-- TOOLS_PLACEHOLDER_START --> ... <!-- TOOLS_PLACEHOLDER_END -->`
-     - `<!-- SKILLS_PLACEHOLDER_START --> ... <!-- SKILLS_PLACEHOLDER_END -->`
-     These ranges are reserved for the `skills` command.
+   - **Preserve Sections**: Do NOT remove or overwrite the `## Agents`, `## Skills`, and `## Tools` managed ranges. Keep marker comments intact:
+     - `<!-- AGENTS_REGISTRY_START --> ... <!-- AGENTS_REGISTRY_END -->`
+     - `<!-- SKILLS_REGISTRY_START --> ... <!-- SKILLS_REGISTRY_END -->`
+     - `<!-- TOOLS_REGISTRY_START --> ... <!-- TOOLS_REGISTRY_END -->`
+     These ranges are reserved for the `agents`, `skills`, and `tools` commands.
    - **Incorporate User Input**: If `$ARGUMENTS` provided specific instructions or context, integrate them into the file.
 
 5. **Reintegrate Preserved Blocks** (skip if the **Preserve & Decompose** step was skipped):

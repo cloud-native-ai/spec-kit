@@ -22,11 +22,11 @@ Create or update a requirements specification from a natural-language feature de
 
 2. **Check for existing branches** — Fetches all remote branches, scans local branches and `.specify/specs/` directories to determine the next available feature number.
 
-3. **Run setup script** — Executes `create-new-requirement.sh` to create a new git branch and initialize the spec directory at `.specify/specs/<NNN-short-name>/`.
+3. **Run setup script** — Executes `create-new-requirements.sh` to create a new git branch and initialize the spec directory at `.specify/specs/<NNN-short-name>/`.
 
 4. **Parse feature description** — Extracts key concepts: actors, actions, data entities, and constraints from the user's input.
 
-5. **Generate specification** — Fills the spec template (`templates/spec-template.md`) with:
+5. **Generate specification** — Fills the spec template (`templates/requirements-template.md`) with:
    - Overview and context
    - User scenarios and testing flows
    - Functional requirements (each must be testable)

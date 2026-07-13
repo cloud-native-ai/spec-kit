@@ -11,7 +11,7 @@ handoffs:
      send: true
 scripts:
    sh: |
-      cat << 'EOF' | .specify/scripts/bash/create-new-requirement.sh --json --short-name "<SHORT_NAME>"
+      cat << 'EOF' | .specify/scripts/bash/create-new-requirements.sh --json --short-name "<SHORT_NAME>"
       $ARGUMENTS
       EOF
 ---
@@ -35,7 +35,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/reference
 
 3. **Run script** `{SCRIPT}` from repo root (replace `<SHORT_NAME>`). Parse JSON for BRANCH_NAME and SPEC_FILE. Run only once.
 
-4. **Load** `templates/spec-template.md` for required sections.
+4. **Load** `templates/requirements-template.md` for required sections.
 
 5. **Execute spec generation**:
    1. Parse user description. If empty: ERROR.
