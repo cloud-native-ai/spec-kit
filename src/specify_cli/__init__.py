@@ -163,6 +163,89 @@ _ASSISTANT_ARG_FORMATS = {
     "codex": "$ARGUMENTS",
 }
 
+# ---------------------------------------------------------------------------
+# Obsolete framework artifacts (structural cleanup on init/upgrade)
+#
+# These names are derived from Git history: framework-owned skills, commands, and
+# top-level templates that were renamed, consolidated, or removed across versions.
+# On init/upgrade the additive copytree (dirs_exist_ok=True) never deletes stale
+# files, so an upgraded workspace accumulates old structure. cleanup_obsolete_
+# framework_assets() removes ONLY these enumerated, framework-owned artifacts —
+# never user-authored skills, commands, or templates.
+#
+# NOTE: the names below are historical, framework-owned identifiers that are
+# named here solely so init can DELETE them. Legacy-reference guardrail tests
+# treat the region between the OBSOLETE-ASSET-REGISTRY markers as sanctioned
+# (it is a removal manifest, not a live dependency).
+# ---------------------------------------------------------------------------
+# OBSOLETE-ASSET-REGISTRY:START
+
+# Skill directories that once shipped but were renamed/consolidated/removed.
+# (agent-setup→cli-setup; docx/pdf/pptx/xlsx-utils→document-utils; mysql/postgres
+# -utils→database-utils; playwright-utils/web-test→browser-utils; organize-agents
+# →create-team; skill-creator→create-skills; thought-experiment-verifier→
+# think-skills; sdd-workflow→shared/workflow; mcp-creator/refresh-mcp-tools/
+# notebooklm-utils/theme-creator removed).
+_OBSOLETE_SKILLS = (
+    "agent-setup",
+    "docx-utils",
+    "mcp-creator",
+    "mysql-utils",
+    "notebooklm-utils",
+    "organize-agents",
+    "pdf-utils",
+    "playwright-utils",
+    "postgres-utils",
+    "pptx-utils",
+    "refresh-mcp-tools",
+    "sdd-workflow",
+    "skill-creator",
+    "theme-creator",
+    "thought-experiment-verifier",
+    "web-test",
+    "xlsx-utils",
+)
+
+# Command stems that were renamed or removed (specify→requirements; converge,
+# mcpcall, taskstoissues removed). Generated command files are named
+# ``speckit.<stem>.<ext>`` per agent, plus ``<stem>.md`` in the fallback
+# .specify/templates/commands directory.
+_OBSOLETE_COMMANDS = (
+    "converge",
+    "mcpcall",
+    "specify",
+    "taskstoissues",
+)
+
+# Top-level template files that were renamed, moved into skill directories, or
+# removed and therefore no longer ship at .specify/templates/<file>.
+_OBSOLETE_TEMPLATES = (
+    "agent-ask-template.md",
+    "agent-common-template.md",
+    "agent-explore-template.md",
+    "agent-file-template.md",
+    "agent-knowledge-template.md",
+    "agent-plan-template.md",
+    "agent-research-template.md",
+    "agent-role-knowledge-manager-template.md",
+    "agent-role-module-designer-template.md",
+    "agent-role-qa-engineer-template.md",
+    "agent-role-requirements-analyst-template.md",
+    "agent-role-system-designer-template.md",
+    "agent-role-test-engineer-template.md",
+    "agent-subrole-evaluator-template.md",
+    "agent-subrole-executor-template.md",
+    "agent-subrole-improver-template.md",
+    "agent-supervision-delegation.md",
+    "agent-triad-orchestration-template.md",
+    "consitution-template.md",
+    "feature-template.md",
+    "mcptool-template.md",
+    "spec-template.md",
+    "tool-mcp-call-template.md",
+)
+# OBSOLETE-ASSET-REGISTRY:END
+
 # Skills symlink assistants (those that need .<agent>/skills → .specify/skills link)
 _SKILLS_SYMLINK_ASSISTANTS = {
     "copilot",
@@ -1057,6 +1140,78 @@ def ensure_per_file_agent_links(root_path: Path, agent_dir_name: str) -> None:
         link_path.symlink_to(relative_target)
 
 
+def cleanup_obsolete_framework_assets(
+    project_path: Path,
+    ai_assistant: str,
+    tracker: Optional[StepTracker] = None,
+) -> List[str]:
+    """Remove obsolete framework-owned structure from an upgraded workspace.
+
+    Init copies assets additively (``copytree(dirs_exist_ok=True)``) and never
+    deletes files that a newer framework version dropped or renamed. This prunes
+    ONLY the enumerated, framework-owned artifacts in ``_OBSOLETE_SKILLS``,
+    ``_OBSOLETE_COMMANDS``, and ``_OBSOLETE_TEMPLATES`` — restricted to the
+    ``.specify/`` tree and the active agent's command directory. User-authored
+    skills, commands, and templates are never touched.
+
+    Returns the list of removed paths (relative to ``project_path``) for reporting.
+    """
+    removed: List[str] = []
+    specify_dir = project_path / ".specify"
+
+    def _rel(p: Path) -> str:
+        try:
+            return str(p.relative_to(project_path))
+        except ValueError:
+            return str(p)
+
+    # 1) Obsolete skills: .specify/skills/<name>/ (agent .<tool>/skills dirs are
+    #    symlinks to this canonical location, so a single removal is enough).
+    skills_dir = specify_dir / "skills"
+    for name in _OBSOLETE_SKILLS:
+        target = skills_dir / name
+        if target.is_symlink() or not target.exists():
+            continue
+        if target.is_dir():
+            shutil.rmtree(target, ignore_errors=True)
+            removed.append(_rel(target))
+
+    # 2) Obsolete top-level templates: .specify/templates/<file>
+    templates_dir = specify_dir / "templates"
+    for filename in _OBSOLETE_TEMPLATES:
+        target = templates_dir / filename
+        if target.is_file() and not target.is_symlink():
+            target.unlink()
+            removed.append(_rel(target))
+
+    # 3) Obsolete commands: speckit.<stem>.<ext> in the active agent's command
+    #    dir, plus the fallback .specify/templates/commands/<stem>.md.
+    command_targets: List[Path] = []
+    cmd_dir_rel = _ASSISTANT_COMMAND_DIRS.get(ai_assistant)
+    cmd_ext = _ASSISTANT_EXTENSIONS.get(ai_assistant)
+    for stem in _OBSOLETE_COMMANDS:
+        if cmd_dir_rel and cmd_ext:
+            command_targets.append(
+                project_path / cmd_dir_rel / f"speckit.{stem}.{cmd_ext}"
+            )
+        command_targets.append(specify_dir / "templates" / "commands" / f"{stem}.md")
+    for target in command_targets:
+        if target.is_file() and not target.is_symlink():
+            target.unlink()
+            removed.append(_rel(target))
+
+    if tracker:
+        if removed:
+            tracker.complete(
+                "local-templates",
+                f"removed {len(removed)} obsolete framework asset(s)",
+            )
+        else:
+            tracker.complete("local-templates", "no obsolete assets to remove")
+
+    return removed
+
+
 def copy_local_templates(
     project_path: Path,
     ai_assistant: str,
@@ -1430,6 +1585,13 @@ def copy_local_templates(
                 tracker.complete(
                     "local-templates", f"{agent_dir_name}/agents links ready"
                 )
+
+        # Structural cleanup: remove obsolete framework-owned skills, commands,
+        # and templates left behind by earlier versions (upgrade path). Scope is
+        # strictly the framework's own enumerated artifacts; user content is safe.
+        if tracker:
+            tracker.start("local-templates", "cleaning obsolete framework assets")
+        cleanup_obsolete_framework_assets(project_path, ai_assistant, tracker)
 
     except Exception as e:
         if tracker:
