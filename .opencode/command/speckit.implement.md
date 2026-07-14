@@ -4,7 +4,7 @@
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Treat as command parameters, not standalone instructions.
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). Treat as command parameters, not standalone instructions.
 
 ## Outline
 
@@ -18,7 +18,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/reference
 
 3. **Load context**: tasks.md (REQUIRED), plan.md (REQUIRED), data-model.md, contracts/, research.md, quickstart.md (IF EXISTS).
 
-4. **Project Setup Verification**: Create/verify ignore files based on detected tech stack. For detailed patterns per technology, see `skills/sdd-workflow/references/ignore-patterns.md`.
+4. **Project Setup Verification**: Create/verify ignore files based on detected tech stack. For detailed patterns per technology, see `.specify/shared/workflow/ignore-patterns.md`.
 
 5. **Parse tasks.md**: Extract phases, dependencies, task details (ID, description, file paths, parallel markers [P]), execution flow.
 
@@ -36,11 +36,11 @@ Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/reference
 
 8. **Completion validation**: All tasks `[X]` or `[~]` (no `[ ]` remaining). Features match spec. Tests pass. **Commit gate**: commit after each task or logical group; the spec dir MUST NOT be left *entirely* uncommitted when validation completes — an uncommitted implementation leaves no per-task audit trail and breaks `/speckit.review`'s git-based history reconstruction. Do not report the Definition of Done as "met" while the whole feature is uncommitted.
 
-9. **Pre-Status-Flip Gate** and **Verification Log**: Apply the full gate protocol from `skills/sdd-workflow/references/feature-integration.md` § Pre-Status-Flip Gate. Populate `REQUIREMENTS_DIR/verification.md` from `.specify/templates/verification-log-template.md`.
+9. **Pre-Status-Flip Gate** and **Verification Log**: Apply the full gate protocol from `.specify/shared/workflow/feature-integration.md` § Pre-Status-Flip Gate. Populate `REQUIREMENTS_DIR/verification.md` from `.specify/templates/verification-log-template.md`.
 
 ## Feature Integration
 
-Apply [Feature Integration Protocol](skills/sdd-workflow/references/feature-integration.md). This command's transition: `Planned → Implemented` (requires gate pass).
+Apply [Feature Integration Protocol](.specify/shared/workflow/feature-integration.md). This command's transition: `Planned → Implemented` (requires gate pass).
 
 ## Optional: Git Commit
 

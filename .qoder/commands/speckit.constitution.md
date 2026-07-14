@@ -4,7 +4,7 @@
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Treat as governance principles, amendment intentions, or supplemental context.
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). Treat as governance principles, amendment intentions, or supplemental context.
 
 ## Outline
 

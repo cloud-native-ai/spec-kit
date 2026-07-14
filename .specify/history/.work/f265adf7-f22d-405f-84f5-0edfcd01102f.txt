@@ -1,0 +1,135 @@
+SESSION f265adf7-f22d-405f-84f5-0edfcd01102f  TITLE: Write command docs and reorganize usage guide
+
+### USER
+在docs/commands目录中为当前支持的所有命令(如/speckit.agents)分别写一个命令的详细说明,详细记录命令的使用场景,命令的执行流程等相关信息.将./docs/usage.md的内容合并到./docs/quickstart.md文档中,然后精简其中关于命令的说明,通过引用新文档的方式说明命令的使用方法.
+
+### ASSISTANT
+Let me start by understanding the current state of the project - the existing commands, documentation, and templates.
+
+### ASSISTANT
+Now let me read all the command templates to understand each command's execution flow in detail.
+
+### ASSISTANT
+Now let me read the remaining command templates.
+
+### ASSISTANT
+I now have a complete picture of all 15 commands and both docs. Let me create the command documentation files and update the quickstart guide.
+
+### ASSISTANT
+Starting with creating all the command documentation files. I'll write them in batches.
+
+### ASSISTANT
+The `docs/commands/` directory was created by root, so some files had permission issues. Let me fix the directory permissions and retry.
+
+### ASSISTANT
+Now writing the remaining command docs.
+
+### ASSISTANT
+Now writing the remaining command docs: instructions, agents, skills, tools.
+
+### ASSISTANT
+Now let me also create an index file for the commands directory and verify all 15 files are created.
+
+### ASSISTANT
+All 15 command docs are created. Now let me create the index file and mark task 1 complete.
+
+### ASSISTANT
+Now for the second task: merge `usage.md` content into `quickstart.md` and simplify command descriptions by referencing the new docs. Let me re-read both files to plan the merge carefully.
+
+The key changes needed:
+1. Merge the unique content from `usage.md` into `quickstart.md` (AI tool maintenance workflows, command relationships, workflow flowchart, best practices)
+2. Replace detailed command descriptions in the quickstart with concise summaries linking to `docs/commands/`
+3. Keep the quickstart as a practical guide with examples
+
+### ASSISTANT
+Now let me update the usage.md to redirect to the new docs, and update the root README to include the command reference content instead of the separate README.md.
+
+### ASSISTANT
+Now I'll delete the `docs/commands/README.md`, add the command reference content to the root `README.md`, and update the usage.md to redirect.
+
+### ASSISTANT
+Now update the root README.md to add a command reference section and update the docs index:
+
+### ASSISTANT
+Now update the quickstart.md to remove references to the deleted `docs/commands/README.md` and point to the README directly:
+
+### ASSISTANT
+Now update the quickstart's "Further Reading" section to remove the reference to the deleted README and add a reference to the root README's command reference instead:
+
+### ASSISTANT
+Now update `usage.md` to redirect to the quickstart and command docs. Since the content has been merged into quickstart.md, usage.md should redirect readers:
+
+### ASSISTANT
+Let me verify the final state of all changes:
+
+### ASSISTANT
+Here's a summary of all changes:
+
+**Created 15 command documentation files** in `docs/commands/`, one for each `/speckit.*` command:
+- `requirements.md`, `clarify.md`, `plan.md`, `tasks.md`, `implement.md`, `review.md` (core lifecycle)
+- `analyze.md`, `checklist.md`, `research.md` (quality assurance)
+- `constitution.md`, `feature.md` (governance)
+- `agents.md`, `skills.md`, `tools.md` (extension)
+- `instructions.md` (documentation)
+
+Each doc covers: when to use, syntax, detailed execution flow, output artifacts, prerequisites, and next steps.
+
+**Updated `docs/quickstart.md`** — merged in the unique content from `usage.md` (AI tool maintenance workflows, command relationships table, workflow flowchart, best practices). Command descriptions are now concise tables linking to the individual `docs/commands/*.md` files.
+
+**Updated root `README.md`** — added a Command Reference section with tables linking to all 15 command docs, plus a workflow order summary. Removed the separate `Usage Guide` link since it's merged into quickstart.
+
+**Simplified `docs/usage.md`** — replaced with a redirect pointing to `quickstart.md` and the command reference.
+
+### USER
+针对"[Command Reference](../README.md#command-reference) — Detailed documentation for every `/speckit.*` command   "这部分需要进行修改,应该是README.md引用docs/quickstart.md等文档,而不是反过来.将README.md文档中的内容尽可能挪到docs目录中对应的文档中,然后在README.md使用引用的方式关联这些文档中的具体内容.
+
+### ASSISTANT
+Let me review the current state of the files to plan the restructuring.
+
+### ASSISTANT
+Let me check `docs/overview.md` to understand what detailed content already lives there.
+
+### ASSISTANT
+Good. `docs/spec-driven.md` already covers methodology in depth. Now I have a clear plan:
+
+1. **README.md**: Strip down to a lean entry point — keep brief overview, replace detailed sections with links to docs/
+2. **quickstart.md**: Fix the reverse reference to README.md, make it self-contained as the command reference hub
+3. **usage.md**: Fix the reverse reference
+
+### ASSISTANT
+Now fix `quickstart.md` — remove the reverse reference to README.md in "Further Reading":
+
+### ASSISTANT
+Now fix `usage.md` — remove the reverse reference to README.md:
+
+### ASSISTANT
+Now let me verify there are no remaining reverse references from docs/ back to README.md:
+
+### ASSISTANT
+These remaining references are all contextual (describing that a command reads/updates `README.md` as part of its execution flow, not linking to README.md as the source of truth for documentation). That's correct — the commands do interact with `README.md` at runtime.
+
+Let me also verify README.md no longer has any detailed content that should live in docs/:
+
+### ASSISTANT
+README.md went from 190 lines to 90 lines. Here's what changed:
+
+**README.md (精简后)**:
+- 移除了大量详细内容：Command Reference 表格（3个分类表格）、Workflow Order 代码块、Core Philosophy 段落、Applicable Development Stages 表格、Research Goals 4个子节（Technology Independence / Enterprise Constraint Adaptation / User-Oriented Development / Creative & Iterative Processes）、What is Spec-Driven Development 段落
+- Documentation Index 改为单一表格，全部通过链接指向 `docs/` 下的文件：
+  - Command Reference → `docs/quickstart.md#command-overview`
+  - Per-Command Details → `docs/commands/`
+  - 其余文档均链接到 `docs/` 下对应文件
+- SDD 方法论部分只保留一行引用链接到 `docs/spec-driven.md`
+
+**docs/quickstart.md**:
+- "Further Reading" 中不再反向引用 `../README.md`，改为指向 `docs/commands/`
+
+**docs/usage.md**:
+- 不再反向引用 `../README.md`，改为指向 `docs/commands/`
+
+引用方向现在统一为：`README.md` → `docs/quickstart.md` → `docs/commands/*.md`，不存在反向引用。
+
+### USER
+<command-name>/exit</command-name>
+            <command-message>exit</command-message>
+            <command-args></command-args>

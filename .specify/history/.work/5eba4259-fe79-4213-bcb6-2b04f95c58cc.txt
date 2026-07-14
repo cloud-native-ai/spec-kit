@@ -1,0 +1,51 @@
+SESSION 5eba4259-fe79-4213-bcb6-2b04f95c58cc  TITLE: Retrieve Claude conversation history
+
+### USER
+如何获取claude历史对话的完整记录
+
+### ASSISTANT
+Claude Code 的对话记录存储在本地 JSONL 文件中，可以通过以下方式获取：
+
+**1. 查找转录文件位置**
+
+```bash
+# macOS/Linux 默认路径
+ls ~/.claude/projects/*/conversations/
+
+# 或者用 find 搜索
+find ~/.claude -name "*.jsonl" -path "*/conversations/*"
+```
+
+**2. 读取特定对话**
+
+```bash
+# 查看最近的对话文件
+ls -lt ~/.claude/projects/*/conversations/*.jsonl | head -5
+
+# 读取内容（JSON Lines 格式，每行一条消息）
+cat <conversation-file>.jsonl | python3 -m json.tool
+```
+
+**3. 使用 Claude Code 内置命令**
+
+- `/history` — 在 Claude Code CLI 中查看历史会话列表
+- `claude --resume` — 恢复最近的对话
+- `claude --resume <session-id>` — 恢复指定会话
+
+**4. 导出为可读格式**
+
+```bash
+# 用 jq 提取对话内容
+cat <file>.jsonl | jq -r 'select(.type=="human" or .type=="assistant") | "\(.type): \(.content)"'
+```
+
+---
+
+如果你问的是 **claude.ai 网页版**的历史记录，可以在设置中导出：Settings → Account → Export Data。
+
+你具体想获取哪种场景的对话记录？
+
+### USER
+<command-name>/exit</command-name>
+            <command-message>exit</command-message>
+            <command-args></command-args>

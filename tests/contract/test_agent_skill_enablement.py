@@ -33,7 +33,6 @@ PRESET_ROLES = [
 
 # Skills that MUST NOT be declared by any role agent (reference-only + meta), per C-1/C-4.
 NON_DECLARABLE = {
-    "sdd-workflow",
     "create-agent",
     "improve-agent",
     "create-skills",

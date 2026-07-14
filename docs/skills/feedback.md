@@ -26,7 +26,7 @@ Feedback attaches only to long-running, qualifying flows — never to trivial on
 
 The authoritative classification lives in the feature's
 `contracts/command-classification.md`; the canonical step text lives at
-`.specify/skills/sdd-workflow/references/feedback-step.md`.
+`.specify/shared/workflow/feedback-step.md`.
 
 | Command | Class | Command | Class |
 |---------|-------|---------|-------|

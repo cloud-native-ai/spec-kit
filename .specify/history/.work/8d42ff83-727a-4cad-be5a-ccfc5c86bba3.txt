@@ -1,0 +1,52 @@
+SESSION 8d42ff83-727a-4cad-be5a-ccfc5c86bba3  TITLE: Get Claude Code session history
+
+### USER
+如何获取claude code的历史session
+
+### ASSISTANT
+Claude Code 的历史 session 可以通过以下方式获取：
+
+**CLI 命令**
+
+```bash
+# 列出最近的会话
+claude sessions list
+
+# 恢复特定会话（交互式选择）
+claude sessions resume
+```
+
+**直接访问存储文件**
+
+Session 数据存储在 `~/.claude/projects/` 目录下，按项目路径组织：
+
+```bash
+# 查看所有项目的 session 目录
+ls ~/.claude/projects/
+
+# 每个项目目录下有 sessions/ 子目录，包含 JSONL 格式的对话记录
+ls ~/.claude/projects/<project-path-hash>/sessions/
+```
+
+**在交互模式中**
+
+在 Claude Code REPL 里直接输入：
+- `/sessions` — 列出并选择历史会话
+- `/resume` — 恢复上一次会话继续对话
+
+**常用技巧**
+
+```bash
+# 以非交互方式恢复最近一次会话
+claude --resume
+
+# 恢复特定 session ID
+claude --resume <session-id>
+```
+
+Session 文件是 JSONL 格式，每行一个 JSON 对象，记录了完整的对话上下文（用户消息、工具调用、模型响应等）。
+
+### USER
+<command-name>/exit</command-name>
+            <command-message>exit</command-message>
+            <command-args></command-args>

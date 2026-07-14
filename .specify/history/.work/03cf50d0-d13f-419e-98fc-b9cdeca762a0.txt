@@ -1,0 +1,257 @@
+SESSION 03cf50d0-d13f-419e-98fc-b9cdeca762a0  TITLE: add-speckit-history-command
+
+### USER
+如何将我在claude code中针对本项目的历史对话session都整理成有价值的文档保存下来,不需要原文保存,只需求提取其中的有价值信息即可.
+
+### ASSISTANT
+我来帮你把 Claude Code 中针对本项目的历史对话 session 整理成有价值的文档。首先让我确认 session 文件的存储位置和规模。
+
+### ASSISTANT
+规模不小:25 个 session 文件,总计约 30MB。让我先了解文件结构,以便设计合理的提取方案。
+
+### ASSISTANT
+结构清楚了。每个 session 含 `ai-title`(AI 生成标题)、`last-prompt`、以及 user/assistant 消息。我先生成一份全量 session 清单(标题 + 首个用户诉求 + 时间 + 消息量),作为整理的索引依据。
+
+### ASSISTANT
+已经有清晰的清单了。25 个 session,大致可归为几个主题:Agent 机制重构、`/speckit.tools` 重构、docs 整理、skills 相关、draw-plantuml 长期迭代、依赖检查、patch 同步,以及若干琐碎/元问题会话。
+
+我注意到工作区里已经有未跟踪的 `docs/summary/` 和 `docs/team/`,先看看里面有没有既有产物,避免重复。
+
+### ASSISTANT
+工作区已有 `docs/summary/`(1 篇提案)和 `docs/team/`(plantuml 多智能体优化记录),而 `.specify/memory/knowledge/`(长期知识层)目前还是空的。
+
+我已经掌握了全貌:25 个 session 约 28MB,其中约 15 个是有实质内容的开发会话,其余是琐碎/元问题(如"如何获取 session")。
+
+在动手提取前,有几个关键决策会影响整个产物形态,想先跟你确认一下。
+
+### ASSISTANT
+明确了。你的选择:
+
+- **组织方式**:按主题聚合
+- **保存位置**:`docs/history/`
+- **内容侧重**:①关键决策与理由 ②可复用经验/踩坑 ③未完成/待办 ④关键交互流程 ⑤**你与模型之间存在冲突/分歧的地方**(这条很有价值)
+
+我先建任务清单,然后写提取脚本把每个 session 的"干净对话文本"(剥离工具调用噪声)抽出来并测量体积,再据此分主题委派子代理提炼。
+
+### ASSISTANT
+Now the extraction script:
+
+### ASSISTANT
+剥离噪声后总量约 98 万字符(~245 页),单个最大约 13 万字符。适合按 session 委派子代理。有两个标题为空、开头是通用 `## User Input` 模板的 session(5ee06f07、207f8d40)需要确认主题归属。
+
+### ASSISTANT
+分类清楚了。最终主题分组(覆盖 15 个有实质内容的 session,其余 10 个为元问题/琐碎,仅在索引里一句带过):
+
+1. **Agent 机制与角色体系** — 46696883, 5e7f0ff3, 264ad40c, 26d59af9, 12df2298, 5ee06f07
+2. **命令与 CLI 体系** — 101d217a(/speckit.tools), 207f8d40(018-cli-priority)
+3. **Skills 体系建设** — 031835d1, 46a705d0, 5878b07d
+4. **draw-plantuml 长期优化** — ee7d6b0a, 037a7e53, eac5d261, c243363f
+5. **文档与项目治理/同步** — f265adf7, 40cdddea, 217c6503, fe67eaef
+
+策略:大 session(>18K 字符,13 个)委派并行子代理提炼;小 session(6 个,合计~28K)我直接读。先启动子代理。
+
+### ASSISTANT
+13 个子代理全部返回了高质量的结构化提炼。现在我直接读 6 个小 session。
+
+### ASSISTANT
+全部素材到手。现在生成 `docs/history/` 下的主题文档。我会建 6 个文件:1 个跨会话通用经验(最高复用价值)+ 5 个主题 + 1 个 README 索引。先建目录并确认可写。
+
+### ASSISTANT
+Now writing the documents. First the cross-cutting lessons (highest reuse value):
+
+### ASSISTANT
+Now the README index:
+
+### ASSISTANT
+全部文档写完。清理临时文件并核对产出。
+
+### ASSISTANT
+有个残留的 `.writetest`(之前 rm 被交互式确认拦下了),清掉它。
+
+### ASSISTANT
+完成。已把 25 个历史 session 提炼为 `docs/history/` 下的一套按主题聚合的知识库。
+
+## 做了什么
+
+1. **提取**:写脚本把 25 个 JSONL(28MB)剥离工具调用噪声,抽出干净对话文本(压缩到 ~98 万字符),并测量分类。
+2. **提炼**:13 个大 session 委派并行子代理按你指定的五个维度结构化提取,6 个小 session 我直接读。
+3. **成文**:按主题聚合写成 7 个文档。
+
+## 产出结构(`docs/history/`)
+
+| 文件 | 内容 |
+|------|------|
+| **README.md** | 索引 + 阅读顺序 + 时间线 + 4 条"元结论" + 未纳入的琐碎会话说明 |
+| **00-cross-cutting-lessons** | ⭐ 跨会话通用踩坑(镜像同步、`create-new-requirements.sh` 复数、root 权限、测试基线、SDD 关卡…)——最该先看 |
+| **01-agent-system-evolution** | Agent 机制 014→015→code-reviewer 合并→022 supervisor/EEI 演进主线 |
+| **02-commands-and-cli-tools** | /speckit.tools 定义化重构、CLI 分层+Codex、移除废弃工具 |
+| **03-skills-system** | 草稿合并、git-workflow 三模式、Agent 特定配置 |
+| **04-draw-plantuml-optimization** | 打分迭代法 + 大量可复用 PlantUML 技巧 + 渲染管线坑 + 跨机 patch 同步教训 |
+| **05-docs-and-governance** | 命令文档引用方向、上游同步价值分析、依赖清理、team goal/sdd-workflow |
+
+## 关于你强调的第 5 点(用户↔模型冲突)
+
+我在每个主题里都单列了冲突表格,格式统一为 `用户主张 X;模型原本 Y;最终 Z`。提炼中浮现出一条贯穿全程的模式,已写进 README 元结论:**模型倾向"差不多就收尾",你坚持更高标准并要求定位根因,且多数情况你的判断更准**(如小图根因是脚本 scale 从未生效的 bug、Integration 架构对本项目无价值)。
+
+文档间用 `[[...]]` 与你已有的三条记忆(no-dfx-overdesign、plantuml 布局/离线渲染)做了交叉链接。临时提取文件已清理。
+
+需要的话我可以:把这套文档也写一份结构化条目进 `.specify/memory/knowledge/`(供 memory-recall 检索),或提交到 git。
+
+### USER
+将这个过程封装为一个新的命令/speckit.history,这个命令针对当前工具当前项目总结历史记录输出到.specify/history目录,命令第一步先明确当前工具和项目的信息,然后按照上面的流程进行总结.
+
+### ASSISTANT
+这是个不小的新命令开发任务,涉及命令模板格式、各工具的历史存储位置差异、以及注册到 features/instructions 等约定。让我先探清现有命令的结构和约定,再规划。
+
+### ASSISTANT
+命令模板格式清楚了(frontmatter + User Input + 步骤 + Feedback + Handoffs,可选 `scripts:` 挂 bash 脚本)。这个命令天生是"工具相关"的(各 AI 工具的历史存储位置不同),所以我要看看带 Agent 特定配置的命令怎么写,以及运行时命令如何从模板生成、有无脚本约定。
+
+### ASSISTANT
+`agents.md` 结构清楚了。我还需要确认:CLI 如何从模板生成运行时命令(是否需手动镜像)、脚本约定、以及各工具历史的存储位置编码。
+
+### ASSISTANT
+CLI 从 `templates/commands/*.md` 自动生成各工具的运行时命令。核心难点在于**各 AI 工具的历史存储位置不同**(Claude Code 是 `~/.claude/projects/<编码路径>/*.jsonl`,其他工具格式各异)。让我确认几处引用路径和工具命令目录,然后进入规划。
+
+### ASSISTANT
+我已经摸清了机制:命令模板放 `templates/commands/history.md`,CLI 自动为各工具生成运行时命令(去 frontmatter、`{SCRIPT}` 替换为 `.specify/scripts/bash/...`、剥离 Feedback 段)。核心难点是**各 AI 工具历史存储位置不同**。
+
+进入规划前,有一个会显著影响工作量的关键点想跟你确认。
+
+### ASSISTANT
+我已经对代码结构有了充分了解。补充两处定向探索:各命令如何"识别当前工具",以及有无可复用的"生成报告到目录"脚本模式。
+
+### ASSISTANT
+Explore 子代理报了模型错误。我直接自己探查这两处。
+
+### ASSISTANT
+我已经掌握了所有需要的模式:
+
+- **工具识别**:`skills/sdd-workflow/references/agent-configuration.md` 已有权威的"Step 1 识别当前 Agent"表(按 `.claude/`、`.qoder/` 等目录信号 + 系统提示判断)。命令第一步直接复用它。
+- **报告类命令模式**:`research.md` 是范本——frontmatter 挂 `scripts: sh: ...--json`,`{SCRIPT}` 运行时替换,`## Outline` 走"跑脚本拿 JSON → 加载上下文 → 分析 → 写报告到目录(存在则合并/追加)"。
+- **会话存储**:只有 Claude Code 有明确可访问的本地 JSONL 存储(`~/.claude/projects/<路径编码>/`,斜杠转连字符);其他工具的本地历史位置各异、多数不明确。
+
+有两个决策会明显影响实现方式,想先确认。
+
+### ASSISTANT
+两个推荐项都确认了:**Claude 先行 + 可扩展**、**增量更新(manifest)**。我核对两个实现细节(Claude 目录编码规律、各工具命令文件命名),然后写计划。
+
+### ASSISTANT
+全部细节确认。Claude 编码为 `[/._]`→`-`(精确匹配项目根,排除 `--specify` 等子目录变体)。运行时命令目录本仓库存在 4 个:`.claude/commands`、`.github/prompts`、`.qoder/commands`、`.opencode/command`。现在写计划。
+
+### ASSISTANT
+Plan approved. Let me set up task tracking and start implementing.
+
+### ASSISTANT
+Let me establish the test baseline and inspect a couple of reference files (common.sh, an existing util skeleton) in parallel.
+
+### ASSISTANT
+基线较多失败(631 passed / 95 failed / 13 errors),这是 028 开发分支的既有状态。我把失败清单存下来,后面对比确保不新增回归。
+
+### ASSISTANT
+Now let me look at an existing util skeleton and common.sh to match conventions:
+
+### ASSISTANT
+约定清楚了。现在编写核心引擎 `history-utils.py`。
+
+### ASSISTANT
+Now let me test the core engine before proceeding:
+
+### ASSISTANT
+locate 三种情况都正确。测试 extract:
+
+### ASSISTANT
+正是 docs/history/00 记录的 `.specify/` root 属主坑。检查一下:
+
+### ASSISTANT
+`.specify/history` 被建成 root 属主了。父目录 `.specify` 是 agent 属主,我可以删掉这个空的 root 子目录再以 agent 重建。
+
+### ASSISTANT
+extract 正常:25 个 session,993520 字符(与上轮量级一致)。测试 manifest 读写:
+
+### ASSISTANT
+manifest 读写正常。但 `pending` 仍是 25——因为我测试时用了 8 位短 id,而 extract 用完整 uuid(`sid`)匹配。实际命令流中 AI 会传 inventory 里的完整 `sid`。用完整 uuid 重测,并清掉刚才的错误短 id 条目:
+
+### ASSISTANT
+增量逻辑正确(pending 23/25)。清掉测试用的 manifest 让首次真实运行为全量:
+
+### ASSISTANT
+Now the bash wrapper. Let me check how another wrapper sources common.sh and resolves paths:
+
+### ASSISTANT
+`refresh-tools.sh` 是完美范本。照它写 `collect-history.sh`:
+
+### ASSISTANT
+包装脚本正常(且未传 `--tool` 时自动识别为 claude,因为多个工具目录都在但只有 claude 可解析)。
+
+### ASSISTANT
+现在写命令模板 `templates/commands/history.md`(结构仿 research.md + todo.md,复用 agent-configuration 与 feedback-step 规范):
+
+### ASSISTANT
+运行时镜像。先检查 `.specify` 下目标目录属主/可写性:
+
+### ASSISTANT
+`.specify/templates/commands` 在本仓库不存在——命令模板不镜像到那里(runtime 命令直接在 `.claude/commands` 等由源模板生成)。只需镜像两个脚本到 `.specify/scripts/`,再生成 4 个运行时命令。先镜像脚本:
+
+### ASSISTANT
+脚本镜像并从 `.specify` 路径验证通过。现在看 runtime 命令到底保留哪些段(Feedback 段被剥离,Handoffs 段是否保留),以精确复制转换:
+
+### ASSISTANT
+转换规则清晰:剥离 frontmatter、`{SCRIPT}`→`.specify/scripts/bash/...`、删除 `## Feedback` 段、保留 `## Handoffs`。为精确复制路径重写规则(如 `skills/`→`.specify/skills/`),我直接看生成器源码:
+
+### ASSISTANT
+关键发现:生成器**保留** frontmatter 之外的 body,`{SCRIPT}` 用单行替换,并对 body 跑 `rewrite_paths()` 做路径重写(`scripts/`→`.specify/scripts/` 等);而且它**并不删除 `## Feedback` 段**——现有 runtime 命令缺 Feedback 段其实是"stale 未重新生成"(正是我 00 文档记录的坑)。最稳妥是直接调用真正的生成器函数。先看 `rewrite_paths`:
+
+### ASSISTANT
+`rewrite_paths` 只重写 `memory/ scripts/ templates/ shared/`(不含 `skills/`)。最可靠的做法是直接复用生成器的转换逻辑,只针对 history.md 生成 4 个文件(不动其他命令,避免把全部 stale 命令重刷出大 diff)。写个小脚本导入 `rewrite_paths` 精确复制转换:
+
+### ASSISTANT
+4 个运行时命令生成完毕。核对结构(无 frontmatter、首行为 `## User Input`、路径重写一致):
+
+### ASSISTANT
+4 个 runtime 文件完全一致,结构与转换均正确(`skills/` 引用保持原样,与其他命令一致)。运行时镜像完成。
+
+### ASSISTANT
+命令已被发现(可用列表中已出现 `speckit.history`)。现在写 `docs/commands/history.md`,先看 research.md 完整格式:
+
+### ASSISTANT
+Now the docs/commands/history.md:
+
+### ASSISTANT
+Now `.gitignore` and features registration. Let me check both:
+
+### ASSISTANT
+先更新 `.gitignore`(忽略 `.work/` scratch,保留 md 与 manifest):
+
+### ASSISTANT
+Now the features registry. Let me see the tail of the table and a features detail sample:
+
+### ASSISTANT
+添加 Feature 030。先更新总数与表格行:
+
+### ASSISTANT
+Now the feature detail file 030.md:
+
+### ASSISTANT
+Now end-to-end verification. Let me run the pytest regression against baseline and confirm CLI discovers the command:
+
+### ASSISTANT
+命令确实已被发现(在可用 skills 列表中);`get_canonical_command_stems()` 返回 0 是因为 dev 环境下 `get_resource_path()` 找的是打包资源而非仓库,非问题。
+
+但有**一个新增回归**:`test_core_assets_detectable_in_multi_assistant_project`。我来查:
+
+### ASSISTANT
+这个失败是关于 `.specify/shared` 未被检测到——属于 **Feature 029(Shared Reference Directory)** 的在建代码(`core_asset_relpaths()` 已把 `.specify/shared` 列入核心资产,但 `copy_local_templates` 尚未拷贝它),与 `/speckit.history` 毫无关联。我未触碰 `core_asset_relpaths`/`copy_local_templates`。确认它是既有/不稳定失败——重跑全量两次对比:
+
+### ASSISTANT
+关键发现:`git status` 显示 `src/specify_cli/__init__.py` 被改动、且新增了 `test_shared_reference_directory.py` 等测试——这些都是**并发进行的 Feature 029** 改动(不是我做的)。第 314 行把 `.specify/shared` 列入核心资产、1300 行才刚加拷贝逻辑,导致该测试在 029 半成品状态下失败。与 `/speckit.history` 无关(我只新增文件 + 改 `.gitignore`/`features.md`,均未被该测试导入)。
+
+我的基线是在 029 改动落地前抓的,已失效。直接验证:当前全量失败里是否有任何与 history 相关的项:
+
+### ASSISTANT
+确认:**无任何 history 相关测试失败**,那个回归是并发的 029 工作导致。不过 `git status` 显示工作树正被并发进程改动(029 相关文件被 staged,我的部分 docs/history 文件显示 `AD`)。我确认一下我的交付文件在磁盘上完好:
+
+### ASSISTANT
+这两个是**上一轮**生成的 docs/history 文件,被并发进程从工作树删除了(仍在 git index 里)。从索引恢复它们:
+
+### ASSISTANT
+恢复完成。做最后一次端到端流程验证(按命令模板实际调用的 `.specify` 运行时路径):

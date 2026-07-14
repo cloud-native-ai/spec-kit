@@ -22,7 +22,7 @@ scripts:
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Treat as command parameters, not standalone instructions.
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). Treat as command parameters, not standalone instructions.
 
 ## Checklist Purpose: "
 
@@ -33,13 +33,13 @@ prompt = """
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Treat as command parameters, not standalone instructions.
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). Treat as command parameters, not standalone instructions.
 
 ## Checklist Purpose: "Unit Tests for English"
 
 Checklists are **UNIT TESTS FOR REQUIREMENTS WRITING** — they validate quality, clarity, and completeness of requirements. NOT implementation verification.
 
-For detailed methodology, examples, anti-examples, and quality dimension patterns, see `skills/sdd-workflow/references/checklist-methodology.md`.
+For detailed methodology, examples, anti-examples, and quality dimension patterns, see `.specify/shared/workflow/checklist-methodology.md`.
 
 ## Execution Steps
 
@@ -65,7 +65,7 @@ For detailed methodology, examples, anti-examples, and quality dimension pattern
    - Use short descriptive filename: `[domain].md` (e.g., `ux.md`, `api.md`, `security.md`)
    - Number items sequentially from CHK001
    - Each run creates a NEW file (never overwrites existing)
-   - Apply methodology from `skills/sdd-workflow/references/checklist-methodology.md`:
+   - Apply methodology from `.specify/shared/workflow/checklist-methodology.md`:
      - Group by quality dimensions (Completeness, Clarity, Consistency, Measurability, Coverage, Edge Cases, Non-Functional, Dependencies, Ambiguities)
      - Each item: question format + quality dimension bracket + traceability reference
      - ≥80% items must include traceability (`[Req §X]`, `[Gap]`, `[Ambiguity]`, etc.)
@@ -79,7 +79,7 @@ For detailed methodology, examples, anti-examples, and quality dimension pattern
 
 ## Feature Integration
 
-Apply [Feature Integration Protocol](skills/sdd-workflow/references/feature-integration.md). This command transitions status: `Implemented → Ready for Review` (if applicable).
+Apply [Feature Integration Protocol](.specify/shared/workflow/feature-integration.md). This command transitions status: `Implemented → Ready for Review` (if applicable).
 
 ## Handoffs
 

@@ -141,8 +141,7 @@ they prefer a purpose-built framework skill over improvising the same operation.
 
 1. **`skills:` frontmatter** — a YAML list of the canonical slugs of the installed skills
    relevant to that role (e.g. `skills: [draw-plantuml, memory-recall, memory-record, think-skills]`).
-   Slugs MUST resolve to an installed `.specify/skills/<slug>/SKILL.md`. Reference-only
-   (`sdd-workflow`) and meta/framework-authoring skills (`create-agent`, `improve-agent`,
+   Slugs MUST resolve to an installed `.specify/skills/<slug>/SKILL.md`. Meta/framework-authoring skills (`create-agent`, `improve-agent`,
    `create-skills`, `improve-skills`, `create-team`, `improve-team`) are **non-declarable** and never appear
    in a role agent's list.
 2. **A `## Skill Enablement` body section** — the shared preference protocol (single source of

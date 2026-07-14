@@ -49,7 +49,7 @@ The input is a description of the Skill to improve. It must be interpreted as fo
      - Bare relative paths such as `./scripts/init.sh` or `./references/checklist.md` → rewrite as `${SKILL_HOME}/...`.
      - `${SKILL_ROOT}/X` references → rewrite as `${SKILL_HOME}/X`.
      - Agent-specific install paths embedded in prose (e.g., `${HOME}/.copilot/skills/<name>/...`, hard-coded `.specify/skills/<name>/...`) → rewrite as `${SKILL_HOME}/...`.
-   - **Feedback-section conformance (Feature 028)**: verify the Skill carries a `## Feedback` section as its final workflow section. If it is **missing**, repair it by appending the canonical block from `.specify/skills/sdd-workflow/references/feedback-step.md` (substituting `skill:<name>` / `--unit-type skill`). If it is **malformed** (missing the qualification/completion gate, the no-user-input reflection rule, the scope guard vs `/speckit.review`, the stable-`run_id` dedup guard, the `feedback-utils.py --action record` invocation, or the consolidated threshold-prompt behavior), realign it to the canonical block. Apply the fix to BOTH `skills/<name>/SKILL.md` and `.specify/skills/<name>/SKILL.md`.
+   - **Feedback-section conformance (Feature 028)**: verify the Skill carries a `## Feedback` section as its final workflow section. If it is **missing**, repair it by appending the canonical block from `.specify/shared/workflow/feedback-step.md` (substituting `skill:<name>` / `--unit-type skill`). If it is **malformed** (missing the qualification/completion gate, the no-user-input reflection rule, the scope guard vs `/speckit.review`, the stable-`run_id` dedup guard, the `feedback-utils.py --action record` invocation, or the consolidated threshold-prompt behavior), realign it to the canonical block. Apply the fix to BOTH `skills/<name>/SKILL.md` and `.specify/skills/<name>/SKILL.md`.
 
 4. **Correct the root causes with minimal changes**
    - For complete execution failures, fix the instruction that caused non-execution first, such as wrong command-line arguments, nonexistent paths, invalid expected file formats, incompatible metadata, or missing prerequisite checks.
@@ -167,7 +167,7 @@ Only generate feedback when a genuine agent-specific obstacle was encountered.
 
 ## Feedback
 
-At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/skills/sdd-workflow/references/feedback-step.md`:
+At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
 
 1. **Gate on qualification & completion.** Only proceed if this run reached a meaningful wrap-up. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
 2. **Reflect (no user input).** Review this run against this skill's declared purpose and produce a short review plus ≥1 concrete, skill-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`

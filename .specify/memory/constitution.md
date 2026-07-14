@@ -1,13 +1,14 @@
 <!--
 Sync Impact Report
-- Version change: 1.1.0 ← 1.0.1.1 (MINOR; Principle V amended to add Codex CLI and tier classification)
-- Modified principles: None
-- Added sections: None
+- Version change: 1.3.0.1 → 1.4.0.1 (MINOR; added Principle IX "Framework Scope Discipline"; expanded Principle VI with root-cause rule and Principle VII with explicit SDD Workflow Gates)
+- Modified principles: VI. Continuous Quality & Observability (added root-cause rule); VII. Specification-Plan-Task-Implementation Workflow (added NON-NEGOTIABLE Workflow Gates)
+- Added sections: Principle IX — Framework Scope Discipline (No Over-Engineering)
 - Removed sections: None
 - Templates requiring updates:
-  ✅ templates/plan-template.md - Aligned (7 principles map 1:1)
-  ✅ templates/tasks-template.md - Aligned (correctly references Principle IV)
-  ✅ templates/requirements-template.md - No principle-number references; no sync needed
+  ✅ templates/plan-template.md - No change needed (Constitution Check renders principles dynamically from constitution.md; auto-includes new/expanded principles)
+  ✅ templates/tasks-template.md - No change needed (no hard-coded principle numbers)
+  ✅ templates/requirements-template.md - No change needed (no principle-number references)
+  ⚠ .specify/instructions.md - Documentation Map principle count updated separately (7 → 9)
 - Follow-up TODOs: None
 -->
 
@@ -70,6 +71,7 @@ All components MUST be observable, versioned, and maintainable:
 - Keep designs as simple as possible; avoid speculative features (YAGNI)
 - Linting, formatting, and basic tests MUST pass in CI
 - New behavior MUST be reflected in specs/plan/tasks/docs where applicable
+- Root-cause over "good enough": when results fall short of the stated bar, locate and fix the root cause rather than settling near the threshold
 
 Rationale: Makes systems debuggable, upgradable, maintainable, and ensures consistent quality.
 
@@ -80,8 +82,32 @@ The SDD workflow MUST be followed rigorously:
 - **Task Breakdown Phase**: Create actionable, atomic tasks from implementation plans
 - **Implementation Phase**: Execute tasks according to plans, generating code from specifications
 - Each phase MUST validate against the Feature Index and update it as needed
+- **Workflow Gates (NON-NEGOTIABLE)**:
+  - **Feature reuse-first**: bind evolution/refactor specs to an existing Feature (many-specs-to-one-feature); create a new Feature only when none fits
+  - **No status regression**: appending an evolution spec to an `Implemented` Feature keeps it Implemented; never revert to Planned
+  - **Pre-Status-Flip Gate** (Planned→Implemented): requires zero open `[ ]` tasks AND a status line for every Success Criterion in `verification.log`
+  - **Deferred tasks are first-class**: work that cannot run this session is marked `[~]` with `<!-- deferred: reason -->`, never left as `[ ]`
+  - **Template-only features**: features with no executable runtime code judge Test-First as Partial (justified) — "tests" verify template content, canonical paths, and structure instead
 
 Rationale: Provides systematic structure for transforming specifications into working systems while maintaining traceability.
+
+### VIII. Code as the Single Source of Truth
+Source code is the authoritative record of the system's ACTUAL state:
+- Source code MUST be treated as the single source of truth for how the system currently behaves; documentation, specifications, and plans express INTENDED or TARGET behavior that may not yet be realized
+- When establishing or citing facts about current behavior, code MUST take precedence over documentation, UNLESS a document is explicitly designated as authoritative for that fact
+- When code and documentation disagree, the divergence MUST be treated as a signal to update the documentation (or to flag the code as not yet implementing the intended goal) — never as license to trust the document as current reality
+- Fact-checking, analysis, and troubleshooting MUST verify claims against the code first, then reconcile documentation
+
+Rationale: Specifications and docs describe where the project is going; code describes where it actually is. Trusting docs as current reality propagates drift and errors. This principle complements Principle I (specs drive what SHOULD be built) by fixing code as the record of what IS.
+
+### IX. Framework Scope Discipline (No Over-Engineering)
+Spec Kit is a documentation/prompt framework, NOT a runtime platform or agent execution engine:
+- Every "adopt / sync / add" decision MUST be measured against this scope; features that assume a multi-agent runtime, workflow execution engine, or remote-download platform are OUT of scope unless explicitly justified
+- Supervisor / orchestration constructs are PROMPT INSTRUCTIONS interpreted by an AI agent, never runtime schedulers
+- Upstream changes, security fixes, and dependencies are adopted only when they fit this scope — a fix for functionality this project does not use (e.g. remote catalog download) is NOT applicable
+- Prefer the simplest artifact (template / prompt / doc) that satisfies the need; reject speculative infrastructure (YAGNI applied at the architectural level)
+
+Rationale: The single most-reused decision standard across the project's history. Assuming an upstream "runtime platform" trajectory or over-building infrastructure repeatedly wasted effort; anchoring to "framework, not runtime" keeps scope honest.
 
 ## Spec-Driven Development Workflow
 
@@ -133,4 +159,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.2.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-06-22
+**Version**: 1.4.0.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-07-14

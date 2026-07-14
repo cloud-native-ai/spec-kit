@@ -8,14 +8,16 @@ skill_id: "<SKILL:.specify/skills/improve-team/SKILL.md>"
 
 ## Goal
 
-Adjust and optimize an **existing** agent team. `improve-team` is the team-domain analogue of `improve-agent`, completing the create → improve lifecycle for teams. It loads a persisted team, makes **targeted, evidence-based, structure-preserving** edits (never a broad rewrite), re-persists the team, and reports what changed and why. The multi-agent Conceptual Model it operates against is defined once in `../create-team/references/conceptual-model.md`.
+Adjust and optimize an **existing** agent team. `improve-team` is the team-domain analogue of `improve-agent`, completing the create → improve lifecycle for teams. It loads a persisted team, makes **targeted, evidence-based, structure-preserving** edits (never a broad rewrite), re-persists the team, and reports what changed and why. The multi-agent Conceptual Model it operates against is defined once in `../create-team/references/conceptual-model.md`; the team **goal** concept in `../create-team/references/goal.md`.
+
+Editing a team's **goal** is a first-class modify that **cascades into structure realignment** — follow `references/goal-editing.md`.
 
 ## Inputs
 
 | Input | Required | Description |
 |-------|----------|-------------|
 | target team | yes | Slug/name resolving to `.specify/teams/<slug>.team.md`. |
-| improvement direction | yes | What to change: add/remove member, change pattern, tune thresholds/parallelism/dimensions. |
+| improvement direction | yes | What to change: **redefine the goal** (cascades into structure realignment — see `references/goal-editing.md`), add/remove member, change pattern, tune thresholds/parallelism/dimensions. |
 | evidence | recommended | Concrete signals: run reports, non-convergence, oscillating scores, territory conflicts, stale member references. |
 
 ## Behavior
@@ -37,10 +39,13 @@ Adjust and optimize an **existing** agent team. `improve-team` is the team-domai
 | Serial stage stalls | Broken/missing handoff dependency | Fix `blockedBy` edges / handoff file path |
 | Stale member | Agent renamed/deleted | Repoint or remove the member; surface the broken reference |
 | Missing a role (e.g. no QA gate) | Roster gap | Add a member (e.g. a `qa-engineer`) without altering existing members |
+| Goal drifted / team doing off-target work | Goal stale or never made explicit | Redefine the `goal` (verifiable form) and **realign** roster + pattern to it — see `references/goal-editing.md` |
+| Goal changed from one-time to continuous | Requirement shifted to "keep improving" | Switch to a team-loop (elimination or progressive) and add `threshold`/`max_iterations` — see `../create-team/references/optimization-goals.md` |
 
 ## MUST / MUST NOT
 
 - MUST operate only on an **existing** persisted team; MUST NOT silently create one (on miss, report "team not found" and offer to create).
+- MAY **redefine the team's `goal`** as a first-class edit, but only on an explicit goal-change request; MUST NOT change the goal as a side effect of restructuring. When the goal changes, MUST **realign** the roster + pattern to the new goal (see `references/goal-editing.md`).
 - MUST make **targeted, evidence-based, structure-preserving** edits — no broad rewrites; unaffected fields stay byte-identical.
 - MUST bump the `updated` date on every successful edit.
 - MUST NOT modify single agents (that is `improve-agent`'s domain) beyond team-membership references.
@@ -51,7 +56,7 @@ Adjust and optimize an **existing** agent team. `improve-team` is the team-domai
 
 ## Feedback
 
-At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/skills/sdd-workflow/references/feedback-step.md`:
+At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
 
 1. **Gate on qualification & completion.** Only proceed if this run reached a meaningful wrap-up. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
 2. **Reflect (no user input).** Review this run against this skill's declared purpose and produce a short review plus ≥1 concrete, skill-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`

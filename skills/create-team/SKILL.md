@@ -14,14 +14,17 @@ Create and run an **agent team**: organize multiple Agents into a **collaborativ
 
 The multi-agent Conceptual Model (Role × Stage × Type + Team/Loop, the Team Supervisor Meta role, and the static/dynamic structure split) is defined once, authoritatively, in `references/conceptual-model.md`. Read it before defining or running a team; do not re-define it elsewhere.
 
+The **goal** — the team's north star that both structures serve — is defined authoritatively in `references/goal.md`. When a goal's theme is **optimization**, `references/optimization-goals.md` gives the one-time-vs-continuous classification and the elimination-vs-progressive strategies. Read `references/goal.md` before defining a team; it is the goal-side companion to the conceptual model.
+
 ## Team Definition & Persistence (create mode)
 
-Produce a team from a user goal and (unless one-shot) persist it as `.specify/teams/<slug>.team.md`.
+Produce a team from a user **goal** and (unless one-shot) persist it as `.specify/teams/<slug>.team.md`. The goal is the team's north star — **establish it first, then derive both structures from it** (goal concept: `references/goal.md`).
 
-1. **Select the pattern** via the Pattern Selection decision tree below (independent → parallel; sequenced → serial; iterative-quality → team-loop).
-2. **Build the roster (static structure)** — a Role × Stage × Type matrix. If the user did not supply members, **propose** them from the goal: prefer existing agents under `.specify/agents/`, otherwise temporary stage/worker templates from `templates/`. A **team-loop team MUST include exactly one Team Supervisor** (Meta role).
-3. **Build the pattern config (dynamic structure)** — parallelism + territories (parallel), DAG `blockedBy` edges + file-path-only handoff (serial), or quality dimensions + threshold + max_iterations + regression_limit (team-loop).
-4. **Confirm** the proposed roster + pattern with the user, then persist the `Team` to `.specify/teams/<slug>.team.md` using the schema below (skip persistence only for an explicit one-shot run).
+1. **Establish the goal (first)** — extract the goal from `$ARGUMENTS`/conversation/repo context, ask if missing, and confirm it with the user; write it in a **verifiable** form (success criteria / threshold). If the goal's theme is **optimization**, classify it (one-time vs continuous) and pick a strategy (elimination vs progressive) per `references/optimization-goals.md`.
+2. **Select the pattern** via the Pattern Selection decision tree below (independent → parallel; sequenced → serial; iterative-quality → team-loop) — **derived from the goal**.
+3. **Build the roster (static structure)** — a Role × Stage × Type matrix. If the user did not supply members, **propose** them from the goal: prefer existing agents under `.specify/agents/`, otherwise temporary stage/worker templates from `templates/`. A **team-loop team MUST include exactly one Team Supervisor** (Meta role).
+4. **Build the pattern config (dynamic structure)** — parallelism + territories (parallel), DAG `blockedBy` edges + file-path-only handoff (serial), or quality dimensions + threshold + max_iterations + regression_limit (team-loop).
+5. **Confirm** the proposed **goal** + roster + pattern with the user, then persist the `Team` to `.specify/teams/<slug>.team.md` using the schema below (skip persistence only for an explicit one-shot run).
 
 ### Persisted `.team.md` schema
 
@@ -31,7 +34,8 @@ Stored at `.specify/teams/<slug>.team.md` (no per-tool symlink — framework-int
 ---
 name: <display name>
 slug: <kebab-slug>
-description: <goal / purpose>
+description: <one-line label>
+goal: <overall final objective + success criteria / threshold>
 pattern: parallel | serial | team-loop
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
@@ -44,6 +48,9 @@ members:
 config:
   # pattern-specific block (parallelism / DAG / loop settings)
 ---
+
+## Goal
+<the team's overall final objective + success criteria; authored FIRST — the static and dynamic sections are organized to serve it. See references/goal.md>
 
 ## Static Structure
 <Role × Stage × Type matrix table for this team's roster>
@@ -61,9 +68,10 @@ config:
 `/speckit.team run <slug>` loads a persisted team and executes it behind the mandatory **preview → confirm → execute** gate:
 
 1. **Load** the team from `.specify/teams/<slug>.team.md`.
-2. **Render Static Structure** — the roster as a Role × Stage × Type matrix (agent, role, Worker/Meta, persistent/temporary).
-3. **Render Dynamic Structure** — the `pattern`, its parallelism/DAG/loop settings, and an execution flow diagram (textual/mermaid/PlantUML showing dispatch/handoff/loop edges).
-4. **Confirmation gate** — present both structures and require explicit user confirmation. On decline, stop without executing. On confirm, orchestrate per pattern using the engine defined in the pattern sections below, preserving the Hard Constraints (territory validation before parallel dispatch; DAG no-cycle before serial; mandatory max-iteration cap for team loops; file-path-only handoff; context isolation; idempotent execution).
+2. **Restate the Goal** — surface the team's `goal` up front, so both structures are read as *means to that end* and execution can be judged against it.
+3. **Render Static Structure** — the roster as a Role × Stage × Type matrix (agent, role, Worker/Meta, persistent/temporary).
+4. **Render Dynamic Structure** — the `pattern`, its parallelism/DAG/loop settings, and an execution flow diagram (textual/mermaid/PlantUML showing dispatch/handoff/loop edges).
+5. **Confirmation gate** — present the **goal** and both structures and require explicit user confirmation. On decline, stop without executing. On confirm, orchestrate per pattern using the engine defined in the pattern sections below, preserving the Hard Constraints (territory validation before parallel dispatch; DAG no-cycle before serial; mandatory max-iteration cap for team loops; file-path-only handoff; context isolation; idempotent execution).
 
 ## Pattern Selection (Decision Tree)
 
@@ -497,7 +505,7 @@ Only generate feedback when a genuine agent-specific obstacle was encountered.
 
 ## Feedback
 
-At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/skills/sdd-workflow/references/feedback-step.md`:
+At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
 
 1. **Gate on qualification & completion.** Only proceed if this run reached a meaningful wrap-up. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
 2. **Reflect (no user input).** Review this run against this skill's declared purpose and produce a short review plus ≥1 concrete, skill-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`

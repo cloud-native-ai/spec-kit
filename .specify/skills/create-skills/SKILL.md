@@ -72,7 +72,7 @@ Optional frontmatter (on demand):
 - Result goal
 - Key steps (executable, checkable)
 - Resource references (use relative paths: `./scripts/x.py`, `./references/details.md`)
-- A `## Feedback` section as the final workflow section (mandatory per Feature 028). Copy the canonical block from `.specify/skills/sdd-workflow/references/feedback-step.md`, substituting `skill:<name>` / `--unit-type skill`. A new Skill lacking a `## Feedback` section is **non-conformant** and MUST fail validation.
+- A `## Feedback` section as the final workflow section (mandatory per Feature 028). Copy the canonical block from `.specify/shared/workflow/feedback-step.md`, substituting `skill:<name>` / `--unit-type skill`. A new Skill lacking a `## Feedback` section is **non-conformant** and MUST fail validation.
 
 **Size control**: Keep `SKILL.md` under 500 lines. Move large details into `./references/`.
 
@@ -142,13 +142,13 @@ Minimum checks:
 - [ ] Registry: one deduplicated row in `.specify/instructions.md`
 - [ ] Size: `SKILL.md` < 500 lines
 - [ ] No unrelated documentation files
-- [ ] Feedback: a `## Feedback` section is present as the final workflow section (Feature 028). A Skill without it is non-conformant — add the canonical block from `.specify/skills/sdd-workflow/references/feedback-step.md` before reporting completion.
+- [ ] Feedback: a `## Feedback` section is present as the final workflow section (Feature 028). A Skill without it is non-conformant — add the canonical block from `.specify/shared/workflow/feedback-step.md` before reporting completion.
 
 ### 7. Propagate the Skill to built-in agents
 
 Applies only when creating a **new** Skill. Wire it into the built-in role agents so they prefer it for role-relevant work, following the Feature 026 Skill Enablement convention (see `docs/agents/command-and-skills.md`).
 
-1. **Guard**: skip if the new Skill is non-declarable (reference-only/meta: `sdd-workflow`, `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `create-team`, `improve-team`). Normal user-created Skills proceed.
+1. **Guard**: skip if the new Skill is non-declarable (reference-only/meta: `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `create-team`, `improve-team`). Normal user-created Skills proceed.
 2. **Analyze**: read the 7 built-in role agents from `.specify/agents/` (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`) and judge each agent's role against the new Skill's capability + trigger keywords.
 3. **Match**: pick the agents whose role operations the Skill covers; draft a one-line "when to use" per match. If none match, report "no role-relevant agents" and skip edits (no forced use).
 4. **Propose then apply**: show a `| Agent | Skill | When to use |` table and wait for confirmation. On confirm, for each matched agent edit BOTH `agents/<slug>.agent.md` and `.specify/agents/<slug>.agent.md`:
@@ -203,7 +203,7 @@ Skill behavior in the `/` menu is controlled by frontmatter:
 
 ## Feedback
 
-At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/skills/sdd-workflow/references/feedback-step.md`:
+At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
 
 1. **Gate on qualification & completion.** Only proceed if this run reached a meaningful wrap-up. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
 2. **Reflect (no user input).** Review this run against this skill's declared purpose and produce a short review plus ≥1 concrete, skill-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`

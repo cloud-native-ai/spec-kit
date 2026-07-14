@@ -14,13 +14,13 @@ scripts:
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). If empty, display list of all registered tools. If `tool_id` and natural-language hint conflict, stop and request correction.
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). If empty, display list of all registered tools. If `tool_id` and natural-language hint conflict, stop and request correction.
 
 ## Outline
 
 Goal: Definition-first tool management. Create, modify, view, or invoke tools with explicit behavioral rules that override LLM built-in knowledge.
 
-For detailed tool type semantics, behavioral rules format, edge cases, and invocation preview format, see `skills/sdd-workflow/references/tool-definitions.md`.
+For detailed tool type semantics, behavioral rules format, edge cases, and invocation preview format, see `.specify/shared/workflow/tool-definitions.md`.
 
 ### Execution Steps
 
@@ -59,7 +59,7 @@ For detailed tool type semantics, behavioral rules format, edge cases, and invoc
 
 8. **View/List**: Display full definition or summary table of all tools.
 
-For agent-specific operational guidance, see `skills/sdd-workflow/references/agent-configuration.md`.
+For agent-specific operational guidance, see `.specify/shared/workflow/agent-configuration.md`.
 
 ## Handoffs
 
@@ -75,13 +75,13 @@ prompt = """
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). If empty, display list of all registered tools. If `tool_id` and natural-language hint conflict, stop and request correction.
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). If empty, display list of all registered tools. If `tool_id` and natural-language hint conflict, stop and request correction.
 
 ## Outline
 
 Goal: Definition-first tool management. Create, modify, view, or invoke tools with explicit behavioral rules that override LLM built-in knowledge.
 
-For detailed tool type semantics, behavioral rules format, edge cases, and invocation preview format, see `skills/sdd-workflow/references/tool-definitions.md`.
+For detailed tool type semantics, behavioral rules format, edge cases, and invocation preview format, see `.specify/shared/workflow/tool-definitions.md`.
 
 ### Execution Steps
 
@@ -120,7 +120,7 @@ For detailed tool type semantics, behavioral rules format, edge cases, and invoc
 
 8. **View/List**: Display full definition or summary table of all tools.
 
-For agent-specific operational guidance, see `skills/sdd-workflow/references/agent-configuration.md`.
+For agent-specific operational guidance, see `.specify/shared/workflow/agent-configuration.md`.
 
 ## Handoffs
 

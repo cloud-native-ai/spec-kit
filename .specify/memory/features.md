@@ -1,7 +1,7 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-07-13
-**Total Features**: 28
+**Last Updated**: 2026-07-14
+**Total Features**: 30
 
 ## Features
 
@@ -35,6 +35,8 @@
 | 026 | Agent Skill Enablement | Empower the 7 built-in role agents to prefer installed framework skills for role-relevant operations, since skills and agent definitions install together. | Implemented | .specify/memory/features/026.md | .specify/specs/025-agent-skill-enablement/requirements.md | 2026-07-13 (spec 025 implemented: skills: frontmatter + ## Skill Enablement section on all 7 role agents + create-agent templates; contract test_agent_skill_enablement.py green) |
 | 027 | Team Management | Dedicated team domain for multi-agent configuration: `/speckit.team` (create/modify/run) as the sole entry point, `create-team` (renamed from organize-agents) + `improve-team` skills, Conceptual Model extracted from create-agent, and single-agent vs team separation. | Implemented | .specify/memory/features/027.md | .specify/specs/026-agent-team-management/requirements.md | 2026-07-13 |
 | 028 | Feedback Mechanism | Distributed, local-scope feedback layer: agent self-reflection optimization points generated at flow wrap-up for every skill and for complex (process-interaction) commands, persisted to `.specify/memory/feedback/` with a threshold-triggered consolidated submission prompt; complements the global `/speckit.review`. | Implemented | .specify/memory/features/028.md | .specify/specs/027-feedback-mechanism/requirements.md | 2026-07-14 (implemented: feedback-utils.py engine + `## Feedback` on all 21 skills & 13 complex commands; 64/64 feature tests pass, 0 regressions) |
+| 029 | Shared Reference Directory | Reclassify `sdd-workflow` from a (non-invocable) skill into a dedicated shared reference directory (`shared/workflow` → `.specify/shared/workflow`) copied wholesale at init like templates/scripts, retained across re-init, with a `.specify/` path-rewrite rule; remove it from the skills registry/count/symlinks and rewrite ~100 references, with a zero-`sdd-workflow`-reference acceptance gate. | Planned | .specify/memory/features/029.md | .specify/specs/028-sdd-workflow-refactor/requirements.md | 2026-07-14 (planned: plan.md + data-model.md + 5 contracts + quickstart.md; Constitution 7/7 Pass; touchpoints = pyproject force-include, init copy, _CORE_SPECIFY_ASSETS, rewrite_paths, ~38 source refs) |
+| 030 | History Command | `/speckit.history` distills the current AI tool's past conversations for the current project into a theme-aggregated knowledge base under `.specify/history/` (decisions, reusable lessons, TODOs, interaction flows, user↔model conflicts — not verbatim). Incremental via a manifest; Claude Code supported today with a pluggable `STORE_RESOLVERS` adapter for other tools. | Implemented | .specify/memory/features/030.md | - | 2026-07-14 (implemented: history-utils.py engine + collect-history.sh + templates/commands/history.md + 4 runtime command mirrors + docs/commands/history.md) |
 
 ## Feature Entry Format
 

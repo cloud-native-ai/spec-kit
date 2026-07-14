@@ -7,7 +7,7 @@ This project documentation is distributed across several key files. You MUST ref
 
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
-| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | 7 core principles (SDD foundation, Feature-Centric, Intent-Driven, Test-First, AI Agent Integration, Quality/Observability, SDD Workflow) and governance rules |
+| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | 9 core principles (SDD foundation, Feature-Centric, Intent-Driven, Test-First, AI Agent Integration, Quality/Observability, SDD Workflow, Code as Single Source of Truth, Framework Scope Discipline) and governance rules |
 | **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | 25 features tracking /speckit.* commands, AI tool support (Claude/Qoder/Qwen/opencode/Copilot), MCP, skills, and core capabilities |
 | **Feature Details** | `.specify/memory/features/<ID>.md` | Per-feature deep dives | Overview, key changes, implementation notes, status criteria |
 | **Readme** | `README.md` | Project entry point | Spec-Driven Development overview, supported AI agents, feature list, installation pointer |
@@ -51,7 +51,7 @@ Escalation rules:
   - `src/specify_cli/`: single-module CLI implementation (`__init__.py`; Typer commands live here).
   - `templates/`: Source-of-truth templates packaged into the wheel (constitution, plan, requirements, tasks, agent variants, `commands/` for /speckit.* prompts, plus tool/skill templates).
   - `scripts/bash/` and `scripts/python/`: Repeatable workflow scripts mirrored from `.specify/scripts/`. Use these for shell automation; never call `/speckit.*` as a shell command.
-  - `skills/`: Installed Spec Kit skills (20 total, e.g. analysis-project, create-agent, create-skills, improve-agent, improve-skills, create-team, improve-team, sdd-workflow, think-skills, git-workflow, git-submodule-edit, memory-record, memory-recall, browser-utils, database-utils, document-utils, draw-d3js, draw-echarts, draw-plantuml, extension-e2e-test). Mirrored to `.specify/skills/` via package install; `.github/skills/` is a compatibility symlink.
+  - `skills/`: Installed Spec Kit skills (19 total, e.g. analysis-project, create-agent, create-skills, improve-agent, improve-skills, create-team, improve-team, think-skills, git-workflow, git-submodule-edit, memory-record, memory-recall, browser-utils, database-utils, document-utils, draw-d3js, draw-echarts, draw-plantuml, extension-e2e-test). Mirrored to `.specify/skills/` via package install; `.github/skills/` is a compatibility symlink.
   - `agents/`: Role-based agent definitions (`*.agent.md`) mirrored to `.specify/agents/`.
   - `tests/`: `contract/`, `contracts/`, `integration/`, `unit/`, with shared `conftest.py`, `fixtures/`, `script_api.py`.
   - `memory/`: Default in-package memory shipped with the CLI; the canonical project memory lives at `.specify/memory/` (constitution, features, features/<ID>.md, plus the dynamic memory-as-files layer under `session/` and `knowledge/`).
@@ -76,6 +76,27 @@ Escalation rules:
 - **Canonical skills directory**: `.specify/skills/` is the primary location for installed Spec Kit skills. `.github/skills` is a compatibility symlink to `.specify/skills/` for tools that discover skills under `.github/skills`.
 - **Do not duplicate symlink targets**: Treat these compatibility paths as aliases, not independent source files or directories. When reading or editing instructions and skills, prefer the canonical `.specify/...` paths and avoid applying the same change separately through each symlink.
 - **Regeneration behavior**: `/speckit.instructions` refreshes the instructions content and recreates compatibility symlinks. If a compatibility path appears to contain the same content as `.specify/instructions.md` or `.specify/skills/`, verify whether it is a symlink before treating it as a separate file.
+- **Mirror-sync map (highest-frequency rework source — change source, sync ALL mirrors)**:
+  - `templates/` ↔ `.specify/templates/` — template changes MUST be dual-written.
+  - `skills/<name>/` ↔ `.specify/skills/<name>/` — **BOTH are independent git copies, NOT symlinks**; after editing, verify byte-identical with `diff -rq`.
+  - `templates/commands/<cmd>.md` → per-tool runtime copies `.claude/commands/speckit.<cmd>.md`, `.github/prompts/*.prompt.md`, `.qoder/commands/*.md` — each tool has its own copy (source template minus frontmatter, with `templates/` → `.specify/templates/` path rewrites); update each separately.
+  - Only `.github/skills` and `.github/agents` are symlinks into `.specify/`; `.specify/skills/` and `.specify/agents/` are real copies. `.venv/.../site-packages/specify_cli/skills/...` is a build artifact — never hand-edit.
+
+## Recurring Operational Lessons
+Project-specific gotchas distilled from prior sessions (`docs/history/`). These prevent the most common rework.
+
+- **Test baseline discipline**: before changing anything, run the full suite and record the baseline; a batch of change-unrelated pre-existing failures exists long-term. Distinguish "baseline failure" from "regression I introduced". Hard-coded counts/numbers in test names or assertions (e.g. `test_five_official_assistants`) are fragile signals that break on expansion.
+- **In-place amend ≠ re-scaffold**: `create-new-plan.sh` unconditionally overwrites `plan.md`; do NOT run overwrite scaffolding when amending existing specs. Append tasks (e.g. T032–T057) instead of regenerating, to preserve history.
+- **Template neutrality**: keep generic `templates/` (esp. `constitution-template.md`) project-agnostic; do NOT push spec-kit-specific content into shared scaffolding. Project-specific rules belong in `.specify/memory/constitution.md` or this file.
+- **Documentation reference direction is one-way**: `README.md` → `docs/quickstart.md` → `docs/commands/*.md`. Sink detail into `docs/`; keep README a lean entry point. Avoid reverse/circular references.
+- **Removal safety**: before removing a dependency or deleting a file, verify it is truly unused in two steps (no code `import`, no shell invocation) and that any stated delete conditions ALL hold — when conditions are an AND, any one failing means do NOT delete.
+- **Environment & tooling gotchas**:
+  - Each `Bash` call is a fresh shell — `source .venv/bin/activate` does NOT persist; chain `source && cmd` in one call or use absolute interpreter paths.
+  - `cp` may be aliased to `cp -i` (silently skips overwrite) — use `cp -f` or `\cp` when mirroring files.
+  - Container dirs created via `mkdir` can become root-owned and unwritable — recreate as current user before editing.
+  - Match `${...}` / special-char literals with Python exact-string matching, NOT shell `grep` (shell expands `${}`, causing false "path missing" results).
+  - `yaml.safe_dump()` defaults to `allow_unicode=False` (escapes CJK to `\uXXXX`) — pass `allow_unicode=True` for Chinese YAML frontmatter.
+  - Script names are plural: the real file is `create-new-requirements.sh` (not `-requirement`). Confirm the real path before running any script.
 
 ## Resource Registry
 Use this machine-maintained section to track reusable resource identifiers created by SpecKit commands. Keep entries deduplicated and sorted when updating this file. Record each resource as a single row in the corresponding horizontal Markdown table, and keep column names aligned with the corresponding agent/skill/tool templates. When no records exist, keep a single row with `None yet.` in the first column and `-` in the remaining columns.

@@ -18,7 +18,7 @@ scripts:
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Detect input type and apply:
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). Detect input type and apply:
 - **Background info** → integrate as context constraints
 - **Task outline** → use as primary organizational structure
 - **Additional task entries** → parse, standardize, merge into appropriate phases
@@ -36,7 +36,7 @@ prompt = """
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). Detect input type and apply:
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). Detect input type and apply:
 - **Background info** → integrate as context constraints
 - **Task outline** → use as primary organizational structure
 - **Additional task entries** → parse, standardize, merge into appropriate phases
@@ -100,7 +100,7 @@ The tasks.md should be immediately executable - each task must be specific enoug
 
 ## Feature Integration
 
-Apply [Feature Integration Protocol](skills/sdd-workflow/references/feature-integration.md). This command maintains status from planning phase. Additionally, **the tasks phase MUST review the Feature list** — task breakdown may expose new Features or invalidate old ones. Update `.specify/memory/features.md` and detail files synchronously if changes are discovered.
+Apply [Feature Integration Protocol](.specify/shared/workflow/feature-integration.md). This command maintains status from planning phase. Additionally, **the tasks phase MUST review the Feature list** — task breakdown may expose new Features or invalidate old ones. Update `.specify/memory/features.md` and detail files synchronously if changes are discovered.
 
 ## Task Generation Rules
 

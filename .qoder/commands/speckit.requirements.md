@@ -7,7 +7,7 @@ description:
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](skills/sdd-workflow/references/user-input-protocol.md). The text after `/speckit.requirements` IS the feature description.
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). The text after `/speckit.requirements` IS the feature description.
 
 ## Outline
 
@@ -40,7 +40,7 @@ EOF
 
 6. **Write spec** to SPEC_FILE. Preserve section order. Keep `Related Feature` with default "Need clarification" values.
 
-7. **Quality Validation**: Follow the validation process in `skills/sdd-workflow/references/requirements-guidelines.md`:
+7. **Quality Validation**: Follow the validation process in `.specify/shared/workflow/requirements-guidelines.md`:
    - Create checklist at `FEATURE_DIR/checklists/requirements.md`
    - Validate spec against each item
    - Handle failures (max 3 iterations) and remaining clarifications (max 3 questions with table format)
@@ -50,11 +50,11 @@ EOF
 
 ## Feature Integration
 
-Apply [Feature Integration Protocol](skills/sdd-workflow/references/feature-integration.md) § Feature Binding Rules. This command binds specs to features (many-specs to one-feature). See the protocol for lookup rules and integration responsibilities.
+Apply [Feature Integration Protocol](.specify/shared/workflow/feature-integration.md) § Feature Binding Rules. This command binds specs to features (many-specs to one-feature). See the protocol for lookup rules and integration responsibilities.
 
 ## Guidelines
 
-For detailed quality validation, success criteria guidelines, and AI generation best practices, see `skills/sdd-workflow/references/requirements-guidelines.md`.
+For detailed quality validation, success criteria guidelines, and AI generation best practices, see `.specify/shared/workflow/requirements-guidelines.md`.
 
 Key rules:
 - Focus on WHAT and WHY, not HOW

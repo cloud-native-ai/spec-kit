@@ -311,6 +311,7 @@ _CORE_SPECIFY_ASSETS = [
     ".specify/scripts",
     ".specify/skills",
     ".specify/agents",
+    ".specify/shared",
     ".specify/instructions.md",
 ]
 
@@ -680,6 +681,7 @@ def rewrite_paths(content: str) -> str:
     content = re.sub(r"(?<!\.specify/)memory/", r".specify/memory/", content)
     content = re.sub(r"(?<!\.specify/)scripts/", r".specify/scripts/", content)
     content = re.sub(r"(?<!\.specify/)templates/", r".specify/templates/", content)
+    content = re.sub(r"(?<!\.specify/)shared/", r".specify/shared/", content)
     return content
 
 
@@ -1294,6 +1296,22 @@ def copy_local_templates(
             )
             if tracker:
                 tracker.complete("local-templates", "agents copied")
+
+        # Copy shared directory (shared reference documents)
+        if (resource_path / "shared").exists():
+            if tracker:
+                tracker.start("local-templates", "copying shared")
+
+            shared_dest = project_path / ".specify" / "shared"
+            shared_dest.mkdir(parents=True, exist_ok=True)
+
+            shutil.copytree(
+                resource_path / "shared",
+                shared_dest,
+                dirs_exist_ok=True,
+            )
+            if tracker:
+                tracker.complete("local-templates", "shared copied")
 
         if ai_assistant == "copilot":
             if tracker:

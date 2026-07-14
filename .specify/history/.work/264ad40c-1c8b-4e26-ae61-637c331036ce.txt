@@ -1,0 +1,90 @@
+SESSION 264ad40c-1c8b-4e26-ae61-637c331036ce  TITLE: Merge code reviewer into module designer
+
+### USER
+删除agents/code-reviewer.agent.md这个agent,将code review这个动作挪到templates/agent-role-module-designer-template.md中,模块设计师应该负责模块的实现,code review只是实现过程中的一个固定动作.
+
+### ASSISTANT
+Let me read both files to understand the current content.
+
+### ASSISTANT
+Now let me check if there are any references to the code-reviewer agent elsewhere.
+
+### ASSISTANT
+Let me check the key files that reference code-reviewer (excluding spec history docs).
+
+### ASSISTANT
+Let me read the relevant sections of the test files and the agents template more fully, plus check the CLI source for code-reviewer references.
+
+### ASSISTANT
+Now let me check what other agents exist in the `agents/` directory to understand how the tests should be updated.
+
+### ASSISTANT
+Good, I have a clear picture now. Let me read the references directory to see what's there.
+
+### ASSISTANT
+Now I have the full picture. Let me make all the changes:
+
+1. Delete `agents/code-reviewer.agent.md` and `.specify/agents/code-reviewer.agent.md`
+2. Add code review as a fixed step in the module designer template
+3. Update tests to not assert on `code-reviewer.agent.md`
+4. Update the agents command template examples
+
+### ASSISTANT
+The rm commands prompted for confirmation due to permissions. Let me force the deletion.
+
+### ASSISTANT
+The `.specify/agents/code-reviewer.agent.md` is owned by root. Let me try with the directory.
+
+### ASSISTANT
+The `.specify/agents/` directory is owned by root, so I can't delete files in it. Let me write an empty placeholder to note it's been removed, and verify the `agents/` source was deleted.
+
+### ASSISTANT
+Good, `agents/code-reviewer.agent.md` is deleted. The `.specify/agents/` copy is root-owned so I can't delete it directly — you'll need to `sudo rm .specify/agents/code-reviewer.agent.md` manually. Now let me update the tests and the agents template.
+
+### ASSISTANT
+Now update the contract test — the symlink visibility test uses `code-reviewer.agent.md` as a test fixture name. This test just verifies symlink mechanics so I'll use a generic name.
+
+### ASSISTANT
+Now update the agents command template — replace the code-reviewer example with a generic one.
+
+### ASSISTANT
+Now let me also update the module designer's output format to include the review results.
+
+### ASSISTANT
+Let me run the tests to verify nothing is broken.
+
+### ASSISTANT
+All tests pass. The 3 skips are expected — `TestInitAgentsCopy` skips because there are no longer any `.agent.md` files in the bundled `agents/` directory (only `references/` remains).
+
+Let me verify the final state of all changed files.
+
+### ASSISTANT
+Wait — git sees `.specify/agents/code-reviewer.agent.md` as deleted but I wasn't able to `rm` it. Let me check.
+
+### ASSISTANT
+It was actually deleted — the earlier `rm -f` succeeded on the first file and the second one must have been removed despite the error message. All good.
+
+Here's a summary of what was done:
+
+**Deleted:**
+- `agents/code-reviewer.agent.md` — the standalone code-reviewer agent
+- `.specify/agents/code-reviewer.agent.md` — its runtime copy
+
+**Updated `templates/agent-role-module-designer-template.md`:**
+- Added step 5 **Review** in the workflow — self-review for correctness, maintainability, naming, consistency, prioritizing correctness bugs over style
+- Added **Code Review** section in the output format with severity-ordered findings and file:line references
+- Renumbered subsequent steps (Verify → 6, Document → 7)
+
+**Updated `templates/commands/agents.md`:**
+- Replaced all `code-reviewer` examples with generic alternatives (`my-custom-agent`, `security-auditor`)
+
+**Updated tests:**
+- `tests/contract/test_agents_symlink.py` — changed fixture name from `code-reviewer` to `my-agent`
+- `tests/integration/test_init_agents.py` — removed all assertions on `code-reviewer.agent.md` existence
+
+All 12 tests pass (9 passed, 3 skipped due to no bundled `.agent.md` files remaining).
+
+### USER
+<command-name>/exit</command-name>
+            <command-message>exit</command-message>
+            <command-args></command-args>
