@@ -50,3 +50,6 @@ output/
 node_modules/
 **/.temp-execution-*.js
 .specify/tools/*.json
+
+# /speckit.history scratch (de-noised transcripts); .md docs + .manifest.json are tracked
+.specify/history/.work/
