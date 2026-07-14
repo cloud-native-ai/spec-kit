@@ -1117,6 +1117,29 @@ def copy_local_templates(
                             "local-templates", f"{filename} not found in source"
                         )
 
+            # Copy memory subdirectories (e.g. session/, knowledge/) so the
+            # dynamic memory-as-files scaffolding matches what ships in git.
+            # Existing files are preserved to avoid clobbering user content.
+            for sub_dir in sorted(p for p in memory_src.iterdir() if p.is_dir()):
+                dest_sub = memory_dest / sub_dir.name
+                if tracker:
+                    tracker.start(
+                        "local-templates", f"copying memory/{sub_dir.name}"
+                    )
+                for src_item in sub_dir.rglob("*"):
+                    rel = src_item.relative_to(sub_dir)
+                    dest_item = dest_sub / rel
+                    if src_item.is_dir():
+                        dest_item.mkdir(parents=True, exist_ok=True)
+                    elif not dest_item.exists():
+                        dest_item.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(src_item, dest_item)
+                dest_sub.mkdir(parents=True, exist_ok=True)
+                if tracker:
+                    tracker.complete(
+                        "local-templates", f"memory/{sub_dir.name} copied"
+                    )
+
         # Copy scripts directory
         if (resource_path / "scripts").exists():
             if tracker:

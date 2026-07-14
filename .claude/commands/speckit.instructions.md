@@ -102,10 +102,11 @@ Fallback behavior:
    - Read the content of `.specify/instructions.md` (whether newly created or existing).
    - **Fill Placeholders**: Replace any bracketed placeholders (e.g., `[Brief summary...]`, `[Detected tech stack...]`) with concrete details derived from your analysis.
    - **Update Documentation Map**: Ensure the table correctly points to existing documentation files in the repository.
-   - **Preserve Sections**: Do NOT remove or overwrite the `## Tools` and `## Skills` managed ranges. Keep marker comments intact:
-     - `<!-- TOOLS_PLACEHOLDER_START --> ... <!-- TOOLS_PLACEHOLDER_END -->`
-     - `<!-- SKILLS_PLACEHOLDER_START --> ... <!-- SKILLS_PLACEHOLDER_END -->`
-     These ranges are reserved for the `skills` command.
+   - **Preserve Sections**: Do NOT remove or overwrite the `## Agents`, `## Skills`, and `## Tools` managed ranges. Keep marker comments intact:
+     - `<!-- AGENTS_REGISTRY_START --> ... <!-- AGENTS_REGISTRY_END -->`
+     - `<!-- SKILLS_REGISTRY_START --> ... <!-- SKILLS_REGISTRY_END -->`
+     - `<!-- TOOLS_REGISTRY_START --> ... <!-- TOOLS_REGISTRY_END -->`
+     These ranges are reserved for the `agents`, `skills`, and `tools` commands.
    - **Incorporate User Input**: If `$ARGUMENTS` provided specific instructions or context, integrate them into the file.
 
 5. **Reintegrate Preserved Blocks** (skip if the **Preserve & Decompose** step was skipped):
@@ -127,6 +128,25 @@ Fallback behavior:
    - Report the full path of the instructions file (`.specify/instructions.md`).
    - If decomposition/reintegration ran, summarize how many blocks were preserved, reconciled, or re-appended, and confirm the temp directory was cleaned up.
    - Confirm that symlinks for Copilot, Qoder, and Claude have been established (or explicitly report warning/fallback actions if setup script partially failed).
+
+## Feedback
+
+At wrap-up (the same lifecycle point where this command prompts for a Git commit), perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
+
+1. **Gate on qualification & completion.** Only proceed if this command reached its wrap-up stage. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
+2. **Reflect (no user input).** Review this run against `/speckit.instructions`'s declared purpose and produce a short review plus ≥1 concrete, command-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`
+3. **Scope guard.** Keep strictly to this command's operation; do NOT produce a global/whole-project assessment (that is `/speckit.review`'s job). Entries are `scope: local`.
+4. **Dedup guard.** Use a stable `run_id` (e.g. the feature key + a run timestamp); if a nested skill/command already recorded feedback for this same `(unit_id, run_id)`, the engine no-ops.
+5. **Persist** via the engine:
+   ```bash
+   python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
+     --unit-id "/speckit.instructions" --unit-type command \
+     --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
+     --review "<review prose>" --points-file "<points file>"
+   ```
+6. **Consolidated submission prompt.** If the returned `should_prompt` is `true`, surface a single consolidated prompt inviting the user to submit collected feedback to the Spec Kit developers; on confirmation run `--action mark-submitted`. Below threshold, do not prompt.
+
+**Abort / partial-run rule.** If the run failed before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.
 
 ## Handoffs
 

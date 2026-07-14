@@ -12,7 +12,7 @@ handoffs:
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). Interpret mode: empty → global refresh; concrete context (commit/PR/branch) → context mining; description → locate-and-refresh.
+Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-protocol.md). Interpret mode: empty → global refresh; concrete context (commit/PR/branch) → context mining; description → locate-and-refresh.
 
 ## Outline
 
