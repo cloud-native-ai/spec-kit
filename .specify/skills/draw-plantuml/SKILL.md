@@ -51,7 +51,12 @@ skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 
 在编写代码之前，分析组件间的语义关系以确定自然位置。识别组件角色（Hub/Edge/Peer/Entry/Sink/External），根据关系模式规划布局，先画位置草图再编写代码。
 
-→ 布局规划方法参见 [10-layout-planning.md](references/howto/10-layout-planning.md)，基础语义布局规则参见 [layout.md §一](references/guide/layout.md)
+**布局前必做的方向/宽高比决策**（宽嵌套架构尤其关键）：
+1. 数出「最宽层宽度 B」与「主流深度 D」，据此选方向——**宽而浅用 `top to bottom`，深而窄的长链用 `left to right`**（B/D 决策表见 layout.md §2.1）。
+2. 用 `C ≈ round(sqrt(N × 1.3))` 估算列数，把框摆成**接近正方形的网格**（C ≈ R），像素比自然落在 4:3–16:9；对嵌套图，此规则同样用在每个 frame 内部（layout.md §2.5）。
+3. 单层兄弟数 ≤6，超出的下沉为子层或拆 frame；预判并避免「长标签边 / 跨多层直连边」把画布撑变形。
+
+→ 布局规划方法参见 [10-layout-planning.md](references/howto/10-layout-planning.md)，基础语义布局规则参见 [layout.md §一](references/guide/layout.md)，方向与宽高比决策规则参见 [layout.md §2.1、§2.5](references/guide/layout.md)
 
 ### Step 5: 阅读最佳实践
 
@@ -103,3 +108,22 @@ skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 ## 参考文档
 
 所有参考文档（操作指南、最佳实践、官方文档）的完整索引和说明，参见 [references/README.md](references/README.md)。
+
+## Feedback
+
+At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/skills/sdd-workflow/references/feedback-step.md`:
+
+1. **Gate on qualification & completion.** Only proceed if this run reached a meaningful wrap-up. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
+2. **Reflect (no user input).** Review this run against this skill's declared purpose and produce a short review plus ≥1 concrete, skill-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`
+3. **Scope guard.** Keep strictly to this skill's operation; do NOT produce a global/whole-project assessment (that is `/speckit.review`'s job). Entries are `scope: local`.
+4. **Dedup guard.** Use a stable `run_id`; if a parent flow already recorded feedback for this same `(unit_id, run_id)`, the engine no-ops.
+5. **Persist** via the engine:
+   ```bash
+   python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
+     --unit-id "skill:draw-plantuml" --unit-type skill \
+     --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
+     --review "<review prose>" --points-file "<points file>"
+   ```
+6. **Consolidated submission prompt.** If the returned `should_prompt` is `true`, surface a single consolidated prompt inviting the user to submit collected feedback to the Spec Kit developers; on confirmation run `--action mark-submitted`. Below threshold, do not prompt.
+
+**Abort / partial-run rule.** If the run failed before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.

@@ -114,6 +114,15 @@ def codex_minimal_resource_path(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
+def feedback_store(tmp_path: Path) -> Path:
+    """Isolated feedback store workspace containing .specify/memory/feedback/."""
+    store_dir = tmp_path / ".specify" / "memory" / "feedback"
+    store_dir.mkdir(parents=True, exist_ok=True)
+    (store_dir / ".gitkeep").touch()
+    return tmp_path
+
+
+@pytest.fixture
 def ai_tools_resource_path(tmp_path: Path) -> Path:
     """Create a comprehensive resource root for AI tools support tests."""
     from fixtures.ai_tools_support import make_resource_with_skills

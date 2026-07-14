@@ -49,6 +49,7 @@ The input is a description of the Skill to improve. It must be interpreted as fo
      - Bare relative paths such as `./scripts/init.sh` or `./references/checklist.md` → rewrite as `${SKILL_HOME}/...`.
      - `${SKILL_ROOT}/X` references → rewrite as `${SKILL_HOME}/X`.
      - Agent-specific install paths embedded in prose (e.g., `${HOME}/.copilot/skills/<name>/...`, hard-coded `.specify/skills/<name>/...`) → rewrite as `${SKILL_HOME}/...`.
+   - **Feedback-section conformance (Feature 028)**: verify the Skill carries a `## Feedback` section as its final workflow section. If it is **missing**, repair it by appending the canonical block from `.specify/skills/sdd-workflow/references/feedback-step.md` (substituting `skill:<name>` / `--unit-type skill`). If it is **malformed** (missing the qualification/completion gate, the no-user-input reflection rule, the scope guard vs `/speckit.review`, the stable-`run_id` dedup guard, the `feedback-utils.py --action record` invocation, or the consolidated threshold-prompt behavior), realign it to the canonical block. Apply the fix to BOTH `skills/<name>/SKILL.md` and `.specify/skills/<name>/SKILL.md`.
 
 4. **Correct the root causes with minimal changes**
    - For complete execution failures, fix the instruction that caused non-execution first, such as wrong command-line arguments, nonexistent paths, invalid expected file formats, incompatible metadata, or missing prerequisite checks.
@@ -163,3 +164,22 @@ Only generate feedback when a genuine agent-specific obstacle was encountered.
 | Directory | Contents |
 |-----------|----------|
 | `${SKILL_HOME}/references/` | `skill-slimming-principles.md`, `skill-quality-checklist.md`, `hardening-examples.md`, `claude-code-guide.md`, `copilot-guide.md` |
+
+## Feedback
+
+At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/skills/sdd-workflow/references/feedback-step.md`:
+
+1. **Gate on qualification & completion.** Only proceed if this run reached a meaningful wrap-up. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
+2. **Reflect (no user input).** Review this run against this skill's declared purpose and produce a short review plus ≥1 concrete, skill-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`
+3. **Scope guard.** Keep strictly to this skill's operation; do NOT produce a global/whole-project assessment (that is `/speckit.review`'s job). Entries are `scope: local`.
+4. **Dedup guard.** Use a stable `run_id`; if a parent flow already recorded feedback for this same `(unit_id, run_id)`, the engine no-ops.
+5. **Persist** via the engine:
+   ```bash
+   python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
+     --unit-id "skill:improve-skills" --unit-type skill \
+     --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
+     --review "<review prose>" --points-file "<points file>"
+   ```
+6. **Consolidated submission prompt.** If the returned `should_prompt` is `true`, surface a single consolidated prompt inviting the user to submit collected feedback to the Spec Kit developers; on confirmation run `--action mark-submitted`. Below threshold, do not prompt.
+
+**Abort / partial-run rule.** If the run failed before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.

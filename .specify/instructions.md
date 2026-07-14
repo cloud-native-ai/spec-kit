@@ -20,6 +20,7 @@ This project documentation is distributed across several key files. You MUST ref
 | **Security** | `docs/security.md` | Security considerations | Threat surface and handling guidance |
 | **Git Workflow** | `docs/git-workflow.md` | 分支同步机制与操作文件 | 三层分支模型、rebase 同步流程、推送策略、安全底线 |
 | **Memory System** | `docs/skills/memory.md` | Dynamic memory-as-files layer | session/ (short-term) + knowledge/ (long-term) store, `memory-utils.py` engine, memory-record / memory-recall skills, Spec-Kit-only recording boundary |
+| **Feedback System** | `docs/skills/feedback.md` | Distributed local-scope feedback layer | `.specify/memory/feedback/` store, `feedback-utils.py` engine, `## Feedback` step on all skills + 13 complex commands (4 simple excluded), threshold-triggered consolidated submission prompt, distinct from global `/speckit.review` |
 | **Skills Docs** | `docs/skills/` | Skills system reference | Specification, troubleshooting, VS Code integration |
 | **Agent Tools** | `docs/agent-tools/` | Supported agent tool reference | Per-tool overview, install, CLI usage, and official documentation links for every supported agent (Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode, Qwen Code, Hermes Agent, iFlow CLI) |
 
