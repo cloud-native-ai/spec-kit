@@ -25,7 +25,7 @@ description: "Task list: Reclassify sdd-workflow as a Shared Reference Directory
 - DoD-6: Docs describe the shared reference directory, not a skill; `.specify/` mirror regenerated (FR-009).
 - DoD-7: Full `pytest` run shows no new failures vs. the pre-refactor baseline (SC-006).
 
-**DoD Status**: pending
+**DoD Status**: met
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -49,8 +49,8 @@ Code-generator/framework layout: source assets at repo root (`shared/`, `skills/
 
 **Purpose**: Capture baselines and scaffold the new source directory.
 
-- [ ] T001 [P] Capture pre-refactor baselines: record the current `grep -rn "sdd-workflow"` match count and the current skill count ("20 total"), and run `pytest -q` to snapshot the passing/failing baseline; note results in `.specify/specs/028-sdd-workflow-refactor/verification.md` (create if absent).
-- [ ] T002 Create the source directory `shared/workflow/` at repo root (empty, git-tracked).
+- [X] T001 [P] Capture pre-refactor baselines: record the current `grep -rn "sdd-workflow"` match count and the current skill count ("20 total"), and run `pytest -q` to snapshot the passing/failing baseline; note results in `.specify/specs/028-sdd-workflow-refactor/verification.md` (create if absent).
+- [X] T002 Create the source directory `shared/workflow/` at repo root (empty, git-tracked).
 
 ---
 
@@ -60,7 +60,7 @@ Code-generator/framework layout: source assets at repo root (`shared/`, `skills/
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Relocate all ten reference docs with history preserved: `git mv skills/sdd-workflow/references/{user-input-protocol,feature-integration,agent-configuration,checklist-methodology,requirements-guidelines,dfx-catalog,clarify-taxonomy,ignore-patterns,tool-definitions,feedback-step}.md shared/workflow/` — verify content parity per `data-model.md` §2 (0 lost, 0 altered).
+- [X] T003 Relocate all ten reference docs with history preserved: `git mv skills/sdd-workflow/references/{user-input-protocol,feature-integration,agent-configuration,checklist-methodology,requirements-guidelines,dfx-catalog,clarify-taxonomy,ignore-patterns,tool-definitions,feedback-step}.md shared/workflow/` — verify content parity per `data-model.md` §2 (0 lost, 0 altered).
 
 **Checkpoint**: `shared/workflow/` holds all ten docs; `skills/sdd-workflow/` now contains only `SKILL.md` + an empty `references/`.
 
@@ -76,16 +76,16 @@ Code-generator/framework layout: source assets at repo root (`shared/`, `skills/
 
 > Write these FIRST and ensure they FAIL before implementation.
 
-- [ ] T004 [P] [US2] Unit test for the `shared/` path-rewrite rule (root-relative → `.specify/shared/`, idempotent, guarded) in `tests/unit/test_rewrite_paths_shared.py` (contract: `contracts/path-rewrite.contract.md`).
-- [ ] T005 [P] [US2] Contract test that `pyproject.toml` force-include maps `shared` and that the init copy places `shared/workflow/*` into `.specify/shared/workflow/` in `tests/contract/test_shared_reference_directory.py` (contract: `contracts/install-copy.contract.md`).
-- [ ] T006 [P] [US2] Integration test: fresh init installs `.specify/shared/workflow/` with 10 docs; re-init preserves it (retained core asset) in `tests/integration/test_shared_dir_install.py` (contract: `contracts/install-copy.contract.md`).
+- [X] T004 [P] [US2] Unit test for the `shared/` path-rewrite rule (root-relative → `.specify/shared/`, idempotent, guarded) in `tests/unit/test_rewrite_paths_shared.py` (contract: `contracts/path-rewrite.contract.md`).
+- [X] T005 [P] [US2] Contract test that `pyproject.toml` force-include maps `shared` and that the init copy places `shared/workflow/*` into `.specify/shared/workflow/` in `tests/contract/test_shared_reference_directory.py` (contract: `contracts/install-copy.contract.md`).
+- [X] T006 [P] [US2] Integration test: fresh init installs `.specify/shared/workflow/` with 10 docs; re-init preserves it (retained core asset) in `tests/integration/test_shared_dir_install.py` (contract: `contracts/install-copy.contract.md`).
 
 ### Implementation for User Story 2
 
-- [ ] T007 [US2] Add `"shared" = "specify_cli/shared"` to `[tool.hatch.build.targets.wheel.force-include]` in `pyproject.toml` (after the `agents` entry).
-- [ ] T008 [US2] Add a `shared/ → .specify/shared/` rule to `rewrite_paths()` in `src/specify_cli/__init__.py` (~L674), matching the existing negative-lookbehind pattern for `memory/`/`scripts/`/`templates/`.
-- [ ] T009 [US2] Add `".specify/shared"` to `_CORE_SPECIFY_ASSETS` in `src/specify_cli/__init__.py` (~L308) so re-init preserves the directory.
-- [ ] T010 [US2] Add the init copy block for `shared/` in `src/specify_cli/__init__.py` (near the skills copy ~L1267): guarded `if (resource_path / "shared").exists():` → `shutil.copytree(resource_path / "shared", project_path / ".specify" / "shared", dirs_exist_ok=True)`.
+- [X] T007 [US2] Add `"shared" = "specify_cli/shared"` to `[tool.hatch.build.targets.wheel.force-include]` in `pyproject.toml` (after the `agents` entry).
+- [X] T008 [US2] Add a `shared/ → .specify/shared/` rule to `rewrite_paths()` in `src/specify_cli/__init__.py` (~L674), matching the existing negative-lookbehind pattern for `memory/`/`scripts/`/`templates/`.
+- [X] T009 [US2] Add `".specify/shared"` to `_CORE_SPECIFY_ASSETS` in `src/specify_cli/__init__.py` (~L308) so re-init preserves the directory.
+- [X] T010 [US2] Add the init copy block for `shared/` in `src/specify_cli/__init__.py` (near the skills copy ~L1267): guarded `if (resource_path / "shared").exists():` → `shutil.copytree(resource_path / "shared", project_path / ".specify" / "shared", dirs_exist_ok=True)`.
 
 **Checkpoint**: `shared/` is packaged, installed, retained, and reachable via root-relative refs. US2 tests pass.
 
@@ -99,12 +99,12 @@ Code-generator/framework layout: source assets at repo root (`shared/`, `skills/
 
 ### Tests for User Story 1 (MANDATORY) ⚠️
 
-- [ ] T011 [P] [US1] Contract test that `skills/sdd-workflow` does not exist in source, that `skills-utils.py` enumeration excludes it, and that the skills registry/count omit it in `tests/contract/test_sdd_workflow_removed.py` (contract: `contracts/skill-removal.contract.md`).
+- [X] T011 [P] [US1] Contract test that `skills/sdd-workflow` does not exist in source, that `skills-utils.py` enumeration excludes it, and that the skills registry/count omit it in `tests/contract/test_sdd_workflow_removed.py` (contract: `contracts/skill-removal.contract.md`).
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Delete the pseudo-skill directory `skills/sdd-workflow/` (its `SKILL.md` and now-empty `references/`) via `git rm -r`.
-- [ ] T013 [US1] Remove the `sdd-workflow` mention and decrement the skill count ("20 total" → "19 total") in the skills list — update the generated `.specify/instructions.md` (~L54) and any source that carries the count (e.g. `templates/instructions-template.md` if present); leave the SKILLS registry table free of an `sdd-workflow` row.
+- [X] T012 [US1] Delete the pseudo-skill directory `skills/sdd-workflow/` (its `SKILL.md` and now-empty `references/`) via `git rm -r`.
+- [X] T013 [US1] Remove the `sdd-workflow` mention and decrement the skill count ("20 total" → "19 total") in the skills list — update the generated `.specify/instructions.md` (~L54) and any source that carries the count (e.g. `templates/instructions-template.md` if present); leave the SKILLS registry table free of an `sdd-workflow` row.
 
 **Checkpoint**: `sdd-workflow` no longer exists as a skill anywhere. US1 test passes.
 
@@ -118,14 +118,14 @@ Code-generator/framework layout: source assets at repo root (`shared/`, `skills/
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T014 [P] [US3] Contract test that each command template uses `shared/workflow/…` (no `sdd-workflow`) and each skill uses `.specify/shared/workflow/…`, with no form mixing, in `tests/contract/test_shared_reference_rewrite.py` (contract: `contracts/reference-rewrite.contract.md`).
-- [ ] T015 [P] [US3] Integration test for the zero-reference gate (empty result outside the excluded set) and link resolution of every `shared/workflow/*` target in `tests/integration/test_zero_sdd_workflow_references.py` (contract: `contracts/zero-reference-gate.contract.md`).
+- [X] T014 [P] [US3] Contract test that each command template uses `shared/workflow/…` (no `sdd-workflow`) and each skill uses `.specify/shared/workflow/…`, with no form mixing, in `tests/contract/test_shared_reference_rewrite.py` (contract: `contracts/reference-rewrite.contract.md`).
+- [X] T015 [P] [US3] Integration test for the zero-reference gate (empty result outside the excluded set) and link resolution of every `shared/workflow/*` target in `tests/integration/test_zero_sdd_workflow_references.py` (contract: `contracts/zero-reference-gate.contract.md`).
 
 ### Implementation for User Story 3
 
-- [ ] T016 [P] [US3] Rewrite `skills/sdd-workflow/references/<f>.md` → `shared/workflow/<f>.md` (root-relative form) in all 17 `templates/commands/*.md` (agents, analyze, checklist, clarify, constitution, feature, implement, instructions, plan, requirements, research, review, skills, tasks, team, todo, tools).
-- [ ] T017 [P] [US3] Rewrite the `sdd-workflow` reference in `templates/skills-template.md` to the installed absolute form `.specify/shared/workflow/<f>.md`.
-- [ ] T018 [P] [US3] Rewrite the hard-coded `.specify/skills/sdd-workflow/references/<f>.md` → `.specify/shared/workflow/<f>.md` in all 20 sibling `skills/*/SKILL.md` (analysis-project, browser-utils, cli-setup, create-agent, create-skills, create-team, database-utils, document-utils, draw-d3js, draw-echarts, draw-plantuml, extension-e2e-test, git-submodule-edit, git-workflow, improve-agent, improve-skills, improve-team, memory-recall, memory-record, think-skills).
+- [X] T016 [P] [US3] Rewrite `skills/sdd-workflow/references/<f>.md` → `shared/workflow/<f>.md` (root-relative form) in all 17 `templates/commands/*.md` (agents, analyze, checklist, clarify, constitution, feature, implement, instructions, plan, requirements, research, review, skills, tasks, team, todo, tools).
+- [X] T017 [P] [US3] Rewrite the `sdd-workflow` reference in `templates/skills-template.md` to the installed absolute form `.specify/shared/workflow/<f>.md`.
+- [X] T018 [P] [US3] Rewrite the hard-coded `.specify/skills/sdd-workflow/references/<f>.md` → `.specify/shared/workflow/<f>.md` in all 20 sibling `skills/*/SKILL.md` (analysis-project, browser-utils, cli-setup, create-agent, create-skills, create-team, database-utils, document-utils, draw-d3js, draw-echarts, draw-plantuml, extension-e2e-test, git-submodule-edit, git-workflow, improve-agent, improve-skills, improve-team, memory-recall, memory-record, think-skills).
 
 **Checkpoint**: All source references point at the shared location. US3 tests pass (pending mirror regen in Polish).
 
@@ -139,13 +139,13 @@ Code-generator/framework layout: source assets at repo root (`shared/`, `skills/
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T019 [P] [US4] Extend `tests/contract/test_shared_reference_rewrite.py` (or add a focused assertion) verifying the four docs no longer describe `sdd-workflow` as a skill and quote the corrected skill count.
+- [X] T019 [P] [US4] Extend `tests/contract/test_shared_reference_rewrite.py` (or add a focused assertion) verifying the four docs no longer describe `sdd-workflow` as a skill and quote the corrected skill count.
 
 ### Implementation for User Story 4
 
-- [ ] T020 [P] [US4] Update `docs/agents/command-and-skills.md` and `docs/agents/design.md` to describe the shared reference directory instead of the `sdd-workflow` skill.
-- [ ] T021 [P] [US4] Update `docs/commands/skills.md` and `docs/skills/feedback.md` (feedback-step now at `shared/workflow/feedback-step.md`) to reference the shared location and remove skill framing.
-- [ ] T022 [US4] Update the AGENTS.md / instructions Documentation Map and skill-count wording so `sdd-workflow` is described as a shared reference directory (not a skill) and counts are consistent with US1.
+- [X] T020 [P] [US4] Update `docs/agents/command-and-skills.md` and `docs/agents/design.md` to describe the shared reference directory instead of the `sdd-workflow` skill.
+- [X] T021 [P] [US4] Update `docs/commands/skills.md` and `docs/skills/feedback.md` (feedback-step now at `shared/workflow/feedback-step.md`) to reference the shared location and remove skill framing.
+- [X] T022 [US4] Update the AGENTS.md / instructions Documentation Map and skill-count wording so `sdd-workflow` is described as a shared reference directory (not a skill) and counts are consistent with US1.
 
 **Checkpoint**: Documentation is consistent and free of skill framing for `sdd-workflow`.
 
@@ -155,10 +155,10 @@ Code-generator/framework layout: source assets at repo root (`shared/`, `skills/
 
 **Purpose**: Regenerate the mirror and run the final acceptance gates.
 
-- [ ] T023 Regenerate the `.specify/` mirror from source so it reflects the move (copy `shared/` → `.specify/shared/`, re-sync `.specify/skills/` without `sdd-workflow`, re-sync `.specify/templates/`, regenerate `.specify/instructions.md`); confirm no `sdd-workflow` remnant survives regeneration.
-- [ ] T024 Run the zero-reference acceptance gate: `grep -rn "sdd-workflow" .` excluding `.git`, `.venv`, `docs/history`, `docs/summary/03-sdd-workflow-refactor-proposal.md`, and `.specify/specs/028-sdd-workflow-refactor/` → expect empty (SC-001).
-- [ ] T025 Run `pytest -q` and compare against the T001 baseline; confirm 0 new failures (SC-006). Record the SC-001…SC-006 status rows and any `[~]` deferrals in `.specify/specs/028-sdd-workflow-refactor/verification.md`.
-- [ ] T026 Run `quickstart.md` steps 1-7 as a final manual verification sweep and update Feature 029 detail (`.specify/memory/features/029.md`) with the implementation outcome.
+- [X] T023 Regenerate the `.specify/` mirror from source so it reflects the move (copy `shared/` → `.specify/shared/`, re-sync `.specify/skills/` without `sdd-workflow`, re-sync `.specify/templates/`, regenerate `.specify/instructions.md`); confirm no `sdd-workflow` remnant survives regeneration.
+- [X] T024 Run the zero-reference acceptance gate: `grep -rn "sdd-workflow" .` excluding `.git`, `.venv`, `docs/history`, `docs/summary/03-sdd-workflow-refactor-proposal.md`, and `.specify/specs/028-sdd-workflow-refactor/` → expect empty (SC-001).
+- [X] T025 Run `pytest -q` and compare against the T001 baseline; confirm 0 new failures (SC-006). Record the SC-001…SC-006 status rows and any `[~]` deferrals in `.specify/specs/028-sdd-workflow-refactor/verification.md`.
+- [X] T026 Run `quickstart.md` steps 1-7 as a final manual verification sweep and update Feature 029 detail (`.specify/memory/features/029.md`) with the implementation outcome.
 
 ---
 

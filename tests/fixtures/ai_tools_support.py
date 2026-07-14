@@ -104,6 +104,13 @@ def make_resource_with_skills(
         "# Analysis Project Skill\n", encoding="utf-8"
     )
 
+    # shared reference directory (installed to .specify/shared)
+    shared_workflow = root / "shared" / "workflow"
+    shared_workflow.mkdir(parents=True, exist_ok=True)
+    (shared_workflow / "user-input-protocol.md").write_text(
+        "# User Input Protocol\n", encoding="utf-8"
+    )
+
     return root
 
 

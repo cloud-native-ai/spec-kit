@@ -1,14 +1,15 @@
 <!--
 Sync Impact Report
-- Version change: 1.3.0.1 → 1.4.0.1 (MINOR; added Principle IX "Framework Scope Discipline"; expanded Principle VI with root-cause rule and Principle VII with explicit SDD Workflow Gates)
-- Modified principles: VI. Continuous Quality & Observability (added root-cause rule); VII. Specification-Plan-Task-Implementation Workflow (added NON-NEGOTIABLE Workflow Gates)
-- Added sections: Principle IX — Framework Scope Discipline (No Over-Engineering)
+- Version change: 1.4.0.1 → 1.5.0.1 (MINOR; added Principle X "Documentation Naming & Location Conventions")
+- Modified principles: None
+- Added sections: Principle X — Documentation Naming & Location Conventions
 - Removed sections: None
 - Templates requiring updates:
-  ✅ templates/plan-template.md - No change needed (Constitution Check renders principles dynamically from constitution.md; auto-includes new/expanded principles)
+  ✅ templates/plan-template.md - No change needed (Constitution Check renders principles dynamically from constitution.md; auto-includes Principle X)
   ✅ templates/tasks-template.md - No change needed (no hard-coded principle numbers)
   ✅ templates/requirements-template.md - No change needed (no principle-number references)
-  ⚠ .specify/instructions.md - Documentation Map principle count updated separately (7 → 9)
+  ✅ templates/commands/constitution.md - Added matching "MUST include" directive for Documentation Naming conventions
+  ⚠ .specify/instructions.md - Documentation Map principle count updated separately (9 → 10)
 - Follow-up TODOs: None
 -->
 
@@ -109,6 +110,14 @@ Spec Kit is a documentation/prompt framework, NOT a runtime platform or agent ex
 
 Rationale: The single most-reused decision standard across the project's history. Assuming an upstream "runtime platform" trajectory or over-building infrastructure repeatedly wasted effort; anchoring to "framework, not runtime" keeps scope honest.
 
+### X. Documentation Naming & Location Conventions
+Markdown documents MUST follow naming and location conventions so that names and paths carry meaning:
+- **ALL-CAPS filenames are reserved**: uppercase names (`README.md`, `LICENSE`, `CHANGELOG.md`, `CONTRIBUTING.md`, `BUILD`, …) carry special ecosystem meaning and are reserved for those conventional root-level artifacts; ordinary documentation MUST use lowercase, hyphenated `kebab-case.md` and MUST NOT reuse these reserved names for unrelated content
+- **Path is semantic**: a document's meaning derives from its full path, not its filename alone — `docs/team/overview.md` is the overview of the *team* concept, `docs/agents/design.md` is the design for *agents*. Place documents so `<area>/<topic>.md` reads as "the `<topic>` of `<area>`", and reuse generic filenames (`overview.md`, `design.md`, `README.md`) scoped by their directory rather than inventing globally-unique names
+- **Tool/framework-mandated names are non-negotiable**: files whose names are dictated by an external tool or framework MUST match that exact pattern and location — e.g. GitHub Copilot commands MUST be `.github/prompts/<name>.prompt.md`; the `*.prompt.md` suffix and path are fixed and MUST NOT be renamed or "normalized" to project conventions
+
+Rationale: Consistent, path-aware naming keeps documents discoverable, prevents collisions with well-known ecosystem/tool conventions, and preserves the meaning encoded in a document's location for both humans and AI agents.
+
 ## Spec-Driven Development Workflow
 
 ### Research & Context Gathering
@@ -159,4 +168,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.4.0.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-07-14
+**Version**: 1.5.0.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-07-14

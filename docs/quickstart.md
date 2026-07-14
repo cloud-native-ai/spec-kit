@@ -221,9 +221,12 @@ The following commands are **prompt instructions** for your AI Agent. For detail
 | `/speckit.constitution` | Manage project constitution and governance rules | [details →](commands/constitution.md) |
 | `/speckit.feature` | Manage feature registry (ID, name, status) | [details →](commands/feature.md) |
 | `/speckit.agents` | Generate role-based agents or create custom agents | [details →](commands/agents.md) |
+| `/speckit.team` | Organize and run multi-agent teams (create / modify / run) | [details →](commands/team.md) |
 | `/speckit.skills` | Manage specialized skills | [details →](commands/skills.md) |
 | `/speckit.tools` | Define/discover reusable tools with behavioral rules | [details →](commands/tools.md) |
 | `/speckit.instructions` | Generate AI agent instructions and symlinks | [details →](commands/instructions.md) |
+| `/speckit.history` | Distill past AI conversations into a theme-aggregated knowledge base | [details →](commands/history.md) |
+| `/speckit.todo` | Discover TODO blocks in files and turn them into execution plans | [details →](commands/todo.md) |
 
 ### Command Prerequisites & Next Steps
 

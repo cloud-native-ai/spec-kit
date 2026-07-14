@@ -7,8 +7,8 @@ This project documentation is distributed across several key files. You MUST ref
 
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
-| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | 9 core principles (SDD foundation, Feature-Centric, Intent-Driven, Test-First, AI Agent Integration, Quality/Observability, SDD Workflow, Code as Single Source of Truth, Framework Scope Discipline) and governance rules |
-| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | 25 features tracking /speckit.* commands, AI tool support (Claude/Qoder/Qwen/opencode/Copilot), MCP, skills, and core capabilities |
+| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | 10 core principles (SDD foundation, Feature-Centric, Intent-Driven, Test-First, AI Agent Integration, Quality/Observability, SDD Workflow, Code as Single Source of Truth, Framework Scope Discipline, Documentation Naming Conventions) and governance rules |
+| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | 30 features tracking /speckit.* commands, AI tool support (Claude/Qoder/Qwen/opencode/Copilot), MCP, skills, and core capabilities |
 | **Feature Details** | `.specify/memory/features/<ID>.md` | Per-feature deep dives | Overview, key changes, implementation notes, status criteria |
 | **Readme** | `README.md` | Project entry point | Spec-Driven Development overview, supported AI agents, feature list, installation pointer |
 | **Installation** | `docs/installation.md` | How to install the CLI | Setup steps for the `specify` CLI |
@@ -21,6 +21,7 @@ This project documentation is distributed across several key files. You MUST ref
 | **Git Workflow** | `docs/git-workflow.md` | 分支同步机制与操作文件 | 三层分支模型、rebase 同步流程、推送策略、安全底线 |
 | **Memory System** | `docs/skills/memory.md` | Dynamic memory-as-files layer | session/ (short-term) + knowledge/ (long-term) store, `memory-utils.py` engine, memory-record / memory-recall skills, Spec-Kit-only recording boundary |
 | **Feedback System** | `docs/skills/feedback.md` | Distributed local-scope feedback layer | `.specify/memory/feedback/` store, `feedback-utils.py` engine, `## Feedback` step on all skills + 13 complex commands (4 simple excluded), threshold-triggered consolidated submission prompt, distinct from global `/speckit.review` |
+| **History System** | `docs/commands/history.md` | Distilled conversation knowledge base | `/speckit.history` distills the current AI tool's past project conversations into `.specify/history/` (theme-aggregated: decisions, lessons, TODOs, interaction flows, conflicts); `history-utils.py` engine with pluggable `STORE_RESOLVERS` + incremental manifest |
 | **Skills Docs** | `docs/skills/` | Skills system reference | Specification, troubleshooting, VS Code integration |
 | **Agent Tools** | `docs/agent-tools/` | Supported agent tool reference | Per-tool overview, install, CLI usage, and official documentation links for every supported agent (Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode, Qwen Code, Hermes Agent, iFlow CLI) |
 

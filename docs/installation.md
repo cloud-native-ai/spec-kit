@@ -74,7 +74,7 @@ After initialization, you should see the following structure and commands:
 - `.specify/agents/` — Agent workspace with bundled agents (symlinked to `.github/agents/`, `.qoder/agents/`, etc.)
 - `.specify/memory/` — Project memory (constitution, features)
 
-**All 15 commands available in your AI agent**:
+**All 18 commands available in your AI agent**:
 
 | Command | Purpose |
 |---------|---------|
@@ -90,9 +90,12 @@ After initialization, you should see the following structure and commands:
 | `/speckit.implement` | Execute tasks with built-in validation |
 | `/speckit.review` | Review implementation against specs and plan |
 | `/speckit.agents` | Generate role-based agents or create custom agents |
+| `/speckit.team` | Organize and run multi-agent teams (create / modify / run) |
 | `/speckit.skills` | Create or refresh project skills |
 | `/speckit.tools` | Define or discover reusable tools |
 | `/speckit.instructions` | Generate/update AI agent instructions and symlinks |
+| `/speckit.todo` | Discover TODO blocks in files and turn them into execution plans |
+| `/speckit.history` | Distill past AI conversations into a theme-aggregated knowledge base |
 
 **Next step**: Run `/speckit.agents` (no arguments) in your AI agent to generate seven role-based development workflow agents tailored to your project's context.
 
