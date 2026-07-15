@@ -51,6 +51,8 @@ references/
 
 | 文档 | 对应步骤 | 方面 | 内容说明 |
 |------|---------|------|---------|
+| [diagram-principles.md](guide/diagram-principles.md) | Step 1–7（所有图通用） | 通用原则 | **图表类型无关的核心原则**：四步执行顺序（UML语义→视觉语义→布局→美化）、UML 语义先行（选对图类型/元素种类/关系类型/构造型/接口）、视觉语义（角色即位置/数量表拓扑/关联同色/文字即负担）、**元素标签最小化规则（去重优先）** |
+| [large-diagram-playbook.md](guide/large-diagram-playbook.md) | Step 4/5/7 | 大图美化 | **第0步 先做 UML 语义分析（图类型/元素种类/关系类型/构造型/接口）再绘图** + 复杂大图五步技术栈——「×N」语义折叠、弱化管线/突出语义色、字号层级、正交路由+隐藏边控宽高比消交叉、长文本移入 legend；含大图专用自检清单 |
 | [style.md](guide/style.md) | Step 7 | 样式 | 基础 skinparam 模板、色彩模式选择（单色/彩色）、关键路径着色、条件样式（actor）、SVG/PNG 双策略说明、配置项说明、样式校验要点 |
 | [layout.md](guide/layout.md) | Step 4/5 | 布局 | 语义驱动布局、布局优化（方向控制/隐藏连线/分组/间距/宽高比）、按图表类型的布局速查、常见布局问题排查、Graphviz 引擎行为规律、PlantUML Server 限制（PNG 硬上限/CJK 字体）、三方权衡分析、版本演进转折点 |
 | [content.md](guide/content.md) | Step 5/6 | 内容 | 单一职责/C4 分层/元素数量控制/标签精简 ≤10 字符 + 富文本注释、注释策略、别名与标签规范、协作与维护规范、质量自检清单 |
@@ -96,5 +98,6 @@ UML 理论、PlantUML 语法参考、官方文档和建模方法论的原始参�
 | 样式怎么配 | [guide/style.md](guide/style.md) |
 | 怎么渲染和验证 | [howto/12-rendering-and-output.md](howto/12-rendering-and-output.md) |
 | 布局出问题怎么排查 | [howto/10-layout-planning.md](howto/10-layout-planning.md) §三 + [guide/layout.md](guide/layout.md) §四 |
+| 复杂大图太乱/太大怎么美化 | [guide/large-diagram-playbook.md](guide/large-diagram-playbook.md) |
 | 某个语法怎么写 | [guide/syntax-reference.md](guide/syntax-reference.md) + [document/00-plantuml-overview.md](document/00-plantuml-overview.md) |
 | UML 理论基础 | [document/](document/) 目录下 01–10 的理论文档 |

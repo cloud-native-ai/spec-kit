@@ -1,0 +1,31 @@
+{
+  "store": "feedback",
+  "updated": "2026-07-15T06:41:31Z",
+  "threshold": 10,
+  "count_since_submission": 2,
+  "submitted_at": null,
+  "entries": [
+    {
+      "id": "20260715T064131Z-skill-create-team",
+      "file": "20260715T064131Z-skill-create-team.md",
+      "unit_id": "skill:create-team",
+      "unit_type": "skill",
+      "run_id": "run-draw-plantuml-optimizer-20260715",
+      "feature": "team-draw-plantuml-optimizer",
+      "partial": false,
+      "created": "2026-07-15T06:41:31Z",
+      "summary": "执行 team draw-plantuml-optimizer（team-loop/淘汰）：baseline 0.57，2 代收敛至 0.859≥0.85。每代 3 变体并行→查看渲染打分→锦标赛留优汰劣→注入改进点。产出优胜图 + 将验证过的『复杂大图五步技术栈』落为 large-diagram-playbook.md 并同步镜像。流程顺畅，3 处可固化经验。"
+    },
+    {
+      "id": "20260715T060043Z-skill-create-team",
+      "file": "20260715T060043Z-skill-create-team.md",
+      "unit_id": "skill:create-team",
+      "unit_type": "skill",
+      "run_id": "create-draw-plantuml-optimizer-20260715",
+      "feature": "team-draw-plantuml-optimizer",
+      "partial": false,
+      "created": "2026-07-15T06:00:43Z",
+      "summary": "为『持续优化 draw-plantuml 复杂大图』组建团队：确立可验证 goal（benchmark=05-detailed.puml，加权≥0.85，美观优先），按 optimization-goals 分类为持续优化并选淘汰/锦标赛策略，映射为 team-loop（1 Supervisor + 3 变体优化器 + renderer + scorer，全 temporary），持久化到 .sp"
+    }
+  ]
+}
