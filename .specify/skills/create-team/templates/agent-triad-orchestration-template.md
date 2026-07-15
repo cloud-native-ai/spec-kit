@@ -12,6 +12,7 @@ description: "EEI Triad orchestration for {{AGENT_NAME}}"
 **Threshold**: {{THRESHOLD}} (stop when weighted total exceeds this)
 **Max Iterations**: {{MAX_ITERATIONS}} (default: 20)
 **Max Consecutive Regressions**: {{MAX_REGRESSIONS}} (default: 3)
+**Run Workspace**: `.specify/teams/.work/{{TEAM_SLUG}}/` (git-ignored) — per-iteration candidate outputs, scores, and scratch. Final deliverables (best iteration's output that the goal declares as the product) go to their declared target paths, not the workspace. On completion, write a dated run report to `.specify/teams/{{TEAM_SLUG}}/runs/`.
 
 ### Scoring Dimensions
 
@@ -26,7 +27,7 @@ description: "EEI Triad orchestration for {{AGENT_NAME}}"
 ### Executor (Stage: executor, Type: Worker)
 - **Template**: agent-stage-executor-template.md
 - **Environment Paths**: {{EXECUTOR_ENVIRONMENT_PATHS}}
-- **Output Directory**: {{OUTPUT_DIRECTORY}}
+- **Output Directory**: `.specify/teams/.work/{{TEAM_SLUG}}/` (run workspace for iteration artifacts; only declared final deliverables go to real target paths)
 
 ### Evaluator (Stage: evaluator, Type: Meta)
 - **Template**: agent-stage-evaluator-template.md

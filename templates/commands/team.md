@@ -19,7 +19,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 
 `/speckit.team` is the **single entry point** for every **team** operation — the multi-agent analogue of `/speckit.agents`. It recognizes intent, then routes to the owning team skill. It delegates to skills and does **NOT** render templates inline. It MUST NOT serve single-agent authoring (that is `/speckit.agents`), and single-agent commands MUST NOT serve team operations.
 
-A **team** is a named, reusable multi-agent structure organized around a single **goal**. Every team has three parts: a **goal** (the team's overall final objective — the north star that all work serves), a **static structure** (Role × Stage × Type roster — *who* participates), and a **dynamic structure** (collaboration pattern — parallel / serial / team-loop — with its parallelism/DAG/iteration settings and execution flow — *how* they collaborate). The static and dynamic structures exist **only to achieve the goal**; whatever they are, they MUST be organized and run around it. Persistent teams are stored at the canonical location `.specify/teams/<slug>.team.md`. The multi-agent Conceptual Model that underpins teams is defined once in `skills/create-team/references/conceptual-model.md`.
+A **team** is a named, reusable multi-agent structure organized around a single **goal**. Every team has three parts: a **goal** (the team's overall final objective — the north star that all work serves), a **static structure** (Role × Stage × Type roster — *who* participates), and a **dynamic structure** (collaboration pattern — parallel / serial / team-loop — with its parallelism/DAG/iteration settings and execution flow — *how* they collaborate). The static and dynamic structures exist **only to achieve the goal**; whatever they are, they MUST be organized and run around it. Persistent teams own a directory at the canonical location `.specify/teams/<slug>/` (definition at `.specify/teams/<slug>/team.md`; run reports under `.specify/teams/<slug>/runs/`). The multi-agent Conceptual Model that underpins teams is defined once in `skills/create-team/references/conceptual-model.md`.
 
 ### Goal — 团队的最终目标
 
@@ -47,7 +47,7 @@ The goal is persisted as the `goal` frontmatter field and rendered as a `## Goal
 **Routing flow**:
 
 1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: classify as `create`, `modify`, or `run`.
-2. **create** → `create-team`: **first establish the goal** — elicit it from `$ARGUMENTS` / conversation / repo context, or ask for it, and confirm it with the user — then propose a roster (static structure) + pattern config (dynamic structure) **derived from that goal**; on confirmation persist `.specify/teams/<slug>.team.md` (or run one-shot without persisting).
+2. **create** → `create-team`: **first establish the goal** — elicit it from `$ARGUMENTS` / conversation / repo context, or ask for it, and confirm it with the user — then propose a roster (static structure) + pattern config (dynamic structure) **derived from that goal**; on confirmation persist `.specify/teams/<slug>/team.md` (or run one-shot without persisting).
 3. **modify** → `improve-team`: load the existing team and apply targeted, evidence-based edits to any of its three parts — the **goal**, the **static structure**, or the **dynamic structure**. Structure edits are structure-preserving and keep serving the current goal. **Redefining the goal is a first-class, supported edit**: when the goal changes, re-evaluate and realign the roster and pattern to serve the new goal. Re-persist and bump `updated`.
 4. **run** → `create-team` execution path: follow the **preview → confirm → execute** gate below.
 5. **Ambiguous / unsupported** → see below.
@@ -65,7 +65,7 @@ When intent cannot be resolved, the command MUST report the recognized capabilit
 
 The **run** mode MUST follow this sequence and MUST NOT execute before confirmation:
 
-1. **Load** the target team from `.specify/teams/<slug>.team.md`.
+1. **Load** the target team from `.specify/teams/<slug>/team.md`.
 2. **Restate the Goal** — surface the team's `goal` up front, so both structures below are read as *means to that end* and execution can be judged against it.
 3. **Render Static Structure** — the roster as a Role × Stage × Type matrix: each member agent, its role, its type (Worker/Meta), and its lifecycle (persistent/temporary).
 4. **Render Dynamic Structure** —
@@ -75,10 +75,13 @@ The **run** mode MUST follow this sequence and MUST NOT execute before confirmat
 5. **Confirmation gate** — present the **goal** and both structures, and ask the user to confirm. The team executes **only** on explicit confirmation.
    - On confirm → orchestrate per the team's pattern (delegating to `create-team`'s execution engine): territory validation before parallel dispatch, DAG (no-cycle) validation before serial chain, mandatory max-iteration cap for team loops, file-path-only handoff. Throughout, work is steered toward the **goal**, and the evaluator/team-loop measures progress against it (iterate until the goal's threshold is met or the cap is reached).
    - On decline → stop without executing; optionally suggest `modify`.
+6. **Report** — after execution finishes, write a dated run report to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (goal, execution time, result summary, full process detail). Mandatory for every run.
+
+**Output discipline** (see `skills/create-team/SKILL.md` → Run Workspace, Reports & Output Discipline): all run **intermediates** stay in the git-ignored workspace `.specify/teams/.work/<slug>/`; **deliverables** (standard output) go only to their declared target paths; the team directory `.specify/teams/<slug>/` holds **only** `team.md` + `runs/`.
 
 ### Persistence
 
-- Canonical store: `.specify/teams/<slug>.team.md` (Markdown + YAML frontmatter). No per-tool symlink — teams are a framework-internal concept.
+- Canonical store: the team **directory** `.specify/teams/<slug>/` — definition at `.specify/teams/<slug>/team.md`, accumulating run reports under `.specify/teams/<slug>/runs/`. No per-tool symlink — teams are a framework-internal concept. Run intermediates live in the git-ignored `.specify/teams/.work/<slug>/`, never in the team directory.
 - Each persisted team carries frontmatter (`slug`, `name`, `description`, `goal`, `pattern`, `members`, `config`, `created`, `updated`), a `## Goal` section (the team's overall final objective + success criteria), a `## Static Structure` section, and a `## Dynamic Structure` section (see `skills/create-team/SKILL.md` and the data model). The `## Goal` section is authored first — the static and dynamic sections are organized to serve it.
 
 ## Handoffs

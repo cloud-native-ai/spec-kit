@@ -15,7 +15,7 @@ A **team** has two structures (defined once in `skills/create-team/references/co
 - **Static structure** — a **Role × Stage × Type** roster (who participates, in what role, at what stage, Worker or Meta).
 - **Dynamic structure** — the collaboration **pattern** (parallel / serial / team-loop) with its parallelism / DAG / iteration settings and an execution flow.
 
-Persistent teams are stored at `.specify/teams/<slug>.team.md` (Markdown + YAML frontmatter, no per-tool symlink).
+Persistent teams own a directory `.specify/teams/<slug>/` — the definition lives at `.specify/teams/<slug>/team.md` (Markdown + YAML frontmatter, no per-tool symlink) and per-run reports accumulate under `.specify/teams/<slug>/runs/`.
 
 ## Syntax
 
@@ -40,10 +40,11 @@ The command **delegates to skills** and never renders templates inline. On ambig
 
 The **run** mode never executes before you confirm:
 
-1. **Load** the team from `.specify/teams/<slug>.team.md`.
+1. **Load** the team from `.specify/teams/<slug>/team.md`.
 2. **Render Static Structure** — the Role × Stage × Type roster matrix.
 3. **Render Dynamic Structure** — the pattern, its parallelism/DAG/loop settings, and an execution flow diagram.
 4. **Confirmation gate** — you review both structures and explicitly confirm. Only then does orchestration run (territory validation for parallel, DAG no-cycle for serial, max-iteration cap for team-loop, file-path-only handoff). Declining stops without executing.
+5. **Report** — after execution, a dated report is written to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (goal, timing, result summary, process detail). Run intermediates stay in the git-ignored `.specify/teams/.work/<slug>/`; deliverables go only to their declared target paths.
 
 ## Collaboration Patterns
 
@@ -53,9 +54,12 @@ The **run** mode never executes before you confirm:
 
 ## Output Artifacts
 
-| Artifact | Location |
-|----------|----------|
-| Persisted teams | `.specify/teams/<slug>.team.md` |
+| Artifact | Location | Git |
+|----------|----------|-----|
+| Team definition | `.specify/teams/<slug>/team.md` | tracked |
+| Run reports (per execution) | `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` | tracked |
+| Deliverables (standard output) | declared target path (real project path) | tracked |
+| Run intermediates | `.specify/teams/.work/<slug>/` | git-ignored |
 
 ## Companion Skills
 

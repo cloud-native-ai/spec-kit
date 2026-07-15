@@ -17,8 +17,8 @@
 | goal / team intent | one of | Natural-language description of what the team must accomplish. |
 | member agent list | one of | Explicit roster; if absent, `create-team` proposes members from the goal (FR-007). |
 | pattern hint | optional | parallel / serial / team-loop; inferred via the decision tree when omitted. |
-| persist? | optional | Whether to write `.specify/teams/<slug>.team.md` (default: persist). |
-| target team (run) | run only | Existing `.team.md` to execute. |
+| persist? | optional | Whether to write `.specify/teams/<slug>/team.md` (default: persist). |
+| target team (run) | run only | Existing `team.md` to execute. |
 
 ## Behavior
 
@@ -27,7 +27,7 @@
 1. Select the pattern via the decision tree (independent→parallel; sequenced→serial; iterative-quality→team-loop).
 2. Build the roster (static structure) and pattern config (dynamic structure); for team-loop include exactly one Team Supervisor.
 3. If members are missing, propose them (existing agents from `.specify/agents/`, or temporary stage/worker templates) for confirmation.
-4. Persist a `Team` to `.specify/teams/<slug>.team.md` per the data-model schema (unless one-shot).
+4. Persist a `Team` to `.specify/teams/<slug>/team.md` per the data-model schema (unless one-shot).
 
 ### Execute (run mode)
 

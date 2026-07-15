@@ -14,16 +14,16 @@
 
 | Input | Required | Description |
 |-------|----------|-------------|
-| target team | yes | Slug/name resolving to `.specify/teams/<slug>.team.md`. |
+| target team | yes | Slug/name resolving to `.specify/teams/<slug>/team.md`. |
 | improvement direction | yes | What to change: add/remove member, change pattern, tune thresholds/parallelism/dimensions. |
 | evidence | recommended | Concrete signals: run reports, non-convergence, oscillating scores, territory conflicts. |
 
 ## Behavior
 
-1. **Resolve target** — load the `.team.md`. If none exists → report "team not found" and offer to create one (FR-010).
+1. **Resolve target** — load the `team.md`. If none exists → report "team not found" and offer to create one (FR-010).
 2. **Gather evidence** — run history, convergence/oscillation, territory conflicts, stale/broken member references.
 3. **Attribute root cause** — map each issue to the responsible part (roster, pattern, config/thresholds, member territories/DAG).
-4. **Apply targeted edits** — minimal, evidence-based changes that preserve the parts of the team that work (SC-005). Re-persist the `.team.md`; update `updated` date.
+4. **Apply targeted edits** — minimal, evidence-based changes that preserve the parts of the team that work (SC-005). Re-persist the `team.md`; update `updated` date.
 5. **Report** — list each change and the evidence that motivated it; recommend a `run` to validate.
 
 ## Refinement map (examples)

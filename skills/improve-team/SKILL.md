@@ -16,17 +16,17 @@ Editing a team's **goal** is a first-class modify that **cascades into structure
 
 | Input | Required | Description |
 |-------|----------|-------------|
-| target team | yes | Slug/name resolving to `.specify/teams/<slug>.team.md`. |
+| target team | yes | Slug/name resolving to `.specify/teams/<slug>/team.md`. |
 | improvement direction | yes | What to change: **redefine the goal** (cascades into structure realignment — see `references/goal-editing.md`), add/remove member, change pattern, tune thresholds/parallelism/dimensions. |
-| evidence | recommended | Concrete signals: run reports, non-convergence, oscillating scores, territory conflicts, stale member references. |
+| evidence | recommended | Concrete signals from the tracked run reports under `.specify/teams/<slug>/runs/`: non-convergence, oscillating scores, territory conflicts, stale member references. |
 
 ## Behavior
 
-1. **Resolve target** — load the `.team.md` from `.specify/teams/<slug>.team.md`. If none exists → report **"team not found"** and offer to **create** one (hand off to `create-team` via `/speckit.team create`). Never silently create a team.
-2. **Gather evidence** — inspect run history, convergence/oscillation, territory conflicts, and stale/broken member references before proposing changes.
+1. **Resolve target** — load `team.md` from `.specify/teams/<slug>/team.md`. If none exists → report **"team not found"** and offer to **create** one (hand off to `create-team` via `/speckit.team create`). Never silently create a team.
+2. **Gather evidence** — inspect the tracked run reports (`.specify/teams/<slug>/runs/`) for convergence/oscillation, territory conflicts, and stale/broken member references before proposing changes.
 3. **Attribute root cause** — map each issue to the responsible part (roster, pattern, config/thresholds, member territories/DAG).
 4. **Apply targeted edits** — make the **minimal, evidence-based** change that fixes the issue while **preserving the parts of the team that already work** (SC-005). Do not touch unaffected fields — they must remain byte-identical.
-5. **Re-persist** — write the updated `.team.md` and **bump the `updated` date**; leave `created` and all unaffected frontmatter/members untouched.
+5. **Re-persist** — write the updated `team.md` and **bump the `updated` date**; leave `created` and all unaffected frontmatter/members untouched. Run intermediates stay in the git-ignored workspace `.specify/teams/.work/<slug>/`; if editing a legacy team, repoint any stale `progress_file` there.
 6. **Report** — list each change and the evidence that motivated it, and recommend a `run` to validate.
 
 ## Refinement Map (examples)
@@ -52,7 +52,7 @@ Editing a team's **goal** is a first-class modify that **cascades into structure
 
 ## Outputs
 
-- An updated `.specify/teams/<slug>.team.md` (with a bumped `updated` date) and a change report listing each edit and its motivating evidence.
+- An updated `.specify/teams/<slug>/team.md` (with a bumped `updated` date) and a change report listing each edit and its motivating evidence.
 
 ## Feedback
 

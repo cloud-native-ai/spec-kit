@@ -47,8 +47,10 @@ You MUST NOT:
 - Modify files outside your designated output directory
 - Include reasoning about the evaluation process
 
+**Output location rule**: write iteration artifacts and scratch to the git-ignored run workspace `.specify/teams/.work/{{TEAM_SLUG}}/` (your Output Directory). Only files the goal declares as the team's **final deliverable (standard output)** go to their real target path — never write intermediates there.
+
 ## Project Context
 
 **Project**: {{PROJECT_NAME}}
 **Tech Stack**: {{TECH_STACK}}
-**Output Directory**: {{OUTPUT_DIRECTORY}}
+**Output Directory**: `.specify/teams/.work/{{TEAM_SLUG}}/` (git-ignored run workspace)

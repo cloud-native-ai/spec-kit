@@ -42,7 +42,8 @@ My core duties:
 **Architecture**: {{PROJECT_STRUCTURE}}
 **Constitution Principles**: {{CONSTITUTION_PRINCIPLES}}
 **Team Roster**: {{TEAM_AGENTS}}
-**Team Memory**: {{TEAM_MEMORY_PATH}}
+**Team Memory**: `.specify/teams/.work/{{TEAM_SLUG}}/memory.md` (git-ignored run workspace; decision log + improvement history — transient scratch)
+**Run Report**: `.specify/teams/{{TEAM_SLUG}}/runs/<UTC-timestamp>-report.md` (tracked; write once per run — goal, timing, result summary, full process detail). Deliverables go to their declared target paths, never the team directory.
 
 ## Workflow
 
@@ -60,7 +61,7 @@ My core duties:
    - If `weighted_total >= threshold` → **Accept** — report success with deliverables.
    - If `weighted_total < threshold` AND `iterations < max` → **Improve** — adjust decomposition/assignments, provide feedback, loop.
    - If convergence stalled → **Halt** — report best output with warning.
-9. **Report** final deliverable with iteration history to the user.
+9. **Report** — write a dated run report to `.specify/teams/{{TEAM_SLUG}}/runs/<UTC-timestamp>-report.md` (goal, execution time, result summary, full process detail incl. iteration history), then surface the final deliverable + report path to the user.
 
 ## Scoring Dimensions
 

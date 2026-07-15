@@ -10,7 +10,7 @@
 
 ## 编辑流程
 
-1. **Resolve target**——加载 `.specify/teams/<slug>.team.md`；不存在则报 "team not found" 并提议 `create`（绝不静默创建）。
+1. **Resolve target**——加载 `.specify/teams/<slug>/team.md`；不存在则报 "team not found" 并提议 `create`（绝不静默创建）。
 2. **Classify the edit**——判断本次改动属于：
    - **结构编辑**（加/减成员、换模式、调阈值/并行度/维度）→ 保结构、证据驱动的最小改动，且**保持服务于当前 goal**；
    - **goal 编辑**（重定义总体目标）→ 进入下一步。
@@ -20,7 +20,7 @@
    - 协作模式是否仍合适（parallel / serial / team-loop）？
    - 若新 goal 主题为「优化」，按 [`../../create-team/references/optimization-goals.md`](../../create-team/references/optimization-goals.md) 重新区分一次性/持续并选择淘汰/渐进策略与其 `config`。
    - 仅做**必要**的结构改动；未受影响的成员/字段保持逐字节不变。
-5. **Re-persist & report**——写回 `.team.md`，**bump `updated`**（保留 `created`），并报告：goal 前后对比、因 goal 变更而做的结构对齐、以及各改动的动机证据。建议随后 `run` 验证。
+5. **Re-persist & report**——写回 `.specify/teams/<slug>/team.md`，**bump `updated`**（保留 `created`），并报告：goal 前后对比、因 goal 变更而做的结构对齐、以及各改动的动机证据。建议随后 `run` 验证。
 
 ## Refinement Map（goal 相关）
 

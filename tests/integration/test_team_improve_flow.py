@@ -22,7 +22,7 @@ class TestTeamImproveFlow:
         return IMPROVE_TEAM.read_text(encoding="utf-8")
 
     def test_operates_on_existing_team(self, content):
-        assert ".specify/teams/" in content, "improve-team must load the persisted .team.md"
+        assert ".specify/teams/" in content, "improve-team must load the persisted team.md"
 
     def test_targeted_structure_preserving(self, content):
         lower = content.lower()

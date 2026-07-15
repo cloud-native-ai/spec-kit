@@ -48,7 +48,7 @@ Defines the declarative data model for multi-agent serial workflows (DAG-based s
           "outputs": {
             "type": "array",
             "items": { "type": "string" },
-            "description": "File paths this stage will produce"
+            "description": "File paths this stage will produce. Intermediate (non-terminal) handoff files MUST live under the git-ignored run workspace `.specify/teams/.work/<slug>/`; only the terminal stage's final deliverables (standard output) use real project target paths."
           },
           "blockedBy": {
             "type": "array",
@@ -70,7 +70,7 @@ Defines the declarative data model for multi-agent serial workflows (DAG-based s
     },
     "progress_file": {
       "type": "string",
-      "description": "Path to the workflow progress tracking file"
+      "description": "Path to the workflow progress tracking file; a run intermediate — MUST live under `.specify/teams/.work/<slug>/`"
     }
   }
 }
@@ -97,7 +97,7 @@ Defines the declarative data model for multi-agent serial workflows (DAG-based s
       "agent_kind": "requirements-analyst",
       "task": "Analyze user stories and produce a requirements spec for authentication",
       "inputs_from": [],
-      "outputs": [".specify/specs/auth-requirements.md"],
+      "outputs": [".specify/teams/.work/feature-user-auth/requirements.md"],
       "blockedBy": []
     },
     {
@@ -105,7 +105,7 @@ Defines the declarative data model for multi-agent serial workflows (DAG-based s
       "agent_kind": "system-designer",
       "task": "Design system architecture based on requirements",
       "inputs_from": ["requirements"],
-      "outputs": [".specify/specs/auth-design.md"],
+      "outputs": [".specify/teams/.work/feature-user-auth/design.md"],
       "blockedBy": ["requirements"],
       "quality_gate": "Design covers all requirements and has no unresolved trade-offs"
     },
@@ -119,7 +119,7 @@ Defines the declarative data model for multi-agent serial workflows (DAG-based s
     }
   ],
   "handoff_protocol": "file-path-only",
-  "progress_file": ".specify/workflow-progress-feature-user-auth.md"
+  "progress_file": ".specify/teams/.work/feature-user-auth/progress.md"
 }
 ```
 
@@ -135,7 +135,7 @@ Defines the declarative data model for multi-agent serial workflows (DAG-based s
       "agent_kind": "requirements-analyst",
       "task": "Draft the feature specification from user intent",
       "inputs_from": [],
-      "outputs": [".specify/specs/draft-feature.md"],
+      "outputs": [".specify/teams/.work/spec-review-apply/draft-feature.md"],
       "blockedBy": []
     },
     {
@@ -143,7 +143,7 @@ Defines the declarative data model for multi-agent serial workflows (DAG-based s
       "agent_kind": "qa-engineer",
       "task": "Review spec for completeness, consistency, and testability",
       "inputs_from": ["draft-spec"],
-      "outputs": [".specify/reviews/feature-review.md"],
+      "outputs": [".specify/teams/.work/spec-review-apply/feature-review.md"],
       "blockedBy": ["draft-spec"],
       "quality_gate": "No critical issues remain unresolved"
     },
@@ -157,7 +157,7 @@ Defines the declarative data model for multi-agent serial workflows (DAG-based s
     }
   ],
   "handoff_protocol": "file-path-only",
-  "progress_file": ".specify/workflow-progress-spec-review-apply.md"
+  "progress_file": ".specify/teams/.work/spec-review-apply/progress.md"
 }
 ```
 
@@ -173,7 +173,7 @@ Defines the declarative data model for multi-agent serial workflows (DAG-based s
       "agent_kind": "qa-engineer",
       "task": "Analyze current test coverage gaps",
       "inputs_from": [],
-      "outputs": [".specify/analysis/coverage-gaps.md"],
+      "outputs": [".specify/teams/.work/test-coverage-pipeline/coverage-gaps.md"],
       "blockedBy": []
     },
     {
@@ -181,7 +181,7 @@ Defines the declarative data model for multi-agent serial workflows (DAG-based s
       "agent_kind": "test-engineer",
       "task": "Create test plan addressing coverage gaps",
       "inputs_from": ["analyze"],
-      "outputs": [".specify/specs/test-plan.md"],
+      "outputs": [".specify/teams/.work/test-coverage-pipeline/test-plan.md"],
       "blockedBy": ["analyze"]
     },
     {
@@ -195,6 +195,6 @@ Defines the declarative data model for multi-agent serial workflows (DAG-based s
     }
   ],
   "handoff_protocol": "file-path-only",
-  "progress_file": ".specify/workflow-progress-test-coverage.md"
+  "progress_file": ".specify/teams/.work/test-coverage-pipeline/progress.md"
 }
 ```

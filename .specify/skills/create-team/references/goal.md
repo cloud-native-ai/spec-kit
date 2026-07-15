@@ -23,7 +23,7 @@
 
 ## 持久化
 
-持久化的 `.team.md`：
+持久化的 `.specify/teams/<slug>/team.md`（团队目录，运行报告累积在同目录 `runs/` 下）：
 
 - frontmatter 含 **`goal`** 字段（顺序：`slug, name, description, goal, pattern, members, config, created, updated`）；
 - 含 **`## Goal`** 小节（总体最终目标 + 成功标准），**先写 `## Goal`**，静态与动态小节都围绕它组织。

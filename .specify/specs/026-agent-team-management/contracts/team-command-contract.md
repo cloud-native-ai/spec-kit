@@ -10,7 +10,7 @@
 
 | Mode | Intent signals | Delegates to | Definition |
 |------|----------------|--------------|------------|
-| **create** | "创建团队", "组织一个团队", "new team", "build a team" | `create-team` | Author a new team (static + dynamic structure) from user needs; persist as `.specify/teams/<slug>.team.md` (or run one-shot). |
+| **create** | "创建团队", "组织一个团队", "new team", "build a team" | `create-team` | Author a new team (static + dynamic structure) from user needs; persist as `.specify/teams/<slug>/team.md` (or run one-shot). |
 | **modify** | "修改团队", "调整团队", "improve/adjust team", "优化 team" | `improve-team` | Load an existing team and apply targeted, evidence-based changes. |
 | **run** | "运行团队", "执行团队", "run/execute team", "跑一遍" | `create-team` (execution path) | Load a team, render its structure, confirm, then orchestrate. |
 
@@ -25,7 +25,7 @@
 
 The **run** mode MUST follow this sequence and MUST NOT execute before confirmation:
 
-1. **Load** the target team from `.specify/teams/<slug>.team.md`.
+1. **Load** the target team from `.specify/teams/<slug>/team.md`.
 2. **Render Static Structure** — the roster as a Role × Stage × Type matrix: each member agent, its role, its kind/type (Worker/Meta), and its lifecycle (persistent/temporary).
 3. **Render Dynamic Structure** —
    - the collaboration `pattern` (parallel / serial / team-loop);

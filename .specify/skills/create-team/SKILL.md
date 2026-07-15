@@ -8,7 +8,7 @@ skill_id: "<SKILL:.specify/skills/create-team/SKILL.md>"
 
 ## Goal
 
-Create and run an **agent team**: organize multiple Agents into a **collaborative structure** (static roster + dynamic execution pattern — parallel dispatch, serial chain, or self-iterating team loop), persist it as a reusable `.specify/teams/<slug>.team.md`, and **execute** it behind a preview→confirm gate. This skill owns both **defining** a team and **running** it, and is the single source of truth for the multi-agent Conceptual Model (see `references/conceptual-model.md`).
+Create and run an **agent team**: organize multiple Agents into a **collaborative structure** (static roster + dynamic execution pattern — parallel dispatch, serial chain, or self-iterating team loop), persist it as a reusable `.specify/teams/<slug>/team.md`, and **execute** it behind a preview→confirm gate. This skill owns both **defining** a team and **running** it, and is the single source of truth for the multi-agent Conceptual Model (see `references/conceptual-model.md`).
 
 ## Conceptual Model
 
@@ -18,17 +18,17 @@ The **goal** — the team's north star that both structures serve — is defined
 
 ## Team Definition & Persistence (create mode)
 
-Produce a team from a user **goal** and (unless one-shot) persist it as `.specify/teams/<slug>.team.md`. The goal is the team's north star — **establish it first, then derive both structures from it** (goal concept: `references/goal.md`).
+Produce a team from a user **goal** and (unless one-shot) persist it as `.specify/teams/<slug>/team.md`. The goal is the team's north star — **establish it first, then derive both structures from it** (goal concept: `references/goal.md`).
 
 1. **Establish the goal (first)** — extract the goal from `$ARGUMENTS`/conversation/repo context, ask if missing, and confirm it with the user; write it in a **verifiable** form (success criteria / threshold). If the goal's theme is **optimization**, classify it (one-time vs continuous) and pick a strategy (elimination vs progressive) per `references/optimization-goals.md`.
 2. **Select the pattern** via the Pattern Selection decision tree below (independent → parallel; sequenced → serial; iterative-quality → team-loop) — **derived from the goal**.
 3. **Build the roster (static structure)** — a Role × Stage × Type matrix. If the user did not supply members, **propose** them from the goal: prefer existing agents under `.specify/agents/`, otherwise temporary stage/worker templates from `templates/`. A **team-loop team MUST include exactly one Team Supervisor** (Meta role).
 4. **Build the pattern config (dynamic structure)** — parallelism + territories (parallel), DAG `blockedBy` edges + file-path-only handoff (serial), or quality dimensions + threshold + max_iterations + regression_limit (team-loop).
-5. **Confirm** the proposed **goal** + roster + pattern with the user, then persist the `Team` to `.specify/teams/<slug>.team.md` using the schema below (skip persistence only for an explicit one-shot run).
+5. **Confirm** the proposed **goal** + roster + pattern with the user, then persist the `Team` to `.specify/teams/<slug>/team.md` using the schema below (skip persistence only for an explicit one-shot run).
 
-### Persisted `.team.md` schema
+### Persisted `team.md` schema
 
-Stored at `.specify/teams/<slug>.team.md` (no per-tool symlink — framework-internal):
+Each persistent team owns a **directory** `.specify/teams/<slug>/` (no per-tool symlink — framework-internal). The definition is stored at `.specify/teams/<slug>/team.md`; per-run reports accumulate under `.specify/teams/<slug>/runs/` (see Run Workspace, Reports & Output Discipline below):
 
 ```markdown
 ---
@@ -59,7 +59,7 @@ config:
 <pattern description, parallelism/DAG/loop settings, and the execution flow diagram>
 ```
 
-- `slug` MUST be unique within `.specify/teams/`; it also names the file.
+- `slug` MUST be unique within `.specify/teams/`; it also names the team directory `.specify/teams/<slug>/`.
 - `members` MUST resolve to `.specify/agents/<slug>.agent.md` or a temporary stage/worker template; unresolved members are surfaced as broken references.
 - `config` MUST match `pattern`.
 
@@ -67,11 +67,57 @@ config:
 
 `/speckit.team run <slug>` loads a persisted team and executes it behind the mandatory **preview → confirm → execute** gate:
 
-1. **Load** the team from `.specify/teams/<slug>.team.md`.
+1. **Load** the team from `.specify/teams/<slug>/team.md`.
 2. **Restate the Goal** — surface the team's `goal` up front, so both structures are read as *means to that end* and execution can be judged against it.
 3. **Render Static Structure** — the roster as a Role × Stage × Type matrix (agent, role, Worker/Meta, persistent/temporary).
 4. **Render Dynamic Structure** — the `pattern`, its parallelism/DAG/loop settings, and an execution flow diagram (textual/mermaid/PlantUML showing dispatch/handoff/loop edges).
-5. **Confirmation gate** — present the **goal** and both structures and require explicit user confirmation. On decline, stop without executing. On confirm, orchestrate per pattern using the engine defined in the pattern sections below, preserving the Hard Constraints (territory validation before parallel dispatch; DAG no-cycle before serial; mandatory max-iteration cap for team loops; file-path-only handoff; context isolation; idempotent execution).
+5. **Confirmation gate** — present the **goal** and both structures and require explicit user confirmation. On decline, stop without executing. On confirm, orchestrate per pattern using the engine defined in the pattern sections below, preserving the Hard Constraints (territory validation before parallel dispatch; DAG no-cycle before serial; mandatory max-iteration cap for team loops; file-path-only handoff; context isolation; idempotent execution). All run-generated intermediate files MUST stay in the run workspace `.specify/teams/.work/<slug>/`; deliverables go only to their declared target paths (see Run Workspace, Reports & Output Discipline).
+6. **Write the run Report** — after execution finishes (success, halt, or abort), write a dated report to `.specify/teams/<slug>/runs/` per the Report contract below. This is mandatory for every run.
+
+## Run Workspace, Reports & Output Discipline
+
+Every team run produces files in **four distinct classes**. Keep them strictly separated — this is what makes runs reproducible, the team directory clean, and later skill/command optimization possible.
+
+| Class | Location | Git | What goes here |
+|-------|----------|-----|----------------|
+| **Team definition** | `.specify/teams/<slug>/team.md` | tracked | The persisted team (frontmatter + Goal/Static/Dynamic sections). |
+| **Run reports** | `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` | tracked, **accumulate** | One report per execution; filename carries the date. |
+| **Deliverables (standard output)** | the **declared target path** (a real project path the user/goal specifies) | tracked | The team's actual product — final artifacts only. **Never** the team directory. |
+| **Run intermediates** | `.specify/teams/.work/<slug>/` | **git-ignored** | Everything else, any filename: progress files, parallel status manifests, per-iteration candidate renders, evaluator score dumps, team working memory, executor/optimizer scratch, intermediate serial-stage handoff files. |
+
+Rules:
+
+- The team directory `.specify/teams/<slug>/` holds **only** `team.md` and `runs/` — no intermediate files, no deliverables.
+- **Only final deliverables** count as standard output and escape to real target paths. Intermediate handoff files between serial stages are run intermediates → `.specify/teams/.work/<slug>/` (file-path-only handoff still works: downstream stages read from the workspace).
+- The run workspace is created on demand by the orchestrator at run time; it is transient and safe to delete. Do not rely on it across runs — durable knowledge belongs in the tracked report.
+
+### Report contract
+
+After **every** run, write `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (e.g. `20260715T143000Z-report.md`). It MUST record at least:
+
+```markdown
+# Team Run Report: <team name>
+
+- **Team**: <slug>
+- **Goal**: <the team's goal / success criteria>
+- **Started**: <ISO-8601>  **Finished**: <ISO-8601>  **Duration**: <hh:mm:ss>
+- **Pattern**: parallel | serial | team-loop
+- **Outcome**: <converged / max-reached / regression-halted / completed / aborted>
+
+## Result Summary
+<concise summary of the final result against the goal>
+
+## Deliverables
+| Artifact | Target path |
+|----------|-------------|
+<final deliverable paths — real project paths, not the team dir>
+
+## Execution Detail
+<full process record: task decomposition / stage or iteration log / scores / decisions / handoffs / problems encountered — enough to later optimize the team, its skills, and commands>
+
+## Run Workspace
+- Intermediates: `.specify/teams/.work/<slug>/` (git-ignored; transient)
+```
 
 ## Pattern Selection (Decision Tree)
 
@@ -158,7 +204,7 @@ Per-Agent Payload:
 | `task_brief` | One-paragraph task with clear deliverable |
 | `territory` | Write Scope + Read Scope |
 | `forbidden_files` | Files this agent MUST NOT modify |
-| `output_convention` | Where to write results and status |
+| `output_convention` | Where to write status + intermediates (`.specify/teams/.work/<slug>/`) vs. final deliverables (declared target path) |
 | `model_hint` | Suggested model tier (light / standard / heavy) |
 
 Context Isolation Rules:
@@ -169,7 +215,7 @@ Context Isolation Rules:
 
 ### Monitoring
 
-Monitor each agent's output manifest at `<output_dir>/.parallel-result-<agent-id>.md`.
+Monitor each agent's output manifest at `.specify/teams/.work/<slug>/parallel-result-<agent-id>.md`.
 
 **Stall Detection:**
 
@@ -254,7 +300,7 @@ Orchestrate Agents in a **serial chain** (DAG-based pipeline) where each stage's
     }
   ],
   "handoff_protocol": "file-path-only",
-  "progress_file": ".specify/workflow-progress-<workflow_id>.md"
+  "progress_file": ".specify/teams/.work/<slug>/progress.md"
 }
 ```
 
@@ -286,7 +332,7 @@ For each stage in topological order:
 
 ### Progress Tracking
 
-Write to `.specify/workflow-progress-<id>.md`:
+Write to `.specify/teams/.work/<slug>/progress.md`:
 
 ```markdown
 # Workflow Progress: <name>
@@ -430,9 +476,9 @@ All patterns use **file-path-only** communication:
 
 ### Progress Tracking
 
-- Parallel: manifest files at `<output_dir>/.parallel-result-<agent-id>.md`
-- Serial: progress file at `.specify/workflow-progress-<id>.md`
-- Team Loop: iteration history embedded in final report
+- Parallel: manifest files at `.specify/teams/.work/<slug>/parallel-result-<agent-id>.md`
+- Serial: progress file at `.specify/teams/.work/<slug>/progress.md`
+- Team Loop: iteration history in the run workspace; final summary in the tracked run report
 
 ### Model Selection Guidance
 
@@ -450,6 +496,8 @@ All patterns use **file-path-only** communication:
 - **File-path-only handoff** — never paste content between agents
 - **Context isolation** — each agent invocation is a fresh subagent
 - **Idempotent execution** — stages/iterations can be re-run safely
+- **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory
+- **Every run writes a dated report** to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` per the Report contract
 
 ---
 

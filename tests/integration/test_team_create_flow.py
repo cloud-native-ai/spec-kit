@@ -4,7 +4,7 @@ Because teams are authored/executed by an interactive agent, this integration
 test validates the *artifacts* that drive the create flow rather than spawning a
 live agent:
   - `templates/commands/team.md` documents the create mode and the persisted
-    store path `.specify/teams/<slug>.team.md`.
+    store path `.specify/teams/<slug>/team.md`.
   - `skills/create-team/SKILL.md` describes producing a persisted team with the
     data-model schema: YAML frontmatter (slug / pattern / members / config), a
     `## Static Structure` matrix, and a `## Dynamic Structure`.
@@ -34,7 +34,7 @@ class TestTeamCreateFlow:
 
     def test_skill_describes_team_file_schema(self):
         content = CREATE_TEAM_SKILL.read_text(encoding="utf-8")
-        assert ".specify/teams/" in content, "create-team must document the .team.md store"
+        assert ".specify/teams/" in content, "create-team must document the team.md store"
         assert "## Static Structure" in content, "create-team must define the Static Structure"
         assert "## Dynamic Structure" in content, "create-team must define the Dynamic Structure"
         for key in ("pattern", "members", "config", "slug"):

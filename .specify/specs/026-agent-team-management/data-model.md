@@ -2,7 +2,7 @@
 
 **Feature**: 027 Team Management | **Spec**: [requirements.md](./requirements.md) | **Plan**: [plan.md](./plan.md)
 
-This document defines the entities of the team domain, the persisted `.team.md` file schema, and the classification that governs which `agent-*` templates move from the single-agent domain into the team domain.
+This document defines the entities of the team domain, the persisted team-directory schema (`<slug>/team.md` + `<slug>/runs/`), the run-workspace/output discipline, and the classification that governs which `agent-*` templates move from the single-agent domain into the team domain.
 
 ## Entities
 
@@ -12,7 +12,7 @@ A named, reusable multi-agent structure organized from a user goal. It is the pr
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `slug` | kebab-case string | yes | Unique identifier; also the file name `<slug>.team.md`. |
+| `slug` | kebab-case string | yes | Unique identifier; also names the team directory `.specify/teams/<slug>/` (definition at `<slug>/team.md`). |
 | `name` | string | yes | Human-readable display name. |
 | `description` | string | yes | One-line purpose (goal statement). |
 | `pattern` | enum `parallel` \| `serial` \| `team-loop` | yes | The collaboration/dynamic structure. |
@@ -46,12 +46,37 @@ Pattern-specific runtime settings; exactly one shape applies per `pattern`.
 | Pattern | Fields |
 |---------|--------|
 | `parallel` | `parallelism` (int, recommended 2–4), `territories` (per-member write/read scopes), `forbidden_write` (shared files only the lead writes) |
-| `serial` | `stages` (ordered), `blockedBy` edges (DAG, no cycles), `handoff` = file-path-only, `progress_file` |
+| `serial` | `stages` (ordered), `blockedBy` edges (DAG, no cycles), `handoff` = file-path-only, `progress_file` (a run intermediate → `.specify/teams/.work/<slug>/`) |
 | `team-loop` | `quality_dimensions[]` (name+weight, Σ=1.0), `threshold` (default 0.8), `max_iterations` (default 5, max 10), `regression_limit` (default 2) |
 
-### Team `.team.md` file schema (canonical persistence)
+### Report
 
-Stored at `.specify/teams/<slug>.team.md`. No per-tool symlink (framework-internal artifact).
+A per-run record written **after every run** to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (tracked; reports accumulate across runs).
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| goal | yes | The team's goal / success criteria for this run. |
+| timing | yes | Started / finished / duration. |
+| result summary | yes | Concise summary of the final result against the goal. |
+| execution detail | yes | Full process record (decomposition / stage or iteration log / scores / decisions / handoffs / problems) — enough to later optimize the team, its skills, and commands. |
+| deliverables | yes | Final deliverable paths (real target paths, not the team directory). |
+
+### Run Workspace & Output Discipline
+
+Every run separates four output classes:
+
+| Class | Location | Git |
+|-------|----------|-----|
+| Team definition | `.specify/teams/<slug>/team.md` | tracked |
+| Run reports | `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` | tracked, accumulate |
+| Deliverables (standard output) | declared target path (real project path) | tracked |
+| Run intermediates (progress, manifests, iteration scratch, working memory, intermediate handoffs) | `.specify/teams/.work/<slug>/` | git-ignored |
+
+The team directory `.specify/teams/<slug>/` holds **only** `team.md` + `runs/`. Only final deliverables count as standard output; intermediate serial-stage handoffs are run intermediates.
+
+### Team `team.md` file schema (canonical persistence)
+
+Stored at `.specify/teams/<slug>/team.md` (the team owns the directory `.specify/teams/<slug>/`; run reports accumulate under `<slug>/runs/`). No per-tool symlink (framework-internal artifact).
 
 ```markdown
 ---
@@ -81,14 +106,14 @@ config:
 ## State / Lifecycle
 
 ```
-(none) --create--> Defined(persisted .team.md)
+(none) --create--> Defined(persisted <slug>/team.md)
 Defined --modify--> Defined(updated)
-Defined --run--> Preview(static+dynamic) --confirm--> Executing --> Completed/Halted
+Defined --run--> Preview(static+dynamic) --confirm--> Executing --> Completed/Halted --> Report(<slug>/runs/<ts>-report.md)
 ```
 
-- **create** (create-team): produce a `Team` and persist the `.team.md` (or run one-shot without persisting).
-- **modify** (improve-team): load an existing `.team.md`, apply targeted evidence-based edits, re-persist; unaffected fields unchanged (SC-005).
-- **run** (create-team execution): load the `.team.md`, render **Static Structure** + **Dynamic Structure** (incl. flow diagram), require explicit user confirmation, then orchestrate (parallel/serial/team-loop).
+- **create** (create-team): produce a `Team` and persist `<slug>/team.md` (or run one-shot without persisting).
+- **modify** (improve-team): load an existing `<slug>/team.md`, apply targeted evidence-based edits, re-persist; unaffected fields unchanged (SC-005).
+- **run** (create-team execution): load `<slug>/team.md`, render **Static Structure** + **Dynamic Structure** (incl. flow diagram), require explicit user confirmation, orchestrate (parallel/serial/team-loop) with intermediates in `.specify/teams/.work/<slug>/`, then write a dated report to `<slug>/runs/`.
 
 ## Template Classification (single-agent vs team)
 

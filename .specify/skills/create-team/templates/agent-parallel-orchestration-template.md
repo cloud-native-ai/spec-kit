@@ -13,6 +13,7 @@ description: "Parallel multi-agent orchestration for {{PROJECT_NAME}}"
 **Max Concurrency**: {{MAX_CONCURRENCY}} (default: 4)
 **Aggregation Strategy**: {{AGGREGATION_STRATEGY}} (merge | report-only | sequential-merge)
 **Timeout Per Agent**: {{AGENT_TIMEOUT}} (default: 300s)
+**Run Workspace**: `.specify/teams/.work/{{TEAM_SLUG}}/` (git-ignored) — holds all status manifests and intermediate files. Final deliverables go to their declared target paths (real project paths), never the workspace.
 
 ### Territory Rules
 
@@ -55,7 +56,7 @@ Payload for Agent <ID>:
   write_scope: [files/dirs agent may modify]
   read_scope: [files/dirs agent may read]
   forbidden_files: [files agent MUST NOT touch]
-  output_manifest: <path to write completion status>
+  output_manifest: .specify/teams/.work/{{TEAM_SLUG}}/parallel-result-<agent-id>.md
 ```
 
 **Rule**: NO conversation history, NO other agents' tasks, NO shared mutable references.
@@ -72,10 +73,10 @@ Issue ALL agent calls in a **single response block**:
 
 ### Step 4: Completion Monitoring
 
-Poll for completion manifests at each agent's declared output path:
+Poll for completion manifests at each agent's declared output path in the run workspace:
 
 ```
-{{OUTPUT_DIRECTORY}}/.parallel-result-<agent-id>.md
+.specify/teams/.work/{{TEAM_SLUG}}/parallel-result-<agent-id>.md
 ```
 
 Monitor for:

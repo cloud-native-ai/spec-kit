@@ -23,7 +23,7 @@
 
 ## 案例
 
-- **淘汰策略实战**（复杂图表下持续优化 draw-plantuml 技能，含评分规则与 5 代结果）：[draw-plantuml-optimization-case.md](draw-plantuml-optimization-case.md)
+- **淘汰策略范例**（复杂图表下持续优化 draw-plantuml 技能，定义了加权评分规则与淘汰/精英保留策略）：[`.specify/teams/draw-plantuml-optimizer/team.md`](../../.specify/teams/draw-plantuml-optimizer/team.md)。该团队已定义、可直接 re-run；逐轮评分结果需实际执行后累积，届时每轮报告落在同目录 `runs/` 下（运行中间态则落在被忽略的 `.specify/teams/.work/`）。
 
 ## 待完善
 

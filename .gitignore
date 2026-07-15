@@ -53,3 +53,6 @@ node_modules/
 
 # /speckit.history scratch (de-noised transcripts); .md docs + .manifest.json are tracked
 .specify/history/.work/
+
+# /speckit.team run intermediate workspace (transient); team defs + runs/ reports stay tracked
+.specify/teams/.work/
