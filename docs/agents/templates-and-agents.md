@@ -53,9 +53,7 @@ The Stage templates (`agent-stage-{executor,evaluator,optimizer}`), the orchestr
 (`agent-{parallel,serial,triad}-orchestration-template.md`), the Team Supervisor template, and the
 `agent-workflow-schema.md` (the `AgentWorkflow` JSON schema used by serial orchestration) are all
 **multi-agent** artifacts under `skills/create-team/templates/`. They are documented in
-[`docs/teams/orchestration.md`](../teams/orchestration.md), not here. The former `agent-subrole-*`
-naming and the `improver` stage name are **removed**; see [design.md §七](./design.md) for the
-migration record.
+[`docs/teams/orchestration.md`](../teams/orchestration.md), not here.
 
 ## Persisted agents (`.specify/agents/`)
 
@@ -159,7 +157,7 @@ scope; the former `AGENTS.md`/`MEMORY.md`/`SOUL.md`/`USER.md` shared files have 
 
 ## Traceability
 
-Normative source: `.specify/specs/023-agent-framework-redesign/`
-(`data-model.md`, `contracts/template-migration-contract.md`). The deprecated-term guard
-`tests/unit/test_agent_deprecated_terms.py` keeps the `Stage`/`optimizer` naming enforced
-across all templates and persisted agents.
+Normative source: the template catalog under `skills/create-agent/templates/` and
+`skills/create-team/templates/`, and the persisted agents under `.specify/agents/`. The
+deprecated-term guard `tests/unit/test_agent_deprecated_terms.py` keeps the `Stage`/`optimizer`
+naming enforced across all templates and persisted agents.

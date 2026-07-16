@@ -6,7 +6,7 @@
 - **static structure（静态结构）** — Role × Stage × Type 花名册（*谁*参与）。
 - **dynamic structure（动态结构）** — 协作模式 parallel / serial / iteration / continuous（*怎么*协作）。
 
-> `/speckit.agents` 负责**单 Agent**（创作 / 优化一个 Agent）；组织或运行多个 Agent（编排、组合）一律归 `/speckit.team` 与团队技能。单 Agent 框架概念见 [`docs/agents/`](../agents/agent-framework.md)。
+> `/speckit.agents` 负责**单 Agent**（创作 / 优化一个 Agent）；组织或运行多个 Agent（编排、组合）一律归 `/speckit.team` 与团队技能。单 Agent 框架概念见 [`docs/agents/`](../agents/overview.md)。
 
 ## 四种协作模式（动态结构）
 
@@ -68,7 +68,7 @@
 | 命令入口（create / modify / run 三模式、run 门、continuous 单 cycle 门控） | [`templates/commands/team.md`](../../templates/commands/team.md) |
 | 创建 / 运行技能（模式选择、四种模式引擎、持久化 schema） | [`skills/create-team/SKILL.md`](../../skills/create-team/SKILL.md) |
 | 修改技能（Refinement Map，含 continuous 项） | [`skills/improve-team/SKILL.md`](../../skills/improve-team/SKILL.md) |
-| 数据模型与 `.team.md` schema | [`.specify/specs/026-agent-team-management/data-model.md`](../../.specify/specs/026-agent-team-management/data-model.md) |
+| 数据模型与 `.team.md` schema | [`.specify/specs/.archive/026-agent-team-management/data-model.md`](../../.specify/specs/.archive/026-agent-team-management/data-model.md) |
 
 ## 案例
 
@@ -76,5 +76,5 @@
 
 ## 待完善
 
-- `goal` 已作为一等概念落在命令与技能 `references/` 中；数据模型 [`data-model.md`](../../.specify/specs/026-agent-team-management/data-model.md) 仍把 goal 混入 `description`，需要把 `goal` 分离为独立字段以与技能 schema 一致（建议走 `/speckit.feature`）。
+- `goal` 已作为一等概念落在命令与技能 `references/` 中；数据模型 [`data-model.md`](../../.specify/specs/.archive/026-agent-team-management/data-model.md) 仍把 goal 混入 `description`，需要把 `goal` 分离为独立字段以与技能 schema 一致（建议走 `/speckit.feature`）。
 - 数据模型仍以三模式描述动态结构；需补齐 `iteration` 与 `continuous`（含 `config` 运营字段），与本目录及技能 `references/` 对齐（建议走 `/speckit.feature`）。

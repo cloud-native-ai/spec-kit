@@ -1,7 +1,7 @@
 """Contract test: `organize-agents` is renamed to `create-team` (M1, Feature 027).
 
 Enforces the Team Migration contract
-(``.specify/specs/026-agent-team-management/contracts/team-migration-contract.md`` § M1)
+(``.specify/specs/.archive/026-agent-team-management/contracts/team-migration-contract.md`` § M1)
 and the create-team skill contract § Identity.
 
 Assertions:

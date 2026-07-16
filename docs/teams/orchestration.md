@@ -210,7 +210,7 @@ Stage 4: Test Engineer
 > Role×Stage matrix). It has exactly **two layers** — a single **Team Supervisor** (Meta role) and
 > its **Workers** — with the `executor`/`evaluator`/`optimizer` stages running under the Supervisor's
 > control. The per-role quality loop it builds on is documented in
-> [eei-triad-pattern.md](../agents/eei-triad-pattern.md).
+> [quality-loop.md](../agents/quality-loop.md).
 
 Iteration exists to **converge one deliverable to a measurable quality threshold**. It maps to a
 **one-time** optimization goal (raise X from A to B, then deliver and stop). For a quality that must
@@ -390,7 +390,7 @@ The multi-agent authoring templates live at **`skills/create-team/templates/`** 
 - The long-lived operating discipline (maturity, constraints, budget, verifier, state spine): [continuous-operations.md](./continuous-operations.md)
 - Normative concept model (Role × Stage × Type, Team/Loop, merged Team Supervisor): [`conceptual-model.md`](../../skills/create-team/references/conceptual-model.md)
 - Command entry point (create / modify / run): [`templates/commands/team.md`](../../templates/commands/team.md)
-- The per-role quality loop iteration builds on: [eei-triad-pattern.md](../agents/eei-triad-pattern.md)
+- The per-role quality loop iteration builds on: [quality-loop.md](../agents/quality-loop.md)
 
-Normative source: `.specify/specs/026-agent-team-management/` and the orchestration templates
+Normative source: `.specify/specs/.archive/026-agent-team-management/` and the orchestration templates
 `skills/create-team/templates/agent-{parallel,serial,triad}-orchestration-template.md`.

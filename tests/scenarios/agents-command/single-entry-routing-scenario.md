@@ -1,7 +1,7 @@
 # Test Scenario: Single-Entry Intent Routing — `/speckit.agents`
 
 Layer-2 structural scenario for the single **single-agent** command entry point.
-Contract: [agents-command-contract.md](../../../.specify/specs/023-agent-framework-redesign/contracts/agents-command-contract.md) A1–A6; FR-019, FR-001, FR-002. Team routing was removed in Feature 027 (Team Management) — all multi-agent/team operations now live behind `/speckit.team`.
+Contract: [agents-command-contract.md](../../../.specify/specs/.archive/023-agent-framework-redesign/contracts/agents-command-contract.md) A1–A6; FR-019, FR-001, FR-002. Team routing was removed in Feature 027 (Team Management) — all multi-agent/team operations now live behind `/speckit.team`.
 
 ## Scenario Description
 

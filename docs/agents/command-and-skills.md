@@ -166,7 +166,7 @@ for tool records.
 
 ## Traceability
 
-Normative source: `.specify/specs/023-agent-framework-redesign/contracts/agents-command-contract.md`
-and the skill contracts. See also `skills/create-agent/SKILL.md`,
-`skills/improve-agent/SKILL.md`, and the team skills `skills/create-team/SKILL.md`,
-`skills/improve-team/SKILL.md`.
+Normative source: the command template `templates/commands/agents.md` (installed as
+`/speckit.agents`) and the skill contracts `skills/create-agent/SKILL.md` and
+`skills/improve-agent/SKILL.md`. For team operations see the team skills
+`skills/create-team/SKILL.md` and `skills/improve-team/SKILL.md`.

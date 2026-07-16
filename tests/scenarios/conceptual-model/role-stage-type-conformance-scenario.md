@@ -1,7 +1,7 @@
 # Test Scenario: Role/Stage/Type Conformance — Agent Templates
 
 Layer-2 structural scenario for the redesigned conceptual model.
-Contract: [conceptual-model-contract.md](../../../.specify/specs/023-agent-framework-redesign/contracts/conceptual-model-contract.md) C1–C6; data-model.md; SC-005.
+Contract: [conceptual-model-contract.md](../../../.specify/specs/.archive/023-agent-framework-redesign/contracts/conceptual-model-contract.md) C1–C6; data-model.md; SC-005.
 
 ## Scenario Description
 
