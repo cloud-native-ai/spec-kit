@@ -39,9 +39,10 @@ team operations (organize / run several agents) are directed to `/speckit.team`.
 
 ### Team topologies (owned by `/speckit.team`)
 
-Organizing and running multiple agents (parallel / serial / team closed-loop) is owned by the
-team domain — the `create-team` skill via `/speckit.team`. Operational detail lives in
-[multi-agent-orchestration.md](./multi-agent-orchestration.md).
+Organizing and running multiple agents (parallel / serial / iteration / continuous) is owned by
+the team domain — the `create-team` skill via `/speckit.team`. Operational detail lives in
+[`docs/teams/orchestration.md`](../teams/orchestration.md) (and
+[`continuous-operations.md`](../teams/continuous-operations.md) for the long-lived form).
 
 ## The single-agent skills
 
@@ -83,10 +84,12 @@ Changes must be **evidence-based** and **minimal**, preserving established struc
 a multi-agent **team** (stages, orchestration, thresholds), use `improve-team` via `/speckit.team`.
 
 > **Team orchestration**: organizing and running multiple agents is owned by the team domain —
-> the `create-team` skill via `/speckit.team`. It selects a pattern (Parallel Dispatch / Serial
-> Chain / Team Loop) via a decision tree and enforces territory validation, DAG (no-cycle)
-> validation, a mandatory max-iteration cap, file-path-only handoff, and context isolation.
-> See [multi-agent-orchestration.md](./multi-agent-orchestration.md) for full protocols.
+> the `create-team` skill via `/speckit.team`. It selects a pattern (parallel / serial /
+> iteration / continuous) via a decision tree and enforces territory validation, DAG (no-cycle)
+> validation, per-step handoff verification, a mandatory max-iteration cap, file-path-only
+> handoff, context isolation, and — for `continuous` — maturity gating, a budget/circuit-breaker,
+> and an independent verifier. See [`docs/teams/orchestration.md`](../teams/orchestration.md) and
+> [`continuous-operations.md`](../teams/continuous-operations.md) for full protocols.
 
 ## Agent lifecycle: temporary vs persistent
 

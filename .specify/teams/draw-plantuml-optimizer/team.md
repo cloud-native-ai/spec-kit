@@ -1,13 +1,13 @@
 ---
 name: Draw-PlantUML 复杂大图优化团队
 slug: draw-plantuml-optimizer
-description: 以淘汰/锦标赛式 team-loop 持续优化 draw-plantuml 技能对复杂大型图表的美观绘制
+description: 以淘汰/锦标赛式 iteration 持续优化 draw-plantuml 技能对复杂大型图表的美观绘制
 goal: >
   持续提升 skills/draw-plantuml 技能对「复杂大型图表」的绘制质量——结构清晰、美观明确、
   降低用户处理信息的心智负担。以 docs/diagrams/05-detailed.puml 为基准测试图，令加权评分
   （美观 0.40 / 结构清晰 0.30 / 正确 0.20 / 心智负担 0.10）达到 ≥ 0.85 即视为该轮达标；
   对复杂大图，美观度优先级高于其他维度。持续机制：可复现、可复盘，多轮 re-run 累积改进。
-pattern: team-loop
+pattern: iteration
 created: 2026-07-15
 updated: 2026-07-15
 members:
@@ -97,11 +97,11 @@ Role × Stage × Type 花名册（全部 temporary，由 `create-team/templates/
 | renderer | renderer | executor | **Worker** | temporary | 对每个变体的指南，渲染 benchmark → SVG/PNG（`render-plantuml.sh`，本地 jar + Noto CJK 回退） |
 | scorer | scorer | evaluator | Meta | temporary | 按 4 维度对每个渲染产出打分，产出加权总分 + 每变体「最大可改进点」 |
 
-**约束**：team-loop 团队恰含**一个** Team Supervisor（Meta）。变体优化器数 = `config.variants`（默认 3）。
+**约束**：iteration 团队恰含**一个** Team Supervisor（Meta）。变体优化器数 = `config.variants`（默认 3）。
 
 ## Dynamic Structure
 
-**Pattern**：`team-loop`（淘汰/锦标赛策略）。**每代内多变体并行、跨代串行**。
+**Pattern**：`iteration`（淘汰/锦标赛策略）。**每代内多变体并行、跨代串行**。
 
 **Loop 设置**：`threshold=0.85` · `max_iterations=5` · `regression_limit=2` · `variants=3` · 收敛判据「连续 2 代无提升」。
 
@@ -129,11 +129,11 @@ flowchart TD
   N -.下一代.-> S
 ```
 
-**每代五相**（team-loop 标准相位）：
+**每代五相**（iteration 标准相位）：
 1. **COORDINATE** — Supervisor 以当前最优指南为种子，给 3 个变体各派不同改进角度的子任务（territory = 各自变体工作区）。
 2. **EXECUTE** — 变体优化器改进 `guide/` 指南副本 → renderer 用该副本重渲 benchmark，产出 SVG/PNG。
 3. **EVALUATE** — scorer 对每个渲染产出按 4 维度打分，算加权总分，记录每变体「最大可改进点」。
 4. **DECIDE** — 最高分 ≥ 0.85 → 达标停；`iteration ≥ 5` 或连续 2 代无提升 → 停并恢复历史最优；否则继续。
 5. **IMPROVE** — 保留最高分为下一代种子、淘汰最低分，把评分器的最大可改进点注入下一代变异，使进化有方向。
 
-**收尾**：达标或收敛后，采纳最优变体对 `skills/draw-plantuml/references/guide/` 的改进，**双写同步**到 `.specify/skills/draw-plantuml/`（`diff -rq` 校验字节一致），并产出 team-loop 报告（评分明细 + 迭代历史 + lessons）。
+**收尾**：达标或收敛后，采纳最优变体对 `skills/draw-plantuml/references/guide/` 的改进，**双写同步**到 `.specify/skills/draw-plantuml/`（`diff -rq` 校验字节一致），并产出 iteration 报告（评分明细 + 迭代历史 + lessons）。

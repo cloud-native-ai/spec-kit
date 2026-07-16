@@ -16,8 +16,8 @@ organized by two structures, driven by one command, and produced by three skills
   recognizes intent and delegates; it never renders templates inline. Multi-agent teams
   (organizing / running several agents) live behind `/speckit.team`.
 - **Skills** — `create-agent` (author a single agent), `improve-agent` (refine a single
-  agent). Team orchestration (parallel / serial / team-loop) is owned by the team domain:
-  `create-team` and `improve-team` via `/speckit.team`.
+  agent). Team orchestration (parallel / serial / iteration / continuous) is owned by the
+  team domain: `create-team` and `improve-team` via `/speckit.team`.
 - **Artifacts** — reusable templates under `skills/create-agent/templates/` and persisted
   agents under `.specify/agents/`, linked into every supported tool by per-file symlink.
 
@@ -27,9 +27,9 @@ organized by two structures, driven by one command, and produced by three skills
         ┌────────┴────────┐                          ┌────────┴────────┐
         ▼                 ▼                          ▼                 ▼
    create-agent      improve-agent               create-team      improve-team
-   (author)          (refine)                    (define|run:              (refine team:
-        │                 │                        parallel|serial|          stages/thresholds)
-        ▼                 ▼                        team-loop)
+   (author)          (refine)                    (define|run:              (refine team: stages/
+        │                 │                        parallel|serial|          thresholds/maturity)
+        ▼                 ▼                        iteration|continuous)
    skills/create-agent/templates/*        .specify/agents/*.agent.md  ──(per-file symlink)──▶ .qoder/agents/, .github/agents/, …
    (Role × Stage × Type source)           (persisted Team members)
 ```
@@ -41,8 +41,9 @@ organized by two structures, driven by one command, and produced by three skills
 | [design.md](./design.md) | **Authoritative conceptual model & design** — Role/Stage/Type, Type-follows-Stage, the Team matrix, the Loop, and the merged Team Supervisor. Start here. |
 | [command-and-skills.md](./command-and-skills.md) | The `/speckit.agents` single entry point, intent→capability routing, the three skills, the temporary/persistent lifecycle, and tool integration. |
 | [templates-and-agents.md](./templates-and-agents.md) | The canonical template catalog and naming scheme, the seven preset role agents + Team Supervisor, the `.specify/agents/` layout, and the `AGENTS.md` registry. |
-| [eei-triad-pattern.md](./eei-triad-pattern.md) | The Executor-Evaluator-Optimizer (EEI) quality loop and role-scoped supervisors. |
-| [multi-agent-orchestration.md](./multi-agent-orchestration.md) | Operational guide for the three collaboration topologies: parallel dispatch, serial chain, team loop — owned by the team domain (`/speckit.team`, `create-team`). |
+| [eei-triad-pattern.md](./eei-triad-pattern.md) | The Executor-Evaluator-Optimizer (EEI) quality loop and role-scoped supervisors (single-agent). |
+
+> **Multi-agent orchestration moved.** Organizing / running multiple agents (parallel · serial · iteration · continuous) is owned by the team domain and documented under [`docs/teams/`](../teams/overview.md) — see [orchestration.md](../teams/orchestration.md) (the four-pattern operational guide) and [continuous-operations.md](../teams/continuous-operations.md) (the long-lived operating discipline).
 
 ## Core vocabulary (quick reference)
 
@@ -57,8 +58,8 @@ organized by two structures, driven by one command, and produced by three skills
 
 > **Terminology note**: `Stage` replaced the deprecated "SubRole" dimension name;
 > `optimizer` replaced the former "improver" stage name; and a single merged
-> **Team Supervisor** replaced the formerly separate "Meta-Coordinator" role.
-> These are the only accepted terms in live artifacts.
+> **Team Supervisor** replaced the formerly separate "Meta-Coordinator" role. These are
+> the only accepted terms in live artifacts.
 
 ## Traceability
 

@@ -1,6 +1,6 @@
 ---
 name: improve-team
-description: Adjust and optimize an existing agent team — add/remove members, change the collaboration pattern, tune thresholds/parallelism/quality dimensions — with targeted, evidence-based, structure-preserving edits. Use when the user mentions ["调整团队", "优化团队", "优化 team", "修改团队", "improve team", "adjust team", "refine team", "tune team", "给团队增加", "给团队减少"]
+description: Adjust and optimize an existing agent team — add/remove members, change the collaboration pattern, tune thresholds/parallelism/quality dimensions, or operate a continuous loop (promote/demote maturity L1→L2→L3, tune budget/constraints/cadence/verifier) — with targeted, evidence-based, structure-preserving edits. Use when the user mentions ["调整团队", "优化团队", "优化 team", "修改团队", "升级成熟度", "降级成熟度", "调预算", "improve team", "adjust team", "refine team", "tune team", "promote maturity", "给团队增加", "给团队减少"]
 skill_id: "<SKILL:.specify/skills/improve-team/SKILL.md>"
 ---
 
@@ -10,15 +10,15 @@ skill_id: "<SKILL:.specify/skills/improve-team/SKILL.md>"
 
 Adjust and optimize an **existing** agent team. `improve-team` is the team-domain analogue of `improve-agent`, completing the create → improve lifecycle for teams. It loads a persisted team, makes **targeted, evidence-based, structure-preserving** edits (never a broad rewrite), re-persists the team, and reports what changed and why. The multi-agent Conceptual Model it operates against is defined once in `../create-team/references/conceptual-model.md`; the team **goal** concept in `../create-team/references/goal.md`.
 
-Editing a team's **goal** is a first-class modify that **cascades into structure realignment** — follow `references/goal-editing.md`.
+Editing a team's **goal** is a first-class modify that **cascades into structure realignment** — follow `references/goal-editing.md`. For a **`continuous`** team, the operating discipline you tune (maturity level, cadence, budget/circuit-breaker, constraints file, independent verifier, state spine) is defined in `../create-team/references/operating-loops.md`.
 
 ## Inputs
 
 | Input | Required | Description |
 |-------|----------|-------------|
 | target team | yes | Slug/name resolving to `.specify/teams/<slug>/team.md`. |
-| improvement direction | yes | What to change: **redefine the goal** (cascades into structure realignment — see `references/goal-editing.md`), add/remove member, change pattern, tune thresholds/parallelism/dimensions. |
-| evidence | recommended | Concrete signals from the tracked run reports under `.specify/teams/<slug>/runs/`: non-convergence, oscillating scores, territory conflicts, stale member references. |
+| improvement direction | yes | What to change: **redefine the goal** (cascades into structure realignment — see `references/goal-editing.md`), add/remove member, change pattern, tune thresholds/parallelism/dimensions, or — for a `continuous` team — **promote/demote maturity** (L1→L2→L3), tune budget/constraints/cadence, or fix verifier independence. |
+| evidence | recommended | Concrete signals from the tracked run reports under `.specify/teams/<slug>/runs/` (and, for `continuous` teams, `STATE.md` Post-Run Critique + `run-log.jsonl`): non-convergence, oscillating scores, territory conflicts, stale member references, budget overruns, false-positive rate, runaway token spend. |
 
 ## Behavior
 
@@ -33,14 +33,18 @@ Editing a team's **goal** is a first-class modify that **cascades into structure
 
 | Symptom | Likely cause | Team edit |
 |---------|--------------|-----------|
-| Team-loop never converges | Threshold too high or conflicting dimensions | Lower threshold / rebalance `quality_dimensions` weights |
+| Iteration never converges | Threshold too high or conflicting dimensions | Lower threshold / rebalance `quality_dimensions` weights |
 | Score oscillates | Ambiguous evaluator criteria | Tighten the evaluator rubric (via the moved stage templates in `create-team/templates/`) |
 | Parallel file conflicts | Overlapping territories | Repartition `territories`; move shared files to forbidden-write |
 | Serial stage stalls | Broken/missing handoff dependency | Fix `blockedBy` edges / handoff file path |
 | Stale member | Agent renamed/deleted | Repoint or remove the member; surface the broken reference |
 | Missing a role (e.g. no QA gate) | Roster gap | Add a member (e.g. a `qa-engineer`) without altering existing members |
 | Goal drifted / team doing off-target work | Goal stale or never made explicit | Redefine the `goal` (verifiable form) and **realign** roster + pattern to it — see `references/goal-editing.md` |
-| Goal changed from one-time to continuous | Requirement shifted to "keep improving" | Switch to a team-loop (elimination or progressive) and add `threshold`/`max_iterations` — see `../create-team/references/optimization-goals.md` |
+| Goal changed from one-time to continuous | Requirement shifted to "keep improving" / recurring work | Switch the pattern from `iteration` to `continuous`; add `maturity` (start L1), `cadence`, `budget`, `constraints_file`, independent verifier — see `../create-team/references/operating-loops.md` |
+| Continuous loop burns too many tokens / runs away | No budget or circuit-breaker | Add/tighten `budget` (daily cap, `on_80pct: report-only`, `on_100pct: halt`) + `kill_switch` |
+| Continuous loop makes bad auto-changes | Jumped past L1, or verifier not independent | Demote `maturity` to L1 (report-only); make the verifier a **separate** sub-agent with a default-REJECT stance |
+| Continuous loop ready for more autonomy | ≥2 L1 cycles, <20% false positives, verifier proven, constraints authored | Promote `maturity` L1→L2 (or L2→L3) per operating-loops.md graduation gates |
+| Continuous `STATE.md` grows unbounded | Resolved items never pruned | Enforce per-cycle pruning of resolved/closed items in the state spine |
 
 ## MUST / MUST NOT
 

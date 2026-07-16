@@ -8,13 +8,18 @@ the command/skill surface see [command-and-skills.md](./command-and-skills.md).
 
 ## Canonical template catalog
 
-All templates live at **`skills/create-agent/templates/`** (installed mirror:
-`.specify/skills/create-agent/templates/`). There are 15 templates in four families:
+Agent templates are split by domain. This document covers the **single-agent** families, which
+live at **`skills/create-agent/templates/`** (installed mirror:
+`.specify/skills/create-agent/templates/`). The **multi-agent** templates — the Team Supervisor,
+the three EEI stages, the parallel/serial/triad orchestration templates, and the workflow schema —
+live at **`skills/create-team/templates/`** and are catalogued in the team docs
+([`docs/teams/orchestration.md`](../teams/orchestration.md); normative source
+[`conceptual-model.md`](../../skills/create-team/references/conceptual-model.md)).
 
 ### Role templates (`agent-role-*`)
 
-Seven Worker roles plus the single Meta role. Each Worker role template carries
-`supervisor: true` and `role-scope: <slug>` in frontmatter.
+The seven Worker roles. Each Worker role template carries `supervisor: true` and
+`role-scope: <slug>` in frontmatter.
 
 | Template | Role | Type |
 |----------|------|------|
@@ -25,37 +30,32 @@ Seven Worker roles plus the single Meta role. Each Worker role template carries
 | `agent-role-test-engineer-template.md` | Test Engineer | Worker |
 | `agent-role-qa-engineer-template.md` | QA Engineer | Worker |
 | `agent-role-knowledge-manager-template.md` | Knowledge Manager | Worker |
-| `agent-role-team-supervisor-template.md` | Team Supervisor | Meta (all stages) |
+
+> The eighth role, **Team Supervisor** (the single Meta role, Meta at all stages), is a
+> multi-agent template: `agent-role-team-supervisor-template.md` lives in
+> `skills/create-team/templates/`. See [`docs/teams/`](../teams/overview.md).
 
 > Every role template enforces **six mandatory sections** (Identity & Responsibilities,
 > Project Context, Workflow, Upstream, Downstream, Output Format), uses only approved
 > `{{PLACEHOLDER}}` variables, and **omits** the `tools` field (inherits platform defaults).
 
-### Stage templates (`agent-stage-*`) — the EEI triad
-
-| Template | Stage | Type |
-|----------|-------|------|
-| `agent-stage-executor-template.md` | executor | Worker |
-| `agent-stage-evaluator-template.md` | evaluator | Meta |
-| `agent-stage-optimizer-template.md` | optimizer | Meta |
-
-These are the canonical, current filenames. The former `agent-subrole-*` naming and the
-`improver` stage name are **removed**; see [design.md §七](./design.md) for the migration record.
-
-### Orchestration templates
-
-| Template | Topology |
-|----------|----------|
-| `agent-parallel-orchestration-template.md` | parallel dispatch |
-| `agent-serial-orchestration-template.md` | serial chain |
-| `agent-triad-orchestration-template.md` | EEI triad loop |
-
-### Shared assets
+### Project-custom & shared single-agent assets
 
 | Template | Purpose |
 |----------|---------|
+| `agent-project-custom-template.md` | A project-bound custom agent (marks its project + carries a scope guard) |
 | `agent-supervision-delegation.md` | **Single-source** supervision snippet, inlined into every generated supervisor at generation time — edit only here |
-| `agent-workflow-schema.md` | The `AgentWorkflow` JSON schema used by serial orchestration |
+| `agent-skill-enablement.md` | **Single-source** Skill Enablement protocol, composed into each role agent's `## Skill Enablement` section |
+
+### Multi-agent templates (owned by the team domain)
+
+The Stage templates (`agent-stage-{executor,evaluator,optimizer}`), the orchestration templates
+(`agent-{parallel,serial,triad}-orchestration-template.md`), the Team Supervisor template, and the
+`agent-workflow-schema.md` (the `AgentWorkflow` JSON schema used by serial orchestration) are all
+**multi-agent** artifacts under `skills/create-team/templates/`. They are documented in
+[`docs/teams/orchestration.md`](../teams/orchestration.md), not here. The former `agent-subrole-*`
+naming and the `improver` stage name are **removed**; see [design.md §七](./design.md) for the
+migration record.
 
 ## Persisted agents (`.specify/agents/`)
 

@@ -86,16 +86,20 @@ Meta 角色（Team Supervisor）不承担实际任务，各阶段恒为 Meta。
 逐文件（而非整目录）软链接的好处是：工具目录中可以让框架 Agent 与该工具自建的 Agent（例如
 qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节见 [templates-and-agents.md](./templates-and-agents.md)。
 
-## 五、多 Agent 使用场景
+## 五、多 Agent 使用场景（编排与组合）
 
-框架支持三类多 Agent 协作拓扑，全部经由 `create-team` 技能（`/speckit.team` 命令）落地（操作细节见
-[multi-agent-orchestration.md](./multi-agent-orchestration.md)）：
+多个 Agent 的**编排与组合**由**团队域**承载：全部经由 `create-team` 技能（`/speckit.team` 命令）落地，
+共有**四种**协作模式，每种编码一种优先取向——
 
-1. **并行操作（Parallel Dispatch）**：多个 Agent 并行执行，通过并行度提升效率（领域隔离 → 并行派发 → 结果聚合）。
-2. **串行操作（Serial Chain）**：多个 Agent 串行执行，每个 Agent 负责一个阶段性工作，互相配合完成复杂而长期的任务（阶段 N 的产物作为阶段 N+1 的输入）。
-3. **团队闭环（Team Loop）**：多个 Agent 组织成一个团队，构成闭环可自迭代的系统。该系统为**两层结构**：
-   - **监督 + 协调层**：Team Supervisor（Meta 角色）——质量门禁、收敛决策、任务分解、Agent 派发、进度监控；
-   - **执行层**：Worker Agents（7 个预置角色 + 自定义 Agent）——产出交付物。
+- **parallel（效率优先）**：相互独立、无共享状态的任务，按不相交领域并发拆分；
+- **serial（质量优先）**：有严格前序依赖的阶段流水线，每步与前序间做简单验证后才推进；
+- **iteration（目标收敛）**：多个 Agent 组成含**唯一 Team Supervisor** 的两层闭环，反复打磨到质量阈值即交付；
+- **continuous（长期运营）**：按 cadence 长期运行，每个 cycle 在预算/约束/独立验证/状态脊柱下处理源源不断的工作。
+
+> 概念、四模式语义、目录布局与操作细节均在**团队文档集**：
+> [`docs/teams/overview.md`](../teams/overview.md)、[`docs/teams/orchestration.md`](../teams/orchestration.md)、[`docs/teams/continuous-operations.md`](../teams/continuous-operations.md)；
+> 单一真相源为 [`skills/create-team/references/conceptual-model.md`](../../skills/create-team/references/conceptual-model.md) 与 [`operating-loops.md`](../../skills/create-team/references/operating-loops.md)。
+> 本框架文档只保留「团队 = 静态 Team 矩阵 + 动态 Loop」这一**概念**（见 §二、§三），不再复述编排操作。
 
 ## 六、实现结构
 
@@ -104,7 +108,7 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 单 Agent 与团队操作有各自的命令入口（Feature 027 团队管理引入的分离）：
 
 - `/speckit.agents` 是**单 Agent** 操作的唯一入口——创作或优化**一个** Agent；不新增其他单 Agent 命令，本身不内联渲染模板。
-- `/speckit.team` 是**团队**操作的唯一入口——组织或运行多个 Agent（parallel / serial / team-loop）。
+- `/speckit.team` 是**团队**操作的唯一入口——组织或运行多个 Agent（parallel / serial / iteration / continuous）。
 
 单 Agent 命令工作流程：
 
@@ -124,7 +128,7 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 团队域（`/speckit.team`）：
 
-- **`create-team`**：团队引擎——定义并运行团队，实现并行、串行、团队闭环三种拓扑。
+- **`create-team`**：团队引擎——定义并运行团队，实现并行、串行、迭代收敛、长期运营四种协作模式。
 - **`improve-team`**：团队优化引擎——基于运行反馈精炼团队结构（阶段 / 编排 / 阈值）。
 
 ### 6.3 模板归位

@@ -4,7 +4,7 @@ A quality optimization pattern for AI agent workflows. Instead of running a task
 
 > **Model alignment (Role × Stage × Type)**: the triad is a **Loop** over three **Stages** of a single Role — `executor` (Type **Worker**), `evaluator` (Type **Meta**), and `optimizer` (Type **Meta**). The orchestrator is the **Team Supervisor** (Meta role). The `optimizer` stage was formerly called "Improver"; the term is renamed here for consistency with [design.md](./design.md).
 >
-> **Where this fits**: this document details the *quality Loop* itself. For the concept model see [design.md](./design.md); for the templates that back the triad see [templates-and-agents.md](./templates-and-agents.md); for how the triad relates to the team-loop topology see [multi-agent-orchestration.md](./multi-agent-orchestration.md).
+> **Where this fits**: this document details the *quality Loop* itself, as it runs inside a single **role-scoped supervisor** (single-agent). For the concept model see [design.md](./design.md); for the templates that back the triad see [templates-and-agents.md](./templates-and-agents.md); for how the triad scales up into the team-level **iteration** pattern and its long-lived **continuous** form, see [`docs/teams/orchestration.md`](../teams/orchestration.md).
 
 ## Pattern Overview
 

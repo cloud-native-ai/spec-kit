@@ -1,4 +1,4 @@
-# Test Scenario: Team Loop — API Specification Writing Team
+# Test Scenario: Iteration — API Specification Writing Team
 
 ## Scenario Description
 
@@ -80,7 +80,7 @@ quality_dimensions:
 
 ### V2: Iteration History
 - [ ] Each iteration records: iteration number, per-dimension scores, weighted score, decision
-- [ ] History is written to `.specify/handoff/team-loop-history.md`
+- [ ] History is written to `.specify/handoff/iteration-history.md`
 - [ ] Score progression is monotonically increasing (in successful scenarios)
 - [ ] Regression counter resets when score improves
 
@@ -109,7 +109,7 @@ quality_dimensions:
 
 ## Success Criteria
 
-- Team loop converges within max_iterations
+- Iteration converges within max_iterations
 - Quality scores improve monotonically across iterations (in happy path)
 - Final artifact meets or exceeds all quality dimension expectations
 - Iteration history provides full audit trail for review

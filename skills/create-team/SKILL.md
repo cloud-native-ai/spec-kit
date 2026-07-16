@@ -1,6 +1,6 @@
 ---
 name: create-team
-description: Create and run an agent team — organize multiple agents into a collaborative structure (parallel dispatch, serial chain, or self-iterating team loop), persist it as a reusable team, and execute it behind a preview→confirm gate. Use when the user mentions ["创建团队", "组织一个团队", "组建团队", "运行团队", "执行团队", "编排", "并行", "串行", "团队", "闭环", "new team", "build a team", "run team", "pipeline", "parallel", "chain", "team loop", "多agent协作", "agent协同"]
+description: Create and run an agent team — organize multiple agents into a collaborative structure (parallel dispatch, serial chain, self-iterating iteration loop, or long-lived continuous operating loop), persist it as a reusable team, and execute it behind a preview→confirm gate. Use when the user mentions ["创建团队", "组织一个团队", "组建团队", "运行团队", "执行团队", "编排", "并行", "串行", "团队", "闭环", "迭代", "运营", "持续", "new team", "build a team", "run team", "pipeline", "parallel", "chain", "iteration", "continuous", "team loop", "多agent协作", "agent协同"]
 skill_id: "<SKILL:.specify/skills/create-team/SKILL.md>"
 ---
 
@@ -8,7 +8,7 @@ skill_id: "<SKILL:.specify/skills/create-team/SKILL.md>"
 
 ## Goal
 
-Create and run an **agent team**: organize multiple Agents into a **collaborative structure** (static roster + dynamic execution pattern — parallel dispatch, serial chain, or self-iterating team loop), persist it as a reusable `.specify/teams/<slug>/team.md`, and **execute** it behind a preview→confirm gate. This skill owns both **defining** a team and **running** it, and is the single source of truth for the multi-agent Conceptual Model (see `references/conceptual-model.md`).
+Create and run an **agent team**: organize multiple Agents into a **collaborative structure** (static roster + dynamic execution pattern — parallel dispatch, serial chain, self-iterating iteration loop, or long-lived continuous operating loop), persist it as a reusable `.specify/teams/<slug>/team.md`, and **execute** it behind a preview→confirm gate. This skill owns both **defining** a team and **running** it, and is the single source of truth for the multi-agent Conceptual Model (see `references/conceptual-model.md`).
 
 ## Conceptual Model
 
@@ -21,9 +21,9 @@ The **goal** — the team's north star that both structures serve — is defined
 Produce a team from a user **goal** and (unless one-shot) persist it as `.specify/teams/<slug>/team.md`. The goal is the team's north star — **establish it first, then derive both structures from it** (goal concept: `references/goal.md`).
 
 1. **Establish the goal (first)** — extract the goal from `$ARGUMENTS`/conversation/repo context, ask if missing, and confirm it with the user; write it in a **verifiable** form (success criteria / threshold). If the goal's theme is **optimization**, classify it (one-time vs continuous) and pick a strategy (elimination vs progressive) per `references/optimization-goals.md`.
-2. **Select the pattern** via the Pattern Selection decision tree below (independent → parallel; sequenced → serial; iterative-quality → team-loop) — **derived from the goal**.
-3. **Build the roster (static structure)** — a Role × Stage × Type matrix. If the user did not supply members, **propose** them from the goal: prefer existing agents under `.specify/agents/`, otherwise temporary stage/worker templates from `templates/`. A **team-loop team MUST include exactly one Team Supervisor** (Meta role).
-4. **Build the pattern config (dynamic structure)** — parallelism + territories (parallel), DAG `blockedBy` edges + file-path-only handoff (serial), or quality dimensions + threshold + max_iterations + regression_limit (team-loop).
+2. **Select the pattern** via the Pattern Selection decision tree below (independent → parallel; sequenced → serial; iterative-quality → iteration; long-lived operation → continuous) — **derived from the goal**.
+3. **Build the roster (static structure)** — a Role × Stage × Type matrix. If the user did not supply members, **propose** them from the goal: prefer existing agents under `.specify/agents/`, otherwise temporary stage/worker templates from `templates/`. An **iteration or continuous team MUST include exactly one Team Supervisor** (Meta role).
+4. **Build the pattern config (dynamic structure)** — parallelism + territories (parallel), DAG `blockedBy` edges + per-handoff verification + file-path-only handoff (serial), quality dimensions + threshold + max_iterations + regression_limit (iteration), or the operating config — maturity + cadence + budget + constraints + independent verifier + state spine (continuous; see `references/operating-loops.md`).
 5. **Confirm** the proposed **goal** + roster + pattern with the user, then persist the `Team` to `.specify/teams/<slug>/team.md` using the schema below (skip persistence only for an explicit one-shot run).
 
 ### Persisted `team.md` schema
@@ -36,7 +36,7 @@ name: <display name>
 slug: <kebab-slug>
 description: <one-line label>
 goal: <overall final objective + success criteria / threshold>
-pattern: parallel | serial | team-loop
+pattern: parallel | serial | iteration | continuous
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 members:
@@ -71,7 +71,7 @@ config:
 2. **Restate the Goal** — surface the team's `goal` up front, so both structures are read as *means to that end* and execution can be judged against it.
 3. **Render Static Structure** — the roster as a Role × Stage × Type matrix (agent, role, Worker/Meta, persistent/temporary).
 4. **Render Dynamic Structure** — the `pattern`, its parallelism/DAG/loop settings, and an execution flow diagram (textual/mermaid/PlantUML showing dispatch/handoff/loop edges).
-5. **Confirmation gate** — present the **goal** and both structures and require explicit user confirmation. On decline, stop without executing. On confirm, orchestrate per pattern using the engine defined in the pattern sections below, preserving the Hard Constraints (territory validation before parallel dispatch; DAG no-cycle before serial; mandatory max-iteration cap for team loops; file-path-only handoff; context isolation; idempotent execution). All run-generated intermediate files MUST stay in the run workspace `.specify/teams/.work/<slug>/`; deliverables go only to their declared target paths (see Run Workspace, Reports & Output Discipline).
+5. **Confirmation gate** — present the **goal** and both structures and require explicit user confirmation. On decline, stop without executing. On confirm, orchestrate per pattern using the engine defined in the pattern sections below, preserving the Hard Constraints (territory validation before parallel dispatch; DAG no-cycle + per-handoff verification before serial; mandatory max-iteration cap for iteration loops; for **continuous** loops read `constraints.md` + budget + kill-switch at cycle start, run exactly one cycle at the declared maturity level starting at L1, and use an independent verifier at L2+; file-path-only handoff; context isolation; idempotent execution). All run-generated intermediate files MUST stay in the run workspace `.specify/teams/.work/<slug>/`; deliverables go only to their declared target paths (see Run Workspace, Reports & Output Discipline).
 6. **Write the run Report** — after execution finishes (success, halt, or abort), write a dated report to `.specify/teams/<slug>/runs/` per the Report contract below. This is mandatory for every run.
 
 ## Run Workspace, Reports & Output Discipline
@@ -101,7 +101,7 @@ After **every** run, write `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md
 - **Team**: <slug>
 - **Goal**: <the team's goal / success criteria>
 - **Started**: <ISO-8601>  **Finished**: <ISO-8601>  **Duration**: <hh:mm:ss>
-- **Pattern**: parallel | serial | team-loop
+- **Pattern**: parallel | serial | iteration | continuous
 - **Outcome**: <converged / max-reached / regression-halted / completed / aborted>
 
 ## Result Summary
@@ -121,34 +121,41 @@ After **every** run, write `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md
 
 ## Pattern Selection (Decision Tree)
 
-Analyze the user's intent and task characteristics to select the right pattern:
+The team domain has **four** collaboration patterns, each with a distinct priority: **parallel** = 效率优先 (throughput), **serial** = 质量优先 (quality, with a verified handoff between every step), **iteration** = 目标收敛 (converge then stop), **continuous** = 长期运营 (operate indefinitely on a cadence). Analyze the user's intent and task characteristics to select the right one:
 
 ```
-1. Are sub-tasks independent with no shared mutable state?
-   → YES: Parallel Dispatch
+1. Is the work long-lived / recurring — running on a cadence to keep handling a
+   stream of incoming work (CI failures, new PRs/issues, dependency updates) or
+   to keep improving / maintaining a quality over time?
+   → YES: Continuous (operating loop) — see references/operating-loops.md; start at maturity L1
    → NO: Continue to Q2
 
-2. Do tasks form a strict sequence (output of A feeds input of B)?
-   → YES: Serial Chain
+2. Are sub-tasks independent with no shared mutable state? (throughput-first)
+   → YES: Parallel Dispatch
    → NO: Continue to Q3
 
-3. Does the deliverable need iterative quality improvement by a team?
-   → YES: Team Loop
+3. Do tasks form a strict sequence (output of A feeds input of B)? (quality-first, verified handoffs)
+   → YES: Serial Chain
+   → NO: Continue to Q4
+
+4. Does the deliverable need iterative quality improvement that converges to a goal, then stops?
+   → YES: Iteration
    → NO: Consider Serial Chain with parallel stages
 ```
 
-| Scenario | Pattern | Signals |
-|----------|---------|---------|
-| Independent tasks, no shared state | Parallel Dispatch | "并行", "同时", "independent", "parallel" |
-| Sequential phases with dependencies | Serial Chain | "阶段", "串行", "pipeline", "chain", "依次" |
-| Quality-critical, needs iteration | Team Loop | "团队", "闭环", "自迭代", "quality loop" |
-| Mix of independent + dependent | Serial Chain with parallel stages | "先…再分别…" |
+| Scenario | Pattern | Priority | Signals |
+|----------|---------|----------|---------|
+| Independent tasks, no shared state | Parallel Dispatch | 效率优先 | "并行", "同时", "independent", "parallel", "效率" |
+| Sequential phases with dependencies | Serial Chain | 质量优先 | "阶段", "串行", "pipeline", "chain", "依次" |
+| Quality-critical, converge then stop | Iteration | 目标收敛 | "团队", "闭环", "自迭代", "迭代", "quality loop", "converge" |
+| Long-lived, cadence-driven, unattended-capable | Continuous | 长期运营 | "持续", "长期", "运营", "每天/每次", "keep running", "operating loop" |
+| Mix of independent + dependent | Serial Chain with parallel stages | 质量优先 | "先…再分别…" |
 
 ---
 
 ## § Parallel Dispatch Pattern
 
-Dispatch **multiple independent agents** in parallel to maximize throughput when the task decomposes into non-overlapping sub-tasks.
+**Priority: 效率优先 (throughput-first).** This team form puts **maximum efficiency first** — it runs multiple operations **concurrently** to compress wall-clock time. Dispatch **multiple independent agents** in parallel when the task decomposes into non-overlapping sub-tasks. Correctness rests on conflict-free territories rather than on step-by-step verification.
 
 ### When to Use
 
@@ -258,7 +265,7 @@ Monitor each agent's output manifest at `.specify/teams/.work/<slug>/parallel-re
 
 ## § Serial Chain Pattern
 
-Orchestrate Agents in a **serial chain** (DAG-based pipeline) where each stage's output feeds into the next stage's input.
+**Priority: 质量优先 (quality-first).** This team form puts **quality first**: work advances through an ordered chain where **every step has a strict predecessor dependency**, and **a simple verification guards each handoff** between a step and its predecessor before the next step may start. It runs slower than parallel dispatch, but the per-handoff gate guarantees quality accumulates rather than compounds errors. Orchestrate Agents in a **serial chain** (DAG-based pipeline) where each stage's output feeds into the next stage's input.
 
 ### When to Use
 
@@ -272,7 +279,7 @@ Orchestrate Agents in a **serial chain** (DAG-based pipeline) where each stage's
 - All tasks are **independent** → use Parallel Dispatch
 - A single Agent can complete the task alone
 - No clear stage boundary exists
-- Task is purely **iterative refinement** → use Team Loop
+- Task is purely **iterative refinement** → use Iteration
 
 ### Workflow Definition
 
@@ -316,10 +323,15 @@ For each stage in topological order:
 1. CHECK: All blockedBy stages completed? (read progress file)
 2. BUILD CONTEXT: Gather upstream output paths from inputs_from
 3. INVOKE: Spawn subagent with agent_kind role
-4. VALIDATE: Check outputs exist; run quality_gate if defined
-5. RECORD: Update progress file
-6. UNLOCK: Mark downstream stages as unblocked
+4. VALIDATE: Check outputs exist; run the stage's `quality_gate`
+5. VERIFY HANDOFF: run a **simple verification** that this step's output is
+   consistent with its predecessor's (the quality-first per-handoff gate) —
+   on fail, apply Failure Recovery before unlocking downstream stages
+6. RECORD: Update progress file
+7. UNLOCK: Mark downstream stages as unblocked
 ```
+
+> **Per-handoff verification is mandatory** in the serial pattern — it is what makes this the quality-first form. Keep it lightweight (a targeted check that the handoff artifact satisfies the downstream stage's `inputs_from` contract), not a full re-evaluation.
 
 ### Failure Recovery
 
@@ -356,9 +368,11 @@ Write to `.specify/teams/.work/<slug>/progress.md`:
 
 ---
 
-## § Team Loop Pattern
+## § Iteration Pattern
 
-Orchestrate a **multi-Agent team** forming a self-iterating closed-loop system with two layers: a **Team Supervisor** (strategy + coordination, the single Meta role) and **Workers** (execution). The former Meta-Coordinator is merged into the Team Supervisor.
+> **iteration** reaches a goal **through iteration**, carrying the **convergence** meaning: it runs, scores, and iterates until the goal's threshold is met or a cap is hit, **then stops and delivers**. For a long-lived loop that keeps operating on a cadence, use **§ Continuous Operating Loop Pattern** instead.
+
+**Priority: 目标收敛 (converge to the goal).** Orchestrate a **multi-Agent team** forming a self-iterating closed-loop system with two layers: a **Team Supervisor** (strategy + coordination, the single Meta role) and **Workers** (execution). The former Meta-Coordinator is merged into the Team Supervisor. This is a **bounded** loop — it converges then ends.
 
 ### When to Use
 
@@ -374,6 +388,7 @@ Orchestrate a **multi-Agent team** forming a self-iterating closed-loop system w
 - A single Agent can complete the task in one pass
 - Purely sequential with no iteration → use Serial Chain
 - Tasks are independent with no shared goal → use Parallel Dispatch
+- Work is **long-lived / recurring** and must run on a cadence (never "done") → use **Continuous**
 
 ### Architecture
 
@@ -442,7 +457,7 @@ LOOP (iteration in 1..max_iterations):
 ### Final Report
 
 ```markdown
-# Team Loop Report
+# Iteration Report
 ## Outcome
 **Status**: Converged | Max Reached | Regression Halted
 **Final Score**: [weighted_total] / 1.0
@@ -465,6 +480,78 @@ LOOP (iteration in 1..max_iterations):
 
 ---
 
+## § Continuous Operating Loop Pattern
+
+**Priority: 长期运营 (operate the team long-term).** A **continuous** team is not "run once and finish" — it is a **long-lived operating loop** that runs on a **cadence** to keep handling a stream of incoming work or to keep maintaining/improving a quality over time. Where `iteration` converges then stops, `continuous` keeps running, cycle after cycle, and must be engineered to run **continuously and smoothly, without going out of control**. Its full operating discipline is the single source of truth in [`references/operating-loops.md`](references/operating-loops.md); this section is the orchestration summary.
+
+### When to Use
+
+- Work **arrives continuously** (CI failures, new PRs/issues, dependency updates) and needs periodic triage/action.
+- A quality must be **maintained or improved over the long term**, not just brought to a bar once.
+- You want the team to run **unattended-capable** on a schedule, with humans gating only the risky parts.
+
+### When NOT to Use
+
+- The goal is a **one-time** lift to a bar → use **Iteration**.
+- No cadence / no recurring source of work → use one of the bounded patterns.
+- No budget, constraints, or scoring can be defined — a continuous loop **without guardrails is unsafe**; define them first or stay at Iteration.
+
+### Maturity Levels (start at L1, never skip)
+
+| Level | Does | Guardrails required |
+|-------|------|---------------------|
+| **L1 — report** | discover + triage + score + write state; **no changes** | state spine + budget |
+| **L2 — assisted** | minimal changes to small, well-scoped items; **independent verifier** gates; drafts for human review | L1 + constraints file + independent verifier + workspace isolation + attempt cap |
+| **L3 — unattended** | auto-lands within the allowed scope; stops at boundaries for humans | L2 + full denylist + explicit human-handoff points + kill-switch + proven metrics |
+
+Graduation is an `improve-team` action, gated on evidence (≥ 2 cadence cycles at L1 with < 20% high-priority false positives, verifier proven on manual fixes, constraints authored). **Do not skip L1 — the report phase is the calibration phase.**
+
+### Per-Cycle Loop (one `run` = one cycle)
+
+```
+1. READ    read constraints.md + budget + kill-switch; kill-switch or ≥100% → exit now
+2. BUDGET  sum today's spend; ≥80% daily cap → drop this cycle to report-only
+3. TRIAGE  discover & prioritize source work; nothing actionable → early-exit (no-op, <5k tokens)
+4. ACT     L1: write STATE only; L2+: minimal change per item (≤ max_attempts_per_item)
+5. VERIFY  L2+: independent verifier (separate sub-agent, default REJECT, actually runs tests)
+6. SCORE   score against quality_dimensions (measured against the goal)
+7. CRITIQUE append a Post-Run Critique line to STATE.md; append one line to run-log.jsonl
+8. REPORT  write runs/<UTC-timestamp>-report.md; update STATE.md Last cycle + prune resolved items
+```
+
+### Config (frontmatter `config`, continuous only)
+
+```yaml
+config:
+  maturity: L1                 # start here; only improve-team promotes
+  cadence: 1d                  # 1d | 2h | "cron: 0 8 * * 1-5"
+  verifier: independent        # maker/checker, default REJECT (L2+)
+  max_attempts_per_item: 3
+  quality_dimensions: [...]    # Σ weights = 1.0
+  threshold: 0.8               # per-cycle acceptance bar (L2+)
+  budget: { max_cycles_per_day: 1, max_tokens_per_day: 100000, max_subagents_per_cycle: 0, on_80pct: report-only, on_100pct: halt }
+  kill_switch: loop-pause-all
+  constraints_file: .specify/teams/<slug>/constraints.md
+  state_spine: .specify/teams/<slug>/STATE.md
+  run_log: .specify/teams/<slug>/run-log.jsonl
+```
+
+### Directory (continuous extends the standard layout)
+
+Beyond `team.md` + `runs/`, a continuous team's directory also holds tracked operating-spine files: `constraints.md` (§3 of operating-loops), `STATE.md` (cross-run memory), `run-log.jsonl` (append-only). Run intermediates still go only to git-ignored `.specify/teams/.work/<slug>/`.
+
+### Stop / Halt (per cycle)
+
+| Condition | Action |
+|-----------|--------|
+| Nothing actionable | Early-exit `no-op` (<5k tokens) |
+| Spend ≥ 80% daily cap | Drop to `report-only` for the rest of the cycle |
+| Spend ≥ 100% or kill-switch set | **Halt immediately**; one-line note to STATE.md |
+| Item exceeds `max_attempts_per_item` | Escalate to human; stop retrying that item |
+| Verifier REJECT / ESCALATE_HUMAN (L2+) | Discard the change; log; do not land |
+
+---
+
 ## Shared Protocols
 
 ### File Handshake Protocol
@@ -478,7 +565,8 @@ All patterns use **file-path-only** communication:
 
 - Parallel: manifest files at `.specify/teams/.work/<slug>/parallel-result-<agent-id>.md`
 - Serial: progress file at `.specify/teams/.work/<slug>/progress.md`
-- Team Loop: iteration history in the run workspace; final summary in the tracked run report
+- Iteration: iteration history in the run workspace; final summary in the tracked run report
+- Continuous: cross-run `STATE.md` + append-only `run-log.jsonl` in the team directory; per-cycle report under `runs/` (see `references/operating-loops.md`)
 
 ### Model Selection Guidance
 
@@ -491,12 +579,13 @@ All patterns use **file-path-only** communication:
 ### Hard Constraints
 
 - **Territory validation MUST pass** before parallel dispatch
-- **DAG validation (no cycles)** before serial chain starts
-- **Max iterations MUST be set** for team loops (default: 5, max: 10)
+- **DAG validation (no cycles)** before serial chain starts; a **simple per-handoff verification** guards every serial step
+- **Max iterations MUST be set** for iteration loops (default: 5, max: 10)
+- **Continuous loops MUST start at maturity L1**, read `constraints.md` + budget + kill-switch at cycle start, honor the budget circuit-breaker (80% → report-only, 100%/kill-switch → halt), and use an **independent verifier** (default REJECT) at L2+ — see `references/operating-loops.md`
 - **File-path-only handoff** — never paste content between agents
-- **Context isolation** — each agent invocation is a fresh subagent
-- **Idempotent execution** — stages/iterations can be re-run safely
-- **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory
+- **Context isolation** — each agent invocation is a fresh subagent; the continuous **verifier MUST be a separate sub-agent** from the implementer
+- **Idempotent execution** — stages/iterations/cycles can be re-run safely
+- **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory. Continuous teams additionally keep tracked `constraints.md` / `STATE.md` / `run-log.jsonl` in the team directory
 - **Every run writes a dated report** to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` per the Report contract
 
 ---

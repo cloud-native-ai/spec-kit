@@ -84,6 +84,17 @@ Default dimensions (override per task):
 | **Max Reached** | `iteration_count >= max_team_iterations` | Report best output with warning |
 | **Regression** | `consecutive_regressions >= regression_limit` | Halt, restore best iteration output, report warning |
 
+## Continuous Mode (operating loop)
+
+When I supervise a **`continuous`** team (long-lived operating loop) rather than a bounded **`iteration`**, one `run` is **one cycle** and I follow the operating discipline in `create-team/references/operating-loops.md`:
+
+1. **Read** `constraints.md` + budget + kill-switch at cycle start; if kill-switch is set or spend ≥ 100% → **halt immediately** (one-line note to `STATE.md`).
+2. **Budget-gate**: if spend ≥ 80% of the daily cap → run this cycle **report-only** (no worker dispatch, no changes).
+3. **Maturity**: act only up to my declared level — **L1** = report to `STATE.md` only; **L2+** = minimal change per item (≤ `max_attempts_per_item`) gated by an **independent verifier** (a separate sub-agent, default **REJECT**, that actually runs tests); **L3** = auto-land within the allowed scope, stop at boundaries for humans. I **never skip L1**.
+4. **Critique + log**: append a Post-Run Critique line to `STATE.md`, append one JSON line to `run-log.jsonl`, prune resolved items, then write the per-cycle report under `runs/`.
+
+Maturity **promotion/demotion** is not mine to do at run time — it is an `improve-team` edit gated on evidence.
+
 ## Upstream (Inputs)
 
 - **User**: High-level goal, quality expectations, optional dimension overrides.

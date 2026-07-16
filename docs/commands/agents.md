@@ -60,7 +60,7 @@ Everything else (purpose, workflow, output format) is free-form and adapts to th
 
 ## Team Operations
 
-Organizing and running multiple agents (parallel / serial / team closed-loop) is owned by [`/speckit.team`](team.md) and the `create-team` / `improve-team` skills — not by `/speckit.agents`.
+Organizing and running multiple agents (parallel / serial / iteration / continuous) is owned by [`/speckit.team`](team.md) and the `create-team` / `improve-team` skills — not by `/speckit.agents`.
 
 ## Lifecycle: Temporary vs Persistent
 
@@ -104,7 +104,7 @@ Each tool's `agents/` directory is a **real directory** of **per-file symlinks**
 
 - `create-agent` — author new role-based, custom, or project-custom agents (canonical templates in `skills/create-agent/templates/`)
 - `improve-agent` — iteratively improve an existing agent from execution feedback
-- Team orchestration (parallel / serial / team-loop) is owned by [`/speckit.team`](team.md) via the `create-team` / `improve-team` skills
+- Team orchestration (parallel / serial / iteration / continuous) is owned by [`/speckit.team`](team.md) via the `create-team` / `improve-team` skills
 
 ## Prerequisites
 
@@ -153,7 +153,7 @@ The command **delegates to skills** and never renders templates inline. On ambig
 
 ## Team Operations
 
-Organizing and running multiple agents (parallel / serial / team closed-loop) is owned by [`/speckit.team`](team.md) and the `create-team` / `improve-team` skills — not by `/speckit.agents`.
+Organizing and running multiple agents (parallel / serial / iteration / continuous) is owned by [`/speckit.team`](team.md) and the `create-team` / `improve-team` skills — not by `/speckit.agents`.
 
 ## Lifecycle: Temporary vs Persistent
 
@@ -197,7 +197,7 @@ Each tool's `agents/` directory is a **real directory** of **per-file symlinks**
 
 - `create-agent` — author new role-based or custom agents (canonical templates in `skills/create-agent/templates/`)
 - `improve-agent` — iteratively improve an existing agent from execution feedback
-- Team orchestration (parallel / serial / team-loop) is owned by [`/speckit.team`](team.md) via the `create-team` / `improve-team` skills
+- Team orchestration (parallel / serial / iteration / continuous) is owned by [`/speckit.team`](team.md) via the `create-team` / `improve-team` skills
 
 ## Prerequisites
 

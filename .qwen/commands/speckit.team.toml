@@ -1,24 +1,4 @@
-description = "Single entry point for all team operations — create, modify, and run agent teams via intent routing.
-handoffs:
-  - label: Update Instructions
-    agent: speckit.instructions
-    prompt: Refresh project instructions so newly created teams and team skills are discoverable.
-    send: false
----
-
-## User Input
-
-```text
-$ARGUMENTS
-```
-
-Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-protocol.md). If empty, infer intent from conversation/repo context. If intent is ambiguous or unsupported, report capabilities and request the missing intent (do NOT guess silently).
-
-## Outline
-
-`/speckit.team` is the **single entry point** for every **team** operation — the multi-agent analogue of `/speckit.agents`. It recognizes intent, then routes to the owning team skill. It delegates to skills and does **NOT** render templates inline. It MUST NOT serve single-agent authoring (that is `/speckit.agents`), and single-agent commands MUST NOT serve team operations.
-
-A **team** is a named, reusable multi-agent structure organized around a single **goal**. Every team has three parts: a **goal** (the team"
+description = "Single entry point for all team operations — create, modify, and run agent teams via intent routing."
 
 prompt = """
 ## User Input
@@ -33,14 +13,14 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 
 `/speckit.team` is the **single entry point** for every **team** operation — the multi-agent analogue of `/speckit.agents`. It recognizes intent, then routes to the owning team skill. It delegates to skills and does **NOT** render templates inline. It MUST NOT serve single-agent authoring (that is `/speckit.agents`), and single-agent commands MUST NOT serve team operations.
 
-A **team** is a named, reusable multi-agent structure organized around a single **goal**. Every team has three parts: a **goal** (the team's overall final objective — the north star that all work serves), a **static structure** (Role × Stage × Type roster — *who* participates), and a **dynamic structure** (collaboration pattern — parallel / serial / team-loop — with its parallelism/DAG/iteration settings and execution flow — *how* they collaborate). The static and dynamic structures exist **only to achieve the goal**; whatever they are, they MUST be organized and run around it. Persistent teams own a directory at the canonical location `.specify/teams/<slug>/` (definition at `.specify/teams/<slug>/team.md`; run reports under `.specify/teams/<slug>/runs/`). The multi-agent Conceptual Model that underpins teams is defined once in `skills/create-team/references/conceptual-model.md`.
+A **team** is a named, reusable multi-agent structure organized around a single **goal**. Every team has three parts: a **goal** (the team's overall final objective — the north star that all work serves), a **static structure** (Role × Stage × Type roster — *who* participates), and a **dynamic structure** (collaboration pattern — parallel / serial / iteration / continuous — with its parallelism/DAG/iteration/operating settings and execution flow — *how* they collaborate). The four patterns each encode a priority: **parallel** = 效率优先 (throughput), **serial** = 质量优先 (quality, verified handoffs), **iteration** = 目标收敛 (converge then stop), **continuous** = 长期运营 (operate on a cadence). The static and dynamic structures exist **only to achieve the goal**; whatever they are, they MUST be organized and run around it. Persistent teams own a directory at the canonical location `.specify/teams/<slug>/` (definition at `.specify/teams/<slug>/team.md`; run reports under `.specify/teams/<slug>/runs/`). The multi-agent Conceptual Model that underpins teams is defined once in `skills/create-team/references/conceptual-model.md`; the `continuous` operating discipline in `skills/create-team/references/operating-loops.md`.
 
 ### Goal — 团队的最终目标
 
 Every team MUST have a **goal** set at creation and carried for its whole lifetime. The goal is the team's single overall final objective — the reason the team exists — and it governs both structures below.
 
 - **North star, not a task list.** The goal states the desired end outcome, not the steps. The static structure (roster) and dynamic structure (pattern) are both *derived from* and *subordinate to* the goal: the goal decides which roles/stages are needed and which collaboration pattern fits.
-- **Concrete and verifiable.** State the goal so progress toward it can be judged — ideally with explicit success criteria / quality dimensions and, where possible, a measurable target (e.g. a score threshold, a passing test suite, a coverage bar). The **evaluator** stage and the **team-loop** `threshold` / quality dimensions measure progress *against the goal*; a goal that cannot be evaluated cannot drive a loop.
+- **Concrete and verifiable.** State the goal so progress toward it can be judged — ideally with explicit success criteria / quality dimensions and, where possible, a measurable target (e.g. a score threshold, a passing test suite, a coverage bar). The **evaluator** stage and the **iteration/continuous** `threshold` / quality dimensions measure progress *against the goal*; a goal that cannot be evaluated cannot drive a loop.
 - **Distinct from `description`.** `description` is a one-line label; the **goal** is the operational objective the whole team is organized around. A team has exactly **one** goal (sub-objectives belong to member roles/stages).
 - **Deliberately revisable, never drifting.** The goal stays fixed while a team runs and never changes as a *side effect* of restructuring — but it is not frozen. The **modify** mode can deliberately **redefine an existing team's goal**; when it does, the static and dynamic structures MUST be re-checked and realigned to serve the new goal.
 
@@ -83,11 +63,11 @@ The **run** mode MUST follow this sequence and MUST NOT execute before confirmat
 2. **Restate the Goal** — surface the team's `goal` up front, so both structures below are read as *means to that end* and execution can be judged against it.
 3. **Render Static Structure** — the roster as a Role × Stage × Type matrix: each member agent, its role, its type (Worker/Meta), and its lifecycle (persistent/temporary).
 4. **Render Dynamic Structure** —
-   - the collaboration `pattern` (parallel / serial / team-loop);
-   - the **parallelism** (parallel: degree + territories; serial: DAG stage order; team-loop: threshold, max_iterations, regression_limit, quality dimensions);
+   - the collaboration `pattern` (parallel / serial / iteration / continuous);
+   - the **parallelism** (parallel: degree + territories; serial: DAG stage order + per-handoff verification; iteration: threshold, max_iterations, regression_limit, quality dimensions; continuous: maturity level, cadence, budget, constraints, independent verifier, state spine);
    - an **execution flow diagram** (textual / mermaid / PlantUML flow showing dispatch / handoff / loop edges).
 5. **Confirmation gate** — present the **goal** and both structures, and ask the user to confirm. The team executes **only** on explicit confirmation.
-   - On confirm → orchestrate per the team's pattern (delegating to `create-team`'s execution engine): territory validation before parallel dispatch, DAG (no-cycle) validation before serial chain, mandatory max-iteration cap for team loops, file-path-only handoff. Throughout, work is steered toward the **goal**, and the evaluator/team-loop measures progress against it (iterate until the goal's threshold is met or the cap is reached).
+   - On confirm → orchestrate per the team's pattern (delegating to `create-team`'s execution engine): territory validation before parallel dispatch, DAG (no-cycle) validation + per-handoff verification before serial chain, mandatory max-iteration cap for iteration loops, and — for **continuous** loops — read `constraints.md` + budget + kill-switch at cycle start, run exactly **one cycle** at the team's declared maturity level (starting at L1), with an independent verifier at L2+; file-path-only handoff throughout. Work is steered toward the **goal**, and the evaluator measures progress against it (iteration: iterate until the goal's threshold is met or the cap is reached; continuous: run one cycle, then update the state spine and stop).
    - On decline → stop without executing; optionally suggest `modify`.
 6. **Report** — after execution finishes, write a dated run report to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (goal, execution time, result summary, full process detail). Mandatory for every run.
 
