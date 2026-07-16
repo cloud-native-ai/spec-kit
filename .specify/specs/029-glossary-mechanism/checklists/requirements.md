@@ -31,6 +31,5 @@
 
 ## Notes
 
-- All quality items pass; no `[NEEDS CLARIFICATION]` markers were needed — ambiguities were resolved via informed guesses recorded in the spec's **Assumptions** section (glossary as a document artifact, voice-primary/all-input anchoring, user-authoritative precedence).
-- **Pending by design**: `Related Feature` remains `Feature ID/Name: Need clarification`. This is the expected initial-draft state and MUST be resolved by `/speckit.clarify` before `/speckit.plan`.
-- Optional **Shared Strings** section omitted — no cross-artefact string literals are pinned by this spec at the requirements stage.
+- All quality items pass. Ambiguities were resolved via `/speckit.clarify` (Session 2026-07-16): feature binding → new Feature 031 "Glossary Mechanism"; integration → ambient context for all commands; scope → one project-wide glossary. `Related Feature` is now bound (was `Need clarification`).
+- Optional **Shared Strings** section omitted — no cross-artefact string literals are pinned at the requirements stage.

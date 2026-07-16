@@ -1,10 +1,65 @@
 {
   "store": "feedback",
-  "updated": "2026-07-16T07:51:14Z",
+  "updated": "2026-07-16T11:10:45Z",
   "threshold": 10,
-  "count_since_submission": 6,
-  "submitted_at": null,
+  "count_since_submission": 1,
+  "submitted_at": "2026-07-16T11:09:25Z",
   "entries": [
+    {
+      "id": "20260716T111045Z-speckit-tasks",
+      "file": "20260716T111045Z-speckit-tasks.md",
+      "unit_id": "/speckit.tasks",
+      "unit_type": "command",
+      "run_id": "029-glossary-mechanism-tasks-20260716",
+      "feature": "029-glossary-mechanism",
+      "partial": false,
+      "created": "2026-07-16T11:10:45Z",
+      "summary": "Generated tasks.md for Feature 031 Glossary Mechanism from plan + 4 contracts + data-model + quickstart. Tests Mode ON (Principle IV; VII template-only clause applied). 39 tasks across 7 phases organi"
+    },
+    {
+      "id": "20260716T103313Z-skill-draw-plantuml",
+      "file": "20260716T103313Z-skill-draw-plantuml.md",
+      "unit_id": "skill:draw-plantuml",
+      "unit_type": "skill",
+      "run_id": "arc7-stability-verify-r3",
+      "feature": "draw-plantuml-optimizer",
+      "partial": false,
+      "created": "2026-07-16T10:33:13Z",
+      "summary": "从零生成「部署与治理拓扑」部署图，稳定性验证第3轮。严格套用两条确定性规则：保色配方(monochrome false + legend 内 <color:#..>)一次命中，渲染日志确认「Color markup detected — skipping monochrome」，SVG 含 6 组语义填充色 + 蓝/红着色边，稳定彩色不抖动；输入输出同 basename 触发脚本的碰撞保护(tem"
+    },
+    {
+      "id": "20260716T102609Z-speckit-plan",
+      "file": "20260716T102609Z-speckit-plan.md",
+      "unit_id": "/speckit.plan",
+      "unit_type": "command",
+      "run_id": "029-glossary-mechanism-plan-20260716",
+      "feature": "029-glossary-mechanism",
+      "partial": false,
+      "created": "2026-07-16T10:26:09Z",
+      "summary": "Planned Feature 031 Glossary Mechanism from spec 029. Filled plan.md in place (no residual placeholders, single H1, Requirement→Feature stamp present), rendered the full 10-principle Constitution Chec"
+    },
+    {
+      "id": "20260716T102401Z-skill-draw-plantuml",
+      "file": "20260716T102401Z-skill-draw-plantuml.md",
+      "unit_id": "skill:draw-plantuml",
+      "unit_type": "skill",
+      "run_id": "arc7-stability-round2-deploy-govern",
+      "feature": "draw-plantuml-optimizer",
+      "partial": false,
+      "created": "2026-07-16T10:24:01Z",
+      "summary": "Generated a band-by-plane E2B deployment & governance diagram from the context digest, strictly applying diagram-principles §1-§4 and large-diagram-playbook §4d/§4e/§2/§5. Full UML deployment semantic"
+    },
+    {
+      "id": "20260716T101953Z-speckit-clarify",
+      "file": "20260716T101953Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "029-glossary-mechanism-clarify-20260716",
+      "feature": "029-glossary-mechanism",
+      "partial": false,
+      "created": "2026-07-16T10:19:53Z",
+      "summary": "Mode A clarify on 029 glossary-mechanism. Ran the Mode A taxonomy scan, found 3 material ambiguities (feature linkage, integration scope, glossary granularity) and resolved all via multiple-choice wit"
+    },
     {
       "id": "20260716T075114Z-skill-draw-plantuml",
       "file": "20260716T075114Z-skill-draw-plantuml.md",

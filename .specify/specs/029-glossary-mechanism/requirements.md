@@ -7,13 +7,10 @@
 
 ## Related Feature *(mandatory)*
 
-<!--
-  ACTION REQUIRED: Keep the default values as "Need clarification" in the initial draft.
-  /speckit.clarify must resolve this section to the final Feature binding before planning.
--->
+**Feature ID**: 031  
+**Feature Name**: Glossary Mechanism
 
-**Feature ID**: Need clarification  
-**Feature Name**: Need clarification
+<!-- New feature — not yet in .specify/memory/features.md; register via /speckit.feature before /speckit.plan wrap-up. -->
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -35,7 +32,7 @@ When a project author runs the instruction-generation step, the framework seeds 
 
 ### User Story 2 - Correct and anchor voice/dictated input against the glossary (Priority: P1)
 
-A contributor dictates a request by voice; speech-to-text introduces homophone or easily-confused substitutions (e.g. a domain term rendered as a phonetically similar but wrong word). When the framework processes such input, it consults the glossary, recognizes a known variant/homophone of a canonical term, and interprets the input using the canonical term — anchoring the contributor's high-frequency descriptions to the project's agreed vocabulary. Because user input is authoritative, the correction is applied for interpretation without silently discarding what the user literally said.
+A contributor dictates a request by voice; speech-to-text introduces homophone or easily-confused substitutions (e.g. a domain term rendered as a phonetically similar but wrong word). When any workflow command processes such input, it consults the glossary (loaded as ambient context), recognizes a known variant/homophone of a canonical term, and interprets the input using the canonical term — anchoring the contributor's high-frequency descriptions to the project's agreed vocabulary. Because user input is authoritative, the correction is applied for interpretation without silently discarding what the user literally said.
 
 **Why this priority**: This is the stated core purpose of the feature — reducing errors from voice input. Without it the glossary is only a static dictionary. It is P1 because it delivers the primary user value once a glossary exists.
 
@@ -43,7 +40,7 @@ A contributor dictates a request by voice; speech-to-text introduces homophone o
 
 **Acceptance Scenarios**:
 
-1. **Given** a glossary entry whose canonical term has a recorded homophone/confusable variant, **When** input contains that variant, **Then** the input is interpreted using the canonical term.
+1. **Given** a glossary entry whose canonical term has a recorded homophone/confusable variant, **When** input to any workflow command contains that variant, **Then** the input is interpreted using the canonical term.
 2. **Given** a correction was applied, **When** the framework acts on the input, **Then** the substitution is surfaced (traceable) so the user can see and, if wrong, override it.
 3. **Given** an ambiguous variant that could map to more than one canonical term, **When** the framework cannot choose confidently, **Then** it does not silently pick one and instead defers to the user.
 
@@ -51,7 +48,7 @@ A contributor dictates a request by voice; speech-to-text introduces homophone o
 
 ### User Story 3 - Progressively enrich the glossary with conflict prompts (Priority: P2)
 
-As the project develops across the spec → plan → tasks → implement workflow, new project-specific terms appear. The framework proposes adding these emerging terms to the glossary. When a proposed (or manually added) term conflicts — or could plausibly conflict — with an existing entry (same term with a different meaning, or a homophone/near-duplicate of an existing canonical term), the framework flags the conflict and asks the user to confirm how to resolve it. No conflicting change is written without user confirmation.
+As the project develops across the spec → plan → tasks → implement workflow, new project-specific terms appear. At natural workflow checkpoints the framework proposes adding these emerging terms to the glossary. When a proposed (or manually added) term conflicts — or could plausibly conflict — with an existing entry (same term with a different meaning, or a homophone/near-duplicate of an existing canonical term), the framework flags the conflict and asks the user to confirm how to resolve it. No conflicting change is written without user confirmation.
 
 **Why this priority**: Keeps the glossary alive and accurate over the project lifetime and prevents corruption from ambiguous additions. It is P2 because it enhances a glossary that Stories 1–2 have already made useful.
 
@@ -59,7 +56,7 @@ As the project develops across the spec → plan → tasks → implement workflo
 
 **Acceptance Scenarios**:
 
-1. **Given** ongoing development produces a new project-specific term, **When** the framework detects it, **Then** it proposes adding the term to the glossary.
+1. **Given** ongoing development produces a new project-specific term, **When** the framework reaches a workflow checkpoint and detects it, **Then** it proposes adding the term to the glossary.
 2. **Given** a proposed or manually entered term conflicts (or may conflict) with an existing entry, **When** the framework evaluates it, **Then** it presents the conflict and asks the user to confirm the resolution before writing.
 3. **Given** the user resolves a conflict, **When** the resolution is recorded, **Then** the user's decision is honored as authoritative.
 
@@ -98,7 +95,7 @@ A user directly edits the glossary — adding, changing, or removing an entry, o
 - **FR-001**: The framework MUST initialize a project glossary as part of the instruction-generation step, seeding it with domain-specific and project-specific terms observable from existing project material.
 - **FR-002**: The glossary MUST record only project-specific / domain-specific terms; common everyday words that carry no project-specific meaning MUST be excluded.
 - **FR-003**: Each glossary entry MUST capture a canonical term, its known confusable/homophone variants (if any), and a brief domain meaning.
-- **FR-004**: The framework MUST be able to propose new glossary terms as they emerge during the project development workflow (progressive enrichment).
+- **FR-004**: The framework MUST propose new glossary terms as they emerge during the project development workflow (progressive enrichment), at natural workflow checkpoints (e.g. requirements, plan, tasks, implement) in addition to manual updates.
 - **FR-005**: The framework MUST use the glossary to correct and anchor user input — mapping recorded homophone/confusable variants to their canonical term — with the primary goal of correcting errors introduced by voice/dictated input.
 - **FR-006**: When a correction is applied to user input, the framework MUST make the substitution traceable/visible so the user can review and override it.
 - **FR-007**: When a variant is ambiguous (could map to more than one canonical term) or unrecognized, the framework MUST NOT silently choose a canonical term and MUST defer to the user.
@@ -108,10 +105,12 @@ A user directly edits the glossary — adding, changing, or removing an entry, o
 - **FR-011**: Manual (user-authored) glossary entries MUST be treated as authoritative — preserved across regenerations and never silently overwritten by automatic proposals.
 - **FR-012**: The glossary MUST be stored as a durable, human-readable project artifact that is directly viewable and editable.
 - **FR-013**: Re-running instruction generation MUST preserve the existing glossary's user-authored content rather than discarding it.
+- **FR-014**: There MUST be a single project-wide glossary (one per project), shared across all features and workflow steps; the framework MUST NOT fragment the vocabulary into per-feature glossaries.
+- **FR-015**: The glossary MUST be available as ambient context to all `/speckit.*` workflow commands so any of them can anchor and correct user input against it (analogous to how the constitution is ambiently available), rather than being consulted only by a single dedicated command.
 
 ### Key Entities *(include if requirement involves data)*
 
-- **Glossary (词汇表)**: The project-scoped collection of domain/project terms. Serves as both an input-anchoring aid and a lightweight domain-knowledge dictionary. One per project.
+- **Glossary (词汇表)**: The single project-wide collection of domain/project terms. Serves as both an input-anchoring aid and a lightweight domain-knowledge dictionary. Exactly one per project; shared across all features and workflow steps.
 - **Glossary Entry (词条)**: A single term record. Attributes: canonical term; known confusable/homophone variants; brief domain meaning/definition; origin (auto-proposed vs. user-authored) and confirmation status. User-authored entries carry precedence over auto-proposed ones.
 - **Conflict**: A detected relationship between a candidate term (proposed or manual) and one or more existing entries — either identical spelling with divergent meaning, or phonetic/near-duplicate similarity. Requires user confirmation to resolve. Records the candidate, the conflicting existing entry/entries, and the user's resolution.
 
@@ -138,7 +137,7 @@ A user directly edits the glossary — adding, changing, or removing an entry, o
 ## Assumptions
 
 - The glossary is a **document/prompt-framework artifact** (a human-readable, editable project file), consistent with Spec Kit's nature as a document- and prompt-driven framework — not a runtime service, database, or background process.
-- "Instruction generation" refers to the framework's existing project-instruction generation step; the glossary is initialized there and lives alongside the project's other canonical memory artifacts.
+- "Instruction generation" refers to the framework's existing project-instruction generation step; the glossary is initialized there and lives alongside the project's other canonical memory artifacts (the concrete file location/format is a design decision for `/speckit.plan`).
 - "Correction/anchoring" is applied by the AI agent when interpreting user input during the workflow; it is an interpretation aid, not a destructive rewrite of what the user typed/said.
 - The primary driver is voice/dictated input, but the same anchoring benefits any user input that references project vocabulary.
 - Conflict detection targets project-specific terms only; the deliberate exclusion of common words keeps the glossary small and the conflict surface focused.
@@ -146,7 +145,8 @@ A user directly edits the glossary — adding, changing, or removing an entry, o
 
 ## Clarifications
 
-<!-- 
-This section will be populated by /speckit.clarify command with questions and answers.
-Format: - Q: <question> → A: <answer>
--->
+### Session 2026-07-16
+
+- Q: How should this glossary spec bind to a feature (no existing feature covers vocabulary/glossary)? → A: Create a new feature "Glossary Mechanism" (Feature ID 031); register it in `.specify/memory/features.md` via `/speckit.feature`.
+- Q: Which parts of the workflow should actively use the glossary (input correction + progressive enrichment)? → A: Ambient context for all commands — the glossary is loaded as ambient context (like the constitution) so every `/speckit.*` command anchors/corrects input; new terms are proposed at natural checkpoints (requirements/plan/tasks/implement) plus manual edits.
+- Q: What is the scope/granularity of the glossary? → A: One project-wide glossary (a single shared vocabulary for the whole project; no per-feature glossaries).
