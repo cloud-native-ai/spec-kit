@@ -429,10 +429,15 @@ LOOP (iteration in 1..max_iterations):
 
   PHASE 2 — EXECUTE:
     Workers execute assigned sub-tasks, write deliverables
+    IF goal optimizes a TARGET (a skill / implementation / config, e.g. config.optimization_target):
+      (a) Workers/optimizers mutate ONLY the target (a working copy) — NOT the scored artifact directly
+      (b) an executor then REGENERATES the scored deliverable from the source inputs
+          BY APPLYING the current target (reload latest target; do not hand-edit the artifact)
+      (c) so the score in PHASE 3 reflects the TARGET, not a hand-tuned proxy
     Team Supervisor monitors, handles failures, consolidates results
 
   PHASE 3 — EVALUATE:
-    Team Supervisor scores output on each quality dimension
+    Team Supervisor scores the regenerated deliverable on each quality dimension
     Compute weighted_total, record in history
 
   PHASE 4 — DECIDE:
@@ -445,6 +450,14 @@ LOOP (iteration in 1..max_iterations):
     Team Supervisor generates improvement feedback, adjusts strategy,
     and triggers improve-agent on weak areas
 ```
+
+> **Optimization-target invariant (`score = f(target)`) — mandatory whenever the goal optimizes a reusable target** (a skill, implementation, prompt, or config; e.g. `config.optimization_target`). The loop MUST optimize the **target**, not the scored artifact (the "proxy"):
+> 1. Each iteration, optimizers edit **only the target** (a working copy of the skill/impl/config) — **never hand-edit the scored deliverable directly**.
+> 2. An executor then **regenerates the deliverable from the source inputs by applying the current target** (reload the latest target each iteration — see the progressive strategy's "重载最新实现" in `references/optimization-goals.md §4`).
+> 3. Score the **regenerated** deliverable. This guarantees the score measures the target's quality, closing the loop "improve target → regenerate from target → score → keep best target".
+> 4. On success, the **adopted target** is the standard-output deliverable (persist to its real path); the regenerated artifact is a run intermediate.
+>
+> **Anti-pattern (do not do this):** optimizing the scored artifact directly (e.g. hand-editing the output diagram/file) and only distilling changes back into the target in batch at the end. That measures the *artifact*, not the *target* — the improvement loop for the target never actually closes. This applies to **both** the elimination and progressive strategies in `references/optimization-goals.md`.
 
 ### Convergence Detection
 

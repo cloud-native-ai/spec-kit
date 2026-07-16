@@ -71,7 +71,7 @@ UML 语义保证「正确」，读者的**第一眼理解**还依赖**视觉语�
 
 ### 3.3 字号与字体一致（图内 + 跨图集）
 文字「看起来不一致」多半不是内容问题，而是**字号/字体没统一**：
-- **用 skinparam 的 per-kind 字号集中设定层级**（`TitleFontSize` > `node/rectangle/frameFontSize` > `component/artifact/databaseFontSize` > `noteFontSize` > `legendFontSize` > `ArrowFontSize` > `StereotypeFontSize`）。一处定义、全图一致。
+- **用 skinparam 的 per-kind 字号按「四级字号阶梯」集中设定**：定一个基准字号 `B`（正文可读下限，13–15），按语义层级套倍率——**T1 标题** `TitleFontSize`≈1.5×B(+`TitleFontStyle bold`)、**T2 容器** `node/frame/rectangle/packageFontSize`≈1.0×B、**T3 成员** `component/artifact/database/actorFontSize`≈0.9×B、**T4 附注** `note/legend/Arrow/StereotypeFontSize`≈0.8×B。**相邻阶梯至少差 1pt**（差 0 则层级消失、显得「字号无规律」），**T1↔T2 拉到 ≥1.4×** 让标题跳出；**只留四档**，其余元素种类归入语义最近一档、不新增第五档（档位越少越像「统一排版系统」）。一处定义、全图一致。
 - **不要用零散的内联 `<size:N>` 或 `**bold**` 逐元素装饰**——那让同一张图字号忽大忽小、粗细不一，是「文字大小看起来不一致」的头号成因。加粗只留给标题（`TitleFontStyle bold`）与个别 callout，且全图集用法一致（含 note/legend 内的强调也要跨图统一）。
 - **跨图集一致**：一组图共用**同一套 per-kind 字号**与同一字体族（承 §4.3 图集共享词汇）——同类元素在每张图字号相同，风格才统一。
 - **工具注意**：有的渲染管线会强制 `defaultFontSize`/`defaultFontName`；但 per-kind 的 `*FontSize` 通常可在其上**覆盖生效**——层级就用这些设，不必与被强制的基准较劲。
