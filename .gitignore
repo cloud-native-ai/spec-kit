@@ -49,10 +49,5 @@ output/
 # Node / Playwright skill runtime artifacts
 node_modules/
 **/.temp-execution-*.js
-.specify/tools/*.json
 
-# /speckit.history scratch (de-noised transcripts); .md docs + .manifest.json are tracked
-.specify/history/.work/
-
-# /speckit.team run intermediate workspace (transient); team defs + runs/ reports stay tracked
-.specify/teams/.work/
+input/

@@ -1,6 +1,0 @@
-SESSION cedfb1d7-34b8-414e-b18b-ba82a6dd477a  TITLE: 
-
-### USER
-<command-name>/exit</command-name>
-            <command-message>exit</command-message>
-            <command-args></command-args>

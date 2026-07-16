@@ -1443,6 +1443,21 @@ def copy_local_templates(
             if codexignore_template.exists():
                 shutil.copy2(codexignore_template, project_path / ".codexignore")
 
+        # Ship the framework-owned .specify/.gitignore so target projects ignore
+        # the transient /speckit.history and /speckit.team .work/ scratch dirs
+        # created inside their own .specify/ tree during daily development.
+        gitignore_specify_template = (
+            resource_path / "templates" / "gitignore-specify-template"
+        )
+        if not gitignore_specify_template.exists():
+            fallback_template = (
+                MODULE_DIR.parent.parent / "templates" / "gitignore-specify-template"
+            )
+            if fallback_template.exists():
+                gitignore_specify_template = fallback_template
+        if gitignore_specify_template.exists():
+            shutil.copy2(gitignore_specify_template, specify_dir / ".gitignore")
+
         # Copy skills directory
         if (resource_path / "skills").exists():
             if tracker:

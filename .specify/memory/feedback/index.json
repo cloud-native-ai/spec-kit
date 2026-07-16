@@ -1,10 +1,54 @@
 {
   "store": "feedback",
-  "updated": "2026-07-15T06:41:31Z",
+  "updated": "2026-07-16T07:51:14Z",
   "threshold": 10,
-  "count_since_submission": 2,
+  "count_since_submission": 6,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260716T075114Z-skill-draw-plantuml",
+      "file": "20260716T075114Z-skill-draw-plantuml.md",
+      "unit_id": "skill:draw-plantuml",
+      "unit_type": "skill",
+      "run_id": "gen23-final-d5-text-decoration",
+      "feature": "arc4-context-split",
+      "partial": false,
+      "created": "2026-07-16T07:51:14Z",
+      "summary": "将图5(Build+Serverless 序列图)提升到最新技能标准，重点应用 §3 文字修饰步骤：参与者标题剥离冗长副标题(控制面/构建节点/:3002等)，改用 «角色» 构造型承载身份，详解外置为 2 个布局安全的 note(快照货币锚 + 黑箱交叉引用)。保留核心点(快照即通用货币)、两个片段(构建/Serverless)、3 条指向 Object storage 的快照货币锚箭头、通道色"
+    },
+    {
+      "id": "20260716T074550Z-speckit-requirements",
+      "file": "20260716T074550Z-speckit-requirements.md",
+      "unit_id": "/speckit.requirements",
+      "unit_type": "command",
+      "run_id": "029-glossary-mechanism-20260716",
+      "feature": "029-glossary-mechanism",
+      "partial": false,
+      "created": "2026-07-16T07:45:50Z",
+      "summary": "Processed the 词汇表/glossary-mechanism feature into a clean requirements spec (029). Generated 4 prioritized, independently-testable user stories (init at instruction-gen, voice/homophone correction, pr"
+    },
+    {
+      "id": "20260716T074022Z-skill-draw-plantuml",
+      "file": "20260716T074022Z-skill-draw-plantuml.md",
+      "unit_id": "skill:draw-plantuml",
+      "unit_type": "skill",
+      "run_id": "gen21-textdecor-d2",
+      "feature": "arc4-context-split",
+      "partial": false,
+      "created": "2026-07-16T07:40:22Z",
+      "summary": "文字修饰 pass on 图2 Deployment&Governance: stripped verbose subtitles to concise titles (always-safe win), then attempted external explanatory notes. Layout-safety guard proved decisive — of 3 candidate n"
+    },
+    {
+      "id": "20260716T073831Z-skill-draw-plantuml",
+      "file": "20260716T073831Z-skill-draw-plantuml.md",
+      "unit_id": "skill:draw-plantuml",
+      "unit_type": "skill",
+      "run_id": "gen21-textdecor-d1",
+      "feature": "arc4-context-split",
+      "partial": false,
+      "created": "2026-07-16T07:38:31Z",
+      "summary": "Applied a focused text-decoration pass to 图1 Overview: stripped the 3 layer boxes (access/k8s/exec) to concise bold titles + tiny cross-ref, moved verbose multi-clause descriptions into 3 family-tinte"
+    },
     {
       "id": "20260715T064131Z-skill-create-team",
       "file": "20260715T064131Z-skill-create-team.md",
