@@ -69,6 +69,13 @@ UML 语义保证「正确」，读者的**第一眼理解**还依赖**视觉语�
 - **选择性**：只修饰含义不明的元素，**不要每个盒子都挂 note**（note 泛滥同样是噪声）。note 数量宜少（如 ≤ 5）。
 - **兜底顺序**：贴身 note（布局安全时·首选，最清晰）→ 折叠进父级 note / legend（note 不安全时）→ 都不合适则仅留简洁标题。
 
+### 3.3 字号与字体一致（图内 + 跨图集）
+文字「看起来不一致」多半不是内容问题，而是**字号/字体没统一**：
+- **用 skinparam 的 per-kind 字号集中设定层级**（`TitleFontSize` > `node/rectangle/frameFontSize` > `component/artifact/databaseFontSize` > `noteFontSize` > `legendFontSize` > `ArrowFontSize` > `StereotypeFontSize`）。一处定义、全图一致。
+- **不要用零散的内联 `<size:N>` 或 `**bold**` 逐元素装饰**——那让同一张图字号忽大忽小、粗细不一，是「文字大小看起来不一致」的头号成因。加粗只留给标题（`TitleFontStyle bold`）与个别 callout，且全图集用法一致（含 note/legend 内的强调也要跨图统一）。
+- **跨图集一致**：一组图共用**同一套 per-kind 字号**与同一字体族（承 §4.3 图集共享词汇）——同类元素在每张图字号相同，风格才统一。
+- **工具注意**：有的渲染管线会强制 `defaultFontSize`/`defaultFontName`；但 per-kind 的 `*FontSize` 通常可在其上**覆盖生效**——层级就用这些设，不必与被强制的基准较劲。
+
 - **判据**：读者用「简洁标题(图元) + 形状/颜色(种类) + 接口(契约) + stereotype(部署) + 外置 note/legend(详解)」应能**重建全部信息**，而画布上每个盒子只剩一个短标题、详解在旁而不挤。
 - **可选增强**：用 OpenIconic `<&icon>` 给标题加一个种类图标（`<&cog>`服务、`<&hard-drive>`存储、`<&box>`制品、`<&person>`actor…），以符号强化——冗余编码，小尺寸收益有限，按需采用。
 
