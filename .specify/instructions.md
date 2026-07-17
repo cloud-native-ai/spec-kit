@@ -8,8 +8,9 @@ This project documentation is distributed across several key files. You MUST ref
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
 | **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | 10 core principles (SDD foundation, Feature-Centric, Intent-Driven, Test-First, AI Agent Integration, Quality/Observability, SDD Workflow, Code as Single Source of Truth, Framework Scope Discipline, Documentation Naming Conventions) and governance rules |
-| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | 30 features tracking /speckit.* commands, AI tool support (Claude/Qoder/Qwen/opencode/Copilot), MCP, skills, and core capabilities |
+| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | 31 features tracking /speckit.* commands, AI tool support (Claude/Qoder/Qwen/opencode/Copilot), MCP, skills, and core capabilities |
 | **Feature Details** | `.specify/memory/features/<ID>.md` | Per-feature deep dives | Overview, key changes, implementation notes, status criteria |
+| **Glossary** | `.specify/memory/glossary.md` | Project vocabulary anchor & domain dictionary | Canonical terms, homophone/confusable variants, meanings; voice-input correction source (protocol: `.specify/shared/workflow/glossary.md`) |
 | **Readme** | `README.md` | Project entry point | Spec-Driven Development overview, supported AI agents, feature list, installation pointer |
 | **Installation** | `docs/installation.md` | How to install the CLI | Setup steps for the `specify` CLI |
 | **Quickstart** | `docs/quickstart.md` | First-run walkthrough | End-to-end /speckit.* workflow example |

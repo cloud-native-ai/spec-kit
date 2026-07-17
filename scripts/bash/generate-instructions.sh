@@ -130,6 +130,21 @@ else
   render_template "$TEMPLATE_FILE" >"$TARGET_FILE"
 fi
 
+# Initialize the project glossary (non-destructive; create only if absent).
+# The glossary anchors project vocabulary and corrects voice/dictated input;
+# it is loaded ambiently by every /speckit.* command via the Documentation Map.
+GLOSSARY_ENGINE="$SCRIPT_DIR/../python/glossary-utils.py"
+GLOSSARY_TEMPLATE=".specify/templates/glossary-template.md"
+if [ -f "$GLOSSARY_ENGINE" ] && [ -f "$GLOSSARY_TEMPLATE" ]; then
+  if python3 "$GLOSSARY_ENGINE" --action init --from-template "$GLOSSARY_TEMPLATE" >/dev/null 2>&1; then
+    log info "Ensured project glossary at .specify/memory/glossary.md (non-destructive)"
+  else
+    log warning "Glossary init skipped (engine returned non-zero)"
+  fi
+else
+  log warning "Glossary engine or template not found; skipping glossary initialization"
+fi
+
 # Cleanup deprecated AI tool artifacts
 for deprecated_dir in .clinerules .lingma .trae; do
   if [ -d "$deprecated_dir" ]; then

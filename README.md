@@ -25,6 +25,7 @@ Unlike the traditional approach of "write code first, treat specs as reference o
 | [Spec-Driven Development](docs/spec-driven.md) | Methodology deep-dive |
 | [Vibe Coding Guide](docs/vibe-coding.md) | Iterative AI-assisted style guide |
 | [Upstream Project](docs/upstream.md) | Relationship to github/spec-kit |
+| [Glossary Mechanism](docs/glossary.md) | Project vocabulary anchor & voice-input correction |
 | [Skills Specification](docs/skills/specification.md) | Skills system reference |
 | [Skills Troubleshooting](docs/skills/problems.md) | Common skill issues |
 | [VS Code Skills Guide](docs/skills/vscode.md) | VS Code integration |

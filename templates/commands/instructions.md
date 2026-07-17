@@ -69,6 +69,15 @@ When `$ARGUMENTS` is empty (full update), apply these rules:
 
 When `$ARGUMENTS` has content (partial update), modify only requested sections and keep unrelated sections untouched.
 
+## Glossary Initialization
+
+Ensure the single project-wide glossary exists and seed it with observed domain terms (Feature 031 — see `.specify/shared/workflow/glossary.md`):
+
+- The setup script creates `.specify/memory/glossary.md` from `.specify/templates/glossary-template.md` **only if absent** (non-destructive — never overwrite or discard an existing glossary; user-authored entries are authoritative).
+- Propose **project-specific** terms observed from the constitution, `features.md`, feature names, and high-frequency documentation phrases as `origin=auto`, `status=proposed`. **Exclude common everyday words.**
+- Record proposals via `python3 .specify/scripts/python/glossary-utils.py --action add --canonical "<T>" --meaning "<M>" --origin auto --status proposed`, routing any detected conflict through explicit user confirmation before writing.
+- Confirm the generated `.specify/instructions.md` Documentation Map includes the **Glossary** row so the glossary is ambient for every command.
+
 ## Error Handling
 
 Classify failures before deciding to stop:

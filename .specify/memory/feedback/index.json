@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-07-16T11:10:45Z",
+  "updated": "2026-07-16T17:50:27Z",
   "threshold": 10,
-  "count_since_submission": 1,
+  "count_since_submission": 2,
   "submitted_at": "2026-07-16T11:09:25Z",
   "entries": [
+    {
+      "id": "20260716T175027Z-speckit-implement",
+      "file": "20260716T175027Z-speckit-implement.md",
+      "unit_id": "/speckit.implement",
+      "unit_type": "command",
+      "run_id": "029-glossary-mechanism-implement-20260716",
+      "feature": "029-glossary-mechanism",
+      "partial": false,
+      "created": "2026-07-16T17:50:27Z",
+      "summary": "Implemented Feature 031 Glossary Mechanism end-to-end as a doc/prompt-framework capability. Built glossary-utils.py (stdlib engine: init/list/validate/detect-conflict/add/remove) with a conflict/prece"
+    },
     {
       "id": "20260716T111045Z-speckit-tasks",
       "file": "20260716T111045Z-speckit-tasks.md",

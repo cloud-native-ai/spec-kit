@@ -77,8 +77,23 @@ def test_no_sdd_workflow_reference_in_source():
     assert not offenders, f"live sdd-workflow references remain in source: {sorted(offenders)}"
 
 
-def test_shared_workflow_directory_has_ten_docs():
+# The 10 docs relocated by Feature 029 (sdd-workflow refactor). This is the gate's
+# real invariant — that the relocation happened and these remain present. The set is
+# allowed to GROW as later features add shared-workflow protocols (e.g. Feature 031
+# added glossary.md), so we assert presence of the relocated docs rather than a brittle
+# exact count (see the "hard-coded counts are fragile" lesson).
+RELOCATED_DOCS = {
+    "agent-configuration.md", "checklist-methodology.md", "clarify-taxonomy.md",
+    "dfx-catalog.md", "feature-integration.md", "feedback-step.md",
+    "ignore-patterns.md", "requirements-guidelines.md", "tool-definitions.md",
+    "user-input-protocol.md",
+}
+
+
+def test_shared_workflow_directory_contains_relocated_docs():
     shared = ROOT / "shared" / "workflow"
     assert shared.is_dir(), "shared/workflow/ must exist"
-    docs = sorted(p.name for p in shared.glob("*.md"))
-    assert len(docs) == 10, f"expected 10 shared docs, found {len(docs)}: {docs}"
+    docs = {p.name for p in shared.glob("*.md")}
+    missing = RELOCATED_DOCS - docs
+    assert not missing, f"relocated shared docs missing: {sorted(missing)}"
+    assert len(docs) >= len(RELOCATED_DOCS), f"unexpectedly few shared docs: {sorted(docs)}"
