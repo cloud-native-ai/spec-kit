@@ -1,4 +1,24 @@
-description = "Single entry point for all team operations — create, modify, and run agent teams via intent routing."
+description = "Single entry point for all team operations — create, modify, and run agent teams via intent routing.
+handoffs:
+  - label: Update Instructions
+    agent: speckit.instructions
+    prompt: Refresh project instructions so newly created teams and team skills are discoverable.
+    send: false
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-protocol.md). If empty, infer intent from conversation/repo context. If intent is ambiguous or unsupported, report capabilities and request the missing intent (do NOT guess silently).
+
+## Outline
+
+`/speckit.team` is the **single entry point** for every **team** operation — the multi-agent analogue of `/speckit.agents`. It recognizes intent, then routes to the owning team skill. It delegates to skills and does **NOT** render templates inline. It MUST NOT serve single-agent authoring (that is `/speckit.agents`), and single-agent commands MUST NOT serve team operations.
+
+A **team** is a named, reusable multi-agent structure organized around a single **goal**. Every team has three parts: a **goal** (the team"
 
 prompt = """
 ## User Input
