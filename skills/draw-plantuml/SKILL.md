@@ -107,7 +107,7 @@ skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 - 输出为单个 HTML 文档，包含渲染的图表（不嵌入原始 PlantUML 文本）
 - 图表通过 [render-plantuml.sh](scripts/render-plantuml.sh) 渲染，同时产出 PNG 与 SVG
 - **默认优先选用 PNG 格式**引用/嵌入图片（最美观，且在 Preview / Markdown 预览中可直接查看）；仅当图表过宽/过大触及 PNG 4096px 上限或需任意无损缩放时改用 SVG
-- **嵌入 Markdown 文档时（最佳实践）**：默认内嵌 PNG，并在图片正下方附一条「新标签页打开 SVG」链接（内联 HTML `<a … target="_blank" rel="noopener">`，纯 Markdown 链接无法强制新标签）——PNG 细节不足时读者可打开 SVG 无损放大；**SVG/PNG 必须同时产出**。→ 见 [12-rendering-and-output.md §4.3](references/howto/12-rendering-and-output.md)
+- **嵌入 Markdown 文档时（最佳实践）**：默认看 PNG、细节不够可开 SVG 无损放大，**SVG/PNG 必须同时产出**。⚠️ Markdown 图片 `![]()` 与内联 HTML `<a>` 走**不同的路径解析管线**（有的渲染器会代理/改写 Markdown 图片 URL 却透传 HTML `href`），混用会导致两条路径不一致——故 **PNG 与 SVG 引用须用同一机制**：首选**全内联 HTML**（`<a href=x.svg target=_blank rel=noopener><img src=x.png></a>`，点图即开 SVG 新标签），渲染器会剥 HTML 时回退**全纯 Markdown**（同标签打开）。→ 见 [12-rendering-and-output.md §4.3](references/howto/12-rendering-and-output.md)
 - PNG/SVG 与 HTML 保存在同一目录，HTML 通过相对路径引用图片
 - PlantUML 源文件（`.puml`）保存以供未来编辑
 - 每张图至少包含标题、渲染图片和简要说明
