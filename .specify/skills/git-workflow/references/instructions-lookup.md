@@ -20,5 +20,5 @@
 在目标文档的 Documentation Map 表格中添加一行：
 
 ```markdown
-| **Git Workflow** | `docs/git-workflow.md` | 分支同步机制与操作文件 | 三层分支模型、rebase 同步流程、推送策略、安全底线 |
+| **Git Workflow** | `.specify/memory/git-workflow.md` | 分支同步机制与操作文件 | 三层分支模型、rebase 同步流程、推送策略、安全底线 |
 ```

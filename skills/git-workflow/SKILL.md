@@ -1,7 +1,7 @@
 ---
 name: git-workflow
 description: |
-  Three-tier Git workflow management skill that dynamically discovers or defines branch names (trunk/pre-release/dev) and maintains `docs/git-workflow.md` as the single source of truth. Supports three modes: Setup (interactive branch naming + creation + .gitexcludes init), Maintain (structure/sync/.gitexcludes health check), Execute (rebase sync, merge, and safe push with automatic .gitexcludes enforcement). Covers pre-checks, rebase synchronization, conflict resolution, force-with-lease push strategies, and per-branch file exclusion via `.gitexcludes`. Use this when the user mentions ["git workflow", "branch sync", "rebase sync", "分支同步", "git rebase", "force-with-lease", "发布流程", "分支策略", "主干分支", "预发分支", "开发分支", "three-tier git", "git workflow setup", "创建git工作流", "工作流维护", "workflow health check", "工作流检查", "selective merge", "选择性合并", "排除文件", "忽略配置文件", "分支排除", "branch-exclusive", ".gitexcludes", "开发专属文件", "merge filter"]
+  Three-tier Git workflow management skill that dynamically discovers or defines branch names (trunk/pre-release/dev) and maintains `.specify/memory/git-workflow.md` as the single source of truth. Supports three modes: Setup (interactive branch naming + creation + .gitexcludes init), Maintain (structure/sync/.gitexcludes health check), Execute (rebase sync, merge, and safe push with automatic .gitexcludes enforcement). Covers pre-checks, rebase synchronization, conflict resolution, force-with-lease push strategies, and per-branch file exclusion via `.gitexcludes`. Use this when the user mentions ["git workflow", "branch sync", "rebase sync", "分支同步", "git rebase", "force-with-lease", "发布流程", "分支策略", "主干分支", "预发分支", "开发分支", "three-tier git", "git workflow setup", "创建git工作流", "工作流维护", "workflow health check", "工作流检查", "selective merge", "选择性合并", "排除文件", "忽略配置文件", "分支排除", "branch-exclusive", ".gitexcludes", "开发专属文件", "merge filter"]
 skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 ---
 
@@ -13,7 +13,7 @@ skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 
 | 模式 | 触发条件 | 功能 |
 |------|----------|------|
-| **Setup** | `docs/git-workflow.md` 不存在 | 建立工作流：确认分支名、创建分支、初始化 `.gitexcludes`、生成配置文档 |
+| **Setup** | `.specify/memory/git-workflow.md` 不存在 | 建立工作流：确认分支名、创建分支、初始化 `.gitexcludes`、生成配置文档 |
 | **Maintain** | 文档存在 且 无操作参数 | 维护工作流：检查分支结构、同步状态、`.gitexcludes` 一致性，输出健康报告 |
 | **Execute** | 文档存在 且 有操作参数 | 执行工作流：按工作流规范执行具体 git 操作（所有同步/合并自动尊重 `.gitexcludes`） |
 
@@ -25,7 +25,7 @@ skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 | **`PRE`** | 预发分支 | 预发发布分支，用于版本集成与环境验证 |
 | **`DEV`** | 开发分支 | 本地开发分支，所有新改动先在此开发与自测 |
 
-> **重要**：分支名称因项目而异（如 `master` / `xuanji/prepub` / `xuanji/hanzhi`，或 `main` / `staging` / `dev`）。本技能在执行时**动态确认**实际分支名，将其记录到 `${SKILL_WORKDIR}/docs/git-workflow.md`，后续操作以该文档为准。
+> **重要**：分支名称因项目而异（如 `master` / `xuanji/prepub` / `xuanji/hanzhi`，或 `main` / `staging` / `dev`）。本技能在执行时**动态确认**实际分支名，将其记录到 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md`，后续操作以该文档为准。
 
 核心链路（角色代号）：
 
@@ -42,7 +42,20 @@ skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 
 ### Phase 0: 模式判定
 
-1. 检查 `${SKILL_WORKDIR}/docs/git-workflow.md` 是否存在。
+0. **迁移旧位置文档（一次性）**：本技能的输出文档已从旧位置 `docs/git-workflow.md` 迁移到 `.specify/memory/git-workflow.md`。执行任何模式前，若检测到旧位置仍有文件而新位置尚不存在，先迁移：
+
+   ```bash
+   if [ -f "${SKILL_WORKDIR}/docs/git-workflow.md" ] && [ ! -f "${SKILL_WORKDIR}/.specify/memory/git-workflow.md" ]; then
+     mkdir -p "${SKILL_WORKDIR}/.specify/memory"
+     git mv "${SKILL_WORKDIR}/docs/git-workflow.md" "${SKILL_WORKDIR}/.specify/memory/git-workflow.md" 2>/dev/null \
+       || mv "${SKILL_WORKDIR}/docs/git-workflow.md" "${SKILL_WORKDIR}/.specify/memory/git-workflow.md"
+     echo "migrated git-workflow.md -> .specify/memory/"
+   fi
+   ```
+
+   若归口 instructions 文档的 Documentation Map 仍引用旧路径 `docs/git-workflow.md`，同时将其更新为 `.specify/memory/git-workflow.md`。
+
+1. 检查 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` 是否存在。
 2. 检查用户是否传入了操作参数（具体的 git 操作指令）。
 
 | 文档存在 | 有操作参数 | 进入模式 |
@@ -55,7 +68,7 @@ skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 
 ### Mode 1: Setup — 建立工作流
 
-当 `${SKILL_WORKDIR}/docs/git-workflow.md` 不存在时进入。
+当 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` 不存在时进入。
 
 #### 1.1 检测现有分支
 
@@ -88,9 +101,9 @@ git checkout -b <DEV> origin/<PRE>
 git push -u origin <DEV>
 ```
 
-#### 1.4 生成 `docs/git-workflow.md`
+#### 1.4 生成 `.specify/memory/git-workflow.md`
 
-读取模板 `${SKILL_HOME}/assets/git-workflow-template.md`，替换 `<MAIN>` / `<PRE>` / `<DEV>` 为实际分支名，写入 `${SKILL_WORKDIR}/docs/git-workflow.md`。
+读取模板 `${SKILL_HOME}/assets/git-workflow-template.md`，替换 `<MAIN>` / `<PRE>` / `<DEV>` 为实际分支名，写入 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md`。
 
 #### 1.5 初始化 `.gitexcludes`（分支排除规则）
 
@@ -140,7 +153,7 @@ git add .gitexcludes && git commit -m "chore: init .gitexcludes for PRE"
 在归口 instructions 文档的 Documentation Map 中添加引用行：
 
 ```markdown
-| **Git Workflow** | `docs/git-workflow.md` | 分支同步机制与操作文件 | 三层分支模型、rebase 同步流程、推送策略、安全底线、.gitexcludes 机制 |
+| **Git Workflow** | `.specify/memory/git-workflow.md` | 分支同步机制与操作文件 | 三层分支模型、rebase 同步流程、推送策略、安全底线、.gitexcludes 机制 |
 ```
 
 目标文档查找优先级：见 `${SKILL_HOME}/references/instructions-lookup.md`。
@@ -149,11 +162,11 @@ git add .gitexcludes && git commit -m "chore: init .gitexcludes for PRE"
 
 ### Mode 2: Maintain — 维护工作流
 
-当 `${SKILL_WORKDIR}/docs/git-workflow.md` 存在且用户未传入操作参数时进入。
+当 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` 存在且用户未传入操作参数时进入。
 
 #### 2.1 加载配置
 
-从 `${SKILL_WORKDIR}/docs/git-workflow.md` frontmatter 读取分支映射：
+从 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` frontmatter 读取分支映射：
 
 ```yaml
 MAIN = main_branch 字段值
@@ -201,7 +214,7 @@ git show origin/<DEV>:.gitexcludes 2>/dev/null && echo "DEV: exists" || echo "DE
 
 #### 2.5 文档一致性检查
 
-- `docs/git-workflow.md` 中记录的分支名与实际分支是否一致
+- `.specify/memory/git-workflow.md` 中记录的分支名与实际分支是否一致
 - frontmatter 格式完整（`main_branch`、`pre_branch`、`dev_branch`、`last_updated`）
 - instructions 文档中是否包含 Git Workflow 引用行
 
@@ -226,7 +239,7 @@ git show origin/<DEV>:.gitexcludes 2>/dev/null && echo "DEV: exists" || echo "DE
 - 被排除路径跟踪状态: ✅ 已清理 / ⚠️ 仍被跟踪（列表）
 
 ### 文档一致性
-- docs/git-workflow.md: ✅ / ❌ 问题描述
+- .specify/memory/git-workflow.md: ✅ / ❌ 问题描述
 - instructions 引用: ✅ / ❌
 
 ### 建议操作
@@ -237,7 +250,7 @@ git show origin/<DEV>:.gitexcludes 2>/dev/null && echo "DEV: exists" || echo "DE
 
 ### Mode 3: Execute — 执行工作流
 
-当 `${SKILL_WORKDIR}/docs/git-workflow.md` 存在且用户传入了具体操作参数时进入。
+当 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` 存在且用户传入了具体操作参数时进入。
 
 #### 3.1 加载配置
 
@@ -372,7 +385,7 @@ git rebase origin/<base-branch>
 
 ##### 操作 E: 自定义操作
 
-对于无法匹配预定义操作的用户指令，根据 `docs/git-workflow.md` 中的规范理解用户意图，拆解为安全的 git 操作序列。遵守 Security 章节的安全底线。
+对于无法匹配预定义操作的用户指令，根据 `.specify/memory/git-workflow.md` 中的规范理解用户意图，拆解为安全的 git 操作序列。遵守 Security 章节的安全底线。
 
 ##### 操作 F: 管理 `.gitexcludes`
 
@@ -460,11 +473,11 @@ git ls-files -- $(cat .gitexcludes | grep -v '^#' | grep -v '^$' | tr '\n' ' ')
 
 ---
 
-## docs/git-workflow.md 文档维护
+## .specify/memory/git-workflow.md 文档维护
 
 - **创建**：Mode 1 Setup 完成后，使用 `${SKILL_HOME}/assets/git-workflow-template.md` 生成。
 - **更新**：分支改名时更新 frontmatter 映射；新增异常经验追加到 Known Issues 章节；更新 `last_updated` 日期。
-- **数据源**：`docs/git-workflow.md` frontmatter 是后续所有操作的唯一分支名数据源；各分支的 `.gitexcludes` 是排除规则的数据源。
+- **数据源**：`.specify/memory/git-workflow.md` frontmatter 是后续所有操作的唯一分支名数据源；各分支的 `.gitexcludes` 是排除规则的数据源。
 
 ## Resource ID
 
@@ -483,7 +496,7 @@ git ls-files -- $(cat .gitexcludes | grep -v '^#' | grep -v '^$' | tr '\n' ' ')
 - `gitexcludes-subroutine.md` — `.gitexcludes` 通用排除子程序详细实现。
 
 ### Assets (`${SKILL_HOME}/assets/`)
-- `git-workflow-template.md` — `docs/git-workflow.md` 生成模板，含 `<MAIN>` / `<PRE>` / `<DEV>` 占位符。
+- `git-workflow-template.md` — `.specify/memory/git-workflow.md` 生成模板，含 `<MAIN>` / `<PRE>` / `<DEV>` 占位符。
 
 ## Feedback
 
