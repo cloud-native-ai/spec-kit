@@ -208,6 +208,22 @@ node ${SKILL_HOME}/scripts/svg-to-png-cjk.cjs <input.svg> <output-cjk.png> 2
 - 确保所有图片有有意义的 `alt` 属性
 - HTML 应自包含，可直接在浏览器中打开 `.html` 文件查看
 
+### 4.3 Markdown 嵌入场景（最佳实践：PNG 内嵌 + SVG 新标签链接）
+
+当图表要**嵌入 Markdown 文档**（README / 设计文档 / Wiki 等）而非独立 HTML 时，采用「**PNG 内嵌 + SVG 外链**」双格式：
+
+- **默认内嵌 PNG**（`![alt](x.png)`）——各类 Markdown 预览器直接可见、最省事、最美观。
+- **紧邻图片正下方**加一条「**用新标签页打开 SVG**」链接：PNG 细节不够时，读者可打开 SVG 矢量图**无损放大**看细节。因**纯 Markdown 链接无法强制新标签**，用**内联 HTML 锚点** + `target="_blank"`：
+
+```markdown
+![图1 · 系统全景](diagrams/01-overview.png)
+
+<sub>🔍 细节不够？<a href="diagrams/01-overview.svg" target="_blank" rel="noopener">在新标签页打开 SVG 矢量大图</a>可无损放大。</sub>
+```
+
+- **必须同时产出 SVG 与 PNG**（`render-plantuml.sh` 默认双出）；两者与 Markdown 文档同目录、相对路径引用。
+- 链接固定放在**图片正下方**（合适位置），一图一链、文案统一；用 `rel="noopener"` 保证安全。
+
 ---
 
 ## 五、输出要求
@@ -217,6 +233,7 @@ node ${SKILL_HOME}/scripts/svg-to-png-cjk.cjs <input.svg> <output-cjk.png> 2
 - SVG/PNG 图片文件与 HTML 保存在同一输出目录中
 - HTML 通过相对路径引用图片，**默认优先 PNG**（如 `<img src="01-overview.png" />`）；超宽/超大图或需无损缩放时改用 SVG
 - 单图输出时，内联 SVG 嵌入可作为替代方案
+- **嵌入 Markdown 文档时**（非独立 HTML）：默认内嵌 PNG，并在图片正下方加一条「新标签页打开 SVG」的内联 HTML 链接（`target="_blank"`），供 PNG 细节不足时无损放大；SVG/PNG 双格式必须同时产出（见 §4.3）
 - PlantUML 源文件（`.puml`）也应保存以供未来编辑/重新生成
 - HTML 语义元素中的文字描述（标题、段落、列表）
 - 默认语言：遵循用户首选语言（本项目默认中文）
@@ -249,6 +266,10 @@ node ${SKILL_HOME}/scripts/svg-to-png-cjk.cjs <input.svg> <output-cjk.png> 2
 - [ ] 关系标签描述了交互方式（如 "uses via HTTP" 而非仅 "uses"）
 - [ ] 无孤立元素（每个元素至少有一条关系）
 - [ ] `skinparam` 在所有图表中提供一致的视觉样式（标准文档用单色；需要彩色时省略）
+
+### 嵌入 Markdown（如适用）
+- [ ] 默认内嵌 PNG（`![](x.png)`），图片正下方有「新标签页打开 SVG」内联 HTML 链接（`target="_blank" rel="noopener"`）
+- [ ] SVG 与 PNG 双格式齐备、与文档同目录、相对路径引用
 
 ### HTML 输出
 - [ ] HTML 用正确的相对路径引用所有图表图片
