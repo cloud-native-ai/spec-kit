@@ -68,14 +68,27 @@ render_template() {
 # template structure — is performed by the /speckit.instructions command.
 #
 # The template is used ONLY to bootstrap a brand-new file when none exists.
+#
+# Backups are NON-CLOBBERING and fully timestamped (down to the second). An
+# older date-only name was overwritten by a second run on the same day, which
+# could destroy a pristine pre-damage copy. Preserving every generation keeps
+# the .specify/instructions.md-* history intact so a project damaged by an
+# older overwriting version can recover lost content via /speckit.instructions.
 if [ -f "$TARGET_FILE" ]; then
-  BACKUP_FILE="${TARGET_FILE}-$(date '+%Y-%m-%d')"
+  BACKUP_FILE="${TARGET_FILE}-$(date '+%Y-%m-%d-%H%M%S')"
+  # Guard against a collision within the same second (never overwrite history).
+  if [ -e "$BACKUP_FILE" ]; then
+    BACKUP_FILE="${BACKUP_FILE}-$$"
+  fi
   log info "Backing up existing instructions to $BACKUP_FILE"
   cp "$TARGET_FILE" "$BACKUP_FILE"
+  # Keep the accumulating local backups out of version control.
+  gitignore_add_pattern ".specify/instructions.md-*" "$REPO_ROOT/.gitignore"
 
   log info "Existing instructions kept as the refresh base (not overwritten)."
-  log info "The /speckit.instructions command will reconcile each section against"
-  log info "current project state and the latest template; user content is preserved."
+  log info "The /speckit.instructions command reconciles each section against current"
+  log info "project state and the latest template, and can recover content dropped by"
+  log info "older versions from the .specify/instructions.md-* backup history."
 else
   log info "Generating new instructions file from template..."
   render_template "$TEMPLATE_FILE" >"$TARGET_FILE"

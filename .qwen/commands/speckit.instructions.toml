@@ -108,23 +108,31 @@ Fallback behavior:
 1. **Setup**: Run `.specify/scripts/bash/generate-instructions.sh` to ensure the basic directory structure, `.copilotignore`, and template `.specify/instructions.md` exist.
    - This script handles the "heavy lifting" of creating directories, ignoring files, establishing symlinks for supported AI tools (`.github`, `.qoder`, `.claude`), and cleaning up deprecated tool artifacts (`.clinerules`, `.lingma`, `.trae`, etc.).
    - It renders a fresh `.specify/instructions.md` from the template **only** when one does not already exist.
-   - When `.specify/instructions.md` already exists, the script is **non-destructive**: it keeps the existing file **as the refresh base** (never rendering the template over it) and writes a timestamped backup (`.specify/instructions.md-<DATE>`). It no longer fuses only `## Project Overview`; the full section-by-section refresh is performed by the steps below.
+   - When `.specify/instructions.md` already exists, the script is **non-destructive**: it keeps the existing file **as the refresh base** (never rendering the template over it) and writes a non-clobbering timestamped backup (`.specify/instructions.md-<TIMESTAMP>`). It no longer fuses only `## Project Overview`; the full section-by-section refresh is performed by the steps below.
    - If the script returns non-zero, apply the **Error Handling** rules above instead of failing immediately.
 
 2. **Establish the Refresh Base** (skip entirely if no `.specify/instructions.md` existed before this run):
    - The existing `.specify/instructions.md` **IS** the refresh base — the setup script left it in place untouched, so you refresh it *in situ*. Do NOT regenerate from the template and do NOT rebuild the file from decomposed fragments.
-   - **Safety net**: the setup script wrote a timestamped backup (`.specify/instructions.md-<DATE>`). If the script did not run or produced no backup, copy the current file to such a snapshot before you start editing, so any mistaken edit is recoverable.
+   - **Safety net**: the setup script wrote a non-clobbering timestamped backup (`.specify/instructions.md-<TIMESTAMP>`) and never overwrites earlier ones, so `.specify/instructions.md-*` is a durable history. If the script did not run or produced no backup, copy the current file to such a snapshot before you start editing, so any mistaken edit is recoverable.
    - **Read for reconciliation**: read (a) the current `.specify/instructions.md` (the base) and (b) the latest `.specify/templates/instructions-template.md` (the target structure a fresh spec-kit version expects). The template tells you which sections/markers *should* exist; the base holds the authoritative user content.
    - **Inventory sections**: list the base's top-level sections and note, for each, whether it is auto-derivable from a codebase scan (e.g., raw Tech Stack facts, Documentation Map paths) or hand-authored / non-reproducible (custom governance rules, recurring lessons, registries, decision rationale). Hand-authored sections are must-keep and are only touched to correct a clearly stale fact.
 
-3. **Analyze Project Context**:
+3. **Recover content lost to older overwriting versions** (run whenever any `.specify/instructions.md-*` backup exists; this is the repair path for projects damaged before the non-destructive fix):
+   - **Motivation**: earlier versions of the setup script rebuilt the file from the template and preserved **only** `## Project Overview`, silently dropping every other hand-authored section on each run. A project that ran those versions may have a current base that is already missing content which still survives in a backup.
+   - **Gather the history**: list every `.specify/instructions.md-*` backup (there may be several timestamps). Treat the whole set as the recovery source — the most recent backup may itself be post-damage, so do **not** rely on it alone; scan older ones too.
+   - **Detect loss**: diff the current base against the backups. Flag any section, bullet block, or registry row that is present in some backup but **absent** from the current base.
+   - **Recover — additively, user-authored only**: re-inject flagged content that is clearly hand-authored / non-reproducible (custom governance rules, recurring lessons, registry rows, decision rationale, tribal knowledge). Restore the fullest surviving wording and recreate the containing section/heading if it no longer exists. Do **NOT** resurrect stale auto-derivable facts (old tech-stack numbers, moved doc paths, obsolete feature counts) — those are refreshed in the next steps.
+   - **Reconciliation rules**: when backups disagree, prefer the fullest user-authored version; when a backup and the base describe the same item differently, keep the base unless the base is a clear truncation/loss, in which case restore from backup. This step is strictly **additive** — never delete or shrink current content while recovering.
+   - If no backup exists, or the base already contains everything the backups do, skip.
+
+4. **Analyze Project Context**:
    - Read `README.md` to understand the project's purpose and existing features.
    - Inspect configuration files (`pyproject.toml`, `package.json`, `pom.xml`, `Makefile`, etc.) to determine the tech stack.
    - Check `.specify/memory/constitution.md` (if exists) to identify any mandated project rules.
    - Check `.specify/memory/features.md` (if exists) for feature status reference.
    - **Check `.specify/` Directory**: When referencing the `.specify/` directory (if exists), **ONLY** consider the one in the **project root** (same level as `README.md`/`pyproject.toml`). Ignore any `.specify/` directories found inside subdirectories or submodules (as they belong to other projects).
 
-4. **Section-by-section refresh** (operate directly on the base file — a newly created file starts empty-of-user-content, so its sections are simply filled in):
+5. **Section-by-section refresh** (operate directly on the base file — a newly created file starts empty-of-user-content, so its sections are simply filled in):
    - **Iterate over the base file's sections in place.** For each existing section, decide the action by comparing its *described* state against current project reality:
      - **Matches reality** → leave it untouched (this includes all hand-authored / non-reproducible sections: custom governance rules, recurring lessons, registries, decision rationale).
      - **Drifted / stale** → update *only* the stale facts within that section, preserving the surrounding hand-authored prose and structure. Do not rewrite a whole section to change one fact.
@@ -140,14 +148,14 @@ Fallback behavior:
    - **Incorporate User Input**: if `$ARGUMENTS` provided specific instructions or context, integrate them into the relevant sections.
    - **No wholesale replacement**: modify only what mismatches; everything else stays byte-for-byte.
 
-5. **Validation**:
+6. **Validation**:
    - Ensure the file is well-formatted Markdown.
    - Verify that the resulting instructions clearly describe the project to a fresh AI instance.
-   - **Coverage check**: diff the result against the `.specify/instructions.md-<DATE>` backup and confirm no user-authored section or registry row was silently dropped. If any is missing, restore it from the backup before finishing.
+   - **Coverage check**: diff the result against **every** `.specify/instructions.md-*` backup and confirm no user-authored section or registry row present in the history was silently dropped. If any is missing, restore it from the backup before finishing.
 
-6. **Report**:
+7. **Report**:
    - Report the full path of the instructions file (`.specify/instructions.md`).
-   - Summarize which sections were left untouched, which had stale facts updated, and which (if any) new template sections were added.
+   - Summarize which sections were left untouched, which had stale facts updated, which (if any) new template sections were added, and any content recovered from backup history.
    - Confirm that symlinks for Copilot, Qoder, and Claude have been established (or explicitly report warning/fallback actions if setup script partially failed).
 
 ## Feedback
