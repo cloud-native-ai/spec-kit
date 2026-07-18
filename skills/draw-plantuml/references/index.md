@@ -8,7 +8,7 @@
 
 ```
 references/
-├── README.md          ← 本文件（汇总索引）
+├── index.md           ← 本文件（汇总索引）
 ├── howto/             ← 操作指南（分步指南，对应工作流步骤）
 ├── guide/             ← 最佳实践与优化指南
 └── document/          ← 官方文档与参考手册
@@ -40,8 +40,10 @@ references/
 | 15 | [15-mindmap-diagram.md](howto/15-mindmap-diagram.md) | 专项 | 思维导图——OrgMode/Markdown/算术三套写法、左右分支、无框节点、`<style>` 与命名样式类 |
 | 16 | [16-json-diagram.md](howto/16-json-diagram.md) | 专项 | JSON 数据可视化——对象/数组/嵌套渲染、`#highlight` 路径高亮、`jsonDiagram` `<style>` |
 | 17 | [17-yaml-diagram.md](howto/17-yaml-diagram.md) | 专项 | YAML 显示效果——嵌套映射/列表渲染、`# highlight` 路径高亮、`yamlDiagram` `<style>` |
+| 18 | [18-er-diagram.md](howto/18-er-diagram.md) | 专项 | ER 实体关系图——`entity` 属性/主外键、乌鸦脚基数、复合主键、域分组、正交路由 |
+| 19 | [19-salt-diagram.md](howto/19-salt-diagram.md) | 专项 | Salt UI 线框图——按钮/输入/复选/单选/下拉控件、列布局、分组框、导航树、表格、菜单/页签 |
 
-> **专项图表（非 UML）**：13–17 覆盖 WBS/甘特图/思维导图/JSON/YAML 五种非 UML 图表，使用各自原生语法，无需 Graphviz。
+> **专项图表（非 UML）**：13–17、19 覆盖 WBS/甘特图/思维导图/JSON/YAML/Salt 六种非 UML 图表，使用各自原生语法，无需 Graphviz；18 为 ER 图（`@startuml` + `entity` 乌鸦脚语法，遵循 UML 样式规范，走 Graphviz 布局）。
 
 ---
 
@@ -93,6 +95,7 @@ UML 理论、PlantUML 语法参考、官方文档和建模方法论的原始参�
 | 该选哪种 UML 图 | [howto/01-choose-diagram-type.md](howto/01-choose-diagram-type.md) |
 | 某种图怎么画 | [howto/02–09](howto/) 对应图表类型 |
 | 专项图怎么画（WBS/甘特/思维导图/JSON/YAML） | [howto/13–17](howto/) 对应专项图表 |
+| ER 图 / Salt 线框图怎么画 | [howto/18-er-diagram.md](howto/18-er-diagram.md)、[howto/19-salt-diagram.md](howto/19-salt-diagram.md) |
 | 布局怎么规划 | [howto/10-layout-planning.md](howto/10-layout-planning.md) + [guide/layout.md](guide/layout.md) §一 |
 | 标签和注释怎么写 | [howto/11-code-generation.md](howto/11-code-generation.md) §二 + [guide/content.md](guide/content.md) §1.5 |
 | 样式怎么配 | [guide/style.md](guide/style.md) |
