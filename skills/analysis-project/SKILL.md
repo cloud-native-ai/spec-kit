@@ -1,6 +1,6 @@
 ---
 name: analysis-project
-description: Deep analysis of current project with professional architecture reports. Use when the user mentions "analyze project", "analyze repository", "source code analysis", "architecture analysis", "code analysis", "study this project", "research this framework"
+description: Deep analysis of current project with professional architecture reports, illustrated with standard UML diagrams (component diagram, deployment diagram, sequence diagram) rendered via draw-plantuml. Use when the user mentions "analyze project", "analyze repository", "source code analysis", "architecture analysis", "code analysis", "study this project", "research this framework", "UML图", "UML diagram", "架构图", "component diagram", "deployment diagram", "sequence diagram"
 skill_id: "<SKILL:.specify/skills/analysis-project/SKILL.md>"
 ---
 
@@ -140,7 +140,7 @@ If the request is clear and asking would only slow execution, do not pause for c
    - Scenario-based problem introduction (material from Phase 3)
    - Competitive positioning (differences in design philosophy and tech approach)
    - Project overview, architecture chapter, tech stack chapter, module deep analysis, git evolution chapter, deployment chapter, evaluation & insights
-   - Architecture visualization (Mermaid diagrams), code evidence
+   - Architecture visualization: plan standard **UML figures for the report's primary views** (architecture structure, key behavior flows, deployment topology) per [uml-visualization-guide.md](references/uml-visualization-guide.md), choosing the diagram type that matches each view's semantics; Mermaid sketches remain for secondary, quick-glance content; code evidence
 3. **Identify modules**: categorize core vs secondary by business function
 4. **Design narrative line**: determine module presentation order and transition logic (data flow / layered / problem-driven)
 5. Output report outline for user confirmation, then write to `drafts/05-modules-plan.md`
@@ -184,8 +184,9 @@ Detailed prompt templates at [module-analysis-guide.md](references/module-analys
    - Narrative coherence: organize by narrative line, use natural transitions
    - Preserve the recommended chapter order: architecture → tech stack → modules → git evolution → deployment, unless the project clearly demands a different narrative
 4. **Segmented writing**: final report typically exceeds 500 lines; Write first 2-3 chapters (200-300 lines), then Edit to append
-5. Coverage summary to `drafts/08-coverage.md` (not included in final report)
-6. Output single markdown file: `$WORK_DIR/docs/overview.md`
+5. **UML figure rendering & embedding**: render the UML figures planned in Phase 5 by delegating to the draw-plantuml skill (PNG default + SVG available, `.puml` sources kept); store figure files under `$WORK_DIR/docs/figures/`; embed each figure with a brief caption using relative paths; never embed raw diagram source in the report
+6. Coverage summary to `drafts/08-coverage.md` (not included in final report)
+7. Output single markdown file: `$WORK_DIR/docs/overview.md`
 
 ### Intermediate File Manifest
 
@@ -199,7 +200,10 @@ Detailed prompt templates at [module-analysis-guide.md](references/module-analys
 
 ## Output Requirements
 
-- Heavy use of **Mermaid diagrams** for architecture, flows, data flows
+- **UML figures as the standard for primary views**: architecture structure, key behavior flows, and deployment topology MUST be expressed as standard UML diagrams rendered via the draw-plantuml skill — see [uml-visualization-guide.md](references/uml-visualization-guide.md) for the view-to-diagram-type mapping
+- **Mermaid diagrams remain for secondary content only**: quick-glance sketches, minor flows, small data illustrations
+- **Figure conventions**: figure files stored under `$WORK_DIR/docs/figures/` (PNG + SVG + `.puml` sources), embedded with brief captions via relative paths; no raw diagram source in the reader-facing report
+- **Degradation**: if draw-plantuml rendering is unavailable during the run, primary views fall back to Mermaid sketches and the report carries a visible degradation note per affected view
 - Default output in **Chinese** (follow user's language if different)
 - Critical thinking: compare with industry practice, point out real issues, don't dodge defects
 - Code as evidence: all conclusions backed by code, cite `file path` or `file path:line range`
@@ -218,6 +222,7 @@ Detailed prompt templates at [module-analysis-guide.md](references/module-analys
 | [module-analysis-guide.md](references/module-analysis-guide.md) | Module analysis methods, completeness standard, subagent prompt templates |
 | [git-analysis-guide.md](references/git-analysis-guide.md) | Commit/tag/branch history analysis and architectural evolution signals |
 | [deployment-analysis-guide.md](references/deployment-analysis-guide.md) | Runtime topology, packaging, delivery pipeline, and operability analysis |
+| [uml-visualization-guide.md](references/uml-visualization-guide.md) | View-to-UML-diagram-type mapping, figure conventions (docs/figures/), rendering delegation, degradation rule |
 
 ## Report Output Location
 

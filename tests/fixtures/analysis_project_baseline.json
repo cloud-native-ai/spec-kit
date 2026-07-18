@@ -1,0 +1,33 @@
+{
+  "skill": "analysis-project",
+  "captured_at": "2026-07-18",
+  "purpose": "Pre-enhancement regression baseline for SC-007: the US4 UML enhancement MUST NOT remove these sections or the deliverable-location convention.",
+  "required_headings": [
+    "# Project Deep Analysis Skill",
+    "## Core Principles",
+    "## Recommended Analysis Order",
+    "## Analysis Workflow",
+    "### Execution Contract",
+    "### Phase 1: Project Acquisition & Initialization",
+    "### Phase 2: Project Scale, Hypothesis Validation, and Mode Selection",
+    "### Phase 3: External Research + Project Documentation (Search First, Read Later)",
+    "### Phase 4: Project Feature Identification + Adaptive Questioning",
+    "### Phase 5: Dynamic Report Structure Design",
+    "### Phase 6: Parallel Deep Analysis (Subagent Team)",
+    "### Phase 7: Cross-Validation + Quality Control (Main Agent)",
+    "### Phase 8: Multi-Source Fusion & Final Report (Main Agent)",
+    "## Output Requirements",
+    "## Special Scenarios",
+    "## Reference Documents",
+    "## Report Output Location",
+    "## Feedback"
+  ],
+  "deliverable_statement": "$WORK_DIR/docs/overview.md",
+  "reference_guides": [
+    "architect-analysis-guide.md",
+    "deployment-analysis-guide.md",
+    "git-analysis-guide.md",
+    "module-analysis-guide.md",
+    "tech-stack-analysis-guide.md"
+  ]
+}

@@ -1,0 +1,281 @@
+openapi: 3.0.3
+info:
+  title: Visual Reporting Skills — Structural Contract
+  version: 1.0.0
+  description: >-
+    Structural contract for the two skill packages delivered by requirement
+    030-summarize-project (Feature 013 Skills Command). It fixes the prompt-asset
+    surface of each skill — frontmatter, required sections, delegation targets,
+    output artifacts, and fallback behaviors — as normative rules. Contract tests
+    under tests/contract/ assert these rules structurally against the shipped
+    SKILL.md and reference files. Traceability tags (FR-xxx, SC-xxx, SR-x) refer
+    to requirements.md and data-model.md.
+
+paths:
+  /skills/summarize-project:
+    get:
+      summary: Skill package presence and frontmatter
+      description: >-
+        C-1: The canonical package exists at skills/summarize-project/ and its
+        mirror exists at .specify/skills/summarize-project/; the two trees are
+        byte-equivalent (SR-1).
+        C-2: SKILL.md frontmatter declares name: summarize-project (STR-001),
+        a description containing the trigger keywords listed in
+        components/schemas/TriggerKeywords, and a skill_id of the form
+        <SKILL:.specify/skills/summarize-project/SKILL.md> (FR-001, FR-002).
+        C-3: The .specify/instructions.md skills registry contains exactly one
+        row for summarize-project (SR-3).
+      responses:
+        '200':
+          description: Package present, frontmatter and registry conformant.
+          content:
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/SkillPackage'
+        '400':
+          description: >-
+            Frontmatter invalid, trigger keywords incomplete, registry row
+            missing or duplicated, or mirror not byte-equivalent.
+
+  /skills/summarize-project/workflow:
+    get:
+      summary: Reporting workflow and delegation rules
+      description: >-
+        C-4: SKILL.md defines an ordered five-step workflow — (1) collect and
+        source-trace work items, (2) single hierarchical decomposition,
+        (3) WBS chart, (4) Gantt chart, (5) assemble one self-contained HTML
+        report (FR-003, FR-004, FR-010).
+        C-5: The WBS step names draw-plantuml's WBS capability (@startwbs) as
+        the rendering path, and the Gantt step names draw-plantuml's Gantt
+        capability (@startgantt) as the rendering path; the package contains
+        no rendering script of its own (FR-005, FR-006, FR-011, SR-2).
+        C-6: The workflow requires milestones and progress status semantics in
+        the Gantt output, and the two-chart consistency rule (every scheduled
+        WBS leaf work item appears as a Gantt entry with identical naming)
+        (FR-007, FR-008, FR-009).
+        C-7: The workflow defines the information-shortfall behavior: proceed
+        with visibly marked assumptions, or at most one clarification round of
+        no more than four questions (FR-012).
+        C-8: The workflow defines chart-set splitting for large projects
+        (overview plus drill-down charts) (FR-013).
+        C-9: references/reporting-playbook.md exists and carries the
+        decomposition depth rules, schedule-estimation defaults with
+        assumption marking, chart-set splitting rules, and the two-chart
+        consistency checklist (SR-5).
+      responses:
+        '200':
+          description: Workflow and delegation rules conformant.
+        '400':
+          description: >-
+            Workflow steps missing or out of order, delegation target absent,
+            or consistency/clarification/splitting rules undefined.
+
+  /skills/summarize-project/output:
+    get:
+      summary: Summary report output conventions
+      description: >-
+        C-10: The report contract fixes one self-contained HTML document with
+        rendered charts embedded, a brief explanation per chart, and an
+        overview narrative covering background, goals, and current progress;
+        raw diagram source is never embedded. The default output location is
+        docs/project-summary/ under the target workspace, user-overridable per
+        request (FR-010).
+        C-11: Every chart is produced as both PNG and SVG; the HTML references
+        images by relative path; PlantUML sources are kept alongside (FR-011).
+        C-12: The report states generation date, reporting scope, and any
+        estimation assumptions (FR-014).
+        C-13: SKILL.md ends with the canonical ## Feedback block whose unit-id
+        is skill:summarize-project (SR-4).
+      responses:
+        '200':
+          description: Output conventions conformant.
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/SummaryReport'
+        '400':
+          description: Output conventions violated.
+
+  /skills/analysis-project/uml-actions:
+    get:
+      summary: UML diagramming actions injected into the analysis workflow
+      description: >-
+        C-14: SKILL.md frontmatter keeps name: analysis-project (STR-002) and
+        its description gains UML-diagram-related trigger terms (e.g. "UML",
+        "架构图", "component diagram", "deployment diagram") (FR-015).
+        C-15: The workflow text assigns UML figures to the report's primary
+        views — architecture structure, key behavior flows, deployment
+        topology — and names draw-plantuml's standard UML capabilities as the
+        rendering path; the package adds no rendering code (FR-015, FR-016,
+        SR-2).
+        C-16: The view-to-diagram-type mapping of
+        components/schemas/ViewDiagramMapping is stated verbatim or
+        equivalently in references/uml-visualization-guide.md (FR-017).
+        C-17: Lightweight inline sketches (Mermaid) are explicitly scoped to
+        secondary content; UML figures are the standard for primary views;
+        the deliverable location $WORK_DIR/docs/overview.md, the phase
+        workflow, and the existing output conventions remain stated and
+        unchanged (FR-018).
+        C-18: The degradation rule is documented: when draw-plantuml rendering
+        is unavailable, primary views fall back to inline sketches with a
+        visible note in the report (edge case: UML renderer unavailable).
+      responses:
+        '200':
+          description: UML actions conformant.
+        '400':
+          description: >-
+            Injection points missing, mapping absent, rendering code
+            introduced, or existing conventions silently altered.
+
+  /skills/analysis-project/uml-figures:
+    get:
+      summary: UML figure output conventions in analysis reports
+      description: >-
+        C-19: Every UML figure ships as PNG plus SVG with a brief caption;
+        PlantUML sources are kept; reader-facing output embeds no raw diagram
+        source. Figures and sources are stored under docs/figures/ of the
+        analyzed workspace and referenced by relative paths (FR-019).
+        C-20: A report's primary figures cover, at minimum, one structural
+        view and one behavioral-or-deployment view (SC-006).
+      responses:
+        '200':
+          description: Figure conventions conformant.
+          content:
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/UMLFigure'
+
+components:
+  schemas:
+    SkillPackage:
+      type: object
+      required: [name, canonical_path, mirror_path, frontmatter, mirror_byte_equivalent]
+      properties:
+        name:
+          type: string
+          enum: [summarize-project, analysis-project]
+        canonical_path:
+          type: string
+          pattern: '^skills/(summarize-project|analysis-project)/$'
+        mirror_path:
+          type: string
+          pattern: '^\.specify/skills/(summarize-project|analysis-project)/$'
+        frontmatter:
+          type: object
+          required: [name, description, skill_id]
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+              description: Free-form trigger text; must cover the trigger keywords.
+            skill_id:
+              type: string
+              pattern: '^<SKILL:\.specify/skills/[a-z0-9-]+/SKILL\.md>$'
+        mirror_byte_equivalent:
+          type: boolean
+          const: true
+
+    TriggerKeywords:
+      type: array
+      description: Minimum trigger terms for the summarize-project description (FR-002).
+      items:
+        type: string
+        enum:
+          - 项目总结
+          - 项目汇报
+          - 进展报告
+          - 项目进展
+          - summarize project
+          - project summary
+          - project report
+      minItems: 7
+
+    SummaryReport:
+      type: object
+      required: [narrative, wbs_charts, gantt_charts, generated_at, scope]
+      properties:
+        narrative:
+          type: string
+          description: Background, goals, current progress (FR-010).
+        wbs_charts:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/RenderedChart'
+        gantt_charts:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/RenderedChart'
+        generated_at:
+          type: string
+          format: date
+        scope:
+          type: string
+        assumptions:
+          type: array
+          items:
+            type: string
+
+    RenderedChart:
+      type: object
+      required: [png, svg, source_puml, caption]
+      properties:
+        png:
+          type: string
+          description: Relative path referenced by the report (FR-011).
+        svg:
+          type: string
+        source_puml:
+          type: string
+          description: Kept alongside; never embedded raw (FR-010, FR-011).
+        caption:
+          type: string
+
+    UMLFigure:
+      type: object
+      required: [diagram_type, view, caption, image_png, image_svg, source_puml, set_role]
+      properties:
+        diagram_type:
+          type: string
+          enum: [component, package, deployment, sequence, activity, class, er]
+        view:
+          type: string
+          enum: [architecture-structure, behavior-flow, deployment-topology, data-structure]
+        caption:
+          type: string
+        image_png:
+          type: string
+        image_svg:
+          type: string
+        source_puml:
+          type: string
+        set_role:
+          type: string
+          enum: [standalone, overview, drill-down]
+
+    ViewDiagramMapping:
+      type: object
+      description: Normative view-to-diagram-type mapping (FR-017).
+      properties:
+        architecture-structure:
+          type: array
+          items:
+            type: string
+          example: [component, package]
+        behavior-flow:
+          type: array
+          items:
+            type: string
+          example: [sequence, activity]
+        deployment-topology:
+          type: array
+          items:
+            type: string
+          example: [deployment]
+        data-structure:
+          type: array
+          items:
+            type: string
+          example: [class, er]
