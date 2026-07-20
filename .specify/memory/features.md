@@ -1,7 +1,7 @@
 # 🌱 Spec Kit Feature Index
 
-**Last Updated**: 2026-07-16
-**Total Features**: 31
+**Last Updated**: 2026-07-20
+**Total Features**: 32
 
 ## Features
 
@@ -38,6 +38,7 @@
 | 029 | Shared Reference Directory | Reclassify `sdd-workflow` from a (non-invocable) skill into a dedicated shared reference directory (`shared/workflow` → `.specify/shared/workflow`) copied wholesale at init like templates/scripts, retained across re-init, with a `.specify/` path-rewrite rule; remove it from the skills registry/count/symlinks and rewrite ~100 references, with a zero-`sdd-workflow`-reference acceptance gate. | Implemented | .specify/memory/features/029.md | .specify/specs/028-sdd-workflow-refactor/requirements.md | 2026-07-14 (implemented: 10 docs relocated to shared/workflow/; skills 20→19; ~38 source refs + 70 generated command files rewritten; .specify/shared installed & retained; SC-001..006 pass; pytest 104F/643P = 0 new failures vs baseline) |
 | 030 | History Command | `/speckit.history` distills the current AI tool's past conversations for the current project into a theme-aggregated knowledge base under `.specify/history/` (decisions, reusable lessons, TODOs, interaction flows, user↔model conflicts — not verbatim). Incremental via a manifest; Claude Code supported today with a pluggable `STORE_RESOLVERS` adapter for other tools. | Implemented | .specify/memory/features/030.md | - | 2026-07-14 (implemented: history-utils.py engine + collect-history.sh + templates/commands/history.md + 4 runtime command mirrors + docs/commands/history.md) |
 | 031 | Glossary Mechanism | Single project-wide glossary (`.specify/memory/glossary.md`) anchoring project vocabulary and correcting voice/dictated input (homophones,易混淆词); initialized at instruction generation, ambient to all commands via the Documentation Map, progressively enriched at checkpoints with user-confirmed conflict handling and user-authoritative manual edits. | Implemented | .specify/memory/features/031.md | .specify/specs/029-glossary-mechanism/requirements.md | 2026-07-16 (implemented: glossary-utils.py engine + glossary-template + shared/workflow/glossary.md protocol + generate-instructions init hook + Documentation Map wiring + `## Glossary` step on 4 commands & instructions seeding; 23 tests pass, 0 regressions; SC-006 deferred as post-adoption metric) |
+| 032 | Task Complexity Rubric | Embed a technology-agnostic task-complexity rubric in the generated instructions doc (`.specify/instructions.md`) mapping observable task signals → complexity tiers → prescribed thinking depth, so agents calibrate effort (avoid under-thinking complex tasks and over-thinking trivial ones) to balance efficiency and quality; delivered via `/speckit.instructions` non-destructively. | Implemented | .specify/memory/features/032.md | .specify/specs/031-task-complexity-rubric/requirements.md | 2026-07-20 (implemented: `## Task Complexity Rubric` section added to `templates/` + `.specify/templates/instructions-template.md` (byte-identical mirror); contract test `tests/contract/test_task_complexity_rubric.py` 10/10 pass (C-1…C-10); full suite 720P/106F/13E/1S = +10 passed, zero new failures vs baseline; SC-001/002/005 pass, SC-003/004 deferred post-adoption; T013 dogfood deferred to interactive `/speckit.instructions` run) |
 
 ## Feature Entry Format
 

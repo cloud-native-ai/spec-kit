@@ -1,10 +1,65 @@
 {
   "store": "feedback",
-  "updated": "2026-07-18T16:49:58Z",
+  "updated": "2026-07-20T05:39:33Z",
   "threshold": 10,
-  "count_since_submission": 8,
+  "count_since_submission": 13,
   "submitted_at": "2026-07-16T11:09:25Z",
   "entries": [
+    {
+      "id": "20260720T053933Z-speckit-implement",
+      "file": "20260720T053933Z-speckit-implement.md",
+      "unit_id": "/speckit.implement",
+      "unit_type": "command",
+      "run_id": "031-task-complexity-rubric-implement-20260720T133933",
+      "feature": "031-task-complexity-rubric",
+      "partial": false,
+      "created": "2026-07-20T05:39:33Z",
+      "summary": "Clean TDD implementation run. Red: authored tests/contract/test_task_complexity_rubric.py (10/10 fail, section absent). Green: inserted the ## Task Complexity Rubric section into templates/instruction"
+    },
+    {
+      "id": "20260720T042618Z-speckit-tasks",
+      "file": "20260720T042618Z-speckit-tasks.md",
+      "unit_id": "/speckit.tasks",
+      "unit_type": "command",
+      "run_id": "031-task-complexity-rubric-tasks-20260720T122618",
+      "feature": "031-task-complexity-rubric",
+      "partial": false,
+      "created": "2026-07-20T04:26:18Z",
+      "summary": "Clean run: Tests Mode correctly resolved ON (Principle IV Test-First/Contract-Driven), realized as Layer-1 structural assertions since the feature is template-only. Generated tasks.md with 13 tasks or"
+    },
+    {
+      "id": "20260720T041830Z-speckit-plan",
+      "file": "20260720T041830Z-speckit-plan.md",
+      "unit_id": "/speckit.plan",
+      "unit_type": "command",
+      "run_id": "031-task-complexity-rubric-plan-20260720T121830",
+      "feature": "031-task-complexity-rubric",
+      "partial": false,
+      "created": "2026-07-20T04:18:30Z",
+      "summary": "Clean run: filled plan.md in place (one top-level heading, zero residual placeholders, Requirement->Feature stamp present). Constitution Check rendered all 10 principles dynamically from constitution."
+    },
+    {
+      "id": "20260720T040646Z-speckit-clarify",
+      "file": "20260720T040646Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "031-task-complexity-rubric-clarify-20260720T120646",
+      "feature": "031-task-complexity-rubric",
+      "partial": false,
+      "created": "2026-07-20T04:06:46Z",
+      "summary": "Clean Mode-A run: taxonomy scan found a single critical gap (Feature Linkage; Related Feature was 'Need clarification'). Asked one targeted question; user chose to mint a new Feature 032 'Task Complex"
+    },
+    {
+      "id": "20260720T033644Z-speckit-requirements",
+      "file": "20260720T033644Z-speckit-requirements.md",
+      "unit_id": "/speckit.requirements",
+      "unit_type": "command",
+      "run_id": "031-task-complexity-rubric-20260720T113644",
+      "feature": "031-task-complexity-rubric",
+      "partial": false,
+      "created": "2026-07-20T03:36:44Z",
+      "summary": "Clean run of /speckit.requirements: generated the 031-task-complexity-rubric spec from a Chinese dictated description, applied a surfaced homophone correction (负责->复杂 / fuze->fuza), grounded WHAT/WHY "
+    },
     {
       "id": "20260718T164958Z-speckit-implement",
       "file": "20260718T164958Z-speckit-implement.md",

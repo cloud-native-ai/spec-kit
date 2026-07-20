@@ -51,3 +51,4 @@ node_modules/
 **/.temp-execution-*.js
 
 input/
+.qoder/sessions/
