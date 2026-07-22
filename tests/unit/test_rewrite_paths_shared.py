@@ -16,9 +16,9 @@ def test_shared_rewrite_is_guarded_against_double_prefix():
 
 
 def test_shared_rewrite_is_idempotent():
-    once = rewrite_paths("shared/workflow/tool-definitions.md")
+    once = rewrite_paths("shared/definitions/tool-definitions.md")
     twice = rewrite_paths(once)
-    assert once == twice == ".specify/shared/workflow/tool-definitions.md"
+    assert once == twice == ".specify/shared/definitions/tool-definitions.md"
 
 
 def test_shared_rewrite_alongside_existing_rules():

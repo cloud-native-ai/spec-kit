@@ -30,7 +30,7 @@ Features are classified: **functional** (user-facing) vs **non-functional** (qua
 3. **Discover future features** via gap analysis:
    - Prioritize project-intrinsic features first (what improves core value delivery)
    - For document artifacts: content quality, cross-consumer compatibility, lifecycle, authoring experience
-   - For runtime code: apply DFX Catalog from `.specify/shared/workflow/dfx-catalog.md`
+   - For runtime code: apply DFX Catalog from `.specify/shared/constants/dfx-catalog.md`
    - Avoid over-design: don't propose runtime DFX for document-only projects
    - Future features: status `Draft`, max 8–12 per run
 

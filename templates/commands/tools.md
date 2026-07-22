@@ -21,7 +21,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 
 Goal: Definition-first tool management. Create, modify, view, or invoke tools with explicit behavioral rules that override LLM built-in knowledge.
 
-For detailed tool type semantics, behavioral rules format, edge cases, and invocation preview format, see `shared/workflow/tool-definitions.md`.
+For detailed tool type semantics, behavioral rules format, edge cases, and invocation preview format, see `shared/definitions/tool-definitions.md`.
 
 ### Execution Steps
 

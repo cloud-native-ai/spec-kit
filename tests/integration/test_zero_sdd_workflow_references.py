@@ -77,23 +77,34 @@ def test_no_sdd_workflow_reference_in_source():
     assert not offenders, f"live sdd-workflow references remain in source: {sorted(offenders)}"
 
 
-# The 10 docs relocated by Feature 029 (sdd-workflow refactor). This is the gate's
-# real invariant — that the relocation happened and these remain present. The set is
-# allowed to GROW as later features add shared-workflow protocols (e.g. Feature 031
-# added glossary.md), so we assert presence of the relocated docs rather than a brittle
-# exact count (see the "hard-coded counts are fragile" lesson).
+# The docs relocated by Feature 029 (sdd-workflow refactor), grouped by shared/ type
+# subdirectory after the content-type subdivision. This is the gate's real invariant — that
+# the relocation happened and these remain present. Each set is allowed to GROW as later
+# features add shared protocols (e.g. Feature 031 added glossary.md to workflow/), so we
+# assert presence of the relocated docs rather than a brittle exact count (see the
+# "hard-coded counts are fragile" lesson).
 RELOCATED_DOCS = {
-    "agent-configuration.md", "checklist-methodology.md", "clarify-taxonomy.md",
-    "dfx-catalog.md", "feature-integration.md", "feedback-step.md",
-    "ignore-patterns.md", "requirements-guidelines.md", "tool-definitions.md",
-    "user-input-protocol.md",
+    "workflow": {
+        "agent-configuration.md", "feature-integration.md", "feedback-step.md",
+        "user-input-protocol.md",
+    },
+    "guidelines": {
+        "checklist-methodology.md", "requirements-guidelines.md",
+    },
+    "constants": {
+        "clarify-taxonomy.md", "dfx-catalog.md", "ignore-patterns.md",
+    },
+    "definitions": {
+        "tool-definitions.md",
+    },
 }
 
 
-def test_shared_workflow_directory_contains_relocated_docs():
-    shared = ROOT / "shared" / "workflow"
-    assert shared.is_dir(), "shared/workflow/ must exist"
-    docs = {p.name for p in shared.glob("*.md")}
-    missing = RELOCATED_DOCS - docs
-    assert not missing, f"relocated shared docs missing: {sorted(missing)}"
-    assert len(docs) >= len(RELOCATED_DOCS), f"unexpectedly few shared docs: {sorted(docs)}"
+def test_shared_directories_contain_relocated_docs():
+    for subdir, expected in RELOCATED_DOCS.items():
+        typed_dir = ROOT / "shared" / subdir
+        assert typed_dir.is_dir(), f"shared/{subdir}/ must exist"
+        docs = {p.name for p in typed_dir.glob("*.md")}
+        missing = expected - docs
+        assert not missing, f"relocated shared docs missing from {subdir}: {sorted(missing)}"
+        assert len(docs) >= len(expected), f"unexpectedly few shared docs in {subdir}: {sorted(docs)}"

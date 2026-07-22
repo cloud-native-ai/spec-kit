@@ -1,33 +1,45 @@
 """Contract tests: references point at the shared reference directory (Feature 029, contract C-REFS).
 
 Every reference that previously targeted ``skills/sdd-workflow/references/`` must now target the
-shared reference directory in the correct per-artefact form, with no dead links:
+shared reference directory in the correct per-artefact form, with no dead links. The shared
+directory is subdivided by content type: ``workflow/`` (process protocols), ``guidelines/``
+(methodology), ``constants/`` (enumerated catalogs), ``definitions/`` (semantics).
 
 - Command templates (``templates/commands/*.md``, ``templates/skills-template.md``) use the
-  root-relative form ``shared/workflow/<f>.md`` (install-time ``rewrite_paths`` upgrades these to
-  ``.specify/shared/workflow/<f>.md``). Where a command template intentionally hard-codes the
-  installed path, it uses ``.specify/shared/workflow/<f>.md``.
+  root-relative form ``shared/<type>/<f>.md`` (install-time ``rewrite_paths`` upgrades these to
+  ``.specify/shared/<type>/<f>.md``). Where a command template intentionally hard-codes the
+  installed path, it uses ``.specify/shared/<type>/<f>.md``.
 - Sibling skills (``skills/*/SKILL.md``) use the installed-absolute form
-  ``.specify/shared/workflow/<f>.md``.
+  ``.specify/shared/<type>/<f>.md``.
 """
 
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-# The ten relocated reference documents.
+# The relocated reference documents, grouped by shared/ type subdirectory.
 SHARED_DOCS = {
-    "agent-configuration.md",
-    "checklist-methodology.md",
-    "clarify-taxonomy.md",
-    "dfx-catalog.md",
-    "feature-integration.md",
-    "feedback-step.md",
-    "ignore-patterns.md",
-    "requirements-guidelines.md",
-    "tool-definitions.md",
-    "user-input-protocol.md",
+    "workflow": {
+        "agent-configuration.md",
+        "feature-integration.md",
+        "feedback-step.md",
+        "user-input-protocol.md",
+    },
+    "guidelines": {
+        "checklist-methodology.md",
+        "requirements-guidelines.md",
+    },
+    "constants": {
+        "clarify-taxonomy.md",
+        "dfx-catalog.md",
+        "ignore-patterns.md",
+    },
+    "definitions": {
+        "tool-definitions.md",
+    },
 }
+
+SHARED_TYPES = tuple(SHARED_DOCS)
 
 
 def _iter_files(*globs):
@@ -52,29 +64,32 @@ def test_no_skill_mentions_sdd_workflow():
 
 
 def test_skills_use_installed_absolute_shared_form():
-    """Sibling skills reference the feedback-step doc via the installed-absolute shared path."""
+    """Sibling skills reference shared docs via the installed-absolute shared path."""
+    import re
+
     offenders = []
+    bare = re.compile(r"(?<![\w./])shared/(" + "|".join(SHARED_TYPES) + r")/")
     for f in _iter_files("skills/*/SKILL.md"):
         text = f.read_text(encoding="utf-8")
-        if "shared/workflow/" in text and ".specify/shared/workflow/" not in text:
+        if bare.search(text):
             offenders.append(str(f.relative_to(ROOT)))
-    assert not offenders, f"skills must use .specify/shared/workflow/ form: {offenders}"
+    assert not offenders, f"skills must use .specify/shared/<type>/ form: {offenders}"
 
 
 def test_shared_reference_targets_resolve():
-    """Every shared/workflow/<f>.md reference resolves to an existing source document."""
+    """Every shared/<type>/<f>.md reference resolves to an existing source document."""
     import re
 
     missing = []
-    pattern = re.compile(r"shared/workflow/([a-z0-9-]+\.md)")
+    pattern = re.compile(r"shared/(" + "|".join(SHARED_TYPES) + r")/([a-z0-9-]+\.md)")
     for f in _iter_files(
         "templates/commands/*.md",
         "templates/skills-template.md",
         "skills/*/SKILL.md",
     ):
-        for name in pattern.findall(f.read_text(encoding="utf-8")):
-            if not (ROOT / "shared" / "workflow" / name).exists():
-                missing.append((str(f.relative_to(ROOT)), name))
+        for subdir, name in pattern.findall(f.read_text(encoding="utf-8")):
+            if not (ROOT / "shared" / subdir / name).exists():
+                missing.append((str(f.relative_to(ROOT)), f"{subdir}/{name}"))
     assert not missing, f"references resolve to missing shared docs: {missing}"
 
 

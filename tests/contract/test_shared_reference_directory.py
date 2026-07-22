@@ -9,25 +9,34 @@ import specify_cli
 
 ROOT = Path(__file__).resolve().parents[2]
 
-TEN_DOCS = {
-    "user-input-protocol.md",
-    "feature-integration.md",
-    "agent-configuration.md",
-    "checklist-methodology.md",
-    "requirements-guidelines.md",
-    "dfx-catalog.md",
-    "clarify-taxonomy.md",
-    "ignore-patterns.md",
-    "tool-definitions.md",
-    "feedback-step.md",
+TYPED_DOCS = {
+    "workflow": {
+        "user-input-protocol.md",
+        "feature-integration.md",
+        "agent-configuration.md",
+        "feedback-step.md",
+    },
+    "guidelines": {
+        "checklist-methodology.md",
+        "requirements-guidelines.md",
+    },
+    "constants": {
+        "clarify-taxonomy.md",
+        "dfx-catalog.md",
+        "ignore-patterns.md",
+    },
+    "definitions": {
+        "tool-definitions.md",
+    },
 }
 
 
-def test_shared_source_dir_has_ten_docs():
-    shared = ROOT / "shared" / "workflow"
-    assert shared.is_dir()
-    present = {p.name for p in shared.glob("*.md")}
-    assert TEN_DOCS.issubset(present)
+def test_shared_source_dirs_have_typed_docs():
+    for subdir, expected in TYPED_DOCS.items():
+        typed_dir = ROOT / "shared" / subdir
+        assert typed_dir.is_dir(), f"shared/{subdir}/ must exist"
+        present = {p.name for p in typed_dir.glob("*.md")}
+        assert expected.issubset(present), f"shared/{subdir}/ missing: {sorted(expected - present)}"
 
 
 def test_pyproject_force_includes_shared():

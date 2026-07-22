@@ -63,7 +63,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 
 3. **Load context**: tasks.md (REQUIRED), plan.md (REQUIRED), data-model.md, contracts/, research.md, quickstart.md (IF EXISTS).
 
-4. **Project Setup Verification**: Create/verify ignore files based on detected tech stack. For detailed patterns per technology, see `.specify/shared/workflow/ignore-patterns.md`.
+4. **Project Setup Verification**: Create/verify ignore files based on detected tech stack. For detailed patterns per technology, see `.specify/shared/constants/ignore-patterns.md`.
 
 5. **Parse tasks.md**: Extract phases, dependencies, task details (ID, description, file paths, parallel markers [P]), execution flow.
 

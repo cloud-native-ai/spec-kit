@@ -29,7 +29,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 
 Checklists are **UNIT TESTS FOR REQUIREMENTS WRITING** — they validate quality, clarity, and completeness of requirements. NOT implementation verification.
 
-For detailed methodology, examples, anti-examples, and quality dimension patterns, see `shared/workflow/checklist-methodology.md`.
+For detailed methodology, examples, anti-examples, and quality dimension patterns, see `shared/guidelines/checklist-methodology.md`.
 
 ## Execution Steps
 
@@ -55,7 +55,7 @@ For detailed methodology, examples, anti-examples, and quality dimension pattern
    - Use short descriptive filename: `[domain].md` (e.g., `ux.md`, `api.md`, `security.md`)
    - Number items sequentially from CHK001
    - Each run creates a NEW file (never overwrites existing)
-   - Apply methodology from `shared/workflow/checklist-methodology.md`:
+   - Apply methodology from `shared/guidelines/checklist-methodology.md`:
      - Group by quality dimensions (Completeness, Clarity, Consistency, Measurability, Coverage, Edge Cases, Non-Functional, Dependencies, Ambiguities)
      - Each item: question format + quality dimension bracket + traceability reference
      - ≥80% items must include traceability (`[Req §X]`, `[Gap]`, `[Ambiguity]`, etc.)

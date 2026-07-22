@@ -31,7 +31,7 @@ Goal: Detect and reduce ambiguity or missing decision points in the current phas
 
 ### Taxonomy & Coverage Scan
 
-For the active mode's detailed taxonomy categories and integration rules, load: `.specify/shared/workflow/clarify-taxonomy.md`
+For the active mode's detailed taxonomy categories and integration rules, load: `.specify/shared/constants/clarify-taxonomy.md`
 
 Each mode has its own taxonomy. For each category, mark status (Clear / Partial / Missing). Add candidate questions for Partial/Missing categories unless clarification would not materially change implementation.
 

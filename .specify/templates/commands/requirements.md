@@ -56,7 +56,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 
 6. **Write spec** to SPEC_FILE. Preserve section order. Keep `Related Feature` with default "Need clarification" values.
 
-7. **Quality Validation**: Follow the validation process in `shared/workflow/requirements-guidelines.md`:
+7. **Quality Validation**: Follow the validation process in `shared/guidelines/requirements-guidelines.md`:
    - Create checklist at `FEATURE_DIR/checklists/requirements.md`
    - Validate spec against each item
    - Handle failures (max 3 iterations) and remaining clarifications (max 3 questions with table format)
@@ -70,7 +70,7 @@ Apply [Feature Integration Protocol](shared/workflow/feature-integration.md) § 
 
 ## Guidelines
 
-For detailed quality validation, success criteria guidelines, and AI generation best practices, see `shared/workflow/requirements-guidelines.md`.
+For detailed quality validation, success criteria guidelines, and AI generation best practices, see `shared/guidelines/requirements-guidelines.md`.
 
 Key rules:
 - Focus on WHAT and WHY, not HOW
