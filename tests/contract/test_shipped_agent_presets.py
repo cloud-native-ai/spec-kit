@@ -14,7 +14,7 @@ SHIPPED_AGENTS_DIR = Path(__file__).resolve().parents[2] / "agents"
 PRESET_ROLES = [
     "requirements-analyst",
     "ux-analyst",
-    "system-designer",
+    "system-designer",  
     "module-designer",
     "test-engineer",
     "qa-engineer",

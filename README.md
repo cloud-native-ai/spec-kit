@@ -71,19 +71,30 @@ Unlike the traditional approach of "write code first, treat specs as reference o
 - **Review Command**: Review implementation against rules. (Status: Completed)
 - **Skills Command**: Manage extensible skills/tools. (Status: Implemented)
 - **Tasks Command**: Break down plans into atomic tasks. (Status: Completed)
+- **Tools Command**: Definition-first tool management with explicit behavioral rules. (Status: Implemented)
 - **Agents Command**: Create or refine custom AI agents (.agent.md) for workspace-specific workflows. (Status: Implemented)
 - **Qoder Support**: Add Qoder as a supported CLI assistant across initialization, validation, documentation, and release distribution. (Status: Implemented)
 - **Claude Code Support**: Add Claude Code as a first-class assistant with custom commands and Claude Code-specific configuration assets. (Status: Implemented)
 - **AI Tools Support**: Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files. (Status: Implemented)
+- **Todo Command**: Discover marked TODO blocks in text files and turn them into reviewable execution plans. (Status: Implemented)
+- **Team Management**: Multi-agent team configuration via `/speckit.team` (create/modify/run). (Status: Implemented)
+- **History Command**: Distill past AI tool conversations into a theme-aggregated knowledge base. (Status: Implemented)
 
 ### Non-functional Features
 
 - **CLI Interface**: Rich terminal interface using Typer. (Status: Completed)
-- **Tools Command**: Definition-first tool management with explicit behavioral rules. (Status: Planned)
 - **Template Engine**: Markdown-based template system. (Status: Completed)
 - **Configuration Management**: Project configuration via pyproject.toml. (Status: Completed)
 - **Prompt Template Quality**: Structural validation and consistency enforcement across all command and skill templates. (Status: Draft)
 - **Specification Workspace Versioning**: Version management and migration support for .specify/ workspace across CLI releases. (Status: Draft)
+- **Agent Skill Enablement**: Empower role agents to prefer installed framework skills for role-relevant operations. (Status: Implemented)
+- **Feedback Mechanism**: Distributed feedback layer with threshold-triggered consolidated submission prompt. (Status: Implemented)
+- **Shared Reference Directory**: Shared workflow docs as a first-class reference directory installed at init. (Status: Implemented)
+- **Glossary Mechanism**: Project-wide glossary anchoring vocabulary and correcting voice/dictated input. (Status: Implemented)
+- **Task Complexity Rubric**: Task-complexity rubric in generated instructions for effort calibration. (Status: Implemented)
+- **Agent Project Context Parameterization**: Per-project rendering of agent Project Context sections at init/refresh. (Status: Draft)
+- **CI/CD Pipeline**: Automated testing, building, and publishing via GitHub Actions workflows. (Status: Draft)
+- **Code Quality Tooling**: Python linting, formatting, and type checking configuration. (Status: Draft)
 
 ## 📦 Installation
 

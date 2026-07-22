@@ -56,7 +56,7 @@ When `/speckit.requirements` creates a new spec:
 
 2. **Bind or Create**:
    - If matching Feature found → bind to that Feature ID, do NOT create new
-   - If NO match → create new Feature from `.specify/templates/feature-template.md`, add row to index
+   - If NO match → create new Feature from `.specify/templates/feature-details-template.md`, add row to index
 
 3. **Integration responsibilities**:
    - Ensure corresponding Feature entry exists

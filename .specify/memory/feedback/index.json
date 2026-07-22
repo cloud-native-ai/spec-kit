@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-07-20T05:39:33Z",
+  "updated": "2026-07-22T07:26:06Z",
   "threshold": 10,
-  "count_since_submission": 13,
-  "submitted_at": "2026-07-16T11:09:25Z",
+  "count_since_submission": 0,
+  "submitted_at": "2026-07-22T07:26:06Z",
   "entries": [
+    {
+      "id": "20260722T065659Z-speckit-instructions",
+      "file": "20260722T065659Z-speckit-instructions.md",
+      "unit_id": "/speckit.instructions",
+      "unit_type": "command",
+      "run_id": "2026-07-22-speckit-instructions-dogfood",
+      "feature": "008",
+      "partial": false,
+      "created": "2026-07-22T06:56:59Z",
+      "summary": "Full reconcile of .specify/instructions.md after feature registry expanded to 35 features. Stale facts (feature count, root path, missing docs, skill inventory, Task Complexity Rubric scaffolding) wer"
+    },
     {
       "id": "20260720T053933Z-speckit-implement",
       "file": "20260720T053933Z-speckit-implement.md",

@@ -66,7 +66,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 
 ## Feature Integration
 
-Apply [Feature Integration Protocol](shared/workflow/feature-integration.md) § Feature Binding Rules. This command binds specs to features (many-specs to one-feature). See the protocol for lookup rules and integration responsibilities.
+Apply [Feature Integration Protocol](shared/workflow/feature-integration.md) § Feature Binding Rules for lookup rules and integration responsibilities. **Binding timing**: this command does NOT create or bind Features itself — it always initializes `Related Feature` with `Need clarification` values (Outline steps 3/6) and defers the actual Feature lookup/creation/binding to the `/speckit.clarify` checkpoint, where the Binding Rules are applied.
 
 ## Guidelines
 

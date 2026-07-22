@@ -16,8 +16,8 @@
 #              /svg/{enc} or /png/{enc}. Preferred when reachable.
 #   • local  — a local PlantUML jar (PLANTUML_JAR or a well-known path) via `java`.
 #             Works fully offline. Required diagram types that need Graphviz
-#             (class/component/deployment/sequence/state/usecase/activity/package)
-#             still need `dot` on PATH; WBS/Gantt/MindMap/JSON/YAML do not.
+#             (class/component/deployment/sequence/state/usecase/activity/package/ER)
+#             still need `dot` on PATH; WBS/Gantt/MindMap/JSON/YAML/Salt do not.
 # Backend selection: PLANTUML_BACKEND=server|local|auto (default auto).
 #   auto → probe the server; on failure fall back to the local jar if present.
 #

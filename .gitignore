@@ -52,3 +52,5 @@ node_modules/
 
 input/
 .qoder/sessions/
+.specify/tools/*.json
+.specify/instructions.md-*

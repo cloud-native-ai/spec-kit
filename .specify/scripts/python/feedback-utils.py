@@ -17,6 +17,14 @@ An entry's ``unit_id`` must name a Spec Kit command or skill
 (``/speckit.<command>`` | ``skill:<name>``); ``record`` rejects any other id.
 Each entry is local-scoped (``scope: local``) and stays strictly distinct from
 the global ``/speckit.review`` report.
+
+Positioning: feedback targets the Spec Kit framework itself (templates,
+commands, skills, scripts, docs) — never the LLM, agent CLI, harness, or the
+user's project code. Entries are user data: recording and processing are fully
+optional and ignorable. This engine performs **no network operations of any
+kind**; ``package`` only produces a local zip that the user may send manually,
+and ``mark-submitted`` merely resets the local counter ("user confirmed
+disposition", NOT "uploaded").
 """
 from __future__ import annotations
 
@@ -25,15 +33,18 @@ import json
 import os
 import re
 import sys
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 FEEDBACK_SUBDIR = Path(".specify") / "memory" / "feedback"
+PACKAGES_DIRNAME = "packages"
 INDEX_NAME = "index.json"
 STORE_NAME = "feedback"
 DEFAULT_THRESHOLD = 10
 NO_OP_POINT = "No significant optimization points identified this run."
+DIST_NAME = "specify-cli"
 
 # A unit id is valid only when it names a Spec Kit command or skill.
 _UNIT_ID_RE = re.compile(r"^(?:/speckit\.[a-z0-9._-]+|skill:[a-z0-9._-]+)$")
@@ -367,6 +378,10 @@ def action_list(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 def action_mark_submitted(args: argparse.Namespace) -> Dict[str, Any]:
+    """Reset the local counter after the user confirms disposition.
+
+    This is purely local bookkeeping — it does NOT upload or transmit anything.
+    """
     workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
     index = load_index(workspace_root)
     reset_from = index.get("count_since_submission", 0)
@@ -395,6 +410,8 @@ def action_reindex(args: argparse.Namespace) -> Dict[str, Any]:
     index = empty_index()
     index["threshold"] = threshold
     index["submitted_at"] = submitted_at
+    if prior.get("upstream_repo"):
+        index["upstream_repo"] = prior["upstream_repo"]
     index["entries"] = entries
     index["count_since_submission"] = count_since_submission(entries, submitted_at)
     save_index(workspace_root, index)
@@ -402,9 +419,179 @@ def action_reindex(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 # --------------------------------------------------------------------------- #
+# Upstream detection / packaging (no network operations — red line)
+# --------------------------------------------------------------------------- #
+def _speckit_version() -> str:
+    try:
+        from importlib import metadata
+        return metadata.version(DIST_NAME)
+    except Exception:
+        return "unknown"
+
+
+def detect_upstream(index: Dict[str, Any]) -> Dict[str, Any]:
+    """Resolve the upstream repo URL for manual feedback delivery.
+
+    Priority: user-configured ``upstream_repo`` in index.json > PEP 610
+    ``direct_url.json`` install metadata (records the git URL the custom
+    spec-kit build was installed from) > none (user must ``--set``).
+    Detection only reads local files; it never touches the network.
+    """
+    configured = (index.get("upstream_repo") or "").strip()
+    if configured:
+        return {"url": configured, "source": "configured", "commit": None}
+    try:
+        from importlib import metadata
+        raw = metadata.distribution(DIST_NAME).read_text("direct_url.json")
+        if raw:
+            data = json.loads(raw)
+            url = (data.get("url") or "").strip()
+            vcs = data.get("vcs_info") or {}
+            if url and vcs.get("vcs") == "git":
+                return {
+                    "url": url,
+                    "source": "install-metadata",
+                    "commit": vcs.get("commit_id"),
+                }
+    except Exception:
+        pass
+    return {"url": None, "source": None, "commit": None}
+
+
+def _send_guidance(upstream: Dict[str, Any]) -> List[str]:
+    url = upstream.get("url")
+    if not url:
+        return [
+            "Upstream repo unknown — set it once via: "
+            "--action upstream --set <repo-url>",
+            "Then send the zip manually (issue attachment or MR); "
+            "this engine never sends anything itself.",
+        ]
+    host_kind = "GitHub" if "github" in url.lower() else "GitLab"
+    if host_kind == "GitHub":
+        how = "open an issue on the upstream repo and attach the zip"
+    else:
+        how = ("open an issue and attach the zip, or submit an MR adding it "
+               "under the repo's feedback intake directory")
+    return [
+        f"Send the zip manually to the upstream repo ({host_kind}): {url}",
+        f"Suggested: {how}.",
+        "Sending is entirely manual and optional — this engine performs no "
+        "network operations.",
+    ]
+
+
+def action_upstream(args: argparse.Namespace) -> Dict[str, Any]:
+    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    index = load_index(workspace_root)
+    set_url = (args.set_url or "").strip()
+    if set_url:
+        index["upstream_repo"] = set_url
+        save_index(workspace_root, index)
+    return detect_upstream(index)
+
+
+def action_package(args: argparse.Namespace) -> Dict[str, Any]:
+    """Zip pending entries for manual delivery. Source files are never touched."""
+    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    index = load_index(workspace_root)
+    submitted_at = index.get("submitted_at")
+    entries = index.get("entries", [])
+    if not args.all and submitted_at:
+        selected = [e for e in entries if str(e.get("created", "")) > submitted_at]
+    else:
+        selected = list(entries)
+    selected.sort(key=lambda e: e.get("created", ""))
+
+    upstream = detect_upstream(index)
+    if not selected:
+        return {
+            "packaged": 0,
+            "zip": None,
+            "upstream": upstream,
+            "note": "No feedback entries to package.",
+        }
+
+    store_dir = feedback_dir(workspace_root)
+    packages_dir = store_dir / PACKAGES_DIRNAME
+    packages_dir.mkdir(parents=True, exist_ok=True)
+    zip_name = f"feedback-{timestamp_id()}.zip"
+    zip_path = packages_dir / zip_name
+    counter = 1
+    while zip_path.exists():
+        zip_path = packages_dir / f"feedback-{timestamp_id()}-{counter}.zip"
+        counter += 1
+
+    manifest_lines = [
+        "# Feedback Package Manifest",
+        "",
+        "> This feedback targets the Spec Kit framework itself (templates, "
+        "commands, skills, scripts, docs) — not the LLM, agent CLI, harness, "
+        "or any user project code.",
+        "",
+        f"- **Generated**: {now_iso()}",
+        f"- **Entries**: {len(selected)}",
+        f"- **Time range**: {selected[0].get('created', '-')} → "
+        f"{selected[-1].get('created', '-')}",
+        f"- **spec-kit version**: {_speckit_version()}",
+        f"- **Install source**: {upstream.get('url') or 'unknown'}"
+        + (f" @ {upstream['commit']}" if upstream.get("commit") else ""),
+        "",
+        "| Created | Unit | Partial | Summary |",
+        "|---------|------|---------|---------|",
+    ]
+    missing: List[str] = []
+    packaged: List[str] = []
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for entry in selected:
+            src = store_dir / entry["file"]
+            if not src.exists():
+                missing.append(entry["file"])
+                continue
+            zf.write(src, arcname=entry["file"])  # read-only: sources untouched
+            packaged.append(entry["file"])
+            summary = str(entry.get("summary", "")).replace("|", "\\|")[:120]
+            manifest_lines.append(
+                f"| {entry.get('created', '-')} | {entry.get('unit_id', '?')} "
+                f"| {entry.get('partial', False)} | {summary} |"
+            )
+        zf.writestr("MANIFEST.md", "\n".join(manifest_lines) + "\n")
+
+    rel_zip = zip_path.relative_to(workspace_root).as_posix()
+    return {
+        "packaged": len(packaged),
+        "zip": rel_zip,
+        "missing": missing,
+        "upstream": upstream,
+        "next_steps": _send_guidance(upstream)
+        + ["After you have dealt with the batch (sent or deliberately ignored), "
+           "reset the local counter: --action mark-submitted"],
+    }
+
+
+# --------------------------------------------------------------------------- #
 # Rendering / CLI
 # --------------------------------------------------------------------------- #
 def render_text(action: str, payload: Dict[str, Any]) -> str:
+    if action == "package":
+        if not payload.get("zip"):
+            return payload.get("note", "Nothing to package.")
+        lines = [
+            f"Packaged {payload['packaged']} feedback entr"
+            f"{'y' if payload['packaged'] == 1 else 'ies'} (sources untouched):",
+            f"  zip: {payload['zip']}",
+        ]
+        if payload.get("missing"):
+            lines.append(f"  missing entry files skipped: {payload['missing']}")
+        lines.extend(f"  {step}" for step in payload.get("next_steps", []))
+        return "\n".join(lines)
+    if action == "upstream":
+        url = payload.get("url")
+        if not url:
+            return ("Upstream repo: unknown — configure once via "
+                    "--action upstream --set <repo-url>")
+        commit = f" @ {payload['commit']}" if payload.get("commit") else ""
+        return f"Upstream repo ({payload.get('source')}): {url}{commit}"
     if action == "list":
         matches = payload.get("matches", [])
         if not matches:
@@ -429,7 +616,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--action",
         required=True,
-        choices=["record", "status", "list", "mark-submitted", "reindex"],
+        choices=["record", "status", "list", "mark-submitted", "reindex",
+                 "package", "upstream"],
     )
     parser.add_argument("--workspace-root", default=None)
     parser.add_argument("--unit-id", default=None)
@@ -444,6 +632,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--threshold", type=int, default=None)
     parser.add_argument("--since", default=None)
     parser.add_argument("--limit", type=int, default=5)
+    parser.add_argument("--all", action="store_true",
+                        help="package: include entries from before the last "
+                             "mark-submitted as well")
+    parser.add_argument("--set", dest="set_url", default=None,
+                        help="upstream: persist the upstream repo URL")
     parser.add_argument("--format", choices=["text", "json"], default="text")
     return parser
 
@@ -454,6 +647,8 @@ _ACTIONS = {
     "list": action_list,
     "mark-submitted": action_mark_submitted,
     "reindex": action_reindex,
+    "package": action_package,
+    "upstream": action_upstream,
 }
 
 

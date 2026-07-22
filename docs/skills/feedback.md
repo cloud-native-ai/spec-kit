@@ -66,8 +66,10 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 | `record` | Write one entry; idempotent per `(unit_id, run_id)`; increments the count on a new entry. |
 | `status` | Read counters; `should_prompt = count_since_submission >= threshold`. |
 | `list` | List recent entries (filters: `--unit-id`, `--unit-type`, `--since`, `--limit`). |
-| `mark-submitted` | Reset `count_since_submission` to 0 and stamp `submitted_at` (entries are kept). |
-| `reindex` | Rebuild `index.json` from entry files; preserves `submitted_at`. |
+| `mark-submitted` | Reset `count_since_submission` to 0 and stamp `submitted_at` (entries are kept). Local bookkeeping only — NOT an upload. |
+| `reindex` | Rebuild `index.json` from entry files; preserves `submitted_at` and `upstream_repo`. |
+| `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. |
+| `upstream` | Show (or `--set`) the upstream repo URL used for manual delivery guidance. |
 
 - `--unit-id` must match `^(?:/speckit\.[a-z0-9._-]+|skill:[a-z0-9._-]+)$` (else exit code 2).
 - A `record` with an empty `--review` or empty `--points` exits with code 2.
@@ -87,6 +89,57 @@ resets the counter. Below threshold, no prompt appears.
   record their own scope but never double-count the same unit+run.
 - **Partial runs**: an aborted/failed run either records nothing or records with
   `--partial`; the `## Review` then begins with `**Partial run** — `.
+
+## Positioning & Red Lines
+
+Four facts govern the whole mechanism (canonical statement in
+`.specify/shared/workflow/feedback-step.md` § *Positioning & Red Lines*):
+
+1. **Target = the Spec Kit framework itself** (templates, commands, skills, scripts, docs)
+   — never the LLM, the agent CLI/harness, or the user's project code.
+2. **User data, fully optional** — the user may ignore the prompt, leave entries
+   unprocessed forever, or delete the store; nothing blocks or nags because of it.
+3. **Zero automated transmission** — the engine performs no network operations; the only
+   transmission paths are the user manually sending a packaged zip or the user committing
+   feedback files to their own git repo. `mark-submitted` is local bookkeeping.
+4. **Local workaround value** — before a Spec Kit update lands, past entries document how a
+   recurring issue was worked around.
+
+## Processing side: package → manual send
+
+When `count_since_submission >= threshold`, the consolidated prompt offers three choices:
+**package** / **skip this time** / **stop prompting** (raise the threshold). Packaging is
+the processing path:
+
+```bash
+python3 .specify/scripts/python/feedback-utils.py --action package
+```
+
+- Zips all pending entries (those recorded after the last `submitted_at`; `--all` for the
+  full store) into `.specify/memory/feedback/packages/feedback-<ts>.zip`, plus a
+  `MANIFEST.md` (entry list, time range, spec-kit version, install source). **Source
+  entry files are never modified.**
+- Prints the detected **upstream repo** and manual-send guidance. Detection priority:
+  the user-configured `upstream_repo` in `index.json` > PEP 610 install metadata
+  (`direct_url.json`, i.e. the git URL this custom spec-kit build was installed from) >
+  none (then run `--action upstream --set <repo-url>` once). GitHub → attach the zip to
+  an issue; GitLab → issue attachment or an MR to the feedback intake directory.
+- The agent **never sends the zip** — delivery is entirely the user's manual action.
+  After the batch is dealt with (sent or deliberately discarded), run `mark-submitted`.
+
+The `packages/` directory is not git-ignored: like the entries, a zip is user data, and
+whether to commit it is the user's call.
+
+## Workaround lookup
+
+Hit a recurring problem before a fix ships? Check whether an earlier run recorded a
+workaround:
+
+```bash
+python3 .specify/scripts/python/feedback-utils.py --action list --unit-id "/speckit.plan"
+```
+
+Read-only; never gates execution.
 
 ## Distinction from `/speckit.review`
 

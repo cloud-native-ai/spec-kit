@@ -25,3 +25,6 @@
 | Spec Kit | speckit, spec-kit, speck it | The SDD CLI toolkit distributed as specify-cli | user | confirmed |
 | SDD | - | Spec-Driven Development: specifications drive implementation | user | confirmed |
 | Constitution | - | Project governance principles at .specify/memory/constitution.md | auto | proposed |
+| Feature Index | - | Single source of truth for project capabilities at .specify/memory/features.md | auto | proposed |
+| Reconcile Engine | - | Diff-and-converge engine used by Spec Kit commands to align artifacts with desired state | auto | proposed |
+| Task Complexity Rubric | - | Tiered effort-calibration framework embedded in .specify/instructions.md | auto | proposed |

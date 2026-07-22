@@ -5,6 +5,24 @@ truth for the `## Feedback` step that every qualifying unit embeds. Skills embed
 as their final workflow section; the 13 **complex** command templates embed it at
 their wrap-up / Git-commit-prompt stage. Simple commands MUST NOT embed it.
 
+## Positioning & Red Lines
+
+These four facts govern every part of the mechanism and outrank any embedded wording:
+
+1. **Target = the Spec Kit framework itself.** Feedback describes friction in Spec Kit's
+   templates, commands, skills, scripts, and docs — never an assessment of the LLM, the
+   agent CLI/harness, or the user's project code.
+2. **Feedback is user data and fully optional.** The user may ignore the threshold
+   prompt, leave entries unprocessed forever, or delete the store. No flow may block,
+   nag repeatedly, or degrade because feedback was not handled.
+3. **Zero automated transmission.** Neither the engine nor any embedding unit may
+   upload, push, or otherwise send feedback anywhere. The only legitimate transmission
+   paths are (a) the user manually sending a packaged zip, and (b) the user committing
+   feedback files to their own git repository. `mark-submitted` is local bookkeeping
+   ("user confirmed disposition"), not an upload.
+4. **Local workaround value.** Until a Spec Kit version update lands, past entries are a
+   reference for working around recurring issues — see *Workaround lookup* below.
+
 Do not diverge per surface — copy the canonical block below verbatim (adjusting only
 the `<unit-id>` / `<unit-type>` placeholders for the embedding unit).
 
@@ -43,6 +61,9 @@ content from the user.
    (or run `--action status`). When it is `true`, surface a **single** consolidated
    notification inviting the user to submit collected feedback to the Spec Kit developers;
    on user confirmation run `--action mark-submitted`. Below threshold, do NOT prompt.
+   The detailed prompt semantics (package → manual send → mark-submitted, plus the
+   skip / silence options) live in the canonical protocol:
+   `.specify/shared/workflow/feedback-step.md` § *Threshold prompt protocol*.
 
 **Abort / partial-run rule.** If the run failed or was interrupted before wrap-up, either
 skip recording OR record with `--partial` and a `## Review` that begins with
@@ -52,6 +73,45 @@ skip recording OR record with `--partial` and a `## Review` that begins with
 qualifying unit records feedback for **its own** scope only, keyed by its own
 `(unit_id, run_id)`. The same unit+run MUST NOT be recorded twice.
 ```
+
+---
+
+## Threshold prompt protocol (canonical semantics for step 6)
+
+When `should_prompt` is `true`, surface **one** prompt offering exactly three choices
+(embedded copies that still say only "invite the user to submit" defer to this section):
+
+1. **Package for manual delivery** — run:
+   ```bash
+   python3 .specify/scripts/python/feedback-utils.py --action package
+   ```
+   The engine zips all pending entries into `.specify/memory/feedback/packages/`
+   (**source files untouched**, no network access), and prints the zip path, the
+   detected upstream repo (user-configured `upstream_repo` > PEP 610 install metadata
+   `direct_url.json` — the custom spec-kit's GitHub/GitLab origin), and manual send
+   guidance (GitHub: issue attachment; GitLab: issue attachment or MR to the feedback
+   intake directory). **The agent never sends the zip itself.** After the user confirms
+   the batch is dealt with (sent — or deliberately discarded), run
+   `--action mark-submitted` to reset the local counter.
+2. **Skip this time** — do nothing; the prompt will naturally reappear only after more
+   entries accumulate.
+3. **Stop prompting** — raise the threshold (`--threshold <N>` or
+   `SPECKIT_FEEDBACK_THRESHOLD`); feedback keeps recording but stops prompting.
+
+If the upstream repo cannot be detected, show
+`--action upstream --set <repo-url>` as a one-time setup step instead of guessing.
+
+## Workaround lookup (local value of the store)
+
+When a command or skill misbehaves and a Spec Kit update is not yet available, check
+whether earlier runs already hit — and worked around — the same issue:
+
+```bash
+python3 .specify/scripts/python/feedback-utils.py --action list --unit-id "<skill:NAME | /speckit.COMMAND>"
+```
+
+Entries' `## Review` / `## Optimization Points` often name the concrete obstacle and the
+workaround applied. This is a read-only aid — it never gates execution.
 
 ---
 

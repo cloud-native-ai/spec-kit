@@ -1,6 +1,6 @@
 # PlantUML 架构图语法参考
 
-绘制架构图的快速参考。覆盖全部 7 种图表类型：组件图、部署图、时序图、类图/包图、用例图、活动图和状态机图。
+绘制架构图的快速参考。覆盖 8 种 UML 图表类型（类图、包图、组件图、部署图、时序图、用例图、活动图、状态机图），以及 7 种专项图（WBS、甘特图、思维导图、JSON、YAML、Salt、ER）。
 
 ## 通用规则
 
@@ -533,9 +533,9 @@ skinparam ArrowColor #555555
 @enduml
 ```
 
-## 8. 专项图表（WBS / 甘特图 / 思维导图 / JSON / YAML）
+## 8. 专项图表（WBS / 甘特图 / 思维导图 / JSON / YAML / Salt）与 ER 图
 
-以下 5 种为**非 UML** 专项图，各自用独立的 `@start.../@end...` 包裹，**不用** `skinparam`，靠原生配色与各自的 `<style>` 块控制外观。此处为紧凑速查，完整说明见 [howto/](../howto/) 13~17。
+以下 6 种为**非 UML** 专项图（§8.1~§8.6），各自用独立的 `@start.../@end...` 包裹，**不用** `skinparam`，靠原生配色与各自的 `<style>` 块控制外观。§8.7 的 ER 图例外：它用 `@startuml` + `entity` 语法，走 UML skinparam 规范。此处为紧凑速查，完整说明见 [howto/](../howto/) 13~19。
 
 ### 8.1 WBS（工作分解结构）
 
@@ -650,6 +650,44 @@ spec:
 @endyaml
 ```
 
+### 8.6 Salt（UI 线框图）
+
+`@startsalt ... @endsalt`，无需 Graphviz，渲染脚本按专项图保留原生线框外观。根面板 `{ ... }`；换行 = 行，`|` = 列（表单对齐核心）；`{` 后紧跟网格线修饰符 `#`（全部线）/`!`（竖线）/`-`（横线）/`+`（仅外框）。控件：按钮 `[文字]`、输入框 `"文字"`、复选 `[X]`/`[]`、单选 `(X)`/`()`、下拉 `^文字^`；容器：分组框 `{^"标题"`、树 `{T`（仅 `+` 层级）、表 `{#`（`.` 空单元格，首行 `<b>` 作表头）、菜单 `{*`、页签 `{/`；分隔线 `..`/`==`/`~~`/`--`；图标 `<&图标名>`。
+
+```plantuml
+@startsalt
+{^"用户登录"
+  用户名 | "admin          "
+  密码   | "****           "
+  [X] 记住登录状态
+  --
+  [取消] | [    登 录    ]
+}
+@endsalt
+```
+
+### 8.7 ER 图（实体关系图）
+
+`@startuml ... @enduml` + `entity` 语法，**走 UML skinparam 规范**（需 Graphviz）。`entity { ... }` 内用 `--` 分隔主键区与普通属性区，`*` 前缀 = 必填；乌鸦脚基数：`|` 一、`o` 零、`}` 多，组合为 `||`（恰好一）、`o|`（零或一）、`}|`（一或多）、`}o`（零或多）；实线 `--` 标识性关系、虚线 `..` 非标识性；可嵌方向 `-down-`。
+
+```plantuml
+@startuml
+hide circle
+entity "user 用户" as user {
+  * id : BIGINT <<PK>>
+  --
+  * username : VARCHAR(64)
+}
+entity "order 订单" as order {
+  * id : BIGINT <<PK>>
+  --
+  * user_id : BIGINT <<FK>>
+  * status : VARCHAR(16)
+}
+user ||--o{ order : 下单
+@enduml
+```
+
 ## 按图表类型的快速语法参考
 
 | 图表 | 关键元素 | 关系语法 |
@@ -666,6 +704,8 @@ spec:
 | **思维导图** | `@startmindmap`, `*`/`+`/`-` 深度与方向, `left side`, `[#色]`, `<<类名>>` | `_` 去框, `**:...;` 多行（见 [howto/15](../howto/15-mindmap-diagram.md)） |
 | **JSON 图** | `@startjson` + 合法 JSON, `#highlight "键"`, `<style> jsonDiagram` | 路径 `"键" / "0" / "子键"`（见 [howto/16](../howto/16-json-diagram.md)） |
 | **YAML 图** | `@startyaml` + YAML, `# highlight "键"`, `<style> yamlDiagram` | 路径 `"父" / "子"`, 只命中键（见 [howto/17](../howto/17-yaml-diagram.md)） |
+| **Salt 线框图** | `@startsalt`, `{ }` 面板, `[按钮]` `"输入"` `[X]` `(X)` `^下拉^` | `|` 分列, `{^"标题"` 分组, `{T`/`{#`/`{*`/`{/`（见 [howto/19](../howto/19-salt-diagram.md)） |
+| **ER 图** | `@startuml` + `entity { }`, `--` 分主键区, `*` 必填 | `||--o{` 乌鸦脚基数, `..` 非标识性（见 [howto/18](../howto/18-er-diagram.md)） |
 
 ## 常见模式
 

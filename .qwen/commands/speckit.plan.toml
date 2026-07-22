@@ -138,7 +138,7 @@ This integration ensures that all feature planning activities are properly track
    - Use standard REST/GraphQL patterns
    - Output OpenAPI/GraphQL schema to `/contracts/`
 
-**Output**: data-model.md, /contracts/*, quickstart.md file
+**Output**: data-model.md, /contracts/*, quickstart.md, feature-ref.md (records the bound Feature ID/name and how this plan maps to it — see the plan template's Project Structure)
 
 ### Post-Generation Quality Gate: Contract Artifact Cleanup
 

@@ -141,15 +141,18 @@ skinparam actorStyle awesome
 
 ## 八、专项图表的样式（非 UML）
 
-WBS、甘特图、思维导图、JSON、YAML 这 5 种专项图**不是** UML 图，**不适用**本文前七节的单色 `skinparam` 规范：它们不接受 `skinparam monochrome true`、`skinparam dpi/scale` 等通用配置，而是使用**原生配色** + 各自的 `<style>` 块 + 内联着色指令。
+WBS、甘特图、思维导图、JSON、YAML、Salt 这 6 种专项图**不是** UML 图，**不适用**本文前七节的单色 `skinparam` 规范：它们不接受 `skinparam monochrome true`、`skinparam dpi/scale` 等通用配置，而是使用**原生配色** + 各自的 `<style>` 块 + 内联着色指令。
 
-- **不要注入单色 skinparam**：这些图靠颜色传达状态/分类/高亮，强制单色会丢失信息。渲染脚本 [render-plantuml.sh](../../scripts/render-plantuml.sh) 已对 `@startwbs` / `@startgantt` / `@startmindmap` / `@startjson` / `@startyaml` **自动跳过单色处理**，保留原生配色，无需手动干预。
+> **例外：ER 图走 UML 规范。** ER 实体关系图虽被官方归为非 UML，但用 `@startuml` + `entity` 语法、走 Graphviz 布局，**适用**本文前七节的单色 skinparam 规范（可叠加 `hide circle`、`skinparam entity { ... }`），见 [howto/18-er-diagram.md](../howto/18-er-diagram.md)。
+
+- **不要注入单色 skinparam**：这些图靠颜色传达状态/分类/高亮，强制单色会丢失信息。渲染脚本 [render-plantuml.sh](../../scripts/render-plantuml.sh) 已对 `@startwbs` / `@startgantt` / `@startmindmap` / `@startjson` / `@startyaml` / `@startsalt` **自动跳过单色处理**，保留原生配色，无需手动干预。
 - **各图的样式载体**：
   - **WBS** → `<style> wbsDiagram { ... }` + 内联 `[#色]` + `<<类名>>`
   - **思维导图** → `<style> mindmapDiagram { ... }` + 内联 `[#色]` + `<<类名>>`
   - **甘特图** → 内联 `is colored in 前景/边框`、`today ... is colored in #色`、`YYYY-MM-DD is colored in 色`（甘特图**无** `<style>` 作用域）
   - **JSON** → `<style> jsonDiagram { node / arrow / highlight }` + `#highlight ... <<类名>>`
   - **YAML** → `<style> yamlDiagram { node / arrow / highlight }` + `# highlight ... <<类名>>`
+  - **Salt** → 无 `<style>` 作用域，保持原生线框外观（渲染脚本仅注入字体与缩放参数），见 [howto/19-salt-diagram.md](../howto/19-salt-diagram.md)
 - **配色原则同 UML**：颜色服务于信息（状态/分类/重点），全图控制在 3~4 种以内，浅背景 + 深文字保证对比度，中文务必设 `FontName "Noto Sans SC"`（JSON/YAML）避免方块字。
 
 ### WBS `<style>` 示例
@@ -203,7 +206,7 @@ yamlDiagram {
 </style>
 ```
 
-> 完整语法与逐项说明见 [syntax-reference.md](./syntax-reference.md) §8 及 [howto/](../howto/) 13~17。
+> 完整语法与逐项说明见 [syntax-reference.md](./syntax-reference.md) §8 及 [howto/](../howto/) 13~19。
 
 ## 扩展阅读
 

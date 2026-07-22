@@ -3,13 +3,16 @@ name: draw-plantuml
 description: |
   Draw system architecture diagrams with PlantUML, render to SVG/PNG via PlantUML server, and output as HTML with rendered images.
   Use standard UML semantics (Component, Deployment, Sequence, Class/Package) to describe system architecture.
-  Also supports five non-UML specialty diagrams: WBS (工作分解结构), Gantt (甘特图), MindMap (思维导图), JSON 数据可视化, YAML 显示效果图.
+  Also supports six non-UML specialty diagrams with native @start tags: WBS (工作分解结构), Gantt (甘特图), MindMap (思维导图), JSON 数据可视化, YAML 显示效果图, Salt UI 线框图;
+  plus ER 实体关系图 (@startuml + entity, crow's foot) for database design.
   Use when the user mentions "架构图", "architecture diagram", "UML图", "plantuml", "系统架构图", "画架构", "设计图", "组件图", "部署图", "时序图", "类图", "包图", "系统设计",
   "流程图", "状态图", "活动图", "用例图", "状态机图", "模块图", "交互图",
   "sequence diagram", "class diagram", "component diagram", "deployment diagram",
   "activity diagram", "state diagram", "use case diagram", "package diagram",
   "工作分解结构", "WBS", "甘特图", "gantt", "项目计划图", "进度图", "思维导图", "mindmap", "脑图",
   "JSON可视化", "JSON数据图", "json diagram", "YAML可视化", "YAML显示", "yaml diagram", "配置可视化", "数据结构图",
+  "ER图", "实体关系图", "数据库设计", "数据建模", "表结构", "ERD", "entity relationship", "crow's foot",
+  "UI原型", "线框图", "wireframe", "界面原型", "salt", "界面草图",
   "复刻图", "图片重绘", "图片转UML", "replicate diagram", "redraw", "image to UML"
 skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 ---
@@ -23,7 +26,7 @@ skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 - **UML 语义，而非随意方框**：UML 类图表必须遵循标准 UML 图表类型，使用正确的 UML 元素和关系
 - **架构优先的叙事**：图和文字互补——文字解释*为什么*，图展示*什么*
 - **统一样式**：使用 `skinparam` / `<style>` 保持统一样式，UML 图每张核心元素 ≤7 个（硬上限 ≤15）
-- **专项图表遵循其原生语义**：WBS/甘特图/思维导图/JSON/YAML 五类非 UML 图表使用各自的原生语法（`@startwbs`/`@startgantt`/`@startmindmap`/`@startjson`/`@startyaml`）与原生配色，不套用 UML 的 skinparam 单色规则
+- **专项图表遵循其原生语义**：WBS/甘特图/思维导图/JSON/YAML/Salt 六类非 UML 图表使用各自的原生语法（`@startwbs`/`@startgantt`/`@startmindmap`/`@startjson`/`@startyaml`/`@startsalt`）与原生配色，不套用 UML 的 skinparam 单色规则；ER 图虽被官方归为非 UML，但用 `@startuml` + `entity` 语法、走 Graphviz 布局，按 UML 图同套 skinparam 规范处理
 
 ### 方法论总纲（贯穿全流程，先「对」与「达意」再「好看」）
 
@@ -90,7 +93,7 @@ skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 
 ## 专项图表（非 UML）
 
-除 8 种标准 UML 图表外，本技能还支持 5 种专项图表。它们不遵循 UML 语义，各自有独立语法与原生配色。当用户意图属于以下场景时，在 Step 2 直接选用对应专项图表，并阅读其操作指南：
+除 8 种标准 UML 图表外，本技能还支持 7 种专项图表。其中 WBS/甘特图/思维导图/JSON/YAML/Salt 六种不遵循 UML 语义，各自有独立语法与原生配色；ER 图用 `@startuml` + `entity` 乌鸦脚语法，遵循 UML 样式规范。当用户意图属于以下场景时，在 Step 2 直接选用对应专项图表，并阅读其操作指南：
 
 | 专项图表 | 适用场景 | 起止标记 | 操作指南 |
 |---------|---------|---------|---------|
@@ -99,8 +102,10 @@ skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 | **思维导图 MindMap** | 知识梳理、发散规划 | `@startmindmap`/`@endmindmap` | [15-mindmap-diagram.md](references/howto/15-mindmap-diagram.md) |
 | **JSON 数据可视化** | 展示 JSON 数据结构 | `@startjson`/`@endjson` | [16-json-diagram.md](references/howto/16-json-diagram.md) |
 | **YAML 显示效果图** | 展示 YAML 配置结构 | `@startyaml`/`@endyaml` | [17-yaml-diagram.md](references/howto/17-yaml-diagram.md) |
+| **ER 实体关系图** | 数据库表结构、数据建模、表间基数 | `@startuml`（`entity` 语法） | [18-er-diagram.md](references/howto/18-er-diagram.md) |
+| **Salt UI 线框图** | 界面原型、表单/窗口线框 | `@startsalt`/`@endsalt` | [19-salt-diagram.md](references/howto/19-salt-diagram.md) |
 
-> 专项图表的渲染同样走 Step 8 的渲染脚本；无需 Graphviz（`dot`）即可渲染。样式与美观要点见各操作指南的「布局与美观技巧」小节。
+> 专项图表的渲染同样走 Step 8 的渲染脚本；除 ER 图外均无需 Graphviz（`dot`）即可渲染（ER 走 Graphviz 布局，本地 jar 渲染时须有 `dot`）。样式与美观要点见各操作指南的「布局与美观技巧」小节。
 
 ## 输出要求
 
