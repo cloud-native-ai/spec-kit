@@ -68,9 +68,15 @@ Content guidelines for `.specify/instructions.md`:
 
 After updating `.specify/instructions.md`, ask the user for feedback on anything unclear or incomplete so you can iterate.
 
-## Update Strategy
+## Update Strategy (Reconcile Model)
 
-When `$ARGUMENTS` is empty (full update), apply these rules:
+This command runs as a **reconcile engine** over the instructions space (see `.specify/shared/patterns/reconcile-pattern.md`): the **desired state** is the latest template structure + current project reality + user-authored accumulated knowledge + this run's `$ARGUMENTS`; the **current state** is the existing `.specify/instructions.md` + compatibility symlinks + glossary seed. Each run observes, diffs section-by-section through a **tolerance band**, and converges non-destructively — fresh generation is just the bootstrap case (empty current state), and partial update is directed convergence.
+
+- **Tolerance band**: a section whose described state still matches project reality is marked consistent and left **byte-for-byte untouched** — never rewrite a section to change nothing, never churn cosmetic wording.
+- **Archive-not-delete**: user-authored content is never dropped; superseded snapshots live on as `.specify/instructions.md-<TIMESTAMP>` backups, and lost content is recovered from them (Action 3).
+- **Scope zones**: managed registry ranges (`AGENTS/SKILLS/TOOLS_REGISTRY`) are owned by their commands — observed but never converged here.
+
+When `$ARGUMENTS` is empty (full reconcile), apply these rules:
 - **Auto-update sections**: Documentation Map, Tech Stack & Resources, Key Directories, Build/Test commands.
 - **Preserve sections**: project-specific custom notes, manually added governance rules, and registries.
 - **Conflict policy**: If generated content conflicts with clearly user-authored content, preserve user-authored content and update only stale factual items.
@@ -111,11 +117,11 @@ Fallback behavior:
    - When `.specify/instructions.md` already exists, the script is **non-destructive**: it keeps the existing file **as the refresh base** (never rendering the template over it) and writes a non-clobbering timestamped backup (`.specify/instructions.md-<TIMESTAMP>`). It no longer fuses only `## Project Overview`; the full section-by-section refresh is performed by the steps below.
    - If the script returns non-zero, apply the **Error Handling** rules above instead of failing immediately.
 
-2. **Establish the Refresh Base** (skip entirely if no `.specify/instructions.md` existed before this run):
+2. **Establish the Refresh Base + Observation Snapshot** (skip entirely if no `.specify/instructions.md` existed before this run):
    - The existing `.specify/instructions.md` **IS** the refresh base — the setup script left it in place untouched, so you refresh it *in situ*. Do NOT regenerate from the template and do NOT rebuild the file from decomposed fragments.
    - **Safety net**: the setup script wrote a non-clobbering timestamped backup (`.specify/instructions.md-<TIMESTAMP>`) and never overwrites earlier ones, so `.specify/instructions.md-*` is a durable history. If the script did not run or produced no backup, copy the current file to such a snapshot before you start editing, so any mistaken edit is recoverable.
    - **Read for reconciliation**: read (a) the current `.specify/instructions.md` (the base) and (b) the latest `.specify/templates/instructions-template.md` (the target structure a fresh spec-kit version expects). The template tells you which sections/markers *should* exist; the base holds the authoritative user content.
-   - **Inventory sections**: list the base's top-level sections and note, for each, whether it is auto-derivable from a codebase scan (e.g., raw Tech Stack facts, Documentation Map paths) or hand-authored / non-reproducible (custom governance rules, recurring lessons, registries, decision rationale). Hand-authored sections are must-keep and are only touched to correct a clearly stale fact.
+   - **Inventory sections (mandatory artifact — observation snapshot)**: list the base's top-level sections and note, for each, whether it is auto-derivable from a codebase scan (e.g., raw Tech Stack facts, Documentation Map paths) or hand-authored / non-reproducible (custom governance rules, recurring lessons, registries, decision rationale). Hand-authored sections are must-keep and are only touched to correct a clearly stale fact. This inventory is the diff baseline for Action 5 — without it the section-by-section refresh cannot classify sections.
 
 3. **Recover content lost to older overwriting versions** (run whenever any `.specify/instructions.md-*` backup exists; this is the repair path for projects damaged before the non-destructive fix):
    - **Motivation**: earlier versions of the setup script rebuilt the file from the template and preserved **only** `## Project Overview`, silently dropping every other hand-authored section on each run. A project that ran those versions may have a current base that is already missing content which still survives in a backup.
@@ -132,9 +138,9 @@ Fallback behavior:
    - Check `.specify/memory/features.md` (if exists) for feature status reference.
    - **Check `.specify/` Directory**: When referencing the `.specify/` directory (if exists), **ONLY** consider the one in the **project root** (same level as `README.md`/`pyproject.toml`). Ignore any `.specify/` directories found inside subdirectories or submodules (as they belong to other projects).
 
-5. **Section-by-section refresh** (operate directly on the base file — a newly created file starts empty-of-user-content, so its sections are simply filled in):
-   - **Iterate over the base file's sections in place.** For each existing section, decide the action by comparing its *described* state against current project reality:
-     - **Matches reality** → leave it untouched (this includes all hand-authored / non-reproducible sections: custom governance rules, recurring lessons, registries, decision rationale).
+5. **Section-by-section refresh** (the diff-and-converge pass — operate directly on the base file; a newly created file starts empty-of-user-content, so its sections are simply filled in):
+   - **Iterate over the base file's sections in place.** For each existing section, decide the action by comparing its *described* state against current project reality (tolerance band first):
+     - **Matches reality (within tolerance)** → leave it untouched — do not enter the convergence set (this includes all hand-authored / non-reproducible sections: custom governance rules, recurring lessons, registries, decision rationale).
      - **Drifted / stale** → update *only* the stale facts within that section, preserving the surrounding hand-authored prose and structure. Do not rewrite a whole section to change one fact.
      - **Placeholders** → replace any bracketed placeholders (e.g., `[Brief summary...]`, `[Detected tech stack...]`) with concrete details from your analysis.
    - **Documentation Map**: verify each row still points to a file that exists in the repo; fix paths that moved and add rows only for genuinely new canonical docs.
@@ -153,9 +159,9 @@ Fallback behavior:
    - Verify that the resulting instructions clearly describe the project to a fresh AI instance.
    - **Coverage check**: diff the result against **every** `.specify/instructions.md-*` backup and confirm no user-authored section or registry row present in the history was silently dropped. If any is missing, restore it from the backup before finishing.
 
-7. **Report**:
+7. **Report (mandatory artifact — residual report)**:
    - Report the full path of the instructions file (`.specify/instructions.md`).
-   - Summarize which sections were left untouched, which had stale facts updated, which (if any) new template sections were added, and any content recovered from backup history.
+   - Structure the summary as a residual report: **converged** (sections with stale facts updated / new template sections added), **tolerated** (sections verified and left untouched), **recovered** (content restored from backup history), **pending** (items needing user decision, if any). If nothing converged, state plainly that all sections were within tolerance.
    - Confirm that symlinks for Copilot, Qoder, and Claude have been established (or explicitly report warning/fallback actions if setup script partially failed).
 
 ## Feedback

@@ -3,7 +3,8 @@
 Every reference that previously targeted ``skills/sdd-workflow/references/`` must now target the
 shared reference directory in the correct per-artefact form, with no dead links. The shared
 directory is subdivided by content type: ``workflow/`` (process protocols), ``guidelines/``
-(methodology), ``constants/`` (enumerated catalogs), ``definitions/`` (semantics).
+(methodology), ``constants/`` (enumerated catalogs), ``definitions/`` (semantics),
+``patterns/`` (design patterns).
 
 - Command templates (``templates/commands/*.md``, ``templates/skills-template.md``) use the
   root-relative form ``shared/<type>/<f>.md`` (install-time ``rewrite_paths`` upgrades these to
@@ -36,6 +37,9 @@ SHARED_DOCS = {
     },
     "definitions": {
         "tool-definitions.md",
+    },
+    "patterns": {
+        "reconcile-pattern.md",
     },
 }
 

@@ -1,7 +1,7 @@
 ---
 name: git-workflow
 description: |
-  Three-tier Git workflow management skill that dynamically discovers or defines branch names (trunk/pre-release/dev) and maintains `.specify/memory/git-workflow.md` as the single source of truth. Supports three modes: Setup (interactive branch naming + creation + .gitexcludes init), Maintain (structure/sync/.gitexcludes health check), Execute (rebase sync, merge, and safe push with automatic .gitexcludes enforcement). Covers pre-checks, rebase synchronization, conflict resolution, force-with-lease push strategies, and per-branch file exclusion via `.gitexcludes`. Use this when the user mentions ["git workflow", "branch sync", "rebase sync", "分支同步", "git rebase", "force-with-lease", "发布流程", "分支策略", "主干分支", "预发分支", "开发分支", "three-tier git", "git workflow setup", "创建git工作流", "工作流维护", "workflow health check", "工作流检查", "selective merge", "选择性合并", "排除文件", "忽略配置文件", "分支排除", "branch-exclusive", ".gitexcludes", "开发专属文件", "merge filter"]
+  Three-tier Git workflow management skill that dynamically discovers or defines branch names (trunk/pre-release/dev) and maintains `.specify/memory/git-workflow.md` as the single source of truth. Runs as a single **reconcile engine** (see `.specify/shared/patterns/reconcile-pattern.md`): the desired state is the declared three-tier branch structure + sync relations + per-branch `.gitexcludes` rules; every invocation observes the current repo state, diffs, and converges — bootstrap (interactive branch naming + creation + .gitexcludes init when the config doc is absent), health-check (structure/sync/.gitexcludes observation + residual report), and directed convergence (rebase sync, merge, and safe push with automatic .gitexcludes enforcement) are the same engine under different inputs. Covers pre-checks, rebase synchronization, conflict resolution, force-with-lease push strategies, and per-branch file exclusion via `.gitexcludes`. Use this when the user mentions ["git workflow", "branch sync", "rebase sync", "分支同步", "git rebase", "force-with-lease", "发布流程", "分支策略", "主干分支", "预发分支", "开发分支", "three-tier git", "git workflow setup", "创建git工作流", "工作流维护", "workflow health check", "工作流检查", "selective merge", "选择性合并", "排除文件", "忽略配置文件", "分支排除", "branch-exclusive", ".gitexcludes", "开发专属文件", "merge filter", "调谐工作流", "git 调谐"]
 skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 ---
 
@@ -9,13 +9,31 @@ skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 
 ## Overview
 
-三层 Git 开发工作流管理技能，根据项目状态和用户输入自动选择运行模式：
+三层 Git 开发工作流管理技能。**只有一个运行模式——调谐（Reconcile）**，遵循 [`.specify/shared/patterns/reconcile-pattern.md`](../../shared/patterns/reconcile-pattern.md)：
 
-| 模式 | 触发条件 | 功能 |
-|------|----------|------|
-| **Setup** | `.specify/memory/git-workflow.md` 不存在 | 建立工作流：确认分支名、创建分支、初始化 `.gitexcludes`、生成配置文档 |
-| **Maintain** | 文档存在 且 无操作参数 | 维护工作流：检查分支结构、同步状态、`.gitexcludes` 一致性，输出健康报告 |
-| **Execute** | 文档存在 且 有操作参数 | 执行工作流：按工作流规范执行具体 git 操作（所有同步/合并自动尊重 `.gitexcludes`） |
+- **期望态（spec）** = `.specify/memory/git-workflow.md` 声明的三层分支结构（MAIN/PRE/DEV 存在且 tracking 正确）+ 固定 rebase 同步关系（无积压分叉）+ 各分支 `.gitexcludes` 规则就位且被排除路径未被跟踪 + 本次用户操作指令。
+- **当前态（status）** = 仓库实际分支结构、同步状态、`.gitexcludes` 分布。
+- **调谐** = 观测 → diff（过容忍带）→ 收敛（分级确认）→ 校验。
+
+原「Setup / Maintain / Execute 三模式」是**同一调谐引擎在不同输入下的表现**：
+
+| 输入 | 作用域 | 行为（旧模式名） |
+|------|--------|------------------|
+| 配置文档 `.specify/memory/git-workflow.md` 不存在 | **Bootstrap** | 对空配置的调谐：交互确认分支名、创建分支、初始化 `.gitexcludes`、生成配置文档（Setup） |
+| 文档存在 且 无操作参数 | **全维度体检** | R1 观测 + R3 diff + 残差汇报，不自动收敛（Maintain） |
+| 文档存在 且 有操作参数 | **定向收敛** | 用户指令并入期望态，执行具体 git 操作（自动尊重 `.gitexcludes`）（Execute） |
+
+**容忍带**：同步状态 `0 0`、`.gitexcludes` 内容语义等价、文档与实际分支名一致——均标记「已一致（容忍）」不触发收敛；仅 ahead/behind 分叉、分支缺失、排除路径仍被跟踪等实质偏离进入收敛建议。
+
+**分级确认门禁**（与模式文档对齐）：
+
+| 动作类 | 门禁 |
+|--------|------|
+| 只读观测、体检报告、本地分支创建 | 自动执行 |
+| 写远端（push / 建远端分支）、直接 merge 入 PRE/MAIN | **停下确认**（外部权威源） |
+| 共享分支 force-with-lease 强推 | **停下确认** + 团队同步窗口 + 回滚预案 |
+
+**强制产物**：体检的「工作流维护报告」同时充当观测快照与残差汇报；定向收敛的审计由 git 提交历史天然承担（每次同步/恢复操作都有显式 commit 与打印清单）。
 
 ### 分支角色
 
@@ -40,7 +58,7 @@ skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 
 ## Workflow
 
-### Phase 0: 模式判定
+### Phase 0: 调谐作用域判定
 
 0. **迁移旧位置文档（一次性）**：本技能的输出文档已从旧位置 `docs/git-workflow.md` 迁移到 `.specify/memory/git-workflow.md`。执行任何模式前，若检测到旧位置仍有文件而新位置尚不存在，先迁移：
 
@@ -58,17 +76,17 @@ skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 1. 检查 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` 是否存在。
 2. 检查用户是否传入了操作参数（具体的 git 操作指令）。
 
-| 文档存在 | 有操作参数 | 进入模式 |
-|----------|------------|----------|
-| 否 | — | Mode 1: Setup |
-| 是 | 否 | Mode 2: Maintain |
-| 是 | 是 | Mode 3: Execute |
+| 文档存在 | 有操作参数 | 进入作用域 |
+|----------|------------|------------|
+| 否 | — | Bootstrap 调谐（Setup） |
+| 是 | 否 | 全维度体检（Maintain） |
+| 是 | 是 | 定向收敛（Execute） |
 
 ---
 
-### Mode 1: Setup — 建立工作流
+### Bootstrap 调谐（Setup）— 建立工作流
 
-当 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` 不存在时进入。
+当 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` 不存在时进入：期望态 = 完整三层工作流骨架，通过最少必要问题（逐一确认，不臆造分支名）+ 自动探测补齐信息。
 
 #### 1.1 检测现有分支
 
@@ -160,9 +178,9 @@ git add .gitexcludes && git commit -m "chore: init .gitexcludes for PRE"
 
 ---
 
-### Mode 2: Maintain — 维护工作流
+### 全维度体检（Maintain）— 观测 + diff + 残差汇报
 
-当 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` 存在且用户未传入操作参数时进入。
+当 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` 存在且用户未传入操作参数时进入。只观测与 diff，不自动收敛；收敛建议列入报告尾部待用户确认。
 
 #### 2.1 加载配置
 
@@ -218,7 +236,9 @@ git show origin/<DEV>:.gitexcludes 2>/dev/null && echo "DEV: exists" || echo "DE
 - frontmatter 格式完整（`main_branch`、`pre_branch`、`dev_branch`、`last_updated`）
 - instructions 文档中是否包含 Git Workflow 引用行
 
-#### 2.6 输出维护报告
+#### 2.6 输出维护报告（观测快照 + 残差汇报，强制产物）
+
+容忍带内的项（同步 `0 0`、文档与实际一致）标记「✅ 已一致」；仅实质偏离进入「建议操作」：
 
 ```markdown
 ## 工作流维护报告
@@ -248,13 +268,13 @@ git show origin/<DEV>:.gitexcludes 2>/dev/null && echo "DEV: exists" || echo "DE
 
 ---
 
-### Mode 3: Execute — 执行工作流
+### 定向收敛（Execute）— 执行工作流
 
-当 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` 存在且用户传入了具体操作参数时进入。
+当 `${SKILL_WORKDIR}/.specify/memory/git-workflow.md` 存在且用户传入了具体操作参数时进入：用户指令并入期望态，按下列预定义操作收敛，写远端/直接合入类动作遵循 Overview 的分级确认门禁。
 
 #### 3.1 加载配置
 
-同 Mode 2 Step 2.1，从 frontmatter 读取 `MAIN` / `PRE` / `DEV` 分支名。
+同全维度体检 Step 2.1，从 frontmatter 读取 `MAIN` / `PRE` / `DEV` 分支名。
 
 #### 3.2 前置校验
 
@@ -475,7 +495,7 @@ git ls-files -- $(cat .gitexcludes | grep -v '^#' | grep -v '^$' | tr '\n' ' ')
 
 ## .specify/memory/git-workflow.md 文档维护
 
-- **创建**：Mode 1 Setup 完成后，使用 `${SKILL_HOME}/assets/git-workflow-template.md` 生成。
+- **创建**：Bootstrap 调谐（Setup）完成后，使用 `${SKILL_HOME}/assets/git-workflow-template.md` 生成。
 - **更新**：分支改名时更新 frontmatter 映射；新增异常经验追加到 Known Issues 章节；更新 `last_updated` 日期。
 - **数据源**：`.specify/memory/git-workflow.md` frontmatter 是后续所有操作的唯一分支名数据源；各分支的 `.gitexcludes` 是排除规则的数据源。
 

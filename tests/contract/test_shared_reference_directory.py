@@ -28,6 +28,9 @@ TYPED_DOCS = {
     "definitions": {
         "tool-definitions.md",
     },
+    "patterns": {
+        "reconcile-pattern.md",
+    },
 }
 
 
