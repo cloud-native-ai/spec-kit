@@ -22,7 +22,7 @@ You manage feature metadata across:
 
 Features are classified: **functional** (user-facing) vs **non-functional** (quality attributes), and **current** (existing) vs **future** (gap-identified, status `Draft`).
 
-**Reconcile model** (see `.specify/shared/patterns/reconcile-pattern.md`): the registry is a durable artifact space. **Desired state** = what the repo actually delivers (current features) + credible gaps (future features) + registry format rules; **current state** = the existing index + detail files. Each run observes, diffs through a tolerance band, and converges:
+**Reconcile model** (see `shared/patterns/reconcile-pattern.md`): the registry is a durable artifact space. **Desired state** = what the repo actually delivers (current features) + credible gaps (future features) + registry format rules; **current state** = the existing index + detail files. Each run observes, diffs through a tolerance band, and converges:
 
 | Input | Scope | Behavior |
 |-------|-------|----------|
@@ -31,21 +31,7 @@ Features are classified: **functional** (user-facing) vs **non-functional** (qua
 | Description | **Single-target convergence** | Locate the matching feature and converge only it |
 
 - **Tolerance band**: rows whose Name/Description/Status still match repo reality are left untouched — do not rewrite descriptions for cosmetic wording, do not touch `Last Updated` on unchanged rows.
-- **Archive-not-delete**: never remove a feature row or detail file because the capability disappeared from the code — keep the row and mark its status/description accordingly (history is part of the registry's value).
-- **Never regress status**: registry convergence must not move a feature's status backward (e.g. Implemented → Draft) without explicit user confirmation.
-
-## Actions
-
-0. **Determine PROJECT_TYPE and DELIVERY_MODEL** (MUST do first):
-   - Infer from repo structure, README/docs, build config
-   - DELIVERY_MODEL: `runtime code` | `document/prompt artifacts` | `hybrid`
-   - This constrains which DFX categories and future features are relevant
-
-1. **Determine scope**: No args → full-registry reconcile. Concrete context → fan-out mining. Description → single-target convergence.
-
-2. **Generate/refresh current features** (functional + non-functional):
-   - Functional: tailor to PROJECT_TYPE (CLI: commands/IO/config; Library: APIs/extension; Framework: abstractions/scaffolding; Microservice: domain/interfaces/workflows)
-   - Non-functional: derive from repo"
+- **Archive-not-delete**: never remove a feature row or detail file because the capability disappeared from the code — keep the row and mark its status/description accordingly (history is part of the registry"
 
 prompt = """
 ## User Input
