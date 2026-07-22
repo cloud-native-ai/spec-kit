@@ -23,6 +23,7 @@ import shutil
 import ssl
 import subprocess
 import sys
+import traceback
 
 # Check Python version
 if sys.version_info < (3, 8):
@@ -644,8 +645,9 @@ class StepTracker:
     Supports live auto-refresh via an attached refresh callback.
     """
 
-    def __init__(self, title: str):
+    def __init__(self, title: str, plain: bool = False):
         self.title = title
+        self.plain = plain
         self.steps = []  # list of dicts: {key, label, status, detail}
         self.status_order = {
             "pending": 0,
@@ -684,13 +686,29 @@ class StepTracker:
                 s["status"] = status
                 if detail:
                     s["detail"] = detail
+                self._plain_log(s)
                 self._maybe_refresh()
                 return
 
-        self.steps.append(
-            {"key": key, "label": key, "status": status, "detail": detail}
-        )
+        step = {"key": key, "label": key, "status": status, "detail": detail}
+        self.steps.append(step)
+        self._plain_log(step)
         self._maybe_refresh()
+
+    def _plain_log(self, step):
+        if not self.plain or step["status"] in ("pending", "running"):
+            return
+        tags = {
+            "done": ("ok", "green"),
+            "error": ("error", "red"),
+            "skipped": ("skip", "yellow"),
+        }
+        word, color = tags.get(step["status"], (step["status"], "white"))
+        detail = f": {step['detail']}" if step["detail"] else ""
+        console.print(
+            f"[{color}]{word:>5}[/{color}] {step['label']}{detail}",
+            highlight=False,
+        )
 
     def _maybe_refresh(self):
         if self._refresh_cb:
@@ -1609,14 +1627,26 @@ def copy_local_templates(
         cleanup_obsolete_framework_assets(project_path, ai_assistant, tracker)
 
     except Exception as e:
+        last_step = ""
         if tracker:
-            tracker.error("local-templates", str(e))
+            last_step = next(
+                (
+                    s["detail"]
+                    for s in tracker.steps
+                    if s["key"] == "local-templates"
+                ),
+                "",
+            )
+        step_prefix = f"failed during '{last_step}': " if last_step else ""
+        message = f"{step_prefix}{type(e).__name__}: {e}"
+        if tracker:
+            tracker.error("local-templates", message)
         else:
-            console.print(f"[red]Error copying local templates:[/red] {e}")
+            console.print(f"[red]Error copying local templates:[/red] {message}")
         # Clean up project directory if created and not current directory
         if not is_current_dir and project_path.exists():
             shutil.rmtree(project_path)
-        raise typer.Exit(1)
+        raise
 
     return project_path
 
@@ -2013,8 +2043,6 @@ def init(
         specify init --here --force  # Skip confirmation when current directory not empty
     """
 
-    show_banner()
-
     if project_name == ".":
         here = True
         project_name = None  # Clear project_name to use existing validation logic
@@ -2057,30 +2085,21 @@ def init(
         assert project_name is not None
         project_path = Path(project_name).resolve()
         if project_path.exists():
-            error_panel = Panel(
-                f"Directory '[cyan]{project_name}[/cyan]' already exists\n"
-                "Please choose a different project name or remove the existing directory.",
-                title="[red]Directory Conflict[/red]",
-                border_style="red",
-                padding=(1, 2),
+            console.print(
+                f"[red]Error:[/red] Directory '{project_name}' already exists"
             )
-            console.print()
-            console.print(error_panel)
+            console.print(
+                "Choose a different project name or remove the existing directory."
+            )
             raise typer.Exit(1)
 
     current_dir = Path.cwd()
 
-    setup_lines = [
-        "[cyan]Specify Project Setup[/cyan]",
-        "",
-        f"{'Project':<15} [green]{project_path.name}[/green]",
-        f"{'Working Path':<15} [dim]{current_dir}[/dim]",
-    ]
-
+    console.print("[cyan]Specify project setup[/cyan]", highlight=False)
+    console.print(f"  Project:      {project_path.name}", highlight=False)
+    console.print(f"  Working path: {current_dir}", highlight=False)
     if not here:
-        setup_lines.append(f"{'Target Path':<15} [dim]{project_path}[/dim]")
-
-    console.print(Panel("\n".join(setup_lines), border_style="cyan", padding=(1, 2)))
+        console.print(f"  Target path:  {project_path}", highlight=False)
 
     should_init_git = False
     if not no_git:
@@ -2111,17 +2130,12 @@ def init(
         if agent_config and agent_config["requires_cli"]:
             install_url = agent_config["install_url"]
             if not check_tool(selected_ai):
-                error_panel = Panel(
-                    f"[cyan]{selected_ai}[/cyan] not found\n"
-                    f"Install from: [cyan]{install_url}[/cyan]\n"
-                    f"{agent_config['name']} is required to continue with this project type.\n\n"
-                    "Tip: Use [cyan]--ignore-agent-tools[/cyan] to skip this check",
-                    title="[red]Agent Detection Error[/red]",
-                    border_style="red",
-                    padding=(1, 2),
+                console.print(
+                    f"[red]Error:[/red] '{selected_ai}' not found - "
+                    f"{agent_config['name']} is required for this project type."
                 )
-                console.print()
-                console.print(error_panel)
+                console.print(f"Install from: {install_url}")
+                console.print("Tip: use --ignore-agent-tools to skip this check")
                 raise typer.Exit(1)
 
     if script_type:
@@ -2146,179 +2160,112 @@ def init(
     console.print(f"[cyan]Selected AI assistant:[/cyan] {selected_ai}")
     console.print(f"[cyan]Selected script type:[/cyan] {selected_script}")
 
-    tracker = StepTracker("Initialize Specify Project")
+    tracker = StepTracker("Initialize Specify Project", plain=True)
 
-    setattr(sys, "_specify_tracker_active", True)
+    tracker.add("local-check", "Check for local templates")
+    tracker.add("features-dir", "Prepare features directory")
+    tracker.add("git", "Initialize git repository")
+    tracker.add("vscode-settings", "Configure VS Code")
 
-    tracker.add("precheck", "Check required tools")
-    tracker.complete("precheck", "ok")
-    tracker.add("ai-select", "Select AI assistant")
-    tracker.complete("ai-select", f"{selected_ai}")
-    tracker.add("script-select", "Select script type")
-    tracker.complete("script-select", selected_script)
-    for key, label in [
-        ("local-check", "Check for local templates"),
-        ("fetch", "Fetch latest release"),
-        ("download", "Download template"),
-        ("extract", "Extract template"),
-        ("zip-list", "Archive contents"),
-        ("extracted-summary", "Extraction summary"),
-        ("chmod", "Ensure scripts executable"),
-        ("cleanup", "Cleanup"),
-        ("git", "Initialize git repository"),
-        ("vscode-settings", "Configure VS Code"),
-        ("final", "Finalize"),
-    ]:
-        tracker.add(key, label)
-
-    # Track git error message outside Live context so it persists
     git_error_message = None
 
-    with Live(
-        tracker.render(), console=console, refresh_per_second=8, transient=True
-    ) as live:
-        tracker.attach_refresh(lambda: live.update(tracker.render()))
-        try:
-            verify = not skip_tls
-            local_ssl_context = ssl_context if verify else False
-            local_client = httpx.Client(verify=local_ssl_context)
+    try:
+        verify = not skip_tls
+        local_ssl_context = ssl_context if verify else False
+        local_client = httpx.Client(verify=local_ssl_context)
 
-            # First, check if local templates are available
-            if has_local_templates():
-                if tracker:
-                    tracker.complete("local-check", "found - using local templates")
-                elif debug:
-                    console.print(
-                        "[cyan]Local templates found - using installed templates instead of downloading from GitHub[/cyan]"
-                    )
+        # First, check if local templates are available
+        if has_local_templates():
+            tracker.complete("local-check", "found - using local templates")
 
-                # Use local templates
-                copy_local_templates(
-                    project_path, selected_ai, selected_script, here, tracker
-                )
-            else:
-                if tracker:
-                    tracker.error("local-check", "not found")
-
-                error_msg = (
-                    "Local templates not found. GitHub download is no longer supported."
-                )
-                console.print(f"[red]Error:[/red] {error_msg}")
-                raise typer.Exit(1)
-            # Ensure the features directory exists under .specify/memory for downstream workflows
-            features_dir = project_path / ".specify" / "memory" / "features"
-            try:
-                if tracker:
-                    tracker.start(
-                        "features-dir", "creating .specify/memory/features directory"
-                    )
-                features_dir.mkdir(parents=True, exist_ok=True)
-                if tracker:
-                    tracker.complete("features-dir", f"created {features_dir}")
-            except Exception as e:
-                if tracker:
-                    tracker.error("features-dir", str(e))
-                else:
-                    console.print(
-                        f"[yellow]Warning: could not create features directory:[/yellow] {e}"
-                    )
-
-            ensure_executable_scripts(project_path, tracker=tracker)
-
-            if not no_git:
-                tracker.start("git")
-                if is_git_repo(project_path):
-                    tracker.complete("git", "existing repo detected")
-                elif should_init_git:
-                    success, error_msg = init_git_repo(project_path, quiet=True)
-                    if success:
-                        tracker.complete("git", "initialized")
-                    else:
-                        tracker.error("git", "init failed")
-                        git_error_message = error_msg
-                else:
-                    tracker.skip("git", "git not available")
-            else:
-                tracker.skip("git", "--no-git flag")
-
-            # Configure VS Code settings
-            configure_vscode_settings(project_path, tracker=tracker)
-
-            tracker.complete("final", "project ready")
-        except Exception as e:
-            tracker.error("final", str(e))
-            console.print(
-                Panel(
-                    f"Initialization failed: {e}", title="Failure", border_style="red"
-                )
+            # Use local templates
+            copy_local_templates(
+                project_path, selected_ai, selected_script, here, tracker
             )
-            if debug:
-                _env_pairs = [
-                    ("Python", sys.version.split()[0]),
-                    ("Platform", sys.platform),
-                    ("CWD", str(Path.cwd())),
-                ]
-                _label_width = max(len(k) for k, _ in _env_pairs)
-                env_lines = [
-                    f"{k.ljust(_label_width)} → [bright_black]{v}[/bright_black]"
-                    for k, v in _env_pairs
-                ]
-                console.print(
-                    Panel(
-                        "\n".join(env_lines),
-                        title="Debug Environment",
-                        border_style="magenta",
-                    )
-                )
-            if not here and project_path.exists():
-                shutil.rmtree(project_path)
+        else:
+            tracker.error("local-check", "not found")
+            console.print(
+                "[red]Error:[/red] Local templates not found. GitHub download is no longer supported."
+            )
             raise typer.Exit(1)
-        finally:
-            pass
+        # Ensure the features directory exists under .specify/memory for downstream workflows
+        features_dir = project_path / ".specify" / "memory" / "features"
+        try:
+            features_dir.mkdir(parents=True, exist_ok=True)
+            tracker.complete("features-dir", f"created {features_dir}")
+        except Exception as e:
+            tracker.error("features-dir", str(e))
 
-    console.print(tracker.render())
+        ensure_executable_scripts(project_path, tracker=tracker)
+
+        if not no_git:
+            if is_git_repo(project_path):
+                tracker.complete("git", "existing repo detected")
+            elif should_init_git:
+                success, error_msg = init_git_repo(project_path, quiet=True)
+                if success:
+                    tracker.complete("git", "initialized")
+                else:
+                    tracker.error("git", "init failed")
+                    git_error_message = error_msg
+            else:
+                tracker.skip("git", "git not available")
+        else:
+            tracker.skip("git", "--no-git flag")
+
+        # Configure VS Code settings
+        configure_vscode_settings(project_path, tracker=tracker)
+    except Exception as e:
+        if isinstance(e, typer.Exit):
+            detail = "aborted by an earlier error (see messages above)"
+        else:
+            detail = f"{type(e).__name__}: {e}"
+        console.print(f"[red]Error:[/red] Initialization failed: {detail}")
+        if debug:
+            console.print(traceback.format_exc().rstrip(), highlight=False)
+            console.print(
+                f"Python {sys.version.split()[0]} on {sys.platform}, cwd: {Path.cwd()}",
+                highlight=False,
+            )
+        else:
+            console.print("[dim]Re-run with --debug for the full traceback.[/dim]")
+        if not here and project_path.exists():
+            shutil.rmtree(project_path)
+        raise typer.Exit(1)
+
     console.print("\n[bold green]Project ready.[/bold green]")
 
     # Show git error details if initialization failed
     if git_error_message:
-        console.print()
-        git_error_panel = Panel(
-            f"[yellow]Warning:[/yellow] Git repository initialization failed\n\n"
-            f"{git_error_message}\n\n"
-            f"[dim]You can initialize git manually later with:[/dim]\n"
-            f"[cyan]cd {project_path if not here else '.'}[/cyan]\n"
-            f"[cyan]git init[/cyan]\n"
-            f"[cyan]git add .[/cyan]\n"
-            f'[cyan]git commit -m "Initial commit"[/cyan]',
-            title="[red]Git Initialization Failed[/red]",
-            border_style="red",
-            padding=(1, 2),
+        console.print(
+            "[yellow]Warning:[/yellow] Git repository initialization failed: "
+            f"{git_error_message}"
         )
-        console.print(git_error_panel)
+        cd_target = project_path if not here else "."
+        console.print(
+            f"Initialize manually: cd {cd_target} && git init && git add . "
+            '&& git commit -m "Initial commit"',
+            highlight=False,
+        )
 
     # Agent folder security notice
     agent_config = AGENT_CONFIG.get(selected_ai)
     if agent_config:
         agent_folder = agent_config["folder"]
-        security_notice = Panel(
-            f"Some agents may store credentials, auth tokens, or other identifying and private artifacts in the agent folder within your project.\n"
-            f"Consider adding [cyan]{agent_folder}[/cyan] (or parts of it) to [cyan].gitignore[/cyan] to prevent accidental credential leakage.",
-            title="[yellow]Agent Folder Security[/yellow]",
-            border_style="yellow",
-            padding=(1, 2),
+        console.print(
+            f"[yellow]Note:[/yellow] agents may store credentials in {agent_folder}; "
+            "consider adding it (or parts of it) to .gitignore.",
+            highlight=False,
         )
-        console.print()
-        console.print(security_notice)
 
-    steps_lines = []
+    console.print("\n[cyan]Next steps[/cyan]")
+    step_num = 1
     if not here:
-        steps_lines.append(
-            f"1. Go to the project folder: [cyan]cd {project_name}[/cyan]"
+        console.print(
+            f"  {step_num}. Go to the project folder: cd {project_name}",
+            highlight=False,
         )
-        step_num = 2
-    else:
-        steps_lines.append("1. You're already in the project directory!")
-        step_num = 2
+        step_num += 1
 
     # Add Codex-specific setup step if needed
     if selected_ai == "codex":
@@ -2328,60 +2275,32 @@ def init(
             cmd = f"setx CODEX_HOME {quoted_path}"
         else:  # Unix-like systems
             cmd = f"export CODEX_HOME={quoted_path}"
-
-        steps_lines.append(
-            f"{step_num}. Set [cyan]CODEX_HOME[/cyan] environment variable before running Codex: [cyan]{cmd}[/cyan]"
+        console.print(
+            f"  {step_num}. Set CODEX_HOME before running Codex: {cmd}",
+            highlight=False,
         )
         step_num += 1
 
     if selected_ai == "claude":
-        steps_lines.append(
-            f"{step_num}. Claude Code commands are in [cyan].claude/commands/[/cyan] and ignore rules are in [cyan].claudeignore[/cyan]"
+        console.print(
+            f"  {step_num}. Claude Code commands are in .claude/commands/ "
+            "and ignore rules are in .claudeignore",
+            highlight=False,
         )
         step_num += 1
 
-    steps_lines.append(f"{step_num}. Start using slash commands with your AI agent:")
-
-    steps_lines.append(
-        "   2.1 [cyan]/speckit.constitution[/] - Establish project principles"
+    console.print(
+        f"  {step_num}. Start with slash commands: /speckit.constitution -> "
+        "/speckit.feature -> /speckit.requirements -> /speckit.plan -> "
+        "/speckit.tasks -> /speckit.implement",
+        highlight=False,
     )
-    steps_lines.append(
-        "   2.2 [cyan]/speckit.feature[/] - Manage feature lifecycle & index"
+    console.print(
+        "  Optional: /speckit.clarify /speckit.analyze /speckit.checklist "
+        "/speckit.research /speckit.review /speckit.agents /speckit.tools "
+        "/speckit.skills /speckit.instructions",
+        highlight=False,
     )
-    steps_lines.append(
-        "   2.3 [cyan]/speckit.requirements[/] - Create baseline specification"
-    )
-    steps_lines.append("   2.4 [cyan]/speckit.plan[/] - Create implementation plan")
-    steps_lines.append("   2.5 [cyan]/speckit.tasks[/] - Generate actionable tasks")
-    steps_lines.append("   2.6 [cyan]/speckit.implement[/] - Implement feature")
-
-    steps_panel = Panel(
-        "\n".join(steps_lines), title="Next Steps", border_style="cyan", padding=(1, 2)
-    )
-    console.print()
-    console.print(steps_panel)
-
-    enhancement_lines = [
-        "Optional commands that you can use for your specs [bright_black](improve quality & confidence)[/bright_black]",
-        "",
-        "○ [cyan]/speckit.clarify[/] [bright_black](optional)[/bright_black] - Ask structured questions to de-risk ambiguous areas before planning (run before [cyan]/speckit.plan[/] if used)",
-        "○ [cyan]/speckit.analyze[/] [bright_black](optional)[/bright_black] - Cross-artifact consistency & alignment report (after [cyan]/speckit.tasks[/], before [cyan]/speckit.implement[/])",
-        "○ [cyan]/speckit.checklist[/] [bright_black](optional)[/bright_black] - Generate quality checklists to validate Requirements (What) completeness, clarity, and consistency (after [cyan]/speckit.requirements[/]; optionally re-run after [cyan]/speckit.plan[/] for traceability)",
-        "○ [cyan]/speckit.research[/] [bright_black](optional)[/bright_black] - In-depth research and analysis to support the implementation plan",
-        "○ [cyan]/speckit.review[/] [bright_black](optional)[/bright_black] - Review the full SDD artifact set for a feature and summarize it (after [cyan]/speckit.implement[/])",
-        "○ [cyan]/speckit.agents[/] [bright_black](optional)[/bright_black] - Generate role-based workflow agents or create custom agents (run after init to populate .specify/agents/)",
-        "○ [cyan]/speckit.tools[/] [bright_black](optional)[/bright_black] - Explicitly describe and invoke a tool with reusable local records",
-        "○ [cyan]/speckit.skills[/] [bright_black](optional)[/bright_black] - Create agent skills and project skill scaffolding",
-        "○ [cyan]/speckit.instructions[/] [bright_black](optional)[/bright_black] - Generate or update project AI instructions and compatibility symlinks",
-    ]
-    enhancements_panel = Panel(
-        "\n".join(enhancement_lines),
-        title="Enhancement Commands",
-        border_style="cyan",
-        padding=(1, 2),
-    )
-    console.print()
-    console.print(enhancements_panel)
 
 
 @app.command()
