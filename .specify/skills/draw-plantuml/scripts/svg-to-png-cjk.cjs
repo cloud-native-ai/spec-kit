@@ -70,8 +70,8 @@ async function main() {
   * { margin: 0; padding: 0; }
   body { background: white; }
   svg text {
-    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
-                 "Noto Sans CJK SC", "WenQuanYi Micro Hei",
+    font-family: "Noto Sans CJK SC", "PingFang SC", "Hiragino Sans GB",
+                 "Microsoft YaHei", "WenQuanYi Micro Hei",
                  Arial, Helvetica, sans-serif !important;
   }
 </style>

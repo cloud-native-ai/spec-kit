@@ -14,6 +14,31 @@ Apply this pattern when **all** of these hold:
 
 Do **not** apply to: one-shot pipelines (generate a report, render a diagram), read-only analysis, or purely conversational flows.
 
+## Boundary: Reconcile vs Continuous Operating Loop (概念消歧)
+
+This pattern is easily confused with the **continuous operating loop** defined in [`skills/create-team/references/operating-loops.md`](../../skills/create-team/references/operating-loops.md) — both are "repeated runs + LLM judgment + state files". The root difference is **what is processed + when it terminates (处理对象 + 终止语义)**:
+
+| Dimension | Reconcile (this pattern) | Continuous operating loop |
+|-----------|--------------------------|---------------------------|
+| Processing object | One durable artifact space (tree / config / registry / KB) with a describable ideal form | An unbounded stream of incoming work (CI failures, new PRs, issues, dependency updates) or a quality metric to sustain long-term |
+| Paradigm | Declarative: desired vs current → diff → converge to consistency | Operational: process by cadence, no terminal "done" |
+| Per-invocation termination | Closes within one call (R0–R6 loop completes in a single invocation) | One run = one bounded cycle (steps 1–8); the overall lifecycle is unbounded |
+| Outer repetition driven by | User / on demand (invoked when convergence is wanted) | Cadence / cron scheduling, possibly unattended |
+| Guardrail focus | Tolerance band (anti-churn) + archive-not-delete (anti-data-loss) + tiered confirmation | Maturity L1→L2→L3 + budget/circuit-breaker/kill-switch + independent verifier + attempt caps |
+| Human position | Present at every invocation, gating destructive actions via tiers | L3 may run unattended, stopping only at boundaries — hence kill-switch/budget |
+| Org structure | A design pattern inside one skill/agent (fan-out optional) | A multi-role team (supervisor / worker / independent verifier) |
+| State-file semantics | snapshot / plan / audit / residual — describes one invocation's convergence transaction | STATE.md spine + run-log + post-run critique — cross-run memory and promotion evidence |
+
+**Nesting, not competitors (嵌套关系，不是竞品)**: reconcile is a convergence engine that finishes *within one invocation*; the operating loop is the cross-invocation scheduling + governance shell that decides *when to act and with how much autonomy*. Inside a continuous team's cycle, if the TRIAGE→ACT work happens to be "keep artifact space X converged", it may invoke one full reconcile loop — **an operating loop can wrap a reconcile loop, never the reverse**.
+
+**判定口诀 (rule of thumb)**: 有可描述的制品理想形态要反复收敛 → reconcile；有源源不断的工作、或要按节奏长期改进的指标 → continuous 运营循环。
+
+**Near-synonyms not to conflate (容易张冠李戴的近义概念)**:
+- 容忍带 (reconcile, skips cosmetic diffs) ≠ quality threshold / scoring (operating loop, per-cycle acceptance)
+- audit log / residual report (reconcile, per invocation) ≠ STATE.md + post-run critique (operating loop, cross-run promotion evidence)
+- 分级确认门禁 (human present) ≠ 成熟度 + kill-switch (unattended-capable)
+- 只归档不删除 (reconcile) ≠ 路径黑名单 / 约束文件 (operating loop)
+
 ## Core Model (核心模型)
 
 - **Desired state (期望态 / spec)** = the artifact space's ideal form, assembled from: templates + rules/thresholds + principles + authoritative external facts + **existing local content** (local conventions outrank templates) + **this invocation's user input**.

@@ -188,7 +188,7 @@ inject_style() {
 skinparam dpi ${dpi}
 scale ${scale}
 skinparam shadowing false
-skinparam defaultFontName "Noto Sans SC, Arial, Helvetica, sans-serif"
+skinparam defaultFontName "Noto Sans CJK SC"
 EOF
   else
     cat <<EOF > "$style_tmp"
@@ -198,7 +198,7 @@ skinparam roundCorner 20
 skinparam dpi ${dpi}
 scale ${scale}
 skinparam defaultFontSize 14
-skinparam defaultFontName "Arial, Helvetica, sans-serif"
+skinparam defaultFontName "Noto Sans CJK SC"
 skinparam padding 8
 skinparam ArrowThickness 2
 skinparam BorderThickness 2

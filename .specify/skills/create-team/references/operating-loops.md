@@ -15,6 +15,31 @@
 
 > 核心信条（源自 Loop Engineering）：**不要跳过报告阶段。** 运营循环的价值不在于一开始就自动改东西，而在于先低风险地校准判断，再逐级授予自动权限。
 
+## 概念消歧：continuous 运营循环 vs reconcile 调谐模式
+
+本模式与 [`shared/patterns/reconcile-pattern.md`](../../../shared/patterns/reconcile-pattern.md) 的**调谐模式（reconcile）**极易混淆——二者都是「反复运行 + LLM 判断 + 写状态文件」的循环。根本区别在于**处理对象 + 终止语义**：
+
+| 维度 | reconcile（调谐模式） | continuous 运营循环（本文） |
+|------|----------------------|----------------------------|
+| 处理对象 | 一个持久制品空间（目录树/配置/注册表/知识库），有可描述的理想形态 | 源源不断到达的工作流（CI 失败、新 PR、issue、依赖更新）或要长期维持的质量指标 |
+| 范式 | 声明式：desired vs current → diff → 收敛到一致 | 命令式/运营式：按 cadence 长期处理，无终态「done」 |
+| 单次调用的终止 | 收敛到一致即结束（R0–R6 在一次调用内闭环） | 一次 run 只跑一个有界 cycle（§10 步骤 1–8），整体生命周期无界 |
+| 外层重复的驱动 | 用户/按需触发（想收敛时才调） | cadence/cron 调度，可能无人值守 |
+| 护栏重心 | 容忍带（防抖动）+ 只归档不删除（防数据丢失）+ 分级确认 | 成熟度 L1→L2→L3 + 预算/断路器/kill-switch + 独立验证者 + 尝试上限 |
+| 人的位置 | 每次调用人都在场，通过分级门禁确认破坏性动作 | L3 可无人值守，仅在越界点停下 → 所以才需要 kill-switch/预算 |
+| 组织结构 | 一个 skill/agent 应用的设计模式（扇出可选） | 一个多角色团队（supervisor/worker/独立验证者） |
+| 状态文件语义 | snapshot/plan/audit/residual —— 描述一次调用的收敛事务 | STATE.md 脊柱 + run-log + post-run critique —— 跨 run 记忆与晋级证据 |
+
+**嵌套关系（不是竞品）**：reconcile 是「一次调用内把制品空间收敛到一致」的**收敛引擎**；运营循环是「决定何时、以多大自治度去动手」的**跨调用调度 + 治理外壳**。一个 continuous 团队的 cycle 里，TRIAGE→ACT 若处理的工作恰好是「保持某制品空间 X 收敛」，其内部完全可以调用一次 reconcile 循环——**运营循环可以包住调谐环，反之不行**。
+
+**判定口诀**：有可描述的制品理想形态要反复收敛 → reconcile；有源源不断的工作、或要按节奏长期改进的指标 → continuous 运营循环。
+
+**容易张冠李戴的近义概念**：
+- 「容忍带」（reconcile，跳过表面差异）≠「quality threshold/打分」（运营循环，cycle 验收）
+- 「audit log/residual report」（reconcile，每次调用）≠「STATE.md + post-run critique」（运营循环，跨 run 晋级证据）
+- 「分级确认门禁」（人在场）≠「成熟度 + kill-switch」（可无人值守）
+- 「只归档不删除」（reconcile）≠「路径黑名单/约束文件」（运营循环）
+
 ## 1. 成熟度级别 L1 → L2 → L3（不可跳级）
 
 每个 continuous 团队都在某个**成熟度级别**运行，`config.maturity` 记录当前级别。**必须从 L1 起步**，达标后才逐级晋升。

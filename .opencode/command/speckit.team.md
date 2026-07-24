@@ -4,7 +4,7 @@
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). If empty, infer intent from conversation/repo context. If intent is ambiguous or unsupported, report capabilities and request the missing intent (do NOT guess silently).
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). If empty, execute the **Default Behavior (No Arguments)** defined below. If non-empty but intent is ambiguous or unsupported, report capabilities and request the missing intent (do NOT guess silently).
 
 ## Outline
 
@@ -41,12 +41,27 @@ The goal is persisted as the `goal` frontmatter field and rendered as a `## Goal
 2. **create** → `create-team`: **first establish the goal** — elicit it from `$ARGUMENTS` / conversation / repo context, or ask for it, and confirm it with the user — then propose a roster (static structure) + pattern config (dynamic structure) **derived from that goal**; on confirmation persist `.specify/teams/<slug>/team.md` (or run one-shot without persisting).
 3. **modify** → `improve-team`: load the existing team and apply targeted, evidence-based edits to any of its three parts — the **goal**, the **static structure**, or the **dynamic structure**. Structure edits are structure-preserving and keep serving the current goal. **Redefining the goal is a first-class, supported edit**: when the goal changes, re-evaluate and realign the roster and pattern to serve the new goal. Re-persist and bump `updated`.
 4. **run** → `create-team` execution path: follow the **preview → confirm → execute** gate below.
-5. **Ambiguous / unsupported** → see below.
-6. **modify / run targeting a team that does not exist** under `.specify/teams/` → report **"team not found"** and offer to `create` it.
+5. **Empty arguments** → execute **Default Behavior (No Arguments)** below.
+6. **Non-empty but ambiguous / unsupported** → report capabilities and request the missing intent (see "Ambiguous or Unsupported Intent" below).
+7. **modify / run targeting a team that does not exist** under `.specify/teams/` → report **"team not found"** and offer to `create` it.
+
+### Default Behavior (No Arguments)
+
+When `$ARGUMENTS` is empty, the command MUST execute the following sequence instead of routing to a mode:
+
+1. **List all existing teams** — scan `.specify/teams/*/team.md` and present a summary table with each team's `slug`, `name`, `goal`, and `pattern`. If no teams exist, state "No teams found" explicitly.
+2. **Give contextual suggestions** — based on the current conversation, recent repo activity, and the listed teams, recommend the most relevant next action. Examples:
+   - A team whose goal aligns with the current task → suggest `run <slug>`.
+   - A team whose structure seems outdated relative to recent changes → suggest `modify <slug>`.
+   - No teams exist or no team fits the current need → suggest `create` with a proposed goal derived from context.
+   Suggestions MUST be grounded in observable context (conversation history, repo state, team definitions), NOT fabricated.
+3. **Show capability summary** — briefly list the three modes (create / modify / run) so the user knows what operations are available.
+
+This behavior is informational and non-destructive: it MUST NOT create, modify, or run any team without explicit user instruction.
 
 ### Ambiguous or Unsupported Intent
 
-When intent cannot be resolved, the command MUST report the recognized capabilities and request the missing intent. It MUST NOT guess silently or fail without a message. Report this capability listing:
+When intent cannot be resolved from non-empty arguments, the command MUST report the recognized capabilities and request the missing intent. It MUST NOT guess silently or fail without a message. Report this capability listing:
 
 - **create** — establish the team's **goal**, then author a new team (static + dynamic structure) organized around it and persist it → `create-team`
 - **modify** — adjust/optimize an existing team — reshape its structure, or **redefine its goal** and realign the structure to the new goal → `improve-team`
