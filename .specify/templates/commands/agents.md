@@ -23,6 +23,8 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 
 Agents are expressed with the **Role × Stage × Type** model (defined once in `skills/create-team/references/conceptual-model.md`). Persistent agents are written to the canonical location `.specify/agents/<name>.agent.md`; tool-specific directories are symlinks — never write to them directly.
 
+**Template / Instance model**: `create` authors a reusable agent **definition** (template) at `.specify/agents/<name>.agent.md`. `run` **instantiates** that definition into a live subagent. Each `run` spawns an independent instance from the same definition — the same agent can be run multiple times (sequentially or concurrently), and each instance operates autonomously without affecting the definition or other instances. `refine` edits the definition itself, which takes effect on subsequent `run` invocations.
+
 ### Intent → Capability Routing
 
 | Recognized intent | Capability | Delegates to |
@@ -59,7 +61,7 @@ This behavior is informational and non-destructive: it MUST NOT create, refine, 
 
 ### Run Mode (subagent dispatch)
 
-The **run** mode dispatches a single agent as a subagent to execute a specific task. It MUST follow this sequence:
+The **run** mode **instantiates** the agent definition as a new, independent subagent to execute a specific task. Each invocation spawns a fresh instance — the same agent definition can be run multiple times (sequentially or concurrently), and each instance is isolated from the definition and from other instances. It MUST follow this sequence:
 
 1. **Resolve the target agent** — identify the agent by name from `$ARGUMENTS` or conversation context. Load its definition from `.specify/agents/<name>.agent.md`.
    - If the agent does not exist → report **"agent not found"** and offer to `create` it.
