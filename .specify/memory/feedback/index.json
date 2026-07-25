@@ -1,9 +1,9 @@
 {
   "store": "feedback",
-  "updated": "2026-07-25T13:16:32Z",
+  "updated": "2026-07-25T13:26:22Z",
   "threshold": 10,
-  "count_since_submission": 7,
-  "submitted_at": "2026-07-22T07:26:06Z",
+  "count_since_submission": 0,
+  "submitted_at": "2026-07-25T13:26:22Z",
   "entries": [
     {
       "id": "20260725T131632Z-speckit-review",

@@ -11,6 +11,7 @@ For each category below, mark status (Clear / Partial / Missing):
 **Feature Linkage:**
 - `Related Feature` section has concrete `Feature ID` and `Feature Name`
 - The requirement-to-feature relationship is explicit and internally consistent
+- When proposing bind-vs-create, list candidate Features with their Status and a one-line scope summary so overlap is judged on evidence, not recall
 
 **Functional Scope & Behavior:**
 - Core user goals & success criteria

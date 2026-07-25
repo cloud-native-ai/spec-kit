@@ -76,6 +76,15 @@ If spec contains `Feature ID: Need clarification` or `Feature Name: Need clarifi
 - Respect early termination signals ("stop", "done", "proceed")
 - Do not modify upstream artifacts in later modes (B won't edit requirements.md; C won't edit plan.md)
 
+### Scope Revision Protocol (user re-scopes AFTER plan/tasks exist)
+
+The rule above governs *clarification* runs. When the USER explicitly changes the feature's scope or core concept after downstream artifacts exist, that is a **revision**, not a clarification — follow this protocol instead of forcing new specs or re-running scaffolding:
+
+1. **Amend upstream in place**: update requirements.md first, recording the user directive verbatim under `## Clarifications` (dated session entry). Never re-run creation scripts — they overwrite history.
+2. **Regenerate downstream by hand**: rewrite plan/data-model/contracts/quickstart/tasks to match; delete artifacts the revision obsoletes (use alias-proof `\rm -f`).
+3. **Residual-reference sweep (exit gate)**: grep all spec artifacts for terms belonging to the dropped design; zero hits (outside "removed/dropped" annotations) before reporting completion.
+4. **Re-validate**: re-run the spec quality checklist and update the Feature entry notes with the revision rationale.
+
 ## Feedback
 
 At wrap-up (the same lifecycle point where this command prompts for a Git commit), perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:

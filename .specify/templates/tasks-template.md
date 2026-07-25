@@ -111,6 +111,10 @@ A `/speckit.implement` run is considered complete when **zero `[ ]` rows remain*
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
+> OMIT this phase entirely (and renumber subsequent phases) when the feature has no
+> blocking prerequisites — e.g. pure template/governance/documentation features. Do
+> NOT keep an empty phase header with "(no tasks)".
+
 Examples of foundational tasks (adjust based on your project):
 
 - [ ] T004 Setup database schema and migrations framework

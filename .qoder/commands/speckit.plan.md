@@ -130,6 +130,7 @@ After generating all Phase 1 artifacts (especially contract documents under `con
    - Normative rules (MUST, MUST NOT, SHOULD)
    - Concrete examples or schemas
    - No first-person reasoning, no self-correction prose, no exploratory narration
+4. **Execution-verify emitted command examples**: every executable CLI example written into `quickstart.md` or `contracts/` MUST be either (a) executed once against the real tool during this phase, or (b) pinned by a contract test asserting its validity. Examples written from intent instead of code routinely drift from actual validators (flags, ID formats, argument grammars) and ship as broken documentation.
 
 ## Key rules
 

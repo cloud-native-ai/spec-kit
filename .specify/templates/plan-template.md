@@ -104,6 +104,11 @@
 
   If your project does not match any of these, document what is true. The goal is
   evidence-faithful structure, not adherence to a fixed taxonomy.
+
+  MIRROR OBLIGATIONS: if any changed file has mirrors or generated runtime copies
+  (dual-written template dirs, per-tool command copies, script mirrors), list EVERY
+  copy explicitly in this tree — missed mirrors are the highest-frequency rework
+  source during implementation.
 -->
 
 ```text

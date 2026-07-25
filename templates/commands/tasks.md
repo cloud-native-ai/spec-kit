@@ -159,6 +159,7 @@ Every task MUST strictly follow this format:
 2. **From Contracts**:
    - Map each contract/endpoint → to the user story it serves
    - If tests requested: Each contract → contract test task [P] before implementation in that story's phase
+   - Prefer one test file per contract document rather than per story: when multiple stories append to a single shared test file, [P] parallel markers become invalid and stories serialize on that file
 
 3. **From Data Model**:
    - Map each entity to the user story(ies) that need it

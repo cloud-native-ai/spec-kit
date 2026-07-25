@@ -34,6 +34,9 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
    - Respect dependencies; parallel tasks [P] can run together
    - TDD approach: test tasks before implementation tasks
    - Validate every project-side regen/build command (fail-open EXIT=0 insufficient — verify output artifacts)
+   - **Shell hygiene (alias-proof)**: destructive/mirror file operations MUST use alias-proof forms (`\rm -f`, `\cp -f`, or `command rm/cp`) and MUST verify the result afterwards (`ls` / `diff -q`) — interactive aliases (`rm -i`, `cp -i`) silently swallow non-interactive deletes/copies while appearing to succeed
+   - **Test runs**: prefer the canonical runner `.specify/scripts/bash/run-tests.sh` (resolves the pytest interpreter once, pipe-safe) for baseline and regression tasks instead of ad-hoc `python -m pytest | tail` pipelines whose exit codes mask interpreter failures
+   - **Commit discipline**: wrap-up metadata fix-ups (verification stamps, mirror syncs) go into NEW commits — never `--amend` an already-created commit
 
 7. **Progress tracking**:
    - Report after each completed task

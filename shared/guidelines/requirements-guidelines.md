@@ -87,7 +87,7 @@ Generate a checklist file at `FEATURE_DIR/checklists/requirements.md`:
 
   4. Number questions sequentially (Q1, Q2, Q3 — max 3 total)
   5. Present all questions together before waiting
-  6. Update spec after user responds
+  6. Update spec after user responds — record each accepted answer under `## Clarifications` > `### Session YYYY-MM-DD` (same convention as /speckit.clarify), never as loose bullets outside a session heading
   7. Re-run validation after all resolved
 
 ## General Guidelines
@@ -107,6 +107,7 @@ Generate a checklist file at `FEATURE_DIR/checklists/requirements.md`:
 ### For AI Generation
 
 1. **Make informed guesses**: Use context, industry standards, common patterns
+   - **Conceptual/philosophy inputs** (idea essays, methodology write-ups): first distill them into concrete deliverable slices — typically "what the system itself must embody" vs "what its consumers receive" — before drafting user stories; this cuts clarification rounds
 2. **Document assumptions**: Record defaults in the Assumptions section
 3. **Limit clarifications**: Maximum 3 [NEEDS CLARIFICATION] markers for critical decisions only
 4. **Prioritize clarifications**: scope > security/privacy > user experience > technical details
