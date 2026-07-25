@@ -1,6 +1,6 @@
-# UML Visualization Guide — analysis-project
+# UML Visualization Guide — study-project
 
-Normative rules for expressing analysis-project report views as standard UML diagrams. Rendering is **delegated to the draw-plantuml skill** — this package contains no rendering code; draw-plantuml owns diagram syntax, its `scripts/render-plantuml.sh`, and image conventions.
+Normative rules for expressing study-project report views as standard UML diagrams. Rendering is **delegated to the draw-plantuml skill** — this package contains no rendering code; draw-plantuml owns diagram syntax, its `scripts/render-plantuml.sh`, and image conventions.
 
 ## 1. Primary views and required coverage
 

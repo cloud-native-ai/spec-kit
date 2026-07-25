@@ -71,7 +71,7 @@ def validate_unit_id(unit_id: str) -> bool:
 
 
 def unit_slug(unit_id: str) -> str:
-    """`/speckit.plan` -> `speckit-plan`; `skill:analysis-project` -> `skill-analysis-project`."""
+    """`/speckit.plan` -> `speckit-plan`; `skill:study-project` -> `skill-study-project`."""
     slug = _SLUG_RE.sub("-", (unit_id or "").strip().lower()).strip("-")
     return slug or "unit"
 

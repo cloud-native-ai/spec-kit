@@ -8,7 +8,7 @@ from tests.script_api import feedback_utils
 # --------------------------------------------------------------------------- #
 def test_validate_unit_id_accepts_speckit_and_skill():
     assert feedback_utils.validate_unit_id("/speckit.plan")
-    assert feedback_utils.validate_unit_id("skill:analysis-project")
+    assert feedback_utils.validate_unit_id("skill:study-project")
     assert feedback_utils.validate_unit_id("/speckit.feedback-mechanism")
 
 
@@ -24,7 +24,7 @@ def test_validate_unit_id_rejects_arbitrary_text():
 # --------------------------------------------------------------------------- #
 def test_unit_slug_derivation():
     assert feedback_utils.unit_slug("/speckit.plan") == "speckit-plan"
-    assert feedback_utils.unit_slug("skill:analysis-project") == "skill-analysis-project"
+    assert feedback_utils.unit_slug("skill:study-project") == "skill-study-project"
     assert feedback_utils.unit_slug("/speckit.implement") == "speckit-implement"
 
 

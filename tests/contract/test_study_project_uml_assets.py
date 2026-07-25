@@ -1,4 +1,4 @@
-"""Contract tests for the analysis-project UML enhancement prompt assets.
+"""Contract tests for the study-project UML enhancement prompt assets.
 
 Spec: .specify/specs/030-summarize-project (Feature 013 — Skills Command)
 Covers contract items C-14…C-20 from
@@ -23,11 +23,11 @@ from tests.contract.helpers_prompt_assets import (
     text_of,
 )
 
-SKILL_DIR = ROOT / "skills" / "analysis-project"
+SKILL_DIR = ROOT / "skills" / "study-project"
 SKILL_FILE = SKILL_DIR / "SKILL.md"
 GUIDE_FILE = SKILL_DIR / "references" / "uml-visualization-guide.md"
-MIRROR_DIR = ROOT / ".specify" / "skills" / "analysis-project"
-BASELINE_FILE = ROOT / "tests" / "fixtures" / "analysis_project_baseline.json"
+MIRROR_DIR = ROOT / ".specify" / "skills" / "study-project"
+BASELINE_FILE = ROOT / "tests" / "fixtures" / "study_project_baseline.json"
 
 UML_TRIGGERS = ["UML", "component diagram", "deployment diagram", "sequence diagram"]
 
@@ -62,7 +62,7 @@ def test_mirror_is_byte_equivalent():
 
 def test_frontmatter_name_preserved():
     fm = read_frontmatter(SKILL_FILE)
-    assert fm.get("name") == "analysis-project", f"got name={fm.get('name')}"
+    assert fm.get("name") == "study-project", f"got name={fm.get('name')}"
 
 
 def test_frontmatter_description_has_uml_triggers():

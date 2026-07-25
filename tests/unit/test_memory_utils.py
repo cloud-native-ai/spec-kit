@@ -36,7 +36,7 @@ def _namespace(**overrides):
 # --------------------------------------------------------------------------- #
 def test_validate_source_accepts_speckit_and_skill():
     assert memory_utils.validate_source("/speckit.plan")
-    assert memory_utils.validate_source("skill:analysis-project")
+    assert memory_utils.validate_source("skill:study-project")
 
 
 def test_validate_source_rejects_arbitrary_text():
@@ -106,7 +106,7 @@ def test_knowledge_non_ascii_titles_do_not_overwrite(tmp_path: Path):
 
 def test_knowledge_upsert_merges_tags(tmp_path: Path):
     common = dict(action="record", workspace_root=str(tmp_path), scope="knowledge",
-                  source="skill:analysis-project", title="Team convention")
+                  source="skill:study-project", title="Team convention")
     memory_utils.action_record(_namespace(content="First", tags="style", **common))
     result = memory_utils.action_record(_namespace(content="Second", tags="review", **common))
 

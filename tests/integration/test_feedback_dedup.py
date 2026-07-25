@@ -26,11 +26,11 @@ def _record(ws: Path, unit_id: str, run_id: str, capsys):
 
 
 def test_second_record_same_unit_run_is_duplicate(feedback_store: Path, capsys):
-    first = _record(feedback_store, "skill:analysis-project", "nested-run", capsys)
+    first = _record(feedback_store, "skill:study-project", "nested-run", capsys)
     assert first["duplicate"] is False
     assert first["count_since_submission"] == 1
 
-    second = _record(feedback_store, "skill:analysis-project", "nested-run", capsys)
+    second = _record(feedback_store, "skill:study-project", "nested-run", capsys)
     assert second["duplicate"] is True
     assert second["count_since_submission"] == 1  # unchanged
 
@@ -51,7 +51,7 @@ def test_nested_command_then_skill_same_run_not_double_counted(feedback_store: P
     capsys.readouterr()
     feedback_utils.main([
         "--action", "record", "--workspace-root", str(feedback_store),
-        "--unit-id", "skill:analysis-project", "--unit-type", "skill",
+        "--unit-id", "skill:study-project", "--unit-type", "skill",
         "--run-id", "shared-run", "--review", "R", "--points", "P",
     ])
     out = json.loads(capsys.readouterr().out)

@@ -1,7 +1,7 @@
 ---
-name: analysis-project
-description: Deep analysis of current project with professional architecture reports, illustrated with standard UML diagrams (component diagram, deployment diagram, sequence diagram) rendered via draw-plantuml. Use when the user mentions "analyze project", "analyze repository", "source code analysis", "architecture analysis", "code analysis", "study this project", "research this framework", "UML图", "UML diagram", "架构图", "component diagram", "deployment diagram", "sequence diagram"
-skill_id: "<SKILL:.specify/skills/analysis-project/SKILL.md>"
+name: study-project
+description: Deep study of the current project as it exists today — what is implemented and why — producing professional architecture reports illustrated with standard UML diagrams (component diagram, deployment diagram, sequence diagram) rendered via draw-plantuml. Use when the user mentions "study this project", "explain this project", "analyze project", "analyze repository", "source code analysis", "architecture analysis", "code analysis", "UML图", "UML diagram", "架构图", "component diagram", "deployment diagram", "sequence diagram"
+skill_id: "<SKILL:.specify/skills/study-project/SKILL.md>"
 ---
 
 # Project Deep Analysis Skill
@@ -243,7 +243,7 @@ At the end of a substantial run of this skill, perform an agent self-reflection 
 5. **Persist** via the engine:
    ```bash
    python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
-     --unit-id "skill:analysis-project" --unit-type skill \
+     --unit-id "skill:study-project" --unit-type skill \
      --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
      --review "<review prose>" --points-file "<points file>"
    ```

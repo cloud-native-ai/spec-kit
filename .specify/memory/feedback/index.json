@@ -1,10 +1,32 @@
 {
   "store": "feedback",
-  "updated": "2026-07-25T15:20:03Z",
+  "updated": "2026-07-25T16:10:16Z",
   "threshold": 10,
-  "count_since_submission": 33,
+  "count_since_submission": 35,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260725T161016Z-skill-improve-skills",
+      "file": "20260725T161016Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "improve-skills-visualize-project-layering-20260726",
+      "feature": "013",
+      "partial": false,
+      "created": "2026-07-25T16:10:16Z",
+      "summary": "Layered decomposition of visualize-project per user direction: split the monolithic visualization-playbook.md into five per-layer reference docs (project-overview / requirements-features / work-breakd"
+    },
+    {
+      "id": "20260725T154402Z-skill-improve-skills",
+      "file": "20260725T154402Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "improve-skills-visualize-project-refactor-20260725",
+      "feature": "013",
+      "partial": false,
+      "created": "2026-07-25T15:44:02Z",
+      "summary": "Refactored manage-project into visualize-project per user direction: repositioned from a PM input tool (overlapping spec-kit's own requirements/features/tasks framework) into a read-only presentation/"
+    },
     {
       "id": "20260725T152003Z-skill-improve-skills",
       "file": "20260725T152003Z-skill-improve-skills.md",

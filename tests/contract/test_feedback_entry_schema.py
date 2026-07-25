@@ -60,13 +60,13 @@ def test_entry_file_frontmatter_and_body(feedback_store: Path):
 
 @pytest.mark.contract
 def test_entry_filename_convention(feedback_store: Path):
-    _record(feedback_store, unit_id="skill:analysis-project", unit_type="skill",
+    _record(feedback_store, unit_id="skill:study-project", unit_type="skill",
             run_id="name-run")
     files = [f for f in (feedback_store / ".specify/memory/feedback").glob("*.md")]
     assert files
     for f in files:
         assert FILENAME_RE.match(f.name), f.name
-        assert "skill-analysis-project" in f.name
+        assert "skill-study-project" in f.name
 
 
 @pytest.mark.contract

@@ -32,7 +32,7 @@ class TestRecordAction:
     def test_record_json_output_shape(self, feedback_store: Path, capsys):
         feedback_utils.main([
             "--action", "record", "--workspace-root", str(feedback_store),
-            "--unit-id", "skill:analysis-project", "--unit-type", "skill",
+            "--unit-id", "skill:study-project", "--unit-type", "skill",
             "--run-id", "run-shape-test",
             "--review", "Review text.",
             "--points", "Point one",

@@ -123,7 +123,7 @@ Use the `improve-skills` skill to iterate on existing skills:
 
 Spec Kit ships with these skills ready to use:
 
-- `analysis-project` — Deep architecture analysis reports
+- `study-project` — Deep architecture analysis reports
 - `draw-plantuml` — System architecture diagrams via PlantUML
 - `draw-echarts` — Data visualizations via Apache ECharts
 - `draw-d3js` — Interactive D3.js visualizations

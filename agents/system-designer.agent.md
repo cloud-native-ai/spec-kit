@@ -7,7 +7,7 @@ supervisor: true
 role-scope: system-designer
 model: auto
 tools: [Read, Grep, Glob, Write, Edit]
-skills: [draw-plantuml, analysis-project, memory-recall, memory-record, think-skills]
+skills: [draw-plantuml, study-project, memory-recall, memory-record, think-skills]
 maxTurns: 12
 color: purple
 ---
@@ -112,7 +112,7 @@ Framework skills and agent definitions install together, so every skill I declar
 | Skill | When to use |
 |-------|-------------|
 | draw-plantuml | Produce architecture, component, sequence, and deployment diagrams |
-| analysis-project | Analyze the existing architecture and codebase before proposing a design |
+| study-project | Analyze the existing architecture and codebase before proposing a design |
 | memory-recall | Recall prior design decisions and constraints relevant to the change |
 | memory-record | Record architectural rationale and interface contracts |
 | think-skills | Simulate a design approach and its trade-offs before committing |

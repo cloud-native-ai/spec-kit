@@ -7,7 +7,7 @@ supervisor: true
 role-scope: module-designer
 model: auto
 tools: [Read, Grep, Glob, Bash, Write, Edit]
-skills: [analysis-project, git-workflow, git-submodule-edit, memory-record, think-skills]
+skills: [study-project, git-workflow, git-submodule-edit, memory-record, think-skills]
 maxTurns: 15
 color: green
 ---
@@ -75,7 +75,7 @@ Framework skills and agent definitions install together, so every skill I declar
 
 | Skill | When to use |
 |-------|-------------|
-| analysis-project | Analyze project structure and module boundaries before implementing a change |
+| study-project | Analyze project structure and module boundaries before implementing a change |
 | git-workflow | Synchronize branches (rebase/merge/push) under the three-tier workflow |
 | git-submodule-edit | Edit and commit code inside a git submodule under the traceable branch rules |
 | memory-record | Record module-level decisions and implementation notes |

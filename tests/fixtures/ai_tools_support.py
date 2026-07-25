@@ -99,9 +99,9 @@ def make_resource_with_skills(
     # skills
     skills_dir = root / "skills"
     skills_dir.mkdir(parents=True, exist_ok=True)
-    (skills_dir / "analysis-project").mkdir(parents=True, exist_ok=True)
-    (skills_dir / "analysis-project" / "SKILL.md").write_text(
-        "# Analysis Project Skill\n", encoding="utf-8"
+    (skills_dir / "study-project").mkdir(parents=True, exist_ok=True)
+    (skills_dir / "study-project" / "SKILL.md").write_text(
+        "# Project Deep Analysis Skill\n", encoding="utf-8"
     )
 
     # shared reference directory (installed to .specify/shared)

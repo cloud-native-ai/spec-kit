@@ -28,7 +28,7 @@ Do not store anything derivable from project state: code, architecture, file lay
 ## Workflow
 1. Confirm the trigger is a Spec Kit command or skill. Determine the correct `--source`:
    - `/speckit.<command>` for command-driven work (e.g. `/speckit.plan`).
-   - `skill:<skill-name>` for skill-driven work (e.g. `skill:analysis-project`).
+   - `skill:<skill-name>` for skill-driven work (e.g. `skill:study-project`).
    The engine rejects any other source, so this is a hard boundary — never fabricate a source to force a write.
 2. Distill the takeaway into a concise title and a few lines of content.
 3. Pick the scope (`session` vs `knowledge`) using the guidance above.

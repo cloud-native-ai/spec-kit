@@ -1,7 +1,7 @@
 """Shared assertion helpers for skill prompt-asset contract tests.
 
-Used by test_manage_project_prompt_assets.py and
-test_analysis_project_uml_assets.py (spec 030-summarize-project, Feature 013).
+Used by test_visualize_project_prompt_assets.py and
+test_study_project_uml_assets.py (spec 030-summarize-project, Feature 013).
 Modeled on the conventions of test_create_skills_prompt_assets.py.
 """
 from pathlib import Path

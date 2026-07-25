@@ -7,7 +7,7 @@ supervisor: true
 role-scope: qa-engineer
 model: auto
 tools: [Read, Grep, Glob, Bash]
-skills: [analysis-project, browser-utils, database-utils, memory-recall]
+skills: [study-project, browser-utils, database-utils, memory-recall]
 maxTurns: 10
 color: orange
 ---
@@ -70,7 +70,7 @@ Framework skills and agent definitions install together, so every skill I declar
 
 | Skill | When to use |
 |-------|-------------|
-| analysis-project | Analyze architecture and constitution compliance across the integrated system |
+| study-project | Analyze architecture and constitution compliance across the integrated system |
 | browser-utils | Perform end-to-end web checks against the running system |
 | database-utils | Validate persisted data with read-only SQL queries |
 | memory-recall | Recall requirements and acceptance criteria to check the system against |

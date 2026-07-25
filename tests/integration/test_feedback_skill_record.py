@@ -19,7 +19,7 @@ pytestmark = pytest.mark.integration
 def test_skill_record_writes_local_skill_entry(feedback_store: Path):
     rc = feedback_utils.main([
         "--action", "record", "--workspace-root", str(feedback_store),
-        "--unit-id", "skill:analysis-project", "--unit-type", "skill",
+        "--unit-id", "skill:study-project", "--unit-type", "skill",
         "--run-id", "analysis-20260714T1000",
         "--review", "Reviewed my own run against my stated purpose (deep project analysis).",
         "--points", "Cache repeated file reads to speed up large repos",
@@ -33,7 +33,7 @@ def test_skill_record_writes_local_skill_entry(feedback_store: Path):
     meta, body = feedback_utils.parse_frontmatter(files[0].read_text(encoding="utf-8"))
     assert meta["scope"] == "local"
     assert meta["unit_type"] == "skill"
-    assert meta["unit_id"] == "skill:analysis-project"
+    assert meta["unit_id"] == "skill:study-project"
     assert "## Review" in body and "## Optimization Points" in body
     bullets = [ln for ln in body.splitlines() if ln.strip().startswith("- ")]
     assert len(bullets) >= 1
