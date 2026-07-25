@@ -65,7 +65,23 @@ Real friction you hit while using the framework's commands and skills is valuabl
 
 ### Loop B — Build the same loop for your own product
 
-(Completed in the following subsections.)
+The framework's shipped capabilities are enough to run a Dogfooding loop for **your own product** — no extra tooling required:
+
+| Capability | Role in your product's loop |
+|------------|-----------------------------|
+| Feedback engine (`feedback-utils.py`) | Record real-use findings about your product with `--unit-id "skill:<scenario-name>"` (unit-id accepts `/speckit.<command>` or `skill:<name>`); track accumulation with `--action status` / `--action list` |
+| Memory (session/knowledge) | Persist working notes and distilled lessons from real usage |
+| History | Distill past project conversations into reusable knowledge |
+| Review | Periodic retrospective checkpoint where findings are revisited |
+| Task records (tasks/verification) | Trace each finding to the iteration that addressed it |
+
+**Adoption advice (advisory — never a gate):**
+
+- **Staged rollout**: start with the core team first, then widen; forcing 100% usage of an immature product hurts more than it helps (over-idealization).
+- **Tailor to your product's shape**: if daily self-use is not suited to your product (embedded firmware, consumer hardware), substitute periodic real-environment drills or a designated proxy user group instead of forcing it.
+- **Anti-patterns to avoid**: *formalism* (going through the motions without real reliance), *echo chamber* (only builders participate — bring in non-technical roles), *dead-letter feedback* (findings recorded but never acted on — close or resolve every entry deliberately), *over-idealization* (mandating full usage regardless of maturity).
+
+The test of a healthy loop is simple: do team members rely on the product for real tasks, and does what they report visibly change the next iteration?
 
 ## Tech Stack & Resources
 - **Project Name**: {{PROJECT_NAME}}

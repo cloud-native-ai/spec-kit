@@ -161,3 +161,57 @@ def test_c3_mirror_byte_identical():
 def test_c5_section_appears_once_per_mirror():
     for p in (SRC, MIRROR):
         assert read(p).count(SECTION_HEADING) == 1, f"{SECTION_HEADING!r} must appear exactly once in {p}"
+
+
+# --- C-2 (Loop B): capability mapping, anti-patterns, staged adoption ---
+
+LOOP_B_CAPABILITIES = ["feedback", "memory", "history", "review", "task record"]
+ANTI_PATTERNS = ["formalis", "echo chamber", "dead-letter", "over-ideal"]
+
+
+def test_c2_loop_b_capability_mapping():
+    body = guidance_section(read(SRC))
+    assert "Loop B" in body, "Loop B subsection missing"
+    low = body.lower()
+    for cap in LOOP_B_CAPABILITIES:
+        assert cap in low, f"Loop B capability mapping missing {cap!r}"
+
+
+def test_c2_anti_patterns_and_adoption():
+    body = guidance_section(read(SRC)).lower()
+    for ap in ANTI_PATTERNS:
+        assert ap in body, f"anti-pattern {ap!r} missing from guidance"
+    assert re.search(r"staged|stage[- ]by[- ]stage|core team first", body), "staged adoption advice missing"
+    assert re.search(r"tailor|not suited|proxy user|drill", body), "scenario-tailoring advice missing"
+
+
+# --- C-4: no new machinery (FR-004 / SC-004) ---
+
+ENGINE_SRC = ROOT / "scripts" / "python" / "feedback-utils.py"
+ENGINE_MIRROR = ROOT / ".specify" / "scripts" / "python" / "feedback-utils.py"
+COMMANDS_DIR = ROOT / "templates" / "commands"
+
+
+def test_c4_engine_action_set_unchanged():
+    src = read(ENGINE_SRC)
+    m = re.search(r'choices=\[([^\]]+)\]', src)
+    assert m, "argparse --action choices not found"
+    actions = set(re.findall(r'"([a-z-]+)"', m.group(1)))
+    assert actions == ENGINE_ACTIONS, f"engine action set changed: {actions ^ ENGINE_ACTIONS}"
+
+
+def test_c4_engine_mirror_untouched():
+    assert ENGINE_SRC.read_bytes() == ENGINE_MIRROR.read_bytes(), "feedback-utils.py mirrors diverged"
+
+
+def test_c4_no_dogfooding_steps_in_command_templates():
+    for p in sorted(COMMANDS_DIR.glob("*.md")):
+        assert "Dogfooding" not in read(p), \
+            f"command template {p.name} gained Dogfooding content — violates FR-004 (no new steps)"
+
+
+def test_c4_no_new_memory_layout():
+    memory = ROOT / ".specify" / "memory"
+    dirs = {d.name for d in memory.iterdir() if d.is_dir()}
+    assert dirs <= {"features", "feedback", "knowledge", "session"}, \
+        f"unexpected new .specify/memory/ subdirectory: {dirs - {'features', 'feedback', 'knowledge', 'session'}}"

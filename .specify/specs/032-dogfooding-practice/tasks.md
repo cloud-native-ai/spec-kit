@@ -109,16 +109,16 @@ Single project：仓库根下 `templates/`、`tests/`、`docs/`；镜像 `.speci
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T011 [US3] 在 tests/contract/test_dogfooding_practice.py 追加 C-2 Loop B 断言（五项能力映射齐全、四项反误区齐全、分阶段与场景裁剪存在、项目无关）与 C-4（无新机器：feedback-utils choices 集合不变、templates/commands/ 相对 T002 快照零 Dogfooding 新增、.specify/memory/ 布局不变）断言，先失败
+- [X] T011 [US3] 在 tests/contract/test_dogfooding_practice.py 追加 C-2 Loop B 断言（五项能力映射齐全、四项反误区齐全、分阶段与场景裁剪存在、项目无关）与 C-4（无新机器：feedback-utils choices 集合不变、templates/commands/ 相对 T002 快照零 Dogfooding 新增、.specify/memory/ 布局不变）断言，先失败
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] 在 templates/instructions-template.md 的 `## Dogfooding Practice` 节补全 Loop B 能力映射、反误区清单、分阶段/场景裁剪建议（保持项目无关）
-- [ ] T013 [US3] 镜像同步：`\cp -f templates/instructions-template.md .specify/templates/instructions-template.md` 并 `diff -q` 确认（C-3 复验）
+- [X] T012 [US3] 在 templates/instructions-template.md 的 `## Dogfooding Practice` 节补全 Loop B 能力映射、反误区清单、分阶段/场景裁剪建议（保持项目无关）
+- [X] T013 [US3] 镜像同步：`\cp -f templates/instructions-template.md .specify/templates/instructions-template.md` 并 `diff -q` 确认（C-3 复验）
 
 ### Manual Verification for User Story 3
 
-- [ ] T014 [US3] Manual QA：按 quickstart 场景 2 以自定义 unit-id 记录一条"自己的产品"发现 + 场景 4 无新机器自检（对照 T002 快照），结果记入 verification.md
+- [X] T014 [US3] Manual QA：按 quickstart 场景 2 以自定义 unit-id 记录一条"自己的产品"发现 + 场景 4 无新机器自检（对照 T002 快照），结果记入 verification.md
 
 **Checkpoint**: 三个用户故事均独立可验
 
