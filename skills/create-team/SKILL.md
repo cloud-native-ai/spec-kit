@@ -581,6 +581,14 @@ All patterns use **file-path-only** communication:
 - Iteration: iteration history in the run workspace; final summary in the tracked run report
 - Continuous: cross-run `STATE.md` + append-only `run-log.jsonl` in the team directory; per-cycle report under `runs/` (see `references/operating-loops.md`)
 
+### Structured Returns from Loop Sub-Agents
+
+In iteration/continuous loops, every dispatched sub-agent (optimizer, executor/renderer, scorer/evaluator) MUST finish by writing a small **structured result manifest** into the run workspace (e.g. `.specify/teams/.work/<slug>/gen-<N>/<role>-result.md` or `.json`), containing: `status` (done/failed), `output_paths` (file-path-only, no content), per-dimension scores (evaluators), and the single biggest improvement point observed.
+
+- **Sub-agents never write tracked team files.** `runs/<ts>-report.md`, `team.md`, `STATE.md`, and `run-log.jsonl` are written **only by the Team Supervisor (orchestrator)**, which aggregates the manifests. Sub-agents run in isolated contexts — concurrent writes to tracked files race, a sub-agent cannot see sibling variants to aggregate them, and a partial write corrupts the durable record.
+- The supervisor **validates each manifest before DECIDE**; a missing or empty manifest counts that variant/cycle as failed (it does not silently score zero-quality work as zero points).
+- The scored deliverable path in the manifest is what the supervisor passes to the evaluator — evaluators read the artifact from that path, never from pasted content.
+
 ### Model Selection Guidance
 
 | Sub-task Type | Examples | Recommended Tier |
