@@ -89,3 +89,75 @@ def test_c7_deviation_log_location():
     body = principle_section(read(CONSTITUTION))
     assert ".specify/specs/" in body and ".specify/memory/" in body, \
         "deviation log locations (.specify/specs/<key>/ or .specify/memory/) not named"
+
+
+# ---------------------------------------------------------------------------
+# Guidance section (instructions-template) — C-2 / C-3 / C-5
+# ---------------------------------------------------------------------------
+
+SECTION_HEADING = "## Dogfooding Practice"
+ENGINE_ACTIONS = {"record", "status", "list", "mark-submitted", "reindex", "package", "upstream"}
+# Project identifiers that MUST NOT leak into a project-neutral shared section.
+FORBIDDEN = ["spec-kit", "specify-cli", "specify_cli", "Feature 036", "032-dogfooding-practice", "cloud-native-ai"]
+
+
+def guidance_section(text: str) -> str:
+    lines = text.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if line.strip() == SECTION_HEADING:
+            start = i
+            break
+    assert start is not None, f"section heading {SECTION_HEADING!r} not found"
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if lines[j].startswith("## ") or lines[j].startswith("# "):
+            end = j
+            break
+    return "\n".join(lines[start:end])
+
+
+# --- C-2 (Loop A): actionable feed-back-to-framework path ---
+
+def test_c2_section_present_in_template():
+    assert SECTION_HEADING in read(SRC), f"{SECTION_HEADING!r} missing in templates/instructions-template.md"
+
+
+def test_c2_loop_a_path():
+    body = guidance_section(read(SRC))
+    assert "Loop A" in body, "Loop A subsection missing"
+    for step in ("record", "package"):
+        assert step in body, f"Loop A path step {step!r} missing"
+    assert re.search(r"threshold", body, re.IGNORECASE), "threshold prompt mention missing"
+    assert re.search(r"manual", body, re.IGNORECASE), "manual submission mention missing"
+    assert re.search(r"no automatic|never transmits|zero automatic", body, re.IGNORECASE), \
+        "zero-automatic-transmission statement missing"
+
+
+def test_c2_action_names_are_real():
+    body = guidance_section(read(SRC))
+    used = set(re.findall(r"--action\s+([a-z-]+)", body))
+    unknown = used - ENGINE_ACTIONS
+    assert not unknown, f"guidance references non-existent engine actions: {unknown}"
+
+
+def test_c2_project_neutral():
+    body = guidance_section(read(SRC))
+    for bad in FORBIDDEN:
+        assert bad not in body, f"project-specific identifier {bad!r} leaked into shared guidance"
+    for bad in ("Dogfooded", "Dogfoodding"):
+        assert bad not in body, f"misspelled variant {bad!r} in guidance section"
+
+
+# --- C-3: byte-identical mirrors ---
+
+def test_c3_mirror_byte_identical():
+    assert SRC.read_bytes() == MIRROR.read_bytes(), \
+        "templates/instructions-template.md and .specify/templates/instructions-template.md differ"
+
+
+# --- C-5: single delivery point, no duplication ---
+
+def test_c5_section_appears_once_per_mirror():
+    for p in (SRC, MIRROR):
+        assert read(p).count(SECTION_HEADING) == 1, f"{SECTION_HEADING!r} must appear exactly once in {p}"

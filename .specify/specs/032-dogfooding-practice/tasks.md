@@ -86,16 +86,16 @@ Single project：仓库根下 `templates/`、`tests/`、`docs/`；镜像 `.speci
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T007 [US2] 在 tests/contract/test_dogfooding_practice.py 追加 C-2 Loop A 断言（节存在；回流路径四步可辨；手动提交与零自动传输明示；动作名属既有 7 动作集）与 C-3（双镜像字节一致）、C-5（非破坏送达表述）断言，先失败
+- [X] T007 [US2] 在 tests/contract/test_dogfooding_practice.py 追加 C-2 Loop A 断言（节存在；回流路径四步可辨；手动提交与零自动传输明示；动作名属既有 7 动作集）与 C-3（双镜像字节一致）、C-5（非破坏送达表述）断言，先失败
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] 在 templates/instructions-template.md 新增 `## Dogfooding Practice` 节骨架 + Loop A 小节（项目无关表述；路径步骤与既有动作名严格对应 feedback-utils 实际动作集）
-- [ ] T009 [US2] 镜像同步：`\cp -f templates/instructions-template.md .specify/templates/instructions-template.md` 并 `diff -q` 确认（C-3）
+- [X] T008 [US2] 在 templates/instructions-template.md 新增 `## Dogfooding Practice` 节骨架 + Loop A 小节（项目无关表述；路径步骤与既有动作名严格对应 feedback-utils 实际动作集）
+- [X] T009 [US2] 镜像同步：`\cp -f templates/instructions-template.md .specify/templates/instructions-template.md` 并 `diff -q` 确认（C-3）
 
 ### Manual Verification for User Story 2
 
-- [ ] T010 [US2] Manual QA：按 quickstart 场景 1 在本工作区完成 record → status → package 全链路演练（SC-003），结果记入 verification.md
+- [X] T010 [US2] Manual QA：按 quickstart 场景 1 在本工作区完成 record → status → package 全链路演练（SC-003），结果记入 verification.md
 
 **Checkpoint**: US1 与 US2 均独立可验
 

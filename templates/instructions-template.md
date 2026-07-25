@@ -50,6 +50,23 @@ Classify each task by these signals: scope/size, uncertainty/novelty, blast radi
 - **Tie-break**: when a task's signals span more than one tier, choose the **higher tier**. Blast-radius/reversibility and requirements clarity dominate — a tiny edit to a shared, irreversible, or security-sensitive surface is High-stakes, not Trivial.
 - **Default**: if a task cannot yet be classified, treat it as **Standard**; but when the reason is unclear or under-specified requirements, that is itself a High-stakes / Ambiguous signal — clarify before proceeding rather than guessing.
 
+## Dogfooding Practice
+
+Dogfooding means the people who build a product also rely on it in their real daily work — developer and user tightly linked, often the same team — so a smooth **use → feedback → iterate** loop forms naturally. A project that provides development-assistance capabilities proves them the way a compiler proves itself by self-hosting: only a tool that performs well in its own engineering has earned the credibility to assist others. This section identifies two loops that already exist — it adds no new tools, steps, or storage.
+
+### Loop A — Feed your framework usage back upstream
+
+Real friction you hit while using the framework's commands and skills is valuable. The built-in feedback chain carries it upstream:
+
+1. **Record** — commands/skills self-record optimization points at wrap-up; you can also record friction you personally hit: `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "/speckit.<command>" --unit-type command --run-id "<id>" --review "<what happened>" --points "<suggestion>"` (unit-id must be `/speckit.<command>` or `skill:<name>`).
+2. **Threshold prompt** — check accumulation with `--action status`; when the count crosses the threshold, a consolidated prompt invites (never forces) submission.
+3. **Package** — `--action package` bundles pending entries into a local archive.
+4. **Manual submission** — delivering the archive to the framework's install-source repository is a deliberate, manual step. There is **no automatic transmission** of any feedback data; nothing leaves your machine unless you send it.
+
+### Loop B — Build the same loop for your own product
+
+(Completed in the following subsections.)
+
 ## Tech Stack & Resources
 - **Project Name**: {{PROJECT_NAME}}
 - **Root Path**: {{PROJECT_ROOT}}
