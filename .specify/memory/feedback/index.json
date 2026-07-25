@@ -1,10 +1,32 @@
 {
   "store": "feedback",
-  "updated": "2026-07-25T16:56:35Z",
+  "updated": "2026-07-25T17:56:41Z",
   "threshold": 10,
-  "count_since_submission": 36,
-  "submitted_at": null,
+  "count_since_submission": 2,
+  "submitted_at": "2026-07-25T17:14:57Z",
   "entries": [
+    {
+      "id": "20260725T175641Z-skill-improve-skills",
+      "file": "20260725T175641Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "feedback-triage-groupB-20260726",
+      "feature": "feedback-system",
+      "partial": false,
+      "created": "2026-07-25T17:56:41Z",
+      "summary": "Group B command-layer optimization batch (B1-B3): applied 11 triaged feedback items to requirements/clarify/plan/tasks/implement/review command templates plus requirements/plan/tasks templates, create"
+    },
+    {
+      "id": "20260725T173024Z-skill-improve-skills",
+      "file": "20260725T173024Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "group-c-skill-layer-20260726",
+      "feature": "028-skill-feedback",
+      "partial": false,
+      "created": "2026-07-25T17:30:24Z",
+      "summary": "Group C 技能层优化：improve-skills 吸收改名接线清单/git-mv 重读/stash 基线 diff 三条自教训；create-team 补淘汰策略花名册样例、种子嫁接、循环子代理结构化返回约定；draw-plantuml 补注释锚定纪律（顶层挂点/留白地图/族彩 tint/#FFCDD2 单点）、时序图 participant 构造型着色与 ≤5 note 预算、分带隐藏轴"
+    },
     {
       "id": "20260725T165635Z-skill-improve-skills",
       "file": "20260725T165635Z-skill-improve-skills.md",
