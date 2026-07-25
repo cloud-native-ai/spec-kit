@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-07-25T13:26:22Z",
+  "updated": "2026-07-25T14:54:40Z",
   "threshold": 10,
-  "count_since_submission": 0,
-  "submitted_at": "2026-07-25T13:26:22Z",
+  "count_since_submission": 32,
+  "submitted_at": null,
   "entries": [
+    {
+      "id": "20260725T145345Z-skill-manage-project",
+      "file": "20260725T145345Z-skill-manage-project.md",
+      "unit_id": "skill:manage-project",
+      "unit_type": "skill",
+      "run_id": "speckit-dogfood-init-20260725",
+      "feature": "032-dogfooding-practice",
+      "partial": false,
+      "created": "2026-07-25T14:53:45Z",
+      "summary": "首次对 spec-kit 自身完成 manage-project 全六步运行（dogfooding）：初始化模式建立 .specify/project/project.md 四要素基线，三图（WBS 15 节点、里程碑视图 6+2、进度甘特 10 任务包+6 里程碑）渲染校验通过，三图一致性自检两轮收敛；期间按用户指令将管理根目录从 docs/project-management/ 迁移至 .sp"
+    },
     {
       "id": "20260725T131632Z-speckit-review",
       "file": "20260725T131632Z-speckit-review.md",
