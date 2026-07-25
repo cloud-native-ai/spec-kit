@@ -148,3 +148,13 @@ Feedback Entries are bound to a single unit + run (`scope: local`) and MUST NOT 
 that global perspective — they complement it. Even the `review` command's own wrap-up
 records only a *local* self-review of that run, kept distinct from the global report it
 produces.
+
+## Dogfooding: this system is Loop A
+
+The feedback system is the carrier of the framework's **Dogfooding Loop A** (Constitution
+Principle XI): every project using the framework feeds real-use friction back upstream
+through the existing chain — record → threshold prompt → package → **manual** submission —
+with zero automatic transmission. Downstream projects also reuse this same engine as part
+of **Loop B** to run a use→feedback→iterate loop for their own product (see the
+`## Dogfooding Practice` section delivered into each project's instructions file). No
+Dogfooding-specific actions, steps, or storage exist — identification over invention.

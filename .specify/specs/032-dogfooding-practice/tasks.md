@@ -18,7 +18,7 @@
 - DoD-4: quickstart.md 四场景手工验证通过（含 SC-004 无新机器自检）
 - DoD-5: SC-001…SC-004 在 verification.md 有状态行（pass/deferred）
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -128,9 +128,9 @@ Single project：仓库根下 `templates/`、`tests/`、`docs/`；镜像 `.speci
 
 **Purpose**: 文档、回归与成功标准核验
 
-- [ ] T015 [P] 更新 docs/skills/feedback.md：补注该机制即 Dogfooding Loop A 的载体（一段轻量说明 + 指向 instructions 指引节）
-- [ ] T016 运行全量 `pytest` 与 T001 基线比对（零新增失败），结果记入 verification.md
-- [ ] T017 按 quickstart.md 四场景完整手工回归，并在 verification.md 写入 SC-001…SC-004 状态行（SC-001 属持续性指标可 deferred；SC-002 以模板节存在性 + 非破坏机制核验代验）
+- [X] T015 [P] 更新 docs/skills/feedback.md：补注该机制即 Dogfooding Loop A 的载体（一段轻量说明 + 指向 instructions 指引节）
+- [X] T016 运行全量 `pytest` 与 T001 基线比对（零新增失败），结果记入 verification.md
+- [X] T017 按 quickstart.md 四场景完整手工回归，并在 verification.md 写入 SC-001…SC-004 状态行（SC-001 属持续性指标可 deferred；SC-002 以模板节存在性 + 非破坏机制核验代验）
 
 ---
 
