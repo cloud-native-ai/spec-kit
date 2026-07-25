@@ -1,19 +1,22 @@
-"""Contract tests for the summarize-project skill prompt assets.
+"""Contract tests for the manage-project skill prompt assets.
 
-Spec: .specify/specs/030-summarize-project (Feature 013 — Skills Command)
-Covers contract items C-1…C-13 from
-contracts/visual-reporting-skills.openapi.yaml:
+Evolved from summarize-project (spec 030, Feature 013). Covers:
 
-- Package presence + byte-equivalent mirror (C-1)
-- Frontmatter: name, 7 trigger keywords, skill_id pattern (C-2)
-- Skills registry row in .specify/instructions.md (C-3)
-- Ordered five-step workflow (C-4)
-- Delegation to draw-plantuml @startwbs/@startgantt, no own scripts/ (C-5)
-- Milestones + progress status semantics + two-chart consistency (C-6)
-- Information-shortfall behavior (C-7), chart-set splitting (C-8)
-- references/reporting-playbook.md contents (C-9)
-- Report output conventions incl. docs/project-summary/ (C-10, C-11, C-12)
-- Canonical ## Feedback block with unit-id skill:summarize-project (C-13)
+- Package presence + byte-equivalent mirror
+- Frontmatter: name, trigger keywords, skill_id pattern
+- Skills registry row in .specify/instructions.md
+- Ordered six-step workflow (load/init -> collect -> decompose ->
+  embedded chart sources -> render validation -> consistency + persist)
+- Single Markdown management document as source of truth with the four
+  project-management elements (background, milestones, WBS, progress)
+- Charts embedded as PlantUML source blocks (text-form, editable), with
+  rendering delegated to draw-plantuml (@startwbs/@startgantt), no own scripts/
+- Milestone tracking view (happens entries + tracking table)
+- Progress semantics (three states, percent-complete, current-date reference)
+- Incremental update mode for repeat runs
+- Information-shortfall behavior, chart-set splitting
+- references/management-playbook.md contents
+- Canonical ## Feedback block with unit-id skill:manage-project
 """
 from pathlib import Path
 
@@ -26,19 +29,22 @@ from tests.contract.helpers_prompt_assets import (
     text_of,
 )
 
-SKILL_DIR = ROOT / "skills" / "summarize-project"
+SKILL_DIR = ROOT / "skills" / "manage-project"
 SKILL_FILE = SKILL_DIR / "SKILL.md"
-PLAYBOOK_FILE = SKILL_DIR / "references" / "reporting-playbook.md"
-MIRROR_DIR = ROOT / ".specify" / "skills" / "summarize-project"
+PLAYBOOK_FILE = SKILL_DIR / "references" / "management-playbook.md"
+MIRROR_DIR = ROOT / ".specify" / "skills" / "manage-project"
 
 TRIGGER_KEYWORDS = [
-    "项目总结",
-    "项目汇报",
-    "进展报告",
-    "项目进展",
-    "summarize project",
-    "project summary",
-    "project report",
+    "项目管理",
+    "项目背景",
+    "项目里程碑",
+    "进度追踪",
+    "manage project",
+    "project management",
+    "progress tracking",
+    "WBS",
+    "工作分解",
+    "甘特图",
 ]
 
 WORKFLOW_STEPS = [
@@ -47,11 +53,19 @@ WORKFLOW_STEPS = [
     "Step 3",
     "Step 4",
     "Step 5",
+    "Step 6",
+]
+
+FOUR_ELEMENT_SECTIONS = [
+    "项目背景",
+    "项目里程碑",
+    "主要工作",
+    "进度追踪",
 ]
 
 
 # ---------------------------------------------------------------------------
-# C-1: package presence and mirror equivalence
+# Package presence and mirror equivalence
 # ---------------------------------------------------------------------------
 
 def test_skill_package_exists():
@@ -62,19 +76,26 @@ def test_playbook_exists():
     assert PLAYBOOK_FILE.exists(), f"Expected {PLAYBOOK_FILE} to exist"
 
 
+def test_legacy_summarize_project_removed():
+    legacy = ROOT / "skills" / "summarize-project"
+    legacy_mirror = ROOT / ".specify" / "skills" / "summarize-project"
+    assert not legacy.exists(), "summarize-project must be fully evolved into manage-project"
+    assert not legacy_mirror.exists(), "stale summarize-project mirror must be removed"
+
+
 def test_mirror_is_byte_equivalent():
     assert_dirs_byte_equivalent(SKILL_DIR, MIRROR_DIR)
 
 
 # ---------------------------------------------------------------------------
-# C-2: frontmatter
+# Frontmatter
 # ---------------------------------------------------------------------------
 
 def test_frontmatter_name_and_skill_id():
     fm = read_frontmatter(SKILL_FILE)
-    assert fm.get("name") == "summarize-project", f"got name={fm.get('name')}"
+    assert fm.get("name") == "manage-project", f"got name={fm.get('name')}"
     skill_id = fm.get("skill_id", "")
-    assert skill_id == "<SKILL:.specify/skills/summarize-project/SKILL.md>", (
+    assert skill_id == "<SKILL:.specify/skills/manage-project/SKILL.md>", (
         f"unexpected skill_id: {skill_id}"
     )
 
@@ -87,19 +108,24 @@ def test_frontmatter_description_trigger_keywords():
 
 
 # ---------------------------------------------------------------------------
-# C-3: skills registry row
+# Skills registry row
 # ---------------------------------------------------------------------------
 
 def test_registry_has_exactly_one_row():
-    rows = skill_registry_rows("summarize-project")
+    rows = skill_registry_rows("manage-project")
     assert len(rows) == 1, f"Expected exactly 1 registry row, got {len(rows)}: {rows}"
 
 
+def test_registry_has_no_stale_summarize_project_row():
+    rows = [r for r in skill_registry_rows("summarize-project") if r.startswith("| summarize-project ")]
+    assert not rows, f"Stale summarize-project registry row(s) remain: {rows}"
+
+
 # ---------------------------------------------------------------------------
-# C-4/C-5: workflow order and delegation
+# Workflow order and delegation
 # ---------------------------------------------------------------------------
 
-def test_five_step_workflow_in_order():
+def test_six_step_workflow_in_order():
     text = text_of(SKILL_FILE)
     assert_ordered(text, WORKFLOW_STEPS, context="in SKILL.md workflow")
 
@@ -114,12 +140,44 @@ def test_delegates_rendering_to_draw_plantuml():
 def test_no_own_scripts_directory():
     scripts_dir = SKILL_DIR / "scripts"
     assert not scripts_dir.exists(), (
-        "summarize-project must delegate rendering; no scripts/ directory allowed"
+        "manage-project must delegate rendering; no scripts/ directory allowed"
     )
 
 
 # ---------------------------------------------------------------------------
-# C-6/C-7/C-8: consistency, shortfall behavior, chart-set splitting
+# Single management document with the four PM elements
+# ---------------------------------------------------------------------------
+
+def test_management_document_is_source_of_truth():
+    text = text_of(SKILL_FILE)
+    assert "docs/project-management/" in text, (
+        "Expected default management document location docs/project-management/"
+    )
+    assert "单一事实源" in text, "Expected single-source-of-truth principle"
+
+
+def test_four_pm_elements_documented():
+    text = text_of(SKILL_FILE)
+    for section in FOUR_ELEMENT_SECTIONS:
+        assert section in text, f"Expected PM element section: {section}"
+
+
+def test_charts_embedded_as_plantuml_source():
+    text = text_of(SKILL_FILE)
+    assert "```plantuml" in text, (
+        "Expected charts embedded as ```plantuml source blocks in the document"
+    )
+    assert "源码" in text and "嵌入" in text, "Expected embedded-source (text-form chart) rule"
+
+
+def test_incremental_update_mode_documented():
+    text = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
+    assert "更新模式" in text, "Expected update mode for repeat runs"
+    assert "增量" in text, "Expected incremental update rule"
+
+
+# ---------------------------------------------------------------------------
+# Milestones, progress semantics, consistency
 # ---------------------------------------------------------------------------
 
 def test_milestone_and_status_semantics_documented():
@@ -130,10 +188,16 @@ def test_milestone_and_status_semantics_documented():
         assert needle in text, f"Expected status semantics: {needle}"
 
 
-def test_two_chart_consistency_rule_documented():
+def test_milestone_view_and_tracking_table_documented():
+    text = text_of(SKILL_FILE)
+    assert "happens" in text, "Expected milestone happens-entry semantics"
+    assert "表格" in text, "Expected milestone tracking table"
+
+
+def test_chart_consistency_rule_documented():
     text = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
     assert "一致" in text or "consistency" in text.lower(), (
-        "Expected two-chart consistency rule (WBS leaves <-> Gantt entries)"
+        "Expected chart consistency rule (WBS leaves <-> Gantt entries <-> milestones)"
     )
 
 
@@ -149,30 +213,9 @@ def test_chart_set_splitting_documented():
     )
 
 
-# ---------------------------------------------------------------------------
-# C-10/C-11/C-12: output conventions
-# ---------------------------------------------------------------------------
-
-def test_output_location_and_image_conventions():
-    text = text_of(SKILL_FILE)
-    assert "docs/project-summary/" in text, "Expected default output location docs/project-summary/"
-    lowered = text.lower()
-    for needle in ["png", "svg", ".puml"]:
-        assert needle in lowered, f"Expected image convention mention: {needle}"
-
-
-def test_report_states_date_scope_assumptions():
-    lowered = text_of(SKILL_FILE).lower()
-    assert "scope" in lowered or "范围" in lowered, "Expected reporting scope statement rule"
-
-
-# ---------------------------------------------------------------------------
-# C-6 (US2/T015): milestone anchoring, percent-complete, reference marker
-# ---------------------------------------------------------------------------
-
 def test_milestone_anchoring_rule_documented():
-    """Gantt step requires zero-duration milestone markers anchored to a date
-    or to an associated work item's end (FR-007)."""
+    """Milestones are zero-duration diamond markers anchored to a date or an
+    associated work item's end."""
     text = text_of(SKILL_FILE)
     assert "零工期" in text or "happens" in text.lower(), "Expected zero-duration milestone semantics"
     assert "锚定" in text or "anchor" in text.lower(), "Expected milestone anchoring rule"
@@ -180,7 +223,7 @@ def test_milestone_anchoring_rule_documented():
 
 def test_percent_complete_and_reference_marker_documented():
     """In-progress items carry percent-complete; mid-flight projects mark the
-    current-date reference line (FR-008)."""
+    current-date reference line."""
     text = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
     assert "百分比" in text or "percent" in text.lower(), "Expected percent-complete rule"
     assert "参照线" in text or "today" in text.lower(), "Expected current-date reference marker rule"
@@ -195,33 +238,43 @@ def test_status_inference_and_degenerate_states_documented():
 
 
 # ---------------------------------------------------------------------------
-# US3/T027: reporting-period scoping and audience granularity controls
+# Scope and audience granularity controls
 # ---------------------------------------------------------------------------
 
 def test_scope_and_granularity_controls_documented():
-    """SKILL.md documents reporting-period scoping and audience-driven
-    granularity control (US3, FR per requirements.md User Story 4-era scope)."""
     text = text_of(SKILL_FILE)
-    assert "汇报范围与受众粒度" in text or ("scope" in text.lower() and "粒度" in text), (
+    assert "范围与受众粒度" in text or ("scope" in text.lower() and "粒度" in text), (
         "Expected a scope/granularity section in SKILL.md"
     )
-    assert "汇报周期" in text or "周期" in text, "Expected reporting-period scoping guidance"
+    assert "周期" in text, "Expected period scoping guidance"
 
 
 def test_granularity_rules_in_playbook():
-    """Playbook carries period-scoping and granularity rules while preserving
-    phase-level structure and the two-chart consistency rule."""
     text = text_of(PLAYBOOK_FILE)
-    assert "周期限定" in text or "汇报周期" in text, "Expected period-scoping rule in playbook"
+    assert "周期限定" in text, "Expected period-scoping rule in playbook"
     assert "粒度限定" in text or "高管" in text, "Expected audience-granularity rule in playbook"
     assert "阶段级结构" in text, "Phase-level structure preservation rule required"
 
 
 # ---------------------------------------------------------------------------
-# C-13: canonical Feedback block
+# Playbook management-document structure
+# ---------------------------------------------------------------------------
+
+def test_playbook_defines_document_skeleton():
+    text = text_of(PLAYBOOK_FILE)
+    assert "docs/project-management/project.md" in text, (
+        "Expected default document path in playbook skeleton"
+    )
+    for section in FOUR_ELEMENT_SECTIONS:
+        assert section in text, f"Expected skeleton section in playbook: {section}"
+    assert "元信息" in text, "Expected meta-info section in skeleton"
+
+
+# ---------------------------------------------------------------------------
+# Canonical Feedback block
 # ---------------------------------------------------------------------------
 
 def test_canonical_feedback_block():
     text = text_of(SKILL_FILE)
     assert "## Feedback" in text, "Expected canonical ## Feedback section"
-    assert "skill:summarize-project" in text, "Expected unit-id skill:summarize-project"
+    assert "skill:manage-project" in text, "Expected unit-id skill:manage-project"
