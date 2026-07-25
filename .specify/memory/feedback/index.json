@@ -1,10 +1,65 @@
 {
   "store": "feedback",
-  "updated": "2026-07-22T07:26:06Z",
+  "updated": "2026-07-25T08:10:45Z",
   "threshold": 10,
-  "count_since_submission": 0,
+  "count_since_submission": 5,
   "submitted_at": "2026-07-22T07:26:06Z",
   "entries": [
+    {
+      "id": "20260725T081045Z-speckit-implement",
+      "file": "20260725T081045Z-speckit-implement.md",
+      "unit_id": "/speckit.implement",
+      "unit_type": "command",
+      "run_id": "032-dogfooding-practice-dogfood-T005",
+      "feature": "032-dogfooding-practice",
+      "partial": false,
+      "created": "2026-07-25T08:10:45Z",
+      "summary": "Dogfooding 亲历摩擦点两条：(1) rm 交互别名拦截非交互删除，需 \\rm -f 重试；(2) 按 quickstart 初稿用自定义 unit-id 记录 Loop B 发现被引擎格式校验拒绝（仅接受 /speckit.<cmd> 或 skill:<name>），暴露文档示例未对齐源码校验——已回改 quickstart 与指引文案。这是本原则'指引动作名以实际代码为准'条款的现场实"
+    },
+    {
+      "id": "20260725T063522Z-speckit-tasks",
+      "file": "20260725T063522Z-speckit-tasks.md",
+      "unit_id": "/speckit.tasks",
+      "unit_type": "command",
+      "run_id": "032-dogfooding-practice-20260725T143522",
+      "feature": "032-dogfooding-practice",
+      "partial": false,
+      "created": "2026-07-25T06:35:22Z",
+      "summary": "26 任务按 3 故事 + Setup/Foundational/Polish 组织；Tests Mode ON（Principle IV）；契约 C-1…C-8 / E-1…E-6 全部映射到测试任务；镜像同步作为显式任务（T005/T012/T019/T021）落实高频返工教训。"
+    },
+    {
+      "id": "20260725T062947Z-speckit-plan",
+      "file": "20260725T062947Z-speckit-plan.md",
+      "unit_id": "/speckit.plan",
+      "unit_type": "command",
+      "run_id": "032-dogfooding-practice-20260725T142947",
+      "feature": "032-dogfooding-practice",
+      "partial": false,
+      "created": "2026-07-25T06:29:47Z",
+      "summary": "生成 plan + 4 个 Phase 1 产物；Phase 0 内联（引擎能力实测核验）；Constitution Check 10 原则动态渲染全 Pass；Feature 036 Draft→Planned。设计走最小扩展路线（复用 028 引擎 + 3 个小动作），符合 Principle IX。"
+    },
+    {
+      "id": "20260725T061744Z-speckit-clarify",
+      "file": "20260725T061744Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "032-dogfooding-practice-20260725T141744",
+      "feature": "032-dogfooding-practice",
+      "partial": false,
+      "created": "2026-07-25T06:17:44Z",
+      "summary": "Mode A 运行：2 问 2 答，完成 Feature 036 新建与绑定、周期度量口径定义（评审节点为界）；无遗留 NEEDS CLARIFICATION。"
+    },
+    {
+      "id": "20260725T055451Z-speckit-requirements",
+      "file": "20260725T055451Z-speckit-requirements.md",
+      "unit_id": "/speckit.requirements",
+      "unit_type": "command",
+      "run_id": "032-dogfooding-practice-20260725T135451",
+      "feature": "032-dogfooding-practice",
+      "partial": false,
+      "created": "2026-07-25T05:54:51Z",
+      "summary": "本次运行将概念性 Dogfooding 材料成功蒸馏为两级实践需求（框架自用 + 下游项目采用），复用既有反馈机制作为闭环载体，仅留 1 个约束强度澄清点。"
+    },
     {
       "id": "20260722T065659Z-speckit-instructions",
       "file": "20260722T065659Z-speckit-instructions.md",

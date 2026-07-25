@@ -1,15 +1,13 @@
 <!--
 Sync Impact Report
-- Version change: 1.4.0.1 → 1.5.0.1 (MINOR; added Principle X "Documentation Naming & Location Conventions")
+- Version change: 1.5.0.1 → 1.6.0 (MINOR; added Principle XI "Dogfooding (Self-Application)")
 - Modified principles: None
-- Added sections: Principle X — Documentation Naming & Location Conventions
+- Added sections: Principle XI — Dogfooding (Self-Application)
 - Removed sections: None
 - Templates requiring updates:
-  ✅ templates/plan-template.md - No change needed (Constitution Check renders principles dynamically from constitution.md; auto-includes Principle X)
+  ✅ templates/plan-template.md - No change needed (Constitution Check renders principles dynamically; auto-includes Principle XI)
   ✅ templates/tasks-template.md - No change needed (no hard-coded principle numbers)
-  ✅ templates/requirements-template.md - No change needed (no principle-number references)
-  ✅ templates/commands/constitution.md - Added matching "MUST include" directive for Documentation Naming conventions
-  ⚠ .specify/instructions.md - Documentation Map principle count updated separately (9 → 10)
+  ✅ templates/instructions-template.md - Gains a project-neutral `## Dogfooding Practice` guidance section (spec 032, Feature 036)
 - Follow-up TODOs: None
 -->
 
@@ -118,6 +116,16 @@ Markdown documents MUST follow naming and location conventions so that names and
 
 Rationale: Consistent, path-aware naming keeps documents discoverable, prevents collisions with well-known ecosystem/tool conventions, and preserves the meaning encoded in a document's location for both humans and AI agents.
 
+### XI. Dogfooding (Self-Application)
+The framework's developers and users are tightly linked — often the same team — which enables smooth use→feedback→iterate loops. Spec Kit MUST practice Dogfooding through its existing loop mechanisms, never through new parallel machinery:
+- **Self-application (bootstrap discipline)**: Spec Kit's own feature evolution MUST go through its own SDD workflow (spec → plan → tasks → implement). Like a compiler achieving self-hosting or an operating system bootstrapping itself, a project that provides development-assistance capabilities proves them by developing itself with them first — only a tool that performs well in its own engineering has earned the credibility to assist other projects
+- **Deviation logging**: when a change legitimately bypasses the self-application workflow (e.g. an emergency fix), the deviation and its reason MUST be logged in the affected spec directory (`.specify/specs/<key>/`) or in `.specify/memory/` governance documents — never silently
+- **Loop A (framework-level, existing)**: every project using Spec Kit helps improve Spec Kit via the existing feedback chain (record → threshold prompt → package → manual submission to the install-source repo); this path is identified and surfaced, not rebuilt
+- **Loop B (project-level, existing capabilities)**: downstream projects reuse the framework's shipped capabilities (feedback engine, memory, history, review, task records) to build the same use→feedback→iterate loop for their own product
+- **Advisory only**: toward downstream projects Dogfooding is an advisory principle delivered as guidance; adoption MUST NOT be enforced through blocking gates, and this principle MUST NOT justify adding new recording, statistics, or reminder systems (see Principle IX)
+
+Rationale: Dogfooding's essence is replacing hypothetical design with real working scenarios. The loops already exist in the framework; naming them in governance keeps the framework honest (it must eat its own dog food to ship) while keeping scope disciplined (identification over invention).
+
 ## Spec-Driven Development Workflow
 
 ### Research & Context Gathering
@@ -168,4 +176,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.5.0.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-07-14
+**Version**: 1.6.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-07-25
