@@ -150,8 +150,8 @@ def test_no_own_scripts_directory():
 
 def test_management_document_is_source_of_truth():
     text = text_of(SKILL_FILE)
-    assert "docs/project-management/" in text, (
-        "Expected default management document location docs/project-management/"
+    assert ".specify/project/" in text, (
+        "Expected default management document location .specify/project/"
     )
     assert "单一事实源" in text, "Expected single-source-of-truth principle"
 
@@ -262,7 +262,7 @@ def test_granularity_rules_in_playbook():
 
 def test_playbook_defines_document_skeleton():
     text = text_of(PLAYBOOK_FILE)
-    assert "docs/project-management/project.md" in text, (
+    assert ".specify/project/project.md" in text, (
         "Expected default document path in playbook skeleton"
     )
     for section in FOUR_ELEMENT_SECTIONS:

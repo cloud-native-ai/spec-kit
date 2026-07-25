@@ -1,0 +1,21 @@
+@startwbs
+skinparam dpi 300
+scale 4
+skinparam shadowing false
+skinparam defaultFontName "Noto Sans CJK SC"
+* Spec Kit（specify-cli）
+** 核心框架
+***< CLI 与初始化（Feature 015/018）
+***< SDD 命令族 18 命令（Feature 002–014/016/025/030）
+***> 模板体系与工作区（Feature 017/024）
+** 生态接入
+***< 多代理工具支持（Feature 020–022，spec 019/021/024）
+***> 技能库 22 技能（Feature 013，spec 017/030）
+***> 角色代理与团队（Feature 019/026/027）
+** 质量与反馈闭环
+***< 反馈机制（Feature 028）
+***< 记忆/历史/词汇表（Feature 030/031，spec 029）
+***> 治理与 Dogfooding（Feature 032/036，Constitution v1.6.0）
+** 工程基础设施
+***> CI/CD 与代码质量（Feature 034/035，Draft）
+@endwbs

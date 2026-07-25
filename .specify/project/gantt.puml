@@ -1,0 +1,63 @@
+@startgantt
+skinparam dpi 300
+scale 4
+skinparam shadowing false
+skinparam defaultFontName "Noto Sans CJK SC"
+<style>
+ganttDiagram {
+  task { FontSize 13 }
+  milestone { BackGroundColor #FFD54F; LineColor #F57F17; FontStyle bold }
+  separator { FontSize 14; FontStyle bold }
+  timeline { BackgroundColor #FCFCFC }
+  closed { BackgroundColor #F7F7F7; FontColor #F7F7F7 }
+}
+</style>
+projectscale monthly
+Project starts 2025-08-21
+' 2026-07-25（最后更新日）= 项目起点后第 338 天；显式定位避免依赖渲染环境时钟
+today is 338 days after start and is colored in #FF6B6B
+
+-- 核心框架 --
+[CLI 与初始化] starts 2025-08-21 and ends 2026-02-10
+[CLI 与初始化] is 100% complete
+[CLI 与初始化] is colored in GreenYellow/Green
+[首个发布版本 v0.0.1] happens 2025-08-22
+[SDD 命令族 18 命令] starts 2025-08-21 and ends 2026-07-14
+[SDD 命令族 18 命令] is 100% complete
+[SDD 命令族 18 命令] is colored in GreenYellow/Green
+[核心命令族全量可用] happens 2026-02-10
+[模板体系与工作区] starts 2025-09-01 and ends 2026-06-05
+[模板体系与工作区] is 90% complete
+[模板体系与工作区] is colored in Lavender/RoyalBlue
+
+-- 生态接入 --
+[多代理工具支持] starts 2026-03-01 and ends 2026-07-12
+[多代理工具支持] is 100% complete
+[多代理工具支持] is colored in GreenYellow/Green
+[多代理工具支持成型] happens 2026-03-30
+[技能库 22 技能] starts 2026-04-01 and ends 2026-07-25
+[技能库 22 技能] is 100% complete
+[技能库 22 技能] is colored in GreenYellow/Green
+[技能体系成型] happens 2026-06-17
+[角色代理与团队] starts 2026-06-01 and ends 2026-07-13
+[角色代理与团队] is 100% complete
+[角色代理与团队] is colored in GreenYellow/Green
+
+-- 质量与反馈闭环 --
+[反馈机制] starts 2026-07-14 and ends 2026-07-22
+[反馈机制] is 100% complete
+[反馈机制] is colored in GreenYellow/Green
+[反馈闭环机制上线] happens 2026-07-22
+[记忆/历史/词汇表] starts 2026-07-14 and ends 2026-07-16
+[记忆/历史/词汇表] is 100% complete
+[记忆/历史/词汇表] is colored in GreenYellow/Green
+[治理与 Dogfooding] starts 2026-07-16 and ends 2026-07-25
+[治理与 Dogfooding] is 90% complete
+[治理与 Dogfooding] is colored in Lavender/RoyalBlue
+[Dogfooding 写入宪法] happens 2026-07-25
+
+-- 工程基础设施 --
+[CI/CD 与代码质量] starts 2026-07-22 and requires 30 days
+[CI/CD 与代码质量] is 0% complete
+[CI/CD 与代码质量] is colored in LightGray/Gray
+@endgantt

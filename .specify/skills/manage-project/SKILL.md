@@ -8,7 +8,7 @@ skill_id: "<SKILL:.specify/skills/manage-project/SKILL.md>"
 
 # 轻量级项目管理技能
 
-以**一份 Markdown 项目管理文档**（默认 `docs/project-management/project.md`，用户可指定其他位置）作为项目的单一事实源，持续管理项目管理的四个核心要素：
+以**一份 Markdown 项目管理文档**（默认 `.specify/project/project.md`，用户可指定其他位置）作为项目的单一事实源，持续管理项目管理的四个核心要素：
 
 | 要素 | 载体 | 形态 |
 |------|------|------|
@@ -35,7 +35,7 @@ skill_id: "<SKILL:.specify/skills/manage-project/SKILL.md>"
 
 ### Step 1: 加载或初始化管理文档
 
-检查目标位置（默认 `docs/project-management/project.md`）是否已有管理文档：
+检查目标位置（默认 `.specify/project/project.md`）是否已有管理文档：
 
 - **已存在 → 更新模式**：读取现有文档，解析四要素现状（背景文本、里程碑清单、WBS 树、甘特条目与状态），本次运行只做增量更新；保留用户手工修改的措辞与补充内容。
 - **不存在 → 初始化模式**：按管理文档结构（见 [references/management-playbook.md](references/management-playbook.md) §1）创建骨架，再进入后续步骤填充。

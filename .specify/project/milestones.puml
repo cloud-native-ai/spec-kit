@@ -1,0 +1,21 @@
+@startgantt
+skinparam dpi 300
+scale 4
+skinparam shadowing false
+skinparam defaultFontName "Noto Sans CJK SC"
+<style>
+ganttDiagram {
+  milestone { BackGroundColor #FFD54F; LineColor #F57F17; FontStyle bold; FontSize 14 }
+  timeline { BackgroundColor #FCFCFC }
+  closed { BackgroundColor #F7F7F7; FontColor #F7F7F7 }
+}
+</style>
+projectscale monthly
+Project starts 2025-08-21
+[首个发布版本 v0.0.1] happens 2025-08-22
+[核心命令族全量可用] happens 2026-02-10
+[多代理工具支持成型] happens 2026-03-30
+[技能体系成型] happens 2026-06-17
+[反馈闭环机制上线] happens 2026-07-22
+[Dogfooding 写入宪法] happens 2026-07-25
+@endgantt
