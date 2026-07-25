@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-07-25T16:10:16Z",
+  "updated": "2026-07-25T16:56:35Z",
   "threshold": 10,
-  "count_since_submission": 35,
+  "count_since_submission": 36,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260725T165635Z-skill-improve-skills",
+      "file": "20260725T165635Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "improve-skills-summarize-project-rename-20260726",
+      "feature": "013",
+      "partial": false,
+      "created": "2026-07-25T16:56:35Z",
+      "summary": "Renamed visualize-project back to summarize-project per user direction: the report pairs textual summary with visual charts, so 'summarize' is the more accurate name (also the original spec-030 name)."
+    },
     {
       "id": "20260725T161016Z-skill-improve-skills",
       "file": "20260725T161016Z-skill-improve-skills.md",

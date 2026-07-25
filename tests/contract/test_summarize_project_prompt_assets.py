@@ -1,9 +1,12 @@
-"""Contract tests for the visualize-project skill prompt assets.
+"""Contract tests for the summarize-project skill prompt assets.
 
-Refactored from manage-project (spec 030, Feature 013). Covers:
+Refactored from manage-project (spec 030, Feature 013); renamed back from
+visualize-project because the report carries both textual summary and
+visual charts — "summarize" is the accurate name. Covers:
 
 - Package presence + byte-equivalent mirror
-- Legacy manage-project removal + obsolete-skills cleanup manifest entry
+- Legacy manage-project / visualize-project removal + obsolete-skills
+  cleanup manifest entry
 - Frontmatter: name, trigger keywords, skill_id pattern
 - Skills registry row in .specify/instructions.md
 - Presentation/output-tool positioning (read-only, derived report)
@@ -18,9 +21,9 @@ Refactored from manage-project (spec 030, Feature 013). Covers:
 - Layered references: one reference doc per presentation layer
   (project-overview, requirements-features, work-breakdown, milestones,
   task-progress), each answering one external-reader question, with
-  references/visualization-playbook.md holding cross-layer conventions
+  references/reporting-playbook.md holding cross-layer conventions
   and the layer index
-- Canonical ## Feedback block with unit-id skill:visualize-project
+- Canonical ## Feedback block with unit-id skill:summarize-project
 """
 from pathlib import Path
 
@@ -35,11 +38,11 @@ from tests.contract.helpers_prompt_assets import (
     text_of,
 )
 
-SKILL_DIR = ROOT / "skills" / "visualize-project"
+SKILL_DIR = ROOT / "skills" / "summarize-project"
 SKILL_FILE = SKILL_DIR / "SKILL.md"
-PLAYBOOK_FILE = SKILL_DIR / "references" / "visualization-playbook.md"
+PLAYBOOK_FILE = SKILL_DIR / "references" / "reporting-playbook.md"
 DETECT_SCRIPT = SKILL_DIR / "scripts" / "detect-project-sources.py"
-MIRROR_DIR = ROOT / ".specify" / "skills" / "visualize-project"
+MIRROR_DIR = ROOT / ".specify" / "skills" / "summarize-project"
 
 LAYER_DOCS = {
     "project-overview.md": "目标",
@@ -50,13 +53,14 @@ LAYER_DOCS = {
 }
 
 TRIGGER_KEYWORDS = [
-    "项目可视化",
+    "项目总结",
     "项目现状",
     "需求特性",
     "功能分解",
     "里程碑",
     "进度追踪",
-    "visualize project",
+    "summarize project",
+    "project summary",
     "project visualization",
     "project report",
     "WBS",
@@ -101,8 +105,15 @@ def test_detect_script_exists():
 def test_legacy_manage_project_removed():
     legacy = ROOT / "skills" / "manage-project"
     legacy_mirror = ROOT / ".specify" / "skills" / "manage-project"
-    assert not legacy.exists(), "manage-project must be fully refactored into visualize-project"
+    assert not legacy.exists(), "manage-project must be fully refactored into summarize-project"
     assert not legacy_mirror.exists(), "stale manage-project mirror must be removed"
+
+
+def test_legacy_visualize_project_removed():
+    legacy = ROOT / "skills" / "visualize-project"
+    legacy_mirror = ROOT / ".specify" / "skills" / "visualize-project"
+    assert not legacy.exists(), "visualize-project must be fully renamed to summarize-project"
+    assert not legacy_mirror.exists(), "stale visualize-project mirror must be removed"
 
 
 def test_manage_project_in_obsolete_cleanup_manifest():
@@ -122,9 +133,9 @@ def test_mirror_is_byte_equivalent():
 
 def test_frontmatter_name_and_skill_id():
     fm = read_frontmatter(SKILL_FILE)
-    assert fm.get("name") == "visualize-project", f"got name={fm.get('name')}"
+    assert fm.get("name") == "summarize-project", f"got name={fm.get('name')}"
     skill_id = fm.get("skill_id", "")
-    assert skill_id == "<SKILL:.specify/skills/visualize-project/SKILL.md>", (
+    assert skill_id == "<SKILL:.specify/skills/summarize-project/SKILL.md>", (
         f"unexpected skill_id: {skill_id}"
     )
 
@@ -141,13 +152,14 @@ def test_frontmatter_description_trigger_keywords():
 # ---------------------------------------------------------------------------
 
 def test_registry_has_exactly_one_row():
-    rows = skill_registry_rows("visualize-project")
+    rows = skill_registry_rows("summarize-project")
     assert len(rows) == 1, f"Expected exactly 1 registry row, got {len(rows)}: {rows}"
 
 
-def test_registry_has_no_stale_manage_project_row():
-    rows = [r for r in skill_registry_rows("manage-project") if r.startswith("| manage-project ")]
-    assert not rows, f"Stale manage-project registry row(s) remain: {rows}"
+def test_registry_has_no_stale_predecessor_rows():
+    for name in ("manage-project", "visualize-project"):
+        rows = [r for r in skill_registry_rows(name) if r.startswith(f"| {name} ")]
+        assert not rows, f"Stale {name} registry row(s) remain: {rows}"
 
 
 # ---------------------------------------------------------------------------
@@ -204,11 +216,11 @@ def test_detect_script_referenced_and_structured():
 
 def test_default_report_paths_documented():
     text = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
-    assert ".specify/project/visualization.md" in text, (
-        "Expected SpecKit default report path .specify/project/visualization.md"
+    assert ".specify/project/summary.md" in text, (
+        "Expected SpecKit default report path .specify/project/summary.md"
     )
-    assert "docs/project-visualization.md" in text, (
-        "Expected non-SpecKit default report path docs/project-visualization.md"
+    assert "docs/project-summary.md" in text, (
+        "Expected non-SpecKit default report path docs/project-summary.md"
     )
 
 
@@ -412,4 +424,4 @@ def test_work_breakdown_layer_doc_is_single_data_source():
 def test_canonical_feedback_block():
     text = text_of(SKILL_FILE)
     assert "## Feedback" in text, "Expected canonical ## Feedback section"
-    assert "skill:visualize-project" in text, "Expected unit-id skill:visualize-project"
+    assert "skill:summarize-project" in text, "Expected unit-id skill:summarize-project"

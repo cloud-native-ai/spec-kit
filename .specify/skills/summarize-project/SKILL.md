@@ -1,14 +1,14 @@
 ---
-name: visualize-project
+name: summarize-project
 description: |
-  项目可视化呈现技能（由 manage-project 重构而来）。定位是项目的**呈现/输出工具**，不是管理/输入工具：只读项目现有事实源，产出一份派生的可视化现状报告，不修改项目的任何管理工件。呈现内容覆盖：项目概览、需求与特性、功能分解（WBS 工作分解图）、里程碑视图、任务进展甘特图。报告按五个呈现层面分解，每个层面回答外部读者的一个问题（项目目标是什么、要交付哪些能力、包含哪些任务、里程碑是什么/完成了哪些、每个任务什么状态与整体进度安排），并对应 references/ 下一份层参考文档。信息源识别：若目标项目已使用 SpecKit 框架管理（存在 .specify/ 目录及相应结构），以该目录中的工件（specs/*/requirements.md、specs/*/tasks.md、memory/features.md 等）为主要信息源展现项目信息；非 SpecKit 项目回退到代码结构、README/docs、外部需求/任务/进度文档、git 历史等来源——输入源不限于代码，外部文件与文档均可作为材料。所有图表以 PlantUML 源码嵌入报告（可编辑、可 diff、可版本管理），渲染校验一律委托 draw-plantuml 技能完成。报告是派生产物，支持重复运行刷新。
-  Use when the user mentions "项目可视化", "可视化项目", "项目现状", "项目报告", "项目汇报", "项目进展", "需求特性", "功能分解", "里程碑", "进度追踪", "项目进度", "项目概览", "visualize project", "project visualization", "project overview", "project report", "project status", "project dashboard", "milestone", "progress tracking", "WBS", "工作分解", "甘特图".
-skill_id: "<SKILL:.specify/skills/visualize-project/SKILL.md>"
+  项目总结呈现技能（由 manage-project 重构而来）。定位是项目的**呈现/输出工具**，不是管理/输入工具：只读项目现有事实源，产出一份派生的项目总结报告，不修改项目的任何管理工件。报告**文本综述与可视化图表并重**——文字总结覆盖项目概览、需求与特性叙述，图形呈现覆盖功能分解（WBS 工作分解图）、里程碑视图、任务进展甘特图。报告按五个呈现层面分解，每个层面回答外部读者的一个问题（项目目标是什么、要交付哪些能力、包含哪些任务、里程碑是什么/完成了哪些、每个任务什么状态与整体进度安排），并对应 references/ 下一份层参考文档。信息源识别：若目标项目已使用 SpecKit 框架管理（存在 .specify/ 目录及相应结构），以该目录中的工件（specs/*/requirements.md、specs/*/tasks.md、memory/features.md 等）为主要信息源总结项目信息；非 SpecKit 项目回退到代码结构、README/docs、外部需求/任务/进度文档、git 历史等来源——输入源不限于代码，外部文件与文档均可作为材料。所有图表以 PlantUML 源码嵌入报告（可编辑、可 diff、可版本管理），渲染校验一律委托 draw-plantuml 技能完成。报告是派生产物，支持重复运行刷新。
+  Use when the user mentions "项目总结", "总结项目", "项目现状", "项目报告", "项目汇报", "项目进展", "项目概览", "项目可视化", "需求特性", "功能分解", "里程碑", "进度追踪", "项目进度", "summarize project", "project summary", "project report", "project overview", "project status", "project dashboard", "project visualization", "milestone", "progress tracking", "WBS", "工作分解", "甘特图".
+skill_id: "<SKILL:.specify/skills/summarize-project/SKILL.md>"
 ---
 
-# 项目可视化呈现技能
+# 项目总结呈现技能
 
-以**一份可视化报告**（SpecKit 项目默认 `.specify/project/visualization.md`，非 SpecKit 项目默认 `docs/project-visualization.md`，用户可指定其他位置）呈现项目当前现状。报告是**派生产物**：事实源永远在项目自身材料中，本技能只读取、组织、可视化，不代替项目管理工具维护任何事实。
+以**一份项目总结报告**（SpecKit 项目默认 `.specify/project/summary.md`，非 SpecKit 项目默认 `docs/project-summary.md`，用户可指定其他位置）呈现项目当前现状。**文本综述与可视化图表并重**：文字总结回答"项目是什么、要交付什么、进展如何"，图表让外部读者一眼看清结构与进度。报告是**派生产物**：事实源永远在项目自身材料中，本技能只读取、总结、可视化，不代替项目管理工具维护任何事实。
 
 报告按**五个呈现层面**分解，每个层面回答外部读者的一个问题，并对应 `references/` 目录下**一份层参考文档**（一层一文档；生成该章节前先读对应层文档）：
 
@@ -89,7 +89,7 @@ python3 ${SKILL_HOME}/scripts/detect-project-sources.py --target <项目根目�
 
 ### Step 6: 一致性自检与报告落盘
 
-执行**三图一致性自检**：WBS 叶子工作项（带时间信息的）与甘特条目一一对应、命名一致；里程碑视图与甘特图中的里程碑同名同锚定；三态口径在图与叙述间一致；特性清单表格与概览叙述一致。清单见 [references/visualization-playbook.md](references/visualization-playbook.md)。通过后写入报告（保留既有 `## 附注` 节），并刷新元信息（生成日期、信息源清单、估计假设逐条显式标注）。
+执行**三图一致性自检**：WBS 叶子工作项（带时间信息的）与甘特条目一一对应、命名一致；里程碑视图与甘特图中的里程碑同名同锚定；三态口径在图与叙述间一致；特性清单表格与概览叙述一致。清单见 [references/reporting-playbook.md](references/reporting-playbook.md)。通过后写入报告（保留既有 `## 附注` 节），并刷新元信息（生成日期、信息源清单、估计假设逐条显式标注）。
 
 ## 信息不足与澄清
 
@@ -97,11 +97,11 @@ python3 ${SKILL_HOME}/scripts/detect-project-sources.py --target <项目根目�
 
 ## 大项目与图集拆分
 
-单图放不下时做图集拆分：一张概览图（只到阶段层）+ 每个阶段一张下钻子图，每张子图都是报告内独立的 PlantUML 源码块，图间命名/配色/编号一致并互相交叉引用。拆分规则与阈值见 [references/visualization-playbook.md](references/visualization-playbook.md)。
+单图放不下时做图集拆分：一张概览图（只到阶段层）+ 每个阶段一张下钻子图，每张子图都是报告内独立的 PlantUML 源码块，图间命名/配色/编号一致并互相交叉引用。拆分规则与阈值见 [references/reporting-playbook.md](references/reporting-playbook.md)。
 
 ## 呈现范围与受众粒度
 
-用户可限定**呈现周期**（如本迭代/本季度）或**受众粒度**（如高管层只看阶段级）：周期受限时甘特时间轴与叙述只覆盖该范围，范围外工作省略或明显弱化；粒度受限时分解到指定深度即止，保持阶段级结构完整。详见 [references/visualization-playbook.md](references/visualization-playbook.md)。
+用户可限定**呈现周期**（如本迭代/本季度）或**受众粒度**（如高管层只看阶段级）：周期受限时甘特时间轴与叙述只覆盖该范围，范围外工作省略或明显弱化；粒度受限时分解到指定深度即止，保持阶段级结构完整。详见 [references/reporting-playbook.md](references/reporting-playbook.md)。
 
 ## 参考文档
 
@@ -115,7 +115,7 @@ python3 ${SKILL_HOME}/scripts/detect-project-sources.py --target <项目根目�
 
 **跨层公共约定与工具**：
 
-- [references/visualization-playbook.md](references/visualization-playbook.md) — 层参考文档索引、报告结构、刷新规则、图集拆分、三图一致性清单、范围/粒度控制、落盘检查单、外部文档取材
+- [references/reporting-playbook.md](references/reporting-playbook.md) — 层参考文档索引、报告结构、刷新规则、图集拆分、三图一致性清单、范围/粒度控制、落盘检查单、外部文档取材
 - `${SKILL_HOME}/scripts/detect-project-sources.py` — 信息源检测脚本（SpecKit 结构识别 + 候选文档发现，JSON 输出）
 - draw-plantuml 技能：`references/howto/13-wbs-diagram.md`（WBS）、`references/howto/14-gantt-diagram.md`（甘特图与里程碑）、`references/howto/12-rendering-and-output.md`（渲染与输出约定）
 
@@ -130,7 +130,7 @@ At the end of a substantial run of this skill, perform an agent self-reflection 
 5. **Persist** via the engine:
    ```bash
    python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
-     --unit-id "skill:visualize-project" --unit-type skill \
+     --unit-id "skill:summarize-project" --unit-type skill \
      --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
      --review "<review prose>" --points-file "<points file>"
    ```

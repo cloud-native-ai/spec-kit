@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Detect project information sources for the visualize-project skill.
+"""Detect project information sources for the summarize-project skill.
 
 Purpose: identify whether a target project is managed with the SpecKit
 framework (a .specify/ directory with recognizable structure) and enumerate
@@ -13,7 +13,7 @@ Output: JSON on stdout with keys:
     feature detail files, per-spec requirements/tasks/plan/verification,
     project dir files); empty when not a SpecKit project
   - candidates: non-SpecKit source hints (README, docs/, common doc files)
-  - default_report_path: suggested visualization report location
+  - default_report_path: suggested summary report location
 Exit code: 0 on success, 1 when the target directory does not exist.
 """
 import argparse
@@ -92,7 +92,7 @@ def detect(target: Path) -> dict:
         "artifacts": artifacts if speckit else {},
         "candidates": candidates,
         "default_report_path": (
-            ".specify/project/visualization.md" if speckit else "docs/project-visualization.md"
+            ".specify/project/summary.md" if speckit else "docs/project-summary.md"
         ),
     }
 

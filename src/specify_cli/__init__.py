@@ -185,7 +185,8 @@ _ASSISTANT_ARG_FORMATS = {
 # (agent-setup→cli-setup; docx/pdf/pptx/xlsx-utils→document-utils; mysql/postgres
 # -utils→database-utils; playwright-utils/web-test→browser-utils; organize-agents
 # →create-team; skill-creator→create-skills; thought-experiment-verifier→
-# think-skills; manage-project→visualize-project; sdd-workflow→shared/workflow;
+# think-skills; manage-project→visualize-project→summarize-project;
+# sdd-workflow→shared/workflow;
 # mcp-creator/refresh-mcp-tools/notebooklm-utils/theme-creator removed).
 _OBSOLETE_SKILLS = (
     "agent-setup",
@@ -204,6 +205,7 @@ _OBSOLETE_SKILLS = (
     "skill-creator",
     "theme-creator",
     "thought-experiment-verifier",
+    "visualize-project",
     "web-test",
     "xlsx-utils",
 )

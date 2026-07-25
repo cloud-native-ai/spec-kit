@@ -1,6 +1,6 @@
-# 项目可视化操作手册 (Visualization Playbook)
+# 项目总结操作手册 (Reporting Playbook)
 
-`visualize-project` 技能的**跨层公共约定**：报告结构、刷新规则、图集拆分、三图一致性清单、范围与粒度控制、落盘检查单、外部文档取材。各呈现层面的细则已分解到独立层参考文档（见下方索引）；工作流主框架见 [../SKILL.md](../SKILL.md)；图表语法与渲染以 draw-plantuml 技能的操作指南为准。
+`summarize-project` 技能的**跨层公共约定**：报告结构、刷新规则、图集拆分、三图一致性清单、范围与粒度控制、落盘检查单、外部文档取材。各呈现层面的细则已分解到独立层参考文档（见下方索引）；工作流主框架见 [../SKILL.md](../SKILL.md)；图表语法与渲染以 draw-plantuml 技能的操作指南为准。
 
 ## 0. 层参考文档索引（一层一文档）
 
@@ -18,10 +18,10 @@
 
 ## 1. 报告结构（派生呈现物）
 
-默认位置：SpecKit 项目 `.specify/project/visualization.md`，非 SpecKit 项目 `docs/project-visualization.md`（检测脚本输出 `default_report_path`，用户可覆盖）。章节骨架固定如下：
+默认位置：SpecKit 项目 `.specify/project/summary.md`，非 SpecKit 项目 `docs/project-summary.md`（检测脚本输出 `default_report_path`，用户可覆盖）。章节骨架固定如下：
 
 ````markdown
-# <项目名> 项目可视化报告
+# <项目名> 项目总结报告
 
 ## 项目概览
 <背景、目标、范围 —— 提炼自事实源的纯 Markdown 文本，注明出处>
@@ -103,7 +103,7 @@
 ```bash
 python3 - <<'EOF'
 import re, pathlib
-text = pathlib.Path("visualization.md").read_text()
+text = pathlib.Path("summary.md").read_text()
 blocks = re.findall(r"```plantuml\n(.*?)```", text, re.S)
 names = ["features", "wbs", "milestones", "gantt"]  # 与报告中源码块顺序一致；图集拆分或省略可选图时按需调整
 for name, src in zip(names, blocks):
