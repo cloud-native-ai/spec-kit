@@ -47,6 +47,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
    - Read `$ARGUMENTS` content
    - Determine if it contains background information, planning outline, or specific constraints
    - Apply appropriate processing strategy based on content type
+   - **Spec-restructure first**: if `$ARGUMENTS` expands or changes the requirement scope, do NOT plan against the stale spec — first restructure `requirements.md` (new/changed stories, FRs, success criteria) and re-validate its checklist, and only then fill the plan template. Plan artifacts are only trustworthy when the spec restructure has already landed.
 
 3. **Load context**: Read FEATURE_SPEC, `.specify/memory/constitution.md`, and processed `$ARGUMENTS` context. Load IMPL_PLAN template (already copied).
    - Check if `SPECS_DIR/research.md` exists. If so, read it.
@@ -83,6 +84,7 @@ The `/speckit.plan` command automatically integrates with the feature tracking s
   - Detect the current feature directory (format: `.specify/specs/[REQUIREMENTS_KEY]/`)
   - Extract the feature ID from the directory name
   - Update the corresponding feature entry in `.specify/memory/features.md`:
+    - **Bound-but-unregistered Feature**: if the spec's `Related Feature` names a Feature ID that has NO row yet in `features.md` (e.g. the binding was decided at `/speckit.clarify` but never registered), first CREATE the row and the `.specify/memory/features/<ID>.md` detail from `.specify/templates/feature-details-template.md` — then advance status. Do not leave the create-vs-advance branch implicit or skip registration because the ID is already written into the spec.
     - Advance status `Draft → Planned` per the canonical state machine in `.specify/templates/feature-details-template.md` § "Canonical Status State Machine". `/speckit.plan` MUST NOT land status `Implemented` — that transition is owned by `/speckit.implement`.
     - Keep the specification path unchanged
     - Update the "Last Updated" date

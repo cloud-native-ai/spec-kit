@@ -32,6 +32,8 @@ From `git log` scoped to REQUIREMENTS_DIR: commit ordering, command traces (dist
 
 **Fallback when `git log` for REQUIREMENTS_DIR is empty** (the feature was implemented but never committed): reconstruct from working-tree state instead — `git status --short` for the spec dir, staged/untracked artifact set, and `verification.md` self-reports — and record the missing-commit condition itself as a process-history finding.
 
+**Degradation when commits exist but are NOT story/task-grouped** (e.g. one bulk "implement everything" commit, or commits that mix several phases): git history cannot attribute artifacts to individual tasks. Degrade to working-tree + artifact reconstruction (task `[X]` markers, file mtimes, `verification.md` self-reports) for the per-task timeline, use the commits only for coarse ordering, and annotate every timeline claim drawn from this path with its evidence strength (e.g. "inferred from artifact state, not commit trace"). Record the missing story-grouped commit discipline itself as a Workflow finding citing the commit gate in the `/speckit.implement` command.
+
 ### 3. Load core SDD artifacts
 
 From REQUIREMENTS_DIR: requirements.md, plan.md, tasks.md (REQUIRED). Plus data-model.md, contracts/, research.md, checklists/, feature detail (IF EXISTS). Also load constitution, templates, scripts, command files as reference targets for recommendations.

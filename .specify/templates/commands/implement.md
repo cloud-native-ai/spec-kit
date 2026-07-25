@@ -51,13 +51,17 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
    - Validate every project-side regen/build command (fail-open EXIT=0 insufficient — verify output artifacts)
    - **Shell hygiene (alias-proof)**: destructive/mirror file operations MUST use alias-proof forms (`\rm -f`, `\cp -f`, or `command rm/cp`) and MUST verify the result afterwards (`ls` / `diff -q`) — interactive aliases (`rm -i`, `cp -i`) silently swallow non-interactive deletes/copies while appearing to succeed
    - **Test runs**: prefer the canonical runner `scripts/bash/run-tests.sh` (resolves the pytest interpreter once, pipe-safe) for baseline and regression tasks instead of ad-hoc `python -m pytest | tail` pipelines whose exit codes mask interpreter failures
+   - **Runnable-runner probe**: a baseline whose collection fails (e.g. `No module named pytest`, venv interpreter missing) is a probe FAILURE, not an empty baseline — resolve the interpreter first, then capture the baseline. Before adding files to a directory, grep the test suite for brittle count assertions on that directory (e.g. `test_*_has_ten_*`, hard-coded `len(...) == N`) and update them in the same task
    - **Commit discipline**: wrap-up metadata fix-ups (verification stamps, mirror syncs) go into NEW commits — never `--amend` an already-created commit
+   - **Command/template edits**: after editing anything under `templates/commands/`, regenerate every per-tool copy and the `.specify` mirror with `python3 scripts/python/regen-command-copies.py` (verify with `--check`) — never hand-sync the 5 tool dirs
 
 7. **Progress tracking**:
    - Report after each completed task
    - Halt on non-parallel task failure; for [P] continue successful, report failed
    - Mark completed: `[X]`. Deferred (resource unavailable): `[~]` with `<!-- deferred: <reason> -->`. Never leave deferred work as `[ ]`.
    - **Evidence-backed closure**: only mark `[X]` for work you have actually executed and verified. Each closure MUST be justified by concrete evidence (a passing test id, a command/grep result, or a diff of the named target file). Do NOT close a task whose named file was not changed.
+   - **Front-loading closure**: when a task's substance was already landed earlier (e.g. a later-story file written ahead of its phase), close it by re-verifying its assertion set against the current tree and recording that evidence in the progress report — never re-perform the work theatrically (revert-then-rewrite), and never tick silently without evidence.
+   - **Doc/example evidence**: tasks that add command examples, usage snippets, or feedback records are only `[X]` when the example was actually executed (or its engine invoked) and the output observed. Feedback-record unit ids MUST match the engine's accepted format (`/speckit.<cmd>` or `skill:<name>`) — a record written with a free-form unit id is silently dropped by consolidation queries.
 
 8. **Completion validation**: All tasks `[X]` or `[~]` (no `[ ]` remaining). Features match spec. Tests pass. **Commit gate**: commit after each task or logical group; the spec dir MUST NOT be left *entirely* uncommitted when validation completes — an uncommitted implementation leaves no per-task audit trail and breaks `/speckit.review`'s git-based history reconstruction. Do not report the Definition of Done as "met" while the whole feature is uncommitted.
 

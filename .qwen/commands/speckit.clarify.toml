@@ -28,9 +28,13 @@ Goal: Detect and reduce ambiguity or missing decision points in the current phas
    - If no `requirements.md` at all → abort, instruct `/speckit.requirements` first.
    - Log: `**Mode: [A/B/C] — clarifying [target]**`
 
-3. **Load common context**: `.specify/memory/constitution.md`, `README.md`, relevant `docs/`, `.specify/memory/features.md`, `research.md` (if exists).
+   **Mode override**: when `$ARGUMENTS` explicitly names an upstream artifact (e.g. "re-clarify the requirements" while `plan.md` already exists), clarify THAT artifact instead of the phase-detected one, cascade accepted answers into the derived artifacts, and log the deviation from the default mode. The default table applies only when the user gives no explicit target.
 
-4. **Load mode-specific context** (see taxonomy reference).
+3. **Writability probe (fail fast)**: before generating any questions, verify the target file is writable (touch-test or write-bit stat on the target and its directory). If unwritable (e.g. root-owned spec dir), STOP immediately with an actionable message (owning path + fix command such as `sudo chown -R $USER <dir>`) — do NOT run the question loop first and lose the integration work at the final write. If the user chooses to proceed read-only, batch all integrations into ONE write attempt at the end instead of the per-answer saves the mode's integration rules call for.
+
+4. **Load common context**: `.specify/memory/constitution.md`, `README.md`, relevant `docs/`, `.specify/memory/features.md`, `research.md` (if exists).
+
+5. **Load mode-specific context** (see taxonomy reference).
 
 ### Taxonomy & Coverage Scan
 
@@ -78,6 +82,15 @@ If spec contains `Feature ID: Need clarification` or `Feature Name: Need clarifi
 - Never exceed 5 total questions
 - Respect early termination signals ("stop", "done", "proceed")
 - Do not modify upstream artifacts in later modes (B won't edit requirements.md; C won't edit plan.md)
+
+### Scope Revision Protocol (user re-scopes AFTER plan/tasks exist)
+
+The rule above governs *clarification* runs. When the USER explicitly changes the feature's scope or core concept after downstream artifacts exist, that is a **revision**, not a clarification — follow this protocol instead of forcing new specs or re-running scaffolding:
+
+1. **Amend upstream in place**: update requirements.md first, recording the user directive verbatim under `## Clarifications` (dated session entry). Never re-run creation scripts — they overwrite history.
+2. **Regenerate downstream by hand**: rewrite plan/data-model/contracts/quickstart/tasks to match; delete artifacts the revision obsoletes (use alias-proof `\rm -f`).
+3. **Residual-reference sweep (exit gate)**: grep all spec artifacts for terms belonging to the dropped design; zero hits (outside "removed/dropped" annotations) before reporting completion.
+4. **Re-validate**: re-run the spec quality checklist and update the Feature entry notes with the revision rationale.
 
 ## Feedback
 

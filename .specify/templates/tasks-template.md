@@ -92,6 +92,13 @@ A `/speckit.implement` run is considered complete when **zero `[ ]` rows remain*
   - Delivered as an MVP increment
   
   DO NOT keep these sample tasks in the generated tasks.md file.
+
+  The samples are APP-SHAPED (models/services/endpoints). For template-only,
+  documentation, or prompt-framework specs, use the doc-feature taxonomy
+  instead (author-section / mirror-parity / render-verify / refresh-verify —
+  see the /speckit.tasks command's "Doc-feature phase shape") and turn every
+  row of plan.md's Mirror Obligations table into a paired dual-write +
+  diff-verify task set.
   ============================================================================
 -->
 

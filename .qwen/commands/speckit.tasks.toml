@@ -137,6 +137,8 @@ or
 **Tests Mode**: OFF (constitution.md declares no test-mandating principle; spec did not request TDD)
 ```
 
+**Template-only / doc-feature gate**: if the constitution (or plan.md's Constitution Check) carries a *template-only features* principle (e.g. a Principle VII-style rule that template/prompt/doc artifacts are governed by structural contract tests rather than runtime tests), cite THAT gate in the banner and emit **structural contract tests** (content/heading/mirror-parity assertions on the artifact) — not unit/integration tests, which have nothing to run against. Do not re-derive this from feature history each run.
+
 ### Checklist Format (REQUIRED)
 
 Every task MUST strictly follow this format:
@@ -183,6 +185,7 @@ Every task MUST strictly follow this format:
 2. **From Contracts**:
    - Map each contract/endpoint → to the user story it serves
    - If tests requested: Each contract → contract test task [P] before implementation in that story's phase
+   - Prefer one test file per contract document rather than per story: when multiple stories append to a single shared test file, [P] parallel markers become invalid and stories serialize on that file
 
 3. **From Data Model**:
    - Map each entity to the user story(ies) that need it
@@ -202,6 +205,13 @@ Every task MUST strictly follow this format:
   - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
   - Each phase should be a complete, independently testable increment
 - **Final Phase**: Polish & Cross-Cutting Concerns
+
+**Doc-feature phase shape (template-only / documentation / prompt-framework specs)**: when the spec's deliverables are templates, docs, prompts, or skills rather than runtime code, "Models → Services → Endpoints" does not apply — do not force it. Switch the within-story order to the doc-feature taxonomy:
+1. **author-section** — write/edit the template or document section itself
+2. **mirror-parity** — for each row of plan.md's *Mirror Obligations* table, emit a **paired task set**: one task to dual-write every mirror/copy AND one task to verify parity (`diff -q` for mirrors; grep-for-the-edit for regenerated per-tool copies). Mirror pairs are first-class tasks, never implicit side-effects of the authoring task.
+3. **render-verify** — actually render/execute the artifact (render the diagram, run the template through its consumer) and inspect the output
+4. **refresh-verify** — re-run the artifact's refresh/regeneration path to confirm repeatability
+The app-shaped examples in the tasks template are illustrative, not mandatory; pick the taxonomy that matches the spec's actual deliverables.
 
 ## Feedback
 

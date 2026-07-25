@@ -1,4 +1,4 @@
-description = "Single entry point for single-agent operations — create and refine agents via intent routing.
+description = "Single entry point for single-agent operations — create, refine, and run agents via intent routing.
 handoffs:
   - label: Update Instructions
     agent: speckit.instructions
@@ -14,11 +14,11 @@ handoffs:
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-protocol.md). If empty, infer intent from conversation/repo context. If intent is ambiguous or unsupported, report capabilities and request the missing intent (do NOT guess silently).
+Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-protocol.md). If empty, execute the **Default Behavior (No Arguments)** defined below. If non-empty but intent is ambiguous or unsupported, report capabilities and request the missing intent (do NOT guess silently).
 
 ## Outline
 
-`/speckit.agents` is the **single entry point** for every **single-agent** operation (create / refine). There is no other single-agent command. It recognizes intent, then routes to the owning skill. It delegates to skills and does **NOT** render templates inline. **Team operations (organize / run multiple agents) are NOT served here** — use `/speckit.team`.
+`/speckit.agents` is the **single entry point** for every **single-agent** operation (create / refine / run). There is no other single-agent command. It recognizes intent, then routes to the owning skill. It delegates to skills and does **NOT** render templates inline. **Team operations (organize / run multiple agents) are NOT served here** — use `/speckit.team`.
 
 Agents are expressed with the **Role × Stage × Type** model (defined once in `skills/create-team/references/conceptual-model.md`). Persistent agents are written to the canonical location `.specify/agents/<name>.agent.md`; tool-specific directories are symlinks — never write to them directly.
 
@@ -26,47 +26,23 @@ Agents are expressed with the **Role × Stage × Type** model (defined once in `
 
 ### Intent → Capability Routing
 
-| Recognized intent | Capability | Delegates to skill |
+| Recognized intent | Capability | Delegates to |
 |-------------------|------------|--------------------|
-| Create a new agent | authoring | `create-agent` |
-| Refine / improve an existing agent | authoring | `improve-agent` |
+| Create a new agent | authoring | `create-agent` skill |
+| Refine / improve an existing agent | authoring | `improve-agent` skill |
+| Run / invoke an agent to execute a task | execution | subagent dispatch (see Run Mode) |
 | Organize / run a team of agents | (out of scope) | → use `/speckit.team` |
 
 **Routing flow**:
 
-1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: is this a single-agent *authoring* request (create/refine)? If instead it is a **team** request (organize / run multiple agents), direct the user to `/speckit.team` and stop.
-2. **Authoring** → check `.specify/agents/<name>.agent.md` existence: absent → `create-agent`; present → `improve-agent`. Build the `AgentAuthoringRequest`, handle backup/preservation, write to `.specify/agents/`, verify per-file symlinks.
+1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: classify as `create`, `refine`, or `run`. If instead it is a **team** request (organize / run multiple agents), direct the user to `/speckit.team` and stop.
+2. **create** → check `.specify/agents/<name>.agent.md` existence: absent → `create-agent`. Build the `AgentAuthoringRequest`, handle backup/preservation, write to `.specify/agents/`, verify per-file symlinks.
    - **Confirm the authoring mode** before generating when the request is not unambiguous: offer `role`, `supervisor`, `custom` (narrow, general-purpose), or `project-custom` (project-bound). Do NOT guess the mode silently.
    - **`project-custom`** produces an agent from `skills/create-agent/templates/agent-project-custom-template.md`. It MUST be marked with its bound project via the `project:` frontmatter field and MUST keep the `## Project Scope Guard` section, so it warns the user when later invoked in a different project. Its creation flow is intentionally flexible — no fixed section list beyond the guard.
-3. **Ambiguous / unsupported** → see below.
-
-### Ambiguous or Unsupported Intent (FR-019)
-
-When intent cannot be resolved, the command MUST report the recognized capabilities and request the missing intent. It MUST NOT guess silently or fail without a message. Report this capability listing:
-
-- **create** — author a new agent (role-based or custom) → `create-agent`
-- **refine** — improve an existing agent → `improve-agent`
-
-For organizing or running a **team** of agents (multiple agents collaborating), use `/speckit.team`.
-
-### Lifecycle: Temporary vs Persistent
-
-- **Temporary** agents live only in conversation context and are NOT written to the agent directory.
-- **Persistent** agents are written under `.specify/agents/` and made available to **all officially supported tools** on initialization via per-file symlinks (e.g. `.qoder/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md`).
-
-### Authoring Rules
-
-- Focus on **what** the agent does and **when to call** it
-- Concise, explicit instructions over narrative
-- Single responsibility per agent
-- Least-privilege tool set
-- Approved providers: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder — reject anything else
-
-### Frontmatter Baseline
-
-```yaml
----
-name: "
+3. **refine** → `.specify/agents/<name>.agent.md` exists → `improve-agent`. Load the existing agent definition and apply targeted, evidence-based edits.
+4. **run** → follow the **Run Mode** sequence below.
+5. **Empty arguments** → execute **Default Behavior (No Arguments)** below.
+6. **Non-empty but ambiguous / unsupported** → report capabilities and request the missing intent (see "
 
 prompt = """
 > Compatibility: Follow VS Code Copilot custom agent format for `.agent.md` files.

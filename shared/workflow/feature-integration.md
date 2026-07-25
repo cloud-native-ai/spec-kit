@@ -53,6 +53,7 @@ When `/speckit.requirements` creates a new spec:
 1. **Scan for existing Feature**:
    - Search by context: Scan `memory/features/*.md` and `memory/feature-index.md`
    - Search by ID: Check `SPECIFY_FEATURE` env, git branch name, numeric prefix in BRANCH_NAME
+   - **Binding-precedent heuristic**: for each candidate Feature, check its sibling specs (prior spec directories already bound to it, e.g. via its detail file's Related Files/history). A Feature whose siblings repeatedly absorbed similar work is strong evidence for **bind**; a candidate with no topical siblings is evidence for **create**. Surface the precedent when recommending bind-vs-create.
 
 2. **Bind or Create**:
    - If matching Feature found → bind to that Feature ID, do NOT create new

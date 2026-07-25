@@ -25,9 +25,13 @@ Goal: Detect and reduce ambiguity or missing decision points in the current phas
    - If no `requirements.md` at all → abort, instruct `/speckit.requirements` first.
    - Log: `**Mode: [A/B/C] — clarifying [target]**`
 
-3. **Load common context**: `.specify/memory/constitution.md`, `README.md`, relevant `docs/`, `.specify/memory/features.md`, `research.md` (if exists).
+   **Mode override**: when `$ARGUMENTS` explicitly names an upstream artifact (e.g. "re-clarify the requirements" while `plan.md` already exists), clarify THAT artifact instead of the phase-detected one, cascade accepted answers into the derived artifacts, and log the deviation from the default mode. The default table applies only when the user gives no explicit target.
 
-4. **Load mode-specific context** (see taxonomy reference).
+3. **Writability probe (fail fast)**: before generating any questions, verify the target file is writable (touch-test or write-bit stat on the target and its directory). If unwritable (e.g. root-owned spec dir), STOP immediately with an actionable message (owning path + fix command such as `sudo chown -R $USER <dir>`) — do NOT run the question loop first and lose the integration work at the final write. If the user chooses to proceed read-only, batch all integrations into ONE write attempt at the end instead of the per-answer saves the mode's integration rules call for.
+
+4. **Load common context**: `.specify/memory/constitution.md`, `README.md`, relevant `docs/`, `.specify/memory/features.md`, `research.md` (if exists).
+
+5. **Load mode-specific context** (see taxonomy reference).
 
 ### Taxonomy & Coverage Scan
 

@@ -96,6 +96,17 @@ Follow this execution flow:
      - When code and documentation disagree, treat the divergence as a signal to update the
        documentation (or flag the code as not-yet-implementing the intended goal), not to
        trust the document as current reality.
+   - **MUST include** a principle for "Documentation Naming & Location Conventions" that mandates:
+     - ALL-CAPS Markdown filenames are RESERVED for conventional, ecosystem-recognized
+       root-level artifacts (e.g. `README.md`, `LICENSE`, `CHANGELOG.md`, `CONTRIBUTING.md`);
+       ordinary content documents use lowercase `kebab-case.md` and MUST NOT squat these names.
+     - A document's meaning derives from its FULL PATH, not just its filename: place docs so
+       that `<area>/<topic>.md` reads as "the <topic> of <area>" (e.g. `docs/team/overview.md`,
+       `docs/agents/design.md`), reusing generic filenames scoped by directory rather than
+       inventing globally-unique names.
+     - Tool/framework-mandated filenames are NON-NEGOTIABLE and MUST match the exact required
+       pattern and location (e.g. GitHub Copilot commands MUST be `.github/prompts/<name>.prompt.md`);
+       such names MUST NOT be renamed to fit project conventions.
    - Ensure Governance section lists amendment procedure, versioning policy, and compliance review expectations.
 
 4. Consistency propagation checklist (convert prior checklist into active validations):
