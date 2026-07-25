@@ -1,6 +1,6 @@
 """Contract test for the unified env-var agent configuration (024-agent-env-config).
 
-Asserts that skills/agent-setup/SKILL.md documents:
+Asserts that skills/cli-setup/SKILL.md documents:
   - the unified variables (AGENT_API_KEY, AGENT_MODEL, AGENT_BASE_URL,
     AGENT_ANTHROPIC_BASE_URL),
   - the config_agent_env_validate / config_agent_env_apply commands,
@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
-SKILL_MD = ROOT / "skills" / "agent-setup" / "SKILL.md"
+SKILL_MD = ROOT / "skills" / "cli-setup" / "SKILL.md"
 
 UNIFIED_VARIABLES = [
     "AGENT_API_KEY",
@@ -31,7 +31,7 @@ SIX_TOOLS = ["claude", "codex", "qwen", "qoder", "iflow", "opencode"]
 
 @pytest.fixture(scope="module")
 def skill_text() -> str:
-    assert SKILL_MD.exists(), "skills/agent-setup/SKILL.md does not exist"
+    assert SKILL_MD.exists(), "skills/cli-setup/SKILL.md does not exist"
     return SKILL_MD.read_text(encoding="utf-8")
 
 
