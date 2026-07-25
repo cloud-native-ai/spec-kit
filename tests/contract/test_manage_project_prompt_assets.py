@@ -54,6 +54,7 @@ WORKFLOW_STEPS = [
     "Step 4",
     "Step 5",
     "Step 6",
+    "Step 7",
 ]
 
 FOUR_ELEMENT_SECTIONS = [
@@ -125,7 +126,7 @@ def test_registry_has_no_stale_summarize_project_row():
 # Workflow order and delegation
 # ---------------------------------------------------------------------------
 
-def test_six_step_workflow_in_order():
+def test_seven_step_workflow_in_order():
     text = text_of(SKILL_FILE)
     assert_ordered(text, WORKFLOW_STEPS, context="in SKILL.md workflow")
 
@@ -268,6 +269,57 @@ def test_playbook_defines_document_skeleton():
     for section in FOUR_ELEMENT_SECTIONS:
         assert section in text, f"Expected skeleton section in playbook: {section}"
     assert "元信息" in text, "Expected meta-info section in skeleton"
+
+
+# ---------------------------------------------------------------------------
+# Agile management loop, concept mapping, extension points
+# ---------------------------------------------------------------------------
+
+def test_agile_loop_documented():
+    """SKILL.md defines the basic agile loop: requirement -> feature ->
+    task (staffing) -> testcase -> evaluation, iterated continuously."""
+    text = text_of(SKILL_FILE)
+    for needle in ["需求", "特性", "任务", "测试用例", "评估", "迭代", "人力分配"]:
+        assert needle in text, f"Expected agile loop element: {needle}"
+    assert "管理循环" in text, "Expected a management-loop section"
+
+
+def test_speckit_concept_mapping_documented():
+    """Loop stages anchor to existing spec-kit artifacts instead of
+    reinventing them; non-spec-kit projects get a fallback."""
+    text = text_of(SKILL_FILE)
+    for anchor in ["requirements.md", "features.md", "tasks.md", "verification.md"]:
+        assert anchor in text, f"Expected spec-kit artifact anchor: {anchor}"
+    assert "非 spec-kit" in text, "Expected non-spec-kit fallback column"
+
+
+def test_iteration_log_section_in_skeleton():
+    text = text_of(SKILL_FILE)
+    playbook = text_of(PLAYBOOK_FILE)
+    assert "迭代记录" in text, "Expected iteration-log element in SKILL.md"
+    assert "迭代记录" in playbook, "Expected iteration-log section in playbook skeleton"
+    assert "只追加" in playbook or "不改写" in playbook, (
+        "Expected append-only rule for iteration history rows"
+    )
+
+
+def test_integration_extension_points_reserved_not_implemented():
+    """Future Jira/CI-CD/SCM integration is a reserved extension seam;
+    no external calls are implemented now."""
+    text = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
+    assert "Jira" in text, "Expected Jira named as a future integration direction"
+    assert "预留" in text, "Expected extension points marked as reserved"
+    assert "不实现" in text or "不得引入" in text, (
+        "Expected explicit no-implementation red line for external integrations"
+    )
+    assert "source" in text.lower() or "来源" in text, "Expected source convention for loop stages"
+
+
+def test_deterministic_today_anchoring_rule():
+    """Gantt today line must be anchored relative to project start, not the
+    rendering environment clock (dogfood-run regression)."""
+    text = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
+    assert "days after start" in text, "Expected deterministic today anchoring rule"
 
 
 # ---------------------------------------------------------------------------

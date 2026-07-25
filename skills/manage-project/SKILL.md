@@ -1,8 +1,8 @@
 ---
 name: manage-project
 description: |
-  轻量级项目管理技能（由 summarize-project 进化而来）。以一份 Markdown 项目管理文档为单一事实源，覆盖项目管理四要素：项目背景介绍（文本）、项目里程碑（里程碑视图）、项目主要工作（WBS 工作分解图）、项目进度追踪（甘特图）。所有图表以文本形态的 PlantUML 源码直接嵌入管理文档（可编辑、可 diff、可版本管理），渲染校验一律委托 draw-plantuml 技能完成，本技能不含渲染脚本。支持重复运行以增量更新进度。
-  Use when the user mentions "项目管理", "管理项目", "项目背景", "项目里程碑", "里程碑", "进度追踪", "项目进度", "项目总结", "项目汇报", "进展报告", "项目进展", "manage project", "project management", "milestone", "progress tracking", "summarize project", "project summary", "project report", "WBS", "工作分解", "甘特图".
+  轻量级项目管理技能（由 summarize-project 进化而来）。以一份 Markdown 项目管理文档为单一事实源，覆盖项目管理四要素：项目背景介绍（文本）、项目里程碑（里程碑视图）、项目主要工作（WBS 工作分解图）、项目进度追踪（甘特图）；并以基础敏捷管理循环（需求 → 特性 → 任务/人力分配 → 测试用例 → 评估，持续迭代）作为过程骨架，循环环节优先锚定 spec-kit 已有工件（requirements/features/tasks/verification/review），预留外部系统（Jira、CI/CD、代码托管）集成扩展点但当前不实现。所有图表以文本形态的 PlantUML 源码直接嵌入管理文档（可编辑、可 diff、可版本管理），渲染校验一律委托 draw-plantuml 技能完成，本技能不含渲染脚本。支持重复运行以增量更新进度。
+  Use when the user mentions "项目管理", "管理项目", "项目背景", "项目里程碑", "里程碑", "进度追踪", "项目进度", "迭代管理", "敏捷", "项目总结", "项目汇报", "进展报告", "项目进展", "manage project", "project management", "milestone", "progress tracking", "iteration", "agile", "summarize project", "project summary", "project report", "WBS", "工作分解", "甘特图".
 skill_id: "<SKILL:.specify/skills/manage-project/SKILL.md>"
 ---
 
@@ -16,6 +16,7 @@ skill_id: "<SKILL:.specify/skills/manage-project/SKILL.md>"
 | 2. 项目里程碑 | 管理文档 `## 项目里程碑` 节 | 里程碑视图：仅含 `happens` 里程碑条目的 `@startgantt` 图（PlantUML 源码嵌入）+ 跟踪表格 |
 | 3. 项目主要工作 | 管理文档 `## 主要工作` 节 | WBS 工作分解图：`@startwbs`（PlantUML 源码嵌入） |
 | 4. 项目进度追踪 | 管理文档 `## 进度追踪` 节 | 甘特图：`@startgantt`，三态进度 + 当前日期参照线（PlantUML 源码嵌入） |
+| 5. 迭代循环 | 管理文档 `## 迭代记录` 节 | 敏捷循环日志：每迭代一行（需求 → 特性 → 任务/负责人 → 测试用例 → 评估） |
 
 **图表即文本**：所有图表以 PlantUML 源码形式写在管理文档的 ```` ```plantuml ```` 代码块中——源码是唯一权威形态，可直接编辑、可 diff、可随 git 演进；渲染出的图片只是派生产物。这是与一次性"汇报文档"的本质区别：管理文档要被**持续修改与跟踪**，而不是一次性输出。
 
@@ -29,9 +30,25 @@ skill_id: "<SKILL:.specify/skills/manage-project/SKILL.md>"
 - **图源嵌入，渲染委托**：PlantUML 源码嵌入管理文档；WBS 走 draw-plantuml 的 `@startwbs` 能力，里程碑视图与甘特图走 `@startgantt` 能力。渲染仅用于**语法校验与可选配图**，产物机制以 draw-plantuml 为准。
 - **管理者与读者兼顾**：命名用业务语言，避免内部黑话；每张图配一段简要说明，外部读者不读代码也能看懂。
 
+## 管理循环（敏捷迭代）
+
+本技能以基础敏捷循环作为过程骨架：**需求 (Requirement) → 特性 (Feature) → 任务 (Task，含人力分配) → 测试用例 (Testcase) → 评估 (Evaluation)**，评估结论作为下一轮迭代的需求输入，循环往复推进项目。管理文档的 `## 迭代记录` 节按迭代逐行登记这条链路的锚点与结论；四要素图表在每轮迭代的更新模式运行中同步刷新。
+
+**概念不重复发明**：循环中的管理对象优先锚定到项目已有的事实源——只登记锚点（路径/ID）与结论，绝不把源工件内容复制进管理文档（避免双源漂移）。在 spec-kit / SDD 项目中按下表映射；非 spec-kit 项目回退到用户提供的等价材料：
+
+| 循环环节 | spec-kit 项目锚点 | 非 spec-kit 项目回退 |
+|----------|-------------------|----------------------|
+| 需求 (Requirement) | `.specify/specs/<key>/requirements.md`（`/speckit.requirements` 产出） | 需求文档 / 用户描述 |
+| 特性 (Feature) | `.specify/memory/features.md` 与 `features/<ID>.md` | 产品功能清单 |
+| 任务与人力分配 (Task) | `.specify/specs/<key>/tasks.md`（负责人登记在任务行或迭代记录） | 任务清单 / 看板导出 |
+| 测试用例 (Testcase) | `tests/`、`checklists/`、`verification.md` | 测试计划 / 用例清单 |
+| 评估 (Evaluation) | `/speckit.review` 报告、`.specify/memory/feedback/` | 迭代复盘纪要 |
+
+**集成扩展点（预留，不实现）**：迭代记录的每个环节带有"来源 (source)"约定，当前一律为本地工件锚点；未来接入外部系统（如 Jira、CI/CD 流水线、代码托管平台）时仅替换对应环节的来源适配并登记外部 ID，文档结构、四要素章节与图表约定不变。在用户明确要求之前，本技能不得引入任何外部系统调用。细则见 [references/management-playbook.md](references/management-playbook.md) §10–§11。
+
 ## 工作流
 
-按以下 6 个步骤顺序执行。
+按以下 7 个步骤顺序执行。
 
 ### Step 1: 加载或初始化管理文档
 
@@ -42,7 +59,7 @@ skill_id: "<SKILL:.specify/skills/manage-project/SKILL.md>"
 
 ### Step 2: 收集项目材料与溯源
 
-从用户提供或工作区可用的材料中收集：项目背景信息（目标、干系人、范围）、工作项、里程碑事件。为每个工作项记录：**名称、来源出处、状态（completed / in-progress / not-started）、进度百分比（in-progress 时必填）、时间信息（若有）、负责人（若有）**；为每个里程碑记录：**名称、锚定方式（绝对日期或关联工作项结束点）、达成状态**。材料不足时按「信息不足与澄清」节处理，不臆造。
+从用户提供或工作区可用的材料中收集：项目背景信息（目标、干系人、范围）、工作项、里程碑事件，以及**本轮迭代的循环环节锚点**（需求、特性、任务/负责人、测试用例、评估材料——按「管理循环」映射表定位，只记锚点不复制内容）。为每个工作项记录：**名称、来源出处、状态（completed / in-progress / not-started）、进度百分比（in-progress 时必填）、时间信息（若有）、负责人（若有）**；为每个里程碑记录：**名称、锚定方式（绝对日期或关联工作项结束点）、达成状态**。材料不足时按「信息不足与澄清」节处理，不臆造。
 
 ### Step 3: 工作分解与里程碑定稿
 
@@ -55,8 +72,8 @@ skill_id: "<SKILL:.specify/skills/manage-project/SKILL.md>"
 1. **WBS 工作分解图**（`## 主要工作`）：`@startwbs` 渲染分解树，遵循 draw-plantuml 的 `references/howto/13-wbs-diagram.md`。项目过大时按「大项目与图集拆分」节拆分。
 2. **里程碑视图**（`## 项目里程碑`）：仅含里程碑条目的紧凑 `@startgantt` 图——每个里程碑用 `[名称] happens <日期>` 或 `happens at [工作项]'s end` 声明为零工期菱形节点，配套一张「里程碑 | 锚定 | 状态」Markdown 表格，使里程碑既可视又可逐行跟踪。
 3. **进度甘特图**（`## 进度追踪`）：`@startgantt` 渲染带时间信息的工作项，遵循 `references/howto/14-gantt-diagram.md`。必须包含：
-   - **进度状态语义**：completed / in-progress（带完成百分比）/ not-started 三态视觉可辨；项目进行期须标出当前日期参照线；
-   - **里程碑**：与里程碑视图同名同锚定的 `happens` 菱形节点；
+   - **进度状态语义**：completed / in-progress（带完成百分比）/ not-started 三态视觉可辨；项目进行期须标出当前日期参照线，且 `today` **必须**以 `today is N days after start` 相对项目起点显式定位——不得依赖渲染环境时钟；
+   - **里程碑**：**逐条复制**里程碑视图中的全部 `happens` 条目（同名同锚定）——一致性在生成时保证，而非留待落盘前自检兜底；
    - **依赖关系**：工作项间先后依赖按材料呈现，无依据时不虚构依赖。
 
 更新模式下只改动受影响的条目（状态、百分比、新增/移除行），保持其余源码稳定以便 diff 审阅。
@@ -68,6 +85,10 @@ skill_id: "<SKILL:.specify/skills/manage-project/SKILL.md>"
 ### Step 6: 一致性自检与文档落盘
 
 执行**三图一致性自检**：WBS 叶子工作项（带时间信息的）与甘特条目一一对应、命名一致；里程碑视图与甘特图中的里程碑同名同锚定；三态口径在图与叙述间一致。清单见 [references/management-playbook.md](references/management-playbook.md)。通过后写入管理文档，并刷新元信息（最后更新日期、本次变更摘要、估计假设逐条显式标注）。
+
+### Step 7: 迭代评估与循环
+
+以本轮迭代的评估材料（评审报告、反馈记录、测试结果）得出**评估结论**，在 `## 迭代记录` 追加或补全本迭代行——登记需求 → 特性 → 任务/负责人 → 测试用例 → 评估五个环节的锚点与结论（缺失环节显式写「无」，不留空猜测）。评估产生的改进项作为**下一轮迭代的需求输入**记入结论列。历史迭代行只追加、不改写（如需修正在评估列追加备注）。规则见 [references/management-playbook.md](references/management-playbook.md) §10。
 
 ## 信息不足与澄清
 
@@ -83,7 +104,7 @@ skill_id: "<SKILL:.specify/skills/manage-project/SKILL.md>"
 
 ## 参考文档
 
-- [references/management-playbook.md](references/management-playbook.md) — 管理文档结构、更新模式规则、分解深度、估计默认与假设标注、状态推断、里程碑跟踪、图集拆分、三图一致性清单、范围/粒度控制
+- [references/management-playbook.md](references/management-playbook.md) — 管理文档结构、更新模式规则、分解深度、估计默认与假设标注、状态推断、里程碑跟踪、图集拆分、三图一致性清单、范围/粒度控制、管理循环与概念映射、集成扩展点
 - draw-plantuml 技能：`references/howto/13-wbs-diagram.md`（WBS）、`references/howto/14-gantt-diagram.md`（甘特图与里程碑）、`references/howto/12-rendering-and-output.md`（渲染与输出约定）
 
 ## Feedback

@@ -148,10 +148,18 @@ today is 338 days after start and is colored in #FF6B6B
 - **not-started（灰色，0%）**：CI/CD 与代码质量（Feature 034/035 均为 Draft，2026-07-22 登记）；其 30 天工期为估计假设（见元信息）。
 - **当前日期参照线**：红色竖线（`today`）标于 2026-07-25，落在「治理与 Dogfooding」尾部与「CI/CD 与代码质量」起步区间，直观呈现"主体能力已交付、工程基础设施待启动"的现状。
 
+## 迭代记录
+
+敏捷循环日志：每迭代一行，登记 需求 → 特性 → 任务/负责人 → 测试用例 → 评估 的锚点与结论（来源当前均为本地工件）。
+
+| 迭代 | 周期 | 需求 | 特性 | 任务/负责人 | 测试用例 | 评估 |
+|------|------|------|------|-------------|----------|------|
+| 1 | 2026-07-25 | `.specify/specs/032-dogfooding-practice/requirements.md` | Feature 036 Dogfooding Practice | `.specify/specs/032-dogfooding-practice/tasks.md`（17 任务；负责人：框架维护者） | `tests/contract/test_dogfooding_practice.py` 19 passed；`verification.md` SC-001…004 pass | `review.md` 0P0/3P1/4P2；评审+反馈已消费入框架（6 项修复）；下一轮输入：F7 测试债维护迭代立项 |
+
 ## 元信息
 
 - 最后更新：2026-07-25
-- 本次变更摘要：初始化管理文档（首次以 manage-project 技能对 Spec Kit 自身建立四要素管理基线）；按用户指令将项目管理根目录定为 `.specify/project/`。
+- 本次变更摘要：初始化管理文档（首次以 manage-project 技能对 Spec Kit 自身建立四要素管理基线）；按用户指令将项目管理根目录定为 `.specify/project/`；按技能升级后的骨架补齐 `## 迭代记录` 节并登记迭代 1（spec 032 Dogfooding 循环）。
 - 估计假设：
   1. 假设：「CI/CD 与代码质量」工期估计为 30 天（Feature 034/035 为 Draft，材料未提供排期）。
   2. 假设：「模板体系与工作区」起点取 2025-09-01（模板体系随早期版本渐进成型，材料未提供精确启动日；终点取 Feature 023/024 登记日 2026-06-05）。
