@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-07-25T14:54:40Z",
+  "updated": "2026-07-25T15:20:03Z",
   "threshold": 10,
-  "count_since_submission": 32,
+  "count_since_submission": 33,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260725T152003Z-skill-improve-skills",
+      "file": "20260725T152003Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "manage-project-agile-loop-20260725",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-25T15:20:03Z",
+      "summary": "基于用户方向（敏捷管理循环、复用 spec-kit 概念、预留 Jira/CI-CD/SCM 扩展点）与 dogfood 首跑证据（today 时钟依赖返工、里程碑 1/6 缺失返工、两次手写相同提取代码）完成 manage-project 定向改进：SKILL.md 新增管理循环章节+概念映射表+Step 7，playbook 新增迭代记录骨架、§10/§11 与标准渲染校验命令，两条运行回归教"
+    },
     {
       "id": "20260725T145345Z-skill-manage-project",
       "file": "20260725T145345Z-skill-manage-project.md",
