@@ -81,6 +81,31 @@ def validate_source(source: str) -> bool:
     return bool(source) and bool(_SOURCE_RE.match(source.strip()))
 
 
+def resolve_workspace_root(explicit: Optional[str]) -> Path:
+    """Locate the project workspace root that owns the ``.specify/`` store.
+
+    Priority: explicit CLI argument > script self-location (an engine copy
+    installed under ``*/.specify/scripts/`` anchors its parent project) >
+    nearest CWD ancestor containing ``.specify/`` > CWD itself. Self-location
+    must outrank the walk-up: when the agent's CWD sits inside a skill
+    directory that contains a stray nested ``.specify/`` (created by an
+    earlier bug), the walk-up would capture that nested tree and split the
+    store. Falling back to bare CWD is only a last resort outside any project.
+    """
+    if explicit:
+        return Path(explicit).resolve()
+    script = Path(__file__).resolve()
+    parts = script.parts
+    for i, part in enumerate(parts):
+        if part == ".specify" and i + 1 < len(parts) and parts[i + 1] == "scripts":
+            return Path(*parts[:i])
+    cwd = Path.cwd().resolve()
+    for candidate in (cwd, *cwd.parents):
+        if (candidate / ".specify").is_dir():
+            return candidate
+    return cwd
+
+
 def memory_root(workspace_root: Path) -> Path:
     return Path(workspace_root).resolve() / MEMORY_SUBDIR
 
@@ -227,7 +252,7 @@ def entry_meta(meta: Dict[str, Any], filename: str) -> Dict[str, Any]:
 # Actions
 # --------------------------------------------------------------------------- #
 def action_record(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     scope = args.scope
     source = (args.source or "").strip()
     if not validate_source(source):
@@ -316,7 +341,7 @@ def _collect_scopes(scope: str) -> List[str]:
 
 
 def action_recall(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     if args.scope != "all" and args.scope not in SCOPES:
         raise MemoryError(f"Unknown scope: {args.scope}")
 
@@ -351,7 +376,7 @@ def action_recall(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 def action_list(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     limit = max(1, args.limit)
     items: List[Dict[str, Any]] = []
     for scope in _collect_scopes(args.scope):
@@ -364,7 +389,7 @@ def action_list(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 def action_prune(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     scope = args.scope
     if scope not in SCOPES:
         raise MemoryError(f"prune requires a concrete scope, got: {scope}")
@@ -409,7 +434,7 @@ def action_prune(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 def action_reindex(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     result: Dict[str, Any] = {}
     for scope in _collect_scopes(args.scope):
         target = scope_dir(workspace_root, scope)

@@ -1,7 +1,7 @@
 ---
 name: summarize-project
 description: |
-  项目总结呈现技能（由 manage-project 重构而来）。定位是项目的**呈现/输出工具**，不是管理/输入工具：只读项目现有事实源，产出一份派生的项目总结报告，不修改项目的任何管理工件。报告**文本综述与可视化图表并重**——文字总结覆盖项目概览、需求与特性叙述，图形呈现覆盖功能分解（WBS 工作分解图）、里程碑视图、任务进展甘特图。报告按五个呈现层面分解，每个层面回答外部读者的一个问题（项目目标是什么、要交付哪些能力、包含哪些任务、里程碑是什么/完成了哪些、每个任务什么状态与整体进度安排），并对应 references/ 下一份层参考文档。信息源识别：若目标项目已使用 SpecKit 框架管理（存在 .specify/ 目录及相应结构），以该目录中的工件（specs/*/requirements.md、specs/*/tasks.md、memory/features.md 等）为主要信息源总结项目信息；非 SpecKit 项目回退到代码结构、README/docs、外部需求/任务/进度文档、git 历史等来源——输入源不限于代码，外部文件与文档均可作为材料。所有图表以 PlantUML 源码嵌入报告（可编辑、可 diff、可版本管理），渲染校验一律委托 draw-plantuml 技能完成。报告是派生产物，支持重复运行刷新。
+  项目总结呈现技能（由 manage-project 重构而来）。定位是项目的**呈现/输出工具**，不是管理/输入工具：只读项目现有事实源，产出一份派生的项目总结报告，不修改项目的任何管理工件。报告**文本综述与可视化图表并重**——文字总结覆盖项目概览、需求与特性叙述，图形呈现覆盖功能分解（WBS 工作分解图）、里程碑视图、任务进展甘特图。报告按五个呈现层面分解，每个层面回答外部读者的一个问题（项目目标是什么、要交付哪些能力、包含哪些任务、里程碑是什么/完成了哪些、每个任务什么状态与整体进度安排），并对应 references/ 下一份层参考文档。信息源识别：若目标项目已使用 SpecKit 框架管理（存在 .specify/ 目录及相应结构），以该目录中的工件（specs/*/requirements.md、specs/*/tasks.md、memory/features.md 等）为主要信息源总结项目信息；非 SpecKit 项目回退到代码结构、README/docs、外部需求/任务/进度文档、git 历史等来源——输入源不限于代码，外部文件与文档均可作为材料。所有图表以 PlantUML 源码嵌入报告（可编辑、可 diff、可版本管理），渲染校验一律委托 draw-plantuml 技能完成。四项核心内容（项目概览、项目里程碑、功能分解 WBS、任务进展甘特图）默认逐层交互式确认后落盘——WBS 与甘特图须先渲染出图再确认；非交互模式（用户显式声明跳过）自动确认并在元信息标注。报告是派生产物，支持重复运行刷新。
   Use when the user mentions "项目总结", "总结项目", "项目现状", "项目报告", "项目汇报", "项目进展", "项目概览", "项目可视化", "需求特性", "功能分解", "里程碑", "进度追踪", "项目进度", "summarize project", "project summary", "project report", "project overview", "project status", "project dashboard", "project visualization", "milestone", "progress tracking", "WBS", "工作分解", "甘特图".
 skill_id: "<SKILL:.specify/skills/summarize-project/SKILL.md>"
 ---
@@ -30,7 +30,8 @@ skill_id: "<SKILL:.specify/skills/summarize-project/SKILL.md>"
 - **报告可再生**：重复运行本技能时**刷新**报告（重新读取事实源、重生成图表与表格）。报告正文不承载人工维护的事实；用户若在报告内手工补充了 `## 附注` 节，刷新时原样保留该节，其余章节视为可再生的派生内容。
 - **单一呈现口径**：先产出一棵**功能分解树**（阶段 → 任务 →（可选）子任务），WBS 图、甘特图、里程碑视图都由它派生——三处工作项/里程碑命名逐字一致，无孤儿条目。
 - **可溯源，不臆造**：每个呈现条目（特性、工作项、里程碑）必须能溯源到信息源材料（`.specify/` 工件、外部文档、代码结构、git 历史、用户描述）。材料里没有的内容，宁可提问也绝不编造；推断性内容显式标注。
-- **图源嵌入，渲染委托**：PlantUML 源码嵌入报告；WBS 走 draw-plantuml 的 `@startwbs` 能力，里程碑视图与甘特图走 `@startgantt` 能力。渲染仅用于**语法校验与可选配图**，产物机制以 draw-plantuml 为准。
+- **图源嵌入，渲染委托**：PlantUML 源码嵌入报告；WBS 走 draw-plantuml 的 `@startwbs` 能力，里程碑视图与甘特图走 `@startgantt` 能力。渲染仅用于**语法校验、交互确认与可选配图**，产物机制以 draw-plantuml 为准。
+- **确认后落盘**：四项项目管理核心内容——项目概览（背景介绍）、项目里程碑、功能分解（WBS）、任务进展（甘特图）——默认逐层**交互式确认**，用户确认通过的内容才允许写入报告；WBS 与甘特图必须先经 draw-plantuml **渲染出图**、连图带源码一并呈现确认，不得拿未渲染源码要求确认。非交互运行（用户显式声明跳过确认）自动通过全部门禁，并在 `## 元信息` 标注「未经交互确认」。
 - **读者兼顾**：命名用业务语言，避免内部黑话；每张图配一段简要说明，外部读者不读代码也能看懂。
 
 ## 信息源识别
@@ -57,7 +58,7 @@ python3 ${SKILL_HOME}/scripts/detect-project-sources.py --target <项目根目�
 
 ## 工作流
 
-按以下 6 个步骤顺序执行。
+按以下 7 个步骤顺序执行。
 
 ### Step 1: 识别信息源
 
@@ -69,27 +70,36 @@ python3 ${SKILL_HOME}/scripts/detect-project-sources.py --target <项目根目�
 
 ### Step 3: 组织呈现模型
 
-把工作项自顶向下组织为**阶段 → 任务 →（可选）子任务**的单一功能分解树，并确定特性清单与里程碑清单（关键评审、发布、验收节点）。这棵树与这两份清单是后续所有图表的唯一数据源：先在上下文中定稿（命名、层级、归属、锚定），再进入绘图步骤。分解深度与命名规范见 [references/work-breakdown.md](references/work-breakdown.md)；里程碑识别与锚定规则见 [references/milestones.md](references/milestones.md)。
+把工作项自顶向下组织为**阶段 → 任务 →（可选）子任务**的单一功能分解树，并确定特性清单与里程碑清单（关键评审、发布、验收节点）。这棵树与这两份清单是后续所有图表的唯一数据源：先在上下文中定稿（命名、层级、归属、锚定），再进入确认门禁。分解深度与命名规范见 [references/work-breakdown.md](references/work-breakdown.md)；里程碑识别与锚定规则见 [references/milestones.md](references/milestones.md)。
 
-### Step 4: 生成图表源码
+### Step 4: 逐层交互式确认（四道门禁）
 
-在报告对应章节内以 ```` ```plantuml ```` 代码块写入图表源码：
+四项核心内容各设一道确认门禁，按以下顺序逐层进行。每道门禁流程固定：**起草内容 → 向用户呈现 → 等待确认**——借助当前工具的交互提问能力（如 AskUserQuestion）给出「确认通过 / 提出修改 / 跳过本门禁（记为未确认）」三个选项；确认通过才进入下一道门禁，提出修改则原地修订后**再次呈现确认**（同一门禁内迭代直至通过）。**未经确认的内容不得写入最终报告。**
 
-1. **WBS 功能分解图**（`## 功能分解`）：`@startwbs` 渲染分解树，细则见 [references/work-breakdown.md](references/work-breakdown.md)，语法遵循 draw-plantuml 的 `references/howto/13-wbs-diagram.md`。项目过大时按「大项目与图集拆分」节拆分。
-2. **里程碑视图**（`## 项目里程碑`）：仅含里程碑条目的紧凑 `@startgantt` 图——每个里程碑用 `[名称] happens <日期>` 或 `happens at [工作项]'s end` 声明为零工期菱形节点，配套一张「里程碑 | 锚定 | 状态」Markdown 表格与达成叙述（完成了哪些里程碑），细则见 [references/milestones.md](references/milestones.md)。
-3. **进展甘特图**（`## 任务进展`）：`@startgantt` 渲染带时间信息的工作项，配套整体进度叙述，细则见 [references/task-progress.md](references/task-progress.md)，语法遵循 `references/howto/14-gantt-diagram.md`。必须包含：
+1. **门禁 1 — 项目概览（背景介绍）**：按 [references/project-overview.md](references/project-overview.md) 起草 `## 项目概览` 文本（背景、目标、范围，逐条注明出处）→ 呈现全文 → 确认。
+2. **门禁 2 — 项目里程碑**：按 [references/milestones.md](references/milestones.md) 起草里程碑视图与跟踪材料 → 呈现 → 确认。里程碑视图为仅含 `happens` 条目的紧凑 `@startgantt` 图——每个里程碑用 `[名称] happens <日期>` 或 `happens at [工作项]'s end` 声明为零工期菱形节点；配套「里程碑 | 锚定 | 状态」Markdown 表格与达成叙述（完成了哪些里程碑）。
+3. **门禁 3 — 功能分解（WBS，须渲染确认）**：按 [references/work-breakdown.md](references/work-breakdown.md) 生成 `@startwbs` 源码（语法遵循 draw-plantuml 的 `references/howto/13-wbs-diagram.md`；项目过大时按「大项目与图集拆分」节拆分）→ **委托 draw-plantuml 渲染出图** → 将渲染图片（路径）与源码**一并呈现** → 确认。渲染失败先修正源码重试；不得拿未渲染的源码要求确认。
+4. **门禁 4 — 任务进展（甘特图，须渲染确认）**：按 [references/task-progress.md](references/task-progress.md) 生成 `@startgantt` 源码（语法遵循 `references/howto/14-gantt-diagram.md`）→ **渲染出图** → 图与源码一并呈现 → 确认。源码必须包含：
    - **进度状态语义**：completed / in-progress（带完成百分比）/ not-started 三态视觉可辨；项目进行期须标出当前日期参照线，且 `today` **必须**以 `today is N days after start` 相对项目起点显式定位——不得依赖渲染环境时钟；
-   - **里程碑**：**逐条复制**里程碑视图中的全部 `happens` 条目（同名同锚定）——一致性在生成时保证，而非留待落盘前自检兜底；
+   - **里程碑**：**逐条复制**门禁 2 已确认的全部 `happens` 条目（同名同锚定）——一致性在生成时保证，而非留待落盘前自检兜底；
    - **依赖关系**：工作项间先后依赖按材料呈现，无依据时不虚构依赖。
-4. **特性概览图**（`## 需求与特性`，可选）：特性数量适合图示时以 `@startmindmap` 呈现特性分组；特性以表格为主、图为辅，细则见 [references/requirements-features.md](references/requirements-features.md)。
 
-### Step 5: 渲染校验（委托 draw-plantuml）
+- **确认即冻结**：门禁通过后对应章节内容即冻结；后续步骤发现一致性问题时，凡改动冻结内容须回到对应门禁**重新确认**。
+- **刷新运行的批量确认**：重复运行刷新报告时，与既有报告对应章节逐字一致的门禁内容可合并为一次「全部沿用」确认；有变化的章节仍逐层确认。
+- **非交互模式**：用户显式声明跳过确认（或调用方以非交互方式运行）时，四道门禁自动通过，并在 `## 元信息` 标注「未经交互确认」。
 
-将报告中每个 PlantUML 代码块交给 draw-plantuml 技能渲染一次，验证语法正确、版面可读（布局与输出约定见其 `references/howto/12-rendering-and-output.md`）。校验失败则修正源码后重试。渲染出的 PNG/SVG 图片为**可选配套产物**：存放于报告同目录，报告中可在源码块之后以相对路径引用图片，但嵌入的源码始终保留、始终是权威形态。
+### Step 5: 组装报告与剩余内容
 
-### Step 6: 一致性自检与报告落盘
+1. **需求与特性**（无门禁层）：按 [references/requirements-features.md](references/requirements-features.md) 起草特性清单表格；特性数量适合图示时以 `@startmindmap` 附特性分组概览图——特性以表格为主、图为辅。
+2. 按报告骨架（见 [references/reporting-playbook.md](references/reporting-playbook.md)）组装五个章节：四道门禁冻结的内容 + 需求与特性 + 保留的既有 `## 附注` 节。
 
-执行**三图一致性自检**：WBS 叶子工作项（带时间信息的）与甘特条目一一对应、命名一致；里程碑视图与甘特图中的里程碑同名同锚定；三态口径在图与叙述间一致；特性清单表格与概览叙述一致。清单见 [references/reporting-playbook.md](references/reporting-playbook.md)。通过后写入报告（保留既有 `## 附注` 节），并刷新元信息（生成日期、信息源清单、估计假设逐条显式标注）。
+### Step 6: 渲染校验（委托 draw-plantuml）
+
+WBS 与甘特图在门禁 3/4 已渲染确认，确认后源码未再改动即视为通过校验，不重复渲染。其余 PlantUML 代码块（里程碑视图、特性概览图，以及门禁确认后被修订过的 WBS/甘特）交给 draw-plantuml 技能渲染一次，验证语法正确、版面可读（布局与输出约定见其 `references/howto/12-rendering-and-output.md`）。校验失败则修正源码后重试——若修正涉及门禁冻结内容，须回到对应门禁重新确认。渲染出的 PNG/SVG 图片为**可选配套产物**：存放于报告同目录，报告中可在源码块之后以相对路径引用图片，但嵌入的源码始终保留、始终是权威形态。
+
+### Step 7: 一致性自检与报告落盘
+
+执行**三图一致性自检**：WBS 叶子工作项（带时间信息的）与甘特条目一一对应、命名一致；里程碑视图与甘特图中的里程碑同名同锚定；三态口径在图与叙述间一致；特性清单表格与概览叙述一致。清单见 [references/reporting-playbook.md](references/reporting-playbook.md)。通过后写入报告（保留既有 `## 附注` 节），并刷新元信息：生成日期、信息源清单、估计假设逐条显式标注、**四道门禁确认状态**（全部确认 / 部分跳过 / 未经交互确认）。
 
 ## 信息不足与澄清
 

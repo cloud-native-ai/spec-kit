@@ -1,10 +1,65 @@
 {
   "store": "feedback",
-  "updated": "2026-07-25T17:56:41Z",
+  "updated": "2026-07-27T02:55:51Z",
   "threshold": 10,
-  "count_since_submission": 2,
+  "count_since_submission": 7,
   "submitted_at": "2026-07-25T17:14:57Z",
   "entries": [
+    {
+      "id": "20260727T025551Z-skill-code-review",
+      "file": "20260727T025551Z-skill-code-review.md",
+      "unit_id": "skill:code-review",
+      "unit_type": "skill",
+      "run_id": "workspace-root-fix-2026-07-27",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-27T02:55:51Z",
+      "summary": "Dogfooding review of the workspace-root resolution fix (feedback/memory/history engines). Presented the engine diff via delta, recorded 5 notes, merge gate flagged 1 important which was responded to a"
+    },
+    {
+      "id": "20260727T020410Z-skill-improve-skills",
+      "file": "20260727T020410Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "improve-skills-summarize-project-20260726",
+      "feature": "summarize-project",
+      "partial": false,
+      "created": "2026-07-27T02:04:10Z",
+      "summary": "Added four interactive confirmation gates (overview / milestones / WBS-rendered / Gantt-rendered) to summarize-project per user emphasis. Evidence gathering showed the six-step ordered contract assert"
+    },
+    {
+      "id": "20260726T151918Z-skill-code-review",
+      "file": "20260726T151918Z-skill-code-review.md",
+      "unit_id": "skill:code-review",
+      "unit_type": "skill",
+      "run_id": "code-review-delta-install-20260726",
+      "feature": "code-review",
+      "partial": false,
+      "created": "2026-07-26T15:19:18Z",
+      "summary": "Closed the remaining validation gap from the first dogfood loop: delta was missing in this environment. crates.io was unreachable (403) and GitHub releases timed out; rsproxy mirror worked, but cargo "
+    },
+    {
+      "id": "20260726T125534Z-skill-code-review",
+      "file": "20260726T125534Z-skill-code-review.md",
+      "unit_id": "skill:code-review",
+      "unit_type": "skill",
+      "run_id": "code-review-dogfood-20260726",
+      "feature": "code-review",
+      "partial": false,
+      "created": "2026-07-26T12:55:34Z",
+      "summary": "First dogfood run of code-review (presenting the instructions+memory change set) exposed two real defects in git-delta-review.sh: no support for uncommitted changes (ref..ref only) and silent invisibi"
+    },
+    {
+      "id": "20260726T075125Z-skill-improve-skills",
+      "file": "20260726T075125Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "improve-skills-code-review-20260726",
+      "feature": "code-review",
+      "partial": false,
+      "created": "2026-07-26T07:51:25Z",
+      "summary": "Rebuilt skills/code-review from a frontmatter-less design document into a contract-style SpecKit skill centered on git-delta: proper SKILL.md (frontmatter, 4-phase workflow skeleton, strict requiremen"
+    },
     {
       "id": "20260725T175641Z-skill-improve-skills",
       "file": "20260725T175641Z-skill-improve-skills.md",

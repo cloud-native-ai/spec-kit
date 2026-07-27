@@ -213,7 +213,28 @@ def _now_iso() -> str:
 # --------------------------------------------------------------------------- #
 
 def _project_root(arg: Optional[str]) -> Path:
-    return Path(arg).resolve() if arg else Path.cwd().resolve()
+    """Locate the project workspace root that owns the ``.specify/`` store.
+
+    Priority: explicit CLI argument > script self-location (an engine copy
+    installed under ``*/.specify/scripts/`` anchors its parent project) >
+    nearest CWD ancestor containing ``.specify/`` > CWD itself. Self-location
+    must outrank the walk-up: when the agent's CWD sits inside a skill
+    directory that contains a stray nested ``.specify/`` (created by an
+    earlier bug), the walk-up would capture that nested tree and split the
+    store. Falling back to bare CWD is only a last resort outside any project.
+    """
+    if arg:
+        return Path(arg).resolve()
+    script = Path(__file__).resolve()
+    parts = script.parts
+    for i, part in enumerate(parts):
+        if part == ".specify" and i + 1 < len(parts) and parts[i + 1] == "scripts":
+            return Path(*parts[:i])
+    cwd = Path.cwd().resolve()
+    for candidate in (cwd, *cwd.parents):
+        if (candidate / ".specify").is_dir():
+            return candidate
+    return cwd
 
 
 def _guess_tool(project_path: Path) -> Optional[str]:

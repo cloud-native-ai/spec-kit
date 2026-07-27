@@ -1,0 +1,37 @@
+{
+  "scope": "knowledge",
+  "updated": "2026-07-27T02:55:33Z",
+  "entries": [
+    {
+      "id": "specify-9eb23254",
+      "file": "specify-9eb23254.md",
+      "scope": "knowledge",
+      "source": "skill:code-review",
+      "feature": "",
+      "tags": [
+        "workspace-root",
+        "path-resolution",
+        "engines"
+      ],
+      "title": "根项目 .specify 锚定原则",
+      "created": "2026-07-27T02:55:33Z",
+      "summary": "原则(用户确立): 所有 speckit 框架的技能和命令, 都应以根项目的 .specify 目录作为一切存储的根目录, 绝不在技能目录等嵌套位置创建 .specify。落地: feedback-utils/memory-utils/history-utils 三引擎统一 resolve_workspace_root — 显式参数 > 脚本自定位(*/.specify/scripts 锚定父项目"
+    },
+    {
+      "id": "dogfood-code-review-f1495907",
+      "file": "dogfood-code-review-f1495907.md",
+      "scope": "knowledge",
+      "source": "skill:improve-skills",
+      "feature": "code-review",
+      "tags": [
+        "code-review",
+        "dogfooding",
+        "workflow-convention",
+        "feedback-loop"
+      ],
+      "title": "Dogfood code-review 技能：所有改动经其展现与审查",
+      "created": "2026-07-26T09:55:45Z",
+      "summary": "用户决策（2026-07-26）：本项目自身 dogfood 新创建的 code-review 技能。后续所有代码修改或需用户确认的改动，均使用 code-review 技能（git-delta 工作流：diff 渲染 / review 逐文件 / note 分级意见 / report --summary 门禁）进行展现与审查，而非裸 git diff。目的：在真实使用中持续收集对该技能本身的反馈"
+    }
+  ]
+}

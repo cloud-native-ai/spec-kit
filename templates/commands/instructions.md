@@ -4,6 +4,10 @@ handoffs:
   - label: Scan Skills
     agent: speckit.skills
     prompt: Scan project for available tools and skills to populate the instructions.
+  - label: Record Run to Memory
+    agent: memory-record
+    prompt: Persist this run's residual report and any durable conventions surfaced into project memory.
+    send: false
 scripts:
   sh: scripts/bash/generate-instructions.sh
 ---
@@ -128,6 +132,7 @@ Fallback behavior:
    - Inspect configuration files (`pyproject.toml`, `package.json`, `pom.xml`, `Makefile`, etc.) to determine the tech stack.
    - Check `.specify/memory/constitution.md` (if exists) to identify any mandated project rules.
    - Check `.specify/memory/features.md` (if exists) for feature status reference.
+   - **Recall prior project memory** (native `memory-recall` skill): retrieve recorded conventions, user preferences, durable decisions, and prior-run outcomes from `.specify/memory/session/` and `.specify/memory/knowledge/` (suggested queries: `convention`, `preference`, `decision`, `instructions`, plus project-specific terms observed above). Treat recalled entries as hand-authored / non-derivable inputs to Action 5 — they are must-keep knowledge on par with content recovered from backups (e.g., a recorded workflow convention belongs in `## Recurring Operational Lessons` or the relevant workflow section). Never contradict a recalled user decision without explicit user confirmation.
    - **Check `.specify/` Directory**: When referencing the `.specify/` directory (if exists), **ONLY** consider the one in the **project root** (same level as `README.md`/`pyproject.toml`). Ignore any `.specify/` directories found inside subdirectories or submodules (as they belong to other projects).
 
 5. **Section-by-section refresh** (the diff-and-converge pass — operate directly on the base file; a newly created file starts empty-of-user-content, so its sections are simply filled in):
@@ -156,6 +161,10 @@ Fallback behavior:
    - Structure the summary as a residual report: **converged** (sections with stale facts updated / new template sections added), **tolerated** (sections verified and left untouched), **recovered** (content restored from backup history), **pending** (items needing user decision, if any). If nothing converged, state plainly that all sections were within tolerance.
    - Confirm that symlinks for Copilot, Qoder, and Claude have been established (or explicitly report warning/fallback actions if setup script partially failed).
 
+8. **Record run outcome** (native `memory-record` skill — skip for trivial no-op runs where all sections were within tolerance and `$ARGUMENTS` was empty):
+   - **Session scope**: persist a working note of this run's residual report (converged / tolerated / recovered / pending) so the next run can recall what changed and why (feeds Action 4's recall on the next run).
+   - **Knowledge scope**: when the run surfaced a durable convention, user preference, or decision (including one carried by `$ARGUMENTS`), upsert it as long-term knowledge so future refreshes classify it as must-keep.
+
 ## Feedback
 
 At wrap-up (the same lifecycle point where this command prompts for a Git commit), perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
@@ -180,7 +189,9 @@ At wrap-up (the same lifecycle point where this command prompts for a Git commit
 **Before running this command**:
 
 - Run when you need to (re)generate project-wide AI instructions or compatibility symlinks.
+- Invoke `memory-recall` to surface prior recorded conventions and decisions that the refresh must preserve (Action 4 does this by default).
 
 **After running this command**:
 
 - Run `/speckit.skills` to populate the Tools and Skills sections based on the project scan.
+- Invoke `memory-record` to persist the residual report and any durable conventions surfaced (Action 8), so the next refresh can recall what changed and why.

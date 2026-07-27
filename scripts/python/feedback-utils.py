@@ -109,6 +109,31 @@ def resolve_threshold(explicit: Optional[int], stored: Optional[int]) -> int:
     return DEFAULT_THRESHOLD
 
 
+def resolve_workspace_root(explicit: Optional[str]) -> Path:
+    """Locate the project workspace root that owns the ``.specify/`` store.
+
+    Priority: explicit CLI argument > script self-location (an engine copy
+    installed under ``*/.specify/scripts/`` anchors its parent project) >
+    nearest CWD ancestor containing ``.specify/`` > CWD itself. Self-location
+    must outrank the walk-up: when the agent's CWD sits inside a skill
+    directory that contains a stray nested ``.specify/`` (created by an
+    earlier bug), the walk-up would capture that nested tree and split the
+    store. Falling back to bare CWD is only a last resort outside any project.
+    """
+    if explicit:
+        return Path(explicit).resolve()
+    script = Path(__file__).resolve()
+    parts = script.parts
+    for i, part in enumerate(parts):
+        if part == ".specify" and i + 1 < len(parts) and parts[i + 1] == "scripts":
+            return Path(*parts[:i])
+    cwd = Path.cwd().resolve()
+    for candidate in (cwd, *cwd.parents):
+        if (candidate / ".specify").is_dir():
+            return candidate
+    return cwd
+
+
 # --------------------------------------------------------------------------- #
 # Input reading
 # --------------------------------------------------------------------------- #
@@ -254,7 +279,7 @@ def entry_meta(meta: Dict[str, Any], filename: str) -> Dict[str, Any]:
 # Actions
 # --------------------------------------------------------------------------- #
 def action_record(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     unit_id = (args.unit_id or "").strip()
     if not validate_unit_id(unit_id):
         raise FeedbackError(
@@ -342,7 +367,7 @@ def action_record(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 def action_status(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     index = load_index(workspace_root)
     threshold = resolve_threshold(args.threshold, index.get("threshold"))
     count = index.get("count_since_submission", 0)
@@ -356,7 +381,7 @@ def action_status(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 def action_list(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     limit = max(1, args.limit)
     unit_id = (args.unit_id or "").strip()
     unit_type = (args.unit_type or "").strip()
@@ -382,7 +407,7 @@ def action_mark_submitted(args: argparse.Namespace) -> Dict[str, Any]:
 
     This is purely local bookkeeping — it does NOT upload or transmit anything.
     """
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     index = load_index(workspace_root)
     reset_from = index.get("count_since_submission", 0)
     submitted_at = now_iso()
@@ -393,7 +418,7 @@ def action_mark_submitted(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 def action_reindex(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     prior = load_index(workspace_root)
     submitted_at = prior.get("submitted_at")
     threshold = resolve_threshold(args.threshold, prior.get("threshold"))
@@ -482,7 +507,7 @@ def _send_guidance(upstream: Dict[str, Any]) -> List[str]:
 
 
 def action_upstream(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     index = load_index(workspace_root)
     set_url = (args.set_url or "").strip()
     if set_url:
@@ -493,7 +518,7 @@ def action_upstream(args: argparse.Namespace) -> Dict[str, Any]:
 
 def action_package(args: argparse.Namespace) -> Dict[str, Any]:
     """Zip pending entries for manual delivery. Source files are never touched."""
-    workspace_root = Path(args.workspace_root or Path.cwd()).resolve()
+    workspace_root = resolve_workspace_root(args.workspace_root)
     index = load_index(workspace_root)
     submitted_at = index.get("submitted_at")
     entries = index.get("entries", [])
