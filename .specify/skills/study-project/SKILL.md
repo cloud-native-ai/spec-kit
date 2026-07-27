@@ -234,6 +234,10 @@ $WORK_DIR/docs/overview.md
 
 ## Feedback
 
+**Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is
+running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills
+directory) — skip this entire Feedback step: no engine call, no feedback entry.
+
 At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
 
 1. **Gate on qualification & completion.** Only proceed if this run reached a meaningful wrap-up. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.

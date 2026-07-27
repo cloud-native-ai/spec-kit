@@ -49,7 +49,7 @@ The input is a description of the Skill to improve. It must be interpreted as fo
      - Bare relative paths such as `./scripts/init.sh` or `./references/checklist.md` → rewrite as `${SKILL_HOME}/...`.
      - `${SKILL_ROOT}/X` references → rewrite as `${SKILL_HOME}/X`.
      - Agent-specific install paths embedded in prose (e.g., `${HOME}/.copilot/skills/<name>/...`, hard-coded `.specify/skills/<name>/...`) → rewrite as `${SKILL_HOME}/...`.
-   - **Feedback-section conformance (Feature 028)**: verify the Skill carries a `## Feedback` section as its final workflow section. If it is **missing**, repair it by appending the canonical block from `.specify/shared/workflow/feedback-step.md` (substituting `skill:<name>` / `--unit-type skill`). If it is **malformed** (missing the qualification/completion gate, the no-user-input reflection rule, the scope guard vs `/speckit.review`, the stable-`run_id` dedup guard, the `feedback-utils.py --action record` invocation, or the consolidated threshold-prompt behavior), realign it to the canonical block. Apply the fix to BOTH `skills/<name>/SKILL.md` and `.specify/skills/<name>/SKILL.md`.
+   - **Feedback-section conformance (Feature 028)**: verify the Skill carries a `## Feedback` section as its final workflow section, beginning with the **runtime-mode gate** (see `.specify/shared/workflow/runtime-mode.md`). If the section is **missing**, repair it by appending the canonical block from `.specify/shared/workflow/feedback-step.md` (substituting `skill:<name>` / `--unit-type skill`). If it is **malformed** (missing the runtime-mode gate, the qualification/completion gate, the no-user-input reflection rule, the scope guard vs `/speckit.review`, the stable-`run_id` dedup guard, the `feedback-utils.py --action record` invocation, or the consolidated threshold-prompt behavior), realign it to the canonical block. Apply the fix to BOTH `skills/<name>/SKILL.md` and `.specify/skills/<name>/SKILL.md`. **Standalone-mode exception**: for a Skill living in a standalone (non–Spec Kit) skills directory — no `.specify/` at the working-directory root — the engine-backed block is NOT required; a self-contained gated reflection section is conformant, the dual-copy rule does not apply, and no registry/agent propagation repair should be attempted.
 
 4. **Correct the root causes with minimal changes**
    - For complete execution failures, fix the instruction that caused non-execution first, such as wrong command-line arguments, nonexistent paths, invalid expected file formats, incompatible metadata, or missing prerequisite checks.
@@ -169,6 +169,10 @@ Only generate feedback when a genuine agent-specific obstacle was encountered.
 | `${SKILL_HOME}/references/` | `skill-slimming-principles.md`, `skill-quality-checklist.md`, `hardening-examples.md`, `claude-code-guide.md`, `copilot-guide.md` |
 
 ## Feedback
+
+**Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is
+running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills
+directory) — skip this entire Feedback step: no engine call, no feedback entry.
 
 At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
 

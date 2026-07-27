@@ -12,6 +12,19 @@ Create a high-quality Spec Kit Skill from explicit user input or by distilling r
 
 ## Workflow
 
+### 0. Detect the runtime mode (Spec Kit project vs standalone)
+
+Spec Kit skills serve both code projects and non-code agent applications (e.g. QoderWork, Wukong, OpenClaw global skill directories). Before anything else, apply the canonical detection rule from `.specify/shared/workflow/runtime-mode.md`:
+
+- `${SKILL_WORKDIR}/.specify/` **exists** → **Spec Kit project mode**: run the full workflow below (scaffolding, registration, agent propagation, engine-backed Feedback).
+- `${SKILL_WORKDIR}/.specify/` **does not exist** → **standalone mode**: the target is a plain skills directory owned by the host application. In this mode:
+  - `SKILL_HOME` is a sibling directory in the host skills directory; **align the new Skill's format with the existing skills there** (inspect one or two siblings first).
+  - **Skip** Step 5 (registration into `.specify/instructions.md`) and Step 7 (propagation to built-in role agents) — neither surface exists.
+  - In Step 3, emit a **self-contained** `## Feedback` section (gated reflection, no `feedback-utils.py` invocation) instead of the engine-backed canonical block.
+  - Do not scaffold or reference any `.specify/**` path in the generated Skill.
+
+State the detected mode briefly in the final report.
+
 ### 1. Determine the creation source
 
 **Case A — User provided explicit input**
@@ -40,9 +53,10 @@ Distill a reusable Skill from the current conversation history:
 - **description** must include keywords and trigger scenarios; avoid vague descriptions.
 
 Storage location options (`SKILL_HOME`):
-- `.specify/skills/<name>/` — project-level primary (preferred)
+- `.specify/skills/<name>/` — project-level primary (preferred in Spec Kit project mode)
 - `.github/skills/<name>/` — compatibility entry (symlink, not primary)
 - `${HOME}/.copilot/skills/<name>/` — personal-level
+- host skills directory `<skills-dir>/<name>/` — standalone mode (the directory the host agent application loads skills from)
 
 When authoring the new Skill, follow the path conventions from `templates/commands/skills.md` (`## Path Conventions`):
 
@@ -72,7 +86,7 @@ Optional frontmatter (on demand):
 - Result goal
 - Key steps (executable, checkable)
 - Resource references (use relative paths: `./scripts/x.py`, `./references/details.md`)
-- A `## Feedback` section as the final workflow section (mandatory per Feature 028). Copy the canonical block from `.specify/shared/workflow/feedback-step.md`, substituting `skill:<name>` / `--unit-type skill`. A new Skill lacking a `## Feedback` section is **non-conformant** and MUST fail validation.
+- A `## Feedback` section as the final workflow section (mandatory per Feature 028). In Spec Kit project mode, copy the canonical block from `.specify/shared/workflow/feedback-step.md` (it begins with the runtime-mode gate), substituting `skill:<name>` / `--unit-type skill`; in standalone mode, write a self-contained variant — keep the runtime-mode gate and the reflection steps, drop the `feedback-utils.py` invocation and threshold prompt. A new Skill lacking a `## Feedback` section is **non-conformant** and MUST fail validation.
 
 **Size control**: Keep `SKILL.md` under 500 lines. Move large details into `./references/`.
 
@@ -118,6 +132,8 @@ Iterate until:
 
 ### 5. Register the Skill
 
+**Spec Kit project mode only** — in standalone mode skip this step entirely (the host application discovers skills by scanning its skills directory; there is no registry file).
+
 Generate the Resource ID and persist:
 
 - **skill_id**: `<SKILL:.specify/skills/<name>/SKILL.md>`
@@ -139,14 +155,15 @@ Minimum checks:
 - [ ] Frontmatter: `name` matches directory, `description` has triggers
 - [ ] Body: clear steps, no vague placeholders
 - [ ] Resources: relative paths, no broken links; standard generated resource directories are acceptable
-- [ ] Registry: one deduplicated row in `.specify/instructions.md`
+- [ ] Registry: one deduplicated row in `.specify/instructions.md` (Spec Kit project mode only; not applicable standalone)
 - [ ] Size: `SKILL.md` < 500 lines
 - [ ] No unrelated documentation files
-- [ ] Feedback: a `## Feedback` section is present as the final workflow section (Feature 028). A Skill without it is non-conformant — add the canonical block from `.specify/shared/workflow/feedback-step.md` before reporting completion.
+- [ ] Feedback: a `## Feedback` section is present as the final workflow section (Feature 028), beginning with the runtime-mode gate. Spec Kit project mode requires the canonical engine-backed block from `.specify/shared/workflow/feedback-step.md`; standalone mode requires the self-contained variant (no engine call). A Skill without the section is non-conformant — fix before reporting completion.
+- [ ] Standalone mode only: format is consistent with sibling skills in the host directory, and no `.specify/**` path is referenced
 
 ### 7. Propagate the Skill to built-in agents
 
-Applies only when creating a **new** Skill. Wire it into the built-in role agents so they prefer it for role-relevant work, following the Feature 026 Skill Enablement convention (see `docs/agents/command-and-skills.md`).
+Applies only when creating a **new** Skill **in Spec Kit project mode** — in standalone mode skip this step (no built-in role agents exist). Wire it into the built-in role agents so they prefer it for role-relevant work, following the Feature 026 Skill Enablement convention (see `docs/agents/command-and-skills.md`).
 
 1. **Guard**: skip if the new Skill is non-declarable (reference-only/meta: `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `create-team`, `improve-team`). Normal user-created Skills proceed.
 2. **Analyze**: read the 7 built-in role agents from `.specify/agents/` (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`) and judge each agent's role against the new Skill's capability + trigger keywords.
@@ -160,6 +177,7 @@ Applies only when creating a **new** Skill. Wire it into the built-in role agent
 ### 8. Report completion
 
 Summarize:
+- Detected runtime mode (Spec Kit project vs standalone) and which Spec-Kit-specific steps were skipped
 - Skill capabilities and directory structure
 - `SKILL.md` path and `skill_id`
 - Example prompts
@@ -202,6 +220,10 @@ Skill behavior in the `/` menu is controlled by frontmatter:
 4. Validate again, forming a stable iteration
 
 ## Feedback
+
+**Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is
+running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills
+directory) — skip this entire Feedback step: no engine call, no feedback entry.
 
 At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
 

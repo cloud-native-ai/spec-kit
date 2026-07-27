@@ -33,6 +33,10 @@ the `<unit-id>` / `<unit-type>` placeholders for the embedding unit).
 ```markdown
 ## Feedback
 
+**Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is
+running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills
+directory) — skip this entire Feedback step: no engine call, no feedback entry.
+
 At wrap-up (the same lifecycle point where this unit would prompt for a Git commit),
 run this self-reflection step. It is agent self-reflection — **never** solicit feedback
 content from the user.
@@ -117,6 +121,11 @@ workaround applied. This is a read-only aid — it never gates execution.
 
 ## Notes for embedders
 
+- **Runtime-mode gate is mandatory for skills**: skills are also deployed standalone
+  (outside any Spec Kit project — no `.specify/`, no engine). The gate paragraph at the
+  top of the canonical block MUST be kept verbatim; detection semantics live in
+  `.specify/shared/workflow/runtime-mode.md`. Commands (`/speckit.*`) only ever run
+  inside a Spec Kit project, so the gate is a no-op for them.
 - **Skills**: `--unit-id "skill:<name>"`, `--unit-type skill`. The section is the last
   workflow section of `SKILL.md`.
 - **Complex commands**: `--unit-id "/speckit.<command>"`, `--unit-type command`. Place the

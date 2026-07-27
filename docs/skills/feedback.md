@@ -15,6 +15,12 @@ database and no vector store**.
 
 Feedback attaches only to long-running, qualifying flows — never to trivial ones:
 
+- **Runtime-mode gate first**: every skill's `## Feedback` step begins with a
+  runtime-mode gate (see `shared/workflow/runtime-mode.md`). Skills also ship to
+  standalone agent applications (QoderWork, Wukong, OpenClaw, …) whose working
+  directory has no `.specify/` — there the entire Feedback step is skipped (no
+  engine, no store, no prompt). Commands only run inside Spec Kit projects, so the
+  gate never fires for them.
 - **All skills** carry a `## Feedback` step by default (a skill without it is
   non-conformant; `create-skills` validates it and `improve-skills` repairs it).
 - **Complex commands only** carry the step. A command is *complex* iff it (a) invokes
