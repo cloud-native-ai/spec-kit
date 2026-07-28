@@ -101,11 +101,11 @@ def test_docs_do_not_describe_sdd_workflow_as_skill():
     """User-facing docs (excluding history/proposal) must not mention the retired sdd-workflow skill."""
     offenders = []
     for f in _iter_files(
-        "docs/agents/command-and-skills.md",
-        "docs/agents/design.md",
-        "docs/commands/skills.md",
-        "docs/commands/history.md",
-        "docs/skills/feedback.md",
+        "docs/reference/agents/command-and-skills.md",
+        "docs/reference/agents/design.md",
+        "docs/reference/commands/skills.md",
+        "docs/reference/commands/history.md",
+        "docs/reference/skills/feedback.md",
     ):
         if "sdd-workflow" in f.read_text(encoding="utf-8"):
             offenders.append(str(f.relative_to(ROOT)))

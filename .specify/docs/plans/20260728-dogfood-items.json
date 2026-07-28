@@ -1,0 +1,23 @@
+[
+ {"action":"move","source":"docs/installation.md","target":"docs/tutorials/installation.md","result":"ok"},
+ {"action":"move","source":"docs/quickstart.md","target":"docs/tutorials/quickstart.md","result":"ok"},
+ {"action":"move","source":"docs/spec-driven.md","target":"docs/concepts/spec-driven.md","result":"ok"},
+ {"action":"move","source":"docs/overview.md","target":"docs/concepts/overview.md","result":"ok"},
+ {"action":"move","source":"docs/vibe-coding.md","target":"docs/concepts/vibe-coding.md","result":"ok"},
+ {"action":"move","source":"docs/upstream.md","target":"docs/concepts/upstream.md","result":"ok"},
+ {"action":"move","source":"docs/security.md","target":"docs/concepts/security.md","result":"ok"},
+ {"action":"move","source":"docs/glossary.md","target":"docs/reference/glossary.md","result":"ok"},
+ {"action":"move","source":"docs/commands/","target":"docs/reference/commands/","result":"ok"},
+ {"action":"move","source":"docs/cli/","target":"docs/reference/cli/","result":"ok"},
+ {"action":"move","source":"docs/skills/","target":"docs/reference/skills/","result":"ok"},
+ {"action":"move","source":"docs/agents/","target":"docs/reference/agents/","result":"ok"},
+ {"action":"move","source":"docs/teams/","target":"docs/reference/teams/","result":"ok"},
+ {"action":"move","source":"docs/history/","target":"docs/reference/history/","result":"ok"},
+ {"action":"archive","source":"docs/summary/03-sdd-workflow-refactor-proposal.md","target":"docs/archive/","result":"ok"},
+ {"action":"create","source":"-","target":"ARCHITECTURE.md, CONTRIBUTING.md, CHANGELOG.md","result":"ok"},
+ {"action":"create","source":"-","target":"docs/decisions/{README,template,0001-adopt-docs-taxonomy}.md","result":"ok"},
+ {"action":"create","source":"-","target":"docs/concepts/documentation-model.md, docs/contribute/dev-setup.md, docs/tasks/README.md, docs/notes/README.md","result":"ok"},
+ {"action":"notes-exit","source":"docs/notes/{docs-design,notes-design}.md","target":"archived -> docs/concepts/documentation-model.md","result":"ok"},
+ {"action":"sync","source":"README.md (110->51 lines), .specify/instructions.md map, 3 test pin files, 134 broken links","target":"0 violations","result":"ok"},
+ {"action":"tolerate","source":"docs/assets/, root tool-mandated ALL-CAPS files, .github symlinks","target":"-","result":"tolerated"}
+]

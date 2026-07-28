@@ -67,7 +67,7 @@ The command validates that the target file exists and is writable before inserti
 
 ## Related
 
-- [Quickstart](quickstart.md) — End-to-end walkthrough
-- [Specification](../.specify/specs/020-speckit-todo-command/requirements.md)
-- [Data Model](../.specify/specs/020-speckit-todo-command/data-model.md)
-- [CLI Contract](../.specify/specs/020-speckit-todo-command/contracts/search-todo-cli.md)
+- [Quickstart](../../tutorials/quickstart.md) — End-to-end walkthrough
+- [Specification](requirements.md)
+- [Data Model](../../../.specify/specs/020-speckit-todo-command/data-model.md)
+- [CLI Contract](../../../.specify/specs/020-speckit-todo-command/contracts/search-todo-cli.md)

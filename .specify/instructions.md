@@ -12,18 +12,19 @@ This project documentation is distributed across several key files. You MUST ref
 | **Feature Details** | `.specify/memory/features/<ID>.md` | Per-feature deep dives | Overview, key changes, implementation notes, status criteria |
 | **Glossary** | `.specify/memory/glossary.md` | Project vocabulary anchor & domain dictionary | Canonical terms, homophone/confusable variants, meanings; voice-input correction source (protocol: `.specify/shared/workflow/glossary.md`) |
 | **Readme** | `README.md` | Project entry point | Spec-Driven Development overview, supported AI agents, feature list, installation pointer |
-| **Installation** | `docs/installation.md` | How to install the CLI | Setup steps for the `specify` CLI |
-| **Quickstart** | `docs/quickstart.md` | First-run walkthrough | End-to-end /speckit.* workflow example |
-| **Command Reference** | `docs/commands/` | Per-command documentation | Execution flow, output artifacts, and usage notes for every `/speckit.*` command |
-| **SDD Methodology** | `docs/spec-driven.md` | Why specs drive implementation | Principles behind Spec-Driven Development |
-| **Vibe Coding** | `docs/vibe-coding.md` | Iterative AI-assisted style guide | When and how to combine specs with exploratory coding |
-| **Upstream** | `docs/upstream.md` | Relationship to github/spec-kit | Divergence points and sync model |
-| **Security** | `docs/security.md` | Security considerations | Threat surface and handling guidance |
-| **Memory System** | `docs/skills/memory.md` | Dynamic memory-as-files layer | session/ (short-term) + knowledge/ (long-term) store, `memory-utils.py` engine, memory-record / memory-recall skills, Spec-Kit-only recording boundary |
-| **Feedback System** | `docs/skills/feedback.md` | Distributed local-scope feedback layer | `.specify/memory/feedback/` store, `feedback-utils.py` engine, `## Feedback` step on all skills + 13 complex commands (4 simple excluded), threshold-triggered consolidated submission prompt, distinct from global `/speckit.review` |
-| **History System** | `docs/commands/history.md` | Distilled conversation knowledge base | `/speckit.history` distills the current AI tool's past project conversations into `.specify/history/` (theme-aggregated: decisions, lessons, TODOs, interaction flows, conflicts); `history-utils.py` engine with pluggable `STORE_RESOLVERS` + incremental manifest |
-| **Skills Docs** | `docs/skills/` | Skills system reference | Specification, troubleshooting, VS Code integration |
-| **Agent Tools** | `docs/cli/` | Supported agent tool reference | Per-tool CLI reference docs for every supported agent (Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode, Qwen Code, Hermes Agent, iFlow CLI) |
+| **Installation** | `docs/tutorials/installation.md` | How to install the CLI | Setup steps for the `specify` CLI |
+| **Quickstart** | `docs/tutorials/quickstart.md` | First-run walkthrough | End-to-end /speckit.* workflow example |
+| **Command Reference** | `docs/reference/commands/` | Per-command documentation | Execution flow, output artifacts, and usage notes for every `/speckit.*` command |
+| **SDD Methodology** | `docs/concepts/spec-driven.md` | Why specs drive implementation | Principles behind Spec-Driven Development |
+| **Vibe Coding** | `docs/concepts/vibe-coding.md` | Iterative AI-assisted style guide | When and how to combine specs with exploratory coding |
+| **Upstream** | `docs/concepts/upstream.md` | Relationship to github/spec-kit | Divergence points and sync model |
+| **Security** | `docs/concepts/security.md` | Security considerations | Threat surface and handling guidance |
+| **Memory System** | `docs/reference/skills/memory.md` | Dynamic memory-as-files layer | session/ (short-term) + knowledge/ (long-term) store, `memory-utils.py` engine, memory-record / memory-recall skills, Spec-Kit-only recording boundary |
+| **Feedback System** | `docs/reference/skills/feedback.md` | Distributed local-scope feedback layer | `.specify/memory/feedback/` store, `feedback-utils.py` engine, `## Feedback` step on all skills + 13 complex commands (4 simple excluded), threshold-triggered consolidated submission prompt, distinct from global `/speckit.review` |
+| **History System** | `docs/reference/commands/history.md` | Distilled conversation knowledge base | `/speckit.history` distills the current AI tool's past project conversations into `.specify/history/` (theme-aggregated: decisions, lessons, TODOs, interaction flows, conflicts); `history-utils.py` engine with pluggable `STORE_RESOLVERS` + incremental manifest |
+| **Documentation Model** | `docs/concepts/documentation-model.md` + `docs/decisions/` | Docs taxonomy, uppercase special-name registry, notes lifecycle (ADR-0001); managed by `/speckit.docs` | Six-type `docs/` layout, root thin layer, notes exit mechanism |
+| **Skills Docs** | `docs/reference/skills/` | Skills system reference | Specification, troubleshooting, VS Code integration |
+| **Agent Tools** | `docs/reference/cli/` | Supported agent tool reference | Per-tool CLI reference docs for every supported agent (Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode, Qwen Code, Hermes Agent, iFlow CLI) |
 
 > **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
 
@@ -85,7 +86,7 @@ Classify each task by these signals: scope/size, uncertainty/novelty, blast radi
 
 ## AI Tool Compatibility
 - **Supported Agents**: Tier 1 — Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode; Tier 2 — Qwen Code, Hermes Agent, iFlow CLI. The canonical list lives in `AGENT_CONFIG` / `_ASSISTANT_TIERS` in `src/specify_cli/__init__.py`.
-- **Agent-specific configuration & CLI arguments**: For any tool-specific configuration, command-line arguments, authentication, or installation details, consult the **official documentation** — do not guess flags or config keys. Start from `docs/cli/supported-agent-tools.md`, which links each tool's official docs source; verify deeper specifics against the upstream documentation.
+- **Agent-specific configuration & CLI arguments**: For any tool-specific configuration, command-line arguments, authentication, or installation details, consult the **official documentation** — do not guess flags or config keys. Start from `docs/reference/cli/supported-agent-tools.md`, which links each tool's official docs source; verify deeper specifics against the upstream documentation.
 - **Instructions Refresh**: Run `/speckit.instructions` to regenerate this file and compatibility symlinks.
 
 ## Spec Kit Runtime & Symlink Model
@@ -102,12 +103,12 @@ Classify each task by these signals: scope/size, uncertainty/novelty, blast radi
   - Only `.github/skills` and `.github/agents` are symlinks into `.specify/`; `.specify/skills/` and `.specify/agents/` are real copies. `.venv/.../site-packages/specify_cli/skills/...` is a build artifact — never hand-edit.
 
 ## Recurring Operational Lessons
-Project-specific gotchas distilled from prior sessions (`docs/history/`). These prevent the most common rework.
+Project-specific gotchas distilled from prior sessions (`docs/reference/history/`). These prevent the most common rework.
 
 - **Test baseline discipline**: before changing anything, run the full suite and record the baseline; a batch of change-unrelated pre-existing failures exists long-term. Distinguish "baseline failure" from "regression I introduced". Hard-coded counts/numbers in test names or assertions (e.g. `test_five_official_assistants`) are fragile signals that break on expansion.
 - **In-place amend ≠ re-scaffold**: `create-new-plan.sh` unconditionally overwrites `plan.md`; do NOT run overwrite scaffolding when amending existing specs. Append tasks (e.g. T032–T057) instead of regenerating, to preserve history.
 - **Template neutrality**: keep generic `templates/` (esp. `constitution-template.md`) project-agnostic; do NOT push spec-kit-specific content into shared scaffolding. Project-specific rules belong in `.specify/memory/constitution.md` or this file.
-- **Documentation reference direction is one-way**: `README.md` → `docs/quickstart.md` → `docs/commands/*.md`. Sink detail into `docs/`; keep README a lean entry point. Avoid reverse/circular references.
+- **Documentation reference direction is one-way**: `README.md` → `docs/tutorials/quickstart.md` → `docs/reference/commands/*.md`. Sink detail into `docs/`; keep README a lean entry point. Avoid reverse/circular references.
 - **Removal safety**: before removing a dependency or deleting a file, verify it is truly unused in two steps (no code `import`, no shell invocation) and that any stated delete conditions ALL hold — when conditions are an AND, any one failing means do NOT delete.
 - **Environment & tooling gotchas**:
   - Each `Bash` call is a fresh shell — `source .venv/bin/activate` does NOT persist; chain `source && cmd` in one call or use absolute interpreter paths.

@@ -9,10 +9,10 @@ discipline — the essence of *Loop Engineering* applied to the team domain: sta
 report-only mode, earn trust with evidence, and only then grant automation.
 
 > **This is the doc-level companion.** The normative single source of truth is
-> [`operating-loops.md`](../../skills/create-team/references/operating-loops.md); when the two
+> [`operating-loops.md`](../../../skills/create-team/references/operating-loops.md); when the two
 > disagree, that reference wins. For how continuous relates to the other three patterns, see
 > [orchestration.md](./orchestration.md); for the concept model see
-> [`conceptual-model.md`](../../skills/create-team/references/conceptual-model.md).
+> [`conceptual-model.md`](../../../skills/create-team/references/conceptual-model.md).
 
 ---
 
@@ -240,6 +240,6 @@ config:
 
 - The four patterns and how to choose among them: [orchestration.md](./orchestration.md)
 - Team concept, directory layout, authoritative-source index: [overview.md](./overview.md)
-- **Normative single source of truth**: [`operating-loops.md`](../../skills/create-team/references/operating-loops.md)
-- One-time vs continuous optimization goals: [`optimization-goals.md`](../../skills/create-team/references/optimization-goals.md)
-- Graduating a team's maturity (the `improve-team` edit): [`goal-editing.md`](../../skills/improve-team/references/goal-editing.md)
+- **Normative single source of truth**: [`operating-loops.md`](../../../skills/create-team/references/operating-loops.md)
+- One-time vs continuous optimization goals: [`optimization-goals.md`](../../../skills/create-team/references/optimization-goals.md)
+- Graduating a team's maturity (the `improve-team` edit): [`goal-editing.md`](../../../skills/improve-team/references/goal-editing.md)

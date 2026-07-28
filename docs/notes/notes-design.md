@@ -1,3 +1,14 @@
+---
+title: "docs/notes/ 退场机制设计"
+created: 2026-07-28
+expires: 2026-09-26
+status: archived
+target: "docs/concepts/documentation-model.md"
+tags: [docs, design]
+---
+
+> ✅ 已合入 [docs/concepts/documentation-model.md](../concepts/documentation-model.md)（spec 033 / Feature 037 / ADR-0001 落地）
+
 # docs/notes/ 退场机制设计
 
 ## 更新后的完整目录结构

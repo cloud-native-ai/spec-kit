@@ -18,7 +18,7 @@ Spec Kit 解决的不是“如何生成几份 Markdown 文件”，而是 AI 辅
 2. **需要团队规范的技术负责人/架构师**：他们希望每次实现都能追溯到需求、计划、任务和治理原则，而不是只留下一个 PR。
 3. **需要多 Agent 兼容的工程团队**：同一个组织可能同时使用 Copilot、Qwen、opencode、Qoder；如果每个工具维护一套流程，方法论会快速分叉。
 
-README 将项目定位为围绕 Spec-Driven Development 的开放工具包，强调让团队关注产品场景、业务约束和可预测结果，而不是“vibe coding”式从零生成代码：[README.md](README.md#L9-L18)。
+README 将项目定位为围绕 Spec-Driven Development 的开放工具包，强调让团队关注产品场景、业务约束和可预测结果，而不是“vibe coding”式从零生成代码：[README.md](../../README.md#L9-L18)。
 
 ### 1.2 痛点来自哪里
 
@@ -29,7 +29,7 @@ README 将项目定位为围绕 Spec-Driven Development 的开放工具包，强
 - 任务拆解不稳定，同一份需求在不同 Agent 中会生成不同执行路径。
 - 质量门禁依赖模型自觉，而不是项目内可重复执行的脚本、模板和测试。
 
-Spec Kit 的方法论文档把这种转变称为“Power Inversion”：规格不是代码的附属说明，规格本身成为驱动实现的源资产：[docs/spec-driven.md](docs/spec-driven.md#L3-L24)。
+Spec Kit 的方法论文档把这种转变称为“Power Inversion”：规格不是代码的附属说明，规格本身成为驱动实现的源资产：[docs/spec-driven.md](spec-driven.md#L3-L24)。
 
 ### 1.3 为什么现有方案不够
 
@@ -46,7 +46,7 @@ Spec Kit 的独立价值在于：**它把 SDD 方法论、项目骨架、AI 命�
 
 ### 1.4 项目存在的独特定位
 
-项目核心哲学由宪法固化：规格驱动、Feature 中心、意图优先、测试优先、AI Agent 标准、持续质量以及 spec → plan → tasks → implement 工作流：[.specify/memory/constitution.md](.specify/memory/constitution.md#L18-L91)。Feature Index 又将能力长期化，目前记录 20 个功能项：[.specify/memory/features.md](.specify/memory/features.md#L1-L29)。
+项目核心哲学由宪法固化：规格驱动、Feature 中心、意图优先、测试优先、AI Agent 标准、持续质量以及 spec → plan → tasks → implement 工作流：[.specify/memory/constitution.md](../../.specify/memory/constitution.md#L18-L91)。Feature Index 又将能力长期化，目前记录 20 个功能项：[.specify/memory/features.md](../../.specify/memory/features.md#L1-L29)。
 
 这说明 Spec Kit 不是一个“CLI 命令集合”，而是一个**把 AI 协作过程产品化的工作流内核**。
 
@@ -141,23 +141,23 @@ sequenceDiagram
 | 工具/技能模型 | Python dataclass + Markdown 记录 | Resource ID、ToolRecord、发现适配 | 将临时工具发现沉淀为可引用资源 |
 | 测试 | pytest | contract/unit/integration | 验证表面契约而不只验证函数 |
 
-`pyproject.toml` 显示 CLI 依赖 Typer、Rich、httpx、platformdirs、readchar、mcp，并通过 hatchling 构建：[pyproject.toml](pyproject.toml#L1-L18)。资源打包通过 `force-include` 将 `memory`、`scripts`、`templates`、`skills` 放入 wheel：[pyproject.toml](pyproject.toml#L26-L33)。
+`pyproject.toml` 显示 CLI 依赖 Typer、Rich、httpx、platformdirs、readchar、mcp，并通过 hatchling 构建：[pyproject.toml](../../pyproject.toml#L1-L18)。资源打包通过 `force-include` 将 `memory`、`scripts`、`templates`、`skills` 放入 wheel：[pyproject.toml](../../pyproject.toml#L26-L33)。
 
 ### 3.2 Python 的角色：用户入口和领域模型
 
-Python CLI 集中在单文件 [src/specify_cli/__init__.py](src/specify_cli/__init__.py)。这种单模块设计不是最“学院派”的分层方式，但非常符合小型开发者工具的分发需求：入口简单、安装简单、测试可直接导入函数。
+Python CLI 集中在单文件 [src/specify_cli/__init__.py](../../src/specify_cli/__init__.py)。这种单模块设计不是最“学院派”的分层方式，但非常符合小型开发者工具的分发需求：入口简单、安装简单、测试可直接导入函数。
 
-Typer 适合命令行参数建模，Rich 负责进度、面板和终端可视化。`StepTracker` 用树形状态展示初始化阶段：[src/specify_cli/__init__.py](src/specify_cli/__init__.py#L105-L202)。这对一个方法论工具很重要：初始化过程本身也在向用户传达“阶段化、可见、可追踪”的产品气质。
+Typer 适合命令行参数建模，Rich 负责进度、面板和终端可视化。`StepTracker` 用树形状态展示初始化阶段：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L105-L202)。这对一个方法论工具很重要：初始化过程本身也在向用户传达“阶段化、可见、可追踪”的产品气质。
 
 ### 3.3 Bash 的角色：确定性文件状态机
 
-Bash 脚本负责工作区状态变更，而不是让 AI 自己推断路径。`common.sh` 提供分支校验、Feature 路径推导和输入校验：[scripts/bash/common.sh](scripts/bash/common.sh#L43-L139)。`check-prerequisites.sh` 将不同阶段所需文档转成硬门禁：[scripts/bash/check-prerequisites.sh](scripts/bash/check-prerequisites.sh#L33-L64)。
+Bash 脚本负责工作区状态变更，而不是让 AI 自己推断路径。`common.sh` 提供分支校验、Feature 路径推导和输入校验：[scripts/bash/common.sh](../../scripts/bash/common.sh#L43-L139)。`check-prerequisites.sh` 将不同阶段所需文档转成硬门禁：[scripts/bash/check-prerequisites.sh](../../scripts/bash/check-prerequisites.sh#L33-L64)。
 
-这种设计的好处是可审计；代价是 Bash 的可移植性和字符串安全成本较高。项目为此加入 UTF-8 locale、`safe_quote()`、`validate_input()` 等防御：[scripts/bash/common.sh](scripts/bash/common.sh#L145-L219)。
+这种设计的好处是可审计；代价是 Bash 的可移植性和字符串安全成本较高。项目为此加入 UTF-8 locale、`safe_quote()`、`validate_input()` 等防御：[scripts/bash/common.sh](../../scripts/bash/common.sh#L145-L219)。
 
 ### 3.4 Markdown 的角色：人机共读的协议层
 
-命令模板用 Markdown + frontmatter 定义行为，例如 `/speckit.requirements` 同时包含描述、handoffs 和脚本调用片段：[templates/commands/requirements.md](templates/commands/requirements.md#L1-L13)。计划模板强制包含技术上下文、宪法检查、项目结构和复杂度追踪：[templates/plan-template.md](templates/plan-template.md#L1-L116)。
+命令模板用 Markdown + frontmatter 定义行为，例如 `/speckit.requirements` 同时包含描述、handoffs 和脚本调用片段：[templates/commands/requirements.md](../../templates/commands/requirements.md#L1-L13)。计划模板强制包含技术上下文、宪法检查、项目结构和复杂度追踪：[templates/plan-template.md](../../templates/plan-template.md#L1-L116)。
 
 这种方式的优势是极强的可解释性：团队可以通过 PR 审查修改 AI 行为。风险是文本协议容易漂移，例如某些模板引用的 marker 或脚本名与实际文件名不一致，后文会专门指出。
 
@@ -171,7 +171,7 @@ Bash 脚本负责工作区状态变更，而不是让 AI 自己推断路径。`c
 
 CLI 初始化模块要把抽象 SDD 方法论落到一个可运行项目骨架中。它创建 `.specify` 结构，复制治理文档、脚本、模板和技能，并根据所选 Agent 生成命令表面。
 
-`AGENT_CONFIG` 集中定义 Copilot、Qwen、opencode、Qoder 的显示名、目录、安装地址和 CLI 检查要求：[src/specify_cli/__init__.py](src/specify_cli/__init__.py#L62-L88)。`init()` 是初始化主入口：[src/specify_cli/__init__.py](src/specify_cli/__init__.py#L1075-L1124)。
+`AGENT_CONFIG` 集中定义 Copilot、Qwen、opencode、Qoder 的显示名、目录、安装地址和 CLI 检查要求：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L62-L88)。`init()` 是初始化主入口：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L1075-L1124)。
 
 #### 流程
 
@@ -195,13 +195,13 @@ flowchart TD
 
 #### 设计取舍
 
-1. **本地模板优先**：`init()` 明确说明 GitHub download 不再支持，必须使用包内模板：[src/specify_cli/__init__.py](src/specify_cli/__init__.py#L1118-L1124)。优点是离线、可版本化、供应链风险低；代价是模板更新必须通过包发布。
-2. **单源模板，多 Agent 输出**：`generate_commands()` 从一套 `templates/commands/*.md` 生成 Copilot/Qwen/opencode/Qoder 各自格式：[src/specify_cli/__init__.py](src/specify_cli/__init__.py#L233-L398)。这比维护四套 prompt 可靠得多。
-3. **`.specify/skills` canonical + Agent symlink**：Copilot/Qoder 的 skills 入口通过相对 symlink 指向 `.specify/skills`，避免多 Agent 复制分叉：[src/specify_cli/__init__.py](src/specify_cli/__init__.py#L540-L570)。
+1. **本地模板优先**：`init()` 明确说明 GitHub download 不再支持，必须使用包内模板：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L1118-L1124)。优点是离线、可版本化、供应链风险低；代价是模板更新必须通过包发布。
+2. **单源模板，多 Agent 输出**：`generate_commands()` 从一套 `templates/commands/*.md` 生成 Copilot/Qwen/opencode/Qoder 各自格式：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L233-L398)。这比维护四套 prompt 可靠得多。
+3. **`.specify/skills` canonical + Agent symlink**：Copilot/Qoder 的 skills 入口通过相对 symlink 指向 `.specify/skills`，避免多 Agent 复制分叉：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L540-L570)。
 
 #### 风险
 
-`copy_local_templates()` 已经承担目录创建、资源复制、命令生成、skills 迁移、根文件复制等多重职责：[src/specify_cli/__init__.py](src/specify_cli/__init__.py#L518-L735)。当前规模尚可，但如果继续增加 Agent 或资源类型，建议将 Agent 输出格式也数据化进 `AGENT_CONFIG`，并拆出 `TemplateDistributor` / `AgentCommandEmitter`。
+`copy_local_templates()` 已经承担目录创建、资源复制、命令生成、skills 迁移、根文件复制等多重职责：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L518-L735)。当前规模尚可，但如果继续增加 Agent 或资源类型，建议将 Agent 输出格式也数据化进 `AGENT_CONFIG`，并拆出 `TemplateDistributor` / `AgentCommandEmitter`。
 
 ---
 
@@ -211,14 +211,14 @@ flowchart TD
 
 命令模板层是 Spec Kit 的“LLM 操作系统接口”。它让 `/speckit.requirements`、`/speckit.plan`、`/speckit.tasks` 等命令成为稳定契约，而不是普通聊天提示。
 
-使用文档明确区分终端 CLI 与 AI Agent 命令：`specify ...` 在终端运行，`/speckit.*` 在 AI chat 中使用：[docs/usage.md](docs/usage.md#L1-L29)。
+使用文档明确区分终端 CLI 与 AI Agent 命令：`specify ...` 在终端运行，`/speckit.*` 在 AI chat 中使用：[docs/usage.md](../tutorials/quickstart.md#L1-L29)。
 
 #### 模板如何约束 LLM
 
-- 输入不能覆盖命令工作流：requirements 模板要求把 `$ARGUMENTS` 作为参数而非独立指令：[templates/commands/requirements.md](templates/commands/requirements.md#L16-L33)。
-- 需求阶段聚焦 WHAT/WHY，计划阶段再进入 HOW：requirements 模板限制澄清数量和需求质量：[templates/commands/requirements.md](templates/commands/requirements.md#L91-L120)。
-- 计划模板加入宪法检查，确保技术选择回到项目原则：[templates/plan-template.md](templates/plan-template.md#L31-L46)。
-- tasks 模板要求任务可执行、可并行标记、按用户故事组织：[templates/tasks-template.md](templates/tasks-template.md#L65-L220)。
+- 输入不能覆盖命令工作流：requirements 模板要求把 `$ARGUMENTS` 作为参数而非独立指令：[templates/commands/requirements.md](../../templates/commands/requirements.md#L16-L33)。
+- 需求阶段聚焦 WHAT/WHY，计划阶段再进入 HOW：requirements 模板限制澄清数量和需求质量：[templates/commands/requirements.md](../../templates/commands/requirements.md#L91-L120)。
+- 计划模板加入宪法检查，确保技术选择回到项目原则：[templates/plan-template.md](../../templates/plan-template.md#L31-L46)。
+- tasks 模板要求任务可执行、可并行标记、按用户故事组织：[templates/tasks-template.md](../../templates/tasks-template.md#L65-L220)。
 
 #### 工作流状态机
 
@@ -238,7 +238,7 @@ flowchart LR
 
 #### 设计取舍
 
-使用 Markdown prompt 契约而不是硬编码工作流，换来了跨 Agent 可移植性和人类可审查性；代价是模板与脚本之间缺少编译期校验。项目用 contract tests 抵消部分风险，例如 Qoder 需要出现在支持矩阵、模板和刷新脚本中：[tests/unit/test_qoder_support_matrix.py](tests/unit/test_qoder_support_matrix.py#L8-L19)、[tests/integration/test_qoder_refresh.py](tests/integration/test_qoder_refresh.py#L6-L18)。
+使用 Markdown prompt 契约而不是硬编码工作流，换来了跨 Agent 可移植性和人类可审查性；代价是模板与脚本之间缺少编译期校验。项目用 contract tests 抵消部分风险，例如 Qoder 需要出现在支持矩阵、模板和刷新脚本中：[tests/unit/test_qoder_support_matrix.py](../../tests/unit/test_qoder_support_matrix.py#L8-L19)、[tests/integration/test_qoder_refresh.py](../../tests/integration/test_qoder_refresh.py#L6-L18)。
 
 ---
 
@@ -248,7 +248,7 @@ flowchart LR
 
 Bash 工作流引擎是 AI 命令背后的确定性执行层。AI 负责理解和填充内容，Bash 负责命名、分支、路径、文件存在性和 JSON 返回。
 
-`create-new-requirements.sh` 将自然语言需求转成 `NNN-short-name` 分支和 `requirements.md`：[scripts/bash/create-new-requirements.sh](scripts/bash/create-new-requirements.sh#L74-L89)、[scripts/bash/create-new-requirements.sh](scripts/bash/create-new-requirements.sh#L128-L143)。`get_feature_paths()` 从当前分支推导所有核心文件路径：[scripts/bash/common.sh](scripts/bash/common.sh#L105-L139)。
+`create-new-requirements.sh` 将自然语言需求转成 `NNN-short-name` 分支和 `requirements.md`：[scripts/bash/create-new-requirements.sh](../../scripts/bash/create-new-requirements.sh#L74-L89)、[scripts/bash/create-new-requirements.sh](../../scripts/bash/create-new-requirements.sh#L128-L143)。`get_feature_paths()` 从当前分支推导所有核心文件路径：[scripts/bash/common.sh](../../scripts/bash/common.sh#L105-L139)。
 
 #### 数据路径
 
@@ -271,13 +271,13 @@ flowchart TD
 
 #### 关键设计
 
-1. **分支名即上下文**：`check_feature_branch()` 要求 Git 分支符合 `NNN-*`：[scripts/bash/common.sh](scripts/bash/common.sh#L43-L60)。这减少了命令参数，但对非 Git 或错误分支不友好。
-2. **按数字前缀匹配 spec 目录**：`find_feature_dir_by_prefix()` 支持多个分支共享同一个需求编号：[scripts/bash/common.sh](scripts/bash/common.sh#L64-L103)。这是成熟设计，说明项目将需求 ID 视为稳定业务资产，而非临时分支名。
-3. **前置条件脚本化**：`check-prerequisites.sh` 可要求 spec、plan、tasks，并输出 `AVAILABLE_DOCS`：[scripts/bash/check-prerequisites.sh](scripts/bash/check-prerequisites.sh#L140-L207)。这让 AI 工作流不只靠 prompt 自律。
+1. **分支名即上下文**：`check_feature_branch()` 要求 Git 分支符合 `NNN-*`：[scripts/bash/common.sh](../../scripts/bash/common.sh#L43-L60)。这减少了命令参数，但对非 Git 或错误分支不友好。
+2. **按数字前缀匹配 spec 目录**：`find_feature_dir_by_prefix()` 支持多个分支共享同一个需求编号：[scripts/bash/common.sh](../../scripts/bash/common.sh#L64-L103)。这是成熟设计，说明项目将需求 ID 视为稳定业务资产，而非临时分支名。
+3. **前置条件脚本化**：`check-prerequisites.sh` 可要求 spec、plan、tasks，并输出 `AVAILABLE_DOCS`：[scripts/bash/check-prerequisites.sh](../../scripts/bash/check-prerequisites.sh#L140-L207)。这让 AI 工作流不只靠 prompt 自律。
 
 #### 风险
 
-`scripts/bash/common.sh` 顶部依赖 `CWS_LIB_BASH_HOME`，缺失会直接失败：[scripts/bash/common.sh](scripts/bash/common.sh#L4-L40)。这与公开安装文档中强调 `uvx` 和通用环境的叙述存在张力：[docs/installation.md](docs/installation.md#L13-L26)。如果这是企业内扩展，需要在文档中明确；如果面向开源使用，应将 CWS 依赖降级为可选。
+`scripts/bash/common.sh` 顶部依赖 `CWS_LIB_BASH_HOME`，缺失会直接失败：[scripts/bash/common.sh](../../scripts/bash/common.sh#L4-L40)。这与公开安装文档中强调 `uvx` 和通用环境的叙述存在张力：[docs/installation.md](../tutorials/installation.md#L13-L26)。如果这是企业内扩展，需要在文档中明确；如果面向开源使用，应将 CWS 依赖降级为可选。
 
 ---
 
@@ -287,7 +287,7 @@ flowchart TD
 
 扩展模块解决的是：一次会话里发现的技能、脚本、系统命令或 MCP 工具，如何沉淀为可复用、可追踪、可跨 Agent 共享的资源。
 
-Skill 侧使用 `.specify/skills/<name>/SKILL.md` 作为主副本，Tool 侧使用 `.specify/memory/tools/<name>.md` 作为记录。资源 ID 采用 `<SKILL:path>` 和 `<TOOL:path>` 形式，由工作区相对路径构成：[scripts/python/skills-utils.py](scripts/python/skills-utils.py#L25-L54)。
+Skill 侧使用 `.specify/skills/<name>/SKILL.md` 作为主副本，Tool 侧使用 `.specify/memory/tools/<name>.md` 作为记录。资源 ID 采用 `<SKILL:path>` 和 `<TOOL:path>` 形式，由工作区相对路径构成：[scripts/python/skills-utils.py](../../scripts/python/skills-utils.py#L25-L54)。
 
 #### 资源 ID 流程
 
@@ -308,13 +308,13 @@ flowchart TD
 
 #### 设计取舍
 
-1. **路径型 ID 而不是 UUID**：可读、可审查、与 Git 友好；但文件移动会造成 stale ID。`resolve_resource_id()` 显式检查 stale artifact：[scripts/python/skills-utils.py](scripts/python/skills-utils.py#L126-L142)。
-2. **Markdown 作为资源数据库**：`ToolRecord` 模型保存为 Markdown 记录，便于 AI 与人类共同审查：[scripts/python/tools-utils.py](scripts/python/tools-utils.py#L39-L69)、[scripts/python/tools-utils.py](scripts/python/tools-utils.py#L131-L184)。代价是字段解析依赖 `**key**:` 文本格式：[scripts/python/tools-utils.py](scripts/python/tools-utils.py#L187-L218)。
-3. **Bash 编排 + Python 领域逻辑**：Bash 负责创建流程，Python 负责资源 ID、JSON 和模型。这个边界合理，但目前有重复实现，例如 Tool ID 在 Bash 和 Python 中都有生成逻辑：[scripts/python/tools-utils.py](scripts/python/tools-utils.py#L112-L114)。
+1. **路径型 ID 而不是 UUID**：可读、可审查、与 Git 友好；但文件移动会造成 stale ID。`resolve_resource_id()` 显式检查 stale artifact：[scripts/python/skills-utils.py](../../scripts/python/skills-utils.py#L126-L142)。
+2. **Markdown 作为资源数据库**：`ToolRecord` 模型保存为 Markdown 记录，便于 AI 与人类共同审查：[scripts/python/tools-utils.py](../../scripts/python/tools-utils.py#L39-L69)、[scripts/python/tools-utils.py](../../scripts/python/tools-utils.py#L131-L184)。代价是字段解析依赖 `**key**:` 文本格式：[scripts/python/tools-utils.py](../../scripts/python/tools-utils.py#L187-L218)。
+3. **Bash 编排 + Python 领域逻辑**：Bash 负责创建流程，Python 负责资源 ID、JSON 和模型。这个边界合理，但目前有重复实现，例如 Tool ID 在 Bash 和 Python 中都有生成逻辑：[scripts/python/tools-utils.py](../../scripts/python/tools-utils.py#L112-L114)。
 
 #### 发现流程
 
-`refresh-tools.sh` 将系统二进制、Shell 函数、项目脚本统一成 JSON 工具库存：[scripts/bash/refresh-tools.sh](scripts/bash/refresh-tools.sh)。这使 `/speckit.tools` 能把"找工具"从临时认知变成可持久化记录。
+`refresh-tools.sh` 将系统二进制、Shell 函数、项目脚本统一成 JSON 工具库存：[scripts/bash/refresh-tools.sh](../../scripts/bash/refresh-tools.sh)。这使 `/speckit.tools` 能把"找工具"从临时认知变成可持久化记录。
 
 ---
 
@@ -338,7 +338,7 @@ flowchart TD
 | 测试 | 33 | 1132 |
 | 文档 | 10 | 2389 |
 
-测试文件列表显示 contract、integration、unit 三层都已覆盖：[tests/](tests/)。
+测试文件列表显示 contract、integration、unit 三层都已覆盖：[tests/](../../tests)。
 
 ---
 
@@ -350,20 +350,20 @@ flowchart TD
 
 Git churn 显示最频繁变更的是：
 
-- [src/specify_cli/__init__.py](src/specify_cli/__init__.py)：109 次
-- [README.md](README.md)：89 次
-- [templates/commands/plan.md](templates/commands/plan.md)：48 次
-- [templates/commands/tasks.md](templates/commands/tasks.md)：44 次
-- [templates/commands/implement.md](templates/commands/implement.md)：43 次
-- [pyproject.toml](pyproject.toml)：32 次
-- [templates/plan-template.md](templates/plan-template.md)：28 次
-- [scripts/bash/common.sh](scripts/bash/common.sh)：23 次
+- [src/specify_cli/__init__.py](../../src/specify_cli/__init__.py)：109 次
+- [README.md](../../README.md)：89 次
+- [templates/commands/plan.md](../../templates/commands/plan.md)：48 次
+- [templates/commands/tasks.md](../../templates/commands/tasks.md)：44 次
+- [templates/commands/implement.md](../../templates/commands/implement.md)：43 次
+- [pyproject.toml](../../pyproject.toml)：32 次
+- [templates/plan-template.md](../../templates/plan-template.md)：28 次
+- [scripts/bash/common.sh](../../scripts/bash/common.sh)：23 次
 
 这说明项目的演进重心从“实现复杂运行时”转向“稳定命令契约、模板和 Agent 表面”。这与 Spec Kit 的产品形态一致：核心资产是规范化流程，不是底层服务。
 
 ### 6.2 发布与分支模型
 
-标签从 `v0.1.x` 到 `v0.6.1`，但当前 `pyproject.toml` 版本是 `0.0.22`：[pyproject.toml](pyproject.toml#L1-L3)。`git describe` 显示当前提交距离某些标签较远。这里可能存在上游标签、内部版本和包版本不同步的问题。对用户而言，这会影响“我安装的包到底对应哪个模板版本”的判断。
+标签从 `v0.1.x` 到 `v0.6.1`，但当前 `pyproject.toml` 版本是 `0.0.22`：[pyproject.toml](../../pyproject.toml#L1-L3)。`git describe` 显示当前提交距离某些标签较远。这里可能存在上游标签、内部版本和包版本不同步的问题。对用户而言，这会影响“我安装的包到底对应哪个模板版本”的判断。
 
 ### 6.3 所有权信号
 
@@ -382,7 +382,7 @@ Spec Kit 的部署不是服务部署，而是**开发者本地工具部署**。
 - Agent 命令文件：按 Copilot/Qwen/opencode/Qoder 输出到不同目录。
 - symlink：将 canonical instructions 和 skills 暴露给不同工具。
 
-安装文档推荐通过 `uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME>` 初始化：[docs/installation.md](docs/installation.md#L13-L26)。
+安装文档推荐通过 `uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME>` 初始化：[docs/installation.md](../tutorials/installation.md#L13-L26)。
 
 ### 7.2 运行拓扑
 
@@ -402,7 +402,7 @@ flowchart TD
 
 ### 7.3 运维风险
 
-1. **symlink 在部分文件系统/平台上不稳定**：Skill 创建脚本已提供 placeholder fallback：[scripts/bash/create-new-skill.sh](scripts/bash/create-new-skill.sh#L193-L230)，但 instructions symlink 生成脚本主要使用 `ln -sf`：[scripts/bash/generate-instructions.sh](scripts/bash/generate-instructions.sh#L122-L160)。Windows 或受限环境可能需要同等 fallback。
+1. **symlink 在部分文件系统/平台上不稳定**：Skill 创建脚本已提供 placeholder fallback：[scripts/bash/create-new-skill.sh](../../scripts/bash/create-new-skill.sh#L193-L230)，但 instructions symlink 生成脚本主要使用 `ln -sf`：[scripts/bash/generate-instructions.sh](../../scripts/bash/generate-instructions.sh#L122-L160)。Windows 或受限环境可能需要同等 fallback。
 2. **Bash 与 CWS 依赖削弱公开可移植性**：如前文所述，`common.sh` 的强依赖需要被文档化或降级。
 3. **版本源不一致**：Git tags、package version、README 安装源之间应建立清晰映射。
 
@@ -412,31 +412,31 @@ flowchart TD
 
 ### 8.1 ✅ 已修复：命令模板与脚本文件名不一致
 
-历史问题：`templates/commands/requirements.md` 的脚本片段曾调用单数 `create-new-requirement.sh`，但仓库实际脚本是 [scripts/bash/create-new-requirements.sh](scripts/bash/create-new-requirements.sh)（复数）。单数文件名从未真实存在，源于脚本重命名（`af64131`）时的笔误。
+历史问题：`templates/commands/requirements.md` 的脚本片段曾调用单数 `create-new-requirement.sh`，但仓库实际脚本是 [scripts/bash/create-new-requirements.sh](../../scripts/bash/create-new-requirements.sh)（复数）。单数文件名从未真实存在，源于脚本重命名（`af64131`）时的笔误。
 
 **处理**：已统一为复数文件名（命令源模板、docs、5 个 agent 副本均已修正）。建议后续增加 contract test：遍历所有 command template 中的脚本路径，验证目标文件存在。
 
 ### 8.2 ✅ 已修复：模板命名存在旧称残留
 
-历史问题：requirements 命令曾要求加载 `templates/spec-template.md`，但该文件已在 `6248499` 中被重命名为 [templates/requirements-template.md](templates/requirements-template.md)，引用未同步更新，会诱导 Agent 查找不存在的模板。
+历史问题：requirements 命令曾要求加载 `templates/spec-template.md`，但该文件已在 `6248499` 中被重命名为 [templates/requirements-template.md](../../templates/requirements-template.md)，引用未同步更新，会诱导 Agent 查找不存在的模板。
 
 **处理**：已统一术语为 requirements template（命令源模板、docs、5 个 agent 副本均已修正）。原遗留死脚本 `.specify/scripts/bash/create-new-feature.sh` 已删除，其工具注册表条目已同步清除。
 
 ### 8.3 ✅ 已修复：instructions registry marker 命名漂移
 
-历史问题：instructions 命令文档曾提到 `TOOLS_PLACEHOLDER_START` 等 marker，但实际 instructions 模板使用 `AGENTS_REGISTRY_START`、`SKILLS_REGISTRY_START`、`TOOLS_REGISTRY_START`：[templates/instructions-template.md](templates/instructions-template.md#L71-L92)。
+历史问题：instructions 命令文档曾提到 `TOOLS_PLACEHOLDER_START` 等 marker，但实际 instructions 模板使用 `AGENTS_REGISTRY_START`、`SKILLS_REGISTRY_START`、`TOOLS_REGISTRY_START`：[templates/instructions-template.md](../../templates/instructions-template.md#L71-L92)。
 
-**处理**：已将 [templates/commands/instructions.md](templates/commands/instructions.md) 中的 marker 名称统一为 `*_REGISTRY_*`（含新增 Agents 注册表）。建议补充测试：instructions 生成流程不会丢失注册表内容。
+**处理**：已将 [templates/commands/instructions.md](../../templates/commands/instructions.md) 中的 marker 名称统一为 `*_REGISTRY_*`（含新增 Agents 注册表）。建议补充测试：instructions 生成流程不会丢失注册表内容。
 
 ### 8.4 中优先级：`implement-plan.sh` 引用了未定义的 `json_escape`
 
-`implement-plan.sh` 在 JSON 输出中调用 `json_escape`：[scripts/bash/implement-plan.sh](scripts/bash/implement-plan.sh#L252-L261)，但在已读取的 `common.sh` 范围内未发现对应定义。这会让 JSON 模式在运行时失败。
+`implement-plan.sh` 在 JSON 输出中调用 `json_escape`：[scripts/bash/implement-plan.sh](../../scripts/bash/implement-plan.sh#L252-L261)，但在已读取的 `common.sh` 范围内未发现对应定义。这会让 JSON 模式在运行时失败。
 
 **建议**：将 `json_escape()` 放入 `common.sh` 并测试所有 `--json` 脚本输出。
 
 ### 8.5 中优先级：单文件 CLI 已接近职责上限
 
-[src/specify_cli/__init__.py](src/specify_cli/__init__.py) 1548 行，覆盖 UI、Agent 配置、模板生成、资源复制、Git、VS Code settings。单模块仍可维护，但新增 Agent/资源类型会继续扩大。
+[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py) 1548 行，覆盖 UI、Agent 配置、模板生成、资源复制、Git、VS Code settings。单模块仍可维护，但新增 Agent/资源类型会继续扩大。
 
 **建议**：不必马上大重构，但可以先做低风险拆分：
 
@@ -447,7 +447,7 @@ flowchart TD
 
 ### 8.6 中优先级：版本治理需要更清晰
 
-Feature Index、Constitution、Git tags、`pyproject.toml` 版本都在表达“当前状态”，但它们之间的同步关系不够明确。宪法要求语义化版本和 breaking changes 记录：[.specify/memory/constitution.md](.specify/memory/constitution.md#L76-L83)，但当前包版本与 Git tag 显示出不同节奏。
+Feature Index、Constitution、Git tags、`pyproject.toml` 版本都在表达“当前状态”，但它们之间的同步关系不够明确。宪法要求语义化版本和 breaking changes 记录：[.specify/memory/constitution.md](../../.specify/memory/constitution.md#L76-L83)，但当前包版本与 Git tag 显示出不同节奏。
 
 **建议**：在 release checklist 中加入：包版本、tag、README 安装说明、instructions version 的一致性检查。
 

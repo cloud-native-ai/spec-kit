@@ -1,3 +1,14 @@
+---
+title: "整合方案：K8s 基底 + ADR 机制 + 根目录索引"
+created: 2026-07-28
+expires: 2026-09-26
+status: archived
+target: "docs/concepts/documentation-model.md"
+tags: [docs, design]
+---
+
+> ✅ 已合入 [docs/concepts/documentation-model.md](../concepts/documentation-model.md)（spec 033 / Feature 037 / ADR-0001 落地）
+
 # 整合方案：K8s 基底 + ADR 机制 + 根目录索引
 
 ## 整体结构
@@ -62,15 +73,15 @@
 
 | 我想... | 去哪里 |
 |---------|--------|
-| 了解核心概念和设计哲学 | [docs/concepts/](docs/concepts/) |
-| 跟着教程上手 | [docs/tutorials/](docs/tutorials/) |
-| 完成一个具体任务 | [docs/tasks/](docs/tasks/) |
-| 查 API / CLI / 配置项 | [docs/reference/](docs/reference/) |
-| 了解某个设计决策的背景 | [docs/decisions/](docs/decisions/) |
-| 参与项目开发 | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| 了解核心概念和设计哲学 | [docs/concepts/](../concepts) |
+| 跟着教程上手 | [docs/tutorials/](../tutorials) |
+| 完成一个具体任务 | [docs/tasks/](../tasks) |
+| 查 API / CLI / 配置项 | [docs/reference/](../reference) |
+| 了解某个设计决策的背景 | [docs/decisions/](../decisions) |
+| 参与项目开发 | [CONTRIBUTING.md](../../CONTRIBUTING.md) |
 
 ## 架构总览
-→ 见 [ARCHITECTURE.md](ARCHITECTURE.md)
+→ 见 [ARCHITECTURE.md](../../ARCHITECTURE.md)
 ```
 
 **设计意图：** README 是"路标"，不承载实质内容，只做分发。读者 3 秒内能找到自己要去的地方。
@@ -103,8 +114,8 @@
 | 为什么采用 Z 架构 | Accepted | [ADR-0002](docs/decisions/0002-adopt-yyy.md) |
 
 ## 深入阅读
-- 概念详解 → [docs/concepts/](docs/concepts/)
-- 决策全量列表 → [docs/decisions/README.md](docs/decisions/README.md)
+- 概念详解 → [docs/concepts/](../concepts)
+- 决策全量列表 → [docs/decisions/README.md](../decisions/README.md)
 ```
 
 **设计意图：** ARCHITECTURE.md 是"一页纸架构"，给新人一个全局视图，同时通过链接指向 docs/ 中的深度内容。它和 docs/concepts/ 的关系是**摘要 vs 全文**。
@@ -120,7 +131,7 @@
 
 ## 快速参与
 
-1. Fork & Clone → [docs/contribute/dev-setup.md](docs/contribute/dev-setup.md)
+1. Fork & Clone → [docs/contribute/dev-setup.md](../contribute/dev-setup.md)
 2. 了解代码规范 → [docs/contribute/coding-standards.md](docs/contribute/coding-standards.md)
 3. 提交 PR → 遵循下方流程
 
@@ -128,9 +139,9 @@
 （简要描述，或链接到详细文档）
 
 ## 深入阅读
-- 开发环境搭建 → [docs/contribute/dev-setup.md](docs/contribute/dev-setup.md)
+- 开发环境搭建 → [docs/contribute/dev-setup.md](../contribute/dev-setup.md)
 - 发布流程 → [docs/contribute/release-process.md](docs/contribute/release-process.md)
-- 架构决策背景 → [docs/decisions/](docs/decisions/)
+- 架构决策背景 → [docs/decisions/](../decisions)
 ```
 
 **设计意图：** CONTRIBUTING.md 是 GitHub 约定的标准文件（PR 页面会自动展示），所以它必须是自包含的"够用"文档，同时链接到 docs/contribute/ 中的深度内容。

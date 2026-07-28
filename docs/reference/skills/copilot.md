@@ -81,7 +81,7 @@ Contains detailed instructions, guidelines, and examples for Copilot to follow w
 
 Write detailed instructions here...
 
-You can reference files within the directory, e.g.: [Test Script](./test-template.js).
+You can reference files within the directory, e.g.: `[Test Script](./test-template.js)`.
 ```
 
 ## How Copilot Uses Skills

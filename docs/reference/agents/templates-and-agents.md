@@ -14,7 +14,7 @@ live at **`skills/create-agent/templates/`** (installed mirror:
 the three EEI stages, the parallel/serial/triad orchestration templates, and the workflow schema —
 live at **`skills/create-team/templates/`** and are catalogued in the team docs
 ([`docs/teams/orchestration.md`](../teams/orchestration.md); normative source
-[`conceptual-model.md`](../../skills/create-team/references/conceptual-model.md)).
+[`conceptual-model.md`](../../../skills/create-team/references/conceptual-model.md)).
 
 ### Role templates (`agent-role-*`)
 

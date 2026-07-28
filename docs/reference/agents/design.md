@@ -98,7 +98,7 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 > 概念、四模式语义、目录布局与操作细节均在**团队文档集**：
 > [`docs/teams/overview.md`](../teams/overview.md)、[`docs/teams/orchestration.md`](../teams/orchestration.md)、[`docs/teams/continuous-operations.md`](../teams/continuous-operations.md)；
-> 单一真相源为 [`skills/create-team/references/conceptual-model.md`](../../skills/create-team/references/conceptual-model.md) 与 [`operating-loops.md`](../../skills/create-team/references/operating-loops.md)。
+> 单一真相源为 [`skills/create-team/references/conceptual-model.md`](../../../skills/create-team/references/conceptual-model.md) 与 [`operating-loops.md`](../../../skills/create-team/references/operating-loops.md)。
 > 本框架文档只保留「团队 = 静态 Team 矩阵 + 动态 Loop」这一**概念**（见 §二、§三），不再复述编排操作。
 
 ## 六、实现结构

@@ -22,9 +22,8 @@ _OFFICIAL_NAMES = [
 # Files that constitute release-blocking support surfaces.
 _SURFACE_FILES = [
     "README.md",
-    "docs/installation.md",
-    "docs/quickstart.md",
-    "docs/usage.md",
+    "docs/tutorials/installation.md",
+    "docs/tutorials/quickstart.md",
     ".specify/memory/constitution.md",
     "templates/instructions-template.md",
     ".specify/templates/instructions-template.md",
@@ -48,11 +47,11 @@ class TestSupportSurfaceAudit:
             assert name in content, f"README.md missing '{name}'"
 
     def test_installation_docs_mention_all_assistants(self):
-        content = self._read_if_exists("docs/installation.md")
+        content = self._read_if_exists("docs/tutorials/installation.md")
         if not content:
-            pytest.skip("docs/installation.md not found")
+            pytest.skip("docs/tutorials/installation.md not found")
         for name in _OFFICIAL_NAMES:
-            assert name in content, f"docs/installation.md missing '{name}'"
+            assert name in content, f"docs/tutorials/installation.md missing '{name}'"
 
     def test_constitution_mentions_all_assistants(self):
         content = self._read_if_exists(".specify/memory/constitution.md")

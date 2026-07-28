@@ -127,7 +127,7 @@ def test_c10_runtime_copies_exist_for_every_present_tool():
 
 @pytest.mark.contract
 def test_c11_reference_doc_and_quickstart_row():
-    ref = REPO_ROOT / "docs" / "commands" / "docs.md"
-    assert ref.is_file(), "docs/commands/docs.md reference doc missing"
-    quickstart = (REPO_ROOT / "docs" / "quickstart.md").read_text(encoding="utf-8")
+    ref = REPO_ROOT / "docs" / "reference" / "commands" / "docs.md"
+    assert ref.is_file(), "docs/reference/commands/docs.md reference doc missing"
+    quickstart = (REPO_ROOT / "docs" / "tutorials" / "quickstart.md").read_text(encoding="utf-8")
     assert "/speckit.docs" in quickstart, "quickstart command table missing /speckit.docs"

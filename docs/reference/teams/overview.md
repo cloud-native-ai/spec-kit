@@ -60,21 +60,21 @@
 
 | 主题 | 权威文件 |
 |------|----------|
-| 概念模型（Role × Stage × Type、Team Supervisor、静/动结构、四模式表） | [`skills/create-team/references/conceptual-model.md`](../../skills/create-team/references/conceptual-model.md) |
-| **continuous 运营循环**（成熟度、约束、预算、验证者、状态脊柱、每 cycle 流程） | [`skills/create-team/references/operating-loops.md`](../../skills/create-team/references/operating-loops.md) |
-| **Goal 概念**（定义、四条性质、goal-first、持久化 `## Goal`/`goal` 字段） | [`skills/create-team/references/goal.md`](../../skills/create-team/references/goal.md) |
-| **「优化」类目标**（一次性→iteration vs 持续→continuous；淘汰 vs 渐进策略） | [`skills/create-team/references/optimization-goals.md`](../../skills/create-team/references/optimization-goals.md) |
-| **修改 goal**（modify 一等编辑 + 结构级联重对齐 + 成熟度晋级/降级） | [`skills/improve-team/references/goal-editing.md`](../../skills/improve-team/references/goal-editing.md) |
-| 命令入口（create / modify / run 三模式、run 门、continuous 单 cycle 门控） | [`templates/commands/team.md`](../../templates/commands/team.md) |
-| 创建 / 运行技能（模式选择、四种模式引擎、持久化 schema） | [`skills/create-team/SKILL.md`](../../skills/create-team/SKILL.md) |
-| 修改技能（Refinement Map，含 continuous 项） | [`skills/improve-team/SKILL.md`](../../skills/improve-team/SKILL.md) |
-| 数据模型与 `.team.md` schema | [`.specify/specs/.archive/026-agent-team-management/data-model.md`](../../.specify/specs/.archive/026-agent-team-management/data-model.md) |
+| 概念模型（Role × Stage × Type、Team Supervisor、静/动结构、四模式表） | [`skills/create-team/references/conceptual-model.md`](../../../skills/create-team/references/conceptual-model.md) |
+| **continuous 运营循环**（成熟度、约束、预算、验证者、状态脊柱、每 cycle 流程） | [`skills/create-team/references/operating-loops.md`](../../../skills/create-team/references/operating-loops.md) |
+| **Goal 概念**（定义、四条性质、goal-first、持久化 `## Goal`/`goal` 字段） | [`skills/create-team/references/goal.md`](../../../skills/create-team/references/goal.md) |
+| **「优化」类目标**（一次性→iteration vs 持续→continuous；淘汰 vs 渐进策略） | [`skills/create-team/references/optimization-goals.md`](../../../skills/create-team/references/optimization-goals.md) |
+| **修改 goal**（modify 一等编辑 + 结构级联重对齐 + 成熟度晋级/降级） | [`skills/improve-team/references/goal-editing.md`](../../../skills/improve-team/references/goal-editing.md) |
+| 命令入口（create / modify / run 三模式、run 门、continuous 单 cycle 门控） | [`templates/commands/team.md`](../commands/team.md) |
+| 创建 / 运行技能（模式选择、四种模式引擎、持久化 schema） | [`skills/create-team/SKILL.md`](../../../skills/create-team/SKILL.md) |
+| 修改技能（Refinement Map，含 continuous 项） | [`skills/improve-team/SKILL.md`](../../../skills/improve-team/SKILL.md) |
+| 数据模型与 `.team.md` schema | [`.specify/specs/.archive/026-agent-team-management/data-model.md`](../../../.specify/specs/.archive/026-agent-team-management/data-model.md) |
 
 ## 案例
 
-- **淘汰策略范例**（复杂图表下持续优化 draw-plantuml 技能，定义了加权评分规则与淘汰/精英保留策略）：[`.specify/teams/draw-plantuml-optimizer/team.md`](../../.specify/teams/draw-plantuml-optimizer/team.md)。该团队已定义、可直接 re-run；逐轮评分结果需实际执行后累积，届时每轮报告落在同目录 `runs/` 下（运行中间态则落在被忽略的 `.specify/teams/.work/`）。
+- **淘汰策略范例**（复杂图表下持续优化 draw-plantuml 技能，定义了加权评分规则与淘汰/精英保留策略）：[`.specify/teams/draw-plantuml-optimizer/team.md`](../commands/team.md)。该团队已定义、可直接 re-run；逐轮评分结果需实际执行后累积，届时每轮报告落在同目录 `runs/` 下（运行中间态则落在被忽略的 `.specify/teams/.work/`）。
 
 ## 待完善
 
-- `goal` 已作为一等概念落在命令与技能 `references/` 中；数据模型 [`data-model.md`](../../.specify/specs/.archive/026-agent-team-management/data-model.md) 仍把 goal 混入 `description`，需要把 `goal` 分离为独立字段以与技能 schema 一致（建议走 `/speckit.feature`）。
+- `goal` 已作为一等概念落在命令与技能 `references/` 中；数据模型 [`data-model.md`](../../../.specify/specs/.archive/026-agent-team-management/data-model.md) 仍把 goal 混入 `description`，需要把 `goal` 分离为独立字段以与技能 schema 一致（建议走 `/speckit.feature`）。
 - 数据模型仍以三模式描述动态结构；需补齐 `iteration` 与 `continuous`（含 `config` 运营字段），与本目录及技能 `references/` 对齐（建议走 `/speckit.feature`）。

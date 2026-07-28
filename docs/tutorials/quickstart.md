@@ -199,35 +199,35 @@ The following commands are **prompt instructions** for your AI Agent. For detail
 
 | Command | Purpose | Details |
 |---------|---------|---------|
-| `/speckit.requirements` | Create/update requirements specification (WHAT/WHY) | [details →](commands/requirements.md) |
-| `/speckit.clarify` | Resolve ambiguous requirements | [details →](commands/clarify.md) |
-| `/speckit.plan` | Generate implementation plans (HOW) | [details →](commands/plan.md) |
-| `/speckit.tasks` | Break down plans into actionable tasks | [details →](commands/tasks.md) |
-| `/speckit.implement` | Implement tasks with validation | [details →](commands/implement.md) |
-| `/speckit.review` | Review implementations against specs | [details →](commands/review.md) |
+| `/speckit.requirements` | Create/update requirements specification (WHAT/WHY) | [details →](../reference/commands/requirements.md) |
+| `/speckit.clarify` | Resolve ambiguous requirements | [details →](../reference/commands/clarify.md) |
+| `/speckit.plan` | Generate implementation plans (HOW) | [details →](../reference/commands/plan.md) |
+| `/speckit.tasks` | Break down plans into actionable tasks | [details →](../reference/commands/tasks.md) |
+| `/speckit.implement` | Implement tasks with validation | [details →](../reference/commands/implement.md) |
+| `/speckit.review` | Review implementations against specs | [details →](../reference/commands/review.md) |
 
 ### Quality Assurance & Research
 
 | Command | Purpose | Details |
 |---------|---------|---------|
-| `/speckit.analyze` | Cross-artifact consistency analysis (read-only) | [details →](commands/analyze.md) |
-| `/speckit.checklist` | Generate quality checklists ("unit tests for English") | [details →](commands/checklist.md) |
-| `/speckit.research` | Conduct technical research to inform decisions | [details →](commands/research.md) |
+| `/speckit.analyze` | Cross-artifact consistency analysis (read-only) | [details →](../reference/commands/analyze.md) |
+| `/speckit.checklist` | Generate quality checklists ("unit tests for English") | [details →](../reference/commands/checklist.md) |
+| `/speckit.research` | Conduct technical research to inform decisions | [details →](../reference/commands/research.md) |
 
 ### Governance & Extension
 
 | Command | Purpose | Details |
 |---------|---------|---------|
-| `/speckit.constitution` | Manage project constitution and governance rules | [details →](commands/constitution.md) |
-| `/speckit.feature` | Manage feature registry (ID, name, status) | [details →](commands/feature.md) |
-| `/speckit.agents` | Generate role-based agents or create custom agents | [details →](commands/agents.md) |
-| `/speckit.team` | Organize and run multi-agent teams (create / modify / run) | [details →](commands/team.md) |
-| `/speckit.skills` | Manage specialized skills | [details →](commands/skills.md) |
-| `/speckit.tools` | Define/discover reusable tools with behavioral rules | [details →](commands/tools.md) |
-| `/speckit.instructions` | Generate AI agent instructions and symlinks | [details →](commands/instructions.md) |
-| `/speckit.history` | Distill past AI conversations into a theme-aggregated knowledge base | [details →](commands/history.md) |
-| `/speckit.docs` | Standardize and manage the project documentation space (reconcile engine) | [details →](commands/docs.md) |
-| `/speckit.todo` | Discover TODO blocks in files and turn them into execution plans | [details →](commands/todo.md) |
+| `/speckit.constitution` | Manage project constitution and governance rules | [details →](../reference/commands/constitution.md) |
+| `/speckit.feature` | Manage feature registry (ID, name, status) | [details →](../reference/commands/feature.md) |
+| `/speckit.agents` | Generate role-based agents or create custom agents | [details →](../reference/commands/agents.md) |
+| `/speckit.team` | Organize and run multi-agent teams (create / modify / run) | [details →](../reference/commands/team.md) |
+| `/speckit.skills` | Manage specialized skills | [details →](../reference/commands/skills.md) |
+| `/speckit.tools` | Define/discover reusable tools with behavioral rules | [details →](../reference/commands/tools.md) |
+| `/speckit.instructions` | Generate AI agent instructions and symlinks | [details →](../reference/commands/instructions.md) |
+| `/speckit.history` | Distill past AI conversations into a theme-aggregated knowledge base | [details →](../reference/commands/history.md) |
+| `/speckit.docs` | Standardize and manage the project documentation space (reconcile engine) | [details →](../reference/commands/docs.md) |
+| `/speckit.todo` | Discover TODO blocks in files and turn them into execution plans | [details →](../reference/commands/todo.md) |
 
 ### Command Prerequisites & Next Steps
 
@@ -255,7 +255,7 @@ Commands follow a natural order. The table below shows common prerequisites and 
 
 ### Command Execution Flowchart
 
-![Command Execution Flowchart: a UML activity diagram showing three phases (Setup, Customize, Core Development) as a top-to-bottom command pipeline, with advisory role agents and auxiliary commands attached as side notes at their relevant stages](assets/quickstart-workflow.png)
+![Command Execution Flowchart: a UML activity diagram showing three phases (Setup, Customize, Core Development) as a top-to-bottom command pipeline, with advisory role agents and auxiliary commands attached as side notes at their relevant stages](../assets/quickstart-workflow.png)
 
 This flowchart shows three phases with role-based agents as auxiliary aids:
 
@@ -368,6 +368,6 @@ For each project, create 5-15 tasks randomly distributed across columns, with at
 
 ## Further Reading
 
-- [Per-Command Details](commands/) — Detailed execution flow, output artifacts, and examples for every `/speckit.*` command
-- [Spec-Driven Development](spec-driven.md) — Methodology deep-dive
+- [Per-Command Details](../reference/commands) — Detailed execution flow, output artifacts, and examples for every `/speckit.*` command
+- [Spec-Driven Development](../concepts/spec-driven.md) — Methodology deep-dive
 - [Installation Guide](installation.md) — Detailed setup options

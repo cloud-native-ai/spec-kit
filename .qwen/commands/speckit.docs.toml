@@ -105,7 +105,7 @@ python3 .specify/scripts/python/docs-utils.py --action archive-check --root . # 
 python3 .specify/scripts/python/docs-utils.py --action stats --root .         # 统计
 ```
 
-Reference documentation: `docs/commands/docs.md`.
+Reference documentation: `docs/reference/commands/docs.md` (projects following the six-type taxonomy; pre-reorg location was `docs/commands/docs.md`).
 
 ## Feedback
 

@@ -198,6 +198,9 @@ def check_links(root: Path, files: list[Path], violations: list) -> None:
             text = path.read_text(encoding="utf-8")
         except OSError:
             continue
+        # links quoted inside fenced code blocks or inline code are examples, not references
+        text = re.sub(r"```.*?```", "", text, flags=re.S)
+        text = re.sub(r"`[^`\n]*`", "", text)
         for target in LINK_RE.findall(text):
             target = target.split("#", 1)[0]
             if not target or "://" in target or target.startswith(("mailto:", "/", "#")):
@@ -236,6 +239,8 @@ def cmd_validate(root: Path) -> dict:
             })
     docs = root / "docs"
     doc_files = sorted(docs.rglob("*.md")) if docs.is_dir() else []
+    # notes zone is temporary (no stability guarantee): exempt from link checking
+    doc_files = [f for f in doc_files if notes_dir(root) not in f.parents]
     root_entries = [root / n for n in REGISTRY if (root / n).is_file()]
     check_links(root, root_entries + doc_files, violations)
     decisions = docs / "decisions"

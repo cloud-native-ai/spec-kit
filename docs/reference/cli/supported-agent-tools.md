@@ -2,7 +2,7 @@
 
 Spec Kit's `specify` CLI can bootstrap its `/speckit.*` command surface into a
 number of AI coding agents. The authoritative list lives in `AGENT_CONFIG` and
-`_ASSISTANT_TIERS` in [src/specify_cli/__init__.py](../../src/specify_cli/__init__.py).
+`_ASSISTANT_TIERS` in [src/specify_cli/__init__.py](../../../src/specify_cli/__init__.py).
 
 This directory collects a concise reference for each officially supported agent,
 distilled from the tool's **official documentation** (source URL noted at the top
