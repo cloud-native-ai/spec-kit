@@ -264,6 +264,10 @@ def cmd_audit(root: Path, scope: str, summary: str, items_file: str | None) -> d
     audit_dir.mkdir(parents=True, exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     path = audit_dir / f"{ts}-docs-audit.md"
+    seq = 1
+    while path.exists():
+        seq += 1
+        path = audit_dir / f"{ts}-docs-audit-{seq}.md"
     items = []
     if items_file:
         items = json.loads(Path(items_file).read_text(encoding="utf-8"))

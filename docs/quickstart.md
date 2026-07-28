@@ -226,6 +226,7 @@ The following commands are **prompt instructions** for your AI Agent. For detail
 | `/speckit.tools` | Define/discover reusable tools with behavioral rules | [details →](commands/tools.md) |
 | `/speckit.instructions` | Generate AI agent instructions and symlinks | [details →](commands/instructions.md) |
 | `/speckit.history` | Distill past AI conversations into a theme-aggregated knowledge base | [details →](commands/history.md) |
+| `/speckit.docs` | Standardize and manage the project documentation space (reconcile engine) | [details →](commands/docs.md) |
 | `/speckit.todo` | Discover TODO blocks in files and turn them into execution plans | [details →](commands/todo.md) |
 
 ### Command Prerequisites & Next Steps
