@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-07-28T08:29:01Z",
+  "updated": "2026-07-28T10:20:59Z",
   "threshold": 10,
-  "count_since_submission": 13,
+  "count_since_submission": 14,
   "submitted_at": "2026-07-25T17:14:57Z",
   "entries": [
+    {
+      "id": "20260728T102059Z-speckit-implement",
+      "file": "20260728T102059Z-speckit-implement.md",
+      "unit_id": "/speckit.implement",
+      "unit_type": "command",
+      "run_id": "033-docs-command-implement-20260728",
+      "feature": "033-docs-command",
+      "partial": false,
+      "created": "2026-07-28T10:20:59Z",
+      "summary": "37/37 任务零延期：TDD 全程（3 契约先红后绿）、镜像纪律（regen --check 全程零漂移）、dogfooding 激进重组经干跑计划确认执行、运行中两次用户指示（root-owned 目录修复、保留文件名严格阻断）按修订协议消化（spec/宪法/引擎/测试/重命名全链路同步）；回归 84F/877P，失败全部根因归因为基线既有。"
+    },
     {
       "id": "20260728T082901Z-speckit-docs",
       "file": "20260728T082901Z-speckit-docs.md",
