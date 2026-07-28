@@ -17,9 +17,9 @@
 | `contribute/` | How do I work on this project? | procedural |
 | `notes/` | (temporary holding) | no stability guarantee, lifecycle-bound |
 
-## Uppercase special names (filename IS semantics)
+## Reserved Filenames — uppercase special names (filename IS semantics)
 
-`README.md` → indexes all of `docs/`; `ARCHITECTURE.md` → one-page summary of concepts + decisions; `CONTRIBUTING.md` → summary of contribute; `CHANGELOG.md` → self-contained timeline. ALL-CAPS names are reserved; ordinary docs are lowercase kebab-case. The registry is extensible — a new special name must register its fixed semantics.
+`README.md` → indexes all of `docs/`; `ARCHITECTURE.md` → one-page summary of concepts + decisions; `CONTRIBUTING.md` → summary of contribute; `CHANGELOG.md` → self-contained timeline. ALL-CAPS names are **strictly reserved identifiers** (like reserved keywords): each registry entry carries fixed semantics AND a registered location (currently project root) and may appear only there. User documents must not use a reserved name; same-semantics documents elsewhere take lowercase alternatives — directory indexes are `index.md`, never a nested `README.md`. Ordinary docs are lowercase kebab-case. The registry is extensible — a new reserved name registers semantics + location. (Constitution Principle X, v1.7.0; ADR-0002.)
 
 ## Document lifecycle
 

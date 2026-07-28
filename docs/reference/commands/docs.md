@@ -22,9 +22,9 @@ Standardize and manage the project documentation space as a single reconcile eng
 ## Desired State (baseline)
 
 - **Thin root layer** — uppercase special names with fixed semantics (filename IS semantics), each ≤ one screen:
-  `README.md` (indexes all of `docs/`) · `ARCHITECTURE.md` (summary of concepts + decisions) · `CONTRIBUTING.md` (summary of contribute) · `CHANGELOG.md` (self-contained timeline). Registry is extensible; ordinary docs use lowercase kebab-case.
+  `README.md` (indexes all of `docs/`) · `ARCHITECTURE.md` (summary of concepts + decisions) · `CONTRIBUTING.md` (summary of contribute) · `CHANGELOG.md` (self-contained timeline). These are **Reserved Filenames** (like reserved keywords, constitution Principle X): each registers semantics + location and may appear ONLY there — user documents must not reuse them; directory indexes elsewhere are `index.md`, never a nested `README.md`. Registry is extensible; ordinary docs use lowercase kebab-case.
 - **Thick `docs/` layer** — `concepts/ tutorials/ tasks/ reference/ decisions/ contribute/` (formal, archive-not-delete) + `notes/` (temporary, lifecycle-constrained).
-- **ADR** — `docs/decisions/NNNN-slug.md`, append-only, status Proposed / Accepted / Deprecated / Superseded by.
+- **ADR** — `docs/decisions/NNNN-slug.md` (+ `index.md` + `template.md`), append-only, status Proposed / Accepted / Deprecated / Superseded by.
 - **Notes lifecycle** — frontmatter (`title/created/expires/status/target/tags`, default TTL 60 days); state machine draft → expired → (renew | confirmed delete) and draft → archived (merged into `target`).
 
 ## Execution Flow
@@ -45,7 +45,7 @@ python3 .specify/scripts/python/docs-utils.py --action validate --root .
 python3 .specify/scripts/python/docs-utils.py --action audit --root . --scope <s> --summary <text>
 ```
 
-`validate` covers the deterministic dimensions: reserved-name case/misuse, one-screen threshold for root entries, broken relative links, ADR numbering continuity, notes frontmatter completeness.
+`validate` covers the deterministic dimensions: reserved-name case/misuse/misplacement, one-screen threshold for root entries, broken relative links, ADR numbering continuity, notes frontmatter completeness.
 
 ## Output Artifacts
 

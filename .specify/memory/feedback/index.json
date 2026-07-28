@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-07-28T07:50:40Z",
+  "updated": "2026-07-28T08:29:01Z",
   "threshold": 10,
-  "count_since_submission": 12,
+  "count_since_submission": 13,
   "submitted_at": "2026-07-25T17:14:57Z",
   "entries": [
+    {
+      "id": "20260728T082901Z-speckit-docs",
+      "file": "20260728T082901Z-speckit-docs.md",
+      "unit_id": "/speckit.docs",
+      "unit_type": "command",
+      "run_id": "033-dogfood-20260728",
+      "feature": "033-docs-command",
+      "partial": false,
+      "created": "2026-07-28T08:29:01Z",
+      "summary": "首次真实运行（对 Spec Kit 自身的激进全量调谐）：作用域判定→观察快照（validate 134 断链+README 超屏）→干跑计划（30 项，用户确认）→收敛（git mv 保历史、只归档不删除、notes 退场 2 篇）→校验（0 违规、符号链接完好、regen 零漂移）→审计与残差齐备。"
+    },
     {
       "id": "20260728T075040Z-speckit-tasks",
       "file": "20260728T075040Z-speckit-tasks.md",

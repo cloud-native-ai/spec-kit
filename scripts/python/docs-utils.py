@@ -24,13 +24,16 @@ REQUIRED_KEYS = ("title", "created", KEY_EXPIRES, "status")
 DEFAULT_TTL_DAYS = 60
 ROOT_ENTRY_MAX_LINES = 60
 
-# FR-010 special-name registry: filename itself carries fixed semantics.
+# Principle X Reserved Filenames: name -> (fixed semantics, registered location).
+# Reserved names may appear ONLY at their registered location; directory indexes
+# elsewhere use index.md.
 REGISTRY = {
     "README.md": "root entry point indexing all of docs/",
     "ARCHITECTURE.md": "one-page summary of docs/concepts/ + docs/decisions/",
     "CONTRIBUTING.md": "contribution entry summarizing docs/contribute/",
     "CHANGELOG.md": "self-contained timeline",
 }
+INDEX_NAME = "index.md"
 # Tool/ecosystem-mandated ALL-CAPS names (constitution Principle X) that are
 # legitimate outside the registry.
 ALLOWED_SPECIAL = {
@@ -76,7 +79,7 @@ def iter_notes(root: Path):
     if not ndir.is_dir():
         return
     for path in sorted(ndir.glob("*.md")):
-        if path.name == "README.md":
+        if path.name in ("README.md", INDEX_NAME):
             continue
         yield path
 
@@ -239,6 +242,22 @@ def cmd_validate(root: Path) -> dict:
             })
     docs = root / "docs"
     doc_files = sorted(docs.rglob("*.md")) if docs.is_dir() else []
+    # Reserved Filenames strict blocking: reserved names only at their registered
+    # location (project root); directory indexes elsewhere use index.md.
+    for path in doc_files:
+        name = path.name
+        if name in REGISTRY:
+            alt = INDEX_NAME if name == "README.md" else "a lowercase kebab-case name"
+            violations.append({
+                "kind": "reserved-name-misplaced", "path": rel(root, path),
+                "detail": f"reserved filename outside its registered location (root); use {alt}",
+            })
+        elif re.sub(r"[^A-Za-z]", "", path.stem).isupper() \
+                and len(re.sub(r"[^A-Za-z]", "", path.stem)) >= 2:
+            violations.append({
+                "kind": "reserved-name-misuse", "path": rel(root, path),
+                "detail": "ALL-CAPS names are reserved identifiers; use kebab-case.md",
+            })
     # notes zone is temporary (no stability guarantee): exempt from link checking
     doc_files = [f for f in doc_files if notes_dir(root) not in f.parents]
     root_entries = [root / n for n in REGISTRY if (root / n).is_file()]

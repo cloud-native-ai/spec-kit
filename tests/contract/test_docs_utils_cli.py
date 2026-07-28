@@ -130,6 +130,11 @@ def test_c7_validate_deterministic_dimensions(messy_project: Path):
     kinds = {v["kind"] for v in out["violations"]}
     assert "reserved-name-case" in kinds, "lowercase readme.md must be flagged"
     assert "reserved-name-misuse" in kinds, "DESIGN.md misuse must be flagged"
+    assert "reserved-name-misplaced" in kinds, \
+        "nested README.md (reserved filename outside registered location) must be flagged"
+    misplaced = [v for v in out["violations"] if v["kind"] == "reserved-name-misplaced"]
+    assert any("index.md" in v["detail"] for v in misplaced), \
+        "misplaced README must suggest index.md"
     assert "broken-link" in kinds, "broken relative link must be flagged"
     # validate is read-only
     assert (messy_project / "readme.md").exists()

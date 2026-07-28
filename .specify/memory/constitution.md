@@ -1,13 +1,12 @@
 <!--
 Sync Impact Report
-- Version change: 1.5.0.1 → 1.6.0 (MINOR; added Principle XI "Dogfooding (Self-Application)")
-- Modified principles: None
-- Added sections: Principle XI — Dogfooding (Self-Application)
+- Version change: 1.6.0 → 1.7.0 (MINOR; Principle X strengthened with the Reserved Filenames concept — strict blocking, registry with location + semantics, spec 033 / Feature 037)
+- Modified principles: X. Documentation Naming & Location Conventions (ALL-CAPS reserved names upgraded from "reserved for conventional root artifacts" to a strict reserved-filename registry: registered location + registered semantics only; directory indexes use index.md)
+- Added sections: None
 - Removed sections: None
 - Templates requiring updates:
-  ✅ templates/plan-template.md - No change needed (Constitution Check renders principles dynamically; auto-includes Principle XI)
-  ✅ templates/tasks-template.md - No change needed (no hard-coded principle numbers)
-  ✅ templates/instructions-template.md - Gains a project-neutral `## Dogfooding Practice` guidance section (spec 032, Feature 036)
+  ✅ templates/commands/docs.md - baseline updated (bootstrap emits index.md for directory indexes)
+  ✅ scripts/python/docs-utils.py - validate() enforces reserved-name misplacement deterministically
 - Follow-up TODOs: None
 -->
 
@@ -110,11 +109,11 @@ Rationale: The single most-reused decision standard across the project's history
 
 ### X. Documentation Naming & Location Conventions
 Markdown documents MUST follow naming and location conventions so that names and paths carry meaning:
-- **ALL-CAPS filenames are reserved**: uppercase names (`README.md`, `LICENSE`, `CHANGELOG.md`, `CONTRIBUTING.md`, `BUILD`, …) carry special ecosystem meaning and are reserved for those conventional root-level artifacts; ordinary documentation MUST use lowercase, hyphenated `kebab-case.md` and MUST NOT reuse these reserved names for unrelated content
-- **Path is semantic**: a document's meaning derives from its full path, not its filename alone — `docs/team/overview.md` is the overview of the *team* concept, `docs/agents/design.md` is the design for *agents*. Place documents so `<area>/<topic>.md` reads as "the `<topic>` of `<area>`", and reuse generic filenames (`overview.md`, `design.md`, `README.md`) scoped by their directory rather than inventing globally-unique names
-- **Tool/framework-mandated names are non-negotiable**: files whose names are dictated by an external tool or framework MUST match that exact pattern and location — e.g. GitHub Copilot commands MUST be `.github/prompts/<name>.prompt.md`; the `*.prompt.md` suffix and path are fixed and MUST NOT be renamed or "normalized" to project conventions
+- **Reserved Filenames (保留文件名) — strict blocking**: analogous to reserved keywords in a programming language, ALL-CAPS document names are **reserved identifiers**. Each reserved name is defined in a registry entry carrying its **fixed semantics AND registered location**, and may appear ONLY at that location with that meaning. Currently registered (location: project root): `README.md` (root entry indexing all of `docs/`), `ARCHITECTURE.md` (one-page summary of concepts + decisions), `CONTRIBUTING.md` (contribution entry), `CHANGELOG.md` (self-contained timeline). User documents MUST NOT use a reserved name; a document with similar semantics elsewhere MUST use a lowercase alternative — directory indexes use `index.md`, never a nested `README.md`. The registry is extensible: registering a new reserved name requires recording both its semantics and its location. Scope: the managed documentation space (project root + `docs/`); enforcement is a deterministic check of `/speckit.docs`
+- **Path is semantic**: a document's meaning derives from its full path, not its filename alone — `docs/team/overview.md` is the overview of the *team* concept. Place documents so `<area>/<topic>.md` reads as "the `<topic>` of `<area>`", and reuse generic lowercase filenames (`overview.md`, `design.md`, `index.md`) scoped by their directory rather than inventing globally-unique names
+- **Tool/framework-mandated names are non-negotiable**: files whose names are dictated by an external tool or framework are exempt from the reserved-name blocking and MUST match that exact pattern and location — e.g. GitHub Copilot commands MUST be `.github/prompts/<name>.prompt.md`; tool instruction aliases (`CLAUDE.md`, `QODER.md`, `AGENTS.md`, …), `LICENSE`, and `skills/*/SKILL.md` keep their mandated names and MUST NOT be renamed or "normalized" to project conventions
 
-Rationale: Consistent, path-aware naming keeps documents discoverable, prevents collisions with well-known ecosystem/tool conventions, and preserves the meaning encoded in a document's location for both humans and AI agents.
+Rationale: Consistent, path-aware naming keeps documents discoverable and preserves the meaning encoded in a document's location. Treating ALL-CAPS names as strictly reserved identifiers (name = semantics contract) prevents silent semantic collisions — a `README.md` buried in a subdirectory would falsely claim root-entry semantics; `index.md` says exactly what it is.
 
 ### XI. Dogfooding (Self-Application)
 The framework's developers and users are tightly linked — often the same team — which enables smooth use→feedback→iterate loops. Spec Kit MUST practice Dogfooding through its existing loop mechanisms, never through new parallel machinery:
@@ -176,4 +175,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.6.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-07-25
+**Version**: 1.7.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-07-28

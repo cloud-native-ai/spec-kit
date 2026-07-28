@@ -43,9 +43,9 @@ def make_skeleton(root: Path) -> None:
         (root / "docs" / d).mkdir(parents=True)
     (root / "docs" / "concepts" / "overview.md").write_text("# Overview\n", encoding="utf-8")
     (root / "docs" / "contribute" / "dev-setup.md").write_text("# Dev setup\n", encoding="utf-8")
-    (root / "docs" / "decisions" / "README.md").write_text("# ADR index\n", encoding="utf-8")
+    (root / "docs" / "decisions" / "index.md").write_text("# ADR index\n", encoding="utf-8")
     (root / "docs" / "decisions" / "template.md").write_text("# ADR-NNNN: title\n", encoding="utf-8")
-    (root / "docs" / "notes" / "README.md").write_text(
+    (root / "docs" / "notes" / "index.md").write_text(
         "# Notes\n\nfrontmatter required: title/created/expires/status\n", encoding="utf-8"
     )
 
@@ -80,5 +80,6 @@ def test_sc006_naming_violations_all_named(tmp_path: Path):
     flagged = {(v["kind"], v["path"]) for v in out["violations"]}
     assert ("reserved-name-case", "readme.md") in flagged
     assert ("reserved-name-misuse", "DESIGN.md") in flagged
+    assert ("reserved-name-misplaced", "docs/README.md") in flagged
     broken = [v for v in out["violations"] if v["kind"] == "broken-link"]
     assert len(broken) >= 2, "both broken links must be reported"

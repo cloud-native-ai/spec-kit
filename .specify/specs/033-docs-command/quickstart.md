@@ -7,7 +7,7 @@
 1. 在无 `docs/`、无根入口文件的项目工作区，聊天中运行 `/speckit.docs`。
 2. 引擎判定作用域 = bootstrap，生成骨架：
    - 根目录：`README.md`、`ARCHITECTURE.md`、`CONTRIBUTING.md`、`CHANGELOG.md`（全大写，各按注册语义，≤ 一屏）
-   - `docs/`：`concepts/ tutorials/ tasks/ reference/ decisions/（含 README + template）contribute/ notes/（含规则 README）`
+   - `docs/`：`concepts/ tutorials/ tasks/ reference/ decisions/（含 README + template）contribute/ notes/（含规则 index.md）`
 3. 验收：骨架清单逐项存在；`.specify/docs/audit/` 留有审计记录。
 
 ## 场景 2：全量调谐 + 防抖（US1 / SC-002）

@@ -25,4 +25,4 @@ Spec Kit is a **documentation/prompt framework, not a runtime platform** (Consti
 ## Deeper Reading
 
 - Concepts → [docs/concepts/](docs/concepts/)
-- Decisions → [docs/decisions/README.md](docs/decisions/README.md)
+- Decisions → [docs/decisions/index.md](docs/decisions/index.md)
