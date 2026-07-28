@@ -42,10 +42,11 @@ If the description is missing, derive it from the current conversation or ask on
 
 Distill a reusable Skill from the current conversation history:
 
-1. **Review the conversation history**: Identify recurring task patterns, explicit user intent (e.g., "save as a skill", "solidify this workflow"), multi-step operations with reuse value, and domain-specific decision logic.
-2. **Distill a reusable workflow**: Extract the core task objective, key execution steps, trigger conditions/keywords, and required tools/scripts/resources.
-3. **Generate Skill metadata**: Produce a concise English `name` (e.g., `data-validation`, `api-testing`) and a `description` with capability summary plus trigger keywords.
-4. **Minimal clarification**: If critical information cannot be determined, ask **only one question at a time**. Prioritize: target output, scope (project vs personal), checklist vs multi-step workflow.
+1. **Prefer an execution-notes doc over raw transcript**: if the workflow ran in a prior (possibly compacted) session, first look for a dated notes doc (e.g. `${SKILL_WORKDIR}/docs/notes/`) capturing the key commands and outcomes, and distill from it — mining a raw or compacted transcript is slow and lossy. When no such note exists, advise the user (in the wrap-up report) to record key commands into a dated notes doc *during* future executions so later distillation has a reliable source.
+2. **Review the conversation history**: Identify recurring task patterns, explicit user intent (e.g., "save as a skill", "solidify this workflow"), multi-step operations with reuse value, and domain-specific decision logic.
+3. **Distill a reusable workflow**: Extract the core task objective, key execution steps, trigger conditions/keywords, and required tools/scripts/resources.
+4. **Generate Skill metadata**: Produce a concise English `name` (e.g., `data-validation`, `api-testing`) and a `description` with capability summary plus trigger keywords.
+5. **Minimal clarification**: If critical information cannot be determined, ask **only one question at a time**. Prioritize: target output, scope (project vs personal), checklist vs multi-step workflow.
 
 ### 2. Determine SKILL_HOME and metadata
 

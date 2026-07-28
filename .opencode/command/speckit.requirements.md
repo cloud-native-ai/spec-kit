@@ -37,11 +37,12 @@ EOF
    2. Extract key concepts: actors, actions, data, constraints.
    3. Initialize `Related Feature`: `Feature ID: Need clarification`, `Feature Name: Need clarification` (resolved by `/speckit.clarify`).
    4. **Peek at house conventions**: skim the highest-numbered existing spec under `.specify/specs/` before drafting — match its language, section conventions (e.g. Assumptions subsection), and Shared Strings usage. Aligning with the most recent merged spec reduces convention drift at zero clarification cost.
-   5. For unclear aspects: make informed guesses. Only use `[NEEDS CLARIFICATION: question]` if choice significantly impacts scope/UX, multiple interpretations exist, and no reasonable default. **Max 3 markers.**
-   6. Fill User Scenarios & Testing — write as many stories as the feature decomposes into (the template's three slots are open-ended scaffolding, not a quota; delete unused slots).
-   7. Generate testable Functional Requirements.
-   8. Define measurable, technology-agnostic Success Criteria.
-   9. Identify Key Entities (if data involved).
+   5. **Reserved identifier check**: if the spec names any new identifier (env var, macro, CLI flag, config key), grep the codebase for that name before drafting — a collision with an existing/reserved identifier (e.g. a build env var) must be surfaced with a proposed alternate name and an explicit user-override note, not silently adopted.
+   6. For unclear aspects: make informed guesses. Only use `[NEEDS CLARIFICATION: question]` if choice significantly impacts scope/UX, multiple interpretations exist, and no reasonable default. **Max 3 markers.**
+   7. Fill User Scenarios & Testing — write as many stories as the feature decomposes into (the template's three slots are open-ended scaffolding, not a quota; delete unused slots).
+   8. Generate testable Functional Requirements.
+   9. Define measurable, technology-agnostic Success Criteria.
+   10. Identify Key Entities (if data involved).
 
 6. **Write spec** to SPEC_FILE. Preserve section order. Keep `Related Feature` with default "Need clarification" values.
 

@@ -100,6 +100,14 @@ or
 
 **Template-only / doc-feature gate**: if the constitution (or plan.md's Constitution Check) carries a *template-only features* principle (e.g. a Principle VII-style rule that template/prompt/doc artifacts are governed by structural contract tests rather than runtime tests), cite THAT gate in the banner and emit **structural contract tests** (content/heading/mirror-parity assertions on the artifact) — not unit/integration tests, which have nothing to run against. Do not re-derive this from feature history each run.
 
+### Environment Prerequisites (probe at generation time)
+
+When any generated task depends on an external environment (docker daemon, network-pullable images, a live cluster, special hardware):
+
+1. **Probe availability now**: check each required environment during task generation (e.g. `docker info`, a registry pull check) instead of letting `/speckit.implement` discover the gap mid-run.
+2. **Emit a per-phase prerequisites block**: each affected phase lists its environment prerequisites explicitly so a runner can skip or defer the phase as a unit.
+3. **Pre-validate named targets**: any concrete build/smoke target named in a task MUST have a locally satisfiable dependency chain (base images pullable, toolchain present). If unsatisfiable, either substitute a satisfiable target up front or pre-flag the task `[~]`-eligible in Notes with the substitution guidance.
+
 ### Checklist Format (REQUIRED)
 
 Every task MUST strictly follow this format:

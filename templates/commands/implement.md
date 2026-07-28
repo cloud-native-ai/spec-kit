@@ -40,7 +40,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 
 3. **Load context**: tasks.md (REQUIRED), plan.md (REQUIRED), data-model.md, contracts/, research.md, quickstart.md (IF EXISTS).
 
-4. **Project Setup Verification**: Create/verify ignore files based on detected tech stack. For detailed patterns per technology, see `shared/constants/ignore-patterns.md`.
+4. **Project Setup Verification**: Create/verify ignore files based on detected tech stack. For detailed patterns per technology, see `shared/constants/ignore-patterns.md`. Also verify the ignore rules ADMIT every output artifact this run is expected to write (reports, logs, per-session subdirectory files) — a whitelist that misses a nested path surfaces as a silent loss at report-writing time, so check it here with `git check-ignore` on a representative expected path.
 
 5. **Parse tasks.md**: Extract phases, dependencies, task details (ID, description, file paths, parallel markers [P]), execution flow.
 

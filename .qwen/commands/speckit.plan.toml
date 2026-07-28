@@ -79,7 +79,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
      - Integrate the outline structure into the plan template
      - Ensure all required sections are properly filled
    - Phase 0: Resolve clarifications (refer to `research.md` or conduct analysis)
-   - Phase 1: Generate data-model.md, contracts/, quickstart.md
+   - Phase 1: Generate data-model.md, contracts/, quickstart.md, feature-ref.md
    - Re-evaluate Constitution Check post-design
 
 5. **Plan integrity gate + stop and report**: Before finishing, verify the filled IMPL_PLAN contains (a) **no** residual `[UPPER_SNAKE_CASE]` placeholder tokens, (b) **exactly one** top-level `# Implementation Plan:` heading (no duplicated template body appended), and (c) the `**Requirement → Feature**` stamp. Fix the file if any check fails. Then report branch, IMPL_PLAN path, and generated artifacts.
@@ -116,6 +116,7 @@ This integration ensures that all feature planning activities are properly track
 1. **Information Gathering**:
    - **Project Docs**: Read `README.md` and all files in `docs/` to understand system architecture, guidelines, and setup.
    - **Feature Memory**: Read `.specify/memory/features.md` and all files in `.specify/memory/features/` to identify reusable patterns, potential conflicts, and integration points with existing features.
+   - **Codebase exploration pass**: before filling the template, run a dedicated exploration pass (use an Explore subagent when available) over the code the plan will touch — touchpoints, existing precedents, and downstream consumers. Use the findings to confirm or refute the spec's documented assumptions in one round rather than discovering them mid-design.
    - **Research Check**: Check if `research.md` exists in the local directory.
      - **If yes**: Read and analyze its contents. Use the Decisions and Rationale to resolve "NEEDS CLARIFICATION" items in the Technical Context.
      - **If no**: Perform sufficient analysis of project docs and memory to populate the Technical Context. If significant unknowns remain, ERROR and instruct the user to run `/speckit.research`.
@@ -139,6 +140,8 @@ This integration ensures that all feature planning activities are properly track
    - For each user action → endpoint
    - Use standard REST/GraphQL patterns
    - Output OpenAPI/GraphQL schema to `/contracts/`
+
+3. **Record feature binding** → `feature-ref.md`: the bound Feature ID/name and how this plan maps to it (see the plan template's Project Structure).
 
 **Output**: data-model.md, /contracts/*, quickstart.md, feature-ref.md (records the bound Feature ID/name and how this plan maps to it — see the plan template's Project Structure)
 
