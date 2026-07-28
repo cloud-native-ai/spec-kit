@@ -173,3 +173,31 @@ def test_c9_exit_zero_even_with_violations(messy_project: Path):
 def test_c10_engine_does_not_touch_feedback_machinery():
     source = SCRIPT.read_text(encoding="utf-8").lower()
     assert "feedback" not in source, "docs engine must not reference feedback machinery"
+
+
+@pytest.mark.contract
+def test_c12_fix_links_move_map_anchor_and_dry_run(tmp_path: Path):
+    proj = tmp_path / "proj"
+    (proj / "docs" / "reference").mkdir(parents=True)
+    (proj / "docs" / "concepts").mkdir(parents=True)
+    (proj / "docs" / "reference" / "guide.md").write_text("# Guide\n", encoding="utf-8")
+    page = proj / "docs" / "concepts" / "page.md"
+    page.write_text(
+        "See [guide](../old/guide.md#setup) and [gone](../old/missing.md).\n",
+        encoding="utf-8",
+    )
+    moves = tmp_path / "moves.json"
+    moves.write_text('{"docs/old/": "docs/reference/"}', encoding="utf-8")
+
+    dry = run_engine("--action", "fix-links", "--root", str(proj), "--moves", str(moves))
+    assert dry["dry_run"] is True
+    assert any(f["old"] == "../old/guide.md" for f in dry["fixed"])
+    assert "../old/guide.md#setup" in page.read_text(encoding="utf-8"), \
+        "dry-run must not write"
+
+    real = run_engine("--action", "fix-links", "--root", str(proj), "--moves", str(moves), "--apply")
+    assert real["dry_run"] is False
+    text = page.read_text(encoding="utf-8")
+    assert "(../reference/guide.md#setup)" in text, "rewrite must preserve the anchor"
+    assert any("missing.md" in u["target"] for u in real["unresolved"]), \
+        "unmappable targets must be reported, not guessed"

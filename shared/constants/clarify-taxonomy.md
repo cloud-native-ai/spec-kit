@@ -77,6 +77,7 @@ After each accepted answer:
   - Edge case → Add bullet under Edge Cases / Error Handling
   - Terminology → Normalize across spec; note `(formerly "X")` once if needed
 - If invalidates earlier statement, replace it (no duplicates)
+- **Append-only invariant (all modes)**: `## Clarifications` session entries are historical record — integrations MUST append new rows, never rewrite or replace existing ones. After each integration, re-count the entry rows (`- Q:` / `- 用户修订指示`) and verify the count strictly increased; a decreased or equal count means an Edit replaced history — restore the lost row before proceeding.
 - Save `requirements.md` after EACH integration
 
 ---

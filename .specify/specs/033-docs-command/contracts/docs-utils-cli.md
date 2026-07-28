@@ -8,7 +8,7 @@
 python3 scripts/python/docs-utils.py --action <action> [--root <project-root>] [其余 action 特定参数]
 ```
 
-- **C-1** 参数解析 MUST 为单一 argparse，`--action` 取值集合固定为：`scan | expire | clean | archive-check | stats | validate | audit`。新增动作属契约变更。
+- **C-1** 参数解析 MUST 为单一 argparse，`--action` 取值集合固定为：`scan | expire | clean | archive-check | stats | validate | fix-links | audit`。新增动作属契约变更。
 - **C-2** `scan` MUST 输出 notes 分组清单 JSON：`{"drafts": [...], "expireds": [...], "archiveds": [...], "invalid": [...]}`；`invalid` 收 frontmatter 缺失/损坏项（含缺失字段名与修复建议，默认 [[STR-004]] = created + 60 天）。
 - **C-3** `expire` MUST 将超过 [[STR-004]] 日期的 [[STR-001]] 笔记状态改写为 [[STR-002]]，输出 `{"marked": [...], "count": N}`；MUST NOT 删除任何文件。
 - **C-4** `clean` MUST 仅在显式确认参数（`--yes`）存在时删除 status=[[STR-002]] 的笔记，且作用域仅限 notes 区；无 `--yes` 时只输出候选清单（dry-run 默认）。
@@ -19,3 +19,4 @@ python3 scripts/python/docs-utils.py --action <action> [--root <project-root>] [
 - **C-9** 所有动作 exit code：0=成功（含"发现违规但正常报告"）；非 0 仅用于脚本自身错误（参数/IO）。
 - **C-10** 引擎 MUST NOT 触碰 feedback 引擎与其存储（零新增循环机器红线，FR-009/FR-011e；由既有 test_dogfooding_practice C-4 类钉点保障）。
 - **C-11** quickstart.md 中出现的每个 docs-utils.py 示例命令 MUST 与本契约的 action/参数语法一致（实现阶段以真实执行回验）。
+- **C-12**（2026-07-28 feedback 落地）`fix-links` MUST 按显式搬迁映射（`--moves <json>`：旧路径/前缀 → 新路径）重写失效相对链接：锚点保持（`(path#anchor)` 仅换 path）、默认 dry-run（无 `--apply` 时零写盘，仅输出计划）、输出 `{"dry_run": bool, "fixed": [{path,old,new}], "unresolved": [...]}`；属安全写入层（只改链接文本，不移动文件）。

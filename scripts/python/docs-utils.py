@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from datetime import date, datetime, timedelta, timezone
@@ -283,6 +284,75 @@ def cmd_validate(root: Path) -> dict:
     return {"violations": violations}
 
 
+def broken_links(root: Path) -> list:
+    return [v for v in cmd_validate(root)["violations"] if v["kind"] == "broken-link"]
+
+
+def cmd_fix_links(root: Path, moves_file: str | None, apply: bool) -> dict:
+    moves: dict[str, str] = {}
+    if moves_file:
+        moves = json.loads(Path(moves_file).read_text(encoding="utf-8"))
+
+    def move_map(p: str) -> str | None:
+        for old, new in moves.items():
+            if old.endswith("/") and p.startswith(old):
+                return new + p[len(old):]
+            if p == old:
+                return new
+        return None
+
+    def resolve(fpath: Path, target: str) -> Path | None:
+        if (root / target).exists():
+            return root / target
+        mm = move_map(target)
+        if mm and (root / mm).exists():
+            return root / mm
+        for extra in ("", "../", "../../"):
+            norm = os.path.normpath(os.path.join(str(fpath.parent), extra + target))
+            try:
+                rn = str(Path(norm).resolve().relative_to(root))
+            except ValueError:
+                continue
+            if (root / rn).exists():
+                return root / rn
+            mm2 = move_map(rn)
+            if mm2 and (root / mm2).exists():
+                return root / mm2
+        return None
+
+    fixed, unresolved = [], []
+    for rounds in range(3):
+        changed = False
+        for v in broken_links(root):
+            f = root / v["path"]
+            target = v["detail"]
+            cand = resolve(f, target)
+            if cand is None:
+                unresolved.append({"path": v["path"], "target": target})
+                continue
+            newrel = os.path.relpath(cand, f.parent)
+            if newrel == target:
+                continue
+            if apply:
+                text = f.read_text(encoding="utf-8")
+                pat = re.compile(r"\(" + re.escape(target) + r"(#[^)]*)?\)")
+                new_text = pat.sub(lambda m: f"({newrel}{m.group(1) or ''})", text)
+                if new_text != text:
+                    f.write_text(new_text, encoding="utf-8")
+                    changed = True
+            fixed.append({"path": v["path"], "old": target, "new": newrel})
+        if not (apply and changed):
+            break
+    # dedup preserving order
+    seen, uniq = set(), []
+    for item in fixed:
+        key = (item["path"], item["old"], item["new"])
+        if key not in seen:
+            seen.add(key)
+            uniq.append(item)
+    return {"dry_run": not apply, "fixed": uniq, "unresolved": unresolved}
+
+
 def cmd_audit(root: Path, scope: str, summary: str, items_file: str | None) -> dict:
     audit_dir = root / ".specify" / "docs" / "audit"
     audit_dir.mkdir(parents=True, exist_ok=True)
@@ -321,10 +391,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="docs space deterministic engine")
     parser.add_argument(
         "--action", required=True,
-        choices=["scan", "expire", "clean", "archive-check", "stats", "validate", "audit"],
+        choices=["scan", "expire", "clean", "archive-check", "stats", "validate",
+                 "fix-links", "audit"],
     )
     parser.add_argument("--root", default=".")
     parser.add_argument("--yes", action="store_true", help="confirm deletion for clean")
+    parser.add_argument("--apply", action="store_true", help="apply fix-links rewrites (default dry-run)")
+    parser.add_argument("--moves", default=None, help="JSON file mapping old path prefixes to new (fix-links)")
     parser.add_argument("--scope", default="unspecified", help="audit scope label")
     parser.add_argument("--summary", default="", help="audit summary line")
     parser.add_argument("--items-file", default=None, help="JSON file with audit items")
@@ -343,6 +416,8 @@ def main() -> int:
         out = cmd_stats(root)
     elif args.action == "validate":
         out = cmd_validate(root)
+    elif args.action == "fix-links":
+        out = cmd_fix_links(root, args.moves, args.apply)
     else:
         out = cmd_audit(root, args.scope, args.summary, args.items_file)
     json.dump(out, sys.stdout, ensure_ascii=False, indent=2)

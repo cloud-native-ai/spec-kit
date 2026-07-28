@@ -33,7 +33,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
    - Read `$ARGUMENTS` content
    - Determine if it contains background information, planning outline, or specific constraints
    - Apply appropriate processing strategy based on content type
-   - **Spec-restructure first**: if `$ARGUMENTS` expands or changes the requirement scope, do NOT plan against the stale spec — first restructure `requirements.md` (new/changed stories, FRs, success criteria) and re-validate its checklist, and only then fill the plan template. Plan artifacts are only trustworthy when the spec restructure has already landed.
+   - **Spec-restructure first**: if `$ARGUMENTS` expands or changes the requirement scope, do NOT plan against the stale spec — first restructure `requirements.md` (new/changed stories, FRs, success criteria) and re-validate its checklist, and only then fill the plan template. Plan artifacts are only trustworthy when the spec restructure has already landed. When MULTIPLE directives arrive across the run, batch them: integrate all into requirements.md and re-validate the checklist once, then fill the plan — do not interleave spec edits with plan filling. Record each directive verbatim under `## Clarifications` (append-only).
 
 3. **Load context**: Read FEATURE_SPEC, `.specify/memory/constitution.md`, and processed `$ARGUMENTS` context. Load IMPL_PLAN template (already copied).
    - Check if `SPECS_DIR/research.md` exists. If so, read it.

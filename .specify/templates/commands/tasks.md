@@ -123,6 +123,14 @@ When any generated task depends on an external environment (docker daemon, netwo
 2. **Emit a per-phase prerequisites block**: each affected phase lists its environment prerequisites explicitly so a runner can skip or defer the phase as a unit.
 3. **Pre-validate named targets**: any concrete build/smoke target named in a task MUST have a locally satisfiable dependency chain (base images pullable, toolchain present). If unsatisfiable, either substitute a satisfiable target up front or pre-flag the task `[~]`-eligible in Notes with the substitution guidance.
 
+### Pin Hygiene (test-authoring rule)
+
+Tasks that author or modify tests MUST follow pin-hygiene so the project's own next increment does not break its own contracts:
+
+1. **Version pins use floor semantics**: assert `parsed >= (MAJOR, MINOR)`, never `startswith("X.Y")` — a later legitimate bump must not fail an unrelated contract.
+2. **Surface-file lists must be real**: every file path listed in a test fixture/surface list MUST be existence-checked at authoring time (or the list derived from the tree); a phantom entry turns the whole test into a permanent FileNotFoundError.
+3. **Counts are contracts, not conveniences**: hard-code a count only when the count itself is the contract (then update it in the same task that changes the population); otherwise derive it with `len(...)` from a glob.
+
 ### Checklist Format (REQUIRED)
 
 Every task MUST strictly follow this format:

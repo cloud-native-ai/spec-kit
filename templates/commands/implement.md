@@ -40,7 +40,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 
 3. **Load context**: tasks.md (REQUIRED), plan.md (REQUIRED), data-model.md, contracts/, research.md, quickstart.md (IF EXISTS).
 
-4. **Project Setup Verification**: Create/verify ignore files based on detected tech stack. For detailed patterns per technology, see `shared/constants/ignore-patterns.md`. Also verify the ignore rules ADMIT every output artifact this run is expected to write (reports, logs, per-session subdirectory files) — a whitelist that misses a nested path surfaces as a silent loss at report-writing time, so check it here with `git check-ignore` on a representative expected path.
+4. **Project Setup Verification**: Create/verify ignore files based on detected tech stack. For detailed patterns per technology, see `shared/constants/ignore-patterns.md`. Also verify the ignore rules ADMIT every output artifact this run is expected to write (reports, logs, per-session subdirectory files) — a whitelist that misses a nested path surfaces as a silent loss at report-writing time, so check it here with `git check-ignore` on a representative expected path. **Writability pre-probe (fail fast)**: walk every directory named in plan.md's Source Code tree and Mirror Obligations rows and write-bit-probe each (touch-test); report ALL unwritable paths (e.g. root-owned container dirs) up front with the `sudo chown -R $USER <dir>` remedy — do NOT let a phase discover an unwritable target mid-run.
 
 5. **Parse tasks.md**: Extract phases, dependencies, task details (ID, description, file paths, parallel markers [P]), execution flow.
 
@@ -50,7 +50,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
    - TDD approach: test tasks before implementation tasks
    - Validate every project-side regen/build command (fail-open EXIT=0 insufficient — verify output artifacts)
    - **Shell hygiene (alias-proof)**: destructive/mirror file operations MUST use alias-proof forms (`\rm -f`, `\cp -f`, or `command rm/cp`) and MUST verify the result afterwards (`ls` / `diff -q`) — interactive aliases (`rm -i`, `cp -i`) silently swallow non-interactive deletes/copies while appearing to succeed
-   - **Test runs**: prefer the canonical runner `scripts/bash/run-tests.sh` (resolves the pytest interpreter once, pipe-safe) for baseline and regression tasks instead of ad-hoc `python -m pytest | tail` pipelines whose exit codes mask interpreter failures
+   - **Test runs**: prefer the canonical runner `scripts/bash/run-tests.sh` (resolves the pytest interpreter once, pipe-safe) for baseline and regression tasks instead of ad-hoc `python -m pytest | tail` pipelines whose exit codes mask interpreter failures. **Baseline captures names, not just counts**: record the baseline with `--names-out <spec-dir>/baseline-failed.txt` and re-run regression the same way, so zero-new-failures is proven by `comm -13 baseline current` instead of count archaeology
    - **Runnable-runner probe**: a baseline whose collection fails (e.g. `No module named pytest`, venv interpreter missing) is a probe FAILURE, not an empty baseline — resolve the interpreter first, then capture the baseline. Before adding files to a directory, grep the test suite for brittle count assertions on that directory (e.g. `test_*_has_ten_*`, hard-coded `len(...) == N`) and update them in the same task
    - **Commit discipline**: wrap-up metadata fix-ups (verification stamps, mirror syncs) go into NEW commits — never `--amend` an already-created commit
    - **Command/template edits**: after editing anything under `templates/commands/`, regenerate every per-tool copy and the `.specify` mirror with `python3 scripts/python/regen-command-copies.py` (verify with `--check`) — never hand-sync the 5 tool dirs
@@ -66,6 +66,15 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 8. **Completion validation**: All tasks `[X]` or `[~]` (no `[ ]` remaining). Features match spec. Tests pass. **Commit gate**: commit after each task or logical group; the spec dir MUST NOT be left *entirely* uncommitted when validation completes — an uncommitted implementation leaves no per-task audit trail and breaks `/speckit.review`'s git-based history reconstruction. Do not report the Definition of Done as "met" while the whole feature is uncommitted.
 
 9. **Pre-Status-Flip Gate** and **Verification Log**: Apply the full gate protocol from `shared/workflow/feature-integration.md` § Pre-Status-Flip Gate. Populate `REQUIREMENTS_DIR/verification.md` from `.specify/templates/verification-log-template.md`.
+
+### Mid-Run User Directives (scope changes DURING implement)
+
+When the user changes scope or adds a design constraint while this command is running, do NOT improvise: apply the Scope Revision Protocol from `templates/commands/clarify.md` adapted to implement:
+
+1. **Upstream first**: amend `requirements.md` (FR/SC/entities/edge cases) and record the directive verbatim under `## Clarifications` (dated, append-only — never replace existing rows), then cascade to plan/contracts as needed.
+2. **Append tasks, never renumber**: new work lands as new `T0NN` rows appended to `tasks.md` (marked to the relevant story or Polish); existing IDs and history stay intact.
+3. **Re-verify the touched surface**: re-run the affected contract/integration batch plus mirror checks before continuing the phase sequence.
+4. **Leave a trace**: note the directive and its landing (FRs, tasks, commits) in `verification.md` `notes=`.
 
 ## Feature Integration
 
