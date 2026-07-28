@@ -19,7 +19,7 @@
 - DoD-5: verification.md 覆盖 SC-001…SC-007 的逐项状态（pass/deferred + 证据）
 - DoD-6: Dogfooding 调谐留有审计日志与残差报告，符号链接/镜像/内链零破坏
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -46,8 +46,8 @@
 
 **Purpose**: 基线与夹具
 
-- [ ] T001 运行全量 pytest 并记录基线计数（P/F/E/S）到 .specify/specs/033-docs-command/verification.md 的 `baseline=` 行（基线纪律：区分既有失败与新增回归）
-- [ ] T002 [P] 创建测试夹具 tests/fixtures/docs_command/：blank_project/（空白）、messy_project/（含小写 readme.md、错放文档、断链）、notes_samples/（draft / 超期 draft / archived 含 target / archived 缺 target / frontmatter 损坏 五类样例）
+- [X] T001 运行全量 pytest 并记录基线计数（P/F/E/S）到 .specify/specs/033-docs-command/verification.md 的 `baseline=` 行（基线纪律：区分既有失败与新增回归）
+- [X] T002 [P] 创建测试夹具 tests/fixtures/docs_command/：blank_project/（空白）、messy_project/（含小写 readme.md、错放文档、断链）、notes_samples/（draft / 超期 draft / archived 含 target / archived 缺 target / frontmatter 损坏 五类样例）
 
 ---
 
@@ -57,10 +57,10 @@
 
 **⚠️ CRITICAL**: 契约测试先写并确认失败，再实现
 
-- [ ] T003 Contract test（先写、先失败）：contracts/docs-utils-cli.md C-1…C-10 断言（action 集合、scan 分组 JSON、expire 不删文件、clean 默认 dry-run/--yes 门禁、archive-check broken 清单、validate 五维校验、audit 落盘 .specify/docs/audit/、exit code 约定、不触碰 feedback 引擎）in tests/contract/test_docs_utils_cli.py
-- [ ] T004 实现 scripts/python/docs-utils.py：单一 argparse `--action {scan,expire,clean,archive-check,stats,validate,audit}`，标准库-only，stdout 单 JSON；字面量以 requirements.md Shared Strings（[[STR-001..004]]）为准
-- [ ] T005 双写镜像 .specify/scripts/python/docs-utils.py（`\cp -f` 防 cp -i 别名）
-- [ ] T006 校验：`diff -q scripts/python/docs-utils.py .specify/scripts/python/docs-utils.py` 零差异；T003 契约测试转绿
+- [X] T003 Contract test（先写、先失败）：contracts/docs-utils-cli.md C-1…C-10 断言（action 集合、scan 分组 JSON、expire 不删文件、clean 默认 dry-run/--yes 门禁、archive-check broken 清单、validate 五维校验、audit 落盘 .specify/docs/audit/、exit code 约定、不触碰 feedback 引擎）in tests/contract/test_docs_utils_cli.py
+- [X] T004 实现 scripts/python/docs-utils.py：单一 argparse `--action {scan,expire,clean,archive-check,stats,validate,audit}`，标准库-only，stdout 单 JSON；字面量以 requirements.md Shared Strings（[[STR-001..004]]）为准
+- [X] T005 双写镜像 .specify/scripts/python/docs-utils.py（`\cp -f` 防 cp -i 别名）
+- [X] T006 校验：`diff -q scripts/python/docs-utils.py .specify/scripts/python/docs-utils.py` 零差异；T003 契约测试转绿
 
 **Checkpoint**: 引擎可用——各用户故事可开始
 
@@ -74,18 +74,18 @@
 
 ### Tests for User Story 1 (MANDATORY) ⚠️
 
-- [ ] T007 [P] [US1] Contract test（先写、先失败）：contracts/docs-command-template.md C-1…C-11 结构断言（frontmatter、章节顺序、作用域表、门禁表、四产物落点、docs/archive/、薄调度、根相对 shared/ 引用、注册表种子）in tests/contract/test_docs_command_template.py
-- [ ] T008 [P] [US1] Integration test：bootstrap 骨架清单（SC-001）+ 防抖（同一夹具连续两次 validate/audit 第二次零新增收敛项，SC-002 确定性部分）+ 命名违规点名（SC-006，messy 夹具 validate）in tests/integration/test_docs_command_scenarios.py
+- [X] T007 [P] [US1] Contract test（先写、先失败）：contracts/docs-command-template.md C-1…C-11 结构断言（frontmatter、章节顺序、作用域表、门禁表、四产物落点、docs/archive/、薄调度、根相对 shared/ 引用、注册表种子）in tests/contract/test_docs_command_template.py
+- [X] T008 [P] [US1] Integration test：bootstrap 骨架清单（SC-001）+ 防抖（同一夹具连续两次 validate/audit 第二次零新增收敛项，SC-002 确定性部分）+ 命名违规点名（SC-006，messy 夹具 validate）in tests/integration/test_docs_command_scenarios.py
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] author-section：编写 templates/commands/docs.md（frontmatter description/handoffs；## User Input / ## Glossary / ## Outline（作用域判定表、R0–R6 薄调度引用 shared/patterns/reconcile-pattern.md、分级确认门禁、四件产物、bootstrap 骨架含 FR-010 注册表四条种子语义与 ADR decisions/ 模板节）/ ## Feedback（unit-id /speckit.docs）/ ## Documentation / ## Handoffs）
-- [ ] T010 [US1] mirror-parity（双写）：运行 `python3 scripts/python/regen-command-copies.py` 生成 .specify/templates/commands/docs.md 镜像 + 全部工具运行时副本（.claude/.github/.qoder/.qwen/.opencode/.codex/.hermes/.iflow 既存目录）
-- [ ] T011 [US1] mirror-parity（校验）：`python3 scripts/python/regen-command-copies.py --check` 零漂移；T007 契约测试转绿
-- [ ] T012 [P] [US1] author-section：编写命令参考文档 docs/commands/docs.md（结构对齐 docs/commands/history.md：When to Use / Syntax / Execution Flow / Output Artifacts / Tool Support）
-- [ ] T013 [US1] docs/quickstart.md 命令表新增 /speckit.docs 行（含 `[details →](commands/docs.md)` 链接）
-- [ ] T014 [US1] render-verify：以 blank/messy 夹具走一遍引擎确定性路径（validate → audit）确认四件产物落点与审计内容；T008 集成测试转绿
-- [ ] T015 [US1] Manual QA：交互会话运行 quickstart 场景 1/2（bootstrap + 全量调谐防抖），证据记入 verification.md
+- [X] T009 [US1] author-section：编写 templates/commands/docs.md（frontmatter description/handoffs；## User Input / ## Glossary / ## Outline（作用域判定表、R0–R6 薄调度引用 shared/patterns/reconcile-pattern.md、分级确认门禁、四件产物、bootstrap 骨架含 FR-010 注册表四条种子语义与 ADR decisions/ 模板节）/ ## Feedback（unit-id /speckit.docs）/ ## Documentation / ## Handoffs）
+- [X] T010 [US1] mirror-parity（双写）：运行 `python3 scripts/python/regen-command-copies.py` 生成 .specify/templates/commands/docs.md 镜像 + 全部工具运行时副本（.claude/.github/.qoder/.qwen/.opencode/.codex/.hermes/.iflow 既存目录）
+- [X] T011 [US1] mirror-parity（校验）：`python3 scripts/python/regen-command-copies.py --check` 零漂移；T007 契约测试转绿
+- [X] T012 [P] [US1] author-section：编写命令参考文档 docs/commands/docs.md（结构对齐 docs/commands/history.md：When to Use / Syntax / Execution Flow / Output Artifacts / Tool Support）
+- [X] T013 [US1] docs/quickstart.md 命令表新增 /speckit.docs 行（含 `[details →](commands/docs.md)` 链接）
+- [X] T014 [US1] render-verify：以 blank/messy 夹具走一遍引擎确定性路径（validate → audit）确认四件产物落点与审计内容；T008 集成测试转绿
+- [X] T015 [US1] Manual QA：交互会话运行 quickstart 场景 1/2（bootstrap + 全量调谐防抖），证据记入 verification.md
 
 **Checkpoint**: MVP——命令可独立交付
 
@@ -99,14 +99,14 @@
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T016 [P] [US2] Integration test：三条退场路径（合入 archived+target、续期回 draft、clean --yes 确认删除）+ 超期点名 100%（SC-003）+ invalid 修复建议（默认 expires=created+60 天）in tests/integration/test_docs_notes_lifecycle.py
+- [X] T016 [P] [US2] Integration test：三条退场路径（合入 archived+target、续期回 draft、clean --yes 确认删除）+ 超期点名 100%（SC-003）+ invalid 修复建议（默认 expires=created+60 天）in tests/integration/test_docs_notes_lifecycle.py
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] author-section：在 templates/commands/docs.md 的 bootstrap 骨架节补全 notes 区规则 README 内容与 frontmatter 模板（title/created/expires/status/target/tags；引用 [[STR-001..004]] 字面量）
-- [ ] T018 [US2] mirror-parity（双写+校验）：T017 修改后重跑 `regen-command-copies.py` 并 `--check` 零漂移
-- [ ] T019 [US2] refresh-verify：对 notes_samples 夹具重复执行 scan/expire/stats 两轮，确认幂等（第二轮 expire marked=0）；T016 转绿
-- [ ] T020 [US2] Manual QA：交互会话按 quickstart 场景 3 演练三条退场路径，证据记入 verification.md
+- [X] T017 [US2] author-section：在 templates/commands/docs.md 的 bootstrap 骨架节补全 notes 区规则 README 内容与 frontmatter 模板（title/created/expires/status/target/tags；引用 [[STR-001..004]] 字面量）
+- [X] T018 [US2] mirror-parity（双写+校验）：T017 修改后重跑 `regen-command-copies.py` 并 `--check` 零漂移
+- [X] T019 [US2] refresh-verify：对 notes_samples 夹具重复执行 scan/expire/stats 两轮，确认幂等（第二轮 expire marked=0）；T016 转绿
+- [X] T020 [US2] Manual QA：交互会话按 quickstart 场景 3 演练三条退场路径，证据记入 verification.md
 
 **Checkpoint**: US1+US2 均可独立验证
 
@@ -120,16 +120,16 @@
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T021 [P] [US3] Contract test（先写、先失败）：contracts/docs-step-injection.md C-1…C-9 断言（单一事实源镜像一致、14/4 注入范围、## Documentation 紧邻 ## Feedback 且在 ## Handoffs 前、引用不复制、无新增持久化存储）in tests/contract/test_docs_step_injection.py
+- [X] T021 [P] [US3] Contract test（先写、先失败）：contracts/docs-step-injection.md C-1…C-9 断言（单一事实源镜像一致、14/4 注入范围、## Documentation 紧邻 ## Feedback 且在 ## Handoffs 前、引用不复制、无新增持久化存储）in tests/contract/test_docs_step_injection.py
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] author-section：编写 shared/workflow/docs-step.md（评估语义、结论二选一格式、非阻断、增量评估禁全量 R0–R6、安全写入门禁、移动/归档级动作降级为"建议运行 /speckit.docs"）
-- [ ] T023 [US3] mirror-parity（双写+校验）：`\cp -f` 到 .specify/shared/workflow/docs-step.md 并 `diff -q` 零差异
-- [ ] T024 [US3] author-section：向 13 个既有复杂命令模板 templates/commands/{agents,analyze,clarify,constitution,feature,history,implement,instructions,plan,requirements,research,review,tasks}.md 注入 `## Documentation` 引用节（紧邻 ## Feedback；根相对 `shared/workflow/docs-step.md` 引用）——以 test_feedback_command_classification.py 的 COMPLEX_COMMANDS 实际清单为准核对成员
-- [ ] T025 [US3] 更新 tests/contract/test_feedback_command_classification.py：COMPLEX_COMMANDS 加入 `docs`（13→14），SIMPLE_COMMANDS 保持 4，计数断言同步
-- [ ] T026 [US3] mirror-parity（双写+校验）：重跑 `regen-command-copies.py` 覆盖全部被注入模板的镜像与工具副本，`--check` 零漂移；T021 转绿
-- [ ] T027 [US3] Manual QA：交互会话运行一个复杂命令至收尾，观察 Documentation 步骤输出"需记录/无需记录"且不阻断（quickstart 场景 5），证据记入 verification.md
+- [X] T022 [US3] author-section：编写 shared/workflow/docs-step.md（评估语义、结论二选一格式、非阻断、增量评估禁全量 R0–R6、安全写入门禁、移动/归档级动作降级为"建议运行 /speckit.docs"）
+- [X] T023 [US3] mirror-parity（双写+校验）：`\cp -f` 到 .specify/shared/workflow/docs-step.md 并 `diff -q` 零差异
+- [X] T024 [US3] author-section：向 13 个既有复杂命令模板 templates/commands/{agents,analyze,clarify,constitution,feature,history,implement,instructions,plan,requirements,research,review,tasks}.md 注入 `## Documentation` 引用节（紧邻 ## Feedback；根相对 `shared/workflow/docs-step.md` 引用）——以 test_feedback_command_classification.py 的 COMPLEX_COMMANDS 实际清单为准核对成员
+- [X] T025 [US3] 更新 tests/contract/test_feedback_command_classification.py：COMPLEX_COMMANDS 加入 `docs`（13→14），SIMPLE_COMMANDS 保持 4，计数断言同步
+- [X] T026 [US3] mirror-parity（双写+校验）：重跑 `regen-command-copies.py` 覆盖全部被注入模板的镜像与工具副本，`--check` 零漂移；T021 转绿
+- [X] T027 [US3] Manual QA：交互会话运行一个复杂命令至收尾，观察 Documentation 步骤输出"需记录/无需记录"且不阻断（quickstart 场景 5），证据记入 verification.md
 
 **Checkpoint**: 文档同步步骤全网生效
 
@@ -143,11 +143,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T028 [US4] 为 docs/notes/docs-design.md 与 docs/notes/notes-design.md 补合规 frontmatter（status: draft、target 指向计划中的正式归宿文档）
-- [ ] T029 [US4] 交互会话运行 `/speckit.docs`（激进重组基调）：干跑计划逐项确认后收敛——docs/ 子目录向 concepts/tutorials/tasks/reference/decisions/contribute 归位、新建根 ARCHITECTURE.md 与 CONTRIBUTING.md（≤一屏）、归档区 docs/archive/、两份设计笔记内容合入正式文档后置 archived
-- [ ] T030 [US4] 同步一贯性表面：更新 .specify/instructions.md Documentation Map 与全部内部链接至新路径（经 /speckit.instructions 或手工），保持 README → docs 单向引用
-- [ ] T031 [US4] render-verify：`python3 scripts/python/docs-utils.py --action validate` 零断链；`find . -type l` 符号链接完好；`regen-command-copies.py --check` 零漂移；`--action archive-check` 两笔记 target 存在
-- [ ] T032 [US4] Manual QA：SC-004 逐项证据（审计日志/残差报告路径、docs/ 顶层清单、frontmatter 抽检）记入 verification.md
+- [X] T028 [US4] 为 docs/notes/docs-design.md 与 docs/notes/notes-design.md 补合规 frontmatter（status: draft、target 指向计划中的正式归宿文档）
+- [X] T029 [US4] 交互会话运行 `/speckit.docs`（激进重组基调）：干跑计划逐项确认后收敛——docs/ 子目录向 concepts/tutorials/tasks/reference/decisions/contribute 归位、新建根 ARCHITECTURE.md 与 CONTRIBUTING.md（≤一屏）、归档区 docs/archive/、两份设计笔记内容合入正式文档后置 archived
+- [X] T030 [US4] 同步一贯性表面：更新 .specify/instructions.md Documentation Map 与全部内部链接至新路径（经 /speckit.instructions 或手工），保持 README → docs 单向引用
+- [X] T031 [US4] render-verify：`python3 scripts/python/docs-utils.py --action validate` 零断链；`find . -type l` 符号链接完好；`regen-command-copies.py --check` 零漂移；`--action archive-check` 两笔记 target 存在
+- [X] T032 [US4] Manual QA：SC-004 逐项证据（审计日志/残差报告路径、docs/ 顶层清单、frontmatter 抽检）记入 verification.md
 
 **Checkpoint**: Dogfooding 完成，框架自身文档合规
 
@@ -161,15 +161,16 @@
 
 ### Implementation for User Story 5
 
-- [ ] T033 [US5] 演练：完成一次合格 /speckit.docs 运行的 Feedback 步骤（feedback-utils.py record，unit-id "/speckit.docs"），随后以相同 run-id 重复记录验证 `duplicate: true` 去重；确认引擎动作集与存储布局零变化（SC-005），证据记入 verification.md
+- [X] T033 [US5] 演练：完成一次合格 /speckit.docs 运行的 Feedback 步骤（feedback-utils.py record，unit-id "/speckit.docs"），随后以相同 run-id 重复记录验证 `duplicate: true` 去重；确认引擎动作集与存储布局零变化（SC-005），证据记入 verification.md
 
 ---
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T034 refresh-verify：执行 quickstart.md 全部 CLI 示例逐条真实回验（C-11），修正任何漂移（改文档或改实现，以契约为准）
-- [ ] T035 全量 pytest 回归并与 T001 基线对比：零新增失败；结果记入 verification.md
-- [ ] T036 完成 verification.md：SC-001…SC-007 逐项 `SC-NNN_status=pass|deferred` + 证据行 + `deferred_tasks=` 清单
+- [X] T034 refresh-verify：执行 quickstart.md 全部 CLI 示例逐条真实回验（C-11），修正任何漂移（改文档或改实现，以契约为准）
+- [X] T035 全量 pytest 回归并与 T001 基线对比：零新增失败；结果记入 verification.md
+- [X] T036 完成 verification.md：SC-001…SC-007 逐项 `SC-NNN_status=pass|deferred` + 证据行 + `deferred_tasks=` 清单
+- [X] T037 （运行中用户指示）保留文件名严格阻断：宪法原则 X 修订（v1.7.0）+ ADR-0002 + FR-010 强化 + 引擎 reserved-name-misplaced 校验 + 4 个嵌套 README.md → index.md + 模板/参考/夹具/契约/测试全链路同步
 
 ---
 

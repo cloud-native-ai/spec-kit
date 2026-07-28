@@ -25,7 +25,7 @@ def repo_root() -> Path:
 def qoder_support_surface_files(repo_root: Path) -> list[Path]:
     return [
         repo_root / "README.md",
-        repo_root / "docs" / "installation.md",
+        repo_root / "docs" / "tutorials" / "installation.md",
         repo_root / ".specify" / "instructions.md",
         repo_root / "templates" / "plan-template.md",
         repo_root / "templates" / "commands" / "agents.md",
@@ -36,8 +36,7 @@ def qoder_support_surface_files(repo_root: Path) -> list[Path]:
 def claude_support_surface_files(repo_root: Path) -> list[Path]:
     return [
         repo_root / "README.md",
-        repo_root / "docs" / "installation.md",
-        repo_root / "docs" / "usage.md",
+        repo_root / "docs" / "tutorials" / "installation.md",
         repo_root / ".specify" / "memory" / "constitution.md",
         repo_root / "templates" / "plan-template.md",
         repo_root / "templates" / "instructions-template.md",

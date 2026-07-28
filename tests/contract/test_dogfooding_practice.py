@@ -71,7 +71,8 @@ def test_c1_version_minor_bumped():
     text = read(CONSTITUTION)
     m = re.search(r"\*\*Version\*\*: (\S+)", text)
     assert m, "constitution version line missing"
-    assert m.group(1).startswith("1.6"), f"expected MINOR bump to 1.6.x, found {m.group(1)}"
+    parts = tuple(int(x) for x in m.group(1).split(".")[:2])
+    assert parts >= (1, 6), f"expected version >= 1.6 (Dogfooding landed in 1.6.0), found {m.group(1)}"
 
 
 # --- C-6: terminology — canonical noun only, no misspelled variants ---
