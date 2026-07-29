@@ -25,6 +25,9 @@ export function workspaceToClaudeSlugVariants(workspace) {
   const expanded = expandHome(workspace ?? process.cwd());
   const normalized = path.win32.isAbsolute(expanded) ? path.win32.normalize(expanded) : normalizeWorkspace(expanded);
   return [...new Set([
+    // Observed Claude Code rule (verified 2026-07-29 against a real store:
+    // /cws_work → -cws-work): every non-alphanumeric character becomes "-".
+    normalized.replace(/[^a-zA-Z0-9]/g, "-"),
     normalized.replace(/:/g, "-").replace(/[\\/]+/g, "-"),
     normalized.replace(/:/g, "").replace(/[\\/]+/g, "-"),
   ])];

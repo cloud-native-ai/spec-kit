@@ -224,7 +224,14 @@ async function loadPlatform(platform = "qoder") {
       main: module.main,
     };
   }
-  throw new Error(`Unsupported platform: ${platform}. Supported platforms: qoder, codex, claude, cursor.`);
+  if (platform === "opencode") {
+    const module = await import("./session-analysis/platforms/opencode.mjs");
+    return {
+      Analyzer: module.OpencodeSessionAnalyzer,
+      main: module.main,
+    };
+  }
+  throw new Error(`Unsupported platform: ${platform}. Supported platforms: qoder, codex, claude, cursor, opencode.`);
 }
 
 export async function createAnalyzer(platform = "qoder") {

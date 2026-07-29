@@ -201,11 +201,34 @@ def engine_subset_path(root: Path):
     return None
 
 
+SESSION_FILE_SUFFIXES = (".jsonl", ".json")
+
+
+def probe_session_store(store: str) -> str:
+    """Three-state probe (P7-a): directory existence alone is not evidence of sessions."""
+    base = Path(os.path.expanduser(store))
+    if not base.exists():
+        return "not-detected"
+    try:
+        stack = [base]
+        depth = {base: 0}
+        while stack:
+            current = stack.pop()
+            for entry in current.iterdir():
+                if entry.is_file() and entry.suffix in SESSION_FILE_SUFFIXES:
+                    return "detected"
+                if entry.is_dir() and depth[current] < 3:
+                    depth[entry] = depth[current] + 1
+                    stack.append(entry)
+    except OSError:
+        return "detected-empty"
+    return "detected-empty"
+
+
 def probe_platforms() -> dict:
     platforms = {}
     for name, store in PLATFORM_SESSION_STORES.items():
-        detected = Path(os.path.expanduser(store)).exists()
-        platforms[name] = {"sessionStore": "detected" if detected else "not-detected"}
+        platforms[name] = {"sessionStore": probe_session_store(store)}
     return platforms
 
 

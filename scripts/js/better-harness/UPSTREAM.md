@@ -14,7 +14,7 @@ upstream relative layout so cross-imports (`../session-analysis/...`) resolve un
 | Path | Purpose |
 |------|---------|
 | `session-analysis.mjs` | session-lane CLI entry (upstream root-level entry, kept sibling to `session-analysis/`) |
-| `session-analysis/` | session discovery, Task Episodes, redaction funnel (`privacy-safe-text.mjs`, `semantic-facets.mjs`), platform adapters (`platforms/{qoder,codex,claude,cursor}.mjs`) |
+| `session-analysis/` | session discovery, Task Episodes, redaction funnel (`privacy-safe-text.mjs`, `semantic-facets.mjs`), platform adapters (`platforms/{qoder,codex,claude,cursor}.mjs` from upstream + `platforms/opencode.mjs` spec-kit-owned, P7-b) |
 | `core-change-watch/` | project profile, git history signals, core paths, diff impact (8 self-executable scripts) |
 | `agent-customize/` | configured-asset inventory providers (`providers/{qoder,codex,claude,cursor,index}.mjs`) |
 | `coding-agent-practices/` | `asset-baseline.mjs` + `asset-integrity.mjs` + `inventory.mjs` + `asset-eval/` (three read-only envelopes; **no `checkup/`**) |
@@ -43,7 +43,10 @@ the excluded canvas subtree). The subset uses `node:` built-ins exclusively.
 |------|------|-----------|--------------|
 | 2026-07-29 | `agent-lint/index.mjs` | Removed `import ... "../findings-recommend.mjs"` and made `withAgentsMdRecommendation()` an identity function — findings-recommend is verdict-layer, excluded per contracts C-B2; findings pass through without recommendation enrichment | No (subset-boundary specific) |
 | 2026-07-29 | `agent-lint/index.mjs` | `resolveReference` normalizes the spec-kit `${SKILL_HOME}/` path variable to owner-relative `./` before resolution — eliminates 4 false-positive "missing local reference" findings on skills using the documented `${SKILL_HOME}` convention | Yes (generic path-variable hook could be upstreamed) |
-| 2026-07-29 | `tests/js/*.test.mjs` (spec-kit side, not in this dir) | Import/spawn paths rewritten `../scripts/...` → `../../scripts/js/better-harness/...`; facade invocations (`better-harness.mjs <group> <cmd>`) rewritten to direct capability-CLI invocations; two verdict-layer tests (agents-md-review recommendation fields, findings-recommend catalog) removed | No (layout specific) |
+| 2026-07-29 | `session-analysis/platforms/claude.mjs` | `workspaceToClaudeSlugVariants` adds the observed Claude Code slug rule (every non-alphanumeric char → `-`; verified against a real store: `/cws_work` → `-cws-work`); previous variants kept for compatibility | Yes (fixes real-store discovery) |
+| 2026-07-29 | `session-analysis/platforms/opencode.mjs` (new file) | spec-kit owned opencode session adapter (provider-runner pattern, P7-b): project/storage JSON layout (info/message/part), workspace filtering by session `directory`, tool lifecycle events, inherited-timestamp gap declared via `opencode-partial-event-timestamps` warning | Yes (new platform, upstream-compatible shape) |
+| 2026-07-29 | `session-analysis.mjs` + `session-analysis/analyzer.mjs` | `loadPlatform` registers the `opencode` branch (explicit dispatch, per upstream pattern) | Yes (accompanies the opencode adapter) |
+| 2026-07-29 | `tests/js/*.test.mjs` (spec-kit side, not in this dir) | Import/spawn paths rewritten `../scripts/...` → `../../scripts/js/better-harness/...`; facade invocations (`better-harness.mjs <group> <cmd>`) rewritten to direct capability-CLI invocations; two verdict-layer tests (agents-md-review recommendation fields, findings-recommend catalog) removed; `session-analysis-opencode.test.mjs` added (5 fixture tests) | No (layout specific) |
 
 ## Resync Policy
 

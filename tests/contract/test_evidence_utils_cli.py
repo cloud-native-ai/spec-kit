@@ -95,7 +95,7 @@ class TestCE3Doctor:
         expected = {"qoder", "codex", "claude", "copilot", "opencode", "qwen", "hermes", "iflow"}
         assert expected.issubset(set(doctor["platforms"].keys()))
         for name, info in doctor["platforms"].items():
-            assert info["sessionStore"] in ("detected", "not-detected"), name
+            assert info["sessionStore"] in ("detected", "detected-empty", "not-detected"), name
 
     def test_lanes_block(self, doctor):
         assert set(doctor["lanes"].keys()) == {"session", "project", "assets", "runs", "feedback"}
