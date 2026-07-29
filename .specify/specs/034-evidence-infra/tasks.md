@@ -121,14 +121,14 @@
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T019 [P] [US3] 集成测试 `tests/integration/test_evidence_python_lanes.py`(先写先红):runs 泳道对 fixture 团队目录(完整版含 STATE.md/run-log.jsonl + 残缺版仅 runs/)的 partial 降级(C-E9)、feedback 泳道 recurrence 聚合与 index 缺失回退(C-E10)、无 Node PATH 下 collect --lanes all 的降级行为(C-E4.3,SC-003)、C-F13 package 排除断言(构造 evidence 目录后跑 feedback package,断言 zip 无 evidence 路径)
+- [X] T019 [P] [US3] 集成测试 `tests/integration/test_evidence_python_lanes.py`(先写先红):runs 泳道对 fixture 团队目录(完整版含 STATE.md/run-log.jsonl + 残缺版仅 runs/)的 partial 降级(C-E9)、feedback 泳道 recurrence 聚合与 index 缺失回退(C-E10)、无 Node PATH 下 collect --lanes all 的降级行为(C-E4.3,SC-003)、C-F13 package 排除断言(构造 evidence 目录后跑 feedback package,断言 zip 无 evidence 路径)
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] 实现 runs 泳道(C-E9):扫描 `.specify/teams/*/`,解析 runs/*-report.md 计数、STATE.md `## Post-Run Critique` 追加行、run-log.jsonl 七字段;缺文件按 partial,无 teams 目录 unavailable;Python 侧脱敏后成条目(signals:cycles/escalations/falsePositives 等)
-- [ ] T021 [US3] 实现 feedback 泳道(C-E10):读 index.json + 条目 `## Optimization Points`,跨条目重复主题聚合为 `signals.recurrence`,evidenceRefs 用条目相对路径;index 缺失回退全量扫描(partial)
-- [ ] T022 [US3] 实现 compare 基础(C-E7 前半):baseline/current 解析(默认次新/最新)、signalDeltas 计算、newEvidence/resolvedEvidence 对账;intervention verdict 部分留 US6(输出结构预留 intervention 键)
-- [ ] T023 [US3] 运行 T019 全绿 + 真实数据演练:`--action collect --target project --lanes all` 断言 feedback 泳道 entries 与 `.specify/memory/feedback/index.json` 动态一致、runs 泳道 teamsScanned=2(bh-port-monitor 完整 + draw-plantuml-optimizer partial);quickstart §6 无 Node 命令实测;更新镜像 `scripts/python/evidence-utils.py` 并 `diff -q`
+- [X] T020 [US3] 实现 runs 泳道(C-E9):扫描 `.specify/teams/*/`,解析 runs/*-report.md 计数、STATE.md `## Post-Run Critique` 追加行、run-log.jsonl 七字段;缺文件按 partial,无 teams 目录 unavailable;Python 侧脱敏后成条目(signals:cycles/escalations/falsePositives 等)
+- [X] T021 [US3] 实现 feedback 泳道(C-E10):读 index.json + 条目 `## Optimization Points`,跨条目重复主题聚合为 `signals.recurrence`,evidenceRefs 用条目相对路径;index 缺失回退全量扫描(partial)
+- [X] T022 [US3] 实现 compare 基础(C-E7 前半):baseline/current 解析(默认次新/最新)、signalDeltas 计算、newEvidence/resolvedEvidence 对账;intervention verdict 部分留 US6(输出结构预留 intervention 键)
+- [X] T023 [US3] 运行 T019 全绿 + 真实数据演练:`--action collect --target project --lanes all` 断言 feedback 泳道 entries 与 `.specify/memory/feedback/index.json` 动态一致、runs 泳道 teamsScanned=2(bh-port-monitor 完整 + draw-plantuml-optimizer partial);quickstart §6 无 Node 命令实测;更新镜像 `scripts/python/evidence-utils.py` 并 `diff -q`
 
 **Checkpoint**: 五泳道齐备,纯 Python 环境保底可用
 
