@@ -1,0 +1,32 @@
+{
+  "runId": "ev-20260729-102952-project",
+  "target": "project",
+  "created": "2026-07-29T10:29:52Z",
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "unavailable",
+      "reason": "lane not requested"
+    },
+    "assets": {
+      "status": "unavailable",
+      "reason": "lane not requested"
+    },
+    "runs": {
+      "status": "unavailable",
+      "reason": "lane not requested"
+    },
+    "feedback": {
+      "status": "unavailable",
+      "reason": "lane not requested"
+    }
+  },
+  "engine": {
+    "engineSubsetPath": "scripts/js/better-harness",
+    "upstreamCommit": "b2e621d",
+    "nodeVersion": "25.9.0"
+  },
+  "findingsDigest": "sha256:9e6306e58c38bfd85e36c0adea7830a47b090feab2909d9d57d3bb8f8cb490a4"
+}
