@@ -1,10 +1,120 @@
 {
   "store": "feedback",
-  "updated": "2026-07-28T11:30:36Z",
+  "updated": "2026-07-29T09:49:58Z",
   "threshold": 10,
   "count_since_submission": 0,
-  "submitted_at": "2026-07-28T11:30:36Z",
+  "submitted_at": "2026-07-29T09:49:58Z",
   "entries": [
+    {
+      "id": "20260729T093943Z-skill-collect-evidence",
+      "file": "20260729T093943Z-skill-collect-evidence.md",
+      "unit_id": "skill:collect-evidence",
+      "unit_type": "skill",
+      "run_id": "dogfood-project-20260729",
+      "feature": "034-evidence-infra",
+      "partial": false,
+      "created": "2026-07-29T09:39:43Z",
+      "summary": "对 spec-kit 自身完成首次真实 dogfood 证据闭环:采集(ev-093344)→分拣冻结唯一缺陷候选(assets 泳道计数缺陷)→最小修复+回归钉点→台账→第二轮采集+compare(lintFindings 3→16)→verdict=Outcome-supported(机制首个正向判定)。红线全守:Unobserved 只记录、计数不产生发现、冻结外发现(上游 SKILL_HO"
+    },
+    {
+      "id": "20260729T093535Z-skill-create-team",
+      "file": "20260729T093535Z-skill-create-team.md",
+      "unit_id": "skill:create-team",
+      "unit_type": "skill",
+      "run_id": "create-team-bh-port-monitor-run-20260729T093345Z",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-29T09:35:35Z",
+      "summary": "执行 bh-port-monitor cycle 4（收官）：41/41 任务、DoD green、Feature 038 Implemented，本 loop 独立终验三项实跑全绿；全程 4 cycles 误报 0/3、零写入，加权 0.9175。用户 override 预算断路器按人工授权处理并双留痕。"
+    },
+    {
+      "id": "20260729T075223Z-speckit-implement",
+      "file": "20260729T075223Z-speckit-implement.md",
+      "unit_id": "/speckit.implement",
+      "unit_type": "command",
+      "run_id": "034-evidence-infra-20260729",
+      "feature": "034-evidence-infra",
+      "partial": false,
+      "created": "2026-07-29T07:52:23Z",
+      "summary": "spec 034 实施完成:41/41 任务、6 次提交(US1-US6 + wrap-up)、SC-001..008 全 pass。引擎子集移植含两处复制期修正(asset-eval 补入、findings-recommend 剔除)均记 UPSTREAM.md;全套回归以失败集 diff 证明零新增失败(84F 基线不变,+75 通过);两轮 dogfood 闭环以诚实 Unobserved "
+    },
+    {
+      "id": "20260729T074212Z-skill-create-team",
+      "file": "20260729T074212Z-skill-create-team.md",
+      "unit_id": "skill:create-team",
+      "unit_type": "skill",
+      "run_id": "create-team-bh-port-monitor-run-20260729T074013Z",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-29T07:42:12Z",
+      "summary": "执行 bh-port-monitor cycle 3（增量锚点+精简采集）：HP-3 闭环（累计误报 0/3），实现 23/41 任务四项深检全绿，加权 0.895；晋级判据达标但按 goal 建议维持 L1 终态。发现预算 75%~80% 区间的精简采集缺操作定义。"
+    },
+    {
+      "id": "20260729T072158Z-skill-create-team",
+      "file": "20260729T072158Z-skill-create-team.md",
+      "unit_id": "skill:create-team",
+      "unit_type": "skill",
+      "run_id": "create-team-bh-port-monitor-run-20260729T072002Z",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-29T07:21:58Z",
+      "summary": "执行 bh-port-monitor 的 continuous cycle 2（run 模式，preview→confirm→execute 门禁完整）：上轮 2 个 HP 项闭环核销（误报 0/2），检出新 HP-3，STATE 剪枝 3 项，加权 0.890（↑0.015）。流程顺畅；发现 run-log schema 与晋级判据字段脱节。"
+    },
+    {
+      "id": "20260729T071153Z-speckit-tasks",
+      "file": "20260729T071153Z-speckit-tasks.md",
+      "unit_id": "/speckit.tasks",
+      "unit_type": "command",
+      "run_id": "034-evidence-infra-20260729",
+      "feature": "034-evidence-infra",
+      "partial": false,
+      "created": "2026-07-29T07:11:53Z",
+      "summary": "spec 034 任务分解完成:41 任务/10 阶段,按 7 用户故事组织;Tests Mode ON(宪法 IV),6 组先写先红测试任务;镜像义务逐行转为 dual-write+diff 配对任务;环境探测发现 Node 25 超 engines 上限并预置降级策略;交付边界(US7 仅 doctor 报告)落实为单任务 T038。"
+    },
+    {
+      "id": "20260729T064602Z-speckit-plan",
+      "file": "20260729T064602Z-speckit-plan.md",
+      "unit_id": "/speckit.plan",
+      "unit_type": "command",
+      "run_id": "034-evidence-infra-20260729",
+      "feature": "034-evidence-infra",
+      "partial": false,
+      "created": "2026-07-29T06:46:02Z",
+      "summary": "spec 034 计划完成:plan.md(11 原则 Constitution Check,VIII 受治理分叉 Partial)+ data-model 9 实体 + contracts ×3(C-F14/C-E11/C-B7)+ quickstart + feature-ref;并行 Explore 勘察修正 4 处实施关键事实(根级 CLI 入口、agent-lint 依赖、镜像存量漂移、"
+    },
+    {
+      "id": "20260729T063617Z-skill-create-team",
+      "file": "20260729T063617Z-skill-create-team.md",
+      "unit_id": "skill:create-team",
+      "unit_type": "skill",
+      "run_id": "create-team-bh-port-monitor-20260729T063425Z",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-29T06:36:17Z",
+      "summary": "创建 continuous(L1) 监控团队 bh-port-monitor 并完成首个 cycle：goal 先行确认、四文件运营脊柱落盘、基线报告产出（加权 0.875≥0.8）。流程顺畅；发现监控'另一 session 未提交工作树'场景缺少增量锚点约定。"
+    },
+    {
+      "id": "20260729T063542Z-speckit-clarify",
+      "file": "20260729T063542Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "034-evidence-infra-20260729",
+      "feature": "034-evidence-infra",
+      "partial": false,
+      "created": "2026-07-29T06:35:42Z",
+      "summary": "Mode A 澄清 spec 034:3 问 3 答全部采纳推荐项——新建 Feature 038 并完成注册(索引+详情文件)、FR-014 镜像策略定稿(全量镜像)、US7 交付边界定界(doctor 报告为限);NEEDS CLARIFICATION 清零,检查单全项通过。"
+    },
+    {
+      "id": "20260729T061035Z-speckit-requirements",
+      "file": "20260729T061035Z-speckit-requirements.md",
+      "unit_id": "/speckit.requirements",
+      "unit_type": "command",
+      "run_id": "034-evidence-infra-20260729",
+      "feature": "034-evidence-infra",
+      "partial": false,
+      "created": "2026-07-29T06:10:35Z",
+      "summary": "对 better-harness 证据基础设施移植方案完成规格化:7 用户故事、14 FR、8 SC、11 Shared Strings;并行 subagent 核实历史会话后修订 3 处事实偏差(Claude 适配器现状、源码探测优先于上游文档、时点计数动态化);保留 1 个镜像策略澄清项交 /speckit.clarify。"
+    },
     {
       "id": "20260728T103718Z-speckit-review",
       "file": "20260728T103718Z-speckit-review.md",

@@ -222,6 +222,8 @@ Every task MUST strictly follow this format:
   - Each phase should be a complete, independently testable increment
 - **Final Phase**: Polish & Cross-Cutting Concerns
 
+**Asset-migration phase shape (porting/vendoring an external code subset)**: when a spec copies an external codebase subset in as a hosted asset, split the copy from its acceptance: the **physical copy + static dependency-closure check** is Foundational (Phase 2 — it blocks everything), while **governance artifacts** (provenance ledger, license, ported regression tests, mirrors) belong to the user story that owns the asset. Two standard acceptance actions for the copy task: (1) grep-assert every import resolves to the runtime's builtins or inside the subset; (2) **actually resolve all entry modules with the runtime** (e.g. `node -e "await import(...)"` per entry) — checklist-driven copying misses transitive dependencies that only real module resolution exposes.
+
 **Doc-feature phase shape (template-only / documentation / prompt-framework specs)**: when the spec's deliverables are templates, docs, prompts, or skills rather than runtime code, "Models → Services → Endpoints" does not apply — do not force it. Switch the within-story order to the doc-feature taxonomy:
 1. **author-section** — write/edit the template or document section itself
 2. **mirror-parity** — for each row of plan.md's *Mirror Obligations* table, emit a **paired task set**: one task to dual-write every mirror/copy AND one task to verify parity (`diff -q` for mirrors; grep-for-the-edit for regenerated per-tool copies). Mirror pairs are first-class tasks, never implicit side-effects of the authoring task.

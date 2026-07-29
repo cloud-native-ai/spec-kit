@@ -91,8 +91,10 @@ kill_switch: <flag/label>   # 例如 loop-pause-all
 
 规则：
 - **无可执行工作** → 以极小开销早退（不派子代理），并在 run-log 记 `no-op`。
+- 花费 **≥ 75%** 日预算 → 进入**精简档**（report-only 的前置降档）：跳过高成本核验项（如全量测试实测、逐文件 diff 复扫），只保留轻量观察（状态文件、日志尾部、计数对账）；每个被跳过的检项必须在 run report 中显式标注 `skipped(budget)` 并把对应结论记为 Unobserved，不得静默省略。
 - 花费 **≥ 80%** 日预算 → 切 **report-only**（等价临时降到 L1）。
 - 花费 **≥ 100%** 或 kill-switch 生效 → **立即退出**，在 `STATE.md` 留一行说明。
+- **用户显式解除断路器**：用户可在确认门显式 override 预算断路器（人工授权优先于 loop 自律护栏），但必须双留痕（run report + STATE.md：授权人、时点、实际消耗），且授权仅对**当前 cycle** 有效——下一 cycle 断路器自动恢复。
 - 绝不超过 `max_subagents_per_cycle`。
 
 ## 5. 状态脊柱（跨运行记忆）
@@ -116,6 +118,8 @@ Last cycle: <ISO-8601>   Maturity: L1|L2|L3   Cadence: <...>
 - <cycle 时间>: 误报=<n>；噪声项；下一轮的一个改进
 ```
 
+**增量锚点**：当监控对象是一个（可能属于另一 session 的）工作树时，每 cycle 在 STATE.md 固化一行观测锚点——`Anchor: HEAD=<sha> statusHash=<sha256(git status --porcelain)>`。下一 cycle 先比对锚点：未变化即可跳过全量重扫（记 no-op 或轻量确认）；变化则以 `git diff <旧HEAD>` 做增量审读,而非全量基线盘点。
+
 ## 6. 独立验证者（Maker/Checker，L2+ 强制）
 
 这是把 `iteration` 的 evaluator 按 Loop Engineering 强化后的形态。L2 及以上，任何交付物改动都要经过**独立验证者**：
@@ -134,8 +138,10 @@ Last cycle: <ISO-8601>   Maturity: L1|L2|L3   Cadence: <...>
 - **Run-Log**：向 `.specify/teams/<slug>/run-log.jsonl` 追加一行结构化记录，便于观测与预算核算：
 
 ```json
-{"cycle":"<ISO8601>","maturity":"L1","items_found":<n>,"actions_taken":<n>,"escalations":<n>,"tokens_estimate":<n>,"outcome":"no-op|report-only|fix-proposed|escalated|halted"}
+{"cycle":"<ISO8601>","maturity":"L1","items_found":<n>,"resolved":<n>,"false_positives":<n>,"actions_taken":<n>,"escalations":<n>,"tokens_estimate":<n>,"outcome":"no-op|report-only|fix-proposed|escalated|halted"}
 ```
+
+`resolved`（本 cycle 关闭的既有项）与 `false_positives`（本 cycle 判定为误报的项）是 L1→L2 晋级门控的核心判据——逐 cycle 机读记录后，误报率可直接从 run-log 聚合，无需回读 Critique 散文。
 
 - **完整 run report** 仍按 create-team 的 Report 契约写入 `runs/<UTC-timestamp>-report.md`（每 cycle 一份）。
 

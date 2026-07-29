@@ -359,7 +359,11 @@ async function resolveReference({ workspace, ownerPath, ownerHeadings, link }) {
   }
 
   const { filePart, anchor } = splitDestination(destination);
-  const decodedFilePart = safeDecodeURIComponent(filePart);
+  // spec-kit local modification (see UPSTREAM.md): resolve the ${SKILL_HOME}
+  // path variable — it denotes the directory containing the owning SKILL.md,
+  // so links like ${SKILL_HOME}/references/x.md are owner-relative.
+  const normalizedFilePart = filePart.replace(/^\$\{SKILL_HOME\}\//, "./");
+  const decodedFilePart = safeDecodeURIComponent(normalizedFilePart);
   const resolvedPath = path.resolve(path.dirname(ownerPath), decodedFilePart);
   if (!isInsideWorkspace(workspace, resolvedPath)) {
     return {

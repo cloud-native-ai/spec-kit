@@ -42,6 +42,7 @@ the excluded canvas subtree). The subset uses `node:` built-ins exclusively.
 | Date | File | Motivation | Upstreamable |
 |------|------|-----------|--------------|
 | 2026-07-29 | `agent-lint/index.mjs` | Removed `import ... "../findings-recommend.mjs"` and made `withAgentsMdRecommendation()` an identity function — findings-recommend is verdict-layer, excluded per contracts C-B2; findings pass through without recommendation enrichment | No (subset-boundary specific) |
+| 2026-07-29 | `agent-lint/index.mjs` | `resolveReference` normalizes the spec-kit `${SKILL_HOME}/` path variable to owner-relative `./` before resolution — eliminates 4 false-positive "missing local reference" findings on skills using the documented `${SKILL_HOME}` convention | Yes (generic path-variable hook could be upstreamed) |
 | 2026-07-29 | `tests/js/*.test.mjs` (spec-kit side, not in this dir) | Import/spawn paths rewritten `../scripts/...` → `../../scripts/js/better-harness/...`; facade invocations (`better-harness.mjs <group> <cmd>`) rewritten to direct capability-CLI invocations; two verdict-layer tests (agents-md-review recommendation fields, findings-recommend catalog) removed | No (layout specific) |
 
 ## Resync Policy

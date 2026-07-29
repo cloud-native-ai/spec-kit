@@ -171,6 +171,23 @@ class TestAssetsLintCount:
             "assets lane must count findings.items (upstream envelope is "
             "{items,total,omitted}); counting the dict itself reports 3 forever")
 
+    def test_lane_envelope_access_paths_pinned(self):
+        """Dogfood follow-up: pin every Node-lane envelope access path, not just lint."""
+        source = SCRIPT.read_text(encoding="utf-8")
+        for marker in (
+            '"admission"',        # session lane: envelope.admission.taskEpisodes
+            '"candidates"',       # session lane: envelope.candidates[]
+            '"primaryLanguages"', # project lane: projectInfo.primaryLanguages
+            '"envelopes"',        # assets lane: envelope.envelopes.{lint,inventory}
+        ):
+            assert marker in source, f"lane envelope access path drifted: {marker}"
+
+    def test_engine_resolves_skill_home_variable(self):
+        engine = REPO_ROOT / "scripts" / "js" / "better-harness" / "agent-lint" / "index.mjs"
+        assert "SKILL_HOME" in engine.read_text(encoding="utf-8"), (
+            "agent-lint must normalize ${SKILL_HOME} links (UPSTREAM.md local mod); "
+            "otherwise assets-lane carries 4 permanent false-positive broken refs")
+
 
 # --- C-E11 / mirror -----------------------------------------------------------
 

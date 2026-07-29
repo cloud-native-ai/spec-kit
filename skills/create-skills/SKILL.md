@@ -161,6 +161,7 @@ Minimum checks:
 - [ ] No unrelated documentation files
 - [ ] Feedback: a `## Feedback` section is present as the final workflow section (Feature 028), beginning with the runtime-mode gate. Spec Kit project mode requires the canonical engine-backed block from `.specify/shared/workflow/feedback-step.md`; standalone mode requires the self-contained variant (no engine call). A Skill without the section is non-conformant — fix before reporting completion.
 - [ ] Standalone mode only: format is consistent with sibling skills in the host directory, and no `.specify/**` path is referenced
+- [ ] Spec Kit project mode: **run the existing skill-conformance contract suite** (`pytest tests/contract/ -q -k "skill or runtime_mode"`) before reporting completion — new skills are subject to ALL pre-existing conformance contracts (runtime-mode gate, feedback-section shape, registry dedup); a later full-suite regression is the wrong place to discover a miss
 
 ### 7. Propagate the Skill to built-in agents
 
