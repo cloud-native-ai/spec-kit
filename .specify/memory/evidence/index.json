@@ -1,6 +1,6 @@
 {
   "store": "evidence",
-  "updated": "2026-07-29T09:37:56Z",
+  "updated": "2026-07-29T09:50:28Z",
   "entries": [
     {
       "runId": "ev-20260729-073639-project",
@@ -105,6 +105,19 @@
         "feedback": "available"
       },
       "file": "ev-20260729-093755-project/findings.json"
+    },
+    {
+      "runId": "ev-20260729-095028-project",
+      "target": "project",
+      "created": "2026-07-29T09:50:28Z",
+      "lanesSummary": {
+        "session": "unavailable",
+        "project": "unavailable",
+        "assets": "unavailable",
+        "runs": "partial",
+        "feedback": "available"
+      },
+      "file": "ev-20260729-095028-project/findings.json"
     }
   ]
 }

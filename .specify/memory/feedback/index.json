@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-07-29T09:49:58Z",
+  "updated": "2026-07-29T09:54:10Z",
   "threshold": 10,
-  "count_since_submission": 0,
+  "count_since_submission": 1,
   "submitted_at": "2026-07-29T09:49:58Z",
   "entries": [
+    {
+      "id": "20260729T095410Z-skill-improve-team",
+      "file": "20260729T095410Z-skill-improve-team.md",
+      "unit_id": "skill:improve-team",
+      "unit_type": "skill",
+      "run_id": "improve-team-req-impl-monitor-20260729",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-29T09:54:10Z",
+      "summary": "goal 重定义 + 通用化升格：bh-port-monitor → requirement-implement-monitor。evidence-step 走新落地的 runs/feedback 泳道（ev-001 Exercised: 4 报告/4 cycle/4 critique 佐证机制有效）；目录迁移保留 4 份 runs 档案为血统；team.md 参数化 target/通用基准 1-"
+    },
     {
       "id": "20260729T093943Z-skill-collect-evidence",
       "file": "20260729T093943Z-skill-collect-evidence.md",
