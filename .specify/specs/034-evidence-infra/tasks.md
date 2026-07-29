@@ -97,17 +97,17 @@
 
 > 先写先红:T011/T012 在 evidence-utils.py 存在前编写并确认收集失败/断言失败
 
-- [ ] T011 [P] [US2] 合同测试 `tests/contract/test_evidence_utils_cli.py`(仿 test_feedback_utils_cli.py):C-E1 action 枚举封闭与 JSON 输出、C-E2 静态断言(源码无 shell=True/网络调用/仅 stdlib import)、C-E3 doctor 键结构与零副作用、C-E5/C-E6 list/latest 行为(含 found:false 与 stale 警告)、C-E11 退出码;pin 纪律:枚举/键名断言精确,版本类断言用下限语义
-- [ ] T012 [P] [US2] 合同测试 `tests/contract/test_evidence_findings_schema.py`:C-F1 顶层白名单、C-F2 target 正则、C-F3 runId 格式、C-F4 七态枚举封闭、C-F5 泳道五键与状态枚举、C-F6 裁决字段递归黑名单、C-F7 隐私模式断言、C-F8 digest 格式与交叉一致、C-F9 条目字段、C-F10 manifest 必填、C-F12 index 结构(以运行真实 collect 产物 + 构造夹具双路径校验)
+- [X] T011 [P] [US2] 合同测试 `tests/contract/test_evidence_utils_cli.py`(仿 test_feedback_utils_cli.py):C-E1 action 枚举封闭与 JSON 输出、C-E2 静态断言(源码无 shell=True/网络调用/仅 stdlib import)、C-E3 doctor 键结构与零副作用、C-E5/C-E6 list/latest 行为(含 found:false 与 stale 警告)、C-E11 退出码;pin 纪律:枚举/键名断言精确,版本类断言用下限语义
+- [X] T012 [P] [US2] 合同测试 `tests/contract/test_evidence_findings_schema.py`:C-F1 顶层白名单、C-F2 target 正则、C-F3 runId 格式、C-F4 七态枚举封闭、C-F5 泳道五键与状态枚举、C-F6 裁决字段递归黑名单、C-F7 隐私模式断言、C-F8 digest 格式与交叉一致、C-F9 条目字段、C-F10 manifest 必填、C-F12 index 结构(以运行真实 collect 产物 + 构造夹具双路径校验)
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] 实现 `.specify/scripts/python/evidence-utils.py` 骨架与公共层:argparse(--action 五枚举)、resolve_workspace_root(仿 feedback-utils.py L112-134)、JSON 输出约定、存储路径常量(`.specify/memory/evidence/`)、runId 生成、index 读写与损坏重扫(C-F12)、脱敏过滤器(密钥模式 + 绝对路径掩码 + 字段白名单,C-F7)、findingsDigest 计算(C-F8)
-- [ ] T014 [US2] 实现 doctor(C-E3):Node 探测(版本 + satisfies 按 engines 判定但不阻断)、引擎子集在位性(含读 UPSTREAM.md 的 upstreamCommit)、八工具会话落盘探测(qoder `~/.qoder/projects/`、codex/claude/cursor 按上游 paths 约定,其余四工具按各自默认目录探测、探不到即 not-detected)、五泳道可用性汇总
-- [ ] T015 [US2] 实现 collect 的三条 Node 泳道(C-E4/C-E8):argv-array subprocess(120s 超时)、envelope → 证据条目映射(session-core-facts/asset-baseline/core-change-watch JSON → E3 结构,evidenceState 赋值规则记入实现注释引用 discipline 文档)、单泳道失败标注后继续、lanes/*.json 落盘、manifest/findings 合成
-- [ ] T016 [US2] 实现 list + latest(C-E5/C-E6,含 --max-age-days 默认 7 与 stale 警告)
-- [ ] T017 [US2] 运行 T011/T012 至全绿;并在本仓库实测 `--action doctor` 与 `--action collect --target project --lanes session,project,assets`,确认 quickstart §1-2 命令逐字可执行(执行验证门)
-- [ ] T018 [US2] 镜像 dual-write + parity:`cp -f` `.specify/scripts/python/evidence-utils.py` → `scripts/python/evidence-utils.py`;`diff -q` 零差异
+- [X] T013 [US2] 实现 `.specify/scripts/python/evidence-utils.py` 骨架与公共层:argparse(--action 五枚举)、resolve_workspace_root(仿 feedback-utils.py L112-134)、JSON 输出约定、存储路径常量(`.specify/memory/evidence/`)、runId 生成、index 读写与损坏重扫(C-F12)、脱敏过滤器(密钥模式 + 绝对路径掩码 + 字段白名单,C-F7)、findingsDigest 计算(C-F8)
+- [X] T014 [US2] 实现 doctor(C-E3):Node 探测(版本 + satisfies 按 engines 判定但不阻断)、引擎子集在位性(含读 UPSTREAM.md 的 upstreamCommit)、八工具会话落盘探测(qoder `~/.qoder/projects/`、codex/claude/cursor 按上游 paths 约定,其余四工具按各自默认目录探测、探不到即 not-detected)、五泳道可用性汇总
+- [X] T015 [US2] 实现 collect 的三条 Node 泳道(C-E4/C-E8):argv-array subprocess(120s 超时)、envelope → 证据条目映射(session-core-facts/asset-baseline/core-change-watch JSON → E3 结构,evidenceState 赋值规则记入实现注释引用 discipline 文档)、单泳道失败标注后继续、lanes/*.json 落盘、manifest/findings 合成
+- [X] T016 [US2] 实现 list + latest(C-E5/C-E6,含 --max-age-days 默认 7 与 stale 警告)
+- [X] T017 [US2] 运行 T011/T012 至全绿;并在本仓库实测 `--action doctor` 与 `--action collect --target project --lanes session,project,assets`,确认 quickstart §1-2 命令逐字可执行(执行验证门)
+- [X] T018 [US2] 镜像 dual-write + parity:`cp -f` `.specify/scripts/python/evidence-utils.py` → `scripts/python/evidence-utils.py`;`diff -q` 零差异
 
 **Checkpoint**: MVP 达成 — 引擎 + 合同 + 三 Node 泳道可独立演示
 
