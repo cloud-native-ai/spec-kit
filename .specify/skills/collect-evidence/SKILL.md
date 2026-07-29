@@ -70,7 +70,11 @@ python3 .specify/scripts/python/evidence-utils.py --action collect \
 
 ## Feedback
 
-At wrap-up, perform the agent self-reflection step per the canonical convention in `.specify/shared/workflow/feedback-step.md` (runtime-mode gate applies):
+**Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is
+running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills
+directory) — skip this entire Feedback step: no engine call, no feedback entry.
+
+At wrap-up, perform the agent self-reflection step per the canonical convention in `.specify/shared/workflow/feedback-step.md`:
 
 1. Gate on qualification & completion; skip trivial/no-op runs.
 2. Reflect without user input; produce a short review plus ≥1 concrete optimization point, or exactly `No significant optimization points identified this run.`

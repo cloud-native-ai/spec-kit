@@ -19,7 +19,7 @@
 - DoD-5: findings.json 抽查:七态封闭、裁决字段零出现、脱敏双闸生效(SC-002/004)
 - DoD-6: 对 improve-skills 完成一次"采集 → 分拣 → 优化 → 台账"闭环(SC-006);verification.md 记录 SC-001…008 逐项结论
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -204,7 +204,7 @@
 
 ### Implementation for User Story 7
 
-- [ ] T038 [US7] 运行 `--action doctor` 产出八工具本地落盘探测快照,结合探测结果撰写 `.specify/specs/034-evidence-infra/platform-adapter-survey.md`:各工具 sessionStore 探测结论、现有适配器现状(qoder/codex/claude/cursor 按源码)、后续适配器实施定序建议(初始候选 opencode → Qwen → iFlow → Hermes → Copilot 按探测修正)、每适配器工作量级注记(Claude = 核实补齐)
+- [X] T038 [US7] 运行 `--action doctor` 产出八工具本地落盘探测快照,结合探测结果撰写 `.specify/specs/034-evidence-infra/platform-adapter-survey.md`:各工具 sessionStore 探测结论、现有适配器现状(qoder/codex/claude/cursor 按源码)、后续适配器实施定序建议(初始候选 opencode → Qwen → iFlow → Hermes → Copilot 按探测修正)、每适配器工作量级注记(Claude = 核实补齐)
 
 **Checkpoint**: US7 边界内交付完成
 
@@ -212,9 +212,9 @@
 
 ## Phase 10: Polish & Cross-Cutting Concerns
 
-- [ ] T039 [P] 全镜像汇总校验(plan.md Mirror Obligations 全 8 行逐行执行 diff 命令)+ `find . -maxdepth 1 -type l` 符号链接完好检查
-- [ ] T040 [P] quickstart.md 全 7 场景逐条实测(§4 技能演练引用 T028 存档;§5 引用 T034;其余命令逐字执行),修正文档与实现的任何漂移(执行验证门)
-- [ ] T041 运行全套 `pytest -q` 与 `bash tests/js/run.sh`,对比 T003 基线:零新增失败;新增测试计数入账;结果与 SC-001…008 逐项结论写入 `.specify/specs/034-evidence-infra/verification.md`(含 deferred_tasks= 清单、Node 25 兼容性实测结论、glossary 新词提案记录:泳道/证据合同/干预台账)
+- [X] T039 [P] 全镜像汇总校验(plan.md Mirror Obligations 全 8 行逐行执行 diff 命令)+ `find . -maxdepth 1 -type l` 符号链接完好检查
+- [X] T040 [P] quickstart.md 全 7 场景逐条实测(§4 技能演练引用 T028 存档;§5 引用 T034;其余命令逐字执行),修正文档与实现的任何漂移(执行验证门)
+- [X] T041 运行全套 `pytest -q` 与 `bash tests/js/run.sh`,对比 T003 基线:零新增失败;新增测试计数入账;结果与 SC-001…008 逐项结论写入 `.specify/specs/034-evidence-infra/verification.md`(含 deferred_tasks= 清单、Node 25 兼容性实测结论、glossary 新词提案记录:泳道/证据合同/干预台账)
 
 ---
 
