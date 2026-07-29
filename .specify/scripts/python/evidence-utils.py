@@ -91,8 +91,14 @@ def target_slug(target: str) -> str:
     return slug or "project"
 
 
-def make_run_id(target: str, now: datetime) -> str:
-    return f"ev-{now.strftime('%Y%m%d')}-{now.strftime('%H%M%S')}-{target_slug(target)}"
+def make_run_id(target: str, now: datetime, store: Path = None) -> str:
+    base = f"ev-{now.strftime('%Y%m%d')}-{now.strftime('%H%M%S')}-{target_slug(target)}"
+    if store is None or not (store / base).exists():
+        return base
+    counter = 2
+    while (store / f"{base}-{counter}").exists():
+        counter += 1
+    return f"{base}-{counter}"
 
 
 def load_index(root: Path) -> dict:
@@ -501,7 +507,7 @@ def action_collect(args) -> dict:
             raise CliError(f"unknown lane: {lane}")
 
     now = utc_now()
-    run_id = make_run_id(args.target, now)
+    run_id = make_run_id(args.target, now, evidence_dir(root))
     run_dir = evidence_dir(root) / run_id
     lanes_dir = run_dir / "lanes"
     node = probe_node()

@@ -185,12 +185,12 @@
 
 ### Tests for User Story 6 (MANDATORY) ⚠️
 
-- [ ] T035 [US6] 单元/集成测试(追加到 `tests/integration/test_evidence_python_lanes.py` 或新建 `tests/integration/test_evidence_compare_verdict.py`,先写先红):C-F14 intervention 字段校验、C-E7 verdict 三分支(信号改善 → Outcome-supported;无可比信号 → Unobserved;targetFinding 不存在 → 错误)、verdict 写回幂等
+- [X] T035 [US6] 单元/集成测试(追加到 `tests/integration/test_evidence_python_lanes.py` 或新建 `tests/integration/test_evidence_compare_verdict.py`,先写先红):C-F14 intervention 字段校验、C-E7 verdict 三分支(信号改善 → Outcome-supported;无可比信号 → Unobserved;targetFinding 不存在 → 错误)、verdict 写回幂等
 
 ### Implementation for User Story 6
 
-- [ ] T036 [US6] 实现 compare 的 verdict 判定与写回(C-E7 后半):读 baseline 目录 intervention.json → expectedSignal 方向比对 → verdict 写回(compare 为唯一写回方);运行 T035 全绿;镜像同步 `scripts/python/evidence-utils.py` + `diff -q`
-- [ ] T037 [US6] 第二轮闭环演练(SC-007):对 T034 同目标再次 collect → compare → 断言输出含第一轮 intervention 引用与 verdict 判定(改善证据不足时如实 Unobserved,禁止"已修复"表述);演练记录存档 <!-- 若两轮间隔内无新执行数据导致信号不可比,verdict=Unobserved 本身即合法验收结果 -->
+- [X] T036 [US6] 实现 compare 的 verdict 判定与写回(C-E7 后半):读 baseline 目录 intervention.json → expectedSignal 方向比对 → verdict 写回(compare 为唯一写回方);运行 T035 全绿;镜像同步 `scripts/python/evidence-utils.py` + `diff -q`
+- [X] T037 [US6] 第二轮闭环演练(SC-007):对 T034 同目标再次 collect → compare → 断言输出含第一轮 intervention 引用与 verdict 判定(改善证据不足时如实 Unobserved,禁止"已修复"表述);演练记录存档 <!-- 若两轮间隔内无新执行数据导致信号不可比,verdict=Unobserved 本身即合法验收结果 -->
 
 **Checkpoint**: 纵向验证闭环走通
 

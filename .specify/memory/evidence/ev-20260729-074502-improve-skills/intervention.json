@@ -2,5 +2,9 @@
   "targetFinding": "ev-007",
   "change": "improve-skills Step 2 upgraded to evidence-step A/B (findings consumption + candidate freeze + Unobserved red line) so recurring feedback themes are systematically consumed on every improvement loop instead of relying on LLM recall.",
   "baselineRunId": "ev-20260729-074502-improve-skills",
-  "expectedSignal": { "signalKey": "recurringThemes", "direction": "improve" }
+  "expectedSignal": {
+    "signalKey": "recurringThemes",
+    "direction": "improve"
+  },
+  "verdict": "Unobserved"
 }
