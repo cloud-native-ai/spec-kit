@@ -1,0 +1,23 @@
+{
+  "teams": [
+    {
+      "team": "bh-port-monitor",
+      "runReports": 4,
+      "critiques": [
+        "2026-07-29T06:34:25Z: 首个 cycle，误报=n/a（无上轮可核）；HP-1 依赖对另一 session 意图的确认，已按纪律标注两种可能而非下结论；下一轮改进：核查 `.specify/memory/feedback/20260729T061035Z-speckit-requirements.md` 内容以佐证 clarify 是否完成（本轮遗漏的低成本证据源）",
+        "2026-07-29T07:20:02Z: 误报=0/2（HP-1、HP-2 均为有效检出且均已被开发 session 解决）；上轮承诺的 feedback 证据源本轮已核查（plan/tasks 两条 feedback 提供了勘察与风险信号，价值高，纳入常规证据源清单）；下一轮改进：实现期开始后把 `git status 文件级 diff + tasks.md 勾选计数` 作为增量锚点，按 Phase 顺序核对 DoD-1~6 而非全量重扫",
+        "2026-07-29T07:40:13Z: 误报=0/1（HP-3 有效检出且已解决）；累计 0/3=0%，已满 2 个 cadence 周期——**L1→L2 晋级门控的误报率与周期数判据均已达标**（若需晋级由 improve-team 评估，本团队场景零写入约束下 L1 可能就是终态，晋级非必需）；增量锚点模式生效（本 cycle 采集成本明显低于全量）；预算 75% 触发精简采集被验证可行；下一轮改进：Phase 6/7 落地后核查 4 技能目录镜像与 evidence-step.md 注入的一致性",
+        "2026-07-29T09:33:45Z: 误报=0/0（本轮无待核 HP）；累计 0/3=0% 保持；**预算 93% 断路器被用户显式 override 解除**（人工授权记录在案，非 loop 自行越限）；一次检索误判（pass 字面量 vs 键值格式）在同 cycle 内自纠，未进结论；监控全程 4 cycles 零写入监控对象、全部判定有证据路径——goal 成功标准整体达成；后续改进：若 loop 续期，把「tests/js 实跑 + doctor 实测」固化为每次终验的标准两件套"
+      ],
+      "logRows": 4,
+      "partial": false
+    },
+    {
+      "team": "draw-plantuml-optimizer",
+      "runReports": 5,
+      "critiques": [],
+      "logRows": 0,
+      "partial": true
+    }
+  ]
+}

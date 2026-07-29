@@ -345,7 +345,11 @@ def collect_assets_lane(subset: Path, root: Path, args) -> tuple:
     lint_findings = 0
     lint_data = envelopes.get("lint", {}).get("data") or {}
     if isinstance(lint_data, dict):
-        lint_findings = len(lint_data.get("findings", []) or [])
+        findings_block = lint_data.get("findings")
+        if isinstance(findings_block, dict):
+            lint_findings = len(findings_block.get("items") or [])
+        elif isinstance(findings_block, list):
+            lint_findings = len(findings_block)
     inventory_status = envelopes.get("inventory", {}).get("status", "missing")
     items = [{
         "lane": "assets",

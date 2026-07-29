@@ -162,6 +162,16 @@ class TestCE7CompareErrors:
         assert "error" in json.loads(result.stdout)
 
 
+# --- lint-count regression (dogfood finding: envelope dict was counted as list) ---
+
+class TestAssetsLintCount:
+    def test_lint_findings_counts_items_not_dict_keys(self):
+        source = SCRIPT.read_text(encoding="utf-8")
+        assert 'findings_block.get("items")' in source, (
+            "assets lane must count findings.items (upstream envelope is "
+            "{items,total,omitted}); counting the dict itself reports 3 forever")
+
+
 # --- C-E11 / mirror -----------------------------------------------------------
 
 class TestMirror:

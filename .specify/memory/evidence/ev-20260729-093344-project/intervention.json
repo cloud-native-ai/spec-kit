@@ -1,0 +1,10 @@
+{
+  "targetFinding": "ev-004",
+  "change": "Fixed assets-lane lintFindings counting defect in evidence-utils.py: upstream lint findings is an envelope dict {items,total,omitted}; len(dict) reported a constant 3 and masked 13 real findings. Now counts findings.items. Regression pinned by TestAssetsLintCount.",
+  "baselineRunId": "ev-20260729-093344-project",
+  "expectedSignal": {
+    "signalKey": "lintFindings",
+    "direction": "improve"
+  },
+  "verdict": "Outcome-supported"
+}
