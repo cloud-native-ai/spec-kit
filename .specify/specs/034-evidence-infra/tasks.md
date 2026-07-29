@@ -142,14 +142,14 @@
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T024 [P] [US4] 结构合同测试 `tests/contract/test_evidence_step_conformance.py`(先写先红,本任务先落 US4 断言,US5 断言同文件预写并以 xfail/skip 标注待 US5 实现):collect-evidence SKILL.md 存在性、frontmatter 完整、≤500 行、含范围解析/doctor/collect/边界申明四步与标准 `## Feedback` 节、全文零裁决词(建议/严重度/severity/recommendation 模式)、references 两文件存在且 evidence-discipline.md 含七态定义与四纪律及 C-B7 只进事实句、`shared/workflow/evidence-step.md` 与 `.specify/shared/workflow/evidence-step.md` 一致且含分拣规则与候选冻结与 Unobserved 红线
+- [X] T024 [P] [US4] 结构合同测试 `tests/contract/test_evidence_step_conformance.py`(先写先红,本任务先落 US4 断言,US5 断言同文件预写并以 xfail/skip 标注待 US5 实现):collect-evidence SKILL.md 存在性、frontmatter 完整、≤500 行、含范围解析/doctor/collect/边界申明四步与标准 `## Feedback` 节、全文零裁决词(建议/严重度/severity/recommendation 模式)、references 两文件存在且 evidence-discipline.md 含七态定义与四纪律及 C-B7 只进事实句、`shared/workflow/evidence-step.md` 与 `.specify/shared/workflow/evidence-step.md` 一致且含分拣规则与候选冻结与 Unobserved 红线
 
 ### Implementation for User Story 4
 
-- [ ] T025 [P] [US4] 撰写 `.specify/shared/workflow/evidence-step.md`(FR-009,与 feedback-step.md 对偶结构:定位与红线 → canonical 步骤块 Step A 采集/复用 → Step B 按 evidenceState 分拣(四路规则)+ 候选冻结 → Step E 干预台账 → embedder 注意事项);源侧镜像 `shared/workflow/evidence-step.md`(确认仓库存在顶层 shared/ 后双写;不存在则以 .specify/ 侧为单源并在 verification.md 记录)
-- [ ] T026 [P] [US4] 撰写 `skills/collect-evidence/SKILL.md`(编排四步 + Feedback 节,红线:不解读证据)与 `references/evidence-contract.md`(findings 合同人读版,引用 contracts/findings-contract.md 内容)、`references/evidence-discipline.md`(四纪律 + 七态定义,移植上游 agent-work-loop.md:97-103 语义 + C-B7 边界句)
-- [ ] T027 [US4] 双镜像 + 注册:`cp -rf skills/collect-evidence .specify/skills/collect-evidence` 且 `diff -rq` 零差异;`.specify/instructions.md` Skills 注册表追加 collect-evidence 行 + Key Directories 技能计数更新为真实值(现 23 + 1 = 24,列表补 code-review/collect-evidence 等实际在位技能名)
-- [ ] T028 [US4] 运行 T024 的 US4 断言全绿;对话式演练技能一次(doctor → collect → 边界申明),输出存档为 SC-005 素材
+- [X] T025 [P] [US4] 撰写 `.specify/shared/workflow/evidence-step.md`(FR-009,与 feedback-step.md 对偶结构:定位与红线 → canonical 步骤块 Step A 采集/复用 → Step B 按 evidenceState 分拣(四路规则)+ 候选冻结 → Step E 干预台账 → embedder 注意事项);源侧镜像 `shared/workflow/evidence-step.md`(确认仓库存在顶层 shared/ 后双写;不存在则以 .specify/ 侧为单源并在 verification.md 记录)
+- [X] T026 [P] [US4] 撰写 `skills/collect-evidence/SKILL.md`(编排四步 + Feedback 节,红线:不解读证据)与 `references/evidence-contract.md`(findings 合同人读版,引用 contracts/findings-contract.md 内容)、`references/evidence-discipline.md`(四纪律 + 七态定义,移植上游 agent-work-loop.md:97-103 语义 + C-B7 边界句)
+- [X] T027 [US4] 双镜像 + 注册:`cp -rf skills/collect-evidence .specify/skills/collect-evidence` 且 `diff -rq` 零差异;`.specify/instructions.md` Skills 注册表追加 collect-evidence 行 + Key Directories 技能计数更新为真实值(现 23 + 1 = 24,列表补 code-review/collect-evidence 等实际在位技能名)
+- [X] T028 [US4] 运行 T024 的 US4 断言全绿;对话式演练技能一次(doctor → collect → 边界申明),输出存档为 SC-005 素材
 
 **Checkpoint**: 证据层公共入口就绪,消费改造可开始
 
