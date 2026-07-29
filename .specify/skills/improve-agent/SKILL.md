@@ -44,7 +44,9 @@ If the identifier matches multiple kinds or none, ask one clarifying question.
 
 ### 2. Gather evidence
 
-Collect concrete evidence of what needs improvement:
+First execute Step A/B per `.specify/shared/workflow/evidence-step.md` (single source of truth): reuse or collect findings via `evidence-utils.py --action latest|collect --target skill:create-agent --lanes all` — the **assets lane** carries template lint/inventory evidence relevant to agent artifacts; session/feedback lanes carry behavioral and recurring-theme signals. Triage by `evidenceState` and freeze the candidate list. Combined red line: do NOT optimize from generic best practices without execution evidence, and do NOT treat `Unobserved` items as defects — both are the same discipline: no evidence, no edit.
+
+Then collect concrete supplementary evidence of what needs improvement:
 
 - **User feedback**: Direct statements about what the agent did wrong
 - **Behavioral observations**: How the generated agent actually behaved vs. expected behavior

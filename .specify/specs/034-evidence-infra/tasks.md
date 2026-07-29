@@ -163,15 +163,15 @@
 
 ### Tests for User Story 5 (MANDATORY) ⚠️
 
-- [ ] T029 [US5] 启用 T024 中预写的 US5 断言(去除 xfail/skip):三个 improve SKILL.md 均含对 `evidence-step.md` 的引用(单一事实源,零复制定义)、含 Unobserved 红线句、行数 ≤500、improve-team 不再含直接解析 STATE.md/run-log.jsonl 的指令文本(grep 断言其 evidence 输入改为 runs 泳道/findings 表述)——先运行确认全红
+- [X] T029 [US5] 启用 T024 中预写的 US5 断言(去除 xfail/skip):三个 improve SKILL.md 均含对 `evidence-step.md` 的引用(单一事实源,零复制定义)、含 Unobserved 红线句、行数 ≤500、improve-team 不再含直接解析 STATE.md/run-log.jsonl 的指令文本(grep 断言其 evidence 输入改为 runs 泳道/findings 表述)——先运行确认全红
 
 ### Implementation for User Story 5
 
-- [ ] T030 [P] [US5] 改造 `skills/improve-skills/SKILL.md`:Workflow Step 2("Measure execution effectiveness from history",L32-41)升级为 Step A/B(调 evidence-utils latest/collect,session+feedback 泳道分拣,候选冻结);保留失败模式分类法与既有纪律;改动 30~60 行级
-- [ ] T031 [P] [US5] 改造 `skills/improve-agent/SKILL.md`:同构接入 Step A/B(assets 泳道模板 lint 证据入分析);"不从通用最佳实践优化"红线与 Unobserved 红线合并表述;保留六节结构分析法(§3 Analyze root causes)
-- [ ] T032 [P] [US5] 改造 `skills/improve-team/SKILL.md`:Inputs 表 evidence 行(L21)与 Behavior Gather evidence 步骤改为消费 runs 泳道 findings(evidence-utils latest/collect),移除对 STATE.md/run-log.jsonl 的直接解析表述;保留 Refinement Map 与结构保持编辑
-- [ ] T033 [US5] 三技能镜像 dual-write + parity:分别 `cp -f` 到 `.specify/skills/{improve-skills,improve-agent,improve-team}/SKILL.md`;逐个 `diff -q` 零差异;运行 T029 断言全绿;改造前后 SKILL.md diff 存档(保留项完好性复核,SC-006 素材)
-- [ ] T034 [US5] Dogfood 闭环演练(SC-006):对 `skill:improve-skills` 走完整流程——collect(全泳道)→ 按 evidenceState 分拣并冻结候选 → 选一条 Exercised 负向证据做最小定向修改 → 写 `intervention.json`(E8 四要素,verdict 留空)→ 演练记录存档
+- [X] T030 [P] [US5] 改造 `skills/improve-skills/SKILL.md`:Workflow Step 2("Measure execution effectiveness from history",L32-41)升级为 Step A/B(调 evidence-utils latest/collect,session+feedback 泳道分拣,候选冻结);保留失败模式分类法与既有纪律;改动 30~60 行级
+- [X] T031 [P] [US5] 改造 `skills/improve-agent/SKILL.md`:同构接入 Step A/B(assets 泳道模板 lint 证据入分析);"不从通用最佳实践优化"红线与 Unobserved 红线合并表述;保留六节结构分析法(§3 Analyze root causes)
+- [X] T032 [P] [US5] 改造 `skills/improve-team/SKILL.md`:Inputs 表 evidence 行(L21)与 Behavior Gather evidence 步骤改为消费 runs 泳道 findings(evidence-utils latest/collect),移除对 STATE.md/run-log.jsonl 的直接解析表述;保留 Refinement Map 与结构保持编辑
+- [X] T033 [US5] 三技能镜像 dual-write + parity:分别 `cp -f` 到 `.specify/skills/{improve-skills,improve-agent,improve-team}/SKILL.md`;逐个 `diff -q` 零差异;运行 T029 断言全绿;改造前后 SKILL.md diff 存档(保留项完好性复核,SC-006 素材)
+- [X] T034 [US5] Dogfood 闭环演练(SC-006):对 `skill:improve-skills` 走完整流程——collect(全泳道)→ 按 evidenceState 分拣并冻结候选 → 选一条 Exercised 负向证据做最小定向修改 → 写 `intervention.json`(E8 四要素,verdict 留空)→ 演练记录存档
 
 **Checkpoint**: 消费层改造完成,第一轮干预台账在库
 

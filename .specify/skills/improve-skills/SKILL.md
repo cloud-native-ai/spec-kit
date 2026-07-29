@@ -29,8 +29,10 @@ The input is a description of the Skill to improve. It must be interpreted as fo
    - Define the execution window to review: current conversation, last Skill run, failed command output, user correction, test failure, or recent edits.
    - When improving `improve-skills` itself, use the most recent improvement loop as the execution window and avoid reapplying the same lesson unless new evidence shows the previous fix was insufficient.
 
-2. **Measure execution effectiveness from history**
-   - Gather concrete evidence before editing: user feedback, steps that were confusing, tool failures, wrong assumptions, repeated manual fixes, validation gaps, and changed files from the execution.
+2. **Measure execution effectiveness from evidence (evidence-step A/B)**
+   - Execute Step A/B per `.specify/shared/workflow/evidence-step.md` (single source of truth; do not restate its rules here): reuse fresh findings via `evidence-utils.py --action latest --target skill:<name>`, or collect via `--action collect --target skill:<name> --lanes all` (session + feedback lanes carry the strongest signals for skill improvement: episode-level rework/failure evidence and recurring optimization themes with `recurrence` signals).
+   - Triage findings evidence by `evidenceState` per the evidence-step table, then **freeze the candidate list** — later steps must not add or drop candidates. Red lines: `Unobserved` items are recorded only and MUST NOT be treated as defects to fix; counting signals MUST NOT directly generate optimization points.
+   - Gather concrete supplementary evidence from the current execution window: user feedback, steps that were confusing, tool failures, wrong assumptions, repeated manual fixes, validation gaps, and changed files from the execution.
    - Include terminal/test outputs and error messages when they explain what went wrong.
    - Review changed files as evidence, but classify generated validation artifacts such as `tools/*.json` separately from hand-edited Skill instructions.
    - Measure the target Skill against the requested or inferred optimization goal: whether it could be invoked, whether its expected input format was accepted, whether the workflow produced the expected output, how many avoidable manual/tool steps occurred, and whether validation caught the issue.
@@ -86,6 +88,7 @@ The input is a description of the Skill to improve. It must be interpreted as fo
    - **When the suite has pre-existing failures, prove zero regression with a stash-based failure-set diff**: capture the sorted `FAILED|ERROR` lines of the full run, `git stash -u`, rerun the same suite on the clean tree, `git stash pop`, and diff the two failure sets — an identical set means your change introduced no regression. "The same tests still fail" eyeballed from counts is not sufficient when the baseline itself is red; only the set comparison distinguishes baseline failures from new ones.
    - If a combined validation command returns only partial output or omits later checks, rerun the missing checks individually before concluding validation passed.
    - Do not document `.specify/scripts/` as a Skill-owned resource directory; Skill-owned executable resources belong in `./scripts/`.
+   - **Intervention ledger (evidence-step Step E)**: when the run consumed findings evidence, write `intervention.json` into the baseline evidence-run directory (targetFinding / change / baselineRunId / expectedSignal). The next same-target run's `--action compare` decides `Outcome-supported` vs `Unobserved`; never claim "fixed" without that before/after comparison.
 
 7. **Report the feedback-driven changes**
    - Summarize the execution feedback that drove the update.

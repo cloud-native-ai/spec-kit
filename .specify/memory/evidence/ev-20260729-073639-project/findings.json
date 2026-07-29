@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "kind": "speckit.evidence-findings",
+  "target": "project",
+  "runId": "ev-20260729-073639-project",
+  "window": {
+    "since": null,
+    "until": null
+  },
+  "platforms": [
+    "qoder"
+  ],
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "unavailable",
+      "reason": "lane not requested"
+    },
+    "feedback": {
+      "status": "unavailable",
+      "reason": "lane not requested"
+    }
+  },
+  "evidence": [
+    {
+      "id": "ev-001",
+      "lane": "session",
+      "evidenceState": "Unobserved",
+      "summary": "No eligible qoder sessions observed for this workspace in the window.",
+      "evidenceRefs": [],
+      "signals": {
+        "eligibleSessions": 0
+      },
+      "privacyNote": "redacted-semantic-facet"
+    },
+    {
+      "id": "ev-002",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Project profile captured: primary languages javascript, python; git history signals collected.",
+      "evidenceRefs": [
+        "core-change-watch/project-profile",
+        "core-change-watch/git-history-profile"
+      ],
+      "signals": {
+        "primaryLanguages": 2,
+        "sourceFiles": 238,
+        "testFiles": 181
+      }
+    },
+    {
+      "id": "ev-003",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Dependency governance: 2 ecosystem(s), risk level medium.",
+      "evidenceRefs": [
+        "dependency-governance/cli"
+      ],
+      "signals": {
+        "ecosystems": 2,
+        "staleDependencyFiles": 0
+      }
+    },
+    {
+      "id": "ev-004",
+      "lane": "assets",
+      "evidenceState": "Present",
+      "summary": "Asset baseline (qoder): status complete, 3 lint finding(s), inventory available.",
+      "evidenceRefs": [
+        "coding-agent-practices/asset-baseline"
+      ],
+      "signals": {
+        "lintFindings": 3
+      }
+    }
+  ],
+  "findingsDigest": "sha256:b0b972e3868177810ee51976f1a59637eaaa755e4fe992c63ec18ff1749c8727"
+}

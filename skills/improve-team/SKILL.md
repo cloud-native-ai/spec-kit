@@ -18,12 +18,12 @@ Editing a team's **goal** is a first-class modify that **cascades into structure
 |-------|----------|-------------|
 | target team | yes | Slug/name resolving to `.specify/teams/<slug>/team.md`. |
 | improvement direction | yes | What to change: **redefine the goal** (cascades into structure realignment — see `references/goal-editing.md`), add/remove member, change pattern, tune thresholds/parallelism/dimensions, or — for a `continuous` team — **promote/demote maturity** (L1→L2→L3), tune budget/constraints/cadence, or fix verifier independence. |
-| evidence | recommended | Concrete signals from the tracked run reports under `.specify/teams/<slug>/runs/` (and, for `continuous` teams, `STATE.md` Post-Run Critique + `run-log.jsonl`): non-convergence, oscillating scores, territory conflicts, stale member references, budget overruns, false-positive rate, runaway token spend. |
+| evidence | recommended | Normalized findings evidence from the **runs lane** (team run reports, Post-Run Critique notes, cycle logs — all consumed via `evidence-utils.py`, per `.specify/shared/workflow/evidence-step.md`): non-convergence, oscillating scores, territory conflicts, stale member references, budget overruns, false-positive rate, runaway token spend. |
 
 ## Behavior
 
 1. **Resolve target** — load `team.md` from `.specify/teams/<slug>/team.md`. If none exists → report **"team not found"** and offer to **create** one (hand off to `create-team` via `/speckit.team create`). Never silently create a team.
-2. **Gather evidence** — inspect the tracked run reports (`.specify/teams/<slug>/runs/`) for convergence/oscillation, territory conflicts, and stale/broken member references before proposing changes.
+2. **Gather evidence (evidence-step A/B)** — execute Step A/B per `.specify/shared/workflow/evidence-step.md`: reuse or collect findings via `evidence-utils.py --action latest|collect --target project --lanes runs,feedback`, then use the **runs-lane** evidence items (per-team run-report counts, critique notes, cycle/escalation signals) to identify convergence/oscillation, territory conflicts, and stale/broken member references before proposing changes. Triage by `evidenceState` and freeze the candidate list; `Unobserved` items are recorded only, never fixed.
 3. **Attribute root cause** — map each issue to the responsible part (roster, pattern, config/thresholds, member territories/DAG).
 4. **Apply targeted edits** — make the **minimal, evidence-based** change that fixes the issue while **preserving the parts of the team that already work** (SC-005). Do not touch unaffected fields — they must remain byte-identical.
 5. **Re-persist** — write the updated `team.md` and **bump the `updated` date**; leave `created` and all unaffected frontmatter/members untouched. Run intermediates stay in the git-ignored workspace `.specify/teams/.work/<slug>/`; if editing a legacy team, repoint any stale `progress_file` there.
