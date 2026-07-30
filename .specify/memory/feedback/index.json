@@ -1,10 +1,32 @@
 {
   "store": "feedback",
-  "updated": "2026-07-30T02:47:42Z",
+  "updated": "2026-07-30T04:04:10Z",
   "threshold": 10,
-  "count_since_submission": 3,
-  "submitted_at": "2026-07-29T09:49:58Z",
+  "count_since_submission": 0,
+  "submitted_at": "2026-07-30T04:04:10Z",
   "entries": [
+    {
+      "id": "20260730T034112Z-skill-improve-skills",
+      "file": "20260730T034112Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "p7c-export-session-adoption-20260730",
+      "feature": "034-evidence-infra",
+      "partial": false,
+      "created": "2026-07-30T03:41:12Z",
+      "summary": "P7-c 迭代完成:export-session 六项优秀方法全部吸收入证据引擎——P1 cwd-in-file 归属判定(qoder 全目录扫描+内嵌 cwd,实证 eligible 0→4;cursor 探测增强)、P2 opencode SQLite 并行数据源(parent_id 子会话)、P3 三平台 currentSessionId env 因子、P4 qoder IDE state."
+    },
+    {
+      "id": "20260730T033647Z-speckit-tools",
+      "file": "20260730T033647Z-speckit-tools.md",
+      "unit_id": "/speckit.tools",
+      "unit_type": "command",
+      "run_id": "tools-restructure-20260730",
+      "feature": "016",
+      "partial": false,
+      "created": "2026-07-30T03:36:47Z",
+      "summary": "Restructured /speckit.tools into a single-entry intent router matching the team/agents/skills pattern: five modes route define->create-tools and modify->improve-tools, view/list are read-only, invoke "
+    },
     {
       "id": "20260730T024742Z-skill-improve-skills",
       "file": "20260730T024742Z-skill-improve-skills.md",

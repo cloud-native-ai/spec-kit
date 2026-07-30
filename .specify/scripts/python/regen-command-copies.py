@@ -21,6 +21,15 @@ import tempfile
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+# Guard: running the .specify/scripts/python/ mirror copy resolves parents[2]
+# to `.specify`, producing doubled `.specify/.specify/` paths downstream.
+# Fail fast with a pointer to the canonical copy instead of crashing mid-run.
+if REPO_ROOT.name == ".specify":
+    sys.stderr.write(
+        "regen-command-copies.py: running from the .specify/scripts/python/ mirror; "
+        f"use the canonical copy instead: {REPO_ROOT.parent / 'scripts' / 'python' / Path(__file__).name}\n"
+    )
+    sys.exit(2)
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
 import specify_cli  # noqa: E402
