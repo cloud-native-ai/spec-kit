@@ -57,6 +57,17 @@ The feedback-as-files engine: persists local, unit-scoped feedback entries produ
 | `threshold` | Current consolidated-submission threshold |
 | `should_prompt` | Whether the caller should surface the consolidated submission prompt |
 
+## Environment Applicability
+
+| Field | Value |
+|-------|-------|
+| Verified Version | python3 3.11.0rc1 |
+| Version Differences | Requires Python >= 3.8 per the project's `pyproject.toml`; no version-specific flags observed |
+| Platform | linux (verified); pure-Python and path-based, so no OS-specific invocation known |
+| Architecture | x86_64 (verified); no architecture-specific behavior known |
+| Fallback | None — this is the only writer of the feedback store; do not hand-edit `.specify/memory/feedback/` |
+| Preflight Check | `python3 scripts/python/feedback-utils.py --help` (exit 0) |
+
 ## Usage Notes
 
 - Feedback content is produced by agent self-reflection; it MUST NOT be solicited from the user.

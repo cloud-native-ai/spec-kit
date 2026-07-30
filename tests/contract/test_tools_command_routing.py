@@ -107,6 +107,103 @@ class TestToolSkillPairPresence:
 
 
 @pytest.mark.contract
+class TestToolConceptDefinition:
+    """The Tool concept — what it is and why it exists — is defined once, canonically."""
+
+    def test_definition_file_states_what_a_tool_is(self):
+        content = (REPO_ROOT / "shared" / "definitions" / "tool-definitions.md").read_text(encoding="utf-8")
+        assert "## What a Tool Is" in content, (
+            "tool-definitions.md must define the Tool concept, not only its schema"
+        )
+
+    def test_definition_file_states_both_rationales(self):
+        content = (REPO_ROOT / "shared" / "definitions" / "tool-definitions.md").read_text(encoding="utf-8").lower()
+        # Rationale 1: absorbing environment variance.
+        for token in ("environment variance", "version", "architecture"):
+            assert token in content, f"tool-definitions.md must explain environment variance ({token})"
+        # Rationale 2: replacing throwaway LLM-generated scripts.
+        assert "throwaway" in content or "ad-hoc script" in content, (
+            "tool-definitions.md must explain that Tools replace throwaway generated scripts"
+        )
+        assert "inference overhead" in content, (
+            "tool-definitions.md must state the efficiency rationale (inference overhead)"
+        )
+
+    def test_definition_file_disambiguates_terminology(self):
+        content = (REPO_ROOT / "shared" / "definitions" / "tool-definitions.md").read_text(encoding="utf-8")
+        assert "three different things called" in content.lower(), (
+            "tool-definitions.md must disambiguate Tool record vs AI agent CLI vs tool-call list"
+        )
+
+    def test_definition_file_documents_environment_applicability(self):
+        content = (REPO_ROOT / "shared" / "definitions" / "tool-definitions.md").read_text(encoding="utf-8")
+        assert "## Environment Applicability" in content
+        for label in ("Verified Version", "Version Differences", "Platform", "Architecture", "Fallback", "Preflight Check"):
+            assert label in content, f"Environment Applicability must document the '{label}' field"
+
+    @pytest.mark.parametrize("root", ["shared", ".specify/shared"])
+    def test_reuse_gate_convention_exists(self, root):
+        gate = REPO_ROOT / root / "workflow" / "tool-reuse-gate.md"
+        assert gate.exists(), f"{root}/workflow/tool-reuse-gate.md must exist"
+        content = gate.read_text(encoding="utf-8")
+        assert "Reuse when found" in content or "reuse it" in content.lower()
+        assert "Draft" in content, "the gate must state that a Draft record does not satisfy it"
+
+    def test_constitution_codifies_tool_reuse(self):
+        content = (REPO_ROOT / ".specify" / "memory" / "constitution.md").read_text(encoding="utf-8")
+        assert "### XII. Tool Reuse Over Ad-Hoc Generation" in content, (
+            "the constitution must codify the tool-reuse discipline as a principle"
+        )
+
+    @pytest.mark.parametrize("template", TOOL_TEMPLATES)
+    def test_templates_carry_environment_applicability(self, template):
+        content = (TOOL_TEMPLATE_DIR / template).read_text(encoding="utf-8")
+        assert "## Environment Applicability" in content, (
+            f"{template} must let a record express environment variance"
+        )
+
+    def test_engine_round_trips_environment_fields(self, tmp_path):
+        from tests.script_api import tools_utils as mod
+
+        record = mod.ToolRecord(
+            name="probe",
+            tool_type="system-binary",
+            source_identifier="/usr/bin/probe",
+            description="probe",
+            environment=mod.EnvironmentApplicability(
+                verified_version="1.2.3",
+                version_differences="flag renamed in 2.x",
+                platform="linux",
+                architecture="x86_64",
+                fallback="use probe-legacy",
+                preflight_check="probe --version",
+            ),
+        )
+        mod.save_record(tmp_path, record)
+        loaded = mod.load_record(tmp_path, "probe")
+        assert loaded.environment == record.environment, (
+            "environment applicability must survive a save/load round-trip"
+        )
+
+    def test_empty_environment_omits_section(self, tmp_path):
+        from tests.script_api import tools_utils as mod
+
+        mod.save_record(
+            tmp_path,
+            mod.ToolRecord(
+                name="plain",
+                tool_type="system-binary",
+                source_identifier="/usr/bin/plain",
+                description="plain",
+            ),
+        )
+        content = (tmp_path / "plain.md").read_text(encoding="utf-8")
+        assert "## Environment Applicability" not in content, (
+            "a record with no known variance must not emit an empty environment section"
+        )
+
+
+@pytest.mark.contract
 class TestToolTemplatesLiveInsideSkill:
     @pytest.mark.parametrize("template", TOOL_TEMPLATES)
     def test_template_moved_into_create_tools(self, template):

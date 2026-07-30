@@ -56,6 +56,17 @@ The evidence-lane orchestrator: gathers normalized `findings.json` evidence for 
 | `findingsDigest` | Content digest of the emitted findings |
 | `found` | `false` from `--action latest` when no prior run exists for the target |
 
+## Environment Applicability
+
+| Field | Value |
+|-------|-------|
+| Verified Version | python3 3.11.0rc1 |
+| Version Differences | Requires Python >= 3.8 per the project's `pyproject.toml`; no version-specific flags observed |
+| Platform | linux (verified). The session/project/assets lanes delegate to a Node engine subset, so those lanes degrade to `partial`/unavailable when Node is absent; the runs/feedback lanes are native Python |
+| Architecture | x86_64 (verified); no architecture-specific behavior known |
+| Fallback | None for collection. Use `--action latest` to reuse a prior run instead of re-collecting |
+| Preflight Check | `python3 scripts/python/evidence-utils.py --action doctor` (reports per-lane capability) |
+
 ## Usage Notes
 
 - Evidence carries an `evidenceState` per item; `Unobserved` means "not seen", which is **not** the same as "defect found".

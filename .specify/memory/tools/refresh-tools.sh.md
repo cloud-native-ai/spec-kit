@@ -52,6 +52,17 @@ At least one source flag must be supplied; `--format markdown` is explicitly rej
 | `shell_functions` | Functions defined in the invoking shell session |
 | `project_scripts` | `*.sh` / `*.py` scripts found under the project's script directories |
 
+## Environment Applicability
+
+| Field | Value |
+|-------|-------|
+| Verified Version | GNU bash 5.1.16(1)-release; delegates to python3 3.11.0rc1 |
+| Version Differences | `--format markdown` is rejected by design in all versions; at least one source flag is required |
+| Platform | linux (verified). Shell-function discovery reads the *calling* shell, so results differ between an interactive and a non-interactive shell |
+| Architecture | x86_64 (verified); no architecture-specific behavior known |
+| Fallback | Query a single source directly via `python3 scripts/python/tools-utils.py --action list` |
+| Preflight Check | `bash scripts/bash/refresh-tools.sh --project --json` (exit 0; note `--help` exits 1 by design) |
+
 ## Usage Notes
 
 - Output is a snapshot of the invoking environment: shell functions reflect the *calling* shell, so results differ between an interactive shell and a fresh non-interactive one.

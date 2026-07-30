@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-07-30T04:04:10Z",
+  "updated": "2026-07-30T04:07:16Z",
   "threshold": 10,
-  "count_since_submission": 0,
+  "count_since_submission": 1,
   "submitted_at": "2026-07-30T04:04:10Z",
   "entries": [
+    {
+      "id": "20260730T040716Z-speckit-tools",
+      "file": "20260730T040716Z-speckit-tools.md",
+      "unit_id": "/speckit.tools",
+      "unit_type": "command",
+      "run_id": "tools-semantics-20260730",
+      "feature": "016",
+      "partial": false,
+      "created": "2026-07-30T04:07:16Z",
+      "summary": "Clarified the Tool concept across the project after a full audit. Found three gaps: the rationale (stability+efficiency abstraction layer absorbing environment variance and replacing throwaway LLM-gen"
+    },
     {
       "id": "20260730T034112Z-skill-improve-skills",
       "file": "20260730T034112Z-skill-improve-skills.md",

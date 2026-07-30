@@ -12,6 +12,8 @@ Improve **one existing tool definition record** under `.specify/memory/tools/` s
 
 Edits are **field-level**: load the record, change only what the evidence justifies, re-validate, re-persist. Never regenerate a record from a template — that discards the user's accumulated authoritative knowledge.
 
+Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instrument — improving a tool record strengthens the **Controlled Execution** dimension (correct, safe, repeatable invocations) and closes the **Learning Capture** loop; goal model in `.specify/shared/guidelines/better-harness.md`.
+
 ## Input Contract
 
 The input is a description of the tool to improve. Interpret it as follows:
@@ -31,6 +33,7 @@ The input is a description of the tool to improve. Interpret it as follows:
    | **Source correction** | `source_identifier` or `tool_type` is wrong | Re-verify the source resolves; a type change re-selects the canonical type and may reset `status` to `Draft` |
    | **Contract correction** | `arguments` / `returns` wrong or incomplete | A `Verified` record MUST retain at least one of `arguments` / `returns` |
    | **Rule hardening** | add / sharpen `## Behavioral Rules` | Keywords limited to `MUST` / `MUST NOT` / `SHOULD` / `SHOULD NOT`, one bullet per rule |
+   | **Environment drift** | `## Environment Applicability` is stale or incomplete — the tool was upgraded, a flag changed between versions, a new OS/architecture is now in play, or a fallback/preflight check is needed | Re-verify on the environment actually in use and record only what was observed; never widen a claim to a platform or version you did not verify. If the pinned invocation no longer holds, demote to `Draft` rather than leaving a wrong `Verified` contract |
    | **Alias / rename** | add an alias, or rename the record | Rename MUST fail on a name conflict rather than overwrite; renaming changes the canonical path, so the `tool_id` must be regenerated |
    | **Status promotion** | `Draft` → `Verified` | Only when every mandatory field is present, the source verified, and `arguments` or `returns` populated |
 

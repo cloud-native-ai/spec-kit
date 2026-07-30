@@ -12,7 +12,7 @@ Based on [github.com/github/spec-kit](https://github.com/github/spec-kit.git) wi
 |--------------|-------|
 | Install the `specify` CLI | [docs/tutorials/installation.md](docs/tutorials/installation.md) |
 | Follow the quick start walkthrough | [docs/tutorials/quickstart.md](docs/tutorials/quickstart.md) |
-| Understand concepts & methodology (SDD, vibe coding, docs model, upstream, security) | [docs/concepts/](docs/concepts/) |
+| Understand concepts & methodology (SDD, vibe coding, better harness, docs model, upstream, security) | [docs/concepts/](docs/concepts/) |
 | Accomplish a specific task | [docs/tasks/](docs/tasks/) |
 | Look up exact references (commands, CLI tools, skills, agents, teams, glossary) | [docs/reference/](docs/reference/) |
 | Understand why a design decision was made | [docs/decisions/](docs/decisions/) |

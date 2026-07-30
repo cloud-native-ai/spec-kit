@@ -95,6 +95,26 @@ Feature is the long-term core framework of the project:
 
 Rationale: Keep project evolution Feature-centric to ensure long-term consistency and maintainability.
 
+### IX. Better-Harness Orientation
+The project is a *harness* for AI agent work — an environment in which an agent can
+understand the task, execute on supported and repeatable paths, validate its changes,
+deliver safely, and carry lessons forward. Improvement work MUST be oriented toward
+making that harness better:
+- Locate and motivate improvements against the five Agent Work Loop dimensions
+  (Task Understanding, Controlled Execution, Change Validation, Reliable Delivery,
+  Learning Capture); the canonical goal model is `.specify/shared/guidelines/better-harness.md`
+  — reference it, do not restate it.
+- Evidence discipline governs improvement claims: a configured asset proves at most that a
+  mechanism exists (configured ≠ used); unobserved evidence MUST NOT be treated as a defect
+  or a conclusion; "improved" MUST only be claimed from comparable before/after evidence.
+- This principle adds orientation, not machinery: it MUST NOT justify new scoring systems,
+  maturity reports, or tracking/recording engines.
+
+Rationale: Like Dogfooding, Better Harness is a core mindset of the agent era — agents
+change code fast, but the workflow around them (fuzzy goals, improvised steps, unproven
+"it works", bypassed safeguards, lost lessons) is usually the weak point. Naming the goal
+lets every improvement answer "which part of the harness does this strengthen?".
+
 ## [SECTION_2_NAME]
 <!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 

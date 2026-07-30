@@ -107,6 +107,21 @@ Follow this execution flow:
      - Tool/framework-mandated filenames are NON-NEGOTIABLE and MUST match the exact required
        pattern and location (e.g. GitHub Copilot commands MUST be `.github/prompts/<name>.prompt.md`);
        such names MUST NOT be renamed to fit project conventions.
+   - **MUST include** a principle for "Better-Harness Orientation" that mandates:
+     - The project treats itself as a *harness* for AI agent work — an environment in which
+       an agent can understand the task, execute on supported and repeatable paths, validate
+       its changes, deliver safely, and carry lessons forward — and improvement work is
+       oriented toward making that harness better.
+     - Improvements are located and motivated against the five Agent Work Loop dimensions
+       (Task Understanding, Controlled Execution, Change Validation, Reliable Delivery,
+       Learning Capture); the canonical goal model lives at
+       `.specify/shared/guidelines/better-harness.md` and MUST be referenced, not restated.
+     - Evidence discipline governs improvement claims: a configured asset proves at most that
+       a mechanism exists (configured ≠ used); unobserved evidence MUST NOT be treated as a
+       defect or a conclusion; "improved" MUST only be claimed from comparable before/after
+       evidence.
+     - This principle adds orientation, not machinery: it MUST NOT justify new scoring
+       systems, maturity reports, or tracking/recording engines.
    - Ensure Governance section lists amendment procedure, versioning policy, and compliance review expectations.
 
 4. Consistency propagation checklist (convert prior checklist into active validations):

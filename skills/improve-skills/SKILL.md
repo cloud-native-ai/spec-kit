@@ -10,6 +10,8 @@ skill_id: "<SKILL:.specify/skills/improve-skills/SKILL.md>"
 
 Continuously improve one existing local SpecKit Skill from a user-provided Skill description and evidence from real executions. The expected result is a focused Skill update that fixes observed problems, captures reusable lessons, and makes the next execution more reliable.
 
+Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instrument — improving a Skill strengthens the **Controlled Execution** dimension (the supported, repeatable path the Skill provides) and closes the **Learning Capture** loop; goal model in `.specify/shared/guidelines/better-harness.md`.
+
 ## Input Contract
 
 The input is a description of the Skill to improve. It must be interpreted as follows:

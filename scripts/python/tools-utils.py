@@ -74,6 +74,34 @@ class ToolArgument:
 
 
 @dataclass
+class EnvironmentApplicability:
+    """Where a tool's invocation is verified to hold, and how it differs elsewhere.
+
+    Every field is optional: an empty field means "no known variance along this
+    axis", never "verified everywhere".
+    """
+
+    verified_version: str = ""
+    version_differences: str = ""
+    platform: str = ""
+    architecture: str = ""
+    fallback: str = ""
+    preflight_check: str = ""
+
+    def is_empty(self) -> bool:
+        return not any(
+            (
+                self.verified_version,
+                self.version_differences,
+                self.platform,
+                self.architecture,
+                self.fallback,
+                self.preflight_check,
+            )
+        )
+
+
+@dataclass
 class ToolRecord:
     name: str
     tool_type: str
@@ -84,6 +112,7 @@ class ToolRecord:
     arguments: List[ToolArgument] = field(default_factory=list)
     returns: List[dict] = field(default_factory=list)
     behavioral_rules: List[BehavioralRule] = field(default_factory=list)
+    environment: EnvironmentApplicability = field(default_factory=EnvironmentApplicability)
     discovery_origin: str = "manual-entry"
     tool_id: Optional[str] = None
     last_updated: str = field(default_factory=lambda: date.today().isoformat())
@@ -296,6 +325,20 @@ def save_record(tools_dir: Path, record: Any) -> Path:
     else:
         lines.extend(["", "- None"])
 
+    env = getattr(record, "environment", None)
+    if env is not None and not env.is_empty():
+        lines.extend(["", "## Environment Applicability", "", "| Field | Value |", "|-------|-------|"])
+        for label, value in (
+            ("Verified Version", env.verified_version),
+            ("Version Differences", env.version_differences),
+            ("Platform", env.platform),
+            ("Architecture", env.architecture),
+            ("Fallback", env.fallback),
+            ("Preflight Check", env.preflight_check),
+        ):
+            if value:
+                lines.append(f"| {label} | {value} |")
+
     rules = getattr(record, "behavioral_rules", []) or []
     lines.extend(["", "## Behavioral Rules", ""])
     if rules:
@@ -370,6 +413,25 @@ def _parse_returns(content: str) -> List[dict]:
     return returns
 
 
+def _parse_environment(content: str) -> EnvironmentApplicability:
+    labels = {
+        "verified version": "verified_version",
+        "version differences": "version_differences",
+        "platform": "platform",
+        "architecture": "architecture",
+        "fallback": "fallback",
+        "preflight check": "preflight_check",
+    }
+    env = EnvironmentApplicability()
+    for cells in _parse_table_rows(_section_body(content, "## Environment Applicability")):
+        if len(cells) < 2:
+            continue
+        attr = labels.get(cells[0].strip().lower())
+        if attr:
+            setattr(env, attr, cells[1].strip())
+    return env
+
+
 def load_record(tools_dir: Path, name: str) -> Optional[ToolRecord]:
     record_file = _record_path(tools_dir, name)
     if not record_file.exists():
@@ -413,6 +475,7 @@ def load_record(tools_dir: Path, name: str) -> Optional[ToolRecord]:
         arguments=_parse_arguments(content),
         returns=_parse_returns(content),
         behavioral_rules=behavioral_rules,
+        environment=_parse_environment(content),
         discovery_origin=fields.get("discovery_origin", "manual-entry"),
     )
     return record

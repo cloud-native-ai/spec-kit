@@ -1,12 +1,14 @@
 <!--
 Sync Impact Report
-- Version change: 1.6.0 → 1.7.0 (MINOR; Principle X strengthened with the Reserved Filenames concept — strict blocking, registry with location + semantics, spec 033 / Feature 037)
-- Modified principles: X. Documentation Naming & Location Conventions (ALL-CAPS reserved names upgraded from "reserved for conventional root artifacts" to a strict reserved-filename registry: registered location + registered semantics only; directory indexes use index.md)
-- Added sections: None
+- Version change: 1.8.0 → 1.9.0 (MINOR; new Principle XIII — Better-Harness Orientation: names the shared goal that feedback, evidence, and the create-*/improve-* families serve, anchored to shared/guidelines/better-harness.md; concepts adapted from the open-source Better Harness model. Note: 1.7.0 → 1.8.0 was the concurrent Principle XII Tool Reuse amendment)
+- Modified principles: None
+- Added sections: Principle XIII. Better-Harness Orientation (Improvement North Star)
 - Removed sections: None
 - Templates requiring updates:
-  ✅ templates/commands/docs.md - baseline updated (bootstrap emits index.md for directory indexes)
-  ✅ scripts/python/docs-utils.py - validate() enforces reserved-name misplacement deterministically
+  ✅ shared/guidelines/better-harness.md + .specify/shared/guidelines/better-harness.md - new canonical goal-model anchor
+  ✅ shared/workflow/feedback-step.md - Goal anchor paragraph added (Positioning & Red Lines, outside the canonical embedded block)
+  ✅ shared/workflow/evidence-step.md - goal pointer added to the positioning preamble
+  ✅ skills/improve-{skills,agent,team,tools}/SKILL.md - one-line goal-anchor statement in ## Goal (both mirrors)
 - Follow-up TODOs: None
 -->
 
@@ -125,6 +127,24 @@ The framework's developers and users are tightly linked — often the same team 
 
 Rationale: Dogfooding's essence is replacing hypothetical design with real working scenarios. The loops already exist in the framework; naming them in governance keeps the framework honest (it must eat its own dog food to ship) while keeping scope disciplined (identification over invention).
 
+### XII. Tool Reuse Over Ad-Hoc Generation
+A **Tool** is a named, pre-verified, reusable definition of one concrete capability (`.specify/memory/tools/<name>.md`) — an abstraction layer between an agent's intent and the environment's reality, defined canonically in `.specify/shared/definitions/tool-definitions.md`. Tools exist because the unmediated alternative fails in two ways: the same logical capability differs by command name, version, version-specific flags, CPU architecture, and OS; and for anything non-trivial an LLM otherwise writes throwaway script code that varies in quality and correctness **between runs**.
+- **Reuse before generating**: before generating script code to perform a complex or repeatable action, an agent MUST look for an existing Tool and reuse it when one covers the capability. Where no Tool exists, writing the code is the expected outcome — and a capability worth repeating SHOULD be offered for promotion to a Tool
+- **Records outrank model knowledge**: when a Tool record exists, its `## Behavioral Rules` are authoritative; where the record and the model's training knowledge disagree, the record wins
+- **Verified, not assumed**: a record MUST NOT claim a version, platform, or CPU architecture it was not verified against. Environment applicability states what was observed and leaves the rest unstated; a `Draft` record is incomplete by definition and MUST NOT be invoked
+- **Cheap by construction**: the gate is a lookup plus a decision — it MUST NOT block work, MUST NOT apply to ordinary one-off reads/greps/single obvious commands, and MUST NOT justify new tracking or enforcement machinery (see Principle IX). Its operational form is the existing convention `.specify/shared/workflow/tool-reuse-gate.md`
+
+Rationale: reproducibility and cost both degrade when every run re-improvises how to do the same thing. Pinning a verified invocation once buys stability (identical behavior across runs, sessions, and agents) and efficiency (no re-deriving or re-validating the invocation, so less inference overhead) — while keeping the mechanism to a lookup rather than a new subsystem.
+
+### XIII. Better-Harness Orientation (Improvement North Star)
+All of Spec Kit's improvement mechanisms serve one explicit, shared goal: making every project a **better harness** for agent work — an environment in which an AI agent can understand the task, execute on supported and repeatable paths, validate its changes, deliver safely, and carry lessons forward:
+- The goal model — the feedforward/feedback loop and the five Agent Work Loop dimensions (Task Understanding, Controlled Execution, Change Validation, Reliable Delivery, Learning Capture) with their mapping to Spec Kit mechanisms — is defined once in `.specify/shared/guidelines/better-harness.md`; improvement units MUST reference that anchor, never fork or restate it
+- The feedback mechanism (Loop A/B carrier), the evidence layer, and the create-*/improve-* skill families are instruments of this goal; when motivating or prioritizing an improvement, units SHOULD name the dimension it strengthens instead of inventing ad-hoc categories
+- Evidence discipline governs every improvement claim: a configured asset proves at most that a mechanism exists (configured ≠ used); `Unobserved` evidence MUST NOT be treated as a defect or a conclusion; "improved" MUST only be claimed from comparable before/after evidence
+- This principle adds orientation, not machinery: it MUST NOT be used to justify new scoring systems, maturity reports, recording engines, or runtime evaluation platforms (Principle IX), and it does not alter the feedback red lines (framework-only target, user-data optionality, zero automated transmission)
+
+Rationale: The feedback mechanism and the improve-* skills each carried their own discipline but no named common goal. Naming the goal — adapted from the open-source Better Harness model, whose evidence-state vocabulary the evidence layer already uses — lets every flow answer "which part of the harness does this strengthen?" and keeps improvement work evidence-honest.
+
 ## Spec-Driven Development Workflow
 
 ### Research & Context Gathering
@@ -175,4 +195,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.7.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-07-28
+**Version**: 1.9.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-07-30

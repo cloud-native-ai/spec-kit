@@ -20,7 +20,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 
 `/speckit.tools` is the **single entry point** for every **tool** operation — the tool-domain analogue of `/speckit.agents` and `/speckit.team`. It recognizes intent, then routes to the owning tool skill. It delegates to skills and does **NOT** render templates inline.
 
-A **tool** is a named, reusable **definition record** persisted at `.specify/memory/tools/<name>.md`, carrying the user"
+A **tool** is a named, pre-verified, reusable **definition of one concrete capability** — persisted at `.specify/memory/tools/<name>.md` — that an agent invokes *instead of* working out how to perform that action on the fly. It is an **abstraction layer between an agent"
 
 prompt = """
 ## User Input
@@ -35,9 +35,16 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 
 `/speckit.tools` is the **single entry point** for every **tool** operation — the tool-domain analogue of `/speckit.agents` and `/speckit.team`. It recognizes intent, then routes to the owning tool skill. It delegates to skills and does **NOT** render templates inline.
 
-A **tool** is a named, reusable **definition record** persisted at `.specify/memory/tools/<name>.md`, carrying the user's authoritative knowledge about how the tool is invoked. Its defining property: **the record's behavioral rules override the agent's built-in training knowledge**. When a record exists, the agent MUST follow the persisted rules rather than what it believes it knows about the command. This is why **definition is the primary action** and discovery only bootstraps a `Draft` for the user to complete — a record auto-filled from model knowledge would defeat its own purpose.
+A **tool** is a named, pre-verified, reusable **definition of one concrete capability** — persisted at `.specify/memory/tools/<name>.md` — that an agent invokes *instead of* working out how to perform that action on the fly. It is an **abstraction layer between an agent's intent and the environment's reality**, and it removes two failure modes of the unmediated default:
 
-Every record has four canonical types (`project-script`, `system-binary`, `shell-function`, `webhook`) and a two-state lifecycle (`Draft` → `Verified`); only `Verified` records may be invoked. Type semantics, the RFC 2119 behavioral-rules format, edge cases, and the invocation preview contract are defined once in `.specify/shared/definitions/tool-definitions.md`. The authoring templates live inside the owning skill at `skills/create-tools/templates/`.
+- **Environment variance** — the same logical capability is not the same command everywhere: the binary may be named differently, be a different version, need different flags per version, or differ by CPU architecture or OS. An agent reasoning from training knowledge picks one plausible invocation and gets it wrong on the machine actually present. A record pins what is **verified here** and states the known variance explicitly.
+- **Throwaway generated scripts** — for anything non-trivial an LLM otherwise writes ad-hoc script code in the moment, varying in quality and correctness and differing **between runs**, so behavior is not reproducible. A record replaces per-run improvisation with something verified once and reused thereafter.
+
+That buys **stability** (same behavior across runs, sessions, and agents), **efficiency** (no re-deriving or re-validating the invocation, so less inference overhead), and **authority** (the record's behavioral rules **override the agent's built-in training knowledge**). Hence **definition is the primary action** and discovery only bootstraps a `Draft` for the user to complete — a record auto-filled from model knowledge would defeat its own purpose. The operating rule for every other skill/command is **reuse before generating**: check for an existing tool before writing script code for a complex action (`.specify/shared/workflow/tool-reuse-gate.md`; Constitution Principle XII).
+
+> **Terminology**: unqualified "tool" here means the record above. A supported coding agent (Claude Code, Codex CLI, …) is an **AI agent CLI**; the `tools:` frontmatter key on an agent is its **tool-call list**.
+
+Every record has four canonical types (`project-script`, `system-binary`, `shell-function`, `webhook`), an optional `## Environment Applicability` block (verified version, version differences, platform, architecture, fallback, preflight check), and a two-state lifecycle (`Draft` → `Verified`); only `Verified` records may be invoked. Type semantics, the RFC 2119 behavioral-rules format, environment applicability, the reuse gate, edge cases, and the invocation preview contract are defined once in `.specify/shared/definitions/tool-definitions.md`. The authoring templates live inside the owning skill at `skills/create-tools/templates/`.
 
 ### Modes → Capability Routing
 

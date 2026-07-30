@@ -1,10 +1,27 @@
 # /speckit.tools
 
-Define, modify, view, or invoke reusable tools with persistent records and explicit behavioral rules.
+Define, modify, view, or invoke reusable **Tools** — pre-verified capability records with explicit behavioral rules.
+
+## What a Tool Is
+
+A **Tool** is a named, pre-verified, reusable definition of one concrete capability, persisted at `.specify/memory/tools/<name>.md`, that an agent invokes *instead of* working out how to perform that action on the fly. It is an **abstraction layer between an agent's intent and the environment's reality**.
+
+It exists to remove two failure modes of the unmediated default:
+
+- **Environment variance** — the same logical capability is not the same command everywhere: the binary may be named differently, be a different version, need different flags per version, or differ by CPU architecture or OS. An agent reasoning from training knowledge picks one plausible invocation and gets it wrong on the machine actually present. A record pins what is **verified here** and states the known variance explicitly.
+- **Throwaway generated scripts** — for anything non-trivial an LLM otherwise writes ad-hoc script code in the moment, varying in quality and correctness and differing **between runs**, so behavior is not reproducible. A record replaces per-run improvisation with something verified once and reused thereafter.
+
+What that buys: **stability** (same behavior across runs, sessions, and agents), **efficiency** (no re-deriving or re-validating the invocation, so less inference overhead), and **authority** (a record's behavioral rules override the agent's built-in training knowledge).
+
+Hence the operating rule — **reuse before generating**: before writing script code for a complex or repeatable action, look for an existing Tool. See `.specify/shared/workflow/tool-reuse-gate.md` and Constitution Principle XII. The canonical concept definition is `.specify/shared/definitions/tool-definitions.md`.
+
+> **Terminology**: unqualified "Tool" here means the record above. A supported coding agent (Claude Code, Codex CLI, …) is an **AI agent CLI**; the `tools:` frontmatter key on an agent is its **tool-call list**. Three different things.
 
 ## When to Use
 
+- Before generating a script for a complex action — check whether a Tool already covers it
 - To define a new tool record with behavioral rules that the AI agent must follow
+- To capture environment variance (verified version, version-specific flags, platform, architecture, fallback)
 - To modify or view an existing tool definition
 - To invoke a defined tool with preview and confirmation
 - To list all registered tools in the project
@@ -48,6 +65,21 @@ Empty arguments list all records plus contextual suggestions; ambiguous intent r
 | `system-binary` | System-level | `/usr/bin/jq`, `/usr/local/bin/docker` |
 | `shell-function` | Shell-session-level | Functions from `${HOME}/.bashrc` |
 | `webhook` | Network-level | `https://ci.example.com/api/trigger-build` |
+
+## Environment Applicability
+
+A record can state **where its invocation is verified to hold** and **how it differs elsewhere**. Every field is optional — omit what does not vary. An empty field means "no known variance", never "verified everywhere".
+
+| Field | Purpose |
+|-------|---------|
+| Verified Version | The exact version the contract was verified against |
+| Version Differences | Invocation/flag differences across versions |
+| Platform | OS applicability and per-OS differences |
+| Architecture | CPU-architecture applicability or differences |
+| Fallback | What to use when the primary source is unavailable |
+| Preflight Check | A cheap command proving the tool is usable |
+
+**Verified, not assumed**: a record MUST NOT claim a version, platform, or architecture it was not verified on. When variance is known but one invocation cannot cover it, put the branch in the relevant field rather than silently pinning one form. Re-verify after a toolchain, OS, or machine change — `improve-tools` handles this as the *environment drift* improvement class.
 
 ## Execution Flow
 

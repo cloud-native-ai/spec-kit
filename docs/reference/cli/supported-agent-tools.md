@@ -9,6 +9,13 @@ distilled from the tool's **official documentation** (source URL noted at the to
 of each file). Docs were captured on 2026-07-11 — always confirm against the
 upstream source for the latest details.
 
+> **Terminology**: "tools" in this document means **AI agent CLIs** (Claude Code,
+> Codex CLI, …). It does *not* mean the **Tool definition records** owned by
+> `/speckit.tools` — those are pre-verified capability records under
+> `.specify/memory/tools/`, defined in
+> [tool-definitions.md](../../../shared/definitions/tool-definitions.md). A third
+> sense, an agent's `tools:` frontmatter key, is its **tool-call list**.
+
 ## Support matrix
 
 | Key | Name | Tier | Agent folder | CLI required | Official source |

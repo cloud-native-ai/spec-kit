@@ -48,6 +48,21 @@
 |------|------|-------------|
 | [field] | [type] | [meaning of return field] |
 
+## Environment Applicability
+
+Optional — record only the axes along which this tool actually varies. An empty
+field means "no known variance", never "verified everywhere". See
+`.specify/shared/definitions/tool-definitions.md` → Environment Applicability.
+
+| Field | Value |
+|-------|-------|
+| Verified Version | [exact version this contract was verified against] |
+| Version Differences | [invocation/flag differences across versions] |
+| Platform | [OS applicability and per-OS differences] |
+| Architecture | [CPU-architecture applicability or differences] |
+| Fallback | [what to use when the primary source is unavailable] |
+| Preflight Check | [cheap command proving the tool is usable] |
+
 ## Usage Notes
 
 - [Authentication requirements — what credentials are needed and how to provide them]

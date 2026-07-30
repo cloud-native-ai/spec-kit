@@ -23,6 +23,13 @@ These four facts govern every part of the mechanism and outrank any embedded wor
 4. **Local workaround value.** Until a Spec Kit version update lands, past entries are a
    reference for working around recurring issues — see *Workaround lookup* below.
 
+**Goal anchor (Constitution Principle XIII — Better-Harness Orientation).** Feedback is one
+of the framework's Better-Harness instruments: it strengthens the **Learning Capture**
+dimension of the goal model defined once in `.specify/shared/guidelines/better-harness.md`.
+Vocabulary note: the "harness" in red line 1 means the agent CLI/runtime (the host); the
+goal model's "Harness" means the project-level execution environment that Spec Kit's
+artifacts help build. The anchor adds orientation only — it never overrides these red lines.
+
 Do not diverge per surface — copy the canonical block below verbatim (adjusting only
 the `<unit-id>` / `<unit-type>` placeholders for the embedding unit).
 
