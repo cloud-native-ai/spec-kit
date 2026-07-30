@@ -1,0 +1,6 @@
+{
+  "baselineRunId": "ev-20260730-022019-create-team",
+  "targetFinding": "user-emphasis: team creation derives roster+pattern purely from a vague free-form goal, producing arbitrary teams that diverge from user expectation; agent-template ownership between create-agent and create-team was undocumented",
+  "change": "added references/capacity-vs-responsibility.md (capacity vs responsibility boundary + edit routing), references/team-presets.md (preset contract + matching protocol), templates/team-presets/{workspace-cluster,artifact-optimizer,process-monitor}.md distilled from real runs, scripts/match-team-preset.py (deterministic scorer), new create-mode step 2 (preset matching before pattern selection), optional team.md 'preset' field, Resources index; pointers added in create-agent/SKILL.md and templates/commands/team.md",
+  "expectedSignal": "next create-team run on a vague multi-repo / optimization / monitoring goal surfaces a matched preset with confidence>=medium and persists team.md carrying preset:<id>, instead of deriving a fresh arbitrary roster"
+}

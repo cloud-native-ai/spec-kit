@@ -24,6 +24,22 @@ Define, modify, view, or invoke reusable tools with persistent records and expli
 
 **Important**: Natural-language arguments describe the **tool capability to define**, not immediate execution. `/speckit.tools download DingTalk docs` means "create/locate a tool for downloading DingTalk docs", not "download now".
 
+## Modes → Intent Routing
+
+`/speckit.tools` is the **single entry point** for every tool operation. It recognizes intent and routes to the owning skill; it does not render templates inline.
+
+| Mode | Recognized intent | Routes to |
+|------|-------------------|-----------|
+| **define** | "定义工具", "创建工具", "define/create/add/register a tool" | `create-tools` skill |
+| **modify** | "修改工具", "优化工具", "modify/improve/fix a tool", "add alias", "verify tool" | `improve-tools` skill |
+| **view** | "查看工具", "view/show a tool" | read-only display |
+| **list** | "列出工具", "list tools" | read-only display |
+| **invoke** | "调用工具", "执行工具", "invoke/run a tool" | invocation gate |
+
+**Definition-first**: a record exists so its behavioral rules **override the agent's built-in training knowledge**. Mandatory fields therefore come from the user; discovery only bootstraps a `Draft` for the user to complete. A record auto-filled from model knowledge would defeat its own purpose.
+
+Empty arguments list all records plus contextual suggestions; ambiguous intent reports the capability list rather than guessing.
+
 ## Tool Types
 
 | Type | Scope | Example |
@@ -100,6 +116,17 @@ Rules are **authoritative** — when a tool has a definition record, the AI agen
 - **Non-existent source**: Warning issued but record created as `Draft`
 - **Incomplete record invocation**: Blocked with guidance to complete the definition
 - **Contradictory rules**: Persisted as-is with advisory note (user is authoritative)
+
+## Companion Skills
+
+| Skill | Owns | Canonical path |
+|-------|------|----------------|
+| `create-tools` | Authoring a new record: intake, template selection, validation, persistence, registry row | `.specify/skills/create-tools/SKILL.md` |
+| `improve-tools` | Field-level refinement of an existing record: source/contract correction, rule hardening, alias/rename, `Draft` → `Verified` promotion | `.specify/skills/improve-tools/SKILL.md` |
+
+The four type templates live inside the owning skill at `.specify/skills/create-tools/templates/` (`tool-project-script-template.md`, `tool-system-binary-template.md`, `tool-shell-function-template.md`, `tool-webhook-template.md`). Shared type semantics, the rules format, and the invocation preview contract are defined once in `.specify/shared/definitions/tool-definitions.md`.
+
+**Dogfooding**: Spec Kit manages its own core scripts through this command — see the `### Tools` registry in `.specify/instructions.md` and the records under `.specify/memory/tools/`.
 
 ## Prerequisites
 

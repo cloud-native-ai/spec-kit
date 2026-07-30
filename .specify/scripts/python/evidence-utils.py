@@ -85,6 +85,20 @@ def iso(ts: datetime) -> str:
     return ts.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def write_text_atomic(path: Path, text: str) -> None:
+    """Atomic file write (.part + os.replace) — adopted from export-session's zip commit."""
+    tmp = path.with_name(path.name + ".part")
+    try:
+        tmp.write_text(text, encoding="utf-8")
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+        raise
+
+
 def target_slug(target: str) -> str:
     slug = target.split(":", 1)[-1].lstrip("/").replace("speckit.", "")
     slug = re.sub(r"[^a-z0-9-]+", "-", slug.lower()).strip("-")
@@ -201,7 +215,7 @@ def engine_subset_path(root: Path):
     return None
 
 
-SESSION_FILE_SUFFIXES = (".jsonl", ".json")
+SESSION_FILE_SUFFIXES = (".jsonl", ".json", ".db", ".sqlite")
 
 
 def probe_session_store(store: str) -> str:
@@ -619,15 +633,14 @@ def action_collect(args) -> dict:
     }
 
     run_dir.mkdir(parents=True, exist_ok=True)
-    (run_dir / "findings.json").write_text(
-        json.dumps(findings, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    (run_dir / "manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_text_atomic(run_dir / "findings.json",
+        json.dumps(findings, ensure_ascii=False, indent=2) + "\n")
+    write_text_atomic(run_dir / "manifest.json",
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
     for lane, envelope in envelopes.items():
         lanes_dir.mkdir(parents=True, exist_ok=True)
-        (lanes_dir / f"{lane}.json").write_text(
-            json.dumps(redact_deep(envelope, root), ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8")
+        write_text_atomic(lanes_dir / f"{lane}.json",
+            json.dumps(redact_deep(envelope, root), ensure_ascii=False, indent=2) + "\n")
 
     index = load_index(root)
     index["entries"].append({

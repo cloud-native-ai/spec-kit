@@ -589,6 +589,12 @@ async function firstJsonlRecord(filePath) {
 }
 
 export class CodexSessionAnalyzer extends SessionAnalyzer {
+  currentSessionId() {
+    // spec-kit local modification (UPSTREAM.md): client-injected env factors,
+    // aligned with export-session's _SESSION_ID_ENV list.
+    return process.env.CODEX_THREAD_ID ?? process.env.CODEX_SESSION_ID ?? null;
+  }
+
   async resolveScope(options = {}) {
     const workspace = normalizeWorkspace(options.workspace);
     const since = normalizeCliDate(options.since, false);

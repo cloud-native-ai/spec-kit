@@ -1,9 +1,9 @@
 ---
-description: Define, modify, view, or invoke a tool via reusable local records with explicit behavioral rules. Definition is the primary action — discovery assists only when bootstrapping a new record.
+description: Single entry point for all tool operations — define, modify, view, list, and invoke tool definition records via intent routing.
 handoffs:
-  - label: Create Plan
-    agent: speckit.plan
-    prompt: Generate an implementation plan for /speckit.tools
+  - label: Update Instructions
+    agent: speckit.instructions
+    prompt: Refresh project instructions so newly created tool records are discoverable.
     send: false
 scripts:
   sh: scripts/bash/create-new-tools.sh --json --name $ARGUMENTS --action find
@@ -15,52 +15,120 @@ scripts:
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-protocol.md). If empty, display list of all registered tools. If `tool_id` and natural-language hint conflict, stop and request correction.
+Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-protocol.md). If empty, execute the **Default Behavior (No Arguments)** defined below. If non-empty but intent is ambiguous or unsupported, report capabilities and request the missing intent (do NOT guess silently). If a `tool_id` and a natural-language hint conflict, stop and request correction.
 
 ## Outline
 
-Goal: Definition-first tool management. Create, modify, view, or invoke tools with explicit behavioral rules that override LLM built-in knowledge.
+`/speckit.tools` is the **single entry point** for every **tool** operation — the tool-domain analogue of `/speckit.agents` and `/speckit.team`. It recognizes intent, then routes to the owning tool skill. It delegates to skills and does **NOT** render templates inline.
 
-For detailed tool type semantics, behavioral rules format, edge cases, and invocation preview format, see `shared/definitions/tool-definitions.md`.
+A **tool** is a named, reusable **definition record** persisted at `.specify/memory/tools/<name>.md`, carrying the user's authoritative knowledge about how the tool is invoked. Its defining property: **the record's behavioral rules override the agent's built-in training knowledge**. When a record exists, the agent MUST follow the persisted rules rather than what it believes it knows about the command. This is why **definition is the primary action** and discovery only bootstraps a `Draft` for the user to complete — a record auto-filled from model knowledge would defeat its own purpose.
 
-### Execution Steps
+Every record has four canonical types (`project-script`, `system-binary`, `shell-function`, `webhook`) and a two-state lifecycle (`Draft` → `Verified`); only `Verified` records may be invoked. Type semantics, the RFC 2119 behavioral-rules format, edge cases, and the invocation preview contract are defined once in `shared/definitions/tool-definitions.md`. The authoring templates live inside the owning skill at `skills/create-tools/templates/`.
 
-1. **Determine intent**: Parse `$ARGUMENTS` → classify as: **define** | **modify** | **view** | **invoke** | **list**.
+### Modes → Capability Routing
 
-2. **Resolve existing record**: Check `.specify/memory/tools/<tool-name>.md`. Check alias matches.
+`/speckit.tools` exposes **exactly five** modes:
 
-3. **Route by intent and record state**:
+| Mode | Recognized intent | Delegates to |
+|------|-------------------|--------------|
+| **define** | "定义工具", "创建工具", "新增工具", "注册工具", "define a tool", "create/add/register a tool" | `create-tools` skill |
+| **modify** | "修改工具", "优化工具", "更新工具", "改工具规则", "modify/improve/fix a tool", "add alias", "verify tool" | `improve-tools` skill |
+| **view** | "查看工具", "看下这个工具", "view/show a tool" | read-only display (see View / List Mode) |
+| **list** | "列出工具", "有哪些工具", "list tools" | read-only display (see View / List Mode) |
+| **invoke** | "调用工具", "执行工具", "跑一下", "invoke/run/execute a tool" | invocation gate (see Invoke Mode) |
 
-   | Intent | Record Exists | Action |
-   |--------|--------------|--------|
-   | define | No | → Collect mandatory fields |
-   | define | Yes | → Inform user; offer modify or view |
-   | modify | Yes | → Field-level update |
-   | modify | No | → Error: use define intent |
-   | view | Yes | → Display full definition |
-   | view | No | → Error: no definition found |
-   | invoke | Yes + Verified | → Preview and confirm |
-   | invoke | Yes + Draft | → Error: complete definition first |
-   | invoke | No | → Error: define first |
-   | list | — | → Show summary table |
+**Routing flow**:
 
-4. **Create new tool** (define intent, no record):
-   - **CRITICAL**: Mandatory fields MUST be provided by user. Do NOT auto-populate from built-in knowledge.
-   - Collect: Tool Name, Tool Type (`project-script`|`system-binary`|`shell-function`|`webhook`), Source Identifier, Description
-   - Optionally collect: Behavioral Rules (RFC 2119 format), Parameters, Returns, Aliases
-   - If only name provided: offer discovery via `{SCRIPT}` to bootstrap draft
-   - Validate → set status (`Draft` or `Verified`) → persist at `.specify/memory/tools/<name>.md`
-   - Generate `tool_id` from canonical path
+1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: classify as `define`, `modify`, `view`, `list`, or `invoke`.
+2. **Resolve the record** — check `.specify/memory/tools/<tool-name>.md` and alias matches. When the same name exists under different types, require explicit user disambiguation and present all matching records.
+3. **define** → `create-tools`: collect the mandatory fields **from the user** (never auto-populate a tool's contract from built-in knowledge), author the record from the matching type template, validate, persist with a generated `tool_id`, and register it. If the record already exists, inform the user and offer `modify` or `view` instead.
+4. **modify** → `improve-tools`: load the existing record and apply **field-level** edits only — source/contract correction, rule hardening, alias/rename, or `Draft` → `Verified` promotion. Preserve every unmodified field; re-validate and re-persist. If the record does not exist, report "no definition found" and offer to `define` it.
+5. **view / list** → read-only display; never mutate a record (see View / List Mode below).
+6. **invoke** → follow the **preview → confirm → execute** gate below.
+7. **Empty arguments** → execute **Default Behavior (No Arguments)** below.
+8. **Non-empty but ambiguous / unsupported** → report capabilities and request the missing intent (see "Ambiguous or Unsupported Intent" below).
 
-5. **Modify**: Load record → apply field-level updates only → re-validate → persist.
+### Default Behavior (No Arguments)
 
-6. **Invoke**: Load record → display preview (command, params, rules, expected output) → `Proceed? (yes/no)` → execute only on explicit yes.
+When `$ARGUMENTS` is empty, the command MUST execute the following sequence instead of routing to a mode:
 
-7. **Register**: Add/update entry in `.specify/instructions.md` `## Resource Registry` → `### Tools`.
+1. **List all registered tools** — scan `.specify/memory/tools/*.md` and present a summary table with each tool's `name`, `tool_type`, `source_identifier`, and `status`. If no records exist, state "No tools found" explicitly.
+2. **Give contextual suggestions** — based on the current conversation, recent repo activity, and the listed records, recommend the most relevant next action. Examples: a `Draft` record blocking use → suggest `modify` to complete it; a script the conversation keeps invoking by hand → suggest `define` it; a `Verified` record matching the current task → suggest `invoke`. Suggestions MUST be grounded in observable context, NOT fabricated.
+3. **Show capability summary** — briefly list the five modes so the user knows what operations are available.
 
-8. **View/List**: Display full definition or summary table of all tools.
+This behavior is informational and non-destructive: it MUST NOT define, modify, or invoke any tool without explicit user instruction.
 
-For agent-specific operational guidance, see `shared/workflow/agent-configuration.md`.
+### Ambiguous or Unsupported Intent
+
+When intent cannot be resolved from non-empty arguments, the command MUST report the recognized capabilities and request the missing intent. It MUST NOT guess silently or fail without a message. Report this capability listing:
+
+- **define** — author a new tool definition record with authoritative behavioral rules → `create-tools`
+- **modify** — correct or strengthen an existing record, or promote it to `Verified` → `improve-tools`
+- **view** — display one record's full definition
+- **list** — show a summary table of all records
+- **invoke** — preview a resolved invocation and execute it only after explicit confirmation
+
+### View / List Mode
+
+Read-only, never mutating:
+
+- **view** — load the record and display its full definition: fields, parameters, returns, behavioral rules, aliases, `status`, `discovery_origin`, and `tool_id`. If no record exists, report "no definition found" and offer to `define` it.
+- **list** — display a summary table of all records under `.specify/memory/tools/`. Distinguish `Draft` from `Verified` so incomplete records are visible.
+
+### Invoke Mode (preview → confirm → execute)
+
+Invocation is gated. The command MUST NOT execute a tool before explicit user confirmation:
+
+1. **Load** the record and require `status: Verified`. A `Draft` record MUST block invocation — guide the user to complete the definition via `modify` instead.
+2. **Preview** using the Invocation Preview format in `shared/definitions/tool-definitions.md`: the resolved command, resolved parameter values, the record's behavioral rules, and the expected output shape.
+3. **Confirmation gate** — prompt `Proceed with execution? (yes/no)` and execute **only** on an explicit `yes`. On anything else, stop without executing and record the session as `cancelled`.
+4. **Execute** exactly what was previewed — do NOT modify parameters beyond the preview — while honoring the record's behavioral rules as authoritative over built-in knowledge.
+5. **Record the session** — `tool_name`, `tool_id`, `resolved_command`, `result_status`.
+
+### Persistence
+
+- Definition records: `.specify/memory/tools/<name>.md`; `tool_id` is the canonical form `<TOOL:.specify/memory/tools/<name>.md>`.
+- Registry: exactly one row per tool in the `### Tools` table of `.specify/instructions.md` (`## Resource Registry`), inside the `<!-- TOOLS_REGISTRY_START -->` / `<!-- TOOLS_REGISTRY_END -->` range. This range is owned by the tools domain; `/speckit.instructions` does not reconcile it.
+- `.specify/memory/tools.md` is the **discovery inventory** regenerated by `refresh-tools.sh` — it is not a definition record and MUST NOT be hand-edited by these modes.
+
+## Agent-Specific Configuration
+
+### Step 1: Identify Executing Agent
+
+Identify which AI agent is executing this command:
+
+| Agent | Detection Signals |
+|-------|-------------------|
+| **Claude Code** | Tools include `Agent`, `Edit`, `Bash`, `Read`; `.claude/` directory exists |
+| **GitHub Copilot** | Running in VS Code Copilot Chat context; `.github/copilot-instructions.md` loaded |
+| **Qoder CLI** | `.qoder/` directory exists; `AGENTS.md` instructions loaded |
+| **opencode** | `.opencode/` directory exists |
+| **Qwen Code** | `QWEN.md` instructions loaded; `.qwen/` directory exists |
+| **Codex CLI** | `.codex/` directory exists |
+| **Hermes Agent** | `.hermes/` directory exists |
+| **iFlow** | `.iflow/` directory exists |
+
+If you cannot identify your agent, skip Step 2 and proceed with the standard flow.
+
+### Step 2: Load Agent-Specific Guidance
+
+Check whether a guide exists for the routed skill at:
+
+```
+.specify/skills/<create-tools|improve-tools>/references/<agent-slug>-guide.md
+```
+
+If it exists, apply its tool mappings and pitfall avoidances during execution. Otherwise proceed with the standard flow. For shared operational guidance, see `shared/workflow/agent-configuration.md`.
+
+### Step 3: Capture Execution Feedback
+
+If you hit a genuine agent-specific obstacle (an unavailable tool call, an output format mismatch, a needed workaround), write a feedback document to:
+
+```
+.specify/memory/feedback/tools-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
+```
+
+Include: **Source** (`/speckit.tools`), **Agent**, **Timestamp**, **Outcome**, then `## Obstacle`, `## Workaround Applied`, and `## Suggested Improvement`. Only generate feedback when a genuine agent-specific obstacle was encountered.
 
 ## Feedback
 
@@ -87,6 +155,6 @@ At the same wrap-up point as the Feedback step, apply the docs-sync evaluation p
 
 ## Handoffs
 
-**Before**: Use when you need to externalize and reuse tool records with strict behavioral rules.
+**Before**: Use when you need to externalize and reuse tool records with strict behavioral rules that outrank the agent's built-in knowledge.
 
-**After**: Tool records are available for agent permissions wiring and `/speckit.instructions` registry.
+**After**: Tool records are available for agent permissions wiring and the `/speckit.instructions` registry.

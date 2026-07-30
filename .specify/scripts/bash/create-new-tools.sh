@@ -397,16 +397,31 @@ get_template_file() {
         shell-function)
             template_name="tool-shell-function-template.md"
             ;;
+        webhook)
+            template_name="tool-webhook-template.md"
+            ;;
     esac
-    
-    # Check template locations
-    if [ -f "$ROOT_DIR/.specify/templates/$template_name" ]; then
-        echo "$ROOT_DIR/.specify/templates/$template_name"
-    elif [ -f "$ROOT_DIR/templates/$template_name" ]; then
-        echo "$ROOT_DIR/templates/$template_name"
-    else
+
+    if [ -z "$template_name" ]; then
         echo ""
+        return
     fi
+
+    # Templates are owned by the create-tools skill; the templates/ paths are a
+    # fallback for installs predating the move.
+    local candidate
+    for candidate in \
+        "$ROOT_DIR/.specify/skills/create-tools/templates/$template_name" \
+        "$ROOT_DIR/skills/create-tools/templates/$template_name" \
+        "$ROOT_DIR/.specify/templates/$template_name" \
+        "$ROOT_DIR/templates/$template_name"; do
+        if [ -f "$candidate" ]; then
+            echo "$candidate"
+            return
+        fi
+    done
+
+    echo ""
 }
 
 # Create tool record from template

@@ -247,6 +247,10 @@ _OBSOLETE_TEMPLATES = (
     "mcptool-template.md",
     "spec-template.md",
     "tool-mcp-call-template.md",
+    "tool-project-script-template.md",
+    "tool-shell-function-template.md",
+    "tool-system-binary-template.md",
+    "tool-webhook-template.md",
 )
 # OBSOLETE-ASSET-REGISTRY:END
 
@@ -777,15 +781,14 @@ def has_local_templates() -> bool:
 
 
 def rewrite_paths(content: str) -> str:
-    """Rewrite paths in content to use .specify/ prefix."""
+    """Rewrite root-relative paths in content to use the .specify/ prefix."""
     import re
 
-    # Only rewrite paths that don't already start with .specify/
-    # Use negative lookbehind to ensure we don't match paths that already have .specify/
-    content = re.sub(r"(?<!\.specify/)memory/", r".specify/memory/", content)
-    content = re.sub(r"(?<!\.specify/)scripts/", r".specify/scripts/", content)
-    content = re.sub(r"(?<!\.specify/)templates/", r".specify/templates/", content)
-    content = re.sub(r"(?<!\.specify/)shared/", r".specify/shared/", content)
+    # Only rewrite a segment that STARTS a path reference. The lookbehind rejects
+    # any preceding path character, which covers both an existing `.specify/`
+    # prefix and nested references such as `skills/<name>/templates/`.
+    for segment in ("memory", "scripts", "templates", "shared"):
+        content = re.sub(rf"(?<![\w./-]){segment}/", rf".specify/{segment}/", content)
     return content
 
 

@@ -64,6 +64,66 @@ function toolStateOutput(state) {
   return "";
 }
 
+// spec-kit owned (P2): SQLite helpers (node:sqlite, read-only, lazily imported
+// because node:sqlite is still flagged experimental on some 22.x runtimes).
+let sqliteModulePromise = null;
+async function loadSqlite() {
+  if (!sqliteModulePromise) {
+    sqliteModulePromise = import("node:sqlite").catch(() => null);
+  }
+  return sqliteModulePromise;
+}
+
+function parseDataColumn(row) {
+  if (row && typeof row.data === "string") {
+    try {
+      row.data = JSON.parse(row.data);
+    } catch {
+      row.data = null;
+    }
+  }
+  return row;
+}
+
+async function openOpencodeDb(dbPath) {
+  const sqlite = await loadSqlite();
+  if (!sqlite?.DatabaseSync) return null;
+  try {
+    return new sqlite.DatabaseSync(dbPath, { readOnly: true });
+  } catch {
+    return null;
+  }
+}
+
+async function queryOpencodeSessions(dbPath) {
+  const db = await openOpencodeDb(dbPath);
+  if (!db) return [];
+  try {
+    const rows = db.prepare("SELECT * FROM session ORDER BY time_updated DESC").all();
+    return rows.map(parseDataColumn);
+  } catch {
+    return [];
+  } finally {
+    db.close();
+  }
+}
+
+function queryOpencodeMessages(db, sessionId) {
+  try {
+    return db.prepare("SELECT * FROM message WHERE session_id = ? ORDER BY rowid").all(sessionId).map(parseDataColumn);
+  } catch {
+    return [];
+  }
+}
+
+function queryOpencodeParts(db, messageId) {
+  try {
+    return db.prepare("SELECT * FROM part WHERE message_id = ? ORDER BY rowid").all(messageId).map(parseDataColumn);
+  } catch {
+    return [];
+  }
+}
+
 export class OpencodeSessionAnalyzer extends SessionAnalyzer {
   currentSessionId() {
     return process.env.OPENCODE_SESSION_ID ?? null;
@@ -108,6 +168,20 @@ export class OpencodeSessionAnalyzer extends SessionAnalyzer {
         workspaceScoped: true,
         coverage: "optional",
       },
+      {
+        // spec-kit owned (P2): opencode also persists sessions in a SQLite DB
+        // (session/message/part tables, parent_id for subsessions) — adopted
+        // from export-session's storage reality. Probed in parallel; sessions
+        // found in both sources are merged by sessionId.
+        id: "opencode-sqlite",
+        kind: "opencode-sqlite-db",
+        role: "session-transcript",
+        path: path.join(scope.home, "opencode.db"),
+        optional: true,
+        enabled: true,
+        workspaceScoped: true,
+        coverage: "optional",
+      },
     ];
     return Promise.all(roots.map(async (root) => ({
       ...root,
@@ -116,9 +190,22 @@ export class OpencodeSessionAnalyzer extends SessionAnalyzer {
   }
 
   async discoverSessions(scope, roots) {
-    const sessions = [];
+    const sessionsById = new Map();
+    const pushSession = (session) => {
+      const existing = sessionsById.get(session.sessionId);
+      if (!existing) {
+        sessionsById.set(session.sessionId, session);
+        return;
+      }
+      existing.sourceKinds = [...new Set([...existing.sourceKinds, ...session.sourceKinds])];
+      existing.sourceRefs.push(...session.sourceRefs);
+      if (session.parentId && !existing.parentId) existing.parentId = session.parentId;
+      mergeTimeRange(existing, session.firstSeen);
+      mergeTimeRange(existing, session.lastSeen);
+    };
+
     const infoDirs = [];
-    for (const root of roots.filter((item) => item.exists && item.enabled)) {
+    for (const root of roots.filter((item) => item.exists && item.enabled && item.kind !== "opencode-sqlite-db")) {
       if (root.kind === "opencode-session-json") {
         const projectDirs = await walkFiles(root.path, {
           maxDepth: 4,
@@ -162,9 +249,36 @@ export class OpencodeSessionAnalyzer extends SessionAnalyzer {
       };
       mergeTimeRange(session, firstSeen);
       mergeTimeRange(session, lastSeen);
-      sessions.push(session);
+      pushSession(session);
     }
-    return sessions.sort((left, right) =>
+
+    // SQLite source (opencode.db): session/message/part tables; parent_id
+    // marks subagent subsessions. Rows double as their own source ref.
+    const dbRoot = roots.find((item) => item.kind === "opencode-sqlite-db" && item.exists && item.enabled);
+    if (dbRoot) {
+      for (const row of await queryOpencodeSessions(dbRoot.path)) {
+        const directory = row.directory ?? row.data?.directory ?? null;
+        if (!isWorkspaceMatch(directory, scope.workspace)) continue;
+        const firstSeen = normalizeTimestamp(row.time_created ?? row.data?.time?.created ?? null);
+        const lastSeen = normalizeTimestamp(row.time_updated ?? row.data?.time?.updated ?? null) ?? firstSeen;
+        if (!withinTimeRange(lastSeen ?? firstSeen, scope)) continue;
+        const session = {
+          sessionId: row.id,
+          parentId: row.parent_id ?? row.data?.parentID ?? null,
+          workspace: scope.workspace,
+          firstSeen: null,
+          lastSeen: null,
+          sourceKinds: ["opencode-sqlite-db"],
+          sourceRefs: [{ kind: "opencode-sqlite-db", role: dbRoot.role, path: dbRoot.path, firstSeen, lastSeen }],
+          title: typeof row.title === "string" ? row.title.slice(0, 120) : null,
+        };
+        mergeTimeRange(session, firstSeen);
+        mergeTimeRange(session, lastSeen);
+        pushSession(session);
+      }
+    }
+
+    return [...sessionsById.values()].sort((left, right) =>
       (timestampMillis(right.lastSeen) ?? 0) - (timestampMillis(left.lastSeen) ?? 0));
   }
 
@@ -237,10 +351,57 @@ export class OpencodeSessionAnalyzer extends SessionAnalyzer {
     };
   }
 
+  async readSqliteSession(session, scope, ref, options, events, seq) {
+    const db = await openOpencodeDb(ref.path);
+    if (!db) return seq;
+    try {
+      for (const row of queryOpencodeMessages(db, session.sessionId)) {
+        const data = row.data && typeof row.data === "object" ? row.data : {};
+        const messageTime = row.time_created ?? data?.time?.created ?? null;
+        const role = row.role ?? data.role;
+        const model = row.model ?? data.model?.modelID ?? data.modelID ?? null;
+        const messageParts = queryOpencodeParts(db, row.id);
+        const text = messageParts
+          .filter((part) => (part.type ?? part.data?.type) === "text")
+          .map((part) => partText(part.data && typeof part.data === "object" ? { ...part.data, type: "text" } : part))
+          .filter(Boolean)
+          .join("\n")
+          .trim();
+        const messageEvent = this.normalizeEvent(
+          { ...data, id: row.id, role, modelID: model, _eventType: "message", _text: text, _messageTime: messageTime, _seq: seq += 1 },
+          { ...ref, sessionId: session.sessionId }, options);
+        if (withinTimeRange(messageEvent.timestamp, scope)) events.push(messageEvent);
+        for (const part of messageParts) {
+          const pdata = part.data && typeof part.data === "object" ? part.data : {};
+          const ptype = part.type ?? pdata.type;
+          if (ptype !== "tool") continue;
+          const state = pdata.state && typeof pdata.state === "object" ? pdata.state : part.state;
+          const callEvent = this.normalizeEvent(
+            { ...pdata, id: part.id, _eventType: "tool.call", _messageTime: state?.time?.start ?? messageTime, _seq: seq += 1 },
+            { ...ref, sessionId: session.sessionId }, options);
+          if (withinTimeRange(callEvent.timestamp, scope)) events.push(callEvent);
+          if (state?.status === "completed" || state?.status === "error") {
+            const resultEvent = this.normalizeEvent(
+              { ...pdata, id: part.id, _eventType: "tool.result", _messageTime: state?.time?.end ?? messageTime, _seq: seq += 1 },
+              { ...ref, sessionId: session.sessionId }, options);
+            if (withinTimeRange(resultEvent.timestamp, scope)) events.push(resultEvent);
+          }
+        }
+      }
+    } finally {
+      db.close();
+    }
+    return seq;
+  }
+
   async readSession(session, scope, options = {}) {
     const events = [];
     let seq = 0;
     for (const ref of session.sourceRefs ?? []) {
+      if (ref.kind === "opencode-sqlite-db") {
+        seq = await this.readSqliteSession(session, scope, ref, options, events, seq);
+        continue;
+      }
       const sessionRoot = ref.sessionRoot;
       const messageDir = path.join(sessionRoot, "message", session.sessionId);
       const partDir = path.join(sessionRoot, "part", session.sessionId);

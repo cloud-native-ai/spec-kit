@@ -12,6 +12,8 @@ Author a **single agent artifact** for the Spec Kit agent system — a role temp
 
 > **Conceptual Model**: the multi-agent Role × Stage × Type + Team/Loop model is defined once in the team domain — see `skills/create-team/references/conceptual-model.md`. This skill authors the single **Role** artifacts that can participate in a team.
 
+> **Capacity, not responsibility**: templates here define an agent's **capacity** — what it *can do*, team-agnostic (tools, skills, model budget, professional identity, domain method). Team-scoped **responsibility** (stage assignment, write territory, handoff paths, reporting duty) is defined in the team domain, never here. The authoritative boundary and edit routing: `skills/create-team/references/capacity-vs-responsibility.md`.
+
 Canonical template home: `skills/create-agent/templates/` (installed mirror: `.specify/skills/create-agent/templates/`).
 
 ## Capability Matrix

@@ -1,0 +1,18 @@
+{
+  "teams": [
+    {
+      "team": "draw-plantuml-optimizer",
+      "runReports": 5,
+      "critiques": [],
+      "logRows": 0,
+      "partial": true
+    },
+    {
+      "team": "requirement-implement-monitor",
+      "runReports": 4,
+      "critiques": [],
+      "logRows": 4,
+      "partial": false
+    }
+  ]
+}

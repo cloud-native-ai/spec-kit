@@ -26,6 +26,24 @@ export function workspaceToCursorSlugVariants(workspace) {
   return [...new Set([hyphenated.replace(/^-+/, ""), colonless.replace(/^-+/, ""), hyphenated, colonless])];
 }
 
+// spec-kit local modification (UPSTREAM.md): cwd-in-file probe helper.
+async function probeCwdFromTranscript(filePath, maxLines = 200) {
+  let cwd = null;
+  await forEachJsonLine(
+    filePath,
+    (raw) => {
+      const value = raw?.cwd ?? raw?.workspace ?? null;
+      if (value) {
+        cwd = value;
+        return false;
+      }
+      return undefined;
+    },
+    { maxLines },
+  );
+  return cwd;
+}
+
 function transcriptSessionId(filePath) {
   return path.basename(filePath, ".jsonl");
 }
@@ -476,6 +494,11 @@ export class CursorSessionAnalyzer extends SessionAnalyzer {
       if (!await pathExists(rootPath)) continue;
       const files = await walkFiles(rootPath, { maxDepth: 2, limit: 20_000, match: (file) => file.endsWith(".jsonl") });
       for (const filePath of files) {
+        // spec-kit local modification (UPSTREAM.md): cwd-in-file probe — a
+        // transcript whose embedded cwd clearly belongs elsewhere is skipped;
+        // transcripts without any cwd field stay included (no inference).
+        const probedCwd = await probeCwdFromTranscript(filePath);
+        if (probedCwd && !isWorkspaceMatch(probedCwd, scope.workspace)) continue;
         const sessionId = transcriptSessionId(filePath);
         addRef(sessions, sessionId, scope.workspace, {
           kind: transcriptRoot.kind,

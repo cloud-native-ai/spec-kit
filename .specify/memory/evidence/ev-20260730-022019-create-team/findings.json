@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "kind": "speckit.evidence-findings",
+  "target": "skill:create-team",
+  "runId": "ev-20260730-022019-create-team",
+  "window": {
+    "since": null,
+    "until": null
+  },
+  "platforms": [
+    "qoder"
+  ],
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 2
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 62
+    }
+  },
+  "evidence": [
+    {
+      "id": "ev-001",
+      "lane": "session",
+      "evidenceState": "Unobserved",
+      "summary": "No eligible qoder sessions observed for this workspace in the window.",
+      "evidenceRefs": [],
+      "signals": {
+        "eligibleSessions": 0
+      },
+      "privacyNote": "redacted-semantic-facet"
+    },
+    {
+      "id": "ev-002",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Project profile captured: primary languages javascript, python; git history signals collected.",
+      "evidenceRefs": [
+        "core-change-watch/project-profile",
+        "core-change-watch/git-history-profile"
+      ],
+      "signals": {
+        "primaryLanguages": 2,
+        "sourceFiles": 242,
+        "testFiles": 187
+      }
+    },
+    {
+      "id": "ev-003",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Dependency governance: 2 ecosystem(s), risk level medium.",
+      "evidenceRefs": [
+        "dependency-governance/cli"
+      ],
+      "signals": {
+        "ecosystems": 2,
+        "staleDependencyFiles": 0
+      }
+    },
+    {
+      "id": "ev-004",
+      "lane": "assets",
+      "evidenceState": "Present",
+      "summary": "Asset baseline (qoder): status complete, 16 lint finding(s), inventory available.",
+      "evidenceRefs": [
+        "coding-agent-practices/asset-baseline"
+      ],
+      "signals": {
+        "lintFindings": 16
+      }
+    },
+    {
+      "id": "ev-005",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team draw-plantuml-optimizer: 5 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/draw-plantuml-optimizer/runs/20260715T130546Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T071030Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T074420Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T094834Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T104232Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-006",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team requirement-implement-monitor: 4 run report(s), 4 logged cycle(s), 0 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/requirement-implement-monitor/runs/20260729T063425Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T072002Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T074013Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T093345Z-report.md"
+      ],
+      "signals": {
+        "runReports": 4,
+        "loggedCycles": 4,
+        "escalations": 4,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-007",
+      "lane": "feedback",
+      "evidenceState": "Present",
+      "summary": "Feedback store scanned: 62 entr(y/ies), 0 recurring optimization theme(s).",
+      "evidenceRefs": [
+        ".specify/memory/feedback/index.json"
+      ],
+      "signals": {
+        "entries": 62,
+        "recurringThemes": 0
+      }
+    }
+  ],
+  "findingsDigest": "sha256:5ba39dce0750227c079f986a62f65da842211d1534e7d3d4f0806a9a57ef2dff"
+}

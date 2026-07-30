@@ -1,10 +1,32 @@
 {
   "store": "feedback",
-  "updated": "2026-07-29T09:54:10Z",
+  "updated": "2026-07-30T02:47:42Z",
   "threshold": 10,
-  "count_since_submission": 1,
+  "count_since_submission": 3,
   "submitted_at": "2026-07-29T09:49:58Z",
   "entries": [
+    {
+      "id": "20260730T024742Z-skill-improve-skills",
+      "file": "20260730T024742Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "improve-skills-20260730-create-team-presets",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-30T02:47:42Z",
+      "summary": "Improved create-team by resolving the capacity-vs-responsibility ownership boundary between the two agent-template sets and adding a predefined team-preset library with a deterministic matcher, driven"
+    },
+    {
+      "id": "20260730T022515Z-skill-improve-skills",
+      "file": "20260730T022515Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "20260730T022200Z-agent-template-monitor",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-30T02:25:15Z",
+      "summary": "以 /improve-skills 入口收到监控类任务，判定与技能输入契约失配后改走 requirement-implement-monitor 团队 Cycle 1（新目标 agent-template-consolidation 全量基线，SCORE 0.8775，HP-1 一项待人工决策），对监控对象零写入。"
+    },
     {
       "id": "20260729T095410Z-skill-improve-team",
       "file": "20260729T095410Z-skill-improve-team.md",

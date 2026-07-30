@@ -1,0 +1,30 @@
+{
+  "runId": "ev-20260730-022019-create-team",
+  "target": "skill:create-team",
+  "created": "2026-07-30T02:20:19Z",
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 2
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 62
+    }
+  },
+  "engine": {
+    "engineSubsetPath": "scripts/js/better-harness",
+    "upstreamCommit": "b2e621d",
+    "nodeVersion": "25.9.0"
+  },
+  "findingsDigest": "sha256:5ba39dce0750227c079f986a62f65da842211d1534e7d3d4f0806a9a57ef2dff"
+}

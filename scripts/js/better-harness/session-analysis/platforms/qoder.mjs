@@ -93,6 +93,156 @@ function isWorkspaceMatch(candidate, workspace) {
   return resolved === workspace || resolved.startsWith(`${workspace}${path.sep}`);
 }
 
+// spec-kit local modification (UPSTREAM.md): cwd-in-file probing helpers.
+async function probeCwdFromJsonl(filePath, maxLines = 200) {
+  let cwd = null;
+  await forEachJsonLine(
+    filePath,
+    (raw) => {
+      const value = inferCwd(raw);
+      if (value) {
+        cwd = value;
+        return false;
+      }
+      return undefined;
+    },
+    { maxLines },
+  );
+  return cwd;
+}
+
+// spec-kit local modification (UPSTREAM.md): Qoder IDE state.vscdb resolution
+// (adopted from export-session). The IDE keeps per-workspace VS Code-style
+// state in <User>/workspaceStorage/<hash>/state.vscdb; per-session real model
+// lives at ItemTable["chat.modelConfig.session.<sid>"].
+let sqliteModulePromise = null;
+async function loadSqlite() {
+  if (!sqliteModulePromise) {
+    sqliteModulePromise = import("node:sqlite").catch(() => null);
+  }
+  return sqliteModulePromise;
+}
+
+function qoderIdeUserDir() {
+  if (process.platform === "darwin") {
+    return path.join(expandHome("~"), "Library", "Application Support", "Qoder", "User");
+  }
+  if (process.platform === "win32") {
+    const appdata = process.env.APPDATA;
+    return appdata ? path.join(appdata, "Qoder", "User") : null;
+  }
+  return path.join(expandHome("~"), ".config", "Qoder", "User");
+}
+
+let workspaceDbCache = new Map();
+async function findIdeWorkspaceDb(cwd) {
+  if (workspaceDbCache.has(cwd)) return workspaceDbCache.get(cwd);
+  let result = null;
+  const userDir = qoderIdeUserDir();
+  const wsRoot = userDir ? path.join(userDir, "workspaceStorage") : null;
+  if (wsRoot && (await pathExists(wsRoot))) {
+    const target = path.resolve(cwd);
+    for (const entry of await readdir(wsRoot, { withFileTypes: true }).catch(() => [])) {
+      if (!entry.isDirectory()) continue;
+      const wj = path.join(wsRoot, entry.name, "workspace.json");
+      if (!(await pathExists(wj))) continue;
+      const meta = await readJson(wj).catch(() => null);
+      const folder = typeof meta?.folder === "string" ? meta.folder : null;
+      if (!folder) continue;
+      let folderPath = folder;
+      try {
+        folderPath = decodeURIComponent(new URL(folder).pathname);
+      } catch {
+        folderPath = folder;
+      }
+      if (path.resolve(folderPath.replace(/\/+$/, "")) === target) {
+        const dbPath = path.join(wsRoot, entry.name, "state.vscdb");
+        result = (await pathExists(dbPath)) ? dbPath : null;
+        break;
+      }
+    }
+  }
+  workspaceDbCache.set(cwd, result);
+  return result;
+}
+
+async function readIdeItem(dbPath, key) {
+  const sqlite = await loadSqlite();
+  if (!sqlite?.DatabaseSync) return null;
+  let db = null;
+  try {
+    db = new sqlite.DatabaseSync(dbPath, { readOnly: true });
+    const row = db.prepare("SELECT value FROM ItemTable WHERE key = ?").get(key);
+    return row?.value ?? null;
+  } catch {
+    return null;
+  } finally {
+    db?.close();
+  }
+}
+
+async function resolveIdeSessionModel(cwd, sessionId) {
+  if (!cwd || !sessionId) return null;
+  const dbPath = await findIdeWorkspaceDb(cwd);
+  if (!dbPath) return null;
+  const raw = await readIdeItem(dbPath, `chat.modelConfig.session.${sessionId}`);
+  if (typeof raw !== "string" || !raw.trim()) return null;
+  const value = raw.trim();
+  if (value.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(value);
+      const model = parsed?.model ?? parsed?.modelId ?? parsed?.modelID ?? null;
+      return typeof model === "string" && model ? model : null;
+    } catch {
+      return null;
+    }
+  }
+  return value.replace(/^"|"$/g, "") || null;
+}
+
+async function probeProjectDirWorkspace(dirPath, workspace) {
+  // true: some file carries a matching cwd; false: files carry only non-matching
+  // cwd values; null: no cwd field found anywhere (caller falls back to slug).
+  const candidates = [];
+  try {
+    for (const entry of await readdir(dirPath, { withFileTypes: true })) {
+      if (entry.isFile() && entry.name.endsWith(JSONL_EXT)) {
+        candidates.push(path.join(dirPath, entry.name));
+      } else if (entry.isDirectory() && entry.name === "transcript") {
+        const transcriptDir = path.join(dirPath, "transcript");
+        for (const sub of await readdir(transcriptDir, { withFileTypes: true }).catch(() => [])) {
+          if (sub.isFile() && sub.name.endsWith(JSONL_EXT)) {
+            candidates.push(path.join(transcriptDir, sub.name));
+          }
+        }
+      }
+    }
+  } catch {
+    return null;
+  }
+  candidates.sort();
+  let sawAnyCwd = false;
+  for (const filePath of candidates.slice(0, 8)) {
+    // sibling state dir <sid>/state.json also carries workspace facts
+    const statePath = path.join(dirPath, path.basename(filePath, JSONL_EXT), "state.json");
+    if (await pathExists(statePath)) {
+      const state = await readJson(statePath).catch(() => null);
+      const stateCwd = state?.workspace ?? state?.cwd ?? null;
+      if (stateCwd) {
+        sawAnyCwd = true;
+        if (isWorkspaceMatch(stateCwd, workspace)) return true;
+      }
+    }
+    const cwd = await probeCwdFromJsonl(filePath);
+    if (!cwd) continue;
+    sawAnyCwd = true;
+    if (isWorkspaceMatch(cwd, workspace)) {
+      return true;
+    }
+  }
+  return sawAnyCwd ? false : null;
+}
+
 function inferSessionId(raw, sourceRef) {
   return (
     raw?.sessionId ??
@@ -254,7 +404,16 @@ function inferModel(raw) {
 }
 
 function inferRequestId(raw) {
-  return raw?.request_id ?? raw?.requestId ?? raw?.data?.request_id ?? raw?.data?.requestId ?? null;
+  const direct = raw?.request_id ?? raw?.requestId ?? raw?.data?.request_id ?? raw?.data?.requestId ?? null;
+  if (direct) return direct;
+  // spec-kit local modification (UPSTREAM.md): qoder-cli assistant rows carry the
+  // bailian request id as message.id = "chatcmpl-<hex>" (verified against a real
+  // store 2026-07-30; adopted from export-session's _strip_chatcmpl).
+  const messageId = raw?.message?.id ?? raw?.data?.message?.id ?? null;
+  if (typeof messageId === "string" && messageId.startsWith("chatcmpl-")) {
+    return messageId.slice("chatcmpl-".length);
+  }
+  return null;
 }
 
 function inferResponseId(raw) {
@@ -848,6 +1007,10 @@ function disabledRootWarnings(roots) {
 }
 
 export class QoderSessionAnalyzer extends SessionAnalyzer {
+  currentSessionId() {
+    return process.env.QODER_SESSION_ID ?? null;
+  }
+
   async resolveScope(options = {}) {
     const workspace = normalizeWorkspace(options.workspace);
     const since = normalizeCliDate(options.since, false);
@@ -1034,10 +1197,30 @@ export class QoderSessionAnalyzer extends SessionAnalyzer {
   }
 
   async discoverProjectSessions(scope, roots, sessions) {
-    const root = roots.find((item) => item.id === "qoder-projects");
-    if (root?.exists && root.enabled) {
-      for (const sourceRoot of sourceRootPaths(root)) {
-        await this.discoverProjectRootSessions(scope, sessions, sourceRoot, {
+    // spec-kit local modification (UPSTREAM.md): cwd-in-file ownership probing.
+    // Directory-name slugs are lossy and version-dependent; the session's own
+    // cwd/workspace field is the ground truth (adopted from export-session).
+    // Probing policy: any file in the project dir that carries a cwd matching
+    // the workspace marks the whole dir as ours; a dir whose files carry only
+    // non-matching cwd values is skipped; a dir with NO cwd field at all falls
+    // back to the slug-variant directory-name match. The scan gate is the
+    // projects/ parent dir itself, not slug-derived root paths.
+    const projectsParent = path.join(scope.home, "projects");
+    if (await pathExists(projectsParent)) {
+      const slugVariants = new Set(scope._workspaceSlugVariants ?? [scope.workspaceSlug]);
+      let projectDirs = [];
+      try {
+        projectDirs = await readdir(projectsParent, { withFileTypes: true });
+      } catch {
+        projectDirs = [];
+      }
+      for (const entry of projectDirs) {
+        if (!entry.isDirectory()) continue;
+        const dirPath = path.join(projectsParent, entry.name);
+        const ownership = await probeProjectDirWorkspace(dirPath, scope.workspace);
+        if (ownership === false) continue;
+        if (ownership === null && !slugVariants.has(entry.name)) continue;
+        await this.discoverProjectRootSessions(scope, sessions, dirPath, {
           kind: "project-jsonl",
           transcriptKind: "execution-transcript",
           planningScope: "workspace",
@@ -1424,7 +1607,7 @@ export class QoderSessionAnalyzer extends SessionAnalyzer {
       }
     }
 
-    return events
+    const refined = events
       .map((event) => event.cwd ? event : { ...event, cwd: scope.workspace })
       .filter((event) => withinTimeRange(event.timestamp, scope))
       .sort((a, b) => {
@@ -1435,6 +1618,20 @@ export class QoderSessionAnalyzer extends SessionAnalyzer {
         }
         return (a.evidenceRef.line ?? a.evidenceRef.seq ?? 0) - (b.evidenceRef.line ?? b.evidenceRef.seq ?? 0);
       });
+
+    // spec-kit local modification (UPSTREAM.md): overlay the IDE state.vscdb
+    // per-session real model over tier-alias model strings (e.g. "kmodel_latest")
+    // recorded in transcripts — adopted from export-session's model resolution.
+    const realModel = await resolveIdeSessionModel(scope.workspace, session.sessionId);
+    if (realModel) {
+      for (const event of refined) {
+        if (!event.model || /^kmodel/i.test(event.model)) {
+          event.model = realModel;
+          event.modelSource = "ide-state-vscdb";
+        }
+      }
+    }
+    return refined;
   }
 
   async readJsonlEvents(sessionId, ref, events, options) {

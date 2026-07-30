@@ -142,3 +142,67 @@ test("opencode facts flow redacts user text by default (no raw prompt in facts)"
     await rm(root, { recursive: true, force: true });
   }
 });
+
+async function makeSqliteFixture() {
+  const { root, home, workspace } = await makeFixture();
+  const { DatabaseSync } = await import("node:sqlite");
+  const db = new DatabaseSync(path.join(home, "opencode.db"));
+  db.exec(`CREATE TABLE session(id TEXT PRIMARY KEY, parent_id TEXT, directory TEXT, title TEXT,
+           time_created INTEGER, time_updated INTEGER, data TEXT)`);
+  db.exec(`CREATE TABLE message(id TEXT PRIMARY KEY, session_id TEXT, role TEXT, time_created INTEGER, data TEXT)`);
+  db.exec(`CREATE TABLE part(id TEXT PRIMARY KEY, message_id TEXT, session_id TEXT, type TEXT, data TEXT)`);
+  const created = Date.parse("2026-07-01T12:00:00Z");
+  const ins = (sql, args) => db.prepare(sql).run(...args);
+  ins("INSERT INTO session VALUES (?,?,?,?,?,?,?)",
+    ["ses_parent", null, workspace, "parent session", created, created + 90_000, null]);
+  ins("INSERT INTO session VALUES (?,?,?,?,?,?,?)",
+    ["ses_child", "ses_parent", workspace, "child subsession", created + 30_000, created + 60_000, null]);
+  ins("INSERT INTO session VALUES (?,?,?,?,?,?,?)",
+    ["ses_far", null, path.join(root, "far"), "other workspace", created, created, null]);
+  ins("INSERT INTO message VALUES (?,?,?,?,?)",
+    ["msg_p1", "ses_parent", "user", created, JSON.stringify({ role: "user" })]);
+  ins("INSERT INTO message VALUES (?,?,?,?,?)",
+    ["msg_p2", "ses_parent", "assistant", created + 5_000,
+     JSON.stringify({ role: "assistant", model: { modelID: "db-model" } })]);
+  ins("INSERT INTO part VALUES (?,?,?,?,?)",
+    ["prt_p1", "msg_p1", "ses_parent", "text",
+     JSON.stringify({ type: "text", text: "run the db fixture" })]);
+  ins("INSERT INTO part VALUES (?,?,?,?,?)",
+    ["prt_p2", "msg_p2", "ses_parent", "tool",
+     JSON.stringify({ type: "tool", callID: "call_db1", tool: "bash",
+       state: { status: "completed", input: { command: "make test" }, output: "ok",
+         time: { start: created + 6_000, end: created + 8_000 } } })]);
+  ins("INSERT INTO message VALUES (?,?,?,?,?)",
+    ["msg_c1", "ses_child", "assistant", created + 40_000,
+     JSON.stringify({ role: "assistant", modelID: "db-model" })]);
+  db.close();
+  return { root, home, workspace };
+}
+
+test("opencode sqlite source: workspace filtering, parent_id, message/part events", async () => {
+  const { root, home, workspace } = await makeSqliteFixture();
+  try {
+    const analyzer = new OpencodeSessionAnalyzer();
+    const scope = await analyzer.resolveScope({ workspace, home });
+    const roots = await analyzer.discoverSourceRoots(scope);
+    assert.equal(roots.find((r) => r.id === "opencode-sqlite").exists, true);
+    const sessions = await analyzer.discoverSessions(scope, roots);
+    const ids = sessions.map((s) => s.sessionId).sort();
+    assert.deepEqual(ids, ["ses_abc", "ses_child", "ses_parent"],
+      "JSON-layout ses_abc plus sqlite parent/child; far-workspace filtered");
+    const parent = sessions.find((s) => s.sessionId === "ses_parent");
+    const child = sessions.find((s) => s.sessionId === "ses_child");
+    assert.equal(child.parentId, "ses_parent");
+    const events = await analyzer.readSession(parent, scope, { includeCommandText: true });
+    const types = events.map((e) => e.type);
+    assert.ok(types.includes("user") && types.includes("assistant"));
+    const call = events.find((e) => e.type === "tool.call");
+    assert.equal(call.toolName, "bash");
+    assert.equal(call.commandText, "make test");
+    const result = events.find((e) => e.type === "tool.result");
+    assert.equal(result.success, true);
+    assert.ok(events.find((e) => e.type === "assistant").model === "db-model");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});

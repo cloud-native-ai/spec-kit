@@ -218,16 +218,28 @@ def _normalize_tool_type(tool_type: str) -> str:
     return mapping.get(tool_type, tool_type)
 
 
+def _workspace_root_for(tools_dir: Path) -> Path:
+    """Resolve the workspace root that a tool record's canonical path is relative to.
+
+    Canonical layout is ``<workspace>/.specify/memory/tools``. When no ``.specify``
+    ancestor exists (a bare directory, as in tests), fall back to the deepest
+    available ancestor instead of indexing past the end of ``parents``.
+    """
+    root = tools_dir
+    while root.name != ".specify" and root.parent != root:
+        root = root.parent
+    if root.name == ".specify":
+        return root.parent
+    parents = tools_dir.parents
+    return parents[min(2, len(parents) - 1)] if len(parents) else tools_dir
+
+
 def save_record(tools_dir: Path, record: Any) -> Path:
     tools_dir.mkdir(parents=True, exist_ok=True)
     record.last_updated = date.today().isoformat()
     if not record.tool_id:
         record_file = _record_path(tools_dir, record.name)
-        root = tools_dir
-        while root.name != ".specify" and root.parent != root:
-            root = root.parent
-        workspace_root = root.parent if root.name == ".specify" else tools_dir.parents[2]
-        record.tool_id = _generate_tool_id(record_file, workspace_root)
+        record.tool_id = _generate_tool_id(record_file, _workspace_root_for(tools_dir))
 
     record_file = _record_path(tools_dir, record.name)
     origin = getattr(record, "discovery_origin", "manual-entry") or "manual-entry"

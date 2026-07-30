@@ -1,6 +1,6 @@
 {
   "store": "evidence",
-  "updated": "2026-07-29T10:29:52Z",
+  "updated": "2026-07-30T02:20:20Z",
   "entries": [
     {
       "runId": "ev-20260729-073639-project",
@@ -131,6 +131,19 @@
         "feedback": "unavailable"
       },
       "file": "ev-20260729-102952-project/findings.json"
+    },
+    {
+      "runId": "ev-20260730-022019-create-team",
+      "target": "skill:create-team",
+      "created": "2026-07-30T02:20:19Z",
+      "lanesSummary": {
+        "session": "available",
+        "project": "available",
+        "assets": "available",
+        "runs": "partial",
+        "feedback": "available"
+      },
+      "file": "ev-20260730-022019-create-team/findings.json"
     }
   ]
 }

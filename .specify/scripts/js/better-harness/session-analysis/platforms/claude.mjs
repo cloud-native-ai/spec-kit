@@ -303,7 +303,7 @@ function dedupeEvents(events) {
 
 export class ClaudeSessionAnalyzer extends SessionAnalyzer {
   currentSessionId() {
-    return process.env.CLAUDE_SESSION_ID ?? null;
+    return process.env.CLAUDE_CODE_SESSION_ID ?? process.env.CLAUDE_SESSION_ID ?? null;
   }
 
   async resolveScope(options = {}) {

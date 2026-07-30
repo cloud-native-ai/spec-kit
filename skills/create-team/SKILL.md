@@ -14,6 +14,8 @@ Create and run an **agent team**: organize multiple Agents into a **collaborativ
 
 The multi-agent Conceptual Model (Role × Stage × Type + Team/Loop, the Team Supervisor Meta role, and the static/dynamic structure split) is defined once, authoritatively, in `references/conceptual-model.md`. Read it before defining or running a team; do not re-define it elsewhere.
 
+**Which template set defines an agent** — `create-agent/templates/` defines an agent's **capacity** (team-agnostic: tools, skills, professional identity); `create-team/templates/` defines an agent's **responsibility** (team-scoped: stage, territory, handoff, reporting duty). The authoritative boundary, including the no-cross-writing rule and edit routing, is `references/capacity-vs-responsibility.md`. Read it before adding or editing any agent template.
+
 The **goal** — the team's north star that both structures serve — is defined authoritatively in `references/goal.md`. When a goal's theme is **optimization**, `references/optimization-goals.md` gives the one-time-vs-continuous classification and the elimination-vs-progressive strategies. Read `references/goal.md` before defining a team; it is the goal-side companion to the conceptual model.
 
 ## Team Definition & Persistence (create mode)
@@ -21,10 +23,11 @@ The **goal** — the team's north star that both structures serve — is defined
 Produce a team from a user **goal** and (unless one-shot) persist it as `.specify/teams/<slug>/team.md`. The goal is the team's north star — **establish it first, then derive both structures from it** (goal concept: `references/goal.md`).
 
 1. **Establish the goal (first)** — extract the goal from `$ARGUMENTS`/conversation/repo context, ask if missing, and confirm it with the user; write it in a **verifiable** form (success criteria / threshold). If the goal's theme is **optimization**, classify it (one-time vs continuous) and pick a strategy (elimination vs progressive) per `references/optimization-goals.md`.
-2. **Select the pattern** via the Pattern Selection decision tree below (independent → parallel; sequenced → serial; iterative-quality → iteration; long-lived operation → continuous) — **derived from the goal**.
-3. **Build the roster (static structure)** — a Role × Stage × Type matrix. If the user did not supply members, **propose** them from the goal: prefer existing agents under `.specify/agents/`, otherwise temporary stage/worker templates from `templates/`. An **iteration or continuous team MUST include exactly one Team Supervisor** (Meta role).
-4. **Build the pattern config (dynamic structure)** — parallelism + territories (parallel), DAG `blockedBy` edges + per-handoff verification + file-path-only handoff (serial), quality dimensions + threshold + max_iterations + regression_limit (iteration), or the operating config — maturity + cadence + budget + constraints + independent verifier + state spine (continuous; see `references/operating-loops.md`).
-5. **Confirm** the proposed **goal** + roster + pattern with the user, then persist the `Team` to `.specify/teams/<slug>/team.md` using the schema below (skip persistence only for an explicit one-shot run).
+2. **Match against team presets (before deriving anything)** — run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<goal text>"` and act on the returned `confidence`: `high` → present the top preset (goal skeleton + roster + pattern) and **recommend reuse**; `medium` → present the top 2 candidates alongside the from-scratch option; `low`/`none` → say no preset matched and continue to step 3. Presets are known-good shapes distilled from teams that actually ran — reusing one is what keeps a vague goal from producing an arbitrary team. Never instantiate a preset silently, and never let it override an explicit user instruction. See `references/team-presets.md`.
+3. **Select the pattern** via the Pattern Selection decision tree below (independent → parallel; sequenced → serial; iterative-quality → iteration; long-lived operation → continuous) — **derived from the goal**. On preset reuse, the preset supplies the pattern; still confirm it fits.
+4. **Build the roster (static structure)** — a Role × Stage × Type matrix. If the user did not supply members, **propose** them from the goal: prefer existing agents under `.specify/agents/`, otherwise temporary stage/worker templates from `templates/`. An **iteration or continuous team MUST include exactly one Team Supervisor** (Meta role). Roster rows carry **responsibility** (stage, territory, `blockedBy`, reporting duty); the referenced agent carries **capacity** — never fork a capacity artifact to express a new seat (`references/capacity-vs-responsibility.md`).
+5. **Build the pattern config (dynamic structure)** — parallelism + territories (parallel), DAG `blockedBy` edges + per-handoff verification + file-path-only handoff (serial), quality dimensions + threshold + max_iterations + regression_limit (iteration), or the operating config — maturity + cadence + budget + constraints + independent verifier + state spine (continuous; see `references/operating-loops.md`).
+6. **Confirm** the proposed **goal** + roster + pattern with the user, then persist the `Team` to `.specify/teams/<slug>/team.md` using the schema below (skip persistence only for an explicit one-shot run). When a preset was reused, record `preset: <preset_id>` in the frontmatter and apply the preset's `## Instantiation` steps (including any `constraints.md` / `STATE.md` bootstrap).
 
 ### Persisted `team.md` schema
 
@@ -37,6 +40,7 @@ slug: <kebab-slug>
 description: <one-line label>
 goal: <overall final objective + success criteria / threshold>
 pattern: parallel | serial | iteration | continuous
+preset: <preset_id>            # optional — set when instantiated from a team preset
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 members:
@@ -610,6 +614,15 @@ In iteration/continuous loops, every dispatched sub-agent (optimizer, executor/r
 - **Every run writes a dated report** to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` per the Report contract
 
 ---
+
+## Resources
+
+| Path | Contents |
+|------|----------|
+| `${SKILL_HOME}/references/` | `conceptual-model.md` (Role × Stage × Type), `capacity-vs-responsibility.md` (which template set defines what), `goal.md`, `optimization-goals.md`, `operating-loops.md`, `team-presets.md` (preset mechanism + matching protocol) |
+| `${SKILL_HOME}/templates/` | team-supervisor role template, the three EEI stage templates, the parallel/serial/triad orchestration templates, `agent-workflow-schema.md` |
+| `${SKILL_HOME}/templates/team-presets/` | Predefined team shapes: `workspace-cluster.md`, `artifact-optimizer.md`, `process-monitor.md` |
+| `${SKILL_HOME}/scripts/match-team-preset.py` | Deterministic preset matcher — scores a goal against every preset's signals and returns ranked JSON with a `confidence` verdict (`--help` for usage) |
 
 ## Agent-Specific Configuration
 
