@@ -32,7 +32,7 @@ State the detected mode briefly in the final report.
 Parse `skill name` and `description` from the user input:
 
 - **skill name**: A concise command-like identifier matching the project script validator: letters, digits, hyphens (`-`), and underscores (`_`) only. When inventing a name, prefer lowercase kebab-case (for example, `api-testing`) unless the user explicitly needs another valid form.
-- **description**: A capability summary plus trigger keyword list. Format: `This skill can <capability>. Use this when the user mentions [ "keyword1", "keyword2", ... ]`.
+- **description**: A capability summary plus trigger keyword list. Format: `This skill can <capability>. Use this when the user mentions [ "keyword1", "keyword2", ... ]`. **No-workflow-summary rule**: the description MUST NOT summarize the workflow steps or body content — an agent that sees a workflow summary in the description will skip loading the body and execute a degraded version. Capability + triggers only.
 
 If the input contains only a valid name and the Skill already exists (`.specify/skills/<name>/SKILL.md`), redirect to `improve-skills` rather than creating a duplicate.
 
@@ -163,6 +163,16 @@ Minimum checks:
 - [ ] Standalone mode only: format is consistent with sibling skills in the host directory, and no `.specify/**` path is referenced
 - [ ] Spec Kit project mode: **run the existing skill-conformance contract suite** (`pytest tests/contract/ -q -k "skill or runtime_mode"`) before reporting completion — new skills are subject to ALL pre-existing conformance contracts (runtime-mode gate, feedback-section shape, registry dedup); a later full-suite regression is the wrong place to discover a miss
 
+### 6.5 Pressure Test (RED-GREEN)
+
+Apply the method in [pressure-testing.md](./references/pressure-testing.md) before registering a **discipline/workflow skill** (one that constrains agent behavior):
+
+1. **RED** — dispatch a fresh subagent on a realistic pressure scenario WITHOUT the skill; record its failures and rationalizations verbatim.
+2. **GREEN** — repeat WITH the skill loaded; verify the RED failure modes do not recur (observed compliance, not a plausibility argument).
+3. **REFACTOR** — close every loophole GREEN exposed (MUST/MUST NOT lines, red-flag phrases), re-run until clean.
+
+Pure utility skills (deterministic script wrappers) may substitute a smoke invocation — state which case applied. The user may explicitly waive this step; record the waiver in the completion report either way.
+
 ### 7. Propagate the Skill to built-in agents
 
 Applies only when creating a **new** Skill **in Spec Kit project mode** — in standalone mode skip this step (no built-in role agents exist). Wire it into the built-in role agents so they prefer it for role-relevant work, following the Feature 026 Skill Enablement convention (see `docs/agents/command-and-skills.md`).
@@ -196,11 +206,12 @@ Summarize:
 
 ### Discoverable Descriptions
 
-`description` must include keywords and trigger scenarios. Avoid vague one-liners.
+`description` must include keywords and trigger scenarios. Avoid vague one-liners. It states capability + triggers ONLY — never a summary of the workflow steps (a workflow summary invites the agent to skip the body).
 
 ### Anti-Patterns
 
 - Vague descriptions that fail to trigger
+- Descriptions that summarize the workflow body (agent skips loading the body)
 - `SKILL.md` too large without splitting into `./references/`
 - Directory name inconsistent with `name` in frontmatter
 - Missing executable steps (only background prose)

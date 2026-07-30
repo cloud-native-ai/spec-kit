@@ -6,6 +6,7 @@ Use this checklist to validate a newly created Skill before reporting completion
 
 - [ ] `name` matches the Skill directory name
 - [ ] `description` includes trigger keywords and scenarios (not vague)
+- [ ] `description` does NOT summarize the workflow body — capability + triggers only (a workflow summary invites agents to skip loading the body)
 - [ ] `skill_id` is present and uses the `<SKILL:.specify/skills/<name>/SKILL.md>` format
 - [ ] Optional frontmatter fields (`argument-hint`, `user-invocable`, `disable-model-invocation`) are only present when needed
 

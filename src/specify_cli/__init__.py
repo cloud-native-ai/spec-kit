@@ -954,9 +954,14 @@ def generate_commands(
 
         # Write the command file based on format
         output_path = output_dir / f"speckit.{name}.{ext}"
+        marker = (
+            f"AUTO-GENERATED from templates/commands/{name}.md — do not edit; "
+            "edit the source template, then run scripts/python/regen-command-copies.py"
+        )
         if ext == "toml":
             toml_content = (
-                f'description = "{description}"\n\n'
+                f"# {marker}\n"
+                + f'description = "{description}"\n\n'
                 + 'prompt = """\n'
                 + body
                 + '\n"""\n'
@@ -966,7 +971,7 @@ def generate_commands(
         else:
             # For "prompt.md" and "md" just write the body
             with open(output_path, "w", encoding="utf-8") as f:
-                f.write(body)
+                f.write(f"<!-- {marker} -->\n" + body)
 
 
 def strip_comments(text: str) -> str:

@@ -18,8 +18,18 @@ Use this checklist when improving a Skill after a real execution. The focus is e
 - Each issue has an observed symptom.
 - Each issue has a likely cause in the current Skill instructions or resources.
 - Each issue has a desired next-run behavior.
-- Issues are grouped by failure mode: trigger/discovery, scope inference, missing context, wrong tool choice, unsafe step, unclear output, validation gap, or resource/reference issue.
+- Issues are grouped by failure mode: trigger/discovery, scope inference, missing context, wrong tool choice, unsafe step, unclear output, validation gap, constraint non-compliance, or resource/reference issue.
 - One-off environment noise is excluded unless the Skill should handle it in future runs; successful fallback warnings are tracked as validation notes, not root causes.
+
+## Constraint Placement and Compliance
+
+- Runs where the workflow was followed but a hard rule was violated are classified as constraint non-compliance, and diagnosed as a placement problem first (see [constraint-placement.md](./constraint-placement.md)).
+- Hard constraints in the target Skill live in one compact, clearly delimited block, not scattered across step prose.
+- Steps that repeatedly violate one rule carry that rule's concrete text inline at the decision point — not a pointer such as "see Constraints" (a measured no-op).
+- No constraint block is duplicated across sections; one source of truth only (duplication measurably reduces compliance).
+- Prohibitions are paired with the required alternative to avoid negation-priming toward the banned behavior.
+- Completion conditions are objective and checkable (named sections, tables, counts, exit codes), not subjective adverbs.
+- A placement fix is verified against the previously failing high-difficulty constraints, not against position-immune easy rules.
 
 ## Root-Cause-Driven Improvement
 

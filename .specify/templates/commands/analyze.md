@@ -170,6 +170,22 @@ Feature-specific severity rules:
 - **MEDIUM**: Requirement likely feature-related but binding confidence is low due to incomplete metadata
 - **LOW**: Cosmetic naming drift where semantic intent still matches
 
+### 5.5 Finding Validation (independent subagent pass)
+
+Before reporting, every **CRITICAL** and **HIGH** finding MUST be confirmed by an independent read-only validation subagent:
+
+- **Fresh context**: the validator receives ONLY the finding (id, category, claim, severity) and its evidence location(s) — never the detection reasoning or the other findings.
+- **Task**: re-read the cited artifacts and return one verdict: `confirm` (evidence supports the claim), `reject` (claim not supported — state why), or `downgrade` (real but overstated — propose severity).
+- **Batching**: validate findings in one parallel dispatch wave; a validator MUST NOT validate a finding it produced.
+- **Report handling**: only `confirm`ed findings keep CRITICAL/HIGH in the main table; `downgrade`d rows get the new severity with a `(validated: downgraded)` note; `reject`ed rows move to a separate **Unvalidated Findings** appendix (never silently dropped). MEDIUM/LOW skip validation.
+
+**DO-NOT-FLAG list** (noise control — do not report these at any severity):
+- Style/wording preferences already consistent within the project's own conventions
+- Intentional template placeholders (`[REQUIREMENT NAME]`, `TXXX`, sample tasks marked as samples)
+- Deferred `[~]` tasks with recorded reasons (they are deliberate, not gaps)
+- Cross-references into `.specify/` mirrors that duplicate canonical paths by design
+- Pre-existing baseline test failures already recorded in the feature's baseline file
+
 ### 6. Produce Compact Analysis Report
 
 Output Markdown report (no file writes):

@@ -1,3 +1,4 @@
+<!-- AUTO-GENERATED from templates/commands/history.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 
 ```text

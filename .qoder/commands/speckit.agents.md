@@ -1,3 +1,4 @@
+<!-- AUTO-GENERATED from templates/commands/agents.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 > Compatibility: Follow VS Code Copilot custom agent format for `.agent.md` files.
 
 ## User Input

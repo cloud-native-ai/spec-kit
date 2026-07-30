@@ -60,7 +60,14 @@ config:
 <Role × Stage × Type matrix table for this team's roster>
 
 ## Dynamic Structure
-<pattern description, parallelism/DAG/loop settings, and the execution flow diagram>
+<pattern description, parallelism/DAG/loop settings, and the execution flow diagram.
+ For iteration/continuous patterns this section MUST end with an explicit Loop Card
+ (WHEN→SEE→DO→CHECK→STOP→LEAVE table): WHEN = trigger/cadence, SEE = state read first
+ (STATE.md/constraints), DO = the bounded unit per cycle, CHECK = concrete verification
+ (evaluator command/criterion), STOP = termination condition + hard caps
+ (threshold/max_iterations/budget/kill-switch), LEAVE = what is persisted/handed off
+ (runs report, STATE update, escalations). A loop whose CHECK or STOP cannot be
+ stated concretely is not ready to persist.>
 ```
 
 - `slug` MUST be unique within `.specify/teams/`; it also names the team directory `.specify/teams/<slug>/`.
@@ -223,6 +230,15 @@ Context Isolation Rules:
 - NO other agent's task briefs shared
 - NO intermediate results from other agents visible
 - Child agents receive only their territory manifest
+
+### Worktree Isolation (optional, config `isolation: worktree`)
+
+Territory validation gives *logical* isolation; worktrees add *physical* isolation for teams whose members write real project files (not just report manifests). Enable by setting `isolation: worktree` in the team's `config`.
+
+- **Dispatch**: each writing member runs in its own git worktree (dispatch the agent with worktree isolation; the runtime creates a branch per member from the default branch HEAD). Read-only members (evaluators, analysts) do NOT need worktrees.
+- **Merge protocol**: the Lead — never a member — reviews each member branch (diff against base), then merges sequentially into the integration branch; territory validation still applies, so merges are conflict-free by construction. A conflict at merge time means territory validation was wrong — stop and repartition rather than resolving ad hoc.
+- **Dirty-tree refusal**: never delete a worktree with uncommitted changes; surface it to the user (it may be salvageable work). Cleanup only after the branch is merged or explicitly discarded.
+- **When to skip**: single-writer teams, report-only (L1) teams, and teams whose members write only into `.specify/teams/.work/<slug>/` gain nothing from worktrees — keep the default shared-tree dispatch.
 
 ### Monitoring
 

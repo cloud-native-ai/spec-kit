@@ -1,3 +1,4 @@
+# AUTO-GENERATED from templates/commands/review.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py
 description = "Critically review the SDD process for the current feature and produce a self-contained, improvement-focused report for the spec-kit maintainers.
 handoffs:
   - label: Analyze For Consistency
@@ -90,6 +91,14 @@ For each artifact and workflow as a whole, find issues:
 - **Process gaps**: Lifecycle steps lacking automation
 
 Per finding: **ID** (F1, F2...), **Severity** (P0/P1/P2), **Category** (Template|Command Prompt|Automation|Workflow|Documentation), **Location** (absolute path or URL), **Evidence** (quoted excerpt), **Why**, **Proposed fix**.
+
+### 4.5 Finding validation (independent subagent pass)
+
+Every **P0** finding MUST be confirmed by an independent read-only validation subagent before it enters the report:
+
+- The validator receives ONLY the finding (id, claim, severity, location, quoted evidence) — never the diagnostic reasoning or sibling findings — and returns `confirm` / `reject` (with why) / `downgrade` (with proposed severity).
+- Only `confirm`ed findings keep P0; `downgrade`d rows take the proposed severity with a `(validated: downgraded)` note; `reject`ed rows go to an **Unvalidated Findings** appendix in the report — never silently dropped. P1/P2 skip validation.
+- Do not flag: deliberate `[~]` deferrals with recorded reasons, mirror-by-design duplication under `.specify/`, or pre-existing baseline failures already recorded for the feature.
 
 ### 5. Generate report
 

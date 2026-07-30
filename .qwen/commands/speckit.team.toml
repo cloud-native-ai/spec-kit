@@ -1,3 +1,4 @@
+# AUTO-GENERATED from templates/commands/team.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py
 description = "Single entry point for all team operations — create, modify, and run agent teams via intent routing.
 handoffs:
   - label: Update Instructions
@@ -61,7 +62,7 @@ The goal is persisted as the `goal` frontmatter field and rendered as a `## Goal
 **Routing flow**:
 
 1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: classify as `create`, `modify`, or `run`.
-2. **create** → `create-team`: **first establish the goal** — elicit it from `$ARGUMENTS` / conversation / repo context, or ask for it, and confirm it with the user — then **match the goal against the predefined team presets** (`skills/create-team/templates/team-presets/`, matched via `skills/create-team/scripts/match-team-preset.py`): on a strong match, recommend reusing that preset instead of deriving a team from scratch; otherwise propose a roster (static structure) + pattern config (dynamic structure) **derived from that goal**. On confirmation persist `.specify/teams/<slug>/team.md` (or run one-shot without persisting).
+2. **create** → `create-team`: **first establish the goal** — elicit it from `$ARGUMENTS` / conversation / repo context, or ask for it, and confirm it with the user — then **match the goal against the predefined team presets** (`skills/create-team/templates/teams/`, matched via `skills/create-team/scripts/match-team-preset.py`): on a strong match, recommend reusing that preset instead of deriving a team from scratch; otherwise propose a roster (static structure) + pattern config (dynamic structure) **derived from that goal**. On confirmation persist `.specify/teams/<slug>/team.md` (or run one-shot without persisting).
 3. **modify** → `improve-team`: load the existing team and apply targeted, evidence-based edits to any of its three parts — the **goal**, the **static structure**, or the **dynamic structure**. Structure edits are structure-preserving and keep serving the current goal. **Redefining the goal is a first-class, supported edit**: when the goal changes, re-evaluate and realign the roster and pattern to serve the new goal. Re-persist and bump `updated`.
 4. **run** → `create-team` execution path: follow the **preview → confirm → execute** gate below.
 5. **Empty arguments** → execute **Default Behavior (No Arguments)** below.

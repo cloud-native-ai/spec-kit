@@ -1,3 +1,4 @@
+# AUTO-GENERATED from templates/commands/docs.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py
 description = "Standardize and manage the project documentation space (root entry files + docs/ tree) as a single reconcile engine — observe, diff through a tolerance band, dry-run plan, converge with archive-not-delete, verify.
 handoffs:
   - label: Record to Memory

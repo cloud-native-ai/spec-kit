@@ -160,4 +160,6 @@ A slim `SKILL.md` makes the agent's behavior **predictable and auditable**:
 - Triggers (frontmatter description) stay aligned with what the body actually delivers.
 - The Skill stops accumulating environment-recovery code that no other Skill needs.
 
+Slimming also has a **measured compliance payoff**. Skill loading is progressive across four levels: **L0** frontmatter `description` (always in context), **L1** `SKILL.md` body (loaded on trigger; keep ≤ ~5K tokens), **L2** `references/` (read on demand), **L3** `scripts/` (executed, near-zero token cost). Hard constraints buried mid-way through a bloated L1 body sit in the attention low-zone and get violated at a measurably higher rate (~72–80% vs ~100% when kept compact and well-placed — see [constraint-placement.md](./constraint-placement.md)). Every manual paragraph left in L1 dilutes the rules that must survive there; moving it to L2/L3 is compliance protection, not just tidiness.
+
 Slimming is not a one-time refactor; it is a steady-state discipline applied every time the Skill changes.

@@ -58,6 +58,7 @@
 2. 独立验证者 + 工作区隔离已在**人工触发**的改动上验证可用。
 3. 约束文件（路径黑名单、构建/测试命令、尝试上限）已写全。
 4. 无未解决的越界/预算事件。
+5. **不可自标绿（cannot self-mark green）**：晋级证据 MUST 来自 `run-log.jsonl` 的机读聚合（误报率由 `false_positives`/`items_found` 逐 cycle 计算），MUST NOT 采信团队或其 supervisor 在散文里的自评达标声明。执行晋级的 `improve-team` MUST 亲自重跑核验（聚合 run-log、抽查对应 runs/ 报告与证据路径），并把核验命令与输出片段附进晋级记录——声称"已达标"而无可复算证据的晋级请求一律拒绝。
 
 > 反面教材（`why-we-killed-ci-sweeper`）：直接上自动修复、验证者与实现者同会话、无分支白名单、无预算 → 48h 烧掉 8M tokens、11 个 PR 里 1 个破坏生产配置。**这四条恰好是 L1 门控 + 独立验证者 + 约束文件 + 预算断路器要防的。**
 
@@ -186,7 +187,10 @@ config:
 1. READ    读取 constraints.md + budget + kill-switch；若 kill-switch/100% → 立即退出
 2. BUDGET  核算今日已花；≥80% → 本 cycle 转 report-only
 3. TRIAGE  发现 & 分诊源工作（CI/PR/issue/质量差距）；无可执行项 → 早退(no-op)
-4. ACT     L1: 仅写 STATE；L2+: 对小而明确项做最小改动（每项 ≤ max_attempts）
+4. ACT     L1: 仅写 STATE；L2+: 对小而明确项做最小改动（每项 ≤ max_attempts）；
+           **机械门禁**：若存在 `.specify/gate.yaml`，任何 mutate 动作前先跑
+           `python3 .specify/scripts/python/gate-check.py <目标路径>` —— exit 2 一律不写并升级给人，
+           exit 1 过确认门，exit 3（gate 不可读）显式报告；门禁裁决是机械的，不得用散文绕过
 5. VERIFY  L2+: 独立验证者裁决（默认 REJECT，实跑测试）
 6. SCORE   按 quality_dimensions 打分（对着 goal 度量）
 7. CRITIQUE STATE.md 追加 Post-Run Critique；run-log.jsonl 追加一行

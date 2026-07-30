@@ -151,6 +151,7 @@ Every task MUST strictly follow this format:
    - User Story phases: MUST have story label
    - Polish phase: NO story label
 5. **Description**: Clear action with exact file path
+6. **[blockedBy: Txxx,Tyyy] tag**: REQUIRED whenever a task depends on specific earlier tasks (derived from plan/data-model/contract dependencies). Use the tag, not prose ("depends on T012") — `/speckit.implement` orders execution topologically from these tags and refuses to start a task whose blockers are not `[X]`. Omit the tag when only phase order applies.
 
 **Examples**:
 

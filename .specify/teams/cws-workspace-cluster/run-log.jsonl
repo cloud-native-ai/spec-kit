@@ -1,0 +1,2 @@
+{"cycle":"2026-07-30T08:20:21Z","maturity":"L1","items_found":4,"resolved":1,"false_positives":0,"actions_taken":0,"escalations":1,"tokens_estimate":38000,"outcome":"report-only"}
+{"cycle":"2026-07-30T09:45:00Z","maturity":"L1","items_found":12,"resolved":0,"false_positives":0,"actions_taken":0,"escalations":12,"tokens_estimate":120000,"outcome":"report-only","note":"goal-redefined insight-harvest cycle 1; 10 subagents dispatched read-only"}

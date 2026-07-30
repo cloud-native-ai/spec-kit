@@ -1,3 +1,4 @@
+# AUTO-GENERATED from templates/commands/agents.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py
 description = "Single entry point for single-agent operations — create, refine, and run agents via intent routing.
 handoffs:
   - label: Update Instructions

@@ -1,3 +1,4 @@
+# AUTO-GENERATED from templates/commands/instructions.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py
 description = "Generate or update project instructions and compatibility symlinks, ensuring a consistent AI context across tools.
 handoffs:
   - label: Scan Skills
