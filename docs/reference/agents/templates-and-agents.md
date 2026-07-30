@@ -12,28 +12,28 @@ Agent templates are split by domain. This document covers the **single-agent** f
 live at **`skills/create-agent/templates/`** (installed mirror:
 `.specify/skills/create-agent/templates/`). The **multi-agent** templates — the Team Supervisor,
 the three EEI stages, the parallel/serial/triad orchestration templates, and the workflow schema —
-live at **`skills/create-team/templates/`** and are catalogued in the team docs
+live at **`skills/create-team/templates/agents/`** and are catalogued in the team docs
 ([`docs/teams/orchestration.md`](../teams/orchestration.md); normative source
 [`conceptual-model.md`](../../../skills/create-team/references/conceptual-model.md)).
 
-### Role templates (`agent-role-*`)
+### Capacity templates (`agent-capacity-*`)
 
 The seven Worker roles. Each Worker role template carries `supervisor: true` and
-`role-scope: <slug>` in frontmatter.
+`capacity-scope: <slug>` in frontmatter.
 
 | Template | Role | Type |
 |----------|------|------|
-| `agent-role-requirements-analyst-template.md` | Requirements Analyst | Worker |
-| `agent-role-ux-analyst-template.md` | UX Analyst | Worker |
-| `agent-role-system-designer-template.md` | System Designer | Worker |
-| `agent-role-module-designer-template.md` | Module Designer | Worker |
-| `agent-role-test-engineer-template.md` | Test Engineer | Worker |
-| `agent-role-qa-engineer-template.md` | QA Engineer | Worker |
-| `agent-role-knowledge-manager-template.md` | Knowledge Manager | Worker |
+| `agent-capacity-requirements-analyst-template.md` | Requirements Analyst | Worker |
+| `agent-capacity-ux-analyst-template.md` | UX Analyst | Worker |
+| `agent-capacity-system-designer-template.md` | System Designer | Worker |
+| `agent-capacity-module-designer-template.md` | Module Designer | Worker |
+| `agent-capacity-test-engineer-template.md` | Test Engineer | Worker |
+| `agent-capacity-qa-engineer-template.md` | QA Engineer | Worker |
+| `agent-capacity-knowledge-manager-template.md` | Knowledge Manager | Worker |
 
 > The eighth role, **Team Supervisor** (the single Meta role, Meta at all stages), is a
-> multi-agent template: `agent-role-team-supervisor-template.md` lives in
-> `skills/create-team/templates/`. See [`docs/teams/`](../teams/overview.md).
+> multi-agent template: `agent-team-supervisor-template.md` lives in
+> `skills/create-team/templates/agents/`. See [`docs/teams/`](../teams/overview.md).
 
 > Every role template enforces **six mandatory sections** (Identity & Responsibilities,
 > Project Context, Workflow, Upstream, Downstream, Output Format), uses only approved
@@ -52,7 +52,7 @@ The seven Worker roles. Each Worker role template carries `supervisor: true` and
 The Stage templates (`agent-stage-{executor,evaluator,optimizer}`), the orchestration templates
 (`agent-{parallel,serial,triad}-orchestration-template.md`), the Team Supervisor template, and the
 `agent-workflow-schema.md` (the `AgentWorkflow` JSON schema used by serial orchestration) are all
-**multi-agent** artifacts under `skills/create-team/templates/`. They are documented in
+**multi-agent** artifacts under `skills/create-team/templates/agents/`. They are documented in
 [`docs/teams/orchestration.md`](../teams/orchestration.md), not here.
 
 ## Persisted agents (`.specify/agents/`)
@@ -78,7 +78,7 @@ as a preset row in the registry.
 Each generated role agent (example: `requirements-analyst.agent.md`) contains:
 
 - **Frontmatter**: `name`, `description`, `user-invocable`, `disable-model-invocation`,
-  `supervisor: true`, `role-scope: <slug>`, plus Qoder-compatible fields `model` (default
+  `supervisor: true`, `capacity-scope: <slug>`, plus Qoder-compatible fields `model` (default
   `auto`), `tools`, `maxTurns`, and `color`. Optional Qoder fields (`disallowedTools`,
   `timeoutMins`, `skills`, `mcpServers`, `permissionMode`, `background`, `isolation`) are
   available but unset by default.
@@ -158,6 +158,6 @@ scope; the former `AGENTS.md`/`MEMORY.md`/`SOUL.md`/`USER.md` shared files have 
 ## Traceability
 
 Normative source: the template catalog under `skills/create-agent/templates/` and
-`skills/create-team/templates/`, and the persisted agents under `.specify/agents/`. The
+`skills/create-team/templates/agents/`, and the persisted agents under `.specify/agents/`. The
 deprecated-term guard `tests/unit/test_agent_deprecated_terms.py` keeps the `Stage`/`optimizer`
 naming enforced across all templates and persisted agents.

@@ -18,6 +18,16 @@ You are **{{AGENT_NAME}}**, a project-specific agent built exclusively for the *
   preserved: the `project:` frontmatter marker above, and the `## Project Scope
   Guard` section below. Everything else (Purpose, Workflow, Output Format) is
   free-form — expand, replace, or reorder it to fit this project's actual need.
+
+  Capacity → responsibility: the `tools:` list above is this agent's CAPACITY, and
+  capacity gates the responsibilities it can hold. The default `[Read, Grep, Glob]`
+  is read-only, which confines this agent to **Worker** responsibilities (it operates
+  on business artifacts, never on agent/skill/team definitions). Only an agent whose
+  tools permit editing agent/skill/team definitions (e.g. `Write`, `Edit`, `Bash`) can
+  be a **Meta** agent and take team-management responsibilities (optimizer,
+  process-evaluator, team-config editor). Granting write tools is therefore a
+  deliberate choice, not a default. Type is judged by operating object — see
+  `.specify/skills/create-team/references/conceptual-model.md`.
 -->
 
 ## Project Binding

@@ -139,7 +139,7 @@ class TestAgentSkillEnablement:
         Uses string checks (not YAML parse) because template frontmatter contains
         ``{{PLACEHOLDER}}`` tokens that are not valid YAML.
         """
-        path = ROLE_TEMPLATES_DIR / f"agent-role-{slug}-template.md"
+        path = ROLE_TEMPLATES_DIR / f"agent-capacity-{slug}-template.md"
         assert path.exists(), f"role template missing: {path}"
         parts = path.read_text(encoding="utf-8").split("---", 2)
         assert len(parts) >= 3, f"{slug} template: malformed frontmatter"

@@ -49,12 +49,12 @@ class TestRoleTemplateExistence:
 
     @pytest.mark.parametrize("slug", ROLE_SLUGS)
     def test_template_file_exists(self, slug):
-        path = TEMPLATES_DIR / f"agent-role-{slug}-template.md"
+        path = TEMPLATES_DIR / f"agent-capacity-{slug}-template.md"
         assert path.exists(), f"Role template missing: {path}"
 
     @pytest.mark.parametrize("slug", ROLE_SLUGS)
     def test_template_has_yaml_frontmatter(self, slug):
-        path = TEMPLATES_DIR / f"agent-role-{slug}-template.md"
+        path = TEMPLATES_DIR / f"agent-capacity-{slug}-template.md"
         content = path.read_text()
         assert content.startswith("---"), f"{slug}: must start with YAML frontmatter"
         parts = content.split("---", 2)
@@ -67,7 +67,7 @@ class TestRoleTemplateExistence:
     @pytest.mark.parametrize("slug", ROLE_SLUGS)
     def test_template_has_qoder_frontmatter(self, slug):
         """Role templates carry Qoder-compatible frontmatter (model/tools/maxTurns)."""
-        path = TEMPLATES_DIR / f"agent-role-{slug}-template.md"
+        path = TEMPLATES_DIR / f"agent-capacity-{slug}-template.md"
         content = path.read_text()
         parts = content.split("---", 2)
         frontmatter = parts[1]
@@ -81,7 +81,7 @@ class TestRoleTemplateSections:
 
     @pytest.mark.parametrize("slug", ROLE_SLUGS)
     def test_mandatory_sections_present(self, slug):
-        path = TEMPLATES_DIR / f"agent-role-{slug}-template.md"
+        path = TEMPLATES_DIR / f"agent-capacity-{slug}-template.md"
         content = path.read_text()
         for section in MANDATORY_SECTIONS:
             assert section in content, f"{slug}: missing mandatory section '{section}'"
@@ -93,7 +93,7 @@ class TestRoleTemplatePlaceholders:
 
     @pytest.mark.parametrize("slug", ROLE_SLUGS)
     def test_only_approved_placeholders(self, slug):
-        path = TEMPLATES_DIR / f"agent-role-{slug}-template.md"
+        path = TEMPLATES_DIR / f"agent-capacity-{slug}-template.md"
         content = path.read_text()
         found = set(re.findall(r"\{\{[A-Z_]+\}\}", content))
         unapproved = found - APPROVED_PLACEHOLDERS

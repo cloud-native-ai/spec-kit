@@ -2,13 +2,13 @@
 """Match a user goal against the predefined team presets.
 
 Deterministic scorer for create-team step 2. It only ranks candidates; the
-calling agent decides what to do with them (see references/team-presets.md).
+calling agent decides what to do with them (see references/teams.md).
 
 Inputs (one of):
   --goal "<text>"     the user's goal / request text
   --goal-file <path>  read the goal text from a file ("-" = stdin)
 Options:
-  --presets-dir <dir> preset directory (default: ../templates/team-presets
+  --presets-dir <dir> preset directory (default: ../templates/teams
                       relative to this script)
   --top N             how many candidates to return (default 3)
 
@@ -116,7 +116,7 @@ def main(argv: list[str]) -> int:
         print(json.dumps({"error": "provide --goal or --goal-file"}), file=sys.stderr)
         return 2
 
-    presets_dir = Path(args.presets_dir) if args.presets_dir else Path(__file__).resolve().parent.parent / "templates" / "team-presets"
+    presets_dir = Path(args.presets_dir) if args.presets_dir else Path(__file__).resolve().parent.parent / "templates" / "teams"
     if not presets_dir.is_dir():
         print(json.dumps({"error": f"presets dir not found: {presets_dir}"}), file=sys.stderr)
         return 3

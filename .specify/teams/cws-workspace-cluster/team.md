@@ -12,7 +12,7 @@ preset: workspace-cluster
 created: 2026-07-30
 updated: 2026-07-30
 members:
-  - agent: agent-role-team-supervisor-template
+  - agent: agent-team-supervisor-template
     role: team-supervisor
     stage: optimizer
     type: Meta
@@ -21,7 +21,7 @@ members:
   - agent: agent-stage-evaluator-template
     role: consistency-checker
     stage: evaluator
-    type: Meta
+    type: Worker   # 操作对象是各仓库的业务信息（分支策略/脏度/产物新鲜度）→ 业务层评估者
     lifecycle: temporary
     responsibility: 跨仓一致性判定与结论分类（缺陷 / 环境限制 / 需人决策）
   # repo-analyst × N —— N 等于 workspace folders 数量，每 cycle 按 folders 重算，不写死
@@ -156,7 +156,7 @@ config:
 |------|-------|------|-----------|----------------|
 | team-supervisor | optimizer | Meta | persistent | 花名册解析与 diff、任务分解派发、证据抽查复核、汇总、确认门 |
 | repo-analyst × 11 | executor | Worker | temporary | 每 folder 一个实例的只读分析与巡检，结构化输出 |
-| consistency-checker | evaluator | Meta | temporary | 跨仓一致性判定与结论分类 |
+| consistency-checker | evaluator | Worker | temporary | 跨仓一致性判定与结论分类（评估对象是仓库业务信息 → Worker） |
 
 首轮花名册（11 个 folder，全部已验证存在且为 git 仓库）：
 
@@ -217,6 +217,6 @@ flowchart TD
 
 ## Lineage
 
-由预置模板 `workspace-cluster` 实例化（`skills/create-team/templates/team-presets/workspace-cluster.md`），
+由预置模板 `workspace-cluster` 实例化（`skills/create-team/templates/teams/workspace-cluster.md`），
 该模板蒸馏自 2026-07 一次真实的 10 仓 IaC 集群运营 Session（复盘见 `draft/Code Workspace.md`）。
 本团队是该模板的**首次实例化**，同时用于验证预置模板 → 匹配 → 实例化这条流程。

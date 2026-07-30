@@ -7,7 +7,7 @@ Maturity: L1   Cadence: 2h   Current target: **agent-template-consolidation**（
 
 ## Watch List (监控，暂不动作)
 - W-1 SDD 入口未走：无 spec 目录（specs 最新 034）、无 feature 登记（features 最新 038）——执行 agent 若直接改 templates 即升级为偏离项
-- W-2 概念前提待验证：capacity vs responsibility 二分在 `agent-role-team-supervisor-template.md`（create-team 侧）存在归属交叉，需执行方给出判据
+- W-2 概念前提待验证：capacity vs responsibility 二分在 `agent-team-supervisor-template.md`（create-team 侧）存在归属交叉，需执行方给出判据
 - W-3 镜像锚点：`skills/{create-agent,create-team}` ↔ `.specify/skills/` 当前 `diff -rq` 为空；每 cycle 复检
 - W-4 `draft/Code Workspace.md` untracked，有丢失/漂移风险
 - 增量锚点：git HEAD=8da7fc5f；create-agent/templates=10 文件、create-team/templates=8 文件

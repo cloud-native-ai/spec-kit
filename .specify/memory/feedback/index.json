@@ -1,10 +1,54 @@
 {
   "store": "feedback",
-  "updated": "2026-07-30T04:07:16Z",
+  "updated": "2026-07-30T07:23:18Z",
   "threshold": 10,
-  "count_since_submission": 1,
+  "count_since_submission": 5,
   "submitted_at": "2026-07-30T04:04:10Z",
   "entries": [
+    {
+      "id": "20260730T072318Z-skill-create-agent",
+      "file": "20260730T072318Z-skill-create-agent.md",
+      "unit_id": "skill:create-agent",
+      "unit_type": "skill",
+      "run_id": "capacity-authority-gate-20260730",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-30T07:23:18Z",
+      "summary": "Applied the capacity->responsibility gating principle to the three remaining create-agent templates. (1) agent-supervision-delegation.md: replaced the retired hard-coded Evaluator(Meta)/Optimizer(Meta"
+    },
+    {
+      "id": "20260730T071029Z-skill-create-agent",
+      "file": "20260730T071029Z-skill-create-agent.md",
+      "unit_id": "skill:create-agent",
+      "unit_type": "skill",
+      "run_id": "capacity-rename-refactor-20260730",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-30T07:10:29Z",
+      "summary": "Refactored agent-definition templates to remove the capacity/responsibility confusion. (1) Moved all 8 create-team agent-* templates into templates/agents/ (they express team responsibility), renaming"
+    },
+    {
+      "id": "20260730T064240Z-skill-create-team",
+      "file": "20260730T064240Z-skill-create-team.md",
+      "unit_id": "skill:create-team",
+      "unit_type": "skill",
+      "run_id": "meta-write-authority-clarification-20260730",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-30T06:42:40Z",
+      "summary": "Clarified the Meta<->role relationship as a one-way implication, closing the confusion that made the retired coupling feel compulsory. Stated in conceptual-model.md (new 'Meta and write authority' sub"
+    },
+    {
+      "id": "20260730T063643Z-skill-create-team",
+      "file": "20260730T063643Z-skill-create-team.md",
+      "unit_id": "skill:create-team",
+      "unit_type": "skill",
+      "run_id": "type-criterion-fix-20260730",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-30T06:36:43Z",
+      "summary": "Fixed the Type-follows-Stage modeling error per docs/notes/type-follows-stage-misclassification.md (Option A). Replaced the stage->type derivation with a judge-by-operating-object criterion, retaining"
+    },
     {
       "id": "20260730T040716Z-speckit-tools",
       "file": "20260730T040716Z-speckit-tools.md",
@@ -43,7 +87,7 @@
       "file": "20260730T024742Z-skill-improve-skills.md",
       "unit_id": "skill:improve-skills",
       "unit_type": "skill",
-      "run_id": "improve-skills-20260730-create-team-presets",
+      "run_id": "improve-skills-20260730-create-teams",
       "feature": "",
       "partial": false,
       "created": "2026-07-30T02:47:42Z",

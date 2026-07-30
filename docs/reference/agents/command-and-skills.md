@@ -55,7 +55,7 @@ templates under `skills/create-agent/templates/`:
 
 | `kind` | Produces | Key source templates |
 |--------|----------|----------------------|
-| `role` | One role-based agent (six mandatory sections) | `agent-role-*-template.md` |
+| `role` | One role-based agent (six mandatory sections) | `agent-capacity-*-template.md` |
 | `supervisor` | A role agent that runs its own EEI loop | role template + `agent-supervision-delegation.md` (inlined) |
 | `custom` | A single narrow, general-purpose custom `.agent.md` (not project-bound) | free-form per intent |
 | `project-custom` | A project-bound custom agent (marks its project + carries a scope guard) | `agent-project-custom-template.md` |
@@ -76,7 +76,7 @@ cases, behavioral drift). It first classifies the target, then routes:
 
 | Target kind | Match | Route |
 |-------------|-------|-------|
-| role | `agent-role-*-template.md` | six-section root-cause workflow |
+| role | `agent-capacity-*-template.md` | six-section root-cause workflow |
 | supervision snippet | `agent-supervision-delegation.md` | steps 3–5; **warns** the edit affects every supervisor |
 | custom | `.specify/agents/*.agent.md` | six-section workflow against the generated file |
 
@@ -132,7 +132,7 @@ Every agent `create-agent` can produce has one of two lifecycles; choose it befo
   Supported fields: `name` (required), `description` (required), `tools`, `disallowedTools`,
   `model` (`auto`/`lite`/`efficient`/`performance`/`ultimate`), `maxTurns`, `timeoutMins`, `skills`,
   `mcpServers`, `permissionMode`, `background`, `isolation`, `color`, plus the framework fields
-  `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`. Validation rejects
+  `user-invocable`, `disable-model-invocation`, `supervisor`, `capacity-scope`. Validation rejects
   invalid YAML, unsupported providers, and unresolved contradictions.
 
 ## Skill Enablement convention
@@ -140,7 +140,7 @@ Every agent `create-agent` can produce has one of two lifecycles; choose it befo
 Because framework skills and agent definitions install together, every installed skill is
 invocable by every agent. The seven built-in role agents make this explicit and consistent so
 they prefer a purpose-built framework skill over improvising the same operation. Each role agent
-(and its `agent-role-*-template.md` generator) declares two things:
+(and its `agent-capacity-*-template.md` generator) declares two things:
 
 1. **`skills:` frontmatter** — a YAML list of the canonical slugs of the installed skills
    relevant to that role (e.g. `skills: [draw-plantuml, memory-recall, memory-record, think-skills]`).

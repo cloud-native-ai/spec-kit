@@ -62,7 +62,7 @@ After a **new** Skill is created (skip on the `improve-skills` path), wire it in
 5. **Apply** (on confirm): for each matched agent, edit BOTH `agents/<slug>.agent.md` and `.specify/agents/<slug>.agent.md`:
    - Append the canonical Skill slug to the `skills:` frontmatter list (dedup; preserve order and all other keys).
    - Add a `| <skill> | <when-to-use> |` row to that agent's `## Skill Enablement` table.
-6. **Invariants**: use the canonical slug; it MUST resolve to an installed `.specify/skills/<slug>/SKILL.md`; never add a non-declarable slug; preserve all existing frontmatter. Generator templates (`agent-role-*-template.md`) are intentionally NOT updated (a later regeneration would drop the added Skill).
+6. **Invariants**: use the canonical slug; it MUST resolve to an installed `.specify/skills/<slug>/SKILL.md`; never add a non-declarable slug; preserve all existing frontmatter. Generator templates (`agent-capacity-*-template.md`) are intentionally NOT updated (a later regeneration would drop the added Skill).
 
 ### Step 5: Validate and report
 

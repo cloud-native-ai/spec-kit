@@ -10,7 +10,7 @@ goal: >
   本 loop 对监控对象零写入（仅写本团队目录）。
 pattern: continuous
 members:
-  - agent: agent-role-team-supervisor-template
+  - agent: agent-team-supervisor-template
     role: team-supervisor
     lifecycle: persistent
   - agent: qa-engineer
@@ -81,7 +81,7 @@ updated: 2026-07-29
 
 | Agent | Role | Stage | Type | Lifecycle | L1 职责 |
 |-------|------|-------|------|-----------|---------|
-| agent-role-team-supervisor-template | Team Supervisor | 全周期 | Meta | persistent | 独自执行整个 cycle：READ→BUDGET→TRIAGE→ACT(仅写STATE)→SCORE→CRITIQUE→REPORT |
+| agent-team-supervisor-template | Team Supervisor | 全周期 | Meta | persistent | 独自执行整个 cycle：READ→BUDGET→TRIAGE→ACT(仅写STATE)→SCORE→CRITIQUE→REPORT |
 | qa-engineer (`.specify/agents/qa-engineer.agent.md`) | Quality Checker | 核查 | Worker | persistent | **L1 不派遣**（max_subagents_per_cycle=0）；晋级 L2 后承接定向核查任务 |
 
 ## Dynamic Structure

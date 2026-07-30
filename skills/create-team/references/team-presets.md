@@ -1,6 +1,6 @@
 # Team Presets: predefined team shapes
 
-**Owner**: the team domain (`create-team` / `/speckit.team`). This file defines the preset mechanism; the presets themselves live in `../templates/team-presets/`.
+**Owner**: the team domain (`create-team` / `/speckit.team`). This file defines the preset mechanism; the presets themselves live in `../templates/teams/`.
 
 ## Why presets exist
 
@@ -10,7 +10,7 @@ Presets do **not** replace the goal-first flow. They are offered as a **match** 
 
 ## Preset file contract
 
-Each preset is one file `../templates/team-presets/<preset-id>.md` with YAML frontmatter plus a body:
+Each preset is one file `../templates/teams/<preset-id>.md` with YAML frontmatter plus a body:
 
 ```yaml
 ---

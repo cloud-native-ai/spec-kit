@@ -362,13 +362,13 @@ total token cost by 40–60% compared to using high-capability models everywhere
 
 ## Multi-Agent Template Catalog
 
-The multi-agent authoring templates live at **`skills/create-team/templates/`** (installed mirror:
-`.specify/skills/create-team/templates/`). The single-agent role/custom templates stay in
+The multi-agent authoring templates live at **`skills/create-team/templates/agents/`** (installed mirror:
+`.specify/skills/create-team/templates/agents/`). The single-agent role/custom templates stay in
 `skills/create-agent/templates/` (see [`docs/agents/templates-and-agents.md`](../agents/templates-and-agents.md)).
 
 | Template | Purpose |
 |----------|---------|
-| `agent-role-team-supervisor-template.md` | The single **Meta** role (Meta at all stages) — the Lead / quality gate; mandatory for iteration & continuous |
+| `agent-team-supervisor-template.md` | The single **Meta** role (Meta at all stages) — the Lead / quality gate; mandatory for iteration & continuous |
 | `agent-stage-executor-template.md` | EEI `executor` stage (Type Worker) — does the work |
 | `agent-stage-evaluator-template.md` | EEI `evaluator` stage (Type Meta) — scores / independently verifies |
 | `agent-stage-optimizer-template.md` | EEI `optimizer` stage (Type Meta) — refines from feedback |
@@ -393,4 +393,4 @@ The multi-agent authoring templates live at **`skills/create-team/templates/`** 
 - The per-role quality loop iteration builds on: [quality-loop.md](../agents/quality-loop.md)
 
 Normative source: `.specify/specs/.archive/026-agent-team-management/` and the orchestration templates
-`skills/create-team/templates/agent-{parallel,serial,triad}-orchestration-template.md`.
+`skills/create-team/templates/agents/agent-{parallel,serial,triad}-orchestration-template.md`.

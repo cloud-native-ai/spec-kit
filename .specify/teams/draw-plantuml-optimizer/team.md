@@ -42,7 +42,7 @@ members:
   - agent: agent-stage-evaluator-template
     role: scorer
     stage: evaluator
-    type: Meta
+    type: Worker   # 评分对象是渲染出的图（业务产物）→ 业务层评估者；Type 按操作对象判定
     lifecycle: temporary
 config:
   strategy: elimination                 # 淘汰/锦标赛（Supervisor 做精英保留式选择）
@@ -95,7 +95,7 @@ Role × Stage × Type 花名册（全部 temporary，由 `create-team/templates/
 | variant-optimizer-style | variant-optimizer | optimizer | Meta | temporary | **风格向**：配色体系/视觉层级、字体、skinparam、边框/箭头/圆角、留白节奏 |
 | variant-optimizer-semantic | variant-optimizer | optimizer | Meta | temporary | **语义分解向**：拆包/分层子图、图例/标注、信息分块、层次抽象降低心智负担 |
 | renderer | renderer | executor | **Worker** | temporary | 对每个变体的指南，渲染 benchmark → SVG/PNG（`render-plantuml.sh`，本地 jar + Noto CJK 回退） |
-| scorer | scorer | evaluator | Meta | temporary | 按 4 维度对每个渲染产出打分，产出加权总分 + 每变体「最大可改进点」 |
+| scorer | scorer | evaluator | Worker | temporary | 按 4 维度对每个渲染产出打分，产出加权总分 + 每变体「最大可改进点」 |
 
 **约束**：iteration 团队恰含**一个** Team Supervisor（Meta）。变体优化器数 = `config.variants`（默认 3）。
 

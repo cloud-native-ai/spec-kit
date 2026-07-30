@@ -4,7 +4,7 @@ import re
 import pytest
 from pathlib import Path
 
-TEMPLATES_DIR = Path(__file__).resolve().parents[2] / "templates"
+TEMPLATES_DIR = Path(__file__).resolve().parents[2] / "skills" / "create-agent" / "templates"
 COMMANDS_DIR = TEMPLATES_DIR / "commands"
 
 ROLE_SLUGS = [
@@ -36,7 +36,7 @@ class TestContextPlaceholderCoverage:
 
     @pytest.mark.parametrize("slug", ROLE_SLUGS)
     def test_no_raw_placeholders_left_unresolvable(self, slug):
-        path = TEMPLATES_DIR / f"agent-role-{slug}-template.md"
+        path = TEMPLATES_DIR / f"agent-capacity-{slug}-template.md"
         content = path.read_text()
         found = set(re.findall(r"\{\{[A-Z_]+\}\}", content))
         frontmatter_only = {"{{AGENT_NAME}}", "{{AGENT_DESCRIPTION}}", "{{ROLE_NAME}}"}
@@ -85,10 +85,10 @@ class TestRoleSpecificContext:
 
     def test_all_templates_have_project_name(self):
         for slug in ROLE_SLUGS:
-            content = (TEMPLATES_DIR / f"agent-role-{slug}-template.md").read_text()
+            content = (TEMPLATES_DIR / f"agent-capacity-{slug}-template.md").read_text()
             assert "{{PROJECT_NAME}}" in content, f"{slug}: missing {{{{PROJECT_NAME}}}}"
 
     def test_all_templates_have_tech_stack(self):
         for slug in ROLE_SLUGS:
-            content = (TEMPLATES_DIR / f"agent-role-{slug}-template.md").read_text()
+            content = (TEMPLATES_DIR / f"agent-capacity-{slug}-template.md").read_text()
             assert "{{TECH_STACK}}" in content, f"{slug}: missing {{{{TECH_STACK}}}}"

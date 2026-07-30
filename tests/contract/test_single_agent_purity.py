@@ -42,7 +42,7 @@ class TestSingleAgentPurity:
 
     def test_create_agent_retains_single_agent_modes(self):
         content = CREATE_AGENT.read_text(encoding="utf-8")
-        for kind in ("role", "supervisor", "custom", "project-custom"):
+        for kind in ("capacity", "supervisor", "custom", "project-custom"):
             assert kind in content, f"create-agent must retain the '{kind}' authoring mode"
 
     def test_create_agent_no_triad_mode(self):

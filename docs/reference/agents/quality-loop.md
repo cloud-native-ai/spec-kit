@@ -122,7 +122,7 @@ From the K8s diagram optimization session (49 to 91 over 17 rounds):
 
 Every role-based agent is a **role-scoped supervisor** that runs its own EEI loop — the loop is not a standalone pattern bolted on beside role-based agents.
 
-- **Default-on**: generated role agents carry `supervisor: true` + `role-scope: <slug>` in frontmatter; supervision is active unless a role opts out with `supervisor: false`.
+- **Default-on**: generated role agents carry `supervisor: true` + `capacity-scope: <slug>` in frontmatter; supervision is active unless a role opts out with `supervisor: false`.
 - **Single source of truth**: the delegation behaviour lives once in `skills/create-agent/templates/agent-supervision-delegation.md` and is **inlined by `create-agent` at generation time** — it is never copied into individual role templates (no drift).
 - **Role-scoped loop**: the supervisor spawns Executor/Evaluator/Optimizer subagents whose task, environment paths, and default scoring dimensions are bound to the role's domain via the orchestration template's `{{ROLE_SCOPE}}` binding.
 
@@ -139,8 +139,8 @@ Every role-based agent is a **role-scoped supervisor** that runs its own EEI loo
 
 Canonical templates (author/edit here — see [templates-and-agents.md](./templates-and-agents.md)):
 
-- **Stage templates**: `skills/create-team/templates/agent-stage-{executor,evaluator,optimizer}-template.md`
-- **Loop orchestration**: `skills/create-team/templates/agent-triad-orchestration-template.md`
+- **Stage templates**: `skills/create-team/templates/agents/agent-stage-{executor,evaluator,optimizer}-template.md`
+- **Loop orchestration**: `skills/create-team/templates/agents/agent-triad-orchestration-template.md`
 - **Supervision snippet** (single source): `skills/create-agent/templates/agent-supervision-delegation.md`
 
 Normative source: the templates above plus the persisted role agents under `.specify/agents/`. The team-level **iteration** and **continuous** patterns that build on this loop are documented in [`docs/teams/orchestration.md`](../teams/orchestration.md).

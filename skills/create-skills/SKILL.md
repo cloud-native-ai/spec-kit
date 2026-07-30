@@ -174,7 +174,7 @@ Applies only when creating a **new** Skill **in Spec Kit project mode** — in s
    - Append the canonical Skill slug to the `skills:` frontmatter list (dedup; preserve order and all other keys).
    - Add a `| <skill> | <when-to-use> |` row to that agent's `## Skill Enablement` table.
 
-**Invariants**: use the canonical slug; it MUST resolve to an installed `.specify/skills/<slug>/SKILL.md`; never add a non-declarable slug; preserve all existing frontmatter. Generator templates (`agent-role-*-template.md`) are intentionally NOT updated — a later regeneration would drop the added Skill.
+**Invariants**: use the canonical slug; it MUST resolve to an installed `.specify/skills/<slug>/SKILL.md`; never add a non-declarable slug; preserve all existing frontmatter. Generator templates (`agent-capacity-*-template.md`) are intentionally NOT updated — a later regeneration would drop the added Skill.
 
 ### 8. Report completion
 

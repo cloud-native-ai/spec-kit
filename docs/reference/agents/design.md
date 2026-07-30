@@ -33,9 +33,24 @@ Agent 框架用**一个统一的概念模型**消除 Agent 定义上的几类混
    - **Worker Agent**：处理项目中的实际任务；
    - **Meta Agent**：优化和处理其他 Agent（Team Supervisor 就是一种 Meta Agent，负责监控整个团队与其他 Agent 的表现）。
 
-**Type-follows-Stage（类型由阶段决定）**：Type 不是独立选择的，而是由 Stage 推导——
-Worker 角色处于 **执行者** 阶段时为 Worker，处于 **评估者 / 优化者** 阶段时切换为 Meta；
-Meta 角色（Team Supervisor）不承担实际任务，各阶段恒为 Meta。
+**Type 按操作对象判定（不由 Stage 推导）**：Stage 与 Type 是两个**正交维度**——Stage 回答
+"处于协作流程的哪一站"（横向分工），Type 回答"操作对象处于哪个抽象层次"（纵向分层）。
+判据：操作对象是**其他 agent / skill / 定义 agent-skill 的配置** → **Meta**；操作对象是
+**业务工件与业务信息本身** → **Worker**。Stage 只提供默认倾向，判据优先。
+
+> 历史修订：旧的 "Type-follows-Stage"（evaluator/optimizer 一律 Meta）已被本判据取代。
+> 该耦合会把**业务层评估者**系统性误标为 Meta（例：评估各仓库状态的 consistency-checker
+> 实为 evaluator 阶段的 Worker）。唯一保留的耦合是 **Team Supervisor 恒为 Meta**——
+> 它的操作对象天然是 agent 系统。判据详见 `skills/create-team/references/conceptual-model.md`。
+
+> **Meta 与写权限是单向蕴含,不是充要关系**:只有 `Meta` 类型的 Agent 才能修改**团队自身配置**
+> (team.md)、**Agent 定义**(`.specify/agents/*.agent.md`、角色/阶段模板)与 **Skill 定义**
+> (SKILL.md 及其引用/模板)。因此"需要写这些东西的 Agent ⇒ 必为 Meta"成立(**必要条件**)。
+> 但反向不成立:"拥有评估者 / 优化者 / 持续优化角色 ⇏ 就是 Meta"(**非充分**)。这正是旧耦合
+> 令人误解之处——复杂团队里做持续优化的 Agent 通常确实会改写 prompt / Agent 定义 / Skill 指南,
+> 于是"看起来"优化者必为 Meta;但若某个持续优化 Agent 优化的是**业务工件本身**(收紧一份 spec、
+> 重构产品代码、润色文档),无论其循环多么长期迭代,它仍是 **Worker**。判定 Type 要看**它写什么**,
+> 而不是它叫什么角色。
 
 ### 2.2 两种组织结构
 
@@ -48,33 +63,35 @@ Meta 角色（Team Supervisor）不承担实际任务，各阶段恒为 Meta。
 **每一列代表工作过程中的一个 Stage**，**整张表格整体代表一个团队**。
 行列交叉的单元格用 **Worker** / **Meta** 表示该 Agent 在对应阶段的 Type 属性。
 
-下表的角色与阶段均来自 `skills/create-agent/templates/` 中的角色模板（`agent-role-*`）
+下表的角色与阶段均来自 `skills/create-agent/templates/` 中的能力（Capacity）模板（`agent-capacity-*`）
 与阶段模板（`agent-stage-*`）：
 
 | Agent 角色（Role） \ Stage | 执行者（Executor） | 评估者（Evaluator） | 优化者（Optimizer） |
 | --- | --- | --- | --- |
-| 需求分析师（Requirements Analyst） | Worker | Meta | Meta |
-| 用户体验分析师（UX Analyst） | Worker | Meta | Meta |
-| 系统架构师（System Designer） | Worker | Meta | Meta |
-| 模块设计师（Module Designer） | Worker | Meta | Meta |
-| 测试工程师（Test Engineer） | Worker | Meta | Meta |
-| 质量保证工程师（QA Engineer） | Worker | Meta | Meta |
-| 知识管理员（Knowledge Manager） | Worker | Meta | Meta |
+| 需求分析师（Requirements Analyst） | Worker | Worker | Worker |
+| 用户体验分析师（UX Analyst） | Worker | Worker | Worker |
+| 系统架构师（System Designer） | Worker | Worker | Worker |
+| 模块设计师（Module Designer） | Worker | Worker | Worker |
+| 测试工程师（Test Engineer） | Worker | Worker | Worker |
+| 质量保证工程师（QA Engineer） | Worker | Worker | Worker |
+| 知识管理员（Knowledge Manager） | Worker | Worker | Worker |
 | 团队监督者（Team Supervisor） | Meta | Meta | Meta |
 
 说明：
 
 - **行 = Role**：每个 Agent 占一行。前 7 行为 **Worker 角色**，最后一行 **团队监督者（Team Supervisor）** 为**唯一的 Meta 角色**，统一承担任务协调与团队监督职责。
 - **列 = Stage**：对应三个阶段——执行者（executor）、评估者（evaluator）、优化者（optimizer）。
-- **单元格 = Type**：遵循 Type-follows-Stage——Worker 角色在执行者阶段为 **Worker**，在评估者 / 优化者阶段为 **Meta**；Team Supervisor 各阶段均为 **Meta**。
+- **单元格 = Type**：按**操作对象**判定。7 个 Worker 角色在三个阶段的操作对象都是**业务工件**（需求、设计、代码、测试、文档），故均为 **Worker**——评估自己领域的业务产物不会使其变成 Meta；Team Supervisor 的操作对象是 agent 及其产出的元属性，各阶段均为 **Meta**。若某 Worker 角色的实例改为评估/优化 **agent 或 skill 本身**，则该实例为 Meta。
 
 > **关于 UX Analyst**：用户体验分析师（UX Analyst）是内置的第 7 个 Worker 角色，负责分析与优化
 > **所有用户接口**——不仅是前端 / GUI 页面，也包括命令行（CLI）设计，以及 `/command` 与 skill 等
 > 与用户交互的部分。它以需求为输入、并评审既有接口，向 System Designer 与 Module Designer 输出
 > 跨全部用户界面（前端、CLI、命令、技能）的 UX 规范与交互契约。模板
-> `agent-role-ux-analyst-template.md` 与持久化 Agent `.specify/agents/ux-analyst.agent.md` 均已提供。
+> `agent-capacity-ux-analyst-template.md` 与持久化 Agent `.specify/agents/ux-analyst.agent.md` 均已提供。
 
 ## 四、Agent 的两种生命周期
+
+> **Class → Instance（类与实例）**：`skills/create-agent/templates/agent-capacity-<X>-template.md` 是一个**抽象的 Agent 类**——带有未填充的 `{{占位符}}`，描述该 Agent **能做什么**（Capacity）。调用 `create-agent` 是**实例化**过程：填充占位符，产出一份**具体的 Agent 定义**写入 `.specify/agents/<slug>.agent.md`。运行时 `/speckit.agents run` 再从该定义**派生出活动实例（object）**——同一定义可派生多个互相独立的实例。三层关系：**能力模板（抽象类）→ 落地定义（具体类）→ 运行实例（对象）**。`create-agent` / `improve-agent` 只作用于前两层，从不触碰运行实例。
 
 1. **临时 Agent（temporary）**：仅在当前上下文中记录，随会话结束而消失。
 2. **持久化 Agent（persistent）**：保存到项目的 Agent 目录 `.specify/agents/`，可跨会话复用。
@@ -138,7 +155,7 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 ### 6.4 技能赋能（Skill Enablement）
 
-技能与 Agent 定义同步安装，因此每个内置 Agent 都可调用任意已安装技能。七个内置角色 Agent 将这一能力**显式化、一致化**：优先使用与角色相关的框架技能，而非手工重复同类操作。每个角色 Agent 及其 `agent-role-*` 模板都声明两部分：
+技能与 Agent 定义同步安装，因此每个内置 Agent 都可调用任意已安装技能。七个内置角色 Agent 将这一能力**显式化、一致化**：优先使用与角色相关的框架技能，而非手工重复同类操作。每个角色 Agent 及其 `agent-capacity-*`（Capacity）模板都声明两部分：
 
 - **`skills:` 前置字段**：该角色相关的已安装技能规范 slug 列表（如需求分析师 → `draw-plantuml`；模块设计师 → `study-project`）。元 / 框架创作类技能（`create-agent`、`improve-agent`、`create-skills`、`improve-skills`、`create-team`、`improve-team`）为**不可声明**，不出现在任何角色列表中。
 - **`## Skill Enablement` 正文小节**：共享的偏好协议（单一事实来源 `skills/create-agent/templates/agent-skill-enablement.md`，各 Agent 组合复用而非各自改写）+ 与 `skills:` 一致的 `| Skill | When to use |` 表格。协议要求：优先选用适用技能；多个适用时选最贴合角色者；无适用技能或技能不可用 / 失败时，直接完成操作并暴露失败。
@@ -149,6 +166,6 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 本文档以仓库中的**活制品**为规范来源，而非任何单份规格文档：
 
-- **模板目录**：`skills/create-agent/templates/`（单 Agent）与 `skills/create-team/templates/`（多 Agent）。
+- **模板目录**：`skills/create-agent/templates/`（单 Agent）与 `skills/create-team/templates/agents/`（多 Agent）。
 - **持久化 Agent**：`.specify/agents/*.agent.md`。
 - **守卫测试**：`tests/contract/test_agent_skill_enablement.py`（技能赋能约定）、`tests/unit/test_agent_deprecated_terms.py`（术语规范，持续保证 `Stage` / `optimizer` 等命名在所有 live 制品中成立）。

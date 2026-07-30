@@ -17,7 +17,7 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 The input is a description of the agent to improve and what went wrong or could be better. Parse:
 
 - **Target identifier**: Resolve to exactly one artifact of a supported kind (see § Target Classification):
-  - `skills/create-agent/templates/agent-role-*-template.md` (role)
+  - `skills/create-agent/templates/agent-capacity-*-template.md` (role)
   - `skills/create-agent/templates/agent-supervision-delegation.md` (shared supervision snippet — edits here propagate to ALL supervisors)
   - `.specify/agents/*.agent.md` (a generated custom agent)
 - **Improvement direction**: What specifically needs to change — extracted from user feedback, observed failures, or behavioral drift.
@@ -29,7 +29,7 @@ Before the workflow, classify the target and route to the matching refinement ru
 
 | Target kind | Match | Route to |
 |-------------|-------|----------|
-| role | `agent-role-*-template.md` | Workflow steps 1–6 (root-cause on the six mandatory sections) |
+| role | `agent-capacity-*-template.md` | Workflow steps 1–6 (root-cause on the six mandatory sections) |
 | supervision snippet | `agent-supervision-delegation.md` | Workflow steps 3–5; WARN that changes affect every supervisor (single source) |
 | custom | `.specify/agents/*.agent.md` | Workflow steps 1–6 against the generated file's own structure |
 
@@ -40,7 +40,7 @@ If the identifier matches multiple kinds or none, ask one clarifying question.
 ### 1. Identify the target template
 
 - Parse the user's input for a role name, slug, or template path
-- Resolve to `skills/create-agent/templates/agent-role-<slug>-template.md`
+- Resolve to `skills/create-agent/templates/agent-capacity-<slug>-template.md`
 - If multiple templates match or none match, ask one clarifying question
 - Read the current template content before making changes
 

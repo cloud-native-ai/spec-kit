@@ -8,11 +8,13 @@ skill_id: "<SKILL:.specify/skills/create-agent/SKILL.md>"
 
 ## Goal
 
-Author a **single agent artifact** for the Spec Kit agent system — a role template, a role-scoped **supervisor**, a **custom** `.agent.md`, or a **project-custom** agent. This skill is the single authoring engine invoked by `/speckit.agents` for single-agent work; the command gathers project context and delegates here rather than rendering templates inline. Multi-agent teams (organizing/running several agents) are out of scope — see `/speckit.team` and the `create-team` skill.
+Author a **single agent artifact** for the Spec Kit agent system — a **capacity** template, a capacity-scoped **supervisor**, a **custom** `.agent.md`, or a **project-custom** agent. This skill is the single authoring engine invoked by `/speckit.agents` for single-agent work; the command gathers project context and delegates here rather than rendering templates inline. Multi-agent teams (organizing/running several agents) are out of scope — see `/speckit.team` and the `create-team` skill.
 
-> **Conceptual Model**: the multi-agent Role × Stage × Type + Team/Loop model is defined once in the team domain — see `skills/create-team/references/conceptual-model.md`. This skill authors the single **Role** artifacts that can participate in a team.
+> **Class → Instance**: a template here is an **abstract agent Class** — a `agent-capacity-<X>-template.md` with unfilled `{{PLACEHOLDERS}}`. Authoring **instantiates** that Class: `create-agent` fills the placeholders and writes a **concrete agent definition** to `.specify/agents/<slug>.agent.md`. At runtime, `/speckit.agents run` spawns a **live instance (object)** from that definition — many instances from one definition, each independent. This skill operates at the Class/definition layer, never on running instances.
 
-> **Capacity, not responsibility**: templates here define an agent's **capacity** — what it *can do*, team-agnostic (tools, skills, model budget, professional identity, domain method). Team-scoped **responsibility** (stage assignment, write territory, handoff paths, reporting duty) is defined in the team domain, never here. The authoritative boundary and edit routing: `skills/create-team/references/capacity-vs-responsibility.md`.
+> **Conceptual Model**: the multi-agent Role × Stage × Type + Team/Loop model is defined once in the team domain — see `skills/create-team/references/conceptual-model.md`. This skill authors the single **capacity** Classes that fill a team's Role seats.
+
+> **Capacity, not responsibility**: templates here define an agent's **capacity** — what it *can do*, team-agnostic (tools, skills, model budget, professional identity, domain method). Team-scoped **responsibility** (the Role seat, stage assignment, write territory, handoff paths, reporting duty) is defined in the team domain, never here. The authoritative boundary and edit routing: `skills/create-team/references/capacity-vs-responsibility.md`.
 
 Canonical template home: `skills/create-agent/templates/` (installed mirror: `.specify/skills/create-agent/templates/`).
 
@@ -22,14 +24,14 @@ Select the capability from the request `kind` (or infer from user intent):
 
 | kind | Produces | Source templates | Primary section |
 |------|----------|------------------|-----------------|
-| `role` | One role-based agent (six mandatory sections) | `skills/create-agent/templates/agent-role-*-template.md` | Workflow steps 1–5 below |
-| `supervisor` | A role agent that runs its own self-improvement loop | role template + `skills/create-agent/templates/agent-supervision-delegation.md` inlined | § Supervisor Capability |
+| `capacity` | One capacity agent Class (six mandatory sections) | `skills/create-agent/templates/agent-capacity-*-template.md` | Workflow steps 1–5 below |
+| `supervisor` | A capacity agent that runs its own self-improvement loop | capacity template + `skills/create-agent/templates/agent-supervision-delegation.md` inlined | § Supervisor Capability |
 | `custom` | A single narrow, general-purpose custom `.agent.md` (not bound to a project) | free-form per intent | § Mode Confirmation |
 | `project-custom` | A project-bound custom agent that marks its project and guards against being run elsewhere | `skills/create-agent/templates/agent-project-custom-template.md` | § Project-Custom Capability |
 
 ### Mode Confirmation
 
-When a create request does not clearly map to a single `kind`, do **not** guess. Confirm with the user which authoring mode they want before generating — offer the choices explicitly: `role`, `supervisor`, `custom` (narrow, general-purpose), or `project-custom` (project-bound). This is the one confirmation gate shared by all authoring capabilities.
+When a create request does not clearly map to a single `kind`, do **not** guess. Confirm with the user which authoring mode they want before generating — offer the choices explicitly: `capacity`, `supervisor`, `custom` (narrow, general-purpose), or `project-custom` (project-bound). This is the one confirmation gate shared by all authoring capabilities.
 
 All capabilities share the same validate + report tail (Workflow steps 4–5) and the Agent-Specific Configuration handling below.
 
@@ -60,13 +62,13 @@ Analyze the conversation history and project context to infer a useful role:
 
 ### 2. Validate against existing templates
 
-- Check `skills/create-agent/templates/agent-role-*-template.md` for existing roles
+- Check `skills/create-agent/templates/agent-capacity-*-template.md` for existing roles
 - If a similar role exists, suggest updating it via `improve-agent` instead
 - Ensure the new role does not overlap significantly with the seven preset roles
 
 ### 3. Create the template file
 
-Write `skills/create-agent/templates/agent-role-<slug>-template.md` following the established structure:
+Write `skills/create-agent/templates/agent-capacity-<slug>-template.md` following the established structure:
 
 ```markdown
 ---
@@ -75,7 +77,7 @@ description: {{AGENT_DESCRIPTION}}
 user-invocable: true
 disable-model-invocation: false
 supervisor: true
-role-scope: <slug>
+capacity-scope: <slug>
 model: auto
 tools: [Read, Grep, Glob, Write, Edit]
 maxTurns: 12
@@ -124,7 +126,7 @@ You are a **<Role Name>** for the {{PROJECT_NAME}} project.
 - Role instructions MUST be written in first-person professional identity
 - This skill operates on templates in `skills/create-agent/templates/`, NOT on generated agents in `.specify/agents/`
 - `project-custom` agents MUST carry the `project:` frontmatter marker and the mandatory `## Project Scope Guard` section (see § Project-Custom Capability)
-- The full framework frontmatter field set is: `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`, `project` (the last used only by `project-custom` agents)
+- The full framework frontmatter field set is: `user-invocable`, `disable-model-invocation`, `supervisor`, `capacity-scope`, `project` (the last used only by `project-custom` agents)
 
 ## Agent Lifecycle (temporary vs persistent)
 
@@ -151,17 +153,17 @@ Use this capability (`kind: supervisor`) to author a **role-scoped supervisor** 
 
 ### How it works
 
-1. Load the role template `skills/create-agent/templates/agent-role-<role_slug>-template.md` (it carries `supervisor: true` and `role-scope: <role_slug>` in frontmatter).
+1. Load the capacity template `skills/create-agent/templates/agent-capacity-<capacity_slug>-template.md` (it carries `supervisor: true` and `capacity-scope: <capacity_slug>` in frontmatter).
 2. **Inline the single-source snippet** `skills/create-agent/templates/agent-supervision-delegation.md` into the generated agent body, resolving its placeholders:
-   - `{{ROLE_SCOPE}}` → `role_slug`
+   - `{{CAPACITY_SCOPE}}` → `capacity_slug` (the request's `role_slug`)
    - `{{ROLE_NAME}}` → role display name
    - `{{ROLE_DIMENSIONS}}` → the request's `scoring_dimensions` (or role-appropriate defaults if omitted)
 3. Preserve `supervisor: true` in the generated frontmatter (honor `supervisor: false` only if the request explicitly opts out).
-4. Write the generated agent to `.specify/agents/<role_slug>.agent.md` and run the shared validate + report tail.
+4. Write the generated agent to `.specify/agents/<capacity_slug>.agent.md` and run the shared validate + report tail.
 
 ### Rule
 
-Never copy the delegation section text into `skills/create-agent/templates/agent-role-*-template.md`; edit it only in `skills/create-agent/templates/agent-supervision-delegation.md` so all supervisors stay in sync (single source of truth).
+Never copy the delegation section text into `skills/create-agent/templates/agent-capacity-*-template.md`; edit it only in `skills/create-agent/templates/agent-supervision-delegation.md` so all supervisors stay in sync (single source of truth).
 
 ## Project-Custom Capability
 

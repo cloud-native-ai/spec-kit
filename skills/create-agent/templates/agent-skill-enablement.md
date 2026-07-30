@@ -3,13 +3,23 @@
 
   This file is NOT a standalone agent template. It is the canonical wording of the
   skill-preference protocol that every built-in role agent (`agents/*.agent.md`) and
-  its generator (`agent-role-*-template.md`) composes into a `## Skill Enablement`
+  its generator (`agent-capacity-*-template.md`) composes into a `## Skill Enablement`
   section. Edit the protocol text HERE only; keep every agent/template copy identical
   so agent→skill guidance stays uniform and discoverable (FR-009, SC-005).
 
   The ONLY per-agent-varying part is the `| Skill | When to use |` table, whose skill
   set MUST equal that agent's `skills:` frontmatter list. Do not reword the shared
   protocol paragraph per agent (contract C-2).
+
+  Capability → responsibility note (authoring guidance; do NOT copy into the body):
+  an agent's declared `skills:` + `tools:` are its CAPACITY — what it can do. Capacity
+  gates responsibility: an agent can only be assigned a team responsibility its capacity
+  supports. In particular, the capacity to edit agent/skill/team definitions is what
+  makes an agent a Meta agent, and only a Meta agent may take the team-management
+  responsibilities (optimizer, process-evaluator, team-config editor). An agent with a
+  read-only skill/tool set is confined to Worker responsibilities. See the capacity↔
+  responsibility boundary in `.specify/skills/create-team/references/capacity-vs-responsibility.md`
+  and the Type criterion in `.specify/skills/create-team/references/conceptual-model.md`.
 -->
 
 ## Skill Enablement
