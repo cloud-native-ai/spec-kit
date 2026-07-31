@@ -1,0 +1,362 @@
+{
+  "schemaVersion": 3,
+  "kind": "session-core-facts",
+  "scope": {
+    "platform": "qoder",
+    "workspace": "spec-kit",
+    "until": "2026-07-30T12:16:49.373Z",
+    "selection": "all-eligible",
+    "eligibleSessions": 22,
+    "selectedSessions": 22,
+    "sampled": false
+  },
+  "candidateSelection": {
+    "strategy": "agent-work-loop-portfolio-v1",
+    "availableClasses": {
+      "validation-repair": 2,
+      "boundary-change": 6,
+      "lifecycle-demand": 5,
+      "operation-control": 32,
+      "change-gap": 22,
+      "read-only-work": 10
+    },
+    "emittedClasses": {
+      "validation-repair": 2,
+      "boundary-change": 1,
+      "lifecycle-demand": 2,
+      "operation-control": 5,
+      "change-gap": 2,
+      "read-only-work": 3
+    }
+  },
+  "admission": {
+    "taskEpisodes": 471,
+    "candidateEpisodes": 37,
+    "distinctRequests": 33,
+    "emittedCandidates": 5
+  },
+  "populationCoverage": {
+    "withChanges": 22,
+    "withChecks": 2,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 6,
+    "withFrictionConsequence": 1
+  },
+  "observationCoverage": {
+    "withChanges": 2,
+    "withChecks": 2,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 3,
+    "withFrictionConsequence": 1
+  },
+  "admissionSupport": {
+    "semanticGuardrails": [
+      "occurrences-not-distinct-episodes",
+      "coverage-not-suggestion",
+      "omitted-details-not-signal-evidence",
+      "project-capability-inventory-unobserved"
+    ],
+    "sharedFrictionConsequences": []
+  },
+  "candidates": [
+    {
+      "ref": "E1",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "处理feedback-20260728T033901Z.zip中用户提交的feedback",
+        "key": "req:3f3a5dd5b462",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "operation-control",
+        "read-only-work"
+      ],
+      "acceptanceSignals": [
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [
+        "failed-check"
+      ],
+      "activity": {
+        "toolCalls": 44,
+        "classifiedReads": 22
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "execute",
+          "change",
+          "execute",
+          "check"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 7
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "failed",
+          "relation": "no-change-context",
+          "countQuality": "unavailable"
+        }
+      ],
+      "friction": {
+        "executionFailures": 2,
+        "permissionDenials": 0
+      },
+      "closure": "no-change-observed",
+      "repair": "failure-without-confirmed-repair",
+      "mechanisms": [
+        "hook:SessionStart",
+        "hook:PostToolUse"
+      ]
+    },
+    {
+      "ref": "E2",
+      "contextGroup": "G2",
+      "request": {
+        "summary": "先将当前的所有改动进行提交，然后再排查剩余的问题",
+        "key": "req:17ee27fd0049",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "operation-control",
+        "read-only-work"
+      ],
+      "acceptanceSignals": [
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 23
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "check",
+          "execute",
+          "check"
+        ]
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "no-change-context"
+        },
+        {
+          "kind": "pytest",
+          "status": "passed",
+          "relation": "no-change-context"
+        }
+      ],
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "hook:Stop"
+      ]
+    },
+    {
+      "ref": "E3",
+      "contextGroup": "G3",
+      "request": {
+        "summary": "当前我使用speckit框架在使用过程中生成了\"/storage/project/kangaroo-xuanji/xuanji-images/.specify/skills/start-kind/.specify/memory/feedback/20260726T150602Z-skill-create-skills.md \"这样的文档,感觉是路径解析的问题,我预期的目录应该是/storage/project/kangaroo-xuanji/xuanji-images/.sp…",
+        "key": "req:6c4601b99a39",
+        "occurrences": 1,
+        "followUp": "This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation. Summary:…",
+        "observedTurns": 2,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 1,
+        "files": 1
+      },
+      "evidenceClasses": [
+        "boundary-change",
+        "lifecycle-demand",
+        "operation-control",
+        "change-gap"
+      ],
+      "acceptanceSignals": [
+        "project-change"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 25,
+        "classifiedReads": 12
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "change"
+        ]
+      },
+      "checks": [],
+      "closure": "changed-without-check",
+      "mechanisms": [
+        "hook:Stop",
+        "hook:SessionStart",
+        "hook:PostToolUse"
+      ],
+      "lifecycle": [
+        {
+          "intent": "review-acceptance",
+          "family": "review-acceptance-delivery",
+          "dimensionId": "reliable-delivery",
+          "checkId": "acceptance-evidence",
+          "confidence": "High"
+        }
+      ]
+    },
+    {
+      "ref": "E4",
+      "contextGroup": "G3",
+      "request": {
+        "summary": "所有code <path>,需要先修改相应的技能,然后将当前项目中的文档挪到这个目录中.",
+        "key": "req:e415174d9e56",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 2,
+        "files": 1
+      },
+      "evidenceClasses": [
+        "lifecycle-demand",
+        "operation-control",
+        "change-gap"
+      ],
+      "acceptanceSignals": [
+        "project-change"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 12
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "change"
+        ]
+      },
+      "checks": [],
+      "friction": {
+        "executionFailures": 2,
+        "permissionDenials": 0
+      },
+      "closure": "changed-without-check",
+      "mechanisms": [
+        "hook:Stop"
+      ],
+      "lifecycle": [
+        {
+          "intent": "review-acceptance",
+          "family": "review-acceptance-delivery",
+          "dimensionId": "reliable-delivery",
+          "checkId": "acceptance-evidence",
+          "confidence": "High"
+        }
+      ]
+    },
+    {
+      "ref": "E5",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "Goal still active - model has not called update_goal(status=\"complete\")",
+        "key": "req:2f5080bd697d",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "operation-control",
+        "read-only-work"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 14
+      },
+      "workTrace": {
+        "steps": [
+          "execute"
+        ]
+      },
+      "checks": [],
+      "friction": {
+        "executionFailures": 3,
+        "permissionDenials": 0
+      },
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "hook:Stop"
+      ]
+    }
+  ],
+  "omitted": {
+    "noRequest": 434,
+    "selfAnalysis": 0,
+    "lowSignal": 0,
+    "duplicateRequests": 4,
+    "candidateBudget": 28,
+    "checkBudget": 0,
+    "activeSessions": 0,
+    "homeSessionOnly": 0
+  },
+  "warningCodes": [
+    "missing-optional-root",
+    "disabled-source-root"
+  ],
+  "excludes": [
+    "assistantText",
+    "rawPrompts",
+    "commands",
+    "toolOutput",
+    "paths",
+    "rawIds",
+    "secrets"
+  ],
+  "diagnosticFlags": [
+    "portfolio-truncated",
+    "population-portfolio-divergence",
+    "no-reviewed-relevant-check-evidence",
+    "no-result-evidence"
+  ],
+  "cost": {
+    "serializedBytes": 6115,
+    "estimatedTokens": 1555
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "kind": "speckit.evidence-findings",
+  "target": "skill:draw-plantuml",
+  "runId": "ev-20260730-121649-draw-plantuml",
+  "window": {
+    "since": null,
+    "until": null
+  },
+  "platforms": [
+    "qoder"
+  ],
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 4
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 72
+    }
+  },
+  "evidence": [
+    {
+      "id": "ev-001",
+      "lane": "session",
+      "evidenceState": "Exercised",
+      "summary": "471 task episode(s) observed on qoder; 5 candidate(s) admitted, 0 with user corrections.",
+      "evidenceRefs": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5"
+      ],
+      "signals": {
+        "taskEpisodes": 471,
+        "candidates": 5,
+        "userCorrections": 0
+      },
+      "privacyNote": "redacted-semantic-facet"
+    },
+    {
+      "id": "ev-002",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Project profile captured: primary languages javascript, python; git history signals collected.",
+      "evidenceRefs": [
+        "core-change-watch/project-profile",
+        "core-change-watch/git-history-profile"
+      ],
+      "signals": {
+        "primaryLanguages": 2,
+        "sourceFiles": 244,
+        "testFiles": 189
+      }
+    },
+    {
+      "id": "ev-003",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Dependency governance: 2 ecosystem(s), risk level medium.",
+      "evidenceRefs": [
+        "dependency-governance/cli"
+      ],
+      "signals": {
+        "ecosystems": 2,
+        "staleDependencyFiles": 0
+      }
+    },
+    {
+      "id": "ev-004",
+      "lane": "assets",
+      "evidenceState": "Present",
+      "summary": "Asset baseline (qoder): status complete, 16 lint finding(s), inventory available.",
+      "evidenceRefs": [
+        "coding-agent-practices/asset-baseline"
+      ],
+      "signals": {
+        "lintFindings": 16
+      }
+    },
+    {
+      "id": "ev-005",
+      "lane": "runs",
+      "evidenceState": "Unobserved",
+      "summary": "Team cws-workspace-cluster: 0 run report(s), 0 logged cycle(s), 0 critique note(s).",
+      "evidenceRefs": [],
+      "signals": {
+        "runReports": 0,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-006",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team draw-plantuml-optimizer: 5 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/draw-plantuml-optimizer/runs/20260715T130546Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T071030Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T074420Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T094834Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T104232Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-007",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team requirement-implement-monitor: 5 run report(s), 5 logged cycle(s), 1 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/requirement-implement-monitor/runs/20260729T063425Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T072002Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T074013Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T093345Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260730T022200Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 5,
+        "escalations": 4,
+        "critiqueNotes": 1
+      }
+    },
+    {
+      "id": "ev-008",
+      "lane": "runs",
+      "evidenceState": "Unobserved",
+      "summary": "Team summarize-project-optimizer: 0 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [],
+      "signals": {
+        "runReports": 0,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-009",
+      "lane": "feedback",
+      "evidenceState": "Present",
+      "summary": "Feedback store scanned: 72 entr(y/ies), 0 recurring optimization theme(s).",
+      "evidenceRefs": [
+        ".specify/memory/feedback/index.json"
+      ],
+      "signals": {
+        "entries": 72,
+        "recurringThemes": 0
+      }
+    }
+  ],
+  "findingsDigest": "sha256:aaa5a411b4d18f7625ea4e85bae54e59d80b51c3af1cace1e1aae8591c5e7383"
+}

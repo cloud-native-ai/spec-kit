@@ -1,0 +1,19 @@
+{
+  "baselineRunId": "ev-20260730-121649-draw-plantuml",
+  "target": "skill:draw-plantuml",
+  "scope": "WBS (@startwbs) + Gantt (@startgantt) drawing only",
+  "targetFinding": "WBS/甘特图的版面与排期决策在技能中被写成经验值与查表规则（固定 zoom 值、on {} 行为不明、依赖箭头当装饰、里程碑视图写法缺失、大图内联无分档），执行者无法判定成图是否可读、标签是否越界、某写法是否改写了排期；且 14-gantt-diagram.md「声明任务的三种方式」示例缺 Project starts 基准，实测直接渲染失败。",
+  "change": [
+    "新增 scripts/measure-svg-layout.py：量测 viewBox/长宽比/有效字号/时间轴标签溢出，并提供 --compare A/B 判定 scheduleChanged（含 uniformShiftUnits 与条形段筛选，避免把整体平移/背景着色误判成改排期）。",
+    "14-gantt-diagram.md：新增 on {} 实测结论（不改排期，资源盒占图高 30%~50%，默认 hide resources footbox）、依赖箭头会重排后继的实测警告、里程碑视图两种可行写法（绝对日期 / 锚点任务 + transparent）、刻度与 zoom 实测决策矩阵（7 变体）、<style> 一行多属性炸画布警告、skinparam titleFontSize 实测影响、量测自检三判据小节，以及两张实测通过的完整示例（带责任人的交付甘特图 1.48:1、里程碑视图 1.71:1）；修复缺 Project starts 导致渲染失败的示例。",
+    "13-wbs-diagram.md：新增 @startwbs 默认单色须显式 <style> 的告知、<style> 一行多属性炸画布警告、状态色 + \\n【责任人】 + ◆Mn 锚点 + ✓ 的完整示例（实测 1.58:1 / 19.0px）、内联「有效字号」分档规则（拆图优先、放大 zoom 无效）、✔(U+2714) → ✓(U+2713) 字形坑。",
+    "SKILL.md + references/index.md：加入 WBS/甘特交付前量测自检的入口指引与脚本索引。"
+  ],
+  "expectedSignal": "下一次真实的 WBS/甘特绘制运行中：(1) 不再出现照抄 zoom 值导致的细长/字小成图（有效字号 <12px 或长宽比 >2）；(2) 不再出现里程碑视图因引用未声明任务而渲染失败；(3) 依赖箭头造成的静默排期改写被 A/B 拦下；(4) 技能内所有 @startwbs/@startgantt 示例保持 100% 可渲染（本轮 40/40）。",
+  "validation": {
+    "renderedBlocks": "40/40 PASS (13-wbs: 14, 14-gantt: 26)，修复前为 39/40",
+    "abGroundTruthCases": "4/4 分类正确：on {} → 不改排期；着色留白区间 → 不改排期；titleFontSize → uniformShiftUnits=1291 不算改排期；-[dotted]-> → scheduleChanged=true",
+    "mirrorSync": "diff -rq skills/draw-plantuml .specify/skills/draw-plantuml → identical",
+    "contractTests": "tests/contract/test_study_project_uml_assets.py 全通过；test_summarize_project_prompt_assets.py 的 2 项失败经 HEAD 干净 worktree 复核为并发 summarize-project 未提交改动所致（基线 58/58 通过），与本次改动无关"
+  }
+}

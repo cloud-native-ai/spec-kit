@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-07-30T13:00:54Z",
+  "updated": "2026-07-30T18:01:47Z",
   "threshold": 10,
-  "count_since_submission": 6,
+  "count_since_submission": 9,
   "submitted_at": "2026-07-30T04:04:10Z",
   "entries": [
+    {
+      "id": "20260730T180147Z-skill-create-team",
+      "file": "20260730T180147Z-skill-create-team.md",
+      "unit_id": "skill:create-team",
+      "unit_type": "skill",
+      "run_id": "run-summarize-project-optimizer-20260730T180020Z",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-30T18:01:47Z",
+      "summary": "Second run on a new sparse benchmark (kdbg-tool). Converged in 2 generations via a MERGE strategy: gen-1's three orthogonal variants all passed threshold, gen-2 merged them into one target and re-scor"
+    },
     {
       "id": "20260730T130054Z-skill-improve-skills",
       "file": "20260730T130054Z-skill-improve-skills.md",
@@ -15,6 +26,28 @@
       "partial": false,
       "created": "2026-07-30T13:00:54Z",
       "summary": "Applied externally sourced, quantified skill best-practice knowledge (150-run constraint-injection experiment + LLM Wiki L0-L3 model) to improve-skills: added constraint non-compliance failure mode, e"
+    },
+    {
+      "id": "20260730T122623Z-skill-create-team",
+      "file": "20260730T122623Z-skill-create-team.md",
+      "unit_id": "skill:create-team",
+      "unit_type": "skill",
+      "run_id": "run-summarize-project-optimizer-20260730T122438Z",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-30T12:26:23Z",
+      "summary": "Run mode executed the iteration pattern end-to-end: preview→confirm gate, 2 generations x (3 variant optimizers -> 3 report generators -> 3 scorers), elimination with elite retention + crossover, conv"
+    },
+    {
+      "id": "20260730T083635Z-skill-create-team",
+      "file": "20260730T083635Z-skill-create-team.md",
+      "unit_id": "skill:create-team",
+      "unit_type": "skill",
+      "run_id": "create-team-summarize-project-optimizer-20260730",
+      "feature": "",
+      "partial": false,
+      "created": "2026-07-30T08:36:35Z",
+      "summary": "Create mode ran cleanly end-to-end: goal established from user input, preset matcher returned high-confidence artifact-optimizer, roster/pattern derived from preset, user confirmed with one weight adj"
     },
     {
       "id": "20260730T072318Z-skill-create-agent",

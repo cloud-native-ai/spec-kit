@@ -1,0 +1,30 @@
+{
+  "runId": "ev-20260730-121649-draw-plantuml",
+  "target": "skill:draw-plantuml",
+  "created": "2026-07-30T12:16:49Z",
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 4
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 72
+    }
+  },
+  "engine": {
+    "engineSubsetPath": "scripts/js/better-harness",
+    "upstreamCommit": "b2e621d",
+    "nodeVersion": "26.3.0"
+  },
+  "findingsDigest": "sha256:aaa5a411b4d18f7625ea4e85bae54e59d80b51c3af1cace1e1aae8591c5e7383"
+}
