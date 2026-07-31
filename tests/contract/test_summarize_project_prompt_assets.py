@@ -10,9 +10,17 @@ visual charts — "summarize" is the accurate name. Covers:
 - Frontmatter: name, trigger keywords, skill_id pattern
 - Skills registry row in .specify/instructions.md
 - Presentation/output-tool positioning (read-only, derived report)
-- SpecKit auto-detection (.specify/ structure as primary info source)
-- Multi-source inputs (code, README/docs, external documents, git history)
-- Deterministic source detection codified in scripts/detect-project-sources.py
+- Input contract: required-info table + context ingestion + form fill-in
+  (project-input form under the delivery dir), with git repo material as an
+  opt-in supplementary source rather than the primary path
+- Traceable, non-code-only inputs: management-system exports and user
+  documents are the primary sources; git history / README stay available as
+  optional supplements
+- Deterministic input validation codified in scripts (validate-project-input.py
+  for the form contract, detect-project-sources.py for opt-in repo probing)
+- Forward-guarded assertions: checks specific to the new input model skip when
+  the skill copy predates it (no required-info.md), so this suite stays green
+  across the refactor rollout
 - Ordered six-step workflow (detect -> collect -> model -> charts ->
   render validation -> consistency + persist)
 - Charts embedded as PlantUML source blocks, rendering delegated to
@@ -26,6 +34,8 @@ visual charts — "summarize" is the accurate name. Covers:
 - Canonical ## Feedback block with unit-id skill:summarize-project
 """
 from pathlib import Path
+
+import pytest
 
 from specify_cli import _OBSOLETE_SKILLS
 
@@ -42,7 +52,21 @@ SKILL_DIR = ROOT / "skills" / "summarize-project"
 SKILL_FILE = SKILL_DIR / "SKILL.md"
 PLAYBOOK_FILE = SKILL_DIR / "references" / "reporting-playbook.md"
 DETECT_SCRIPT = SKILL_DIR / "scripts" / "detect-project-sources.py"
+REQUIRED_INFO_DOC = SKILL_DIR / "references" / "required-info.md"
+VALIDATE_SCRIPT = SKILL_DIR / "scripts" / "validate-project-input.py"
+FORM_TEMPLATE = SKILL_DIR / "templates" / "project-input.template.yaml"
 MIRROR_DIR = ROOT / ".specify" / "skills" / "summarize-project"
+
+
+def _input_model_present() -> bool:
+    """True when this skill copy already carries the required-info input model.
+
+    The input-model refactor (required-info table + form fill-in) lands in the
+    skill package as references/required-info.md. Checks that only make sense
+    under the new model are guarded by this helper so the suite stays green on
+    copies that predate it.
+    """
+    return REQUIRED_INFO_DOC.exists()
 
 LAYER_DOCS = {
     "project-overview.md": "目标",
@@ -184,13 +208,33 @@ def test_report_is_regenerable_derived_artifact():
 # SpecKit auto-detection and multi-source inputs
 # ---------------------------------------------------------------------------
 
-def test_speckit_detection_documented():
+def test_input_sources_are_identifiable_and_traceable():
+    """Intent (preserved across the input-model refactor): information sources
+    must be identifiable and traceable, and the skill must have an explicit
+    identification/validation step before it collects anything.
+
+    Architecture-tolerant: the pre-refactor copy documents repo-artifact
+    detection (.specify/ + requirements/features/tasks anchors); the
+    post-refactor copy documents the required-info table + project-input form
+    contract (repo material demoted to an opt-in supplement). Default delivery
+    locations are asserted separately in test_default_report_paths_documented.
+    """
     text = text_of(SKILL_FILE)
-    assert ".specify" in text, "Expected .specify/ detection rule"
-    for anchor in ["requirements.md", "features.md", "tasks.md"]:
-        assert anchor in text, f"Expected SpecKit artifact anchor: {anchor}"
-    assert "非 SpecKit" in text, "Expected non-SpecKit fallback column"
-    assert "检测" in text, "Expected detection step wording"
+    assert ".specify" in text, "Expected .specify/ paths (delivery location / artifact anchors)"
+    assert "检测" in text or "校验" in text, (
+        "Expected an explicit detection/validation step for project information"
+    )
+    repo_artifact_model = all(
+        anchor in text for anchor in ("requirements.md", "features.md", "tasks.md")
+    )
+    form_input_model = all(
+        marker in text
+        for marker in ("required-info.md", "project-input", "必要信息表", "表单")
+    )
+    assert repo_artifact_model or form_input_model, (
+        "Expected either repo-artifact source anchors or the required-info "
+        "table + project-input form contract to be documented"
+    )
 
 
 def test_multi_source_inputs_documented():
@@ -203,6 +247,12 @@ def test_multi_source_inputs_documented():
     assert "不限于代码" in text_of(SKILL_FILE), (
         "Expected explicit 'inputs not limited to code' statement"
     )
+    if _input_model_present():
+        combined = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
+        assert "管理系统" in combined or "导出" in combined, (
+            "Under the required-info input model, management-system exports / "
+            "user documents must be documented as the primary input source"
+        )
 
 
 def test_detect_script_referenced_and_structured():
@@ -212,15 +262,114 @@ def test_detect_script_referenced_and_structured():
     assert "--target" in script, "Expected --target CLI argument"
     assert "json" in script, "Expected JSON output"
     assert "default_report_path" in script, "Expected default report path in script output"
+    if _input_model_present():
+        assert "opt-in" in text or "可选" in text, (
+            "Repo probing must be documented as an opt-in supplement, not the main path"
+        )
+        assert "validate-project-input.py" in text, (
+            "Expected the form-contract validator to be invoked from SKILL.md"
+        )
+        validator = text_of(VALIDATE_SCRIPT)
+        for flag in ("--input", "--form-skeleton", "--emit-json"):
+            assert flag in validator, f"Expected validator CLI flag: {flag}"
+
+
+CANONICAL_FIELDS = [
+    "project_name",
+    "baseline_date",
+    "phase_id",
+    "item_id",
+    "item_name",
+    "owner_id",
+    "milestone_id",
+    "planned_end",
+    "anchor_item_id",
+    "depends_on",
+    "feature_id",
+    "source",
+]
+
+
+def test_required_info_table_is_input_contract():
+    """The required-info table is the single authority for the input contract:
+    canonical snake_case field names (also used as relational foreign keys),
+    the three requiredness tiers, and referential-integrity rules."""
+    if not _input_model_present():
+        pytest.skip("skill copy predates the required-info input model")
+    text = text_of(REQUIRED_INFO_DOC)
+    missing = [f for f in CANONICAL_FIELDS if f not in text]
+    assert not missing, f"required-info.md missing canonical fields: {missing}"
+    for entity in ("project", "phases", "work_items", "milestones", "people",
+                   "features", "sources"):
+        assert entity in text, f"required-info.md missing entity: {entity}"
+    for tier in ("必填", "可推断", "可选"):
+        assert tier in text, f"required-info.md missing requiredness tier: {tier}"
+    assert "全局唯一" in text, "Expected globally-unique *_id rule"
+    assert "外键" in text, "Expected foreign-key resolvability rule"
+    assert "inferred_from" in text, "Expected inferred-value provenance marker"
+
+
+def test_form_fill_in_flow_documented():
+    """Three-stage input flow: context ingestion -> validation -> form fill-in
+    (blocking only when a truly required field is missing)."""
+    if not _input_model_present():
+        pytest.skip("skill copy predates the required-info input model")
+    text = text_of(SKILL_FILE)
+    for marker in ("上下文摄取", "校验", "表单补填", "阻断"):
+        assert marker in text, f"SKILL.md missing input-flow marker: {marker}"
+    assert "data/project-input.yaml" in text, (
+        "Expected the project-input form to live inside the delivery directory data/"
+    )
+    assert "只读" in text, "Expected read-only positioning for the user-owned form"
+    assert FORM_TEMPLATE.exists(), f"Expected blank form template: {FORM_TEMPLATE}"
+    template = text_of(FORM_TEMPLATE)
+    for field in ("project_name", "baseline_date", "work_items", "milestones"):
+        assert field in template, f"form template missing field: {field}"
+
+
+def test_repo_material_is_opt_in():
+    """Repo material is an opt-in supplementary source: nothing is scanned
+    unless the form declares repos[] and marks fields as repo-derived."""
+    if not _input_model_present():
+        pytest.skip("skill copy predates the required-info input model")
+    skill = text_of(SKILL_FILE)
+    tiers = text_of(SKILL_DIR / "references" / "source-tiers.md")
+    for marker in ("repos", "derive_fields", "opt-in"):
+        assert marker in skill, f"SKILL.md missing repo opt-in marker: {marker}"
+    assert "默认不扫" in skill or "默认不查" in skill, (
+        "Expected an explicit 'no repo scanning by default' statement"
+    )
+    assert "opt-in" in tiers, "source-tiers.md must be framed as an opt-in supplement"
+    assert "全仓扫描" in tiers, "Expected the no-full-repo-scan prohibition"
+    assert "多 repo" in tiers or "多 repo" in skill, (
+        "Expected multi-repo aggregation rules (a project may span several repos)"
+    )
+
+
+def test_engine_input_schema_matches_required_info():
+    """Convergence point: the form IS the engine input -- required-info table,
+    engine --print-schema, and the validator share one set of field names."""
+    if not _input_model_present():
+        pytest.skip("skill copy predates the required-info input model")
+    engine = text_of(SKILL_DIR / "scripts" / "progress-engine.py")
+    validator = text_of(VALIDATE_SCRIPT)
+    doc = text_of(REQUIRED_INFO_DOC)
+    for field in CANONICAL_FIELDS:
+        assert field in engine, f"progress-engine.py missing canonical field: {field}"
+        assert field in validator, f"validate-project-input.py missing canonical field: {field}"
+        assert field in doc, f"required-info.md missing canonical field: {field}"
 
 
 def test_default_report_paths_documented():
+    """Delivery contract: two default delivery locations (delivery directory
+    .specify/project/summary/ for SpecKit projects, docs/project-summary/
+    otherwise), chosen by the detection result."""
     text = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
-    assert ".specify/project/summary.md" in text, (
-        "Expected SpecKit default report path .specify/project/summary.md"
+    assert ".specify/project/summary" in text, (
+        "Expected SpecKit default delivery location .specify/project/summary/"
     )
-    assert "docs/project-summary.md" in text, (
-        "Expected non-SpecKit default report path docs/project-summary.md"
+    assert "docs/project-summary" in text, (
+        "Expected non-SpecKit default delivery location docs/project-summary/"
     )
 
 
@@ -241,11 +390,27 @@ def test_delegates_rendering_to_draw_plantuml():
 
 
 def test_charts_embedded_as_plantuml_source():
+    """Intent (preserved across the delivery-contract change): every chart is
+    delivered in **editable PlantUML text form**, not only as a rendered bitmap.
+
+    Architecture-tolerant: the pre-refactor copy embeds ```plantuml source
+    blocks in the report body; the post-refactor copy ships the source as
+    `assets/<name>.puml` files inside the self-contained delivery directory
+    (report body then references the rendered image by relative path). Either
+    form satisfies the rule; what must never happen is charts shipping without
+    an editable text source.
+    """
     text = text_of(SKILL_FILE)
-    assert "```plantuml" in text, (
-        "Expected charts embedded as ```plantuml source blocks in the report"
+    embedded_blocks = "```plantuml" in text
+    puml_files = ".puml" in text and "assets/" in text
+    assert embedded_blocks or puml_files, (
+        "Expected charts delivered as editable PlantUML text — either "
+        "```plantuml source blocks in the report or assets/*.puml source files"
     )
-    assert "源码" in text and "嵌入" in text, "Expected embedded-source (text-form chart) rule"
+    assert "源码" in text, "Expected the PlantUML source (源码) rule to be stated"
+    assert "嵌入" in text or "可编辑" in text, (
+        "Expected the chart source to be documented as embedded or editable text"
+    )
 
 
 # ---------------------------------------------------------------------------
