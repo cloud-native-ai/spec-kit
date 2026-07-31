@@ -23,7 +23,7 @@ The **goal** — the team's north star that both structures serve — is defined
 Produce a team from a user **goal** and (unless one-shot) persist it as `.specify/teams/<slug>/team.md`. The goal is the team's north star — **establish it first, then derive both structures from it** (goal concept: `references/goal.md`).
 
 1. **Establish the goal (first)** — extract the goal from `$ARGUMENTS`/conversation/repo context, ask if missing, and confirm it with the user; write it in a **verifiable** form (success criteria / threshold). If the goal's theme is **optimization**, classify it (one-time vs continuous) and pick a strategy (elimination vs progressive) per `references/optimization-goals.md`.
-2. **Match against team presets (before deriving anything)** — run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<goal text>"` and act on the returned `confidence`: `high` → present the top preset (goal skeleton + roster + pattern) and **recommend reuse**; `medium` → present the top 2 candidates alongside the from-scratch option; `low`/`none` → say no preset matched and continue to step 3. Presets are known-good shapes distilled from teams that actually ran — reusing one is what keeps a vague goal from producing an arbitrary team. Never instantiate a preset silently, and never let it override an explicit user instruction. See `references/teams.md`.
+2. **Match against team presets (before deriving anything)** — run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<goal text>"` and act on the returned `confidence`: `high` → present the top preset (goal skeleton + roster + pattern) and **recommend reuse**; `medium` → present the top 2 candidates alongside the from-scratch option; `low`/`none` → say no preset matched and continue to step 3. Presets are known-good shapes distilled from teams that actually ran — reusing one is what keeps a vague goal from producing an arbitrary team. Never instantiate a preset silently, and never let it override an explicit user instruction. See `references/team-presets.md`.
 3. **Select the pattern** via the Pattern Selection decision tree below (independent → parallel; sequenced → serial; iterative-quality → iteration; long-lived operation → continuous) — **derived from the goal**. On preset reuse, the preset supplies the pattern; still confirm it fits.
 4. **Build the roster (static structure)** — a Role × Stage × Type matrix. If the user did not supply members, **propose** them from the goal: prefer existing agents under `.specify/agents/`, otherwise temporary stage/worker templates from `templates/`. An **iteration or continuous team MUST include exactly one Team Supervisor** (Meta role). **Judge each member's `type` explicitly by its operating object** — operates on business artifacts/information → `Worker`; operates on other agents/skills/agent-defining configuration → `Meta`. Do **not** derive Type from Stage: an evaluator scoring a business artifact (repo state, rendered output, a document) is a `Worker`, not Meta. The implication runs **one way only**: a member that must **write** team config / agent definitions / skill definitions MUST be `Meta` (necessary); but holding an evaluator / optimizer / "continuous improvement" role does **not** by itself make it Meta (not sufficient) — an agent that iteratively improves a *business artifact* is still a `Worker`. Decide each member's Type from **what it writes to**, never from its role name (see `references/conceptual-model.md` → Type criterion + "Meta and write authority"). Roster rows carry **responsibility** (stage, territory, `blockedBy`, reporting duty); the referenced agent carries **capacity** — never fork a capacity artifact to express a new seat (`references/capacity-vs-responsibility.md`).
 5. **Build the pattern config (dynamic structure)** — parallelism + territories (parallel), DAG `blockedBy` edges + per-handoff verification + file-path-only handoff (serial), quality dimensions + threshold + max_iterations + regression_limit (iteration), or the operating config — maturity + cadence + budget + constraints + independent verifier + state spine (continuous; see `references/operating-loops.md`).
@@ -51,6 +51,10 @@ members:
     # blockedBy: [...]        # serial
 config:
   # pattern-specific block (parallelism / DAG / loop settings)
+  # optimization goals: optimization_target (single target path), or co_targets
+  # (coordinated multi-target optimization — list of target paths + the layering
+  # principle stating which kind of content belongs to which target; see
+  # references/optimization-goals.md)
 ---
 
 ## Goal
@@ -436,6 +440,10 @@ WORKER AGENTS (Execution Layer)
 2. **Select Workers**: Choose from preset roles or create custom agents
 3. **Configure Team Supervisor**: Task decomposition strategy, dispatch pattern, team roster, quality dimensions + weights, threshold (default: 0.8), max iterations (default: 5), regression limit (default: 2)
 
+**Mid-run requirement additions.** If the user adds requirements while a run is underway, the cutoff is **task-set finalization**: before the task set is finalized (during INIT / the first COORDINATE), merge the addition **and write it back to `team.md`** (e.g. extend `config.test_environment`) so the task set stays fixed across iterations; after finalization, take the addition as input to the **next run or `improve-team`** instead of mutating the task set mid-loop — otherwise scores stop being comparable across iterations.
+
+**Per-run focus (optional).** A run MAY declare a focus (e.g. "功能全面覆盖" / coverage-first) that temporarily extends the task set or shifts per-dimension scoring emphasis for that run only. The Team Supervisor MUST record in the run report exactly how the focus changed the task set and the scoring basis — focused-run scores are not comparable with other runs' scores unless that delta is recorded; `team.md` itself stays unchanged.
+
 ### Self-Iteration Loop
 
 ```
@@ -476,6 +484,7 @@ LOOP (iteration in 1..max_iterations):
 > 2. An executor then **regenerates the deliverable from the source inputs by applying the current target** (reload the latest target each iteration — see the progressive strategy's "重载最新实现" in `references/optimization-goals.md §4`).
 > 3. Score the **regenerated** deliverable. This guarantees the score measures the target's quality, closing the loop "improve target → regenerate from target → score → keep best target".
 > 4. On success, the **adopted target** is the standard-output deliverable (persist to its real path); the regenerated artifact is a run intermediate.
+> 5. When the target's content is a **workflow/mechanism** (a protocol, review process, self-feedback loop), the scored deliverable is **a record of actually executing that mechanism once** — the executor follows the protocol for real and produces either concrete evidenced changes or an explicit no-findings statement. A static reading of the mechanism text is not an evaluable artifact.
 >
 > **Anti-pattern (do not do this):** optimizing the scored artifact directly (e.g. hand-editing the output diagram/file) and only distilling changes back into the target in batch at the end. That measures the *artifact*, not the *target* — the improvement loop for the target never actually closes. This applies to **both** the elimination and progressive strategies in `references/optimization-goals.md`.
 
@@ -486,6 +495,8 @@ LOOP (iteration in 1..max_iterations):
 | **Quality Met** | weighted_total >= threshold | Accept — deliver best output |
 | **Max Iterations** | iteration >= max_iterations | Stop — report best with warning |
 | **Diminishing Returns** | consecutive_regressions >= regression_limit | Halt — restore best, warn user |
+
+> **Delivery pre-check — score pass ≠ deliverable.** A passing `weighted_total` measures the quality dimensions, not structural integrity the dimensions don't cover (e.g. a new file never registered in its routing/index, dangling internal references). Before adopting, the Team Supervisor runs a structural-integrity check on the winning deliverable; on findings, append a **lightweight convergence round** scoped to only those structural fixes (not a full iteration), then adopt.
 
 ### Final Report
 
@@ -606,6 +617,7 @@ All patterns use **file-path-only** communication:
 In iteration/continuous loops, every dispatched sub-agent (optimizer, executor/renderer, scorer/evaluator) MUST finish by writing a small **structured result manifest** into the run workspace (e.g. `.specify/teams/.work/<slug>/gen-<N>/<role>-result.md` or `.json`), containing: `status` (done/failed), `output_paths` (file-path-only, no content), per-dimension scores (evaluators), and the single biggest improvement point observed.
 
 - **Sub-agents never write tracked team files.** `runs/<ts>-report.md`, `team.md`, `STATE.md`, and `run-log.jsonl` are written **only by the Team Supervisor (orchestrator)**, which aggregates the manifests. Sub-agents run in isolated contexts — concurrent writes to tracked files race, a sub-agent cannot see sibling variants to aggregate them, and a partial write corrupts the durable record.
+- **Interruption recovery.** If a sub-agent dispatch is cut off mid-flight (connection dropped, tool failure), first check whether its result manifest exists. **A missing manifest means the work is incomplete**, regardless of how many files the agent already wrote. Recover by re-dispatching with a resume prompt that (a) lists the changes already found on disk and (b) instructs the agent to verify those landed changes first, then complete only the remainder — this keeps recovery idempotent instead of redoing or double-applying work.
 - The supervisor **validates each manifest before DECIDE**; a missing or empty manifest counts that variant/cycle as failed (it does not silently score zero-quality work as zero points).
 - The scored deliverable path in the manifest is what the supervisor passes to the evaluator — evaluators read the artifact from that path, never from pasted content.
 
@@ -635,7 +647,7 @@ In iteration/continuous loops, every dispatched sub-agent (optimizer, executor/r
 
 | Path | Contents |
 |------|----------|
-| `${SKILL_HOME}/references/` | `conceptual-model.md` (Role × Stage × Type), `capacity-vs-responsibility.md` (which template set defines what), `goal.md`, `optimization-goals.md`, `operating-loops.md`, `teams.md` (preset mechanism + matching protocol) |
+| `${SKILL_HOME}/references/` | `conceptual-model.md` (Role × Stage × Type), `capacity-vs-responsibility.md` (which template set defines what), `goal.md`, `optimization-goals.md`, `operating-loops.md`, `team-presets.md` (preset mechanism + matching protocol) |
 | `${SKILL_HOME}/templates/` | team-supervisor role template, the three EEI stage templates, the parallel/serial/triad orchestration templates, `agent-workflow-schema.md` |
 | `${SKILL_HOME}/templates/teams/` | Predefined team shapes: `workspace-cluster.md`, `artifact-optimizer.md`, `process-monitor.md` |
 | `${SKILL_HOME}/scripts/match-team-preset.py` | Deterministic preset matcher — scores a goal against every preset's signals and returns ranked JSON with a `confidence` verdict (`--help` for usage) |

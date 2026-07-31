@@ -15,6 +15,12 @@ signals:
   - 淘汰
   - 锦标赛
   - 美观
+  - 实测
+  - 测试环境
+  - CLI 验证
+  - 实测验证
+  - real-run
+  - verify against real environment
   - optimize
   - improve quality
   - score

@@ -44,4 +44,4 @@ Responsibility is the accountability the team assigns to a seat for one goal. It
 ## Related
 
 - The three orthogonal dimensions (Role × Stage × Type) and the static/dynamic split: [`conceptual-model.md`](conceptual-model.md).
-- Predefined team shapes that pre-assign responsibilities for a known goal: [`teams.md`](teams.md).
+- Predefined team shapes that pre-assign responsibilities for a known goal: [`team-presets.md`](team-presets.md).

@@ -2,7 +2,7 @@
 """Match a user goal against the predefined team presets.
 
 Deterministic scorer for create-team step 2. It only ranks candidates; the
-calling agent decides what to do with them (see references/teams.md).
+calling agent decides what to do with them (see references/team-presets.md).
 
 Inputs (one of):
   --goal "<text>"     the user's goal / request text
