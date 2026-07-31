@@ -54,3 +54,4 @@ input/
 .qoder/sessions/
 .specify/tools/*.json
 .specify/instructions.md-*
+.specify/teams/.work/

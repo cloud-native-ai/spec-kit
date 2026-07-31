@@ -35,8 +35,8 @@ references/
 | 10 | [10-layout-planning.md](howto/10-layout-planning.md) | Step 4 | 布局规划——多区域复杂布局、布局故障排除、CJK 渲染问题 |
 | 11 | [11-code-generation.md](howto/11-code-generation.md) | Step 6 | 代码生成——草拟流程、标签与注释规则（≤10 字符 + note）、配套文字准备 |
 | 12 | [12-rendering-and-output.md](howto/12-rendering-and-output.md) | Step 8 | 渲染、匹配验证与输出——SVG/PNG 渲染、HTML 组装、质量检查清单 |
-| 13 | [13-wbs-diagram.md](howto/13-wbs-diagram.md) | 专项 | WBS 工作分解结构——层级分解、左右方向、无框节点、算术记法、`<style>` 配色 |
-| 14 | [14-gantt-diagram.md](howto/14-gantt-diagram.md) | 专项 | 甘特图——任务/工期/依赖、里程碑、完成度、颜色、分隔符、工作日历、今日标记、时间刻度 |
+| 13 | [13-wbs-diagram.md](howto/13-wbs-diagram.md) | 专项 | WBS 工作分解结构——层级分解、左右方向、无框节点、算术记法、`<style>` 配色；状态色 + `\n【责任人】` + `◆Mn` 里程碑锚点的信息编码、内联「有效字号」分档规则 |
+| 14 | [14-gantt-diagram.md](howto/14-gantt-diagram.md) | 专项 | 甘特图——任务/工期/依赖、里程碑、完成度、颜色、分隔符、工作日历、今日标记、时间刻度；刻度/zoom 实测决策矩阵、里程碑视图写法、`on {}` 与依赖箭头对排期的实测影响、量测自检三判据 |
 | 15 | [15-mindmap-diagram.md](howto/15-mindmap-diagram.md) | 专项 | 思维导图——OrgMode/Markdown/算术三套写法、左右分支、无框节点、`<style>` 与命名样式类 |
 | 16 | [16-json-diagram.md](howto/16-json-diagram.md) | 专项 | JSON 数据可视化——对象/数组/嵌套渲染、`#highlight` 路径高亮、`jsonDiagram` `<style>` |
 | 17 | [17-yaml-diagram.md](howto/17-yaml-diagram.md) | 专项 | YAML 显示效果——嵌套映射/列表渲染、`# highlight` 路径高亮、`yamlDiagram` `<style>` |
@@ -100,6 +100,7 @@ UML 理论、PlantUML 语法参考、官方文档和建模方法论的原始参�
 | 标签和注释怎么写 | [howto/11-code-generation.md](howto/11-code-generation.md) §二 + [guide/content.md](guide/content.md) §1.5 |
 | 样式怎么配 | [guide/style.md](guide/style.md) |
 | 怎么渲染和验证 | [howto/12-rendering-and-output.md](howto/12-rendering-and-output.md) |
+| WBS/甘特成图够不够清晰、标签有没有越界、某写法有没有改排期 | `../scripts/measure-svg-layout.py`（量测三判据 + `--compare` A/B）；判据说明见 [howto/14-gantt-diagram.md](howto/14-gantt-diagram.md) 「量测自检」与 [howto/13-wbs-diagram.md](howto/13-wbs-diagram.md) 「尺寸、清晰度与留白」 |
 | 布局出问题怎么排查 | [howto/10-layout-planning.md](howto/10-layout-planning.md) §三 + [guide/layout.md](guide/layout.md) §四 |
 | 复杂大图太乱/太大怎么美化 | [guide/large-diagram-playbook.md](guide/large-diagram-playbook.md) |
 | 某个语法怎么写 | [guide/syntax-reference.md](guide/syntax-reference.md) + [document/00-plantuml-overview.md](document/00-plantuml-overview.md) |
