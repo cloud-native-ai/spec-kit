@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-07-30T18:01:47Z",
+  "updated": "2026-08-01T16:24:40Z",
   "threshold": 10,
-  "count_since_submission": 9,
-  "submitted_at": "2026-07-30T04:04:10Z",
+  "count_since_submission": 0,
+  "submitted_at": "2026-08-01T16:24:40Z",
   "entries": [
+    {
+      "id": "20260801T162048Z-speckit-requirements",
+      "file": "20260801T162048Z-speckit-requirements.md",
+      "unit_id": "/speckit.requirements",
+      "unit_type": "command",
+      "run_id": "035-token-efficiency-20260802",
+      "feature": "035-token-efficiency",
+      "partial": false,
+      "created": "2026-08-01T16:20:48Z",
+      "summary": "本次 /speckit.requirements 运行完整走通:概念级输入按落地层级切分为三条纪律故事(程序优先/摘要优先/消耗观察),零 NEEDS CLARIFICATION(关键默认值入 Assumptions),质检清单一次全过。发现命令自身流程存在与本规格主题同类的 Token 低效点(整读最新规格取家规)。"
+    },
     {
       "id": "20260730T180147Z-skill-create-team",
       "file": "20260730T180147Z-skill-create-team.md",

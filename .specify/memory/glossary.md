@@ -28,3 +28,6 @@
 | Feature Index | - | Single source of truth for project capabilities at .specify/memory/features.md | auto | proposed |
 | Reconcile Engine | - | Diff-and-converge engine used by Spec Kit commands to align artifacts with desired state | auto | proposed |
 | Task Complexity Rubric | - | Tiered effort-calibration framework embedded in .specify/instructions.md | auto | proposed |
+| 程序优先 (Program-First) | program first, 程序优先原则 | Token 效率纪律之一:可用固定规则表达的文本/数据判断交由确定性程序执行,不送入大模型 | auto | proposed |
+| 摘要优先 (Summary-First) | summary first, 摘要化访问 | Token 效率纪律之一:机器管理数据文件原文不整体注入大模型上下文,例行消费摘要/投影/节选 | auto | proposed |
+| 升级阶梯 (Escalation Ladder) | escalation ladder, 访问升级阶梯 | 数据访问逐级放宽路径:摘要 → 定向节选 → 有界整读(整读须满足例外情形或记录理由) | auto | proposed |
