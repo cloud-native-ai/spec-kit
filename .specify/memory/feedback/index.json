@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-08-01T17:09:14Z",
+  "updated": "2026-08-01T17:47:25Z",
   "threshold": 10,
-  "count_since_submission": 3,
+  "count_since_submission": 4,
   "submitted_at": "2026-08-01T16:24:40Z",
   "entries": [
+    {
+      "id": "20260801T174725Z-speckit-implement",
+      "file": "20260801T174725Z-speckit-implement.md",
+      "unit_id": "/speckit.implement",
+      "unit_type": "command",
+      "run_id": "035-token-efficiency-implement-20260802",
+      "feature": "035-token-efficiency",
+      "partial": false,
+      "created": "2026-08-01T17:47:25Z",
+      "summary": "30/30 任务单会话完成,TDD 三轮 RED→GREEN(12+20+16+12 合同测试),top-5 整改全部附实测前后对比,全套 37F 基线零新增失败,五道完成门重验通过,Feature 040 落 Implemented。中途处置 root 属主 .git/objects 桶(已知 gotcha,按台账修复)。"
+    },
     {
       "id": "20260801T170914Z-speckit-tasks",
       "file": "20260801T170914Z-speckit-tasks.md",
