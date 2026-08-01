@@ -21,7 +21,7 @@
 - DoD-5: quickstart.md 五步走查全部通过;verification.md 覆盖 SC-001…SC-005 各一行状态
 - DoD-6: 一次真实 Token 观察条目可经 `list --contains token-efficiency` 完整检索(SC-005 实证)
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Completion Gate
 
@@ -133,10 +133,10 @@
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T027 [P] [blockedBy: T006] 将 ambient 引用同步应用到现行 `.specify/instructions.md`(生成文件,按模板同款措辞落节;注明下次 /speckit.instructions 再生时由模板保障)
-- [ ] T028 [P] [blockedBy: T025] 文档增量:在 `docs/reference/skills/feedback.md` 补 Token 效率自评维度与 `--contains` 检索一段(引用纪律文档,不复制规则)
-- [ ] T029 [blockedBy: T016,T020,T021,T026] GATE-1 终验:全套 `pytest -q` 与 baseline.txt 比对零新增失败;`sync-mirrors.py --check` exit 0
-- [ ] T030 [blockedBy: T029] quickstart.md 五步走查逐条执行并产出 `verification.md`(SC-001…SC-005 各一行状态 + `deferred_tasks=` 登记;审计冻结完整性 GATE-5 复核)
+- [X] T027 [P] [blockedBy: T006] 将 ambient 引用同步应用到现行 `.specify/instructions.md`(生成文件,按模板同款措辞落节;注明下次 /speckit.instructions 再生时由模板保障)
+- [X] T028 [P] [blockedBy: T025] 文档增量:在 `docs/reference/skills/feedback.md` 补 Token 效率自评维度与 `--contains` 检索一段(引用纪律文档,不复制规则)
+- [X] T029 [blockedBy: T016,T020,T021,T026] GATE-1 终验:全套 `pytest -q` 与 baseline.txt 比对零新增失败;`sync-mirrors.py --check` exit 0
+- [X] T030 [blockedBy: T029] quickstart.md 五步走查逐条执行并产出 `verification.md`(SC-001…SC-005 各一行状态 + `deferred_tasks=` 登记;审计冻结完整性 GATE-5 复核)
 
 ---
 

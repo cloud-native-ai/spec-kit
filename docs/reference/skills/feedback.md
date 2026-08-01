@@ -71,7 +71,7 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 |--------|---------|
 | `record` | Write one entry; idempotent per `(unit_id, run_id)`; increments the count on a new entry. |
 | `status` | Read counters; `should_prompt = count_since_submission >= threshold`. |
-| `list` | List recent entries (filters: `--unit-id`, `--unit-type`, `--since`, `--limit`). |
+| `list` | List recent entries (filters: `--unit-id`, `--unit-type`, `--since`, `--limit` — `0` = no limit; `--contains <text>` case-insensitive substring over entry summary + body, engine-side read, summary-level output). |
 | `mark-submitted` | Reset `count_since_submission` to 0 and stamp `submitted_at` (entries are kept). Local bookkeeping only — NOT an upload. |
 | `reindex` | Rebuild `index.json` from entry files; preserves `submitted_at` and `upstream_repo`. |
 | `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. |
@@ -79,6 +79,10 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 
 - `--unit-id` must match `^(?:/speckit\.[a-z0-9._-]+|skill:[a-z0-9._-]+)$` (else exit code 2).
 - A `record` with an empty `--review` or empty `--points` exits with code 2.
+
+### Token-efficiency self-assessment (Feature 040)
+
+The canonical Reflect step (`.specify/shared/workflow/feedback-step.md`) includes a token-efficiency self-assessment: at wrap-up the agent checks for avoidable token spend (whole-file dumps of machine-managed data, LLM doing fixed-rule work, repeated reads). Findings are recorded as optimization points carrying the stable literal `token-efficiency`, retrievable in one query via `--action list --contains token-efficiency --limit 0` and consumed by the evidence feedback lane (recurrence signals) for improve-* flows. Discipline rules live in `.specify/shared/guidelines/token-efficiency.md` (single source; qualitative/proxy metrics only — no fabricated token counts).
 
 ## Threshold behavior
 
