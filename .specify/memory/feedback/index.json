@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-08-01T16:24:40Z",
+  "updated": "2026-08-01T16:29:16Z",
   "threshold": 10,
-  "count_since_submission": 0,
+  "count_since_submission": 1,
   "submitted_at": "2026-08-01T16:24:40Z",
   "entries": [
+    {
+      "id": "20260801T162916Z-speckit-clarify",
+      "file": "20260801T162916Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "035-token-efficiency-clarify-20260802",
+      "feature": "035-token-efficiency",
+      "partial": false,
+      "created": "2026-08-01T16:29:16Z",
+      "summary": "Mode A 运行完整:两残余问题(Feature 绑定 + top 整改配额)合并一轮提问,双双采纳推荐项;新建 Feature 040 并完成索引/详情/规格三处一致落地,Clarifications 会话按追加不变量写入。"
+    },
     {
       "id": "20260801T162048Z-speckit-requirements",
       "file": "20260801T162048Z-speckit-requirements.md",
