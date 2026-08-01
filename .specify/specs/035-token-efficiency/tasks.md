@@ -118,14 +118,14 @@
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T022 [P] [US3] 编写反馈标记 contract 测试(先 RED):`tests/contract/test_token_efficiency_feedback.py` 断言 C-M1(feedback-step.md step 2 含三问自评、标记字面量 `token-efficiency`、干净运行句式、不编造数值规则)+ C-M2(`--contains` 大小写不敏感子串、与既有过滤器 AND、空结果 exit 0、输出仍为摘要级、省略时行为不变)+ C-M3(全量检索完备性,用临时反馈目录 fixture)
+- [X] T022 [P] [US3] 编写反馈标记 contract 测试(先 RED):`tests/contract/test_token_efficiency_feedback.py` 断言 C-M1(feedback-step.md step 2 含三问自评、标记字面量 `token-efficiency`、干净运行句式、不编造数值规则)+ C-M2(`--contains` 大小写不敏感子串、与既有过滤器 AND、空结果 exit 0、输出仍为摘要级、省略时行为不变)+ C-M3(全量检索完备性,用临时反馈目录 fixture)
 
 ### Implementation for User Story 3
 
-- [ ] T023 [US3] [blockedBy: T022] 扩展 `shared/workflow/feedback-step.md` Canonical block step 2(Reflect):三问自评 + 有发现内嵌 `token-efficiency` 标记 + 干净运行不加条目 + 定性/代理口径;嵌入单元零改动
-- [ ] T024 [P] [US3] [blockedBy: T022] 在 `scripts/python/feedback-utils.py` 的 `list` action 实现 `--contains <text>`(引擎程序侧读文件匹配 frontmatter summary + 正文;输出保持摘要级)
-- [ ] T025 [US3] [blockedBy: T023,T024] 镜像扇出核验:`sync-mirrors.py --write` + `--check` exit 0(shared/workflow 与 scripts/python 两触点)
-- [ ] T026 [US3] [blockedBy: T025] 验证闭环(SC-005 实证):对本 spec 已存在的含标记反馈条目(035 运行已产生)执行 `python3 scripts/python/feedback-utils.py --action list --contains token-efficiency --limit 0`,确认全部返回、无误报;运行 `pytest tests/contract/test_token_efficiency_feedback.py -q` GREEN
+- [X] T023 [US3] [blockedBy: T022] 扩展 `shared/workflow/feedback-step.md` Canonical block step 2(Reflect):三问自评 + 有发现内嵌 `token-efficiency` 标记 + 干净运行不加条目 + 定性/代理口径;嵌入单元零改动
+- [X] T024 [P] [US3] [blockedBy: T022] 在 `scripts/python/feedback-utils.py` 的 `list` action 实现 `--contains <text>`(引擎程序侧读文件匹配 frontmatter summary + 正文;输出保持摘要级)
+- [X] T025 [US3] [blockedBy: T023,T024] 镜像扇出核验:`sync-mirrors.py --write` + `--check` exit 0(shared/workflow 与 scripts/python 两触点)
+- [X] T026 [US3] [blockedBy: T025] 验证闭环(SC-005 实证):对本 spec 已存在的含标记反馈条目(035 运行已产生)执行 `python3 scripts/python/feedback-utils.py --action list --contains token-efficiency --limit 0`,确认全部返回、无误报;运行 `pytest tests/contract/test_token_efficiency_feedback.py -q` GREEN
 
 **Checkpoint**: 三故事全部独立可验
 
