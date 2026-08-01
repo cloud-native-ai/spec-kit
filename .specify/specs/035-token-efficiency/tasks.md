@@ -43,8 +43,8 @@
 
 **Purpose**: 基线与预检(既有基线纪律:动手前记录,区分存量失败与新回归)
 
-- [ ] T001 记录全套 pytest 基线:`pytest -q` 输出摘要与失败清单写入 `.specify/specs/035-token-efficiency/baseline.txt`(含失败测试 ID 列表,供 GATE-1 comm 比对)
-- [ ] T002 [P] 预检镜像零漂移:`python3 scripts/python/sync-mirrors.py --check` exit 0;若有漂移先停下调查(不得顺手覆盖)
+- [X] T001 记录全套 pytest 基线:`pytest -q` 输出摘要与失败清单写入 `.specify/specs/035-token-efficiency/baseline.txt`(含失败测试 ID 列表,供 GATE-1 comm 比对)
+- [X] T002 [P] 预检镜像零漂移:`python3 scripts/python/sync-mirrors.py --check` exit 0;若有漂移先停下调查(不得顺手覆盖)
 
 ---
 
@@ -54,12 +54,12 @@
 
 **⚠️ CRITICAL**: 审计排序(top-5)决定 US1/US2 的整改对象;纪律文档是审计判据
 
-- [ ] T003 [P] 编写结构性 contract 测试(先 RED):`tests/contract/test_token_efficiency_discipline.py` 断言 C-D1(文件+镜像存在且字节一致)、C-D2(六节标题字面量)、C-D3(规则清单/例外 (a)(b)(c)/阈值 `≤ 100 行` 且 `≤ 10 KB`/标记约定/不编造数值)、C-D4(templates/instructions-template.md 含 token-efficiency 引用且模板双镜像一致);运行确认 RED
-- [ ] T004 [blockedBy: T003] 撰写 `shared/guidelines/token-efficiency.md`(canonical;六节结构按 data-model.md §1:程序优先/摘要优先/升级阶梯/小文件阈值/判定边界/消耗观察;互引 tool-reuse-gate.md 与 feedback-step.md,不复制其定义)
-- [ ] T005 [blockedBy: T003] 在 `templates/instructions-template.md` 增 ambient 引用节(置于 Task Complexity Rubric 相邻位置;引用路径,不内联规则全文)
-- [ ] T006 [blockedBy: T004,T005] 镜像扇出与核验:`python3 scripts/python/sync-mirrors.py --write` 后 `--check` exit 0(覆盖 shared/guidelines 新文件与 instructions-template 镜像)
-- [ ] T007 [blockedBy: T004] 执行两纪律存量审计并产出 `.specify/specs/035-token-efficiency/audit.md`:动态枚举 `templates/commands/*.md` + `skills/*/SKILL.md` + `shared/workflow/*.md` + `shared/guidelines/*.md` + `scripts/python/*-utils.py`(引擎按 data-model.md §4 矩阵复核);每违规行含 V-NNN/单元/纪律/证据 file:line/注入量 `wc -l`+`wc -c` 实测/频率/严重度名次/状态;排序定稿即冻结(C-A1/C-A2);Phase 0 采样五热点(plan/clarify/implement/tasks/requirements)必须逐一复核收录或说明排除理由
-- [ ] T008 [blockedBy: T006] 运行 `pytest tests/contract/test_token_efficiency_discipline.py -q` 确认 GREEN(纪律文档与 ambient 引用合同闭合)
+- [X] T003 [P] 编写结构性 contract 测试(先 RED):`tests/contract/test_token_efficiency_discipline.py` 断言 C-D1(文件+镜像存在且字节一致)、C-D2(六节标题字面量)、C-D3(规则清单/例外 (a)(b)(c)/阈值 `≤ 100 行` 且 `≤ 10 KB`/标记约定/不编造数值)、C-D4(templates/instructions-template.md 含 token-efficiency 引用且模板双镜像一致);运行确认 RED
+- [X] T004 [blockedBy: T003] 撰写 `shared/guidelines/token-efficiency.md`(canonical;六节结构按 data-model.md §1:程序优先/摘要优先/升级阶梯/小文件阈值/判定边界/消耗观察;互引 tool-reuse-gate.md 与 feedback-step.md,不复制其定义)
+- [X] T005 [blockedBy: T003] 在 `templates/instructions-template.md` 增 ambient 引用节(置于 Task Complexity Rubric 相邻位置;引用路径,不内联规则全文)
+- [X] T006 [blockedBy: T004,T005] 镜像扇出与核验:`python3 scripts/python/sync-mirrors.py --write` 后 `--check` exit 0(覆盖 shared/guidelines 新文件与 instructions-template 镜像)
+- [X] T007 [blockedBy: T004] 执行两纪律存量审计并产出 `.specify/specs/035-token-efficiency/audit.md`:动态枚举 `templates/commands/*.md` + `skills/*/SKILL.md` + `shared/workflow/*.md` + `shared/guidelines/*.md` + `scripts/python/*-utils.py`(引擎按 data-model.md §4 矩阵复核);每违规行含 V-NNN/单元/纪律/证据 file:line/注入量 `wc -l`+`wc -c` 实测/频率/严重度名次/状态;排序定稿即冻结(C-A1/C-A2);Phase 0 采样五热点(plan/clarify/implement/tasks/requirements)必须逐一复核收录或说明排除理由
+- [X] T008 [blockedBy: T006] 运行 `pytest tests/contract/test_token_efficiency_discipline.py -q` 确认 GREEN(纪律文档与 ambient 引用合同闭合)
 
 **Checkpoint**: 纪律判据就绪、审计清单冻结——US1/US2/US3 可并行开工
 
