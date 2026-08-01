@@ -97,14 +97,14 @@
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T017 [P] [US2] [blockedBy: T007] 编写 summary-first 整改钉扎测试(先 RED):`tests/contract/test_token_efficiency_remediation_summary_first.py` 按 audit.md 冻结的 summary-first 类 top-5 行写字符串对(预期候选:plan.md "all files in `.specify/memory/features/`" 整读、clarify.md "Load common context" 整读、implement.md 一次性全工件加载、requirements.md 最新规格整读取家规;实际以清单为准)
+- [X] T017 [P] [US2] [blockedBy: T007] 编写 summary-first 整改钉扎测试(先 RED):`tests/contract/test_token_efficiency_remediation_summary_first.py` 按 audit.md 冻结的 summary-first 类 top-5 行写字符串对(预期候选:plan.md "all files in `.specify/memory/features/`" 整读、clarify.md "Load common context" 整读、implement.md 一次性全工件加载、requirements.md 最新规格整读取家规;实际以清单为准)
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] [blockedBy: T017] 整改 summary-first 类 top-5 行:改写 canonical `templates/commands/<cmd>.md` 为摘要级指令(行投影/定向节选/引擎查询 + 升级阶梯引用),`sync-mirrors.py --write` 扇出 `.specify/templates/` 与 5 套 per-tool 副本;audit.md 对应行记前后 `wc` 实测对比并置 `remediated`
-- [ ] T019 [US2] [blockedBy: T007] 引擎摘要模式缺口处置:history-utils.py(及审计新发现引擎)若入 top-5 → 增摘要级输出模式 + `.specify/scripts/python/` 镜像 + 行为测试;未入 → audit.md 记 `backlogged` 行(条件任务,二选一必落其一)
-- [ ] T020 [US2] [blockedBy: T018] 副本核验:`sync-mirrors.py --check` exit 0;抽查每个整改命令的 `.qoder/commands/`、`.claude/commands/` 等副本含整改措辞且保留 AUTO-GENERATED 头
-- [ ] T021 [US2] [blockedBy: T018] Manual QA(SC-003/SC-004 抽样):重跑 1 个整改后的流程(如 /speckit.plan 的上下文加载段),核对结论一致 + 注入量降 ≥ 50%,记录于 audit.md 备注列
+- [X] T018 [US2] [blockedBy: T017] 整改 summary-first 类 top-5 行:改写 canonical `templates/commands/<cmd>.md` 为摘要级指令(行投影/定向节选/引擎查询 + 升级阶梯引用),`sync-mirrors.py --write` 扇出 `.specify/templates/` 与 5 套 per-tool 副本;audit.md 对应行记前后 `wc` 实测对比并置 `remediated`
+- [X] T019 [US2] [blockedBy: T007] 引擎摘要模式缺口处置:history-utils.py(及审计新发现引擎)若入 top-5 → 增摘要级输出模式 + `.specify/scripts/python/` 镜像 + 行为测试;未入 → audit.md 记 `backlogged` 行(条件任务,二选一必落其一)
+- [X] T020 [US2] [blockedBy: T018] 副本核验:`sync-mirrors.py --check` exit 0;抽查每个整改命令的 `.qoder/commands/`、`.claude/commands/` 等副本含整改措辞且保留 AUTO-GENERATED 头
+- [X] T021 [US2] [blockedBy: T018] Manual QA(SC-003/SC-004 抽样):重跑 1 个整改后的流程(如 /speckit.plan 的上下文加载段),核对结论一致 + 注入量降 ≥ 50%,记录于 audit.md 备注列
 
 **Checkpoint**: US1+US2 硬约束面完整,可独立验证
 
