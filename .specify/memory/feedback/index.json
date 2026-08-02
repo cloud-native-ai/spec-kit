@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-08-01T17:47:25Z",
+  "updated": "2026-08-02T06:52:11Z",
   "threshold": 10,
-  "count_since_submission": 4,
+  "count_since_submission": 5,
   "submitted_at": "2026-08-01T16:24:40Z",
   "entries": [
+    {
+      "id": "20260802T065211Z-speckit-review",
+      "file": "20260802T065211Z-speckit-review.md",
+      "unit_id": "/speckit.review",
+      "unit_type": "command",
+      "run_id": "035-token-efficiency-review-20260802",
+      "feature": "035-token-efficiency",
+      "partial": false,
+      "created": "2026-08-02T06:52:11Z",
+      "summary": "评审按用户聚焦(真实 Token 计量可视性)完成:9 提交时间线重建(故事分组无偏差),6 项发现(0 P0/3 P1/3 P2)全部带原文证据;关键发现 F1 由本机会话存储实测支撑(137 条 usage 记录、引擎零消费);无 P0 故未触发验证子代理。报告自含检查全过。"
+    },
     {
       "id": "20260801T174725Z-speckit-implement",
       "file": "20260801T174725Z-speckit-implement.md",
