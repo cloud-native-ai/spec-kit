@@ -11,6 +11,13 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 - If contains `--insert` or explicitly requests insertion → **Insertion Mode**
 - Otherwise → **Collection Mode** (default)
 
+## Glossary
+
+Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Documentation Map) and apply the protocol in `.specify/shared/workflow/glossary.md`:
+
+- **Before acting on the user input**, map any recorded homophone/confusable variant to its canonical term (correcting voice/dictated input); surface each correction so the user can override it, and defer to the user on ambiguous variants.
+- **At wrap-up**, propose any new project-specific terms (`origin=auto`, `status=proposed`), excluding common words; run conflict detection and obtain explicit user confirmation before writing. User-authored entries are authoritative.
+
 ## Collection Mode Workflow
 
 ### Step 1: Run Scanner
@@ -52,6 +59,8 @@ Execute `.specify/scripts/bash/search-todo.sh --json` from repo root. The script
 }
 ```
 
+**Consume scanner output summary-first** (see `.specify/shared/guidelines/token-efficiency.md`): the JSON is machine-managed data — do NOT inject it wholesale into context. First consume `counters` + `malformed` + a projected digest (e.g. `jq '{counters, malformed, blocks: [.blocks[] | {block_id, source_file, opening_line, context_heading}]}'`); open a block's full `content`/`prologue`/`epilogue` only for the group you are actively planning in Step 3–5.
+
 ### Step 2: Handle Edge Cases
 
 - **Zero blocks found**: Report "No actionable SPECKIT TODO blocks found in workspace." and stop.
@@ -59,6 +68,8 @@ Execute `.specify/scripts/bash/search-todo.sh --json` from repo root. The script
 - **Scanner exit code ≠ 0**: Report error and stop. Exit codes: 1=argument error, 2=repo root undefined, 3=I/O error.
 
 ### Step 3: Group and Organize Blocks
+
+**Recall prior memory first** (native `memory-recall` skill): search `.specify/memory/session/` and `.specify/memory/knowledge/` for prior TODO-run outcomes and durable preferences (suggested queries: `todo`, `convention`, `preference`, `decision`, `veto`). Apply recalled entries as non-derivable inputs below — e.g. a recorded user veto or deferral of a recurring block, a preferred grouping/batching convention, or a standing scope constraint. Never contradict a recalled user decision without explicit user confirmation.
 
 For each valid block, create a **work item** with:
 1. **Source**: `source_file:opening_line` (link to origin)
@@ -154,6 +165,19 @@ Report:
 4. **Bounded changes**: Each executed task should produce a small, reviewable change. Never batch large refactors into a single execution step.
 5. **No file creation in insertion mode**: The `--insert` mode MUST NOT create new files.
 
+## Optional: Git Commit
+
+After execution, offer to commit the changes using `.specify/templates/commit-template.md`:
+- Collect: BRANCH, TYPE (`feat`/`fix`/`chore` per block content), SCOPE, SUBJECT
+- Display `git add -A && git commit -m "{msg}"` — only execute on explicit user approval
+
+## Memory Record
+
+At wrap-up, invoke the native `memory-record` skill (skip for trivial no-op runs — zero blocks found, or a pure insertion with no decisions):
+
+- **Session scope**: persist a working note of this run's outcome (blocks executed / deferred / vetoed and why, batches confirmed) so the next `/speckit.todo` run recalls what was already handled and avoids re-proposing it.
+- **Knowledge scope**: when the run surfaced a durable user preference, veto rule, or grouping/batching convention, upsert it as long-term knowledge so future runs apply it at Step 3.
+
 ## Feedback
 
 At wrap-up (the same lifecycle point where this command prompts for a Git commit), perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
@@ -181,7 +205,9 @@ At the same wrap-up point as the Feedback step, apply the docs-sync evaluation p
 
 **Before running this command**:
 - Embed `SPECKIT TODO` blocks in your project files where work is needed.
+- Invoke `memory-recall` to surface prior TODO-run outcomes and conventions (Step 3 does this by default).
 
 **After running this command**:
 - Run `/speckit.implement` to execute generated plans if they align with a feature spec.
 - Run `/speckit.review` to validate execution results.
+- Invoke `memory-record` to persist durable decisions and conventions (the Memory Record step does this by default).

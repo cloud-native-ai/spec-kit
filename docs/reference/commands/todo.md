@@ -56,6 +56,14 @@ The command validates that the target file exists and is writable before inserti
 - **Batching**: When more than 10 valid TODO blocks are found, they are split into batches of at most 5 groups each, presented sequentially for review.
 - **Safety veto**: TODO blocks requesting destructive operations (e.g., `rm -rf /`) or secret exposure are rejected.
 
+## Memory & Framework Integration
+
+- **Memory recall (planning)**: before grouping blocks, the command recalls prior TODO-run outcomes and durable preferences from project memory (`.specify/memory/session/` + `knowledge/`) via the `memory-recall` skill — previously vetoed or deferred blocks are not re-proposed, and recorded grouping/batching conventions are applied.
+- **Memory record (wrap-up)**: non-trivial runs persist the outcome via the `memory-record` skill — session scope for what was executed/deferred/vetoed, knowledge scope for durable user preferences and conventions.
+- **Summary-first scanner consumption**: the scanner JSON is consumed as counters + a projected digest first; full block content is opened only for the group being planned (token-efficiency discipline).
+- **Glossary**: user input passes through the project glossary's homophone/confusable correction before mode detection.
+- **Optional Git commit**: after execution, the command offers a `commit-template.md`-based commit, executed only on explicit approval.
+
 ## Exit Codes
 
 | Code | Meaning |
