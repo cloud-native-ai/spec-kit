@@ -115,6 +115,31 @@ change code fast, but the workflow around them (fuzzy goals, improvised steps, u
 "it works", bypassed safeguards, lost lessons) is usually the weak point. Naming the goal
 lets every improvement answer "which part of the harness does this strengthen?".
 
+### X. Non-Destructive Remediation
+Problems MUST be fixed at their root cause, never by destroying the artifact that
+exhibits them:
+- Deleting files, code, or data MUST NOT be used as a shortcut to make an immediate
+  problem disappear; a "fix" that works by destruction proves the approach is wrong,
+  not that the problem is solved.
+- When an obstacle is encountered, the underlying cause MUST be identified and repaired;
+  bypassing safety checks or removing the surface that exposes the problem is forbidden.
+- When a destructive operation is genuinely required (deletion, force-overwrite, reset),
+  it MUST be explicitly confirmed with the user before execution.
+
+Rationale: destructive shortcuts destroy information and trust, and usually recreate the
+same problem elsewhere; mandatory confirmation keeps irreversible actions under human control.
+
+### XI. Complete & Correct Options, or None
+Presenting options that are incomplete or incorrect is WORSE than presenting no options:
+- Any option set offered to the user (choices, plans, recommendations) MUST be verified
+  correct and MUST cover the realistic decision space.
+- When correctness or completeness cannot be ensured, the open question MUST be presented
+  directly instead of a partial or speculative option list.
+- A known-imperfect option MUST be labeled with its gap rather than presented as solid.
+
+Rationale: wrong or partial options mislead decisions more than no guidance at all — they
+manufacture false confidence and foreclose alternatives the user never saw.
+
 ## [SECTION_2_NAME]
 <!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 

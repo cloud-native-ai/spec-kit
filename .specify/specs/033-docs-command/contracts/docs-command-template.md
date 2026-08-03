@@ -5,7 +5,7 @@
 - **C-1** 源模板 MUST 位于 `templates/commands/docs.md`，并在 `.specify/templates/commands/docs.md` 存在字节一致镜像（`regen-command-copies.py --check` 零漂移）。
 - **C-2** frontmatter MUST 含 `description`（一行）与 `handoffs`；引用共享文档 MUST 使用根相对形式（`shared/workflow/...`、`shared/patterns/reconcile-pattern.md`），由再生成器重写为 `.specify/shared/...`（test_shared_reference_rewrite 约定）。
 - **C-3** 模板 body MUST 含以下章节（顺序固定）：`## User Input`（含 `$ARGUMENTS` 与 User Input Protocol 引用）、`## Glossary`、`## Outline`、`## Reconcile Loop`（或 Outline 内等价小节）、`## Feedback`、`## Documentation`、`## Handoffs`。
-- **C-4** `## Outline` MUST 含作用域判定表（无参全量 / 单目标 / 原始材料扇出 / bootstrap 四行，FR-003）与分级确认门禁表（安全写入自动 / 移动归档须计划确认，FR-004）。
+- **C-4** `## Outline` MUST 含作用域判定表（无参全量 / 单目标 / 原始材料扇出 / 写作委托文档写作 / bootstrap 五行，FR-003）与分级确认门禁表（安全写入自动 / 移动归档须计划确认，FR-004）。
 - **C-5** 模板 MUST 声明四件强制产物及其落点：观察快照（内联）、干跑计划（`.specify/docs/plans/`）、审计日志（`.specify/docs/audit/`，零收敛也落盘）、残差报告（内联）。
 - **C-6** 模板 MUST 声明归档区为 `docs/archive/`，且正式区动作词汇中不出现"删除"（notes 区确认删除除外，须引用 FR-006c 语义）。
 - **C-7** 模板 MUST 保持薄调度层：引擎细节引用 `shared/patterns/reconcile-pattern.md` 与 `docs/commands/docs.md`，不内联重复完整 R0–R6 规程（reconcile-pattern §Applying-6）。

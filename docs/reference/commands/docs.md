@@ -7,6 +7,7 @@ Standardize and manage the project documentation space as a single reconcile eng
 - Bootstrap a standard documentation skeleton on a new project.
 - Converge an existing, drifted `docs/` tree back toward the desired state (full sweep).
 - Reorganize one document or triage a raw material dump into the right doc types.
+- Author new documents from a writing commission — the command places each document per the taxonomy and enforces all naming/format norms.
 - Operate the `docs/notes/` lifecycle (expire / archive / renew / confirmed deletion).
 
 ## Syntax
@@ -15,6 +16,7 @@ Standardize and manage the project documentation space as a single reconcile eng
 /speckit.docs                    # full sweep over the managed space
 /speckit.docs <path-or-target>   # single-target directional reconcile
 /speckit.docs <raw material>     # fan-out intake: triage into doc types
+/speckit.docs <writing request>  # authoring: create new compliant documents
 ```
 
 `/speckit.docs` is a chat instruction, not a terminal command.
@@ -29,9 +31,10 @@ Standardize and manage the project documentation space as a single reconcile eng
 
 ## Execution Flow
 
-1. **Scope resolution**: full sweep / single target / fan-out / bootstrap.
+1. **Scope resolution**: full sweep / single target / fan-out / authoring / bootstrap.
 2. **R0–R6 reconcile loop** (per `shared/patterns/reconcile-pattern.md`): observe snapshot → desired state → diff through the tolerance band → dry-run plan with per-item opt-out → tiered convergence → verify + residual report.
 3. **Tiered gates**: safe local writes auto-execute (never clobber); moves/archives/restructures require plan confirmation; the formal zone is archive-only (`docs/archive/`); notes deletion requires explicit human confirmation.
+4. **Authoring scope** (writing commission in arguments): parse the request → place each document in its taxonomy home → confirm an inline writing plan (path, type, title, outline) → write documents that comply with the baseline (lowercase kebab-case names, reserved-name blocking, ADR numbering + index registration, notes frontmatter, one-screen root entries, local style conventions, never clobber) → `validate` + index updates + audit log. If the topic is already covered, the command proposes updating the existing document instead of creating a near-duplicate.
 
 ## Deterministic Engine
 

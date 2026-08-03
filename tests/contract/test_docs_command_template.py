@@ -62,7 +62,7 @@ def test_c3_section_order():
 @pytest.mark.contract
 def test_c4_scope_resolution_and_tiered_gates():
     text = source_text()
-    for marker in ["全量", "单目标", "扇出", "ootstrap"]:
+    for marker in ["全量", "单目标", "扇出", "ootstrap", "写作", "authoring"]:
         assert marker in text, f"scope resolution table missing {marker}"
     assert "自动执行" in text, "safe-write auto tier missing"
     assert "干跑计划" in text, "dry-run plan gate missing"
