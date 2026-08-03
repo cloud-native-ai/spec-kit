@@ -10,6 +10,25 @@ The design borrows the "memory as files" idea from
 heavy parts: there is **no vector store** — retrieval uses a plain local JSON index with
 keyword/tag scoring.
 
+## Terminology (ADR-0003)
+
+**"Memory system" is the umbrella name for this entire layer** — the engine, the two
+skills, and the `.specify/memory/` store. It is never the name of one tier. The two
+archive tiers are always referred to by their scope names:
+
+- **session — short-term memory**: working context (progress, in-flight state). The
+  *forgettable* tier.
+- **knowledge — long-term memory**: cross-session, project-global knowledge (stable
+  preferences, conventions, lasting decisions). The *durable* tier.
+
+Say "session vs knowledge", never "memory vs knowledge" — the latter collides with the
+umbrella name and is ambiguous.
+
+**Maturity promotion chain:** `session → knowledge → constitution/features`. Working
+notes mature into distilled knowledge; knowledge that becomes durable project truth is
+promoted into the static memory assets (`constitution.md`, `features.md`, `tools.md`)
+and must not remain duplicated in `knowledge/` afterwards.
+
 ## Scope boundary
 
 This memory only records LLM conversations that are **driven by a Spec Kit command or
