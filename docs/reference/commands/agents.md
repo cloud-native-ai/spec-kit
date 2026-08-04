@@ -67,7 +67,7 @@ Organizing and running multiple agents (parallel / serial / iteration / continuo
 | Lifecycle | Behavior |
 |-----------|----------|
 | Temporary | Lives only in conversation context; not written to the agent directory |
-| Persistent | Written under `.specify/agents/` and made available to all officially supported tools on initialization |
+| Persistent | Written under `.specify/agents/templates/` (role Templates) or `.specify/agents/instances/` (Instances) and made available to all officially supported tools on initialization |
 
 ## Role-Based Generation
 
@@ -87,17 +87,16 @@ With no explicit intent, `/speckit.agents` generates the seven role-based workfl
 
 | Artifact | Location |
 |----------|----------|
-| Agent files | `.specify/agents/<name>.agent.md` |
-| Shared assets | `.specify/agents/references/` |
+| Agent files | `.specify/agents/templates/<name>.agent.md` (Templates) · `.specify/agents/instances/<name>.agent.md` (Instances) |
 
 ## Symlink Model
 
-Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/` (never write framework agents into them directly):
+Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/{templates,instances}/` (never write framework agents into them directly):
 
-- `.github/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Copilot, Claude Code)
-- `.qoder/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qoder)
-- `.qwen/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qwen Code)
-- `.opencode/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (opencode)
+- `.github/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Copilot, Claude Code)
+- `.qoder/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qoder)
+- `.qwen/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qwen Code)
+- `.opencode/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (opencode)
 - (and `.hermes/agents/`, `.iflow/agents/` where supported)
 
 ## Companion Skills
@@ -160,7 +159,7 @@ Organizing and running multiple agents (parallel / serial / iteration / continuo
 | Lifecycle | Behavior |
 |-----------|----------|
 | Temporary | Lives only in conversation context; not written to the agent directory |
-| Persistent | Written under `.specify/agents/` and made available to all officially supported tools on initialization |
+| Persistent | Written under `.specify/agents/templates/` (role Templates) or `.specify/agents/instances/` (Instances) and made available to all officially supported tools on initialization |
 
 ## Role-Based Generation
 
@@ -180,17 +179,16 @@ With no explicit intent, `/speckit.agents` generates the seven role-based workfl
 
 | Artifact | Location |
 |----------|----------|
-| Agent files | `.specify/agents/<name>.agent.md` |
-| Shared assets | `.specify/agents/references/` |
+| Agent files | `.specify/agents/templates/<name>.agent.md` (Templates) · `.specify/agents/instances/<name>.agent.md` (Instances) |
 
 ## Symlink Model
 
-Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/` (never write framework agents into them directly):
+Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/{templates,instances}/` (never write framework agents into them directly):
 
-- `.github/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Copilot, Claude Code)
-- `.qoder/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qoder)
-- `.qwen/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qwen Code)
-- `.opencode/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (opencode)
+- `.github/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Copilot, Claude Code)
+- `.qoder/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qoder)
+- `.qwen/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qwen Code)
+- `.opencode/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (opencode)
 - (and `.hermes/agents/`, `.iflow/agents/` where supported)
 
 ## Companion Skills
@@ -247,9 +245,9 @@ Generates seven software development workflow agents from role templates, popula
 
 4. **Agent preservation** — Only creates/updates the seven role-based agent files. Leaves all other existing agents untouched.
 
-5. **Write agents** — All seven agents written to `.specify/agents/` (canonical location).
+5. **Write agents** — All seven agents written to `.specify/agents/templates/` (canonical Template store).
 
-6. **Discovery** — Agents are discovered by globbing `.specify/agents/*.agent.md`; no separate registry/workspace files are created.
+6. **Discovery** — Agents are discovered by globbing `.specify/agents/{templates,instances}/*.agent.md`; no separate registry/workspace files are created.
 
 7. **Report** — Lists generated agents, notes any backups, suggests running `/speckit.instructions`.
 
@@ -267,7 +265,7 @@ Creates or updates a single custom agent based on user-provided intent.
 
 4. **Iterate** — Drafts the agent file, identifies weak parts, asks targeted follow-ups.
 
-5. **Create `.agent.md`** — Writes to `.specify/agents/<agent-name>.agent.md` with YAML frontmatter and body sections for role, constraints, workflow, and output format.
+5. **Create `.agent.md`** — Writes to `.specify/agents/instances/<agent-name>.agent.md` with YAML frontmatter and body sections for role, constraints, workflow, and output format.
 
 6. **Quality checks** — Validates YAML syntax, provider support (Claude Code, Copilot, Qwen Code, opencode, Qoder only), and tool-workflow alignment.
 
@@ -279,16 +277,15 @@ Creates or updates a single custom agent based on user-provided intent.
 
 | Artifact | Location |
 |----------|----------|
-| Agent files | `.specify/agents/<name>.agent.md` |
-| Shared assets | `.specify/agents/references/` |
+| Agent files | `.specify/agents/templates/<name>.agent.md` (Templates) · `.specify/agents/instances/<name>.agent.md` (Instances) |
 
 ## Symlink Model
 
-Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/`:
-- `.github/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Copilot, Claude Code)
-- `.qoder/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qoder)
-- `.qwen/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (Qwen Code)
-- `.opencode/agents/<slug>.agent.md` → `.specify/agents/<slug>.agent.md` (opencode)
+Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/{templates,instances}/`:
+- `.github/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Copilot, Claude Code)
+- `.qoder/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qoder)
+- `.qwen/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qwen Code)
+- `.opencode/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (opencode)
 - (and `.hermes/agents/`, `.iflow/agents/` where supported)
 
 ## Companion Skills

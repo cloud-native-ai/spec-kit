@@ -143,4 +143,4 @@ Canonical templates (author/edit here — see [templates-and-agents.md](./templa
 - **Loop orchestration**: `skills/create-team/templates/agents/agent-triad-orchestration-template.md`
 - **Supervision snippet** (single source): `skills/create-agent/templates/agent-supervision-delegation.md`
 
-Normative source: the templates above plus the persisted role agents under `.specify/agents/`. The team-level **iteration** and **continuous** patterns that build on this loop are documented in [`docs/teams/orchestration.md`](../teams/orchestration.md).
+Normative source: the templates above plus the persisted role agents under `.specify/agents/templates/`. The team-level **iteration** and **continuous** patterns that build on this loop are documented in [`docs/teams/orchestration.md`](../teams/orchestration.md).

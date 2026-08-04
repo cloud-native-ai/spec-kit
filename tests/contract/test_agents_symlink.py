@@ -1,13 +1,23 @@
-"""Contract tests: per-file agent symlink creation and migration."""
+"""Contract tests: per-file agent symlink creation and migration.
+
+Canonical stores are the layered directories ``.specify/agents/templates/`` and
+``.specify/agents/instances/`` (see ``shared/definitions/agent-definitions.md``);
+the legacy flat ``.specify/agents/*.agent.md`` layout is migrated into ``templates/``.
+"""
 
 import pytest
 from pathlib import Path
 
-from specify_cli import ensure_per_file_agent_links
+from specify_cli import ensure_agent_layer_dirs, ensure_per_file_agent_links
 
 
-def _seed_agent(root: Path, name: str = "my-agent.agent.md", content: str = "agent content"):
-    agents = root / ".specify" / "agents"
+def _seed_agent(
+    root: Path,
+    name: str = "my-agent.agent.md",
+    content: str = "agent content",
+    layer: str = "templates",
+):
+    agents = root / ".specify" / "agents" / layer
     agents.mkdir(parents=True, exist_ok=True)
     (agents / name).write_text(content, encoding="utf-8")
     return agents / name
@@ -40,18 +50,52 @@ class TestPerFileAgentLinkCreation:
     def test_only_agent_md_files_linked(self, tmp_path):
         _seed_agent(tmp_path)
         # A non-agent file in the canonical store must not be linked.
-        (tmp_path / ".specify" / "agents" / "references").mkdir()
-        (tmp_path / ".specify" / "agents" / "references" / "shared.md").write_text("x")
+        extra = tmp_path / ".specify" / "agents" / "templates" / "notes"
+        extra.mkdir(parents=True)
+        (extra / "shared.md").write_text("x")
         ensure_per_file_agent_links(tmp_path, ".qoder")
 
         tool_dir = tmp_path / ".qoder" / "agents"
         assert (tool_dir / "my-agent.agent.md").is_symlink()
-        assert not (tool_dir / "references").exists()
+        assert not (tool_dir / "notes").exists()
+
+    def test_execution_layer_never_linked(self, tmp_path):
+        _seed_agent(tmp_path)
+        agents_root = ensure_agent_layer_dirs(tmp_path)
+        (agents_root / "execution" / "configs" / "my-agent.yaml").write_text("agent: my-agent")
+        ensure_per_file_agent_links(tmp_path, ".qoder")
+
+        tool_dir = tmp_path / ".qoder" / "agents"
+        assert not (tool_dir / "my-agent.yaml").exists()
+
+    def test_instance_wins_on_name_collision(self, tmp_path):
+        _seed_agent(tmp_path, content="template body", layer="templates")
+        instance = _seed_agent(tmp_path, content="instance body", layer="instances")
+        ensure_per_file_agent_links(tmp_path, ".qoder")
+
+        link = tmp_path / ".qoder" / "agents" / "my-agent.agent.md"
+        assert link.is_symlink()
+        assert link.resolve() == instance.resolve()
+        assert link.read_text(encoding="utf-8") == "instance body"
 
 
 @pytest.mark.contract
 class TestPerFileAgentLinkMigration:
-    """Migration from the legacy whole-directory symlink model."""
+    """Migration from the legacy whole-directory symlink model and flat layout."""
+
+    def test_legacy_flat_layout_migrated_to_templates(self, tmp_path):
+        # Legacy: agent file at the top level of .specify/agents/.
+        legacy_dir = tmp_path / ".specify" / "agents"
+        legacy_dir.mkdir(parents=True)
+        (legacy_dir / "old.agent.md").write_text("legacy", encoding="utf-8")
+
+        ensure_per_file_agent_links(tmp_path, ".qoder")
+
+        migrated = legacy_dir / "templates" / "old.agent.md"
+        assert migrated.exists() and not (legacy_dir / "old.agent.md").exists()
+        link = tmp_path / ".qoder" / "agents" / "old.agent.md"
+        assert link.is_symlink()
+        assert link.resolve() == migrated.resolve()
 
     def test_legacy_whole_dir_symlink_replaced(self, tmp_path):
         source = _seed_agent(tmp_path)
@@ -74,7 +118,7 @@ class TestPerFileAgentLinkMigration:
         assert (tool_dir / "keep.agent.md").is_symlink()
 
         # Remove the canonical source and re-link: stale link must be pruned.
-        (tmp_path / ".specify" / "agents" / "keep.agent.md").unlink()
+        (tmp_path / ".specify" / "agents" / "templates" / "keep.agent.md").unlink()
         ensure_per_file_agent_links(tmp_path, ".github")
         assert not (tool_dir / "keep.agent.md").exists()
 

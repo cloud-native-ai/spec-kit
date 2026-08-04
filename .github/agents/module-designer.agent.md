@@ -1,1 +1,1 @@
-../../.specify/agents/module-designer.agent.md
+../../.specify/agents/templates/module-designer.agent.md

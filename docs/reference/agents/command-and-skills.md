@@ -13,7 +13,7 @@ team operations (organize / run several agents) are directed to `/speckit.team`.
 
 - It **recognizes intent**, then **routes to the owning skill**.
 - It **delegates** — it never renders templates inline.
-- Persistent agents are always written to the canonical location `.specify/agents/<name>.agent.md`;
+- Persistent agents are always written to the canonical layered stores `.specify/agents/templates/<name>.agent.md` / `.specify/agents/instances/<name>.agent.md`;
   tool-specific directories are symlinks and are **never** written to directly.
 
 > Source: `templates/commands/agents.md` (installed as the `/speckit.agents` command).
@@ -30,9 +30,9 @@ team operations (organize / run several agents) are directed to `/speckit.team`.
 
 1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context — is this
    single-agent *authoring* (create/refine), or a *team* request?
-2. **Authoring** → check whether `.specify/agents/<name>.agent.md` exists: absent →
+2. **Authoring** → check whether `.specify/agents/{templates,instances}/<name>.agent.md` exists: absent →
    `create-agent`; present → `improve-agent`. Build the `AgentAuthoringRequest`, handle
-   backup/preservation, write to `.specify/agents/`, verify per-file symlinks.
+   backup/preservation, write to the target layer's store under `.specify/agents/`, verify per-file symlinks.
 3. **Team request** → do **not** handle it here; direct the user to `/speckit.team` and stop.
 4. **Ambiguous / unsupported** → do **not** guess silently. Report the recognized single-agent
    capabilities (create / refine) and request the missing intent (FR-019).
@@ -64,7 +64,7 @@ Key rules:
 - **Supervision is active by default** (`supervisor: true`); the delegation snippet is
   **composed at generation time**, never copied into role templates — edit it only in
   `agent-supervision-delegation.md` (single source of truth).
-- It operates on **templates**, not on generated agents in `.specify/agents/`.
+- It targets an explicit **layer**: template (`.specify/agents/templates/`, `skills/create-agent/templates/`), instance (`.specify/agents/instances/`), or execution (`.specify/agents/execution/{configs,scripts}/`).
 - It accepts an `AgentAuthoringRequest` (`kind`, `role_slug`, `task`, `scoring_dimensions[]`,
   `threshold`, `max_iterations`, environment/workspace paths, `project_context`) and returns
   an `AuthoringResult` (`artifact_paths`, `kind`, `status`).
@@ -78,7 +78,7 @@ cases, behavioral drift). It first classifies the target, then routes:
 |-------------|-------|-------|
 | role | `agent-capacity-*-template.md` | six-section root-cause workflow |
 | supervision snippet | `agent-supervision-delegation.md` | steps 3–5; **warns** the edit affects every supervisor |
-| custom | `.specify/agents/*.agent.md` | six-section workflow against the generated file |
+| custom | `.specify/agents/instances/*.agent.md` | six-section workflow against the generated file |
 
 Changes must be **evidence-based** and **minimal**, preserving established structure. To adjust
 a multi-agent **team** (stages, orchestration, thresholds), use `improve-team` via `/speckit.team`.
@@ -98,16 +98,16 @@ Every agent `create-agent` can produce has one of two lifecycles; choose it befo
 | Lifecycle | Where it lives | When to use | Tool config |
 |-----------|----------------|-------------|-------------|
 | **temporary** | Context-only — never written to disk | A worker/stage agent spawned for a single Loop or orchestration run; discarded when the run ends | None; exists only in the orchestrator's context (FR-011) |
-| **persistent** | `.specify/agents/<slug>.agent.md` (canonical store) | A reusable role or supervisor kept across sessions | Per-file symlinked into every supported tool's agent dir on init (FR-010/012) |
+| **persistent** | `.specify/agents/templates/<slug>.agent.md` or `.specify/agents/instances/<slug>.agent.md` (canonical layered stores) | A reusable role or supervisor kept across sessions | Per-file symlinked into every supported tool's agent dir on init (FR-010/012) |
 
 **Persistent generation rules:**
-- Write to `.specify/agents/<slug>.agent.md` (single source of truth).
-- On initialization the CLI (re)creates a **per-file** symlink for each `.specify/agents/*.agent.md`
-  inside each supported tool's agent dir — e.g. `.qoder/agents/<slug>.agent.md → ../../.specify/agents/<slug>.agent.md`,
+- Write to the layer's store (`templates/` or `instances/`) — single source of truth per layer.
+- On initialization the CLI (re)creates a **per-file** symlink for each `*.agent.md` under `.specify/agents/{templates,instances}/`
+  inside each supported tool's agent dir — e.g. `.qoder/agents/<slug>.agent.md → ../../.specify/agents/templates/<slug>.agent.md`,
   plus `.github/agents`, `.qwen/agents`, `.opencode/agents` (and `.hermes/agents`, `.iflow/agents`
   where supported). Each tool `agents/` is a real directory of links; never write tool-specific
   copies of framework agents.
-- Agents are discovered by globbing `.specify/agents/*.agent.md` (frontmatter `name`/`description`); there is no separate registry file.
+- Agents are discovered by globbing `.specify/agents/{templates,instances}/*.agent.md` (frontmatter `name`/`description`); there is no separate registry file.
 
 ## Tool integration & provider whitelist
 

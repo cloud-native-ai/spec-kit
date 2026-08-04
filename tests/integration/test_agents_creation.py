@@ -1,4 +1,4 @@
-"""Integration test: verify the agents command template targets .specify/agents/ as canonical path."""
+"""Integration test: verify the agents command template targets the layered .specify/agents/ stores."""
 
 import pytest
 from pathlib import Path
@@ -6,7 +6,7 @@ from pathlib import Path
 
 @pytest.mark.integration
 class TestAgentsCommandTemplate:
-    """Verify the agents command template uses canonical .specify/agents/ paths."""
+    """Verify the agents command template uses canonical layered .specify/agents/ paths."""
 
     @pytest.fixture
     def agents_template(self):
@@ -16,7 +16,12 @@ class TestAgentsCommandTemplate:
         return template_path.read_text()
 
     def test_canonical_path_is_specify_agents(self, agents_template):
-        assert ".specify/agents/" in agents_template
+        assert ".specify/agents/templates/" in agents_template
+        assert ".specify/agents/instances/" in agents_template
+
+    def test_execution_layer_documented(self, agents_template):
+        assert ".specify/agents/execution/" in agents_template
+        assert "gitignored" in agents_template
 
     def test_no_direct_github_agents_target(self, agents_template):
         lines_with_target = [
@@ -35,8 +40,10 @@ class TestAgentsCommandTemplate:
                 f"Removed workspace file {ws_file} should no longer be documented in template"
             )
 
-    def test_references_directory_documented(self, agents_template):
-        assert ".specify/agents/references/" in agents_template
+    def test_no_shared_assets_directory_documented(self, agents_template):
+        # Agent definitions are self-contained; the retired shared-assets dir must not resurface.
+        assert ".specify/agents/templates/references/" not in agents_template
+        assert ".specify/agents/references/" not in agents_template
 
     def test_agent_id_uses_canonical_path(self, agents_template):
         assert ".specify/agents/" in agents_template
@@ -49,4 +56,4 @@ class TestAgentsCommandTemplate:
                 pytest.fail(f"agent_id still references .github/agents/: {line}")
 
     def test_valid_file_locations_updated(self, agents_template):
-        assert "Canonical (workspace) scope:" in agents_template or "canonical location" in agents_template.lower()
+        assert "Canonical (workspace) scope:" in agents_template or "canonical layered stores" in agents_template.lower()

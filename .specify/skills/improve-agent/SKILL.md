@@ -8,7 +8,7 @@ skill_id: "<SKILL:.specify/skills/improve-agent/SKILL.md>"
 
 ## Goal
 
-Improve **an existing single-agent artifact** based on evidence from real usage — user feedback, failure cases, behavioral drift, or observed inefficiencies. Targets include role templates, the shared supervision snippet, and generated custom agents. The result is a targeted update that fixes the identified issues while preserving the artifact's established structure. To adjust or optimize a multi-agent **team** (stages, orchestration, thresholds), use `improve-team` via `/speckit.team`.
+Improve **an existing single-agent artifact** based on evidence from real usage — user feedback, failure cases, behavioral drift, or observed inefficiencies. Targets include role templates, the shared supervision snippet, generated agents, and execution configs. The result is a targeted update that fixes the identified issues while preserving the artifact's established structure. To adjust or optimize a multi-agent **team** (stages, orchestration, thresholds), use `improve-team` via `/speckit.team`.
 
 Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instrument — improving an agent artifact strengthens the **Task Understanding** and **Controlled Execution** dimensions (clearer role intent, more reliable guided behavior) and closes the **Learning Capture** loop; goal model in `.specify/shared/guidelines/better-harness.md`.
 
@@ -16,33 +16,38 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 
 The input is a description of the agent to improve and what went wrong or could be better. Parse:
 
+- **Layer (mandatory, explicit)**: which agent layer the improvement targets — `template` / `instance` / `execution` (taxonomy: `shared/definitions/agent-definitions.md`). Never infer the layer silently; if the request does not state it and the target identifier does not imply it unambiguously, ask the user before editing anything.
 - **Target identifier**: Resolve to exactly one artifact of a supported kind (see § Target Classification):
-  - `skills/create-agent/templates/agent-capacity-*-template.md` (role)
+  - `.specify/agents/templates/*.agent.md` (an installed role Template)
+  - `skills/create-agent/templates/agent-capacity-*-template.md` (an abstract capacity Class)
   - `skills/create-agent/templates/agent-supervision-delegation.md` (shared supervision snippet — edits here propagate to ALL supervisors)
-  - `.specify/agents/*.agent.md` (a generated custom agent)
+  - `.specify/agents/instances/*.agent.md` (a generated custom / project-custom agent)
+  - `.specify/agents/execution/configs/*.yaml` or `execution/scripts/*` (dispatch config / wrapper)
 - **Improvement direction**: What specifically needs to change — extracted from user feedback, observed failures, or behavioral drift.
-- **Evidence**: Concrete examples of the problem (conversation excerpts, incorrect outputs, missing behaviors).
+- **Evidence**: Concrete examples of the problem (conversation excerpts, incorrect outputs, missing behaviors; for the execution layer, runtime logs under `.specify/agents/execution/logs/` are first-class evidence — read them, never edit them).
 
 ## Target Classification
 
-Before the workflow, classify the target and route to the matching refinement rules:
+Before the workflow, classify the target by **layer + kind** and route to the matching refinement rules:
 
-| Target kind | Match | Route to |
-|-------------|-------|----------|
-| role | `agent-capacity-*-template.md` | Workflow steps 1–6 (root-cause on the six mandatory sections) |
-| supervision snippet | `agent-supervision-delegation.md` | Workflow steps 3–5; WARN that changes affect every supervisor (single source) |
-| custom | `.specify/agents/*.agent.md` | Workflow steps 1–6 against the generated file's own structure |
+| Layer | Target kind | Match | Route to |
+|-------|-------------|-------|----------|
+| template | role Template | `.specify/agents/templates/*.agent.md` | Workflow steps 1–6 (root-cause on the six mandatory sections) |
+| template | capacity Class | `agent-capacity-*-template.md` | Workflow steps 1–6 (root-cause on the six mandatory sections) |
+| template | supervision snippet | `agent-supervision-delegation.md` | Workflow steps 3–5; WARN that changes affect every supervisor (single source) |
+| instance | custom / project-custom | `.specify/agents/instances/*.agent.md` | Workflow steps 1–6 against the generated file's own structure; keep the Template reference (`capacity-scope:`) intact — capability gaps route to the template layer instead |
+| execution | dispatch config / script | `.specify/agents/execution/{configs,scripts}/*` | Workflow steps 2–6 driven by log evidence; preserve the Visibility Contract (`shared/definitions/subagent-definitions.md`); logs themselves are read-only evidence, never a target |
 
-If the identifier matches multiple kinds or none, ask one clarifying question.
+If the identifier matches multiple kinds or none, ask one clarifying question. A misbehaving **running** execution is out of scope — terminate/re-dispatch it; the durable fix lands in one of the three layers above.
 
 ## Workflow
 
 ### 1. Identify the target template
 
-- Parse the user's input for a role name, slug, or template path
-- Resolve to `skills/create-agent/templates/agent-capacity-<slug>-template.md`
-- If multiple templates match or none match, ask one clarifying question
-- Read the current template content before making changes
+- Parse the user's input for a role name, slug, or artifact path, plus the declared **layer**
+- Resolve within the declared layer: `template` → `.specify/agents/templates/<slug>.agent.md` or `skills/create-agent/templates/agent-capacity-<slug>-template.md`; `instance` → `.specify/agents/instances/<slug>.agent.md`; `execution` → `.specify/agents/execution/configs/<slug>.yaml`
+- If multiple artifacts match or none match, ask one clarifying question
+- Read the current artifact content before making changes
 
 ### 2. Gather evidence
 
@@ -91,7 +96,7 @@ For each issue, determine whether the root cause is in:
 
 ## Constraints
 
-- This skill operates on templates in `skills/create-agent/templates/`, NOT on generated agents in `.specify/agents/`
+- The **layer** MUST be explicit before any edit; the layer decides the editable surface (template → templates stores; instance → `.specify/agents/instances/`; execution → `execution/{configs,scripts}/` only — logs are read-only evidence)
 - Changes MUST be evidence-based — do not optimize from generic best practices without concrete evidence
 - The established template structure (six mandatory sections) MUST be preserved
 - Handoff chain consistency with other role templates MUST be maintained

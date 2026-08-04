@@ -74,7 +74,7 @@ Four patterns; the goal decides which fits. The first three are **bounded** (run
 
 ## Prerequisites
 
-- `specify init` (project initialized); `.specify/agents/` populated with the agents that become team members
+- `specify init` (project initialized); `.specify/agents/{templates,instances}/` populated with the agents that become team members
 
 ## Next Steps
 

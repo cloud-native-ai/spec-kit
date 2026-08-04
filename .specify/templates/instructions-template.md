@@ -124,6 +124,27 @@ Note also: `.specify/memory/tools.md` (file) is the discovery inventory regenera
 - **Supported Agents**: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder
 - **Instructions Refresh**: Run `/speckit.instructions` to regenerate this file and compatibility symlinks.
 
+## Spec Kit Framework Map
+
+This file is a **map, not a manual**: it tells you *what* exists and *where* it lives; the *how* belongs to the documents each row points to. The framework state lives under `.specify/`:
+
+| What | Where | Notes (what lives there — not how to use it) |
+|------|-------|-----------------------------------------------|
+| Project memory | `.specify/memory/` | constitution, features index + `features/<ID>.md`, glossary, `tools/` records, feedback store |
+| Artifact templates | `.specify/templates/` | requirements/plan/tasks/commands templates rendered by `/speckit.*` |
+| Automation scripts | `.specify/scripts/` | bash/python engines invoked by commands and skills |
+| Installed skills | `.specify/skills/` | one directory per skill (`SKILL.md` + references/ + scripts/) |
+| **Agent Templates** | `.specify/agents/templates/` | capability descriptions — shipped role set installed by `specify init`; each `.agent.md` is self-contained |
+| **Agent Instances** | `.specify/agents/instances/` | responsibility-bound agents authored in this project; reference a Template |
+| **Agent Execution** | `.specify/agents/execution/` | dispatch `configs/` + `scripts/` (tracked); runtime `logs/` (gitignored, never committed) |
+| Teams | `.specify/teams/<slug>/` | team definitions + `runs/` reports; run intermediates in git-ignored `.work/` |
+| Shared definitions & conventions | `.specify/shared/` | canonical concept docs — e.g. agent taxonomy (`definitions/agent-definitions.md`), subagent modes (`definitions/subagent-definitions.md`), tool definitions, workflow conventions |
+| Feature specs | `.specify/specs/<ID>-<slug>/` | requirements / plan / tasks / verification per feature |
+| This file | `.specify/instructions.md` | canonical AI instructions; per-tool files are symlinks |
+| [Other project-specific location] | [Path] | [What lives there] |
+
+> Agent layer taxonomy (Template → Instance → Execution) is defined once in `.specify/shared/definitions/agent-definitions.md` — consult it before creating/refining/running agents.
+
 ## Spec Kit Runtime & Symlink Model
 - **Canonical instructions file**: `.specify/instructions.md` is the single source of truth for project-level AI instructions. Compatibility files such as `.github/copilot-instructions.md`, `.qoder/project_rules.md`, `QWEN.md`, `CLAUDE.md`, `QODER.md`, and `AGENTS.md` are symlinks to this file.
 - **Canonical skills directory**: `.specify/skills/` is the primary location for installed Spec Kit skills. `.github/skills` is a compatibility symlink to `.specify/skills/` for tools that discover skills under `.github/skills`.

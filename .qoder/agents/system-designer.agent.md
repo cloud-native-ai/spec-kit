@@ -1,1 +1,1 @@
-../../.specify/agents/system-designer.agent.md
+../../.specify/agents/templates/system-designer.agent.md

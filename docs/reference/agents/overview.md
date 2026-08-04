@@ -18,7 +18,7 @@ Agent 为准——这里描述的是当前**已实现**的机制，而非提案�
   团队编排（parallel / serial / iteration / continuous）由团队域的 `create-team` /
   `improve-team` 承载。
 - **制品（Artifacts）**：可复用模板位于 `skills/create-agent/templates/`，持久化 Agent 位于
-  `.specify/agents/`，经逐文件软链接暴露给每个受支持工具。
+  `.specify/agents/templates/`（预置角色）与 `.specify/agents/instances/`（项目实例），经逐文件软链接暴露给每个受支持工具。
 
 ```
          /speckit.agents  (single-agent entry)        /speckit.team  (team entry)
@@ -29,7 +29,7 @@ Agent 为准——这里描述的是当前**已实现**的机制，而非提案�
    (author)          (refine)                    (define|run:              (refine team: stages/
         │                 │                        parallel|serial|          thresholds/maturity)
         ▼                 ▼                        iteration|continuous)
-   skills/create-agent/templates/*        .specify/agents/*.agent.md  ──(per-file symlink)──▶ .qoder/agents/, .github/agents/, …
+   skills/create-agent/templates/*        .specify/agents/{templates,instances}/*.agent.md  ──(per-file symlink)──▶ .qoder/agents/, .github/agents/, …
    (Role × Stage × Type source)           (persisted Team members)
 ```
 
@@ -39,7 +39,7 @@ Agent 为准——这里描述的是当前**已实现**的机制，而非提案�
 |------|----------|
 | [design.md](./design.md) | **权威概念模型与设计**——Role / Stage / Type、Type 由 Stage 决定、Team 矩阵、Loop，以及唯一的 Team Supervisor。**从这里开始。** |
 | [command-and-skills.md](./command-and-skills.md) | `/speckit.agents` 单一入口、意图→能力路由、两个单 Agent 技能、临时 / 持久生命周期与工具集成。 |
-| [templates-and-agents.md](./templates-and-agents.md) | 规范模板目录与命名、七个预置角色 Agent + Team Supervisor、`.specify/agents/` 布局与发现机制。 |
+| [templates-and-agents.md](./templates-and-agents.md) | 规范模板目录与命名、七个预置角色 Agent + Team Supervisor、`.specify/agents/` 分层布局（templates/instances/execution）与发现机制。 |
 | [quality-loop.md](./quality-loop.md) | Executor-Evaluator-Optimizer（EEI）质量闭环与角色域监督者（单 Agent）。 |
 
 > **多 Agent 编排在别处**：组织 / 运行多个 Agent（parallel · serial · iteration · continuous）
@@ -55,7 +55,7 @@ Agent 为准——这里描述的是当前**已实现**的机制，而非提案�
 | **Type（类型）** | 由 Stage 推导的分类 | `Worker`（实际任务）· `Meta`（管理 / 优化 Agent） |
 | **Team（团队）** | 静态结构 | Role×Stage 矩阵，单元格存 Type |
 | **Loop（循环）** | 动态结构 | 运行时跨阶段迭代 |
-| **Lifecycle（生命周期）** | Agent 存放位置 | `temporary`（仅上下文）· `persistent`（`.specify/agents/`） |
+| **Lifecycle（生命周期）** | Agent 存放位置 | `temporary`（仅上下文）· `persistent`（`.specify/agents/{templates,instances}/`） |
 
 ## 规范来源
 

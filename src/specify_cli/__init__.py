@@ -1122,19 +1122,57 @@ def ensure_specify_symlink(
     link_path.symlink_to(relative_target, target_is_directory=True)
 
 
+def ensure_agent_layer_dirs(root_path: Path) -> Path:
+    """Ensure the three-layer agent directory skeleton under ``.specify/agents/``.
+
+    Layout (canonical taxonomy: ``shared/definitions/agent-definitions.md``):
+
+    - ``templates/``  Agent Templates — shipped role set installed by ``specify init``
+    - ``instances/``  Agent Instances — project-authored agents (``create-agent``)
+    - ``execution/``  Agent Execution — dispatch ``configs/``, ``scripts/`` and
+      runtime ``logs/`` (logs are gitignored via the shipped ``.specify/.gitignore``)
+
+    Also migrates the legacy flat layout: any top-level
+    ``.specify/agents/*.agent.md`` predates the layered layout and is moved into
+    ``templates/`` — everything ``specify init`` installed at the top level was the
+    shipped template set.
+    Returns the ``.specify/agents`` root.
+    """
+    agents_root = root_path / ".specify" / "agents"
+    for sub in ("templates", "instances", "execution/configs", "execution/scripts", "execution/logs"):
+        (agents_root / sub).mkdir(parents=True, exist_ok=True)
+
+    templates_dir = agents_root / "templates"
+    for legacy in sorted(agents_root.glob("*.agent.md")):
+        target = templates_dir / legacy.name
+        if not target.exists():
+            shutil.move(str(legacy), str(target))
+        else:
+            legacy.unlink()
+
+    return agents_root
+
+
 def ensure_per_file_agent_links(root_path: Path, agent_dir_name: str) -> None:
-    """Link each ``.specify/agents/*.agent.md`` into ``<agent_dir_name>/agents/`` individually.
+    """Link each persisted agent file into ``<agent_dir_name>/agents/`` individually.
+
+    Canonical sources are the two definition layers (see
+    ``shared/definitions/agent-definitions.md``): ``.specify/agents/templates/*.agent.md``
+    (shipped Agent Templates) and ``.specify/agents/instances/*.agent.md``
+    (project-authored Agent Instances). On a filename collision the **instance wins**
+    — it is the project's own specialization. The ``execution/`` layer holds runtime
+    configs/scripts/logs, not agent definitions, and is never linked.
 
     Unlike :func:`ensure_specify_symlink` (which links a whole directory), this creates a
     **real** ``<tool>/agents/`` directory populated with one relative symlink per persisted
     agent file. This lets tools like Qoder mix framework agents with their own overrides in
-    the same directory. Only ``*.agent.md`` files are linked, so removed shared files and the
-    ``references/`` directory are never exposed through the tool directory.
+    the same directory. Only ``*.agent.md`` files are linked, so non-agent files are never
+    exposed through the tool directory.
 
-    Handles migration from the previous whole-directory symlink model.
+    Handles migration from the previous whole-directory symlink model and from the
+    legacy flat ``.specify/agents/*.agent.md`` layout.
     """
-    specify_agents = root_path / ".specify" / "agents"
-    specify_agents.mkdir(parents=True, exist_ok=True)
+    agents_root = ensure_agent_layer_dirs(root_path)
 
     tool_agents = root_path / agent_dir_name / "agents"
 
@@ -1144,8 +1182,12 @@ def ensure_per_file_agent_links(root_path: Path, agent_dir_name: str) -> None:
 
     tool_agents.mkdir(parents=True, exist_ok=True)
 
-    source_files = sorted(specify_agents.glob("*.agent.md"))
-    expected_names = {f.name for f in source_files}
+    sources_by_name = {}
+    for layer in ("templates", "instances"):  # instances after templates: instance wins
+        for source in sorted((agents_root / layer).glob("*.agent.md")):
+            sources_by_name[source.name] = source
+    source_files = [sources_by_name[name] for name in sorted(sources_by_name)]
+    expected_names = set(sources_by_name)
 
     # Remove stale per-file links that no longer have a canonical source.
     for existing in tool_agents.iterdir():
@@ -1503,13 +1545,12 @@ def copy_local_templates(
             if tracker:
                 tracker.complete("local-templates", "skills copied")
 
-        # Copy agents directory
+        # Copy agents directory (shipped Agent Templates -> .specify/agents/templates/)
         if (resource_path / "agents").exists():
             if tracker:
                 tracker.start("local-templates", "copying agents")
 
-            agents_dest = project_path / ".specify" / "agents"
-            agents_dest.mkdir(parents=True, exist_ok=True)
+            agents_dest = ensure_agent_layer_dirs(project_path) / "templates"
 
             shutil.copytree(
                 resource_path / "agents",
@@ -1607,7 +1648,8 @@ def copy_local_templates(
             if tracker:
                 tracker.complete("local-templates", ".iflow/skills symlink ready")
 
-        # Agent directory per-file symlinks (each .specify/agents/*.agent.md linked individually)
+        # Agent directory per-file symlinks (each *.agent.md under
+        # .specify/agents/{templates,instances}/ linked individually)
         _AGENT_LINK_DIRS = {
             "copilot": ".github",
             "claude": ".github",

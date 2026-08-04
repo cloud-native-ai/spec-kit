@@ -54,6 +54,7 @@ Find essential knowledge that helps an AI agent be immediately productive:
 
 Content guidelines for `.specify/instructions.md`:
 
+- **Map, not manual (地图而非手册)**: the file's job is to answer *what exists* and *where it lives*, then point to the owning document — never to teach *how*. Operational detail (workflows, step sequences, invocation rules) belongs in the documents the map points to (constitution, `docs/`, `shared/` definitions, skill/command files); when you are tempted to explain a procedure here, replace it with a pointer to the canonical doc that owns it.
 - If `.specify/instructions.md` already exists, merge intelligently: preserve valuable content and update only what is outdated
 - **Non-destructive guarantee**: The existing instructions may contain accumulated, hand-authored knowledge that is NOT reproducible from a fresh codebase scan (e.g., custom governance rules, tribal knowledge, decision rationale, registries). This content **MUST NOT** be lost. When the file already exists, the setup script keeps it **in place as the refresh base** (it does not render the template over it), so you **MUST** refresh it *in place, section by section* — updating only sections whose described state no longer matches project reality and preserving everything else verbatim (see the **Establish the Refresh Base** and **Section-by-section refresh** actions below).
 - Keep it concise and actionable (~20–50 lines) using Markdown structure
@@ -73,7 +74,7 @@ This command runs as a **reconcile engine** over the instructions space (see `sh
 - **Scope zones**: managed registry ranges (`AGENTS/SKILLS/TOOLS_REGISTRY`) are owned by their commands — observed but never converged here.
 
 When `$ARGUMENTS` is empty (full reconcile), apply these rules:
-- **Auto-update sections**: Documentation Map, Tech Stack & Resources, Key Directories, Build/Test commands.
+- **Auto-update sections**: Documentation Map, Spec Kit Framework Map, Tech Stack & Resources, Key Directories, Build/Test commands.
 - **Preserve sections**: project-specific custom notes, manually added governance rules, and registries.
 - **Conflict policy**: If generated content conflicts with clearly user-authored content, preserve user-authored content and update only stale factual items.
 
@@ -141,6 +142,7 @@ Fallback behavior:
      - **Drifted / stale** → update *only* the stale facts within that section, preserving the surrounding hand-authored prose and structure. Do not rewrite a whole section to change one fact.
      - **Placeholders** → replace any bracketed placeholders (e.g., `[Brief summary...]`, `[Detected tech stack...]`) with concrete details from your analysis.
    - **Documentation Map**: verify each row still points to a file that exists in the repo — run a scripted existence check (loop every Location cell through `test -e`) instead of eyeballing; fix paths that moved and add rows only for genuinely new canonical docs. Also re-verify numeric facts quoted in Key Content cells (e.g. feature counts) against their source files — these drift silently and have survived previous refreshes.
+   - **Spec Kit Framework Map**: keep this section a **map (what/where), never a manual (how)**. Verify each Where cell against the actual `.specify/` tree with the same scripted existence check — in particular the layered agent stores `.specify/agents/templates/` (shipped Agent Templates), `.specify/agents/instances/` (project-authored Agent Instances), and `.specify/agents/execution/` (dispatch configs/scripts tracked, `logs/` gitignored) — and drop or fix rows whose paths no longer exist. Add rows only for genuinely new framework locations observed on disk (e.g. `.specify/history/`, `.specify/review/` when present). If prose in this section starts explaining procedures, compress it back to a pointer at the owning document.
    - **Add missing scaffolding**: if the latest `.specify/templates/instructions-template.md` defines a section (or a managed registry range) that is **absent** from the base, insert it at the structurally appropriate place. Never remove a base section merely because the template lacks it (e.g., project-specific sections like `## Recurring Operational Lessons` are kept).
    - **Preserve managed ranges**: do NOT remove or overwrite the `## Agents`, `## Skills`, and `## Tools` managed ranges; keep the marker comments intact:
      - `<!-- AGENTS_REGISTRY_START --> ... <!-- AGENTS_REGISTRY_END -->`

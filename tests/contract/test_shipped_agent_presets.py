@@ -1,9 +1,10 @@
 """Contract test: the shipped ``agents/`` resource carries the preset role agents.
 
-``specify init`` copies the shipped ``agents/`` resource into ``.specify/agents/`` and then
-pre-links each ``*.agent.md`` per file into every supported tool directory. For that to work
-on a fresh install, the seven preset role agents must exist in the shipped resource (not only
-in this repo's dogfooded ``.specify/agents/``).
+``specify init`` copies the shipped ``agents/`` resource into ``.specify/agents/templates/``
+(the Agent Template layer) and then pre-links each ``*.agent.md`` per file into every
+supported tool directory. For that to work on a fresh install, the seven preset role agents
+must exist in the shipped resource (not only in this repo's dogfooded
+``.specify/agents/templates/``).
 """
 
 import pytest

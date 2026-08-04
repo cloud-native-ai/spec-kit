@@ -1,1 +1,1 @@
-../../.specify/agents/ux-analyst.agent.md
+../../.specify/agents/templates/ux-analyst.agent.md

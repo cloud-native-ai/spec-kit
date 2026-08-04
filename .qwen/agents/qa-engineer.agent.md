@@ -1,1 +1,1 @@
-../../.specify/agents/qa-engineer.agent.md
+../../.specify/agents/templates/qa-engineer.agent.md

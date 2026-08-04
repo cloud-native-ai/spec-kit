@@ -57,7 +57,7 @@ The Stage templates (`agent-stage-{executor,evaluator,optimizer}`), the orchestr
 
 ## Persisted agents (`.specify/agents/`)
 
-Persistent agents are stored as `<slug>.agent.md` in `.specify/agents/`, the **single source
+Persistent agents are stored as `<slug>.agent.md` in the layered stores `.specify/agents/templates/` (role Templates, installed by `specify init`) and `.specify/agents/instances/` (project-authored Instances) — the **single source
 of truth**. The seven preset role agents ship active:
 
 | Name | File | Status |
@@ -92,7 +92,7 @@ Each generated role agent (example: `requirements-analyst.agent.md`) contains:
 ## Discovery & the role workflow chain
 
 There is **no separate registry file**. Agents are discovered by globbing
-`.specify/agents/*.agent.md` and reading each file's frontmatter `name`/`description`.
+`.specify/agents/{templates,instances}/*.agent.md` and reading each file's frontmatter `name`/`description`.
 The seven preset roles form this workflow chain:
 
 ```
@@ -131,17 +131,21 @@ built-in expert's name (per Qoder's priority mechanism).
 
 ## Directory & symlink model
 
-`.specify/agents/` is the **only** place agents are authored. Every supported tool's agent
-directory is a **real directory** populated with **per-file symlinks** back to it — one link
-per `*.agent.md`. Never write framework agents into the tool directories directly.
+`.specify/agents/` is the **only** place agents are authored (Templates under `templates/`,
+Instances under `instances/`; taxonomy: `shared/definitions/agent-definitions.md`). Every
+supported tool's agent directory is a **real directory** populated with **per-file symlinks**
+back to it — one link per `*.agent.md` (instance wins on filename collision). Never write
+framework agents into the tool directories directly.
 
 ```
 .specify/agents/                 ← canonical source of truth (author here)
-   ├── requirements-analyst.agent.md
-   ├── system-designer.agent.md
-   └── … (+ references/ shared assets)
+   ├── templates/                ← Agent Templates (shipped role set; self-contained `.agent.md` files)
+   │     ├── requirements-analyst.agent.md
+   │     └── …
+   ├── instances/                ← Agent Instances (project-authored)
+   └── execution/                ← dispatch configs/ + scripts/ (tracked), logs/ (gitignored)
 
-.qoder/agents/    (real dir)  ── <slug>.agent.md ─▶ ../../.specify/agents/<slug>.agent.md
+.qoder/agents/    (real dir)  ── <slug>.agent.md ─▶ ../../.specify/agents/templates/<slug>.agent.md
 .github/agents/   (real dir)  ── (per-file symlinks, same scheme)
 .qwen/agents/     (real dir)  ── (per-file symlinks, same scheme)
 .opencode/agents/ (real dir)  ── (per-file symlinks, same scheme)
@@ -149,10 +153,11 @@ per `*.agent.md`. Never write framework agents into the tool directories directl
 ```
 
 The CLI (re)creates these per-file links on initialization, migrating any legacy
-whole-directory symlink to the per-file model. Because each tool `agents/` is a real
+whole-directory symlink — and any legacy flat `.specify/agents/*.agent.md` layout — to the
+layered per-file model. Because each tool `agents/` is a real
 directory, a tool can add its own agent files (e.g. Qoder overrides) beside the framework
-links. Only `.specify/agents/references/` remains a shared-assets store in the canonical
-scope; the former `AGENTS.md`/`MEMORY.md`/`SOUL.md`/`USER.md` shared files have been removed
+links. Agent definitions are **self-contained** — there is no shared-assets directory under
+the agent stores; the former `AGENTS.md`/`MEMORY.md`/`SOUL.md`/`USER.md` shared files have been removed
 (agent runtime context is per chat-session, so they served no purpose).
 
 ## Traceability

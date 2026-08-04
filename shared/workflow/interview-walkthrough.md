@@ -1,6 +1,6 @@
 # Interview-Driven Requirements Walkthrough (访谈式需求走查)
 
-This document is the authoritative detailed reference for the Requirements Analyst's **interview mode**. The agent definition (`.specify/agents/requirements-analyst.agent.md`) declares the mode and its phases; everything here is the operational detail.
+This document is the authoritative detailed reference for the Requirements Analyst's **interview mode**. The agent definition (`.specify/agents/templates/requirements-analyst.agent.md`) declares the mode and its phases; everything here is the operational detail.
 
 Use it when requirement details live in the stakeholder's head rather than in a written document. Do not ask the user to "write a spec" — decompose the requirement into interview units, show the user the real artifact for each unit, ask open questions, and land every decision on the spot. A full walkthrough can span dozens of units and multiple days; the walkthrough ledger file is the durable state that makes this possible.
 

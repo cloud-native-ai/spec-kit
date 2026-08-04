@@ -55,12 +55,12 @@ After initialization, your project has a `.specify/` directory with the followin
 ```
 
 Symlinks are created for your AI tool:
-- `.github/agents/` → `.specify/agents/` (Copilot, Claude Code)
-- `.qoder/agents/` → `.specify/agents/` (Qoder)
-- `.qwen/agents/` → `.specify/agents/` (Qwen)
-- `.hermes/agents/` → `.specify/agents/` (Hermes Agent)
-- `.iflow/agents/` → `.specify/agents/` (iFlow)
-- `.opencode/agents/` → `.specify/agents/` (opencode)
+- `.github/agents/` → `.specify/agents/{templates,instances}/` (Copilot, Claude Code)
+- `.qoder/agents/` → `.specify/agents/{templates,instances}/` (Qoder)
+- `.qwen/agents/` → `.specify/agents/{templates,instances}/` (Qwen)
+- `.hermes/agents/` → `.specify/agents/{templates,instances}/` (Hermes Agent)
+- `.iflow/agents/` → `.specify/agents/{templates,instances}/` (iFlow)
+- `.opencode/agents/` → `.specify/agents/{templates,instances}/` (opencode)
 
 The same symlink model applies to skills directories.
 

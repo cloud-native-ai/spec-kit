@@ -1,1 +1,1 @@
-../../.specify/agents/requirements-analyst.agent.md
+../../.specify/agents/templates/requirements-analyst.agent.md

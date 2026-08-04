@@ -10,7 +10,7 @@ skill_id: "<SKILL:.specify/skills/create-agent/SKILL.md>"
 
 Author a **single agent artifact** for the Spec Kit agent system — a **capacity** template, a capacity-scoped **supervisor**, a **custom** `.agent.md`, or a **project-custom** agent. This skill is the single authoring engine invoked by `/speckit.agents` for single-agent work; the command gathers project context and delegates here rather than rendering templates inline. Multi-agent teams (organizing/running several agents) are out of scope — see `/speckit.team` and the `create-team` skill.
 
-> **Class → Instance**: a template here is an **abstract agent Class** — a `agent-capacity-<X>-template.md` with unfilled `{{PLACEHOLDERS}}`. Authoring **instantiates** that Class: `create-agent` fills the placeholders and writes a **concrete agent definition** to `.specify/agents/<slug>.agent.md`. At runtime, `/speckit.agents run` spawns a **live instance (object)** from that definition — many instances from one definition, each independent. This skill operates at the Class/definition layer, never on running instances.
+> **Class → Instance**: a template here is an **abstract agent Class** — a `agent-capacity-<X>-template.md` with unfilled `{{PLACEHOLDERS}}`. Authoring **instantiates** that Class: `create-agent` fills the placeholders and writes a **concrete agent definition** into its layer's store under `.specify/agents/` (role Templates → `templates/`, responsibility-bound Instances → `instances/`; see § Layer Targeting). At runtime, `/speckit.agents run` spawns a **live instance (object)** from that definition — many instances from one definition, each independent. This skill operates at the Class/definition layer, never on running instances. In the canonical Agent taxonomy (`shared/definitions/agent-definitions.md`) these three layers are **Agent Template → Agent Instance → Agent Execution**; the Execution layer's dispatch modes are governed by `shared/definitions/subagent-definitions.md`.
 
 > **Conceptual Model**: the multi-agent Role × Stage × Type + Team/Loop model is defined once in the team domain — see `skills/create-team/references/conceptual-model.md`. This skill authors the single **capacity** Classes that fill a team's Role seats.
 
@@ -18,20 +18,33 @@ Author a **single agent artifact** for the Spec Kit agent system — a **capacit
 
 Canonical template home: `skills/create-agent/templates/` (installed mirror: `.specify/skills/create-agent/templates/`).
 
+## Layer Targeting (mandatory, explicit)
+
+Every operation of this skill MUST declare which **agent layer** it operates on (taxonomy: `shared/definitions/agent-definitions.md`). Never infer the layer silently — if the request does not state it and the `kind` does not imply it unambiguously, ask the user before writing anything.
+
+| Layer | Project directory | What lives there | Operated by |
+|-------|-------------------|------------------|-------------|
+| `template` | `.specify/agents/templates/` | Agent Templates — the shipped role set installed by `specify init` from the spec-kit source `agents/` directory, plus project-authored role templates | kinds `capacity`, `supervisor` |
+| `instance` | `.specify/agents/instances/` | Agent Instances — responsibility-bound agents referencing a Template | kinds `custom`, `project-custom` |
+| `execution` | `.specify/agents/execution/` | Agent Execution — dispatch `configs/`, wrapper `scripts/`, runtime `logs/` (logs gitignored, never committed) | kind `execution-config` |
+
+The `kind` → layer mapping above is fixed; state the resolved layer in the confirmation gate and in the final report.
+
 ## Capability Matrix
 
 Select the capability from the request `kind` (or infer from user intent):
 
-| kind | Produces | Source templates | Primary section |
-|------|----------|------------------|-----------------|
-| `capacity` | One capacity agent Class (six mandatory sections) | `skills/create-agent/templates/agent-capacity-*-template.md` | Workflow steps 1–5 below |
-| `supervisor` | A capacity agent that runs its own self-improvement loop | capacity template + `skills/create-agent/templates/agent-supervision-delegation.md` inlined | § Supervisor Capability |
-| `custom` | A single narrow, general-purpose custom `.agent.md` (not bound to a project) | free-form per intent | § Mode Confirmation |
-| `project-custom` | A project-bound custom agent that marks its project and guards against being run elsewhere | `skills/create-agent/templates/agent-project-custom-template.md` | § Project-Custom Capability |
+| kind | Layer | Produces | Source templates | Primary section |
+|------|-------|----------|------------------|-----------------|
+| `capacity` | template | One capacity agent Class (six mandatory sections) | `skills/create-agent/templates/agent-capacity-*-template.md` | Workflow steps 1–5 below |
+| `supervisor` | template | A capacity agent that runs its own self-improvement loop | capacity template + `skills/create-agent/templates/agent-supervision-delegation.md` inlined | § Supervisor Capability |
+| `custom` | instance | A single narrow, general-purpose custom `.agent.md` (not bound to a project) | free-form per intent | § Mode Confirmation |
+| `project-custom` | instance | A project-bound custom agent that marks its project and guards against being run elsewhere | `skills/create-agent/templates/agent-project-custom-template.md` | § Project-Custom Capability |
+| `execution-config` | execution | A dispatch config (and optional wrapper script) for running an agent | § Execution Config Capability | § Execution Config Capability |
 
 ### Mode Confirmation
 
-When a create request does not clearly map to a single `kind`, do **not** guess. Confirm with the user which authoring mode they want before generating — offer the choices explicitly: `capacity`, `supervisor`, `custom` (narrow, general-purpose), or `project-custom` (project-bound). This is the one confirmation gate shared by all authoring capabilities.
+When a create request does not clearly map to a single `kind`, do **not** guess. Confirm with the user which authoring mode they want before generating — offer the choices explicitly: `capacity` / `supervisor` (template layer), `custom` (narrow, general-purpose) / `project-custom` (project-bound) (instance layer), or `execution-config` (execution layer). This is the one confirmation gate shared by all authoring capabilities; it MUST surface the resolved **layer** alongside the kind.
 
 All capabilities share the same validate + report tail (Workflow steps 4–5) and the Agent-Specific Configuration handling below.
 
@@ -115,8 +128,8 @@ You are a **<Role Name>** for the {{PROJECT_NAME}} project.
 
 ### 5. Report
 
-- Report the created template file path
-- Suggest running `/speckit.agents` to generate the new agent from the template
+- Report the created template file path and the resolved **layer**
+- Suggest running `/speckit.agents` to install the role Template to `.specify/agents/templates/<slug>.agent.md`
 - Propose how this role fits into the existing workflow chain
 
 ## Constraints
@@ -125,7 +138,8 @@ You are a **<Role Name>** for the {{PROJECT_NAME}} project.
 - Templates MUST use only approved `{{PLACEHOLDER}}` variables
 - Frontmatter uses Qoder-compatible fields — `model` (default `auto`, Qoder smart routing), `tools`/`disallowedTools`, `maxTurns`/`timeoutMins`, `skills`/`mcpServers`, `permissionMode`, `background`, `isolation`, `color`. Only `name` and `description` are strictly required; set `model`/`tools`/`maxTurns` for every role and leave the rest unset unless needed.
 - Role instructions MUST be written in first-person professional identity
-- This skill operates on templates in `skills/create-agent/templates/`, NOT on generated agents in `.specify/agents/`
+- Layer discipline: template-layer output goes to `.specify/agents/templates/`, instance-layer output to `.specify/agents/instances/`, execution-layer output to `.specify/agents/execution/{configs,scripts}/`; abstract capacity Classes stay in `skills/create-agent/templates/`. Never write across layers, and never write logs anywhere but `.specify/agents/execution/logs/` (gitignored)
+- An instance-layer agent derived from a role MUST reference its Template (`capacity-scope:` frontmatter) instead of restating capability
 - `project-custom` agents MUST carry the `project:` frontmatter marker and the mandatory `## Project Scope Guard` section (see § Project-Custom Capability)
 - The full framework frontmatter field set is: `user-invocable`, `disable-model-invocation`, `supervisor`, `capacity-scope`, `project` (the last used only by `project-custom` agents)
 
@@ -136,13 +150,13 @@ Every agent this skill can produce has one of two lifecycles. Choose the lifecyc
 | Lifecycle | Where it lives | When to use | Tool config |
 |-----------|----------------|-------------|-------------|
 | **temporary** | Context-only — never written to disk | A worker/stage agent spawned for a single run; discarded when the run ends | None; it exists only in the invoking context (FR-011) |
-| **persistent** | `.specify/agents/<slug>.agent.md` (the canonical store) | A reusable role or supervisor the project keeps across sessions | Per-file symlinked into every officially supported tool's agent config directory on initialization (FR-010/012) |
+| **persistent** | `.specify/agents/templates/<slug>.agent.md` (template layer) or `.specify/agents/instances/<slug>.agent.md` (instance layer) — the canonical stores | A reusable role or supervisor the project keeps across sessions | Per-file symlinked into every officially supported tool's agent config directory on initialization (FR-010/012) |
 
 **Persistent generation rules**:
 
-- Write the generated agent to `.specify/agents/<slug>.agent.md` (canonical, single source of truth).
-- On initialization the CLI (re)creates a **per-file** symlink for each `.specify/agents/*.agent.md` inside every officially supported tool's agent config dir — e.g. `.qoder/agents/<slug>.agent.md → ../../.specify/agents/<slug>.agent.md`, plus `.github/agents`, `.qwen/agents`, `.opencode/agents`, `.hermes/agents`, `.iflow/agents`. Each tool `agents/` is a real directory of per-file links (so tools may add their own overrides beside the framework links); never write tool-specific copies of framework agents.
-- Agents are discovered by globbing `.specify/agents/*.agent.md` and reading each file's frontmatter `name`/`description`; no separate registry file is maintained.
+- Write the generated agent to its layer's canonical store: role Templates to `.specify/agents/templates/<slug>.agent.md`, responsibility-bound Instances to `.specify/agents/instances/<slug>.agent.md` (single source of truth per layer).
+- On initialization the CLI (re)creates a **per-file** symlink for each `*.agent.md` under `.specify/agents/{templates,instances}/` inside every officially supported tool's agent config dir — e.g. `.qoder/agents/<slug>.agent.md → ../../.specify/agents/templates/<slug>.agent.md`, plus `.github/agents`, `.qwen/agents`, `.opencode/agents`, `.hermes/agents`, `.iflow/agents`. On a filename collision the instance wins. Each tool `agents/` is a real directory of per-file links (so tools may add their own overrides beside the framework links); never write tool-specific copies of framework agents.
+- Agents are discovered by globbing `.specify/agents/{templates,instances}/*.agent.md` and reading each file's frontmatter `name`/`description`; no separate registry file is maintained. The `execution/` directory holds no agent definitions and is never globbed for discovery.
 
 **Temporary generation rules**:
 
@@ -160,7 +174,7 @@ Use this capability (`kind: supervisor`) to author a **role-scoped supervisor** 
    - `{{ROLE_NAME}}` → role display name
    - `{{ROLE_DIMENSIONS}}` → the request's `scoring_dimensions` (or role-appropriate defaults if omitted)
 3. Preserve `supervisor: true` in the generated frontmatter (honor `supervisor: false` only if the request explicitly opts out).
-4. Write the generated agent to `.specify/agents/<capacity_slug>.agent.md` and run the shared validate + report tail.
+4. Write the generated agent to `.specify/agents/templates/<capacity_slug>.agent.md` (template layer) and run the shared validate + report tail.
 
 ### Rule
 
@@ -189,11 +203,42 @@ Unlike the role-based flow (Workflow steps 1–5), project-custom creation is **
 2. Resolve `{{PROJECT_NAME}}` to the bound project and `{{AGENT_NAME}}`/`{{AGENT_DESCRIPTION}}` from the user's intent.
 3. Fill the free-form body sections; delete the scaffold NOTE comment.
 4. Keep the `project:` frontmatter marker and the `## Project Scope Guard` section intact — these enable the mismatch warning behavior.
-5. Write the generated agent to `.specify/agents/<slug>.agent.md` and run the shared validate + report tail (Workflow steps 4–5).
+5. Write the generated agent to `.specify/agents/instances/<slug>.agent.md` (instance layer) and run the shared validate + report tail (Workflow steps 4–5).
 
 ### Rule
 
 A project-custom agent MUST always carry both the `project:` frontmatter marker and the `## Project Scope Guard` section. When such an agent is invoked in a project other than the one it is bound to, it MUST warn the user and request explicit confirmation rather than silently executing.
+
+## Execution Config Capability
+
+Use this capability (`kind: execution-config`) to author the **execution-layer artifacts** for an agent — the durable dispatch configuration (and optional wrapper script) that turns an Agent Instance/Template into a repeatable **Agent Execution** (see `shared/definitions/subagent-definitions.md` for the three execution modes and the External Dispatch Visibility Contract).
+
+### Directory contract
+
+| Path | Content | Versioned |
+|------|---------|-----------|
+| `.specify/agents/execution/configs/<slug>.yaml` | Dispatch config for one agent | yes |
+| `.specify/agents/execution/scripts/` | Optional per-agent dispatch wrappers (thin; prefer reusing `skills/create-team/scripts/dispatch.sh`) | yes |
+| `.specify/agents/execution/logs/` | Runtime artifacts (`<label>.live.log` / `.jsonl` / `.status`) | **no — gitignored, never committed** |
+
+### Config schema (`configs/<slug>.yaml`)
+
+```yaml
+agent: <slug>              # the Instance/Template this config dispatches (templates/ or instances/)
+mode: external             # native | virtual | external (subagent-definitions.md)
+cli: qodercli              # external only: agent CLI binary
+model: auto                # optional per-dispatch overrides
+reasoning_effort: ""
+context_window: ""
+extra_flags: ""            # appended CLI flags
+log_dir: .specify/agents/execution/logs
+```
+
+### Rules
+
+- The config references an existing agent definition; if `<slug>` resolves to neither `templates/` nor `instances/`, stop and report instead of inventing one.
+- External-mode configs MUST honor the Visibility Contract — dispatch through the stream-json + filter pipeline (reference implementation `skills/create-team/scripts/dispatch.sh` with `DISPATCH_LOG_DIR` pointed at `log_dir`); silent `cli -p … > log 2>&1` dispatch is prohibited.
+- Logs are runtime evidence, not deliverables: never commit them, never edit them, and point `log_dir` only inside `execution/logs/`.
 
 ## Agent-Specific Configuration
 

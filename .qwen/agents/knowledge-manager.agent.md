@@ -1,1 +1,1 @@
-../../.specify/agents/knowledge-manager.agent.md
+../../.specify/agents/templates/knowledge-manager.agent.md

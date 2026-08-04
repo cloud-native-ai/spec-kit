@@ -25,7 +25,7 @@ Produce a team from a user **goal** and (unless one-shot) persist it as `.specif
 1. **Establish the goal (first)** — extract the goal from `$ARGUMENTS`/conversation/repo context, ask if missing, and confirm it with the user; write it in a **verifiable** form (success criteria / threshold). If the goal's theme is **optimization**, classify it (one-time vs continuous) and pick a strategy (elimination vs progressive) per `references/optimization-goals.md`.
 2. **Match against team presets (before deriving anything)** — run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<goal text>"` and act on the returned `confidence`: `high` → present the top preset (goal skeleton + roster + pattern) and **recommend reuse**; `medium` → present the top 2 candidates alongside the from-scratch option; `low`/`none` → say no preset matched and continue to step 3. Presets are known-good shapes distilled from teams that actually ran — reusing one is what keeps a vague goal from producing an arbitrary team. Never instantiate a preset silently, and never let it override an explicit user instruction. See `references/team-presets.md`.
 3. **Select the pattern** via the Pattern Selection decision tree below (independent → parallel; sequenced → serial; iterative-quality → iteration; long-lived operation → continuous) — **derived from the goal**. On preset reuse, the preset supplies the pattern; still confirm it fits.
-4. **Build the roster (static structure)** — a Role × Stage × Type matrix. If the user did not supply members, **propose** them from the goal: prefer existing agents under `.specify/agents/`, otherwise temporary stage/worker templates from `templates/`. An **iteration or continuous team MUST include exactly one Team Supervisor** (Meta role). **Judge each member's `type` explicitly by its operating object** — operates on business artifacts/information → `Worker`; operates on other agents/skills/agent-defining configuration → `Meta`. Do **not** derive Type from Stage: an evaluator scoring a business artifact (repo state, rendered output, a document) is a `Worker`, not Meta. The implication runs **one way only**: a member that must **write** team config / agent definitions / skill definitions MUST be `Meta` (necessary); but holding an evaluator / optimizer / "continuous improvement" role does **not** by itself make it Meta (not sufficient) — an agent that iteratively improves a *business artifact* is still a `Worker`. Decide each member's Type from **what it writes to**, never from its role name (see `references/conceptual-model.md` → Type criterion + "Meta and write authority"). Roster rows carry **responsibility** (stage, territory, `blockedBy`, reporting duty); the referenced agent carries **capacity** — never fork a capacity artifact to express a new seat (`references/capacity-vs-responsibility.md`).
+4. **Build the roster (static structure)** — a Role × Stage × Type matrix. If the user did not supply members, **propose** them from the goal: prefer existing agents under `.specify/agents/{templates,instances}/`, otherwise temporary stage/worker templates from `templates/`. An **iteration or continuous team MUST include exactly one Team Supervisor** (Meta role). **Judge each member's `type` explicitly by its operating object** — operates on business artifacts/information → `Worker`; operates on other agents/skills/agent-defining configuration → `Meta`. Do **not** derive Type from Stage: an evaluator scoring a business artifact (repo state, rendered output, a document) is a `Worker`, not Meta. The implication runs **one way only**: a member that must **write** team config / agent definitions / skill definitions MUST be `Meta` (necessary); but holding an evaluator / optimizer / "continuous improvement" role does **not** by itself make it Meta (not sufficient) — an agent that iteratively improves a *business artifact* is still a `Worker`. Decide each member's Type from **what it writes to**, never from its role name (see `references/conceptual-model.md` → Type criterion + "Meta and write authority"). Roster rows carry **responsibility** (stage, territory, `blockedBy`, reporting duty); the referenced agent carries **capacity** — never fork a capacity artifact to express a new seat (`references/capacity-vs-responsibility.md`).
 5. **Build the pattern config (dynamic structure)** — parallelism + territories (parallel), DAG `blockedBy` edges + per-handoff verification + file-path-only handoff (serial), quality dimensions + threshold + max_iterations + regression_limit (iteration), or the operating config — maturity + cadence + budget + constraints + independent verifier + state spine (continuous; see `references/operating-loops.md`).
 6. **Confirm** the proposed **goal** + roster + pattern with the user, then persist the `Team` to `.specify/teams/<slug>/team.md` using the schema below (skip persistence only for an explicit one-shot run). When a preset was reused, record `preset: <preset_id>` in the frontmatter and apply the preset's `## Instantiation` steps (including any `constraints.md` / `STATE.md` bootstrap).
 
@@ -75,7 +75,7 @@ config:
 ```
 
 - `slug` MUST be unique within `.specify/teams/`; it also names the team directory `.specify/teams/<slug>/`.
-- `members` MUST resolve to `.specify/agents/<slug>.agent.md` or a temporary stage/worker template; unresolved members are surfaced as broken references.
+- `members` MUST resolve to `.specify/agents/{templates,instances}/<slug>.agent.md` (instance wins on filename collision) or a temporary stage/worker template; unresolved members are surfaced as broken references.
 - `config` MUST match `pattern`.
 
 ## Execution (run mode)
@@ -220,6 +220,8 @@ Territory: agent-<N>
 
 **Key principle**: Issue all sub-agent calls in ONE response block — sequential dispatch defeats the purpose.
 
+**Dispatch modality**: choose each member's execution mode per `.specify/shared/definitions/subagent-definitions.md` — **native** subagent when the runtime supports it, **virtual** (simulated in-session) when the tool has no subagent capability, **external** CLI process for long-running/parallel/isolated work. External dispatch MUST go through `scripts/dispatch.sh` (stream-json → compact filter → `.live.log`/`.jsonl`/`.status` triplet); silent `cli -p … > log 2>&1` dispatch is prohibited — a buffered log yields zero progress signal and defeats stall detection.
+
 Per-Agent Payload:
 
 | Field | Content |
@@ -247,7 +249,7 @@ Territory validation gives *logical* isolation; worktrees add *physical* isolati
 
 ### Monitoring
 
-Monitor each agent's output manifest at `.specify/teams/.work/<slug>/parallel-result-<agent-id>.md`.
+Monitor each agent's output manifest at `.specify/teams/.work/<slug>/parallel-result-<agent-id>.md`. For externally dispatched members, additionally watch `<label>.live.log` growth (bytes/lines) as the liveness signal — stalled growth counts toward the stall thresholds below.
 
 **Stall Detection:**
 

@@ -72,7 +72,7 @@ When a **new** skill is created, `/speckit.skills` wires it into the built-in ro
 1. Skips non-declarable skills (reference-only/meta: `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `create-team`, `improve-team`).
 2. Analyzes the 7 built-in role agents (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`) against the skill's capability and triggers.
 3. Proposes a `Agent | Skill | When to use` table and waits for confirmation.
-4. On confirm, adds the canonical slug to each matched agent's `skills:` frontmatter and a row to its `## Skill Enablement` table, in both `agents/<slug>.agent.md` and `.specify/agents/<slug>.agent.md`. Generator templates are not modified.
+4. On confirm, adds the canonical slug to each matched agent's `skills:` frontmatter and a row to its `## Skill Enablement` table, in both `agents/<slug>.agent.md` and `.specify/agents/templates/<slug>.agent.md`. Generator templates are not modified.
 
 If no agent is role-relevant, propagation is skipped (no forced use).
 
@@ -100,7 +100,7 @@ If no agent is role-relevant, propagation is skipped (no forced use).
 | Skill definition | `.specify/skills/<name>/SKILL.md` |
 | Skill scripts | `.specify/skills/<name>/scripts/` |
 | Registry update | `.specify/instructions.md` → Skills section |
-| Agent skill enablement (create path) | `agents/<slug>.agent.md` + `.specify/agents/<slug>.agent.md` |
+| Agent skill enablement (create path) | `agents/<slug>.agent.md` + `.specify/agents/templates/<slug>.agent.md` |
 
 ## Prerequisites
 

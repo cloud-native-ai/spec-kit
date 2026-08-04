@@ -1,1 +1,1 @@
-../../.specify/agents/test-engineer.agent.md
+../../.specify/agents/templates/test-engineer.agent.md

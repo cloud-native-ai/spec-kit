@@ -1,10 +1,32 @@
 {
   "store": "feedback",
-  "updated": "2026-08-02T06:52:11Z",
+  "updated": "2026-08-04T03:40:43Z",
   "threshold": 10,
-  "count_since_submission": 5,
-  "submitted_at": "2026-08-01T16:24:40Z",
+  "count_since_submission": 83,
+  "submitted_at": null,
   "entries": [
+    {
+      "id": "20260804T034043Z-speckit-clarify",
+      "file": "20260804T034043Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "036-team-summary-20260804T000000Z",
+      "feature": "036-team-summary",
+      "partial": false,
+      "created": "2026-08-04T03:40:43Z",
+      "summary": "Mode A 运行:目标 .specify/specs/036-team-summary/requirements.md。按 clarify-taxonomy 的 Mode A 分类做覆盖扫描后生成 5 问队列并逐题问答,5 问全部作答(Feature 绑定 / 工作项身份 / 默认启用语义 / 累积上限 / 历史条目降级路径),达到 5 题上限后停止。达成了命令的声明目的:消除了会实质改变下游 "
+    },
+    {
+      "id": "20260804T025150Z-speckit-requirements",
+      "file": "20260804T025150Z-speckit-requirements.md",
+      "unit_id": "/speckit.requirements",
+      "unit_type": "command",
+      "run_id": "036-team-summary-20260804T000000Z",
+      "feature": "036-team-summary",
+      "partial": false,
+      "created": "2026-08-04T02:51:50Z",
+      "summary": "本次运行完整走通了 /speckit.requirements 的声明职责:短名生成 → 编号推算(035→036)→ 脚本单次执行 → 模板加载 → 规格生成 → 质量校验闭环。产出 .specify/specs/036-team-summary/requirements.md(25 条 FR / 10 条 SC + 10 条测量来源 / 5 条 Shared Strings / 5 个用户故事"
+    },
     {
       "id": "20260802T065211Z-speckit-review",
       "file": "20260802T065211Z-speckit-review.md",

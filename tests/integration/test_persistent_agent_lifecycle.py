@@ -3,12 +3,12 @@
 Spec 023 (Agent Framework Redesign) distinguishes two agent lifecycles:
 
 - **temporary** — spawned for a single orchestration; context-only, never written to disk.
-- **persistent** — written under ``.specify/agents/`` and linked into every officially
-  supported tool's agent config directory (e.g. ``.qoder/agents`` → ``.specify/agents``).
+- **persistent** — written under the layered stores ``.specify/agents/templates/`` /
+  ``.specify/agents/instances/`` and linked into every officially supported tool's agent
+  config directory (per-file links, e.g. ``.qoder/agents/<slug>.agent.md``).
 
 This test asserts the persistence + linking behaviour for persistent agents and confirms
-the ``create-agent`` skill documents the temporary (non-persisted) lifecycle. It is expected
-to FAIL until the persisted agents are migrated (T027) and the lifecycle is documented (T029).
+the ``create-agent`` skill documents the temporary (non-persisted) lifecycle.
 """
 
 import pytest
@@ -33,8 +33,8 @@ class TestPersistentAgentLifecycle:
     """Persistent agents live under .specify/agents/ and are linked into supported tools."""
 
     def test_persisted_agents_written_under_specify_agents(self):
-        agents_dir = REPO_ROOT / ".specify" / "agents"
-        assert agents_dir.is_dir(), ".specify/agents/ must exist as the canonical persistent store"
+        agents_dir = REPO_ROOT / ".specify" / "agents" / "templates"
+        assert agents_dir.is_dir(), ".specify/agents/templates/ must exist as the canonical Template store"
         for role in PERSISTED_ROLES:
             agent_file = agents_dir / f"{role}.agent.md"
             assert agent_file.exists(), f"persistent agent missing: {agent_file}"
@@ -46,16 +46,16 @@ class TestPersistentAgentLifecycle:
         deprecated = re.compile(r"subrole|improver|meta-coordinator", re.IGNORECASE)
         offenders = []
         agents_dir = REPO_ROOT / ".specify" / "agents"
-        for md in sorted(agents_dir.glob("*.agent.md")):
+        for md in sorted(agents_dir.glob("*/*.agent.md")):
             for lineno, line in enumerate(md.read_text(encoding="utf-8").splitlines(), 1):
                 if deprecated.search(line):
                     offenders.append(f"{md.name}:{lineno}: {line.strip()}")
         assert not offenders, "persisted agents retain deprecated terms:\n" + "\n".join(offenders)
 
     def test_initialization_creates_tool_agent_link(self, tmp_path):
-        """Each supported tool gets a per-file agents symlink into .specify/agents (FR-012)."""
-        # Simulate a persistent agent being written to the canonical store.
-        specify_agents = tmp_path / ".specify" / "agents"
+        """Each supported tool gets a per-file agents symlink into the layered stores (FR-012)."""
+        # Simulate a persistent agent being written to the canonical Template store.
+        specify_agents = tmp_path / ".specify" / "agents" / "templates"
         specify_agents.mkdir(parents=True, exist_ok=True)
         (specify_agents / "system-designer.agent.md").write_text("persistent", encoding="utf-8")
 
@@ -68,13 +68,13 @@ class TestPersistentAgentLifecycle:
         link = tool_dir / "system-designer.agent.md"
         assert link.is_symlink(), ".qoder/agents/system-designer.agent.md must be a symlink"
         assert link.resolve() == (specify_agents / "system-designer.agent.md").resolve(), (
-            "per-file link must resolve to the canonical .specify/agents file"
+            "per-file link must resolve to the canonical .specify/agents/templates file"
         )
         assert link.read_text(encoding="utf-8") == "persistent"
 
     def test_per_file_links_preserve_tool_authored_overrides(self, tmp_path):
         """A tool's own agent file (non-symlink) is not clobbered by linking."""
-        specify_agents = tmp_path / ".specify" / "agents"
+        specify_agents = tmp_path / ".specify" / "agents" / "templates"
         specify_agents.mkdir(parents=True, exist_ok=True)
         (specify_agents / "system-designer.agent.md").write_text("persistent", encoding="utf-8")
         tool_dir = tmp_path / ".qoder" / "agents"
@@ -93,7 +93,7 @@ class TestPersistentAgentLifecycle:
         specify_agents = tmp_path / ".specify" / "agents"
         specify_agents.mkdir(parents=True, exist_ok=True)
         # A temporary orchestration spawns context-only workers; no files should appear.
-        assert list(specify_agents.glob("*.agent.md")) == [], (
+        assert list(specify_agents.glob("**/*.agent.md")) == [], (
             "temporary agents must not be persisted to .specify/agents/"
         )
 

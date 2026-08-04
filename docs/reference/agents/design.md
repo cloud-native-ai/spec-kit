@@ -44,7 +44,7 @@ Agent 框架用**一个统一的概念模型**消除 Agent 定义上的几类混
 > 它的操作对象天然是 agent 系统。判据详见 `skills/create-team/references/conceptual-model.md`。
 
 > **Meta 与写权限是单向蕴含,不是充要关系**:只有 `Meta` 类型的 Agent 才能修改**团队自身配置**
-> (team.md)、**Agent 定义**(`.specify/agents/*.agent.md`、角色/阶段模板)与 **Skill 定义**
+> (team.md)、**Agent 定义**(`.specify/agents/{templates,instances}/*.agent.md`、角色/阶段模板)与 **Skill 定义**
 > (SKILL.md 及其引用/模板)。因此"需要写这些东西的 Agent ⇒ 必为 Meta"成立(**必要条件**)。
 > 但反向不成立:"拥有评估者 / 优化者 / 持续优化角色 ⇏ 就是 Meta"(**非充分**)。这正是旧耦合
 > 令人误解之处——复杂团队里做持续优化的 Agent 通常确实会改写 prompt / Agent 定义 / Skill 指南,
@@ -87,18 +87,18 @@ Agent 框架用**一个统一的概念模型**消除 Agent 定义上的几类混
 > **所有用户接口**——不仅是前端 / GUI 页面，也包括命令行（CLI）设计，以及 `/command` 与 skill 等
 > 与用户交互的部分。它以需求为输入、并评审既有接口，向 System Designer 与 Module Designer 输出
 > 跨全部用户界面（前端、CLI、命令、技能）的 UX 规范与交互契约。模板
-> `agent-capacity-ux-analyst-template.md` 与持久化 Agent `.specify/agents/ux-analyst.agent.md` 均已提供。
+> `agent-capacity-ux-analyst-template.md` 与持久化 Agent `.specify/agents/templates/ux-analyst.agent.md` 均已提供。
 
 ## 四、Agent 的两种生命周期
 
-> **Class → Instance（类与实例）**：`skills/create-agent/templates/agent-capacity-<X>-template.md` 是一个**抽象的 Agent 类**——带有未填充的 `{{占位符}}`，描述该 Agent **能做什么**（Capacity）。调用 `create-agent` 是**实例化**过程：填充占位符，产出一份**具体的 Agent 定义**写入 `.specify/agents/<slug>.agent.md`。运行时 `/speckit.agents run` 再从该定义**派生出活动实例（object）**——同一定义可派生多个互相独立的实例。三层关系：**能力模板（抽象类）→ 落地定义（具体类）→ 运行实例（对象）**。`create-agent` / `improve-agent` 只作用于前两层，从不触碰运行实例。
+> **Class → Instance（类与实例）**：`skills/create-agent/templates/agent-capacity-<X>-template.md` 是一个**抽象的 Agent 类**——带有未填充的 `{{占位符}}`，描述该 Agent **能做什么**（Capacity）。调用 `create-agent` 是**实例化**过程：填充占位符，产出一份**具体的 Agent 定义**写入所属层目录（Template → `.specify/agents/templates/<slug>.agent.md`，Instance → `.specify/agents/instances/<slug>.agent.md`）。运行时 `/speckit.agents run` 再从该定义**派生出活动实例（object）**——同一定义可派生多个互相独立的实例。三层关系：**能力模板（抽象类）→ 落地定义（具体类）→ 运行实例（对象）**，规范术语为 **Agent Template → Agent Instance → Agent Execution**（分类法真源：`shared/definitions/agent-definitions.md`；Execution 层的三种派发模式见 `shared/definitions/subagent-definitions.md`）。`create-agent` / `improve-agent` 只作用于前两层，从不触碰运行实例。
 
 1. **临时 Agent（temporary）**：仅在当前上下文中记录，随会话结束而消失。
-2. **持久化 Agent（persistent）**：保存到项目的 Agent 目录 `.specify/agents/`，可跨会话复用。
+2. **持久化 Agent（persistent）**：保存到项目的分层 Agent 目录 `.specify/agents/templates/`（角色模板）或 `.specify/agents/instances/`（实例），可跨会话复用。
 
-持久化 Agent 以 `.specify/agents/` 为**唯一真源**，并通过 `specify init`（或安装流程）为各工具建立**逐文件软链接**。
-以 qoder 工具为例，`.qoder/agents/` 是一个**真实目录**，其中每个 `.specify/agents/<slug>.agent.md`
-都对应一条软链接 `.qoder/agents/<slug>.agent.md -> ../../.specify/agents/<slug>.agent.md`；
+持久化 Agent 以 `.specify/agents/templates/` 与 `.specify/agents/instances/` 为**唯一真源**（按层），并通过 `specify init`（或安装流程）为各工具建立**逐文件软链接**。
+以 qoder 工具为例，`.qoder/agents/` 是一个**真实目录**，其中每个 `.specify/agents/{templates,instances}/<slug>.agent.md`
+都对应一条软链接 `.qoder/agents/<slug>.agent.md -> ../../.specify/agents/templates/<slug>.agent.md`；
 `.github/agents`、`.qwen/agents`、`.opencode/agents`、`.hermes/agents`、`.iflow/agents` 同理。
 逐文件（而非整目录）软链接的好处是：工具目录中可以让框架 Agent 与该工具自建的 Agent（例如
 qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节见 [templates-and-agents.md](./templates-and-agents.md)。
@@ -167,5 +167,5 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 本文档以仓库中的**活制品**为规范来源，而非任何单份规格文档：
 
 - **模板目录**：`skills/create-agent/templates/`（单 Agent）与 `skills/create-team/templates/agents/`（多 Agent）。
-- **持久化 Agent**：`.specify/agents/*.agent.md`。
+- **持久化 Agent**：`.specify/agents/{templates,instances}/*.agent.md`。
 - **守卫测试**：`tests/contract/test_agent_skill_enablement.py`（技能赋能约定）、`tests/unit/test_agent_deprecated_terms.py`（术语规范，持续保证 `Stage` / `optimizer` 等命名在所有 live 制品中成立）。

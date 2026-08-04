@@ -5,7 +5,8 @@ Canonical sources fan out to their runtime mirrors in one command:
 
   templates/            -> .specify/templates/
   skills/<name>/        -> .specify/skills/<name>/   (repo skills/ may be empty placeholder)
-  agents/               -> .specify/agents/
+  agents/               -> .specify/agents/templates/  (Agent Template layer; instances/
+                           and execution/ are project-local, never mirrored)
   scripts/              -> .specify/scripts/
   shared/               -> .specify/shared/
   templates/commands/*  -> per-tool copies (delegated to regen-command-copies.py)
@@ -33,7 +34,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 MIRROR_PAIRS = [
     ("templates", ".specify/templates"),
     ("skills", ".specify/skills"),
-    ("agents", ".specify/agents"),
+    ("agents", ".specify/agents/templates"),
     ("scripts", ".specify/scripts"),
     ("shared", ".specify/shared"),
 ]

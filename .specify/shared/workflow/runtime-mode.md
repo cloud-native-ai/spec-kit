@@ -37,7 +37,7 @@ fi
 |---|---|---|
 | `## Feedback` engine persistence (`feedback-utils.py`) | Run per `feedback-step.md` | **Skip the entire Feedback step** (no engine, no store, no prompt) |
 | Registry write to `.specify/instructions.md` (Skills/Agents/Tools tables) | Required | **Skip** — the host application discovers skills by directory scan |
-| Propagation to built-in role agents (`.specify/agents/*.agent.md`) | Per convention (e.g. Skill Enablement) | **Skip** — no role agents exist |
+| Propagation to built-in role agents (`.specify/agents/templates/*.agent.md`) | Per convention (e.g. Skill Enablement) | **Skip** — no role agents exist |
 | Memory engine (`memory-utils.py`, `.specify/memory/session|knowledge/`) | Available | **Unavailable** — state the limitation instead of erroring |
 | Canonical shared docs (`.specify/shared/workflow/*.md`) | Read as source of truth | **Not present** — the block embedded in the skill file governs |
 | Output paths under `.specify/**` (reports, teams, review records, workflow docs) | Default | **Fall back** to the skill's declared alternative (e.g. `docs/`, the host skills directory, or a user-specified path); ask when no alternative is declared |
