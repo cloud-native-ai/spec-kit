@@ -1,0 +1,2 @@
+{"item_id":"TI-0001","title":"stage 1 交付物:需求切片","phase_ref":"PH-0001","state":"completed","provenance":".specify/teams/serial-fixture/runs/20260801T090000Z-report.md","ts":"2026-08-01T09:00:00Z","identity":"explicit","maturity_at_event":"L1"}
+{"item_id":"TI-0002","title":"stage 2 交付物:接口契约","phase_ref":"PH-0002","state":"in-progress","provenance":".specify/teams/serial-fixture/runs/20260802T090000Z-report.md","ts":"2026-08-02T09:00:00Z","identity":"explicit","maturity_at_event":"L1"}

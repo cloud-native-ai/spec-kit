@@ -52,23 +52,35 @@ post_change_commit=[PENDING — Phases 1-2 only; run not yet complete]
 
 phase1_status=complete (T001-T003)
 phase2_status=complete (T004-T013, T102-T103)
-tasks_closed=15
-tasks_open=105
+phase3_status=near-complete (T014-T028, T030-T032 closed; T029 left OPEN — its documented half landed in summary-mapping.md section 9, but the actual non-interactive invocation belongs to the US2 SUMMARIZE step, so it is not closed on partial evidence)
+tasks_closed=33
+tasks_open=87
 regression_failed_count=39
 regression_new_failures=0
-regression_evidence=comm -13 baseline-failed.txt current-failed.txt returned EMPTY; passes rose 1108 -> 1177 (+69, exactly the new contract tests)
-new_contract_tests=69 passing (test_team_item_ledger.py 21, test_summary_writeset.py 23, test_goal_identity.py 25)
+regression_evidence=comm -13 baseline-failed.txt current-failed.txt returned EMPTY after Phase 3 as well; passes rose 1108 -> 1201 (+93, exactly the new tests)
+new_contract_tests=93 passing (test_team_item_ledger.py 21, test_summary_writeset.py 23, test_goal_identity.py 25, test_summary_form_generator.py 15, test_summary_four_patterns.py 9)
+generator=skills/create-team/scripts/build-summary-input.py + mirror; --goal/--team selector, exit 0/2/3, mirror --help verified
+
+# -- SC-001 / SC-002 real-data evidence (T032), all four REAL teams, 2026-08-04 --
+# command per team: build-summary-input.py --team <slug> --out /tmp/... --json
+#   then validate-project-input.py --json, project-db.py --load, project-db.py --check
+sc001_cws_workspace_cluster=gen=0 validate=0 load=0 check=0 status=ready missing_required=0 work_items=2 milestones=3 goal_identity=inferred
+sc001_requirement_implement_monitor=gen=0 validate=0 load=0 check=0 status=ready missing_required=0 work_items=13 milestones=3 goal_identity=inferred
+sc001_draw_plantuml_optimizer=gen=0 validate=0 load=0 check=0 status=ready missing_required=0 work_items=5 milestones=0 goal_identity=inferred
+sc001_summarize_project_optimizer=gen=0 validate=0 load=0 check=0 status=ready missing_required=0 work_items=14 milestones=0 goal_identity=inferred
+sc001_serial_and_parallel=covered by tests/fixtures/teams/{serial,parallel}-fixture via tests/integration/test_summary_four_patterns.py (all four patterns exit 0 end-to-end)
+sc002_manual_form_edits=0 across all four real teams and both fixtures
 mirror_parity=sync-mirrors.py --check exit 0; summary-mapping.md + create-team/SKILL.md + templates/commands/team.md all byte-identical to mirrors; 5 per-tool speckit.team copies regenerated and each carries the goal-directory edit
 
 # -- Success Criteria evaluation --
 
-SC-001_status=unknown
-SC-001_value=[PENDING]
-SC-001_note=Four patterns each produce a summary from tracked artifacts alone; requires T032 (US1) + serial/parallel fixtures (T030)
+SC-001_status=pass
+SC-001_value=4/4 real teams and 4/4 patterns: generator+validate+load+check all exit 0; status=ready; missing_required=0 (baseline was 0/4 able to produce a summary)
+SC-001_note=continuous+iteration from real teams, serial+parallel from fixtures (no real team of those patterns exists); proven by T032 evidence rows above plus test_summary_four_patterns.py
 
-SC-002_status=partial
-SC-002_value=Phase 0 proof: validate-project-input.py returned status=ready, missing_required=[] on a hand-built form derived solely from cws-workspace-cluster tracked artifacts
-SC-002_note=R-tier satisfiability proven feasible by execution; full criterion needs the generator (T020-T029) producing the form automatically
+SC-002_status=pass
+SC-002_value=R-tier missing_required=0 on all four real teams with zero manual form editing; forms produced automatically by build-summary-input.py
+SC-002_note=Upgraded from the Phase 0 hand-built proof to the automated generator path
 
 SC-003_status=unknown
 SC-003_value=[PENDING]

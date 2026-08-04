@@ -1,0 +1,602 @@
+#!/usr/bin/env python3
+"""build-summary-input.py — derive a summarize-project input form from team artifacts.
+
+Contract: `.specify/specs/036-team-summary/contracts/team-project-form.contract.md`
+Mapping single source of truth: `../references/summary-mapping.md`
+
+The invoked skill (`summarize-project`) only accepts a user-authored form and blocks
+with exit 3 when its R-tier fields are missing. This script plays the form author so
+that a team never has to: it folds every tracked artifact of every team sharing a goal
+into one form, deterministically, with no model in the loop.
+
+Indexing is dual:
+  * `.specify/teams/<team-slug>/`        team index — run info (read-only here)
+  * `.specify/project/goal/<goal-slug>/` goal index — the sole complete summary
+
+Exit codes: 0 form written | 2 input error | 3 no execution material (declined).
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import sys
+from pathlib import Path
+from typing import Any
+
+try:
+    import yaml
+except ImportError:  # pragma: no cover - environment guard
+    print("PyYAML is required", file=sys.stderr)
+    raise SystemExit(2)
+
+EXIT_OK, EXIT_INPUT_ERROR, EXIT_NO_MATERIAL = 0, 2, 3
+
+# FG-10 / §6.2 — the DDL identifier grammar, enforced upstream by entity_ids
+DDL_IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.\-]*$")
+
+# WS-6 — provenance that is not tracked in version control
+INADMISSIBLE_PREFIXES = (
+    ".specify/teams/.work/",
+    ".specify/agents/execution/logs/",
+)
+# WS-7 — tracked execution-layer paths are admissible despite the layer
+ADMISSIBLE_EXECUTION_PREFIXES = (
+    ".specify/agents/execution/configs/",
+    ".specify/agents/execution/scripts/",
+)
+
+LEDGER_STATES = {"completed", "in-progress", "delayed", "not-started", "unknown"}
+
+# Source literal → the four-state palette the invoked skill normalizes on
+STATE_TO_SOURCE_LITERAL = {
+    "completed": "已完成",
+    "in-progress": "进行中",
+    "delayed": "延期",
+    "not-started": "未开始",
+    "unknown": "",  # empty → the engine records `unknown`, never 0%
+}
+
+# §3 — per-pattern phase unit label
+PHASE_UNIT = {
+    "continuous": "cycle",
+    "iteration": "generation",
+    "serial": "stage",
+    "parallel": "batch",
+}
+
+# FR-029 / FG-9 — completed and archived items stay in the data layer but are
+# aggregated in presentation once a phase exceeds this many of them.
+AGGREGATE_COMPLETED_ABOVE = 3
+
+
+# --------------------------------------------------------------------------
+# Small helpers
+# --------------------------------------------------------------------------
+
+
+def fail(message: str, code: int) -> None:
+    print(message, file=sys.stderr)
+    raise SystemExit(code)
+
+
+def split_frontmatter(text: str) -> dict[str, Any]:
+    if not text.startswith("---"):
+        return {}
+    parts = text.split("\n---", 1)
+    if len(parts) < 2:
+        return {}
+    raw = parts[0][3:]
+    try:
+        loaded = yaml.safe_load(raw)
+    except yaml.YAMLError:
+        return {}
+    return loaded if isinstance(loaded, dict) else {}
+
+
+def is_admissible_provenance(path: str) -> bool:
+    """WS-5 / WS-6 / WS-7."""
+    if not path:
+        return False
+    if path.startswith(ADMISSIBLE_EXECUTION_PREFIXES):
+        return True
+    if path.startswith(INADMISSIBLE_PREFIXES):
+        return False
+    if path.startswith(("/", "~", "../")):
+        return False
+    return True
+
+
+def inferred_item_id(title: str, phase_ref: str) -> str:
+    """FR-027 — derived identity must be hashed; a CJK title is not a legal id."""
+    digest = hashlib.sha256(f"{title}\x00{phase_ref}".encode()).hexdigest()[:8]
+    return f"TIX-{digest}"
+
+
+def namespaced(team_slug: str, identifier: str) -> str:
+    """FG-15 — `entity_ids` is global, so per-team ids must carry the team."""
+    return f"{team_slug}.{identifier}"
+
+
+# --------------------------------------------------------------------------
+# Team discovery and goal identity
+# --------------------------------------------------------------------------
+
+
+class Team:
+    def __init__(self, directory: Path, frontmatter: dict[str, Any]) -> None:
+        self.dir = directory
+        self.fm = frontmatter
+        self.slug: str = str(frontmatter.get("slug") or directory.name)
+        self.name: str = str(frontmatter.get("name") or self.slug)
+        self.pattern: str = str(frontmatter.get("pattern") or "continuous")
+        self.description: str = str(frontmatter.get("description") or "")
+        self.goal_text: str = " ".join(str(frontmatter.get("goal") or "").split())
+
+    @property
+    def goal_identity(self) -> tuple[str, str]:
+        """FG-13 — explicit `goal_slug` wins, else the team slug marked inferred."""
+        declared = self.fm.get("goal_slug")
+        if declared:
+            return str(declared), "explicit"
+        return self.slug, "inferred"
+
+    @property
+    def ledger(self) -> Path:
+        return self.dir / "items.jsonl"
+
+    @property
+    def run_reports(self) -> list[Path]:
+        return sorted((self.dir / "runs").glob("*-report.md"))
+
+    def has_material(self) -> bool:
+        return self.ledger.is_file() or bool(self.run_reports)
+
+
+def discover_teams(teams_root: Path) -> list[Team]:
+    teams: list[Team] = []
+    for team_md in sorted(teams_root.glob("*/team.md")):
+        if team_md.parent.name.startswith("."):
+            continue
+        fm = split_frontmatter(team_md.read_text(encoding="utf-8"))
+        teams.append(Team(team_md.parent, fm))
+    return teams
+
+
+def resolve_goal(teams: list[Team], *, goal: str | None, team_slug: str | None) -> tuple[str, str, list[Team]]:
+    """Return (goal_slug, identity_kind, contributing_teams) — FG-13 / FG-14."""
+    if team_slug:
+        match = [t for t in teams if t.slug == team_slug]
+        if not match:
+            fail(f"unknown team slug: {team_slug}", EXIT_INPUT_ERROR)
+        goal_slug, kind = match[0].goal_identity
+    else:
+        goal_slug, kind = str(goal), "explicit"
+        if not any(t.goal_identity[0] == goal_slug for t in teams):
+            fail(f"no team resolves to goal: {goal_slug}", EXIT_INPUT_ERROR)
+
+    if not DDL_IDENTIFIER.match(goal_slug) or goal_slug in {".", ".."} or "/" in goal_slug:
+        fail(f"goal identity {goal_slug!r} is not a legal identifier/path segment", EXIT_INPUT_ERROR)
+
+    members = sorted(
+        (t for t in teams if t.goal_identity[0] == goal_slug), key=lambda t: t.slug
+    )
+    # A team never summarizes in isolation; the kind reported is the triggering
+    # team's, but an explicit declaration anywhere makes the goal explicit.
+    if any(t.goal_identity[1] == "explicit" for t in members):
+        kind = "explicit"
+    return goal_slug, kind, members
+
+
+# --------------------------------------------------------------------------
+# Ledger fold and run-report backfill
+# --------------------------------------------------------------------------
+
+
+def fold_ledger(team: Team, gaps: list[str]) -> list[dict[str, Any]]:
+    """IL-2 — last event per item_id wins. Returns rows in id order."""
+    if not team.ledger.is_file():
+        return []
+    events: list[dict[str, Any]] = []
+    for lineno, line in enumerate(team.ledger.read_text(encoding="utf-8").splitlines(), 1):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            gaps.append(f"{team.slug}: unparseable ledger line {lineno} skipped")
+            continue
+        if not isinstance(row, dict) or "item_id" not in row:
+            gaps.append(f"{team.slug}: ledger line {lineno} lacks item_id, skipped")
+            continue
+        events.append(row)
+
+    folded: dict[str, dict[str, Any]] = {}
+    superseded: set[str] = set()
+    for row in sorted(events, key=lambda r: str(r.get("ts") or "")):
+        folded[str(row["item_id"])] = row
+        if row.get("supersedes"):
+            superseded.add(str(row["supersedes"]))
+    # §6.3 step 3 — an item that crossed identity forms collapses to one record
+    for stale in superseded:
+        folded.pop(stale, None)
+    return [folded[k] for k in sorted(folded)]
+
+
+REPORT_OUTCOME = re.compile(r"^- \*\*Outcome\*\*:\s*(.+?)\s*$", re.M)
+REPORT_FINISHED = re.compile(r"\*\*Finished\*\*:\s*(\d{4}-\d{2}-\d{2})")
+REPORT_STARTED = re.compile(r"\*\*Started\*\*:\s*(\d{4}-\d{2}-\d{2})")
+# Continuous teams write a "Cycle Report" carrying `**UTC**:` instead of the
+# Report contract's Started/Finished pair — both shapes exist in practice.
+REPORT_UTC = re.compile(r"\*\*UTC\*\*:\s*(\d{4}-\d{2}-\d{2})")
+# The `runs/<UTC-timestamp>-report.md` filename convention is mandated for every
+# run, so it is the most reliable deterministic date source of all.
+REPORT_FILENAME_STAMP = re.compile(r"^(\d{4})(\d{2})(\d{2})T\d{6}Z-report\.md$")
+DELIVERABLE_ROW = re.compile(r"^\|\s*(?!Artifact)([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$", re.M)
+
+
+def report_date(report: Path, text: str) -> str:
+    """Extract a run date, tolerating every report shape actually in use."""
+    for pattern in (REPORT_FINISHED, REPORT_STARTED, REPORT_UTC):
+        match = pattern.search(text)
+        if match:
+            return match.group(1)
+    stamp = REPORT_FILENAME_STAMP.match(report.name)
+    if stamp:
+        return f"{stamp.group(1)}-{stamp.group(2)}-{stamp.group(3)}"
+    return ""
+
+
+def backfill_from_reports(team: Team, gaps: list[str]) -> list[dict[str, Any]]:
+    """FR-025 / FG-3 — targeted extraction of the fixed Report contract sections.
+
+    Only used for history that predates the ledger. Identities are inferred and
+    marked as such; nothing here is presented as precise.
+    """
+    rows: list[dict[str, Any]] = []
+    for index, report in enumerate(team.run_reports, 1):
+        text = report.read_text(encoding="utf-8")
+        rel = f".specify/teams/{team.slug}/runs/{report.name}"
+        outcome_match = REPORT_OUTCOME.search(text)
+        outcome = outcome_match.group(1) if outcome_match else ""
+        stamp = report_date(report, text)
+        phase_ref = f"PH-{index:04d}"
+        state = "completed" if outcome.strip().strip("*") in {"completed", "converged"} else "unknown"
+
+        if not outcome_match:
+            gaps.append(
+                f"{team.slug}: {report.name} does not follow the documented Report contract "
+                f"(no **Outcome** field); item state recorded as unknown rather than guessed"
+            )
+
+        deliverables = [
+            m.group(1).strip()
+            for m in DELIVERABLE_ROW.finditer(text.split("## Deliverables", 1)[-1].split("##", 2)[0])
+            if m.group(1).strip() and "---" not in m.group(1)
+        ] if "## Deliverables" in text else []
+
+        if not deliverables:
+            gaps.append(f"{team.slug}: {report.name} declares no deliverables; run recorded as one item")
+            deliverables = [f"run {report.name.split('-')[0]}"]
+
+        for title in deliverables:
+            rows.append(
+                {
+                    "item_id": inferred_item_id(title, phase_ref),
+                    "title": title,
+                    "phase_ref": phase_ref,
+                    "state": state,
+                    "provenance": rel,
+                    "ts": stamp,
+                    "identity": "inferred",
+                }
+            )
+    return rows
+
+
+# --------------------------------------------------------------------------
+# Goal-level entity assembly
+# --------------------------------------------------------------------------
+
+CRITERIA_SPLIT = re.compile(r"[;；]|(?<=[。.])\s*")
+
+
+def extract_milestones(goal_text: str) -> list[str]:
+    """FR-003 — the goal's verifiable success criteria become milestones."""
+    if not goal_text:
+        return []
+    tail = goal_text
+    for marker in ("成功标准", "成功判据", "Success criteria", "success criteria"):
+        if marker in tail:
+            tail = tail.split(marker, 1)[1].lstrip(":： ")
+            break
+    else:
+        return []
+    criteria = [c.strip(" 。.;；") for c in CRITERIA_SPLIT.split(tail)]
+    return [c for c in criteria if len(c) >= 4][:12]
+
+
+def resolve_person_name(repo_root: Path, agent_ref: str) -> str | None:
+    """FR-004 — instance definition wins over template."""
+    for sub in ("instances", "templates"):
+        candidate = repo_root / ".specify/agents" / sub / f"{agent_ref}.agent.md"
+        if candidate.is_file():
+            name = split_frontmatter(candidate.read_text(encoding="utf-8")).get("name")
+            if name:
+                return str(name)
+    return None
+
+
+def build_form(repo_root: Path, goal_slug: str, kind: str, teams: list[Team],
+               baseline: str | None) -> tuple[dict[str, Any], list[str], dict[str, Any]]:
+    gaps: list[str] = []
+    inferred_fields: list[dict[str, str]] = []
+
+    per_team_items: dict[str, list[dict[str, Any]]] = {}
+    for team in teams:
+        rows = fold_ledger(team, gaps)
+        if not rows:
+            rows = backfill_from_reports(team, gaps)
+            if rows:
+                gaps.append(
+                    f"{team.slug}: no item ledger; history backfilled from runs/ with inferred identities"
+                )
+        per_team_items[team.slug] = rows
+
+    if not any(per_team_items.values()):
+        return {}, gaps, {"declined": True}
+
+    if kind == "inferred":
+        inferred_fields.append(
+            {
+                "field": "project.project_name",
+                "inferred_from": "团队未声明 goal_slug,以 team slug 回填 goal 身份(FR-034)",
+            }
+        )
+
+    # baseline: latest event timestamp across the goal (FG-6, never the clock)
+    stamps = sorted(
+        str(r.get("ts") or "")[:10]
+        for rows in per_team_items.values()
+        for r in rows
+        if r.get("ts")
+    )
+    baseline_date = baseline or (stamps[-1] if stamps else "")
+    if not baseline_date:
+        gaps.append("no ledger/report timestamp available for the baseline date")
+
+    phases: list[dict[str, Any]] = []
+    work_items: list[dict[str, Any]] = []
+    people: list[dict[str, Any]] = []
+    sources: list[dict[str, Any]] = []
+    seen_people: set[str] = set()
+    completed_per_phase: dict[str, int] = {}
+    order = 0
+
+    for team in teams:
+        rows = per_team_items[team.slug]
+        unit = PHASE_UNIT.get(team.pattern, "phase")
+
+        # phases — FG-16, namespaced so different patterns never share a sequence
+        for phase_ref in sorted({str(r.get("phase_ref") or "PH-0001") for r in rows}):
+            order += 1
+            phases.append(
+                {
+                    "phase_id": namespaced(team.slug, phase_ref),
+                    "phase_name": f"{team.slug} · {unit} {phase_ref.split('-')[-1].lstrip('0') or '1'}",
+                    "phase_order": order,
+                }
+            )
+
+        # people — union across teams, deduped on agent slug
+        for member in team.fm.get("members") or []:
+            if not isinstance(member, dict):
+                continue
+            agent_ref = str(member.get("agent") or "").strip()
+            if not agent_ref or agent_ref in seen_people:
+                continue
+            seen_people.add(agent_ref)
+            resolved = resolve_person_name(repo_root, agent_ref)
+            if resolved is None:
+                gaps.append(f"{team.slug}: agent definition {agent_ref} unresolved; owner recorded as 未记录")
+                inferred_fields.append(
+                    {"field": f"people[{agent_ref}].owner_name",
+                     "inferred_from": "名册引用的 agent 定义未找到,按 FR-004 记为未记录"}
+                )
+            people.append(
+                {
+                    "owner_id": agent_ref,
+                    "owner_name": resolved or "未记录",
+                    "owner_role": str(member.get("role") or "未记录"),
+                }
+            )
+
+        # work items — FG-15 prefixing carries attribution (FG-17)
+        for row in rows:
+            provenance = str(row.get("provenance") or "")
+            if not is_admissible_provenance(provenance):
+                gaps.append(
+                    f"{team.slug}: item {row.get('item_id')} provenance is untracked "
+                    f"({provenance}); item degraded to unknown without a source"
+                )
+                continue
+            state = str(row.get("state") or "unknown")
+            if state not in LEDGER_STATES:
+                gaps.append(f"{team.slug}: item {row.get('item_id')} state {state!r} unrecognized → unknown")
+                state = "unknown"
+            phase_id = namespaced(team.slug, str(row.get("phase_ref") or "PH-0001"))
+            if state == "completed":
+                completed_per_phase[phase_id] = completed_per_phase.get(phase_id, 0) + 1
+            entry: dict[str, Any] = {
+                "item_id": namespaced(team.slug, str(row["item_id"])),
+                "item_name": str(row.get("title") or row["item_id"]),
+                "phase_id": phase_id,
+                "status": STATE_TO_SOURCE_LITERAL.get(state, ""),
+                "source": provenance,
+            }
+            if row.get("identity") == "inferred":
+                inferred_fields.append(
+                    {"field": f"work_items[{entry['item_id']}].item_id",
+                     "inferred_from": "台账发放显式 ID 之前的历史条目,身份由标题+阶段派生(FR-027)"}
+                )
+            if row.get("excluded_reason"):
+                entry["progress_source"] = f"excluded: {row['excluded_reason']}"
+            work_items.append(entry)
+
+        sources.append(
+            {
+                "source_id": f"S-{len(sources) + 1:04d}",
+                "source_kind": "user-form",
+                "source_ref": f".specify/teams/{team.slug}/",
+                "covers": ["work_items", "phases", "people"],
+            }
+        )
+
+    # milestones — goal level, emitted once (FR-032)
+    goal_text = next((t.goal_text for t in teams if t.goal_text), "")
+    criteria = extract_milestones(goal_text)
+    anchor = work_items[0]["item_id"] if work_items else None
+    milestones = [
+        {
+            "milestone_id": f"MS-{i:04d}",
+            "milestone_name": text[:60],
+            **({"anchor_item_id": anchor} if anchor else {}),
+            "source": f".specify/teams/{teams[0].slug}/team.md",
+        }
+        for i, text in enumerate(criteria, 1)
+    ]
+    if not milestones:
+        gaps.append("goal 正文未声明可验证成功判据,里程碑组为空(依赖 work_items 满足 R 档组级约束)")
+
+    distinct_goal_texts = {t.goal_text for t in teams if t.goal_text}
+    if len(distinct_goal_texts) > 1:
+        gaps.append(
+            "同一 goal_slug 下各团队的 goal 正文不一致,以显式声明为准(GI-4);差异记入元信息供人裁决"
+        )
+
+    # coverage — FG-8, always emitted
+    truncated = sum(c for c in completed_per_phase.values() if c > AGGREGATE_COMPLETED_ABOVE)
+    excluded = sum(1 for w in work_items if str(w.get("progress_source", "")).startswith("excluded:"))
+    form: dict[str, Any] = {
+        "schema": "project-input/v1",
+        "project": {
+            "project_name": goal_slug,
+            "project_desc": (goal_text[:180] if goal_text else ""),
+            "baseline_date": baseline_date,
+            "repos": [],  # FG-5 — repository derivation stays opt-in and unused
+        },
+        "phases": phases,
+        "work_items": work_items,
+        "milestones": milestones,
+        "people": people,
+        "features": [],
+        "sources": sources,
+        "coverage": {
+            "candidate_total": sum(len(v) for v in per_team_items.values()),
+            "excluded": excluded,
+            "granularity_truncated": truncated,
+            "unattributed": 0,
+            "source_label": "团队条目台账 items.jsonl",
+        },
+    }
+    meta = {
+        "goal_slug": goal_slug,
+        "goal_identity": kind,
+        "contributing_teams": [t.slug for t in teams],
+        "inferred_fields": inferred_fields,
+        "material_gaps": gaps,
+        "declined": False,
+    }
+    return form, gaps, meta
+
+
+# --------------------------------------------------------------------------
+# CLI
+# --------------------------------------------------------------------------
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Derive a summarize-project input form from team artifacts."
+    )
+    selector = parser.add_mutually_exclusive_group(required=True)
+    selector.add_argument("--goal", help="aggregate every team declaring this goal_slug")
+    selector.add_argument("--team", help="resolve this team's goal, then aggregate that goal")
+    parser.add_argument("--out", help="form destination (default: <delivery_dir>/data/project-input.yaml)")
+    parser.add_argument("--baseline", help="baseline date (default: latest ledger/report timestamp)")
+    parser.add_argument("--repo-root", default=".", help="repository root (default: cwd)")
+    parser.add_argument("--json", action="store_true", help="emit a machine-readable generation report")
+    args = parser.parse_args(argv)
+
+    repo_root = Path(args.repo_root).resolve()
+    teams_root = repo_root / ".specify/teams"
+    if not teams_root.is_dir():
+        fail(f"no teams directory at {teams_root}", EXIT_INPUT_ERROR)
+
+    teams = discover_teams(teams_root)
+    if not teams:
+        fail("no persisted teams found", EXIT_INPUT_ERROR)
+
+    goal_slug, kind, members = resolve_goal(teams, goal=args.goal, team_slug=args.team)
+    if not any(t.has_material() for t in members):
+        report = {
+            "status": "declined(no-material)",
+            "goal_slug": goal_slug,
+            "goal_identity": kind,
+            "contributing_teams": [t.slug for t in members],
+            "reason": "该 goal 下所有团队既无条目台账也无运行报告,拒绝出总结",
+        }
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return EXIT_NO_MATERIAL
+
+    form, gaps, meta = build_form(repo_root, goal_slug, kind, members, args.baseline)
+    if meta.get("declined"):
+        print(
+            json.dumps(
+                {
+                    "status": "declined(no-material)",
+                    "goal_slug": goal_slug,
+                    "material_gaps": gaps,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return EXIT_NO_MATERIAL
+
+    delivery_dir = repo_root / ".specify/project/goal" / goal_slug
+    out_path = Path(args.out) if args.out else delivery_dir / "data/project-input.yaml"
+    if not out_path.is_absolute():
+        out_path = repo_root / out_path
+    out_path.parent.mkdir(parents=True, exist_ok=True)  # FG-11 — only here
+
+    rendered = yaml.safe_dump(
+        form, allow_unicode=True, sort_keys=False, default_flow_style=False, width=100
+    )
+    out_path.write_text(rendered, encoding="utf-8")
+
+    report = {
+        "status": "produced",
+        "form": str(out_path.relative_to(repo_root)) if out_path.is_relative_to(repo_root) else str(out_path),
+        "delivery_dir": str(delivery_dir.relative_to(repo_root)),
+        **meta,
+        "entity_counts": {
+            k: len(form[k])
+            for k in ("phases", "work_items", "milestones", "people", "features", "sources")
+        },
+    }
+    if args.json:
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+    else:
+        print(f"form written: {report['form']}")
+        print(f"goal: {goal_slug} ({kind}) ← teams: {', '.join(meta['contributing_teams'])}")
+        for gap in gaps:
+            print(f"  gap: {gap}")
+    return EXIT_OK
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
