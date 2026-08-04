@@ -39,6 +39,7 @@ name: <display name>
 slug: <kebab-slug>
 description: <one-line label>
 goal: <overall final objective + success criteria / threshold>
+goal_slug: <kebab-slug>        # optional — the GOAL's identity; distinct from `slug` (the team's identity). See Summary Refresh below
 pattern: parallel | serial | iteration | continuous
 preset: <preset_id>            # optional — set when instantiated from a team preset
 created: YYYY-MM-DD
@@ -55,6 +56,11 @@ config:
   # (coordinated multi-target optimization — list of target paths + the layering
   # principle stating which kind of content belongs to which target; see
   # references/optimization-goals.md)
+  summary:                     # optional — omit the block entirely and summary is still ENABLED (opt-out)
+    enabled: true
+    every: 5                   # refresh once per N phase boundaries; continuous default 5, bounded patterns 1
+    delivery_dir: .specify/project/goal/<goal-slug>/   # derived from goal_slug, never from the team slug
+    interactive: false         # team-triggered refresh is automated → invoke the skill non-interactively
 ---
 
 ## Goal
@@ -75,6 +81,8 @@ config:
 ```
 
 - `slug` MUST be unique within `.specify/teams/`; it also names the team directory `.specify/teams/<slug>/`.
+- `goal_slug` identifies the **goal**, not the team — it is deliberately a different axis from `slug` (the team slug). Two teams that declare the same `goal_slug` are pursuing one goal and share one summary; a team that omits it falls back to its own `slug` as an *inferred* goal identity. It MUST NOT be derived from the goal prose, so rewriting the goal text never relocates the summary. See [`references/summary-mapping.md`](references/summary-mapping.md).
+- `config.summary` tunes the periodic summary refresh (enable/disable, cadence, delivery directory, interactivity). Omitting the block leaves the summary **enabled** with the pattern's default cadence — `continuous` defaults to every 5th cycle, never every cycle.
 - `members` MUST resolve to `.specify/agents/{templates,instances}/<slug>.agent.md` (instance wins on filename collision) or a temporary stage/worker template; unresolved members are surfaced as broken references.
 - `config` MUST match `pattern`.
 
@@ -102,7 +110,7 @@ Every team run produces files in **four distinct classes**. Keep them strictly s
 
 Rules:
 
-- The team directory `.specify/teams/<slug>/` holds **only** `team.md` and `runs/` — no intermediate files, no deliverables.
+- The team directory `.specify/teams/<slug>/` holds **only** the team's own tracked run information — `team.md`, `runs/`, the append-only item ledger `items.jsonl`, and (continuous only) `constraints.md` / `STATE.md` / `run-log.jsonl`. No intermediate files, no deliverables, and **no summary artifacts**: the summary is a derived product that belongs to the *goal* index at `.specify/project/goal/<goal-slug>/` (see [`references/summary-mapping.md`](references/summary-mapping.md)).
 - **Only final deliverables** count as standard output and escape to real target paths. Intermediate handoff files between serial stages are run intermediates → `.specify/teams/.work/<slug>/` (file-path-only handoff still works: downstream stages read from the workspace).
 - The run workspace is created on demand by the orchestrator at run time; it is transient and safe to delete. Do not rely on it across runs — durable knowledge belongs in the tracked report.
 - Token efficiency (see `.specify/shared/guidelines/token-efficiency.md`): agent prompts and stage handoffs carry digests/paths, never whole machine-managed data files; deterministic checks (counting, diff, pattern match) run as program steps, not LLM judgments — validate this when persisting a team.
@@ -641,7 +649,7 @@ In iteration/continuous loops, every dispatched sub-agent (optimizer, executor/r
 - **File-path-only handoff** — never paste content between agents
 - **Context isolation** — each agent invocation is a fresh subagent; the continuous **verifier MUST be a separate sub-agent** from the implementer
 - **Idempotent execution** — stages/iterations/cycles can be re-run safely
-- **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory. Continuous teams additionally keep tracked `constraints.md` / `STATE.md` / `run-log.jsonl` in the team directory
+- **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory. Every team additionally keeps the tracked item ledger `items.jsonl`, and continuous teams also keep tracked `constraints.md` / `STATE.md` / `run-log.jsonl`, in the team directory. The summary delivery directory is **not** in the team directory — it belongs to the goal index `.specify/project/goal/<goal-slug>/`
 - **Every run writes a dated report** to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` per the Report contract
 
 ---

@@ -1,10 +1,65 @@
 {
   "store": "feedback",
-  "updated": "2026-08-04T03:40:43Z",
+  "updated": "2026-08-04T12:16:55Z",
   "threshold": 10,
-  "count_since_submission": 83,
+  "count_since_submission": 88,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260804T121655Z-speckit-implement",
+      "file": "20260804T121655Z-speckit-implement.md",
+      "unit_id": "/speckit.implement",
+      "unit_type": "command",
+      "run_id": "036-team-summary-implement-20260804T200000Z",
+      "feature": "036-team-summary",
+      "partial": false,
+      "created": "2026-08-04T12:16:55Z",
+      "summary": "执行 036-team-summary 的 Phase 1(Setup)与 Phase 2(Foundational),15/120 任务闭环、105 项待办;两相内零开放任务。达成命令声明目的:按拓扑序、测试先行、逐任务证据闭环推进,并以基线名单证明零回归。"
+    },
+    {
+      "id": "20260804T120253Z-speckit-analyze",
+      "file": "20260804T120253Z-speckit-analyze.md",
+      "unit_id": "/speckit.analyze",
+      "unit_type": "command",
+      "run_id": "036-team-summary-analyze-20260804T195000Z",
+      "feature": "036-team-summary",
+      "partial": false,
+      "created": "2026-08-04T12:02:53Z",
+      "summary": "对 036-team-summary 做实现前的跨工件一致性分析(requirements 36 FR / 15 SC / 6 US、plan、tasks 120 任务 / 9 相、4 份契约、research、data-model、quickstart、feature-ref、feature 记忆)。达成命令声明目的:找出 9 条发现(0 CRITICAL / 1 HIGH / 7 MEDIUM"
+    },
+    {
+      "id": "20260804T113853Z-speckit-tasks",
+      "file": "20260804T113853Z-speckit-tasks.md",
+      "unit_id": "/speckit.tasks",
+      "unit_type": "command",
+      "run_id": "036-team-summary-revision-20260804T190000Z",
+      "feature": "036-team-summary",
+      "partial": false,
+      "created": "2026-08-04T11:38:53Z",
+      "summary": "处理一次范围修订(用户在 plan.md 与 tasks.md 均已存在后要求双索引输出:.specify/teams 以 team 为索引、.specify/project/goal/<goal-slug> 以 goal 为索引)。按 clarify 文档中的 Scope Revision Protocol 执行:先用 AskUserQuestion 就三处实质歧义定案(1 goal:N tea"
+    },
+    {
+      "id": "20260804T103951Z-speckit-tasks",
+      "file": "20260804T103951Z-speckit-tasks.md",
+      "unit_id": "/speckit.tasks",
+      "unit_type": "command",
+      "run_id": "036-team-summary-tasks-20260804T183500Z",
+      "feature": "036-team-summary",
+      "partial": false,
+      "created": "2026-08-04T10:39:51Z",
+      "summary": "从 036-team-summary 的六份设计工件生成 tasks.md:101 个任务,按 5 个用户故事分 8 相(Setup 3 / Foundational 10 / US1 19 / US2 17 / US3 10 / US4 13 / US5 14 / Polish 15),36 个 [P] 可并行,99 处 blockedBy 依赖,7 条 DoD + 6 条 GATE。测试模式按"
+    },
+    {
+      "id": "20260804T103009Z-speckit-plan",
+      "file": "20260804T103009Z-speckit-plan.md",
+      "unit_id": "/speckit.plan",
+      "unit_type": "command",
+      "run_id": "036-team-summary-plan-20260804T180000Z",
+      "feature": "036-team-summary",
+      "partial": false,
+      "created": "2026-08-04T10:30:09Z",
+      "summary": "填充 .specify/specs/036-team-summary/plan.md 并产出 Phase 1 全套工件(research.md、data-model.md、4 份契约、quickstart.md、feature-ref.md)。达成命令声明目的:需求映射到技术决策且每条决策有落盘理由。两处偏离默认流程且均属正确判断——(1) 跳过 Outline 步骤 1 的 create-new"
+    },
     {
       "id": "20260804T034043Z-speckit-clarify",
       "file": "20260804T034043Z-speckit-clarify.md",

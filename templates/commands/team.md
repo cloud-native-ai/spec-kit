@@ -92,7 +92,7 @@ The **run** mode MUST follow this sequence and MUST NOT execute before confirmat
    - On decline → stop without executing; optionally suggest `modify`.
 6. **Report** — after execution finishes, write a dated run report to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (goal, execution time, result summary, full process detail). Mandatory for every run.
 
-**Output discipline** (see `skills/create-team/SKILL.md` → Run Workspace, Reports & Output Discipline): all run **intermediates** stay in the git-ignored workspace `.specify/teams/.work/<slug>/`; **deliverables** (standard output) go only to their declared target paths; the team directory `.specify/teams/<slug>/` holds **only** `team.md` + `runs/`.
+**Output discipline** (see `skills/create-team/SKILL.md` → Run Workspace, Reports & Output Discipline): all run **intermediates** stay in the git-ignored workspace `.specify/teams/.work/<slug>/`; **deliverables** (standard output) go only to their declared target paths; the team directory `.specify/teams/<slug>/` holds **only** the team's tracked run information (`team.md`, `runs/`, `items.jsonl`, plus `constraints.md` / `STATE.md` / `run-log.jsonl` for continuous teams). The periodic **summary** is a derived product indexed by *goal*, not by team: it lands in `.specify/project/goal/<goal-slug>/` and never in the team directory.
 
 ### Persistence
 
