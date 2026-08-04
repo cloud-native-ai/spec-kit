@@ -53,12 +53,14 @@ post_change_commit=[PENDING — Phases 1-2 only; run not yet complete]
 phase1_status=complete (T001-T003)
 phase2_status=complete (T004-T013, T102-T103)
 phase3_status=near-complete (T014-T028, T030-T032 closed; T029 left OPEN — its documented half landed in summary-mapping.md section 9, but the actual non-interactive invocation belongs to the US2 SUMMARIZE step, so it is not closed on partial evidence)
-tasks_closed=33
-tasks_open=87
+phase4_status=near-complete (T029, T033-T048 closed; T049 left OPEN — it requires a live `/speckit.team run` on a continuous team, which is user-gated by the preview→confirm gate by design)
+tasks_closed=50
+tasks_open=70
 regression_failed_count=39
 regression_new_failures=0
-regression_evidence=comm -13 baseline-failed.txt current-failed.txt returned EMPTY after Phase 3 as well; passes rose 1108 -> 1201 (+93, exactly the new tests)
-new_contract_tests=93 passing (test_team_item_ledger.py 21, test_summary_writeset.py 23, test_goal_identity.py 25, test_summary_form_generator.py 15, test_summary_four_patterns.py 9)
+regression_evidence=comm -13 baseline-failed.txt current-failed.txt returned EMPTY after every phase; passes rose 1108 -> 1249 (+141, exactly the new tests)
+us2_propagation=3/3 shipped presets declare config.summary (artifact-optimizer every=1; process-monitor + workspace-cluster every=5); 5/5 per-tool speckit.team copies carry the confirmation-gate summary disclosure
+new_contract_tests=141 passing (added test_summary_trigger.py 48) (test_team_item_ledger.py 21, test_summary_writeset.py 23, test_goal_identity.py 25, test_summary_form_generator.py 15, test_summary_four_patterns.py 9)
 generator=skills/create-team/scripts/build-summary-input.py + mirror; --goal/--team selector, exit 0/2/3, mirror --help verified
 
 # -- SC-001 / SC-002 real-data evidence (T032), all four REAL teams, 2026-08-04 --
@@ -94,9 +96,9 @@ SC-005_status=unknown
 SC-005_value=[PENDING]
 SC-005_note=Intake must not double between run-count K and 2K; requires T064
 
-SC-006_status=unknown
-SC-006_value=[PENDING]
-SC-006_note=Budget-tier skip behaviour; requires T049
+SC-006_status=partial
+SC-006_value=Gate order, skip vocabulary and the first-drop rule are landed and pinned by 48 passing trigger contract assertions; the live report-only-tier run is not yet executed
+SC-006_note=Remaining evidence needs T049, a real /speckit.team run on requirement-implement-monitor at the report-only tier — user-gated by the preview→confirm gate by design
 
 SC-007_status=unknown
 SC-007_value=[PENDING]

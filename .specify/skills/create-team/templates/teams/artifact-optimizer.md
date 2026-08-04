@@ -66,6 +66,10 @@ members:
     lifecycle: temporary
     responsibility: 按 quality_dimensions 对候选产物加权打分，输出强制格式的 `[DIM]_SCORE` / `WEIGHTED_TOTAL` / `SUGGESTIONS`
 config:
+  summary:
+    enabled: true          # opt-out: omit the block and the summary is still enabled
+    every: 1               # refresh once per 1 phase boundary(ies)
+    interactive: false     # automated refresh → invoke summarize-project non-interactively
   strategy: elimination
   variants: 3
   threshold: 0.85

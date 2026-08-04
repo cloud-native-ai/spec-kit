@@ -42,6 +42,10 @@ members:
     lifecycle: persistent
     responsibility: 作为独立核查者，对 supervisor 的进度判定与 High-Priority 问题做定向复核（L1 不派遣，晋级 L2 后启用）；默认 REJECT 无证据结论
 config:
+  summary:
+    enabled: true          # opt-out: omit the block and the summary is still enabled
+    every: 5               # refresh once per 5 phase boundary(ies)
+    interactive: false     # automated refresh → invoke summarize-project non-interactively
   maturity: L1
   cadence: 2h
   verifier: independent

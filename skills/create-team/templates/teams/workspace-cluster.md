@@ -45,6 +45,10 @@ members:
     lifecycle: temporary
     responsibility: 跨仓一致性判定——子模块边 initialized/pinned vs 远端 tip 的 SHA 三方校验、源码 HEAD 与构建产物新鲜度比对、依赖链每一跳存在性；对每条结论标注缺陷/环境限制/需人决策
 config:
+  summary:
+    enabled: true          # opt-out: omit the block and the summary is still enabled
+    every: 5               # refresh once per 5 phase boundary(ies)
+    interactive: false     # automated refresh → invoke summarize-project non-interactively
   maturity: L1
   cadence: 4h
   verifier: independent

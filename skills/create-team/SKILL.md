@@ -141,6 +141,12 @@ After **every** run, write `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md
 
 ## Run Workspace
 - Intermediates: `.specify/teams/.work/<slug>/` (git-ignored; transient)
+
+## Summary
+Summary: produced | skipped(cadence) | skipped(budget) | declined(no-material)
+<`produced` names the goal delivery directory; `skipped(budget)` names the tier; the
+ first summary a team ever produces additionally declares that the mechanism has just
+ activated and at what cadence. See Summary Refresh (all patterns).>
 ```
 
 ## Pattern Selection (Decision Tree)
@@ -245,6 +251,12 @@ Context Isolation Rules:
 - NO other agent's task briefs shared
 - NO intermediate results from other agents visible
 - Child agents receive only their territory manifest
+
+### Summary Boundary
+
+After cross-verification and **Result Aggregation** complete, refresh the goal summary
+subject to the gate order in Summary Refresh (all patterns), and record the `Summary:`
+status line in the run report.
 
 ### Worktree Isolation (optional, config `isolation: worktree`)
 
@@ -367,6 +379,12 @@ For each stage in topological order:
 ```
 
 > **Per-handoff verification is mandatory** in the serial pattern — it is what makes this the quality-first form. Keep it lightweight (a targeted check that the handoff artifact satisfies the downstream stage's `inputs_from` contract), not a full re-evaluation.
+
+### Summary Boundary
+
+After each stage's **handoff verification passes**, refresh the goal summary subject to the
+gate order in Summary Refresh (all patterns), and record the `Summary:` status line in the
+run report. Two stage handoffs completing in rapid succession coalesce into one refresh.
 
 ### Failure Recovery
 
@@ -499,6 +517,12 @@ LOOP (iteration in 1..max_iterations):
 >
 > **Anti-pattern (do not do this):** optimizing the scored artifact directly (e.g. hand-editing the output diagram/file) and only distilling changes back into the target in batch at the end. That measures the *artifact*, not the *target* — the improvement loop for the target never actually closes. This applies to **both** the elimination and progressive strategies in `references/optimization-goals.md`.
 
+### Summary Boundary
+
+After each generation's **DECIDE** phase completes, refresh the goal summary subject to the
+gate order in Summary Refresh (all patterns), and record the `Summary:` status line in the
+run report. A converged or capped run also produces the terminal summary.
+
 ### Convergence Detection
 
 | Condition | Check | Action |
@@ -572,6 +596,10 @@ Graduation is an `improve-team` action, gated on evidence (≥ 2 cadence cycles 
 6. SCORE   score against quality_dimensions (measured against the goal)
 7. CRITIQUE append a Post-Run Critique line to STATE.md; append one line to run-log.jsonl
 8. REPORT  write runs/<UTC-timestamp>-report.md; update STATE.md Last cycle + prune resolved items
+9. SUMMARIZE refresh the GOAL's summary when the gates allow (budget → cadence → material);
+             record the outcome as a `Summary:` status line in this cycle's report.
+             Runs AFTER REPORT because the report is one of its provenance sources.
+             See "Summary Refresh (all patterns)" below.
 ```
 
 ### Config (frontmatter `config`, continuous only)
@@ -604,8 +632,73 @@ Beyond `team.md` + `runs/`, a continuous team's directory also holds tracked ope
 | Spend ≥ 100% or kill-switch set | **Halt immediately**; one-line note to STATE.md |
 | Item exceeds `max_attempts_per_item` | Escalate to human; stop retrying that item |
 | Verifier REJECT / ESCALATE_HUMAN (L2+) | Discard the change; log; do not land |
+| Goal met / converged / halted / stopped by a human | Produce one **terminal summary** before wrapping up, unless the budget is already exceeded |
 
 ---
+
+## Summary Refresh (all patterns)
+
+Every team's execution flow periodically refreshes a **goal-level summary** — the team
+itself treated as a project — by driving the `summarize-project` skill. The team side
+authors the input form; that skill is never modified. Concept mapping, the item ledger
+and the provenance rules live in [`references/summary-mapping.md`](references/summary-mapping.md).
+
+**Indexing**: run information stays under `.specify/teams/<team-slug>/` (team index);
+the one complete summary lands in `.specify/project/goal/<goal-slug>/` (goal index) and
+aggregates **every** team declaring the same `goal_slug`.
+
+### Trigger boundaries
+
+| Pattern | Boundary |
+|---------|----------|
+| `continuous` | end of every Nth cycle — phase 9 SUMMARIZE, after REPORT |
+| `iteration` | after each generation's DECIDE phase |
+| `serial` | after each stage handoff verification passes |
+| `parallel` | after cross-verification and Result Aggregation complete |
+| all | **terminal summary** on goal met / converged / halt / manual stop (unless budget is already exceeded) |
+
+### Gate order (hard sequence)
+
+Evaluate in this order; the first gate that blocks determines the recorded status.
+
+1. **Budget** — at the report-only tier or with the kill-switch set → skip, record `skipped(budget)`.
+2. **Cadence** — not at an Nth boundary → skip, record `skipped(cadence)`.
+3. **Material** — no item ledger and no run reports anywhere in the goal → decline, record `declined(no-material)`.
+4. Otherwise → refresh, record `produced`.
+
+- **Budget outranks cadence**: reaching a cadence point MUST NOT force chart generation once the budget ladder has tripped.
+- The summary is the **first step dropped** under budget pressure, and MUST NOT be retried inside the same run after being skipped.
+- The summary's own consumption MUST NOT push the run over budget; a run completes normally when the summary is skipped.
+- Budget is evaluated against the **triggering team's** budget, since that team's run bears the cost.
+- Two boundaries reached in rapid succession **coalesce** into a single refresh — never one summary per boundary.
+
+### Status line (mandatory in every run report)
+
+```
+Summary: produced | skipped(cadence) | skipped(budget) | declined(no-material)
+```
+
+Exactly one of the four MUST appear per run. Absence is a violation: this line is what
+makes "not observed" distinguishable from "observed, no progress". `produced` MUST name
+the delivery directory; `skipped(budget)` MUST name the tier that caused it;
+`declined(no-material)` MUST NOT appear alongside any chart or partial summary artifact.
+
+**First activation**: the first time a summary is produced for a team that never had one,
+the report MUST additionally carry a one-time declaration that the mechanism has activated
+and the cadence now in force — so the opt-out default is never a silent behaviour change
+for a pre-existing team.
+
+### Enablement
+
+`config.summary` is **opt-out**: a team that does not declare the block is still enabled,
+running at its pattern's documented default cadence. The `continuous` default is every 5th
+cycle and MUST NOT be every cycle — full charting on a 2h cadence is the one cost profile
+this mechanism is designed to avoid. Bounded patterns default to every boundary.
+
+The invoked skill defaults to four interactive per-layer confirmation gates; a team-triggered
+refresh is automated, so it MUST be invoked **non-interactively** with that fact recorded in
+the report's metadata section, and MUST load with `--load` (rebuild from the ledger) rather
+than `--update`.
 
 ## Shared Protocols
 
