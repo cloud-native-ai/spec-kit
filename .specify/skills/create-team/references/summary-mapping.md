@@ -146,9 +146,56 @@ tracked、append-only、JSON Lines。每行一个**条目状态事件**。只由
 - **不可采纳**:`.specify/teams/.work/**`(运行中间物,git-ignored)、`.specify/agents/execution/logs/**`(运行时日志,git-ignored,含外部派发可见性三元组 `.live.log` / `.jsonl` / `.status`)、以及任何仓库外路径。
 - 只存在于不可采纳位置的数值 MUST 降级为 `unknown`,MUST NOT 从缓存或记忆回填——出处必须在读取时可验证。
 
+## 7.1 写入面与不变性的边界(FR-020 / FR-021)
+
+不变性约束的对象是**总结步骤**,不是团队的全部运行。二者必须分清,否则会得出"团队永远不能写 `STATE.md`"这种错误结论。
+
+| 阶段 | 允许写入 | 说明 |
+|------|---------|------|
+| **总结步骤**(SUMMARIZE) | 仅 goal 交付目录(`.specify/project/goal/<goal-slug>/`)与反馈存量 | 纯派生步骤。此期间 `.specify/teams/**`、被监控目标、`summarize-project` 技能自身文件、`.specify/agents/**`、以及 `.specify/project/` 下 `goal/` 之外的既有历史产物**五组**均 MUST 保持字节不变 |
+| **团队正常 cycle 写入**(ACT / CRITIQUE / REPORT 等) | `STATE.md`、`items.jsonl`、`run-log.jsonl`、`runs/<ts>-report.md`、结果清单 | 不受上表限制。团队主管在这些相里按 FR-026 发放条目 ID、追加台账事件、写运行报告(含总结状态行) |
+
+- **只有团队主管写 tracked 工件**:`team.md` / `STATE.md` / `run-log.jsonl` / `items.jsonl` / `runs/` 与 tracked 的总结产物一律只由团队主管(orchestrator)写入。**子代理 MUST NOT 写入任何 tracked 工件**——子代理在隔离上下文中运行,并发写会竞争,半写会损坏持久记录;它们只往 git-ignored 的运行工作区写结果清单,由主管汇总(FR-021)。
+- 运行报告的**总结状态行**由主管在写报告时落盘,属于"正常 cycle 写入",不违反总结步骤的不变性。
+
 ## 8. 人工批注由被调技能保留
 
 上一版总结中的 `## 附注` 节由被调技能的既有刷新行为原样保留,团队侧 **MUST NOT** 重复实现(FR-018)。
+
+## 10. goal 索引的机制细节(FR-030 … FR-036)
+
+### 10.1 goal 身份解析
+
+1. `team.md` frontmatter 声明了 `goal_slug` → 取其值,身份类型 `explicit`。
+2. 未声明 → 取该团队自身的 `slug`,身份类型 `inferred`,并在派生数据的 `inferred_fields` 与报告元信息中标记为推断(FR-034)。
+
+`goal_slug` MUST 同时满足 §6.2 的 DDL 字面量文法与路径片段安全(不含 `/`、不为 `.` / `..`)。
+
+**不变式**:
+- **GI-1**:取值 MUST NOT 由 goal 正文派生。改写 goal 正文不改变它,故不迁移交付目录(FR-019);正文变更本身记入元信息。
+- **GI-2**:一个团队在任一时刻只属于一个 goal。改绑时原 goal 目录保留其历史贡献并标注其已不再参与,新 goal 目录自改绑时点起接收新贡献。
+- **GI-3**:推断身份升为显式身份时归并到显式 goal 目录并保留历史,不留两份并列总结。
+- **GI-4**:两团队声明同一 `goal_slug` 但 goal 正文实质不同时,**以显式声明为准**(声明即同一 goal),正文差异记入元信息供人裁决——机制不自行判定"其实不是同一目标"。
+
+### 10.2 聚合与归属
+
+- 触发刷新的团队只是**触发者**;刷新范围恒为该 goal 下的**全部**团队。团队从不单独出总结。
+- 某团队本次未参与刷新 MUST NOT 使其历史贡献消失——每次都从全部团队台账重新折叠(FR-032)。
+- 归属由两处冗余承载且都不得丢:工作项 ID 的 `<team-slug>.` 前缀,以及 `source` 出处路径的 `.specify/teams/<team-slug>/` 前缀(FR-033)。
+- 归属以 **team slug** 呈现,不以代理 id / 结果清单路径等内部标识符呈现(FR-022)。
+
+### 10.3 与既有产物共存
+
+`.specify/project/` 已存在 `manage-project` 时代的历史产物(`project.md` 与 wbs / gantt / milestones 图表)。`goal/` 子树平级新增,MUST NOT 覆盖或迁移既有内容(FR-036)。被调技能对 SpecKit 项目的默认交付目录 `.specify/project/summary/` 亦为平级,互不冲突。
+
+### 10.4 并发刷新串行化(FR-035)
+
+同一 goal 下多个团队邻近触发时:
+
+- 刷新以交付目录级互斥锁(`data/.refresh.lock`)**串行化为一次成功刷新**;让位的那次以 `skipped(serialized)` 退出并由调用方在其运行报告中记录状态行,MUST NOT 静默 no-op。
+- 写入是**原子**的(临时文件 + 同目录替换):刷新要么完整落盘,要么保留上一版总结。半写的交付目录是被禁止的状态(WS-13)。
+- 让位的刷新 MUST NOT 改动既有产物。
+- 陈旧锁(超过阈值)按被遗弃处理并回收,避免死掉的运行永久堵住该 goal。
 
 ## 9. 调用方式
 

@@ -1,0 +1,2 @@
+{"item_id":"TI-0001","title":"A 团队的第一条目","phase_ref":"PH-0001","state":"completed","provenance":".specify/teams/goal-share-a/runs/20260801T090000Z-report.md","ts":"2026-08-01T09:00:00Z","identity":"explicit","maturity_at_event":"L1"}
+{"item_id":"TI-0002","title":"A 团队的第二条目","phase_ref":"PH-0001","state":"in-progress","provenance":".specify/teams/goal-share-a/runs/20260801T090000Z-report.md","ts":"2026-08-01T09:00:00Z","identity":"explicit","maturity_at_event":"L1"}

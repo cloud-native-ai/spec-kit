@@ -19,7 +19,7 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 | Input | Required | Description |
 |-------|----------|-------------|
 | target team | yes | Slug/name resolving to `.specify/teams/<slug>/team.md`. |
-| improvement direction | yes | What to change: **redefine the goal** (cascades into structure realignment — see `references/goal-editing.md`), add/remove member, change pattern, tune thresholds/parallelism/dimensions, or — for a `continuous` team — **promote/demote maturity** (L1→L2→L3), tune budget/constraints/cadence, or fix verifier independence. |
+| improvement direction | yes | What to change: **redefine the goal** (cascades into structure realignment — see `references/goal-editing.md`), add/remove member, change pattern, tune thresholds/parallelism/dimensions, tune the **summary refresh** (`config.summary`: enable/disable, cadence `every`, delivery directory, interactivity — see `../create-team/references/summary-mapping.md`) or bind the team to a **goal** (`goal_slug`), or — for a `continuous` team — **promote/demote maturity** (L1→L2→L3), tune budget/constraints/cadence, or fix verifier independence. |
 | evidence | recommended | Normalized findings evidence from the **runs lane** (team run reports, Post-Run Critique notes, cycle logs — all consumed via `evidence-utils.py`, per `.specify/shared/workflow/evidence-step.md`): non-convergence, oscillating scores, territory conflicts, stale member references, budget overruns, false-positive rate, runaway token spend. |
 
 ## Behavior
@@ -46,6 +46,9 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 | Continuous loop burns too many tokens / runs away | No budget or circuit-breaker | Add/tighten `budget` (daily cap, `on_80pct: report-only`, `on_100pct: halt`) + `kill_switch` |
 | Continuous loop makes bad auto-changes | Jumped past L1, or verifier not independent | Demote `maturity` to L1 (report-only); make the verifier a **separate** sub-agent with a default-REJECT stance |
 | Continuous loop ready for more autonomy | ≥2 L1 cycles, <20% false positives, verifier proven, constraints authored | Promote `maturity` L1→L2 (or L2→L3) per operating-loops.md graduation gates |
+| Summary refresh too costly on a fast cadence | `config.summary.every` too low for the team's cycle rate | Raise `every` (continuous defaults to 5); never set it to 1 for a `continuous` team — full charting per cycle is the cost profile the mechanism exists to avoid |
+| Goal progress invisible across sibling teams | Teams pursuing one goal have not declared a shared `goal_slug`, so each resolves to its own inferred goal | Declare the same `goal_slug` on every team serving that goal; their histories then aggregate into one goal summary (prior contributions are preserved on migration) |
+| Summary never appears for a team | `config.summary.enabled` was explicitly set to false, or every run is gated | Re-enable it, or check the run report's `Summary:` status line — it distinguishes cadence skips, budget skips and no-material declines |
 | Continuous `STATE.md` grows unbounded | Resolved items never pruned | Enforce per-cycle pruning of resolved/closed items in the state spine |
 
 ## MUST / MUST NOT

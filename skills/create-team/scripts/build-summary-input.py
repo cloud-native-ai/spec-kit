@@ -21,8 +21,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -33,6 +35,11 @@ except ImportError:  # pragma: no cover - environment guard
     raise SystemExit(2)
 
 EXIT_OK, EXIT_INPUT_ERROR, EXIT_NO_MATERIAL = 0, 2, 3
+# FR-035 — another refresh of the same goal holds the lock; this one stands down
+# rather than racing it. Reported so the caller can record a status line.
+EXIT_SERIALIZED = 4
+# A lock older than this is treated as abandoned by a dead run.
+LOCK_STALE_SECONDS = 900
 
 # FG-10 / §6.2 — the DDL identifier grammar, enforced upstream by entity_ids
 DDL_IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.\-]*$")
@@ -571,12 +578,77 @@ def main(argv: list[str] | None = None) -> int:
     out_path = Path(args.out) if args.out else delivery_dir / "data/project-input.yaml"
     if not out_path.is_absolute():
         out_path = repo_root / out_path
+
+    # FR-019 — a deliberate goal edit is recorded, not silently absorbed. The prior
+    # form is consulted ONLY to detect the change; the ledger stays authoritative
+    # for accumulation, so this never makes the derived form a source of truth.
+    if out_path.is_file():
+        try:
+            previous = yaml.safe_load(out_path.read_text(encoding="utf-8")) or {}
+            prior_desc = str((previous.get("project") or {}).get("project_desc") or "")
+        except yaml.YAMLError:
+            prior_desc = ""
+        current_desc = str(form["project"]["project_desc"])
+        if prior_desc and prior_desc != current_desc:
+            note = (
+                "goal 叙述自上次总结以来发生变更(FR-019):历史工作项保留,"
+                f"前值『{prior_desc[:60]}』→ 现值『{current_desc[:60]}』"
+            )
+            gaps.append(note)
+            meta["goal_changed"] = True
+            meta["goal_desc_previous"] = prior_desc
+            meta["material_gaps"] = gaps
+
     out_path.parent.mkdir(parents=True, exist_ok=True)  # FG-11 — only here
 
-    rendered = yaml.safe_dump(
-        form, allow_unicode=True, sort_keys=False, default_flow_style=False, width=100
-    )
-    out_path.write_text(rendered, encoding="utf-8")
+    # FR-035 / WS-13 — serialize concurrent refreshes of one goal directory and make
+    # the write atomic, so a refresh either lands complete or leaves the previous
+    # summary intact. A half-written delivery directory is a prohibited state.
+    lock_path = out_path.parent / ".refresh.lock"
+    lock_handle = None
+    try:
+        lock_handle = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        stale = False
+        try:
+            stale = (time.time() - lock_path.stat().st_mtime) > LOCK_STALE_SECONDS
+        except OSError:
+            stale = True
+        if not stale:
+            print(
+                json.dumps(
+                    {
+                        "status": "skipped(serialized)",
+                        "goal_slug": goal_slug,
+                        "reason": (
+                            "另一次针对同一 goal 的刷新正在进行,本次按 FR-035 串行化让位;"
+                            "调用方应在其运行报告中记录状态行"
+                        ),
+                        "lock": str(lock_path),
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
+            return EXIT_SERIALIZED
+        lock_path.unlink(missing_ok=True)
+        lock_handle = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+
+    try:
+        os.write(lock_handle, str(os.getpid()).encode())
+        os.close(lock_handle)
+        lock_handle = None
+
+        rendered = yaml.safe_dump(
+            form, allow_unicode=True, sort_keys=False, default_flow_style=False, width=100
+        )
+        tmp_path = out_path.with_suffix(out_path.suffix + ".tmp")
+        tmp_path.write_text(rendered, encoding="utf-8")
+        os.replace(tmp_path, out_path)  # atomic within the same directory
+    finally:
+        if lock_handle is not None:
+            os.close(lock_handle)
+        lock_path.unlink(missing_ok=True)
 
     report = {
         "status": "produced",

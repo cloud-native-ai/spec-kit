@@ -62,10 +62,65 @@ Four patterns; the goal decides which fits. The first three are **bounded** (run
 | Artifact | Location | Git |
 |----------|----------|-----|
 | Team definition | `.specify/teams/<slug>/team.md` | tracked |
+| Item ledger (all patterns) | `.specify/teams/<slug>/items.jsonl` | tracked, append-only |
 | Continuous operating spine (continuous only) | `.specify/teams/<slug>/{constraints.md,STATE.md,run-log.jsonl}` | tracked |
 | Run reports (per execution) | `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` | tracked |
+| **Goal summary** (per goal, not per team) | `.specify/project/goal/<goal-slug>/` (`summary.md` + `assets/` + `data/`) | tracked |
 | Deliverables (standard output) | declared target path (real project path) | tracked |
 | Run intermediates | `.specify/teams/.work/<slug>/` | git-ignored |
+
+## Goal Summary
+
+A team's execution flow periodically produces a **goal-level summary** — the team treated
+as a project — by driving the `summarize-project` skill. Output is **dual-indexed**:
+
+| Index | Path | Answers |
+|-------|------|---------|
+| **team** | `.specify/teams/<team-slug>/` | how is this team running |
+| **goal** | `.specify/project/goal/<goal-slug>/` | how far has this goal progressed |
+
+The goal directory holds the single complete summary and aggregates **every** team that
+declares the same `goal_slug`, so a goal outlives any individual team's rebuild or rename.
+The team directory keeps run information only.
+
+### Trigger boundaries
+
+| Pattern | Boundary |
+|---------|----------|
+| `continuous` | end of every Nth cycle (phase 9 SUMMARIZE, after REPORT) |
+| `iteration` | after each generation's DECIDE phase |
+| `serial` | after each stage handoff verification passes |
+| `parallel` | after cross-verification and result aggregation |
+| all | terminal summary on goal met / converged / halt / manual stop |
+
+Gates are evaluated in a fixed order — **budget → cadence → material** — and every run
+records the outcome in its report:
+
+```text
+Summary: produced | skipped(cadence) | skipped(budget) | declined(no-material)
+```
+
+That line is mandatory: it is what makes "not observed" distinguishable from "observed,
+no progress". The run-mode confirmation gate discloses the summary decision, the resolved
+goal identity, and the target directory before you confirm, so the cost is known up front.
+
+### Configuration
+
+```yaml
+goal_slug: my-goal        # frontmatter — the GOAL's identity; distinct from `slug`
+config:
+  summary:
+    enabled: true         # omit the whole block and the summary is still enabled
+    every: 5              # per N boundaries; continuous defaults to 5, bounded patterns 1
+    interactive: false
+```
+
+`goal_slug` is optional: a team that omits it falls back to its own slug as an *inferred*
+goal identity, so pre-existing teams need no migration. Editing the goal prose never moves
+the delivery directory, because identity is declared rather than derived. Concurrent
+refreshes of one goal serialize into a single atomic write.
+
+Details: `skills/create-team/references/summary-mapping.md`.
 
 ## Companion Skills
 

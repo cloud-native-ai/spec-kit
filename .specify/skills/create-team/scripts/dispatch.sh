@@ -18,7 +18,10 @@
 #
 # Environment overrides:
 #   DISPATCH_CLI        agent CLI binary          (default: qodercli; claude also works)
-#   DISPATCH_LOG_DIR    artifact directory        (default: ${TMPDIR:-/tmp}/spec-kit-dispatch)
+#   DISPATCH_LOG_DIR    artifact directory        (default: .specify/agents/execution/logs,
+#                                                  which .specify/.gitignore already ignores;
+#                                                  falls back to ${TMPDIR:-/tmp}/spec-kit-dispatch
+#                                                  when that tree is unavailable)
 #   DISPATCH_FILTER     stream filter script      (default: <this script's dir>/stream-filter.py)
 #   DISPATCH_CLI_FLAGS  non-interactive CLI flags (default: "-p --output-format stream-json
 #                       --dangerously-skip-permissions" — valid for qodercli and claude)
@@ -39,7 +42,17 @@ shift 3
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLI="${DISPATCH_CLI:-qodercli}"
-LOG_DIR="${DISPATCH_LOG_DIR:-${TMPDIR:-/tmp}/spec-kit-dispatch}"
+# Default to the tracked-repo runtime-log location documented in
+# shared/definitions/agent-definitions.md (git-ignored via .specify/.gitignore), so the
+# visibility triplet lands where every consumer expects it. Outside a Spec Kit tree the
+# temp-dir fallback keeps the script usable.
+if [[ -n "${DISPATCH_LOG_DIR:-}" ]]; then
+  LOG_DIR="${DISPATCH_LOG_DIR}"
+elif [[ -d ".specify/agents/execution" ]]; then
+  LOG_DIR=".specify/agents/execution/logs"
+else
+  LOG_DIR="${TMPDIR:-/tmp}/spec-kit-dispatch"
+fi
 FILTER="${DISPATCH_FILTER:-${SCRIPT_DIR}/stream-filter.py}"
 CLI_FLAGS="${DISPATCH_CLI_FLAGS:--p --output-format stream-json --dangerously-skip-permissions}"
 
