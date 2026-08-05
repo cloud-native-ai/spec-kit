@@ -1,10 +1,76 @@
 {
   "store": "feedback",
-  "updated": "2026-08-04T13:14:23Z",
+  "updated": "2026-08-05T05:22:51Z",
   "threshold": 10,
-  "count_since_submission": 89,
+  "count_since_submission": 95,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260805T052251Z-speckit-tasks",
+      "file": "20260805T052251Z-speckit-tasks.md",
+      "unit_id": "/speckit.tasks",
+      "unit_type": "command",
+      "run_id": "037-goal-registry-tasks-20260805",
+      "feature": "037-goal-registry",
+      "partial": false,
+      "created": "2026-08-05T05:22:51Z",
+      "summary": "Decomposed requirement 037-goal-registry (42 FR / 18 SC / 5 user stories) into 68 tasks across 8 phases. Tests Mode ON, determined by the prescribed grep against constitution.md: Principle IV mandates"
+    },
+    {
+      "id": "20260805T044509Z-speckit-plan",
+      "file": "20260805T044509Z-speckit-plan.md",
+      "unit_id": "/speckit.plan",
+      "unit_type": "command",
+      "run_id": "037-goal-registry-plan-20260805",
+      "feature": "037-goal-registry",
+      "partial": false,
+      "created": "2026-08-05T04:45:09Z",
+      "summary": "Planned requirement 037-goal-registry (42 FR / 18 SC / 5 user stories) against Feature 041 Goal Registry. No arguments, so no scope restructure was requested — but the mandated exploration pass refute"
+    },
+    {
+      "id": "20260805T041907Z-speckit-clarify",
+      "file": "20260805T041907Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "037-goal-registry-clarify3-coordination-20260805",
+      "feature": "037-goal-registry",
+      "partial": false,
+      "created": "2026-08-05T04:19:07Z",
+      "summary": "Mode A clarify on 037-goal-registry/requirements.md, third pass. The argument was a capability addition, not an ambiguity: record at the goal level which teams are advancing it, and build a coordinati"
+    },
+    {
+      "id": "20260804T175218Z-speckit-clarify",
+      "file": "20260804T175218Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "037-goal-registry-clarify2-conformance-20260805",
+      "feature": "037-goal-registry",
+      "partial": false,
+      "created": "2026-08-04T17:52:18Z",
+      "summary": "Mode A clarify on 037-goal-registry/requirements.md, driven by an argument that named an external authority: check the spec's concept understanding against shared/definitions/goal-definitions.md. This"
+    },
+    {
+      "id": "20260804T173254Z-speckit-clarify",
+      "file": "20260804T173254Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "037-goal-registry-clarify-20260805",
+      "feature": "037-goal-registry",
+      "partial": false,
+      "created": "2026-08-04T17:32:54Z",
+      "summary": "Mode A clarify on requirements.md for 037-goal-registry. Both items the draft had left open were closed: the Related Feature binding (new Feature 041 Goal Registry, registered with index row + detail "
+    },
+    {
+      "id": "20260804T133743Z-speckit-requirements",
+      "file": "20260804T133743Z-speckit-requirements.md",
+      "unit_id": "/speckit.requirements",
+      "unit_type": "command",
+      "run_id": "037-goal-registry-requirements-20260804T213000Z",
+      "feature": "037-goal-registry",
+      "partial": false,
+      "created": "2026-08-04T13:37:43Z",
+      "summary": "为「goal 提升为项目级一等概念」生成规格 `.specify/specs/037-goal-registry/requirements.md`(28 FR / 11 SC / 5 用户故事 / 2 Shared Strings / 1 澄清标记)与质量清单。达成命令声明目的:把一句概念级诉求落成可验证的需求切片,并按 house convention 对齐 036 的行文与结构。"
+    },
     {
       "id": "20260804T131423Z-speckit-implement",
       "file": "20260804T131423Z-speckit-implement.md",

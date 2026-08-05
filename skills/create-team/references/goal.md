@@ -1,6 +1,6 @@
 # Team Goal — 团队目标（操作规范）
 
-**Owner**: the team domain (`create-team` / `/speckit.team`). This file is the **single source of truth** for the team **goal** concept. `improve-team` and other team skills MUST link here rather than re-defining it. It is the goal-side companion to [`conceptual-model.md`](conceptual-model.md).
+**Owner**: the team domain (`create-team` / `/speckit.team`). This file is the single source of truth for the **team-side goal operations** — how a team establishes, carries, and deliberately revises the goal it serves. The **Goal concept itself** (project-level first-class entity at `.specify/goal/<goal-slug>/`, Goal vs Requirement boundary, criteria authority, singularity, and the `goal_slug` Goal–Team binding) is defined once in `.specify/shared/definitions/goal-definitions.md` — this file defers to it and MUST NOT re-define the concept. `improve-team` and other team skills link here for operations, there for the concept. It is the goal-side companion to [`conceptual-model.md`](conceptual-model.md).
 
 ## 定义
 

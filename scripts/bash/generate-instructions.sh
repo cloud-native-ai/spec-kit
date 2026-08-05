@@ -132,7 +132,8 @@ pushd .github >/dev/null
 ln -sf ../.specify/instructions.md copilot-instructions.md
 popd >/dev/null
 
-# .qoder
+# .qoder — project_rules.md serves the Qoder IDE (old format) only; Qoder CLI
+# (qodercli) reads the root AGENTS.md symlink instead and never loads this file.
 mkdir -p .qoder
 pushd .qoder >/dev/null
 ln -sf ../.specify/instructions.md project_rules.md
