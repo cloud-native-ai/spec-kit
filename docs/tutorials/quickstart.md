@@ -222,6 +222,7 @@ The following commands are **prompt instructions** for your AI Agent. For detail
 | `/speckit.feature` | Manage feature registry (ID, name, status) | [details →](../reference/commands/feature.md) |
 | `/speckit.agents` | Generate role-based agents or create custom agents | [details →](../reference/commands/agents.md) |
 | `/speckit.team` | Organize and run multi-agent teams (create / modify / run) | [details →](../reference/commands/team.md) |
+| `/speckit.goal` | Author project-level goal definitions and coordinate teams sharing one | [details →](../reference/commands/goal.md) |
 | `/speckit.skills` | Manage specialized skills | [details →](../reference/commands/skills.md) |
 | `/speckit.tools` | Define/discover reusable tools with behavioral rules | [details →](../reference/commands/tools.md) |
 | `/speckit.instructions` | Generate AI agent instructions and symlinks | [details →](../reference/commands/instructions.md) |

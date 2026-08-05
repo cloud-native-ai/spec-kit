@@ -91,6 +91,7 @@ After initialization, you should see the following structure and commands:
 | `/speckit.review` | Review implementation against specs and plan |
 | `/speckit.agents` | Generate role-based agents or create custom agents |
 | `/speckit.team` | Organize and run multi-agent teams (create / modify / run) |
+| `/speckit.goal` | Author project-level goal definitions and coordinate teams sharing one |
 | `/speckit.skills` | Create or refresh project skills |
 | `/speckit.tools` | Define or discover reusable tools |
 | `/speckit.instructions` | Generate/update AI agent instructions and symlinks |

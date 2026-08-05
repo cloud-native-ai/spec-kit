@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-08-05T05:22:51Z",
+  "updated": "2026-08-05T06:06:06Z",
   "threshold": 10,
-  "count_since_submission": 95,
+  "count_since_submission": 96,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260805T060606Z-speckit-implement",
+      "file": "20260805T060606Z-speckit-implement.md",
+      "unit_id": "/speckit.implement",
+      "unit_type": "command",
+      "run_id": "037-goal-registry-implement-phase2-20260805",
+      "feature": "037-goal-registry",
+      "partial": true,
+      "created": "2026-08-05T06:06:06Z",
+      "summary": "Partial run — completed Phase 1 (Setup) and Phase 2 (Foundational) of 72 tasks: 17 closed, 55 open across Phases 3-8. Phase 2 was the blocking migration of requirement 036's goal-indexed delivery dire"
+    },
     {
       "id": "20260805T052251Z-speckit-tasks",
       "file": "20260805T052251Z-speckit-tasks.md",

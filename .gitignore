@@ -55,3 +55,6 @@ input/
 .specify/tools/*.json
 .specify/instructions.md-*
 .specify/teams/.work/
+
+# /speckit.implement long-run mode state (per-spec, transient)
+*.local.md
