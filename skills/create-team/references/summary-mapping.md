@@ -9,7 +9,7 @@
 | 索引 | 路径 | 内容 | 回答的问题 |
 |------|------|------|-----------|
 | **team 索引** | `.specify/teams/<team-slug>/` | 运行信息(事实源):`runs/` / `STATE.md` / `run-log.jsonl` / `items.jsonl` / `constraints.md` | 这个团队在怎么运行 |
-| **goal 索引** | `.specify/project/goal/<goal-slug>/` | **唯一的完整总结**(派生物、自包含交付目录) | 这个目标推进到哪里 |
+| **goal 索引** | `.specify/goal/<goal-slug>/summary/` | **唯一的完整总结**(派生物、自包含交付目录) | 这个目标推进到哪里 |
 
 团队目录 MUST NOT 承载完整总结产物(FR-017)。总结步骤期间团队目录 MUST 保持字节不变(FR-020)。
 
@@ -152,7 +152,7 @@ tracked、append-only、JSON Lines。每行一个**条目状态事件**。只由
 
 | 阶段 | 允许写入 | 说明 |
 |------|---------|------|
-| **总结步骤**(SUMMARIZE) | 仅 goal 交付目录(`.specify/project/goal/<goal-slug>/`)与反馈存量 | 纯派生步骤。此期间 `.specify/teams/**`、被监控目标、`summarize-project` 技能自身文件、`.specify/agents/**`、以及 `.specify/project/` 下 `goal/` 之外的既有历史产物**五组**均 MUST 保持字节不变 |
+| **总结步骤**(SUMMARIZE) | **白名单**:仅 `.specify/goal/<goal-slug>/summary/**` 与反馈存量 | 纯派生步骤。此期间**六组** MUST 保持字节不变:① `.specify/goal/<goal-slug>/goal.md`(被撰写的定义——刷新写到它即为写入面违规,而非"顺带更新")、② `.specify/teams/**`、③ 被监控目标、④ `summarize-project` 技能自身文件、⑤ `.specify/agents/**`、⑥ `.specify/project/**`(`manage-project` 时代的既有产物,其下已不再有任何 goal 内容) |
 | **团队正常 cycle 写入**(ACT / CRITIQUE / REPORT 等) | `STATE.md`、`items.jsonl`、`run-log.jsonl`、`runs/<ts>-report.md`、结果清单 | 不受上表限制。团队主管在这些相里按 FR-026 发放条目 ID、追加台账事件、写运行报告(含总结状态行) |
 
 - **只有团队主管写 tracked 工件**:`team.md` / `STATE.md` / `run-log.jsonl` / `items.jsonl` / `runs/` 与 tracked 的总结产物一律只由团队主管(orchestrator)写入。**子代理 MUST NOT 写入任何 tracked 工件**——子代理在隔离上下文中运行,并发写会竞争,半写会损坏持久记录;它们只往 git-ignored 的运行工作区写结果清单,由主管汇总(FR-021)。

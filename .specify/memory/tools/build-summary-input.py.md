@@ -32,7 +32,7 @@ refresh of the same goal holds the lock.
 - MUST be invoked with `--repo-root` when the working directory is not the repository root.
 - Reads ONLY: `.specify/teams/*/team.md`, `<team>/items.jsonl`, `<team>/runs/*-report.md`,
   `<team>/run-log.jsonl`, `.specify/agents/{templates,instances}/*.agent.md`.
-- Writes ONLY `--out` (default `.specify/project/goal/<goal-slug>/data/project-input.yaml`)
+- Writes ONLY `--out` (default `.specify/goal/<goal-slug>/summary/data/project-input.yaml`)
   and its parent directory. Never writes into `.specify/teams/**`.
 - Output is deterministic: identical inputs produce byte-identical forms. Safe to re-run.
 - Work-item and phase identifiers are namespaced `<team-slug>.` because `entity_ids` is a

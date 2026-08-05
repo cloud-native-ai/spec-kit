@@ -2,7 +2,7 @@
 
 Pins `data-model.md` § 1.3 invariants GI-1…GI-4 and FR-031 / FR-034 / SC-013.
 
-Goal identity is what makes `.specify/project/goal/<goal-slug>/` a *goal* index
+Goal identity is what makes `.specify/goal/<goal-slug>/summary/` a *goal* index
 rather than a relocated team index, so its resolution order and its stability
 under goal-prose edits are contract surface.
 """
@@ -106,7 +106,7 @@ def test_invalid_goal_slugs_are_rejected(value: str) -> None:
 
 def test_delivery_directory_is_derived_from_goal_not_team() -> None:
     slug, _ = resolve_goal_identity({"slug": "team-a", "goal_slug": "shared-goal"})
-    assert f".specify/project/goal/{slug}/" == ".specify/project/goal/shared-goal/"
+    assert f".specify/goal/{slug}/summary/" == ".specify/goal/shared-goal/summary/"
 
 
 # --------------------------------------------------------------------------

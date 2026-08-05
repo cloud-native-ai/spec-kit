@@ -112,7 +112,7 @@ def refresh(sandbox: Path) -> subprocess.CompletedProcess:
 
 
 def form_of(sandbox: Path) -> dict:
-    path = sandbox / ".specify/project/goal/acc/data/project-input.yaml"
+    path = sandbox / ".specify/goal/acc/summary/data/project-input.yaml"
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
@@ -147,7 +147,7 @@ def test_delivery_directory_holds_exactly_one_current_form(sandbox: Path) -> Non
     append_events(sandbox, [event("TI-0001", "completed", "2026-08-01T09:00:00Z")])
     for _ in range(3):
         assert refresh(sandbox).returncode == 0
-    forms = list((sandbox / ".specify/project/goal/acc").rglob("project-input.yaml"))
+    forms = list((sandbox / ".specify/goal/acc").rglob("project-input.yaml"))
     assert len(forms) == 1, f"expected exactly one current form, found {forms}"
 
 
@@ -159,11 +159,11 @@ def test_reproducible_after_deleting_the_delivery_directory(sandbox: Path) -> No
         event("TI-0002", "delayed", "2026-08-02T09:00:00Z"),
     ])
     assert refresh(sandbox).returncode == 0
-    before = (sandbox / ".specify/project/goal/acc/data/project-input.yaml").read_bytes()
+    before = (sandbox / ".specify/goal/acc/summary/data/project-input.yaml").read_bytes()
 
-    shutil.rmtree(sandbox / ".specify/project/goal/acc")
+    shutil.rmtree(sandbox / ".specify/goal/acc")
     assert refresh(sandbox).returncode == 0
-    after = (sandbox / ".specify/project/goal/acc/data/project-input.yaml").read_bytes()
+    after = (sandbox / ".specify/goal/acc/summary/data/project-input.yaml").read_bytes()
     assert before == after, "regeneration from the ledger must be byte-identical"
 
 
@@ -284,7 +284,7 @@ def test_aggregation_keeps_expanded_nodes_within_the_upstream_threshold(sandbox:
 def test_goal_prose_edit_keeps_history_and_directory(sandbox: Path) -> None:
     append_events(sandbox, [event("TI-0001", "completed", "2026-08-01T09:00:00Z")])
     assert refresh(sandbox).returncode == 0
-    before_dir = sorted(p.name for p in (sandbox / ".specify/project/goal").iterdir())
+    before_dir = sorted(p.name for p in (sandbox / ".specify/goal").iterdir())
 
     team_file = sandbox / ".specify/teams/acc/team.md"
     team_file.write_text(
@@ -292,7 +292,7 @@ def test_goal_prose_edit_keeps_history_and_directory(sandbox: Path) -> None:
     )
     result = refresh(sandbox)
     assert result.returncode == 0
-    after_dir = sorted(p.name for p in (sandbox / ".specify/project/goal").iterdir())
+    after_dir = sorted(p.name for p in (sandbox / ".specify/goal").iterdir())
 
     assert before_dir == after_dir, "a goal prose edit must not relocate the delivery directory"
     assert len(form_of(sandbox)["work_items"]) == 1, "history must survive a goal edit"
@@ -318,7 +318,7 @@ def test_chain_still_loads_after_repeated_refreshes(sandbox: Path) -> None:
     for day, state in ((1, "in-progress"), (2, "completed"), (3, "completed")):
         append_events(sandbox, [event("TI-0001", state, f"2026-08-0{day}T09:00:00Z")])
         assert refresh(sandbox).returncode == 0
-    form = sandbox / ".specify/project/goal/acc/data/project-input.yaml"
+    form = sandbox / ".specify/goal/acc/summary/data/project-input.yaml"
     val = subprocess.run(
         [sys.executable, str(SUMMARIZE / "validate-project-input.py"), "--input", str(form), "--json"],
         capture_output=True, text=True, cwd=str(sandbox),

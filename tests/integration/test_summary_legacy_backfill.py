@@ -121,7 +121,7 @@ def generate(root: Path, slug: str = "legacy", *extra: str) -> subprocess.Comple
 
 def form_of(root: Path, goal: str = "legacy") -> dict:
     return yaml.safe_load(
-        (root / f".specify/project/goal/{goal}/data/project-input.yaml").read_text(encoding="utf-8")
+        (root / f".specify/goal/{goal}/summary/data/project-input.yaml").read_text(encoding="utf-8")
     )
 
 
@@ -322,7 +322,7 @@ def test_excluded_variants_are_not_counted_as_delayed(tmp_path: Path) -> None:
 @requires_generator
 def test_backfilled_form_still_passes_the_upstream_validator(legacy: Path) -> None:
     assert generate(legacy).returncode == 0
-    form = legacy / ".specify/project/goal/legacy/data/project-input.yaml"
+    form = legacy / ".specify/goal/legacy/summary/data/project-input.yaml"
     val = subprocess.run(
         [sys.executable, str(SUMMARIZE / "validate-project-input.py"), "--input", str(form), "--json"],
         capture_output=True, text=True, cwd=str(legacy),

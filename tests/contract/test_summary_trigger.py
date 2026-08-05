@@ -212,7 +212,12 @@ def test_confirmation_gate_discloses_the_summary_decision(path: Path) -> None:
 )
 def test_gate_discloses_goal_identity_and_target_directory(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
-    assert "project/goal/" in text, f"{path.name} does not name the goal delivery directory"
+    assert ".specify/goal/<goal-slug>/summary/" in text, (
+        f"{path.name} does not name the goal delivery directory"
+    )
+    assert "project/goal" not in text, (
+        f"{path.name} still names the pre-migration delivery directory"
+    )
 
 
 # --------------------------------------------------------------------------

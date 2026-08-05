@@ -54,7 +54,7 @@ def refresh(root: Path, team: str) -> subprocess.CompletedProcess:
 
 
 def delivery_dir(root: Path) -> Path:
-    return root / f".specify/project/goal/{SHARED_GOAL}"
+    return root / f".specify/goal/{SHARED_GOAL}/summary"
 
 
 def form_path(root: Path) -> Path:

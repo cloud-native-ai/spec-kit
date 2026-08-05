@@ -81,3 +81,4 @@ No other transition is defined. `superseded` is not a state.
 | `## Objective` missing or empty | Rejected |
 | `## Success Criteria` section missing | Rejected; an empty criteria set requires the explicit `None provided.` marker |
 | Objective reads as a task list | Rejected with the GD-2 violation named |
+| Objective bundles more than one objective | Rejected with the GD-3 violation named; message instructs splitting into separate `<goal-slug>` directories |

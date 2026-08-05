@@ -65,7 +65,7 @@ Four patterns; the goal decides which fits. The first three are **bounded** (run
 | Item ledger (all patterns) | `.specify/teams/<slug>/items.jsonl` | tracked, append-only |
 | Continuous operating spine (continuous only) | `.specify/teams/<slug>/{constraints.md,STATE.md,run-log.jsonl}` | tracked |
 | Run reports (per execution) | `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` | tracked |
-| **Goal summary** (per goal, not per team) | `.specify/project/goal/<goal-slug>/` (`summary.md` + `assets/` + `data/`) | tracked |
+| **Goal summary** (per goal, not per team) | `.specify/goal/<goal-slug>/summary/` (`summary.md` + `assets/` + `data/`) | tracked |
 | Deliverables (standard output) | declared target path (real project path) | tracked |
 | Run intermediates | `.specify/teams/.work/<slug>/` | git-ignored |
 
@@ -77,7 +77,7 @@ as a project — by driving the `summarize-project` skill. Output is **dual-inde
 | Index | Path | Answers |
 |-------|------|---------|
 | **team** | `.specify/teams/<team-slug>/` | how is this team running |
-| **goal** | `.specify/project/goal/<goal-slug>/` | how far has this goal progressed |
+| **goal** | `.specify/goal/<goal-slug>/summary/` | how far has this goal progressed |
 
 The goal directory holds the single complete summary and aggregates **every** team that
 declares the same `goal_slug`, so a goal outlives any individual team's rebuild or rename.

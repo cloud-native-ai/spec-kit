@@ -51,7 +51,7 @@ def run(root: Path, *args: str) -> subprocess.CompletedProcess:
 
 def form_of(root: Path, goal: str = SHARED_GOAL) -> dict:
     return yaml.safe_load(
-        (root / f".specify/project/goal/{goal}/data/project-input.yaml").read_text(encoding="utf-8")
+        (root / f".specify/goal/{goal}/summary/data/project-input.yaml").read_text(encoding="utf-8")
     )
 
 
@@ -66,7 +66,7 @@ def test_both_teams_land_in_one_goal_directory(two_teams: Path) -> None:
     assert result.returncode == 0, result.stdout + result.stderr
     report = json.loads(result.stdout)
     assert sorted(report["contributing_teams"]) == ["goal-share-a", "goal-share-b"]
-    goal_dirs = sorted(p.name for p in (two_teams / ".specify/project/goal").iterdir())
+    goal_dirs = sorted(p.name for p in (two_teams / ".specify/goal").iterdir())
     assert goal_dirs == [SHARED_GOAL], f"expected exactly one goal directory, got {goal_dirs}"
 
 
@@ -100,7 +100,7 @@ def test_all_teams_work_items_are_present(two_teams: Path) -> None:
 def test_colliding_per_team_ids_survive_aggregation(two_teams: Path) -> None:
     """FG-15 — both fixtures issue TI-0001; unprefixed this would be exit 3."""
     assert run(two_teams, "--goal", SHARED_GOAL).returncode == 0
-    form = two_teams / f".specify/project/goal/{SHARED_GOAL}/data/project-input.yaml"
+    form = two_teams / f".specify/goal/{SHARED_GOAL}/summary/data/project-input.yaml"
     load = subprocess.run(
         [sys.executable, str(SUMMARIZE / "project-db.py"), "--db", str(two_teams / "p.db"),
          "--load", str(form)],
@@ -215,7 +215,7 @@ def test_declaring_goal_slug_migrates_the_team_into_the_shared_goal(two_teams: P
     original = team_file.read_text(encoding="utf-8")
     team_file.write_text(original.replace(f"goal_slug: {SHARED_GOAL}\n", ""), encoding="utf-8")
     assert run(two_teams, "--team", "goal-share-a").returncode == 0
-    assert (two_teams / ".specify/project/goal/goal-share-a").is_dir()
+    assert (two_teams / ".specify/goal/goal-share-a").is_dir()
 
     team_file.write_text(original, encoding="utf-8")  # declare it explicitly
     result = run(two_teams, "--team", "goal-share-a")
@@ -256,7 +256,7 @@ def test_unknown_goal_is_an_input_error(two_teams: Path) -> None:
 @requires_fixtures
 def test_aggregate_form_passes_the_upstream_validator(two_teams: Path) -> None:
     assert run(two_teams, "--goal", SHARED_GOAL).returncode == 0
-    form = two_teams / f".specify/project/goal/{SHARED_GOAL}/data/project-input.yaml"
+    form = two_teams / f".specify/goal/{SHARED_GOAL}/summary/data/project-input.yaml"
     val = subprocess.run(
         [sys.executable, str(SUMMARIZE / "validate-project-input.py"), "--input", str(form), "--json"],
         capture_output=True, text=True, cwd=str(two_teams),

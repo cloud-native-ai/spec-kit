@@ -14,7 +14,7 @@
 | Goal Archive | authored aggregate | the `.specify/goal/` tree | `/speckit.goal` only |
 | Goal–Team Binding | authored (team side) | `team.md` frontmatter `goal_slug` | team maintainer / `/speckit.team` |
 | Team Territory | authored (team side) | `team.md` frontmatter `territory` | team maintainer / `/speckit.team`; ratified coordination writes here |
-| Team Roster | **derived** | `.specify/goal/<goal-slug>/summary/roster.md` (+ machine form in `summary/data/`) | summary refresh only |
+| Team Roster | **derived** | `.specify/goal/<goal-slug>/summary/roster.md` (+ machine form in the generation report) | summary refresh only |
 | Overlap Finding | **derived** | same refresh output + run report status line | summary refresh only |
 | Contested Area | **derived** classification | subset of Overlap Findings | summary refresh only |
 | Coordination Round | **proposal** (no authority) | run-scoped proposal surfaced to the user | coordination round; ratification writes to `team.md` |

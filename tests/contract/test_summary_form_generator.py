@@ -189,7 +189,7 @@ def test_generates_a_form_from_a_ledger(workspace: Path) -> None:
     )
     result = run_generator("--team", "demo", "--json", cwd=workspace)
     assert result.returncode == 0, result.stdout + result.stderr
-    form = workspace / ".specify/project/goal/demo/data/project-input.yaml"
+    form = workspace / ".specify/goal/demo/summary/data/project-input.yaml"
     assert form.is_file(), f"form not written; stdout={result.stdout}"
 
 
@@ -203,9 +203,9 @@ def test_generation_is_deterministic(workspace: Path) -> None:
         runs=["20260730T080000Z-report.md"],
     )
     assert run_generator("--team", "demo", cwd=workspace).returncode == 0
-    first = (workspace / ".specify/project/goal/demo/data/project-input.yaml").read_bytes()
+    first = (workspace / ".specify/goal/demo/summary/data/project-input.yaml").read_bytes()
     assert run_generator("--team", "demo", cwd=workspace).returncode == 0
-    second = (workspace / ".specify/project/goal/demo/data/project-input.yaml").read_bytes()
+    second = (workspace / ".specify/goal/demo/summary/data/project-input.yaml").read_bytes()
     assert first == second
 
 
@@ -217,7 +217,7 @@ def test_baseline_date_is_supplied_explicitly(workspace: Path) -> None:
     )
     assert run_generator("--team", "demo", cwd=workspace).returncode == 0
     doc = yaml.safe_load(
-        (workspace / ".specify/project/goal/demo/data/project-input.yaml").read_text(
+        (workspace / ".specify/goal/demo/summary/data/project-input.yaml").read_text(
             encoding="utf-8"
         )
     )
@@ -231,7 +231,7 @@ def test_repos_is_always_empty(workspace: Path) -> None:
     write_team(workspace / ".specify/teams", "demo", items=[item("TI-0001")], runs=[])
     run_generator("--team", "demo", cwd=workspace)
     doc = yaml.safe_load(
-        (workspace / ".specify/project/goal/demo/data/project-input.yaml").read_text(
+        (workspace / ".specify/goal/demo/summary/data/project-input.yaml").read_text(
             encoding="utf-8"
         )
     )
@@ -244,7 +244,7 @@ def test_coverage_block_is_always_emitted(workspace: Path) -> None:
     write_team(workspace / ".specify/teams", "demo", items=[item("TI-0001")], runs=[])
     run_generator("--team", "demo", cwd=workspace)
     doc = yaml.safe_load(
-        (workspace / ".specify/project/goal/demo/data/project-input.yaml").read_text(
+        (workspace / ".specify/goal/demo/summary/data/project-input.yaml").read_text(
             encoding="utf-8"
         )
     )
@@ -266,7 +266,7 @@ def test_all_seven_entities_are_present_or_explicitly_empty(workspace: Path) -> 
     write_team(workspace / ".specify/teams", "demo", items=[item("TI-0001")], runs=[])
     run_generator("--team", "demo", cwd=workspace)
     doc = yaml.safe_load(
-        (workspace / ".specify/project/goal/demo/data/project-input.yaml").read_text(
+        (workspace / ".specify/goal/demo/summary/data/project-input.yaml").read_text(
             encoding="utf-8"
         )
     )
@@ -293,7 +293,7 @@ def test_every_work_item_carries_provenance(workspace: Path) -> None:
     )
     run_generator("--team", "demo", cwd=workspace)
     doc = yaml.safe_load(
-        (workspace / ".specify/project/goal/demo/data/project-input.yaml").read_text(
+        (workspace / ".specify/goal/demo/summary/data/project-input.yaml").read_text(
             encoding="utf-8"
         )
     )
@@ -316,7 +316,7 @@ def test_inadmissible_provenance_is_rejected(workspace: Path) -> None:
     result = run_generator("--team", "demo", "--json", cwd=workspace)
     if result.returncode == 0:
         doc = yaml.safe_load(
-            (workspace / ".specify/project/goal/demo/data/project-input.yaml").read_text(
+            (workspace / ".specify/goal/demo/summary/data/project-input.yaml").read_text(
                 encoding="utf-8"
             )
         )
@@ -334,7 +334,7 @@ def test_people_names_come_from_the_agent_definition(workspace: Path) -> None:
     write_team(workspace / ".specify/teams", "demo", items=[item("TI-0001")], runs=[])
     run_generator("--team", "demo", cwd=workspace)
     doc = yaml.safe_load(
-        (workspace / ".specify/project/goal/demo/data/project-input.yaml").read_text(
+        (workspace / ".specify/goal/demo/summary/data/project-input.yaml").read_text(
             encoding="utf-8"
         )
     )
@@ -350,7 +350,7 @@ def test_instance_definition_wins_over_template(workspace: Path) -> None:
     write_team(workspace / ".specify/teams", "demo", items=[item("TI-0001")], runs=[])
     run_generator("--team", "demo", cwd=workspace)
     doc = yaml.safe_load(
-        (workspace / ".specify/project/goal/demo/data/project-input.yaml").read_text(
+        (workspace / ".specify/goal/demo/summary/data/project-input.yaml").read_text(
             encoding="utf-8"
         )
     )
@@ -370,7 +370,7 @@ def test_milestones_derive_from_goal_success_criteria(workspace: Path) -> None:
     )
     run_generator("--team", "demo", cwd=workspace)
     doc = yaml.safe_load(
-        (workspace / ".specify/project/goal/demo/data/project-input.yaml").read_text(
+        (workspace / ".specify/goal/demo/summary/data/project-input.yaml").read_text(
             encoding="utf-8"
         )
     )

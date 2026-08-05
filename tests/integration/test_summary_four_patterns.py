@@ -189,7 +189,7 @@ def test_unknown_state_yields_no_fabricated_progress(sandbox: Path) -> None:
 @requires_chain
 def test_real_repo_project_directory_is_not_written(sandbox: Path) -> None:
     """FG-11 / FR-036 — generation must not touch the real delivery tree."""
-    real_goal_dir = REPO_ROOT / ".specify/project/goal"
+    real_goal_dir = REPO_ROOT / ".specify/goal"
     before = sorted(p.name for p in real_goal_dir.iterdir()) if real_goal_dir.is_dir() else None
     teams = _teams_by_pattern()
     slug = _install(sandbox, teams["serial"])
@@ -197,4 +197,4 @@ def test_real_repo_project_directory_is_not_written(sandbox: Path) -> None:
         [sys.executable, str(GENERATOR), "--team", slug, "--repo-root", str(sandbox)], sandbox
     ).returncode == 0
     after = sorted(p.name for p in real_goal_dir.iterdir()) if real_goal_dir.is_dir() else None
-    assert before == after, "the real .specify/project/goal tree changed during a sandboxed run"
+    assert before == after, "the real .specify/goal tree changed during a sandboxed run"

@@ -10,8 +10,12 @@ that a team never has to: it folds every tracked artifact of every team sharing 
 into one form, deterministically, with no model in the loop.
 
 Indexing is dual:
-  * `.specify/teams/<team-slug>/`        team index — run info (read-only here)
-  * `.specify/project/goal/<goal-slug>/` goal index — the sole complete summary
+  * `.specify/teams/<team-slug>/`             team index — run info (read-only here)
+  * `.specify/goal/<goal-slug>/summary/`      goal index — the sole complete summary
+
+The goal archive holds both faces of one object: `<goal-slug>/goal.md` is the authored
+definition and is NEVER written here; `<goal-slug>/summary/` is the derived subtree and
+is the only surface this script may touch.
 
 Exit codes: 0 form written | 2 input error | 3 no execution material (declined).
 """
@@ -574,7 +578,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         return EXIT_NO_MATERIAL
 
-    delivery_dir = repo_root / ".specify/project/goal" / goal_slug
+    delivery_dir = repo_root / ".specify/goal" / goal_slug / "summary"
     out_path = Path(args.out) if args.out else delivery_dir / "data/project-input.yaml"
     if not out_path.is_absolute():
         out_path = repo_root / out_path

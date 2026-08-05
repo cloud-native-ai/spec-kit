@@ -12,7 +12,7 @@
 
 ## Definition of Done (DoD)
 
-- DoD-1: Every functional requirement FR-001…FR-042 has an implementing task, and every task's artifact exists at the stated path
+- DoD-1: Every functional requirement FR-001…FR-042 is covered by an implementing task, traceable via a direct FR citation on the task or via the contract/data-model rule the task names; every task's artifact exists at the stated path
 - DoD-2: Full test suite shows zero NEW failures against `baseline-failed.txt` (baseline: 40 failed / 1308 passed / 1 skipped)
 - DoD-3: `python3 scripts/python/sync-mirrors.py --check` exits 0 — every mirror obligation row in plan.md verified
 - DoD-4: Live-face residual `project/goal` references are 0; the 18 historical files are byte-unchanged
@@ -30,6 +30,8 @@
 - GATE-4: verification.md lists every SC-NNN with a status — check: grep SC ids against requirements.md (expect 18)
 - GATE-5: Live-face old-path residual is 0 — check: `grep -rl 'project/goal'` classified by face, live subset empty
 - GATE-6: Definition read-only holds — check: `sha256sum` of a goal's `goal.md` identical across a refresh
+- GATE-7: Every FR-001…FR-042 resolves to at least one task, directly or through a named contract/data-model rule — check: script that extracts FR ids from `requirements.md` and reports any with no path to a task row
+- GATE-8: Every SC status in `verification.md` cites the task that measured it — check: grep each `SC-NNN` status line for a `T\d{3}` citation; zero uncited statuses
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -63,8 +65,8 @@ This is a template/prompt framework repository. Canonical sources live in `templ
 
 **Purpose**: confirm the ground state the whole plan assumes
 
-- [ ] T001 Re-run `pytest -q` and confirm the failure set matches `.specify/specs/037-goal-registry/baseline-failed.txt` exactly (expect 40 failed / 1308 passed / 1 skipped); if it differs, stop and reconcile before any edit
-- [ ] T002 [P] Track the read-only concept authority: `git add shared/definitions/goal-definitions.md .specify/shared/definitions/goal-definitions.md` — this requirement references it (FR-019) and MUST NOT modify it
+- [X] T001 Re-run `pytest -q` and confirm the failure set matches `.specify/specs/037-goal-registry/baseline-failed.txt` exactly (expect 40 failed / 1308 passed / 1 skipped); if it differs, stop and reconcile before any edit <!-- reconciled: run-tests.sh --names-out gave 39 failed / 1309 passed / 1 skipped; comm showed 0 new and 1 resolved (test_review_prerequisite_flags_are_supported, branch-state-dependent per research D-12, self-healed once tasks.md existed). Baseline re-frozen to the 39 true names; pre-reconcile copy at /tmp/baseline-037-preT001.txt -->
+- [X] T002 [P] Track the read-only concept authority: `git add shared/definitions/goal-definitions.md .specify/shared/definitions/goal-definitions.md` — this requirement references it (FR-019) and MUST NOT modify it <!-- verified: both paths tracked in HEAD (commit a7fd58c7) and diff -q byte-identical; no modification made -->
 
 **Checkpoint**: baseline confirmed; the concept authority is under version control
 
@@ -78,24 +80,24 @@ This is a template/prompt framework repository. Canonical sources live in `templ
 
 ### Tests for Foundational (MANDATORY)
 
-- [ ] T003 [P] Contract test for the write-set allow-list in `tests/contract/test_goal_writeset.py` — assert the summary step's writable surface is `<goal-slug>/summary/**`, that `goal.md` belongs to the invariant set, and that all six invariant groups from `contracts/goal-writeset-migration.contract.md` are named
-- [ ] T004 [P] Contract test for migration completeness in `tests/contract/test_goal_migration.py` — assert live-face residual `project/goal` references are 0 and that the historical face (036 spec artifacts, 037 spec, feedback records, feature memory) is excluded from the sweep rather than rewritten
+- [X] T003 [P] Contract test for the write-set allow-list in `tests/contract/test_goal_writeset.py` — assert the summary step's writable surface is `<goal-slug>/summary/**`, that `goal.md` belongs to the invariant set, and that all six invariant groups from `contracts/goal-writeset-migration.contract.md` are named <!-- verified: 33 tests authored; RED confirmed pre-migration (21 failed), GREEN post-migration; pins goal.md as the 6th invariant group -->
+- [X] T004 [P] Contract test for migration completeness in `tests/contract/test_goal_migration.py` — assert live-face residual `project/goal` references are 0 and that the historical face (036 spec artifacts, 037 spec, feedback records, feature memory) is excluded from the sweep rather than rewritten <!-- verified: live/historical face split verified; sweep excludes 4 named migration guards that must cite the old path to assert its absence -->
 
 ### Implementation for Foundational
 
-- [ ] T005 Change the single delivery-path construction site in `skills/create-team/scripts/build-summary-input.py` (line 577) from `.specify/project/goal/<slug>` to `.specify/goal/<slug>/summary`, so the `--out` default, the `mkdir`, the lock path and the reported `delivery_dir` all follow [blockedBy: T003,T004]
-- [ ] T006 [P] Update `skills/create-team/references/summary-mapping.md` — §0 dual-index paths, §7.1 write-set table (add `goal.md` as a sixth invariant group), §10.3 coexistence note [blockedBy: T003]
-- [ ] T007 [P] Update `skills/create-team/SKILL.md` — the `config.summary.delivery_dir` schema default plus the three prose sites naming the old path [blockedBy: T003]
-- [ ] T008 [P] Update the delivery-directory disclosure lines in `templates/commands/team.md` [blockedBy: T003]
-- [ ] T009 [P] Update the source contract in `.specify/memory/tools/build-summary-input.py.md` to the new delivery path [blockedBy: T005]
-- [ ] T010 [P] Update the layout tables in `docs/reference/commands/team.md` [blockedBy: T003]
-- [ ] T011 Repath the 9 existing test files — `tests/contract/{test_summary_form_generator,test_summary_writeset,test_goal_identity,test_summary_trigger}.py` and `tests/integration/{test_summary_accumulation,test_goal_aggregation,test_goal_concurrent_refresh,test_summary_legacy_backfill,test_summary_four_patterns}.py`. Path literals only — no assertion may be weakened, deleted, or made less specific. `test_summary_trigger.py:215` asserts the old path across the canonical file, its mirror and all 5 tool copies and MUST be updated to the new path [blockedBy: T005]
-- [ ] T012 Run the mirror fan-out: `python3 scripts/python/sync-mirrors.py --write` [blockedBy: T005,T006,T007,T008]
-- [ ] T013 [P] Verify skills mirror parity — `diff -q` `skills/create-team/{SKILL.md,references/summary-mapping.md}` against `.specify/skills/create-team/...` [blockedBy: T012]
-- [ ] T014 [P] Verify the templates mirror and all 5 per-tool copies (`.claude/commands/speckit.team.md`, `.github/prompts/speckit.team.prompt.md`, `.qoder/commands/speckit.team.md`, `.opencode/command/speckit.team.md`, `.qwen/commands/speckit.team.toml`) contain the new path, contain no `project/goal`, and retain their `AUTO-GENERATED` headers [blockedBy: T012]
-- [ ] T015 [P] Verify the script mirror `diff -q skills/create-team/scripts/build-summary-input.py .specify/skills/create-team/scripts/build-summary-input.py` [blockedBy: T012]
-- [ ] T016 Execute the generator end-to-end against the `goal-share-a` / `goal-share-b` fixtures in a sandbox and read the report: `delivery_dir` MUST be `.specify/goal/shared-harvest-goal/summary`, exit code 0 [blockedBy: T012]
-- [ ] T017 Foundational regression gate: `pytest -q`, diff failures against `baseline-failed.txt`, zero new names [blockedBy: T011,T012]
+- [X] T005 Change the single delivery-path construction site in `skills/create-team/scripts/build-summary-input.py` (line 577) from `.specify/project/goal/<slug>` to `.specify/goal/<slug>/summary`, so the `--out` default, the `mkdir`, the lock path and the reported `delivery_dir` all follow [blockedBy: T003,T004] <!-- verified: line 577 -> `.specify/goal/<slug>/summary`; executed: delivery_dir=.specify/goal/shared-harvest-goal/summary, exit 0, no .specify/project created -->
+- [X] T006 [P] Update `skills/create-team/references/summary-mapping.md` — §0 dual-index paths, §7.1 write-set table (add `goal.md` as a sixth invariant group), §10.3 coexistence note [blockedBy: T003] <!-- verified: 2 path occurrences + write-set row restated as an allow-list with 6 invariant groups (goal.md first) -->
+- [X] T007 [P] Update `skills/create-team/SKILL.md` — the `config.summary.delivery_dir` schema default plus the three prose sites naming the old path [blockedBy: T003] <!-- verified: 4 path occurrences replaced; residual 'project/goal' = 0 -->
+- [X] T008 [P] Update the delivery-directory disclosure lines in `templates/commands/team.md` [blockedBy: T003] <!-- verified: 2 path occurrences replaced; residual = 0 -->
+- [X] T009 [P] Update the source contract in `.specify/memory/tools/build-summary-input.py.md` to the new delivery path [blockedBy: T005] <!-- verified: Tool record source contract updated to the summary subtree; residual = 0 -->
+- [X] T010 [P] Update the layout tables in `docs/reference/commands/team.md` [blockedBy: T003] <!-- verified: 2 layout-table occurrences replaced; residual = 0 -->
+- [X] T011 Repath the 9 existing test files — `tests/contract/{test_summary_form_generator,test_summary_writeset,test_goal_identity,test_summary_trigger}.py` and `tests/integration/{test_summary_accumulation,test_goal_aggregation,test_goal_concurrent_refresh,test_summary_legacy_backfill,test_summary_four_patterns}.py`. Path literals only — no assertion may be weakened, deleted, or made less specific. `test_summary_trigger.py:215` asserts the old path across the canonical file, its mirror and all 5 tool copies and MUST be updated to the new path [blockedBy: T005] <!-- verified: 41 occurrences across 9 files via a slug-aware rule; first blind pass dropped the `summary/` segment and was reverted; test_summary_trigger.py:215 retargeted + old-path negative added; test_goal_concurrent_refresh delivery_dir piecewise builder fixed; test_summary_writeset whitelist assertion kept on 036's frozen wording (FR-022) -->
+- [X] T012 Run the mirror fan-out: `python3 scripts/python/sync-mirrors.py --write` [blockedBy: T005,T006,T007,T008] <!-- verified: sync-mirrors.py --write: 5 per-tool copies regenerated, 4 mirrors synced, exit 0 -->
+- [X] T013 [P] Verify skills mirror parity — `diff -q` `skills/create-team/{SKILL.md,references/summary-mapping.md}` against `.specify/skills/create-team/...` [blockedBy: T012] <!-- verified: diff -q identical: SKILL.md, references/summary-mapping.md -->
+- [X] T014 [P] Verify the templates mirror and all 5 per-tool copies (`.claude/commands/speckit.team.md`, `.github/prompts/speckit.team.prompt.md`, `.qoder/commands/speckit.team.md`, `.opencode/command/speckit.team.md`, `.qwen/commands/speckit.team.toml`) contain the new path, contain no `project/goal`, and retain their `AUTO-GENERATED` headers [blockedBy: T012] <!-- verified: templates mirror identical; all 5 copies: new-path=2, old-path=0, AUTO-GENERATED header present -->
+- [X] T015 [P] Verify the script mirror `diff -q skills/create-team/scripts/build-summary-input.py .specify/skills/create-team/scripts/build-summary-input.py` [blockedBy: T012] <!-- verified: diff -q identical: build-summary-input.py -->
+- [X] T016 Execute the generator end-to-end against the `goal-share-a` / `goal-share-b` fixtures in a sandbox and read the report: `delivery_dir` MUST be `.specify/goal/shared-harvest-goal/summary`, exit code 0 [blockedBy: T012] <!-- verified: executed end-to-end on goal-share-a/b: delivery_dir asserted == .specify/goal/shared-harvest-goal/summary, exit 0, contributing_teams=[goal-share-a, goal-share-b] -->
+- [X] T017 Foundational regression gate: `pytest -q`, diff failures against `baseline-failed.txt`, zero new names — this is the proof that 036's aggregation semantics and identity grammar survived the path change (FR-014) [blockedBy: T011,T012] <!-- verified: run-tests.sh: 39 failed / 1342 passed / 1 skipped; comm vs baseline = 0 new, 0 resolved; passed 1309->1342 (+33 new tests green) -->
 
 **Checkpoint**: one goal index exists, the old path is gone from the live face, and 036's behavior is unchanged apart from the path
 
@@ -110,7 +112,7 @@ This is a template/prompt framework repository. Canonical sources live in `templ
 ### Tests for User Story 1 (MANDATORY) ⚠️
 
 - [ ] T018 [P] [US1] Structural contract test in `tests/contract/test_goal_definition.py` — frontmatter carries exactly the three lifecycle values, the three required sections exist, identity grammar and path-safety hold, and each rejection case from `contracts/goal-definition.contract.md` § "Validation outcomes" produces its named error
-- [ ] T019 [P] [US1] Structural contract test in `tests/contract/test_goal_command_surface.py` — `templates/commands/goal.md` exists with the required frontmatter, the `.specify/` mirror and all 5 per-tool copies exist with `AUTO-GENERATED` headers naming the source, and `docs/reference/commands/goal.md` exists
+- [ ] T019 [P] [US1] Structural contract test in `tests/contract/test_goal_command_surface.py` — `templates/commands/goal.md` exists with the required frontmatter, the `.specify/` mirror and all 5 per-tool copies exist with `AUTO-GENERATED` headers naming the source, `docs/reference/commands/goal.md` exists, and no new `--goal` option is introduced anywhere in the command or `goal-utils.py` (FR-021: the name is already claimed with two different meanings, so identity is passed positionally)
 - [ ] T020 [P] [US1] Unit tests in `tests/unit/test_goal_utils.py` — identity validation (floor-semantics, not prefix matching), duplicate-identity rejection, lifecycle transition table, three-part structure validation, archive enumeration, and the empty-criteria path returning "none provided" rather than synthesizing
 
 ### Implementation for User Story 1
@@ -136,7 +138,7 @@ This is a template/prompt framework repository. Canonical sources live in `templ
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T029 [P] [US2] Contract test in `tests/contract/test_goal_reference.py` — same-identity teams resolve identically; a nonexistent identity is reported as a broken link naming the missing identity and never degrades to an empty goal; an inline-only team resolves from its inline goal; reference-vs-inline divergence resolves to the definition with the divergence surfaced
+- [ ] T029 [P] [US2] Contract test in `tests/contract/test_goal_reference.py` covering FR-008…FR-012 — same-identity teams resolve identically; **a team declaring two `goal_slug` values is rejected** (FR-009); a nonexistent identity is reported as a broken link naming the missing identity and never degrades to an empty goal; an inline-only team resolves from its inline goal; reference-vs-inline divergence resolves to the definition with the divergence surfaced
 
 ### Implementation for User Story 2
 
@@ -164,7 +166,7 @@ This is a template/prompt framework repository. Canonical sources live in `templ
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] Source `project.project_desc` from the definition's objective and emit one milestone per success criterion in `build-summary-input.py`; when criteria are empty, emit an explicit "no verifiable criteria provided" declaration and an empty milestone group rather than synthesizing [blockedBy: T036]
+- [ ] T038 [US3] Source `project.project_desc` from the definition's objective and emit one milestone per success criterion in `skills/create-team/scripts/build-summary-input.py`, falling back to existing behavior when no definition exists (FR-013); when criteria are empty, emit an explicit "no verifiable criteria provided" declaration and an empty milestone group rather than synthesizing [blockedBy: T036]
 - [ ] T039 [US3] In `skills/create-team/scripts/build-summary-input.py`, treat criteria as measured-by-degree — milestones carry progress state, and no criterion is rendered as a binary pass/fail clause (FR-030) [blockedBy: T038]
 - [ ] T040 [US3] Add the advancing/not-advanced determination in `skills/create-team/scripts/build-summary-input.py` and surface it in the generation report [blockedBy: T037]
 - [ ] T041 [US3] Update the §2 seven-entity source table in `skills/create-team/references/summary-mapping.md` to name the definition as the narrative and milestone source, then fan out and verify the mirror [blockedBy: T038]
@@ -191,7 +193,7 @@ This is a template/prompt framework repository. Canonical sources live in `templ
 
 - [ ] T047 [US5] Add the team-level `territory` key (`write` / `read` / `forbidden` / `non_path`) to the frontmatter schema in `skills/create-team/SKILL.md` after `goal_slug` (line 42), with an invariant bullet after line 84 stating it applies to all four collaboration patterns [blockedBy: T042]
 - [ ] T048 [P] [US5] Add `territory` to `tests/fixtures/teams/goal-share-a/team.md` and `goal-share-b/team.md` — one pair overlapping on writes, one pair overlapping only on reads — and update `tests/fixtures/teams/README.md` to document the new key [blockedBy: T042]
-- [ ] T049 [US5] Implement path normalization and pairwise intersection in `build-summary-input.py`: brace expansion, relative→canonical, trailing-slash removal, glob retention with pattern-vs-path matching [blockedBy: T042,T043]
+- [ ] T049 [US5] Implement path normalization and pairwise intersection in `skills/create-team/scripts/build-summary-input.py`: brace expansion, relative→canonical, trailing-slash removal, glob retention with pattern-vs-path matching [blockedBy: T042,T043]
 - [ ] T050 [US5] Implement roster derivation into `.specify/goal/<slug>/summary/roster.md` plus the machine form in the generation report, extending the existing `contributing_teams` field rather than adding a second collection pass [blockedBy: T044,T049]
 - [ ] T051 [US5] Emit overlap findings and contested-area classification into the `gaps` / `meta` fields of `skills/create-team/scripts/build-summary-input.py` so they surface in the generation report and the team's `runs/<ts>-report.md` status line [blockedBy: T049]
 - [ ] T052 [US5] Wire detection into the gate order in `skills/create-team/SKILL.md` between gate 3 (Material) and gate 4 (refresh), after line 666, and extend the status-line vocabulary at lines 677-679 [blockedBy: T051]
@@ -212,7 +214,7 @@ This is a template/prompt framework repository. Canonical sources live in `templ
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T057 [P] [US4] Integration test in `tests/integration/test_goal_migration_path.py` — migration preserves resolved objective and criteria; inline retention is the user's choice and never forced; the other teams are unaffected; migration is not a precondition for the mechanism
+- [ ] T057 [P] [US4] Integration test in `tests/integration/test_goal_migration_path.py` covering FR-016…FR-018 — migration preserves resolved objective and criteria; inline retention is the user's choice and never forced (FR-017); the other teams are unaffected; migration is not a precondition for the mechanism (FR-018)
 
 ### Implementation for User Story 4
 
@@ -232,8 +234,12 @@ This is a template/prompt framework repository. Canonical sources live in `templ
 - [ ] T064 Live-face residual sweep: classify `grep -rl 'project/goal'` by face using the rule in `requirements.md` § "SC-011 Source"; the live subset MUST be empty and the 18 historical files (`.specify/specs/036-team-summary/**`, `.specify/specs/037-goal-registry/**`, `.specify/memory/feedback/**`, `.specify/memory/features*`) MUST be byte-unchanged [blockedBy: T012,T026,T055]
 - [ ] T065 Full mirror verification: `python3 scripts/python/sync-mirrors.py --check` exits 0, covering every row of plan.md's Mirror Obligations table [blockedBy: T012,T026,T034,T055,T060]
 - [ ] T066 Definition read-only proof: fingerprint a goal's `goal.md`, run a refresh, re-fingerprint — identical [blockedBy: T050]
-- [ ] T067 Full suite and baseline diff: `pytest -q`, zero new failure names vs `baseline-failed.txt`. Note that `test_review_prerequisite_flags_are_supported` should now pass again because `tasks.md` exists [blockedBy: T064,T065]
-- [ ] T068 Write `verification.md` with a status line for every SC-001…SC-018, the measured value for each, and `deferred_tasks=` if any row is `[~]` [blockedBy: T067]
+- [ ] T067 [P] **Measure SC-010**: scan `skills/create-team/references/goal.md`, `skills/improve-team/references/goal-editing.md` and `skills/create-team/references/optimization-goals.md` (plus their mirrors) for residual statements that a goal belongs inside team files; the count of second-account statements MUST be 0 and every concept statement MUST link to `shared/definitions/goal-definitions.md` [blockedBy: T031,T032,T033]
+- [ ] T068 [P] **Measure SC-012**: count the surfaces able to write a goal definition (commands, skills, scripts that write under `.specify/goal/**`) — MUST be exactly 1 (`/speckit.goal` via `goal-utils.py`); record the count, not just the existence of the command [blockedBy: T026,T065]
+- [ ] T069 [P] **Measure SC-013**: run the eight-dimension conformance check of `requirements.md` against `shared/definitions/goal-definitions.md` (composition, lifecycle set, plane relation incl. no structural link, criteria authority, singularity, object scope, narrative shape, verification mode); conflicts MUST be 0 [blockedBy: T002]
+- [ ] T070 [P] **Measure SC-014**: cross-compare every archived `goal.md` against every `requirements.md` in the repo — verbatim criteria duplication MUST be 0, `requirements.md` files carrying a goal field MUST be 0, and goal definitions enumerating FRs MUST be 0 [blockedBy: T028]
+- [ ] T071 Full suite and baseline diff: `pytest -q`, zero new failure names vs `baseline-failed.txt`. Note that `test_review_prerequisite_flags_are_supported` should now pass again because `tasks.md` exists [blockedBy: T064,T065]
+- [ ] T072 Write `verification.md` with a status line for every SC-001…SC-018, the measured value for each, and `deferred_tasks=` if any row is `[~]` — every status MUST cite the task that produced its measurement, never an assertion [blockedBy: T067,T068,T069,T070,T071]
 
 ---
 
@@ -272,7 +278,7 @@ US3 and US5 are mutually independent and may proceed in parallel after US2. US4 
 
 **Phase 6** — the five test tasks `T042`…`T046` are five separate new files, fully parallel; `T048` (fixtures) is independent of `T047` (schema prose).
 
-**Phase 8** — `T061`, `T062`, `T063` touch unrelated files and run in parallel; the verification chain `T064`→`T067`→`T068` is strictly serial.
+**Phase 8** — `T061`, `T062`, `T063` touch unrelated files and run in parallel, as do the four measurement tasks `T067`…`T070`; the closing chain `T064`/`T065` → `T071` → `T072` is strictly serial, and `T072` additionally waits on all four measurements.
 
 **Anti-parallel note**: every task that runs `sync-mirrors.py --write` (T012, T026, T034, T055, T060) MUST be serial with respect to each other and to any task editing a mirrored source — concurrent fan-out races on the same destination files.
 
