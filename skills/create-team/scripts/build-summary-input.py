@@ -155,6 +155,23 @@ class Team:
         return self.slug, "inferred"
 
     @property
+    def territory(self) -> dict[str, Any] | None:
+        """Team-level scope (FR-035). None means UNDECLARED — never conflated with empty.
+
+        Path lists are normalised (brace-expanded, canonicalised); `non_path` carries
+        typed {type, target} entries that are listed for arbitration, never intersected.
+        """
+        raw = self.fm.get("territory")
+        if not isinstance(raw, dict):
+            return None
+        return {
+            "write": sorted(expand_scopes(raw.get("write") or [])),
+            "read": sorted(expand_scopes(raw.get("read") or [])),
+            "forbidden": sorted(expand_scopes(raw.get("forbidden") or [])),
+            "non_path": list(raw.get("non_path") or []),
+        }
+
+    @property
     def ledger(self) -> Path:
         return self.dir / "items.jsonl"
 
@@ -387,6 +404,201 @@ def resolve_person_name(repo_root: Path, agent_ref: str) -> str | None:
     return None
 
 
+def _brace_expand(pattern: str) -> list[str]:
+    """Expand one level of `{a,b,c}` alternation, recursively for multiple groups."""
+    start = pattern.find("{")
+    if start == -1:
+        return [pattern]
+    depth = 0
+    for i in range(start, len(pattern)):
+        if pattern[i] == "{":
+            depth += 1
+        elif pattern[i] == "}":
+            depth -= 1
+            if depth == 0:
+                end = i
+                break
+    else:
+        return [pattern]  # unbalanced; treat literally
+    head, options, tail = pattern[:start], pattern[start + 1:end], pattern[end + 1:]
+    out: list[str] = []
+    for opt in options.split(","):
+        out.extend(_brace_expand(head + opt + tail))
+    return out
+
+
+def normalize_scope(pattern: str) -> str:
+    """Canonicalise one path pattern: drop ./, resolve . and .. textually, drop trailing /.
+
+    Globs (`*`, `**`, `?`) are retained as patterns, never expanded against the disk.
+    """
+    p = pattern.strip().replace("\\", "/")
+    while p.startswith("./"):
+        p = p[2:]
+    parts: list[str] = []
+    for seg in p.split("/"):
+        if seg in ("", "."):
+            continue
+        if seg == ".." and parts and parts[-1] != "..":
+            parts.pop()
+            continue
+        parts.append(seg)
+    norm = "/".join(parts)
+    return norm.rstrip("/")
+
+
+def expand_scopes(patterns: list[str]) -> set[str]:
+    out: set[str] = set()
+    for pattern in patterns:
+        for expanded in _brace_expand(str(pattern)):
+            norm = normalize_scope(expanded)
+            if norm:
+                out.add(norm)
+    return out
+
+
+def _glob_prefix(pattern: str) -> str:
+    """The path portion before the first glob metacharacter."""
+    cut = len(pattern)
+    for i, ch in enumerate(pattern):
+        if ch in "*?[":
+            cut = i
+            break
+    prefix = pattern[:cut]
+    return prefix.rstrip("/") if "/" in prefix else prefix
+
+
+def _is_ancestor_or_equal(a: str, b: str) -> bool:
+    """True when path `a` equals `b` or is a component-wise ancestor of `b`."""
+    if a == b:
+        return True
+    if a == "":
+        return True  # an empty prefix (bare glob) matches anywhere
+    ap, bp = a.split("/"), b.split("/")
+    return len(ap) <= len(bp) and bp[:len(ap)] == ap
+
+
+def scopes_overlap(a: str, b: str) -> bool:
+    """Conservative overlap: prefixes nest either way.
+
+    Errs toward reporting overlap (never misses a real write collision), which is the
+    safe direction for a mechanism whose whole point is preventing two teams from
+    competing for the same write set. `a/**` and `a/b/c.md` therefore overlap.
+    """
+    pa, pb = _glob_prefix(normalize_scope(a)), _glob_prefix(normalize_scope(b))
+    return _is_ancestor_or_equal(pa, pb) or _is_ancestor_or_equal(pb, pa)
+
+
+def _write_intersections(wa: list[str], wb: list[str]) -> list[list[str]]:
+    return [[x, y] for x in wa for y in wb if scopes_overlap(x, y)]
+
+
+def overlap_verdict(team_a: str, terr_a: dict[str, Any] | None,
+                    team_b: str, terr_b: dict[str, Any] | None) -> dict[str, Any]:
+    """Verdict for one unordered team pair (OV-1..OV-5).
+
+    `no-overlap` requires BOTH teams to declare a non-empty path-shaped write scope.
+    A team that declares nothing (territory None) or declares no write paths gives
+    `undecidable` — never conflated with `no-overlap` (FR-042).
+    """
+    base = {"pair": sorted([team_a, team_b])}
+    if terr_a is None or terr_b is None:
+        undeclared = [t for t, terr in ((team_a, terr_a), (team_b, terr_b)) if terr is None]
+        return {**base, "verdict": "undecidable", "kind": "undeclared",
+                "entries": [], "note": f"范围未声明,无法判定重叠:{', '.join(undeclared)}"}
+    intersections = _write_intersections(terr_a["write"], terr_b["write"])
+    if intersections:
+        return {**base, "verdict": "overlap", "kind": "write-write",
+                "entries": intersections}
+    if terr_a["non_path"] and terr_b["non_path"] and not (terr_a["write"] and terr_b["write"]):
+        return {**base, "verdict": "undecidable", "kind": "non-path",
+                "entries": [], "non_path_pairs": [terr_a["non_path"], terr_b["non_path"]],
+                "note": "仅非路径维度声明,如实并列供人裁定,机制不判定等价(FR-036)"}
+    if not terr_a["write"] or not terr_b["write"]:
+        empty = [t for t, terr in ((team_a, terr_a), (team_b, terr_b)) if not terr["write"]]
+        return {**base, "verdict": "undecidable", "kind": "no-write-scope",
+                "entries": [], "note": f"无路径形 Write Scope,无法判定重叠:{', '.join(empty)}"}
+    return {**base, "verdict": "no-overlap", "kind": "write-write", "entries": []}
+
+
+def detect_overlaps(teams: list[Team]) -> list[dict[str, Any]]:
+    findings: list[dict[str, Any]] = []
+    for i in range(len(teams)):
+        for j in range(i + 1, len(teams)):
+            findings.append(
+                overlap_verdict(teams[i].slug, teams[i].territory,
+                                teams[j].slug, teams[j].territory)
+            )
+    return findings
+
+
+def containment_violations(team_write: list[str], member_write: list[str]) -> list[str]:
+    """TT-6 — member write scopes that escape the team-level write scope."""
+    team = sorted(expand_scopes(team_write))
+    out: list[str] = []
+    for m in sorted(expand_scopes(member_write)):
+        if not any(scopes_overlap(m, t) and _is_ancestor_or_equal(_glob_prefix(t), _glob_prefix(m))
+                   for t in team):
+            out.append(m)
+    return out
+
+
+def build_roster(teams: list[Team]) -> list[dict[str, Any]]:
+    """RO-1..RO-4 — one derived row per team; regenerated wholesale."""
+    roster: list[dict[str, Any]] = []
+    for team in sorted(teams, key=lambda t: t.slug):
+        _, identity_type = team.goal_identity
+        roster.append({
+            "team": team.slug,
+            "territory": team.territory,          # None when undeclared
+            "identity_type": identity_type,       # explicit | inferred
+            "advancing": team.has_material(),
+            "participation": "active",
+        })
+    return roster
+
+
+def render_roster_md(goal_slug: str, roster: list[dict[str, Any]],
+                     overlaps: list[dict[str, Any]], contested: list[dict[str, Any]]) -> str:
+    """Human-readable derived roster (FR-033). Regenerated wholesale each refresh."""
+    lines = [
+        f"# Goal roster — {goal_slug}",
+        "",
+        "> 派生产物,每次刷新整体重算;请勿手工编辑。团队↔goal 绑定是单向的,",
+        "> 本名册不改变 goal 定义。",
+        "",
+        "## 参与团队",
+        "",
+        "| 团队 | 身份 | 是否推进 | 声明的 Write Scope |",
+        "|------|------|---------|--------------------|",
+    ]
+    for row in roster:
+        terr = row.get("territory")
+        write = "、".join(terr["write"]) if terr and terr["write"] else (
+            "(空)" if terr else "**未声明**"
+        )
+        lines.append(
+            f"| {row['team']} | {row['identity_type']} | "
+            f"{'是' if row['advancing'] else '否'} | {write} |"
+        )
+    lines += ["", "## 重叠检测", ""]
+    if not overlaps:
+        lines.append("- 单团队或无可比对范围,未发起检测。")
+    for f in overlaps:
+        detail = f.get("note", "")
+        if f["verdict"] == "overlap":
+            paths = sorted({p for pair in f["entries"] for p in pair})
+            detail = "写重叠于 " + "、".join(paths)
+        lines.append(f"- **{f['verdict']}** {f['pair'][0]} ↔ {f['pair'][1]}:{detail}")
+    lines += ["", "## 争用区(须归给唯一团队或转禁写区)", ""]
+    if not contested:
+        lines.append("- 无。")
+    for f in contested:
+        paths = sorted({p for pair in f["entries"] for p in pair})
+        lines.append(f"- {f['pair'][0]} 与 {f['pair'][1]}:{'、'.join(paths)}")
+    return "\n".join(lines) + "\n"
+
+
 def build_form(repo_root: Path, goal_slug: str, kind: str, teams: list[Team],
                baseline: str | None) -> tuple[dict[str, Any], list[str], dict[str, Any]]:
     gaps: list[str] = []
@@ -603,6 +815,28 @@ def build_form(repo_root: Path, goal_slug: str, kind: str, teams: list[Team],
             "source_label": "团队条目台账 items.jsonl",
         },
     }
+    # ------------------------------------------------------------------
+    # multi-team coordination (FR-033..FR-042): derived roster + overlap findings.
+    # Detection rides this refresh — no second trigger. It only reports; the
+    # coordination round and any team.md write are a separate, human-ratified step.
+    # ------------------------------------------------------------------
+    roster = build_roster(teams)
+    overlaps = detect_overlaps(teams)
+    contested = [f for f in overlaps if f["verdict"] == "overlap"]
+    for f in contested:
+        paths = sorted({p for pair in f["entries"] for p in pair})
+        gaps.append(
+            f"写重叠(争用区,FR-037/FR-038):团队 {f['pair'][0]} 与 {f['pair'][1]} "
+            f"的 Write Scope 相交于 {', '.join(paths)};须归给唯一团队或转为禁写区,"
+            "MUST NOT 停留在双方都可写"
+        )
+    for f in overlaps:
+        if f["verdict"] == "undecidable" and f["kind"] == "undeclared":
+            gaps.append(f"范围未声明,无法判定重叠(FR-042):{f.get('note', '')}")
+    goal_meta["roster"] = roster
+    goal_meta["overlaps"] = overlaps
+    goal_meta["contested_areas"] = contested
+
     meta = {
         "goal_slug": goal_slug,
         "goal_identity": kind,
@@ -740,6 +974,17 @@ def main(argv: list[str] | None = None) -> int:
         tmp_path = out_path.with_suffix(out_path.suffix + ".tmp")
         tmp_path.write_text(rendered, encoding="utf-8")
         os.replace(tmp_path, out_path)  # atomic within the same directory
+
+        # Derived roster (FR-033/FR-034) lands beside the form, inside the same lock.
+        # It always belongs in the goal's canonical summary/ subtree, even when --out
+        # redirects the form elsewhere, so ensure that directory exists first.
+        delivery_dir.mkdir(parents=True, exist_ok=True)
+        roster_path = delivery_dir / "roster.md"
+        roster_md = render_roster_md(goal_slug, meta.get("roster", []),
+                                     meta.get("overlaps", []), meta.get("contested_areas", []))
+        roster_tmp = roster_path.with_suffix(".md.tmp")
+        roster_tmp.write_text(roster_md, encoding="utf-8")
+        os.replace(roster_tmp, roster_path)
     finally:
         if lock_handle is not None:
             os.close(lock_handle)

@@ -6,6 +6,11 @@ goal: >
   两个团队共同推进同一个目标:让团队状态可被目标级读者理解。
   成功标准:聚合总结覆盖两个团队;每个工作项可归属;并发刷新不丢更新。
 goal_slug: shared-harvest-goal
+territory:
+  write:
+    - fixtures/harvest/reports/weekly.md
+  read:
+    - fixtures/harvest/shared/**
 pattern: iteration
 created: 2026-08-01
 updated: 2026-08-04

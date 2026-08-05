@@ -40,6 +40,15 @@ slug: <kebab-slug>
 description: <one-line label>
 goal: <overall final objective + success criteria / threshold>
 goal_slug: <kebab-slug>        # optional — the GOAL's identity; distinct from `slug` (the team's identity). See Summary Refresh below
+territory:                     # optional — TEAM-level coverage; all four patterns. Lifts member Territory Division one level up
+  write:                       #   paths this team may create/modify (glob / brace / relative all normalised before compare)
+    - <path-or-glob>
+  read:                        #   paths this team may read (read overlap between teams is allowed)
+    - <path-or-glob>
+  forbidden:                   #   shared paths this team MUST NOT modify
+    - <path-or-glob>
+  non_path:                    #   coverage that is not file-shaped (framework itself, runtime, …); listed for arbitration, never intersected
+    - { type: <dimension>, target: <free text> }
 pattern: parallel | serial | iteration | continuous
 preset: <preset_id>            # optional — set when instantiated from a team preset
 created: YYYY-MM-DD
@@ -82,6 +91,7 @@ config:
 
 - `slug` MUST be unique within `.specify/teams/`; it also names the team directory `.specify/teams/<slug>/`.
 - `goal_slug` identifies the **goal**, not the team — it is deliberately a different axis from `slug` (the team slug). Two teams that declare the same `goal_slug` are pursuing one goal and share one summary; a team that omits it falls back to its own `slug` as an *inferred* goal identity. It MUST NOT be derived from the goal prose, so rewriting the goal text never relocates the summary. See [`references/summary-mapping.md`](references/summary-mapping.md).
+- `territory` is the **team-level** coverage declaration and applies to all four patterns (the member-level Territory Division lifted one level up). An absent key means **undeclared** — never conflated with an empty scope. Path entries are normalised (brace-expanded, canonicalised) before comparison. Among teams sharing one `goal_slug`, no two `write` scopes may intersect (read overlap is allowed); a write intersection is a **contested area** that must be resolved to a single owner or a forbidden-write entry. The refresh only **detects and proposes** a re-division — a human ratifies it and the agreed scopes are written back into each `team.md`, never into the goal directory.
 - `config.summary` tunes the periodic summary refresh (enable/disable, cadence, delivery directory, interactivity). Omitting the block leaves the summary **enabled** with the pattern's default cadence — `continuous` defaults to every 5th cycle, never every cycle.
 - `members` MUST resolve to `.specify/agents/{templates,instances}/<slug>.agent.md` (instance wins on filename collision) or a temporary stage/worker template; unresolved members are surfaced as broken references.
 - `config` MUST match `pattern`.
@@ -664,7 +674,8 @@ Evaluate in this order; the first gate that blocks determines the recorded statu
 1. **Budget** — at the report-only tier or with the kill-switch set → skip, record `skipped(budget)`.
 2. **Cadence** — not at an Nth boundary → skip, record `skipped(cadence)`.
 3. **Material** — no item ledger and no run reports anywhere in the goal → decline, record `declined(no-material)`.
-4. Otherwise → refresh, record `produced`.
+4. **Overlap detection** — since the refresh will run, detect write-scope overlap across every team sharing this `goal_slug` (it rides this one refresh, no separate trigger). Record any contested areas in the roster and the status line; this only reports — it MUST NOT rewrite any `team.md`, and the coordination round is a separate, human-initiated step.
+5. Otherwise → refresh, record `produced`.
 
 - **Budget outranks cadence**: reaching a cadence point MUST NOT force chart generation once the budget ladder has tripped.
 - The summary is the **first step dropped** under budget pressure, and MUST NOT be retried inside the same run after being skipped.
@@ -676,6 +687,7 @@ Evaluate in this order; the first gate that blocks determines the recorded statu
 
 ```
 Summary: produced | skipped(cadence) | skipped(budget) | declined(no-material)
+Overlap: none | contested(<n>) | undecidable(<team,…>)   # when ≥2 teams share the goal
 ```
 
 Exactly one of the four MUST appear per run. Absence is a violation: this line is what

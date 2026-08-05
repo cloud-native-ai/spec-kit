@@ -24,3 +24,8 @@ nothing else.
 - Fixture content is illustrative and MUST NOT be copied into real team definitions.
 - Keep fixtures small. They are read by deterministic parsing, not by a model, so
   volume buys nothing.
+- `goal-share-a` and `goal-share-b` additionally carry a team-level `territory` block
+  (037 coordination): their `write` scopes overlap under `fixtures/harvest/reports/`
+  (a contested area the overlap detector must flag) while their `read` scopes are
+  identical (read overlap is allowed and MUST NOT be flagged). They are the
+  overlap-detection test bed for `test_coordination_round.py` and `test_goal_roster.py`.
