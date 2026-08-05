@@ -23,11 +23,11 @@
 
 | 实体 | 团队侧来源 | 缺席降级 |
 |------|-----------|---------|
-| `project` | **goal 级**:`project_name` ← 解析出的 goal 身份;`project_desc` ← 该 goal 的 goal 正文;`baseline_date` ← 本次触发运行/cycle 的时间戳(FR-005,不依赖被调技能读系统时钟);`repos` 恒为空(不 opt-in 扫仓) | 不可缺席(R 档) |
+| `project` | **goal 级**:`project_name` ← 解析出的 goal 身份;`project_desc` ← 该 goal 的**定义** `.specify/goal/<goal-slug>/goal.md` 的目标叙述(定义存在时),无定义时回退到团队内联 goal 正文;`baseline_date` ← 本次触发运行/cycle 的时间戳(FR-005,不依赖被调技能读系统时钟);`repos` 恒为空(不 opt-in 扫仓) | 不可缺席(R 档) |
 | `people` | N 个团队名册行的**并集**;`owner_id` ← 名册 agent slug;`owner_name` ← 所引用 agent 定义的 frontmatter `name`(解析顺序见 §5);`owner_role` ← 名册 `role`。同一 agent slug 出现在多个团队 → 归并为一人 | 解析不到定义 → `owner_name` 记 `未记录`,不臆造(FR-004) |
 | `phases` | N 个团队各自的阶段单位,**按团队命名空间化**(见 §3) | 无阶段材料 → 该团队单一阶段并声明 |
 | `work_items` | N 个团队 `items.jsonl` 台账的**并集**(权威结构面,见 §6) | 全部团队台账为空且 `runs/` 亦无交付物 → 拒绝出总结(`declined(no-material)`) |
-| `milestones` | **goal 级,只一套**:该 goal 的可验证成功判据逐条映射,`anchor_item_id` 锚到对应工作项(FR-003) | goal 无可验证判据 → 该组为空,依赖 `work_items` 满足 R 档组级约束 |
+| `milestones` | **goal 级,只一套**:定义存在时逐条映射该 goal **定义**的成功判据(`source` 指向 `goal.md`);无定义时回退到解析内联 goal 正文的判据(FR-013);`anchor_item_id` 锚到对应工作项(FR-003) | 定义判据为空(`None provided.`)或内联无判据 → 该组为空并显式声明,依赖 `work_items` 满足 R 档组级约束 |
 | `features` | N 个团队产出的能力/交付物类目并集 | 无类目材料 → 空,《需求与特性》按既有降级只留声明 |
 | `sources` | 每个团队每组信息一条声明,`source_kind: user-form`,`source_ref` 指向该团队的 tracked 工件路径 | 不可缺席(否则条目 `source` 无法推断) |
 

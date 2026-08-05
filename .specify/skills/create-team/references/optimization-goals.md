@@ -1,6 +1,6 @@
 # 「优化」类目标的途径与策略（操作规范）
 
-**Owner**: the team domain (`create-team`). 当 team 的 [goal](goal.md) 主题为**「优化」**时，用本文的分类与策略来选择团队形态。
+**Owner**: the team domain (`create-team`). 当 team 的 [goal](goal.md) 主题为**「优化」**时，用本文的分类与策略来选择团队形态。本文只讲**优化类目标的团队形态选择**;goal 概念本身(定义、作用对象、判据权威)见 `.specify/shared/definitions/goal-definitions.md`,经 [goal.md](goal.md) 转引,不在此另述。
 
 ## 1. 一次性 vs 持续优化（先分类）
 

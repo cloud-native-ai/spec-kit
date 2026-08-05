@@ -315,6 +315,52 @@ def backfill_from_reports(team: Team, gaps: list[str]) -> list[dict[str, Any]]:
 CRITERIA_SPLIT = re.compile(r"[;；]|(?<=[。.])\s*")
 
 
+#: The goal archive. Read-only from this script — `goal-utils.py` is its only writer.
+ARCHIVE_DIRNAME = ".specify/goal"
+
+
+def load_goal_definition(repo_root: Path, goal_slug: str) -> dict[str, Any] | None:
+    """Read the archived definition's objective and criteria, or None if absent.
+
+    This parses locally rather than importing `scripts/python/goal-utils.py`:
+    the two files live in different mirrored trees (`skills/` and `scripts/`) at
+    different relative depths, so a cross-tree import breaks once installed into a
+    consuming project. The reader is deliberately minimal and read-only —
+    `goal-utils.py` stays the single writer and the single validator.
+    """
+    path = repo_root / ARCHIVE_DIRNAME / goal_slug / "goal.md"
+    if not path.is_file():
+        return None
+    text = path.read_text(encoding="utf-8")
+    body = text.split("---", 2)[2] if text.startswith("---") else text
+
+    def section(heading: str) -> str:
+        out: list[str] = []
+        inside = False
+        for line in body.split("\n"):
+            if line.strip() == heading:
+                inside = True
+                continue
+            if inside and line.startswith("## "):
+                break
+            if inside:
+                out.append(line)
+        return "\n".join(out).strip()
+
+    raw = section("## Success Criteria")
+    criteria: list[str] = []
+    if raw and raw.strip() != "None provided.":
+        for line in raw.splitlines():
+            stripped = re.sub(r"^\s*(?:\d+[.)]|[-*+])\s*", "", line).strip()
+            if stripped:
+                criteria.append(stripped)
+    return {
+        "relpath": f"{ARCHIVE_DIRNAME}/{goal_slug}/goal.md",
+        "objective": " ".join(section("## Objective").split()),
+        "criteria": criteria,
+    }
+
+
 def extract_milestones(goal_text: str) -> list[str]:
     """FR-003 — the goal's verifiable success criteria become milestones."""
     if not goal_text:
@@ -466,27 +512,71 @@ def build_form(repo_root: Path, goal_slug: str, kind: str, teams: list[Team],
             }
         )
 
-    # milestones — goal level, emitted once (FR-032)
-    goal_text = next((t.goal_text for t in teams if t.goal_text), "")
-    criteria = extract_milestones(goal_text)
+    # ------------------------------------------------------------------
+    # goal narrative + milestones (FR-008 / FR-010 / FR-012 / FR-013)
+    #
+    # The archived definition is authoritative when present; otherwise the
+    # pre-037 inline behaviour is preserved byte-for-byte so existing teams keep
+    # working with zero edits.
+    # ------------------------------------------------------------------
+    definition = load_goal_definition(repo_root, goal_slug)
+    inline_texts = {t.goal_text for t in teams if t.goal_text}
+    goal_meta: dict[str, Any] = {}
+
+    if definition:
+        goal_text = definition["objective"]
+        criteria = list(definition["criteria"])
+        milestone_source = definition["relpath"]
+        goal_meta["goal_source"] = "definition"
+        goal_meta["goal_definition"] = definition["relpath"]
+        # FR-012 — the definition wins, and the divergence is surfaced, not hidden.
+        divergent = sorted(t.slug for t in teams if t.goal_text and t.goal_text != goal_text)
+        if divergent:
+            gaps.append(
+                "团队内联 goal 与被引用的定义不一致,以定义为权威(FR-012);"
+                f"不一致的团队:{', '.join(divergent)}"
+            )
+    else:
+        goal_text = next((t.goal_text for t in teams if t.goal_text), "")
+        criteria = extract_milestones(goal_text)
+        milestone_source = f".specify/teams/{teams[0].slug}/team.md"
+        goal_meta["goal_source"] = "inline"
+        # FR-010 — a declared identity with no definition is a broken reference.
+        # Reported only once the project has adopted the concept (the archive
+        # exists), so a pure-036 project that never defined a goal is untouched.
+        if (repo_root / ARCHIVE_DIRNAME).is_dir():
+            declared = sorted(t.slug for t in teams if t.fm.get("goal_slug"))
+            if declared:
+                gaps.append(
+                    f"断链引用(FR-010):团队 {', '.join(declared)} 声明了 goal_slug "
+                    f"'{goal_slug}',但 {ARCHIVE_DIRNAME}/{goal_slug}/goal.md 不存在;"
+                    "已回退到内联目标,未降级为空目标"
+                )
+        # GI-4 — without a definition, differing inline wordings need arbitration.
+        if len(inline_texts) > 1:
+            gaps.append(
+                "同一 goal_slug 下各团队的 goal 正文不一致,以显式声明为准(GI-4);差异记入元信息供人裁决"
+            )
+
     anchor = work_items[0]["item_id"] if work_items else None
     milestones = [
         {
             "milestone_id": f"MS-{i:04d}",
             "milestone_name": text[:60],
             **({"anchor_item_id": anchor} if anchor else {}),
-            "source": f".specify/teams/{teams[0].slug}/team.md",
+            "source": milestone_source,
         }
         for i, text in enumerate(criteria, 1)
     ]
     if not milestones:
-        gaps.append("goal 正文未声明可验证成功判据,里程碑组为空(依赖 work_items 满足 R 档组级约束)")
-
-    distinct_goal_texts = {t.goal_text for t in teams if t.goal_text}
-    if len(distinct_goal_texts) > 1:
-        gaps.append(
-            "同一 goal_slug 下各团队的 goal 正文不一致,以显式声明为准(GI-4);差异记入元信息供人裁决"
-        )
+        if definition:
+            # GD-8 — an empty criteria set is legal; declare it, never invent one.
+            gaps.append(
+                "该 goal 的定义未提供可验证判据(None provided.),里程碑组为空"
+                "(依赖 work_items 满足 R 档组级约束)"
+            )
+        else:
+            gaps.append("goal 正文未声明可验证成功判据,里程碑组为空(依赖 work_items 满足 R 档组级约束)")
 
     # coverage — FG-8, always emitted
     truncated = sum(c for c in completed_per_phase.values() if c > AGGREGATE_COMPLETED_ABOVE)
@@ -520,6 +610,7 @@ def build_form(repo_root: Path, goal_slug: str, kind: str, teams: list[Team],
         "inferred_fields": inferred_fields,
         "material_gaps": gaps,
         "declined": False,
+        **goal_meta,
     }
     return form, gaps, meta
 

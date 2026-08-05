@@ -21,13 +21,15 @@
 2. **Derive structure from the goal**——由 goal 决定需要哪些角色/阶段（静态）与哪种协作模式（动态）。
 3. 若 **goal 主题为「优化」**，进一步按 [`optimization-goals.md`](optimization-goals.md) 区分**一次性 / 持续**，并为持续优化选择**淘汰 / 渐进**策略。
 
-## 持久化
+## 持久化:引用优先,内联可选
 
-持久化的 `.specify/teams/<slug>/team.md`（团队目录，运行报告累积在同目录 `runs/` 下）：
+一个具体 goal 的**内容**(目标叙述 + 成功判据)的单一事实源是它在 `.specify/goal/<goal-slug>/goal.md` 的**定义**,由 `/speckit.goal` 撰写。团队侧只声明它服务于哪个 goal,不复制其内容:
 
-- frontmatter 含 **`goal`** 字段（顺序：`slug, name, description, goal, pattern, members, config, created, updated`）；
-- 含 **`## Goal`** 小节（总体最终目标 + 成功标准），**先写 `## Goal`**，静态与动态小节都围绕它组织。
+- frontmatter 以 **`goal_slug`** 声明所引用的 goal(**引用,不是副本**);同一 `goal_slug` 的多个团队解析到同一份定义。
+- 内联的 **`goal`** 字段与 **`## Goal`** 小节仍为合法,用于可读性与存量兼容(字段顺序:`slug, name, description, goal, goal_slug, territory, pattern, members, config, created, updated`;先写 `## Goal`,静态与动态小节围绕它组织)。**当定义存在时以定义为权威**;内联与定义不一致会被显式报出供人裁决,不静默降级。
+- 未声明 `goal_slug` 的存量团队仍以内联 `goal` 正常工作,MUST NOT 要求先迁移。
 
-## modify 模式：goal 可修改
+## modify 模式:改内容去定义,改结构在团队
 
-`modify`（`improve-team`）可把 goal 作为**一等可修改对象**重定义；goal 变更时必须**重新对齐**花名册与协作模式。详见 [`../../improve-team/references/goal-editing.md`](../../improve-team/references/goal-editing.md)。
+- 修改某个 goal 的**内容**(重写目标或判据)是对**定义**的编辑,经 `/speckit.goal`(`modify` / `criteria` / `status`),不在 `team.md` 里就地改。
+- 因 goal 变更而**重对齐花名册与协作模式**仍是团队侧的 `modify`(`improve-team`)。详见 [`../../improve-team/references/goal-editing.md`](../../improve-team/references/goal-editing.md)。
