@@ -307,6 +307,56 @@ def set_criteria(path: Path, criteria: list[str]) -> Path:
     return path
 
 
+def migrate_team(repo_root: Path, team_slug: str, *, keep_inline: bool = True) -> tuple[Path, str]:
+    """Derive a goal definition from a team's inline goal and switch it to a reference.
+
+    Per-team and optional (FR-016..FR-019). The inline goal is kept by default —
+    removal is the user's choice, never forced. Semantics are preserved: the objective
+    the team resolved before migration is the objective the definition carries after.
+    """
+    team_md = Path(repo_root) / ".specify/teams" / team_slug / "team.md"
+    if not team_md.is_file():
+        raise GoalError(f"team not found: {team_md}")
+    text = team_md.read_text(encoding="utf-8")
+    fm, body = _split_frontmatter(text)
+
+    inline = str(fm.get("goal") or "").strip()
+    if not inline:
+        raise GoalError(f"team {team_slug!r} has no inline goal to migrate")
+
+    # objective = first sentence/line of the inline goal; criteria = 成功标准/success lines
+    objective = " ".join(inline.split())
+    criteria: list[str] = []
+    goal_body = _section(body, "## Goal")
+    for line in goal_body.splitlines():
+        stripped = re.sub(r"^\s*(?:\d+[.)]|[-*+])\s*", "", line).strip()
+        if stripped and re.search(r"成功标准|success crit|criteri|判据|阈值|threshold", stripped, re.I):
+            criteria.append(stripped)
+
+    identity = str(fm.get("goal_slug") or team_slug)
+    if definition_path(repo_root, identity).exists():
+        raise GoalError(
+            f"a definition for {identity!r} already exists; migration would overwrite it — "
+            "resolve manually via the modify path"
+        )
+    created = create_goal(repo_root, identity, objective, criteria)
+
+    # set goal_slug on the team, preserving the rest of the file verbatim
+    if "goal_slug:" in text:
+        new_text = re.sub(r"(?m)^goal_slug:.*$", f"goal_slug: {identity}", text)
+    else:
+        # insert right after the `goal:` line (or its folded block's first line)
+        new_text = re.sub(r"(?m)^(goal:.*\n(?:\s+.*\n)*)", r"\1" + f"goal_slug: {identity}\n",
+                          text, count=1)
+        if "goal_slug:" not in new_text:  # no goal line matched; append to frontmatter
+            new_text = text.replace("---\n", f"---\ngoal_slug: {identity}\n", 1)
+    if not keep_inline:
+        # the caller explicitly opted to drop the inline copy
+        new_text = re.sub(r"(?m)^goal:.*(?:\n\s+.*)*\n", "", new_text, count=1)
+    team_md.write_text(new_text, encoding="utf-8")
+    return created, identity
+
+
 def list_goals(repo_root: Path) -> list[dict]:
     root = archive_root(repo_root)
     if not root.is_dir():
@@ -371,6 +421,12 @@ def main(argv: list[str] | None = None) -> int:
     p_criteria.add_argument("slug")
     p_criteria.add_argument("--criterion", action="append", default=[])
 
+    p_migrate = sub.add_parser("migrate", parents=[common],
+                               help="derive a definition from a team's inline goal and reference it")
+    p_migrate.add_argument("team_slug")
+    p_migrate.add_argument("--drop-inline", action="store_true",
+                           help="remove the team's inline goal after migrating (default: keep)")
+
     args = parser.parse_args(argv)
     repo_root = Path(args.repo_root or ".").resolve()
 
@@ -401,6 +457,12 @@ def main(argv: list[str] | None = None) -> int:
                 return EXIT_NOT_FOUND
             set_criteria(path, args.criterion)
             result = {"slug": args.slug, "criteria": args.criterion}
+        elif args.action == "migrate":
+            created, identity = migrate_team(
+                repo_root, args.team_slug, keep_inline=not args.drop_inline)
+            result = {"migrated_team": args.team_slug, "goal_slug": identity,
+                      "created": str(created.relative_to(repo_root)),
+                      "inline_kept": not args.drop_inline}
         else:  # pragma: no cover - argparse guards this
             parser.error(f"unknown action {args.action}")
     except GoalError as exc:

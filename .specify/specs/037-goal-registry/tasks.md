@@ -214,13 +214,13 @@ This is a template/prompt framework repository. Canonical sources live in `templ
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T057 [P] [US4] Integration test in `tests/integration/test_goal_migration_path.py` covering FR-016…FR-018 — migration preserves resolved objective and criteria; inline retention is the user's choice and never forced (FR-017); the other teams are unaffected; migration is not a precondition for the mechanism (FR-018)
+- [X] T057 [P] [US4] Integration test in `tests/integration/test_goal_migration_path.py` covering FR-016…FR-018 — migration preserves resolved objective and criteria; inline retention is the user's choice and never forced (FR-017); the other teams are unaffected; migration is not a precondition for the mechanism (FR-018) <!-- verified: 6 tests green: objective preserved across migration (inline->definition, same project_desc), inline kept by default, dropped only on --drop-inline, other teams untouched (bytes), unmigrated team still resolves, migrating onto an existing definition refused (exit 2) -->
 
 ### Implementation for User Story 4
 
-- [ ] T058 [US4] Add the `migrate` mode to `templates/commands/goal.md` — derive a definition from a team's inline goal, switch the team to a reference, and leave inline removal to the user [blockedBy: T057]
-- [ ] T059 [US4] Verify all 4 existing teams under `.specify/teams/` resolve and run with zero file edits [blockedBy: T058]
-- [ ] T060 [US4] Fan out and verify mirrors for the command change — `templates/commands/goal.md` → `.specify/templates/commands/goal.md` plus the 5 per-tool copies [blockedBy: T058]
+- [X] T058 [US4] Add the `migrate` mode to `templates/commands/goal.md` — derive a definition from a team's inline goal, switch the team to a reference, and leave inline removal to the user [blockedBy: T057] <!-- verified: migrate mode: templates/commands/goal.md step 6 + goal-utils.py migrate action (reads inline goal, creates definition at goal_slug|team-slug, sets goal_slug, keeps inline by default) -->
+- [X] T059 [US4] Verify all 4 existing teams under `.specify/teams/` resolve and run with zero file edits [blockedBy: T058] <!-- verified: 4 real teams (cws-workspace-cluster, draw-plantuml-optimizer, requirement-implement-monitor, summarize-project-optimizer) are inline-only; resolve via fallback with zero edits; four-patterns integration test green -->
+- [X] T060 [US4] Fan out and verify mirrors for the command change — `templates/commands/goal.md` → `.specify/templates/commands/goal.md` plus the 5 per-tool copies [blockedBy: T058] <!-- verified: sync-mirrors --write + --check exit 0; goal.md (+5 copies) and goal-utils.py mirror diff-identical -->
 
 **Checkpoint**: adoption has no migration toll
 
