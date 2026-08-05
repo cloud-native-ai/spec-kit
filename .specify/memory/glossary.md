@@ -38,6 +38,11 @@
 | Goal–Team Binding | 目标—团队绑定, goal 引用 | 团队到 goal 的单向引用(N 团队 : 1 goal),以 goal_slug 声明;团队侧只存身份不存目标副本;一个团队同时只绑一个 goal | user | confirmed |
 | Team Goal | 团队目标, team 目标 | 团队服务于哪个项目级 Goal 的**引用**(经 goal_slug);未迁移团队可退化为内联副本,定义存在时以 Goal 定义为权威 | user | confirmed |
 | Team Summary | 团队总结 | 把团队自身视作项目而产出的累积式状态总结(**派生物**);按 goal 索引落在 .specify/goal/&lt;goal-slug&gt;/summary/ 子树内,与同目录下被撰写的 goal.md 定义结构分离——刷新只写 summary/,不写定义 | auto | proposed |
+| Team Territory | 团队级范围, 团队 territory, team territory | 团队在 team.md 声明的覆盖范围(write/read/forbidden 路径 + 类型化 non_path 条目);把成员级 Territory Division 抬到团队级,四种协作模式通用;缺省该键即「未声明」,不等于空 | auto | proposed |
+| Team Roster | 参与团队名册, goal 名册, roster | 同一 goal 下全部引用团队的**派生**清单(team slug + 声明范围 + 身份类型 + 是否推进),落在 summary/roster.md;每次刷新整体重算,不改 goal 定义 | auto | proposed |
+| Overlap Finding | 重叠发现, 范围重叠, overlap | 同一 goal 下两团队范围的比对结论:overlap(写-写相交,指名路径)/ no-overlap(双方均声明且不相交)/ undecidable(有一方未声明或仅非路径声明) | auto | proposed |
+| Contested Area | 争用区, 写重叠区, contested area | 被两个及以上团队写入的重叠区(write-write finding);MUST 归给唯一团队或转为该 goal 的禁写区,不得停留在双方都可写 | auto | proposed |
+| Coordination Round | 协调轮, 协调机制, coordination round | 针对已检出重叠的一次重划:机制**只检测并提议**(附依据),人裁定后把划分写回各 team.md;机制自身无改写权,提议阶段对 team.md 零写入 | auto | proposed |
 | 工作项四态色板 | 四态色板, work item four-state palette | 已完成/进行中/延期/未开始 四态的统一颜色与冗余符号编码,颜色之外必配符号 | auto | proposed |
 | Agent Template | agent模板, 能力模板, 抽象agent类, capacity template | Agent 三层分类法第一层:能力与行为框架描述,源码 agents/ 角色集由 specify init 安装到 .specify/agents/templates/;真源 shared/definitions/agent-definitions.md | user | confirmed |
 | Agent Instance | agent实例, 落地定义, agent definition | Agent 三层分类法第二层:职责描述定义(.specify/agents/instances/*.agent.md、team 名册席位),引用 Agent Template 并绑定具体职责,由命令/技能实例化产生 | user | confirmed |

@@ -1,6 +1,6 @@
 # 编辑团队 Goal（modify 操作规范）
 
-**Owner**: `improve-team`. 本文规范 `modify` 模式下对团队 **goal** 的编辑行为。goal 概念本身的定义见 [`../../create-team/references/goal.md`](../../create-team/references/goal.md)（单一真相源）。
+**Owner**: `improve-team`. 本文规范 `modify` 模式下对团队 **goal** 的编辑行为。goal **概念本身**(定义、与 requirement 的分界、判据权威、单一性)的单一事实源是 `.specify/shared/definitions/goal-definitions.md`;团队侧的 goal **操作**规范见 [`../../create-team/references/goal.md`](../../create-team/references/goal.md)。
 
 ## 原则
 

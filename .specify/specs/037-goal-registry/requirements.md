@@ -2,7 +2,7 @@
 
 **Requirement Branch**: `037-goal-registry`  
 **Created**: 2026-08-04  
-**Status**: Planned  
+**Status**: Implemented  
 **Input**: User description: "添加一个独立的概念“goal”，当前在team相关的技能和命令中会配置goal,但是这些goal都是分散的,需要使用spec-kit框架建立项目级别的goal(.specify/goal目录归档).一个goal可以由多个team来实现,另外code cli程序内置的/goal命令也可以通过这个goal的描述文件来指定."
 
 ## Related Feature *(mandatory)*
