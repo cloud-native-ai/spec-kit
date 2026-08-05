@@ -44,6 +44,10 @@ If spec contains `Feature ID: Need clarification` or `Feature Name: Need clarifi
 
 ### Question Generation & Interactive Loop
 
+This loop is a **bounded instance** of the interview pattern (`.specify/shared/patterns/interview-pattern.md`): its question format, fact-vs-decision split (never ask the user for anything the repo can answer), and write-through discipline come from that pattern. What this command narrows is the **budget** — a capped pass over a fixed taxonomy, not an open design tree.
+
+**Escalation**: when the coverage scan shows the decision space is *branching* rather than merely underspecified — answers keep unlocking new questions, or the cap is reached with critical ambiguities still open — stop and recommend `/speckit.interview` on the same target artifact (unbounded rounds, durable ledger). Do not silently exceed the cap, and do not fabricate the remainder.
+
 1. **Integrate user-provided decisions first**: when `$ARGUMENTS` contains explicit decisions (not open questions — e.g. a naming choice, a chosen option), integrate them into the target artifact BEFORE generating the question queue; the queue then covers only residual ambiguities. When residuals are few and independent, group them into one prompt instead of a per-question loop.
 
 2. **Generate prioritized queue** (max 5 questions internally). Constraints:

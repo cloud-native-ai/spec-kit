@@ -22,6 +22,7 @@ COMPLEX_COMMANDS = [
     "requirements", "clarify", "plan", "tasks", "implement",
     "analyze", "checklist", "review", "research",
     "instructions", "tools", "skills", "todo", "docs",
+    "interview",
 ]
 SIMPLE_COMMANDS = ["agents", "constitution", "feature", "team"]
 
@@ -41,7 +42,7 @@ def test_c1_single_source_and_mirror():
 
 @pytest.mark.contract
 def test_c2_injection_scope_counts():
-    assert len(COMPLEX_COMMANDS) == 14
+    assert len(COMPLEX_COMMANDS) == 15
     assert len(SIMPLE_COMMANDS) == 4
 
 

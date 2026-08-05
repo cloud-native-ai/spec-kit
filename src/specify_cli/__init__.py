@@ -2349,9 +2349,9 @@ def init(
         highlight=False,
     )
     console.print(
-        "  Optional: /speckit.clarify /speckit.analyze /speckit.checklist "
-        "/speckit.research /speckit.review /speckit.agents /speckit.tools "
-        "/speckit.skills /speckit.instructions",
+        "  Optional: /speckit.clarify /speckit.interview /speckit.analyze "
+        "/speckit.checklist /speckit.research /speckit.review /speckit.agents "
+        "/speckit.tools /speckit.skills /speckit.instructions",
         highlight=False,
     )
 

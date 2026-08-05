@@ -104,6 +104,7 @@ This integration ensures that all feature planning activities are properly track
 2. **Refine Technical Context**:
    - Update the "Technical Context" section in the plan based on the gathered info and any `$ARGUMENTS`.
    - Ensure all key technical decisions (language, framework, storage, API style) are explicitly stated.
+   - **Underdetermined design → interview, never fabricate**: when a key decision is not answerable from the spec, `research.md`, or the codebase because it is a **user preference or trade-off acceptance**, run the interview pattern (`.specify/shared/patterns/interview-pattern.md`) over the plan — ask the settled-prerequisite decisions in one round with recommended answers, write each answer into Technical Context before asking the next round. For a wide or deeply branching design space, hand off to `/speckit.interview` with `plan.md` as the target artifact instead of running an ad-hoc loop here. Silently inventing a design the user never chose is the failure this prevents.
 
 **Output**: Updated IMPL_PLAN with technical context filled.
 

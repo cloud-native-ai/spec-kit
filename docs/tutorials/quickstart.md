@@ -201,6 +201,7 @@ The following commands are **prompt instructions** for your AI Agent. For detail
 |---------|---------|---------|
 | `/speckit.requirements` | Create/update requirements specification (WHAT/WHY) | [details →](../reference/commands/requirements.md) |
 | `/speckit.clarify` | Resolve ambiguous requirements | [details →](../reference/commands/clarify.md) |
+| `/speckit.interview` | Interview the user in rounds until an artifact converges (unbounded; clarify's escalation target) | [details →](../reference/commands/interview.md) |
 | `/speckit.plan` | Generate implementation plans (HOW) | [details →](../reference/commands/plan.md) |
 | `/speckit.tasks` | Break down plans into actionable tasks | [details →](../reference/commands/tasks.md) |
 | `/speckit.implement` | Implement tasks with validation | [details →](../reference/commands/implement.md) |
@@ -240,6 +241,7 @@ Commands follow a natural order. The table below shows common prerequisites and 
 | `/speckit.feature` | (Optional) `/speckit.constitution` | `/speckit.requirements` |
 | `/speckit.requirements` | (Optional) `/speckit.feature` | `/speckit.clarify`, `/speckit.plan` |
 | `/speckit.clarify` | `/speckit.requirements` | `/speckit.plan` |
+| `/speckit.interview` | None (commonly `/speckit.clarify` hitting its question cap) | Depends on the converged artifact: `/speckit.plan`, `/speckit.tasks`, `/speckit.implement`, `/speckit.goal` |
 | `/speckit.research` | `/speckit.requirements` or `/speckit.plan` | `/speckit.plan` |
 | `/speckit.plan` | `/speckit.requirements` (clarify done if needed) | `/speckit.tasks`, `/speckit.checklist` |
 | `/speckit.tasks` | `/speckit.plan` | `/speckit.analyze`, `/speckit.implement` |

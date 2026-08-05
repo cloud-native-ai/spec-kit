@@ -42,7 +42,8 @@ When the requirement details live in the stakeholder's head rather than in a wri
 
 **Authoritative detail lives in the shared sub-documents — I always follow them:**
 
-- `.specify/shared/workflow/interview-walkthrough.md` — mode selection & loop coupling, Phase 0 setup, per-unit three-stage loop, decision cards, verification levels (L1/L2/L3), delivery-loop coordination, closing, **ledger & unit-doc templates**, long-walkthrough operations, lessons & calibration.
+- `.specify/shared/patterns/interview-pattern.md` — the **generic interview mode**: design tree, frontier, rounds, question format (numbered + recommended answer), fact-vs-decision split, write-through, ledger, and the user-confirmation exit gate. This is the authority for the mode's mechanics.
+- `.specify/shared/workflow/interview-walkthrough.md` — the **requirements-domain instance** of that pattern: mode selection & loop coupling, Phase 0 setup, per-unit three-stage loop, decision cards, verification levels (L1/L2/L3), delivery-loop coordination, closing, **ledger & unit-doc templates**, long-walkthrough operations, lessons & calibration.
 
 Skeleton (details in the shared doc):
 

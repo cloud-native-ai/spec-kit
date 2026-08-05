@@ -40,6 +40,7 @@ SHARED_DOCS = {
     },
     "patterns": {
         "reconcile-pattern.md",
+        "interview-pattern.md",
     },
 }
 
