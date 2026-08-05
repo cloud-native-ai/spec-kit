@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-08-05T06:06:06Z",
+  "updated": "2026-08-05T07:39:58Z",
   "threshold": 10,
-  "count_since_submission": 96,
+  "count_since_submission": 97,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260805T073958Z-speckit-implement",
+      "file": "20260805T073958Z-speckit-implement.md",
+      "unit_id": "/speckit.implement",
+      "unit_type": "command",
+      "run_id": "037-goal-registry-implement-complete-20260805",
+      "feature": "037-goal-registry",
+      "partial": false,
+      "created": "2026-08-05T07:39:58Z",
+      "summary": "Completed /speckit.implement for 037-goal-registry across all 8 phases in long-run mode: 72/72 tasks closed, 0 deferred, six phase-boundary commits (f3b9d088 foundational, e5256dd7 US1, c077cb6f US2+3"
+    },
     {
       "id": "20260805T060606Z-speckit-implement",
       "file": "20260805T060606Z-speckit-implement.md",
