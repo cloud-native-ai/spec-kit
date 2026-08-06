@@ -15,7 +15,7 @@
 | **server** | `PLANTUML_SERVER` 可达 | 一个 PlantUML 服务器 + `python3` | 首选；脚本将源码做 Deflate+Base64 编码后 GET `/svg/{enc}`、`/png/{enc}`（官方 PlantUML server 协议） |
 | **local** | 服务器不可达且找到本地 jar | `java` + PlantUML jar（+ CJK 字体） | 完全离线；专项图（WBS/甘特/思维导图/JSON/YAML）无需 Graphviz |
 
-`auto` 会先探测服务器，不可达时自动回退到本地 jar。
+`auto` 的探测顺序：`PLANTUML_SERVER` → `PLANTUML_SERVER_FALLBACKS`（空格分隔的备选服务器列表，默认 `https://www.plantuml.com/plantuml` 公共实例）→ 本地 jar。所有 HTTP 请求携带显式 UA（`render-plantuml.sh/1.0`）——plantuml.com 会以 403 拦截 urllib 等默认 UA。
 
 **默认远程服务器**——脚本默认使用自建的 PlantUML server 渲染表图：
 
@@ -23,7 +23,7 @@
 http://xuanji-plantuml.aliyun-inc.com:9696/plantuml
 ```
 
-如需指向其他服务器，设置 `PLANTUML_SERVER=<url>`（URL 以上下文路径结尾，不含 `/svg` 等后缀）。
+如需指向其他服务器，设置 `PLANTUML_SERVER=<url>`（URL 以上下文路径结尾，不含 `/svg` 等后缀）。自建服务器在家庭网络等环境不可达时，脚本自动回退到 `PLANTUML_SERVER_FALLBACKS`（默认含 plantuml.com；设为空字符串可禁用公网回退）。
 
 **自建远程服务器（Docker）**——上述默认服务器由以下 Docker 镜像在主机 `xuanji-plantuml.aliyun-inc.com` 上运行；如需自行部署，可复用相同命令：
 

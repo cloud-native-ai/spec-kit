@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 3,
+  "kind": "session-core-facts",
+  "scope": {
+    "platform": "qoder",
+    "workspace": "spec-kit",
+    "until": "2026-08-05T17:03:51.562Z",
+    "selection": "all-eligible",
+    "eligibleSessions": 2,
+    "selectedSessions": 2,
+    "sampled": false
+  },
+  "candidateSelection": {
+    "strategy": "agent-work-loop-portfolio-v1",
+    "availableClasses": {
+      "operation-control": 1
+    },
+    "emittedClasses": {
+      "operation-control": 1
+    }
+  },
+  "admission": {
+    "taskEpisodes": 3,
+    "candidateEpisodes": 1,
+    "distinctRequests": 1,
+    "emittedCandidates": 1
+  },
+  "populationCoverage": {
+    "withChanges": 0,
+    "withChecks": 0,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 0,
+    "withFrictionConsequence": 0
+  },
+  "observationCoverage": {
+    "withChanges": 0,
+    "withChecks": 0,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 0,
+    "withFrictionConsequence": 0
+  },
+  "admissionSupport": {
+    "semanticGuardrails": [
+      "occurrences-not-distinct-episodes",
+      "coverage-not-suggestion",
+      "omitted-details-not-signal-evidence",
+      "project-capability-inventory-unobserved"
+    ],
+    "sharedFrictionConsequences": []
+  },
+  "candidates": [
+    {
+      "ref": "E1",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "处理 <path> 中的feedback",
+        "key": "req:fc18b3566c55",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "skill:improve-skills"
+      ]
+    }
+  ],
+  "omitted": {
+    "noRequest": 1,
+    "selfAnalysis": 0,
+    "lowSignal": 1,
+    "duplicateRequests": 0,
+    "candidateBudget": 0,
+    "checkBudget": 0,
+    "activeSessions": 0,
+    "homeSessionOnly": 0
+  },
+  "warningCodes": [
+    "missing-optional-root",
+    "disabled-source-root"
+  ],
+  "excludes": [
+    "assistantText",
+    "rawPrompts",
+    "commands",
+    "toolOutput",
+    "paths",
+    "rawIds",
+    "secrets"
+  ],
+  "diagnosticFlags": [
+    "no-change-evidence",
+    "no-reviewed-relevant-check-evidence",
+    "no-result-evidence"
+  ],
+  "cost": {
+    "serializedBytes": 2046,
+    "estimatedTokens": 513
+  }
+}

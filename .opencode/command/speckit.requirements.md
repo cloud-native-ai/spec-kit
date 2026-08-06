@@ -20,7 +20,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 
 2. **Check existing branches**:
    - `git fetch --all --prune`
-   - Find highest number across: remote branches, local branches, specs directories matching `[0-9]+-<short-name>`
+   - Find highest number across: remote branches, local branches, specs directories matching `[0-9]+-<short-name>` (INCLUDING `.specify/specs/.archive/` — archived specs keep their numbers and a globally-max archived number would otherwise collide)
    - Next number = highest + 1 (or 1 if none found)
 
 3. **Run script** `

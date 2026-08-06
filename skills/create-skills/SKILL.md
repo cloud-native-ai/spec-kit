@@ -147,6 +147,7 @@ Constraints:
 - Do not write duplicate entries for the same `skill_id`
 - Keep the list sorted and deduplicated
 - Remove `None yet.` once real entries exist
+- **Insertion anchor rule**: when inserting the new row via file editing, use the complete unique text of the target's adjacent table row as the edit anchor — never a registry boundary/END marker or table separator, which risks silently deleting an adjacent row
 
 ### 6. Validate the Skill
 
@@ -161,7 +162,7 @@ Minimum checks:
 - [ ] No unrelated documentation files
 - [ ] Feedback: a `## Feedback` section is present as the final workflow section (Feature 028), beginning with the runtime-mode gate. Spec Kit project mode requires the canonical engine-backed block from `.specify/shared/workflow/feedback-step.md`; standalone mode requires the self-contained variant (no engine call). A Skill without the section is non-conformant — fix before reporting completion.
 - [ ] Standalone mode only: format is consistent with sibling skills in the host directory, and no `.specify/**` path is referenced
-- [ ] Spec Kit project mode: **run the existing skill-conformance contract suite** (`pytest tests/contract/ -q -k "skill or runtime_mode"`) before reporting completion — new skills are subject to ALL pre-existing conformance contracts (runtime-mode gate, feedback-section shape, registry dedup); a later full-suite regression is the wrong place to discover a miss
+- [ ] Spec Kit project mode: **run the existing skill-conformance contract suite** (`pytest tests/contract/ -q -k "skill or runtime_mode"`) before reporting completion — new skills are subject to ALL pre-existing conformance contracts (runtime-mode gate, feedback-section shape, registry dedup); a later full-suite regression is the wrong place to discover a miss. **Fallback**: if the project has no `tests/` or `tests/contract/` directory, the suite is not applicable — verify conformance via the manual checklist items above (frontmatter / Feedback section / registry / size) and state "contract suite not applicable" explicitly in the completion report; do not spin on the missing suite or report it as a failure
 
 ### 6.5 Pressure Test (RED-GREEN)
 

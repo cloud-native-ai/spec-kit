@@ -1,0 +1,34 @@
+{
+  "teams": [
+    {
+      "team": "cws-workspace-cluster",
+      "runReports": 2,
+      "critiques": [],
+      "logRows": 2,
+      "partial": false
+    },
+    {
+      "team": "draw-plantuml-optimizer",
+      "runReports": 5,
+      "critiques": [],
+      "logRows": 0,
+      "partial": true
+    },
+    {
+      "team": "requirement-implement-monitor",
+      "runReports": 5,
+      "critiques": [
+        "**2026-07-30T02:22:00Z（新目标 Cycle 1，全量基线）**：目标切换基线按 constraints 执行；"
+      ],
+      "logRows": 5,
+      "partial": false
+    },
+    {
+      "team": "summarize-project-optimizer",
+      "runReports": 2,
+      "critiques": [],
+      "logRows": 0,
+      "partial": true
+    }
+  ]
+}

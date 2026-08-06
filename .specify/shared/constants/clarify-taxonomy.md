@@ -69,7 +69,7 @@ After each accepted answer:
 - Ensure `## Clarifications` exists (create after highest-level overview section). Under it, `### Session YYYY-MM-DD`.
 - Append: `- Q: <question> → A: <final answer>`
 - Apply to most appropriate section:
-  - Feature linkage → Update `Related Feature` with `Feature ID` and `Feature Name`
+  - Feature linkage → Update `Related Feature` with `Feature ID` and `Feature Name`. When the answer is a **new** Feature, the obligation continues: allocate the next ID from `.specify/memory/features.md`, add the index row (Draft) and `features/<ID>.md` detail, and add the reverse cross-reference in the neighbouring Feature — otherwise the spec points at an unregistered Feature that `/speckit.analyze` will flag.
   - Functional ambiguity → Update/add bullet in Functional Requirements
   - User interaction → Update User Stories or Actors
   - Data shape → Update Data Model (fields, types, relationships)
@@ -77,6 +77,7 @@ After each accepted answer:
   - Edge case → Add bullet under Edge Cases / Error Handling
   - Terminology → Normalize across spec; note `(formerly "X")` once if needed
 - If invalidates earlier statement, replace it (no duplicates)
+- **Removal & renumbering**: when an accepted answer removes FRs/user stories, renumber the LIVE IDs to stay contiguous, but NEVER touch prior `## Clarifications` entries (append-only) — instead emit an explicit `旧→新` numbering map in the new session entry, and mechanically rewrite every live `FR-\d+`/`SC-\d+` reference outside `## Clarifications` per that map (a prose map documents the change; it does not perform it — verify zero stale references by grep afterwards)
 - **Append-only invariant (all modes)**: `## Clarifications` session entries are historical record — integrations MUST append new rows, never rewrite or replace existing ones. After each integration, re-count the entry rows (`- Q:` / `- 用户修订指示`) and verify the count strictly increased; a decreased or equal count means an Edit replaced history — restore the lost row before proceeding.
 - Save `requirements.md` after EACH integration
 

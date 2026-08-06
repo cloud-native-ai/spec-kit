@@ -189,7 +189,7 @@ Every task MUST strictly follow this format:
 
 **Doc-feature phase shape (template-only / documentation / prompt-framework specs)**: when the spec's deliverables are templates, docs, prompts, or skills rather than runtime code, "Models → Services → Endpoints" does not apply — do not force it. Switch the within-story order to the doc-feature taxonomy:
 1. **author-section** — write/edit the template or document section itself
-2. **mirror-parity** — for each row of plan.md's *Mirror Obligations* table, emit a **paired task set**: one task to dual-write every mirror/copy AND one task to verify parity (`diff -q` for mirrors; grep-for-the-edit for regenerated per-tool copies). Mirror pairs are first-class tasks, never implicit side-effects of the authoring task.
+2. **mirror-parity** — every row of plan.md's *Mirror Obligations* table MUST be covered by an explicit write task and an explicit verify task: rows that share one fan-out command (e.g. a single `sync-mirrors.py --write`) MAY share the write task (one per phase, not one per row), but each verify task MUST enumerate the rows it covers (`diff -q` for mirrors; grep-for-the-edit for regenerated per-tool copies). Mirror pairs are first-class tasks, never implicit side-effects of the authoring task.
 3. **render-verify** — actually render/execute the artifact (render the diagram, run the template through its consumer) and inspect the output
 4. **refresh-verify** — re-run the artifact's refresh/regeneration path to confirm repeatability
 The app-shaped examples in the tasks template are illustrative, not mandatory; pick the taxonomy that matches the spec's actual deliverables.

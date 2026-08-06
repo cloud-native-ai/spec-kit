@@ -27,7 +27,18 @@ import sys
 from fnmatch import fnmatch
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+def _find_repo_root() -> Path:
+    # Fixed parents[2] breaks when invoked via the .specify/scripts/python/
+    # mirror copy (resolves to `.specify`, doubled paths, gate unreadable).
+    # Walk up to the nearest ancestor containing a .specify/ directory so
+    # both the canonical and the mirror copy resolve the same repo root.
+    for parent in Path(__file__).resolve().parents:
+        if (parent / ".specify").is_dir():
+            return parent
+    return Path(__file__).resolve().parents[2]
+
+
+REPO_ROOT = _find_repo_root()
 GATE_FILE = REPO_ROOT / ".specify" / "gate.yaml"
 
 

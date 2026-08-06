@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "kind": "speckit.evidence-findings",
+  "target": "skill:create-skills",
+  "runId": "ev-20260805-170351-create-skills",
+  "window": {
+    "since": null,
+    "until": null
+  },
+  "platforms": [
+    "qoder"
+  ],
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 4
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 97
+    }
+  },
+  "evidence": [
+    {
+      "id": "ev-001",
+      "lane": "session",
+      "evidenceState": "Exercised",
+      "summary": "3 task episode(s) observed on qoder; 1 candidate(s) admitted, 0 with user corrections.",
+      "evidenceRefs": [
+        "E1"
+      ],
+      "signals": {
+        "taskEpisodes": 3,
+        "candidates": 1,
+        "userCorrections": 0
+      },
+      "privacyNote": "redacted-semantic-facet"
+    },
+    {
+      "id": "ev-002",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Project profile captured: primary languages javascript, python; git history signals collected.",
+      "evidenceRefs": [
+        "core-change-watch/project-profile",
+        "core-change-watch/git-history-profile"
+      ],
+      "signals": {
+        "primaryLanguages": 2,
+        "sourceFiles": 266,
+        "testFiles": 218
+      }
+    },
+    {
+      "id": "ev-003",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Dependency governance: 2 ecosystem(s), risk level medium.",
+      "evidenceRefs": [
+        "dependency-governance/cli"
+      ],
+      "signals": {
+        "ecosystems": 2,
+        "staleDependencyFiles": 0
+      }
+    },
+    {
+      "id": "ev-004",
+      "lane": "assets",
+      "evidenceState": "Present",
+      "summary": "Asset baseline (qoder): status complete, 15 lint finding(s), inventory available.",
+      "evidenceRefs": [
+        "coding-agent-practices/asset-baseline"
+      ],
+      "signals": {
+        "lintFindings": 15
+      }
+    },
+    {
+      "id": "ev-005",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team cws-workspace-cluster: 2 run report(s), 2 logged cycle(s), 0 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/cws-workspace-cluster/runs/20260730T082021Z-report.md",
+        ".specify/teams/cws-workspace-cluster/runs/20260730T094500Z-report.md"
+      ],
+      "signals": {
+        "runReports": 2,
+        "loggedCycles": 2,
+        "escalations": 13,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-006",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team draw-plantuml-optimizer: 5 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/draw-plantuml-optimizer/runs/20260715T130546Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T071030Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T074420Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T094834Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T104232Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-007",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team requirement-implement-monitor: 5 run report(s), 5 logged cycle(s), 1 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/requirement-implement-monitor/runs/20260729T063425Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T072002Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T074013Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T093345Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260730T022200Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 5,
+        "escalations": 4,
+        "critiqueNotes": 1
+      }
+    },
+    {
+      "id": "ev-008",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team summarize-project-optimizer: 2 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/summarize-project-optimizer/runs/20260730T122438Z-report.md",
+        ".specify/teams/summarize-project-optimizer/runs/20260730T180020Z-report.md"
+      ],
+      "signals": {
+        "runReports": 2,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-009",
+      "lane": "feedback",
+      "evidenceState": "Exercised",
+      "summary": "Recurring optimization theme across 7 feedback entries: optimization points",
+      "evidenceRefs": [
+        ".specify/memory/feedback/20260804T173254Z-speckit-clarify.md",
+        ".specify/memory/feedback/20260804T175218Z-speckit-clarify.md",
+        ".specify/memory/feedback/20260805T041907Z-speckit-clarify.md",
+        ".specify/memory/feedback/20260805T044509Z-speckit-plan.md",
+        ".specify/memory/feedback/20260805T052251Z-speckit-tasks.md",
+        ".specify/memory/feedback/20260805T060606Z-speckit-implement.md"
+      ],
+      "signals": {
+        "recurrence": 7
+      }
+    },
+    {
+      "id": "ev-010",
+      "lane": "feedback",
+      "evidenceState": "Present",
+      "summary": "Feedback store scanned: 97 entr(y/ies), 1 recurring optimization theme(s).",
+      "evidenceRefs": [
+        ".specify/memory/feedback/index.json"
+      ],
+      "signals": {
+        "entries": 97,
+        "recurringThemes": 1
+      }
+    }
+  ],
+  "findingsDigest": "sha256:f71e8d450cb02ac02243c03136730da95c4247d5912f1ae0c2ce5008f62dc60e"
+}

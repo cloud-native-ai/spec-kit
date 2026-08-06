@@ -1,10 +1,43 @@
 {
   "store": "feedback",
-  "updated": "2026-08-05T07:39:58Z",
+  "updated": "2026-08-05T18:53:10Z",
   "threshold": 10,
-  "count_since_submission": 97,
-  "submitted_at": null,
+  "count_since_submission": 0,
+  "submitted_at": "2026-08-05T18:53:10Z",
   "entries": [
+    {
+      "id": "20260805T185310Z-skill-improve-skills",
+      "file": "20260805T185310Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "improve-skills-local-store-review-20260806",
+      "feature": "",
+      "partial": false,
+      "created": "2026-08-05T18:53:10Z",
+      "summary": "本地 feedback 存储首次审阅闭环:99 条(19 单元)程序化 digest 后按复发度与证据强度分拣,覆盖检查剔除已吸收项,冻结 6 项候选全部落地(2 脚本缺陷修复 + 4 命令模板条款),sync-mirrors 一致、全量测试零回归;其余单次性/外仓项如实留待各单元下次运行。随后 mark-submitted 归零计数器。"
+    },
+    {
+      "id": "20260805T184247Z-skill-improve-skills",
+      "file": "20260805T184247Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "improve-skills-fb-batch-12-apply-20260806-pass2",
+      "feature": "",
+      "partial": false,
+      "created": "2026-08-05T18:42:47Z",
+      "summary": "batch-12 第二轮(用户确认框架方可直接处理全部 feedback):profiles 侧落地 dingtalk-follow-up(S5 无变化事项跳过写盘规则、旧路径 grep 收尾验证通过)与 aliyun-workspace(scripts/dump-help-by-domain.sh 沉淀并实测 151 条命令、SKILL.md 技能维护节、skills-utils validat"
+    },
+    {
+      "id": "20260805T171328Z-skill-improve-skills",
+      "file": "20260805T171328Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "improve-skills-fb-batch-12-apply-20260806",
+      "feature": "",
+      "partial": false,
+      "created": "2026-08-05T17:13:28Z",
+      "summary": "处理 draft/2026-08-05-profiles-feedback-batch-12(12 条)批量反馈:分拣出本仓库可落地 10 条,落地 3 个技能共 10 项改进——draw-plantuml(render-plantuml.sh 彩色标记循环陷阱修复并实测双轮渲染验证、PLANTUML_SERVER_FALLBACKS 公网回退+显式 UA 并实测 plantuml.com 回退、"
+    },
     {
       "id": "20260805T073958Z-speckit-implement",
       "file": "20260805T073958Z-speckit-implement.md",

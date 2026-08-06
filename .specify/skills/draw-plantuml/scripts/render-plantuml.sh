@@ -26,7 +26,11 @@
 set -euo pipefail
 
 PLANTUML_SERVER="${PLANTUML_SERVER:-http://xuanji-plantuml.aliyun-inc.com:9696/plantuml}"
+# Extra servers tried in order when PLANTUML_SERVER is unreachable (auto mode).
+# plantuml.com is the public fallback; note it rejects default urllib UAs (403).
+PLANTUML_SERVER_FALLBACKS="${PLANTUML_SERVER_FALLBACKS:-https://www.plantuml.com/plantuml}"
 PLANTUML_BACKEND="${PLANTUML_BACKEND:-auto}"   # server | local | auto
+HTTP_UA="render-plantuml.sh/1.0 (spec-kit draw-plantuml)"
 SVG_SCALE=4        # SVG: maximum quality (vector, no size limit)
 SVG_DPI=300
 PNG_MAX=4095       # PNG: target max dimension (< server hard cap 4096)
@@ -83,29 +87,44 @@ sys.stdout.write("".join(out))
 '
 }
 
-# Probe whether the PlantUML server can render. Uses the official server
+# Probe whether a PlantUML server can render. Uses the official server
 # protocol: GET a known-good encoded trivial diagram and expect HTTP 2xx.
+# Sends an explicit UA (plantuml.com rejects default urllib UAs with 403).
 server_reachable() {
-  curl -sf -m 6 "${PLANTUML_SERVER}/svg/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000" \
+  local server="${1:-$PLANTUML_SERVER}"
+  curl -sf -m 6 -H "User-Agent: ${HTTP_UA}" \
+    "${server}/svg/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000" \
     -o /dev/null 2>/dev/null
 }
 
-# Decide which backend to use. Echoes "server" or "local"; exits on neither.
+# Decide which backend to use. Echoes "server <url>" or "local <jar>" (the
+# caller runs this in a subshell via $(...), so state must be returned, not
+# assigned here). Exits when neither is usable.
 select_backend() {
   local jar; jar="$(resolve_jar || true)"
   case "$PLANTUML_BACKEND" in
-    server) echo "server" ;;
+    server) echo "server $PLANTUML_SERVER" ;;
     local)
       [[ -n "$jar" ]] || { warn "PLANTUML_BACKEND=local but no jar found"; exit 1; }
-      echo "local" ;;
+      echo "local $jar" ;;
     auto|*)
       if server_reachable; then
-        echo "server"
-      elif [[ -n "$jar" ]]; then
-        warn "Server unreachable; using local jar: ${jar}"
-        echo "local"
+        echo "server $PLANTUML_SERVER"
+        return
+      fi
+      local fb
+      for fb in $PLANTUML_SERVER_FALLBACKS; do
+        if server_reachable "$fb"; then
+          warn "Primary server unreachable; using fallback server: ${fb}"
+          echo "server $fb"
+          return
+        fi
+      done
+      if [[ -n "$jar" ]]; then
+        warn "All servers unreachable; using local jar: ${jar}"
+        echo "local $jar"
       else
-        warn "PlantUML server unreachable and no local jar found."
+        warn "PlantUML servers unreachable (${PLANTUML_SERVER} + fallbacks) and no local jar found."
         warn "Set PLANTUML_JAR=/path/to/plantuml.jar or start a server."
         exit 1
       fi ;;
@@ -138,7 +157,7 @@ render_diagram() {
       warn "PlantUML source encoding failed (python3 required for server backend)"
       return 1
     fi
-    curl -sf -m 30 "${PLANTUML_SERVER}/${fmt}/${enc}" -o "$out"
+    curl -sf -m 30 -H "User-Agent: ${HTTP_UA}" "${PLANTUML_SERVER}/${fmt}/${enc}" -o "$out"
   fi
 }
 
@@ -146,10 +165,15 @@ render_diagram() {
 
 # Remove existing style directives that we'll inject (avoid duplicates).
 # Direction directives (top to bottom, left to right) are preserved.
+# NOTE: `skinparam monochrome false` is deliberately NOT stripped — it is the
+# user's color declaration. Stripping it would lose the color marker on
+# in-place re-renders, so the next run would detect no color markup and
+# inject `monochrome true`, silently wiping all colors (color-marker loop).
 strip_style() {
   local input="$1"
   sed -E \
-    -e '/^[[:space:]]*skinparam[[:space:]]+(monochrome|shadowing|roundCorner|dpi|defaultFontSize|defaultFontName|padding|ArrowThickness|BorderThickness|svgDimensionStyle|svgLinkTarget|actorStyle)[[:space:]]/d' \
+    -e '/^[[:space:]]*skinparam[[:space:]]+monochrome[[:space:]]+true[[:space:]]*$/d' \
+    -e '/^[[:space:]]*skinparam[[:space:]]+(shadowing|roundCorner|dpi|defaultFontSize|defaultFontName|padding|ArrowThickness|BorderThickness|svgDimensionStyle|svgLinkTarget|actorStyle)[[:space:]]/d' \
     -e '/^[[:space:]]*scale[[:space:]]/d' \
     "$input"
 }
@@ -317,11 +341,14 @@ main() {
   mkdir -p "$output_dir"
 
   # ── Select rendering backend (server or local jar) ──
-  BACKEND="$(select_backend)"
+  local _selection
+  _selection="$(select_backend)"
+  BACKEND="${_selection%% *}"
   if [[ "$BACKEND" == "local" ]]; then
-    JAR="$(resolve_jar)"
+    JAR="${_selection#* }"
     log "Backend: local jar (${JAR})"
   else
+    PLANTUML_SERVER="${_selection#* }"
     log "Backend: server (${PLANTUML_SERVER})"
   fi
 
