@@ -22,12 +22,10 @@ def _extensions_for(assistant: str) -> list:
     ext_map = {
         "copilot": ".prompt.md",
         "claude": ".md",
-        "qwen": ".toml",
         "opencode": ".md",
         "qoder": ".md",
         "codex": ".md",
         "hermes": ".md",
-        "iflow": ".md",
     }
     return [ext_map.get(assistant, ".md")]
 

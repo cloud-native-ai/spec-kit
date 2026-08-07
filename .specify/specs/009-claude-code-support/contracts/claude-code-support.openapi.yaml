@@ -138,7 +138,7 @@ components:
       properties:
         key:
           type: string
-          enum: [copilot, qwen, opencode, qoder, claude]
+          enum: [copilot, opencode, qoder, claude, codex, hermes]
         displayName:
           type: string
         assistantType:

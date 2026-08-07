@@ -1,9 +1,9 @@
-"""US1 integration tests — one-shot configuration of all six tools (T008).
+"""US1 integration tests — one-shot configuration of all four tools (T008).
 
 Covers requirements FR-002, FR-005..FR-008, FR-012..FR-014 and success criteria
 SC-001, SC-002, SC-004, SC-005, SC-006 for 024-agent-env-config.
 
-  (a) `apply --all` writes all 6 config files with fields per
+  (a) `apply --all` writes all 4 config files with fields per
       contracts/tool-config-targets.md
   (b) idempotency — two runs produce identical managed fields
   (c) unrelated pre-existing keys are preserved
@@ -27,7 +27,7 @@ def _read_json(path: Path) -> dict:
 
 @pytest.mark.integration
 class TestUS1ApplyAllWritesFiles:
-    def test_apply_all_writes_all_six_files_with_fields(self, tmp_path: Path):
+    def test_apply_all_writes_all_four_files_with_fields(self, tmp_path: Path):
         result = run_config_agent("config_agent_env_apply --all", tmp_path, valid_env(tmp_path))
         assert result.returncode == 0, result.combined
 
@@ -46,23 +46,11 @@ class TestUS1ApplyAllWritesFiles:
         auth = _read_json(tmp_path / ".codex" / "auth.json")
         assert auth["OPENAI_API_KEY"] == SECRET_VALUE
 
-        # qwen → ~/.qwen/.env
-        qwen = (tmp_path / ".qwen" / ".env").read_text(encoding="utf-8")
-        assert f"OPENAI_API_KEY={SECRET_VALUE}" in qwen
-        assert f"OPENAI_BASE_URL={BASE_URL}" in qwen
-        assert f"OPENAI_MODEL={MODEL}" in qwen
-
         # qoder → ~/.qoder/config.json
         qoder = _read_json(tmp_path / ".qoder" / "config.json")
         assert qoder["apiKey"] == SECRET_VALUE
         assert qoder["baseURL"] == BASE_URL
         assert qoder["model"] == MODEL
-
-        # iflow → ~/.iflow/settings.json
-        iflow = _read_json(tmp_path / ".iflow" / "settings.json")
-        assert iflow["apiKey"] == SECRET_VALUE
-        assert iflow["baseUrl"] == BASE_URL
-        assert iflow["modelName"] == MODEL
 
         # opencode → ~/.config/opencode/config.json
         oc = _read_json(tmp_path / ".config" / "opencode" / "config.json")
@@ -76,7 +64,7 @@ class TestUS1ApplyAllWritesFiles:
         result = run_config_agent("config_agent_env_apply --all", tmp_path, valid_env(tmp_path))
         assert result.returncode == 0, result.combined
         assert (tmp_path / ".config" / "opencode" / "config.json").exists()
-        assert (tmp_path / ".qwen" / ".env").exists()
+        assert (tmp_path / ".qoder" / "config.json").exists()
 
 
 @pytest.mark.integration
@@ -103,7 +91,7 @@ class TestUS1Idempotency:
 @pytest.mark.integration
 class TestUS1PreservesUnrelatedKeys:
     def test_unrelated_json_keys_survive(self, tmp_path: Path):
-        # Seed qoder + claude + opencode + iflow with unrelated content.
+        # Seed qoder + claude + opencode with unrelated content.
         (tmp_path / ".qoder").mkdir(parents=True)
         (tmp_path / ".qoder" / "config.json").write_text(
             json.dumps({"general": {"enableAutoUpdate": True}, "keepMe": 42}),
@@ -119,8 +107,6 @@ class TestUS1PreservesUnrelatedKeys:
             json.dumps({"provider": {"other": {"name": "other"}}, "topLevel": 1}),
             encoding="utf-8",
         )
-        (tmp_path / ".qwen").mkdir(parents=True)
-        (tmp_path / ".qwen" / ".env").write_text("EXISTING_LINE=keep\n", encoding="utf-8")
 
         result = run_config_agent("config_agent_env_apply --all", tmp_path, valid_env(tmp_path))
         assert result.returncode == 0, result.combined
@@ -139,10 +125,6 @@ class TestUS1PreservesUnrelatedKeys:
         assert oc["topLevel"] == 1
         assert oc["provider"]["other"] == {"name": "other"}
         assert "agent" in oc["provider"]
-
-        qwen = (tmp_path / ".qwen" / ".env").read_text(encoding="utf-8")
-        assert "EXISTING_LINE=keep" in qwen
-        assert f"OPENAI_API_KEY={SECRET_VALUE}" in qwen
 
 
 @pytest.mark.integration

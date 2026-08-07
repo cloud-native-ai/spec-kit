@@ -4,7 +4,7 @@ Asserts that skills/cli-setup/SKILL.md documents:
   - the unified variables (AGENT_API_KEY, AGENT_MODEL, AGENT_BASE_URL,
     AGENT_ANTHROPIC_BASE_URL),
   - the config_agent_env_validate / config_agent_env_apply commands,
-  - the six-tool scope (claude, codex, qwen, qoder, iflow, opencode).
+  - the four-tool scope (claude, codex, qoder, opencode).
 Traces to contracts/unified-env-contract.md.
 """
 from pathlib import Path
@@ -26,7 +26,7 @@ COMMANDS = [
     "config_agent_env_apply",
 ]
 
-SIX_TOOLS = ["claude", "codex", "qwen", "qoder", "iflow", "opencode"]
+SIX_TOOLS = ["claude", "codex", "qoder", "opencode"]
 
 
 @pytest.fixture(scope="module")

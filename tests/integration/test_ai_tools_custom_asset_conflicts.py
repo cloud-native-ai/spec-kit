@@ -52,11 +52,11 @@ class TestCustomAssetConflicts:
         from specify_cli import copy_local_templates
 
         project = tmp_path / "workspace"
-        copy_local_templates(project, "qwen", "sh")
+        copy_local_templates(project, "hermes", "sh")
 
         # Add a user file
-        user_file = project / ".qwen" / "user-config.toml"
-        user_file.write_text('[custom]\nkey = "value"', encoding="utf-8")
+        user_file = project / ".hermes" / "user-config.md"
+        user_file.write_text('# custom\n', encoding="utf-8")
 
         # Add another assistant - user file in original assistant dir should survive
         copy_local_templates(project, "claude", "sh", is_current_dir=True)

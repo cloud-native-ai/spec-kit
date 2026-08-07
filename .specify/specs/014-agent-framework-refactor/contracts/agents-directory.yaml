@@ -72,8 +72,6 @@ symlink_bridges:
     target: .specify/agents/
     type: directory
 
-  - tool: "qwen"
-    source: .qwen/agents/
     target: .specify/agents/
     type: directory
 

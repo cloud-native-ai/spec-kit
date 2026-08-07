@@ -7,7 +7,7 @@ Generate or update project instructions and compatibility symlinks, ensuring a c
 - After `specify init` to generate the initial project instructions
 - After template, documentation, or configuration updates to refresh AI context
 - When compatibility symlinks need to be recreated
-- To sync project-wide AI instructions across Claude Code, GitHub Copilot, Qwen Code, opencode, and Qoder
+- To sync project-wide AI instructions across Claude Code, GitHub Copilot, opencode, Qoder, Codex CLI, and Hermes Agent
 
 ## Syntax
 
@@ -64,7 +64,6 @@ The canonical file is `.specify/instructions.md`. Compatibility files are symlin
 |---------|-------------|
 | `CLAUDE.md` | Claude Code |
 | `.github/copilot-instructions.md` | GitHub Copilot |
-| `QWEN.md` | Qwen Code |
 | `QODER.md` | Qoder |
 | `AGENTS.md` | Qoder (base rule), Codex |
 

@@ -32,7 +32,6 @@ LIVE_SURFACES = (
     ".github/prompts/speckit.team.prompt.md",
     ".qoder/commands/speckit.team.md",
     ".opencode/command/speckit.team.md",
-    ".qwen/commands/speckit.team.toml",
     "docs/reference/commands/team.md",
     ".specify/memory/tools/build-summary-input.py.md",
 )

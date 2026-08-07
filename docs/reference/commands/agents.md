@@ -95,9 +95,8 @@ Each tool's `agents/` directory is a **real directory** of **per-file symlinks**
 
 - `.github/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Copilot, Claude Code)
 - `.qoder/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qoder)
-- `.qwen/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qwen Code)
 - `.opencode/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (opencode)
-- (and `.hermes/agents/`, `.iflow/agents/` where supported)
+- (and `.hermes/agents/` where supported)
 
 ## Companion Skills
 
@@ -187,9 +186,8 @@ Each tool's `agents/` directory is a **real directory** of **per-file symlinks**
 
 - `.github/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Copilot, Claude Code)
 - `.qoder/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qoder)
-- `.qwen/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qwen Code)
 - `.opencode/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (opencode)
-- (and `.hermes/agents/`, `.iflow/agents/` where supported)
+- (and `.hermes/agents/` where supported)
 
 ## Companion Skills
 
@@ -267,7 +265,7 @@ Creates or updates a single custom agent based on user-provided intent.
 
 5. **Create `.agent.md`** — Writes to `.specify/agents/instances/<agent-name>.agent.md` with YAML frontmatter and body sections for role, constraints, workflow, and output format.
 
-6. **Quality checks** — Validates YAML syntax, provider support (Claude Code, Copilot, Qwen Code, opencode, Qoder only), and tool-workflow alignment.
+6. **Quality checks** — Validates YAML syntax, provider support (Claude Code, Copilot, opencode, Qoder, Codex CLI, Hermes Agent only), and tool-workflow alignment.
 
 7. **Register agent** — Generates a deterministic `agent_id` and updates the Resource Registry in `.specify/instructions.md`.
 
@@ -284,9 +282,8 @@ Creates or updates a single custom agent based on user-provided intent.
 Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/{templates,instances}/`:
 - `.github/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Copilot, Claude Code)
 - `.qoder/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qoder)
-- `.qwen/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qwen Code)
 - `.opencode/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (opencode)
-- (and `.hermes/agents/`, `.iflow/agents/` where supported)
+- (and `.hermes/agents/` where supported)
 
 ## Companion Skills
 

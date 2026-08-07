@@ -1,10 +1,65 @@
 {
   "store": "feedback",
-  "updated": "2026-08-07T05:15:29Z",
+  "updated": "2026-08-07T13:14:42Z",
   "threshold": 10,
-  "count_since_submission": 2,
+  "count_since_submission": 7,
   "submitted_at": "2026-08-05T18:53:10Z",
   "entries": [
+    {
+      "id": "20260807T131442Z-skill-draw-mermaid",
+      "file": "20260807T131442Z-skill-draw-mermaid.md",
+      "unit_id": "skill:draw-mermaid",
+      "unit_type": "skill",
+      "run_id": "sandbox-20260807-draw-mermaid",
+      "feature": "viz-skill-arena-sandbox",
+      "partial": false,
+      "created": "2026-08-07T13:14:42Z",
+      "summary": "绘制 sandbox (wasm-e2b-k8s) 三张架构图：组件（五大子系统 hub-and-spoke + legend）、部署（C4Deployment：ate-api-server Deployment / atelet DaemonSet / valkey StatefulSet / ateom-wasmd worker Pod / atunnel / ateom-gvisor 伴生 "
+    },
+    {
+      "id": "20260807T091115Z-skill-draw-echarts",
+      "file": "20260807T091115Z-skill-draw-echarts.md",
+      "unit_id": "skill:draw-echarts",
+      "unit_type": "skill",
+      "run_id": "substrate-echarts-20260807-1710",
+      "feature": "viz-skill-arena",
+      "partial": false,
+      "created": "2026-08-07T09:11:15Z",
+      "summary": "Substrate 架构三图（力导向关系图 / 手工布局状态机 / 横向树图）均输出为独立暗色主题 HTML，并通过 node mock 校验（link 引用完整性 + 语法）。本次运行干净。"
+    },
+    {
+      "id": "20260807T070517Z-skill-draw-mermaid",
+      "file": "20260807T070517Z-skill-draw-mermaid.md",
+      "unit_id": "skill:draw-mermaid",
+      "unit_type": "skill",
+      "run_id": "20260807-mermaid-server",
+      "feature": "internal-render-server",
+      "partial": false,
+      "created": "2026-08-07T07:05:17Z",
+      "summary": "Added skills/draw-mermaid/server/ — a self-hosted mermaid.ink-compatible render server (Dockerfile + server.js + docker-run.sh + README), following the plantuml-server container pattern (port 9696, ap"
+    },
+    {
+      "id": "20260807T064532Z-skill-draw-plantuml",
+      "file": "20260807T064532Z-skill-draw-plantuml.md",
+      "unit_id": "skill:draw-plantuml",
+      "unit_type": "skill",
+      "run_id": "20260807-remote-first",
+      "feature": "remote-first-rendering",
+      "partial": false,
+      "created": "2026-08-07T06:45:32Z",
+      "summary": "Remote-first policy: default backend server; local rendering only after user consent (TTY prompt or non-TTY guidance + exit 1, never silent fallback). SKILL.md 核心原则/Step8/输出要求 + howto/12 §1.0 updated."
+    },
+    {
+      "id": "20260807T064532Z-skill-draw-mermaid",
+      "file": "20260807T064532Z-skill-draw-mermaid.md",
+      "unit_id": "skill:draw-mermaid",
+      "unit_type": "skill",
+      "run_id": "20260807-remote-first",
+      "feature": "remote-first-rendering",
+      "partial": false,
+      "created": "2026-08-07T06:45:32Z",
+      "summary": "Remote-first policy: default backend server (mermaid.ink); local mermaid-cli only after user consent (TTY prompt or non-TTY guidance + exit 1, never silent fallback). SKILL.md 核心原则/Step8/输出要求 + howto/"
+    },
     {
       "id": "20260807T051529Z-skill-create-team",
       "file": "20260807T051529Z-skill-create-team.md",

@@ -104,14 +104,14 @@ Every agent `create-agent` can produce has one of two lifecycles; choose it befo
 - Write to the layer's store (`templates/` or `instances/`) — single source of truth per layer.
 - On initialization the CLI (re)creates a **per-file** symlink for each `*.agent.md` under `.specify/agents/{templates,instances}/`
   inside each supported tool's agent dir — e.g. `.qoder/agents/<slug>.agent.md → ../../.specify/agents/templates/<slug>.agent.md`,
-  plus `.github/agents`, `.qwen/agents`, `.opencode/agents` (and `.hermes/agents`, `.iflow/agents`
+  plus `.github/agents`, `.qoder/agents`, `.opencode/agents` (and `.hermes/agents`
   where supported). Each tool `agents/` is a real directory of links; never write tool-specific
   copies of framework agents.
 - Agents are discovered by globbing `.specify/agents/{templates,instances}/*.agent.md` (frontmatter `name`/`description`); there is no separate registry file.
 
 ## Tool integration & provider whitelist
 
-- **Approved providers**: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder — anything
+- **Approved providers**: Claude Code, GitHub Copilot, opencode, Qoder, Codex CLI, Hermes Agent — anything
   else is rejected at validation time.
 - Each skill runs an **Agent-Specific Configuration** step: it identifies the executing agent
   from detection signals, optionally loads a `references/<agent-slug>-guide.md`, and captures

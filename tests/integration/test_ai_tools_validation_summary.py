@@ -41,10 +41,10 @@ class TestValidationSummary:
         project = tmp_path / "multi-detect"
         copy_local_templates(project, "copilot", "sh")
         copy_local_templates(project, "claude", "sh", is_current_dir=True)
-        copy_local_templates(project, "qwen", "sh", is_current_dir=True)
+        copy_local_templates(project, "hermes", "sh", is_current_dir=True)
 
         configured = detect_configured_assistants(project)
-        for expected in ["copilot", "claude", "qwen"]:
+        for expected in ["copilot", "claude", "hermes"]:
             assert expected in configured, f"{expected} not detected"
 
     def test_empty_project_returns_no_assistants(self, tmp_path: Path):
@@ -72,7 +72,7 @@ class TestValidationSummary:
 
         project = tmp_path / "core-detect"
         copy_local_templates(project, "copilot", "sh")
-        copy_local_templates(project, "qwen", "sh", is_current_dir=True)
+        copy_local_templates(project, "hermes", "sh", is_current_dir=True)
 
         initialized = detect_initialized_core_assets(project)
         all_core = core_asset_relpaths()

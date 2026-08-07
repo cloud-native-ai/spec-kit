@@ -34,11 +34,11 @@ class TestSkillsSymlinkRegression:
         assert link.is_symlink()
         assert link.resolve() == (tmp_path / ".specify" / "skills").resolve()
 
-    def test_qwen_skills_symlink_resolves(self, tmp_path):
+    def test_hermes_skills_symlink_resolves(self, tmp_path):
         (tmp_path / ".specify").mkdir()
-        ensure_specify_symlink(tmp_path, ".qwen", "skills")
+        ensure_specify_symlink(tmp_path, ".hermes", "skills")
 
-        link = tmp_path / ".qwen" / "skills"
+        link = tmp_path / ".hermes" / "skills"
         assert link.is_symlink()
         assert link.resolve() == (tmp_path / ".specify" / "skills").resolve()
 

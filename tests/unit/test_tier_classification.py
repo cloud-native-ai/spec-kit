@@ -1,7 +1,8 @@
 """Unit test for tier classification (T028).
 
-Asserts _ASSISTANT_TIERS has exactly 6 entries, all Tier 1 keys are in
-_OFFICIAL_ASSISTANT_KEYS, get_assistant_profile() returns valid tier field.
+Asserts _ASSISTANT_TIERS classifies 4 CLI tools as Tier 1 and 2 non-CLI
+tools as Tier 2, all keys are in _OFFICIAL_ASSISTANT_KEYS, and
+get_assistant_profile() returns a valid tier field.
 """
 
 from specify_cli import (
@@ -10,28 +11,28 @@ from specify_cli import (
     get_assistant_profile,
 )
 
-TIER1_KEYS = {"claude", "codex", "qoder", "copilot", "opencode"}
-TIER2_KEYS = {"qwen"}
+TIER1_KEYS = {"claude", "codex", "qoder", "opencode"}
+TIER2_KEYS = {"hermes", "copilot"}
 
 
 def test_tiers_has_six_entries():
     assert len(_ASSISTANT_TIERS) == 6
 
 
-def test_all_tier1_keys_in_official_list():
-    for key in TIER1_KEYS:
+def test_all_tier_keys_in_official_list():
+    for key in TIER1_KEYS | TIER2_KEYS:
         assert key in _OFFICIAL_ASSISTANT_KEYS, f"{key} not in official list"
 
 
-def test_tier1_count_is_five():
+def test_tier1_count_is_four():
     tier1 = [k for k, v in _ASSISTANT_TIERS.items() if v == "tier1"]
-    assert len(tier1) == 5
+    assert len(tier1) == 4
 
 
-def test_tier2_count_is_one():
+def test_tier2_count_is_two():
     tier2 = [k for k, v in _ASSISTANT_TIERS.items() if v == "tier2"]
-    assert len(tier2) == 1
-    assert tier2[0] == "qwen"
+    assert len(tier2) == 2
+    assert set(tier2) == TIER2_KEYS
 
 
 def test_profile_tier_field_for_each_tool():
@@ -47,6 +48,6 @@ def test_tier1_tools_profile_tier():
         assert profile["tier"] == "tier1", f"{key} should be tier1"
 
 
-def test_qwen_is_tier2():
-    profile = get_assistant_profile("qwen")
+def test_copilot_is_tier2():
+    profile = get_assistant_profile("copilot")
     assert profile["tier"] == "tier2"

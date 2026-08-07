@@ -74,21 +74,9 @@ AGENT_CONFIG = {
         "install_url": None,  # IDE-based, no CLI check needed
         "requires_cli": False,
     },
-    "qwen": {
-        "name": "Qwen Code",
-        "folder": ".qwen/",
-        "install_url": "https://github.com/QwenLM/qwen-code",
-        "requires_cli": True,
-    },
     "hermes": {
         "name": "Hermes Agent",
         "folder": ".hermes/",
-        "install_url": None,
-        "requires_cli": True,
-    },
-    "iflow": {
-        "name": "iFlow",
-        "folder": ".iflow/",
         "install_url": None,
         "requires_cli": True,
     },
@@ -121,20 +109,16 @@ _OFFICIAL_ASSISTANT_KEYS = [
     "claude",
     "codex",
     "qoder",
-    "copilot",
     "opencode",
-    "qwen",
     "hermes",
-    "iflow",
+    "copilot",
 ]
 
 # Assistant → command output directory mapping (relative to project root)
 _ASSISTANT_COMMAND_DIRS = {
     "copilot": ".github/prompts",
     "claude": ".claude/commands",
-    "qwen": ".qwen/commands",
     "hermes": ".hermes/commands",
-    "iflow": ".iflow/commands",
     "opencode": ".opencode/command",
     "qoder": ".qoder/commands",
     "codex": ".codex/commands",
@@ -144,9 +128,7 @@ _ASSISTANT_COMMAND_DIRS = {
 _ASSISTANT_EXTENSIONS = {
     "copilot": "prompt.md",
     "claude": "md",
-    "qwen": "toml",
     "hermes": "md",
-    "iflow": "md",
     "opencode": "md",
     "qoder": "md",
     "codex": "md",
@@ -156,9 +138,7 @@ _ASSISTANT_EXTENSIONS = {
 _ASSISTANT_ARG_FORMATS = {
     "copilot": "$ARGUMENTS",
     "claude": "$ARGUMENTS",
-    "qwen": "{{args}}",
     "hermes": "$ARGUMENTS",
-    "iflow": "$ARGUMENTS",
     "opencode": "$ARGUMENTS",
     "qoder": "$ARGUMENTS",
     "codex": "$ARGUMENTS",
@@ -259,23 +239,20 @@ _SKILLS_SYMLINK_ASSISTANTS = {
     "copilot",
     "qoder",
     "claude",
-    "qwen",
     "hermes",
-    "iflow",
     "opencode",
     "codex",
 }
 
 # Assistant → support tier classification
+# Tier 1 = common CLI-form AI tools; Tier 2 = non-CLI-form tools (IDE-based / platform agents)
 _ASSISTANT_TIERS = {
     "claude": "tier1",
     "codex": "tier1",
     "qoder": "tier1",
-    "copilot": "tier1",
     "opencode": "tier1",
-    "qwen": "tier2",
     "hermes": "tier2",
-    "iflow": "tier2",
+    "copilot": "tier2",
 }
 
 
@@ -512,9 +489,7 @@ _INSTRUCTIONS_FILE_MAP = {
     "claude": "CLAUDE.md",
     "codex": "AGENTS.md",
     "qoder": "AGENTS.md",
-    "qwen": "QWEN.md",
     "hermes": "HERMES.md",
-    "iflow": "IFLOW.md",
     "copilot": ".github/copilot-instructions.md",
     "opencode": ".opencode/instructions.md",
 }
@@ -1413,14 +1388,6 @@ def copy_local_templates(
                     script_type,
                 )
                 # VS Code settings are handled by configure_vscode_settings() later
-            elif ai_assistant == "qwen":
-                generate_commands(
-                    "qwen",
-                    "toml",
-                    "{{args}}",
-                    project_path / ".qwen" / "commands",
-                    script_type,
-                )
             elif ai_assistant == "opencode":
                 generate_commands(
                     "opencode",
@@ -1459,14 +1426,6 @@ def copy_local_templates(
                     "md",
                     "$ARGUMENTS",
                     project_path / ".hermes" / "commands",
-                    script_type,
-                )
-            elif ai_assistant == "iflow":
-                generate_commands(
-                    "iflow",
-                    "md",
-                    "$ARGUMENTS",
-                    project_path / ".iflow" / "commands",
                     script_type,
                 )
             else:
@@ -1603,15 +1562,6 @@ def copy_local_templates(
             if tracker:
                 tracker.complete("local-templates", ".claude/skills symlink ready")
 
-        if ai_assistant == "qwen":
-            if tracker:
-                tracker.start(
-                    "local-templates", "linking .qwen/skills to .specify/skills"
-                )
-            ensure_specify_symlink(project_path, ".qwen", "skills")
-            if tracker:
-                tracker.complete("local-templates", ".qwen/skills symlink ready")
-
         if ai_assistant == "opencode":
             if tracker:
                 tracker.start(
@@ -1639,25 +1589,14 @@ def copy_local_templates(
             if tracker:
                 tracker.complete("local-templates", ".hermes/skills symlink ready")
 
-        if ai_assistant == "iflow":
-            if tracker:
-                tracker.start(
-                    "local-templates", "linking .iflow/skills to .specify/skills"
-                )
-            ensure_specify_symlink(project_path, ".iflow", "skills")
-            if tracker:
-                tracker.complete("local-templates", ".iflow/skills symlink ready")
-
         # Agent directory per-file symlinks (each *.agent.md under
         # .specify/agents/{templates,instances}/ linked individually)
         _AGENT_LINK_DIRS = {
             "copilot": ".github",
             "claude": ".github",
             "qoder": ".qoder",
-            "qwen": ".qwen",
             "opencode": ".opencode",
             "hermes": ".hermes",
-            "iflow": ".iflow",
         }
         agent_dir_name = _AGENT_LINK_DIRS.get(ai_assistant)
         if agent_dir_name:
@@ -2038,7 +1977,7 @@ def init(
     ai_assistant: str = typer.Option(
         None,
         "--ai",
-        help="AI assistant to use: claude, codex, qoder, copilot, opencode (Tier 1), or qwen, hermes, iflow (Tier 2)",
+        help="AI assistant to use: claude, codex, qoder, opencode (Tier 1), or hermes, copilot (Tier 2)",
     ),
     script_type: str = typer.Option(
         None, "--script", help="Script type to use: sh or ps"
@@ -2046,7 +1985,7 @@ def init(
     ignore_agent_tools: bool = typer.Option(
         False,
         "--ignore-agent-tools",
-        help="Skip checks for AI agent tools like Claude Code, Codex CLI, Qoder CLI, opencode, Qwen CLI, Hermes Agent, or iFlow",
+        help="Skip checks for AI agent tools like Claude Code, Codex CLI, Qoder CLI, opencode, Hermes Agent, or GitHub Copilot",
     ),
     no_git: bool = typer.Option(
         False, "--no-git", help="Skip git repository initialization"
@@ -2087,8 +2026,6 @@ def init(
         specify init --ignore-agent-tools my-project
         specify init . --ai claude         # Initialize in current directory with Claude Code
         specify init . --ai hermes         # Initialize in current directory with Hermes Agent
-        specify init . --ai iflow          # Initialize in current directory with iFlow
-        specify init . --ai qwen           # Initialize in current directory
         specify init . --ai qoder          # Initialize in current directory with Qoder
         specify init .                     # Initialize in current directory (interactive AI selection)
         specify init --here --ai opencode  # Alternative syntax for current directory
@@ -2175,7 +2112,7 @@ def init(
             key: AGENT_CONFIG[key]["name"] for key in _OFFICIAL_ASSISTANT_KEYS
         }
         selected_ai = select_with_arrows(
-            ai_choices, "Choose your AI assistant:", "copilot"
+            ai_choices, "Choose your AI assistant:", "claude"
         )
 
     if not ignore_agent_tools:

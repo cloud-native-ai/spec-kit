@@ -13,7 +13,7 @@ CONTRACT = (
 
 def test_init_contract_lists_claude_as_supported_assistant():
     content = CONTRACT.read_text(encoding="utf-8")
-    assert "enum: [copilot, qwen, opencode, qoder, claude]" in content
+    assert "enum: [copilot, opencode, qoder, claude, codex, hermes]" in content
     assert "/projects/init:" in content
 
 

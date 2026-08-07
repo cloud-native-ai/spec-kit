@@ -21,7 +21,6 @@ PER_TOOL_COPIES = (
     REPO_ROOT / ".github/prompts/speckit.goal.prompt.md",
     REPO_ROOT / ".qoder/commands/speckit.goal.md",
     REPO_ROOT / ".opencode/command/speckit.goal.md",
-    REPO_ROOT / ".qwen/commands/speckit.goal.toml",
 )
 REFERENCE_DOC = REPO_ROOT / "docs/reference/commands/goal.md"
 ENGINE = REPO_ROOT / "scripts/python/goal-utils.py"
@@ -60,10 +59,9 @@ def test_per_tool_copy_exists_and_is_generated(path):
     )
 
 
-def test_qwen_copy_uses_the_toml_form():
-    qwen = REPO_ROOT / ".qwen/commands/speckit.goal.toml"
-    assert qwen.suffix == ".toml"
-    assert "prompt" in qwen.read_text(encoding="utf-8")
+def test_copies_use_the_md_form():
+    for path in PER_TOOL_COPIES:
+        assert path.suffix == ".md", f"{path.name} should use .md form"
 
 
 def test_reference_doc_exists():

@@ -23,7 +23,7 @@ Deliberately excluded (with rationale, so the certified scope matches SC-004):
   - symlinks — compatibility aliases (AGENTS.md, CLAUDE.md, ...) that resolve to
     regenerated files.
   - per-tool generated command dirs (.qoder/, .claude/, .github/, .opencode/,
-    .qwen/, .hermes/, .iflow/) — regenerated from templates/commands/.
+    .hermes/) — regenerated from templates/commands/.
 """
 
 import pytest

@@ -10,7 +10,7 @@ import pytest
 
 pytestmark = pytest.mark.integration
 
-_OFFICIAL_ASSISTANTS = ["copilot", "claude", "qwen", "opencode", "qoder"]
+_OFFICIAL_ASSISTANTS = ["copilot", "claude", "opencode", "qoder", "codex"]
 _CANONICAL_COMMANDS = {
     "constitution",
     "feature",
@@ -75,9 +75,9 @@ class TestCommandCoverageBasics:
             dir_map = {
                 "copilot": project / ".github" / "prompts",
                 "claude": project / ".claude" / "commands",
-                "qwen": project / ".qwen" / "commands",
                 "opencode": project / ".opencode" / "command",
                 "qoder": project / ".qoder" / "commands",
+                "codex": project / ".codex" / "commands",
             }
             output_dir = dir_map.get(assistant)
             if output_dir and output_dir.exists():

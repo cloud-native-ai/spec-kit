@@ -44,16 +44,16 @@ def test_audit_entries_have_required_fields(tmp_path: Path):
         assert entry["status"] in ("pass", "fail", "missing")
 
 
-def test_audit_contains_hermes_and_iflow_for_all_dimensions(tmp_path: Path):
+def test_audit_contains_hermes_and_copilot_for_all_dimensions(tmp_path: Path):
     project = tmp_path / "audit_project"
     project.mkdir()
     result = audit_capability_matrix(project)
 
     hermes_entries = [e for e in result["entries"] if e["tool_key"] == "hermes"]
-    iflow_entries = [e for e in result["entries"] if e["tool_key"] == "iflow"]
+    copilot_entries = [e for e in result["entries"] if e["tool_key"] == "copilot"]
 
     assert len(hermes_entries) == len(_CAPABILITY_DIMENSIONS)
-    assert len(iflow_entries) == len(_CAPABILITY_DIMENSIONS)
+    assert len(copilot_entries) == len(_CAPABILITY_DIMENSIONS)
 
 
 def test_audit_initialized_project_has_some_passes(

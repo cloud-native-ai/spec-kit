@@ -8,18 +8,18 @@ from specify_cli import InitializationResultSummary
 
 def test_set_configured_assistants_populates_tiers():
     summary = InitializationResultSummary()
-    summary.set_configured_assistants(["claude", "codex", "qwen"])
+    summary.set_configured_assistants(["claude", "codex", "hermes"])
 
     assert summary.assistant_tiers == {
         "claude": "tier1",
         "codex": "tier1",
-        "qwen": "tier2",
+        "hermes": "tier2",
     }
 
 
 def test_render_rich_includes_tier_labels():
     summary = InitializationResultSummary()
-    summary.set_configured_assistants(["claude", "codex", "qwen"])
+    summary.set_configured_assistants(["claude", "codex", "hermes"])
     summary.add_created(".codex/commands")
 
     output = summary.render_rich()

@@ -1,0 +1,3 @@
+{"ts":"2026-08-07T15:00:00Z","cycle":1,"task":"Substrate 架构图","champion":"draw-plantuml","score":0.89,"phase":"A:4/4 B:3/3 C:✓ D:4/4 E:2/2 F:✓"}
+{"ts":"2026-08-07T16-30-00Z","cycle":2,"task":"Substrate 架构图(修复Phase C)","champion":"draw-plantuml","adopted":["draw-mermaid","draw-plantuml","draw-echarts","draw-d3js"]}
+{"ts":"2026-08-07T18-30-00Z","cycle":2,"task":"sandbox 架构图","champion":"draw-plantuml","adopted":["draw-plantuml","draw-echarts","draw-d3js"]}

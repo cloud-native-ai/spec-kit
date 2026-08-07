@@ -9,7 +9,6 @@
 |------|--------------------------|
 | GitHub Copilot | `${SKILL_WORKDIR}/.github/copilot-instructions.md` |
 | Claude Code | `${SKILL_WORKDIR}/CLAUDE.md` |
-| Qwen Code | `${SKILL_WORKDIR}/QWEN.md` |
 | Qoder CLI (`qodercli`) | `${SKILL_WORKDIR}/AGENTS.md`（CLI 只读 AGENTS.md，不读 project_rules.md） |
 | Qoder IDE | `${SKILL_WORKDIR}/QODER.md` 或 `${SKILL_WORKDIR}/.qoder/project_rules.md`（IDE 旧格式） |
 | opencode | `${SKILL_WORKDIR}/AGENTS.md` |

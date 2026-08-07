@@ -91,8 +91,8 @@ class TestCE3Doctor:
         assert "better-harness" in doctor["engineSubset"]["path"]
         assert doctor["engineSubset"]["upstreamCommit"] == "b2e621d"
 
-    def test_platforms_block_covers_eight_tools(self, doctor):
-        expected = {"qoder", "codex", "claude", "copilot", "opencode", "qwen", "hermes", "iflow"}
+    def test_platforms_block_covers_six_tools(self, doctor):
+        expected = {"qoder", "codex", "claude", "copilot", "opencode", "hermes"}
         assert expected.issubset(set(doctor["platforms"].keys()))
         for name, info in doctor["platforms"].items():
             assert info["sessionStore"] in ("detected", "detected-empty", "not-detected"), name

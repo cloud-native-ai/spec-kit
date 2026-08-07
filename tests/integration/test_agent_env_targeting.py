@@ -3,7 +3,7 @@
 Covers FR-009, FR-015 and success criteria SC-002 for 024-agent-env-config.
 
   (a) single-tool apply writes only that tool's file; others untouched
-  (b) an unknown tool → exit 3 and lists the six supported tools
+  (b) an unknown tool → exit 3 and lists the four supported tools
   (c) `--all` without AGENT_ANTHROPIC_BASE_URL skips claude, configures the rest
 """
 import json
@@ -13,17 +13,17 @@ import pytest
 
 from .agent_env_helpers import SECRET_VALUE, run_config_agent, valid_env
 
-SUPPORTED = ["claude", "codex", "qwen", "qoder", "iflow", "opencode"]
+SUPPORTED = ["claude", "codex", "qoder", "opencode"]
 
 
 @pytest.mark.integration
 class TestUS3SingleTool:
     def test_single_tool_writes_only_its_file(self, tmp_path: Path):
-        result = run_config_agent("config_agent_env_apply qwen", tmp_path, valid_env(tmp_path))
+        result = run_config_agent("config_agent_env_apply opencode", tmp_path, valid_env(tmp_path))
         assert result.returncode == 0, result.combined
-        assert (tmp_path / ".qwen" / ".env").exists()
+        assert (tmp_path / ".config" / "opencode" / "config.json").exists()
         # No other tool's config directory should have been created.
-        for other in [".claude", ".codex", ".qoder", ".iflow", ".config"]:
+        for other in [".claude", ".codex", ".qoder", ".hermes"]:
             assert not (tmp_path / other).exists(), f"{other} should be untouched"
 
     def test_single_qoder_only(self, tmp_path: Path):
@@ -31,7 +31,7 @@ class TestUS3SingleTool:
         assert result.returncode == 0, result.combined
         qoder = json.loads((tmp_path / ".qoder" / "config.json").read_text(encoding="utf-8"))
         assert qoder["apiKey"] == SECRET_VALUE
-        assert not (tmp_path / ".qwen").exists()
+        assert not (tmp_path / ".config").exists()
 
 
 @pytest.mark.integration
@@ -58,10 +58,8 @@ class TestUS3AllSkipsClaudeWithoutAnthropic:
         assert result.returncode == 0, result.combined
         assert "claude" in result.combined
         assert "skip" in result.combined.lower()
-        # claude config not written; the other five are.
+        # claude config not written; the other three are.
         assert not (tmp_path / ".claude" / "settings.json").exists()
-        assert (tmp_path / ".qwen" / ".env").exists()
         assert (tmp_path / ".qoder" / "config.json").exists()
-        assert (tmp_path / ".iflow" / "settings.json").exists()
         assert (tmp_path / ".codex" / "config.toml").exists()
         assert (tmp_path / ".config" / "opencode" / "config.json").exists()

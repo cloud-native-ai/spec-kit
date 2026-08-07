@@ -10,7 +10,7 @@ import pytest
 
 pytestmark = pytest.mark.integration
 
-_THREE_ASSISTANTS = ["claude", "hermes", "iflow"]
+_THREE_ASSISTANTS = ["claude", "hermes", "opencode"]
 
 
 class TestMultiAssistantCoexistence:
@@ -30,12 +30,12 @@ class TestMultiAssistantCoexistence:
         # Add second
         copy_local_templates(project, "claude", "sh", is_current_dir=True)
         # Add third
-        copy_local_templates(project, "qwen", "sh", is_current_dir=True)
+        copy_local_templates(project, "opencode", "sh", is_current_dir=True)
 
         # All three assistant roots must exist
         assert (project / ".github").is_dir(), ".github/ missing"
         assert (project / ".claude").is_dir(), ".claude/ missing"
-        assert (project / ".qwen").is_dir(), ".qwen/ missing"
+        assert (project / ".opencode").is_dir(), ".opencode/ missing"
 
         # .specify must exist with full core
         assert (project / ".specify").is_dir()
@@ -44,8 +44,8 @@ class TestMultiAssistantCoexistence:
         assert (project / ".specify" / "skills").is_dir()
         assert (project / ".specify" / "templates").is_dir()
 
-    def test_eight_assistants_can_coexist(self, monkeypatch, tmp_path: Path):
-        """All eight official assistants should coexist in one workspace."""
+    def test_six_assistants_can_coexist(self, monkeypatch, tmp_path: Path):
+        """All six official assistants should coexist in one workspace."""
         resource_root = tmp_path / "resource"
         from fixtures.ai_tools_support import make_resource_with_skills
 
@@ -54,7 +54,7 @@ class TestMultiAssistantCoexistence:
 
         from specify_cli import _OFFICIAL_ASSISTANT_KEYS, copy_local_templates
 
-        project = tmp_path / "all8"
+        project = tmp_path / "all6"
         first = _OFFICIAL_ASSISTANT_KEYS[0]
         copy_local_templates(project, first, "sh")
 
@@ -65,12 +65,10 @@ class TestMultiAssistantCoexistence:
         profile = {
             "copilot": ".github/",
             "claude": ".claude/",
-            "qwen": ".qwen/",
             "opencode": ".opencode/",
             "qoder": ".qoder/",
             "codex": ".codex/",
             "hermes": ".hermes/",
-            "iflow": ".iflow/",
         }
         for assistant in _OFFICIAL_ASSISTANT_KEYS:
             root_dir = project / profile[assistant]
@@ -99,8 +97,8 @@ class TestMultiAssistantCoexistence:
             if p.is_file()
         )
 
-        # Add qwen
-        copy_local_templates(project, "qwen", "sh", is_current_dir=True)
+        # Add opencode
+        copy_local_templates(project, "opencode", "sh", is_current_dir=True)
 
         claude_files_after = sorted(
             str(p.relative_to(project))

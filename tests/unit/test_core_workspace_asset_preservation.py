@@ -85,8 +85,8 @@ class TestDetectConfiguredAssistants:
     def test_multiple_assistants_detected(self, tmp_path: Path):
         (tmp_path / ".github").mkdir()
         (tmp_path / ".claude").mkdir()
-        (tmp_path / ".qwen").mkdir()
+        (tmp_path / ".hermes").mkdir()
         result = detect_configured_assistants(tmp_path)
         assert "copilot" in result
         assert "claude" in result
-        assert "qwen" in result
+        assert "hermes" in result

@@ -778,7 +778,6 @@ In iteration/continuous loops, every dispatched sub-agent (optimizer, executor/r
 | **GitHub Copilot** | Running in VS Code Copilot Chat context |
 | **Qoder CLI** | `.qoder/` directory exists; `AGENTS.md` instructions loaded |
 | **opencode** | `.opencode/` directory exists |
-| **Qwen Code** | `QWEN.md` instructions loaded; `.qwen/` directory exists |
 
 ### Step 2: Load Agent-Specific Guidance
 

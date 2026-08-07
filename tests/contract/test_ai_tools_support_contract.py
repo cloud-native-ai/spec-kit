@@ -85,16 +85,16 @@ class TestAssistantSchemas:
         for assistant in [
             "copilot",
             "claude",
-            "qwen",
             "opencode",
             "qoder",
             "codex",
+            "hermes",
         ]:
             assert assistant in text, f"Assistant '{assistant}' not found in contract"
 
 
 class TestOfficialAssistantCount:
-    def test_official_assistant_count_is_eight(self):
-        assert len(_OFFICIAL_ASSISTANT_KEYS) == 8
+    def test_official_assistant_count_is_six(self):
+        assert len(_OFFICIAL_ASSISTANT_KEYS) == 6
         assert "hermes" in _OFFICIAL_ASSISTANT_KEYS
-        assert "iflow" in _OFFICIAL_ASSISTANT_KEYS
+        assert "copilot" in _OFFICIAL_ASSISTANT_KEYS

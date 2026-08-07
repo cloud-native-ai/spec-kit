@@ -23,7 +23,6 @@ PER_TOOL_COPIES = [
     REPO_ROOT / ".claude/commands/speckit.team.md",
     REPO_ROOT / ".github/prompts/speckit.team.prompt.md",
     REPO_ROOT / ".qoder/commands/speckit.team.md",
-    REPO_ROOT / ".qwen/commands/speckit.team.toml",
     REPO_ROOT / ".opencode/command/speckit.team.md",
 ]
 PRESETS = sorted((REPO_ROOT / "skills/create-team/templates/teams").glob("*.md"))

@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_assistant_matrix_contains_qoder():
-    assert set(AGENT_CONFIG) >= {"copilot", "qwen", "opencode", "qoder"}
+    assert set(AGENT_CONFIG) >= {"copilot", "opencode", "qoder", "claude", "codex", "hermes"}
 
 
 def test_governance_and_templates_include_qoder():

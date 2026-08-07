@@ -16,7 +16,7 @@ Spec Kit 解决的不是“如何生成几份 Markdown 文件”，而是 AI 辅
 
 1. **使用 AI 编码助手的开发者**：他们希望从模糊需求快速推进到可实现任务，但不希望 AI 直接跳到代码。
 2. **需要团队规范的技术负责人/架构师**：他们希望每次实现都能追溯到需求、计划、任务和治理原则，而不是只留下一个 PR。
-3. **需要多 Agent 兼容的工程团队**：同一个组织可能同时使用 Copilot、Qwen、opencode、Qoder；如果每个工具维护一套流程，方法论会快速分叉。
+3. **需要多 Agent 兼容的工程团队**：同一个组织可能同时使用 Copilot、Claude Code、opencode、Qoder；如果每个工具维护一套流程，方法论会快速分叉。
 
 README 将项目定位为围绕 Spec-Driven Development 的开放工具包，强调让团队关注产品场景、业务约束和可预测结果，而不是“vibe coding”式从零生成代码：[README.md](../../README.md#L9-L18)。
 
@@ -40,7 +40,7 @@ Spec Kit 的方法论文档把这种转变称为“Power Inversion”：规格�
 | 普通项目脚手架 | 初始化目录和依赖 | 无法持续约束需求→计划→任务→实现的生命周期 |
 | Prompt 集合 | 提供可复用问法 | 缺少文件状态机、分支约束、Feature 索引和测试契约 |
 | 传统需求文档 | 记录意图 | 通常不是 AI 执行入口，也不会自动衔接计划和任务 |
-| 单一 Agent 配置 | 优化某个工具体验 | 无法跨 Copilot/Qwen/opencode/Qoder 保持一致 |
+| 单一 Agent 配置 | 优化某个工具体验 | 无法跨 Copilot/Claude Code/opencode/Qoder 保持一致 |
 
 Spec Kit 的独立价值在于：**它把 SDD 方法论、项目骨架、AI 命令、脚本执行层和资源注册表合成一个本地优先的开发运行时**。
 
@@ -86,7 +86,7 @@ flowchart TD
     RUNTIME --> SKILLS[skills\n可复用能力]
     RUNTIME --> TOOLS[tools/manifests\n工具发现快照]
 
-    TPL --> AGENTS[Copilot / Qwen / opencode / Qoder 命令表面]
+    TPL --> AGENTS[Copilot / Claude Code / opencode / Qoder 命令表面]
     AGENTS --> LLM[AI Agent 读取命令契约]
     LLM --> SCRIPTS
     SCRIPTS --> SPECS[.specify/specs/NNN-name\nrequirements/plan/tasks]
@@ -110,7 +110,7 @@ sequenceDiagram
     participant Bash as Bash 脚本
     participant Artifacts as SDD Artifacts
 
-    Dev->>CLI: specify init --ai copilot/qwen/opencode/qoder
+    Dev->>CLI: specify init --ai copilot/claude/opencode/qoder
     CLI->>FS: 复制 memory/scripts/templates/skills
     CLI->>FS: 生成 Agent 命令与 instructions symlink
     Dev->>Agent: /speckit.requirements 用户需求
@@ -171,7 +171,7 @@ Bash 脚本负责工作区状态变更，而不是让 AI 自己推断路径。`c
 
 CLI 初始化模块要把抽象 SDD 方法论落到一个可运行项目骨架中。它创建 `.specify` 结构，复制治理文档、脚本、模板和技能，并根据所选 Agent 生成命令表面。
 
-`AGENT_CONFIG` 集中定义 Copilot、Qwen、opencode、Qoder 的显示名、目录、安装地址和 CLI 检查要求：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L62-L88)。`init()` 是初始化主入口：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L1075-L1124)。
+`AGENT_CONFIG` 集中定义 Copilot、Claude Code、opencode、Qoder 的显示名、目录、安装地址和 CLI 检查要求：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L62-L88)。`init()` 是初始化主入口：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L1075-L1124)。
 
 #### 流程
 
@@ -196,7 +196,7 @@ flowchart TD
 #### 设计取舍
 
 1. **本地模板优先**：`init()` 明确说明 GitHub download 不再支持，必须使用包内模板：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L1118-L1124)。优点是离线、可版本化、供应链风险低；代价是模板更新必须通过包发布。
-2. **单源模板，多 Agent 输出**：`generate_commands()` 从一套 `templates/commands/*.md` 生成 Copilot/Qwen/opencode/Qoder 各自格式：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L233-L398)。这比维护四套 prompt 可靠得多。
+2. **单源模板，多 Agent 输出**：`generate_commands()` 从一套 `templates/commands/*.md` 生成 Copilot/Claude Code/opencode/Qoder 各自格式：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L233-L398)。这比维护四套 prompt 可靠得多。
 3. **`.specify/skills` canonical + Agent symlink**：Copilot/Qoder 的 skills 入口通过相对 symlink 指向 `.specify/skills`，避免多 Agent 复制分叉：[src/specify_cli/__init__.py](../../src/specify_cli/__init__.py#L540-L570)。
 
 #### 风险
@@ -379,7 +379,7 @@ Spec Kit 的部署不是服务部署，而是**开发者本地工具部署**。
 
 - Python wheel/package：包含 CLI 和资源文件。
 - `.specify` 项目运行时：由 `specify init` 复制到目标项目。
-- Agent 命令文件：按 Copilot/Qwen/opencode/Qoder 输出到不同目录。
+- Agent 命令文件：按 Copilot/Claude Code/opencode/Qoder 输出到不同目录。
 - symlink：将 canonical instructions 和 skills 暴露给不同工具。
 
 安装文档推荐通过 `uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME>` 初始化：[docs/installation.md](../tutorials/installation.md#L13-L26)。

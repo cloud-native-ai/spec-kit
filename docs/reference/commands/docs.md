@@ -61,7 +61,7 @@ python3 .specify/scripts/python/docs-utils.py --action audit --root . --scope <s
 
 ## Tool Support
 
-Distributed like every other `/speckit.*` command to all supported AI tools (Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode, Qwen Code, Hermes Agent, iFlow CLI) via the standard command-generation path.
+Distributed like every other `/speckit.*` command to all supported AI tools (Claude Code, Codex CLI, Qoder CLI, opencode, Hermes Agent, GitHub Copilot) via the standard command-generation path.
 
 ## Related
 

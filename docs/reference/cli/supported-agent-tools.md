@@ -23,14 +23,14 @@ upstream source for the latest details.
 | `claude`   | Claude Code    | Tier 1 | `.claude/`   | yes | https://docs.claude.com/en/docs/claude-code |
 | `codex`    | Codex CLI      | Tier 1 | `.codex/`    | yes | https://github.com/openai/codex |
 | `qoder`    | Qoder CLI      | Tier 1 | `.qoder/`    | yes | https://docs.qoder.com/en/cli |
-| `copilot`  | GitHub Copilot | Tier 1 | `.github/`   | no (IDE-based) | https://docs.github.com/en/copilot |
 | `opencode` | opencode       | Tier 1 | `.opencode/` | yes | https://opencode.ai/docs |
-| `qwen`     | Qwen Code      | Tier 2 | `.qwen/`     | yes | https://github.com/QwenLM/qwen-code |
 | `hermes`   | Hermes Agent   | Tier 2 | `.hermes/`   | yes | https://hermes-agent.nousresearch.com/docs |
-| `iflow`    | iFlow CLI      | Tier 2 | `.iflow/`    | yes | https://platform.iflow.cn/en/cli |
+| `copilot`  | GitHub Copilot | Tier 2 | `.github/`   | no (IDE-based) | https://docs.github.com/en/copilot |
 
-- **Tier 1** — first-class targets validated by the contract/integration test suite.
-- **Tier 2** — supported targets with a narrower validation surface.
+- **Tier 1** — common CLI-form AI tools; first-class targets validated by the
+  contract/integration test suite.
+- **Tier 2** — non-CLI-form tools (IDE-based / platform agents); supported
+  targets with a narrower validation surface.
 
 Only these officially supported agents may be added (Constitution Principle V);
 config parsing rejects unknown providers.
@@ -40,20 +40,18 @@ config parsing rejects unknown providers.
 - [Claude Code](./claude-code.md)
 - [Codex CLI](./codex-cli.md)
 - [Qoder CLI](./qoder-cli.md)
-- [GitHub Copilot](./github-copilot.md)
 - [opencode](./opencode.md)
-- [Qwen Code](./qwen-code.md)
 - [Hermes Agent](./hermes-agent.md)
-- [iFlow CLI](./iflow-cli.md)
+- [GitHub Copilot](./github-copilot.md)
 
 ## Selecting an agent
 
 Pass the key via `--ai` at init time:
 
 ```bash
-python -m specify_cli init <PROJECT_NAME> --ai <claude|codex|qoder|copilot|opencode|qwen|hermes|iflow>
+python -m specify_cli init <PROJECT_NAME> --ai <claude|codex|qoder|opencode|hermes|copilot>
 ```
 
 Each agent receives its own native command directory (e.g. `.claude/commands`,
-`.github/prompts`, `.qwen/commands`) and file format, rendered from the single
+`.github/prompts`, `.qoder/commands`) and file format, rendered from the single
 set of templates in `templates/commands/*.md`.

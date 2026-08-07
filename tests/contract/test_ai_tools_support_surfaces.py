@@ -12,11 +12,12 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 
 _OFFICIAL_NAMES = [
-    "GitHub Copilot",
     "Claude Code",
-    "Qwen Code",
-    "opencode",
+    "Codex CLI",
     "Qoder",
+    "opencode",
+    "Hermes Agent",
+    "GitHub Copilot",
 ]
 
 # Files that constitute release-blocking support surfaces.

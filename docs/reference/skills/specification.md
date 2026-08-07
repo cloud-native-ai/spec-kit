@@ -142,7 +142,7 @@ The optional `compatibility` field:
 Examples:
 
 ```yaml  theme={null}
-compatibility: Designed for GitHub Copilot, Qwen Code, or opencode
+compatibility: Designed for GitHub Copilot, Claude Code, or opencode
 ```
 
 ```yaml  theme={null}

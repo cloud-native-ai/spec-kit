@@ -99,7 +99,7 @@ Agent 框架用**一个统一的概念模型**消除 Agent 定义上的几类混
 持久化 Agent 以 `.specify/agents/templates/` 与 `.specify/agents/instances/` 为**唯一真源**（按层），并通过 `specify init`（或安装流程）为各工具建立**逐文件软链接**。
 以 qoder 工具为例，`.qoder/agents/` 是一个**真实目录**，其中每个 `.specify/agents/{templates,instances}/<slug>.agent.md`
 都对应一条软链接 `.qoder/agents/<slug>.agent.md -> ../../.specify/agents/templates/<slug>.agent.md`；
-`.github/agents`、`.qwen/agents`、`.opencode/agents`、`.hermes/agents`、`.iflow/agents` 同理。
+`.github/agents`、`.qoder/agents`、`.opencode/agents`、`.hermes/agents` 同理。
 逐文件（而非整目录）软链接的好处是：工具目录中可以让框架 Agent 与该工具自建的 Agent（例如
 qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节见 [templates-and-agents.md](./templates-and-agents.md)。
 

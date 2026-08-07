@@ -28,11 +28,9 @@ Specify your AI assistant explicitly (optional):
 specify init <PROJECT_NAME> --ai claude    # Claude Code (Tier 1)
 specify init <PROJECT_NAME> --ai codex    # Codex CLI (Tier 1)
 specify init <PROJECT_NAME> --ai qoder    # Qoder CLI (Tier 1)
-specify init <PROJECT_NAME> --ai copilot   # GitHub Copilot (Tier 1)
 specify init <PROJECT_NAME> --ai opencode  # opencode (Tier 1)
-specify init <PROJECT_NAME> --ai qwen     # Qwen Code (Tier 2)
 specify init <PROJECT_NAME> --ai hermes   # Hermes Agent (Tier 2)
-specify init <PROJECT_NAME> --ai iflow    # iFlow (Tier 2)
+specify init <PROJECT_NAME> --ai copilot   # GitHub Copilot (Tier 2)
 ```
 
 ### What `specify init` Creates
@@ -57,9 +55,7 @@ After initialization, your project has a `.specify/` directory with the followin
 Symlinks are created for your AI tool:
 - `.github/agents/` → `.specify/agents/{templates,instances}/` (Copilot, Claude Code)
 - `.qoder/agents/` → `.specify/agents/{templates,instances}/` (Qoder)
-- `.qwen/agents/` → `.specify/agents/{templates,instances}/` (Qwen)
 - `.hermes/agents/` → `.specify/agents/{templates,instances}/` (Hermes Agent)
-- `.iflow/agents/` → `.specify/agents/{templates,instances}/` (iFlow)
 - `.opencode/agents/` → `.specify/agents/{templates,instances}/` (opencode)
 
 The same symlink model applies to skills directories.
@@ -288,7 +284,7 @@ Each supported AI assistant follows the same lifecycle pattern:
 3. Refresh cross-agent instruction links after template updates by running `/speckit.instructions`
 4. Re-run `/speckit.review` before release to verify support remains consistent across assistants
 
-Supported tools (Tier 1): `claude`, `codex`, `qoder`, `copilot`, `opencode`; (Tier 2): `qwen`, `hermes`, `iflow`.
+Supported tools (Tier 1): `claude`, `codex`, `qoder`, `opencode`; (Tier 2): `hermes`, `copilot`.
 
 ---
 

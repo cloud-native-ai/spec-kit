@@ -33,8 +33,8 @@ Full feature roadmap: `.specify/memory/features.md` (single source of truth).
 
 ## 🤖 Supported AI Agents
 
-**Tier 1**: [Claude Code](https://www.anthropic.com/claude-code) · [Codex CLI](https://github.com/openai/codex) · [Qoder CLI](https://qoder.com/cli) · [GitHub Copilot](https://code.visualstudio.com/) · [opencode](https://opencode.ai/)
-**Tier 2**: [Qwen Code](https://github.com/QwenLM/qwen-code) · Hermes Agent · iFlow
+**Tier 1** (CLI 形态): [Claude Code](https://www.anthropic.com/claude-code) · [Codex CLI](https://github.com/openai/codex) · [Qoder CLI](https://qoder.com/cli) · [opencode](https://opencode.ai/)
+**Tier 2** (非 CLI 形态): Hermes Agent · [GitHub Copilot](https://code.visualstudio.com/)
 
 ## 📦 Installation
 

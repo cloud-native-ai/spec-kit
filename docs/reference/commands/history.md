@@ -61,7 +61,7 @@ Summarize the **current AI tool's** past conversations **for the current project
 | Tool | Status | Session store |
 |------|--------|---------------|
 | Claude Code | ✅ Supported | `~/.claude/projects/<encoded-project-path>/*.jsonl` |
-| Codex / Qoder / opencode / Qwen / Copilot / … | ⏳ Not yet | Reported by the command; extraction is pluggable via `STORE_RESOLVERS` in `scripts/python/history-utils.py` |
+| Codex / Qoder / opencode / Copilot / Hermes / … | ⏳ Not yet | Reported by the command; extraction is pluggable via `STORE_RESOLVERS` in `scripts/python/history-utils.py` |
 
 ## Prerequisites
 

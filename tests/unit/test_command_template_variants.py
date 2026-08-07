@@ -14,5 +14,8 @@ def test_tier1_tools_use_dollar_arguments():
         )
 
 
-def test_qwen_uses_double_brace_args():
-    assert _ASSISTANT_ARG_FORMATS["qwen"] == "{{args}}"
+def test_all_tools_use_dollar_arguments():
+    for key in _ASSISTANT_ARG_FORMATS:
+        assert _ASSISTANT_ARG_FORMATS[key] == "$ARGUMENTS", (
+            f"Tool {key} should use $ARGUMENTS, got {_ASSISTANT_ARG_FORMATS[key]}"
+        )

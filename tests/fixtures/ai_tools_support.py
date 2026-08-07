@@ -15,9 +15,7 @@ _OFFICIAL_ASSISTANTS = [
     "qoder",
     "copilot",
     "opencode",
-    "qwen",
     "hermes",
-    "iflow",
 ]
 
 
@@ -63,7 +61,7 @@ def make_resource_with_skills(
         parents=True, exist_ok=True
     )
     (root / "templates" / "instructions-template.md").write_text(
-        "# Instructions\n\nSupported agents: copilot, claude, qwen, opencode, qoder, codex, hermes, iflow\n",
+        "# Instructions\n\nSupported agents: copilot, claude, opencode, qoder, codex, hermes\n",
         encoding="utf-8",
     )
 
@@ -84,7 +82,7 @@ def make_resource_with_skills(
     memory_dir = root / "memory"
     memory_dir.mkdir(parents=True, exist_ok=True)
     (memory_dir / "constitution.md").write_text(
-        "# Constitution\n\nSupported: Claude Code, Codex CLI, GitHub Copilot, Qwen Code, Hermes Agent, iFlow, opencode, Qoder\n",
+        "# Constitution\n\nSupported: Claude Code, Codex CLI, GitHub Copilot, Hermes Agent, opencode, Qoder\n",
         encoding="utf-8",
     )
     (memory_dir / "features.md").write_text(

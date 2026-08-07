@@ -114,7 +114,7 @@ components:
       properties:
         key:
           type: string
-          enum: [copilot, qwen, opencode, qoder]
+          enum: [copilot, opencode, qoder, claude, codex, hermes]
         displayName:
           type: string
         assistantType:
@@ -139,7 +139,7 @@ components:
           enum: [new-project, existing-directory]
         assistantKey:
           type: string
-          enum: [copilot, qwen, opencode, qoder]
+          enum: [copilot, opencode, qoder, claude, codex, hermes]
         ignoreAgentTools:
           type: boolean
         scriptVariant:

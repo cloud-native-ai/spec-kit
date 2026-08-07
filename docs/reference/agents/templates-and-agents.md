@@ -147,9 +147,8 @@ framework agents into the tool directories directly.
 
 .qoder/agents/    (real dir)  ── <slug>.agent.md ─▶ ../../.specify/agents/templates/<slug>.agent.md
 .github/agents/   (real dir)  ── (per-file symlinks, same scheme)
-.qwen/agents/     (real dir)  ── (per-file symlinks, same scheme)
 .opencode/agents/ (real dir)  ── (per-file symlinks, same scheme)
-   (and .hermes/agents, .iflow/agents where supported)
+   (and .hermes/agents where supported)
 ```
 
 The CLI (re)creates these per-file links on initialization, migrating any legacy

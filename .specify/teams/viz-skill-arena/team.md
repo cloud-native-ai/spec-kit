@@ -118,7 +118,7 @@ config:
     - skills/draw-plantuml
   layering: 每个技能目录（SKILL.md + references/ + scripts/）只归对应技能的变更；「需求→技能匹配」结论归结论账本 .specify/memory/knowledge/visualization-skill-selection.md；被评图与运行中间件只进 .specify/teams/.work/viz-skill-arena/
   conclusion_ledger: .specify/memory/knowledge/visualization-skill-selection.md
-  deliverables_dir: docs/figures/   # 每轮冠军图默认交付路径（单轮任务可覆盖）
+  deliverables_dir: .specify/teams/.work/viz-skill-arena/   # 每轮冠军图默认交付路径（git-ignored，单轮任务可覆盖）
   budget:
     max_cycles_per_day: 3
     max_tokens_per_day: 200000

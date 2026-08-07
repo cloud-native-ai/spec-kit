@@ -27,7 +27,7 @@ def _seed_agent(
 class TestPerFileAgentLinkCreation:
     """Each tool's agents/ is a real directory of per-file symlinks."""
 
-    @pytest.mark.parametrize("tool", [".github", ".qoder", ".qwen", ".opencode", ".hermes", ".iflow"])
+    @pytest.mark.parametrize("tool", [".github", ".qoder", ".opencode", ".hermes"])
     def test_tool_agents_is_real_dir_with_per_file_links(self, tmp_path, tool):
         source = _seed_agent(tmp_path)
         ensure_per_file_agent_links(tmp_path, tool)
