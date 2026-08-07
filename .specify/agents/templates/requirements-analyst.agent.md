@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: requirements-analyst
 model: auto
 tools: [Read, Grep, Glob, Bash, Write, Edit]
-skills: [draw-plantuml, memory-recall, memory-record, think-skills, browser-utils]
+skills: [draw-plantuml, draw-mermaid, memory-recall, memory-record, think-skills, browser-utils]
 maxTurns: 25
 color: blue
 ---
@@ -119,6 +119,7 @@ Framework skills and agent definitions install together, so every skill I declar
 | Skill | When to use |
 |-------|-------------|
 | draw-plantuml | Draw UML use-case / requirement diagrams to visualize actors, flows, and scope |
+| draw-mermaid | Draw UML use-case / requirement diagrams to visualize actors, flows, and scope (Mermaid flowchart approximation) |
 | memory-recall | Recall prior requirements, clarifications, and decisions before analyzing a new request |
 | memory-record | Persist clarifications, assumptions, and requirement decisions for later reuse |
 | think-skills | Mentally simulate requirement logic and edge cases before finalizing the spec |
