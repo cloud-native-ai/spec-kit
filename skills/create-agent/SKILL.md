@@ -81,41 +81,7 @@ Analyze the conversation history and project context to infer a useful role:
 
 ### 3. Create the template file
 
-Write `skills/create-agent/templates/agent-capacity-<slug>-template.md` following the established structure:
-
-```markdown
----
-name: {{AGENT_NAME}}
-description: {{AGENT_DESCRIPTION}}
-user-invocable: true
-disable-model-invocation: false
-supervisor: true
-capacity-scope: <slug>
-model: auto
-tools: [Read, Grep, Glob, Write, Edit]
-maxTurns: 12
-color: blue
----
-You are a **<Role Name>** for the {{PROJECT_NAME}} project.
-
-## Identity & Responsibilities
-[First-person professional identity and core duties]
-
-## Project Context
-[Project-specific placeholders from approved list]
-
-## Workflow
-[Step-by-step workflow for this role]
-
-## Upstream (Inputs)
-[Who provides inputs and what format]
-
-## Downstream (Outputs)
-[Who consumes outputs and what format]
-
-## Output Format
-[Expected output structure]
-```
+Write `skills/create-agent/templates/agent-capacity-<slug>-template.md` following the skeleton in [`./references/template-authoring.md`](./references/template-authoring.md) — Qoder-compatible frontmatter plus six mandatory body sections (Identity & Responsibilities, Project Context, Workflow, Upstream, Downstream, Output Format).
 
 ### 4. Validate the template
 
@@ -223,16 +189,7 @@ Use this capability (`kind: execution-config`) to author the **execution-layer a
 
 ### Config schema (`configs/<slug>.yaml`)
 
-```yaml
-agent: <slug>              # the Instance/Template this config dispatches (templates/ or instances/)
-mode: external             # native | virtual | external (subagent-definitions.md)
-cli: qodercli              # external only: agent CLI binary
-model: auto                # optional per-dispatch overrides
-reasoning_effort: ""
-context_window: ""
-extra_flags: ""            # appended CLI flags
-log_dir: .specify/agents/execution/logs
-```
+Field-level schema in [`./references/execution-config.md`](./references/execution-config.md) — `agent`, `mode` (native | virtual | external), `cli`, per-dispatch overrides (`model`, `reasoning_effort`, `context_window`, `extra_flags`), and `log_dir`.
 
 ### Rules
 

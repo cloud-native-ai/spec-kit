@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-08-07T13:31:32Z",
+  "updated": "2026-08-07T14:29:57Z",
   "threshold": 10,
-  "count_since_submission": 8,
+  "count_since_submission": 9,
   "submitted_at": "2026-08-05T18:53:10Z",
   "entries": [
+    {
+      "id": "20260807T142957Z-skill-improve-skills",
+      "file": "20260807T142957Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "batch-l1-shape-remediation-20260807",
+      "feature": "",
+      "partial": false,
+      "created": "2026-08-07T14:29:57Z",
+      "summary": "按 improve-skills 的 batch mode 对 spec-kit/skills 下 7 个存量超形态技能做批量整治：summarize-project、create-team、document-utils、git-workflow、create-agent、cli-setup、think-skills。一次性采集批次证据（门禁度量 + 契约测试基线 19 failed/1008 p"
+    },
     {
       "id": "20260807T133132Z-skill-improve-skills",
       "file": "20260807T133132Z-skill-improve-skills.md",

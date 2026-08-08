@@ -63,10 +63,11 @@ CJK_RANGES = (
 # Sections whose implementation-flavoured content is contract-mandated and therefore
 # exempt from the "no concrete CLI flags outside strict-requirements/conventions" rule
 # (Principle 7.2). Feedback + Agent-Specific Configuration are canonical blocks that
-# contract tests assert are present inline.
+# contract tests assert are present inline; security/red-line sections are contract content
+# by definition (a destructive-operation prohibition must name the flag it forbids).
 FLAG_EXEMPT_SECTIONS = re.compile(
     r"feedback|agent-specific configuration|strict requirement|hard constraint"
-    r"|constraints|conventions|严格要求|硬约束|约定",
+    r"|constraints|conventions|security|red line|严格要求|硬约束|约定|安全|红线",
     re.IGNORECASE,
 )
 EXAMPLE_SECTION = re.compile(
