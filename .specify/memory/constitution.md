@@ -12,7 +12,7 @@ Sync Impact Report
   ✅ skills/cli-setup/references/available-tuples.md (both mirrors) - tool roster only; qwen3 model IDs deliberately retained
   ✅ .specify/memory/glossary.md - Qwen Code CLI vs qwen3 model ID disambiguation recorded to stop the two concepts being conflated
   ✅ .specify/scripts/bash/update-agent-context.sh - qwen branch, QWEN_FILE variable, and usage/error strings removed
-- Follow-up TODOs: .specify/scripts/bash/update-agent-context.sh remains an orphan upstream leftover (no root `scripts/bash/` source counterpart, no live caller, and its own integration task was abandoned per docs/reference/history/02); it still names several inherited editors/CLIs this fork never supported. Deciding whether to delete it outright is deferred as a separate scope.
+- Follow-up TODOs: RESOLVED after v1.9.1 — `.specify/scripts/bash/update-agent-context.sh` and `setup-plan.sh` were deleted as orphan upstream leftovers (no canonical `scripts/` source, so `specify init` could never distribute them; zero live callers; superseded by generate-instructions.sh + the symlink instructions model and by create-new-plan.sh respectively). The defect class is now gated: `sync-mirrors.py` treats a mirror-only file under `scripts/` as a fatal ORPHAN under `--check`, enforced by tests/contract/test_scripts_distribution_parity.py. Remaining unrelated observation: `.specify/skills/draw-echarts/yuque-workspace/` (10 files) is nested inside another skill with no canonical source — a skill-placement issue, not governance.
 - Preserved by design: .specify/specs/019-tier2-hermes-iflow/ and other historical specs/feedback/evidence keep their original wording as dated records.
 -->
 
