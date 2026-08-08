@@ -46,4 +46,7 @@
 | 工作项四态色板 | 四态色板, work item four-state palette | 已完成/进行中/延期/未开始 四态的统一颜色与冗余符号编码,颜色之外必配符号 | auto | proposed |
 | Agent Template | agent模板, 能力模板, 抽象agent类, capacity template | Agent 三层分类法第一层:能力与行为框架描述,源码 agents/ 角色集由 specify init 安装到 .specify/agents/templates/;真源 shared/definitions/agent-definitions.md | user | confirmed |
 | Agent Instance | agent实例, 落地定义, agent definition | Agent 三层分类法第二层:职责描述定义(.specify/agents/instances/*.agent.md、team 名册席位),引用 Agent Template 并绑定具体职责,由命令/技能实例化产生 | user | confirmed |
+| Qwen Code CLI | qwen, qwen-code, qwen cli, QWEN.md, .qwen/ | **Agent CLI 工具名**(非模型):曾为 Tier 2 支持的编码 agent,已随 0c300bc8 下线;当前 AGENT_CONFIG 只含 claude/codex/copilot/hermes/opencode/qoder 六工具。与 qwen3 系列模型 ID 是两个不同概念,勿混淆 | user | confirmed |
+| qwen3 系列模型 ID | qwen3.7-max, qwen3.7-plus, qwen3-coder-plus, qwen3-rerank | **百炼大模型 ID**(非工具名):cli-setup 的模型四元组仍在使用,状态为活跃。与已下线的 Qwen Code CLI 仅名称形近、语义无关;清理 qwen 工具时 MUST NOT 按 `grep -i qwen` 整体删除,否则会误删 supported-tuples.md / config-agent.sh 中生效的模型配置 | user | confirmed |
+| iFlow CLI | iflow, iflow-cli, .iflow/ | **Agent CLI 工具名**:曾为 Tier 2 支持,已随 0c300bc8 下线;不存在与之对应的同名模型 ID | user | confirmed |
 | Agent Execution | agent执行, 运行实例, subagent, 子代理 | Agent 三层分类法第三层:定义真正执行时的运行形态,持久产物在 .specify/agents/execution/(configs/scripts 归档,logs 不入库);三种模式(native/virtual/external)见 shared/definitions/subagent-definitions.md | user | confirmed |

@@ -1,15 +1,19 @@
 <!--
 Sync Impact Report
-- Version change: 1.8.0 → 1.9.0 (MINOR; new Principle XIII — Better-Harness Orientation: names the shared goal that feedback, evidence, and the create-*/improve-* families serve, anchored to shared/guidelines/better-harness.md; concepts adapted from the open-source Better Harness model. Note: 1.7.0 → 1.8.0 was the concurrent Principle XII Tool Reuse amendment)
-- Modified principles: None
-- Added sections: Principle XIII. Better-Harness Orientation (Improvement North Star)
+- Version change: 1.9.0 → 1.9.1 (PATCH; non-semantic reconciliation of Principle V's approved-agent roster with the already-shipped code in src/specify_cli AGENT_CONFIG — Qwen Code and iFlow were dropped in 0c300bc8, leaving governance text asserting support that no longer exists. No principle added, removed, or materially changed.)
+- Modified principles: V. AI Agent Integration Standards (approved-agent list and Tier 2 roster: removed Qwen Code and iFlow)
+- Added sections: None
 - Removed sections: None
 - Templates requiring updates:
-  ✅ shared/guidelines/better-harness.md + .specify/shared/guidelines/better-harness.md - new canonical goal-model anchor
-  ✅ shared/workflow/feedback-step.md - Goal anchor paragraph added (Positioning & Red Lines, outside the canonical embedded block)
-  ✅ shared/workflow/evidence-step.md - goal pointer added to the positioning preamble
-  ✅ skills/improve-{skills,agent,team,tools}/SKILL.md - one-line goal-anchor statement in ## Goal (both mirrors)
-- Follow-up TODOs: None
+  ✅ .specify/instructions.md - supported-agent lists and QWEN.md compatibility claim
+  ✅ shared/definitions/tool-definitions.md + .specify/shared/definitions/tool-definitions.md - AI agent CLI tool roster
+  ✅ shared/workflow/agent-configuration.md + .specify/shared/workflow/agent-configuration.md - detection table rows removed
+  ✅ agents/{knowledge-manager,qa-engineer,system-designer}.agent.md + .specify/agents/templates/ mirrors
+  ✅ skills/cli-setup/references/available-tuples.md (both mirrors) - tool roster only; qwen3 model IDs deliberately retained
+  ✅ .specify/memory/glossary.md - Qwen Code CLI vs qwen3 model ID disambiguation recorded to stop the two concepts being conflated
+  ✅ .specify/scripts/bash/update-agent-context.sh - qwen branch, QWEN_FILE variable, and usage/error strings removed
+- Follow-up TODOs: .specify/scripts/bash/update-agent-context.sh remains an orphan upstream leftover (no root `scripts/bash/` source counterpart, no live caller, and its own integration task was abandoned per docs/reference/history/02); it still names several inherited editors/CLIs this fork never supported. Deciding whether to delete it outright is deferred as a separate scope.
+- Preserved by design: .specify/specs/019-tier2-hermes-iflow/ and other historical specs/feedback/evidence keep their original wording as dated records.
 -->
 
 # Spec Kit Constitution
@@ -55,8 +59,8 @@ Rationale: Reduces regressions, clarifies intent, and validates real-world behav
 
 ### V. AI Agent Integration Standards
 AI agent integration MUST follow strict guidelines:
-- Only support officially approved AI agents: Claude Code, Codex CLI, GitHub Copilot, Qwen Code, Hermes Agent, iFlow, opencode, and Qoder
-- Tiered support classification: Tier 1 (priority support with deepest integration) — Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode; Tier 2 (standard support) — Qwen Code, Hermes Agent, iFlow
+- Only support officially approved AI agents: Claude Code, Codex CLI, GitHub Copilot, Hermes Agent, opencode, and Qoder
+- Tiered support classification: Tier 1 (priority support with deepest integration) — Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode; Tier 2 (standard support) — Hermes Agent
 - Configuration parsing MUST reject unsupported providers
 - Agent capabilities MUST be leveraged for specification interpretation and implementation generation
 - Heavy reliance on advanced AI model capabilities for specification understanding is expected
@@ -195,4 +199,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.9.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-07-30
+**Version**: 1.9.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-08-08

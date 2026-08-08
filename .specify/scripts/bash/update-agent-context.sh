@@ -30,12 +30,12 @@
 #
 # 5. Multi-Agent Support
 #    - Handles agent-specific file paths and naming conventions
-#    - Supports: Claude, Gemini, Copilot, Cursor, Qwen, opencode, Codex, Windsurf, Kilo Code, Auggie CLI, or Amazon Q Developer CLI
+#    - Supports: Claude, Gemini, Copilot, Cursor, opencode, Codex, Windsurf, Kilo Code, Auggie CLI, or Amazon Q Developer CLI
 #    - Can update single agents or all existing agent files
 #    - Creates default Claude file if no agent files exist
 #
 # Usage: ./update-agent-context.sh [agent_type]
-# Agent types: claude|gemini|copilot|cursor|qwen|opencode|codex|windsurf|kilocode|auggie|q
+# Agent types: claude|gemini|copilot|cursor|opencode|codex|windsurf|kilocode|auggie|q
 # Leave empty to update all existing agent files
 
 set -e
@@ -63,7 +63,6 @@ CLAUDE_FILE="$REPO_ROOT/CLAUDE.md"
 GEMINI_FILE="$REPO_ROOT/GEMINI.md"
 COPILOT_FILE="$REPO_ROOT/.github/copilot-instructions.md"
 CURSOR_FILE="$REPO_ROOT/.cursor/rules/specify-rules.mdc"
-QWEN_FILE="$REPO_ROOT/QWEN.md"
 AGENTS_FILE="$REPO_ROOT/AGENTS.md"
 WINDSURF_FILE="$REPO_ROOT/.windsurf/rules/specify-rules.md"
 KILOCODE_FILE="$REPO_ROOT/.kilocode/rules/specify-rules.md"
@@ -571,9 +570,6 @@ update_specific_agent() {
         cursor)
             update_agent_file "$CURSOR_FILE" "Cursor IDE"
             ;;
-        qwen)
-            update_agent_file "$QWEN_FILE" "Qwen Code"
-            ;;
         opencode)
             update_agent_file "$AGENTS_FILE" "opencode"
             ;;
@@ -597,7 +593,7 @@ update_specific_agent() {
             ;;
         *)
             log_error "Unknown agent type '$agent_type'"
-            log_error "Expected: claude|gemini|copilot|cursor|qwen|opencode|codex|windsurf|kilocode|auggie|roo|q"
+            log_error "Expected: claude|gemini|copilot|cursor|opencode|codex|windsurf|kilocode|auggie|roo|q"
             exit 1
             ;;
     esac
@@ -624,11 +620,6 @@ update_all_existing_agents() {
     
     if [[ -f "$CURSOR_FILE" ]]; then
         update_agent_file "$CURSOR_FILE" "Cursor IDE"
-        found_agent=true
-    fi
-    
-    if [[ -f "$QWEN_FILE" ]]; then
-        update_agent_file "$QWEN_FILE" "Qwen Code"
         found_agent=true
     fi
     
@@ -685,7 +676,7 @@ print_summary() {
     fi
     
     echo
-    log_info "Usage: $0 [claude|gemini|copilot|cursor|qwen|opencode|codex|windsurf|kilocode|auggie|q]"
+    log_info "Usage: $0 [claude|gemini|copilot|cursor|opencode|codex|windsurf|kilocode|auggie|q]"
 }
 
 #==============================================================================

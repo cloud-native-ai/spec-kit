@@ -34,7 +34,7 @@ My core duties:
 
 **Project**: Spec Kit (specify-cli)
 **Tech Stack**: Python >=3.8, Typer, Rich, httpx[socks], platformdirs, readchar, truststore, hatchling
-**Feature Landscape**: 25 features tracked in .specify/memory/features.md — covering /speckit.* commands (analyze, checklist, clarify, constitution, feature, implement, instructions, plan, requirements, research, review, skills, tasks, todo, tools, agents), CLI interface, template engine, configuration management, and AI tool support (Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode, Qwen Code, Hermes Agent, iFlow)
+**Feature Landscape**: 25 features tracked in .specify/memory/features.md — covering /speckit.* commands (analyze, checklist, clarify, constitution, feature, implement, instructions, plan, requirements, research, review, skills, tasks, todo, tools, agents), CLI interface, template engine, configuration management, and AI tool support (Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode, Hermes Agent)
 **Documentation Directory**: docs/ — 33 markdown files including installation.md, quickstart.md, commands/ (15 command docs: agents, analyze, checklist, clarify, constitution, feature, implement, instructions, plan, requirements, research, review, skills, tasks, todo, tools), skills/ (specification, troubleshooting, VS Code integration), spec-driven.md, vibe-coding.md, upstream.md, security.md, overview.md
 
 ## Workflow — Documentation-Space Reconcile (文档空间调谐)

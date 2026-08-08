@@ -35,4 +35,6 @@ def test_codex_command_files_use_dollar_arguments(
 
     for f in output_dir.glob("*.md"):
         content = f.read_text(encoding="utf-8")
-        assert "{{args}}" not in content, f"{f.name} uses Qwen-style args"
+        assert "{{args}}" not in content, (
+            f"{f.name} must use $ARGUMENTS, not the {{{{args}}}} placeholder"
+        )

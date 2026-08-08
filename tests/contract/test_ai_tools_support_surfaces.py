@@ -78,14 +78,9 @@ class TestSupportSurfaceAudit:
     def test_no_unsupported_assistant_names_in_surfaces(self):
         """Ensure only official assistant names appear on support surfaces."""
         # This is a smoke test - if unknown names appear it's a warning
-        known = {
-            "GitHub Copilot",
-            "Claude Code",
-            "Qwen Code",
-            "opencode",
-            "Qoder",
-            "Qoder CLI",
-        }
+        # Derived from _OFFICIAL_NAMES so a roster change cannot leave a stale
+        # entry here (e.g. a dropped tool lingering as an "official" name).
+        known = set(_OFFICIAL_NAMES) | {"Qoder CLI"}
         for rel_path in _SURFACE_FILES:
             content = self._read_if_exists(rel_path)
             if not content:
