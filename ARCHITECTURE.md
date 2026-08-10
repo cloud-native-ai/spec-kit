@@ -25,4 +25,5 @@ Spec Kit is a **documentation/prompt framework, not a runtime platform** (Consti
 ## Deeper Reading
 
 - Concepts → [docs/concepts/](docs/concepts/)
+- Where Spec Kit sits on the Prompt → Context → Harness → Loop → Graph path → [concepts/prompt-to-graph.md](docs/concepts/prompt-to-graph.md)
 - Decisions → [docs/decisions/index.md](docs/decisions/index.md)
