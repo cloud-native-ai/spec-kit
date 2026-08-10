@@ -1,10 +1,43 @@
 {
   "store": "feedback",
-  "updated": "2026-08-07T14:29:57Z",
+  "updated": "2026-08-10T10:18:04Z",
   "threshold": 10,
-  "count_since_submission": 9,
+  "count_since_submission": 12,
   "submitted_at": "2026-08-05T18:53:10Z",
   "entries": [
+    {
+      "id": "20260810T101804Z-skill-create-skills",
+      "file": "20260810T101804Z-skill-create-skills.md",
+      "unit_id": "skill:create-skills",
+      "unit_type": "skill",
+      "run_id": "create-improve-docs-20260810",
+      "feature": "037",
+      "partial": false,
+      "created": "2026-08-10T10:18:04Z",
+      "summary": "Created improve-docs as the content-quality half of the docs pair. One clarification resolved a contradiction in the request (the brief said 'improve the skill' while also demanding parity with the ot"
+    },
+    {
+      "id": "20260810T092231Z-speckit-skills",
+      "file": "20260810T092231Z-speckit-skills.md",
+      "unit_id": "/speckit.skills",
+      "unit_type": "command",
+      "run_id": "create-docs-hugo-layer-20260810",
+      "feature": "037",
+      "partial": false,
+      "created": "2026-08-10T09:22:31Z",
+      "summary": "improve path on create-docs: added a Hugo presentation layer so the Markdown library publishes as a static site. docs/ doubles as the Hugo project root with content mounted-never-copied (index.md -> _"
+    },
+    {
+      "id": "20260810T083333Z-speckit-skills",
+      "file": "20260810T083333Z-speckit-skills.md",
+      "unit_id": "/speckit.skills",
+      "unit_type": "command",
+      "run_id": "create-docs-extraction-20260810",
+      "feature": "037",
+      "partial": false,
+      "created": "2026-08-10T08:33:33Z",
+      "summary": "Extracted the /speckit.docs engine into the create-docs skill and rewrote the command as a thin mandatory delegator; re-pinned spec-033 contract clauses C-4/C-5/C-6/C-9 onto the skill and added C-4a/C"
+    },
     {
       "id": "20260807T142957Z-skill-improve-skills",
       "file": "20260807T142957Z-skill-improve-skills.md",
@@ -61,17 +94,6 @@
       "summary": "Added skills/draw-mermaid/server/ — a self-hosted mermaid.ink-compatible render server (Dockerfile + server.js + docker-run.sh + README), following the plantuml-server container pattern (port 9696, ap"
     },
     {
-      "id": "20260807T064532Z-skill-draw-plantuml",
-      "file": "20260807T064532Z-skill-draw-plantuml.md",
-      "unit_id": "skill:draw-plantuml",
-      "unit_type": "skill",
-      "run_id": "20260807-remote-first",
-      "feature": "remote-first-rendering",
-      "partial": false,
-      "created": "2026-08-07T06:45:32Z",
-      "summary": "Remote-first policy: default backend server; local rendering only after user consent (TTY prompt or non-TTY guidance + exit 1, never silent fallback). SKILL.md 核心原则/Step8/输出要求 + howto/12 §1.0 updated."
-    },
-    {
       "id": "20260807T064532Z-skill-draw-mermaid",
       "file": "20260807T064532Z-skill-draw-mermaid.md",
       "unit_id": "skill:draw-mermaid",
@@ -81,6 +103,17 @@
       "partial": false,
       "created": "2026-08-07T06:45:32Z",
       "summary": "Remote-first policy: default backend server (mermaid.ink); local mermaid-cli only after user consent (TTY prompt or non-TTY guidance + exit 1, never silent fallback). SKILL.md 核心原则/Step8/输出要求 + howto/"
+    },
+    {
+      "id": "20260807T064532Z-skill-draw-plantuml",
+      "file": "20260807T064532Z-skill-draw-plantuml.md",
+      "unit_id": "skill:draw-plantuml",
+      "unit_type": "skill",
+      "run_id": "20260807-remote-first",
+      "feature": "remote-first-rendering",
+      "partial": false,
+      "created": "2026-08-07T06:45:32Z",
+      "summary": "Remote-first policy: default backend server; local rendering only after user consent (TTY prompt or non-TTY guidance + exit 1, never silent fallback). SKILL.md 核心原则/Step8/输出要求 + howto/12 §1.0 updated."
     },
     {
       "id": "20260807T051529Z-skill-create-team",

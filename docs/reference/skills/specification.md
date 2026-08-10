@@ -31,7 +31,7 @@ The `SKILL.md` file must contain YAML frontmatter followed by Markdown content.
 
 ### Frontmatter (required)
 
-```yaml  theme={null}
+```yaml
 ---
 name: skill-name
 description: A description of what this skill does and when to use it.
@@ -40,7 +40,7 @@ description: A description of what this skill does and when to use it.
 
 With optional fields:
 
-```yaml  theme={null}
+```yaml
 ---
 name: pdf-processing
 description: Extract text and tables from PDF files, fill forms, merge documents.
@@ -72,29 +72,29 @@ The required `name` field:
 
 Valid examples:
 
-```yaml  theme={null}
+```yaml
 name: pdf-processing
 ```
 
-```yaml  theme={null}
+```yaml
 name: data-analysis
 ```
 
-```yaml  theme={null}
+```yaml
 name: code-review
 ```
 
 Invalid examples:
 
-```yaml  theme={null}
+```yaml
 name: PDF-Processing  # uppercase not allowed
 ```
 
-```yaml  theme={null}
+```yaml
 name: -pdf  # cannot start with hyphen
 ```
 
-```yaml  theme={null}
+```yaml
 name: pdf--processing  # consecutive hyphens not allowed
 ```
 
@@ -108,13 +108,13 @@ The required `description` field:
 
 Good example:
 
-```yaml  theme={null}
+```yaml
 description: Extracts text and tables from PDF files, fills PDF forms, and merges multiple PDFs. Use when working with PDF documents or when the user mentions PDFs, forms, or document extraction.
 ```
 
 Poor example:
 
-```yaml  theme={null}
+```yaml
 description: Helps with PDFs.
 ```
 
@@ -127,7 +127,7 @@ The optional `license` field:
 
 Example:
 
-```yaml  theme={null}
+```yaml
 license: Proprietary. LICENSE.txt has complete terms
 ```
 
@@ -141,11 +141,11 @@ The optional `compatibility` field:
 
 Examples:
 
-```yaml  theme={null}
+```yaml
 compatibility: Designed for GitHub Copilot, Claude Code, or opencode
 ```
 
-```yaml  theme={null}
+```yaml
 compatibility: Requires git, docker, jq, and access to the internet
 ```
 
@@ -163,7 +163,7 @@ The optional `metadata` field:
 
 Example:
 
-```yaml  theme={null}
+```yaml
 metadata:
   author: example-org
   version: "1.0"
@@ -178,7 +178,7 @@ The optional `allowed-tools` field:
 
 Example:
 
-```yaml  theme={null}
+```yaml
 allowed-tools: Bash(git:*) Bash(jq:*) Read
 ```
 
@@ -238,7 +238,7 @@ Keep your main `SKILL.md` under 500 lines. Move detailed reference material to s
 
 When referencing other files in your skill, use relative paths from the skill root:
 
-```markdown  theme={null}
+```markdown
 See `references/REFERENCE.md` for details.
 
 Run the extraction script:
@@ -251,7 +251,7 @@ Keep file references one level deep from `SKILL.md`. Avoid deeply nested referen
 
 Use the [skills-ref](https://github.com/agentskills/agentskills/tree/main/skills-ref) reference library to validate your skills:
 
-```bash  theme={null}
+```bash
 skills-ref validate ./my-skill
 ```
 

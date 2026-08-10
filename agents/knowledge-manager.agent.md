@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: knowledge-manager
 model: auto
 tools: [Read, Grep, Glob, Write, Edit]
-skills: [document-utils, memory-record, memory-recall, draw-plantuml, draw-mermaid, draw-d3js, draw-echarts]
+skills: [document-utils, memory-record, memory-recall, draw-plantuml, draw-mermaid, draw-d3js, draw-echarts, create-docs, improve-docs]
 maxTurns: 10
 color: teal
 ---
@@ -126,6 +126,8 @@ Framework skills and agent definitions install together, so every skill I declar
 
 | Skill | When to use |
 |-------|-------------|
+| create-docs | Author/reconcile the docs space (root entries, six-type docs/ tree, ADRs, notes lifecycle) via the reconcile engine instead of ad-hoc edits |
+| improve-docs | Improve an existing document from evidence (validate/build findings, recorded feedback, verified staleness) with section-level edits; hand structural moves to create-docs |
 | document-utils | Produce and edit office documents (Word, PDF, PowerPoint, Excel) for deliverables |
 | memory-record | Capture decisions and knowledge into project memory |
 | memory-recall | Retrieve prior knowledge and decision records when updating docs |

@@ -2,6 +2,8 @@
 
 Standardize and manage the project documentation space as a single reconcile engine.
 
+> Architecture: `/speckit.docs` is a thin dispatch layer. All engine semantics (desired-state baseline, scope resolution, reconcile loop, tiered gates, authoring flow, notes automation) live in the **`create-docs` skill** (`.specify/skills/create-docs/SKILL.md`), which the command loads and executes with its arguments. The skill is equally usable standalone (e.g. a knowledge-manager agent invoking it directly).
+
 ## When to Use
 
 - Bootstrap a standard documentation skeleton on a new project.
@@ -49,6 +51,37 @@ python3 .specify/scripts/python/docs-utils.py --action audit --root . --scope <s
 ```
 
 `validate` covers the deterministic dimensions: reserved-name case/misuse/misplacement, one-screen threshold for root entries, broken relative links, ADR numbering continuity, notes frontmatter completeness.
+
+## Static Site (Hugo)
+
+The documentation space is publishable, not just readable in the repo: `docs/` doubles as a
+**Hugo project root**, so a reconcile run also scaffolds and maintains `docs/hugo.toml`,
+`docs/layouts/`, `docs/static/css/site.css`, and `docs/.gitignore` (build output).
+
+```bash
+SC=.specify/skills/create-docs/scripts/scaffold-hugo.py
+python3 $SC --action check    --root .                     # drift only, no writes
+python3 $SC --action scaffold --root . --site-title "<t>"   # create/repair the site layer
+python3 $SC --action build    --root .                      # -> docs/public
+cd docs && hugo server                                     # local preview
+```
+
+Key properties:
+
+- **Mounted, never copied** — Markdown is mounted into Hugo via module mounts, so `docs/`
+  stays pure Markdown, keeps its repo-native relative links, and `content/` never appears on
+  disk. Directory indexes stay `index.md` (mounted as `_index.md`, so sibling pages remain
+  pages), and relative `.md`/image links are resolved by render hooks at build time.
+- **Minimal and offline** — layouts and a single stylesheet ship with the skill; no external
+  theme, no network, no asset pipeline. Absent `hugo` binary → the scaffold is still complete
+  and only the build step is skipped.
+- **Never clobbers** — only the `# >>> speckit:mounts` block in `hugo.toml` is machine-owned;
+  layouts or config you edit are reported `kept`. A repeat run writes nothing.
+- **Publish scope** is all of `docs/` (six types + `notes/` + `archive/` + media).
+
+CI integration is delivered as **guidance**, not a generated workflow: install Hugo extended,
+run it with `docs/` as the working directory, publish `docs/public`. Copy-pasteable snippet and
+troubleshooting live in `.specify/skills/create-docs/references/hugo-site.md`.
 
 ## Output Artifacts
 
