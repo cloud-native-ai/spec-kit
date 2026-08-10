@@ -62,9 +62,10 @@ git show origin/<DEV>:.gitexcludes 2>/dev/null && echo "DEV: exists" || echo "DE
 - DEV  .gitexcludes: ✅ 存在 / ❌ 缺失
 - 被排除路径跟踪状态: ✅ 已清理 / ⚠️ 仍被跟踪（列表）
 
-### 文档一致性
-- .specify/memory/git-workflow.md: ✅ / ❌ 问题描述
-- instructions 引用: ✅ / ❌
+### Git Workflow 块一致性
+- instructions `## Git Workflow` 块（分支名与实际一致）: ✅ / ❌ 问题描述
+- START/END 标记成对存在: ✅ / ❌
+- 无遗留第二数据源（docs/git-workflow.md、.specify/memory/git-workflow.md）: ✅ / ⚠️ 冗余待处理（路径）
 
 ### 建议操作
 - （列出需要执行的操作，如有）

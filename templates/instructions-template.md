@@ -153,6 +153,20 @@ This file is a **map, not a manual**: it tells you *what* exists and *where* it 
 - **Detect & repair symlinks**: List every symlink in the project with `find . -type l` (or inspect a single path with `ls -l <path>` / `readlink <path>`) before assuming a compatibility file is a real file. If a link was accidentally broken or replaced with a regular file, run `/speckit.instructions` to regenerate the canonical instructions and recreate all compatibility symlinks.
 - **Regeneration behavior**: `/speckit.instructions` refreshes the instructions content and recreates compatibility symlinks. If a compatibility path appears to contain the same content as `.specify/instructions.md` or `.specify/skills/`, verify whether it is a symlink before treating it as a separate file.
 
+## Git Workflow
+Machine-maintained by the `git-workflow` skill. The branch roles recorded below are the **single source of truth** for every git operation in this project — no separate workflow document is generated. To rename a role, edit its `Branch` cell; the operational procedure (pre-checks, rebase sequences, push strategy, `.gitexcludes` subroutine, safety rules) lives in the skill and its references, not here.
+
+<!-- GIT_WORKFLOW_START -->
+<!-- Record one row per branch role (MAIN / PRE / DEV). While no workflow is established, keep the `None yet.` row. -->
+| Role | Branch | Tracking | Purpose |
+|------|--------|----------|---------|
+| None yet. | - | - | - |
+
+- **Sync chain (rebase)**: `MAIN -> PRE -> DEV`
+- **Merge chain (PR)**: `MAIN <- PRE <- DEV`
+- **Last updated**: -
+<!-- GIT_WORKFLOW_END -->
+
 ## Resource Registry
 Use this machine-maintained section to track reusable resource identifiers created by SpecKit commands. Keep entries deduplicated and sorted when updating this file. Record each resource as a single row in the corresponding horizontal Markdown table, and keep column names aligned with the corresponding agent/skill/tool templates. When no records exist, keep a single row with `None yet.` in the first column and `-` in the remaining columns.
 

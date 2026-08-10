@@ -1,10 +1,21 @@
 {
   "store": "feedback",
-  "updated": "2026-08-10T10:18:04Z",
+  "updated": "2026-08-10T12:00:39Z",
   "threshold": 10,
-  "count_since_submission": 12,
+  "count_since_submission": 13,
   "submitted_at": "2026-08-05T18:53:10Z",
   "entries": [
+    {
+      "id": "20260810T120039Z-skill-improve-skills",
+      "file": "20260810T120039Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "git-workflow-instructions-block-20260810",
+      "feature": "",
+      "partial": false,
+      "created": "2026-08-10T12:00:39Z",
+      "summary": "Moved git-workflow's branch data out of a generated document and into a GIT_WORKFLOW managed block in the project's instructions file, per user request. Corrected two premise errors first (the store w"
+    },
     {
       "id": "20260810T101804Z-skill-create-skills",
       "file": "20260810T101804Z-skill-create-skills.md",

@@ -1,21 +1,25 @@
 # Bootstrap 调谐命令序列
 
-Phase 0（旧文档迁移）与 Phase 1（分支检测、创建、`.gitexcludes` 初始化）的完整命令序列。SKILL.md 保留步骤骨架与交互决策逻辑，此处承载操作细节。
+Phase 0（遗留配置迁移）与 Phase 1（分支检测、创建、`.gitexcludes` 初始化、写入 Git Workflow 块）的完整命令序列。SKILL.md 保留步骤骨架与交互决策逻辑，此处承载操作细节。
 
-## 旧位置文档迁移
+## 遗留配置迁移
 
-本技能的输出文档已从旧位置 `docs/git-workflow.md` 迁移到 `.specify/memory/git-workflow.md`。执行任何模式前，若检测到旧位置仍有文件而新位置尚不存在，先迁移：
+分支信息现在只存在于归口 instructions 文件的 `## Git Workflow` 块中（写入规则见 [instructions-lookup.md](./instructions-lookup.md)），本技能**不再生成独立工作流文档**。执行任何模式前，若检测到任一遗留文档，把其 frontmatter 的分支映射提取出来填入块：
 
 ```bash
-if [ -f "${SKILL_WORKDIR}/docs/git-workflow.md" ] && [ ! -f "${SKILL_WORKDIR}/.specify/memory/git-workflow.md" ]; then
-  mkdir -p "${SKILL_WORKDIR}/.specify/memory"
-  git mv "${SKILL_WORKDIR}/docs/git-workflow.md" "${SKILL_WORKDIR}/.specify/memory/git-workflow.md" 2>/dev/null \
-    || mv "${SKILL_WORKDIR}/docs/git-workflow.md" "${SKILL_WORKDIR}/.specify/memory/git-workflow.md"
-  echo "migrated git-workflow.md -> .specify/memory/"
-fi
+for legacy in "${SKILL_WORKDIR}/.specify/memory/git-workflow.md" "${SKILL_WORKDIR}/docs/git-workflow.md"; do
+  [ -f "$legacy" ] || continue
+  echo "legacy config found: $legacy"
+  sed -n '/^---$/,/^---$/p' "$legacy" \
+    | grep -E '^(main_branch|pre_branch|dev_branch|last_updated):' \
+    | sed 's/"//g'
+done
 ```
 
-若归口 instructions 文档的 Documentation Map 仍引用旧路径 `docs/git-workflow.md`，同时将其更新为 `.specify/memory/git-workflow.md`。
+把提取到的 `main_branch` / `pre_branch` / `dev_branch` 写入块的 MAIN / PRE / DEV 行，并刷新 `Last updated`。
+
+- 迁移完成后，遗留文件即为**冗余数据源**：在报告中列出其路径并建议用户删除或归档，**不要自动删除**（可能含用户手写的补充内容，删除不可逆）。
+- 若归口 instructions 文件的 Documentation Map 仍有指向 `docs/git-workflow.md` 或 `.specify/memory/git-workflow.md` 的引用行，删除该行——已无独立文档可引用。
 
 ## 分支检测
 
@@ -78,12 +82,8 @@ git add .gitexcludes && git commit -m "chore: init .gitexcludes for PRE"
 
 若用户不需要排除规则，创建空 `.gitexcludes` 文件（留备后续使用）。
 
-## 更新 instructions 文档
+## 写入 Git Workflow 块
 
-在归口 instructions 文档的 Documentation Map 中添加引用行：
+用 `${SKILL_HOME}/assets/git-workflow-block.md` 填充分支名、tracking 与日期，写入归口 instructions 文件的 `## Git Workflow` 块。目标文件查找优先级、标记内替换规则与读取命令：见 [instructions-lookup.md](./instructions-lookup.md)。
 
-```markdown
-| **Git Workflow** | `.specify/memory/git-workflow.md` | 分支同步机制与操作文件 | 三层分支模型、rebase 同步流程、推送策略、安全底线、.gitexcludes 机制 |
-```
-
-目标文档查找优先级：见 [instructions-lookup.md](./instructions-lookup.md)。
+不要额外添加 Documentation Map 引用行——分支信息就在该块内，没有独立文档可引用。

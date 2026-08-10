@@ -136,6 +136,20 @@ Project-specific gotchas distilled from prior sessions (`docs/reference/history/
   - A root-owned `.git/objects/<xx>/` hash-bucket dir intermittently blocks commits (tree hashes land in buckets probabilistically). Root fix: `mv` the bucket aside, recreate it as the current user, copy the blobs back — do NOT mutate file content to dodge the hash.
   - When restructuring a command/engine, **execute its real pipeline end-to-end** (create → view → invoke, or collect → compare) as a mandatory step — "files exist / headings present" checks miss latent defects that only surface at runtime (four such defects found in one tools restructure).
 
+## Git Workflow
+Machine-maintained by the `git-workflow` skill. The branch roles recorded below are the **single source of truth** for every git operation in this project — no separate workflow document is generated. To rename a role, edit its `Branch` cell; the operational procedure (pre-checks, rebase sequences, push strategy, `.gitexcludes` subroutine, safety rules) lives in the skill and its references, not here.
+
+<!-- GIT_WORKFLOW_START -->
+<!-- Record one row per branch role (MAIN / PRE / DEV). While no workflow is established, keep the `None yet.` row. -->
+| Role | Branch | Tracking | Purpose |
+|------|--------|----------|---------|
+| None yet. | - | - | - |
+
+- **Sync chain (rebase)**: `MAIN -> PRE -> DEV`
+- **Merge chain (PR)**: `MAIN <- PRE <- DEV`
+- **Last updated**: -
+<!-- GIT_WORKFLOW_END -->
+
 ## Resource Registry
 Use this machine-maintained section to track reusable resource identifiers created by SpecKit commands. Keep entries deduplicated and sorted when updating this file. Record each resource as a single row in the corresponding horizontal Markdown table, and keep column names aligned with the corresponding agent/skill/tool templates. When no records exist, keep a single row with `None yet.` in the first column and `-` in the remaining columns.
 
@@ -158,7 +172,7 @@ Use this machine-maintained section to track reusable resource identifiers creat
 | Skill Name | Skill ID | Description | Argument Hint | User Invocable | Disable Model Invocation | Canonical Path |
 |------------|----------|-------------|---------------|----------------|--------------------------|----------------|
 | git-submodule-edit | <SKILL:.specify/skills/git-submodule-edit/SKILL.md> | Edit and commit code inside a git submodule from the parent project under disciplined rules: edits happen on a branch named after the parent project (traceable upstream), and every submodule-pointer bump validated in the parent is recorded in a ledger (submodule-edits.md). | - | true | false | .specify/skills/git-submodule-edit/SKILL.md |
-| git-workflow | <SKILL:.specify/skills/git-workflow/SKILL.md> | Three-tier Git workflow management (trunk/pre-release/dev). Single reconcile engine (see .specify/shared/patterns/reconcile-pattern.md): bootstrap (establish workflow), health-check (observe + residual report), directed convergence (run git operations). Uses .specify/memory/git-workflow.md as single source of truth. | - | true | false | .specify/skills/git-workflow/SKILL.md |
+| git-workflow | <SKILL:.specify/skills/git-workflow/SKILL.md> | Three-tier Git workflow management (trunk/pre-release/dev). Single reconcile engine (see .specify/shared/patterns/reconcile-pattern.md): bootstrap (establish workflow), health-check (observe + residual report), directed convergence (run git operations). Records branch roles into this file's `## Git Workflow` managed block as the single source of truth; generates no separate workflow document. | - | true | false | .specify/skills/git-workflow/SKILL.md |
 | summarize-project | <SKILL:.specify/skills/summarize-project/SKILL.md> | Project summary and presentation (refactored from manage-project; renamed from visualize-project since the report pairs textual summary with visual charts): a read-only presentation/output tool — reads the project's existing sources of truth and produces a derived summary report (overview, requirements & features, WBS functional decomposition, milestone view, task-progress Gantt). Auto-detects SpecKit-managed projects (.specify/ structure) and uses its artifacts (specs/*/requirements.md, specs/*/tasks.md, memory/features.md) as primary sources; non-SpecKit projects fall back to code structure, README/docs, external documents, and git history. Charts embedded as editable PlantUML source blocks; rendering delegated to draw-plantuml; repeat runs regenerate the derived report. | - | true | false | .specify/skills/summarize-project/SKILL.md |
 | memory-recall | <SKILL:.specify/skills/memory-recall/SKILL.md> | Retrieve relevant prior memory before or during a Spec Kit task using a lightweight local file index (no vectors). Searches session/ (short-term) and knowledge/ (long-term) by keyword, tag, source, feature, and date. Pairs with memory-record. | - | true | false | .specify/skills/memory-recall/SKILL.md |
 | memory-record | <SKILL:.specify/skills/memory-record/SKILL.md> | Persist a durable, structured record of a Spec Kit conversation into project memory (memory-as-files). Writes short-term working notes to .specify/memory/session/ and long-term distilled knowledge to .specify/memory/knowledge/. Only records conversations driven by a Spec Kit command or skill. | - | true | false | .specify/skills/memory-record/SKILL.md |
