@@ -452,5 +452,6 @@ Shift developers' attention from low-level syntax and algorithm implementation t
 
 > **Related Documents**:
 > - [Spec-Driven Development](./spec-driven.md)
+> - [AI Engineering Evolution: Prompt → Graph](./prompt-to-graph.md)
 > - [Constitution](../../memory/constitution.md)
 > - [Feature Index](../../memory/features.md)

@@ -42,3 +42,7 @@ and carry lessons forward.
   automatically.
 - **Not a per-unit fork.** The goal model lives in one shared anchor; units
   reference it instead of restating it.
+
+> **Related**: [prompt-to-graph.md](./prompt-to-graph.md) places this Harness
+> dimension on the wider Prompt → Context → Harness → Loop → Graph path and maps
+> each stage to Spec Kit assets.
