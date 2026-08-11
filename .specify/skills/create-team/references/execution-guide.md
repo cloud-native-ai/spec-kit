@@ -22,6 +22,15 @@ Rules:
 - The run workspace is created on demand by the orchestrator at run time; it is transient and safe to delete. Do not rely on it across runs — durable knowledge belongs in the tracked report.
 - Token efficiency (see `.specify/shared/guidelines/token-efficiency.md`): agent prompts and stage handoffs carry digests/paths, never whole machine-managed data files; deterministic checks (counting, diff, pattern match) run as program steps, not LLM judgments — validate this when persisting a team.
 
+### Target-Focused Runs (`--target`, 038)
+
+A run may be issued with `--target T-<nnn>` to focus on one authorized Target (scope slice) of the bound goal. Runtime discipline:
+
+- **Focus, not rebind.** The assignment steers the run's work toward that slice; the Goal–Team binding, identity resolution, and the summary delivery directory are unchanged. It is not a write-scope claim.
+- **Preview verdicts are final.** Dangling, terminal, cross-goal, and goal-terminal references stop the run before the gate with zero execution trace; a terminal Target triggers the review bifurcation (verify by hand; reopen via `/speckit.goal targets --set open --id <T-nnn>` if the evidence contradicts). There is no terminal-execution bypass.
+- **Disclosure and report.** The confirmation gate discloses `本次 Target: T-<nnn> — <statement>(<status>)` (or `本次 Target: 无(对 goal 整体运行)`); the run report carries `**Target 指派**: T-<nnn>(<statement>)` (or `无(goal 整体)`).
+- **Ledger attribution is the supervisor's write.** New ledger entries produced by a Target-assigned run carry `"target_ref": "T-<nnn>"` (local form) — written **only by the Team Supervisor**, like every ledger field; sub-agents MUST NOT write it. Entries without the field attribute to the goal as a whole.
+
 ---
 
 ## Shared Protocols

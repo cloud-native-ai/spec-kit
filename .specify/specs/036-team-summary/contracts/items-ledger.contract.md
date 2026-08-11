@@ -18,7 +18,7 @@ Each line is a single JSON object representing one **state event**.
 ```
 
 Required keys: `item_id`, `title`, `phase_ref`, `state`, `provenance`, `ts`, `identity`.
-Optional keys: `supersedes`, `excluded_reason`, `maturity_at_event`.
+Optional keys: `supersedes`, `excluded_reason`, `maturity_at_event`, `target_ref` (038 扩展,见 LC-11)。
 
 ## Normative rules
 
@@ -32,6 +32,7 @@ Optional keys: `supersedes`, `excluded_reason`, `maturity_at_event`.
 - **LC-8**: Only the Team Supervisor writes this file. Sub-agents MUST NOT write it.
 - **LC-9**: `excluded_reason` non-empty removes the item from delay and incompletion accounting while keeping it in the data layer.
 - **LC-10**: `maturity_at_event` anchors state semantics to the maturity in force when the event occurred. A later maturity promotion MUST NOT retroactively reinterpret earlier events.
+- **LC-11** (038 叠加,不改动 LC-1…LC-10 任何条款): `target_ref` 为可选字段,取值文法为**局部形** `T-\d{3}`——goal 由团队 `goal_slug` 绑定隐含,限定形不合法。字段缺失 = 该条目归属 goal 整体;存量行与无 Target 团队的行语义 MUST 不变。指向不存在身份的行按 goal 整体降级计入并由折叠侧声明,不静默。`target_ref` 不改变 LC-1(append-only)、LC-2(末行定态)、LC-3(tracked provenance)、LC-4/LC-5(身份文法)、LC-6(supersedes 折叠)的任何语义;写入者仍受 LC-8 约束(仅团队主管)。
 
 ## Identifier issuance
 

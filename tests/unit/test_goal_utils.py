@@ -214,3 +214,228 @@ def test_validate_flags_an_out_of_range_status(tmp_path):
     ok, problems = goal_utils.validate_goal(path)
     assert not ok
     assert any("status" in p for p in problems)
+
+
+# ==========================================================================
+# Targets data layer (038-goal-target, T002)
+# Contract: .specify/specs/038-goal-target/contracts/targets-engine.contract.md
+# ==========================================================================
+
+def _active_goal(tmp_path, slug="sliced", criteria=None):
+    return goal_utils.create_goal(tmp_path, slug, "Broad platform outcome.", criteria or [])
+
+
+# --- SC-002 engine side: section absent ⇒ empty targets, byte-identical ---
+
+def test_parse_goal_returns_empty_targets_when_section_absent(tmp_path):
+    path = _active_goal(tmp_path)
+    assert goal_utils.parse_goal(path)["targets"] == []
+
+
+def test_create_output_is_byte_stable_without_targets(tmp_path):
+    """SC-002: the new optional parameter must not change existing rendering."""
+    path = goal_utils.create_goal(tmp_path, "stable", "An outcome.", ["c1"])
+    before = path.read_bytes()
+    # re-render through the same code path the actions use
+    data = goal_utils.parse_goal(path)
+    rerendered = goal_utils._render(
+        data["objective"], data["criteria"], data["status"], data["created"],
+        data["updated"], data["history"].splitlines(), data["slug"],
+    )
+    assert rerendered.encode("utf-8") == before
+
+
+# --- D3 rendering grammar + round-trip byte stability ---
+
+def test_targets_render_matches_d3_grammar_and_round_trips():
+    targets = [
+        {"id": "T-001", "statement": "日志组件拆分完成", "status": "open"},
+        {"id": "T-002", "statement": "指标采集链路独立可部署", "status": "done"},
+    ]
+    rendered = goal_utils._render_targets_table(targets)
+    assert rendered == (
+        "| ID | Target | Status |\n"
+        "|----|--------|--------|\n"
+        "| T-001 | 日志组件拆分完成 | open |\n"
+        "| T-002 | 指标采集链路独立可部署 | done |"
+    )
+    assert goal_utils._parse_targets_text(rendered) == targets
+
+
+def test_render_sorts_rows_by_id_ascending():
+    targets = [
+        {"id": "T-010", "statement": "later one", "status": "open"},
+        {"id": "T-002", "statement": "earlier one", "status": "done"},
+    ]
+    lines = goal_utils._render_targets_table(targets).splitlines()
+    assert lines[2].startswith("| T-002 |")
+    assert lines[3].startswith("| T-010 |")
+
+
+def test_parse_round_trip_is_byte_stable(tmp_path):
+    path = _active_goal(tmp_path)
+    goal_utils.add_target(path, "第一个切片成果")
+    first = path.read_bytes()
+    data = goal_utils.parse_goal(path)
+    section = goal_utils._render_targets_table(data["targets"])
+    assert goal_utils._parse_targets_text(section) == data["targets"]
+    assert path.read_bytes() == first
+
+
+@pytest.mark.parametrize(
+    "bad_section,why",
+    [
+        (
+            "## Targets\n\n| ID | Target | State |\n|----|--------|--------|\n"
+            "| T-001 | x | open |\n",
+            "wrong header",
+        ),
+        (
+            "## Targets\n\n| ID | Target | Status |\n|----|--------|--------|\n"
+            "| T-001 | open |\n",
+            "missing column",
+        ),
+        (
+            "## Targets\n\n| ID | Target | Status |\n|----|--------|--------|\n"
+            "| T-001 | x | finished |\n",
+            "illegal status",
+        ),
+    ],
+)
+def test_validate_rejects_hand_broken_target_rows(tmp_path, bad_section, why):
+    path = _active_goal(tmp_path)
+    text = path.read_text(encoding="utf-8")
+    path.write_text(text.replace("## History", bad_section + "\n## History"), encoding="utf-8")
+    ok, problems = goal_utils.validate_goal(path)
+    assert not ok, f"{why} must be flagged"
+    assert any("手写" in p or "engine" in p.lower() for p in problems)
+
+
+def test_validate_rejects_empty_targets_table(tmp_path):
+    path = _active_goal(tmp_path)
+    text = path.read_text(encoding="utf-8")
+    empty = "## Targets\n\n| ID | Target | Status |\n|----|--------|--------|\n"
+    path.write_text(text.replace("## History", empty + "\n## History"), encoding="utf-8")
+    ok, problems = goal_utils.validate_goal(path)
+    assert not ok
+    assert any("empty" in p.lower() or "空" in p for p in problems)
+    # parse side: the header-only table yields no rows
+    assert goal_utils.parse_goal(path)["targets"] == []
+
+
+# --- identity grammar: unique, monotonic, terminal identities never reused ---
+
+def test_target_ids_are_monotonic_and_terminal_not_reused(tmp_path):
+    path = _active_goal(tmp_path)
+    t1 = goal_utils.add_target(path, "切片一")
+    t2 = goal_utils.add_target(path, "切片二")
+    goal_utils.set_target_status(path, t2, "dropped")
+    t3 = goal_utils.add_target(path, "切片三")
+    assert [t1, t2, t3] == ["T-001", "T-002", "T-003"]
+    # dropped identity must NOT be reused: next id is max+1, not first-gap
+    data = goal_utils.parse_goal(path)
+    assert [t["id"] for t in data["targets"]] == ["T-001", "T-002", "T-003"]
+
+
+def test_next_target_id_is_monotone_max_plus_one():
+    assert goal_utils._next_target_id([]) == "T-001"
+    assert goal_utils._next_target_id([{"id": "T-001"}, {"id": "T-002"}]) == "T-003"
+    assert goal_utils._next_target_id([{"id": "T-001"}, {"id": "T-007"}]) == "T-008"
+
+
+# --- state transition matrix: 3x3, exactly four legal ---
+
+@pytest.mark.parametrize(
+    "frm,to,ok",
+    [
+        ("open", "open", False),
+        ("open", "done", True),
+        ("open", "dropped", True),
+        ("done", "open", True),
+        ("done", "done", False),
+        ("done", "dropped", False),
+        ("dropped", "open", True),
+        ("dropped", "done", False),
+        ("dropped", "dropped", False),
+    ],
+)
+def test_target_transition_matrix(frm, to, ok):
+    assert goal_utils.target_transition_allowed(frm, to) is ok
+
+
+# --- statement shape: GD-2/GD-3 same-source detection at slice scale ---
+
+@pytest.mark.parametrize(
+    "statement",
+    [
+        "1. 修改配置\n2. 重启服务\n3. 验证日志",
+        "- 拆分模块\n- 补测试",
+        "首先梳理依赖，然后逐个迁移",
+    ],
+)
+def test_task_list_target_statement_is_rejected(statement):
+    """GD-2 reused at slice scale (SC-003): task lists are not outcome slices."""
+    with pytest.raises(goal_utils.GoalError) as exc:
+        goal_utils._reject_bad_target_statement(statement)
+    assert "GD-2" in str(exc.value)
+
+
+@pytest.mark.parametrize(
+    "statement",
+    [
+        "完成指标链路 and also 重写部署文档",
+        "拆分日志组件，同时还迁移存储层",
+    ],
+)
+def test_composite_target_statement_is_rejected(statement):
+    """GD-3 reused at slice scale: one slice = one sub-outcome."""
+    with pytest.raises(goal_utils.GoalError) as exc:
+        goal_utils._reject_bad_target_statement(statement)
+    assert "GD-3" in str(exc.value)
+
+
+def test_good_target_statement_passes_the_same_check():
+    goal_utils._reject_bad_target_statement("日志组件拆分完成")  # must not raise
+
+
+def test_objective_rejection_still_works_after_refactor(tmp_path):
+    """The shared detector must keep the objective-side behavior intact."""
+    with pytest.raises(goal_utils.GoalError) as exc:
+        goal_utils.create_goal(tmp_path, "still-bad", "1. do a\n2. do b", [])
+    assert "GD-2" in str(exc.value)
+
+
+# --- data-layer add/set primitives ---
+
+def test_add_target_creates_section_and_history_line(tmp_path):
+    path = _active_goal(tmp_path)
+    tid = goal_utils.add_target(path, "日志组件拆分完成")
+    text = path.read_text(encoding="utf-8")
+    assert tid == "T-001"
+    assert "| T-001 | 日志组件拆分完成 | open |" in text
+    assert "## Targets" in text
+    assert "target T-001 added: 日志组件拆分完成" in text
+
+
+def test_set_target_status_writes_transition_history(tmp_path):
+    path = _active_goal(tmp_path)
+    tid = goal_utils.add_target(path, "一个切片")
+    goal_utils.set_target_status(path, tid, "done")
+    text = path.read_text(encoding="utf-8")
+    assert "| T-001 | 一个切片 | done |" in text
+    assert "target T-001 open→done" in text
+
+
+def test_set_target_status_rejects_illegal_transition(tmp_path):
+    path = _active_goal(tmp_path)
+    tid = goal_utils.add_target(path, "一个切片")
+    goal_utils.set_target_status(path, tid, "done")
+    with pytest.raises(goal_utils.GoalError) as exc:
+        goal_utils.set_target_status(path, tid, "dropped")
+    assert "done" in str(exc.value)
+
+
+def test_set_target_status_unknown_id_raises_not_found(tmp_path):
+    path = _active_goal(tmp_path)
+    with pytest.raises(goal_utils.GoalNotFound):
+        goal_utils.set_target_status(path, "T-999", "done")

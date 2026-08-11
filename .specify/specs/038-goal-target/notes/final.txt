@@ -1,0 +1,933 @@
+# test runner: python3 -m pytest tests/ -q
+......................................................FF.FF............. [  4%]
+........................................................................ [  8%]
+....F................................................................... [ 12%]
+...........................F............................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+..........................................F...........................FF [ 42%]
+FFF.....FFFFF.........................................F................. [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 63%]
+........................................................................ [ 68%]
+............................FFFFFFF..................................... [ 72%]
+........................................................................ [ 76%]
+....................................s................................... [ 80%]
+...................F..................F.F.F.........FF.................. [ 85%]
+.....F..FF.............................................................. [ 89%]
+........................................................................ [ 93%]
+....................................................................F.FF [ 97%]
+.....................................                                    [100%]
+=================================== FAILURES ===================================
+__ TestC001CommandTemplateSectionPresence.test_section_headings_exist[agents] __
+
+self = <contract.test_agent_specific_config_commands.TestC001CommandTemplateSectionPresence object at 0x7f86f30b5550>
+template_path = PosixPath('/storage/project/cloud-native-ai/spec-kit/templates/commands/agents.md')
+
+    @pytest.mark.contract
+    @pytest.mark.parametrize("template_path", COMMAND_TEMPLATES, ids=lambda p: p.stem)
+    def test_section_headings_exist(self, template_path: Path):
+        content = template_path.read_text(encoding="utf-8")
+        for heading in REQUIRED_HEADINGS:
+>           assert heading in content, (
+                f"{template_path.name} missing required heading: {heading}"
+            )
+E           AssertionError: agents.md missing required heading: ## Agent-Specific Configuration
+E           assert '## Agent-Specific Configuration' in '---\ndescription: Single entry point for single-agent operations — create, refine, and run agents via intent routing....kill. Optional `/speckit.tools` for tool records.\n\n**After**: Run `/speckit.instructions` to sync discoverability.\n'
+
+tests/contract/test_agent_specific_config_commands.py:31: AssertionError
+__ TestC001CommandTemplateSectionPresence.test_section_headings_exist[skills] __
+
+self = <contract.test_agent_specific_config_commands.TestC001CommandTemplateSectionPresence object at 0x7f86f30b5690>
+template_path = PosixPath('/storage/project/cloud-native-ai/spec-kit/templates/commands/skills.md')
+
+    @pytest.mark.contract
+    @pytest.mark.parametrize("template_path", COMMAND_TEMPLATES, ids=lambda p: p.stem)
+    def test_section_headings_exist(self, template_path: Path):
+        content = template_path.read_text(encoding="utf-8")
+        for heading in REQUIRED_HEADINGS:
+>           assert heading in content, (
+                f"{template_path.name} missing required heading: {heading}"
+            )
+E           AssertionError: skills.md missing required heading: ## Agent-Specific Configuration
+E           assert '## Agent-Specific Configuration' in '---\ndescription: Create Agent Skills\nhandoffs:\n  - label: Update Instructions\n    agent: speckit.instructions\n  ...instead of executing it here.\n\n## Handoffs\n\n**After**: Run `/speckit.instructions` to update discovery metadata.\n'
+
+tests/contract/test_agent_specific_config_commands.py:31: AssertionError
+__________ TestC007AdditiveConstraint.test_section_not_at_top[agents] __________
+
+self = <contract.test_agent_specific_config_commands.TestC007AdditiveConstraint object at 0x7f86f30b6590>
+template_path = PosixPath('/storage/project/cloud-native-ai/spec-kit/templates/commands/agents.md')
+
+    @pytest.mark.contract
+    @pytest.mark.parametrize("template_path", COMMAND_TEMPLATES, ids=lambda p: p.stem)
+    def test_section_not_at_top(self, template_path: Path):
+        content = template_path.read_text(encoding="utf-8")
+        agent_config_pos = content.find("## Agent-Specific Configuration")
+>       assert agent_config_pos != -1, (
+            f"{template_path.name} missing ## Agent-Specific Configuration"
+        )
+E       AssertionError: agents.md missing ## Agent-Specific Configuration
+E       assert -1 != -1
+
+tests/contract/test_agent_specific_config_commands.py:49: AssertionError
+__________ TestC007AdditiveConstraint.test_section_not_at_top[skills] __________
+
+self = <contract.test_agent_specific_config_commands.TestC007AdditiveConstraint object at 0x7f86f30b6810>
+template_path = PosixPath('/storage/project/cloud-native-ai/spec-kit/templates/commands/skills.md')
+
+    @pytest.mark.contract
+    @pytest.mark.parametrize("template_path", COMMAND_TEMPLATES, ids=lambda p: p.stem)
+    def test_section_not_at_top(self, template_path: Path):
+        content = template_path.read_text(encoding="utf-8")
+        agent_config_pos = content.find("## Agent-Specific Configuration")
+>       assert agent_config_pos != -1, (
+            f"{template_path.name} missing ## Agent-Specific Configuration"
+        )
+E       AssertionError: skills.md missing ## Agent-Specific Configuration
+E       assert -1 != -1
+
+tests/contract/test_agent_specific_config_commands.py:49: AssertionError
+_____________ test_create_new_skill_generates_json_tool_manifests ______________
+
+    def test_create_new_skill_generates_json_tool_manifests():
+        root = Path(__file__).resolve().parents[2]
+        script = root / ".specify" / "scripts" / "bash" / "create-new-skill.sh"
+        output_dir = root / "tmp" / f"skill-test-{uuid.uuid4().hex}"
+        try:
+            output_dir.mkdir(parents=True, exist_ok=False)
+            result = subprocess.run(
+                [
+                    str(script),
+                    "--json",
+                    "--output-dir",
+                    str(output_dir),
+                    "git-workflow-sync - Sync upstream code to target branch",
+                ],
+                cwd=root,
+                stdin=subprocess.DEVNULL,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            payload = json.loads(result.stdout)
+    
+            skill_dir = output_dir / "git-workflow-sync"
+            assert payload["status"] == "created"
+            assert payload["SKILL_NAME"] == "git-workflow-sync"
+            assert (skill_dir / "SKILL.md").exists()
+>           assert (skill_dir / "tools" / "system.json").exists()
+E           AssertionError: assert False
+E            +  where False = exists()
+E            +    where exists = ((PosixPath('/storage/project/cloud-native-ai/spec-kit/tmp/skill-test-7b62b54752264e1789696b3fc2001d74/git-workflow-sync') / 'tools') / 'system.json').exists
+
+tests/contract/test_create_new_skill_contract.py:34: AssertionError
+_________________________ test_c4_no_new_memory_layout _________________________
+
+    def test_c4_no_new_memory_layout():
+        memory = ROOT / ".specify" / "memory"
+        dirs = {d.name for d in memory.iterdir() if d.is_dir()}
+>       assert dirs <= {"features", "feedback", "knowledge", "session"}, \
+            f"unexpected new .specify/memory/ subdirectory: {dirs - {'features', 'feedback', 'knowledge', 'session'}}"
+E       AssertionError: unexpected new .specify/memory/ subdirectory: {'evidence', 'todo', 'tools'}
+E       assert {'evidence', ..., 'todo', ...} <= {'features', ...e', 'session'}
+E         
+E         Extra items in the left set:
+E         'evidence'
+E         'todo'
+E         'tools'
+
+tests/contract/test_dogfooding_practice.py:217: AssertionError
+________________ test_skills_use_installed_absolute_shared_form ________________
+
+    def test_skills_use_installed_absolute_shared_form():
+        """Sibling skills reference shared docs via the installed-absolute shared path."""
+        import re
+    
+        offenders = []
+        bare = re.compile(r"(?<![\w./])shared/(" + "|".join(SHARED_TYPES) + r")/")
+        for f in _iter_files("skills/*/SKILL.md"):
+            text = f.read_text(encoding="utf-8")
+            if bare.search(text):
+                offenders.append(str(f.relative_to(ROOT)))
+>       assert not offenders, f"skills must use .specify/shared/<type>/ form: {offenders}"
+E       AssertionError: skills must use .specify/shared/<type>/ form: ['skills/create-agent/SKILL.md', 'skills/improve-agent/SKILL.md']
+E       assert not ['skills/create-agent/SKILL.md', 'skills/improve-agent/SKILL.md']
+
+tests/contract/test_shared_reference_rewrite.py:81: AssertionError
+________________ test_us1_template_has_path_conventions_section ________________
+
+    @pytest.mark.contract
+    def test_us1_template_has_path_conventions_section():
+        """TemplateAssertions.hasPathConventionsSection."""
+        body = _read(TEMPLATE_PATH)
+>       assert re.search(r"^##\s+Path Conventions\s*$", body, re.MULTILINE), (
+            f"{TEMPLATE_PATH} must contain a top-level '## Path Conventions' heading"
+        )
+E       AssertionError: templates/commands/skills.md must contain a top-level '## Path Conventions' heading
+E       assert None
+E        +  where None = <function search at 0x7f86f4bb23e0>('^##\\s+Path Conventions\\s*$', '---\ndescription: Create Agent Skills\nhandoffs:\n  - label: Update Instructions\n    agent: speckit.instructions\n  ...instead of executing it here.\n\n## Handoffs\n\n**After**: Run `/speckit.instructions` to update discovery metadata.\n', re.MULTILINE)
+E        +    where <function search at 0x7f86f4bb23e0> = re.search
+E        +    and   re.MULTILINE = re.MULTILINE
+
+tests/contract/test_skill_home_workdir_template.py:82: AssertionError
+_______________ test_us1_template_has_computation_idioms_section _______________
+
+    @pytest.mark.contract
+    def test_us1_template_has_computation_idioms_section():
+        """TemplateAssertions.hasComputationIdiomsSection — SKILL_HOME idiom substring present."""
+        body = _read(TEMPLATE_PATH)
+>       assert re.search(r"^###\s+Computation Idioms\s*$", body, re.MULTILINE), (
+            f"{TEMPLATE_PATH} must contain a '### Computation Idioms' subsection"
+        )
+E       AssertionError: templates/commands/skills.md must contain a '### Computation Idioms' subsection
+E       assert None
+E        +  where None = <function search at 0x7f86f4bb23e0>('^###\\s+Computation Idioms\\s*$', '---\ndescription: Create Agent Skills\nhandoffs:\n  - label: Update Instructions\n    agent: speckit.instructions\n  ...instead of executing it here.\n\n## Handoffs\n\n**After**: Run `/speckit.instructions` to update discovery metadata.\n', re.MULTILINE)
+E        +    where <function search at 0x7f86f4bb23e0> = re.search
+E        +    and   re.MULTILINE = re.MULTILINE
+
+tests/contract/test_skill_home_workdir_template.py:91: AssertionError
+___________ test_us1_template_contains_normative_skill_home_fallback ___________
+
+    @pytest.mark.contract
+    def test_us1_template_contains_normative_skill_home_fallback():
+        """TemplateAssertions.containsNormativeScriptIdiom.skillHomeFallback."""
+        body = _read(TEMPLATE_PATH)
+>       assert SKILL_HOME_IDIOM in body, (
+            f"{TEMPLATE_PATH} must contain SKILL_HOME_IDIOM (FR-016 normative recipe)"
+        )
+E       AssertionError: templates/commands/skills.md must contain SKILL_HOME_IDIOM (FR-016 normative recipe)
+E       assert 'SKILL_HOME="${SKILL_HOME:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd -P)}"' in '---\ndescription: Create Agent Skills\nhandoffs:\n  - label: Update Instructions\n    agent: speckit.instructions\n  ...instead of executing it here.\n\n## Handoffs\n\n**After**: Run `/speckit.instructions` to update discovery metadata.\n'
+
+tests/contract/test_skill_home_workdir_template.py:103: AssertionError
+________________ test_us1_template_has_non_shell_agents_clause _________________
+
+    @pytest.mark.contract
+    def test_us1_template_has_non_shell_agents_clause():
+        """TemplateAssertions.hasNonShellAgentsClause (FR-013)."""
+        body = _read(TEMPLATE_PATH)
+>       assert re.search(r"^###\s+Non-shell Agents\s*$", body, re.MULTILINE), (
+            f"{TEMPLATE_PATH} must contain a '### Non-shell Agents' subsection"
+        )
+E       AssertionError: templates/commands/skills.md must contain a '### Non-shell Agents' subsection
+E       assert None
+E        +  where None = <function search at 0x7f86f4bb23e0>('^###\\s+Non-shell Agents\\s*$', '---\ndescription: Create Agent Skills\nhandoffs:\n  - label: Update Instructions\n    agent: speckit.instructions\n  ...instead of executing it here.\n\n## Handoffs\n\n**After**: Run `/speckit.instructions` to update discovery metadata.\n', re.MULTILINE)
+E        +    where <function search at 0x7f86f4bb23e0> = re.search
+E        +    and   re.MULTILINE = re.MULTILINE
+
+tests/contract/test_skill_home_workdir_template.py:112: AssertionError
+_______________ test_us1_template_has_nested_invocations_clause ________________
+
+    @pytest.mark.contract
+    def test_us1_template_has_nested_invocations_clause():
+        """TemplateAssertions.hasNestedInvocationsClause (F2 remediation; resolves Nested Invocations edge case)."""
+        body = _read(TEMPLATE_PATH)
+>       assert re.search(r"^###\s+Nested Invocations\s*$", body, re.MULTILINE), (
+            f"{TEMPLATE_PATH} must contain a '### Nested Invocations' subsection"
+        )
+E       AssertionError: templates/commands/skills.md must contain a '### Nested Invocations' subsection
+E       assert None
+E        +  where None = <function search at 0x7f86f4bb23e0>('^###\\s+Nested Invocations\\s*$', '---\ndescription: Create Agent Skills\nhandoffs:\n  - label: Update Instructions\n    agent: speckit.instructions\n  ...instead of executing it here.\n\n## Handoffs\n\n**After**: Run `/speckit.instructions` to update discovery metadata.\n', re.MULTILINE)
+E        +    where <function search at 0x7f86f4bb23e0> = re.search
+E        +    and   re.MULTILINE = re.MULTILINE
+
+tests/contract/test_skill_home_workdir_template.py:121: AssertionError
+_________ test_us2_template_contains_normative_skill_workdir_fallback __________
+
+    @pytest.mark.contract
+    def test_us2_template_contains_normative_skill_workdir_fallback():
+        """TemplateAssertions.containsNormativeScriptIdiom.skillWorkdirFallback."""
+        body = _read(TEMPLATE_PATH)
+>       assert SKILL_WORKDIR_IDIOM in body, (
+            f"{TEMPLATE_PATH} must contain the FR-016 SKILL_WORKDIR script idiom verbatim:\n  {SKILL_WORKDIR_IDIOM}"
+        )
+E       AssertionError: templates/commands/skills.md must contain the FR-016 SKILL_WORKDIR script idiom verbatim:
+E           SKILL_WORKDIR="${SKILL_WORKDIR:-$(pwd -P)}"
+E       assert 'SKILL_WORKDIR="${SKILL_WORKDIR:-$(pwd -P)}"' in '---\ndescription: Create Agent Skills\nhandoffs:\n  - label: Update Instructions\n    agent: speckit.instructions\n  ...instead of executing it here.\n\n## Handoffs\n\n**After**: Run `/speckit.instructions` to update discovery metadata.\n'
+
+tests/contract/test_skill_home_workdir_template.py:201: AssertionError
+_____________________ test_us2_template_has_paired_example _____________________
+
+    @pytest.mark.contract
+    def test_us2_template_has_paired_example():
+        """TemplateAssertions.hasPairedExample (FR-006)."""
+        body = _read(TEMPLATE_PATH)
+>       assert re.search(r"^###\s+Paired Example\s*$", body, re.MULTILINE), (
+            f"{TEMPLATE_PATH} must contain a '### Paired Example' subsection"
+        )
+E       AssertionError: templates/commands/skills.md must contain a '### Paired Example' subsection
+E       assert None
+E        +  where None = <function search at 0x7f86f4bb23e0>('^###\\s+Paired Example\\s*$', '---\ndescription: Create Agent Skills\nhandoffs:\n  - label: Update Instructions\n    agent: speckit.instructions\n  ...instead of executing it here.\n\n## Handoffs\n\n**After**: Run `/speckit.instructions` to update discovery metadata.\n', re.MULTILINE)
+E        +    where <function search at 0x7f86f4bb23e0> = re.search
+E        +    and   re.MULTILINE = re.MULTILINE
+
+tests/contract/test_skill_home_workdir_template.py:210: AssertionError
+_______________ test_us3_template_has_migration_mapping_present ________________
+
+    @pytest.mark.contract
+    def test_us3_template_has_migration_mapping_present():
+        """TemplateAssertions.hasMigrationMapping.present."""
+        body = _read(TEMPLATE_PATH)
+>       assert re.search(r"^##\s+Migration Mapping\s*$", body, re.MULTILINE), (
+            f"{TEMPLATE_PATH} must contain a '## Migration Mapping' section (FR-011)"
+        )
+E       AssertionError: templates/commands/skills.md must contain a '## Migration Mapping' section (FR-011)
+E       assert None
+E        +  where None = <function search at 0x7f86f4bb23e0>('^##\\s+Migration Mapping\\s*$', '---\ndescription: Create Agent Skills\nhandoffs:\n  - label: Update Instructions\n    agent: speckit.instructions\n  ...instead of executing it here.\n\n## Handoffs\n\n**After**: Run `/speckit.instructions` to update discovery metadata.\n', re.MULTILINE)
+E        +    where <function search at 0x7f86f4bb23e0> = re.search
+E        +    and   re.MULTILINE = re.MULTILINE
+
+tests/contract/test_skill_home_workdir_template.py:240: AssertionError
+_________ test_us3_template_migration_mapping_has_at_least_three_rows __________
+
+    @pytest.mark.contract
+    def test_us3_template_migration_mapping_has_at_least_three_rows():
+        """TemplateAssertions.hasMigrationMapping.rowCount >= 3 (SC-005, data-model.md entity 3)."""
+>       rows = _migration_table_rows()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_skill_home_workdir_template.py:266: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _migration_table_rows() -> list[str]:
+        """Return the body rows of the Migration Mapping markdown table."""
+        body = _read(TEMPLATE_PATH)
+        section = re.search(
+            r"^##\s+Migration Mapping\s*$(?P<body>.*?)(?=^##\s|\Z)",
+            body,
+            re.MULTILINE | re.DOTALL,
+        )
+>       assert section, "Migration Mapping section not found"
+E       AssertionError: Migration Mapping section not found
+E       assert None
+
+tests/contract/test_skill_home_workdir_template.py:253: AssertionError
+__________ test_us3_template_migration_mapping_covers_required_idioms __________
+
+    @pytest.mark.contract
+    def test_us3_template_migration_mapping_covers_required_idioms():
+        """TemplateAssertions.hasMigrationMapping.covers{BareRelative,SkillRoot,AgentSpecificPaths}."""
+>       table_text = "\n".join(_migration_table_rows())
+                               ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_skill_home_workdir_template.py:276: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _migration_table_rows() -> list[str]:
+        """Return the body rows of the Migration Mapping markdown table."""
+        body = _read(TEMPLATE_PATH)
+        section = re.search(
+            r"^##\s+Migration Mapping\s*$(?P<body>.*?)(?=^##\s|\Z)",
+            body,
+            re.MULTILINE | re.DOTALL,
+        )
+>       assert section, "Migration Mapping section not found"
+E       AssertionError: Migration Mapping section not found
+E       assert None
+
+tests/contract/test_skill_home_workdir_template.py:253: AssertionError
+________________________ test_mirror_is_byte_equivalent ________________________
+
+    def test_mirror_is_byte_equivalent():
+>       assert_dirs_byte_equivalent(SKILL_DIR, MIRROR_DIR)
+
+tests/contract/test_summarize_project_prompt_assets.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/helpers_prompt_assets.py:61: in assert_dirs_byte_equivalent
+    left, right = dir_file_map(canonical), dir_file_map(mirror)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/helpers_prompt_assets.py:50: in dir_file_map
+    return {
+tests/contract/helpers_prompt_assets.py:51: in <dictcomp>
+    str(p.relative_to(base)): p.read_text(encoding="utf-8")
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1059: in read_text
+    return f.read()
+           ^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <encodings.utf_8.IncrementalDecoder object at 0x7f86f1e369d0>
+input = b'\xa7\r\r\n\x00\x00\x00\x00\x19\xe6lj|\x80\x01\x00\xe3\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0f\x00\x00\x0...8T\x89V\x8cV\xd1\x04\x14\xd4\x04\x14\xd0\x04\x14\xd0\x04\x14\xd0\x04\x14\xf0\x03\x00\x04\x1a\xd0\x03\x19rR\x00\x00\x00'
+final = True
+
+>   ???
+E   UnicodeDecodeError: 'utf-8' codec can't decode byte 0xa7 in position 0: invalid start byte
+
+<frozen codecs>:322: UnicodeDecodeError
+_ TestContextPlaceholderCoverage.test_all_context_sources_documented_in_command _
+
+self = <integration.test_context_injection.TestContextPlaceholderCoverage object at 0x7f86f24d8250>
+
+    def test_all_context_sources_documented_in_command(self):
+        agents_cmd = COMMANDS_DIR / "agents.md"
+>       content = agents_cmd.read_text()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_context_injection.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/commands/agents.md')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/commands/agents.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_________ TestRoleSpecificContext.test_module_designer_has_module_list _________
+
+self = <integration.test_context_injection.TestRoleSpecificContext object at 0x7f86f24d9d90>
+
+    def test_module_designer_has_module_list(self):
+>       content = (TEMPLATES_DIR / "agent-role-module-designer-template.md").read_text()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_context_injection.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-module-designer-template.md')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-module-designer-template.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______ TestRoleSpecificContext.test_module_designer_has_project_structure ______
+
+self = <integration.test_context_injection.TestRoleSpecificContext object at 0x7f86f24da0d0>
+
+    def test_module_designer_has_project_structure(self):
+>       content = (TEMPLATES_DIR / "agent-role-module-designer-template.md").read_text()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_context_injection.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-module-designer-template.md')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-module-designer-template.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_____ TestRoleSpecificContext.test_qa_engineer_has_constitution_principles _____
+
+self = <integration.test_context_injection.TestRoleSpecificContext object at 0x7f86f24da410>
+
+    def test_qa_engineer_has_constitution_principles(self):
+>       content = (TEMPLATES_DIR / "agent-role-qa-engineer-template.md").read_text()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_context_injection.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-qa-engineer-template.md')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-qa-engineer-template.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+________ TestRoleSpecificContext.test_system_designer_has_feature_index ________
+
+self = <integration.test_context_injection.TestRoleSpecificContext object at 0x7f86f24da950>
+
+    def test_system_designer_has_feature_index(self):
+>       content = (TEMPLATES_DIR / "agent-role-system-designer-template.md").read_text()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_context_injection.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-system-designer-template.md')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-system-designer-template.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_______ TestRoleSpecificContext.test_test_engineer_has_testing_framework _______
+
+self = <integration.test_context_injection.TestRoleSpecificContext object at 0x7f86f24daf50>
+
+    def test_test_engineer_has_testing_framework(self):
+>       content = (TEMPLATES_DIR / "agent-role-test-engineer-template.md").read_text()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_context_injection.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-test-engineer-template.md')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-test-engineer-template.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_________ TestRoleSpecificContext.test_knowledge_manager_has_docs_dir __________
+
+self = <integration.test_context_injection.TestRoleSpecificContext object at 0x7f86f24db550>
+
+    def test_knowledge_manager_has_docs_dir(self):
+>       content = (TEMPLATES_DIR / "agent-role-knowledge-manager-template.md").read_text()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_context_injection.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-knowledge-manager-template.md')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/skills/create-agent/templates/agent-role-knowledge-manager-template.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________ TestTeamCreateFlow.test_skill_describes_team_file_schema ___________
+
+self = <integration.test_team_create_flow.TestTeamCreateFlow object at 0x7f86f2416ad0>
+
+    def test_skill_describes_team_file_schema(self):
+        content = CREATE_TEAM_SKILL.read_text(encoding="utf-8")
+        assert ".specify/teams/" in content, "create-team must document the team.md store"
+>       assert "## Static Structure" in content, "create-team must define the Static Structure"
+E       AssertionError: create-team must define the Static Structure
+E       assert '## Static Structure' in '---\nname: create-team\ndescription: Create and run an agent team — organize multiple agents into a collaborative str...d before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.\n'
+
+tests/integration/test_team_create_flow.py:38: AssertionError
+___________________ test_no_sdd_workflow_reference_in_source ___________________
+
+    def test_no_sdd_workflow_reference_in_source():
+        offenders = []
+        for p in _scan_paths():
+            try:
+                text = p.read_text(encoding="utf-8")
+            except (UnicodeDecodeError, OSError):
+                continue
+            if TOKEN in _strip_obsolete_registry(text):
+                offenders.append(str(p.relative_to(ROOT)))
+>       assert not offenders, f"live sdd-workflow references remain in source: {sorted(offenders)}"
+E       AssertionError: live sdd-workflow references remain in source: ['docs/archive/03-sdd-workflow-refactor-proposal.md', 'docs/reference/history/04-draw-plantuml-optimization.md', 'docs/reference/history/05-docs-and-governance.md', 'docs/reference/history/index.md', 'docs/reference/history/overview.md']
+E       assert not ['docs/reference/history/05-docs-and-governance.md', 'docs/reference/history/04-draw-plantuml-optimization.md', 'docs/reference/history/index.md', 'docs/reference/history/overview.md', 'docs/archive/03-sdd-workflow-refactor-proposal.md']
+
+tests/integration/test_zero_sdd_workflow_references.py:77: AssertionError
+____________________ test_no_live_deprecated_term[improver] ____________________
+
+term = 'improver'
+
+    @pytest.mark.parametrize("term", sorted(DEPRECATED_PATTERNS))
+    def test_no_live_deprecated_term(term: str):
+        hits = _live_matches(term, DEPRECATED_PATTERNS[term])
+>       assert not hits, (
+            f"Found {len(hits)} live use(s) of deprecated term '{term}' "
+            f"(use Stage/optimizer/Team Supervisor instead):\n" + "\n".join(hits)
+        )
+E       AssertionError: Found 1 live use(s) of deprecated term 'improver' (use Stage/optimizer/Team Supervisor instead):
+E         docs/reference/history/01-agent-system-evolution.md:62: - **022**(commit `f261cea`/后续):6 个角色模板加 `supervisor: true` + `role-scope:`;`templates/agent-supervision-delegation.md`;`templates/agent-subrole-{executor,evaluator,improver}-template.md` + `agent-triad-orchestration-template.md`;`docs/eei-triad-pattern.md`;create-agent 加 Capability Matrix(role·supervisor·triad·custom);spec `022-eei-agent-triad/`。EEI 三元组的抽象来自 draw-plantuml 优化的三角色循环,详见 [[04-draw-plantuml-optimization]]。
+E       assert not ['docs/reference/history/01-agent-system-evolution.md:62: - **022**(commit `f261cea`/后续):6 个角色模板加 `supervisor: true` +...r·triad·custom);spec `022-eei-agent-triad/`。EEI 三元组的抽象来自 draw-plantuml 优化的三角色循环,详见 [[04-draw-plantuml-optimization]]。']
+
+tests/unit/test_agent_deprecated_terms.py:121: AssertionError
+____________________ test_no_live_deprecated_term[subrole] _____________________
+
+term = 'subrole'
+
+    @pytest.mark.parametrize("term", sorted(DEPRECATED_PATTERNS))
+    def test_no_live_deprecated_term(term: str):
+        hits = _live_matches(term, DEPRECATED_PATTERNS[term])
+>       assert not hits, (
+            f"Found {len(hits)} live use(s) of deprecated term '{term}' "
+            f"(use Stage/optimizer/Team Supervisor instead):\n" + "\n".join(hits)
+        )
+E       AssertionError: Found 1 live use(s) of deprecated term 'subrole' (use Stage/optimizer/Team Supervisor instead):
+E         docs/reference/history/01-agent-system-evolution.md:62: - **022**(commit `f261cea`/后续):6 个角色模板加 `supervisor: true` + `role-scope:`;`templates/agent-supervision-delegation.md`;`templates/agent-subrole-{executor,evaluator,improver}-template.md` + `agent-triad-orchestration-template.md`;`docs/eei-triad-pattern.md`;create-agent 加 Capability Matrix(role·supervisor·triad·custom);spec `022-eei-agent-triad/`。EEI 三元组的抽象来自 draw-plantuml 优化的三角色循环,详见 [[04-draw-plantuml-optimization]]。
+E       assert not ['docs/reference/history/01-agent-system-evolution.md:62: - **022**(commit `f261cea`/后续):6 个角色模板加 `supervisor: true` +...r·triad·custom);spec `022-eei-agent-triad/`。EEI 三元组的抽象来自 draw-plantuml 优化的三角色循环,详见 [[04-draw-plantuml-optimization]]。']
+
+tests/unit/test_agent_deprecated_terms.py:121: AssertionError
+___________________ test_no_reference_to_premigration_paths ____________________
+
+    def test_no_reference_to_premigration_paths():
+        hits: list[str] = []
+        for path in _iter_live_files():
+            try:
+                lines = path.read_text(encoding="utf-8").splitlines()
+            except (UnicodeDecodeError, OSError):
+                continue
+            for lineno, line in enumerate(lines, start=1):
+                if MIGRATION_MARKERS.search(line):
+                    continue  # historical/migration context allowed (D5, T035)
+                for pat in OLD_PATH_PATTERNS:
+                    if pat.search(line):
+                        rel = path.relative_to(ROOT)
+                        hits.append(f"{rel}:{lineno}: {line.strip()}")
+                        break
+>       assert not hits, (
+            f"Found {len(hits)} live reference(s) to pre-migration template "
+            f"paths/names:\n" + "\n".join(hits)
+        )
+E       AssertionError: Found 12 live reference(s) to pre-migration template paths/names:
+E         skills/create-team/references/capacity-vs-responsibility.md:14: | **Files** | `agent-capacity-<X>-template.md`, `agent-project-custom-template.md`, `agent-supervision-delegation.md`, `agent-skill-enablement.md` | `agent-team-supervisor-template.md`, `agent-stage-{executor,evaluator,optimizer}-template.md`, the `agent-*-orchestration-template.md` set, `agent-workflow-schema.md`; `teams/` stays in `templates/` |
+E         skills/create-team/references/conceptual-model.md:9: - **Role** — the responsibility/perspective (e.g. `system-designer`, `test-engineer`, `team-supervisor`); a Role is a **seat** filled by an agent whose **Capacity** is defined in a `agent-capacity-<X>-template.md` (create-agent) or, for the sole Meta role, `agent-team-supervisor-template.md` (create-team). Role is the responsibility; Capacity is what the filling agent can do (see `capacity-vs-responsibility.md`).
+E         docs/reference/agents/templates-and-agents.md:35: > multi-agent template: `agent-team-supervisor-template.md` lives in
+E         docs/reference/teams/orchestration.md:371: | `agent-team-supervisor-template.md` | The single **Meta** role (Meta at all stages) — the Lead / quality gate; mandatory for iteration & continuous |
+E         docs/reference/history/01-agent-system-evolution.md:62: - **022**(commit `f261cea`/后续):6 个角色模板加 `supervisor: true` + `role-scope:`;`templates/agent-supervision-delegation.md`;`templates/agent-subrole-{executor,evaluator,improver}-template.md` + `agent-triad-orchestration-template.md`;`docs/eei-triad-pattern.md`;create-agent 加 Capability Matrix(role·supervisor·triad·custom);spec `022-eei-agent-triad/`。EEI 三元组的抽象来自 draw-plantuml 优化的三角色循环,详见 [[04-draw-plantuml-optimization]]。
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:20: role:   filled-by "agent-capacity-<X>-template.md" (worker capacities) or "agent-team-supervisor-template.md" (the Meta role)
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:46: - agent-team-supervisor-template.md      # merged Meta role
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:68: 1. Exactly one merged `agent-team-supervisor-template.md` exists.
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:90: - [ ] Exactly one `agent-team-supervisor-template.md`
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:94: - [ ] Capacity templates: `agent-capacity-<X>-template.md`; the sole Meta role: `agent-team-supervisor-template.md`
+E         .specify/skills/create-team/references/capacity-vs-responsibility.md:14: | **Files** | `agent-capacity-<X>-template.md`, `agent-project-custom-template.md`, `agent-supervision-delegation.md`, `agent-skill-enablement.md` | `agent-team-supervisor-template.md`, `agent-stage-{executor,evaluator,optimizer}-template.md`, the `agent-*-orchestration-template.md` set, `agent-workflow-schema.md`; `teams/` stays in `templates/` |
+E         .specify/skills/create-team/references/conceptual-model.md:9: - **Role** — the responsibility/perspective (e.g. `system-designer`, `test-engineer`, `team-supervisor`); a Role is a **seat** filled by an agent whose **Capacity** is defined in a `agent-capacity-<X>-template.md` (create-agent) or, for the sole Meta role, `agent-team-supervisor-template.md` (create-team). Role is the responsibility; Capacity is what the filling agent can do (see `capacity-vs-responsibility.md`).
+E       assert not ['skills/create-team/references/capacity-vs-responsibility.md:14: | **Files** | `agent-capacity-<X>-template.md`, `age...d-by "agent-capacity-<X>-template.md" (worker capacities) or "agent-team-supervisor-template.md" (the Meta role)', ...]
+
+tests/unit/test_agent_reference_integrity.py:116: AssertionError
+______________ test_referenced_templates_exist_in_canonical_home _______________
+
+    def test_referenced_templates_exist_in_canonical_home():
+        missing: list[str] = []
+        for path in _iter_live_files():
+            if path.name in NEGATIVE_ASSERTION_FILES:
+                continue
+            try:
+                lines = path.read_text(encoding="utf-8").splitlines()
+            except (UnicodeDecodeError, OSError):
+                continue
+            for lineno, line in enumerate(lines, start=1):
+                if MIGRATION_MARKERS.search(line):
+                    continue  # historical mentions of removed templates allowed
+                for basename in TEMPLATE_REF.findall(line):
+                    if (CANONICAL_TEMPLATES / basename).exists():
+                        continue
+                    if (MIRROR_TEMPLATES / basename).exists():
+                        continue
+                    rel = path.relative_to(ROOT)
+                    missing.append(f"{rel}:{lineno}: {basename}")
+>       assert not missing, (
+            "Referenced agent-*-template.md files not found under "
+            f"skills/create-agent/templates/:\n" + "\n".join(missing)
+        )
+E       AssertionError: Referenced agent-*-template.md files not found under skills/create-agent/templates/:
+E         skills/create-team/templates/agents/agent-triad-orchestration-template.md:28: agent-stage-executor-template.md
+E         skills/create-team/templates/agents/agent-triad-orchestration-template.md:33: agent-stage-evaluator-template.md
+E         skills/create-team/templates/agents/agent-triad-orchestration-template.md:38: agent-stage-optimizer-template.md
+E         skills/create-team/references/capacity-vs-responsibility.md:14: agent-team-supervisor-template.md
+E         skills/create-team/references/conceptual-model.md:9: agent-team-supervisor-template.md
+E         skills/create-agent/templates/agent-supervision-delegation.md:41: agent-stage-executor-template.md
+E         skills/create-agent/templates/agent-supervision-delegation.md:43: agent-stage-optimizer-template.md
+E         skills/create-agent/templates/agent-supervision-delegation.md:47: agent-triad-orchestration-template.md
+E         docs/reference/agents/quality-loop.md:143: agent-triad-orchestration-template.md
+E         docs/reference/agents/templates-and-agents.md:35: agent-team-supervisor-template.md
+E         docs/reference/teams/orchestration.md:371: agent-team-supervisor-template.md
+E         docs/reference/teams/orchestration.md:372: agent-stage-executor-template.md
+E         docs/reference/teams/orchestration.md:373: agent-stage-evaluator-template.md
+E         docs/reference/teams/orchestration.md:374: agent-stage-optimizer-template.md
+E         docs/reference/teams/orchestration.md:375: agent-parallel-orchestration-template.md
+E         docs/reference/teams/orchestration.md:376: agent-serial-orchestration-template.md
+E         docs/reference/teams/orchestration.md:377: agent-triad-orchestration-template.md
+E         docs/reference/history/01-agent-system-evolution.md:62: agent-triad-orchestration-template.md
+E         docs/notes/type-follows-stage-misclassification.md:84: agent-stage-evaluator-template.md
+E         docs/notes/type-follows-stage-misclassification.md:85: agent-triad-orchestration-template.md
+E         tests/contract/test_cleanup_obsolete_assets.py:40: agent-explore-template.md
+E         tests/contract/test_cleanup_obsolete_assets.py:74: agent-explore-template.md
+E         tests/contract/test_cleanup_obsolete_assets.py:86: agent-explore-template.md
+E         tests/contract/test_cleanup_obsolete_assets.py:155: agent-explore-template.md
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:20: agent-team-supervisor-template.md
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:46: agent-team-supervisor-template.md
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:48: agent-stage-executor-template.md
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:49: agent-stage-evaluator-template.md
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:52: agent-parallel-orchestration-template.md
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:53: agent-serial-orchestration-template.md
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:54: agent-triad-orchestration-template.md
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:68: agent-team-supervisor-template.md
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:90: agent-team-supervisor-template.md
+E         tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md:94: agent-team-supervisor-template.md
+E         tests/integration/test_context_injection.py:63: agent-role-module-designer-template.md
+E         tests/integration/test_context_injection.py:67: agent-role-module-designer-template.md
+E         tests/integration/test_context_injection.py:71: agent-role-qa-engineer-template.md
+E         tests/integration/test_context_injection.py:75: agent-role-system-designer-template.md
+E         tests/integration/test_context_injection.py:79: agent-role-test-engineer-template.md
+E         tests/integration/test_context_injection.py:83: agent-role-knowledge-manager-template.md
+E         .specify/agents/templates/ux-analyst.agent.md:83: agent-stage-executor-template.md
+E         .specify/agents/templates/ux-analyst.agent.md:84: agent-stage-evaluator-template.md
+E         .specify/agents/templates/ux-analyst.agent.md:85: agent-stage-optimizer-template.md
+E         .specify/agents/templates/ux-analyst.agent.md:87: agent-triad-orchestration-template.md
+E         .specify/agents/templates/system-designer.agent.md:86: agent-stage-executor-template.md
+E         .specify/agents/templates/system-designer.agent.md:87: agent-stage-evaluator-template.md
+E         .specify/agents/templates/system-designer.agent.md:88: agent-stage-optimizer-template.md
+E         .specify/agents/templates/system-designer.agent.md:90: agent-triad-orchestration-template.md
+E         .specify/agents/templates/requirements-analyst.agent.md:93: agent-stage-executor-template.md
+E         .specify/agents/templates/requirements-analyst.agent.md:94: agent-stage-evaluator-template.md
+E         .specify/agents/templates/requirements-analyst.agent.md:95: agent-stage-optimizer-template.md
+E         .specify/agents/templates/requirements-analyst.agent.md:97: agent-triad-orchestration-template.md
+E         .specify/agents/templates/test-engineer.agent.md:82: agent-stage-executor-template.md
+E         .specify/agents/templates/test-engineer.agent.md:83: agent-stage-evaluator-template.md
+E         .specify/agents/templates/test-engineer.agent.md:84: agent-stage-optimizer-template.md
+E         .specify/agents/templates/test-engineer.agent.md:86: agent-triad-orchestration-template.md
+E         .specify/agents/templates/qa-engineer.agent.md:83: agent-stage-executor-template.md
+E         .specify/agents/templates/qa-engineer.agent.md:84: agent-stage-evaluator-template.md
+E         .specify/agents/templates/qa-engineer.agent.md:85: agent-stage-optimizer-template.md
+E         .specify/agents/templates/qa-engineer.agent.md:87: agent-triad-orchestration-template.md
+E         .specify/agents/templates/knowledge-manager.agent.md:101: agent-stage-executor-template.md
+E         .specify/agents/templates/knowledge-manager.agent.md:102: agent-stage-evaluator-template.md
+E         .specify/agents/templates/knowledge-manager.agent.md:103: agent-stage-optimizer-template.md
+E         .specify/agents/templates/knowledge-manager.agent.md:105: agent-triad-orchestration-template.md
+E         .specify/agents/templates/module-designer.agent.md:88: agent-stage-executor-template.md
+E         .specify/agents/templates/module-designer.agent.md:89: agent-stage-evaluator-template.md
+E         .specify/agents/templates/module-designer.agent.md:90: agent-stage-optimizer-template.md
+E         .specify/agents/templates/module-designer.agent.md:92: agent-triad-orchestration-template.md
+E         .specify/skills/create-team/templates/agents/agent-triad-orchestration-template.md:28: agent-stage-executor-template.md
+E         .specify/skills/create-team/templates/agents/agent-triad-orchestration-template.md:33: agent-stage-evaluator-template.md
+E         .specify/skills/create-team/templates/agents/agent-triad-orchestration-template.md:38: agent-stage-optimizer-template.md
+E         .specify/skills/create-team/references/capacity-vs-responsibility.md:14: agent-team-supervisor-template.md
+E         .specify/skills/create-team/references/conceptual-model.md:9: agent-team-supervisor-template.md
+E         .specify/skills/create-agent/templates/agent-supervision-delegation.md:41: agent-stage-executor-template.md
+E         .specify/skills/create-agent/templates/agent-supervision-delegation.md:43: agent-stage-optimizer-template.md
+E         .specify/skills/create-agent/templates/agent-supervision-delegation.md:47: agent-triad-orchestration-template.md
+E       assert not ['skills/create-team/templates/agents/agent-triad-orchestration-template.md:28: agent-stage-executor-template.md', 'sk...emplate.md', 'skills/create-agent/templates/agent-supervision-delegation.md:41: agent-stage-executor-template.md', ...]
+
+tests/unit/test_agent_reference_integrity.py:141: AssertionError
+_________________ test_usage_doc_documents_claude_refresh_flow _________________
+
+    def test_usage_doc_documents_claude_refresh_flow():
+>       usage = (ROOT / "docs" / "usage.md").read_text(encoding="utf-8")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_claude_refresh_helpers.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/docs/usage.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/docs/usage.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_________________ test_governance_and_templates_include_claude _________________
+
+    def test_governance_and_templates_include_claude():
+        constitution = (ROOT / ".specify" / "memory" / "constitution.md").read_text(
+            encoding="utf-8"
+        )
+        plan_template = (ROOT / "templates" / "plan-template.md").read_text(
+            encoding="utf-8"
+        )
+        instructions_template = (ROOT / "templates" / "instructions-template.md").read_text(
+            encoding="utf-8"
+        )
+        agents_template = (ROOT / "templates" / "commands" / "agents.md").read_text(
+            encoding="utf-8"
+        )
+    
+        assert "Claude Code" in constitution
+>       assert "Claude Code" in plan_template
+E       AssertionError: assert 'Claude Code' in '# Implementation Plan: [SPEC]\n\n**Branch**: `[###-spec-name]` | **Date**: [DATE] | **Spec**: [link]\n**Requirement →... projects insufficient] |\n| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |\n'
+
+tests/unit/test_claude_support_matrix.py:35: AssertionError
+__________________ test_support_surfaces_include_claude_name ___________________
+
+claude_support_surface_files = [PosixPath('/storage/project/cloud-native-ai/spec-kit/README.md'), PosixPath('/storage/project/cloud-native-ai/spec-ki...plates/instructions-template.md'), PosixPath('/storage/project/cloud-native-ai/spec-kit/templates/commands/agents.md')]
+
+    def test_support_surfaces_include_claude_name(claude_support_surface_files: list[Path]):
+        for surface in claude_support_surface_files:
+            text = surface.read_text(encoding="utf-8")
+>           assert "Claude Code" in text
+E           AssertionError: assert 'Claude Code' in '# Implementation Plan: [SPEC]\n\n**Branch**: `[###-spec-name]` | **Date**: [DATE] | **Spec**: [link]\n**Requirement →... projects insufficient] |\n| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |\n'
+
+tests/unit/test_claude_support_surfaces.py:7: AssertionError
+_________________ test_usage_doc_documents_qoder_refresh_flow __________________
+
+    def test_usage_doc_documents_qoder_refresh_flow():
+>       usage = (ROOT / "docs" / "usage.md").read_text(encoding="utf-8")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_qoder_refresh_helpers.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/docs/usage.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/docs/usage.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_________________ test_governance_and_templates_include_qoder __________________
+
+    def test_governance_and_templates_include_qoder():
+        constitution = (ROOT / ".specify" / "memory" / "constitution.md").read_text(encoding="utf-8")
+        plan_template = (ROOT / "templates" / "plan-template.md").read_text(encoding="utf-8")
+        agents_template = (ROOT / "templates" / "commands" / "agents.md").read_text(encoding="utf-8")
+    
+        assert "Qoder" in constitution
+>       assert "Qoder" in plan_template
+E       AssertionError: assert 'Qoder' in '# Implementation Plan: [SPEC]\n\n**Branch**: `[###-spec-name]` | **Date**: [DATE] | **Spec**: [link]\n**Requirement →... projects insufficient] |\n| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |\n'
+
+tests/unit/test_qoder_support_matrix.py:18: AssertionError
+___________________ test_support_surfaces_include_qoder_name ___________________
+
+qoder_support_surface_files = [PosixPath('/storage/project/cloud-native-ai/spec-kit/README.md'), PosixPath('/storage/project/cloud-native-ai/spec-ki...-kit/templates/plan-template.md'), PosixPath('/storage/project/cloud-native-ai/spec-kit/templates/commands/agents.md')]
+
+    def test_support_surfaces_include_qoder_name(qoder_support_surface_files: list[Path]):
+        for surface in qoder_support_surface_files:
+            text = surface.read_text(encoding="utf-8")
+>           assert "Qoder" in text
+E           AssertionError: assert 'Qoder' in '# Implementation Plan: [SPEC]\n\n**Branch**: `[###-spec-name]` | **Date**: [DATE] | **Spec**: [link]\n**Requirement →... projects insufficient] |\n| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |\n'
+
+tests/unit/test_qoder_support_surfaces.py:7: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_agent_specific_config_commands.py::TestC001CommandTemplateSectionPresence::test_section_headings_exist[agents]
+FAILED tests/contract/test_agent_specific_config_commands.py::TestC001CommandTemplateSectionPresence::test_section_headings_exist[skills]
+FAILED tests/contract/test_agent_specific_config_commands.py::TestC007AdditiveConstraint::test_section_not_at_top[agents]
+FAILED tests/contract/test_agent_specific_config_commands.py::TestC007AdditiveConstraint::test_section_not_at_top[skills]
+FAILED tests/contract/test_create_new_skill_contract.py::test_create_new_skill_generates_json_tool_manifests
+FAILED tests/contract/test_dogfooding_practice.py::test_c4_no_new_memory_layout
+FAILED tests/contract/test_shared_reference_rewrite.py::test_skills_use_installed_absolute_shared_form
+FAILED tests/contract/test_skill_home_workdir_template.py::test_us1_template_has_path_conventions_section
+FAILED tests/contract/test_skill_home_workdir_template.py::test_us1_template_has_computation_idioms_section
+FAILED tests/contract/test_skill_home_workdir_template.py::test_us1_template_contains_normative_skill_home_fallback
+FAILED tests/contract/test_skill_home_workdir_template.py::test_us1_template_has_non_shell_agents_clause
+FAILED tests/contract/test_skill_home_workdir_template.py::test_us1_template_has_nested_invocations_clause
+FAILED tests/contract/test_skill_home_workdir_template.py::test_us2_template_contains_normative_skill_workdir_fallback
+FAILED tests/contract/test_skill_home_workdir_template.py::test_us2_template_has_paired_example
+FAILED tests/contract/test_skill_home_workdir_template.py::test_us3_template_has_migration_mapping_present
+FAILED tests/contract/test_skill_home_workdir_template.py::test_us3_template_migration_mapping_has_at_least_three_rows
+FAILED tests/contract/test_skill_home_workdir_template.py::test_us3_template_migration_mapping_covers_required_idioms
+FAILED tests/contract/test_summarize_project_prompt_assets.py::test_mirror_is_byte_equivalent
+FAILED tests/integration/test_context_injection.py::TestContextPlaceholderCoverage::test_all_context_sources_documented_in_command
+FAILED tests/integration/test_context_injection.py::TestRoleSpecificContext::test_module_designer_has_module_list
+FAILED tests/integration/test_context_injection.py::TestRoleSpecificContext::test_module_designer_has_project_structure
+FAILED tests/integration/test_context_injection.py::TestRoleSpecificContext::test_qa_engineer_has_constitution_principles
+FAILED tests/integration/test_context_injection.py::TestRoleSpecificContext::test_system_designer_has_feature_index
+FAILED tests/integration/test_context_injection.py::TestRoleSpecificContext::test_test_engineer_has_testing_framework
+FAILED tests/integration/test_context_injection.py::TestRoleSpecificContext::test_knowledge_manager_has_docs_dir
+FAILED tests/integration/test_team_create_flow.py::TestTeamCreateFlow::test_skill_describes_team_file_schema
+FAILED tests/integration/test_zero_sdd_workflow_references.py::test_no_sdd_workflow_reference_in_source
+FAILED tests/unit/test_agent_deprecated_terms.py::test_no_live_deprecated_term[improver]
+FAILED tests/unit/test_agent_deprecated_terms.py::test_no_live_deprecated_term[subrole]
+FAILED tests/unit/test_agent_reference_integrity.py::test_no_reference_to_premigration_paths
+FAILED tests/unit/test_agent_reference_integrity.py::test_referenced_templates_exist_in_canonical_home
+FAILED tests/unit/test_claude_refresh_helpers.py::test_usage_doc_documents_claude_refresh_flow
+FAILED tests/unit/test_claude_support_matrix.py::test_governance_and_templates_include_claude
+FAILED tests/unit/test_claude_support_surfaces.py::test_support_surfaces_include_claude_name
+FAILED tests/unit/test_qoder_refresh_helpers.py::test_usage_doc_documents_qoder_refresh_flow
+FAILED tests/unit/test_qoder_support_matrix.py::test_governance_and_templates_include_qoder
+FAILED tests/unit/test_qoder_support_surfaces.py::test_support_surfaces_include_qoder_name
+37 failed, 1655 passed, 1 skipped in 25.88s
+# failed-name list written: .specify/specs/038-goal-target/notes/final-failed.txt (37 entries)

@@ -34,7 +34,7 @@ The goal is persisted as the `goal` frontmatter field and rendered as a `## Goal
 |------|-------------------|--------------------|
 | **create** | "创建团队", "组织一个团队", "组建团队", "new team", "build a team" | `create-team` |
 | **modify** | "修改团队", "调整团队", "优化 team", "improve/adjust team" | `improve-team` |
-| **run** | "运行团队", "执行团队", "run/execute team", "跑一遍" | `create-team` (execution path) |
+| **run** | "运行团队", "执行团队", "run/execute team", "跑一遍"(可选 `--target T-<nnn>` 指定目标切片) | `create-team` (execution path) |
 
 **Routing flow**:
 
@@ -73,17 +73,34 @@ When intent cannot be resolved from non-empty arguments, the command MUST report
 The **run** mode MUST follow this sequence and MUST NOT execute before confirmation:
 
 1. **Load** the target team from `.specify/teams/<slug>/team.md`.
-2. **Restate the Goal** — surface the team's `goal` up front, so both structures below are read as *means to that end* and execution can be judged against it.
-3. **Render Static Structure** — the roster as a Role × Stage × Type matrix: each member agent, its role, its type (Worker/Meta), and its lifecycle (persistent/temporary).
-4. **Render Dynamic Structure** —
+2. **Resolve the optional `--target` (preview validation, before the gate).** `run <team-slug> [--target <T-<nnn> | <goal-slug>.T-<nnn>>]` — the local form `T-<nnn>` is canonical; the qualified form is accepted only when its `<goal-slug>` equals the bound goal. Run the five checks **in order**; any failure stops the run **with zero execution trace** (no report, no ledger write). The engine parse of `.specify/scripts/python/goal-utils.py` (`parse_goal` / `preview_target_check`) is the single source of truth for every judgment below — never re-derive it in prose:
+   1. **解析绑定 goal**——沿用既有两级身份解析(`goal_slug` 显式 → 团队 slug 推断);本流程不引入第三级。团队无 goal 定义而指定了 `--target` → 报"Target 依赖 goal 定义",指向 `/speckit.goal migrate` 并停止;不指定 `--target` 时一切照旧。
+   2. **悬空引用**——`T-<nnn>` 不存在于绑定 goal 的 `## Targets` 节 → 报为悬空并停止,提议先经 `/speckit.goal targets --add` 添加;不静默接受、不降级、不臆测。
+   3. **终态引用**——Target 状态为 `done`/`dropped` → 显式报出终态并停止,附**复核二分**指引:属实 → 返回报告结束本次 run;证据不符 → 经 `/speckit.goal targets --set open --id <T-nnn>` 重开后重新发起。run 模式 **MUST NOT 提供终态执行旁路**,MUST NOT 默默当作 open 执行。
+   4. **跨 goal 引用**——限定形前缀与绑定 goal 身份不一致 → 拒绝,指明绑定轴不可越界。
+   5. **goal 自身终态**(`achieved`/`abandoned`)→ 拒绝指派,指明终态 goal 只读。
+3. **Restate the Goal** — surface the team's `goal` up front, so both structures below are read as *means to that end* and execution can be judged against it.
+4. **Render Static Structure** — the roster as a Role × Stage × Type matrix: each member agent, its role, its type (Worker/Meta), and its lifecycle (persistent/temporary).
+5. **Render Dynamic Structure** —
    - the collaboration `pattern` (parallel / serial / iteration / continuous);
    - the **parallelism** (parallel: degree + territories; serial: DAG stage order + per-handoff verification; iteration: threshold, max_iterations, regression_limit, quality dimensions; continuous: maturity level, cadence, budget, constraints, independent verifier, state spine);
    - an **execution flow diagram** (textual / mermaid / PlantUML flow showing dispatch / handoff / loop edges).
-5. **Confirmation gate** — present the **goal** and both structures, and ask the user to confirm. The team executes **only** on explicit confirmation.
+6. **Confirmation gate** — present the **goal** and both structures, and ask the user to confirm. The team executes **only** on explicit confirmation.
    - **Disclose the summary decision** before confirming, so its cost is known at decision time: whether this run will refresh the goal summary or not and — when it will not — which gate suppresses it (budget / cadence / no material); the resolved **goal identity** and whether it is explicit (`goal_slug` declared) or inferred (falling back to the team slug); and the **target delivery directory** `.specify/goal/<goal-slug>/summary/`. See `skills/create-team/SKILL.md` → Summary Refresh (all patterns).
-   - On confirm → orchestrate per the team's pattern (delegating to `create-team`'s execution engine): territory validation before parallel dispatch, DAG (no-cycle) validation + per-handoff verification before serial chain, mandatory max-iteration cap for iteration loops, and — for **continuous** loops — read `constraints.md` + budget + kill-switch at cycle start, run exactly **one cycle** at the team's declared maturity level (starting at L1), with an independent verifier at L2+; file-path-only handoff throughout. Per-member dispatch modality (native / virtual / external) follows `.specify/shared/definitions/subagent-definitions.md`; external CLI dispatch MUST honor its Visibility Contract (stream-json + progress filter + `.live.log`/`.jsonl`/`.status` triplet — silent `cli -p … > log 2>&1` dispatch is prohibited). Work is steered toward the **goal**, and the evaluator measures progress against it (iteration: iterate until the goal's threshold is met or the cap is reached; continuous: run one cycle, then update the state spine and stop).
+   - **Disclose the Target assignment** as one extra line, verbatim forms:
+     ```text
+     本次 Target: T-002 — <statement>(open)
+     本次 Target: 无(对 goal 整体运行)
+     ```
+   - On confirm → orchestrate per the team's pattern (delegating to `create-team`'s execution engine): territory validation before parallel dispatch, DAG (no-cycle) validation + per-handoff verification before serial chain, mandatory max-iteration cap for iteration loops, and — for **continuous** loops — read `constraints.md` + budget + kill-switch at cycle start, run exactly **one cycle** at the team's declared maturity level (starting at L1), with an independent verifier at L2+; file-path-only handoff throughout. Per-member dispatch modality (native / virtual / external) follows `.specify/shared/definitions/subagent-definitions.md`; external CLI dispatch MUST honor its Visibility Contract (stream-json + progress filter + `.live.log`/`.jsonl`/`.status` triplet — silent `cli -p … > log 2>&1` dispatch is prohibited). Work is steered toward the **goal** — and, when a Target was assigned, focused on that slice — and the evaluator measures progress against it (iteration: iterate until the goal's threshold is met or the cap is reached; continuous: run one cycle, then update the state spine and stop).
    - On decline → stop without executing; optionally suggest `modify`.
-6. **Report** — after execution finishes, write a dated run report to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (goal, execution time, result summary, full process detail). Mandatory for every run.
+7. **Report** — after execution finishes, write a dated run report to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (goal, execution time, result summary, full process detail). Mandatory for every run. The report MUST carry the assignment line (fixed field name):
+   ```text
+   **Target 指派**: T-002(<statement>)   # 或 "无(goal 整体)"
+   ```
+   New ledger entries produced by a Target-assigned run MUST carry `"target_ref": "T-<nnn>"` (written by the team supervisor into `items.jsonl`).
+
+**`--target` invariants**: Goal–Team 绑定、身份解析结果、summary 交付目录位置不因 `--target` 改变——它不是改绑、不是写域声明,只是本次 run 的聚焦切片。未指定 `--target` 时,preview/confirm/execute/report 全流程与引入前逐字节等价(SC-002)。
 
 **Output discipline** (see `skills/create-team/SKILL.md` → Run Workspace, Reports & Output Discipline): all run **intermediates** stay in the git-ignored workspace `.specify/teams/.work/<slug>/`; **deliverables** (standard output) go only to their declared target paths; the team directory `.specify/teams/<slug>/` holds **only** the team's tracked run information (`team.md`, `runs/`, `items.jsonl`, plus `constraints.md` / `STATE.md` / `run-log.jsonl` for continuous teams). The periodic **summary** is a derived product indexed by *goal*, not by team: it lands in `.specify/goal/<goal-slug>/summary/` and never in the team directory.
 

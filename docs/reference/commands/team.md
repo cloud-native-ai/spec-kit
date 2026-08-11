@@ -48,6 +48,14 @@ The **run** mode never executes before you confirm:
 4. **Confirmation gate** — you review the goal and both structures and explicitly confirm. Only then does orchestration run (territory validation for parallel, DAG no-cycle + per-handoff verification for serial, max-iteration cap for iteration, and — for **continuous** — read `constraints.md` + budget + kill-switch and run exactly **one cycle** at the declared maturity level with an independent verifier at L2+; file-path-only handoff throughout). Declining stops without executing.
 5. **Report** — after execution, a dated report is written to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (goal, timing, result summary, process detail). Run intermediates stay in the git-ignored `.specify/teams/.work/<slug>/`; deliverables go only to their declared target paths.
 
+### Target-focused runs (`--target`)
+
+```text
+/speckit.team run <team-slug> --target T-001
+```
+
+A run MAY focus on one authorized **Target** (scope slice) of the bound goal — see [`/speckit.goal`](goal.md) → Targets for the authorization side. The parameter is validated in preview, before the gate: dangling references stop with a pointer to `/speckit.goal targets --add`; cross-goal references and terminal goals are refused; a **terminal-state Target** (`done`/`dropped`) stops for the **review bifurcation** — verify by hand: if it is genuinely done, the run ends with a report; if the evidence contradicts, reopen it via `/speckit.goal targets <slug> --set open --id <T-nnn>` and re-issue the run. There is no terminal-execution bypass. On success the gate discloses `本次 Target: T-<nnn> — <statement>(open)` (or `本次 Target: 无(对 goal 整体运行)` when omitted), the report carries `**Target 指派**: …`, and new ledger entries carry `target_ref`. The assignment never rebinds the team, never changes identity resolution, and never moves the summary delivery directory; without `--target` the whole flow is byte-equivalent to the pre-038 behavior.
+
 ## Collaboration Patterns
 
 Four patterns; the goal decides which fits. The first three are **bounded** (run once and stop); `continuous` is **unbounded** (operates on a cadence). Pick with the decision tree in [`docs/teams/orchestration.md`](../teams/orchestration.md).

@@ -28,7 +28,8 @@ A goal is a project-level **authored fact source** stating a desired end outcome
 |------|---------|--------|
 | `create` | archive a new definition | `goal.md` |
 | `view` | list the archive or show one goal | nothing |
-| `modify` | change objective, criteria, or lifecycle state | `goal.md` |
+| `modify` | change objective, criteria, lifecycle state, or Targets | `goal.md` |
+| `targets` | add / list / transition the goal's Targets (scope slices) | `goal.md` |
 | `migrate` | derive a definition from a team's inline goal and switch the team to a reference | `goal.md` + that `team.md` |
 | `coordinate` | propose a territory re-division across teams sharing a goal | nothing until ratified |
 
@@ -59,6 +60,9 @@ python3 scripts/python/goal-utils.py list                       # enumerate the 
 python3 scripts/python/goal-utils.py validate <goal-slug>        # check one definition
 python3 scripts/python/goal-utils.py status   <goal-slug> --set achieved
 python3 scripts/python/goal-utils.py criteria <goal-slug> --criterion "<new criterion>"
+python3 scripts/python/goal-utils.py targets  <goal-slug> --add "<sub-outcome statement>"
+python3 scripts/python/goal-utils.py targets  <goal-slug> --list
+python3 scripts/python/goal-utils.py targets  <goal-slug> --set done --id T-001
 ```
 
 `--repo-root` and `--json` are accepted both before and after the subcommand.
@@ -91,6 +95,10 @@ A goal may carry an objective and no criteria. The archive records `None provide
 A team references a goal by declaring `goal_slug` in its `team.md` — identity only, never a copy of the objective. The binding is **N teams : 1 goal**, one-way; the goal side learns its teams by derivation, not by storage. A team serves exactly one goal at a time.
 
 Once two or more teams share a goal, their declared territories must not overlap on writes. `coordinate` detects overlap and proposes a re-division; a human ratifies it, and the ratified division is written back into each `team.md`.
+
+## Targets (scope slices)
+
+A goal MAY additionally carry **Targets** — run-assignable scope slices (`T-<nnn>`, three states, engine-rendered `## Targets` section). The concept — identity grammar, lifecycle, boundary against the criteria axis — is defined once in the concept authority (Target Decomposition); this command owns only the operations: `targets <slug> --add/--list/--set`. Statements pass the same GD-2/GD-3 shape check at slice scale and must not restate a success criterion; terminal goals are read-only; terminal identities are never reused. Runs consume an authorized slice via `/speckit.team run <team> --target T-<nnn>`; a terminal-state reference triggers the review bifurcation (verify by hand; reopen via `--set open` if evidence contradicts) — there is no terminal-execution bypass.
 
 ## Out of scope
 

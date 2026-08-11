@@ -148,3 +148,43 @@ def test_wrap_up_steps_present():
     assert "## Feedback" in text
     assert "## Documentation" in text
     assert "/speckit.goal" in text, "feedback unit-id must be the command id"
+
+
+# --------------------------------------------------------------------------
+# 038 — the targets action group on the command surface
+# --------------------------------------------------------------------------
+
+def test_targets_mode_row_is_documented():
+    text = CANONICAL.read_text(encoding="utf-8")
+    assert "| `targets` |" in text, "Modes table must carry a targets row"
+
+
+def test_engine_invocation_examples_cover_the_targets_action_group():
+    text = CANONICAL.read_text(encoding="utf-8")
+    for example in ("targets <goal-slug> --add", "targets <goal-slug> --list",
+                    "targets <goal-slug> --set"):
+        assert example in text, f"engine example missing: {example}"
+
+
+def test_targets_routes_through_the_single_authoring_entry():
+    """modify-intent routing: no second authoring surface for ## Targets."""
+    text = CANONICAL.read_text(encoding="utf-8")
+    assert "modify-intent route" in text
+
+
+def test_review_bifurcation_is_declared_without_an_execution_bypass():
+    text = CANONICAL.read_text(encoding="utf-8")
+    assert "review bifurcation" in text
+    assert "no terminal-execution bypass" in text
+
+
+@pytest.mark.parametrize("path", PER_TOOL_COPIES, ids=lambda p: p.name)
+def test_per_tool_copies_carry_the_targets_content(path):
+    """Derived from the same PER_TOOL_COPIES fixture — no second copy list."""
+    text = path.read_text(encoding="utf-8")
+    assert "targets <goal-slug> --add" in text, f"{path.name} lacks targets content"
+
+
+def test_engine_implements_the_targets_action():
+    text = ENGINE.read_text(encoding="utf-8")
+    assert 'add_parser("targets"' in text

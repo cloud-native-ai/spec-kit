@@ -37,6 +37,8 @@
 | Goal Archive | 目标归档, goal 归档 | .specify/goal/ 下全部 goal 定义的集合,即「项目当前与历史目标清单」的物化形态;终态 goal 保留不删 | user | confirmed |
 | Goal–Team Binding | 目标—团队绑定, goal 引用 | 团队到 goal 的单向引用(N 团队 : 1 goal),以 goal_slug 声明;团队侧只存身份不存目标副本;一个团队同时只绑一个 goal | user | confirmed |
 | Team Goal | 团队目标, team 目标 | 团队服务于哪个项目级 Goal 的**引用**(经 goal_slug);未迁移团队可退化为内联副本,定义存在时以 Goal 定义为权威 | user | confirmed |
+| Goal Target | 目标切片, target 切片, 切片 | Goal 之下的 run 级可指派范围切片:身份 T-&lt;nnn&gt;、三态(open/done/dropped)、引擎渲染于 goal.md 的 ## Targets 节;授权只经 /speckit.goal targets,run 经 --target 消费;台账经可选 target_ref 归属;概念真源 shared/definitions/goal-definitions.md → Target Decomposition([[STR-004]]) | auto | proposed |
+| target(消歧) | - | 以下既有 "target" 用法与 Goal Target **无关**,均不改名:团队 territory 的 optimization_target/co_targets(优化对象)、evidence-utils / interview-utils 的 --target 参数(取证/访谈对象) | auto | proposed |
 | Team Summary | 团队总结 | 把团队自身视作项目而产出的累积式状态总结(**派生物**);按 goal 索引落在 .specify/goal/&lt;goal-slug&gt;/summary/ 子树内,与同目录下被撰写的 goal.md 定义结构分离——刷新只写 summary/,不写定义 | auto | proposed |
 | Team Territory | 团队级范围, 团队 territory, team territory | 团队在 team.md 声明的覆盖范围(write/read/forbidden 路径 + 类型化 non_path 条目);把成员级 Territory Division 抬到团队级,四种协作模式通用;缺省该键即「未声明」,不等于空 | auto | proposed |
 | Team Roster | 参与团队名册, goal 名册, roster | 同一 goal 下全部引用团队的**派生**清单(team slug + 声明范围 + 身份类型 + 是否推进),落在 summary/roster.md;每次刷新整体重算,不改 goal 定义 | auto | proposed |
