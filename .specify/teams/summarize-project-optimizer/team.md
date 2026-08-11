@@ -14,7 +14,7 @@ preset: artifact-optimizer
 created: 2026-07-30
 updated: 2026-07-30
 members:
-  - agent: team-supervisor-template
+  - agent: agent-team-supervisor-template
     role: team-supervisor
     stage: meta
     type: Meta

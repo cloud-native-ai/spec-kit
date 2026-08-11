@@ -66,9 +66,13 @@ content from the user.
    ```bash
    python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
      --unit-id "<skill:NAME | /speckit.COMMAND>" --unit-type "<skill|command>" \
-     --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
+     --run-id "<stable-run-id>" --feature "<requirement-key-if-any>" \
+     [--feature-id "<Feature-registry-ID-if-any>"] \
      --review "<review prose>" --points-file "<points file>"
    ```
+   Identifier discipline: `--feature` carries the **requirement key** (e.g.
+   `038-goal-target`); `--feature-id` carries the **Feature registry ID** (e.g.
+   `041`). Different number spaces — never overload one field with both.
 6. **Consolidated submission prompt.** Read `should_prompt` from the `record` output
    (or run `--action status`). When it is `true`, surface a **single** consolidated
    notification inviting the user to submit collected feedback to the Spec Kit developers;
@@ -104,7 +108,10 @@ When `should_prompt` is `true`, surface **one** prompt offering exactly three ch
    guidance (GitHub: issue attachment; GitLab: issue attachment or MR to the feedback
    intake directory). **The agent never sends the zip itself.** After the user confirms
    the batch is dealt with (sent — or deliberately discarded), run
-   `--action mark-submitted` to reset the local counter.
+   `--action mark-submitted [--notes "<disposition summary>"]`: the engine
+   archives the pending batch into `packages/` (with the optional disposition
+   record as `SUBMISSION-NOTES.md` inside the zip) and then resets the local
+   counter — every reset therefore leaves an auditable package artifact behind.
 2. **Skip this time** — do nothing; the prompt will naturally reappear only after more
    entries accumulate.
 3. **Stop prompting** — raise the threshold (`--threshold <N>` or

@@ -1,10 +1,77 @@
 {
   "store": "feedback",
-  "updated": "2026-08-10T12:00:39Z",
+  "updated": "2026-08-11T18:24:15Z",
   "threshold": 10,
-  "count_since_submission": 13,
-  "submitted_at": "2026-08-05T18:53:10Z",
+  "count_since_submission": 1,
+  "submitted_at": "2026-08-11T17:50:30Z",
   "entries": [
+    {
+      "id": "20260811T182415Z-speckit-implement",
+      "file": "20260811T182415Z-speckit-implement.md",
+      "unit_id": "/speckit.implement",
+      "unit_type": "command",
+      "run_id": "038-goal-target-20260812-implement",
+      "feature": "038-goal-target",
+      "feature_id": "",
+      "partial": false,
+      "created": "2026-08-11T18:24:15Z",
+      "summary": "Full 038 implementation run: 32/32 tasks across 7 phases, test-first throughout (unit data layer → CLI contract → structural template pins → fold/milestone integration), every claim evidence-backed wi"
+    },
+    {
+      "id": "20260811T171551Z-speckit-todo",
+      "file": "20260811T171551Z-speckit-todo.md",
+      "unit_id": "/speckit.todo",
+      "unit_type": "command",
+      "run_id": "session-naming-park-2026-08-12",
+      "feature": "none",
+      "partial": false,
+      "created": "2026-08-11T17:15:51Z",
+      "summary": "Input was a design idea (agent session custom naming) with no TODO-block tie; binary mode detection had no legal path, so the run paused and asked the user, who chose to (a) extend /speckit.todo with "
+    },
+    {
+      "id": "20260811T170810Z-speckit-tasks",
+      "file": "20260811T170810Z-speckit-tasks.md",
+      "unit_id": "/speckit.tasks",
+      "unit_type": "command",
+      "run_id": "038-goal-target-tasks-2026-08-11",
+      "feature": "038-goal-target",
+      "partial": false,
+      "created": "2026-08-11T17:08:10Z",
+      "summary": "Generated tasks.md for 038-goal-target: Tests Mode ON (Principle IV NON-NEGOTIABLE). 32 tasks across 7 phases — Setup (baseline freeze), Foundational (engine data layer, blocking), US1 authoring (MVP "
+    },
+    {
+      "id": "20260811T151639Z-speckit-plan",
+      "file": "20260811T151639Z-speckit-plan.md",
+      "unit_id": "/speckit.plan",
+      "unit_type": "command",
+      "run_id": "038-goal-target-plan-2026-08-11",
+      "feature": "038-goal-target",
+      "partial": false,
+      "created": "2026-08-11T15:16:39Z",
+      "summary": "Planned 038-goal-target: Explore-agent touchpoint pass confirmed/refuted spec assumptions in one round (per-tool copies are 4 dirs not 5; no pre-existing ## Targets renderer or target_ref anywhere). F"
+    },
+    {
+      "id": "20260811T145026Z-speckit-clarify",
+      "file": "20260811T145026Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "038-goal-target-clarify-2026-08-11",
+      "feature": "038-goal-target",
+      "partial": false,
+      "created": "2026-08-11T14:50:26Z",
+      "summary": "Mode A run on 038-goal-target. Coverage scan found one material ambiguity (terminal Target reference path after preview confirmation) resolved via one closed question with a user-custom ruling (review"
+    },
+    {
+      "id": "20260811T144441Z-speckit-requirements",
+      "file": "20260811T144441Z-speckit-requirements.md",
+      "unit_id": "/speckit.requirements",
+      "unit_type": "command",
+      "run_id": "038-goal-target-requirements-2026-08-11",
+      "feature": "038-goal-target",
+      "partial": false,
+      "created": "2026-08-11T14:44:41Z",
+      "summary": "Re-ran the requirements creation flow on the pre-existing 038-goal-target spec dir. Bypassed create-new-requirements.sh (would overwrite the existing requirements.md) and manually created the 038-goal"
+    },
     {
       "id": "20260810T120039Z-skill-improve-skills",
       "file": "20260810T120039Z-skill-improve-skills.md",

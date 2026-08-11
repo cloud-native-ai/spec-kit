@@ -98,6 +98,72 @@ def test_package_respects_submitted_at_boundary(tmp_path, monkeypatch):
 
 
 # --------------------------------------------------------------------------- #
+# mark-submitted: archive-then-reset (audit fixes F2/F3)
+# --------------------------------------------------------------------------- #
+def test_mark_submitted_archives_batch_before_reset(tmp_path):
+    _record(tmp_path, "/speckit.plan", "r1")
+    _record(tmp_path, "/speckit.tasks", "r2")
+
+    result = fu.action_mark_submitted(
+        argparse.Namespace(workspace_root=str(tmp_path))
+    )
+
+    assert result["reset_from"] == 2
+    assert result["packaged"] == 2
+    assert result["zip"] and (tmp_path / result["zip"]).exists()
+    with zipfile.ZipFile(tmp_path / result["zip"]) as zf:
+        names = zf.namelist()
+    assert "MANIFEST.md" in names
+    assert sum(1 for n in names if n.endswith(".md") and n != "MANIFEST.md") == 2
+    index = fu.load_index(tmp_path)
+    assert index["count_since_submission"] == 0
+
+
+def test_mark_submitted_embeds_submission_notes(tmp_path):
+    _record(tmp_path, "/speckit.plan", "r1")
+
+    result = fu.action_mark_submitted(
+        argparse.Namespace(workspace_root=str(tmp_path),
+                           notes="batch applied to templates/commands/x.md")
+    )
+
+    with zipfile.ZipFile(tmp_path / result["zip"]) as zf:
+        assert "SUBMISSION-NOTES.md" in zf.namelist()
+        notes = zf.read("SUBMISSION-NOTES.md").decode("utf-8")
+    assert "batch applied to templates/commands/x.md" in notes
+
+
+def test_mark_submitted_without_pending_entries_still_resets(tmp_path):
+    result = fu.action_mark_submitted(
+        argparse.Namespace(workspace_root=str(tmp_path))
+    )
+    assert result["packaged"] == 0
+    assert result["zip"] is None
+    assert fu.load_index(tmp_path)["count_since_submission"] == 0
+
+
+# --------------------------------------------------------------------------- #
+# record: requirement key vs Feature registry ID (audit fix F1)
+# --------------------------------------------------------------------------- #
+def test_record_persists_feature_id_distinctly(tmp_path):
+    args = argparse.Namespace(
+        workspace_root=str(tmp_path), unit_id="/speckit.plan",
+        unit_type="command", run_id="f1", review="review prose",
+        review_file=None, points="- a point", points_file=None,
+        partial=False, feature="038-goal-target", feature_id="041",
+        threshold=100, format="json",
+    )
+    fu.action_record(args)
+
+    entry = fu.load_index(tmp_path)["entries"][0]
+    assert entry["feature"] == "038-goal-target"
+    assert entry["feature_id"] == "041"
+    text = (fu.feedback_dir(tmp_path) / entry["file"]).read_text(encoding="utf-8")
+    assert 'feature: "038-goal-target"' in text
+    assert 'feature_id: "041"' in text
+
+
+# --------------------------------------------------------------------------- #
 # upstream detection priority
 # --------------------------------------------------------------------------- #
 def test_upstream_prefers_configured_over_metadata(monkeypatch):

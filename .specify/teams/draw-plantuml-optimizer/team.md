@@ -11,7 +11,7 @@ pattern: iteration
 created: 2026-07-15
 updated: 2026-07-15
 members:
-  - agent: team-supervisor-template
+  - agent: agent-team-supervisor-template
     role: team-supervisor
     stage: meta
     type: Meta

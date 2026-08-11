@@ -23,8 +23,15 @@ commands, skills, scripts, docs) — never the LLM, agent CLI, harness, or the
 user's project code. Entries are user data: recording and processing are fully
 optional and ignorable. This engine performs **no network operations of any
 kind**; ``package`` only produces a local zip that the user may send manually,
-and ``mark-submitted`` merely resets the local counter ("user confirmed
-disposition", NOT "uploaded").
+and ``mark-submitted`` archives the pending batch into ``packages/`` (with an
+optional disposition note, ``--notes``) before resetting the local counter
+("user confirmed disposition", NOT "uploaded") — a reset therefore always
+leaves an auditable package artifact behind.
+
+Identifier discipline: ``--feature`` carries the **requirement key** (e.g.
+``038-goal-target``); ``--feature-id`` carries the **Feature registry ID**
+(e.g. ``041``). They are different number spaces — never overload one field
+with both.
 """
 from __future__ import annotations
 
@@ -167,7 +174,7 @@ def _scalar(value: str) -> Any:
 
 def dump_frontmatter(meta: Dict[str, Any]) -> str:
     order = ["id", "unit_id", "unit_type", "run_id", "scope",
-             "feature", "partial", "created", "summary"]
+             "feature", "feature_id", "partial", "created", "summary"]
     lines = ["---"]
     for key in order:
         if key not in meta:
@@ -269,6 +276,7 @@ def entry_meta(meta: Dict[str, Any], filename: str) -> Dict[str, Any]:
         "unit_type": meta.get("unit_type", ""),
         "run_id": meta.get("run_id", ""),
         "feature": meta.get("feature", ""),
+        "feature_id": meta.get("feature_id", ""),
         "partial": bool(meta.get("partial", False)),
         "created": meta.get("created", ""),
         "summary": meta.get("summary", ""),
@@ -342,6 +350,7 @@ def action_record(args: argparse.Namespace) -> Dict[str, Any]:
         "run_id": run_id,
         "scope": "local",
         "feature": (args.feature or "").strip(),
+        "feature_id": (getattr(args, "feature_id", "") or "").strip(),
         "partial": partial,
         "created": created,
         "summary": make_summary(review),
@@ -412,18 +421,38 @@ def action_list(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 def action_mark_submitted(args: argparse.Namespace) -> Dict[str, Any]:
-    """Reset the local counter after the user confirms disposition.
+    """Archive the pending batch, then reset the local counter.
 
-    This is purely local bookkeeping — it does NOT upload or transmit anything.
+    Every reset leaves an auditable package artifact behind (F2): the entries
+    accumulated since the last submission are zipped into ``packages/`` before
+    the counter resets. An optional ``--notes`` disposition summary is stored
+    inside the archive as ``SUBMISSION-NOTES.md`` (F3). This is purely local
+    bookkeeping — it does NOT upload or transmit anything.
     """
     workspace_root = resolve_workspace_root(args.workspace_root)
     index = load_index(workspace_root)
     reset_from = index.get("count_since_submission", 0)
-    submitted_at = now_iso()
+
+    submitted_at = index.get("submitted_at")
+    entries = index.get("entries", [])
+    if submitted_at:
+        selected = [e for e in entries if str(e.get("created", "")) > submitted_at]
+    else:
+        selected = list(entries)
+    selected.sort(key=lambda e: e.get("created", ""))
+    package = write_package(workspace_root, index, selected,
+                            notes=getattr(args, "notes", None))
+
+    new_submitted_at = now_iso()
     index["count_since_submission"] = 0
-    index["submitted_at"] = submitted_at
+    index["submitted_at"] = new_submitted_at
     save_index(workspace_root, index)
-    return {"submitted_at": submitted_at, "reset_from": reset_from}
+    return {
+        "submitted_at": new_submitted_at,
+        "reset_from": reset_from,
+        "packaged": package.get("packaged", 0),
+        "zip": package.get("zip"),
+    }
 
 
 def action_reindex(args: argparse.Namespace) -> Dict[str, Any]:
@@ -525,26 +554,21 @@ def action_upstream(args: argparse.Namespace) -> Dict[str, Any]:
     return detect_upstream(index)
 
 
-def action_package(args: argparse.Namespace) -> Dict[str, Any]:
-    """Zip pending entries for manual delivery. Source files are never touched."""
-    workspace_root = resolve_workspace_root(args.workspace_root)
-    index = load_index(workspace_root)
-    submitted_at = index.get("submitted_at")
-    entries = index.get("entries", [])
-    if not args.all and submitted_at:
-        selected = [e for e in entries if str(e.get("created", "")) > submitted_at]
-    else:
-        selected = list(entries)
-    selected.sort(key=lambda e: e.get("created", ""))
+def write_package(
+    workspace_root: Path,
+    index: Dict[str, Any],
+    selected: List[Dict[str, Any]],
+    notes: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Zip ``selected`` entries into ``packages/``; source files are never touched.
 
+    When ``notes`` is given, a ``SUBMISSION-NOTES.md`` disposition record is
+    added to the archive so every counter reset leaves auditable context.
+    """
     upstream = detect_upstream(index)
     if not selected:
-        return {
-            "packaged": 0,
-            "zip": None,
-            "upstream": upstream,
-            "note": "No feedback entries to package.",
-        }
+        return {"packaged": 0, "zip": None, "missing": [], "upstream": upstream,
+                "note": "No feedback entries to package."}
 
     store_dir = feedback_dir(workspace_root)
     packages_dir = store_dir / PACKAGES_DIRNAME
@@ -590,17 +614,38 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
                 f"| {entry.get('partial', False)} | {summary} |"
             )
         zf.writestr("MANIFEST.md", "\n".join(manifest_lines) + "\n")
+        if notes and notes.strip():
+            zf.writestr(
+                "SUBMISSION-NOTES.md",
+                "# Submission Notes (disposition of this batch)\n\n"
+                f"- **Recorded**: {now_iso()}\n\n{notes.strip()}\n",
+            )
 
     rel_zip = zip_path.relative_to(workspace_root).as_posix()
-    return {
-        "packaged": len(packaged),
-        "zip": rel_zip,
-        "missing": missing,
-        "upstream": upstream,
-        "next_steps": _send_guidance(upstream)
-        + ["After you have dealt with the batch (sent or deliberately ignored), "
-           "reset the local counter: --action mark-submitted"],
-    }
+    return {"packaged": len(packaged), "zip": rel_zip, "missing": missing,
+            "upstream": upstream}
+
+
+def action_package(args: argparse.Namespace) -> Dict[str, Any]:
+    """Zip pending entries for manual delivery. Source files are never touched."""
+    workspace_root = resolve_workspace_root(args.workspace_root)
+    index = load_index(workspace_root)
+    submitted_at = index.get("submitted_at")
+    entries = index.get("entries", [])
+    if not args.all and submitted_at:
+        selected = [e for e in entries if str(e.get("created", "")) > submitted_at]
+    else:
+        selected = list(entries)
+    selected.sort(key=lambda e: e.get("created", ""))
+
+    result = write_package(workspace_root, index, selected)
+    if not result.get("zip"):
+        result["upstream"] = detect_upstream(index)
+        return result
+    result["next_steps"] = _send_guidance(result["upstream"]) + [
+        "After you have dealt with the batch (sent or deliberately ignored), "
+        "reset the local counter: --action mark-submitted"]
+    return result
 
 
 # --------------------------------------------------------------------------- #
@@ -636,6 +681,7 @@ def render_text(action: str, payload: Dict[str, Any]) -> str:
             lines.append(f"  path: {item.get('path', '')}")
             lines.append(
                 f"  run_id: {item.get('run_id', '-')} | feature: {item.get('feature') or '-'}"
+                f" | feature_id: {item.get('feature_id') or '-'}"
                 f" | partial: {item.get('partial', False)}"
             )
             lines.append(f"  created: {item.get('created', '-')}")
@@ -662,7 +708,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--points", default=None)
     parser.add_argument("--points-file", default=None)
     parser.add_argument("--partial", action="store_true")
-    parser.add_argument("--feature", default=None)
+    parser.add_argument("--feature", default=None,
+                        help="record: requirement key (e.g. 038-goal-target); "
+                             "NOT the Feature registry ID")
+    parser.add_argument("--feature-id", dest="feature_id", default=None,
+                        help="record: Feature registry ID (e.g. 041); distinct "
+                             "number space from --feature")
+    parser.add_argument("--notes", default=None,
+                        help="mark-submitted: disposition summary for this batch, "
+                             "archived as SUBMISSION-NOTES.md inside the package")
     parser.add_argument("--threshold", type=int, default=None)
     parser.add_argument("--since", default=None)
     parser.add_argument("--limit", type=int, default=5,

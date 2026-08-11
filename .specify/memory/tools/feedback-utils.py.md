@@ -7,7 +7,7 @@
 **Aliases**: feedback-utils  
 **Status**: Verified  
 **Discovery Origin**: manual-entry  
-**Last Updated**: 2026-07-30
+**Last Updated**: 2026-08-12
 
 ## Scope
 
@@ -42,7 +42,9 @@ The feedback-as-files engine: persists local, unit-scoped feedback entries produ
 | `--review` / `--review-file` | for `record` | Review prose, inline or from a file |
 | `--points` / `--points-file` | for `record` | Optimization points, inline or from a file |
 | `--partial` | no | Marks an aborted/partial run |
-| `--feature` | no | Associated feature key |
+| `--feature` | no | Associated **requirement key** (e.g. `038-goal-target`); NOT the Feature registry ID |
+| `--feature-id` | no | Associated **Feature registry ID** (e.g. `041`); distinct number space from `--feature` |
+| `--notes` | no | `mark-submitted`: disposition summary for the batch, archived as `SUBMISSION-NOTES.md` inside the package |
 | `--threshold` | no | Override the consolidated-submission threshold |
 | `--format` | no | `text` or `json` |
 
@@ -91,6 +93,8 @@ The feedback-as-files engine: persists local, unit-scoped feedback entries produ
 ## Behavioral Rules
 
 - MUST be run with a `--run-id` that is stable for the run, so re-invocation de-duplicates instead of double-recording
+- MUST keep `--feature` (requirement key) and `--feature-id` (Feature registry ID) as distinct fields — never overload one with the other
+- MUST treat `mark-submitted` as archive-then-reset: the pending batch is zipped into `packages/` (with optional `--notes` as `SUBMISSION-NOTES.md`) before the counter resets, so every reset leaves an auditable package artifact
 - MUST use `scope: local` semantics — a whole-project assessment belongs to `/speckit.review`, not here
 - MUST NOT solicit feedback content from the user; entries are agent self-reflection
 - MUST NOT prompt for consolidated submission unless the returned `should_prompt` is `true`
@@ -102,4 +106,4 @@ The feedback-as-files engine: persists local, unit-scoped feedback entries produ
 - **Method**: manual definition
 - **Source**: project scripts directory
 - **Verification Status**: verified
-- **Notes**: Contract confirmed against the script's `--help` output and a real `--action record` invocation on 2026-07-30.
+- **Notes**: Contract confirmed against the script's `--help` output and a real `--action record` invocation on 2026-07-30. Re-verified 2026-08-12: sandbox round-trip confirmed `--feature-id` frontmatter, `mark-submitted` auto-packaging, and `SUBMISSION-NOTES.md` embedding; baseline feedback test suite 76/76 unchanged.
