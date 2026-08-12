@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [x] No [NEEDS CLARIFICATION] markers remain — *0 markers;两处开放点已按规格纪律处理:Copilot/Hermes 落盘形态以实现期探测为准(FR-010,行为契约先行);Related Feature 留 Need clarification 由 /speckit.clarify 裁决*
+- [x] No [NEEDS CLARIFICATION] markers remain — *0 markers;Related Feature 已由 /speckit.clarify 裁决(新建 Feature 043 Session Export,2026-08-12);总结预算与覆盖机制两处开放点同轮裁决,见 requirements.md `## Clarifications`*
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
