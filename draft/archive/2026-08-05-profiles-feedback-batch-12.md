@@ -1,5 +1,7 @@
 # Profiles 仓库反馈批次（12 条，2026-07-31 → 2026-08-05）
 
+> **处置(2026-08-12)**:外部项目(profiles 仓库)反馈批次,单元(dingtalk-follow-up/aliyun-workspace 等技能)均不存在于本仓库,且引用 zip 缺失——在本仓库不可处置,归档留痕;如需处理请在 profiles 仓库执行。
+
 **来源项目**: /Users/liuqiming.lqm/project/profiles
 **打包文件**: [feedback-20260805T055914Z.zip](./feedback-20260805T055914Z.zip)（12 条条目 + MANIFEST.md）
 **上次提交**: 2026-07-31T08:40:05Z

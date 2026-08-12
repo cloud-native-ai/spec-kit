@@ -253,7 +253,8 @@ Report the record path, title, and a one-line preview of the body. State explici
 ### Step 4: Lifecycle Transitions (later runs)
 
 - **Promote**: when a parked idea becomes actionable — it turns into a `SPECKIT TODO` block (`--insert`), a requirement spec (`/speckit.requirements`), or an executed task — set `status: promoted` and append an Evolution Log line citing the destination.
-- **Drop**: on explicit user veto, set `status: dropped` with a reason line. Never delete the file silently — the park store is an append-only history of considered ideas.
+- **Retire after merge**: once a promoted item's destination has actually landed (code/doc committed), the parked file MAY be deleted — the merge site is the record of truth, and keeping the original input after merge is data redundancy. Deletion requires a verifiable destination record; before the merge lands, the file stays.
+- **Drop**: on explicit user veto, set `status: dropped` with a reason line. Never delete a parked/dropped/pre-merge file silently — the park store is an append-only history of considered ideas until an item retires per the rule above.
 
 ## Safety Rules
 

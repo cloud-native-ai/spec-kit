@@ -7,7 +7,7 @@
 **Aliases**: sync-mirrors  
 **Status**: Verified  
 **Discovery Origin**: manual-entry  
-**Last Updated**: 2026-07-30
+**Last Updated**: 2026-08-12
 
 ## Scope
 
@@ -43,8 +43,9 @@ Single-source mirror sync engine (adopted from ai-website-cloner-template's sync
 | Signal | Description |
 |--------|-------------|
 | exit 0 | All mirrors match (or were successfully synced in `--write` mode) |
+| exit 1 | `--write` had per-file failures: the failing files stayed stale, the rest synced, and a `SYNC FAILURES` summary lists each (`FAIL <path>: <error>`) |
 | exit 2 | `--check` found drift (`MISS`/`DIFF` lines list each file) |
-| stdout lines | `ok`/`MISS`/`DIFF`/`sync`/`note`/`skip` prefixed per-file report |
+| stdout lines | `ok`/`MISS`/`DIFF`/`sync`/`FAIL`/`note`/`skip` prefixed per-file report |
 
 ## Environment Applicability
 
@@ -85,6 +86,7 @@ DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
 
 - MUST be run from within the repository (script resolves repo root from its own location)
 - MUST use `--check` in CI/verification contexts; `--write` only when syncing is intended
+- MUST treat a `--write` exit 1 as a failed sync: fix the listed files' permissions (typically `sudo chown -R $USER <dir>` for root-owned mirrors) and re-run — never assume the mirrors are current after a non-zero exit
 - MUST NOT be used to push edits from a mirror back to a canonical source (one-way only)
 - MUST NOT delete mirror-only files; extras are report-only
 - SHOULD be run after any edit to `templates/`, `skills/`, `agents/`, `scripts/`, or `shared/`
@@ -95,4 +97,4 @@ DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
 - **Method**: manual definition
 - **Source**: project scripts directory
 - **Verification Status**: verified
-- **Notes**: Verified 2026-07-30: `--check` detects injected drift (exit 2), `--write` repairs to byte-identical, clean run exits 0.
+- **Notes**: Verified 2026-07-30: `--check` detects injected drift (exit 2), `--write` repairs to byte-identical, clean run exits 0. Re-verified 2026-08-12: write-mode per-file failure collection — a write-protected mirror file yields `FAIL` + exit 1 with the sibling files still synced (tests/unit/test_sync_mirrors_resilience.py, 3 cases).

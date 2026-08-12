@@ -129,7 +129,7 @@ Project-specific gotchas distilled from prior sessions (`docs/reference/history/
 - **Environment & tooling gotchas**:
   - Each `Bash` call is a fresh shell — `source .venv/bin/activate` does NOT persist; chain `source && cmd` in one call or use absolute interpreter paths.
   - `cp` may be aliased to `cp -i` (silently skips overwrite) — use `cp -f` or `\cp` when mirroring files.
-  - Container dirs created via `mkdir` can become root-owned and unwritable — recreate as current user before editing.
+  - Container dirs created via `mkdir` can become root-owned and unwritable — recreate as current user before editing. This extends to **mirror files**: root-owned leftovers under `.specify/` make `sync-mirrors.py --write` fail per file — the engine now collects failures, keeps syncing the rest, and exits 1 with a `FAIL` summary (`sudo chown -R $USER <dir>` then re-run); a green-looking pass with stale mirrors is the defect this guard exists to prevent.
   - Match `${...}` / special-char literals with Python exact-string matching, NOT shell `grep` (shell expands `${}`, causing false "path missing" results).
   - `yaml.safe_dump()` defaults to `allow_unicode=False` (escapes CJK to `\uXXXX`) — pass `allow_unicode=True` for Chinese YAML frontmatter.
   - Script names are plural: the real file is `create-new-requirements.sh` (not `-requirement`). Confirm the real path before running any script.

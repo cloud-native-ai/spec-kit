@@ -15,6 +15,11 @@ Modes:
   --check   report drift, exit 2 if any (CI gate); never writes
   --write   sync all mirrors from canonical sources (default)
 
+Write-mode failures are collected per file, never fatal mid-pass: an unwritable
+mirror file (e.g. a root-owned leftover) is reported as FAIL, the remaining
+files still sync, and the run ends with exit 1 plus a failure summary — a
+stale mirror must never pass silently.
+
 Junk entries (__pycache__, node_modules, .DS_Store) are ignored on both sides
 and never copied.
 
@@ -91,6 +96,7 @@ def main() -> int:
 
     drift = False
     orphans = False
+    failures: list[tuple[str, str]] = []
     for src_name, dst_name, strict_extras in MIRROR_PAIRS:
         src = REPO_ROOT / src_name
         dst = REPO_ROOT / dst_name
@@ -111,11 +117,18 @@ def main() -> int:
             for rel in differing:
                 print(f"DIFF  {dst_name}/{rel}")
             if not check_only:
+                synced = 0
                 for rel in missing + differing:
                     target = dst / rel
-                    target.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(src / rel, target)
-                print(f"sync  {src_name}/ -> {dst_name}/ ({len(missing) + len(differing)} files)")
+                    try:
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(src / rel, target)
+                        synced += 1
+                    except OSError as exc:
+                        failures.append((f"{dst_name}/{rel}", str(exc)))
+                        print(f"FAIL  {dst_name}/{rel}: {exc}")
+                if synced:
+                    print(f"sync  {src_name}/ -> {dst_name}/ ({synced} files)")
         # Extras are never deleted (archive-not-delete discipline), but in a
         # strict tree they are a distribution defect, not a note.
         for rel in extra:
@@ -132,6 +145,17 @@ def main() -> int:
     if result.returncode != 0:
         drift = True
 
+    if failures:
+        print(
+            f"\nSYNC FAILURES: {len(failures)} file(s) stayed stale — fix and re-run:"
+        )
+        for rel, err in failures:
+            print(f"  FAIL {rel}: {err}")
+        print(
+            "  Remedy for root-owned mirrors: `sudo chown -R $USER <dir>`, then "
+            "re-run `python3 scripts/python/sync-mirrors.py --write`"
+        )
+        return 1
     if check_only and orphans:
         print(
             "ORPHANS detected — a mirror-only file cannot be distributed by "
