@@ -1,7 +1,23 @@
 {
   "scope": "knowledge",
-  "updated": "2026-08-13T09:27:49Z",
+  "updated": "2026-08-13T11:42:25Z",
   "entries": [
+    {
+      "id": "feedback-intake-repo-root-feedback-holds-feedback-zip-proces",
+      "file": "feedback-intake-repo-root-feedback-holds-feedback-zip-proces.md",
+      "scope": "knowledge",
+      "source": "/speckit.instructions",
+      "feature": "",
+      "tags": [
+        "convention",
+        "feedback",
+        "intake",
+        "instructions"
+      ],
+      "title": "Feedback intake: repo-root feedback/ holds feedback-*.zip, processed as one batch",
+      "created": "2026-08-13T11:42:25Z",
+      "summary": "User decision (2026-08-13): the repo-root `feedback/` directory is the single central intake for feedback collected from users in this spec-kit repo. Each received bundle is stored as `feedback/feedba"
+    },
     {
       "id": "rename-retire-init-cd74502f",
       "file": "rename-retire-init-cd74502f.md",

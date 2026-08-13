@@ -1,10 +1,34 @@
 {
   "store": "feedback",
-  "updated": "2026-08-13T09:28:19Z",
+  "updated": "2026-08-13T11:52:44Z",
   "threshold": 10,
-  "count_since_submission": 7,
+  "count_since_submission": 9,
   "submitted_at": "2026-08-11T17:50:30Z",
   "entries": [
+    {
+      "id": "20260813T115244Z-skill-improve-docs",
+      "file": "20260813T115244Z-skill-improve-docs.md",
+      "unit_id": "skill:improve-docs",
+      "unit_type": "skill",
+      "run_id": "20260813T115200Z-feedback-intake-doc",
+      "feature": "",
+      "feature_id": "",
+      "partial": false,
+      "created": "2026-08-13T11:52:44Z",
+      "summary": "Improved docs/reference/skills/feedback.md on a completeness gap: the doc documented the sending half of Dogfooding Loop A but the receiving half was unnamed ('an MR to the feedback intake directory')"
+    },
+    {
+      "id": "20260813T114254Z-speckit-instructions",
+      "file": "20260813T114254Z-speckit-instructions.md",
+      "unit_id": "/speckit.instructions",
+      "unit_type": "command",
+      "run_id": "20260813T114300Z-feedback-intake",
+      "feature": "",
+      "feature_id": "",
+      "partial": false,
+      "created": "2026-08-13T11:42:54Z",
+      "summary": "Partial-update run driven by a user convention: designate repo-root feedback/ as the central intake for user feedback bundles (feedback-*.zip) and mandate consolidated batch processing. The reconcile "
+    },
     {
       "id": "20260813T092819Z-speckit-instructions",
       "file": "20260813T092819Z-speckit-instructions.md",

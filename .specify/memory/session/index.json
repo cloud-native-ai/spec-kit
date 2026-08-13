@@ -1,0 +1,21 @@
+{
+  "scope": "session",
+  "updated": "2026-08-13T11:42:36Z",
+  "entries": [
+    {
+      "id": "20260813T114236Z-instructions-refresh-2026-08-13-feedback-intake-registered-p",
+      "file": "20260813T114236Z-instructions-refresh-2026-08-13-feedback-intake-registered-p.md",
+      "scope": "session",
+      "source": "/speckit.instructions",
+      "feature": "",
+      "tags": [
+        "instructions",
+        "residual-report",
+        "feedback"
+      ],
+      "title": "instructions refresh 2026-08-13: feedback/ intake registered (partial update)",
+      "created": "2026-08-13T11:42:36Z",
+      "summary": "Residual report — CONVERGED: (1) Key Directories gained a feedback/ entry (central intake, feedback-*.zip naming, gitignore negation fact, one-consolidated-batch rule); (2) Documentation Map 'Feedback"
+    }
+  ]
+}
