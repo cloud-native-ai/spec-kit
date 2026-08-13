@@ -9,9 +9,9 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 
 ## Positioning
 
-Host AI agent CLIs (Claude Code / Codex CLI / Qoder CLI / GitHub Copilot / opencode / Hermes Agent) give sessions only auto-generated IDs — there is no official naming/renaming mechanism. `/speckit.session` lands the degraded route: **rename on the export side** — export the session's raw records into a directory whose name the user chooses, plus a session description document (deterministic meta + structured summary). The export's heavy lifting is delegated to the `export-session` skill; this command owns only the interaction and the gate.
+Host AI agent CLIs (Claude Code / Codex CLI / Qoder CLI / GitHub Copilot / opencode / Hermes Agent) give sessions only auto-generated IDs — there is no official naming/renaming mechanism. `/speckit.session` lands the degraded route: **rename on the export side** — export the session's raw records into a directory whose name the user chooses, plus a session description document (deterministic meta + structured summary). The export's heavy lifting is delegated to the `archive-session` skill; this command owns only the interaction and the gate.
 
-Deterministic rules (session location, tool detection, meta extraction, budget verdicts) live in `skills/export-session/scripts/export.py`. Call the engine; do not re-derive its judgments in prose.
+Deterministic rules (session location, tool detection, meta extraction, budget verdicts) live in `skills/archive-session/scripts/export.py`. Call the engine; do not re-derive its judgments in prose.
 
 ## Glossary
 
@@ -29,7 +29,7 @@ Unknown intent → report the capability list (only `export` today); do not gues
 
 ## Outline
 
-1. **Resolve context**: the export root is `<repo-root>/.session-export/`; the engine is `skills/export-session/scripts/export.py`.
+1. **Resolve context**: the export root is `<repo-root>/.session-export/`; the engine is `skills/archive-session/scripts/export.py`.
 
 2. **Collect the export parameters**:
    - `--name <bundle-name>` is **必填** — the bundle directory name; never auto-generate one (naming is the purpose of this command). Grammar: safe path segment (first character alphanumeric, remaining `[A-Za-z0-9_.-]`); violations are rejected.
@@ -46,11 +46,11 @@ Unknown intent → report the capability list (only `export` today); do not gues
 4. **Execute via the engine** — never reimplement export logic here:
 
    ```bash
-   python3 skills/export-session/scripts/export.py \
+   python3 skills/archive-session/scripts/export.py \
      --name "<bundle-name>" --verify "<distinctive recent user text>"
    # explicit forms:
-   python3 skills/export-session/scripts/export.py --name "<n>" --session "<session-id>"
-   python3 skills/export-session/scripts/export.py --name "<n>" --tool claude-code
+   python3 skills/archive-session/scripts/export.py --name "<n>" --session "<session-id>"
+   python3 skills/archive-session/scripts/export.py --name "<n>" --tool claude-code
    ```
 
    Exit codes: `0` ok · `2` invalid arguments (missing/bad `--name`, empty `--session`, same-name conflict) · `3` no matching session · `4` no supported tool usable (includes copilot/hermes probe declarations "会话存储未探测到") · `5` IO/SQLite error. A non-zero exit is a **verdict**: report it, never argue around it.

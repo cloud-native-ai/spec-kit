@@ -1,4 +1,4 @@
-"""Contract tests for export-session genericity (039-session-export, T009).
+"""Contract tests for archive-session genericity (039-session-export, T009).
 
 Contract: .specify/specs/039-session-export/contracts/export-skill-rework.contract.md §1/§4
 
@@ -16,8 +16,8 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-ENGINE = REPO_ROOT / "skills/export-session/scripts/export.py"
-SKILL = REPO_ROOT / "skills/export-session/SKILL.md"
+ENGINE = REPO_ROOT / "skills/archive-session/scripts/export.py"
+SKILL = REPO_ROOT / "skills/archive-session/SKILL.md"
 
 pytestmark = pytest.mark.contract
 

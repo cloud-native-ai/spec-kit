@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-export-session: 把当前 AI Agent 会话相关的全部原始文件导出为目录到项目根 .session-export/<name>/
+archive-session: 把当前 AI Agent 会话相关的全部原始文件导出为目录到项目根 .session-export/<name>/
 
 支持的工具(恰好六家,规范名): claude-code / codex-cli / qoder-cli / copilot / opencode / hermes
   - Claude Code: 主 {sid}.jsonl + {sid}/subagents/*(→subagents/) + {sid}/tool-results/*(→large-results/)
@@ -961,7 +961,7 @@ def _win_ancestor_chain():
 
 def _self_path_fragments():
     """本脚本自身路径的各种书写形态(原样/resolve/posix 分隔符)+ skill 目录。
-    用于从命令行文本里剔除自身路径:本脚本常安装在 ~/.claude/skills/export-session/ 下,
+    用于从命令行文本里剔除自身路径:本脚本常安装在 ~/.claude/skills/archive-session/ 下,
     启动它的命令行里含 'claude' 字样,若不剔除会让 _CLIENT_PROC_MARKERS 误判客户端。"""
     me, skill_dir = Path(__file__), Path(__file__).parents[1]
     frags = set()

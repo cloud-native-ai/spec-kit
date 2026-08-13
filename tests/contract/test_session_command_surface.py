@@ -91,7 +91,7 @@ def test_same_name_conflict_uses_interactive_override():
 
 def test_command_delegates_to_the_skill():
     text = CANONICAL.read_text(encoding="utf-8")
-    assert "export-session" in text, "must delegate to skills/export-session"
+    assert "archive-session" in text, "must delegate to skills/archive-session"
 
 
 # --------------------------------------------------------------------------

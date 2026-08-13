@@ -3,7 +3,7 @@
 Export AI agent CLI sessions into **user-named directories** — the export-side answer to a naming problem the host CLIs cannot solve: sessions carry only auto-generated IDs, with no official rename mechanism. Exporting copies a session's raw records into a directory whose name you choose, plus a description document that makes the session searchable and skimmable.
 
 - **Source of truth**: `templates/commands/session.md`
-- **Engine**: `skills/export-session/scripts/export.py` (stdlib-only, network-free)
+- **Engine**: `skills/archive-session/scripts/export.py` (stdlib-only, network-free)
 - **Feature**: 043 Session Export · **Requirement**: `039-session-export`
 
 ## What it does, in one paragraph
@@ -55,5 +55,5 @@ Name bundles by dispatch label (`<team-slug>--<run-stamp>--<member-role>`) so `/
 ## See also
 
 - `.specify/specs/039-session-export/requirements.md` — the requirement (degraded route from session renaming)
-- `skills/export-session/SKILL.md` — engine invocation contract and support matrix
+- `skills/archive-session/SKILL.md` — engine invocation contract and support matrix
 - `docs/reference/commands/team.md` — run-mode dispatch whose sessions this exports

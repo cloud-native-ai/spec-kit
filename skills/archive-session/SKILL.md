@@ -1,5 +1,5 @@
 ---
-name: export-session
+name: archive-session
 description: 把当前 AI agent CLI 会话导出为用户命名的目录(含主记录、子代理日志、状态目录、超大工具结果、requestId),并附带会话描述文档(session-meta.json 元信息 + SESSION.md 总结骨架)。支持恰好六家工具:`claude-code` / `codex-cli` / `qoder-cli` / `copilot` / `opencode` / `hermes`(后两家为探测式适配,会话存储未探测到时诚实声明)。
 version: 2.0.0
 user-invocable: true
@@ -19,13 +19,13 @@ bash(macOS / Linux / Windows 的 Git Bash):
 SCRIPT="<本SKILL.md所在目录>/scripts/export.py"
 if [ ! -f "$SCRIPT" ]; then
   SCRIPT=""
-  for d in "${CLAUDE_SKILL_DIR:-}" ~/.qoder/skills/export-session ~/.claude/skills/export-session ~/.codex/skills/export-session ~/.config/opencode/skills/export-session; do
+  for d in "${CLAUDE_SKILL_DIR:-}" ~/.qoder/skills/archive-session ~/.claude/skills/archive-session ~/.codex/skills/archive-session ~/.config/opencode/skills/archive-session; do
     [ -n "$d" ] && [ -f "$d/scripts/export.py" ] && SCRIPT="$d/scripts/export.py" && break
   done
 fi
-[ -z "$SCRIPT" ] && { echo "export-session: scripts/export.py not found" >&2; exit 4; }
+[ -z "$SCRIPT" ] && { echo "archive-session: scripts/export.py not found" >&2; exit 4; }
 PY=""; for c in python3 python py; do "$c" -V >/dev/null 2>&1 && PY="$c" && break; done
-[ -z "$PY" ] && { echo "export-session: python not found" >&2; exit 4; }
+[ -z "$PY" ] && { echo "archive-session: python not found" >&2; exit 4; }
 "$PY" "$SCRIPT" --name "<bundle-name>" --verify "用户最近一句内容"
 ```
 
@@ -34,12 +34,12 @@ PowerShell(Windows):
 ```powershell
 $SCRIPT = "<本SKILL.md所在目录>\scripts\export.py"
 if (-not (Test-Path -LiteralPath $SCRIPT)) {
-  $dirs = @($env:CLAUDE_SKILL_DIR) + ('.qoder','.claude','.codex','.config\opencode' | ForEach-Object { Join-Path $env:USERPROFILE "$_\skills\export-session" })
+  $dirs = @($env:CLAUDE_SKILL_DIR) + ('.qoder','.claude','.codex','.config\opencode' | ForEach-Object { Join-Path $env:USERPROFILE "$_\skills\archive-session" })
   $SCRIPT = $dirs | Where-Object { $_ } | ForEach-Object { Join-Path $_ 'scripts\export.py' } | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 }
-if (-not $SCRIPT) { Write-Error 'export-session: scripts/export.py not found'; exit 4 }
+if (-not $SCRIPT) { Write-Error 'archive-session: scripts/export.py not found'; exit 4 }
 $PY = 'python','py','python3' | Where-Object { try { & $_ -V *>$null; $LASTEXITCODE -eq 0 } catch { $false } } | Select-Object -First 1
-if (-not $PY) { Write-Error 'export-session: python not found'; exit 4 }
+if (-not $PY) { Write-Error 'archive-session: python not found'; exit 4 }
 & $PY $SCRIPT --name "<bundle-name>" --verify "用户最近一句内容"
 exit $LASTEXITCODE
 ```
@@ -78,7 +78,7 @@ exit $LASTEXITCODE
 
 ```
 ✅ 会话已导出
-- 版本:export-session v{version}
+- 版本:archive-session v{version}
 - 工具:{tool}
 - 目录:{导出目录绝对路径}
 - 描述文档:{目录}/SESSION.md
@@ -128,7 +128,7 @@ At the end of a substantial run of this skill, perform an agent self-reflection 
 
 ```bash
 python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
-  --unit-id "skill:export-session" --unit-type skill \
+  --unit-id "skill:archive-session" --unit-type skill \
   --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
   --review "<review prose>" --points-file "<points file>"
 ```

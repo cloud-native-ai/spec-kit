@@ -1,5 +1,5 @@
 ---
-name: agent-setup
+name: agent-cli-setup
 description: |
   Configure AI agent CLI tools (Claude Code, Codex, Qoder CLI, OpenCode)
   from a single, unified set of environment variables. Export AGENT_API_KEY, AGENT_MODEL,
@@ -11,10 +11,10 @@ description: |
   "config agent", "agent setup", "install codex", "install claude",
   "configure agent", "switch model", "agent four-tuple", "四元组配置", "互斥配置",
   "统一环境变量", "unified env", "AGENT_API_KEY"
-skill_id: "<SKILL:.specify/skills/agent-setup/SKILL.md>"
+skill_id: "<SKILL:.specify/skills/agent-cli-setup/SKILL.md>"
 ---
 
-# agent-setup
+# agent-cli-setup
 
 ## Overview
 
@@ -200,7 +200,7 @@ This Skill follows the canonical path conventions:
 ## Resources
 
 ### Scripts (`${SKILL_HOME}/scripts/`)
-- `agent-setup.sh` — Main configuration management script providing all functions
+- `config-agent.sh` — Main configuration management script providing all functions
 
 ### References (`${SKILL_HOME}/references/`)
 - `unified-variables.md` — unified `AGENT_*` env-var model, rules, and per-tool mapping
@@ -214,8 +214,8 @@ This Skill follows the canonical path conventions:
 - Worked invocation examples: `./references/usage-examples.md`
 
 ## Resource ID
-- Canonical ID: `<SKILL:.specify/skills/agent-setup/SKILL.md>`
-- Canonical Path: `.specify/skills/agent-setup/SKILL.md`
+- Canonical ID: `<SKILL:.specify/skills/agent-cli-setup/SKILL.md>`
+- Canonical Path: `.specify/skills/agent-cli-setup/SKILL.md`
 
 ## Feedback
 
@@ -232,7 +232,7 @@ At the end of a substantial run of this skill, perform an agent self-reflection 
 5. **Persist** via the engine:
    ```bash
    python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
-     --unit-id "skill:cli-setup" --unit-type skill \
+     --unit-id "skill:agent-cli-setup" --unit-type skill \
      --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
      --review "<review prose>" --points-file "<points file>"
    ```
