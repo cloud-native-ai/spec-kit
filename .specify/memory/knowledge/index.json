@@ -1,7 +1,24 @@
 {
   "scope": "knowledge",
-  "updated": "2026-07-27T02:55:33Z",
+  "updated": "2026-08-13T09:27:49Z",
   "entries": [
+    {
+      "id": "rename-retire-init-cd74502f",
+      "file": "rename-retire-init-cd74502f.md",
+      "scope": "knowledge",
+      "source": "/speckit.instructions",
+      "feature": "instructions",
+      "tags": [
+        "convention",
+        "instructions",
+        "init",
+        "obsolete-asset",
+        "rename"
+      ],
+      "title": "Rename/retire 需登记 init 回收清单",
+      "created": "2026-08-13T09:27:49Z",
+      "summary": "持久约定（用户补充，已写入 .specify/instructions.md Recurring Operational Lessons）：每次重命名或废弃命令/技能/脚本时，必须在 src/specify_cli/__init__.py 的 OBSOLETE-ASSET-REGISTRY（_OBSOLETE_SKILLS/_OBSOLETE_COMMANDS/_OBSOLETE_TEMPLATE"
+    },
     {
       "id": "specify-9eb23254",
       "file": "specify-9eb23254.md",

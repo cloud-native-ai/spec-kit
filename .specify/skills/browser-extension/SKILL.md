@@ -1,28 +1,55 @@
 ---
-name: extension-e2e-test
+name: browser-extension
 description: |
-  Chrome extension E2E testing with Playwright and Chrome for Testing.
-  Manages full extension lifecycle: loads unpacked MV3 extension, accesses service worker,
-  tests popup/options pages, triggers keyboard commands, and verifies content scripts
-  on target websites. Delegates browser automation to the browser-utils skill (Tier 3
-  Playwright path). Uses Chrome for Testing (non-branded Chromium) which still supports
+  Browser extension execution with Playwright and Chrome for Testing. Loads an
+  unpacked MV3 extension into a real browser, then drives the extension to do
+  work: access its service worker, operate popup/options pages, trigger keyboard
+  commands, run content scripts on target websites, and read/write chrome.storage.
+  The extension itself is the automation vehicle — this skill executes the
+  extension's features, with testing as one application. Browser-level operations
+  (browser launch, page navigation, element interaction, screenshots, network
+  interception) are delegated to the browser-utils skill (Tier 3 Playwright path).
+  Uses Chrome for Testing (non-branded Chromium) which still supports
   --load-extension despite Chrome v137+ removing it from branded builds.
-  Use this when the user mentions "extension test", "E2E test extension",
-  "测试插件", "扩展测试", "service worker test", "popup test", "options page test",
-  "content script test", "插件E2E测试", "浏览器扩展测试", "Playwright extension",
-  "load unpacked extension", "chrome extension automation"
-skill_id: "<SKILL:.specify/skills/extension-e2e-test/SKILL.md>"
+  Use when the user mentions "extension", "browser extension", "插件",
+  "扩展", "execute extension", "run extension", "drive extension",
+  "extension automation", "load unpacked extension", "chrome extension",
+  "popup", "options page", "content script", "service worker",
+  "extension test", "E2E test extension", "测试插件", "扩展测试",
+  "插件执行", "扩展执行", "浏览器扩展", "Playwright extension"
+skill_id: "<SKILL:.specify/skills/browser-extension/SKILL.md>"
 ---
 
-# Extension E2E Test
+# Browser Extension Execution
 
 ## Overview
 
-End-to-end testing skill for Chrome Manifest V3 browser extensions. Provides a
-structured workflow to load an unpacked extension into Chrome for Testing via
-Playwright, then test all extension surfaces: service worker, popup, options page,
-content scripts, and keyboard commands. Delegates actual browser automation to the
-**browser-utils** skill's Tier 3 Playwright executor (`run.js`).
+Execution skill for Chrome Manifest V3 browser extensions. Provides a structured
+workflow to load an unpacked extension into Chrome for Testing via Playwright,
+then **execute the extension's features** to accomplish real tasks on web pages:
+service worker logic, popup, options page, content scripts, keyboard commands,
+and chrome.storage. The extension is the automation vehicle — this skill drives
+the extension's own surfaces instead of operating the page from outside.
+Extension **testing** is one application of this skill; the same machinery runs
+verification, demonstration, and task execution.
+
+### Delegation to browser-utils
+
+This skill is **not** a general browser automation skill. Browser-level operations
+are delegated to the **browser-utils** skill:
+
+| Handled by browser-utils | Handled by this skill (browser-extension) |
+|--------------------------|------------------------------------------|
+| Browser launch & lifecycle (`launchPersistentContext` setup) | Loading the extension (`--load-extension`, `--disable-extensions-except`) |
+| Page navigation, element interaction, form filling | Extension ID extraction from the service worker |
+| Screenshots, network interception (`context.route()` / `page.route()`), console capture | Driving extension surfaces: `sw.evaluate()`, popup/options pages, `chrome.*` API calls |
+| Dev-server detection, run-mode selection, Playwright installation | Content-script execution & on-demand injection via `chrome.scripting` |
+| Script execution via the universal executor (`run.js`) | Reading/writing `chrome.storage` through extension pages |
+
+In practice this means: launch the browser and run the script through
+browser-utils' executor, but the script body operates the **extension**, not the
+web page. When the task needs plain page automation (no extension involved),
+use browser-utils directly instead.
 
 ### Key Design Decisions
 
@@ -57,7 +84,7 @@ Verify the following before starting:
    cd .specify/skills/browser-utils/scripts/js && npm run setup
    ```
 
-4. **Dependency services running** — if the test uses real network (STS endpoints,
+4. **Dependency services running** — if the run uses real network (STS endpoints,
    dev servers, API stubs), verify each is reachable before launching the browser.
    A missing STS service, for example, causes OSS operations to fail with cryptic
    `AxiosError: Network Error` messages that are hard to trace back to the root cause.
@@ -77,18 +104,18 @@ Verify the following before starting:
    pkill -f "Google Chrome for Testing" 2>/dev/null; sleep 2
    ```
 
-### Step 2: Determine Test Scope
+### Step 2: Determine Execution Surface
 
-Identify which extension surfaces to test based on user request:
+Identify which extension surface must be driven to accomplish the task:
 
 | Surface | Description | Key API |
 |---------|-------------|---------|
-| **Service Worker** | Background script (MV3) | `context.serviceWorkers()` |
-| **Popup Page** | Extension popup UI | `chrome-extension://${id}/popup.html` |
-| **Options Page** | Settings page | `chrome-extension://${id}/options.html` |
-| **Content Scripts** | Scripts injected into web pages | Navigate to target URL, inspect DOM |
+| **Service Worker** | Background logic (MV3) — message dispatch, `chrome.scripting` injection, alarms | `context.serviceWorkers()`, `sw.evaluate()` |
+| **Popup Page** | Extension popup UI — read state, trigger actions | `chrome-extension://${id}/popup.html` |
+| **Options Page** | Settings page — configure the extension | `chrome-extension://${id}/options.html` |
+| **Content Scripts** | Scripts injected into web pages — page-level behavior | Navigate to target URL, inspect DOM |
 | **Keyboard Commands** | Shortcut-triggered actions | ⚠️ synthetic keys do **not** fire `chrome.commands.onCommand` — dispatch the equivalent message from the service worker instead (see §6 of the patterns doc) |
-| **Chrome Storage** | Extension storage API | Via popup/options page `chrome.storage` |
+| **Chrome Storage** | Extension storage API — read/write state | Via popup/options page `chrome.storage` |
 
 > **Note on this project's surfaces**: only `static/js/main.js` + `static/js/clipper.js`
 > are declared content scripts (auto-injected on `<all_urls>` at `document_end`). The
@@ -97,15 +124,15 @@ Identify which extension surfaces to test based on user request:
 > then messages the tab with the matching `WindowMessageType`. Navigating to a platform
 > URL alone will not inject them.
 
-### Step 3: Write the Test Script
+### Step 3: Write the Execution Script
 
-Write a Playwright test script to `/tmp/extension-e2e-test-*.js` following the
-extension testing patterns. The script must:
+Write a Playwright script to `/tmp/browser-extension-*.js` following the extension
+patterns. The script must:
 
 1. **Launch persistent context** with extension loaded (include focus-free args):
    ```javascript
    const pathToExtension = '${SKILL_WORKDIR}/dist';
-   const userDataDir = '/tmp/extension-e2e-profile';
+   const userDataDir = '/tmp/browser-extension-profile';
 
    const context = await chromium.launchPersistentContext(userDataDir, {
      channel: 'chromium',
@@ -130,7 +157,8 @@ extension testing patterns. The script must:
    const extensionId = serviceWorker.url().split('/')[2];
    ```
 
-3. **Execute test operations** (popup, options, content scripts, keyboard commands).
+3. **Drive the extension** to perform the task (popup, options, content scripts,
+   keyboard commands) and capture the outcomes.
 
 4. **Cleanup** — always close the context:
    ```javascript
@@ -140,7 +168,7 @@ extension testing patterns. The script must:
 For complete code patterns for each surface, see
 [./references/playwright-extension-patterns.md](./references/playwright-extension-patterns.md).
 
-For a ready-to-use test script template, see
+For a ready-to-use script template covering all surfaces, see
 [./assets/extension-test-template.js](./assets/extension-test-template.js).
 
 For advanced reliability topics — MV3 service-worker lifecycle & keepalive
@@ -151,10 +179,10 @@ mock-unit-tests + E2E strategy, and error-code assertions — see
 
 ### Step 4: Execute via browser-utils Executor
 
-Run the test script using browser-utils' universal Playwright executor:
+Run the script using browser-utils' universal Playwright executor:
 
 ```bash
-node ${SKILL_HOME_BROWSER_UTILS}/scripts/js/run.js /tmp/extension-e2e-test-<timestamp>.js
+node ${SKILL_HOME_BROWSER_UTILS}/scripts/js/run.js /tmp/browser-extension-<timestamp>.js
 ```
 
 Where `${SKILL_HOME_BROWSER_UTILS}` resolves to
@@ -166,9 +194,10 @@ Where `${SKILL_HOME_BROWSER_UTILS}` resolves to
 
 ### Step 5: Interpret Results
 
-The executor prints `console.log` output from the test script. Common patterns:
+The executor prints `console.log` output from the script. Common patterns:
 
-- **Success**: Script completes without errors, all assertions pass.
+- **Success**: Script completes without errors, the extension's expected side
+  effects are observed (storage writes, DOM changes, network calls, message logs).
 - **Extension not loaded**: Service worker event times out — check
   `--load-extension` path and build output.
 - **Popup navigation fails**: Extension ID mismatch — ensure service worker is
@@ -178,7 +207,7 @@ The executor prints `console.log` output from the test script. Common patterns:
 
 ### Step 6: Optional — Reuse Login State
 
-For testing against internal platforms (e.g., `asiops.alibaba-inc.com`) that require
+For running against internal platforms (e.g., `asiops.alibaba-inc.com`) that require
 authentication, reuse an existing Chrome user data directory with login state:
 
 ```javascript
@@ -209,40 +238,44 @@ const context = await chromium.launchPersistentContext(userDataDir, {
    and profile resets. Never hardcode it.
 5. **Always close the context** — `await context.close()` in finally block to prevent
    orphaned Chrome processes.
-6. **Write test scripts to `/tmp/`** — never write test files to the skill directory
+6. **Write scripts to `/tmp/`** — never write script files to the skill directory
    or user's project, following browser-utils conventions.
-7. **Use `--disable-extensions-except`** — isolates the extension under test by
+7. **Use `--disable-extensions-except`** — isolates the extension under execution by
    disabling all other extensions in the profile.
 8. **Respect the read-only / OSS-only boundary** — per the project Constitution, the
    extension only reads from `*.alibaba-inc.com` and only writes to OSS. Triggering a
-   real collection during E2E sends live GET requests to internal platforms and may
-   write to OSS. Default to **mocking** those responses with `context.route()` /
-   `page.route()`, reusing fixtures under `test/data/` (`asiops/`, `splc/`,
-   `qianzhou/`). Only hit real network in a controlled, authorized environment.
+   real collection sends live GET requests to internal platforms and may write to OSS.
+   Default to **mocking** those responses with `context.route()` / `page.route()`,
+   reusing fixtures under `test/data/` (`asiops/`, `splc/`, `qianzhou/`). Only hit
+   real network in a controlled, authorized environment.
 9. **Treat the service worker as ephemeral** — it suspends after ~30s and loses all
    in-memory state. Get it via `waitForEvent('serviceworker')`, wake it with a cheap
-   `sw.evaluate()` before asserting, and assert on durable effects (`chrome.storage`,
+   `sw.evaluate()` before asserting, and rely on durable effects (`chrome.storage`,
    DOM, mocked outputs) rather than SW-held state across a gap. Never rely on a fixed
    sleep to "keep it alive". See the reliability reference.
-10. **Push logic down to fast unit tests** — only cover in Playwright E2E what needs a
-    real page/SW. Test message-protocol/handler logic as `node --test` unit tests with
-    mocked `chrome.*` APIs. Assert on stable **error codes**, not message-text.
+10. **Verify on durable effects, not transient state** — assert task outcomes via
+    `chrome.storage`, DOM, network calls, or mocked outputs; message-text assertions
+    should use stable **error codes**, not message-text.
 11. **Add focus-free launch args** — always include `--window-position=-32000,-32000`,
     `--window-size=1280,720`, `--no-default-browser-check`, `--no-first-run` in the
     `args` array. This prevents the headed browser from stealing desktop focus and
     disrupting the user's active work. See [browser-utils patterns](../browser-utils/references/playwright-patterns.md)
     § Focus-Free Automation for CDP-based alternatives to focus-dependent APIs.
 12. **Avoid synthetic keyboard/mouse input** — never use `page.keyboard.press()` or
-    `page.mouse.click()` in extension tests. Synthetic keys do not fire
+    `page.mouse.click()` in extension scripts. Synthetic keys do not fire
     `chrome.commands.onCommand` (see §6 of the patterns doc), and synthetic mouse
     events pollute the OS input queue. Use `sw.evaluate()`, `page.evaluate()`, or
     `page.click(selector)` instead.
-13. **Check prerequisite services before launch** — if the test uses real STS, API,
+13. **Check prerequisite services before launch** — if the run uses real STS, API,
     or dev-server endpoints, verify each is reachable with `curl` before launching
     the browser. A missing service produces cascading failures (network errors,
     empty OSS writes) that are hard to trace.
 14. **Clean up stale Chrome processes** — when reusing a profile, kill any existing
     Chrome for Testing processes first to avoid profile-lock failures.
+15. **Delegate plain page automation to browser-utils** — when the task does not
+    involve the extension (plain web automation, screenshots of ordinary pages,
+    form filling on non-extension pages), use the browser-utils skill directly
+    rather than loading an extension.
 
 ## Path Conventions
 
@@ -276,7 +309,7 @@ Additionally, this skill references the browser-utils skill's executor:
 
 ### Assets (`${SKILL_HOME}/assets/`)
 - [extension-test-template.js](./assets/extension-test-template.js) —
-  Ready-to-use test script template covering all extension surfaces.
+  Ready-to-use script template covering all extension surfaces.
 
 ## Dependencies
 
@@ -302,7 +335,7 @@ At the end of a substantial run of this skill, perform an agent self-reflection 
 5. **Persist** via the engine:
    ```bash
    python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
-     --unit-id "skill:extension-e2e-test" --unit-type skill \
+     --unit-id "skill:browser-extension" --unit-type skill \
      --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
      --review "<review prose>" --points-file "<points file>"
    ```

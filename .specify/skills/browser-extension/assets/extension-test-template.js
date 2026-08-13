@@ -1,15 +1,15 @@
 /**
- * Chrome Extension E2E Test Template
+ * Chrome Extension Execution Template
  *
- * Ready-to-use Playwright test script for Chrome MV3 extension testing.
+ * Ready-to-use Playwright script for driving a Chrome MV3 extension.
  * Covers: extension lifecycle, service worker, popup, options, content scripts,
  * keyboard commands, and Chrome Storage.
  *
  * Usage:
- *   1. Copy this file to /tmp/extension-e2e-test-<timestamp>.js
+ *   1. Copy this file to /tmp/browser-extension-<timestamp>.js
  *   2. Modify EXTENSION_PATH and TEST_URL as needed
  *   3. Run via browser-utils executor:
- *      node .specify/skills/browser-utils/scripts/js/run.js /tmp/extension-e2e-test-*.js
+ *      node .specify/skills/browser-utils/scripts/js/run.js /tmp/browser-extension-*.js
  *
  * Prerequisites:
  *   - Extension build output exists at EXTENSION_PATH

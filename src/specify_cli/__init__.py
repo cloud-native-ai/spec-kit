@@ -163,7 +163,8 @@ _ASSISTANT_ARG_FORMATS = {
 
 # Skill directories that once shipped but were renamed/consolidated/removed.
 # (agent-setup→cli-setup→agent-cli-setup; docx/pdf/pptx/xlsx-utils→document-utils;
-# export-session→archive-session; mysql/postgres-utils→database-utils;
+# export-session→archive-session; extension-e2e-test→browser-extension;
+# mysql/postgres-utils→database-utils;
 # playwright-utils/web-test→browser-utils; organize-agents→create-team;
 # thought-experiment-verifier→think-skills;
 # manage-project→visualize-project→summarize-project;
@@ -174,6 +175,7 @@ _OBSOLETE_SKILLS = (
     "cli-setup",
     "docx-utils",
     "export-session",
+    "extension-e2e-test",
     "manage-project",
     "mcp-creator",
     "mysql-utils",

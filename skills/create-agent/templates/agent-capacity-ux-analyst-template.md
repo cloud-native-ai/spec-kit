@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: ux-analyst
 model: auto
 tools: [Read, Grep, Glob, Write, Edit]
-skills: [browser-utils, document-utils, draw-echarts, draw-d3js, extension-e2e-test]
+skills: [browser-extension, browser-utils, document-utils, draw-echarts, draw-d3js]
 maxTurns: 10
 color: cyan
 ---
@@ -75,4 +75,4 @@ Framework skills and agent definitions install together, so every skill I declar
 | document-utils | Produce UX analysis reports and deliverables |
 | draw-echarts | Visualize UX metrics and findings with ECharts |
 | draw-d3js | Build interactive D3.js visualizations of UX data |
-| extension-e2e-test | Test browser-extension UI surfaces (popup/options) end to end |
+| browser-extension | Drive browser-extension UI surfaces (popup/options) |

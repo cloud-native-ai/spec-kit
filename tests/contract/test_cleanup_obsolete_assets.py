@@ -32,6 +32,7 @@ def _build_workspace(root: Path) -> None:
     _write(specify / "skills" / "sdd-workflow" / "SKILL.md")
     _write(specify / "skills" / "organize-agents" / "SKILL.md")
     _write(specify / "skills" / "docx-utils" / "SKILL.md")
+    _write(specify / "skills" / "extension-e2e-test" / "SKILL.md")
     # Current skill + user-authored skill (must survive)
     _write(specify / "skills" / "create-team" / "SKILL.md")
     _write(specify / "skills" / "my-custom-skill" / "SKILL.md")
@@ -70,6 +71,7 @@ def test_removes_obsolete_skills_commands_and_templates(tmp_path):
     assert not (specify / "skills" / "sdd-workflow").exists()
     assert not (specify / "skills" / "organize-agents").exists()
     assert not (specify / "skills" / "docx-utils").exists()
+    assert not (specify / "skills" / "extension-e2e-test").exists()
     # Obsolete templates gone
     assert not (specify / "templates" / "agent-explore-template.md").exists()
     assert not (specify / "templates" / "consitution-template.md").exists()

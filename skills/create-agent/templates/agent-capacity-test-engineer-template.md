@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: test-engineer
 model: auto
 tools: [Read, Grep, Glob, Bash, Write, Edit]
-skills: [browser-utils, extension-e2e-test, database-utils, think-skills]
+skills: [browser-extension, browser-utils, database-utils, think-skills]
 maxTurns: 15
 color: yellow
 ---
@@ -70,6 +70,6 @@ Framework skills and agent definitions install together, so every skill I declar
 | Skill | When to use |
 |-------|-------------|
 | browser-utils | Run end-to-end web tests, screenshots, and responsive/UX checks |
-| extension-e2e-test | Run E2E tests for Chrome/MV3 browser extensions (popup, options, service worker) |
+| browser-extension | Execute/drive Chrome/MV3 browser extensions (popup, options, service worker) |
 | database-utils | Execute read-only SQL to verify data-backed behavior during testing |
 | think-skills | Simulate test scenarios and edge cases before authoring test cases |
