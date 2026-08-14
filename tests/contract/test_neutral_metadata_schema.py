@@ -101,10 +101,11 @@ def test_c3_camelcase_key_fails():
 
 def test_c5_metadata_extraction_needs_no_body_semantics():
     metadata, _body = validate_agent_metadata("sample.agent.md", NEUTRAL_SAMPLE)
-    # Every metadata value is obtained from the frontmatter alone.
+    # Every metadata value is obtained from the frontmatter alone: one
+    # parsed key per frontmatter line, no body read required.
     fm_lines, _ = split_agent_frontmatter(NEUTRAL_SAMPLE)
-    assert len(fm_lines) == len(NEUTRAL_AGENT_METADATA_KEYS)
-    assert set(metadata) == set(NEUTRAL_AGENT_METADATA_KEYS)
+    assert len(fm_lines) == len(metadata)
+    assert set(metadata) <= set(NEUTRAL_AGENT_METADATA_KEYS)
 
 
 def test_c5_body_carries_no_distribution_parameters():
@@ -126,7 +127,12 @@ def test_c7_placeholders_in_metadata_rejected():
 
 
 def test_c6_framework_keys_are_marked_non_rendering():
-    assert NEUTRAL_AGENT_FRAMEWORK_KEYS == {"supervisor", "capacity-scope"}
+    assert NEUTRAL_AGENT_FRAMEWORK_KEYS == {
+        "supervisor",
+        "capacity-scope",
+        "role-scope",
+        "project",
+    }
     for key in NEUTRAL_AGENT_FRAMEWORK_KEYS:
         _domain, _default, renders = NEUTRAL_AGENT_METADATA_KEYS[key]
         assert renders is False, key

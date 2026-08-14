@@ -5,11 +5,11 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 capacity-scope: requirements-analyst
-model: auto
-tools: [Read, Grep, Glob, Write, Edit]
+model-tier: auto
+capability-tools: [Read, Grep, Glob, Write, Edit]
 skills: [draw-plantuml, memory-recall, memory-record, think-skills]
-maxTurns: 10
-color: blue
+run-turn-budget: 10
+display-color: blue
 ---
 You are a **Requirements Analyst** for the {{PROJECT_NAME}} project.
 

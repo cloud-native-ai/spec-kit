@@ -5,11 +5,11 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 capacity-scope: ux-analyst
-model: auto
-tools: [Read, Grep, Glob, Write, Edit]
+model-tier: auto
+capability-tools: [Read, Grep, Glob, Write, Edit]
 skills: [browser-extension, browser-utils, document-utils, draw-echarts, draw-d3js]
-maxTurns: 10
-color: cyan
+run-turn-budget: 10
+display-color: cyan
 ---
 You are a **UX Analyst** for the Spec Kit (specify-cli) project.
 

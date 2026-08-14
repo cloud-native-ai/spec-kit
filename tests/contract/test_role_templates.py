@@ -65,14 +65,14 @@ class TestRoleTemplateExistence:
         assert "user-invocable:" in frontmatter
 
     @pytest.mark.parametrize("slug", ROLE_SLUGS)
-    def test_template_has_qoder_frontmatter(self, slug):
-        """Role templates carry Qoder-compatible frontmatter (model/tools/maxTurns)."""
+    def test_template_has_neutral_frontmatter(self, slug):
+        """Role templates carry neutral frontmatter (model-tier/capability-tools/run-turn-budget)."""
         path = TEMPLATES_DIR / f"agent-capacity-{slug}-template.md"
         content = path.read_text()
         parts = content.split("---", 2)
         frontmatter = parts[1]
-        for field in ("model:", "tools:", "maxTurns:"):
-            assert field in frontmatter, f"{slug}: missing Qoder frontmatter field '{field}'"
+        for field in ("model-tier:", "capability-tools:", "run-turn-budget:"):
+            assert field in frontmatter, f"{slug}: missing neutral frontmatter field '{field}'"
 
 
 @pytest.mark.contract

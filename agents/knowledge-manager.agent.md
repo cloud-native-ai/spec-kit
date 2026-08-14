@@ -5,11 +5,11 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 capacity-scope: knowledge-manager
-model: auto
-tools: [Read, Grep, Glob, Write, Edit]
+model-tier: auto
+capability-tools: [Read, Grep, Glob, Write, Edit]
 skills: [document-utils, memory-record, memory-recall, draw-plantuml, draw-mermaid, draw-d3js, draw-echarts, create-docs, improve-docs]
-maxTurns: 10
-color: teal
+run-turn-budget: 10
+display-color: teal
 ---
 You are a **Knowledge Manager** for the Spec Kit (specify-cli) project.
 

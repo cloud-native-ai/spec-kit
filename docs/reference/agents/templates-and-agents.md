@@ -77,11 +77,12 @@ as a preset row in the registry.
 
 Each generated role agent (example: `requirements-analyst.agent.md`) contains:
 
-- **Frontmatter**: `name`, `description`, `user-invocable`, `disable-model-invocation`,
-  `supervisor: true`, `capacity-scope: <slug>`, plus Qoder-compatible fields `model` (default
-  `auto`), `tools`, `maxTurns`, and `color`. Optional Qoder fields (`disallowedTools`,
-  `timeoutMins`, `skills`, `mcpServers`, `permissionMode`, `background`, `isolation`) are
-  available but unset by default.
+- **Frontmatter (neutral metadata)**: `name`, `description`, `user-invocable`,
+  `disable-model-invocation`, `model-tier` (default `auto`), `capability-tools`, `skills`,
+  `run-turn-budget`, `display-color`, plus the framework assembly keys `supervisor` and
+  `capacity-scope: <slug>` (`role-scope` / `project` in the team-supervisor and
+  project-custom variants). The vocabulary is tool-agnostic by contract; per-tool field
+  names are produced only at render time by the tool metadata mapping in `specify_cli`.
 - **Role / Stage / Type** section — states the role's Type and its per-stage Type
   (`executor` Worker · `evaluator` Meta · `optimizer` Meta), and its place in the Team/Loop.
 - The **six mandatory sections** (Identity, Project Context, Workflow, Upstream, Downstream,
@@ -107,27 +108,15 @@ UX Analyst is a cross-cutting design-phase Worker covering **all** user surfaces
 
 After adding or updating agents, run `/speckit.instructions` to refresh discovery metadata.
 
-## Qoder expert crosswalk
+## Per-tool rendering (no tool is the format baseline)
 
-Spec Kit's SDD roles and Qoder's built-in expert team are **different taxonomies**. The SDD
-roles keep their own names and are made available to Qoder as per-file symlinks **alongside**
-Qoder's built-ins (they do not force-override built-ins). The nearest mapping is:
-
-| Qoder built-in | Responsibility | SDD role (nearest) | Coverage |
-|---|---|---|---|
-| Lead Agent (not customizable) | understand / decompose / coordinate | Team Supervisor | Conceptual match (Lead Agent itself cannot be replaced) |
-| Researcher | investigate, code location | Requirements Analyst | Partial (RA adds a code-investigation facet) |
-| Full-Stack Engineer | front/back-end implementation | Module Designer | Full |
-| QA | run tests & builds | QA Engineer | Full |
-| Code Reviewer | code review | — | Gap |
-| UI Operator | browser/UI verification | — (UX Analyst is design, not runtime verification) | Gap |
-| Debug Engineer | fault diagnosis | — | Gap |
-| — | — | UX Analyst / System Designer / Test Engineer / Knowledge Manager | SDD-only (no Qoder equivalent) |
-
-The three gaps (Code Reviewer, UI Operator, Debug Engineer) have no direct SDD equivalent;
-author them on demand via `/speckit.agents` if needed. To actually **override** a Qoder
-built-in, create a file in `.qoder/agents/` whose frontmatter `name` exactly matches the
-built-in expert's name (per Qoder's priority mechanism).
+No supported AI agent CLI is treated as the metadata format baseline. The neutral metadata
+is translated at `specify init --ai <tool>` time through a single mapping (target
+directory, file naming, per-field translation, provenance) maintained in `specify_cli`.
+Fields with no counterpart on the target tool are skipped and reported, never emitted in a
+foreign dialect. To override a tool's built-in agent (where the tool supports it), create a
+file in that tool's agent directory whose frontmatter `name` exactly matches the built-in's
+name, per the tool's own priority mechanism.
 
 ## Directory & symlink model
 

@@ -131,14 +131,21 @@ NEUTRAL_AGENT_METADATA_KEYS = {
     "run-turn-budget": ("int", 10, True),
     "display-color": (None, None, True),
     # Framework assembly keys — never rendered to any tool (C-6).
+    # `role-scope` is the team-domain counterpart of `capacity-scope`
+    # (used by agent-team-supervisor-template.md); `project` marks
+    # project-custom agents (agent-project-custom-template.md).
     "supervisor": ("bool", False, False),
     "capacity-scope": (None, None, False),
+    "role-scope": (None, None, False),
+    "project": (None, None, False),
 }
 
 NEUTRAL_AGENT_REQUIRED_KEYS = ("name", "description")
 
 # Keys reserved for framework assembly; excluded from tool rendering (C-6).
-NEUTRAL_AGENT_FRAMEWORK_KEYS = frozenset({"supervisor", "capacity-scope"})
+NEUTRAL_AGENT_FRAMEWORK_KEYS = frozenset(
+    {"supervisor", "capacity-scope", "role-scope", "project"}
+)
 
 # Tool-dialect vocabulary forbidden anywhere in agent metadata (C-4).
 FORBIDDEN_AGENT_METADATA_KEYS = frozenset(

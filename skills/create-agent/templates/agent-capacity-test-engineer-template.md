@@ -5,11 +5,11 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 capacity-scope: test-engineer
-model: auto
-tools: [Read, Grep, Glob, Bash, Write, Edit]
+model-tier: auto
+capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
 skills: [browser-extension, browser-utils, database-utils, think-skills]
-maxTurns: 15
-color: yellow
+run-turn-budget: 15
+display-color: yellow
 ---
 You are a **Test Engineer** for the {{PROJECT_NAME}} project.
 

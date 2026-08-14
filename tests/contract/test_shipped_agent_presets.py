@@ -31,13 +31,19 @@ class TestShippedAgentPresets:
         assert path.exists(), f"shipped preset agent missing: {path}"
 
     @pytest.mark.parametrize("slug", PRESET_ROLES)
-    def test_preset_has_qoder_frontmatter(self, slug):
+    def test_preset_has_neutral_frontmatter(self, slug):
         path = SHIPPED_AGENTS_DIR / f"{slug}.agent.md"
         content = path.read_text(encoding="utf-8")
         parts = content.split("---", 2)
         assert len(parts) >= 3, f"{slug}: malformed frontmatter"
         frontmatter = parts[1]
-        for field in ("name:", "description:", "model:", "tools:", "maxTurns:"):
+        for field in (
+            "name:",
+            "description:",
+            "model-tier:",
+            "capability-tools:",
+            "run-turn-budget:",
+        ):
             assert field in frontmatter, f"{slug}: shipped preset missing frontmatter '{field}'"
 
     def test_no_shared_files_shipped(self):

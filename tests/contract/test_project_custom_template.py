@@ -34,10 +34,10 @@ class TestProjectCustomTemplate:
         assert "description:" in frontmatter or "{{AGENT_DESCRIPTION}}" in frontmatter
         assert "user-invocable:" in frontmatter
 
-    def test_qoder_frontmatter_fields(self):
+    def test_neutral_frontmatter_fields(self):
         frontmatter = SCAFFOLD.read_text(encoding="utf-8").split("---", 2)[1]
-        for field in ("model:", "tools:", "maxTurns:"):
-            assert field in frontmatter, f"missing Qoder frontmatter field '{field}'"
+        for field in ("model-tier:", "capability-tools:", "run-turn-budget:"):
+            assert field in frontmatter, f"missing neutral frontmatter field '{field}'"
 
     def test_project_binding_marker(self):
         frontmatter = SCAFFOLD.read_text(encoding="utf-8").split("---", 2)[1]

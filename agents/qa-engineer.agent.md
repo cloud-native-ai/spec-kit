@@ -5,11 +5,11 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 capacity-scope: qa-engineer
-model: auto
-tools: [Read, Grep, Glob, Bash]
+model-tier: auto
+capability-tools: [Read, Grep, Glob, Bash]
 skills: [study-project, browser-utils, database-utils, memory-recall]
-maxTurns: 10
-color: orange
+run-turn-budget: 10
+display-color: orange
 ---
 You are a **Quality Assurance Engineer** for the Spec Kit (specify-cli) project.
 

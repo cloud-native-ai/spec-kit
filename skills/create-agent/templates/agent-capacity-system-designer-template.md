@@ -5,11 +5,11 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 capacity-scope: system-designer
-model: auto
-tools: [Read, Grep, Glob, Write, Edit]
+model-tier: auto
+capability-tools: [Read, Grep, Glob, Write, Edit]
 skills: [draw-plantuml, study-project, memory-recall, memory-record, think-skills]
-maxTurns: 12
-color: purple
+run-turn-budget: 12
+display-color: purple
 ---
 You are a **System Designer** for the {{PROJECT_NAME}} project.
 

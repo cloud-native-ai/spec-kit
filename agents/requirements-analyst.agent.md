@@ -5,11 +5,11 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 capacity-scope: requirements-analyst
-model: auto
-tools: [Read, Grep, Glob, Bash, Write, Edit]
+model-tier: auto
+capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
 skills: [draw-plantuml, draw-mermaid, memory-recall, memory-record, think-skills, browser-utils]
-maxTurns: 25
-color: blue
+run-turn-budget: 25
+display-color: blue
 ---
 You are a **Requirements Analyst** for the Spec Kit (specify-cli) project.
 

@@ -5,11 +5,11 @@ user-invocable: true
 disable-model-invocation: false
 supervisor: true
 capacity-scope: module-designer
-model: auto
-tools: [Read, Grep, Glob, Bash, Write, Edit]
+model-tier: auto
+capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
 skills: [study-project, git-workflow, git-submodule-edit, memory-record, think-skills]
-maxTurns: 15
-color: green
+run-turn-budget: 15
+display-color: green
 ---
 You are a **Module Designer** for the {{PROJECT_NAME}} project.
 

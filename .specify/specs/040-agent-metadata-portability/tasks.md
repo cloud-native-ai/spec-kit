@@ -67,18 +67,18 @@ Task State Sigil:`[ ]` 待做 / `[X]` 完成 / `[~]` 延迟(须在 Notes 说明)
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T007 [US2] [blockedBy: T003] 创建 `tests/contract/test_neutral_vocabulary_scan.py`:对 `agents/`、`skills/create-agent/templates/`、`skills/create-team/templates/agents/` 扫描禁用词表(C-4)并断言命中 0;断言全部键 kebab-case(C-3)
+- [X] T007 [US2] [blockedBy: T003] 创建 `tests/contract/test_neutral_vocabulary_scan.py`:对 `agents/`、`skills/create-agent/templates/`、`skills/create-team/templates/agents/` 扫描禁用词表(C-4)并断言命中 0;断言全部键 kebab-case(C-3)
 
 ### Implementation for User Story 2
 
-- [ ] T008 [P] [US2] [blockedBy: T003] 重写 `agents/` 全部 7 个 `*.agent.md` 的 frontmatter 为中立键集(`maxTurns`→`run-turn-budget`、`tools`→`capability-tools`、`color`→`display-color`、`model`→`model-tier`;取值按 §E2 映射)
-- [ ] T009 [P] [US2] [blockedBy: T003] 重写 `skills/create-agent/templates/` 全部 10 个文件的 frontmatter 为中立键集(保持占位符白名单不动)
-- [ ] T010 [P] [US2] [blockedBy: T003] 重写 `skills/create-team/templates/agents/` 全部 8 个文件的 frontmatter 为中立键集(`role-scope` 作为框架键保留,T-5 裁定在 US5 成文)
-- [ ] T011 [US2] [blockedBy: T008] 改写 `tests/contract/test_shipped_agent_presets.py` 的 `test_preset_has_qoder_frontmatter` → 中立断言(更名去 qoder,[[STR-001]])
-- [ ] T012 [US2] [blockedBy: T009] 改写 `tests/contract/test_role_templates.py` 的 `test_template_has_qoder_frontmatter` → 中立断言(更名去 qoder,[[STR-002]];保留 `test_only_approved_placeholders` 与必备章节断言)
-- [ ] T013 [US2] [blockedBy: T007, T010, T011, T012] 运行契约套件至绿(`pytest tests/contract -q`)
-- [ ] T014 [US2] [blockedBy: T013] 文档去工具基准:重写 `docs/reference/agents/templates-and-agents.md` 中 [[STR-003]] 表述、删除 `## Qoder expert crosswalk`、以中立格式 + 出处表取代
-- [ ] T015 [P] [US2] [blockedBy: T013] 更新 `shared/definitions/agent-definitions.md` 的 frontmatter 键描述为中立键集
+- [X] T008 [P] [US2] [blockedBy: T003] 重写 `agents/` 全部 7 个 `*.agent.md` 的 frontmatter 为中立键集(`maxTurns`→`run-turn-budget`、`tools`→`capability-tools`、`color`→`display-color`、`model`→`model-tier`;取值按 §E2 映射)
+- [X] T009 [P] [US2] [blockedBy: T003] 重写 `skills/create-agent/templates/` 全部 10 个文件的 frontmatter 为中立键集(保持占位符白名单不动)
+- [X] T010 [P] [US2] [blockedBy: T003] 重写 `skills/create-team/templates/agents/` 全部 8 个文件的 frontmatter 为中立键集(`role-scope` 作为框架键保留,T-5 裁定在 US5 成文)
+- [X] T011 [US2] [blockedBy: T008] 改写 `tests/contract/test_shipped_agent_presets.py` 的 `test_preset_has_qoder_frontmatter` → 中立断言(更名去 qoder,[[STR-001]])
+- [X] T012 [US2] [blockedBy: T009] 改写 `tests/contract/test_role_templates.py` 的 `test_template_has_qoder_frontmatter` → 中立断言(更名去 qoder,[[STR-002]];保留 `test_only_approved_placeholders` 与必备章节断言)
+- [X] T013 [US2] [blockedBy: T007, T010, T011, T012] 运行契约套件至绿(`pytest tests/contract -q`)
+- [X] T014 [US2] [blockedBy: T013] 文档去工具基准:重写 `docs/reference/agents/templates-and-agents.md` 中 [[STR-003]] 表述、删除 `## Qoder expert crosswalk`、以中立格式 + 出处表取代
+- [X] T015 [P] [US2] [blockedBy: T013] 更新 `shared/definitions/agent-definitions.md` 的 frontmatter 键描述为中立键集
 
 ## Phase 5: User Story 3 - init 按目标工具渲染真实文件 (Priority: P1)
 
