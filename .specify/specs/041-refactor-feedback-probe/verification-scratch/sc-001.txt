@@ -1,0 +1,11 @@
+== probes --validate ==
+Probe registry valid: 3 classes, 49 internal + 0 external objects
+exit=0
+
+== probes --reconcile ==
+Probe registry reconciled zero-gap: 3 classes, 49 internal + 0 external objects, 49 embeds
+exit=0
+
+== embeds live grep ==
+commands: 18
+skills: 31

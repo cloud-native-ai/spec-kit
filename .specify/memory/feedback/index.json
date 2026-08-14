@@ -1,10 +1,70 @@
 {
   "store": "feedback",
-  "updated": "2026-08-14T08:04:57Z",
+  "updated": "2026-08-14T17:40:22Z",
   "threshold": 10,
-  "count_since_submission": 3,
+  "count_since_submission": 8,
   "submitted_at": "2026-08-14T07:47:34Z",
   "entries": [
+    {
+      "id": "20260814T174022Z-speckit-analyze",
+      "file": "20260814T174022Z-speckit-analyze.md",
+      "unit_id": "/speckit.analyze",
+      "unit_type": "command",
+      "run_id": "041-refactor-feedback-probe-20260814-analyze1",
+      "feature": "041-refactor-feedback-probe",
+      "feature_id": "028",
+      "partial": false,
+      "created": "2026-08-14T17:40:22Z",
+      "summary": "完整只读运行:9 项发现(CRITICAL 0/HIGH 3/MEDIUM 2/LOW 4),三项 HIGH(第 50 插点矛盾链、GATE-6 unzip -l 空转检查、镜像义务行 5 无任务覆盖且 T031 假保证)经独立校验子代理单波三发全部 confirm,校验者另贡献两处连带发现(C-2.4 过时计数、T030 复用空转断言)已并入报告。覆盖率 FR 21/21、故事 6/6、契约测试"
+    },
+    {
+      "id": "20260814T171220Z-speckit-tasks",
+      "file": "20260814T171220Z-speckit-tasks.md",
+      "unit_id": "/speckit.tasks",
+      "unit_type": "command",
+      "run_id": "041-refactor-feedback-probe-20260814-tasks1",
+      "feature": "041-refactor-feedback-probe",
+      "feature_id": "028",
+      "partial": false,
+      "created": "2026-08-14T17:12:20Z",
+      "summary": "完整运行:前置检查 → 测试模式判定(原则 IV 强制 ON + template-only 门,双轨测试均置顶)→ 34 任务生成(Setup2/Foundational3/US1:3/US2:3/US3:4/US4:6/US5:4/US6:5/Polish4;8 个 [P])→ DoD/GATE 六门(含 reconcile 守恒与外部隔离两专项)→ 格式 lint 全过 + 自检脚本发现并修"
+    },
+    {
+      "id": "20260814T164732Z-speckit-plan",
+      "file": "20260814T164732Z-speckit-plan.md",
+      "unit_id": "/speckit.plan",
+      "unit_type": "command",
+      "run_id": "041-refactor-feedback-probe-20260814-plan1",
+      "feature": "041-refactor-feedback-probe",
+      "feature_id": "028",
+      "partial": false,
+      "created": "2026-08-14T16:47:32Z",
+      "summary": "完整运行:脚手架 → spec-restructure(三模式指令批次集成:Story4 重写+Story6 外部 probe+FR-018~021+SC-007/008,FR 编号映射记入 Clarifications 第二会话)→ checklist 复验 → 代码探察(引擎 763 行动作面/6 个反馈契约测试/6 工具副本/shared-definitions 先例)→ plan.md 填"
+    },
+    {
+      "id": "20260814T162543Z-speckit-clarify",
+      "file": "20260814T162543Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "041-refactor-feedback-probe-20260814-clarify1",
+      "feature": "041-refactor-feedback-probe",
+      "feature_id": "",
+      "partial": false,
+      "created": "2026-08-14T16:25:43Z",
+      "summary": "Mode A 完整运行:阶段检测 A → 词汇表/分支可写性探测 → taxonomy 覆盖扫描(Feature Linkage 高优先) → 4 问分组单轮提问 → 4 项答复集成。两项自定义答复带来实质修订(Probe Class/Object 两层建模;旧条目 review 收敛处置),以定点 Edit 完成;词汇表登记前做了变体冲突检查(避免裸『切片』与 Goal Target 冲突)。集"
+    },
+    {
+      "id": "20260814T154958Z-speckit-requirements",
+      "file": "20260814T154958Z-speckit-requirements.md",
+      "unit_id": "/speckit.requirements",
+      "unit_type": "command",
+      "run_id": "041-refactor-feedback-probe-20260814-1",
+      "feature": "041-refactor-feedback-probe",
+      "feature_id": "",
+      "partial": false,
+      "created": "2026-08-14T15:49:58Z",
+      "summary": "干净完整运行:脚手架 → 反馈机制现状研究(docs/tool record/027 spec/feedback-step 真源) → 保留标识符检查(/speckit.feedback 与 Feedback Probe 无冲突) → 按 040 惯例撰写中文 spec(5 故事/17 FR/6 SC) → checklist 一轮全过。词汇表协议捕获一处同音误写(Spike→Spec Kit)并"
+    },
     {
       "id": "20260814T080457Z-skill-improve-skills",
       "file": "20260814T080457Z-skill-improve-skills.md",

@@ -649,9 +649,260 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 # --------------------------------------------------------------------------- #
+# Probe registry (requirement 041 — Feedback Probe 化重构)
+# --------------------------------------------------------------------------- #
+PROBE_DEFS_REL = Path(".specify") / "shared" / "definitions" / "probe-definitions.md"
+EXTERNAL_PROBES_DIRNAME = "probes"
+_PROBE_ID_RE = re.compile(r"^[a-z][a-z0-9-]*$")
+_CUSTOM_UNIT_RE = re.compile(r"^custom:[a-z0-9._/-]+$")
+_PROBE_KINDS = ("internal", "external")
+_CLASS_FIELDS = ("class_id", "kind", "collection", "target_slice",
+                 "processing", "insertion_type")
+_OBJECT_FIELDS = ("object_id", "class_id", "unit", "lifecycle_point")
+
+
+def probe_defs_path(workspace_root: Path) -> Path:
+    return workspace_root / PROBE_DEFS_REL
+
+
+def _table_rows(text: str, heading: str) -> List[Dict[str, str]]:
+    """Parse the first pipe table under ``## <heading>``; keys = header cells."""
+    lines = text.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if line.strip().lower() == f"## {heading}".lower():
+            start = i + 1
+            break
+    if start is None:
+        return []
+    headers: Optional[List[str]] = None
+    rows: List[Dict[str, str]] = []
+    for line in lines[start:]:
+        stripped = line.strip()
+        if stripped.startswith("## "):
+            break
+        if not stripped.startswith("|"):
+            continue
+        cells = [c.strip() for c in stripped.strip("|").split("|")]
+        if headers is None:
+            headers = cells
+            continue
+        if all(set(c) <= {"-", ":"} for c in cells):
+            continue
+        if len(cells) == len(headers):
+            rows.append(dict(zip(headers, cells)))
+    return rows
+
+
+def _load_external_probes(workspace_root: Path,
+                          errors: List[str]) -> List[Dict[str, str]]:
+    out: List[Dict[str, str]] = []
+    probes_dir = feedback_dir(workspace_root) / EXTERNAL_PROBES_DIRNAME
+    if not probes_dir.is_dir():
+        return out
+    for path in sorted(probes_dir.glob("*.md")):
+        meta, _body = parse_frontmatter(path.read_text(encoding="utf-8"))
+        obj = {f: str(meta.get(f, "")).strip() for f in _OBJECT_FIELDS}
+        if not obj["object_id"]:
+            errors.append(f"external probe {path.name}: missing object_id")
+            continue
+        out.append(obj)
+    return out
+
+
+def load_probe_registry(workspace_root: Path) -> Dict[str, Any]:
+    """Load + structurally validate the merged probe truth source.
+
+    ``available`` is False when the framework definitions file is absent
+    (un-upgraded workspace): callers fall back to legacy behavior instead of
+    hard-failing, per red line 2 (the mechanism must never block work).
+    """
+    errors: List[str] = []
+    classes: List[Dict[str, str]] = []
+    objects: List[Dict[str, str]] = []
+    defs = probe_defs_path(workspace_root)
+    available = defs.is_file()
+    external: List[Dict[str, str]] = []
+    if available:
+        text = defs.read_text(encoding="utf-8")
+        classes = _table_rows(text, "Classes")
+        objects = _table_rows(text, "Objects")
+        seen_classes = set()
+        for c in classes:
+            cid = c.get("class_id", "")
+            for field in _CLASS_FIELDS:
+                if not c.get(field, "").strip():
+                    errors.append(f"class '{cid or '?'}': field '{field}' must be non-empty")
+            if not _PROBE_ID_RE.match(cid):
+                errors.append(f"class '{cid}': id must match ^[a-z][a-z0-9-]*$")
+            if cid in seen_classes:
+                errors.append(f"class '{cid}': duplicate class_id")
+            seen_classes.add(cid)
+            if c.get("kind", "") not in _PROBE_KINDS:
+                errors.append(f"class '{cid}': kind must be one of internal|external")
+        class_ids = {c.get("class_id", "") for c in classes}
+        seen_objects = set()
+        for o in objects:
+            oid = o.get("object_id", "")
+            if not _PROBE_ID_RE.match(oid):
+                errors.append(f"object '{oid}': id must match ^[a-z][a-z0-9-]*$")
+            if oid in seen_objects:
+                errors.append(f"object '{oid}': duplicate object_id")
+            seen_objects.add(oid)
+            if o.get("class_id", "") not in class_ids:
+                errors.append(f"object '{oid}': unknown class '{o.get('class_id', '')}'")
+            if not validate_unit_id(o.get("unit", "")):
+                errors.append(
+                    f"object '{oid}': unit '{o.get('unit', '')}' must be /speckit.* or skill:*")
+        external = _load_external_probes(workspace_root, errors)
+        class_kind = {c.get("class_id", ""): c.get("kind", "") for c in classes}
+        for e in external:
+            oid = e.get("object_id", "")
+            if not oid.startswith("ext-"):
+                errors.append(f"external probe '{oid}': object_id MUST start with 'ext-'")
+            if oid in seen_objects:
+                errors.append(f"external probe '{oid}': duplicate object_id")
+            seen_objects.add(oid)
+            kind = class_kind.get(e.get("class_id", ""), "")
+            if kind != "external":
+                errors.append(
+                    f"external probe '{oid}': class '{e.get('class_id', '')}' "
+                    "must be kind=external")
+            if not _CUSTOM_UNIT_RE.match(e.get("unit", "")):
+                errors.append(
+                    f"external probe '{oid}': unit '{e.get('unit', '')}' must match custom:<owner>/<name>")
+    return {
+        "available": available,
+        "defs_path": defs.as_posix(),
+        "classes": classes,
+        "objects": objects,
+        "external": external,
+        "errors": errors,
+    }
+
+
+def _class_index(registry: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
+    return {c.get("class_id", ""): c for c in registry["classes"]}
+
+
+def merged_probe_objects(registry: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Internal + external objects with class features merged in."""
+    classes = _class_index(registry)
+
+    def _merge(obj: Dict[str, str], is_external: bool) -> Dict[str, Any]:
+        c = classes.get(obj.get("class_id", ""), {})
+        return {
+            "object_id": obj.get("object_id", ""),
+            "class_id": obj.get("class_id", ""),
+            "unit": obj.get("unit", ""),
+            "lifecycle_point": obj.get("lifecycle_point", ""),
+            "kind": c.get("kind", ""),
+            "slice": c.get("target_slice", ""),
+            "collection": c.get("collection", ""),
+            "processing": c.get("processing", ""),
+            "external": is_external,
+        }
+
+    out = [_merge(o, False) for o in registry["objects"]]
+    out += [_merge(e, True) for e in registry["external"]]
+    return out
+
+
+def resolve_probe(registry: Dict[str, Any], unit_id: str) -> Optional[Dict[str, Any]]:
+    for obj in merged_probe_objects(registry):
+        if obj["unit"] == unit_id:
+            return obj
+    return None
+
+
+def scan_embed_units(workspace_root: Path) -> Dict[str, str]:
+    """unit_id → file, from ``## Feedback`` embeds (framework repo layout)."""
+    found: Dict[str, str] = {}
+    cmd_dir = workspace_root / "templates" / "commands"
+    if cmd_dir.is_dir():
+        for path in sorted(cmd_dir.glob("*.md")):
+            if "## Feedback" in path.read_text(encoding="utf-8"):
+                found[f"/speckit.{path.stem}"] = path.relative_to(workspace_root).as_posix()
+    skills_dir = workspace_root / "skills"
+    if skills_dir.is_dir():
+        for path in sorted(skills_dir.glob("*/SKILL.md")):
+            if "## Feedback" in path.read_text(encoding="utf-8"):
+                found[f"skill:{path.parent.name}"] = path.relative_to(workspace_root).as_posix()
+    return found
+
+
+def action_probes(args: argparse.Namespace) -> Dict[str, Any]:
+    workspace_root = resolve_workspace_root(args.workspace_root)
+    registry = load_probe_registry(workspace_root)
+    errors = list(registry["errors"])
+    if args.validate or args.reconcile:
+        if not registry["available"]:
+            raise FeedbackError(f"probe registry not found: {probe_defs_path(workspace_root)}")
+        if args.reconcile:
+            embeds = scan_embed_units(workspace_root)
+            declared = {o.get("unit", ""): o for o in registry["objects"]}
+            for unit in sorted(u for u in embeds if u not in declared):
+                errors.append(f"embed without probe object: {unit} ({embeds[unit]})")
+            for obj in registry["objects"]:
+                if obj.get("unit", "") not in embeds:
+                    errors.append(
+                        f"probe object without embed: {obj.get('object_id', '')} "
+                        f"({obj.get('unit', '')})")
+        if errors:
+            raise FeedbackError("probe registry invalid:\n- " + "\n- ".join(errors))
+        return {
+            "ok": True,
+            "reconciled": bool(args.reconcile),
+            "classes": len(registry["classes"]),
+            "objects": len(registry["objects"]),
+            "external_objects": len(registry["external"]),
+            "embeds": len(scan_embed_units(workspace_root)) if args.reconcile else None,
+        }
+    return {
+        "available": registry["available"],
+        "classes": registry["classes"],
+        "objects": merged_probe_objects(registry),
+    }
+
+
+# --------------------------------------------------------------------------- #
 # Rendering / CLI
 # --------------------------------------------------------------------------- #
 def render_text(action: str, payload: Dict[str, Any]) -> str:
+    if action == "probes":
+        if payload.get("ok"):
+            scope = "reconciled zero-gap" if payload.get("reconciled") else "valid"
+            return (f"Probe registry {scope}: {payload.get('classes')} classes, "
+                    f"{payload.get('objects')} internal + "
+                    f"{payload.get('external_objects')} external objects"
+                    + (f", {payload.get('embeds')} embeds" if payload.get("reconciled") else ""))
+        if not payload.get("available"):
+            return ("No probe registry found at "
+                    ".specify/shared/definitions/probe-definitions.md — "
+                    "run /speckit.instructions to install it.")
+        lines = ["# Probe overview", ""]
+        objects = payload.get("objects", [])
+        classes = {c.get("class_id", ""): c for c in payload.get("classes", [])}
+        for kind, label in (("internal", "internal"), ("external", "external")):
+            group = [o for o in objects if o.get("kind") == kind]
+            if not group:
+                continue
+            lines.append(f"## {label}")
+            lines.append("")
+            by_class: Dict[str, List[Dict[str, Any]]] = {}
+            for o in group:
+                by_class.setdefault(o.get("class_id", ""), []).append(o)
+            for cid in sorted(by_class):
+                c = classes.get(cid, {})
+                lines.append(
+                    f"- {cid}  [slice: {c.get('target_slice', '-')}] — "
+                    f"{c.get('collection', '-')} → {c.get('processing', '-')}")
+                for o in sorted(by_class[cid], key=lambda x: x.get("object_id", "")):
+                    lines.append(
+                        f"  - {o.get('object_id')}   ({o.get('unit')} @ "
+                        f"{o.get('lifecycle_point')})")
+            lines.append("")
+        return "\n".join(lines).rstrip()
     if action == "package":
         if not payload.get("zip"):
             return payload.get("note", "Nothing to package.")
@@ -697,8 +948,15 @@ def build_parser() -> argparse.ArgumentParser:
         "--action",
         required=True,
         choices=["record", "status", "list", "mark-submitted", "reindex",
-                 "package", "upstream"],
+                 "package", "upstream", "probes"],
     )
+    parser.add_argument("--validate", action="store_true",
+                        help="probes: structurally validate the merged probe "
+                             "registry (exit 2 listing every violation)")
+    parser.add_argument("--reconcile", action="store_true",
+                        help="probes: additionally reconcile internal probe "
+                             "objects against live ## Feedback embeds "
+                             "(two-way zero-gap required)")
     parser.add_argument("--workspace-root", default=None)
     parser.add_argument("--unit-id", default=None)
     parser.add_argument("--unit-type", default=None)
@@ -741,6 +999,7 @@ _ACTIONS = {
     "reindex": action_reindex,
     "package": action_package,
     "upstream": action_upstream,
+    "probes": action_probes,
 }
 
 
