@@ -1,0 +1,79 @@
+# Dogfooding Definitions(Dogfooding 概念权威)
+
+> **Single source of truth** for the Dogfooding concept pairs defined under
+> Constitution Principle XI (v1.10.0): 问题/机制与两种修复、客户项目/框架项目与
+> 三副本拓扑。Canonical at `shared/definitions/dogfooding-definitions.md`,
+> mirrored to `.specify/shared/definitions/`. Normative language follows RFC 2119.
+> References: `.specify/memory/constitution.md` § XI; glossary entries
+> (问题修复 / 机制修复 / 框架项目 / 客户项目).
+
+## 1. 问题与机制 (Problem vs Mechanism)
+
+- **问题 (Problem)**: 一次执行中观察到的**具体缺陷实例**——某文件缺某节、某次
+  输出错、某条测试红。有具体位置,可一次性修补。
+- **机制 (Mechanism)**: **稳定产生/维护该类工件或行为的流程载体**——模板、
+  生成/再生成命令、reconcile 流程、契约测试、镜像同步引擎。问题实例是机制
+  运行的输出;同类问题在机制的所有下游实例上同构存在。
+
+### 1.1 两种修复
+
+| | 问题修复 (Problem Fix) | 机制修复 (Mechanism Fix) |
+|---|---|---|
+| 修补对象 | 实例(这份文件、这次输出、这条测试) | 产生实例的源头(模板/命令/流程/契约) |
+| 传播性 | **不传播**——同机制下次运行复现同类问题;其它项目实例原样带病 | **自然传播**——下次执行对应命令时,修复随流程到达本仓活动文件与所有下游项目 init 出来的实例 |
+| 适用场景 | 一次性工件的缺陷;或机制修复落地前的**临时止血** | 一切由机制反复产生的工件(默认情形) |
+
+### 1.2 修复判定法则(宪法 XI,规范性)
+
+修复任何非一次性工件时,执行者 MUST 先回答:**"这个实例是哪个机制产生的?"**
+
+1. 修复 MUST 落在机制侧(模板、生成命令的注入规则、reconcile 流程、守护契约)。
+2. 问题侧修补**仅允许**作为机制修复落地前的临时止血,且 MUST 留痕(何处止血、
+   机制侧待办),止血不留痕视为未修复。
+3. 机制修复交付的验收口径:下一次执行对应命令,修复在**未经手工干预**的活动
+   工件上自然出现(或由守护契约证明不再可能复发)。
+
+**标定案例(2026-08-14 Dogfooding 节缺口)**:活动 `instructions.md` 缺
+`## Dogfooding Practice` 节。机制诊断 = ① `/speckit.instructions` reconcile
+流程不传播模板新增节;② 无契约守护活动文件节集。问题修复 = 手工插节(不传播,
+其它项目同样缺);机制修复 = 修 reconcile 注入规则 + 补契约(活动文件托管节集
+⊇ 模板节集),下次刷新自然带上、全下游免疫。
+
+## 2. 客户项目与框架项目 (Client Project vs Framework Project)
+
+Spec Kit 仓库的 Dogfooding 本质是**一人分饰两角**:既是框架的作者,又是框架
+的用户。物理上存在三个副本:
+
+| 副本 | 路径(本仓语境) | 角色 |
+|------|----------------|------|
+| **框架源** (Framework Sources) | `skills/`、`templates/`、`scripts/`、`shared/`、`agents/`、`src/specify_cli/` | 框架作者帽:开发与发布(git push / 打包) |
+| **自用运行时** (Self-Dogfood Runtime) | 本仓 `.specify/` | 框架用户帽:以客户身份由 init/刷新装出来的运行副本 |
+| **已安装发行版** (Installed Distribution) | `.../site-packages/specify_cli/` | 发布产物:下游用户安装;`specify init` 由此把框架装进各客户项目的 `.specify/` |
+
+**流转链**: `skills/` 等框架源开发 → 发布 → 用户安装到 site-packages →
+`specify init` 装进客户项目 `.specify/`。
+
+### 2.1 两顶帽子规则(宪法 XI,规范性)
+
+1. 对本仓 `.specify/`(自用运行时)的任何**直接**修改都只是**客户侧问题修复**:
+   对框架源无效,其它客户项目永远得不到,且可能被下次刷新覆盖。
+2. 意在影响**所有**客户项目的修复 MUST 落在框架源侧并沿流转链重新发布;
+   活动工件(本仓 `.specify/` 文件)只应作为机制运行的输出存在。
+3. 任一时刻的修改动作 MUST 先自答:**"我现在戴的是框架作者帽(改 `skills/`
+   等源)还是框架用户帽(消费 `.specify/`)?"** 修复落在与目标受众匹配的一侧。
+
+### 2.2 与既有机制的同构映射
+
+这对概念并非新发明,而是既有机制在概念层的命名:
+
+- **Mirror 体系**(`sync-mirrors.py`,canonical → `.specify/` 镜像)= 框架源到
+  自用运行时的受控投影,防止两顶帽子直接混写;
+- **AGENTS.md / CLAUDE.md 符号链接** = 活动工件单源化,消灭客户侧双写;
+- **Feedback Probe 内外类别(req 041)** = 同一对概念在反馈流向维度的实例化:
+  Loop A(内部 → 框架上送)与 Loop B(外部 → 宿主项目自留)。
+
+## 3. 术语登记(词汇表)
+
+以下术语已登记于 `.specify/memory/glossary.md`(origin=user, status=confirmed):
+问题修复 (Problem Fix)、机制修复 (Mechanism Fix)、框架项目 (Framework Project)、
+客户项目 (Client Project)。本文件为它们的**概念权威**;词汇表条目为检索锚点。

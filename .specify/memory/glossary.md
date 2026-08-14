@@ -54,3 +54,7 @@
 | Agent Execution | agent执行, 运行实例, subagent, 子代理 | Agent 三层分类法第三层:定义真正执行时的运行形态,持久产物在 .specify/agents/execution/(configs/scripts 归档,logs 不入库);三种模式(native/virtual/external)见 shared/definitions/subagent-definitions.md | user | confirmed |
 | Feedback Probe | 反馈插点, feedback probe, 插点 | 两层建模的显式反馈插点:Probe Class 定义一类插点的特征(收集内容/目标系统切片/收集后处理流程/适用插入位置类型),Probe Object 为其在当前系统中的实例化(绑定具体流程单元×生命周期点);既有 49 个 wrap-up 埋点重构为 Object 并归类到 Class(需求 041) | auto | proposed |
 | System Slice | 系统切片, feedback slice | 反馈针对的框架部位,沿框架既有组成维度(命令/技能/脚本/模板/文档)取值;由 Probe Class 声明为目标、条目经 Object→Class 继承,作为反馈过滤与统计维度;与 Goal Target 的「目标切片」无关 | auto | proposed |
+| 问题修复 (Problem Fix) | problem fix, 实例修复, 问题侧修复 | 修补机制产生的具体缺陷**实例**(改这份文件/这次输出/这条测试);修复不传播,同机制下次运行复现同类问题;仅允许作机制修复落地前的临时止血且 MUST 留痕;真源 shared/definitions/dogfooding-definitions.md §1 | user | confirmed |
+| 机制修复 (Mechanism Fix) | mechanism fix, 机制侧修复, 最机智的修复 | 修补产生实例的**源头**(模板/生成命令注入规则/reconcile 流程/守护契约),下次执行对应命令时修复自然传播到本仓活动文件与全部下游项目;宪法 XI 规定非一次性工件的修复 MUST 落机制侧 | user | confirmed |
+| 框架项目 (Framework Project) | framework project, 框架源, 框架作者帽 | 作为 Spec Kit 源代码的仓库角色:skills/、templates/、scripts/、shared/、src/specify_cli/ 为框架源,经发布(git push/打包)供用户安装;影响所有客户项目的修复 MUST 落此侧 | user | confirmed |
+| 客户项目 (Client Project) | client project, 宿主项目, 框架用户帽 | 经 specify init 把框架装进自身 .specify/ 的任意项目;本仓库同时是自己的客户项目(自用运行时=本仓 .specify/,三副本拓扑之第二副本);对其运行副本的直接修改属客户侧问题修复,不传播 | user | confirmed |
