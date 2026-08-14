@@ -133,12 +133,38 @@ python3 .specify/scripts/python/feedback-utils.py --action package
   the user-configured `upstream_repo` in `index.json` > PEP 610 install metadata
   (`direct_url.json`, i.e. the git URL this custom spec-kit build was installed from) >
   none (then run `--action upstream --set <repo-url>` once). GitHub → attach the zip to
-  an issue; GitLab → issue attachment or an MR to the feedback intake directory.
+  an issue; GitLab → issue attachment or an MR adding the zip to the upstream repo's
+  feedback intake directory (`feedback/` at its root — see *Intake side* below).
 - The agent **never sends the zip** — delivery is entirely the user's manual action.
   After the batch is dealt with (sent or deliberately discarded), run `mark-submitted`.
 
 The `packages/` directory is not git-ignored: like the entries, a zip is user data, and
 whether to commit it is the user's call.
+
+## Intake side: the framework repo's `feedback/` directory
+
+The Spec Kit repo receives those bundles into a single central store — the root-level
+`feedback/` directory, one bundle per file:
+
+```
+feedback/
+  feedback-<ts>.zip   # kept exactly as `--action package` produced it (MANIFEST.md inside)
+  .gitignore          # `!feedback-*.zip` re-includes bundles against the root `*.zip` rule
+```
+
+Filenames are kept verbatim, which makes the store self-describing: the timestamp orders
+the bundles, and each `MANIFEST.md` still carries its reporting project's entry list, time
+range, spec-kit version, and install source. Because the root `.gitignore` ignores
+`*.zip`, the negation in `feedback/.gitignore` is what keeps arriving bundles
+version-tracked instead of silently uncommittable.
+
+**Process the pending bundles as one consolidated batch — never one zip at a time.**
+Reporters run different spec-kit versions in different environments, so entries from two
+bundles can assert conflicting facts about the same unit. Reading the whole directory
+before changing anything is what surfaces those conflicts, and it forces a single
+mechanism that fits every reporting environment rather than a fix shaped by whichever
+bundle happened to be opened first. The same rule is recorded for agents in the project
+instructions (`.specify/instructions.md` → Key Directories).
 
 ## Workaround lookup
 
