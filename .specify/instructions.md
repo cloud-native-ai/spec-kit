@@ -67,6 +67,39 @@ LLM token usage efficiency is a framework-level quality attribute. The full disc
 - **Summary-First (摘要优先)**: never inject the whole raw content of machine-managed data files (feedback, memory, evidence, history stores, run artifacts, inventories) into LLM context; consume digests, field projections, or targeted excerpts, escalating per the discipline doc's escalation ladder (exceptions: edit target, small-file threshold, recorded justification).
 - **Consumption Observation (消耗观察)**: at feedback wrap-up, self-assess avoidable token spend; findings carry the stable `token-efficiency` marker (retrievable via `feedback-utils.py --action list --contains token-efficiency`); never fabricate token counts.
 
+## Dogfooding Practice
+
+Dogfooding means the people who build a product also rely on it in their real daily work — developer and user tightly linked, often the same team — so a smooth **use → feedback → iterate** loop forms naturally. A project that provides development-assistance capabilities proves them the way a compiler proves itself by self-hosting: only a tool that performs well in its own engineering has earned the credibility to assist others. This section identifies two loops that already exist — it adds no new tools, steps, or storage.
+
+### Loop A — Feed your framework usage back upstream
+
+Real friction you hit while using the framework's commands and skills is valuable. The built-in feedback chain carries it upstream:
+
+1. **Record** — commands/skills self-record optimization points at wrap-up; you can also record friction you personally hit: `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "/speckit.<command>" --unit-type command --run-id "<id>" --review "<what happened>" --points "<suggestion>"` (unit-id must be `/speckit.<command>` or `skill:<name>`).
+2. **Threshold prompt** — check accumulation with `--action status`; when the count crosses the threshold, a consolidated prompt invites (never forces) submission.
+3. **Package** — `--action package` bundles pending entries into a local archive.
+4. **Manual submission** — delivering the archive to the framework's install-source repository is a deliberate, manual step. There is **no automatic transmission** of any feedback data; nothing leaves your machine unless you send it.
+
+### Loop B — Build the same loop for your own product
+
+The framework's shipped capabilities are enough to run a Dogfooding loop for **your own product** — no extra tooling required:
+
+| Capability | Role in your product's loop |
+|------------|-----------------------------|
+| Feedback engine (`feedback-utils.py`) | Record real-use findings about your product with `--unit-id "skill:<scenario-name>"` (unit-id accepts `/speckit.<command>` or `skill:<name>`); track accumulation with `--action status` / `--action list` |
+| Memory (session/knowledge) | Persist working notes and distilled lessons from real usage |
+| History | Distill past project conversations into reusable knowledge |
+| Review | Periodic retrospective checkpoint where findings are revisited |
+| Task records (tasks/verification) | Trace each finding to the iteration that addressed it |
+
+**Adoption advice (advisory — never a gate):**
+
+- **Staged rollout**: start with the core team first, then widen; forcing 100% usage of an immature product hurts more than it helps (over-idealization).
+- **Tailor to your product's shape**: if daily self-use is not suited to your product (embedded firmware, consumer hardware), substitute periodic real-environment drills or a designated proxy user group instead of forcing it.
+- **Anti-patterns to avoid**: *formalism* (going through the motions without real reliance), *echo chamber* (only builders participate — bring in non-technical roles), *dead-letter feedback* (findings recorded but never acted on — close or resolve every entry deliberately), *over-idealization* (mandating full usage regardless of maturity).
+
+The test of a healthy loop is simple: do team members rely on the product for real tasks, and does what they report visibly change the next iteration?
+
 ## Tech Stack & Resources
 - **Project Name**: spec-kit (distributed as `specify-cli`)
 - **Root Path**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
@@ -106,6 +139,27 @@ Note also: `.specify/memory/tools.md` (file) is the discovery inventory regenera
 - **Supported Agents**: Tier 1 (CLI 形态) — Claude Code, Codex CLI, Qoder CLI, opencode; Tier 2 (非 CLI 形态) — Hermes Agent, GitHub Copilot. The canonical list lives in `AGENT_CONFIG` / `_ASSISTANT_TIERS` in `src/specify_cli/__init__.py`.
 - **Agent-specific configuration & CLI arguments**: For any tool-specific configuration, command-line arguments, authentication, or installation details, consult the **official documentation** — do not guess flags or config keys. Start from `docs/reference/cli/supported-agent-tools.md`, which links each tool's official docs source; verify deeper specifics against the upstream documentation.
 - **Instructions Refresh**: Run `/speckit.instructions` to regenerate this file and compatibility symlinks.
+
+## Spec Kit Framework Map
+
+This file is a **map, not a manual**: it tells you *what* exists and *where* it lives; the *how* belongs to the documents each row points to. The framework state lives under `.specify/`:
+
+| What | Where | Notes (what lives there — not how to use it) |
+|------|-------|-----------------------------------------------|
+| Project memory | `.specify/memory/` | constitution, features index + `features/<ID>.md`, glossary, `tools/` records, feedback store |
+| Artifact templates | `.specify/templates/` | requirements/plan/tasks/commands templates rendered by `/speckit.*` |
+| Automation scripts | `.specify/scripts/` | bash/python engines invoked by commands and skills |
+| Installed skills | `.specify/skills/` | one directory per skill (`SKILL.md` + references/ + scripts/) |
+| **Agent Templates** | `.specify/agents/templates/` | capability descriptions — shipped role set installed by `specify init`; each `.agent.md` is self-contained |
+| **Agent Instances** | `.specify/agents/instances/` | responsibility-bound agents authored in this project; reference a Template |
+| **Agent Execution** | `.specify/agents/execution/` | dispatch `configs/` + `scripts/` (tracked); runtime `logs/` (gitignored, never committed) |
+| Teams | `.specify/teams/<slug>/` | team definitions + `runs/` reports; run intermediates in git-ignored `.work/` |
+| Shared definitions & conventions | `.specify/shared/` | canonical concept docs — e.g. agent taxonomy (`definitions/agent-definitions.md`), subagent modes (`definitions/subagent-definitions.md`), tool definitions, workflow conventions |
+| Feature specs | `.specify/specs/<ID>-<slug>/` | requirements / plan / tasks / verification per feature |
+| This file | `.specify/instructions.md` | canonical AI instructions; per-tool files are symlinks |
+| [Other project-specific location] | [Path] | [What lives there] |
+
+> Agent layer taxonomy (Template → Instance → Execution) is defined once in `.specify/shared/definitions/agent-definitions.md` — consult it before creating/refining/running agents.
 
 ## Spec Kit Runtime & Symlink Model
 - **Canonical instructions file**: `.specify/instructions.md` is the single source of truth for project-level AI instructions. Compatibility files such as `.github/copilot-instructions.md`, `CLAUDE.md`, `QODER.md`, and `AGENTS.md` are symlinks to this file. **Consumer note**: Qoder **CLI** (`qodercli`) loads the root `AGENTS.md` (plus `.qoder/rules/**/*.md`, additively — no documented override priority); `.qoder/project_rules.md` is the Qoder **IDE**'s old format, kept only for IDE compatibility and never read by the CLI. All aliases point at the same canonical file, so no divergence is possible.
@@ -193,4 +247,3 @@ Use this machine-maintained section to track reusable resource identifiers creat
 | refresh-tools.sh | <TOOL:.specify/memory/tools/refresh-tools.sh.md> | project-script | scripts/bash/refresh-tools.sh | refresh-tools | Verified | 2026-07-30 | Discovery engine: enumerates system binaries, shell functions, and project scripts and emits a unified JSON inventory. | <TOOL:.specify/memory/tools/refresh-tools.sh.md> | .specify/memory/tools/refresh-tools.sh.md |
 | sync-mirrors.py | <TOOL:.specify/memory/tools/sync-mirrors.py.md> | project-script | scripts/python/sync-mirrors.py | sync-mirrors | Verified | 2026-07-30 | Single-source mirror sync engine: fans canonical templates/skills/agents/scripts/shared out to .specify mirrors and regenerates per-tool command copies in one command. | <TOOL:.specify/memory/tools/sync-mirrors.py.md> | .specify/memory/tools/sync-mirrors.py.md |
 <!-- TOOLS_REGISTRY_END -->
-

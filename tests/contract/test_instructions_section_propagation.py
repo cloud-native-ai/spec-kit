@@ -59,6 +59,12 @@ def test_c2_generator_injects_missing_sections_additively(tmp_path: Path):
         encoding="utf-8",
     )
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    # refresh-tools.sh (invoked by the generator) resolves tools-utils.py from
+    # the project root — mirror a real installed project's layout.
+    specify_py = tmp_path / ".specify" / "scripts" / "python"
+    specify_py.mkdir(parents=True, exist_ok=True)
+    (specify_py / "tools-utils.py").symlink_to(
+        REPO_ROOT / "scripts" / "python" / "tools-utils.py")
 
     result = subprocess.run(
         ["bash", str(GENERATOR)], cwd=tmp_path, capture_output=True, text=True
