@@ -70,6 +70,7 @@ content from the user.
      [--feature-id "<Feature-registry-ID-if-any>"] \
      --review "<review prose>" --points-file "<points file>"
    ```
+   Probe attribution (req 041): the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
    Identifier discipline: `--feature` carries the **requirement key** (e.g.
    `038-goal-target`); `--feature-id` carries the **Feature registry ID** (e.g.
    `041`). Different number spaces — never overload one field with both.
@@ -141,7 +142,8 @@ workaround applied. This is a read-only aid — it never gates execution.
   top of the canonical block MUST be kept verbatim; detection semantics live in
   `.specify/shared/workflow/runtime-mode.md`. Commands (`/speckit.*`) only ever run
   inside a Spec Kit project, so the gate is a no-op for them.
-- **Skills**: `--unit-id "skill:<name>"`, `--unit-type skill`. The section is the last
+- **Skills**: `--unit-id "skill:<name>"`, `--unit-type skill`.
+- **External custom units** (host-project skills/agents/commands with an injected `ext-*` probe): `--unit-id custom:<owner>/<name>`, `--unit-type custom-unit`. Entries stay host-project-local (never packaged upstream) — see `/speckit.feedback` Mode 3. The section is the last
   workflow section of `SKILL.md`.
 - **Complex commands**: `--unit-id "/speckit.<command>"`, `--unit-type command`. Place the
   section next to `## Optional: Git Commit`, never mid-flow.

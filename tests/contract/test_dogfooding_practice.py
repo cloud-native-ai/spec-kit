@@ -99,7 +99,7 @@ def test_c7_deviation_log_location():
 SECTION_HEADING = "## Dogfooding Practice"
 # Amended by requirement 041-refactor-feedback-probe: the engine action set
 # legitimately grows (probes + map/cleanup/migrate-legacy/probe-inject as they land).
-ENGINE_ACTIONS = {"record", "status", "list", "dispose", "mark-submitted", "reindex", "package", "upstream", "probes", "map", "cleanup", "migrate-legacy"}
+ENGINE_ACTIONS = {"record", "status", "list", "dispose", "mark-submitted", "reindex", "package", "upstream", "probes", "map", "cleanup", "migrate-legacy", "probe-inject"}
 # Project identifiers that MUST NOT leak into a project-neutral shared section.
 FORBIDDEN = ["spec-kit", "specify-cli", "specify_cli", "Feature 036", "032-dogfooding-practice", "cloud-native-ai"]
 

@@ -171,14 +171,14 @@
 
 ### Tests for User Story 6 (MANDATORY) ⚠️
 
-- [ ] T026 [US6] [blockedBy: T004] 编写失败测试:在 `test_feedback_probe_cli.py` 追加 probe-inject 用例(`ext-` 前缀派生、冲突 exit 2、`custom:` unit 语法;engine-cli C-6)与 package 排除用例(外部条目 0 入包、`excluded_external` 计数、MANIFEST probe/slice 列;engine-cli C-4)
+- [X] T026 [US6] [blockedBy: T004] 编写失败测试:在 `test_feedback_probe_cli.py` 追加 probe-inject 用例(`ext-` 前缀派生、冲突 exit 2、`custom:` unit 语法;engine-cli C-6)与 package 排除用例(外部条目 0 入包、`excluded_external` 计数、MANIFEST probe/slice 列;engine-cli C-4)
 
 ### Implementation for User Story 6
 
-- [ ] T027 [US6] [blockedBy: T026] 实现 `--action probe-inject --unit custom:<owner>/<name> [--lifecycle-point] --notes-file`:写 `.specify/memory/feedback/probes/ext-<slug>.md`(registry C-4 schema),注入即入合并真源
-- [ ] T028 [US6] [blockedBy: T027] 实现 package 外部排除 + MANIFEST 增列(probe/slice)+ JSON 输出 `excluded_external` 计数(engine-cli C-4);record 支持 `custom:` unit(`unit_type=custom-unit`,entry-schema C-3)
-- [ ] T029 [US6] [blockedBy: T013] 更新 canonical 步骤 `shared/workflow/feedback-step.md`:record 经 probe 自动解析的说明、外部自定义单元的记录指引;**同步受牵连的内嵌副本**(canonical 块要求逐字内嵌——覆盖 plan.md Mirror Obligations 行 5):受措辞改动影响的 18 个 `templates/commands/*.md` 内嵌 `## Feedback` 节与 31 个 `skills/*/SKILL.md` 内嵌节同批更新,经 `python3 scripts/python/sync-mirrors.py --write` 再生 `.specify/` 镜像与各工具命令副本,逐副本 grep 新措辞核对(与 T019/T031 的镜像写操作串行执行,避免 `--write` 竞争)
-- [ ] T030 [US6] [blockedBy: T028, T011] 手动 QA(quickstart §3~4):scratch 项目注入样例外部 probe → 模式一总览与 `--action map` 均含 `ext-*` 对象 → 记录一条外部条目 → package 后 `unzip -p <zip> '*.md' | grep -c '^kind: external'` 断言 0 并核 MANIFEST 无 external 行(与 GATE-6 同口径);证据存 `verification-scratch/sc-008.txt`
+- [X] T027 [US6] [blockedBy: T026] 实现 `--action probe-inject --unit custom:<owner>/<name> [--lifecycle-point] --notes-file`:写 `.specify/memory/feedback/probes/ext-<slug>.md`(registry C-4 schema),注入即入合并真源
+- [X] T028 [US6] [blockedBy: T027] 实现 package 外部排除 + MANIFEST 增列(probe/slice)+ JSON 输出 `excluded_external` 计数(engine-cli C-4);record 支持 `custom:` unit(`unit_type=custom-unit`,entry-schema C-3)
+- [X] T029 [US6] [blockedBy: T013] 更新 canonical 步骤 `shared/workflow/feedback-step.md`:record 经 probe 自动解析的说明、外部自定义单元的记录指引;**同步受牵连的内嵌副本**(canonical 块要求逐字内嵌——覆盖 plan.md Mirror Obligations 行 5):受措辞改动影响的 18 个 `templates/commands/*.md` 内嵌 `## Feedback` 节与 31 个 `skills/*/SKILL.md` 内嵌节同批更新,经 `python3 scripts/python/sync-mirrors.py --write` 再生 `.specify/` 镜像与各工具命令副本,逐副本 grep 新措辞核对(与 T019/T031 的镜像写操作串行执行,避免 `--write` 竞争)
+- [X] T030 [US6] [blockedBy: T028, T011] 手动 QA(quickstart §3~4):scratch 项目注入样例外部 probe → 模式一总览与 `--action map` 均含 `ext-*` 对象 → 记录一条外部条目 → package 后 `unzip -p <zip> '*.md' | grep -c '^kind: external'` 断言 0 并核 MANIFEST 无 external 行(与 GATE-6 同口径);证据存 `verification-scratch/sc-008.txt`
 
 **Checkpoint**: US6 独立可测——Loop B 本地反馈环闭合
 

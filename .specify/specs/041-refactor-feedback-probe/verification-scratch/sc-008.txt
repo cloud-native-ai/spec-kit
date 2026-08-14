@@ -1,0 +1,14 @@
+== inject external probe ==
+injected: ext-myteam-deploy-skill | rc: 0
+
+== mode-1 overview + map include it ==
+overview contains ext object: True
+map contains ext object: True | map marks external: True
+
+== record internal + external, package, assert exclusion ==
+external filter count: 1
+package: .specify/memory/feedback/packages/feedback-20260814T184140Z.zip | packaged: 1 | excluded_external: 1
+kind:external occurrences in zip CONTENT (expect 0): 0
+ext object in MANIFEST (expect False): False
+
+QA VERDICT (SC-008 external isolation): True

@@ -392,3 +392,81 @@ class TestMigrateLegacy:
             "--workspace-root", str(probe_workspace),
         ])
         assert rc == 2
+
+
+@pytest.mark.contract
+class TestProbeInjectAndExclusion:
+    def test_probe_inject_writes_ext_file_and_enters_merged_view(
+        self, probe_workspace: Path, capsys
+    ):
+        notes = probe_workspace / "notes.md"
+        notes.write_text("Collect deploy friction for our custom skill.\n",
+                         encoding="utf-8")
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "probe-inject", "--unit", "custom:myteam/deploy-skill",
+            "--notes-file", str(notes),
+            "--format", "json", "--workspace-root", str(probe_workspace),
+        ])
+        out = json.loads(capsys.readouterr().out)
+        assert rc == 0
+        assert out["object_id"].startswith("ext-")
+        ext_file = (probe_workspace / ".specify" / "memory" / "feedback"
+                    / "probes" / f"{out['object_id']}.md")
+        assert ext_file.is_file()
+        # merged view + map now include it
+        capsys.readouterr()
+        feedback_utils.main([
+            "--action", "probes", "--format", "json",
+            "--workspace-root", str(probe_workspace)])
+        listing = json.loads(capsys.readouterr().out)
+        assert any(o["object_id"] == out["object_id"]
+                   and o["kind"] == "external" for o in listing["objects"])
+        capsys.readouterr()
+        feedback_utils.main([
+            "--action", "map", "--workspace-root", str(probe_workspace)])
+        map_text = (probe_workspace / ".specify" / "memory" / "feedback"
+                    / "probe-map.md").read_text(encoding="utf-8")
+        assert out["object_id"] in map_text
+
+    def test_probe_inject_conflict_exit2(self, probe_workspace: Path, capsys):
+        notes = probe_workspace / "notes.md"
+        notes.write_text("x\n", encoding="utf-8")
+        args = ["--action", "probe-inject", "--unit", "custom:myteam/deploy",
+                "--notes-file", str(notes), "--workspace-root", str(probe_workspace)]
+        capsys.readouterr()
+        assert feedback_utils.main(args) == 0
+        capsys.readouterr()
+        assert feedback_utils.main(args) == 2
+
+    def test_package_excludes_external_entries(
+        self, probe_workspace: Path, capsys, tmp_path: Path
+    ):
+        probes = (probe_workspace / ".specify" / "memory" / "feedback" / "probes")
+        probes.mkdir(parents=True, exist_ok=True)
+        (probes / "ext-myteam-deploy-wrapup.md").write_text(
+            "---\nobject_id: ext-myteam-deploy-wrapup\n"
+            "class_id: external-custom\nunit: custom:myteam/deploy-skill\n"
+            "lifecycle_point: wrap-up\n---\n", encoding="utf-8")
+        assert _record_entry(probe_workspace, "/speckit.plan", "command", "in-1") == 0
+        assert _record_entry(
+            probe_workspace, "custom:myteam/deploy-skill", "custom-unit", "ext-1") == 0
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "package", "--format", "json",
+            "--workspace-root", str(probe_workspace),
+        ])
+        out = json.loads(capsys.readouterr().out)
+        assert rc == 0
+        assert out["excluded_external"] == 1
+        assert out["packaged"] == 1
+        import zipfile
+        zip_path = probe_workspace / out["zip"]
+        with zipfile.ZipFile(zip_path) as zf:
+            contents = zf.read(
+                [n for n in zf.namelist() if n.endswith(".md")
+                 and n != "MANIFEST.md"][0]).decode("utf-8")
+            manifest = zf.read("MANIFEST.md").decode("utf-8")
+        assert "kind: \"external\"" not in contents
+        assert "ext-myteam-deploy-wrapup" not in manifest
+        assert "speckit-plan-wrapup" in manifest  # probe column present

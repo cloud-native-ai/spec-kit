@@ -669,8 +669,8 @@ def write_package(
         f"- **Install source**: {upstream.get('url') or 'unknown'}"
         + (f" @ {upstream['commit']}" if upstream.get("commit") else ""),
         "",
-        "| Created | Unit | Partial | Summary |",
-        "|---------|------|---------|---------|",
+        "| Created | Unit | Partial | Probe | Slice | Summary |",
+        "|---------|------|---------|-------|-------|---------|",
     ]
     missing: List[str] = []
     packaged: List[str] = []
@@ -685,7 +685,8 @@ def write_package(
             summary = str(entry.get("summary", "")).replace("|", "\\|")[:120]
             manifest_lines.append(
                 f"| {entry.get('created', '-')} | {entry.get('unit_id', '?')} "
-                f"| {entry.get('partial', False)} | {summary} |"
+                f"| {entry.get('partial', False)} | {entry.get('probe', '-') or '-'} "
+                f"| {entry.get('slice', '-') or '-'} | {summary} |"
             )
         zf.writestr("MANIFEST.md", "\n".join(manifest_lines) + "\n")
         if notes and notes.strip():
@@ -701,7 +702,12 @@ def write_package(
 
 
 def action_package(args: argparse.Namespace) -> Dict[str, Any]:
-    """Zip pending entries for manual delivery. Source files are never touched."""
+    """Zip pending entries for manual delivery. Source files are never touched.
+
+    External entries (``kind: external``) are host-project-local by contract
+    (engine-cli C-4): they are excluded from the upstream package and only
+    surfaced as an ``excluded_external`` count.
+    """
     workspace_root = resolve_workspace_root(args.workspace_root)
     index = load_index(workspace_root)
     submitted_at = index.get("submitted_at")
@@ -711,8 +717,11 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
     else:
         selected = list(entries)
     selected.sort(key=lambda e: e.get("created", ""))
+    excluded_external = sum(1 for e in selected if e.get("kind") == "external")
+    selected = [e for e in selected if e.get("kind") != "external"]
 
     result = write_package(workspace_root, index, selected)
+    result["excluded_external"] = excluded_external
     if not result.get("zip"):
         result["upstream"] = detect_upstream(index)
         return result
@@ -1227,6 +1236,68 @@ def action_migrate_legacy(args: argparse.Namespace) -> Dict[str, Any]:
     }
 
 
+def action_probe_inject(args: argparse.Namespace) -> Dict[str, Any]:
+    """Mode 3 (req 041, engine-cli C-6): inject an external probe for a
+    host-project custom unit into the project-side registry."""
+    workspace_root = resolve_workspace_root(args.workspace_root)
+    unit = ((getattr(args, "unit", None) or getattr(args, "unit_id", None) or "")).strip()
+    if not _CUSTOM_UNIT_RE.match(unit):
+        raise FeedbackError("--unit must match custom:<owner>/<name>.")
+    registry = load_probe_registry(workspace_root)
+    if not registry["available"]:
+        raise FeedbackError(f"probe registry not found: {probe_defs_path(workspace_root)}")
+    external_classes = [c for c in registry["classes"]
+                        if c.get("kind") == "external" and c.get("class_id")]
+    if not external_classes:
+        raise FeedbackError("registry declares no kind=external class to instantiate.")
+    class_id = external_classes[0]["class_id"]
+    lifecycle = (getattr(args, "lifecycle_point", None) or "wrap-up").strip()
+
+    slug = _SLUG_RE.sub("-", unit.removeprefix("custom:")).strip("-")
+    object_id = f"ext-{slug}"
+    probes_dir = feedback_dir(workspace_root) / EXTERNAL_PROBES_DIRNAME
+    probes_dir.mkdir(parents=True, exist_ok=True)
+    target = probes_dir / f"{object_id}.md"
+    if target.exists():
+        raise FeedbackError(
+            f"probe object already exists: {object_id} ({target.name})")
+
+    notes = ""
+    notes_file = getattr(args, "notes_file", None)
+    if notes_file:
+        notes = Path(notes_file).read_text(encoding="utf-8").strip()
+    elif getattr(args, "notes", None):
+        notes = str(args.notes).strip()
+
+    meta = {
+        "object_id": object_id,
+        "class_id": class_id,
+        "unit": unit,
+        "lifecycle_point": lifecycle,
+    }
+    fm = "\n".join(f"{k}: {json.dumps(v, ensure_ascii=False)}"
+                   for k, v in meta.items())
+    target.write_text(
+        f"---\n{fm}\n---\n\n{notes or 'External probe for a host-project custom unit.'}\n",
+        encoding="utf-8",
+    )
+    # validate the registry still passes with the new object
+    recheck = load_probe_registry(workspace_root)
+    if recheck["errors"]:
+        target.unlink(missing_ok=True)
+        raise FeedbackError(
+            "injection would invalidate the registry:\n- "
+            + "\n- ".join(recheck["errors"]))
+    return {
+        "object_id": object_id,
+        "class_id": class_id,
+        "path": (FEEDBACK_SUBDIR / EXTERNAL_PROBES_DIRNAME
+                 / f"{object_id}.md").as_posix(),
+        "note": "external probe feedback stays host-project-local; "
+                "it is excluded from upstream packages.",
+    }
+
+
 # --------------------------------------------------------------------------- #
 # Rendering / CLI
 # --------------------------------------------------------------------------- #
@@ -1310,11 +1381,17 @@ def build_parser() -> argparse.ArgumentParser:
         "--action",
         required=True,
         choices=["record", "status", "list", "dispose", "mark-submitted", "reindex",
-                 "package", "cleanup", "upstream", "probes", "map", "migrate-legacy"],
+                 "package", "cleanup", "upstream", "probes", "map", "migrate-legacy", "probe-inject"],
     )
     parser.add_argument("--package", default=None,
                         help="cleanup: path to the package zip (workspace-"
                              "relative or absolute), or 'latest'")
+    parser.add_argument("--unit", default=None,
+                        help="probe-inject: target custom unit custom:<owner>/<name>")
+    parser.add_argument("--lifecycle-point", default=None,
+                        help="probe-inject: lifecycle point (default wrap-up)")
+    parser.add_argument("--notes-file", default=None,
+                        help="probe-inject: collection-intent note file")
     parser.add_argument("--plan-file", default=None,
                         help="migrate-legacy: approved disposition plan, one "
                              "'<entry-id> -> delete|re-register' per line")
@@ -1388,6 +1465,7 @@ _ACTIONS = {
     "map": action_map,
     "cleanup": action_cleanup,
     "migrate-legacy": action_migrate_legacy,
+    "probe-inject": action_probe_inject,
 }
 
 
