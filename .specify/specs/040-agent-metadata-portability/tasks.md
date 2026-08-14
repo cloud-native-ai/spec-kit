@@ -103,12 +103,12 @@ Task State Sigil:`[ ]` 待做 / `[X]` 完成 / `[~]` 延迟(须在 Notes 说明)
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T023 [US4] [blockedBy: T020] 扩展 `tests/contract/test_agent_render_migration.py` 与 `tests/integration/test_init_agents.py`:旧逐文件链接项目 → init 后零链接(R-8);手改 → 备份 + 覆盖 + 反馈含备份路径(R-5);中立源删除 → 清理且手改先备份(R-6);清单外无源文件 → 不触碰;工具 A→B 切换隔离(R-7);SC-006 端到端场景
+- [X] T023 [US4] [blockedBy: T020] 扩展 `tests/contract/test_agent_render_migration.py` 与 `tests/integration/test_init_agents.py`:旧逐文件链接项目 → init 后零链接(R-8);手改 → 备份 + 覆盖 + 反馈含备份路径(R-5);中立源删除 → 清理且手改先备份(R-6);清单外无源文件 → 不触碰;工具 A→B 切换隔离(R-7);SC-006 端到端场景
 
 ### Implementation for User Story 4
 
-- [ ] T024 [US4] [blockedBy: T023] 在 `src/specify_cli/__init__.py` 补齐漂移/备份/清理实现(`.specify/agents/.backups/<tool>/<name>.<UTC-compact>.agent.md` 命名、init 反馈列备份)使 T023 全绿
-- [ ] T025 [US4] [blockedBy: T024] 在临时目录按 quickstart.md §4 手工演练手改→再渲染→取回,核对 SC-006 两计数为 0
+- [X] T024 [US4] [blockedBy: T023] 在 `src/specify_cli/__init__.py` 补齐漂移/备份/清理实现(`.specify/agents/.backups/<tool>/<name>.<UTC-compact>.agent.md` 命名、init 反馈列备份)使 T023 全绿
+- [X] T025 [US4] [blockedBy: T024] 在临时目录按 quickstart.md §4 手工演练手改→再渲染→取回,核对 SC-006 两计数为 0
 
 ## Phase 7: User Story 5 - 三目录差别成文与迁移落位 (Priority: P2)
 

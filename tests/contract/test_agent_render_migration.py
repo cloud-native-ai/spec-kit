@@ -111,3 +111,24 @@ def test_execution_layer_never_rendered(tmp_path):
 
     names = {p.name for p in (root / ".qoder" / "agents").iterdir()}
     assert names == {"alpha.agent.md"}
+
+
+def test_r7_tool_switch_keeps_previous_tool_outputs(tmp_path):
+    root = _seed(tmp_path)
+    render_agents_for_tool(root, "qoder")
+    qoder_output = root / ".qoder" / "agents" / "alpha.agent.md"
+    assert qoder_output.is_file()
+
+    render_agents_for_tool(root, "claude")
+
+    assert qoder_output.is_file(), (
+        "rendering for a second tool must not prune the first tool's outputs (R-7)"
+    )
+    assert (root / ".claude" / "agents" / "alpha.md").is_file()
+    import json as _json
+
+    manifest = _json.loads(
+        (root / ".specify" / "agents" / ".render-manifest.json").read_text()
+    )
+    assert any(k.startswith(".qoder/") for k in manifest["entries"])
+    assert any(k.startswith(".claude/") for k in manifest["entries"])

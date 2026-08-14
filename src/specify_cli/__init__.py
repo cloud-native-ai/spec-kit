@@ -503,10 +503,15 @@ def render_agents_for_tool(project_path, tool, tracker=None):
     definitions = load_project_agent_definitions(project_path)
     target_dir = project_path / row["target_dir"]
 
-    # Legacy migration: a whole-dir symlink at the target is removed first.
+    # Legacy migration: a whole-dir symlink at the target is removed first,
+    # then every legacy per-file symlink in the dir (even dangling ones whose
+    # source slug is gone) — real files are left for drift handling below.
     if target_dir.is_symlink():
         target_dir.unlink()
     target_dir.mkdir(parents=True, exist_ok=True)
+    for entry in sorted(target_dir.iterdir()):
+        if entry.is_symlink():
+            entry.unlink()
 
     manifest_path = project_path / ".specify" / "agents" / _AGENT_MANIFEST_NAME
     manifest = {"version": 1, "tool": tool, "rendered_at": "", "entries": {}}
@@ -580,9 +585,16 @@ def render_agents_for_tool(project_path, tool, tracker=None):
         }
         stats["rendered"] += 1
 
-    # Prune stale outputs (source removed). Modified ones are backed up first.
+    # Prune stale outputs (source removed) — scoped to THIS tool's target
+    # dir; other tools' entries are carried forward untouched (R-7).
+    scope_prefix = row["target_dir"] + "/"
+    carried_entries = {
+        rel_path: entry
+        for rel_path, entry in previous_entries.items()
+        if not rel_path.startswith(scope_prefix)
+    }
     for rel_path, entry in previous_entries.items():
-        if rel_path in new_entries:
+        if rel_path in new_entries or not rel_path.startswith(scope_prefix):
             continue
         stale = project_path / rel_path
         if stale.is_symlink():
@@ -596,7 +608,7 @@ def render_agents_for_tool(project_path, tool, tracker=None):
         "version": 1,
         "tool": tool,
         "rendered_at": _utc_compact_stamp(),
-        "entries": new_entries,
+        "entries": {**carried_entries, **new_entries},
     }
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
