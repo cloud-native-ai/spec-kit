@@ -56,7 +56,7 @@
 
 ## 最终产出 / 现状
 
-- **014**(commit `c1fbe21`,fast-forward 合入 master):`.specify/agents/` 权威 + 目录级 symlink;`ensure_specify_symlink()`;`specify init` 预置 bundled agents;spec `.specify/specs/014-agent-framework-refactor/`。
+- **014**(commit `c1fbe21`,fast-forward 合入 master):`.specify/agents/` 权威 + 目录级 symlink;`ensure_specify_symlink()`;`specify init` 预置 bundled agents;spec `.specify/archive/spec/014-agent-framework-refactor/`。
 - **015**(commit `f95f425` 等):6 个 `agent-role-*` 模板 + create-agent/improve-agent skill;删 4 个 legacy 模板;`templates/commands/agents.md` Mode A/B;78 测试通过;spec `015-role-based-agents/`。
 - **264ad40c**:删 `agents/code-reviewer.agent.md` + 运行时副本;module-designer 模板加 Review step 5 与 Code Review 输出段;测试 fixture 改用泛化名。
 - **022**(commit `f261cea`/后续):6 个角色模板加 `supervisor: true` + `role-scope:`;`templates/agent-supervision-delegation.md`;`templates/agent-subrole-{executor,evaluator,improver}-template.md` + `agent-triad-orchestration-template.md`;`docs/eei-triad-pattern.md`;create-agent 加 Capability Matrix(role·supervisor·triad·custom);spec `022-eei-agent-triad/`。EEI 三元组的抽象来自 draw-plantuml 优化的三角色循环,详见 [[04-draw-plantuml-optimization]]。

@@ -11,10 +11,14 @@ import pytest
 from specify_cli import _OFFICIAL_ASSISTANT_KEYS
 
 ROOT = Path(__file__).resolve().parents[2]
+# Spec 011 archived 2026-08-15 (.specify/archive/spec/, full-specs audit) as
+# superseded — but this OpenAPI-style contract stays LIVE: it pins the official
+# assistant enum against src/specify_cli, so the test follows the archive home.
 CONTRACT = (
     ROOT
     / ".specify"
-    / "specs"
+    / "archive"
+    / "spec"
     / "011-ai-tools-support"
     / "contracts"
     / "ai-tools-support.openapi.yaml"
