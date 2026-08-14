@@ -19,7 +19,7 @@
 - DoD-5: docs/reference/commands/feedback.md 新增、docs/reference/skills/feedback.md 分类表更新(18→19)
 - DoD-6: 本仓库旧格式反馈条目迁移完成(legacy_remaining=0)且 migration-log.md 留痕
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Completion Gate
 
@@ -188,10 +188,10 @@
 
 **Purpose**: 跨 story 收敛与全仓一致性
 
-- [ ] T031 [blockedBy: T008, T015, T019, T029] 全仓镜像终检:`python3 scripts/python/sync-mirrors.py --check` exit 0(覆盖 plan.md Mirror Obligations 已触发的各行;行 5 的「再生副本含编辑」由 T029 的逐副本 grep 核验承担,`--check` 不提供该证明)
-- [ ] T032 [blockedBy: T021, T025, T030] 全量 suite 复跑并与 T001 基线按名比对,零新增失败;记录到 verification-scratch
-- [ ] T033 [P] 刷新工具记录 `.specify/memory/tools/feedback-utils.py.md`:新增 5 动作与新旗标入 Parameters/Behavioral Rules,Discovery Notes 记复验日期
-- [ ] T034 [blockedBy: T031, T032] 撰写 `.specify/specs/041-refactor-feedback-probe/verification.md`(SC-001~008 逐条状态+证据路径);更新 `features/028.md`(Implemented 描述扩展)与 `features.md` 行 Notes(交付记录)
+- [X] T031 [blockedBy: T008, T015, T019, T029] 全仓镜像终检:`python3 scripts/python/sync-mirrors.py --check` exit 0(覆盖 plan.md Mirror Obligations 已触发的各行;行 5 的「再生副本含编辑」由 T029 的逐副本 grep 核验承担,`--check` 不提供该证明)
+- [X] T032 [blockedBy: T021, T025, T030] 全量 suite 复跑并与 T001 基线按名比对,零新增失败;记录到 verification-scratch
+- [X] T033 [P] 刷新工具记录 `.specify/memory/tools/feedback-utils.py.md`:新增 5 动作与新旗标入 Parameters/Behavioral Rules,Discovery Notes 记复验日期
+- [X] T034 [blockedBy: T031, T032] 撰写 `.specify/specs/041-refactor-feedback-probe/verification.md`(SC-001~008 逐条状态+证据路径);更新 `features/028.md`(Implemented 描述扩展)与 `features.md` 行 Notes(交付记录)
 
 ---
 

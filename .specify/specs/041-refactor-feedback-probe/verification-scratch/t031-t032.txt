@@ -1,0 +1,4 @@
+== T031/T032 final gates ==
+sync-mirrors --check: exit 0
+suite: # failed-name list written: /tmp/cur8.txt (38 entries)
+new failures vs baseline: 0
