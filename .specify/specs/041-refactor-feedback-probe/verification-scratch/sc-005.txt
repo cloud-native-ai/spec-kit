@@ -1,0 +1,16 @@
+== SC-005: legacy migration (user-confirmed all-delete, 2026-08-14) ==
+deleted: 140 | re_registered: 0 | legacy_remaining: 0
+
+== status after ==
+{
+  "count_since_submission": 0,
+  "threshold": 10,
+  "should_prompt": false,
+  "total_entries": 0,
+  "submitted_at": "2026-08-14T07:47:34Z",
+  "legacy_remaining": 0,
+  "external_count": 0
+}
+
+migration-log rows: 140
+active legacy files left: 0

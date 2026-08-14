@@ -175,7 +175,7 @@ def _scalar(value: str) -> Any:
 def dump_frontmatter(meta: Dict[str, Any]) -> str:
     order = ["id", "unit_id", "unit_type", "run_id", "scope",
              "probe", "kind", "slice",
-             "feature", "feature_id", "disposition", "partial", "created", "summary"]
+             "feature", "feature_id", "disposition", "migrated_from", "partial", "created", "summary"]
     lines = ["---"]
     for key in order:
         if key not in meta:
@@ -409,12 +409,15 @@ def action_status(args: argparse.Namespace) -> Dict[str, Any]:
     index = load_index(workspace_root)
     threshold = resolve_threshold(args.threshold, index.get("threshold"))
     count = index.get("count_since_submission", 0)
+    entries = index.get("entries", [])
     return {
         "count_since_submission": count,
         "threshold": threshold,
         "should_prompt": should_prompt(count, threshold),
-        "total_entries": len(index.get("entries", [])),
+        "total_entries": len(entries),
         "submitted_at": index.get("submitted_at"),
+        "legacy_remaining": sum(1 for e in entries if not e.get("probe")),
+        "external_count": sum(1 for e in entries if e.get("kind") == "external"),
     }
 
 
@@ -1126,6 +1129,104 @@ def action_cleanup(args: argparse.Namespace) -> Dict[str, Any]:
     }
 
 
+MIGRATION_LOG_NAME = "migration-log.md"
+
+
+def action_migrate_legacy(args: argparse.Namespace) -> Dict[str, Any]:
+    """One-shot legacy-entry convergence (req 041, engine-cli C-8).
+
+    The plan file (agent-produced, user-confirmed) carries one directive per
+    line: ``<entry-id> -> delete | re-register``. The engine only executes;
+    it never decides dispositions itself. Every outcome lands in
+    ``migration-log.md``.
+    """
+    workspace_root = resolve_workspace_root(args.workspace_root)
+    plan_path = Path(getattr(args, "plan_file", "") or "")
+    if not str(plan_path):
+        raise FeedbackError("--plan-file is required.")
+    if not plan_path.is_absolute():
+        plan_path = workspace_root / plan_path
+    if not plan_path.is_file():
+        raise FeedbackError(f"plan file not found: {plan_path}")
+
+    registry = load_probe_registry(workspace_root)
+    if not registry["available"]:
+        raise FeedbackError(f"probe registry not found: {probe_defs_path(workspace_root)}")
+
+    directives: List[Tuple[str, str]] = []
+    for raw in plan_path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "->" not in line:
+            raise FeedbackError(f"unparsable plan line: {raw!r}")
+        entry_id, _, action = (part.strip() for part in line.partition("->"))
+        action = action.split("#", 1)[0].strip()  # tolerate inline comments
+        entry_id = entry_id.split("#", 1)[0].strip()
+        if action not in ("delete", "re-register"):
+            raise FeedbackError(f"unknown disposition {action!r} for {entry_id}")
+        directives.append((entry_id, action))
+
+    index = load_index(workspace_root)
+    by_id = {e.get("id"): e for e in index.get("entries", [])}
+    unknown = [eid for eid, _ in directives if eid not in by_id]
+    if unknown:
+        raise FeedbackError("plan references unknown entry ids: " + ", ".join(unknown))
+
+    store = feedback_dir(workspace_root)
+    deleted: List[str] = []
+    re_registered: List[str] = []
+    log_lines = [f"## {now_iso()} — plan {plan_path.name}"]
+    for entry_id, action in directives:
+        entry = by_id[entry_id]
+        entry_file = store / entry["file"]
+        if action == "delete":
+            if entry_file.is_file():
+                entry_file.unlink()
+            index["entries"] = [e for e in index["entries"] if e.get("id") != entry_id]
+            deleted.append(entry_id)
+            log_lines.append(
+                f"- {entry_id} | delete | rationale: per approved plan | "
+                f"unit {entry.get('unit_id', '?')}")
+        else:  # re-register in place with probe attribution
+            if not entry_file.is_file():
+                raise FeedbackError(f"entry file missing for re-register: {entry_id}")
+            meta, body = parse_frontmatter(entry_file.read_text(encoding="utf-8"))
+            probe = resolve_probe(registry, str(meta.get("unit_id", "")))
+            if probe is None:
+                raise FeedbackError(
+                    f"cannot re-register {entry_id}: no probe object for unit "
+                    f"{meta.get('unit_id', '?')}")
+            meta["probe"] = probe["object_id"]
+            meta["kind"] = probe["kind"]
+            meta["slice"] = probe["slice"]
+            meta["migrated_from"] = entry_id
+            entry_file.write_text(
+                dump_frontmatter(meta) + "\n\n" + body.strip() + "\n",
+                encoding="utf-8",
+            )
+            mirror = next(e for e in index["entries"] if e.get("id") == entry_id)
+            mirror.update({"probe": probe["object_id"], "kind": probe["kind"],
+                           "slice": probe["slice"]})
+            re_registered.append(entry_id)
+            log_lines.append(
+                f"- {entry_id} | re-register | probe {probe['object_id']} "
+                f"| unit {meta.get('unit_id', '?')}")
+
+    index["count_since_submission"] = count_since_submission(
+        index["entries"], index.get("submitted_at"))
+    save_index(workspace_root, index)
+    with (store / MIGRATION_LOG_NAME).open("a", encoding="utf-8") as fh:
+        fh.write("\n".join(log_lines) + "\n")
+    remaining = sum(1 for e in index["entries"] if not e.get("probe"))
+    return {
+        "deleted": deleted,
+        "re_registered": re_registered,
+        "legacy_remaining": remaining,
+        "log": (FEEDBACK_SUBDIR / MIGRATION_LOG_NAME).as_posix(),
+    }
+
+
 # --------------------------------------------------------------------------- #
 # Rendering / CLI
 # --------------------------------------------------------------------------- #
@@ -1209,11 +1310,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--action",
         required=True,
         choices=["record", "status", "list", "dispose", "mark-submitted", "reindex",
-                 "package", "cleanup", "upstream", "probes", "map"],
+                 "package", "cleanup", "upstream", "probes", "map", "migrate-legacy"],
     )
     parser.add_argument("--package", default=None,
                         help="cleanup: path to the package zip (workspace-"
                              "relative or absolute), or 'latest'")
+    parser.add_argument("--plan-file", default=None,
+                        help="migrate-legacy: approved disposition plan, one "
+                             "'<entry-id> -> delete|re-register' per line")
     parser.add_argument("--dry-run", action="store_true",
                         help="cleanup: list what would be removed, change nothing")
     parser.add_argument("--slice", default=None,
@@ -1283,6 +1387,7 @@ _ACTIONS = {
     "probes": action_probes,
     "map": action_map,
     "cleanup": action_cleanup,
+    "migrate-legacy": action_migrate_legacy,
 }
 
 

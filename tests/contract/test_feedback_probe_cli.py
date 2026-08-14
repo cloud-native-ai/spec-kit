@@ -289,3 +289,106 @@ class TestCleanupAction:
             "--workspace-root", str(probe_workspace),
         ])
         assert rc == 2
+
+
+def _write_legacy_entry(root: Path, unit_id: str, run_id: str) -> str:
+    """Hand-write an OLD-format entry (no probe field) like pre-041 stores."""
+    store = root / ".specify" / "memory" / "feedback"
+    store.mkdir(parents=True, exist_ok=True)
+    entry_id = f"20260101T000000Z-{unit_id.replace(':', '-').replace('/', '-')}"
+    body = (
+        "---\n"
+        f"id: {entry_id}\n"
+        f"unit_id: {unit_id}\n"
+        "unit_type: command\n"
+        f"run_id: {run_id}\n"
+        "scope: local\n"
+        "partial: false\n"
+        'created: "2026-01-01T00:00:00Z"\n'
+        'summary: "legacy entry"\n'
+        "---\n\n## Review\nold review\n\n## Optimization Points\n- old point\n"
+    )
+    (store / f"{entry_id}.md").write_text(body, encoding="utf-8")
+    return entry_id
+
+
+@pytest.mark.contract
+class TestMigrateLegacy:
+    def test_status_reports_legacy_remaining(
+        self, probe_workspace: Path, capsys
+    ):
+        _write_legacy_entry(probe_workspace, "/speckit.plan", "legacy-run")
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "reindex", "--workspace-root", str(probe_workspace),
+        ])
+        assert rc == 0
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "status", "--workspace-root", str(probe_workspace),
+        ])
+        out = json.loads(capsys.readouterr().out)
+        assert rc == 0
+        assert out["legacy_remaining"] == 1
+        assert out["external_count"] == 0
+
+    def test_migrate_legacy_deletes_per_plan(
+        self, probe_workspace: Path, capsys
+    ):
+        entry_id = _write_legacy_entry(probe_workspace, "/speckit.plan", "legacy-run")
+        feedback_utils.main([
+            "--action", "reindex", "--workspace-root", str(probe_workspace)])
+        plan = probe_workspace / "migration-plan.md"
+        plan.write_text(f"# plan\n\n{entry_id} -> delete\n", encoding="utf-8")
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "migrate-legacy", "--plan-file", str(plan),
+            "--format", "json", "--workspace-root", str(probe_workspace),
+        ])
+        out = json.loads(capsys.readouterr().out)
+        assert rc == 0
+        assert out["deleted"] == [entry_id]
+        assert not (probe_workspace / ".specify" / "memory" / "feedback"
+                    / f"{entry_id}.md").exists()
+        assert (probe_workspace / ".specify" / "memory" / "feedback"
+                / "migration-log.md").is_file()
+
+    def test_migrate_legacy_re_registers_with_probe_fields(
+        self, probe_workspace: Path, capsys
+    ):
+        entry_id = _write_legacy_entry(probe_workspace, "/speckit.plan", "legacy-run")
+        feedback_utils.main([
+            "--action", "reindex", "--workspace-root", str(probe_workspace)])
+        plan = probe_workspace / "migration-plan.md"
+        plan.write_text(f"{entry_id} -> re-register\n", encoding="utf-8")
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "migrate-legacy", "--plan-file", str(plan),
+            "--format", "json", "--workspace-root", str(probe_workspace),
+        ])
+        out = json.loads(capsys.readouterr().out)
+        assert rc == 0
+        assert out["re_registered"] == [entry_id]
+        entry_file = (probe_workspace / ".specify" / "memory" / "feedback"
+                      / f"{entry_id}.md")
+        assert entry_file.exists()  # re-registered in place
+        meta, body = feedback_utils.parse_frontmatter(
+            entry_file.read_text(encoding="utf-8"))
+        assert meta["probe"] == "speckit-plan-wrapup"
+        assert meta["kind"] == "internal"
+        assert meta["slice"] == "commands"
+        assert meta["migrated_from"] == entry_id
+        assert meta["created"] == "2026-01-01T00:00:00Z"
+        assert "## Review" in body
+
+    def test_migrate_legacy_unknown_id_exit2(
+        self, probe_workspace: Path, capsys
+    ):
+        plan = probe_workspace / "migration-plan.md"
+        plan.write_text("ghost-entry -> delete\n", encoding="utf-8")
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "migrate-legacy", "--plan-file", str(plan),
+            "--workspace-root", str(probe_workspace),
+        ])
+        assert rc == 2

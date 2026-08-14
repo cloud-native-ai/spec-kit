@@ -152,13 +152,13 @@
 
 ### Tests for User Story 5 (MANDATORY) ⚠️
 
-- [ ] T022 [US5] [blockedBy: T013] 编写失败测试:在 `test_feedback_probe_cli.py` 追加 migrate-legacy 用例(计划执行 delete/re-register、`legacy_remaining` 计数、重登记条目 `migrated_from` 保留;engine-cli C-8、entry-schema C-2)
+- [X] T022 [US5] [blockedBy: T013] 编写失败测试:在 `test_feedback_probe_cli.py` 追加 migrate-legacy 用例(计划执行 delete/re-register、`legacy_remaining` 计数、重登记条目 `migrated_from` 保留;engine-cli C-8、entry-schema C-2)
 
 ### Implementation & Migration for User Story 5
 
-- [ ] T023 [US5] [blockedBy: T022] 实现 `--action migrate-legacy --plan-file <plan>` 与 `status` 的 `legacy_remaining`/`external_count` 输出;migration-log.md 逐条记录(id|delete|re-register|rationale|date)
-- [ ] T024 [US5] [blockedBy: T023] agent 整体 review 本仓库 `.specify/memory/feedback/` 旧格式条目(逐条核对优化点是否已合入或已过时),产出处置计划 `.specify/memory/feedback/migration-plan.md`,**停点:向用户确认计划后**方可执行
-- [ ] T025 [US5] [blockedBy: T024] 执行迁移(`migrate-legacy --plan-file`)并验证 `legacy_remaining: 0`、重登记条目可按新格式检索、计数重算不重复触发提示;证据存 `verification-scratch/sc-005.txt`
+- [X] T023 [US5] [blockedBy: T022] 实现 `--action migrate-legacy --plan-file <plan>` 与 `status` 的 `legacy_remaining`/`external_count` 输出;migration-log.md 逐条记录(id|delete|re-register|rationale|date)
+- [X] T024 [US5] [blockedBy: T023] agent 整体 review 本仓库 `.specify/memory/feedback/` 旧格式条目(逐条核对优化点是否已合入或已过时),产出处置计划 `.specify/memory/feedback/migration-plan.md`,**停点:向用户确认计划后**方可执行
+- [X] T025 [US5] [blockedBy: T024] 执行迁移(`migrate-legacy --plan-file`)并验证 `legacy_remaining: 0`、重登记条目可按新格式检索、计数重算不重复触发提示;证据存 `verification-scratch/sc-005.txt`
 
 **Checkpoint**: US5 独立可测——旧格式归零且全程留痕
 
