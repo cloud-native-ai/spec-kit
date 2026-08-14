@@ -101,6 +101,237 @@ AGENT_CONFIG = {
 }
 
 # ---------------------------------------------------------------------------
+# Neutral agent metadata (Feature 044 — Agent Metadata Portability)
+#
+# Tool-agnostic metadata vocabulary for agent definitions. The frontmatter of
+# every *.agent.md under agents/ and .specify/agents/{templates,instances}/
+# MUST use only these keys (kebab-case). Per-tool field names are produced at
+# render time by _AGENT_METADATA_MAPPING, never authored here.
+#
+# model-tier domain note (analyze U-1): `lite` is a documented tier on at
+# least one supported tool and maps 1:1; `none` means "no model preference"
+# and renders as field-omission via the unmapped-field policy (D3).
+# ---------------------------------------------------------------------------
+
+# key -> (value_domain, default, renders_to_tools)
+# value_domain: None = any non-empty string; set = enumerated; "bool";
+#               "int"; "str-list"
+NEUTRAL_AGENT_METADATA_KEYS = {
+    "name": (None, None, True),
+    "description": (None, None, True),
+    "user-invocable": ("bool", True, True),
+    "disable-model-invocation": ("bool", False, True),
+    "model-tier": (
+        {"auto", "lite", "efficient", "performance", "ultimate", "none"},
+        "auto",
+        True,
+    ),
+    "capability-tools": ("str-list", [], True),
+    "skills": ("str-list", [], True),
+    "run-turn-budget": ("int", 10, True),
+    "display-color": (None, None, True),
+    # Framework assembly keys — never rendered to any tool (C-6).
+    "supervisor": ("bool", False, False),
+    "capacity-scope": (None, None, False),
+}
+
+NEUTRAL_AGENT_REQUIRED_KEYS = ("name", "description")
+
+# Keys reserved for framework assembly; excluded from tool rendering (C-6).
+NEUTRAL_AGENT_FRAMEWORK_KEYS = frozenset({"supervisor", "capacity-scope"})
+
+# Tool-dialect vocabulary forbidden anywhere in agent metadata (C-4).
+FORBIDDEN_AGENT_METADATA_KEYS = frozenset(
+    {
+        "maxTurns",
+        "disallowedTools",
+        "timeoutMins",
+        "mcpServers",
+        "permissionMode",
+        "background",
+        "isolation",
+        "tools",
+        "color",
+        "model",
+    }
+)
+
+
+class AgentMetadataError(ValueError):
+    """Structured agent metadata violation: file path + offending key(s)."""
+
+    def __init__(self, path, message, keys=()):
+        self.path = str(path)
+        self.keys = tuple(keys)
+        super().__init__(f"{path}: {message}")
+
+
+def split_agent_frontmatter(text):
+    """Split an agent definition into (frontmatter_lines, body).
+
+    Frontmatter is the block between a leading '---' line and the next '---'
+    line. Returns ([], text) when no frontmatter is present.
+    """
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return [], text
+    for idx in range(1, len(lines)):
+        if lines[idx].strip() == "---":
+            return lines[1:idx], "\n".join(lines[idx + 1 :])
+    return [], text
+
+
+def _parse_agent_scalar(raw):
+    value = raw.strip()
+    if value.startswith("[") and value.endswith("]"):
+        inner = value[1:-1].strip()
+        if not inner:
+            return []
+        return [item.strip().strip("\"'") for item in inner.split(",")]
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        return value[1:-1]
+    lowered = value.lower()
+    if lowered in ("true", "false"):
+        return lowered == "true"
+    try:
+        return int(value)
+    except ValueError:
+        return value
+
+
+def parse_agent_frontmatter(frontmatter_lines):
+    """Parse frontmatter lines into an ordered dict (stdlib-only subset).
+
+    Supports `key: value` scalars, quoted strings, booleans, integers and
+    inline lists. Nested/multi-line YAML constructs are out of scope for
+    agent metadata and raise AgentMetadataError.
+    """
+    data = {}
+    for line in frontmatter_lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if line[:1] in (" ", "\t"):
+            raise AgentMetadataError(
+                "<frontmatter>",
+                "nested/multi-line YAML is not supported in agent metadata: "
+                f"{stripped!r}",
+            )
+        key, sep, value = stripped.partition(":")
+        if not sep:
+            raise AgentMetadataError(
+                "<frontmatter>",
+                f"malformed frontmatter line (missing ':'): {stripped!r}",
+            )
+        data[key.strip()] = _parse_agent_scalar(value)
+    return data
+
+
+def _check_agent_value_domain(key, value):
+    domain, _default, _renders = NEUTRAL_AGENT_METADATA_KEYS[key]
+    if domain == "bool":
+        if not isinstance(value, bool):
+            return f"key '{key}' expects a boolean, got {value!r}"
+    elif domain == "int":
+        if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
+            return f"key '{key}' expects a positive integer, got {value!r}"
+    elif domain == "str-list":
+        if not isinstance(value, list) or not all(
+            isinstance(item, str) and item for item in value
+        ):
+            return f"key '{key}' expects a list of non-empty strings, got {value!r}"
+    elif isinstance(domain, set):
+        if value not in domain:
+            allowed = "/".join(sorted(domain))
+            return f"key '{key}' expects one of [{allowed}], got {value!r}"
+    else:
+        if not isinstance(value, str) or not value.strip():
+            return f"key '{key}' expects a non-empty string, got {value!r}"
+    return None
+
+
+def validate_agent_metadata(path, text):
+    """Validate one agent definition against the neutral metadata contract.
+
+    Returns (metadata_dict, body). Raises AgentMetadataError for: missing
+    frontmatter, out-of-set keys (C-1), forbidden dialect keys (C-4),
+    non-kebab-case keys (C-3), missing required keys (C-2), domain
+    violations, and placeholders inside the metadata block (C-7).
+    """
+    frontmatter_lines, body = split_agent_frontmatter(text)
+    if not frontmatter_lines:
+        raise AgentMetadataError(path, "missing frontmatter block")
+    metadata = parse_agent_frontmatter(frontmatter_lines)
+
+    unknown = sorted(set(metadata) - set(NEUTRAL_AGENT_METADATA_KEYS))
+    if unknown:
+        raise AgentMetadataError(
+            path,
+            "metadata keys outside the neutral set: " + ", ".join(unknown),
+            keys=unknown,
+        )
+    kebab_violations = sorted(k for k in metadata if k != k.lower() or "_" in k)
+    if kebab_violations:
+        raise AgentMetadataError(
+            path,
+            "metadata keys must be kebab-case: " + ", ".join(kebab_violations),
+            keys=kebab_violations,
+        )
+    missing = [k for k in NEUTRAL_AGENT_REQUIRED_KEYS if k not in metadata]
+    if missing:
+        raise AgentMetadataError(
+            path, "missing required metadata keys: " + ", ".join(missing), keys=missing
+        )
+    for key, value in metadata.items():
+        problem = _check_agent_value_domain(key, value)
+        if problem:
+            raise AgentMetadataError(path, problem, keys=(key,))
+    placeholder_keys = sorted(
+        k
+        for k in frontmatter_lines
+        if "{{" in k and "}}" in k
+    )
+    if placeholder_keys:
+        raise AgentMetadataError(
+            path,
+            "unresolved placeholders in metadata block (authoring templates "
+            "must not enter the render input)",
+        )
+    return metadata, body
+
+
+def load_project_agent_definitions(project_path):
+    """Collect validated agent definitions from the neutral source layers.
+
+    Reads ``.specify/agents/templates/`` then ``.specify/agents/instances/``
+    (instance wins on slug collision), validates every ``*.agent.md`` against
+    the neutral metadata contract, and returns one record per definition:
+    ``{"slug", "metadata", "body", "source"}`` sorted by slug. Any violation
+    raises AgentMetadataError naming the offending file and key(s).
+    """
+    agents_root = Path(project_path) / ".specify" / "agents"
+    collected = {}
+    for layer in ("templates", "instances"):
+        layer_dir = agents_root / layer
+        if not layer_dir.is_dir():
+            continue
+        for entry in sorted(layer_dir.iterdir()):
+            if not entry.is_file() or entry.suffix != ".md":
+                continue
+            if not entry.name.endswith(".agent.md"):
+                continue
+            slug = entry.name[: -len(".agent.md")]
+            metadata, body = validate_agent_metadata(entry, entry.read_text())
+            collected[slug] = {
+                "slug": slug,
+                "metadata": metadata,
+                "body": body,
+                "source": f"{layer}/{entry.name}",
+            }
+    return [collected[slug] for slug in sorted(collected)]
+
+
+# ---------------------------------------------------------------------------
 # Assistant support profile helpers (Feature 022)
 # ---------------------------------------------------------------------------
 
