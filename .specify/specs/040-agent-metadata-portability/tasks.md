@@ -134,12 +134,12 @@ Task State Sigil:`[ ]` 待做 / `[X]` 完成 / `[~]` 延迟(须在 Notes 说明)
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T038 [blockedBy: T022, T025, T029] 全量回归:`pytest -q` 与 `baseline-failed.txt` 按名比对,零新增失败(GATE-1/SC-008)
-- [ ] T039 [blockedBy: T034] 运行 `python3 scripts/python/sync-mirrors.py --check`(GATE-3)与 docs-utils validate,零新增违规
-- [ ] T040 [blockedBy: T019] SC-003 交付门:运行 `pytest tests/contract/test_tool_mapping.py` 确认"待核实"行数 0(GATE-5)
-- [ ] T041 SC-004 演练:在映射中临时加入假想工具行,验证 agent 定义文件零改动,随后还原(记录改动文件清单入 verification.md)
-- [ ] T042 [blockedBy: T038] 填写 `.specify/specs/040-agent-metadata-portability/verification.md`:SC-001~008 逐条 pass/partial/deferred + 证据
-- [ ] T043 [blockedBy: T042] 收尾:更新 `.specify/memory/features/044.md` 实施备注;执行 Feedback 与 Documentation 收尾步骤
+- [X] T038 [blockedBy: T022, T025, T029] 全量回归:`pytest -q` 与 `baseline-failed.txt` 按名比对,零新增失败(GATE-1/SC-008)
+- [X] T039 [blockedBy: T034] 运行 `python3 scripts/python/sync-mirrors.py --check`(GATE-3)与 docs-utils validate,零新增违规
+- [X] T040 [blockedBy: T019] SC-003 交付门:运行 `pytest tests/contract/test_tool_mapping.py` 确认"待核实"行数 0(GATE-5)
+- [X] T041 SC-004 演练:在映射中临时加入假想工具行,验证 agent 定义文件零改动,随后还原(记录改动文件清单入 verification.md)
+- [X] T042 [blockedBy: T038] 填写 `.specify/specs/040-agent-metadata-portability/verification.md`:SC-001~008 逐条 pass/partial/deferred + 证据
+- [X] T043 [blockedBy: T042] 收尾:更新 `.specify/memory/features/044.md` 实施备注;执行 Feedback 与 Documentation 收尾步骤
 
 ---
 
