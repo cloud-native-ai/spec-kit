@@ -39,7 +39,7 @@ Agents are expressed with the **Role × Stage × Type** model (defined once in `
 **Routing flow**:
 
 1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: classify as `create`, `refine`, or `run`. If instead it is a **team** request (organize / run multiple agents), direct the user to `/speckit.team` and stop.
-2. **create** → resolve the target **layer** (template / instance / execution; ask if ambiguous), check `.specify/agents/{templates,instances}/<name>.agent.md` existence: absent → `create-agent`. Build the `AgentAuthoringRequest` (carrying the layer/kind), handle backup/preservation, write to the layer's store, verify per-file symlinks.
+2. **create** → resolve the target **layer** (template / instance / execution; ask if ambiguous), check `.specify/agents/{templates,instances}/<name>.agent.md` existence: absent → `create-agent`. Build the `AgentAuthoringRequest` (carrying the layer/kind), handle backup/preservation, write to the layer's store, re-render the tool agent directories (or advise `specify init`).
    - **Confirm the authoring mode** before generating when the request is not unambiguous: offer `role`, `supervisor`, `custom` (narrow, general-purpose), or `project-custom` (project-bound). Do NOT guess the mode silently.
    - **`project-custom`** produces an agent from `skills/create-agent/templates/agent-project-custom-template.md`. It MUST be marked with its bound project via the `project:` frontmatter field and MUST keep the `## Project Scope Guard` section, so it warns the user when later invoked in a different project. Its creation flow is intentionally flexible — no fixed section list beyond the guard.
 3. **refine** → resolve the target **layer**, then the artifact (`.specify/agents/templates/<name>.agent.md`, `.specify/agents/instances/<name>.agent.md`, or `.specify/agents/execution/configs/<name>.yaml`) exists → `improve-agent`. Load the existing definition and apply targeted, evidence-based edits.
@@ -86,7 +86,7 @@ For organizing or running a **team** of agents (multiple agents collaborating), 
 ### Lifecycle: Temporary vs Persistent
 
 - **Temporary** agents live only in conversation context and are NOT written to the agent directory.
-- **Persistent** agents are written under `.specify/agents/templates/` (role Templates) or `.specify/agents/instances/` (Instances) and made available to **all officially supported tools** on initialization via per-file symlinks (e.g. `.qoder/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md`; instance wins on filename collision).
+- **Persistent** agents are written under `.specify/agents/templates/` (Meta Agent presets) or `.specify/agents/instances/` (Instances) and made available to **all officially supported tools** on initialization via per-tool rendering into real files (e.g. `.qoder/agents/<slug>.agent.md` in Qoder format; instance wins on filename collision).
 
 ### Authoring Rules
 
@@ -114,7 +114,7 @@ Supported fields: `name` (required), `description` (required), `tools`, `disallo
 
 - Canonical: `.specify/agents/templates/*.agent.md` + `.specify/agents/instances/*.agent.md` (single source of truth per layer; discovered by globbing these patterns and reading each file's frontmatter `name`/`description`)
 - Execution artifacts: `.specify/agents/execution/{configs,scripts}/` tracked; `execution/logs/` gitignored, never committed
-- Per-file symlinks (read-only): `.github/agents/`, `.qoder/agents/`, `.opencode/agents/`, `.hermes/agents/`
+- Rendered outputs (read-only, rebuilt from the neutral source): `.qoder/agents/`, `.claude/agents/`, `.github/agents/`, `.opencode/agents/`
 
 Agent definitions are **self-contained**: everything an agent needs lives in its own `.agent.md` (no shared-assets directory under the agent stores).
 

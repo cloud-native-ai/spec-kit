@@ -52,13 +52,13 @@ After initialization, your project has a `.specify/` directory with the followin
 └── specs/                   # Feature specifications (created per feature)
 ```
 
-Symlinks are created for your AI tool:
-- `.github/agents/` → `.specify/agents/{templates,instances}/` (Copilot, Claude Code)
-- `.qoder/agents/` → `.specify/agents/{templates,instances}/` (Qoder)
-- `.hermes/agents/` → `.specify/agents/{templates,instances}/` (Hermes Agent)
-- `.opencode/agents/` → `.specify/agents/{templates,instances}/` (opencode)
+Agents are rendered for your AI tool as real files (translated from the neutral metadata at init):
+- `.qoder/agents/<slug>.agent.md` (Qoder)
+- `.claude/agents/<slug>.md` (Claude Code)
+- `.github/agents/<slug>.agent.md` (GitHub Copilot)
+- `.opencode/agents/<slug>.md` (opencode)
 
-The same symlink model applies to skills directories.
+Skills directories still use the symlink model (whole-directory links).
 
 ### Generate Role-Based Agents
 

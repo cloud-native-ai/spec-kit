@@ -91,12 +91,12 @@ With no explicit intent, `/speckit.agents` generates the seven role-based workfl
 
 ## Symlink Model
 
-Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/{templates,instances}/` (never write framework agents into them directly):
+Each tool's `agents/` directory holds **rendered real files** translated at `specify init` from the neutral metadata in `.specify/agents/{templates,instances}/` (never write framework agents into them directly — outputs are rebuilt from the neutral source):
 
-- `.github/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Copilot, Claude Code)
-- `.qoder/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qoder)
-- `.opencode/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (opencode)
-- (and `.hermes/agents/` where supported)
+- `.qoder/agents/<slug>.agent.md` — Qoder format
+- `.claude/agents/<slug>.md` — Claude Code format
+- `.github/agents/<slug>.agent.md` — GitHub Copilot format
+- `.opencode/agents/<slug>.md` — opencode format (filename carries the agent name)
 
 ## Companion Skills
 
@@ -182,12 +182,12 @@ With no explicit intent, `/speckit.agents` generates the seven role-based workfl
 
 ## Symlink Model
 
-Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/{templates,instances}/` (never write framework agents into them directly):
+Each tool's `agents/` directory holds **rendered real files** translated at `specify init` from the neutral metadata in `.specify/agents/{templates,instances}/` (never write framework agents into them directly — outputs are rebuilt from the neutral source):
 
-- `.github/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Copilot, Claude Code)
-- `.qoder/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qoder)
-- `.opencode/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (opencode)
-- (and `.hermes/agents/` where supported)
+- `.qoder/agents/<slug>.agent.md` — Qoder format
+- `.claude/agents/<slug>.md` — Claude Code format
+- `.github/agents/<slug>.agent.md` — GitHub Copilot format
+- `.opencode/agents/<slug>.md` — opencode format (filename carries the agent name)
 
 ## Companion Skills
 
@@ -279,11 +279,11 @@ Creates or updates a single custom agent based on user-provided intent.
 
 ## Symlink Model
 
-Each tool's `agents/` directory is a **real directory** of **per-file symlinks** back to `.specify/agents/{templates,instances}/`:
-- `.github/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Copilot, Claude Code)
-- `.qoder/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (Qoder)
-- `.opencode/agents/<slug>.agent.md` → `.specify/agents/templates/<slug>.agent.md` (opencode)
-- (and `.hermes/agents/` where supported)
+Each tool's `agents/` directory holds **rendered real files** translated at `specify init` from the neutral metadata in `.specify/agents/{templates,instances}/`:
+- `.qoder/agents/<slug>.agent.md` — Qoder format
+- `.claude/agents/<slug>.md` — Claude Code format
+- `.github/agents/<slug>.agent.md` — GitHub Copilot format
+- `.opencode/agents/<slug>.md` — opencode format (filename carries the agent name)
 
 ## Companion Skills
 

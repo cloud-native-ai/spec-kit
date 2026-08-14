@@ -72,9 +72,10 @@ def test_all_keys_are_kebab_case():
 
 
 def test_scan_surface_is_nontrivial():
-    # Pin hygiene: the scan must actually see metadata-bearing files.
+    # Pin hygiene: the scan must actually see metadata-bearing files
+    # (post-relocation surface: 17 files across the three directories).
     with_metadata = [
         path
         for path, _line in _frontmatter_key_lines()
     ]
-    assert len(set(with_metadata)) >= 20
+    assert len(set(with_metadata)) >= 15

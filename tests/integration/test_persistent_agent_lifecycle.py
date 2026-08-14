@@ -27,13 +27,8 @@ NEUTRAL_DEF = (
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 PERSISTED_ROLES = [
-    "requirements-analyst",
-    "ux-analyst",
-    "system-designer",
-    "module-designer",
-    "test-engineer",
-    "qa-engineer",
-    "knowledge-manager",
+    "structure-adjuster",
+    "skill-verifier",
 ]
 
 

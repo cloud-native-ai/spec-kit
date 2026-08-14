@@ -1,4 +1,4 @@
-"""Contract test: the seven shipped role agents are skill-enabled.
+"""Contract test: the seven role agents (Worker capability templates since Feature 044) are skill-enabled.
 
 Enforces the Agent Skill Enablement contract
 (``.specify/specs/025-agent-skill-enablement/contracts/agent-skill-enablement-contract.md``).
@@ -54,8 +54,10 @@ def _split_frontmatter(content):
 
 
 def _agent_content(slug):
-    path = SHIPPED_AGENTS_DIR / f"{slug}.agent.md"
-    assert path.exists(), f"shipped preset agent missing: {path}"
+    # Feature 044: the seven role agents were relocated from agents/ to the
+    # Worker capability templates; the enablement contract follows them.
+    path = ROLE_TEMPLATES_DIR / f"agent-capacity-{slug}-template.md"
+    assert path.exists(), f"role capability template missing: {path}"
     return path.read_text(encoding="utf-8")
 
 

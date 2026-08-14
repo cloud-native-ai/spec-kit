@@ -2,9 +2,35 @@
 
 This document is the reference for the framework's **artifacts**: the canonical template
 catalog that `create-agent`/`improve-agent` operate on, the persisted agents under
-`.specify/agents/`, the registry, and the directory/symlink model that makes agents
+`.specify/agents/`, the registry, and the directory/render model that makes agents
 available to every supported tool. For the concept model see [design.md](./design.md); for
 the command/skill surface see [command-and-skills.md](./command-and-skills.md).
+
+## The three agent directories (Worker/Meta division)
+
+The three directories that hold `*.agent.md` files are divided along the Worker/Meta type
+line (Feature 044):
+
+| Directory | Category | Content | Placeholders | Directly runnable | Producer → Consumer |
+|-----------|----------|---------|--------------|-------------------|---------------------|
+| `agents/` | **Meta Agent preset set** | framework-maintenance agents operating on skills/agents/structure | none | yes | framework maintainers → init render pipeline → tool agent dirs |
+| `skills/create-agent/templates/` | **Worker capability templates** | problem-domain agents along the capability dimension | `{{…}}` whitelist | no (instantiate first) | `create-agent` → team building / single-agent authoring |
+| `skills/create-team/templates/agents/` | **Worker responsibility templates** | problem-domain agents along the team-responsibility dimension (stage seats, orchestration contracts) | `{{…}}` whitelist | no | `create-team` → team building |
+
+**Team pickup rule**: when composing a Team, Meta Agents are picked from `agents/`;
+Worker Agents are instantiated from the capability/responsibility templates.
+
+**Qualified terminology** (glossary-anchored): say "Meta Agent preset set", "Worker
+capability template", "Worker responsibility template" — never a bare "templates", which
+is ambiguous across the three locations.
+
+**Adjudications of known asymmetries** (FR-025):
+- `capacity-scope` (single-agent templates) vs `role-scope` (team supervisor template):
+  **intentional** — capability scope names the capability slug a single agent fills;
+  role scope names the team seat (team-supervisor) as such.
+- Stage templates (executor/evaluator/optimizer) carry no runtime parameters:
+  **intentional** — responsibility seats receive parameters from the team orchestration
+  that fills them.
 
 ## Canonical template catalog
 
@@ -37,7 +63,8 @@ The seven Worker roles. Each Worker role template carries `supervisor: true` and
 
 > Every role template enforces **six mandatory sections** (Identity & Responsibilities,
 > Project Context, Workflow, Upstream, Downstream, Output Format), uses only approved
-> `{{PLACEHOLDER}}` variables, and **omits** the `tools` field (inherits platform defaults).
+> `{{PLACEHOLDER}}` variables, and declares its capability surface in the neutral
+> `capability-tools:` / `skills:` frontmatter keys.
 
 ### Project-custom & shared single-agent assets
 
@@ -57,21 +84,22 @@ The Stage templates (`agent-stage-{executor,evaluator,optimizer}`), the orchestr
 
 ## Persisted agents (`.specify/agents/`)
 
-Persistent agents are stored as `<slug>.agent.md` in the layered stores `.specify/agents/templates/` (role Templates, installed by `specify init`) and `.specify/agents/instances/` (project-authored Instances) — the **single source
-of truth**. The seven preset role agents ship active:
+Persistent agents are stored as `<slug>.agent.md` in the layered stores `.specify/agents/templates/` (Meta Agent presets, installed by `specify init`) and `.specify/agents/instances/` (project-authored Instances) — the **single source
+of truth**. The Meta Agent preset set ships active:
 
 | Name | File | Status |
 |------|------|--------|
-| Requirements Analyst | `requirements-analyst.agent.md` | Active |
-| UX Analyst | `ux-analyst.agent.md` | Active |
-| System Designer | `system-designer.agent.md` | Active |
-| Module Designer | `module-designer.agent.md` | Active |
-| Test Engineer | `test-engineer.agent.md` | Active |
-| QA Engineer | `qa-engineer.agent.md` | Active |
-| Knowledge Manager | `knowledge-manager.agent.md` | Active |
+| Structure Adjuster | `structure-adjuster.agent.md` | Active |
+| Skill Verifier | `skill-verifier.agent.md` | Active |
 
-The Team Supervisor (Meta role) is authored on demand from its template rather than shipping
-as a preset row in the registry.
+The seven former preset role agents (Requirements Analyst, UX Analyst, System Designer,
+Module Designer, Test Engineer, QA Engineer, Knowledge Manager) are Worker agents by the
+operating-object criterion; they were relocated to `skills/create-agent/templates/`
+(`agent-capacity-<slug>-template.md`) and are distributed via instantiation, no longer as
+presets (Feature 044).
+
+The Team Supervisor (Meta role) is authored on demand from its team-domain template rather
+than shipping as a preset row in the registry.
 
 ### Anatomy of a persisted role agent
 
@@ -118,35 +146,41 @@ foreign dialect. To override a tool's built-in agent (where the tool supports it
 file in that tool's agent directory whose frontmatter `name` exactly matches the built-in's
 name, per the tool's own priority mechanism.
 
-## Directory & symlink model
+## Directory & render model
 
-`.specify/agents/` is the **only** place agents are authored (Templates under `templates/`,
-Instances under `instances/`; taxonomy: `shared/definitions/agent-definitions.md`). Every
-supported tool's agent directory is a **real directory** populated with **per-file symlinks**
-back to it — one link per `*.agent.md` (instance wins on filename collision). Never write
-framework agents into the tool directories directly.
+`.specify/agents/` is the **only** place agents are authored (presets under `templates/`,
+Instances under `instances/`; taxonomy: `shared/definitions/agent-definitions.md`). At
+`specify init --ai <tool>` the neutral metadata of every definition is **rendered into the
+target tool's own agent format** and written as **real files** into that tool's agent
+directory (instance wins on filename collision). The per-file symlink model is retired.
+Never write framework agents into the tool directories directly — rendered outputs are
+derived artifacts and are rebuilt from the neutral source.
 
 ```
 .specify/agents/                 ← canonical source of truth (author here)
-   ├── templates/                ← Agent Templates (shipped role set; self-contained `.agent.md` files)
-   │     ├── requirements-analyst.agent.md
-   │     └── …
+   ├── templates/                ← Meta Agent presets (shipped; self-contained `.agent.md` files)
+   │     ├── structure-adjuster.agent.md
+   │     └── skill-verifier.agent.md
    ├── instances/                ← Agent Instances (project-authored)
-   └── execution/                ← dispatch configs/ + scripts/ (tracked), logs/ (gitignored)
+   ├── execution/                ← dispatch configs/ + scripts/ (tracked), logs/ (gitignored)
+   ├── .render-manifest.json     ← render manifest (drift detection + stale prune)
+   └── .backups/<tool>/          ← hand-edited outputs backed up before overwrite
 
-.qoder/agents/    (real dir)  ── <slug>.agent.md ─▶ ../../.specify/agents/templates/<slug>.agent.md
-.github/agents/   (real dir)  ── (per-file symlinks, same scheme)
-.opencode/agents/ (real dir)  ── (per-file symlinks, same scheme)
-   (and .hermes/agents where supported)
+.qoder/agents/    (real dir)  ── <slug>.agent.md  (Qoder format, rendered)
+.claude/agents/   (real dir)  ── <slug>.md        (Claude format, rendered)
+.github/agents/   (real dir)  ── <slug>.agent.md  (Copilot format, rendered)
+.opencode/agents/ (real dir)  ── <slug>.md        (opencode format; filename = agent name)
 ```
 
-The CLI (re)creates these per-file links on initialization, migrating any legacy
-whole-directory symlink — and any legacy flat `.specify/agents/*.agent.md` layout — to the
-layered per-file model. Because each tool `agents/` is a real
-directory, a tool can add its own agent files (e.g. Qoder overrides) beside the framework
-links. Agent definitions are **self-contained** — there is no shared-assets directory under
-the agent stores; the former `AGENTS.md`/`MEMORY.md`/`SOUL.md`/`USER.md` shared files have been removed
-(agent runtime context is per chat-session, so they served no purpose).
+The CLI renders on initialization, replacing any legacy per-file/whole-directory symlinks
+(and any legacy flat `.specify/agents/*.agent.md` layout) with rendered real files.
+Hand-modified outputs are backed up under `.backups/<tool>/` before being refreshed, and
+outputs whose neutral source was deleted are pruned. Because each tool `agents/` is a real
+directory, a tool can add its own agent files beside the rendered ones; such user assets
+are never overwritten. Agent definitions are **self-contained** — there is no shared-assets
+directory under the agent stores; the former `AGENTS.md`/`MEMORY.md`/`SOUL.md`/`USER.md`
+shared files have been removed (agent runtime context is per chat-session, so they served
+no purpose).
 
 ## Traceability
 

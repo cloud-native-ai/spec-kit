@@ -1,4 +1,4 @@
-"""Contract test: the shipped ``agents/`` resource carries the preset role agents.
+"""Contract test: the shipped ``agents/`` resource carries the Meta Agent preset set (Feature 044).
 
 ``specify init`` copies the shipped ``agents/`` resource into ``.specify/agents/templates/``
 (the Agent Template layer) and then pre-links each ``*.agent.md`` per file into every
@@ -13,13 +13,8 @@ from pathlib import Path
 SHIPPED_AGENTS_DIR = Path(__file__).resolve().parents[2] / "agents"
 
 PRESET_ROLES = [
-    "requirements-analyst",
-    "ux-analyst",
-    "system-designer",  
-    "module-designer",
-    "test-engineer",
-    "qa-engineer",
-    "knowledge-manager",
+    "structure-adjuster",
+    "skill-verifier",
 ]
 
 

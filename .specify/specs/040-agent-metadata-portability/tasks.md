@@ -116,21 +116,21 @@ Task State Sigil:`[ ]` 待做 / `[X]` 完成 / `[~]` 延迟(须在 Notes 说明)
 
 ### Tests for User Story 5 (MANDATORY) ⚠️
 
-- [ ] T026 [US5] [blockedBy: T013] 改写 `tests/contract/test_shipped_agent_presets.py` 的 `test_preset_shipped`:断言对象改为 Meta 预置集(`structure-adjuster`、`skill-verifier`);同步核对并调整 `test_agent_skill_enablement.py`、`test_handoff_chain.py`、`test_context_injection.py`、`test_persistent_agent_lifecycle.py` 中引用旧 7-slug 的夹具(pin hygiene:文件清单从目录派生)——此任务先红,随 T027/T028 转绿
+- [X] T026 [US5] [blockedBy: T013] 改写 `tests/contract/test_shipped_agent_presets.py` 的 `test_preset_shipped`:断言对象改为 Meta 预置集(`structure-adjuster`、`skill-verifier`);同步核对并调整 `test_agent_skill_enablement.py`、`test_handoff_chain.py`、`test_context_injection.py`、`test_persistent_agent_lifecycle.py` 中引用旧 7-slug 的夹具(pin hygiene:文件清单从目录派生)——此任务先红,随 T027/T028 转绿
 
 ### Implementation for User Story 5
 
-- [ ] T027 [US5] [blockedBy: T008, T009, T026] 迁移落位(T-3):用 `agents/<slug>.agent.md` 的已中立化内容逐一**替换** `skills/create-agent/templates/agent-capacity-<slug>-template.md`(7 份),正文仅把项目身份行与 Project Context 段的 "Spec Kit (specify-cli)" 参数化为 `{{PROJECT_NAME}}`;完成后删除 `agents/` 下该 7 文件
-- [ ] T028 [US5] [blockedBy: T027] 新作 `agents/structure-adjuster.agent.md` 与 `agents/skill-verifier.agent.md`(T-4:中立元信息、`user-invocable: true`、六大必备章节、职责限定操作技能/agent/结构)
-- [ ] T029 [US5] [blockedBy: T028] 运行迁移后的契约 + 集成套件至绿(T026 转绿;`test_role_templates.py` 的 ROLE_SLUGS 断言对象随替换自然满足,若白名单需增补同一任务内完成)
-- [ ] T030 [P] [US5] [blockedBy: T029] 成文差别定义(T-1/T-2/T-5):重写 `docs/reference/agents/templates-and-agents.md` 的目录分类节 —— Worker/Meta 三目录表、组队取件规则、[[STR-005]]/[[STR-006]] 与阶段模板缺参的裁定记录
-- [ ] T031 [P] [US5] [blockedBy: T029] 机械联动(文档面):改写 `docs/reference/commands/agents.md`、`docs/tutorials/quickstart.md`、`docs/reference/agents/design.md` 的预置表与软链接叙述 → 渲染叙述
-- [ ] T032 [P] [US5] [blockedBy: T029] 机械联动(模板面):改写 `templates/commands/agents.md` 与 `templates/commands/skills.md`(去软链接表述、7-slug 枚举改为维度表述),然后运行 `python3 scripts/python/regen-command-copies.py` 并 grep 验证 `.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/`、`.codex/commands/`、`.hermes/commands/` 副本无旧叙述残留
-- [ ] T033 [P] [US5] [blockedBy: T029] 机械联动(shared/skills 面):改写 `shared/workflow/agent-configuration.md`(软链接核验 → 渲染产物核验)、`shared/workflow/interview-walkthrough.md`、`skills/create-skills/SKILL.md`、`skills/create-team/references/patterns.md`、`skills/create-team/templates/agents/agent-workflow-schema.md` 中的旧枚举与软链接表述
-- [ ] T034 [US5] [blockedBy: T030, T031, T032, T033] 镜像扇出:运行 `python3 scripts/python/sync-mirrors.py --write` 再 `--check`(覆盖 plan.md Mirror Obligations 全部行:`.specify/agents/templates`、`.specify/skills/...`、`.specify/shared/...`、`.specify/templates/...`),exit 0
-- [ ] T035 [US5] [blockedBy: T034] 运行 `/speckit.instructions` 刷新 `AGENTS.md`(Agents 注册表与分发叙述;顺带修复缺 ux-analyst 的既有漂移),验证 GATE-6 软链接完好
-- [ ] T036 [US5] [blockedBy: T034] 术语表提案:向用户提交 feature-ref.md 的 5 条候选(Meta Agent/Worker Agent/渲染产物/渲染清单/"原 Agent"更正);获确认后写入 `.specify/memory/glossary.md`,未确认则 `[~]` 延迟并注明
-- [ ] T037 [US5] [blockedBy: T030] SC-007 演练:三目录各抽样 ≥3 文件,按 T-1 表一步判类,记录正确率 100%
+- [X] T027 [US5] [blockedBy: T008, T009, T026] 迁移落位(T-3):用 `agents/<slug>.agent.md` 的已中立化内容逐一**替换** `skills/create-agent/templates/agent-capacity-<slug>-template.md`(7 份),正文仅把项目身份行与 Project Context 段的 "Spec Kit (specify-cli)" 参数化为 `{{PROJECT_NAME}}`;完成后删除 `agents/` 下该 7 文件
+- [X] T028 [US5] [blockedBy: T027] 新作 `agents/structure-adjuster.agent.md` 与 `agents/skill-verifier.agent.md`(T-4:中立元信息、`user-invocable: true`、六大必备章节、职责限定操作技能/agent/结构)
+- [X] T029 [US5] [blockedBy: T028] 运行迁移后的契约 + 集成套件至绿(T026 转绿;`test_role_templates.py` 的 ROLE_SLUGS 断言对象随替换自然满足,若白名单需增补同一任务内完成)
+- [X] T030 [P] [US5] [blockedBy: T029] 成文差别定义(T-1/T-2/T-5):重写 `docs/reference/agents/templates-and-agents.md` 的目录分类节 —— Worker/Meta 三目录表、组队取件规则、[[STR-005]]/[[STR-006]] 与阶段模板缺参的裁定记录
+- [X] T031 [P] [US5] [blockedBy: T029] 机械联动(文档面):改写 `docs/reference/commands/agents.md`、`docs/tutorials/quickstart.md`、`docs/reference/agents/design.md` 的预置表与软链接叙述 → 渲染叙述
+- [X] T032 [P] [US5] [blockedBy: T029] 机械联动(模板面):改写 `templates/commands/agents.md` 与 `templates/commands/skills.md`(去软链接表述、7-slug 枚举改为维度表述),然后运行 `python3 scripts/python/regen-command-copies.py` 并 grep 验证 `.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/`、`.codex/commands/`、`.hermes/commands/` 副本无旧叙述残留
+- [X] T033 [P] [US5] [blockedBy: T029] 机械联动(shared/skills 面):改写 `shared/workflow/agent-configuration.md`(软链接核验 → 渲染产物核验)、`shared/workflow/interview-walkthrough.md`、`skills/create-skills/SKILL.md`、`skills/create-team/references/patterns.md`、`skills/create-team/templates/agents/agent-workflow-schema.md` 中的旧枚举与软链接表述
+- [X] T034 [US5] [blockedBy: T030, T031, T032, T033] 镜像扇出:运行 `python3 scripts/python/sync-mirrors.py --write` 再 `--check`(覆盖 plan.md Mirror Obligations 全部行:`.specify/agents/templates`、`.specify/skills/...`、`.specify/shared/...`、`.specify/templates/...`),exit 0
+- [X] T035 [US5] [blockedBy: T034] 运行 `/speckit.instructions` 刷新 `AGENTS.md`(Agents 注册表与分发叙述;顺带修复缺 ux-analyst 的既有漂移),验证 GATE-6 软链接完好
+- [~] T036 [US5] [blockedBy: T034] 术语表提案 <!-- deferred: 5 条候选条目已列于 feature-ref.md,写入需用户显式确认(术语表协议),本次 implement 收尾时用户未回复 -->:向用户提交 feature-ref.md 的 5 条候选(Meta Agent/Worker Agent/渲染产物/渲染清单/"原 Agent"更正);获确认后写入 `.specify/memory/glossary.md`,未确认则 `[~]` 延迟并注明
+- [X] T037 [US5] [blockedBy: T030] SC-007 演练:三目录各抽样 ≥3 文件,按 T-1 表一步判类,记录正确率 100%
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
