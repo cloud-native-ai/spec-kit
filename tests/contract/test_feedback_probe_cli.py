@@ -198,3 +198,94 @@ class TestListFiltersAndDispose:
             "--workspace-root", str(mixed_workspace),
         ])
         assert rc == 2
+
+
+@pytest.mark.contract
+class TestCleanupAction:
+    def _record(self, root: Path, run_id: str) -> None:
+        rc = feedback_utils.main([
+            "--action", "record", "--workspace-root", str(root),
+            "--unit-id", "/speckit.plan", "--unit-type", "command",
+            "--run-id", run_id, "--review", "r", "--points", "p",
+        ])
+        assert rc == 0
+
+    def _package(self, root: Path, capsys) -> str:
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "package", "--format", "json",
+            "--workspace-root", str(root),
+        ])
+        out = json.loads(capsys.readouterr().out)
+        assert rc == 0 and out["zip"]
+        return out["zip"]
+
+    def test_cleanup_dry_run_lists_then_removes_packaged_entries(
+        self, probe_workspace: Path, capsys
+    ):
+        self._record(probe_workspace, "c1")
+        zip_rel = self._package(probe_workspace, capsys)
+        store = probe_workspace / ".specify" / "memory" / "feedback"
+
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "cleanup", "--package", zip_rel, "--dry-run",
+            "--format", "json", "--workspace-root", str(probe_workspace),
+        ])
+        out = json.loads(capsys.readouterr().out)
+        assert rc == 0 and out["dry_run"] is True
+        assert len(out["would_remove"]) == 1
+
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "cleanup", "--package", zip_rel,
+            "--format", "json", "--workspace-root", str(probe_workspace),
+        ])
+        out = json.loads(capsys.readouterr().out)
+        assert rc == 0
+        assert len(out["removed"]) == 1
+        assert not list(store.glob("2*.md")), "active entry file not removed"
+        assert (store / "cleanup-log.md").is_file()
+
+        import json as _j
+        index = _j.loads((store / "index.json").read_text(encoding="utf-8"))
+        assert index["entries"] == []
+
+    def test_cleanup_scopes_to_packaged_batch_only(
+        self, probe_workspace: Path, capsys
+    ):
+        self._record(probe_workspace, "keep-me")   # archived by mark-submitted
+        capsys.readouterr()
+        feedback_utils.main([
+            "--action", "mark-submitted",
+            "--workspace-root", str(probe_workspace),
+        ])
+        # now_iso() has second granularity: an entry recorded in the SAME
+        # second as mark-submitted falls outside the pending window
+        # (created > submitted_at is False). Cross the boundary deliberately.
+        import time
+        time.sleep(1.1)
+        self._record(probe_workspace, "remove-me")  # pending → packaged
+        zip_rel = self._package(probe_workspace, capsys)
+        store = probe_workspace / ".specify" / "memory" / "feedback"
+        before = sorted(p.name for p in store.glob("2*.md"))
+        assert len(before) == 2
+
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "cleanup", "--package", zip_rel,
+            "--format", "json", "--workspace-root", str(probe_workspace),
+        ])
+        assert rc == 0
+        remaining = sorted(p.name for p in store.glob("2*.md"))
+        assert len(remaining) == 1, "cleanup must only remove packaged entries"
+
+    def test_cleanup_unknown_package_exit2(
+        self, probe_workspace: Path, capsys
+    ):
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "cleanup", "--package", "feedback-9999.zip",
+            "--workspace-root", str(probe_workspace),
+        ])
+        assert rc == 2

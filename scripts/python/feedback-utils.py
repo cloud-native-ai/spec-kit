@@ -1055,6 +1055,77 @@ def action_map(args: argparse.Namespace) -> Dict[str, Any]:
     }
 
 
+CLEANUP_LOG_NAME = "cleanup-log.md"
+
+
+def action_cleanup(args: argparse.Namespace) -> Dict[str, Any]:
+    """Post-package cleanup (req 041 Mode 2): remove entries that a package
+    already archived — the zip is the record; the active store converges.
+
+    Scope is strictly the packaged batch (engine-cli C-5): only entry files
+    actually inside the named zip are removed, never un-packaged entries.
+    """
+    workspace_root = resolve_workspace_root(args.workspace_root)
+    packages_dir = feedback_dir(workspace_root) / PACKAGES_DIRNAME
+    spec = (getattr(args, "package", None) or "").strip()
+    if spec == "latest":
+        zips = sorted(packages_dir.glob("feedback-*.zip")) if packages_dir.is_dir() else []
+        if not zips:
+            raise FeedbackError(f"no packages found under {packages_dir}")
+        zip_path = zips[-1]
+    else:
+        if not spec:
+            raise FeedbackError("--package <zip-path|latest> is required.")
+        zip_path = Path(spec)
+        if not zip_path.is_absolute():
+            zip_path = workspace_root / spec
+    if not zip_path.is_file():
+        raise FeedbackError(f"package not found: {zip_path}")
+
+    with zipfile.ZipFile(zip_path) as zf:
+        names = set(zf.namelist())
+        if "MANIFEST.md" not in names:
+            raise FeedbackError(f"package has no MANIFEST.md: {zip_path}")
+        packaged = {n for n in names if n.endswith(".md")
+                    and n not in ("MANIFEST.md", "SUBMISSION-NOTES.md")}
+
+    index = load_index(workspace_root)
+    targeted = [e for e in index.get("entries", []) if e.get("file") in packaged]
+    dry_run = bool(getattr(args, "dry_run", False))
+    removed: List[str] = []
+    if not dry_run:
+        store = feedback_dir(workspace_root)
+        for entry in targeted:
+            source = store / entry["file"]
+            if source.is_file():
+                source.unlink()
+            removed.append(entry.get("id", entry["file"]))
+        index["entries"] = [e for e in index.get("entries", [])
+                            if e.get("file") not in packaged]
+        index["count_since_submission"] = count_since_submission(
+            index["entries"], index.get("submitted_at"))
+        save_index(workspace_root, index)
+        log_path = store / CLEANUP_LOG_NAME
+        stamp = now_iso()
+        lines = [f"## {stamp} — {zip_path.name}"]
+        for entry in targeted:
+            lines.append(
+                f"- removed {entry.get('id', '?')} ({entry.get('unit_id', '?')}, "
+                f"created {entry.get('created', '-')}) — archived in "
+                f"{zip_path.name}")
+        with log_path.open("a", encoding="utf-8") as fh:
+            fh.write("\n".join(lines) + "\n")
+    would_remove = [e.get("id", e["file"]) for e in targeted]
+    return {
+        "package": zip_path.relative_to(workspace_root).as_posix()
+        if zip_path.is_relative_to(workspace_root) else str(zip_path),
+        "dry_run": dry_run,
+        "would_remove": would_remove if dry_run else [],
+        "removed": removed,
+        "remaining_entries": len(load_index(workspace_root)["entries"]),
+    }
+
+
 # --------------------------------------------------------------------------- #
 # Rendering / CLI
 # --------------------------------------------------------------------------- #
@@ -1138,8 +1209,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--action",
         required=True,
         choices=["record", "status", "list", "dispose", "mark-submitted", "reindex",
-                 "package", "upstream", "probes", "map"],
+                 "package", "cleanup", "upstream", "probes", "map"],
     )
+    parser.add_argument("--package", default=None,
+                        help="cleanup: path to the package zip (workspace-"
+                             "relative or absolute), or 'latest'")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="cleanup: list what would be removed, change nothing")
     parser.add_argument("--slice", default=None,
                         help="list: filter entries by target system slice "
                              "(inherited from the entry's probe class)")
@@ -1206,6 +1282,7 @@ _ACTIONS = {
     "upstream": action_upstream,
     "probes": action_probes,
     "map": action_map,
+    "cleanup": action_cleanup,
 }
 
 

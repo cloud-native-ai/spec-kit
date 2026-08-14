@@ -1,0 +1,12 @@
+== Mode 1: overview <-> json consistency ==
+tree objects: 50, json objects: 50, identical: True
+
+== Mode 2: record -> filter -> package -> cleanup ==
+record rc: 0
+filter commands count: 1
+package: .specify/memory/feedback/packages/feedback-20260814T183030Z.zip
+dry-run would_remove: ['20260814T183030Z-speckit-plan']
+cleanup removed: ['20260814T183030Z-speckit-plan'] | remaining: 0
+active entries left: 0 | zip archived: ['20260814T183030Z-speckit-plan.md'] | cleanup-log: True
+
+QA VERDICT — mode1 consistency: True | mode2 full loop: ['20260814T183030Z-speckit-plan.md']

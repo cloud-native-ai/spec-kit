@@ -20,13 +20,13 @@ COMPLEX_COMMANDS = [
     "requirements", "clarify", "plan", "tasks", "implement",
     "analyze", "checklist", "review", "research",
     "instructions", "tools", "skills", "todo", "docs", "goal",
-    "interview",
+    "interview", "feedback",
 ]
 SIMPLE_COMMANDS = ["agents", "constitution", "feature", "team"]
 
 
 def test_classification_counts():
-    assert len(COMPLEX_COMMANDS) == 16
+    assert len(COMPLEX_COMMANDS) == 17
     assert len(SIMPLE_COMMANDS) == 4
 
 

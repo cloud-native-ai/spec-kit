@@ -80,6 +80,7 @@
 | skill-study-project-wrapup | skill-wrapup | skill:study-project | wrap-up |
 | skill-summarize-project-wrapup | skill-wrapup | skill:summarize-project | wrap-up |
 | skill-think-skills-wrapup | skill-wrapup | skill:think-skills | wrap-up |
+| speckit-feedback-wrapup | command-wrapup | /speckit.feedback | wrap-up |
 
 ## External Probe 登记契约
 

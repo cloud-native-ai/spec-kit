@@ -131,15 +131,15 @@
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T016 [US4] [blockedBy: T014] 编写失败测试:`tests/contract/test_feedback_command_template.py`(模板存在、三模式章节、`## Feedback`+`## Documentation` 步、现存工具副本面——清单由 regen 现存目录探测动态派生,本仓实测 4——存在且含 AUTO-GENERATED 头,feedback-command C-1)+ 在 `test_feedback_probe_cli.py` 追加 cleanup 用例(engine-cli C-5);同步更新 `tests/contract/test_feedback_command_classification.py` 分类计数(复杂命令 +feedback,计数改动与命令落地同任务,沿 Pin Hygiene 规则 3)
+- [X] T016 [US4] [blockedBy: T014] 编写失败测试:`tests/contract/test_feedback_command_template.py`(模板存在、三模式章节、`## Feedback`+`## Documentation` 步、现存工具副本面——清单由 regen 现存目录探测动态派生,本仓实测 4——存在且含 AUTO-GENERATED 头,feedback-command C-1)+ 在 `test_feedback_probe_cli.py` 追加 cleanup 用例(engine-cli C-5);同步更新 `tests/contract/test_feedback_command_classification.py` 分类计数(复杂命令 +feedback,计数改动与命令落地同任务,沿 Pin Hygiene 规则 3)
 
 ### Implementation for User Story 4
 
-- [ ] T017 [US4] [blockedBy: T016] 在 `scripts/python/feedback-utils.py` 实现 `--action cleanup --package <zip|latest> [--dry-run]`(仅删包内实际收录条目,先校验 zip+MANIFEST,追加 `cleanup-log.md`,计数重算;engine-cli C-5)
-- [ ] T018 [US4] [blockedBy: T005, T014, T017] 撰写 `templates/commands/feedback.md`(canonical,复杂命令):三模式执行流程(模式一调 `probes` 渲染竖状总览;模式二 status/list 过滤→处置→package→cleanup;模式三引导 `probe-inject`)+ canonical `## Feedback` 步 + docs-step,依 `contracts/feedback-command.md`;**同任务**在 `shared/definitions/probe-definitions.md` 的 `## Objects` 增行 `speckit-feedback-wrapup | command-wrapup | /speckit.feedback | wrap-up` 并重跑 `--action probes --reconcile`(19+31=50 双向零缺漏,registry C-3.4)
-- [ ] T019 [US4] [blockedBy: T018] mirror-parity:`sync-mirrors.py --write` 生成 `.specify/templates/commands/feedback.md` 与现存工具副本面(本仓实测 4:`.claude/commands/speckit.feedback.md`、`.github/prompts/speckit.feedback.prompt.md`、`.qoder/commands/speckit.feedback.md`、`.opencode/command/speckit.feedback.md`;codex/hermes 由 `specify init` 下游分发);逐副本 grep 三模式关键节 + AUTO-GENERATED 头
-- [ ] T020 [US4] [P] [blockedBy: T018] 文档:新增 `docs/reference/commands/feedback.md`(三模式用法/退出码,与 quickstart 一致);更新 `docs/reference/skills/feedback.md` 分类表(复杂命令 +feedback)与 probe 化机制段
-- [ ] T021 [US4] [blockedBy: T017, T019] 手动 QA(quickstart §1~2):scratch 项目内无参数总览 ↔ `probes --format json` 一致;记录一条真实反馈→package→`cleanup --dry-run` 预览→执行清理,对账活跃库清空与包内留档;证据存 `verification-scratch/sc-007-mode12.txt`
+- [X] T017 [US4] [blockedBy: T016] 在 `scripts/python/feedback-utils.py` 实现 `--action cleanup --package <zip|latest> [--dry-run]`(仅删包内实际收录条目,先校验 zip+MANIFEST,追加 `cleanup-log.md`,计数重算;engine-cli C-5)
+- [X] T018 [US4] [blockedBy: T005, T014, T017] 撰写 `templates/commands/feedback.md`(canonical,复杂命令):三模式执行流程(模式一调 `probes` 渲染竖状总览;模式二 status/list 过滤→处置→package→cleanup;模式三引导 `probe-inject`)+ canonical `## Feedback` 步 + docs-step,依 `contracts/feedback-command.md`;**同任务**在 `shared/definitions/probe-definitions.md` 的 `## Objects` 增行 `speckit-feedback-wrapup | command-wrapup | /speckit.feedback | wrap-up` 并重跑 `--action probes --reconcile`(19+31=50 双向零缺漏,registry C-3.4)
+- [X] T019 [US4] [blockedBy: T018] mirror-parity:`sync-mirrors.py --write` 生成 `.specify/templates/commands/feedback.md` 与现存工具副本面(本仓实测 4:`.claude/commands/speckit.feedback.md`、`.github/prompts/speckit.feedback.prompt.md`、`.qoder/commands/speckit.feedback.md`、`.opencode/command/speckit.feedback.md`;codex/hermes 由 `specify init` 下游分发);逐副本 grep 三模式关键节 + AUTO-GENERATED 头
+- [X] T020 [US4] [P] [blockedBy: T018] 文档:新增 `docs/reference/commands/feedback.md`(三模式用法/退出码,与 quickstart 一致);更新 `docs/reference/skills/feedback.md` 分类表(复杂命令 +feedback)与 probe 化机制段
+- [X] T021 [US4] [blockedBy: T017, T019] 手动 QA(quickstart §1~2):scratch 项目内无参数总览 ↔ `probes --format json` 一致;记录一条真实反馈→package→`cleanup --dry-run` 预览→执行清理,对账活跃库清空与包内留档;证据存 `verification-scratch/sc-007-mode12.txt`
 
 **Checkpoint**: US4 独立可测——用户无需手工调引擎即可完成三类诉求
 
