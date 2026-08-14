@@ -6,7 +6,7 @@
 
 ## C-1 `record` 扩展
 
-- C-1.1 `record` MUST 按 `--unit-id` 从 probe 合并真源解析 `probe`(Object);解析失败(无对应 Object)→ 退出码 2,错误信息含 `no probe object for unit`。
+- C-1.1 `record` MUST 按 `--unit-id` 从 probe 合并真源解析 `probe`(Object);解析失败(无对应 Object)→ 退出码 2,错误信息含 `no probe object for unit`。**实施语义**:真源文件缺失(未升级工作区)→ legacy 回退(照常记录、无 probe 字段),符合红线 2(机制不得阻塞)。
 - C-1.2 条目 frontmatter MUST 写入 `probe`、`kind`、`slice`(自 Object→Class 继承);不接受调用方手工传 `kind`/`slice` 覆盖。
 - C-1.3 外部条目(`kind=external`)与内部条目共同计入 `count_since_submission`(阈值为本地提示语义,与上送无关);外部排除仅发生在 package(C-4)。
 
@@ -16,6 +16,7 @@
 - C-2.2 新旗标 `--kind <internal|external>`:仅返回对应类别条目。
 - C-2.3 既有 `--unit-id/--since/--limit/--contains` 语义不变;过滤为引擎端程序判定,输出保持摘要级。
 - C-2.4 新旗标 `--disposition <processed|ignored|open>`:按处置状态过滤(open=缺省)。
+- C-2.5 新动作 `dispose`(FR-011 的 setter,与 C-2.4 过滤器配对):`--action dispose --id <entry-id> --to processed|ignored` 将处置状态写入条目 frontmatter 与 index 镜像(仅元数据,正文 MUST NOT 改写);非法 `--to` 或未知 `--id` → 退出码 2。
 
 ## C-3 `probes`(新动作,模式一后端)
 

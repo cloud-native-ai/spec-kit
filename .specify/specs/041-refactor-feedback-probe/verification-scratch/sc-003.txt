@@ -1,0 +1,7 @@
+== SC-003: double rebuild diff ==
+ZERO-DIFF ✓
+
+== structural check ==
+mermaid nodes: 55 (expect 1 root + 2 kinds + 3 classes + 49 objects = 55)
+detail rows: 49 (expect 49)
+external-custom zero-marker: 1

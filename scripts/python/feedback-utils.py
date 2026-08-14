@@ -174,7 +174,8 @@ def _scalar(value: str) -> Any:
 
 def dump_frontmatter(meta: Dict[str, Any]) -> str:
     order = ["id", "unit_id", "unit_type", "run_id", "scope",
-             "feature", "feature_id", "partial", "created", "summary"]
+             "probe", "kind", "slice",
+             "feature", "feature_id", "disposition", "partial", "created", "summary"]
     lines = ["---"]
     for key in order:
         if key not in meta:
@@ -275,8 +276,12 @@ def entry_meta(meta: Dict[str, Any], filename: str) -> Dict[str, Any]:
         "unit_id": meta.get("unit_id", ""),
         "unit_type": meta.get("unit_type", ""),
         "run_id": meta.get("run_id", ""),
+        "probe": meta.get("probe", ""),
+        "kind": meta.get("kind", ""),
+        "slice": meta.get("slice", ""),
         "feature": meta.get("feature", ""),
         "feature_id": meta.get("feature_id", ""),
+        "disposition": meta.get("disposition", ""),
         "partial": bool(meta.get("partial", False)),
         "created": meta.get("created", ""),
         "summary": meta.get("summary", ""),
@@ -289,13 +294,23 @@ def entry_meta(meta: Dict[str, Any], filename: str) -> Dict[str, Any]:
 def action_record(args: argparse.Namespace) -> Dict[str, Any]:
     workspace_root = resolve_workspace_root(args.workspace_root)
     unit_id = (args.unit_id or "").strip()
-    if not validate_unit_id(unit_id):
-        raise FeedbackError(
-            "Invalid --unit-id; expected '/speckit.<command>' or 'skill:<name>'."
-        )
     unit_type = (args.unit_type or "").strip()
-    if unit_type not in ("skill", "command"):
-        raise FeedbackError("--unit-type must be 'skill' or 'command'.")
+    if unit_id.startswith("custom:"):
+        if not _CUSTOM_UNIT_RE.match(unit_id):
+            raise FeedbackError(
+                "Invalid --unit-id; expected 'custom:<owner>/<name>'.")
+        if unit_type != "custom-unit":
+            raise FeedbackError("--unit-type must be 'custom-unit' for custom: units.")
+    else:
+        if not validate_unit_id(unit_id):
+            raise FeedbackError(
+                "Invalid --unit-id; expected '/speckit.<command>' or 'skill:<name>'."
+            )
+        if unit_type == "custom-unit":
+            raise FeedbackError(
+                "--unit-type 'custom-unit' requires a 'custom:' --unit-id.")
+        if unit_type not in ("skill", "command"):
+            raise FeedbackError("--unit-type must be 'skill' or 'command'.")
     run_id = (args.run_id or "").strip()
     if not run_id:
         raise FeedbackError("--run-id is required.")
@@ -309,6 +324,16 @@ def action_record(args: argparse.Namespace) -> Dict[str, Any]:
             "record requires --points / --points-file with at least one line "
             f"(use '{NO_OP_POINT}' for a clean run)."
         )
+
+    # Probe resolution (requirement 041): with the registry installed, every
+    # entry MUST carry probe attribution (engine-resolved; never caller-set).
+    # Registry absent (un-upgraded workspace) → legacy record without fields.
+    registry = load_probe_registry(workspace_root)
+    probe = None
+    if registry["available"]:
+        probe = resolve_probe(registry, unit_id)
+        if probe is None:
+            raise FeedbackError(f"no probe object for unit: {unit_id}")
 
     index = load_index(workspace_root)
     threshold = resolve_threshold(args.threshold, index.get("threshold"))
@@ -355,6 +380,10 @@ def action_record(args: argparse.Namespace) -> Dict[str, Any]:
         "created": created,
         "summary": make_summary(review),
     }
+    if probe is not None:
+        meta["probe"] = probe["object_id"]
+        meta["kind"] = probe["kind"]
+        meta["slice"] = probe["slice"]
     (target_dir / filename).write_text(
         compose_entry(meta, review, points, partial), encoding="utf-8"
     )
@@ -396,6 +425,9 @@ def action_list(args: argparse.Namespace) -> Dict[str, Any]:
     unit_type = (args.unit_type or "").strip()
     since = (args.since or "").strip()
     contains = (args.contains or "").strip().lower()
+    slice_filter = (getattr(args, "slice", None) or "").strip()
+    kind_filter = (getattr(args, "kind", None) or "").strip()
+    disposition = (getattr(args, "disposition", None) or "").strip()
 
     items: List[Dict[str, Any]] = []
     for entry in load_index(workspace_root).get("entries", []):
@@ -405,6 +437,14 @@ def action_list(args: argparse.Namespace) -> Dict[str, Any]:
             continue
         if since and str(entry.get("created", "")) < since:
             continue
+        if slice_filter and entry.get("slice", "") != slice_filter:
+            continue
+        if kind_filter and entry.get("kind", "") != kind_filter:
+            continue
+        if disposition:
+            current = entry.get("disposition", "") or "open"
+            if current != disposition:
+                continue
         if contains:
             haystack = str(entry.get("summary", ""))
             entry_file = feedback_dir(workspace_root) / entry.get("file", "")
@@ -418,6 +458,37 @@ def action_list(args: argparse.Namespace) -> Dict[str, Any]:
     items.sort(key=lambda e: e.get("created", ""), reverse=True)
     matches = items if limit is None else items[:limit]
     return {"count": len(matches), "matches": matches}
+
+
+_VALID_DISPOSITIONS = ("processed", "ignored")
+
+
+def action_dispose(args: argparse.Namespace) -> Dict[str, Any]:
+    """Mark one entry's disposition (local metadata; body never rewritten)."""
+    workspace_root = resolve_workspace_root(args.workspace_root)
+    target_state = (getattr(args, "to", None) or "").strip()
+    if target_state not in _VALID_DISPOSITIONS:
+        raise FeedbackError(
+            "--to must be one of " + " | ".join(_VALID_DISPOSITIONS) + ".")
+    entry_id = (getattr(args, "id", None) or "").strip()
+    if not entry_id:
+        raise FeedbackError("--id is required.")
+    index = load_index(workspace_root)
+    for entry in index.get("entries", []):
+        if entry.get("id") != entry_id:
+            continue
+        entry["disposition"] = target_state
+        entry_file = feedback_dir(workspace_root) / entry.get("file", "")
+        if entry_file.is_file():
+            meta, body = parse_frontmatter(entry_file.read_text(encoding="utf-8"))
+            meta["disposition"] = target_state
+            entry_file.write_text(
+                dump_frontmatter(meta) + "\n\n" + body.strip() + "\n",
+                encoding="utf-8",
+            )
+        save_index(workspace_root, index)
+        return {"id": entry_id, "disposition": target_state}
+    raise FeedbackError(f"no entry with id: {entry_id}")
 
 
 def action_mark_submitted(args: argparse.Namespace) -> Dict[str, Any]:
@@ -865,6 +936,125 @@ def action_probes(args: argparse.Namespace) -> Dict[str, Any]:
     }
 
 
+PROBE_MAP_NAME = "probe-map.md"
+
+
+def _map_slug(name: str) -> str:
+    """Deterministic Mermaid node id: keep [a-zA-Z0-9_] only."""
+    return _SLUG_RE.sub("_", name).strip("_")
+
+
+def compose_probe_map(registry: Dict[str, Any]) -> str:
+    """Render the derived probe map (deterministic: sorted, no timestamps).
+
+    Rebuilding from an unchanged truth source MUST be byte-identical — that
+    invariant is what makes drift detectable (SC-003).
+    """
+    classes = _class_index(registry)
+    objects = merged_probe_objects(registry)
+    lines: List[str] = [
+        "# Feedback Probe Map(反馈插点结构图)",
+        "",
+        "> **派生物** — 由 `--action map` 自 probe 真源整体重建,禁止手工编辑;",
+        "> 真源:`shared/definitions/probe-definitions.md` + 项目外部 probe。",
+        "",
+    ]
+    for kind, kind_label in (("internal", "internal(内部 — 目标为 Spec Kit 框架)"),
+                             ("external", "external(外部 — 目标为宿主项目自定义单元)")):
+        group = sorted((o for o in objects if o.get("kind") == kind),
+                       key=lambda o: (o.get("class_id", ""), o.get("object_id", "")))
+        by_class: Dict[str, List[Dict[str, Any]]] = {}
+        for o in group:
+            by_class.setdefault(o.get("class_id", ""), []).append(o)
+        # render EVERY class of this kind — zero-object classes stay visible
+        kind_classes = sorted(
+            (c for c in registry["classes"]
+             if c.get("kind") == kind and c.get("class_id")),
+            key=lambda c: c.get("class_id", ""))
+        if not kind_classes:
+            continue
+        lines.append(f"## {kind_label}")
+        lines.append("")
+        for cid in [c.get("class_id", "") for c in kind_classes]:
+            c = classes.get(cid, {})
+            members = sorted(by_class.get(cid, []),
+                             key=lambda x: x.get("object_id", ""))
+            lines.append(f"### {cid}  [slice: {c.get('target_slice', '-')}]")
+            lines.append("")
+            lines.append(f"- **收集内容**: {c.get('collection', '-')}")
+            lines.append(f"- **处理流程**: {c.get('processing', '-')}")
+            lines.append(f"- **适用插入位置**: {c.get('insertion_type', '-')}")
+            if members:
+                lines.append(f"- **Objects** ({len(members)}):")
+                for o in members:
+                    lines.append(
+                        f"  - `{o.get('object_id')}` — {o.get('unit')} @ "
+                        f"{o.get('lifecycle_point')}")
+            else:
+                lines.append("- **Objects** (0 — 尚无实例;外部类经模式三注入)")
+            lines.append("")
+    lines.append("## 结构总览(Mermaid)")
+    lines.append("")
+    lines.append("```mermaid")
+    lines.append("graph TD")
+    lines.append("  root[Feedback Probe]")
+    for kind in ("internal", "external"):
+        group = [o for o in objects if o.get("kind") == kind]
+        kind_classes = sorted(
+            (c for c in registry["classes"]
+             if c.get("kind") == kind and c.get("class_id")),
+            key=lambda c: c.get("class_id", ""))
+        if not group and not kind_classes:
+            continue
+        kind_node = _map_slug(f"kind {kind}")
+        lines.append(f"  root --> {kind_node}[{kind}]")
+        by_class: Dict[str, List[Dict[str, Any]]] = {}
+        for o in group:
+            by_class.setdefault(o.get("class_id", ""), []).append(o)
+        for cid in [c.get("class_id", "") for c in kind_classes]:
+            class_node = _map_slug(f"class {cid}")
+            lines.append(f"  {kind_node} --> {class_node}[{cid}]")
+            for o in sorted(by_class.get(cid, []), key=lambda x: x.get("object_id", "")):
+                obj_node = _map_slug(f"obj {o.get('object_id', '')}")
+                lines.append(f"  {class_node} --> {obj_node}[{o.get('object_id')}]")
+    lines.append("```")
+    lines.append("")
+    lines.append("## 明细表")
+    lines.append("")
+    lines.append("| Object | Class | Kind | 插入位置(unit @ lifecycle) | 收集内容 | 处理流程 |")
+    lines.append("|--------|-------|------|------------------------------|----------|----------|")
+    for o in sorted(objects, key=lambda x: (x.get("kind", ""), x.get("class_id", ""),
+                                            x.get("object_id", ""))):
+        c = classes.get(o.get("class_id", ""), {})
+        lines.append(
+            f"| `{o.get('object_id')}` | {o.get('class_id')} | {o.get('kind')} "
+            f"| {o.get('unit')} @ {o.get('lifecycle_point')} "
+            f"| {c.get('collection', '-')} | {c.get('processing', '-')} |")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def action_map(args: argparse.Namespace) -> Dict[str, Any]:
+    workspace_root = resolve_workspace_root(args.workspace_root)
+    registry = load_probe_registry(workspace_root)
+    if not registry["available"]:
+        raise FeedbackError(f"probe registry not found: {probe_defs_path(workspace_root)}")
+    if registry["errors"]:
+        raise FeedbackError(
+            "probe registry invalid (run --action probes --validate):\n- "
+            + "\n- ".join(registry["errors"][:10]))
+    target_dir = ensure_feedback_dir(workspace_root)
+    (target_dir / PROBE_MAP_NAME).write_text(
+        compose_probe_map(registry), encoding="utf-8")
+    rel = (FEEDBACK_SUBDIR / PROBE_MAP_NAME).as_posix()
+    return {
+        "map": rel,
+        "classes": len(registry["classes"]),
+        "objects": len(registry["objects"]),
+        "external_objects": len(registry["external"]),
+    }
+
+
 # --------------------------------------------------------------------------- #
 # Rendering / CLI
 # --------------------------------------------------------------------------- #
@@ -947,9 +1137,23 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--action",
         required=True,
-        choices=["record", "status", "list", "mark-submitted", "reindex",
-                 "package", "upstream", "probes"],
+        choices=["record", "status", "list", "dispose", "mark-submitted", "reindex",
+                 "package", "upstream", "probes", "map"],
     )
+    parser.add_argument("--slice", default=None,
+                        help="list: filter entries by target system slice "
+                             "(inherited from the entry's probe class)")
+    parser.add_argument("--kind", default=None,
+                        help="list: filter entries by probe kind "
+                             "(internal|external)")
+    parser.add_argument("--disposition", default=None,
+                        help="list: filter entries by disposition "
+                             "(processed|ignored|open)")
+    parser.add_argument("--id", default=None,
+                        help="dispose: target entry id")
+    parser.add_argument("--to", default=None,
+                        help="dispose: target disposition state "
+                             "(processed|ignored)")
     parser.add_argument("--validate", action="store_true",
                         help="probes: structurally validate the merged probe "
                              "registry (exit 2 listing every violation)")
@@ -995,11 +1199,13 @@ _ACTIONS = {
     "record": action_record,
     "status": action_status,
     "list": action_list,
+    "dispose": action_dispose,
     "mark-submitted": action_mark_submitted,
     "reindex": action_reindex,
     "package": action_package,
     "upstream": action_upstream,
     "probes": action_probes,
+    "map": action_map,
 }
 
 

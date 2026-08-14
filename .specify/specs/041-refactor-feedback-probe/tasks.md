@@ -94,12 +94,12 @@
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T009 [US2] [blockedBy: T004] 创建引擎契约测试 `tests/contract/test_feedback_probe_cli.py` 首批用例(map 幂等零差异、覆盖度=合并真源、Class→Object 分组与内外标注,engine-cli C-7);先失败后实现
+- [X] T009 [US2] [blockedBy: T004] 创建引擎契约测试 `tests/contract/test_feedback_probe_cli.py` 首批用例(map 幂等零差异、覆盖度=合并真源、Class→Object 分组与内外标注,engine-cli C-7);先失败后实现
 
 ### Implementation for User Story 2
 
-- [ ] T010 [US2] [blockedBy: T009] 在 `scripts/python/feedback-utils.py` 实现 `--action map`:整体重建 `.specify/memory/feedback/probe-map.md`(竖状树 + Mermaid 源码块 + 明细表,见 data-model §6);不读旧文件、无合并语义
-- [ ] T011 [US2] [blockedBy: T010] render-verify:生成 probe-map.md,Mermaid 块结构校验(节点数=Class+Object 数),连续两次执行 `diff` 零差异;证据存 `verification-scratch/sc-003.txt`
+- [X] T010 [US2] [blockedBy: T009] 在 `scripts/python/feedback-utils.py` 实现 `--action map`:整体重建 `.specify/memory/feedback/probe-map.md`(竖状树 + Mermaid 源码块 + 明细表,见 data-model §6);不读旧文件、无合并语义
+- [X] T011 [US2] [blockedBy: T010] render-verify:生成 probe-map.md,Mermaid 块结构校验(节点数=Class+Object 数),连续两次执行 `diff` 零差异;证据存 `verification-scratch/sc-003.txt`
 
 **Checkpoint**: US2 独立可测——图 = 真源函数,SC-003 可判
 
@@ -112,13 +112,13 @@
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T012 [US3] [P] [blockedBy: T004] 编写失败测试:扩展 `tests/contract/test_feedback_probe_entry_schema.py`(probe/kind/slice frontmatter、无对应 Object 时 exit 2、disposition 只经处置动作,entry-schema C-1)并在 `tests/contract/test_feedback_probe_cli.py` 追加 `--slice/--kind/--disposition` 过滤用例(engine-cli C-2)
+- [X] T012 [US3] [P] [blockedBy: T004] 编写失败测试:扩展 `tests/contract/test_feedback_probe_entry_schema.py`(probe/kind/slice frontmatter、无对应 Object 时 exit 2、disposition 只经处置动作,entry-schema C-1)并在 `tests/contract/test_feedback_probe_cli.py` 追加 `--slice/--kind/--disposition` 过滤用例(engine-cli C-2)
 
 ### Implementation for User Story 3
 
-- [ ] T013 [US3] [blockedBy: T012] 在 `scripts/python/feedback-utils.py` 实现 record 的 probe 自动解析(unit_id→Object;失败 exit 2 报 `no probe object for unit`)与 frontmatter/index 新键(probe/kind/slice/disposition,entry-schema C-1/C-4;不接受手工 kind/slice 覆盖)
-- [ ] T014 [US3] [blockedBy: T013] 实现 `list --slice/--kind/--disposition` 过滤(引擎端程序判定,输出保持摘要级)
-- [ ] T015 [US3] [blockedBy: T013] mirror-parity:引擎镜像 `sync-mirrors.py --write` + `--check` exit 0;`diff -q scripts/python/feedback-utils.py .specify/scripts/python/feedback-utils.py` 零差异
+- [X] T013 [US3] [blockedBy: T012] 在 `scripts/python/feedback-utils.py` 实现 record 的 probe 自动解析(unit_id→Object;失败 exit 2 报 `no probe object for unit`)与 frontmatter/index 新键(probe/kind/slice/disposition,entry-schema C-1/C-4;不接受手工 kind/slice 覆盖)
+- [X] T014 [US3] [blockedBy: T013] 实现 `list --slice/--kind/--disposition` 过滤(引擎端程序判定,输出保持摘要级)
+- [X] T015 [US3] [blockedBy: T013] mirror-parity:引擎镜像 `sync-mirrors.py --write` + `--check` exit 0;`diff -q scripts/python/feedback-utils.py .specify/scripts/python/feedback-utils.py` 零差异
 
 **Checkpoint**: US3 独立可测——切片消费闭环成立;MVP(US1+US2+US3)齐备,STOP 验证
 
