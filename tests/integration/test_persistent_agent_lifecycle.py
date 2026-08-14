@@ -4,17 +4,26 @@ Spec 023 (Agent Framework Redesign) distinguishes two agent lifecycles:
 
 - **temporary** — spawned for a single orchestration; context-only, never written to disk.
 - **persistent** — written under the layered stores ``.specify/agents/templates/`` /
-  ``.specify/agents/instances/`` and linked into every officially supported tool's agent
-  config directory (per-file links, e.g. ``.qoder/agents/<slug>.agent.md``).
+  ``.specify/agents/instances/`` and rendered into every officially supported tool's
+  agent config directory as real files (Feature 044; per-file symlinks retired).
 
-This test asserts the persistence + linking behaviour for persistent agents and confirms
+This test asserts the persistence + rendering behaviour for persistent agents and confirms
 the ``create-agent`` skill documents the temporary (non-persisted) lifecycle.
 """
 
 import pytest
 from pathlib import Path
 
-from specify_cli import ensure_per_file_agent_links
+from specify_cli import render_agents_for_tool
+
+NEUTRAL_DEF = (
+    "---\n"
+    'name: "System Designer"\n'
+    'description: "Designs system-level architecture."\n'
+    "model-tier: auto\n"
+    "---\n"
+    "persistent\n"
+)
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 PERSISTED_ROLES = [
@@ -52,41 +61,45 @@ class TestPersistentAgentLifecycle:
                     offenders.append(f"{md.name}:{lineno}: {line.strip()}")
         assert not offenders, "persisted agents retain deprecated terms:\n" + "\n".join(offenders)
 
-    def test_initialization_creates_tool_agent_link(self, tmp_path):
-        """Each supported tool gets a per-file agents symlink into the layered stores (FR-012)."""
+    def test_initialization_renders_tool_agent_file(self, tmp_path):
+        """Each supported tool gets rendered real files from the layered stores (FR-012)."""
         # Simulate a persistent agent being written to the canonical Template store.
         specify_agents = tmp_path / ".specify" / "agents" / "templates"
         specify_agents.mkdir(parents=True, exist_ok=True)
-        (specify_agents / "system-designer.agent.md").write_text("persistent", encoding="utf-8")
+        (specify_agents / "system-designer.agent.md").write_text(
+            NEUTRAL_DEF, encoding="utf-8"
+        )
 
-        ensure_per_file_agent_links(tmp_path, ".qoder")
+        render_agents_for_tool(tmp_path, "qoder")
 
         tool_dir = tmp_path / ".qoder" / "agents"
         assert tool_dir.is_dir() and not tool_dir.is_symlink(), (
-            ".qoder/agents must be a real directory of per-file links"
+            ".qoder/agents must be a real directory of rendered files"
         )
-        link = tool_dir / "system-designer.agent.md"
-        assert link.is_symlink(), ".qoder/agents/system-designer.agent.md must be a symlink"
-        assert link.resolve() == (specify_agents / "system-designer.agent.md").resolve(), (
-            "per-file link must resolve to the canonical .specify/agents/templates file"
+        output = tool_dir / "system-designer.agent.md"
+        assert output.is_file() and not output.is_symlink(), (
+            ".qoder/agents/system-designer.agent.md must be a rendered real file"
         )
-        assert link.read_text(encoding="utf-8") == "persistent"
+        content = output.read_text(encoding="utf-8")
+        assert "persistent" in content
 
-    def test_per_file_links_preserve_tool_authored_overrides(self, tmp_path):
-        """A tool's own agent file (non-symlink) is not clobbered by linking."""
+    def test_render_preserves_tool_authored_overrides(self, tmp_path):
+        """A tool-side user asset (not in the manifest, no matching slug) is untouched."""
         specify_agents = tmp_path / ".specify" / "agents" / "templates"
         specify_agents.mkdir(parents=True, exist_ok=True)
-        (specify_agents / "system-designer.agent.md").write_text("persistent", encoding="utf-8")
+        (specify_agents / "system-designer.agent.md").write_text(
+            NEUTRAL_DEF, encoding="utf-8"
+        )
         tool_dir = tmp_path / ".qoder" / "agents"
         tool_dir.mkdir(parents=True, exist_ok=True)
         override = tool_dir / "Full-Stack Engineer.md"
         override.write_text("tool-authored override", encoding="utf-8")
 
-        ensure_per_file_agent_links(tmp_path, ".qoder")
+        render_agents_for_tool(tmp_path, "qoder")
 
         assert override.exists() and not override.is_symlink()
         assert override.read_text(encoding="utf-8") == "tool-authored override"
-        assert (tool_dir / "system-designer.agent.md").is_symlink()
+        assert (tool_dir / "system-designer.agent.md").is_file()
 
     def test_temporary_agent_is_not_persisted(self, tmp_path):
         """A temporary agent is context-only: nothing is written under .specify/agents/."""

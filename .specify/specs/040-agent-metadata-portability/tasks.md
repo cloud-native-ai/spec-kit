@@ -86,16 +86,16 @@ Task State Sigil:`[ ]` 待做 / `[X]` 完成 / `[~]` 延迟(须在 Notes 说明)
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T016 [US3] [blockedBy: T003] 创建 `tests/contract/test_tool_mapping.py`:M-1 完备性(以 `AGENT_CONFIG` 键域动态对照,禁硬编码 6)、M-2 每行 provenance 非空且无"待核实"、M-3 目录矩阵、M-4 字段转换无遗漏、M-5 策略文本在常量头部、M-6 越界回退、M-7 单点真源(渲染代码不得出现并行目录/字段知识)
-- [ ] T017 [US3] [blockedBy: T003] 创建 `tests/contract/test_agent_render.py`:R-1 真实文件非链接、R-2 仅 `*.agent.md` 且 execution 层不分发、R-3 instance 同名优先、R-4 连续两次渲染逐字节一致(SC-005)、R-9 反馈含工具/计数/备份/未承载汇总、R-10 占位符拒入、C-6 框架键不出现在任何产物
-- [ ] T018 [US3] [blockedBy: T017] 改写 `tests/integration/test_init_agents.py` 为渲染语义:四工具参数化(目录按 M-3)、符号链接计数为 0(SC-002)、渲染文件数 = `len(中立源 glob)`(禁硬编码)、user agent 保全、instances 层存活
+- [X] T016 [US3] [blockedBy: T003] 创建 `tests/contract/test_tool_mapping.py`:M-1 完备性(以 `AGENT_CONFIG` 键域动态对照,禁硬编码 6)、M-2 每行 provenance 非空且无"待核实"、M-3 目录矩阵、M-4 字段转换无遗漏、M-5 策略文本在常量头部、M-6 越界回退、M-7 单点真源(渲染代码不得出现并行目录/字段知识)
+- [X] T017 [US3] [blockedBy: T003] 创建 `tests/contract/test_agent_render.py`:R-1 真实文件非链接、R-2 仅 `*.agent.md` 且 execution 层不分发、R-3 instance 同名优先、R-4 连续两次渲染逐字节一致(SC-005)、R-9 反馈含工具/计数/备份/未承载汇总、R-10 占位符拒入、C-6 框架键不出现在任何产物
+- [X] T018 [US3] [blockedBy: T017] 改写 `tests/integration/test_init_agents.py` 为渲染语义:四工具参数化(目录按 M-3)、符号链接计数为 0(SC-002)、渲染文件数 = `len(中立源 glob)`(禁硬编码)、user agent 保全、instances 层存活
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] [blockedBy: T016] 在 `src/specify_cli/__init__.py` 实现 `_AGENT_METADATA_MAPPING` 全量(qoder/claude/copilot/opencode 渲染行 + codex/hermes 标注行;每行 provenance URL 见 contracts/tool-mapping.md §M-2;D3 策略写入常量头部注释;claude 行字段清单实现期对照官方文档二次核实后方可去"待核实")
-- [ ] T020 [US3] [blockedBy: T019, T017] 在 `src/specify_cli/__init__.py` 实现 `render_agents_for_tool()` + 清单写入(E4 schema);替换 init 调用点(`:1599-1617` 区域)为渲染调用;tracker 文案按 R-9
-- [ ] T021 [US3] [blockedBy: T020] 退役软链接机制(R-11):先把 `tests/contract/test_agents_symlink.py` 改写为 `tests/contract/test_agent_render_migration.py`(语义映射到 R-5/R-6/R-8),绿后删除 `ensure_per_file_agent_links()` 与 `_AGENT_LINK_DIRS`;按仓库 rename/retire 纪律评估是否登记 `_OBSOLETE_*`
-- [ ] T022 [US3] [blockedBy: T018, T021] 运行 US3 全量(契约 + 集成)至绿
+- [X] T019 [US3] [blockedBy: T016] 在 `src/specify_cli/__init__.py` 实现 `_AGENT_METADATA_MAPPING` 全量(qoder/claude/copilot/opencode 渲染行 + codex/hermes 标注行;每行 provenance URL 见 contracts/tool-mapping.md §M-2;D3 策略写入常量头部注释;claude 行字段清单实现期对照官方文档二次核实后方可去"待核实")
+- [X] T020 [US3] [blockedBy: T019, T017] 在 `src/specify_cli/__init__.py` 实现 `render_agents_for_tool()` + 清单写入(E4 schema);替换 init 调用点(`:1599-1617` 区域)为渲染调用;tracker 文案按 R-9
+- [X] T021 [US3] [blockedBy: T020] 退役软链接机制(R-11):先把 `tests/contract/test_agents_symlink.py` 改写为 `tests/contract/test_agent_render_migration.py`(语义映射到 R-5/R-6/R-8),绿后删除 `ensure_per_file_agent_links()` 与 `_AGENT_LINK_DIRS`;按仓库 rename/retire 纪律评估是否登记 `_OBSOLETE_*`
+- [X] T022 [US3] [blockedBy: T018, T021] 运行 US3 全量(契约 + 集成)至绿
 
 ## Phase 6: User Story 4 - 迁移平滑且不吞用户改动 (Priority: P2)
 

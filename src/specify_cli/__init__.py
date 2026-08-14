@@ -339,6 +339,278 @@ def load_project_agent_definitions(project_path):
 
 
 # ---------------------------------------------------------------------------
+# Tool metadata mapping + renderer (Feature 044 — init-time distribution)
+#
+# unmapped-field policy (D3, contracts/tool-mapping.md M-5): a neutral field
+# with no counterpart on the target tool is SKIPPED (never emitted) and
+# reported per-agent in the init feedback; the policy applies identically to
+# every tool. Provenance rows cite the official docs the field knowledge was
+# verified from (FR-010); codex/hermes are annotated rows, not rendered.
+# ---------------------------------------------------------------------------
+
+_AGENT_METADATA_MAPPING = {
+    "qoder": {
+        "mode": "render",
+        "target_dir": ".qoder/agents",
+        "file_naming": "{slug}.agent.md",
+        "fields": {
+            "name": {"emit": "name"},
+            "description": {"emit": "description"},
+            "user-invocable": None,
+            "disable-model-invocation": None,
+            "model-tier": {"emit": "model"},
+            "capability-tools": {"emit": "tools", "style": "list"},
+            "skills": {"emit": "skills", "style": "list"},
+            "run-turn-budget": {"emit": "maxTurns"},
+            "display-color": {"emit": "color"},
+        },
+        "provenance": "https://docs.qoder.com/cli/subagent",
+    },
+    "claude": {
+        "mode": "render",
+        "target_dir": ".claude/agents",
+        "file_naming": "{slug}.md",
+        "fields": {
+            "name": {"emit": "name"},
+            "description": {"emit": "description"},
+            "user-invocable": None,
+            "disable-model-invocation": None,
+            # Claude model identifiers are product names, not preference
+            # tiers — no faithful mapping (D3).
+            "model-tier": None,
+            "capability-tools": {"emit": "tools", "style": "comma-string"},
+            "skills": None,
+            "run-turn-budget": None,
+            "display-color": None,
+        },
+        "provenance": (
+            "https://code.claude.com/docs/en/sub-agents (official page; the "
+            "field list was verified 2026-08-13 via the VS Code docs, which "
+            "document the Claude sub-agents format for .claude/agents/)"
+        ),
+    },
+    "copilot": {
+        "mode": "render",
+        "target_dir": ".github/agents",
+        "file_naming": "{slug}.agent.md",
+        "fields": {
+            "name": {"emit": "name"},
+            "description": {"emit": "description"},
+            "user-invocable": {"emit": "user-invocable"},
+            "disable-model-invocation": {"emit": "disable-model-invocation"},
+            # Copilot model values are product-specific; tiers don't map (D3).
+            "model-tier": None,
+            "capability-tools": {"emit": "tools", "style": "list"},
+            "skills": None,
+            "run-turn-budget": None,
+            "display-color": None,
+        },
+        "provenance": (
+            "https://code.visualstudio.com/docs/copilot/customization/"
+            "custom-agents; https://docs.github.com/en/copilot/concepts/"
+            "agents/cloud-agent/about-custom-agents"
+        ),
+    },
+    "opencode": {
+        "mode": "render",
+        "target_dir": ".opencode/agents",
+        # opencode: the FILENAME is the agent name — `name` is not emitted.
+        "file_naming": "{slug}.md",
+        "omit_name": True,
+        "mode_from_invocability": True,
+        "fields": {
+            "name": None,
+            "description": {"emit": "description"},
+            "user-invocable": None,
+            "disable-model-invocation": None,
+            # opencode model values are provider/model IDs; tiers don't map (D3).
+            "model-tier": None,
+            # `tools` is deprecated in opencode agent frontmatter (D3).
+            "capability-tools": None,
+            "skills": None,
+            "run-turn-budget": {"emit": "steps"},
+            "display-color": {"emit": "color"},
+        },
+        "provenance": "https://opencode.ai/docs/agents/",
+    },
+    "codex": {
+        "mode": "annotated",
+        "provenance": (
+            "https://github.com/openai/codex (source: codex-rs/core/src/"
+            "config/agent_roles.rs; official docs page unreachable at "
+            "verification time)"
+        ),
+        "note": (
+            "Codex agents are TOML files under the user-level config layer "
+            "($CODEX_HOME/agents/), outside project scope — not rendered this "
+            "round (FR-012)."
+        ),
+    },
+    "hermes": {
+        "mode": "annotated",
+        "provenance": "https://hermes-agent.nousresearch.com/docs",
+        "note": (
+            "No documented project-level agent file convention — silent skip "
+            "(FR-014)."
+        ),
+    },
+}
+
+_AGENT_MANIFEST_NAME = ".render-manifest.json"
+_AGENT_BACKUP_DIR = ".backups"
+
+
+def _format_agent_frontmatter_value(value):
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, list):
+        return "[" + ", ".join(value) + "]"
+    text = str(value)
+    if any(ch in text for ch in ":#{}[]") or text != text.strip():
+        return '"' + text.replace('"', "'") + '"'
+    return text
+
+
+def _utc_compact_stamp():
+    import datetime
+
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+
+def _agent_file_sha256(path):
+    import hashlib
+
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def render_agents_for_tool(project_path, tool, tracker=None):
+    """Render validated agent definitions into the target tool's agent dir.
+
+    Real files only (no symlinks). Semantics: instance beats template
+    (load order), drift detection via the render manifest (modified outputs
+    are backed up before overwrite), stale outputs pruned, user assets
+    untouched, legacy per-file/whole-dir symlinks replaced (migration).
+    Returns stats: {"tool", "rendered", "backups", "unmapped"}.
+    """
+    project_path = Path(project_path)
+    stats = {"tool": tool, "rendered": 0, "backups": [], "unmapped": {}}
+    row = _AGENT_METADATA_MAPPING.get(tool)
+    if not row or row["mode"] != "render":
+        return stats
+
+    definitions = load_project_agent_definitions(project_path)
+    target_dir = project_path / row["target_dir"]
+
+    # Legacy migration: a whole-dir symlink at the target is removed first.
+    if target_dir.is_symlink():
+        target_dir.unlink()
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    manifest_path = project_path / ".specify" / "agents" / _AGENT_MANIFEST_NAME
+    manifest = {"version": 1, "tool": tool, "rendered_at": "", "entries": {}}
+    if manifest_path.exists():
+        try:
+            manifest = json.loads(manifest_path.read_text())
+        except (ValueError, OSError):
+            pass
+    previous_entries = dict(manifest.get("entries", {}))
+    new_entries = {}
+
+    def _backup(rel_path, target_file):
+        backup_root = (
+            project_path / ".specify" / "agents" / _AGENT_BACKUP_DIR / tool
+        )
+        backup_root.mkdir(parents=True, exist_ok=True)
+        backup_path = backup_root / (
+            f"{target_file.stem}.{_utc_compact_stamp()}{target_file.suffix}"
+        )
+        shutil.copy2(target_file, backup_path)
+        stats["backups"].append(str(backup_path))
+
+    for definition in definitions:
+        slug = definition["slug"]
+        metadata = definition["metadata"]
+        out_lines = ["---"]
+        if row.get("mode_from_invocability") and not metadata.get(
+            "user-invocable", True
+        ):
+            out_lines.append("mode: subagent")
+        for key in NEUTRAL_AGENT_METADATA_KEYS:
+            if key not in metadata or key not in row["fields"]:
+                continue
+            rule = row["fields"][key]
+            if rule is None:
+                if key == "name" and row.get("omit_name"):
+                    continue  # carried by the filename, not an unmapped intent
+                if key in metadata and NEUTRAL_AGENT_METADATA_KEYS[key][2]:
+                    stats["unmapped"].setdefault(slug, []).append(key)
+                continue
+            value = metadata[key]
+            style = rule.get("style")
+            if style == "comma-string":
+                if not isinstance(value, list):
+                    continue
+                out_lines.append(f"{rule['emit']}: " + ", ".join(value))
+            else:
+                out_lines.append(
+                    f"{rule['emit']}: {_format_agent_frontmatter_value(value)}"
+                )
+        out_lines.append("---")
+        body = definition["body"].lstrip("\n")
+        content = "\n".join(out_lines) + "\n" + body
+        if not content.endswith("\n"):
+            content += "\n"
+
+        filename = row["file_naming"].format(slug=slug)
+        target_file = target_dir / filename
+        rel_path = f"{row['target_dir']}/{filename}"
+
+        if target_file.is_symlink():
+            target_file.unlink()  # legacy per-file link → replaced by render
+        elif target_file.exists():
+            previous = previous_entries.get(rel_path)
+            if previous and previous.get("sha256") != _agent_file_sha256(target_file):
+                _backup(rel_path, target_file)
+        target_file.write_text(content)
+        new_entries[rel_path] = {
+            "source": definition["source"],
+            "sha256": _agent_file_sha256(target_file),
+        }
+        stats["rendered"] += 1
+
+    # Prune stale outputs (source removed). Modified ones are backed up first.
+    for rel_path, entry in previous_entries.items():
+        if rel_path in new_entries:
+            continue
+        stale = project_path / rel_path
+        if stale.is_symlink():
+            stale.unlink()
+        elif stale.exists():
+            if entry.get("sha256") != _agent_file_sha256(stale):
+                _backup(rel_path, stale)
+            stale.unlink()
+
+    manifest = {
+        "version": 1,
+        "tool": tool,
+        "rendered_at": _utc_compact_stamp(),
+        "entries": new_entries,
+    }
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
+
+    if tracker:
+        tracker.complete(
+            "local-templates",
+            f"rendered {stats['rendered']} agents for {tool} "
+            f"({len(stats['backups'])} backups)",
+        )
+    return stats
+
+
+# ---------------------------------------------------------------------------
 # Assistant support profile helpers (Feature 022)
 # ---------------------------------------------------------------------------
 
@@ -1371,64 +1643,6 @@ def ensure_agent_layer_dirs(root_path: Path) -> Path:
     return agents_root
 
 
-def ensure_per_file_agent_links(root_path: Path, agent_dir_name: str) -> None:
-    """Link each persisted agent file into ``<agent_dir_name>/agents/`` individually.
-
-    Canonical sources are the two definition layers (see
-    ``shared/definitions/agent-definitions.md``): ``.specify/agents/templates/*.agent.md``
-    (shipped Agent Templates) and ``.specify/agents/instances/*.agent.md``
-    (project-authored Agent Instances). On a filename collision the **instance wins**
-    — it is the project's own specialization. The ``execution/`` layer holds runtime
-    configs/scripts/logs, not agent definitions, and is never linked.
-
-    Unlike :func:`ensure_specify_symlink` (which links a whole directory), this creates a
-    **real** ``<tool>/agents/`` directory populated with one relative symlink per persisted
-    agent file. This lets tools like Qoder mix framework agents with their own overrides in
-    the same directory. Only ``*.agent.md`` files are linked, so non-agent files are never
-    exposed through the tool directory.
-
-    Handles migration from the previous whole-directory symlink model and from the
-    legacy flat ``.specify/agents/*.agent.md`` layout.
-    """
-    agents_root = ensure_agent_layer_dirs(root_path)
-
-    tool_agents = root_path / agent_dir_name / "agents"
-
-    # Migrate away from the legacy whole-directory symlink, if present.
-    if tool_agents.is_symlink():
-        tool_agents.unlink(missing_ok=True)
-
-    tool_agents.mkdir(parents=True, exist_ok=True)
-
-    sources_by_name = {}
-    for layer in ("templates", "instances"):  # instances after templates: instance wins
-        for source in sorted((agents_root / layer).glob("*.agent.md")):
-            sources_by_name[source.name] = source
-    source_files = [sources_by_name[name] for name in sorted(sources_by_name)]
-    expected_names = set(sources_by_name)
-
-    # Remove stale per-file links that no longer have a canonical source.
-    for existing in tool_agents.iterdir():
-        if existing.is_symlink() and existing.name.endswith(".agent.md"):
-            if existing.name not in expected_names:
-                existing.unlink(missing_ok=True)
-
-    for source in source_files:
-        link_path = tool_agents / source.name
-        relative_target = Path(os.path.relpath(source, start=tool_agents))
-        if link_path.is_symlink():
-            try:
-                if link_path.resolve() == source.resolve():
-                    continue
-            except OSError:
-                pass
-            link_path.unlink(missing_ok=True)
-        elif link_path.exists():
-            # A real file with the same name is a tool-authored override: leave it alone.
-            continue
-        link_path.symlink_to(relative_target)
-
-
 def cleanup_obsolete_framework_assets(
     project_path: Path,
     ai_assistant: str,
@@ -1832,27 +2046,29 @@ def copy_local_templates(
             if tracker:
                 tracker.complete("local-templates", ".hermes/skills symlink ready")
 
-        # Agent directory per-file symlinks (each *.agent.md under
-        # .specify/agents/{templates,instances}/ linked individually)
-        _AGENT_LINK_DIRS = {
-            "copilot": ".github",
-            "claude": ".github",
-            "qoder": ".qoder",
-            "opencode": ".opencode",
-            "hermes": ".hermes",
-        }
-        agent_dir_name = _AGENT_LINK_DIRS.get(ai_assistant)
-        if agent_dir_name:
+        # Agent distribution: render the neutral metadata into the target
+        # tool's own agent format as real files (Feature 044; the per-file
+        # symlink model is retired). Annotated rows (codex/hermes) skip
+        # silently per FR-012/FR-014.
+        agent_row = _AGENT_METADATA_MAPPING.get(ai_assistant)
+        if agent_row and agent_row["mode"] == "render":
             if tracker:
                 tracker.start(
                     "local-templates",
-                    f"linking {agent_dir_name}/agents to .specify/agents",
+                    f"rendering agents for {ai_assistant}",
                 )
-            ensure_per_file_agent_links(project_path, agent_dir_name)
+            render_stats = render_agents_for_tool(project_path, ai_assistant)
+            summary = (
+                f"rendered {render_stats['rendered']} agents for {ai_assistant}"
+            )
+            if render_stats["backups"]:
+                summary += f" ({len(render_stats['backups'])} hand-edited backups)"
+            if render_stats["unmapped"]:
+                summary += (
+                    f"; unmapped intents on {len(render_stats['unmapped'])} agent(s)"
+                )
             if tracker:
-                tracker.complete(
-                    "local-templates", f"{agent_dir_name}/agents links ready"
-                )
+                tracker.complete("local-templates", summary)
 
         # Structural cleanup: remove obsolete framework-owned skills, commands,
         # and templates left behind by earlier versions (upgrade path). Scope is
