@@ -53,6 +53,7 @@
 | iFlow CLI | iflow, iflow-cli, .iflow/ | **Agent CLI 工具名**:曾为 Tier 2 支持,已随 0c300bc8 下线;不存在与之对应的同名模型 ID | user | confirmed |
 | Agent Execution | agent执行, 运行实例, subagent, 子代理 | Agent 三层分类法第三层:定义真正执行时的运行形态,持久产物在 .specify/agents/execution/(configs/scripts 归档,logs 不入库);三种模式(native/virtual/external)见 shared/definitions/subagent-definitions.md | user | confirmed |
 | Feedback Probe | 反馈插点, feedback probe, 插点 | 两层建模的显式反馈插点:Probe Class 定义一类插点的特征(收集内容/目标系统切片/收集后处理流程/适用插入位置类型),Probe Object 为其在当前系统中的实例化(绑定具体流程单元×生命周期点);既有 49 个 wrap-up 埋点重构为 Object 并归类到 Class(需求 041) | auto | proposed |
+| Dogfooding | dogfooding, 吃自己的狗粮, 自举, self-hosting, 自食其力 | **使用自身(作为开发工具/框架)开发自身**的工程实践,常见于工具/框架类项目;类比编译器自举——用编译器编译其自身源码,只有自身工程表现良好的工具才赢得辅助他人的可信度;Spec Kit 语境=本仓既是框架源又是自己的客户项目(用 /speckit.* 开发 /speckit.* 本身);提及即承载完整语义束(自举证明/两顶帽子/Loop A-B/修复落机制侧);真源 shared/definitions/dogfooding-definitions.md §0 | user | confirmed |
 | System Slice | 系统切片, feedback slice | 反馈针对的框架部位,沿框架既有组成维度(命令/技能/脚本/模板/文档)取值;由 Probe Class 声明为目标、条目经 Object→Class 继承,作为反馈过滤与统计维度;与 Goal Target 的「目标切片」无关 | auto | proposed |
 | 问题修复 (Problem Fix) | problem fix, 实例修复, 问题侧修复 | 修补机制产生的具体缺陷**实例**(改这份文件/这次输出/这条测试);修复不传播,同机制下次运行复现同类问题;仅允许作机制修复落地前的临时止血且 MUST 留痕;真源 shared/definitions/dogfooding-definitions.md §1 | user | confirmed |
 | 机制修复 (Mechanism Fix) | mechanism fix, 机制侧修复, 最机智的修复 | 修补产生实例的**源头**(模板/生成命令注入规则/reconcile 流程/守护契约),下次执行对应命令时修复自然传播到本仓活动文件与全部下游项目;宪法 XI 规定非一次性工件的修复 MUST 落机制侧 | user | confirmed |

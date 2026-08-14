@@ -1,11 +1,39 @@
 # Dogfooding Definitions(Dogfooding 概念权威)
 
-> **Single source of truth** for the Dogfooding concept pairs defined under
-> Constitution Principle XI (v1.10.0): 问题/机制与两种修复、客户项目/框架项目与
-> 三副本拓扑。Canonical at `shared/definitions/dogfooding-definitions.md`,
-> mirrored to `.specify/shared/definitions/`. Normative language follows RFC 2119.
-> References: `.specify/memory/constitution.md` § XI; glossary entries
-> (问题修复 / 机制修复 / 框架项目 / 客户项目).
+> **Single source of truth** for the Dogfooding concept system defined under
+> Constitution Principle XI (v1.10.0): §0 Dogfooding 本体定义、§1 问题/机制与
+> 两种修复、§2 客户项目/框架项目与三副本拓扑。Canonical at
+> `shared/definitions/dogfooding-definitions.md`, mirrored to
+> `.specify/shared/definitions/`. Normative language follows RFC 2119.
+> **引用约定**: 后续任何文档、流程或对话提及 "Dogfooding" 时,均按本文件定义
+> 赋予其完整含义,无需在各处重述。References: `.specify/memory/constitution.md`
+> § XI; glossary entries (Dogfooding / 问题修复 / 机制修复 / 框架项目 / 客户项目).
+
+## 0. Dogfooding(本体定义)
+
+**Dogfooding**(直译"吃自己的狗粮";说法流行于 1980 年代末美国软件业,常被
+追溯到宠物食品广告典故与微软内部用语)特指
+**使用自身来开发自身**的工程实践场景——一个提供开发辅助能力的项目,把该能力
+用作自己日常的开发工具。最常见于**开发工具或框架类**程序开发项目(编译器、
+构建系统、CLI 工具、SDK、SDD 框架)。
+
+**类比:编译器自举 (self-hosting)** —— 用编译器编译其自身的源代码。只有完成
+自举的编译器,才证明其表达力与正确性达到了实用水平;同理,只有在自身工程中
+表现良好的开发工具,才赢得辅助其它项目的可信度。
+
+在 **Spec Kit 语境**下:spec-kit 仓库既是框架源(作者帽,`skills/` 等),又是
+自己的客户项目(用户帽,本仓 `.specify/`),即**用 /speckit.* 工作流开发
+/speckit.* 工作流本身**。
+
+该词一经提及即承载以下语义束(详见对应章节,不另行重述):
+
+| 语义束 | 章节 |
+|--------|------|
+| 真实场景替代假想设计(用自身工程验证能力,而非纸上推演) | 宪法 XI Rationale |
+| 自举证明(自身工程表现 = 能力可信度的必要条件) | §0 |
+| 一人两顶帽子:框架作者 vs 框架用户(三副本拓扑) | §2 |
+| 两个反馈环:Loop A(客户→框架上送)/ Loop B(客户自用) | 宪法 XI |
+| 修复落机制侧(问题修复 vs 机制修复判定法则) | §1 |
 
 ## 1. 问题与机制 (Problem vs Mechanism)
 
@@ -75,5 +103,6 @@ Spec Kit 仓库的 Dogfooding 本质是**一人分饰两角**:既是框架的作
 ## 3. 术语登记(词汇表)
 
 以下术语已登记于 `.specify/memory/glossary.md`(origin=user, status=confirmed):
-问题修复 (Problem Fix)、机制修复 (Mechanism Fix)、框架项目 (Framework Project)、
-客户项目 (Client Project)。本文件为它们的**概念权威**;词汇表条目为检索锚点。
+**Dogfooding**(§0 本体)、问题修复 (Problem Fix)、机制修复 (Mechanism Fix)、
+框架项目 (Framework Project)、客户项目 (Client Project)。本文件为它们的
+**概念权威**;词汇表条目为检索锚点。
