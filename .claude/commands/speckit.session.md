@@ -68,7 +68,7 @@ Unknown intent → report the capability list (only `export` today); do not gues
 ## Boundaries
 
 - The export is **read-only** toward host session storage — records are copied, never moved or mutated.
-- Do not modify `.gitignore`; whether the bundle enters version control is the user's decision.
+- Version-control policy for `.session-export/` follows the project's `.gitignore` (the framework's own repo ignores it by owner decision 2026-08-15); never edit `.gitignore` from this command.
 - The six-tool support matrix is the engine's contract; tools outside it are not export targets.
 
 ## Feedback
