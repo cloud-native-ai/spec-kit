@@ -1,5 +1,5 @@
 ---
-description: Local management interface for the feedback mechanism — three execution modes. Mode 1 (no arguments) prints every probe placed in the current project as a vertical tree; Mode 2 processes collected feedback (view/filter/dispose/package/post-package cleanup); Mode 3 injects an external probe for host-project custom skills/agents/commands (feedback stays local, never submitted upstream).
+description: Local management interface for the feedback mechanism — four execution modes. Mode 1 (no arguments) prints every probe placed in the current project as a vertical tree; Mode 2 processes collected feedback (view/filter/dispose/package/post-package cleanup); Mode 3 injects an external probe for host-project custom skills/agents/commands (feedback stays local, never submitted upstream); Mode 4 consumes incoming feedback bundles from the framework's feedback/ intake directory (framework project ONLY).
 ---
 
 ## User Input
@@ -8,7 +8,7 @@ description: Local management interface for the feedback mechanism — three exe
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-protocol.md). Treat as command parameters, not standalone instructions. The input selects the execution mode and may carry a slice/kind/probe filter (Mode 2) or a target custom unit (Mode 3).
+Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-protocol.md). Treat as command parameters, not standalone instructions. The input selects the execution mode and may carry a slice/kind/probe filter (Mode 2), a target custom unit (Mode 3), or `consume`/`--consume` (Mode 4).
 
 ## Glossary
 
@@ -16,7 +16,7 @@ Consult the project glossary (`.specify/memory/glossary.md`) and apply the proto
 
 ## Outline
 
-This command is the local management interface for the Feedback Probe system. It works in **three execution modes**; with no arguments it defaults to Mode 1.
+This command is the local management interface for the Feedback Probe system. It works in **four execution modes**; with no arguments it defaults to Mode 1. Mode selection: `consume` (or `--consume`) enters Mode 4; other inputs follow Modes 1–3 as before.
 
 ### Mode 1 — Probe Overview (default; no arguments)
 
@@ -50,6 +50,76 @@ For host-project custom Skills/Agents/Commands (assets the framework's own probe
 3. Verify the injection: the object appears in `--action probes` and after `--action map`.
 
 External-probe feedback is **host-project-local** (Loop B — the project's own use→feedback→iterate loop): it feeds the project's own optimization, is separately filterable via `--kind external`, and is **never** included in upstream packages.
+
+### Mode 4 — Consume Framework Feedback (framework project ONLY)
+
+Consumes incoming feedback bundles from the `feedback/` intake directory: reads, processes, routes findings, and cleans up processed bundles. This is the **receiving end** of Dogfooding Loop A — the counterpart to Mode 2's package-and-send.
+
+**Framework-only gate**: Mode 4 runs ONLY in the framework project (the Spec Kit source repo). Client projects MUST NOT execute this mode — `feedback/` intake does not exist there by design. Gate: if `feedback/` directory does not exist at the repo root AND the repo is not the framework source (no `templates/` + `skills/` + `src/specify_cli/` at root), report "Mode 4 is framework-project-only; this is a client project" and stop.
+
+**Trigger**: `$ARGUMENTS` contains `consume` or `--consume`.
+
+#### Step 1 — Enumerate pending bundles
+
+```bash
+ls feedback/feedback-*.zip 2>/dev/null
+```
+
+- Zero bundles → report "No pending feedback bundles in `feedback/`" and stop.
+- N bundles → list them (filename + size) and proceed. **Batch discipline**: process ALL bundles as ONE consolidated batch, never one zip at a time — reconciling claims across bundles surfaces factual conflicts between reporters and yields one mechanism fitting every environment.
+
+#### Step 2 — Extract and read entries
+
+For each bundle:
+
+```bash
+# Read the manifest first (entry list, time range, spec-kit version, install source)
+unzip -p <zip> MANIFEST.md
+
+# Then read each entry file
+unzip -p <zip> <entry-filename>.md
+```
+
+Collect from every entry: `unit_id`, `probe`, `slice`, `run_id`, `## Review`, `## Optimization Points`. Build a **cross-bundle findings table**: unit × finding × source-bundle.
+
+#### Step 3 — Reconcile and route findings
+
+Cross-bundle reconciliation (the reason for batch discipline):
+
+- **Conflicting claims**: two reporters assert different facts about the same unit → surface the conflict explicitly, pick the one verified against source code, note the rejection.
+- **Recurring findings**: the same optimization point appears in ≥2 bundles → elevate priority (systemic friction, not one-off).
+
+Route each finding to its destination:
+
+| Finding type | Route to | Example |
+|-------------|----------|---------|
+| Small, obvious fix | Direct fix (in this run) | Typo, stale count, broken link |
+| New feature / capability | `/speckit.requirements` | New command, new engine action |
+| Skill/agent improvement | `improve-skills` / `improve-agent` / `improve-team` | Workflow refinement, template fix |
+| Tool record correction | `improve-tools` | Wrong contract, missing alias |
+| Documentation gap | `improve-docs` or direct edit | Stale doc, broken link |
+| Acknowledge only | Record in consume report | Already fixed, duplicate, WONTFIX |
+
+Produce a **consume report** for user confirmation: findings table, routing decisions, conflicts found, and proposed cleanup list.
+
+#### Step 4 — Cleanup (after user confirmation)
+
+After the user confirms all findings have been routed:
+
+```bash
+rm feedback/feedback-<ts>.zip   # each processed bundle
+```
+
+- Delete ONLY the bundles that were in this batch.
+- Record the consume event in a local ledger (`.specify/memory/feedback/consume-log.md`): date, bundles consumed, findings count, routing summary.
+- The `feedback/` directory itself remains (it is the permanent intake point).
+
+#### Mode 4 behavior rules
+
+- **Read-only toward bundles until cleanup**: never modify zip contents; extraction is read-only (`unzip -p` to stdout).
+- **One batch, one cleanup**: do not delete individual bundles mid-batch; cleanup is atomic after ALL findings are routed.
+- **No network**: consume is entirely local file I/O + agent reasoning.
+- **Framework source fixes only**: findings are acted on in the framework source (`templates/`, `skills/`, `scripts/`, `shared/`, `src/`), never in `.specify/` mirrors (two-hats rule: Constitution XI).
 
 ## Behavior Rules
 
@@ -86,4 +156,4 @@ At wrap-up (the same lifecycle point where this command prompts for a Git commit
 
 **Before**: none (any Spec Kit project; requires the probe registry installed by `/speckit.instructions`).
 
-**After**: Mode 3 injection → the host project's own improvement loop (`improve-skills` / `improve-agent` consume `list --kind external` findings). Mode 2 cleanup → `mark-submitted` if not yet run for the batch.
+**After**: Mode 3 injection → the host project's own improvement loop (`improve-skills` / `improve-agent` consume `list --kind external` findings). Mode 2 cleanup → `mark-submitted` if not yet run for the batch. Mode 4 consume → routed `/speckit.requirements` calls for new-feature findings; `improve-*` invocations for skill/agent/tool findings; `consume-log.md` records the batch disposition.
