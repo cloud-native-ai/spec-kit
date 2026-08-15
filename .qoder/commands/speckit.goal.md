@@ -92,7 +92,7 @@ python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action
   --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
   --review "<review prose>" --points-file "<points file>"
 ```
-   Probe attribution (req 041): the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
+   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
 
 If the returned `should_prompt` is `true`, surface one consolidated submission prompt; on confirmation run `--action mark-submitted`.
 

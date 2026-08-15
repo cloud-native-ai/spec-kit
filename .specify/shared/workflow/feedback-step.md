@@ -1,6 +1,6 @@
 # Canonical `## Feedback` Step
 
-**Feature 028 — Framework Feedback Mechanism.** This file is the single source of
+This file is the single source of
 truth for the `## Feedback` step that every qualifying unit embeds. Skills embed it
 as their final workflow section; the 13 **complex** command templates embed it at
 their wrap-up / Git-commit-prompt stage. Simple commands MUST NOT embed it.
@@ -70,7 +70,7 @@ content from the user.
      [--feature-id "<Feature-registry-ID-if-any>"] \
      --review "<review prose>" --points-file "<points file>"
    ```
-   Probe attribution (req 041): the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
+   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
    Identifier discipline: `--feature` carries the **requirement key** (e.g.
    `038-goal-target`); `--feature-id` carries the **Feature registry ID** (e.g.
    `041`). Different number spaces — never overload one field with both.

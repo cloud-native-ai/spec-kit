@@ -97,7 +97,7 @@ Spec Kit 仓库的 Dogfooding 本质是**一人分饰两角**:既是框架的作
 - **Mirror 体系**(`sync-mirrors.py`,canonical → `.specify/` 镜像)= 框架源到
   自用运行时的受控投影,防止两顶帽子直接混写;
 - **AGENTS.md / CLAUDE.md 符号链接** = 活动工件单源化,消灭客户侧双写;
-- **Feedback Probe 内外类别(req 041)** = 同一对概念在反馈流向维度的实例化:
+- **Feedback Probe 内外类别** = 同一对概念在反馈流向维度的实例化:
   Loop A(内部 → 框架上送)与 Loop B(外部 → 宿主项目自留)。
 
 ## 3. 术语登记(词汇表)

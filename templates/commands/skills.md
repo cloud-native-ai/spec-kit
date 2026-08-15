@@ -53,7 +53,7 @@ For detailed path conventions (`${SKILL_HOME}` / `${SKILL_WORKDIR}` semantics, c
 
 ### Step 4: Propagate to built-in agents (create path only)
 
-After a **new** Skill is created (skip on the `improve-skills` path), wire it into the built-in role agents so they prefer it for role-relevant work (Feature 026 Skill Enablement convention; see `docs/agents/command-and-skills.md`).
+After a **new** Skill is created (skip on the `improve-skills` path), wire it into the built-in role agents so they prefer it for role-relevant work (Skill Enablement convention: the `## Skill Enablement` section pattern carried by the built-in role agents under `.specify/agents/templates/`).
 
 1. **Guard**: skip if the new Skill is non-declarable (reference-only/meta: `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `create-team`, `improve-team`). Normal user-created Skills proceed.
 2. **Analyze**: read the Meta Agent preset set from `.specify/agents/templates/` and the 7 Worker role capability templates from `skills/create-agent/templates/` (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`). Judge each agent's role (Identity & Responsibilities) against the new Skill's capability + trigger keywords.
@@ -88,7 +88,7 @@ At wrap-up (the same lifecycle point where this command prompts for a Git commit
      --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
      --review "<review prose>" --points-file "<points file>"
    ```
-   Probe attribution (req 041): the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
+   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
 6. **Consolidated submission prompt.** If the returned `should_prompt` is `true`, surface a single consolidated prompt inviting the user to submit collected feedback to the Spec Kit developers; on confirmation run `--action mark-submitted`. Below threshold, do not prompt.
 
 **Abort / partial-run rule.** If the run failed before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.

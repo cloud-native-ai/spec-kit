@@ -49,7 +49,7 @@ Batch procedure, ownership resolution, and routing rationale: [`./references/loo
    - **Run the matching fact-check gate before writing any capability or data claim** (delegation capability / data tables / tier-coverage tables) — verify the real surface, never write values or capabilities from memory. Gates: [`./references/loop-playbook.md`](./references/loop-playbook.md) `## Step 3`.
    - When an item must be **deferred for lack of evidence**, record which concrete evidence would unlock it. Discard one-off environment noise unless the Skill should handle it next run. Detail: same reference.
    - **Legacy path idioms** (bare relative paths, `${SKILL_ROOT}/X`, agent-specific install paths in prose) → rewrite as `${SKILL_HOME}/...`; mapping table in the same reference.
-   - **Feedback-section conformance (Feature 028)**: verify the Skill's final workflow section is `## Feedback` opening with the runtime-mode gate; repair if missing or malformed, and apply to both mirrors. Malformed-criteria list, canonical-block source, and the standalone-mode exception: same reference, `### Feedback-section conformance`.
+   - **Feedback-section conformance**: verify the Skill's final workflow section is `## Feedback` opening with the runtime-mode gate; repair if missing or malformed, and apply to both mirrors. Malformed-criteria list, canonical-block source, and the standalone-mode exception: same reference, `### Feedback-section conformance`.
 
 4. **Correct the root causes with minimal changes**
    - Fix the instruction that caused the observed failure first (wrong arguments, nonexistent paths, invalid expected formats, incompatible metadata, missing prerequisite checks). For inefficiency, replace the inefficient step with a more direct method, deterministic script, or clearer decision branch.
@@ -194,7 +194,7 @@ At the end of a substantial run of this skill, perform an agent self-reflection 
      --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
      --review "<review prose>" --points-file "<points file>"
    ```
-   Probe attribution (req 041): the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
+   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
 6. **Consolidated submission prompt.** If the returned `should_prompt` is `true`, surface a single consolidated prompt inviting the user to submit collected feedback to the Spec Kit developers; on confirmation run `--action mark-submitted`. Below threshold, do not prompt.
 
 **Abort / partial-run rule.** If the run failed before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.

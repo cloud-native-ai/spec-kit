@@ -2,11 +2,13 @@
 
 > **Single source of truth** for Feedback Probe(反馈插点)definitions — canonical at
 > `shared/definitions/probe-definitions.md`, mirrored to `.specify/shared/definitions/`.
-> Requirement `041-refactor-feedback-probe` → Feature 028. Two-layer model:
+> Two-layer model:
 > **Probe Class**(插点类,特征定义)× **Probe Object**(插点实例,系统落点);
 > each Class carries an **internal/external** kind. Derived views (probe-map, command
 > mode-1 overview) MUST be rebuilt from this file — never hand-copied.
-> Invariants & schema: `.specify/specs/041-refactor-feedback-probe/contracts/probe-registry.md`.
+> Invariants: five class features non-empty; ids unique; every Object belongs to exactly
+> one Class; internal units match `/speckit.*` or `skill:*`; external ids carry the `ext-`
+> prefix and `custom:` units. Validate with `--action probes --validate`.
 
 ## Slices
 

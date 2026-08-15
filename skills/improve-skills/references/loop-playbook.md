@@ -106,7 +106,7 @@ Flag these as migration candidates and apply the Migration Mapping table from
 | `${SKILL_ROOT}/X` | `${SKILL_HOME}/X` |
 | Agent-specific install paths in prose (`${HOME}/.copilot/skills/<name>/...`, hard-coded `.specify/skills/<name>/...`) | `${SKILL_HOME}/...` |
 
-### Feedback-section conformance (Feature 028)
+### Feedback-section conformance
 
 Verify the Skill carries a `## Feedback` section as its final workflow section, beginning with
 the **runtime-mode gate** (`.specify/shared/workflow/runtime-mode.md`).
