@@ -13,7 +13,16 @@ Consult the project glossary (`.specify/memory/glossary.md`) and apply the proto
 
 ## Outline
 
-This command is the local management interface for the Feedback Probe system. It works in **four execution modes**; with no arguments it defaults to Mode 1. Mode selection: `consume` (or `--consume`) enters Mode 4; other inputs follow Modes 1–3 as before.
+This command is the local management interface for the Feedback Probe system. It works in **four execution modes**:
+
+| Input | Mode | Who runs it |
+|-------|------|-------------|
+| *(empty)* | 1 — Probe Overview | Any project |
+| filter/dispose/package keywords | 2 — Process Collected Feedback | Any project |
+| unit / inject keywords | 3 — Inject External Probe | Any project (host-project custom units) |
+| `consume` / `--consume` | 4 — Consume Framework Feedback | **Framework project ONLY** |
+
+With no arguments it defaults to Mode 1.
 
 ### Mode 1 — Probe Overview (default; no arguments)
 
@@ -52,7 +61,7 @@ External-probe feedback is **host-project-local** (Loop B — the project's own 
 
 Consumes incoming feedback bundles from the `feedback/` intake directory: reads, processes, routes findings, and cleans up processed bundles. This is the **receiving end** of Dogfooding Loop A — the counterpart to Mode 2's package-and-send.
 
-**Framework-only gate**: Mode 4 runs ONLY in the framework project (the Spec Kit source repo). Client projects MUST NOT execute this mode — `feedback/` intake does not exist there by design. Gate: if `feedback/` directory does not exist at the repo root AND the repo is not the framework source (no `.specify/templates/` + `skills/` + `src/specify_cli/` at root), report "Mode 4 is framework-project-only; this is a client project" and stop.
+**Framework-only gate**: Mode 4 runs ONLY in the framework project (the Spec Kit source repo). Client projects MUST NOT execute this mode. Gate on framework-source structure — the repo must have `.specify/templates/` + `skills/` + `src/specify_cli/` at root (the canonical source directories that only the framework repo owns). If absent → report "Mode 4 is framework-project-only; this is a client project" and stop. (Do NOT gate on `feedback/` directory existence — a client project could have one for unrelated purposes.) If the gate passes but `feedback/` is absent or empty, Step 1 handles it gracefully.
 
 **Trigger**: `$ARGUMENTS` contains `consume` or `--consume`.
 
@@ -67,17 +76,22 @@ ls feedback/feedback-*.zip 2>/dev/null
 
 #### Step 2 — Extract and read entries
 
-For each bundle:
+For small batches (≤3 bundles, ≤20 entries total), read inline:
 
 ```bash
-# Read the manifest first (entry list, time range, spec-kit version, install source)
-unzip -p <zip> MANIFEST.md
-
-# Then read each entry file
-unzip -p <zip> <entry-filename>.md
+unzip -p <zip> MANIFEST.md       # manifest first
+unzip -p <zip> <entry-filename>.md  # then each entry
 ```
 
-Collect from every entry: `unit_id`, `probe`, `slice`, `run_id`, `## Review`, `## Optimization Points`. Build a **cross-bundle findings table**: unit × finding × source-bundle.
+For larger batches, extract to a temp directory first (faster, avoids repeated unzip overhead):
+
+```bash
+tmpdir=$(mktemp -d)
+for z in feedback/feedback-*.zip; do unzip -o -d "$tmpdir/$(basename $z .zip)" "$z"; done
+# then read files with standard file-reading tools
+```
+
+Collect from every entry: `unit_id`, `probe`, `slice`, `run_id`, `## Review`, `## Optimization Points`. Build a **cross-bundle findings table**: unit × finding × source-bundle. Clean up the temp dir after reading.
 
 #### Step 3 — Reconcile and route findings
 
@@ -108,7 +122,14 @@ rm feedback/feedback-<ts>.zip   # each processed bundle
 ```
 
 - Delete ONLY the bundles that were in this batch.
-- Record the consume event in a local ledger (`.specify/memory/feedback/consume-log.md`): date, bundles consumed, findings count, routing summary.
+- Record the consume event by appending one row to `.specify/memory/feedback/consume-log.md`:
+
+  ```markdown
+  | 2026-08-15 | feedback-<ts1>.zip, feedback-<ts2>.zip | 23 | 5 direct fix, 3 improve-skills, 1 requirement | 1 (conflicting tool count) | 2 zips removed |
+  ```
+
+  Columns: `| Date | Bundles | Entries | Findings Routed | Conflicts | Cleanup |`
+
 - The `feedback/` directory itself remains (it is the permanent intake point).
 
 #### Mode 4 behavior rules
@@ -121,7 +142,7 @@ rm feedback/feedback-<ts>.zip   # each processed bundle
 ## Behavior Rules
 
 - Zero network operations of any kind (red line); `mark-submitted` remains local bookkeeping.
-- All actions run against the local store `.specify/memory/feedback/`; never edit store files by hand.
+- Modes 1–3 operate on the local store `.specify/memory/feedback/`; never edit store files by hand. Mode 4 operates on the `feedback/` intake directory (read-only until atomic cleanup).
 - Exit code 2 from the engine is a verdict — report it, do not argue around it.
 - Probe truth source: `.specify/shared/definitions/probe-definitions.md` (+ project `probes/`); derived views (`probe-map.md`) are rebuilt, never hand-edited.
 
