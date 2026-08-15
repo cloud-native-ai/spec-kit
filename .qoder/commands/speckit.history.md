@@ -35,7 +35,7 @@ It is **incremental**: a manifest tracks which sessions were already distilled, 
      "session_store": "<path or null>", "session_count": <int>,
      "output_dir": "<...>/.specify/history",
      "manifest_path": "<...>/.specify/history/.manifest.json",
-     "supported_tools": ["claude"], "note": "<explanation>"
+     "supported_tools": ["claude", "qoder"], "note": "<explanation>"
    }
    ```
    - If the detected `tool` is wrong, re-run with `--tool <key>` (append to the script call).
