@@ -22,7 +22,15 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 
 ## Outline
 
-`/speckit.history` distills the **current AI tool's** past conversations **for the current project** into a durable, theme-aggregated knowledge base at `.specify/history/`. It does **not** store transcripts verbatim — it extracts long-term value: decisions, reusable lessons, open TODOs, key interaction flows, and points of user↔model disagreement.
+`/speckit.history` distills the **current AI tool's** past conversations **for the current project** into a durable, theme-aggregated knowledge base at `.specify/history/`.
+
+**Scope & unit of work** — what makes this command distinct from `/speckit.session`:
+
+- **Scope = ALL history**: it reads the tool's *entire* past conversation record for this project (every session in the store), not one session. Runs are incremental only to avoid re-reading; the analytical horizon is always the full corpus.
+- **Unit of work = concepts/themes**: the output is mined *information* — decisions, lessons, TODOs, flows, conflicts — grouped into concepts or themes (one or many), each aggregating evidence across sessions. A concept may draw on 20 sessions; a session may feed 5 concepts.
+- **Counterpart**: operating on a *single* session as a data object (export, naming, archiving) is `/speckit.session`'s job — that command manages session **data** and does not parse content into concepts.
+
+This command does **not** store transcripts verbatim — it extracts long-term value: decisions, reusable lessons, open TODOs, key interaction flows, and points of user↔model disagreement.
 
 It is **incremental**: a manifest tracks which sessions were already distilled, so re-runs only process new ones and merge into the existing documents.
 

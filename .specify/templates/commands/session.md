@@ -17,6 +17,12 @@ Host AI agent CLIs (Claude Code / Codex CLI / Qoder CLI / GitHub Copilot / openc
 
 Deterministic rules (session location, tool detection, meta extraction, budget verdicts) live in `skills/archive-session/scripts/export.py`. Call the engine; do not re-derive its judgments in prose.
 
+**Scope & unit of work** — what makes this command distinct from `/speckit.history`:
+
+- **Scope = ONE session**: the current (or explicitly specified) session, treated as a **data object** — located, verified, copied out under a user-chosen name. Success is a faithful, complete raw export, not an interpretation of it.
+- **Unit of work = session data management**: export / naming / archiving. The bundled description document (`SESSION.md`) is a light, snapshot-level inventory (任务脉络 / 关键决策 / 产物清单) kept faithful to the records — it is **not** concept extraction.
+- **Counterpart**: mining *value* out of the project's **entire** conversation history — cross-session concept/theme aggregation (decisions, lessons, TODOs, flows, conflicts) — is `/speckit.history`'s job. Never grow this command toward content analysis; route concept-level needs there.
+
 ## Glossary
 
 Consult `.specify/memory/glossary.md` and apply `.specify/shared/workflow/glossary.md`: map recorded homophone/confusable variants to canonical terms before acting, surfacing each correction. At wrap-up propose new project-specific terms (`origin=auto`, `status=proposed`) with user confirmation.
