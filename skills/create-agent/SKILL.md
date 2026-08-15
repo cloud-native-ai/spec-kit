@@ -50,7 +50,7 @@ All capabilities share the same validate + report tail (Workflow steps 4–5) an
 
 ## AgentAuthoringRequest Intake
 
-When invoked by `/speckit.agents`, accept the `AgentAuthoringRequest` defined in `.specify/specs/022-eei-agent-triad/contracts/agent-authoring-contract.md` and consume every field: `kind`, `role_slug`, `task`, `scoring_dimensions[]`, `threshold`, `max_iterations`, `environment_paths[]`, `workspace_paths[]`, `project_context`. Missing optional fields fall back to role defaults (threshold from role, `max_iterations`=20). Return an `AuthoringResult` (`artifact_paths`, `kind`, `status`).
+When invoked by `/speckit.agents`, accept the `AgentAuthoringRequest` (defined in the framework repo, spec 022) and consume every field: `kind`, `role_slug`, `task`, `scoring_dimensions[]`, `threshold`, `max_iterations`, `environment_paths[]`, `workspace_paths[]`, `project_context`. Missing optional fields fall back to role defaults (threshold from role, `max_iterations`=20). Return an `AuthoringResult` (`artifact_paths`, `kind`, `status`).
 
 ## Workflow
 

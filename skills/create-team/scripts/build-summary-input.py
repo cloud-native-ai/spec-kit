@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """build-summary-input.py — derive a summarize-project input form from team artifacts.
 
-Contract: `.specify/specs/036-team-summary/contracts/team-project-form.contract.md`
+Contract: team-project-form (defined in the framework repo, spec 036)
 Mapping single source of truth: `../references/summary-mapping.md`
 
 The invoked skill (`summarize-project`) only accepts a user-authored form and blocks

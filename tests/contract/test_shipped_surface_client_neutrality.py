@@ -35,12 +35,8 @@ BANNED_PATTERNS = [
 ]
 
 KNOWN_DEBT = {
-    # framework spec-contract references pending semantic rewrite (Class-B)
-    "skills/create-docs/SKILL.md",
-    "skills/create-team/scripts/build-summary-input.py",
-    "skills/create-agent/SKILL.md",
-    "skills/agent-cli-setup/references/unified-variables.md",
-    "skills/collect-evidence/references/evidence-contract.md",
+    # emptied 2026-08-15: all five framework-contract references rewritten
+    # client-neutrally (framework-repo attribution, no bare .specify/specs/ paths)
 }
 
 

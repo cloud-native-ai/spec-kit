@@ -213,8 +213,5 @@ def test_c4_no_dogfooding_steps_in_command_templates():
             f"command template {p.name} gained Dogfooding content — violates FR-004 (no new steps)"
 
 
-def test_c4_no_new_memory_layout():
-    memory = ROOT / ".specify" / "memory"
-    dirs = {d.name for d in memory.iterdir() if d.is_dir()}
-    assert dirs <= {"features", "feedback", "knowledge", "session"}, \
-        f"unexpected new .specify/memory/ subdirectory: {dirs - {'features', 'feedback', 'knowledge', 'session'}}"
+# test_c4_no_new_memory_layout deleted 2026-08-15: stale pin
+# (evidence/todo/tools dirs legitimately predate the assertion; owner verdict: delete)

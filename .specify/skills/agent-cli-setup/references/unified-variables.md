@@ -6,7 +6,7 @@ the skill performs a **secondary assignment** into each tool's native variable
 names and persists the result into each tool's own config file.
 
 > Single source of truth for the variable names:
-> `.specify/specs/024-agent-env-config/contracts/unified-env-contract.md`.
+> (defined in the framework repo, spec 024 — unified-env-contract).
 
 ## The variables
 
@@ -55,7 +55,7 @@ explicit protocol variant of "URL" — not a new input concept.
 
 The unified values are mapped onto each tool's native fields and persisted to
 that tool's own file. See
-`.specify/specs/024-agent-env-config/contracts/tool-config-targets.md` for the
+the framework repo's tool-config-targets contract (spec 024) for the
 exact per-tool mapping.
 
 | Tool | Protocol | URL source | Config file |
