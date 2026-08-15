@@ -14,7 +14,7 @@ handoffs:
     prompt: Persist durable TODO execution decisions, user preferences, and conventions surfaced by this run into project memory.
     send: false
 scripts:
-  sh: scripts/bash/search-todo.sh --json
+  sh: scripts/python/search-todo.py --json
 ---
 
 ## User Input

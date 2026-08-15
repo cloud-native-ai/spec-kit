@@ -1315,25 +1315,34 @@ def render_text(action: str, payload: Dict[str, Any]) -> str:
                     "run /speckit.instructions to install it.")
         lines = ["# Probe overview", ""]
         objects = payload.get("objects", [])
-        classes = {c.get("class_id", ""): c for c in payload.get("classes", [])}
-        for kind, label in (("internal", "internal"), ("external", "external")):
-            group = [o for o in objects if o.get("kind") == kind]
-            if not group:
+        classes = payload.get("classes", [])
+        for kind in ("internal", "external"):
+            kind_classes = sorted(
+                (c for c in classes
+                 if c.get("kind") == kind and c.get("class_id")),
+                key=lambda c: c.get("class_id", ""))
+            if not kind_classes:
                 continue
-            lines.append(f"## {label}")
+            lines.append(f"## {kind}")
             lines.append("")
             by_class: Dict[str, List[Dict[str, Any]]] = {}
-            for o in group:
-                by_class.setdefault(o.get("class_id", ""), []).append(o)
-            for cid in sorted(by_class):
-                c = classes.get(cid, {})
+            for o in objects:
+                if o.get("kind") == kind:
+                    by_class.setdefault(o.get("class_id", ""), []).append(o)
+            for c in kind_classes:
+                cid = c.get("class_id", "")
+                members = sorted(by_class.get(cid, []),
+                                 key=lambda x: x.get("object_id", ""))
                 lines.append(
                     f"- {cid}  [slice: {c.get('target_slice', '-')}] — "
                     f"{c.get('collection', '-')} → {c.get('processing', '-')}")
-                for o in sorted(by_class[cid], key=lambda x: x.get("object_id", "")):
-                    lines.append(
-                        f"  - {o.get('object_id')}   ({o.get('unit')} @ "
-                        f"{o.get('lifecycle_point')})")
+                if members:
+                    for o in members:
+                        lines.append(
+                            f"  - {o.get('object_id')}   ({o.get('unit')} @ "
+                            f"{o.get('lifecycle_point')})")
+                else:
+                    lines.append("  - (0 objects — 尚无实例;外部类经模式三注入)")
             lines.append("")
         return "\n".join(lines).rstrip()
     if action == "package":
@@ -1469,9 +1478,47 @@ _ACTIONS = {
 }
 
 
+_DESTRUCTIVE_ACTIONS = {"package", "cleanup", "migrate-legacy",
+                        "mark-submitted", "dispose"}
+
+
+def _cwd_project_root() -> Optional[Path]:
+    """Nearest ancestor of the CURRENT working directory containing .specify/."""
+    cur = Path.cwd().resolve()
+    for candidate in [cur, *cur.parents]:
+        if (candidate / ".specify").is_dir():
+            return candidate
+    return None
+
+
+def warn_anchor_mismatch(action: str, args: argparse.Namespace) -> None:
+    """F16 guard: destructive actions warn when the engine's self-location
+    anchor disagrees with the CWD's project root (cross-project invocation
+    without an explicit --workspace-root — the 041 T021 incident class).
+    Non-blocking (red line 2): a warning, never a gate."""
+    if action not in _DESTRUCTIVE_ACTIONS:
+        return
+    if getattr(args, "workspace_root", None):
+        return  # explicit override always silences the check
+    try:
+        anchored = resolve_workspace_root(None)
+    except Exception:
+        return
+    cwd_root = _cwd_project_root()
+    if cwd_root is None or anchored == cwd_root:
+        return
+    print(
+        f"warning: destructive action '{action}' is anchored at {anchored} "
+        f"(engine self-location) while the CWD project appears to be "
+        f"{cwd_root}. Pass --workspace-root to target the intended store.",
+        file=sys.stderr,
+    )
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    warn_anchor_mismatch(args.action, args)
     try:
         payload = _ACTIONS[args.action](args)
     except FeedbackError as exc:

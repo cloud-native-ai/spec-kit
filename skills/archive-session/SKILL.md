@@ -117,7 +117,7 @@ exit $LASTEXITCODE
 # 约束
 
 - 对宿主会话存储**只读**——记录被复制,从不被移动或修改。
-- 不要改 `.gitignore`,不要建议用户把 `.session-export/` 加进去;入库与否由用户自管。
+- `.session-export/` 已由框架所有者裁定加入 `.gitignore`(2026-08-15):导出物默认不入库;用户确要入库时自行改回。
 - 无网络调用、无外部凭证;支持 macOS / Linux / Windows,平台差异全部由脚本内部处理,调用方只需选对 shell。
 
 ## Feedback

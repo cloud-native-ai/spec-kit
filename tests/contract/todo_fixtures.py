@@ -45,11 +45,11 @@ def oversized_workspace():
 def search_todo_script():
     """Returns absolute path to search-todo.sh script"""
     script = (
-        Path(__file__).parent.parent.parent.parent
+        Path(__file__).resolve().parents[2]
         / ".specify"
         / "scripts"
-        / "bash"
-        / "search-todo.sh"
+        / "python"
+        / "search-todo.py"
     )
     return str(script)
 
@@ -69,25 +69,13 @@ def run_search_todo(workspace: str, json_mode: bool = False, **kwargs) -> dict:
     Raises:
         subprocess.CalledProcessError if script not found
     """
-    script = (
-        Path(workspace).parent.parent.parent.parent.parent
-        / ".specify"
-        / "scripts"
-        / "bash"
-        / "search-todo.sh"
-    )
-    if not script.exists():
-        script = (
-            Path(__file__).parent.parent.parent.parent
-            / ".specify"
-            / "scripts"
-            / "bash"
-            / "search-todo.sh"
-        )
+    repo_root = Path(__file__).resolve().parents[2]  # tests/contract -> repo
+    script = repo_root / ".specify" / "scripts" / "python" / "search-todo.py"
 
-    cmd = [str(script), workspace]
+    import sys as _sys
+    cmd = [_sys.executable, str(script), workspace]
     if json_mode:
-        cmd.insert(1, "--json")
+        cmd.insert(2, "--json")
 
     for flag, value in kwargs.items():
         cmd.extend([f"--{flag}", str(value)])

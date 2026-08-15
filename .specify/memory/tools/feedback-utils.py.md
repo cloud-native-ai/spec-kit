@@ -98,6 +98,7 @@ The feedback-as-files engine: persists local, unit-scoped feedback entries produ
 
 ## Behavioral Rules
 
+- MUST pass an explicit `--workspace-root` whenever invoking a store-residing engine copy from outside that store's project (QA/demo drills): the engine anchors at its own install location, and destructive actions (`package`/`cleanup`/`migrate-legacy`/`mark-submitted`/`dispose`) warn when the anchor disagrees with the CWD project (F16 guard) — never ignore that warning
 - MUST auto-resolve `record`'s unit to its probe object when the registry is installed (entry inherits probe/kind/slice; unresolvable unit → exit 2 "no probe object for unit"); registry absent (un-upgraded workspace) → legacy record without probe fields, never a hard failure
 - MUST exclude `kind: external` entries from `package` (upstream submission) — they are host-project-local; `MANIFEST.md` carries probe/slice columns
 - MUST treat `--action map` output as a derived artifact: deterministic whole-file rebuild, byte-identical on unchanged truth source

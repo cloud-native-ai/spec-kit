@@ -48,7 +48,7 @@ Mode is inferred from `$ARGUMENTS` and **confirmed with the user before any writ
    python3 .specify/scripts/python/goal-utils.py create <goal-slug> \
      --objective "<desired end outcome>" \
      --criterion "<verifiable condition>" --criterion "<...>" --json
-   python3 .specify/scripts/python/goal-utils.py view   # → `list`
+   python3 .specify/scripts/python/goal-utils.py list    # archive listing (no `view` action)
    python3 .specify/scripts/python/goal-utils.py validate <goal-slug>
    python3 .specify/scripts/python/goal-utils.py status <goal-slug> --set achieved
    python3 .specify/scripts/python/goal-utils.py criteria <goal-slug> --criterion "<new>"

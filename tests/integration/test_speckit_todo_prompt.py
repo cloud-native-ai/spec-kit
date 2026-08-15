@@ -6,7 +6,7 @@ generation, review gate, confirmation flow, and execution orchestration.
 Also covers insertion mode, batching, and safety veto behaviour.
 
 Uses fixtures from tests/fixtures/todo-workspaces/ and the scanner output
-from .specify/scripts/bash/search-todo.sh.
+from .specify/scripts/python/search-todo.py.
 """
 
 import json
@@ -20,8 +20,8 @@ SEARCH_TODO_SCRIPT = (
     Path(__file__).parent.parent.parent.parent
     / ".specify"
     / "scripts"
-    / "bash"
-    / "search-todo.sh"
+    / "python"
+    / "search-todo.py"
 )
 
 

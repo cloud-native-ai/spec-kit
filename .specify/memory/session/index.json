@@ -1,7 +1,21 @@
 {
   "scope": "session",
-  "updated": "2026-08-13T11:42:36Z",
+  "updated": "2026-08-15T06:18:15Z",
   "entries": [
+    {
+      "id": "20260815T061815Z-instructions-refresh-2026-08-15-numeric-fact-reconcile-3-sta",
+      "file": "20260815T061815Z-instructions-refresh-2026-08-15-numeric-fact-reconcile-3-sta.md",
+      "scope": "session",
+      "source": "/speckit.instructions",
+      "feature": "",
+      "tags": [
+        "instructions",
+        "residual-report"
+      ],
+      "title": "instructions refresh 2026-08-15: numeric-fact reconcile (3 stale counts)",
+      "created": "2026-08-15T06:18:15Z",
+      "summary": "Residual report — CONVERGED: (1) Documentation Map Constitution row 10->13 core principles (added Dogfooding, Tool Reuse, Better-Harness Orientation; file itself cites XII/XIII elsewhere); (2) Feature"
+    },
     {
       "id": "20260813T114236Z-instructions-refresh-2026-08-13-feedback-intake-registered-p",
       "file": "20260813T114236Z-instructions-refresh-2026-08-13-feedback-intake-registered-p.md",

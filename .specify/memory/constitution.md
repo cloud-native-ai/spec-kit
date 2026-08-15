@@ -200,4 +200,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.9.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-08-08
+**Version**: 1.10.0.001 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-08-15

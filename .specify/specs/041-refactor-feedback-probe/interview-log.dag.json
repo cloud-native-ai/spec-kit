@@ -1,0 +1,83 @@
+{
+  "ledger": ".specify/specs/041-refactor-feedback-probe/interview-log.md",
+  "target": ".specify/specs/041-refactor-feedback-probe/requirements.md",
+  "mode": "special",
+  "branches": [
+    "modeling",
+    "truth-source",
+    "class-partition",
+    "external-target"
+  ],
+  "started": "2026-08-15",
+  "decisions": [
+    {
+      "id": "D0",
+      "question": "Probe 两层建模(Class/Object)形态是否成立",
+      "dependsOn": [],
+      "branch": "modeling",
+      "status": "settled",
+      "decision": "成立:Probe Class 定义一类插点的特征,Probe Object 为其在当前系统中的实例化;既有 49 个插点重构为 Object 并归类到具体 Class 之下(面试前已由既有澄清记录裁定,不重问)",
+      "span": "## Clarifications → Session 2026-08-14(初始 Probe 粒度); FR-001",
+      "supersededBy": null,
+      "round": 0,
+      "updated": "2026-08-15 14:19:10"
+    },
+    {
+      "id": "D1",
+      "question": "probe 真源(单一事实来源)的载体形态受什么约束",
+      "dependsOn": [
+        "D0"
+      ],
+      "branch": "truth-source",
+      "status": "settled",
+      "decision": "files-based 单一真源:可由程序枚举、派生物(结构图)可重建;禁止数据库/向量存储(既有条文绑定,非本次访谈新决策)",
+      "span": "FR-003(单一真源+程序枚举+派生物重建); ## Out of Scope(不引入数据库/向量存储;维持 files-based 引擎形态)",
+      "supersededBy": null,
+      "round": 0,
+      "updated": "2026-08-15 14:19:24"
+    },
+    {
+      "id": "D2",
+      "question": "Probe Class 的划分方案:按单元类型/生命周期点/切片维度如何组合",
+      "dependsOn": [
+        "D0"
+      ],
+      "branch": "class-partition",
+      "status": "open",
+      "decision": null,
+      "span": null,
+      "supersededBy": null,
+      "round": null,
+      "updated": "2026-08-15 14:19:10"
+    },
+    {
+      "id": "D3",
+      "question": "外部 probe 的目标单元标识方式:如何引用宿主项目自定义 Skill/Agent/Command",
+      "dependsOn": [
+        "D0"
+      ],
+      "branch": "external-target",
+      "status": "open",
+      "decision": null,
+      "span": null,
+      "supersededBy": null,
+      "round": null,
+      "updated": "2026-08-15 14:19:10"
+    },
+    {
+      "id": "D4",
+      "question": "probe 真源的载体位置与文件格式(目录/模板/schema)",
+      "dependsOn": [
+        "D1"
+      ],
+      "branch": "truth-source",
+      "status": "open",
+      "decision": null,
+      "span": null,
+      "supersededBy": null,
+      "round": null,
+      "updated": "2026-08-15 14:19:10"
+    }
+  ],
+  "retractions": []
+}

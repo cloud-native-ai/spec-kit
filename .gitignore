@@ -58,3 +58,6 @@ input/
 
 # /speckit.implement long-run mode state (per-spec, transient)
 *.local.md
+
+# session export scratch (owner decision 2026-08-15)
+.session-export/

@@ -18,7 +18,7 @@ post_change_embed_points=50 (19 + 31; feedback.md 自身第 50 点)
 post_change_probe_objects=50 internal + external via inject
 post_change_legacy_entries=0 (migrated, migration-log.md 140 rows)
 post_change_engine_actions=13 (+dispose/cleanup/probes/map/migrate-legacy/probe-inject)
-post_change_new_contract_tests=27 (registry 14 + cli 13[map5+filter/dispose5+cleanup3... 见测试文件] + entry-schema 6 + command-template 6 — 按文件计 4 文件 42 用例全绿)
+post_change_new_contract_tests=49 (collect-only across the 4 feedback contract files; smoke-remediation contracts included)
 
 # -- Success Criteria --
 SC-001_status=pass

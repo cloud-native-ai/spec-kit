@@ -1,7 +1,7 @@
 # 🌱 Spec Kit Feature Index
 
 **Last Updated**: 2026-08-06
-**Total Features**: 42
+**Total Features**: 44
 
 ## Features
 

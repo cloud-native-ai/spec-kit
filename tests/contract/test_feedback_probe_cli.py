@@ -470,3 +470,47 @@ class TestProbeInjectAndExclusion:
         assert "kind: \"external\"" not in contents
         assert "ext-myteam-deploy-wrapup" not in manifest
         assert "speckit-plan-wrapup" in manifest  # probe column present
+
+
+@pytest.mark.contract
+class TestSmokeRemediationContracts:
+    """F2 + F16 remediation contracts (2026-08-15 command smoke test)."""
+
+    def test_f2_probes_text_render_includes_zero_object_class(
+        self, probe_workspace: Path, capsys
+    ):
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "probes", "--workspace-root", str(probe_workspace),
+        ])
+        out = capsys.readouterr().out
+        assert rc == 0
+        assert "external-custom" in out, "zero-object class missing from overview"
+        assert "尚无实例" in out
+
+    def test_f16_anchor_mismatch_warning_on_destructive(self, tmp_path):
+        import subprocess, sys
+        (tmp_path / ".specify").mkdir()
+        # F16 fires only for the .specify/scripts/ engine COPY (self-location
+        # anchoring); the canonical scripts/python copy falls back to CWD.
+        engine = Path(feedback_utils.__file__).resolve().parents[2] / \
+            ".specify" / "scripts" / "python" / "feedback-utils.py"
+        result = subprocess.run(
+            [sys.executable, str(engine), "--action", "dispose", "--id", "ghost"],
+            cwd=tmp_path, capture_output=True, text=True,
+        )
+        assert result.returncode == 2
+        assert "anchored at" in result.stderr
+        assert "--workspace-root" in result.stderr
+
+    def test_f16_explicit_root_silences_warning(self, tmp_path):
+        import subprocess, sys
+        (tmp_path / ".specify").mkdir()
+        engine = Path(feedback_utils.__file__).resolve().parents[2] / \
+            ".specify" / "scripts" / "python" / "feedback-utils.py"
+        result = subprocess.run(
+            [sys.executable, str(engine), "--action", "dispose",
+             "--id", "ghost", "--workspace-root", str(tmp_path)],
+            cwd=tmp_path, capture_output=True, text=True,
+        )
+        assert "anchored at" not in result.stderr

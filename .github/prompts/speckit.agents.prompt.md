@@ -60,7 +60,7 @@ The **run** mode turns the **Agent Instance** definition into a new, independent
 1. **Resolve the target agent** — identify the agent by name from `$ARGUMENTS` or conversation context. Load its definition from `.specify/agents/instances/<name>.agent.md`, falling back to `.specify/agents/templates/<name>.agent.md` (instance wins on collision); apply `.specify/agents/execution/configs/<name>.yaml` when present.
    - If the agent does not exist → report **"agent not found"** and offer to `create` it.
 2. **Confirm the task** — present the agent's `name`, `description`, and the task to be executed. Ask the user to confirm before dispatching.
-3. **Dispatch** — launch the agent as a subagent with its configured `tools`, `model`, `maxTurns`, and system prompt. Choose the execution mode per `.specify/shared/definitions/subagent-definitions.md` (**native** when the runtime supports subagents, **virtual** in-session when it does not, **external** CLI process for long-running/parallel work or per-dispatch model overrides); external CLI dispatch MUST follow that document's Visibility Contract (stream-json + compact filter + `.live.log`/`.jsonl`/`.status` triplet) — never redirect print-mode output into a silent log. The subagent executes the task autonomously within its defined scope.
+3. **Dispatch** — launch the agent as a subagent with its configured `capability-tools`, `model-tier`, and `run-turn-budget`, and system prompt. Choose the execution mode per `.specify/shared/definitions/subagent-definitions.md` (**native** when the runtime supports subagents, **virtual** in-session when it does not, **external** CLI process for long-running/parallel work or per-dispatch model overrides); external CLI dispatch MUST follow that document's Visibility Contract (stream-json + compact filter + `.live.log`/`.jsonl`/`.status` triplet) — never redirect print-mode output into a silent log. The subagent executes the task autonomously within its defined scope.
 4. **Report** — relay the subagent's result back to the user. If the subagent fails or hits its turn limit, report the partial result and the failure reason.
 
 **Scope boundary**: Run mode executes a **single** agent on a **single** task. For multi-agent orchestration (parallel dispatch, serial chains, iteration loops), use `/speckit.team`.
@@ -94,13 +94,14 @@ For organizing or running a **team** of agents (multiple agents collaborating), 
 ---
 name: "<required: unique identifier>"
 description: "<required: trigger words + when to use>"
-tools: [Read, Grep, Glob]
-model: auto
-maxTurns: 12
+capability-tools: [Read, Grep, Glob]
+model-tier: auto
+run-turn-budget: 12
+display-color: purple
 ---
 ```
 
-Supported fields: `name` (required), `description` (required), `tools`, `disallowedTools`, `model` (`auto`/`lite`/`efficient`/`performance`/`ultimate`), `maxTurns`, `timeoutMins`, `skills`, `mcpServers`, `permissionMode`, `background`, `isolation`, `color`, plus the framework fields `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`, `project` (the last binds a `project-custom` agent to its project).
+Supported fields (neutral vocabulary, per `.specify/shared/definitions/agent-definitions.md` — the shipped role set is the reference implementation): `name` (required), `description` (required), `capability-tools`, `disallowed-tools`, `model-tier` (`auto`/`lite`/`efficient`/`performance`/`ultimate`), `run-turn-budget`, `timeout-mins`, `skills`, `mcp-servers`, `permission-mode`, `background`, `isolation`, `display-color`, plus the framework fields `user-invocable`, `disable-model-invocation`, `supervisor`, `role-scope`, `project` (the last binds a `project-custom` agent to its project). Host-CLI-specific renderers map these neutral fields onto each tool's native keys at init time.
 
 ### Valid File Locations
 

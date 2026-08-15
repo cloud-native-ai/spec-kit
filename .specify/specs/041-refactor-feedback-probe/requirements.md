@@ -2,7 +2,7 @@
 
 **Requirement Branch**: `041-refactor-feedback-probe`  
 **Created**: 2026-08-14  
-**Status**: Draft  
+**Status**: Implemented  
 **Input**: User description: "需要针对当前的 feedback 反馈机制做一次大的重构，当前反馈机制主要存在如下几个问题：
 
 1. 所有的反馈都没有进行特定的系统切片的指定，也就是所有的反馈都是针对所有的系统，以全局视角去进行反馈。这种反馈带来的信息往往过于冗余，不容易进行特定的处理。

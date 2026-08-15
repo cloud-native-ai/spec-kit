@@ -2,7 +2,7 @@
 
 This file is the single source of
 truth for the `## Feedback` step that every qualifying unit embeds. Skills embed it
-as their final workflow section; the 13 **complex** command templates embed it at
+as their final workflow section; the 19 **complex** command templates embed it at
 their wrap-up / Git-commit-prompt stage. Simple commands MUST NOT embed it.
 
 ## Positioning & Red Lines

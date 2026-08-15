@@ -27,7 +27,7 @@ Triggered when `$ARGUMENTS` is empty or contains `--list`. Read-only: enumerate 
 
 ### Step 1: Scanner Digest
 
-Run `.specify/scripts/bash/search-todo.sh --json` and consume summary-first (see Step 1 of Collection Mode): only `counters`, `malformed`, and a per-block projection — `source_file`, `opening_line`, `context_heading`, plus the **first line** of `content`. Do NOT open full `content`/`prologue`/`epilogue` in this mode.
+Run `.specify/scripts/python/search-todo.py --json` and consume summary-first (see Step 1 of Collection Mode): only `counters`, `malformed`, and a per-block projection — `source_file`, `opening_line`, `context_heading`, plus the **first line** of `content`. Do NOT open full `content`/`prologue`/`epilogue` in this mode.
 
 ### Step 2: Parked Store Projection
 
@@ -57,7 +57,7 @@ Present two tables, then counts:
 
 ### Step 1: Run Scanner
 
-Execute `.specify/scripts/bash/search-todo.sh --json` from repo root. The script outputs JSON to stdout:
+Execute `.specify/scripts/python/search-todo.py --json` from repo root. The script outputs JSON to stdout:
 
 ```json
 {

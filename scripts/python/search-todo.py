@@ -32,11 +32,28 @@ def parse_args() -> argparse.Namespace:
 
 DEFAULT_EXCLUDES = [
     r"\.git/", r"\.svn/", r"node_modules/", r"\.venv/", r"venv/",
+    r"tests/fixtures/", r"test_fixtures/",
     r"__pycache__/", r"dist/", r"build/", r"target/", r"\.idea/",
     r"\.vscode/", r"\.DS_Store", r"Thumbs\.db",
 ]
 
 MAX_FILE_SIZE = 16 * 1024 * 1024  # 16 MB
+
+# F8b: capped warning sinks (print summarized, never 300-line floods)
+warnings_encoding: List[str] = []
+warnings_toolarge: List[str] = []
+
+
+def flush_warnings() -> None:
+    for label, sink in (("encoding_error", warnings_encoding),
+                        ("too_large", warnings_toolarge)):
+        for relpath in sink[:10]:
+            print(f"search-todo: warning: excluded file ({label}): {relpath}",
+                  file=sys.stderr)
+        if len(sink) > 10:
+            print(f"search-todo: warning: ... and {len(sink) - 10} more excluded "
+                  f"({label}) files suppressed", file=sys.stderr)
+
 
 
 def resolve_root(pos_root: Optional[str], root_arg: Optional[str]) -> str:
@@ -71,7 +88,7 @@ def is_eligible(abspath: str, relpath: str, exclude_patterns: List[str], exclude
         sz = os.path.getsize(abspath)
         if sz > MAX_FILE_SIZE:
             excluded_files.append(relpath)
-            print(f"search-todo: warning: excluded file (too_large): {relpath}", file=sys.stderr)
+            warnings_toolarge.append(relpath)
             return False
         # Check encoding
         with open(abspath, "rb") as fh:
@@ -82,7 +99,7 @@ def is_eligible(abspath: str, relpath: str, exclude_patterns: List[str], exclude
         return False
     except UnicodeDecodeError:
         excluded_files.append(relpath)
-        print(f"search-todo: warning: excluded file (encoding_error): {relpath}", file=sys.stderr)
+        warnings_encoding.append(relpath)
         return False
 
 
@@ -127,6 +144,28 @@ def scan_file(filepath: str, rel_path: str, context_depth: int, headings_only: b
             continue
 
         if is_fence and in_fence:
+            bare_close = re.match(r"^(`{3}|~{3,})[ \t]*$", stripped)
+            if not bare_close and is_todo:
+                # Info-string fence inside an open TODO block: the TODO never
+                # got a proper close — malformed, and this fence opens a new
+                # (non-TODO) region.
+                malformed.append({
+                    "source_file": rel_path,
+                    "opening_line": fence_start,
+                    "reason": "nested_fence",
+                    "content_snippet": "".join(block_lines)[:120],
+                })
+                in_fence, is_todo, block_lines = True, False, []
+                continue
+            if not bare_close and not is_todo:
+                if "SPECKIT TODO" in stripped:
+                    malformed.append({
+                        "source_file": rel_path,
+                        "opening_line": ln,
+                        "reason": "nested_fence",
+                        "content_snippet": stripped[:120],
+                    })
+                continue  # nested info fence inside a non-TODO fence: stay in it
             # Closing fence
             if is_todo:
                 closing_line = ln
@@ -244,6 +283,8 @@ def output_json(
 
 def main() -> None:
     args = parse_args()
+    import atexit
+    atexit.register(flush_warnings)
 
     workspace_root = resolve_root(args.ROOT, args.root)
     excluded_files: List[str] = []

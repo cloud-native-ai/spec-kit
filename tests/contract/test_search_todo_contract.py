@@ -19,8 +19,8 @@ SEARCH_TODO_SCRIPT = (
     Path(__file__).parent.parent.parent
     / ".specify"
     / "scripts"
-    / "bash"
-    / "search-todo.sh"
+    / "python"
+    / "search-todo.py"
 )
 
 
@@ -291,8 +291,12 @@ class TestMalformedUnclosed:
         result = run_search_todo(malformed_workspace, json_mode=True)
         assert result["exit_code"] == 0
         data = result["stdout_json"]
-        # The malformed fixture has an unclosed fence
-        assert data["counters"]["malformed_blocks"] >= 0  # at least not crash
+        # F8a remediation: every pathological construct in the fixture MUST be
+        # reported malformed — and none may leak through as a valid block.
+        assert data["counters"]["malformed_blocks"] == 3, data["counters"]
+        assert data["counters"]["total_blocks_found"] == 0, data["counters"]
+        reasons = {m["reason"] for m in data["malformed"]}
+        assert reasons == {"nested_fence"}
 
 
 # ============================================================================
@@ -302,9 +306,13 @@ class TestNestedFence:
     """Contract tests for D-4 (nested fence handling)."""
 
     def test_d4_nested_fence(self, malformed_workspace):
-        """D-4: Nested SPECKIT TODO inside another fence is handled."""
+        """D-4: Nested SPECKIT TODO inside another fence is reported, not executed."""
         result = run_search_todo(malformed_workspace, json_mode=True)
         assert result["exit_code"] == 0
+        data = result["stdout_json"]
+        # a TODO opened inside a non-TODO fence is flagged at ITS OWN line
+        openings = {m["opening_line"] for m in data["malformed"]}
+        assert 13 in openings, openings
 
 
 # ============================================================================

@@ -26,7 +26,7 @@ Print **every probe placed in the current project** as a graphical list / vertic
 python3 .specify/scripts/python/feedback-utils.py --action probes
 python3 .specify/scripts/python/feedback-utils.py --action probes --validate     # schema check
 python3 .specify/scripts/python/feedback-utils.py --action probes --reconcile   # embed audit
-python3 .specify/scripts/python/feedback-utils.py --action map                  # rebuild probe-map.md
+python3 .specify/scripts/python/feedback-utils.py --action map                  # OPTIONAL (writes): rebuild probe-map.md
 ```
 
 Render the merged truth source (framework Classes/Objects + project external probes) as a tree: kind → class (with target slice, collection, processing) → objects (unit @ lifecycle point). Mark internal vs external. The overview MUST be rendered from the truth source — never a hand-maintained list. Empty external section: show the `external-custom` class with its zero-object marker, no error.
