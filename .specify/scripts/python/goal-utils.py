@@ -602,6 +602,37 @@ def preview_target_check(repo_root: Path, team_slug: str, reference: str) -> dic
             "statement": row["statement"], "target_id": tid, "message": ""}
 
 
+def resolve_effective_target(team_md_path: Path, explicit_target: str | None = None) -> dict:
+    """Resolve the effective run Target (042 contract §C-1): explicit --target
+    > team.md `focus_target` > none.
+
+    Pure resolution — never judges: the effective value (when not None) is fed
+    to preview_target_check for the unchanged five-check pass. `source=none`
+    (no explicit target, no declared field) keeps field-less teams
+    byte-equivalent to pre-042 behavior. A malformed `focus_target` is a
+    configuration error: input-error stop, never silently ignored, never
+    degraded to none."""
+    team_md_path = Path(team_md_path)
+    if not team_md_path.is_file():
+        raise GoalNotFound(f"team not found: {team_md_path}")
+    meta, _ = _split_frontmatter(team_md_path.read_text(encoding="utf-8"))
+    raw_focus = meta.get("focus_target")
+    declared_focus = str(raw_focus).strip() if raw_focus is not None else None
+    if explicit_target:
+        return {"effective": explicit_target, "source": "explicit",
+                "declared_focus": declared_focus or None}
+    if declared_focus is not None and not TARGET_IDENTITY.match(declared_focus):
+        return {"effective": None, "source": "input-error",
+                "declared_focus": declared_focus,
+                "message": ("input-error: focus_target 值 " f"{declared_focus!r} 不符合文法 "
+                            "T-<nnn>(配置错误,停止——不静默忽略、不降级为无;经 "
+                            "improve-team 修正字段)")}
+    if declared_focus:
+        return {"effective": declared_focus, "source": "team-default",
+                "declared_focus": declared_focus}
+    return {"effective": None, "source": "none", "declared_focus": None}
+
+
 def migrate_team(repo_root: Path, team_slug: str, *, keep_inline: bool = True) -> tuple[Path, str]:
     """Derive a goal definition from a team's inline goal and switch it to a reference.
 

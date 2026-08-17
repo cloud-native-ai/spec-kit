@@ -38,6 +38,17 @@ Persistent teams own a directory `.specify/teams/<slug>/` — the definition liv
 
 The command **delegates to skills** and never renders templates inline. On ambiguous or unsupported intent it reports the three recognized capabilities (create / modify / run) and requests the missing intent — it never guesses silently. A `modify`/`run` targeting a team that does not exist reports **"team not found"** and offers to `create` it.
 
+### Goal-based creation (create with an archived goal)
+
+When the input names a goal that is already archived under `.specify/goal/` (exact slug match, confirmed with you), create runs the **goal-based branch** instead of re-eliciting the goal as free text:
+
+1. **Load & restate** — the definition (objective, criteria, lifecycle, existing Targets) is loaded via the `goal-utils.py` engine and restated for your confirmation. A dangling name stops with the verbatim error prefix `goal 未定义:` and points to `/speckit.goal create`; a terminal goal (`achieved`/`abandoned`) is refused outright.
+2. **Four-element analysis** — dimension, criteria coverage (missing criteria declared, never invented), existing Targets, and single-team achievability, each with rationale. The conclusion is advisory: you adjudicate single-team vs decomposition.
+3. **Decomposition proposal (optional)** — on the decomposition path, a proposal set is drafted (outcome-form statements, no criteria restatement), each statement dry-run validated by `goal-utils.py targets <slug> --check` (zero writes) before presentation; one merged confirmation lands them per-statement via the existing `targets --add` authorization surface. The team side never writes `goal.md`.
+4. **One team per Target (N teams : 1 Goal)** — each open Target gets a team: all declare the same `goal_slug`, each carries `focus_target: T-<nnn>` (its default focus), slugs derive as `<goal-slug>-t<nnn>` with uniqueness checks, and a pairwise-disjoint territory proposal is verified by `skills/create-team/scripts/verify-territory-disjoint.py` before landing — known overlaps are disclosed and handed to `/speckit.goal coordinate`, never landed silently.
+
+Concepts (Goal / Target / binding / decomposition) are defined once in `.specify/shared/definitions/goal-definitions.md`.
+
 ## Run Mode: preview → confirm → execute
 
 The **run** mode never executes before you confirm:
@@ -55,6 +66,8 @@ The **run** mode never executes before you confirm:
 ```
 
 A run MAY focus on one authorized **Target** (scope slice) of the bound goal — see [`/speckit.goal`](goal.md) → Targets for the authorization side. The parameter is validated in preview, before the gate: dangling references stop with a pointer to `/speckit.goal targets --add`; cross-goal references and terminal goals are refused; a **terminal-state Target** (`done`/`dropped`) stops for the **review bifurcation** — verify by hand: if it is genuinely done, the run ends with a report; if the evidence contradicts, reopen it via `/speckit.goal targets <slug> --set open --id <T-nnn>` and re-issue the run. There is no terminal-execution bypass. On success the gate discloses `本次 Target: T-<nnn> — <statement>(open)` (or `本次 Target: 无(对 goal 整体运行)` when omitted), the report carries `**Target 指派**: …`, and new ledger entries carry `target_ref`. The assignment never rebinds the team, never changes identity resolution, and never moves the summary delivery directory; without `--target` the whole flow is byte-equivalent to the pre-038 behavior.
+
+**Default focus (`focus_target`, 042).** A team created through the goal-based branch may declare `focus_target: T-<nnn>` in its frontmatter — the team's default focus Target. Resolution order is **explicit `--target` > `focus_target` > none**: a run without `--target` resolves to the declared Target and discloses the source with the `(团队默认)` marker (`本次 Target: T-003 — <statement>(open)(团队默认)`); an explicit `--target` always overrides; teams without the field behave exactly as before (byte-equivalent). `focus_target` is a prefill of `--target` — not a write-scope claim and not a binding change; the five preview checks apply unchanged to the resolved value (a terminal default Target is intercepted the same way; re-focus via `improve-team`, reopen via `/speckit.goal`).
 
 ## Collaboration Patterns
 

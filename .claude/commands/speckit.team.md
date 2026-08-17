@@ -91,6 +91,9 @@ The create path first checks whether the user passed an **already-defined goal**
    - **中途中止**:用户中止或某条落盘失败时,已落盘条目保留(它们是合法授权),其余丢弃;再次发起时既有 open Targets 自动成为复用基线,不重复授权。
 5. **团队派生与落盘**:确认路径后派生团队——
    - 单团队路径:roster 与 pattern 以该 goal 叙事为输入走既有机制(`python3 skills/create-team/scripts/match-team-preset.py` preset 匹配 + `skills/create-team/references/patterns.md` 决策树),派生理由 MUST 进入确认预览;preset 强匹配时推荐复用该 preset。
+   - **成组路径(N teams : 1 Goal)**:分解批准后(或复用基线成立时),**每个 open Target 对应创建一个团队**——全部声明**同一 `goal_slug`**;每个团队的 roster/pattern 以其 **Target 语句**为输入复用既有派生机制(`python3 skills/create-team/scripts/match-team-preset.py --goal "<Target 语句>"` + pattern 决策树),派生理由入确认预览;`focus_target: T-<nnn>` 指向该团队对应的切片(**插在 `goal_slug` 之后**;创建落盘前 MUST 校验其存在于绑定 goal 的 `## Targets` 且为 `open`,否则拒绝创建);团队 slug 缺省派生 `<goal-slug>-t<nnn>`(小写、三位零填充,如 `log-split-t003`),对 `.specify/teams/` 现存目录**查重**,冲突即改写并回显,用户可在确认门禁改名。
+   - **territory 纪律**:多团队方案 MUST 基于切片呈现两两不相交的 territory 提议,落盘前经 `python3 skills/create-team/scripts/verify-territory-disjoint.py --input <proposals.json> [--repo-root <root>] --json` 校验(提议团队 ∪ 同 `goal_slug` 既有团队;判定文法 import 自 `build-summary-input.py`,零第二文法):`exit 0` → 提议划分随各 team.md 落盘;`exit 4`(任何 overlap/undecidable)→ 披露争用区/未声明方,人工改划后重跑或移交 `/speckit.goal coordinate`,MUST NOT 静默落盘已知重叠的 territory;同 goal 下已有其他团队时,单团队路径同样必跑 verify。
+   - **确认门禁一次性披露**:分支判定(命中的 goal-slug 与定义摘要)、分析结论、路径决策、提议集或复用声明、territory 划分提议(含 verify verdict)。同一 `goal_slug` 下已存在团队(扫描 `.specify/teams/*/team.md` frontmatter)时:MUST 检测并提议复用既有团队或移交 `/speckit.goal coordinate`,MUST NOT 无提示重复建队。
    - frontmatter 声明 `goal_slug`(引用,不是内容副本);内联 `goal` 字段(如保留)仅为可读性渲染,**定义权威**——与定义不一致时显式报出供人裁决,MUST NOT 分叉出第二份权威叙事。
    - 写入面仅限 `team.md`;本分支对 `goal.md` 零写入(`## Targets`/`## History` 只经 `/speckit.goal` 的引擎渲染)。
 
@@ -99,7 +102,7 @@ The create path first checks whether the user passed an **already-defined goal**
 The **run** mode MUST follow this sequence and MUST NOT execute before confirmation:
 
 1. **Load** the target team from `.specify/teams/<slug>/team.md`.
-2. **Resolve the optional `--target` (preview validation, before the gate).** `run <team-slug> [--target <T-<nnn> | <goal-slug>.T-<nnn>>]` — the local form `T-<nnn>` is canonical; the qualified form is accepted only when its `<goal-slug>` equals the bound goal. Run the five checks **in order**; any failure stops the run **with zero execution trace** (no report, no ledger write). The engine parse of `.specify/scripts/python/goal-utils.py` (`parse_goal` / `preview_target_check`) is the single source of truth for every judgment below — never re-derive it in prose:
+2. **Resolve the effective Target, then run the five checks (preview validation, before the gate).** `run <team-slug> [--target <T-<nnn> | <goal-slug>.T-<nnn>>]` — the local form `T-<nnn>` is canonical; the qualified form is accepted only when its `<goal-slug>` equals the bound goal. Resolution order is **显式 `--target` > team.md `focus_target` > 无**: an explicit `--target` always wins (semantics identical to 038); otherwise a declared `focus_target` (局部形 `T-<nnn>`,插在 frontmatter `goal_slug` 之后) is the team's default focus, resolved via `resolve_effective_target` (`.specify/scripts/python/goal-utils.py`) → `{effective, source, declared_focus}`. `focus_target` 是 run 级 `--target` 的**预填**——不是写域声明、不是 Goal–Team 绑定变更、不参与 goal 身份解析。`focus_target` 格式非法(`source=input-error`)→ 停止并经 improve-team 修正,不静默忽略、不降级为无;未声明且未显式指定(`source=none`)→ 全流程与引入前逐字节等价。The resolved `effective` value (when not None) is then validated by the five checks below — **the local form is canonical** and the checks themselves are UNCHANGED; the engine parse of `.specify/scripts/python/goal-utils.py` (`parse_goal` / `preview_target_check`) is the single source of truth for every judgment below — never re-derive it in prose:
    1. **解析绑定 goal**——沿用既有两级身份解析(`goal_slug` 显式 → 团队 slug 推断);本流程不引入第三级。团队无 goal 定义而指定了 `--target` → 报"Target 依赖 goal 定义",指向 `/speckit.goal migrate` 并停止;不指定 `--target` 时一切照旧。
    2. **悬空引用**——`T-<nnn>` 不存在于绑定 goal 的 `## Targets` 节 → 报为悬空并停止,提议先经 `/speckit.goal targets --add` 添加;不静默接受、不降级、不臆测。
    3. **终态引用**——Target 状态为 `done`/`dropped` → 显式报出终态并停止,附**复核二分**指引:属实 → 返回报告结束本次 run;证据不符 → 经 `/speckit.goal targets --set open --id <T-nnn>` 重开后重新发起。run 模式 **MUST NOT 提供终态执行旁路**,MUST NOT 默默当作 open 执行。
@@ -113,18 +116,19 @@ The **run** mode MUST follow this sequence and MUST NOT execute before confirmat
    - an **execution flow diagram** (textual / mermaid / PlantUML flow showing dispatch / handoff / loop edges).
 6. **Confirmation gate** — present the **goal** and both structures, and ask the user to confirm. The team executes **only** on explicit confirmation.
    - **Disclose the summary decision** before confirming, so its cost is known at decision time: whether this run will refresh the goal summary or not and — when it will not — which gate suppresses it (budget / cadence / no material); the resolved **goal identity** and whether it is explicit (`goal_slug` declared) or inferred (falling back to the team slug); and the **target delivery directory** `.specify/goal/<goal-slug>/summary/`. See `skills/create-team/SKILL.md` → Summary Refresh (all patterns).
-   - **Disclose the Target assignment** as one extra line, verbatim forms:
+   - **Disclose the Target assignment** as one extra line, verbatim forms (the third carries the STR-001 source marker `(团队默认)` when the resolution source is `team-default`):
      ```text
      本次 Target: T-002 — <statement>(open)
+     本次 Target: T-003 — <statement>(open)(团队默认)
      本次 Target: 无(对 goal 整体运行)
      ```
    - On confirm → orchestrate per the team's pattern (delegating to `create-team`'s execution engine): territory validation before parallel dispatch, DAG (no-cycle) validation + per-handoff verification before serial chain, mandatory max-iteration cap for iteration loops, and — for **continuous** loops — read `constraints.md` + budget + kill-switch at cycle start, run exactly **one cycle** at the team's declared maturity level (starting at L1), with an independent verifier at L2+; file-path-only handoff throughout. Per-member dispatch modality (native / virtual / external) follows `.specify/shared/definitions/subagent-definitions.md`; external CLI dispatch MUST honor its Visibility Contract (stream-json + progress filter + `.live.log`/`.jsonl`/`.status` triplet — silent `cli -p … > log 2>&1` dispatch is prohibited). Work is steered toward the **goal** — and, when a Target was assigned, focused on that slice — and the evaluator measures progress against it (iteration: iterate until the goal's threshold is met or the cap is reached; continuous: run one cycle, then update the state spine and stop).
    - On decline → stop without executing; optionally suggest `modify`.
 7. **Report** — after execution finishes, write a dated run report to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (goal, execution time, result summary, full process detail). Mandatory for every run. The report MUST carry the assignment line (fixed field name):
    ```text
-   **Target 指派**: T-002(<statement>)   # 或 "无(goal 整体)"
+   **Target 指派**: T-002(<statement>)   # 或 "无(goal 整体)";team-default 来源时附 (团队默认)
    ```
-   New ledger entries produced by a Target-assigned run MUST carry `"target_ref": "T-<nnn>"` (written by the team supervisor into `items.jsonl`).
+   New ledger entries produced by a Target-assigned run MUST carry `"target_ref": "T-<nnn>"` (written by the team supervisor into `items.jsonl`; the value is the resolved `effective` — explicit or team-default alike).
 
 **`--target` invariants**: Goal–Team 绑定、身份解析结果、summary 交付目录位置不因 `--target` 改变——它不是改绑、不是写域声明,只是本次 run 的聚焦切片。未指定 `--target` 时,preview/confirm/execute/report 全流程与引入前逐字节等价(SC-002)。
 
