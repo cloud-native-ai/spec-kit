@@ -17,6 +17,20 @@ Produce a team from a user **goal** and (unless one-shot) persist it as `.specif
 
 ---
 
+## Goal-based create branch
+
+When the user's input names an **already-defined goal**, create runs through this branch instead of re-eliciting the goal as free text. Concept anchor: `.specify/shared/definitions/goal-definitions.md` (Goal / Target / binding — linked, never restated).
+
+1. **Recognize (deterministic, zero semantic guessing)** — run `python3 scripts/python/goal-utils.py list --json` for the archive slug set; a token that **exactly matches** a slug (or a path to its `goal.md`) enters the branch after user confirmation. Near-misses (case/hyphen variants) are **not** hits; no match → continue with the free-text procedure above, unchanged. The verdict comes from the engine enumeration, never from agent memory.
+2. **Load and restate** — read the definition via `parse_goal` (`scripts/python/goal-utils.py`): objective, criteria (including the `None provided.` missing state), status, targets, history; restate to the user for confirmation.
+   - **Dangling reference** (user names a slug absent from `list`): error with the verbatim prefix `goal 未定义:`, pointing to `/speckit.goal create`; zero artifacts, zero writes — MUST NOT silently degrade to inline goal creation.
+   - **Terminal goal** (`achieved`/`abandoned`): report the terminal state explicitly and refuse to create. Both rejections stop without needing confirmation — they are stops, not writes.
+3. **Four-element analysis (advisory, not a gate)** — present before any derivation, each element with rationale: **维度** (the plane the goal's object lives on), **判据覆盖** (criteria listed, or the missing state declared — never invented), **既有 Target** (open/done/dropped inventory — the reuse baseline), **可达成性** (single-team short-term achievable vs broad-needs-decomposition, conclusion + basis). The conclusion is a recommendation: the user adjudicates single-team vs decomposition; forcing single-team on a broad goal is not blocked, but the adjudication is recorded in the confirmation preview.
+4. **Single-team path (adjudicated)** — derive roster + pattern with the loaded goal narrative as input through the existing machinery (step 2 preset matching + step 3 pattern tree of the procedure above); derivation reasons MUST enter the confirmation preview; a strong preset match recommends reuse.
+5. **Landing invariants** — frontmatter declares `goal_slug` (reference, not a content copy); an inline `goal` field, if kept, is readability rendering only — the definition is authoritative, and any mismatch is surfaced for human adjudication, never forked into a second authoritative narrative. The branch writes `team.md` only; it performs **zero writes to `goal.md`** (`## Targets` / `## History` are rendered only by the `/speckit.goal` engine).
+
+---
+
 ## Persisted `team.md` schema
 
 Each persistent team owns a **directory** `.specify/teams/<slug>/` (no per-tool symlink — framework-internal). The definition is stored at `.specify/teams/<slug>/team.md`; per-run reports accumulate under `.specify/teams/<slug>/runs/`:

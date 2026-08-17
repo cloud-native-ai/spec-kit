@@ -22,6 +22,8 @@ The **goal** concept is defined authoritatively in `references/goal.md`. When a 
 
 Produce a team from a user **goal** and persist it as `.specify/teams/<slug>/team.md`. Establish the goal first, then derive both structures from it. Full procedure, schema, and persistence rules: [`references/create-mode.md`](references/create-mode.md).
 
+**Goal-based branch (before step 1)**: when a token in the input exactly matches an archived goal slug — verified deterministically via `python3 scripts/python/goal-utils.py list --json`, never guessed — offer to enter the **goal-based create branch**: load the definition via `parse_goal`, present the four-element analysis (维度 / 判据覆盖 / 既有 Target / 可达成性 — advisory, the user adjudicates), then derive the team from the loaded goal. Dangling references stop with the verbatim prefix `goal 未定义:`; terminal goals (`achieved`/`abandoned`) are rejected. Full branch procedure: [`references/create-mode.md`](references/create-mode.md) → *Goal-based create branch*.
+
 1. **Establish the goal** — extract/confirm a verifiable goal from `$ARGUMENTS`/context.
 2. **Match presets** — run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<text>"` and act on its `confidence`.
 3. **Select the pattern** — derive from the goal via the decision tree in [`references/patterns.md`](references/patterns.md).

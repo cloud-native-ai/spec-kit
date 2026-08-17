@@ -47,7 +47,7 @@ The goal is persisted as the `goal` frontmatter field and rendered as a `## Goal
 **Routing flow**:
 
 1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: classify as `create`, `modify`, or `run`.
-2. **create** → `create-team`: **first establish the goal** — elicit it from `$ARGUMENTS` / conversation / repo context, or ask for it, and confirm it with the user — then **match the goal against the predefined team presets** (`skills/create-team/templates/teams/`, matched via `skills/create-team/scripts/match-team-preset.py`): on a strong match, recommend reusing that preset instead of deriving a team from scratch; otherwise propose a roster (static structure) + pattern config (dynamic structure) **derived from that goal**. On confirmation persist `.specify/teams/<slug>/team.md` (or run one-shot without persisting).
+2. **create** → `create-team`: **first establish the goal** — check the **Goal-Based Create branch** first (see below: exact-match the input token against archived goal slugs), otherwise elicit it from `$ARGUMENTS` / conversation / repo context as free text, or ask for it, and confirm it with the user — then **match the goal against the predefined team presets** (`skills/create-team/templates/teams/`, matched via `skills/create-team/scripts/match-team-preset.py`): on a strong match, recommend reusing that preset instead of deriving a team from scratch; otherwise propose a roster (static structure) + pattern config (dynamic structure) **derived from that goal**. On confirmation persist `.specify/teams/<slug>/team.md` (or run one-shot without persisting).
 3. **modify** → `improve-team`: load the existing team and apply targeted, evidence-based edits to any of its three parts — the **goal**, the **static structure**, or the **dynamic structure**. Structure edits are structure-preserving and keep serving the current goal. **Redefining the goal is a first-class, supported edit**: when the goal changes, re-evaluate and realign the roster and pattern to serve the new goal. Re-persist and bump `updated`.
 4. **run** → `create-team` execution path: follow the **preview → confirm → execute** gate below.
 5. **Empty arguments** → execute **Default Behavior (No Arguments)** below.
@@ -75,6 +75,25 @@ When intent cannot be resolved from non-empty arguments, the command MUST report
 - **create** — establish the team's **goal**, then author a new team (static + dynamic structure) organized around it and persist it → `create-team`
 - **modify** — adjust/optimize an existing team — reshape its structure, or **redefine its goal** and realign the structure to the new goal → `improve-team`
 - **run** — restate the **goal**, render the team's structure, and execute it after confirmation → `create-team`
+
+### Goal-Based Create(基于已定义 Goal 的创建分支)
+
+The create path first checks whether the user passed an **already-defined goal**: when a token in `$ARGUMENTS` matches an archived `<goal-slug>` under `.specify/goal/`, the flow enters the **goal-based branch** after user confirmation. Recognition is deterministic and engine-driven — never guessed from memory.
+
+1. **识别(确定性,零语义猜测)**:先运行 `python3 scripts/python/goal-utils.py list --json` 取得 archive slug 全集;入参 token 与某 slug **精确匹配**(或为指向其 `goal.md` 的路径)→ 向用户确认"基于已定义 goal `<slug>` 创建"后进入分支。匹配判定 MUST 由引擎枚举结果驱动,MUST NOT 由 agent 凭记忆或语义猜测断言;近似不匹配(大小写/连字符差异)**不构成命中**。无命中 → 走既有自由文本流程,行为与引入前一致(零回归)。
+2. **加载与两类拒绝**:进入分支后经 `parse_goal`(`scripts/python/goal-utils.py`)读取 objective、criteria(含 `None provided.` 缺失态)、status、targets、history,并复述给用户确认。
+   - **悬空引用**(用户指名但 `list` 无此 slug):输出以逐字前缀 `goal 未定义:` 开始的报错,指向 `/speckit.goal create`;零产物、零写入,MUST NOT 静默降级为内联 goal 创建。
+   - **终态 goal**(`achieved`/`abandoned`):显式报出终态并拒绝创建团队。两类拒绝是停止而非写入,无需用户确认即可执行。
+3. **四要素分析(建议非门禁)**:创建前呈现,每项附理由:
+   1. **维度**——goal 对象所处平面(链接概念锚 `.specify/shared/definitions/goal-definitions.md` 的 Goal Dimensions,不复述);
+   2. **判据覆盖**——criteria 逐条列出,或显式声明缺失(`None provided.`,MUST NOT 臆造);
+   3. **既有 Target**——open/done/dropped 分类清单(复用基线,见下文"分解提议"小节的处置规则);
+   4. **可达成性**——单团队短期可达成 vs 宽泛需分解,结论 + 依据。
+   分析结论是建议而非门禁:单团队/分解路径由用户裁决;用户坚持单团队不被阻止,但裁决留痕于确认预览。
+4. **团队派生与落盘**:确认路径后派生团队——
+   - 单团队路径:roster 与 pattern 以该 goal 叙事为输入走既有机制(`python3 skills/create-team/scripts/match-team-preset.py` preset 匹配 + `skills/create-team/references/patterns.md` 决策树),派生理由 MUST 进入确认预览;preset 强匹配时推荐复用该 preset。
+   - frontmatter 声明 `goal_slug`(引用,不是内容副本);内联 `goal` 字段(如保留)仅为可读性渲染,**定义权威**——与定义不一致时显式报出供人裁决,MUST NOT 分叉出第二份权威叙事。
+   - 写入面仅限 `team.md`;本分支对 `goal.md` 零写入(`## Targets`/`## History` 只经 `/speckit.goal` 的引擎渲染)。
 
 ### Run Mode (preview → confirm → execute)
 
