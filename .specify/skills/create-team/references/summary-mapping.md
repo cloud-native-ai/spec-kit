@@ -183,6 +183,8 @@ tracked、append-only、JSON Lines。每行一个**条目状态事件**。只由
 
 `goal_slug` MUST 同时满足 §6.2 的 DDL 字面量文法与路径片段安全(不含 `/`、不为 `.` / `..`)。
 
+> 042 note: team.md 的可选字段 `focus_target`(默认聚焦 Target)**不参与**本节两级身份解析——它只是 run 级 `--target` 的预填,不构成第三级,也不影响 summary 归属与交付目录。
+
 **不变式**:
 - **GI-1**:取值 MUST NOT 由 goal 正文派生。改写 goal 正文不改变它,故不迁移交付目录(FR-019);正文变更本身记入元信息。
 - **GI-2**:一个团队在任一时刻只属于一个 goal。改绑时原 goal 目录保留其历史贡献并标注其已不再参与,新 goal 目录自改绑时点起接收新贡献。

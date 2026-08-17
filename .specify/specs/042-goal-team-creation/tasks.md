@@ -21,7 +21,7 @@
 - DoD-5: SC-001..006 在 verification.md 中逐条给出状态与证据(实现期由 /speckit.implement 落笔)
 - DoD-6: 词汇表/Feature 索引复核完成(现记 Focus Target、Decomposition Proposal 两条 proposed 术语;任务分解未暴露新术语或 Feature 变更)
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Completion Gate
 
@@ -140,9 +140,9 @@
 
 **Purpose**: FR-014/FR-015 收口与全量回归
 
-- [ ] T031 [P] FR-015 文档集完整性核查:检查 `skills/create-team/references/summary-mapping.md`——按 feature-ref.md 裁定 036 summary 语义零改动,预期结论"无需变更";仅当该文件存在 team.md frontmatter 字段清单时,补一行 focus_target 不参与 summary 的交叉引用(不引入语义)
-- [ ] T032 全量回归收口:`bash scripts/bash/run-tests.sh --names-out /tmp/042-final.txt && comm -13 .specify/specs/042-goal-team-creation/baseline-failed.txt /tmp/042-final.txt` 输出必须为空(GATE-1);任何新增失败先二分归属再修复,禁止改基线文件消音
-- [ ] T033 端到端演练:在隔离临时 repo root(`--repo-root /tmp/<dir>`)依 quickstart.md §1–§6 走黄金路径——定义 goal → goal-based create → 分析裁决分解 → `--check` 全过 → 合并批准逐条落盘 → 成组 3 队(territory exit 0)→ 聚焦 run(披露 `(团队默认)`、台账 target_ref)→ coordinate 冲突面;结果记入 verification.md
+- [X] T031 [P] FR-015 文档集完整性核查:检查 `skills/create-team/references/summary-mapping.md`——按 feature-ref.md 裁定 036 summary 语义零改动,预期结论"无需变更";仅当该文件存在 team.md frontmatter 字段清单时,补一行 focus_target 不参与 summary 的交叉引用(不引入语义)
+- [X] T032 全量回归收口:`bash scripts/bash/run-tests.sh --names-out /tmp/042-final.txt && comm -13 .specify/specs/042-goal-team-creation/baseline-failed.txt /tmp/042-final.txt` 输出必须为空(GATE-1);任何新增失败先二分归属再修复,禁止改基线文件消音
+- [X] T033 端到端演练:在隔离临时 repo root(`--repo-root /tmp/<dir>`)依 quickstart.md §1–§6 走黄金路径——定义 goal → goal-based create → 分析裁决分解 → `--check` 全过 → 合并批准逐条落盘 → 成组 3 队(territory exit 0)→ 聚焦 run(披露 `(团队默认)`、台账 target_ref)→ coordinate 冲突面;结果记入 verification.md
 
 ---
 

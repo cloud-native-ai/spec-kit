@@ -2,7 +2,7 @@
 
 **Requirement Branch**: `042-goal-team-creation`  
 **Created**: 2026-08-17  
-**Status**: Planned  
+**Status**: Implemented (2026-08-17, via /speckit.implement — 33/33 tasks, SC-001..006 pass; see verification.md)  
 **Input**: User description: "需要为team命令增加一个基于goal的创建流程. 通常情况下我们会先通过/speckit.goal命令定义一个goal,然后通过/speckit.team命令创建一个team去实现这个goal. 需要在/speckit.team命令中创建流程增加一个分支,如果用户传入了一个已定义的goal,需要能够根据这个goal的特点创建一个符合需要的team. 在创建之前需要新仔细分析goal的内容,如果goal的内容过于宽泛并且没法短期实现,那么可能需要将goal分解为多个Target(参考@.specify/shared/definitions/goal-definitions.md), 每个target创建一个team. 需要完善goal->target的分解过程来达成这一点."
 
 ## Related Feature *(mandatory)*
