@@ -241,3 +241,32 @@ def test_payload_values_never_carry_the_formal_version(tmp_path, monkeypatch):
     payload = json.loads((tmp_path / STAMP_RELPATH).read_text(encoding="utf-8"))
     assert all(value != version for value in payload.values()), \
         "the pyproject version must never be a payload value (FR-002)"
+
+
+# --------------------------------------------------------------------------
+# degradation face (043 US3): unavailable sentinel, two-level honest chain
+# --------------------------------------------------------------------------
+
+SENTINEL = "unavailable"  # [[STR-002]]
+
+
+def test_write_lands_sentinel_and_reason_when_unresolved(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        sc, "resolve_source_commit",
+        lambda: {"commit": None, "origin": "unavailable", "reason": "no git"})
+    assert sc.write_source_stamp(tmp_path) is True
+    payload = json.loads((tmp_path / STAMP_RELPATH).read_text(encoding="utf-8"))
+    assert payload["commit"] == SENTINEL
+    assert payload["reason"] == "no git"
+    assert payload["framework"] == FRAMEWORK_NAME
+
+
+def test_write_passes_embedded_unavailable_reason_through(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        sc, "resolve_source_commit",
+        lambda: {"commit": None, "origin": "embedded",
+                 "reason": "built without git"})
+    sc.write_source_stamp(tmp_path)
+    payload = json.loads((tmp_path / STAMP_RELPATH).read_text(encoding="utf-8"))
+    assert payload["commit"] == SENTINEL
+    assert payload["reason"] == "built without git"

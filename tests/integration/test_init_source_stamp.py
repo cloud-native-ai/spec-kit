@@ -108,3 +108,17 @@ def test_legacy_project_gains_the_stamp(tmp_path, monkeypatch,
     assert result.exit_code == 0, result.output
     stamp = json.loads((project / STAMP_RELPATH).read_text(encoding="utf-8"))
     assert stamp["commit"] == _repo_head()
+
+
+def test_unavailable_resolution_still_leaves_init_green(tmp_path, monkeypatch,
+                                                        qoder_minimal_resource_path):
+    """US3/FR-005: honest degradation — sentinel stamp, init unaffected."""
+    monkeypatch.setattr(
+        sc, "resolve_source_commit",
+        lambda: {"commit": None, "origin": "unavailable", "reason": "no git"})
+    result = _invoke_init(monkeypatch, tmp_path, qoder_minimal_resource_path)
+    assert result.exit_code == 0, result.output
+    payload = json.loads(
+        (tmp_path / "demo-proj" / STAMP_RELPATH).read_text(encoding="utf-8"))
+    assert payload["commit"] == "unavailable"
+    assert payload["reason"] == "no git"

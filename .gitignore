@@ -61,3 +61,5 @@ input/
 
 # session export scratch (owner decision 2026-08-15)
 .session-export/
+# 043: build-embedded source commit (build artifact)
+src/specify_cli/_source_commit.json
