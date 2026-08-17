@@ -71,6 +71,7 @@ Batch procedure, ownership resolution, and routing rationale: [`./references/loo
    - Update `./references/`, `./scripts/`, or `./assets/` only when the evidence shows they will reduce future mistakes.
    - When Step 4 extracted deterministic logic into a new `${SKILL_HOME}/scripts/` script, list that script in the Resources table so the executable resource stays discoverable.
    - Avoid adding process logs, changelogs, or full retrospectives to the Skill; distill only reusable lessons.
+   - **Never narrate the document's own history**: corrections state the current fact only — never `旧文档断言…已证伪` / `重要勘误` / `本条不再是限制` frames (exceptions: confidence markers, misuse guards). Rewrite examples: [`./references/skill-slimming-principles.md`](./references/skill-slimming-principles.md) `## No History Narration`.
    - **Rename/removal downstream-wiring checklist**: a rename/consolidation/removal is not done until every downstream pointer moves with it (obsolete-skills list, contract tests, skills-count list, feature history, dogfooded artifacts), and both mirrors are synced and verified byte-equal. Five-step checklist and the move-then-edit ordering rule: [`./references/loop-playbook.md`](./references/loop-playbook.md) `## Step 5`.
 
 6. **Validate the improvement loop**
@@ -171,9 +172,10 @@ Objective conditions for finishing a loop. Each is checkable, not a matter of ju
 2. **New detail lands in L2/L3 by default.** Do not add worked examples, full command sequences, or multi-line snippets to `SKILL.md` — write them into `./references/` or `./scripts/` and leave a one-line pointer with an anchor in the body.
 3. **Evidence before defect.** Do not label anything a defect without an observed symptom (error text, wrong output, user correction, artifact). `Unobserved` findings are recorded only; counting signals alone never becomes an optimization point.
 4. **Capability verified before it is documented.** Before writing a delegation path, data table, or coverage claim, read the delegate's real surface (`--help`, contract, cached facts) and encode honest limitation branches. Do not write values or capabilities from memory.
-5. **Reference code is executed, not eyeballed.** Any snippet or script added/changed must be run (or traced line-by-line against the documented API). "File exists" and "links resolve" are not validation — state explicitly when runtime validation is deferred.
+5. **Reference code is executed, not eyeballed.** Any snippet or script added/changed must be run (or traced line-by-line against the documented API). "File exists" and "links resolve" are not validation — state explicitly when runtime validation is deferred. For detection scripts also run a **reverse case on a domain-legitimate sample** (must NOT flag required syntax) — catching bad samples alone can induce deleting required syntax.
 6. **Removal preserves content.** Every slimming move is delete-and-absorb in the same edit; never delete a section and defer relocating its substance.
 7. **No claim of "fixed" without before/after.** Improvement outcomes are decided by the intervention ledger's next-run comparison, not by asserting the edit works.
+8. **Wrap-up commits verify the staging area.** Before any loop-end commit, `git status --short` and confirm only this loop's files are staged; unstage unrelated pre-staged entries or commit by explicit pathspec — never `git add -A`.
 
 ## Feedback
 
