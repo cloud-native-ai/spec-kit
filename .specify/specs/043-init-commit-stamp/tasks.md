@@ -92,9 +92,9 @@
 
 ### Tests + Verification for User Story 2
 
-- [ ] T009 [US2] [blockedBy: T008] 扩展 `tests/contract/test_source_stamp.py` 刷新组:monkeypatch 解析先后返回 commit A(40-hex 造值)与 commit B → 连续两次 `write_source_stamp` → 文件最终载荷=B、`grep A` 于文件 0 命中(零残留,FR-006);断言载荷任何字段的值不等于 `pyproject` 的 version 串(FR-002;读 pyproject 提取对比)
-- [ ] T010 [US2] [blockedBy: T009] 扩展 `tests/integration/test_init_source_stamp.py` 升级组:同一临时项目连续两次 `RUNNER.invoke(init)`(第二次 monkeypatch 解析返回新造值)→ 落章为新值;模拟存量项目(预置 `.specify/` 而无 source.json)→ init 后获得
-- [ ] T011 [US2] [blockedBy: T010] 运行 US2 测试组;若红,修复 `write_source_stamp` 覆写路径(整体覆写、不合并)至全绿——测试即规格,不为绿改断言
+- [X] T009 [US2] [blockedBy: T008] 扩展 `tests/contract/test_source_stamp.py` 刷新组:monkeypatch 解析先后返回 commit A(40-hex 造值)与 commit B → 连续两次 `write_source_stamp` → 文件最终载荷=B、`grep A` 于文件 0 命中(零残留,FR-006);断言载荷任何字段的值不等于 `pyproject` 的 version 串(FR-002;读 pyproject 提取对比)
+- [X] T010 [US2] [blockedBy: T009] 扩展 `tests/integration/test_init_source_stamp.py` 升级组:同一临时项目连续两次 `RUNNER.invoke(init)`(第二次 monkeypatch 解析返回新造值)→ 落章为新值;模拟存量项目(预置 `.specify/` 而无 source.json)→ init 后获得
+- [X] T011 [US2] [blockedBy: T010] 运行 US2 测试组;若红,修复 `write_source_stamp` 覆写路径(整体覆写、不合并)至全绿——测试即规格,不为绿改断言
 
 **Checkpoint**: US2 独立可测——回溯恒指向最近一次 init 的真实来源
 

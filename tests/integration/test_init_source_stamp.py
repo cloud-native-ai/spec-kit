@@ -66,3 +66,45 @@ def test_reverse_lookup_hits_both_stamped_commits(tmp_path, monkeypatch):
         show = subprocess.run(["git", "show", "--quiet", value],
                               cwd=repo, capture_output=True)
         assert show.returncode == 0, f"git show failed for {value}"
+
+
+def test_reinit_refreshes_the_stamp(tmp_path, monkeypatch,
+                                    qoder_minimal_resource_path):
+    """US2: a second init (upgrade path via --here --force) overwrites the
+    stamp with the new source commit — zero stale residue."""
+    result = _invoke_init(monkeypatch, tmp_path, qoder_minimal_resource_path)
+    assert result.exit_code == 0, result.output
+    project = tmp_path / "demo-proj"
+    old = json.loads((project / STAMP_RELPATH).read_text(encoding="utf-8"))
+
+    fresh = "e" * 40
+    monkeypatch.chdir(project)
+    monkeypatch.setattr(
+        sc, "resolve_source_commit",
+        lambda: {"commit": fresh, "origin": "git", "reason": None})
+    again = RUNNER.invoke(app, [
+        "init", "--here", "--force", "--ai", "qoder", "--no-git",
+        "--ignore-agent-tools", "--skip-tls"])
+    assert again.exit_code == 0, again.output
+    text = (project / STAMP_RELPATH).read_text(encoding="utf-8")
+    assert old["commit"] not in text, "stale commit must not survive re-init"
+    assert json.loads(text)["commit"] == fresh
+
+
+def test_legacy_project_gains_the_stamp(tmp_path, monkeypatch,
+                                        qoder_minimal_resource_path):
+    """US2/FR-007: a project initialized before this feature (no stamp file)
+    gains it on the next init with zero migration."""
+    project = tmp_path / "legacy"
+    (project / ".specify").mkdir(parents=True)
+    (project / ".specify" / "instructions.md").write_text("# legacy\n",
+                                                          encoding="utf-8")
+    monkeypatch.chdir(project)
+    monkeypatch.setattr(sc, "get_resource_path",
+                        lambda: qoder_minimal_resource_path)
+    result = RUNNER.invoke(app, [
+        "init", "--here", "--force", "--ai", "qoder", "--no-git",
+        "--ignore-agent-tools", "--skip-tls"])
+    assert result.exit_code == 0, result.output
+    stamp = json.loads((project / STAMP_RELPATH).read_text(encoding="utf-8"))
+    assert stamp["commit"] == _repo_head()

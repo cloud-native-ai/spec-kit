@@ -211,3 +211,33 @@ def test_write_failure_warns_and_never_raises(tmp_path, monkeypatch):
     assert sc.write_source_stamp(tmp_path) is False, \
         "write failure MUST return False, not raise (stamping never blocks init)"
     monkeypatch.setattr(Path, "write_text", real_write)
+
+
+# --------------------------------------------------------------------------
+# refresh face (043 US2): full-overwrite, zero stale residue, no version key
+# --------------------------------------------------------------------------
+
+OLD_COMMIT = "c" * 40
+NEW_COMMIT = "d" * 40
+
+
+def test_refresh_overwrites_with_zero_stale_residue(tmp_path, monkeypatch):
+    monkeypatch.setattr(sc, "resolve_source_commit",
+                        lambda: _resolve_result(commit=OLD_COMMIT))
+    assert sc.write_source_stamp(tmp_path) is True
+    monkeypatch.setattr(sc, "resolve_source_commit",
+                        lambda: _resolve_result(commit=NEW_COMMIT))
+    assert sc.write_source_stamp(tmp_path) is True
+    text = (tmp_path / STAMP_RELPATH).read_text(encoding="utf-8")
+    assert OLD_COMMIT not in text, "stale commit MUST leave zero residue (FR-006)"
+    assert NEW_COMMIT in text, "the NEW form must be present and correct"
+
+
+def test_payload_values_never_carry_the_formal_version(tmp_path, monkeypatch):
+    monkeypatch.setattr(sc, "resolve_source_commit", lambda: _resolve_result())
+    sc.write_source_stamp(tmp_path)
+    pyproject = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    version = re.search(r'^version\s*=\s*"([^"]+)"', pyproject, re.M).group(1)
+    payload = json.loads((tmp_path / STAMP_RELPATH).read_text(encoding="utf-8"))
+    assert all(value != version for value in payload.values()), \
+        "the pyproject version must never be a payload value (FR-002)"
