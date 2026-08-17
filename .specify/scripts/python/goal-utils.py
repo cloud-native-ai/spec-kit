@@ -465,14 +465,11 @@ def _assert_goal_mutable(data: dict) -> None:
         )
 
 
-def add_target(path: Path, statement: str) -> str:
-    """Authorize a new open Target; returns the issued identity (D6 history)."""
-    path = Path(path)
-    data = parse_goal(path)
-    _assert_goal_mutable(data)
+def _validate_target_statement(data: dict, statement: str) -> None:
+    """Same-source statement validation shared by --add and --check (042 C-1):
+    GD-2/GD-3 shape plus criteria-restatement — one grammar, zero forks."""
     _reject_bad_target_statement(statement)
-    statement = statement.strip()
-    normalized = _normalize(statement)
+    normalized = _normalize(statement.strip())
     for criterion in data["criteria"]:
         if normalized == _normalize(criterion):
             raise GoalError(
@@ -480,6 +477,15 @@ def add_target(path: Path, statement: str) -> str:
                 "criteria axis is authoritative — rewrite the slice as a scope cut "
                 "(判据权威互斥,改写为范围切片)"
             )
+
+
+def add_target(path: Path, statement: str) -> str:
+    """Authorize a new open Target; returns the issued identity (D6 history)."""
+    path = Path(path)
+    data = parse_goal(path)
+    _assert_goal_mutable(data)
+    _validate_target_statement(data, statement)
+    statement = statement.strip()
     targets = data["targets"]
     tid = _next_target_id(targets)
     targets.append({"id": tid, "statement": statement, "status": "open"})
@@ -721,6 +727,9 @@ def main(argv: list[str] | None = None) -> int:
     p_targets.add_argument("slug")
     p_targets.add_argument("--add", dest="add_statement", default=None,
                            metavar="STATEMENT", help="append a new open Target")
+    p_targets.add_argument("--check", dest="check_statement", default=None,
+                           metavar="STATEMENT",
+                           help="dry-run statement validation; zero writes (042)")
     p_targets.add_argument("--list", dest="list_targets", action="store_true",
                            help="list every Target, machine-parseable lines")
     p_targets.add_argument("--set", dest="set_state", default=None,
@@ -770,12 +779,27 @@ def main(argv: list[str] | None = None) -> int:
                 _emit({"error": f"goal not found: {args.slug}"}, args.json)
                 return EXIT_NOT_FOUND
             chosen = [args.add_statement is not None, args.list_targets,
-                      args.set_state is not None]
+                      args.set_state is not None, args.check_statement is not None]
             if sum(chosen) != 1:
-                _emit({"error": "targets expects exactly one of --add / --list / --set"},
+                _emit({"error": "targets expects exactly one of --add / --check / --list / --set"},
                       args.json)
                 return EXIT_INPUT_ERROR
-            if args.list_targets:
+            if args.check_statement is not None:
+                # 042 dry-run: same-source validation as --add, zero writes.
+                data = parse_goal(path)
+                if data["status"] in TERMINAL_STATES:
+                    _emit({"verdict": "goal-terminal",
+                           "error": f"goal is in terminal state {data['status']!r} "
+                                    "(终态 goal 只读); a proposal has nowhere to land"},
+                          args.json)
+                    return EXIT_INVALID
+                try:
+                    _validate_target_statement(data, args.check_statement)
+                except GoalError as exc:
+                    _emit({"verdict": "rejected", "error": str(exc)}, args.json)
+                    return EXIT_INPUT_ERROR
+                result = {"slug": args.slug, "verdict": "ok"}
+            elif args.list_targets:
                 targets = parse_goal(path)["targets"]
                 if args.json:
                     result = {"targets": targets}

@@ -39,5 +39,7 @@
 Target 是 goal 之下的 run 级可指派范围切片——概念(身份文法、三态生命周期、与判据轴的边界)定义一次于 `.specify/shared/definitions/goal-definitions.md` 的 Target Decomposition([[STR-004]]),此处只规范团队侧的操作纪律,不复述概念:
 
 - **提议 → 批准(ratify)两段式**:团队或某次 run 认为需要新切片、或某切片已完成/应放弃时,只**提议**——在 run 报告与台账证据中写明理由;实际的新增(`targets <slug> --add`)与状态迁移(`targets <slug> --set done|dropped|open --id <T-nnn>`)MUST 经 `/speckit.goal` 由人批准执行。**派生流程 MUST NOT 写 `goal.md`**——包括 `## Targets` 节,它只由引擎渲染。
+- **分解提议(goal-based 创建,042)**:分解路径产出**分解提议集**——每条候选为成果形语句(GD-2)、从属同一目标、自身独立成立者另立 goal;呈现前每条经 `targets <slug> --check` 干跑通过(校验器与 `--add` 同源),批准为一次**合并确认**,随后逐条 `--add`;exit-2 拒绝原样上报、修订重检或显式放弃,不绕过引擎。对 `goal.md` 零写入的红线覆盖提议全程(过程细节见 [`create-mode.md`](create-mode.md) → *Goal-based create branch*)。
+- **复用基线**:既有 open Target 是分解提议的复用基线——直接复用、不推倒重建,语义重复的语句不重复授权;done/dropped 条目保留展示、不复用身份、不被顺带重开(重开仅 `/speckit.goal targets --set open`,由人发起)。提议集为空时直接进入成组建队,不强制新增。
 - **run 指派是消费不是授权**:`/speckit.team run <team-slug> --target T-<nnn>` 只挑选一个已授权的 `open` 切片聚焦执行;悬空/终态/跨 goal 引用在 preview 即被拦截,终态引用走复核二分而非执行旁路。
 - **归属落痕**:被指派 run 产生的新台账条目由团队主管写入可选 `target_ref`(局部形),供总结侧折叠出切片轴;归属与证据不一致时列为待批准项,两侧都不自动翻转(见 [`summary-mapping.md`](summary-mapping.md) §6.5)。

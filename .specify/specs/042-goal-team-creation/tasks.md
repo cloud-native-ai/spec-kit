@@ -91,17 +91,17 @@
 
 ### Tests for User Story 2(先写、先看它失败)
 
-- [ ] T010 [P] [US2] [blockedBy: T009] 创建 `tests/contract/test_targets_check.py`:钉 contracts/decomposition-proposal.contract.md C-1——进程内 `main()` 断言(风格沿 `tests/contract/test_goal_targets_engine.py` 的 importlib 夹具):合法成果形语句 exit 0 且 goal.md 前后逐字节不变(mtime/内容双钉);步骤形语句 exit 2 附原因;复述判据 exit 2;`--check --add` 同给 exit 2;不存在 slug exit 3;终态 goal exit 4;`--json` 输出 verdict 形状;全程零 `## History` 记录、零身份发放
-- [ ] T011 [P] [US2] [blockedBy: T009] 扩展 `tests/contract/test_goal_team_creation.py` 增分解提议组:钉 decomposition-proposal.contract.md C-2/C-3/C-4 模板面——[[STR-002]] 逐字 `分解提议` 小节名、每条语句+理由+`--check` verdict 的呈现规则、"呈现前每条已 exit 0"措辞、一次合并确认 → 逐条 `--add` 措辞、exit-2 verdict 原样上报/修订重提/显式放弃、无序集措辞(无依赖边/无编号顺序语义)、复用基线措辞(open 复用、done/dropped 不复用不重开)、独立成立候选引导另立 goal(GD-3)、提议阶段 `goal.md` 零写入断言
+- [X] T010 [P] [US2] [blockedBy: T009] 创建 `tests/contract/test_targets_check.py`:钉 contracts/decomposition-proposal.contract.md C-1——进程内 `main()` 断言(风格沿 `tests/contract/test_goal_targets_engine.py` 的 importlib 夹具):合法成果形语句 exit 0 且 goal.md 前后逐字节不变(mtime/内容双钉);步骤形语句 exit 2 附原因;复述判据 exit 2;`--check --add` 同给 exit 2;不存在 slug exit 3;终态 goal exit 4;`--json` 输出 verdict 形状;全程零 `## History` 记录、零身份发放
+- [X] T011 [P] [US2] [blockedBy: T009] 扩展 `tests/contract/test_goal_team_creation.py` 增分解提议组:钉 decomposition-proposal.contract.md C-2/C-3/C-4 模板面——[[STR-002]] 逐字 `分解提议` 小节名、每条语句+理由+`--check` verdict 的呈现规则、"呈现前每条已 exit 0"措辞、一次合并确认 → 逐条 `--add` 措辞、exit-2 verdict 原样上报/修订重提/显式放弃、无序集措辞(无依赖边/无编号顺序语义)、复用基线措辞(open 复用、done/dropped 不复用不重开)、独立成立候选引导另立 goal(GD-3)、提议阶段 `goal.md` 零写入断言
 
 ### Implementation for User Story 2
 
-- [ ] T012 [US2] [blockedBy: T010] 在 `scripts/python/goal-utils.py` 实现 `targets <slug> --check "<语句>" [--json]`:校验器与 `--add` 同源(复用 `_bad_shape`/`_reject_bad_target_statement`/判据归一化比对,零第二文法);零写入(不发放身份、不改 goal.md、不记 History);退出码 0/2/3/4 沿全局语义;`--check` 与 `--add`/`--list`/`--set` 互斥(违者 exit 2)
-- [ ] T013 [US2] [blockedBy: T011] 在 `templates/commands/team.md` 撰写分解路径(C-2/C-3/C-4):分解决策呈现(结论+依据,用户裁决,否决则回退单团队或中止、裁决留痕);起草纪律(每条成果形 GD-2、GD-3 litmus 引导另立 goal 退出提议集、MUST NOT 复述判据或 SC-xxx);以 `分解提议` 小节一次性呈现全量(语句+理由+每条 `--check` verdict,呈现前必须全过);一次合并确认 → 逐条 `python3 scripts/python/goal-utils.py targets <slug> --add "<语句>"`,每条 verdict 即时尊重;中途中止语义(已落盘保留、续起走复用基线零重复授权)
-- [ ] T014 [P] [US2] 扩展 `skills/create-team/references/goal.md` §Target:团队侧提议纪律补强——复用基线处置(open 直接复用、终态条目不复用身份不顺带重开)、提议只补缺口、单一撰写入口红线(team 侧对 goal.md 零写入)
-- [ ] T015 [P] [US2] 更新 `skills/create-team/references/create-mode.md`:分解提议与成组批准步骤并入 goal-based 过程规范(含"提议集为空 → 直接进入成组建队"分支)
-- [ ] T016 [US2] [blockedBy: T012,T013,T014,T015] 扇出 + 核验:`python3 scripts/python/regen-command-copies.py` + `python3 scripts/python/sync-mirrors.py --write`;核验(Mirror Obligations 本 phase 行):`cmp scripts/python/goal-utils.py .specify/scripts/python/goal-utils.py` 逐字节相同(引擎镜像首次实际变更)、`sync-mirrors.py --check` exit 0(goal.md、create-mode.md 行)、4 份 per-tool 副本 `diff -q` 一致
-- [ ] T017 [US2] [blockedBy: T016] 运行 `pytest tests/contract/test_targets_check.py tests/contract/test_goal_team_creation.py tests/contract/test_goal_targets_engine.py -q`(新面全绿 + 既有 targets 引擎面零回归),全量对照基线无新增;手工 QA quickstart §3(--check 合法/步骤形/复述判据的 exit 码与原因;批准后逐条 --add;模拟中途中止再续起的基线复用)
+- [X] T012 [US2] [blockedBy: T010] 在 `scripts/python/goal-utils.py` 实现 `targets <slug> --check "<语句>" [--json]`:校验器与 `--add` 同源(复用 `_bad_shape`/`_reject_bad_target_statement`/判据归一化比对,零第二文法);零写入(不发放身份、不改 goal.md、不记 History);退出码 0/2/3/4 沿全局语义;`--check` 与 `--add`/`--list`/`--set` 互斥(违者 exit 2)
+- [X] T013 [US2] [blockedBy: T011] 在 `templates/commands/team.md` 撰写分解路径(C-2/C-3/C-4):分解决策呈现(结论+依据,用户裁决,否决则回退单团队或中止、裁决留痕);起草纪律(每条成果形 GD-2、GD-3 litmus 引导另立 goal 退出提议集、MUST NOT 复述判据或 SC-xxx);以 `分解提议` 小节一次性呈现全量(语句+理由+每条 `--check` verdict,呈现前必须全过);一次合并确认 → 逐条 `python3 scripts/python/goal-utils.py targets <slug> --add "<语句>"`,每条 verdict 即时尊重;中途中止语义(已落盘保留、续起走复用基线零重复授权)
+- [X] T014 [P] [US2] 扩展 `skills/create-team/references/goal.md` §Target:团队侧提议纪律补强——复用基线处置(open 直接复用、终态条目不复用身份不顺带重开)、提议只补缺口、单一撰写入口红线(team 侧对 goal.md 零写入)
+- [X] T015 [P] [US2] 更新 `skills/create-team/references/create-mode.md`:分解提议与成组批准步骤并入 goal-based 过程规范(含"提议集为空 → 直接进入成组建队"分支)
+- [X] T016 [US2] [blockedBy: T012,T013,T014,T015] 扇出 + 核验:`python3 scripts/python/regen-command-copies.py` + `python3 scripts/python/sync-mirrors.py --write`;核验(Mirror Obligations 本 phase 行):`cmp scripts/python/goal-utils.py .specify/scripts/python/goal-utils.py` 逐字节相同(引擎镜像首次实际变更)、`sync-mirrors.py --check` exit 0(goal.md、create-mode.md 行)、4 份 per-tool 副本 `diff -q` 一致
+- [X] T017 [US2] [blockedBy: T016] 运行 `pytest tests/contract/test_targets_check.py tests/contract/test_goal_team_creation.py tests/contract/test_goal_targets_engine.py -q`(新面全绿 + 既有 targets 引擎面零回归),全量对照基线无新增;手工 QA quickstart §3(--check 合法/步骤形/复述判据的 exit 码与原因;批准后逐条 --add;模拟中途中止再续起的基线复用)
 
 **Checkpoint**: US2 独立可测——宽泛 goal 获得成组切片,全部 Target 变更可溯源到引擎调用,零 `goal.md` 手写
 

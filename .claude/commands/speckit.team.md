@@ -82,7 +82,14 @@ The create path first checks whether the user passed an **already-defined goal**
    3. **既有 Target**——open/done/dropped 分类清单(复用基线,见下文"分解提议"小节的处置规则);
    4. **可达成性**——单团队短期可达成 vs 宽泛需分解,结论 + 依据。
    分析结论是建议而非门禁:单团队/分解路径由用户裁决;用户坚持单团队不被阻止,但裁决留痕于确认预览。
-4. **团队派生与落盘**:确认路径后派生团队——
+4. **分解提议与成组批准(分解路径)**——分析判定宽泛且用户裁决分解时:
+   - **起草纪律**:每条候选为成果形语句(GD-2 切片尺度)、从属同一目标;自身独立成立的候选经 GD-3 litmus 引导**另立 goal**,退出提议集并在预览中说明;MUST NOT 复述该 goal 的成功判据或任何需求规格的 SC-xxx。提议集为**无序集**——呈现顺序不承载执行语义,落盘身份由引擎单调发放;MUST NOT 附依赖边、编号顺序或阶段化措辞。
+   - **干跑校验**:每条候选在呈现前经 `python3 .specify/scripts/python/goal-utils.py targets <slug> --check "<候选语句>"` 干跑(零写入,校验器与 `--add` 同源);呈现给用户前每条 MUST 已通过(exit 0)——被拒条目改写重检或移出,MUST NOT 以 exit-2 状态进入确认门禁。
+   - **呈现**:以 `分解提议` 小节一次性呈现全量——每条语句 + 单独理由 + `--check` verdict。
+   - **批准与落盘**:一次**合并确认**(预览全部语句 → 单次用户批准)覆盖整组;随后**逐条**执行 `python3 .specify/scripts/python/goal-utils.py targets <slug> --add "<语句>"`。每条 verdict 即时尊重:exit 2 的拒绝被**原样上报** verdict 与原因,修订后重走 `--check` 再提交或被显式放弃;MUST NOT 绕过引擎、MUST NOT 手写或手改 `## Targets` 节。
+   - **复用基线**:goal 已有 Target 时以既有集合为**复用基线**——open 条目直接复用(后续成组建队的对象),语义重复的语句 MUST NOT 被重复授权;done/dropped 条目保留展示、不复用身份、MUST NOT 被顺带重开(重开仅 `/speckit.goal targets --set open`,由人发起)。提议只补缺口或确认复用;提议集为空时直接进入成组建队。
+   - **中途中止**:用户中止或某条落盘失败时,已落盘条目保留(它们是合法授权),其余丢弃;再次发起时既有 open Targets 自动成为复用基线,不重复授权。
+5. **团队派生与落盘**:确认路径后派生团队——
    - 单团队路径:roster 与 pattern 以该 goal 叙事为输入走既有机制(`python3 skills/create-team/scripts/match-team-preset.py` preset 匹配 + `skills/create-team/references/patterns.md` 决策树),派生理由 MUST 进入确认预览;preset 强匹配时推荐复用该 preset。
    - frontmatter 声明 `goal_slug`(引用,不是内容副本);内联 `goal` 字段(如保留)仅为可读性渲染,**定义权威**——与定义不一致时显式报出供人裁决,MUST NOT 分叉出第二份权威叙事。
    - 写入面仅限 `team.md`;本分支对 `goal.md` 零写入(`## Targets`/`## History` 只经 `/speckit.goal` 的引擎渲染)。
