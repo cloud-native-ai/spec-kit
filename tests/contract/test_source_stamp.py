@@ -158,3 +158,56 @@ def test_resolve_is_read_only(tmp_path, monkeypatch):
     monkeypatch.setattr(sc, "MODULE_DIR", d)
     sc.resolve_source_commit()
     assert list(d.iterdir()) == [], "resolution MUST not write anything"
+
+
+# --------------------------------------------------------------------------
+# write face (043 US1): source-stamp-write.contract.md C-1..C-3
+# --------------------------------------------------------------------------
+
+STAMP_RELPATH = ".specify/source.json"  # [[STR-001]]
+FRAMEWORK_NAME = "spec-kit"             # [[STR-003]]
+STAMP_TS_RE = re.compile(r"^\d{8}T\d{6}Z$")
+
+
+def _resolve_result(commit=FAKE_COMMIT, origin="git", reason=None):
+    return {"commit": commit, "origin": origin, "reason": reason}
+
+
+def test_write_lands_the_exact_payload(tmp_path, monkeypatch):
+    monkeypatch.setattr(sc, "resolve_source_commit",
+                        lambda: _resolve_result())
+    assert sc.write_source_stamp(tmp_path) is True
+    stamp = tmp_path / STAMP_RELPATH
+    assert stamp.is_file(), "stamp MUST land at .specify/source.json"
+    payload = json.loads(stamp.read_text(encoding="utf-8"))
+    assert payload["framework"] == FRAMEWORK_NAME
+    assert payload["commit"] == FAKE_COMMIT
+    assert "reason" not in payload, "reason key MUST be absent when commit is valid"
+    assert STAMP_TS_RE.match(payload["stamped_at"])
+
+
+def test_write_payload_is_pretty_json(tmp_path, monkeypatch):
+    monkeypatch.setattr(sc, "resolve_source_commit",
+                        lambda: _resolve_result(commit=ALT_FAKE_COMMIT))
+    sc.write_source_stamp(tmp_path)
+    text = (tmp_path / STAMP_RELPATH).read_text(encoding="utf-8")
+    assert text.startswith("{\n  \""), "indent-2 pretty JSON expected"
+    assert text.endswith("}\n"), "trailing newline expected"
+
+
+def test_write_creates_specify_dir_defensively(tmp_path, monkeypatch):
+    monkeypatch.setattr(sc, "resolve_source_commit", lambda: _resolve_result())
+    assert sc.write_source_stamp(tmp_path) is True
+    assert (tmp_path / ".specify").is_dir()
+
+
+def test_write_failure_warns_and_never_raises(tmp_path, monkeypatch):
+    monkeypatch.setattr(sc, "resolve_source_commit", lambda: _resolve_result())
+    real_write = Path.write_text
+
+    def boom(self, *a, **k):
+        raise OSError("disk full")
+    monkeypatch.setattr(Path, "write_text", boom)
+    assert sc.write_source_stamp(tmp_path) is False, \
+        "write failure MUST return False, not raise (stamping never blocks init)"
+    monkeypatch.setattr(Path, "write_text", real_write)

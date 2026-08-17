@@ -546,6 +546,32 @@ def resolve_source_commit():
             "reason": reason or "no embedded source commit"}
 
 
+def write_source_stamp(project_path) -> bool:
+    """Write the framework source stamp (043 contract source-stamp-write):
+    `<project>/.specify/source.json` = {framework, commit, [reason],
+    stamped_at}, a full overwrite on every init (refresh leaves no stale id).
+    Stamping is an incidental record, never a gate: any failure warns on the
+    console and returns False — it MUST NOT fail init."""
+    try:
+        resolved = resolve_source_commit()
+        payload = {"framework": "spec-kit",
+                   "commit": resolved["commit"],
+                   "stamped_at": _utc_compact_stamp()}
+        if resolved["commit"] is None:
+            payload["commit"] = "unavailable"
+            payload["reason"] = resolved["reason"] or "source commit unresolvable"
+        specify_dir = Path(project_path) / ".specify"
+        specify_dir.mkdir(parents=True, exist_ok=True)
+        (specify_dir / "source.json").write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8")
+        return True
+    except OSError as exc:
+        console.print(
+            f"[yellow]Warning:[/yellow] Source stamp not written: {exc}")
+        return False
+
+
 def _agent_file_sha256(path):
     import hashlib
 
@@ -2761,6 +2787,7 @@ def init(
             shutil.rmtree(project_path)
         raise typer.Exit(1)
 
+    write_source_stamp(project_path)
     console.print("\n[bold green]Project ready.[/bold green]")
 
     # Show git error details if initialization failed

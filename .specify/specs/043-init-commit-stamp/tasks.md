@@ -72,13 +72,13 @@
 
 ### Tests for User Story 1(先写、先看它失败)
 
-- [ ] T005 [P] [US1] [blockedBy: T004] 扩展 `tests/contract/test_source_stamp.py` 写入组:钉 source-stamp-write.contract.md C-1..C-3——monkeypatch `resolve_source_commit` 返回有效 commit → `write_source_stamp(tmp)` 落 `<tmp>/.specify/source.json`,载荷逐字段断言(`framework` 逐字 [[STR-003]]、commit 原样、**reason 键不存在**、`stamped_at` 匹配 `^\d{8}T\d{6}Z$`);JSON/UTF-8/indent 2;monkeypatch `Path.write_text` 抛 OSError → 返回 False 且不抛;[[STR-001]] 路径常量断言
-- [ ] T006 [US1] [blockedBy: T005] 创建 `tests/integration/test_init_source_stamp.py`:conftest 最小资源夹具(`qoder_minimal_resource_path`)+ `RUNNER.invoke(app, ["init", "<tmp 项目名>", "--ai", "qoder", "--no-git", "--skip-tls"])`(沿 `tests/script_api.py` 模式)→ 断言 `<项目>/.specify/source.json` 存在且 commit 等于本仓 `git rev-parse HEAD`(真实 git 探测路径);SC-002 回溯闭环:monkeypatch 解析分别返回 HEAD 与 `git rev-parse HEAD~1` 两个值、各落一次章 → 对两 id 执行 `git show --quiet <id>` 均 exit 0 且各自正确
+- [X] T005 [P] [US1] [blockedBy: T004] 扩展 `tests/contract/test_source_stamp.py` 写入组:钉 source-stamp-write.contract.md C-1..C-3——monkeypatch `resolve_source_commit` 返回有效 commit → `write_source_stamp(tmp)` 落 `<tmp>/.specify/source.json`,载荷逐字段断言(`framework` 逐字 [[STR-003]]、commit 原样、**reason 键不存在**、`stamped_at` 匹配 `^\d{8}T\d{6}Z$`);JSON/UTF-8/indent 2;monkeypatch `Path.write_text` 抛 OSError → 返回 False 且不抛;[[STR-001]] 路径常量断言
+- [X] T006 [US1] [blockedBy: T005] 创建 `tests/integration/test_init_source_stamp.py`:conftest 最小资源夹具(`qoder_minimal_resource_path`)+ `RUNNER.invoke(app, ["init", "<tmp 项目名>", "--ai", "qoder", "--no-git", "--skip-tls"])`(沿 `tests/script_api.py` 模式)→ 断言 `<项目>/.specify/source.json` 存在且 commit 等于本仓 `git rev-parse HEAD`(真实 git 探测路径);SC-002 回溯闭环:monkeypatch 解析分别返回 HEAD 与 `git rev-parse HEAD~1` 两个值、各落一次章 → 对两 id 执行 `git show --quiet <id>` 均 exit 0 且各自正确
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] [blockedBy: T005] 在 `src/specify_cli/__init__.py` 实现 `write_source_stamp(project_path) -> bool`:消费 `resolve_source_result`,载荷 `{"framework": "spec-kit", "commit": <40hex|unavailable>, ["reason": <仅不可得>], "stamped_at": _utc_compact_stamp()}`;`.specify` 目录防御性兜底创建;整体覆写;捕获自身 OSError/序列化异常 → 模块级 console 黄色告警一行、返回 False,永不抛、永不改 init 退出语义;成功静默
-- [ ] T008 [US1] [blockedBy: T006,T007] 在 `src/specify_cli/__init__.py` `init()` 打印 `"Project ready."` 之前插入唯一调用点 `write_source_stamp(project_path)`(fresh 与再次 init 必经;不改任何既有输出步骤);运行 T005/T006 全部测试转绿,`pytest tests/integration/ -q -k init` 既有 init 面零回归
+- [X] T007 [US1] [blockedBy: T005] 在 `src/specify_cli/__init__.py` 实现 `write_source_stamp(project_path) -> bool`:消费 `resolve_source_result`,载荷 `{"framework": "spec-kit", "commit": <40hex|unavailable>, ["reason": <仅不可得>], "stamped_at": _utc_compact_stamp()}`;`.specify` 目录防御性兜底创建;整体覆写;捕获自身 OSError/序列化异常 → 模块级 console 黄色告警一行、返回 False,永不抛、永不改 init 退出语义;成功静默
+- [X] T008 [US1] [blockedBy: T006,T007] 在 `src/specify_cli/__init__.py` `init()` 打印 `"Project ready."` 之前插入唯一调用点 `write_source_stamp(project_path)`(fresh 与再次 init 必经;不改任何既有输出步骤);运行 T005/T006 全部测试转绿,`pytest tests/integration/ -q -k init` 既有 init 面零回归
 
 **Checkpoint**: US1 独立可测——一次 init、一份标识、一次成功回溯(MVP)
 
