@@ -21,7 +21,7 @@
 - DoD-5: SC-001..005 在 verification.md 中逐条给出状态与证据(实现期由 /speckit.implement 落笔)
 - DoD-6: 用户文档落位(docs/tutorials/installation.md「来源标识」小节);Feature 复核无新增/失效(045 维持,无邻接 Feature 改动)
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Completion Gate
 
@@ -123,9 +123,9 @@
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T017 [blockedBy: T015] 用户文档:在 `docs/tutorials/installation.md` 增「来源标识(source stamp)」小节——`cat .specify/source.json` → 框架仓 `git show <commit>` 回溯指引、三态语义表(沿 spec quickstart §5)、checkout 运行 CLI 的可执行形态(直跑 `src/specify_cli/__init__.py`,plan 勘测 `-m` 形态不可用);链接 `.specify/shared/definitions/goal-definitions.md` 式概念不复述原则不适用(无新概念面)
-- [ ] T018 [blockedBy: T016,T017] 全量回归收口:`bash scripts/bash/run-tests.sh --names-out /tmp/043-final.txt && comm -13 .specify/specs/043-init-commit-stamp/baseline-failed.txt /tmp/043-final.txt` 输出必须为空;quickstart.md 📌 项按实现态复核(可执行者实跑转 ✅,T016 若 [~] 则对应项保持 📌 并注因)
-- [ ] T019 [blockedBy: T018] 端到端演练:临时目录走 quickstart §1–§3——真 init(checkout 形态)→ 读落章 → 本仓 `git show <commit> --stat` 命中 → 再次 init 刷新零残留(grep 旧 id 0 命中);结果记 verification.md
+- [X] T017 [blockedBy: T015] 用户文档:在 `docs/tutorials/installation.md` 增「来源标识(source stamp)」小节——`cat .specify/source.json` → 框架仓 `git show <commit>` 回溯指引、三态语义表(沿 spec quickstart §5)、checkout 运行 CLI 的可执行形态(直跑 `src/specify_cli/__init__.py`,plan 勘测 `-m` 形态不可用);链接 `.specify/shared/definitions/goal-definitions.md` 式概念不复述原则不适用(无新概念面)
+- [X] T018 [blockedBy: T016,T017] 全量回归收口:`bash scripts/bash/run-tests.sh --names-out /tmp/043-final.txt && comm -13 .specify/specs/043-init-commit-stamp/baseline-failed.txt /tmp/043-final.txt` 输出必须为空;quickstart.md 📌 项按实现态复核(可执行者实跑转 ✅,T016 若 [~] 则对应项保持 📌 并注因)
+- [X] T019 [blockedBy: T018] 端到端演练:临时目录走 quickstart §1–§3——真 init(checkout 形态)→ 读落章 → 本仓 `git show <commit> --stat` 命中 → 再次 init 刷新零残留(grep 旧 id 0 命中);结果记 verification.md
 
 ---
 

@@ -61,6 +61,35 @@ If you prefer to get the templates without checking for the right tools:
 uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai copilot --ignore-agent-tools
 ```
 
+## Source Stamp (来源标识)
+
+Every `specify init` writes `.specify/source.json` into the target project — the record of **which framework source commit** produced this scaffolding. The commit id is the **sole version identifier** (formal version numbers are deliberately not used):
+
+```json
+{
+  "framework": "spec-kit",
+  "commit": "<40-hex git commit id>",
+  "stamped_at": "20260817T115529Z"
+}
+```
+
+**Reverse lookup** — answer "which code slice built my `.specify/`?" with one command in the spec-kit repo:
+
+```bash
+cat .specify/source.json           # read the commit id
+git -C <spec-kit-repo> show <commit> --stat
+```
+
+Three states, never a fourth:
+
+| `.specify/source.json` | Meaning | Action |
+|---|---|---|
+| `commit` is 40-hex | Valid provenance | `git show <commit>` in the framework repo |
+| `commit` is `"unavailable"` (+ `reason`) | Explicitly unresolvable | inspect `reason`; never guess |
+| file missing | Source unknown (pre-043 project, or deleted) | re-run `specify init` to (re)gain it |
+
+Notes: re-running init (upgrade path) **overwrites** the stamp with the new source commit — it always reflects the most recent init. Installed wheels carry the commit embedded at build time (`python3 -m build --wheel`); a development checkout installed editable (`pip install -e .`) probes the commit straight from git. Note: running `init` from a bare checkout without installing is not supported — templates ship only inside the built distribution. Stamping never blocks init: a failed write only warns.
+
 ## Verification
 
 After initialization, you should see the following structure and commands:

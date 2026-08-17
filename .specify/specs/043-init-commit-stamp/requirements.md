@@ -2,7 +2,7 @@
 
 **Requirement Branch**: `043-init-commit-stamp`  
 **Created**: 2026-08-17  
-**Status**: Draft  
+**Status**: Implemented (2026-08-17, via /speckit.implement — 19/19 tasks, SC-001..005 pass; see verification.md)  
 **Input**: User description: "需要在init命令中增加一个机制:在init命令后需要将当前speckit的版本信息(以commit id为版本号)写到目标项目中,需要达成的效果是在目标项目中可以通过这个信息反向的查看来源于哪个代码切片.当前不使用正式的版本号,以commit id作为唯一标识."
 
 > **词汇表映射**(`.specify/memory/glossary.md` 协议):输入中"代码切片"为高危混淆词(Goal Target「目标切片」/ System Slice「系统切片」),本需求语义映射为 **git commit(框架仓的一次提交)**;"init命令" 指 `specify init` CLI 命令;"speckit" 即本框架 Spec Kit。

@@ -10,14 +10,16 @@
 git rev-parse HEAD          # ✅ 框架仓当前 commit,落章的期望值(40-hex)
 ```
 
-## 1. checkout 形态:init 落章
+## 1. 安装形态:init 落章(2026-08-17 实测)
 
 ```bash
+cd <spec-kit 仓> && python3 -m build --wheel          # ✅ 构建钩子嵌入源 commit
+python3 -m venv /tmp/venv && /tmp/venv/bin/pip install dist/specify_cli-*.whl
 cd /tmp && mkdir stamp-demo && cd stamp-demo
-python3 <repo>/src/specify_cli/__init__.py init demo-proj --ai qoder --no-git   # ✅ init 既有面
+/tmp/venv/bin/specify init demo-proj --ai qoder --no-git --ignore-agent-tools --skip-tls   # ✅ exit 0
 ```
 
-📌 实现后,上例产出 `demo-proj/.specify/source.json`:
+上例实测产出 `demo-proj/.specify/source.json`(commit == wheel 内嵌入值):
 
 ```json
 {
@@ -27,7 +29,7 @@ python3 <repo>/src/specify_cli/__init__.py init demo-proj --ai qoder --no-git   
 }
 ```
 
-checkout 直跑时 commit 来自 git 探测(`origin=git`);不含 `reason` 键(可得时不出现)。
+安装形态 commit 来自构建嵌入(`origin=embedded`);开发 checkout(editable 安装)下经 git 探测(`origin=git`,由集成测试钉);不含 `reason` 键(可得时不出现)。注:裸 checkout 直跑 `python3 src/specify_cli/__init__.py init` 因模板仅随 wheel 分发而不可用(既有事实,与本需求无关)。
 
 ## 2. 反向回溯(用户核心动作)
 
