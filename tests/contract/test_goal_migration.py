@@ -24,10 +24,10 @@ LIVE_SURFACES = (
     "skills/create-team/references/summary-mapping.md",
     "skills/create-team/scripts/build-summary-input.py",
     "templates/commands/team.md",
+    # 2026-08-17: .specify/templates/commands/ mirror retired.
     ".specify/skills/create-team/SKILL.md",
     ".specify/skills/create-team/references/summary-mapping.md",
     ".specify/skills/create-team/scripts/build-summary-input.py",
-    ".specify/templates/commands/team.md",
     ".claude/commands/speckit.team.md",
     ".github/prompts/speckit.team.prompt.md",
     ".qoder/commands/speckit.team.md",

@@ -44,7 +44,7 @@ Check `.specify/skills/<name>/SKILL.md` exists (canonical source).
    - Frontmatter: `name`, `description` (with triggers), `skill_id`
    - Path conventions: `${SKILL_HOME}/` for Skill-owned resources, `${SKILL_WORKDIR}/` for runtime paths
    - Legacy idiom migration: `./X` → `${SKILL_HOME}/X`, `${SKILL_ROOT}/X` → `${SKILL_HOME}/X`
-   - Registry: one deduplicated row in `.specify/instructions.md` `### Skills`
+   - Discoverability: `.specify/skills/<name>/SKILL.md` present with valid frontmatter — no registration table exists (see `.specify/skills.md`)
    - Hygiene: SKILL.md under 500 lines; oversize → `references/`
 
 2. **Phase B — User-requested refinement**: Standard `improve-skills` workflow.
@@ -68,8 +68,8 @@ After a **new** Skill is created (skip on the `improve-skills` path), wire it in
 
 - Confirm frontmatter valid (`name`, `description`, `skill_id`)
 - Verify canonical path matches `.specify/skills/<name>/SKILL.md`
-- Verify Skills registry includes deduplicated row
-- Report: paths, skill_id, registry edits, modernization results, and (create path) which built-in agents the Skill was propagated to
+- Verify the skill is discoverable from the filesystem (`.specify/skills/<name>/SKILL.md`, valid frontmatter)
+- Report: paths, skill_id, modernization results, and (create path) which built-in agents the Skill was propagated to
 
 For agent-specific operational guidance, see `shared/workflow/agent-configuration.md`.
 

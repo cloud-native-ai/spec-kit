@@ -67,10 +67,8 @@ def test_generate_instructions_invokes_glossary_init():
 
 
 def test_instructions_command_has_glossary_seeding_guidance():
-    for rel in ("templates/commands/instructions.md",
-                ".specify/templates/commands/instructions.md"):
-        text = read(ROOT / rel)
-        assert "## Glossary Initialization" in text, f"seeding guidance missing in {rel}"
+    text = read(ROOT / "templates" / "commands" / "instructions.md")
+    assert "## Glossary Initialization" in text, "seeding guidance missing in command template"
 
 
 # --- Protocol doc (glossary-protocol.md) ---
@@ -102,7 +100,6 @@ def test_shared_protocol_covers_all_rules():
 def test_command_templates_reference_glossary(cmd):
     surfaces = [
         ROOT / f"templates/commands/{cmd}.md",
-        ROOT / f".specify/templates/commands/{cmd}.md",
         ROOT / f".claude/commands/speckit.{cmd}.md",
         ROOT / f".github/prompts/speckit.{cmd}.prompt.md",
         ROOT / f".qoder/commands/speckit.{cmd}.md",

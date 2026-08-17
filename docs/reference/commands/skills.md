@@ -6,7 +6,7 @@ Manage specialized AI agent skills — create new skills or refresh and moderniz
 
 - To create a new reusable skill for a specialized workflow
 - To refresh and modernize an existing skill to comply with the current spec
-- When you need to validate skill structure and registry consistency
+- When you need to validate skill structure and discoverability
 - After creating skills that need to be discoverable by AI agents
 
 ## Syntax
@@ -37,7 +37,7 @@ Determines whether `.specify/skills/<name>/SKILL.md` already exists.
 - Parses explicit input or distills from conversation
 - Minimal clarification questions
 - Scaffolds SKILL.md structure, resource directories
-- Registers the skill and reports completion
+- Registers the skill and reports completion — there is no registry: the skill directory itself (`.specify/skills/<name>/SKILL.md`) is the discovery surface (see `.specify/skills.md`)
 - **Propagates the skill to built-in agents**: analyzes the 7 built-in role agents, proposes which ones the new skill is role-relevant to, and (after confirmation) adds the skill to those agents' `skills:` frontmatter and `## Skill Enablement` table (see [Agent propagation](#agent-propagation-create-path))
 
 **If the skill ALREADY exists** → delegates to `improve-skills` with a two-phase pass:
@@ -48,7 +48,7 @@ Determines whether `.specify/skills/<name>/SKILL.md` already exists.
    - Frontmatter fields validation (`name`, `description`, `skill_id`)
    - Path convention enforcement (`${SKILL_HOME}` / `${SKILL_WORKDIR}`)
    - Legacy idiom migration (bare relative paths → `${SKILL_HOME}/...`)
-   - Registry consistency in `.specify/instructions.md`
+   - Discoverability check (`.specify/skills/<name>/SKILL.md` present with valid frontmatter; no registry — see `.specify/skills.md`)
    - Hygiene (size limits, reference chain depth)
 
 2. **Phase B — User-requested refinement**:
@@ -60,8 +60,8 @@ Determines whether `.specify/skills/<name>/SKILL.md` already exists.
 ### Step 4: Validate and Report
 
 - Confirms frontmatter is valid and canonical path matches
-- Verifies Skills registry in `.specify/instructions.md`
-- Reports created/updated paths, `skill_id`, and registry edits
+- Verifies the skill is discoverable via `.specify/skills/<name>/SKILL.md`
+- Reports created/updated paths and `skill_id`
 - Lists which modernization items required edits vs. were already compliant
 - (Create path) Lists which built-in agents the skill was propagated to
 
@@ -99,7 +99,7 @@ If no agent is role-relevant, propagation is skipped (no forced use).
 |----------|----------|
 | Skill definition | `.specify/skills/<name>/SKILL.md` |
 | Skill scripts | `.specify/skills/<name>/scripts/` |
-| Registry update | `.specify/instructions.md` → Skills section |
+| Discovery doc | `.specify/skills.md` (explanatory; created if absent by `/speckit.instructions`) |
 | Agent skill enablement (create path) | `agents/<slug>.agent.md` + `.specify/agents/templates/<slug>.agent.md` |
 
 ## Prerequisites

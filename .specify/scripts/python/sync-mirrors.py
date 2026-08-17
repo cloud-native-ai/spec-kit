@@ -3,13 +3,18 @@
 
 Canonical sources fan out to their runtime mirrors in one command:
 
-  templates/            -> .specify/templates/
+  templates/            -> .specify/templates/   (excluding commands/, see below)
   skills/<name>/        -> .specify/skills/<name>/   (repo skills/ may be empty placeholder)
   agents/               -> .specify/agents/templates/  (Agent Template layer; instances/
                            and execution/ are project-local, never mirrored)
   scripts/              -> .specify/scripts/
   shared/               -> .specify/shared/
   templates/commands/*  -> per-tool copies (delegated to regen-command-copies.py)
+
+The .specify/templates/commands/ mirror is intentionally NO LONGER maintained:
+per-tool command copies are generated directly from templates/commands/ by
+regen-command-copies.py, so the subtree is excluded from the templates pair on
+both sides.
 
 Modes:
   --check   report drift, exit 2 if any (CI gate); never writes
@@ -45,37 +50,43 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-# (source, mirror, strict_extras) pairs; source is canonical.
+# (source, mirror, strict_extras, exclude_parts) pairs; source is canonical.
 # strict_extras=True means a mirror-only file is an ERROR under --check: the tree
 # is entirely framework-owned, so an unsourced file can never reach downstream
 # projects via `specify init`. skills/ is intentionally lenient because a project
-# may legitimately keep its own local skills in the mirror.
+# may legitimately keep its own local skills in the mirror. exclude_parts are
+# path components skipped on BOTH sides of the pair; the templates pair excludes
+# commands/ because the .specify/templates/commands mirror is retired (per-tool
+# copies come straight from templates/commands/ via regen-command-copies.py).
 MIRROR_PAIRS = [
-    ("templates", ".specify/templates", False),
-    ("skills", ".specify/skills", False),
-    ("agents", ".specify/agents/templates", False),
-    ("scripts", ".specify/scripts", True),
-    ("shared", ".specify/shared", False),
+    ("templates", ".specify/templates", False, {"commands"}),
+    ("skills", ".specify/skills", False, set()),
+    ("agents", ".specify/agents/templates", False, set()),
+    ("scripts", ".specify/scripts", True, set()),
+    ("shared", ".specify/shared", False, set()),
 ]
 
 IGNORE_NAMES = {"__pycache__", "node_modules", ".DS_Store", ".gitkeep"}
 
 
-def iter_files(root: Path):
+def iter_files(root: Path, exclude_parts=frozenset()):
     if not root.exists():
         return
     for path in sorted(root.rglob("*")):
         if path.is_dir():
             continue
-        if any(part in IGNORE_NAMES for part in path.relative_to(root).parts):
+        if any(
+            part in IGNORE_NAMES or part in exclude_parts
+            for part in path.relative_to(root).parts
+        ):
             continue
         yield path.relative_to(root)
 
 
-def compare_pair(src: Path, dst: Path):
+def compare_pair(src: Path, dst: Path, exclude_parts=frozenset()):
     """Return (missing_in_dst, differing, extra_in_dst) relative paths."""
-    src_files = set(iter_files(src))
-    dst_files = set(iter_files(dst))
+    src_files = set(iter_files(src, exclude_parts))
+    dst_files = set(iter_files(dst, exclude_parts))
     missing = sorted(src_files - dst_files)
     extra = sorted(dst_files - src_files)
     differing = sorted(
@@ -97,17 +108,17 @@ def main() -> int:
     drift = False
     orphans = False
     failures: list[tuple[str, str]] = []
-    for src_name, dst_name, strict_extras in MIRROR_PAIRS:
+    for src_name, dst_name, strict_extras, exclude_parts in MIRROR_PAIRS:
         src = REPO_ROOT / src_name
         dst = REPO_ROOT / dst_name
         if not src.exists():
             continue
-        src_files = list(iter_files(src))
+        src_files = list(iter_files(src, exclude_parts))
         if not src_files:
             # placeholder-only source (e.g. empty skills/): mirror is canonical, skip
             print(f"skip  {src_name}/ (placeholder-only source; {dst_name}/ is canonical)")
             continue
-        missing, differing, extra = compare_pair(src, dst)
+        missing, differing, extra = compare_pair(src, dst, exclude_parts)
         if not (missing or differing):
             print(f"ok    {src_name}/ == {dst_name}/ ({len(src_files)} files)")
         else:

@@ -14,7 +14,7 @@
 
 - `.github/skills`、`.github/agents` **才是** 指向 `.specify/` 的 symlink;而 `.specify/skills/`、`.specify/agents/` 本身是实体副本。
 - `.venv/.../site-packages/specify_cli/skills/...` 是安装构建产物(非 git 跟踪),装包时重生成,**不要手改**。
-- 改完 skill/agent 后,记得更新 `.specify/instructions.md` 的 Resource Registry,并提示用户跑 `/speckit.instructions` 刷新兼容 symlink。
+- 改完 skill/agent 后无需登记——instructions.md 的 Resource Registry 已于 2026-08-17 退役（发现机制=目录扫描，说明见 `.specify/skills.md`/`.specify/tools.md`）；跑 `python3 scripts/python/sync-mirrors.py --write` 落镜像即可。
 
 ## 二、脚本名是复数:`create-new-requirements.sh`
 
@@ -57,9 +57,9 @@ mirror 文件时 `cp` 被 alias 成 `cp -i`,遇到已存在目标会**静默跳�
 
 多份文档/文件(如 8 份 references + 4 份 SKILL.md、3 个独立 skill 目录)彼此独立时,用并行 subagent 生成,主流程边等边标记任务。注意**并行 subagent 有配额上限**,过多需分批启动(如 7 个分 4+3)。
 
-## 十一、编辑注册表(Registry)时小心 copy-paste 串行
+## 十一、编辑注册表(Registry)时小心 copy-paste 串行(已随 Registry 退役)
 
-往 `.specify/instructions.md` 的 Skills/Agents 表写新行时,容易误改到相邻行(如把 git-workflow 的 Canonical Path 改错)。写完回查该表。
+往 `.specify/instructions.md` 的 Skills/Agents 表写新行时,容易误改到相邻行(如把 git-workflow 的 Canonical Path 改错)。写完回查该表。*(2026-08-17 起 Registry 已退役,本条仅作历史参考;同理适用任何机器维护表格的手工编辑。)*
 
 ---
 

@@ -17,7 +17,8 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 CANONICAL = REPO_ROOT / "templates/commands/session.md"
-MIRROR = REPO_ROOT / ".specify/templates/commands/session.md"
+# 2026-08-17: the .specify/templates/commands/ mirror is retired — per-tool
+# copies are generated straight from templates/commands/.
 
 #: Derived from the real per-tool copy trees (pin hygiene: no phantom paths).
 PER_TOOL_COPIES = [
@@ -95,14 +96,8 @@ def test_command_delegates_to_the_skill():
 
 
 # --------------------------------------------------------------------------
-# mirror + per-tool copy parity
+# per-tool copy parity (2026-08-17: .specify mirror retired)
 # --------------------------------------------------------------------------
-
-def test_mirror_is_byte_identical():
-    assert MIRROR.is_file(), f"mirror missing: {MIRROR}"
-    assert MIRROR.read_bytes() == CANONICAL.read_bytes(), (
-        "run scripts/python/sync-mirrors.py --write"
-    )
 
 
 @pytest.mark.parametrize("path", PER_TOOL_COPIES, ids=lambda p: p.name)

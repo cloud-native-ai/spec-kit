@@ -12,7 +12,8 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SOURCE = REPO_ROOT / "templates" / "commands" / "docs.md"
-MIRROR = REPO_ROOT / ".specify" / "templates" / "commands" / "docs.md"
+# 2026-08-17: the .specify/templates/commands/ mirror is retired — per-tool
+# copies are generated straight from templates/commands/.
 SKILL = REPO_ROOT / "skills" / "create-docs" / "SKILL.md"
 SKILL_MIRROR = REPO_ROOT / ".specify" / "skills" / "create-docs" / "SKILL.md"
 
@@ -42,8 +43,9 @@ def skill_text() -> str:
 @pytest.mark.contract
 def test_c1_source_and_mirror():
     assert SOURCE.is_file()
-    assert MIRROR.is_file(), ".specify/templates/commands/docs.md mirror missing"
-    assert SOURCE.read_bytes() == MIRROR.read_bytes(), "mirror drift"
+    assert not (REPO_ROOT / ".specify" / "templates" / "commands" / "docs.md").exists(), (
+        "commands mirror retired (2026-08-17); remove any recreated mirror"
+    )
 
 
 @pytest.mark.contract

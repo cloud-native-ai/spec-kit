@@ -44,7 +44,6 @@ from tests.contract.helpers_prompt_assets import (
     assert_dirs_byte_equivalent,
     assert_ordered,
     read_frontmatter,
-    skill_registry_rows,
     text_of,
 )
 
@@ -172,18 +171,21 @@ def test_frontmatter_description_trigger_keywords():
 
 
 # ---------------------------------------------------------------------------
-# Skills registry row
+# Directory discoverability (no registry)
 # ---------------------------------------------------------------------------
 
-def test_registry_has_exactly_one_row():
-    rows = skill_registry_rows("summarize-project")
-    assert len(rows) == 1, f"Expected exactly 1 registry row, got {len(rows)}: {rows}"
+def test_skill_discoverable_via_directory():
+    skill_md = ROOT / ".specify" / "skills" / "summarize-project" / "SKILL.md"
+    assert skill_md.is_file(), "skills are discovered by directory — SKILL.md must exist"
+    fm = read_frontmatter(skill_md)
+    assert str(fm.get("name", "")) == "summarize-project", \
+        "frontmatter name must match the directory for directory-based discovery"
 
 
-def test_registry_has_no_stale_predecessor_rows():
+def test_no_stale_predecessor_directories():
     for name in ("manage-project", "visualize-project"):
-        rows = [r for r in skill_registry_rows(name) if r.startswith(f"| {name} ")]
-        assert not rows, f"Stale {name} registry row(s) remain: {rows}"
+        stale = ROOT / ".specify" / "skills" / name
+        assert not stale.is_dir(), f"Stale {name} directory remains — discovery would surface it"
 
 
 # ---------------------------------------------------------------------------

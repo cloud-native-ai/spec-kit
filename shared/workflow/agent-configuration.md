@@ -25,7 +25,6 @@ If you cannot identify your agent, skip agent-specific guidance and proceed with
 - **Script execution**: Use `Bash` tool. Check exit code explicitly — scripts may exit 0 on partial failure.
 - **YAML validation**: `python -c "import yaml; yaml.safe_load(open('file').read().split('---')[1])"`
 - **Render verification**: `ls -la .github/agents/ .qoder/agents/ 2>/dev/null` (rendered real files, no symlinks expected)
-- **Registry updates**: Use `Edit` with precise `old_string` matching to avoid clobbering other entries.
 - **Subagent delegation**: Use `Agent` tool with `subagent_type` to test newly created artifacts.
 
 ### GitHub Copilot
@@ -34,7 +33,6 @@ If you cannot identify your agent, skip agent-specific guidance and proceed with
 - **Script execution**: Use `@terminal` to run scripts. Copy JSON output from terminal to chat.
 - **Render handling**: agent distribution happens via `specify init` rendering. Advise user to run `specify init` from terminal.
 - **Model field**: Default to `GPT-5 (copilot)` for the `model` frontmatter field.
-- **Registry updates**: Use workspace edit. Be cautious of partial content replacement in large files.
 
 ## Step 3: Capture Execution Feedback
 

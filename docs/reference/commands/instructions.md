@@ -38,7 +38,7 @@ Generate or update project instructions and compatibility symlinks, ensuring a c
 4. **Update instructions content**:
    - Fills placeholders with concrete details from analysis
    - Updates Documentation Map with correct file references
-   - Preserves Tools and Skills managed ranges (marker comments intact)
+   - Preserves user-authored content; supersedes machine-maintained legacy sections (registry tables are replaced by the `## Skills & Tools` pointer; an inline `## Git Workflow` block's branch roles migrate to `.specify/git-workflow.md` before removal)
    - Incorporates user input for targeted sections
 
 5. **Reintegrate preserved blocks** (only if step 2 ran):
@@ -53,7 +53,7 @@ Generate or update project instructions and compatibility symlinks, ensuring a c
 
 | Mode | Behavior |
 |------|----------|
-| Full update (no arguments) | Auto-updates Documentation Map, Tech Stack, Key Directories, Build/Test commands. Preserves custom notes and registries. |
+| Full update (no arguments) | Auto-updates Documentation Map, Tech Stack, Key Directories, Build/Test commands. Preserves custom notes; legacy registry/Git Workflow sections are superseded, not preserved. |
 | Partial update (with arguments) | Modifies only requested sections, leaves everything else untouched. |
 
 ## Symlink Model
@@ -73,6 +73,8 @@ The canonical file is `.specify/instructions.md`. Compatibility files are symlin
 |----------|----------|
 | Instructions file | `.specify/instructions.md` |
 | Compatibility symlinks | `CLAUDE.md`, `.github/copilot-instructions.md`, etc. |
+| Skills discovery doc | `.specify/skills.md` (created if absent) |
+| Tools discovery doc | `.specify/tools.md` (created if absent) |
 
 ## Error Handling
 

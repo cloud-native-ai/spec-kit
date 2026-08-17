@@ -267,7 +267,7 @@ Creates or updates a single custom agent based on user-provided intent.
 
 6. **Quality checks** — Validates YAML syntax, provider support (Claude Code, Copilot, opencode, Qoder, Codex CLI, Hermes Agent only), and tool-workflow alignment.
 
-7. **Register agent** — Generates a deterministic `agent_id` and updates the Resource Registry in `.specify/instructions.md`.
+7. **Finalize identity** — Embeds a deterministic `agent_id` in the agent file; agents are discovered by scanning `.specify/agents/` (no registry).
 
 8. **Report** — Outputs the file path, agent ID, example trigger prompts, and suggested next customizations.
 

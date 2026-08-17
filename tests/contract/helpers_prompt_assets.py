@@ -65,16 +65,3 @@ def assert_dirs_byte_equivalent(canonical: Path, mirror: Path) -> None:
     )
     diffs = [rel for rel in left if left[rel] != right[rel]]
     assert not diffs, f"Byte differences in mirrored files: {diffs}"
-
-
-def skill_registry_rows(skill_name: str) -> list[str]:
-    """Return SKILLS registry table rows mentioning the given skill name."""
-    text = text_of(INSTRUCTIONS_FILE)
-    start = text.find("<!-- SKILLS_REGISTRY_START -->")
-    end = text.find("<!-- SKILLS_REGISTRY_END -->")
-    assert 0 <= start < end, "SKILLS registry markers not found in instructions.md"
-    block = text[start:end]
-    return [
-        line for line in block.splitlines()
-        if line.startswith("|") and skill_name in line
-    ]

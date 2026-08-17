@@ -10,7 +10,7 @@ Spec Kit skills are also deployed to standalone agent applications
 * ``templates/skills-template.md`` and ``shared/workflow/feedback-step.md``
   carry the gate;
 * ``create-skills`` documents mode detection and the standalone skips
-  (registration / role-agent propagation / engine-backed feedback).
+  (role-agent propagation / engine-backed feedback).
 """
 from __future__ import annotations
 
@@ -88,9 +88,11 @@ def test_create_skills_documents_standalone_mode():
         "create-skills lacks the runtime-mode detection step"
     )
     assert "standalone mode" in text
-    # Spec-Kit-specific steps must be declared conditional.
-    assert "Spec Kit project mode only" in text, (
-        "create-skills registration step is not gated to Spec Kit project mode"
+    # Spec-Kit-specific steps must be declared conditional. Registration is
+    # gone in every mode (2026-08-17 registry retirement); the still-gated
+    # steps are engine-backed Feedback and role-agent propagation.
+    assert "self-contained" in text and "`## Feedback`" in text, (
+        "create-skills engine-backed Feedback step is not gated to Spec Kit project mode"
     )
     assert "in Spec Kit project mode" in text and "skip this step" in text, (
         "create-skills agent propagation step is not gated to Spec Kit project mode"

@@ -92,9 +92,8 @@ flowchart TD
     SCRIPTS --> SPECS[.specify/specs/NNN-name\nrequirements/plan/tasks]
     SCRIPTS --> MEM
 
-    SKILLS --> REG[Resource Registry]
-    TOOLS --> REG
-    REG --> AGENTS
+    SKILLS --> AGENTS
+    TOOLS --> LLM
 ```
 
 这个架构选择的是**本地优先的模块化单体**：它不是服务端平台，也不需要数据库；所有状态落在 Git 工作区中，通过文件系统和 Markdown 形成可审计轨迹。
@@ -427,6 +426,8 @@ flowchart TD
 历史问题：instructions 命令文档曾提到 `TOOLS_PLACEHOLDER_START` 等 marker，但实际 instructions 模板使用 `AGENTS_REGISTRY_START`、`SKILLS_REGISTRY_START`、`TOOLS_REGISTRY_START`：[templates/instructions-template.md](../../templates/instructions-template.md#L71-L92)。
 
 **处理**：已将 [templates/commands/instructions.md](../../templates/commands/instructions.md) 中的 marker 名称统一为 `*_REGISTRY_*`（含新增 Agents 注册表）。建议补充测试：instructions 生成流程不会丢失注册表内容。
+
+**2026-08-17 后续**：Resource Registry（Agents/Skills/Tools 三表）已整体退役——各 Agent CLI 自带目录扫描发现机制，说明文档迁至 `.specify/skills.md` 与 `.specify/tools.md`，`*_REGISTRY_*` marker 随之消失。
 
 ### 8.4 中优先级：`implement-plan.sh` 引用了未定义的 `json_escape`
 

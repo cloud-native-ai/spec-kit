@@ -98,7 +98,7 @@ A record can state **where its invocation is verified to hold** and **how it dif
 
 3. **Persist record** at `.specify/memory/tools/<tool-name>.md` with a deterministic `tool_id`.
 
-4. **Register** in the Resource Registry of `.specify/instructions.md`.
+4. **Report** — the record persisted in step 3 is the single source of truth; there is no registry (discovery explained in `.specify/tools.md`).
 
 ### Modify (update existing tool)
 
@@ -133,7 +133,7 @@ Rules are **authoritative** — when a tool has a definition record, the AI agen
 | Artifact | Location |
 |----------|----------|
 | Tool definition | `.specify/memory/tools/<tool-name>.md` |
-| Registry update | `.specify/instructions.md` → Tools section |
+| Discovery doc | `.specify/tools.md` (explanatory; created if absent by `/speckit.instructions`) |
 
 ## Tool Statuses
 
@@ -153,12 +153,12 @@ Rules are **authoritative** — when a tool has a definition record, the AI agen
 
 | Skill | Owns | Canonical path |
 |-------|------|----------------|
-| `create-tools` | Authoring a new record: intake, template selection, validation, persistence, registry row | `.specify/skills/create-tools/SKILL.md` |
+| `create-tools` | Authoring a new record: intake, template selection, validation, persistence | `.specify/skills/create-tools/SKILL.md` |
 | `improve-tools` | Field-level refinement of an existing record: source/contract correction, rule hardening, alias/rename, `Draft` → `Verified` promotion | `.specify/skills/improve-tools/SKILL.md` |
 
 The four type templates live inside the owning skill at `.specify/skills/create-tools/templates/` (`tool-project-script-template.md`, `tool-system-binary-template.md`, `tool-shell-function-template.md`, `tool-webhook-template.md`). Shared type semantics, the rules format, and the invocation preview contract are defined once in `.specify/shared/definitions/tool-definitions.md`.
 
-**Dogfooding**: Spec Kit manages its own core scripts through this command — see the `### Tools` registry in `.specify/instructions.md` and the records under `.specify/memory/tools/`.
+**Dogfooding**: Spec Kit manages its own core scripts through this command — see the records under `.specify/memory/tools/` and the discovery notes in `.specify/tools.md`.
 
 ## Prerequisites
 

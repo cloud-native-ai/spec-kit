@@ -12,7 +12,6 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = REPO_ROOT / "templates" / "commands" / "feedback.md"
-SPEC_MIRROR = REPO_ROOT / ".specify" / "templates" / "commands" / "feedback.md"
 
 # Per-tool copies only for tool dirs that exist in THIS repo (mirrors
 # regen-command-copies.py's present-dirs behavior; codex/hermes are generated
@@ -47,9 +46,8 @@ class TestFeedbackCommandTemplate:
         assert "/speckit.feedback" in text
         assert "## Documentation" in text
 
-    def test_spec_mirror_identical(self):
-        assert SPEC_MIRROR.read_bytes() == TEMPLATE.read_bytes(), \
-            ".specify/templates/commands/feedback.md diverged from canonical"
+    # test_spec_mirror_identical removed 2026-08-17: the .specify/templates/commands/
+    # mirror is retired — per-tool copies are generated straight from templates/commands/.
 
     def test_tool_copies_exist_with_generated_header(self):
         assert PRESENT_COPIES, "no tool command dirs found"

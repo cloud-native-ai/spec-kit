@@ -19,7 +19,6 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 CANONICAL = REPO_ROOT / "templates/commands/team.md"
-MIRROR = REPO_ROOT / ".specify/templates/commands/team.md"
 PER_TOOL_COPIES = (
     REPO_ROOT / ".claude/commands/speckit.team.md",
     REPO_ROOT / ".github/prompts/speckit.team.prompt.md",
@@ -34,10 +33,8 @@ def test_canonical_exists():
     assert CANONICAL.is_file(), f"command source of truth missing: {CANONICAL}"
 
 
-def test_mirror_is_byte_identical():
-    assert MIRROR.read_bytes() == CANONICAL.read_bytes(), (
-        "run scripts/python/sync-mirrors.py --write"
-    )
+# test_mirror_is_byte_identical removed 2026-08-17: the .specify/templates/commands/
+# mirror is retired — per-tool copies are generated straight from templates/commands/.
 
 
 # --------------------------------------------------------------------------

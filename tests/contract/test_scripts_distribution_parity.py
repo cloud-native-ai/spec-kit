@@ -38,7 +38,7 @@ sm = _load_engine()
 class TestScriptsDistributionParity:
     def test_scripts_pair_is_strict_about_orphans(self):
         """The scripts/ tree is framework-owned, so mirror-only files must be fatal."""
-        pairs = {src: strict for src, _dst, strict in sm.MIRROR_PAIRS}
+        pairs = {src: strict for src, _dst, strict, _excl in sm.MIRROR_PAIRS}
         assert "scripts" in pairs, "scripts/ must be a declared mirror pair"
         assert pairs["scripts"] is True, (
             "scripts/ must keep strict_extras=True; otherwise a .specify-only "
@@ -47,7 +47,7 @@ class TestScriptsDistributionParity:
 
     def test_skills_pair_stays_lenient(self):
         """skills/ may legitimately hold project-local skills in the mirror."""
-        pairs = {src: strict for src, _dst, strict in sm.MIRROR_PAIRS}
+        pairs = {src: strict for src, _dst, strict, _excl in sm.MIRROR_PAIRS}
         assert pairs.get("skills") is False, (
             "skills/ must stay lenient so project-local skills are not flagged"
         )

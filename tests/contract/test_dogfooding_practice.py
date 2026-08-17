@@ -2,10 +2,12 @@
 
 Template/governance-only feature (Constitution Principle IV → justified
 Partial per Principle VII template-only rule): these verify the constitution
-principle, the instructions-template guidance section, mirror parity, and the
-"no new machinery" invariant (FR-004).
+principle, the instructions-template summary+pointer section, the single-source
+dogfooding doc, mirror parity, and the "no new machinery" invariant (FR-004).
 
-Maps to contracts/dogfooding-artifacts.md checks C-1 … C-7.
+Maps to contracts/dogfooding-artifacts.md checks C-1 … C-7 (amended 2026-08-17:
+full-content assertions moved to shared/guidelines/dogfooding.md; the template
+carries only a summary + link).
 """
 
 import re
@@ -15,6 +17,9 @@ ROOT = Path(__file__).resolve().parents[2]
 CONSTITUTION = ROOT / ".specify" / "memory" / "constitution.md"
 SRC = ROOT / "templates" / "instructions-template.md"
 MIRROR = ROOT / ".specify" / "templates" / "instructions-template.md"
+DOC = ROOT / "shared" / "guidelines" / "dogfooding.md"
+DOC_MIRROR = ROOT / ".specify" / "shared" / "guidelines" / "dogfooding.md"
+DOC_LINK = "shared/guidelines/dogfooding.md"
 
 PRINCIPLE_RE = re.compile(r"^### XI\. Dogfooding", re.MULTILINE)
 
@@ -93,7 +98,7 @@ def test_c7_deviation_log_location():
 
 
 # ---------------------------------------------------------------------------
-# Guidance section (instructions-template) — C-2 / C-3 / C-5
+# Single-source doc + template summary — C-2 / C-3 / C-5
 # ---------------------------------------------------------------------------
 
 SECTION_HEADING = "## Dogfooding Practice"
@@ -120,15 +125,33 @@ def guidance_section(text: str) -> str:
     return "\n".join(lines[start:end])
 
 
-# --- C-2 (Loop A): actionable feed-back-to-framework path ---
+# --- C-2 (template): summary + pointer shape ---
 
 def test_c2_section_present_in_template():
     assert SECTION_HEADING in read(SRC), f"{SECTION_HEADING!r} missing in templates/instructions-template.md"
 
 
-def test_c2_loop_a_path():
+def test_c2_template_summary_shape():
     body = guidance_section(read(SRC))
-    assert "Loop A" in body, "Loop A subsection missing"
+    assert "Loop A" in body and "Loop B" in body, "summary must name both loops"
+    assert DOC_LINK in body, f"pointer link {DOC_LINK!r} missing from template summary"
+    assert re.search(r"no automatic", body, re.IGNORECASE), \
+        "summary must keep the zero-automatic-transmission statement"
+    assert "| Capability | Role in your product's loop |" not in body, \
+        "the Loop B capability table must live in the external doc, not the template"
+
+
+def test_c2_doc_exists_with_mirror():
+    assert DOC.is_file(), f"missing dogfooding doc: {DOC}"
+    assert DOC_MIRROR.is_file(), f"missing dogfooding doc mirror: {DOC_MIRROR}"
+    assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), "dogfooding doc mirror drift"
+
+
+# --- C-2 (doc): Loop A path / Loop B mapping / anti-patterns ---
+
+def test_c2_loop_a_path():
+    body = read(DOC)
+    assert "Loop A" in body, "Loop A section missing from doc"
     for step in ("record", "package"):
         assert step in body, f"Loop A path step {step!r} missing"
     assert re.search(r"threshold", body, re.IGNORECASE), "threshold prompt mention missing"
@@ -138,18 +161,17 @@ def test_c2_loop_a_path():
 
 
 def test_c2_action_names_are_real():
-    body = guidance_section(read(SRC))
-    used = set(re.findall(r"--action\s+([a-z-]+)", body))
+    used = set(re.findall(r"--action\s+([a-z-]+)", read(DOC)))
     unknown = used - ENGINE_ACTIONS
-    assert not unknown, f"guidance references non-existent engine actions: {unknown}"
+    assert not unknown, f"doc references non-existent engine actions: {unknown}"
 
 
 def test_c2_project_neutral():
-    body = guidance_section(read(SRC))
-    for bad in FORBIDDEN:
-        assert bad not in body, f"project-specific identifier {bad!r} leaked into shared guidance"
-    for bad in ("Dogfooded", "Dogfoodding"):
-        assert bad not in body, f"misspelled variant {bad!r} in guidance section"
+    for name, text in (("template section", guidance_section(read(SRC))), ("doc", read(DOC))):
+        for bad in FORBIDDEN:
+            assert bad not in text, f"project-specific identifier {bad!r} leaked into {name}"
+        for bad in ("Dogfooded", "Dogfoodding"):
+            assert bad not in text, f"misspelled variant {bad!r} in {name}"
 
 
 # --- C-3: byte-identical mirrors ---
@@ -166,24 +188,22 @@ def test_c5_section_appears_once_per_mirror():
         assert read(p).count(SECTION_HEADING) == 1, f"{SECTION_HEADING!r} must appear exactly once in {p}"
 
 
-# --- C-2 (Loop B): capability mapping, anti-patterns, staged adoption ---
-
 LOOP_B_CAPABILITIES = ["feedback", "memory", "history", "review", "task record"]
 ANTI_PATTERNS = ["formalis", "echo chamber", "dead-letter", "over-ideal"]
 
 
 def test_c2_loop_b_capability_mapping():
-    body = guidance_section(read(SRC))
-    assert "Loop B" in body, "Loop B subsection missing"
+    body = read(DOC)
+    assert "Loop B" in body, "Loop B section missing from doc"
     low = body.lower()
     for cap in LOOP_B_CAPABILITIES:
         assert cap in low, f"Loop B capability mapping missing {cap!r}"
 
 
 def test_c2_anti_patterns_and_adoption():
-    body = guidance_section(read(SRC)).lower()
+    body = read(DOC).lower()
     for ap in ANTI_PATTERNS:
-        assert ap in body, f"anti-pattern {ap!r} missing from guidance"
+        assert ap in body, f"anti-pattern {ap!r} missing from doc"
     assert re.search(r"staged|stage[- ]by[- ]stage|core team first", body), "staged adoption advice missing"
     assert re.search(r"tailor|not suited|proxy user|drill", body), "scenario-tailoring advice missing"
 

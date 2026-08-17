@@ -15,7 +15,6 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 CANONICAL = REPO_ROOT / "templates/commands/goal.md"
-MIRROR = REPO_ROOT / ".specify/templates/commands/goal.md"
 PER_TOOL_COPIES = (
     REPO_ROOT / ".claude/commands/speckit.goal.md",
     REPO_ROOT / ".github/prompts/speckit.goal.prompt.md",
@@ -42,11 +41,8 @@ def test_canonical_has_frontmatter_with_a_description():
     assert "description:" in head
 
 
-def test_mirror_is_byte_identical():
-    assert MIRROR.is_file(), f"mirror missing: {MIRROR}"
-    assert MIRROR.read_bytes() == CANONICAL.read_bytes(), (
-        "run scripts/python/sync-mirrors.py --write"
-    )
+# test_mirror_is_byte_identical removed 2026-08-17: the .specify/templates/commands/
+# mirror is retired — per-tool copies are generated straight from templates/commands/.
 
 
 @pytest.mark.parametrize("path", PER_TOOL_COPIES, ids=lambda p: p.name)

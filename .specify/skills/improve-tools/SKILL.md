@@ -39,7 +39,7 @@ The input is a description of the tool to improve. Interpret it as follows:
 
 4. **Apply the minimal field-level edit.** Change only the fields the evidence supports. Preserve every unmodified field verbatim — including `behavioral_rules`, `aliases`, `discovery_origin`, and the record's section order. Do not reorder or drop sections, and do not clear a mandatory field (`name` / `tool_type` / `source_identifier` / `description`): clearing one is an error, not an edit.
 5. **Re-validate and re-persist.** Run the same validation `create-tools` applies: canonical `tool_type`, non-empty mandatory fields, valid rule keywords, and the `Verified` ⇒ `arguments or returns` invariant. Refresh `last_updated`. If the edit invalidates the contract, demote to `Draft` and say so explicitly rather than persisting an inconsistent `Verified` record.
-6. **Sync the registry.** Update the tool's row in the `### Tools` table of `.specify/instructions.md` when `name`, `tool_type`, `source_identifier`, `aliases`, `status`, `description`, or the canonical path changed. On rename, move the row rather than adding a second one — the registry MUST NOT carry two rows for one tool.
+6. **No registry to sync.** No registration table exists — the record file `.specify/memory/tools/<name>.md` is the single source of truth (see `.specify/tools.md`). On rename, the old record directory MUST be removed so directory discovery cannot surface two records for one tool.
 7. **Report.** State which record changed, the fields before → after, the resulting `status`, and any follow-up the user must do (e.g. fields still missing for `Verified`, or a stale reference to an old name).
 
 ## Constraints

@@ -142,7 +142,7 @@ When slimming removes a capability description from the body (e.g. an intra-doma
 - `frontmatter.description` — drop sentences that referenced the removed capability; do not leave promotional text without a corresponding section.
 - `frontmatter.version` — bump for any user-visible scope change (per the project's semver convention).
 - `package.json.description` (if the Skill has one) — must match `frontmatter.description`.
-- Skill registry rows in `.specify/instructions.md` — re-check.
+- Discoverability invariants — directory name and frontmatter `name` still agree after the slim (no registry table exists to re-check).
 
 **Failure mode prevented**: the Skill is triggered by a phrase the description still advertises, but the body no longer contains the matching workflow.
 

@@ -158,6 +158,18 @@ else
   log warning "Glossary engine or template not found; skipping glossary initialization"
 fi
 
+# Create the skills/tools explanation docs at .specify top level (create-only,
+# never overwrite — same non-destructive policy as the glossary). These carry
+# the no-registry discovery model; canonical sources live in templates/.
+for doc_name in skills tools; do
+  DOC_TEMPLATE=".specify/templates/${doc_name}.md"
+  DOC_TARGET="$TARGET_DIR/${doc_name}.md"
+  if [ -f "$DOC_TEMPLATE" ] && [ ! -f "$DOC_TARGET" ]; then
+    render_template "$DOC_TEMPLATE" > "$DOC_TARGET"
+    log info "Created $DOC_TARGET (non-destructive)"
+  fi
+done
+
 # Cleanup deprecated AI tool artifacts
 for deprecated_dir in .clinerules .lingma .trae; do
   if [ -d "$deprecated_dir" ]; then

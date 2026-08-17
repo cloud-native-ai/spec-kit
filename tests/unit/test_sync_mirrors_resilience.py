@@ -37,7 +37,7 @@ def _load_engine():
 def sandbox(tmp_path, monkeypatch):
     module = _load_engine()
     monkeypatch.setattr(module, "REPO_ROOT", tmp_path)
-    monkeypatch.setattr(module, "MIRROR_PAIRS", [("csrc", "cdst", False)])
+    monkeypatch.setattr(module, "MIRROR_PAIRS", [("csrc", "cdst", False, frozenset())])
     src = tmp_path / "csrc"
     src.mkdir()
     (src / "a.md").write_text("canonical A v2\n", encoding="utf-8")

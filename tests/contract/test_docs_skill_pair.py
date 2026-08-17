@@ -58,12 +58,16 @@ def test_c18_pair_member_is_mirrored(name: str):
 
 @pytest.mark.contract
 @pytest.mark.parametrize("name", PAIR)
-def test_c18_pair_member_registered_exactly_once(name: str):
-    registry = INSTRUCTIONS.read_text(encoding="utf-8")
-    rows = [line for line in registry.splitlines()
-            if line.startswith(f"| {name} |")]
-    assert len(rows) == 1, f"{name}: expected exactly one registry row, found {len(rows)}"
-    assert f"<SKILL:.specify/skills/{name}/SKILL.md>" in rows[0], f"{name}: row missing skill_id"
+def test_c18_pair_member_discoverable_without_registry(name: str):
+    """Registry retired (2026-08-17): the skills directory itself is the discovery surface."""
+    mirror = mirror_path(name)
+    assert mirror.is_file(), f".specify/skills/{name}/SKILL.md mirror missing"
+    text = mirror.read_text(encoding="utf-8")
+    assert f"name: {name}" in text.split("---", 2)[1], f"{name}: frontmatter name must match"
+    assert f'<SKILL:.specify/skills/{name}/SKILL.md>' in text, f"{name}: skill_id missing"
+    instructions = INSTRUCTIONS.read_text(encoding="utf-8")
+    rows = [line for line in instructions.splitlines() if line.startswith(f"| {name} |")]
+    assert not rows, f"{name}: registry rows must not return to instructions.md: {rows}"
 
 
 @pytest.mark.contract
