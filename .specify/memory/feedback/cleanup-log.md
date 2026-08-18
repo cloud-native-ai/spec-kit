@@ -1,0 +1,14 @@
+## 2026-08-18T02:18:08Z — feedback-20260818T020825Z.zip
+- removed 20260817T121447Z-speckit-feedback (/speckit.feedback, created 2026-08-17T12:14:47Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260817T115931Z-speckit-implement (/speckit.implement, created 2026-08-17T11:59:31Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260817T113827Z-speckit-tasks (/speckit.tasks, created 2026-08-17T11:38:27Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260817T102954Z-speckit-plan (/speckit.plan, created 2026-08-17T10:29:54Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260817T102213Z-speckit-clarify (/speckit.clarify, created 2026-08-17T10:22:13Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260817T075305Z-speckit-requirements (/speckit.requirements, created 2026-08-17T07:53:05Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260817T072201Z-speckit-implement (/speckit.implement, created 2026-08-17T07:22:01Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260817T065032Z-speckit-tasks (/speckit.tasks, created 2026-08-17T06:50:32Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260817T061743Z-speckit-plan (/speckit.plan, created 2026-08-17T06:17:43Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260817T055643Z-speckit-clarify (/speckit.clarify, created 2026-08-17T05:56:43Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260817T033422Z-speckit-requirements (/speckit.requirements, created 2026-08-17T03:34:22Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260815T061846Z-speckit-instructions (/speckit.instructions, created 2026-08-15T06:18:46Z) — archived in feedback-20260818T020825Z.zip
+- removed 20260814T184503Z-speckit-implement (/speckit.implement, created 2026-08-14T18:45:03Z) — archived in feedback-20260818T020825Z.zip

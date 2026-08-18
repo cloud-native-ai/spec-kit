@@ -48,7 +48,8 @@ Guide the user through the local processing loop:
 2. **Summary view**: `--action list --limit 0` with filters as requested — `--slice <commands|skills|host-custom|...>`, `--kind <internal|external>`, `--disposition <processed|ignored|open>`, plus the pre-existing `--unit-id/--since/--contains`.
 3. **Disposition**: `--action dispose --id <entry-id> --to processed|ignored` (local metadata only).
 4. **Package** (on user confirmation, internal entries only): `--action package` → print zip path + manual-send guidance. The agent NEVER sends the zip.
-5. **Post-package cleanup** (only after the user confirms the batch is dealt with): `--action cleanup --package <zip|latest> --dry-run` to preview, then run without `--dry-run`. Cleanup removes only entries actually inside that zip; `cleanup-log.md` records every removal.
+5. **Post-package cleanup (default closing step of the package run)**: once the zip exists, the packaged batch no longer needs to live in the active store — the zip is the record. Preview with `--action cleanup --package <zip|latest> --dry-run`, then run without `--dry-run` in the same session as packaging. Cleanup removes only entries actually inside that zip; `cleanup-log.md` records every removal. The zip itself STAYS under `.specify/memory/feedback/packages/` as the delivery artifact.
+6. **After delivery (`mark-submitted`)**: once the batch is dealt with (sent, or deliberately ignored) and `mark-submitted` has reset the counter, the zip has served its purpose — remove it from the outbox: `rm .specify/memory/feedback/packages/feedback-<ts>.zip`. The store, the outbox, and the counter all return to zero; `cleanup-log.md` plus the (already-delivered) zip's MANIFEST remain the audit trail.
 
 ### Mode 3 — Inject an External Probe
 
@@ -116,15 +117,15 @@ Route each finding to its destination:
 
 Produce a **consume report** for user confirmation: findings table, routing decisions, conflicts found, and proposed cleanup list.
 
-#### Step 4 — Cleanup (after user confirmation)
+#### Step 4 — Cleanup (mandatory closing step of the consume run)
 
-After the user confirms all findings have been routed:
+The user confirms the **routing decisions** in the consume report — confirmation of the report, NOT completion of every downstream routed run (findings routed to later `improve-*` / `/speckit.requirements` runs carry their input from the consume report and the log row below). On that confirmation, cleanup runs before the command ends:
 
 ```bash
-rm feedback/feedback-<ts>.zip   # each processed bundle
+rm feedback/feedback-<ts>.zip   # each processed bundle in this batch
 ```
 
-- Delete ONLY the bundles that were in this batch.
+- Delete ONLY the bundles that were in this batch; cleanup is atomic and **part of the run** — a consume run does not end with its intake files still on disk. The durable record is the consume-log row (routings + conflicts), never the zips: lingering bundles would form a second, staler source of truth.
 - Record the consume event by appending one row to `.specify/memory/feedback/consume-log.md`:
 
   ```markdown
@@ -138,7 +139,7 @@ rm feedback/feedback-<ts>.zip   # each processed bundle
 #### Mode 4 behavior rules
 
 - **Read-only toward bundles until cleanup**: never modify zip contents; extraction is read-only (`unzip -p` to stdout).
-- **One batch, one cleanup**: do not delete individual bundles mid-batch; cleanup is atomic after ALL findings are routed.
+- **One batch, one cleanup**: do not delete individual bundles mid-batch; cleanup is atomic, runs once at the end of the consume run (after the routing report is confirmed), and leaves the intake empty.
 - **No network**: consume is entirely local file I/O + agent reasoning.
 - **Framework source fixes only**: findings are acted on in the framework source (`templates/`, `skills/`, `scripts/`, `shared/`, `src/`), never in `.specify/` mirrors (two-hats rule: Constitution XI).
 

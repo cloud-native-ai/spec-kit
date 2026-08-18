@@ -141,7 +141,16 @@ python3 .specify/scripts/python/feedback-utils.py --action package
   an issue; GitLab → issue attachment or an MR adding the zip to the upstream repo's
   feedback intake directory (`feedback/` at its root — see *Intake side* below).
 - The agent **never sends the zip** — delivery is entirely the user's manual action.
-  After the batch is dealt with (sent or deliberately discarded), run `mark-submitted`.
+- **Post-package cleanup is the default closing step**: once the zip exists it is the
+  record, so the packaged entries leave the active store in the same session
+  (`--action cleanup --package <zip|latest>`, `--dry-run` preview first; removes only
+  entries inside that zip; `cleanup-log.md` records every removal). The zip itself
+  stays in `packages/` as the delivery artifact; after the batch is dealt with (sent
+  or deliberately discarded) and `mark-submitted` has reset the counter, remove the
+  zip from `packages/` — store, outbox, and counter all return to zero.
+- On the framework side, `/speckit.feedback consume` likewise ends with a mandatory
+  cleanup: after the routing report is confirmed, the batch's intake bundles are
+  deleted and one `consume-log.md` row (routings + conflicts) is the durable record.
 
 The `packages/` directory is not git-ignored: like the entries, a zip is user data, and
 whether to commit it is the user's call.
