@@ -19,7 +19,7 @@ This command is the local management interface for the Feedback Probe system. It
 |-------|------|-------------|
 | *(empty)* | 1 — Probe Overview | Any project |
 | filter/dispose/package keywords | 2 — Process Collected Feedback | Any project |
-| unit / inject keywords | 3 — Inject External Probe | Any project (host-project custom units) |
+| unit / inject keywords | 3 — Inject External Probe | Any client project (its own custom units) |
 | `consume` / `--consume` | 4 — Consume Framework Feedback | **Framework project ONLY** |
 
 With no arguments it defaults to Mode 1.
@@ -50,13 +50,13 @@ Guide the user through the local processing loop:
 
 ### Mode 3 — Inject an External Probe
 
-For host-project custom Skills/Agents/Commands (assets the framework's own probes never cover):
+For **client-project** custom Skills/Agents/Commands (assets the framework's own probes never cover). Terminology — **客户项目 (Client Project)** / **框架项目 (Framework Project)** — is defined canonically in [`.specify/shared/definitions/dogfooding-definitions.md`](../../.specify/shared/definitions/dogfooding-definitions.md) §2 (one repo, two hats; the flow chain framework sources → publish → install → each client project's `.specify/`); this command says "client project" wherever older drafts said "host project":
 
 1. Elicit the target unit (`custom:<owner>/<name>`), lifecycle point (default `wrap-up`), and a short collection-intent note (`--notes-file`).
 2. Run `--action probe-inject --unit custom:<owner>/<name> --notes-file <file>` — writes `.specify/memory/feedback/probes/ext-<slug>.md`.
 3. Verify the injection: the object appears in `--action probes` and after `--action map`.
 
-External-probe feedback is **host-project-local** (Loop B — the project's own use→feedback→iterate loop): it feeds the project's own optimization, is separately filterable via `--kind external`, and is **never** included in upstream packages.
+External-probe feedback is **client-project-local** (Loop B — the client project's own use→feedback→iterate loop): it feeds the client project's own optimization, is separately filterable via `--kind external`, and is **never** included in upstream packages.
 
 ### Mode 4 — Consume Framework Feedback (framework project ONLY)
 
@@ -166,7 +166,7 @@ At wrap-up (the same lifecycle point where this command prompts for a Git commit
      --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
      --review "<review prose>" --points-file "<points file>"
    ```
-   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
+   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay client-project-local and never enter upstream packages.
 6. **Consolidated submission prompt.** If the returned `should_prompt` is `true`, surface a single consolidated prompt inviting the user to submit collected feedback to the Spec Kit developers; on confirmation run `--action mark-submitted`. Below threshold, do not prompt.
 
 **Abort / partial-run rule.** If the run failed before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.
@@ -175,4 +175,4 @@ At wrap-up (the same lifecycle point where this command prompts for a Git commit
 
 **Before**: none (any Spec Kit project; requires the probe registry installed by `/speckit.instructions`).
 
-**After**: Mode 3 injection → the host project's own improvement loop (`improve-skills` / `improve-agent` consume `list --kind external` findings). Mode 2 cleanup → `mark-submitted` if not yet run for the batch. Mode 4 consume → routed `/speckit.requirements` calls for new-feature findings; `improve-*` invocations for skill/agent/tool findings; `consume-log.md` records the batch disposition.
+**After**: Mode 3 injection → the client project's own improvement loop (`improve-skills` / `improve-agent` consume `list --kind external` findings). Mode 2 cleanup → `mark-submitted` if not yet run for the batch. Mode 4 consume → routed `/speckit.requirements` calls for new-feature findings; `improve-*` invocations for skill/agent/tool findings; `consume-log.md` records the batch disposition.
