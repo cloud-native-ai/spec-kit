@@ -3,7 +3,7 @@
 Contract: .specify/specs/043-init-commit-stamp/contracts/build-embedding.contract.md
 
 The hatchling build API exists only inside the build environment, so this suite
-injects a stub module before loading the repo-root hook file. Pins: the embedded
+injects a stub module before loading the src-tree hook file. Pins: the embedded
 file's fields, the honest-unavailable degradation, the same-probe-grammar
 object identity (no second git implementation), the write-failure = build-failure
 semantics, and the pyproject/.gitignore declarations.
@@ -22,7 +22,7 @@ import pytest
 import specify_cli as sc
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-HOOK = REPO_ROOT / "hatch_build.py"
+HOOK = REPO_ROOT / "src" / "hatch_build.py"
 EMBED = REPO_ROOT / "src/specify_cli/_source_commit.json"
 
 pytestmark = pytest.mark.contract
@@ -104,6 +104,6 @@ def test_write_failure_fails_the_build(hook_module, monkeypatch):
 def test_declarations_are_in_place():
     pyproject = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
     assert "[tool.hatch.build.hooks.custom]" in pyproject
-    assert 'path = "hatch_build.py"' in pyproject
+    assert 'path = "src/hatch_build.py"' in pyproject
     gitignore = (REPO_ROOT / ".gitignore").read_text(encoding="utf-8")
     assert "src/specify_cli/_source_commit.json" in gitignore

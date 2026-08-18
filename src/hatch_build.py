@@ -18,7 +18,7 @@ from pathlib import Path
 
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 
-_REPO_ROOT = Path(__file__).resolve().parent
+_REPO_ROOT = Path(__file__).resolve().parents[1]  # src/hatch_build.py -> repo root
 _PROVENANCE_PATH = _REPO_ROOT / "src" / "specify_cli" / "_provenance.py"
 _EMBED_PATH = _REPO_ROOT / "src" / "specify_cli" / "_source_commit.json"
 _CANONICAL_NAME = "specify_cli._provenance"
