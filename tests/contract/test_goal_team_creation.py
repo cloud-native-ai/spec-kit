@@ -73,9 +73,10 @@ def test_near_miss_is_not_a_hit_and_falls_back_to_free_text():
     assert "自由文本" in text, "free-text fallback path missing"
 
 
-def test_branch_entry_requires_user_confirmation():
+def test_branch_entry_is_disclosed_without_blocking_gate():
+    # 044: branch entry is deterministic and disclosed; the blocking confirmation was removed.
     text = _text()
-    assert "确认" in text, "user confirmation gate before entering the branch missing"
+    assert "直接进入分支" in text, "direct branch entry wording missing"
 
 
 # --------------------------------------------------------------------------
@@ -189,9 +190,10 @@ def test_every_statement_is_dry_run_checked_before_the_gate():
     )
 
 
-def test_approval_is_one_merged_confirmation_then_per_statement_add():
+def test_approval_is_one_merged_ratification_then_per_statement_add():
+    # 044: merged ratification keeps propose->ratify decision semantics without gate wording.
     text = _text()
-    assert "合并确认" in text, "single merged confirmation wording missing"
+    assert "合并批准" in text, "single merged ratification wording missing"
     assert "逐条" in text, "per-statement execution wording missing"
     assert "--add" in text, "the engine add command must be the only landing path"
 

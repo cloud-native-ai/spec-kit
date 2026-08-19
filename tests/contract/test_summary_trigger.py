@@ -18,7 +18,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILL_CANONICAL = REPO_ROOT / "skills/create-team/SKILL.md"
 SKILL_MIRROR = REPO_ROOT / ".specify/skills/create-team/SKILL.md"
 CMD_CANONICAL = REPO_ROOT / "templates/commands/team.md"
-CMD_MIRROR = REPO_ROOT / ".specify/templates/commands/team.md"
+# CMD_MIRROR retired: the .specify/templates/commands/ mirror is intentionally no
+# longer maintained (see scripts/python/sync-mirrors.py header) — per-tool copies
+# are generated straight from templates/commands/ by regen-command-copies.py.
+CMD_MIRROR = None  # sentinel; excluded from every parametrize list below
 PER_TOOL_COPIES = [
     REPO_ROOT / ".claude/commands/speckit.team.md",
     REPO_ROOT / ".github/prompts/speckit.team.prompt.md",
@@ -192,22 +195,26 @@ def test_presets_declare_a_summary_cadence(preset: Path) -> None:
 
 
 @pytest.mark.parametrize(
-    "path", [CMD_CANONICAL, CMD_MIRROR, *PER_TOOL_COPIES], ids=lambda p: p.name
+    "path", [CMD_CANONICAL, *PER_TOOL_COPIES], ids=lambda p: p.name
 )
-def test_confirmation_gate_discloses_the_summary_decision(path: Path) -> None:
-    """TG-13/TG-14/TG-18 must reach every tool copy, not just the canonical source."""
+def test_present_and_execute_discloses_the_summary_decision(path: Path) -> None:
+    """TG-13/TG-14/TG-18 must reach every tool copy, not just the canonical source.
+
+    044: the confirmation gate became a present-and-execute disclosure; the summary
+    decision disclosure obligation is unchanged, only the section anchor moved.
+    """
     text = path.read_text(encoding="utf-8")
     assert re.search(r"summar", text, re.I), f"{path.name} never mentions the summary"
-    gate_region = text.split("Confirmation gate", 1)
-    assert len(gate_region) > 1, f"{path.name} has no confirmation gate section"
-    window = gate_region[1][:2500]
+    region = text.split("Present & execute", 1)
+    assert len(region) > 1, f"{path.name} has no present-and-execute section"
+    window = region[1][:2500]
     assert re.search(r"summar", window, re.I), (
-        f"{path.name}: the confirmation gate does not disclose the summary decision"
+        f"{path.name}: the present-and-execute section does not disclose the summary decision"
     )
 
 
 @pytest.mark.parametrize(
-    "path", [CMD_CANONICAL, CMD_MIRROR, *PER_TOOL_COPIES], ids=lambda p: p.name
+    "path", [CMD_CANONICAL, *PER_TOOL_COPIES], ids=lambda p: p.name
 )
 def test_gate_discloses_goal_identity_and_target_directory(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
@@ -226,7 +233,7 @@ def test_gate_discloses_goal_identity_and_target_directory(path: Path) -> None:
 
 @pytest.mark.parametrize(
     "path",
-    [SKILL_CANONICAL, SKILL_MIRROR, CMD_CANONICAL, CMD_MIRROR, *PER_TOOL_COPIES],
+    [SKILL_CANONICAL, SKILL_MIRROR, CMD_CANONICAL, *PER_TOOL_COPIES],
     ids=lambda p: p.name,
 )
 def test_no_artifact_claims_the_team_directory_holds_only_team_md_and_runs(path: Path) -> None:

@@ -6,7 +6,7 @@
 
 Without them, every `create` run derives a roster and a pattern purely from a free-form user sentence. User goals are usually vague ("帮我组个团队盯着这些仓库"), so the derived team is arbitrary and often does not match what the user pictured — the divergence only surfaces after a run. A preset is a **known-good team shape distilled from a team that actually ran**: goal skeleton, roster with pre-assigned responsibilities, pattern config with tuned thresholds, and the constraints that made it work.
 
-Presets do **not** replace the goal-first flow. They are offered as a **match** during step 2 of team creation, and the user always confirms before instantiation.
+Presets do **not** replace the goal-first flow. They are offered as a **match** during step 2 of team creation; instantiation proceeds directly with the match disclosed (users adjust afterwards via modify — no blocking confirmation).
 
 ## Preset file contract
 
@@ -49,10 +49,10 @@ Body sections (all mandatory):
 
 1. Run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<the user's goal text>"`. It scores every preset's `signals` + `pattern` keywords against the goal and returns JSON (`matches[]` with `preset_id`, `score`, `confidence`, `reasons`).
 2. Act on `confidence` — **the script scores, the agent decides**:
-   - `high` — present the top preset with its goal skeleton, roster and pattern, and **recommend reusing it**. Ask the user to confirm reuse, adapt, or start from scratch.
+   - `high` — present the top preset with its goal skeleton, roster and pattern, **recommend reusing it, and proceed with reuse**; the user can adapt or start from scratch afterwards via modify (no blocking choice point).
    - `medium` — present the top 2 candidates alongside the from-scratch option, without recommending.
    - `low` / `none` — say no preset matched and proceed with the normal goal-first derivation.
-3. Never instantiate a preset silently, and never let a preset override an explicit user instruction — a preset is a starting point, and every field stays editable at the confirmation gate.
+3. Never instantiate a preset silently, and never let a preset override an explicit user instruction — a preset is a starting point, and every field stays editable afterwards via `/speckit.team` modify / `improve-team`.
 4. On reuse, fill the preset's `inputs`, apply `## Instantiation`, then persist through the ordinary `team.md` schema. Record `preset: <preset_id>` in the persisted frontmatter so later `modify` runs know the origin.
 
 ## Adding a preset

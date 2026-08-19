@@ -73,18 +73,18 @@
 
 ### Tests for User Story 1 (MANDATORY) ⚠️
 
-- [ ] T010 [P] 编写结构契约测试 `tests/contract/test_confirmation_gates_team_flow.py`:断言 `templates/commands/team.md` 与 `skills/create-team/SKILL.md` 在一次性模式(parallel/serial/iteration)流程中不含阻塞确认指令("等待用户确认"/"MUST NOT execute before confirmation"族);含落盘后呈现 + 修改途径、执行报告引用、continuous 例外条款、收尾非阻塞提交提示 [blockedBy: T003]
+- [X] T010 [P] 编写结构契约测试 `tests/contract/test_confirmation_gates_team_flow.py`:断言 `templates/commands/team.md` 与 `skills/create-team/SKILL.md` 在一次性模式(parallel/serial/iteration)流程中不含阻塞确认指令("等待用户确认"/"MUST NOT execute before confirmation"族);含落盘后呈现 + 修改途径、执行报告引用、continuous 例外条款、收尾非阻塞提交提示 [blockedBy: T003]
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] 改写 `templates/commands/team.md`:移除创建确认门控(现 :50,83,84,97,102-104)与运行确认门控(现 :52,108-110,125,133-134),改为直接落盘/启动 + 呈现;收尾动作自动化;保留 continuous 分级门控条文;单行引用判据文档(team-flow-contract C-1/C-2/C-4/C-5) [blockedBy: T005,T010]
-- [ ] T012 [US1] 改写 `skills/create-team/SKILL.md`(现 :32,:38,:44,:236)与 `references/create-mode.md`(:16)、`references/team-presets.md`(:9,52,55)、`references/execution-guide.md`(:31):移除落盘/运行前确认,收尾提交提示改非阻塞一行(附 package 途径),补执行报告三要素;MUST NOT 触碰 `references/operating-loops.md` 与 `workspace-cluster.md` 的分级门控(team-flow-contract C-3/C-4/C-6) [blockedBy: T005,T010]
-- [ ] T013 [US1] 再生 team 命令 per-tool 副本:`python3 scripts/python/regen-command-copies.py`;grep-for-the-edit 验证 `.claude/commands/speckit.team.md`、`.qoder/commands/speckit.team.md`、`.github/prompts/speckit.team.prompt.md`、`.opencode/command/speckit.team.md` 均含改写(Mirror Obligations 行 1) [blockedBy: T011]
-- [ ] T014 [US1] `python3 scripts/python/sync-mirrors.py --write` 同步 create-team 技能;`diff -rq skills/create-team .specify/skills/create-team` 验证(Mirror Obligations 行 3) [blockedBy: T012]
+- [X] T011 [US1] 改写 `templates/commands/team.md`:移除创建确认门控(现 :50,83,84,97,102-104)与运行确认门控(现 :52,108-110,125,133-134),改为直接落盘/启动 + 呈现;收尾动作自动化;保留 continuous 分级门控条文;单行引用判据文档(team-flow-contract C-1/C-2/C-4/C-5) [blockedBy: T005,T010]
+- [X] T012 [US1] 改写 `skills/create-team/SKILL.md`(现 :32,:38,:44,:236)与 `references/create-mode.md`(:16)、`references/team-presets.md`(:9,52,55)、`references/execution-guide.md`(:31):移除落盘/运行前确认,收尾提交提示改非阻塞一行(附 package 途径),补执行报告三要素;MUST NOT 触碰 `references/operating-loops.md` 与 `workspace-cluster.md` 的分级门控(team-flow-contract C-3/C-4/C-6) [blockedBy: T005,T010]
+- [X] T013 [US1] 再生 team 命令 per-tool 副本:`python3 scripts/python/regen-command-copies.py`;grep-for-the-edit 验证 `.claude/commands/speckit.team.md`、`.qoder/commands/speckit.team.md`、`.github/prompts/speckit.team.prompt.md`、`.opencode/command/speckit.team.md` 均含改写(Mirror Obligations 行 1) [blockedBy: T011]
+- [X] T014 [US1] `python3 scripts/python/sync-mirrors.py --write` 同步 create-team 技能;`diff -rq skills/create-team .specify/skills/create-team` 验证(Mirror Obligations 行 3) [blockedBy: T012]
 
 ### Manual Verification for User Story 1
 
-- [ ] T015 [US1] 走查 quickstart.md §1:在改写后的 team 命令/技能指令面确认零阻塞确认、呈现与报告指令齐备、continuous 分支门控保留;结果记入 verification 素材 [blockedBy: T013,T014]
+- [X] T015 [US1] 走查 quickstart.md §1:在改写后的 team 命令/技能指令面确认零阻塞确认、呈现与报告指令齐备、continuous 分支门控保留;结果记入 verification 素材 [blockedBy: T013,T014]
 
 **Checkpoint**: User Story 1 (MVP) 独立可用——team 全流程零确认
 
