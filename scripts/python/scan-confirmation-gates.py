@@ -36,6 +36,12 @@ SCAN_DIRS = ("templates/commands", "skills", "shared")
 SCAN_ROOT_FILES = ("templates",)  # templates/*.md (non-directory entries)
 SKIP_DIR_PARTS = {".specify", ".claude", ".qoder", ".github", ".opencode", "__pycache__", ".archive"}
 SELF_REL = Path("shared/guidelines/confirmation-gates.md")
+# Policy anchors that DEFINE the confirmation discipline cite gate patterns
+# prescriptively — excluded from counting for the same reason as SELF_REL.
+POLICY_DOCS = (
+    Path("shared/patterns/reconcile-pattern.md"),
+    Path("shared/patterns/interview-pattern.md"),
+)
 
 BLOCKING_PATTERNS = (
     r"等待用户确认",
@@ -54,6 +60,7 @@ BLOCKING_PATTERNS = (
     r"Confirm and persist|确认并落盘|合并确认",
     r"Execute on Confirmation",
     r"interactive confirmation",
+    r"inviting the user to submit collected feedback",
 )
 BLOCKING_RE = re.compile("|".join(BLOCKING_PATTERNS))
 
@@ -105,7 +112,7 @@ def classify(rel_path: Path, line: str):
 def scan(root: Path):
     gates = []
     for path, rel in iter_source_files(root):
-        if rel == SELF_REL:
+        if rel == SELF_REL or rel in POLICY_DOCS:
             continue
         try:
             text = path.read_text(encoding="utf-8")

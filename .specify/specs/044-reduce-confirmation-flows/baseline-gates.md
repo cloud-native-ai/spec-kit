@@ -2,7 +2,10 @@
 
 **采集时间**: 2026-08-18(需求阶段全框架盘点,经 Explore 子代理核实)
 **口径**: 阻塞确认语义指令,源侧文件(mirror 与 per-tool 副本不计);与 gate-scanner-contract.md C-2 扫描根一致。
-**总数**: 61 处(实测,`scan-confirmation-gates.py` 2026-08-18 首扫;destructive=44 / governance_kept=14 / reversible=3,逐条记录见同目录 `baseline.json`)。分布:templates/commands 29、skills/create-team 10、shared/patterns 7、其余 skills 与 shared 15。
+**总数**: 93 处(实测,`scan-confirmation-gates.py` 修订版基线)。
+**基线修订(2026-08-19,implement Phase 4 前)**:首版基线 61 处遗漏提交提示样板模式族("inviting the user to submit collected feedback",约 30 处,分布于命令模板 + 技能 SKILL.md 的 Feedback 样板段);补全扫描模式后重冻基线为 93。修订属测量器具完备性修正(模式族补齐),非治理面变化;修订时点树状态 = Phase 3 结束态(team 面已治理)。分类:destructive=72 / governance_kept=20 / reversible=1,逐条记录见同目录 `baseline.json`。
+**口径细化(2026-08-19,Phase 4 治理中)**:判据真源自身(confirmation-gates.md)与两份**定义确认纪律的策略锚文档**(reconcile-pattern.md、interview-pattern.md)以规范口吻引用门控模式族,非待治理门控,自计数中排除(与 SELF_REL 同理);基线 93 保持不变(含该部分属保守口径)。
+**治理后实测(Phase 4 末)**:残留 22 处(destructive=12 / governance_kept=10),violations=[](reversible 阻塞门控零残留);降幅 (93−22)/93 = 76.3% ≥ 75%(SC-002 达标)。残留全部在保留清单语义内(删除前确认、分级门控、覆盖确认、远程推送、固有交互、治理保留)。
 
 ## 分布概览
 

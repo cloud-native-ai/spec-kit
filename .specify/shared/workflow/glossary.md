@@ -50,6 +50,10 @@ The engine reports **structural** collisions (identical canonical; a variant alr
 a different canonical). Additionally apply prompt-side judgment for **phonetic/near-duplicate**
 and **same-term/different-meaning** clashes.
 
+Non-conflicting writes MUST proceed directly (non-blocking) and be merged into the flow's
+wrap-up report — only conflicts and overwrites of user-authored entries stop for user
+resolution (see below; criteria: `shared/guidelines/confirmation-gates.md`).
+
 - On any detected or plausible conflict, **present it** (candidate, colliding entries, kind)
   and obtain an **explicit user resolution** (`keep-existing` / `replace` / `merge-variant` /
   `add-distinct` / `defer`) **before writing**.

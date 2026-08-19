@@ -76,8 +76,7 @@ content from the user.
    `041`). Different number spaces — never overload one field with both.
 6. **Consolidated submission prompt.** Read `should_prompt` from the `record` output
    (or run `--action status`). When it is `true`, surface a **single** consolidated
-   notification inviting the user to submit collected feedback to the Spec Kit developers;
-   on user confirmation run `--action mark-submitted`. Below threshold, do NOT prompt.
+   non-blocking notification inviting submission (attach the `--action package` path); the wrap-up MUST NOT pause for the choice and MUST NOT trigger any automated transmission (silence = skip). Below threshold, do NOT prompt.
    The detailed prompt semantics (package → manual send → mark-submitted, plus the
    skip / silence options) live in the canonical protocol:
    `.specify/shared/workflow/feedback-step.md` § *Threshold prompt protocol*.
@@ -95,8 +94,12 @@ qualifying unit records feedback for **its own** scope only, keyed by its own
 
 ## Threshold prompt protocol (canonical semantics for step 6)
 
-When `should_prompt` is `true`, surface **one** prompt offering exactly three choices
-(embedded copies that still say only "invite the user to submit" defer to this section):
+When `should_prompt` is `true`, append **one non-blocking notification** to the wrap-up
+report offering exactly three choices — the wrap-up MUST NOT pause waiting for the
+user's choice; the choice is honored whenever the user responds (same turn or later),
+and silence counts as **Skip this time** (the notification reappears only after more
+entries accumulate). It MUST NOT trigger any automated transmission.
+(Embedded copies that still say only "invite the user to submit" defer to this section):
 
 1. **Package for manual delivery** — run:
    ```bash

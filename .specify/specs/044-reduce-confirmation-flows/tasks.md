@@ -96,23 +96,23 @@
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T016 [P] 编写结构契约测试 `tests/contract/test_confirmation_gates_sweep.py`:按 baseline-gates.md 治理清单断言 auto_execute 面(goal/agents/skills/todo 批次/样板术语确认/样板提交提示)不再含阻塞样板;keep 面全在( feedback consume、docs 分级、session 同名覆盖、feature 状态回退、analyze 补救批准、interview、constitution 不可撤销、glossary 冲突、git-workflow 远程、tools invoke、commit 批准、implement CONFIRM)[blockedBy: T004]
+- [X] T016 [P] 编写结构契约测试 `tests/contract/test_confirmation_gates_sweep.py`:按 baseline-gates.md 治理清单断言 auto_execute 面(goal/agents/skills/todo 批次/样板术语确认/样板提交提示)不再含阻塞样板;keep 面全在( feedback consume、docs 分级、session 同名覆盖、feature 状态回退、analyze 补救批准、interview、constitution 不可撤销、glossary 冲突、git-workflow 远程、tools invoke、commit 批准、implement CONFIRM)[blockedBy: T004]
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] [P] 改写 `templates/commands/goal.md`(现 :28,47):目标定义写入由 preview→confirm 改为直接写入 + 执行报告;单行引用判据文档 [blockedBy: T005,T016]
-- [ ] T018 [US2] [P] 改写 `templates/commands/agents.md`(现 :43,70):模式选择与派发的阻塞确认改为直接执行 + 报告(破坏性分支除外)[blockedBy: T005,T016]
-- [ ] T019 [US2] [P] 改写 `templates/commands/skills.md`(现 :61-62):编辑 agent 文件的确认改为直接执行 + 报告 [blockedBy: T005,T016]
-- [ ] T020 [US2] 改写 `templates/commands/todo.md`:移除各批次执行前确认(现 :143,164-166,206,249),改为自动执行 + 逐批报告——批次是用户明确请求执行的 TODO 计划,git 提供可逆性(执行级决策,理由记入 verification.md);保留 :272 commit 显式批准(governance-kept)与歧义停问 [blockedBy: T005,T016]
-- [ ] T021 [US2] 收尾术语确认非阻塞化:改写约 10 个命令模板的 Glossary wrap-up 步骤(requirements/plan/tasks/implement/goal/session/interview/docs/feedback/todo 等,以 baseline.json 实测清单为准)为直接写入 + 并入收尾报告;冲突/覆盖用户既有条目仍停等(FR-008 但书);每模板单行引用判据文档 [blockedBy: T005,T016]
-- [ ] T022 [US2] 反馈提交提示非阻塞化:改写约 20 个命令模板收尾段与 `shared/workflow/feedback-step.md`(现 :80),达阈值时仅在收尾报告附一行非阻塞提示(附 `--action package` 途径);绝不阻塞、绝不自动传输(D5)[blockedBy: T005,T016]
-- [ ] T023 [US2] 微调 `shared/workflow/glossary.md`:明确非冲突收尾术语直接写入(冲突确认条文不动)[blockedBy: T005,T016]
-- [ ] T024 [US2] 再生全部受影响命令 per-tool 副本:`python3 scripts/python/regen-command-copies.py`;grep-for-the-edit 验证受影响 stem(goal/agents/skills/todo + 全部样板受影响命令)的 `.claude/.qoder/.github/prompts/.opencode` 副本均含改写(Mirror Obligations 行 1) [blockedBy: T017,T018,T019,T020,T021,T022]
-- [ ] T025 [US2] `python3 scripts/python/sync-mirrors.py --write` 同步 shared/workflow 改动(feedback-step.md、glossary.md);`diff -q` 验证(Mirror Obligations 行 3) [blockedBy: T022,T023]
+- [X] T017 [US2] [P] 改写 `templates/commands/goal.md`(现 :28,47):目标定义写入由 preview→confirm 改为直接写入 + 执行报告;单行引用判据文档 [blockedBy: T005,T016]
+- [X] T018 [US2] [P] 改写 `templates/commands/agents.md`(现 :43,70):模式选择与派发的阻塞确认改为直接执行 + 报告(破坏性分支除外)[blockedBy: T005,T016]
+- [X] T019 [US2] [P] 改写 `templates/commands/skills.md`(现 :61-62):编辑 agent 文件的确认改为直接执行 + 报告 [blockedBy: T005,T016]
+- [X] T020 [US2] 改写 `templates/commands/todo.md`:移除各批次执行前确认(现 :143,164-166,206,249),改为自动执行 + 逐批报告——批次是用户明确请求执行的 TODO 计划,git 提供可逆性(执行级决策,理由记入 verification.md);保留 :272 commit 显式批准(governance-kept)与歧义停问 [blockedBy: T005,T016]
+- [X] T021 [US2] 收尾术语确认非阻塞化:改写约 10 个命令模板的 Glossary wrap-up 步骤(requirements/plan/tasks/implement/goal/session/interview/docs/feedback/todo 等,以 baseline.json 实测清单为准)为直接写入 + 并入收尾报告;冲突/覆盖用户既有条目仍停等(FR-008 但书);每模板单行引用判据文档 [blockedBy: T005,T016]
+- [X] T022 [US2] 反馈提交提示非阻塞化:改写约 20 个命令模板收尾段与 `shared/workflow/feedback-step.md`(现 :80),达阈值时仅在收尾报告附一行非阻塞提示(附 `--action package` 途径);绝不阻塞、绝不自动传输(D5)[blockedBy: T005,T016]
+- [X] T023 [US2] 微调 `shared/workflow/glossary.md`:明确非冲突收尾术语直接写入(冲突确认条文不动)[blockedBy: T005,T016]
+- [X] T024 [US2] 再生全部受影响命令 per-tool 副本:`python3 scripts/python/regen-command-copies.py`;grep-for-the-edit 验证受影响 stem(goal/agents/skills/todo + 全部样板受影响命令)的 `.claude/.qoder/.github/prompts/.opencode` 副本均含改写(Mirror Obligations 行 1) [blockedBy: T017,T018,T019,T020,T021,T022]
+- [X] T025 [US2] `python3 scripts/python/sync-mirrors.py --write` 同步 shared/workflow 改动(feedback-step.md、glossary.md);`diff -q` 验证(Mirror Obligations 行 3) [blockedBy: T022,T023]
 
 ### Manual Verification for User Story 2
 
-- [ ] T026 [US2] 扫描复扫 + 基线对比:`python3 scripts/python/scan-confirmation-gates.py --json --baseline baseline.json` —— 断言 total 降幅 ≥75%、by_class 残留全部在 keep 清单、violations=[]、退出码 0;实测数记入 verification 素材(quickstart §2) [blockedBy: T024,T025]
+- [X] T026 [US2] 扫描复扫 + 基线对比:`python3 scripts/python/scan-confirmation-gates.py --json --baseline baseline.json` —— 断言 total 降幅 ≥75%、by_class 残留全部在 keep 清单、violations=[]、退出码 0;实测数记入 verification 素材(quickstart §2) [blockedBy: T024,T025]
 
 **Checkpoint**: User Stories 1 AND 2 独立可用——team 零确认 + 全框架治理达标
 
