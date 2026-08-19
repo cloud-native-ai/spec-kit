@@ -1,0 +1,565 @@
+{
+  "total": 61,
+  "gates": [
+    {
+      "id": "gate-001",
+      "file": "templates/commands/agents.md",
+      "line": 70,
+      "trigger": "2. **Confirm the task** — present the agent's `name`, `description`, and the task to be executed. Ask the user to confir",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-002",
+      "file": "templates/commands/feature.md",
+      "line": 36,
+      "trigger": "- **Never regress status**: registry convergence must not move a feature's status backward (e.g. Implemented → Draft) wi",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-003",
+      "file": "templates/commands/implement.md",
+      "line": 29,
+      "trigger": "- **At wrap-up**, propose any new project-specific terms (`origin=auto`, `status=proposed`), excluding common words; run",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-004",
+      "file": "templates/commands/implement.md",
+      "line": 37,
+      "trigger": "- If incomplete: STOP, show table, ask \"Proceed anyway? (yes/no)\"",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-005",
+      "file": "templates/commands/instructions.md",
+      "line": 86,
+      "trigger": "- Record proposals via `python3 .specify/scripts/python/glossary-utils.py --action add --canonical \"<T>\" --meaning \"<M>\"",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-006",
+      "file": "templates/commands/instructions.md",
+      "line": 134,
+      "trigger": "- **Recall prior project memory** (native `memory-recall` skill): retrieve recorded conventions, user preferences, durab",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-007",
+      "file": "templates/commands/interview.md",
+      "line": 69,
+      "trigger": "| **Exit gate** | Per-mode convergence criterion above → present the consolidated understanding → **explicit user confir",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-008",
+      "file": "templates/commands/plan.md",
+      "line": 40,
+      "trigger": "- **At wrap-up**, propose any new project-specific terms (`origin=auto`, `status=proposed`), excluding common words; run",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-009",
+      "file": "templates/commands/requirements.md",
+      "line": 32,
+      "trigger": "- **At wrap-up**, propose any new project-specific terms (`origin=auto`, `status=proposed`), excluding common words; run",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-010",
+      "file": "templates/commands/session.md",
+      "line": 54,
+      "trigger": "Same-name conflict: if `.session-export/<name>/` already exists, refuse by default. Override (覆盖) only through an **inte",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-011",
+      "file": "templates/commands/skills.md",
+      "line": 61,
+      "trigger": "4. **Propose**: present a `| Agent | Skill | When to use |` table and wait for user confirmation before editing.",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-012",
+      "file": "templates/commands/tasks.md",
+      "line": 34,
+      "trigger": "- **At wrap-up**, propose any new project-specific terms (`origin=auto`, `status=proposed`), excluding common words; run",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-013",
+      "file": "templates/commands/team.md",
+      "line": 52,
+      "trigger": "4. **run** → `create-team` execution path: follow the **preview → confirm → execute** gate below.",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-014",
+      "file": "templates/commands/team.md",
+      "line": 77,
+      "trigger": "- **run** — restate the **goal**, render the team's structure, and execute it after confirmation → `create-team`",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-015",
+      "file": "templates/commands/team.md",
+      "line": 81,
+      "trigger": "The create path first checks whether the user passed an **already-defined goal**: when a token in `$ARGUMENTS` matches a",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "破坏性清单关键词:archive"
+    },
+    {
+      "id": "gate-016",
+      "file": "templates/commands/team.md",
+      "line": 95,
+      "trigger": "- **干跑校验**:每条候选在呈现前经 `python3 scripts/python/goal-utils.py targets <slug> --check \"<候选语句>\"` 干跑(零写入,校验器与 `--add` 同源);呈现给用",
+      "action_class": "reversible",
+      "verdict": "auto_execute",
+      "evidence": "两级判据:可逆动作自动执行"
+    },
+    {
+      "id": "gate-017",
+      "file": "templates/commands/team.md",
+      "line": 97,
+      "trigger": "- **批准与落盘**:一次**合并确认**(预览全部语句 → 单次用户批准)覆盖整组;随后**逐条**执行 `python3 scripts/python/goal-utils.py targets <slug> --add \"<语句>\"",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "破坏性清单关键词:覆盖"
+    },
+    {
+      "id": "gate-018",
+      "file": "templates/commands/team.md",
+      "line": 102,
+      "trigger": "- **成组路径(N teams : 1 Goal)**:分解批准后(或复用基线成立时),**每个 open Target 对应创建一个团队**——全部声明**同一 `goal_slug`**;每个团队的 roster/pattern 以其",
+      "action_class": "reversible",
+      "verdict": "auto_execute",
+      "evidence": "两级判据:可逆动作自动执行"
+    },
+    {
+      "id": "gate-019",
+      "file": "templates/commands/team.md",
+      "line": 104,
+      "trigger": "- **确认门禁一次性披露**:分支判定(命中的 goal-slug 与定义摘要)、分析结论、路径决策、提议集或复用声明、territory 划分提议(含 verify verdict)。同一 `goal_slug` 下已存在团队(扫描 `",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-020",
+      "file": "templates/commands/team.md",
+      "line": 108,
+      "trigger": "### Run Mode (preview → confirm → execute)",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-021",
+      "file": "templates/commands/team.md",
+      "line": 110,
+      "trigger": "The **run** mode MUST follow this sequence and MUST NOT execute before confirmation:",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-022",
+      "file": "templates/commands/todo.md",
+      "line": 40,
+      "trigger": "- **At wrap-up**, propose any new project-specific terms (`origin=auto`, `status=proposed`), excluding common words; run",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-023",
+      "file": "templates/commands/todo.md",
+      "line": 125,
+      "trigger": "**Recall prior memory first** (native `memory-recall` skill): search `.specify/memory/session/` and `.specify/memory/kno",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-024",
+      "file": "templates/commands/todo.md",
+      "line": 143,
+      "trigger": "- Require explicit user confirmation before proceeding to next batch",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-025",
+      "file": "templates/commands/todo.md",
+      "line": 164,
+      "trigger": "### Step 6: Execute on Confirmation",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-026",
+      "file": "templates/commands/tools.md",
+      "line": 54,
+      "trigger": "6. **invoke** → follow the **preview → confirm → execute** gate below.",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-027",
+      "file": "templates/commands/tools.md",
+      "line": 85,
+      "trigger": "### Invoke Mode (preview → confirm → execute)",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-028",
+      "file": "templates/commands/tools.md",
+      "line": 87,
+      "trigger": "Invocation is gated. The command MUST NOT execute a tool before explicit user confirmation:",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-029",
+      "file": "templates/commands/tools.md",
+      "line": 91,
+      "trigger": "3. **Confirmation gate** — prompt `Proceed with execution? (yes/no)` and execute **only** on an explicit `yes`. On anyth",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-030",
+      "file": "skills/create-agent/SKILL.md",
+      "line": 31,
+      "trigger": "The `kind` → layer mapping above is fixed; state the resolved layer in the confirmation gate and in the final report.",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-031",
+      "file": "skills/create-agent/SKILL.md",
+      "line": 47,
+      "trigger": "When a create request does not clearly map to a single `kind`, do **not** guess. Confirm with the user which authoring m",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-032",
+      "file": "skills/create-docs/SKILL.md",
+      "line": 75,
+      "trigger": "### Tiered Confirmation（分级确认门禁）",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-033",
+      "file": "skills/create-docs/SKILL.md",
+      "line": 92,
+      "trigger": "- **R4 写作计划 (inline)**: per document — target path, doc type, title, outline. Pure-write plans may be shown inline; conf",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-034",
+      "file": "skills/create-team/SKILL.md",
+      "line": 32,
+      "trigger": "6. **Confirm and persist** — present goal + roster + pattern, then write `team.md`.",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-035",
+      "file": "skills/create-team/SKILL.md",
+      "line": 38,
+      "trigger": "`/speckit.team run <slug>` loads a persisted team and executes it behind the mandatory **preview → confirm → execute** g",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-036",
+      "file": "skills/create-team/references/create-mode.md",
+      "line": 24,
+      "trigger": "1. **Recognize (deterministic, zero semantic guessing)** — run `python3 scripts/python/goal-utils.py list --json` for th",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "破坏性清单关键词:archive"
+    },
+    {
+      "id": "gate-037",
+      "file": "skills/create-team/references/create-mode.md",
+      "line": 42,
+      "trigger": "- the confirmation gate discloses in one place: the branch verdict, the analysis conclusion, the path decision, the prop",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-038",
+      "file": "skills/create-team/references/execution-guide.md",
+      "line": 31,
+      "trigger": "- **Disclosure and report.** The confirmation gate discloses `本次 Target: T-<nnn> — <statement>(<status>)` — appending th",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-039",
+      "file": "skills/create-team/references/goal.md",
+      "line": 42,
+      "trigger": "- **分解提议(goal-based 创建,042)**:分解路径产出**分解提议集**——每条候选为成果形语句(GD-2)、从属同一目标、自身独立成立者另立 goal;呈现前每条经 `targets <slug> --check` 干跑",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "破坏性清单关键词:覆盖"
+    },
+    {
+      "id": "gate-040",
+      "file": "skills/create-team/references/goal.md",
+      "line": 45,
+      "trigger": "- **focus_target(默认聚焦,042)**:goal-based 创建产出的 team.md 可在 frontmatter(`goal_slug` 之后)声明 `focus_target: T-<nnn>`——该团队**默认聚",
+      "action_class": "reversible",
+      "verdict": "auto_execute",
+      "evidence": "两级判据:可逆动作自动执行"
+    },
+    {
+      "id": "gate-041",
+      "file": "skills/create-team/references/operating-loops.md",
+      "line": 40,
+      "trigger": "- 「分级确认门禁」（人在场）≠「成熟度 + kill-switch」（可无人值守）",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-042",
+      "file": "skills/create-team/references/summary-mapping.md",
+      "line": 216,
+      "trigger": "被调技能默认有四道逐层交互确认门禁;团队触发是自动流程,故 MUST 以**非交互模式**调用,并在报告 `## 元信息` 标注该事实。装载用 `--load`(每次从台账重建)而非 `--update`:累积状态的权威在团队台账,不在派生",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "破坏性清单关键词:删除"
+    },
+    {
+      "id": "gate-043",
+      "file": "skills/create-team/references/team-presets.md",
+      "line": 55,
+      "trigger": "3. Never instantiate a preset silently, and never let a preset override an explicit user instruction — a preset is a sta",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-044",
+      "file": "skills/create-tools/SKILL.md",
+      "line": 62,
+      "trigger": "- **Never execute the tool while defining it.** Authoring is a write-a-record operation. Invocation is a separate mode b",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-045",
+      "file": "skills/draw-plantuml/references/guide/content.md",
+      "line": 250,
+      "trigger": "A -> B : 发送订单创建请求并等待确认",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-046",
+      "file": "skills/git-workflow/SKILL.md",
+      "line": 28,
+      "trigger": "**分级确认门禁**（与模式文档对齐）：",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-047",
+      "file": "skills/git-workflow/SKILL.md",
+      "line": 145,
+      "trigger": "当`.specify/git-workflow.md` 的 Git Workflow 托管块已填写且用户传入了具体操作参数时进入：用户指令并入期望态，按下列预定义操作收敛，写远端/直接合入类动作遵循 Overview 的分级确认门禁。命令序",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-048",
+      "file": "skills/improve-tools/SKILL.md",
+      "line": 48,
+      "trigger": "- **Never invoke the tool to \"test\" an improvement.** Verification is limited to checking that the source resolves. Actu",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-049",
+      "file": "skills/summarize-project/SKILL.md",
+      "line": 77,
+      "trigger": "四项核心内容各设门禁，按序逐层确认：起草 → 呈现 → 等待确认（通过/修改/跳过）。门禁 1 项目概览（含 `### 整体进度摘要`）；门禁 2 项目里程碑（跟踪表格 + 条件出图的里程碑视图 `happens` 条目 + 锚定 + 进度",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-050",
+      "file": "skills/summarize-project/references/data-model.md",
+      "line": 28,
+      "trigger": "- 结构在上下文中定稿后进入确认门禁；门禁通过即冻结，所有派生物（图表、叙述）必须与冻结的结构逐字一致。",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-051",
+      "file": "skills/summarize-project/references/degradation.md",
+      "line": 196,
+      "trigger": "**门禁仍走**：概览/里程碑/WBS/甘特四道确认门禁不跳过；但退化章节向用户呈现的是\"降级形态 + 材料声明\"，用户确认的是\"这些内容确实无材料、如实声明\"，而非确认一份编造内容。里程碑/甘特门禁在完全缺失时呈现的即\"本节不出图 + 声",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-052",
+      "file": "shared/definitions/tool-definitions.md",
+      "line": 121,
+      "trigger": "Prompt: `Proceed with execution? (yes/no)`",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-053",
+      "file": "shared/guidelines/task-complexity-rubric.md",
+      "line": 14,
+      "trigger": "| **High-stakes / Ambiguous** | High blast radius (shared infra, data migration, security, public API); hard or irrevers",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-054",
+      "file": "shared/patterns/interview-pattern.md",
+      "line": 30,
+      "trigger": "**判定口诀 (rule of thumb)**: 信息只在用户脑子里、且答案会长出新问题 → interview；有可描述的制品理想形态要反复收敛 → reconcile；靠打分逼近阈值 → iteration；源源不断的工作流 → co",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-055",
+      "file": "shared/patterns/interview-pattern.md",
+      "line": 36,
+      "trigger": "- 用户确认稳定 (interview: the exit gate) ≠ 质量阈值 (iteration: a score) ≠ 一次性预览确认 (confirmation gate)",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-056",
+      "file": "shared/patterns/interview-pattern.md",
+      "line": 60,
+      "trigger": "- [ ] Exit gate: present the consolidated understanding → explicit user confirmation",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-057",
+      "file": "shared/patterns/interview-pattern.md",
+      "line": 77,
+      "trigger": "- **Exit gate**: the session is done when the frontier is empty — every branch visited, nothing silently assumed, **no u",
+      "action_class": "governance_kept",
+      "verdict": "keep_gate",
+      "evidence": "治理保留清单(路径命中)"
+    },
+    {
+      "id": "gate-058",
+      "file": "shared/patterns/reconcile-pattern.md",
+      "line": 39,
+      "trigger": "- 分级确认门禁 (human present) ≠ 成熟度 + kill-switch (unattended-capable)",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-059",
+      "file": "shared/patterns/reconcile-pattern.md",
+      "line": 85,
+      "trigger": "- [ ] R4 Dry-run plan + tiered confirmation gates → artifact: plan",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-060",
+      "file": "shared/patterns/reconcile-pattern.md",
+      "line": 98,
+      "trigger": "### Tiered confirmation (分级确认门禁)",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    },
+    {
+      "id": "gate-061",
+      "file": "shared/workflow/glossary.md",
+      "line": 63,
+      "trigger": "without explicit user confirmation. The engine refuses an `auto` write over a `user` entry",
+      "action_class": "destructive",
+      "verdict": "keep_gate",
+      "evidence": "存疑从严(无可逆动作上下文)"
+    }
+  ],
+  "by_class": {
+    "destructive": 44,
+    "governance_kept": 14,
+    "reversible": 3
+  },
+  "by_verdict": {
+    "keep_gate": 58,
+    "auto_execute": 3
+  },
+  "baseline_delta": null,
+  "violations": []
+}

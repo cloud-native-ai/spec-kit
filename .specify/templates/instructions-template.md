@@ -16,6 +16,7 @@ This project documentation is distributed across several key files. You MUST ref
 | **Development** | `CONTRIBUTING.md` | Setup and Guidelines | Setup, testing, and pull request guidelines |
 | **Readme** | `README.md` or `README` | basic information of project | {TODO} |
 | **Project Documents** | `docs/` | High-level architecture | Architecture and design documentation |
+| **Confirmation Gates** | `.specify/shared/guidelines/confirmation-gates.md` | Confirmation-gate governance criteria | Two-level taxonomy (destructive/irreversible → front-loaded confirmation; reversible → auto-execute + execution report), destructive list, governance-kept list, doubtful-strict rule, anti-backflow constraint |
 | [Other Doc] | [Path] | [Purpose] | [Summary] |
 
 > **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
