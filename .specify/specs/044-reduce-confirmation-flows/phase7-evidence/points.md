@@ -1,0 +1,3 @@
+- token-efficiency: 基线失败集采集两次因 /tmp 越界被拒(自动模式边界),浪费两轮;仓库内 shell 重定向同样被拒——失败集 diff 应直接用 git worktree 基线运行对比,不依赖临时文件。
+- 指针/注册表文案落地前应先对 BLOCKING_PATTERNS 做字面预检("确认门控"字面在注册表自身引发 3 处扫描器假阳性,事后才发现);可在 scan 脚本加文本预检入口,或在协议节附禁词表。
+- 双副本仓库(scripts/ 与 .specify/scripts/)下,引擎改动必须先改契约测试实际加载的那份(script_api 加载 scripts/),否则 RED/GREEN 判定失真;本次靠测试失败才暴露。

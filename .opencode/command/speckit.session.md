@@ -48,6 +48,7 @@ Unknown intent → report the capability list (only `export` today); do not gues
    - **规模**: the estimated record size when obtainable.
 
    Same-name conflict: if `.session-export/<name>/` already exists, refuse by default. Override (覆盖) only through an **interactive confirmation** inside this gate (the override clears the directory before rewriting, no leftovers). There is no bypass flag of any kind; in non-interactive contexts a same-name re-export fails and the user picks another name.
+   > Gate probe: gate-session-export-overwrite — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 
 4. **Execute via the engine** — never reimplement export logic here:
 

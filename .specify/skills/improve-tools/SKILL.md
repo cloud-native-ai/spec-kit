@@ -46,6 +46,7 @@ The input is a description of the tool to improve. Interpret it as follows:
 
 - **Never regenerate from a template.** Field-level edits only; templates belong to `create-tools`.
 - **Never invoke the tool to "test" an improvement.** Verification is limited to checking that the source resolves. Actual execution goes through the `/speckit.tools` invoke mode's preview → confirm → execute gate.
+  > Gate probe: gate-improve-tools-no-test-invoke — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 - **Never silently promote to `Verified`.** Promotion is an explicit, validated decision reported to the user.
 - **Never weaken a behavioral rule without stated cause.** Rules are the record's safety surface; removing or loosening one requires the user's explicit instruction, recorded in the report.
 - **One record per invocation.** Improving several tools is several runs.

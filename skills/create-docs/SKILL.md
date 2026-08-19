@@ -73,6 +73,7 @@ Source precedence (low → high): templates < rules/thresholds < principles < ex
 - R6 verify (re-run validate; link/symlink integrity; `scaffold-hugo.py --action build --root .` when `hugo` is installed — a failed build is a convergence failure, an absent binary is not) → **残差报告** (inline): converged / archived / tolerated / pending-human-decision.
 
 ### Tiered Confirmation（分级确认门禁）
+> Gate probe: gate-create-docs-tiered-disposition — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 
 | Action class | Gate |
 |--------------|------|
@@ -90,6 +91,7 @@ Same engine, authoring semantics: the desired state **gains new documents** from
 - **R2 期望态**: the new compliant document(s) + index updates (the type dir's `index.md`; root `README.md` when a new indexed area appears).
 - **R3 差异**: the topic is already covered → propose a directional update of that existing document (single-target scope) instead of a near-duplicate new file.
 - **R4 写作计划 (inline)**: per document — target path, doc type, title, outline. Pure-write plans may be shown inline; confirm before writing.
+  > Gate probe: gate-create-docs-write-plan — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 - **R5 写作收敛** (safe-local-writes tier; auto-execute after plan confirmation):
   - **Naming**: lowercase `kebab-case.md`; never a reserved filename (README/ARCHITECTURE/CONTRIBUTING/CHANGELOG or later registrations); directory indexes are `index.md`, never a nested `README.md`.
   - **`decisions/`**: `NNNN-slug.md` with the next free number, status `Proposed`, registered in `decisions/index.md`; existing ADRs are never rewritten.

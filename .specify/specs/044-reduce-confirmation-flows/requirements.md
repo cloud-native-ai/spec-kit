@@ -100,6 +100,13 @@
 - **FR-010**: 自动执行中途失败时 MUST 如实报告失败与已产生的中间产物,MUST NOT 静默跳过或掩盖。
 - **FR-011**: 本需求 MUST NOT 削弱既有固有确认机制:访谈式交互的确认本质、宪章对不可撤销动作的确认要求、实现门禁的安全 CONFIRM 判定、git 工作流的远程操作门控,均维持原状。
 
+**门控必要性探针(Phase 7 追加)**
+
+- **FR-012**: 每个非 intrinsic 保留门控 MUST 挂一个必要性 feedback probe(probe 注册表对象 + 点位单行指针),覆盖率 20/20。
+- **FR-013**: probe MUST 在门控解除(用户已作出决定)后自动记录观察事实(gate_id、fired_during、触发上下文、决策信号 approved-as-is/modified/asked-questions/denied);MUST NOT 向用户追加提问,MUST NOT 阻塞宿主流程;记录失败 MUST NOT 使宿主流程失败。
+- **FR-014**: 门控观察条目 MUST 携带稳定标记 `confirm-gate`,并可通过 `feedback-utils.py --action list --contains confirm-gate` 检索聚合。
+- **FR-015**: probe 落地 MUST NOT 改变门控治理基线:扫描器门控总数保持 22、KEEP_LIST 不变、契约失败集零新增;指针措辞 MUST NOT 命中扫描器阻塞模式。
+
 ### Key Entities *(include if requirement involves data)*
 
 - **确认门控 (Confirmation Gate)**: 流程中"停下等待用户确认"的干预点;关键属性:触发场景、所保护动作的可逆性分类、治理后形态(保留前置确认 / 自动执行 + 事后报告)。
@@ -123,6 +130,13 @@
 - **SC-003 Source**: 契约测试——枚举改为自动执行的动作清单,逐一断言其收尾输出包含三要素。
 - **SC-004 Source**: 破坏性动作清单对照测试——清单内每个动作场景各断言一次"仍触发前置确认"。
 - **SC-005 Source**: 与 SC-002 同一门控扫描,在后续新增/修订命令的契约检查中持续运行。
+
+**Phase 7 追加**
+
+- **SC-006**: 非 intrinsic 保留门控的 probe 覆盖率 20/20(注册表对象与点位指针双向对账)。
+- **SC-007**: dry-run 记录可解析 gate probe(frontmatter 落 `probe/kind/slice`),且 `--action list --contains confirm-gate` 可检索。
+- **SC-008**: Phase 7 落地后扫描器 total == 22、契约失败集相对基线零新增。
+- **SC-006/007/008 Source**: `contracts/gate-probe-protocol.md` 契约 + 契约测试(test_feedback_probe_registry / test_feedback_probe_entry_schema / test_scan_confirmation_gates / test_confirmation_gates_sweep)+ `phase7-evidence/` dry-run 留痕。
 
 ## Out of Scope
 

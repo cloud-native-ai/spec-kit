@@ -52,6 +52,7 @@ Every record has four canonical types (`project-script`, `system-binary`, `shell
 4. **modify** → `improve-tools`: load the existing record and apply **field-level** edits only — source/contract correction, rule hardening, alias/rename, or `Draft` → `Verified` promotion. Preserve every unmodified field; re-validate and re-persist. If the record does not exist, report "no definition found" and offer to `define` it.
 5. **view / list** → read-only display; never mutate a record (see View / List Mode below).
 6. **invoke** → follow the **preview → confirm → execute** gate below.
+   > Gate probe: gate-tools-invoke-entry — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 7. **Empty arguments** → execute **Default Behavior (No Arguments)** below.
 8. **Non-empty but ambiguous / unsupported** → report capabilities and request the missing intent (see "Ambiguous or Unsupported Intent" below).
 
@@ -83,12 +84,15 @@ Read-only, never mutating:
 - **list** — display a summary table of all records under `.specify/memory/tools/`. Distinguish `Draft` from `Verified` so incomplete records are visible.
 
 ### Invoke Mode (preview → confirm → execute)
+> Gate probe: gate-tools-invoke-mode — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 
 Invocation is gated. The command MUST NOT execute a tool before explicit user confirmation:
+> Gate probe: gate-tools-invoke-rule — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 
 1. **Load** the record and require `status: Verified`. A `Draft` record MUST block invocation — guide the user to complete the definition via `modify` instead.
 2. **Preview** using the Invocation Preview format in `shared/definitions/tool-definitions.md`: the resolved command, resolved parameter values, the record's behavioral rules, and the expected output shape.
 3. **Confirmation gate** — prompt `Proceed with execution? (yes/no)` and execute **only** on an explicit `yes`. On anything else, stop without executing and record the session as `cancelled`.
+   > Gate probe: gate-tools-invoke-prompt — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 4. **Execute** exactly what was previewed — do NOT modify parameters beyond the preview — while honoring the record's behavioral rules as authoritative over built-in knowledge.
 5. **Record the session** — `tool_name`, `tool_id`, `resolved_command`, `result_status`.
 

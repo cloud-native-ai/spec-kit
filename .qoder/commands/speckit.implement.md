@@ -21,6 +21,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 2. **Check checklists status** (if `REQUIREMENTS_DIR/checklists/` exists):
    - Count total/completed/incomplete items per checklist
    - If incomplete: STOP, show table, ask "Proceed anyway? (yes/no)"
+     > Gate probe: gate-implement-checklist-waiver — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
    - If user proceeds: require waiver comment, record in `REQUIREMENTS_DIR/waivers.md`
    - If all complete: proceed automatically
 

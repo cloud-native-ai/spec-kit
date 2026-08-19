@@ -56,3 +56,11 @@ sc_rows_complete=true
 # -- Notes --
 
 notes=执行级决策与留痕:(1) T020 todo 批次确认移除的裁定理由——批次是用户明确请求执行的 TODO 计划、git 提供可逆性;与 tools invoke 保留门控的区别为"请求内执行 vs 即兴任意脚本";commit 显式批准保留(governance-kept)。(2) 基线修订(61→93):测量器具完备性修正,补提交提示样板模式族,留痕于 baseline-gates.md。(3) 口径细化:判据真源与两份策略锚文档自计数排除。(4) 同批契约重钉:042 时代 6 处旧门控语义断言按 044 新语义更新;已退役 .specify/templates/commands 镜像的 3 个 stale pin 清理(该镜像退役声明见 sync-mirrors.py 头部)。(5) 失败归因记录:2 次断言侧修复(节标题正则 ##/### 边界、workspace-cluster.md 路径),1 次被测侧修复(taxonomy 文档补"自动执行"字面),均于进度中归因声明。(6) 全部改写只落框架源侧,经 regen-command-copies.py + sync-mirrors.py 传播;客户项目经发布/init 自然获得(两顶帽子:框架作者帽)。
+
+# -- Phase 7: 门控必要性探针(2026-08-19) --
+
+phase7_probe_coverage=20/20  # 注册表对象 ↔ 点位指针双向对账(tool-definitions.md:121 与 tools.md:91 共用 gate-tools-invoke-prompt 一处对象、两处锚点)
+phase7_gate_total=22  # 指针落地后复扫不变:destructive=12 / governance_kept=10 / violations=0
+phase7_contract_delta=0  # 全量契约失败集相对 HEAD worktree 基线零新增(2 个环境性失败为未跟踪 __pycache__/.migration-backups 产物,与改动无关)
+phase7_dryrun=pass  # phase7-evidence/:record --lifecycle-point gate-tools-invoke-prompt → frontmatter probe/kind/slice 齐备;--action list --contains confirm-gate 检索命中
+phase7_notes=(1) 引擎最小改动:resolve_probe 增 (unit, lifecycle_point) 解析、record 透传 --lifecycle-point、reconcile embed 对账仅约束 wrap-up 类;无 lifecycle_point 的 record 行为字节级不变。(2) 指针措辞避开 BLOCKING_PATTERNS;注册表自身"确认门控"字面曾致 3 处假阳性,改写为"确认点"后归零。(3) intrinsic 排除口径:访谈问答/退出门与宪章不可撤销确认不挂 probe(确认即产品形态,必要性无信号)。

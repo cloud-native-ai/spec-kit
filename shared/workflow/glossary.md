@@ -66,6 +66,7 @@ resolution (see below; criteria: `shared/guidelines/confirmation-gates.md`).
 - `origin=user` entries are **authoritative**: automatic proposals MUST NOT overwrite them
   without explicit user confirmation. The engine refuses an `auto` write over a `user` entry
   unless `--confirmed-resolution` is given.
+  > Gate probe: gate-glossary-user-entry-overwrite — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 - User-authored entries are **preserved across regenerations** — instruction generation
   creates the glossary only if absent and never discards existing content.
 

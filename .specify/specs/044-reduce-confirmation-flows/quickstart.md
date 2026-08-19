@@ -45,3 +45,23 @@ python3 scripts/python/scan-confirmation-gates.py --json --baseline baseline.jso
 | 访谈退出门 | `/speckit.interview` 尝试收尾 | 需用户显式确认结果稳定 |
 
 **断言**:5/5 保留;任一缺失即 SC-004 失败。
+
+## 4. 门控必要性探针走查(SC-006 / SC-007)
+
+前置:`shared/definitions/probe-definitions.md` 已含 command-gate / skill-gate 两类 20 个对象,20 个点位带 `Gate probe:` 指针。
+
+1. 触发任一保留门控(如 `/speckit.tools invoke` 的执行确认)并完成用户决定。
+2. **预期**:执行 agent 在决定后自动记录观察事实:
+
+   ```bash
+   python3 .specify/scripts/python/feedback-utils.py --action record \
+     --unit-id /speckit.tools --unit-type command \
+     --lifecycle-point gate-tools-invoke-prompt \
+     --run-id "gate:gate-tools-invoke-prompt:<UTC ts>" \
+     --review "confirm-gate firing: <决策信号>; <触发上下文>; fired_during: <实际调用单元>" \
+     --points-file <要点文件>
+   ```
+
+3. **断言**:条目 frontmatter 落 `probe: gate-tools-invoke-prompt`、`kind: internal`、`slice: commands`;全程零额外提问、不阻塞宿主流程。
+4. 聚合检索:`python3 .specify/scripts/python/feedback-utils.py --action list --contains confirm-gate`。
+5. **预期**:所有门控触发证据可按标记一次性列出,供框架层确认设计分析(summary-first,不整文件注入)。

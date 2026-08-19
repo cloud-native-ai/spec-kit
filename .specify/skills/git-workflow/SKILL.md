@@ -26,6 +26,7 @@ skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 **容忍带**：同步状态 `0 0`、`.gitexcludes` 内容语义等价、Git Workflow 块与实际分支名一致——均标记「已一致（容忍）」不触发收敛；仅 ahead/behind 分叉、分支缺失、排除路径仍被跟踪等实质偏离进入收敛建议。
 
 **分级确认门禁**（与模式文档对齐）：
+> Gate probe: gate-git-workflow-tiered-mode — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 
 | 动作类 | 门禁 |
 |--------|------|
@@ -143,6 +144,7 @@ skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 ### 定向收敛（Execute）— 执行工作流
 
 当`.specify/git-workflow.md` 的 Git Workflow 托管块已填写且用户传入了具体操作参数时进入：用户指令并入期望态，按下列预定义操作收敛，写远端/直接合入类动作遵循 Overview 的分级确认门禁。命令序列见 [execute-commands.md](./references/execute-commands.md)。
+> Gate probe: gate-git-workflow-remote-ops — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 
 #### 3.1 加载配置
 

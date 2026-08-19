@@ -258,3 +258,62 @@ class TestProbesReconcile:
         ])
         assert rc == 2
         assert "speckit-ghost-wrapup" in capsys.readouterr().err
+
+
+GATE_REGISTRY = """# Feedback Probe Definitions
+
+## Classes
+
+| class_id | kind | collection | target_slice | processing | insertion_type |
+|----------|------|------------|--------------|------------|----------------|
+| command-wrapup | internal | command run review | commands | record→package | wrap-up |
+| skill-wrapup | internal | skill run review | skills | record→package | wrap-up |
+| command-gate | internal | gate firing evidence | commands | record→package | confirm-gate |
+
+## Objects
+
+| object_id | class_id | unit | lifecycle_point |
+|-----------|----------|------|-----------------|
+| speckit-plan-wrapup | command-wrapup | /speckit.plan | wrap-up |
+| skill-study-wrapup | skill-wrapup | skill:study-project | wrap-up |
+| gate-plan-sample | command-gate | /speckit.plan | gate-plan-sample |
+"""
+
+
+@pytest.mark.contract
+class TestGateProbeObjects:
+    """044 Phase 7: confirm-gate probes anchor via pointer lines, not embeds."""
+
+    def test_validate_accepts_confirm_gate_class(self, tmp_path: Path, capsys):
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "probes", "--validate",
+            "--workspace-root", str(_workspace(tmp_path, GATE_REGISTRY)),
+        ])
+        assert rc == 0
+
+    def test_reconcile_tolerates_gate_object_without_embed(
+        self, tmp_path: Path, capsys
+    ):
+        _embed_workspace(tmp_path)
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "probes", "--reconcile",
+            "--workspace-root", str(_workspace(tmp_path, GATE_REGISTRY)),
+        ])
+        assert rc == 0
+
+    def test_reconcile_still_flags_orphan_wrapup_with_gate_present(
+        self, tmp_path: Path, capsys
+    ):
+        _embed_workspace(tmp_path)
+        orphan = GATE_REGISTRY + (
+            "| speckit-ghost-wrapup | command-wrapup | /speckit.ghost | wrap-up |\n"
+        )
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "probes", "--reconcile",
+            "--workspace-root", str(_workspace(tmp_path, orphan)),
+        ])
+        assert rc == 2
+        assert "speckit-ghost-wrapup" in capsys.readouterr().err

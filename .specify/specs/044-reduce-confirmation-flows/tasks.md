@@ -185,3 +185,19 @@ T016 (契约测试) 完成后:
 2. **Incremental**: Phase 4 全框架治理(SC-002)→ Phase 5 报告全覆盖(SC-003)→ Phase 6 证据闭环(SC-004/SC-005 + GATE-1..5)。
 3. **执行级决策记录**: T020 的 todo 批次自动执行裁定(批次=用户明确请求执行的计划、git 可逆;与 tools invoke 保留门控的区别在于"请求内执行 vs 即兴任意脚本")MUST 记入 verification.md,供 SC 复核引用。
 4. **防回流**: 此后任何新增命令/技能在契约测试 + 扫描脚本(退出码 2)双重约束下不得回流非破坏性门控(FR-003/SC-005)。
+
+## Phase 7: 门控必要性探针(044 完成后追加,FR-012~FR-015 / SC-006~SC-008)
+
+- [X] T035 清单锁定:scanner 22 行 → 20 个 probe 对象映射(排除 interview intrinsic;tool-definitions.md:121 折叠进 gate-tools-invoke-prompt)
+- [X] T036 注册表:`shared/definitions/probe-definitions.md` 新增 command-gate / skill-gate 两类 + 20 个 Objects(canonical + `.specify/` 镜像)
+- [X] T037 引擎契约测试 RED:`tests/contract/test_feedback_probe_{registry,entry_schema}.py` 新增 gate 用例
+- [X] T038 引擎 GREEN:`feedback-utils.py` resolve_probe 支持 (unit, lifecycle_point)、record 透传 `--lifecycle-point`、reconcile 仅约束 wrap-up 对象(scripts/ + .specify/ 双副本)
+- [X] T039 协议:`shared/guidelines/confirmation-gates.md` 新增「门控观察协议」节(+ 镜像)
+- [X] T040 指针:命令模板(feature/implement/session/tools)与 shared(rubric/glossary/tool-definitions)
+- [X] T041 指针:skills(create-docs/create-team/create-tools/git-workflow/improve-tools/summarize-project)
+- [X] T042 指针措辞复扫:避开 BLOCKING_PATTERNS(注册表自身"确认门控"字面改写为"确认点")
+- [X] T043 传播:`sync-mirrors.py --write`(含 regen-command-copies 委托)
+- [X] T044 复扫:`scan-confirmation-gates.py --json` total==22、violations 空;契约失败集与 HEAD 基线 diff 零新增
+- [X] T045 dry-run 证据:`phase7-evidence/` 内 record 落 probe/kind/slice + `--contains confirm-gate` 检索通过
+- [X] T046 quickstart §4 走查
+- [X] T047 features.md 046 行更新

@@ -75,6 +75,7 @@ R 档只三条：`project_name`、`baseline_date`、`work_items`/`milestones` �
 ### Step 4: 逐层交互式确认（四道门禁）
 
 四项核心内容各设门禁，按序逐层确认：起草 → 呈现 → 等待确认（通过/修改/跳过）。门禁 1 项目概览（含 `### 整体进度摘要`）；门禁 2 项目里程碑（跟踪表格 + 条件出图的里程碑视图 `happens` 条目 + 锚定 + 进度汇总表）；门禁 3 功能分解 WBS（须渲染确认，含 `### 工作项进度` + `### 人员与分工`）；门禁 4 任务进展甘特图（须渲染确认，含 `### 进度叙述`）。确认即冻结；非交互模式（用户显式声明跳过）自动通过全部门禁并标注。详见各层参考文档与 [reporting-playbook.md](references/reporting-playbook.md) §3。
+> Gate probe: gate-summarize-project-four-gates — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 
 ### Step 5: 组装报告与剩余内容
 

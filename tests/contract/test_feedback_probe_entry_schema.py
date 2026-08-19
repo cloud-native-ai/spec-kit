@@ -136,3 +136,79 @@ class TestRecordProbeResolution:
             "--run-id", "x", "--review", "r", "--points", "p",
         ])
         assert rc == 2
+
+
+GATE_REGISTRY = """# Feedback Probe Definitions
+
+## Classes
+
+| class_id | kind | collection | target_slice | processing | insertion_type |
+|----------|------|------------|--------------|------------|----------------|
+| command-wrapup | internal | command run review | commands | record→package | wrap-up |
+| command-gate | internal | gate firing evidence | commands | record→package | confirm-gate |
+
+## Objects
+
+| object_id | class_id | unit | lifecycle_point |
+|-----------|----------|------|-----------------|
+| speckit-plan-wrapup | command-wrapup | /speckit.plan | wrap-up |
+| gate-plan-sample | command-gate | /speckit.plan | gate-plan-sample |
+"""
+
+
+@pytest.fixture
+def gate_workspace(tmp_path: Path) -> Path:
+    defs = tmp_path / ".specify" / "shared" / "definitions"
+    defs.mkdir(parents=True, exist_ok=True)
+    (defs / "probe-definitions.md").write_text(GATE_REGISTRY, encoding="utf-8")
+    return tmp_path
+
+
+@pytest.mark.contract
+class TestRecordGateProbeResolution:
+    """044 Phase 7: (unit, lifecycle_point) resolution for gate probes."""
+
+    def test_record_with_lifecycle_point_stamps_gate_object(
+        self, gate_workspace: Path, capsys
+    ):
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "record", "--workspace-root", str(gate_workspace),
+            "--unit-id", "/speckit.plan", "--unit-type", "command",
+            "--lifecycle-point", "gate-plan-sample",
+            "--run-id", "gate:gate-plan-sample:20260819T000000Z",
+            "--review", "confirm-gate firing: approved-as-is", "--points", "one point",
+        ])
+        assert rc == 0
+        meta, _body = feedback_utils.parse_frontmatter(
+            _entry_file(gate_workspace).read_text(encoding="utf-8"))
+        assert meta["probe"] == "gate-plan-sample"
+        assert meta["kind"] == "internal"
+        assert meta["slice"] == "commands"
+
+    def test_record_without_lifecycle_point_keeps_wrapup_resolution(
+        self, gate_workspace: Path, capsys
+    ):
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "record", "--workspace-root", str(gate_workspace),
+            "--unit-id", "/speckit.plan", "--unit-type", "command",
+            "--run-id", "wrapup-run", "--review", "review", "--points", "one point",
+        ])
+        assert rc == 0
+        meta, _body = feedback_utils.parse_frontmatter(
+            _entry_file(gate_workspace).read_text(encoding="utf-8"))
+        assert meta["probe"] == "speckit-plan-wrapup"
+
+    def test_record_unknown_lifecycle_point_exit2(
+        self, gate_workspace: Path, capsys
+    ):
+        capsys.readouterr()
+        rc = feedback_utils.main([
+            "--action", "record", "--workspace-root", str(gate_workspace),
+            "--unit-id", "/speckit.plan", "--unit-type", "command",
+            "--lifecycle-point", "gate-nonexistent",
+            "--run-id", "bad-gate", "--review", "r", "--points", "p",
+        ])
+        assert rc == 2
+        assert "lifecycle_point" in capsys.readouterr().err
