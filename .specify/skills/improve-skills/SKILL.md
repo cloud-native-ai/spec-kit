@@ -43,13 +43,14 @@ Batch procedure, ownership resolution, and routing rationale: [`./references/loo
    - If evidence is insufficient, ask one targeted question about what failed, what was inefficient, or what should happen differently next time.
 
 3. **Analyze user-provided emphasis and organize improvement items**
-   - Give the user's stated optimization direction a dedicated analysis pass: confirm which parts are already satisfied, which parts are missing, and which edits will directly address the request.
+   - Give the user's stated optimization direction a dedicated analysis pass: confirm what is already satisfied, what is missing, and which edits address the request.
    - Group observations by failure mode: trigger/discovery, scope inference, missing context, wrong tool choice, unsafe step, unclear output, validation gap, resource/reference issue, **constraint non-compliance** (workflow followed but a hard rule violated — diagnose as a constraint-*placement* problem per [`./references/constraint-placement.md`](./references/constraint-placement.md) before rewording the rule), or **cross-skill ownership boundary** (the undocumented boundary is the root cause, not any single step).
-   - For each item, record: observed symptom, likely cause in the current Skill instructions, desired next behavior, and the file section to change.
+   - **Misuse-vs-pitfall gate**: wrong-method expected behavior is not a pitfall — fix the method-selection branch. Detail: [`./references/loop-playbook.md`](./references/loop-playbook.md) `### Misuse-vs-pitfall reflection gate`.
+   - For each item, record: symptom, likely cause in the Skill instructions, desired next behavior, and the section to change.
    - **Run the matching fact-check gate before writing any capability or data claim** (delegation capability / data tables / tier-coverage tables) — verify the real surface, never write values or capabilities from memory. Gates: [`./references/loop-playbook.md`](./references/loop-playbook.md) `## Step 3`.
    - When an item must be **deferred for lack of evidence**, record which concrete evidence would unlock it. Discard one-off environment noise unless the Skill should handle it next run. Detail: same reference.
    - **Legacy path idioms** (bare relative paths, `${SKILL_ROOT}/X`, agent-specific install paths in prose) → rewrite as `${SKILL_HOME}/...`; mapping table in the same reference.
-   - **Feedback-section conformance**: verify the Skill's final workflow section is `## Feedback` opening with the runtime-mode gate; repair if missing or malformed, and apply to both mirrors. Malformed-criteria list, canonical-block source, and the standalone-mode exception: same reference, `### Feedback-section conformance`.
+   - **Feedback-section conformance**: verify the Skill's final workflow section is `## Feedback` opening with the runtime-mode gate; repair if missing or malformed, and apply to both mirrors. Malformed criteria, canonical-block source, standalone-mode exception: same reference, `### Feedback-section conformance`.
 
 4. **Correct the root causes with minimal changes**
    - Fix the instruction that caused the observed failure first (wrong arguments, nonexistent paths, invalid expected formats, incompatible metadata, missing prerequisite checks). For inefficiency, replace the inefficient step with a more direct method, deterministic script, or clearer decision branch.

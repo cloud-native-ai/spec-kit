@@ -1,10 +1,26 @@
 {
   "store": "feedback",
-  "updated": "2026-08-19T06:15:49Z",
+  "updated": "2026-08-19T07:24:39Z",
   "threshold": 10,
-  "count_since_submission": 5,
+  "count_since_submission": 6,
   "submitted_at": "2026-08-14T07:47:34Z",
   "entries": [
+    {
+      "id": "20260819T072439Z-skill-improve-skills",
+      "file": "20260819T072439Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "improve-skills-2026-08-19-misuse-vs-pitfall-gate",
+      "probe": "skill-improve-skills-wrapup",
+      "kind": "internal",
+      "slice": "skills",
+      "feature": "",
+      "feature_id": "",
+      "disposition": "",
+      "partial": false,
+      "created": "2026-08-19T07:24:39Z",
+      "summary": "Loop added the misuse-vs-pitfall reflection gate (SKILL.md Step-3 decision branch + loop-playbook detail section with worked case + 2 quality-checklist items), driven by a real incident where expected"
+    },
     {
       "id": "20260819T061549Z-speckit-implement",
       "file": "20260819T061549Z-speckit-implement.md",

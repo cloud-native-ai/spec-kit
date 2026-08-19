@@ -95,6 +95,39 @@ capacity templates vs responsibility templates), the root cause is the **undocum
 boundary itself**, not any single failing step. The fix usually includes writing the boundary
 down in both skills.
 
+### Misuse-vs-pitfall reflection gate
+
+Many observations recorded as "pitfalls" are not tool pitfalls at all — the executor chose a
+wrong method from the start, and the tool behaved exactly as designed. Recording expected
+behavior as a pitfall pollutes the learning store (memory records, agent-guide Known-Pitfalls
+sections, skill references) with noise that encodes misuse as tool blame.
+
+**Run this gate before labeling an observation a pitfall, and before writing any
+pitfall/lesson into memory, an agent guide, or a reference:**
+
+1. Is the observed behavior described anywhere as the tool's intended/documented behavior
+   (`--help`, official docs, the tool's own contract)?
+2. Did a different supported method exist that would have produced the desired result
+   directly — i.e. was the problem the *method choice*, not the tool?
+3. Would the same "problem" recur for any competent user of the chosen method?
+
+- **Yes to 1–2** → this is **expected behavior under misuse**, not a pitfall. Do NOT record
+  it as a pitfall. Instead fix the *method-selection instructions*: add an explicit decision
+  branch mapping each intent to the correct method (which tool/flag/entry point to use for
+  which goal). Optionally record a one-line *misuse guard* ("X is not for Y; use Z") — never
+  a pitfall entry describing the expected behavior as surprising.
+- **No** → a genuine pitfall: undocumented, surprising, or version-drifting behavior. Record
+  it with symptom, scope, and workaround as usual.
+
+**Worked case** (doc-workspace tooling): an agent inserted structured content via
+`block insert --text`, observed that newlines/lists/headings were flattened, and recorded it
+as a new pitfall entry plus a memory record. Wrong framing — `--text` is designed to hold one
+plain text block; flattening is its expected behavior. The correct method existed from the
+start: headings via `--heading --level`, one block per list item, or a whole-document write
+via `doc create/update --content-file` (the only path that parses Markdown into
+heading/table/list blocks). The fix is a method-selection decision branch (intent → correct
+entry point), not a pitfall entry.
+
 ### Legacy path idioms
 
 Flag these as migration candidates and apply the Migration Mapping table from
