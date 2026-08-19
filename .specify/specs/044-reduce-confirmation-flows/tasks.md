@@ -25,7 +25,7 @@
 - DoD-5: quickstart.md 三条走查通过(team 零确认、扫描前后对比、破坏性保留 5/5)
 - DoD-6: requirements.md 的 SC-001..SC-005 在 verification.md 逐条有状态行
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Completion Gate
 
@@ -124,12 +124,12 @@
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T027 [P] 编写结构契约测试 `tests/contract/test_confirmation_gates_execution_report.py`:断言判据文档执行报告节含三要素 + 琐碎并入 + 合并呈现 + 失败如实报告;断言 US1/US2 改写面(由测试内从 baseline 治理清单动态枚举,勿硬编码文件数)均含执行报告或收尾合并报告指令 [blockedBy: T003]
+- [X] T027 [P] 编写结构契约测试 `tests/contract/test_confirmation_gates_execution_report.py`:断言判据文档执行报告节含三要素 + 琐碎并入 + 合并呈现 + 失败如实报告;断言 US1/US2 改写面(由测试内从 baseline 治理清单动态枚举,勿硬编码文件数)均含执行报告或收尾合并报告指令 [blockedBy: T003]
 
 ### Implementation for User Story 3
 
-- [ ] T028 [US3] 执行报告指令补齐:逐一检查 US1/US2 改写的每个自动执行流程面,缺失三要素/合并报告指令者补齐(预期为少量补丁;改动文件与理由记入 verification.md) [blockedBy: T015,T026,T027]
-- [ ] T029 [US3] 传播 T028 改动(如有):regen-command-copies.py / sync-mirrors.py --write 并验证对应副本 [blockedBy: T028]
+- [X] T028 [US3] 执行报告指令补齐:逐一检查 US1/US2 改写的每个自动执行流程面,缺失三要素/合并报告指令者补齐(预期为少量补丁;改动文件与理由记入 verification.md) [blockedBy: T015,T026,T027]
+- [X] T029 [US3] 传播 T028 改动(如有):regen-command-copies.py / sync-mirrors.py --write 并验证对应副本 [blockedBy: T028]
 
 **Checkpoint**: All user stories independently functional
 
@@ -137,11 +137,11 @@
 
 **Purpose**: 再生 instructions、全量回归与 SC 证据闭环。
 
-- [ ] T030 再生本仓 instructions:运行 `/speckit.instructions` 对应脚本路径刷新 `.specify/instructions.md`(AGENTS.md/CLAUDE.md/QODER.md/.github/copilot-instructions.md 符号链接消费面);验证 Documentation Map 新行存在、符号链接完好(Mirror Obligations 行 2) [blockedBy: T009]
-- [ ] T031 全套件回归:运行全套 pytest,与 T001 基线按名称级 diff,零新增失败 [blockedBy: T029]
-- [ ] T032 quickstart §2/§3 走查:扫描对比度量(SC-002/SC-005 证据)+ 破坏性门控保留抽查 5/5(SC-004 证据),结果写入 verification.md [blockedBy: T026]
-- [ ] T033 SC-003 证据:枚举自动执行动作面,逐一确认报告覆盖(三要素或并入收尾),覆盖率 100% 写入 verification.md [blockedBy: T028]
-- [ ] T034 终验:`python3 scripts/python/regen-command-copies.py --check` 与 `python3 scripts/python/sync-mirrors.py --check` 均 exit 0(GATE-2) [blockedBy: T030,T031]
+- [X] T030 再生本仓 instructions:运行 `/speckit.instructions` 对应脚本路径刷新 `.specify/instructions.md`(AGENTS.md/CLAUDE.md/QODER.md/.github/copilot-instructions.md 符号链接消费面);验证 Documentation Map 新行存在、符号链接完好(Mirror Obligations 行 2) [blockedBy: T009]
+- [X] T031 全套件回归:运行全套 pytest,与 T001 基线按名称级 diff,零新增失败 [blockedBy: T029]
+- [X] T032 quickstart §2/§3 走查:扫描对比度量(SC-002/SC-005 证据)+ 破坏性门控保留抽查 5/5(SC-004 证据),结果写入 verification.md [blockedBy: T026]
+- [X] T033 SC-003 证据:枚举自动执行动作面,逐一确认报告覆盖(三要素或并入收尾),覆盖率 100% 写入 verification.md [blockedBy: T028]
+- [X] T034 终验:`python3 scripts/python/regen-command-copies.py --check` 与 `python3 scripts/python/sync-mirrors.py --check` 均 exit 0(GATE-2) [blockedBy: T030,T031]
 
 ## Dependencies & Execution Order
 
