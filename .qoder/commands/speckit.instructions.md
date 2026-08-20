@@ -1,3 +1,6 @@
+---
+description: 生成或更新项目指令文件与各工具兼容符号链接
+---
 <!-- AUTO-GENERATED from templates/commands/instructions.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

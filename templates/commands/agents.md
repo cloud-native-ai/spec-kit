@@ -1,5 +1,6 @@
 ---
 description: Single entry point for single-agent operations — create, refine, and run agents via intent routing.
+short-description: 单代理操作统一入口：按意图路由创建、优化或运行代理
 handoffs:
   - label: Update Instructions
     agent: speckit.instructions

@@ -1,3 +1,6 @@
+---
+description: 反馈机制本地管理：探测总览、处置、外部探针、消费反馈包
+---
 <!-- AUTO-GENERATED from templates/commands/feedback.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

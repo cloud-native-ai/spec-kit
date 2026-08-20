@@ -1,5 +1,6 @@
 ---
 description: Critically review the SDD process for the current feature and produce a self-contained, improvement-focused report for the spec-kit maintainers.
+short-description: 批判性评审当前特性的 SDD 过程，出具改进导向报告
 handoffs:
   - label: Analyze For Consistency
     agent: speckit.analyze

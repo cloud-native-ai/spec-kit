@@ -1,5 +1,6 @@
 ---
 description: Standardize and manage the project documentation space (root entry files + docs/ tree) by delegating to the create-docs skill — a single reconcile engine that observes, diffs through a tolerance band, dry-run plans, converges with archive-not-delete, and verifies; a writing commission routes to the skill's authoring flow.
+short-description: 文档空间治理入口：委托 create-docs 技能统一收敛与核对 docs 树
 handoffs:
   - label: Record to Memory
     agent: memory-record

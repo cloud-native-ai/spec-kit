@@ -1,3 +1,6 @@
+---
+description: 基于需求生成实现规划，产出 plan.md 设计产物
+---
 <!-- AUTO-GENERATED from templates/commands/plan.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

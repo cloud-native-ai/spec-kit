@@ -1,3 +1,6 @@
+---
+description: 为实现规划开展深度调研与分析
+---
 <!-- AUTO-GENERATED from templates/commands/research.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

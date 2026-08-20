@@ -1,3 +1,6 @@
+---
+description: 工具记录操作统一入口：定义、修改、查看或调用 Tool
+---
 <!-- AUTO-GENERATED from templates/commands/tools.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

@@ -1,5 +1,6 @@
 ---
 description: Local management interface for the feedback mechanism — four execution modes. Mode 1 (no arguments) prints every probe placed in the current project as a vertical tree; Mode 2 processes collected feedback (view/filter/dispose/package/post-package cleanup); Mode 3 injects an external probe for client-project custom skills/agents/commands (feedback stays client-local, never submitted upstream); Mode 4 consumes incoming feedback bundles from the framework's feedback/ intake directory (framework project ONLY).
+short-description: 反馈机制本地管理：探测总览、处置、外部探针、消费反馈包
 ---
 
 ## User Input

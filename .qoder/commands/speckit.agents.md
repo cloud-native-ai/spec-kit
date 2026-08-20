@@ -1,3 +1,6 @@
+---
+description: 单代理操作统一入口：按意图路由创建、优化或运行代理
+---
 <!-- AUTO-GENERATED from templates/commands/agents.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 > Compatibility: Follow VS Code Copilot custom agent format for `.agent.md` files.
 

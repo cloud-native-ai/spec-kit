@@ -1,5 +1,6 @@
 ---
 description: Maintain and refresh the project feature registry (index + per-feature detail files) based on repo context.
+short-description: 维护项目特性注册表（索引与特性详情文件）
 handoffs:
   - label: Create / Update Requirements
     agent: speckit.requirements

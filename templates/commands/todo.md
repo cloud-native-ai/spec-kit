@@ -1,5 +1,6 @@
 ---
 description: List all current TODO items (workspace SPECKIT TODO blocks + parked ideas), scan blocks into reviewable execution plans, insert new TODO blocks, or park free-floating ideas into the `.specify/memory/todo/` idea store.
+short-description: TODO 管家：列出、扫描、插入 TODO 块并寄存搁置想法
 handoffs:
   - label: Implement Plan
     agent: speckit.implement

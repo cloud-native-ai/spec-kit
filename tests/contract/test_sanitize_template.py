@@ -124,7 +124,9 @@ def test_four_tool_copies_exist_with_same_content():
     for copy in COPIES:
         assert copy.is_file(), f"missing per-tool copy: {copy}"
         copy_text = copy.read_text(encoding="utf-8")
-        assert copy_text.startswith("<!-- AUTO-GENERATED from templates/commands/sanitize.md"), \
+        # Qoder copies carry a description frontmatter above the marker.
+        body_text = re.sub(r"\A---\ndescription: [^\n]*\n---\n", "", copy_text)
+        assert body_text.startswith("<!-- AUTO-GENERATED from templates/commands/sanitize.md"), \
             f"copy missing AUTO-GENERATED header: {copy}"
         assert sentinel in copy_text, f"copy does not carry the template content: {copy}"
 

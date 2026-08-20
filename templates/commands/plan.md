@@ -1,5 +1,6 @@
 ---
 description: Implement the implementation planning workflow using the plan template to generate design artifacts.
+short-description: 基于需求生成实现规划，产出 plan.md 设计产物
 handoffs:
   - label: Create Tasks
     agent: speckit.tasks

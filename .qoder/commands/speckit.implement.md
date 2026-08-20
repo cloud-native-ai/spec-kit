@@ -1,3 +1,6 @@
+---
+description: 按 tasks.md 顺序逐项实现当前特性的全部任务
+---
 <!-- AUTO-GENERATED from templates/commands/implement.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

@@ -1,5 +1,6 @@
 ---
 description: Conduct in-depth research and analysis to support the implementation plan.
+short-description: 为实现规划开展深度调研与分析
 handoffs:
    - label: Build / Update Plan
       agent: speckit.plan

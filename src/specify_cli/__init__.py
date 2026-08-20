@@ -698,6 +698,11 @@ _ASSISTANT_EXTENSIONS = {
     "codex": "md",
 }
 
+# Assistants whose generated command files carry YAML frontmatter with a
+# `description` field (shown in the tool's slash-command palette). Qoder
+# documents `description` as a required field of `.qoder/commands/*.md`.
+_ASSISTANT_COMMAND_FRONTMATTER = {"qoder"}
+
 # Assistant → argument format placeholder
 _ASSISTANT_ARG_FORMATS = {
     "copilot": "$ARGUMENTS",
@@ -1407,10 +1412,23 @@ def generate_commands(
         import re
 
         description_match = re.search(
-            r'description:\s*["\']?([^"\']+)["\']?', file_content
+            r'^description:\s*["\']?([^"\']+)["\']?', file_content, re.MULTILINE
         )
         description = (
             description_match.group(1) if description_match else f"Command for {name}"
+        )
+
+        # Single-line description emitted into command-file frontmatter (see
+        # _ASSISTANT_COMMAND_FRONTMATTER); falls back to the full description.
+        short_description_match = re.search(
+            r'^short-description:\s*["\']?([^"\'\n]+)["\']?\s*$',
+            file_content,
+            re.MULTILINE,
+        )
+        frontmatter_description = (
+            short_description_match.group(1).strip()
+            if short_description_match
+            else description
         )
 
         # Extract script command for the script variant
@@ -1533,9 +1551,15 @@ def generate_commands(
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(toml_content)
         else:
-            # For "prompt.md" and "md" just write the body
+            # For "prompt.md" and "md" just write the body; tools that read a
+            # description from command frontmatter get it prepended on top.
+            content = f"<!-- {marker} -->\n" + body
+            if agent in _ASSISTANT_COMMAND_FRONTMATTER:
+                content = (
+                    f"---\ndescription: {frontmatter_description}\n---\n" + content
+                )
             with open(output_path, "w", encoding="utf-8") as f:
-                f.write(f"<!-- {marker} -->\n" + body)
+                f.write(content)
 
 
 def strip_comments(text: str) -> str:

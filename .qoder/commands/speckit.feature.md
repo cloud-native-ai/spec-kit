@@ -1,3 +1,6 @@
+---
+description: 维护项目特性注册表（索引与特性详情文件）
+---
 <!-- AUTO-GENERATED from templates/commands/feature.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

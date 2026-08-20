@@ -1,5 +1,6 @@
 ---
 description: Implement the feature by processing and implementing all tasks defined in tasks.md
+short-description: 按 tasks.md 顺序逐项实现当前特性的全部任务
 handoffs:
   - label: Review Implementation
     agent: speckit.review

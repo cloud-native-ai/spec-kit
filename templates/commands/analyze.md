@@ -1,5 +1,6 @@
 ---
 description: Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md, plan.md, tasks.md, and feature metadata after task generation.
+short-description: 跨产物只读一致性分析，检查需求/规划/任务间的漂移与缺口
 handoffs:
   - label: Update Feature Registry
     agent: speckit.feature

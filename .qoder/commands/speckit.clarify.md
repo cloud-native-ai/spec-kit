@@ -1,3 +1,6 @@
+---
+description: 识别特性产物中的欠指定区域，并将澄清答案写回对应阶段文件
+---
 <!-- AUTO-GENERATED from templates/commands/clarify.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

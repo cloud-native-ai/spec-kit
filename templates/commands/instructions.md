@@ -1,5 +1,6 @@
 ---
 description: Generate or update project instructions and compatibility symlinks, ensuring a consistent AI context across tools.
+short-description: 生成或更新项目指令文件与各工具兼容符号链接
 handoffs:
   - label: Record Run to Memory
     agent: memory-record

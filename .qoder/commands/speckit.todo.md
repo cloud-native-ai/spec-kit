@@ -1,3 +1,6 @@
+---
+description: TODO 管家：列出、扫描、插入 TODO 块并寄存搁置想法
+---
 <!-- AUTO-GENERATED from templates/commands/todo.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

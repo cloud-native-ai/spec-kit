@@ -1,3 +1,6 @@
+---
+description: 技能管理编排入口：委托创建或优化对应技能
+---
 <!-- AUTO-GENERATED from templates/commands/skills.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 > `/speckit.skills` is the orchestration entrypoint for Skill management. It delegates to `create-skills` (new) or `improve-skills` (existing, with mandatory spec-compliance modernization pass first).
 

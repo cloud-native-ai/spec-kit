@@ -1,5 +1,6 @@
 ---
 description: Author and manage project-level goal definitions — create, view, modify, manage Targets (scope slices), migrate a team's inline goal, and coordinate teams that share one goal.
+short-description: 创建、查看、修改项目目标，并协调共享该目标的团队
 argument-hint: "[create|view|modify|targets|migrate|coordinate] [goal-slug|team-slug]"
 ---
 

@@ -1,3 +1,6 @@
+---
+description: 批判性评审当前特性的 SDD 过程，出具改进导向报告
+---
 <!-- AUTO-GENERATED from templates/commands/review.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

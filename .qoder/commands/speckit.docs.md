@@ -1,3 +1,6 @@
+---
+description: 文档空间治理入口：委托 create-docs 技能统一收敛与核对 docs 树
+---
 <!-- AUTO-GENERATED from templates/commands/docs.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

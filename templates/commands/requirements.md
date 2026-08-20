@@ -1,5 +1,6 @@
 ---
 description: Create or update the Requirements from a natural language feature description.
+short-description: 从自然语言特性描述创建或更新 requirements.md
 handoffs:
    - label: Clarify Requirements
      agent: speckit.clarify

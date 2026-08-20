@@ -1,3 +1,6 @@
+---
+description: 基于设计产物生成依赖有序的 tasks.md 任务清单
+---
 <!-- AUTO-GENERATED from templates/commands/tasks.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

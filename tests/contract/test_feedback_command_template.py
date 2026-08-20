@@ -54,7 +54,7 @@ class TestFeedbackCommandTemplate:
         for directory, name in PRESENT_COPIES:
             copy = directory / name
             assert copy.is_file(), f"missing tool copy: {copy}"
-            head = "\n".join(copy.read_text(encoding="utf-8").splitlines()[:3])
+            head = "\n".join(copy.read_text(encoding="utf-8").splitlines()[:5])
             assert "AUTO-GENERATED" in head, f"{copy} missing AUTO-GENERATED header"
 
     def test_default_mode_is_probe_overview(self):

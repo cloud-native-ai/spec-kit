@@ -1,3 +1,6 @@
+---
+description: 为当前特性生成需求质量检查清单
+---
 <!-- AUTO-GENERATED from templates/commands/checklist.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

@@ -1,3 +1,6 @@
+---
+description: 将当前工具的会话历史增量蒸馏为主题聚合知识库
+---
 <!-- AUTO-GENERATED from templates/commands/history.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

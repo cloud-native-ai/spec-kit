@@ -1,3 +1,6 @@
+---
+description: 将当前会话导出到用户命名的目录
+---
 <!-- AUTO-GENERATED from templates/commands/session.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

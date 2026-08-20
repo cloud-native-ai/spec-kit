@@ -1,3 +1,6 @@
+---
+description: 框架资料卫生治理：检测过期残留并按两级判据清理
+---
 <!-- AUTO-GENERATED from templates/commands/sanitize.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

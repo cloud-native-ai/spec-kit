@@ -41,4 +41,5 @@ def test_v004_fanout_copies_carry_edit():
     text = QODER_COPY.read_text(encoding="utf-8")
     assert OLD_PHRASE not in text, "per-tool copy still has old phrase (regen missed)"
     assert NEW_PHRASE in text, "per-tool copy missing remediated phrase (regen missed)"
-    assert "AUTO-GENERATED" in text.splitlines()[0], "per-tool copy lost AUTO-GENERATED header"
+    head = "\n".join(text.splitlines()[:5])  # qoder copies carry description frontmatter above the marker
+    assert "AUTO-GENERATED" in head, "per-tool copy lost AUTO-GENERATED header"

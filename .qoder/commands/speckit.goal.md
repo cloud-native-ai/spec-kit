@@ -1,3 +1,6 @@
+---
+description: 创建、查看、修改项目目标，并协调共享该目标的团队
+---
 <!-- AUTO-GENERATED from templates/commands/goal.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

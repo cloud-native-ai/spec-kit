@@ -1,5 +1,6 @@
 ---
 description: Summarize the current tool's conversation history for this project into a theme-aggregated knowledge base under .specify/history/. Incremental — only new sessions are distilled on re-run.
+short-description: 将当前工具的会话历史增量蒸馏为主题聚合知识库
 handoffs:
   - label: Record to Memory
     agent: memory-record

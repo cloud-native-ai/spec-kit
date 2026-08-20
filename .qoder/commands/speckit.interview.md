@@ -1,3 +1,6 @@
+---
+description: 对目标产物执行多轮收敛访谈（定向访谈与漫游访谈）
+---
 <!-- AUTO-GENERATED from templates/commands/interview.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 

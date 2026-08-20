@@ -1,5 +1,6 @@
 ---
 description: Single entry point for all team operations — create, modify, and run agent teams via intent routing.
+short-description: 团队操作统一入口：按意图路由创建、修改或运行代理团队
 handoffs:
   - label: Update Instructions
     agent: speckit.instructions

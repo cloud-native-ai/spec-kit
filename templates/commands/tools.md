@@ -1,5 +1,6 @@
 ---
 description: Single entry point for all tool operations — define, modify, view, list, and invoke tool definition records via intent routing.
+short-description: 工具记录操作统一入口：定义、修改、查看或调用 Tool
 handoffs:
   - label: Update Instructions
     agent: speckit.instructions

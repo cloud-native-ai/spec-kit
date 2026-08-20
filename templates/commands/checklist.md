@@ -1,5 +1,6 @@
 ---
 description: Generate a requirements-quality checklist for the current feature (Feature as requirement-level scope).
+short-description: 为当前特性生成需求质量检查清单
 handoffs:
    - label: Back to Plan
      agent: speckit.plan

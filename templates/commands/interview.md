@@ -1,5 +1,6 @@
 ---
 description: "Run a relentless multi-round interview on any target artifact — Special Interview converges one named file, directory, or concept; Informal Interview maps a space you have not scoped yet. Both ask a full round at a time and converge until the user confirms the result is stable."
+short-description: 对目标产物执行多轮收敛访谈（定向访谈与漫游访谈）
 argument-hint: "[special|informal] [topic or target artifact] [resume]"
 scripts:
   sh: scripts/bash/check-prerequisites.sh --json --paths-only

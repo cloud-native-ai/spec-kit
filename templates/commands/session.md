@@ -1,5 +1,6 @@
 ---
 description: Export the current AI agent CLI session into a user-named directory — export-side naming for sessions that host CLIs cannot rename.
+short-description: 将当前会话导出到用户命名的目录
 argument-hint: "export --name <bundle-name> [--session <id>] [--tool <name>] [--verify <text>]"
 ---
 

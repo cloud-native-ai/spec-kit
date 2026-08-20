@@ -1,5 +1,6 @@
 ---
 description: Create Agent Skills
+short-description: 技能管理编排入口：委托创建或优化对应技能
 handoffs:
   - label: Update Instructions
     agent: speckit.instructions

@@ -1,5 +1,6 @@
 ---
 description: Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
+short-description: 创建或更新项目宪法，并保持依赖模板同步
 handoffs:
    - label: Refresh Feature Registry
       agent: speckit.feature

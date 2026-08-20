@@ -1,5 +1,6 @@
 ---
 description: "Identify underspecified areas in the current feature artifacts and encode answers back into the phase target (pre-plan requirements.md, post-plan plan.md, post-tasks tasks.md)."
+short-description: 识别特性产物中的欠指定区域，并将澄清答案写回对应阶段文件
 handoffs:
   - label: Build Technical Plan
     agent: speckit.plan

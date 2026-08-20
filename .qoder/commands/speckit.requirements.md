@@ -1,3 +1,6 @@
+---
+description: 从自然语言特性描述创建或更新 requirements.md
+---
 <!-- AUTO-GENERATED from templates/commands/requirements.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input
 
