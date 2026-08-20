@@ -75,6 +75,22 @@ def test_feedback_disk_entry_without_index(tmp_path):
     assert any("20260820T000000Z-unit.md" in f["target"] for f in findings)
 
 
+def test_feedback_bookkeeping_files_exempt(tmp_path):
+    """Store scaffolding (logs / probe-map) is not feedback entries."""
+    ws = make_ws(tmp_path)
+    fb = ws / ".specify" / "memory" / "feedback"
+    fb.mkdir(parents=True, exist_ok=True)
+    (fb / "index.json").write_text(json.dumps({
+        "store": "feedback", "updated": "x", "threshold": 10, "count_since_submission": 0,
+        "entries": [],
+    }), encoding="utf-8")
+    for name in ("cleanup-log.md", "consume-log.md", "migration-log.md",
+                 "migration-plan.md", "probe-map.md"):
+        (fb / name).write_text("# bookkeeping\n", encoding="utf-8")
+    findings = su.check_index_consistency(ws)
+    assert not any(name in f["target"] for f in findings)
+
+
 # --- evidence family (C-8) -----------------------------------------------------------
 
 def test_evidence_index_run_without_dir(tmp_path):

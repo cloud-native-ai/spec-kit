@@ -63,3 +63,8 @@ input/
 .session-export/
 # 043: build-embedded source commit (build artifact)
 src/specify_cli/_source_commit.json
+
+# sanitize findings ledger (Feature 047): machine-regenerable runtime cache
+# (deterministic checkers re-derive findings on every collect); dogfood
+# evidence is recorded in the spec's verification.md instead.
+.specify/memory/sanitize/

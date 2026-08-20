@@ -94,12 +94,31 @@ def test_evidence_pack_gitlog_bounded_and_path_existence(tmp_path):
     assert pack["pathExistence"]["scripts/js/better-harness/session-analysis/platforms/claude.mjs"] is True
 
 
-def test_evidence_pack_since_uses_claim_date(tmp_path):
-    assemble_workspace(tmp_path)
-    candidates, _ = su.collect_semantic_candidates(tmp_path)
+def test_evidence_pack_covers_commits_predating_claim(tmp_path):
+    """Absence-of-work claims are often contradicted by commits that PREDATE
+    the claim date (the parking note copied a stale conclusion) — the pack
+    must not be date-filtered (real-case regression: 1a090c72 vs 0801 todo)."""
+    tmp = assemble_workspace(tmp_path)
+    candidates, _ = su.collect_semantic_candidates(tmp)
     pack = candidates[0]["evidencePack"]
-    # the claim postdates the import commit, so only the landing commit shows
-    assert not any("import material" in line for line in pack["gitLog"])
+    assert any("import material" in line for line in pack["gitLog"]), \
+        "commits older than the claim date must stay visible"
+
+
+def test_evidence_pack_fragment_globs_reach_deep_paths(tmp_path):
+    """Fragments without a rooted prefix (e.g. `platforms/claude.mjs`) glob to
+    their deep counterparts for git evidence."""
+    tmp = assemble_workspace(tmp_path)
+    text = (tmp / ".specify" / "memory" / "todo" / "20260812-backlog.md").read_text(encoding="utf-8")
+    # simulate a material that references only the bare fragment
+    (tmp / ".specify" / "memory" / "todo" / "fragment-only.md").write_text(
+        text.replace("scripts/js/better-harness/session-analysis/platforms/claude.mjs",
+                     "platforms/claude.mjs"), encoding="utf-8")
+    candidates, _ = su.collect_semantic_candidates(tmp)
+    by_material = {c["material"]: c for c in candidates}
+    pack = by_material[".specify/memory/todo/fragment-only.md"]["evidencePack"]
+    assert any("land all five items" in line for line in pack["gitLog"]), \
+        "fragment glob must reach the deep path's history"
 
 
 # --- git-unavailable degradation ------------------------------------------------------

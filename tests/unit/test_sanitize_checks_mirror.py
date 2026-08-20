@@ -92,6 +92,19 @@ def test_orphan_check_skipped_without_source_root(tmp_path):
     assert findings == []
 
 
+def test_agents_runtime_structure_not_flagged(tmp_path):
+    """`.specify/agents/` carries legitimate runtime structure (templates/
+    instances/execution per agent-definitions); orphan detection is scoped to
+    the skills pair only (dogfood-driven refinement)."""
+    mirror = tmp_path / ".specify" / "agents"
+    for sub in ("templates", "instances", "execution"):
+        (mirror / sub).mkdir(parents=True, exist_ok=True)
+        (mirror / sub / "x.md").write_text("#\n", encoding="utf-8")
+    (tmp_path / "agents").mkdir(exist_ok=True)
+    findings = su.find_orphan_mirror_dirs(tmp_path, set())
+    assert findings == []
+
+
 # --- obsolete-asset registry cross-check (C-12) ------------------------------------------
 
 def test_load_obsolete_registry_parses_markers(tmp_path):

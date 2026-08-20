@@ -312,14 +312,14 @@ SPECS_ARCHIVE_PREFIX = ".specify/specs/.archive/"
 
 
 def _iter_reference_materials(root: Path):
-    """Materials whose prose references are checked by the sanitize grammar.
+    """LIVE materials whose prose references are checked by the sanitize
+    grammar. Frozen history (`.specify/archive/**`, `.specify/history/**`) is
+    exempt — its references describe past states and are dead by design.
     Machine-generated stores (feedback/evidence/session/knowledge) are data,
     not prose — excluded. Docs tree is covered solely by the docs-utils lane."""
     candidates = [
         root / ".specify" / "memory" / "todo",
         root / ".specify" / "memory" / "draft",
-        root / ".specify" / "history",
-        root / ".specify" / "archive" / "spec",
     ]
     for base in candidates:
         if base.is_dir():
@@ -426,6 +426,7 @@ def check_dead_references(root: Path) -> list:
 
 
 FEATURES_ROW_RE = re.compile(r"^\| (\d{3}) \|")
+FEEDBACK_ENTRY_RE = re.compile(r"^\d{8}T\d{6}Z-")
 
 
 def check_index_consistency(root: Path) -> list:
@@ -490,8 +491,11 @@ def check_index_consistency(root: Path) -> list:
                         f"evidence 索引条目 {value} 指向不存在的运行目录"))
         store_dir = memory / store_name
         if key_field == "file":
+            # only timestamp-named entry files count on disk; bookkeeping files
+            # (cleanup-log / consume-log / migration-log / probe-map / ...) are
+            # store scaffolding, not feedback entries
             for path in sorted(store_dir.glob("*.md")):
-                if path.name not in indexed:
+                if path.name not in indexed and FEEDBACK_ENTRY_RE.match(path.name):
                     findings.append(_finding(
                         "index-inconsistency", path.relative_to(root).as_posix(),
                         f"feedback 条目文件 {path.name} 存在而索引无登记(反向缺项)"))
@@ -556,7 +560,11 @@ def parse_mirror_drift_lines(text: str) -> list:
     return items
 
 
-MIRROR_DIR_PAIRS = [("skills", ".specify/skills"), ("agents", ".specify/agents")]
+# Orphan-dir detection is scoped to the skills pair: `agents/` mirrors only
+# *.agent.md files while `.specify/agents/` additionally carries legitimate
+# runtime structure (templates/instances/execution per agent-definitions),
+# so source-less dirs there are not rename residue.
+MIRROR_DIR_PAIRS = [("skills", ".specify/skills")]
 
 
 def find_orphan_mirror_dirs(root: Path, registry: set) -> list:
@@ -655,6 +663,7 @@ FRONTMATTER_RE = re.compile(r"\A---\s*\n(.*?)\n---\s*\n?", re.S)
 CLAIM_PHRASES = ["未落地", "未实现", "未合入", "待办", "pending", "not landed", "TODO"]
 REPO_PATH_RE = re.compile(
     r"((?:scripts|shared|templates|docs|skills|agents|src|tests|\.specify)/[A-Za-z0-9_./-]+)")
+FILE_FRAGMENT_RE = re.compile(r"([A-Za-z0-9_][\w./-]*\.(?:mjs|py|md|sh|json|ts|vscdb|db))")
 
 
 def _parse_frontmatter(text: str) -> dict:
@@ -711,12 +720,16 @@ def collect_semantic_candidates(root: Path):
         if not relpath.endswith(".md"):
             continue
         text = (root / relpath).read_text(encoding="utf-8", errors="replace")
-        fm = _parse_frontmatter(text)
-        since = fm.get("parked_at") or fm.get("created") or None
         paths = extract_repo_paths(text)
+        # file-like fragments without a rooted prefix still carry locating
+        # power as glob pathspecs ("*platforms/opencode.mjs" matches
+        # scripts/js/.../platforms/opencode.mjs) — absence-of-work claims are
+        # often contradicted by commits that PREDATE the claim date, so the
+        # pack carries the latest bounded history instead of a since-window
+        fragments = [f for f in FILE_FRAGMENT_RE.findall(text) if f not in paths]
+        pathspecs = list(paths) + [f"*{f}" for f in fragments]
         log = _git(root, ["log", "--oneline", "-n", "20"]
-                   + (["--since", since] if since else [])
-                   + ["--"] + (paths or [".specify/memory"]))
+                   + ["--"] + (pathspecs or [".specify/memory"]))
         if log is None:
             notes.append("git unavailable - semantic detection degraded")
             return [], notes

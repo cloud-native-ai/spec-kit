@@ -44,6 +44,12 @@ HISTORICAL_PREFIXES = (
     ".specify/memory/features",
 )
 
+#: The sanitize findings ledger (Feature 047) is a machine-generated observation
+#: cache that records dead references to renamed paths by design.
+RUNTIME_CACHE_PREFIXES = (
+    ".specify/memory/sanitize/",
+)
+
 #: Migration guards must *name* the old path in order to assert its absence, so they
 #: are not offenders. Listed explicitly — never filtered by a silent pattern.
 GUARD_FILES = (
@@ -81,7 +87,7 @@ def _tracked_files_containing(needle: str) -> list[str]:
 
 
 def _is_historical(path: str) -> bool:
-    return any(path.startswith(prefix) for prefix in HISTORICAL_PREFIXES)
+    return any(path.startswith(prefix) for prefix in HISTORICAL_PREFIXES + RUNTIME_CACHE_PREFIXES)
 
 
 def _is_guard(path: str) -> bool:

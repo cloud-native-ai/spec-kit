@@ -7,7 +7,7 @@
 
 ## 1. 死引用(dead-reference)
 
-- C-1 抽取范围:资料根上的文本材料(memory 层 .md/.json 索引与条目、specs *.md、instructions、docs 树之外的材料)。**排除围栏代码块**(fenced code block)内部——与 docs-utils 断链检查的排除惯例一致;行内反引号内容**纳入**抽取。
+- C-1 抽取范围:**存活材料**——memory 层(todo/draft/顶层 .md)、存活 specs(.specify/specs/,排除 .archive)。**冻结历史豁免**:`.specify/archive/**` 与 `.specify/history/**` 不做引用检查——其引用描述归档/蒸馏时点的历史状态,"失效"是按设计而非缺陷。**排除围栏代码块**(fenced code block)内部——与 docs-utils 断链检查的排除惯例一致;行内反引号内容**纳入**抽取。
 - C-2 抽取语法(正则可表达,顺序应用):
   1. Markdown 链接 `[text](relpath)` / `[text](<relpath>)` → 相对链接,按所在文件目录解析;
   2. 行内代码/正文中的仓库相对路径:匹配已知根前缀 `scripts/`、`shared/`、`templates/`、`docs/`、`skills/`、`agents/`、`src/`、`tests/`、`.specify/` 开头的路径样式串;
@@ -22,7 +22,7 @@
 双向判定,每个索引族一组规则:
 
 - C-6 features 族:`features.md` 表行(ID、Feature Details 路径、Spec Path)↔ 磁盘文件,双向:行指向的文件缺失 / 磁盘存在 `features/<ID>.md` 而索引无行。
-- C-7 feedback 族:`feedback/index.json` 的 `entries[].file` ↔ 条目文件,双向。
+- C-7 feedback 族:`feedback/index.json` 的 `entries[].file` ↔ 条目文件,双向;磁盘侧只统计**时间戳命名形态**(`YYYYMMDDTHHMMSSZ-*.md`)的条目文件——簿记文件(cleanup-log/consume-log/migration-log/migration-plan/probe-map)是存储脚手架而非条目,豁免。
 - C-8 evidence 族:`evidence/index.json` 登记的运行目录 ↔ `ev-*` 目录,双向。
 - C-9 索引 JSON 自身不可解析 → 单条 index-inconsistency(target=索引文件),不逐条展开。
 
@@ -33,7 +33,7 @@
 ## 4. 镜像漂移(mirror-drift)
 
 - C-11 复用 `sync-mirrors.py --check` 的 JSON 输出:MISS/DIFF/ORPHAN 项逐条映射为 mirror-drift 发现(处置:MISS/DIFF → delegate(sync-mirrors);ORPHAN(多余文件)→ delegate)。
-- C-12 孤儿目录补检(引擎自实现,sync-mirrors 不覆盖):`.specify/skills/`、`.specify/agents/` 下存在而 `skills/`、`agents/` 源侧已无对应目录 → mirror-drift 发现;若该目录名未登记于 `src/specify_cli/__init__.py` 的 `_OBSOLETE_*` 注册表 → severity=high(未注册改名残留,对齐 AGENTS.md Rename/retire 纪律),处置 `delete`(破坏性,入清理计划)。
+- C-12 孤儿目录补检(引擎自实现,sync-mirrors 不覆盖,**仅限 skills 镜像对**——`agents/` 源侧只镜像 `*.agent.md` 而 `.specify/agents/` 另含合法运行时结构 templates/instances/execution,按 agent-definitions 分类法,源侧无对应目录不构成改名残留):`.specify/skills/` 下存在而 `skills/` 源侧已无对应目录 → mirror-drift 发现;若该目录名未登记于 `src/specify_cli/__init__.py` 的 `_OBSOLETE_*` 注册表 → severity=high(未注册改名残留,对齐 AGENTS.md Rename/retire 纪律),处置 `delete`(破坏性,入清理计划)。
 - C-13 引擎自身 strict 镜像(`scripts/python/sanitize-utils.py` ↔ `.specify/scripts/python/`)漂移同样报告(自检不豁免镜像纪律)。
 
 ## 5. 语义证据包(stale-residue / redundant 的输入)
@@ -41,8 +41,8 @@
 - C-14 候选材料:memory-todo/memory-draft 根下的 .md(每文件一候选)。
 - C-15 claims 抽取(机械):frontmatter 日期字段(parked_at/created/status 等)+ 正文中的状态声明短语(如"未落地""待办""P1–P5"清单行、"status: parked/draft")。抽取为短语列表,不做语义归纳。
 - C-16 evidencePack 组装:
-  - `gitLog`:`git log --oneline -n 20 --since <材料声明日期> -- <材料引用的路径列表>`(材料中按 C-2 语法抽取的路径;无路径时退化为 `--all -- <memory 根>`);输出截断 20 行;
-  - `pathExistence`:材料引用路径 → 存在/缺失映射。
+  - `gitLog`:`git log --oneline -n 20 -- <pathspecs>`——pathspec 由材料中的根前缀路径 + **文件名片段 glob**(`*<fragment>`,如 `*platforms/opencode.mjs` 匹配深层同尾路径)组成;**无日期过滤**——"未落地"类声明断言工作的缺失,矛盾提交常早于声明日期(结转抄写陈旧结论的典型形态),按计数截断(20 行)而非时间窗;无任何 pathspec 时退化为 `-- .specify/memory`;
+  - `pathExistence`:根前缀路径 → 存在/缺失映射(片段不参与,避免无根噪声)。
 - C-17 agent 判定输出(经 record 写入):verdict=stale-residue(声明与证据矛盾)/ redundant(内容已完整并入其他存活材料)/ insufficient(证据不足,不写入);每 verdict 附具体证据引用(commit 哈希/路径)。
 - C-18 处置映射:stale-residue → delete("已合入即删除"纪律);redundant → archive(被取代材料归档至 `.specify/archive/memory/<原相对路径>`)。
 

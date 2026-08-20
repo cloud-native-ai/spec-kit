@@ -51,10 +51,17 @@ HISTORICAL_RECORD_PREFIXES = (
     ".specify/memory/knowledge/",
 )
 
+# The sanitize findings ledger (Feature 047) is a machine-generated observation
+# cache whose job is recording dead references to renamed assets — every entry
+# names an old identifier by design, so the literal scan must skip it.
+RUNTIME_CACHE_PREFIXES = (
+    ".specify/memory/sanitize/",
+)
+
 
 def _is_historical(path: Path) -> bool:
     rel = path.relative_to(REPO_ROOT).as_posix()
-    return rel.startswith(HISTORICAL_RECORD_PREFIXES)
+    return rel.startswith(HISTORICAL_RECORD_PREFIXES + RUNTIME_CACHE_PREFIXES)
 
 
 # Sanctioned exception: the CLI's obsolete-asset cleanup registry names legacy

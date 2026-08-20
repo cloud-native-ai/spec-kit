@@ -110,3 +110,17 @@ def test_store_self_is_exempt_from_reference_scan(tmp_path):
         '{"notes": "references scripts/python/never-exists.py"}', encoding="utf-8")
     findings = su.check_dead_references(ws)
     assert not any("findings.json" in f["target"] for f in findings)
+
+
+def test_frozen_history_exempt_from_reference_scan(tmp_path):
+    """Archived specs and history distillations describe past states — their
+    references are dead by design, not findings (dogfood-driven refinement)."""
+    ws = make_ws(tmp_path)
+    archive = ws / ".specify" / "archive" / "spec" / "002-old"
+    archive.mkdir(parents=True, exist_ok=True)
+    (archive / "plan.md").write_text("see docs/usage.md and scripts/init.sh\n", encoding="utf-8")
+    history = ws / ".specify" / "history"
+    history.mkdir(parents=True, exist_ok=True)
+    (history / "01-some-topic.md").write_text("mentions docs/old-path.md\n", encoding="utf-8")
+    findings = su.check_dead_references(ws)
+    assert not any("archive/spec" in f["target"] or "history/" in f["target"] for f in findings)

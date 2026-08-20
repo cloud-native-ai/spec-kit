@@ -146,10 +146,10 @@
 
 **Purpose**: 镜像终验、全量回归、dogfood、SC 台账
 
-- [ ] T029 镜像义务终验:运行 `python3 scripts/python/sync-mirrors.py --write`;`diff -q` 核验引擎与 probe-definitions 两对镜像逐字节一致;`--check` exit 0[blockedBy: T023, T025]
-- [ ] T030 全量回归与 pin 卫生:全套件 vs baseline-failed.txt 名字级零新增失败;复核硬编码计数仅限"计数即契约"处(复杂命令 18、门控 total 23),其余以 len()/glob 派生[blockedBy: T011, T020, T027, T029]
-- [ ] T031 dogfood 检查运行(本仓真实工作区):执行 collect + 对 `.specify/memory/todo/20260812-evidence-session-backlog.md` 作语义判定并入台账,断言发现携带 1a090c72 证据引用;清理执行留给用户确认(非阻塞),如实报告发现清单[blockedBy: T029]
-- [ ] T032 撰写 `verification.md`:SC-001..005 逐条状态与证据(SC-001 夹具+dogfood 双源;SC-002 快照;SC-003 集成;SC-004 集成;SC-005 夹具+抽检记录),含 deferred_tasks 记录区[blockedBy: T030, T031]
+- [X] T029 镜像义务终验:运行 `python3 scripts/python/sync-mirrors.py --write`;`diff -q` 核验引擎与 probe-definitions 两对镜像逐字节一致;`--check` exit 0[blockedBy: T023, T025]
+- [X] T030 全量回归与 pin 卫生:全套件 vs baseline-failed.txt 名字级零新增失败;复核硬编码计数仅限"计数即契约"处(复杂命令 18、门控 total 23),其余以 len()/glob 派生[blockedBy: T011, T020, T027, T029]
+- [X] T031 dogfood 检查运行(本仓真实工作区):执行 collect + 对 `.specify/memory/todo/20260812-evidence-session-backlog.md` 作语义判定并入台账,断言发现携带 1a090c72 证据引用;清理执行留给用户确认(非阻塞),如实报告发现清单[blockedBy: T029]
+- [X] T032 撰写 `verification.md`:SC-001..005 逐条状态与证据(SC-001 夹具+dogfood 双源;SC-002 快照;SC-003 集成;SC-004 集成;SC-005 夹具+抽检记录),含 deferred_tasks 记录区[blockedBy: T030, T031]
 
 ---
 
