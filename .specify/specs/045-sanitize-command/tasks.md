@@ -126,17 +126,17 @@
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T021 [P] [US3] 契约测试(RED,append):apply 门与红线——未 confirmed 计划退出 2 零执行、越界 target(src//tests//.git/)退出 2、disposition 不一致退出 2、repair/dismiss 仅状态更新,追加至 `tests/contract/test_sanitize_engine_contract.py`(锚 contracts/sanitize-engine.md §2/§4)[blockedBy: T002]
-- [ ] T022 [P] [US3] 结构契约测试(RED):命令模板——流程锚文本(C-4..C-10)、红线声明(C-11..C-14)、门控指针行存在且不命中扫描器阻塞模式、## Feedback 步骤存在、4 副本一致性,写入 `tests/contract/test_sanitize_template.py`(锚 contracts/sanitize-command-template.md)
+- [X] T021 [P] [US3] 契约测试(RED,append):apply 门与红线——未 confirmed 计划退出 2 零执行、越界 target(src//tests//.git/)退出 2、disposition 不一致退出 2、repair/dismiss 仅状态更新,追加至 `tests/contract/test_sanitize_engine_contract.py`(锚 contracts/sanitize-engine.md §2/§4)[blockedBy: T002]
+- [X] T022 [P] [US3] 结构契约测试(RED):命令模板——流程锚文本(C-4..C-10)、红线声明(C-11..C-14)、门控指针行存在且不命中扫描器阻塞模式、## Feedback 步骤存在、4 副本一致性,写入 `tests/contract/test_sanitize_template.py`(锚 contracts/sanitize-command-template.md)
 
 ### Implementation for User Story 3
 
-- [ ] T023 [US3] 实现 cleanup-plan + apply `scripts/python/sanitize-utils.py`:计划校验、delete/archive(至 `.specify/archive/<原相对路径>`)机械执行、状态更新(resolved)、执行报告信封(三要素+失败如实)、executed 标记[blockedBy: T021, T005]
-- [ ] T024 [US3] 撰写命令模板 `templates/commands/sanitize.md`:frontmatter(script 指向引擎)、执行流 Preflight/Collect/Judge/Present/Confirm/Apply/Wrap-up、单行门控指针 `> Gate probe: gate-sanitize-destructive-cleanup — ...`、红线四条、## Feedback 与 ## Documentation 步骤(GREEN for T022)[blockedBy: T022, T023]
-- [ ] T025 [US3] 登记面同步:`shared/definitions/probe-definitions.md` Objects 表 +2 行(speckit-sanitize-wrapup / gate-sanitize-destructive-cleanup);`tests/contract/test_feedback_command_classification.py` 复杂命令计数 17→18;`.specify/specs/044-reduce-confirmation-flows/baseline.json` total +1;运行 `scan-confirmation-gates.py` 验证新门控归类 keep_gate 且 violations 为空[blockedBy: T024]
-- [ ] T026 [US3] 传播命令副本:运行 `python3 scripts/python/regen-command-copies.py`;核验 `.claude/commands/speckit.sanitize.md`、`.github/prompts/speckit.sanitize.prompt.md`、`.opencode/command/speckit.sanitize.md`、`.qoder/commands/speckit.sanitize.md` 四副本含同一编辑且 `--check` 零 stale[blockedBy: T024]
-- [ ] T027 [US3] 集成测试 `tests/integration/test_sanitize_us3.py`:未确认 apply 拒绝且零删除零移动 → confirmed 后 delete/archive 执行 → 状态 pending→resolved → 执行报告三要素 + 失败如实报告路径(SC-003)[blockedBy: T023, T013]
-- [ ] T028 [US3] 用户文档与 Tool 记录:`docs/reference/commands/sanitize.md`(既有命令文档格式:标题/模式/bash 示例/Exit Codes/See Also;CLI 示例与契约测试钉死的语法一致)+ `.specify/memory/tools/sanitize-utils.py.md`(Tool Reuse 纪律:行为规则+环境适用性)[blockedBy: T024, T023]
+- [X] T023 [US3] 实现 cleanup-plan + apply `scripts/python/sanitize-utils.py`:计划校验、delete/archive(至 `.specify/archive/<原相对路径>`)机械执行、状态更新(resolved)、执行报告信封(三要素+失败如实)、executed 标记[blockedBy: T021, T005]
+- [X] T024 [US3] 撰写命令模板 `templates/commands/sanitize.md`:frontmatter(script 指向引擎)、执行流 Preflight/Collect/Judge/Present/Confirm/Apply/Wrap-up、单行门控指针 `> Gate probe: gate-sanitize-destructive-cleanup — ...`、红线四条、## Feedback 与 ## Documentation 步骤(GREEN for T022)[blockedBy: T022, T023]
+- [X] T025 [US3] 登记面同步:`shared/definitions/probe-definitions.md` Objects 表 +2 行(speckit-sanitize-wrapup / gate-sanitize-destructive-cleanup);`tests/contract/test_feedback_command_classification.py` 复杂命令计数 17→18;`.specify/specs/044-reduce-confirmation-flows/baseline.json` total +1;运行 `scan-confirmation-gates.py` 验证新门控归类 keep_gate 且 violations 为空[blockedBy: T024]
+- [X] T026 [US3] 传播命令副本:运行 `python3 scripts/python/regen-command-copies.py`;核验 `.claude/commands/speckit.sanitize.md`、`.github/prompts/speckit.sanitize.prompt.md`、`.opencode/command/speckit.sanitize.md`、`.qoder/commands/speckit.sanitize.md` 四副本含同一编辑且 `--check` 零 stale[blockedBy: T024]
+- [X] T027 [US3] 集成测试 `tests/integration/test_sanitize_us3.py`:未确认 apply 拒绝且零删除零移动 → confirmed 后 delete/archive 执行 → 状态 pending→resolved → 执行报告三要素 + 失败如实报告路径(SC-003)[blockedBy: T023, T013]
+- [X] T028 [US3] 用户文档与 Tool 记录:`docs/reference/commands/sanitize.md`(既有命令文档格式:标题/模式/bash 示例/Exit Codes/See Also;CLI 示例与契约测试钉死的语法一致)+ `.specify/memory/tools/sanitize-utils.py.md`(Tool Reuse 纪律:行为规则+环境适用性)[blockedBy: T024, T023]
 
 **Checkpoint**: 三个故事全部独立成立——完整命令可用,门控治理零回流
 

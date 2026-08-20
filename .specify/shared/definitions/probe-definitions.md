@@ -54,6 +54,7 @@
 | speckit-requirements-wrapup | command-wrapup | /speckit.requirements | wrap-up |
 | speckit-research-wrapup | command-wrapup | /speckit.research | wrap-up |
 | speckit-review-wrapup | command-wrapup | /speckit.review | wrap-up |
+| speckit-sanitize-wrapup | command-wrapup | /speckit.sanitize | wrap-up |
 | speckit-session-wrapup | command-wrapup | /speckit.session | wrap-up |
 | speckit-skills-wrapup | command-wrapup | /speckit.skills | wrap-up |
 | speckit-tasks-wrapup | command-wrapup | /speckit.tasks | wrap-up |
@@ -93,6 +94,7 @@
 | speckit-feedback-wrapup | command-wrapup | /speckit.feedback | wrap-up |
 | gate-feature-status-regression | command-gate | /speckit.feature | gate-feature-status-regression |
 | gate-implement-checklist-waiver | command-gate | /speckit.implement | gate-implement-checklist-waiver |
+| gate-sanitize-destructive-cleanup | command-gate | /speckit.sanitize | gate-sanitize-destructive-cleanup |
 | gate-session-export-overwrite | command-gate | /speckit.session | gate-session-export-overwrite |
 | gate-tools-invoke-entry | command-gate | /speckit.tools | gate-tools-invoke-entry |
 | gate-tools-invoke-mode | command-gate | /speckit.tools | gate-tools-invoke-mode |

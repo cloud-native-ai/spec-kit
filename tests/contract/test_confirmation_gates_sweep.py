@@ -36,6 +36,7 @@ KEEP_LIST = [
     ("shared/workflow/glossary.md", "--confirmed-resolution"),
     ("shared/definitions/tool-definitions.md", "Execution never happens before user confirmation via preview gate"),
     ("skills/create-team/references/operating-loops.md", "分级确认"),
+    ("templates/commands/sanitize.md", "等待用户确认后才执行"),
 ]
 
 

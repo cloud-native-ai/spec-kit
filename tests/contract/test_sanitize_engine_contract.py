@@ -142,6 +142,98 @@ def test_record_accepts_valid_semantic_finding(tmp_path):
 
 # --- apply: confirmation gate ----------------------------------------------------
 
+def test_apply_rejects_unknown_finding_exits_2(tmp_path):
+    plan = tmp_path / "cleanup-plan.json"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(json.dumps({
+        "created": "2026-08-20T00:00:00Z", "confirmed": True,
+        "items": [{"findingId": "nope", "disposition": "delete", "target": ".specify/memory/todo/x.md"}],
+    }), encoding="utf-8")
+    proc = run_engine(
+        ["--action", "apply", "--plan", str(plan), "--workspace-root", str(tmp_path)],
+        cwd=tmp_path,
+    )
+    assert proc.returncode == 2
+
+
+def test_apply_rejects_disposition_mismatch_exits_2(tmp_path):
+    finding = make_finding()  # suggested disposition: delete
+    todo = tmp_path / ".specify" / "memory" / "todo"
+    todo.mkdir(parents=True, exist_ok=True)
+    (todo / "example.md").write_text("x\n", encoding="utf-8")
+    store_path = tmp_path / STORE_REL
+    store_path.parent.mkdir(parents=True, exist_ok=True)
+    store_path.write_text(json.dumps({"version": 1, "updated": "x", "findings": [finding]}), encoding="utf-8")
+    plan = tmp_path / "cleanup-plan.json"
+    plan.write_text(json.dumps({
+        "created": "x", "confirmed": True,
+        "items": [{"findingId": finding["id"], "disposition": "archive", "target": finding["target"]}],
+    }), encoding="utf-8")
+    proc = run_engine(
+        ["--action", "apply", "--plan", str(plan), "--workspace-root", str(tmp_path)],
+        cwd=tmp_path,
+    )
+    assert proc.returncode == 2
+    assert (todo / "example.md").is_file(), "rejected plan must leave the material untouched"
+
+
+def test_apply_repair_is_state_only(tmp_path):
+    finding = make_finding(
+        category="dead-reference", target=".specify/memory/todo/example.md#scripts/x.py",
+        detection="programmatic", disposition="repair", severity="medium",
+        evidenceRefs=[{"kind": "path", "ref": "scripts/x.py"}],
+    )
+    todo = tmp_path / ".specify" / "memory" / "todo"
+    todo.mkdir(parents=True, exist_ok=True)
+    (todo / "example.md").write_text("x\n", encoding="utf-8")
+    store_path = tmp_path / STORE_REL
+    store_path.parent.mkdir(parents=True, exist_ok=True)
+    store_path.write_text(json.dumps({"version": 1, "updated": "x", "findings": [finding]}), encoding="utf-8")
+    plan = tmp_path / "cleanup-plan.json"
+    plan.write_text(json.dumps({
+        "created": "x", "confirmed": True,
+        "items": [{"findingId": finding["id"], "disposition": "repair", "target": finding["target"]}],
+    }), encoding="utf-8")
+    proc = run_engine(
+        ["--action", "apply", "--plan", str(plan), "--workspace-root", str(tmp_path)],
+        cwd=tmp_path,
+    )
+    assert proc.returncode == 0
+    assert (todo / "example.md").read_text(encoding="utf-8") == "x\n", "repair is state-only; the agent edits content"
+    store = json.loads((tmp_path / STORE_REL).read_text(encoding="utf-8"))
+    assert store["findings"][0]["state"] == "resolved"
+
+
+def test_apply_archive_moves_to_archive_root(tmp_path):
+    finding = make_finding(
+        category="redundant", target=".specify/memory/draft/old.md",
+        severity="low", summary="superseded by /speckit.docs rewrite",
+        evidenceRefs=[{"kind": "path", "ref": ".specify/memory/todo/new.md"}],
+        detection="semantic", disposition="archive",
+    )
+    draft = tmp_path / ".specify" / "memory" / "draft"
+    draft.mkdir(parents=True, exist_ok=True)
+    (draft / "old.md").write_text("old\n", encoding="utf-8")
+    store_path = tmp_path / STORE_REL
+    store_path.parent.mkdir(parents=True, exist_ok=True)
+    store_path.write_text(json.dumps({"version": 1, "updated": "x", "findings": [finding]}), encoding="utf-8")
+    plan = tmp_path / "cleanup-plan.json"
+    plan.write_text(json.dumps({
+        "created": "x", "confirmed": True,
+        "items": [{"findingId": finding["id"], "disposition": "archive", "target": finding["target"]}],
+    }), encoding="utf-8")
+    proc = run_engine(
+        ["--action", "apply", "--plan", str(plan), "--workspace-root", str(tmp_path)],
+        cwd=tmp_path,
+    )
+    assert proc.returncode == 0
+    assert not (draft / "old.md").exists(), "archived material leaves its origin"
+    archived = tmp_path / ".specify" / "archive" / "memory" / "draft" / "old.md"
+    assert archived.is_file() and archived.read_text(encoding="utf-8") == "old\n"
+    report = out_json(proc)
+    assert any(a["change"] == "archived" for a in report["artifacts"])
+
+
 def _make_plan(tmp_path, confirmed: bool) -> Path:
     finding = make_finding()
     todo = tmp_path / ".specify" / "memory" / "todo"

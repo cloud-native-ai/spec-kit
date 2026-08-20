@@ -1,6 +1,6 @@
 """Contract test (US2): command feedback-step classification.
 
-Driven by ``contracts/command-classification.md``: each of the 14 **complex**
+Driven by ``contracts/command-classification.md``: each of the 18 **complex**
 command templates contains the feedback step; each of the 4 **simple** templates
 (``agents``, ``constitution``, ``feature``, ``team``) does NOT.
 """
@@ -20,13 +20,13 @@ COMPLEX_COMMANDS = [
     "requirements", "clarify", "plan", "tasks", "implement",
     "analyze", "checklist", "review", "research",
     "instructions", "tools", "skills", "todo", "docs", "goal",
-    "interview", "feedback",
+    "interview", "feedback", "sanitize",
 ]
 SIMPLE_COMMANDS = ["agents", "constitution", "feature", "team"]
 
 
 def test_classification_counts():
-    assert len(COMPLEX_COMMANDS) == 17
+    assert len(COMPLEX_COMMANDS) == 18
     assert len(SIMPLE_COMMANDS) == 4
 
 

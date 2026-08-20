@@ -526,9 +526,18 @@ def check_broken_symlinks(root: Path) -> list:
 
 
 def run_sync_mirrors_check(root: Path):
-    """Run the sibling sync-mirrors.py --check in the workspace. Returns
+    """Run the sibling sync-mirrors.py --check. sync-mirrors resolves its repo
+    from its own script location, so the lane only runs when the workspace IS
+    that repo (framework dogfood or an installed client copy); against any
+    other workspace it would inspect the wrong tree — skip instead. Returns
     (returncode, stdout); stdout is parsed for drift lines regardless of rc."""
     script = Path(__file__).with_name("sync-mirrors.py")
+    try:
+        script_repo = script.resolve().parents[2]
+    except OSError:
+        return 0, ""
+    if root.resolve() != script_repo:
+        return 0, ""
     proc = subprocess.run(
         [sys.executable, str(script), "--check"],
         cwd=str(root), capture_output=True, text=True, timeout=180)
@@ -818,6 +827,8 @@ def cmd_apply(root: Path, plan_file: str) -> int:
             errors.append(f"item #{idx}: finding {f['id']} is {f['state']}, not pending")
         if item.get("disposition") not in APPLYABLE_DISPOSITIONS:
             errors.append(f"item #{idx}: disposition {item.get('disposition')} is not applyable (delegate items are recommendations, not plan rows)")
+        elif item["disposition"] != f["disposition"] and item["disposition"] != "dismiss":
+            errors.append(f"item #{idx}: disposition {item['disposition']} does not match the finding's suggestion {f['disposition']}")
         if item.get("target") != f["target"]:
             errors.append(f"item #{idx}: target mismatch with finding")
         if not is_material_target(root, item.get("target", "")):
@@ -843,11 +854,14 @@ def cmd_apply(root: Path, plan_file: str) -> int:
                 modify_paths.append(f"git history retains {target} (recoverable via git checkout)")
             elif disposition == "archive":
                 src = root / target
-                dest = root / ARCHIVE_REL / target
+                # archive preserves relative layout under .specify/archive/
+                # (a .specify-prefixed target drops its leading .specify/)
+                rel = target[len(".specify/"):] if target.startswith(".specify/") else target
+                dest = root / ARCHIVE_REL / rel
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(str(src), str(dest))
-                artifacts.append({"change": "archived", "path": target, "to": (ARCHIVE_REL / target).as_posix()})
-                modify_paths.append((ARCHIVE_REL / target).as_posix())
+                artifacts.append({"change": "archived", "path": target, "to": (ARCHIVE_REL / rel).as_posix()})
+                modify_paths.append((ARCHIVE_REL / rel).as_posix())
             elif disposition in ("repair", "dismiss"):
                 artifacts.append({"change": f"{disposition}-state-only", "path": target})
                 modify_paths.append(target)
