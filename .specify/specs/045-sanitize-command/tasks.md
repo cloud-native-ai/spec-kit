@@ -102,17 +102,17 @@
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T013 [P] [US2] 夹具 `tests/fixtures/sanitize/correctness/`:死引用材料(链接/路径/命令/技能四形态 + 围栏豁免 + 占位符豁免)、features 索引双向缺项、断链+被替换为普通文件的链接、孤儿镜像目录(已注册/未注册两态)
-- [ ] T014 [P] [US2] 单元测试(RED):死引用抽取语法,写入 `tests/unit/test_sanitize_checks_refs.py`(锚 contracts/sanitize-detection-rules.md §1 C-1..C-5)
-- [ ] T015 [P] [US2] 单元测试(RED):索引一致性与符号链接检查器,写入 `tests/unit/test_sanitize_checks_index.py`(锚 §2/§3 C-6..C-10)
-- [ ] T016 [P] [US2] 单元测试(RED):镜像漂移检查器(sync-mirrors --check 解析 + 孤儿目录 + obsolete 交叉核对),写入 `tests/unit/test_sanitize_checks_mirror.py`(锚 §4 C-11..C-13)
+- [X] T013 [P] [US2] 夹具 `tests/fixtures/sanitize/correctness/`:死引用材料(链接/路径/命令/技能四形态 + 围栏豁免 + 占位符豁免)、features 索引双向缺项、断链+被替换为普通文件的链接、孤儿镜像目录(已注册/未注册两态)
+- [X] T014 [P] [US2] 单元测试(RED):死引用抽取语法,写入 `tests/unit/test_sanitize_checks_refs.py`(锚 contracts/sanitize-detection-rules.md §1 C-1..C-5)
+- [X] T015 [P] [US2] 单元测试(RED):索引一致性与符号链接检查器,写入 `tests/unit/test_sanitize_checks_index.py`(锚 §2/§3 C-6..C-10)
+- [X] T016 [P] [US2] 单元测试(RED):镜像漂移检查器(sync-mirrors --check 解析 + 孤儿目录 + obsolete 交叉核对),写入 `tests/unit/test_sanitize_checks_mirror.py`(锚 §4 C-11..C-13)
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] 实现死引用检查器 `scripts/python/sanitize-utils.py`:自有语法(材料根)+ docs 树 lane 复用 docs_utils 导入(C-4)[blockedBy: T013, T014]
-- [ ] T018 [US2] 实现索引一致性与符号链接检查器 `scripts/python/sanitize-utils.py`:features/feedback/evidence 三族双向 + 固定链接集三态判定 + delegate 处置[blockedBy: T013, T015]
-- [ ] T019 [US2] 实现镜像漂移检查器 `scripts/python/sanitize-utils.py`:sync-mirrors --check 子进程解析、孤儿目录补检、未注册改名残留 severity=high[blockedBy: T013, T016]
-- [ ] T020 [US2] 集成测试 `tests/integration/test_sanitize_us2.py`:四类发现全检出且 detection=programmatic(SC-004)、severity 默认映射、修复一项后重跑自动收敛(C-10)、--roots 子集不误销账(C-14)[blockedBy: T017, T018, T019]
+- [X] T017 [US2] 实现死引用检查器 `scripts/python/sanitize-utils.py`:自有语法(材料根)+ docs 树 lane 复用 docs_utils 导入(C-4)[blockedBy: T013, T014]
+- [X] T018 [US2] 实现索引一致性与符号链接检查器 `scripts/python/sanitize-utils.py`:features/feedback/evidence 三族双向 + 固定链接集三态判定 + delegate 处置[blockedBy: T013, T015]
+- [X] T019 [US2] 实现镜像漂移检查器 `scripts/python/sanitize-utils.py`:sync-mirrors --check 子进程解析、孤儿目录补检、未注册改名残留 severity=high[blockedBy: T013, T016]
+- [X] T020 [US2] 集成测试 `tests/integration/test_sanitize_us2.py`:四类发现全检出且 detection=programmatic(SC-004)、severity 默认映射、修复一项后重跑自动收敛(C-10)、--roots 子集不误销账(C-14)[blockedBy: T017, T018, T019]
 
 **Checkpoint**: US1+US2 独立成立——确定性检查零 LLM 参与,台账自动收敛闭环
 

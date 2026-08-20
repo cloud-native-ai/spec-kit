@@ -50,6 +50,11 @@ def assemble_workspace(tmp_path: Path) -> Path:
     target = tmp_path / "scripts" / "js" / "better-harness" / "session-analysis" / "platforms" / "claude.mjs"
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text("export const probeTranscript = 1;\n", encoding="utf-8")
+    # the material also references evidence-utils.py — keep it alive so the
+    # US1 assertions see exactly one semantic finding and zero dead references
+    evidence = tmp_path / "scripts" / "python" / "evidence-utils.py"
+    evidence.parent.mkdir(parents=True, exist_ok=True)
+    evidence.write_text("# engine\n", encoding="utf-8")
     git(tmp_path, "init", "-q")
     git(tmp_path, "config", "user.email", "t@example.com")
     git(tmp_path, "config", "user.name", "t")

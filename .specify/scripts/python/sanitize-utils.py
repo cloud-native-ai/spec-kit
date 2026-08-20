@@ -73,6 +73,15 @@ COMPAT_SYMLINKS = [
     "CLAUDE.md", "QODER.md", "AGENTS.md",
     ".github/copilot-instructions.md", ".github/skills",
 ]
+# A compat link is EXPECTED only when its owning tool surface exists; a client
+# workspace initialized for one CLI must not be flagged for another CLI's link.
+COMPAT_SYMLINK_EXPECTATIONS = {
+    "CLAUDE.md": ".claude",
+    "QODER.md": ".qoder",
+    "AGENTS.md": ".specify/instructions.md",
+    ".github/copilot-instructions.md": ".github",
+    ".github/skills": ".github",
+}
 
 DELEGATE_COMMAND_RE = re.compile(r"speckit\.[a-z][a-z-]*|sync-mirrors|regen-command-copies")
 
@@ -273,25 +282,326 @@ def _iter_root_files(root: Path, kinds: set):
 
 
 # --------------------------------------------------------------------------
-# deterministic checkers (contracts/sanitize-detection-rules.md) — US2 fills
-# these in; the registry runs them under collect with per-category failure
-# isolation (C-19: one crashed checker never kills the run).
+# deterministic checkers (contracts/sanitize-detection-rules.md)
 # --------------------------------------------------------------------------
 
+DEFAULT_DISPOSITION = {
+    "stale-residue": "delete", "redundant": "archive", "dead-reference": "repair",
+    "index-inconsistency": "repair", "broken-symlink": "delegate", "mirror-drift": "delegate",
+}
+
+
+def _finding(category: str, target: str, summary: str, evidence=None,
+             disposition=None, severity=None) -> dict:
+    disposition = disposition or DEFAULT_DISPOSITION[category]
+    return {
+        "id": stable_id(category, target),
+        "category": category,
+        "target": target,
+        "severity": severity or DEFAULT_SEVERITY[category],
+        "summary": summary,
+        "evidenceRefs": evidence or [{"kind": "path", "ref": target.split("#", 1)[0]}],
+        "detection": "programmatic",
+        "disposition": disposition,
+        "reversibility": REVERSIBILITY[disposition],
+        "state": "pending",
+    }
+
+
+SPECS_ARCHIVE_PREFIX = ".specify/specs/.archive/"
+
+
+def _iter_reference_materials(root: Path):
+    """Materials whose prose references are checked by the sanitize grammar.
+    Machine-generated stores (feedback/evidence/session/knowledge) are data,
+    not prose — excluded. Docs tree is covered solely by the docs-utils lane."""
+    candidates = [
+        root / ".specify" / "memory" / "todo",
+        root / ".specify" / "memory" / "draft",
+        root / ".specify" / "history",
+        root / ".specify" / "archive" / "spec",
+    ]
+    for base in candidates:
+        if base.is_dir():
+            for path in sorted(base.rglob("*.md")):
+                yield path.relative_to(root).as_posix()
+    specs = root / ".specify" / "specs"
+    if specs.is_dir():
+        for path in sorted(specs.rglob("*.md")):
+            relpath = path.relative_to(root).as_posix()
+            if relpath.startswith(SPECS_ARCHIVE_PREFIX):
+                continue
+            yield relpath
+    for path in sorted((root / ".specify" / "memory").glob("*.md")):
+        yield path.relative_to(root).as_posix()
+
+
+FENCE_RE = re.compile(r"```.*?```", re.S)
+LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
+CMD_RE = re.compile(r"speckit\.([a-z][a-z-]*)")
+SKILL_REF_RE = re.compile(r"skills/([a-z0-9][a-z0-9-]*)")
+PLACEHOLDER_RE = re.compile(r"[<>{}\[\]]")
+
+
+def _strip_fences(text: str) -> str:
+    return FENCE_RE.sub("", text)
+
+
+def _link_target_ok(target: str) -> bool:
+    if "://" in target or target.startswith(("mailto:", "#", "/", "~")):
+        return False
+    if PLACEHOLDER_RE.search(target):
+        return False
+    return bool(target)
+
+
+def _path_target_ok(target: str) -> bool:
+    return not PLACEHOLDER_RE.search(target)
+
+
 def check_dead_references(root: Path) -> list:
-    return []
+    findings = []
+    reported = {}  # (material, refkey) -> finding
+
+    def report(material, refkey, summary):
+        key = (material, refkey)
+        if key in reported:
+            return
+        finding = _finding("dead-reference", f"{material}#{refkey}", summary)
+        reported[key] = finding
+        findings.append(finding)
+
+    for relpath in _iter_reference_materials(root):
+        if relpath.startswith(SELF_EXEMPT_PREFIX):
+            continue
+        try:
+            text = (root / relpath).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        body = _strip_fences(text)
+        # 1) markdown links (resolved against the file dir, then repo root)
+        for target in LINK_RE.findall(body):
+            target = target.strip("<>")
+            if not _link_target_ok(target):
+                continue
+            rel_file = root / relpath
+            resolved = (rel_file.parent / target)
+            try:
+                resolved = Path(os.path.normpath(str(resolved)))
+            except ValueError:
+                continue
+            repo_root_resolved = root / target if _has_prefix(
+                target, MATERIAL_TARGET_PREFIXES + ("scripts/", "shared/", "templates/",
+                                                    "skills/", "agents/", "src/", "tests/")) else None
+            if resolved.exists() or (repo_root_resolved and repo_root_resolved.exists()):
+                continue
+            report(relpath, target, f"引用了不存在的链接目标 {target}")
+        # 2) repo-prefixed paths (inline backticks included)
+        for path in REPO_PATH_RE.findall(body):
+            if not _path_target_ok(path):
+                continue
+            refkey = path.rstrip("/")
+            if not (root / refkey).exists():
+                report(relpath, refkey, f"引用了不存在的路径 {refkey}")
+        # 3) command refs
+        for name in CMD_RE.findall(body):
+            if not (root / "templates" / "commands" / f"{name}.md").exists():
+                report(relpath, f"speckit.{name}", f"引用了不存在的命令 speckit.{name}")
+        # 4) skill refs
+        for name in SKILL_REF_RE.findall(body):
+            if not (root / "skills" / name).is_dir():
+                report(relpath, f"skills/{name}", f"引用了不存在的技能目录 skills/{name}")
+
+    # docs tree + root registry files: reuse docs-utils (Tool Reuse, C-4)
+    docs_violations = check_docs_lane(root)
+    if docs_violations:
+        for violation in docs_violations:
+            path = violation.get("path", "")
+            detail = violation.get("detail", "")
+            findings.append(_finding(
+                "dead-reference", f"{path}#{detail}",
+                f"docs 断链(docs-utils):引用了不存在的 {detail}",
+                evidence=[{"kind": "output", "ref": "docs-utils:broken-links"}]))
+    return findings
+
+
+FEATURES_ROW_RE = re.compile(r"^\| (\d{3}) \|")
 
 
 def check_index_consistency(root: Path) -> list:
-    return []
+    findings = []
+    memory = root / ".specify" / "memory"
+
+    # features family (C-6)
+    features_md = memory / "features.md"
+    if features_md.is_file():
+        rows = {}
+        for line in features_md.read_text(encoding="utf-8", errors="replace").splitlines():
+            match = FEATURES_ROW_RE.match(line)
+            if not match:
+                continue
+            parts = [p.strip() for p in line.split("|")]
+            if len(parts) > 5:
+                rows[match.group(1)] = parts[5]
+        for fid, detail in rows.items():
+            if detail and detail != "-" and not (root / detail).is_file():
+                findings.append(_finding(
+                    "index-inconsistency", f"{features_md.relative_to(root).as_posix()}#missing-{fid}",
+                    f"features 索引行 {fid} 指向不存在的 {detail}"))
+        features_dir = memory / "features"
+        if features_dir.is_dir():
+            for path in sorted(features_dir.glob("*.md")):
+                fid = path.stem
+                if fid not in rows:
+                    findings.append(_finding(
+                        "index-inconsistency", path.relative_to(root).as_posix(),
+                        f"features/{fid}.md 存在而索引无对应行(反向缺项)"))
+
+    # feedback + evidence families (C-7/C-8)
+    for store_name, key_field in (("feedback", "file"), ("evidence", "runId")):
+        index_path = memory / store_name / "index.json"
+        if not index_path.is_file():
+            continue
+        rel_index = index_path.relative_to(root).as_posix()
+        try:
+            index = json.loads(index_path.read_text(encoding="utf-8"))
+            entries = index.get("entries", [])
+        except (ValueError, OSError):
+            findings.append(_finding(
+                "index-inconsistency", rel_index,
+                f"{store_name} 索引不可解析(单条发现,不逐条展开)"))
+            continue
+        indexed = set()
+        for entry in entries:
+            value = entry.get(key_field) if isinstance(entry, dict) else None
+            if not value:
+                continue
+            indexed.add(value)
+            if key_field == "file":
+                target_path = memory / store_name / value
+                if not target_path.is_file():
+                    findings.append(_finding(
+                        "index-inconsistency", f"{rel_index}#{value}",
+                        f"feedback 索引条目 {entry.get('id', value)} 指向不存在的 {value}"))
+            else:
+                if not (memory / store_name / value).is_dir():
+                    findings.append(_finding(
+                        "index-inconsistency", f"{rel_index}#{value}",
+                        f"evidence 索引条目 {value} 指向不存在的运行目录"))
+        store_dir = memory / store_name
+        if key_field == "file":
+            for path in sorted(store_dir.glob("*.md")):
+                if path.name not in indexed:
+                    findings.append(_finding(
+                        "index-inconsistency", path.relative_to(root).as_posix(),
+                        f"feedback 条目文件 {path.name} 存在而索引无登记(反向缺项)"))
+        else:
+            for path in sorted(store_dir.glob("ev-*")):
+                if path.is_dir() and path.name not in indexed:
+                    findings.append(_finding(
+                        "index-inconsistency", path.relative_to(root).as_posix(),
+                        f"evidence 运行目录 {path.name} 存在而索引无登记(反向缺项)"))
+    return findings
 
 
 def check_broken_symlinks(root: Path) -> list:
-    return []
+    findings = []
+    for name in COMPAT_SYMLINKS:
+        link = root / name
+        expected = (root / COMPAT_SYMLINK_EXPECTATIONS[name]).exists()
+        if link.is_symlink():
+            if not link.exists():  # symlink whose target is gone
+                findings.append(_finding(
+                    "broken-symlink", name,
+                    f"兼容性符号链接 {name} 目标缺失(断链)——经 /speckit.instructions 再生成修复"))
+        elif link.exists():
+            findings.append(_finding(
+                "broken-symlink", name,
+                f"{name} 已被普通文件替换(形态漂移)——经 /speckit.instructions 再生成修复"))
+        elif expected:
+            findings.append(_finding(
+                "broken-symlink", name,
+                f"兼容性符号链接 {name} 缺失——经 /speckit.instructions 再生成修复"))
+    return findings
+
+
+def run_sync_mirrors_check(root: Path):
+    """Run the sibling sync-mirrors.py --check in the workspace. Returns
+    (returncode, stdout); stdout is parsed for drift lines regardless of rc."""
+    script = Path(__file__).with_name("sync-mirrors.py")
+    proc = subprocess.run(
+        [sys.executable, str(script), "--check"],
+        cwd=str(root), capture_output=True, text=True, timeout=180)
+    return proc.returncode, proc.stdout
+
+
+DRIFT_LINE_RE = re.compile(r"^(MISS|DIFF|ORPHAN)\s+(\S+)")
+
+
+def parse_mirror_drift_lines(text: str) -> list:
+    items = []
+    for line in text.splitlines():
+        match = DRIFT_LINE_RE.match(line.strip())
+        if match:
+            items.append((match.group(2), match.group(1)))
+    return items
+
+
+MIRROR_DIR_PAIRS = [("skills", ".specify/skills"), ("agents", ".specify/agents")]
+
+
+def find_orphan_mirror_dirs(root: Path, registry: set) -> list:
+    findings = []
+    for src_rel, mirror_rel in MIRROR_DIR_PAIRS:
+        src, mirror = root / src_rel, root / mirror_rel
+        if not (src.is_dir() and mirror.is_dir()):
+            continue  # client projects have no source root — pair not applicable
+        for child in sorted(mirror.iterdir()):
+            if not child.is_dir() or (src / child.name).exists():
+                continue
+            if child.name in registry:
+                findings.append(_finding(
+                    "mirror-drift", f"{mirror_rel}/{child.name}",
+                    f"已注册孤儿镜像目录(obsolete-asset registry 已登记 {child.name}),"
+                    "由 init 回收或手动移除;sync-mirrors 不删除",
+                    disposition="delegate", severity="medium"))
+            else:
+                findings.append(_finding(
+                    "mirror-drift", f"{mirror_rel}/{child.name}",
+                    f"未注册孤儿镜像目录:源侧 {src_rel}/ 已无 {child.name}(重命名未登记 "
+                    "_OBSOLETE_* registry)——建议删除并在 registry 登记",
+                    disposition="delete", severity="high"))
+    return findings
+
+
+OBSOLETE_MARKER_RE = re.compile(
+    r"OBSOLETE-ASSET-REGISTRY[-:]START(.*?)OBSOLETE-ASSET-REGISTRY[-:]END", re.S)
+QUOTED_RE = re.compile(r'"([^"]+)"')
+
+
+def load_obsolete_registry(root: Path) -> set:
+    path = root / "src" / "specify_cli" / "__init__.py"
+    if not path.is_file():
+        return set()
+    match = OBSOLETE_MARKER_RE.search(path.read_text(encoding="utf-8", errors="replace"))
+    if not match:
+        return set()
+    return set(QUOTED_RE.findall(match.group(1)))
 
 
 def check_mirror_drift(root: Path) -> list:
-    return []
+    findings = []
+    try:
+        _, output = run_sync_mirrors_check(root)
+        for path, kind in parse_mirror_drift_lines(output):
+            findings.append(_finding(
+                "mirror-drift", path,
+                f"sync-mirrors --check 报告 {kind}——运行 sync-mirrors --write 收敛",
+                disposition="delegate"))
+    except (OSError, subprocess.TimeoutExpired):
+        pass  # sub-lane unavailable; orphan check still applies
+    findings.extend(find_orphan_mirror_dirs(root, load_obsolete_registry(root)))
+    return findings
 
 
 def check_docs_lane(root: Path):

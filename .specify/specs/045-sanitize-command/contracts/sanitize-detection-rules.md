@@ -28,7 +28,7 @@
 
 ## 3. 符号链接有效性(broken-symlink)
 
-- C-10 固定链接集:`CLAUDE.md`、`QODER.md`、`AGENTS.md`、`.github/copilot-instructions.md`、`.github/skills`。判定:链接不存在、链接存在但目标缺失(broken)、被替换为普通文件(非 symlink,形态漂移)三种均为发现;处置一律 `delegate`(移交 /speckit.instructions 再生成,不在本命令修复)。
+- C-10 固定链接集:`CLAUDE.md`、`QODER.md`、`AGENTS.md`、`.github/copilot-instructions.md`、`.github/skills`。判定:断链(链接存在而目标缺失)、形态漂移(被普通文件/目录替换)两种始终为发现;"缺失"仅在**对应工具面存在**时为发现(`CLAUDE.md`↔`.claude/`、`QODER.md`↔`.qoder/`、`AGENTS.md`↔`.specify/instructions.md`、`.github/*`↔`.github/`)——单一 CLI 初始化的客户工作区不得因其他 CLI 的链接缺失而报发现。处置一律 `delegate`(移交 /speckit.instructions 再生成,不在本命令修复)。
 
 ## 4. 镜像漂移(mirror-drift)
 
