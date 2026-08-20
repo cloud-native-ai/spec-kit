@@ -60,3 +60,4 @@ At the same wrap-up point, apply the docs-sync evaluation step per the canonical
 - Address the residual report's pending-human-decision items.
 - Invoke `memory-record` to persist notable reconcile decisions.
 - If the reconcile changed instructions-facing structure (e.g. documentation map), run `/speckit.instructions` to refresh generated instruction files.
+- To publish the space as a static site — or to repair mounts staled by a move — use the `create-pages` skill; presentation is an optional layer this command never scaffolds or builds.

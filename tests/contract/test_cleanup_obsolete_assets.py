@@ -13,6 +13,7 @@ import pytest
 
 from specify_cli import (
     _OBSOLETE_COMMANDS,
+    _OBSOLETE_SKILL_FILES,
     _OBSOLETE_SKILLS,
     _OBSOLETE_TEMPLATES,
     cleanup_obsolete_framework_assets,
@@ -58,6 +59,16 @@ def _build_workspace(root: Path) -> None:
     _write(specify / "templates" / "commands" / "specify.md")
     _write(specify / "templates" / "commands" / "requirements.md")
 
+    # Files a skill no longer owns — the Hugo layer moved create-docs → create-pages
+    # (must be removed, leaving no empty scripts/references/assets dirs behind)
+    _write(specify / "skills" / "create-docs" / "scripts" / "scaffold-hugo.py")
+    _write(specify / "skills" / "create-docs" / "references" / "hugo-site.md")
+    _write(specify / "skills" / "create-docs" / "assets" / "hugo" / "hugo.toml.tmpl")
+    _write(specify / "skills" / "create-docs" / "assets" / "hugo" / "static" / "css" / "site.css")
+    # The skill itself and anything the user added to it (must survive)
+    _write(specify / "skills" / "create-docs" / "SKILL.md")
+    _write(specify / "skills" / "create-docs" / "references" / "my-notes.md")
+
 
 @pytest.mark.contract
 def test_removes_obsolete_skills_commands_and_templates(tmp_path):
@@ -83,10 +94,19 @@ def test_removes_obsolete_skills_commands_and_templates(tmp_path):
     assert not (tmp_path / ".qoder" / "commands" / "speckit.converge.md").exists()
     assert not (specify / "templates" / "commands" / "specify.md").exists()
 
+    # Files the skill no longer owns are reclaimed, and dirs they emptied are pruned
+    create_docs = specify / "skills" / "create-docs"
+    assert not (create_docs / "scripts" / "scaffold-hugo.py").exists()
+    assert not (create_docs / "references" / "hugo-site.md").exists()
+    assert not (create_docs / "assets" / "hugo" / "hugo.toml.tmpl").exists()
+    assert not (create_docs / "scripts").exists(), "emptied scripts/ dir must be pruned"
+    assert not (create_docs / "assets").exists(), "emptied assets/ tree must be pruned"
+
     # Reported removals reference each removed path
     assert any("sdd-workflow" in r for r in removed)
     assert any("agent-explore-template.md" in r for r in removed)
     assert any("speckit.specify.md" in r for r in removed)
+    assert any("scaffold-hugo.py" in r for r in removed)
 
 
 @pytest.mark.contract
@@ -102,6 +122,9 @@ def test_preserves_current_and_user_assets(tmp_path):
     assert (specify / "templates" / "plan-template.md").exists()
     assert (tmp_path / ".qoder" / "commands" / "speckit.requirements.md").exists()
     assert (specify / "templates" / "commands" / "requirements.md").exists()
+    # A skill losing files keeps itself and anything the user put inside it
+    assert (specify / "skills" / "create-docs" / "SKILL.md").exists()
+    assert (specify / "skills" / "create-docs" / "references" / "my-notes.md").exists()
     # User-authored assets preserved
     assert (specify / "skills" / "my-custom-skill" / "SKILL.md").exists()
     assert (specify / "templates" / "my-team-template.md").exists()
@@ -155,7 +178,9 @@ def test_registries_are_nonempty_and_derived_from_history():
     assert "sdd-workflow" in _OBSOLETE_SKILLS
     assert "specify" in _OBSOLETE_COMMANDS
     assert "agent-explore-template.md" in _OBSOLETE_TEMPLATES
+    assert "create-docs/scripts/scaffold-hugo.py" in _OBSOLETE_SKILL_FILES
     # Current names must never be listed as obsolete.
     assert "create-team" not in _OBSOLETE_SKILLS
     assert "requirements" not in _OBSOLETE_COMMANDS
     assert "plan-template.md" not in _OBSOLETE_TEMPLATES
+    assert "create-pages/scripts/scaffold-hugo.py" not in _OBSOLETE_SKILL_FILES

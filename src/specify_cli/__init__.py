@@ -759,6 +759,26 @@ _OBSOLETE_SKILLS = (
     "xlsx-utils",
 )
 
+# Files a skill once shipped but no longer owns, relative to .specify/skills/.
+# (Hugo mount-mode scaffolder + reference + asset templates moved
+# create-docs → create-pages when presentation was decoupled from structure;
+# create-pages/scripts/scaffold.sh → scaffold-ci.sh when rendering and hosting
+# were split into separate stages.)
+_OBSOLETE_SKILL_FILES = (
+    "create-docs/scripts/scaffold-hugo.py",
+    "create-docs/references/hugo-site.md",
+    "create-docs/assets/hugo/hugo.toml.tmpl",
+    "create-docs/assets/hugo/dotgitignore",
+    "create-docs/assets/hugo/layouts/index.html",
+    "create-docs/assets/hugo/layouts/_default/baseof.html",
+    "create-docs/assets/hugo/layouts/_default/list.html",
+    "create-docs/assets/hugo/layouts/_default/single.html",
+    "create-docs/assets/hugo/layouts/_default/_markup/render-link.html",
+    "create-docs/assets/hugo/layouts/_default/_markup/render-image.html",
+    "create-docs/assets/hugo/static/css/site.css",
+    "create-pages/scripts/scaffold.sh",
+)
+
 # Command stems that were renamed or removed (specify→requirements; converge,
 # mcpcall, taskstoissues removed). Generated command files are named
 # ``speckit.<stem>.<ext>`` per agent, plus ``<stem>.md`` in the fallback
@@ -1707,9 +1727,9 @@ def cleanup_obsolete_framework_assets(
     Init copies assets additively (``copytree(dirs_exist_ok=True)``) and never
     deletes files that a newer framework version dropped or renamed. This prunes
     ONLY the enumerated, framework-owned artifacts in ``_OBSOLETE_SKILLS``,
-    ``_OBSOLETE_COMMANDS``, and ``_OBSOLETE_TEMPLATES`` — restricted to the
-    ``.specify/`` tree and the active agent's command directory. User-authored
-    skills, commands, and templates are never touched.
+    ``_OBSOLETE_SKILL_FILES``, ``_OBSOLETE_COMMANDS``, and ``_OBSOLETE_TEMPLATES``
+    — restricted to the ``.specify/`` tree and the active agent's command
+    directory. User-authored skills, commands, and templates are never touched.
 
     Returns the list of removed paths (relative to ``project_path``) for reporting.
     """
@@ -1733,7 +1753,21 @@ def cleanup_obsolete_framework_assets(
             shutil.rmtree(target, ignore_errors=True)
             removed.append(_rel(target))
 
-    # 2) Obsolete top-level templates: .specify/templates/<file>
+    # 2) Files a skill no longer owns (e.g. moved to another skill): delete the
+    #    file, then prune directories it leaves empty, bounded to that skill dir.
+    for rel in _OBSOLETE_SKILL_FILES:
+        target = skills_dir / rel
+        if target.is_symlink() or not target.is_file():
+            continue
+        target.unlink()
+        removed.append(_rel(target))
+        skill_root = skills_dir / Path(rel).parts[0]
+        parent = target.parent
+        while parent != skill_root and parent.is_dir() and not any(parent.iterdir()):
+            parent.rmdir()
+            parent = parent.parent
+
+    # 3) Obsolete top-level templates: .specify/templates/<file>
     templates_dir = specify_dir / "templates"
     for filename in _OBSOLETE_TEMPLATES:
         target = templates_dir / filename
@@ -1741,7 +1775,7 @@ def cleanup_obsolete_framework_assets(
             target.unlink()
             removed.append(_rel(target))
 
-    # 3) Obsolete commands: speckit.<stem>.<ext> in the active agent's command
+    # 4) Obsolete commands: speckit.<stem>.<ext> in the active agent's command
     #    dir, plus the fallback .specify/templates/commands/<stem>.md.
     command_targets: List[Path] = []
     cmd_dir_rel = _ASSISTANT_COMMAND_DIRS.get(ai_assistant)

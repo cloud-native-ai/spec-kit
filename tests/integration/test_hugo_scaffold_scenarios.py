@@ -1,8 +1,10 @@
-"""Integration tests: Hugo scaffold behaviour on a real docs tree (spec 033).
+"""Integration tests: mount-mode Hugo scaffold behaviour on a real docs tree.
 
-Covers the mount rules that keep docs/ pure Markdown, the anti-churn guarantee
-(a repeat run converges nothing), the never-clobber guarantee, the cross-engine
-invariant with docs-utils.py, and — when the binary is present — a real build.
+Exercises the create-pages mode-B scaffolder: the mount rules that keep the docs
+tree pure Markdown, the anti-churn guarantee (a repeat run converges nothing), the
+never-clobber guarantee, the cross-engine invariant with docs-utils.py, and — when
+the binary is present — a real build. The capability is optional; these scenarios
+skip when the scaffolder is not installed.
 """
 from __future__ import annotations
 
@@ -16,8 +18,13 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SCRIPT = REPO_ROOT / "skills" / "create-docs" / "scripts" / "scaffold-hugo.py"
+SCRIPT = REPO_ROOT / "skills" / "create-pages" / "scripts" / "scaffold-hugo.py"
 DOCS_UTILS = REPO_ROOT / "scripts" / "python" / "docs-utils.py"
+
+pytestmark = pytest.mark.skipif(
+    not SCRIPT.is_file(),
+    reason="optional capability: create-pages mount-mode scaffolder is not installed",
+)
 
 SCAFFOLD_FILES = (
     "hugo.toml",

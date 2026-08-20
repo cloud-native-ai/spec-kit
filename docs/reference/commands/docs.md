@@ -52,36 +52,21 @@ python3 .specify/scripts/python/docs-utils.py --action audit --root . --scope <s
 
 `validate` covers the deterministic dimensions: reserved-name case/misuse/misplacement, one-screen threshold for root entries, broken relative links, ADR numbering continuity, notes frontmatter completeness.
 
-## Static Site (Hugo)
+## Static Site (optional, not part of this command)
 
-The documentation space is publishable, not just readable in the repo: `docs/` doubles as a
-**Hugo project root**, so a reconcile run also scaffolds and maintains `docs/hugo.toml`,
-`docs/layouts/`, `docs/static/css/site.css`, and `docs/.gitignore` (build output).
+Publishing the space as a static site is an **optional** capability layered on top of the
+structure, owned by the `create-pages` skill — a documentation space is complete and valid
+without it. `/speckit.docs` never scaffolds, mounts, or builds a site; it only skips the
+site-tooling directories (`layouts/`, `static/`, `public/`, `resources/`, `themes/`,
+`archetypes/`) so they are never triaged as content or archived.
 
-```bash
-SC=.specify/skills/create-docs/scripts/scaffold-hugo.py
-python3 $SC --action check    --root .                     # drift only, no writes
-python3 $SC --action scaffold --root . --site-title "<t>"   # create/repair the site layer
-python3 $SC --action build    --root .                      # -> docs/public
-cd docs && hugo server                                     # local preview
-```
+`create-pages` offers two modes: **CI-deployed pages** (`<docs>/hugo.yaml` + platform
+pipeline) and **in-place mount site** (`<docs>/hugo.toml`, Markdown mounted rather than
+copied, build output in `<docs>/public/`). Details, commands, and CI guidance live in
+`.specify/skills/create-pages/SKILL.md` and its `references/hugo-site.md`.
 
-Key properties:
-
-- **Mounted, never copied** — Markdown is mounted into Hugo via module mounts, so `docs/`
-  stays pure Markdown, keeps its repo-native relative links, and `content/` never appears on
-  disk. Directory indexes stay `index.md` (mounted as `_index.md`, so sibling pages remain
-  pages), and relative `.md`/image links are resolved by render hooks at build time.
-- **Minimal and offline** — layouts and a single stylesheet ship with the skill; no external
-  theme, no network, no asset pipeline. Absent `hugo` binary → the scaffold is still complete
-  and only the build step is skipped.
-- **Never clobbers** — only the `# >>> speckit:mounts` block in `hugo.toml` is machine-owned;
-  layouts or config you edit are reported `kept`. A repeat run writes nothing.
-- **Publish scope** is all of `docs/` (six types + `notes/` + `archive/` + media).
-
-CI integration is delivered as **guidance**, not a generated workflow: install Hugo extended,
-run it with `docs/` as the working directory, publish `docs/public`. Copy-pasteable snippet and
-troubleshooting live in `.specify/skills/create-docs/references/hugo-site.md`.
+A move that adds or removes a documentation directory can stale an existing site's mounts —
+a reconcile run reports that as a `create-pages` follow-up instead of repairing it.
 
 ## Output Artifacts
 
