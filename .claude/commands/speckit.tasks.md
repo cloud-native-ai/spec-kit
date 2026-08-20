@@ -43,6 +43,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
    - Generate dependency graph showing user story completion order
    - Create parallel execution examples per user story
    - Validate task completeness (each user story has all needed tasks, independently testable)
+   - Validate story-label placement mechanically: every task row inside a User Story phase carries exactly one `[US*]` label, and NON-story phases (Setup / Foundational / Polish) carry ZERO `[US` markers — placeholder labels like `[US-none]` are format violations (grep the phase ranges; do not rely on remembering the rule)
 
 4. **Generate tasks.md**: Use `.specify/templates/tasks-template.md` as structure, fill with:
    - Correct feature name from plan.md

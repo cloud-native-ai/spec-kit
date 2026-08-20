@@ -12,3 +12,16 @@
 - removed 20260817T033422Z-speckit-requirements (/speckit.requirements, created 2026-08-17T03:34:22Z) — archived in feedback-20260818T020825Z.zip
 - removed 20260815T061846Z-speckit-instructions (/speckit.instructions, created 2026-08-15T06:18:46Z) — archived in feedback-20260818T020825Z.zip
 - removed 20260814T184503Z-speckit-implement (/speckit.implement, created 2026-08-14T18:45:03Z) — archived in feedback-20260818T020825Z.zip
+## 2026-08-20T08:10:32Z — feedback-20260820T081023Z.zip
+- removed 20260820T071932Z-speckit-review (/speckit.review, created 2026-08-20T07:19:32Z) — archived in feedback-20260820T081023Z.zip
+- removed 20260820T071046Z-speckit-implement (/speckit.implement, created 2026-08-20T07:10:46Z) — archived in feedback-20260820T081023Z.zip
+- removed 20260820T060750Z-speckit-tasks (/speckit.tasks, created 2026-08-20T06:07:50Z) — archived in feedback-20260820T081023Z.zip
+- removed 20260820T060028Z-speckit-plan (/speckit.plan, created 2026-08-20T06:00:28Z) — archived in feedback-20260820T081023Z.zip
+- removed 20260820T041251Z-speckit-clarify (/speckit.clarify, created 2026-08-20T04:12:51Z) — archived in feedback-20260820T081023Z.zip
+- removed 20260820T032230Z-speckit-requirements (/speckit.requirements, created 2026-08-20T03:22:30Z) — archived in feedback-20260820T081023Z.zip
+- removed 20260819T072439Z-skill-improve-skills (skill:improve-skills, created 2026-08-19T07:24:39Z) — archived in feedback-20260820T081023Z.zip
+- removed 20260819T061549Z-speckit-implement (/speckit.implement, created 2026-08-19T06:15:49Z) — archived in feedback-20260820T081023Z.zip
+- removed 20260819T033628Z-speckit-tasks (/speckit.tasks, created 2026-08-19T03:36:28Z) — archived in feedback-20260820T081023Z.zip
+- removed 20260819T032843Z-speckit-plan (/speckit.plan, created 2026-08-19T03:28:43Z) — archived in feedback-20260820T081023Z.zip
+- removed 20260818T074124Z-speckit-requirements (/speckit.requirements, created 2026-08-18T07:41:24Z) — archived in feedback-20260820T081023Z.zip
+- removed 20260818T021842Z-speckit-feedback (/speckit.feedback, created 2026-08-18T02:18:42Z) — archived in feedback-20260820T081023Z.zip
