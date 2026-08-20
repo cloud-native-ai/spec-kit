@@ -327,11 +327,89 @@ def run_deterministic_checks(root: Path, roots_filter=None):
 
 
 # --------------------------------------------------------------------------
-# semantic candidates (contracts/sanitize-detection-rules.md §5) — US1 fills
+# semantic candidates (contracts/sanitize-detection-rules.md §5) — the engine
+# gathers mechanical claims + a bounded evidence pack; the agent judges
+# staleness/redundancy against that pack only (FR-007 program-first).
 # --------------------------------------------------------------------------
 
+FRONTMATTER_RE = re.compile(r"\A---\s*\n(.*?)\n---\s*\n?", re.S)
+CLAIM_PHRASES = ["未落地", "未实现", "未合入", "待办", "pending", "not landed", "TODO"]
+REPO_PATH_RE = re.compile(
+    r"((?:scripts|shared|templates|docs|skills|agents|src|tests|\.specify)/[A-Za-z0-9_./-]+)")
+
+
+def _parse_frontmatter(text: str) -> dict:
+    match = FRONTMATTER_RE.match(text)
+    if not match:
+        return {}
+    fm = {}
+    for line in match.group(1).splitlines():
+        if ":" in line:
+            key, _, value = line.partition(":")
+            fm[key.strip()] = value.strip()
+    return fm
+
+
+def extract_claims(text: str) -> list:
+    """Mechanical claim extraction (C-15): frontmatter status/date fields plus
+    declaration phrases. No semantic induction — phrases are matched verbatim."""
+    claims = []
+    fm = _parse_frontmatter(text)
+    for key in ("status", "parked_at", "created"):
+        if key in fm:
+            claims.append(f"{key}={fm[key]}")
+    body = FRONTMATTER_RE.sub("", text)
+    lowered = body.lower()
+    for phrase in CLAIM_PHRASES:
+        if phrase.lower() in lowered:
+            claims.append(phrase)
+    claims.extend(re.findall(r"P[1-9](?:[–—-]\w+)?", body)[:6])
+    seen, ordered = set(), []
+    for claim in claims:
+        if claim not in seen:
+            seen.add(claim)
+            ordered.append(claim)
+    return ordered[:15]
+
+
+def extract_repo_paths(text: str) -> list:
+    return sorted(set(REPO_PATH_RE.findall(text)))
+
+
+def _git(root: Path, args: list):
+    """Run git in the workspace; None on any failure/timeout (never raises)."""
+    try:
+        proc = subprocess.run(
+            ["git", *args], cwd=str(root), capture_output=True, text=True, timeout=15)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return proc.stdout if proc.returncode == 0 else None
+
+
 def collect_semantic_candidates(root: Path):
-    return [], []
+    candidates, notes = [], []
+    for relpath in _iter_root_files(root, {"memory-todo", "memory-draft"}):
+        if not relpath.endswith(".md"):
+            continue
+        text = (root / relpath).read_text(encoding="utf-8", errors="replace")
+        fm = _parse_frontmatter(text)
+        since = fm.get("parked_at") or fm.get("created") or None
+        paths = extract_repo_paths(text)
+        log = _git(root, ["log", "--oneline", "-n", "20"]
+                   + (["--since", since] if since else [])
+                   + ["--"] + (paths or [".specify/memory"]))
+        if log is None:
+            notes.append("git unavailable - semantic detection degraded")
+            return [], notes
+        candidates.append({
+            "material": relpath,
+            "claims": extract_claims(text),
+            "evidencePack": {
+                "gitLog": [line for line in log.splitlines() if line.strip()][:20],
+                "pathExistence": {p: (root / p).exists() for p in paths},
+            },
+        })
+    return candidates, notes
 
 
 # --------------------------------------------------------------------------

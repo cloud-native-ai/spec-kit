@@ -76,19 +76,19 @@
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation
 
-- [ ] T006 [P] [US1] 夹具 `tests/fixtures/sanitize/stale-todo/`:本地迷你 git 仓 + parked todo(声明"未落地"五项,引用具体路径)+ 已合入提交(触碰所引路径)——真实案例(20260812 todo vs 1a090c72)的复刻,SC-001 度量源
-- [ ] T007 [P] [US1] 单元测试(RED):语义候选采集——claims 机械抽取(frontmatter 日期 + 状态声明短语)、证据包(gitLog 截断 20 行、pathExistence 映射)、git 不可用降级 note,写入 `tests/unit/test_sanitize_semantic.py`(锚 contracts/sanitize-detection-rules.md §5 C-14..C-16)
+- [X] T006 [P] [US1] 夹具 `tests/fixtures/sanitize/stale-todo/`:本地迷你 git 仓 + parked todo(声明"未落地"五项,引用具体路径)+ 已合入提交(触碰所引路径)——真实案例(20260812 todo vs 1a090c72)的复刻,SC-001 度量源
+- [X] T007 [P] [US1] 单元测试(RED):语义候选采集——claims 机械抽取(frontmatter 日期 + 状态声明短语)、证据包(gitLog 截断 20 行、pathExistence 映射)、git 不可用降级 note,写入 `tests/unit/test_sanitize_semantic.py`(锚 contracts/sanitize-detection-rules.md §5 C-14..C-16)
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] 实现 collect 的语义候选采集 `scripts/python/sanitize-utils.py`:memory-todo/draft 根扫描、claims/evidencePack 组装、git 子进程(超时/失败→证据不足)[blockedBy: T005, T006, T007]
-- [ ] T009 [US1] 实现 collect 的确定性发现合并与 status 动作 `scripts/python/sanitize-utils.py`:台账摘要信封、零写入 status[blockedBy: T008]
-- [ ] T010 [US1] 实现 record 动作 `scripts/python/sanitize-utils.py`:--file schema 校验(违例退出 2 且全有或全无)、语义发现按合并语义入账、"证据不足"候选拒绝[blockedBy: T009]
-- [ ] T011 [US1] 集成测试 `tests/integration/test_sanitize_us1.py`:US1 全流程断言——发现含 commit 证据引用(SC-001)、被检材料快照零变更且写入仅落台账(SC-002)、证据不足候选不入账[blockedBy: T010]
+- [X] T008 [US1] 实现 collect 的语义候选采集 `scripts/python/sanitize-utils.py`:memory-todo/draft 根扫描、claims/evidencePack 组装、git 子进程(超时/失败→证据不足)[blockedBy: T005, T006, T007]
+- [X] T009 [US1] 实现 collect 的确定性发现合并与 status 动作 `scripts/python/sanitize-utils.py`:台账摘要信封、零写入 status[blockedBy: T008]
+- [X] T010 [US1] 实现 record 动作 `scripts/python/sanitize-utils.py`:--file schema 校验(违例退出 2 且全有或全无)、语义发现按合并语义入账、"证据不足"候选拒绝[blockedBy: T009]
+- [X] T011 [US1] 集成测试 `tests/integration/test_sanitize_us1.py`:US1 全流程断言——发现含 commit 证据引用(SC-001)、被检材料快照零变更且写入仅落台账(SC-002)、证据不足候选不入账[blockedBy: T010]
 
 ### Manual Verification for User Story 1
 
-- [ ] T012 [US1] 手工走查:按 quickstart.md 走查 1 在临时目录副本上执行引擎三命令,核对输出信封与台账状态[blockedBy: T011]
+- [X] T012 [US1] 手工走查:按 quickstart.md 走查 1 在临时目录副本上执行引擎三命令,核对输出信封与台账状态[blockedBy: T011]
 
 **Checkpoint**: US1 独立可测——过期残留检出 + 台账持久化 + 零材料修改全部成立(MVP 达成)
 

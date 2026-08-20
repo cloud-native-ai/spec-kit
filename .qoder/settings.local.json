@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /storage/project/cloud-native-ai/spec-kit && git status --short | head -60)",
+      "Bash(cd /storage/project/cloud-native-ai/spec-kit && git --no-pager log --oneline -3)",
+      "Bash(cd /storage/project/cloud-native-ai/spec-kit && git add .claude/commands .github/prompts .opencode/command .qoder/commands .specify/memory/features.md .specify/scripts/python/feedback-utils.py .specify/shared .specify/skills .specify/specs/044-reduce-confirmation-flows scripts/python/feedback-utils.py shared skills templates/commands tests/contract/test_feedback_probe_entry_schema.py tests/contract/test_feedback_probe_registry.py && git status --short | grep -v \"^A\\\\|^M\" | head -3; git commit -m \"$\\(cat <<'EOF'\nfeat\\(046\\): 保留门控必要性 feedback probe——确认后自动采集门控存在必要性证据\\(Phase 7, T035-T047\\)\n\n20 个非 intrinsic 保留门控各挂一个 probe:注册表新增 command-gate/skill-gate\n两类 20 对象 + 21 处单行指针 + confirmation-gates.md §门控观察协议;引擎\nresolve_probe 支持 \\(unit, lifecycle_point\\),条目带 confirm-gate 标记可聚合检索,\n为框架层确认设计迭代积累运行证据。SC-006..008 pass:覆盖 20/20、dry-run\nfrontmatter 齐备、扫描器 total 保持 22、契约失败集零新增。\nEOF\n\\)\" && git status --short | head -5)"
+    ]
+  }
+}
