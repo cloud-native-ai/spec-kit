@@ -29,6 +29,7 @@ skills_utils = _load_module("skills_utils", "skills-utils.py")
 memory_utils = _load_module("memory_utils", "memory-utils.py")
 feedback_utils = _load_module("feedback_utils", "feedback-utils.py")
 history_utils = _load_module("history_utils", "history-utils.py")
+sanitize_utils = _load_module("sanitize_utils", "sanitize-utils.py")
 
 
 def run_specify_init(args: list[str]):
