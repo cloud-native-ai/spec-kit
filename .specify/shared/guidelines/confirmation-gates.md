@@ -65,7 +65,7 @@
 - **合并呈现**:同一流程多个自动执行动作 MUST 合并为一次收尾呈现,逐项列出,MUST NOT 逐动作打断用户。
 - **失败如实报告**:自动执行中途失败 MUST 报告失败点、原因与已产生的中间产物,MUST NOT 静默跳过或掩盖。
 
-收尾阶段达阈值触发的反馈提交提示 MUST 为非阻塞一次性提示(附 `feedback-utils.py --action package` 途径),MUST NOT 阻塞收尾,MUST NOT 自动传输任何内容。
+收尾阶段达阈值触发的反馈提交提示 MUST 为非阻塞一次性提示(附 `/speckit.feedback package` 用户视角途径,不展示 `feedback-utils.py` 引擎原始调用),MUST NOT 阻塞收尾,MUST NOT 自动传输任何内容。
 
 ## 门控观察协议 (Gate Observation Protocol)
 

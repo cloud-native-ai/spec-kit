@@ -113,7 +113,7 @@ python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action
   --review "<review prose>" --points-file "<points file>"
 ```
 
-If the returned `should_prompt` is `true`, append ONE non-blocking line inviting submission (attach the `--action package` path); MUST NOT block wrap-up, MUST NOT 自动传输.
+If the returned `should_prompt` is `true`, append ONE non-blocking line inviting submission (point the user to the `/speckit.feedback package` command — the user-facing path; never paste the raw `feedback-utils.py` engine call into the user-facing line); MUST NOT block wrap-up, MUST NOT 自动传输.
 
 ## Handoffs
 

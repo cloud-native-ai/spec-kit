@@ -123,8 +123,9 @@ Four facts govern the whole mechanism (canonical statement in
 ## Processing side: package → manual send
 
 When `count_since_submission >= threshold`, the consolidated prompt offers three choices:
-**package** / **skip this time** / **stop prompting** (raise the threshold). Packaging is
-the processing path:
+**package** / **skip this time** / **stop prompting** (raise the threshold). The prompt
+points the user to the user-facing `/speckit.feedback package` command (never the raw
+engine path); under the hood, packaging runs:
 
 ```bash
 python3 .specify/scripts/python/feedback-utils.py --action package

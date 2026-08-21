@@ -94,7 +94,7 @@ python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action
 ```
    Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
 
-If the returned `should_prompt` is `true`, append one non-blocking line to the wrap-up report inviting submission (attach the `--action package` path); it MUST NOT block wrap-up and MUST NOT trigger any 自动传输 (manual delivery only; `--action mark-submitted` runs only if the user initiates submission).
+If the returned `should_prompt` is `true`, append one non-blocking line to the wrap-up report inviting submission (point the user to the `/speckit.feedback package` command — the user-facing path; never paste the raw `feedback-utils.py` engine call into the user-facing line); it MUST NOT block wrap-up and MUST NOT trigger any 自动传输 (manual delivery only; `--action mark-submitted` runs only if the user initiates submission).
 
 ## Documentation
 

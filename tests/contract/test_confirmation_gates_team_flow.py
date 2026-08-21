@@ -64,7 +64,7 @@ def test_run_mode_preview_execute_shape() -> None:
 def test_wrapup_submission_prompt_nonblocking() -> None:
     text = read(SKILL)
     assert "非阻塞" in text, "wrap-up submission prompt must be non-blocking"
-    assert "--action package" in text, "submission path must be disclosed"
+    assert "/speckit.feedback package" in text, "user-facing submission path must be disclosed"
     assert "自动传输" in text and "MUST NOT" in text, "no-auto-transmission red line missing"
 
 
