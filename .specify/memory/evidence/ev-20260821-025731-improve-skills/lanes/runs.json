@@ -1,0 +1,45 @@
+{
+  "teams": [
+    {
+      "team": "cws-workspace-cluster",
+      "runReports": 2,
+      "critiques": [],
+      "logRows": 2,
+      "partial": false
+    },
+    {
+      "team": "draw-plantuml-optimizer",
+      "runReports": 5,
+      "critiques": [],
+      "logRows": 0,
+      "partial": true
+    },
+    {
+      "team": "requirement-implement-monitor",
+      "runReports": 5,
+      "critiques": [
+        "**2026-07-30T02:22:00Z（新目标 Cycle 1，全量基线）**：目标切换基线按 constraints 执行；"
+      ],
+      "logRows": 5,
+      "partial": false
+    },
+    {
+      "team": "summarize-project-optimizer",
+      "runReports": 2,
+      "critiques": [],
+      "logRows": 0,
+      "partial": true
+    },
+    {
+      "team": "viz-skill-arena",
+      "runReports": 3,
+      "critiques": [
+        "（本轮 cycle 完成后的复盘点）",
+        "cycle 2 复盘（2026-08-07T16:30:00Z）：Phase C 技能工作副本写入与加载闭环已修复（.specify/teams/.work/viz-skill-arena/skills-work/），四个技能变更全部经无回退门采纳并合并回 canonical；R2 四技能加权分全部较 R1 提升（mermaid 0.73→0.87、plantuml 0.86→0.90、echarts 0.70→0.76、d3js 0.73→0.79），证明优化闭环有效。",
+        "cycle 2 复盘（2026-08-07T18:30:00Z）：本轮 Phase C 技能工作副本写入与加载闭环生效，四技能重绘均加载工作副本；R2 中 plantuml/echarts/d3js 无回退且加权分 ≥0.85（plantuml 0.82→0.87 显著提升），其技能变更已合并回 canonical 并同步镜像；mermaid 重绘回退（0.79→0.74，无回退=false），变更未采纳，留待下轮观察。"
+      ],
+      "logRows": 3,
+      "partial": false
+    }
+  ]
+}

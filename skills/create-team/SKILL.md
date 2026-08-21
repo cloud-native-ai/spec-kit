@@ -161,7 +161,7 @@ All patterns share file-path-only handoffs, progress tracking, structured result
 |------|----------|
 | `${SKILL_HOME}/references/` | `conceptual-model.md`, `capacity-vs-responsibility.md`, `goal.md`, `optimization-goals.md`, `operating-loops.md`, `team-presets.md`, `summary-mapping.md`, `create-mode.md`, `patterns.md`, `execution-guide.md` |
 | `${SKILL_HOME}/templates/` | team-supervisor role template, the three EEI stage templates, the parallel/serial/triad orchestration templates, `agent-workflow-schema.md` |
-| `${SKILL_HOME}/templates/teams/` | Predefined team shapes: `workspace-cluster.md`, `artifact-optimizer.md`, `process-monitor.md` |
+| `${SKILL_HOME}/templates/teams/` | Predefined team shapes: `capability-arena.md` (skill/command/subagent 竞技场), `project-cluster.md` (跨项目协作集群) |
 | `${SKILL_HOME}/scripts/match-team-preset.py` | Deterministic preset matcher — returns ranked JSON with a `confidence` verdict |
 
 ## Agent-Specific Configuration

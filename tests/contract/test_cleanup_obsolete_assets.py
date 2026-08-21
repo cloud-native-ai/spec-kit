@@ -69,6 +69,15 @@ def _build_workspace(root: Path) -> None:
     _write(specify / "skills" / "create-docs" / "SKILL.md")
     _write(specify / "skills" / "create-docs" / "references" / "my-notes.md")
 
+    # Retired create-team team presets — consolidated into capability-arena +
+    # project-cluster (must be removed; the two new presets must survive)
+    _write(specify / "skills" / "create-team" / "templates" / "teams" / "skills-arena.md")
+    _write(specify / "skills" / "create-team" / "templates" / "teams" / "workspace-cluster.md")
+    _write(specify / "skills" / "create-team" / "templates" / "teams" / "artifact-optimizer.md")
+    _write(specify / "skills" / "create-team" / "templates" / "teams" / "process-monitor.md")
+    _write(specify / "skills" / "create-team" / "templates" / "teams" / "capability-arena.md")
+    _write(specify / "skills" / "create-team" / "templates" / "teams" / "project-cluster.md")
+
 
 @pytest.mark.contract
 def test_removes_obsolete_skills_commands_and_templates(tmp_path):
@@ -102,11 +111,19 @@ def test_removes_obsolete_skills_commands_and_templates(tmp_path):
     assert not (create_docs / "scripts").exists(), "emptied scripts/ dir must be pruned"
     assert not (create_docs / "assets").exists(), "emptied assets/ tree must be pruned"
 
+    # Retired create-team team presets are reclaimed
+    create_team_presets = specify / "skills" / "create-team" / "templates" / "teams"
+    assert not (create_team_presets / "skills-arena.md").exists()
+    assert not (create_team_presets / "workspace-cluster.md").exists()
+    assert not (create_team_presets / "artifact-optimizer.md").exists()
+    assert not (create_team_presets / "process-monitor.md").exists()
+
     # Reported removals reference each removed path
     assert any("sdd-workflow" in r for r in removed)
     assert any("agent-explore-template.md" in r for r in removed)
     assert any("speckit.specify.md" in r for r in removed)
     assert any("scaffold-hugo.py" in r for r in removed)
+    assert any("skills-arena.md" in r for r in removed)
 
 
 @pytest.mark.contract
@@ -125,6 +142,10 @@ def test_preserves_current_and_user_assets(tmp_path):
     # A skill losing files keeps itself and anything the user put inside it
     assert (specify / "skills" / "create-docs" / "SKILL.md").exists()
     assert (specify / "skills" / "create-docs" / "references" / "my-notes.md").exists()
+    # The consolidated create-team presets survive
+    create_team_presets = specify / "skills" / "create-team" / "templates" / "teams"
+    assert (create_team_presets / "capability-arena.md").exists()
+    assert (create_team_presets / "project-cluster.md").exists()
     # User-authored assets preserved
     assert (specify / "skills" / "my-custom-skill" / "SKILL.md").exists()
     assert (specify / "templates" / "my-team-template.md").exists()
@@ -179,8 +200,14 @@ def test_registries_are_nonempty_and_derived_from_history():
     assert "specify" in _OBSOLETE_COMMANDS
     assert "agent-explore-template.md" in _OBSOLETE_TEMPLATES
     assert "create-docs/scripts/scaffold-hugo.py" in _OBSOLETE_SKILL_FILES
+    assert "create-team/templates/teams/skills-arena.md" in _OBSOLETE_SKILL_FILES
+    assert "create-team/templates/teams/workspace-cluster.md" in _OBSOLETE_SKILL_FILES
+    assert "create-team/templates/teams/artifact-optimizer.md" in _OBSOLETE_SKILL_FILES
+    assert "create-team/templates/teams/process-monitor.md" in _OBSOLETE_SKILL_FILES
     # Current names must never be listed as obsolete.
     assert "create-team" not in _OBSOLETE_SKILLS
     assert "requirements" not in _OBSOLETE_COMMANDS
     assert "plan-template.md" not in _OBSOLETE_TEMPLATES
     assert "create-pages/scripts/scaffold-hugo.py" not in _OBSOLETE_SKILL_FILES
+    assert "create-team/templates/teams/capability-arena.md" not in _OBSOLETE_SKILL_FILES
+    assert "create-team/templates/teams/project-cluster.md" not in _OBSOLETE_SKILL_FILES

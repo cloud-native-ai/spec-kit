@@ -1,0 +1,30 @@
+{
+  "runId": "ev-20260821-025731-improve-skills",
+  "target": "skill:improve-skills",
+  "created": "2026-08-21T02:57:31Z",
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 5
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 7
+    }
+  },
+  "engine": {
+    "engineSubsetPath": "scripts/js/better-harness",
+    "upstreamCommit": "b2e621d",
+    "nodeVersion": "26.3.0"
+  },
+  "findingsDigest": "sha256:a0d039301e910001946358f4a7905e96c488e18db2b432acdd140b79da4ce7f7"
+}

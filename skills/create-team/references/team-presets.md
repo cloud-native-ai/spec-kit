@@ -58,3 +58,14 @@ Body sections (all mandatory):
 ## Adding a preset
 
 Only distil a preset from a team that has **actually run** (its `runs/` reports are the evidence). Write the file per the contract above, keep `signals` specific enough not to shadow other presets, and state `provenance`. A hypothetical shape is not a preset.
+
+## Retiring or renaming a preset
+
+A preset is referenced from more places than its own file. When one is dissolved, merged, or renamed, work this checklist (distilled from the 2026-08-20 four-to-two consolidation):
+
+1. **Register the removal** — add every deleted preset file to `_OBSOLETE_SKILL_FILES` in `src/specify_cli/__init__.py` (OBSOLETE-ASSET-REGISTRY markers) and extend `tests/contract/test_cleanup_obsolete_assets.py`. Init's additive copytree never deletes; an unregistered removal leaves dead presets in every upgraded workspace.
+2. **Sweep live instances** — `.specify/teams/*/team.md` frontmatter `preset:` fields referencing the old id: repoint to the successor preset (with a dated note) or drop it with a `## Lineage` note; bump `updated`. A dangling `preset:` reference is silent rot — nothing validates it.
+3. **Update coupling surfaces** — `SKILL.md` Resources table, `templates/commands/team.md` (then regenerate per-tool copies via `regen-command-copies.py`), the governance-kept table in `shared/guidelines/confirmation-gates.md`, `GOVERNANCE_PATH_PATTERNS` in `scripts/python/scan-confirmation-gates.py`, and `tests/contract/test_confirmation_gates_team_flow.py`.
+4. **Sync and prune mirrors** — run `sync-mirrors.py --write`, then delete the stale mirror copies under `.specify/skills/create-team/templates/teams/` by hand; mirror sync never deletes.
+5. **Do not rewrite history** — specs, `docs/notes/`, and team `runs/` keep the old names; they are point-in-time records.
+6. **Re-validate matching** — run `match-team-preset.py` against the surviving presets' canonical use-case phrasings; a consolidation that merges two presets must not leave either intent unmatched (check `confidence` for both lineages).

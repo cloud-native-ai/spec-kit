@@ -1,0 +1,6 @@
+{
+  "baselineRunId": "ev-20260821-025731-improve-skills",
+  "targetFinding": "user-directive: improve-skills lacked an implementation-research step before optimization actions and an explicit user-requirement-priority pass; SKILL.md sat at the token-budget edge (≈4998/5000) with a 64-line Workflow section carrying manual-level detail",
+  "change": "rewrote skills/improve-skills/SKILL.md (203→158 lines, ≈4062 tokens): new Workflow step 2 (调研实现 — implementation research with strengths/weaknesses/optimization-space note, Hard Constraint 1) and step 6 (按用户要求优化 — user requirements outrank built-in defaults within norm bounds, two-level conflict taxonomy, Hard Constraint 2); flow restated as 调研→按规范优化→按用户要求优化→最终检查; slimmed Workflow/Agent-Specific sections via delete-and-absorb into loop-playbook.md (new ## Step 2 / ## Step 6 sections, anchors renumbered, skill_id uniqueness check absorbed); restored contract-pinned FR-010 legacy-idiom clause after a caught regression",
+  "expectedSignal": "next improve-skills run opens with an implementation-research note before any edit and applies user-passed requirements in a dedicated pass; skill-shape.py stays exit 0; contract tests (C-002 headings, evidence-step conformance, FR-010 idiom clause, feedback conformance) stay green"
+}

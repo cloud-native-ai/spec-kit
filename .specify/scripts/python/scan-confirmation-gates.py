@@ -71,7 +71,7 @@ DESTRUCTIVE_KEYWORDS = (
 GOVERNANCE_PATH_PATTERNS = (
     r"interview", r"constitution-template", r"git-workflow",
     r"feedback\.md", r"docs\.md", r"session\.md", r"feature\.md",
-    r"analyze\.md", r"tools\.md", r"operating-loops", r"workspace-cluster",
+    r"analyze\.md", r"tools\.md", r"operating-loops", r"project-cluster",
     r"gate\.yaml", r"CONFIRM",
 )
 GOVERNANCE_RE = re.compile("|".join(GOVERNANCE_PATH_PATTERNS))

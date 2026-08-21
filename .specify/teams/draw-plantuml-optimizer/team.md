@@ -8,8 +8,9 @@ goal: >
   （美观 0.40 / 结构清晰 0.30 / 正确 0.20 / 心智负担 0.10）达到 ≥ 0.85 即视为该轮达标；
   对复杂大图，美观度优先级高于其他维度。持续机制：可复现、可复盘，多轮 re-run 累积改进。
 pattern: iteration
+preset: capability-arena   # 变体模式实例(单目标 × 正交角度);preset 由原 artifact-optimizer 泛化而来
 created: 2026-07-15
-updated: 2026-07-15
+updated: 2026-08-20
 members:
   - agent: agent-team-supervisor-template
     role: team-supervisor

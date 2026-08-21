@@ -768,7 +768,9 @@ _OBSOLETE_SKILLS = (
 # (Hugo mount-mode scaffolder + reference + asset templates moved
 # create-docs → create-pages when presentation was decoupled from structure;
 # create-pages/scripts/scaffold.sh → scaffold-ci.sh when rendering and hosting
-# were split into separate stages.)
+# were split into separate stages; create-team's four team presets
+# skills-arena/workspace-cluster/artifact-optimizer/process-monitor were
+# consolidated into capability-arena.md + project-cluster.md.)
 _OBSOLETE_SKILL_FILES = (
     "create-docs/scripts/scaffold-hugo.py",
     "create-docs/references/hugo-site.md",
@@ -782,6 +784,10 @@ _OBSOLETE_SKILL_FILES = (
     "create-docs/assets/hugo/layouts/_default/_markup/render-image.html",
     "create-docs/assets/hugo/static/css/site.css",
     "create-pages/scripts/scaffold.sh",
+    "create-team/templates/teams/skills-arena.md",
+    "create-team/templates/teams/workspace-cluster.md",
+    "create-team/templates/teams/artifact-optimizer.md",
+    "create-team/templates/teams/process-monitor.md",
 )
 
 # Command stems that were renamed or removed (specify→requirements; converge,

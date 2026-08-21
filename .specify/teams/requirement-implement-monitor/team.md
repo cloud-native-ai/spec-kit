@@ -42,7 +42,7 @@ config:
   state_spine: .specify/teams/requirement-implement-monitor/STATE.md
   run_log: .specify/teams/requirement-implement-monitor/run-log.jsonl
 created: 2026-07-29
-updated: 2026-07-29
+updated: 2026-08-20
 ---
 
 ## Goal
@@ -126,3 +126,6 @@ updated: 2026-07-29
 该使命于同日收官（spec 034 全部 41 任务、Feature 038 Implemented），4 个 cycle 的完整档案
 保留在 `runs/`（20260729T063425Z ~ 20260729T093345Z）与 `run-log.jsonl` 前 4 行；本团队为其
 goal 重定义 + 通用化后的延续，已验证机制全部继承。
+
+2026-08-20:由本团队蒸馏的 `process-monitor` 预置并入 `project-cluster` 预置（证据纪律、独立复核、
+误报核算等机制由后者继承）；本团队为单目标过程监控形态,不声明 preset,定义保持独立。

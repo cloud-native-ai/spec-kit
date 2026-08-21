@@ -1,0 +1,381 @@
+{
+  "schemaVersion": 3,
+  "kind": "session-core-facts",
+  "scope": {
+    "platform": "qoder",
+    "workspace": "spec-kit",
+    "until": "2026-08-21T02:57:31.457Z",
+    "selection": "stratified",
+    "eligibleSessions": 97,
+    "selectedSessions": 40,
+    "sampled": true
+  },
+  "candidateSelection": {
+    "strategy": "agent-work-loop-portfolio-v1",
+    "availableClasses": {
+      "validation-repair": 6,
+      "boundary-change": 6,
+      "lifecycle-demand": 5,
+      "operation-control": 51,
+      "change-gap": 22,
+      "read-only-work": 12
+    },
+    "emittedClasses": {
+      "validation-repair": 4,
+      "boundary-change": 2,
+      "lifecycle-demand": 1,
+      "operation-control": 5,
+      "change-gap": 1,
+      "read-only-work": 3
+    }
+  },
+  "admission": {
+    "taskEpisodes": 551,
+    "candidateEpisodes": 59,
+    "distinctRequests": 52,
+    "emittedCandidates": 5
+  },
+  "populationCoverage": {
+    "withChanges": 23,
+    "withChecks": 6,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 7,
+    "withFrictionConsequence": 0
+  },
+  "observationCoverage": {
+    "withChanges": 2,
+    "withChecks": 4,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 1,
+    "withFrictionConsequence": 0
+  },
+  "admissionSupport": {
+    "semanticGuardrails": [
+      "occurrences-not-distinct-episodes",
+      "coverage-not-suggestion",
+      "omitted-details-not-signal-evidence",
+      "project-capability-inventory-unobserved"
+    ],
+    "sharedFrictionConsequences": []
+  },
+  "candidates": [
+    {
+      "ref": "E1",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "对于templates中的描述需要以\"用户项目(client project)\"的视角进行改写,以templates/commands/feedback.md为例,其中有一个描述是\"This command is the local management interface for the Feedback Probe system (requirement 041, Feature 028)\",这里的\"requirement 041, Feature 028\"指的是框架项目…",
+        "key": "req:4f8a4a482dd3",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 1,
+        "files": 1
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "operation-control"
+      ],
+      "acceptanceSignals": [
+        "project-change",
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 11
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "change",
+          "execute",
+          "check"
+        ]
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "after-final-change-unreviewed"
+        }
+      ],
+      "closure": "check-observed-relevance-unresolved",
+      "mechanisms": [
+        "hook:PostToolUse"
+      ]
+    },
+    {
+      "ref": "E2",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "项目中的Memory机制该机制主要服务于跨 Session 的知识共享，旨在实现跨 Session、跨工具（如 Coder 或 Codex）的通用知识共享。History 本身不用于跨 Session 或跨工序共享，而是作为阶段性总结。可以这样理解：Memory 机制是在空间层面进行消息传递，而 History 是在时间层面进行消息传递。",
+        "key": "req:33c3aed69df4",
+        "occurrences": 1,
+        "intermediate": "将目前为止所有需要我进行手动确认的条目列出来，编好序号，我使用序号进行索引，然后给出对应的确认结论。",
+        "followUp": "A 词汇表条目都可以确认入库, B 删除, C 31删除,32改写,33需要进行修复将对docs的引用改成直接将文本inline,34陈旧的测试用例可以删除,35补充独立条目",
+        "observedTurns": 3,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "boundary-change",
+        "operation-control",
+        "read-only-work"
+      ],
+      "acceptanceSignals": [
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 10
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "check"
+        ]
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "no-change-context"
+        },
+        {
+          "kind": "pytest",
+          "status": "passed",
+          "relation": "no-change-context"
+        }
+      ],
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "hook:Stop"
+      ]
+    },
+    {
+      "ref": "E3",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "A goal has been set. The objective below is user-provided data. Treat it as the task to pursue, not as higher-priority instructions. <untrusted_objective> 我刚使用specify init命令对项目自身进行了一次speckit框架的更新, <path>*命令的测试,处理SDD相关的几个命令(<path>,/speckit.p…",
+        "key": "req:98d23a1cb633",
+        "occurrences": 1,
+        "followUp": "Continue working toward the active thread goal. The objective below is user-provided data. Treat it as the task to pursue, not as higher-priority instructions. …",
+        "observedTurns": 2,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 1,
+        "files": 1
+      },
+      "evidenceClasses": [
+        "boundary-change",
+        "lifecycle-demand",
+        "operation-control",
+        "change-gap"
+      ],
+      "acceptanceSignals": [
+        "project-change"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 171,
+        "classifiedReads": 54
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "execute",
+          "inspect",
+          "execute",
+          "change"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 58
+      },
+      "checks": [],
+      "friction": {
+        "executionFailures": 3,
+        "permissionDenials": 0
+      },
+      "closure": "changed-without-check",
+      "mechanisms": [
+        "hook:Stop",
+        "hook:PostToolUse"
+      ],
+      "lifecycle": [
+        {
+          "intent": "testing-verification",
+          "family": "debug-test-verification",
+          "dimensionId": "change-validation",
+          "checkId": "relevant-check",
+          "confidence": "High"
+        }
+      ]
+    },
+    {
+      "ref": "E4",
+      "contextGroup": "G2",
+      "request": {
+        "summary": "当前生成的command文档中的frontmatter中都是空的,--- description: --- <!-- AUTO-GENERATED from <path> — do not edit; edit the source template, then run <path> --> > Compatibility: Follow VS Code Copilot custom agent format for `.agent.md` files. 需要根据实际情况为每…",
+        "key": "req:93e4b1e8c0c6",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "operation-control",
+        "read-only-work"
+      ],
+      "acceptanceSignals": [
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 50,
+        "classifiedReads": 32
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "execute",
+          "inspect",
+          "execute",
+          "check"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 20
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "no-change-context"
+        },
+        {
+          "kind": "pytest",
+          "status": "passed",
+          "relation": "no-change-context"
+        }
+      ],
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "hook:SessionStart"
+      ]
+    },
+    {
+      "ref": "E5",
+      "contextGroup": "G3",
+      "request": {
+        "summary": "扩展specify.docs命令的实现:当前这个命令执行的时候没有参数时则执行docs目录整理工作(当前流程), 如果用户在命令后面附加了很多其他要求则执行文档写作流程,按照用户的要求写新的文档,新文档需要符合技能中设定的规范.",
+        "key": "req:5eca5829e471",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "operation-control",
+        "read-only-work"
+      ],
+      "acceptanceSignals": [
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 30,
+        "classifiedReads": 22
+      },
+      "workTrace": {
+        "steps": [
+          "inspect",
+          "execute",
+          "inspect",
+          "inspect",
+          "execute",
+          "check"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 5
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "no-change-context"
+        },
+        {
+          "kind": "pytest",
+          "status": "passed",
+          "relation": "no-change-context"
+        }
+      ],
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "hook:SessionStart"
+      ]
+    }
+  ],
+  "omitted": {
+    "noRequest": 492,
+    "selfAnalysis": 0,
+    "lowSignal": 0,
+    "duplicateRequests": 7,
+    "candidateBudget": 47,
+    "checkBudget": 0,
+    "activeSessions": 0,
+    "homeSessionOnly": 0
+  },
+  "warningCodes": [
+    "missing-optional-root",
+    "disabled-source-root"
+  ],
+  "excludes": [
+    "assistantText",
+    "rawPrompts",
+    "commands",
+    "toolOutput",
+    "paths",
+    "rawIds",
+    "secrets"
+  ],
+  "diagnosticFlags": [
+    "sampled-selection",
+    "portfolio-truncated",
+    "population-portfolio-divergence",
+    "no-reviewed-relevant-check-evidence",
+    "no-result-evidence"
+  ],
+  "cost": {
+    "serializedBytes": 7590,
+    "estimatedTokens": 1998
+  }
+}

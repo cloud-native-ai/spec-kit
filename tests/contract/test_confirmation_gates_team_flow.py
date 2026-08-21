@@ -70,7 +70,7 @@ def test_wrapup_submission_prompt_nonblocking() -> None:
 
 def test_continuous_tiered_gates_untouched() -> None:
     ops = REPO_ROOT / "skills" / "create-team" / "references" / "operating-loops.md"
-    ws = REPO_ROOT / "skills" / "create-team" / "templates" / "teams" / "workspace-cluster.md"
+    ws = REPO_ROOT / "skills" / "create-team" / "templates" / "teams" / "project-cluster.md"
     for path in (ops, ws):
         text = read(path)
         assert "confirm" in text.lower() or "确认" in text, (

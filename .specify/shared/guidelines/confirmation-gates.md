@@ -38,7 +38,7 @@
 | feature 状态回退确认 | feature.md | 治理状态保护(governance-kept) |
 | analyze 补救批准 | analyze.md | 严格只读命令的例外写批准(governance-kept) |
 | glossary 冲突/覆盖用户条目确认 | shared/workflow/glossary.md | 覆盖用户权威数据,破坏性桶 |
-| continuous 循环分级门控 | create-team references(operating-loops / workspace-cluster) | 长时运行资源占用,既有分级门控保留 |
+| continuous 循环分级门控 | create-team references(operating-loops / project-cluster) | 长时运行资源占用,既有分级门控保留 |
 
 ## 存疑从严
 

@@ -32,8 +32,9 @@ territory:
   non_path:
     - { type: skill-invocation, target: 四个绘制技能的运行（渲染脚本执行、技能工作副本重载） }
 pattern: continuous
+preset: capability-arena   # 竞技模式实例(4 技能同题竞技);preset 由原 skills-arena 泛化而来
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-20
 members:
   - agent: agent-team-supervisor-template
     role: team-supervisor

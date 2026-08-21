@@ -1,0 +1,460 @@
+{
+  "kind": "agent-asset-baseline",
+  "schemaVersion": 1,
+  "status": "complete",
+  "scope": {
+    "provider": "qoder",
+    "workspace": ".",
+    "includeUserHome": false,
+    "includeMemories": true
+  },
+  "envelopes": {
+    "lint": {
+      "status": "available",
+      "data": {
+        "kind": "agent-lint",
+        "profile": "agent-assets-review",
+        "summary": {
+          "entrypoints": 1,
+          "documents": 1,
+          "links": 0,
+          "references": 0,
+          "missingReferences": 0,
+          "findings": 15,
+          "errors": 2,
+          "warnings": 4,
+          "advisories": 9
+        },
+        "assetInventory": {
+          "provider": "qoder",
+          "summary": {
+            "skills": 31,
+            "mcps": 0,
+            "commands": 24,
+            "hooks": 0,
+            "rules": 1,
+            "agents": 2,
+            "plugins": 0
+          }
+        },
+        "findings": {
+          "items": [
+            {
+              "id": "skill-missing-local-reference",
+              "severity": "error",
+              "assetKind": "skill",
+              "assetName": "create-docs",
+              "scope": "project",
+              "file": ".qoder/skills/create-docs/SKILL.md",
+              "line": 12,
+              "evidence": ".qoder/skills/create-docs/SKILL.md:12 points to missing local reference ../../shared/patterns/reconcile-pattern.md.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Skill Review"
+            },
+            {
+              "id": "skill-missing-local-reference",
+              "severity": "error",
+              "assetKind": "skill",
+              "assetName": "git-workflow",
+              "scope": "project",
+              "file": ".qoder/skills/git-workflow/SKILL.md",
+              "line": 12,
+              "evidence": ".qoder/skills/git-workflow/SKILL.md:12 points to missing local reference ../../shared/patterns/reconcile-pattern.md.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Skill Review"
+            },
+            {
+              "id": "custom-agent-invalid-name",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "Skill Verifier",
+              "scope": "project",
+              "file": ".qoder/agents/skill-verifier.agent.md",
+              "evidence": ".qoder/agents/skill-verifier.agent.md declares a name that is not a lowercase hyphenated identifier.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-invalid-name",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "Structure Adjuster",
+              "scope": "project",
+              "file": ".qoder/agents/structure-adjuster.agent.md",
+              "evidence": ".qoder/agents/structure-adjuster.agent.md declares a name that is not a lowercase hyphenated identifier.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-name-mismatch",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "Skill Verifier",
+              "scope": "project",
+              "file": ".qoder/agents/skill-verifier.agent.md",
+              "evidence": ".qoder/agents/skill-verifier.agent.md declares Skill Verifier, while the invocable filename is skill-verifier.agent.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-name-mismatch",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "Structure Adjuster",
+              "scope": "project",
+              "file": ".qoder/agents/structure-adjuster.agent.md",
+              "evidence": ".qoder/agents/structure-adjuster.agent.md declares Structure Adjuster, while the invocable filename is structure-adjuster.agent.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "skill-long-without-progressive-references",
+              "severity": "advisory",
+              "assetKind": "skill",
+              "assetName": "archive-session",
+              "scope": "project",
+              "file": ".qoder/skills/archive-session/SKILL.md",
+              "line": 1,
+              "evidence": ".qoder/skills/archive-session/SKILL.md is 137 lines and has no existing local Markdown references.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Progressive Disclosure"
+            },
+            {
+              "id": "skill-long-without-progressive-references",
+              "severity": "advisory",
+              "assetKind": "skill",
+              "assetName": "clone-website-ui",
+              "scope": "project",
+              "file": ".qoder/skills/clone-website-ui/SKILL.md",
+              "line": 1,
+              "evidence": ".qoder/skills/clone-website-ui/SKILL.md is 197 lines and has no existing local Markdown references.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Progressive Disclosure"
+            },
+            {
+              "id": "skill-long-without-progressive-references",
+              "severity": "advisory",
+              "assetKind": "skill",
+              "assetName": "create-docs",
+              "scope": "project",
+              "file": ".qoder/skills/create-docs/SKILL.md",
+              "line": 1,
+              "evidence": ".qoder/skills/create-docs/SKILL.md is 170 lines and has no existing local Markdown references.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Progressive Disclosure"
+            },
+            {
+              "id": "skill-long-without-progressive-references",
+              "severity": "advisory",
+              "assetKind": "skill",
+              "assetName": "create-tools",
+              "scope": "project",
+              "file": ".qoder/skills/create-tools/SKILL.md",
+              "line": 1,
+              "evidence": ".qoder/skills/create-tools/SKILL.md is 163 lines and has no existing local Markdown references.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Progressive Disclosure"
+            },
+            {
+              "id": "skill-long-without-progressive-references",
+              "severity": "advisory",
+              "assetKind": "skill",
+              "assetName": "database-utils",
+              "scope": "project",
+              "file": ".qoder/skills/database-utils/SKILL.md",
+              "line": 1,
+              "evidence": ".qoder/skills/database-utils/SKILL.md is 244 lines and has no existing local Markdown references.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Progressive Disclosure"
+            },
+            {
+              "id": "skill-long-without-progressive-references",
+              "severity": "advisory",
+              "assetKind": "skill",
+              "assetName": "git-submodule-edit",
+              "scope": "project",
+              "file": ".qoder/skills/git-submodule-edit/SKILL.md",
+              "line": 1,
+              "evidence": ".qoder/skills/git-submodule-edit/SKILL.md is 142 lines and has no existing local Markdown references.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Progressive Disclosure"
+            },
+            {
+              "id": "skill-long-without-progressive-references",
+              "severity": "advisory",
+              "assetKind": "skill",
+              "assetName": "improve-agent",
+              "scope": "project",
+              "file": ".qoder/skills/improve-agent/SKILL.md",
+              "line": 1,
+              "evidence": ".qoder/skills/improve-agent/SKILL.md is 186 lines and has no existing local Markdown references.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Progressive Disclosure"
+            },
+            {
+              "id": "skill-long-without-progressive-references",
+              "severity": "advisory",
+              "assetKind": "skill",
+              "assetName": "improve-docs",
+              "scope": "project",
+              "file": ".qoder/skills/improve-docs/SKILL.md",
+              "line": 1,
+              "evidence": ".qoder/skills/improve-docs/SKILL.md is 150 lines and has no existing local Markdown references.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Progressive Disclosure"
+            },
+            {
+              "id": "skill-long-without-progressive-references",
+              "severity": "advisory",
+              "assetKind": "skill",
+              "assetName": "improve-tools",
+              "scope": "project",
+              "file": ".qoder/skills/improve-tools/SKILL.md",
+              "line": 1,
+              "evidence": ".qoder/skills/improve-tools/SKILL.md is 149 lines and has no existing local Markdown references.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Progressive Disclosure"
+            }
+          ],
+          "total": 15,
+          "omitted": 0
+        }
+      }
+    },
+    "inventory": {
+      "status": "available",
+      "data": {
+        "scope": {
+          "platform": "qoder",
+          "includeUserHome": false,
+          "includeMemories": true
+        },
+        "summary": {
+          "projectAssets": 4,
+          "userAssets": 0,
+          "pluginAssets": 0,
+          "sessionSourceHints": 1,
+          "memories": 0
+        },
+        "coverageRows": [
+          {
+            "surface": "Rules",
+            "scopes": [
+              "Project"
+            ],
+            "count": 1,
+            "paths": [
+              "AGENTS.md"
+            ]
+          },
+          {
+            "surface": "Skills",
+            "scopes": [
+              "Project"
+            ],
+            "count": 31,
+            "paths": [
+              ".qoder/skills/agent-cli-setup/SKILL.md",
+              ".qoder/skills/archive-session/SKILL.md",
+              ".qoder/skills/browser-extension/SKILL.md",
+              ".qoder/skills/browser-utils/SKILL.md",
+              ".qoder/skills/clone-website-ui/SKILL.md"
+            ]
+          },
+          {
+            "surface": "Commands",
+            "scopes": [
+              "Project"
+            ],
+            "count": 24,
+            "paths": [
+              ".qoder/commands/speckit.agents.md",
+              ".qoder/commands/speckit.analyze.md",
+              ".qoder/commands/speckit.checklist.md",
+              ".qoder/commands/speckit.clarify.md",
+              ".qoder/commands/speckit.constitution.md"
+            ]
+          },
+          {
+            "surface": "Custom Agents",
+            "scopes": [
+              "Project"
+            ],
+            "count": 2,
+            "paths": [
+              ".qoder/agents/skill-verifier.agent.md",
+              ".qoder/agents/structure-adjuster.agent.md"
+            ]
+          }
+        ],
+        "ownerRoutes": {
+          "items": [
+            {
+              "kind": "rules",
+              "scope": "project",
+              "name": "AGENTS.md",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": "AGENTS.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "agent-cli-setup",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/agent-cli-setup/SKILL.md"
+            },
+            {
+              "kind": "commands",
+              "scope": "project",
+              "name": "speckit.agents",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/commands/speckit.agents.md"
+            },
+            {
+              "kind": "agents",
+              "scope": "project",
+              "name": "Skill Verifier",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/agents/skill-verifier.agent.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "archive-session",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/archive-session/SKILL.md"
+            },
+            {
+              "kind": "commands",
+              "scope": "project",
+              "name": "speckit.analyze",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/commands/speckit.analyze.md"
+            },
+            {
+              "kind": "agents",
+              "scope": "project",
+              "name": "Structure Adjuster",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/agents/structure-adjuster.agent.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "browser-extension",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/browser-extension/SKILL.md"
+            },
+            {
+              "kind": "commands",
+              "scope": "project",
+              "name": "speckit.checklist",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/commands/speckit.checklist.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "browser-utils",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/browser-utils/SKILL.md"
+            },
+            {
+              "kind": "commands",
+              "scope": "project",
+              "name": "speckit.clarify",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/commands/speckit.clarify.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "clone-website-ui",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/clone-website-ui/SKILL.md"
+            },
+            {
+              "kind": "commands",
+              "scope": "project",
+              "name": "speckit.constitution",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/commands/speckit.constitution.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "code-review",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/code-review/SKILL.md"
+            },
+            {
+              "kind": "commands",
+              "scope": "project",
+              "name": "speckit.docs",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/commands/speckit.docs.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "collect-evidence",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/collect-evidence/SKILL.md"
+            }
+          ],
+          "total": 58,
+          "omitted": 42
+        },
+        "memories": {
+          "included": true,
+          "contentPolicy": "raw-memory-content-not-read",
+          "categories": [],
+          "titleCount": 0
+        },
+        "warnings": []
+      }
+    },
+    "integrity": {
+      "status": "available",
+      "data": {
+        "kind": "asset-integrity-review",
+        "profile": "asset-integrity-review",
+        "status": "reviewed",
+        "contentPolicy": "memory-title-and-path-metadata-only",
+        "summary": {
+          "findingCount": 0,
+          "memories": {
+            "titleCount": 0,
+            "reviewedTitleCount": 0,
+            "truncated": false,
+            "exactCollisionGroups": 0,
+            "similarityCandidates": 0
+          },
+          "plugins": {
+            "enabledPluginCount": 0,
+            "nameCollisionGroups": 0,
+            "capabilityOverlapGroups": 0,
+            "familyCandidates": 0
+          },
+          "hooks": {
+            "enabledHookCount": 0,
+            "overRecommendedLimit": false,
+            "exactDuplicateGroups": 0,
+            "fanoutCandidates": 0
+          }
+        },
+        "findings": {
+          "items": [],
+          "total": 0,
+          "omitted": 0
+        }
+      }
+    }
+  },
+  "diagnostics": {
+    "sharedInventorySnapshot": true,
+    "compact": true,
+    "findingLimitPerEnvelope": 16,
+    "ownerRouteLimit": 16
+  }
+}

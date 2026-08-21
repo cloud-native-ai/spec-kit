@@ -10,9 +10,9 @@ goal: >
   最多 5 代，连续 2 代无提升则中止。图表质量优先级最高（当前主要痛点在可视化效果）。
   胜出改动落回 skills/summarize-project/ 并双写同步 .specify/skills/summarize-project/。
 pattern: iteration
-preset: artifact-optimizer
+preset: capability-arena   # 变体模式实例(单目标 × 正交角度);2026-08-20 由 artifact-optimizer 改指泛化后的 capability-arena
 created: 2026-07-30
-updated: 2026-07-30
+updated: 2026-08-20
 members:
   - agent: agent-team-supervisor-template
     role: team-supervisor

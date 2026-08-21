@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "kind": "speckit.evidence-findings",
+  "target": "skill:improve-skills",
+  "runId": "ev-20260821-025731-improve-skills",
+  "window": {
+    "since": null,
+    "until": null
+  },
+  "platforms": [
+    "qoder"
+  ],
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 5
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 7
+    }
+  },
+  "evidence": [
+    {
+      "id": "ev-001",
+      "lane": "session",
+      "evidenceState": "Exercised",
+      "summary": "551 task episode(s) observed on qoder; 5 candidate(s) admitted, 0 with user corrections.",
+      "evidenceRefs": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5"
+      ],
+      "signals": {
+        "taskEpisodes": 551,
+        "candidates": 5,
+        "userCorrections": 0
+      },
+      "privacyNote": "redacted-semantic-facet"
+    },
+    {
+      "id": "ev-002",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Project profile captured: primary languages javascript, python; git history signals collected.",
+      "evidenceRefs": [
+        "core-change-watch/project-profile",
+        "core-change-watch/git-history-profile"
+      ],
+      "signals": {
+        "primaryLanguages": 2,
+        "sourceFiles": 291,
+        "testFiles": 267
+      }
+    },
+    {
+      "id": "ev-003",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Dependency governance: 2 ecosystem(s), risk level medium.",
+      "evidenceRefs": [
+        "dependency-governance/cli"
+      ],
+      "signals": {
+        "ecosystems": 2,
+        "staleDependencyFiles": 0
+      }
+    },
+    {
+      "id": "ev-004",
+      "lane": "assets",
+      "evidenceState": "Present",
+      "summary": "Asset baseline (qoder): status complete, 15 lint finding(s), inventory available.",
+      "evidenceRefs": [
+        "coding-agent-practices/asset-baseline"
+      ],
+      "signals": {
+        "lintFindings": 15
+      }
+    },
+    {
+      "id": "ev-005",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team cws-workspace-cluster: 2 run report(s), 2 logged cycle(s), 0 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/cws-workspace-cluster/runs/20260730T082021Z-report.md",
+        ".specify/teams/cws-workspace-cluster/runs/20260730T094500Z-report.md"
+      ],
+      "signals": {
+        "runReports": 2,
+        "loggedCycles": 2,
+        "escalations": 13,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-006",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team draw-plantuml-optimizer: 5 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/draw-plantuml-optimizer/runs/20260715T130546Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T071030Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T074420Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T094834Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T104232Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-007",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team requirement-implement-monitor: 5 run report(s), 5 logged cycle(s), 1 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/requirement-implement-monitor/runs/20260729T063425Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T072002Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T074013Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T093345Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260730T022200Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 5,
+        "escalations": 4,
+        "critiqueNotes": 1
+      }
+    },
+    {
+      "id": "ev-008",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team summarize-project-optimizer: 2 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/summarize-project-optimizer/runs/20260730T122438Z-report.md",
+        ".specify/teams/summarize-project-optimizer/runs/20260730T180020Z-report.md"
+      ],
+      "signals": {
+        "runReports": 2,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-009",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team viz-skill-arena: 3 run report(s), 3 logged cycle(s), 3 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/viz-skill-arena/runs/2026-08-07T15-00-00Z-report.md",
+        ".specify/teams/viz-skill-arena/runs/2026-08-07T16-30-00Z-report.md",
+        ".specify/teams/viz-skill-arena/runs/2026-08-07T18-30-00Z-report.md"
+      ],
+      "signals": {
+        "runReports": 3,
+        "loggedCycles": 3,
+        "escalations": 0,
+        "critiqueNotes": 3
+      }
+    },
+    {
+      "id": "ev-010",
+      "lane": "feedback",
+      "evidenceState": "Exercised",
+      "summary": "Recurring optimization theme across 2 feedback entries: optimization points",
+      "evidenceRefs": [
+        ".specify/memory/feedback/20260820T062957Z-skill-improve-skills.md",
+        ".specify/memory/feedback/20260820T075028Z-skill-improve-skills.md"
+      ],
+      "signals": {
+        "recurrence": 2
+      }
+    },
+    {
+      "id": "ev-011",
+      "lane": "feedback",
+      "evidenceState": "Present",
+      "summary": "Feedback store scanned: 7 entr(y/ies), 1 recurring optimization theme(s).",
+      "evidenceRefs": [
+        ".specify/memory/feedback/index.json"
+      ],
+      "signals": {
+        "entries": 7,
+        "recurringThemes": 1
+      }
+    }
+  ],
+  "findingsDigest": "sha256:a0d039301e910001946358f4a7905e96c488e18db2b432acdd140b79da4ce7f7"
+}
