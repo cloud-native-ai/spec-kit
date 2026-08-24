@@ -1,6 +1,6 @@
-# MCP Browser-Use Tools Reference (Tier 2)
+# MCP Browser-Use Tools Reference (Tier 3)
 
-Tier 2 strategy: operate the desktop Chrome browser via the `browser-use` MCP connector.
+Tier 3 strategy: operate the desktop Chrome browser via the `browser-use` MCP connector.
 The agent communicates with a real browser through MCP tool calls — no script files needed.
 
 This reference covers all available `browser-use` MCP tools, common operation patterns, and best practices.

@@ -39,6 +39,24 @@ SCAFFOLD_FILES = (
 )
 
 
+BOOK_FILES = (
+    "hugo.toml",
+    ".gitignore",
+    ".speckit/nav/section-index.md",
+    "layouts/_partials/docs/title.html",
+    "layouts/_shortcodes/speckit-children.html",
+)
+
+
+def fake_theme(root: Path, min_version: str = "0.158.0") -> None:
+    """A theme present on disk, without touching the network: only the marker file and
+    its declared Hugo minimum matter to the scaffolder."""
+    theme = root / "docs" / "themes" / "book"
+    (theme / "layouts").mkdir(parents=True)
+    (theme / "theme.toml").write_text(
+        f'name = "Book"\nmin_version = "{min_version}"\n', encoding="utf-8")
+
+
 def run(root: Path, *args: str) -> dict:
     proc = subprocess.run(
         [sys.executable, str(SCRIPT), "--root", str(root), *args],
@@ -248,3 +266,155 @@ def test_real_build_renders_links_and_media(tmp_path: Path):
     assert (public / "assets" / "flow.svg").is_file(), "media-only directory must be published"
     assert (public / "concepts" / "diagram.svg").is_file(), "media beside prose must be published"
     assert not list(public.rglob("*.md")), "raw Markdown must never be copied into the output"
+
+
+# --------------------------------------------------------------------------------------
+# Book mode: the preferred theme, plus the navigation it needs to be complete.
+# --------------------------------------------------------------------------------------
+
+
+@pytest.mark.integration
+def test_auto_mode_falls_back_to_builtin_without_the_theme(tmp_path: Path):
+    make_docs(tmp_path)
+    out = run(tmp_path, "--action", "scaffold")
+    assert out["theme"]["mode"] == "builtin" and out["theme"]["present"] is False
+    assert out["nav"]["applied"] is False, "nav completion is a Book-mode capability"
+    assert (tmp_path / "docs" / "layouts" / "_default" / "baseof.html").is_file()
+    assert not (tmp_path / "docs" / ".speckit").exists(), \
+        "the nav stub belongs to Book mode only"
+
+
+@pytest.mark.integration
+def test_explicit_book_request_without_the_theme_refuses_to_write(tmp_path: Path):
+    make_docs(tmp_path)
+    before = fingerprint(tmp_path / "docs")
+    out = run(tmp_path, "--action", "scaffold", "--theme", "book")
+    assert out["clean"] is False and "error" in out
+    assert "theme" in out["guidance"], "the report must name the install path"
+    assert fingerprint(tmp_path / "docs") == before, "a refused run must write nothing"
+
+
+@pytest.mark.integration
+def test_theme_status_never_touches_the_network(tmp_path: Path):
+    make_docs(tmp_path)
+    out = run(tmp_path, "--action", "theme")
+    assert out["fetched"] is False and out["present"] is False and out["clean"] is True
+    assert "--fetch" in out["guidance"]
+    fake_theme(tmp_path)
+    out = run(tmp_path, "--action", "theme")
+    assert out["present"] is True and out["min_hugo"] == "0.158.0"
+    assert out["fetched"] is False, "status alone must not install anything"
+
+
+@pytest.mark.integration
+def test_book_mode_completes_the_navigation(tmp_path: Path):
+    make_docs(tmp_path)
+    fake_theme(tmp_path)
+    out = run(tmp_path, "--action", "scaffold", "--site-title", "Probe")
+    assert out["theme"]["mode"] == "book" and out["nav"]["applied"] is True
+    missing = [rel for rel in BOOK_FILES if not (tmp_path / "docs" / rel).is_file()]
+    assert not missing, f"Book scaffold did not place: {missing}"
+
+    config = (tmp_path / "docs" / "hugo.toml").read_text(encoding="utf-8")
+    assert 'theme = "book"' in config
+    # a nested directory without an index.md is not a Hugo section at all, so the
+    # sidebar would lose the grouping: the shared stub restores it
+    assert "reference/commands" in out["nav"]["generated_indexes"]
+    assert 'target = "content/reference/commands/_index.md"' in config
+    assert f'source = "{".speckit/nav/section-index.md"}"' in config
+    # the docs root has no index.md either, so the home page gets one too
+    assert 'target = "content/_index.md"' in config
+    # reading order, not alphabetical: concepts before tutorials before archive
+    order = out["nav"]["order"]
+    assert order["concepts"] < order["tutorials"] < order["archive"]
+    assert '    path = "/concepts"' in config and "[cascade.target]" in config
+    # generated sections get a machine label; curated ones keep their H1
+    assert 'title = "Commands"' in config
+    assert 'title = "Tasks"' not in config, \
+        "tasks/index.md exists: its H1 is the label, not a generated title"
+    # documents are never touched
+    assert not (tmp_path / "docs" / "reference" / "commands" / "index.md").exists()
+    assert not (tmp_path / "docs" / "reference" / "commands" / "_index.md").exists()
+
+
+@pytest.mark.integration
+def test_collapse_threshold_marks_only_crowded_sections(tmp_path: Path):
+    make_docs(tmp_path)
+    fake_theme(tmp_path)
+    for index in range(6):
+        (tmp_path / "docs" / "reference" / "commands" / f"cmd-{index}.md").write_text(
+            f"# Command {index}\n", encoding="utf-8")
+    out = run(tmp_path, "--action", "scaffold", "--collapse-threshold", "6")
+    assert "reference/commands" in out["nav"]["collapsed"]
+    assert "tutorials" not in out["nav"]["collapsed"], "a two-page section stays expanded"
+    config = (tmp_path / "docs" / "hugo.toml").read_text(encoding="utf-8")
+    assert "bookCollapseSection = true" in config
+
+
+@pytest.mark.integration
+def test_mode_switch_is_atomic_and_needs_force(tmp_path: Path):
+    """Half a switch (theme config, no layouts / builtin config, no layouts) is an
+    unbuildable site, so a blocked switch must write nothing at all."""
+    make_docs(tmp_path)
+    run(tmp_path, "--action", "scaffold", "--site-title", "Probe")
+    fake_theme(tmp_path)
+    before = fingerprint(tmp_path / "docs")
+
+    blocked = run(tmp_path, "--action", "scaffold", "--site-title", "Probe")
+    assert blocked["clean"] is False
+    assert [f["action"] for f in blocked["files"] if f["path"].endswith("hugo.toml")] == \
+        ["mode-mismatch"]
+    assert "--force" in blocked["guidance"]
+    assert fingerprint(tmp_path / "docs") == before, "a blocked switch must write nothing"
+
+    switched = run(tmp_path, "--action", "scaffold", "--site-title", "Probe", "--force")
+    actions = {f["path"]: f["action"] for f in switched["files"]}
+    assert actions["docs/hugo.toml"] == "rewritten"
+    assert actions["docs/layouts/_default/baseof.html"] == "removed", \
+        "a leftover baseof.html would replace the theme's whole page shell"
+    assert not (tmp_path / "docs" / "layouts" / "_default").exists()
+    assert not (tmp_path / "docs" / "static" / "css").exists()
+    assert switched["clean"] is True
+    assert run(tmp_path, "--action", "scaffold", "--site-title", "Probe")["clean"] is True
+
+
+@pytest.mark.integration
+def test_locally_edited_layout_survives_a_mode_switch(tmp_path: Path):
+    make_docs(tmp_path)
+    run(tmp_path, "--action", "scaffold")
+    edited = tmp_path / "docs" / "layouts" / "_default" / "single.html"
+    edited.write_text("<!-- mine -->\n", encoding="utf-8")
+    fake_theme(tmp_path)
+
+    out = run(tmp_path, "--action", "scaffold", "--force")
+    assert out["stale_edited"] == ["docs/layouts/_default/single.html"]
+    assert edited.read_text(encoding="utf-8") == "<!-- mine -->\n", \
+        "an edited file is reported, never silently deleted"
+    assert out["clean"] is False, "the leftover needs a human decision"
+
+
+@pytest.mark.integration
+def test_book_mode_space_still_validates_clean(tmp_path: Path):
+    """Cross-engine invariant, Book mode: the mounted stub and the vendored theme must
+    not produce documentation-space violations."""
+    make_docs(tmp_path)
+    fake_theme(tmp_path)
+    run(tmp_path, "--action", "scaffold")
+    proc = subprocess.run(
+        [sys.executable, str(DOCS_UTILS), "--action", "validate", "--root", str(tmp_path)],
+        capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert json.loads(proc.stdout)["violations"] == []
+
+
+@pytest.mark.integration
+@pytest.mark.skipif(shutil.which("hugo") is None, reason="hugo binary not installed")
+def test_build_refuses_when_hugo_is_older_than_the_theme(tmp_path: Path):
+    make_docs(tmp_path)
+    fake_theme(tmp_path, min_version="99.0.0")   # no Hugo will ever satisfy this
+    run(tmp_path, "--action", "scaffold")
+    out = run(tmp_path, "--action", "build")
+    assert out["built"] is False and out["reason"] == "hugo-older-than-theme"
+    assert out["clean"] is True, "an old local binary is an environment gap, not drift"
+    assert "--theme builtin" in out["guidance"]

@@ -26,6 +26,7 @@ SCRIPT = SKILL_DIR / "scripts" / "scaffold-hugo.py"
 CI_SCRIPT = SKILL_DIR / "scripts" / "scaffold-ci.sh"
 CI_TEMPLATES = SKILL_DIR / "scripts" / "ci-templates"
 ASSETS = SKILL_DIR / "assets" / "hugo"
+BOOK_ASSETS = SKILL_DIR / "assets" / "book"
 REFERENCE = SKILL_DIR / "references" / "hugo-site.md"
 
 CREATE_DOCS_MD = REPO_ROOT / "skills" / "create-docs" / "SKILL.md"
@@ -43,9 +44,19 @@ EXPECTED_ASSETS = (
     "static/css/site.css",
 )
 
-ACTIONS = ("scaffold", "check", "mounts", "build")
+# Book mode ships only what the theme cannot do by itself: the label override, the
+# child-index shortcode and the mounted section-index stub.
+EXPECTED_BOOK_ASSETS = (
+    "hugo.toml.tmpl",
+    "dotgitignore",
+    "layouts/_partials/docs/title.html",
+    "layouts/_shortcodes/speckit-children.html",
+    "dotspeckit/nav/section-index.md",
+)
+
+ACTIONS = ("scaffold", "check", "mounts", "build", "theme")
 STDLIB_ALLOWED = {
-    "__future__", "argparse", "json", "shutil", "subprocess", "sys", "pathlib",
+    "__future__", "argparse", "json", "re", "shutil", "subprocess", "sys", "pathlib",
 }
 
 # The capability is optional: when the scaffolder is not installed, its behavioural
@@ -150,7 +161,7 @@ def test_scaffold_script_and_assets_present():
 
 @pytest.mark.contract
 @requires_mount_mode
-def test_script_is_stdlib_only_with_four_actions():
+def test_script_is_stdlib_only_with_declared_actions():
     source = SCRIPT.read_text(encoding="utf-8")
     imported = set(re.findall(r"^\s*(?:import|from)\s+([\w.]+)", source, re.M))
     assert {name.split(".")[0] for name in imported} <= STDLIB_ALLOWED, \
@@ -186,6 +197,102 @@ def test_render_hooks_resolve_semantically():
     image_hook = (ASSETS / "layouts/_default/_markup/render-image.html").read_text(encoding="utf-8")
     assert "path.Join" in image_hook and "relURL" in image_hook, \
         "image hook must resolve relative media against the content file's directory"
+
+
+@pytest.mark.contract
+@requires_mount_mode
+def test_hugo_book_is_the_preferred_theme_with_a_fallback():
+    """Book mode is the recommendation, built-in layouts remain the degraded path."""
+    source = SCRIPT.read_text(encoding="utf-8")
+    assert "alex-shpak/hugo-book" in source, "the preferred theme must be named in the script"
+    ref = re.search(r'THEME_REF = "([^"]+)"', source)
+    assert ref, "the theme ref must be a named constant"
+    assert ref.group(1) not in ("main", "master", "HEAD"), \
+        "pin a release tag: a moving branch makes the vendored snapshot irreproducible"
+    for mode in ("auto", "book", "builtin"):
+        assert f'"{mode}"' in source, f"--theme mode {mode} missing"
+    text = SKILL_MD.read_text(encoding="utf-8")
+    assert "Hugo Book" in text and "alex-shpak/hugo-book" in text, \
+        "the skill must name the preferred theme and its upstream"
+    assert "builtin" in text, "the skill must document the fallback mode"
+
+
+@pytest.mark.contract
+@requires_mount_mode
+def test_theme_assets_do_not_shadow_the_theme():
+    """Book mode overrides two templates on purpose; a stray baseof/list/single or a
+    render hook of our own would silently replace the theme's page shell or its
+    portable-link resolution."""
+    missing = [rel for rel in EXPECTED_BOOK_ASSETS if not (BOOK_ASSETS / rel).is_file()]
+    assert not missing, f"missing Book asset templates: {missing}"
+    shipped = {path.relative_to(BOOK_ASSETS).as_posix()
+               for path in BOOK_ASSETS.rglob("*") if path.is_file()}
+    assert shipped == set(EXPECTED_BOOK_ASSETS), \
+        f"unexpected Book assets: {sorted(shipped - set(EXPECTED_BOOK_ASSETS))}"
+    config = (BOOK_ASSETS / "hugo.toml.tmpl").read_text(encoding="utf-8")
+    assert 'theme = "book"' in config, "the Book config must select the theme"
+    assert 'BookSection = "*"' in config, \
+        "content is mounted at content/<type>, so the menu must span all sections"
+    assert "BookPortableLinks" in config, \
+        "repo-native relative .md links need the theme's portable-link hooks"
+    for placeholder in ("{{SITE_TITLE}}", "{{SITE_DESCRIPTION}}", "{{MOUNTS}}"):
+        assert placeholder in config, f"template placeholder {placeholder} missing"
+
+
+@pytest.mark.contract
+@requires_mount_mode
+def test_book_titles_survive_the_heading_anchor():
+    """The theme's heading hook appends an anchor, so a rendered <h1> plainifies to
+    'Title#'. The label override must read the raw Markdown instead."""
+    partial = (BOOK_ASSETS / "layouts/_partials/docs/title.html").read_text(encoding="utf-8")
+    assert ".RawContent" in partial, "read the H1 from the raw Markdown, not .Content"
+    assert "findRE" in partial, "the H1 fallback must still be a regex over the source"
+    assert "return" in partial, "the theme calls docs/title as a returning partial"
+
+
+@pytest.mark.contract
+@requires_mount_mode
+def test_navigation_completion_is_config_and_mount_only():
+    """Nav completion must not write documentation: order/labels/collapse come from a
+    cascade, and missing section indexes from one mounted stub."""
+    source = SCRIPT.read_text(encoding="utf-8")
+    assert "[[cascade]]" in source, "navigation order must be declared as a cascade"
+    assert "[cascade.target]" in source, \
+        "cascade._target was deprecated in Hugo v0.156.0; emit cascade.target"
+    assert "bookCollapseSection" in source, "crowded sections must collapse in the sidebar"
+    assert "_index.md" in source and "NAV_STUB" in source, \
+        "directories without an index.md must get a mounted section index"
+    stub = (BOOK_ASSETS / "dotspeckit/nav/section-index.md").read_text(encoding="utf-8")
+    assert not stub.lstrip().startswith("{"), \
+        "a content file starting with '{' is parsed as JSON front matter and fails the build"
+    assert "speckit-children" in stub, "the stub must render the child index shortcode"
+
+
+@pytest.mark.contract
+@requires_mount_mode
+def test_vendored_theme_carries_no_third_party_markdown():
+    """docs-utils validate audits every .md under the docs directory, so the vendored
+    theme is reduced to its runtime parts."""
+    source = SCRIPT.read_text(encoding="utf-8")
+    keep = re.search(r"THEME_KEEP = \(([^)]*)\)", source, re.S)
+    assert keep, "the vendoring whitelist must be a named constant"
+    kept = re.findall(r'"([^"]+)"', keep.group(1))
+    assert "layouts" in kept and "LICENSE" in kept, \
+        "the theme needs its layouts, and its licence must travel with it"
+    assert not [name for name in kept if name.endswith(".md")], \
+        "no third-party Markdown may be kept inside the docs space"
+    assert "exampleSite" not in kept and "archetypes" not in kept
+
+
+@pytest.mark.contract
+@requires_mount_mode
+def test_builtin_layouts_stay_compatible_with_older_hugo():
+    """Regression: .Site.Language.Locale only exists from Hugo v0.158, and the
+    built-in mode is exactly the path for environments that cannot run the theme."""
+    for layout in sorted(ASSETS.rglob("*.html")):
+        body = layout.read_text(encoding="utf-8")
+        assert ".Site.Language.Locale" not in body, \
+            f"{layout.name}: Locale is unavailable before Hugo 0.158; use .Language.Lang"
 
 
 @pytest.mark.contract

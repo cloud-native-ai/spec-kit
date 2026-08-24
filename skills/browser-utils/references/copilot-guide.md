@@ -1,6 +1,6 @@
 # Browser Utils — GitHub Copilot Guide
 
-**Tier**: 3 (Playwright headless automation)
+**Tier**: 2 (Playwright headless automation)
 
 Copilot does not have a built-in browser or `browser-use` MCP access.
 Use the Playwright script execution path for all browser automation tasks.
@@ -31,6 +31,6 @@ Use the Playwright script execution path for all browser automation tasks.
 
 ## Capability Notes
 
-- **Supported**: Script generation via workspace edit, terminal command execution, file creation (Tier 3 Playwright)
+- **Supported**: Script generation via workspace edit, terminal command execution, file creation (Tier 2 Playwright)
 - **Limited**: No background task management; no direct image viewing in chat; terminal output may be truncated; no `browser-use` MCP access
-- **Unsupported**: Tier 1 (built-in browser); Tier 2 (MCP connector); visible browser mode in IDE context; real-time script debugging; parallel test execution
+- **Unsupported**: Tier 1 (built-in browser); Tier 3 (MCP connector); visible browser mode in IDE context; real-time script debugging; parallel test execution

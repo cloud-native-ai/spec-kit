@@ -33,9 +33,10 @@ packages = ["src/specify_cli"]
 "memory" = "specify_cli/memory"
 "scripts" = "specify_cli/scripts"
 "templates" = "specify_cli/templates"
-"skills" = "specify_cli/skills"
 "agents" = "specify_cli/agents"
 "shared" = "specify_cli/shared"
+# "skills" is intentionally absent here: src/hatch_build.py stage-copies it
+# minus every `site` runtime-data component (spec 046 / contracts/framework-exclusions.md).
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

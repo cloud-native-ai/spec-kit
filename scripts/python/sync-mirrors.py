@@ -60,7 +60,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # copies come straight from templates/commands/ via regen-command-copies.py).
 MIRROR_PAIRS = [
     ("templates", ".specify/templates", False, {"commands"}),
-    ("skills", ".specify/skills", False, set()),
+    ("skills", ".specify/skills", False, {"site"}),
     ("agents", ".specify/agents/templates", False, set()),
     ("scripts", ".specify/scripts", True, set()),
     ("shared", ".specify/shared", False, set()),

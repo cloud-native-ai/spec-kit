@@ -1,8 +1,8 @@
-# Playwright Automation Patterns (Tier 3)
+# Playwright Automation Patterns (Tier 2)
 
 Code examples and patterns for Playwright-based headless browser automation.
-These patterns are used when Tier 1 (built-in browser) and Tier 2 (MCP connector)
-are not available.
+These patterns are used when Tier 1 (built-in browser) is not available —
+Playwright is the default script-driven path.
 
 For the complete Playwright API reference, see [playwright-api.md](./playwright-api.md).
 
@@ -30,9 +30,9 @@ node -e "require('playwright'); console.log('playwright OK')" \
 
 ---
 
-## Run Modes (Tier 3)
+## Run Modes (Tier 2)
 
-Tier 3 has two mutually exclusive run modes. Pick the mode **before writing a script**
+Tier 2 has two mutually exclusive run modes. Pick the mode **before writing a script**
 (see SKILL.md § Run Mode Selection). This section is the launch recipe for each.
 
 ### Mode 1 — Clean Test Browser (default)
@@ -185,7 +185,7 @@ const TARGET_URL = 'https://internal.example.com/dashboard';
 
 ---
 
-## SPA Site Traversal & Module Extraction (Tier 3)
+## SPA Site Traversal & Module Extraction (Tier 2)
 
 Use this pattern to **map every functional module of a single-page app** (left-nav +
 hash routes) and produce a structured design doc: for each module, its route, label,

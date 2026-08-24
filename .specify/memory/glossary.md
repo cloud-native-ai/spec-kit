@@ -72,3 +72,7 @@
 | Focus Target(默认聚焦引用) | 默认聚焦, focus_target, default focus, 默认 Target | team.md frontmatter 可选字段 focus_target:该团队默认聚焦的 Goal Target(局部形 T-<nnn>);是 run 级 --target 的预填——未显式指定时 run 解析到它,显式 --target 可覆盖;不改 Goal–Team 绑定、不构成写域声明;与台账逐条字段 target_ref 消歧(需求 042) | auto | proposed |
 | Decomposition Proposal(分解提议集) | 分解提议, 目标分解提议, decomposition proposal set | goal→Target 分解的成组提议:N 条成果形候选语句 + 各自理由,一次性呈现、一次合并确认;team 侧只提议(propose→ratify),落盘逐条经 /speckit.goal targets --add;goal 已有 open Target 时以既有集合为复用基线(需求 042) | auto | proposed |
 | 框架资料卫生 (Framework Material Hygiene) | sanitize, 资料卫生, hygiene, 框架清理 | 对**框架自有资料**(memory 层 parked/draft/索引、specs、镜像目录、兼容符号链接、docs 树)的系统性治理:过期残留/冗余检测 + 正确性检查(死引用/索引一致/链接/镜像漂移)+ 确认后清理;治理对象不含用户代码/脚本/测试;由 /speckit.sanitize 承载(需求 045) | auto | proposed |
+| 站点记忆 (Site Memory) | site memory, 站点记忆目录, 网页记忆机制 | browser-utils 的按站点持久化层:以 domain(host:port) 为 key 在技能 site/ 目录下建目录,内含站点状态机文件、探索期操作记录、请求级步骤集与验证证据;三个 Tier 可读写的结构化、agent 中立格式(需求 046) | auto | proposed |
+| 站点状态机 (Site State Machine) | 站点状态, 探索期, 优化期, 验证期, sealed, site state | browser-utils 站点记忆的四态生命周期:exploration(探索期)→optimization(优化期)→validation(验证期)→sealed(固化);验证失败或 sealed 执行失败回退 optimization;状态变更由确定性程序依证据判定,任一状态都完整完成用户任务(需求 046) | auto | proposed |
+| 请求级方向 (Request-Level Direction) | 请求级自动化, 底层请求调用, 泛型调用 | 浏览器脚本自动化两方向之一:在页面上下文中直接发起底层网络请求(如 fetch),自动继承会话;相对物为页面级方向(模拟真实用户 DOM 操作);对已有请求级步骤集的站点优先使用(需求 046) | auto | proposed |
+| 请求级步骤集 (Request Recipe) | 请求配方, 固化流程, 请求步骤集 | 优化期从探索期记录蒸馏出的有序请求步骤列表:每步含方法/URL/参数模板/动态字段解析方式/预期响应特征;无法请求化的步骤显式标注保留为页面级,形成混合形态(需求 046) | auto | proposed |

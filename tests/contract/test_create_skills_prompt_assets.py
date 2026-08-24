@@ -135,10 +135,15 @@ def test_skill_does_not_contain_command_routing_logic():
 # ---------------------------------------------------------------------------
 
 def test_pyproject_toml_force_includes_skills():
-    """pyproject.toml force-include still covers the root skills/ directory."""
-    text = _text_of(PYPROJECT_FILE)
-    assert '"skills" = "specify_cli/skills"' in text, (
-        "Expected pyproject.toml to force-include skills/"
+    """skills/ still ships in the wheel — via hatch_build.py staging (spec 046).
+
+    The static `"skills" = "specify_cli/skills"` force-include line was replaced
+    by `_stage_skills()` in src/hatch_build.py so that `site/` components can be
+    excluded; assert the staging hook carries skills/ into force_include.
+    """
+    build_hook = _text_of(ROOT / "src" / "hatch_build.py")
+    assert "_stage_skills" in build_hook and "force_include" in build_hook, (
+        "Expected src/hatch_build.py to stage skills/ into force_include"
     )
 
 
