@@ -21,14 +21,19 @@ containment violation: report it and remove it.
 
 ```bash
 python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action theme --root .           # mode & theme state
+python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action image --root .           # image a build will use
 python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action check --root .           # drift, no writes
 python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action scaffold --root . --site-title "<t>"
 python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action scaffold --root . # idempotence: all `unchanged`
-cd <docs> && hugo --logLevel warn                                          # build + surface warnings
+python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action build --root .    # builds in the CI image
 ```
 
 Expected:
 
+- The build reports `runner: docker`, the CI `image`, and the `hugo_version` **of the
+  image** — compare it against `hugo version` on the host: they usually differ, and the
+  image's is the one that matters. A `runner: local` result with a `warning` means the
+  docker path was unavailable; treat that site as unverified for CI.
 - `Pages > 0` and **no ERROR lines**; page count ≈ number of `.md` documents
   plus section pages (book mode adds one per generated section index).
 - The second `scaffold` run reports every file `unchanged` and writes nothing
@@ -38,9 +43,9 @@ Expected:
   or warning is a finding — with one qualifier: `BookPortableLinks = "warning"`
   (not the default) reports every link that leaves the docs directory, which is
   legitimate in this repository.
-- Book mode on a Hugo older than the theme's `min_version` must **not** be built
-  locally: `--action build` reports `hugo-older-than-theme` with `clean: true`.
-  Verify it in the CI image instead (see stage 3's container test).
+- `--runner local` on a Hugo older than the theme's floor must refuse with
+  `hugo-older-than-theme` and `clean: true` — that is an environment gap, and the
+  default runner is the fix.
 
 Output checks:
 
@@ -97,13 +102,17 @@ its children.
 ### local
 
 ```bash
-cd <docs> && hugo serve --port 1313 &
+IMAGE=$(python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action image --root . \
+        | python3 -c 'import json,sys; print(json.load(sys.stdin)["image"])')
+docker run -d --name hugo-serve -p 1313:1313 -v "$PWD:/workspace" -w "/workspace/<docs>" \
+  "$IMAGE" hugo server --bind 0.0.0.0
 curl -sf http://localhost:1313/ > /dev/null && echo OK
-kill %1
+docker rm -f hugo-serve
 ```
 
-Expected: HTTP 200 on the home page and live reload on edit. Nothing is written
-to disk by this target.
+Expected: HTTP 200 on the home page and live reload on edit — in the same Hugo CI
+uses. Nothing is written to disk by this target. A host `hugo server` is the
+fallback; note in the report which one served.
 
 ### Hosting platform (aoneci / github)
 
@@ -117,7 +126,9 @@ exists — never silently overwritten), the file parses as YAML, and `deploy-dir
 is `<docs>/public/`. A platform without a template (`github` today) must report a
 warning and create nothing.
 
-Container build test — proves the pipeline's build step works in the CI image:
+Container build test — proves the pipeline's build step works in the CI image. Stage
+2's `--action build` already runs in that image, so this narrows to the pipeline's own
+guard-and-publish wrapper:
 
 ```bash
 docker run --rm -v "$PWD:/workspace" -w /workspace <image> \

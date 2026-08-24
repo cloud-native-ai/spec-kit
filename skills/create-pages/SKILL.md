@@ -82,14 +82,17 @@ is a theme:
 | `book` (**preferred**) | **Hugo Book** — `alex-shpak/hugo-book`, vendored at `<docs>/themes/book`: sidebar, search, dark mode, mermaid/katex, all offline | the theme is installed (needs Hugo ≥ 0.158) |
 | `builtin` | the skill's own minimal layouts, zero dependencies | the theme is absent — `--theme auto` degrades here rather than failing |
 
-Install the theme first — the only step that touches the network — then scaffold. Full
-command catalogue, ownership map, mount and navigation rationale, and troubleshooting:
-[`./references/hugo-site.md`](./references/hugo-site.md).
+Install the theme first — the only step that touches the network — then scaffold and
+build. **Builds run in the CI image by default** (`--runner auto` → docker), so a local
+render and the CI render use the same Hugo; a workstation binary is only the fallback.
+Full command catalogue, ownership map, mount and navigation rationale, and
+troubleshooting: [`./references/hugo-site.md`](./references/hugo-site.md).
 
 ```bash
 python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action theme --root .            # status only
 python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action theme --root . --fetch    # install pinned tag
 python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action check --root .            # drift only, no writes
+python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action build --root .            # build in the CI image
 ```
 
 **Navigation completion** (book mode) is part of scaffolding, and it is derived from the
@@ -131,10 +134,16 @@ Guarantees this stage provides and that you MUST NOT break:
   leftovers are reported (`stale_edited`), never deleted.
 - **Build output is `<docs>/public`**, inside the library's directory — never a
   repository-root `dist/`.
+- **Local rendering equals CI rendering** — `--action build` runs Hugo inside the CI
+  image (resolved from the rendered pipeline, `SPECKIT_HUGO_IMAGE`, or the shared
+  `ci-templates/hugo-image.txt` that stage 3 renders from), never the workstation's
+  Hugo, which is typically older than the image and often older than the theme's floor.
+  A local binary is used only as a fallback and the report says so; verifying a site
+  with a different Hugo than CI proves nothing.
 - **Scaffolding is offline** — only `--action theme --fetch` uses the network, and its
-  failure degrades to `builtin` instead of failing the stage. An absent `hugo` binary
-  skips only the build; a binary older than the theme is reported as an environment gap
-  (build it in the CI image), not as a scaffold defect.
+  failure degrades to `builtin` instead of failing the stage. Missing docker, an
+  unpullable image, an absent binary, or a binary older than the theme are reported as
+  environment gaps with the fix, not as scaffold defects.
 
 Commit the vendored theme: it carries no `.git`, so CI needs neither network access nor
 Go, and the pinned ref/commit is recorded in `themes/book/.speckit-theme.json`.
@@ -144,8 +153,18 @@ or a parallel build script for a particular hosting target.
 
 ### Stage 3 — Pages 服务
 
-Serve the rendered site. For `local`, nothing is scaffolded — run Hugo's own
-server from the docs directory (`hugo serve`, live reload) and report the URL.
+Serve the rendered site. For `local`, nothing is scaffolded — run Hugo's own server from
+the docs directory. Use the CI image here too, so preview and CI agree:
+
+```bash
+IMAGE=$(python3 "${SKILL_HOME}/scripts/scaffold-hugo.py" --action image --root . \
+        | python3 -c 'import json,sys; print(json.load(sys.stdin)["image"])')
+docker run --rm -p 1313:1313 -v "$PWD:/workspace" -w "/workspace/<docs>" "$IMAGE" \
+  hugo server --bind 0.0.0.0     # then report http://localhost:1313/
+```
+
+A workstation `hugo server` is the fallback and only works when its version satisfies
+the theme; say which one you used.
 
 For a hosting platform, render its pipeline (one file, no Hugo artifacts):
 
@@ -179,12 +198,12 @@ CI needs. Then run the Feedback step below.
 
 | Path | Contents |
 |------|----------|
-| `${SKILL_HOME}/scripts/scaffold-hugo.py` | **Stage 2**: deterministic mount-mode scaffolder (`scaffold` / `check` / `mounts` / `build` / `theme`) — resolves the render mode, computes the module-mount block and the navigation cascade from the live docs tree, vendors the Book theme on request, places layouts, never clobbers user-edited files. Stdlib-only, one JSON object per invocation |
+| `${SKILL_HOME}/scripts/scaffold-hugo.py` | **Stage 2**: deterministic mount-mode scaffolder (`scaffold` / `check` / `mounts` / `build` / `theme` / `image`) — resolves the render mode, computes the module-mount block and the navigation cascade from the live docs tree, vendors the Book theme on request, builds in the CI image (docker) with a local-Hugo fallback, never clobbers user-edited files. Stdlib-only, one JSON object per invocation |
 | `${SKILL_HOME}/assets/book/` | **Stage 2, book mode**: `hugo.toml.tmpl` (theme + Book params), `layouts/_partials/docs/title.html` (H1 label override), `layouts/_shortcodes/speckit-children.html` (child index), `dotspeckit/nav/section-index.md` → the mounted section-index stub, `dotgitignore` |
 | `${SKILL_HOME}/assets/hugo/` | **Stage 2, builtin mode**: `hugo.toml.tmpl` (`{{SITE_TITLE}}` / `{{SITE_DESCRIPTION}}` / `{{MOUNTS}}`), `layouts/` (`_default/baseof,list,single`, `index.html`, `_markup/render-link,render-image`), `static/css/site.css`, `dotgitignore` → `<docs>/.gitignore` |
 | `${SKILL_HOME}/references/hugo-site.md` | **Stage 2**: ownership map, theme install/update, navigation completion, mount rationale (`index.md` → `_index.md`), link/image resolution, publish scope, commands, local serve, CI guidance, troubleshooting |
 | `${SKILL_HOME}/scripts/scaffold-ci.sh` | **Stage 3**: renders one hosting platform's CI pipeline and nothing else (run with `--help`) |
-| `${SKILL_HOME}/scripts/ci-templates/` | **Stage 3**: per-platform pipeline templates + registry/extension contract (`README.md`); `aoneci/` implemented, `github/` structural stub |
+| `${SKILL_HOME}/scripts/ci-templates/` | **Stage 3**: per-platform pipeline templates + registry/extension contract (`README.md`); `hugo-image.txt` is the shared build image (stage 2 builds locally in it, stage 3 renders it into the pipeline); `aoneci/` implemented, `github/` structural stub |
 | `${SKILL_HOME}/references/design-rationale.md` | Why behind each stage boundary and guarantee (observed failures) |
 | `${SKILL_HOME}/references/verification.md` | Per-stage verification: render check, output checks, local serve, no-docs guard |
 

@@ -165,6 +165,36 @@ Everything under `docs/` is published — the six formal types, `notes/`, `archi
 published like any other page. To withhold a zone instead, drop its mount from the managed
 block and record the decision in `hugo.toml` above the block.
 
+## Build runner: the CI image first
+
+A build must answer "does this render correctly *in CI*", so Hugo runs in the CI image by
+default — not the workstation's binary, which is typically older (0.141 vs 0.163 in the
+environment this was built in) and may not even reach the theme's floor. `--runner` picks:
+
+| Runner | Behaviour |
+|--------|-----------|
+| `auto` (default) | docker with the CI image; on any docker/image gap, fall back to the local binary and say so in `warning` |
+| `docker` | CI image only — no silent fallback; gaps are reported with a fix |
+| `local` | workstation binary only (subject to the theme's minimum version) |
+
+The image is resolved in this order, so a project that overrode it stays consistent:
+
+1. `--hugo-image <ref>`
+2. `SPECKIT_HUGO_IMAGE` environment variable
+3. the **rendered CI pipeline** (`.aoneci/deploy-pages.yaml`, `.github/workflows/deploy-pages.yaml`) — the strongest "same as CI" signal
+4. `scripts/ci-templates/hugo-image.txt` — the shared default that `scaffold-ci.sh` also
+   renders into the pipeline, so stage 2 and stage 3 cannot drift apart
+
+`--action image` prints the resolved image and its source. The workspace is bind-mounted at
+`/workspace`, so `<docs>/public` is written straight back to the host; a probe first checks
+the daemon can see the workspace and reports `workspace-not-visible` instead of silently
+building an empty site. The container runs as root (this image's entrypoint hooks need it),
+so build output is root-owned — harmless for a gitignored `public/`, but remove it with the
+same privileges.
+
+The reported `hugo_version` always comes from the runner that actually built, and the
+command is the same `hugo --minify` the CI pipeline runs.
+
 ## Commands
 
 ```bash
@@ -182,11 +212,16 @@ python3 ${SKILL_HOME}/scripts/scaffold-hugo.py --action check --root .
 # print the computed navigation+mount block without touching disk
 python3 ${SKILL_HOME}/scripts/scaffold-hugo.py --action mounts --root .
 
-# build the static site into docs/public (skipped with guidance if hugo is absent or too old)
-python3 ${SKILL_HOME}/scripts/scaffold-hugo.py --action build --root . [--base-url <url>]
+# which image would a build use, and why
+python3 ${SKILL_HOME}/scripts/scaffold-hugo.py --action image --root .
 
-# local preview with live reload
-cd docs && hugo server
+# build into docs/public — in the CI image by default, local binary as fallback
+python3 ${SKILL_HOME}/scripts/scaffold-hugo.py --action build --root . \
+  [--runner auto|docker|local] [--hugo-image <ref>] [--base-url <url>]
+
+# local preview in the same image (live reload; Ctrl-C to stop)
+docker run --rm -p 1313:1313 -v "$PWD:/workspace" -w /workspace/docs <image> \
+  hugo server --bind 0.0.0.0
 ```
 
 File actions are reported per path: `created`, `unchanged`, `kept` (you edited it — left
@@ -197,8 +232,11 @@ written), `removed` (an untouched file of the other mode, dropped by a switch),
 managed block markers are missing from `hugo.toml`; nothing was written). A repeat run on an
 unchanged tree reports `unchanged` for every path and writes nothing.
 
-The JSON report also carries `theme` (mode, ref, commit, the theme's Hugo minimum, the local
-Hugo version, compatibility) and `nav` (sections, `generated_indexes`, `collapsed`, `order`).
+The JSON report also carries `theme` (mode, `config_mode` — what `hugo.toml` actually
+selects, ref, commit, the theme's Hugo minimum, the local Hugo version, compatibility) and
+`nav` (sections, `generated_indexes`, `collapsed`, `order`). A build additionally reports
+`runner`, `image`, `image_source`, the `hugo_version` that built, and every `attempts`
+entry when the default runner fell back.
 
 ## CI guidance (stage 3 input)
 
@@ -240,7 +278,11 @@ broken content can add `--panicOnWarning`.
 | `deprecated: module.mounts.excludeFiles` warning | The mount generator still emits `excludeFiles` (deprecated in Hugo v0.153.0 in favour of `files`) | Expected today; it still functions. Migrating needs the `files` semantics checked against current Hugo docs, because the `index.md` remap depends on the exclusion |
 | A layout fix from a newer skill version never appears | Any file differing from the shipped asset is classified user-edited and reported `kept` | Diff the file against the asset, then re-scaffold with `--force` — which also discards genuine local edits |
 | `Error: module "book" not found` | `theme = "book"` is in the config but `docs/themes/book` is missing (never committed, or a submodule was not initialised) | `--action theme --fetch`, then commit the snapshot; or switch back with `--theme builtin --force` |
-| `Error: this project requires Hugo version >= 0.158.0` | The local Hugo is older than the vendored theme | Upgrade Hugo, build in the CI image, pass `--theme-ref v12.0.0` (needs ≥ 0.146), or scaffold `--theme builtin` |
+| `Error: this project requires Hugo version >= 0.158.0` | The Hugo that ran is older than the vendored theme — e.g. `--runner local` on a stale workstation binary | Drop the `--runner local` override (the default builds in the CI image), upgrade Hugo, pass `--theme-ref v12.0.0` (needs ≥ 0.146), or scaffold `--theme builtin` |
+| Build reports `reason: image-unavailable` | The CI image is environment-specific and not pullable here | `--hugo-image <ref>`, `SPECKIT_HUGO_IMAGE=<ref>`, or edit `ci-templates/hugo-image.txt` so stage 3 renders the same one; `--runner local` builds without docker (version may differ from CI) |
+| Build reports `reason: workspace-not-visible` | A sandboxed docker daemon cannot see host paths, so the mount is empty | Copy the tree into a container (`docker cp`) and build there, or use `--runner local` |
+| Build reports `runner: local` with a `warning` | The docker path was unavailable, so the workstation Hugo rendered the site | Fine for a quick look; re-run in the CI image before trusting the result |
+| The site renders locally but breaks in CI | Local build used a different Hugo | `--action image` to see which image CI uses, then `--runner docker` |
 | `mode-mismatch` in the report and nothing was written | The config on disk belongs to the other render mode; a partial switch would leave the site unbuildable | Re-run with `--force` to re-render the config, or keep the current mode with `--theme builtin` / `--theme book` |
 | A nested directory shows no group in the sidebar, its pages sit under the parent | The generated section index is missing — book mode not active, or the block is stale | `--action check`; scaffold in book mode. Hugo only treats a nested directory as a section when it has an `_index.md` |
 | Sidebar labels read like file names (`Directory Structure`), or end with `#` | The `docs/title.html` override is missing or was edited to read `.Content` | Re-scaffold (`--force` if you edited it); the H1 must come from `.RawContent` |

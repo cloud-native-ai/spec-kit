@@ -11,6 +11,7 @@ C-14…C-17 as location mandates on ``create-docs``.
 """
 from __future__ import annotations
 
+import ast
 import re
 import subprocess
 import sys
@@ -25,6 +26,7 @@ SKILL_MD = SKILL_DIR / "SKILL.md"
 SCRIPT = SKILL_DIR / "scripts" / "scaffold-hugo.py"
 CI_SCRIPT = SKILL_DIR / "scripts" / "scaffold-ci.sh"
 CI_TEMPLATES = SKILL_DIR / "scripts" / "ci-templates"
+IMAGE_REGISTRY = CI_TEMPLATES / "hugo-image.txt"
 ASSETS = SKILL_DIR / "assets" / "hugo"
 BOOK_ASSETS = SKILL_DIR / "assets" / "book"
 REFERENCE = SKILL_DIR / "references" / "hugo-site.md"
@@ -56,7 +58,8 @@ EXPECTED_BOOK_ASSETS = (
 
 ACTIONS = ("scaffold", "check", "mounts", "build", "theme")
 STDLIB_ALLOWED = {
-    "__future__", "argparse", "json", "re", "shutil", "subprocess", "sys", "pathlib",
+    "__future__", "argparse", "json", "os", "re", "shutil", "subprocess", "sys",
+    "pathlib",
 }
 
 # The capability is optional: when the scaffolder is not installed, its behavioural
@@ -311,9 +314,24 @@ def test_mirror_parity_for_the_whole_skill():
 @pytest.mark.contract
 @requires_mount_mode
 def test_stage_separation_renderer_never_writes_ci():
-    """Stage 2 renders; only stage 3's adapter may write a pipeline file."""
-    assert ".github" not in SCRIPT.read_text(encoding="utf-8"), \
-        "the render scaffolder must never write CI files"
+    """Stage 2 renders; only stage 3's adapter may write a pipeline file. Stage 2 does
+    *read* the rendered pipeline — that is how a local build picks up the same image CI
+    uses — so the pin is structural: the CI paths may only be touched by the reader."""
+    tree = ast.parse(SCRIPT.read_text(encoding="utf-8"))
+    readers = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.FunctionDef):
+            continue
+        names = {n.id for n in ast.walk(node) if isinstance(n, ast.Name)}
+        if "CI_FILES" in names:
+            readers.add(node.name)
+    assert readers == {"ci_image"}, \
+        f"CI pipeline paths may only be read (by ci_image), not used in {sorted(readers)}"
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Attribute) and node.attr in ("write_text", "write_bytes"):
+            target = ast.unparse(node.value)
+            assert "ci" not in target.lower() or "CI_FILES" not in target, \
+                f"the render scaffolder must never write a CI file: {ast.unparse(node)}"
     reference = REFERENCE.read_text(encoding="utf-8")
     assert "working-directory: docs" in reference, "CI must run Hugo from the docs/ root"
     assert "docs/public" in reference, "CI guidance must name the artifact directory"
@@ -323,3 +341,24 @@ def test_stage_separation_renderer_never_writes_ci():
         "the implemented platform must keep its template"
     assert not (CI_TEMPLATES / "github" / "deploy-pages.yaml.tpl").exists(), \
         "github is a stub: writing a template requires verifying action versions first"
+
+
+@pytest.mark.contract
+@requires_mount_mode
+def test_local_builds_default_to_the_ci_image():
+    """A workstation Hugo is usually older than the image (and often older than the
+    theme's floor), so 'works locally' only means something when local == CI."""
+    source = SCRIPT.read_text(encoding="utf-8")
+    assert '"auto", "docker", "local"' in source, "runner modes must be declared"
+    assert 'default="auto"' in source, "the default runner must prefer the CI image"
+    assert "docker" in source and "-v" in source, "the docker runner must mount the workspace"
+    # one image for both stages, declared in one place
+    assert IMAGE_REGISTRY.is_file(), "ci-templates/hugo-image.txt (shared default) missing"
+    declared = [line.strip() for line in IMAGE_REGISTRY.read_text(encoding="utf-8").splitlines()
+                if line.strip() and not line.strip().startswith("#")]
+    assert len(declared) == 1, "the image registry must hold exactly one image reference"
+    assert "hugo-image.txt" in CI_SCRIPT.read_text(encoding="utf-8"), \
+        "stage 3 must take its default image from the same file as stage 2"
+    assert "IMAGE_FILE" in source, "stage 2 must resolve the shared image file"
+    template = (CI_TEMPLATES / "aoneci" / "deploy-pages.yaml.tpl").read_text(encoding="utf-8")
+    assert "__IMAGE__" in template, "the pipeline image must stay a rendered placeholder"

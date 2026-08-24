@@ -210,6 +210,42 @@ Every page of a builtin-mode site therefore failed to render on v0.141.0
 for which builtin mode is the answer. It now uses `.Site.Language.Lang`, which
 exists in both, verified by a real build on v0.141.0.
 
+### Why a local build runs in the CI image
+
+The workstation this was built on has Hugo v0.141.0; the pipeline image has
+v0.163.2. Two different renderers means a local "it builds" proves nothing about
+CI — and with the Book theme it is worse than useless, because the local binary is
+below the theme's floor, so the only signal it can produce is a false negative.
+`--action build` therefore defaults to docker with the pipeline's image, and the
+local binary is a reported fallback (`runner: local` plus a warning that the
+rendered site may differ). Real numbers from the verification run: the default
+runner reported `hugo_version: 0.163.2` while `hugo version` on the host said
+0.141.0.
+
+The image must be *the same one CI uses*, so it is resolved flag > environment >
+the rendered pipeline file > a shared `ci-templates/hugo-image.txt` that
+`scaffold-ci.sh` renders from as well. Before that file existed the default lived
+only in the stage-3 script, so a stage-2 local build had no way to know it — two
+places to edit, and silent divergence when only one was updated.
+
+Mounting is a bind mount at `/workspace`, checked by a probe first: a sandboxed
+daemon that cannot see host paths would otherwise build an empty site and report
+success. `--user $(id -u):$(id -g)` was tried to keep output ownership sane and
+rejected — this image's entrypoint hooks write to `/etc/profile.d` and abort as
+non-root (`Failed to load general hooks`), so the container runs as root and the
+gitignored `public/` is root-owned.
+
+### The theme's Hugo floor binds the config, not the directory
+
+The first version gated on the theme being *present* under `themes/`, which
+refused a build for a site whose `hugo.toml` had been scaffolded in builtin mode
+with a vendored theme still lying around. The gate now reads what the config
+actually selects (`theme.config_mode`). Related correction: `theme.toml`'s
+`min_version` is the author's declaration — what Hugo actually enforces is the
+theme's own `hugo.toml` (`[module.hugoVersion] min`). Both carry 0.158.0 in
+hugo-book v0.14.0; a hand-made theme fixture with only `theme.toml` is not
+enforced by Hugo at all, which is why that test now pins the local runner.
+
 ## Hosting guarantees
 
 ### CI guard — `if [ -d <docs> ]`

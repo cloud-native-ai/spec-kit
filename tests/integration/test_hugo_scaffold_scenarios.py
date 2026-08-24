@@ -410,11 +410,67 @@ def test_book_mode_space_still_validates_clean(tmp_path: Path):
 
 @pytest.mark.integration
 @pytest.mark.skipif(shutil.which("hugo") is None, reason="hugo binary not installed")
-def test_build_refuses_when_hugo_is_older_than_the_theme(tmp_path: Path):
+def test_local_runner_refuses_when_hugo_is_older_than_the_theme(tmp_path: Path):
+    """The old-Hugo refusal is a --runner local concern now: the default runner uses the
+    CI image, so a stale workstation binary only matters when local is forced."""
     make_docs(tmp_path)
     fake_theme(tmp_path, min_version="99.0.0")   # no Hugo will ever satisfy this
     run(tmp_path, "--action", "scaffold")
-    out = run(tmp_path, "--action", "build")
+    out = run(tmp_path, "--action", "build", "--runner", "local")
     assert out["built"] is False and out["reason"] == "hugo-older-than-theme"
     assert out["clean"] is True, "an old local binary is an environment gap, not drift"
-    assert "--theme builtin" in out["guidance"]
+    assert "CI image" in out["guidance"], "the fix is to build in the CI image"
+
+
+@pytest.mark.integration
+def test_builds_default_to_the_shared_ci_image(tmp_path: Path):
+    """Whatever the runner does, the default image is the one stage 3 renders into CI."""
+    make_docs(tmp_path)
+    fake_theme(tmp_path)
+    run(tmp_path, "--action", "scaffold")
+    registry = (SCRIPT.parent / "ci-templates" / "hugo-image.txt")
+    default_image = next(l.strip() for l in registry.read_text(encoding="utf-8").splitlines()
+                         if l.strip() and not l.strip().startswith("#"))
+    out = run(tmp_path, "--action", "build", "--runner", "docker")
+    assert out["image"] == default_image
+    assert out["image_source"].endswith("hugo-image.txt")
+    assert out["runner"] == "docker"
+
+
+@pytest.mark.integration
+def test_build_image_precedence_flag_env_ci_registry(tmp_path: Path, monkeypatch):
+    """flag > env > rendered CI pipeline > shared registry file."""
+    make_docs(tmp_path)
+    fake_theme(tmp_path)
+    run(tmp_path, "--action", "scaffold")
+    ci = tmp_path / ".aoneci"
+    ci.mkdir()
+    (ci / "deploy-pages.yaml").write_text("jobs:\n  deploy:\n    image: ci.registry/hugo:pinned\n",
+                                          encoding="utf-8")
+    # rendered CI pipeline wins over the registry default
+    out = run(tmp_path, "--action", "build", "--runner", "docker")
+    assert out["image"] == "ci.registry/hugo:pinned" and out["image_source"] == "ci-pipeline"
+    # env beats the pipeline
+    monkeypatch.setenv("SPECKIT_HUGO_IMAGE", "env.registry/hugo:x")
+    out = run(tmp_path, "--action", "build", "--runner", "docker")
+    assert out["image"] == "env.registry/hugo:x" and out["image_source"].startswith("env:")
+    monkeypatch.delenv("SPECKIT_HUGO_IMAGE")
+    # explicit flag beats all
+    out = run(tmp_path, "--action", "build", "--runner", "docker",
+              "--hugo-image", "flag.registry/hugo:y")
+    assert out["image"] == "flag.registry/hugo:y" and out["image_source"] == "flag"
+
+
+@pytest.mark.integration
+def test_docker_runner_reports_missing_image_without_crashing(tmp_path: Path, monkeypatch):
+    """An unpullable image is an environment gap the report explains, not a crash."""
+    if shutil.which("docker") is None:
+        pytest.skip("docker not installed")
+    make_docs(tmp_path)
+    fake_theme(tmp_path)
+    run(tmp_path, "--action", "scaffold")
+    monkeypatch.setenv("SPECKIT_HUGO_IMAGE",
+                       "speckit.invalid/no-such-hugo:does-not-exist")
+    out = run(tmp_path, "--action", "build", "--runner", "docker")
+    assert out["built"] is False and out["reason"] == "image-unavailable"
+    assert "--hugo-image" in out["guidance"] and "hugo-image.txt" in out["guidance"]

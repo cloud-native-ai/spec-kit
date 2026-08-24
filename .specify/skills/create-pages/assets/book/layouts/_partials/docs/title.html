@@ -1,12 +1,12 @@
-{{- /* Nav / link label with a first-<h1> fallback. Overrides the theme's partial.
+{{- /* Nav / link label, with a first-<h1> fallback. Overrides the theme partial.
 
 Documents in this space carry no YAML front matter, so .Title and .LinkTitle are
-empty; the theme would then fall back to a humanized file name, which loses the real
-title ("Documentation Model (What & Why)") and mangles non-English ones. The H1 is
-read from .RawContent rather than .Content because the theme's heading render hook
-appends an anchor link, so plainifying a rendered <h1> yields a trailing "#".
-Machine-generated section pages are labelled by the managed `title` cascade in
-hugo.toml, which lands in .Title above. */ -}}
+empty and the theme would fall back to a humanized file name ("Documentation Model"
+for a page whose real H1 is "Documentation Model (What & Why)", "Notes" for a
+Chinese-titled page). The H1 is read from .RawContent, not .Content, because the
+theme's heading render hook appends an anchor link — plainifying the rendered <h1>
+yields a trailing "#". Machine-generated section pages get their label from the
+managed `title` cascade in hugo.toml instead. */ -}}
 {{- $title := "" -}}
 {{- if .LinkTitle -}}
   {{- $title = .LinkTitle -}}

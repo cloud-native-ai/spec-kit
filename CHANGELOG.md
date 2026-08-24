@@ -13,6 +13,11 @@ All notable changes to this project will be documented in this file.
   section labels, collapse for crowded sections, and a section landing page for every
   directory without an `index.md`, all derived from the live tree via a Hugo cascade and
   mounts (no documentation is written).
+- `create-pages`: **local builds run in the CI image** — `--action build` uses docker with the
+  image the pipeline uses (`--runner auto|docker|local`, `--hugo-image`, `SPECKIT_HUGO_IMAGE`),
+  resolved from the rendered pipeline or the shared `ci-templates/hugo-image.txt` that stage 3
+  renders from; the workstation Hugo is a reported fallback. New `--action image` prints the
+  resolved image and its source.
 - `/speckit.docs` command: documentation-space reconcile engine (six-type taxonomy, uppercase special-name registry, notes lifecycle, docs-utils engine). See ADR-0001.
 - Docs-sync evaluation step (`## Documentation`) on all 14 complex commands.
 

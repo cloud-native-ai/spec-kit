@@ -22,8 +22,9 @@ Actions:
   scaffold  write missing scaffold files and sync the managed navigation+mount block
   check     report drift without writing (missing files, stale mounts, collisions)
   mounts    print the computed navigation+mount block only
-  build     run `hugo --minify` inside docs/ when the binary is available
+  build     run `hugo --minify` in the CI image (docker), or locally as a fallback
   theme     report the vendored theme's state; with --fetch, install/update it
+  image     print the docker image a build would use, and where it came from
 """
 from __future__ import annotations
 
@@ -160,11 +161,15 @@ def theme_state(docs: Path, request: str) -> dict:
 
     `auto` prefers the theme and degrades to the built-in layouts when it is absent;
     an explicit `book` request never degrades (the caller decides what to do).
+    `config_mode` is what the site on disk actually selects, which is what a build has
+    to respect — a vendored theme means nothing while hugo.toml renders builtin.
     """
     theme_root = docs / THEME_DIR
     present = (theme_root / "theme.toml").is_file()
     min_hugo = THEME_MIN_HUGO
     if present:
+        # theme.toml's min_version is the author's declared floor; Hugo enforces the
+        # same number through the theme's own hugo.toml (module.hugoVersion.min).
         declared = re.search(r'min_version\s*=\s*"([\d.]+)"',
                              (theme_root / "theme.toml").read_text(encoding="utf-8"))
         if declared:
@@ -176,11 +181,17 @@ def theme_state(docs: Path, request: str) -> dict:
             record = json.loads(provenance.read_text(encoding="utf-8"))
         except ValueError:
             record = {}
+    config = docs / CONFIG_NAME
+    config_mode = None
+    if config.is_file():
+        config_mode = "book" if THEME_MARKER in config.read_text(encoding="utf-8") \
+            else "builtin"
     installed = hugo_version()
     mode = "book" if (request == "book" or (request == "auto" and present)) else "builtin"
     state = {
         "request": request,
         "mode": mode,
+        "config_mode": config_mode,
         "present": present,
         "dir": f"{docs.name}/{THEME_DIR}",
         "ref": record.get("ref"),
@@ -192,7 +203,8 @@ def theme_state(docs: Path, request: str) -> dict:
         "vendored_markdown": len(list((docs / "themes").rglob("*.md")))
         if (docs / "themes").is_dir() else 0,
     }
-    if mode == "book" and installed is not None:
+    # The floor only binds a site that actually uses the theme.
+    if (config_mode or mode) == "book" and installed is not None:
         state["compatible"] = version_tuple(installed) >= version_tuple(min_hugo)
     return state
 
@@ -733,7 +745,7 @@ def local_guidance(attempt: dict, theme: dict, image: str, docs_name: str) -> st
 def main() -> int:
     parser = argparse.ArgumentParser(description="Hugo scaffolder for the docs space")
     parser.add_argument("--action", required=True,
-                        choices=["scaffold", "check", "mounts", "build", "theme"])
+                        choices=["scaffold", "check", "mounts", "build", "theme", "image"])
     parser.add_argument("--root", default=".", help="project root (SKILL_WORKDIR)")
     parser.add_argument("--docs-dir", default="docs", help="documentation directory name")
     parser.add_argument("--site-title", default=None)
@@ -763,6 +775,8 @@ def main() -> int:
     if args.action == "build":
         out = cmd_build(root, args.docs_dir, args.base_url, args.theme,
                         runner=args.runner, image_override=args.hugo_image)
+    elif args.action == "image":
+        out = {**resolve_image(root, args.hugo_image), "clean": True}
     elif args.action == "theme":
         out = cmd_theme(root / args.docs_dir, args.theme_ref, args.theme_url,
                         args.fetch, args.force)

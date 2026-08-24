@@ -22,13 +22,15 @@ Actions:
   scaffold  write missing scaffold files and sync the managed navigation+mount block
   check     report drift without writing (missing files, stale mounts, collisions)
   mounts    print the computed navigation+mount block only
-  build     run `hugo --minify` inside docs/ when the binary is available
+  build     run `hugo --minify` in the CI image (docker), or locally as a fallback
   theme     report the vendored theme's state; with --fetch, install/update it
+  image     print the docker image a build would use, and where it came from
 """
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -81,6 +83,54 @@ ACRONYMS = {"adr": "ADR", "ai": "AI", "api": "API", "cd": "CD", "ci": "CI", "cli
             "ux": "UX", "vm": "VM"}
 COLLAPSE_THRESHOLD = 6
 
+# Builds run in the CI image by default, so a local render and the CI render use the
+# same Hugo: a workstation binary is usually older than the image (and often older than
+# the theme's minimum), which makes "works locally" mean nothing.
+RUNNERS = ("auto", "docker", "local")
+IMAGE_ENV = "SPECKIT_HUGO_IMAGE"
+IMAGE_FILE = "hugo-image.txt"          # shared with scaffold-ci.sh (stage 3)
+IMAGE_FALLBACK = "reg.docker.alibaba-inc.com/xuanji-images/hugo:latest"
+# Rendered pipelines to read the image from, so the local build follows a project that
+# overrode it. Ordered: first match wins.
+CI_FILES = (".aoneci/deploy-pages.yaml", ".github/workflows/deploy-pages.yaml")
+WORKDIR = "/workspace"
+
+
+def registry_image() -> str:
+    """The shared default image: first non-comment line of ci-templates/hugo-image.txt."""
+    path = Path(__file__).resolve().parent / "ci-templates" / IMAGE_FILE
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            entry = line.strip()
+            if entry and not entry.startswith("#"):
+                return entry
+    return IMAGE_FALLBACK
+
+
+def ci_image(root: Path) -> str | None:
+    """The image a rendered CI pipeline actually uses — the strongest 'same as CI' signal."""
+    for rel in CI_FILES:
+        path = root / rel
+        if not path.is_file():
+            continue
+        found = re.search(r"^\s*image:\s*(\S+)\s*$", path.read_text(encoding="utf-8"), re.M)
+        if found:
+            return found.group(1).strip("'\"")
+    return None
+
+
+def resolve_image(root: Path, override: str | None) -> dict:
+    """Explicit flag > environment > rendered CI pipeline > shared registry default."""
+    if override:
+        return {"image": override, "image_source": "flag"}
+    from_env = os.environ.get(IMAGE_ENV)
+    if from_env:
+        return {"image": from_env, "image_source": f"env:{IMAGE_ENV}"}
+    from_ci = ci_image(root)
+    if from_ci:
+        return {"image": from_ci, "image_source": "ci-pipeline"}
+    return {"image": registry_image(), "image_source": "ci-templates/" + IMAGE_FILE}
+
 
 def assets_dir(mode: str) -> Path:
     """${SKILL_HOME}/assets/<mode> — resolved from this script's own location."""
@@ -111,11 +161,15 @@ def theme_state(docs: Path, request: str) -> dict:
 
     `auto` prefers the theme and degrades to the built-in layouts when it is absent;
     an explicit `book` request never degrades (the caller decides what to do).
+    `config_mode` is what the site on disk actually selects, which is what a build has
+    to respect — a vendored theme means nothing while hugo.toml renders builtin.
     """
     theme_root = docs / THEME_DIR
     present = (theme_root / "theme.toml").is_file()
     min_hugo = THEME_MIN_HUGO
     if present:
+        # theme.toml's min_version is the author's declared floor; Hugo enforces the
+        # same number through the theme's own hugo.toml (module.hugoVersion.min).
         declared = re.search(r'min_version\s*=\s*"([\d.]+)"',
                              (theme_root / "theme.toml").read_text(encoding="utf-8"))
         if declared:
@@ -127,11 +181,17 @@ def theme_state(docs: Path, request: str) -> dict:
             record = json.loads(provenance.read_text(encoding="utf-8"))
         except ValueError:
             record = {}
+    config = docs / CONFIG_NAME
+    config_mode = None
+    if config.is_file():
+        config_mode = "book" if THEME_MARKER in config.read_text(encoding="utf-8") \
+            else "builtin"
     installed = hugo_version()
     mode = "book" if (request == "book" or (request == "auto" and present)) else "builtin"
     state = {
         "request": request,
         "mode": mode,
+        "config_mode": config_mode,
         "present": present,
         "dir": f"{docs.name}/{THEME_DIR}",
         "ref": record.get("ref"),
@@ -143,7 +203,8 @@ def theme_state(docs: Path, request: str) -> dict:
         "vendored_markdown": len(list((docs / "themes").rglob("*.md")))
         if (docs / "themes").is_dir() else 0,
     }
-    if mode == "book" and installed is not None:
+    # The floor only binds a site that actually uses the theme.
+    if (config_mode or mode) == "book" and installed is not None:
         state["compatible"] = version_tuple(installed) >= version_tuple(min_hugo)
     return state
 
@@ -543,55 +604,158 @@ def cmd_theme(docs: Path, ref: str, url: str, fetch: bool, force: bool) -> dict:
                         "then re-run --action scaffold"}
 
 
-def cmd_build(root: Path, docs_name: str, base_url: str | None,
-              theme_request: str = "auto") -> dict:
-    docs = root / docs_name
+def hugo_command(base_url: str | None) -> str:
+    """The one build command, identical in every runner and in the CI pipeline."""
+    command = "hugo --minify"
+    if base_url:
+        command += f" --baseURL {base_url}"
+    return command
+
+
+def tail(text: str, lines: int = 12) -> list:
+    return [line for line in (text or "").splitlines() if line.strip()][-lines:]
+
+
+def build_in_docker(root: Path, docs_name: str, image: str, base_url: str | None) -> dict:
+    """Run the build inside the CI image, so local output matches CI byte for byte.
+
+    The workspace is bind-mounted, which writes `<docs>/public` straight back to the
+    host. Some sandboxed daemons cannot see host paths; that is detected with a probe
+    and reported rather than silently producing an empty site.
+    """
+    docker = shutil.which("docker")
+    if docker is None:
+        return {"built": False, "reason": "docker-not-installed"}
+    mount = f"{root}:{WORKDIR}"
+    probe = subprocess.run(
+        [docker, "run", "--rm", "-v", mount, image,
+         "sh", "-c", f"test -f {WORKDIR}/{docs_name}/{CONFIG_NAME}"],
+        capture_output=True, text=True)
+    if probe.returncode != 0:
+        return {"built": False,
+                "reason": "image-unavailable" if "Unable to find image" in probe.stderr
+                          or "pull access denied" in probe.stderr
+                          or "not found" in probe.stderr.lower() else "workspace-not-visible",
+                "stderr_tail": tail(probe.stderr, 6)}
+    command = hugo_command(base_url)
+    proc = subprocess.run(
+        [docker, "run", "--rm", "-v", mount, "-w", f"{WORKDIR}/{docs_name}", image,
+         "sh", "-c", f"hugo version && {command}"],
+        capture_output=True, text=True)
+    version = re.search(r"hugo v(\d+\.\d+\.\d+)", proc.stdout or "")
+    return {
+        "built": proc.returncode == 0,
+        "returncode": proc.returncode,
+        "hugo_version": version.group(1) if version else None,
+        "command": command,
+        "stdout_tail": tail(proc.stdout),
+        "stderr_tail": tail(proc.stderr),
+    }
+
+
+def build_locally(root: Path, docs_name: str, base_url: str | None, theme: dict) -> dict:
     hugo = shutil.which("hugo")
     if hugo is None:
-        return {
-            "built": False,
-            "reason": "hugo-not-installed",
-            "guidance": "install Hugo extended (https://gohugo.io/installation/), "
-                        f"then run: cd {docs_name} && hugo --minify",
-            "clean": True,
-        }
+        return {"built": False, "reason": "hugo-not-installed"}
+    if theme.get("compatible") is False:
+        # The theme enforces its own minimum, so this build would fail with a Hugo
+        # error rather than a broken site.
+        return {"built": False, "reason": "hugo-older-than-theme",
+                "hugo_version": theme.get("hugo_version")}
+    cmd = [hugo, "--minify"]
+    if base_url:
+        cmd += ["--baseURL", base_url]
+    proc = subprocess.run(cmd, cwd=root / docs_name, capture_output=True, text=True)
+    return {
+        "built": proc.returncode == 0,
+        "returncode": proc.returncode,
+        "hugo_version": theme.get("hugo_version"),
+        "command": hugo_command(base_url),
+        "stdout_tail": tail(proc.stdout),
+        "stderr_tail": tail(proc.stderr),
+    }
+
+
+def cmd_build(root: Path, docs_name: str, base_url: str | None,
+              theme_request: str = "auto", runner: str = "auto",
+              image_override: str | None = None) -> dict:
+    docs = root / docs_name
     if not (docs / CONFIG_NAME).is_file():
         return {"built": False, "reason": "not-scaffolded",
                 "guidance": "run --action scaffold first", "clean": False}
     theme = theme_state(docs, theme_request) if docs.is_dir() else {"compatible": None}
-    if theme.get("compatible") is False:
-        # The theme enforces its own minimum, so this build would fail with a Hugo
-        # error rather than a broken site. An old local binary is an environment gap,
-        # not a scaffold defect — CI images are usually newer.
-        return {"built": False, "reason": "hugo-older-than-theme", "theme": theme,
-                "guidance": f"Hugo {theme['hugo_version']} < {theme['min_hugo']} required "
-                            "by the Book theme: upgrade Hugo, build in the CI image, or "
-                            "scaffold with --theme builtin",
-                "clean": True}
-    cmd = [hugo, "--minify"]
-    if base_url:
-        cmd += ["--baseURL", base_url]
-    proc = subprocess.run(cmd, cwd=docs, capture_output=True, text=True)
-    tail = [line for line in (proc.stdout or "").splitlines() if line.strip()][-12:]
-    return {
-        "built": proc.returncode == 0,
-        "returncode": proc.returncode,
-        "output_dir": f"{docs_name}/public",
-        "stdout_tail": tail,
-        "stderr_tail": [line for line in (proc.stderr or "").splitlines() if line.strip()][-12:],
-        "clean": proc.returncode == 0,
-    }
+    resolved = resolve_image(root, image_override)
+    result = {"docs_dir": docs_name, "output_dir": f"{docs_name}/public", "theme": theme,
+              **resolved}
+
+    attempts: list[dict] = []
+    if runner in ("auto", "docker"):
+        attempt = build_in_docker(root, docs_name, resolved["image"], base_url)
+        attempts.append({"runner": "docker", **attempt})
+        if attempt["built"] or runner == "docker":
+            return {**result, **attempt, "runner": "docker", "attempts": attempts,
+                    "clean": attempt["built"],
+                    **({} if attempt["built"] else
+                       {"guidance": docker_guidance(attempt, resolved["image"], docs_name)})}
+    if runner in ("auto", "local"):
+        attempt = build_locally(root, docs_name, base_url, theme)
+        attempts.append({"runner": "local", **attempt})
+        if attempt["built"]:
+            return {**result, **attempt, "runner": "local", "attempts": attempts,
+                    "clean": True,
+                    "warning": "built with the local Hugo, not the CI image: the rendered "
+                               "site may differ from CI"}
+        # Neither runner produced a site. An environment gap (no docker, no binary, a
+        # binary older than the theme) is not scaffold drift, so it stays `clean`.
+        gap = attempt["reason"] in ("hugo-not-installed", "hugo-older-than-theme")
+        return {**result, **attempt, "runner": "local", "attempts": attempts,
+                "clean": gap,
+                "guidance": local_guidance(attempt, theme, resolved["image"], docs_name)}
+    return {**result, "built": False, "reason": f"unknown runner: {runner}", "clean": False}
+
+
+def docker_guidance(attempt: dict, image: str, docs_name: str) -> str:
+    reason = attempt.get("reason")
+    if reason == "docker-not-installed":
+        return ("docker is required to build with the CI image; install it, or accept a "
+                "local-Hugo build with --runner local (version may differ from CI)")
+    if reason == "image-unavailable":
+        return (f"cannot pull {image}: it is environment-specific. Pass --hugo-image "
+                f"<ref>, set {IMAGE_ENV}, or edit ci-templates/{IMAGE_FILE} so stage 3 "
+                "renders the same image")
+    if reason == "workspace-not-visible":
+        return ("the docker daemon cannot see the host workspace (sandboxed daemon): copy "
+                f"the tree into a container instead, or use --runner local")
+    return f"build failed inside {image}; run: cd {docs_name} && {attempt.get('command')}"
+
+
+def local_guidance(attempt: dict, theme: dict, image: str, docs_name: str) -> str:
+    reason = attempt.get("reason")
+    if reason == "hugo-older-than-theme":
+        return (f"local Hugo {theme.get('hugo_version')} < {theme.get('min_hugo')} required "
+                f"by the Book theme — build in the CI image ({image}, the default runner), "
+                "upgrade Hugo, or scaffold with --theme builtin")
+    if reason == "hugo-not-installed":
+        return (f"no local Hugo and no usable docker image: install Hugo extended "
+                f"(https://gohugo.io/installation/) or make {image} pullable, "
+                f"then run: cd {docs_name} && hugo --minify")
+    return f"local build failed; run it directly for full output: cd {docs_name} && hugo --minify"
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Hugo scaffolder for the docs space")
     parser.add_argument("--action", required=True,
-                        choices=["scaffold", "check", "mounts", "build", "theme"])
+                        choices=["scaffold", "check", "mounts", "build", "theme", "image"])
     parser.add_argument("--root", default=".", help="project root (SKILL_WORKDIR)")
     parser.add_argument("--docs-dir", default="docs", help="documentation directory name")
     parser.add_argument("--site-title", default=None)
     parser.add_argument("--description", default="Project documentation")
     parser.add_argument("--base-url", default=None, help="baseURL override for build")
+    parser.add_argument("--runner", default="auto", choices=list(RUNNERS),
+                        help="build runner: auto (docker CI image, then local), docker, local")
+    parser.add_argument("--hugo-image", default=None,
+                        help=f"docker image for the build (default: {IMAGE_ENV} env, the "
+                             f"rendered CI pipeline, or ci-templates/{IMAGE_FILE})")
     parser.add_argument("--theme", default="auto", choices=list(THEME_MODES),
                         help="auto: prefer the vendored Book theme, else built-in layouts")
     parser.add_argument("--theme-ref", default=THEME_REF,
@@ -609,7 +773,10 @@ def main() -> int:
     site_title = args.site_title or root.name
 
     if args.action == "build":
-        out = cmd_build(root, args.docs_dir, args.base_url, args.theme)
+        out = cmd_build(root, args.docs_dir, args.base_url, args.theme,
+                        runner=args.runner, image_override=args.hugo_image)
+    elif args.action == "image":
+        out = {**resolve_image(root, args.hugo_image), "clean": True}
     elif args.action == "theme":
         out = cmd_theme(root / args.docs_dir, args.theme_ref, args.theme_url,
                         args.fetch, args.force)
