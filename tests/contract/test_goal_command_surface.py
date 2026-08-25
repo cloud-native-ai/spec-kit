@@ -184,3 +184,49 @@ def test_per_tool_copies_carry_the_targets_content(path):
 def test_engine_implements_the_targets_action():
     text = ENGINE.read_text(encoding="utf-8")
     assert 'add_parser("targets"' in text
+
+
+# --------------------------------------------------------------------------
+# create interview — Targets collected as an optional annex (037/038 continuation)
+# --------------------------------------------------------------------------
+
+def _create_interview_section() -> str:
+    text = CANONICAL.read_text(encoding="utf-8")
+    assert "Interview for `create`" in text, "create interview step missing"
+    start = text.index("Interview for `create`")
+    end = text.index("**`migrate <team-slug>`**", start)
+    return text[start:end]
+
+
+def test_create_interview_collects_targets_as_an_optional_item():
+    section = _create_interview_section()
+    assert "**Targets**" in section, "create interview must carry a Targets item"
+    assert "zero is legal" in section.lower(), (
+        "zero Targets must stay legal — the decomposition is an annex, "
+        "a goal without Targets is fully valid"
+    )
+
+
+def test_create_interview_keeps_targets_out_of_the_composition():
+    """Targets are an annex around the concept, never a fourth composition part."""
+    section = _create_interview_section()
+    assert "annex" in section.lower()
+
+
+def test_create_interview_writes_targets_only_through_the_engine():
+    section = _create_interview_section()
+    assert "targets <goal-slug> --add" in section, (
+        "ratified statements must land through the targets action group"
+    )
+    assert "never hand-write" in section.lower() or "never hand-written" in section.lower(), (
+        "the ## Targets section is engine-rendered only"
+    )
+
+
+def test_create_writes_the_definition_before_the_targets():
+    section = _create_interview_section().lower()
+    create_pos = section.find("definition first")
+    assert create_pos != -1, (
+        "the definition must be created before any Target lands "
+        "(statement validation needs the goal file)"
+    )

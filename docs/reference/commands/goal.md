@@ -100,6 +100,8 @@ Once two or more teams share a goal, their declared territories must not overlap
 
 A goal MAY additionally carry **Targets** — run-assignable scope slices (`T-<nnn>`, three states, engine-rendered `## Targets` section). The concept — identity grammar, lifecycle, boundary against the criteria axis — is defined once in the concept authority (Target Decomposition); this command owns only the operations: `targets <slug> --add/--list/--set`. Statements pass the same GD-2/GD-3 shape check at slice scale and must not restate a success criterion; terminal goals are read-only; terminal identities are never reused. Runs consume an authorized slice via `/speckit.team run <team> --target T-<nnn>`; a terminal-state reference triggers the review bifurcation (verify by hand; reopen via `--set open` if evidence contradicts) — there is no terminal-execution bypass.
 
+The `create` interview collects Targets as its fourth, **optional** item: after objective, criteria, and identity, the user may state zero or more sub-outcome statements (zero is legal — a goal without Targets is fully valid, and the item may be skipped entirely). Stated slices land after the definition is created — `targets <slug> --check "<statement>"` for the dry-run verdict, then `targets <slug> --add "<statement>"` to authorize — never hand-written into `goal.md`. A rejected statement is reported as a verdict; the user rewords or drops it while the created goal stands.
+
 ## Out of scope
 
 Driving a host CLI's own goal mechanism from an archived definition is deliberately **not** part of this command. Official documentation confirms the host CLI's `/goal set` accepts inline text only, with no file or identity option, so that integration needs its own requirement.

@@ -53,6 +53,7 @@ Mode is inferred from `$ARGUMENTS`; the inferred mode is disclosed with every ru
    python3 .specify/scripts/python/goal-utils.py status <goal-slug> --set achieved
    python3 .specify/scripts/python/goal-utils.py criteria <goal-slug> --criterion "<new>"
    python3 .specify/scripts/python/goal-utils.py targets <goal-slug> --add "<sub-outcome statement>"
+   python3 .specify/scripts/python/goal-utils.py targets <goal-slug> --check "<sub-outcome statement>"
    python3 .specify/scripts/python/goal-utils.py targets <goal-slug> --list
    python3 .specify/scripts/python/goal-utils.py targets <goal-slug> --set done --id T-001
    ```
@@ -61,12 +62,15 @@ Mode is inferred from `$ARGUMENTS`; the inferred mode is disclosed with every ru
 
    `targets` notes: the engine renders the `## Targets` section (never hand-edit it); statements pass the same GD-2/GD-3 shape check at slice scale and must not restate a success criterion; terminal goals are read-only; terminal Target identities are never reused. A terminal-state Target reported by a run is a **review bifurcation**: verify by hand — if genuinely done, stop; if evidence contradicts, reopen via `targets <slug> --set open --id <T-nnn>` and re-issue the run. There is no terminal-execution bypass.
 
-5. **Interview for `create`** — collect exactly three things, and nothing else. Ask them per the interview pattern (`.specify/shared/patterns/interview-pattern.md`): **open** questions carrying their context, no option menus and no recommended answers (the objective is the user's to state, not yours to propose), facts looked up rather than asked, each answer written through before the next round.
+5. **Interview for `create`** — collect exactly four things, and nothing else. Ask them per the interview pattern (`.specify/shared/patterns/interview-pattern.md`): **open** questions carrying their context, no option menus and no recommended answers (the objective and its slices are the user's to state, not yours to propose), facts looked up rather than asked, each answer written through before the next round.
    - the **objective**: the desired end *outcome*. If the user describes steps, say so and ask for the outcome instead (the engine rejects task lists as GD-2).
    - **success criteria**: zero or more verifiable conditions. Zero is legal — the archive records `None provided.` and consumers declare the absence rather than inventing criteria.
    - the **identity**: a slug that is also the directory name. Reuse `goal_slug` semantics; do not invent a second identifier.
+   - **Targets** (optional annex — concept: Target Decomposition in `.specify/shared/definitions/goal-definitions.md`, link, never restate): zero or more sub-outcome statements under the confirmed objective. Zero is legal — a goal without Targets is fully valid and this item may be skipped entirely. Each statement must be outcome-shaped at slice scale (GD-2), a slice of this objective rather than an independent end state (GD-3), and must not restate a success criterion. Collect only statements the user states — in this mode you never draft slices on their behalf.
 
    If the objective bundles several objectives the engine rejects it as GD-3 — help the user split it into separate goals, each with its own directory and lifecycle.
+
+   **Execution order**: write the definition first (`create`), then land each collected Target statement through the engine — `targets <goal-slug> --check "<statement>"` for the dry-run verdict, `targets <goal-slug> --add "<statement>"` to authorize; never hand-write the `## Targets` section. A rejected statement is a verdict: report it, let the user reword or drop it, and continue with the rest — the already-created goal is never rolled back for a rejected slice.
 
 6. **`migrate <team-slug>`**: read that team's inline goal, derive a definition whose objective and criteria are semantically equivalent, create it, then set the team's `goal_slug` to the new identity. **Never** delete the team's inline goal — retention is the user's choice, and migration is per-team and optional.
 
