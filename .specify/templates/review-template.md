@@ -137,6 +137,7 @@ The generator MUST tick every box below before submitting the report. If any box
 - [ ] No placeholder tokens (`[...]`) remain anywhere in the report.
 - [ ] Section 4 is short and bullet-only — no multi-paragraph narrative summaries leaked back in.
 - [ ] Section 5 recommendations each cite an exact target file in the spec-kit repo and at least one source finding ID.
+- [ ] P0 validation status is stated explicitly. When the review raised zero P0 findings, use the standard wording: "No P0 findings raised; the P0 independent-validation pass is vacuously satisfied." — do not leave the path unmentioned and do not improvise per-run phrasing.
 
 ## 8. Feedback
 

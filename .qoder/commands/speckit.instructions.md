@@ -146,7 +146,7 @@ Fallback behavior:
 6. **Validation**:
    - Ensure the file is well-formatted Markdown.
    - Verify that the resulting instructions clearly describe the project to a fresh AI instance.
-   - **Coverage check**: diff the result against **every** `.specify/instructions.md-*` backup and confirm no user-authored section present in the history was silently dropped. If any is missing, restore it from the backup before finishing.
+   - **Coverage check**: compare the result against **every** `.specify/instructions.md-*` backup by **set membership of section headings** (`grep '^#' | sort` on both sides, then `comm`), not positional line diff — a reordered section is not a lost section, and a positional diff trains the agent to dismiss its own warnings. Exempt `| None yet. |`-style registry placeholder rows from the comparison. Confirm no user-authored section present in the history was silently dropped; if any heading is genuinely missing, restore it from the backup before finishing.
 
 7. **Report (mandatory artifact — residual report)**:
    - Report the full path of the instructions file (`.specify/instructions.md`).

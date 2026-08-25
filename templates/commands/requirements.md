@@ -42,6 +42,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
    - Next number = highest + 1 (or 1 if none found)
 
 3. **Run script** `{SCRIPT}` from repo root (replace `<SHORT_NAME>`). Parse JSON for BRANCH_NAME and SPEC_FILE. Run only once.
+   - Note: the script **pre-creates SPEC_FILE** with template placeholder content — you MUST `Read` it before writing (or overwrite via `Edit`); a blind `Write` fails with "File has not been read yet".
 
 4. **Load** `templates/requirements-template.md` for required sections.
 
@@ -108,6 +109,6 @@ At the same wrap-up point as the Feedback step, apply the docs-sync evaluation p
 
 ## Handoffs
 
-**Before**: Optional `/speckit.feature` to ensure feature registry is up to date.
+**Before**: Optional `/speckit.feature` to ensure feature registry is up to date — **recommended whenever `.specify/memory/features.md` is absent or still a placeholder**, otherwise `/speckit.clarify` has to bootstrap the registry mid-run while binding the Feature.
 
 **After**: If spec has `[NEEDS CLARIFICATION]` or `Related Feature: Need clarification` → `/speckit.clarify`. Otherwise → `/speckit.plan`.

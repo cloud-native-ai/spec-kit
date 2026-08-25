@@ -54,6 +54,7 @@ Distill a reusable Skill from the current conversation history:
 
 - **skill name** determines `SKILL_HOME`. Example: `name = "testing"` → `SKILL_HOME = .specify/skills/testing/` (project-level).
 - **description** must include keywords and trigger scenarios; avoid vague descriptions.
+- **Writability pre-flight (fail fast)**: before drafting any content, touch-test the parent directory of `SKILL_HOME` (e.g. `mkdir -p "$SKILL_HOME" && touch "$SKILL_HOME/.wtest" && rm "$SKILL_HOME/.wtest"`). The host skills directory may be root-owned in some environments (container-created leftovers); report an unwritable target up front with the `sudo chown -R $USER <dir>` remedy instead of discovering it at the first write.
 
 Storage location options (`SKILL_HOME`):
 - `.specify/skills/<name>/` — project-level primary (preferred in Spec Kit project mode)

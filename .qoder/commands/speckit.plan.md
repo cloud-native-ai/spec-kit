@@ -62,7 +62,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
      - Ensure all required sections are properly filled
    - Phase 0: Resolve clarifications (refer to `research.md` or conduct analysis)
    - Phase 1: Generate data-model.md, contracts/, quickstart.md, feature-ref.md
-     - **Summarize after, not before**: any Phase 1 summary written into plan.md (entity counts, contract counts, artifact lists) MUST be filled in AFTER the artifacts land on disk — pre-written counts routinely drift from the actual output and force a correction pass.
+     - **Summarize after, not before**: any Phase 1 summary written into plan.md (entity counts, contract counts, artifact lists) MUST be filled in AFTER the artifacts land on disk — pre-written counts routinely drift from the actual output and force a correction pass. The template carries a commented `## Phase 1: Design Artifacts Summary` placeholder section for exactly this backfill — fill it in place, never pre-write it.
    - Re-evaluate Constitution Check post-design
 
 5. **Plan integrity gate + stop and report**: Before finishing, verify the filled IMPL_PLAN contains (a) **no** residual `[UPPER_SNAKE_CASE]` placeholder tokens, (b) **exactly one** top-level `# Implementation Plan:` heading (no duplicated template body appended), and (c) the `**Requirement → Feature**` stamp. The template's self-referential **Note** line (the one mentioning `[PLACEHOLDER]` replacement) is REMOVED when filling — keeping it false-positives check (a). Fix the file if any check fails. Then report branch, IMPL_PLAN path, and generated artifacts.

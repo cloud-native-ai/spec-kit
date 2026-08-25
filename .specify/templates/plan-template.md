@@ -145,3 +145,21 @@ reference the real directories captured above. Explicitly note any new top-level
 |-----------|------------|-------------------------------------|
 | [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
 | [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+
+## Phase 1: Design Artifacts Summary
+
+<!--
+  ACTION REQUIRED (backfill ONLY — delete this comment when filling):
+  Fill this section AFTER the Phase 1 artifacts (data-model.md, contracts/,
+  quickstart.md, feature-ref.md) have landed on disk — never pre-write counts
+  here. Record the actual artifact inventory: entity count, contract count and
+  names, quickstart scenario count, and any drift from the Phase 0 expectation.
+  Summarize after, not before: pre-written counts routinely drift from the
+  actual output and force a correction pass.
+-->
+
+| Artifact | Path | Count / Scope |
+|----------|------|---------------|
+| [e.g. Data model] | [`data-model.md`] | [N entities] |
+| [e.g. Contracts] | [`contracts/`] | [N files: names] |
+| [e.g. Quickstart] | [`quickstart.md`] | [N scenarios] |

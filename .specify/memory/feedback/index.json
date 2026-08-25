@@ -1,10 +1,26 @@
 {
   "store": "feedback",
-  "updated": "2026-08-24T05:46:39Z",
+  "updated": "2026-08-24T12:55:39Z",
   "threshold": 10,
-  "count_since_submission": 14,
+  "count_since_submission": 15,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260824T125539Z-speckit-feedback",
+      "file": "20260824T125539Z-speckit-feedback.md",
+      "unit_id": "/speckit.feedback",
+      "unit_type": "command",
+      "run_id": "consume-20260824-batch3",
+      "probe": "speckit-feedback-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "",
+      "feature_id": "",
+      "disposition": "",
+      "partial": false,
+      "created": "2026-08-24T12:55:39Z",
+      "summary": "Mode 4 consume run: 3 bundles (34 rows, 23 unique after detecting one exact-duplicate pair), framework gate passed, 14 direct fixes applied to framework source with regen+mirror sync verified (contrac"
+    },
     {
       "id": "20260824T054639Z-speckit-implement",
       "file": "20260824T054639Z-speckit-implement.md",

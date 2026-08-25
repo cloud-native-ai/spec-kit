@@ -89,6 +89,7 @@ Apply [Feature Integration Protocol](.specify/shared/workflow/feature-integratio
 **Tests are Constitution-driven (NOT a fixed default)**: Before generating tasks, detect test-mandating principles **deterministically** (token-efficiency program-first — see `.specify/shared/guidelines/token-efficiency.md`): run `grep -nE 'MUST|MANDATORY|NON-NEGOTIABLE|Test-First|TDD|Contract-Driven' .specify/memory/constitution.md` and consume only the matched principle headings/lines — do NOT read the whole constitution into context for this keyword check.
 
 - **Tests default ON** if any such principle exists, OR if the feature specification / `$ARGUMENTS` explicitly requests TDD. In ON mode you MUST emit test tasks (contract, unit, integration as applicable) per user story BEFORE the corresponding implementation tasks. If the constitution defines distinct testing layers (e.g. Layer-1 generator unit tests + Layer-2 build/smoke validation), emit tasks for EVERY layer it mandates.
+  - **Migration/regression exception**: tests that port or guard *existing* behavior (migrated suites, regression nets) can only go green after the consumer code they exercise has been updated — place such a test task AFTER its implementation task with an explicit `[blockedBy: T<impl>]` tag. Only new-behavior contract tests are strictly red-first. This resolves the otherwise-contradictory "tests precede implementation" vs "Task ID sequential in execution order" pairing for migration scenarios.
 - **Tests default OFF** only when no test-mandating principle is found AND the spec is silent on TDD.
 
 At the top of the generated `tasks.md`, you MUST print a one-line banner declaring which mode was chosen and cite the constitution principle (or absence thereof) that drove the decision. Example:
@@ -128,6 +129,8 @@ Every task MUST strictly follow this format:
 ```text
 - [ ] [TaskID] [P?] [Story?] Description with file path
 ```
+
+**One line per task (mechanical-validation contract)**: the ENTIRE task row — checkbox, ID, labels, description, and file path — MUST stay on a single line. Format validators and downstream tooling inspect only the row's first line; wrapping the description or the file path onto a continuation line makes the path invisible to the gate and forces manual re-verification.
 
 **Format Components**:
 
