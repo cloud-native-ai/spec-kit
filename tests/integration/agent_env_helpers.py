@@ -1,6 +1,6 @@
-"""Isolated-HOME bash invocation helpers for the agent-cli-setup unified env-var flow.
+"""Isolated-HOME bash invocation helpers for the manage-agents unified env-var flow.
 
-These helpers source ``skills/agent-cli-setup/scripts/config-agent.sh`` inside a
+These helpers source ``skills/manage-agents/scripts/config-agent.sh`` inside a
 subprocess with a controlled ``$HOME`` and a controlled ``AGENT_*`` environment,
 run one of the unified-env functions, and capture stdout/stderr/exit code.
 
@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SCRIPT = ROOT / "skills" / "agent-cli-setup" / "scripts" / "config-agent.sh"
+SCRIPT = ROOT / "skills" / "manage-agents" / "scripts" / "config-agent.sh"
 
 
 @dataclass

@@ -60,7 +60,6 @@
 | speckit-tasks-wrapup | command-wrapup | /speckit.tasks | wrap-up |
 | speckit-todo-wrapup | command-wrapup | /speckit.todo | wrap-up |
 | speckit-tools-wrapup | command-wrapup | /speckit.tools | wrap-up |
-| skill-agent-cli-setup-wrapup | skill-wrapup | skill:agent-cli-setup | wrap-up |
 | skill-archive-session-wrapup | skill-wrapup | skill:archive-session | wrap-up |
 | skill-browser-extension-wrapup | skill-wrapup | skill:browser-extension | wrap-up |
 | skill-browser-utils-wrapup | skill-wrapup | skill:browser-utils | wrap-up |
@@ -86,6 +85,7 @@
 | skill-improve-skills-wrapup | skill-wrapup | skill:improve-skills | wrap-up |
 | skill-improve-team-wrapup | skill-wrapup | skill:improve-team | wrap-up |
 | skill-improve-tools-wrapup | skill-wrapup | skill:improve-tools | wrap-up |
+| skill-manage-agents-wrapup | skill-wrapup | skill:manage-agents | wrap-up |
 | skill-memory-recall-wrapup | skill-wrapup | skill:memory-recall | wrap-up |
 | skill-memory-record-wrapup | skill-wrapup | skill:memory-record | wrap-up |
 | skill-study-project-wrapup | skill-wrapup | skill:study-project | wrap-up |

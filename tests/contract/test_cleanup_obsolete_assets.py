@@ -34,6 +34,7 @@ def _build_workspace(root: Path) -> None:
     _write(specify / "skills" / "organize-agents" / "SKILL.md")
     _write(specify / "skills" / "docx-utils" / "SKILL.md")
     _write(specify / "skills" / "extension-e2e-test" / "SKILL.md")
+    _write(specify / "skills" / "agent-cli-setup" / "SKILL.md")
     # Current skill + user-authored skill (must survive)
     _write(specify / "skills" / "create-team" / "SKILL.md")
     _write(specify / "skills" / "my-custom-skill" / "SKILL.md")
@@ -92,6 +93,7 @@ def test_removes_obsolete_skills_commands_and_templates(tmp_path):
     assert not (specify / "skills" / "organize-agents").exists()
     assert not (specify / "skills" / "docx-utils").exists()
     assert not (specify / "skills" / "extension-e2e-test").exists()
+    assert not (specify / "skills" / "agent-cli-setup").exists()
     # Obsolete templates gone
     assert not (specify / "templates" / "agent-explore-template.md").exists()
     assert not (specify / "templates" / "consitution-template.md").exists()
@@ -197,6 +199,7 @@ def test_respects_agent_specific_command_extension(tmp_path):
 def test_registries_are_nonempty_and_derived_from_history():
     """Guardrail: the obsolete registries must remain populated (framework-scoped)."""
     assert "sdd-workflow" in _OBSOLETE_SKILLS
+    assert "agent-cli-setup" in _OBSOLETE_SKILLS
     assert "specify" in _OBSOLETE_COMMANDS
     assert "agent-explore-template.md" in _OBSOLETE_TEMPLATES
     assert "create-docs/scripts/scaffold-hugo.py" in _OBSOLETE_SKILL_FILES
@@ -206,6 +209,7 @@ def test_registries_are_nonempty_and_derived_from_history():
     assert "create-team/templates/teams/process-monitor.md" in _OBSOLETE_SKILL_FILES
     # Current names must never be listed as obsolete.
     assert "create-team" not in _OBSOLETE_SKILLS
+    assert "manage-agents" not in _OBSOLETE_SKILLS
     assert "requirements" not in _OBSOLETE_COMMANDS
     assert "plan-template.md" not in _OBSOLETE_TEMPLATES
     assert "create-pages/scripts/scaffold-hugo.py" not in _OBSOLETE_SKILL_FILES

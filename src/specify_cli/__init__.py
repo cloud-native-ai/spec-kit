@@ -731,7 +731,8 @@ _ASSISTANT_ARG_FORMATS = {
 # OBSOLETE-ASSET-REGISTRY:START
 
 # Skill directories that once shipped but were renamed/consolidated/removed.
-# (agent-setup→cli-setup→agent-cli-setup; docx/pdf/pptx/xlsx-utils→document-utils;
+# (agent-setup→cli-setup→agent-cli-setup→manage-agents;
+# docx/pdf/pptx/xlsx-utils→document-utils;
 # export-session→archive-session; extension-e2e-test→browser-extension;
 # mysql/postgres-utils→database-utils;
 # playwright-utils/web-test→browser-utils; organize-agents→create-team;
@@ -740,6 +741,7 @@ _ASSISTANT_ARG_FORMATS = {
 # sdd-workflow→shared/workflow;
 # mcp-creator/refresh-mcp-tools/notebooklm-utils/theme-creator removed).
 _OBSOLETE_SKILLS = (
+    "agent-cli-setup",
     "agent-setup",
     "cli-setup",
     "docx-utils",

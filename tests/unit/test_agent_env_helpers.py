@@ -10,7 +10,7 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SCRIPT = ROOT / "skills" / "agent-cli-setup" / "scripts" / "config-agent.sh"
+SCRIPT = ROOT / "skills" / "manage-agents" / "scripts" / "config-agent.sh"
 
 
 def _bash(snippet: str, home: Path) -> subprocess.CompletedProcess:
