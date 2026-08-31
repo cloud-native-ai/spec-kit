@@ -1,6 +1,6 @@
 ---
-description: Local management interface for the feedback mechanism — four execution modes. Mode 1 (no arguments) prints every probe placed in the current project as a vertical tree; Mode 2 processes collected feedback (view/filter/dispose/package/post-package cleanup); Mode 3 injects an external probe for client-project custom skills/agents/commands (feedback stays client-local, never submitted upstream); Mode 4 consumes incoming feedback bundles from the framework's feedback/ intake directory (framework project ONLY).
-short-description: 反馈机制本地管理：探测总览、处置、外部探针、消费反馈包
+description: Local management interface for the feedback mechanism — five execution modes. Mode 1 (no arguments) prints every probe placed in the current project as a vertical tree; Mode 2 processes collected feedback (view/filter/dispose/package/post-package cleanup); Mode 3 injects an external probe for client-project custom skills/agents/commands (feedback stays client-local, never submitted upstream); Mode 5 introspects accumulated feedback in the client project (scenario-grounded verification, root-cause clustering, routing decisions, report-enriched packaging); Mode 4 consumes incoming feedback bundles from the framework's feedback/ intake directory (framework project ONLY).
+short-description: 反馈机制本地管理：探测总览、处置、外部探针、自省、消费反馈包
 ---
 
 ## User Input
@@ -17,16 +17,17 @@ Consult the project glossary (`.specify/memory/glossary.md`) and apply the proto
 
 ## Outline
 
-This command is the local management interface for the Feedback Probe system. It works in **four execution modes**:
+This command is the local management interface for the Feedback Probe system. It works in **five execution modes**:
 
 | Input | Mode | Who runs it |
 |-------|------|-------------|
 | *(empty)* | 1 — Probe Overview | Any project |
 | filter/dispose/package keywords | 2 — Process Collected Feedback | Any project |
 | unit / inject keywords | 3 — Inject External Probe | Any client project (its own custom units) |
+| `introspect` | 5 — Introspect Feedback(自省) | Any client project |
 | `consume` / `--consume` | 4 — Consume Framework Feedback | **Framework project ONLY** |
 
-With no arguments it defaults to Mode 1.
+With no arguments it defaults to Mode 1. `introspect` 与 `consume` 同时出现时按 Mode 4 处理并在报告中说明。
 
 ### Mode 1 — Probe Overview (default; no arguments)
 
@@ -45,10 +46,10 @@ Render the merged truth source (framework Classes/Objects + project external pro
 
 Guide the user through the local processing loop:
 
-1. **Status view**: `--action status` (count / threshold / should_prompt).
+1. **Status view**: `--action status` (count / threshold / should_prompt)。若因阈值提示进入本命令:可先运行 Mode 5(`/speckit.feedback introspect`)自省再打包——建议而非强制,跳过不影响任何后续步骤。
 2. **Summary view**: `--action list --limit 0` with filters as requested — `--slice <commands|skills|host-custom|...>`, `--kind <internal|external>`, `--disposition <processed|ignored|open>`, plus the pre-existing `--unit-id/--since/--contains`.
-3. **Disposition**: `--action dispose --id <entry-id> --to processed|ignored` (local metadata only).
-4. **Package** (on user confirmation, internal entries only): `--action package` → print zip path + manual-send guidance. The agent NEVER sends the zip.
+3. **Disposition**: `--action dispose --id <entry-id> --to processed|ignored` (local metadata only; optional `--reason`/`--ref` record provenance, e.g. from an introspection report).
+4. **Package** (on user confirmation, internal entries only): `--action package` → print zip path + manual-send guidance. The agent NEVER sends the zip. 若待打包条目带有 `introspection_ref`(已被自省覆盖),默认提议改用 `--action package --include-introspection` 把覆盖它们的自省报告一并入包;用户可拒绝,拒绝不阻断打包。
 5. **Post-package cleanup (default closing step of the package run)**: once the zip exists, the packaged batch no longer needs to live in the active store — the zip is the record. Preview with `--action cleanup --package <zip|latest> --dry-run`, then run without `--dry-run` in the same session as packaging. Cleanup removes only entries actually inside that zip; `cleanup-log.md` records every removal. The zip itself STAYS under `.specify/memory/feedback/packages/` as the delivery artifact.
 6. **After delivery (`mark-submitted`)**: once the batch is dealt with (sent, or deliberately ignored) and `mark-submitted` has reset the counter, the zip has served its purpose — remove it from the outbox: `rm .specify/memory/feedback/packages/feedback-<ts>.zip`. The store, the outbox, and the counter all return to zero; `cleanup-log.md` plus the (already-delivered) zip's MANIFEST remain the audit trail.
 
@@ -61,6 +62,22 @@ For **client-project** custom Skills/Agents/Commands (assets the framework's own
 3. Verify the injection: the object appears in `--action probes` and after `--action map`.
 
 External-probe feedback is **client-project-local** (Loop B — the client project's own use→feedback→iterate loop): it feeds the client project's own optimization, is separately filterable via `--kind external`, and is **never** included in upstream packages.
+
+### Mode 5 — Introspect Feedback(自省)
+
+在记录与上行之间做**场景化深加工**:回到真实场景核验条目事实、聚类同根因问题、产出自省报告并分流(本地下沉 Loop B / 随包上行 Loop A)。动机:消费方拿到的裸事实脱离了条目诞生的真实场景,容易产出错位方案;自省把深度思考移回客户项目现场。**触发**:`$ARGUMENTS` 含 `introspect`。任意客户项目可运行,无 Mode 4 的框架项目门。
+
+1. **范围快照**:`python3 .specify/scripts/python/feedback-utils.py --action list --disposition open --format json`(可按 `--slice/--kind/--since` 收窄)取条目摘要投影;零条目 → 报告"无可自省条目"并正常结束,不落空报告文件。
+2. **场景化分析**(agent 推理;适用 Token 效率纪律:程序优先、摘要优先、升级阶梯,禁止整库原文注入):逐条目调出被评单元的当前定义/源码与条目引用的上下文,给出带证据的核验结论(成立/部分成立/已过时/不成立);把同根因的条目聚类为**问题**;每个问题含齐五要素——问题陈述、根因、证据锚点(指向具体单元/文件/位置)、分流决定(`local-sink(<channel>)` 或 `upstream-bound(package-attachment)`)、具体优化方案。
+3. **报告产出**:按报告 schema 落盘 draft 报告到 `.specify/memory/feedback/introspection/<report-id>.md`(`report-id` 形如 `introspection-<YYYYmmddTHHMMSSZ>`;frontmatter 七字段 + `## Findings` + `## Excluded`),然后运行 `--action introspect-register --report-file <path>` 完成结构校验与条目关联;校验失败(exit 2)会逐条列出违规,修正后重跑。
+4. **用户确认**:呈现报告摘要(问题清单 + 每个问题的分流决定与建议处置);用户可逐问题覆盖分流方向——覆盖写回报告该问题的 `**用户覆盖**`(原决定 → 覆盖后决定)并同步 `**分流决定**`/`**建议处置**` 行后再确认。确认后运行 `--action introspect-register --report-file <path> --confirm`:报告置 `confirmed`,`**建议处置**` 行逐条生效(等价于逐条 `--action dispose --id <entry-id> --to <state> --reason "introspection:<report-id>#F-nn" --ref <report-id>#F-nn`);报告无 `建议处置` 行时仅翻转报告状态,不动条目。
+5. **路由建议**:列出分流结果的建议去向——本地下沉项给出建议通道(直接修复 / improve-skills / improve-docs / 新需求),随包上行项提示下次打包可附报告(见 Mode 2 第 4 步);**仅建议,不自动执行任何动作**。
+
+红线与边界:
+
+- 本模式 MUST NOT 自动修改代码/配置、MUST NOT 触发任何网络行为或自动传输;所有落地动作(直接修复、improve-* 运行、打包与人工送达)均经既有通道由用户确认后执行。
+- 外部 probe 条目参与自省时分流恒为 local-sink,永不进入上行候选。
+- 自省执行期间新写入的条目不进入本次范围(以发起时刻快照为准);条目引用物已失时标注"已过时/无法复现"而非中断;对同一批条目重复自省时,新报告声明 `supersedes` 承继旧报告,不平行重复造问题。
 
 ### Mode 4 — Consume Framework Feedback (framework project ONLY)
 
@@ -96,7 +113,7 @@ for z in feedback/feedback-*.zip; do unzip -o -d "$tmpdir/$(basename $z .zip)" "
 # then read files with standard file-reading tools
 ```
 
-Collect from every entry: `unit_id`, `probe`, `slice`, `run_id`, `## Review`, `## Optimization Points`. Build a **cross-bundle findings table**: unit × finding × source-bundle. Clean up the temp dir after reading.
+Collect from every entry: `unit_id`, `probe`, `slice`, `run_id`, `## Review`, `## Optimization Points`. Build a **cross-bundle findings table**: unit × finding × source-bundle. Clean up the temp dir after reading. 包内可能附 `introspection/<report-id>.md` 自省报告(条目经源头场景化核验):此类发现可直接采信其核验结论与证据锚点,把精力集中在跨包对账与冲突裁决上,无需重复事实核验。
 
 #### Step 3 — Reconcile and route findings
 

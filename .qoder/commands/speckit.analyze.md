@@ -155,6 +155,7 @@ Before reporting, every **CRITICAL** and **HIGH** finding MUST be confirmed by a
 - **Task**: re-read the cited artifacts and return one verdict: `confirm` (evidence supports the claim), `reject` (claim not supported — state why), or `downgrade` (real but overstated — propose severity).
 - **Batching**: validate findings in one parallel dispatch wave; a validator MUST NOT validate a finding it produced.
 - **Report handling**: only `confirm`ed findings keep CRITICAL/HIGH in the main table; `downgrade`d rows get the new severity with a `(validated: downgraded)` note; `reject`ed rows move to a separate **Unvalidated Findings** appendix (never silently dropped). MEDIUM/LOW skip validation.
+- **Subagent-unavailable fallback**: if the validation subagent dispatch fails twice in a row (upstream error), a direct evidence re-read by the analyzing agent MAY substitute; the report row MUST then carry `(validated: direct re-read, subagent unavailable)` so the weaker evidence path is visible to the reader.
 
 **DO-NOT-FLAG list** (noise control — do not report these at any severity):
 - Style/wording preferences already consistent within the project's own conventions

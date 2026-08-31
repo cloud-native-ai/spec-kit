@@ -130,11 +130,16 @@ reference the real directories captured above. Explicitly note any new top-level
   affected copy as a first-class design output. /speckit.tasks turns each row into a
   paired dual-write + diff-verify task; /speckit.implement checks every row off.
   Delete this section only when the spec touches NO mirrored surface.
+
+  The live mirror pairs are defined in scripts/python/sync-mirrors.py MIRROR_PAIRS —
+  consult it, not memory. NOTE: `.specify/templates/commands/` is RETIRED (the
+  templates pair excludes commands/); command templates fan out ONLY to the
+  regen-command-copies.py per-tool copies listed below.
 -->
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| [e.g. `templates/commands/x.md`] | [e.g. `.specify/templates/commands/x.md`; `.claude/commands/speckit.x.md`; `.github/prompts/speckit.x.prompt.md`; `.qoder/commands/speckit.x.md`; `.opencode/command/speckit.x.md`] | [e.g. `diff -q` for mirrors; regenerated copies contain the edit] |
+| [e.g. `templates/commands/x.md`] | [e.g. `.claude/commands/speckit.x.md`; `.github/prompts/speckit.x.prompt.md`; `.qoder/commands/speckit.x.md`; `.opencode/command/speckit.x.md` — per-tool copies via regen-command-copies.py; NO `.specify/templates/commands/` mirror (retired)] | [e.g. `diff -q` for mirrors; regenerated copies contain the edit] |
 
 ## Complexity Tracking
 
