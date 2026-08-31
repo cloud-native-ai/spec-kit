@@ -35,6 +35,16 @@ Escalation rules:
 - If the suspected error impacts correctness, security, data loss, or large refactors: **pause and ask a clarifying question**.
 - If the issue is low-risk and the fix is obvious: proceed with the correction and mention it briefly.
 
+## One Source Of Truth
+
+Every fact — a concept's meaning, a normative rule, a threshold, an enumerated list, a configuration value, a count — MUST have exactly one authoritative definition point (its **owner**), and every other location MUST reach it by reference. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/one-source-of-truth.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+
+- **Owner, declared**: an owning document says so in its opening lines and names what it owns. Where several candidates exist, authority goes to code first (facts about actual behavior), then a machine-generated artifact (anything a generator can derive, especially counts and indexes), then an authored document (definitional facts).
+- **Reference, not copy**: cite the owner's path (plus a section anchor when relevant); never restate its table, threshold literal, or enumeration. A summary is fine only while a reader who intends to act must still open the owner. If changing a fact would require editing more than one file, the discipline is already broken.
+- **Only three duplicates are legitimate**: a machine-regenerated copy (mirrors, per-tool copies, generated indexes — never hand-edited), a literal pinned in a test to detect drift, and a dated record that is never cited as current reality. Anything else repeating a fact is stale-in-waiting: repair it by turning it into a reference, not by correcting its wording.
+
+Owner-selection order, the duplicate conditions, the counts/enumerations rules, and the disagreement procedure: `.specify/shared/guidelines/one-source-of-truth.md`.
+
 ## Task Complexity Rubric
 
 Right-size your thinking to the task: under-thinking complex or high-stakes tasks causes defects and rework (a **quality** cost); over-thinking trivial tasks wastes time and adds noise (an **efficiency** cost). Classify each task by scope/size, uncertainty/novelty, blast radius/reversibility, cross-cutting impact, and requirements clarity, then adopt the matching depth — **Trivial → Minimal**, **Standard → Moderate**, **Complex → Deep**, **High-stakes/Ambiguous → Exhaustive**. Tie-break to the **higher tier** (blast radius and requirements clarity dominate); treat unclassifiable tasks as **Standard** (the default), and treat unclear/under-specified requirements as themselves a High-stakes signal — clarify before proceeding.

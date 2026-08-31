@@ -29,9 +29,11 @@
 
 ## Objects
 
-> 既有 49 个隐式埋点(31 skills + 18 复杂命令 wrap-up)与嵌入点清单一一对应
-> (SC-001 对账基准);`/speckit.feedback` 命令自身的第 50 个 Object 随命令模板
-> 落地同变更登记(见 contracts/probe-registry.md C-3.4)。
+> SC-001 对账基准(历史快照,仅作当时留痕,不代表当前数量):彼时的隐式埋点
+> 与嵌入点清单一一对应,`/speckit.feedback` 命令自身的 Object 随命令模板落地
+> 同变更登记(见 contracts/probe-registry.md C-3.4)。当前生效的埋点集合以本
+> 注册表为准,用 `feedback-utils.py --action probes --validate` 读取与对账,
+> MUST NOT 在他处复写计数。
 >
 > 51–70 行为 044 Phase 7 的门控必要性 probe(insertion_type=confirm-gate):
 > 每个非 intrinsic 保留确认点一个 Object,锚点是点位的单行 probe 指针

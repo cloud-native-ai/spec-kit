@@ -7,8 +7,8 @@ This project documentation is distributed across several key files. You MUST ref
 
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
-| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | 13 core principles (SDD foundation, Feature-Centric, Intent-Driven, Test-First, AI Agent Integration, Quality/Observability, SDD Workflow, Code as Single Source of Truth, Framework Scope Discipline, Documentation Naming Conventions, Dogfooding, Tool Reuse, Better-Harness Orientation) and governance rules |
-| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | 44 features tracking /speckit.* commands, AI tool support (Claude/Codex/Qoder/Copilot/opencode/Hermes), skills, and core capabilities |
+| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | Numbered Core Principles + governance rules; that file is the authoritative roster, count, and version — not restated here |
+| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | Per-feature status for /speckit.* commands, AI tool support, skills, and core capabilities; the authoritative count is the auto-derived `Total Features` header (maintained by `scripts/bash/update-feature-index.sh`) |
 | **Feature Details** | `.specify/memory/features/<ID>.md` | Per-feature deep dives | Overview, key changes, implementation notes, status criteria |
 | **Glossary** | `.specify/memory/glossary.md` | Project vocabulary anchor & domain dictionary | Canonical terms, homophone/confusable variants, meanings; voice-input correction source (protocol: `.specify/shared/workflow/glossary.md`) |
 | **Readme** | `README.md` | Project entry point | Spec-Driven Development overview, supported AI agents, feature list, installation pointer |
@@ -20,7 +20,7 @@ This project documentation is distributed across several key files. You MUST ref
 | **Upstream** | `docs/concepts/upstream.md` | Relationship to github/spec-kit | Divergence points and sync model |
 | **Security** | `docs/concepts/security.md` | Security considerations | Threat surface and handling guidance |
 | **Memory System** | `docs/reference/skills/memory.md` | Dynamic memory-as-files layer | session/ (short-term) + knowledge/ (long-term) store, `memory-utils.py` engine, memory-record / memory-recall skills, Spec-Kit-only recording boundary |
-| **Feedback System** | `docs/reference/skills/feedback.md` | Distributed local-scope feedback layer | `.specify/memory/feedback/` store, `feedback-utils.py` engine, `## Feedback` step on all skills + 19 complex commands (4 simple excluded), threshold-triggered **non-blocking** submission notice (never blocks wrap-up, never auto-transmits), distinct from global `/speckit.review`; inbound bundles received from users land in the repo-root `feedback/` intake directory (see Key Directories) |
+| **Feedback System** | `docs/reference/skills/feedback.md` | Distributed local-scope feedback layer | `.specify/memory/feedback/` store, `feedback-utils.py` engine, `## Feedback` step on all skills + every **complex** command (simple commands excluded by the classification rule; the live embed set is read from the probe registry, never restated), threshold-triggered **non-blocking** submission notice (never blocks wrap-up, never auto-transmits), distinct from global `/speckit.review`; inbound bundles received from users land in the repo-root `feedback/` intake directory (see Key Directories) |
 | **Better Harness** | `docs/concepts/better-harness.md` + `.specify/shared/guidelines/better-harness.md` | Shared goal of all improvement mechanisms (Constitution Principle XIII) | Harness definition, feedforward/feedback loop, five Agent Work Loop dimensions mapped to Spec Kit mechanisms, evidence discipline (configured ≠ used), Bootstrap/Operationalize/Optimize tracks |
 | **Confirmation Gates** | `.specify/shared/guidelines/confirmation-gates.md` | Confirmation-gate governance criteria | Two-level taxonomy (destructive/irreversible → front-loaded confirmation; reversible → auto-execute + execution report), destructive list, governance-kept list, doubtful-strict rule, anti-backflow constraint; enforced by `scan-confirmation-gates.py` + structural contract tests |
 | **History System** | `docs/reference/commands/history.md` | Distilled conversation knowledge base | `/speckit.history` distills the current AI tool's past project conversations into `.specify/history/` (theme-aggregated: decisions, lessons, TODOs, interaction flows, conflicts); `history-utils.py` engine with pluggable `STORE_RESOLVERS` + incremental manifest |
@@ -43,6 +43,16 @@ Minimum checks:
 Escalation rules:
 - If the suspected error impacts correctness, security, data loss, or large refactors: **pause and ask a clarifying question**.
 - If the issue is low-risk and the fix is obvious: proceed with the correction and mention it briefly.
+
+## One Source Of Truth
+
+Every fact — a concept's meaning, a normative rule, a threshold, an enumerated list, a configuration value, a count — MUST have exactly one authoritative definition point (its **owner**), and every other location MUST reach it by reference. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/one-source-of-truth.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+
+- **Owner, declared**: an owning document says so in its opening lines and names what it owns. Where several candidates exist, authority goes to code first (facts about actual behavior), then a machine-generated artifact (anything a generator can derive, especially counts and indexes), then an authored document (definitional facts).
+- **Reference, not copy**: cite the owner's path (plus a section anchor when relevant); never restate its table, threshold literal, or enumeration. A summary is fine only while a reader who intends to act must still open the owner. If changing a fact would require editing more than one file, the discipline is already broken.
+- **Only three duplicates are legitimate**: a machine-regenerated copy (mirrors, per-tool copies, generated indexes — never hand-edited), a literal pinned in a test to detect drift, and a dated record that is never cited as current reality. Anything else repeating a fact is stale-in-waiting: repair it by turning it into a reference, not by correcting its wording.
+
+Owner-selection order, the duplicate conditions, the counts/enumerations rules, and the disagreement procedure: `.specify/shared/guidelines/one-source-of-truth.md`.
 
 ## Task Complexity Rubric
 
@@ -78,7 +88,7 @@ Operational steps, the capability table, and adoption advice: `.specify/shared/g
   - `src/specify_cli/`: single-module CLI implementation (`__init__.py`; Typer commands live here).
   - `templates/`: Source-of-truth templates packaged into the wheel (constitution, plan, requirements, tasks, agent variants, `commands/` for /speckit.* prompts, plus tool/skill templates).
   - `scripts/bash/` and `scripts/python/`: Repeatable workflow scripts mirrored from `.specify/scripts/`. Use these for shell automation; never call `/speckit.*` as a shell command.
-  - `skills/`: Installed Spec Kit skills (31 total: archive-session, browser-extension, browser-utils, clone-website-ui, code-review, collect-evidence, create-agent, create-docs, create-pages, create-skills, create-team, create-tools, database-utils, document-utils, draw-d3js, draw-echarts, draw-mermaid, draw-plantuml, git-submodule-edit, git-workflow, improve-agent, improve-docs, improve-skills, improve-team, improve-tools, manage-agents, memory-recall, memory-record, study-project, summarize-project, think-skills). Mirrored to `.specify/skills/` via package install; `.github/skills/` is a compatibility symlink.
+  - `skills/`: Installed Spec Kit skills, one directory per skill — the directory listing and `.specify/skills.md` are the authoritative roster and count; neither is restated here. Mirrored to `.specify/skills/` via package install; `.github/skills/` is a compatibility symlink.
   - `agents/`: Role-based agent definitions (`*.agent.md`) mirrored to `.specify/agents/`.
   - `tests/`: `contract/`, `contracts/`, `integration/`, `scenarios/`, `unit/`, with shared `conftest.py`, `fixtures/`, `script_api.py`.
   - `memory/`: Default in-package memory shipped with the CLI; the canonical project memory lives at `.specify/memory/` (constitution, features, features/<ID>.md, plus the dynamic memory-as-files layer under `session/` and `knowledge/`).

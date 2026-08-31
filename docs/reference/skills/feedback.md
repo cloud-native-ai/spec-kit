@@ -25,9 +25,9 @@ Feedback attaches only to long-running, qualifying flows — never to trivial on
   non-conformant; `create-skills` validates it and `improve-skills` repairs it).
 - **Complex commands only** carry the step. A command is *complex* iff it (a) invokes
   scripts/CLI tools, (b) produces an artifact consumed by another flow, or (c) consumes
-  another flow's artifact. As of requirement 041 this yields **19 complex** command
-  templates (18 legacy + `/speckit.feedback` itself) and **4 simple** ones, against a
-  live embed count of 19 commands + 31 skills = **50 probe objects**.
+  another flow's artifact. The current set of embed points is not restated here — read it
+  from the probe registry (`feedback-utils.py --action probes`, which also reconciles the
+  registry against the live templates and skills).
 - **Simple commands** — `agents`, `constitution`, `feature`, `team` — carry **no** step
   (they delegate authoring to skills, which already carry feedback).
 - **Trivial/short flows never trigger it**, preserving execution efficiency.

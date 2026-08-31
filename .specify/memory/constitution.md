@@ -1,18 +1,20 @@
 <!--
 Sync Impact Report
-- Version change: 1.9.1 → 1.10.0 (MINOR; Principle XI materially extended — term definition anchored + two normative rules added from user-directed concept work under Dogfooding, 2026-08-14)
-- Modified principles: XI. Dogfooding (Self-Application) — (a) intro now anchors the TERM's canonical definition at shared/definitions/dogfooding-definitions.md § 0 (using the tool/framework to develop itself; compiler self-hosting analogy; every mention of "Dogfooding" carries that definition by reference); (b) added "Fix the mechanism, not just the instance (修复落机制侧)" (repairs of mechanism-produced artifacts MUST land mechanism-side; instance patches only as logged temporary stabilization); (c) added "Two hats: framework sources vs client runtime (两顶帽子)" (fixes intended for all consuming projects MUST land in framework sources and ride publish→install→init; direct `.specify/` runtime edits are client-side instance fixes)
-- Added sections: None (new concept authority lives outside the constitution at shared/definitions/dogfooding-definitions.md, mirrored to .specify/shared/definitions/)
+- Version change: 1.10.0 → 1.11.0 (MINOR; new Principle XIV added, 2026-08-31)
+- Added principles: XIV. One Source of Truth (Authority & Reference Discipline) — every fact has exactly one authoritative definition point (its owner) and every other location reaches it by reference; anchors the discipline at shared/guidelines/one-source-of-truth.md (owner declaration, owner-selection order code → machine-generated artifact → authored document, the three legitimate duplicate kinds, counts/enumerations rules, disagreement procedure); repair direction is "convert the copy into a reference", never re-word it to agree; explicitly adds no scanner/registry machinery (Principle IX)
+- Modified principles: V. AI Agent Integration Standards — first compliance act under XIV: the tier roster was a drifting copy (this file listed GitHub Copilot as Tier 1 while `_ASSISTANT_TIERS["copilot"] == "tier2"`). Rather than re-word the copy, the principle now defers to `AGENT_CONFIG` / `_ASSISTANT_TIERS` in src/specify_cli/__init__.py as the authoritative roster and tier source, so it cannot diverge again
 - Removed sections: None
 - Templates requiring updates:
-  ✅ shared/definitions/dogfooding-definitions.md — NEW concept authority (§0 Dogfooding 本体定义 with self-hosting analogy + 语义束表; §1 problem/mechanism + fix classification; §2 client/framework + three-copy topology + two-hats rule; §3 glossary anchors)
-  ✅ .specify/memory/glossary.md — five entries registered (Dogfooding / 问题修复 / 机制修复 / 框架项目 / 客户项目, origin=user, status=confirmed)
-  ✅ scripts/bash/generate-instructions.sh (+mirror) — the MECHANISM fix executed 2026-08-15 under the new rule: additive section reconcile (template sections missing from the live file are injected verbatim, in template order; existing sections never touched; idempotent). Running it healed the live file — ## Dogfooding Practice AND ## Spec Kit Framework Map (a second, previously undetected casualty of the same gap) now present; AGENTS.md inherits via symlink
-  ✅ tests/contract/test_instructions_section_propagation.py — guarding contract: C-1 live managed-section set ⊇ template section set (real-tree); C-2 generator injects additively + idempotently (fixture)
-- Follow-up TODOs: test_c4_no_new_memory_layout remains a pre-existing baseline failure (stale pin over evidence/todo/tools dirs, unrelated to XI). Environment note: live .specify/instructions.md was root-owned (container leftover) blocking the mechanism; ownership restored via same-content rename (parent dir writable), then reconcile ran
-- Preserved by design: historical specs/feedback keep their original wording as dated records.
+  ✅ shared/guidelines/one-source-of-truth.md — NEW discipline authority (declare the owner; reference don't copy; legitimate duplicates as mechanical/guard/dated; counts and enumerations; resolving a disagreement; relationship to adjacent principles), mirrored to .specify/shared/guidelines/
+  ✅ templates/instructions-template.md (+mirror) — new ambient `## One Source Of Truth` summary+pointer section between Input Sanity and Task Complexity Rubric; propagated to .specify/instructions.md via generate-instructions.sh additive reconcile (AGENTS.md et al. inherit by symlink)
+  ✅ tests/contract/test_one_source_of_truth.py — guarding contract: doc↔mirror parity, required sections, template carries pointer without inlining the doc's headings, single-source sweep over shared/ + templates/, project-neutrality, constitution XIV + version floor
+  ✅ Drift repaired under the new principle (copies converted to references, counts not re-counted): .specify/instructions.md Documentation Map + Key Directories rows (hand-written principle/feature/skill counts and inline rosters), shared/definitions/probe-definitions.md and shared/workflow/feedback-step.md (+mirrors), docs/reference/skills/feedback.md
+  ⚠️ templates/constitution-template.md — intentionally unchanged: it is the downstream-project template with independent numbering (its own I–XI)
+- Follow-up TODOs: (a) `.specify/skills/git-fleet/` is missing from the skills mirror (pre-existing `sync-mirrors --check` MISS, unrelated to this amendment); (b) the reserved-filename registry is still stated in four places (docs/decisions/0002, skills/create-docs/SKILL.md, scripts/python/docs-utils.py, Principle X) with no declared owner — a candidate for the next XIV compliance pass; (c) test_c4_no_new_memory_layout remains a pre-existing baseline failure carried from 1.10.0
+- Preserved by design: historical specs/feedback keep their original wording as dated records — a legitimate duplicate kind under XIV.
 
-Previous change (1.9.0 → 1.9.1, PATCH): non-semantic reconciliation of Principle V's approved-agent roster with shipped code — Qwen Code and iFlow removed from AGENT_CONFIG in 0c300bc8. Follow-ups resolved: update-agent-context.sh / setup-plan.sh deleted as orphan upstream leftovers (now gated by sync-mirrors --check ORPHAN detection via test_scripts_distribution_parity.py). Remaining unrelated observation: .specify/skills/draw-echarts/yuque-workspace/ nested-skill placement issue.
+Previous change (1.9.1 → 1.10.0, MINOR): Principle XI Dogfooding materially extended — term definition anchored at shared/definitions/dogfooding-definitions.md § 0, plus two normative rules added ("Fix the mechanism, not just the instance" and "Two hats: framework sources vs client runtime"); the generate-instructions.sh additive section reconcile was the mechanism fix executed under the new rule.
+Previous change (1.9.0 → 1.9.1, PATCH): non-semantic reconciliation of Principle V's approved-agent roster with shipped code — Qwen Code and iFlow removed from AGENT_CONFIG in 0c300bc8.
 -->
 
 # Spec Kit Constitution
@@ -58,8 +60,8 @@ Rationale: Reduces regressions, clarifies intent, and validates real-world behav
 
 ### V. AI Agent Integration Standards
 AI agent integration MUST follow strict guidelines:
-- Only support officially approved AI agents: Claude Code, Codex CLI, GitHub Copilot, Hermes Agent, opencode, and Qoder
-- Tiered support classification: Tier 1 (priority support with deepest integration) — Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode; Tier 2 (standard support) — Hermes Agent
+- Only support officially approved AI agents: Claude Code, Codex CLI, GitHub Copilot, Hermes Agent, opencode, and Qoder — the authoritative roster and each agent's tier classification live in `AGENT_CONFIG` / `_ASSISTANT_TIERS` in `src/specify_cli/__init__.py`; where this list and the code disagree, the code wins (Principles VIII and XIV)
+- Tiered support classification: Tier 1 agents get priority support with the deepest integration, Tier 2 agents get standard support; which agent sits in which tier is read from `_ASSISTANT_TIERS`, never restated here
 - Configuration parsing MUST reject unsupported providers
 - Agent capabilities MUST be leveraged for specification interpretation and implementation generation
 - Heavy reliance on advanced AI model capabilities for specification understanding is expected
@@ -150,6 +152,16 @@ All of Spec Kit's improvement mechanisms serve one explicit, shared goal: making
 
 Rationale: The feedback mechanism and the improve-* skills each carried their own discipline but no named common goal. Naming the goal — adapted from the open-source Better Harness model, whose evidence-state vocabulary the evidence layer already uses — lets every flow answer "which part of the harness does this strengthen?" and keeps improvement work evidence-honest.
 
+### XIV. One Source of Truth (Authority & Reference Discipline)
+Every fact — a concept's meaning, a normative rule, a threshold, an enumerated list, a configuration value, a count — MUST have exactly one authoritative definition point (its **owner**), and every other location MUST reach it by reference:
+- The discipline — owner declaration, the owner-selection order (code → machine-generated artifact → authored document), the conditions under which a duplicate is legitimate, the counts/enumerations rules, and the disagreement procedure — is defined once in `.specify/shared/guidelines/one-source-of-truth.md`; every command, skill, agent, and shared document MUST reference that anchor, never restate it
+- **Reference, not copy**: a consuming location cites the owner's path (plus a section anchor where the fact is one section of a larger owner) and MUST NOT restate the owner's table, threshold literal, or enumeration. A summary pointer is permitted only while a reader who intends to act must still open the owner
+- **Only three duplicates are legitimate**: a machine-regenerated copy (mirror, per-tool copy, generated index — never hand-edited, with a regeneration command AND a drift check), a literal pinned in a test in order to fail when the owner changes, and a dated record that is never cited as current reality. Any other repetition of a fact MUST be converted into a reference
+- **Repair direction**: on a disagreement, the owner is authoritative and every diverging location is stale. The repair MUST convert the copy into a reference rather than re-word it to agree — correcting a copy is an instance fix, removing its ability to diverge is the mechanism fix (Principle XI). Where no owner exists, designating and declaring one is the first act of the repair
+- This principle adds a way of writing, not machinery: it MUST NOT be used to justify a duplicate-fact scanner, an authority registry, or any other new tracking system (Principle IX). Enforcement is review plus targeted contract tests where a fact matters enough to guard
+
+Rationale: Facts restated in several places are not merely redundant — they disagree silently, and a reader cannot tell which copy is current. This project has repeatedly hand-corrected the same stale counts and rosters only to watch them drift again, because correcting a copy leaves the copy. Principle VIII settles *which* source wins for facts about actual behavior; this principle generalizes the question to every kind of fact and fixes the matching obligation on the consuming side — reach the owner, never restate it.
+
 ## Spec-Driven Development Workflow
 
 ### Research & Context Gathering
@@ -200,4 +212,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.10.0.001 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-08-15
+**Version**: 1.11.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-08-31

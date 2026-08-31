@@ -2,8 +2,10 @@
 
 This file is the single source of
 truth for the `## Feedback` step that every qualifying unit embeds. Skills embed it
-as their final workflow section; the 19 **complex** command templates embed it at
-their wrap-up / Git-commit-prompt stage. Simple commands MUST NOT embed it.
+as their final workflow section; every **complex** command template embeds it at
+their wrap-up / Git-commit-prompt stage. Simple commands MUST NOT embed it — a
+command is complex iff it invokes scripts/CLI tools, produces an artifact another
+flow consumes, or consumes another flow's artifact.
 
 ## Positioning & Red Lines
 
