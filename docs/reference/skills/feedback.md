@@ -56,7 +56,8 @@ The authoritative classification lives in the feature's
 ```
 .specify/memory/feedback/
   <YYYYMMDDTHHMMSSZ>-<unit-slug>.md   # one file per recorded run
-  index.json                          # store metadata + entry mirror
+  introspection/<report-id>.md        # introspection reports (req 047; subdir keeps them out of reindex's root glob)
+  index.json                          # store metadata + entry mirror (+ introspections[] records)
   .gitkeep                            # keeps the store dir version-tracked
 ```
 
@@ -76,11 +77,18 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 |--------|---------|
 | `record` | Write one entry; idempotent per `(unit_id, run_id)`; increments the count on a new entry. |
 | `status` | Read counters; `should_prompt = count_since_submission >= threshold`. |
-| `list` | List recent entries (filters: `--unit-id`, `--unit-type`, `--since`, `--limit` — `0` = no limit; `--contains <text>` case-insensitive substring over entry summary + body, engine-side read, summary-level output). |
+| `list` | List recent entries (filters: `--unit-id`, `--unit-type`, `--since`, `--limit` — `0` = no limit; `--contains <text>` case-insensitive substring over entry summary + body, engine-side read, summary-level output; plus `--slice`, `--kind`, `--disposition`). |
+| `dispose` | Mark one entry's disposition (`--id` + `--to processed|ignored`; optional `--reason`/`--ref` provenance); index and entry frontmatter both updated, body never rewritten. |
 | `mark-submitted` | Reset `count_since_submission` to 0 and stamp `submitted_at` (entries are kept). Local bookkeeping only — NOT an upload. |
 | `reindex` | Rebuild `index.json` from entry files; preserves `submitted_at` and `upstream_repo`. |
-| `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. |
+| `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. `--include-introspection` additionally packs the introspection reports covering the selected entries (plus a `## Introspection Reports` MANIFEST section). |
+| `cleanup` | After packaging, remove the entries contained in a given zip from the active store (`--package <zip|latest>`, `--dry-run` preview first); every removal is logged to `cleanup-log.md`. |
+| `probes` | Print the merged probe registry (framework Classes/Objects + project external probes) as a tree; `--validate` schema-checks (exit 2), `--reconcile` audits embeds two-way. |
+| `map` | Rebuild the rendered `probe-map.md` deterministically from the registry truth source. |
+| `migrate-legacy` | One-shot convergence of legacy entries per an approved plan file (`--plan-file`, one `<entry-id> -> delete|re-register` per line); every outcome lands in the migration log. |
+| `probe-inject` | Inject an external probe object for a client-project custom unit (`--unit custom:<owner>/<name>`, `--notes-file`); writes `.specify/memory/feedback/probes/ext-<slug>.md`. |
 | `upstream` | Show (or `--set`) the upstream repo URL used for manual delivery guidance. |
+| `introspect-register` | Validate an introspection report (`--report-file`), link its member entries (`introspection_ref`), record it in `index.json.introspections[]`, and flip `supersedes` targets; `--confirm` (after user ratification) flips the report to `confirmed` and applies each finding's `建议处置` rows as batch dispositions. Validation failure exits 2 listing every violation. `dispose` also accepts optional `--reason`/`--ref` provenance fields. |
 
 - `--unit-id` must match `^(?:/speckit\.[a-z0-9._-]+|skill:[a-z0-9._-]+)$` (else exit code 2).
 - A `record` with an empty `--review` or empty `--points` exits with code 2.
@@ -119,6 +127,12 @@ Four facts govern the whole mechanism (canonical statement in
    feedback files to their own git repo. `mark-submitted` is local bookkeeping.
 4. **Local workaround value** — before a Spec Kit update lands, past entries document how a
    recurring issue was worked around.
+
+Between recording and packaging sits the optional **introspection(自省)** stage
+(`/speckit.feedback introspect`, req 047): scenario-grounded verification and
+root-cause clustering in the client project, so upstream packages carry
+facts + evidence + root causes + proposals instead of bare facts. It adds no
+transmission path — red line 3 is unchanged.
 
 ## Processing side: package → manual send
 
