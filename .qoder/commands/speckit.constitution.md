@@ -125,7 +125,7 @@ Follow this execution flow:
      no stale principle numbers or removed principle references allowed.
    - `/.specify/templates/tasks-template.md` → Any "per Constitution Principle X" refs
      MUST use the correct principle number and name after update.
-   - `/README.md` and `/docs/quickstart.md` → Update any references to changed principles.
+   - `/README.md` and `/docs/tutorials/quickstart.md` → Update any references to changed principles.
    - If any file CANNOT be updated automatically, flag it in the Sync Impact Report
      with the specific file path, line range (if determinable), and what needs manual review.
 

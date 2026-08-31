@@ -62,7 +62,8 @@ From `.specify/shared/patterns/interview-pattern.md` it borrows only the **conte
    - Only include questions whose answers materially impact downstream artifacts
    - Balance category coverage; favor high-impact unresolved categories
 
-3. **Sequential questioning loop** — present ONE question at a time:
+3. **Questioning loop** — order-dependent questions singly; mutually independent ones MAY batch:
+   - **Batching rule**: ask a question alone when its framing depends on an earlier answer (the later options change with the earlier choice); when questions are mutually independent — neither answer alters the other's option set — they MAY be presented as one batch, consistent with step 1's rule for residuals. Default to single when unsure.
    - Multiple-choice: table format (Option | Description), state **Recommended** option with reasoning
    - Short-answer: state **Suggested** answer with reasoning
    - User replies: "yes"/"recommended" → use suggestion; otherwise validate answer

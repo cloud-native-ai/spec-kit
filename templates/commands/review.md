@@ -76,6 +76,9 @@ Every **P0** finding MUST be confirmed by an independent read-only validation su
 
 - The validator receives ONLY the finding (id, claim, severity, location, quoted evidence) — never the diagnostic reasoning or sibling findings — and returns `confirm` / `reject` (with why) / `downgrade` (with proposed severity).
 - Only `confirm`ed findings keep P0; `downgrade`d rows take the proposed severity with a `(validated: downgraded)` note; `reject`ed rows go to an **Unvalidated Findings** appendix in the report — never silently dropped. P1/P2 skip validation.
+- **Evidence snapshot at diagnosis time**: capture the quoted evidence (path + line + literal excerpt) when the finding is diagnosed, not when it is validated — the tree can move between the two, and a validator re-reading a since-changed line rejects a finding that was true when observed.
+- **Counts are enumerated, never asserted**: when a finding claims N occurrences, the validator receives the enumerated instances each carrying its own anchor; dispatch only once every instance is anchored, so an inflated count cannot pass as a single confirmed claim.
+- **Subagent-unavailable fallback**: if the validation subagent dispatch fails twice in a row (upstream error), a direct evidence re-read by the reviewing agent MAY substitute; the finding row MUST then carry `(validated: direct re-read, subagent unavailable)` so the weaker evidence path stays visible to the reader.
 - Do not flag: deliberate `[~]` deferrals with recorded reasons, mirror-by-design duplication under `.specify/`, or pre-existing baseline failures already recorded for the feature.
 
 ### 5. Generate report

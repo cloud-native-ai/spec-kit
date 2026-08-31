@@ -77,7 +77,7 @@ After each accepted answer:
   - Non-functional → Add/modify measurable criteria in Quality Attributes
   - Edge case → Add bullet under Edge Cases / Error Handling
   - Terminology → Normalize across spec; note `(formerly "X")` once if needed
-- If invalidates earlier statement, replace it (no duplicates)
+- If invalidates earlier statement, replace it (no duplicates) — but first test whether the two actually conflict: when both hold in different contexts (repo source vs installed copy, different runtime modes, different tool tiers), do NOT replace; keep both in the same requirement with their applicability conditions stated. Replace only when one side is genuinely falsified.
 - **Removal & renumbering**: when an accepted answer removes FRs/user stories, renumber the LIVE IDs to stay contiguous, but NEVER touch prior `## Clarifications` entries (append-only) — instead emit an explicit `旧→新` numbering map in the new session entry, and mechanically rewrite every live `FR-\d+`/`SC-\d+` reference outside `## Clarifications` per that map (a prose map documents the change; it does not perform it — verify zero stale references by grep afterwards)
 - **Append-only invariant (all modes)**: `## Clarifications` session entries are historical record — integrations MUST append new rows, never rewrite or replace existing ones. After each integration, re-count the entry rows (`- Q:` / `- 用户修订指示`) and verify the count strictly increased; a decreased or equal count means an Edit replaced history — restore the lost row before proceeding.
 - Save `requirements.md` after EACH integration

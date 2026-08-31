@@ -64,9 +64,14 @@ description: "Task list template for feature implementation"
   (see implement.md's IDENTIFY→RUN→READ→VERIFY→CLAIM gate function). After 3
   consecutive failed re-validations with no newly closed item, implement STOPS
   and escalates instead of retrying.
+
+  Every check command MUST name a command that exists in THIS project, existence-checked
+  at authoring time (same rule tasks.md applies to surface-file lists). The commands below
+  are placeholders — substitute this project's real test entry and paths; never inherit a
+  framework-specific runner path, which resolves in the Spec Kit repo and nowhere else.
 -->
 
-- GATE-1: Full test suite has zero NEW failures vs recorded baseline — check: `scripts/bash/run-tests.sh` + `comm -13 baseline current`
+- GATE-1: Full test suite has zero NEW failures vs recorded baseline — check: `<this project's test runner>` + `comm -13 baseline current`
 - GATE-2: Every mirror obligation from plan.md verified byte-identical — check: `diff -rq <source> <mirror>`
 - GATE-3: No `[ ]` or `[>]` task rows remain — check: `grep -cE '^- \[[ >]\]' tasks.md` returns 0
 - GATE-4: verification.md lists every SC-NNN with a status — check: grep SC ids against requirements.md

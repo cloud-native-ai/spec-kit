@@ -46,11 +46,13 @@ python3 .specify/scripts/python/docs-utils.py --action expire --root .
 python3 .specify/scripts/python/docs-utils.py --action clean [--yes] --root .
 python3 .specify/scripts/python/docs-utils.py --action archive-check --root .
 python3 .specify/scripts/python/docs-utils.py --action stats --root .
-python3 .specify/scripts/python/docs-utils.py --action validate --root .
+python3 .specify/scripts/python/docs-utils.py --action validate --root . [--allow-special NAME ...]
 python3 .specify/scripts/python/docs-utils.py --action audit --root . --scope <s> --summary <text>
 ```
 
 `validate` covers the deterministic dimensions: reserved-name case/misuse/misplacement, one-screen threshold for root entries, broken relative links, ADR numbering continuity, notes frontmatter completeness.
+
+The built-in allowlist covers the ALL-CAPS names Spec Kit itself generates (`AGENTS.md`, `CLAUDE.md`, `QODER.md`, …). A project carrying some *other* tool-mandated ALL-CAPS root file registers it per run with `--allow-special NAME` (repeatable) — the registry-extensibility path promised by ADR-0001 — instead of living with a permanent `reserved-name-misuse` false positive. Names not passed stay flagged, so the check keeps its teeth.
 
 ## Static Site (optional, not part of this command)
 
