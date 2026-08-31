@@ -262,8 +262,8 @@ This Skill follows the canonical path conventions:
 |-----------|----------|
 | `${SKILL_HOME}/scripts/js/` | `run.js` universal executor, `package.json`, `lib/helpers.js` |
 | `${SKILL_HOME}/scripts/python/` | `with_server.py` server lifecycle manager |
-| `${SKILL_HOME}/scripts/` | `site-memory.py` — site memory engine (state machine, records, recipes, validation evidence; see § Site Memory & Direction Routing) |
-| `${SKILL_HOME}/references/` | `playwright-api.md`, `playwright-patterns.md`, `mcp-browser-tools.md`, `extension-bridge-patterns.md`, `site-memory.md`, `request-level-patterns.md`, `claude-code-guide.md`, `copilot-guide.md`, `qoder-guide.md` |
+| `${SKILL_HOME}/scripts/` | `site-memory.py` — site memory engine (state machine, records, recipes, validation evidence; see § Site Memory & Direction Routing); `chrome_open_trust.sh` — portable trusted-browser launcher + `CHROME_USER_DATA_AGENT` validation (see `references/trusted-browser-launch.md`) |
+| `${SKILL_HOME}/references/` | `playwright-api.md`, `playwright-patterns.md`, `mcp-browser-tools.md`, `extension-bridge-patterns.md`, `site-memory.md`, `request-level-patterns.md`, `trusted-browser-launch.md`, `claude-code-guide.md`, `copilot-guide.md`, `qoder-guide.md` |
 | `${SKILL_HOME}/examples/` | Python example scripts (element discovery, static HTML, console logging) |
 
 ## Dependencies
