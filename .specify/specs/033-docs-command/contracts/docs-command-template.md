@@ -6,15 +6,17 @@
 
 > 2026-08-20 修订（呈现层解耦）：站点呈现/发布是文档基础结构**之上的可选高阶能力**，归 `create-pages` 技能（`skills/create-pages/`，三阶段流水线「本地文档库 → Hugo 渲染 → Pages 服务」，其中阶段 2 承载原 `scaffold-hugo.py` + `assets/hugo/` + `references/hugo-site.md`）。`create-docs` 只负责基础结构，其期望态基线不再含站点层。据此：C-13 收窄为「非文档目录跳过」这一条保护性要求，C-14…C-17 撤销（能力与其测试随脚本迁往 create-pages，且不得再以 MUST 形式要求任一文档空间存在站点层），C-18 的 `create-docs` 职责删去 Hugo 层。
 
-- **C-1** 源模板 MUST 位于 `templates/commands/docs.md`，并在 `.specify/templates/commands/docs.md` 存在字节一致镜像（`regen-command-copies.py --check` 零漂移）。
+> 2026-09-01 修订（需求 048 三段式调协编排）：命令继续保持薄编排层，但从单技能委托升级为「目标结构声明 → 分型动作 → 双技能分发」；项目专属声明作为第五件跨运行产物，结构动作交 `create-docs`、内容动作交 `improve-docs`。本轮修订 C-1/C-4a/C-5/C-7/C-8/C-18；C-3 六章节顺序与既有门禁不变。
+
+- **C-1** 源模板 MUST 位于 `templates/commands/docs.md`；`.specify/templates/commands/docs.md` 镜像已退役且 MUST NOT 被重建。工具副本由 `regen-command-copies.py` 从源模板生成，并以 `--check` 检测漂移。
 - **C-2** frontmatter MUST 含 `description`（一行）与 `handoffs`；引用共享文档 MUST 使用根相对形式（`shared/workflow/...`、`shared/patterns/reconcile-pattern.md`），由再生成器重写为 `.specify/shared/...`（test_shared_reference_rewrite 约定）。
 - **C-3** 模板 body MUST 含以下章节（顺序固定）：`## User Input`（含 `$ARGUMENTS` 与 User Input Protocol 引用）、`## Glossary`、`## Outline`、`## Feedback`、`## Documentation`、`## Handoffs`。
 - **C-4** 引擎语义 MUST 承载于 `create-docs` 技能：技能 MUST 含作用域判定表（无参全量 / 单目标 / 原始材料扇出 / 写作委托文档写作 / bootstrap 五行，FR-003）与分级确认门禁表（安全写入自动 / 移动归档须计划确认，FR-004）。命令 `## Outline` MUST 点名五个作用域但 MUST NOT 内联完整判定表。
-- **C-4a** 命令 `## Outline` MUST 声明对 `create-docs` 技能的强制委托（delegation mandatory），并将技能指认为引擎语义的唯一事实源。
-- **C-5** 四件强制产物及其落点 MUST 由技能声明：观察快照（内联）、干跑计划（`.specify/docs/plans/`）、审计日志（`.specify/docs/audit/`，零收敛也落盘）、残差报告（内联）；命令 SHOULD 点名四件产物以稳定用户预期。
+- **C-4a** 命令 `## Outline` MUST 声明对技能对的强制委托（delegation mandatory）：`create-docs` 是静态基线与结构动作的 single source of truth，`improve-docs` 是既有文档内容动作的 single source of truth；命令只拥有目标声明、动作分解与分发顺序的编排语义。
+- **C-5** 四件按次强制产物及其落点 MUST 由 `create-docs` 技能声明：观察快照（内联）、干跑计划（`.specify/docs/plans/`）、审计日志（`.specify/docs/audit/`，零收敛也落盘）、残差报告（内联）；命令 SHOULD 点名四件产物以稳定用户预期。命令另 MUST 声明第五件跨运行产物 `.specify/docs/target-structure.md`，并引用 `templates/docs-target-structure-template.md` 的骨架；第五件不属于按次产物、不得随其轮转。
 - **C-6** 技能 MUST 声明归档区为 `docs/archive/`，且正式区动作词汇中不出现"删除"（notes 区确认删除除外，须引用 FR-006c 语义，即"只归档不删除"）。
-- **C-7** 模板 MUST 保持薄调度层：引擎细节引用 `shared/patterns/reconcile-pattern.md` 与 `create-docs` 技能，不内联重复完整 R0–R6 规程（reconcile-pattern §Applying-6）。
-- **C-8** `## Feedback` 节 MUST 符合 `shared/workflow/feedback-step.md` 约定（unit-id `/speckit.docs`、unit-type command）；`docs` MUST 加入 `tests/contract/test_feedback_command_classification.py` 的 `COMPLEX_COMMANDS` 清单，计数 13→14，SIMPLE 保持 4。
+- **C-7** 模板 MUST 保持薄编排层：`## Outline` MAY 展开目标结构、差异动作、双技能分发这三段编排，但引擎细节仍须引用 `shared/patterns/reconcile-pattern.md`、`create-docs` 与 `improve-docs`，MUST NOT 内联完整 R0–R6、基线枚举或门禁判据（reconcile-pattern §Applying-6）。
+- **C-8** `## Feedback` 节 MUST 符合 `shared/workflow/feedback-step.md` 约定（unit-id `/speckit.docs`、unit-type command）；`docs` MUST 保持在 `tests/contract/test_feedback_command_classification.py` 的 `COMPLEX_COMMANDS` 清单。当前分类真源是该测试模块：18 complex / 4 simple；本需求不改变分类。
 - **C-9** 期望态基线内容 MUST 与 requirements.md FR-002/FR-010 一致，并由技能承载：六类目录 + notes；特殊名注册表四条种子（README/ARCHITECTURE/CONTRIBUTING/CHANGELOG 及各自语义）。
 - **C-10** 运行时副本 MUST 覆盖仓库中已存在的全部工具命令目录（.claude/.github/.qoder/.qwen/.opencode/.codex/.hermes/.iflow 等），由 `regen-command-copies.py` 生成，禁止手改。
 - **C-11** 命令参考文档 MUST 新增 `docs/reference/commands/docs.md`（结构对齐既有命令参考文档；dogfooding 重组前路径为 `docs/commands/docs.md`），并在 `docs/tutorials/quickstart.md` 命令表加行。
@@ -24,4 +26,4 @@
 - **C-15**（2026-08-20 撤销）挂载而非复制的语义（`content/<dir>` 与 `static/<dir>` 双挂载、`index.md` → `content/<dir>/_index.md` 文件挂载、重新声明 `static → static`、render hook 解析相对链接与图片、禁用 `uglyURLs` 映射）随脚本迁往 `create-pages`，作为该技能阶段 2 的行为约束，不再是本域契约。
 - **C-16**（2026-08-20 撤销）零抖动与不覆盖语义（重复运行报 `unchanged`、用户编辑报 `kept`、仅托管 `# >>> speckit:mounts` 块、`hugo` 缺失时跳过 build 不计失败）同随脚本迁往 `create-pages`。
 - **C-17**（2026-08-20 撤销）CI 集成以文档指引交付的要求随 `references/hugo-site.md` 迁往 `create-pages`；本域不再对 CI 产物提出要求。
-- **C-18** 文档域 MUST 与 tools/agent/team 的 create/improve 成对关系同构：`create-docs` 负责创建与**基础结构**（期望态基线、放置/命名/分类、移动归档、索引、notes 磁盘状态），`improve-docs` 负责**已有文档内容**的证据驱动改进（单文档或单一机械维度的有界批次；九类改进；`--scope improve-docs` 审计留痕），技能本体的改进归 `improve-skills`；基础结构之上的**可选**呈现/发布能力归 `create-pages`。两者 MUST 各自注册且仅注册一行、`skill_id` 为规范形式、含 `## Feedback` 节（unit-id 分别为 `skill:create-docs` / `skill:improve-docs`）、SKILL.md < 500 行、镜像字节一致。`improve-docs` MUST NOT 创建/移动/重命名/归档文档（改为向 `create-docs` 交接），MUST NOT 改写决策历史（只标注 Deprecated / Superseded by），MUST NOT 在无 finding 时做纯样式改动；站点层需求 MUST 交接 `create-pages`。
+- **C-18** 文档域 MUST 与 tools/agent/team 的 create/improve 成对关系同构：`create-docs` 负责创建与**基础结构**，`improve-docs` 负责**已有文档内容**的证据驱动改进；`/speckit.docs` MUST 将二者都纳入同一次调协的分发链路，并按动作类型机械路由，而不是仅在报告中建议 hand-off。技能本体的改进归 `improve-skills`；基础结构之上的**可选**呈现/发布能力归 `create-pages`。两技能 MUST 各自注册且仅注册一行、`skill_id` 为规范形式、含 `## Feedback` 节（unit-id 分别为 `skill:create-docs` / `skill:improve-docs`）、SKILL.md < 500 行、镜像字节一致。`improve-docs` MUST NOT 创建/移动/重命名/归档文档（结构动作由命令路由至 `create-docs`），MUST NOT 改写决策历史，MUST NOT 在无 finding 时做纯样式改动；站点层需求 MUST 交接 `create-pages`。具体职责边界以两技能各自 SKILL.md 为 owner，本契约不复制其完整枚举。

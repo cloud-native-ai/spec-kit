@@ -7,15 +7,19 @@ layer; the engine semantics are pinned on the ``create-docs`` skill.
 from __future__ import annotations
 
 from pathlib import Path
+import runpy
 
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SOURCE = REPO_ROOT / "templates" / "commands" / "docs.md"
+TARGET_TEMPLATE = REPO_ROOT / "templates" / "docs-target-structure-template.md"
 # 2026-08-17: the .specify/templates/commands/ mirror is retired — per-tool
 # copies are generated straight from templates/commands/.
 SKILL = REPO_ROOT / "skills" / "create-docs" / "SKILL.md"
 SKILL_MIRROR = REPO_ROOT / ".specify" / "skills" / "create-docs" / "SKILL.md"
+IMPROVE_SKILL = REPO_ROOT / "skills" / "improve-docs" / "SKILL.md"
+IMPROVE_SKILL_MIRROR = REPO_ROOT / ".specify" / "skills" / "improve-docs" / "SKILL.md"
 
 SECTION_ORDER = [
     "## User Input",
@@ -61,12 +65,8 @@ def test_c2_frontmatter_and_shared_refs():
 @pytest.mark.contract
 def test_c3_section_order():
     text = source_text()
-    positions = []
-    for heading in SECTION_ORDER:
-        idx = text.find(heading)
-        assert idx != -1, f"missing section {heading}"
-        positions.append(idx)
-    assert positions == sorted(positions), "sections out of order"
+    headings = [line for line in text.splitlines() if line.startswith("## ")]
+    assert headings == SECTION_ORDER, "top-level sections must remain the exact six-section contract"
 
 
 @pytest.mark.contract
@@ -84,9 +84,10 @@ def test_c4_scope_resolution_and_tiered_gates():
 @pytest.mark.contract
 def test_c4a_mandatory_delegation():
     text = source_text()
-    assert "create-docs" in text, "command must delegate to the create-docs skill"
-    assert "skills/create-docs/SKILL.md" in text, "command must point at the skill path"
-    assert "single source of truth" in text, "command must name the skill as the engine SoT"
+    assert "skills/create-docs/SKILL.md" in text, "command must point at the structure owner"
+    assert "skills/improve-docs/SKILL.md" in text, "command must point at the content owner"
+    assert text.count("single source of truth") >= 2, "command must name both ownership boundaries"
+    assert "structure" in text.lower() and "content" in text.lower()
 
 
 @pytest.mark.contract
@@ -100,6 +101,9 @@ def test_c5_four_mandatory_artifacts_with_workspace_paths():
     command = source_text()
     for artifact in ["观察快照", "残差报告", "审计日志", "干跑计划"]:
         assert artifact in command, f"command should name artifact {artifact}"
+    assert ".specify/docs/target-structure.md" in command
+    assert "templates/docs-target-structure-template.md" in command
+    assert TARGET_TEMPLATE.is_file(), "target declaration template missing"
 
 
 @pytest.mark.contract
@@ -114,6 +118,7 @@ def test_c7_thin_dispatch_references():
     text = source_text()
     assert "reconcile-pattern.md" in text
     assert "docs-utils.py" in text or "docs/commands/docs.md" in text
+    assert "stop-and-confirm" in text, "governance keep-list literal must survive"
     assert "R0 需求解析" not in text, "authoring loop internals must not be inlined in the command"
 
 
@@ -123,6 +128,10 @@ def test_c8_feedback_step_conformance():
     assert "## Feedback" in text
     assert "feedback-utils.py" in text
     assert '"/speckit.docs"' in text, "feedback unit-id must be /speckit.docs"
+    classification = runpy.run_path(str(REPO_ROOT / "tests" / "contract" / "test_feedback_command_classification.py"))
+    assert "docs" in classification["COMPLEX_COMMANDS"]
+    assert len(classification["COMPLEX_COMMANDS"]) == 18
+    assert len(classification["SIMPLE_COMMANDS"]) == 4
 
 
 @pytest.mark.contract
@@ -171,3 +180,9 @@ def test_c12_skill_source_mirror_and_feedback():
     assert "skill_id" in fm
     assert "## Feedback" in text
     assert '"skill:create-docs"' in text, "skill feedback unit-id must be skill:create-docs"
+    assert IMPROVE_SKILL.is_file(), "skills/improve-docs/SKILL.md missing"
+    assert IMPROVE_SKILL_MIRROR.is_file(), ".specify/skills/improve-docs/SKILL.md mirror missing"
+    assert IMPROVE_SKILL.read_bytes() == IMPROVE_SKILL_MIRROR.read_bytes(), "improve-docs mirror drift"
+    improve = IMPROVE_SKILL.read_text(encoding="utf-8")
+    assert "## Feedback" in improve
+    assert '"skill:improve-docs"' in improve

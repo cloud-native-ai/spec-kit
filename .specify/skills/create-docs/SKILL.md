@@ -22,7 +22,11 @@ Keep the **documentation space** converged toward its desired state, and create 
 
 ### Desired-State Baseline
 
-Source precedence (low → high): templates < rules/thresholds < principles < external authoritative facts < **local established conventions** < **this run's user input**.
+This section is the **single source of truth** for the static documentation baseline and all of its enumerations, fields, states, and thresholds. Consumers cite this section and must not copy its operative details.
+
+Source precedence (low → high): templates < rules/thresholds < principles < external authoritative facts < **local established conventions** < **a confirmed project target declaration supplied by `/speckit.docs`** < **this run's user input**.
+
+When `/speckit.docs` supplies `.specify/docs/target-structure.md`, treat only its confirmed managed block as the project-specific layer above this static baseline. The command owns declaration lifecycle and validation; this skill consumes the result without rewriting the declaration. When invoked standalone or when no confirmed declaration exists, behavior remains unchanged and this static baseline plus local conventions define the desired state.
 
 1. **Thin root layer — uppercase special names (filename IS semantics; ALL-CAPS reserved)**, each ≤ one screen (~60 lines), overflow sinks into `docs/`:
 

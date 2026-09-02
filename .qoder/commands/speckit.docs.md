@@ -16,17 +16,28 @@ Consult the project glossary (`.specify/memory/glossary.md`) and apply the proto
 
 ## Outline
 
-`/speckit.docs` is the **entry point** for every documentation-space operation. It is a **thin dispatch layer only**: all engine semantics live in the **`create-docs` skill** (`skills/create-docs/SKILL.md`), which is the single source of truth for:
+`/speckit.docs` is the **thin orchestration layer** for every documentation-space operation. It owns only target-declaration coordination, typed-action decomposition, and dispatch order; it never copies engine rules into this command:
 
-- the **Desired-State Baseline** — thin root layer (reserved uppercase special names) + six-type `docs/` taxonomy + notes lifecycle;
-- **Scope Resolution** — 全量 (no arguments) / 单目标 (a target path) / 写作 (a writing commission) / 扇出 (raw material intake) / Bootstrap (managed space absent);
-- the **Reconcile Loop** R0–R6 per [.specify/shared/patterns/reconcile-pattern.md](.specify/shared/patterns/reconcile-pattern.md), with the four mandatory artifacts: 观察快照 (inline), 干跑计划 (`.specify/docs/plans/`), 审计日志 (`.specify/docs/audit/`, written even on 零收敛/无净变化), 残差报告 (inline);
-- the **Tiered Confirmation** gates (safe local writes 自动执行; move/archive/restructure stop-and-confirm via the dry-run plan; formal zone 只归档不删除 into `docs/archive/`; notes deletion only after explicit human confirmation);
-- the **Authoring Flow** and the **notes lifecycle automation** (`docs-utils.py` actions).
+- `skills/create-docs/SKILL.md` is the **single source of truth** for the static baseline, Scope Resolution (全量 / 单目标 / 写作 / 扇出 / Bootstrap), structural actions, the Reconcile Loop from [.specify/shared/patterns/reconcile-pattern.md](.specify/shared/patterns/reconcile-pattern.md), the four per-run artifacts (观察快照 / 干跑计划 / 审计日志 / 残差报告), tiered confirmation, Authoring Flow, and `docs-utils.py` automation.
+- `skills/improve-docs/SKILL.md` is the **single source of truth** for evidence-backed content improvement of an existing correctly placed document.
 
-**Delegation (mandatory)**: load the `create-docs` skill and execute it with `$ARGUMENTS` as its input. Do NOT inline or re-implement the baseline, scope table, gates, reconcile loop, or authoring rules here — never add new top-level modes to this command; new needs are new inputs to the same engine.
+### Stage 1 — Establish or load the target structure
 
-Zone orientation (details in the skill): managed = root entry files + `docs/` tree; read-only = source code, `.specify/specs/`, `.specify/memory/`; skip = compatibility symlinks, generated per-tool copies; archive = `docs/archive/`; run workspace = `.specify/docs/` (never mixed into `docs/`).
+The persistent project-specific declaration is `.specify/docs/target-structure.md`; bootstrap it from `.specify/templates/docs-target-structure-template.md`. Its managed region is bounded by `<!-- DOCS_TARGET_STRUCTURE_START -->` and `<!-- DOCS_TARGET_STRUCTURE_END -->`.
+
+1. If the declaration is absent, inspect repository evidence for project shape, audience, current topic inventory, and project-specific extensions. If that evidence is underdetermined, ask one batch of **1–3 necessary questions**; **no declaration or convergence write** happens **before answers arrive**.
+2. Present the first declaration and the convergence plan together at the existing **R4** dry-run confirmation. Safe local writes remain 自动执行; move/archive/restructure actions remain **stop-and-confirm**; the formal zone remains 只归档不删除.
+3. If a valid declaration exists and the user did not request a reset, reuse it without redesign or timestamp churn.
+4. If repository evidence shows **substantive drift**, add a **redesign proposal** to the same R4 plan. The declaration remains byte-identical **before confirmation**.
+5. On missing, unpaired, or unparseable markers, stop and request repair or explicit rebuild authorization; never overwrite the whole file. A valid refresh replaces only managed content and preserves all **outside-block bytes**.
+
+### Stages 2–3 — Reconcile and dispatch
+
+After Stage 1 yields a confirmed target, compare current state with it through the tolerance band and delegate execution to the two owning skills. `$ARGUMENTS` remains an input to this one reconcile engine; it never creates a separate top-level mode. The detailed typed-action and additive-input routing is part of this orchestration and must preserve the owners' constraints.
+
+**Delegation (mandatory)**: load both owning skills. Do NOT inline or re-implement their baseline, scope table, gates, reconcile loop, authoring rules, or content-improvement rules here.
+
+Zone orientation (details in `create-docs`): managed = root entry files + `docs/` tree; read-only = source code, `.specify/specs/`, `.specify/memory/`; skip = compatibility symlinks, generated per-tool copies; archive = `docs/archive/`; run workspace = `.specify/docs/` (never mixed into `docs/`).
 
 ## Feedback
 
