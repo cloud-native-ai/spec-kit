@@ -1,0 +1,32 @@
+=== regen-command-copies --check ===
+OK: all per-tool command copies match the source templates.
+regen_exit=0
+=== sync-mirrors --check ===
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (20 files)
+MISS  .specify/skills/git-fleet/SKILL.md
+MISS  .specify/skills/git-fleet/references/coordination-playbook.md
+MISS  .specify/skills/git-fleet/references/dependency-model.md
+MISS  .specify/skills/git-fleet/references/hazard-taxonomy.md
+MISS  .specify/skills/git-fleet/references/inventory-schema.md
+MISS  .specify/skills/git-fleet/scripts/git_fleet.py
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-238e7083-20260824144920/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-2a513ee9-20260831212342/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-2a885be3-20260828154955/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-5776641c-20260824134200/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-580a7f43-20260824144837/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-69aeb483-20260831212222/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-951ddb82-20260824114934/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-9feb6c64-20260902233459/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-a83dd5ff-20260824131923/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-bca9eff9-20260824123803/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-bf60a77b-20260831212900/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-c0d9c07e-20260828145952/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-e7c23918-20260828155518/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-f8a5c821-20260824132034/SKILL.md
+note  extra file only in mirror: .specify/skills/.migration-backups/layout-int-ffc47964-20260829005130/SKILL.md
+ok    agents/ == .specify/agents/templates/ (2 files)
+ok    scripts/ == .specify/scripts/ (101 files)
+ok    shared/ == .specify/shared/ (32 files)
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+sync_exit=2
