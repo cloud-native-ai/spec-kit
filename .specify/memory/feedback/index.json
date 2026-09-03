@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-08-31T12:11:46Z",
+  "updated": "2026-09-03T14:59:45Z",
   "threshold": 10,
-  "count_since_submission": 2,
+  "count_since_submission": 3,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260903T145945Z-skill-create-skills",
+      "file": "20260903T145945Z-skill-create-skills.md",
+      "unit_id": "skill:create-skills",
+      "unit_type": "skill",
+      "run_id": "create-skills-git-server-init-20260903",
+      "probe": "skill-create-skills-wrapup",
+      "kind": "internal",
+      "slice": "skills",
+      "feature": "",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-03T14:59:45Z",
+      "summary": "以 spec-kit 仓库根 skills/ 为 canonical 源创建 git-server-init（把普通 SSH 服务器置备为 Git 服务器：git 用户 + 裸仓库 + 公钥授权 + 本机 ssh config 条目）。走完 Step 0 模式判定（Spec Kit project mode）、跨 SSOT 命名冲突扫描（8 处加载目录零命中）、可写性预检、脚手架、身份定稿、校验（"
+    },
     {
       "id": "20260831T121146Z-speckit-feedback",
       "file": "20260831T121146Z-speckit-feedback.md",
