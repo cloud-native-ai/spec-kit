@@ -15,8 +15,27 @@ baseline_mirror_notes=15
 baseline_regen_command_copies_exit=0
 baseline_sync_mirrors_exit=2
 
-implementation_date=2026-09-02
-post_change_commit=pending
+implementation_date=2026-09-05
+post_change_commit=phase commits a4c379ee,d56fa466,7968bda2; final polish commit contains this verification log
+completion_gates=GATE-1 through GATE-8 pass on 2026-09-05
+final_open_tasks=0
+final_deferred_tasks=0
+final_success_criteria=7 pass / 0 partial / 0 fail / 0 deferred
+post_targeted_contract_passed=99
+post_full_suite_failed_nodes=47
+post_full_suite_passed=2257
+post_full_suite_skipped=1
+post_new_failures_vs_baseline=0
+post_resolved_failures_vs_baseline=0
+post_gate_total=23
+post_gate_governance_kept=10
+post_gate_destructive=13
+post_gate_violations=0
+post_mirror_miss=6
+post_mirror_diff=0
+post_new_mirror_drift=0
+post_docs_validation_new_findings=0
+post_docs_validation_preexisting_findings=1
 
 SC-001_status=pass
 SC-001_value=isolated first-run declaration persisted; second run produced 0 structural changes; target SHA-256 stayed 63f0697de55e33c0b8315ffb6297bcc8a3156ae266ebae029bf364dced2d8d77
@@ -48,5 +67,11 @@ SC-007_note=US3 surface run captured target reader/task context/user input/repos
 
 deferred_tasks=
 deferred_reason_summary=
+
+touched_files=templates/commands/docs.md; templates/docs-target-structure-template.md; skills/create-docs/SKILL.md; skills/improve-docs/SKILL.md; four generated command copies; two skill/template mirrors; docs/reference/commands/docs.md; three contract-test files; spec 033 contract; requirement 048 artifacts; Feature 037 detail/index
+command_surface_checks=all quickstart scenarios 1-6 plus FR-003/FR-015 variants exercised through active Qoder Skill in disposable worktrees; none skipped or unavailable
+human_discovery_evidence=README and docs/tutorials/index.md resolved isolated canonical login-flow tutorial
+agent_discovery_evidence=.specify/instructions.md Documentation Map and AGENTS/QODER/CLAUDE/Copilot symlinks resolved isolated canonical login-flow tutorial
+fanout_evidence=21 announced; 2 completed; 19 pending after boundary abort; no rollback
 
 notes=Phase 1 baseline captured before implementation source edits. Full-suite failure names are in baseline-failed.txt; gate and mirror outputs are in baseline-gates.json and baseline-mirrors.txt. The mirror baseline contains six MISS rows, zero DIFF rows, and fifteen note rows; the note count changed from the planning observation and is treated as observed external baseline state. Foundational RED: tests/contract/test_docs_command_template.py collected 13 tests; 11 passed and exactly 2 failed because the canonical command lacked skills/improve-docs/SKILL.md delegation and .specify/docs/target-structure.md. US1: declaration suite collected 6 tests and went RED 5/1 before implementation; first GREEN run exposed an assertion defect where generic `/` and `docs/` tokens were mistaken for owner enumerations, so the assertion was narrowed rather than corrupting the correct template; combined suite then passed 19/19. US2: routing/skill-pair suite collected 16 tests and went RED 7/9. First GREEN run passed routing assertions but the phrase `no new confirmation gate` triggered the gate scanner itself; the assertion and command were corrected to equivalent non-triggering wording (`does not introduce another gate`), after which the targeted suite passed 47/47 and scanner returned 23 gates, zero violations. US3: the current 11-test orchestration suite was run against prior MVP commit d56fa466 and produced historical RED 9/2, including the implementation-time user revision for what-to-write/where-it-lives/discovery. Current implementation plus related suites passed 77/77; command copies regenerated cleanly and gate scan remained 23/0. Active surface evidence in /tmp/spec-kit-048-us3: writing commission used all five content-plan inputs, produced exactly one canonical login-flow tutorial and zero near-duplicates, updated README/tutorials index, refreshed `.specify/instructions.md` via `/speckit.instructions`, and verified all four compatibility files remained symlinks exposing the same Documentation Map row. Structural-change scenario updated only the target managed block with prefix/suffix bytes unchanged. Fan-out announced 21 actions, completed 2, stopped at a document boundary, preserved both corrections, and reported 19 pending without rollback.

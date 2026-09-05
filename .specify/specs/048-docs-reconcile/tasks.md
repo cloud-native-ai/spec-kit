@@ -20,7 +20,7 @@
 - DoD-6: `verification.md` lists SC-001 through SC-007 with Pass/Partial/Fail status, evidence paths, and any deferred tasks
 - DoD-7: Feature 037 memory/index notes and `docs/reference/commands/docs.md` reflect the implemented behavior while Feature status remains Implemented
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Completion Gate
 
@@ -150,12 +150,12 @@
 
 **Purpose**: Close mirror, governance, documentation, full-regression, Feature-memory, and success-criteria obligations across all stories.
 
-- [ ] T030 [blockedBy: T013,T022,T029] Run the complete targeted contract suite from GATE-1 and append totals plus any failures to `.specify/specs/048-docs-reconcile/verification.md`
-- [ ] T031 [blockedBy: T030] Run `regen-command-copies.py --check`, targeted `diff -q` checks for `templates/docs-target-structure-template.md`, `skills/create-docs/SKILL.md`, and `skills/improve-docs/SKILL.md`, compare full `sync-mirrors.py --check` MISS/DIFF rows with `.specify/specs/048-docs-reconcile/baseline-mirrors.txt`, and append the mirror verdict to `.specify/specs/048-docs-reconcile/verification.md`
-- [ ] T032 [blockedBy: T031] Run `scan-confirmation-gates.py --json` and `docs-utils.py --action validate --root .`, verify the exact gate baseline and zero new documentation findings, and append both results to `.specify/specs/048-docs-reconcile/verification.md`
-- [ ] T033 [blockedBy: T032] Run the full pytest suite, compare failing node IDs with `.specify/specs/048-docs-reconcile/baseline-failed.txt`, investigate every new failure instead of bypassing hooks/tests, and record the final regression delta in `.specify/specs/048-docs-reconcile/verification.md`
-- [ ] T034 [blockedBy: T033] Update `.specify/memory/features/037.md` and the Feature 037 row in `.specify/memory/features.md` with implementation evidence, task/test/SC totals, dogfood results, mirror-baseline attribution, and Feature status remaining Implemented; keep `Total Features` at 48
-- [ ] T035 [blockedBy: T034] Finalize `.specify/specs/048-docs-reconcile/verification.md` with SC-001…SC-007 status/evidence, deferred_tasks, touched-file inventory, confirmation-gate/mirror/full-suite results, and an explicit statement of any skipped or unavailable command-surface check; then re-run GATE-1 through GATE-8 and set DoD Status to green only if all pass
+- [X] T030 [blockedBy: T013,T022,T029] Run the complete targeted contract suite from GATE-1 and append totals plus any failures to `.specify/specs/048-docs-reconcile/verification.md`
+- [X] T031 [blockedBy: T030] Run `regen-command-copies.py --check`, targeted `diff -q` checks for `templates/docs-target-structure-template.md`, `skills/create-docs/SKILL.md`, and `skills/improve-docs/SKILL.md`, compare full `sync-mirrors.py --check` MISS/DIFF rows with `.specify/specs/048-docs-reconcile/baseline-mirrors.txt`, and append the mirror verdict to `.specify/specs/048-docs-reconcile/verification.md`
+- [X] T032 [blockedBy: T031] Run `scan-confirmation-gates.py --json` and `docs-utils.py --action validate --root .`, verify the exact gate baseline and zero new documentation findings, and append both results to `.specify/specs/048-docs-reconcile/verification.md`
+- [X] T033 [blockedBy: T032] Run the full pytest suite, compare failing node IDs with `.specify/specs/048-docs-reconcile/baseline-failed.txt`, investigate every new failure instead of bypassing hooks/tests, and record the final regression delta in `.specify/specs/048-docs-reconcile/verification.md`
+- [X] T034 [blockedBy: T033] Update `.specify/memory/features/037.md` and the Feature 037 row in `.specify/memory/features.md` with implementation evidence, task/test/SC totals, dogfood results, mirror-baseline attribution, and Feature status remaining Implemented; keep `Total Features` at 48
+- [X] T035 [blockedBy: T034] Finalize `.specify/specs/048-docs-reconcile/verification.md` with SC-001…SC-007 status/evidence, deferred_tasks, touched-file inventory, confirmation-gate/mirror/full-suite results, and an explicit statement of any skipped or unavailable command-surface check; then re-run GATE-1 through GATE-8 and set DoD Status to green only if all pass
 
 **Checkpoint**: Implementation is evidence-complete, Feature memory is current, and no task or success criterion is silently left unresolved.
 
