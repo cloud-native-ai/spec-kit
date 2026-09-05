@@ -1,42 +1,78 @@
 # /speckit.docs
 
-Standardize and manage the project documentation space as a single reconcile engine.
+Reconcile the project documentation space by deciding **what to write** and **where each document belongs**, then dispatching work to the owning documentation skills.
 
-> Architecture: `/speckit.docs` is a thin dispatch layer. All engine semantics (desired-state baseline, scope resolution, reconcile loop, tiered gates, authoring flow, notes automation) live in the **`create-docs` skill** (`.specify/skills/create-docs/SKILL.md`), which the command loads and executes with its arguments. The skill is equally usable standalone (e.g. a knowledge-manager agent invoking it directly).
+> Architecture: `/speckit.docs` is a thin three-stage orchestration layer. Static structure and structural actions are owned by `.specify/skills/create-docs/SKILL.md`; evidence-backed content changes are owned by `.specify/skills/improve-docs/SKILL.md`. Reconcile semantics remain authoritative in `.specify/shared/patterns/reconcile-pattern.md`.
 
 ## When to Use
 
-- Bootstrap a standard documentation skeleton on a new project.
-- Converge an existing, drifted `docs/` tree back toward the desired state (full sweep).
-- Reorganize one document or triage a raw material dump into the right doc types.
-- Author new documents from a writing commission — the command places each document per the taxonomy and enforces all naming/format norms.
-- Operate the `docs/notes/` lifecycle (expire / archive / renew / confirmed deletion).
+- Establish or refresh the project's intended documentation structure.
+- Converge misplaced, unindexed, stale, incomplete, or contradictory documentation.
+- Write a new document from a user commission while baseline reconciliation still runs.
+- Route existing-document content fixes without creating a competing copy.
+- Maintain the notes lifecycle or hand off optional site publishing.
 
 ## Syntax
 
 ```text
-/speckit.docs                    # full sweep over the managed space
-/speckit.docs <path-or-target>   # single-target directional reconcile
-/speckit.docs <raw material>     # fan-out intake: triage into doc types
-/speckit.docs <writing request>  # authoring: create new compliant documents
+/speckit.docs                    # full reconcile
+/speckit.docs <path-or-target>   # directional reconcile for one target
+/speckit.docs <raw material>     # fan-out intake
+/speckit.docs <writing request>  # baseline reconcile plus additional writing action
 ```
 
 `/speckit.docs` is a chat instruction, not a terminal command.
 
-## Desired State (baseline)
+## The Two Core Decisions
 
-- **Thin root layer** — uppercase special names with fixed semantics (filename IS semantics), each ≤ one screen:
-  `README.md` (indexes all of `docs/`) · `ARCHITECTURE.md` (summary of concepts + decisions) · `CONTRIBUTING.md` (summary of contribute) · `CHANGELOG.md` (self-contained timeline). These are **Reserved Filenames** (like reserved keywords, constitution Principle X): each registers semantics + location and may appear ONLY there — user documents must not reuse them; directory indexes elsewhere are `index.md`, never a nested `README.md`. Registry is extensible; ordinary docs use lowercase kebab-case.
-- **Thick `docs/` layer** — `concepts/ tutorials/ tasks/ reference/ decisions/ contribute/` (formal, archive-not-delete) + `notes/` (temporary, lifecycle-constrained).
-- **ADR** — `docs/decisions/NNNN-slug.md` (+ `index.md` + `template.md`), append-only, status Proposed / Accepted / Deprecated / Superseded by.
-- **Notes lifecycle** — frontmatter (`title/created/expires/status/target/tags`, default TTL 60 days); state machine draft → expired → (renew | confirmed delete) and draft → archived (merged into `target`).
+### 1. What to write
 
-## Execution Flow
+A writing action starts with a content plan containing five inputs:
 
-1. **Scope resolution**: full sweep / single target / fan-out / authoring / bootstrap.
-2. **R0–R6 reconcile loop** (per `shared/patterns/reconcile-pattern.md`): observe snapshot → desired state → diff through the tolerance band → dry-run plan with per-item opt-out → tiered convergence → verify + residual report.
-3. **Tiered gates**: safe local writes auto-execute (never clobber); moves/archives/restructures require plan confirmation; the formal zone is archive-only (`docs/archive/`); notes deletion requires explicit human confirmation.
-4. **Authoring scope** (writing commission in arguments): parse the request → place each document in its taxonomy home → confirm an inline writing plan (path, type, title, outline) → write documents that comply with the baseline (lowercase kebab-case names, reserved-name blocking, ADR numbering + index registration, notes frontmatter, one-screen root entries, local style conventions, never clobber) → `validate` + index updates + audit log. If the topic is already covered, the command proposes updating the existing document instead of creating a near-duplicate.
+- target reader;
+- current task context;
+- this run's user input;
+- verified repository evidence;
+- explicit writing boundary.
+
+Missing decisive context is clarified before writing. Generic filler, taste, and unverified assumptions are not evidence.
+
+### 2. Where it lives
+
+The command searches for an existing canonical owner of the topic before creating anything. If coverage already exists, the action updates that document through `improve-docs`; otherwise, it selects exactly one canonical home through `create-docs` using the confirmed target structure and local conventions.
+
+This owner-first rule prevents scattered near-duplicates and contradictory copies.
+
+## Desired-State Layering
+
+- **Static baseline**: owned only by `.specify/skills/create-docs/SKILL.md` § Desired-State Baseline. Open that owner for operative naming, taxonomy, lifecycle, and threshold rules; this reference does not copy them.
+- **Project layer**: persisted in `.specify/docs/target-structure.md` as the **Target structure declaration**. It records project shape, readers, project-specific extensions, topic placement, and fixed discovery routes.
+- **Run layer**: the current repository state plus this run's input and evidence.
+
+The target declaration uses `templates/docs-target-structure-template.md` and preserves bytes outside its managed block.
+
+## Three-Stage Execution Flow
+
+1. **Establish or load the target**: create the declaration once, ask at most three necessary questions when evidence is insufficient, reuse it without churn, and propose evidence-backed redesign when project reality changes.
+2. **Diff and decompose**: apply the tolerance band first, then emit typed actions carrying target, owner, evidence/source, and confirmation tier.
+3. **Dispatch and report**: route structure to `create-docs`, content to `improve-docs`, preserve existing confirmation tiers, audit every run, and group residuals by owner.
+
+User input is additional: baseline reconciliation always runs. Directional instructions affect current priorities; structural changes update the target only through the existing dry-run plan.
+
+## Fixed Discovery Paths
+
+Every created or moved canonical document updates the nearest human index and any required root entry in the same run.
+
+When a canonical path belongs in Agent project knowledge, `/speckit.docs` dispatches `/speckit.instructions` to refresh `.specify/instructions.md` § Documentation Map and verifies that the row resolves. Generated compatibility instruction aliases are never edited directly.
+
+The resulting residual report states both lookup routes:
+
+- **Human**: canonical root or directory index → document.
+- **Agent**: project instruction file → Documentation Map → document.
+
+## Content Fan-Out and Abort
+
+Evidence-backed content actions run one document at a time in sequence. There is **no per-run cap** and no silent truncation. Before dispatch, the command announces the full document count; the user may abort before dispatch or between documents. Completed actions remain complete, while unstarted actions are reported as pending for the next run.
 
 ## Deterministic Engine
 
@@ -50,41 +86,31 @@ python3 .specify/scripts/python/docs-utils.py --action validate --root . [--allo
 python3 .specify/scripts/python/docs-utils.py --action audit --root . --scope <s> --summary <text>
 ```
 
-`validate` covers the deterministic dimensions: reserved-name case/misuse/misplacement, one-screen threshold for root entries, broken relative links, ADR numbering continuity, notes frontmatter completeness.
+The engine supplies deterministic findings and audit output. It does not own or rewrite the target declaration.
 
-The built-in allowlist covers the ALL-CAPS names Spec Kit itself generates (`AGENTS.md`, `CLAUDE.md`, `QODER.md`, …). A project carrying some *other* tool-mandated ALL-CAPS root file registers it per run with `--allow-special NAME` (repeatable) — the registry-extensibility path promised by ADR-0001 — instead of living with a permanent `reserved-name-misuse` false positive. Names not passed stay flagged, so the check keeps its teeth.
+## Static Site
 
-## Static Site (optional, not part of this command)
-
-Publishing the space as a static site is an **optional** capability layered on top of the
-structure, owned by the `create-pages` skill — a documentation space is complete and valid
-without it. `/speckit.docs` never scaffolds, mounts, or builds a site; it only skips the
-site-tooling directories (`layouts/`, `static/`, `public/`, `resources/`, `themes/`,
-`archetypes/`) so they are never triaged as content or archived.
-
-`create-pages` offers two modes: **CI-deployed pages** (`<docs>/hugo.yaml` + platform
-pipeline) and **in-place mount site** (`<docs>/hugo.toml`, Markdown mounted rather than
-copied, build output in `<docs>/public/`). Details, commands, and CI guidance live in
-`.specify/skills/create-pages/SKILL.md` and its `references/hugo-site.md`.
-
-A move that adds or removes a documentation directory can stale an existing site's mounts —
-a reconcile run reports that as a `create-pages` follow-up instead of repairing it.
+Presentation and publishing remain optional and are owned by `create-pages`. Site requests are handed off rather than becoming documentation-space reconcile actions.
 
 ## Output Artifacts
 
-| Artifact | Location | Always produced |
-|----------|----------|-----------------|
-| Observation snapshot | inline in chat | yes |
-| Dry-run plan | `.specify/docs/plans/` | when moves/archives are proposed |
-| Audit log | `.specify/docs/audit/` | yes — even a no-op run records "all dimensions within tolerance" |
-| Residual report | inline in chat | yes |
+| Artifact | Location | Lifecycle |
+|----------|----------|-----------|
+| Target structure declaration | `.specify/docs/target-structure.md` | cross-run, confirmed project contract |
+| Observation snapshot | inline | per run |
+| Dry-run plan | `.specify/docs/plans/` | per run when a confirmable action exists |
+| Audit log | `.specify/docs/audit/` | every run, including no-op |
+| Residual report | inline | per run |
 
 ## Tool Support
 
-Distributed like every other `/speckit.*` command to all supported AI tools (Claude Code, Codex CLI, Qoder CLI, opencode, Hermes Agent, GitHub Copilot) via the standard command-generation path.
+The canonical command template is distributed through the standard command-generation path to the supported AI agent CLIs present in the project.
 
 ## Related
 
-- Engine contract: `.specify/specs/033-docs-command/contracts/docs-utils-cli.md`
-- Reconcile pattern: `shared/patterns/reconcile-pattern.md` (mirrored at `.specify/shared/patterns/`)
-- Docs-sync step convention: `shared/workflow/docs-step.md`
+- Structure and authoring owner: `.specify/skills/create-docs/SKILL.md`
+- Existing-content owner: `.specify/skills/improve-docs/SKILL.md`
+- Optional publishing owner: `.specify/skills/create-pages/SKILL.md`
+- Reconcile pattern: `.specify/shared/patterns/reconcile-pattern.md`
+- Instructions refresh command: `.specify/templates/commands/instructions.md`
+- Deterministic engine contract: `.specify/specs/033-docs-command/contracts/docs-utils-cli.md`

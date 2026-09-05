@@ -16,6 +16,11 @@
 
 把 `/speckit.docs` 从"单技能委托的薄分发层"升级为**目标结构驱动的三段式调协编排**:①根据项目特点与内容设计最佳文档结构并**持久化为目标结构声明**——此后各次执行都向这份既定目标收敛,而不是每次重设;②对比现状与目标的差异(容忍带先行),把实质性偏差分解为**分型执行动作**;③把动作**分发到 owning 技能**执行——结构类动作交 create-docs,内容类动作交 improve-docs。用户附加输入不取代基线调协,而是分解为**额外动作**并入同一次运行(如"创建一个描述登录流程的文档" → 既有调协 + 新建文档动作)。
 
+该命令最终围绕两个不可分割的核心判定:
+
+1. **写什么**:以仓库事实、当前任务语境、目标读者与本次用户上下文共同确定文档的内容边界、事实依据和表达方式;无证据不编造,信息不足先澄清。
+2. **放哪里**:每份文档必须解析到一个符合项目规范的唯一 canonical home;先搜索既有覆盖并优先更新 owner,不得因散乱落位制造近重复或矛盾副本。写入/搬迁后同时维护固定发现路径——人类从根入口/目录索引查找,Agent 从 `.specify/instructions.md` 的 Documentation Map 查找;后者由 `/speckit.instructions` 刷新,`/speckit.docs` 不直接手改生成的 instruction aliases。
+
 ### 现状锚点(以源码实测为准)
 
 - `templates/commands/docs.md`(72 行)为薄分发层,委托对象**仅 create-docs**;全文 improve-docs 出现 **0 次**——内容质量半边不在命令分发链路里。
@@ -83,6 +88,9 @@
 2. **Given** 用户输入为方向性指示("激进重组"/"整理 README"),**When** 分解动作,**Then** 指示作用于对应动作的方向与优先级,不改变目标声明本身
 3. **Given** 用户输入隐含结构变更("把 reference/ 拆成两部分"),**When** 运行,**Then** 变更作为待确认项呈现,确认后写回目标声明,下次运行向新目标收敛
 4. **Given** 用户输入是站点请求(生成/发布站点),**When** 运行,**Then** 仍按既有纪律移交给 create-pages,不被吸收为本命令动作
+5. **Given** 用户要求新写一个主题文档,**When** 命令解析写作动作,**Then** 内容计划同时列出仓库事实证据、当前语境、本次用户输入与目标读者,并据此确定写作边界
+6. **Given** 目标主题已被一份 canonical 文档覆盖,**When** 用户再次要求创建同主题文档,**Then** 命令路由为改进既有 owner,不创建近重复副本
+7. **Given** 新 canonical 文档已创建或路径已移动,**When** 本次调协收尾,**Then** 人类入口/目录索引已更新,且 Agent instructions 的 Documentation Map 经 `/speckit.instructions` 刷新后能定位该文档
 
 ### Edge Cases
 
@@ -114,6 +122,9 @@
 - **FR-013**: 运行结束的残差报告 MUST 按动作路由区分汇报:各技能执行了什么、容忍了什么、待人工决策什么;审计日志在零收敛时也 MUST 照写。
 - **FR-014**: 命令 MUST 维持既有移交边界:站点请求 → create-pages;技能本体改进 → improve-skills。
 - **FR-015**: 运行检测到目标声明与项目实态实质性脱节时,MUST 提议(而非直接执行)目标重设计,经用户确认后重设。
+- **FR-016**: 每个写作动作 MUST 在写入前形成内容计划,明确目标读者、当前任务语境、本次用户输入、仓库事实证据与写作边界;缺少任何决定性信息时 MUST 先澄清,MUST NOT 用通用模板文字替代项目事实。
+- **FR-017**: 每个创建/搬迁动作 MUST 解析到一个且仅一个符合目标声明与 create-docs 分类规范的 canonical home;执行前 MUST 搜索同主题既有 owner,已覆盖时改为 improve-docs 更新而非创建近重复文档。
+- **FR-018**: 每个 canonical 文档创建/搬迁动作 MUST 同步维护固定发现路径:更新所属目录索引与必要的根入口;若路径应进入 Agent 的项目知识入口,本次运行 MUST 通过 `/speckit.instructions` 刷新 `.specify/instructions.md` 的 Documentation Map,不得直接编辑兼容 instruction aliases。
 
 ### Key Entities *(include if requirement involves data)*
 
@@ -130,6 +141,7 @@
 - **SC-004**: 无证据指瑕的文档在连续两次全量运行中被改写的次数为 0(反 churn)。
 - **SC-005**: 目标结构声明中可机检的基线事实(保留文件名清单、分类目录名等由 create-docs 拥有的枚举)的复制数为 0——均以引用表达(单一事实源合规)。
 - **SC-006**: 命令模板保持薄编排层:不内联调谐环步骤展开、门禁表复制等引擎语义(结构契约可检)。
+- **SC-007**: 对一次新文档写作委托,单次运行同时满足:内容计划含 5 类输入(目标读者/任务语境/用户输入/仓库证据/边界)、canonical home 唯一、同主题近重复新增数为 0、并能从所属索引及刷新后的 `.specify/instructions.md` Documentation Map 定位该文档。
 
 ### Measurement Sources & Collection Methods
 
@@ -139,6 +151,7 @@
 - **SC-004 Source**: 两次连续全量运行的审计日志对比 + docs/ 树的变更比对(未指瑕文档零 diff)。
 - **SC-005 Source**: 对目标声明文件与 create-docs SKILL.md 的交叉文本检查——基线枚举字符串在目标声明中的出现计数。
 - **SC-006 Source**: 命令模板结构契约测试(既有 docs-command 契约的扩展)+ 人工评审。
+- **SC-007 Source**: 隔离 worktree 中的写作委托运行:保存内容计划、目标路径、同主题搜索结果、目录/根索引 diff,并运行 `/speckit.instructions` 后从 `.specify/instructions.md` Documentation Map 校验目标路径可达。
 
 ## Clarifications
 
@@ -152,6 +165,10 @@ Format: - Q: <question> → A: <answer>
 - Q: 需求 048 应绑定到哪个 Feature——扩展 037 Docs Command 还是新建 Feature 049? → A: **绑定 037 Docs Command**,作为第四次 follow-up(依据:037 契约 C-18 已治理 create-docs/improve-docs 配对边界;improve-docs 技能从未注册任何 Feature;037 已有三次 follow-up 演进先例;与 041 吸收 038-goal-target 同构)。`Total Features` 保持 48。
 - Q: 目标结构声明(项目专属文档结构契约)应归属哪个平面——项目记忆层 / 运行工作区 / 读者可见文档? → A: **运行工作区 `.specify/docs/`**(与 plans/、audit/ 同址)。已核实该目录受版本控制(`git ls-files` 列出 5 个跟踪文件,未被 `.gitignore` 忽略),可承载跨运行契约;由此引入的语义张力(该目录现为按次运行痕迹,而声明是跨运行长期契约)以 FR-002a 显式约束:声明须在工作区内可区分,且不得随按次产物轮转或清理。
 - Q: 全量调协发现大量内容类问题时,单次运行的内容动作量应如何设界? → A: **不设上限,全部分发**——取单次最大收敛,接受大空间上运行成本不可预期的代价(FR-008 已明确禁止下游引入隐式上限或静默截断)。为使代价可控,补充两项约束:分发前告知计划文档数以便用户在扇出启动前中止;中途中止时已完成项保留、未开始项以 pending 进入残差报告(新增边界情况"大规模内容扇出")。
+
+### Session 2026-09-05
+
+- 用户修订指示: `/speckit.docs` 的核心必须明确解决两大难题——**如何写文档**与**文档放哪里**。写作由项目信息、当前任务语境、本次上下文和目标读者共同决定;落位必须遵循项目规范、避免散乱造成重复矛盾,并提供固定检索方式。工程侧要求新/移动文档可从目录/根索引定位,Agent 可经 `.specify/instructions.md` Documentation Map 定位;该 Map 由 `/speckit.instructions` 刷新,不直接手改兼容 aliases。→ 已并入 Overview、US3 场景 5–7、FR-016…FR-018、SC-007。
 
 ## Out of Scope
 

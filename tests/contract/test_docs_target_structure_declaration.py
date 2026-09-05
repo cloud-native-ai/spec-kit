@@ -20,6 +20,7 @@ REQUIRED_FIELDS = [
     "静态基线引用",
     "项目专属扩展",
     "内容盘点摘要",
+    "固定检索入口",
     "最后确认",
 ]
 
@@ -62,6 +63,9 @@ def test_target_template_has_required_fields_without_copying_owner_facts() -> No
     for field in REQUIRED_FIELDS:
         assert field in template, f"target declaration field missing: {field}"
     assert ".specify/skills/create-docs/SKILL.md" in template
+    assert ".specify/instructions.md" in template
+    assert "Documentation Map" in template
+    assert "/speckit.instructions" in template
     copied = sorted(token for token in _owned_baseline_tokens() if token in template)
     assert not copied, f"target declaration copied baseline-owner facts: {copied}"
 

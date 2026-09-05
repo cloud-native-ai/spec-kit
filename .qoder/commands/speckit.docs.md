@@ -51,7 +51,22 @@ Content dispatch has **no per-run cap** and MUST NOT truncate or silently defer 
 
 Use the owners' existing confirmation tiers; this orchestration **does not introduce another gate**. Group the residual report by owning skill and list converged, tolerated, pending-human-decision, pending, and “no finding” outcomes. Append the audit log even on **zero convergence**.
 
-`$ARGUMENTS` remains an input to this one reconcile engine; it never creates a separate top-level mode. Additive-input routing is completed below without weakening these invariants.
+### Additive user input — decide what to write and where it lives
+
+The **baseline reconcile always runs** at the resolved scope. User input produces **additional actions** in the same plan and **must not replace** baseline reconciliation.
+
+For every **writing commission**, answer two questions before writing:
+
+1. **What to write** — produce a content plan that names the **target reader**, **task context**, **user input**, **repository evidence**, and **writing boundary**. Missing decisive context follows Stage 1's bounded clarification rule; generic filler is not evidence.
+2. **Where it lives** — search for an existing canonical owner of the topic first. If one exists, route a section-level update to `improve-docs` and create no **near-duplicate**. Otherwise choose **exactly one canonical home** under the confirmed target and route creation/placement to `create-docs`.
+
+A **directional input** changes action **priority** for this run and **does not change the target declaration**. Input that truly implies a **structural change** creates a **target-declaration update action** in the **same existing R4 plan**; an approved refresh changes only the managed block and preserves **outside-block bytes**.
+
+Every created or moved canonical document updates its nearest **human index** and any required root entry in the same reconcile. If its canonical path belongs in Agent project knowledge, dispatch `/speckit.instructions` to refresh the `.specify/instructions.md` **Documentation Map** and verify the row resolves. `/speckit.docs` **must not edit compatibility instruction aliases** directly.
+
+Site/publishing requests go to `create-pages`; requests to change the skill bodies go to `improve-skills`. These hand-offs **must not become a reconcile action** in the documentation space.
+
+`$ARGUMENTS` remains an input to this one reconcile engine; it never creates a separate top-level mode.
 
 **Delegation (mandatory)**: load both owning skills. Do NOT inline or re-implement their baseline, scope table, gates, reconcile loop, authoring rules, or content-improvement rules here.
 

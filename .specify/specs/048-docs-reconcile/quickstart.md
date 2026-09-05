@@ -69,9 +69,9 @@
 /speckit.docs "创建一个描述登录流程的文档"
 ```
 
-**期望**: **两个结果同时产出** ——(a) 调协侧如实报告零收敛;(b) 新文档按分类学落位创建(教程或参考,依内容判定)、命名 `kebab-case.md`、非保留文件名、目录索引更新。缺一即不达标。
+**期望**: **两个结果同时产出** ——(a) 调协侧如实报告零收敛;(b) 写作动作先回答“写什么/放哪里”:内容计划列出目标读者、当前语境、用户输入、仓库证据与边界；落位计划先搜索同主题 owner,不存在时才创建唯一 canonical 文档并更新所属索引。若新路径应进入 Agent 项目知识入口,同次运行调度 `/speckit.instructions` 刷新 `.specify/instructions.md` Documentation Map。
 
-**核验**: 用户输入未取代基线调协(FR-009);新文档不占用保留文件名;`docs-utils.py --action validate` 零新增违规。
+**核验**: 用户输入未取代基线调协(FR-009);同主题近重复新增数为 0;新文档可从目录/根索引及刷新后的 Agent Documentation Map 定位;不直接编辑兼容 instruction aliases;`docs-utils.py --action validate` 零新增违规。
 
 ---
 

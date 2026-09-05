@@ -17,7 +17,7 @@
 - DoD-3: All four mirror obligations in `plan.md` are fulfilled: command copies regenerate cleanly; the new template and both skill mirrors are byte-identical; no new mirror drift appears beyond the recorded `git-fleet` baseline
 - DoD-4: Confirmation-gate scan remains `total: 23`, `governance_kept: 10`, `destructive: 13`, and `violations: 0`; no new gate or probe is introduced
 - DoD-5: Quickstart scenarios 1–6 are exercised at the command surface in an isolated worktree or disposable fixture, with observed outcomes recorded honestly
-- DoD-6: `verification.md` lists SC-001 through SC-006 with Pass/Partial/Fail status, evidence paths, and any deferred tasks
+- DoD-6: `verification.md` lists SC-001 through SC-007 with Pass/Partial/Fail status, evidence paths, and any deferred tasks
 - DoD-7: Feature 037 memory/index notes and `docs/reference/commands/docs.md` reflect the implemented behavior while Feature status remains Implemented
 
 **DoD Status**: pending
@@ -73,7 +73,7 @@
 
 ### Structural Contract Tests for User Story 1
 
-- [X] T006 [US1] [blockedBy: T005] Author and run RED tests in `tests/contract/test_docs_target_structure_declaration.py` covering root-level path, paired `DOCS_TARGET_STRUCTURE_START/END` markers, six required fields, byte-preserving outside-block semantics, invalid-marker stop behavior, owner-derived detection of copied baseline facts, no `docs-utils.py` action expansion, underdetermined design producing 1–3 questions with zero declaration writes before answers, substantive project drift producing a confirmation-gated redesign proposal with zero pre-confirmation writes, and real-path existence checks for every asserted surface
+- [X] T006 [US1] [blockedBy: T005] Author and run RED tests in `tests/contract/test_docs_target_structure_declaration.py` covering root-level path, paired `DOCS_TARGET_STRUCTURE_START/END` markers, seven required fields (including fixed discovery routes), byte-preserving outside-block semantics, invalid-marker stop behavior, owner-derived detection of copied baseline facts, no `docs-utils.py` action expansion, underdetermined design producing 1–3 questions with zero declaration writes before answers, substantive project drift producing a confirmation-gated redesign proposal with zero pre-confirmation writes, and real-path existence checks for every asserted surface
 
 ### Authoring and Mirror Parity for User Story 1
 
@@ -128,19 +128,19 @@
 
 ### Structural Contract Tests for User Story 3
 
-- [ ] T023 [US3] [blockedBy: T021] Author and run RED tests in `tests/contract/test_docs_reconcile_orchestration.py` covering additive-not-replacing input, writing commission routing, directional-input priority without target mutation, confirmed target writeback, create-pages/improve-skills handoffs, no-cap fan-out announcement, abort/pending semantics, unchanged six-heading order, required literal survival, and reference-document coverage
+- [X] T023 [US3] [blockedBy: T021] Author and run RED tests in `tests/contract/test_docs_reconcile_orchestration.py` covering additive-not-replacing input, the “what to write / where it lives” split, five-input content plans, canonical-owner search and near-duplicate prevention, unique canonical home, human index maintenance, `/speckit.instructions` Documentation Map refresh without alias edits, directional-input priority without target mutation, confirmed target writeback, create-pages/improve-skills handoffs, no-cap fan-out announcement, abort/pending semantics, unchanged six-heading order, required literal survival, and reference-document coverage
 
 ### Authoring, Documentation, and Generated Copies for User Story 3
 
-- [ ] T024 [P] [US3] [blockedBy: T023] Complete the user-input orchestration in `templates/commands/docs.md`: always run baseline reconciliation at the resolved scope, merge user-derived extra actions into the same plan, write confirmed structural changes back to the managed block, announce the full content-document count before sequential dispatch, and preserve completed/pending results on abort without adding a gate or mode
-- [ ] T025 [P] [US3] [blockedBy: T023] Update `docs/reference/commands/docs.md` architecture statement, desired-state layering, three-stage execution flow, typed routing, additive invocation examples, fifth output artifact, no-cap/abort semantics, and Related links to both skills while referencing rather than copying the create-docs baseline enumeration
-- [ ] T026 [US3] [blockedBy: T024] Re-run `python3 scripts/python/regen-command-copies.py` so all four tool-specific command copies include the final additive-input and fan-out semantics
-- [ ] T027 [US3] [blockedBy: T025,T026] Run `python3 scripts/python/regen-command-copies.py --check`, verify all four generated copies contain the final edit and required AUTO-GENERATED header, verify the canonical template still has exactly six ordered top-level sections and all D-2 literals but no `R0 需求解析`, and confirm the updated reference document exposes every public behavior from D-8/D-9
-- [ ] T028 [US3] [blockedBy: T027] Run `pytest tests/contract/test_docs_reconcile_orchestration.py tests/contract/test_docs_command_template.py tests/contract/test_docs_action_routing.py tests/contract/test_confirmation_gates_sweep.py tests/contract/test_feedback_command_classification.py -q` and re-run the gate scanner to prove total 23/violations 0
+- [X] T024 [P] [US3] [blockedBy: T023] Complete user-input orchestration in `templates/commands/docs.md`: always run baseline reconciliation; answer “what to write” with a content plan combining target reader/task context/user input/repository evidence/boundary; answer “where it lives” by searching a canonical owner first and otherwise selecting exactly one home; maintain human indexes and dispatch `/speckit.instructions` for Documentation Map refresh after canonical path changes; merge structural target updates into the existing R4 plan; announce full content count and preserve completed/pending results on abort without adding a gate or mode
+- [X] T025 [P] [US3] [blockedBy: T023] Update `docs/reference/commands/docs.md` to lead with “what to write / where it lives”, explain five-input content planning, canonical-owner deduplication, unique placement, human index and Agent Documentation Map discovery, three-stage routing, additive examples, fifth artifact, no-cap/abort semantics, and links to both skills while referencing rather than copying the create-docs baseline
+- [X] T026 [US3] [blockedBy: T024] Re-run `python3 scripts/python/regen-command-copies.py` so all four tool-specific command copies include the final additive-input and fan-out semantics
+- [X] T027 [US3] [blockedBy: T025,T026] Run `python3 scripts/python/regen-command-copies.py --check`, verify all four generated copies contain the final edit and required AUTO-GENERATED header, verify the canonical template still has exactly six ordered top-level sections and all D-2 literals but no `R0 需求解析`, and confirm the updated reference document exposes every public behavior from D-8/D-9
+- [X] T028 [US3] [blockedBy: T027] Run `pytest tests/contract/test_docs_reconcile_orchestration.py tests/contract/test_docs_command_template.py tests/contract/test_docs_action_routing.py tests/contract/test_confirmation_gates_sweep.py tests/contract/test_feedback_command_classification.py -q` and re-run the gate scanner to prove total 23/violations 0
 
 ### Surface Verification for User Story 3
 
-- [ ] T029 [US3] [blockedBy: T028] Enter a disposable isolated git worktree and invoke `/speckit.docs` through the active AI agent CLI command/skill surface (Qoder: `Skill` with `speckit.docs`; never Bash) for quickstart scenarios 4–6; verify same-run zero-reconcile plus login-document creation, confirmed managed-block writeback with outside bytes preserved, full fan-out count announcement, pre-start/mid-run abort behavior, and pending carryover; append the command transcript, residual reports, and `git diff --name-status` as SC-003/edge-case evidence in `.specify/specs/048-docs-reconcile/verification.md`, then remove the disposable worktree
+- [X] T029 [US3] [blockedBy: T028] Enter a disposable isolated git worktree and invoke `/speckit.docs` through the active Qoder `Skill` surface for quickstart scenarios 4–6; for the login document capture the five-input content plan, canonical-owner search, unique home, human index diff, and `/speckit.instructions` Documentation Map refresh; verify same-run zero-reconcile plus creation, confirmed managed-block writeback, full fan-out count announcement, pre-start/mid-run abort, pending carryover, zero alias hand-edits, and fixed human/Agent lookup routes; append evidence for SC-003/SC-007 and edge cases to `.specify/specs/048-docs-reconcile/verification.md`, then remove the worktree
 
 **Checkpoint**: All three stories are independently demonstrated and the command supports additive user intent without weakening baseline reconciliation.
 
@@ -155,7 +155,7 @@
 - [ ] T032 [blockedBy: T031] Run `scan-confirmation-gates.py --json` and `docs-utils.py --action validate --root .`, verify the exact gate baseline and zero new documentation findings, and append both results to `.specify/specs/048-docs-reconcile/verification.md`
 - [ ] T033 [blockedBy: T032] Run the full pytest suite, compare failing node IDs with `.specify/specs/048-docs-reconcile/baseline-failed.txt`, investigate every new failure instead of bypassing hooks/tests, and record the final regression delta in `.specify/specs/048-docs-reconcile/verification.md`
 - [ ] T034 [blockedBy: T033] Update `.specify/memory/features/037.md` and the Feature 037 row in `.specify/memory/features.md` with implementation evidence, task/test/SC totals, dogfood results, mirror-baseline attribution, and Feature status remaining Implemented; keep `Total Features` at 48
-- [ ] T035 [blockedBy: T034] Finalize `.specify/specs/048-docs-reconcile/verification.md` with SC-001…SC-006 status/evidence, deferred_tasks, touched-file inventory, confirmation-gate/mirror/full-suite results, and an explicit statement of any skipped or unavailable command-surface check; then re-run GATE-1 through GATE-8 and set DoD Status to green only if all pass
+- [ ] T035 [blockedBy: T034] Finalize `.specify/specs/048-docs-reconcile/verification.md` with SC-001…SC-007 status/evidence, deferred_tasks, touched-file inventory, confirmation-gate/mirror/full-suite results, and an explicit statement of any skipped or unavailable command-surface check; then re-run GATE-1 through GATE-8 and set DoD Status to green only if all pass
 
 **Checkpoint**: Implementation is evidence-complete, Feature memory is current, and no task or success criterion is silently left unresolved.
 
@@ -172,9 +172,10 @@
 | FR-011/FR-012 — existing tiered gates and thin orchestration | T004,T008,T016,T021,T024,T027,T028,T032 | Existing contract regression + exact gate total/violation check |
 | FR-013 — per-skill residual report and no-op audit | T014,T016,T022,T023,T024,T029 | Scenarios 2–3 and routing report assertions |
 | FR-014 — create-pages/improve-skills handoffs | T023,T024,T025,T028 | Orchestration/reference-document assertions |
+| FR-016/FR-017/FR-018 — evidence/context-driven writing, one canonical home with duplicate prevention, and fixed human/Agent discovery | T023–T029,T035 | Orchestration tests + isolated writing commission + index/Documentation Map evidence |
 | SC-001/SC-005/SC-006 | T006–T013,T030–T035 | Persistent/repeat-run evidence, zero baseline copies, thin-template structural checks |
 | SC-002/SC-004 | T014–T022,T030–T035 | Dual-drift routing and unfaulted-document zero-diff evidence |
-| SC-003 | T023–T029,T030–T035 | Same-run reconcile + writing-commission evidence |
+| SC-003/SC-007 | T023–T029,T030–T035 | Same-run reconcile + five-input writing plan + canonical placement/dedup + fixed lookup evidence |
 
 ---
 

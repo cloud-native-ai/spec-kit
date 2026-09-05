@@ -26,9 +26,9 @@ SC-002_status=pass
 SC-002_value=2/2 typed actions routed to the correct owner (100%)
 SC-002_note=Active Qoder speckit.docs surface in disposable worktree /tmp/spec-kit-048-us2 routed the misplaced login-flow fixture to create-docs and the verified stale-path correction to improve-docs; audit log recorded both outcomes by action.
 
-SC-003_status=unknown
-SC-003_value=pending
-SC-003_note=Additive writing commission has not yet been exercised.
+SC-003_status=pass
+SC-003_value=baseline reconcile reported no structural actions while one additional login-flow writing commission completed in the same isolated run
+SC-003_note=Active Qoder speckit.docs surface in /tmp/spec-kit-048-us3 created exactly one canonical `docs/tutorials/login-flow.md` from `src/specify_cli/auth_flow.py`, updated human indexes, and preserved the baseline reconcile result.
 
 SC-004_status=pass
 SC-004_value=79/79 unfaulted Markdown documents retained identical SHA-256 hashes
@@ -39,10 +39,14 @@ SC-005_value=0 owner-derived baseline facts copied into templates/docs-target-st
 SC-005_note=tests/contract/test_docs_target_structure_declaration.py derives filename/directory facts from the create-docs owner; combined US1 suite passed 19/19.
 
 SC-006_status=pass
-SC-006_value=19/19 US1 structural contract tests passed
-SC-006_note=Command retains exactly six top-level sections, required scope/artifact/gate literals, and no inlined `R0 需求解析`; engine and baseline details remain referenced to owners.
+SC-006_value=77/77 complete docs-reconcile contract tests passed
+SC-006_note=Command retains exactly six top-level sections, required scope/artifact/gate literals, and no inlined `R0 需求解析`; engine and baseline details remain referenced to owners. The final suite includes target declaration, routing, additive writing/discovery, gate sweep, and command classification coverage.
+
+SC-007_status=pass
+SC-007_value=5/5 content-plan inputs present; 1 canonical document; 0 near-duplicates; 3 fixed lookup surfaces verified
+SC-007_note=US3 surface run captured target reader/task context/user input/repository evidence/writing boundary, found no existing owner, selected `docs/tutorials/login-flow.md`, updated README and `docs/tutorials/index.md`, dispatched `/speckit.instructions`, and verified `.specify/instructions.md` plus AGENTS/QODER/CLAUDE/Copilot symlinks resolve the same Documentation Map row.
 
 deferred_tasks=
 deferred_reason_summary=
 
-notes=Phase 1 baseline captured before implementation source edits. Full-suite failure names are in baseline-failed.txt; gate and mirror outputs are in baseline-gates.json and baseline-mirrors.txt. The mirror baseline contains six MISS rows, zero DIFF rows, and fifteen note rows; the note count changed from the planning observation and is treated as observed external baseline state. Foundational RED: tests/contract/test_docs_command_template.py collected 13 tests; 11 passed and exactly 2 failed because the canonical command lacked skills/improve-docs/SKILL.md delegation and .specify/docs/target-structure.md. US1: declaration suite collected 6 tests and went RED 5/1 before implementation; first GREEN run exposed an assertion defect where generic `/` and `docs/` tokens were mistaken for owner enumerations, so the assertion was narrowed rather than corrupting the correct template; combined suite then passed 19/19. US2: routing/skill-pair suite collected 16 tests and went RED 7/9. First GREEN run passed routing assertions but the phrase `no new confirmation gate` triggered the gate scanner itself; the assertion and command were corrected to equivalent non-triggering wording (`does not introduce another gate`), after which the targeted suite passed 47/47 and scanner returned 23 gates, zero violations.
+notes=Phase 1 baseline captured before implementation source edits. Full-suite failure names are in baseline-failed.txt; gate and mirror outputs are in baseline-gates.json and baseline-mirrors.txt. The mirror baseline contains six MISS rows, zero DIFF rows, and fifteen note rows; the note count changed from the planning observation and is treated as observed external baseline state. Foundational RED: tests/contract/test_docs_command_template.py collected 13 tests; 11 passed and exactly 2 failed because the canonical command lacked skills/improve-docs/SKILL.md delegation and .specify/docs/target-structure.md. US1: declaration suite collected 6 tests and went RED 5/1 before implementation; first GREEN run exposed an assertion defect where generic `/` and `docs/` tokens were mistaken for owner enumerations, so the assertion was narrowed rather than corrupting the correct template; combined suite then passed 19/19. US2: routing/skill-pair suite collected 16 tests and went RED 7/9. First GREEN run passed routing assertions but the phrase `no new confirmation gate` triggered the gate scanner itself; the assertion and command were corrected to equivalent non-triggering wording (`does not introduce another gate`), after which the targeted suite passed 47/47 and scanner returned 23 gates, zero violations. US3: the current 11-test orchestration suite was run against prior MVP commit d56fa466 and produced historical RED 9/2, including the implementation-time user revision for what-to-write/where-it-lives/discovery. Current implementation plus related suites passed 77/77; command copies regenerated cleanly and gate scan remained 23/0. Active surface evidence in /tmp/spec-kit-048-us3: writing commission used all five content-plan inputs, produced exactly one canonical login-flow tutorial and zero near-duplicates, updated README/tutorials index, refreshed `.specify/instructions.md` via `/speckit.instructions`, and verified all four compatibility files remained symlinks exposing the same Documentation Map row. Structural-change scenario updated only the target managed block with prefix/suffix bytes unchanged. Fan-out announced 21 actions, completed 2, stopped at a document boundary, preserved both corrections, and reported 19 pending without rollback.

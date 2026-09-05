@@ -30,6 +30,13 @@ Content outside the managed block is reserved for human notes and must remain by
 |---------------|---------------|----------|
 | [TOPIC_CLUSTER] | [TARGET_LOCATION] | [SOURCE_PATHS] |
 
+## 固定检索入口
+
+| Consumer | Entry point | Refresh method |
+|----------|-------------|----------------|
+| Human | [HUMAN_INDEX_ENTRY] | Update the canonical index in the same reconcile run |
+| Agent | `.specify/instructions.md` § Documentation Map | Run `/speckit.instructions` when canonical documentation locations change |
+
 ## 最后确认
 
 - Date: [CONFIRMED_DATE]

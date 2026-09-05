@@ -6,7 +6,7 @@
 
 ## Summary
 
-把 `/speckit.docs` 从"只委托 create-docs 的薄分发层"改造为**目标结构驱动的三段式调协编排**,三段全部落在既有 `## Outline` 之内(不新增顶层小节、不新增运行模式):① 首次运行设计项目专属**目标结构声明**并持久化到 `.specify/docs/target-structure.md`(受管块形态,沿用 `.specify/git-workflow.md` 先例);② 现状对目标做容忍带先行的差异计算,分解为携带 owning 技能的**分型动作**;③ 结构类动作分发 `create-docs`、内容类动作分发 `improve-docs`——后者**首次进入命令分发链路**。
+把 `/speckit.docs` 从"只委托 create-docs 的薄分发层"改造为**目标结构驱动的三段式调协编排**,三段全部落在既有 `## Outline` 之内(不新增顶层小节、不新增运行模式):① 首次运行设计项目专属**目标结构声明**并持久化到 `.specify/docs/target-structure.md`(受管块形态,沿用 `.specify/git-workflow.md` 先例);② 现状对目标做容忍带先行的差异计算,分解为携带 owning 技能的**分型动作**;③ 结构类动作分发 `create-docs`、内容类动作分发 `improve-docs`——后者**首次进入命令分发链路**。实现期用户修订进一步把编排收敛到两个核心问题:写什么(项目证据 + 当前语境 + 用户输入 + 目标读者)与放哪里(唯一 canonical home + 去重 + 固定检索路径);canonical 文档位置变化时通过 `/speckit.instructions` 刷新 Agent instructions 的 Documentation Map。
 
 技术路径的核心是**零新增运行时代码**:声明是 LLM 撰写的受管块 Markdown(新增一份 `templates/` 制品模板作为骨架),动作分解与分发是命令模板的编排文字,`docs-utils.py` 不增动作、不改契约。**新增确认门控数为 0**——声明批准(FR-003)、隐含结构变更回写(FR-010)、目标重设计提议(FR-015)、扇出规模告知与中止(FR-008)全部并入既有 R4 干跑计划这**同一个**已治理门控,是"单引擎坍缩"纪律在门控维度的同构应用。
 
@@ -35,7 +35,7 @@
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
-| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | requirements.md 先行(15 FR + FR-002a / 6 SC / 3 story),clarify 三决策已集成;本 plan 由其派生 |
+| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | requirements.md 先行(19 FR,含 FR-002a 与实现期 FR-016…FR-018 / 7 SC / 3 story),clarify 决策与实现期用户修订均已集成;本 plan 由其派生 |
 | II | Feature-Centric Development | ✅ Pass | 绑定 Feature 037 第四次 follow-up;`features/037.md` 已交叉引用,`features.md` 037 行已载 follow-up 说明 |
 | III | Intent-Driven Development | ✅ Pass | 用户意图"先设目标再逐次调协 + 带参叠加"直接映射为三段编排与 FR-009 叠加语义 |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | 3 份新契约(orchestration / declaration / action-routing)先于实现产出;既有 033 契约 6 条修订(5 条行为修订 + C-8 事实纠正)与配套断言在 tasks 阶段先写测试 |
