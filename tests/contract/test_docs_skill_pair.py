@@ -97,3 +97,14 @@ def test_c18_create_docs_keeps_structural_ownership():
     text = skill_text("create-docs")
     assert "Desired-State Baseline" in text, "create-docs must keep the desired-state baseline"
     assert "Bootstrap" in text, "create-docs must keep bootstrap ownership"
+
+
+@pytest.mark.contract
+def test_c18_improve_docs_excludes_target_contract_and_names_run_artifacts_precisely():
+    text = skill_text("improve-docs")
+    assert ".specify/docs/target-structure.md" in text
+    assert "cross-run non-document contract" in text
+    assert "never edit" in text.lower()
+    assert ".specify/docs/plans/" in text
+    assert ".specify/docs/audit/" in text
+    assert ".specify/docs/**` run artifacts" not in text

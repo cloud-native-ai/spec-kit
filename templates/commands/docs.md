@@ -37,9 +37,27 @@ The persistent project-specific declaration is `.specify/docs/target-structure.m
 4. If repository evidence shows **substantive drift**, add a **redesign proposal** to the same R4 plan. The declaration remains byte-identical **before confirmation**.
 5. On missing, unpaired, or unparseable markers, stop and request repair or explicit rebuild authorization; never overwrite the whole file. A valid refresh replaces only managed content and preserves all **outside-block bytes**.
 
-### Stages 2–3 — Reconcile and dispatch
+### Stage 2 — Diff and decompose typed actions
 
-After Stage 1 yields a confirmed target, compare current state with it through the tolerance band and delegate execution to the two owning skills. `$ARGUMENTS` remains an input to this one reconcile engine; it never creates a separate top-level mode. The detailed typed-action and additive-input routing is part of this orchestration and must preserve the owners' constraints.
+After Stage 1 yields a confirmed target, compare current state with it **tolerance band first**. A tolerated difference is reported as consistent and **must not become an action**.
+
+Every substantive action row MUST carry: **type**, **target**, **owning skill**, **confirmation tier**, **source**, and execution result; a content action also carries **evidence**. The source is either baseline reconcile or user input. A **content action requires concrete evidence** from deterministic findings, verified staleness, user correction, or feedback; **Unobserved** is not a defect and produces no content action.
+
+Route each action **mechanically** to **exactly one owning skill**:
+
+- **structure** — placement, naming, creation, move, archive, index, frontmatter, or link structure → `create-docs`;
+- **content** — accuracy, staleness, completeness, readability, or render-safe prose in an existing correctly placed document → `improve-docs`;
+- **user commission** — classify by its actual structure/content effect, then use the same routing rule.
+
+### Stage 3 — Dispatch and report
+
+Dispatch structural actions through one `create-docs` reconcile. Dispatch judgement-based content actions **one document at a time**, **sequential** in severity order; only a single mechanical dimension may use the bounded-batch exception owned by `improve-docs`.
+
+Content dispatch has **no per-run cap** and MUST NOT truncate or silently defer the tail. Before dispatch, **announce the full document count** so the user can **abort before dispatch**. Each document boundary is another abort point: **completed actions stay completed**, while unstarted actions become `pending` in the residual report for the next run.
+
+Use the owners' existing confirmation tiers; this orchestration **does not introduce another gate**. Group the residual report by owning skill and list converged, tolerated, pending-human-decision, pending, and “no finding” outcomes. Append the audit log even on **zero convergence**.
+
+`$ARGUMENTS` remains an input to this one reconcile engine; it never creates a separate top-level mode. Additive-input routing is completed below without weakening these invariants.
 
 **Delegation (mandatory)**: load both owning skills. Do NOT inline or re-implement their baseline, scope table, gates, reconcile loop, authoring rules, or content-improvement rules here.
 

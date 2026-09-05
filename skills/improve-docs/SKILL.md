@@ -100,7 +100,7 @@ Report: the document changed, the evidence behind each edit, class per edit, bef
 - **Never delete content as an improvement.** Superseded prose is corrected or annotated; removal at file scope goes through `create-docs` (archive-not-delete).
 - **Never assert what you did not verify.** An unverifiable claim is either dropped with a note or marked as needing confirmation — do not launder a guess into documentation.
 - **Never edit a generated file or a mirror.** Files carrying an `AUTO-GENERATED` header, `.specify/**` mirrors, and per-tool command copies are outputs: fix the canonical source, then run `python3 scripts/python/sync-mirrors.py --write`.
-- **Never touch machine-managed stores** (`.specify/memory/**` data files, `.specify/docs/**` run artifacts, `docs/public/`) as if they were documentation.
+- **Never touch non-document managed state as documentation.** `.specify/docs/target-structure.md` is a **cross-run non-document contract**: read only when context requires it and **never edit** it. `.specify/docs/plans/` and `.specify/docs/audit/` are run artifacts; `.specify/memory/**` is machine-managed data; `docs/public/` is generated presentation output.
 - **Never restyle without a finding.** Cosmetic churn on an unfaulted document is a violation of the anti-churn discipline, not an improvement.
 - **Reserved filenames stay reserved** (`README.md` / `ARCHITECTURE.md` / `CONTRIBUTING.md` / `CHANGELOG.md` at the root only; directory indexes are `index.md`).
 - **Do not improve this skill or `create-docs` here** → `improve-skills`.
