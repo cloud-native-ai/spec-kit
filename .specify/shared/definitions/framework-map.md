@@ -17,6 +17,7 @@ This is a **map, not a manual**: it tells you *what* exists and *where* it lives
 | **Agent Instances** | `.specify/agents/instances/` | responsibility-bound agents authored in this project; reference a Template |
 | **Agent Execution** | `.specify/agents/execution/` | dispatch `configs/` + `scripts/` (tracked); runtime `logs/` (gitignored, never committed) |
 | Teams | `.specify/teams/<slug>/` | team definitions + `runs/` reports; run intermediates in git-ignored `.work/` |
+| Derivations | `.specify/derive/` | one derivation archive per topic (`<topic-slug>/derive.md`) plus the project-level reasoning-move library `moves.md` (engine-written, accumulating); record semantics in `definitions/derivation-definitions.md` |
 | Shared definitions & conventions | `.specify/shared/` | canonical concept docs — e.g. agent taxonomy (`definitions/agent-definitions.md`), subagent modes (`definitions/subagent-definitions.md`), tool definitions, workflow conventions |
 | Feature specs | `.specify/specs/<ID>-<slug>/` | requirements / plan / tasks / verification per feature |
 | Canonical AI instructions | `.specify/instructions.md` | single source of truth for project-level AI instructions; per-tool files are symlinks (see `workflow/symlink-model.md`) |

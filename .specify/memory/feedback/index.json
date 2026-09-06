@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-03T14:59:45Z",
+  "updated": "2026-09-05T12:03:55Z",
   "threshold": 10,
-  "count_since_submission": 3,
+  "count_since_submission": 4,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260905T120355Z-speckit-skills",
+      "file": "20260905T120355Z-speckit-skills.md",
+      "unit_id": "/speckit.skills",
+      "unit_type": "command",
+      "run_id": "048-derive-command:skills-orchestration:2026-09-05T12:03Z",
+      "probe": "speckit-skills-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "048-derive-command",
+      "feature_id": "049",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-05T12:03:55Z",
+      "summary": "编排入口被用于「创建新命令 /speckit.derive」。路由本身正确(目标不存在 → create 分支),但 create 分支无条件委派 create-skills,而本仓的 /speckit.* 命令不是技能:命令真源是 templates/commands/<name>.md,经 regen-command-copies.py 扇出到 .claude/.github/.qoder/."
+    },
     {
       "id": "20260903T145945Z-skill-create-skills",
       "file": "20260903T145945Z-skill-create-skills.md",
