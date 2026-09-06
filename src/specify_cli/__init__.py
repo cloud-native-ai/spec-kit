@@ -2866,9 +2866,11 @@ def init(
         highlight=False,
     )
     console.print(
-        "  Optional: /speckit.clarify /speckit.interview /speckit.analyze "
-        "/speckit.checklist /speckit.research /speckit.review /speckit.agents "
-        "/speckit.tools /speckit.skills /speckit.instructions",
+        "  Optional: /speckit.agents /speckit.analyze /speckit.checklist /speckit.clarify "
+        "/speckit.derive /speckit.docs /speckit.feedback /speckit.goal "
+        "/speckit.history /speckit.instructions /speckit.interview "
+        "/speckit.research /speckit.review /speckit.sanitize /speckit.session "
+        "/speckit.skills /speckit.team /speckit.todo /speckit.tools",
         highlight=False,
     )
 

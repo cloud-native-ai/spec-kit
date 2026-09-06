@@ -27,10 +27,11 @@
 - **收集内容**: 命令单次运行的回顾与 ≥1 条单元级优化点
 - **处理流程**: record→threshold→package→manual→mark-submitted
 - **适用插入位置**: wrap-up
-- **Objects** (20):
+- **Objects** (21):
   - `speckit-analyze-wrapup` — /speckit.analyze @ wrap-up
   - `speckit-checklist-wrapup` — /speckit.checklist @ wrap-up
   - `speckit-clarify-wrapup` — /speckit.clarify @ wrap-up
+  - `speckit-derive-wrapup` — /speckit.derive @ wrap-up
   - `speckit-docs-wrapup` — /speckit.docs @ wrap-up
   - `speckit-feedback-wrapup` — /speckit.feedback @ wrap-up
   - `speckit-goal-wrapup` — /speckit.goal @ wrap-up
@@ -135,6 +136,7 @@ graph TD
   class_command_wrapup --> obj_speckit_analyze_wrapup[speckit-analyze-wrapup]
   class_command_wrapup --> obj_speckit_checklist_wrapup[speckit-checklist-wrapup]
   class_command_wrapup --> obj_speckit_clarify_wrapup[speckit-clarify-wrapup]
+  class_command_wrapup --> obj_speckit_derive_wrapup[speckit-derive-wrapup]
   class_command_wrapup --> obj_speckit_docs_wrapup[speckit-docs-wrapup]
   class_command_wrapup --> obj_speckit_feedback_wrapup[speckit-feedback-wrapup]
   class_command_wrapup --> obj_speckit_goal_wrapup[speckit-goal-wrapup]
@@ -217,6 +219,7 @@ graph TD
 | `speckit-analyze-wrapup` | command-wrapup | internal | /speckit.analyze @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-checklist-wrapup` | command-wrapup | internal | /speckit.checklist @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-clarify-wrapup` | command-wrapup | internal | /speckit.clarify @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `speckit-derive-wrapup` | command-wrapup | internal | /speckit.derive @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-docs-wrapup` | command-wrapup | internal | /speckit.docs @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-feedback-wrapup` | command-wrapup | internal | /speckit.feedback @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-goal-wrapup` | command-wrapup | internal | /speckit.goal @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |

@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-06T01:01:07Z",
+  "updated": "2026-09-06T02:45:01Z",
   "threshold": 10,
-  "count_since_submission": 2,
+  "count_since_submission": 5,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260906T021316Z-skill-git-workflow",
+      "file": "20260906T021316Z-skill-git-workflow.md",
+      "unit_id": "skill:git-workflow",
+      "unit_type": "skill",
+      "run_id": "048-derive-command-merge-20260905",
+      "probe": "skill-git-workflow-wrapup",
+      "kind": "internal",
+      "slice": "skills",
+      "feature": "",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-06T02:13:16Z",
+      "summary": "Ran the skill in Execute scope for the 048-derive-command delivery: commit the branch's work, then merge into master. Observed the managed block in .specify/git-workflow.md is still the 'None yet.' pl"
+    },
     {
       "id": "20260906T010107Z-skill-git-workflow",
       "file": "20260906T010107Z-skill-git-workflow.md",
@@ -24,6 +42,24 @@
       "summary": "已按用户明确授权完成本地提交与合并:先提交反馈 package/cleanup 闭环为 221af891,再验证 master 是功能分支祖先并以 --ff-only 将 048-docs-reconcile 快进合入 master;未 force/reset、未推送远端、合并后功能分支零未合入提交。"
     },
     {
+      "id": "20260905T120355Z-speckit-skills",
+      "file": "20260905T120355Z-speckit-skills.md",
+      "unit_id": "/speckit.skills",
+      "unit_type": "command",
+      "run_id": "048-derive-command:skills-orchestration:2026-09-05T12:03Z",
+      "probe": "speckit-skills-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "048-derive-command",
+      "feature_id": "049",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-05T12:03:55Z",
+      "summary": "编排入口被用于「创建新命令 /speckit.derive」。路由本身正确(目标不存在 → create 分支),但 create 分支无条件委派 create-skills,而本仓的 /speckit.* 命令不是技能:命令真源是 templates/commands/<name>.md,经 regen-command-copies.py 扇出到 .claude/.github/.qoder/."
+    },
+    {
       "id": "20260905T095250Z-speckit-feedback",
       "file": "20260905T095250Z-speckit-feedback.md",
       "unit_id": "/speckit.feedback",
@@ -40,6 +76,24 @@
       "partial": false,
       "created": "2026-09-05T09:52:50Z",
       "summary": "完成 Mode 2 package 闭环:状态 10/10,待打包 10 条均为 internal 且无 introspection_ref;生成 20,083-byte zip,MANIFEST 存在且含 10 条 Markdown 记录;cleanup dry-run 精确列出 10 条,实际 cleanup 全部移除,活动 store 归零。未执行网络发送或 mark-submitted,z"
+    },
+    {
+      "id": "20260903T145945Z-skill-create-skills",
+      "file": "20260903T145945Z-skill-create-skills.md",
+      "unit_id": "skill:create-skills",
+      "unit_type": "skill",
+      "run_id": "create-skills-git-server-init-20260903",
+      "probe": "skill-create-skills-wrapup",
+      "kind": "internal",
+      "slice": "skills",
+      "feature": "",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-03T14:59:45Z",
+      "summary": "以 spec-kit 仓库根 skills/ 为 canonical 源创建 git-server-init（把普通 SSH 服务器置备为 Git 服务器：git 用户 + 裸仓库 + 公钥授权 + 本机 ssh config 条目）。走完 Step 0 模式判定（Spec Kit project mode）、跨 SSOT 命名冲突扫描（8 处加载目录零命中）、可写性预检、脚手架、身份定稿、校验（"
     }
   ],
   "introspections": [

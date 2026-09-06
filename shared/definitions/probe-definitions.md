@@ -46,6 +46,7 @@
 | speckit-analyze-wrapup | command-wrapup | /speckit.analyze | wrap-up |
 | speckit-checklist-wrapup | command-wrapup | /speckit.checklist | wrap-up |
 | speckit-clarify-wrapup | command-wrapup | /speckit.clarify | wrap-up |
+| speckit-derive-wrapup | command-wrapup | /speckit.derive | wrap-up |
 | speckit-docs-wrapup | command-wrapup | /speckit.docs | wrap-up |
 | speckit-goal-wrapup | command-wrapup | /speckit.goal | wrap-up |
 | speckit-history-wrapup | command-wrapup | /speckit.history | wrap-up |

@@ -130,7 +130,7 @@ def test_c8_feedback_step_conformance():
     assert '"/speckit.docs"' in text, "feedback unit-id must be /speckit.docs"
     classification = runpy.run_path(str(REPO_ROOT / "tests" / "contract" / "test_feedback_command_classification.py"))
     assert "docs" in classification["COMPLEX_COMMANDS"]
-    assert len(classification["COMPLEX_COMMANDS"]) == 18
+    assert len(classification["COMPLEX_COMMANDS"]) == 19
     assert len(classification["SIMPLE_COMMANDS"]) == 4
 
 

@@ -16,7 +16,7 @@
 - **C-5** 四件按次强制产物及其落点 MUST 由 `create-docs` 技能声明：观察快照（内联）、干跑计划（`.specify/docs/plans/`）、审计日志（`.specify/docs/audit/`，零收敛也落盘）、残差报告（内联）；命令 SHOULD 点名四件产物以稳定用户预期。命令另 MUST 声明第五件跨运行产物 `.specify/docs/target-structure.md`，并引用 `templates/docs-target-structure-template.md` 的骨架；第五件不属于按次产物、不得随其轮转。
 - **C-6** 技能 MUST 声明归档区为 `docs/archive/`，且正式区动作词汇中不出现"删除"（notes 区确认删除除外，须引用 FR-006c 语义，即"只归档不删除"）。
 - **C-7** 模板 MUST 保持薄编排层：`## Outline` MAY 展开目标结构、差异动作、双技能分发这三段编排，但引擎细节仍须引用 `shared/patterns/reconcile-pattern.md`、`create-docs` 与 `improve-docs`，MUST NOT 内联完整 R0–R6、基线枚举或门禁判据（reconcile-pattern §Applying-6）。
-- **C-8** `## Feedback` 节 MUST 符合 `shared/workflow/feedback-step.md` 约定（unit-id `/speckit.docs`、unit-type command）；`docs` MUST 保持在 `tests/contract/test_feedback_command_classification.py` 的 `COMPLEX_COMMANDS` 清单。当前分类真源是该测试模块：18 complex / 4 simple；本需求不改变分类。
+- **C-8** `## Feedback` 节 MUST 符合 `shared/workflow/feedback-step.md` 约定（unit-id `/speckit.docs`、unit-type command）；`docs` MUST 保持在 `tests/contract/test_feedback_command_classification.py` 的 `COMPLEX_COMMANDS` 清单。当前分类真源是该测试模块：19 complex / 4 simple（上游新增 `derive` 后）；docs-reconcile 本身不改变分类。
 - **C-9** 期望态基线内容 MUST 与 requirements.md FR-002/FR-010 一致，并由技能承载：六类目录 + notes；特殊名注册表四条种子（README/ARCHITECTURE/CONTRIBUTING/CHANGELOG 及各自语义）。
 - **C-10** 运行时副本 MUST 覆盖仓库中已存在的全部工具命令目录（.claude/.github/.qoder/.qwen/.opencode/.codex/.hermes/.iflow 等），由 `regen-command-copies.py` 生成，禁止手改。
 - **C-11** 命令参考文档 MUST 新增 `docs/reference/commands/docs.md`（结构对齐既有命令参考文档；dogfooding 重组前路径为 `docs/commands/docs.md`），并在 `docs/tutorials/quickstart.md` 命令表加行。
