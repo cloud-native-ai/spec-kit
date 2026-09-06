@@ -210,6 +210,7 @@ The following commands are **prompt instructions** for your AI Agent. For detail
 | `/speckit.analyze` | Cross-artifact consistency analysis (read-only) | [details →](../reference/commands/analyze.md) |
 | `/speckit.checklist` | Generate quality checklists ("unit tests for English") | [details →](../reference/commands/checklist.md) |
 | `/speckit.research` | Conduct technical research to inform decisions | [details →](../reference/commands/research.md) |
+| `/speckit.derive` | Derive an architecture by replaying verified sources' reasoning methods | [details →](../reference/commands/derive.md) |
 
 ### Governance & Extension
 
@@ -226,6 +227,9 @@ The following commands are **prompt instructions** for your AI Agent. For detail
 | `/speckit.history` | Distill past AI conversations into a theme-aggregated knowledge base | [details →](../reference/commands/history.md) |
 | `/speckit.docs` | Standardize and manage the project documentation space (reconcile engine) | [details →](../reference/commands/docs.md) |
 | `/speckit.todo` | Discover TODO blocks in files and turn them into execution plans | [details →](../reference/commands/todo.md) |
+| `/speckit.feedback` | Manage local feedback: probe overview, disposition, introspection, packaging | [details →](../reference/commands/feedback.md) |
+| `/speckit.sanitize` | Detect stale framework material and clean it under the two-level criteria | [details →](../reference/commands/sanitize.md) |
+| `/speckit.session` | Export the current session to a user-named directory | [details →](../reference/commands/session.md) |
 
 ### Command Prerequisites & Next Steps
 
@@ -239,6 +243,7 @@ Commands follow a natural order. The table below shows common prerequisites and 
 | `/speckit.clarify` | `/speckit.requirements` | `/speckit.plan` |
 | `/speckit.interview` | None (commonly `/speckit.clarify` hitting its question cap) | Depends on the converged artifact: `/speckit.plan`, `/speckit.tasks`, `/speckit.implement`, `/speckit.goal` |
 | `/speckit.research` | `/speckit.requirements` or `/speckit.plan` | `/speckit.plan` |
+| `/speckit.derive` | None (a topic and, ideally, a source list) | `/speckit.plan`, `/speckit.clarify` for its open questions |
 | `/speckit.plan` | `/speckit.requirements` (clarify done if needed) | `/speckit.tasks`, `/speckit.checklist` |
 | `/speckit.tasks` | `/speckit.plan` | `/speckit.analyze`, `/speckit.implement` |
 | `/speckit.analyze` | `/speckit.tasks` | Upstream revisions, `/speckit.implement` |

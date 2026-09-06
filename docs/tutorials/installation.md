@@ -109,7 +109,9 @@ After initialization, you should see the following structure and commands:
 | `/speckit.feature` | Manage feature lifecycle and registry |
 | `/speckit.requirements` | Create/update the requirements specification (WHAT/WHY) |
 | `/speckit.clarify` | Resolve ambiguities in specifications |
+| `/speckit.interview` | Interview you in rounds until an artifact converges |
 | `/speckit.research` | Conduct technical research to inform decisions |
+| `/speckit.derive` | Derive an architecture by replaying verified sources' reasoning methods |
 | `/speckit.plan` | Generate implementation plans from specs |
 | `/speckit.tasks` | Break down plans into actionable tasks |
 | `/speckit.checklist` | Generate quality gate checklists |
@@ -124,6 +126,10 @@ After initialization, you should see the following structure and commands:
 | `/speckit.instructions` | Generate/update AI agent instructions and symlinks |
 | `/speckit.todo` | Discover TODO blocks in files and turn them into execution plans |
 | `/speckit.history` | Distill past AI conversations into a theme-aggregated knowledge base |
+| `/speckit.docs` | Standardize and manage the project documentation space |
+| `/speckit.feedback` | Manage local feedback: probe overview, disposition, packaging |
+| `/speckit.sanitize` | Detect stale framework material and clean it under the two-level criteria |
+| `/speckit.session` | Export the current session to a user-named directory |
 
 **Next step**: Run `/speckit.agents` (no arguments) in your AI agent to generate seven role-based development workflow agents tailored to your project's context.
 
