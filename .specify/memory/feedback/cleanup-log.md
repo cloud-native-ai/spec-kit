@@ -49,3 +49,14 @@
 - removed 20260820T081055Z-speckit-feedback (/speckit.feedback, created 2026-08-20T08:10:55Z) — archived in feedback-20260831T093456Z.zip
 - removed 20260820T075028Z-skill-improve-skills (skill:improve-skills, created 2026-08-20T07:50:28Z) — archived in feedback-20260831T093456Z.zip
 - removed 20260820T062957Z-skill-improve-skills (skill:improve-skills, created 2026-08-20T06:29:57Z) — archived in feedback-20260831T093456Z.zip
+## 2026-09-05T09:51:52Z — feedback-20260905T095124Z.zip
+- removed 20260905T044758Z-speckit-implement (/speckit.implement, created 2026-09-05T04:47:58Z) — archived in feedback-20260905T095124Z.zip
+- removed 20260902T151311Z-speckit-analyze (/speckit.analyze, created 2026-09-02T15:13:11Z) — archived in feedback-20260905T095124Z.zip
+- removed 20260902T031233Z-speckit-analyze (/speckit.analyze, created 2026-09-02T03:12:33Z) — archived in feedback-20260905T095124Z.zip
+- removed 20260901T070557Z-speckit-analyze (/speckit.analyze, created 2026-09-01T07:05:57Z) — archived in feedback-20260905T095124Z.zip
+- removed 20260901T061626Z-speckit-tasks (/speckit.tasks, created 2026-09-01T06:16:26Z) — archived in feedback-20260905T095124Z.zip
+- removed 20260901T040825Z-speckit-plan (/speckit.plan, created 2026-09-01T04:08:25Z) — archived in feedback-20260905T095124Z.zip
+- removed 20260901T032924Z-speckit-clarify (/speckit.clarify, created 2026-09-01T03:29:24Z) — archived in feedback-20260905T095124Z.zip
+- removed 20260901T024106Z-speckit-requirements (/speckit.requirements, created 2026-09-01T02:41:06Z) — archived in feedback-20260905T095124Z.zip
+- removed 20260831T121146Z-speckit-feedback (/speckit.feedback, created 2026-08-31T12:11:46Z) — archived in feedback-20260905T095124Z.zip
+- removed 20260831T093636Z-speckit-feedback (/speckit.feedback, created 2026-08-31T09:36:36Z) — archived in feedback-20260905T095124Z.zip
