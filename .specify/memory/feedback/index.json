@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-05T12:03:55Z",
+  "updated": "2026-09-06T02:13:16Z",
   "threshold": 10,
-  "count_since_submission": 4,
+  "count_since_submission": 5,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260906T021316Z-skill-git-workflow",
+      "file": "20260906T021316Z-skill-git-workflow.md",
+      "unit_id": "skill:git-workflow",
+      "unit_type": "skill",
+      "run_id": "048-derive-command-merge-20260905",
+      "probe": "skill-git-workflow-wrapup",
+      "kind": "internal",
+      "slice": "skills",
+      "feature": "",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-06T02:13:16Z",
+      "summary": "Ran the skill in Execute scope for the 048-derive-command delivery: commit the branch's work, then merge into master. Observed the managed block in .specify/git-workflow.md is still the 'None yet.' pl"
+    },
     {
       "id": "20260905T120355Z-speckit-skills",
       "file": "20260905T120355Z-speckit-skills.md",
