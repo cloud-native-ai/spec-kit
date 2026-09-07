@@ -1,0 +1,2927 @@
+{
+  "projectProfile": {
+    "schemaVersion": 1,
+    "kind": "project-profile",
+    "status": "ok",
+    "repoRoot": ".",
+    "filters": {
+      "ignorePatterns": [],
+      "ignoredCount": 0,
+      "ignoredSample": []
+    },
+    "projectInfo": {
+      "name": "🌱 Spec Kit",
+      "description": "",
+      "readmeTitle": "🌱 Spec Kit",
+      "evidence": [
+        "README.md:h1"
+      ],
+      "primaryLanguages": [
+        {
+          "language": "javascript",
+          "sourceFiles": 162,
+          "testFiles": 14
+        },
+        {
+          "language": "python",
+          "sourceFiles": 137,
+          "testFiles": 270
+        }
+      ],
+      "frameworks": [],
+      "sourceFiles": 299,
+      "testFiles": 284,
+      "measuredSourceLines": null,
+      "sourceLineStatus": "skipped",
+      "sourceLineMethod": "not measured by default; use --measure-source-lines to count tracked readable primary source files only",
+      "sourceRoots": [
+        {
+          "path": ".specify",
+          "files": 148
+        },
+        {
+          "path": "scripts",
+          "files": 83
+        },
+        {
+          "path": "skills",
+          "files": 65
+        },
+        {
+          "path": "src",
+          "files": 3
+        }
+      ],
+      "entryCandidates": [
+        {
+          "path": ".specify/scripts/js/better-harness/agent-customize/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/agent-customize/providers/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/agent-lint/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/coding-agent-practices/asset-eval/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/session-analysis/index.mjs",
+          "language": "javascript",
+          "score": 65
+        }
+      ],
+      "manifests": [
+        {
+          "path": ".specify/scripts/js/better-harness/package.json",
+          "kind": "node",
+          "scripts": []
+        },
+        {
+          "path": ".specify/skills/browser-utils/scripts/bridge/package.json",
+          "kind": "node",
+          "scripts": [
+            "setup",
+            "start"
+          ]
+        },
+        {
+          "path": ".specify/skills/browser-utils/scripts/js/package.json",
+          "kind": "node",
+          "scripts": [
+            "install-all-browsers",
+            "setup"
+          ]
+        },
+        {
+          "path": ".specify/skills/database-utils/requirements.txt",
+          "kind": "python",
+          "scripts": []
+        },
+        {
+          "path": ".specify/skills/draw-mermaid/server/package.json",
+          "kind": "node",
+          "scripts": [
+            "start"
+          ]
+        },
+        {
+          "path": "pyproject.toml",
+          "kind": "toml",
+          "scripts": []
+        },
+        {
+          "path": "scripts/js/better-harness/package.json",
+          "kind": "node",
+          "scripts": []
+        },
+        {
+          "path": "skills/browser-utils/scripts/bridge/package.json",
+          "kind": "node",
+          "scripts": [
+            "setup",
+            "start"
+          ]
+        }
+      ]
+    },
+    "agentInstructions": {
+      "count": 1,
+      "rootCount": 1,
+      "nestedCount": 0,
+      "files": [
+        {
+          "path": "AGENTS.md",
+          "scope": "."
+        }
+      ],
+      "status": "thin",
+      "suggestedMinimum": 2,
+      "suggestedAdditional": 1,
+      "sourceFilesPerInstruction": 299,
+      "sourceFilesUnderNestedInstructions": 0,
+      "nestedSourceFileCoveragePercent": 0,
+      "suggestedScopes": [
+        {
+          "path": ".specify/scripts",
+          "sourceFiles": 83
+        },
+        {
+          "path": "scripts/js",
+          "sourceFiles": 66
+        },
+        {
+          "path": ".specify/skills",
+          "sourceFiles": 65
+        },
+        {
+          "path": "skills/document-utils",
+          "sourceFiles": 28
+        },
+        {
+          "path": "scripts/python",
+          "sourceFiles": 17
+        },
+        {
+          "path": "skills/browser-utils",
+          "sourceFiles": 10
+        },
+        {
+          "path": "skills/summarize-project",
+          "sourceFiles": 6
+        },
+        {
+          "path": "skills/create-team",
+          "sourceFiles": 4
+        }
+      ],
+      "reasons": [
+        "root AGENTS.md present",
+        "AGENTS.md count 1 is below suggested minimum 2 for source scale",
+        "large source tree has no nested AGENTS.md coverage"
+      ]
+    },
+    "languages": [
+      {
+        "language": "javascript",
+        "files": 176,
+        "sourceFiles": 162,
+        "testFiles": 14,
+        "roots": [
+          {
+            "name": ".specify/scripts",
+            "count": 66
+          },
+          {
+            "name": "scripts/js",
+            "count": 66
+          },
+          {
+            "name": ".specify/skills",
+            "count": 15
+          },
+          {
+            "name": "tests/js",
+            "count": 14
+          },
+          {
+            "name": "skills/browser-utils",
+            "count": 8
+          },
+          {
+            "name": "skills/draw-echarts",
+            "count": 3
+          },
+          {
+            "name": "skills/draw-mermaid",
+            "count": 2
+          },
+          {
+            "name": "skills/browser-extension",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "language": "python",
+        "files": 407,
+        "sourceFiles": 137,
+        "testFiles": 270,
+        "roots": [
+          {
+            "name": "tests/contract",
+            "count": 140
+          },
+          {
+            "name": "tests/integration",
+            "count": 82
+          },
+          {
+            "name": ".specify/skills",
+            "count": 50
+          },
+          {
+            "name": "tests/unit",
+            "count": 42
+          },
+          {
+            "name": "skills/document-utils",
+            "count": 28
+          },
+          {
+            "name": ".specify/scripts",
+            "count": 17
+          },
+          {
+            "name": "scripts/python",
+            "count": 17
+          },
+          {
+            "name": "skills/summarize-project",
+            "count": 6
+          }
+        ]
+      }
+    ],
+    "manifests": [
+      {
+        "path": ".specify/scripts/js/better-harness/package.json",
+        "kind": "node",
+        "scripts": []
+      },
+      {
+        "path": ".specify/skills/browser-utils/scripts/bridge/package.json",
+        "kind": "node",
+        "scripts": [
+          "setup",
+          "start"
+        ]
+      },
+      {
+        "path": ".specify/skills/browser-utils/scripts/js/package.json",
+        "kind": "node",
+        "scripts": [
+          "install-all-browsers",
+          "setup"
+        ]
+      },
+      {
+        "path": ".specify/skills/database-utils/requirements.txt",
+        "kind": "python",
+        "scripts": []
+      },
+      {
+        "path": ".specify/skills/draw-mermaid/server/package.json",
+        "kind": "node",
+        "scripts": [
+          "start"
+        ]
+      },
+      {
+        "path": "pyproject.toml",
+        "kind": "toml",
+        "scripts": []
+      },
+      {
+        "path": "scripts/js/better-harness/package.json",
+        "kind": "node",
+        "scripts": []
+      },
+      {
+        "path": "skills/browser-utils/scripts/bridge/package.json",
+        "kind": "node",
+        "scripts": [
+          "setup",
+          "start"
+        ]
+      },
+      {
+        "path": "skills/browser-utils/scripts/js/package.json",
+        "kind": "node",
+        "scripts": [
+          "install-all-browsers",
+          "setup"
+        ]
+      },
+      {
+        "path": "skills/database-utils/requirements.txt",
+        "kind": "python",
+        "scripts": []
+      },
+      {
+        "path": "skills/draw-mermaid/server/package.json",
+        "kind": "node",
+        "scripts": [
+          "start"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "sourceRoots": [
+      {
+        "path": ".specify",
+        "files": 148
+      },
+      {
+        "path": "scripts",
+        "files": 83
+      },
+      {
+        "path": "skills",
+        "files": 65
+      },
+      {
+        "path": "src",
+        "files": 3
+      }
+    ],
+    "entryCandidates": [
+      {
+        "path": ".specify/scripts/js/better-harness/agent-customize/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/agent-customize/providers/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/agent-lint/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/coding-agent-practices/asset-eval/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/session-analysis/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/skills/browser-utils/scripts/bridge/server.js",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/skills/draw-mermaid/server/server.js",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/agent-customize/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/agent-customize/providers/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/agent-lint/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/coding-agent-practices/asset-eval/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/session-analysis/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "skills/browser-utils/scripts/bridge/server.js",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "skills/draw-mermaid/server/server.js",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      }
+    ],
+    "corePathHints": [],
+    "totals": {
+      "trackedFiles": 2557,
+      "trackedFilesBeforeFilters": 2557,
+      "sourceFiles": 299,
+      "testFiles": 284,
+      "generatedOrDependencyFiles": 44,
+      "sourceLines": null,
+      "sourceLineMeasurement": "skipped",
+      "readableSourceFiles": 0,
+      "unreadableSourceFiles": 0
+    }
+  },
+  "gitHistoryProfile": {
+    "schemaVersion": 1,
+    "kind": "git-history-profile",
+    "status": "ok",
+    "repoRoot": ".",
+    "filters": {
+      "ignorePatterns": [],
+      "ignoredCount": 0,
+      "ignoredSample": []
+    },
+    "range": {
+      "maxCommits": 500,
+      "analyzedCommits": 500,
+      "newest": "cc344fc",
+      "oldest": "9d9a3b3"
+    },
+    "confidence": {
+      "confidence": "medium",
+      "reasons": [
+        "bounded at maxCommits=500"
+      ]
+    },
+    "historyWindows": [
+      {
+        "days": 30,
+        "since": "2026-08-08T04:13:48.000Z",
+        "analyzedCommits": 110,
+        "trendLabel": "recent-hotspots",
+        "interpretation": "recent window for spotting recent hotspots from bounded git history.",
+        "hotFiles": [
+          {
+            "path": "src/specify_cli/__init__.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 14,
+            "added": 742,
+            "deleted": 160,
+            "churn": 902,
+            "lastTouched": "03b169f"
+          },
+          {
+            "path": ".specify/scripts/python/feedback-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 9,
+            "added": 1327,
+            "deleted": 74,
+            "churn": 1401,
+            "lastTouched": "a32049f"
+          },
+          {
+            "path": "scripts/python/feedback-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 9,
+            "added": 1327,
+            "deleted": 74,
+            "churn": 1401,
+            "lastTouched": "a32049f"
+          },
+          {
+            "path": ".specify/scripts/python/sanitize-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 5,
+            "added": 979,
+            "deleted": 22,
+            "churn": 1001,
+            "lastTouched": "272a9d2"
+          },
+          {
+            "path": "scripts/python/sanitize-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 5,
+            "added": 979,
+            "deleted": 22,
+            "churn": 1001,
+            "lastTouched": "272a9d2"
+          },
+          {
+            "path": ".specify/scripts/python/sync-mirrors.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 5,
+            "added": 147,
+            "deleted": 34,
+            "churn": 181,
+            "lastTouched": "8144bae"
+          },
+          {
+            "path": "scripts/python/sync-mirrors.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 5,
+            "added": 147,
+            "deleted": 34,
+            "churn": 181,
+            "lastTouched": "8144bae"
+          },
+          {
+            "path": ".specify/skills/create-pages/scripts/scaffold-hugo.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 3,
+            "added": 601,
+            "deleted": 77,
+            "churn": 678,
+            "lastTouched": "00abc44"
+          },
+          {
+            "path": "skills/create-pages/scripts/scaffold-hugo.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 3,
+            "added": 588,
+            "deleted": 64,
+            "churn": 652,
+            "lastTouched": "00abc44"
+          },
+          {
+            "path": ".specify/scripts/python/goal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 3,
+            "added": 403,
+            "deleted": 15,
+            "churn": 418,
+            "lastTouched": "2361053"
+          }
+        ],
+        "supportingHotFiles": [
+          {
+            "path": ".specify/memory/feedback/index.json",
+            "language": null,
+            "role": "configuration",
+            "supporting": true,
+            "commits": 33,
+            "added": 1242,
+            "deleted": 2306,
+            "churn": 3548,
+            "lastTouched": "df7ad0d"
+          },
+          {
+            "path": ".specify/memory/features.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 23,
+            "added": 33,
+            "deleted": 26,
+            "churn": 59,
+            "lastTouched": "820ae89"
+          },
+          {
+            "path": ".specify/instructions.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 15,
+            "added": 151,
+            "deleted": 175,
+            "churn": 326,
+            "lastTouched": "cd61d5b"
+          },
+          {
+            "path": ".specify/memory/glossary.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 64,
+            "deleted": 29,
+            "churn": 93,
+            "lastTouched": "cd61d5b"
+          },
+          {
+            "path": "templates/commands/feedback.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 239,
+            "deleted": 40,
+            "churn": 279,
+            "lastTouched": "5c74b0d"
+          },
+          {
+            "path": ".claude/commands/speckit.feedback.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 11,
+            "added": 231,
+            "deleted": 36,
+            "churn": 267,
+            "lastTouched": "5c74b0d"
+          },
+          {
+            "path": ".github/prompts/speckit.feedback.prompt.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 11,
+            "added": 231,
+            "deleted": 36,
+            "churn": 267,
+            "lastTouched": "5c74b0d"
+          },
+          {
+            "path": ".opencode/command/speckit.feedback.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 11,
+            "added": 231,
+            "deleted": 36,
+            "churn": 267,
+            "lastTouched": "5c74b0d"
+          },
+          {
+            "path": "templates/commands/session.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 10,
+            "added": 112,
+            "deleted": 10,
+            "churn": 122,
+            "lastTouched": "4074e28"
+          },
+          {
+            "path": "templates/commands/implement.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 10,
+            "added": 14,
+            "deleted": 9,
+            "churn": 23,
+            "lastTouched": "fa9a70a"
+          }
+        ],
+        "hotPaths": [
+          {
+            "path": ".specify/scripts",
+            "commits": 26
+          },
+          {
+            "path": "scripts/python",
+            "commits": 26
+          },
+          {
+            "path": ".specify/skills",
+            "commits": 16
+          },
+          {
+            "path": "src/specify_cli",
+            "commits": 14
+          },
+          {
+            "path": "skills/create-team",
+            "commits": 4
+          },
+          {
+            "path": "skills/create-pages",
+            "commits": 3
+          },
+          {
+            "path": "skills/export-session",
+            "commits": 2
+          },
+          {
+            "path": "src",
+            "commits": 2
+          },
+          {
+            "path": ".",
+            "commits": 1
+          },
+          {
+            "path": "skills/archive-session",
+            "commits": 1
+          }
+        ]
+      },
+      {
+        "days": 90,
+        "since": "2026-06-09T04:13:48.000Z",
+        "analyzedCommits": 304,
+        "trendLabel": "sustained-hotspots",
+        "interpretation": "sustained window for spotting sustained hotspots from bounded git history.",
+        "hotFiles": [
+          {
+            "path": "src/specify_cli/__init__.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 32,
+            "added": 1681,
+            "deleted": 601,
+            "churn": 2282,
+            "lastTouched": "c1fbe21"
+          },
+          {
+            "path": ".specify/scripts/python/feedback-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 14,
+            "added": 2048,
+            "deleted": 86,
+            "churn": 2134,
+            "lastTouched": "ed4fc0a"
+          },
+          {
+            "path": "scripts/python/feedback-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 14,
+            "added": 2048,
+            "deleted": 86,
+            "churn": 2134,
+            "lastTouched": "ed4fc0a"
+          },
+          {
+            "path": ".specify/skills/create-team/scripts/build-summary-input.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 1147,
+            "deleted": 19,
+            "churn": 1166,
+            "lastTouched": "68fda6f"
+          },
+          {
+            "path": "skills/create-team/scripts/build-summary-input.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 1147,
+            "deleted": 19,
+            "churn": 1166,
+            "lastTouched": "68fda6f"
+          },
+          {
+            "path": ".specify/scripts/python/docs-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 441,
+            "deleted": 7,
+            "churn": 448,
+            "lastTouched": "5dfd868"
+          },
+          {
+            "path": "scripts/python/docs-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 441,
+            "deleted": 7,
+            "churn": 448,
+            "lastTouched": "5dfd868"
+          },
+          {
+            "path": ".specify/scripts/python/sync-mirrors.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 271,
+            "deleted": 36,
+            "churn": 307,
+            "lastTouched": "4b83665"
+          },
+          {
+            "path": "scripts/python/sync-mirrors.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 271,
+            "deleted": 36,
+            "churn": 307,
+            "lastTouched": "4b83665"
+          },
+          {
+            "path": ".specify/scripts/python/evidence-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 6,
+            "added": 875,
+            "deleted": 16,
+            "churn": 891,
+            "lastTouched": "14389b4"
+          }
+        ],
+        "supportingHotFiles": [
+          {
+            "path": ".specify/memory/feedback/index.json",
+            "language": null,
+            "role": "configuration",
+            "supporting": true,
+            "commits": 81,
+            "added": 2545,
+            "deleted": 2412,
+            "churn": 4957,
+            "lastTouched": "d1f58df"
+          },
+          {
+            "path": ".specify/memory/features.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 66,
+            "added": 110,
+            "deleted": 85,
+            "churn": 195,
+            "lastTouched": "c1fbe21"
+          },
+          {
+            "path": ".specify/instructions.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 50,
+            "added": 300,
+            "deleted": 242,
+            "churn": 542,
+            "lastTouched": "f7668d6"
+          },
+          {
+            "path": ".specify/skills/create-team/SKILL.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 29,
+            "added": 560,
+            "deleted": 763,
+            "churn": 1323,
+            "lastTouched": "7055e72"
+          },
+          {
+            "path": "skills/create-team/SKILL.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 29,
+            "added": 560,
+            "deleted": 763,
+            "churn": 1323,
+            "lastTouched": "7055e72"
+          },
+          {
+            "path": ".specify/skills/improve-skills/SKILL.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 26,
+            "added": 250,
+            "deleted": 177,
+            "churn": 427,
+            "lastTouched": "3efb466"
+          },
+          {
+            "path": ".claude/commands/speckit.implement.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 26,
+            "added": 162,
+            "deleted": 261,
+            "churn": 423,
+            "lastTouched": "47c8504"
+          },
+          {
+            "path": ".github/prompts/speckit.implement.prompt.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 26,
+            "added": 162,
+            "deleted": 261,
+            "churn": 423,
+            "lastTouched": "47c8504"
+          },
+          {
+            "path": "templates/commands/implement.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 26,
+            "added": 125,
+            "deleted": 260,
+            "churn": 385,
+            "lastTouched": "ff0a7f0"
+          },
+          {
+            "path": "skills/create-agent/SKILL.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 25,
+            "added": 538,
+            "deleted": 257,
+            "churn": 795,
+            "lastTouched": "f95f425"
+          }
+        ],
+        "hotPaths": [
+          {
+            "path": ".specify/scripts",
+            "commits": 57
+          },
+          {
+            "path": "scripts/python",
+            "commits": 56
+          },
+          {
+            "path": ".specify/skills",
+            "commits": 38
+          },
+          {
+            "path": "src/specify_cli",
+            "commits": 32
+          },
+          {
+            "path": "skills/create-team",
+            "commits": 13
+          },
+          {
+            "path": "skills/browser-utils",
+            "commits": 5
+          },
+          {
+            "path": "scripts/js",
+            "commits": 4
+          },
+          {
+            "path": "draft/skills",
+            "commits": 3
+          },
+          {
+            "path": "skills/create-pages",
+            "commits": 3
+          },
+          {
+            "path": "skills/draw-plantuml",
+            "commits": 3
+          }
+        ]
+      },
+      {
+        "days": 180,
+        "since": "2026-03-11T04:13:48.000Z",
+        "analyzedCommits": 365,
+        "trendLabel": "legacy-or-long-range-hotspots",
+        "interpretation": "long-range window for spotting legacy or long range hotspots from bounded git history.",
+        "hotFiles": [
+          {
+            "path": "src/specify_cli/__init__.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 38,
+            "added": 2054,
+            "deleted": 613,
+            "churn": 2667,
+            "lastTouched": "c5b4b9f"
+          },
+          {
+            "path": ".specify/scripts/python/feedback-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 14,
+            "added": 2048,
+            "deleted": 86,
+            "churn": 2134,
+            "lastTouched": "ed4fc0a"
+          },
+          {
+            "path": "scripts/python/feedback-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 14,
+            "added": 2048,
+            "deleted": 86,
+            "churn": 2134,
+            "lastTouched": "ed4fc0a"
+          },
+          {
+            "path": ".specify/skills/create-team/scripts/build-summary-input.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 1147,
+            "deleted": 19,
+            "churn": 1166,
+            "lastTouched": "68fda6f"
+          },
+          {
+            "path": "skills/create-team/scripts/build-summary-input.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 1147,
+            "deleted": 19,
+            "churn": 1166,
+            "lastTouched": "68fda6f"
+          },
+          {
+            "path": ".specify/scripts/python/docs-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 441,
+            "deleted": 7,
+            "churn": 448,
+            "lastTouched": "5dfd868"
+          },
+          {
+            "path": "scripts/python/docs-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 441,
+            "deleted": 7,
+            "churn": 448,
+            "lastTouched": "5dfd868"
+          },
+          {
+            "path": ".specify/scripts/python/sync-mirrors.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 271,
+            "deleted": 36,
+            "churn": 307,
+            "lastTouched": "4b83665"
+          },
+          {
+            "path": "scripts/python/sync-mirrors.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 271,
+            "deleted": 36,
+            "churn": 307,
+            "lastTouched": "4b83665"
+          },
+          {
+            "path": ".specify/scripts/python/tools-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 6,
+            "added": 848,
+            "deleted": 59,
+            "churn": 907,
+            "lastTouched": "b98f9c5"
+          }
+        ],
+        "supportingHotFiles": [
+          {
+            "path": ".specify/memory/feedback/index.json",
+            "language": null,
+            "role": "configuration",
+            "supporting": true,
+            "commits": 81,
+            "added": 2545,
+            "deleted": 2412,
+            "churn": 4957,
+            "lastTouched": "d1f58df"
+          },
+          {
+            "path": ".specify/memory/features.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 78,
+            "added": 142,
+            "deleted": 112,
+            "churn": 254,
+            "lastTouched": "b98f9c5"
+          },
+          {
+            "path": ".specify/instructions.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 63,
+            "added": 704,
+            "deleted": 546,
+            "churn": 1250,
+            "lastTouched": "7a93539"
+          },
+          {
+            "path": ".specify/skills/improve-skills/SKILL.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 33,
+            "added": 408,
+            "deleted": 250,
+            "churn": 658,
+            "lastTouched": "0eb8b71"
+          },
+          {
+            "path": "skills/improve-skills/SKILL.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 32,
+            "added": 347,
+            "deleted": 189,
+            "churn": 536,
+            "lastTouched": "0eb8b71"
+          },
+          {
+            "path": "templates/commands/implement.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 30,
+            "added": 201,
+            "deleted": 291,
+            "churn": 492,
+            "lastTouched": "af64131"
+          },
+          {
+            "path": ".github/prompts/speckit.skills.prompt.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 29,
+            "added": 694,
+            "deleted": 821,
+            "churn": 1515,
+            "lastTouched": "b98f9c5"
+          },
+          {
+            "path": ".specify/skills/create-team/SKILL.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 29,
+            "added": 560,
+            "deleted": 763,
+            "churn": 1323,
+            "lastTouched": "7055e72"
+          },
+          {
+            "path": "skills/create-team/SKILL.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 29,
+            "added": 560,
+            "deleted": 763,
+            "churn": 1323,
+            "lastTouched": "7055e72"
+          },
+          {
+            "path": "templates/commands/skills.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 29,
+            "added": 589,
+            "deleted": 716,
+            "churn": 1305,
+            "lastTouched": "b98f9c5"
+          }
+        ],
+        "hotPaths": [
+          {
+            "path": ".specify/scripts",
+            "commits": 61
+          },
+          {
+            "path": "scripts/python",
+            "commits": 59
+          },
+          {
+            "path": ".specify/skills",
+            "commits": 39
+          },
+          {
+            "path": "src/specify_cli",
+            "commits": 38
+          },
+          {
+            "path": "skills/create-team",
+            "commits": 13
+          },
+          {
+            "path": "skills/browser-utils",
+            "commits": 5
+          },
+          {
+            "path": "scripts/js",
+            "commits": 4
+          },
+          {
+            "path": "draft/skills",
+            "commits": 3
+          },
+          {
+            "path": "skills/create-pages",
+            "commits": 3
+          },
+          {
+            "path": "skills/draw-echarts",
+            "commits": 3
+          }
+        ]
+      }
+    ],
+    "languageTouchCounts": [
+      {
+        "language": "python",
+        "touches": 577
+      },
+      {
+        "language": "javascript",
+        "touches": 195
+      }
+    ],
+    "hotFiles": [
+      {
+        "path": "src/specify_cli/__init__.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 63,
+        "added": 3012,
+        "deleted": 1475,
+        "churn": 4487,
+        "lastTouched": "df3c506"
+      },
+      {
+        "path": ".specify/scripts/python/feedback-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 14,
+        "added": 2048,
+        "deleted": 86,
+        "churn": 2134,
+        "lastTouched": "ed4fc0a"
+      },
+      {
+        "path": "scripts/python/feedback-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 14,
+        "added": 2048,
+        "deleted": 86,
+        "churn": 2134,
+        "lastTouched": "ed4fc0a"
+      },
+      {
+        "path": ".specify/skills/create-team/scripts/build-summary-input.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 7,
+        "added": 1147,
+        "deleted": 19,
+        "churn": 1166,
+        "lastTouched": "68fda6f"
+      },
+      {
+        "path": "skills/create-team/scripts/build-summary-input.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 7,
+        "added": 1147,
+        "deleted": 19,
+        "churn": 1166,
+        "lastTouched": "68fda6f"
+      },
+      {
+        "path": ".specify/scripts/python/docs-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 7,
+        "added": 441,
+        "deleted": 7,
+        "churn": 448,
+        "lastTouched": "5dfd868"
+      },
+      {
+        "path": "scripts/python/docs-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 7,
+        "added": 441,
+        "deleted": 7,
+        "churn": 448,
+        "lastTouched": "5dfd868"
+      },
+      {
+        "path": ".specify/scripts/python/sync-mirrors.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 7,
+        "added": 271,
+        "deleted": 36,
+        "churn": 307,
+        "lastTouched": "4b83665"
+      },
+      {
+        "path": "scripts/python/sync-mirrors.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 7,
+        "added": 271,
+        "deleted": 36,
+        "churn": 307,
+        "lastTouched": "4b83665"
+      },
+      {
+        "path": ".specify/scripts/python/list_mcp_tools.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 6,
+        "added": 776,
+        "deleted": 776,
+        "churn": 1552,
+        "lastTouched": "44c6451"
+      },
+      {
+        "path": ".specify/scripts/python/tools-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 6,
+        "added": 848,
+        "deleted": 59,
+        "churn": 907,
+        "lastTouched": "b98f9c5"
+      },
+      {
+        "path": "scripts/python/tools-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 6,
+        "added": 845,
+        "deleted": 56,
+        "churn": 901,
+        "lastTouched": "b98f9c5"
+      },
+      {
+        "path": ".specify/scripts/python/evidence-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 6,
+        "added": 875,
+        "deleted": 16,
+        "churn": 891,
+        "lastTouched": "14389b4"
+      },
+      {
+        "path": "scripts/python/evidence-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 6,
+        "added": 875,
+        "deleted": 16,
+        "churn": 891,
+        "lastTouched": "14389b4"
+      },
+      {
+        "path": ".specify/scripts/python/sanitize-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 5,
+        "added": 979,
+        "deleted": 22,
+        "churn": 1001,
+        "lastTouched": "272a9d2"
+      },
+      {
+        "path": "scripts/python/sanitize-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 5,
+        "added": 979,
+        "deleted": 22,
+        "churn": 1001,
+        "lastTouched": "272a9d2"
+      },
+      {
+        "path": ".specify/scripts/python/goal-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 5,
+        "added": 903,
+        "deleted": 15,
+        "churn": 918,
+        "lastTouched": "e5256dd"
+      },
+      {
+        "path": "scripts/python/goal-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 5,
+        "added": 903,
+        "deleted": 15,
+        "churn": 918,
+        "lastTouched": "e5256dd"
+      },
+      {
+        "path": "scripts/python/list_mcp_tools.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 5,
+        "added": 53,
+        "deleted": 434,
+        "churn": 487,
+        "lastTouched": "f2c6cd1"
+      },
+      {
+        "path": ".github/skills/skill-creator/scripts/init_skill.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 606,
+        "deleted": 606,
+        "churn": 1212,
+        "lastTouched": "9a7c880"
+      },
+      {
+        "path": ".specify/scripts/python/history-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 457,
+        "deleted": 6,
+        "churn": 463,
+        "lastTouched": "d8684c9"
+      },
+      {
+        "path": "scripts/python/history-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 457,
+        "deleted": 6,
+        "churn": 463,
+        "lastTouched": "d8684c9"
+      },
+      {
+        "path": ".github/skills/skill-creator/scripts/package_skill.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 220,
+        "deleted": 220,
+        "churn": 440,
+        "lastTouched": "9a7c880"
+      },
+      {
+        "path": ".github/skills/skill-creator/scripts/quick_validate.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 190,
+        "deleted": 190,
+        "churn": 380,
+        "lastTouched": "9a7c880"
+      },
+      {
+        "path": ".specify/scripts/python/regen-command-copies.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 161,
+        "deleted": 23,
+        "churn": 184,
+        "lastTouched": "1cb599a"
+      },
+      {
+        "path": "scripts/python/regen-command-copies.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 161,
+        "deleted": 23,
+        "churn": 184,
+        "lastTouched": "1cb599a"
+      },
+      {
+        "path": ".specify/skills/create-team/scripts/match-team-preset.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 171,
+        "deleted": 4,
+        "churn": 175,
+        "lastTouched": "1a090c7"
+      },
+      {
+        "path": "skills/create-team/scripts/match-team-preset.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 171,
+        "deleted": 4,
+        "churn": 175,
+        "lastTouched": "1a090c7"
+      },
+      {
+        "path": "skills/skill-creator/scripts/init_skill.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 606,
+        "deleted": 303,
+        "churn": 909,
+        "lastTouched": "67d96a5"
+      },
+      {
+        "path": ".specify/skills/create-pages/scripts/scaffold-hugo.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 601,
+        "deleted": 77,
+        "churn": 678,
+        "lastTouched": "00abc44"
+      },
+      {
+        "path": "skills/create-pages/scripts/scaffold-hugo.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 588,
+        "deleted": 64,
+        "churn": 652,
+        "lastTouched": "00abc44"
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/session-analysis/platforms/claude.mjs",
+        "language": "javascript",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 473,
+        "deleted": 1,
+        "churn": 474,
+        "lastTouched": "5fb6bdb"
+      },
+      {
+        "path": "scripts/js/better-harness/session-analysis/platforms/claude.mjs",
+        "language": "javascript",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 473,
+        "deleted": 1,
+        "churn": 474,
+        "lastTouched": "5fb6bdb"
+      },
+      {
+        "path": "skills/skill-creator/scripts/package_skill.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 220,
+        "deleted": 110,
+        "churn": 330,
+        "lastTouched": "67d96a5"
+      },
+      {
+        "path": "skills/skill-creator/scripts/quick_validate.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 198,
+        "deleted": 95,
+        "churn": 293,
+        "lastTouched": "67d96a5"
+      },
+      {
+        "path": "scripts/python/list_project_tools.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 105,
+        "deleted": 105,
+        "churn": 210,
+        "lastTouched": "a032c28"
+      },
+      {
+        "path": ".specify/scripts/python/scan-confirmation-gates.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 207,
+        "deleted": 2,
+        "churn": 209,
+        "lastTouched": "d953301"
+      },
+      {
+        "path": "scripts/python/scan-confirmation-gates.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 207,
+        "deleted": 2,
+        "churn": 209,
+        "lastTouched": "d953301"
+      },
+      {
+        "path": "scripts/python/list_system_tools.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 90,
+        "deleted": 90,
+        "churn": 180,
+        "lastTouched": "a032c28"
+      },
+      {
+        "path": "scripts/python/list_shell_tools.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 78,
+        "deleted": 78,
+        "churn": 156,
+        "lastTouched": "a032c28"
+      }
+    ],
+    "supportingHotFiles": [
+      {
+        "path": ".specify/memory/features.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 87,
+        "added": 254,
+        "deleted": 176,
+        "churn": 430,
+        "lastTouched": "afd64f0"
+      },
+      {
+        "path": ".specify/memory/feedback/index.json",
+        "language": null,
+        "role": "configuration",
+        "supporting": true,
+        "commits": 81,
+        "added": 2545,
+        "deleted": 2412,
+        "churn": 4957,
+        "lastTouched": "d1f58df"
+      },
+      {
+        "path": ".specify/instructions.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 63,
+        "added": 704,
+        "deleted": 546,
+        "churn": 1250,
+        "lastTouched": "7a93539"
+      },
+      {
+        "path": ".github/prompts/speckit.implement.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 49,
+        "added": 514,
+        "deleted": 525,
+        "churn": 1039,
+        "lastTouched": "df3c506"
+      },
+      {
+        "path": "templates/commands/implement.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 49,
+        "added": 370,
+        "deleted": 374,
+        "churn": 744,
+        "lastTouched": "fa42b7d"
+      },
+      {
+        "path": "templates/commands/plan.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 47,
+        "added": 276,
+        "deleted": 167,
+        "churn": 443,
+        "lastTouched": "fa42b7d"
+      },
+      {
+        "path": "templates/commands/skills.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 44,
+        "added": 1875,
+        "deleted": 1772,
+        "churn": 3647,
+        "lastTouched": "35b5f81"
+      },
+      {
+        "path": ".github/prompts/speckit.plan.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 42,
+        "added": 353,
+        "deleted": 248,
+        "churn": 601,
+        "lastTouched": "df3c506"
+      },
+      {
+        "path": "templates/commands/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 42,
+        "added": 290,
+        "deleted": 171,
+        "churn": 461,
+        "lastTouched": "fa42b7d"
+      },
+      {
+        "path": ".github/prompts/speckit.skills.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 41,
+        "added": 1464,
+        "deleted": 1372,
+        "churn": 2836,
+        "lastTouched": "48f5bf7"
+      },
+      {
+        "path": ".github/prompts/speckit.tasks.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 40,
+        "added": 438,
+        "deleted": 327,
+        "churn": 765,
+        "lastTouched": "df3c506"
+      },
+      {
+        "path": "templates/commands/instructions.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 34,
+        "added": 414,
+        "deleted": 212,
+        "churn": 626,
+        "lastTouched": "35b5f81"
+      },
+      {
+        "path": ".github/prompts/speckit.clarify.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 33,
+        "added": 644,
+        "deleted": 687,
+        "churn": 1331,
+        "lastTouched": "67b5c29"
+      },
+      {
+        "path": ".specify/skills/improve-skills/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 33,
+        "added": 408,
+        "deleted": 250,
+        "churn": 658,
+        "lastTouched": "0eb8b71"
+      },
+      {
+        "path": ".specify/templates/instructions-template.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 33,
+        "added": 327,
+        "deleted": 203,
+        "churn": 530,
+        "lastTouched": "44c6451"
+      },
+      {
+        "path": ".github/prompts/speckit.agents.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 32,
+        "added": 803,
+        "deleted": 676,
+        "churn": 1479,
+        "lastTouched": "6248499"
+      },
+      {
+        "path": "README.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 32,
+        "added": 419,
+        "deleted": 1003,
+        "churn": 1422,
+        "lastTouched": "fa42b7d"
+      },
+      {
+        "path": "skills/improve-skills/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 32,
+        "added": 347,
+        "deleted": 189,
+        "churn": 536,
+        "lastTouched": "0eb8b71"
+      },
+      {
+        "path": "templates/commands/clarify.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 31,
+        "added": 495,
+        "deleted": 524,
+        "churn": 1019,
+        "lastTouched": "a2d1c4a"
+      },
+      {
+        "path": ".github/prompts/speckit.instructions.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 31,
+        "added": 396,
+        "deleted": 205,
+        "churn": 601,
+        "lastTouched": "48f5bf7"
+      },
+      {
+        "path": "templates/commands/agents.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 30,
+        "added": 719,
+        "deleted": 583,
+        "churn": 1302,
+        "lastTouched": "6248499"
+      },
+      {
+        "path": "templates/instructions-template.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 30,
+        "added": 271,
+        "deleted": 147,
+        "churn": 418,
+        "lastTouched": "47a32d5"
+      },
+      {
+        "path": ".specify/skills/create-team/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 29,
+        "added": 560,
+        "deleted": 763,
+        "churn": 1323,
+        "lastTouched": "7055e72"
+      },
+      {
+        "path": "skills/create-team/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 29,
+        "added": 560,
+        "deleted": 763,
+        "churn": 1323,
+        "lastTouched": "7055e72"
+      },
+      {
+        "path": ".github/prompts/speckit.checklist.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 29,
+        "added": 512,
+        "deleted": 718,
+        "churn": 1230,
+        "lastTouched": "df3c506"
+      },
+      {
+        "path": "templates/commands/feature.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 29,
+        "added": 635,
+        "deleted": 551,
+        "churn": 1186,
+        "lastTouched": "08b445d"
+      },
+      {
+        "path": ".ai/instructions.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 29,
+        "added": 490,
+        "deleted": 651,
+        "churn": 1141,
+        "lastTouched": "fa42b7d"
+      },
+      {
+        "path": ".specify/memory/constitution.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 29,
+        "added": 547,
+        "deleted": 382,
+        "churn": 929,
+        "lastTouched": "df3c506"
+      },
+      {
+        "path": "templates/commands/tools.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 29,
+        "added": 539,
+        "deleted": 369,
+        "churn": 908,
+        "lastTouched": "a032c28"
+      },
+      {
+        "path": ".claude/commands/speckit.implement.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 28,
+        "added": 406,
+        "deleted": 287,
+        "churn": 693,
+        "lastTouched": "8da8b85"
+      },
+      {
+        "path": ".github/prompts/speckit.requirements.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 28,
+        "added": 166,
+        "deleted": 394,
+        "churn": 560,
+        "lastTouched": "d95e5e6"
+      },
+      {
+        "path": ".github/prompts/speckit.tools.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 27,
+        "added": 523,
+        "deleted": 364,
+        "churn": 887,
+        "lastTouched": "49eccd3"
+      },
+      {
+        "path": ".specify/skills/create-skills/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 27,
+        "added": 482,
+        "deleted": 227,
+        "churn": 709,
+        "lastTouched": "2db6a39"
+      },
+      {
+        "path": "templates/commands/checklist.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 26,
+        "added": 250,
+        "deleted": 444,
+        "churn": 694,
+        "lastTouched": "fa42b7d"
+      },
+      {
+        "path": "skills/create-agent/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 25,
+        "added": 538,
+        "deleted": 257,
+        "churn": 795,
+        "lastTouched": "f95f425"
+      },
+      {
+        "path": "templates/commands/review.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 25,
+        "added": 422,
+        "deleted": 296,
+        "churn": 718,
+        "lastTouched": "67b5c29"
+      },
+      {
+        "path": "templates/commands/requirements.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 25,
+        "added": 174,
+        "deleted": 389,
+        "churn": 563,
+        "lastTouched": "a9173b5"
+      },
+      {
+        "path": ".github/prompts/speckit.constitution.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 25,
+        "added": 252,
+        "deleted": 159,
+        "churn": 411,
+        "lastTouched": "a34f17e"
+      },
+      {
+        "path": "skills/create-skills/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 25,
+        "added": 331,
+        "deleted": 76,
+        "churn": 407,
+        "lastTouched": "2db6a39"
+      },
+      {
+        "path": ".specify/scripts/bash/common.sh",
+        "language": null,
+        "role": "other",
+        "supporting": true,
+        "commits": 24,
+        "added": 1399,
+        "deleted": 1289,
+        "churn": 2688,
+        "lastTouched": "08b445d"
+      }
+    ],
+    "hotPaths": [
+      {
+        "path": ".specify/scripts",
+        "commits": 68
+      },
+      {
+        "path": "scripts/python",
+        "commits": 65
+      },
+      {
+        "path": "src/specify_cli",
+        "commits": 63
+      },
+      {
+        "path": ".specify/skills",
+        "commits": 39
+      },
+      {
+        "path": "skills/create-team",
+        "commits": 13
+      },
+      {
+        "path": "skills/browser-utils",
+        "commits": 5
+      },
+      {
+        "path": ".github/skills",
+        "commits": 4
+      },
+      {
+        "path": "draft/skills",
+        "commits": 4
+      },
+      {
+        "path": "scripts/js",
+        "commits": 4
+      },
+      {
+        "path": "skills/create-pages",
+        "commits": 3
+      },
+      {
+        "path": "skills/draw-echarts",
+        "commits": 3
+      },
+      {
+        "path": "skills/draw-plantuml",
+        "commits": 3
+      },
+      {
+        "path": "skills/skill-creator",
+        "commits": 3
+      },
+      {
+        "path": "skills/summarize-project",
+        "commits": 3
+      },
+      {
+        "path": "scripts",
+        "commits": 2
+      },
+      {
+        "path": "skills/draw-mermaid",
+        "commits": 2
+      },
+      {
+        "path": "skills/export-session",
+        "commits": 2
+      },
+      {
+        "path": "skills/extension-e2e-test",
+        "commits": 2
+      },
+      {
+        "path": "skills/improve-skills",
+        "commits": 2
+      },
+      {
+        "path": "skills/refresh-mcp-tools",
+        "commits": 2
+      },
+      {
+        "path": "src",
+        "commits": 2
+      },
+      {
+        "path": ".",
+        "commits": 1
+      },
+      {
+        "path": "skills/archive-session",
+        "commits": 1
+      },
+      {
+        "path": "skills/browser-extension",
+        "commits": 1
+      },
+      {
+        "path": "skills/create-docs",
+        "commits": 1
+      },
+      {
+        "path": "skills/database-utils",
+        "commits": 1
+      },
+      {
+        "path": "skills/document-utils",
+        "commits": 1
+      },
+      {
+        "path": "skills/docx-utils",
+        "commits": 1
+      },
+      {
+        "path": "skills/git-fleet",
+        "commits": 1
+      },
+      {
+        "path": "skills/git-server-init",
+        "commits": 1
+      }
+    ],
+    "supportingHotPaths": [
+      {
+        "path": ".specify/skills",
+        "commits": 1214
+      },
+      {
+        "path": ".specify/memory",
+        "commits": 918
+      },
+      {
+        "path": ".specify/specs",
+        "commits": 886
+      },
+      {
+        "path": "templates/commands",
+        "commits": 595
+      },
+      {
+        "path": ".github/prompts",
+        "commits": 585
+      },
+      {
+        "path": ".specify/templates",
+        "commits": 436
+      },
+      {
+        "path": ".claude/commands",
+        "commits": 353
+      },
+      {
+        "path": ".opencode/command",
+        "commits": 324
+      },
+      {
+        "path": "draft/skills",
+        "commits": 309
+      },
+      {
+        "path": "tests/contract",
+        "commits": 308
+      },
+      {
+        "path": ".qwen/commands",
+        "commits": 229
+      },
+      {
+        "path": "templates",
+        "commits": 203
+      },
+      {
+        "path": ".specify/scripts",
+        "commits": 191
+      },
+      {
+        "path": "skills/draw-plantuml",
+        "commits": 151
+      },
+      {
+        "path": "tests/integration",
+        "commits": 142
+      },
+      {
+        "path": ".",
+        "commits": 140
+      },
+      {
+        "path": "scripts/bash",
+        "commits": 130
+      },
+      {
+        "path": "skills/create-agent",
+        "commits": 127
+      },
+      {
+        "path": "skills/create-team",
+        "commits": 125
+      },
+      {
+        "path": "docs/reference",
+        "commits": 123
+      },
+      {
+        "path": ".specify/agents",
+        "commits": 98
+      },
+      {
+        "path": ".specify/shared",
+        "commits": 96
+      },
+      {
+        "path": "docs",
+        "commits": 82
+      },
+      {
+        "path": ".specify",
+        "commits": 79
+      },
+      {
+        "path": "skills/document-utils",
+        "commits": 78
+      },
+      {
+        "path": "tests/unit",
+        "commits": 78
+      },
+      {
+        "path": "skills/draw-mermaid",
+        "commits": 69
+      },
+      {
+        "path": "skills/improve-skills",
+        "commits": 68
+      },
+      {
+        "path": ".specify/archive",
+        "commits": 66
+      },
+      {
+        "path": ".specify/teams",
+        "commits": 66
+      }
+    ],
+    "coChangePaths": [
+      {
+        "paths": [
+          ".specify/scripts",
+          "scripts/python"
+        ],
+        "commits": 59
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "skills/create-team"
+        ],
+        "commits": 13
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "src/specify_cli"
+        ],
+        "commits": 9
+      },
+      {
+        "paths": [
+          "scripts/python",
+          "src/specify_cli"
+        ],
+        "commits": 9
+      },
+      {
+        "paths": [
+          ".specify/scripts",
+          ".specify/skills"
+        ],
+        "commits": 8
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "scripts/python"
+        ],
+        "commits": 8
+      },
+      {
+        "paths": [
+          ".specify/scripts",
+          "src/specify_cli"
+        ],
+        "commits": 7
+      },
+      {
+        "paths": [
+          ".specify/scripts",
+          "skills/create-team"
+        ],
+        "commits": 5
+      },
+      {
+        "paths": [
+          "scripts/python",
+          "skills/create-team"
+        ],
+        "commits": 5
+      },
+      {
+        "paths": [
+          ".specify/scripts",
+          "scripts/js"
+        ],
+        "commits": 4
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "skills/browser-utils"
+        ],
+        "commits": 4
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "skills/create-pages"
+        ],
+        "commits": 3
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "skills/draw-plantuml"
+        ],
+        "commits": 3
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "skills/summarize-project"
+        ],
+        "commits": 3
+      },
+      {
+        "paths": [
+          "skills/create-team",
+          "src/specify_cli"
+        ],
+        "commits": 3
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "skills/draw-mermaid"
+        ],
+        "commits": 2
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "skills/improve-skills"
+        ],
+        "commits": 2
+      },
+      {
+        "paths": [
+          "scripts/js",
+          "scripts/python"
+        ],
+        "commits": 2
+      },
+      {
+        "paths": [
+          "skills/skill-creator",
+          "src/specify_cli"
+        ],
+        "commits": 2
+      },
+      {
+        "paths": [
+          ".",
+          "src/specify_cli"
+        ],
+        "commits": 1
+      }
+    ]
+  },
+  "dependencyGovernance": {
+    "schemaVersion": "1.0.0",
+    "kind": "dependency-governance",
+    "status": "ok",
+    "repoRoot": ".",
+    "analyzerVersion": "v5",
+    "elapsedMs": 199.364,
+    "source": {
+      "fileListStrategy": "git-ls-files",
+      "fileCount": 2557,
+      "staleDays": 180,
+      "now": "2026-09-07T04:13:48.485Z"
+    },
+    "summary": {
+      "ecosystemCount": 2,
+      "ecosystems": [
+        "node",
+        "python"
+      ],
+      "manifestCount": 13,
+      "lockfileCount": 6,
+      "dependencyFileCount": 19,
+      "staleDependencyFiles": [],
+      "updateAutomation": {
+        "count": 0,
+        "files": []
+      },
+      "auditSignals": {
+        "count": 0,
+        "files": []
+      },
+      "alertEvidence": {
+        "status": "unverified",
+        "count": 0,
+        "files": []
+      },
+      "findings": [
+        {
+          "id": "dependency-update-automation-missing",
+          "severity": "Medium",
+          "evidenceStrength": "Static configuration evidence",
+          "title": "No dependency update automation config found",
+          "passCheck": "Add or cite Dependabot, Renovate, Snyk, or an equivalent host-native dependency update workflow."
+        }
+      ],
+      "riskLevel": "medium"
+    },
+    "files": {
+      "manifests": [
+        {
+          "path": ".specify/scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/skills/browser-utils/scripts/bridge/node_modules/ws/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/skills/browser-utils/scripts/bridge/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/skills/browser-utils/scripts/js/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/skills/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/skills/draw-mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": "pyproject.toml",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": "scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/browser-utils/scripts/bridge/node_modules/ws/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/browser-utils/scripts/bridge/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/browser-utils/scripts/js/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": "skills/draw-mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        }
+      ],
+      "lockfiles": [
+        {
+          "path": ".specify/skills/browser-utils/scripts/bridge/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/skills/browser-utils/scripts/js/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/skills/draw-mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/browser-utils/scripts/bridge/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/browser-utils/scripts/js/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/draw-mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node"
+        }
+      ],
+      "dependency": [
+        {
+          "path": ".specify/scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-29T15:30:42+08:00",
+          "lastTouchedAgeDays": 39,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/browser-utils/scripts/bridge/node_modules/ws/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-08T11:42:37+08:00",
+          "lastTouchedAgeDays": 61,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/browser-utils/scripts/bridge/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-08T11:42:37+08:00",
+          "lastTouchedAgeDays": 61,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/browser-utils/scripts/bridge/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-08T11:42:37+08:00",
+          "lastTouchedAgeDays": 61,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/browser-utils/scripts/js/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-08T11:42:37+08:00",
+          "lastTouchedAgeDays": 61,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/browser-utils/scripts/js/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-06-18T17:32:03+08:00",
+          "lastTouchedAgeDays": 80,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-06-18T17:32:03+08:00",
+          "lastTouchedAgeDays": 80,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/draw-mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-08-07T22:23:33+08:00",
+          "lastTouchedAgeDays": 30,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/draw-mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-08-07T22:23:33+08:00",
+          "lastTouchedAgeDays": 30,
+          "stale": false
+        },
+        {
+          "path": "pyproject.toml",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-08-24T14:25:31+08:00",
+          "lastTouchedAgeDays": 13,
+          "stale": false
+        },
+        {
+          "path": "scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-29T15:30:42+08:00",
+          "lastTouchedAgeDays": 39,
+          "stale": false
+        },
+        {
+          "path": "skills/browser-utils/scripts/bridge/node_modules/ws/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-06T02:21:18+08:00",
+          "lastTouchedAgeDays": 63,
+          "stale": false
+        },
+        {
+          "path": "skills/browser-utils/scripts/bridge/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-06T02:21:18+08:00",
+          "lastTouchedAgeDays": 63,
+          "stale": false
+        },
+        {
+          "path": "skills/browser-utils/scripts/bridge/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-06T02:21:18+08:00",
+          "lastTouchedAgeDays": 63,
+          "stale": false
+        },
+        {
+          "path": "skills/browser-utils/scripts/js/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-06T02:21:18+08:00",
+          "lastTouchedAgeDays": 63,
+          "stale": false
+        },
+        {
+          "path": "skills/browser-utils/scripts/js/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-06-18T17:32:03+08:00",
+          "lastTouchedAgeDays": 80,
+          "stale": false
+        },
+        {
+          "path": "skills/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-06-18T17:32:03+08:00",
+          "lastTouchedAgeDays": 80,
+          "stale": false
+        },
+        {
+          "path": "skills/draw-mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-08-07T22:23:33+08:00",
+          "lastTouchedAgeDays": 30,
+          "stale": false
+        },
+        {
+          "path": "skills/draw-mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-08-07T22:23:33+08:00",
+          "lastTouchedAgeDays": 30,
+          "stale": false
+        }
+      ]
+    },
+    "availableVersions": [
+      "v1",
+      "v2",
+      "v3",
+      "v4",
+      "v5"
+    ]
+  }
+}

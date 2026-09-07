@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-06T02:45:01Z",
+  "updated": "2026-09-07T04:41:30Z",
   "threshold": 10,
-  "count_since_submission": 5,
+  "count_since_submission": 6,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260907T043622Z-skill-improve-skills",
+      "file": "20260907T043622Z-skill-improve-skills.md",
+      "unit_id": "skill:improve-skills",
+      "unit_type": "skill",
+      "run_id": "improve-skills-merge-skills-2026-09-07",
+      "probe": "skill-improve-skills-wrapup",
+      "kind": "internal",
+      "slice": "skills",
+      "feature": "",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-07T04:36:22Z",
+      "summary": "改进了从未真实执行过的新技能 merge-skills（创建于 2 小时前）。findings 泳道退化（10 条全为项目级，无一条指向该技能），因此改以「实跑技能自带脚本 + 挖创建会话记录」为执行窗口：对 coverage_probe.py 构造正/负/反向样本，实测出 4 个高危缺陷——①SKILL.md 与 reference 均声称覆盖「枚举值/状态码（READ/WRITE、201、42"
+    },
     {
       "id": "20260906T021316Z-skill-git-workflow",
       "file": "20260906T021316Z-skill-git-workflow.md",
@@ -96,38 +114,5 @@
       "summary": "以 spec-kit 仓库根 skills/ 为 canonical 源创建 git-server-init（把普通 SSH 服务器置备为 Git 服务器：git 用户 + 裸仓库 + 公钥授权 + 本机 ssh config 条目）。走完 Step 0 模式判定（Spec Kit project mode）、跨 SSOT 命名冲突扫描（8 处加载目录零命中）、可写性预检、脚手架、身份定稿、校验（"
     }
   ],
-  "introspections": [
-    {
-      "id": "introspection-20260831T072111Z",
-      "file": "introspection/introspection-20260831T072111Z.md",
-      "created": "2026-08-31T07:21:11Z",
-      "status": "confirmed",
-      "supersedes": null,
-      "entries": [
-        "20260820T062957Z-skill-improve-skills",
-        "20260820T075028Z-skill-improve-skills",
-        "20260820T081055Z-speckit-feedback",
-        "20260820T083201Z-speckit-feedback",
-        "20260820T135721Z-speckit-sanitize",
-        "20260820T135804Z-speckit-sanitize",
-        "20260820T155821Z-skill-create-team",
-        "20260821T032029Z-skill-improve-skills",
-        "20260822T044605Z-skill-improve-skills",
-        "20260823T145827Z-speckit-requirements",
-        "20260824T021636Z-speckit-clarify",
-        "20260824T030224Z-speckit-plan",
-        "20260824T033222Z-speckit-tasks",
-        "20260824T054639Z-speckit-implement",
-        "20260824T125539Z-speckit-feedback",
-        "20260827T033738Z-speckit-requirements",
-        "20260828T054156Z-speckit-clarify",
-        "20260828T061407Z-speckit-plan",
-        "20260828T062345Z-speckit-tasks",
-        "20260828T063009Z-speckit-analyze",
-        "20260828T075753Z-speckit-implement",
-        "20260828T140121Z-speckit-review",
-        "20260831T033547Z-skill-git-workflow"
-      ]
-    }
-  ]
+  "introspections": []
 }

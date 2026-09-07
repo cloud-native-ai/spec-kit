@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 3,
+  "kind": "session-core-facts",
+  "scope": {
+    "platform": "qoder",
+    "workspace": "spec-kit",
+    "until": "2026-09-07T04:13:46.510Z",
+    "selection": "all-eligible",
+    "eligibleSessions": 9,
+    "selectedSessions": 9,
+    "sampled": false
+  },
+  "candidateSelection": {
+    "strategy": "agent-work-loop-portfolio-v1",
+    "availableClasses": {
+      "boundary-change": 3,
+      "lifecycle-demand": 2,
+      "operation-control": 7
+    },
+    "emittedClasses": {
+      "boundary-change": 3,
+      "lifecycle-demand": 2,
+      "operation-control": 5
+    }
+  },
+  "admission": {
+    "taskEpisodes": 23,
+    "candidateEpisodes": 7,
+    "distinctRequests": 7,
+    "emittedCandidates": 5
+  },
+  "populationCoverage": {
+    "withChanges": 0,
+    "withChecks": 0,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 3,
+    "withFrictionConsequence": 0
+  },
+  "observationCoverage": {
+    "withChanges": 0,
+    "withChecks": 0,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 3,
+    "withFrictionConsequence": 0
+  },
+  "admissionSupport": {
+    "semanticGuardrails": [
+      "occurrences-not-distinct-episodes",
+      "coverage-not-suggestion",
+      "omitted-details-not-signal-evidence",
+      "project-capability-inventory-unobserved"
+    ],
+    "sharedFrictionConsequences": []
+  },
+  "candidates": [
+    {
+      "ref": "E1",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "提交代码然后合并到master分支",
+        "key": "req:bda3a79c3f60",
+        "occurrences": 1,
+        "followUp": "This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation. Summary:…",
+        "observedTurns": 2,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "boundary-change",
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "friction": {
+        "executionFailures": 2,
+        "permissionDenials": 0
+      },
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "skill:git-workflow"
+      ]
+    },
+    {
+      "ref": "E2",
+      "contextGroup": "G2",
+      "request": {
+        "summary": "Commit the current changes and push to origin.",
+        "key": "req:296a707fb94b",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "lifecycle-demand",
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "friction": {
+        "executionFailures": 1,
+        "permissionDenials": 0
+      },
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "skill:security-scan"
+      ],
+      "lifecycle": [
+        {
+          "intent": "testing-verification",
+          "family": "debug-test-verification",
+          "dimensionId": "change-validation",
+          "checkId": "relevant-check",
+          "confidence": "High"
+        },
+        {
+          "intent": "review-acceptance",
+          "family": "review-acceptance-delivery",
+          "dimensionId": "reliable-delivery",
+          "checkId": "acceptance-evidence",
+          "confidence": "High"
+        }
+      ]
+    },
+    {
+      "ref": "E3",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "continue unfinished",
+        "key": "req:36207d0cde90",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "friction": {
+        "executionFailures": 2,
+        "permissionDenials": 0
+      },
+      "closure": "no-change-observed"
+    },
+    {
+      "ref": "E4",
+      "contextGroup": "G3",
+      "request": {
+        "summary": "<path>,需要检查一下做最终的确认,然后移除skills/agent-cli-setup",
+        "key": "req:01833093c9b2",
+        "occurrences": 1,
+        "followUp": "提交并推送这些更改",
+        "observedTurns": 2,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "boundary-change",
+        "lifecycle-demand",
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "skill:security-scan"
+      ],
+      "lifecycle": [
+        {
+          "intent": "testing-verification",
+          "family": "debug-test-verification",
+          "dimensionId": "change-validation",
+          "checkId": "relevant-check",
+          "confidence": "High"
+        },
+        {
+          "intent": "review-acceptance",
+          "family": "review-acceptance-delivery",
+          "dimensionId": "reliable-delivery",
+          "checkId": "acceptance-evidence",
+          "confidence": "High"
+        }
+      ]
+    },
+    {
+      "ref": "E5",
+      "contextGroup": "G4",
+      "request": {
+        "summary": "yes",
+        "key": "req:8a798890fe93",
+        "occurrences": 1,
+        "followUp": "提交代码",
+        "observedTurns": 2,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "boundary-change",
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "skill:improve-docs"
+      ]
+    }
+  ],
+  "omitted": {
+    "noRequest": 13,
+    "selfAnalysis": 0,
+    "lowSignal": 3,
+    "duplicateRequests": 0,
+    "candidateBudget": 2,
+    "checkBudget": 0,
+    "activeSessions": 0,
+    "homeSessionOnly": 0
+  },
+  "warningCodes": [
+    "missing-optional-root",
+    "disabled-source-root"
+  ],
+  "excludes": [
+    "assistantText",
+    "rawPrompts",
+    "commands",
+    "toolOutput",
+    "paths",
+    "rawIds",
+    "secrets"
+  ],
+  "diagnosticFlags": [
+    "portfolio-truncated",
+    "no-change-evidence",
+    "no-reviewed-relevant-check-evidence",
+    "no-result-evidence"
+  ],
+  "cost": {
+    "serializedBytes": 4943,
+    "estimatedTokens": 1246
+  }
+}
