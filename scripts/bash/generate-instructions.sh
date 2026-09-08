@@ -206,9 +206,16 @@ pushd .claude >/dev/null
 ln -sf ../.specify/instructions.md project_rules.md
 popd >/dev/null
 
+# .opencode
+mkdir -p .opencode
+pushd .opencode >/dev/null
+ln -sf ../.specify/instructions.md instructions.md
+popd >/dev/null
+
 # Root level links
 ln -sf .specify/instructions.md CLAUDE.md
 ln -sf .specify/instructions.md QODER.md
 ln -sf .specify/instructions.md AGENTS.md
+ln -sf .specify/instructions.md HERMES.md
 
 log success "Instructions generated/updated at $TARGET_FILE"

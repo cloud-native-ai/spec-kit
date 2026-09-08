@@ -30,6 +30,16 @@ This project documentation is distributed across several key files. You MUST ref
 
 > **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
 
+## Proactive Flow Trigger
+
+Every user turn carries a silent assessment of which flow is worth running next, and a suggestion appears only when a known situation actually matches. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/proactive-trigger.md` (do NOT copy its rules; reference the file) — which owns the situation vocabulary, the promotion semantics, the telemetry retention window, and the tuning protocol:
+
+- **Assess every turn (每回合评估)**: judge on each user turn whether the current state makes some flow worth running. The assessment itself is silent — zero user-visible output when no flow applies or nothing changed since the previous turn.
+- **Same pass, compliance first (同一趟、合规先行)**: make that judgement in the same pass as, and after, the compliance checks the Documentation Map directive above requires. A suggestion never precedes them.
+- **Evidence budget (证据预算)**: rely only on information already in context. When that is insufficient, escalate through the criteria the discipline doc declares; never pull artifact bodies into context in order to decide.
+- **Suggestion shape (建议形态)**: one non-blocking line = what the flow is for + the exact invocation the engine supplies. The user may adopt it or ignore it; ignoring never affects their current request.
+- **Engine entry (引擎入口)**: state inspection, reset, disabling, and tuning all go through the `trigger-utils.py` engine, whose action list the discipline doc carries. No new name to memorize is introduced.
+
 ## Fact, Correctness & Logic Checks (Input Sanity)
 User-provided context can be wrong (misconceptions), incomplete, or contain typos. Before acting on user input, perform a basic sanity check to avoid propagating errors.
 

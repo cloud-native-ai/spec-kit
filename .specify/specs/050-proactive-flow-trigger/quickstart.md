@@ -20,6 +20,13 @@
 TMP=$(mktemp -d) && cd "$TMP" && git init -q .
 specify init --here --ai qoder --force --ignore-agent-tools
 
+# 步骤二(必需):渲染指令文件并创建 symlink。
+# `specify init` 只分发资源面 —— 它从不写 .specify/instructions.md,也从不创建任何 symlink
+# (src/specify_cli/__init__.py 无任何生成器调用;其 line 985 的 `.specify/instructions.md`
+#  仅是 _CORE_SPECIFY_ASSETS 保留清单的一项)。真实用户管线是两步:init → /speckit.instructions。
+# 这里直接跑临时根自己那份 shipped 副本,顺带验证 STRICT 镜像在下游可用。
+bash .specify/scripts/bash/generate-instructions.sh
+
 # ① 5 个声明文件(_INSTRUCTIONS_FILE_MAP 去重后的值)
 for p in CLAUDE.md AGENTS.md HERMES.md .github/copilot-instructions.md .opencode/instructions.md; do
   test -e "$p" && echo "OK   $p -> $(readlink -f "$p")" || echo "MISS $p"
@@ -34,9 +41,11 @@ done
 grep -c '^## Proactive Flow Trigger' AGENTS.md
 ```
 
-**预期**:① 的 5 条与 ② 的 3 条**共 8 条全部 `OK`**,且都解析到 `.specify/instructions.md`;`grep -c` 输出 `1`。
+**预期**:两步均 exit 0;① 的 5 条与 ② 的 3 条**共 8 条全部 `OK`**,且都解析到 `.specify/instructions.md`;`grep -c` 输出 `1`。
 **契约**:`trigger-section.md` C-1 / C-10 / C-12。**度量源**:SC-001。
-**回归对照**:改动前 `HERMES.md` 与 `.opencode/instructions.md` 为 `MISS`,`_check_instructions` 对 hermes/opencode 返回 `fail`。
+**回归对照**:改动前 `HERMES.md` 与 `.opencode/instructions.md` 为 `MISS`,`_check_instructions` 对 hermes/opencode 返回 `fail`;改动后 6 个 tool key 全部 `pass`。
+
+> **实现期订正(2026-09-08,T013 实测)**:初版本场景把 8 条 symlink 归给 `specify init` 一步。实测 `init` exit 0、且正确分发了指令模板与纪律文档(与工作树字节相同),但 `.specify/instructions.md` 根本不存在、8 条链接全为 `MISS`、`_check_instructions` 对 6 个 key 全返回 `fail`。根因是**场景前提错误**(把 `/speckit.instructions` 的职责算给了 `init`),不是实现缺陷;已补步骤二并复跑通过(8/8 `OK`、6/6 `pass`)。**若省略步骤二而断言 8 条链接存在,该断言必然失败,且失败与本特性无关。**
 
 ---
 
