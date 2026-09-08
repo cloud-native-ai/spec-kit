@@ -35,12 +35,15 @@
     "expectedInternal": 73
   },
   "testBaseline": {
-    "failed": 42,
+    "failed": 43,
     "passed": 2496,
     "skipped": 1,
     "namesFile": ".specify/specs/050-proactive-flow-trigger/baseline-failed.txt",
     "priorBaseline049Entries": 47,
-    "note": "049 baseline was 47; 5 pre-existing failures since fixed — this feature freezes its own"
+    "note": "049 baseline was 47; 5 pre-existing failures since fixed — this feature freezes its own",
+    "entries": 43,
+    "ownFailures": 42,
+    "externalFailures": 1
   },
   "docker": {
     "available": true,
@@ -165,5 +168,22 @@
       }
     ],
     "note": "T003 human pre-flight for seed-derivation.md C-7: all anchors live before implementation, so a later C-7 failure is attributable to this feature, not to stale sources"
+  },
+  "externalAttribution": {
+    "recordedDuring": "Phase 2 (T007 regression diff)",
+    "testId": "tests/contract/test_no_nested_skills.py::TestNoNestedSkills::test_no_skill_contains_another_skill[.specify/skills]",
+    "verdict": "external-provenance — NOT attributable to feature 050",
+    "cause": "a parallel session keeps scaffolding '.specify/skills/.migration-backups/layout-int-*' skill dirs during this run",
+    "evidence": [
+      "absent from the Phase-1 frozen baseline (grep count 0) => genuinely new since Phase 1",
+      "tests/contract/test_no_nested_skills.py is pre-existing (commit 28149891) and unmodified by this feature",
+      "Phase 2 change surface = 4 paths, none under .specify/skills/",
+      "git status --short .specify/skills => 0 entries",
+      "offenders are git-ignored via .gitignore:47 (.migration-backups/) => can never enter a commit here",
+      "offender dir mtimes 2026-09-08 13:23:20 and 13:42:08 — the second appeared while the regression suite was running"
+    ],
+    "actionTaken": "recorded as baseline entry 43 with an in-file note; assertion NOT loosened; dirs NOT deleted (another session's in-progress work)",
+    "selfHealing": "if the parallel session removes its scaffolding the test goes green and comm -13 suppresses the baseline line — no false signal",
+    "maskingRisk": "negligible: feature 050 creates/edits no skills (zero-disturbance promise, D-9)"
   }
 }

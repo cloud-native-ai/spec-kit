@@ -1,10 +1,11 @@
-# baseline-failed.txt — 42 entries, frozen 2026-09-08 by T001 (/speckit.implement); full suite: 42 failed / 2496 passed / 1 skipped
+# baseline-failed.txt — 43 entries, frozen 2026-09-08 by T001 (/speckit.implement); full suite at freeze: 42 failed / 2496 passed / 1 skipped. ENTRY 43 IS EXTERNAL, added during Phase 2 (not attributable to feature 050): test_no_nested_skills[.specify/skills] fails because a PARALLEL session keeps scaffolding git-ignored '.specify/skills/.migration-backups/layout-int-*' dirs (mtimes 13:23:20 / 13:42:08; ignored via .gitignore:47, so they can never enter a commit here). Feature 050 touches no skills. The assertion is CORRECT and was NOT loosened; the dirs were NOT deleted (another session's in-progress work). If that session cleans up, the test goes green and comm -13 simply suppresses this line.
 tests/contract/test_agent_specific_config_commands.py::TestC001CommandTemplateSectionPresence::test_section_headings_exist[agents]
 tests/contract/test_agent_specific_config_commands.py::TestC001CommandTemplateSectionPresence::test_section_headings_exist[skills]
 tests/contract/test_agent_specific_config_commands.py::TestC007AdditiveConstraint::test_section_not_at_top[agents]
 tests/contract/test_agent_specific_config_commands.py::TestC007AdditiveConstraint::test_section_not_at_top[skills]
 tests/contract/test_create_new_skill_contract.py::test_create_new_skill_generates_json_tool_manifests
 tests/contract/test_dogfooding_practice.py::test_c4_no_dogfooding_steps_in_command_templates
+tests/contract/test_no_nested_skills.py::TestNoNestedSkills::test_no_skill_contains_another_skill[.specify/skills]
 tests/contract/test_shared_reference_rewrite.py::test_skills_use_installed_absolute_shared_form
 tests/contract/test_skill_home_workdir_template.py::test_us1_template_contains_normative_skill_home_fallback
 tests/contract/test_skill_home_workdir_template.py::test_us1_template_has_computation_idioms_section
