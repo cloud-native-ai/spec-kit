@@ -137,7 +137,7 @@
 
 ### Manual Verification for User Story 2
 
-- [ ] T028 [US2] 人工走查 `quickstart.md` 场景 2(冷启动首日建议)与场景 3(20 个无关回合静默 + `--probe` 升级),**本任务是 SC-003 / SC-004① / SC-011 / SC-012 / SC-013 / SC-014 的具名产出者**,须交付:① **≥6 种生命周期状态矩阵**的逐状态建议记录与正确性人工判定(SC-003 要求 ≥6 种,`quickstart` 场景 2 只覆盖 1 种,须自行补齐:仅 requirements、requirements 含未决澄清、已澄清未规划、plan 就绪无 tasks、tasks 就绪未实现、feedback 达阈值);② **≥5 个独立会话**对同一构造状态的 `payload.situationId` 一致率(SC-014);③ 场景 3 的 20 回合 `status` 读数 `turns`/`escalationPct`/`visibleOutputCount`(SC-011、SC-004①);④ 词表越界退出码 4 的实测;⑤ 冷启动首日建议(SC-013)。全部记入 `verification.md` 对应 SC 条目 [blockedBy: T027]
+- [X] T028 [US2] 人工走查 `quickstart.md` 场景 2(冷启动首日建议)与场景 3(20 个无关回合静默 + `--probe` 升级),**本任务是 SC-003 / SC-004① / SC-011 / SC-012 / SC-013 / SC-014 的具名产出者**,须交付:① **≥6 种生命周期状态矩阵**的逐状态建议记录与正确性人工判定(SC-003 要求 ≥6 种,`quickstart` 场景 2 只覆盖 1 种,须自行补齐:仅 requirements、requirements 含未决澄清、已澄清未规划、plan 就绪无 tasks、tasks 就绪未实现、feedback 达阈值);② **≥5 个独立会话**对同一构造状态的 `payload.situationId` 一致率(SC-014);③ 场景 3 的 20 回合 `status` 读数 `turns`/`escalationPct`/`visibleOutputCount`(SC-011、SC-004①);④ 词表越界退出码 4 的实测;⑤ 冷启动首日建议(SC-013)。全部记入 `verification.md` 对应 SC 条目 [blockedBy: T027]
 
 **Checkpoint**: **MVP 达成**(US1 + US2)—— 用户不必记得任何命令名即可在第一天得到正确建议;两个 P1 故事合起来构成可独立演示的增量
 
@@ -151,20 +151,20 @@
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T029 [P] [US3] 编写集成测试(RED)`tests/integration/test_trigger_promotion.py`:连续 3 次 accepted → `state=promoted` 且 `assess` 返回 `autoExecute=true`;一次 declined → `consecutive=0`、`state` 回落 `active`、`promotion.resetBy` 指向该 eventId;ignored 与 declined 同效但在 `stats` 分列;**破坏性规则连续 10 次 accepted → `promoted` 恒 false、`state` 恒 ≠ promoted、`autoExecute` 恒 false(SC-005 零容忍)**;`reset --rule` 与 `reset --all` 记 `userResetAt`;`config --enabled false` → 建议产出数与自动执行数均为 0 且状态在指令再生后仍生效(SC-009);`--threshold 1` → `EXIT_USAGE` + `errors:["threshold-below-floor"]`
-- [ ] T030 [P] [US3] 编写集成测试(RED)`tests/integration/test_trigger_telemetry.py`:`config --window 50` 后制造 60 回合 → `rotate` → `telemetry.jsonl` 行数 ≤50 且 `rules --format json` 轮转前后**逐字节相等**(SC-015 零丢失,判别"计数从原始行重算"的缺陷);`escalationPct` 计算正确;`suggested=false` 的回合 `visibleOutput` 恒 false(SC-011 静默性)
+- [X] T029 [P] [US3] 编写集成测试(RED)`tests/integration/test_trigger_promotion.py`:连续 3 次 accepted → `state=promoted` 且 `assess` 返回 `autoExecute=true`;一次 declined → `consecutive=0`、`state` 回落 `active`、`promotion.resetBy` 指向该 eventId;ignored 与 declined 同效但在 `stats` 分列;**破坏性规则连续 10 次 accepted → `promoted` 恒 false、`state` 恒 ≠ promoted、`autoExecute` 恒 false(SC-005 零容忍)**;`reset --rule` 与 `reset --all` 记 `userResetAt`;`config --enabled false` → 建议产出数与自动执行数均为 0 且状态在指令再生后仍生效(SC-009);`--threshold 1` → `EXIT_USAGE` + `errors:["threshold-below-floor"]`
+- [X] T030 [P] [US3] 编写集成测试(RED)`tests/integration/test_trigger_telemetry.py`:`config --window 50` 后制造 60 回合 → `rotate` → `telemetry.jsonl` 行数 ≤50 且 `rules --format json` 轮转前后**逐字节相等**(SC-015 零丢失,判别"计数从原始行重算"的缺陷);`escalationPct` 计算正确;`suggested=false` 的回合 `visibleOutput` 恒 false(SC-011 静默性)
 
 ### Implementation for User Story 3
 
-- [ ] T031 [US3] 在 `scripts/python/trigger-utils.py` 实现 `record` action:写 E3 建议事件(`eventId` = `<UTC-compact>-<seq>`、`snapshot` ≤200 字符否则 `EXIT_INVALID`);更新 E2.`stats{hits,accepted,declined,ignored,lastSeen}` 与 E5 晋升态;accepted → `consecutive += 1`,达 `threshold` 且 `confirmationClass == "reversible"` → `state="promoted"`;declined/ignored → `consecutive=0`、`promoted=false`、记 `resetBy`;**破坏性豁免为硬守卫**(C-16/C-17,`confirmationClass` 只读不计算) [blockedBy: T023,T029]
-- [ ] T032 [US3] 在 `scripts/python/trigger-utils.py` 实现 `reset` 与 `config` action:`reset --rule <r-nnn>` / `--all` 置 `consecutive=0`、`promoted=false`、记 `userResetAt`(FR-012);`config --enabled|--threshold|--window|--probe-budget|--min-sample` 写 E6.`config`,阈值解析优先级链 **显式 `--threshold` > `SPECKIT_TRIGGER_THRESHOLD` > 存储值 > 默认 3**,非法环境变量值忽略降级,解析结果 <2 → `EXIT_USAGE`(C-18,与 `feedback-utils.py:resolve_threshold` 同构) [blockedBy: T031]
-- [ ] T033 [US3] 在 `scripts/python/trigger-utils.py` 实现 `rotate` action 与窗口强制:截断 `telemetry.jsonl` 保留最近 `config.telemetryWindow` 行;**MUST NOT 触及 `index.json`**(晋升计数是 E2 内嵌聚合态,不由原始行重算)(FR-009a / V4.3 / V4.4) [blockedBy: T031,T030]
-- [ ] T034 [US3] mirror-parity 写 + 验(Mirror Obligations 第 3 行,STRICT):`python3 scripts/python/sync-mirrors.py --write` + `diff -q` + `--check` exit 0 [blockedBy: T032,T033]
-- [ ] T035 [US3] 验证:`python3 -m pytest tests/integration/test_trigger_promotion.py tests/integration/test_trigger_telemetry.py tests/contract/test_trigger_engine.py -q` 全绿(C-16…C-18 由 T017 已写就,此处随实现转绿) [blockedBy: T034]
+- [X] T031 [US3] 在 `scripts/python/trigger-utils.py` 实现 `record` action:写 E3 建议事件(`eventId` = `<UTC-compact>-<seq>`、`snapshot` ≤200 字符否则 `EXIT_INVALID`);更新 E2.`stats{hits,accepted,declined,ignored,lastSeen}` 与 E5 晋升态;accepted → `consecutive += 1`,达 `threshold` 且 `confirmationClass == "reversible"` → `state="promoted"`;declined/ignored → `consecutive=0`、`promoted=false`、记 `resetBy`;**破坏性豁免为硬守卫**(C-16/C-17,`confirmationClass` 只读不计算) [blockedBy: T023,T029]
+- [X] T032 [US3] 在 `scripts/python/trigger-utils.py` 实现 `reset` 与 `config` action:`reset --rule <r-nnn>` / `--all` 置 `consecutive=0`、`promoted=false`、记 `userResetAt`(FR-012);`config --enabled|--threshold|--window|--probe-budget|--min-sample` 写 E6.`config`,阈值解析优先级链 **显式 `--threshold` > `SPECKIT_TRIGGER_THRESHOLD` > 存储值 > 默认 3**,非法环境变量值忽略降级,解析结果 <2 → `EXIT_USAGE`(C-18,与 `feedback-utils.py:resolve_threshold` 同构) [blockedBy: T031]
+- [X] T033 [US3] 在 `scripts/python/trigger-utils.py` 实现 `rotate` action 与窗口强制:截断 `telemetry.jsonl` 保留最近 `config.telemetryWindow` 行;**MUST NOT 触及 `index.json`**(晋升计数是 E2 内嵌聚合态,不由原始行重算)(FR-009a / V4.3 / V4.4) [blockedBy: T031,T030]
+- [X] T034 [US3] mirror-parity 写 + 验(Mirror Obligations 第 3 行,STRICT):`python3 scripts/python/sync-mirrors.py --write` + `diff -q` + `--check` exit 0 [blockedBy: T032,T033]
+- [X] T035 [US3] 验证:`python3 -m pytest tests/integration/test_trigger_promotion.py tests/integration/test_trigger_telemetry.py tests/contract/test_trigger_engine.py -q` 全绿(C-16…C-18 由 T017 已写就,此处随实现转绿) [blockedBy: T034]
 
 ### Manual Verification for User Story 3
 
-- [ ] T036 [US3] 人工走查 `quickstart.md` 场景 4(晋升 / 拒绝重置 / 破坏性 10 次零晋升 / 复位 / 全局关闭)与场景 5(轮转零丢失),**本任务是 SC-005 / SC-006 / SC-009 / SC-010 / SC-015 的具名产出者**,须交付:① 破坏性规则连续 **10** 次采纳后 `promoted` 恒 false 的实测(SC-005,强于其 ≥5 次下限);② 一次拒绝后计数归零(SC-006①);③ **实际运行 `bash scripts/bash/generate-instructions.sh` 后** diff `.specify/memory/trigger/index.json`,证明再生零丢失(SC-006②,此前无任何任务产出该半边);④ `config --enabled false` 后建议与自动执行均为 0、且再生后仍生效(SC-009);⑤ **三态降级走查**——状态文件缺失 / JSON 损坏 / `schemaVersion` 不兼容,各观察退出码 0 + `warnings:[state-unreadable]` + `payload.degraded=suggest-only` + 会话不中断(SC-010,此前无任何任务产出);⑥ 场景 5 的截断不变量与轮转零丢失 diff(SC-015)。全部记入 `verification.md` [blockedBy: T035]
+- [X] T036 [US3] 人工走查 `quickstart.md` 场景 4(晋升 / 拒绝重置 / 破坏性 10 次零晋升 / 复位 / 全局关闭)与场景 5(轮转零丢失),**本任务是 SC-005 / SC-006 / SC-009 / SC-010 / SC-015 的具名产出者**,须交付:① 破坏性规则连续 **10** 次采纳后 `promoted` 恒 false 的实测(SC-005,强于其 ≥5 次下限);② 一次拒绝后计数归零(SC-006①);③ **实际运行 `bash scripts/bash/generate-instructions.sh` 后** diff `.specify/memory/trigger/index.json`,证明再生零丢失(SC-006②,此前无任何任务产出该半边);④ `config --enabled false` 后建议与自动执行均为 0、且再生后仍生效(SC-009);⑤ **三态降级走查**——状态文件缺失 / JSON 损坏 / `schemaVersion` 不兼容,各观察退出码 0 + `warnings:[state-unreadable]` + `payload.degraded=suggest-only` + 会话不中断(SC-010,此前无任何任务产出);⑥ 场景 5 的截断不变量与轮转零丢失 diff(SC-015)。全部记入 `verification.md` [blockedBy: T035]
 
 **Checkpoint**: US1 + US2 + US3 —— 机制从"提醒"升级为"代办",且安全边界(破坏性永不晋升)已由零容忍测试钉死
 
