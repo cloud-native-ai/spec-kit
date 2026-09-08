@@ -207,6 +207,10 @@ CI needs. Then run the Feedback step below.
 | `${SKILL_HOME}/references/design-rationale.md` | Why behind each stage boundary and guarantee (observed failures) |
 | `${SKILL_HOME}/references/verification.md` | Per-stage verification: render check, output checks, local serve, no-docs guard |
 
+## Self-Improvement Alignment
+
+A rendered documentation site is a Harness output, not an Execution Subject by default; do not add self-modifying behavior to generated sites or deployment configuration. Site fixes remain Assisted Improvement through `create-pages`/`improve-docs`. This `create-pages` Skill is itself an Execution Subject: qualified own-run evidence may enter `.specify/shared/workflow/self-improvement-workflow.md` and route to `improve-skills`.
+
 ## Feedback
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is

@@ -24,3 +24,5 @@ This is a **map, not a manual**: it tells you *what* exists and *where* it lives
 | [Other project-specific location] | [Path] | [What lives there] |
 
 > Agent layer taxonomy (Template → Instance → Execution) is defined once in `.specify/shared/definitions/agent-definitions.md` — consult it before creating/refining/running agents.
+>
+> Self-Improvement terminology is defined once in `.specify/shared/definitions/self-improvement-definitions.md`; policy, reusable structure, and execution order live respectively under `guidelines/`, `patterns/`, and `workflow/`.

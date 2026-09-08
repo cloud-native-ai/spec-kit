@@ -50,9 +50,9 @@ Resolve these before writing anything. Mandatory fields have **no default** — 
 1. **Resolve the target and reject duplicates.** Check `.specify/memory/tools/<name>.md` and alias matches. If a record already exists, stop and hand off: offer `modify` (→ `improve-tools`) or `view`. Never silently overwrite an existing definition. When the same name exists under a *different* type, require explicit user disambiguation and present all matching records.
 2. **Collect mandatory fields from the user.** Ask for anything missing from the Intake table. **Do NOT auto-populate `source_identifier`, `description`, `arguments`, `returns`, or `behavioral_rules` from built-in knowledge about a well-known command** — that is the exact failure the record exists to prevent. If the user supplied only a name, offer discovery (step 3) to bootstrap a draft.
 3. **Bootstrap from discovery only when asked.** Run `.specify/scripts/bash/create-new-tools.sh --json --name <name> --action find` to locate a candidate source. A discovery-derived record MUST be saved with `status: Draft` and `discovery_origin: discovery-assisted`, labelled `Draft — pending user confirmation`; a manually authored one uses `discovery_origin: manual-entry`. Discovery proposes; the user confirms.
-4. **Author the record from the matching template.** Copy the template selected in the Capability Matrix and fill every placeholder. Preserve the template's section order and the `## Behavioral Rules` section — downstream consumers parse these headings. Write behavioral rules as `- {KEYWORD} {constraint}` bullets using only `MUST` / `MUST NOT` / `SHOULD` / `SHOULD NOT`.
+4. **Author the record from the matching template.** Copy the template selected in the Capability Matrix and fill every placeholder. Preserve the template's section order and the `## Behavioral Rules` section — downstream consumers parse these headings. Write behavioral rules as `- {KEYWORD} {constraint}` bullets using only `MUST` / `MUST NOT` / `SHOULD` / `SHOULD NOT`. Append `${SKILL_HOME}/templates/tool-self-improvement.md` exactly once; it governs the Tool record, never the external executable.
 5. **Capture the verified environment.** Fill `## Environment Applicability` with what was actually observed: the version the contract was verified against, any version-specific flag differences, OS/architecture applicability and per-platform differences, a fallback when the primary source is unavailable, and a cheap preflight check. **Never claim a version, platform, or architecture that was not verified** — state what you verified and leave the rest blank. Where variance is known but one invocation cannot cover it, put the branch in the relevant field rather than silently pinning one form. Omit the section entirely when the capability genuinely does not vary.
-6. **Validate before persisting.** Confirm: `tool_type` is canonical; `name`, `source_identifier`, `description` are non-empty; behavioral-rule keywords are valid; and if `status: Verified`, at least one of `arguments` / `returns` is populated. If the source path/endpoint does not exist, warn the user but still allow creation as `Draft`. Contradictory user rules are persisted as-is with an advisory note — the user is the authority. Also check token-efficiency compliance per `.specify/shared/guidelines/token-efficiency.md`: behavioral rules must not direct whole-file injection of machine-managed data into LLM context; deterministic checks belong on the tool's program side.
+6. **Validate before persisting.** Confirm: `tool_type` is canonical; `name`, `source_identifier`, `description` are non-empty; behavioral-rule keywords are valid; `## Self-Improvement Contract` is present exactly once; and if `status: Verified`, at least one of `arguments` / `returns` is populated. If the source path/endpoint does not exist, warn the user but still allow creation as `Draft`. Contradictory user rules are persisted as-is with an advisory note — the user is the authority. Also check token-efficiency compliance per `.specify/shared/guidelines/token-efficiency.md`: behavioral rules must not direct whole-file injection of machine-managed data into LLM context; deterministic checks belong on the tool's program side.
 7. **Persist and generate the `tool_id`.** Write to `.specify/memory/tools/<name>.md`. The `tool_id` is the canonical form `<TOOL:.specify/memory/tools/<name>.md>` — generate it from the workspace-relative path, never hand-type it.
 8. **Report.** State the record path, the `tool_id`, the resolved `status`, and — when the record is `Draft` — exactly which fields the user must supply to reach `Verified`. No registration table exists — the record file is the single source of truth (see `.specify/tools.md`).
 
@@ -64,6 +64,7 @@ Resolve these before writing anything. Mandatory fields have **no default** — 
 - **One record per invocation.** Batch requests are handled one tool at a time, each with its own confirmation.
 - **Do not edit `.specify/memory/tools.md`** — that file is the discovery inventory regenerated by `refresh-tools.sh`, not a definition record.
 - **Behavioral rules are authoritative at invocation time.** When a record exists, agents MUST follow its persisted rules over training knowledge.
+- **Self-Improvement contract is mandatory.** Every record contains the composed `## Self-Improvement Contract` exactly once; it MUST NOT authorize invocation or mutation of the external executable.
 
 ## Resource ID
 
@@ -74,7 +75,7 @@ Resolve these before writing anything. Mandatory fields have **no default** — 
 
 | Path | Contents |
 |------|----------|
-| `${SKILL_HOME}/templates/` | `tool-project-script-template.md`, `tool-system-binary-template.md`, `tool-shell-function-template.md`, `tool-webhook-template.md` |
+| `${SKILL_HOME}/templates/` | Four type templates plus `tool-self-improvement.md`, the single cross-cutting contract composed into each record |
 | `.specify/shared/definitions/tool-definitions.md` | Single source of truth for type semantics, RFC 2119 rules format, edge cases, and the invocation preview contract |
 | `.specify/scripts/bash/create-new-tools.sh` | Discovery bootstrap + template-driven record creation (`--action find` / `create` / `list`) |
 | `.specify/scripts/python/tools-utils.py` | Record model, validation, save/load, alias resolution |
@@ -137,6 +138,10 @@ The feedback document MUST contain:
 ```
 
 Only generate feedback when a genuine agent-specific obstacle was encountered.
+
+## Self-Improvement Integration
+
+A persisted Tool record is an Execution Subject; the external binary, function, script process, or webhook is not. Every created record includes `## Self-Improvement Contract`, referencing `.specify/shared/workflow/self-improvement-workflow.md` and naming invocation/preflight evidence, record-field mutation boundaries, `improve-tools`, validation, and the later comparison signal. The contract MUST NOT authorize invoking the Tool during definition or bypass the Tool invocation preview gate. This `create-tools` Skill routes its own qualified run evidence through `improve-skills`.
 
 ## Feedback
 

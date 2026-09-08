@@ -149,6 +149,10 @@ This skill owns no scripts, references, or assets of its own — it drives proje
 | `.specify/skills/improve-docs/SKILL.md` | Content-quality half of the pair — hand off document rewrites there |
 | `.specify/skills/create-pages/SKILL.md` | Optional presentation/publishing layer (Hugo scaffolder, layouts, CI) — hand off site requests there |
 
+## Self-Improvement Alignment
+
+Documents and documentation spaces created here are Harness assets, not Execution Subjects by default; do not inject a self-improvement contract into them. Their content/structure changes remain Assisted Improvement through `improve-docs` or `create-docs`. This `create-docs` Skill is itself an Execution Subject: qualified evidence from its own runs may enter `.specify/shared/workflow/self-improvement-workflow.md` and route to `improve-skills`.
+
 ## Feedback
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is

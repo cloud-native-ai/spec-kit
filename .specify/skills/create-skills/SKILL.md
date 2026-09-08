@@ -90,6 +90,7 @@ Optional frontmatter (on demand):
 - Result goal
 - Key steps (executable, checkable)
 - Resource references (use relative paths: `./scripts/x.py`, `./references/details.md`)
+- A `## Self-Improvement Contract` immediately before Feedback, following `.specify/shared/workflow/self-improvement-workflow.md` Create-Flow Integration without copying its steps
 - A `## Feedback` section as the final workflow section (mandatory). In Spec Kit project mode, copy the canonical block from `.specify/shared/workflow/feedback-step.md` (it begins with the runtime-mode gate), substituting `skill:<name>` / `--unit-type skill`; in standalone mode, write a self-contained variant — keep the runtime-mode gate and the reflection steps, drop the `feedback-utils.py` invocation and threshold prompt. A new Skill lacking a `## Feedback` section is **non-conformant** and MUST fail validation.
 
 **Size control**: Keep `SKILL.md` under 500 lines. Move large details into `./references/`.
@@ -157,6 +158,7 @@ Minimum checks:
 - [ ] Size: `SKILL.md` < 500 lines
 - [ ] No unrelated documentation files
 - [ ] Topology & links (when the host keeps a skill-topology registry or fans Skills out to several agent load directories): registry updated, dangling-symlink scan returns zero, each load directory resolves to the new content, and description-caching host registries refreshed — see [name-collision-and-layering.md](./references/name-collision-and-layering.md) §3
+- [ ] Self-Improvement: `## Self-Improvement Contract` is present exactly once immediately before Feedback and references the canonical workflow
 - [ ] Feedback: a `## Feedback` section is present as the final workflow section, beginning with the runtime-mode gate. Spec Kit project mode requires the canonical engine-backed block from `.specify/shared/workflow/feedback-step.md`; standalone mode requires the self-contained variant (no engine call). A Skill without the section is non-conformant — fix before reporting completion.
 - [ ] Standalone mode only: format is consistent with sibling skills in the host directory, and no `.specify/**` path is referenced
 - [ ] Spec Kit project mode: **run the existing skill-conformance contract suite** (`pytest tests/contract/ -q -k "skill or runtime_mode"`) before reporting completion — new skills are subject to ALL pre-existing conformance contracts (runtime-mode gate, feedback-section shape); a later full-suite regression is the wrong place to discover a miss. **Fallback**: if the project has no `tests/` or `tests/contract/` directory, the suite is not applicable — verify conformance via the manual checklist items above (frontmatter / Feedback section / registry / size) and state "contract suite not applicable" explicitly in the completion report; do not spin on the missing suite or report it as a failure
@@ -223,12 +225,11 @@ Skill behavior in the `/` menu is controlled by frontmatter:
 - `disable-model-invocation: true`: Not auto-triggerable
 - Both set: Both disabled
 
-## Continuous Improvement
+## Self-Improvement Integration
 
-1. Validate the skill with real tasks
-2. Record pain points and inefficient steps
-3. Revise `SKILL.md` or resource directories
-4. Validate again, forming a stable iteration
+A created Skill is an Execution Subject. Before validation, add a compact `## Self-Improvement Contract` immediately before `## Feedback`; it MUST identify the canonical Skill directory, own-run observation sources, `improve-skills` as the mutation route, validation/pressure-test route, later comparison signal, and escalation boundary. Follow `.specify/shared/workflow/self-improvement-workflow.md` Create-Flow Integration and `.specify/shared/guidelines/self-improvement.md`; do not copy their workflow or evidence-state definitions into the generated Skill. The current creation run establishes capability only—it is not evidence that the new Skill has improved.
+
+This `create-skills` Skill is itself an Execution Subject: its own qualified run evidence routes through `improve-skills`, with the same canonical-owner and outcome-pending rules.
 
 ## Feedback
 

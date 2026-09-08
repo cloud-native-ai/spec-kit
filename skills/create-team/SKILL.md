@@ -154,6 +154,7 @@ All patterns share file-path-only handoffs, progress tracking, structured result
 - **Idempotent execution** — stages/iterations/cycles can be re-run safely
 - **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory. Every team additionally keeps the tracked item ledger `items.jsonl`, and continuous teams also keep tracked `constraints.md` / `STATE.md` / `run-log.jsonl`, in the team directory. The summary delivery directory is **not** in the team directory — it belongs to the goal index `.specify/goal/<goal-slug>/summary/`
 - **Every run writes a dated report** to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` per the Report contract
+- **Every persisted team contains `## Self-Improvement Contract` exactly once**; one-shot teams do not claim subject identity
 
 ## Resources
 
@@ -212,6 +213,10 @@ If you encounter an agent-specific obstacle, generate feedback at:
 ```
 
 Only generate feedback when a genuine agent-specific obstacle was encountered.
+
+## Self-Improvement Integration
+
+A persisted `team.md` is an Execution Subject; a one-shot team and individual member executions are not separate team subjects. Persistent definitions MUST include a compact `## Self-Improvement Contract` referencing `.specify/shared/workflow/self-improvement-workflow.md`: team run reports/Post-Run Critique are own-run evidence, `improve-team` is the improvement route, behavior/autonomy changes require an independent verifier, and later comparable runs decide outcome. This composes with—not replaces—the continuous operating loop, its maturity gates, budget, and kill-switch. This `create-team` Skill routes its own qualified run evidence through `improve-skills`.
 
 ## Feedback
 

@@ -124,6 +124,10 @@ The feedback document MUST contain:
 
 Only generate feedback when a genuine agent-specific obstacle was encountered.
 
+## Self-Improvement Routing
+
+Start every run with SI-0 from `.specify/shared/workflow/self-improvement-workflow.md`. This skill is Assisted Improvement by default; an own-invocation signal from the same Tool record preserves origin=`self` while `improve-tools` performs the edit. Execute `.specify/shared/workflow/evidence-step.md` Step A/B before classification, freeze candidates, and write the Step-E intervention ledger after validation. The external executable is evidence/source, never the self-modified subject. Actual invocation remains behind the Tool preview gate, and outcome remains pending until a later comparable invocation.
+
 ## Feedback
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is

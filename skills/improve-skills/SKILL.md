@@ -133,6 +133,10 @@ Objective conditions for finishing a loop. Each is checkable, not a matter of ju
 9. **No claim of "fixed" without before/after.** Improvement outcomes are decided by the intervention ledger's next-run comparison, not by asserting the edit works.
 10. **Wrap-up commits verify the staging area.** Before any loop-end commit, `git status --short` and confirm only this loop's files are staged; unstage unrelated pre-staged entries or commit by explicit pathspec — never `git add -A`.
 
+## Self-Improvement Routing
+
+Start every run with SI-0 from `.specify/shared/workflow/self-improvement-workflow.md`. This skill is an Assisted Improvement executor by default; when the target Skill’s own completed run produced the initiating signal, preserve origin=`self` and use this Skill as the delegated improver. Workflow step 3 is SI-2, step 8 performs SI-6/SI-7, and a later comparable run performs SI-8. Report the current intervention as outcome pending; never call it “improved” before comparison. When improving `improve-skills` itself, keep the target and improver roles explicit and use a separate verifier execution for behavior-changing edits.
+
 ## Feedback
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is

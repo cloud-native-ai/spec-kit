@@ -20,6 +20,7 @@ and carry lessons forward.
 | Canonical goal model | `.specify/shared/guidelines/better-harness.md` | Single source of truth: harness definition, feedforward/feedback loop, five-dimension model, evidence red lines, improvement tracks |
 | Feedback mechanism | `.specify/shared/workflow/feedback-step.md` § Goal anchor | Feedback strengthens the **Learning Capture** dimension |
 | Evidence layer | `.specify/shared/workflow/evidence-step.md` (positioning) | The evidence red lines are the goal model's evidence discipline |
+| Self-Improvement | `.specify/shared/definitions/self-improvement-definitions.md` + `.specify/shared/workflow/self-improvement-workflow.md` | Distinguishes subject-originated loops from assisted improvement and composes feedback/evidence/improve flows |
 | Improvement skills | `improve-skills` / `improve-agent` / `improve-team` / `improve-tools` `## Goal` | Each names the dimension(s) it strengthens |
 
 ## The five dimensions in one glance
@@ -42,6 +43,8 @@ and carry lessons forward.
   automatically.
 - **Not a per-unit fork.** The goal model lives in one shared anchor; units
   reference it instead of restating it.
+- **Not unrestricted self-mutation.** Self-Improvement preserves evidence, ownership,
+  confirmation, and independent-verification boundaries; it does not grant authority.
 
 > **Related**: [prompt-to-graph.md](./prompt-to-graph.md) places this Harness
 > dimension on the wider Prompt → Context → Harness → Loop → Graph path and maps

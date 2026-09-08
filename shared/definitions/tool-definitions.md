@@ -124,6 +124,10 @@ Prompt: `Proceed with execution? (yes/no)`
 > Gate probe: gate-tools-invoke-prompt — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 - Record invocation session: tool_name, tool_id, resolved_command, result_status
 
+## Self-Improvement Boundary
+
+A persisted Tool record qualifies as an Execution Subject; the external binary/function/webhook does not. Created records carry the compact contract composed from `skills/create-tools/templates/tool-self-improvement.md` and route evidence-backed changes through `improve-tools`. Concept and execution semantics live in `self-improvement-definitions.md` and `../workflow/self-improvement-workflow.md`; this file does not duplicate them.
+
 ## Output Requirements
 
 - Tool records stored in `.specify/memory/tools/` as `.md` files
@@ -131,3 +135,4 @@ Prompt: `Proceed with execution? (yes/no)`
 - Execution never happens before user confirmation via preview gate
 - Existing complete records should be reused (avoid repeated discovery)
 - AI agent MUST use persisted records as authoritative source
+- Every created record MUST contain `## Self-Improvement Contract` exactly once

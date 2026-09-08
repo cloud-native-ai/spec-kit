@@ -63,6 +63,10 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 
 - An updated `.specify/teams/<slug>/team.md` (with a bumped `updated` date) and a change report listing each edit and its motivating evidence.
 
+## Self-Improvement Routing
+
+Start every run with SI-0 from `.specify/shared/workflow/self-improvement-workflow.md`. This skill is Assisted Improvement by default; a persisted Team’s own run report/Post-Run Critique may preserve origin=`self` while `improve-team` acts as delegated improver. Behavior, maturity, budget, territory, or autonomy changes keep the continuous-loop gates and independent verifier. Reuse Behavior step 2 as SI-2, write the Step-E intervention ledger, report outcome pending, and wait for a comparable team run before claiming improvement.
+
 ## Feedback
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is

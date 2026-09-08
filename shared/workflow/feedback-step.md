@@ -32,6 +32,13 @@ Vocabulary note: the "harness" in red line 1 means the agent CLI/runtime (the ho
 goal model's "Harness" means the project-level execution environment that Spec Kit's
 artifacts help build. The anchor adds orientation only — it never overrides these red lines.
 
+**Relationship to Self-Improvement.** Feedback is an optional observation sensor, never a
+mutation authority or a complete improvement loop. A matching framework Execution Subject may
+consume its own feedback through `self-improvement-workflow.md`, but only after evidence
+qualification; non-framework subjects MUST use their own run evidence instead of repurposing
+this framework-only store. Concept boundary:
+`.specify/shared/definitions/self-improvement-definitions.md`.
+
 Do not diverge per surface — copy the canonical block below verbatim (adjusting only
 the `<unit-id>` / `<unit-type>` placeholders for the embedding unit).
 

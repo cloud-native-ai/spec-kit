@@ -37,7 +37,7 @@ Select the capability from the request `kind` (or infer from user intent):
 | kind | Layer | Produces | Source templates | Primary section |
 |------|-------|----------|------------------|-----------------|
 | `capacity` | template | One capacity agent Class (six mandatory sections) | `skills/create-agent/templates/agent-capacity-*-template.md` | Workflow steps 1–5 below |
-| `supervisor` | template | A capacity agent that runs its own self-improvement loop | capacity template + `skills/create-agent/templates/agent-supervision-delegation.md` inlined | § Supervisor Capability |
+| `supervisor` | template | A capacity agent that orchestrates a role-scoped EEI quality loop; persistent output also receives the standard Self-Improvement Contract | capacity template + `skills/create-agent/templates/agent-supervision-delegation.md` inlined | § Supervisor Capability |
 | `custom` | instance | A single narrow, general-purpose custom `.agent.md` (not bound to a project) | free-form per intent | § Mode Confirmation |
 | `project-custom` | instance | A project-bound custom agent that marks its project and guards against being run elsewhere | `skills/create-agent/templates/agent-project-custom-template.md` | § Project-Custom Capability |
 | `execution-config` | execution | A dispatch config (and optional wrapper script) for running an agent | § Execution Config Capability | § Execution Config Capability |
@@ -81,13 +81,14 @@ Analyze the conversation history and project context to infer a useful role:
 
 ### 3. Create the template file
 
-Write `skills/create-agent/templates/agent-capacity-<slug>-template.md` following the skeleton in [`./references/template-authoring.md`](./references/template-authoring.md) — Qoder-compatible frontmatter plus six mandatory body sections (Identity & Responsibilities, Project Context, Workflow, Upstream, Downstream, Output Format).
+Write `skills/create-agent/templates/agent-capacity-<slug>-template.md` following the skeleton in [`./references/template-authoring.md`](./references/template-authoring.md) — Qoder-compatible frontmatter plus six mandatory body sections (Identity & Responsibilities, Project Context, Workflow, Upstream, Downstream, Output Format). For every persistent Template/Instance, append `${SKILL_HOME}/templates/agent-self-improvement.md` as the cross-cutting `## Self-Improvement Contract`; temporary executions do not receive it.
 
 ### 4. Validate the template
 
 - Verify YAML frontmatter has required fields (name, description, user-invocable)
 - Verify Qoder-compatible fields are present (`model`, `tools`, `maxTurns`); pick role-appropriate `tools`/`maxTurns`/`color`
 - Verify all six mandatory sections are present
+- For a persistent Template/Instance, verify the `## Self-Improvement Contract` from `${SKILL_HOME}/templates/agent-self-improvement.md` is present exactly once
 - Verify only approved `{{PLACEHOLDER}}` variables are used
 - Verify upstream/downstream references are consistent with existing role chain
 - Verify token-efficiency compliance per `.specify/shared/guidelines/token-efficiency.md`: deterministic steps delegated to programs; no whole-file injection of machine-managed data files
@@ -101,6 +102,7 @@ Write `skills/create-agent/templates/agent-capacity-<slug>-template.md` followin
 ## Constraints
 
 - Templates MUST follow the established role-based structure (six mandatory sections)
+- Every persistent Template/Instance MUST include `## Self-Improvement Contract` exactly once; temporary Executions/configs MUST NOT claim a separate subject identity
 - Templates MUST use only approved `{{PLACEHOLDER}}` variables
 - Frontmatter uses Qoder-compatible fields — `model` (default `auto`, Qoder smart routing), `tools`/`disallowedTools`, `maxTurns`/`timeoutMins`, `skills`/`mcpServers`, `permissionMode`, `background`, `isolation`, `color`. Only `name` and `description` are strictly required; set `model`/`tools`/`maxTurns` for every role and leave the rest unset unless needed.
 - Role instructions MUST be written in first-person professional identity
@@ -255,6 +257,10 @@ The feedback document MUST contain:
 ```
 
 Only generate feedback when a genuine agent-specific obstacle was encountered.
+
+## Self-Improvement Integration
+
+Persistent Agent Templates and Instances are Execution Subjects; one live Agent Execution is evidence, not an editable subject. For every persistent agent, install a compact `## Self-Improvement Contract` that identifies own-run evidence, the editable layer, `improve-agent` as the improvement route, an independent behavior verifier, and a later comparison signal. Follow `.specify/shared/workflow/self-improvement-workflow.md` Create-Flow Integration; do not copy its stages. Execution configs attach evidence to their referenced Agent and do not become a second subject. This `create-agent` Skill is itself a Skill subject and routes its own qualified run evidence through `improve-skills`.
 
 ## Feedback
 

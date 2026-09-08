@@ -125,6 +125,10 @@ Report: the document changed, the evidence behind each edit, class per edit, bef
 | `.specify/scripts/python/feedback-utils.py` | Recorded feedback digest (`--action list --contains`) |
 | `.specify/shared/patterns/reconcile-pattern.md` | Tolerance-band and anti-churn semantics shared with `create-docs` |
 
+## Self-Improvement Alignment
+
+The document being edited is not an Execution Subject by default, so this flow is Assisted Improvement of a Harness asset, even when the document reports its own validation results. Do not install self-modifying behavior in the document. This `improve-docs` Skill is itself an Execution Subject: qualified evidence from its own completed runs may enter `.specify/shared/workflow/self-improvement-workflow.md` and route to `improve-skills`.
+
 ## Feedback
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is

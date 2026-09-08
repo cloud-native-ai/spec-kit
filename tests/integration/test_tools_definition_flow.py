@@ -32,6 +32,8 @@ def test_end_to_end_definition_creates_record_with_correct_structure():
 
         content = saved_path.read_text(encoding="utf-8")
         assert "## Behavioral Rules" in content
+        assert "## Self-Improvement Contract" in content
+        assert "self-improvement-workflow.md" in content
         assert "- MUST run from the repository root directory" in content
         assert "- MUST NOT modify source files" in content
         assert "**Discovery Origin**: manual-entry" in content
