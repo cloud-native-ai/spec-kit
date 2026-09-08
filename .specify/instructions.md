@@ -87,6 +87,30 @@ Dogfooding — the people who build a product also rely on it in their real dail
 
 Operational steps, the capability table, and adoption advice: `.specify/shared/guidelines/dogfooding.md`.
 
+## Two Hats: Framework Source vs Client Runtime
+
+A self-hosting repository is **two things at once**: the framework's own source (`templates/`, `shared/`, `scripts/`, `src/`) and one of its client projects (`.specify/`, installed by the same init/refresh flow every downstream project uses). The same logic exists in two roles, and edits are not interchangeable:
+
+- **Name the hat before editing.** A change intended for *every* consuming project MUST land in the framework sources and ride the publish → install → init flow. A direct edit to this repo's `.specify/` runtime copies is a client-side instance fix: it never reaches another project, and the next refresh may overwrite it.
+- **Mirrors are generated, never hand-edited.** The `.specify/` copies are a controlled projection of the sources — edit the source, then re-sync.
+- **Path-resolution trap.** Because both surfaces live in one tree, any "walk up to the nearest ancestor containing `.specify/`" heuristic **self-matches here**, resolving every invocation to the framework repo instead of the caller's workspace. Engine self-location may fire only on a literal `.specify` component of its own resolved path, and the negative case needs its own assertion — this defect surfaces as workspace state written into the framework repo, not as a failing test.
+
+> Not the same subject as **Dogfooding Practice** above. That section is the use → feedback → iterate loop; this one is *which of the two source trees an edit belongs in*. Two different owners, one shared word — check which you need.
+
+Full rule, its rationale, and the three-copy topology: `.specify/shared/definitions/dogfooding-definitions.md` § 2.1.
+
+## Ask, Record, Repeat
+
+Three ideas, one loop — **acquire → retain → keep reachable**. Each closes a failure mode the other two cannot, and all three fail *silently*:
+
+- **Ask (问好过于猜)**: when a load-bearing fact is unknown or ambiguous, ask rather than guess — but resolve it from the repo and docs first, batch related questions together, and bring a recommendation with its tradeoff so the user is deciding, not researching. One question is cheap; a wrong premise is expensive and gets cited downstream as though it were fact.
+- **Record (好记性不如烂笔头)**: an answer obtained from the user MUST be written where the next turn will read it — conversation context dies with the session, so an answer kept only there was never recorded. Record the **rule, not the instance** (举一反三): generalize from the single correction to its class, note *why* it holds, and handle the sibling cases in the same pass.
+- **Repeat (重要的事情说三遍)**: a rule stated in exactly one place is effectively absent, because nothing guarantees a reader will open that place. Correct ownership does not equal reachability. The house pattern is three surfaces — owner doc (detail) → ambient section (summary + pointer) → contract test (drift guard). Repetition count is an importance signal in both directions: a rule you keep re-deriving is a rule that still needs a surface.
+
+**Boundary with One Source Of Truth**: repetition is legitimate in **pointer shape** (a short normative reminder plus the owner's path) and forbidden in **content shape** (restating the owner's table, threshold literal, or enumeration). Mechanical test — if changing the fact requires editing more than the owner, it is already a copy; convert it back into a reference rather than re-wording it to agree.
+
+Full philosophy, the load-bearing criteria, and where each kind of answer belongs: `.specify/shared/guidelines/ask-record-repeat.md`.
+
 ## Tech Stack & Resources
 - **Project Name**: spec-kit (distributed as `specify-cli`)
 - **Root Path**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
@@ -157,6 +181,7 @@ Project-specific gotchas distilled from prior sessions (`docs/reference/history/
   - Script names are plural: the real file is `create-new-requirements.sh` (not `-requirement`). Confirm the real path before running any script.
   - A root-owned `.git/objects/<xx>/` hash-bucket dir intermittently blocks commits (tree hashes land in buckets probabilistically). Root fix: `mv` the bucket aside, recreate it as the current user, copy the blobs back — do NOT mutate file content to dodge the hash.
   - When restructuring a command/engine, **execute its real pipeline end-to-end** (create → view → invoke, or collect → compare) as a mandatory step — "files exist / headings present" checks miss latent defects that only surface at runtime (four such defects found in one tools restructure).
+  - **Root-resolution self-match (two-hats trap)**: this repo holds BOTH the framework sources and a `.specify/` runtime, so any "walk up to the nearest ancestor containing `.specify/`" heuristic resolves every invocation to *this repo* instead of the caller's workspace. Engine self-location may fire only on a literal `.specify` component of its own resolved path (house guard: `derive-utils.py:53`), and needs a **negative** assertion — the defect surfaces as workspace state written into the framework repo (a stray `.specify/memory/<store>/` plus an appended `.gitignore` line), never as a failing test. Rule owner: `.specify/shared/definitions/dogfooding-definitions.md` § 2.1 rule 4.
 
 ## Git Workflow
 Branch roles (MAIN / PRE / DEV) are machine-maintained by the `git-workflow` skill in **`.specify/git-workflow.md`** — that managed block is the **single source of truth** for every git operation in this project. Do not edit it by hand and do not record branch information anywhere else; the operational procedure (pre-checks, rebase sequences, push strategy, `.gitexcludes` subroutine, safety rules) lives in the skill and its references.
