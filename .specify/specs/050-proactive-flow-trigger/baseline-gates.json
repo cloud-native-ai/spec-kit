@@ -1,0 +1,169 @@
+{
+  "feature": "050-proactive-flow-trigger",
+  "frozenAt": "2026-09-08",
+  "frozenBy": "T002 (/speckit.implement Phase 1 Setup)",
+  "pythonVersion": "3.11.11",
+  "pythonMeetsMinimum": true,
+  "pytestVersion": "8.4.2",
+  "syncMirrorsCheck": {
+    "exitCode": 0,
+    "expected": 0,
+    "pairs": 5,
+    "note": "templates 21 / skills 448 / agents 2 / scripts 102 / shared 33 — all ok"
+  },
+  "confirmationGates": {
+    "total": 23,
+    "destructive": 13,
+    "governanceKept": 10,
+    "violations": 0,
+    "expectedTotal": 23,
+    "expectedViolations": 0,
+    "integerHeadroom": 0,
+    "cap": 23.25,
+    "capSource": ".specify/specs/044-reduce-confirmation-flows/baseline.json (total 93) x 0.25"
+  },
+  "regenCommandCopiesCheck": {
+    "exitCode": 0,
+    "expected": 0,
+    "note": "this feature edits no command template; must stay 0"
+  },
+  "feedbackProbesValidate": {
+    "exitCode": 0,
+    "internalObjects": 73,
+    "externalObjects": 0,
+    "classes": 5,
+    "expectedInternal": 73
+  },
+  "testBaseline": {
+    "failed": 42,
+    "passed": 2496,
+    "skipped": 1,
+    "namesFile": ".specify/specs/050-proactive-flow-trigger/baseline-failed.txt",
+    "priorBaseline049Entries": 47,
+    "note": "049 baseline was 47; 5 pre-existing failures since fixed — this feature freezes its own"
+  },
+  "docker": {
+    "available": true,
+    "note": "recorded only; this feature has no container/cluster/network dependency"
+  },
+  "commandClassification": {
+    "complexCommands": 19,
+    "simpleCommands": 4,
+    "docsStepInjections": 16,
+    "note": "zero-disturbance promise (P-Q1=A): no new command => counts unchanged"
+  },
+  "seedAnchorsPrecheck": {
+    "status": "pass",
+    "verified": 13,
+    "total": 13,
+    "method": "extract `## <anchor>` section body, whitespace-normalize, assert flow name and verbatim quote both present",
+    "failures": [],
+    "anchors": [
+      {
+        "situationId": "s01",
+        "file": "templates/commands/requirements.md",
+        "anchorKind": "handoffs",
+        "anchor": "Handoffs",
+        "flow": "/speckit.clarify",
+        "ok": true
+      },
+      {
+        "situationId": "s02",
+        "file": "templates/commands/requirements.md",
+        "anchorKind": "handoffs",
+        "anchor": "Handoffs",
+        "flow": "/speckit.plan",
+        "ok": true
+      },
+      {
+        "situationId": "s03",
+        "file": "templates/commands/requirements.md",
+        "anchorKind": "handoffs",
+        "anchor": "Handoffs",
+        "flow": "/speckit.feature",
+        "ok": true
+      },
+      {
+        "situationId": "s04",
+        "file": "templates/commands/clarify.md",
+        "anchorKind": "handoffs",
+        "anchor": "Handoffs",
+        "flow": "/speckit.tasks",
+        "ok": true
+      },
+      {
+        "situationId": "s05",
+        "file": "templates/commands/tasks.md",
+        "anchorKind": "handoffs",
+        "anchor": "Handoffs",
+        "flow": "/speckit.checklist",
+        "ok": true
+      },
+      {
+        "situationId": "s06",
+        "file": "templates/commands/checklist.md",
+        "anchorKind": "handoffs",
+        "anchor": "Handoffs",
+        "flow": "/speckit.implement",
+        "ok": true
+      },
+      {
+        "situationId": "s07",
+        "file": "templates/commands/implement.md",
+        "anchorKind": "handoffs",
+        "anchor": "Handoffs",
+        "flow": "/speckit.analyze",
+        "ok": true
+      },
+      {
+        "situationId": "s08",
+        "file": "templates/commands/implement.md",
+        "anchorKind": "handoffs",
+        "anchor": "Handoffs",
+        "flow": "/speckit.review",
+        "ok": true
+      },
+      {
+        "situationId": "s09",
+        "file": "shared/workflow/feedback-step.md",
+        "anchorKind": "owning-section",
+        "anchor": "Threshold prompt protocol",
+        "flow": "/speckit.feedback",
+        "ok": true
+      },
+      {
+        "situationId": "s10",
+        "file": "templates/commands/feedback.md",
+        "anchorKind": "owning-section",
+        "anchor": "Outline",
+        "flow": "/speckit.feedback",
+        "ok": true
+      },
+      {
+        "situationId": "s11",
+        "file": "templates/commands/sanitize.md",
+        "anchorKind": "handoffs",
+        "anchor": "Handoffs",
+        "flow": "/speckit.docs",
+        "ok": true
+      },
+      {
+        "situationId": "s12",
+        "file": "templates/commands/docs.md",
+        "anchorKind": "handoffs",
+        "anchor": "Handoffs",
+        "flow": "/speckit.instructions",
+        "ok": true
+      },
+      {
+        "situationId": "s13",
+        "file": "templates/commands/feature.md",
+        "anchorKind": "handoffs",
+        "anchor": "Handoffs",
+        "flow": "/speckit.constitution",
+        "ok": true
+      }
+    ],
+    "note": "T003 human pre-flight for seed-derivation.md C-7: all anchors live before implementation, so a later C-7 failure is attributable to this feature, not to stale sources"
+  }
+}
