@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-08T07:07:28Z",
+  "updated": "2026-09-08T15:31:51Z",
   "threshold": 10,
-  "count_since_submission": 15,
+  "count_since_submission": 16,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260908T153151Z-speckit-implement",
+      "file": "20260908T153151Z-speckit-implement.md",
+      "unit_id": "/speckit.implement",
+      "unit_type": "command",
+      "run_id": "050-implement-20260908T1500-wrapup",
+      "probe": "speckit-implement-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "050-proactive-flow-trigger",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-08T15:31:51Z",
+      "summary": "Full /speckit.implement run on feature 050 to completion: 51 tasks closed as 50 [X] + 1 [~], all 8 Completion Gates re-validated against the current tree rather than trusted, DoD Status flipped to gre"
+    },
     {
       "id": "20260908T070728Z-speckit-implement",
       "file": "20260908T070728Z-speckit-implement.md",
