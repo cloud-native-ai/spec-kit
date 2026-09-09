@@ -4,7 +4,7 @@ Generate or update project instructions and compatibility symlinks, ensuring a c
 
 ## When to Use
 
-- After `specify init` to generate the initial project instructions
+- **Immediately after `specify init` — a required second step, not an optional follow-up.** `specify init` distributes resources (`.specify/templates/`, `.specify/scripts/`, `.specify/shared/`, `.specify/memory/`) but never writes `.specify/instructions.md` and never creates any agent symlink; until this command runs, no agent has an instruction file to read. It renders `.specify/instructions.md` from the template and creates every agent path — `CLAUDE.md`, `AGENTS.md`, `QODER.md`, `HERMES.md`, `.github/copilot-instructions.md`, `.opencode/instructions.md`, and the IDE-side `.qoder/project_rules.md` / `.claude/project_rules.md`
 - After template, documentation, or configuration updates to refresh AI context
 - When compatibility symlinks need to be recreated
 - To sync project-wide AI instructions across Claude Code, GitHub Copilot, opencode, Qoder, Codex CLI, and Hermes Agent
