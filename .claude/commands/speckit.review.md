@@ -27,6 +27,13 @@ Produce a **self-contained, improvement-focused** review report for spec-kit fra
 
 Run `.specify/scripts/bash/check-prerequisites.sh --json --require-spec --include-spec --include-plan --include-tasks`; parse REQUIREMENTS_DIR, FEATURE_ID, FEATURE_NAME, AVAILABLE_DOCS. Then capture via git/shell: REPO_NAME, REPO_URL, BRANCH, COMMIT_SHA, REPO_ROOT_ABS, REVIEW_DATE, REVIEWER, ENVIRONMENT, SPECKIT version, ARTIFACT_INVENTORY (basename, path, line count, one-line summary per artifact).
 
+**Verify that commit-anchored citations will actually resolve** before relying on them — this fails routinely in forks:
+
+- Capture ALL remotes (`git remote -v`), not just `remote.origin.url`. In a fork, `origin` is often the UPSTREAM project while the work lives on a differently-named remote, so a `{REPO_URL}@{COMMIT_SHA}` citation built from `origin` points at a repository that does not contain the commit.
+- Run `git branch -r --contains HEAD`. If it is empty the commit is unpushed and NO URL citation can resolve.
+- Record the result as a `Reachability of COMMIT_SHA` row in §0. When unreachable, cite absolute paths plus `git show <sha>:<path>` recovery instructions instead of URLs, and say so explicitly — a report that looks portable but is not is worse than one that is obviously local.
+- Note that `blob/` URL syntax assumes an HTTPS web remote; SSH-only remotes cannot be rendered that way.
+
 ### 2. Reconstruct process execution history
 
 From `git log` scoped to REQUIREMENTS_DIR: commit ordering, command traces (distinctive artifacts), deviations from prescribed workflow, friction moments (dirty tree, version skew, manual rewrites, repeated template fixes).

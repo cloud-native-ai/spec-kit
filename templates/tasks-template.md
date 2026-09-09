@@ -49,7 +49,13 @@ description: "Task list template for feature implementation"
 - DoD-5: Code reviewed and approved
 - DoD-6: Changes validated against success criteria from requirements.md
 
-**DoD Status**: pending | green   <!-- flip to `green` only when every DoD-N row above is satisfied -->
+**DoD Status**: pending | green | green-with-void   <!-- flip to `green` only when every DoD-N row above is satisfied.
+     Use `green-with-void` when every row is satisfied except one whose PREMISE is measurably false and therefore
+     cannot be satisfied at all (e.g. it names a script that does not write the file it claims to regenerate).
+     Voiding a row requires: (a) cited measurement, not assertion; (b) an inline annotation on this line naming the
+     void row; (c) when the false premise lives in a framework artifact, a correction entry naming every surface that
+     repeats it. A void row is neither "met" nor an open task — never fold it silently into `green`, and never block a
+     finished feature on a requirement that cannot exist. -->
 
 ## Completion Gate
 

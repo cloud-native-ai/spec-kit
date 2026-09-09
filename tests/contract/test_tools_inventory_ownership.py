@@ -138,8 +138,12 @@ def test_generator_actually_writes_the_three_inventories():
         ), f"generate-instructions.sh no longer redirects {source} into {target}"
 
 
-def test_refresh_tools_writes_no_file():
-    """The trap that made DoD-8 unsatisfiable: bare --json is a usage error."""
+def test_refresh_tools_requires_a_source_flag_and_says_why():
+    """The trap that made DoD-8 unsatisfiable: bare --json is a usage error.
+
+    The message must name the requirement AND correct the inventory misconception
+    at the point of failure — that is what stops the next agent from repeating it.
+    """
     proc = subprocess.run(
         ["bash", str(REFRESH), "--json"], cwd=ROOT, capture_output=True, text=True
     )
@@ -147,14 +151,30 @@ def test_refresh_tools_writes_no_file():
         "refresh-tools.sh --json now succeeds standalone; if it also writes "
         ".specify/memory/tools.md, the owner doc must be updated to say so"
     )
-    src = read("scripts/bash/refresh-tools.sh")
-    assert "memory/tools.md" not in src, (
-        "refresh-tools.sh references memory/tools.md — re-check the ownership claim"
+    usage = proc.stderr
+    assert "SOURCE flag" in usage, "the usage text must say a source flag is required"
+    assert "memory/tools.md" in usage and "hand-maintained" in usage, (
+        "the usage text must correct the misconception at the point of failure"
     )
 
 
+# A mention of a path is not a write to it: refresh-tools.sh now documents that it
+# does NOT produce .specify/memory/tools.md, so these assert on write operations.
+WRITE_PATTERNS = (
+    r">\s*[^\n]*memory/tools\.md",          # shell redirection into it
+    r"tee\s+[^\n]*memory/tools\.md",        # tee into it
+    r"memory/tools\.md[^\n]*['\"][wa]",     # python open(..., "w"/"a")
+    r"write_text[^\n]*memory/tools\.md",
+    r"memory/tools\.md[^\n]*write_text",
+)
+
+
+def _write_offenders(text: str) -> list:
+    return [p for p in WRITE_PATTERNS if re.search(p, text)]
+
+
 def test_no_script_writes_the_mcp_index():
-    """Nothing in scripts/ or src/ writes it, by literal or fragment-built path."""
+    """Nothing in scripts/ or src/ WRITES it (mentioning it to warn is fine)."""
     offenders = []
     for base in ("scripts", "src"):
         d = ROOT / base
@@ -164,9 +184,23 @@ def test_no_script_writes_the_mcp_index():
             if p.suffix not in (".py", ".sh") or not p.is_file():
                 continue
             text = p.read_text(encoding="utf-8", errors="replace")
-            if "memory/tools.md" in text or re.search(r'["\']tools["\']\s*\+\s*["\']\.md', text):
-                offenders.append(p.relative_to(ROOT).as_posix())
+            hits = _write_offenders(text)
+            if hits:
+                offenders.append(f"{p.relative_to(ROOT).as_posix()} {hits}")
+            # A fragment-built path would evade every literal pattern above.
+            if re.search(r'["\']tools["\']\s*\+\s*["\']\.md', text):
+                offenders.append(f"{p.relative_to(ROOT).as_posix()} fragment-built path")
     assert not offenders, (
-        f"these scripts reference the MCP index path; if one now writes it, the owner "
+        "these scripts WRITE the MCP index; if that is now intentional, the owner "
         f"doc's 'hand-maintained' claim is stale: {offenders}"
+    )
+
+
+def test_mention_without_write_is_allowed():
+    """Guard the guard: the check above must not regress into a substring ban."""
+    assert not _write_offenders(
+        "Note: .specify/memory/tools.md is NOT produced here — it is hand-maintained."
+    ), "a warning that mentions the path must not be classified as a write"
+    assert _write_offenders('cat > "$ROOT/.specify/memory/tools.md"'), (
+        "an actual redirection into the path must be classified as a write"
     )
