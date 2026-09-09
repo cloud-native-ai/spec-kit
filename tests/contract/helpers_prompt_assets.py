@@ -4,6 +4,7 @@ Used by test_summarize_project_prompt_assets.py and
 test_study_project_uml_assets.py (spec 030-summarize-project, Feature 013).
 Modeled on the conventions of test_create_skills_prompt_assets.py.
 """
+import importlib.util
 from pathlib import Path
 
 import yaml
@@ -11,6 +12,27 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 
 INSTRUCTIONS_FILE = ROOT / ".specify" / "instructions.md"
+
+
+def _mirror_ignore_names() -> frozenset:
+    """Reuse sync-mirrors.py's IGNORE_NAMES rather than restating it.
+
+    sync-mirrors.py owns the definition of a mirror difference and already skips
+    runtime junk; a comparison stricter than the tool it verifies fails on
+    git-ignored, never-authored bytecode (__pycache__/*.pyc), whose presence on
+    each side depends on import order — making the result order-dependent.
+    Loaded by path because the filename is hyphenated (house pattern:
+    tests/script_api.py).
+    """
+    path = ROOT / "scripts" / "python" / "sync-mirrors.py"
+    spec = importlib.util.spec_from_file_location("_sync_mirrors_ignore", path)
+    assert spec is not None and spec.loader is not None, f"cannot load {path}"
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return frozenset(module.IGNORE_NAMES)
+
+
+MIRROR_IGNORE_NAMES = _mirror_ignore_names()
 
 
 def read_frontmatter(path: Path) -> dict:
@@ -46,11 +68,16 @@ def assert_ordered(text: str, needles: list[str], context: str = "") -> None:
 
 
 def dir_file_map(base: Path) -> dict[str, str]:
-    """Map relative path -> file text for every file under base."""
+    """Map relative path -> file text for every non-junk file under base.
+
+    Paths containing an ignored name (see MIRROR_IGNORE_NAMES) are skipped: they
+    are runtime artifacts, never authored, git-ignored, and their presence on
+    each side depends on import order.
+    """
     return {
         str(p.relative_to(base)): p.read_text(encoding="utf-8")
         for p in sorted(base.rglob("*"))
-        if p.is_file()
+        if p.is_file() and not (MIRROR_IGNORE_NAMES & set(p.relative_to(base).parts))
     }
 
 
