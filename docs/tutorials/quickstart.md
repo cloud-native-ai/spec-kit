@@ -263,7 +263,7 @@ Commands follow a natural order. The table below shows common prerequisites and 
 
 This flowchart shows three phases with role-based agents as auxiliary aids:
 
-1.  **Phase 1 — Setup**: Run `specify init` to create the `.specify/` structure, then optionally run `/speckit.constitution` and `/speckit.instructions`.
+1.  **Phase 1 — Setup**: Run `specify init` to create the `.specify/` structure, then run `/speckit.instructions`. The second step is **required, not optional**: `specify init` distributes resources but never writes `.specify/instructions.md` and never creates any agent symlink (`CLAUDE.md`, `AGENTS.md`, `QODER.md`, `HERMES.md`, `.github/copilot-instructions.md`, `.opencode/instructions.md`, and the IDE-side `project_rules.md` links). Until `/speckit.instructions` runs — which invokes `scripts/bash/generate-instructions.sh` — no agent has an instruction file to read. `/speckit.constitution` remains optional at this point.
 2.  **Phase 2 — Customize (Optional)**: Run `/speckit.agents` to generate role-based agents for your project. Use `create-agent` or `create-skills` to define custom agents or skills. Or skip this phase and use the defaults.
 3.  **Phase 3 — Core Development Lifecycle**:
     *   `1. /speckit.feature`: Create/select a feature registry entry.
@@ -286,7 +286,7 @@ Each supported AI assistant follows the same lifecycle pattern:
 
 1. Initialize with `specify init <project> --ai <tool>` (or `specify init . --ai <tool>` for existing directories)
 2. Verify the tool is available (or use `--ignore-agent-tools` to skip the check)
-3. Refresh cross-agent instruction links after template updates by running `/speckit.instructions`
+3. Run `/speckit.instructions` **once immediately after `specify init`** — it renders `.specify/instructions.md` and creates every agent symlink — and again after any template update to refresh cross-agent instruction links
 4. Re-run `/speckit.review` before release to verify support remains consistent across assistants
 
 Supported tools (Tier 1): `claude`, `codex`, `qoder`, `opencode`; (Tier 2): `hermes`, `copilot`.

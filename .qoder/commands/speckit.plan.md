@@ -141,7 +141,7 @@ After generating all Phase 1 artifacts (especially contract documents under `con
    - Normative rules (MUST, MUST NOT, SHOULD)
    - Concrete examples or schemas
    - No first-person reasoning, no self-correction prose, no exploratory narration
-4. **Execution-verify emitted command examples**: every executable CLI example written into `quickstart.md` or `contracts/` MUST be either (a) executed once against the real tool during this phase, or (b) pinned by a contract test asserting its validity. Examples written from intent instead of code routinely drift from actual validators (flags, ID formats, argument grammars) and ship as broken documentation.
+4. **Execution-verify emitted command examples**: every executable CLI example written into `quickstart.md` or `contracts/` MUST be either (a) executed once against the real tool during this phase, or (b) pinned by a contract test asserting its validity. Examples written from intent instead of code routinely drift from actual validators (flags, ID formats, argument grammars) and ship as broken documentation. A **file-level** disclaimer ("this component is not implemented yet, so the examples below cannot be executed") does NOT discharge this rule for the examples it does not cover — it silently vouches for them. Scope any disclaimer **per example**, and for route (b) name exactly which examples the contract test pins. Where an example depends on a multi-step pipeline, show every step: a scenario that omits a required step is wrong even when each command it does show works. (Observed in practice: a quickstart disclaimed only its not-yet-implemented engine examples, which implicitly vouched for a `specify init` example that was never executed and was wrong — it assumed init creates the agent instruction symlinks, which it does not.)
 
 ## Key rules
 
@@ -171,6 +171,10 @@ At wrap-up (the same lifecycle point where this command prompts for a Git commit
 ## Documentation
 
 At the same wrap-up point as the Feedback step, apply the docs-sync evaluation per the canonical convention in `.specify/shared/workflow/docs-step.md`: assess whether information produced by this run (new capabilities, key decisions, structural changes) needs to be recorded into the project documentation space, and conclude with exactly one of `需记录（目标文档 + 要点）` or `无需记录`. Never block wrap-up; incremental judgment only (no full reconcile sweep); when a move/archive-level change is needed, recommend running `/speckit.docs` instead of executing it here.
+
+## Artifact Commit
+
+At wrap-up, **before** the Feedback and Documentation steps, commit the artifact this command produced — and only that artifact, staged by explicit path. Follow the canonical convention in `.specify/shared/workflow/artifact-commit-step.md`: run the deletion-surface audit first, use a single-line message per `.specify/templates/commit-template.md`, never `git add -A`, and never fold another command's uncommitted artifacts into this commit (report that as an upstream deviation instead). A read-only run that produced no artifact skips this step and says so in one line rather than creating an empty commit. Committing here does not advance the feature's lifecycle status and does not push.
 
 ## Handoffs
 
