@@ -37,7 +37,7 @@ When `/speckit.docs` supplies `.specify/docs/target-structure.md`, treat only it
    | `CONTRIBUTING.md` | Contribution entry summarizing `docs/contribute/` |
    | `CHANGELOG.md` | Self-contained timeline |
 
-   These are **Reserved Filenames（保留文件名）** — like reserved keywords: each entry registers fixed semantics AND a registered location (currently project root), and may appear ONLY there (strict blocking, constitution Principle X). User documents MUST NOT use a reserved name; same-semantics documents elsewhere use lowercase alternatives — **directory indexes are `index.md`, never a nested `README.md`**. The registry is extensible (a new reserved name registers semantics + location). Ordinary documents MUST be lowercase `kebab-case.md`.
+   These are **Reserved Filenames（保留文件名）** — like reserved keywords: each entry registers fixed semantics AND a registered location (currently project root), and may appear ONLY there (strict blocking, constitution Principle X). User documents MUST NOT use a reserved name; same-semantics documents elsewhere use lowercase alternatives — **directory indexes are `index.md`, never a nested `README.md`**. The registry is extensible (a new reserved name registers semantics + location). An ALL-CAPS root name the engine's built-in registry does not carry, but that local conventions establish as a tool-mandated anchor (e.g. a C-zone compatibility entry file the host AI agent requires), is accepted by passing it on **every** validate call as `--allow-special <NAME>` (repeatable; flag semantics: the engine's `--help`) — the set is resolved once at R0 from local conventions, so a tolerated name stays tolerated instead of re-appearing as a finding on every run. A name without that local standing remains a violation — the flag extends the registry, it does not mute the check. Ordinary documents MUST be lowercase `kebab-case.md`.
 
 2. **Thick `docs/` layer — six formal type directories + notes**: `concepts/` (What & Why) · `tutorials/` (learning path) · `tasks/` (task steps) · `reference/` (exact specs) · `decisions/` (ADR, append-only: NNNN-slug.md + index.md + template; status Proposed/Accepted/Deprecated/Superseded by — annotate, never rewrite history) · `contribute/` (contributor guide) · `notes/` (temporary, lifecycle-constrained, exits).
 
@@ -70,12 +70,14 @@ When `/speckit.docs` supplies `.specify/docs/target-structure.md`, treat only it
 
 **Authoring vs fan-out discriminator**: the commission asks to *create* content (topic/requirements given, artifact absent) → authoring; the input *is* the content (existing material to file away) → fan-out. Ambiguous → ask per the R0 rule (≤3 questions), never guess.
 
+**Resolution discipline**: resolving input to exactly one scope is a routing decision that runs under the explicit–implicit rule pattern — the table above is this engine's explicit layer; precedence, confidence-gate, and promotion semantics are owned by [`.specify/shared/patterns/explicit-implicit-pattern.md`](../../shared/patterns/explicit-implicit-pattern.md).
+
 **Site requests are a hand-off, not a scope.** "生成站点"/"发布文档"/"build the site" is beyond-structure work: name `create-pages` and stop. This engine never scaffolds, mounts, or builds a site — but it does keep skipping site-tooling directories per the C-zone rule above.
 
 ### Reconcile Loop (thin dispatch — engine semantics live in the pattern doc)
 
 - R0 baseline: load the Desired-State Baseline + local conventions + user input. Underdetermined → ask ≤3 questions, never fabricate.
-- R1 observe → **观察快照** (inline): tree status, root-entry sizes, stray files, deterministic findings from `python3 ${SKILL_WORKDIR}/.specify/scripts/python/docs-utils.py --action validate --root .` (reserved-name case/misuse, one-screen threshold, broken links, ADR numbering, notes frontmatter) plus `--action scan` for notes.
+- R1 observe → **观察快照** (inline): tree status, root-entry sizes, stray files, deterministic findings from `python3 ${SKILL_WORKDIR}/.specify/scripts/python/docs-utils.py --action validate --root . [--allow-special <NAME>]…` (reserved-name case/misuse, one-screen threshold, broken links, ADR numbering, notes frontmatter; the `--allow-special` set comes from R0 local conventions — Desired-State Baseline item 1) plus `--action scan` for notes.
 - R2 compute desired state; R3 diff **tolerance band first** — within-band cosmetic diffs are marked "已一致（容忍）" and never enter the plan (anti-churn: a repeat run on an unchanged space converges nothing).
 - R4 **干跑计划** written to `${SKILL_WORKDIR}/.specify/docs/plans/<ts>-plan.md` with `[x]/[ ]` opt-out rows for every move/archive/restructure item. No disk writes while planning.
 - R5 converge per the tiered gates below; `mkdir → write → mv → fix-links → audit`; same-name targets never clobbered (suffix `__<ts>`); on any mv failure stop remaining items and ask for review. After moves, repair links mechanically with `--action fix-links --moves <json>` over the move mappings — never hand-edit each link site. **审计日志** appended via `python3 ${SKILL_WORKDIR}/.specify/scripts/python/docs-utils.py --action audit --root . --scope <scope> --summary <one-line> [--items-file <json>]` → `${SKILL_WORKDIR}/.specify/docs/audit/` — write it even when 零收敛/无净变化 ("all dimensions within tolerance"). The `--items-file` payload is a **flat JSON list** of objects `[{"action": "...", "source": "...", "target": "...", "result": "..."}, ...]` — do NOT pass a grouped/nested object (the engine iterates the list directly and a grouped shape crashes with a raw `AttributeError`).
@@ -108,7 +110,7 @@ Same engine, authoring semantics: the desired state **gains new documents** from
   - **Root entries**: ≤ one screen; overflow sinks into `docs/` and the root entry links to it.
   - **Style**: follow the local conventions of existing docs in the same directory (language, heading structure, link style) — local conventions outrank templates.
   - **Never clobber**: same-name conflicts get the `__<ts>` suffix, never an overwrite.
-- **R6 验证 + 收尾**: run `python3 ${SKILL_WORKDIR}/.specify/scripts/python/docs-utils.py --action validate --root .`; append the **审计日志** (`--action audit --scope authoring --summary "<one-line>"`) even when nothing was written; end with the inline **残差报告**: written / updated / tolerated / pending-human-decision.
+- **R6 验证 + 收尾**: run `python3 ${SKILL_WORKDIR}/.specify/scripts/python/docs-utils.py --action validate --root .` with the same `--allow-special` set as R1; append the **审计日志** (`--action audit --scope authoring --summary "<one-line>"`) even when nothing was written; end with the inline **残差报告**: written / updated / tolerated / pending-human-decision.
 
 ### Notes Lifecycle Automation
 
@@ -132,7 +134,7 @@ Reference documentation: `docs/reference/commands/docs.md`.
 
 ## Path Conventions
 
-This Skill follows the canonical path conventions defined in `templates/commands/skills.md` (`## Path Conventions`):
+This Skill follows the canonical `${SKILL_HOME}` / `${SKILL_WORKDIR}` path conventions:
 
 - Use `${SKILL_HOME}/<relative-path>` for every Skill-owned resource reference (scripts, references, assets).
 - Use `${SKILL_WORKDIR}/<relative-path>` for every runtime/user-facing path this Skill reads from or writes to (inputs in the user's project, outputs delivered to the user).
@@ -146,6 +148,7 @@ This skill owns no scripts, references, or assets of its own — it drives proje
 |------|----------|
 | `${SKILL_WORKDIR}/.specify/scripts/python/docs-utils.py` | Notes/validation engine: `validate`, `scan`, `expire`, `clean`, `archive-check`, `stats`, `audit`, `fix-links` (contract: `--help`; spec 033) |
 | `.specify/shared/patterns/reconcile-pattern.md` | Reconcile engine semantics: tolerance band, anti-churn, dry-run plan |
+| `.specify/shared/patterns/explicit-implicit-pattern.md` | Scope-resolution semantics: explicit-first precedence, confidence gate, promotion loop |
 | `.specify/skills/improve-docs/SKILL.md` | Content-quality half of the pair — hand off document rewrites there |
 | `.specify/skills/create-pages/SKILL.md` | Optional presentation/publishing layer (Hugo scaffolder, layouts, CI) — hand off site requests there |
 

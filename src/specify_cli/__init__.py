@@ -348,6 +348,83 @@ def load_project_agent_definitions(project_path):
 # verified from (FR-010); codex/hermes are annotated rows, not rendered.
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Tool value domains (contracts/tool-mapping.md M-6): a neutral value the
+# target tool cannot parse MUST NOT be emitted. opencode hard-validates its
+# agent frontmatter at startup (config-invalid → refuses to boot): `color`
+# accepts only a #RRGGBB hex string or one of its theme enum names, and
+# `steps` must be a positive integer. Neutral English color names are
+# translated via _OPENCODE_COLOR_HEX_MAP; anything untranslatable is skipped
+# per M-5 and counted in the render stats' unmapped summary.
+# ---------------------------------------------------------------------------
+
+_OPENCODE_THEME_COLORS = frozenset(
+    {"primary", "secondary", "accent", "success", "warning", "error", "info"}
+)
+_OPENCODE_COLOR_HEX_MAP = {
+    "red": "#FF0000",
+    "green": "#008000",
+    "blue": "#0000FF",
+    "yellow": "#FFFF00",
+    "orange": "#FFA500",
+    "purple": "#800080",
+    "violet": "#8A2BE2",
+    "pink": "#FFC0CB",
+    "brown": "#A52A2A",
+    "cyan": "#00FFFF",
+    "teal": "#008080",
+    "magenta": "#FF00FF",
+    "navy": "#000080",
+    "olive": "#808000",
+    "maroon": "#800000",
+    "lime": "#00FF00",
+    "gray": "#808080",
+    "grey": "#808080",
+    "silver": "#C0C0C0",
+    "gold": "#FFD700",
+    "black": "#000000",
+    "white": "#FFFFFF",
+}
+
+
+def _apply_agent_value_rule(rule, value):
+    """Translate/validate one neutral value against its render rule's spec.
+
+    Returns ``(value_to_emit, None)`` when the target tool accepts the value,
+    or ``(None, reason)`` when it would not (M-6) — the caller then skips the
+    field and counts it as an unmapped intent (M-5).
+
+    Recognized spec keys (all optional; a rule carrying none of them passes
+    values through unchanged, preserving every existing tool's behaviour):
+      ``value_map``  — dict of neutral value → tool value (matched lowercase)
+      ``value_enum`` — set of accepted final string values
+      ``value_re``   — regex the final string value must fully match
+      ``value_int``  — when True, the value must be a positive integer
+    """
+    if rule.get("value_int"):
+        if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+            return None, f"{value!r} is not a positive integer"
+        return value, None
+    if not any(k in rule for k in ("value_map", "value_enum", "value_re")):
+        return value, None
+    text = value if isinstance(value, str) else str(value)
+    value_map = rule.get("value_map")
+    if value_map:
+        mapped = value_map.get(text.strip().lower())
+        if mapped is not None:
+            return mapped, None
+    value_enum = rule.get("value_enum")
+    if value_enum and text in value_enum:
+        return text, None
+    value_re = rule.get("value_re")
+    if value_re and re.fullmatch(value_re, text):
+        return text, None
+    return None, (
+        f"{text!r} is outside the target tool's accepted domain "
+        "(no translation, enum match, or pattern match)"
+    )
+
+
 _AGENT_METADATA_MAPPING = {
     "qoder": {
         "mode": "render",
@@ -428,8 +505,16 @@ _AGENT_METADATA_MAPPING = {
             # `tools` is deprecated in opencode agent frontmatter (D3).
             "capability-tools": None,
             "skills": None,
-            "run-turn-budget": {"emit": "steps"},
-            "display-color": {"emit": "color"},
+            # opencode hard-validates both values at startup (M-6): `steps`
+            # must be a positive integer; `color` must be #RRGGBB hex or a
+            # theme enum name — neutral English names are translated.
+            "run-turn-budget": {"emit": "steps", "value_int": True},
+            "display-color": {
+                "emit": "color",
+                "value_map": _OPENCODE_COLOR_HEX_MAP,
+                "value_enum": _OPENCODE_THEME_COLORS,
+                "value_re": r"#[0-9a-fA-F]{6}",
+            },
         },
         "provenance": "https://opencode.ai/docs/agents/",
     },
@@ -601,6 +686,12 @@ def render_agents_for_tool(project_path, tool, tracker=None):
                     continue
                 out_lines.append(f"{rule['emit']}: " + ", ".join(value))
             else:
+                value, problem = _apply_agent_value_rule(rule, value)
+                if problem:
+                    # M-6: never emit a value the target tool would reject —
+                    # skip the field and count it as an unmapped intent (M-5).
+                    stats["unmapped"].setdefault(slug, []).append(key)
+                    continue
                 out_lines.append(
                     f"{rule['emit']}: {_format_agent_frontmatter_value(value)}"
                 )
@@ -1535,7 +1626,13 @@ def generate_commands(
         else:
             body = cleaned_content.strip()
 
-        # Replace placeholders in the final body
+        # Replace placeholders in the final body.
+        # A multi-line `sh: |` block expands to a fenced ```bash block; the
+        # template quotes the placeholder as inline code (`{SCRIPT}`), so
+        # those backticks must be consumed together with the placeholder or
+        # they remain as stray characters around the fence in every copy.
+        if script_command.startswith("\n```"):
+            body = body.replace("`{SCRIPT}`", script_command)
         body = body.replace("{SCRIPT}", script_command)
         body = body.replace("__AGENT__", agent)
 

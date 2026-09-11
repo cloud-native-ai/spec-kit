@@ -43,7 +43,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
    - Generate dependency graph showing user story completion order
    - Create parallel execution examples per user story
    - Validate task completeness (each user story has all needed tasks, independently testable)
-   - Validate story-label placement mechanically: every task row inside a User Story phase carries exactly one `[US*]` label, and NON-story phases (Setup / Foundational / Polish) carry ZERO `[US` markers — placeholder labels like `[US-none]` are format violations (grep the phase ranges; do not rely on remembering the rule)
+   - Validate story-label placement mechanically: every task row inside a User Story phase carries exactly one `[US*]` label, and NON-story phases (Setup / Foundational / Polish) carry ZERO `[US` markers — placeholder labels like `[US-none]` are format violations (enforced by the structural validator in step 5; do not rely on remembering the rule)
 
 4. **Generate tasks.md**: Use `.specify/templates/tasks-template.md` as structure, fill with:
    - Correct feature name from plan.md
@@ -58,7 +58,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
    - Parallel execution examples per story
    - Implementation strategy section (MVP first, incremental delivery)
 
-5. **Validate DoD format**: Before writing the final file, verify that the `## Definition of Done` section uses ONLY the `- DoD-N:` prefix format. No line in this section may match `^\- \[[ xX~]\]` (checkbox syntax is reserved for task rows). If any DoD items were accidentally written with checkboxes, rewrite them using the `- DoD-N:` prefix.
+5. **Mechanical structural validation (program-first — see `.specify/shared/guidelines/token-efficiency.md`)**: run `python3 .specify/scripts/python/validate-tasks.py <path-to-generated-tasks.md>` on the written file (also valid on rerun against an existing tasks.md). The validator owns the fixed structural rules — task-row single-line contract, ID uniqueness, `blockedBy` resolvability, `[P]` parallel safety (two parallel tasks naming the same file), story-label placement, and the DoD format rule (`## Definition of Done` uses ONLY the `- DoD-N:` prefix; no line in that section may match `^\- \[[ xX~]\]` checkbox syntax) — never hand-roll these checks per run. Fix every ERROR (including rewriting any checkbox-formatted DoD items with the `- DoD-N:` prefix) and re-run until exit 0; resolve or explicitly justify each WARN in the report.
 
 6. **Report**: Output path to generated tasks.md and summary:
    - Total task count
@@ -67,6 +67,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
    - Independent test criteria for each story
    - Suggested MVP scope (typically just User Story 1)
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
+   - Structural validator status: final `validate-tasks.py` verdict (exit code, error/warning counts, justification for any remaining WARN)
 
 Context for task generation: 
 - Design documents from REQUIREMENTS_DIR: {AVAILABLE_DOCS}
@@ -107,9 +108,18 @@ or
 
 When any generated task depends on an external environment (docker daemon, network-pullable images, a live cluster, special hardware):
 
-1. **Probe availability now**: check each required environment during task generation (e.g. `docker info`, a registry pull check) instead of letting `/speckit.implement` discover the gap mid-run.
-2. **Emit a per-phase prerequisites block**: each affected phase lists its environment prerequisites explicitly so a runner can skip or defer the phase as a unit.
+1. **Probe availability now**: check each required environment during task generation (e.g. `docker info`, a registry pull check) instead of letting `/speckit.implement` discover the gap mid-run. Probe results are NEVER cached across sessions or runs — re-probe on every generation and every rerun.
+2. **Single landing point**: record every probe conclusion exactly ONCE, in the generated tasks.md's `## Environment Prerequisites` section (see `.specify/templates/tasks-template.md`). Per-phase prerequisites and `[~]` task notes MUST reference that section instead of restating verdicts — two hand-synced copies of the same conclusion drift apart.
 3. **Pre-validate named targets**: any concrete build/smoke target named in a task MUST have a locally satisfiable dependency chain (base images pullable, toolchain present). If unsatisfiable, either substitute a satisfiable target up front or pre-flag the task `[~]`-eligible in Notes with the substitution guidance.
+4. **Cross-artifact drift check**: after probing, grep this feature's sibling artifacts for environment assertions; any stale claim contradicting the fresh probe result MUST be corrected or flagged in the same run, so artifacts never disagree about the environment.
+
+### Rerun contract (tasks.md already exists)
+
+Regenerating over an existing tasks.md is destructive; a rerun is a **validate-and-amend** pass instead. Keep existing task IDs stable — never renumber (dependency graphs, feature records, and run history cite those IDs); drive incremental corrections from the step-5 structural validator and fresh premise/environment re-measurement; and append genuinely new work as new IDs at the end, mirroring `/speckit.implement`'s "Append tasks, never renumber" precedent. Regenerate from scratch only on explicit user request.
+
+### Premise verification (all task rows)
+
+Factual premises embedded in ANY task row — file existence, counts, "fill/extend existing file X", "diff against pre-change output" — are governed by the **Inherited premises** bullet of `.specify/instructions.md` § "Fact, Correctness & Logic Checks (Input Sanity)": they are hypotheses to re-measure at generation time, for every task type, not only rows that author tests. A row whose premise is a count carries the reproducible re-derivation command. The Pin Hygiene rules below are the test-authoring specialization of this same duty.
 
 ### Pin Hygiene (test-authoring rule)
 

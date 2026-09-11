@@ -65,7 +65,7 @@ External-probe feedback is **client-project-local** (Loop B — the client proje
 
 1. **范围快照**:`python3 .specify/scripts/python/feedback-utils.py --action list --disposition open --format json`(可按 `--slice/--kind/--since` 收窄)取条目摘要投影;零条目 → 报告"无可自省条目"并正常结束,不落空报告文件。
 2. **场景化分析**(agent 推理;适用 Token 效率纪律:程序优先、摘要优先、升级阶梯,禁止整库原文注入):逐条目调出被评单元的当前定义/源码与条目引用的上下文,给出带证据的核验结论(成立/部分成立/已过时/不成立);把同根因的条目聚类为**问题**;每个问题含齐五要素——问题陈述、根因、证据锚点(指向具体单元/文件/位置)、分流决定(`local-sink(<channel>)` 或 `upstream-bound(package-attachment)`)、具体优化方案。
-3. **报告产出**:按报告 schema 落盘 draft 报告到 `.specify/memory/feedback/introspection/<report-id>.md`(`report-id` 形如 `introspection-<YYYYmmddTHHMMSSZ>`;frontmatter 七字段 + `## Findings` + `## Excluded`),然后运行 `--action introspect-register --report-file <path>` 完成结构校验与条目关联;校验失败(exit 2)会逐条列出违规,修正后重跑。
+3. **报告产出**:按报告 schema 落盘 draft 报告到 `.specify/memory/feedback/introspection/<report-id>.md`(`report-id` 形如 `introspection-<YYYYmmddTHHMMSSZ>`;frontmatter 七字段 + `## Findings` + `## Excluded`),然后运行 `--action introspect-register --report-file <path>` 完成结构校验与条目关联;校验失败(exit 2)会逐条列出违规,修正后重跑。**按条目分区,不按点分区**:一个条目只归属一个问题,范围条目须被「问题成员 ∪ Excluded」恰好覆盖一次;条目含多个点时择其主根因归属,次要根因写进该问题的「具体优化方案」并标注。该约束的判据是引擎 `--action introspect-register` 的 V-1 语义校验输出(exit 2 逐条列出违规),以引擎为准——本文不复制引擎内部规则,写报告前不必先读引擎源码。
 4. **用户确认**:呈现报告摘要(问题清单 + 每个问题的分流决定与建议处置);用户可逐问题覆盖分流方向——覆盖写回报告该问题的 `**用户覆盖**`(原决定 → 覆盖后决定)并同步 `**分流决定**`/`**建议处置**` 行后再确认。确认后运行 `--action introspect-register --report-file <path> --confirm`:报告置 `confirmed`,`**建议处置**` 行逐条生效(等价于逐条 `--action dispose --id <entry-id> --to <state> --reason "introspection:<report-id>#F-nn" --ref <report-id>#F-nn`);报告无 `建议处置` 行时仅翻转报告状态,不动条目。
 5. **路由建议**:列出分流结果的建议去向——本地下沉项给出建议通道(直接修复 / improve-skills / improve-docs / 新需求),随包上行项提示下次打包可附报告(见 Mode 2 第 4 步);**仅建议,不自动执行任何动作**。
 
@@ -91,6 +91,7 @@ ls feedback/feedback-*.zip 2>/dev/null
 
 - Zero bundles → report "No pending feedback bundles in `feedback/`" and stop.
 - N bundles → list them (filename + size) and proceed. **Batch discipline**: process ALL bundles as ONE consolidated batch, never one zip at a time — reconciling claims across bundles surfaces factual conflicts between reporters and yields one mechanism fitting every environment.
+- **Already-consumed cross-check (before any processing)**: read `.specify/memory/feedback/consume-log.md` and match every pending bundle against its `Bundles` column. A filename already logged was consumed once — it is a **re-delivered copy**, not new input: name it as such in the consume report, do NOT re-route its entries by default (that row already records their routing), and re-process it only on the user's own instruction in this run. Skipping this check silently re-consumes a batch that was deleted after a previous run and later landed in the intake again.
 
 #### Step 2 — Extract and read entries
 
@@ -111,6 +112,12 @@ for z in feedback/feedback-*.zip; do unzip -o -d "$tmpdir/$(basename $z .zip)" "
 
 Collect from every entry: `unit_id`, `probe`, `slice`, `run_id`, `## Review`, `## Optimization Points`. Build a **cross-bundle findings table**: unit × finding × source-bundle. Clean up the temp dir after reading. 包内可能附 `introspection/<report-id>.md` 自省报告(条目经源头场景化核验):此类发现可直接采信其核验结论与证据锚点,把精力集中在跨包对账与冲突裁决上,无需重复事实核验。
 
+**Bundle identity from the MANIFEST** — take `- **Install source**: <url> @ <sha>` and `- **Generated**: <ts>` for every bundle, plus its entry-file set from the archive listing (`unzip -l <zip>`). This is what catches a re-delivery the Step 1 filename check cannot (same batch, different filename):
+
+- Equal install sha + generated ts, or an equal entry-file set, across two bundles → they are **copies of one batch**: count those entries once, process one copy, and state which copy was processed.
+- Install sha / generated ts matching a batch already in `consume-log.md` under a different filename → a **second copy of a consumed batch**: handle under the Step 1 re-delivered rule, never as new input.
+- No second copy anywhere — the zip is untracked and `git log --all --oneline -- feedback/<zip>` returns nothing → an **orphan**: its contents are unrecoverable once Step 4 removes it. Carry the orphan mark into the consume report.
+
 #### Step 3 — Reconcile and route findings
 
 Cross-bundle reconciliation (the reason for batch discipline):
@@ -129,7 +136,7 @@ Route each finding to its destination:
 | Documentation gap | `improve-docs` or direct edit | Stale doc, broken link |
 | Acknowledge only | Record in consume report | Already fixed, duplicate, WONTFIX |
 
-Produce a **consume report** for user confirmation: findings table, routing decisions, conflicts found, and proposed cleanup list.
+Produce a **consume report** for user confirmation: findings table, routing decisions, conflicts found, proposed cleanup list, and the Step 1/Step 2 identity marks per bundle (re-delivered copy / second copy / orphan).
 
 #### Step 4 — Cleanup (mandatory closing step of the consume run)
 
@@ -140,6 +147,7 @@ rm feedback/feedback-<ts>.zip   # each processed bundle in this batch
 ```
 
 - Delete ONLY the bundles that were in this batch; cleanup is atomic and **part of the run** — a consume run does not end with its intake files still on disk. The durable record is the consume-log row (routings + conflicts), never the zips: lingering bundles would form a second, staler source of truth.
+- **Named marks, never a silent uniform delete**: every bundle carrying a Step 1/Step 2 identity mark (*re-delivered copy*, *second copy*, *orphan*) is listed by name **with that mark** in the consume report's cleanup section, so the confirmation already given for this batch knowingly covers a deletion that has no second copy behind it. An orphan the report did not name is not deleted.
 - Record the consume event by appending one row to `.specify/memory/feedback/consume-log.md`:
 
   ```markdown

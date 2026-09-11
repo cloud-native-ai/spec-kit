@@ -135,11 +135,19 @@ reference the real directories captured above. Explicitly note any new top-level
   consult it, not memory. NOTE: `.specify/templates/commands/` is RETIRED (the
   templates pair excludes commands/); command templates fan out ONLY to the
   regen-command-copies.py per-tool copies listed below.
+
+  BASELINE DRIFT: a Verify cell is an expected result, and expected results are
+  measured, never pre-written. Run the mirror check once BEFORE the edit, record the
+  drift it already reports, and state the criterion as "no NEW drift on the mirror
+  pairs this spec touches". An absolute pass criterion (a bare exit code or "all
+  green") is unpassable whenever unrelated drift predates this spec — writing it down
+  anyway ships a criterion nobody measured and forces a correction pass at
+  implementation time.
 -->
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| [e.g. `templates/commands/x.md`] | [e.g. `.claude/commands/speckit.x.md`; `.github/prompts/speckit.x.prompt.md`; `.qoder/commands/speckit.x.md`; `.opencode/command/speckit.x.md` — per-tool copies via regen-command-copies.py; NO `.specify/templates/commands/` mirror (retired)] | [e.g. `diff -q` for mirrors; regenerated copies contain the edit] |
+| [e.g. `templates/commands/x.md`] | [e.g. `.claude/commands/speckit.x.md`; `.github/prompts/speckit.x.prompt.md`; `.qoder/commands/speckit.x.md`; `.opencode/command/speckit.x.md` — per-tool copies via regen-command-copies.py; NO `.specify/templates/commands/` mirror (retired)] | [e.g. `diff -q` on the pairs touched here, judged against the baseline measured before the edit — "no NEW drift"; regenerated copies contain the edit. Never a pre-written exit code] |
 
 ## Complexity Tracking
 

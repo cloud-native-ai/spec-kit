@@ -40,7 +40,7 @@ Briefly describe what this skill does and when it should be triggered. (Concisen
 
 ## Path Conventions
 
-This Skill follows the canonical path conventions defined in `templates/commands/skills.md` (`## Path Conventions`):
+This Skill follows the canonical `${SKILL_HOME}` / `${SKILL_WORKDIR}` path conventions:
 
 - Use `${SKILL_HOME}/<relative-path>` for every Skill-owned resource reference (scripts, references, assets, sub-directory files).
 - Use `${SKILL_WORKDIR}/<relative-path>` for every runtime/user-facing path this Skill reads from or writes to (inputs in the user's project, outputs delivered to the user).

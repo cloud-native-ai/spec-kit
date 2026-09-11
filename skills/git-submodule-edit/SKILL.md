@@ -93,7 +93,7 @@ Run all git commands from the parent repo root (`${SKILL_WORKDIR}`) unless a ste
 
 ## Path Conventions
 
-This Skill follows the canonical path conventions defined in `templates/commands/skills.md` (`## Path Conventions`):
+This Skill follows the canonical `${SKILL_HOME}` / `${SKILL_WORKDIR}` path conventions:
 
 - Use `${SKILL_HOME}/<relative-path>` for every Skill-owned resource (scripts, references, assets).
 - Use `${SKILL_WORKDIR}/<relative-path>` for runtime/user-facing paths — here, the parent project's ledger at `${SKILL_WORKDIR}/submodule-edits.md`.

@@ -41,7 +41,7 @@ Break down the implementation plan into granular, dependency-ordered, actionable
    - **Phase 3+**: One phase per user story in priority order
    - **Final Phase**: Polish & cross-cutting concerns
 
-6. **Validate DoD format** — Ensures the Definition of Done section uses `- DoD-N:` prefix format (not checkboxes).
+6. **Mechanical structural validation (program-first)** — Runs `.specify/scripts/python/validate-tasks.py` against the written file. The validator owns the fixed structural rules — task-row single-line contract, ID uniqueness, `blockedBy` resolvability, `[P]` parallel safety, story-label placement, and the Definition of Done prefix format — so they are never hand-rolled per run. Every ERROR must be fixed and the validator re-run to exit 0; each remaining WARN is resolved or justified in the report. Rule list owned by the script, not restated here.
 
 7. **Feature integration** — Updates the feature registry with task generation activity.
 

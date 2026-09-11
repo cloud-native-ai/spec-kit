@@ -62,7 +62,7 @@ Storage location options (`SKILL_HOME`):
 - `${HOME}/.copilot/skills/<name>/` — personal-level
 - host skills directory `<skills-dir>/<name>/` — standalone mode (the directory the host agent application loads skills from)
 
-When authoring the new Skill, follow the path conventions from `templates/commands/skills.md` (`## Path Conventions`):
+When authoring the new Skill, follow the canonical `${SKILL_HOME}` / `${SKILL_WORKDIR}` path conventions:
 
 - Use `${SKILL_HOME}/<relative-path>` for every Skill-owned resource reference (scripts, references, assets).
 - Use `${SKILL_WORKDIR}/<relative-path>` for every runtime/user-facing path the new Skill reads or writes (inputs in the user's project, outputs delivered to the user).

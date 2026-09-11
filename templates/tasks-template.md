@@ -82,6 +82,21 @@ description: "Task list template for feature implementation"
 - GATE-3: No `[ ]` or `[>]` task rows remain — check: `grep -cE '^- \[[ >]\]' tasks.md` returns 0
 - GATE-4: verification.md lists every SC-NNN with a status — check: grep SC ids against requirements.md
 
+## Environment Prerequisites
+
+<!--
+  ACTION REQUIRED only when a task depends on an external environment
+  (container runtime, image registry, live cluster, special hardware).
+  This section is the SINGLE landing point for probe conclusions: /speckit.tasks
+  probes at generation time (never cached across runs) and records each verdict
+  here ONCE with its probe command and date. Per-phase prerequisite notes and
+  [~] deferral notes on task rows MUST reference this section instead of
+  restating verdicts. Delete the section entirely when no external environment
+  dependency exists.
+-->
+
+- <dependency>: <available | partial | unavailable> — probe: `<command>` @ <date>; affected phases/tasks: <phase/task refs or none>
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)

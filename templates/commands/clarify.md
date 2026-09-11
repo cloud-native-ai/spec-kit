@@ -82,7 +82,8 @@ From `shared/patterns/interview-pattern.md` it borrows only the **context discip
 
 3. **Questioning loop** — order-dependent questions singly; mutually independent ones MAY batch:
    - **Batching rule**: ask a question alone when its framing depends on an earlier answer (the later options change with the earlier choice); when questions are mutually independent — neither answer alters the other's option set — they MAY be presented as one batch, consistent with step 1's rule for residuals. Default to single when unsure.
-   - Multiple-choice: table format (Option | Description), state **Recommended** option with reasoning
+   - Multiple-choice: table format (Option | Description | Consequence), state **Recommended** option with reasoning
+   - **Consequence preview (per option)**: every option MUST carry a one-line preview of what choosing it changes in the target artifact — sections or requirement IDs added/rewritten, obligations triggered — so the user chooses between outcomes, not labels. Where an option carries a known cost or semantic tension, name it in that preview; the active mode's integration rules (taxonomy reference) then bind that cost into the artifact rather than leaving it as a recorded answer only. When the questioning surface exposes a per-option preview/detail field, put the consequence there; otherwise make it the third table column.
    - Short-answer: state **Suggested** answer with reasoning
    - User replies: "yes"/"recommended" → use suggestion; otherwise validate answer
    - Stop when: all critical ambiguities resolved, user signals "done", or 5 questions reached

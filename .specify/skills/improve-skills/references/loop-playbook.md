@@ -160,8 +160,7 @@ entry point), not a pitfall entry.
 
 ### Legacy path idioms
 
-Flag these as migration candidates and apply the Migration Mapping table from
-`templates/commands/skills.md` (`## Migration Mapping`):
+Flag these as migration candidates and apply this Migration Mapping table:
 
 | Legacy idiom | Rewrite as |
 |--------------|-----------|
@@ -299,6 +298,29 @@ missing checks individually before concluding validation passed.
 **Metadata validation detail**: when `skill_id` is added or corrected, ensure the directory
 name and frontmatter `name` agree and no other skill directory carries the same `name`
 (there is no registration table — see `.specify/skills.md`).
+
+### Recorded exception (shape gate)
+
+Hard Constraint 3 owns the rule; this is the mechanics. `skill-shape.py` exits `10` when a
+body is over the L1 budget or trips a blocking shape rule. Finishing a loop on a red gate is
+legitimate under exactly two cases:
+
+- **Contract-mandated inline section** — a feature spec or contract test requires a section to
+  stay inline in `SKILL.md` (grep `.specify/specs/**` and `tests/contract/**` before claiming
+  this case), and keeping it inline pushes the controllable body past budget. The report names
+  the mandating file.
+- **Pre-existing over-budget baseline** — the step-2 gate run already exited `10` before this
+  loop's first edit, and delete-and-absorb within this loop's scope cannot clear the debt. A
+  loop that touches one line of an over-budget file need not repay the whole debt — but it
+  must not add to it.
+
+Both cases require the numbers: `est_tokens_controllable` from the step-2 baseline run and the
+step-8 final run, plus the delta (`--json` exposes the exact field; the estimate is built to be
+stable enough for this comparison — see the script's docstring). A positive delta on an
+already-over-budget file fails the exception unless the added tokens are themselves the
+mandated content or the same loop delete-and-absorbs an offsetting amount: quantifying the
+growth is the price of finishing red. The exception lives in the step-9 loop report — a reason
+stated only in conversation or a commit message was never recorded.
 
 ---
 

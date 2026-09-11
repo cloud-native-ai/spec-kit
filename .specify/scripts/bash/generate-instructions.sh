@@ -62,10 +62,13 @@ render_template() {
 # Non-destructive policy: when instructions already exist, that file is the
 # canonical refresh BASE. The script never renders the template over it and
 # never modifies or removes existing sections (governance rules, recurring
-# lessons, registries, and other hand-authored knowledge). It only writes a
-# timestamped backup as a safety net. Deep section-by-section refresh —
-# reconciling section CONTENT against current project reality — stays the
-# /speckit.instructions command's job.
+# lessons, registries, and other hand-authored knowledge) — with one
+# sanctioned exception: a legacy section that the template explicitly renamed
+# (see SUPERSEDED_BY below) is stripped once its successor is present, so the
+# stale block no longer needs a manual transcription-risky agent edit. It
+# only writes a timestamped backup as a safety net. Deep section-by-section
+# refresh — reconciling section CONTENT against current project reality —
+# stays the /speckit.instructions command's job.
 #
 # Additive section reconcile (Constitution XI v1.10.0 mechanism fix,
 # 2026-08-14): top-level sections present in the template but MISSING from
@@ -96,10 +99,16 @@ if [ -f "$TARGET_FILE" ]; then
   log info "Existing instructions kept as the refresh base (not overwritten)."
 
   # Additive section reconcile: inject template sections missing from the
-  # live file. Existing sections are never touched. Idempotent by design.
+  # live file. Existing sections are never touched — with ONE sanctioned
+  # exception (F-E10): when the template replaces a legacy section with a
+  # renamed successor (## Resource Registry → ## Skills & Tools), the script
+  # itself strips the superseded block it knows the pairing for, instead of
+  # leaving a manual, transcription-risky agent edit and a stale-registry
+  # window. A timestamped backup of the pre-strip file was written above.
+  # Idempotent by design.
   RENDERED_TEMPLATE="$(mktemp)"
   render_template "$TEMPLATE_FILE" > "$RENDERED_TEMPLATE"
-  INJECTED_SECTIONS="$(python3 - "$RENDERED_TEMPLATE" "$TARGET_FILE" <<'PYEOF'
+  RECONCILE_OUTPUT="$(python3 - "$RENDERED_TEMPLATE" "$TARGET_FILE" <<'PYEOF'
 import re
 import sys
 
@@ -111,28 +120,67 @@ parts = re.split(r"(?m)^(## .+)$", template)
 sections = [(parts[i], parts[i + 1]) for i in range(1, len(parts) - 1, 2)]
 live_headings = set(re.findall(r"(?m)^## .+$", live))
 missing = [(h, b) for h, b in sections if h not in live_headings]
-if not missing:
-    sys.exit(0)
 
-template_order = [h for h, _ in sections]
 lines = live.rstrip("\n").split("\n")
-for heading, body in missing:
-    later = set(template_order[template_order.index(heading) + 1:])
-    insert_at = next((i for i, ln in enumerate(lines) if ln in later), None)
-    block = (heading + body).strip("\n").split("\n") + [""]
-    if insert_at is None:
-        lines = (lines + [""] if lines else []) + block
-    else:
-        lines = lines[:insert_at] + block + lines[insert_at:]
-open(target_path, "w", encoding="utf-8").write("\n".join(lines).rstrip("\n") + "\n")
-print("\n".join(h.lstrip("# ").strip() for h, _ in missing))
+if missing:
+    template_order = [h for h, _ in sections]
+    for heading, body in missing:
+        later = set(template_order[template_order.index(heading) + 1:])
+        insert_at = next((i for i, ln in enumerate(lines) if ln in later), None)
+        block = (heading + body).strip("\n").split("\n") + [""]
+        if insert_at is None:
+            lines = (lines + [""] if lines else []) + block
+        else:
+            lines = lines[:insert_at] + block + lines[insert_at:]
+
+# Supersession strip: successor present in the live file (pre-existing or
+# just injected) → remove the specific legacy section(s) it replaced, from
+# the heading through the line before the next top-level `## ` heading.
+SUPERSEDED_BY = {"## Skills & Tools": ("## Resource Registry",)}
+current_headings = set(re.findall(r"(?m)^## .+$", "\n".join(lines)))
+stripped = []
+for successor, legacy_headings in SUPERSEDED_BY.items():
+    if successor not in current_headings:
+        continue
+    for legacy in legacy_headings:
+        kept = []
+        removed = False
+        i = 0
+        while i < len(lines):
+            if lines[i].strip() == legacy:
+                removed = True
+                i += 1
+                while i < len(lines) and not lines[i].startswith("## "):
+                    i += 1
+                while i < len(lines) and not lines[i].strip():
+                    i += 1
+                if kept and kept[-1].strip():
+                    kept.append("")
+                continue
+            kept.append(lines[i])
+            i += 1
+        if removed:
+            lines = kept
+            stripped.append(legacy)
+
+if missing or stripped:
+    open(target_path, "w", encoding="utf-8").write("\n".join(lines).rstrip("\n") + "\n")
+if missing:
+    print("INJECTED: " + ", ".join(h.lstrip("# ").strip() for h, _ in missing))
+if stripped:
+    print("STRIPPED: " + ", ".join(s.lstrip("# ").strip() for s in stripped))
 PYEOF
   )"
   rm -f "$RENDERED_TEMPLATE"
+  INJECTED_SECTIONS="$(printf '%s\n' "$RECONCILE_OUTPUT" | sed -n 's/^INJECTED: //p')"
+  STRIPPED_SECTIONS="$(printf '%s\n' "$RECONCILE_OUTPUT" | sed -n 's/^STRIPPED: //p')"
   if [ -n "$INJECTED_SECTIONS" ]; then
-    log info "Injected missing template section(s): $(echo "$INJECTED_SECTIONS" | paste -sd ', ' -)"
+    log info "Injected missing template section(s): $INJECTED_SECTIONS"
   else
     log info "Section reconcile: live instructions already carry all template sections."
+  fi
+  if [ -n "$STRIPPED_SECTIONS" ]; then
+    log info "Stripped superseded legacy section(s): $STRIPPED_SECTIONS (replaced by its successor; see backup above)"
   fi
 
   log info "The /speckit.instructions command reconciles each section against current"

@@ -32,11 +32,12 @@ Every user turn carries a silent assessment of which flow is worth running next,
 - **Engine entry (引擎入口)**: state inspection, reset, disabling, and tuning all go through the `trigger-utils.py` engine, whose action list the discipline doc carries. No new name to memorize is introduced.
 
 ## Fact, Correctness & Logic Checks (Input Sanity)
-User-provided context can be wrong (misconceptions), incomplete, or contain typos. Before acting on user input, perform a basic sanity check to avoid propagating errors.
+User-provided context can be wrong (misconceptions), incomplete, or contain typos — and so can a premise inherited from an earlier artifact in the same workflow. Before acting on either, perform a basic sanity check to avoid propagating errors.
 
 Minimum checks:
 - **Names & identifiers**: Verify file paths, module/package names, commands, and symbols exist in the repo. If uncertain, search the workspace rather than guessing.
 - **Factual claims**: Treat user statements as hypotheses; confirm against the repo (code/config), the Documentation Map, or authoritative references.
+- **Inherited premises**: A count, path, or assertion carried forward from an upstream artifact (a specification, plan, or task list) is also a hypothesis, not a fact — re-measure it (`test -e`, `git ls-files`, re-run the count) before acting on it, and never let a check scoped to one kind of step stand in for the others.
 - **Logical consistency**: Detect contradictions between requirements, constraints, and desired outcomes (e.g., incompatible versions, mutually exclusive goals).
 - **Typos & near-misses**: Correct obvious typos (paths, flags, option names) and explicitly state the corrected interpretation.
 - **Assumptions**: If you must assume, keep assumptions minimal, label them clearly, and prefer reversible changes.
