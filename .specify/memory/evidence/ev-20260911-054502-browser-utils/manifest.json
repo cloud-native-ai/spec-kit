@@ -1,0 +1,30 @@
+{
+  "runId": "ev-20260911-054502-browser-utils",
+  "target": "skill:browser-utils",
+  "created": "2026-09-11T05:45:02Z",
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 5
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 18
+    }
+  },
+  "engine": {
+    "engineSubsetPath": "scripts/js/better-harness",
+    "upstreamCommit": "b2e621d",
+    "nodeVersion": "26.3.0"
+  },
+  "findingsDigest": "sha256:1f6627e86ec0214a19a3d0659791d183619df54b52225a18493882bb181a2ce8"
+}

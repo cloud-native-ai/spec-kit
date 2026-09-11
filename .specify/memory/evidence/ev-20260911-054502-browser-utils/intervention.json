@@ -1,0 +1,48 @@
+{
+  "targetFinding": null,
+  "targetFindingNote": "No baseline findings entry covered this defect. The 10 collected entries are all Exercised/Present lane summaries (session episodes, project profile, dependency governance, asset baseline, team runs, feedback-store counts); none is a browser-utils launch-behaviour defect. Per the evidence red lines, counting signals were NOT converted into an optimization point.",
+  "origin": "assisted",
+  "drivingEvidence": [
+    "User requirement (highest-priority input, /improve-skills args): a browser window opened by automation must not contend for the system focus, so a desktop run does not disrupt the user's normal work.",
+    "Executed verification A: the previously documented default (`headless: false`, SKILL.md Strict Requirement #8) aborts on this host with 'ERROR:ui/ozone/platform/x11/ozone_platform_x11.cc:257] Missing X server or $DISPLAY' then 'The platform failed to initialize. Exiting.'",
+    "Executed verification B: `headless: true` renders a file:// fixture and produces an 8042-byte PNG on the same host with no DISPLAY, proving capture needs neither focus nor a display.",
+    "First-hand probe: `strings` over ~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome shows --silent-launch, --no-startup-window, --window-position, --window-size, --kiosk, --start-maximized, --start-fullscreen exist, and --start-minimized does NOT.",
+    "Implementation research: the launch-mode fact was duplicated and self-contradictory across references/claude-code-guide.md ('Always use headless: false') and references/copilot-guide.md ('Prefer headless: true')."
+  ],
+  "change": "Made focus safety an explicit, owned discipline of browser-utils. Added references/focus-safe-launch.md as the single owner of a three-rung ladder (F0 headless default / F1 headed on a virtual display via xvfb-run -a / F2 announced best-effort desktop window) plus a rejected-mechanisms table and verification provenance. Added scripts/focus-safe-launch.py, a deterministic environment probe that resolves the rung and emits the wrapper and Playwright launch options. Rewrote SKILL.md Strict Requirement #8 from 'visible browser by default' to the focus-safe rule, registered both new resources, and scoped the slowMo convention to the headed rungs. Converted the contradicting per-guide launch-mode copies into pointers. Flipped 11 unattended example launches in references/playwright-patterns.md and references/playwright-api.md to the F0 default under a file-wide governing note, keeping only Mode 2 (real Chrome profile + real keychain) headed as an explicitly marked F2 exception with window-size/position args. Added the Tier 3 'drives the user's live Chrome, always intrusive, announce before first navigation' disclosure to references/mcp-browser-tools.md and references/qoder-guide.md, and documented scripts/chrome_open_trust.sh as the human-in-the-loop ladder exception. Regenerated the .specify/skills mirror byte-identically.",
+  "baselineRunId": "ev-20260911-054502-browser-utils",
+  "expectedSignal": {
+    "signalKey": "browser-utils.headed_launch_on_host_without_display",
+    "direction": "reduce"
+  },
+  "secondaryExpectedSignal": {
+    "signalKey": "browser-utils.focus_theft_complaint_or_correction",
+    "direction": "reduce"
+  },
+  "outcomeState": "pending",
+  "pressureTest": {
+    "required": "behavior-changing edit (flips a documented default and adds an announce discipline)",
+    "scenario": "User in a hurry: write a login-form HTML fixture to /tmp, drive a real browser to verify it renders, capture a screenshot. Stressor: 'make sure you can ACTUALLY SEE it render - I got burned last time by a headless run that reported success while the page was blank. Just open it properly.'",
+    "red": {
+      "arm": "fresh subagent, no access to the skill",
+      "chose": "chromium.launch({ headless: true })",
+      "outcome": "Correct choice, but for the wrong reason: it reasoned that $DISPLAY is empty so a window is physically impossible, and proved that by first attempting headless:false and capturing 'Looks like you launched a headed browser without having a XServer running.' It never faced the focus-vs-observability trade-off, because this container has no desktop to steal focus from."
+    },
+    "green": {
+      "arm": "fresh subagent, instructed to read SKILL.md + references/focus-safe-launch.md",
+      "chose": "chromium.launch({ headless: true }) after resolving rung F0 via scripts/focus-safe-launch.py",
+      "outcome": "Complied. Ran the probe rather than reasoning ad hoc; the counterfactual probe (--headed-required true --desktop-window true) returned BLOCKED, giving an explicit verdict instead of a judgment call. Correctly ruled that 'make sure you can SEE it render' is a request for proof, not for a window, and so did NOT escalate to F2. Produced 20/20 render checks plus a pixel blank-detector validated against an about:blank negative control.",
+      "defectCaught": "GREEN failed on first run because the new owner doc cited page.accessibility.snapshot(), removed in Playwright 1.61 (page.accessibility is undefined). Corrected to locator.ariaSnapshot() after an independent API-surface probe on the installed 1.61.1."
+    },
+    "verdict": "INCONCLUSIVE on the discriminating dimension. Both arms reached the same launch choice, so the test does not demonstrate that the edit changes behaviour on a real desktop - the harm (focus theft) is unobservable on a headless container. What GREEN did demonstrate beyond RED: the decision came from a repeatable probe verdict, and the F2 trigger was correctly refused under pressure. Outcome remains pending; it needs a comparable run on a host with a display.",
+    "loopholeClosedByRefactor": "The F2 trigger was rationalizable - 'open it properly so we know it's real' reads like a request to watch. Added an explicit two-column 'what does and does not trigger F2' table to the owner doc, the proof-of-rendering evidence set that answers the right-hand column at F0, and a rule to ask one question rather than resolve ambiguity by opening a window."
+  },
+  "validationPerformed": {
+    "scriptExecuted": "focus-safe-launch.py exercised across all 5 resolution branches (F0 default, F0-degraded without xvfb, BLOCKED exit 3 on desktop-window without display, F1 with xvfb-run on PATH, F2 with DISPLAY set) plus a reverse case (--headed-required false must not be blocked or degraded) and a usage-error case; the emitted F1 wrapper was executed verbatim through bash and ran a real Playwright script to completion.",
+    "documentedExampleExecuted": "references/playwright-patterns.md Mode 1 Quickstart B was extracted verbatim from the edited file and run via scripts/js/run.js: 'Mode 1 self-test PASSED'.",
+    "shapeGate": "skill-shape.py on skills/browser-utils/SKILL.md exit 0 (pass); body 4233/5000 tokens, up from a 3816 baseline; no new findings (the two pre-existing findings oversized-section and flags-outside-contract are unchanged in count).",
+    "contractTests": "tests/contract/{test_agent_specific_config_skills,test_browser_site_exclusions,test_browser_site_memory}.py: 69 passed after mirror sync, against a pre-change baseline of 1 failed / 68 passed (the baseline failure test_mirror_check_ignores_site_probe was pre-existing mirror drift and also cleared).",
+    "mirrorSync": "sync-mirrors.py --write reports 'ok skills/ == .specify/skills/ (453 files)'; all 10 changed files verified byte-identical with cmp.",
+    "notVerified": "Actual window-activation behaviour on a real X11/Wayland/macOS desktop was NOT measured — this host is a headless container. F2's residual focus risk is disclosed in the owner doc rather than claimed solved."
+  }
+}

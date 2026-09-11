@@ -17,7 +17,7 @@ Use the Playwright script execution path for all browser automation tasks.
 
 ## Best Practices
 
-- Always use `headless: false` by default — Claude Code can render visible browser windows
+- **Focus-safe launch — never hard-code the headless flag**: resolve the rung with `${SKILL_HOME}/scripts/focus-safe-launch.py` before writing launch code. Claude Code runs inside the user's own terminal session on their desktop, so a headed window steals focus from the work they are doing — F0 (headless) is the default, F1 (`xvfb-run -a`) covers headed-only defects with zero desktop presence, and an announced F2 is for the user explicitly asking to watch. Ladder owner: [focus-safe-launch.md](./focus-safe-launch.md)
 - Write scripts to `/tmp/` exclusively; never write test files to the skill directory
 - Use `Bash` tool with `timeout: 30000` for Playwright operations that may hang
 - Use `run_in_background: true` for long-running server processes

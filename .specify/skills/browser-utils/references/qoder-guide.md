@@ -17,7 +17,10 @@ needs the user's real desktop Chrome (existing login state, extensions).
 cd ${SKILL_HOME}/scripts/js && node run.js /tmp/playwright-test-*.js
 ```
 
-Follow the standard Tier 2 workflow from [SKILL.md](../SKILL.md).
+Follow the standard Tier 2 workflow from [SKILL.md](../SKILL.md). Launch focus-safe: resolve the
+rung with `${SKILL_HOME}/scripts/focus-safe-launch.py` first — F0 (headless) is the default, so a
+run never takes focus away from the user's own work. Ladder owner:
+[focus-safe-launch.md](./focus-safe-launch.md).
 
 ## Tier 3: MCP Browser-Use
 
@@ -63,6 +66,7 @@ For the complete tool reference, see [mcp-browser-tools.md](./mcp-browser-tools.
 
 ## Known Pitfalls
 
+- **Tier 3 takes over the user's live Chrome**: `navigate_page` / `select_page` change the user's own tabs and bring that window forward — this path cannot be made focus-safe, because reusing the real session is its whole purpose. Announce that the run will take over their live browser **before** the first navigation, and prefer Tier 2 / F0 unless the task genuinely needs the user's session or extensions ([focus-safe-launch.md](./focus-safe-launch.md) § Tier 3)
 - **MCP server not started**: If `browser-use` tools are not in the tool list, the MCP server may not be running. Fall back to Tier 2
 - **Chrome not running**: Tier 3 requires Chrome with the browser-use extension to be running on the desktop
 - **Stale uids**: After any page-changing action (navigation, modal open), take a new snapshot before the next action

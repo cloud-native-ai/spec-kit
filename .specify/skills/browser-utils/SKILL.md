@@ -233,7 +233,7 @@ For the complete tool reference, operation patterns, and best practices, see
 5. **Tier 2: Detect servers FIRST** — for localhost testing (Mode 1), always run `detectDevServers()` before writing test code
 6. **Write scripts to `/tmp`** — never write test files to the skill directory or user's project (`/tmp/playwright-test-*.js`)
 7. **Parameterize URLs** — put detected/provided URL in a `TARGET_URL` constant at the top of every script
-8. **Visible browser by default (Tier 2)** — use `headless: false` unless user explicitly requests headless mode
+8. **Focus-safe launch — never contend for the user's system focus (Tier 2/3)** — resolve the launch rung with `${SKILL_HOME}/scripts/focus-safe-launch.py` **before writing any launch code**, so an automation window never takes keyboard focus away from the user's real work: **F0 `headless: true` is the default** for unattended automation — screenshots, video, PDF and a11y snapshots are CDP capture, so they need neither focus nor a display; **F1** renders headed onto a virtual display (`xvfb-run -a`) when headed fidelity is genuinely required; **F2** opens a real window on the user's desktop **only when the user explicitly asks to watch**, announced beforehand, kept small and fixed (`--window-size` / `--window-position`, never `--start-maximized` / `--start-fullscreen` / `--kiosk`), never re-activated with `page.bringToFront()`, and disclosed as best-effort — no Chromium switch guarantees non-activation (`--start-minimized` does not exist; the window manager decides). Headed mode also **requires a display**: without one it aborts with `Missing X server or $DISPLAY`, so a display precondition check precedes any `headless: false`. **Tier 3 drives the user's live desktop Chrome and is therefore always intrusive** — announce that the run takes over their browser before the first navigation, and never select it silently. Ladder, platform limits, rejected mechanisms and verification provenance: [references/focus-safe-launch.md](./references/focus-safe-launch.md)
 9. **Tier 3: Always snapshot before acting** — uids from stale snapshots are invalid after page changes
 10. **Wait strategies over fixed timeouts** — use `waitForSelector`, `waitForURL`, `waitForLoadState` (Tier 2) or `wait_for` (Tier 3) instead of arbitrary sleeps
 11. **Error handling** — always use try-catch for robust automation; screenshot on error for debugging
@@ -243,7 +243,7 @@ For the complete tool reference, operation patterns, and best practices, see
 
 - **Tier preference**: Tier 1 > Tier 2 > Tier 3 — always use the highest available tier
 - **Inline vs files (Tier 2)**: Inline for quick one-off tasks (screenshot, check element); files for complex tests
-- **slowMo (Tier 2)**: Use `slowMo: 100` to make actions visible and easier to follow
+- **slowMo (Tier 2)**: Use `slowMo: 100` to make actions easier to follow — meaningful only on the headed rungs (F1/F2), since F0 has no visible window; rung choice is owned by [references/focus-safe-launch.md](./references/focus-safe-launch.md)
 - **Custom headers (Tier 2)**: Use `PW_HEADER_NAME`/`PW_HEADER_VALUE` env vars to identify automated traffic
 - **Console output**: Use `console.log()` (JS) or `print()` (Python) to track progress
 - **Full-site enumeration (Tier 2)**: To map every module of an SPA (left-nav + hash routes) into a design doc, use one reused context, resumable checkpoints, and per-module extraction — see [references/playwright-patterns.md § SPA Site Traversal & Module Extraction](./references/playwright-patterns.md#spa-site-traversal--module-extraction-tier-2)
@@ -262,8 +262,8 @@ This Skill follows the canonical path conventions:
 |-----------|----------|
 | `${SKILL_HOME}/scripts/js/` | `run.js` universal executor, `package.json`, `lib/helpers.js` |
 | `${SKILL_HOME}/scripts/python/` | `with_server.py` server lifecycle manager |
-| `${SKILL_HOME}/scripts/` | `site-memory.py` — site memory engine (state machine, records, recipes, validation evidence; see § Site Memory & Direction Routing); `chrome_open_trust.sh` — portable trusted-browser launcher + `CHROME_USER_DATA_AGENT` validation (see `references/trusted-browser-launch.md`) |
-| `${SKILL_HOME}/references/` | `playwright-api.md`, `playwright-patterns.md`, `mcp-browser-tools.md`, `extension-bridge-patterns.md`, `site-memory.md`, `request-level-patterns.md`, `trusted-browser-launch.md`, `claude-code-guide.md`, `copilot-guide.md`, `qoder-guide.md` |
+| `${SKILL_HOME}/scripts/` | `site-memory.py` — site memory engine (state machine, records, recipes, validation evidence; see § Site Memory & Direction Routing); `focus-safe-launch.py` — deterministic focus-safe launch-rung probe (F0/F1/F2; see `references/focus-safe-launch.md`); `chrome_open_trust.sh` — portable trusted-browser launcher + `CHROME_USER_DATA_AGENT` validation (see `references/trusted-browser-launch.md`) |
+| `${SKILL_HOME}/references/` | `playwright-api.md`, `playwright-patterns.md`, `focus-safe-launch.md`, `mcp-browser-tools.md`, `extension-bridge-patterns.md`, `site-memory.md`, `request-level-patterns.md`, `trusted-browser-launch.md`, `claude-code-guide.md`, `copilot-guide.md`, `qoder-guide.md` |
 | `${SKILL_HOME}/examples/` | Python example scripts (element discovery, static HTML, console logging) |
 
 ## Dependencies

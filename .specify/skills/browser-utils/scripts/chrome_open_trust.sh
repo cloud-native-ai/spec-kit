@@ -13,6 +13,13 @@
 #   unset or invalid, stop and ask the user to define it — never fall back
 #   to a throwaway profile silently.
 #
+# Focus-safe ladder exception (human-in-the-loop):
+#   This launcher deliberately opens a REAL window on the user's desktop, because a
+#   human must complete the login in it. It therefore takes focus — announce the
+#   window before launching, and close it once the login is confirmed. It is an
+#   exception to the ladder, not a violation of it; the ladder itself is owned by
+#   references/focus-safe-launch.md (see § The legitimate exceptions).
+#
 # Usage:
 #   source ${SKILL_HOME}/scripts/chrome_open_trust.sh
 #   check_chrome_user_data_agent || return 1

@@ -5,6 +5,14 @@ The agent communicates with a real browser through MCP tool calls — no script 
 
 This reference covers all available `browser-use` MCP tools, common operation patterns, and best practices.
 
+> **Tier 3 cannot be made focus-safe.** It operates the Chrome window the user is *currently
+> using*, so `navigate_page`, `select_page` and `click` change their tabs and pull that window
+> forward — reusing the real session is the entire point of the tier, and there is no
+> non-intrusive variant. **Announce that the run will take over the user's live browser before the
+> first navigation**, and prefer Tier 2 (F0 headless) unless the task genuinely needs the user's
+> login state or extensions. Ownership and the full ladder:
+> [focus-safe-launch.md](./focus-safe-launch.md) § Tier 3.
+
 ---
 
 ## Available Tools

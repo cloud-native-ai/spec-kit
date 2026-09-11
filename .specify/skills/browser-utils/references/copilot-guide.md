@@ -17,7 +17,7 @@ Use the Playwright script execution path for all browser automation tasks.
 
 ## Best Practices
 
-- Prefer `headless: true` mode — Copilot runs in IDE context where visible browsers may not display properly
+- **Focus-safe launch — resolve the rung, do not hard-code the flag**: Copilot's IDE context cannot display a headed window at all, so F0 (headless) is the only practical rung here; the ladder and its platform limits are owned by [focus-safe-launch.md](./focus-safe-launch.md)
 - Use `@terminal` for all shell commands; Copilot Chat cannot execute commands directly
 - Keep Playwright scripts simple — Copilot has limited ability to debug complex async flows
 - Save screenshots to a known location and tell the user to open them manually in VS Code
