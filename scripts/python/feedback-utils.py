@@ -463,6 +463,56 @@ def _speckit_version() -> str:
         return "unknown"
 
 
+def _skill_names_in(skills_dir: Path) -> set:
+    if not skills_dir.is_dir():
+        return set()
+    return {p.name for p in skills_dir.iterdir()
+            if p.is_dir() and (p / "SKILL.md").is_file()}
+
+
+def framework_skill_names(workspace_root: Path) -> Tuple[Optional[set], str]:
+    """Resolve the skill names bundled with the Spec Kit framework itself.
+
+    Returns ``(names, source)``; ``names`` is None when the bundle cannot be
+    resolved at all. Sources, in priority order:
+
+    1. the installed spec-kit package (``<pkg>/skills/<name>/SKILL.md``) —
+       the wheel ships only framework skills, so this set excludes any
+       user-authored skills a downstream project installed alongside them;
+    2. a framework-repo checkout (``<workspace_root>/skills/`` next to
+       ``src/specify_cli/``).
+    """
+    try:
+        import importlib.util
+        spec = importlib.util.find_spec("specify_cli")
+        if spec is not None and getattr(spec, "origin", None):
+            names = _skill_names_in(Path(spec.origin).resolve().parent / "skills")
+            if names:
+                return names, "installed-package"
+    except Exception:
+        pass
+    if (workspace_root / "src" / "specify_cli").is_dir():
+        names = _skill_names_in(workspace_root / "skills")
+        if names:
+            return names, "framework-repo"
+    return None, "unresolved"
+
+
+def is_framework_unit(unit_id: str, framework_skills: Optional[set]) -> bool:
+    """Whether a feedback unit targets the Spec Kit framework itself.
+
+    ``/speckit.*`` commands are framework units by definition; a ``skill:``
+    unit is a framework unit only when the skill ships in the framework
+    bundle. Feedback about user-project skills stays local (it has local
+    workaround value) but is never packaged for upstream delivery.
+    """
+    if unit_id.startswith("/speckit."):
+        return True
+    if unit_id.startswith("skill:"):
+        return framework_skills is not None and unit_id[len("skill:"):] in framework_skills
+    return False
+
+
 def detect_upstream(index: Dict[str, Any]) -> Dict[str, Any]:
     """Resolve the upstream repo URL for manual feedback delivery.
 
@@ -537,13 +587,27 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
         selected = list(entries)
     selected.sort(key=lambda e: e.get("created", ""))
 
+    framework_skills, bundle_source = framework_skill_names(workspace_root)
+    included = [e for e in selected
+                if is_framework_unit(str(e.get("unit_id", "")), framework_skills)]
+    excluded = [e for e in selected if e not in included]
+
     upstream = detect_upstream(index)
-    if not selected:
+    if not included:
+        note = "No feedback entries to package."
+        if excluded:
+            note = ("All pending entries target non-framework units "
+                    "(user-project skills); they stay local and are not "
+                    "packaged for upstream delivery.")
+        if bundle_source == "unresolved":
+            note += (" The framework skill bundle could not be resolved, so "
+                     "only /speckit.* command entries would be packaged.")
         return {
             "packaged": 0,
             "zip": None,
             "upstream": upstream,
-            "note": "No feedback entries to package.",
+            "excluded": sorted({str(e.get("unit_id", "?")) for e in excluded}),
+            "note": note,
         }
 
     store_dir = feedback_dir(workspace_root)
@@ -561,15 +625,25 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
         "",
         "> This feedback targets the Spec Kit framework itself (templates, "
         "commands, skills, scripts, docs) — not the LLM, agent CLI, harness, "
-        "or any user project code.",
+        "or any user project code. Entries about non-framework units "
+        "(user-project skills) are excluded at packaging time and stay local.",
         "",
         f"- **Generated**: {now_iso()}",
-        f"- **Entries**: {len(selected)}",
-        f"- **Time range**: {selected[0].get('created', '-')} → "
-        f"{selected[-1].get('created', '-')}",
+        f"- **Entries**: {len(included)}",
+        f"- **Time range**: {included[0].get('created', '-')} → "
+        f"{included[-1].get('created', '-')}",
         f"- **spec-kit version**: {_speckit_version()}",
         f"- **Install source**: {upstream.get('url') or 'unknown'}"
         + (f" @ {upstream['commit']}" if upstream.get("commit") else ""),
+    ]
+    if excluded:
+        excluded_units = sorted({str(e.get("unit_id", "?")) for e in excluded})
+        manifest_lines.append(
+            f"- **Excluded (non-framework, kept local)**: {len(excluded)} "
+            f"entr{'y' if len(excluded) == 1 else 'ies'} — "
+            + ", ".join(excluded_units)
+        )
+    manifest_lines += [
         "",
         "| Created | Unit | Partial | Summary |",
         "|---------|------|---------|---------|",
@@ -577,7 +651,7 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
     missing: List[str] = []
     packaged: List[str] = []
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for entry in selected:
+        for entry in included:
             src = store_dir / entry["file"]
             if not src.exists():
                 missing.append(entry["file"])
@@ -596,6 +670,7 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
         "packaged": len(packaged),
         "zip": rel_zip,
         "missing": missing,
+        "excluded": sorted({str(e.get("unit_id", "?")) for e in excluded}),
         "upstream": upstream,
         "next_steps": _send_guidance(upstream)
         + ["After you have dealt with the batch (sent or deliberately ignored), "
@@ -617,6 +692,9 @@ def render_text(action: str, payload: Dict[str, Any]) -> str:
         ]
         if payload.get("missing"):
             lines.append(f"  missing entry files skipped: {payload['missing']}")
+        if payload.get("excluded"):
+            lines.append("  excluded non-framework units (kept local): "
+                         + ", ".join(payload["excluded"]))
         lines.extend(f"  {step}" for step in payload.get("next_steps", []))
         return "\n".join(lines)
     if action == "upstream":

@@ -74,7 +74,7 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 | `list` | List recent entries (filters: `--unit-id`, `--unit-type`, `--since`, `--limit` — `0` = no limit; `--contains <text>` case-insensitive substring over entry summary + body, engine-side read, summary-level output). |
 | `mark-submitted` | Reset `count_since_submission` to 0 and stamp `submitted_at` (entries are kept). Local bookkeeping only — NOT an upload. |
 | `reindex` | Rebuild `index.json` from entry files; preserves `submitted_at` and `upstream_repo`. |
-| `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. |
+| `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. Only framework-owned units are packaged (`/speckit.*` commands; skills bundled with Spec Kit) — entries about user-project skills are excluded and stay local. |
 | `upstream` | Show (or `--set`) the upstream repo URL used for manual delivery guidance. |
 
 - `--unit-id` must match `^(?:/speckit\.[a-z0-9._-]+|skill:[a-z0-9._-]+)$` (else exit code 2).
@@ -129,6 +129,15 @@ python3 .specify/scripts/python/feedback-utils.py --action package
   full store) into `.specify/memory/feedback/packages/feedback-<ts>.zip`, plus a
   `MANIFEST.md` (entry list, time range, spec-kit version, install source). **Source
   entry files are never modified.**
+- **Framework-scope filter**: a package is feedback *to the Spec Kit developers*, so
+  only framework-owned units are included — every `/speckit.*` command entry, plus
+  `skill:<name>` entries whose skill ships in the Spec Kit bundle (resolved from the
+  installed `specify-cli` package, or from `skills/` in a framework-repo checkout).
+  Entries about user-project skills (e.g. a project's own `skill:aliyun-*`) are
+  excluded from the zip, listed in the MANIFEST's `Excluded` line and the output's
+  `excluded` field, and remain in the local store for their local workaround value.
+  Recording stays inclusive — the filter applies only at packaging time. If the bundle
+  cannot be resolved, only `/speckit.*` entries are packaged and the output says so.
 - Prints the detected **upstream repo** and manual-send guidance. Detection priority:
   the user-configured `upstream_repo` in `index.json` > PEP 610 install metadata
   (`direct_url.json`, i.e. the git URL this custom spec-kit build was installed from) >

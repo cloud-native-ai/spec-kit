@@ -20,9 +20,9 @@ from tests.script_api import feedback_utils as fu
 # --------------------------------------------------------------------------- #
 # Helpers
 # --------------------------------------------------------------------------- #
-def _record(workspace: Path, unit_id: str, run_id: str) -> None:
+def _record(workspace: Path, unit_id: str, run_id: str, unit_type: str = "command") -> None:
     args = argparse.Namespace(
-        workspace_root=str(workspace), unit_id=unit_id, unit_type="command",
+        workspace_root=str(workspace), unit_id=unit_id, unit_type=unit_type,
         run_id=run_id, review="review prose", review_file=None,
         points="- a point", points_file=None, partial=False,
         feature="028", threshold=100, since=None, limit=5,
@@ -95,6 +95,59 @@ def test_package_respects_submitted_at_boundary(tmp_path, monkeypatch):
     assert fu.action_package(_pkg_args(tmp_path))["packaged"] == 1
     # --all: full store
     assert fu.action_package(_pkg_args(tmp_path, take_all=True))["packaged"] == 2
+
+
+# --------------------------------------------------------------------------- #
+# package: framework-unit filter (only Spec Kit framework feedback ships)
+# --------------------------------------------------------------------------- #
+def _pin_bundle(monkeypatch, names):
+    monkeypatch.setattr(
+        fu, "framework_skill_names", lambda root: (names, "test")
+    )
+
+
+def test_package_excludes_non_framework_skill_entries(tmp_path, monkeypatch):
+    _pin_bundle(monkeypatch, {"create-tools"})
+    _record(tmp_path, "/speckit.plan", "r1")
+    _record(tmp_path, "skill:create-tools", "r2", unit_type="skill")
+    _record(tmp_path, "skill:aliyun-workspace", "r3", unit_type="skill")
+
+    result = fu.action_package(_pkg_args(tmp_path))
+
+    assert result["packaged"] == 2
+    assert result["excluded"] == ["skill:aliyun-workspace"]
+    with zipfile.ZipFile(tmp_path / result["zip"]) as zf:
+        names = zf.namelist()
+        manifest = zf.read("MANIFEST.md").decode("utf-8")
+    assert not any("aliyun-workspace" in n for n in names)
+    assert any("create-tools" in n for n in names)
+    assert "Excluded (non-framework, kept local)" in manifest
+    # excluded entries stay in the local store
+    store_files = [p.name for p in fu.feedback_dir(tmp_path).glob("*.md")]
+    assert any("aliyun-workspace" in f for f in store_files)
+
+
+def test_package_only_non_framework_entries_is_noop(tmp_path, monkeypatch):
+    _pin_bundle(monkeypatch, {"create-tools"})
+    _record(tmp_path, "skill:aliyun-document", "r1", unit_type="skill")
+
+    result = fu.action_package(_pkg_args(tmp_path))
+
+    assert result["packaged"] == 0
+    assert result["zip"] is None
+    assert result["excluded"] == ["skill:aliyun-document"]
+    assert "non-framework" in result["note"]
+
+
+def test_is_framework_unit_classification():
+    bundled = {"create-tools", "memory-record"}
+    assert fu.is_framework_unit("/speckit.plan", bundled)
+    assert fu.is_framework_unit("/speckit.plan", None)  # commands always framework
+    assert fu.is_framework_unit("skill:create-tools", bundled)
+    assert not fu.is_framework_unit("skill:aliyun-workspace", bundled)
+    # unresolved bundle: skill entries cannot be proven framework-owned
+    assert not fu.is_framework_unit("skill:create-tools", None)
+    assert not fu.is_framework_unit("other-unit", bundled)
 
 
 # --------------------------------------------------------------------------- #

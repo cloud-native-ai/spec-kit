@@ -94,6 +94,7 @@ The feedback-as-files engine: persists local, unit-scoped feedback entries produ
 - MUST use `scope: local` semantics — a whole-project assessment belongs to `/speckit.review`, not here
 - MUST NOT solicit feedback content from the user; entries are agent self-reflection
 - MUST NOT prompt for consolidated submission unless the returned `should_prompt` is `true`
+- MUST, on `--action package`, include only framework-owned units (`/speckit.*` commands and skills bundled with Spec Kit, resolved from the installed package or a framework-repo checkout); entries about user-project skills are excluded from the zip, reported in `excluded`, and kept in the local store
 - SHOULD pass multi-line review/points content via `--review-file` / `--points-file`
 - SHOULD be skipped entirely in standalone mode (no `.specify/` at the workspace root)
 
