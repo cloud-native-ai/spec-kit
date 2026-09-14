@@ -61,9 +61,10 @@ skill_id: "<SKILL:.specify/skills/git-workflow/SKILL.md>"
 
 ### Phase 0: 调谐作用域判定
 
-1. 若存在任一遗留数据源（旧位置 `docs/git-workflow.md`、前一代位置 `.specify/memory/git-workflow.md`，或更早版本写在 `.specify/instructions.md` `## Git Workflow` 章节内的托管块），先把其分支映射提取到 `.specify/git-workflow.md` 的 Git Workflow 托管块，并把该遗留文件/旧块报告为「已冗余，待用户确认处理」——**不自动删除**（命令见 [bootstrap-commands.md](./references/bootstrap-commands.md#遗留配置迁移)；instructions 内旧块按 [instructions-lookup.md](./references/instructions-lookup.md) 的迁移规则替换为指针）。
-2. 检查`.specify/git-workflow.md` 的 Git Workflow 托管块是否已填写（存在 MAIN/PRE/DEV 行，且不是 `None yet.` 占位行）。
-3. 检查用户是否传入了操作参数（具体的 git 操作指令）。
+1. **版本漂移探测**：本技能随分支版本化——若会话开始时在旧分支加载了旧版技能文本、或会话中途切换过分支，加载文本可能与当前检出的 `${SKILL_HOME}/SKILL.md` 不一致（判据：状态文件位置约定不同——本技能约定 `.specify/git-workflow.md`，`docs/git-workflow.md` / `.specify/memory/git-workflow.md` 均为更早世代的旧约定）。命中漂移时：以当前检出为准，重新读取本技能与 references 后再继续判定；漂移未排除前不得写入任何状态文件，避免按旧约定重复建文档。无论加载文本约定哪个位置，均无条件探测最新位置 `.specify/git-workflow.md` 的托管块，命中即直接以该块为数据源。
+2. 若存在任一遗留数据源（旧位置 `docs/git-workflow.md`、前一代位置 `.specify/memory/git-workflow.md`，或更早版本写在 `.specify/instructions.md` `## Git Workflow` 章节内的托管块），先把其分支映射提取到 `.specify/git-workflow.md` 的 Git Workflow 托管块，并把该遗留文件/旧块报告为「已冗余，待用户确认处理」——**不自动删除**（命令见 [bootstrap-commands.md](./references/bootstrap-commands.md#遗留配置迁移)；instructions 内旧块按 [instructions-lookup.md](./references/instructions-lookup.md) 的迁移规则替换为指针）。
+3. 检查`.specify/git-workflow.md` 的 Git Workflow 托管块是否已填写（存在 MAIN/PRE/DEV 行，且不是 `None yet.` 占位行）。
+4. 检查用户是否传入了操作参数（具体的 git 操作指令）。
 
 | 块已填写 | 有操作参数 | 进入作用域 |
 |----------|------------|------------|

@@ -43,7 +43,7 @@ Render the merged truth source (framework Classes/Objects + project external pro
 Guide the user through the local processing loop:
 
 1. **Status view**: `--action status` (count / threshold / should_prompt)。若因阈值提示进入本命令:可先运行 Mode 5(`/speckit.feedback introspect`)自省再打包——建议而非强制,跳过不影响任何后续步骤。
-2. **Summary view**: `--action list --limit 0` with filters as requested — `--slice <commands|skills|host-custom|...>`, `--kind <internal|external>`, `--disposition <processed|ignored|open>`, plus the pre-existing `--unit-id/--since/--contains`.
+2. **Summary view**: `--action list --limit 0` with filters as requested — `--slice <commands|skills|host-custom|...>`, `--kind <internal|external>`, `--disposition <processed|ignored|open>`, plus the pre-existing `--unit-id/--since/--contains`. With `--format json` the engine emits `{"count": N, "matches": [...]}` where each match carries `id`, `file`, `unit_id`, `unit_type`, `run_id`, `probe`, `kind`, `slice`, `disposition`, `introspection_ref`, `partial`, `created`, `summary`, `path` — parse that shape, never a bare array.
 3. **Disposition**: `--action dispose --id <entry-id> --to processed|ignored` (local metadata only; optional `--reason`/`--ref` record provenance, e.g. from an introspection report).
 4. **Package** (on user confirmation, internal entries only): `--action package` → print zip path + manual-send guidance. The agent NEVER sends the zip. 若待打包条目带有 `introspection_ref`(已被自省覆盖),默认提议改用 `--action package --include-introspection` 把覆盖它们的自省报告一并入包;用户可拒绝,拒绝不阻断打包。
 5. **Post-package cleanup (default closing step of the package run)**: once the zip exists, the packaged batch no longer needs to live in the active store — the zip is the record. Preview with `--action cleanup --package <zip|latest> --dry-run`, then run without `--dry-run` in the same session as packaging. Cleanup removes only entries actually inside that zip; `cleanup-log.md` records every removal. The zip itself STAYS under `.specify/memory/feedback/packages/` as the delivery artifact.
@@ -110,6 +110,8 @@ for z in feedback/feedback-*.zip; do unzip -o -d "$tmpdir/$(basename $z .zip)" "
 # then read files with standard file-reading tools
 ```
 
+**Large-batch read discipline** (Token 效率纪律 applies — never inject all entry bodies into one context): group the entries by affinity (same unit / same slice / same feature chain), dispatch balanced **parallel read-only verifiers** (one Agent per group) that each read their entries in full, verify every optimization point against current framework source, and return a compact verdict table (point → STILL-VALID / ALREADY-FIXED / PARTIAL / NOT-OURS + evidence `path:line` + suggested routing). The consuming agent reconciles the tables, never re-reads the raw bodies wholesale.
+
 Collect from every entry: `unit_id`, `probe`, `slice`, `run_id`, `## Review`, `## Optimization Points`. Build a **cross-bundle findings table**: unit × finding × source-bundle. Clean up the temp dir after reading. 包内可能附 `introspection/<report-id>.md` 自省报告(条目经源头场景化核验):此类发现可直接采信其核验结论与证据锚点,把精力集中在跨包对账与冲突裁决上,无需重复事实核验。
 
 **Bundle identity from the MANIFEST** — take `- **Install source**: <url> @ <sha>` and `- **Generated**: <ts>` for every bundle, plus its entry-file set from the archive listing (`unzip -l <zip>`). This is what catches a re-delivery the Step 1 filename check cannot (same batch, different filename):
@@ -148,6 +150,7 @@ rm feedback/feedback-<ts>.zip   # each processed bundle in this batch
 
 - Delete ONLY the bundles that were in this batch; cleanup is atomic and **part of the run** — a consume run does not end with its intake files still on disk. The durable record is the consume-log row (routings + conflicts), never the zips: lingering bundles would form a second, staler source of truth.
 - **Named marks, never a silent uniform delete**: every bundle carrying a Step 1/Step 2 identity mark (*re-delivered copy*, *second copy*, *orphan*) is listed by name **with that mark** in the consume report's cleanup section, so the confirmation already given for this batch knowingly covers a deletion that has no second copy behind it. An orphan the report did not name is not deleted.
+- **Orphan preserve-first precondition**: before deleting ANY orphan-marked bundle, copy it to the standard preserve path `${TMPDIR:-/tmp}/speckit-feedback-preserve/<zip-name>` (a grace copy for the current session — `${TMPDIR}` is ephemeral across reboots; anyone needing longer retention moves it and records the final location). An orphan whose preserve copy failed is not deleted. The consume-log Cleanup column MUST record the preserve path for every orphan.
 - Record the consume event by appending one row to `.specify/memory/feedback/consume-log.md`:
 
   ```markdown
