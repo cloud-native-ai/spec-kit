@@ -113,17 +113,6 @@ Spec Kit 仓库的 Dogfooding 本质是**一人分饰两角**:既是框架的作
    以"某个祖先恰好含有 `.specify`"为据。该判据 MUST 有**反向断言**(从框架源副本
    调用时不得自解析),因为只从一侧运行的测试看不见这个缺陷:它表现为工作区状态被
    写进框架仓,而不是表现为一次失败。
-   同族另两个变体(均已实际产出 `.specify/.specify/` 残留投影):(a) **镜像位置根
-   算术**——以 `Path(__file__).resolve().parents[2]` 取根的引擎,从镜像副本
-   `.specify/scripts/python/` 调用时根解析为 `.specify`,镜像目标全部深嵌一层;
-   (b) **cwd 即根**——`specify init --here`(及任何以 cwd 为项目根的流转)在 cwd 位于
-   `.specify/` 内时把框架树装进运行时目录。统一守卫(反向断言):**名为 `.specify` 的
-   目录永远不是仓/项目根**——根推导后若 `root.name == ".specify"` 则向上纠正或直接
-   拒绝(携带守卫的引擎:`scripts/python/sync-mirrors.py`、`gate-check.py`(walk-up
-   跳过名为 `.specify` 的祖先)、`tools-utils.py`;CLI 侧 `render_agents_for_tool` 与
-   `specify init` 两分支直接拒绝)。漂移守护:
-   `tests/contract/test_mirror_root_guard.py`(镜像位置调用不产嵌套 + canonical/镜像
-   等价 + render/init 拒绝)。
 
 ### 2.2 与既有机制的同构映射
 
