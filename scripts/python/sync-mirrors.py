@@ -54,6 +54,12 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+# Guard: invoked via the .specify/scripts/python/ mirror copy, parents[2]
+# resolves to `.specify` and every mirror target doubles into
+# `.specify/.specify/` (stray-projection defect). A dir named `.specify`
+# is never a repo root.
+if REPO_ROOT.name == ".specify":
+    REPO_ROOT = REPO_ROOT.parent
 
 # (source, mirror, strict_extras, exclude_parts) pairs; source is canonical.
 # strict_extras=True means a mirror-only file is an ERROR under --check: the tree

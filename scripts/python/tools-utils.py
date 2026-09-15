@@ -266,6 +266,8 @@ def _workspace_root_for(tools_dir: Path) -> Path:
 def _self_improvement_contract() -> str:
     """Load the canonical Tool-record Self-Improvement contract fragment."""
     repo_root = Path(__file__).resolve().parents[2]
+    if repo_root.name == ".specify":
+        repo_root = repo_root.parent
     for candidate in (
         repo_root / ".specify/skills/create-tools/templates/tool-self-improvement.md",
         repo_root / "skills/create-tools/templates/tool-self-improvement.md",

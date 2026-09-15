@@ -622,6 +622,12 @@ def render_agents_for_tool(project_path, tool, tracker=None):
     Returns stats: {"tool", "rendered", "backups", "unmapped"}.
     """
     project_path = Path(project_path)
+    if project_path.name == ".specify":
+        raise AgentMetadataError(
+            project_path,
+            "project path must not be a .specify runtime dir (rendering into it "
+            "nests the framework tree)",
+        )
     stats = {"tool": tool, "rendered": 0, "backups": [], "unmapped": {}}
     row = _AGENT_METADATA_MAPPING.get(tool)
     if not row or row["mode"] != "render":
@@ -2728,6 +2734,12 @@ def init(
     if here:
         project_name = Path.cwd().name
         project_path = Path.cwd()
+        if project_path.name == ".specify":
+            console.print(
+                "[red]Error:[/red] current directory is a .specify runtime dir, "
+                "not a project root; cd to the project root and retry"
+            )
+            raise typer.Exit(1)
 
         existing_items = list(project_path.iterdir())
         if existing_items:
@@ -2750,6 +2762,12 @@ def init(
         # project_name is not None here due to validation above
         assert project_name is not None
         project_path = Path(project_name).resolve()
+        if project_path.name == ".specify":
+            console.print(
+                f"[red]Error:[/red] '{project_name}' resolves to a .specify runtime "
+                "dir, not a project root"
+            )
+            raise typer.Exit(1)
         if project_path.exists():
             console.print(
                 f"[red]Error:[/red] Directory '{project_name}' already exists"
