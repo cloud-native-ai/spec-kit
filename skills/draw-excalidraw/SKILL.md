@@ -5,7 +5,7 @@ description: |
   Excalidraw 是手绘风格（白板风）绘图：架构图、流程图、拓扑图、思维导图、时序示意、ER 图等自由画布图表；标准流程图/时序图/类图也可走 Mermaid 桥接自动布局。
   Use when the user mentions "excalidraw", "手绘风格图", "手绘图", "手绘风", "白板图", "白板", "手绘架构图", "手绘流程图", "sketch style diagram", "hand-drawn diagram", "whiteboard diagram",
   "画个手绘风格的", "用 excalidraw 画", "excalidraw 场景", ".excalidraw 文件", "mermaid 转手绘", "mermaid 转 excalidraw", "生成 excalidraw", "excalidraw 渲染", "excalidraw 出图"
-skill_id: "<SKILL:/Users/liuqiming.lqm/project/profiles/config/skills/draw-excalidraw/SKILL.md>"
+skill_id: "<SKILL:.specify/skills/draw-excalidraw/SKILL.md>"
 ---
 
 # 手绘风格图表绘制技能（Excalidraw）

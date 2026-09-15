@@ -79,3 +79,9 @@ Phase C 修复后四个技能工作副本均产出变更，全部通过无回退
 |------|----------|----------|--------|
 | 2026-08-07 | Kubernetes 系统架构图 | draw-plantuml | 0.89 |
 | 2026-08-07 | Kubernetes 系统架构图（复跑） | draw-plantuml | 0.90 |
+### 部署拓扑图/架构复刻图（多区域等高分区 + 组件散点布局 + hub-spoke 连线 + 单色精确复现）
+- **推荐技能**: draw-d3js（d3js）
+- **理由**: 该需求类型的本质是像素级复现——散点式组件坐标、等高分区虚线面板、精确的 hub-spoke 箭头端点与单色风格，只有绝对坐标渲染层（D3.js SVG）能完全满足；本轮 d3js 以 0.95 的 R2 均分 1:1 复现 21 组件 / 5 箭头 / 3 等高分区，且数据分离 JSON 块带来最高可复现性。声明式引擎（mermaid 0.755、plantuml 0.845）受自动布局制约，在等高分区与散点位置上明显失真；echarts（0.94）与 excalidraw（0.94）可作为交互式 HTML / 可编辑白板产物的替代选择。
+- **替代选择**: echarts（交互式 HTML 图表/仪表板生态）、excalidraw（可编辑白板产物 .excalidraw）
+- **本轮技能改动摘要**: d3js — 标题字重经像素实测修正为 normal、图数据抽离为独立 JSON 校验块、zone 角色副标题与 SVG title 语义元数据；echarts — 建立"目标图像素测量 → 固定坐标 config JSON（layout:'none'）→ render.mjs 确定性出图"管线，修复箭头/阴影/工具箱/死白；excalidraw — roughness:0 干净单色场景、锐角分区、箭头锚定边中点、统一盒尺寸网格、scale=2 固定导出；mermaid — ghost-spacer 等高分区脚手架 + 跨区隐形链锁格、sans-serif 字体固定、本地 bundle 渲染路径、2x 高分辨率导出；plantuml — measure.py 测量驱动迭代（细箭头 ArrowThickness 1.2 macro、1px 细虚线分区边、等宽分区、MinimumWidth 统一列盒宽、service/robot 错位修正）。
+- **Cycle**: 3 | **Date**: 2026-09-15 | **Champion R2 avg**: 0.95 | **No-regression**: ALL 5 PASS

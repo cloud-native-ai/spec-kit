@@ -1,12 +1,12 @@
 ---
 name: 可视化技能竞技场团队
 slug: viz-skill-arena
-description: 四技能（draw-d3js / draw-echarts / draw-mermaid / draw-plantuml）同图竞技 + 两轮多裁判评审 + 一次重绘，持续区分「需求→技能」匹配并优化四个绘制技能
+description: 五技能（draw-d3js / draw-echarts / draw-excalidraw / draw-mermaid / draw-plantuml）同图竞技 + 两轮多裁判评审 + 一次重绘，持续区分「需求→技能」匹配并优化五个绘制技能
 goal: >
-  通过「用户下发图表任务 → 4 个技能并行绘制同一图表 → 第一轮 3 名裁判从不同角度打分 →
+  通过「用户下发图表任务 → 5 个技能并行绘制同一图表 → 第一轮 3 名裁判从不同角度打分 →
   根据评审意见优化对应技能（工作副本）并重绘 → 第二轮 2 名新裁判评审并选出冠军 →
   记录结论」的循环，逐步建立「需求类型 → 最优技能」的匹配知识（结论账本），
-  并持续优化四个绘制技能（skills/draw-d3js、draw-echarts、draw-mermaid、draw-plantuml）。
+  并持续优化五个绘制技能（skills/draw-d3js、draw-echarts、draw-excalidraw、draw-mermaid、draw-plantuml）。
   成功标准（每轮）：(1) 产出该任务冠军技能与匹配结论，追加至结论账本
   .specify/memory/knowledge/visualization-skill-selection.md；(2) 被采纳的技能变更
   （经第二轮独立裁判接受、无回退）合并回对应 canonical 技能目录并同步镜像；
@@ -17,6 +17,7 @@ territory:
   write:
     - skills/draw-d3js/**
     - skills/draw-echarts/**
+    - skills/draw-excalidraw/**
     - skills/draw-mermaid/**
     - skills/draw-plantuml/**
     - .specify/memory/knowledge/visualization-skill-selection.md
@@ -30,18 +31,18 @@ territory:
   forbidden:
     - .specify/teams/other-slug/**
   non_path:
-    - { type: skill-invocation, target: 四个绘制技能的运行（渲染脚本执行、技能工作副本重载） }
+    - { type: skill-invocation, target: 五个绘制技能的运行（渲染脚本执行、技能工作副本重载） }
 pattern: continuous
-preset: capability-arena   # 竞技模式实例(4 技能同题竞技);preset 由原 skills-arena 泛化而来
+preset: capability-arena   # 竞技模式实例(5 技能同题竞技);preset 由原 skills-arena 泛化而来
 created: 2026-08-07
-updated: 2026-08-20
+updated: 2026-09-15
 members:
   - agent: agent-team-supervisor-template
     role: team-supervisor
     stage: meta
     type: Meta
     lifecycle: persistent
-    responsibility: 唯一 Meta。读任务 → 并行派发 4 绘制者 → 派发 R1 三裁判 → 聚合反馈并把改进写入 4 个技能工作副本（target，不改被评图）→ 派发 4 重绘 → 派发 R2 两裁判 → 冠军裁定 → 采纳的技能变更合并回 canonical + 镜像同步 → 追加结论账本 → 写 run report / STATE / run-log
+    responsibility: 唯一 Meta。读任务 → 并行派发 5 绘制者 → 派发 R1 三裁判 → 聚合反馈并把改进写入 5 个技能工作副本（target，不改被评图）→ 派发 5 重绘 → 派发 R2 两裁判 → 冠军裁定 → 采纳的技能变更合并回 canonical + 镜像同步 → 追加结论账本 → 写 run report / STATE / run-log
   - agent: agent-stage-executor-template
     role: drawer-d3js
     stage: executor
@@ -54,6 +55,12 @@ members:
     type: Worker
     lifecycle: temporary
     responsibility: 同上（skills/draw-echarts）
+  - agent: agent-stage-executor-template
+    role: drawer-excalidraw
+    stage: executor
+    type: Worker
+    lifecycle: temporary
+    responsibility: 同上（skills/draw-excalidraw，render-excalidraw.sh）
   - agent: agent-stage-executor-template
     role: drawer-mermaid
     stage: executor
@@ -89,7 +96,7 @@ members:
     stage: evaluator
     type: Worker
     lifecycle: temporary
-    responsibility: 第二轮裁判（与 R1 不同成员）·综合质量——对重绘后 4 图按同一 4 维加权打分，裁定冠军
+    responsibility: 第二轮裁判（与 R1 不同成员）·综合质量——对重绘后 5 图按同一 4 维加权打分，裁定冠军
   - agent: agent-stage-evaluator-template
     role: judge-r2-match
     stage: evaluator
@@ -115,6 +122,7 @@ config:
   co_targets:
     - skills/draw-d3js
     - skills/draw-echarts
+    - skills/draw-excalidraw
     - skills/draw-mermaid
     - skills/draw-plantuml
   layering: 每个技能目录（SKILL.md + references/ + scripts/）只归对应技能的变更；「需求→技能匹配」结论归结论账本 .specify/memory/knowledge/visualization-skill-selection.md；被评图与运行中间件只进 .specify/teams/.work/viz-skill-arena/
@@ -123,7 +131,7 @@ config:
   budget:
     max_cycles_per_day: 3
     max_tokens_per_day: 200000
-    max_subagents_per_cycle: 12
+    max_subagents_per_cycle: 16
     on_80pct: report-only
     on_100pct: halt
   kill_switch: loop-pause-all
@@ -138,7 +146,7 @@ config:
 
 ## Goal
 
-**目标**：通过「四技能同图竞技 + 两轮多裁判评审 + 一次重绘」的循环，逐步建立「需求类型 → 最优绘制技能」的匹配知识，并持续优化四个绘制技能（draw-d3js / draw-echarts / draw-mermaid / draw-plantuml）。
+**目标**：通过「五技能同图竞技 + 两轮多裁判评审 + 一次重绘」的循环，逐步建立「需求类型 → 最优绘制技能」的匹配知识，并持续优化五个绘制技能（draw-d3js / draw-echarts / draw-excalidraw / draw-mermaid / draw-plantuml）。
 
 **成功标准（每轮 cycle）**：
 1. 冠军裁定：第二轮裁判按加权维度（语义保真 0.30 / 视觉质量 0.30 / 需求契合 0.25 / 可复现可维护 0.15）打分，最高加权分且 ≥0.85 者为冠军；
@@ -153,6 +161,7 @@ config:
 | agent-team-supervisor-template | team-supervisor | meta | **Meta**（唯一；写技能定义/配置/账本） | persistent |
 | agent-stage-executor-template | drawer-d3js | executor | Worker（渲染业务产物=图） | temporary |
 | agent-stage-executor-template | drawer-echarts | executor | Worker | temporary |
+| agent-stage-executor-template | drawer-excalidraw | executor | Worker | temporary |
 | agent-stage-executor-template | drawer-mermaid | executor | Worker | temporary |
 | agent-stage-executor-template | drawer-plantuml | executor | Worker | temporary |
 | agent-stage-evaluator-template | judge-r1-technical | evaluator | Worker（评分对象=渲染出的图） | temporary |
@@ -165,7 +174,7 @@ Type 判定说明：裁判评分对象是渲染出的图表（业务产物）→
 
 ## Dynamic Structure
 
-**Pattern**：continuous（长期运营）。优先级：长期改进（需求-技能匹配知识 + 四技能质量），用户每下发一个图表任务 = 一个 cycle；cycle 内部是「并行绘制 → 并行评审 → 定向重绘 → 独立复审」的锦标赛结构。
+**Pattern**：continuous（长期运营）。优先级：长期改进（需求-技能匹配知识 + 五技能质量），用户每下发一个图表任务 = 一个 cycle；cycle 内部是「并行绘制 → 并行评审 → 定向重绘 → 独立复审」的锦标赛结构。
 
 **Per-cycle 执行流**：
 
@@ -175,18 +184,18 @@ Type 判定说明：裁判评分对象是渲染出的图表（业务产物）→
   ▼
 SUPERVISOR: 读 constraints.md + 预算 + STATE.md 最近结论；确定任务目标路径
   │
-  ▼ PHASE A — 并行绘制（4 个 drawer 同时派发，territory 无写重叠）
-  drawer-d3js / drawer-echarts / drawer-mermaid / drawer-plantuml
+  ▼ PHASE A — 并行绘制（5 个 drawer 同时派发，territory 无写重叠）
+  drawer-d3js / drawer-echarts / drawer-excalidraw / drawer-mermaid / drawer-plantuml
   各加载最新技能工作副本 → 渲染同一任务 T → 结果清单（图路径/成败）→ run workspace
   │
   ▼ PHASE B — 第一轮评审（3 名裁判并行，不同角度）
   judge-r1-technical / judge-r1-visual / judge-r1-semantic
-  对 4 张图按 4 维加权打分 + 每技能 SUGGESTIONS
+  对 5 张图按 4 维加权打分 + 每技能 SUGGESTIONS
   │
   ▼ PHASE C — 技能优化（score = f(target) 不变式）
-  SUPERVISOR 聚合 R1 反馈 → 将改进写入 4 个技能**工作副本**（只改 target，不手改被评图）
+  SUPERVISOR 聚合 R1 反馈 → 将改进写入 5 个技能**工作副本**（只改 target，不手改被评图）
   │
-  ▼ PHASE D — 重绘（4 个 drawer 再次并行，每人恰好一次）
+  ▼ PHASE D — 重绘（5 个 drawer 再次并行，每人恰好一次）
   重载更新后的技能 → 重绘任务 T → 结果清单
   │
   ▼ PHASE E — 第二轮评审（2 名新裁判并行，独立验证，默认 REJECT）

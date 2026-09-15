@@ -8,8 +8,8 @@
 
 ## 范围（允许做什么）
 
-- **允许改**：四个技能 canonical 目录（`skills/draw-d3js`、`skills/draw-echarts`、`skills/draw-mermaid`、`skills/draw-plantuml`，含 SKILL.md/references/scripts）——仅在 R2 接受（无回退）后由 supervisor 合并；结论账本 `.specify/memory/knowledge/visualization-skill-selection.md`。
-- **允许读**：四个技能的 canonical/.specify/.qoder 副本、用户任务上下文、STATE 与历史 run report。
+- **允许改**：五个技能 canonical 目录（`skills/draw-d3js`、`skills/draw-echarts`、`skills/draw-excalidraw`、`skills/draw-mermaid`、`skills/draw-plantuml`，含 SKILL.md/references/scripts）——仅在 R2 接受（无回退）后由 supervisor 合并；结论账本 `.specify/memory/knowledge/visualization-skill-selection.md`。
+- **允许读**：五个技能的 canonical/.specify/.qoder 副本、用户任务上下文、STATE 与历史 run report。
 - **运行中间件**：一律在 `.specify/teams/.work/viz-skill-arena/`（git-ignored）。
 
 ## 禁止（MUST NOT）
