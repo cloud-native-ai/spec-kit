@@ -14,6 +14,24 @@ skill_id: "<SKILL:.specify/skills/draw-d3js/SKILL.md>"
 
 Create interactive data visualizations using D3.js (Data-Driven Documents), output as a self-contained HTML file that can be opened directly in any modern browser.
 
+## SDS 实现与强弱落地
+
+本技能是 draw-* 家族的**语法层**：语义层 `draw-diagram` 拥有 SDS（Semantic Drawing Spec = 逻辑模型 + 几何 + `weight_plan` 档位 + typography 层级），本技能只拥有 **D3 语法、SDS 实现、渲染质量实践、偏离逼近**。
+
+1. **输入契约**：受委派时调用方传入 **SDS 文件路径**（+ 目标/输出要求）——读 SDS，不重推 SDS。**MUST NOT 改写语义**：几何（canvas / 每图元 `box{x,y,w,h}` / 分区盒 / 关系锚点）、`weight_plan` 档位归属、分区布局语义均由语义层决定。仅无 SDS 的直接调用（standalone）才在本地规划版面。
+2. **强弱实现**（SDS 相对档位 → D3 绝对 stroke-width；本表为规范值，理由与深浅/字号阶梯见 references/sds-realization.md §2）：
+
+   | 档位 | 语义角色（SDS 声明） | D3 绝对线宽 |
+   |------|----------------------|-------------|
+   | T1 | 大模块/分区边界 | 2.5px |
+   | T2 | 小模块/组件边界（关键路径粗细封顶 = T2，只抬色相） | 2.0px |
+   | T3 | 数据流/依赖连线 | 1.6px |
+   | T4 | 注释/副标题 | 1.2px |
+
+   **复刻型 SDS**（`fidelity_intent: reproduction`）携带**源图实测线宽/字号/色值**，实测值**覆盖**上表默认——照抄实测，不得归一化回默认档位。
+3. **几何**：d3js 是**绝对坐标引擎** → **MUST 精确兑现 SDS 的每个 box，预期零偏离**（不启力导向重排、不用 margin 约定平移已声明坐标）；运行时不可避免项（字体度量致文本溢出）先在 box 内近似，再量化声明。
+4. 像素测量管线、viewBox 对齐、固定坐标 data-join、锚点计算、坐标校验（`validateCoords` + `validateAgainstSDS`）、偏离策略：[references/sds-realization.md](references/sds-realization.md)。
+
 ## Core Principles
 
 ### 1. Data-Driven Design
@@ -31,6 +49,11 @@ Use D3.js v7 (latest stable). Follow the data-join pattern (`enter/update/exit`)
 ### 4. Progressive Enhancement
 Start with a clean, functional visualization. Add interactivity (tooltips, transitions, zoom) only when it serves the user's needs or when explicitly requested.
 
+### 5. Engine-Unique Capability（本引擎独占，语法层全权）
+- **像素级复刻**：绝对坐标 SVG 控制、无布局引擎干预 → 源图 1:1 重现（实测坐标 / 线宽 / dash / 字号 / 单色调色板）。管线见 [references/sds-realization.md](references/sds-realization.md) §3.4、§5。
+- **bespoke 交互**：超出标准图表目录的自定义交互——常显边标签开关、`?clean=1` 静态快照、拖拽微调、分区折叠、导出 SVG/PNG。
+- 图型选择与语义判定不归本技能：见 § SDS 实现与强弱落地（由 `draw-diagram` 的 SDS 决定）。
+
 ## Workflow
 
 This skill creates D3.js data visualizations based on user-provided data and requirements. Follow the steps below in order.
@@ -43,7 +66,7 @@ Analyze the user's input to determine:
 2. **Data dimensions**: How many variables? Categorical vs quantitative? Time-series?
 3. **Visualization goal**: What story should the chart tell? (comparison, trend, distribution, relationship, composition, hierarchy)
 4. **Interactivity needs**: Static or interactive? Tooltips, zoom, filter, animation?
-5. **Multi-chart needs**: Does the user need multiple perspectives? If so, plan a dashboard layout.
+5. **Multi-chart needs**: Does the user need multiple perspectives? 有 SDS 时图型集合与画布/分区几何照 SDS 执行；仅 standalone 时本地规划 dashboard 版面。
 
 Data format handling:
 - If data is in a markdown table or plain text table, parse it into a JSON array
@@ -53,6 +76,8 @@ Data format handling:
 If critical information is missing, ask **one targeted question**.
 
 ### Step 2: Choose Chart Type
+
+> **SDS 在场时不重选图型**：`diagram_class`、需要的图型集合与覆盖判定已由语义层（draw-diagram）决定并写入 SDS；本步骤退化为"该图型对应哪段 D3 配方"的查表。下表是 **standalone（无 SDS）直接调用**时的决策索引，同时也是本引擎的能力清单。
 
 Match data characteristics and goals to the appropriate D3.js chart type:
 
@@ -72,16 +97,16 @@ Match data characteristics and goals to the appropriate D3.js chart type:
 
 If multiple perspectives are needed, create multiple visualizations in the same HTML document.
 
-**Multi-chart coverage check**: when the request names a fixed set of diagrams (e.g. "5 类图"), enumerate them up front and map each one to a concrete chart type before writing code, then deliver the complete set. Missing requested diagram types are deliverable defects, not rendering details — a heatmap cannot stand in for a missing sequence diagram or a missing layered-model view.
+**Multi-chart coverage check**（有 SDS：覆盖判定归前门的 LDM 验收，本技能只逐张兑现；以下为 standalone 自查）: when the request names a fixed set of diagrams (e.g. "5 类图"), enumerate them up front and map each one to a concrete chart type before writing code, then deliver the complete set. Missing requested diagram types are deliverable defects, not rendering details — a heatmap cannot stand in for a missing sequence diagram or a missing layered-model view.
 
-**Semantic fit**: a heatmap / dependency matrix encodes dependency *intensity* only; it does NOT show topology, deployment layout, or namespace grouping. If the requested diagram is a deployment/architecture view, render a topology or grouped view (fixed-coordinate component layout, zone-grouped force graph, namespace-grouped view) instead of overloading a heatmap with metadata columns (kind/replica/port).
+**Semantic fit**（图类适配判定归前门路由；受委派时按 SDS 的 `diagram_class` 实现，不在此改判）: a heatmap / dependency matrix encodes dependency *intensity* only; it does NOT show topology, deployment layout, or namespace grouping. If the requested diagram is a deployment/architecture view, render a topology or grouped view (fixed-coordinate component layout, zone-grouped force graph, namespace-grouped view) instead of overloading a heatmap with metadata columns (kind/replica/port).
 
 ### Step 3: Write D3.js Code
 
 Based on the chosen chart type and data:
 
 1. **Prepare data**: Parse/transform user data into D3-friendly format
-2. **Set up SVG**: Define dimensions, margins, and responsive viewBox
+2. **Set up SVG**: Define dimensions, margins, and responsive viewBox（SDS 几何图：viewBox 与 SDS canvas **1:1**，**不套 margin 平移**——见 [references/sds-realization.md](references/sds-realization.md) §3.1）
 3. **Create scales**: Map data domains to visual ranges (x, y, color, size)
 4. **Draw axes**: Add labeled axes with proper tick formatting
 5. **Binddata & draw elements**: Use the data-join pattern to render visual marks
@@ -92,19 +117,21 @@ For D3.js syntax, scale types, layouts, and common patterns, reference [d3js-gui
 
 #### Dense Graph & Architecture Diagram Guidance
 
-When the visualization is a component/architecture graph (nodes + links), apply these rules:
+When the visualization is a component/architecture graph (nodes + links), apply these rules.
 
-- **Layout reproducibility**: a bare `d3.forceSimulation` starts from random positions — every reload yields a different layout. For reproducible output either (a) assign fixed/preset coordinates (`x`/`y` on each node) and pin or skip the simulation, (b) constrain the simulation with per-group `forceX`/`forceY` so each group occupies a stable region, or (c) seed node positions deterministically. State the layout strategy in the deliverable explanation.
-- **Dense-graph threshold**: with roughly >15–20 nodes or dense link sets, a free-running force layout tends to cross and overlap. Prefer fixed hand-placed coordinates (readable + reproducible) or a grouped force layout over a pure simulation.
-- **Edge labels**: do NOT keep every edge label permanently visible at full opacity in dense graphs — labels overlap nodes and other links. Show labels on hover (per-link label or tooltip), or display labels only for a curated set of key edges. Keep edge label text short (≤ ~8–10 chars) and color edges by type/relation for extra disambiguation.
-- **Node semantics**: every node must be a real component of the modeled system. Non-component concepts (queues, budgets, behaviors, states) are NOT nodes — move them into annotation text, a description panel, or a visually distinct non-node annotation layer. Mixing pseudo-nodes into the node set misleads readers about the architecture.
-- **Group semantics**: assign groups by semantic role. Infrastructure nodes (storage systems, external services, registries) usually are not part of a subsystem — give them their own group and their own legend color instead of folding them into a subsystem group.
-- **Legend**: always pair color swatches (colored dots/rects) with group names in the legend; a text-only legend is insufficient to decode a colored graph.
-- **Bilingual node labels**: in architecture graphs, give each node a short English name (e.g. access / gateway) plus a Chinese subtitle (职责说明, ≤ ~12 chars) below it when the audience is mixed-language; English-only short names reduce readability for Chinese reviewers.
-- **Edge-label visibility toggle**: default edge labels to hidden (hover reveals), but provide an explicit「常显边标签」toggle (checkbox/button) so the same figure can be printed/exported with labels permanently visible for doc embedding. Hover-only labels with no way to show them statically lose information in static output (screenshots, PDFs).
-- **Cross-panel edges**: when the layout uses panels/zones, route cross-panel edges through unified anchor exit/entry ports on panel borders, or use orthogonal (elbow) routing, instead of long straight diagonals that cut through unrelated panels — long cross-panel lines read as clutter in static output.
-- **Fixed-coordinate hygiene**: with hand-placed coordinates, record the partition/grid rule in the data file header (e.g. "panel A: x∈[40,360], y∈[40,300]; node slots on a 24px grid") and run a lightweight overlap / panel-bounds validation before render, so later node additions do not silently overlap. See the validation snippet in [d3js-guide.md](references/d3js-guide.md).
-- **Inference annotation**: when the diagram includes transitions/states/relations inferred by the author (not stated in the source description) — e.g. a manual recovery path or a direct-delete path — mark them with a distinct style AND a「描述未定义，推断路径」annotation (footnote, legend entry, or edge label); never present inferred semantics as source-described. Similarly, annotate deliberately omitted domain parts instead of omitting silently.
+> **决策 vs 实现**：有 SDS 时——「哪些是节点、谁属哪个分区、坐标在哪、谁是关键路径、哪条是推断路径」全部是语义层的决定（SDS `elements` / `zones` / geometry / `weight_plan`），本技能只做 D3 实现与渲染质量，**不得在此重做这些判定**。无 SDS 的 standalone 调用下，标〔决策〕的条目由本技能自行判定并在交付说明中记录策略。
+
+- **Layout reproducibility**〔有 SDS：固定坐标是契约，不选策略；以下为 standalone 选项〕: a bare `d3.forceSimulation` starts from random positions — every reload yields a different layout. For reproducible output either (a) assign fixed/preset coordinates (`x`/`y` on each node) and pin or skip the simulation, (b) constrain the simulation with per-group `forceX`/`forceY` so each group occupies a stable region, or (c) seed node positions deterministically. State the layout strategy in the deliverable explanation.
+- **Dense-graph threshold**〔决策 / standalone 判据〕: with roughly >15–20 nodes or dense link sets, a free-running force layout tends to cross and overlap. Prefer fixed hand-placed coordinates (readable + reproducible) or a grouped force layout over a pure simulation.
+- **Edge labels**〔实现〕: do NOT keep every edge label permanently visible at full opacity in dense graphs — labels overlap nodes and other links. Show labels on hover (per-link label or tooltip), or display labels only for a curated set of key edges. Keep edge label text short (≤ ~8–10 chars) and color edges by type/relation for extra disambiguation.
+- **Node semantics**〔决策归语义层 elements〕: every node must be a real component of the modeled system. Non-component concepts (queues, budgets, behaviors, states) are NOT nodes — move them into annotation text, a description panel, or a visually distinct non-node annotation layer. Mixing pseudo-nodes into the node set misleads readers about the architecture.
+- **Group semantics**〔决策归语义层 zones〕: assign groups by semantic role. Infrastructure nodes (storage systems, external services, registries) usually are not part of a subsystem — give them their own group and their own legend color instead of folding them into a subsystem group.
+- **Legend**〔实现〕: always pair color swatches (colored dots/rects) with group names in the legend; a text-only legend is insufficient to decode a colored graph.
+- **Bilingual node labels**〔实现〕: in architecture graphs, give each node a short English name (e.g. access / gateway) plus a Chinese subtitle (职责说明, ≤ ~12 chars) below it when the audience is mixed-language; English-only short names reduce readability for Chinese reviewers.
+- **Edge-label visibility toggle**〔实现〕: default edge labels to hidden (hover reveals), but provide an explicit「常显边标签」toggle (checkbox/button) so the same figure can be printed/exported with labels permanently visible for doc embedding. Hover-only labels with no way to show them statically lose information in static output (screenshots, PDFs).
+- **Cross-panel edges**〔实现；锚点位置取自 SDS `relations.anchor`〕: when the layout uses panels/zones, route cross-panel edges through unified anchor exit/entry ports on panel borders, or use orthogonal (elbow) routing, instead of long straight diagonals that cut through unrelated panels — long cross-panel lines read as clutter in static output.
+- **Fixed-coordinate hygiene**〔实现〕: with hand-placed coordinates, record the partition/grid rule in the data file header (e.g. "panel A: x∈[40,360], y∈[40,300]; node slots on a 24px grid") and run the overlap / panel-bounds + SDS 逐 box 一致性校验 before render, so later node additions do not silently overlap. Snippets (`validateCoords` / `validateAgainstSDS`): [references/sds-realization.md](references/sds-realization.md) §4.
+- **Inference annotation**〔判定归语义层摘要纪律；区别样式与图注落地归本技能〕: when the diagram includes transitions/states/relations inferred by the author (not stated in the source description) — e.g. a manual recovery path or a direct-delete path — mark them with a distinct style AND a「描述未定义，推断路径」annotation (footnote, legend entry, or edge label); never present inferred semantics as source-described. Similarly, annotate deliberately omitted domain parts instead of omitting silently.
 
 **Data provenance**: when the visualization encodes an external description (architecture doc, spec, requirement), record the source file/version/date in the data file header or a page note (e.g. `// 依据: docs/architecture.md v2.3 (2026-08-01)`). This keeps the figure auditable against its source and surfaces narrative drift between the description and the diagram.
 
@@ -183,8 +210,10 @@ For multi-chart dashboards:
 
 | Document | Content |
 |----------|---------|  
+| [sds-realization.md](references/sds-realization.md) | **SDS 实现技术所有者**：输入契约与不可改写边界、档位线宽/深浅/字号落地理由、像素测量管线、viewBox 与 canvas 1:1、固定坐标 data-join、锚点计算、`validateCoords` + `validateAgainstSDS`、复刻型实测覆盖、偏离策略 |
 | [d3js-guide.md](references/d3js-guide.md) | D3.js v7 quick reference: scales, axes, shapes, layouts, transitions, data-join pattern, and common chart recipes (incl. dense/reproducible force graphs, state machine, hand-drawn sequence diagram, tree/layered model, heatmap direction conventions) |
 | [d3js-official-docs.md](references/d3js-official-docs.md) | D3.js official documentation: core concepts, module architecture, data-join philosophy. Load on-demand for deeper understanding |
+| [cycle3-reproduction-lessons.md](references/cycle3-reproduction-lessons.md) | Dated record（cycle 3 R1，复刻竞技场）：当次重绘的强制修正与不可动不变量；通用化的质量实践已收入 sds-realization.md §5，本文件不作为当前规范引用 |
 
 ### Best Practices (`best-practices/`)
 
@@ -199,6 +228,11 @@ For multi-chart dashboards:
 ## Quality Checklist
 
 Before delivering the final HTML file, verify:
+- [ ] 受委派时读了调用方给的 SDS，没有重推语义（元素/分区/档位归属未改写）
+- [ ] SDS 几何逐 box 兑现、零偏离（`validateAgainstSDS` 无 delta；未启力导向重排；未套 margin 平移）
+- [ ] 线宽按档位落地且单调递减（T1>T2>T3>T4，非全图单一线宽）；关键路径只抬色相、粗细 ≤ T2
+- [ ] 复刻型用源图实测线宽/字号/色值覆盖默认档位（未"归一化"回默认）
+- [ ] 不可避免的运行时偏离已在 box 内近似并量化声明（维度 + 幅度 + 原因）
 - [ ] HTML file opens correctly in a browser without errors
 - [ ] Browser console shows no JavaScript errors
 - [ ] D3.js v7 is present (CDN link or vendored local file) and correct

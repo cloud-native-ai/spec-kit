@@ -85,3 +85,10 @@ Phase C 修复后四个技能工作副本均产出变更，全部通过无回退
 - **替代选择**: echarts（交互式 HTML 图表/仪表板生态）、excalidraw（可编辑白板产物 .excalidraw）
 - **本轮技能改动摘要**: d3js — 标题字重经像素实测修正为 normal、图数据抽离为独立 JSON 校验块、zone 角色副标题与 SVG title 语义元数据；echarts — 建立"目标图像素测量 → 固定坐标 config JSON（layout:'none'）→ render.mjs 确定性出图"管线，修复箭头/阴影/工具箱/死白；excalidraw — roughness:0 干净单色场景、锐角分区、箭头锚定边中点、统一盒尺寸网格、scale=2 固定导出；mermaid — ghost-spacer 等高分区脚手架 + 跨区隐形链锁格、sans-serif 字体固定、本地 bundle 渲染路径、2x 高分辨率导出；plantuml — measure.py 测量驱动迭代（细箭头 ArrowThickness 1.2 macro、1px 细虚线分区边、等宽分区、MinimumWidth 统一列盒宽、service/robot 错位修正）。
 - **Cycle**: 3 | **Date**: 2026-09-15 | **Champion R2 avg**: 0.95 | **No-regression**: ALL 5 PASS
+
+### 部署拓扑复刻图（SDS 语义/语法分离架构下）
+- **推荐技能**: draw-d3js（cycle-4 R2 0.95）。绝对坐标引擎精确实现 SDS 几何/权重覆写（1px 虚线灰分区、2px 盒/流、13px r3 间隙）；SDS YAML 以 sha 钉扎内嵌为唯一几何源，12/12 in-page QA + 光栅读回。
+- **替代**: echarts 0.92、excalidraw 0.89（同为精确坐标族）；plantuml 0.81 = 仅允许声明式语法时的最佳自动布局回退（等高分区脚手架 + 秩序错位逼近，7 项量化偏离全在界内）。
+- **不推荐**: mermaid 0.59（zigzag elbow、分区不等高、秩塌缩）；cycle-4 变更因无重绘未采纳。
+- **采纳变更**: draw-d3js / draw-echarts / draw-excalidraw / draw-plantuml（references/cycle4-improvements.md dated record）+ draw-diagram（semantic-model.md 增 auto_layout_intent：fallback_rank_order / routing_intent / equal_height_priority）。
+- **Cycle**: 4 | **Date**: 2026-09-15 | **Champion R2**: 0.95 | **No-regression**: 4 PASS / mermaid N/A(无重绘)

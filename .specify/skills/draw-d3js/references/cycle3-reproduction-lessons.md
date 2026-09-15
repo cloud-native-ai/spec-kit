@@ -2,6 +2,8 @@
 
 > R1 weighted avg: 0.963 (rank 1/5). Near-perfect reproduction. Minor refinements only.
 
+> **Dated record.** 本文件是当次复刻竞技场的记录，其中的具体数值（21 nodes / 5 edges / 3 panels、viewBox 2000×1257）只属于那次运行，不作为当前规范引用。可通用的质量实践（zone-title 字重、数据分离为可校验 JSON 块、`?clean=1` 快照元数据、复刻不变量）已由 [sds-realization.md](sds-realization.md) §5 承载；源实测覆盖默认档位的规则见同文 §5。
+
 ## Mandatory fixes for redraw
 
 1. **Zone-title font weight**: target uses regular/medium weight titles, NOT bold. Change zone title `font-weight` from `bold` to `normal` (or `500`) at the same font size.

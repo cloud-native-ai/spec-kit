@@ -1,5 +1,7 @@
 # Cycle 3 R1 Improvements — draw-plantuml
 
+> **性质**：本文件是 Cycle 3 R1 的**当期记录**（dated record），不作为当前配方来源。其中仍然成立的不变式（stereotype 作用域 skinparam + `hide stereotypes` 的虚线分区配方、`-[hidden]down-` 锁秩 / `-[hidden]right-` 不锁秩、`<<ph>>` 透明占位、远端渲染、`scale 4`/`dpi 300`）已被重述为 SDS 逼近技术并**以 [sds-realization.md](sds-realization.md) 为准**；两者不一致处（如内联 `#line.dashed` 尾缀会把作用域块的 `BorderThickness` 重置回基线、虚线须改用块内 `BorderStyle dashed`）按复验后的 sds-realization.md §1.3 执行。
+
 > R1 weighted avg: 0.853 (rank 3/5). Good structure; defects are zone width imbalance, heavy arrows, coarse dashes, non-uniform box sizes.
 
 ## Mandatory fixes for redraw (ALL must be applied)

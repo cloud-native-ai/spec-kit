@@ -14,19 +14,41 @@ skill_id: "<SKILL:.specify/skills/draw-excalidraw/SKILL.md>"
 
 ## 核心原则
 
-- **自由画布 = 坐标自负**：Excalidraw 没有自动布局引擎，每个元素的 `x/y/width/height` 都由本技能计算——先规划网格再落坐标，宁可稀疏不可拥挤
-- **两条生成路径，按图选型**：标准结构图（流程图/时序/类/ER/状态）优先走 **Mermaid 桥接**（布局自动、成功率最高）；自由布局图（架构图/拓扑/脑图/版面自定义）走**场景 JSON 直出**
+- **绝对坐标 = 几何实现**：Excalidraw 没有自动布局引擎，场景 JSON 坐标即最终坐标。谁在哪、多大、谁和谁同区由 **SDS geometry**（draw-diagram 产出）决定；本技能按 SDS box **零偏离**落实，仅在无 SDS 的直接调用时才自规划网格（fallback，宁可稀疏不可拥挤）
+- **两条生成路径，按图选型**：标准结构图（流程图/时序/类/ER/状态）优先走 **Mermaid 桥接**（布局自动、成功率最高）；自由布局图（架构图/拓扑/脑图/版面自定义）走**场景 JSON 直出**。**带 SDS geometry 委派时必须直出**——桥接自动布局兑不了 SDS 坐标
 - **远端渲染优先**：默认只使用渲染服务（`render-excalidraw.sh` 默认 `EXCALIDRAW_BACKEND=server`）；服务不可用时必须先询问用户（修正 `EXCALIDRAW_SERVER` 地址，或经确认后以 `EXCALIDRAW_BACKEND=local` 本机临时起服务），**未获用户确认不得静默切换**
 - **渲染后必回看**：读取渲染出的 PNG 与用户要求比对（重叠/错位/溢出/漏元素），发现问题改场景 JSON 重渲——坐标是算出来的，必须用眼睛验收
-- **手绘美学**：`roughness: 1`、Excalidraw 标准色板、容器圆角、箭头微弯——不要画成僵硬的 CAD 图
+- **手绘美学（风格默认，复刻时被覆盖）**：`style_intent=hand-drawn`（或直接调用无声明）时 `roughness: 1`、Excalidraw 标准色板、容器圆角、箭头微弯；复刻场景触发**复刻覆盖**（`roughness: 0`、直角、crisp），见 [sds-realization.md §4](references/sds-realization.md)
+
+## SDS 实现与强弱落地
+
+本技能是绘图技能族的**语法层**：只拥有 Excalidraw 引擎语法（场景 JSON）、SDS 实现、渲染质量实践与偏离逼近。语义层——逻辑模型、geometry（canvas/box/anchor）、weight_plan 档位、typography 层级——归 draw-diagram，schema 见 [../draw-diagram/references/semantic-model.md](../draw-diagram/references/semantic-model.md)，此处不复述。
+
+**输入契约**：draw-diagram 委派传入 **SDS 文件路径**。**MUST NOT 改写语义**——不增删元素/关系、不挪 box、不改档位次序；兑不了（如 label 装不进 box）→ 量化回报，不擅自修。无 SDS 的直接调用按 [sds-realization.md §5](references/sds-realization.md) 兜底自规划并声明假设。
+
+**强弱实现**（tier → 绝对 `strokeWidth`；相对线宽语义见 owner）：
+
+| 档位（语义角色） | strokeWidth | 落实要点 |
+|------|------|------|
+| T1 大模块/分区边界 | 3 | solid，最深笔画色 |
+| T2 小模块/组件边界 | 2 | solid |
+| T3 数据流/关系箭头 | 1.5→2 | Excalidraw 最小可读笔画钳位；T2>T3 层级转移到深浅通道——流线用更浅颜色 |
+| T4 注释/副标题 | 1 | 独立 text / 细线 |
+
+- zone 边界：`strokeStyle: "dashed"` + `roughness: 0`（crisp 复刻）；`roughness: 1` 仅当 `style_intent=hand-drawn`
+- 关键路径仅色相抬升，线宽封顶 = T2；typography 落实：zone/图标题 28 > 元素标签 20 > 注释 16
+
+**几何**：场景 JSON 是**绝对坐标**引擎 → **MUST 精确兑现 SDS box**（x/y/w/h、zone box、relation anchor+gap 照抄），容器绑定文本按 SDS box 居中（复刻场景写精确居中坐标——渲染器不自动重居中）。**预期零偏离**，不适用"逼近声明"豁免；未声明偏离按 semantic-fidelity 扣分。
+
+**细节**：几何映射表、场景 JSON 约定（containerId/箭头绑定/seed/scale 钉住）、映射理由、复刻覆盖规则、无 SDS 兜底 → [references/sds-realization.md](references/sds-realization.md)
 
 ## 工作流
 
 按以下 7 个步骤顺序执行：
 
-### Step 1: 语义解析 + 吃透上下文
+### Step 1: 语义解析 + 吃透上下文（直接调用时）
 
-分析用户输入理解绘制意图；必要时用 `AskUserQuestion` 确认（最多一轮 ≤4 问）。面对文档/代码等丰富上下文，先产出带出处的上下文摘要（组件、关系、核心流程），后续绘图对着它，不臆造。
+draw-diagram 委派时语义与几何以 **SDS 为准**——本步仅核对 SDS 与输出要求，**不重建语义**。直接调用（无 SDS）时：分析用户输入理解绘制意图；必要时用 `AskUserQuestion` 确认（最多一轮 ≤4 问）。面对文档/代码等丰富上下文，先产出带出处的上下文摘要（组件、关系、核心流程），后续绘图对着它，不臆造。
 
 → [00-semantic-analysis.md](references/howto/00-semantic-analysis.md)
 
@@ -38,14 +60,15 @@ skill_id: "<SKILL:.specify/skills/draw-excalidraw/SKILL.md>"
 |------|------|------|
 | 流程图、时序图、类图、ER 图、状态图、甘特 | **Mermaid 桥接** | 官方转换器自动布局+文本绑定，LLM 写 Mermaid 成功率高 |
 | 架构图、拓扑图、思维导图、分区/分层示意、任何需要自定义版面的图 | **场景 JSON 直出** | Mermaid 表达不了自由版面 |
+| **带 SDS geometry 的委派** | **场景 JSON 直出**（强制） | 桥接自动布局兑不了 SDS 坐标 |
 
 → [01-path-selection.md](references/howto/01-path-selection.md)
 
-### Step 3: 布局规划（场景 JSON 路径必做）
+### Step 3: 实现 SDS 几何（场景 JSON 路径必做）
 
-编码前先在"纸面"规划空间语义：网格（列宽/行高/间距）、角色位置（枢纽居中、上下游左右/上下排布）、分组框选（frame 或大矩形背景）、连线路径（正交优先、避免穿元素）。文本宽度按估算公式预留（CJK ≈ fontSize×字数，ASCII ≈ fontSize×0.6×字数）。
+版面语义由 SDS geometry 决定，本步只**实现给定盒子**：SDS box → 元素 `x/y/w/h` 1:1、zone box → 垫底矩形/frame、relation anchor → 箭头绑定与折点路由；文本宽度估算只用于校验 label 装得进 SDS box（装不下 → 量化回报，不擅自改盒）。无 SDS 的直接调用按兜底网格法自规划并声明假设。
 
-→ [02-layout-planning.md](references/howto/02-layout-planning.md)
+→ [sds-realization.md](references/sds-realization.md)
 
 ### Step 4: 生成场景 JSON / Mermaid 代码
 
@@ -61,7 +84,7 @@ skill_id: "<SKILL:.specify/skills/draw-excalidraw/SKILL.md>"
 
 ### Step 6: 回看比对与微调
 
-读取渲染 PNG 检查：元素齐全？文本溢出容器？箭头穿元素？布局失衡？发现问题回到 Step 3/4 调整坐标/尺寸/文案后重渲，直到满意。Mermaid 路径不满意版面时，可转为场景 JSON 路径手动微调（转换结果就是可编辑场景）。
+读取渲染 PNG 检查：元素齐全？文本溢出容器？箭头穿元素？布局失衡？weight_plan 层级可辨（边框按档递减、流线最细浅）？微调只修**渲染缺陷**（溢出/穿越/重叠/错位），不得挪动 SDS box 与语义；缺陷根源在 SDS 本身（如 box 装不下 label）→ 量化回报语义层/用户。Mermaid 路径不满意版面时，可转为场景 JSON 路径手动微调（转换结果就是可编辑场景）。
 
 ### Step 7: 组装 HTML 输出
 
@@ -85,6 +108,6 @@ skill_id: "<SKILL:.specify/skills/draw-excalidraw/SKILL.md>"
 
 ## 参考文档
 
-完整索引见 [references/index.md](references/index.md)。
+完整索引见 [references/index.md](references/index.md)。SDS 实现（几何映射、强弱落地、复刻覆盖、无 SDS 兜底）见 [references/sds-realization.md](references/sds-realization.md)。
 
 **实战沉淀（务必阅读）**：[best-practices/best-practices.md](best-practices/best-practices.md)（最佳实践）与 [best-practices/pitfalls.md](best-practices/pitfalls.md)（陷阱）——绘制前对照最佳实践，绘制后自查陷阱清单。

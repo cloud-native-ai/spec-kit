@@ -3,7 +3,7 @@
 ## 路径选型
 
 1. **标准结构图先走 Mermaid 桥接**：flowchart/sequence/class/er/state 由官方转换器自动布局 + 文本绑定，一次成功率远高于手写坐标。产物是标准 `.excalidraw` 场景，不满意可继续手改。
-2. **自由版面才直出场景 JSON**：架构图/拓扑/分区图必须直出时，严格走网格法（定尺寸 → 定间距 → 算坐标），落 JSON 前先列布局规划表。
+2. **直出先过 Step 3**：带 SDS 时零偏离实现其 box（几何归语义层）；仅无 SDS 直接调用才用网格法自规划（定尺寸 → 定间距 → 算坐标）并声明假设。落 JSON 前先列实现/规划表（[../references/sds-realization.md](../references/sds-realization.md)）。
 3. **超 15 节点拆图**：概览图 + 下钻子图，图间共享编号与配色词汇。
 
 ## 文本处理
@@ -15,7 +15,7 @@
 
 ## 样式
 
-8. **手绘感来自 roughness: 1 + 官方色板**；`fillStyle: "solid"` 最干净，hachure 适合强调"草稿感"。
+8. **手绘感来自 roughness: 1 + 官方色板**；`fillStyle: "solid"` 最干净，hachure 适合强调"草稿感"。**复刻场景例外**：roughness 0 + 直角 + 细虚线 zone（见 [../references/sds-realization.md §4](../references/sds-realization.md)）。
 9. **同子系统同色系**（蓝系/绿系/黄系分区），跨区关系用红/橙箭头突出。
 10. **分组用垫底大矩形**（浅色背景 + solid）比 frame 美观；frame 适合需要标题栏的强分组。
 

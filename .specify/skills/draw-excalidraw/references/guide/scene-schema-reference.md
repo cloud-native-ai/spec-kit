@@ -119,3 +119,7 @@
 ## 完整最小示例
 
 两节点一箭头（可直接渲染）：见技能实测样例 `references/howto/03-scene-json-generation.md` 的骨架 + 上述模板组合；也可用渲染服务 `/mermaid-to-scene` 从 `flowchart LR; A-->B` 生成参照物。
+
+## 强弱实现（接收 draw-diagram weight_plan）
+
+语义层（draw-diagram）决定「什么该更显眼」，本技能决定「怎么画粗」。字段事实：`strokeWidth` 在场景 JSON 中接受**任意数值**（UI 预设 1/2/4 只是按钮档位）；深浅走 `strokeColor`（色板见上）。tier → strokeWidth 的映射表与钳位/深浅通道理由**不在此复述**——唯一 owner 见 [SKILL.md「SDS 实现与强弱落地」](../../SKILL.md) 与 [../sds-realization.md §3](../sds-realization.md)。全图单一线宽判不合格。

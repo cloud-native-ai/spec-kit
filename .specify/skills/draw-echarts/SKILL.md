@@ -31,9 +31,32 @@ Use a pinned ECharts 5.x version (e.g. `echarts@5.6.0`). Leverage built-in featu
 ### 4. Rich Interactivity by Default
 ECharts provides built-in interactivity (tooltip, legend toggle, zoom, data highlight). Enable these features by default. Add custom interactions only when explicitly requested.
 
+## SDS 实现与强弱落地
+
+**Input contract**：受 draw-diagram 委派时，输入 = SDS（Semantic Drawing Spec）文件路径 —— 逻辑模型 + 几何（canvas、每图元 `box{x,y,w,h}`、zone 盒、relation 锚点）+ weight_plan 档位 + typography 层级；schema owner：[semantic-model.md](../draw-diagram/references/semantic-model.md)。本技能 **MUST NOT 改写语义**（元素、关系、分区、布局/档位决策）——语法层只拥有：引擎语法、SDS 实现、渲染质量实践、偏离逼近。
+
+### 强弱落地（tier → 绝对值；owner = 本节）
+
+| SDS 档位 | ECharts 绝对值 |
+|----------|----------------|
+| T1 大模块/分区边界 | zone `graphic` rect `lineWidth: 2.5`；按 `style_intent` 可用虚线 |
+| T2 小模块/组件边界 | 节点 `itemStyle.borderWidth: 2.0` |
+| T3 数据流 | 边 `lineStyle.width: 1.6` |
+| T4 注释 | `lineStyle.width: 1.2` |
+
+关键路径仅色相抬升、线宽封顶 ≤ T2；色相只编码语义、永不编码权重。**复刻覆盖**：`fidelity_intent=reproduction` 的 SDS 携带源图实测线宽，覆盖上表默认值（规则细节见 [sds-realization.md](references/sds-realization.md)）。全图单一线宽/单一边框粗细判不合格。
+
+### 几何落地
+
+`graph` + `layout:'none'` + 4 个隐形 1×1 角锚点节点 + 固定坐标 `*.config.json` 精确兑现 SDS 盒位（SDS box 左上角原点；graph 节点 x/y 为盒中心 → 需换算）。ECharts 是绝对坐标引擎：**预期零偏离**；确实无法兑现的项 MUST 按 Deviation Declaration 规则（semantic-model.md）逼近并量化声明。
+
+映射理据、固定坐标复刻管线（目标像素测量 → config JSON → render.mjs 确定性导出）、bounds-fit 角锚点与边线 lines-series-压节点技巧、渲染质量清单：[references/sds-realization.md](references/sds-realization.md)。
+
 ## Workflow
 
 This skill creates ECharts data visualizations based on user-provided data and requirements. Follow the steps below in order.
+
+**SDS gate**：若输入是 draw-diagram 委派的 SDS 路径，Step 1–2 的语义推导（数据理解、图类/布局选择）已由 SDS 承载——不得重推或改写；直接从 Step 3 开始，按「SDS 实现与强弱落地」+ [references/sds-realization.md](references/sds-realization.md) 兑现。Step 4–5（HTML 组装、验证交付）始终适用。无 SDS 的直接调用按下列步骤全流程执行。
 
 ### Step 1: Understand Data & Requirements
 
@@ -74,7 +97,7 @@ Match data characteristics and goals to the appropriate ECharts chart type:
 
 ### Graph / Network & State Machine Views
 
-- **Force-directed `graph` is a relationship view, not an architecture diagram.** In force layout, nodes overlap freely and there are no subsystem boundaries or containment/hierarchy semantics. Use force layout for relationship exploration (who talks to whom, clustering). For **component/architecture views with subsystem boundaries**, prefer a fixed layout (`layout: 'none'` with explicit `x`/`y` per node, or `circular` for ring topologies) plus partitioned background zones (a `graphic` rect layer or a background `scatter` series) to visually group subsystems; or explicitly label the deliverable as a "关系视图 / relationship view" instead of presenting it as an architecture diagram.
+- **布局选择是语义决策，本节只保留引擎事实。** SDS 在场时，`layout_intent`、zones、每图元盒位由 SDS 承载（谁和谁同区、谁居中、分区等高都是语义层决定），语法层照 [references/sds-realization.md](references/sds-realization.md) 精确兑现，不得在此重新决策；无 SDS 的直接调用才在本层选择。引擎事实：力导向 `graph` 节点自由重叠、无子系统边界与从属语义——是关系视图而非架构图；边界/包含类视图的 ECharts 形态是固定布局（`layout:'none'` + 显式 `x`/`y`，环形拓扑可 `circular`）+ `graphic` rect 分区背景层；仅表达关系时把产物明确标注为「关系视图 / relationship view」，不得冒充架构图。
 - **Edge labels occlude in dense graphs.** Do not render all edge labels by default in force layouts with many edges. Default `edgeLabel` to hidden and reveal on hover via `emphasis.edgeLabel: { show: true }`, and/or enable `labelLayout: { hideOverlap: true }` avoidance. Provide a global toggle only when the user explicitly asks for always-on labels.
 - **State machines (`graph` with `categories`):** give `[*]` start/end pseudo-nodes a **visible label** (`[*]`, or localized 开始/结束) — never an empty label — and style nodes by state class (steady/transition/exception states) through `categories[].itemStyle` so node fill/border matches the legend and the edge colors.
 - **Inferred vs source-described edges (推断边 vs 源描述边):** when the source description does not specify a transition (e.g. "RUNNING 直接 Delete 未详述") and the model completes it, distinguish the inference from described facts visually — recommended: **dashed gray** (`lineStyle: { type: 'dashed', color: '#999' }`) for inferred/completed edges, **solid** colored edges for source-described transitions, **red dashed** for manual-intervention actions (e.g. operator Delete/恢复 on a CRASHED state that only appears in prose, not in the state graph). Add the distinction to the legend or a prominent in-chart footnote (`title.subtext` / `graphic`), not only in a page footer.
@@ -83,9 +106,9 @@ Match data characteristics and goals to the appropriate ECharts chart type:
 
 ### Scope Boundary: When ECharts Is Not the Right Tool
 
-ECharts is a data-viz library, not a diagramming tool. **Deployment diagrams, sequence diagrams, and UML class diagrams** are outside its natural expression. For such views:
+ECharts is a data-viz library, not a diagramming tool. **Deployment diagrams, sequence diagrams, and UML class diagrams** are outside its natural expression — this capability boundary is an ECharts syntax fact; the *routing decision* itself belongs to the draw-diagram front door (routing matrix + exclusivity registry). For such views:
 - Recommend the sibling diagram skills (draw-plantuml, draw-mermaid) to the user; or
-- If the user insists on ECharts, deliver an approximate view (e.g. a `graph` for deployment topology) **and explicitly document the substitution tradeoff** in the delivery notes: what the view shows and what it cannot show (deployment layers, containment, temporal order).
+- If ECharts must render the view anyway, deliver an approximate view (e.g. a `graph` for deployment topology) and **declare the deviation quantitatively** (dimension + magnitude + reason) per the Deviation Declaration rule in [semantic-model.md](../draw-diagram/references/semantic-model.md), documenting what the view shows and what it cannot show (deployment layers, containment, temporal order).
 
 Never silently substitute one view type for another.
 
@@ -207,6 +230,7 @@ For dark theme:
 
 | Document | Content |
 |----------|---------|  
+| [sds-realization.md](references/sds-realization.md) | SDS 实现（语法层）：SDS box→ECharts 坐标换算、bounds-fit 角锚点、边线 lines-series-压节点、固定坐标复刻管线（测量 → config JSON → render.mjs 确定性导出）、tier 映射理据与复刻覆盖规则、cycle3 渲染质量清单 |
 | [echarts-guide.md](references/echarts-guide.md) | ECharts v5 quick reference: option structure, chart types, components, dataset, styling, common chart recipes, plus graph/state-machine/component-view recipes, label-overlap avoidance, and pinned-version/offline fallback patterns |
 | [echarts-official-docs.md](references/echarts-official-docs.md) | ECharts official documentation: container sizing, themes, dataset patterns, encode mapping. Load on-demand for deeper understanding |
 

@@ -1,5 +1,7 @@
 # Cycle 3 R1 Improvements — draw-mermaid
 
+> **Dated 历史记录**：本文件是 Cycle 3 评审的原始证据记录，不作现行规范引用。其脚手架技术（等高锚点、`~~~` 行锁、sans-serif、2x 导出、版本 pin、curve:linear）已泛化进现行 owner [sds-realization.md](sds-realization.md)。
+
 > R1 weighted avg: 0.723 (rank 5/5). Structural layout failure: zones render at different heights/offsets, breaking the core "three parallel network boundaries" message.
 
 ## Mandatory fixes for redraw (ALL must be applied)

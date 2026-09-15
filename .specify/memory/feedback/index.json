@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-14T18:17:01Z",
+  "updated": "2026-09-15T06:53:48Z",
   "threshold": 10,
-  "count_since_submission": 5,
+  "count_since_submission": 6,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260915T065348Z-skill-create-skills",
+      "file": "20260915T065348Z-skill-create-skills.md",
+      "unit_id": "skill:create-skills",
+      "unit_type": "skill",
+      "run_id": "20260915T070500Z-create-draw-diagram",
+      "probe": "skill-create-skills-wrapup",
+      "kind": "internal",
+      "slice": "skills",
+      "feature": "draw-diagram-front-door",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-15T06:53:48Z",
+      "summary": "Created skills/draw-diagram front door (semantic LDM + exclusivity registry + delegation) over five draw-* specialists; mirror and host load-dir wired; conformance suite attributed failures to pre-exi"
+    },
     {
       "id": "20260914T181701Z-skill-draw-d3js",
       "file": "20260914T181701Z-skill-draw-d3js.md",

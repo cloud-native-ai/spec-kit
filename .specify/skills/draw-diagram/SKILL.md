@@ -1,0 +1,105 @@
+---
+name: draw-diagram
+description: |
+  Unified front door for every diagram request: builds a semantic logical-diagram model (elements, relations, zones, layout/style/artifact/fidelity intent) and delegates rendering to the single best-fit draw-* specialist (d3js / echarts / excalidraw / mermaid / plantuml) via the routing matrix and exclusivity registry. This skill renders nothing itself.
+  统一绘图前门:先语义建模,再委派给最合适的 draw-* 专项技能;本技能不渲染。
+  Use when the user mentions "画图", "绘图", "画个图", "出图", "draw a diagram", "diagram", "图表",
+  "架构图", "拓扑图", "流程图", "时序图", "状态图", "类图", "ER图", "甘特", "WBS", "思维导图", "线框图",
+  "数据可视化", "复刻图", "图片重绘", or asks to draw/replicate any diagram without naming a specific engine.
+skill_id: "<SKILL:.specify/skills/draw-diagram/SKILL.md>"
+---
+
+# 统一绘图前门（draw-diagram）
+
+语义建模在先、引擎选择在后：把任何绘图请求转换为逻辑图模型（LDM），再委派给唯一最合适的
+draw-* 专项技能渲染。**本技能不渲染任何图**，也不维护任何引擎细节。
+
+## Goal
+
+- 用户只面对一个绘图入口；引擎差异由路由矩阵吸收
+- draw-* 下层技能各自强调**独特能力**（独占图种、产物形态），不再追求全面性
+- 委派产物可对照 LDM 验收（元素/关系/分组/产物形态覆盖）
+
+## Delegation Contract
+
+本技能不维护任何下层细节：语法、渲染脚本、scene/schema、skinparam、坑位全部归各 draw-*
+技能自有（command names、options、return shapes come from the delegated skill）。
+前门只持有：语义建模、路由（含独占登记）、委派、覆盖验收。两层各自编辑、互不复制。
+
+## Workflow
+
+### Step 1:  intake 与语义建模
+
+1. 吃透上下文（文档/代码/目标图）：先产出**带出处的上下文摘要**（组件、关系、分区、核心流程），LDM 只从摘要与用户意图构建，**不臆造元素**
+2. 构建 LDM（schema 与覆盖检查定义见 [./references/semantic-model.md](./references/semantic-model.md)）：
+   `diagram_class / elements / relations / zones / layout_intent / style_intent / weight_plan / artifact_intent / fidelity_intent / interactivity_intent / editability_intent`；
+   含多层结构的图**必须填 `weight_plan`**（语义视觉强弱：大模块边界 > 小模块边界 > 数据流；前门决定「什么该更显眼」，引擎决定「怎么画粗」）
+3. 产出**几何层**（语义决策，语法层实现）：canvas 尺寸、每图元 `box{x,y,w,h}`、分区盒与布局语义（equal-height/stack/grid/free）、关系锚点与间隙；复刻类从源图测量（像素或比例），新建类先规划网格再落坐标（schema 见 semantic-model.md Geometry）
+4. 复刻类请求（给了现有图/文档要求重画）：`fidelity_intent=reproduction`——保留源结构与版面语义（含源图实测的每角色线宽，覆盖默认档位），不得"顺手优化"布局
+
+### Step 2: 路由
+
+1. **独占登记优先**（有些图只有一家能画）：[./references/routing-matrix.md](./references/routing-matrix.md) §1 命中即定引擎，不再比较
+2. 否则按 §2 图类矩阵取默认引擎，再按 §3 tie-break（artifact_intent）切换
+3. 仍歧义 → 一轮 `AskUserQuestion`（≤4 问）附推荐项；不得静默猜
+4. **Preflight**：选定引擎的技能目录存在（canonical `skills/<engine>/` 或已安装镜像）；缺失即响亮失败并列出可用引擎，不得即兴自渲染
+
+### Step 3: 委派
+
+- 以 Skill 调用委派选定 draw-* 技能，传入 LDM + 目标/输出要求（尽量 file-path-only handoff）；**`weight_plan` 随 LDM 一并传递**，由被委派技能按其「强弱实现」小节落地（各引擎线宽/边框语法归下层自有）
+- 前门不渲染、不手改引擎产物、不改引擎源码（score = f(target) 纪律在下层各自生效）
+
+### Step 4: 验收与回报
+
+1. 对照 LDM 做覆盖检查：元素与标签、关系集合（含方向）、分组边界、产物形态、**强弱层级（weight_plan 在产物中可辨：边框按档递减、流线最细、关键路径仅色相抬升）**
+2. 不覆盖 → 带 delta 说明再委派一次（上限 1 次）；仍不覆盖 → 如实回报产物与缺口
+3. 回报：产物路径、选定引擎 + 路由理由（命中独占/矩阵行/tie-break）、LDM 摘要
+
+## Document Map
+
+| 问题 | 读哪里 |
+|------|--------|
+| 独占登记 / 图类矩阵 / tie-break | [./references/routing-matrix.md](./references/routing-matrix.md) |
+| LDM schema 与覆盖检查 | [./references/semantic-model.md](./references/semantic-model.md) |
+| 语义视觉强弱（weight_plan 档位与验收） | [./references/semantic-model.md](./references/semantic-model.md) `weight_plan`；引擎落地见各 draw-* 「强弱实现」小节 |
+| 引擎语法、渲染、坑位 | 被委派 draw-* 技能自有 SKILL.md 与 references |
+| 路由证据（竞技场结论） | `${SKILL_WORKDIR}/.specify/memory/knowledge/visualization-skill-selection.md` |
+
+## Boundary with Lower Layers
+
+- 公共部分（intake 摘要纪律、语义建模、路由、验收）只在本技能维护一份
+- 下层 draw-* 的 description 与正文强调独特能力与独占图种；"什么请求该用我"由前门路由回答
+- 新增引擎时：先补 routing-matrix 独占/矩阵行，再建下层技能
+
+## Self-Improvement Contract
+
+- Canonical owner: `skills/draw-diagram/`（镜像 `.specify/skills/draw-diagram/` 由 sync-mirrors 生成，不手改）
+- Own-run observation: 每次委派的路由命中（独占/矩阵/tie-break/问用户）、验收覆盖结果、再委派次数
+- Mutation route: `improve-skills`（路由错配、矩阵缺口、LDM 字段不足均走此路由修订本技能）
+- Validation route: 路由判定用 arena 账本历史案例回放；纪律类修订按 create-skills 压力测试法 RED-GREEN
+- Comparison signal: 同类请求的"问用户次数 ↓、再委派次数 ↓、验收一次通过率 ↑"
+- Escalation boundary: 引擎渲染缺陷不归本技能——记入对应 draw-* 的反馈单元
+
+## Feedback
+
+**Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is
+running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills
+directory) — skip this entire Feedback step: no engine call, no feedback entry.
+
+At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
+
+1. **Gate on qualification & completion.** Only proceed if this run reached a meaningful wrap-up. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
+2. **Reflect (no user input).** Review this run against this skill's declared purpose and produce a short review plus ≥1 concrete, skill-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`
+3. **Scope guard.** Keep strictly to this skill's operation; do NOT produce a global/whole-project assessment (that is `/speckit.review`'s job). Entries are `scope: local`.
+4. **Dedup guard.** Use a stable `run_id`; if a parent flow already recorded feedback for this same `(unit_id, run_id)`, the engine no-ops.
+5. **Persist** via the engine:
+   ```bash
+   python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
+     --unit-id "skill:draw-diagram" --unit-type skill \
+     --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
+     --review "<review prose>" --points-file "<points file>"
+   ```
+   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
+6. **Consolidated submission prompt(非阻塞).** If the returned `should_prompt` is `true`, append ONE non-blocking line to the wrap-up report inviting submission (point the user to the `/speckit.feedback package` command — the user-facing path; never paste the raw `feedback-utils.py` engine call into the user-facing line); it MUST NOT block the wrap-up flow and MUST NOT trigger any 自动传输 (manual delivery only; `--action mark-submitted` runs only if the user initiates submission). Below threshold, do not prompt.
+
+**Abort / partial-run rule.** If the run failed before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.

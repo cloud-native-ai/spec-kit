@@ -22,6 +22,7 @@ skill_id: "<SKILL:.specify/skills/draw-mermaid/SKILL.md>"
 
 ## 核心原则
 
+- **引擎独有能力（路由选中本引擎的理由）**：仓库原生声明式文本图——`.mmd` 文本即产物、diff 友好、可版本管理，GitHub/GitLab/CI 等平台原生免工具链直渲；代价是布局自动（dagre），受 SDS 委派时几何只能逼近并声明偏离（见「SDS 实现与强弱落地」）
 - **UML 语义，而非随意方框**：UML 类图表必须遵循标准 UML 图表类型，使用正确的 UML 元素和关系（Mermaid 的 classDiagram / sequenceDiagram / stateDiagram-v2 / erDiagram / flowchart 各司其职）
 - **架构优先的叙事**：图和文字互补——文字解释*为什么*，图展示*什么*
 - **统一样式**：用 `%%{init: {themeVariables}}%%` / `classDef` 保持统一样式，UML 图每张核心元素 ≤7 个（硬上限 ≤15）
@@ -36,6 +37,29 @@ skill_id: "<SKILL:.specify/skills/draw-mermaid/SKILL.md>"
 2. **减法与拆分**：信息量大时优先整洁美观而非面面俱到，每图突出**一个核心点**；单图表达不下则按架构接缝**拆为图集**（概览图 + 下钻子图，图间层次与交叉引用，每图自足，图集共享稳定词汇）（principles §4.2/§4.3）。
 3. **UML 语义 + 视觉语义**：先选对图类型/元素种类/关系/构造型/接口（§1）；再按人类视角规划视觉语义——角色即位置、一对多用「单代表+多重性」、关联即同色、分组即框选（§2）。
 4. **文字修饰 + 收尾美化**：元素上只留简洁标题、详细说明外置到布局安全的注释（flowchart 的 `:::注释节点`/link 注释、sequence 的 note、class 的 note）、字号层级跨图统一（§3）；最后做对齐/着色/线条与大图专项美化（playbook）。
+
+## SDS 实现与强弱落地
+
+**输入契约**：受 [draw-diagram](../draw-diagram/SKILL.md) 委派时，输入是 **SDS 文件路径**（Semantic Drawing Spec：逻辑模型 + Geometry（canvas / 每图元 box{x,y,w,h} / 分区盒 / 关系锚点）+ weight_plan 档位 + typography 层级）。SDS schema 与 Deviation Declaration 规则的 owner 是 [../draw-diagram/references/semantic-model.md](../draw-diagram/references/semantic-model.md)。**MUST NOT 改写语义**：元素/关系/分区集合、布局语义、weight_plan 档位一律以 SDS 为冻结输入——本技能只负责引擎语法、SDS 实现/逼近、渲染质量。无 SDS（用户直调）时按下方工作流自行补齐同等模型。
+
+### 强弱实现（tier → stroke-width）
+
+SDS 的相对档位（T1>T2>T3>T4）由本层经 `linkStyle` / `classDef` / `style` 落实为绝对线宽；**复刻类 SDS（fidelity_intent=reproduction）携带的源图实测线宽优先，覆盖下表默认值**：
+
+| 档位 | SDS 语义角色 | Mermaid 载体与语法 | 默认线宽 |
+|------|-------------|------------------|---------|
+| T1 | 大模块/顶层分区边界 | 顶层 subgraph（cluster）边框：`style <zoneId> stroke-width:3px`（配深色 stroke） | 3px |
+| T2 | 小模块/组件边界 | 嵌套 subgraph 与组件节点边框：`classDef module stroke-width:2px` | 2px |
+| T3 | 数据流/依赖连线 | 流线：`linkStyle <idx|default> stroke-width:1.5px` | 1.5px |
+| T4 | 注释/副标题 | 注释节点与弱虚线：`classDef note stroke-width:1px`（配 `-.->`） | 1px |
+
+关键路径（weight_plan.key_paths）仅以色相抬升、线宽封顶 = T2；全图单一线宽判不合格（验收判据 owner：semantic-model.md）。
+
+### 几何逼近与偏离声明
+
+Mermaid 为**自动布局引擎**（dagre，无绝对坐标 API）→ SDS Geometry 只能**逼近**：ghost spacer 锚点（等高/顶对齐分区）、`~~~` 行锁链（行序/rank 控制）、invisible links（列对齐）。无法兑现项（精确 x/y、等高分区、锚点位置等）MUST 在**结果清单中量化声明**（偏离维度 + 幅度 + 原因）——未声明的偏离按 semantic-fidelity 扣分，已声明的计入语法实现质量、不算语义缺陷。
+
+→ 逼近技术细节（含 wrappingWidth 陷阱、curve:linear、版本 pin、本地 bundle 渲染回退）、档位映射依据与偏离声明模板：[references/sds-realization.md](references/sds-realization.md)
 
 ## PlantUML ↔ Mermaid 图表类型对照
 
@@ -72,6 +96,8 @@ skill_id: "<SKILL:.specify/skills/draw-mermaid/SKILL.md>"
 
 ### Step 1: 语义解析 + 吃透上下文（上下文驱动）
 
+**受 draw-diagram 委派时本步跳过**：SDS 即语义输入（逻辑模型/几何/强弱已在语义层定案），不得重新建模或就语义再问用户（仅语法/渲染事项可确认）。以下适用于无 SDS 的直调场景：
+
 分析用户输入以理解绘制意图；通过补充推断或交互式提问（`AskUserQuestion`，最多一轮 ≤4 个问题）确认意图。**面对文档/代码等丰富上下文时，先产出一份带出处的上下文摘要**（组件、关系、核心流程、关键决策），后续绘图与自检都对着它，保证程序整体正确、不臆造。
 
 → [00-semantic-analysis.md](references/howto/00-semantic-analysis.md)；上下文驱动见 [diagram-principles.md §4.1](references/guide/diagram-principles.md)
@@ -88,13 +114,12 @@ skill_id: "<SKILL:.specify/skills/draw-mermaid/SKILL.md>"
 
 → [references/howto/](references/howto/)（02–09）；UML 语义先行见 [diagram-principles.md §1](references/guide/diagram-principles.md)
 
-### Step 4: 规划布局 + 视觉语义（人类视角）
+### Step 4: 几何落地（SDS 优先，规划仅作回退）
 
-编码前先规划空间语义：
-- **视觉语义**：角色即位置（枢纽居中偏上、节点沿边/底，Hub/Edge/Entry/Sink）；一对多用**单代表元素 + 多重性标注**（`collections`/`«×N»`），不画 N 份兄弟盒；关联即同色（同子系统同色相族，`classDef`/`style`）；分组即框选（`subgraph` 具名边界、同色系分组）。
-- **方向/宽高比决策**：数「最宽层宽 B」与「主流深 D」选方向（`TD` 宽浅、`LR` 深窄长链）；`C≈round(sqrt(N×1.3))` 估列数摆近正方形网格（嵌套 subgraph 内同理）；单层兄弟 ≤6，超出下沉/拆 subgraph。
+- **有 SDS（受委派）**：几何是语义层已定案的决策（谁和谁同区、谁居中、分区等高、方向/宽高比、锚点）——**不得重新规划**，按「SDS 实现与强弱落地」小节以脚手架逼近（ghost spacer 锚点、`~~~` 行锁链、invisible links），并对无法兑现项做量化偏离声明。
+- **无 SDS（直调回退）**：编码前先补空间语义——角色即位置（枢纽居中偏上、节点沿边/底）；一对多用**单代表元素 + 多重性标注**（`collections`/`«×N»`）；关联即同色；分组即框选（`subgraph` 具名边界）。方向/宽高比：数「最宽层宽 B」与「主流深 D」选 `TD`/`LR`，`C≈round(sqrt(N×1.3))` 估列数，单层兄弟 ≤6。
 
-→ [10-layout-planning.md](references/howto/10-layout-planning.md)、[layout.md §一/§2.1/§2.5](references/guide/layout.md)；视觉语义见 [diagram-principles.md §2](references/guide/diagram-principles.md)
+→ [sds-realization.md](references/sds-realization.md)；回退规划见 [10-layout-planning.md](references/howto/10-layout-planning.md)、[layout.md §一/§2.1/§2.5](references/guide/layout.md)、[diagram-principles.md §2](references/guide/diagram-principles.md)
 
 ### Step 5: 生成 Mermaid 代码
 
