@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "kind": "speckit.evidence-findings",
+  "target": "project",
+  "runId": "ev-20260916-041546-project",
+  "window": {
+    "since": null,
+    "until": null
+  },
+  "platforms": [],
+  "lanes": {
+    "session": {
+      "status": "unavailable",
+      "reason": "lane not requested"
+    },
+    "project": {
+      "status": "unavailable",
+      "reason": "lane not requested"
+    },
+    "assets": {
+      "status": "unavailable",
+      "reason": "lane not requested"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 5
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 7
+    }
+  },
+  "evidence": [
+    {
+      "id": "ev-001",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team cws-workspace-cluster: 2 run report(s), 2 logged cycle(s), 0 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/cws-workspace-cluster/runs/20260730T082021Z-report.md",
+        ".specify/teams/cws-workspace-cluster/runs/20260730T094500Z-report.md"
+      ],
+      "signals": {
+        "runReports": 2,
+        "loggedCycles": 2,
+        "escalations": 13,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-002",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team draw-plantuml-optimizer: 5 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/draw-plantuml-optimizer/runs/20260715T130546Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T071030Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T074420Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T094834Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T104232Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-003",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team requirement-implement-monitor: 5 run report(s), 5 logged cycle(s), 1 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/requirement-implement-monitor/runs/20260729T063425Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T072002Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T074013Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T093345Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260730T022200Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 5,
+        "escalations": 4,
+        "critiqueNotes": 1
+      }
+    },
+    {
+      "id": "ev-004",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team summarize-project-optimizer: 2 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/summarize-project-optimizer/runs/20260730T122438Z-report.md",
+        ".specify/teams/summarize-project-optimizer/runs/20260730T180020Z-report.md"
+      ],
+      "signals": {
+        "runReports": 2,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-005",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team viz-skill-arena: 5 run report(s), 5 logged cycle(s), 4 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/viz-skill-arena/runs/2026-08-07T15-00-00Z-report.md",
+        ".specify/teams/viz-skill-arena/runs/2026-08-07T16-30-00Z-report.md",
+        ".specify/teams/viz-skill-arena/runs/2026-08-07T18-30-00Z-report.md",
+        ".specify/teams/viz-skill-arena/runs/2026-09-15T023000Z-report.md",
+        ".specify/teams/viz-skill-arena/runs/2026-09-15T090000Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 5,
+        "escalations": 0,
+        "critiqueNotes": 4
+      }
+    },
+    {
+      "id": "ev-006",
+      "lane": "feedback",
+      "evidenceState": "Present",
+      "summary": "Feedback store scanned: 7 entr(y/ies), 0 recurring optimization theme(s).",
+      "evidenceRefs": [
+        ".specify/memory/feedback/index.json"
+      ],
+      "signals": {
+        "entries": 7,
+        "recurringThemes": 0
+      }
+    }
+  ],
+  "findingsDigest": "sha256:137539bdbe8f85697bc89e7d4371f06637bc6b96359bc478811856d3d7115644"
+}

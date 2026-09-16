@@ -111,3 +111,38 @@ draw-diagram 委派时语义与几何以 **SDS 为准**——本步仅核对 SDS
 完整索引见 [references/index.md](references/index.md)。SDS 实现（几何映射、强弱落地、复刻覆盖、无 SDS 兜底）见 [references/sds-realization.md](references/sds-realization.md)。
 
 **实战沉淀（务必阅读）**：[best-practices/best-practices.md](best-practices/best-practices.md)（最佳实践）与 [best-practices/pitfalls.md](best-practices/pitfalls.md)（陷阱）——绘制前对照最佳实践，绘制后自查陷阱清单。
+
+## Evaluation Form(绘制评价单)
+
+**定位与边界。** 本节是交付 Excalidraw 产物后的 Evaluation Form(绘制评价单)，承载用户对本次已交付绘图结果的评价；它不是 `## Feedback`，也不替代或改变该节的 agent 自省。`## Feedback` 保持其既有的「不向用户征询」规则，本节只处理用户主动给出的绘制评价。
+
+**触发与一次性征询。** 仅在本技能已交付 Excalidraw 产物及必要使用说明后，随该次交付附上一句非阻塞征询：`已交付 Excalidraw 图；如愿意，请评价它是否准确、清晰且适合用途，或说明希望调整之处。` 不得等待回复、重复询问或因沉默降低交付结果。
+
+**无评价。** 用户没有给出评价即视为本次绘制满意；不创建评价条目、不调用反馈引擎，也不在后续回合追问。
+
+**有评价。** 用户一旦主动给出评价，保留其原意，将 review 内容标为 `## Evaluation Form`，并从评价中提取至少一条评价要点；随后以本节的 probe 记录（不是以 `wrap-up` probe 记录）：
+
+
+## Feedback
+
+**Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is
+running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills
+directory) — skip this entire Feedback step: no engine call, no feedback entry.
+
+At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
+
+1. **Gate on qualification & completion.** Only proceed if this run reached a meaningful wrap-up. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
+2. **Reflect (no user input).** Review this run against this skill's declared purpose and produce a short review plus ≥1 concrete, skill-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`
+3. **Scope guard.** Keep strictly to this skill's operation; do NOT produce a global/whole-project assessment (that is `/speckit.review`'s job). Entries are `scope: local`.
+4. **Dedup guard.** Use a stable `run_id`; if a parent flow already recorded feedback for this same `(unit_id, run_id)`, the engine no-ops.
+5. **Persist** via the engine:
+   ```bash
+   python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
+     --unit-id "skill:draw-excalidraw" --unit-type skill \
+     --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
+     --review "<review prose>" --points-file "<points file>"
+   ```
+   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
+6. **Consolidated submission prompt(非阻塞).** If the returned `should_prompt` is `true`, append ONE non-blocking line to the wrap-up report inviting submission (point the user to the `/speckit.feedback package` command — the user-facing path; never paste the raw `feedback-utils.py` engine call into the user-facing line); it MUST NOT block the wrap-up flow and MUST NOT trigger any 自动传输 (manual delivery only; `--action mark-submitted` runs only if the user initiates submission). Below threshold, do not prompt.
+
+**Abort / partial-run rule.** If the run failed before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.

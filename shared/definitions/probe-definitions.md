@@ -26,6 +26,7 @@
 | external-custom | external | 宿主项目自定义单元运行的回顾与优化点 | host-custom | record→local-consumption(不上送) | wrap-up |
 | command-gate | internal | 保留确认点触发后的用户决定观察事实(门控必要性证据) | commands | record→threshold→package→manual→mark-submitted | confirm-gate |
 | skill-gate | internal | 保留确认点触发后的用户决定观察事实(门控必要性证据) | skills | record→threshold→package→manual→mark-submitted | confirm-gate |
+| skill-evaluation-form | internal | 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果 | skills | record→threshold→package→manual→mark-submitted | evaluation-form |
 
 ## Objects
 
@@ -78,7 +79,9 @@
 | skill-database-utils-wrapup | skill-wrapup | skill:database-utils | wrap-up |
 | skill-document-utils-wrapup | skill-wrapup | skill:document-utils | wrap-up |
 | skill-draw-d3js-wrapup | skill-wrapup | skill:draw-d3js | wrap-up |
+| skill-draw-diagram-wrapup | skill-wrapup | skill:draw-diagram | wrap-up |
 | skill-draw-echarts-wrapup | skill-wrapup | skill:draw-echarts | wrap-up |
+| skill-draw-excalidraw-wrapup | skill-wrapup | skill:draw-excalidraw | wrap-up |
 | skill-draw-mermaid-wrapup | skill-wrapup | skill:draw-mermaid | wrap-up |
 | skill-draw-plantuml-wrapup | skill-wrapup | skill:draw-plantuml | wrap-up |
 | skill-git-submodule-edit-wrapup | skill-wrapup | skill:git-submodule-edit | wrap-up |
@@ -116,6 +119,12 @@
 | gate-summarize-project-four-gates | skill-gate | skill:summarize-project | gate-summarize-project-four-gates |
 | gate-summarize-project-structure-freeze | skill-gate | skill:summarize-project | gate-summarize-project-structure-freeze |
 | gate-summarize-project-degraded-gates | skill-gate | skill:summarize-project | gate-summarize-project-degraded-gates |
+| skill-draw-diagram-evaluation-form | skill-evaluation-form | skill:draw-diagram | evaluation-form |
+| skill-draw-d3js-evaluation-form | skill-evaluation-form | skill:draw-d3js | evaluation-form |
+| skill-draw-echarts-evaluation-form | skill-evaluation-form | skill:draw-echarts | evaluation-form |
+| skill-draw-excalidraw-evaluation-form | skill-evaluation-form | skill:draw-excalidraw | evaluation-form |
+| skill-draw-mermaid-evaluation-form | skill-evaluation-form | skill:draw-mermaid | evaluation-form |
+| skill-draw-plantuml-evaluation-form | skill-evaluation-form | skill:draw-plantuml | evaluation-form |
 
 ## External Probe 登记契约
 

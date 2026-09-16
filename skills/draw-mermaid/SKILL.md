@@ -179,6 +179,17 @@ Mermaid 为**自动布局引擎**（dagre，无绝对坐标 API）→ SDS Geomet
 
 **实战沉淀（务必阅读）**：竞技评审与重绘中固化的经验教训，见 [best-practices/best-practices.md](best-practices/best-practices.md)（最佳实践）与 [best-practices/pitfalls.md](best-practices/pitfalls.md)（陷阱）——绘制前对照最佳实践，绘制后自查陷阱清单。
 
+## Evaluation Form(绘制评价单)
+
+**定位与边界。** 本节是交付 Mermaid 产物后的 Evaluation Form(绘制评价单)，承载用户对本次已交付图表结果的评价；它不是 `## Feedback`，也不替代或改变该节的 agent 自省。`## Feedback` 保持其既有的「不向用户征询」规则，本节只处理用户主动给出的绘制评价。
+
+**触发与一次性征询。** 仅在本技能已交付 Mermaid 产物及必要使用说明后，随该次交付附上一句非阻塞征询：`已交付 Mermaid 图；如愿意，请评价它是否准确、清晰且适合用途，或说明希望调整之处。` 不得等待回复、重复询问或因沉默降低交付结果。
+
+**无评价。** 用户没有给出评价即视为本次绘制满意；不创建评价条目、不调用反馈引擎，也不在后续回合追问。
+
+**有评价。** 用户一旦主动给出评价，保留其原意，将 review 内容标为 `## Evaluation Form`，并从评价中提取至少一条评价要点；随后以本节的 probe 记录（不是以 `wrap-up` probe 记录）：
+
+
 ## Feedback
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is

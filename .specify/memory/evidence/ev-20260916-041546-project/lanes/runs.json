@@ -1,0 +1,46 @@
+{
+  "teams": [
+    {
+      "team": "cws-workspace-cluster",
+      "runReports": 2,
+      "critiques": [],
+      "logRows": 2,
+      "partial": false
+    },
+    {
+      "team": "draw-plantuml-optimizer",
+      "runReports": 5,
+      "critiques": [],
+      "logRows": 0,
+      "partial": true
+    },
+    {
+      "team": "requirement-implement-monitor",
+      "runReports": 5,
+      "critiques": [
+        "**2026-07-30T02:22:00Z（新目标 Cycle 1，全量基线）**：目标切换基线按 constraints 执行；"
+      ],
+      "logRows": 5,
+      "partial": false
+    },
+    {
+      "team": "summarize-project-optimizer",
+      "runReports": 2,
+      "critiques": [],
+      "logRows": 0,
+      "partial": true
+    },
+    {
+      "team": "viz-skill-arena",
+      "runReports": 5,
+      "critiques": [
+        "cycle 2 复盘（2026-08-07T16:30:00Z）：Phase C 技能工作副本写入与加载闭环已修复（.specify/teams/.work/viz-skill-arena/skills-work/），四个技能变更全部经无回退门采纳并合并回 canonical；R2 四技能加权分全部较 R1 提升（mermaid 0.73→0.87、plantuml 0.86→0.90、echarts 0.70→0.76、d3js 0.73→0.79），证明优化闭环有效。",
+        "cycle 2 复盘（2026-08-07T18:30:00Z）：本轮 Phase C 技能工作副本写入与加载闭环生效，四技能重绘均加载工作副本；R2 中 plantuml/echarts/d3js 无回退且加权分 ≥0.85（plantuml 0.82→0.87 显著提升），其技能变更已合并回 canonical 并同步镜像；mermaid 重绘回退（0.79→0.74，无回退=false），变更未采纳，留待下轮观察。",
+        "cycle 3 复盘（2026-09-15T02:30:00Z）：首次五技能竞技（新增 draw-excalidraw）。ALL 5 无回退门通过（历史首次全员通过），echarts 提升最大（+0.10）。冠军 d3js（0.95）凭借像素级绝对坐标复现胜出；excalidraw 首赛即达 0.94（与 echarts 并列第二），证明手绘引擎在 roughness:0 下可胜任精确复刻。mermaid 仍为最弱（0.755），等高分区问题经 ghost-spacer 脚手架改善但未根治（自动布局引擎固有限制）。Phase C 改进文件（CYCLE3-IMPROVEMENTS.md）作为 reference 合并至 canonical，未直接修改 SKILL.md 主体——下轮可考虑将通用规则提升为 SKILL.md 正式条目。",
+        "cycle 4 复盘（2026-09-15T09:00:00Z）：语义/语法分离架构首次成立——SDS 成为唯一语义源（裁判对 SDS 判覆盖），偏离声明机制使自动布局降级可检查（plantuml |dx| 217→39.5px、7 项全在界内），readback QA 链把\"零偏离\"从声明变为证据（建议下轮提升为语法层必备项）。mermaid 重绘被人工中断拒绝，按规则其变更本轮不采纳；其改进单（ghost-chain 共秩 + 边直线化）已写好待下轮验证。T-tier 术语曾出现并行会话与本次重构的双写冲突（T3/T4 语义），已统一为 T3=数据流/T4=注释并以 5 个语法层 tier 映射为准。"
+      ],
+      "logRows": 5,
+      "partial": false
+    }
+  ]
+}
