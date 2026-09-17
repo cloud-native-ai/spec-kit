@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-17T12:12:00Z",
+  "updated": "2026-09-18T12:14:02Z",
   "threshold": 10,
-  "count_since_submission": 14,
+  "count_since_submission": 15,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260917T123109Z-speckit-requirements",
+      "file": "20260917T123109Z-speckit-requirements.md",
+      "unit_id": "/speckit.requirements",
+      "unit_type": "command",
+      "run_id": "051-user-facing-comprehension:2026-09-17:requirements",
+      "probe": "speckit-requirements-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "051-user-facing-comprehension",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-17T12:31:09Z",
+      "summary": "原则级概念输入按 guidelines 的概念型输入规则先蒸馏为可落地切片(框架自身 vs 下游项目两个落地层级),再分片为 5 个 story(3xP1+2xP2),未抄写用户原话句式。有界调研(单次 Explore 委派 + summary-first + 定向 peek 050 头尾)产出带 file:line 的现状清单,核心基线「38 处独立措辞 / 0 真源 / 0 统一名字」为实测值"
+    },
     {
       "id": "20260917T121200Z-skill-create-team",
       "file": "20260917T121200Z-skill-create-team.md",
