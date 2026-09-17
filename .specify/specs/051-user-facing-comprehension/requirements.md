@@ -1,0 +1,348 @@
+# Requirements Specification: 面向用户可理解性纪律——不用行话、带足上下文(User-Facing Comprehension)
+
+**Requirement Branch**: `051-user-facing-comprehension`
+**Created**: 2026-09-17
+**Status**: Draft
+**Input**: User description: ""without jargon, with context"是一个很好的原则需要把它扩散的所有面向用户的流程中,比如提示用户进行确认的流程,比如feedback的流程. 还需要把这条原则输出到用户自己的项目的constitution中(通过constitution模板和命令输出). 当前项目中已经在很多流程中应用了这条规则,但是项目本身没有把它明确的定义出来. 可以把它定义到shared/guidelines中,设定好程度(不能完全杜绝jargon,也不能无限制的添加context)."
+
+## Related Feature *(mandatory)*
+
+<!--
+  ACTION REQUIRED: Keep the default values as "Need clarification" in the initial draft.
+  /speckit.clarify must resolve this section to the final Feature binding before planning.
+-->
+
+**Feature ID**: Need clarification  
+**Feature Name**: Need clarification
+
+## Overview
+
+框架今天**已经在很多流程里执行"不用行话、带足上下文"这条规矩,却从未把它定义出来**:研究实测在 `shared/`、`templates/`、`skills/` 中找到 **38 处独立措辞**,分散在至少 4 个互不引用的领域(访谈提问、反馈通知、门控执行报告、项目总结报告),而**真源文档数量为 0**,`白话`/`行话`/任何一个统一名字在仓库中的出现次数也是 0。这正是 `one-source-of-truth.md` 所定义的"静默分歧"温床——同一事实有 38 个定义点,改一次要改 38 个文件,纪律已经破了。
+
+本特性把这条无名规矩**命名、定界、并给出可判定的程度**:
+
+1. **定名与定源**:在 `shared/guidelines/` 建立唯一真源文档 [[STR-002]],命名该纪律,并按三层表面模式(真源文档 → 指令文件常驻章节 → 契约测试)使其常驻可见、可守。
+2. **设定程度(双向边界,不是形容)**:用户明确要求"不能完全杜绝 jargon,也不能无限制的添加 context"。因此本纪律 MUST 同时给出**行话侧白名单/黑名单**(哪些术语 MUST 保留、哪些 MUST 不出现)与**上下文侧下限/上限**(每条消息至少承载什么、最多承载到哪为止),并配一套**第三方可复现的机械判据**,使两个独立评审者对同一条消息得出同一结论。
+3. **扩散到全部面向用户界面**:枚举封闭的**界面类**集合(门控确认提示、执行报告、反馈通知、访谈提问、澄清提问、主动建议行、干系人工件、外部读者报告、词汇表校正呈现、收尾报告、失败报告),每类的规则真源以**单行指针**接入,不复制正文。
+4. **输出到下游项目的宪章**:经 `templates/constitution-template.md` 新增一条原则 [[STR-003]] + `templates/commands/constitution.md` 的 `MUST include` 清单**双落点**导出,使每个下游项目 bootstrap 即得,并自动进入其 `plan` 门控的动态枚举。
+
+该纪律最终围绕两个不可分割的判定:
+
+1. **读者要不要解码**:面向用户的消息里每个未注解的技术术语,MUST 能归入白名单的某一条;否则读者会"自信地答错"——访谈模式文档已用这句话点明了后果(`interview-pattern.md:281`)。
+2. **读者要不要翻页**:消息 MUST 让读者不打开其他工件即可行动(下限),同时 MUST NOT 复述读者可自行打开的工件(上限)——承载方式是**陈述决定所依赖的事实 + 以路径引用其余一切**,这与 One Source of Truth 的"指针而非副本"是同一种形状。
+
+### 现状锚点(以源码实测为准)
+
+- **唯一写全的地方在一份"模式"文档里,且作用域只有一种交互形态**:`shared/patterns/interview-pattern.md:119-126` 的 `**Comprehension rules (可理解性规则)**` 块含四条本纪律的核心规则(白话优先、无未解释缩写/行话、就地注解特殊术语、绝不假定共享上下文),`:281` 有对应反模式 `Jargon and bare abbreviations`,`:280` 有 `Context-free questions`(即"带足上下文"半侧)。但 `:125-126` 混在同一列表里的另两条(每问一决策、问 what 不问 whether)**不是**可理解性规则,本纪律 MUST NOT 吞并。更关键:该模式的"嵌入契约不可丢弃清单"(`:255`)**没有把 Comprehension rules 列进去**,所以宿主收窄时它可以被合法丢掉。
+- **镜像关系**:`shared/patterns/interview-pattern.md` 与 `.specify/shared/patterns/interview-pattern.md` 为逐字节镜像(`sync-mirrors.py`);`templates/commands/interview.md:154` 与 4 份按工具再生的副本(`.claude/commands/`、`.github/prompts/`、`.opencode/command/`、`.qoder/commands/`)以**内容形态**复述了同一条规则;`docs/reference/commands/interview.md:65` 是第三份手写复述。**无 interview 技能**(`skills/` 36 个目录中无 `*interview*`),故该流程只有命令模板 + 4 份机械副本 + 模式文档 + 文档空间四处表面。
+- **门控治理只管"是否门控",从不管"如何措辞"**:`shared/guidelines/confirmation-gates.md` 全文 99 行,两级判据(`:7-12`)、破坏性清单(`:14-21`)、治理保留清单 13 行表(`:23-41`)、存疑从严(`:43-45`)、回流约束(`:47-52`)、门控观察协议(`:70-99`)**全部与措辞无关**。全文仅两处沾边:
+  - `:56-60` 执行报告三要素(**执行内容 / 产出·变更工件逐项可定位 / 修改途径**)——这是"带足上下文"半侧,已一般化,本纪律 MUST 引用而非复述;
+  - `:68` `收尾阶段达阈值触发的反馈提交提示 MUST 为非阻塞一次性提示(附 /speckit.feedback package 用户视角途径,不展示 feedback-utils.py 引擎原始调用)`——**这是该文档中最强的"不用行话"规则**,点名了`用户视角途径`并禁止暴露引擎调用,但作用域**仅限反馈提交提示**,且作为 `## 执行报告` 的尾段被埋没,从未一般化。其契约测试 `tests/contract/test_confirmation_gates_execution_report.py:44-46` 只断言了 `非阻塞` 与 `自动传输`,**并未断言 `用户视角途径` / 不暴露引擎调用这一子句**——即该规则今天连守卫都没有。
+- **门控扫描器零措辞检查**:`scripts/python/scan-confirmation-gates.py:46-65` 的 18 条 `BLOCKING_PATTERNS` 全部检测**阻塞行为**(`等待用户确认`、`explicit user confirmation`、`stop and confirm`、`preview → confirm → execute` 等),无任何行话/白话/注解/上下文模式。`:38-44` 的 `POLICY_DOCS` 豁免集(现含 `confirmation-gates.md`、`reconcile-pattern.md`、`interview-pattern.md`)是"定义纪律的文档可以援引门控措辞而不被计数"的既有机制——**新真源文档若引用任何阻塞措辞作反例,须在此登记**(具体注册点)。`:35` 的 `SCAN_DIRS` 含 `shared`,故 `shared/guidelines/` 下新文件自动进入扫描范围。
+- **反馈流程是本纪律传播最广的实例**:`shared/workflow/feedback-step.md` 是该规则的**事实真源**——`:89-90`(canonical 块第 6 步)、`:113-114`(`Present the choices in **user-facing terms** … never the raw feedback-utils.py engine path`)、`:141`(`engine detail — do not paste the bare flag into the user-facing line`)。`grep -rl "never paste the raw" --include=*.md .` 命中 **194 个文件**,含 21 个 `templates/commands/*.md` 各一行、`skills/merge-skills/SKILL.md:180`、`docs/reference/skills/feedback.md:139-141`,以及 4 棵按工具树。`:115` 自陈存在**两种并存措辞**(长式与 `sanitize.md:116` / `derive.md:184` 的短式),并规定"仍只写 invite the user to submit 的嵌入副本以本节为准"——即该文档已经在做"收敛到真源"的工作,但**它的权威只覆盖反馈,不覆盖其他界面类**。
+- **澄清流程只借了半侧**:`templates/commands/clarify.md:70` 明写"从 `interview-pattern.md` 只借 **context discipline**(每问说明为何出现、答案将改变什么)与 fact-vs-decision 拆分","刻意不采纳其开放式提问规则"——**但从未借"不用行话"半侧**,`clarify.md` 全文无任何措辞/可理解性规则。`shared/guidelines/requirements-guidelines.md:72-88` 的 `[NEEDS CLARIFICATION]` 提示模板规定了 `**Context**` / `**What we need to know**` / 选项表,同样**对措辞零约束**。`shared/constants/clarify-taxonomy.md:56` 的 "Canonical glossary terms" 是澄清分类里唯一与行话相邻的钩子。
+- **最完整的实现搁浅在一个技能里**:`skills/summarize-project/references/reporting-playbook.md:109-113` 的 `## 1.7 读者用语纪律(内部标识不得渗入正文)` 是**全仓最成体系的实例**——一份完整的内部标识黑名单(分级码 `T1–T5`、`E1–E5`、`RC-*`、`CG-*`、`§编号`、`M-*`、引擎字段名、库/表/列/SQL、脚本名)+ 一张读者向改写映射表(`unknown-schedule` → 「无计划日期,无法判定延期」),`:309` 有落盘门禁,`references/consistency-rules.md:31` 交叉引用(`**字段名是内部标识**`)。同技能 `references/project-overview.md:22` 有最直白的中文表述:`**业务语言**:摘要面向外部读者,只出现数值与业务措辞,不出现字段名、脚本名与内部编号。`,`:51` 有可机械核查的清单门 `- [ ] 无内部黑话;外部读者不读代码也能看懂`。**框架其余部分完全够不到它。**
+- **主动建议行已有"上下文上限"的现成形态**:`shared/guidelines/proactive-trigger.md:47` `one non-blocking line = what the flow is for + the exact invocation the engine supplies`(镜像于 `templates/instructions-template.md:31`)——这正是"带足上下文但不膨胀"的落地样板:用途 + 确切调用形式,一行。`:95` 另有措辞约束(提议形态是批准而非阻塞)。
+- **干系人工件侧的既有表述**:`shared/guidelines/requirements-guidelines.md:24,101` `Written for non-technical stakeholders` / `Written for business stakeholders, not developers`,`:22,32,43,129-131` `No implementation details` / `technology-agnostic`,`:138-141` 给出**坏→好改写对**(`"API response time is under 200ms"` → `"Users see results instantly"`);`templates/requirements-template.md:46,61,75` 占位符即 `[Describe this user journey in plain language]`。
+- **词汇表流程是"入向 + 呈现"半侧**:`shared/workflow/glossary.md:23-24` `When a correction is applied, **surface it** so it is traceable and the user can override it`(附示例 `note: interpreted 『speck it』as canonical 『Spec Kit』 (glossary)`),`:25-26` 绝不破坏性改写用户原始输入,`:27-28` 歧义变体不猜而从用户,`:65` 该文件本身 MUST 人类可读。`templates/commands/interview.md:30` 是**出向**半侧:提问 MUST 用词汇表 canonical 术语并在每问首次出现时就地注解。
+- **既有 guideline 文档的房子骨架**(新文档 MUST 对齐):H1 取 `# 中文名(English Name)` 或 `# English Name`;前 3–8 行内声明所有权(三要素:owns 什么、ambient 指针在哪、MUST 引用/MUST NOT 复制);紧接一段"防的是什么失效";H2 分节(规则 → 边界 → 程度 → 程序 → 与相邻原则的关系);全文 RFC-2119 大写关键词。**程度的表达有四种房子先例**:粗体数值字面量 + 单一定义点声明 + 覆盖协议(`token-efficiency.md:38` 小文件阈值 `≤ 100 行` 且 `≤ 10 KB`)、编号升级阶梯 + 禁止跳级(`:26-34`)、条件表(`one-source-of-truth.md:33-41` 三行"何种重复才合法")、粗体机械测试(`one-source-of-truth.md:29` `if changing the fact would require editing more than one file, the discipline is already broken`)。每份 guideline 都带一条**范围限制/不新增机制**子句(`one-source-of-truth.md:70`、`token-efficiency.md:42-44`)。
+- **暴露通道的硬约束(传播陷阱)**:`generate-instructions.sh:73-78,101-137` 是**按整章节的增量调谐**——只注入模板中存在而活动文件中缺失的顶级 `## ` 章节,**既有章节永不触碰**;`proactive-trigger.md:3` 已明写此结论:`指针不依赖在既有章节(如文档地图表)内部新增一行,因为增量调谐只按整章节传播,既有章节内部的改动抵达不到已初始化项目`。守卫见 `tests/contract/test_instructions_section_propagation.py:35-46`。⇒ **新纪律 MUST 以新增顶级 `## ` 章节暴露;只往文档地图表(`templates/instructions-template.md:11-20`)加一行不会抵达任何已初始化项目。**
+- **宪章导出的双落点与一个已发生的前车之鉴**:`templates/constitution-template.md` 现有 11 条原则(I–XI),单条结构为 `### <罗马数字>. <Title Case 名称>` → 一句以冒号结尾的主张 → 3–6 条 MUST/MUST NOT 要点(硬折行 <100 字符)→ 恰好一个空行 → `Rationale:` 段(1–4 句);唯一"援引 guideline 文档"的先例是 `:103-106`(Better-Harness 锚定 `.specify/shared/guidelines/better-harness.md` 并写明 "reference it, do not restate it"),其 `:110-111` 是配套的范围限制要点。`templates/commands/constitution.md:77-125` 的 **`MUST include` 清单**才是真正的导出机制(逐条点名 5 条原则并拼出其要点),`:40-41` 另授权 bootstrap 时**拒绝**不相关的模板原则。`:56-71` 版本方案 `x.y.z.ddd`,新增原则 = **MINOR** 递增(`:66`);`:142-148` 要求前置 Sync Impact Report。**前车之鉴**:本仓活动宪章 `.specify/memory/constitution.md` 已有 14 条原则,其中 `:155-163` 的 **Principle XIV(One Source of Truth)从未回流**到 `templates/constitution-template.md` 或命令的 `MUST include` 清单——`grep -n "One Source\|XIV"` 在这两个文件中**零命中**,故**没有任何下游项目收到它**。这是本特性 MUST 避免的同型失效,也是 FR-020 双落点要求的直接依据。
+- **下游自动传导已成立,无需改 plan 模板**:`templates/plan-template.md:37-42` 的 `## Constitution Check` 明写"Do NOT hard-code principle names here",而是读 `.specify/memory/constitution.md`、按 `### <roman-or-arabic-numeral>. <name>` **动态枚举**每条原则各渲染一行。⇒ 新原则一旦进入宪章即自动抵达每次 `/speckit.plan` 门控。
+- **镜像机制无需注册**:`scripts/python/sync-mirrors.py:72-78` 的 `MIRROR_PAIRS` 含 `("shared", ".specify/shared", False, set())`,`:83-94` 以 `rglob("*")` 发现全部文件——**无 manifest、无逐文件清单**,新增 `shared/guidelines/<name>.md` 自动被拾取。`pyproject.toml:37` 的 `"shared" = "specify_cli/shared"` 与 `_CORE_SPECIFY_ASSETS` 均为目录级,同样无需改动。`tests/contract/test_shared_reference_directory.py:19-22` 的 `TYPED_DOCS["guidelines"]` 是 `issubset` 断言(`:43`),新文件静默通过。
+- **按工具副本自动再生**:`scripts/python/regen-command-copies.py`(由 `sync-mirrors.py:202-211` 委派)从 `templates/commands/*.md` 再生 `.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/`,仅处理目录已存在的工具。⇒ 命令模板改动后 MUST NOT 手工批改副本。
+- **可复用的守卫模板**:`tests/contract/test_one_source_of_truth.py` 是最完整样板(C-1..C-9:文档存在 + 镜像逐字节一致 `:64-67`;前 8 行声明所有权且含 `"single source of truth"` + `"MUST NOT copy"` `:72-76`;各节齐备 `:79-82`;实质规则术语 `:87-104`;MUST/MUST NOT 关键词 `:106-109`;模板两份副本各含且仅含一次标题与指针 `:114-120`;模板**不内联**文档节名 `:125-131`;`shared/` + `templates/` 单源扫描 `:142-153`;**项目中立性** `FORBIDDEN = ["spec-kit","specify-cli","specify_cli","cloud-native-ai"]` `:37,158-163`;宪章含该原则 + 版本下限 `MIN_VERSION = (1,11)` `:168-180`)。`tests/contract/test_token_efficiency_discipline.py` 同形(`SECTION_HEADINGS` 钉死于 `:21-28`,`test_cd5_headings_only_in_discipline_doc` 扫描 `:94-104`)。
+- **观察标记的先例**:`token-efficiency.md:54` 规定反馈发现 MUST 内嵌稳定字面量 `token-efficiency`(供 `feedback-utils.py --action list --contains token-efficiency` 检索聚合),且"干净运行 MUST NOT 追加空洞观察条目"、"MUST **不编造**具体数值"。本纪律的观察标记 [[STR-005]] 沿用同一形态。
+- **三层表面与同批加守卫的房子规矩**:`shared/guidelines/ask-record-repeat.md:86` `**house 模式(三层表面)**:真源文档(细则)→ 指令文件的常驻章节(摘要 + 指针)→ 契约测试(防漂移)。第三层是关键:没有守卫的重复会各自漂移,最后三处说法不一,比重复之前更糟。`;`:117` `给一条规矩新增表面时,MUST 同批加守卫(契约测试或既有扫描),否则新增的是未来漂移点而不是可达性。`;`:88-99` 给出指针形态 vs 内容形态的裁定表与机械测试(`:97`)。
+
+**与现状的差异(本需求要闭合的缺口)**:
+
+| 缺口 | 现状 | 目标 |
+|------|------|------|
+| 真源与命名 | 38 处独立措辞,0 份真源文档,0 个统一名字 | 1 份命名真源 [[STR-002]],其余以指针接入 |
+| 程度可判定性 | 各处为形容性表述("白话优先""业务语言""不出现内部编号"),无统一判据 | 行话侧白/黑名单 + 上下文侧下限/上限 + 第三方可复现机械判据 |
+| 门控措辞 | `confirmation-gates.md` 99 行零措辞规则;13 个治理保留门控无一附措辞义务 | 每类门控提示附措辞义务(以指针接入);`:68` 的反馈专属规则提升为一般规则 |
+| 澄清措辞 | 只借"上下文"半侧,"不用行话"半侧缺失 | 两半侧齐备 |
+| 搁浅实现 | `summarize-project` 的内部标识黑名单 + 改写映射只有该技能够得到 | 提升为本纪律黑名单/改写指引的实例来源,全框架可达 |
+| 下游导出 | 该原则**不在**宪章模板,也**不在**命令 `MUST include` 清单;Principle XIV 同型缺口已发生且至今未修 | 双落点导出 [[STR-003]],同批回流 [[STR-006]](FR-028),下游 bootstrap 即得并自动进入 plan 门控 |
+| 漂移守卫 | `confirmation-gates.md:68` 的最强措辞规则连契约断言都没有;宪章原则无双落点守卫(XIV 因此漏过) | 五表面守卫 + 项目中立性 + 单源扫描 + **一般化的双落点守卫**(以 XIV 为首个受测样本) + 扫描器豁免登记 |
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - 一条无名规矩获得名字、真源、常驻可见性与守卫 (Priority: P1)
+
+框架维护者打开 `shared/guidelines/`,能看到一份名为"面向用户可理解性"的纪律文档:它在前几行声明自己是这条规矩的唯一定义处,写明引用它的人 MUST 以路径引用而 MUST NOT 复制正文;它给出这条规矩防的是什么失效(读者解码术语就会自信地答错;读者翻页找上下文就会答另一个问题);它把"程度"落成两张条件表(许可行话 / 禁用行话)加两条边界(上下文下限 / 上下文上限),再配一套任何两个人用了都会得出同一结论的机械判据。任何 agent 在任何 `/speckit.*` 流程里都能读到这条纪律的摘要与指针——因为它是 `.specify/instructions.md` 里一个**新增的顶级章节**,不是既有章节里悄悄加的一行(后者抵达不到已初始化的项目)。改动其中任何一处表面,CI 会失败。
+
+**Why this priority**: 这是其余一切的地基。用户的核心诊断是"项目本身没有把它明确的定义出来"——没有真源,扩散就没有可指向的对象,38 处措辞会继续各自漂移。同时它也是唯一能独立交付价值的一片:即便一处界面都还没接入,框架从此**有了这条规矩的名字和判据**,后续每次评审都能援引。
+
+**Independent Test**: 只实现本片即可验证——检查真源文档存在、前 8 行含所有权声明与 MUST NOT copy 语义、五节(白名单/黑名单/下限/上限/机械判据)齐备、镜像逐字节一致、指令模板两份副本各含且仅含一次该章节标题与指针且不内联文档节名、契约测试全绿、项目专有名称零泄漏。交付的价值是"这条纪律从此有唯一权威定义点且被守卫"。
+
+**Acceptance Scenarios**:
+
+1. **Given** 一个已初始化的下游项目, **When** 运行既有的指令再生流程, **Then** 其 `.specify/instructions.md` 出现新的顶级章节 [[STR-004]],形如摘要 + 指向 [[STR-001]] 的指针,且既有章节逐字节未被触碰。
+2. **Given** 真源文档 [[STR-002]] 已建立, **When** 运行镜像一致性检查, **Then** `.specify/shared/guidelines/` 下的副本与源逐字节一致,无需任何 manifest 注册。
+3. **Given** 任取一条面向用户的消息, **When** 两位互不沟通的评审者分别套用文档给出的机械判据, **Then** 两人对"是否违反行话侧""是否违反上下文侧"得出同一结论。
+4. **Given** 有人把真源文档里的白名单条件复制进某命令模板, **When** CI 运行单源扫描, **Then** 该复述被检出为内容形态副本并要求改回指针。
+5. **Given** 有人删掉指令模板里的该章节标题, **When** CI 运行守卫, **Then** 测试失败。
+
+---
+
+### User Story 2 - 确认提示说人话、带足上下文,用户不必先读代码才敢批准 (Priority: P1)
+
+用户在一个门控前停下——比如"feedback consume 将原子删除已消费的反馈包"。今天框架有 13 个这样的治理保留门控,却**没有任何一条规定这个提示该怎么写**。本特性之后,每个门控提示都受一条措辞义务约束:它用读者的词汇说明将要发生什么、载明不可撤销的后果与可逆性、给出确切的用户视角途径;它不出现引擎脚本名、内部函数名或分级代号——除非存在用户 MUST 逐字键入的标识符。门控执行完的三要素报告(执行内容 / 产出·变更工件 / 修改途径)保持不变,本纪律只引用它、不复述它。原先只写给"反馈提交提示"的那条最强规则(附用户视角途径、不展示引擎原始调用)被**提升为面向全部界面类的一般规则**,原处收敛为指针。
+
+**Why this priority**: 用户点名"提示用户进行确认的流程"为扩散目标之一。这也是**风险最高**的界面:确认提示是用户唯一一次阻止不可撤销动作的机会,而一个需要解码的提示换来的是"自信地批准错东西"——门控本身反而制造了虚假安全感。同时今天这一片**零规则、零守卫**(`confirmation-gates.md:68` 的最强措辞子句连契约断言都没有),边际收益最大。
+
+**Independent Test**: 抽样既有 13 个治理保留门控的提示文案,逐个套用机械判据;检查 `confirmation-gates.md` 已接入单行指针且其 `:68` 专属规则已提升为一般规则并收敛为指针;检查既有两级判据、破坏性清单、治理保留清单、回流约束**逐字未变**(本特性只增措辞义务,不改是否门控);检查门控扫描器的门控计数在改动前后不变。
+
+**Acceptance Scenarios**:
+
+1. **Given** 一个破坏性门控触发, **When** 提示呈现给用户, **Then** 一位本会话未打开过仓库的读者能在不追问任何术语含义的前提下作出批准/否决决定。
+2. **Given** 同一门控存在用户视角途径(如 `/speckit.*` 命令), **When** 提示措辞生成, **Then** 面向用户的行中不出现引擎脚本或内部函数调用形态。
+3. **Given** 某门控**不存在**用户视角途径, **When** 提示必须给出可执行形态, **Then** 原始标识符被保留(白名单第 3 条),但被标注为引擎细节并附一句说明它做什么。
+4. **Given** 一个可逆动作已自动执行, **When** 收尾呈现执行报告, **Then** 三要素齐备且由 `confirmation-gates.md` 继续拥有其定义,本纪律文档不复述该三要素。
+5. **Given** 改动落地, **When** 运行门控扫描器与既有门控契约测试, **Then** 两级判据/清单/回流约束未被改写,门控计数不变,全部测试通过。
+
+---
+
+### User Story 3 - 下游项目的宪章收到这条原则,并在 plan 门控里被逐条枚举 (Priority: P1)
+
+一位用户在自己的项目里跑 `specify init` 然后 `/speckit.constitution`。生成的宪章里出现一条新原则 [[STR-003]],结构与既有原则完全一致(罗马数字标题 → 一句以冒号结尾的主张 → 若干条 MUST/MUST NOT 要点 → 空行 → `Rationale:` 段);其中一条要点锚定 [[STR-001]] 并写明"reference it, do not restate it",另一条要点是"不新增机制"的范围限制。之后他跑 `/speckit.plan`,Constitution Check 门控**自动**把这条原则枚举成一行——因为该门控是动态枚举宪章标题的,不需要任何硬编码改动。宪章版本按 MINOR 递增,并前置 Sync Impact Report。
+
+导出走**双落点**:宪章模板新增该原则 **且** `/speckit.constitution` 的 `MUST include` 清单新增对应条目。只改模板不改命令是不够的——本仓 Principle XIV(One Source of Truth)就是前车之鉴:它只存在于活动宪章与一份契约测试里,两个模板文件 `grep` 零命中,所以**没有任何下游项目收到它**。本特性一并把这个既有缺口修好(FR-028),并把它当作"宪章原则 MUST 双落点"这条新守卫的**第一个受测样本**(FR-035)——守卫本来就需要样本,而用一个真实发生过的事故做样本,才能证明它拦得住同型失效,不只是拦得住"新原则忘了写"。
+
+**Why this priority**: 用户显式点名"还需要把这条原则输出到用户自己的项目的constitution中(通过constitution模板和命令输出)"。这一片也**独立可交付且独立有价值**:即便框架自身的界面接入尚未完成,下游项目从第一天起就在其宪章与 plan 门控中拥有这条原则。同时它是唯一一片**跨项目传播**的——US1/US2 的收益限于读到本仓真源的场合,US3 的收益抵达每一个采纳项目。
+
+**Independent Test**: 在一个空白目录跑 init + `/speckit.constitution`,检查生成的宪章含 [[STR-003]] **与**回流的 [[STR-006]] 两条原则且结构合规(标题层级、冒号结尾主张、要点数、恰好一个空行、`Rationale:` 段、折行 <100 字符)、各含 guideline 锚定要点与范围限制要点、无未解释的方括号占位符、版本格式合规、Sync Impact Report 已前置;再跑 `/speckit.plan` 检查两条原则均出现在 Constitution Check 表中且 `plan-template.md` 未被改动;最后人为从模板侧或命令侧删掉任一原则,确认双落点守卫失败。
+
+**Acceptance Scenarios**:
+
+1. **Given** 一个新初始化的下游项目, **When** 运行 `/speckit.constitution`, **Then** 其宪章含原则 [[STR-003]],且 `templates/constitution-template.md` 与 `templates/commands/constitution.md` 的 `MUST include` 清单**双双**含它。
+2. **Given** 下游宪章已含该原则, **When** 运行 `/speckit.plan`, **Then** Constitution Check 表按动态枚举多出一行,且 `plan-template.md` 零改动。
+3. **Given** 本仓活动宪章, **When** 同批落地, **Then** 新增对应原则、版本 MINOR 递增、Sync Impact Report 前置。
+4. **Given** 某下游项目在 bootstrap 时判定该原则与其领域无关, **When** `/speckit.constitution` 依既有授权(`templates/commands/constitution.md:40-41`)拒绝它, **Then** 该拒绝被记录进 Sync Impact Report,MUST NOT 静默丢弃。
+5. **Given** 随包分发的真源文档与两个模板文件, **When** CI 运行项目中立性断言, **Then** 本仓专有名称零泄漏。
+6. **Given** Principle XIV 已回流至两个模板文件, **When** 新下游项目跑 `/speckit.constitution`, **Then** 其宪章同时含 [[STR-006]](基线:今天 0% 的下游项目收到它),且 `plan` 门控把它一并枚举。
+7. **Given** 双落点守卫已一般化为覆盖模板中**全部**原则, **When** 有人从宪章模板或命令 `MUST include` 清单任一侧删除任一原则, **Then** CI 失败——包括删除 [[STR-006]] 这一历史上真的漏过的场合。
+
+---
+
+### User Story 4 - 反馈流程的对外措辞归入同一纪律,不再自成一格 (Priority: P2)
+
+反馈流程今天已经是全仓**执行得最好**的一片:`shared/workflow/feedback-step.md` 拥有"绝不把引擎调用粘进面向用户的行"这条规则,并已传播到 194 个文件。但它自成权威——它的规矩只管反馈,别的界面类援引不到;它自己还承认存在两种并存措辞(长式与短式),靠一句"以本节为准"临时压住。本特性之后,该文档以单行指针接入本纪律,其既有规则**保留**为该纪律在"反馈通知"这一界面类上的实例(不另立第二套措辞规则),两种并存措辞的收敛方向从"以本节为准"变为"以纪律真源为准"。阈值提示、提交通知、自省呈现的对外措辞同受下限/上限约束。
+
+**Why this priority**: 用户点名"feedback的流程"为扩散目标,故属显式要求。但排 P2 而非 P1:这一片**今天已高度合规**(194 文件的传播足迹即证据),边际工作是"命名归属 + 一般化",而非"从零修复";其失效风险与 US2(零规则、零守卫、直接决定不可撤销动作)不在一个量级。此为基于实测证据的排序判断,已记入 Assumptions。
+
+**Independent Test**: 检查 `shared/workflow/feedback-step.md` 已接入单行指针且其 `:89-90`/`:113-114`/`:141` 三处既有规则**保留未删**(降级为实例,不是被替换);检查 `confirmation-gates.md:68` 的反馈专属措辞规则已被 US2 提升为一般规则、原处收敛为指针且二者不冲突;抽样若干命令模板的 `## Feedback` 第 6 步,确认仍指向 `/speckit.feedback package` 用户视角途径、仍为非阻塞、仍不自动传输。
+
+**Acceptance Scenarios**:
+
+1. **Given** 反馈条目数达阈值, **When** 收尾呈现提交提示, **Then** 提示为非阻塞单行、附用户视角途径、不含引擎原始调用、不触发任何自动传输。
+2. **Given** `feedback-step.md` 已接入指针, **When** 检视其既有三条措辞规则, **Then** 三条全部保留,文档头部另有一行指向本纪律真源。
+3. **Given** 一个只写短式措辞的嵌入副本, **When** 判定其权威来源, **Then** 优先级为"本纪律真源 > `feedback-step.md` 的反馈专属实例",不再是"`feedback-step.md` > 旧嵌入副本"的两级。
+4. **Given** 反馈自省运行且无可理解性违规, **When** 收尾记录, **Then** 不追加空洞观察条目;有违规则条目内嵌稳定标记 [[STR-005]] 且不含编造计数。
+
+---
+
+### User Story 5 - 38 处分散措辞收敛为指针,搁浅的实现被提升为全框架可达 (Priority: P2)
+
+维护者想改一次"什么算许可行话",今天需要改 38 个地方;本特性之后只改 1 个。每类面向用户界面的**规则真源文档**都携带一行指向本纪律的指针,不再各自复述白名单/黑名单/下限/上限。访谈模式文档的 `Comprehension rules` 收敛为指针 + 其**模式特有**规则(每问一决策、问 what 不问 whether)——本纪律不吞并后两条。澄清流程补齐它今天缺失的"不用行话"半侧。`summarize-project` 里那份最成体系的内部标识黑名单与读者向改写映射被**提升**为本纪律黑名单与改写指引的实例来源,提升后原处以指针接入、不再保留第二份独立黑名单。按工具的机械副本(4 棵树)交由既有再生脚本处理,MUST NOT 手工批改。
+
+**Why this priority**: 这是把"定义了"变成"只有一处定义"的收敛工作,直接兑现 One Source of Truth 的修复方向("把它变成引用,而不是把措辞改得一致")。排 P2:它依赖 US1 的真源先存在;且其失效模式是**长期漂移**而非**当次答错**,风险曲线比 US2/US3 平缓。但它 MUST NOT 被无限期推迟——`ask-record-repeat.md` 已警告"没有守卫的重复会各自漂移,最后三处说法不一,比重复之前更糟",而本特性正在新增第 39 处表面。
+
+**Independent Test**: 对 `shared/` + `templates/` + `skills/` 运行单源扫描,统计以**内容形态**复述本纪律规则(白名单/黑名单/下限/上限/机械判据)的位置数量,基线 38 → 目标 0(机械副本与测试钉死字面量除外,二者是 `one-source-of-truth.md:33-41` 承认的合法重复);检查 11 类界面的规则真源文档各含且仅含一行指针;检查 `interview-pattern.md` 仍保留其模式特有两规则、`clarify.md` 已补齐行话半侧、`reporting-playbook.md:109-113` 已收敛为指针。
+
+**Acceptance Scenarios**:
+
+1. **Given** 白名单新增一个许可条件, **When** 修订完成, **Then** 只需编辑真源文档 1 个文件;单源扫描不报出任何需同步修改的第二处。
+2. **Given** `interview-pattern.md` 的 Comprehension rules 已收敛, **When** 检视该文档, **Then** 可理解性四规则改为一行指针,而"每问一决策""问 what 不问 whether"两条**原文保留**(它们不属本纪律)。
+3. **Given** `clarify.md` 今天只借上下文半侧, **When** 接入完成, **Then** 其提问与选项表同受行话侧约束,且**不**采纳访谈模式的开放式提问规则(既有裁定不变)。
+4. **Given** `summarize-project` 的内部标识黑名单已提升, **When** 检视该技能, **Then** 原处以指针接入本纪律,不再保留独立黑名单;其读者向改写映射成为本纪律的实例来源。
+5. **Given** `templates/commands/interview.md` 被改动, **When** 运行既有再生脚本, **Then** 4 棵按工具树的副本自动更新,无手工批改痕迹。
+
+---
+
+### Edge Cases
+
+- **不存在用户视角途径时怎么办?** 引擎调用形态是唯一可执行信息。此时原始标识符 MUST 保留(白名单第 3 条),但 MUST 标注为引擎细节并附一句说明它做什么——`feedback-step.md:141` 的 `(engine detail — do not paste the bare flag into the user-facing line)` 是该形态的既有样板。MUST NOT 因为"不用行话"而删掉用户唯一能执行的东西。
+- **用户自己先用行话怎么办?** 白名单第 1 条:镜像用户本轮已使用的术语。MUST NOT 把专家用户的话降级改写——那是另一种不尊重。
+- **白话改写会损失精度怎么办?**(安全/合规上的关键区分) 精度优先:保留术语并就地注解,MUST NOT 为了白话而抹掉区分。
+- **消息是机器消费而非人类消费**(脚本解析的报告、测试夹具、JSON 字段名) 不在本纪律作用域内;纪律只约束人类面向的表面。
+- **上下文下限与非阻塞单行上限冲突** 二者属**不同界面类**:单行上限约束的是"非阻塞流程建议"(`proactive-trigger.md:47` 是其形态真源),下限约束的是"需要用户作出决定的门控提示"。MUST NOT 把两类折叠成一条规则;文档 MUST 给出裁决顺序。
+- **上下文下限与 Token 效率纪律的摘要优先冲突** 解法唯一:陈述**派生事实**、以**路径引用**其余一切,MUST NOT 把机器管理数据文件的原文当作上下文注入。文档 MUST 显式写出这条和解,不留给读者推断。
+- **"每问就地注解"与"不要重复啰嗦"冲突** 消费单元是判定粒度:访谈模式的裁定是**每问**都要注解,因为"用户可能在数天后单独读到这一问"(`interview-pattern.md:122`)。⇒ 注解义务按**消费单元**计,不按会话计;文档 MUST 把消费单元定义清楚。
+- **真源文档为举反例而引用阻塞措辞** 会命中 `scan-confirmation-gates.py:46-65` 的 `BLOCKING_PATTERNS` 并使门控计数虚增。MUST 依既有 `POLICY_DOCS` 机制(`:38-44`)登记豁免。
+- **下游项目拒绝该原则** `templates/commands/constitution.md:40-41` 已授权 bootstrap 拒绝不相关的模板原则。允许,但拒绝 MUST 记录进 Sync Impact Report,MUST NOT 静默丢弃。
+- **新增第 39 处表面本身成为漂移点** `ask-record-repeat.md:117` 的规矩:新增表面 MUST 同批加守卫。US1 的契约测试与本清单的每个表面一一对应,否则本特性自己就是它要修的问题的又一实例。
+- **文档地图表加一行不生效** 增量调谐只按整章节传播(`generate-instructions.sh:73-78`;`proactive-trigger.md:3` 已明写)。MUST 以新增顶级 `## ` 章节暴露;只加表格行是一个**静默失效**——文件看着改了,已初始化项目收不到。
+- **只改宪章模板不改命令** Principle XIV 的实际失效路径:模板里有的原则,命令的 `MUST include` 清单没点名,下游就拿不到。⇒ FR-020 要求双落点,守卫 MUST 分别断言两处。
+- **`interview-pattern.md` 的嵌入契约不可丢弃清单没列 Comprehension rules**(`:255`) 收敛为指针后,该清单 MUST 把"接入本纪律的指针"纳入不可丢弃项,否则宿主收窄时仍可合法丢掉。
+- **194 个文件的措辞轮换** MUST 经既有再生脚本处理机械副本;手写表面按 US5 逐个收敛为指针。MUST NOT 发起一次 194 文件的手工批改。
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+#### 真源、命名与常驻可见性
+
+- **FR-001**: 框架 MUST 在 `shared/guidelines/` 下建立**唯一真源文档** [[STR-002]],为"不用行话、带足上下文"这一纪律命名并定义其全部规则。文档 MUST 在前 8 行内声明自身为该纪律的唯一定义处,并声明:引用本纪律的命令、技能、代理与共享文档 MUST 以路径引用本文档,MUST NOT 复制其规则正文。
+- **FR-002**: 真源文档 MUST 经既有镜像机制在 `.specify/shared/guidelines/` 下产生**逐字节一致**的副本 [[STR-001]],使每个下游项目初始化即得;MUST NOT 要求任何 manifest 或逐文件注册(既有镜像按目录全量发现)。
+- **FR-003**: 本纪律 MUST 以 `templates/instructions-template.md` 中**新增的顶级 `## ` 章节** [[STR-004]] 常驻暴露,形态为"摘要 + 指针"(对齐既有 guideline 章节的房子形态:一段引出核心主张与固定指针短语,2–5 条子规则要点,可选收尾指针行)。MUST NOT 仅以文档地图表格行暴露——增量调谐只按整章节传播,既有章节内部的改动抵达不到已初始化项目。
+- **FR-004**: 真源文档 MUST 遵循既有 guideline 房子骨架:H1 命名;前 3–8 行所有权声明(owns 什么 / ambient 指针在哪 / MUST 引用且 MUST NOT 复制);紧接一段"防的是什么失效";H2 分节(规则 → 边界 → 程度 → 与相邻原则的关系);全文使用 RFC-2119 大写关键词;并含一条**范围限制/不新增机制**子句。
+
+#### 程度:行话侧(双向边界之一)
+
+- **FR-005**: 真源文档 MUST 给出**许可行话**的封闭条件集(白名单),至少覆盖:① 用户在本消费单元已先行使用的术语;② 项目词汇表的 canonical 术语,且在该消费单元内首次出现时就地注解;③ 用户 MUST 逐字键入或复制的标识符(命令、路径、参数、环境变量);④ 用户自身项目/领域的业务术语;⑤ 由输出格式自身定义、且同时被具名的短形式(如决策 ID)。
+- **FR-006**: 真源文档 MUST 给出**禁用行话**的封闭条件集(黑名单),至少覆盖:① 存在用户视角途径时的引擎/脚本/函数内部调用形态;② 内部代号、分级码、字段名、库表列名等内部标识渗入面向读者的正文;③ 在该消费单元内首次出现却无就地注解的缩写;④ 以代码符号名充当行为概念名的提问。
+- **FR-007**: 用户要求的"不能完全杜绝 jargon" MUST 以 FR-005 白名单的形式落地为**可判定的许可条件**;MUST NOT 落地为"尽量少用""避免术语"一类形容性表述。白名单之外的行话一律按违规处理。
+- **FR-008**: 真源文档 MUST 定义**消费单元**(comprehension obligation 的计账粒度),并规定就地注解义务按消费单元计而非按会话计——依据是读者可能在数天后单独读到其中一条(既有裁定见 `interview-pattern.md:122`)。
+
+#### 程度:上下文侧(双向边界之二)
+
+- **FR-009**: 真源文档 MUST 定义**上下文下限**:每条面向用户的消息 MUST 承载足以让读者**不打开其他工件即可行动**的事实,至少包括——为何此刻出现、该决定/回答将改变什么、用户可以做什么(确切的用户视角途径或编辑入口);门控类消息另 MUST 载明不可撤销后果与可逆性。
+- **FR-010**: 真源文档 MUST 定义**上下文上限**:"带足上下文" MUST NOT 被解释为复述读者可自行打开的工件。承载方式 MUST 为**陈述决定所依赖的事实 + 以路径引用其余一切**。上限 MUST 遵守既有约束:非阻塞建议保持单行(其形态真源为 `proactive-trigger.md`,本文档只引用不复述);MUST NOT 把机器管理数据文件的原文当作上下文注入(Token 效率纪律 摘要优先)。
+- **FR-011**: 用户要求的"不能无限制的添加 context" MUST 以 FR-010 的上限**加**每类界面既有的长度/形态约束共同落地;真源文档 MUST NOT 引入与既有约束冲突的第二套长度规则。
+- **FR-012**: 当某类界面的上下文下限与上限冲突时,真源文档 MUST 给出**裁决顺序**,MUST NOT 留下"二者皆可解释"的空白界面类。已知冲突至少两处:① 下限 vs 非阻塞单行上限(裁决:属不同界面类,不折叠);② 下限 vs 摘要优先(裁决:陈述派生事实 + 路径引用,不注入原文)。两处和解 MUST 显式写出。
+- **FR-013**: 真源文档 MUST 提供**第三方可复现的机械判据**(而非品味判断):对任一面向用户的消息,任何两个独立评审者按该判据 MUST 得出同一结论(是否违反行话侧、是否违反上下文侧)。判据 MUST 与既有房子的"机械测试"先例同形(粗体可执行判句,如 `one-source-of-truth.md:29`)。
+
+#### 扩散:面向用户界面类
+
+- **FR-014**: 真源文档 MUST 枚举本纪律约束的**面向用户界面类**(surface classes)为**封闭集**,至少覆盖:① 门控确认提示;② 门控执行报告;③ 反馈阈值/提交通知;④ 访谈提问;⑤ 澄清提问与选项表;⑥ 主动流程建议行;⑦ 面向干系人的需求/规划/任务工件;⑧ 面向外部读者的项目总结报告;⑨ 词汇表校正的对外呈现;⑩ 流程收尾报告;⑪ 失败如实报告。扩展该集合 MUST 只经修订真源文档,MUST NOT 分散到各命令模板。
+- **FR-015**: 每个被枚举界面类的**规则真源文档** MUST 以单行指针接入本纪律,MUST NOT 以内容形态复述其白名单/黑名单/下限/上限/机械判据。
+- **FR-016**: 本特性 MUST 在**同一批**内完成全部 **11 类**面向用户界面的真源文档指针接入,**并**同批完成两处搁浅实现的收敛/提升(FR-021 的访谈模式 Comprehension rules 收敛、FR-022 的项目总结内部标识黑名单提升)。裁定依据(clarify 2026-09-17 R1-Q1=A):用户显式诉求为"扩散到**所有**面向用户的流程",分批接入会使 38 处措辞中的大部分在收敛完成前继续各自漂移;两处搬家虽改写被广泛镜像的模式文档与一个技能的内部参考文档、回归面最大,但**隔离到另一次并不会降低其回归面**,只会让"38 → 0"的收敛量长期停留在中间态。⇒ 回归风险 MUST 由同批的守卫(FR-029..FR-032)与端到端实测(FR-026)承接,而非由缩小范围承接。
+- **FR-017**: 门控治理文档(`confirmation-gates.md`)MUST 保持**是否门控**的唯一判据真源地位不变;本特性只新增**门控如何措辞**的约束并以指针接入。其两级判据、破坏性动作清单、治理保留清单、存疑从严规则、回流约束 MUST 逐字未被改写。
+- **FR-018**: 门控治理文档中既有的、**仅限反馈提交提示**的"用户视角途径、不展示引擎原始调用"规则 MUST 被提升为面向**全部**界面类的一般规则并归本纪律所有;原处 MUST 收敛为指针。此为"记录规则而非实例"(举一反三)的直接应用。
+- **FR-019**: 反馈流程的对外措辞真源(`shared/workflow/feedback-step.md`)MUST 以单行指针接入本纪律;其既有三处措辞规则(`:89-90`、`:113-114`、`:141`)MUST **保留**为该纪律在"反馈通知"界面类上的实例,MUST NOT 另立第二套措辞规则;两种并存措辞(长式/短式)的收敛权威 MUST 从"以本节为准"上移为"以本纪律真源为准"。
+- **FR-020**: 澄清流程(`/speckit.clarify` 命令模板与 `[NEEDS CLARIFICATION]` 提示模板)MUST 补齐其今天缺失的"不用行话"半侧,方式为接入本纪律的单行指针;其既有裁定(封闭式提问、选项表 + Recommended、不采纳访谈模式的开放式提问规则)MUST 保持不变。
+- **FR-021**: 访谈模式文档(`interview-pattern.md`)的 `Comprehension rules` MUST 收敛为对本纪律的指针 + 其**模式特有**规则;"每问一决策""问 what 不问 whether"两条 MUST 原文保留(二者不属可理解性纪律),本纪律 MUST NOT 吞并。该文档的**嵌入契约不可丢弃清单** MUST 同批把"接入本纪律的指针"纳入不可丢弃项。
+- **FR-022**: 项目总结技能中已充分实现但**搁浅**的内部标识黑名单与读者向改写映射 MUST 被提升为本纪律黑名单与改写指引的**实例来源**;提升后原处 MUST 以指针接入,MUST NOT 保留第二份独立黑名单。
+- **FR-023**: 按工具再生的机械副本(4 棵按工具命令树)MUST 交由既有再生脚本处理;MUST NOT 手工批改。手写表面(命令模板、技能文档、`docs/` 参考文档)按 FR-016 裁定的广度逐个收敛为指针。
+
+#### 下游导出
+
+- **FR-024**: 本纪律 MUST 经 `templates/constitution-template.md` 以**一条新原则** [[STR-003]] 输出到下游项目宪章。该原则结构 MUST 与既有原则一致:`### <罗马数字>. <Title Case 名称>` → 一句以冒号结尾的主张 → 3–6 条 MUST/MUST NOT 要点(硬折行 <100 字符)→ 恰好一个空行 → `Rationale:` 段(1–4 句)。要点 MUST 含:一条锚定 [[STR-001]] 并写明 "reference it, do not restate it";一条"不新增机制"的范围限制(对齐 Better-Harness 原则 `:110-111` 的先例)。
+- **FR-025**: 本纪律 MUST 同时进入 `templates/commands/constitution.md` 的 **`MUST include` 原则清单**(即命令逐条点名、强制生成的原则列表),使 `/speckit.constitution` 在下游 bootstrap 时强制生成该原则。MUST NOT 只改模板而不改命令——本仓 Principle XIV(One Source of Truth)从未回流即为同型失效的实证(两个模板文件对其零命中,故无下游项目收到它);该缺口由 FR-028 在本批一并修复。
+- **FR-026**: 下游宪章获得该原则后,`/speckit.plan` 的 Constitution Check 门控 MUST 自动纳入它(该门控按 `### <num>. <name>` **动态枚举**)。`plan-template.md` MUST NOT 需要任何硬编码改动;本特性 MUST **验证**该自动传导确实成立,而非假定成立。
+- **FR-027**: 本仓自身的 `.specify/memory/constitution.md` MUST 同批获得对应原则,版本按 MINOR 递增,并按既有约定前置 Sync Impact Report。该宪章已含 Principle XIV,故本仓侧只新增一条原则;随包分发的宪章模板侧则新增两条(FR-024 的本纪律 + FR-028 的回流)。
+- **FR-028**: 既有 Principle XIV(One Source of Truth,[[STR-006]])从未回流到 `templates/` 这一同型缺口 MUST 在**本批一并修复**:该原则 MUST 同时补入 `templates/constitution-template.md` 与 `templates/commands/constitution.md` 的 `MUST include` 清单,使其抵达下游项目。裁定依据(clarify 2026-09-17 R1-Q2=C):一并回流,并把这次事故用作 FR-035 双落点守卫的**第一个受测样本**——守卫本来就需要样本,边际成本近乎为零,而用一个真实发生过的缺口做样本能证明该守卫拦得住同型失效,而不只是拦得住"新原则忘了写"。
+
+#### 漂移守卫
+
+- **FR-029**: 新增的每一处表面 MUST **同批**获得漂移守卫(三层表面模式:真源文档 → 常驻章节 → 契约测试)。守卫 MUST 至少覆盖:① 真源文档存在且镜像逐字节一致;② 前 8 行声明所有权且含 MUST NOT copy 语义;③ 白名单/黑名单/下限/上限/机械判据/界面类枚举各节齐备;④ 指令模板两份副本各含且仅含一次章节标题 [[STR-004]] 与指针 [[STR-001]],且**不内联**真源文档的节名;⑤ 宪章模板与宪章命令 `MUST include` 清单**分别**含 [[STR-003]]。
+- **FR-030**: 守卫 MUST 含**项目中立性**断言:随包分发的真源文档、宪章模板与命令模板 MUST NOT 泄漏本仓专有名称(对齐 `test_one_source_of_truth.py` 的 `FORBIDDEN` 先例)。
+- **FR-031**: 守卫 MUST 含**单源扫描**:`shared/` + `templates/` 下以内容形态复述本纪律规则的位置数量为 0(机械副本与测试钉死的字面量属 `one-source-of-truth.md:33-41` 承认的合法重复,不计入)。
+- **FR-032**: 若真源文档为说明违规形态而引用任何命中门控扫描器阻塞模式的措辞,该文档 MUST 被登记进扫描器的策略文档豁免集(`scan-confirmation-gates.py` 的 `POLICY_DOCS`),MUST NOT 使门控计数虚增;门控计数在本特性改动前后 MUST 不变。
+- **FR-033**: 本特性 MUST NOT 引入任何新的运行时检查器、行话 lint 引擎、措辞评分系统、成熟度报告或跟踪台账(框架范围纪律 / 不新增机制)。执行手段 MUST 限于既有契约测试与既有扫描器的豁免登记。
+- **FR-034**: `confirmation-gates.md:68` 既有措辞规则今天**无契约断言**(其测试只断言 `非阻塞` 与 `自动传输`)。该规则被 FR-018 提升为一般规则后,MUST 同批获得断言,MUST NOT 在无守卫状态下继续存在。
+- **FR-035**: FR-029 ⑤ 的双落点断言 MUST **一般化**为覆盖全部宪章原则的守卫:随包分发的宪章模板中的每条原则,MUST 在宪章命令的 `MUST include` 清单中有对应条目;任一侧缺失即失败。回流的 Principle XIV([[STR-006]],FR-028)MUST 作为该守卫的**第一个受测样本**,以证明它拦得住一个真实发生过的同型缺口,而不只是拦得住"新原则忘了写"。守卫 MUST 按**原则名**匹配,MUST NOT 钉死罗马数字字面量(模板与活动宪章的原则名册与编号本就不同)。
+
+#### 观察与反馈
+
+- **FR-036**: 收尾反馈自省 MUST 能捕获本纪律的违规观察。观察条目 MUST 内嵌稳定字面标记 [[STR-005]](供既有反馈引擎按标记检索聚合);MUST NOT 编造计数或数值;干净运行 MUST NOT 追加空洞观察条目。此为纯观察,MUST NOT 阻塞宿主流程,MUST NOT 追加对用户的提问。
+
+### Key Entities *(include if requirement involves data)*
+
+- **可理解性纪律真源(Comprehension Discipline Owner)**: 该纪律的唯一权威定义点。属性:名称、所有权声明、失效陈述、行话侧两表、上下文侧两界、机械判据、界面类枚举、范围限制。与其他实体的关系:被所有"指针"引用;被守卫钉死;经导出实体投影到下游。
+- **面向用户界面类(User-Facing Surface Class)**: 本纪律约束的一类人类面向消息(封闭集,11 类)。属性:类名、规则真源文档路径、上下文下限、上下文上限、既有长度/形态约束、是否含门控后果披露义务。关系:每类携带一行指向真源的指针;门控确认提示与执行报告两类的"是否门控"判据仍归 `confirmation-gates.md` 所有。
+- **许可行话条目(Permitted-Jargon Entry)**: 白名单的一条可判定许可条件。属性:条件描述、依据、示例。关系:构成 FR-007 的"不能完全杜绝 jargon"的落地形态。
+- **禁用行话条目(Forbidden-Jargon Entry)**: 黑名单的一条可判定禁止条件。属性:条件描述、内部标识类别、读者向改写映射(可选)。关系:由 `summarize-project` 的搁浅实现提升而来(FR-022)。
+- **上下文界项(Context Bound Item)**: 下限项或上限约束。属性:方向(下限/上限)、内容、所属界面类、与既有纪律的和解方式。关系:冲突时由 FR-012 的裁决顺序裁定。
+- **机械判据(Mechanical Verdict Test)**: 使可理解性违规可被独立复现判定的判句集合。属性:判句、判定对象(行话侧/上下文侧)、预期一致率。关系:SC-006 的度量对象。
+- **宪章原则导出(Constitution Principle Export)**: 一条原则向下游项目的投影。属性:原则名([[STR-003]] / [[STR-006]])、罗马数字位置(按名匹配,不钉死字面量)、要点集(含 guideline 锚定要点与范围限制要点)、Rationale、**双落点**(宪章模板 + 命令 `MUST include` 清单)、版本递增类型。关系:使下游 `plan` 门控经动态枚举自动纳入(FR-026);任一侧落点缺失即由 FR-035 的守卫拦下——Principle XIV 正是历史上漏掉命令侧的实例。
+- **漂移守卫(Drift Guard)**: 钉死各表面一致性的契约断言集合。属性:受测表面、断言类型(存在性 / 镜像一致性 / 所有权声明 / 节齐备 / 唯一性 / 项目中立性 / 单源扫描 / **双落点**)、合法重复豁免、变异式有效性抽查。关系:三层表面模式的第三层;缺失即"新增的是未来漂移点而不是可达性"(`ask-record-repeat.md:117`)。
+- **可理解性观察条目(Comprehension Observation Entry)**: 收尾自省捕获的违规观察。属性:稳定标记 [[STR-005]]、所属单元、生命周期点、观察事实正文。关系:沿用 Token 效率纪律 `token-efficiency` 标记的同构形态;可经既有反馈引擎按标记聚合。
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-001**: 任取一条面向用户的门控确认提示,一位本会话未打开过仓库的读者能在**不追问任何术语含义**的前提下作出批准/否决决定;抽样评审通过率 **100%**(基线:今天 13 个治理保留门控**无一**附措辞义务)。
+- **SC-002**: 在存在用户视角途径的场合,面向用户的消息中出现引擎/脚本内部调用形态的次数为 **0**(可由既有文本检索机械核验;基线:该规则仅覆盖反馈提交提示 1 类界面)。
+- **SC-003**: 本纪律的真源文档数量为 **1**;`shared/` + `templates/` + `skills/` 下以**内容形态**复述其规则(白名单/黑名单/下限/上限/机械判据)的位置数量为 **0**。基线:研究实测 **38 处独立措辞、0 份真源文档、0 个统一名字**。
+- **SC-004**: 被枚举的 **11 类**面向用户界面,其规则真源文档携带指向本纪律的单行指针的比例为 **100%**(FR-016 已裁定为全量同批接入,无分批过渡态);两处搁浅实现在同批完成收敛/提升后,独立第二份规则副本数量为 **0**。
+- **SC-005**: 新建下游项目经既有初始化 + 宪章流程后,其宪章含原则 [[STR-003]] 的比例为 **100%**,且含回流的 [[STR-006]] 的比例为 **100%**(基线:后者今天为 **0%**);该两条原则均出现在其 `plan` 门控的动态枚举中,`plan-template.md` 改动量为 **0 行**;导出双落点(FR-024/FR-025,守卫见 FR-035)零遗漏。
+- **SC-006**: 两位互不沟通的评审者对同一批 **≥20 条**面向用户消息套用机械判据,结论一致率 **≥90%**(判据可复现,非品味判断;基线:今天无任何判据,判定完全依赖评审者直觉)。
+- **SC-007**: 非阻塞流程建议行在接入本纪律后维持既有单行约束,**长度膨胀率为 0%**(抽样 100% 合规)。
+- **SC-008**: 上下文下限与上限存在冲突的界面类,真源文档给出裁决顺序的比例为 **100%**;"二者皆可解释"的空白界面类数量为 **0**(已知冲突至少 2 处,均已点名)。
+- **SC-009**: 漂移守卫覆盖**五个表面**(真源文档 / 镜像一致性 / 指令模板常驻章节 / 宪章模板 / 宪章命令 MUST-include 清单)的比例为 **100%**;守卫在 CI 中执行,人为改动任一处即失败。附加覆盖项目中立性与单源扫描两项断言。
+- **SC-010**: 随包分发的真源文档、宪章模板与命令模板中,本仓专有名称泄漏数为 **0**。
+- **SC-011**: 本特性引入的新运行时检查器 / 行话 lint 引擎 / 措辞评分系统 / 成熟度报告 / 跟踪台账数量为 **0**。
+- **SC-012**: 门控扫描器的门控计数在本特性改动前后**完全不变**(真源文档的示例措辞未虚增计数;基线:扫描器 18 条阻塞模式全部只检测阻塞行为,零措辞检查)。
+- **SC-013**: `confirmation-gates.md:68` 既有措辞规则在被提升为一般规则后**获得契约断言**(基线:0 条断言覆盖该子句);该规则处于无守卫状态的表面数量为 **0**。
+- **SC-014**: 搁浅实现的可达性:`summarize-project` 的内部标识黑名单与读者向改写映射被全框架可引用的比例为 **100%**(基线:仅该技能内部可达),且提升后独立黑名单副本数量为 **0**。
+- **SC-015**: 双落点守卫(FR-035)一般化后覆盖随包分发宪章模板中**全部**原则的比例为 **100%**(基线:0 条原则受此守卫);人为从模板侧或命令侧删除任一原则后守卫失败的比例为 **100%**,首个受测样本为回流的 [[STR-006]]。
+- **SC-016**: 两处搬家(FR-021 访谈模式可理解性规则收敛、FR-022 项目总结黑名单提升)完成后的**既有行为回归数为 0**——具体核验点:访谈模式仍原文保留其模式特有两规则、其嵌入契约不可丢弃清单已含新指针、澄清流程既有形态裁定未变、项目总结技能仍能产出合规报告、门控扫描器计数不变(SC-012)。此项是 FR-016 选择最大接入广度的配套风险约束。
+
+### Measurement Sources & Collection Methods
+
+- **SC-001 Source**: 门控提示文案抽样评审——从 `confirmation-gates.md` 治理保留清单的 13 个门控中取样,由未参与本特性实现的评审者按机械判据逐条判定;每次门控文案变更后复测。基线于实现前采集一次(预期:0/13 附措辞义务)。
+- **SC-002 Source**: 对 `shared/` + `templates/` + `skills/` 的既有文本检索(与本次研究用的同一手法:`grep -rl` 引擎调用形态字面量),统计面向用户行中的命中数;由契约测试在 CI 中执行,每次提交触发。基线:研究已实测该规则仅覆盖 1 类界面。
+- **SC-003 Source**: 契约测试的单源扫描(对齐 `test_one_source_of_truth.py:142-153` 与 `test_token_efficiency_discipline.py:94-104` 的既有形态),排除机械副本与测试钉死字面量;CI 每次提交执行。基线 **38 处 / 0 真源** 由本次研究实测记录于 Overview 现状锚点。
+- **SC-004 Source**: 契约测试遍历 FR-014 的 11 类界面枚举,逐类断言其规则真源文档含且仅含一行指针;CI 每次提交执行。基线:0/11。
+- **SC-005 Source**: 端到端演练——在空白目录执行既有初始化 + `/speckit.constitution`,检查生成宪章含 [[STR-003]] 与 [[STR-006]] 两条原则;随后执行 `/speckit.plan` 检查 Constitution Check 表含二者;并对 `plan-template.md` 做 `git diff` 确认零改动。每次发布前执行一次。基线:[[STR-003]] 0%(不在任一模板中)、[[STR-006]] 0%(仅在活动宪章与一份契约测试中)。
+- **SC-006 Source**: 双评审者盲测——取样 ≥20 条面向用户消息(覆盖 ≥5 个界面类),两人独立套用机械判据,比对结论;计算一致率。实现后执行一次,后续每次修订机械判据时复测。基线:不适用(今天无判据)。
+- **SC-007 Source**: 对主动建议行的形态断言(既有 `proactive-trigger.md:47` 单行约束),由契约测试执行;另在实现前后各抽样一批建议行比对长度分布。基线:既有单行约束已生效,本项防的是接入本纪律后的**回归**。
+- **SC-008 Source**: 契约测试断言真源文档含裁决顺序节,并对已点名的 2 处冲突逐个断言其和解文案存在;CI 每次提交执行。基线:0 处和解成文。
+- **SC-009 Source**: 契约测试文件自身的覆盖清点(逐表面一条测试),对齐 `test_one_source_of_truth.py` C-1..C-9 的分组形态;CI 每次提交执行。另以"人为改动某表面后测试必须失败"的变异式抽查验证守卫**有效**而非仅存在。基线:0 个表面受守。
+- **SC-010 Source**: 契约测试的项目中立性断言(复用 `test_one_source_of_truth.py:37,158-163` 的 `FORBIDDEN` 列表形态);CI 每次提交执行。基线:不适用(文件尚不存在)。
+- **SC-011 Source**: 实现评审 + 新增文件清点——检查本特性新增的文件中是否存在可执行检查器/评分器/台账;由 `/speckit.analyze` 或代码评审判定。基线:0。
+- **SC-012 Source**: 在实现前后各运行一次 `scripts/python/scan-confirmation-gates.py` 并比对门控计数(既有测试 `tests/contract/test_scan_confirmation_gates.py:64-130` 提供断言骨架);CI 每次提交执行。基线:实现前的计数值。
+- **SC-013 Source**: 契约测试断言 `confirmation-gates.md` 的一般化措辞规则被覆盖(扩展 `tests/contract/test_confirmation_gates_execution_report.py:44-46` 既有用例);CI 每次提交执行。基线:0 条断言。
+- **SC-014 Source**: 契约测试断言 `summarize-project` 原处以指针接入、且 `shared/` + `skills/` 下独立黑名单副本数为 0;CI 每次提交执行。基线:1 份搁浅黑名单、0 处外部可达。
+- **SC-015 Source**: 双落点守卫测试(FR-035)——遍历随包分发宪章模板的全部原则标题,逐个断言其在 `templates/commands/constitution.md` 的 `MUST include` 清单中有对应条目;并以变异式抽查验证守卫有效(人为从任一侧删除一条原则后测试 MUST 失败)。首个受测样本为回流的 [[STR-006]]。CI 每次提交执行。基线:0 条原则受此守卫;[[STR-006]] 在两个模板文件中零命中(实测)。
+- **SC-016 Source**: 逐点核验 + 既有测试套件——按 SC-016 列出的五个核验点逐个检查搬家涉及位置的既有行为(访谈模式两规则原文保留、嵌入契约不可丢弃清单含新指针、澄清既有形态裁定未变、项目总结技能端到端产出合规报告、门控扫描器计数不变),并运行既有相关契约测试(`test_confirmation_gates_*`、`test_scan_confirmation_gates`、`test_instructions_section_propagation`)确认全绿。改动前后各执行一次取差值。基线:不适用(搬家尚未发生);本项度量**回归**,不是收敛量。
+
+## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
+
+| String ID | Value (verbatim) | Consumed by |
+|-----------|------------------|-------------|
+| `STR-001` | ".specify/shared/guidelines/user-facing-comprehension.md" | FR-002, FR-024, FR-029;宪章原则的 guideline 锚定要点;指令模板常驻章节的指针行;契约测试的路径断言 |
+| `STR-002` | "shared/guidelines/user-facing-comprehension.md" | FR-001;镜像一致性断言的源侧路径;单源扫描的范围声明 |
+| `STR-003` | "User-Facing Comprehension (No Jargon, With Context)" | FR-024, FR-025, FR-027, FR-029, FR-035;`templates/constitution-template.md` 新增原则标题;`templates/commands/constitution.md` 的 `MUST include` 条目名;`.specify/memory/constitution.md` 对应原则标题;契约测试的原则存在性断言与双落点守卫 |
+| `STR-004` | "## User-Facing Comprehension" | FR-003, FR-029;`templates/instructions-template.md` 新增顶级章节标题;`.specify/instructions.md` 再生后的对应章节;章节传播契约测试 |
+| `STR-005` | "user-facing-comprehension" | FR-036;反馈观察条目的稳定字面标记;既有反馈引擎按标记检索聚合的过滤值(形态对齐 `token-efficiency` 标记先例) |
+| `STR-006` | "One Source of Truth (Authority & Reference Discipline)" | FR-028, FR-035;回流至 `templates/constitution-template.md` 的原则标题(取自 `.specify/memory/constitution.md:155` 既有原则名);`templates/commands/constitution.md` 的 `MUST include` 条目名;双落点守卫的第一个受测样本;SC-005 / SC-015 的断言对象 |
+
+**Citation convention**: 当 FR、契约、任务或测试引用上述字符串时,写 `[[STR-NNN]]` 而非复制字面量;`/speckit.analyze` 可据此校验每个 `[[STR-NNN]]` 引用都解析到本节某一行。
+
+**命名依据**: `user-facing-comprehension` 经预留标识符核查——该字串在本特性的 `shared/`、`templates/`、`skills/`、`scripts/`、`src/`、`tests/` 范围内**零占用**;`comprehension` 一词的既有使用为 `interview-pattern.md:119` 的 `Comprehension rules (可理解性规则)`(本纪律将收敛为指针的对象)与若干历史 spec 中的 `reader-comprehension` 度量措辞,二者均不构成标识符冲突。`STR-005` 的标记值取真源文档 basename,与 `token-efficiency` 标记取法一致。`STR-006` 逐字取自 `.specify/memory/constitution.md:155` 的既有原则标题(已实测核对),回流时 MUST 沿用该名而 MUST NOT 另拟——否则双落点守卫(FR-035)按名匹配会把它判为两条不同原则。`grep -c "One Source" templates/constitution-template.md templates/commands/constitution.md` 实测双双为 **0**,即 FR-028 所修缺口确实存在。
+
+## Clarifications
+
+### Session 2026-09-17
+
+- Q: 界面类接入广度——本纪律写好后,11 类面向用户界面的真源文档各加一行指针即可;但其中两处不只是"加指针",而是要给已有内容搬家(访谈模式文档里那份今天写得最全的可理解性规则要收敛成一行指针;项目总结技能里那份最完整的"内部代号/字段名不许进正文"黑名单要被提升成全局够得到的来源)。这次做多少? → A: **全做,含两处搬家**。11 类指针接入 + 两处搬家在同一批内完成,38 处措辞一次收敛到 0。回归风险由同批守卫与端到端实测承接,而非由缩小范围承接(FR-016)。
+- Q: 本仓宪章第十四条原则(One Source of Truth)从未回流到随包分发的模板里,导致没有任何下游项目收到它——这个既有缺口要不要顺手一起修? → A: **一起修,并当守卫样本**。该原则同批补入宪章模板与命令的强制包含清单(FR-028),并把这次真实发生过的事故用作"宪章原则 MUST 双落点"守卫的第一个受测样本(FR-035),以证明该守卫拦得住同型失效。
+
+## Out of Scope
+
+- **门控"是否触发"的判据改写**——两级判据、破坏性动作清单、治理保留清单、存疑从严、回流约束全部保持 `confirmation-gates.md` 为唯一权威;本特性只新增"门控如何措辞"(FR-017)。
+- **任何新的行话检测运行时机制**——行话 lint 引擎、措辞评分器、成熟度报告、跟踪台账、可读性打分流水线,一律排除(FR-033;框架范围纪律 / 不新增机制)。执行手段限于既有契约测试与既有扫描器的豁免登记。
+- **`scan-confirmation-gates.py` 的措辞检查扩展**——扫描器保持只检测阻塞行为;本特性至多在其 `POLICY_DOCS` 豁免集登记新真源文档(FR-032),MUST NOT 给它新增措辞模式。
+- **Token 效率纪律的改写**——摘要优先/程序优先/升级阶梯/小文件阈值仍由 `token-efficiency.md` 独家拥有;本纪律只引用它来约束上下文上限(FR-010)。
+- **确认门控既有分类与执行报告三要素定义的改写**——三要素(执行内容 / 产出·变更工件 / 修改途径)继续由 `confirmation-gates.md:56-60` 拥有,本纪律引用而不复述(FR-009)。
+- **访谈模式的其他规则**——设计树/依赖 DAG、决策记录、隔离规划、frontier、`I0–I6` 循环、退出门、事实 vs 决策拆分、台账 schema、可恢复性:均不属本特性;"每问一决策""问 what 不问 whether"两条 MUST 原文保留(FR-021)。
+- **澄清流程的既有形态裁定**——封闭式提问、选项表 + Recommended、不采纳开放式提问规则:保持不变(FR-020)。
+- **194 个机械副本的手工批改**——交由既有再生脚本(FR-023)。
+- **`docs/` 文档空间的全量调谐**——本特性只收敛与本纪律直接相关的手写复述处;需要移动/归档级变更时,推荐运行 `/speckit.docs` 而非在此执行。
+- **词汇表机制的改写**——入向校正与出向 canonical 措辞协议仍由 `shared/workflow/glossary.md` 拥有;本纪律只引用其"就地注解优先采用词汇表 canonical 措辞"这一衔接点。
+- **主动触发机制的规则集、晋升态与遥测**——`proactive-trigger.md` 独家拥有;本纪律只引用其"单行 = 用途 + 确切调用形式"作为上下文上限的既有形态(FR-010)。
+- **各 agent 的原生 hook / 运行时拦截**——本纪律是提示指令层的写作纪律,不是运行时强制;不建任何 agent 原生 hook。
+- **面向用户消息的语言本地化/翻译机制**——纪律是语言无关的(注解用读者的语言),但本特性不引入任何翻译或多语言渲染机制。
+
+## Assumptions
+
+- **真源文档命名**: 采用 `user-facing-comprehension.md`([[STR-002]])。已执行预留标识符核查,该字串在仓库内零占用;`comprehension` 的既有使用(`interview-pattern.md:119` 的 `Comprehension rules (可理解性规则)`)是本纪律将收敛的对象而非冲突项。中文侧命名取"面向用户可理解性纪律",与既有 `可理解性规则` 词汇连续,不新造第二套词。
+- **程度以"条件表 + 机械判据"表达,不以裸数值表达**: 用户要求"设定好程度",但本纪律的对象是散文措辞而非数据量。房子的四种程度先例中,**条件表**(`one-source-of-truth.md:33-41`)与**粗体机械测试**(`:29`、`ask-record-repeat.md:97`)适配散文对象;**裸数值 + 覆盖协议**(`token-efficiency.md:38` 的 `≤100 行` 且 `≤10 KB`)适配可计量对象。故本纪律以白/黑名单条件集 + 下限/上限 + 可复现判据落地"程度",数值型长度约束**复用各类界面既有值**(如非阻塞建议的单行)而不另造(FR-007、FR-011、FR-013)。若 `/speckit.plan` 判定某界面类确需数值上限,升级路径是在该类界面上声明覆盖值,而非在本纪律里新增全局数值。
+- **暴露通道 MUST 为新增顶级章节**: 依 `proactive-trigger.md:3` 与 `generate-instructions.sh:73-78` 的实测语义,只往文档地图表加一行是**静默失效**(文件看着改了,已初始化项目收不到)。故 FR-003 把"新增顶级 `## ` 章节"写成硬约束而非风格偏好。
+- **镜像无需注册**: `sync-mirrors.py` 按 `rglob("*")` 全量发现,`pyproject.toml:37` 与 `_CORE_SPECIFY_ASSETS` 均为目录级 ⇒ 新文件自动被拾取(FR-002)。`tests/contract/test_shared_reference_directory.py` 的 `TYPED_DOCS["guidelines"]` 是 `issubset` 断言,可选择性加入以钉死存在性。
+- **同批加守卫**: 依 `ask-record-repeat.md:117`,新增表面 MUST 同批获得守卫,否则新增的是漂移点而非可达性。本特性正在新增第 39 处表面,故 FR-029..FR-032 与 FR-001..FR-003 属同一批、不可拆分交付。
+- **接入广度已裁定(clarify 2026-09-17 R1-Q1=A)**: 11 类界面真源的指针接入 **与** 两处搁浅实现的收敛/提升同批完成,不留分批过渡态。理由:用户显式诉求为"扩散到**所有**面向用户的流程";分批会使 38 处措辞中的大部分在收敛完成前继续各自漂移;而把两处搬家隔离到另一次**并不会降低其回归面**,只会让收敛量长期停在中间态。⇒ 回归风险 MUST 由同批守卫(FR-029..FR-032、FR-035)与端到端实测(FR-026)承接,并以 SC-016 作为配套风险约束(既有行为回归数为 0)。
+- **Principle XIV 回流已裁定(clarify 2026-09-17 R1-Q2=C)**: 研究中发现的同型既有缺陷(该原则从未回流到随包分发的模板,故无下游项目收到它)随本特性一并修复(FR-028),并用作双落点守卫的第一个受测样本(FR-035)。选择"当守卫样本"而非仅"修好"的依据:守卫本来就需要样本,边际成本近乎为零,而用一个**真实发生过**的缺口做样本能证明它拦得住同型失效,不只是拦得住"新原则忘了写"。回流后随包分发的宪章模板原则数 11 → 13,活动宪章原则数 14 → 15(活动宪章已含 XIV,故只新增一条)。
+- **宪章编号**: `templates/constitution-template.md` 现有 11 条原则(I–XI)⇒ 本批新增两条(本纪律 + 回流的 One Source of Truth),位置在 XI(`:132-141`)之后、`## [SECTION_2_NAME]`(`:143`)之前;二者先后顺序由 `/speckit.plan` 定。本仓活动宪章 `.specify/memory/constitution.md` 现有 I–XIV ⇒ 对应新增原则为 **XV**。模板与活动宪章的编号不同属正常(模板是通用脚手架,活动宪章含本项目专有原则);守卫 MUST 按**原则名**匹配([[STR-003]] / [[STR-006]]),MUST NOT 钉死罗马数字字面量(FR-035)。
+- **版本递增**: 新增原则 = MINOR(`templates/commands/constitution.md:66`);本仓宪章现为 `1.11.0` ⇒ 递增后为 `1.12.0`,并前置 Sync Impact Report(`:142-148`)。
+- **下游 plan 门控自动传导成立但 MUST 验证**: `plan-template.md:37-42` 明写动态枚举、禁止硬编码原则名 ⇒ 逻辑上自动纳入。FR-026 要求实测验证而非假定,依据是既有教训"重构命令/引擎时 MUST 端到端执行其真实流水线——'文件存在/标题存在'式检查会漏掉只在运行时浮现的潜在缺陷"。
+- **US4 排 P2 的依据**: 反馈流程是本纪律**今天执行得最好**的一片(`feedback-step.md` 拥有规则 + 194 文件传播足迹),其边际工作是命名归属与一般化,而非从零修复;相较之下 US2(门控措辞)是**零规则、零守卫、且直接决定不可撤销动作**,失效风险高一个量级。此为基于实测证据的排序判断,若用户认为反馈流程应同等优先,调整只影响实现顺序、不影响 FR 集合。
+- **输入模态**: 本次为中文键入文本(非语音),glossary 校正协议已先行——用户输入中的 `jargon` / `context` / `feedback` / `constitution` / `shared/guidelines` 均为本仓既有 canonical 术语,无需校正;无同音/近形变体需提交确认。
+- **落地层级**: 真源文档 + 常驻章节 + 宪章模板 + 宪章命令 MUST-include 条目随 `templates/` 与 `shared/` 分发,框架自身与下游采纳项目**同一机制同时受益**(init 即得);按工具副本经既有再生脚本处理;本仓活动宪章与活动指令文件的落地属客户端实例侧,同批完成。
+- **术语提案(wrap-up 提交)**: 拟按 glossary 协议以 `origin=auto`、`status=proposed` 提交 "面向用户可理解性(User-Facing Comprehension)"、"许可行话 / 禁用行话"、"上下文下限 / 上下文上限"、"消费单元"、"面向用户界面类" 等新词条;需先做冲突检测——`可理解性规则` 已存在于 `interview-pattern.md`(非词汇表条目),`Comprehension` 一词在历史 spec 中作度量措辞使用,二者是否构成需用户确认的冲突由 wrap-up 的冲突检测判定。
