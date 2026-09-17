@@ -2,7 +2,7 @@
 
 Engine:   scripts/python/derive-utils.py
 Contract: .specify/specs/048-derive-command/contracts/derivation-model.md
-          (chain rules C1-C7, audit checks A1-A14, the closed warning set C-44,
+          (chain rules C1-C7, audit checks A1-A16, the closed warning set C-44,
           the shared normalization C-22, and the (rule, locator) dedup C-3)
 Concept:  shared/definitions/derivation-definitions.md
 
@@ -28,8 +28,11 @@ from tests.derive_fixtures import (
     AUDIT,
     CHAIN,
     CONFIDENCES,
+    CRITERIA,
+    DECISIONS,
     ENGINE_CHECKS,
     GRADES,
+    IDENTITY,
     MOVES_APPLIED,
     QUESTIONS,
     SEMANTIC_CHECKS_PENDING,
@@ -117,7 +120,7 @@ def test_envelope_top_level_keys_are_fixed(ws):
 
 def test_semantic_checks_are_never_inherited_as_green(ws):
     _, env = check(ws, build_artifact())
-    assert env["semanticChecksPending"] == list(SEMANTIC_CHECKS_PENDING) == ["A11", "A14"]
+    assert env["semanticChecksPending"] == list(SEMANTIC_CHECKS_PENDING) == ["A11", "A14", "A16"]
 
 
 def test_every_engine_check_passes_on_the_green_path(ws):
@@ -129,7 +132,8 @@ def test_every_engine_check_passes_on_the_green_path(ws):
 
 def test_semantic_audit_reflects_the_attestation(ws):
     _, env = check(ws, build_artifact())
-    assert env["payload"]["audit"]["semantic"] == {"A11": "attested", "A14": "attested"}
+    assert env["payload"]["audit"]["semantic"] == {"A11": "attested", "A14": "attested",
+                                                       "A16": "attested"}
 
 
 def test_grouping_key_sets_are_the_complete_enum(ws):
@@ -589,7 +593,7 @@ def test_missing_section_is_reported(ws):
 
 
 def test_audit_result_diverges(ws):
-    """A1-A10/A12/A13 are engine-derived; a disagreeing artifact row is a defect (C-20)."""
+    """A1-A10/A12/A13/A15 are engine-derived; a disagreeing artifact row is a defect (C-20)."""
     code, env = check(ws, build_artifact(
         audit=AUDIT.replace("| A5 | no banned justifications | engine | pass |",
                             "| A5 | no banned justifications | engine | fail |")))
@@ -731,3 +735,66 @@ def test_normalize_text_empty_is_none():
     assert ENGINE.normalize_text("...") is None
     assert ENGINE.normalize_text("") is None
     assert ENGINE.normalize_text(None) is None
+
+
+# --------------------------------------------------------------------------
+# A15 — the criterion / decision-point layer
+# --------------------------------------------------------------------------
+
+def test_criterion_layer_green_path(ws):
+    code, env = check(ws, build_artifact(identity=IDENTITY, criteria=CRITERIA,
+                                         decisions=DECISIONS))
+    assert code == 0, env.get("errors")
+    assert env["payload"]["criteria"]["total"] == 2
+    assert env["payload"]["decisionPoints"]["total"] == 1
+    assert env["payload"]["audit"]["engine"]["A15"] == "pass"
+
+
+def test_dp_ranking_without_criterion(ws):
+    broken = DECISIONS.replace("ranks first by C-001 and C-002", "ranks first on merit")
+    code, env = check(ws, build_artifact(identity=IDENTITY, criteria=CRITERIA,
+                                         decisions=broken))
+    assert code == 4
+    assert "dp-ranking-without-criterion" in codes(env)
+    assert env["payload"]["audit"]["engine"]["A15"] == "fail"
+
+
+def test_dp_selected_not_among_candidates(ws):
+    broken = DECISIONS.replace("- selected: Opaque token", "- selected: Versioned token")
+    code, env = check(ws, build_artifact(identity=IDENTITY, criteria=CRITERIA,
+                                         decisions=broken))
+    assert code == 4
+    assert "dp-selected-not-candidate" in codes(env)
+
+
+def test_agent_prior_criterion_requires_identity(ws):
+    code, env = check(ws, build_artifact(criteria=CRITERIA, decisions=DECISIONS))
+    assert code == 4
+    assert "agent-prior-without-identity" in codes(env)
+
+
+def test_criterion_source_provenance_needs_an_s_reference(ws):
+    broken = CRITERIA.replace("| source | S-002 |", "| source | (none) |")
+    code, env = check(ws, build_artifact(identity=IDENTITY, criteria=broken,
+                                         decisions=DECISIONS))
+    assert code == 4
+    assert "criterion-source-unresolved" in codes(env)
+
+
+def test_dp_alternates_exceed_two(ws):
+    broken = DECISIONS.replace(
+        "- alternates: Semantic slug — switch trigger C-001 (re-declaration required)",
+        "- alternates: Semantic slug — trigger C-001; Versioned token — trigger Q-1; "
+        "Random token — trigger C-002")
+    code, env = check(ws, build_artifact(identity=IDENTITY, criteria=CRITERIA,
+                                         decisions=broken))
+    assert code == 4
+    assert "dp-alternates-exceed-two" in codes(env)
+
+
+def test_dp_unresolved_reference(ws):
+    broken = DECISIONS.replace("switch trigger C-001", "switch trigger Q-9")
+    code, env = check(ws, build_artifact(identity=IDENTITY, criteria=CRITERIA,
+                                         decisions=broken))
+    assert code == 4
+    assert "dp-reference-unresolved" in codes(env)

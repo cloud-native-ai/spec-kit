@@ -4,8 +4,8 @@ Driving files:
   shared/definitions/derivation-definitions.md  (the concept authority under test)
   .specify/specs/048-derive-command/contracts/derivation-model.md  (C-16 drift guard)
 
-The anchor OWNS the Derivation concept (four record schemas, the provenance grade
-set, C1-C7, A1-A14, the closed banned-justification set, capability degradation).
+The anchor OWNS the Derivation concept (six record schemas, the provenance grade
+set, C1-C7, A1-A16, the closed banned-justification set, capability degradation).
 These tests pin: its existence and byte-identical `.specify/shared/` mirror, its
 ownership declaration, the presence of each owned schema/section, the no-leakage
 discipline (no blocking gates, no reserved one-source-of-truth headings, no URLs,
@@ -50,8 +50,9 @@ RESERVED_HEADINGS = (
     "消耗观察(Consumption Observation)",
 )
 
-#: The four record schemas the anchor owns.
-RECORD_SCHEMAS = ("Source Record", "Move Record", "Step Record", "Element Record")
+#: The six record schemas the anchor owns.
+RECORD_SCHEMAS = ("Source Record", "Move Record", "Criterion Record", "Step Record",
+                  "Decision Point Record", "Element Record")
 
 pytestmark = pytest.mark.contract
 

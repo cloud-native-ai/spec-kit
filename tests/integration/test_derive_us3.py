@@ -2,7 +2,7 @@
 integrity rules and assemble a traceable architecture (048 / Feature 049, P1).
 
 Driving contract: .specify/specs/048-derive-command/contracts/derivation-model.md
-                  (C1-C7, A1-A14, §9 capability degradation C-45..C-48)
+                  (C1-C7, A1-A16, §9 capability degradation C-45..C-48)
 Success criteria: SC-002 (errors[] classified by rule; the complete fixture exits 0)
                   and SC-005 (a run with no online capability anchors zero steps,
                   records every source as unverified, produces no architecture, and
@@ -62,12 +62,13 @@ def test_end_to_end_chain_and_architecture_validates_clean(ws):
 
 
 def test_semantic_checks_remain_pending_on_the_green_run(ws):
-    """A11/A14 can never be inherited as green, even when every engine check passes."""
+    """A11/A14/A16 can never be inherited as green, even when every engine check passes."""
     write_artifact(ws, build_artifact(), TOPIC)
     code, env = validate(ws, TOPIC)
     assert code == 0
-    assert env["semanticChecksPending"] == ["A11", "A14"], "must be non-empty"
-    assert env["payload"]["audit"]["semantic"] == {"A11": "attested", "A14": "attested"}
+    assert env["semanticChecksPending"] == ["A11", "A14", "A16"], "must be non-empty"
+    assert env["payload"]["audit"]["semantic"] == {"A11": "attested", "A14": "attested",
+                                                       "A16": "attested"}
 
 
 # --------------------------------------------------------------------------

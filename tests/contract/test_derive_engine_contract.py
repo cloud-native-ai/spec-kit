@@ -215,7 +215,7 @@ def test_semantic_checks_pending_is_constant_on_validate(tmp_path):
     write_artifact(tmp_path, build_artifact(), TOPIC)
     code, env = run(tmp_path, "--action", "validate", "--slug", TOPIC)
     assert code == 0, env
-    assert env["semanticChecksPending"] == ["A11", "A14"]
+    assert env["semanticChecksPending"] == ["A11", "A14", "A16"]
 
 
 # --------------------------------------------------------------------------

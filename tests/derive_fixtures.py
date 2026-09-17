@@ -75,9 +75,10 @@ GRADES = ("primary", "authoritative-secondary", "community", "unverified")
 ACCESS_VALUES = ("live", "dead", "paywalled", "unknown")
 ACCESS_BUCKETS = ("live", "wayback", "dead", "paywalled", "unknown")
 CONFIDENCES = ("derived", "provisional", "contested")
-SEMANTIC_CHECKS_PENDING = ("A11", "A14")
-ENGINE_CHECKS = ("A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A12", "A13")
-ALL_CHECKS = tuple("A%d" % n for n in range(1, 15))
+SEMANTIC_CHECKS_PENDING = ("A11", "A14", "A16")
+ENGINE_CHECKS = ("A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A12", "A13",
+                 "A15")
+ALL_CHECKS = tuple("A%d" % n for n in range(1, 17))
 
 #: The six closed warning codes (derivation-model.md C-44).
 WARNING_CODES = frozenset({
@@ -154,8 +155,35 @@ QUESTIONS = """### Q-1
 - discriminator: A primary source that derives identifier stability under a versioning scheme.
 """
 
-#: The 14-row self-audit table for a CLEAN run: A1-A10/A12/A13 transcribe the
-#: engine-derived value ``pass``; A11/A14 are agent-``attested`` with a
+#: The criterion/decision-point layer fixtures. IDENTITY signs the agent-prior
+#: criterion; CRITERIA mixes a source-grounded truth-claim (C-001) with a signed
+#: decision-claim (C-002); DECISIONS enumerates, filters (citing D-2/C-001),
+#: ranks (citing C-001/C-002), selects from the enumeration, and carries one
+#: alternate with a switch trigger.
+IDENTITY = """- agent: test-agent 1.0
+- model: test-model
+- run-id: test-run-001
+- run-at: 2026-09-05T00:00:00Z
+- topic: %s
+""" % TOPIC
+
+CRITERIA = """| id | statement | kind | provenance | owner | weight | defeater |
+|---|---|---|---|---|---|---|
+| C-001 | Identifiers must stay opaque to clients | constraint | source | S-002 | high | a primary source deriving controlled exposure of identifier shape |
+| C-002 | Prefer the candidate with the smaller operational surface | preference | agent-prior | Agent Identity test-run-001 | medium | re-declaration by the decision owner |
+"""
+
+DECISIONS = """### DP-1 Identifier scheme
+- question: Which identifier scheme occupies the opaque-identifier slot?
+- candidates: Opaque token [S-002]; Semantic slug [ungrounded]
+- filters: D-2 with C-001 prunes Semantic slug (clients would parse its shape)
+- ranking: Opaque token ranks first by C-001 and C-002
+- selected: Opaque token
+- alternates: Semantic slug — switch trigger C-001 (re-declaration required)
+"""
+
+#: The 16-row self-audit table for a CLEAN run: A1-A10/A12/A13/A15 transcribe
+#: the engine-derived value ``pass``; A11/A14/A16 are agent-``attested`` with a
 #: non-degenerate ``method`` sentence (never ``engine`` / ``n/a`` / empty).
 AUDIT = """| # | check | method | result |
 |---|---|---|---|
@@ -173,6 +201,8 @@ AUDIT = """| # | check | method | result |
 | A12 | step count against budget and termination condition declared | engine | pass |
 | A13 | every move reported as newly issued resolves to a library row | engine | pass |
 | A14 | artifact states method, not content summary | each move is recorded as an inference schema with named slots re-applicable outside this domain, and every step instantiates those slots rather than restating a source | attested |
+| A15 | criteria and decision points well-formed | engine | pass |
+| A16 | decision-claims signed, not laundered into truth-claims | every agent-prior criterion is owned by the Agent Identity block and phrased as a signed decision, and each DP ranking cites the criteria that genuinely support it | attested |
 """
 
 #: The two-move seed library. Slot letters are deliberate: the dedup tests
@@ -208,13 +238,21 @@ SLOT_VARIANT_FORM = (
 
 
 def build_artifact(**overrides: str) -> str:
-    """Render the well-formed artifact, replacing any section body by keyword."""
+    """Render the well-formed artifact, replacing any section body by keyword.
+
+    ``identity`` / ``criteria`` / ``decisions`` default to empty, which omits
+    the optional criterion-layer sections entirely — the backward-compatibility
+    path where A15 passes vacuously.
+    """
     parts = {
+        "identity": "",
         "sources": SOURCES,
         "unverifiable": UNVERIFIABLE,
         "moves": MOVES_APPLIED,
+        "criteria": "",
         "chain": CHAIN,
         "termination": TERMINATION,
+        "decisions": "",
         "arch": ARCH,
         "questions": QUESTIONS,
         "audit": AUDIT,
@@ -223,15 +261,29 @@ def build_artifact(**overrides: str) -> str:
     if unknown:
         raise AssertionError("unknown artifact section(s): %s" % sorted(unknown))
     parts.update(overrides)
+
+    def opt(heading: str, body: str) -> str:
+        return "%s\n\n%s\n\n" % (heading, body.strip("\n")) if body.strip() else ""
+
     return (
         "# Derivation: %s\n\n"
         "Concept authority: `shared/definitions/derivation-definitions.md`.\n\n"
+        "%s"
         "## Sources\n\n%s\n\n## Unverifiable Sources\n\n%s\n\n"
-        "## Reasoning Moves Applied\n\n%s\n\n## Derivation Chain\n\n%s\n\n"
-        "## Termination\n\n%s\n\n## Derived Architecture\n\n%s\n\n"
+        "## Reasoning Moves Applied\n\n%s\n\n"
+        "%s"
+        "## Derivation Chain\n\n%s\n\n"
+        "## Termination\n\n%s\n\n"
+        "%s"
+        "## Derived Architecture\n\n%s\n\n"
         "## Open Questions\n\n%s\n\n## Self-Audit\n\n%s\n"
-        % (TOPIC, parts["sources"], parts["unverifiable"], parts["moves"], parts["chain"],
-           parts["termination"], parts["arch"], parts["questions"], parts["audit"])
+        % (TOPIC,
+           opt("## Agent Identity", parts["identity"]),
+           parts["sources"], parts["unverifiable"], parts["moves"],
+           opt("## Criteria", parts["criteria"]),
+           parts["chain"], parts["termination"],
+           opt("## Decision Points", parts["decisions"]),
+           parts["arch"], parts["questions"], parts["audit"])
     )
 
 

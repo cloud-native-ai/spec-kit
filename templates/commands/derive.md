@@ -30,7 +30,7 @@ Consult the project glossary (`.specify/memory/glossary.md`) and apply the proto
 
 ## Outline
 
-本命令是推导能力的执行入口。**概念真源** = `shared/definitions/derivation-definitions.md` — 四套记录 schema(Source / Reasoning Move / Derivation Step / Architecture Element)、四级溯源等级、链完整性规则 C1–C7、自审集 A1–A14、封闭禁用论证字面量集、能力降级规则均在该文件定义。本模板**引用而不复述**其规则;二者不一致时以概念真源为准。引擎 = `.specify/scripts/python/derive-utils.py`(动作与退出码以其 `--help` 为准)。
+本命令是推导能力的执行入口。**概念真源** = `shared/definitions/derivation-definitions.md` — 六套记录 schema(Source / Reasoning Move / Criterion / Derivation Step / Decision Point / Architecture Element)、四级溯源等级、链完整性规则 C1–C7、自审集 A1–A16、封闭禁用论证字面量集、能力降级规则均在该文件定义。本模板**引用而不复述**其规则;二者不一致时以概念真源为准。引擎 = `.specify/scripts/python/derive-utils.py`(动作与退出码以其 `--help` 为准)。
 
 方法的核心区别:读来源不是为了知道它**主张什么**,而是为了知道它**怎么从前提走到结论**。产物是一条可被独立读者重放核查的推导链,以及每个元素都回指链上某一步的架构。
 
@@ -50,6 +50,8 @@ python3 .specify/scripts/python/derive-utils.py --action init --slug <topic-slug
 ```
 
 档案已存在时引擎拒绝覆盖 —— 就地增补既有档案,仅在用户明确要求重新脚手架时才加 `--force`。
+
+脚手架后立即填写档案的 `## Agent Identity` 块(agent 类型与版本、模型名/版本——宿主未暴露时如实写 `unavailable`、run-id、UTC 时间戳、topic)。该块是本次运行所有 `agent-prior` 准则的**署名锚点**:决策断言因被记录且有署名而有效,不因缺乏外部证据而无效。
 
 随后读取**算子库投影**(摘要优先:消费投影而非整读库文件;阈值定义见 `shared/guidelines/token-efficiency.md`):
 
@@ -108,9 +110,18 @@ python3 .specify/scripts/python/derive-utils.py --action moves-add --file <moves
 
 在 `## Termination` 写明 `- condition: a|b` 与 `- steps: <n> / <budget>`。
 
+### Stage 5.5 — Record Criteria & Decision Points
+
+链推导出**结构**(架构必须包含什么、为什么);产品级**选型**(哪个图存储、哪个向量引擎、哪个模型族)由决策点记录,不埋在散文里。这一步实现「枚举 → 过滤 → 排序 → 选中」的可审计版本:
+
+1. **采集准则** `## Criteria`(每行一条,单元格单行):从 handed-in 约束、项目宪法、以及 agent 自身先验中采集排序根据。`kind` = `constraint`(硬过滤,违反即淘汰)| `preference`(排序权重,违反扣分不淘汰);`provenance` = `source`(**真值断言**——owner 列必须引用已核实的 `S-<nnn>`)| `declared`(利益方声明——owner 写明声明者)| `agent-prior`(**决策断言**——owner 写 `Agent Identity <run-id>`,即本次运行的 agent+LLM 署名)。每条准则 MUST 给出 `defeater`(什么观察或重新声明能推翻它)。
+2. **建决策点** `## Decision Points`(每个 `### DP-<k>` 块字段单行):`question` / `candidates`(每个候选挂 `[S-<nnn>]` 或标 `[ungrounded]`,`;` 分隔)/ `filters`(引用 D-k / C-nnn 说明剪掉了谁、凭什么)/ `ranking`(**每条排序判断引用 ≥1 个 C-nnn** —— 无准则引用的排序是穿着真值断言外衣的偏好,A15 拒绝)/ `selected`(MUST 出自 candidates)/ `alternates`(**≤2 个**,即 top-1..3 输出契约,每个附切换触发器引用 Q-k 或 C-nnn)。
+
+类别纪律(A16 背书项):**真值断言挂来源,决策断言挂署名**。`agent-prior` 准则不得措辞成经验事实(那是 C3 禁用字面量的变体);`source` 准则不得被拉伸到来源文本之外。被记录且署名的偏好选择是**终局的决策**,不因"缺外部证据"降为 provisional——它由重新声明修订,不由引用修订;只有结构层未被来源支撑的部分才走 D 步 `provisional` + Open Question 通道。
+
 ### Stage 6 — Compose the Derived Architecture
 
-每个 `### A-<k> <name>` 块:`statement` / `derived-from`(**强制、≥1、全部可解析**)/ `confidence`(按其步骤的**最小值**继承)/ `open-questions`。
+每个 `### A-<k> <name>` 块:`statement` / `derived-from`(**强制、≥1、全部可解析**)/ `confidence`(按其步骤的**最小值**继承)/ `open-questions`。内嵌产品级选型的元素 MAY 加 `decisions: DP-<k>` 引用决策点而不复述其内容。
 
 缺 `derived-from` 是硬失败,引擎拒绝整个文件 —— 不可溯源的元素是穿着架构外衣的偏好。未定点进 `## Open Questions`(`question` / `why-undetermined` / `would-resolve` / `discriminator`),`Q ↔ A` 链接双向可解析,被阻塞的元素降级为 `provisional` 或 `contested`。**绝不用听起来合理的猜测填空** —— 那正是本命令存在的理由所要防的失败模式。
 
@@ -120,12 +131,13 @@ python3 .specify/scripts/python/derive-utils.py --action moves-add --file <moves
 python3 .specify/scripts/python/derive-utils.py --action validate --slug <topic-slug> --workspace-root . --format json
 ```
 
-引擎程序化判定 A1–A10 与 A12/A13,并把结果写入产物的 `## Self-Audit` 表。输出中的 `semanticChecksPending` 列出**必须由 agent 显式背书**的两项:
+引擎程序化判定 A1–A10 与 A12/A13/A15,并把结果写入产物的 `## Self-Audit` 表。输出中的 `semanticChecksPending` 列出**必须由 agent 显式背书**的三项:
 
 - **A11** — 本次运行确实联网核实了(每个来源至少一次检索或抓取,且记入 `verification`)。
 - **A14** — 产物陈述的是来源的**思维方式**,不是其内容摘要。这是本命令存在的理由;一份 A14 不成立的产物即使结构全绿也没有价值。
+- **A16** — 决策断言已署名、未被洗成真值断言:`agent-prior` 准则不以经验事实口吻措辞,`source` 准则未超出来源文本,每条 DP 排序确实被其引用的准则支撑。
 
-`validate` **零写入**:A1–A10 与 A12/A13 这 12 行的 `result` 由引擎**派生**,产物里的值 MUST 与 `payload.audit.engine` 逐字相等(不等即 `audit-result-diverges`),但引擎不会替你写。故自审是**两趟**:第一趟取 `payload.audit.engine` 与 `payload.audit.semantic` 的派生值 → 由 agent 誊写进产物的 `## Self-Audit` 表(A11/A14 的 `result` 取 `attested` / `not-attested` / `pending`,其 `method` 列 MUST 是一句可核查的话,不能写 `engine` 或 `n/a`)→ 第二趟重跑 `validate` 收敛到零 error。「誊写引擎给出的值」与「自己判一个值填进去」是两件事:前者是记录,后者是 C-20 禁止的手写。
+`validate` **零写入**:A1–A10 与 A12/A13/A15 这 13 行的 `result` 由引擎**派生**,产物里的值 MUST 与 `payload.audit.engine` 逐字相等(不等即 `audit-result-diverges`),但引擎不会替你写。故自审是**两趟**:第一趟取 `payload.audit.engine` 与 `payload.audit.semantic` 的派生值 → 由 agent 誊写进产物的 `## Self-Audit` 表(A11/A14/A16 的 `result` 取 `attested` / `not-attested` / `pending`,其 `method` 列 MUST 是一句可核查的话,不能写 `engine` 或 `n/a`)→ 第二趟重跑 `validate` 收敛到零 error。「誊写引擎给出的值」与「自己判一个值填进去」是两件事:前者是记录,后者是 C-20 禁止的手写。
 
 退出码 4 表示存在结构性违规。**任一引擎检查为红的运行 MUST 如实报告失败与定位,MUST NOT 把 `## Derived Architecture` 当作已推导结果呈现。**
 
@@ -139,7 +151,7 @@ python3 .specify/scripts/python/derive-utils.py --action stats --slug <topic-slu
 
 产物均为可逆写入(新档案文件 + 算子库追加),故全程自动执行,收尾出具三要素执行报告(判据见 `shared/guidelines/confirmation-gates.md`):
 
-1. **执行内容** — 主题、来源数与分级分布、复用/新增算子数、链步数与终止条件、架构元素数、未决问题数、自审结果(含 A11/A14 背书)。
+1. **执行内容** — 主题、来源数与分级分布、复用/新增算子数、链步数与终止条件、准则数与决策点数(含署名 agent 标识)、架构元素数、未决问题数、自审结果(含 A11/A14/A16 背书)。
 2. **变更工件** — 逐项可定位:`.specify/derive/<topic-slug>/derive.md`、`.specify/derive/moves.md`(新增/增锚的 `M-<nnn>`)。
 3. **修改途径** — 两者均 git 跟踪,可经 git 历史回退;算子库为累积存储,`superseded` 行保留不删。
 
@@ -153,8 +165,9 @@ python3 .specify/scripts/python/derive-utils.py --action stats --slug <topic-slu
 
 - **联网核实是硬要求,不是优化项**:没有线上核实的来源一律 `unverified`,一律不得锚定推导步骤。
 - **等级判断归 agent,证据归引擎**:引擎供给 HTTP 状态、快照地址、归属检索命中;等级、算子抽取、判别性问题命名、终止条件 (a)/(b) 是语义判断。
+- **真值断言挂来源,决策断言挂署名**:排序与选型可以基于 agent 先验,但 MUST 以 `agent-prior` 准则记录并署名到 `## Agent Identity`;无署名的偏好诉诸(「业界通用」类字面量)仍被 C3 禁止——修复路径是转换成准则或挂来源,不是删除判断。
 - **算子库只经 `moves-add` 写入**:手工编辑会被 `validate` 检出(行形、ID 单调性、重复 ID、槽位同构重复),不静默接受。
-- **引用不复述**:schema、等级集、C1–C7、A1–A14、禁用字面量集一律以 `shared/definitions/derivation-definitions.md` 为准。
+- **引用不复述**:schema、等级集、C1–C7、A1–A16、禁用字面量集一律以 `shared/definitions/derivation-definitions.md` 为准。
 - **不触碰用户源码**:本命令只写 `.specify/derive/` 下的档案与算子库。
 - **产物不预判领域**:分发文件中的示例一律槽位化合成,handed-in 语料只作为本次运行的输入,不写入框架文件。
 

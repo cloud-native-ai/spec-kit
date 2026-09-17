@@ -90,9 +90,10 @@ CONFIDENCES = ("derived", "provisional", "contested")
 CONFIDENCE_RANK = {"derived": 2, "provisional": 1, "contested": 0}
 ATTESTATION_RESULTS = ("attested", "not-attested", "pending")
 TERMINATION_CONDITIONS = ("a", "b")
-SEMANTIC_CHECKS_PENDING = ("A11", "A14")
-ENGINE_CHECKS = ("A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A12", "A13")
-ALL_CHECKS = tuple("A%d" % n for n in range(1, 15))
+SEMANTIC_CHECKS_PENDING = ("A11", "A14", "A16")
+ENGINE_CHECKS = ("A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A12", "A13",
+                 "A15")
+ALL_CHECKS = tuple("A%d" % n for n in range(1, 17))
 
 NO_ONLINE_CAPABILITY = "no-online-capability"
 
@@ -146,6 +147,13 @@ AUDIT_CODE_MAP = {
             "contested-not-routed"},
     "A12": {"termination-condition-absent", "step-budget-diverges", "step-budget-exceeded"},
     "A13": {"moves-library-hand-edited", "newly-issued-move-unresolved"},
+    "A15": {"criterion-id-malformed", "criterion-duplicate-id", "criterion-kind-invalid",
+            "criterion-provenance-invalid", "criterion-statement-empty",
+            "criterion-source-unresolved", "agent-prior-without-owner",
+            "agent-prior-without-identity", "dp-field-missing",
+            "dp-selected-not-candidate", "dp-ranking-without-criterion",
+            "dp-alternates-exceed-two", "dp-alternate-without-trigger",
+            "dp-reference-unresolved"},
 }
 
 SEC_SOURCES = "## Sources"
@@ -158,6 +166,24 @@ SEC_QUESTIONS = "## Open Questions"
 SEC_AUDIT = "## Self-Audit"
 ARTIFACT_SECTIONS = (SEC_SOURCES, SEC_UNVERIFIABLE, SEC_MOVES_APPLIED, SEC_CHAIN,
                      SEC_TERMINATION, SEC_ARCHITECTURE, SEC_QUESTIONS, SEC_AUDIT)
+
+#: Optional sections (criteria/decision-point layer). Deliberately NOT in
+#: ARTIFACT_SECTIONS: an archive predating the criterion layer must still
+#: validate — a missing section parses to zero rows and A15 passes vacuously.
+SEC_IDENTITY = "## Agent Identity"
+SEC_CRITERIA = "## Criteria"
+SEC_DECISIONS = "## Decision Points"
+
+#: Criterion record — the ranking grounds a Decision Point may cite.
+#: provenance `source` = truth-claim grounded in an S-row; `declared` =
+#: stakeholder-stated criterion; `agent-prior` = signed decision-claim owned
+#: by the run's Agent Identity (revisable by re-declaration, never a
+#: truth-claim — the category distinction the banned-justification set guards).
+CRITERION_COLUMNS = ("id", "statement", "kind", "provenance", "owner", "weight", "defeater")
+CRITERION_KINDS = ("constraint", "preference")
+CRITERION_PROVENANCES = ("source", "declared", "agent-prior")
+CRITERION_ID_RE = re.compile(r"^C-\d{3,}$")
+DP_MAX_ALTERNATES = 2
 
 SOURCE_COLUMNS = ("id", "claimed_title", "resolved_title", "title_mismatch",
                   "grade", "url", "access", "resolved_via", "verification")
@@ -828,8 +854,20 @@ def archive_skeleton(slug: str, budget: int) -> str:
     template = """# Derivation: @@SLUG@@
 
 Concept authority: `shared/definitions/derivation-definitions.md` — the record schemas,
-provenance grades, chain rules C1-C7 and audit checks A1-A14 are defined there and
+provenance grades, chain rules C1-C7 and audit checks A1-A16 are defined there and
 referenced here, never restated.
+
+## Agent Identity
+
+_The signature behind every `agent-prior` criterion and decision in this run. Recorded
+once; a decision-claim is valid because it is signed and revisable, not because it is
+evidentially compelled._
+
+- agent: <host agent type and version>
+- model: <model name/version as exposed by the host, or "unavailable">
+- run-id: <stable run identifier>
+- run-at: <UTC timestamp>
+- topic: @@SLUG@@
 
 ## Sources
 
@@ -845,6 +883,18 @@ _Cite `M-<nnn>` identities from `.specify/derive/moves.md`. A bare identity refe
 always legal. To restate a row, place `<!-- projection of moves.md#M-nnn -->` on the line
 immediately above it; an unmarked or divergent restatement is rejected (A9)._
 
+## Criteria
+
+_Ranking grounds for Decision Points, one row per criterion (single-line cells).
+`kind`: `constraint` (hard filter) | `preference` (ranking weight). `provenance`:
+`source` (truth-claim — `owner` cites the S-row that grounds it) | `declared`
+(stakeholder-stated — `owner` names who declared it) | `agent-prior` (signed
+decision-claim — `owner` is the Agent Identity above; revisable by re-declaration,
+never laundered into a truth-claim). `weight`: high/medium/low or a number.
+`defeater`: what observation or re-declaration would overturn it._
+
+@@CRITERIA@@
+
 ## Derivation Chain
 
 _One `### D-<k>` block per step: `premises` / `leads` / `move` / `derivation` /
@@ -855,10 +905,20 @@ _One `### D-<k>` block per step: `premises` / `leads` / `move` / `derivation` /
 - condition: a
 - steps: 0 / @@BUDGET@@
 
+## Decision Points
+
+_One `### DP-<k> <name>` block per selection: `question` / `candidates` (each annotated
+`[S-nnn]` when grounded or `[ungrounded]`, separated by `;`) / `filters` (cite the D-k
+and C-nnn that prune) / `ranking` (every ordering judgment cites >=1 C-nnn — an
+uncited ranking is a preference wearing a truth-claim's clothes) / `selected` /
+`alternates` (<=2, each with a switch trigger citing Q-k or C-nnn). Every field on a
+single line._
+
 ## Derived Architecture
 
 _One `### A-<k> <name>` block per element: `statement` / `derived-from` / `confidence` /
-`open-questions`. `derived-from` is mandatory and must fully resolve._
+`open-questions`. `derived-from` is mandatory and must fully resolve. An element that
+embeds a selection MAY cite `decisions: DP-<k>` instead of restating it._
 
 ## Open Questions
 
@@ -872,6 +932,7 @@ _One `### Q-<k>` block per gap: `question` / `why-undetermined` / `would-resolve
     return (template
             .replace("@@SLUG@@", slug)
             .replace("@@SOURCES@@", render_table(SOURCE_COLUMNS, []))
+            .replace("@@CRITERIA@@", render_table(CRITERION_COLUMNS, []))
             .replace("@@BUDGET@@", str(budget))
             .replace("@@AUDIT@@", audit_skeleton()))
 
@@ -929,6 +990,119 @@ def longest_banned_hit(haystack: str):
     folded = (haystack or "").casefold()
     hits = [lit for lit in BANNED_JUSTIFICATIONS if lit.casefold() in folded]
     return max(hits, key=len) if hits else None
+
+
+def validate_criteria_and_dps(rep, text, sources, steps, elements, questions):
+    """A15 — the criterion / decision-point layer's mechanical half.
+
+    Criteria are the grounds a Decision Point's ranking may cite; Decision Points
+    are the enumerate -> filter -> rank -> select record the artifact owes for
+    every product-level selection. The semantic half (rankings genuinely supported
+    by their grounds; agent priors recorded as signed decision-claims, never as
+    truth-claims) is A16 and is attested, not computed. Missing sections parse to
+    zero rows, so archives predating this layer still validate.
+    """
+    criteria = parse_table(section(text, SEC_CRITERIA), CRITERION_COLUMNS)
+    identity = section(text, SEC_IDENTITY).strip()
+    source_ids = {(r.get("id") or "").strip() for r in sources}
+    crit_ids = set()
+    for row in criteria:
+        cid = (row.get("id") or "").strip()
+        if not CRITERION_ID_RE.match(cid):
+            rep.error("A15", "criterion-id-malformed", cid or "(row without id)",
+                      "criterion id %r must match C-<nnn>" % cid)
+            continue
+        if cid in crit_ids:
+            rep.error("A15", "criterion-duplicate-id", cid, "criterion ids must be unique")
+        crit_ids.add(cid)
+        statement = (row.get("statement") or "").strip()
+        if not statement or normalize_text(statement) in BARE_ATTESTATIONS:
+            rep.error("A15", "criterion-statement-empty", cid,
+                      "a criterion needs a substantive statement — an empty ground "
+                      "cannot carry a ranking")
+        kind = (row.get("kind") or "").strip()
+        if kind not in CRITERION_KINDS:
+            rep.error("A15", "criterion-kind-invalid", "%s.kind" % cid,
+                      "kind %r is not one of %s" % (kind, "/".join(CRITERION_KINDS)))
+        prov = (row.get("provenance") or "").strip()
+        owner = (row.get("owner") or "").strip()
+        if prov not in CRITERION_PROVENANCES:
+            rep.error("A15", "criterion-provenance-invalid", "%s.provenance" % cid,
+                      "provenance %r is not one of %s" % (prov, "/".join(CRITERION_PROVENANCES)))
+        elif prov == "source":
+            refs = re.findall(r"\bS-\d{3,}\b", owner)
+            if not refs:
+                rep.error("A15", "criterion-source-unresolved", "%s.owner" % cid,
+                          "a source-grounded criterion is a truth-claim: owner must cite "
+                          "the S-<nnn> row that grounds it")
+            for ref in refs:
+                if ref not in source_ids:
+                    rep.error("A15", "criterion-source-unresolved",
+                              "%s.owner:%s" % (cid, ref),
+                              "%s has no row in %s" % (ref, SEC_SOURCES))
+        elif prov == "agent-prior":
+            if not owner or normalize_text(owner) in BARE_ATTESTATIONS:
+                rep.error("A15", "agent-prior-without-owner", cid,
+                          "an agent-prior criterion is a signed decision-claim: owner must "
+                          "name the Agent Identity block (e.g. 'Agent Identity <run-id>')")
+            if not identity:
+                rep.error("A15", "agent-prior-without-identity", cid,
+                          "agent-prior criterion %s exists but %s is empty — a signature "
+                          "without a signer" % (cid, SEC_IDENTITY))
+    dps = parse_blocks(section(text, SEC_DECISIONS), "DP")
+    registries = {
+        "S": source_ids,
+        "D": {s["_id"] for s in steps},
+        "A": {e["_id"] for e in elements},
+        "Q": {q["_id"] for q in questions},
+        "C": crit_ids,
+    }
+    for dp in dps:
+        dpid = dp["_id"]
+        for field in ("question", "candidates", "ranking", "selected"):
+            value = (dp.get(field) or "").strip()
+            if not value or normalize_text(value) in BARE_ATTESTATIONS:
+                rep.error("A15", "dp-field-missing", "%s.%s" % (dpid, field),
+                          "a decision point needs %s — a selection without the enumerated "
+                          "grounds is an unrecorded preference" % field)
+        candidates_raw = (dp.get("candidates") or "")
+        selected = (dp.get("selected") or "").strip()
+        if selected and candidates_raw:
+            names = [re.sub(r"\[[^\]]*\]", "", c).strip()
+                     for c in re.split(r";\s*", candidates_raw)]
+            names = [normalize_text(n) for n in names if n.strip()]
+            sel = normalize_text(selected)
+            if not any(sel == n or (n and (sel in n or n in sel)) for n in names):
+                rep.error("A15", "dp-selected-not-candidate", "%s.selected" % dpid,
+                          "selected %r was not among the enumerated candidates — a "
+                          "selection must come out of the enumeration, not bypass it"
+                          % selected)
+        ranking = (dp.get("ranking") or "")
+        if ranking and not re.search(r"\bC-\d{3,}\b", ranking):
+            rep.error("A15", "dp-ranking-without-criterion", "%s.ranking" % dpid,
+                      "every ordering judgment must cite at least one criterion C-<nnn> — "
+                      "an uncited ranking is a preference wearing a truth-claim's clothes")
+        alternates_raw = (dp.get("alternates") or "").strip()
+        if alternates_raw and normalize_text(alternates_raw) not in BARE_ATTESTATIONS:
+            alts = [a.strip() for a in re.split(r";\s*", alternates_raw) if a.strip()]
+            if len(alts) > DP_MAX_ALTERNATES:
+                rep.error("A15", "dp-alternates-exceed-two", "%s.alternates" % dpid,
+                          "at most %d alternates beside the selection (top-1..3 output "
+                          "rule); found %d" % (DP_MAX_ALTERNATES, len(alts)))
+            if not re.search(r"\b[QC]-\d+\b", alternates_raw):
+                rep.error("A15", "dp-alternate-without-trigger", "%s.alternates" % dpid,
+                          "an alternate needs a switch trigger citing a Q-<k> or C-<nnn> — "
+                          "an alternate without a trigger is dead weight")
+        for field, value in dp.items():
+            if field.startswith("_") or not value:
+                continue
+            for prefix, num in re.findall(r"\b([SDAQC])-(\d+)\b", value):
+                ref = "%s-%s" % (prefix, num)
+                if ref not in registries.get(prefix, set()):
+                    rep.error("A15", "dp-reference-unresolved",
+                              "%s.%s:%s" % (dpid, field, ref),
+                              "%s does not resolve to any recorded row" % ref)
+    return len(criteria), len(dps)
 
 
 def validate_artifact(root: Path, path: Path, budget: int):
@@ -1350,6 +1524,10 @@ def validate_artifact(root: Path, path: Path, budget: int):
             rep.error("A10", "blocked-element-not-downgraded", "%s.confidence" % aid,
                       "an element blocked by an open question must be provisional or contested")
 
+    # ---- A15: criteria & decision points --------------------------------
+    criteria_total, dp_total = validate_criteria_and_dps(
+        rep, text, sources, steps, elements, questions)
+
     # ---- A2: unverified sources must be recorded, never dropped ----------
     unverifiable = section(text, SEC_UNVERIFIABLE)
     for row in sources:
@@ -1387,7 +1565,7 @@ def validate_artifact(root: Path, path: Path, budget: int):
     ids = [(r.get("#") or "").strip() for r in audit_rows]
     if sorted(ids) != sorted(ALL_CHECKS):
         rep.error("A0", "audit-table-shape", SEC_AUDIT,
-                  "the audit table must carry exactly A1..A14 (found %d rows)" % len(ids))
+                  "the audit table must carry exactly A1..A16 (found %d rows)" % len(ids))
     derived_audit = rep.audit_engine()
     semantic_audit = {}
     for row in audit_rows:
@@ -1397,7 +1575,7 @@ def validate_artifact(root: Path, path: Path, budget: int):
         if check in SEMANTIC_CHECKS_PENDING:
             if result not in ATTESTATION_RESULTS:
                 rep.error("A0", "audit-result-diverges", "%s.%s" % (SEC_AUDIT, check),
-                          "A11/A14 result must be one of %s (agent attestation, never "
+                          "A11/A14/A16 result must be one of %s (agent attestation, never "
                           "inherited as pass); found %r" % ("/".join(ATTESTATION_RESULTS), result))
             semantic_audit[check] = result or "pending"
             if normalize_text(method) in (None, "engine", "n/a"):
@@ -1454,6 +1632,8 @@ def validate_artifact(root: Path, path: Path, budget: int):
             "byConfidence": tally(elements, "confidence", CONFIDENCES),
             "untraceable": sum(1 for e in elements if not parse_id_list(e.get("derived-from", ""))),
         },
+        "criteria": {"total": criteria_total},
+        "decisionPoints": {"total": dp_total},
         "openQuestions": {
             "total": len(questions),
             "brokenLinks": sorted({e["locator"] for e in rep.errors
