@@ -1,7 +1,7 @@
 ---
 name: 绘图双层结构重构团队
 slug: draw-two-layer-structure
-description: 以 serial 三阶段链（重构 → 净室自测 → 评价采集）推进 skills/draw-diagram 语义前门与 skills/draw-{d3js,echarts,excalidraw,mermaid,plantuml} 语法引擎的两层自治结构；每次交接有独立验证门
+description: 以 serial 三阶段链（重构 → 净室自测 → 评价采集）推进 skills/draw-diagram 语义前门与 skills/draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml} 语法引擎的两层自治结构；每次交接有独立验证门
 goal: >
   承接已定义 Goal `draw-two-layer-structure`（权威定义：.specify/goal/draw-two-layer-structure/goal.md）。
   本字段仅为可读性渲染，与定义不一致时以定义为准。终态：调用 draw-diagram 不必告知「画什么」（它据上下文
@@ -12,6 +12,7 @@ territory:
   write:
     - skills/draw-diagram/**
     - skills/draw-d3js/**
+    - skills/draw-drawio/**
     - skills/draw-echarts/**
     - skills/draw-excalidraw/**
     - skills/draw-mermaid/**
@@ -36,7 +37,7 @@ territory:
     - .specify/memory/feedback/probe-map.md     # 派生物：由 feedback-utils.py --action map 重建，禁手编
     - templates/**                              # 框架模板中立性
   non_path:
-    - { type: skill-invocation, target: 六个绘图技能的净室调用（draw-diagram 前门 + 五引擎） }
+    - { type: skill-invocation, target: 七个绘图技能的净室调用（draw-diagram 前门 + 六引擎） }
     - { type: framework-convention, target: feedback-step.md 的 never-solicit 条款保持不动；用户评价另立 evaluation form 承载面 }
 pattern: serial
 created: 2026-09-16
@@ -53,21 +54,21 @@ members:
     stage: executor
     type: Worker
     lifecycle: temporary
-    responsibility: S1 重构——产出文件层面的打碎重组方案与补丁集到工作区（语义层归位 draw-diagram、清理引擎侧语义残留与独立语义规划回退、收敛 frontmatter 路由级触发词、为 evaluation form 落承载面）；不直接写 canonical 技能目录
+    responsibility: S1 重构——产出文件层面的打碎重组方案与补丁集到工作区（语义层归位 draw-diagram、清理引擎侧语义残留与独立语义规划回退、收敛 frontmatter 路由级触发词、为 evaluation form 落承载面）；并承接 draw-drawio 的**新建**（经 create-skills，出生即合规于语法层）与七引擎**能力轴路由判据**的落稿；不直接写 canonical 技能目录
     blockedBy: []
   - agent: skill-verifier
     role: cleanroom-verifier
     stage: evaluator
     type: Worker
     lifecycle: temporary
-    responsibility: S2 净室自测——干净 context + subagent 调用技能绘制，判产物是否符合预期（前门未被告知「画什么」是否仍能自行分析语义；引擎未被告知布局/线段/渲染是否仍能兑现）；写验证报告，与 S1 不同席、不同会话
+    responsibility: S2 净室自测——干净 context + subagent 调用技能绘制，判产物是否符合预期（前门未被告知「画什么」是否仍能自行分析语义；引擎未被告知布局/线段/渲染是否仍能兑现）；并按四条能力轴出**判别性用例**（动态图表诉求、本地渲染自由图表诉求、远端渲染强语义诉求各至少一例，验前门是否选对引擎）；写验证报告，与 S1 不同席、不同会话
     blockedBy: [structure-refactorer]
   - agent: agent-stage-executor-template
     role: evaluation-intake
     stage: executor
     type: Worker
     lifecycle: temporary
-    responsibility: S3 评价采集——核验六个技能交付后都主动征询用户评价；按「无评价 = 本次满意」口径入账，有评价则经 feedback probe 送入 .specify/memory/feedback 处置流程并回写处置结论
+    responsibility: S3 评价采集——核验七个技能交付后都主动征询用户评价；按「无评价 = 本次满意」口径入账，有评价则经 feedback probe 送入 .specify/memory/feedback 处置流程并回写处置结论
     blockedBy: [cleanroom-verifier]
 config:
   handoff_protocol: file-path-only
@@ -77,6 +78,7 @@ config:
   co_targets:
     - skills/draw-diagram
     - skills/draw-d3js
+    - skills/draw-drawio
     - skills/draw-echarts
     - skills/draw-excalidraw
     - skills/draw-mermaid
@@ -86,6 +88,14 @@ config:
     语法层（draw-*）只承载语法绘图知识——布局、线段、脚本、渲染等底层实现方法。
     用户评价以 evaluation form 承载，复用 feedback 链路但不等同于 feedback；
     标准 feedback（agent 自省、守 feedback-step.md 红线）与 evaluation form 在同一技能内分立为两物。
+  capability_axes: >
+    引擎选择除既有的「图种独占 / artifact_intent tie-break」外，还须沿四条能力轴判别：
+    ① 动态图表能力（可交互/可随数据刷新）；② 渲染位置（本地渲染 vs 远端渲染）；
+    ③ 版面自由度（可绘自由图表 vs 文本语法生图、版面受语法约束）；
+    ④ 语义强度与绘图约束的正相关（语义越强、约束越强）。
+    **本字段只登记「存在这四条轴」这一分层事实；每条轴上各引擎的取值、判据与红线由
+    `skills/draw-diagram/references/routing-matrix.md` 独占承载（One Source Of Truth，
+    team.md MUST NOT 复写其表格或取值）。** 轴与既有独占登记是正交维度，不是替代关系。
   summary:
     enabled: true
     every: 1                           # bounded pattern 默认每阶段边界刷新一次
@@ -183,22 +193,46 @@ config:
       "quality_gate": "Class 五要素齐全；六个 Object 齐备（含补上缺失的两个）；嵌入文本与 canonical `## Feedback` 段分立不混称；未提议改 feedback-step.md；判定口径「无评价=满意、有评价经 probe 入 .specify/memory/feedback」在文本中可执行"
     },
     {
+      "stage_id": "S1f-drawio-bootstrap",
+      "agent_kind": "structure-refactorer",
+      "task": "**新建 draw-drawio 技能**（今日 `skills/draw-drawio/` 不存在；仓内既有 drawio 提及仅为 plantuml 文档的旁述与 node_modules 噪声，无可复用素材）。与前五个引擎不同：新技能**没有待归属的存量文件**，故本 stage 不是 attribution 形，而是 **born-conforming 创建形**——出生即合规于语法层，不做事后搬迁。产出完整技能包草稿到工作区，**以 `create-skills` 的模板与约定为权威形态**（Worker MUST NOT 直接写 `skills/`；由 Meta 落地时经 `create-skills` 生成 canonical 骨架）。语法层内容（用户提供的一手参考已核实为引擎实现知识，全部归本技能）：① 产物格式 `mxGraph XML` / `.drawio`，生成用**未压缩 XML**（`<diagram>` 内 Base64 是压缩态，生成器无需处理）；② 必备结构 `mxCell id=\"0\"` 与 `mxCell id=\"1\" parent=\"0\"` 两根节点、vertex 用 `vertex=\"1\" parent=\"1\"` + `mxGeometry x/y/width/height`、edge 用 `edge=\"1\" source= target=` + `mxGeometry relative=\"1\"`、样式走 `style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=…;strokeColor=…\"` 串语法；③ **本地渲染**四路：draw.io Desktop（Electron）/ 自托管 webapp / `viewer-static.min.js` 只读 HTML / embed iframe + postMessage（`action: load|export|save`）；④ **CLI 导出成熟**：`drawio -x -f svg|png|pdf -o <out> <in>`，Linux 无图形环境需 `xvfb-run -a`，macOS `/Applications/draw.io.app/Contents/MacOS/draw.io`、Windows `C:\\Program Files\\draw.io\\draw.io.exe`；⑤ **不含自动布局**——调用方必须自算 x/y/width/height（Node 侧 dagre/elkjs/graphlib，Python 侧 networkx/pygraphviz/graphviz），edge 仅需 source/target 即自动连线。硬约束：**语义层内容一律不内置**（层级/结构/关联/样式/配色/图类选择/版面自由度判据全部指向 draw-diagram 的 owner 文件，MUST NOT 复写）；与 draw-excalidraw 同属「本地渲染自由图表」，二者的**取舍判据属前门**，本技能 MUST NOT 自带「何时该选我」的路由叙事；frontmatter 触发词**出生即收敛**为引擎身份（`drawio` / `draw.io` / `.drawio` / `mxgraph` 一类），MUST NOT 声明 架构图/流程图/UML 等通用图类词（否则会重演 mermaid 63 条 / plantuml 65 条越界的老问题）；须含 `## Evaluation Form(绘制评价单)` 与 canonical `## Feedback` 两段并存不混称，Feedback 段取**多数派紧凑指针形**（2534 字节形，指向 `.specify/shared/workflow/feedback-step.md`），MUST NOT 取 draw-mermaid 的 3633 字节内联复述变体；须登记 2 个 probe Object（`skill-draw-drawio-wrapup` @ wrap-up、`skill-draw-drawio-evaluation-form` @ evaluation-form，均挂既有 Class，无需新 Class）。",
+      "inputs_from": ["S1e-evaluation-form"],
+      "outputs": [
+        ".specify/teams/.work/draw-two-layer-structure/S1-refactor/drawio-skill-package.md",
+        ".specify/teams/.work/draw-two-layer-structure/S1-refactor/drawio-probe-objects.md"
+      ],
+      "blockedBy": ["S1e-evaluation-form"],
+      "quality_gate": "① 技能包草稿含 SKILL.md 全文 + 所需 references/ 文件清单与各文件职责，形态符合 `create-skills` 约定；② 上述 ①–⑤ 五类引擎实现知识逐类有着落，且**每类点名承载它的文件**；③ 语义层零内置——凡涉及层级/结构/关联/样式/配色/图类选择处均为指向 draw-diagram owner 的指针，抽查 ≥3 处证实为指针而非复写；④ frontmatter 触发词全为引擎身份，通用图类词计数为 **0**（机械抽取核验，不采信自述）；⑤ `## Evaluation Form(绘制评价单)` 与 `## Feedback` 两段并存、顺序为评价单在前、互不混称，且 Feedback 段为指针形（与 draw-diagram/d3js/echarts/plantuml 四技能同形）；⑥ 2 个 probe Object 行以注册表实际列格式给出（`object_id | class_id | unit | lifecycle_point`），且声明插入位置遵守「wrap-up 行在前」的行序即解析优先级约束；⑦ **增量落盘为 gate 条件**：SKILL.md 与各 references 草稿分文件写、每完成一个立即落盘，桩文件不得通过"
+    },
+    {
+      "stage_id": "S1g-routing-axis",
+      "agent_kind": "structure-refactorer",
+      "task": "把用户裁定的**四条能力轴**落进整个套件的选择逻辑，owner 是 `skills/draw-diagram/references/routing-matrix.md`（team.md 的 `capability_axes` 只登记「轴存在」，取值与判据 MUST 只在本文件承载，禁第二处复写）。四轴：① **动态图表能力**（draw-d3js / draw-echarts 具备：可交互、可随数据刷新）；② **渲染位置**（draw-drawio / draw-excalidraw / draw-mermaid 本地渲染，**draw-plantuml 是唯一远端渲染**）；③ **版面自由度**（draw-drawio / draw-excalidraw / draw-d3js 可绘自由图表；**draw-mermaid 是文本生图**——文本须遵循语法、语法自身即携带语义，故**无法绘自由图表**；draw-echarts 受系列目录约束）；④ **语义强度与绘图约束正相关**（draw-plantuml 语义最强、约束亦最强）。要求：**(A)** **六引擎** × 四轴一张全表（d3js / drawio / echarts / excalidraw / mermaid / plantuml），每格有取值与一句依据，MUST NOT 留空或写 unknown。**draw-diagram 是前门、不是引擎**——它不渲染，故「渲染位置」「动态图表能力」等轴对它无取值，MUST NOT 为凑格数给它编造轴值；它在四轴上的角色是**据轴选引擎**，见 (D)；**(B)** 四轴与既有「独占登记 / 图类矩阵 / artifact_intent tie-break」是**正交维度而非替代**——既有三节保留，draw-drawio 补进独占登记（`.drawio` 可编辑产物、成熟 CLI 导出、标准流程图/架构图/UML 观感）、图类矩阵与 tie-break 顺序；**(C)** **draw-drawio 与 draw-excalidraw 的同轴竞争必须有判据**——二者同处「本地渲染 + 自由图表」，区分点为观感（标准工程图 vs 手绘白板）、产物（`.drawio` XML vs `.excalidraw` JSON）、导出成熟度（官方 CLI vs 需 Playwright/headless）、嵌入形态（viewer/iframe vs React 组件），须给出可判的优先序而非「皆可」；**(D)** 六个 specialist 的 frontmatter description 各自**陈述自己在四轴上的位置**并只声明引擎身份触发词，与前门不争通用图类词；draw-diagram 前门的 description 须说明它**以四轴为选引擎判据**（而非声称自己有轴位置）。硬约束：`routing-matrix.md` 行 3–4 指向竞技场结论账本 `${SKILL_WORKDIR}/.specify/memory/knowledge/visualization-skill-selection.md` 的证据源声明、以及既有 cycle 冠军与分值（如 cycle 3 R2 0.95 / 0.94、mermaid 0.755）是**dated 证据记录，MUST 逐字保留**——用户裁定 arena 团队与账本「逐步不再使用、不彻底废弃」，MUST NOT 删除或改写；新增四轴是**追加维度**，MUST NOT 以「四轴已覆盖」为由删既有判据；三条反路由红线保留并按需增补（如：不得把要求自由版面的诉求路由到 draw-mermaid/draw-plantuml）。",
+      "inputs_from": ["S1f-drawio-bootstrap", "S1d-frontdoor-destination"],
+      "outputs": [
+        ".specify/teams/.work/draw-two-layer-structure/S1-refactor/routing-axis-matrix.md",
+        ".specify/teams/.work/draw-two-layer-structure/S1-refactor/frontmatter-convergence.md"
+      ],
+      "blockedBy": ["S1f-drawio-bootstrap"],
+      "quality_gate": "① **六引擎** × 四轴 = **24 格**全部有取值 + 一句依据，空格数 **0**（机械核验）；draw-diagram **不得**出现在轴值表中（出现即不过——它不是引擎）；② draw-drawio 已入独占登记、图类矩阵、tie-break 三处，缺一不过；③ drawio ↔ excalidraw 同轴竞争给出**可判优先序**，出现「皆可/视情况」字样即不过；④ 既有 arena 证据行（证据源声明 + cycle 冠军分值）逐字保留——以 `diff` 核验被保留行未被改写；⑤ 七技能 frontmatter 全部到位——六个 specialist 各陈述自身四轴位置、前门陈述以四轴为判据，且七者通用图类触发词计数为 0（机械抽取核验，不采信自述；前门 draw-diagram 例外：它**必须**持有通用图类词，那是它的职责，故本条对它只核「不因四轴新增而丢失既有通用词」）；⑥ 四轴取值只在 `routing-axis-matrix.md`（落地后进 `routing-matrix.md`）承载，team.md / 各 specialist SKILL.md 内**无取值复写**（One Source Of Truth，抽查证实为指针）；⑦ 增量落盘为 gate 条件：两份产物分文件写、每完成一轴/一引擎立即落盘，桩文件不得通过；**预算预案（预先约定）**：本 stage 需消化七引擎现状 + 改写 routing-matrix.md + 收敛七份 frontmatter，若撞派发轮次上限，约定拆为 S1g-1（A+B+C：四轴全表与矩阵改写）与 S1g-2（D：七份 frontmatter 收敛），S1g-2 blockedBy S1g-1，MUST NOT 靠降低 ③ 的可判性要求塞进一次派发"
+    },
+    {
       "stage_id": "S2-cleanroom-verify",
       "agent_kind": "cleanroom-verifier",
-      "task": "干净 context + subagent 调用技能绘制，评估结果是否符合预期：只给绘图意图、不给「画什么」的细节，看前门能否自行分析语义并正确委派；只给语义规格、不给布局/线段/渲染指示，看引擎能否自行兑现",
-      "inputs_from": ["S1e-evaluation-form"],
+      "task": "干净 context + subagent 调用技能绘制，评估结果是否符合预期：只给绘图意图、不给「画什么」的细节，看前门能否自行分析语义并正确委派；只给语义规格、不给布局/线段/渲染指示，看引擎能否自行兑现。**并须含四条能力轴的判别性用例**：(a) 动态/可交互图表诉求 → 应落 d3js 或 echarts；(b) 本地渲染的自由版面图表诉求 → 应落 drawio 或 excalidraw，且二者取舍须与 S1g 的优先序一致；(c) 明确要求文本生图、进仓库免工具链直渲 → 应落 mermaid，且 MUST NOT 被要求绘自由版面；(d) 最强 UML 语义且可接受远端渲染与更强约束 → 应落 plantuml。每例记录前门实际选择的引擎与理由，选错即为不通过。",
+      "inputs_from": ["S1g-routing-axis"],
       "outputs": [".specify/teams/.work/draw-two-layer-structure/S2-cleanroom-verify/report.md"],
-      "blockedBy": ["S1e-evaluation-form"],
-      "quality_gate": "每个被调技能一条 通过/不通过 + 证据产物路径；任何不通过项回退对应 S1x（failure_strategy: retry-once-then-escalate）"
+      "blockedBy": ["S1g-routing-axis"],
+      "quality_gate": "**七个技能**每个被调一条 通过/不通过 + 证据产物路径；四条能力轴判别用例 (a)–(d) 各至少一条且各有明确的引擎选择结论；任何不通过项回退对应 S1x（failure_strategy: retry-once-then-escalate）"
     },
     {
       "stage_id": "S3-evaluation-intake",
       "agent_kind": "evaluation-intake",
-      "task": "核验六个技能在交付产物后都主动征询用户评价；按「无评价 = 本次绘制满意」口径入账；有评价则经 feedback probe 送入 .specify/memory/feedback 并跟踪处置结论反哺对应技能",
+      "task": "核验**七个技能**在交付产物后都主动征询用户评价；按「无评价 = 本次绘制满意」口径入账；有评价则经 feedback probe 送入 .specify/memory/feedback 并跟踪处置结论反哺对应技能",
       "inputs_from": ["S2-cleanroom-verify"],
       "outputs": [".specify/teams/.work/draw-two-layer-structure/S3-evaluation-intake/channel-check.md"],
       "blockedBy": ["S2-cleanroom-verify"],
-      "quality_gate": "六个技能各有一条征询面证据（技能文件里的 evaluation form 段落 + 已注册 probe 对象）；.specify/memory/feedback/index.json 出现对应条目，或显式声明缺口而非静默略过"
+      "quality_gate": "**七个技能**各有一条征询面证据（技能文件里的 evaluation form 段落 + 已注册 probe 对象）；.specify/memory/feedback/index.json 出现对应条目，或显式声明缺口而非静默略过"
     }
   ],
   "handoff_protocol": "file-path-only",

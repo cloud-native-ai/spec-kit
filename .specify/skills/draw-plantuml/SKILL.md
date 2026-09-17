@@ -126,6 +126,7 @@ skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 
 ## 输出要求
 
+- **交付契约（必读；规则 owner 在前门）**：[../draw-diagram/references/delivery-contract.md](../draw-diagram/references/delivery-contract.md) —— D1/D2 交付形态、D3–D5 面向用户的文字规则（**图内标签与 HTML 正文同规**）、D6 交付前自检。**条文与示例只存在于契约，本节不复写。**以下各条是本引擎的**机械落地**，与契约冲突时以契约为准。
 - 输出为单个 HTML 文档，包含渲染的图表（渲染图为主体；原始 PlantUML 文本不嵌入正文，仅放入可折叠的「复现性附录」`<details>` 块，默认收起）
 - 图表通过 [render-plantuml.sh](scripts/render-plantuml.sh) 渲染，同时产出 PNG 与 SVG（**默认远端渲染**：脚本默认 `PLANTUML_BACKEND=server`；本地渲染必须先在用户确认后以 `PLANTUML_BACKEND=local` 显式启用）
 - **HTML 附复现性附录**：本图渲染命令（render-plantuml.sh 调用 + CJK 补跑脚本，一律 `${SKILL_HOME}` 相对路径、禁止写死绝对路径）、依赖说明（后端/CJK/本地工具链，含离线 fallback）与可折叠的 puml 源码——**附录源码必须与磁盘实际渲染的 `.puml` 逐字节一致**（含渲染脚本注入的样式块，直接从磁盘复制），保证"这张图怎么重新生成"可复现（详见 [12-rendering-and-output.md §4.4](references/howto/12-rendering-and-output.md)）
@@ -151,6 +152,25 @@ skill_id: "<SKILL:.specify/skills/draw-plantuml/SKILL.md>"
 
 **有评价。** 用户一旦主动给出评价，保留其原意，将 review 内容标为 `## Evaluation Form`，并从评价中提取至少一条评价要点；随后以本节的 probe 记录（不是以 `wrap-up` probe 记录）：
 
+```bash
+python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
+  --unit-id "skill:draw-plantuml" --unit-type skill \
+  --lifecycle-point evaluation-form \
+  --run-id "<drawing-run-id>:evaluation-form" --feature "<feature-key-if-any>" \
+  --review-file "<evaluation-form-review-file>" \
+  --points-file "<evaluation-form-points-file>"
+```
+
+这会经 `skill-draw-plantuml-evaluation-form` probe 把评价条目写入 `.specify/memory/feedback/`。不得把本节记录与同次运行的 `## Feedback` 自省共用 `run_id`，也不得把用户评价改写为 agent 自评。
+
+**处置、回用与传递边界。** 该条目进入既有的 `record→threshold→package→manual→mark-submitted` 链路，并由既有 feedback 处置流程持续标记为 `processed` 或 `ignored`；`processed` 时在 `disposition_reason` 中保留可执行结论。后续执行本技能前，查询本技能已处置的评价单并将适用结论用于 PlantUML 图表实现与交付验收：
+
+```bash
+python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action list \
+  --unit-id "skill:draw-plantuml" --disposition processed --contains "Evaluation Form"
+```
+
+本节绝不自动发送任何内容。若记录结果的既有 threshold 机制要求提示，只能按既有协议给出一次非阻塞的手动打包/提交提示；本节自身的评价征询始终只有交付时的一次。
 
 ## Feedback
 

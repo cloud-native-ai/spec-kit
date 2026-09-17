@@ -84,7 +84,7 @@ relations:
 
 ## Deviation Declaration（语法层偏离声明规则）
 
-1. 绝对坐标引擎（d3js / echarts layout:'none' / excalidraw 场景 JSON）：MUST 精确实现 SDS 几何与权重，预期零偏离
+1. 绝对坐标引擎（d3js / echarts layout:'none' / excalidraw 场景 JSON / drawio mxGraph 几何）：MUST 精确实现 SDS 几何与权重，预期零偏离
 2. 自动布局引擎（mermaid / plantuml）：以脚手架/skinparam **逼近** SDS 几何；无法兑现项（如精确 x/y、等高分区）MUST 在结果清单中**量化声明**（偏离维度 + 幅度 + 原因）
 3. 未声明的偏离 → 按 semantic-fidelity 扣分；已声明的偏离 → 计入该引擎语法实现质量，不计为语义层缺陷
 4. **超界判据**：声明偏离超出 SDS 给定 bound（如 ±150px）时——SDS 含 `auto_layout_intent` 而引擎未利用 → 计**语法层**缺陷；SDS 缺该意图 → 计**语义层**缺陷（建模方漏声明降级秩序）

@@ -80,6 +80,7 @@
 | skill-document-utils-wrapup | skill-wrapup | skill:document-utils | wrap-up |
 | skill-draw-d3js-wrapup | skill-wrapup | skill:draw-d3js | wrap-up |
 | skill-draw-diagram-wrapup | skill-wrapup | skill:draw-diagram | wrap-up |
+| skill-draw-drawio-wrapup | skill-wrapup | skill:draw-drawio | wrap-up |
 | skill-draw-echarts-wrapup | skill-wrapup | skill:draw-echarts | wrap-up |
 | skill-draw-excalidraw-wrapup | skill-wrapup | skill:draw-excalidraw | wrap-up |
 | skill-draw-mermaid-wrapup | skill-wrapup | skill:draw-mermaid | wrap-up |
@@ -121,6 +122,7 @@
 | gate-summarize-project-degraded-gates | skill-gate | skill:summarize-project | gate-summarize-project-degraded-gates |
 | skill-draw-diagram-evaluation-form | skill-evaluation-form | skill:draw-diagram | evaluation-form |
 | skill-draw-d3js-evaluation-form | skill-evaluation-form | skill:draw-d3js | evaluation-form |
+| skill-draw-drawio-evaluation-form | skill-evaluation-form | skill:draw-drawio | evaluation-form |
 | skill-draw-echarts-evaluation-form | skill-evaluation-form | skill:draw-echarts | evaluation-form |
 | skill-draw-excalidraw-evaluation-form | skill-evaluation-form | skill:draw-excalidraw | evaluation-form |
 | skill-draw-mermaid-evaluation-form | skill-evaluation-form | skill:draw-mermaid | evaluation-form |

@@ -1,7 +1,7 @@
 ---
 name: draw-diagram
 description: |
-  Unified front door for every diagram request: builds a semantic logical-diagram model (elements, relations, zones, layout/style/artifact/fidelity intent) and delegates rendering to the single best-fit draw-* specialist (d3js / echarts / excalidraw / mermaid / plantuml) via the routing matrix and exclusivity registry. This skill renders nothing itself.
+  Unified front door for every diagram request: builds a semantic logical-diagram model (elements, relations, zones, layout/style/artifact/fidelity intent) and delegates rendering to the single best-fit draw-* specialist (d3js / drawio / echarts / excalidraw / mermaid / plantuml) via the routing matrix and exclusivity registry. This skill renders nothing itself.
   统一绘图前门:先语义建模,再委派给最合适的 draw-* 专项技能;本技能不渲染。
   Use when the user mentions "画图", "绘图", "画个图", "出图", "draw a diagram", "diagram", "图表",
   "架构图", "拓扑图", "流程图", "时序图", "状态图", "类图", "ER图", "甘特", "WBS", "思维导图", "线框图",
@@ -46,14 +46,33 @@ draw-* 专项技能渲染。**本技能不渲染任何图**，也不维护任何
 
 ### Step 3: 委派
 
-- 以 Skill 调用委派选定 draw-* 技能，传入 LDM + 目标/输出要求（尽量 file-path-only handoff）；**`weight_plan` 随 LDM 一并传递**，由被委派技能按其「强弱实现」小节落地（各引擎线宽/边框语法归下层自有）
+- 以 Skill 调用委派选定 draw-* 技能，传入 LDM + 目标/输出要求 + **交付契约**（[./references/delivery-contract.md](./references/delivery-contract.md)：HTML 包装、源文件与图片保留、面向用户的文字规则）；尽量 file-path-only handoff。**`weight_plan` 随 LDM 一并传递**，由被委派技能按其「强弱实现」小节落地（各引擎线宽/边框语法归下层自有）
 - 前门不渲染、不手改引擎产物、不改引擎源码（score = f(target) 纪律在下层各自生效）
 
 ### Step 4: 验收与回报
 
 1. 对照 LDM 做覆盖检查：元素与标签、关系集合（含方向）、分组边界、产物形态、**强弱层级（weight_plan 在产物中可辨：边框按档递减、流线最细、关键路径仅色相抬升）**
-2. 不覆盖 → 带 delta 说明再委派一次（上限 1 次）；仍不覆盖 → 如实回报产物与缺口
-3. 回报：产物路径、选定引擎 + 路由理由（命中独占/矩阵行/tie-break）、LDM 摘要
+2. **对照交付契约做验收**（[./references/delivery-contract.md](./references/delivery-contract.md) 的 D6 自检表，逐项核对）：D1/D2 交付形态在盘、D3–D5 面向用户的文字规则成立（图内文字与 HTML 正文同规）。**条文与示例只在契约里，本节不复写**；任一项不过 = 不覆盖
+3. 不覆盖 → 带 delta 说明再委派一次（上限 1 次）；仍不覆盖 → 如实回报产物与缺口
+4. 回报：产物路径（HTML + 源文件 + 图片）、选定引擎 + 路由理由（命中独占/矩阵行/tie-break）、LDM 摘要
+
+## 逐级披露（Progressive Disclosure —— 五层）
+
+一次绘图请求按下面五层推进；**每层只读它需要的那一层**，不越层取内容、不把下层内容上抄。
+
+| 层 | 承载面 | 这一层做什么 |
+|----|--------|-------------|
+| **L1** | `skills/draw-diagram/SKILL.md`（本文件） | 分析语义逻辑，构建 LDM 与几何层，产出**整体逻辑图表设计**（Step 1） |
+| **L2** | `skills/draw-diagram/references/*.md` | 选型与判据分析：路由矩阵 / 独占登记 / tie-break / 能力轴（Step 2）、LDM schema 与覆盖检查、**交付契约**（交付形态 + 面向用户的文字规则） |
+| **L3** | 委派动作本身 | 选定后以 Skill 调用委派对应 `skills/draw-*` 引擎，传 SDS 路径 + `weight_plan` + 交付契约（Step 3） |
+| **L4** | `skills/draw-*/SKILL.md` | 针对**自身图表类型**做引擎侧逻辑设计：「SDS 实现与强弱落地」小节把语义档位落实为本引擎的绝对线宽/字号，并声明几何兑现义务 |
+| **L5** | `skills/draw-*/references/*.md` | 各层面完善并输出最终图表：语法/格式、渲染与导出、引擎指南与坑位 |
+
+**当前落地状态（如实记录，不粉饰）**：
+
+- L1、L3 已就位；L2 今日有 `routing-matrix.md`（选型判据）、`semantic-model.md`（LDM/SDS schema 与覆盖检查）、`delivery-contract.md`（交付形态与文字规则）三个文件——**选型、建模、交付三条判据链齐全**，但语义分析 / 图类选择 / 版面规划 / 样式配色 / 内容措辞 / 类专属约定的**专章尚未从下层上移**。
+- 这些专章目前仍**分散存放在 `draw-mermaid`、`draw-plantuml`、`draw-excalidraw` 的 `references/{howto,guide,document}/` 内**。实测口径（勿凭文件名判定重复）：跨 specialist **同名的 47 个 `.md` 文件，无一内容相同，全部已分化**——例如 `12-gantt-diagram.md` 在 mermaid 是 73 行、在 plantuml 是 1708 行，`layout.md` 是 69 行 vs 471 行，`content.md` 是 61 行 vs 345 行。所以它们**不是可直接去重的副本，而是同一主题的两份引擎专属实现**；其中确有一部分是引擎无关的语义内核（如 GRASP 原则、建模方法论），但**须逐文件 diff 才能分离**，不得按文件名批量搬移或合并。
+- 该分离与上移是已知的**结构重构**待办（原估 14 新文件 + 2 合并，须按上述实测口径重估），未在本轮执行；在其完成前，L2 的选型/建模/交付三条判据链不受影响（三个文件自足），但语义专章须到上述下层目录就地查阅，**不得据同名文件各自演化**（One Source Of Truth 风险已登记）。
 
 ## Document Map
 
@@ -61,6 +80,7 @@ draw-* 专项技能渲染。**本技能不渲染任何图**，也不维护任何
 |------|--------|
 | 独占登记 / 图类矩阵 / tie-break | [./references/routing-matrix.md](./references/routing-matrix.md) |
 | LDM schema 与覆盖检查 | [./references/semantic-model.md](./references/semantic-model.md) |
+| **交付形态**（HTML 包装、源文件与渲染图保留）**与面向用户的文字规则** | [./references/delivery-contract.md](./references/delivery-contract.md) |
 | 语义视觉强弱（weight_plan 档位与验收） | [./references/semantic-model.md](./references/semantic-model.md) `weight_plan`；引擎落地见各 draw-* 「强弱实现」小节 |
 | 引擎语法、渲染、坑位 | 被委派 draw-* 技能自有 SKILL.md 与 references |
 | 路由证据（竞技场结论） | `${SKILL_WORKDIR}/.specify/memory/knowledge/visualization-skill-selection.md` |
@@ -90,6 +110,25 @@ draw-* 专项技能渲染。**本技能不渲染任何图**，也不维护任何
 
 **有评价。** 用户一旦主动给出评价，保留其原意，将 review 内容标为 `## Evaluation Form`，并从评价中提取至少一条评价要点；随后以本节的 probe 记录（不是以 `wrap-up` probe 记录）：
 
+```bash
+python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
+  --unit-id "skill:draw-diagram" --unit-type skill \
+  --lifecycle-point evaluation-form \
+  --run-id "<drawing-run-id>:evaluation-form" --feature "<feature-key-if-any>" \
+  --review-file "<evaluation-form-review-file>" \
+  --points-file "<evaluation-form-points-file>"
+```
+
+这会经 `skill-draw-diagram-evaluation-form` probe 把评价条目写入 `.specify/memory/feedback/`。不得把本节记录与同次运行的 `## Feedback` 自省共用 `run_id`，也不得把用户评价改写为 agent 自评。
+
+**处置、回用与传递边界。** 该条目进入既有的 `record→threshold→package→manual→mark-submitted` 链路，并由既有 feedback 处置流程持续标记为 `processed` 或 `ignored`；`processed` 时在 `disposition_reason` 中保留可执行结论。后续执行本技能前，查询本技能已处置的评价单并将适用结论用于语义建模、路由或验收：
+
+```bash
+python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action list \
+  --unit-id "skill:draw-diagram" --disposition processed --contains "Evaluation Form"
+```
+
+本节绝不自动发送任何内容。若记录结果的既有 threshold 机制要求提示，只能按既有协议给出一次非阻塞的手动打包/提交提示；本节自身的评价征询始终只有交付时的一次。
 
 ## Feedback
 

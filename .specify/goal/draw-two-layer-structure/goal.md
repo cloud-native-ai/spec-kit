@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2026-09-16
-updated: 2026-09-16
+updated: 2026-09-17
 ---
 
 # Goal: draw-two-layer-structure
@@ -12,7 +12,7 @@ updated: 2026-09-16
 
 ## Success Criteria
 
-1. 六个绘图技能（draw-diagram 与 draw-{d3js,echarts,excalidraw,mermaid,plantuml}）在交付产物后都主动征询用户评价，评价以 evaluation form 承载：复用 speckit 现有 feedback 链路与机制，但与该技能内遵循 .specify/shared/workflow/feedback-step.md 红线与规则的标准 feedback 分立为两物，不混称。
+1. 七个绘图技能（draw-diagram 与 draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml}）在交付产物后都主动征询用户评价，评价以 evaluation form 承载：复用 speckit 现有 feedback 链路与机制，但与该技能内遵循 .specify/shared/workflow/feedback-step.md 红线与规则的标准 feedback 分立为两物，不混称。
 2. 用户未提出评价即视为本次绘制满意；用户提出评价则该条目经 feedback probe 进入 .specify/memory/feedback 并被持续处置，处置结论反哺对应技能。
 3. 达成程度以「绘制运行中无评价（=满意）的占比」与「已提出评价中被处置的占比」按程度衡量，不设固定阈值：本目标为长期目标，achieved 是一次刻意的人工判定而非算出的结论。
 
@@ -33,3 +33,6 @@ updated: 2026-09-16
 - 2026-09-16 target T-001 open→dropped
 - 2026-09-16 target T-002 open→dropped
 - 2026-09-16 target T-003 open→dropped
+- 2026-09-16 — criteria changed; prior value: 六个绘图技能（draw-diagram 与 draw-{d3js,echarts,excalidraw,mermaid,plantuml}）在交付产物后都主动征询用户评价，评价以 evaluation form 承载：复用 speckit 现有 feedback 链路与机制，但与该技能内遵循 .specify/shared/workflow/feedback-step.md 红线与规则的标准 feedback 分立为两物，不混称。 | 用户未提出评价即视为本次绘制满意；用户提出评价则该条目经 feedback probe 进入 .specify/memory/feedback 并被持续处置，处置结论反哺对应技能。 | 达成程度以「绘制运行中无评价（=满意）的占比」与「已提出评价中被处置的占比」按程度衡量，不设固定阈值：本目标为长期目标，achieved 是一次刻意的人工判定而非算出的结论。
+- 2026-09-17 — criteria changed; prior value: 七个绘图技能（draw-diagram 与 draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml}）在交付产物后都主动征询用户评价，评价以 evaluation form 承载：复用 speckit 现有 feedback 链路与机制，但与该技能内遵循 .specify/shared/workflow/feedback-step.md 红线与规则的标准 feedback 分立为两物，不混称。 | 用户未提出评价即视为本次绘制满意；用户提出评价则该条目经 feedback probe 进入 .specify/memory/feedback 并被持续处置，处置结论反哺对应技能。 | 达成程度以「绘制运行中无评价（=满意）的占比」与「已提出评价中被处置的占比」按程度衡量，不设固定阈值：本目标为长期目标，achieved 是一次刻意的人工判定而非算出的结论。
+- 2026-09-17 — criteria changed; prior value: None provided.

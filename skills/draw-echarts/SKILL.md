@@ -214,6 +214,7 @@ For dark theme:
 
 ## Output Requirements
 
+- **Delivery contract (read first; rules owned by the front door)**: [../draw-diagram/references/delivery-contract.md](../draw-diagram/references/delivery-contract.md) — D1/D2 delivery form, D3–D5 user-facing text rules (**in-chart labels and the HTML prose obey the same rules**), D6 pre-delivery self-check. **The rule text and its examples live only in the contract; they are not restated here.** The items below are this engine's **mechanics**; the contract wins on conflict.
 - Output as a **single `.html` file** (self-contained, no external dependencies except the pinned ECharts script; offline-critical output ships a REAL local `vendor/echarts.min.js`, never an empty stub)
 - **Offline-critical / review-facing deliverables**: `vendor/echarts.min.js` present and non-empty (verified by `scripts/vendor-echarts.sh` / `scripts/verify-deliverable.mjs`) AND a static PNG/SVG snapshot of each chart delivered alongside the HTML as render evidence
 - ECharts version: **pinned 5.x** (e.g. `https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js`), never a floating `@5` tag
@@ -294,6 +295,25 @@ Before delivering the final HTML file, verify:
 
 **有评价。** 用户一旦主动给出评价，保留其原意，将 review 内容标为 `## Evaluation Form`，并从评价中提取至少一条评价要点；随后以本节的 probe 记录（不是以 `wrap-up` probe 记录）：
 
+```bash
+python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
+  --unit-id "skill:draw-echarts" --unit-type skill \
+  --lifecycle-point evaluation-form \
+  --run-id "<drawing-run-id>:evaluation-form" --feature "<feature-key-if-any>" \
+  --review-file "<evaluation-form-review-file>" \
+  --points-file "<evaluation-form-points-file>"
+```
+
+这会经 `skill-draw-echarts-evaluation-form` probe 把评价条目写入 `.specify/memory/feedback/`。不得把本节记录与同次运行的 `## Feedback` 自省共用 `run_id`，也不得把用户评价改写为 agent 自评。
+
+**处置、回用与传递边界。** 该条目进入既有的 `record→threshold→package→manual→mark-submitted` 链路，并由既有 feedback 处置流程持续标记为 `processed` 或 `ignored`；`processed` 时在 `disposition_reason` 中保留可执行结论。后续执行本技能前，查询本技能已处置的评价单并将适用结论用于 ECharts 图表实现与交付验收：
+
+```bash
+python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action list \
+  --unit-id "skill:draw-echarts" --disposition processed --contains "Evaluation Form"
+```
+
+本节绝不自动发送任何内容。若记录结果的既有 threshold 机制要求提示，只能按既有协议给出一次非阻塞的手动打包/提交提示；本节自身的评价征询始终只有交付时的一次。
 
 ## Feedback
 
