@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-18T12:14:02Z",
+  "updated": "2026-09-18T12:14:37Z",
   "threshold": 10,
-  "count_since_submission": 15,
+  "count_since_submission": 16,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260917T130112Z-speckit-clarify",
+      "file": "20260917T130112Z-speckit-clarify.md",
+      "unit_id": "/speckit.clarify",
+      "unit_type": "command",
+      "run_id": "051-user-facing-comprehension:2026-09-17:clarify-modeA",
+      "probe": "speckit-clarify-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "051-user-facing-comprehension",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-17T13:01:12Z",
+      "summary": "Mode A on requirements.md. 11 类 taxonomy 扫描:Feature Linkage = Missing(高优先),3 类 Partial、7 类 Clear。提问 4 个(5 上限内),因四者互不为对方选项集设前提,按 batching rule 合并为一次提示;四项均获批准推荐项。集成按「target artifact first, Feature regis"
+    },
     {
       "id": "20260917T123109Z-speckit-requirements",
       "file": "20260917T123109Z-speckit-requirements.md",
