@@ -50,8 +50,8 @@
 - **门控治理只管"是否门控",从不管"如何措辞"**:`shared/guidelines/confirmation-gates.md` 全文 99 行,两级判据(`:7-12`)、破坏性清单(`:14-21`)、治理保留清单 13 行表(`:23-41`)、存疑从严(`:43-45`)、回流约束(`:47-52`)、门控观察协议(`:70-99`)**全部与措辞无关**。全文仅两处沾边:
   - `:56-60` 执行报告三要素(**执行内容 / 产出·变更工件逐项可定位 / 修改途径**)——这是"带足上下文"半侧,已一般化,本纪律 MUST 引用而非复述;
   - `:68` `收尾阶段达阈值触发的反馈提交提示 MUST 为非阻塞一次性提示(附 /speckit.feedback package 用户视角途径,不展示 feedback-utils.py 引擎原始调用)`——**这是该文档中最强的"不用行话"规则**,点名了`用户视角途径`并禁止暴露引擎调用,但作用域**仅限反馈提交提示**,且作为 `## 执行报告` 的尾段被埋没,从未一般化。其契约测试 `tests/contract/test_confirmation_gates_execution_report.py:44-46` 只断言了 `非阻塞` 与 `自动传输`,**并未断言 `用户视角途径` / 不暴露引擎调用这一子句**——即该规则今天连守卫都没有。
-- **门控扫描器零措辞检查**:`scripts/python/scan-confirmation-gates.py:46-65` 的 18 条 `BLOCKING_PATTERNS` 全部检测**阻塞行为**(`等待用户确认`、`explicit user confirmation`、`stop and confirm`、`preview → confirm → execute` 等),无任何行话/白话/注解/上下文模式。`:38-44` 的 `POLICY_DOCS` 豁免集(现含 `confirmation-gates.md`、`reconcile-pattern.md`、`interview-pattern.md`)是"定义纪律的文档可以援引门控措辞而不被计数"的既有机制——**新真源文档若引用任何阻塞措辞作反例,须在此登记**(具体注册点)。`:35` 的 `SCAN_DIRS` 含 `shared`,故 `shared/guidelines/` 下新文件自动进入扫描范围。
-- **反馈流程是本纪律传播最广的实例**:`shared/workflow/feedback-step.md` 是该规则的**事实真源**——`:89-90`(canonical 块第 6 步)、`:113-114`(`Present the choices in **user-facing terms** … never the raw feedback-utils.py engine path`)、`:141`(`engine detail — do not paste the bare flag into the user-facing line`)。`grep -rl "never paste the raw" --include=*.md .` 命中 **194 个文件**,含 21 个 `templates/commands/*.md` 各一行、`skills/merge-skills/SKILL.md:180`、`docs/reference/skills/feedback.md:139-141`,以及 4 棵按工具树。`:115` 自陈存在**两种并存措辞**(长式与 `sanitize.md:116` / `derive.md:184` 的短式),并规定"仍只写 invite the user to submit 的嵌入副本以本节为准"——即该文档已经在做"收敛到真源"的工作,但**它的权威只覆盖反馈,不覆盖其他界面类**。
+- **门控扫描器零措辞检查**:`scripts/python/scan-confirmation-gates.py:46-64` 的 **17 条** `BLOCKING_PATTERNS`(展开为 22 个顶层 alternation 分支)全部检测**阻塞行为**(`等待用户确认`、`explicit user confirmation`、`stop and confirm`、`preview → confirm → execute` 等),无任何行话/白话/注解/上下文模式。`:38-44` 的 `POLICY_DOCS` 豁免集(现含 `reconcile-pattern.md`、`interview-pattern.md`,外加 `SELF_REL` 的 `confirmation-gates.md`)是"定义纪律的文档可以援引门控措辞而不被计数"的既有机制——**新真源文档若引用任何阻塞措辞作反例,须在此登记**(具体注册点)。`:35` 的 `SCAN_DIRS` 含 `shared`、`:36` 的 `SCAN_ROOT_FILES = ("templates",)` 含根级 `templates/*.md`,故 `shared/guidelines/` 与 `templates/instructions-template.md`、`templates/constitution-template.md` 下新文件**全部自动进入扫描范围**。
+- **反馈流程是本纪律传播最广的实例**:`shared/workflow/feedback-step.md` 是该规则的**事实真源**——`:89-90`(canonical 块第 6 步)、`:113-114`(`Present the choices in user-facing terms … never the raw feedback-utils.py engine path`)、`:141`(`engine detail — do not paste the bare flag into the user-facing line`)。其传播足迹为 **195 个文件**——本数值是 plan 期 2026-09-17 以 `grep -rl "never paste the raw" --include=*.md .` 实测的**唯一定义点**,该计数随仓库演进漂移(需求阶段实测为 194),故本规格他处一律以指针引用而不复述字面量,守卫亦 MUST NOT 钉死此数值。命中面含 21 个 `templates/commands/*.md` 各一行、`skills/merge-skills/SKILL.md:179-180`、`docs/reference/skills/feedback.md:140-142`,以及 4 棵按工具树。`:115` 自陈存在**两种并存措辞**(长式与 `sanitize.md:116` / `derive.md:184` 的短式),并规定"仍只写 invite the user to submit 的嵌入副本以本节为准"——即该文档已经在做"收敛到真源"的工作,但**它的权威只覆盖反馈,不覆盖其他界面类**。
 - **澄清流程只借了半侧**:`templates/commands/clarify.md:70` 明写"从 `interview-pattern.md` 只借 **context discipline**(每问说明为何出现、答案将改变什么)与 fact-vs-decision 拆分","刻意不采纳其开放式提问规则"——**但从未借"不用行话"半侧**,`clarify.md` 全文无任何措辞/可理解性规则。`shared/guidelines/requirements-guidelines.md:72-88` 的 `[NEEDS CLARIFICATION]` 提示模板规定了 `**Context**` / `**What we need to know**` / 选项表,同样**对措辞零约束**。`shared/constants/clarify-taxonomy.md:56` 的 "Canonical glossary terms" 是澄清分类里唯一与行话相邻的钩子。
 - **最完整的实现搁浅在一个技能里**:`skills/summarize-project/references/reporting-playbook.md:109-113` 的 `## 1.7 读者用语纪律(内部标识不得渗入正文)` 是**全仓最成体系的实例**——一份完整的内部标识黑名单(分级码 `T1–T5`、`E1–E5`、`RC-*`、`CG-*`、`§编号`、`M-*`、引擎字段名、库/表/列/SQL、脚本名)+ 一张读者向改写映射表(`unknown-schedule` → 「无计划日期,无法判定延期」),`:309` 有落盘门禁,`references/consistency-rules.md:31` 交叉引用(`**字段名是内部标识**`)。同技能 `references/project-overview.md:22` 有最直白的中文表述:`**业务语言**:摘要面向外部读者,只出现数值与业务措辞,不出现字段名、脚本名与内部编号。`,`:51` 有可机械核查的清单门 `- [ ] 无内部黑话;外部读者不读代码也能看懂`。**框架其余部分完全够不到它。**
 - **主动建议行已有"上下文上限"的现成形态**:`shared/guidelines/proactive-trigger.md:47` `one non-blocking line = what the flow is for + the exact invocation the engine supplies`(镜像于 `templates/instructions-template.md:31`)——这正是"带足上下文但不膨胀"的落地样板:用途 + 确切调用形式,一行。`:95` 另有措辞约束(提议形态是批准而非阻塞)。
@@ -141,9 +141,9 @@
 
 ### User Story 4 - 反馈流程的对外措辞归入同一纪律,不再自成一格 (Priority: P2)
 
-反馈流程今天已经是全仓**执行得最好**的一片:`shared/workflow/feedback-step.md` 拥有"绝不把引擎调用粘进面向用户的行"这条规则,并已传播到 194 个文件。但它自成权威——它的规矩只管反馈,别的界面类援引不到;它自己还承认存在两种并存措辞(长式与短式),靠一句"以本节为准"临时压住。本特性之后,该文档以单行指针接入本纪律,其既有规则**保留**为该纪律在"反馈通知"这一界面类上的实例(不另立第二套措辞规则),两种并存措辞的收敛方向从"以本节为准"变为"以纪律真源为准"。阈值提示、提交通知、自省呈现的对外措辞同受下限/上限约束。
+反馈流程今天已经是全仓**执行得最好**的一片:`shared/workflow/feedback-step.md` 拥有"绝不把引擎调用粘进面向用户的行"这条规则,并已传播到近百个命令模板、技能与文档表面(实测计数见 Overview 现状锚点)。但它自成权威——它的规矩只管反馈,别的界面类援引不到;它自己还承认存在两种并存措辞(长式与短式),靠一句"以本节为准"临时压住。本特性之后,该文档以单行指针接入本纪律,其既有规则**保留**为该纪律在"反馈通知"这一界面类上的实例(不另立第二套措辞规则),两种并存措辞的收敛方向从"以本节为准"变为"以纪律真源为准"。阈值提示、提交通知、自省呈现的对外措辞同受下限/上限约束。
 
-**Why this priority**: 用户点名"feedback的流程"为扩散目标,故属显式要求。但排 P2 而非 P1:这一片**今天已高度合规**(194 文件的传播足迹即证据),边际工作是"命名归属 + 一般化",而非"从零修复";其失效风险与 US2(零规则、零守卫、直接决定不可撤销动作)不在一个量级。此为基于实测证据的排序判断,已记入 Assumptions。
+**Why this priority**: 用户点名"feedback的流程"为扩散目标,故属显式要求。但排 P2 而非 P1:这一片**今天已高度合规**(其跨表面传播足迹即证据,实测计数见 Overview 现状锚点),边际工作是"命名归属 + 一般化",而非"从零修复";其失效风险与 US2(零规则、零守卫、直接决定不可撤销动作)不在一个量级。此为基于实测证据的排序判断,已记入 Assumptions。
 
 **Independent Test**: 检查 `shared/workflow/feedback-step.md` 已接入单行指针且其 `:89-90`/`:113-114`/`:141` 三处既有规则**保留未删**(降级为实例,不是被替换);检查 `confirmation-gates.md:68` 的反馈专属措辞规则已被 US2 提升为一般规则、原处收敛为指针且二者不冲突;抽样若干命令模板的 `## Feedback` 第 6 步,确认仍指向 `/speckit.feedback package` 用户视角途径、仍为非阻塞、仍不自动传输。
 
@@ -190,7 +190,7 @@
 - **常驻章节到了、真源文档没到(悬空指针)** 实测两条投递路径不同步:章节经 `/speckit.instructions` 增量调谐注入既有指令文件,真源文档只在 `specify init` 附加式 copytree 或 `sync-mirrors.py` 时抵达,而 `generate-instructions.sh` 全文**不同步 `shared/`**。已初始化的下游项目只刷新指令文件,就会拿到指向不存在文件的指针。这是既有 11 份 guideline 共有的结构性状况,非 051 新造 ⇒ FR-038 只加**同批抵达 + 缺失显式提示**义务,MUST NOT 静默呈现悬空指针;修投递机制本身属另一条 Feature(见 Out of Scope)。
 - **只改宪章模板不改命令** Principle XIV 的实际失效路径:模板里有的原则,命令的 `MUST include` 清单没点名,下游就拿不到。⇒ FR-020 要求双落点,守卫 MUST 分别断言两处。
 - **`interview-pattern.md` 的嵌入契约不可丢弃清单没列 Comprehension rules**(`:255`) 收敛为指针后,该清单 MUST 把"接入本纪律的指针"纳入不可丢弃项,否则宿主收窄时仍可合法丢掉。
-- **194 个文件的措辞轮换** MUST 经既有再生脚本处理机械副本;手写表面按 US5 逐个收敛为指针。MUST NOT 发起一次 194 文件的手工批改。
+- **跨表面措辞轮换**(命中面实测计数见 Overview 现状锚点) MUST 经既有再生脚本处理机械副本;手写表面按 US5 逐个收敛为指针。MUST NOT 发起一次覆盖全部命中文件的手工批改。
 
 ## Requirements *(mandatory)*
 
@@ -247,7 +247,8 @@
 - **FR-032**: 若真源文档为说明违规形态而引用任何命中门控扫描器阻塞模式的措辞,该文档 MUST 被登记进扫描器的策略文档豁免集(`scan-confirmation-gates.py` 的 `POLICY_DOCS`),MUST NOT 使门控计数虚增;门控计数在本特性改动前后 MUST 不变。
 - **FR-033**: 本特性 MUST NOT 引入任何新的运行时检查器、行话 lint 引擎、措辞评分系统、成熟度报告或跟踪台账(框架范围纪律 / 不新增机制)。执行手段 MUST 限于既有契约测试与既有扫描器的豁免登记。
 - **FR-034**: `confirmation-gates.md:68` 既有措辞规则今天**无契约断言**(其测试只断言 `非阻塞` 与 `自动传输`)。该规则被 FR-018 提升为一般规则后,MUST 同批获得断言,MUST NOT 在无守卫状态下继续存在。
-- **FR-035**: FR-029 ⑤ 的双落点断言 MUST **一般化**为覆盖全部宪章原则的守卫:随包分发的宪章模板中的每条原则,MUST 在宪章命令的 `MUST include` 清单中有对应条目;任一侧缺失即失败。回流的 Principle XIV([[STR-006]],FR-028)MUST 作为该守卫的**第一个受测样本**,以证明它拦得住一个真实发生过的同型缺口,而不只是拦得住"新原则忘了写"。守卫 MUST 按**原则名**匹配,MUST NOT 钉死罗马数字字面量(模板与活动宪章的原则名册与编号本就不同)。
+- **FR-035**: FR-029 ⑤ 的双落点断言 MUST **一般化**为一份**具名双落点观察名单**(watchlist)守卫:名单中的每个原则名 MUST 同时出现在随包分发的宪章模板与宪章命令的 `MUST include` 清单中,任一侧缺失即失败;名单初始为 {[[STR-003]], [[STR-006]]},扩展只经追加名单条目。回流的 Principle XIV([[STR-006]],FR-028)MUST 作为该守卫的**第一个受测样本**,以证明它拦得住一个真实发生过的同型缺口,而不只是拦得住"新原则忘了写"。守卫 MUST 按**完整原则标题**匹配(含括注),MUST NOT 钉死罗马数字字面量(模板与活动宪章的原则名册与编号本就不同),且 MUST NOT 把 `Code as the Single Source of Truth`(宪章命令 `:91` 既有条目)与 [[STR-006]] `One Source of Truth (Authority & Reference Discipline)` 混为一谈——二者是不同原则,活动宪章 XIV 的 Rationale 已显式区分。
+  **范围订正(plan 期实测,2026-09-17)**:本条原文要求"宪章模板中的**每条**原则 MUST 在 `MUST include` 清单中有对应条目",该全称形式**在当前仓库不成立**——实测宪章模板有 11 条原则(I–XI),而命令的 `MUST include` 清单只有 5 条,二者交集仅 3 条(III Documentation-First、VIII Feature-Centric Development、IX Better-Harness Orientation);清单另含 2 条**不在模板中**的原则(Code as the Single Source of Truth、Documentation Naming & Location Conventions)。两个方向的包含关系今天都不成立,故全称守卫会在 8 条既有原则上立即失败。`MUST include` 清单的语义是"命令 bootstrap 时**至少**必须生成的原则",不是模板的镜像 ⇒ 唯一可实现的形态是具名观察名单。该订正**不削弱**用户在 clarify R1-Q2 选择的"当守卫样本"意图:XIV 在名单内,从任一侧删除它仍会使 CI 失败。
 
 #### 观察与反馈
 
@@ -285,10 +286,10 @@
 - **SC-009**: 漂移守卫覆盖**五个表面**(真源文档 / 镜像一致性 / 指令模板常驻章节 / 宪章模板 / 宪章命令 MUST-include 清单)的比例为 **100%**;守卫在 CI 中执行,人为改动任一处即失败。附加覆盖项目中立性与单源扫描两项断言。
 - **SC-010**: 随包分发的真源文档、宪章模板与命令模板中,本仓专有名称泄漏数为 **0**。
 - **SC-011**: 本特性引入的新运行时检查器 / 行话 lint 引擎 / 措辞评分系统 / 成熟度报告 / 跟踪台账数量为 **0**。
-- **SC-012**: 门控扫描器的门控计数在本特性改动前后**完全不变**(真源文档的示例措辞未虚增计数;基线:扫描器 18 条阻塞模式全部只检测阻塞行为,零措辞检查)。
+- **SC-012**: 门控扫描器的门控计数在本特性改动前后**完全不变**(真源文档的示例措辞未虚增计数;基线:扫描器 17 条阻塞模式全部只检测阻塞行为,零措辞检查)。
 - **SC-013**: `confirmation-gates.md:68` 既有措辞规则在被提升为一般规则后**获得契约断言**(基线:0 条断言覆盖该子句);该规则处于无守卫状态的表面数量为 **0**。
 - **SC-014**: 搁浅实现的可达性:`summarize-project` 的内部标识黑名单与读者向改写映射被全框架可引用的比例为 **100%**(基线:仅该技能内部可达),且提升后独立黑名单副本数量为 **0**。
-- **SC-015**: 双落点守卫(FR-035)一般化后覆盖随包分发宪章模板中**全部**原则的比例为 **100%**(基线:0 条原则受此守卫);人为从模板侧或命令侧删除任一原则后守卫失败的比例为 **100%**,首个受测样本为回流的 [[STR-006]]。
+- **SC-015**: 具名双落点观察名单(FR-035)中的原则,其在宪章模板与命令 `MUST include` 清单**两侧同时存在**的比例为 **100%**(名单初始 2 条:[[STR-003]]、[[STR-006]];基线:0 条原则受此守卫,且 [[STR-006]] 两侧均为 0 命中);人为从任一侧删除名单内任一原则后守卫失败的比例为 **100%**。
 - **SC-016**: 两处搬家(FR-021 访谈模式可理解性规则收敛、FR-022 项目总结黑名单提升)完成后的**既有行为回归数为 0**——具体核验点:访谈模式仍原文保留其模式特有两规则、其嵌入契约不可丢弃清单已含新指针、澄清流程既有形态裁定未变、项目总结技能仍能产出合规报告、门控扫描器计数不变(SC-012)。此项是 FR-016 选择最大接入广度的配套风险约束。
 - **SC-017**: 常驻章节所指的真源文档在目标项目中**缺失且未被显式提示**的发生数为 **0**(FR-038)。基线:今天既有 11 份 guideline 的常驻章节在"只刷新指令文件"路径下均可能悬空且无任何提示——该窗口存在但从未被度量或披露。
 - **SC-018**: 全框架声明的**读者基准总数 ≤ 3**(1 条全局基准 + 至多 2 处类级覆盖),且覆盖值只出现在对应界面类的真源文档处、不回写真源纪律文档(FR-037)。基线:实现前并存 3 种互不引用的基准表述(SC-001 的"本会话未打开过仓库的读者"、`requirements-guidelines.md` 的"非技术干系人"、`summarize-project` 的"外部读者"),且无任何一处声明其为全局或覆盖。
@@ -309,7 +310,7 @@
 - **SC-012 Source**: 在实现前后各运行一次 `scripts/python/scan-confirmation-gates.py` 并比对门控计数(既有测试 `tests/contract/test_scan_confirmation_gates.py:64-130` 提供断言骨架);CI 每次提交执行。基线:实现前的计数值。
 - **SC-013 Source**: 契约测试断言 `confirmation-gates.md` 的一般化措辞规则被覆盖(扩展 `tests/contract/test_confirmation_gates_execution_report.py:44-46` 既有用例);CI 每次提交执行。基线:0 条断言。
 - **SC-014 Source**: 契约测试断言 `summarize-project` 原处以指针接入、且 `shared/` + `skills/` 下独立黑名单副本数为 0;CI 每次提交执行。基线:1 份搁浅黑名单、0 处外部可达。
-- **SC-015 Source**: 双落点守卫测试(FR-035)——遍历随包分发宪章模板的全部原则标题,逐个断言其在 `templates/commands/constitution.md` 的 `MUST include` 清单中有对应条目;并以变异式抽查验证守卫有效(人为从任一侧删除一条原则后测试 MUST 失败)。首个受测样本为回流的 [[STR-006]]。CI 每次提交执行。基线:0 条原则受此守卫;[[STR-006]] 在两个模板文件中零命中(实测)。
+- **SC-015 Source**: 双落点守卫测试(FR-035)——读取一份具名观察名单常量,逐个断言名单内原则标题同时出现在 `templates/constitution-template.md` 的 `### <num>. <title>` 标题集与 `templates/commands/constitution.md` 的 `**MUST include** a principle for "<name>"` 名称集中;并以变异式抽查验证守卫有效(人为从任一侧删除名单内一条原则后测试 MUST 失败)。匹配按完整标题、不按罗马数字。CI 每次提交执行。基线:0 条原则受此守卫;[[STR-006]] 在两个模板文件中零命中(`grep -c "One Source"` 实测双双为 0)。**注**:全称形式(遍历模板全部原则)经 plan 期实测**不可实现**,已按 FR-035 的范围订正改为具名名单。
 - **SC-016 Source**: 逐点核验 + 既有测试套件——按 SC-016 列出的五个核验点逐个检查搬家涉及位置的既有行为(访谈模式两规则原文保留、嵌入契约不可丢弃清单含新指针、澄清既有形态裁定未变、项目总结技能端到端产出合规报告、门控扫描器计数不变),并运行既有相关契约测试(`test_confirmation_gates_*`、`test_scan_confirmation_gates`、`test_instructions_section_propagation`)确认全绿。改动前后各执行一次取差值。基线:不适用(搬家尚未发生);本项度量**回归**,不是收敛量。
 - **SC-017 Source**: 契约测试 + 演练——构造"只有常驻章节、真源文档缺失"的项目状态(临时移除镜像副本),断言 agent 侧的提示义务被真源文档/常驻章节以规范措辞承载(即 FR-038 的义务成文且可被守卫检出),并断言既有 11 份 guideline 的同类窗口被同一义务覆盖而非只覆盖新文档。CI 每次提交执行;另在发布前对一个真实的旧初始化项目演练一次。基线:0 份 guideline 有缺失提示义务(实测 `generate-instructions.sh` 全文不同步 `shared/`)。
 - **SC-018 Source**: 契约测试遍历真源纪律文档与 11 类界面真源文档,统计"读者基准"声明处数量并断言 ≤3、且真源纪律文档中恰为 1(全局)、其余至多 2 处位于对应界面类真源文档内;CI 每次提交执行。基线:3 种并存表述、0 处声明为全局或覆盖(实测于 `SC-001` / `requirements-guidelines.md:24,101` / `summarize-project` 各层参考文档)。
@@ -343,6 +344,18 @@
 - Q: "不能无限制的添加 context"目前落成定性上限(陈述决定所依赖的事实 + 以路径引用其余一切),Assumptions 记录了为何不取裸数值——这个选型在需求阶段未经询问。定性上限够不够,还是要数值上限? → A: **定性上限 + 沿用各界面既有数值约束**,不新增逐类数值上限,也不新增单一全局数值上限。落 FR-011(选型由推断转为**用户裁定**)。**已知代价经知情接受并成文**:门控确认提示与流程收尾报告两类界面因此没有长度界;接受条件是长度不设界但**形态**设界——由 FR-013 机械判据("读者要不要翻页")与 FR-010 承载方式("路径引用而非复述")共同兜住,复述工件即违规、不论长短;若实测出现无复述的纯膨胀,升级路径是在该类界面真源处声明覆盖值(FR-037 同型协议)。
 - Q: 实测发现常驻章节与真源文档投递路径不同步(章节经 `/speckit.instructions` 增量调谐注入既有指令文件;真源文档只经 `specify init` 附加式 copytree 或 `sync-mirrors.py` 抵达,`generate-instructions.sh` 全文不同步 `shared/`),已初始化的下游项目只刷新指令文件会拿到指向不存在文件的指针——这是既有 11 份 guideline 共有的结构性状况。051 要不要处理? → A: **记录为既有结构性状况 + 在 051 内加同批抵达义务**,不修投递机制。落 FR-038(同批抵达 + 缺失时 MUST 显式提示文档缺失及获取途径,MUST NOT 静默呈现悬空指针)、FR-003 加前向引用、Edge Cases 增"常驻章节到了、真源文档没到"一条、新增 SC-017(悬空且无提示的发生数为 0,守卫 MUST 覆盖全部 11 份 guideline 而非只覆盖新文档)、Out of Scope 增"投递机制本身的修复属另一条 Feature"。
 
+### Session 2026-09-17(第三轮 — `/speckit.plan` Phase 0 实测订正)
+
+本轮**无新增用户提问**;以下是 plan 期按 Principle VIII(代码为唯一真源)对源码实测后,对既有陈述的就地订正。全部订正均为**事实修正**,不改变任何已裁定的范围。
+
+- 订正: `scan-confirmation-gates.py` 的 `BLOCKING_PATTERNS` 条数由 **18 → 17**(实测 `:46-64`;17 个元组条目展开为 22 个顶层 alternation 分支),引用范围 `:46-65` → `:46-64`。受影响处:Overview 现状锚点、SC-012。
+- 订正: 反馈措辞规则的传播足迹由 **194 → 195 个文件**(`grep -rl "never paste the raw" --include=*.md .` 实测)。同时按 One Source of Truth 把该数值收敛为 **Overview 现状锚点的单一定义点**(附实测日期 2026-09-17 与"MUST NOT 被守卫钉死"声明);原先散布在 US4 叙述、US4 优先级论证、Edge Cases、Out of Scope、Assumptions 的 **6 处复述字面量改为指针引用**——该计数已在两个阶段之间漂移过一次,正是本纪律要消除的重复形态。
+- 订正: `skills/merge-skills/SKILL.md:180` → **`:179-180`**;`docs/reference/skills/feedback.md:139-141` → **`:140-142`**。
+- 订正: `shared/workflow/feedback-step.md:113-114` 的 `user-facing terms` 在源文件中**未加粗**,规格引文的粗体标记已去除(引文 MUST 逐字)。
+- 订正(**范围性**): **FR-035 的全称双落点守卫不可实现**——实测宪章模板有 11 条原则(I–XI),命令 `MUST include` 清单只有 5 条,交集仅 3 条(III Documentation-First / VIII Feature-Centric Development / IX Better-Harness Orientation),且清单另含 2 条**不在模板中**的原则(Code as the Single Source of Truth、Documentation Naming & Location Conventions)。两个方向的包含关系今天都不成立 ⇒ 改为**具名双落点观察名单**(初始 {[[STR-003]], [[STR-006]]});SC-015 与其 Source 同步订正。该订正**不削弱** clarify R1-Q2 的"当守卫样本"意图:XIV 在名单内,从任一侧删除它仍会使 CI 失败。
+- 确认(非订正,但提高约束强度): 门控预算实测 `total = 23`、`cap = 93 × 0.25 = 23.25` ⇒ **整数余量为 0**;且 `tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged` 钉死 total **等于** 23(不只是 ≤ cap)。故 SC-012("计数完全不变")是**硬门禁**而非软目标:新真源文档、新指令模板章节、新宪章原则中任何一行命中 17 条阻塞模式,即同时打爆两个契约测试。另实测 `SCAN_ROOT_FILES = ("templates",)` 使根级 `templates/*.md` 也在扫描范围内,且 `constitution-template.md` 的 governance-path 归类**不豁免于 `total` 计数**。处置方案见 `research.md` D-2。
+- 订正: 界面类 ⑦(面向干系人的需求/规划/任务工件)与 ⑩(流程收尾报告)存在**规则真源缺口**——实测 `templates/plan-template.md` 与 `templates/tasks-template.md` **零**读者/措辞规则,⑩ 也无专属真源(规则分裂在 `confirmation-gates.md:62-66` 与 `feedback-step.md:86-93`)。FR-014 的枚举不变,归属裁定见 `research.md` D-3:⑦ 由 `requirements-guidelines.md` 单独拥有(缺口如实记录、不在本特性内给 plan/tasks 模板新增措辞规则),⑩ 由 `confirmation-gates.md` § 执行报告 拥有。
+
 ## Out of Scope
 
 - **门控"是否触发"的判据改写**——两级判据、破坏性动作清单、治理保留清单、存疑从严、回流约束全部保持 `confirmation-gates.md` 为唯一权威;本特性只新增"门控如何措辞"(FR-017)。
@@ -353,7 +366,7 @@
 - **确认门控既有分类与执行报告三要素定义的改写**——三要素(执行内容 / 产出·变更工件 / 修改途径)继续由 `confirmation-gates.md:56-60` 拥有,本纪律引用而不复述(FR-009)。
 - **访谈模式的其他规则**——设计树/依赖 DAG、决策记录、隔离规划、frontier、`I0–I6` 循环、退出门、事实 vs 决策拆分、台账 schema、可恢复性:均不属本特性;"每问一决策""问 what 不问 whether"两条 MUST 原文保留(FR-021)。
 - **澄清流程的既有形态裁定**——封闭式提问、选项表 + Recommended、不采纳开放式提问规则:保持不变(FR-020)。
-- **194 个机械副本的手工批改**——交由既有再生脚本(FR-023)。
+- **机械副本的手工批改**(命中面实测计数见 Overview 现状锚点)——交由既有再生脚本(FR-023)。
 - **`docs/` 文档空间的全量调谐**——本特性只收敛与本纪律直接相关的手写复述处;需要移动/归档级变更时,推荐运行 `/speckit.docs` 而非在此执行。
 - **词汇表机制的改写**——入向校正与出向 canonical 措辞协议仍由 `shared/workflow/glossary.md` 拥有;本纪律只引用其"就地注解优先采用词汇表 canonical 措辞"这一衔接点。
 - **主动触发机制的规则集、晋升态与遥测**——`proactive-trigger.md` 独家拥有;本纪律只引用其"单行 = 用途 + 确切调用形式"作为上下文上限的既有形态(FR-010)。
@@ -374,7 +387,7 @@
 - **宪章编号**: `templates/constitution-template.md` 现有 11 条原则(I–XI)⇒ 本批新增两条(本纪律 + 回流的 One Source of Truth),位置在 XI(`:132-141`)之后、`## [SECTION_2_NAME]`(`:143`)之前;二者先后顺序由 `/speckit.plan` 定。本仓活动宪章 `.specify/memory/constitution.md` 现有 I–XIV ⇒ 对应新增原则为 **XV**。模板与活动宪章的编号不同属正常(模板是通用脚手架,活动宪章含本项目专有原则);守卫 MUST 按**原则名**匹配([[STR-003]] / [[STR-006]]),MUST NOT 钉死罗马数字字面量(FR-035)。
 - **版本递增**: 新增原则 = MINOR(`templates/commands/constitution.md:66`);本仓宪章现为 `1.11.0` ⇒ 递增后为 `1.12.0`,并前置 Sync Impact Report(`:142-148`)。
 - **下游 plan 门控自动传导成立但 MUST 验证**: `plan-template.md:37-42` 明写动态枚举、禁止硬编码原则名 ⇒ 逻辑上自动纳入。FR-026 要求实测验证而非假定,依据是既有教训"重构命令/引擎时 MUST 端到端执行其真实流水线——'文件存在/标题存在'式检查会漏掉只在运行时浮现的潜在缺陷"。
-- **US4 排 P2 的依据**: 反馈流程是本纪律**今天执行得最好**的一片(`feedback-step.md` 拥有规则 + 194 文件传播足迹),其边际工作是命名归属与一般化,而非从零修复;相较之下 US2(门控措辞)是**零规则、零守卫、且直接决定不可撤销动作**,失效风险高一个量级。此为基于实测证据的排序判断,若用户认为反馈流程应同等优先,调整只影响实现顺序、不影响 FR 集合。
+- **US4 排 P2 的依据**: 反馈流程是本纪律**今天执行得最好**的一片(`feedback-step.md` 拥有规则 + 跨表面传播足迹,实测计数见 Overview 现状锚点),其边际工作是命名归属与一般化,而非从零修复;相较之下 US2(门控措辞)是**零规则、零守卫、且直接决定不可撤销动作**,失效风险高一个量级。此为基于实测证据的排序判断,若用户认为反馈流程应同等优先,调整只影响实现顺序、不影响 FR 集合。
 - **输入模态**: 本次为中文键入文本(非语音),glossary 校正协议已先行——用户输入中的 `jargon` / `context` / `feedback` / `constitution` / `shared/guidelines` 均为本仓既有 canonical 术语,无需校正;无同音/近形变体需提交确认。
 - **落地层级**: 真源文档 + 常驻章节 + 宪章模板 + 宪章命令 MUST-include 条目随 `templates/` 与 `shared/` 分发,框架自身与下游采纳项目**同一机制同时受益**(init 即得);按工具副本经既有再生脚本处理;本仓活动宪章与活动指令文件的落地属客户端实例侧,同批完成。
 - **术语提案(wrap-up 提交)**: 拟按 glossary 协议以 `origin=auto`、`status=proposed` 提交 "面向用户可理解性(User-Facing Comprehension)"、"许可行话 / 禁用行话"、"上下文下限 / 上下文上限"、"消费单元"、"面向用户界面类" 等新词条;需先做冲突检测——`可理解性规则` 已存在于 `interview-pattern.md`(非词汇表条目),`Comprehension` 一词在历史 spec 中作度量措辞使用,二者是否构成需用户确认的冲突由 wrap-up 的冲突检测判定。
