@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-18T12:14:43Z",
+  "updated": "2026-09-18T12:14:47Z",
   "threshold": 10,
-  "count_since_submission": 17,
+  "count_since_submission": 18,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260917T145341Z-speckit-tasks",
+      "file": "20260917T145341Z-speckit-tasks.md",
+      "unit_id": "/speckit.tasks",
+      "unit_type": "command",
+      "run_id": "051-user-facing-comprehension:2026-09-17:tasks",
+      "probe": "speckit-tasks-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "051-user-facing-comprehension",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-17T14:53:41Z",
+      "summary": "Tests Mode 走确定性路径:按命令规定的 grep 检出 Principle IV(:51)含 MUST 级测试要求 ⇒ ON,同时检出 :90 NON-NEGOTIABLE 之下 :95 的 Template-only features 门 ⇒ 发出结构契约测试而非单元/集成测试,banner 同时引用两者、未从特性历史反推。用 doc-feature 分类法(tests-first r"
+    },
     {
       "id": "20260917T135437Z-speckit-plan",
       "file": "20260917T135437Z-speckit-plan.md",
