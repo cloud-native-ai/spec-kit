@@ -207,7 +207,9 @@ grep -nE '^### <roman-or-arabic-numeral>|roman-or-arabic-numeral' templates/plan
 
 > *本子场景**无法**作为一条 shell 管线执行:`/speckit.constitution` 与 `/speckit.plan` 是聊天指令而非终端命令(见 `AGENTS.md` 的 "`/speckit.*` commands are chat instructions, not terminal commands")。以下步骤 MUST 由 agent 在一个临时目录中逐步驱动,每步的判定点已给出可实跑的 shell 核验命令。本文件不对 `specify init` 的副作用(例如是否创建指令文件符号链接)作任何断言——该行为未经本轮实测。*
 
-1. 在仓库外建临时目录,以本仓为安装源执行 `specify init`(具体安装形态依 `docs/tutorials/installation.md`)。
+> **环境前提(2026-09-17 实测,tasks 阶段探测)**:本机 `specify` 为 `/usr/local/bin/specify`,版本 **0.0.22**,安装在 `/usr/local/lib/python3.11/site-packages/specify_cli/__init__.py`——**不是本工作树的可编辑安装**(`python3 -c "import specify_cli; print(specify_cli.__file__)"` 的路径不在仓库内)。而 `specify init --help` 明写"Use local templates (GitHub download is no longer supported)",即 init 用的是**已安装包内**的模板。⇒ 直接跑本子场景验证的是 0.0.22 的模板,**不是本特性的改动**。要让本子场景有效,MUST 先从本树重装(`python3 -m pip install -e .` 或 `pip install .`);该动作会改动全局 site-packages 安装,属**需先征得同意**的操作。替代路径:以 **5a + 5b 的机械核验**作为本特性导出能力的验收证据,把 5c 记为 `[~]` 延后并在 `verification.md` 写明理由。
+
+1. 在仓库外建临时目录;**先按上面的环境前提从本树重装 CLI**(`python3 -m pip install -e .`,会改动全局 site-packages,需先征得同意),再执行 `specify init`(安装形态依 `docs/tutorials/installation.md`)。**未重装则本子场景验证的是已发布的 0.0.22 模板,对本特性无证明力。**
 2. 核验真源文档已随 init 抵达:`ls <tmp>/.specify/shared/guidelines/user-facing-comprehension.md`。
 3. 由 agent 执行 `/speckit.constitution`。核验:`grep -c 'User-Facing Comprehension' <tmp>/.specify/memory/constitution.md` → **≥1**;`grep -c 'One Source of Truth (Authority & Reference Discipline)' <tmp>/.specify/memory/constitution.md` → **≥1**;`grep -n '\*\*Version\*\*' <tmp>/.specify/memory/constitution.md` 的版本符合 `x.y.z.ddd` 且文件头部含 Sync Impact Report。
 4. 由 agent 执行 `/speckit.plan` 至 Constitution Check 一节。核验:该表行数 == `grep -cE '^### [IVXLC0-9]+\.' <tmp>/.specify/memory/constitution.md`,且表中含两条新原则各一行。
