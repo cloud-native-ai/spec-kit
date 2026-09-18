@@ -66,11 +66,10 @@ Apply [Feature Integration Protocol](.specify/shared/workflow/feature-integratio
 
 ## Guidelines
 
-For detailed quality validation, success criteria guidelines, and AI generation best practices, see `.specify/shared/guidelines/requirements-guidelines.md`.
+For detailed quality validation, success criteria guidelines (including the reader baseline these artifacts are written for), and AI generation best practices, see `.specify/shared/guidelines/requirements-guidelines.md`.
 
 Key rules:
 - Focus on WHAT and WHY, not HOW
-- Written for business stakeholders
 - No embedded checklists (separate command)
 - Max 3 [NEEDS CLARIFICATION] markers
 

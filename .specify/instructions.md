@@ -79,6 +79,18 @@ LLM token usage efficiency is a framework-level quality attribute. The full disc
 - **Summary-First (摘要优先)**: never inject the whole raw content of machine-managed data files (feedback, memory, evidence, history stores, run artifacts, inventories) into LLM context; consume digests, field projections, or targeted excerpts, escalating per the discipline doc's escalation ladder (exceptions: edit target, small-file threshold, recorded justification).
 - **Consumption Observation (消耗观察)**: at feedback wrap-up, self-assess avoidable token spend; findings carry the stable `token-efficiency` marker (retrievable via `feedback-utils.py --action list --contains token-efficiency`); never fabricate token counts.
 
+## User-Facing Comprehension
+
+Every user-facing output has to be readable by someone who did not take part in the run. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/user-facing-comprehension.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+
+- **Jargon is bounded, not banned (行话有界而非禁绝)**: a closed whitelist decides when a term may stand unexplained and a closed blacklist decides what may never reach a reader. Outside the whitelist counts as a violation — there is no "use sparingly" middle tier, because that is not decidable.
+- **Context is bounded as well (上下文同样有界)**: each message carries the facts a reader needs in order to act without opening another artifact, and reaches everything else by path reference. Restating an artifact the reader could open themselves is a violation at any length.
+- **One reader, one verdict (判定对象唯一)**: a single baseline reader definition serves both the jargon side and the context side; a per-class override takes effect where it is declared and is never written back into the owner.
+- **Judgement is reproducible (判定可复现)**: two independent reviewers applying the criteria to the same message must reach the same verdict. Disagreement means the criteria need fixing, not that both reviewers are right.
+- **Governed surfaces are a closed set (受约束的界面类为封闭集)**: which kinds of user-facing output the discipline governs is enumerated in the owner, and that list grows only by revising it — never per command template.
+
+Should the owner document be missing from a project, it ships with the framework: refresh the project instructions to restore it together with its mirror copy. Do not reconstruct the rules from memory or act on a summary of them.
+
 ## Dogfooding Practice
 
 Dogfooding — the people who build a product also rely on it in their real daily work, so a smooth **use → feedback → iterate** loop forms naturally — proves development-assistance capabilities the way self-hosting proves a compiler. Two loops already exist and add no new tools, steps, or storage:
