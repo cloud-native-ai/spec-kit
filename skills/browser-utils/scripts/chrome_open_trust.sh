@@ -14,11 +14,19 @@
 #   to a throwaway profile silently.
 #
 # Focus-safe ladder exception (human-in-the-loop):
-#   This launcher deliberately opens a REAL window on the user's desktop, because a
-#   human must complete the login in it. It therefore takes focus — announce the
-#   window before launching, and close it once the login is confirmed. It is an
-#   exception to the ladder, not a violation of it; the ladder itself is owned by
-#   references/focus-safe-launch.md (see § The legitimate exceptions).
+#   This launcher opens a REAL window on the user's desktop, because a human must
+#   complete the login in it. It is an exception to the ladder, not a violation of
+#   it; the ladder itself is owned by references/focus-safe-launch.md (see § The
+#   legitimate exceptions).
+#
+#   🛑 FOCUS RED LINE — even the human-login window must not YANK focus. On macOS
+#   this launcher starts Chrome through `open -g -na "Google Chrome" --args ...`
+#   (`-g` = do not bring to the foreground), so the window APPEARS without taking
+#   keyboard focus; the human clicks it when ready. Invoking the Chrome binary
+#   directly would activate Chrome and steal focus (the classic regression). Set
+#   CHROME_TRUST_FOREGROUND=1 ONLY when a foreground window is explicitly wanted
+#   and already announced to the user. Announce the window before launching either
+#   way, and close it once the login is confirmed.
 #
 # Usage:
 #   source ${SKILL_HOME}/scripts/chrome_open_trust.sh
@@ -43,8 +51,16 @@ chrome_open_trust() {
   args+=(--allow-running-insecure-content --reduce-security-for-testing --test-type)
   [ "${has_profile}" = "false" ] && args+=("--user-data-dir=${HOME}/tmp")
   args+=("$@")
-  # Portable launcher (replaces machine-local chrome_open): self-resolve the
-  # Chrome binary; override with CHROME_MACOS when the host keeps it elsewhere.
+  # 🛑 Focus red line: never YANK the user's focus. On macOS launch through
+  # `open -g -na` so the window appears in the BACKGROUND (no focus steal); the
+  # human clicks it when ready. CHROME_TRUST_FOREGROUND=1 opts into the direct,
+  # foreground binary launch ONLY for an announced human-login case. Non-macOS
+  # hosts have no `open`, so they use the direct binary path (headless boxes are
+  # covered by the F0/F1 ladder, not this launcher).
   local chrome_bin="${CHROME_MACOS:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
-  nohup "${chrome_bin}" "${args[@]}" >/dev/null 2>&1 &
+  if [[ "$(uname -s)" == "Darwin" && "${CHROME_TRUST_FOREGROUND:-0}" != "1" ]]; then
+    open -g -na "Google Chrome" --args "${args[@]}"
+  else
+    nohup "${chrome_bin}" "${args[@]}" >/dev/null 2>&1 &
+  fi
 }

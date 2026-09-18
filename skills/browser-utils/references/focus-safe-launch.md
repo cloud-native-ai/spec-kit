@@ -1,9 +1,15 @@
 # Focus-Safe Browser Launch
 
 > **This document is the owner** of one fact: *how browser-utils launches a browser so the
-> window never contends for the user's system focus.* Every other file in this skill
-> (SKILL.md Strict Requirements, the per-agent guides, the launch recipes) references this
-> ladder instead of restating it.
+> window never contends for the user's system focus* — including the macOS **CDP-attach**
+> channel (a real logged-in Chrome driven via `connectOverCDP`), which the F0–F2 ladder does
+> not cover. Every other file in this skill (SKILL.md Strict Requirements, the per-agent guides,
+> the launch recipes) references this ladder instead of restating it.
+>
+> **Focus red line (non-negotiable):** *no automation method — headless, headed, virtual display,
+> CDP-attached real Chrome, MCP connector, or a shell `open` — may steal the user's system focus
+> or pop a window/tab in front of their work.* Focus theft causes mistyped input and interrupts
+> real work; it outranks every convenience of "just get the run to pass".
 
 ## Why this exists
 
@@ -115,6 +121,36 @@ answer that question trades their focus for evidence they could have had for fre
 If it is genuinely ambiguous which column applies, **ask one question** — never resolve the
 ambiguity by opening a window.
 
+## The macOS CDP-attach channel (real logged-in Chrome)
+
+The F0–F2 ladder governs a browser **Playwright launches itself**. On macOS there is a second,
+distinct channel that the ladder's Linux-centric rungs do not describe: a **real, headed Google
+Chrome** carrying the user's login state, started with `--remote-debugging-port=<port>` and driven
+over `chromium.connectOverCDP('http://127.0.0.1:<port>')`. Internal/SSO sites need this because a
+bundled/headless Chromium has no login state. It is focus-safe **only if** every step below holds —
+the window is real and on the user's desktop, so any activation is a visible focus theft:
+
+1. **Launch it in the background, never by invoking the binary directly.** On macOS use
+   `open -g -na "Google Chrome" --args … --remote-debugging-port=<port> --user-data-dir=<profile>`;
+   `-g` = "do not bring the application to the foreground", so the window appears without taking
+   focus. Invoking `"/Applications/Google Chrome.app/…/Google Chrome"` directly (what
+   `chrome_open_trust` and a bare Playwright `channel:'chrome'` launch do) makes macOS activate
+   Chrome and steal focus — that is the classic regression this channel must avoid.
+2. **Prefer attaching to an already-running Chrome over relaunching.** Probe the CDP endpoint
+   first; if it is up, `connectOverCDP` onto it. Do **not** `open -na` / `--new-window` a fresh
+   instance every run — repeated new windows are the "popups everywhere" symptom.
+3. **Zero re-activation while attached.** Reuse an existing background tab
+   (`browser.contexts()[0].pages()[0]`) instead of calling `newPage()` per step; **never call
+   `page.bringToFront()`** (screenshots, aria snapshots and in-page `fetch` are CDP capture and
+   need no focus); open any genuinely-needed new tab in the background without activating it.
+   On macOS, `Target.createTarget` (newPage) and some navigations can raise the window, so tab
+   reuse is not merely tidy — it is what keeps the run non-intrusive.
+
+This channel is the macOS counterpart of F0's "capture never needs focus": the window stays put,
+the automation drives it over CDP, and the user's keyboard focus is never touched. The front door
+that owns the launch/attach sequence is `profiles-browsers` (`agent_chrome_cdp.sh`); it launches
+via the `open -g` quiet path and attaches rather than relaunching.
+
 ## Considered and rejected as focus mechanisms
 
 | Candidate | Status | Why it is not the answer |
@@ -123,7 +159,7 @@ ambiguity by opening a window.
 | `--silent-launch`, `--no-startup-window` | present in the binary | Startup-window suppressors for background/app mode, not de-activation switches. **Not runtime-verified here** — do not rely on them. |
 | `--window-position=-32000,-32000` | unverified | Off-screen placement is a Windows-minimized convention; not verified on any host in this repo, and it still maps a window. Use F0 instead. |
 | `xdotool` / `wmctrl` post-launch minimize | racy | Fires after the WM has already activated the window, so the focus theft has happened. Also absent on most hosts. |
-| macOS `open -g` | real, but narrow | `-g` = "Do not bring the application to the foreground"; `--args` forwards flags. Valid for a human-login launch, but Playwright spawns the binary directly, so it does not apply to F0–F2. |
+| macOS `open -g` | real, and **the mechanism for the CDP-attach channel** | `-g` = "Do not bring the application to the foreground"; `--args` forwards flags. It does not apply to F0–F2 (Playwright spawns the binary directly), but it is exactly how the real logged-in Chrome must be launched on macOS — see § The macOS CDP-attach channel. |
 
 ## Tier 3 drives the user's live Chrome — always intrusive
 

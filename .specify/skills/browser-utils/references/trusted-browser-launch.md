@@ -25,6 +25,15 @@ chrome_open_trust --user-data-dir="${CHROME_USER_DATA_AGENT}" --new-window <site
   original; its launcher is self-contained (self-resolving Chrome binary,
   overridable via `CHROME_MACOS`). If the runtime environment already loads
   a same-named function, prefer the environment's implementation.
+- 🛑 **Focus red line (macOS):** `chrome_open_trust` opens a real window for a
+  human to complete login, but it must not *yank* the user's focus. On macOS it
+  therefore launches through `open -g -na "Google Chrome" --args ...` (`-g` = do
+  not bring to the foreground) so the window appears in the background; the human
+  clicks it when ready. Set `CHROME_TRUST_FOREGROUND=1` only when a foreground
+  window is explicitly wanted and already announced. On non-macOS hosts (no
+  `open`) it falls back to a direct background `nohup` binary launch. Announce the
+  window before launching either way. See
+  [focus-safe-launch.md § The legitimate exceptions](./focus-safe-launch.md).
 - Flags applied: `--unsafely-treat-insecure-origin-as-secure=<url>` (when a
   URL is given), `--allow-running-insecure-content`,
   `--reduce-security-for-testing`, `--test-type`. Without an explicit
