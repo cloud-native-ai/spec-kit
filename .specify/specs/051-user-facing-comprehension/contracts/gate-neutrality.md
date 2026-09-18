@@ -2,7 +2,21 @@
 
 **Feature**: 051 面向用户可理解性纪律  
 **Guards**: 确认门控计数不变、扫描器零改动、三处新增文本零阻塞模式命中、零新机制  
-**Test files**: 条款分布于 `test_user_facing_comprehension_doc.py`(C-1、C-4 的文档侧)与 `test_user_facing_comprehension_section.py`(C-1、C-4 的章节侧);C-2、C-3、C-5、C-6、C-7 由 `test_user_facing_comprehension_doc.py` 承载  
+**Test files**: 本契约的条款**分布在三个测试文件**中,归属逐条列明(此前本行笼统声明 C-2/C-3/C-5/C-6/C-7 全由纪律文档测试承载,而该测试的撰写任务范围并不含它们,导致这 5 条只剩手工 shell 核验、不进 CI):
+
+| 条款 | 承载测试文件 | 说明 |
+|---|---|---|
+| C-1(a) | `test_user_facing_comprehension_doc.py` | 即该文件的 `discipline-doc` C-16 |
+| C-1(b) | `test_user_facing_comprehension_section.py` | 即该文件的 `ambient-section` C-10 |
+| C-1(c) | `test_constitution_double_landing.py` | 即该文件的 `constitution-export` **C-13** |
+| C-2 | `test_user_facing_comprehension_doc.py` | 实跑扫描器并断言 `total == 23` 且 `violations == []` |
+| C-3 | `test_user_facing_comprehension_doc.py` | 断言 `POLICY_DOCS`、`SELF_REL` 字面量与 `len(BLOCKING_PATTERNS) == 17` 均未变 |
+| C-4 | —(**撰写指引,不设断言**) | 17 条禁用字面形态清单供撰写期自检;机械断言由 C-1 的三条承担 |
+| C-5 | `test_user_facing_comprehension_doc.py` | 枚举本特性新增文件并断言可执行脚本数为 0 |
+| C-6 | `test_user_facing_comprehension_doc.py` | 断言三个零改动面的 `git diff` 为空 |
+| C-7 | —(**由既有套件承担**) | 全量契约套件 vs 冻结基线,执行者是 `tasks.md` 的 T057 与 GATE-1,不新写测试 |
+
+**撰写任务的范围义务**:`tasks.md` 的 T003(该文件唯一的撰写任务)MUST 显式承载 C-2、C-3、C-5、C-6 四条,否则它们只存在于本文档而不存在于 CI。  
 **Date**: 2026-09-17
 
 本契约是整个特性**最硬的机械约束**。实测门控预算整数余量为 **0**,任何一处新增命中即同时打爆两个既有契约测试。处置方案与取舍见 `research.md` D-2。
@@ -64,7 +78,23 @@ EXIT=0
 2. **`classify()` 第 3 条**(`:98-109`)—— 命中 `BLOCKING_RE` 且行内**不含** `执行`/`写入`/`落盘`/`启动`/`继续` 五个中文字面之一、且无破坏性关键词、路径不命中 governance ⇒ 判为 **`reversible`**。这不仅使 `total` +1,还**额外**打爆 `test_confirmation_gates_sweep.py:54-60`(`test_no_reversible_gates_remain_blocking`)并使扫描器在 `--baseline` 下 **exit 2**。本纪律文档必然频繁出现「执行」「写入」,故该路径比单纯计数更易触发 ⇒ 规避是**强制**的。
    注:该 reversible-context 判定**只认那五个中文字面**,英文 `execute` / `execute before` **不算**(`:106`)⇒ 撰写英文反例时不可依赖英文词提供豁免。
 
-**C-5** 本特性新增文件中**可执行脚本数 MUST 为 0**:新增 `.py` 文件 MUST 仅位于 `tests/contract/`;MUST NOT 新增任何行话 lint 引擎、措辞评分器、成熟度报告生成器、跟踪台账或注册表(FR-033 / Principle IX)。断言方式:枚举本特性新增文件路径,断言其中可执行脚本(非 `tests/` 下的 `.py`、任何 `.sh`)数量为 0。
+**C-5** 本特性新增文件中**可执行脚本数 MUST 为 0**:新增 `.py` 文件 MUST 仅位于 `tests/contract/`;MUST NOT 新增任何行话 lint 引擎、措辞评分器、成熟度报告生成器、跟踪台账或注册表(FR-033 / Principle IX)。
+
+断言方式(**命令形态经实测确定,MUST 逐字采用**):
+
+```bash
+# BASE 由 T001 在冻结改前基线时记录为字面 SHA,存于 notes/pre-change-measurements.md
+git diff --name-only --no-renames --diff-filter=ACMR "$BASE" -- . | grep -E '\.(py|sh)$' | grep -vE '^tests/contract/' | wc -l
+# MUST 输出 0
+```
+
+三个要点,缺一个该断言即失效:
+
+1. **MUST 用 `--name-only`,MUST NOT 用 `--stat`**。`--stat` 把每行渲染成 ` path | N ++++`,行尾是 `+` 而非扩展名,且长路径被省略为 `.../name` ⇒ `grep -E '\.(py|sh)$'` **永远零命中**。实测对照(基 `b4fb16cb~1` → `b4fb16cb`,该提交新增了 `scripts/python/validate-tasks.py`):`--stat` 形式零输出 exit 1,`--name-only` 形式正确命中该文件及其镜像;在 6 个提交上循环(共 16 个真实新增 `.py`),`--stat` 形式命中数**恒为 0**。
+2. **MUST 含 `--no-renames` 且 filter 含 `R`**,否则 `git mv` 一个既有脚本到新位置会绕过 `--diff-filter=A`。
+3. **断言 MUST 以"过滤后计数 == 0"的形式表达**,而不是"命中全部落在 `tests/contract/`"——后者在命中集为空时**空真**,无法区分"没有新增脚本"与"命令什么都没匹配到"。
+
+`BASE` MUST 是 T001 记录的**字面 SHA**,MUST NOT 写 `HEAD~<n>`(n 未定,且随后续提交漂移)。
 
 **C-6** `src/specify_cli/__init__.py` 与 `scripts/`(含 `scripts/bash/generate-instructions.sh`、`scripts/python/sync-mirrors.py`、`scripts/python/regen-command-copies.py`、`scripts/python/feedback-utils.py`)MUST **未被本特性修改**。FR-038 的悬空指针义务落在**文本层**(指针行附获取途径说明 + `ambient-section.md` C-11 的遍历断言),MUST NOT 通过改投递脚本实现——修 `generate-instructions.sh` 使其同步 `shared/` 属另一条 Feature 的归属(规格 Out of Scope)。
 

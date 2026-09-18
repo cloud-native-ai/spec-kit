@@ -47,14 +47,12 @@
 
 ## 同批义务(非条款,实现顺序约束)
 
-C-2 与 C-3 无法靠只改源文件满足。实现 MUST 在同一批内:
+C-2 与 C-3 无法靠只改源文件满足。实现 MUST 在同一批内**按下列顺序**执行(顺序不可颠倒:`generate-instructions.sh:22` 的 `TEMPLATE_FILE` 指向 `.specify/templates/instructions-template.md`,即它读的是**镜像**而非源文件,故镜像同步 MUST 先于指令再生,否则再生结果不含新章节):
 
 1. 编辑 `templates/instructions-template.md`;
-2. 运行 `bash scripts/bash/generate-instructions.sh` 再生 `.specify/instructions.md`(满足 C-3);
-3. 运行 `python3 scripts/python/sync-mirrors.py --write` 同步 `.specify/templates/`(满足 C-2);
+2. 运行 `python3 scripts/python/sync-mirrors.py --write` 同步 `.specify/templates/` 与 `.specify/shared/`(满足 C-2);
+3. 运行 `bash scripts/bash/generate-instructions.sh` 再生 `.specify/instructions.md`(满足 C-3);
 4. 核验 8 条 symlink 别名仍为符号链接而非被替换成普通文件(根 `AGENTS.md` / `CLAUDE.md` / `QODER.md` / `HERMES.md`、`.github/copilot-instructions.md`、`.qoder/project_rules.md`、`.claude/project_rules.md`、`.opencode/instructions.md`,创建于 `generate-instructions.sh:235-267`)。
-
-步骤 2 与 3 的顺序不可颠倒:`generate-instructions.sh` 从 `.specify/templates/instructions-template.md` 读取模板,故 MUST 先同步镜像再再生指令文件,否则再生结果不含新章节。
 
 ---
 

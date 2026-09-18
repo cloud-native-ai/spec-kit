@@ -125,7 +125,7 @@
 
 **Why this priority**: 用户显式点名"还需要把这条原则输出到用户自己的项目的constitution中(通过constitution模板和命令输出)"。这一片也**独立可交付且独立有价值**:即便框架自身的界面接入尚未完成,下游项目从第一天起就在其宪章与 plan 门控中拥有这条原则。同时它是唯一一片**跨项目传播**的——US1/US2 的收益限于读到本仓真源的场合,US3 的收益抵达每一个采纳项目。
 
-**Independent Test**: 在一个空白目录跑 init + `/speckit.constitution`,检查生成的宪章含 [[STR-003]] **与**回流的 [[STR-006]] 两条原则且结构合规(标题层级、冒号结尾主张、要点数、恰好一个空行、`Rationale:` 段、折行 <100 字符)、各含 guideline 锚定要点与范围限制要点、无未解释的方括号占位符、版本格式合规、Sync Impact Report 已前置;再跑 `/speckit.plan` 检查两条原则均出现在 Constitution Check 表中且 `plan-template.md` 未被改动;最后人为从模板侧或命令侧删掉任一原则,确认双落点守卫失败。
+**Independent Test**: 在一个空白目录跑 init + `/speckit.constitution`,检查生成的宪章含 [[STR-003]] **与**回流的 [[STR-006]] 两条原则且结构合规(标题层级、冒号结尾主张、要点数、恰好一个空行、`Rationale:` 段、折行 <100 字符)、各含 guideline 锚定要点与范围限制要点、无未解释的方括号占位符、版本格式合规、Sync Impact Report 已前置;再跑 `/speckit.plan` 检查两条原则均出现在 Constitution Check 表中且 `plan-template.md` 未被改动;最后人为从模板侧或命令侧删掉**观察名单内**任一原则,确认双落点守卫失败。
 
 **Acceptance Scenarios**:
 
@@ -135,7 +135,7 @@
 4. **Given** 某下游项目在 bootstrap 时判定该原则与其领域无关, **When** `/speckit.constitution` 依既有授权(`templates/commands/constitution.md:40-41`)拒绝它, **Then** 该拒绝被记录进 Sync Impact Report,MUST NOT 静默丢弃。
 5. **Given** 随包分发的真源文档与两个模板文件, **When** CI 运行项目中立性断言, **Then** 本仓专有名称零泄漏。
 6. **Given** Principle XIV 已回流至两个模板文件, **When** 新下游项目跑 `/speckit.constitution`, **Then** 其宪章同时含 [[STR-006]](基线:今天 0% 的下游项目收到它),且 `plan` 门控把它一并枚举。
-7. **Given** 双落点守卫已一般化为覆盖模板中**全部**原则, **When** 有人从宪章模板或命令 `MUST include` 清单任一侧删除任一原则, **Then** CI 失败——包括删除 [[STR-006]] 这一历史上真的漏过的场合。
+7. **Given** 双落点守卫已一般化为一份**具名观察名单**(初始 = {[[STR-003]], [[STR-006]]},见 FR-035 范围订正), **When** 有人从宪章模板或命令 `MUST include` 清单任一侧删除**名单内**任一原则, **Then** CI 失败——包括删除 [[STR-006]] 这一历史上真的漏过的场合。
 
 ---
 
@@ -355,6 +355,22 @@
 - 订正(**范围性**): **FR-035 的全称双落点守卫不可实现**——实测宪章模板有 11 条原则(I–XI),命令 `MUST include` 清单只有 5 条,交集仅 3 条(III Documentation-First / VIII Feature-Centric Development / IX Better-Harness Orientation),且清单另含 2 条**不在模板中**的原则(Code as the Single Source of Truth、Documentation Naming & Location Conventions)。两个方向的包含关系今天都不成立 ⇒ 改为**具名双落点观察名单**(初始 {[[STR-003]], [[STR-006]]});SC-015 与其 Source 同步订正。该订正**不削弱** clarify R1-Q2 的"当守卫样本"意图:XIV 在名单内,从任一侧删除它仍会使 CI 失败。
 - 确认(非订正,但提高约束强度): 门控预算实测 `total = 23`、`cap = 93 × 0.25 = 23.25` ⇒ **整数余量为 0**;且 `tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged` 钉死 total **等于** 23(不只是 ≤ cap)。故 SC-012("计数完全不变")是**硬门禁**而非软目标:新真源文档、新指令模板章节、新宪章原则中任何一行命中 17 条阻塞模式,即同时打爆两个契约测试。另实测 `SCAN_ROOT_FILES = ("templates",)` 使根级 `templates/*.md` 也在扫描范围内,且 `constitution-template.md` 的 governance-path 归类**不豁免于 `total` 计数**。处置方案见 `research.md` D-2。
 - 订正: 界面类 ⑦(面向干系人的需求/规划/任务工件)与 ⑩(流程收尾报告)存在**规则真源缺口**——实测 `templates/plan-template.md` 与 `templates/tasks-template.md` **零**读者/措辞规则,⑩ 也无专属真源(规则分裂在 `confirmation-gates.md:62-66` 与 `feedback-step.md:86-93`)。FR-014 的枚举不变,归属裁定见 `research.md` D-3:⑦ 由 `requirements-guidelines.md` 单独拥有(缺口如实记录、不在本特性内给 plan/tasks 模板新增措辞规则),⑩ 由 `confirmation-gates.md` § 执行报告 拥有。
+
+### Session 2026-09-18(第四轮 — `/speckit.analyze` 发现项的修复)
+
+本轮**无新增用户提问**;以下是只读跨制品分析(3 个检测代理 + 12 个验证代理,全部 fresh-context)产出 46 条发现后,经用户指示"按照建议进行修复"而落地的**第一批修复**(3 条 HIGH + 5 条与系统性簇直接相关的 MEDIUM)。逐条记录如下,每条附验证代理的裁定。
+
+- 订正(**I-01,HIGH**;原报 CRITICAL,验证裁定 downgrade):US3 的验收场景 7 与同故事的 Independent Test 仍要求**全称**双落点守卫("覆盖模板中全部原则""删除任一原则"),而 FR-035 在第三轮已判定全称形式不可实现并改为具名观察名单——第三轮的订正记录只列了 FR-035 / SC-015 / SC-015 Source 三处,**漏掉这两处**。验证代理独立复算:模板 11 条原则、命令清单 5 条、交集 3 条 ⇒ 8 条反例,两个方向包含关系均假。已把两处改为"具名观察名单(初始 = {STR-003, STR-006})"+"删除**名单内**任一原则"。**验证代理同时确认缺陷未向下传播**:`contracts/constitution-export.md`、`tasks.md` DoD-5、`feature-ref.md`、`plan.md` 四处均已是观察名单形态。
+- 订正(**G-1,HIGH**;验证裁定 confirm):FR-008 的**消费单元**被 `feature-ref.md` 与 `discipline-doc.md` 的映射表**双向声称**由 C-13 覆盖,但 C-13 正文没有任何消费单元断言;该词在 `tasks.md` 与 `contracts/` 中零命中,`data-model.md` 的 V1.1–V1.6 也无一条断言它,T006 列举 E6 时只写了 4 个字段中的 3 个 ⇒ **映射自洽而被映射对象不存在**。验证代理另指出缺口比原报更宽:C-9/C-10 对 FR-005②/FR-006③ 的转述也丢掉了"该消费单元内"限定词。已修四处:C-13 增消费单元断言(恰好 1 条 + 按消费单元计而非按会话计 + 声明它是该限定词的唯一出处)、C-9 与 C-10 还原限定词并加"MUST NOT 简化为『首次出现』"、`data-model.md` V1.5 纳入该字段、T006 补齐 E6 的第 4 个字段。
+- 订正(**G-4,HIGH**;验证裁定 confirm):T056 的证明命令 `git diff --stat --diff-filter=A HEAD~<n> -- . | grep -E '\.(py|sh)$'` **可证明是盲的**——`--stat` 的行尾是 `| N ++++` 且长路径被省略为 `.../name`,故该 grep 永远零命中,FR-033 / SC-011 / DoD-7 / `gate-neutrality` C-5 全部空真。验证代理在一个新增了 `scripts/python/validate-tasks.py` 的真实提交上做了对照(`--stat` 形式零输出 exit 1、`--name-only` 形式正确命中),并在 6 个提交 16 个真实新增 `.py` 上循环,`--stat` 命中数**恒为 0**;另指出 `HEAD~<n>` 是未落定占位符。已修:命令改为 `git diff --name-only --no-renames --diff-filter=ACMR "$BASE" -- . | grep -E '\.(py|sh)$' | grep -vE '^tests/contract/' | wc -l` 且断言输出为 0(**空结果与通过由此可区分**);`BASE` 由 T001 以 `BASE_SHA=<字面 SHA>` 记录;新增 **GATE-9** 承载该命令;GATE-4 的路径集补 `.specify/scripts/`(而 `shared/` 与 `skills/` 是本特性合法改动面,故**不纳入** GATE-4,全仓探测由 GATE-9 承担)。
+- 订正(**G-5,MEDIUM**):`gate-neutrality` C-1(c) 要求一条"两块新宪章原则零 `BLOCKING_RE` 命中"的测试,但 `constitution-export` 的 12 条里没有它、T023 的撰写范围也不含 ⇒ 该子条只剩撰写约束加扫描器 `total` 的**间接**探测;而 `constitution-template.md` 的 governance-path 归类**不豁免于 `total` 计数**,间接探测只能给出 +1 而无法定位是哪一块原则哪一行。已新增 `constitution-export` **C-13**,并纳入 T023 的撰写范围、T024 的 red-first 期望与 T032 的转绿清单。
+- 订正(**T-2,MEDIUM**):`gate-neutrality.md` 开头笼统声明 C-2/C-3/C-5/C-6/C-7"由 `test_user_facing_comprehension_doc.py` 承载",而 T003(该文件唯一的撰写任务)的范围只列 `discipline-doc` C-1…C-16 ⇒ 这 5 条只剩手工 shell 核验、**不进 CI**;且经核实没有任何既有测试钉住 `POLICY_DOCS` / `SELF_REL` 字面量。已把该行改为**逐条归属表**(C-1a/C-1b/C-1c 分别归三个测试文件;C-2/C-3/C-5/C-6 归纪律文档测试;C-4 明标为撰写指引不设断言;C-7 由既有套件经 T057 与 GATE-1 承担),并在 T003 与 T012 的范围里显式点名这 4 条。
+- 订正(**T-3,MEDIUM**):`feature-ref.md` 称 FR-036 的观察节"由 `discipline-doc` C-6 钉死该节存在",但 C-6 的七节封闭元组内**并无观察节**(V1.3 也没有)⇒ T006 写的"观察节含 STR-005 标记约定"背后没有任何断言。已新增 `discipline-doc` **C-17**(断言观察约定存在 + STR-005 字面量 + 三条红线;载体形态不限,故不与 C-6 的七节元组冲突),并把 `data-model.md` E1 增 `observation_convention` 字段、`feature-ref.md` 的 FR-036 行改指 C-17、"未由契约覆盖的 FR"由 2 条减为 1 条。
+- 订正(**F-1,MEDIUM**):`contracts/ambient-section.md` 的编号同批清单把 `generate-instructions.sh` 排在 `sync-mirrors.py --write` **之前**,与它自己的收尾句相反;而 `generate-instructions.sh:22` 的 `TEMPLATE_FILE` 指向 `.specify/templates/instructions-template.md`,即它读的是**镜像**⇒ 编号清单是错的那一个(`tasks.md` 的 T008→T009 是对的)。已把该清单重排为 1 编辑 → 2 同步镜像 → 3 再生指令 → 4 symlink 核验,并把理由内联进列表引言,删去与之矛盾的收尾句。
+- 订正(**F-2,MEDIUM**):GATE-1 与 T057 的 `comm -13` 管线只在本地偶然可用——pytest 在 `running_on_ci()`(检查 `CI` / `BUILD_NUMBER`)为真时给每条 FAILED 行追加 ` - <crash message>`,而 `baseline-failed.txt` 存的是裸 node ID,缺处理会使 24 条基线全部失配、报出 24 条假"新增失败";本地因每个 node ID ≥88 字符(非 tty 下 `fullwidth=80`)恰好抑制了该后缀。已在两处的 `sed` 中加入 `s/ - .*$//` 并把该陷阱成文。
+- 顺带订正(**T-1,LOW**,因与 G-1 同处一句):T012 称 `discipline-doc` C-10 的"完整绿点归 **T052**",但 T052 只跑 pointers 测试;真正复绿它的是 **T054**。已改为 T054,并在 T054 显式声明它是 C-10 的完整绿点。验证代理同时否证了原报的"不可满足"半边:C-10 只断言黑名单节**指明**实例来源,而 T006 在撰写时就写了这句指名 ⇒ C-10 在 T012 时点即为绿,提升后的**内容**由成对条款 `surface-pointers` C-11 守护,而 C-11 在 T052 的清单里。
+- **契约条款计数随之变更**:60 → **62**(`discipline-doc` 16→17、`constitution-export` 12→13)。已同批订正 `plan.md` 的 Phase 1 摘要与落盘后核验段、`feature-ref.md` 的守卫圈行、`tasks.md` 的 Prerequisites 行、`data-model.md` E8 的基数行,并把 `plan.md` 的核验段标注为 2026-09-18 **重新核验**(不假装首次核验就得到了这些数字)。
+- **本批未修**:其余 33 条(25 MEDIUM + 8 LOW)留待后续批次,其中 I-05(上游质量清单的九项计数过期,根因是 `clarify-taxonomy.md` 的 Mode A 集成规则无一触及 `checklists/`,属**机制缺口**且在 `041` 有同型证据)建议按 Principle XI 修机制侧而非逐个 spec 手工刷新。
 
 ## Out of Scope
 

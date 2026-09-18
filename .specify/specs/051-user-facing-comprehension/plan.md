@@ -149,10 +149,10 @@ src/specify_cli/         # 不改动 —— 零运行时逻辑变更(FR-033 / Pr
 |----------|------|---------------|
 | Phase 0 研究 | [`research.md`](./research.md) | 15 条决策 D-1…D-15(全部仓库内部实测,无外部源);推翻需求阶段 6 处陈述 |
 | 数据模型 | [`data-model.md`](./data-model.md) | 9 个实体(对应规格 Key Entities)+ 4 组校验规则 V1…V4 + 2 个状态机(指针接入态、观察名单双落点态) |
-| 结构契约 | [`contracts/`](./contracts/) | 5 份:`discipline-doc.md`(16 条款)、`ambient-section.md`(11 条款)、`surface-pointers.md`(14 条款)、`constitution-export.md`(12 条款)、`gate-neutrality.md`(7 条款)—— 合计 **60 条款** |
+| 结构契约 | [`contracts/`](./contracts/) | 5 份:`discipline-doc.md`(17 条款)、`ambient-section.md`(11 条款)、`surface-pointers.md`(14 条款)、`constitution-export.md`(13 条款)、`gate-neutrality.md`(7 条款)—— 合计 **62 条款** |
 | 快速上手 | [`quickstart.md`](./quickstart.md) | 6 个验证场景(全部命令实测执行,期望结果取自实跑输出) |
-| Feature 绑定 | [`feature-ref.md`](./feature-ref.md) | Feature 051 绑定 + 38 条 FR → 60 条款契约映射 + 18 条 SC → 产出任务映射 |
+| Feature 绑定 | [`feature-ref.md`](./feature-ref.md) | Feature 051 绑定 + 38 条 FR → 62 条款契约映射 + 18 条 SC → 产出任务映射 |
 
 **与 Phase 0 预期的漂移**:无。D-10 预期 5 份契约文档,实际 5 份;D-11 预期 4 个新测试文件 + 1 个扩展,`feature-ref.md` 的映射按此编排。一处**范围收窄已在 Phase 0 内消化**(非 Phase 1 漂移):FR-035 的全称双落点守卫经实测不可实现,改为具名观察名单(D-6),故 `constitution-export.md` 的双落点条款以名单常量而非"遍历全部原则"表述。
 
-**计数已于制品落盘后机械核验**(2026-09-17,依模板"summarize after, not before"要求):`grep -cE '^\*\*C-[0-9]+\*\*'` 逐份实跑得 `discipline-doc` 16 / `ambient-section` 11 / `surface-pointers` 14 / `constitution-export` 12 / `gate-neutrality` 7 = **60**;`grep -cE '^## E[0-9]'` data-model = **9**、`'^### V[0-9]'` = **4**、`'^### S[0-9]'` = **2**;`grep -cE '^## 场景'` quickstart = 7,其中 6 个为验证场景、1 个为「场景 → SC 覆盖对照」表 ⇒ **6 场景**;`research.md` 决策 **D-1…D-15 = 15 条**。上表全部数值与实测一致,无一处为预写。
+**计数已于制品落盘后机械核验**(2026-09-17 首次落盘;2026-09-18 因 `/speckit.analyze` 的修复批次新增 2 条契约条款后**重新核验**,依模板"summarize after, not before"要求):`grep -cE '^\*\*C-[0-9]+\*\*'` 逐份实跑得 `discipline-doc` **17**(原 16,+C-17 观察约定,修 T-3)/ `ambient-section` 11 / `surface-pointers` 14 / `constitution-export` **13**(原 12,+C-13 两块新原则零阻塞命中,修 G-5)/ `gate-neutrality` 7 = **62**;`grep -cE '^## E[0-9]'` data-model = **9**、`'^### V[0-9]'` = **4**、`'^### S[0-9]'` = **2**;`grep -cE '^## 场景'` quickstart = 7,其中 6 个为验证场景、1 个为「场景 → SC 覆盖对照」表 ⇒ **6 场景**;`research.md` 决策 **D-1…D-15 = 15 条**。上表全部数值与实测一致,无一处为预写。

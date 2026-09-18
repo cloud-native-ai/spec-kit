@@ -60,15 +60,16 @@
 | FR-033 | 零新机制 | `discipline-doc` C-8;`gate-neutrality` C-5 | `_doc` |
 | FR-034 | `:68` 提升后获契约断言 | `surface-pointers` C-10 + 扩展 `test_confirmation_gates_execution_report.py` | 既有文件扩展 |
 | FR-035 | 具名双落点观察名单 | `constitution-export` C-7, C-8, C-9, C-10 | `_double_landing` |
-| FR-036 | 观察标记 | 不由契约断言(运行时行为)—— 由真源文档的观察节承载,`discipline-doc` C-6 钉死该节存在 | `_doc` |
+| FR-036 | 观察标记 | `discipline-doc` **C-17**(断言观察约定存在 + STR-005 字面量 + 三条红线);标记的**实际内嵌**属运行时行为,不由契约断言 | `_doc` |
 | FR-037 | 基准读者 + 按类覆盖协议 | `discipline-doc` C-13, C-14 | `_doc` |
 | FR-038 | 同批抵达 + 悬空指针提示 | `ambient-section` C-11;`gate-neutrality` C-6 | `_section` |
 
 **测试文件名缩写**: `_doc` = `test_user_facing_comprehension_doc.py`;`_section` = `test_user_facing_comprehension_section.py`;`_pointers` = `test_user_facing_comprehension_pointers.py`;`_double_landing` = `test_constitution_double_landing.py`。
 
-**未由契约条款覆盖的 FR(2 条),各有其理由**:
+**未由契约条款覆盖的 FR(1 条),有其理由**:
 - **FR-026**(下游动态枚举自动传导)—— 需真实 bootstrap 一个下游项目,是端到端演练而非结构断言 ⇒ 落 `quickstart.md` 场景 5b/5c。FR-026 本身要求"实测验证而非假定",故不入契约。
-- **FR-036**(观察标记)—— 属运行时行为(收尾自省写反馈条目),本特性零运行时代码 ⇒ 契约只钉死真源文档**含**该观察节(C-6 的七节之一),标记的实际内嵌由实现期的收尾流程履行,结果落 `verification.md`。
+
+> FR-036 曾在此列为第二条(理由是"属运行时行为"),经 `/speckit.analyze` 发现该说法与同表声称的"C-6 钉死该节存在"互相矛盾——C-6 的七节封闭元组内并无观察节。现已新增 `discipline-doc` **C-17** 专门断言观察约定,FR-036 移出本清单。
 
 ---
 
@@ -105,7 +106,7 @@
 |---|---|---|
 | 规范圈 | `shared/guidelines/user-facing-comprehension.md`(新)+ 8 个规则真源文件各加 1 行指针 + 3 处内容搬家 | 1 新 / 8 改 / 3 搬家 |
 | 投递圈 | `templates/instructions-template.md` 新章节(17→18)、`templates/constitution-template.md` 两原则(11→13)、`templates/commands/{clarify,interview,constitution}.md`、`.specify/memory/constitution.md`(14→15,1.11.0→1.12.0) | 6 改 |
-| 守卫圈 | `contracts/` 5 份(60 条款)、`tests/contract/` 4 新 + 1 扩展 | 5 + 5 |
+| 守卫圈 | `contracts/` 5 份(**62 条款**:discipline-doc 17 / ambient-section 11 / surface-pointers 14 / constitution-export 13 / gate-neutrality 7)、`tests/contract/` 4 新 + 1 扩展 | 5 + 5 |
 | 文档空间 | `docs/reference/` 3 处手写复述收敛(`docs/public/**` 由 Hugo 重建,不手改) | 3 改 |
 | **零改动** | `src/specify_cli/`、`scripts/`(含 `scan-confirmation-gates.py`、`generate-instructions.sh`)、`templates/plan-template.md`、4 棵按工具树(仅再生) | 0 |
 

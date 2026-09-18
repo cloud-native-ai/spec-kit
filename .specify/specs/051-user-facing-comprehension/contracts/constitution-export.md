@@ -5,7 +5,7 @@
 **Test file**: `tests/contract/test_constitution_double_landing.py`  
 **Date**: 2026-09-17
 
-条款编号 C-1…C-12 由测试函数名 `test_cN_*` 一一对应。落位与顺序裁定见 `research.md` D-9,命名冲突防线见 D-5,全称守卫不可实现的实测推翻见 D-6。
+条款编号 C-1…C-13 由测试函数名 `test_cN_*` 一一对应。落位与顺序裁定见 `research.md` D-9,命名冲突防线见 D-5,全称守卫不可实现的实测推翻见 D-6。
 
 ---
 
@@ -73,6 +73,14 @@ DOUBLE_LANDING_WATCHLIST = (
 - **下游 bootstrap 拒绝该原则的路径**:`templates/commands/constitution.md:40-41` 授权拒绝不相关的模板原则。拒绝 MUST 记录进 Sync Impact Report(规格 US3 场景 4),该义务由命令文档承载,不由本契约机械断言。
 - **模板与活动宪章的编号不一致属正常**:模板 XII/XIII 与活动宪章 XIV/XV 指向同一对原则,编号不同是因两份名册本就不同(模板是通用脚手架,活动宪章含本项目专有原则)。C-8 已禁止钉死数字。
 
+## 门控预算中立(补充条款)
+
+**C-13** 两条新原则块(XII 与 XIII)对 `scan-confirmation-gates.py` 的 `BLOCKING_RE` 命中数 MUST 各为 **0**。测试 MUST 以 `importlib` 内联加载真实扫描器并复用其 `BLOCKING_RE`,MUST NOT 重写模式副本。
+
+> 本条落实 `contracts/gate-neutrality.md` C-1(c),此前该子条**只有撰写约束与扫描器 `total` 的间接探测**,没有直接断言。间接探测不足以定位问题:`constitution-template.md` 的路径命中 `GOVERNANCE_PATH_PATTERNS`,其命中被归类 `governance_kept` 而 **`governance_kept` 仍计入 `total`**,故一旦命中,`total` 只表现为 +1 而不指明是哪一块原则、哪一行。本条把定位粒度收敛到"两块新原则各自零命中"。
+
+---
+
 ## 条款 → FR / SC 映射
 
 | 条款 | FR | SC |
@@ -81,3 +89,4 @@ DOUBLE_LANDING_WATCHLIST = (
 | C-5, C-6 | FR-025 | SC-005 |
 | C-7, C-8, C-9, C-10 | FR-035, FR-028, FR-029 ⑤ | SC-015 |
 | C-11, C-12 | FR-027 | SC-005 |
+| C-13 | FR-032 | SC-012 |
