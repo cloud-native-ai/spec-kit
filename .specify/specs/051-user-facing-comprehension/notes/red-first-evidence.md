@@ -106,3 +106,42 @@ Every function name maps one-to-one onto its contract clause number.
 
 **Re-derive**: `python3 -m pytest <both files> --collect-only -q | tail -1` → `34 tests collected`;
 per file, `grep -c '^def test_' tests/contract/test_user_facing_comprehension_{doc,section}.py` → `23`, `11`.
+
+---
+
+## Amendment after T013 — one "green by construction" entry was green for the wrong reason
+
+The table above lists section `test_c11` as green before any artifact exists, on the grounds
+that "every guideline pointer on both instruction surfaces resolves today". That was true as
+measured, and the clause was still **too weak to be worth its name**. SC-017's stated drill —
+construct a project state where the ambient section is present but the truth document is
+missing — was run during wrap-up:
+
+```bash
+mv .specify/shared/guidelines/user-facing-comprehension.md /tmp/   # simulate the downstream state
+python3 -m pytest tests/contract/test_user_facing_comprehension_section.py::test_c11_no_dangling_guideline_pointer_on_either_instruction_surface -q
+# → 1 passed            <-- the guard did NOT fire
+```
+
+**Root cause**: C-11 resolved each pointer's target against the framework **source** tree
+(`shared/guidelines/<name>.md`) while the pointer text — and therefore the reader — resolves
+`.specify/shared/guidelines/<name>.md`. In this repo both exist, so the source check is a
+weaker proxy that happens to agree. In a downstream project only the runtime copy exists, so
+the one failure mode the clause exists to catch was structurally invisible to it. Same shape
+as the other three blind checks this feature found: the command returns an answer, the answer
+just isn't about the proposition.
+
+**Fix**: assert both halves — the runtime copy (what a reader opens) and the framework source
+(what regenerates it). Re-drilled in both directions:
+
+| Simulated state | Clause verdict |
+|---|---|
+| normal | `11 passed` |
+| runtime copy removed | **fails** — "no runtime copy under .specify/shared/guidelines/" |
+| framework source removed | **fails** — "no framework source under shared/guidelines/" |
+| both restored | `34 passed`, `cmp` → BYTE-IDENTICAL |
+
+Lesson for the other green-by-construction entries above: "green today" is not evidence the
+clause can go red. Each of the six should be drill-tested the way C-3 and C-11 now have been;
+the four gate-neutrality clauses and section C-7 are pinned by equality/ordering assertions
+whose failure modes are already demonstrated by existing tests, so C-11 was the exposed one.

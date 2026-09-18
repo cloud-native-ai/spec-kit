@@ -251,10 +251,24 @@ def test_c11_no_dangling_guideline_pointer_on_either_instruction_surface():
         assert names, f"the {label} instruction surface carries no guideline pointer at all"
         pointed |= names
 
-    dangling = sorted(n for n in pointed if not (GUIDELINES / n).is_file())
-    assert not dangling, (
-        "instruction surfaces point at guidelines that do not exist — the delivery window "
-        f"is open and nothing warns the reader (FR-038 / SC-017): {dangling}"
+    # A pointer's whole job is to let a reader open the file, so the target that must exist
+    # is the one the reader actually resolves: `.specify/shared/guidelines/<name>.md`.
+    # Checking only the framework source leaves the downstream failure mode invisible —
+    # proven by drill: with the runtime copy moved aside and the source intact, a
+    # source-only version of this clause still passed. Both halves are asserted, because
+    # the source is what regenerates the runtime copy.
+    runtime_dir = ROOT / ".specify" / "shared" / "guidelines"
+    dangling_runtime = sorted(n for n in pointed if not (runtime_dir / n).is_file())
+    assert not dangling_runtime, (
+        "instruction surfaces point at guidelines with no runtime copy under "
+        ".specify/shared/guidelines/ — a reader following the pointer finds nothing, which "
+        "is the delivery window FR-038 / SC-017 exists to close "
+        f"(run scripts/python/sync-mirrors.py --write shared): {dangling_runtime}"
+    )
+    dangling_source = sorted(n for n in pointed if not (GUIDELINES / n).is_file())
+    assert not dangling_source, (
+        "instruction surfaces point at guidelines with no framework source under "
+        f"shared/guidelines/ — the runtime copy cannot be regenerated: {dangling_source}"
     )
 
     # C-11(b): the remainder must not grow past the three structurally unpointed files.
