@@ -13,10 +13,33 @@ measured value won and the disagreement is recorded inline.
 ## ① Comparison base
 
 ```
-BASE_SHA=710c7179fc1896d85b5d7d0c8ad52719af18f558
+BASE_SHA=925badb60860fdbbb8a5fade24cecb01627fbc6f
 ```
 
-Re-derive: `git rev-parse HEAD` (run at freeze time, before any US1 edit).
+Re-derive: `git rev-parse gitlab/master` — the commit this feature's branch sits on.
+
+**Re-frozen 2026-09-18 after the rebase onto `gitlab/master`** (supersedes the original
+freeze `710c7179fc1896d85b5d7d0c8ad52719af18f558`, recorded at US1 kickoff). The rebase
+replayed all 32 feature commits onto the new base, so every pre-rebase commit SHA — including
+the original `BASE_SHA` — became **orphaned**: `git merge-base --is-ancestor 710c7179 HEAD`
+now returns false. A comparison base that is not an ancestor of `HEAD` does not delimit
+"what this feature changed"; `git diff 710c7179 HEAD` instead reports the union of this
+feature's work **and the 4 upstream commits** picked up by the rebase. Two gates failed for
+exactly that reason and named upstream's files as this feature's edits:
+
+| Gate | Reported against the orphaned base | Against the re-frozen base |
+|---|---|---|
+| `scripts/` zero-change surface | `1` file (`scripts/python/derive-utils.py`, from upstream's `feat(derive)`) | **0** |
+| new executables outside `tests/contract/` | `.specify/scripts/python/derive-utils.py`, `.specify/skills/browser-utils/scripts/chrome_open_trust.sh` (both upstream) | **0** |
+
+So the re-freeze is not a relaxation — it removes upstream's changes from this feature's
+measurement and makes the assertion strictly about the 33 commits on top of `gitlab/master`.
+**Rule for any future rebase of this branch: `BASE_SHA` MUST be re-frozen to the new base in
+the same operation**, because every comparative gate in this feature (GATE-1, GATE-2, GATE-4,
+GATE-9, T011, T033, T055, T056, and contract clauses `gate-neutrality` C-5/C-6) reads this
+literal. This file MUST carry exactly **one** `BASE_SHA=` line — the gates extract it with
+`sed -n 's/^BASE_SHA=//p'` and the contract test with a `re.M` search, so a second line
+would either break the shell substitution or be silently ignored.
 
 Every zero-change-surface assertion MUST compare against this literal SHA — `git diff
 --name-only --no-renames --diff-filter=ACMR "$BASE" -- <paths>`. MUST NOT use `HEAD`
@@ -57,6 +80,23 @@ fully attributed:
 
 24 + 3 − 1 = 26. ✔
 
+**Post-rebase re-measurement (2026-09-18)**: `baseline-failed.txt` is **unchanged** — after
+rebasing onto `gitlab/master` and fast-forwarding `master`, the suite reports
+**26 failed, 2008 passed**, and `comm -13` against the frozen file is **empty in both
+directions** (0 new, 0 gone). Two things moved underneath it without changing the set:
+
+- **passed 1972 → 2008 (+36)**: upstream's four commits added tests
+  (`test_derivation_definitions.py`, `test_derive_engine_contract.py`, `tests/derive_fixtures.py`,
+  `test_derive_us3.py`, `test_derive_validate.py` and others). All 36 pass, so the failure
+  set is untouched and this feature's 34 cases are still green.
+- **the cause of 3 of the 26 changed while the count did not**: those three assert a
+  whole-tree `sync-mirrors.py --check`. They previously failed on the `skills/draw-diagram/`
+  drift, which this session committed and mirrored away; they now fail on the
+  `skills/improve-skills/scripts/redline-check.py` drift that upstream itself shipped. See
+  section ③. This is exactly why GATE-1 and GATE-2③ compare **name sets**, not counts — a
+  count-only check would have reported "still 26, nothing changed" across a real change of
+  cause.
+
 **Self-check that the freeze is usable** (GATE-1's exact pipeline against the freshly
 frozen file):
 ```bash
@@ -74,8 +114,7 @@ baseline stores bare node IDs — omitting the `sed` makes every baseline entry 
 
 ```
 MIRROR_DRIFT_PREEXISTING_BEGIN
-DIFF  .specify/skills/draw-diagram/SKILL.md
-MISS  .specify/skills/draw-diagram/references/self-deploy-render-service.md
+DIFF  .specify/skills/improve-skills/scripts/redline-check.py
 MIRROR_DRIFT_PREEXISTING_END
 ```
 
@@ -84,24 +123,58 @@ Re-derive:
 python3 scripts/python/sync-mirrors.py --check 2>&1 | grep -E '^(MISS|DIFF)' | sort
 ```
 
-Attribution (verified, not assumed): `git status --porcelain skills/draw-diagram/` shows
-one modified source file and one untracked file; both are uncommitted in-flight work, their
-mtimes (2026-09-18 10:48/10:49) postdate this feature's 2026-09-17 planning baseline, and
-`grep -c user-facing-comprehension` on both returns **0**. Whole-tree `--check` is therefore
-**EXIT=2**, while the scope this feature touches is **EXIT=0**:
+**Re-frozen 2026-09-18 after the rebase onto `gitlab/master`.** The originally frozen set was
+the two `skills/draw-diagram/` lines (one modified source file, one untracked file — another
+unit's in-flight work). Both are gone from this set for two separate reasons:
+
+1. That work was **committed at the user's direction** as its own clearly-attributed commit
+   (`docs(draw-diagram): add the shared render-backend preflight and self-deploy fallback`),
+   and its `.specify/` projection was then synced in a follow-up commit. Source and mirror
+   now agree, so neither line is drift any more.
+2. The single remaining line **arrived with the rebase** and is upstream's own: commit
+   `925badb6 feat(improve-skills): add attribute-triggered red-line framework` committed
+   `skills/improve-skills/scripts/redline-check.py` and its mirror with **different content**.
+   Verified rather than assumed — extracting both blobs from upstream's own tree and
+   comparing them:
+
+   ```bash
+   git show gitlab/master:skills/improve-skills/scripts/redline-check.py          > /tmp/up-src.py
+   git show gitlab/master:.specify/skills/improve-skills/scripts/redline-check.py > /tmp/up-mir.py
+   cmp /tmp/up-src.py /tmp/up-mir.py   # → differ: byte 6510, line 122
+   ```
+
+   The source carries the newer multi-line tuple formatting (14 lines where the mirror has
+   7), i.e. the mirror is a **stale projection** of an earlier revision — upstream edited the
+   source and did not re-sync. Repair is one command, `sync-mirrors.py --write --only
+   skills/improve-skills`, but it is **deliberately not run here**: it is another unit's
+   script, and folding its repair into this feature's branch would attribute their fix to
+   this work. Reported as an upstream deviation instead.
+
+Whole-tree `--check` is therefore still **EXIT=2**, while the scope this feature touches is
+**EXIT=0**:
 
 ```bash
 python3 scripts/python/sync-mirrors.py --check --only shared --only templates --only skills/summarize-project
-# → ok templates/ (22 files) · ok skills/ (24 files) · ok shared/ (41 files) · EXIT=0
+# → ok templates/ · ok skills/ · ok shared/ · EXIT=0
 ```
 
 Consequence for gates: GATE-2 / DoD-8 / T010 / T029 / T051 use the criterion "touched pairs
 report `ok`, and the whole-tree `MISS`/`DIFF` set has **no new lines** versus this frozen
 set" — never a whole-tree EXIT=0. `regen-command-copies.py --check` **is** clean today
 (EXIT=0) and keeps an absolute criterion. Mirror writes MUST stay `--only`-scoped: a bare
-`sync-mirrors.py --write` would absorb the draw-diagram work into this feature's commits and
-turn five gates green for the wrong reason (T050; `049`'s tasks forbid that action in the
+`sync-mirrors.py --write` would absorb unrelated in-flight work into this feature's commits
+and turn five gates green for the wrong reason (T050; `049`'s tasks forbid that action in the
 same words).
+
+**Three existing contract tests fail solely because of this one line** —
+`test_trigger_engine.py::test_c2_sync_mirrors_check_clean`,
+`test_scripts_distribution_parity.py::…::test_repo_has_no_orphan_or_drifted_scripts`, and
+`test_browser_site_exclusions.py::…::test_mirror_check_ignores_site_probe` all assert a
+whole-tree `--check`. They are part of the frozen failure set and MUST NOT be reported as
+this feature's regressions. Note the *cause* moved while the *count* did not: before the
+rebase these three failed on the draw-diagram lines, now they fail on the improve-skills
+line. A count-only comparison would have hidden that, which is why GATE-2③ compares the
+line **set** and not the number.
 
 This drift is expected to disappear when its author commits or syncs. When it does, T001's
 re-freeze yields an empty set and the criterion's shape is unchanged.

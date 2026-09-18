@@ -10,7 +10,9 @@
 
 # -- Baseline (recorded once, BEFORE any /speckit.implement work changes the tree) --
 
-baseline_commit=710c7179fc1896d85b5d7d0c8ad52719af18f558
+baseline_commit=925badb60860fdbbb8a5fade24cecb01627fbc6f
+baseline_commit_superseded=710c7179fc1896d85b5d7d0c8ad52719af18f558
+baseline_commit_superseded_reason=orphaned by the rebase onto gitlab/master; not an ancestor of HEAD, so it no longer delimits this feature's changes
 baseline_date=2026-09-18
 baseline_branch=051-user-facing-comprehension
 
@@ -33,7 +35,8 @@ baseline_blocking_patterns=17
 # -- /speckit.implement results --
 
 implementation_date=2026-09-18
-post_change_commit=82d95e2d
+post_change_commit=8e634e8cae263c923abc514e2181df89addd9c35
+post_change_commit_note=82d95e2d (the US1 phase commit as originally recorded) was orphaned by the rebase; the rebased tree is what every gate below was re-validated against
 post_change_scope=Phase 1 Setup (T001-T002) + Phase 2 US1 (T003-T013); 13 of 63 tasks closed
 post_change_tasks_closed=13
 post_change_tasks_open=50
@@ -152,6 +155,7 @@ gate_4_scanner_and_zero_change_surfaces=PASS (0 files changed vs BASE_SHA)
 gate_5_unclosed_task_rows=FAIL (50 open — US2-US5, outside this run's user-chosen MVP scope)
 gate_6_validate_tasks=PASS (exit 0, 0 errors, 0 warnings)
 gate_7_sc_status_lines=PASS (18 lines, this file)
+gate_2_3_no_new_drift_lines=PASS (drift baseline re-frozen: the draw-diagram lines were committed and mirrored away; the single remaining line is upstream's own improve-skills source/mirror divergence, verified present in gitlab/master itself)
 gate_8_eight_pointer_files=FAIL (0 of 8 — the insertions are US2/US4/US5 tasks)
 gate_9_no_new_executables=PASS (0)
 
@@ -161,4 +165,5 @@ gate_9_no_new_executables=PASS (0)
 
 # -- Free-form notes --
 
+post_change_rebase=rebased onto gitlab/master (925badb6) then master fast-forwarded; 33 commits on top of upstream, 0 behind; 6 index.json conflicts resolved by feedback-utils.py --action reindex, 1 additive table-row conflict in skills/draw-diagram/SKILL.md resolved by keeping both rows; nothing pushed
 notes=MVP scope (Setup + US1) chosen by the user, phase-boundary commits pre-authorized. Three defects were found in this feature's own tests during the run, each by executing a check rather than reading it: (1) gate-neutrality C-5/C-6 derived their change set from `git diff <sha>`, which cannot see untracked files — so during the run window they were blind to exactly the artifacts they exist to judge; (2) discipline-doc C-3 compared two literals inside the test file and never looked at the tree, leaving "MUST NOT be renamed" unasserted; (3) ambient-section C-11 resolved pointers against the framework source tree while readers resolve the runtime copy, so SC-017's own drill passed with the runtime copy deleted. All three were the same shape as the two blind checks found earlier in this feature (the `--stat` piping form and `git diff HEAD`'s vacuity under CI): a command that returns an answer which is not about the proposition. C-3 and C-11 were then drill-proven able to fail. One cross-phase dependency was mis-sequenced in tasks.md — C-18(b)'s green point is T012 (US1) but the work that satisfies it was assigned to T043 (US5) — so the affected half of T043 was front-loaded into US1 and both rows were annotated with the falsified premise rather than the schedule being quietly overridden. Left untouched and reported as an upstream deviation: skills/draw-diagram/SKILL.md (modified) and skills/draw-diagram/references/self-deploy-render-service.md (untracked) belong to another unit's in-flight work and are the sole cause of 3 of the 26 baseline failures.
