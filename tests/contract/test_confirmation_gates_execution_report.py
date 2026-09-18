@@ -46,6 +46,32 @@ def test_nonblocking_submission_notice_rule(doc_text: str) -> None:
     assert "自动传输" in doc_text
 
 
+# --- FR-034: this file had no guard for the comprehension-discipline pointer ---
+#
+# Added by feature 051 T015. `confirmation-gates.md` is the rule source for surface classes
+# ①②⑩⑪, so it must carry the one-line pointer to the discipline's truth document. Before this
+# the obligation existed only in the contract document and in no test — the same gap FR-034
+# names. The two literals above (`非阻塞`, `自动传输`) live on the line T018 rewrites, so this
+# pairing is deliberate: the rewrite must promote the rule to a reference *without* dropping
+# them, and these two assertions are what catches that.
+
+COMPREHENSION_POINTER = "shared/guidelines/user-facing-comprehension.md"
+
+
+def test_doc_carries_comprehension_discipline_pointer(doc_text: str) -> None:
+    lines = doc_text.splitlines()
+    hits = [i for i, ln in enumerate(lines) if COMPREHENSION_POINTER in ln]
+    assert len(hits) == 1, (
+        f"expected exactly one pointer line to the comprehension discipline, got {len(hits)}"
+    )
+    first_h2 = next((i for i, ln in enumerate(lines) if ln.startswith("## ")), len(lines))
+    assert hits[0] < first_h2, (
+        f"the pointer sits at line {hits[0] + 1}, inside the criteria sections (first H2 at "
+        f"line {first_h2 + 1}); it must be in the header ownership area so narrowing a "
+        "criteria section cannot drop it (surface-pointers.md C-2)"
+    )
+
+
 @pytest.mark.parametrize("surface", AUTO_EXEC_SURFACES, ids=lambda p: p.name)
 def test_auto_exec_surface_carries_report_instructions(surface: Path) -> None:
     assert surface.is_file(), f"missing surface: {surface}"

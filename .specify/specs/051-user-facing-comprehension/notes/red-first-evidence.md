@@ -145,3 +145,107 @@ Lesson for the other green-by-construction entries above: "green today" is not e
 clause can go red. Each of the six should be drill-tested the way C-3 and C-11 now have been;
 the four gate-neutrality clauses and section C-7 are pinned by equality/ordering assertions
 whose failure modes are already demonstrated by existing tests, so C-11 was the exposed one.
+
+---
+
+## Phase 3 / US2 — T016 (2026-09-18)
+
+**Deliverables under test**: T014 `tests/contract/test_user_facing_comprehension_pointers.py`
+(surface-pointers **C-1…C-14**) and T015's new assertion in the pre-existing
+`tests/contract/test_confirmation_gates_execution_report.py` (FR-034's missing guard).
+
+**Command**
+
+```bash
+python3 -m pytest tests/contract/test_user_facing_comprehension_pointers.py \
+                  tests/contract/test_confirmation_gates_execution_report.py -q -rx
+```
+
+**Result**: `5 passed, 9 xfailed` + `9 passed, 1 xfailed` · collection `24 tests collected`,
+**0 errors** (so no import defect) · whole-suite `FAILED` count **unchanged at 26**,
+`comm -13` against the frozen baseline **empty**.
+
+### The pending partition is carried by `xfail(strict=True)`, not by failing
+
+surface-pointers' clauses are claimed by three stories (US2 = C-2/C-4/C-5, US4 = C-10,
+US5 = the rest), so this file is *designed* to be partly unsatisfied from US2 until US5.
+Left as ordinary failures that would add 10 `FAILED` node IDs at T014 and keep them there for
+three phases — which collides with GATE-1 ("zero new test failures versus the frozen
+baseline") at every phase boundary in between. Marking each not-yet-due clause
+`xfail(strict=True, reason=<the task that turns it green>)` resolves the collision without
+weakening anything:
+
+* an xfailed case is not a `FAILED` line, so GATE-1 stays satisfiable at each boundary;
+* `strict=True` reports **XPASS as a failure**, so a marker cannot outlive its subject — the
+  story that lands the work is forced to remove it;
+* the reason string names the owning task, so the pending set is self-documenting.
+
+The rejected alternative was re-freezing `baseline-failed.txt` to include the 10 IDs. That
+would be undetectable decay: `comm -13` reports *additions* only, so a clause absorbed into
+the baseline could stay red forever and no gate would ever notice. This is the same
+"green because blind" class recorded in Phase 2 above, arriving through the baseline instead
+of through an assertion.
+
+### Red at this point (US2's own取证 targets)
+
+| Clause | Why red | Turn-green task |
+|---|---|---|
+| C-2 | `confirmation-gates.md` has no pointer line yet, so neither the count nor the header-position half can hold | T017 → T021 |
+| FR-034's new guard (`test_doc_carries_comprehension_discipline_pointer`) | same subject as C-2, asserted from the pre-existing execution-report file so the obligation has a second, independent home | T017 → T021 |
+
+### Green at this point, and why that is correct rather than suspicious
+
+| Clause | Why green before any edit |
+|---|---|
+| C-3 | Mirrors are in sync because nothing has been edited yet. It is a **freeze** assertion: it goes red if a source is edited without re-syncing, which is what T019 exists to prevent. |
+| C-4 | The five criteria sections are byte-frozen by SHA-256 and untouched. Green now is the point — it must *stay* green through T017/T018, which edit the header and `:68` only. |
+| C-5 | `:58-60`'s triad is still owned by `confirmation-gates.md`, and the truth document already reaches it by path (T006 landed that side). Both halves hold before US2 starts. |
+| C-7 | `interview-pattern.md:125-126`'s two pattern-specific rules are untouched; freeze assertion, US5's T041 must not drop them. |
+| C-14 | `regen-command-copies.py --check` is EXIT=0 today and `.specify/templates/commands/` does not exist. |
+
+The remaining xfailed clauses (C-1, C-6, C-8, C-9, C-10, C-11, C-12, C-13) are **US4/US5's**
+取证 targets, not US2's; T035 and T040 own those runs.
+
+### Two needle defects found while authoring, both proven by measurement
+
+1. **C-13's first needle set was keyed to the owner and therefore vacuous.** It used literals
+   from the truth document's own rule text (`白名单之外的行话一律按违规处理`, `长度不设界但形态设界`,
+   …). The truth document is brand new, so *nothing* in the repo can be restating its exact
+   wording — the clause passed on an empty match and `strict` xfail reported **XPASS**, which
+   is how the defect surfaced. C-13's subject is the **pre-existing dispersed wordings**, so
+   the needles must be their characteristic literals. Re-keyed and measured:
+
+   | Needle set | Files matched before convergence |
+   |---|---|
+   | owner's own literals (wrong) | **0** — vacuous |
+   | dispersed-wording literals (correct) | **2** (`shared/patterns/interview-pattern.md` ×6 needles, `shared/workflow/feedback-step.md` ×1) |
+
+   Both matched files are convergence targets (T041, T036), so the count must reach 0 after
+   US4/US5. **Scope limit recorded in the test rather than hidden**: this is a *literal* scan.
+   Research measured 38 dispersed wordings, most of them paraphrases no literal needle can
+   match, and FR-033 forbids building a wording scorer — so C-13 pins the
+   literally-identifiable subset and the rest are verified per-site by C-6/C-9/C-10/C-11.
+2. **C-13 and C-12 would have contradicted C-18 without an explicit exclusion.** Three of the
+   dispersed wordings are *required to survive*: `project-overview.md:51`'s landing check and
+   `requirements-guidelines.md:24,101`'s baseline declarations are registered override sites
+   under discipline-doc C-18(b), and C-12 separately requires `:309` and `:51` kept. Had those
+   literals gone into C-13's needle set, C-13 would demand their removal while C-12/C-18
+   demand their presence — an unsatisfiable pair of the same shape as the B-09 and B-10
+   defects this feature already corrected twice. The exclusion list is written into the test
+   with the reason per item.
+
+### C-12(c)'s required pre-rewrite needle measurement
+
+C-12(c) demands the needle's effectiveness be proven by its hit count **before** the rewrite.
+C-12's needle is *derived* from the truth document's blacklist section, and T046 is what puts
+the identifier literals there — so today the derived set is legitimately empty and the clause's
+own anti-vacuity sentinel is what fails (correctly, as `xfail`). Measured with §1.7's literals
+standing in for the post-promotion needle:
+
+```
+skills/summarize-project/references/reporting-playbook.md   hits=12   e.g. `T1` `E1` `RC-1` `RC-5`
+TOTAL FILES = 1
+```
+
+So the needle is falsifiable: **1 file / 12 hits before T046, must be 0 after**. The sentinel
+asserting the derived set is non-empty is what stops C-12 passing vacuously in the meantime.

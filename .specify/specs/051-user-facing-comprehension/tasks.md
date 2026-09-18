@@ -110,21 +110,21 @@ description: "Task list for Feature 051 — 面向用户可理解性纪律(User-
 
 ### Tests for User Story 2 (MANDATORY — 结构契约测试,red-first)⚠️
 
-- [ ] T014 [US2] 撰写 `tests/contract/test_user_facing_comprehension_pointers.py`,实现 `contracts/surface-pointers.md` 的 **C-1…C-14**;**docstring MUST 记录条款 → Phase 的分区**(本文件被三个 story 的验证行共同认领,依 `/speckit.tasks` 的分区规则避免"同一文件在两个时点被要求全绿"的不可满足对):**US2 = C-2、C-4、C-5**;**US4 = C-10**;**US5 = C-1、C-3、C-6…C-9、C-11…C-14**。C-4 的判据冻结 MUST 用**逐节文本比对**(提取 `:7-12`/`:14-21`/`:23-41`/`:43-45`/`:47-52` 五节全文与冻结字面量比对),MUST NOT 用"包含关键词"的弱断言
-- [ ] T015 [US2] 扩展 `tests/contract/test_confirmation_gates_execution_report.py`:新增断言 `shared/guidelines/confirmation-gates.md` 携带指向真源文档的指针(FR-034 补上今天缺失的守卫),并确认既有用例 `:44-46`(只断言 `非阻塞` 与 `自动传输`)**继续通过**
-- [ ] T016 [US2] [blockedBy: T014,T015] Red-first 取证:运行两个测试文件,确认**改前真红的子义务**因**制品未改**而失败、且失败原因非导入错误——具体为 **C-2**(`confirmation-gates.md` 头部所有权区尚无指针)与 **T015 新增的指针断言**。**同分区内以下条款在 red-first 时点即为绿,不属取证对象、MUST NOT 被读成"断言写错"**:**C-4**(五个判据节"逐字未改写"——改前本就未改写,该条是冻结断言)、**C-5**(`:58-60` 仍由该文件拥有,且真源文档已由 T006 以路径引用它,两侧改前即成立)。追加记入 `notes/red-first-evidence.md`,逐条写明"红的为什么红、绿的为什么绿"(订正发现项 B-12:本行原把 C-4/C-5 一并列为"因制品未改而失败",而二者改前即绿;本行的判据恰是"确认失败原因是制品未改而非断言写错",于是执行者遇到绿的条款会据此**削弱一个正确的断言**)
+- [X] T014 [US2] 撰写 `tests/contract/test_user_facing_comprehension_pointers.py`,实现 `contracts/surface-pointers.md` 的 **C-1…C-14**;**docstring MUST 记录条款 → Phase 的分区**(本文件被三个 story 的验证行共同认领,依 `/speckit.tasks` 的分区规则避免"同一文件在两个时点被要求全绿"的不可满足对):**US2 = C-2、C-4、C-5**;**US4 = C-10**;**US5 = C-1、C-3、C-6…C-9、C-11…C-14**。C-4 的判据冻结 MUST 用**逐节文本比对**(提取 `:7-12`/`:14-21`/`:23-41`/`:43-45`/`:47-52` 五节全文与冻结字面量比对),MUST NOT 用"包含关键词"的弱断言
+- [X] T015 [US2] 扩展 `tests/contract/test_confirmation_gates_execution_report.py`:新增断言 `shared/guidelines/confirmation-gates.md` 携带指向真源文档的指针(FR-034 补上今天缺失的守卫),并确认既有用例 `:44-46`(只断言 `非阻塞` 与 `自动传输`)**继续通过**
+- [X] T016 [US2] [blockedBy: T014,T015] Red-first 取证:运行两个测试文件,确认**改前真红的子义务**因**制品未改**而失败、且失败原因非导入错误——具体为 **C-2**(`confirmation-gates.md` 头部所有权区尚无指针)与 **T015 新增的指针断言**。**同分区内以下条款在 red-first 时点即为绿,不属取证对象、MUST NOT 被读成"断言写错"**:**C-4**(五个判据节"逐字未改写"——改前本就未改写,该条是冻结断言)、**C-5**(`:58-60` 仍由该文件拥有,且真源文档已由 T006 以路径引用它,两侧改前即成立)。追加记入 `notes/red-first-evidence.md`,逐条写明"红的为什么红、绿的为什么绿"(订正发现项 B-12:本行原把 C-4/C-5 一并列为"因制品未改而失败",而二者改前即绿;本行的判据恰是"确认失败原因是制品未改而非断言写错",于是执行者遇到绿的条款会据此**削弱一个正确的断言**)
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] [blockedBy: T016] 在 `shared/guidelines/confirmation-gates.md` 的**头部所有权区**(改前 `:3-5`,紧邻既有的"命令模板与技能 MUST 以单行引用接入本文档,MUST NOT 在模板内复制判据正文")加入**一行**指针,用 T006 定义的 canonical 指针形态,声明其覆盖界面类 **①②⑩⑪**;MUST NOT 落在 `:7-52` 的任何判据节内(`surface-pointers.md` C-2),MUST NOT 增成多行
-- [ ] T018 [US2] [blockedBy: T017] 执行 FR-018 的提升:把 `confirmation-gates.md:68` 那条**仅限反馈提交提示**的措辞规则收敛为指向真源文档的引用,同时**逐字保留** `非阻塞` 与 `自动传输` 两个字面量(否则 T015 校验的既有用例转红);提升后的一般规则("存在用户视角途径时 MUST NOT 暴露引擎/脚本内部调用形态;无途径时保留标识符但标注为引擎细节")归真源文档的黑名单 ① 与白名单 ③ 所有
-- [ ] T019 [US2] [blockedBy: T018] mirror-parity **WRITE + VERIFY**(覆盖 Mirror Obligations 表第 2 行 `shared/guidelines/confirmation-gates.md`):`python3 scripts/python/sync-mirrors.py --write --only shared`,随后 `diff -q shared/guidelines/confirmation-gates.md .specify/shared/guidelines/confirmation-gates.md`
+- [X] T017 [US2] [blockedBy: T016] 在 `shared/guidelines/confirmation-gates.md` 的**头部所有权区**(改前 `:3-5`,紧邻既有的"命令模板与技能 MUST 以单行引用接入本文档,MUST NOT 在模板内复制判据正文")加入**一行**指针,用 T006 定义的 canonical 指针形态,声明其覆盖界面类 **①②⑩⑪**;MUST NOT 落在 `:7-52` 的任何判据节内(`surface-pointers.md` C-2),MUST NOT 增成多行
+- [X] T018 [US2] [blockedBy: T017] 执行 FR-018 的提升:把 `confirmation-gates.md:68` 那条**仅限反馈提交提示**的措辞规则收敛为指向真源文档的引用,同时**逐字保留** `非阻塞` 与 `自动传输` 两个字面量(否则 T015 校验的既有用例转红);提升后的一般规则("存在用户视角途径时 MUST NOT 暴露引擎/脚本内部调用形态;无途径时保留标识符但标注为引擎细节")归真源文档的黑名单 ① 与白名单 ③ 所有
+- [X] T019 [US2] [blockedBy: T018] mirror-parity **WRITE + VERIFY**(覆盖 Mirror Obligations 表第 2 行 `shared/guidelines/confirmation-gates.md`):`python3 scripts/python/sync-mirrors.py --write --only shared`,随后 `diff -q shared/guidelines/confirmation-gates.md .specify/shared/guidelines/confirmation-gates.md`
 
 ### Verification for User Story 2
 
-- [ ] T020 [US2] [blockedBy: T019] gate-neutrality 核验:`python3 scripts/python/scan-confirmation-gates.py` MUST 仍为 `total 23 / violations 0`。本行的证明点是**特定的**——`confirmation-gates.md` 是扫描器的 `SELF_REL`(`:38`)整体豁免对象,故编辑它**不可能**改变计数;若计数变了,说明改动溢出到了别的被扫文件
-- [ ] T021 [US2] [blockedBy: T019] 把 US2 分区转绿:运行 `test_user_facing_comprehension_pointers.py` 与 `test_confirmation_gates_execution_report.py`,确认 **C-2、C-4、C-5** 与 FR-034 新断言全部通过(C-1 的"8 文件各 1 行"此时仍为 1/8,属 US5 的绿点,本行 MUST NOT 要求它绿)
-- [ ] T022 [US2] [blockedBy: T021] 人工 QA:执行 `quickstart.md` **场景 4** 的命令,按**本阶段的部分期望**比对——8 行指针计数中 `confirmation-gates.md` = **1**、其余 7 个 = **0**;并核验第二条命令输出的 `interview-pattern.md:125-126` 两规则原文仍在、`非阻塞|自动传输` 命中 ≥1;实测输出追加进 `notes/quickstart-run.md`
+- [X] T020 [US2] [blockedBy: T019] gate-neutrality 核验:`python3 scripts/python/scan-confirmation-gates.py` MUST 仍为 `total 23 / violations 0`。本行的证明点是**特定的**——`confirmation-gates.md` 是扫描器的 `SELF_REL`(`:38`)整体豁免对象,故编辑它**不可能**改变计数;若计数变了,说明改动溢出到了别的被扫文件
+- [X] T021 [US2] [blockedBy: T019] 把 US2 分区转绿:运行 `test_user_facing_comprehension_pointers.py` 与 `test_confirmation_gates_execution_report.py`,确认 **C-2、C-4、C-5** 与 FR-034 新断言全部通过(C-1 的"8 文件各 1 行"此时仍为 1/8,属 US5 的绿点,本行 MUST NOT 要求它绿)
+- [X] T022 [US2] [blockedBy: T021] 人工 QA:执行 `quickstart.md` **场景 4** 的命令,按**本阶段的部分期望**比对——8 行指针计数中 `confirmation-gates.md` = **1**、其余 7 个 = **0**;并核验第二条命令输出的 `interview-pattern.md:125-126` 两规则原文仍在、`非阻塞|自动传输` 命中 ≥1;实测输出追加进 `notes/quickstart-run.md`
 
 **Checkpoint**: 门控面有了措辞义务与守卫;13 个门控提示的**文案本身**尚未逐条评审(归 T059 的人工评审)。
 

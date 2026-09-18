@@ -136,3 +136,50 @@ existing live file as the refresh base rather than overwriting it. It also wrote
 backup `.specify/instructions.md-2026-09-18-192435` and refreshed the tool JSON manifests.
 The backup is the generator's own history mechanism (the log names it as the recovery source
 for content dropped by older versions); it is not a feature artifact and is not staged.
+
+---
+
+## 场景 4(部分)— 8 行指针接入 11 类界面(US2 阶段期望)
+
+Run by T022 · 2026-09-18. Scenario 4 spans US2/US4/US5, so it is executed once per phase
+against **that phase's partial expectation**; the full 8/8 expectation belongs to T052.
+
+```
+$ for f in shared/guidelines/confirmation-gates.md shared/workflow/feedback-step.md \
+      shared/patterns/interview-pattern.md templates/commands/clarify.md \
+      shared/guidelines/requirements-guidelines.md shared/guidelines/proactive-trigger.md \
+      skills/summarize-project/references/reporting-playbook.md shared/workflow/glossary.md; do
+    printf '%s  %s\n' "$(grep -c 'shared/guidelines/user-facing-comprehension.md' "$f")" "$f"; done
+  1  shared/guidelines/confirmation-gates.md
+  0  shared/workflow/feedback-step.md
+  0  shared/patterns/interview-pattern.md
+  0  templates/commands/clarify.md
+  0  shared/guidelines/requirements-guidelines.md
+  0  shared/guidelines/proactive-trigger.md
+  0  skills/summarize-project/references/reporting-playbook.md
+  0  shared/workflow/glossary.md
+```
+
+| US2-phase expectation | Observed | Verdict |
+|---|---|---|
+| `confirmation-gates.md` = **1** | 1 | ✅ |
+| other seven = **0** | all 0 | ✅ |
+| coverage therefore **1/8**, C-1 still an US5 green point | C-1 remains `xfail` | ✅ |
+
+Second command — the preservation half of the same scenario:
+
+| Expectation | Observed | Verdict |
+|---|---|---|
+| `interview-pattern.md:125-126`'s two pattern-specific rules still verbatim | `One decision per question` + `Ask what, not whether` → **2/2** | ✅ |
+| `非阻塞` / `自动传输` hits ≥ 1 after T018's rewrite of `:68` | **1** line carries both literals | ✅ |
+
+The second row is the one worth recording: T018 rewrote that sentence to converge its
+wording rule into a reference, and both literals live *only* on that line, so a rewrite that
+dropped either would turn `test_nonblocking_submission_notice_rule` red. Verified after the
+edit, not assumed — `grep -c` returns 1 for each.
+
+Also verified in this phase (T020): the gate scan is unchanged at
+`total 23 / destructive 13 / governance_kept 10 / violations 0`. That is the specific proof
+point T020 exists for — `confirmation-gates.md` is the scanner's `SELF_REL` and is wholly
+exempt from counting, so editing it *cannot* move the total. Had the total moved, it would
+mean the edit leaked into a different scanned file.
