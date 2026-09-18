@@ -17,6 +17,7 @@ This project documentation is distributed across several key files. You MUST ref
 | **Readme** | `README.md` or `README` | basic information of project | {TODO} |
 | **Project Documents** | `docs/` | High-level architecture | Architecture and design documentation |
 | **Confirmation Gates** | `.specify/shared/guidelines/confirmation-gates.md` | Confirmation-gate governance criteria | Two-level taxonomy (destructive/irreversible → front-loaded confirmation; reversible → auto-execute + execution report), destructive list, governance-kept list, doubtful-strict rule, anti-backflow constraint |
+| **Objective Analysis** | `.specify/shared/workflow/objective-analysis-gate.md` | Same-author detection delegation criteria | When the artifacts under analysis were written by the agent now analyzing them, detection MUST be delegated to fresh-context read-only subagents; firing condition, the seven gate rules, severity-cap discipline, scope limits |
 | [Other Doc] | [Path] | [Purpose] | [Summary] |
 
 > **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
