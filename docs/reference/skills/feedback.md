@@ -138,8 +138,8 @@ transmission path — red line 3 is unchanged.
 
 When `count_since_submission >= threshold`, the consolidated prompt offers three choices:
 **package** / **skip this time** / **stop prompting** (raise the threshold). The prompt
-points the user to the user-facing `/speckit.feedback package` command (never the raw
-engine path); under the hood, packaging runs:
+points the user at a user-facing path rather than an engine call — the wording rule that
+requires it is defined once in `shared/guidelines/user-facing-comprehension.md`; under the hood, packaging runs:
 
 ```bash
 python3 .specify/scripts/python/feedback-utils.py --action package

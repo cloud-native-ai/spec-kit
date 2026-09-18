@@ -70,7 +70,7 @@ All arguments are optional. Naming a path or artifact pins the target; naming a 
 
 ## Question Format
 
-A question you have to decode is a question you answer badly, so every question ships with **its own context** — you should never need to scroll back, reconstruct what was decided earlier, or ask what a word means. And the question itself is **open**: no option menu, no recommended answer.
+A question you have to decode is a question you answer badly, so every question ships with **its own context** — you should never need to scroll back, reconstruct what was decided earlier, or ask what a word means. The rules that make this checkable — which terms may stand unexplained, what each question must carry, and how a term gets glossed — are defined once in `shared/guidelines/user-facing-comprehension.md` rather than restated here. And the question itself is **open**: no option menu, no recommended answer.
 
 ```text
 ❓ **D4** — **Retry behaviour for failed messages**
@@ -123,8 +123,7 @@ If your CLI has no suitable tool — or none at all — the same prompts arrive 
 | **Open questions only** — no options, no recommendation | Presenting choices anchors you; recommending one records the agent's view as yours |
 | **"What", not "whether"** | "Should we retry 3 times?" collapses the space into ratifying a proposal |
 | **Earlier decisions are named, not just cited** — "Redis as the queue (D3)", never a bare `D3` | You should not have to look up your own history |
-| **Plain language, your vocabulary** — not the codebase's internals | "What should happen when a message fails?" beats "what is the `max_retry` semantic?" |
-| **Special terms glossed inline, every question** | You may read one question in isolation, days later |
+| **Wording and glossing follow one framework-wide discipline** | Vocabulary, in-place annotation, and what a question must carry are defined once in `shared/guidelines/user-facing-comprehension.md` — not restated per command, so the two cannot drift |
 | **One decision per question** | A question with "and" in it hides two answers |
 
 The ID is your handle: "change D3" is all it takes to retract an answer later.

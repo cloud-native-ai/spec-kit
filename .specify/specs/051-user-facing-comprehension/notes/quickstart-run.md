@@ -254,3 +254,67 @@ Gate scan after this phase: `total 23 / destructive 13 / governance_kept 10 / vi
 with **zero** `BLOCKING_RE` hits inside `feedback-step.md`. That file is in scan scope and not
 exempt, so the new pointer line and the rewritten line were both checked against all 17
 patterns rather than assumed safe.
+
+---
+
+## 场景 4(完整)与 T053 单源扫描 — US5
+
+Run by T052/T053 · 2026-09-18.
+
+### 场景 4 — 8 行指针接入 11 类界面(完整期望)
+
+```
+$ for f in shared/guidelines/confirmation-gates.md shared/workflow/feedback-step.md \
+      shared/patterns/interview-pattern.md templates/commands/clarify.md \
+      shared/guidelines/requirements-guidelines.md shared/guidelines/proactive-trigger.md \
+      skills/summarize-project/references/reporting-playbook.md shared/workflow/glossary.md; do
+    printf '%s  %s\n' "$(grep -c 'shared/guidelines/user-facing-comprehension.md' "$f")" "$f"; done
+```
+
+| Expectation | Observed | Verdict |
+|---|---|---|
+| all eight rows = **1** | 1 × 8 | ✅ |
+| surface-pointers C-1 (`14 passed`) | 14 passed, 0 failed, **0 xfail** | ✅ |
+
+`interview-pattern.md:125-126`'s two pattern-specific rules remain verbatim (2/2), and
+`§1.7`'s heading survives with its body converged — C-11 converges the enumeration, it does not
+delete the section.
+
+### T053 — single-source scan (C-13 / SC-003 / DoD-9)
+
+```bash
+# needles: the 8 characteristic restatement fragments pinned in
+# tests/contract/test_user_facing_comprehension_pointers.py (CONVERGED_RESTATED_FRAGMENTS)
+# scope: shared/ + templates/ + skills/, *.md
+# exempt: the truth document itself, .specify/**, the 4 per-tool trees, docs/public/**
+```
+
+**Result: 0 restatement hits.**
+
+Falsifiability was proven rather than assumed, by running the same needle set against the
+pre-convergence revision (`git show HEAD:shared/patterns/interview-pattern.md`): all 7
+interview-pattern fragments returned `pre=True, post=False`, and `defer to this section`
+returned the same across `feedback-step.md`. A needle that matches nothing before *and* after
+would have made this zero meaningless — that is the same vacuity trap C-13 fell into on its
+first draft (recorded in `red-first-evidence.md`), so the check is run against the old revision
+every time the needle set changes.
+
+**Scope limit, restated where the number is claimed**: this is a *literal* scan. Research
+measured 38 dispersed wordings; most are paraphrases no literal needle can match, and FR-033
+forbids building a wording scorer. So "0" here means *zero literally-identifiable
+restatements*, not "all 38 sites individually verified" — those are converged and checked by
+C-6/C-9/C-10/C-11 and by T041–T049's own row-level assertions.
+
+### T049 — docs-space convergence (outside C-13's scan scope, done anyway)
+
+Three hand-written copies in `docs/reference/` were converged to summary pointers: the
+`## Question Format` paragraph and two guarantee-table rows in `commands/interview.md` (two rows
+became one that names the owner), the raw-engine-path wording rule in `skills/feedback.md`, and
+`Write for business stakeholders, not developers` in `commands/requirements.md` — which was a
+**third** unregistered copy of class ⑦'s reader baseline, after the command template's copy was
+removed during US1. `docs/public/**` was not touched: it is Hugo build output, git-ignored
+(`docs/.gitignore:2`), with 0 tracked files.
+
+Summary-pointer form per `one-source-of-truth.md`: a short orienting paraphrase plus the owner's
+path, carrying none of the owner's operative detail — a reader who intends to act must still
+open the owner.

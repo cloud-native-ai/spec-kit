@@ -7,7 +7,7 @@ their wrap-up / Git-commit-prompt stage. Simple commands MUST NOT embed it — a
 command is complex iff it invokes scripts/CLI tools, produces an artifact another
 flow consumes, or consumes another flow's artifact.
 
-面向用户的措辞与上下文规则由 `.specify/shared/guidelines/user-facing-comprehension.md` 统一定义(本文件覆盖界面类 ③);MUST NOT 在本文件内复制其条件集。
+User-facing wording and context rules are defined once in `.specify/shared/guidelines/user-facing-comprehension.md` (this file covers surface class ③); its condition sets MUST NOT be restated here.
 
 ## Positioning & Red Lines
 

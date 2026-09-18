@@ -100,6 +100,8 @@ Generate a checklist file at `FEATURE_DIR/checklists/requirements.md`:
 - Avoid HOW to implement (no tech stack, APIs, code structure)
 - Written for business stakeholders, not developers
 - DO NOT create checklists embedded in the spec (separate command)
+- User-facing wording and context rules are defined once in `.specify/shared/guidelines/user-facing-comprehension.md` (this file covers surface classes ⑤ and ⑦); its condition sets MUST NOT be restated here.
+- Recorded gap, deliberately not filled: class ⑦'s plan- and task-artifact side carries no wording rules of its own — a stakeholder / plain-language / business search of those two templates returns zero hits — and this discipline adds none, because a plan and a task list are written for implementers rather than for stakeholders. Adding wording rules there would widen scope, not close a gap.
 
 ### Section Requirements
 

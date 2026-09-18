@@ -29,6 +29,19 @@
 
 改写方向一律是「读者能据以行动的散文」,MUST NOT 是「更短的内部词」。
 
+**条目 ② 的实例来源**(由 `skills/summarize-project/references/reporting-playbook.md` §1.7 提升而来):该处已在真实报告运行中沉淀出一份可判定的类别枚举与读者向改写映射,提升后原处 MUST 以指针接入本节、MUST NOT 保留第二份独立黑名单。类别枚举:
+
+- **分级代号**:`T1`–`T5`(信息源 tier)、`E1`–`E5`(构建/CI 证据分级)
+- **处理与门禁编号**:`RC-1`~`RC-5`(诚实处理编号)、`CG-COVERAGE`、`CG-1`~`CG-11`(覆盖/自洽门禁名)、规则文档的 `§编号`
+- **统计口径 ID**:`M-FEAT-1`、`M-TASK-*`、`M-SPEC-*` 一类
+- **引擎字段名与枚举值**:`progress_pct`、`delay_days`、`schedule_status`、`schedule_state`、`unknown-schedule`、`progress_basis`、`counts.*`、`gantt.today_offset_days` 一类
+- **数据层内部标识**:数据库/表/列/视图名与 SQL 本身——`project.db`、`schema/project.sql`、`work_items`、`work_item_deps`、`status_norm`、`entity_ids`、`v_*` 视图、`PRAGMA foreign_keys`,以及任何 SQL 片段
+- **脚本名**:生成期工具的可执行文件名
+
+**读者向改写映射**(把内部值翻译成读者能据以行动的散文,而不是更短的内部词):`unknown-schedule` → 「无计划日期,无法判定延期」;`delayed` → 「逾期 N 天」;`progress_pct=null` → 「进度未量化」。
+
+这些标识符服务于**生成期可判定性**,不是读者的语言。它们只允许出现在工件的元信息节或框架内部文档中,MUST NOT 出现在面向读者的正文、图题、图说或正文表格里;数值本身可以给读者看(如 `12/20 = 60%`),字段名与取值来源的对照则留在元信息节。
+
 ## 上下文下限
 
 每条面向用户的消息 MUST 承载足以让基准读者**不打开其他工件即可行动**的事实,至少包括:
@@ -116,7 +129,12 @@
 
 > 面向用户的措辞与上下文规则由 `.specify/shared/guidelines/user-facing-comprehension.md` 统一定义(本文件覆盖界面类 ①②⑩⑪);MUST NOT 在本文件内复制其条件集。
 
+英文宿主文件用同一形态的英文渲染:
+
+> User-facing wording and context rules are defined once in `.specify/shared/guidelines/user-facing-comprehension.md` (this file covers surface class ④); its condition sets MUST NOT be restated here.
+
+- **语言随宿主文件**:指针行的语言 MUST 与所在文件的主导语言一致。本纪律的主题就是"不让读者解码",在一个英文文件里插一行中文指针(或反之)正是它要消除的失效;两种渲染是**同一形态**,不是两套规则。
 - 每个规则真源文件**含且仅含一行**指向本文件的路径。
 - 该行 MUST 落在文件的**头部所有权区**,MUST NOT 落在任何判据节内部——否则宿主收窄判据节时指针会被一并丢弃。
 - 括号内 MUST 声明本文件覆盖的界面类编号,编号取自 § 面向用户界面类 的封闭集。
-- 需要指称本纪律而**不新增第二处路径**时(清单项、反模式列表、图注),MUST 以不含仓库路径的方式指称——写「本纪律真源」即可;每文件的路径行数是受测的。
+- 需要指称本纪律而**不新增第二处路径**时(清单项、反模式列表、图注),MUST 以不含仓库路径的方式指称——写「本纪律真源」/ "the comprehension discipline" 即可;每文件的路径行数是受测的。

@@ -60,7 +60,7 @@ Create or update a requirements specification from a natural-language feature de
 ## Guidelines
 
 - Focus on **WHAT** users need and **WHY** — avoid implementation details
-- Write for business stakeholders, not developers
+- Write for the reader baseline declared by `shared/guidelines/requirements-guidelines.md`
 - Every requirement must be testable and unambiguous
 - Success criteria must be measurable and technology-agnostic
 - Document assumptions rather than asking about every unknown

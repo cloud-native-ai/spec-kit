@@ -3,10 +3,10 @@
 Implements ``.specify/specs/051-user-facing-comprehension/contracts/surface-pointers.md``
 **C-1…C-14**. ``test_cN_*`` maps one-to-one onto that file's C-N.
 
-CLAUSE → PHASE PARTITION
-------------------------
-This file is claimed by three stories' verification rows, which is why the partition is
-recorded here rather than left implicit — without it the same file would be required
+CLAUSE → PHASE PARTITION (all three stories have now landed; every marker was removed)
+--------------------------------------------------------------------------------------
+This file was claimed by three stories' verification rows, which is why the partition is
+recorded here rather than left implicit — without it the same file would have been required
 all-green at two different times, an unsatisfiable pair:
 
 ===========  ==========================  =========================================
@@ -17,23 +17,25 @@ US4          T038                        C-10
 US5          T052                        C-1, C-3, C-6…C-9, C-11…C-14
 ===========  ==========================  =========================================
 
-Green at authoring (freeze assertions — true before any edit, and that is their point):
+Green from authoring (freeze assertions — true before any edit, and that is their point):
 **C-3, C-4, C-5, C-7, C-14**.
 
-PENDING-PARTITION MECHANISM
----------------------------
+PENDING-PARTITION MECHANISM (used while US4/US5 were outstanding; retained as the documented
+pattern for any future clause added ahead of its subject)
+------------------------------------------------------------------------------------------------
 A clause whose subject is not built yet carries ``pytest.mark.xfail(strict=True, reason=…)``
 naming the task that turns it green, rather than being left to fail outright. Two reasons,
 both mechanical:
 
 * ``strict=True`` means that the moment its story lands and the clause passes, pytest
   reports **XPASS as a failure** — so a marker cannot be forgotten, and each story's
-  turn-green task is forced to remove it.
+  turn-green task is forced to remove it. It worked: all seven US5 markers and the US4 one
+  surfaced as XPASS failures the instant their subjects landed, and none was overlooked.
 * An xfailed case is not a ``FAILED`` line, so GATE-1 ("zero new test failures versus the
-  frozen baseline") stays satisfiable at *every* phase boundary from US2 through US5. The
-  alternative — letting nine clauses fail and re-freezing the baseline to include them —
-  would be undetectable decay: ``comm -13`` only reports *additions*, so a clause absorbed
-  into the baseline could stay red forever and no gate would notice.
+  frozen baseline") stays satisfiable at *every* phase boundary. The alternative — letting
+  clauses fail and re-freezing the baseline to include them — would be undetectable decay:
+  ``comm -13`` only reports *additions*, so a clause absorbed into the baseline could stay
+  red forever and no gate would notice.
 
 Pin hygiene: multi-line frozen text is pinned by SHA-256 (C-4's five criteria sections),
 single preserved lines by exact literal (C-7, C-10), and derived needle sets carry an
@@ -109,8 +111,31 @@ PRESERVED_INTERVIEW_RULES = (
     '- **Ask what, not whether.** "What should happen when X?" invites the user\'s actual model; "Should we do X?" narrows it to yes/no and smuggles in a proposal.',
 )
 
-# C-9: the two anti-patterns converged to one short reference.
-CONVERGED_ANTIPATTERNS = ("Context-free questions", "Jargon and bare abbreviations")
+# C-9 / C-13 share one needle definition so the two clauses cannot drift apart about what
+# counts as a restatement. These are fragments of *explanatory text*, NOT entry labels: C-9
+# permits a label to stay beside its pointer (findability), so banning the label
+# "Context-free questions" here would contradict C-9 and the two clauses would fight over the
+# same line — which is exactly what happened on the first pass.
+#
+# Falsifiability was proven against the pre-convergence revision rather than assumed: every
+# fragment below matched `git show HEAD:<file>` before T041/T036 and matches none of the
+# converged files after. Re-derive with the same command.
+ANTIPATTERN_FRAGMENTS = (
+    "only makes sense to someone who just read the repo",
+    "`DLQ`, `TTL`, `idempotent`",
+    "Every unexplained term is an invitation to answer confidently and wrongly",
+)
+RULE_FRAGMENTS = (
+    # interview-pattern.md's four comprehension rules (T041)
+    "Ask in the user's domain vocabulary, not the codebase's internals",
+    "Spell out on first use in every question",
+    "A term defined three questions ago still gets its gloss",
+    "The agent has read the repo; the user has not necessarily read it today",
+    # feedback-step.md's coexistence-authority claim (T036)
+    "defer to this section",
+)
+CONVERGED_ANTIPATTERNS = ANTIPATTERN_FRAGMENTS
+CONVERGED_RESTATED_FRAGMENTS = RULE_FRAGMENTS + ANTIPATTERN_FRAGMENTS
 
 # C-10: three preserved passages in feedback-step.md (exact literals), and the one line
 # that MUST be rewritten. `:115` is deliberately NOT in the preserve set — see the contract's
@@ -143,18 +168,7 @@ REWRITTEN_FEEDBACK_LINE = '(Embedded copies that still say only "invite the user
 # FR-033 forbids building a wording scorer to find them. So C-13 pins the
 # literally-identifiable restatements to zero; the remaining sites are converged and verified
 # individually by C-6/C-9/C-10/C-11 and by T047–T049's own rows.
-RESTATED_NEEDLES = (
-    # ④ interview-pattern.md — T041 converges the four comprehension rules (C-6) and the two
-    # anti-patterns (C-9)
-    "Plain language first",
-    "No unexplained abbreviations or jargon",
-    "Annotate special terms inline",
-    "Never assume shared context",
-    "Context-free questions",
-    "Jargon and bare abbreviations",
-    # ③ feedback-step.md — T036 moves the coexistence authority up to the truth source (C-10)
-    "defer to this section",
-)
+RESTATED_NEEDLES = CONVERGED_RESTATED_FRAGMENTS
 SCAN_DIRS = ("shared", "templates", "skills")
 # Mechanical copies and generated trees are regenerated, never authored, so they are exempt.
 SCAN_EXEMPT = (".specify/", ".claude/", ".github/", ".qoder/", ".opencode/", "docs/public/")
@@ -201,7 +215,6 @@ def _scan(needles) -> list[str]:
 # --- C-1: pointer wiring across all eight rule sources (US5 / T052) ---
 
 
-@pytest.mark.xfail(strict=True, reason="US5/T052 green point — T017/T036/T041-T049 have not inserted the pointers yet")
 def test_c1_each_rule_source_carries_exactly_one_pointer_line():
     counts = {rel: _pointer_line_count(ROOT / rel) for rel, _ in RULE_SOURCES}
     wrong = {k: v for k, v in counts.items() if v != 1}
@@ -292,7 +305,6 @@ def test_c5_execution_report_triad_still_owned_here():
 # --- C-6…C-9: move A, interview-pattern.md (US5) ---
 
 
-@pytest.mark.xfail(strict=True, reason="US5/T052 green point — T041 has not converged the four comprehension rules yet")
 def test_c6_four_comprehension_rules_converged_to_a_pointer():
     text = _text(INTERVIEW)
     assert COMPREHENSION_MOUNT in text, (
@@ -317,7 +329,6 @@ def test_c7_two_pattern_specific_rules_preserved_verbatim():
     )
 
 
-@pytest.mark.xfail(strict=True, reason="US5/T052 green point — T041 has not extended the non-droppable list yet")
 def test_c8_embed_contract_nondroppable_list_includes_the_pointer():
     text = _text(INTERVIEW)
     m = re.search(r"A host may \*\*narrow\*\* the pattern[^\n]*", text)
@@ -331,13 +342,19 @@ def test_c8_embed_contract_nondroppable_list_includes_the_pointer():
     )
 
 
-@pytest.mark.xfail(strict=True, reason="US5/T052 green point — T041 has not converged the two anti-patterns yet")
 def test_c9_two_anti_patterns_converged_to_one_short_reference():
     text = _text(INTERVIEW)
     present = [a for a in CONVERGED_ANTIPATTERNS if a in text]
-    assert len(present) <= 0, (
-        f"anti-patterns still carrying their original condition restatement: {present}. "
-        "C-9 requires one short reference to the truth document's blacklist/floor instead."
+    assert not present, (
+        f"anti-pattern entries still carry their original condition restatement: {present}. "
+        "C-9 requires one short reference to the discipline's blacklist/floor in their place — "
+        "the labels may stay, the restated conditions may not."
+    )
+    # The reference that replaces them must be reachable, and must not add a second path line
+    # (C-1 pins this file to exactly one).
+    assert _pointer_line_count(INTERVIEW) == 1, (
+        "interview-pattern.md must carry exactly one pointer line; the anti-pattern reference "
+        "has to be path-free (C-12(b))"
     )
 
 
@@ -369,7 +386,6 @@ def test_c10_feedback_step_preserves_three_and_rewrites_one():
 # --- C-11…C-12: move C, summarize-project (US5) ---
 
 
-@pytest.mark.xfail(strict=True, reason="US5/T052 green point — T046 has not converged §1.7 nor promoted the blacklist yet")
 def test_c11_playbook_section_converged_and_blacklist_promoted():
     text = _text(PLAYBOOK)
     m = re.search(r"^### 1\.7 .*$", text, re.M)
@@ -399,7 +415,6 @@ def _blacklist_identifier_needles() -> list[str]:
     return sorted(set(re.findall(r"`(?:T1|E1|RC-\d|RC-\*|CG-[A-Z0-9]|CG-\*|M-\*)[^`]*`", bl)))
 
 
-@pytest.mark.xfail(strict=True, reason="US5/T052 green point — T046's promotion has not landed, so the derived needle set is still empty")
 def test_c12_no_independent_blacklist_copy():
     needles = _blacklist_identifier_needles()
     # Anti-vacuity sentinel: an empty needle set would make the count below trivially zero
@@ -428,7 +443,6 @@ def test_c12_no_independent_blacklist_copy():
 # --- C-13: single-source scan (US5) ---
 
 
-@pytest.mark.xfail(strict=True, reason="US5/T052 green point — T036/T041 have not converged the dispersed wordings yet (2 files match today)")
 def test_c13_no_content_form_restatement():
     # Anti-vacuity: the needle set must not have been emptied. A runtime "needle must match
     # something" sentinel is impossible here — after convergence matching nothing IS the pass
