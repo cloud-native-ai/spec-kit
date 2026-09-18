@@ -49,6 +49,7 @@ Batch procedure, ownership resolution, and routing rationale: [`./references/loo
    - Give the user's stated optimization direction a dedicated analysis pass: confirm what is already satisfied, what is missing, and which edits address the request.
    - Group observations by failure mode: trigger/discovery, scope inference, missing context, wrong tool choice, unsafe step, unclear output, validation gap, resource/reference issue, **constraint non-compliance** (diagnose as a constraint-*placement* problem per [`./references/constraint-placement.md`](./references/constraint-placement.md) before rewording the rule), or **cross-skill ownership boundary**.
    - For each item, record: symptom, likely cause in the Skill instructions, desired next behavior, and the section to change. An item deferred for lack of evidence names the concrete evidence that would unlock it.
+   - **Red-line conformance gate (proactive, mandatory)** — run `python3 ${SKILL_HOME}/scripts/redline-check.py <target SKILL.md>`: it collects the target's attributes (automation / sensitive-info / …), fires the red lines bound to each present attribute, and returns PASS or TRIGGERED. A TRIGGERED red line is a **MUST-fix** item — not evidence-gated, not deferrable: remediate it, or record why each flagged signal is a sanctioned, announced exception. Framework, registry, admission rigor, and the HC5 reconciliation: [`./references/red-lines.md`](./references/red-lines.md).
    - Gates before acting — misuse-vs-pitfall gate, fact-check gates (delegation capability / data tables / tier coverage), legacy path idiom detection (bare relative paths / `${SKILL_ROOT}/X` / agent-specific install paths → rewrite as `${SKILL_HOME}/...`), Feedback-section conformance: [`./references/loop-playbook.md`](./references/loop-playbook.md) `## Step 4`.
 
 5. **按规范优化 — correct the root causes with minimal changes**
@@ -70,6 +71,7 @@ Batch procedure, ownership resolution, and routing rationale: [`./references/loo
 8. **最终检查 — validate the improvement loop**
    - Re-read the changed Skill and verify each edit maps to an observed execution issue or a user requirement.
    - **Run the shape gate on every `SKILL.md` you touched**: `python3 ${SKILL_HOME}/scripts/skill-shape.py <SKILL.md>` — exit `0` required, or the report carries a recorded exception per Hard Constraint 3, including the before/after controllable-token counts (step-2 baseline run vs this run) and their delta. Never finish a loop having grown a body past the gate without saying so.
+   - **Re-run the red-line gate**: `python3 ${SKILL_HOME}/scripts/redline-check.py <SKILL.md>` must exit `0`, or the report records why each remaining signal is a sanctioned exception. A loop MUST NOT finish with a triggered red line left unremediated (see [`./references/red-lines.md`](./references/red-lines.md)).
    - **Reference code is executed, not eyeballed**: run or line-trace changed snippets/scripts against a real target; files-exist/links-resolve is not validation — if you cannot run it this loop, mark it as needing runtime validation rather than reporting it verified. When metadata changed, check frontmatter, resource paths, `skill_id`/directory/`name` agreement, and accept a directory-level `.github/skills -> ../.specify/skills` symlink as a valid compatibility entrypoint.
    - **Structural edits run the affected contract tests** (`tests/contract/` of the governing feature) — heading greps are not proof. On a red suite, prove zero regression with a clean-baseline failure-set diff (prefer `git worktree` over `git stash`): [`./references/loop-playbook.md`](./references/loop-playbook.md) `## Step 8`. **Behavior-changing edits get a pressure re-test (RED-GREEN)** per `create-skills/references/pressure-testing.md`; wording-only or resource-path edits are exempt — state which case applied.
    - Skill-owned executable resources belong in `./scripts/`, never documented as `.specify/scripts/`. **Intervention ledger (evidence-step Step E)**: when the run consumed findings evidence, write `intervention.json` into the baseline evidence-run directory (targetFinding / change / baselineRunId / expectedSignal); never claim "fixed" without the next-run before/after comparison.
@@ -115,8 +117,8 @@ On a genuine agent-specific obstacle (tool call unavailable, unexpected output f
 
 | Directory | Contents |
 |-----------|----------|
-| `${SKILL_HOME}/references/` | `skill-slimming-principles.md`, `loop-playbook.md`, `skill-quality-checklist.md`, `hardening-examples.md`, `constraint-placement.md`, `claude-code-guide.md`, `copilot-guide.md` |
-| `${SKILL_HOME}/scripts/` | `skill-shape.py` — deterministic L1 shape gate for a `SKILL.md` (token budget, fence ratio, long fences, example sections); exit `0` pass / `10` slim-recommended; `--help` for thresholds and calibration |
+| `${SKILL_HOME}/references/` | `skill-slimming-principles.md`, `loop-playbook.md`, `skill-quality-checklist.md`, `hardening-examples.md`, `constraint-placement.md`, `red-lines.md` (attribute-triggered red-line framework, registry catalogue, admission rigor), `claude-code-guide.md`, `copilot-guide.md` |
+| `${SKILL_HOME}/scripts/` | `skill-shape.py` — deterministic L1 shape gate for a `SKILL.md` (token budget, fence ratio, long fences, example sections); exit `0` pass / `10` slim-recommended; `--help` for thresholds and calibration. `redline-check.py` — deterministic attribute-triggered red-line probe (collect attributes → fire bound red lines → verdict `not-applicable`/`gap`/`review`/`compliant`); exit `0` pass / `1` triggered; `--json`, `--scan-all`, `--help` |
 
 ## Hard Constraints
 
@@ -132,6 +134,7 @@ Objective conditions for finishing a loop. Each is checkable, not a matter of ju
 8. **Removal preserves content.** Every slimming move is delete-and-absorb in the same edit; never delete a section and defer relocating its substance.
 9. **No claim of "fixed" without before/after.** Improvement outcomes are decided by the intervention ledger's next-run comparison, not by asserting the edit works.
 10. **Wrap-up commits verify the staging area.** Before any loop-end commit, `git status --short` and confirm only this loop's files are staged; unstage unrelated pre-staged entries or commit by explicit pathspec — never `git add -A`.
+11. **Red lines are mandatory, not recommended.** If `redline-check.py` returns TRIGGERED for the target, the loop MUST NOT finish until every triggered red line is remediated, or each flagged signal is explicitly recorded as a sanctioned, announced exception. Adding a new red line requires passing **all** admission criteria in [`./references/red-lines.md`](./references/red-lines.md) — a general best practice MUST NOT be promoted to a red line (that devalues the real ones).
 
 ## Self-Improvement Routing
 
