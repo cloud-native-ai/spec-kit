@@ -249,3 +249,55 @@ TOTAL FILES = 1
 
 So the needle is falsifiable: **1 file / 12 hits before T046, must be 0 after**. The sentinel
 asserting the derived set is non-empty is what stops C-12 passing vacuously in the meantime.
+
+---
+
+## Phase 4 / US3 — T024 (2026-09-18)
+
+**Deliverable under test**: T023 `tests/contract/test_constitution_double_landing.py`
+(constitution-export **C-1…C-13**).
+
+**Result at red-first**: `19 failed, 0 passed` · collection `19 tests collected`, **0 errors**.
+Every failure was an artifact-not-built message — `template is missing principle titles`,
+`principle '<title>' not found`, `command MUST-include list is missing`, `constitution carries
+no principle titled`, `version (1, 11) is below the floor (1, 12)`.
+
+**No xfail markers in this file, deliberately.** Unlike surface-pointers (claimed by three
+stories), all of constitution-export C-1…C-13 belong to US3 and land inside this same phase,
+so the file is red only between T023 and T032 and green at the phase boundary. Marking them
+xfail would have hidden the very transition T032 exists to prove.
+
+**Green at red-first time, per T024's own prediction**: C-8 (a rule about the test's *own*
+matching logic — correct as authored, independent of any artifact) and C-10 (the mutation probe,
+whose precondition is C-7 being green; with STR-006 absent from both sides there was nothing to
+delete, so the probe was *not testable* rather than failing for a missing artifact). C-10's
+anti-vacuity sentinel made that distinction explicit instead of letting it pass silently: it
+failed with `anti-vacuity: the real template must carry it`, which reads as "precondition
+absent", not as "guard broken".
+
+### Five assertion defects found by the red-first run, all in the test
+
+The run was worth more than a formality — five separate ways the assertions were wrong, each
+of which would have produced a false red and invited "fixing" correct artifacts:
+
+| # | Defect | Symptom | Fix |
+|---|---|---|---|
+| 1 | `TEMPLATE_TITLE_RE` lacked `re.M` | `_template_titles()` returned an **empty set**, so every clause reported "principles missing" | added `re.M`; without it `^`/`$` anchor to the whole string |
+| 2 | C-5/C-6 regexes anchored `^- \*\*MUST include\*\*` at column 0 | the real entries are indented 3 spaces, so the pre-existing five matched none | indentation-tolerant `^\s*-` |
+| 3 | C-5 counted entries by the `that mandates:` form | returned **6**, not 7 — the pre-existing `Documentation-First` entry reads `… that is ordered ABOVE any …` | count by entry regex; assert the verbatim form only for the two *new* entries |
+| 4 | C-2(b) read `lines[1]` as the claim sentence | C-2(d) hard-wraps under 100 chars, so the colon sits two lines down | join heading→first-bullet text |
+| 5 | C-2(c) checked each **physical** line for `MUST` | a wrapped bullet's `- …` line often has no `MUST`; the continuation line does | group into logical bullets, then check each |
+
+Defects 4 and 5 share a root cause worth naming: **C-2(d)'s line-length rule makes phrase-level
+assertions on raw text unreliable**, because any fixed phrase longer than the wrap width gets
+split. Every phrase assertion in this file now runs against a whitespace-flattened copy
+(`_flat`), while structural assertions (line length, blank-line placement) run against the raw
+lines. Adding a fifth clause of this kind without that split would reproduce the same false red.
+
+Defect 1 is the same *class* as the four blind checks recorded above, in its quietest form: the
+matcher returned a valid-looking empty answer, and eleven clauses reported "artifact missing"
+when the artifact question had not actually been asked.
+
+**Post-fix state before T025–T028**: `2 failed, 17 passed` — the two reds were exactly C-11 and
+C-12, the clauses whose subject is the live constitution that T028 amends. After T028:
+`19 passed`, including C-10's mutation probe on both sides.

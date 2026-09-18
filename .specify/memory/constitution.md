@@ -1,18 +1,21 @@
 <!--
 Sync Impact Report
-- Version change: 1.10.0 → 1.11.0 (MINOR; new Principle XIV added, 2026-08-31)
-- Added principles: XIV. One Source of Truth (Authority & Reference Discipline) — every fact has exactly one authoritative definition point (its owner) and every other location reaches it by reference; anchors the discipline at shared/guidelines/one-source-of-truth.md (owner declaration, owner-selection order code → machine-generated artifact → authored document, the three legitimate duplicate kinds, counts/enumerations rules, disagreement procedure); repair direction is "convert the copy into a reference", never re-word it to agree; explicitly adds no scanner/registry machinery (Principle IX)
-- Modified principles: V. AI Agent Integration Standards — first compliance act under XIV: the tier roster was a drifting copy (this file listed GitHub Copilot as Tier 1 while `_ASSISTANT_TIERS["copilot"] == "tier2"`). Rather than re-word the copy, the principle now defers to `AGENT_CONFIG` / `_ASSISTANT_TIERS` in src/specify_cli/__init__.py as the authoritative roster and tier source, so it cannot diverge again
+- Version change: 1.11.0 → 1.12.0 (MINOR; new Principle XV added, 2026-09-18)
+- Added principles: XV. User-Facing Comprehension (No Jargon, With Context) — every message a flow sends to a human must be readable by someone who did not take part in the run, which bounds both its vocabulary (closed whitelist / blacklist) and the context it carries (floor + ceiling with an adjudication order), judged by reproducible criteria rather than taste
+- Modified principles: None
 - Removed sections: None
+- Backflow repaired by this amendment: Principle XIV (One Source of Truth) had reached THIS file but was never added to `templates/constitution-template.md`, so no downstream project ever received it — `grep -c "One Source"` returned 0 in both templates. It now lands as template Principle XII, and the pair is guarded by `tests/contract/test_constitution_double_landing.py` (a named watchlist asserted on both sides by set membership, plus a mutation probe proving the guard fails when either side loses a title). That accident is the guard's first tested sample.
 - Templates requiring updates:
-  ✅ shared/guidelines/one-source-of-truth.md — NEW discipline authority (declare the owner; reference don't copy; legitimate duplicates as mechanical/guard/dated; counts and enumerations; resolving a disagreement; relationship to adjacent principles), mirrored to .specify/shared/guidelines/
-  ✅ templates/instructions-template.md (+mirror) — new ambient `## One Source Of Truth` summary+pointer section between Input Sanity and Task Complexity Rubric; propagated to .specify/instructions.md via generate-instructions.sh additive reconcile (AGENTS.md et al. inherit by symlink)
-  ✅ tests/contract/test_one_source_of_truth.py — guarding contract: doc↔mirror parity, required sections, template carries pointer without inlining the doc's headings, single-source sweep over shared/ + templates/, project-neutrality, constitution XIV + version floor
-  ✅ Drift repaired under the new principle (copies converted to references, counts not re-counted): .specify/instructions.md Documentation Map + Key Directories rows (hand-written principle/feature/skill counts and inline rosters), shared/definitions/probe-definitions.md and shared/workflow/feedback-step.md (+mirrors), docs/reference/skills/feedback.md
-  ⚠️ templates/constitution-template.md — intentionally unchanged: it is the downstream-project template with independent numbering (its own I–XI)
-- Follow-up TODOs: (a) `.specify/skills/git-fleet/` is missing from the skills mirror (pre-existing `sync-mirrors --check` MISS, unrelated to this amendment); (b) the reserved-filename registry is still stated in four places (docs/decisions/0002, skills/create-docs/SKILL.md, scripts/python/docs-utils.py, Principle X) with no declared owner — a candidate for the next XIV compliance pass; (c) test_c4_no_new_memory_layout remains a pre-existing baseline failure carried from 1.10.0
-- Preserved by design: historical specs/feedback keep their original wording as dated records — a legitimate duplicate kind under XIV.
+  ✅ templates/constitution-template.md — new XII. One Source of Truth (Authority & Reference Discipline) + XIII. User-Facing Comprehension (No Jargon, With Context); principles 11 → 13
+  ✅ templates/commands/constitution.md — `MUST include` list 5 → 7 entries, each with an anchor sub-bullet (referenced, not restated) and a no-new-machinery sub-bullet; 4 per-tool copy trees regenerated
+  ✅ shared/guidelines/user-facing-comprehension.md (+ .specify mirror) — NEW discipline authority: jargon whitelist/blacklist, context floor/ceiling and adjudication order, mechanical verdict questions, the closed 11-class surface table, one global reader baseline plus its override protocol
+  ✅ templates/instructions-template.md (+ mirror + .specify/instructions.md) — new ambient `## User-Facing Comprehension` summary+pointer section between Token Efficiency Discipline and Dogfooding Practice
+  ✅ tests/contract/test_user_facing_comprehension_doc.py / _section.py / _pointers.py + test_constitution_double_landing.py — guarding contracts
+  ⚠️ 7 of the 8 interface-class rule sources still lack their one-line pointer (only `shared/guidelines/confirmation-gates.md` is wired); the remaining insertions plus the two content moves are pending
+- Follow-up TODOs: (a) the 13 governance-kept gate prompts have a wording obligation now but their individual text has not been reviewed against it; (b) `skills/improve-skills/scripts/redline-check.py` has a source/mirror divergence shipped by an unrelated upstream commit — one `sync-mirrors.py --write --only skills/improve-skills` away, deliberately not folded into this amendment; (c) the reader-baseline cap counts override *sites* by class, and the by-line reading of that cap is an open question recorded in the feature's clarification log
+- Preserved by design: `confirmation-gates.md`'s five criteria sections are frozen byte-for-byte (SHA-256 pinned by contract test) — this feature adds a wording obligation beside them, it does not edit gate criteria
 
+Previous change (1.10.0 → 1.11.0, MINOR): Principle XIV One Source of Truth added — every fact has exactly one authoritative definition point (its owner) and every other location reaches it by reference; discipline anchored at shared/guidelines/one-source-of-truth.md; Principle V's tier roster repaired as the first compliance act; templates/constitution-template.md intentionally left unchanged at the time (independent downstream numbering).
 Previous change (1.9.1 → 1.10.0, MINOR): Principle XI Dogfooding materially extended — term definition anchored at shared/definitions/dogfooding-definitions.md § 0, plus two normative rules added ("Fix the mechanism, not just the instance" and "Two hats: framework sources vs client runtime"); the generate-instructions.sh additive section reconcile was the mechanism fix executed under the new rule.
 Previous change (1.9.0 → 1.9.1, PATCH): non-semantic reconciliation of Principle V's approved-agent roster with shipped code — Qwen Code and iFlow removed from AGENT_CONFIG in 0c300bc8.
 -->
@@ -162,6 +165,42 @@ Every fact — a concept's meaning, a normative rule, a threshold, an enumerated
 
 Rationale: Facts restated in several places are not merely redundant — they disagree silently, and a reader cannot tell which copy is current. This project has repeatedly hand-corrected the same stale counts and rosters only to watch them drift again, because correcting a copy leaves the copy. Principle VIII settles *which* source wins for facts about actual behavior; this principle generalizes the question to every kind of fact and fixes the matching obligation on the consuming side — reach the owner, never restate it.
 
+### XV. User-Facing Comprehension (No Jargon, With Context)
+Every message this project's flows send to a human MUST be readable by someone who did not take
+part in the run, which bounds both its vocabulary and the context it carries:
+- The discipline — the permitted-jargon whitelist, the forbidden-jargon blacklist, the context
+  floor and ceiling, their adjudication order, the closed enumeration of governed interface
+  classes, and the reproducible verdict questions — is defined once in
+  `.specify/shared/guidelines/user-facing-comprehension.md`; every command, skill, agent, and
+  shared document MUST reference that anchor, never restate it.
+- **Jargon is bounded, not banned**: a term may stand unexplained only where a closed whitelist
+  condition holds, and anything outside that whitelist counts as a violation. Internal
+  identifiers and engine call forms MUST NOT reach a reader who has a user-facing path
+  available, and an abbreviation first used within a consumption unit MUST be annotated in
+  place — the duty is accounted per consumption unit, not per session, because a reader may
+  encounter one message alone days later.
+- **Context is bounded in the same breath**: each message MUST carry the facts a reader needs in
+  order to act without opening another artifact, and MUST reach everything else by path
+  reference. Restating an artifact the reader could open themselves MUST NOT be counted as
+  supplying context, at any length.
+- **Judgement is reproducible, not taste**: two independent reviewers applying the criteria to
+  one message MUST reach the same verdict. A disagreement is a defect in the criteria and MUST
+  be repaired there, not resolved by picking a reviewer.
+- **One reader baseline, overrides declared at the class**: the global baseline reader is
+  defined once in the discipline's truth document; an interface class MAY declare a stricter
+  baseline at its own rule source, taking effect where declared and MUST NOT written back into
+  the truth document.
+- This principle adds a way of writing, not machinery: it MUST NOT be used to justify a jargon
+  linter, a wording scorer, a maturity report, or any other new tracking system. Enforcement is
+  review plus targeted contract tests where a rule matters enough to guard.
+
+Rationale: an unreadable prompt does not fail loudly. A reader who has to decode a term guesses
+and then acts confidently on the wrong meaning, and a reader who has to page away for context
+answers a different question — both look like a completed flow while the decision goes wrong.
+This project already applied the rule in many flows without ever defining it, so the same
+obligation was restated in dozens of places and had drifted between them; naming the owner is
+what makes the rule enforceable and Principle XIV's first application to prose aimed at humans.
+
 ## Spec-Driven Development Workflow
 
 ### Research & Context Gathering
@@ -212,4 +251,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.11.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-08-31
+**Version**: 1.12.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-09-18

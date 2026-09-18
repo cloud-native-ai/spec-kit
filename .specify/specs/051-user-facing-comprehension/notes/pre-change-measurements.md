@@ -249,3 +249,32 @@ At kickoff `HEAD` equals `BASE_SHA` and this feature has no commits yet, so the
 legitimate (C-6(c)). The `"$BASE"` form is used anyway so this row cannot be copied as a
 template into T011 / T033 / T055 / GATE-4, which run mid-implementation where `HEAD` is
 wrong.
+
+---
+
+## ⑤ Unit + integration baseline (added at US3, 2026-09-18)
+
+T001 froze only `tests/contract/`, because that is what GATE-1 and DoD-10 compare. US3 edited
+`templates/constitution-template.md` and `.specify/memory/constitution.md`, which the
+`tests/unit` and `tests/integration` suites also read, so their state had to be attributed
+rather than assumed. Measured by running the same selection in a throwaway worktree at the
+comparison base and diffing the failure-name sets:
+
+```bash
+git worktree add /tmp/base-wt gitlab/master
+cd /tmp/base-wt && python3 -m pytest tests/unit tests/integration -q   # → 20 failed, 930 passed
+cd - && python3 -m pytest tests/unit tests/integration -q              # → 20 failed, 930 passed
+# comm -13 base now  → empty     (0 new)
+# comm -23 base now  → empty     (0 healed)
+```
+
+**Result: 20 failures, identical name sets on both sides — all pre-existing, none caused by
+this branch.** The two that look closest to this work are
+`tests/integration/test_team_create_flow.py::…::test_skill_describes_team_file_schema` and
+`tests/integration/test_zero_sdd_workflow_references.py::test_no_sdd_workflow_reference_in_source`;
+both fail at the base commit too.
+
+Recorded because "the contract suite is clean" is not the same claim as "the suite is clean":
+a count-only comparison across two suites with different baselines would have hidden 20
+failures, and a name-set comparison against the *wrong* base would have attributed them here.
+The worktree was removed after use (`git worktree remove --force` + `prune`).

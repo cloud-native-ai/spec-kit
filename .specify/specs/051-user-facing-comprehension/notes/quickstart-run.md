@@ -183,3 +183,40 @@ Also verified in this phase (T020): the gate scan is unchanged at
 point T020 exists for — `confirmation-gates.md` is the scanner's `SELF_REL` and is wholly
 exempt from counting, so editing it *cannot* move the total. Had the total moved, it would
 mean the edit leaked into a different scanned file.
+
+---
+
+## 场景 5a / 5b — 宪章双落点(US3)
+
+Run by T034 · 2026-09-18.
+
+| Expectation | Observed | Verdict |
+|---|---|---|
+| `templates/constitution-template.md` principles **11 → 13** | 13 | ✅ |
+| `.specify/memory/constitution.md` principles **14 → 15** | 15 | ✅ |
+| `One Source` hits in template **0 → 1** | 1 | ✅ |
+| `One Source` hits in command **0 → 1** | 1 | ✅ |
+| `MUST include` entries **5 → 7** | 7 | ✅ |
+| version **1.11.0 → 1.12.0** | `**Version**: 1.12.0` | ✅ |
+| watchlist lands on both sides (C-7) + mutation probe (C-10) | `3 passed` | ✅ |
+
+`grep -c 'User-Facing Comprehension' .specify/memory/constitution.md` → **4** (the principle
+heading, the Sync Impact Report's added-principles line, its backflow note, and the truth-doc
+anchor), against an expectation of ≥1.
+
+### 场景 5c deferred — and why that is not a gap in FR-026's evidence
+
+5c is the downstream bootstrap drill (`specify init` in an empty directory, then
+`/speckit.constitution`). It cannot prove anything about this feature on this machine: the
+installed CLI resolves to `/usr/local/lib/python3.11/site-packages/specify_cli/__init__.py`
+(**0.0.22, non-editable**), so `init` renders the *installed package's* templates, not this
+working tree's. Reinstalling from the tree would modify global site-packages and needs explicit
+consent; T034 is therefore marked `[~]` per its own instruction.
+
+FR-026's acceptance evidence is T033's mechanical verification instead, which tests the actual
+mechanism rather than a rendered artifact: `templates/plan-template.md` is **unchanged** versus
+`BASE_SHA` (0 files), and its `## Constitution Check` block still carries the instruction to
+enumerate `### <roman-or-arabic-numeral>. <name>` headings dynamically with an explicit
+"Do NOT hard-code principle names here". Since the enumeration is derived at plan time from the
+live constitution, a 15-principle constitution renders 15 rows with no template edit — which is
+the property 5c would have demonstrated, checked at the place it is actually implemented.
