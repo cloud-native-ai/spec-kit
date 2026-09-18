@@ -90,7 +90,7 @@ shared/guidelines/       # 新真源文档 user-facing-comprehension.md(第 12 �
 shared/patterns/         # interview-pattern.md:可理解性四规则(:121-124)与两条反模式(:280-281)收敛为指针,:125-126 原文保留,:255 不可丢弃清单追加指针
 shared/workflow/         # feedback-step.md / glossary.md 各加 1 行指针(既有措辞规则保留为界面类实例)
 templates/               # instructions-template.md 新增 ## 章节(17→18);constitution-template.md 新增 2 条原则(11→13)
-templates/commands/      # clarify.md(补齐行话半侧)、interview.md(收敛内容形态复述)、constitution.md(MUST include 清单 +2 条)
+templates/commands/      # clarify.md(补齐行话半侧)、interview.md(收敛内容形态复述)、constitution.md(MUST include 清单 +2 条)、requirements.md(类 ⑦ 读者基准复述收敛为指针,C-18(c))
 skills/summarize-project/references/   # reporting-playbook.md §1.7 黑名单提升出去并收敛为指针;project-overview.md / consistency-rules.md 收敛
 tests/contract/          # 4 个新测试文件 + 扩展 test_confirmation_gates_execution_report.py
 docs/reference/          # 3 处手写内容形态复述收敛(commands/interview.md、skills/feedback.md、commands/requirements.md)
@@ -120,6 +120,7 @@ src/specify_cli/         # 不改动 —— 零运行时逻辑变更(FR-033 / Pr
 | `templates/commands/clarify.md` | `.claude/commands/speckit.clarify.md`、`.github/prompts/speckit.clarify.prompt.md`、`.qoder/commands/speckit.clarify.md`、`.opencode/command/speckit.clarify.md` —— **无** `.specify/templates/commands/` 镜像(该对已退役,`sync-mirrors.py:73` 的 templates 对排除 `commands`) | `regen-command-copies.py --check` EXIT=0 |
 | `templates/commands/interview.md` | 同上 4 棵 | 同上 |
 | `templates/commands/constitution.md` | 同上 4 棵 | 同上 |
+| `templates/commands/requirements.md`(**第二批新增**,由发现项 B-08 的 C-18(c) 引入:类 ⑦ 读者基准的命令侧复述须收敛为指针) | 同上 4 棵 | 同上 |
 | `skills/summarize-project/references/reporting-playbook.md`、`project-overview.md`、`consistency-rules.md` | `.specify/skills/summarize-project/references/` 下同名 3 份 | `sync-mirrors.py --check --only skills` EXIT=0 |
 | `docs/reference/commands/interview.md`、`docs/reference/skills/feedback.md`、`docs/reference/commands/requirements.md` | `docs/public/**` = **Hugo 构建产物**,`git ls-files docs/public` 为 0、经 `docs/.gitignore` 忽略(证据:`skills/create-pages/references/hugo-site.md:22`)⇒ **MUST NOT 手改** | 非 CI 门禁;修好手写源后由既有 create-pages 流程重建。`quickstart.md` 场景 6 记一条提醒 |
 
@@ -138,7 +139,7 @@ src/specify_cli/         # 不改动 —— 零运行时逻辑变更(FR-033 / Pr
 - **未暴露新 Feature**:本计划的 6 项交付面全部落在 Feature 051 已声明的范围内(规格 FR-001…FR-038),无溢出能力。
 - **未使既有 Feature 失效**:8 个交叉引用 Feature 的能力范围均不变;`confirmation-gates.md` 的判据各节逐字冻结(FR-017),Feature 046 的所有权不受影响;`interview-pattern.md` 的模式特有规则原文保留(FR-021),Feature 042 的所有权不受影响;`feedback-step.md` 的三处既有规则保留为实例(FR-019),Feature 028 的所有权不受影响。
 - **发现两项跨 Feature 效应,归属均在对方、051 为交付方**(依 Feature 050 tasks 阶段的同类先例记入对方详情文件):
-  1. **SC-017 的悬空指针守卫覆盖全部 11 份既有 guideline**,不只新文档 ⇒ 它把一个既有结构性缺口变成**受测**的。真正修投递机制(`generate-instructions.sh` 同步 `shared/`)属**另一条尚未登记的 Feature**,已在规格 Out of Scope 与 `features/051.md` 的 Future Evolution Suggestions 记录。
+  1. **SC-017 的悬空指针守卫核算全部 11 份既有 guideline**,不只新文档 ⇒ 它把一个既有结构性缺口变成**受测**的。**核算方式经实测订正(A-02/B-05)**:指针遍历只能抵达**有指针**者——实测模板面 7 份、活动指令面 8 份、`checklist-methodology.md`/`requirements-guidelines.md`/`self-improvement.md` 三份两面无指针——故 8 份经**指针存在性**断言覆盖、其余 3 份经 `ambient-section.md` **C-11(b) 的余集断言**(余集 ⊆ 具名三份,删指针即失败)覆盖;原文"覆盖全部 11 份"若读作"遍历抵达 11 份"则为假,已改为"核算"。真正修投递机制(`generate-instructions.sh` 同步 `shared/`)属**另一条尚未登记的 Feature**,已在规格 Out of Scope 与 `features/051.md` 的 Future Evolution Suggestions 记录。
   2. **FR-028 回流 Principle XIV** 使下游项目首次收到该原则 ⇒ 交付效应落在 Feature 040 的 backlog 上(`features/040.md` 的 Future Evolution Suggestions 第 1 条"把 token 效率纪律提升为宪章原则"今天仍待办,而 051 建立的正是它需要的双落点通道)。已在本轮把反向交叉引用写入 `features/040.md`。
 - **功能/非功能分类一致性**:Feature 051 是**非功能(纪律/质量属性)**类,与 040 Token Efficiency Discipline、032 Task Complexity Rubric 同类;索引行的描述与详情文件的 Overview 均未把它表述为功能能力。一致。
 - **状态推进**:`Draft → Planned`(本命令拥有该转移,依 `.specify/templates/feature-details-template.md` § Canonical Status State Machine)。**MUST NOT** 落 `Implemented`——那由 `/speckit.implement` 拥有。

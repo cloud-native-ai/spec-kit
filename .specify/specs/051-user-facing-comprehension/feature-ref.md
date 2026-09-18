@@ -61,7 +61,7 @@
 | FR-034 | `:68` 提升后获契约断言 | `surface-pointers` C-10 + 扩展 `test_confirmation_gates_execution_report.py` | 既有文件扩展 |
 | FR-035 | 具名双落点观察名单 | `constitution-export` C-7, C-8, C-9, C-10 | `_double_landing` |
 | FR-036 | 观察标记 | `discipline-doc` **C-17**(断言观察约定存在 + STR-005 字面量 + 三条红线);标记的**实际内嵌**属运行时行为,不由契约断言 | `_doc` |
-| FR-037 | 基准读者 + 按类覆盖协议 | `discipline-doc` C-13, C-14 | `_doc` |
+| FR-037 | 基准读者 + 按类覆盖协议 | `discipline-doc` C-13(全局基准恰好 1 条)+ **C-18**(覆盖登记项 ≤2、声明形态针的完备性) | `_doc` |
 | FR-038 | 同批抵达 + 悬空指针提示 | `ambient-section` C-11;`gate-neutrality` C-6 | `_section` |
 
 **测试文件名缩写**: `_doc` = `test_user_facing_comprehension_doc.py`;`_section` = `test_user_facing_comprehension_section.py`;`_pointers` = `test_user_facing_comprehension_pointers.py`;`_double_landing` = `test_constitution_double_landing.py`。
@@ -93,8 +93,8 @@
 | SC-014 | 黑名单全框架可达 100%;独立副本 = 0 | `surface-pointers` C-11, C-12 | 1 份搁浅、0 处外部可达 |
 | SC-015 | 观察名单两侧同时存在 100% + 变异式有效 | `constitution-export` C-7…C-10 | 0 条原则受此守卫 |
 | SC-016 | 两处搬家既有行为回归 = 0 | `surface-pointers` C-4…C-9, C-14;`gate-neutrality` C-2, C-7;`quickstart` 场景 4/6 | 不适用(度量回归) |
-| SC-017 | 悬空且无提示 = 0(覆盖全部 guideline) | `ambient-section` C-11;`quickstart` 场景 2 遍历核验 | 窗口存在但从未受测 |
-| SC-018 | 读者基准声明总数 ≤3 | `discipline-doc` C-13, C-14 | 3 种并存、0 处声明为全局/覆盖 |
+| SC-017 | 悬空且无提示 = 0(11 份 guideline **全部核算**:实测 8 份有指针者经指针存在性断言、3 份无指针者经余集断言) | `ambient-section` C-11(含 C-11(a) 实测分母 / C-11(b) 余集断言);`quickstart` 场景 2 遍历核验 | 窗口存在但从未受测 |
+| SC-018 | 读者基准声明总数 ≤3 | `discipline-doc` C-13(全局侧:恰好 1 条)+ **C-18**(覆盖侧:登记项 ≤2 + 完备性针扫) | 3 种并存、0 处声明为全局/覆盖;声明形态针实测命中 **4 处 / 3 文件**(其中 `templates/commands/requirements.md:82` 是 `research.md` D-14 从未登记的第 4 处,按 C-18(c) 收敛为指针而非登记) |
 
 **人工度量项(3 条)**: SC-001、SC-006 需未参与实现的评审者;SC-007 的长度分布比对需改前抽样。三者的方法记在规格 `### Measurement Sources & Collection Methods`,结果落 `verification.md`。
 

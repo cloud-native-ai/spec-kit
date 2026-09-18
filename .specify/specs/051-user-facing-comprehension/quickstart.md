@@ -77,7 +77,7 @@ grep -n '^## ' templates/instructions-template.md
 
 **期望(改后)**: `## User-Facing Comprehension` 出现在 `Token Efficiency Discipline` 之后、`Dogfooding Practice` 之前;`Documentation Map` → `Proactive Flow Trigger` → `Fact, Correctness & Logic Checks` 三者的相邻关系**不变**。
 
-**悬空指针遍历核验**(FR-038 / SC-017,覆盖全部 guideline 而非只覆盖新文档):
+**悬空指针遍历核验**(FR-038 / SC-017;遍历**全部有指针的** guideline 而非只覆盖新文档,无指针者由 C-11(b) 的余集断言核算):
 
 ```bash
 grep -oE '\.specify/shared/guidelines/[a-z0-9-]+\.md' .specify/instructions.md | sort -u | while read -r p; do
@@ -86,7 +86,7 @@ grep -oE '\.specify/shared/guidelines/[a-z0-9-]+\.md' .specify/instructions.md |
 done
 ```
 
-**期望**: 全部输出 `ok`,零 `MISSING`。改前实跑该命令对既有 11 份 guideline 全部 `ok`(窗口今天尚未被触发,但**从未受测**——这正是 SC-017 要把它变成受测项的理由)。
+**期望**: 全部输出 `ok`,零 `MISSING`。**改前实测(2026-09-18):该命令输出 8 行 `ok`、0 行 `MISSING`**。`shared/guidelines/` 实有 **11** 份,但活动指令文件只对其中 **8** 份有指针——`checklist-methodology.md`、`requirements-guidelines.md`、`self-improvement.md` 三份在两个指令面都无指针,而模板面更少(只 **7** 份,缺 `better-harness.md`)。**故遍历在结构上到不了 11 份**:原文"改前实跑该命令对既有 11 份 guideline 全部 `ok`"为假,已订正为上述实测值,三份无指针者改由 `ambient-section.md` C-11(b) 的**余集断言**核算(余集 ⊆ 那三份 ⇒ 11 份全部有归属,且删掉任一指针都会失败)。窗口今天尚未被触发,但**从未受测**——这正是 SC-017 要把它变成受测项的理由。
 
 ---
 
@@ -265,12 +265,16 @@ python3 -m pytest tests/contract/ -q 2>&1 | tail -3
 
 ```bash
 grep -c 'plain-language title\|Plain language, your vocabulary' docs/reference/commands/interview.md
-grep -c 'never the raw engine path' docs/reference/skills/feedback.md
+grep -c 'never the raw' docs/reference/skills/feedback.md
 grep -c 'business stakeholders, not developers' docs/reference/commands/requirements.md
 git ls-files docs/public | wc -l
 ```
 
-**期望**: 前三条在收敛后降为指针形态(计数下降,具体值由实现期测定并记入 `verification.md`);第四条实测为 **0** —— `docs/public/**` 是 Hugo 构建产物、未被 git 跟踪(经 `docs/.gitignore` 忽略;证据 `skills/create-pages/references/hugo-site.md:22` "Never committed, never documentation"),故 MUST NOT 手工编辑,修好手写源后由既有 create-pages 流程重建。
+**改前基线(2026-09-18 实测,四值依次为)**: **2 / 1 / 1 / 0**。
+
+**期望(改后)**: 前三条 MUST **下降**(手写复述收敛为指针形态),并记入 `verification.md`;第四条保持 **0** —— `docs/public/**` 是 Hugo 构建产物、未被 git 跟踪(经 `docs/.gitignore` 忽略;证据 `skills/create-pages/references/hugo-site.md:22` "Never committed, never documentation"),故 MUST NOT 手工编辑,修好手写源后由既有 create-pages 流程重建。
+
+**第 2 条的探针形态经实测订正(A-03)**:原写作 `grep -c 'never the raw engine path'`,而该字面量在目标文件中**跨行断开**——`docs/reference/skills/feedback.md:141` 行尾为 `…command (never the raw`、`:142` 行首为 `engine path); under the hood…`——故单行 `grep` 对它**恒为 0**,改前改后同为 0,"计数下降"永不可满足,是一个**可证明的盲探针**(与 T056 曾有的 `--stat` 盲命令同一缺陷类)。已改用完整落在 `:141` 单行内的片段 `never the raw`(实测 1);跨行形态若确需匹配,用 `python3 -c` 配 `never\s+the\s+raw\s+engine\s+path`(实测 1)而非 `grep`。**改前基线 MUST 写成具体数字**:原文"具体值由实现期测定"使执行者手里没有"改前"值,于是一个 0 会被读成"已经收敛了"而记为通过——盲探针之所以危险,正因为它与"成功收敛到 0"不可区分。
 
 ---
 

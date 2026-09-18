@@ -41,7 +41,11 @@
 
 ## 悬空指针防护(FR-038)
 
-**C-11** 指令模板中**每一个**指向 `.specify/shared/guidelines/<name>.md` 的指针,其对应的 `shared/guidelines/<name>.md` MUST 存在。该断言 MUST 遍历全部此类指针(覆盖既有 11 份 guideline + 本特性新增的第 12 份),MUST NOT 只检查新文档——FR-038 与 SC-017 要求把既有的投递窗口变成**受测**的,而不是只保护新增面。
+**C-11** 悬空指针断言 MUST 同时遍历**两个**指令面:`templates/instructions-template.md`(随包分发的源)与 `.specify/instructions.md`(本仓生成物)。对其中**每一个**指向 `.specify/shared/guidelines/<name>.md` 的指针,其对应的 `shared/guidelines/<name>.md` MUST 存在。该断言 MUST 遍历全部此类指针,MUST NOT 只检查新文档——FR-038 与 SC-017 要求把既有的投递窗口变成**受测**的,而不是只保护新增面。
+
+**C-11(a) 覆盖分母 MUST 实测、MUST NOT 假定**(A-02/B-05 订正):遍历只能抵达**有指针**的 guideline,故"覆盖既有 11 份 guideline"这一原表述为假。2026-09-18 实测——`ls -1 shared/guidelines/*.md` = **11** 份;`grep -oE 'shared/guidelines/[a-z-]+\.md' <面> | sed 's|.*/||' | sort -u` 得模板面 **7** 份、活动文件面 **8** 份(后者多出 `better-harness.md`,即两面本身就不一致,这也是 MUST 遍历两面的理由),两面并集 **8** 份;`checklist-methodology.md`、`requirements-guidelines.md`、`self-improvement.md` 这 **3** 份在**两面都无指针**,结构上不可能从指令面悬空,因而不在指针存在性断言的可达范围内。
+
+**C-11(b) 余集断言(使该边界不成为静默缺口)**:断言 MUST 另从 `shared/guidelines/*.md` 派生全集、减去被指向的集合,并断言余集 **⊆** {`checklist-methodology.md`, `requirements-guidelines.md`, `self-improvement.md`}——即余集 MUST NOT 出现第 4 个名字。取**子集**语义而非相等语义,方向才对:任何一份既有 guideline 的指针被删除都会让余集多出一个名字而**失败**(覆盖率无法静默缩小),而日后为这 3 份补上指针只会让余集变小、**不误报**。如此 11 份全部被本条核算——8 份经指针存在性、3 份经具名余集——"覆盖全部 11 份"的意图以**可实现**的形式成立。本特性新增的第 12 份(`user-facing-comprehension.md`)落地后必有指针,故余集不变、指针面 +1。
 
 ---
 
