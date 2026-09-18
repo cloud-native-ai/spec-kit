@@ -47,7 +47,7 @@
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `requirements.md`(38 FR / 18 SC / 5 stories / 26 acceptance scenarios)驱动本计划;`research.md` D-1…D-15 每条决策均回溯到具体 FR 或实测事实,无凭空设计 |
 | II | Feature-Centric Development | ✅ Pass | Feature 051 已注册(Draft)并绑定本 spec;`feature-ref.md` 记录 FR → 契约映射;本计划在 § Feature List Review 重新评估 Feature 增删合并 |
-| III | Intent-Driven Development | ✅ Pass | 规格记录 WHY(38 处措辞 / 0 真源 / 门控零措辞规则)而非仅 WHAT;6 项用户裁定连同其依据与**被否决方案的代价**一并成文(clarify 三轮 session 块) |
+| III | Intent-Driven Development | ✅ Pass | 规格记录 WHY(38 处措辞 / 0 真源 / 门控零措辞规则)而非仅 WHAT;6 项用户裁定连同其依据与**被否决方案的代价**一并成文(轮次与内容见 `requirements.md` § `## Clarifications`,MUST NOT 在此复述轮次计数——计数会随每一轮新增而静默过期,本行此前即因第四轮而失真) |
 | IV | Test-First & Contract-Driven Implementation | ⚠ Partial — see Complexity Tracking | 依 Principle VII `:95` 的 **template-only 门**:本特性**零可执行运行时代码**(FR-033 明令禁止新机制),故"测试"验证的是文档内容、canonical 路径与结构,而非运行时行为。仍按测试先行:5 份契约文档先于被钉死的文档内容撰写,4 个新测试文件 + 扩展 `test_confirmation_gates_execution_report.py`(FR-034) |
 | V | AI Agent Integration Standards | ✅ Pass | 不新增 agent、不改 provider 配置、不动 `AGENT_CONFIG` / `_ASSISTANT_TIERS`;纪律文本经**既有** symlink 模型抵达全部受支持 agent,是 agent 无关的散文 |
 | VI | Continuous Quality & Observability | ✅ Pass | 可观察性经 FR-036 的稳定标记 `user-facing-comprehension`(沿用 `token-efficiency` 形态);活动宪章版本 MINOR 递增 1.11.0 → 1.12.0 + 前置 Sync Impact Report;**根因优先**体现在 FR-035 订正——发现全称守卫不可实现后改为可实现的具名名单,而非勉强保留一个必然失败的断言 |
@@ -149,10 +149,10 @@ src/specify_cli/         # 不改动 —— 零运行时逻辑变更(FR-033 / Pr
 |----------|------|---------------|
 | Phase 0 研究 | [`research.md`](./research.md) | 15 条决策 D-1…D-15(全部仓库内部实测,无外部源);推翻需求阶段 6 处陈述 |
 | 数据模型 | [`data-model.md`](./data-model.md) | 9 个实体(对应规格 Key Entities)+ 4 组校验规则 V1…V4 + 2 个状态机(指针接入态、观察名单双落点态) |
-| 结构契约 | [`contracts/`](./contracts/) | 5 份:`discipline-doc.md`(17 条款)、`ambient-section.md`(11 条款)、`surface-pointers.md`(14 条款)、`constitution-export.md`(13 条款)、`gate-neutrality.md`(7 条款)—— 合计 **62 条款** |
+| 结构契约 | [`contracts/`](./contracts/) | 5 份:`discipline-doc.md`、`ambient-section.md`、`surface-pointers.md`、`constitution-export.md`、`gate-neutrality.md`。**条款数一律派生、MUST NOT 手写**:每份文件的条款编号区间由其自身头部声明拥有(它是该区间的唯一权威),跨文件总数由 `grep -cE '^\*\*C-[0-9]+\*\*' contracts/*.md` 派生。依据 Principle XIV 与 `one-source-of-truth.md:49`(可机械计数的数不得手写)、`:51`(发现过期计数时**删除副本,而不是改正数字**);本行此前手写总数,在 C-17/C-13 新增后漂移过一次,故改为派生 |
 | 快速上手 | [`quickstart.md`](./quickstart.md) | 6 个验证场景(全部命令实测执行,期望结果取自实跑输出) |
-| Feature 绑定 | [`feature-ref.md`](./feature-ref.md) | Feature 051 绑定 + 38 条 FR → 62 条款契约映射 + 18 条 SC → 产出任务映射 |
+| Feature 绑定 | [`feature-ref.md`](./feature-ref.md) | Feature 051 绑定 + 38 条 FR → 契约条款映射(条款数以 `contracts/` 为准,不在此复述)+ 18 条 SC → 产出任务映射 |
 
 **与 Phase 0 预期的漂移**:无。D-10 预期 5 份契约文档,实际 5 份;D-11 预期 4 个新测试文件 + 1 个扩展,`feature-ref.md` 的映射按此编排。一处**范围收窄已在 Phase 0 内消化**(非 Phase 1 漂移):FR-035 的全称双落点守卫经实测不可实现,改为具名观察名单(D-6),故 `constitution-export.md` 的双落点条款以名单常量而非"遍历全部原则"表述。
 
-**计数已于制品落盘后机械核验**(2026-09-17 首次落盘;2026-09-18 因 `/speckit.analyze` 的修复批次新增 2 条契约条款后**重新核验**,依模板"summarize after, not before"要求):`grep -cE '^\*\*C-[0-9]+\*\*'` 逐份实跑得 `discipline-doc` **17**(原 16,+C-17 观察约定,修 T-3)/ `ambient-section` 11 / `surface-pointers` 14 / `constitution-export` **13**(原 12,+C-13 两块新原则零阻塞命中,修 G-5)/ `gate-neutrality` 7 = **62**;`grep -cE '^## E[0-9]'` data-model = **9**、`'^### V[0-9]'` = **4**、`'^### S[0-9]'` = **2**;`grep -cE '^## 场景'` quickstart = 7,其中 6 个为验证场景、1 个为「场景 → SC 覆盖对照」表 ⇒ **6 场景**;`research.md` 决策 **D-1…D-15 = 15 条**。上表全部数值与实测一致,无一处为预写。
+**计数已于制品落盘后机械核验**(2026-09-17 首次落盘;2026-09-18 因 `/speckit.analyze` 的修复批次新增 2 条契约条款后**重新核验**,依模板"summarize after, not before"要求):`grep -cE '^\*\*C-[0-9]+\*\*'` 逐份实跑得 `discipline-doc` **17**(原 16,+C-17 观察约定,修 T-3)/ `ambient-section` 11 / `surface-pointers` 14 / `constitution-export` **13**(原 12,+C-13 两块新原则零阻塞命中,修 G-5)/ `gate-neutrality` 7 = **62**;`grep -cE '^## E[0-9]'` data-model = **9**、`'^### V[0-9]'` = **4**、`'^### S[0-9]'` = **2**;`grep -cE '^## 场景'` quickstart = 7,其中 6 个为验证场景、1 个为「场景 → SC 覆盖对照」表 ⇒ **6 场景**;`research.md` 决策 **D-1…D-15 = 15 条**。**2026-09-18 第二次修复批次追加**:上表的条款总数与逐份计数已按 Principle XIV 与 `one-source-of-truth.md:49,51`(可机械计数的数不得手写;发现过期计数时删除副本而非改正数字)**从上表删除、改为派生**,因此本段成为这些数值唯一的**日期化核验记录**——按 `one-source-of-truth.md:39` 的第三个合法副本条件,它 scoped to date 且 MUST NOT 被当作当前真源引用。上表其余数值(5 份契约、6 场景、9 实体 / 4 组校验规则 / 2 状态机、15 条决策)仍与实测一致,无一处为预写。

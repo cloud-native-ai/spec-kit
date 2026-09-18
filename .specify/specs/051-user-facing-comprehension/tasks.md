@@ -8,7 +8,7 @@ description: "Task list for Feature 051 — 面向用户可理解性纪律(User-
 **Requirement Key**: 051-user-facing-comprehension
 **Related Feature**: 051 面向用户可理解性纪律(User-Facing Comprehension)(from `.specify/memory/features.md`,Status = **Planned**)
 **Input**: Design documents from `.specify/specs/051-user-facing-comprehension/`
-**Prerequisites**: plan.md(required)、requirements.md(required)、research.md(D-1…D-15)、data-model.md(E1…E9 / V1…V4 / S1…S2)、contracts/(5 份 62 条款)、quickstart.md(6 场景)、feature-ref.md(FR → 条款映射)
+**Prerequisites**: plan.md(required)、requirements.md(required)、research.md(D-1…D-15)、data-model.md(E1…E9 / V1…V4 / S1…S2)、contracts/(5 份;条款编号区间见各文件头部,总数 MUST 派生不手写)、quickstart.md(6 场景)、feature-ref.md(FR → 条款映射)
 
 **Tests Mode**: ON —— `.specify/memory/constitution.md:51` 的 **Principle IV "Test-First & Contract-Driven Implementation"** 含 MUST 级测试要求(由 `grep -nE 'MUST|MANDATORY|NON-NEGOTIABLE|Test-First|TDD|Contract-Driven'` 确定性检出);**但** `:90` 的 `**Workflow Gates (NON-NEGOTIABLE)**` 之下、`:95` 的 **Template-only features** 门同时适用——本特性**零可执行运行时代码**(`src/specify_cli/` 与 `scripts/` 均不改动,FR-033 禁止任何新机制),故本文件发出的是**结构契约测试**(对制品内容、canonical 路径、标题、镜像字节相等的断言),**不是**单元/集成测试(无运行时代码可测)。plan.md 的 Constitution Check 已据此把 Principle IV 判为 **⚠ Partial(正当化)** 并填入 Complexity Tracking。
 
@@ -16,7 +16,7 @@ description: "Task list for Feature 051 — 面向用户可理解性纪律(User-
 
 ## Definition of Done (DoD)
 
-- DoD-1: 真源文档 `shared/guidelines/user-facing-comprehension.md` 七节齐备、内容与 `contracts/discipline-doc.md` C-1…C-16 全部相符,且镜像逐字节相等。
+- DoD-1: 真源文档 `shared/guidelines/user-facing-comprehension.md` 七节齐备、内容与 `contracts/discipline-doc.md` 的**全部条款**相符(条款清单与编号以该文件头部声明为准,MUST NOT 在本行枚举区间——区间会随新增条款静默过期,本行此前正因 C-17 的新增而漏改)、且镜像逐字节相等。
 - DoD-2: 常驻章节 `## User-Facing Comprehension` 在两份模板各出现且仅一次、抵达 `.specify/instructions.md`、位置在钉死窗口之外、节体 ≤25 行且无 `###`。
 - DoD-3: 8 个界面类规则真源文件各含**且仅含一行**指针;3 处内容搬家完成且各自的**保留项**逐字未动(`interview-pattern.md:125-126`、`feedback-step.md:89-90/:113-115/:141`、`project-overview.md:51` 的清单门)。
 - DoD-4: `confirmation-gates.md` 的判据各节(`:7-12`、`:14-21`、`:23-41`、`:43-45`、`:47-52`)**逐字未改写**;`:58-60` 三要素仍由该文件拥有。
@@ -221,8 +221,8 @@ description: "Task list for Feature 051 — 面向用户可理解性纪律(User-
 
 **Purpose**: 全局门禁复核、SC 逐条落状态、跨 Feature 发现项留痕
 
-- [ ] T055 [blockedBy: T054] gate-neutrality **FINAL** 复核:`python3 scripts/python/scan-confirmation-gates.py` MUST 为 `total 23 / destructive 13 / governance_kept 10 / violations 0`;`git diff --stat HEAD -- src/specify_cli/ scripts/ templates/plan-template.md` MUST 为空(与 T002 的起点比对);以 importlib 加载扫描器确认 `len(BLOCKING_PATTERNS) == 17`、`POLICY_DOCS` 仍为 `['shared/patterns/reconcile-pattern.md', 'shared/patterns/interview-pattern.md']`、`SELF_REL` 仍为 `shared/guidelines/confirmation-gates.md`(`gate-neutrality.md` C-2、C-3、C-6)
-- [ ] T056 [blockedBy: T054] 零新机制核验(FR-033 / SC-011 / DoD-7 / `gate-neutrality.md` C-5):以 T001 记录的 `BASE_SHA` 字面值为基线,运行 `BASE=$(sed -n 's/^BASE_SHA=//p' .specify/specs/051-user-facing-comprehension/notes/pre-change-measurements.md) && git diff --name-only --no-renames --diff-filter=ACMR "$BASE" -- . | grep -E '\.(py\|sh)$' | grep -vE '^tests/contract/' | wc -l`,输出 MUST 为 **0**。**MUST 用 `--name-only`,MUST NOT 用 `--stat`**——`--stat` 的行尾是 `| N ++++` 且长路径被省略为 `.../name`,`grep -E '\.(py|sh)$'` 永远零命中(实测:在一个新增了 `scripts/python/validate-tasks.py` 的真实提交上,`--stat` 形式零输出 exit 1、`--name-only` 形式正确命中;6 个提交 16 个真实新增 `.py` 上 `--stat` 命中数恒为 0)。断言 MUST 取"过滤后计数 == 0"而非"命中全部落在 tests/contract/",否则空结果与通过不可区分(即 GATE-9)
+- [ ] T055 [blockedBy: T054] gate-neutrality **FINAL** 复核:`python3 scripts/python/scan-confirmation-gates.py` MUST 为 `total 23 / destructive 13 / governance_kept 10 / violations 0`;`git diff --stat HEAD -- src/specify_cli/ scripts/ templates/plan-template.md` MUST 为空(与 T002 的起点比对);以 importlib 加载扫描器确认 `len(BLOCKING_PATTERNS) == 17`、`tuple(str(p) for p in POLICY_DOCS) == ('shared/patterns/reconcile-pattern.md', 'shared/patterns/interview-pattern.md')`、`str(SELF_REL) == 'shared/guidelines/confirmation-gates.md'`(**MUST 用这一内容形态**:实测 `POLICY_DOCS` 是 `PosixPath` **元组**、`SELF_REL` 是 `PosixPath`,与字符串列表直接 `==` 恒为假——T003 撰写 CI 断言时 MUST 复用同一形态,否则该断言恒红,或被"修好"成空断言)(`gate-neutrality.md` C-2、C-3、C-6)
+- [ ] T056 [blockedBy: T054] 零新机制核验(FR-033 / SC-011 / DoD-7 / `gate-neutrality.md` C-5):以 T001 记录的 `BASE_SHA` 字面值为基线,运行 `BASE=$(sed -n 's/^BASE_SHA=//p' .specify/specs/051-user-facing-comprehension/notes/pre-change-measurements.md) && git diff --name-only --no-renames --diff-filter=ACMR "$BASE" -- . | grep -E '\.(py|sh)$' | grep -vE '^tests/contract/' | wc -l`,输出 MUST 为 **0**。**MUST 用 `--name-only`,MUST NOT 用 `--stat`**——`--stat` 的行尾是 `| N ++++` 且长路径被省略为 `.../name`,`grep -E '\.(py|sh)$'` 永远零命中(实测:在一个新增了 `scripts/python/validate-tasks.py` 的真实提交上,`--stat` 形式零输出 exit 1、`--name-only` 形式正确命中;6 个提交 16 个真实新增 `.py` 上 `--stat` 命中数恒为 0)。断言 MUST 取"过滤后计数 == 0"而非"命中全部落在 tests/contract/",否则空结果与通过不可区分(即 GATE-9)
 - [ ] T057 [blockedBy: T055,T056] 全量契约套件 vs 冻结基线:`python3 -m pytest tests/contract/ -q 2>&1 | tee /tmp/p.txt | tail -3`,随后 `grep '^FAILED' /tmp/p.txt | sed -E 's/^FAILED //; s/ - .*$//' | sort > /tmp/cur.txt && comm -13 .specify/specs/051-user-facing-comprehension/baseline-failed.txt /tmp/cur.txt` MUST **输出为空**(零新增失败 ID)。**`s/ - .*$//` 不可省**:pytest 在 `running_on_ci()`(检查 `CI` / `BUILD_NUMBER`)为真时给每条 FAILED 行追加 ` - <crash message>`,而基线文件存的是裸 node ID,缺该 sed 会使 24 条基线全部失配、`comm -13` 报出 24 条假新增(即 GATE-1)。注意 `test_specify_script_paths.py::…::test_review_prerequisite_flags_are_supported` 在本文件存在后应**转为通过**(其 `:90` 断言 `tasks.md` 在输出中),故当前失败数预期为 **23**;该减少属基线内的自愈,不是回归
 - [ ] T058 [P] [blockedBy: T057] 项目中立性扫描(C-15 / `ambient-section.md` C-9 / SC-010):断言 `spec-kit`、`specify-cli`、`specify_cli`、`cloud-native-ai` 四个禁用名称(大小写不敏感)在真源文档、新常驻章节(两份模板)、两条新宪章原则块中命中数为 **0**;注意本 spec 目录与 `feature-ref.md` **不在**该断言范围内(它们是本仓专属工件,允许出现专有名称)
 - [ ] T059 [blockedBy: T057,T058] 执行 `quickstart.md` 的**全部 6 个场景**,把每条命令的实测输出追加进 `notes/quickstart-run.md`,并撰写 `.specify/specs/051-user-facing-comprehension/verification.md`:为 **SC-001…SC-018 逐条**写一行 `SC-NNN_status=pass|deferred`(格式依 `/speckit.implement` 的 Pre-Status-Flip Gate)并附 `SC-NNN_note=`;人工度量项(SC-001、SC-006、SC-007 的长度分布比对)如实记为 `deferred` 并指向 T060/T061
@@ -300,9 +300,11 @@ Task: "T050 mirror-parity WRITE — sync-mirrors.py --write + regen-command-copi
 ## Parallel Example: User Story 1
 
 ```bash
-# 两个测试文件互不相干,可同时撰写:
-Task: "T003 tests/contract/test_user_facing_comprehension_doc.py(discipline-doc C-1…C-16)"
-Task: "T004 tests/contract/test_user_facing_comprehension_section.py(ambient-section C-1…C-11)"
+# 两个测试文件互不相干,可同时撰写。撰写范围以各自任务行为准 —— 本块 MUST NOT 复述条款区间:
+# 复述即副本,此处的 "C-1…C-16" 就在 C-17 新增后静默过期(并漏掉 T003 额外承载的
+# gate-neutrality 四条),而 T003/T004 行本身是对的。派发时读任务行,不读本块。
+Task: "T003 tests/contract/test_user_facing_comprehension_doc.py(范围见 T003 行)"
+Task: "T004 tests/contract/test_user_facing_comprehension_section.py(范围见 T004 行)"
 
 # 之后是单一文件链,不可并行:
 # T006 真源文档 → T007 常驻章节 → T008 镜像 WRITE → T009 指令再生

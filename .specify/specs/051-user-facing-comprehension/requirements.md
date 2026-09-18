@@ -372,6 +372,20 @@
 - **契约条款计数随之变更**:60 → **62**(`discipline-doc` 16→17、`constitution-export` 12→13)。已同批订正 `plan.md` 的 Phase 1 摘要与落盘后核验段、`feature-ref.md` 的守卫圈行、`tasks.md` 的 Prerequisites 行、`data-model.md` E8 的基数行,并把 `plan.md` 的核验段标注为 2026-09-18 **重新核验**(不假装首次核验就得到了这些数字)。
 - **本批未修**:其余 33 条(25 MEDIUM + 8 LOW)留待后续批次,其中 I-05(上游质量清单的九项计数过期,根因是 `clarify-taxonomy.md` 的 Mode A 集成规则无一触及 `checklists/`,属**机制缺口**且在 `041` 有同型证据)建议按 Principle XI 修机制侧而非逐个 spec 手工刷新。
 
+### Session 2026-09-18(第五轮 — `/speckit.analyze` 复跑发现项的修复:第二批)
+
+本轮**无新增用户提问**;以下是只读复跑(3 个检测代理 + 13 个验证代理,全部 fresh-context,检测与验证集合互不相交)产出 56 条发现、去重为 50 条后,经用户指示落地的**第二批修复**(4 条机械项 + 发现项 C-01 的 Principle XIV 修复)。验证波裁定:4 confirm / 9 downgrade / 0 reject,**降级率 69%**——每一次降级都落在检测代理未核的传播面事实上,该观测本身已记入本轮 feedback 的优化点。
+
+> **编号消歧(本轮必需)**:下文 `A-*`/`B-*`/`C-*`/`V-*` 是 `/speckit.analyze` **复跑报告的发现项编号**,按检测代理的作用域字母编(A = 规格↔计划↔研究↔quickstart,B = 计划↔契约↔数据模型↔任务,C = Feature 链接↔注册表↔宪章),**与 `contracts/` 的条款编号 `C-N` 无关**。二者在本轮首次同形冲突(第四轮用的发现项前缀是 I-/G-/T-/F-,不与条款号相撞)。实测冲突范围**比看上去窄、但确实存在**:条款编号一律**不补零**(`C-1`…`C-17`,五份契约中 `grep -oE '\bC-0[0-9]\b'` 零命中),故补零的发现项 `C-01`/`C-09` 不与任何条款同形;但 **`C-11` 与 `C-12` 本身就是真条款号**(`ambient-section.md` 有 C-11,`discipline-doc.md` 与 `surface-pointers.md` 各有 C-12),同形歧义成立。故本块凡引用 **`C-*` 系列**发现项一律写作「发现项 C-NN」形态;`A-*`/`B-*`/`V-*` 不与任何既有编号空间相撞,可裸引。这是本轮发现项 A-15 所报缺陷(裸条款号在同一制品集内有多个不同指称)的同型实例,由修复批次自身引入,故在此显式消歧而不留待下轮。
+
+- 订正(**B-01**,原报 HIGH、验证裁定 downgrade 至 MEDIUM):T056 的核验命令写作 `grep -E '\.(py\|sh)$'`——**ERE 内的转义竖线匹配字面量 `.py|sh`**,故该计数恒为 0、该任务恒"通过"。验证代理实测:合成名单上未转义形式命中 3、转义形式命中 0;在契约自身引用的真实提交上为 13 vs 0。同一行 169 字符之后就是正确形态。**该缺陷是第四轮 G-4 修复时由本代理亲手输入的**,已删去反斜杠。GATE-9 与 `gate-neutrality.md` C-5 的形态本就正确,故该义务此前仍有兜底。
+- 订正(**B-15**):DoD-1 要求与 `discipline-doc.md` `C-1…C-16` 相符,而该文件有 17 条——按现文可在缺 C-17 的情况下宣告完成。**修法不是把 16 改成 17**(那只是再修正一次副本),而是改为引用:"与该文件的**全部条款**相符,编号以该文件头部声明为准,MUST NOT 在本行枚举区间"。
+- 订正(**B-16**):`## Parallel Example: User Story 1` 的派发片段复述 T003 的范围且写作 `C-1…C-16`,同时漏掉 T003 额外承载的 `gate-neutrality` 四条——而该块是多代理派发的**字面文本**,按它派发的代理会写出缺 5 条的测试文件。已改为"范围见 T003 行",不再复述(复述即副本)。
+- 订正(**B-17**):T055 要求确认 `POLICY_DOCS` 仍为 `['…reconcile-pattern.md', '…interview-pattern.md']`,但**实测值是 `PosixPath` 元组**,与字符串列表 `==` 恒为假 ⇒ 该 gate-neutrality FINAL 复核按现文不可能通过;同一错误形态若被 T003 抄进 CI 断言,该测试会恒红或被"修好"成空断言。已改为内容形态 `tuple(str(p) for p in POLICY_DOCS) == (…)` 与 `str(SELF_REL) == …`,并把类型陷阱成文。
+- 订正(**发现项 C-01**,CRITICAL;验证裁定 confirm,证据边界收窄):条款总数是**可机械计数**的数(`grep -cE '^\*\*C-[0-9]+\*\*' contracts/*.md`),却被手写在 6 处非豁免位置且已漂移——`features/051.md` 的 Status Tracking 行(标 `(current)`,即 `Planned` 状态的现行 DoD)仍写第四轮之前的旧值。违反 Principle XIV(`constitution.md:156` 明列"a count")与 `one-source-of-truth.md:49`;而第四轮的修法是**把数字改正**到 4 个文件里,正是 `:51` 明令禁止的方向("remove the copy; do not correct the number")。**本批按 `:51` 修**:6 处手写总数**全部删除并改为引用**(`plan.md` 的 Phase 1 摘要两行、`tasks.md` 的 Prerequisites、`feature-ref.md` 的守卫圈行、`data-model.md` E8 基数、`features/051.md` 的 Planned 行),派生方式只在 `plan.md` 摘要行声明一次;`plan.md:158` 的核验段保留为**日期化记录**并显式声明 MUST NOT 当作当前真源引用(`one-source-of-truth.md:39` 第三个合法副本条件)。同时给 `gate-neutrality.md` 补上缺失的条款编号头部声明,使"每份文件拥有自己的编号区间"对 5 份全部成立。**验证代理另指出:被报的 60/62 分歧有一半是豁免的日期化记录**(`features.md:60` 的 3 处、`features/051.md:29` 与 `:46`),本批**未动**它们——真正的活体分歧只有 1 处;`plan.md:61` 的 XIV 行所引证据(传播足迹收敛)经复核**为真**,故该行是不完整而非被自身引证否证。
+- 顺带订正(**发现项 C-12**,LOW):`plan.md:50` 的 Principle III 行引"clarify **三轮** session 块",第四轮后即过期。按发现项 C-12 的建议**删去计数、改为按路径引用** `## Clarifications`——否则本批新增的第五轮会第二次使其过期。
+- **本批未修**:其余 44 条,其中 A-02/B-05(HIGH,"覆盖全部 11 份 guideline"实测只能遍历到 7/8 份)、A-03(HIGH,quickstart 场景 6e 的 grep 因目标字面量跨行而恒零命中,是 T049 的唯一核验且其输出会被 T059 写入 `verification.md`)、B-08(HIGH,SC-018 无任何条款度量却会被 T059 记为 `pass`)三条 HIGH 待下一批;**V-01**(T050 的裸 `sync-mirrors.py --write` 会把 `skills/draw-diagram/` 的在途改动吸收进本特性的提交,从而"以错误理由转绿"五个门禁,正是 `049/tasks.md:284` 同词禁止的动作)由验证代理建议单列,亦待下一批;**发现项 C-09**(质量清单机制缺口)经验证代理复核为"方向正确但三点不完整",应按 Principle XI 修机制侧;**发现项 C-11** 的建议本身会把代码拥有的事实复制成散文,应改为指针。
+
 ## Out of Scope
 
 - **门控"是否触发"的判据改写**——两级判据、破坏性动作清单、治理保留清单、存疑从严、回流约束全部保持 `confirmation-gates.md` 为唯一权威;本特性只新增"门控如何措辞"(FR-017)。

@@ -106,7 +106,7 @@
 |---|---|---|
 | 规范圈 | `shared/guidelines/user-facing-comprehension.md`(新)+ 8 个规则真源文件各加 1 行指针 + 3 处内容搬家 | 1 新 / 8 改 / 3 搬家 |
 | 投递圈 | `templates/instructions-template.md` 新章节(17→18)、`templates/constitution-template.md` 两原则(11→13)、`templates/commands/{clarify,interview,constitution}.md`、`.specify/memory/constitution.md`(14→15,1.11.0→1.12.0) | 6 改 |
-| 守卫圈 | `contracts/` 5 份(**62 条款**:discipline-doc 17 / ambient-section 11 / surface-pointers 14 / constitution-export 13 / gate-neutrality 7)、`tests/contract/` 4 新 + 1 扩展 | 5 + 5 |
+| 守卫圈 | `contracts/` 5 份(条款编号区间以各文件头部声明为准;跨文件总数 MUST 派生而非手写,派生方式见 `plan.md` § Phase 1 摘要)、`tests/contract/` 4 新 + 1 扩展 | 5 + 5 |
 | 文档空间 | `docs/reference/` 3 处手写复述收敛(`docs/public/**` 由 Hugo 重建,不手改) | 3 改 |
 | **零改动** | `src/specify_cli/`、`scripts/`(含 `scan-confirmation-gates.py`、`generate-instructions.sh`)、`templates/plan-template.md`、4 棵按工具树(仅再生) | 0 |
 
