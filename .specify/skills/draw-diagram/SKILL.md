@@ -26,6 +26,11 @@ draw-* 专项技能渲染。**本技能不渲染任何图**，也不维护任何
 技能自有（command names、options、return shapes come from the delegated skill）。
 前门只持有：语义建模、路由（含独占登记）、委派、覆盖验收。两层各自编辑、互不复制。
 
+**例外——共享渲染后端（环境特定）**：六引擎共用的渲染服务（`xuanji-render.aliyun-inc.com:9696-9701`）
+是**跨引擎共享基础设施**，不属于任何单一 draw-* 下层，因此其**可用性 preflight 与自部署回退**由前门统一持有
+（见 Step 2.5 + [./references/self-deploy-render-service.md](./references/self-deploy-render-service.md)）。
+前门仍**不渲染**——它只在委派前确认后端可达、不可达时按既定流程提示/中断/可选自部署；各引擎的渲染请求语法仍归下层自有。
+
 ## Workflow
 
 ### Step 1:  intake 与语义建模
@@ -43,6 +48,21 @@ draw-* 专项技能渲染。**本技能不渲染任何图**，也不维护任何
 2. 否则按 §2 图类矩阵取默认引擎，再按 §3 tie-break（artifact_intent）切换
 3. 仍歧义 → 一轮 `AskUserQuestion`（≤4 问）附推荐项；不得静默猜
 4. **Preflight**：选定引擎的技能目录存在（canonical `skills/<engine>/` 或已安装镜像）；缺失即响亮失败并列出可用引擎，不得即兴自渲染
+
+### Step 2.5: 共享渲染后端 preflight 与自部署回退（环境特定）
+
+> **⚠️ 环境特定信息**：六个引擎共用一个自部署的多引擎渲染服务，消费方契约名为 `xuanji-render.aliyun-inc.com`
+> （一引擎一专用端口 **9696-9701**：plantuml 9696 / mermaid 9697 / excalidraw 9698 / drawio 9699 /
+> echarts 9700 / d3 9701，**无网关 / 无聚合 / 无代理**）。**并非所有执行环境都能访问 `xuanji-render.aliyun-inc.com`**——
+> 它依赖该执行环境的内网 DNS / `/etc/hosts` 映射与 docker 主机。完整契约 + 自部署步骤见附件
+> [./references/self-deploy-render-service.md](./references/self-deploy-render-service.md)。**委派引擎渲染（Step 3）前先过此 preflight**：
+
+1. **探测可用性**：`curl -sf --max-time 5 http://xuanji-render.aliyun-inc.com:9697/healthz`（任一 Node 引擎端口的 `/healthz` 即代表后端可用）。
+   **可用** → 一切按既定流程执行，进入 Step 3 委派，**不做任何部署动作**。
+2. **不可用**（DNS 不解析 / 超时 / 非 200）→ **提示用户并中断**本次渲染委派；**不得**静默降级、**不得**即兴用本地工具（mermaid-cli / plantuml.jar 等）自渲染绕过。提示须说明：该地址是环境特定、当前不可达、本次无法走既定渲染后端。
+3. 该提示的**末尾**必须附一个选项：**「要不要考虑自部署?」**
+4. 用户选择自部署 → 按 [self-deploy-render-service.md](./references/self-deploy-render-service.md) **先分析当时的运行环境**（docker / podman / k8s / 裸机进程能力 + registry/镜像工厂可达性），据此**选择部署形态**：**docker 容器化为最优默认**，但**不假定 docker 一定可用**——按环境给出可选备选（podman rootless / Kubernetes / 裸机 systemd 进程）连同推荐项**交用户拍板**；选定后给出**具体要执行的步骤**，并在执行前**再次向用户确认是否执行自部署操作**，确认后才动手。
+5. 自部署完成后 → 把 `xuanji-render.aliyun-inc.com → 自部署服务 IP` 的映射写入**执行环境**的 `/etc/hosts`；此后再次执行绘图时**直接从第 1 步 preflight 命中可用后端开始，不再重复部署步骤**。
 
 ### Step 3: 委派
 
@@ -81,6 +101,7 @@ draw-* 专项技能渲染。**本技能不渲染任何图**，也不维护任何
 | 独占登记 / 图类矩阵 / tie-break | [./references/routing-matrix.md](./references/routing-matrix.md) |
 | LDM schema 与覆盖检查 | [./references/semantic-model.md](./references/semantic-model.md) |
 | **交付形态**（HTML 包装、源文件与渲染图保留）**与面向用户的文字规则** | [./references/delivery-contract.md](./references/delivery-contract.md) |
+| 共享渲染后端可用性 preflight / 自部署（**环境特定**：xuanji-render.aliyun-inc.com:9696-9701） | [./references/self-deploy-render-service.md](./references/self-deploy-render-service.md) |
 | 语义视觉强弱（weight_plan 档位与验收） | [./references/semantic-model.md](./references/semantic-model.md) `weight_plan`；引擎落地见各 draw-* 「强弱实现」小节 |
 | 引擎语法、渲染、坑位 | 被委派 draw-* 技能自有 SKILL.md 与 references |
 | 路由证据（竞技场结论） | `${SKILL_WORKDIR}/.specify/memory/knowledge/visualization-skill-selection.md` |
