@@ -301,3 +301,35 @@ when the artifact question had not actually been asked.
 **Post-fix state before T025–T028**: `2 failed, 17 passed` — the two reds were exactly C-11 and
 C-12, the clauses whose subject is the live constitution that T028 amends. After T028:
 `19 passed`, including C-10's mutation probe on both sides.
+
+---
+
+## Phase 5 / US4 — T035 (2026-09-18)
+
+**Subject**: surface-pointers **C-10** (`feedback-step.md`), already authored by T014 and
+carried as `xfail` since US2.
+
+`--runxfail` exposes the underlying reason instead of the marker:
+
+```bash
+python3 -m pytest tests/contract/test_user_facing_comprehension_pointers.py -q -k c10 --runxfail --tb=line
+# → AssertionError: the coexistence-authority line still says embedded copies defer to
+#   *this section*. C-10's rewrite obligation moves that authority to the discipline's
+#   truth source …
+```
+
+**Red for the right reason**: the failure is the *rewrite* half (`:115`'s authority not yet
+moved), which is exactly what T036 performs. The *preserve* half already passed — all four
+pinned literals were present — so the assertion order proved useful: it failed on the
+obligation that was genuinely outstanding rather than on the one that was not.
+
+**Green at this point, and why**: C-3 (mirror parity — `feedback-step.md` unedited until T036),
+C-4 / C-5 / C-7 / C-14 (freeze assertions on surfaces US4 does not touch), and C-2 (turned
+green by US2's T021 and unaffected here).
+
+**After T036–T038**: `7 passed, 7 xfailed` — C-10 green, its marker removed. The 7 remaining
+xfails are US5's partition. Verified in the same pass: gate scan still
+`total 23 / violations 0`, and `BLOCKING_RE` hits inside `feedback-step.md` are **none** —
+which is T038's specific proof point, since that file *is* inside the scanner's `SCAN_DIRS`
+and is not exempt, and pattern 17 (`inviting the user to submit collected feedback`) sits in
+the same subject area as the line being edited.

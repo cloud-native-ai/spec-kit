@@ -169,17 +169,17 @@ description: "Task list for Feature 051 — 面向用户可理解性纪律(User-
 
 ### Tests for User Story 4 (MANDATORY — red-first 取证;条款已由 T014 撰写)⚠️
 
-- [ ] T035 [US4] [blockedBy: T014] Red-first 取证:运行 `python3 -m pytest tests/contract/test_user_facing_comprehension_pointers.py -q` 并定位 **C-10** 的失败,确认失败原因是 `feedback-step.md` 尚无指针 / `:115` 权威未上移,而非断言写错;追加记入 `notes/red-first-evidence.md`
+- [X] T035 [US4] [blockedBy: T014] Red-first 取证:运行 `python3 -m pytest tests/contract/test_user_facing_comprehension_pointers.py -q` 并定位 **C-10** 的失败,确认失败原因是 `feedback-step.md` 尚无指针 / `:115` 权威未上移,而非断言写错;追加记入 `notes/red-first-evidence.md`
 
 ### Implementation for User Story 4
 
-- [ ] T036 [US4] [blockedBy: T035] 在 `shared/workflow/feedback-step.md` 的**头部所有权段**(改前 `:1-9`,所有权声明在 `:3`)加入一行指针(用 T006 的 canonical 形态,覆盖界面类 **③**);**逐字保留** `:89-90`、`:113-114`、`:141` 三处既有措辞规则(FR-019 明令保留为实例、MUST NOT 另立第二套规则;**`:115` 不在保留集内**,见下一句);并把 `:115` 的并存措辞收敛权威从"Embedded copies … defer to this section"上移为"以本纪律真源为准"(发现项 B-09 订正:原写 `:113-115`,使"逐字保留"与本句的"改写 `:115`"互斥)。**新增的指针行 MUST NOT 命中任何阻塞字面形态**——该文件在扫描范围内(`SCAN_DIRS` 含 `shared`),且 pattern 17 正是 `inviting the user to submit collected feedback`
+- [X] T036 [US4] [blockedBy: T035] 在 `shared/workflow/feedback-step.md` 的**头部所有权段**(改前 `:1-9`,所有权声明在 `:3`)加入一行指针(用 T006 的 canonical 形态,覆盖界面类 **③**);**逐字保留** `:89-90`、`:113-114`、`:141` 三处既有措辞规则(FR-019 明令保留为实例、MUST NOT 另立第二套规则;**`:115` 不在保留集内**,见下一句);并把 `:115` 的并存措辞收敛权威从"Embedded copies … defer to this section"上移为"以本纪律真源为准"(发现项 B-09 订正:原写 `:113-115`,使"逐字保留"与本句的"改写 `:115`"互斥)。**新增的指针行 MUST NOT 命中任何阻塞字面形态**——该文件在扫描范围内(`SCAN_DIRS` 含 `shared`),且 pattern 17 正是 `inviting the user to submit collected feedback`
 
 ### Verification for User Story 4
 
-- [ ] T037 [US4] [blockedBy: T036] mirror-parity **WRITE + VERIFY**(覆盖 Mirror Obligations 表第 6 行 `shared/workflow/feedback-step.md`):`python3 scripts/python/sync-mirrors.py --write --only shared`,随后 `diff -q shared/workflow/feedback-step.md .specify/shared/workflow/feedback-step.md`
-- [ ] T038 [US4] [blockedBy: T037] 把 **C-10** 转绿并做 gate-neutrality 核验:`python3 -m pytest tests/contract/test_user_facing_comprehension_pointers.py -q` 中 C-10 MUST 通过(C-1 此时为 2/8,仍属 US5 绿点);`python3 scripts/python/scan-confirmation-gates.py` MUST 仍为 `total 23 / violations 0`——本行专门证明 T036 新增的指针行未命中扫描器
-- [ ] T039 [US4] [blockedBy: T038] 人工 QA:重跑 `quickstart.md` **场景 4** 的 8 行指针循环,按本阶段部分期望比对(`confirmation-gates.md` 与 `feedback-step.md` = **1**,其余 6 个 = **0**);并核验 `grep -c 'never paste the raw' shared/workflow/feedback-step.md` ≥1(既有规则保留);实测输出追加进 `notes/quickstart-run.md`
+- [X] T037 [US4] [blockedBy: T036] mirror-parity **WRITE + VERIFY**(覆盖 Mirror Obligations 表第 6 行 `shared/workflow/feedback-step.md`):`python3 scripts/python/sync-mirrors.py --write --only shared`,随后 `diff -q shared/workflow/feedback-step.md .specify/shared/workflow/feedback-step.md`
+- [X] T038 [US4] [blockedBy: T037] 把 **C-10** 转绿并做 gate-neutrality 核验:`python3 -m pytest tests/contract/test_user_facing_comprehension_pointers.py -q` 中 C-10 MUST 通过(C-1 此时为 2/8,仍属 US5 绿点);`python3 scripts/python/scan-confirmation-gates.py` MUST 仍为 `total 23 / violations 0`——本行专门证明 T036 新增的指针行未命中扫描器
+- [X] T039 [US4] [blockedBy: T038] 人工 QA:重跑 `quickstart.md` **场景 4** 的 8 行指针循环,按本阶段部分期望比对(`confirmation-gates.md` 与 `feedback-step.md` = **1**,其余 6 个 = **0**);并核验 `grep -c 'never paste the raw' shared/workflow/feedback-step.md` ≥1(既有规则保留);实测输出追加进 `notes/quickstart-run.md`
 
 **Checkpoint**: 反馈面的措辞规则归入同一纪律,收敛权威上移;其跨表面传播的机械副本尚未再生(归 T050)。
 

@@ -344,7 +344,6 @@ def test_c9_two_anti_patterns_converged_to_one_short_reference():
 # --- C-10: move B, feedback-step.md (US4 / T038) ---
 
 
-@pytest.mark.xfail(strict=True, reason="US4/T038 green point — T036 has not rewritten the coexistence-authority line yet")
 def test_c10_feedback_step_preserves_three_and_rewrites_one():
     text = _text(FEEDBACK)
     # Preserve half: three passages (four literals) must survive verbatim.

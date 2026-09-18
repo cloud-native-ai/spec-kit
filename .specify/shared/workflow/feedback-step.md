@@ -7,6 +7,8 @@ their wrap-up / Git-commit-prompt stage. Simple commands MUST NOT embed it — a
 command is complex iff it invokes scripts/CLI tools, produces an artifact another
 flow consumes, or consumes another flow's artifact.
 
+面向用户的措辞与上下文规则由 `.specify/shared/guidelines/user-facing-comprehension.md` 统一定义(本文件覆盖界面类 ③);MUST NOT 在本文件内复制其条件集。
+
 ## Positioning & Red Lines
 
 These four facts govern every part of the mechanism and outrank any embedded wording:
@@ -112,7 +114,9 @@ and silence counts as **Skip this time** (the notification reappears only after 
 entries accumulate). It MUST NOT trigger any automated transmission.
 Present the choices in user-facing terms: the notification references the
 `/speckit.feedback package` command, never the raw `feedback-utils.py` engine path.
-(Embedded copies that still say only "invite the user to submit" defer to this section):
+(Embedded copies that still say only "invite the user to submit" defer to the comprehension
+discipline named in the header pointer, which owns this wording rule; this section keeps only
+its class-③ instance):
 
 1. **Package for manual delivery** — the user-facing path is `/speckit.feedback
    package` (Mode 2 of the feedback command); when the user picks this choice, run:

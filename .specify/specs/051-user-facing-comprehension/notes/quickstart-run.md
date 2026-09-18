@@ -220,3 +220,37 @@ enumerate `### <roman-or-arabic-numeral>. <name>` headings dynamically with an e
 "Do NOT hard-code principle names here". Since the enumeration is derived at plan time from the
 live constitution, a 15-principle constitution renders 15 rows with no template edit — which is
 the property 5c would have demonstrated, checked at the place it is actually implemented.
+
+---
+
+## 场景 4(部分,US4 阶段)— 指针接入进度 2/8
+
+Run by T039 · 2026-09-18.
+
+```
+  1  shared/guidelines/confirmation-gates.md      (US2 / T017)
+  1  shared/workflow/feedback-step.md             (US4 / T036)
+  0  shared/patterns/interview-pattern.md         (US5 / T041)
+  0  templates/commands/clarify.md                (US5 / T042)
+  0  shared/guidelines/requirements-guidelines.md (US5 / T043)
+  0  shared/guidelines/proactive-trigger.md       (US5 / T044)
+  0  skills/summarize-project/references/reporting-playbook.md (US5 / T046)
+  0  shared/workflow/glossary.md                  (US5 / T045)
+```
+
+| US4-phase expectation | Observed | Verdict |
+|---|---|---|
+| `confirmation-gates.md` and `feedback-step.md` = **1** | 1 / 1 | ✅ |
+| other six = **0** | all 0 | ✅ |
+| `grep -c 'never paste the raw' shared/workflow/feedback-step.md` ≥ 1 | **1** | ✅ |
+
+The last row is the preservation check that matters here: T036 rewrote the coexistence-authority
+line immediately below it, so a careless edit would have taken the preserved rule with it. The
+other three pinned passages (`Present the choices in user-facing terms`, `never the raw
+feedback-utils.py engine path.`, `do not paste the bare flag`) were each verified present too,
+and `defer to this section` — the phrase whose authority C-10 moves — now returns **0**.
+
+Gate scan after this phase: `total 23 / destructive 13 / governance_kept 10 / violations 0`,
+with **zero** `BLOCKING_RE` hits inside `feedback-step.md`. That file is in scan scope and not
+exempt, so the new pointer line and the rewritten line were both checked against all 17
+patterns rather than assumed safe.
