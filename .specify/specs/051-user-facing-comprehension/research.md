@@ -75,7 +75,7 @@ FR-014 枚举 11 类。实测其规则真源**不是 11 个文件**——存在�
 |---|---|---|---|---|
 | ① | 门控确认提示 | `shared/guidelines/confirmation-gates.md` | 头部所有权区 `:3-5`(紧邻 `:5` 既有的"命令模板与技能 MUST 以单行引用接入本文档"规则) | FR-017 冻结 `:7-12` 两级判据、`:14-21` 破坏性清单、`:23-41` 治理保留清单、`:43-45` 存疑从严、`:47-52` 回流约束 ⇒ 指针**不能**进这些节内 |
 | ② | 门控执行报告 | **同上**(共管) | `## 执行报告` `:54-68`;三要素 `:58-60` 仍归此处拥有(FR-009 只引用) | `:68` 按 FR-018 提升后收敛为指针 |
-| ③ | 反馈阈值/提交通知 | `shared/workflow/feedback-step.md` | 头部所有权段 `:1-9`(所有权声明在 `:3`),或 `## Threshold prompt protocol` 起始 `:106`(紧邻 `:113-115`) | 既有三处规则 `:89-90`/`:113-115`/`:141` **保留**为实例(FR-019) |
+| ③ | 反馈阈值/提交通知 | `shared/workflow/feedback-step.md` | 头部所有权段 `:1-9`(所有权声明在 `:3`),或 `## Threshold prompt protocol` 起始 `:106`(紧邻 `:113-115`) | 既有三处规则 `:89-90`/`:113-114`/`:141` **保留**为实例(FR-019;`:115` 属改写项、不在保留集——订正发现项 B-09,本行原写 `:113-115` 与其所引的 FR-019 矛盾) |
 | ④ | 访谈提问 | `shared/patterns/interview-pattern.md` | `Comprehension rules` 块 `:119-126`;**另需**改嵌入契约不可丢弃清单 `:255` | `:121-124` 四条收敛为指针;`:125-126`(每问一决策、问 what 不问 whether)**原文保留**(FR-021);反模式 `:280-281` 一并收敛 |
 | ⑤ | 澄清提问与选项表 | **两个共管**:`templates/commands/clarify.md` + `shared/guidelines/requirements-guidelines.md` | clarify.md 借用段 `:70`(把借用扩到行话半侧);requirements-guidelines.md 的 `[NEEDS CLARIFICATION]` 呈现步骤 `:70-72` 或模板块 `:72-88` | FR-020 显式点名两个表面;clarify 既有裁定(封闭式、选项表 + Recommended、不采纳开放式提问)不变 |
 | ⑥ | 主动流程建议行 | `shared/guidelines/proactive-trigger.md` | `## Suggestion Shape` `:45-55`(在 `:47`),**或**头部"归属不在本文档"要点列表 `:11-15`(已有三条"只以路径引用",含 `:15` 指向 confirmation-gates.md)——后者是加第四条的自然位 | 指令模板 `:31` 的镜像 MUST 保持摘要形态,不内联 |

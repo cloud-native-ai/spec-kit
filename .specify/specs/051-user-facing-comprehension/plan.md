@@ -115,7 +115,7 @@ src/specify_cli/         # 不改动 —— 零运行时逻辑变更(FR-033 / Pr
 | `shared/guidelines/proactive-trigger.md` | `.specify/shared/guidelines/proactive-trigger.md` | 同上 |
 | `shared/guidelines/requirements-guidelines.md` | `.specify/shared/guidelines/requirements-guidelines.md` | 同上 |
 | `shared/patterns/interview-pattern.md` | `.specify/shared/patterns/interview-pattern.md` | 同上;另断言 `:125-126` 两规则原文保留、`:255` 清单含新指针 |
-| `shared/workflow/feedback-step.md` | `.specify/shared/workflow/feedback-step.md` | 同上;另断言 `:89-90`/`:113-115`/`:141` 三处既有规则保留未删(FR-019) |
+| `shared/workflow/feedback-step.md` | `.specify/shared/workflow/feedback-step.md` | 同上;另断言 `:89-90`/`:113-114`/`:141` 三处既有规则保留未删(FR-019;`:115` 属**改写**项、不在保留集,见 C-10 与发现项 B-09) |
 | `shared/workflow/glossary.md` | `.specify/shared/workflow/glossary.md` | 同上 |
 | `templates/instructions-template.md` | ① `.specify/templates/instructions-template.md`(字节相等,被 `test_proactive_trigger_section.py:135` 与 `test_ask_record_repeat.py:185` 钉死);② **再生** `.specify/instructions.md`(新标题须逐字出现,`test_instructions_section_propagation.py:34-42` C-1);③ 8 条 symlink 别名(根 `AGENTS.md`/`CLAUDE.md`/`QODER.md`/`HERMES.md`、`.github/copilot-instructions.md`、`.qoder/project_rules.md`、`.claude/project_rules.md`、`.opencode/instructions.md`,创建于 `generate-instructions.sh:235-267`) | `bash scripts/bash/generate-instructions.sh` 后 `sync-mirrors.py --check` EXIT=0;C-1 测试绿;`ls -l` 确认 8 条仍为 symlink(未被替换成普通文件) |
 | `templates/constitution-template.md` | `.specify/templates/constitution-template.md` | `sync-mirrors.py --check` EXIT=0;新测试断言两条新原则结构合规 |

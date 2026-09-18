@@ -18,7 +18,7 @@ description: "Task list for Feature 051 — 面向用户可理解性纪律(User-
 
 - DoD-1: 真源文档 `shared/guidelines/user-facing-comprehension.md` 七节齐备、内容与 `contracts/discipline-doc.md` 的**全部条款**相符(条款清单与编号以该文件头部声明为准,MUST NOT 在本行枚举区间——区间会随新增条款静默过期,本行此前正因 C-17 的新增而漏改)、且镜像逐字节相等。
 - DoD-2: 常驻章节 `## User-Facing Comprehension` 在两份模板各出现且仅一次、抵达 `.specify/instructions.md`、位置在钉死窗口之外、节体 ≤25 行且无 `###`。
-- DoD-3: 8 个界面类规则真源文件各含**且仅含一行**指针;3 处内容搬家完成且各自的**保留项**逐字未动(`interview-pattern.md:125-126`、`feedback-step.md:89-90/:113-115/:141`、`project-overview.md:51` 的清单门)。
+- DoD-3: 8 个界面类规则真源文件各含**且仅含一行**指针;3 处内容搬家完成且各自的**保留项**逐字未动(`interview-pattern.md:125-126`、`feedback-step.md:89-90/:113-114/:141`、`project-overview.md:51` 的清单门)。**`feedback-step.md:115` 不属逐字保留项**——C-10 要求其并存措辞收敛权威**上移**,故该行会被改写;原表述 `:113-115` 使本行与 C-10/T036 构成不可满足对(发现项 B-09),已按需求侧真源 FR-019 的 `:113-114` 订正。
 - DoD-4: `confirmation-gates.md` 的判据各节(`:7-12`、`:14-21`、`:23-41`、`:43-45`、`:47-52`)**逐字未改写**;`:58-60` 三要素仍由该文件拥有。
 - DoD-5: 宪章双落点成立——模板 13 条原则(含 XII = STR-006、XIII = STR-003)、命令 `MUST include` 清单 7 条、活动宪章 15 条且版本 ≥1.12.0 并含 Sync Impact Report;`templates/plan-template.md` **零改动**。
 - DoD-6: 确认门控扫描 `total == 23` 且 `violations == []`;`scan-confirmation-gates.py` 的 `POLICY_DOCS`、`SELF_REL`、`BLOCKING_PATTERNS`(17 条)**均未被修改**。
@@ -112,7 +112,7 @@ description: "Task list for Feature 051 — 面向用户可理解性纪律(User-
 
 - [ ] T014 [US2] 撰写 `tests/contract/test_user_facing_comprehension_pointers.py`,实现 `contracts/surface-pointers.md` 的 **C-1…C-14**;**docstring MUST 记录条款 → Phase 的分区**(本文件被三个 story 的验证行共同认领,依 `/speckit.tasks` 的分区规则避免"同一文件在两个时点被要求全绿"的不可满足对):**US2 = C-2、C-4、C-5**;**US4 = C-10**;**US5 = C-1、C-3、C-6…C-9、C-11…C-14**。C-4 的判据冻结 MUST 用**逐节文本比对**(提取 `:7-12`/`:14-21`/`:23-41`/`:43-45`/`:47-52` 五节全文与冻结字面量比对),MUST NOT 用"包含关键词"的弱断言
 - [ ] T015 [US2] 扩展 `tests/contract/test_confirmation_gates_execution_report.py`:新增断言 `shared/guidelines/confirmation-gates.md` 携带指向真源文档的指针(FR-034 补上今天缺失的守卫),并确认既有用例 `:44-46`(只断言 `非阻塞` 与 `自动传输`)**继续通过**
-- [ ] T016 [US2] [blockedBy: T014,T015] Red-first 取证:运行两个测试文件,确认 US2 分区(C-2、C-4 的指针侧、C-5 的引用侧 + T015 新断言)因**制品未改**而失败,失败原因非导入错误;追加记入 `notes/red-first-evidence.md`
+- [ ] T016 [US2] [blockedBy: T014,T015] Red-first 取证:运行两个测试文件,确认**改前真红的子义务**因**制品未改**而失败、且失败原因非导入错误——具体为 **C-2**(`confirmation-gates.md` 头部所有权区尚无指针)与 **T015 新增的指针断言**。**同分区内以下条款在 red-first 时点即为绿,不属取证对象、MUST NOT 被读成"断言写错"**:**C-4**(五个判据节"逐字未改写"——改前本就未改写,该条是冻结断言)、**C-5**(`:58-60` 仍由该文件拥有,且真源文档已由 T006 以路径引用它,两侧改前即成立)。追加记入 `notes/red-first-evidence.md`,逐条写明"红的为什么红、绿的为什么绿"(订正发现项 B-12:本行原把 C-4/C-5 一并列为"因制品未改而失败",而二者改前即绿;本行的判据恰是"确认失败原因是制品未改而非断言写错",于是执行者遇到绿的条款会据此**削弱一个正确的断言**)
 
 ### Implementation for User Story 2
 
@@ -139,7 +139,7 @@ description: "Task list for Feature 051 — 面向用户可理解性纪律(User-
 ### Tests for User Story 3 (MANDATORY — 结构契约测试,red-first)⚠️
 
 - [ ] T023 [US3] 撰写 `tests/contract/test_constitution_double_landing.py`,实现 `contracts/constitution-export.md` 的 **C-1…C-13**(C-13 = 两块新宪章原则各自 `BLOCKING_RE` 命中数为 0,落实 `gate-neutrality.md` C-1(c);此前该子条只有撰写约束与扫描器 `total` 的间接探测,而 `constitution-template.md` 的 governance-path 归类**不豁免于 `total` 计数**,间接探测只能给出 +1 而无法定位是哪一块原则哪一行):含 `DOUBLE_LANDING_WATCHLIST` 常量(初始 = STR-003 与 STR-006 两个**完整标题**)、模板标题集 regex `^### [IVXLC0-9]+\. (.+)$`、命令名称集 regex `\*\*MUST include\*\* a principle for "([^"]+)"`、**集合成员相等**判定(C-7,MUST NOT 用子串包含)、不钉死罗马数字(C-8)、`Code as the Single Source of Truth` 与 STR-006 非同一原则的显式断言(C-9)、以及**变异式有效性抽查**(C-10,以临时副本或 monkeypatch 进行,MUST NOT 修改仓库内真实文件);C-13 的 `BLOCKING_RE` MUST 以 `importlib` 内联加载真实扫描器复用,版本断言用**下限语义** `parsed >= (1, 12)`(Pin Hygiene 规则 1),MUST NOT 用 `startswith("1.12")`
-- [ ] T024 [US3] [blockedBy: T023] Red-first 取证:运行 `python3 -m pytest tests/contract/test_constitution_double_landing.py -q`,确认 C-1…C-13 因两条原则尚不存在而失败(尤其 C-7 的名单两侧均缺、C-13 因原则块不存在而报文件缺失);追加记入 `notes/red-first-evidence.md`
+- [ ] T024 [US3] [blockedBy: T023] Red-first 取证:运行 `python3 -m pytest tests/contract/test_constitution_double_landing.py -q`,确认**改前真红的子义务**因两条原则尚不存在而失败——具体为 **C-1…C-7、C-9、C-11、C-12、C-13**(尤其 C-7 的名单两侧均缺、C-13 因原则块不存在而报文件缺失)。**以下两条在 red-first 时点不为红,MUST NOT 列为取证对象**:**C-8** 是关于测试**自身匹配逻辑**的设计规则(不钉死罗马数字字面量),T023 写对即绿,与"制品未改"无关;**C-10** 是变异式有效性抽查,其前提是 C-7 已绿(名单内原则两侧都在,才谈得上"删掉一侧后 MUST 失败"),而改前 STR-006 两侧皆缺(实测 `grep -c "One Source"` 在两个模板文件双双为 0)⇒ 该抽查**改前无从区分**,属"不可测"而非"因制品未改而失败"。追加记入 `notes/red-first-evidence.md`(订正发现项 B-12)
 
 ### Implementation for User Story 3
 
@@ -165,7 +165,7 @@ description: "Task list for Feature 051 — 面向用户可理解性纪律(User-
 
 **Goal**: 把今天自成权威、只管反馈的对外措辞规则接入本纪律,使其成为界面类 ③ 上的实例,并把并存措辞的收敛权威从"以本节为准"上移到纪律真源
 
-**Independent Test**: 核验 `feedback-step.md` 已接入单行指针、`:89-90`/`:113-115`/`:141` 三处既有规则保留未删、阈值提示仍为非阻塞单行且不含引擎原始调用(规格 US4 Independent Test)
+**Independent Test**: 核验 `feedback-step.md` 已接入单行指针、`:89-90`/`:113-114`/`:141` 三处既有规则保留未删(`:115` 属**改写**项、不在保留集,见 C-10)、阈值提示仍为非阻塞单行且不含引擎原始调用(规格 US4 Independent Test)
 
 ### Tests for User Story 4 (MANDATORY — red-first 取证;条款已由 T014 撰写)⚠️
 
@@ -173,7 +173,7 @@ description: "Task list for Feature 051 — 面向用户可理解性纪律(User-
 
 ### Implementation for User Story 4
 
-- [ ] T036 [US4] [blockedBy: T035] 在 `shared/workflow/feedback-step.md` 的**头部所有权段**(改前 `:1-9`,所有权声明在 `:3`)加入一行指针(用 T006 的 canonical 形态,覆盖界面类 **③**);**逐字保留** `:89-90`、`:113-115`、`:141` 三处既有措辞规则(FR-019 明令保留为实例、MUST NOT 另立第二套规则);并把 `:115` 的并存措辞收敛权威从"Embedded copies … defer to this section"上移为"以本纪律真源为准"。**新增的指针行 MUST NOT 命中任何阻塞字面形态**——该文件在扫描范围内(`SCAN_DIRS` 含 `shared`),且 pattern 17 正是 `inviting the user to submit collected feedback`
+- [ ] T036 [US4] [blockedBy: T035] 在 `shared/workflow/feedback-step.md` 的**头部所有权段**(改前 `:1-9`,所有权声明在 `:3`)加入一行指针(用 T006 的 canonical 形态,覆盖界面类 **③**);**逐字保留** `:89-90`、`:113-114`、`:141` 三处既有措辞规则(FR-019 明令保留为实例、MUST NOT 另立第二套规则;**`:115` 不在保留集内**,见下一句);并把 `:115` 的并存措辞收敛权威从"Embedded copies … defer to this section"上移为"以本纪律真源为准"(发现项 B-09 订正:原写 `:113-115`,使"逐字保留"与本句的"改写 `:115`"互斥)。**新增的指针行 MUST NOT 命中任何阻塞字面形态**——该文件在扫描范围内(`SCAN_DIRS` 含 `shared`),且 pattern 17 正是 `inviting the user to submit collected feedback`
 
 ### Verification for User Story 4
 
@@ -193,16 +193,16 @@ description: "Task list for Feature 051 — 面向用户可理解性纪律(User-
 
 ### Tests for User Story 5 (MANDATORY — red-first 取证;条款已由 T014 撰写)⚠️
 
-- [ ] T040 [US5] [blockedBy: T014] Red-first 取证:运行 `python3 -m pytest tests/contract/test_user_facing_comprehension_pointers.py -q`,确认 US5 分区(**C-1、C-3、C-6…C-9、C-11…C-14**)全部因制品未改而失败;追加记入 `notes/red-first-evidence.md`
+- [ ] T040 [US5] [blockedBy: T014] Red-first 取证:运行 `python3 -m pytest tests/contract/test_user_facing_comprehension_pointers.py -q`,确认 US5 分区中**改前真红的子义务**因制品未改而失败——具体为 **C-1**(8 个规则真源文件尚无指针行)、**C-6、C-8、C-9**(`interview-pattern.md` 的可理解性规则尚未收敛)、**C-11、C-12、C-13**(`summarize-project` 侧的搬家与单源扫描尚未发生)。**以下三条在 red-first 时点即为绿,MUST NOT 列为取证对象、更 MUST NOT 因"没红"而被当作断言写错去削弱**:**C-3**(8 个文件的 `.specify/` 侧镜像逐字节相等——本行在 T041…T049 **之前**运行,源侧尚未改动,故两侧本就同步)、**C-7**(`interview-pattern.md:125-126` 两条模式特有规则原文保留——改前本就未动,属冻结断言)、**C-14**(4 棵按工具副本树 `--check` 返回 0——实测今天即为 EXIT=0)。追加记入 `notes/red-first-evidence.md`,逐条写明红/绿各自的原因(订正发现项 B-12:本行原写"C-1、C-3、C-6…C-9、C-11…C-14 **全部**因制品未改而失败",把 C-3/C-7/C-14 三条改前即绿者一并列入)
 
 ### Implementation for User Story 5(9 个任务互不改同一文件,故全部 [P])
 
-- [ ] T041 [P] [US5] [blockedBy: T040] **搬家 A**:编辑 `shared/patterns/interview-pattern.md` —— 把改前 `:121-124` 的四条可理解性规则(白话优先 / 无未解释缩写或行话 / 就地注解特殊术语 / 绝不假定共享上下文)收敛为**一行**指向真源文档的指针(`:119` 的 `**Comprehension rules (可理解性规则)**` 标题行 MAY 保留作挂载点);**逐字保留** `:125-126` 的两条模式特有规则(每问一决策 / 问 what 不问 whether,C-7 明令 MUST NOT 吞并);把 `:280-281` 两条反模式(`Context-free questions`、`Jargon and bare abbreviations`)收敛为一条指向真源文档黑名单/下限的短引用;并在 `:255` 的**嵌入契约不可丢弃清单**追加"接入本纪律的指针"一项(C-8;实测该清单今天未列 Comprehension rules,不补则宿主收窄时指针可被合法丢弃)。该文件属扫描器 `POLICY_DOCS`,门控预算无风险
+- [ ] T041 [P] [US5] [blockedBy: T040] **搬家 A**:编辑 `shared/patterns/interview-pattern.md` —— 把改前 `:121-124` 的四条可理解性规则(白话优先 / 无未解释缩写或行话 / 就地注解特殊术语 / 绝不假定共享上下文)收敛为**一行**指向真源文档的指针(`:119` 的 `**Comprehension rules (可理解性规则)**` 标题行 MAY 保留作挂载点);**逐字保留** `:125-126` 的两条模式特有规则(每问一决策 / 问 what 不问 whether,C-7 明令 MUST NOT 吞并);把 `:280-281` 两条反模式(`Context-free questions`、`Jargon and bare abbreviations`)收敛为一条指向真源文档黑名单/下限的短引用;并在 `:255` 的**嵌入契约不可丢弃清单**追加"接入本纪律的指针"一项(C-8;实测该清单今天未列 Comprehension rules,不补则宿主收窄时指针可被合法丢弃)。该文件属扫描器 `POLICY_DOCS`,门控预算无风险。**C-1 的一行上限适用于本行的全部三处编辑**:该文件含 STR-002 路径的行数 MUST 恰为 **1**,故 `:280-281` 的短引用与 `:255` 清单的新增项 MUST 以**不含仓库路径**的方式指称本纪律(发现项 B-11:本行原未声明该上限,而 C-1 在 T052 这个全部 US5 并行任务的汇聚点才转红,多出一行路径会在那里才暴露)
 - [ ] T042 [P] [US5] [blockedBy: T040] 在 `shared/guidelines/proactive-trigger.md` 的头部"归属不在本文档"要点列表(改前 `:11-15`,已有三条"只以路径引用",其中 `:15` 指向 `confirmation-gates.md`)追加**第四条**指针要点,覆盖界面类 **⑥**;MUST NOT 改写 `:47` 的"一条建议 = 一行非阻塞提示"形态定义(本纪律只引用它作为上下文上限的既有形态)
 - [ ] T043 [P] [US5] [blockedBy: T040] 在 `shared/guidelines/requirements-guidelines.md` 加入一行指针,覆盖界面类 **⑤ 与 ⑦**(该文件是两类的共同真源,故一行覆盖两类);插入位取 `## General Guidelines > Quick Rules`(改前 `:97-102`,在 `:101` 旁)或文件头部;并按 plan D-3 的裁定**如实记录类 ⑦ 的真源缺口**——`templates/plan-template.md` 与 `templates/tasks-template.md` 实测零措辞规则,本特性不给它们新增措辞规则。**并按 FR-037 / `discipline-doc` C-18 把类 ⑦ 的读者基准登记为覆盖站点**:该文件 `:24`(`Written for non-technical stakeholders`)与 `:101`(`Written for business stakeholders, not developers`)是类 ⑦ 既有的读者基准声明,登记进真源文档 11 行表的 `reader_baseline_override` 列(**类 ⑦ 一个登记项、两处命中**,C-18(a) 按类计数);同批把 `templates/commands/requirements.md:82`(`Written for business stakeholders`)——类 ⑦ 的**命令侧孪生、`research.md` D-14 从未登记的第 4 处**——按 **C-18(c) 收敛为指针,MUST NOT 登记为第二个覆盖处**(D-3 已裁定 `requirements-guidelines.md` 是类 ⑦ 唯一真源;若登记它则 1 全局 + 3 覆盖 = 4,**SC-018 直接不成立**)
 - [ ] T044 [P] [US5] [blockedBy: T040] 编辑 `templates/commands/clarify.md`:把改前 `:70` 的借用段("从 `interview-pattern.md` 只借 **context discipline** 与 fact-vs-decision 拆分")扩展为**同时借"不用行话"半侧**,方式为接入真源文档的单行指针(FR-020);**逐字保留**其既有裁定——封闭式提问、选项表 + Recommended、"deliberately does **not** adopt that pattern's open-question rule"
 - [ ] T045 [P] [US5] [blockedBy: T040] 收敛 `templates/commands/interview.md` 的内容形态复述:改前 `:30` 的 Glossary 出向条("A question phrased in codebase jargon gets a confident wrong answer")与 `:153-154` 的 Behavior Rules 两条("Every question carries its own context, in a blockquote" / "No jargon, no unexplained abbreviations … never a bare `DLQ`")改为指向真源文档的指针;MUST NOT 改动该文件的结构性章节(否则 4 棵副本树的再生会产生额外漂移)
-- [ ] T046 [P] [US5] [blockedBy: T040] **搬家 B**:把 `skills/summarize-project/references/reporting-playbook.md` §1.7(改前 `:109-113`)的内部标识黑名单(`T1–T5`、`E1–E5`、`RC-*`、`CG-*`、`§编号`、`M-*`、引擎字段名、库/表/列/SQL、脚本名)与读者向改写映射(`unknown-schedule` → 「无计划日期,无法判定延期」)**提升进** `shared/guidelines/user-facing-comprehension.md` 的黑名单节,作为条目 ② 的实例来源(补齐 T006 预留的锚定位);随后把 §1.7 正文收敛为指针,并把 `:309` 的落盘门禁 `- [ ] **读者用语纪律已过**(§1.7)` 重新指向提升后的来源(C-11)。**本任务会再次编辑真源文档**,故 T054 MUST 重跑其契约测试
+- [ ] T046 [P] [US5] [blockedBy: T040] **搬家 B**:把 `skills/summarize-project/references/reporting-playbook.md` §1.7(改前 `:109-113`)的内部标识黑名单(`T1–T5`、`E1–E5`、`RC-*`、`CG-*`、`§编号`、`M-*`、引擎字段名、库/表/列/SQL、脚本名)与读者向改写映射(`unknown-schedule` → 「无计划日期,无法判定延期」)**提升进** `shared/guidelines/user-facing-comprehension.md` 的黑名单节,作为条目 ② 的实例来源(补齐 T006 预留的锚定位);随后把 §1.7 正文收敛为指针,并把 `:309` 的落盘门禁 `- [ ] **读者用语纪律已过**(§1.7)` 重新指向提升后的来源(C-11)。**本任务会再次编辑真源文档**,故 T054 MUST 重跑其契约测试。**按 C-12(a) 的区分规则处置 `:309`**(订正发现项 B-10——C-12 原一面要求"独立黑名单副本数为 0"、一面要求"该行 MUST 保留",而该行字面枚举了七类标识符,二者不可同时满足):保留该清单项本身(勾选框、`§1.7` 引用、"无内部标识渗入"这一断言与"只出现在 `## 元信息` 或技能内部文档"这一限定),把括号内的**七类枚举替换为对真源文档黑名单节的指称**。**并按 C-12(b) / C-1**:该指称 MUST **不含仓库路径**,使该文件含 STR-002 路径的行数恰为 **1**(本行的 §1.7 收敛已占用那一行;发现项 B-11)
 - [ ] T047 [P] [US5] [blockedBy: T040] 收敛 `skills/summarize-project/references/project-overview.md`(`:22`、`:38`、`:51`)与 `skills/summarize-project/references/consistency-rules.md`(`:31`)的次级实例面为指针;**MUST 保留** `project-overview.md:51` 的 `- [ ] 无内部黑话;外部读者不读代码也能看懂`(它是该界面类的落盘检查门,不是黑名单定义,C-12);并按 FR-037 把该技能"外部读者"表述登记为类 ⑧ 的**读者基准覆盖**声明处
 - [ ] T048 [P] [US5] [blockedBy: T040] 在 `shared/workflow/glossary.md` §1(改前 `:17-28`)加入一行指针,覆盖界面类 **⑨**;插入位取 `:23-24` 的 surface-it 要点旁或节首 `:17`;MUST NOT 改写 `:25-26`(绝不破坏性改写用户输入)与 `:27-28`(歧义从用户)
 - [ ] T049 [P] [US5] [blockedBy: T040] 收敛 `docs/reference/` 的 3 处**手写**内容形态复述为指针:`docs/reference/commands/interview.md`(`:65`、`:71-73` 的 `## Question Format` 节、`:126-127` 的保证表两行)、`docs/reference/skills/feedback.md`(`:140-142`)、`docs/reference/commands/requirements.md`(`:63`)。**MUST NOT 触碰 `docs/public/**`**——它是 Hugo 构建产物、`git ls-files docs/public` 为 0、经 `docs/.gitignore` 忽略(证据 `skills/create-pages/references/hugo-site.md:22`),修好手写源后由既有 create-pages 流程重建
