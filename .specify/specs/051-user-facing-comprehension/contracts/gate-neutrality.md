@@ -13,7 +13,7 @@
 | C-3 | `test_user_facing_comprehension_doc.py` | 断言 `POLICY_DOCS`、`SELF_REL` 字面量与 `len(BLOCKING_PATTERNS) == 17` 均未变 |
 | C-4 | —(**撰写指引,不设断言**) | 17 条禁用字面形态清单供撰写期自检;机械断言由 C-1 的三条承担 |
 | C-5 | `test_user_facing_comprehension_doc.py` | 枚举本特性新增文件并断言可执行脚本数为 0 |
-| C-6 | `test_user_facing_comprehension_doc.py` | 断言三个零改动面的 `git diff` 为空 |
+| C-6 | `test_user_facing_comprehension_doc.py` | 断言三个零改动面自 T001 的 `BASE_SHA` 起无新增/修改。**MUST 用 `git diff --name-only --no-renames --diff-filter=ACMR "$BASE" -- <路径集>` 并断言输出为空,MUST NOT 用 `git diff HEAD`**——CI 洁净检出下工作树恒等于 HEAD,后者无条件空真(见 C-6(a));断言 MUST NOT 按扩展名过滤(见 C-6(b)) |
 | C-7 | —(**由既有套件承担**) | 全量契约套件 vs 冻结基线,执行者是 `tasks.md` 的 T057 与 GATE-1,不新写测试 |
 
 **撰写任务的范围义务**:`tasks.md` 的 T003(该文件唯一的撰写任务)MUST 显式承载 C-2、C-3、C-5、C-6 四条,否则它们只存在于本文档而不存在于 CI。  
@@ -98,7 +98,13 @@ git diff --name-only --no-renames --diff-filter=ACMR "$BASE" -- . | grep -E '\.(
 
 **C-6** `src/specify_cli/__init__.py` 与 `scripts/`(含 `scripts/bash/generate-instructions.sh`、`scripts/python/sync-mirrors.py`、`scripts/python/regen-command-copies.py`、`scripts/python/feedback-utils.py`)MUST **未被本特性修改**。FR-038 的悬空指针义务落在**文本层**(指针行附获取途径说明 + `ambient-section.md` C-11 的遍历断言),MUST NOT 通过改投递脚本实现——修 `generate-instructions.sh` 使其同步 `shared/` 属另一条 Feature 的归属(规格 Out of Scope)。
 
-**C-7** 既有测试基线 MUST 不恶化。实现期门禁:失败集 ⊆ 049 冻结基线(`.specify/specs/049-docs-reconcile/baseline-failed.txt`,47 条)∪ {`test_specify_script_paths.py::TestSpecifyScriptPaths::test_review_prerequisite_flags_are_supported`}。后者因本分支尚无 `tasks.md` 而失败(`check-prerequisites.sh:248-250` 只在文件存在时才把 `tasks.md` 放进 `AVAILABLE_DOCS`),`/speckit.tasks` 后自愈,**无需改任何源码**。任何**新增**失败 ID 即本特性引入的回归。开工前 MUST 重新冻结一份 `baseline-failed.txt` 到本 spec 目录(承 049/050 惯例)。
+**C-6(a) 比对基线 MUST 是 T001 冻结的 `BASE_SHA` 字面值,MUST NOT 是 `HEAD`**(发现项 B-02):`git diff HEAD` 比较工作树与 HEAD,而 `tasks.md` 的提交纪律要求"每完成一个任务或一个逻辑组即提交",故本特性**自己已提交**的改动对该形式不可见。更严重的是**在 CI 里它无条件空真**:CI 检出是干净的,工作树恒等于 HEAD,于是"断言 `git diff HEAD -- <路径>` 为空"的 pytest 用例**永远通过**、不论本特性改了什么——这正是本仓 `AGENTS.md` 点名的最差缺陷形态(看着绿的假通过)。实测对照:`git diff --stat HEAD -- scripts/` 输出为空,而 `git diff --name-only HEAD~20 HEAD -- scripts/` 列出 3 个文件。C-5 已就其自身命令规定了同一约束("`BASE` MUST 是字面 SHA,MUST NOT 写 `HEAD~<n>`);C-6 此前**未规定任何基线**,是本契约内部的不一致。
+
+**C-6(b) 断言 MUST 覆盖路径集下的全部文件类型,MUST NOT 按扩展名过滤**:`templates/plan-template.md` 是 `.md`,而 GATE-9 的探针按 `\.(py|sh)$` 过滤,故 GATE-9 对该面**结构性不可见**;`scripts/` 下另有 **70** 个非 `.py`/`.sh` 的受跟踪文件(实测 67 个 `.mjs` 位于 `scripts/js/better-harness/`,加 `LICENSE`、`UPSTREAM.md`、1 个 `.json`),同样落在扩展名过滤之外。零改动面的命题是"该路径集下**任何**新增/修改/重命名为空",与 GATE-9 的"全仓无可执行脚本新增"是两个不同命题,分别由 **GATE-4** 与 **GATE-9** 承担;故 MUST NOT 靠扩大 GATE-9 的扩展名过滤来补 C-6——那会让一个门承担两个命题、且仍漏掉 `.md`。
+
+**C-6(c) 唯一合法的 `HEAD` 相对用法**:T002 在**开工时**核验三个面干净,此刻 HEAD 即基线(`BASE_SHA` 刚由 T001 记下、本特性尚无任何提交),`git diff HEAD` 与 `git diff "$BASE"` 等价。除此一处外,任何 `HEAD` 相对的零改动断言都是缺陷。
+
+**C-7** 既有测试基线 MUST 不恶化。实现期门禁:失败集 ⊆ 049 冻结基线(`.specify/specs/049-docs-reconcile/baseline-failed.txt`,47 条)∪ {`test_specify_script_paths.py::TestSpecifyScriptPaths::test_review_prerequisite_flags_are_supported`}。后者因本分支尚无 `tasks.md` 而失败(`check-prerequisites.sh:248-250` 只在文件存在时才把 `tasks.md` 放进 `AVAILABLE_DOCS`),`/speckit.tasks` 后自愈,**无需改任何源码**。任何**新增**失败 ID 即本特性引入的回归。开工前 MUST 重新冻结一份 `baseline-failed.txt` 到本 spec 目录(承 049/050 惯例),**执行者是 `tasks.md` 的 T001**——本条此前只声明义务而未指派承担者,而 049 与 050 的同一惯例都由各自的 T001 承担(发现项 B-04)。冻结集 MUST 取自开工当时的实跑输出,不得沿用本 spec 目录里既有的那份:实测 `test_specify_script_paths.py::…::test_review_prerequisite_flags_are_supported` 在 `tasks.md` 生成后**已自愈**(24 条实为 23 条),且仓库另有来自本特性未触及的在途漂移的失败,这些 MUST 一并纳入冻结集,而不是留给 GATE-1 报成"新增失败"。
 
 ---
 
