@@ -67,6 +67,8 @@ From REQUIREMENTS_DIR: requirements.md, plan.md, tasks.md (REQUIRED). Plus data-
 
 ### 4. Diagnostic review — problem-first
 
+**Same-author detection delegation**: when the artifacts under review were produced by the agent now running this command, in the current session — the ordinary case when this review follows an implement run the same agent performed — self-review is weak evidence, and detection MUST be delegated to fresh-context read-only subagents rather than left to §4.5. Apply the canonical gate in `shared/workflow/objective-analysis-gate.md` (single source of truth; do not restate its rules here). This command's local parameter: the propagation-surface cap is **P1** (used when no downstream artifact or process step inherits the finding).
+
 For each artifact and workflow as a whole, find issues:
 - **Friction**: Extra work forced by template/prompt/script gaps
 - **Ambiguity/contradiction**: Conflicting instructions
@@ -82,6 +84,7 @@ Per finding: **ID** (F1, F2...), **Severity** (P0/P1/P2), **Category** (Template
 Every **P0** finding MUST be confirmed by an independent read-only validation subagent before it enters the report:
 
 - The validator receives ONLY the finding (id, claim, severity, location, quoted evidence) — never the diagnostic reasoning or sibling findings — and returns `confirm` / `reject` (with why) / `downgrade` (with proposed severity).
+- **Disjoint from the detection pass**: when §4 delegated detection under the same-author gate, no validator may validate a finding its own detection pass produced (owner: `shared/workflow/objective-analysis-gate.md` rule 5).
 - Only `confirm`ed findings keep P0; `downgrade`d rows take the proposed severity with a `(validated: downgraded)` note; `reject`ed rows go to an **Unvalidated Findings** appendix in the report — never silently dropped. P1/P2 skip validation.
 - **Evidence snapshot at diagnosis time**: capture the quoted evidence (path + line + literal excerpt) when the finding is diagnosed, not when it is validated — the tree can move between the two, and a validator re-reading a since-changed line rejects a finding that was true when observed.
 - **Counts are enumerated, never asserted**: when a finding claims N occurrences, the validator receives the enumerated instances each carrying its own anchor; dispatch only once every instance is anchored, so an inflated count cannot pass as a single confirmed claim.

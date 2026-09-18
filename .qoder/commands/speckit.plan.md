@@ -55,6 +55,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
      3. Emit one row in the Constitution Check table per principle — DO NOT use a hard-coded list, and DO NOT inherit stale principles left over from a previous spec's plan.md.
      4. Mark each row Pass / Fail / Partial based on the design artefacts (`requirements.md`, `data-model.md`, `contracts/`, `tasks.md`).
      5. Any Fail or Partial row MUST have a matching entry under Complexity Tracking with justification.
+     - **Same-author detection delegation**: this command scores its own design twice — the Constitution Check rows above and the Post-Generation Quality Gate below — and in a `requirements → plan` chain without a break the artifacts being scored were written by this same agent, so self-review is weak evidence. When that condition holds, delegate the scoring to fresh-context read-only subagents per the canonical gate in `.specify/shared/workflow/objective-analysis-gate.md` (single source of truth; do not restate its rules here). This command's local parameter: a `Fail` or **Partial** row MUST name the downstream artifact it breaks — a compliance verdict that nothing inherits is Complexity Tracking noise, not a gate failure.
      - Include any additional constraints from `$ARGUMENTS`
    - Evaluate gates (ERROR if violations unjustified)
    - If `$ARGUMENTS` contains a planning outline:

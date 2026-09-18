@@ -32,6 +32,8 @@ For detailed methodology, examples, anti-examples, and quality dimension pattern
    - plan.md (if exists): Specification context for gap-finding only
    - tasks.md (if exists): Specification decomposition for missing requirement detection only
 
+**Same-author detection delegation**: the checklist is an audit instrument for a spec this same agent usually just wrote, so it inherits the author's blind spots — the gaps the spec never mentions are largely the gaps the author never thought of while writing it, and a re-read by that author reproduces the same reading. When that condition holds, derive the gap-finding pass from fresh-context read-only subagents. Apply the canonical gate in `.specify/shared/workflow/objective-analysis-gate.md` (single source of truth; do not restate its rules here). This command has no severity tiers; its local analogue of the propagation-surface cap is the traceability rule step 5 already states — a **CHK** item carries the requirement or gap it guards, so an item guarding nothing is visible as untraceable instead of passing as coverage.
+
 5. **Generate checklist** — Create "Unit Tests for Requirements":
    - Create `REQUIREMENTS_DIR/checklists/` if needed
    - Use short descriptive filename: `[domain].md` (e.g., `ux.md`, `api.md`, `security.md`)

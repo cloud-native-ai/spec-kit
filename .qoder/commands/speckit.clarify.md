@@ -43,6 +43,8 @@ For the active mode's detailed taxonomy categories and integration rules, load: 
 
 Each mode has its own taxonomy. For each category, mark status (Clear / Partial / Missing). Add candidate questions for Partial/Missing categories unless clarification would not materially change implementation.
 
+**Same-author detection delegation**: this scan usually runs on an artifact the same agent just wrote — the ordinary case is a `requirements → clarify` chain without a break — so the scan inherits the author's own reading, and an ambiguity unnoticed while writing is unlikely to be noticed while scanning. When that condition holds, delegate the coverage scan to fresh-context read-only subagents. Apply the canonical gate in `.specify/shared/workflow/objective-analysis-gate.md` (single source of truth; do not restate its rules here). This command has no severity tiers, so the local analogue of the propagation-surface cap is the materiality filter above: do not raise a question whose answer changes no **downstream artifact**.
+
 If spec contains `Feature ID: Need clarification` or `Feature Name: Need clarification`, treat Feature Linkage as high-priority.
 
 ### Question Generation & Interactive Loop
