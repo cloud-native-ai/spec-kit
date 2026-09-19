@@ -318,3 +318,182 @@ removed during US1. `docs/public/**` was not touched: it is Hugo build output, g
 Summary-pointer form per `one-source-of-truth.md`: a short orienting paraphrase plus the owner's
 path, carrying none of the owner's operative detail — a reader who intends to act must still
 open the owner.
+
+---
+
+## 场景 3 — 门控预算不变(US2 / SC-012)— 2026-09-19 实测
+
+All four commands run from the repo root. This is the scenario the feature's hardest gate hangs
+on, so it is recorded verbatim rather than summarised.
+
+```
+$ python3 scripts/python/scan-confirmation-gates.py; echo "EXIT=$?"
+blocking confirmation gates: 23
+  destructive: 13
+  governance_kept: 10
+violations (reversible gates still blocking): 0
+EXIT=0
+
+$ python3 scripts/python/scan-confirmation-gates.py --baseline .specify/specs/044-reduce-confirmation-flows/baseline.json; echo "EXIT=$?"
+blocking confirmation gates: 23
+  destructive: 13
+  governance_kept: 10
+baseline delta total: -70
+violations (reversible gates still blocking): 0
+EXIT=0
+```
+
+**Every number is character-identical to the pre-change output** (`total 23`, `destructive 13`,
+`governance_kept 10`, `violations 0`, `baseline delta total: -70`, both `EXIT=0`). Both pinned
+consumers stay green — `test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target`
+(cap 93 × 0.25 = 23.25) and `test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged`
+(`== 23` equality).
+
+**Scanner-unchanged verification** — the quickstart wrote this as `git diff --stat HEAD`, which is
+the vacuous form under a clean CI checkout (§ 十三 of the cross-cutting lessons). Re-run against
+the frozen `BASE_SHA` instead, which is the stricter and non-vacuous form:
+
+```
+$ git diff --stat 925badb60860fdbbb8a5fade24cecb01627fbc6f -- \
+      scripts/python/scan-confirmation-gates.py src/specify_cli/__init__.py scripts/
+EXIT=0                      # empty output — 0 files changed across all three zero-change surfaces
+```
+
+```
+$ python3 - <<'PY' … PY
+BLOCKING_PATTERNS: 17
+POLICY_DOCS: ['shared/patterns/reconcile-pattern.md', 'shared/patterns/interview-pattern.md']
+SELF_REL: shared/guidelines/confirmation-gates.md
+```
+
+All three match the quickstart's expectation exactly, including the corrected `17` (the
+requirements phase had mis-recorded `18`). FR-032's condition therefore never fired: the budget
+held by **design avoidance** — every line added inside scan scope was checked to carry 0
+`BLOCKING_RE` hits — not by touching the scanner.
+
+---
+
+## 场景 6 — 收敛、镜像与测试基线(US5 / SC-003 / SC-016)— 2026-09-19 实测
+
+### 6a. 单源扫描(四个新测试文件)
+
+```
+$ python3 -m pytest tests/contract/test_user_facing_comprehension_doc.py \
+                     tests/contract/test_user_facing_comprehension_section.py \
+                     tests/contract/test_user_facing_comprehension_pointers.py \
+                     tests/contract/test_constitution_double_landing.py -q
+...................................................................      [100%]
+67 passed in 0.87s
+```
+
+All four files exist and collect (67 cases; the pre-change run reported
+`file or directory not found`, as the quickstart predicted). C-13's single-source scan is inside
+this set and green: content-form restatements under `shared/` + `templates/` + `skills/` = **0**.
+
+### 6b. 既有测试扩展(FR-034)
+
+```
+$ python3 -m pytest tests/contract/test_confirmation_gates_execution_report.py -q
+..........                                                               [100%]
+10 passed in 0.02s
+```
+
+The file went 9 → 10 cases; the added case is
+`test_doc_carries_comprehension_discipline_pointer`, which asserts both the **header position**
+(the pointer sits in the ownership block, not inside any criteria section) and **exactly one**
+occurrence — closing the guard gap FR-034 named (the pre-existing `:44-46` case asserted only
+`非阻塞` and `自动传输`, never `用户视角途径`).
+
+### 6c. 镜像与再生
+
+```
+$ python3 scripts/python/sync-mirrors.py --check; echo "EXIT=$?"
+DIFF  .specify/skills/improve-skills/scripts/redline-check.py
+ok    agents/ == .specify/agents/templates/ (2 files)
+ok    scripts/ == .specify/scripts/ (104 files)
+ok    shared/ == .specify/shared/ (42 files)
+ok    templates/ == .specify/templates/ (22 files)
+EXIT=2
+
+$ python3 scripts/python/regen-command-copies.py --check; echo "EXIT=$?"
+OK: all per-tool command copies match the source templates.
+EXIT=0
+```
+
+**The whole-tree `EXIT=2` is a recorded deviation, not a failure of this feature.** Its single
+cause is the `improve-skills/scripts/redline-check.py` source/mirror divergence that
+`notes/pre-change-measurements.md` § ③ re-froze as the new drift baseline after the rebase; the
+blob comparison there proves the divergence is present in `gitlab/master` itself, i.e. it is
+upstream's, and it is the same line the frozen set already carried. Every pair this feature
+touches reports `ok`:
+
+```
+$ python3 scripts/python/sync-mirrors.py --check --only shared --only templates \
+      --only skills/summarize-project --only agents --only scripts; echo "SCOPED_EXIT=$?"
+scope --only: shared, templates, skills/summarize-project, agents, scripts
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/ == .specify/skills/ (24 files)
+ok    agents/ == .specify/agents/templates/ (2 files)
+ok    scripts/ == .specify/scripts/ (104 files)
+ok    shared/ == .specify/shared/ (42 files)
+SCOPED_EXIT=0
+```
+
+`regen-command-copies.py --check` keeps the quickstart's **absolute** criterion and returns
+`EXIT=0` — all four per-tool trees (`.claude/commands/`, `.github/prompts/`, `.qoder/commands/`,
+`.opencode/command/`) match their source templates, so no hand-sync residue exists. The
+`skills/` pair's `24 files` here versus the whole-tree run's absence of an `ok skills/` line is the
+engine's normal behaviour: a `DIFF` row replaces the pair's `ok` row in whole-tree mode, and
+`--only skills/summarize-project` scopes past the diverging sibling skill.
+
+GATE-2's criterion is therefore satisfied in the form `pre-change-measurements.md` § ③ fixed it to:
+**no new `MISS`/`DIFF` lines versus the frozen set**, never a bare whole-tree `EXIT=0`.
+
+### 6d. 全量契约套件与失败基线
+
+```
+$ bash .specify/scripts/bash/run-tests.sh tests/contract --names-out /tmp/ui-final-contract.txt
+FAILED tests/contract/test_token_efficiency_remediation_summary_first.py::test_mirror_identical[V-003]
+FAILED tests/contract/test_token_efficiency_remediation_summary_first.py::test_mirror_identical[V-005]
+FAILED tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+======================= 26 failed, 2042 passed in 39.62s =======================
+# failed-name list written: /tmp/ui-final-contract.txt (26 entries)
+
+$ comm -13 <(sort baseline-failed.txt) <(sort /tmp/ui-final-contract.txt)   # NEW failures
+(empty)
+$ comm -23 <(sort baseline-failed.txt) <(sort /tmp/ui-final-contract.txt)   # HEALED
+(empty)
+```
+
+Passed count rose **1924 → 2042** (+118, the four new files' 67 cases plus the other suites this
+feature extended); failed count moved **24 → 26**. The `comm` diff is empty in **both** directions
+against the frozen name-level baseline, which is what makes the +2 legitimate: the baseline was
+re-captured by name after the rebase (`notes/pre-change-measurements.md` § ②), so the two extra
+failures are inside it, not new to it. The quickstart's stated expectation — "失败集 ⊆ {049 冻结基线}
+∪ {`test_specify_script_paths.py::…test_review_prerequisite_flags_are_supported`}" — is superseded
+by the stronger name-level form: set **equality** with the frozen baseline, which also detects a
+failure that heals for the wrong reason.
+
+The `test_review_prerequisite_flags_are_supported` self-heal the quickstart predicted did occur
+(`tasks.md` now exists), and is accounted for inside the re-frozen baseline.
+
+### 6e. 文档空间(手写源收敛,生成物不手改)
+
+| 探针 | 改前基线 | 改后实测 | 判定 |
+|---|---|---|---|
+| `grep -c 'plain-language title\|Plain language, your vocabulary' docs/reference/commands/interview.md` | 2 | **1** | 下降 ✓ |
+| `grep -c 'never the raw' docs/reference/skills/feedback.md` | 1 | **0** | 下降 ✓ |
+| `grep -c 'business stakeholders, not developers' docs/reference/commands/requirements.md` | 1 | **0** | 下降 ✓ |
+| `git ls-files docs/public \| wc -l` | 0 | **0** | 不变 ✓ |
+
+All three hand-written restatement counts fell, and `docs/public/**` stayed at 0 tracked files —
+it is Hugo build output ignored by `docs/.gitignore`, so it was correctly **not** hand-edited; the
+existing create-pages flow rebuilds it from the corrected sources. The residual `1` on the first
+probe is the converged pointer row that now *names* the owner instead of restating its rules, which
+is the intended end state rather than an unfinished one.
+
+Probe A-03's correction held in practice: the second needle is the single-line-safe fragment
+`never the raw`, not the cross-line `never the raw engine path` form that would have been a
+provably blind probe (identically 0 before and after, indistinguishable from a successful
+convergence). Because the quickstart recorded concrete pre-change numbers, the `0` here reads as
+"converged from 1", not as "was already 0".
