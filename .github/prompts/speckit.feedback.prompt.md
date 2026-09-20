@@ -15,22 +15,16 @@ Consult the project glossary (`.specify/memory/glossary.md`) and apply the proto
 
 `/speckit.feedback` is the **single entry point** for every operation on the local feedback store. It does not ask the caller to select a mode by keyword: it reads the store, judges where each item points, and routes itself to exactly one of **two execution paths**.
 
-**The hat decides first, `kind` decides second.** "Points at this project" is not a property of an entry — it is a relation between the entry and the repo you are standing in. In the framework repo, this project *is* the upstream, so every entry points at it and there is nowhere to send a zip; in a client project, entries about framework units point outward and entries about the project's own custom units point inward.
-
-| 本仓戴哪顶帽子 | 条目 | 路径 |
+| 反馈指向 | 路径 | 处置 |
 |---|---|---|
-| **框架项目**(本仓即 Spec Kit 源) | 全部本地条目,不论 `kind` —— 上游就是本项目 | **Path A — 就地消化** |
-| **框架项目** | `feedback/` 入站目录里客户项目送来的反馈包 | **Path A — 就地消化** |
-| **客户项目** | `kind: external`(本项目自定义单元,`slice: host-custom`) | **Path A — 就地消化** |
-| **客户项目** | `kind: internal`(框架单元) | **Path B — 打包上送** |
-| 任意 | 为某个自定义单元**注入新探针** | *(超出自动分流)* — a target unit id cannot be inferred from repo state; see § Probe Injection |
-
-**In the framework repo, Path B is reachable only by an explicit `package` request.** Packaging there produces a zip addressed to this same repository, which nobody can deliver to anybody — so the router never selects it on its own, and the threshold prompt MUST NOT recommend it.
+| **本项目** — 客户项目自定义单元的条目(`kind: external`),以及本仓即框架源时 `feedback/` 入站目录里的反馈包 | **Path A — 就地消化 (Digest In This Project)** | inventory → § Introspection → route to this project's own improvement channels → dispose → cleanup |
+| **框架上游** — 通常即 Spec Kit 本身(`kind: internal`) | **Path B — 打包上送 (Package For The Framework Upstream)** | status → package → print the zip and the manual-delivery guidance → mark-submitted → post-package cleanup |
+| 为某个自定义单元**注入新探针** | *(超出自动分流)* | a target unit id cannot be inferred from repo state — see § Probe Injection |
 
 **Routing flow**:
 
-1. **Recognize intent** from `$ARGUMENTS` **and repo state**: an explicit `package` / `打包` request short-circuits to Path B and skips steps 2–5 (in the framework repo this is the only way to reach Path B); an explicit custom-unit injection request goes to § Probe Injection; otherwise continue and let the hat and the inventory decide.
-2. **Determine which hat this repo wears — this is the primary discriminator, not a gate on one sub-step.** Framework project iff the repository root owns the canonical framework **source** directories: `templates`, `skills`, `shared`, `scripts` and `src/specify_cli` (enumeration owned by [`.specify/shared/definitions/dogfooding-definitions.md`](../../.specify/shared/definitions/dogfooding-definitions.md) § 2.1). Test the directories at the **root** — a client project has these only under `.specify/`, which is the runtime mirror, not the source. **Do NOT gate on `feedback/` directory existence**: a client project could have one for unrelated purposes. Write those directory names **without a trailing slash** when stating this criterion: `regen-command-copies.py` calls `rewrite_paths`, which prefixes any path-initial `templates`, `shared`, `scripts` or `memory` segment with the runtime-mirror directory — correct for a doc path a reader opens, but it would silently turn this test into one that every client project passes.
+1. **Recognize intent** from `$ARGUMENTS` **and repo state**: an explicit `package` / `打包` request short-circuits to Path B and skips steps 2–5; an explicit custom-unit injection request goes to § Probe Injection; otherwise continue and let the inventory decide.
+2. **Determine which hat this repo wears** — framework source iff `.specify/templates/` + `skills/` + `src/specify_cli/` all exist at root (the canonical source directories only the framework repo owns). **Do NOT gate on `feedback/` directory existence**: a client project could have one for unrelated purposes. The hat scopes only Path A's *intake* sub-step (A1) — it never disables Path A, because a client project still has its own `kind: external` entries to digest.
 3. **Inventory** (this is where the probe overview lives — a step the judgment needs, not a destination of its own):
 
    ```bash
@@ -44,17 +38,17 @@ Consult the project glossary (`.specify/memory/glossary.md`) and apply the proto
    ```
 
    Render the merged probe truth source (framework Classes/Objects + project external probes) as a tree: kind → class (with target slice, collection, processing) → objects (unit @ lifecycle point). Mark internal vs external. The overview MUST be rendered from the truth source — never a hand-maintained list. Empty external section: show the `external-custom` class with its zero-object marker, no error. With `--format json` the list action emits `{"count": N, "matches": [...]}` where each match carries `id`, `file`, `unit_id`, `unit_type`, `run_id`, `probe`, `kind`, `slice`, `disposition`, `introspection_ref`, `partial`, `created`, `summary`, `path` — parse that shape, never a bare array.
-4. **Classify by where each item points, hat first.** In the **framework project**, every entry in the local store points at this project regardless of its `kind`, and every inbound bundle in `feedback/` does too — all of it is Path A material, and Path B is not selected. In a **client project**, the stored `kind` field is the discriminator; the engine resolves it from the probe registry at record time and already enforces it at three layers, so the router reads a fact rather than forming an opinion: `kind: external` (`slice: host-custom`, recorded against a `custom:<owner>/<name>` unit) points at this project → Path A; `kind: internal` points at the framework upstream → Path B.
-5. **Refine by content, in one direction only** (client projects only — in the framework project there is no outward side to refine toward). Run § Introspection over the open `internal` entries: a finding whose root cause turns out to be *this* project's own configuration or usage routes `local-sink` even though its `kind` is `internal`. The refinement is **one-directional**, because the engine's report validation rejects any `upstream-bound` finding that contains a `kind: external` member (exit 2) — so content analysis may move an internal entry toward this project, but can never move an external entry upstream. Report the classification, including any entry whose route the analysis moved. In the framework project, § Introspection still runs, but its output feeds **A4's channel routing** (which improvement channel owns each finding), not a side selection that has already been settled by the hat.
-6. **Path A — 就地消化** for everything that points at this project: in the framework project that is the whole store plus any inbound bundles; in a client project it is the `kind: external` entries plus any `internal` entry step 5 moved.
-7. **Path B — 打包上送** for everything that points at the framework upstream — a client project's `kind: internal` entries, or an explicit `package` request in either hat.
-8. **Both sides non-empty** (possible only in a client project) → run Path A then Path B in the same session and report both. Never silently drop one side to keep the run short.
+4. **Classify by where each item points.** The mechanical first cut is the stored `kind` field, which the engine resolves from the probe registry at record time and which it already enforces at three separate layers: `kind: external` (`slice: host-custom`, recorded against a `custom:<owner>/<name>` unit) points at **this project** and is excluded from upstream packages by contract; `kind: internal` points at the **framework upstream**. Inbound bundles in `feedback/` point at whichever repo owns that intake directory — in the framework hat, that is this project.
+5. **Refine by content, in one direction only.** Run § Introspection over the open `internal` entries: a finding whose root cause turns out to be *this* project's own configuration or usage routes `local-sink` even though its `kind` is `internal`. The refinement is **one-directional**, because the engine's report validation rejects any `upstream-bound` finding that contains a `kind: external` member (exit 2) — so content analysis may move an internal entry toward this project, but can never move an external entry upstream. Report the classification, including any entry whose route the analysis moved.
+6. **Path A — 就地消化** for everything that points at this project.
+7. **Path B — 打包上送** for everything that points at the framework upstream.
+8. **Both sides non-empty** → run Path A then Path B in the same session and report both. Never silently drop one side to keep the run short.
 9. **Nothing in scope** (zero open entries and, in the framework hat, zero pending bundles) → report the empty inventory and stop normally. Do NOT write an empty report file.
 10. **Undecidable** — the inventory is non-empty but an item's target genuinely cannot be determined → report the two paths and ask **one** elicitation question; do not guess silently, and once answered proceed directly without a further blocking prompt.
 
 ### Path A — 就地消化 (Digest In This Project)
 
-Everything the feedback points at this project. In the **framework project** that is the entire store — every entry, whatever its `kind`, because this repo is the upstream — plus any inbound bundles in the `feedback/` intake directory. In a **client project** it is the `kind: external` entries plus any `internal` entry the step-5 refinement moved.
+Everything the feedback points at this project: inbound bundles in the `feedback/` intake directory (framework hat only), and entries recorded against this project's own custom units.
 
 #### A1 — Enumerate pending bundles (framework hat only)
 
@@ -166,13 +160,11 @@ Local metadata only; optional `--reason` / `--ref` record provenance (e.g. `intr
 - **Read-only toward bundles until cleanup**: never modify zip contents; extraction is read-only (`unzip -p` to stdout).
 - **One batch, one cleanup**: do not delete individual bundles mid-batch; cleanup is atomic, runs once at the end of the digest run (once the routing report is confirmed), and leaves the intake empty.
 - **No network**: digestion is entirely local file I/O + agent reasoning.
-- **Fix at the owning hat**: in the framework project, findings are acted on in the framework **source** — the root-level `templates`, `skills`, `scripts`, `shared` and `src` directories — never in the `.specify/` runtime mirror (two-hats rule: Constitution XI). Those directory names are written without a trailing slash on purpose; see Routing flow step 2. In a client project, findings about a custom unit are acted on in that unit's own files.
+- **Fix at the owning hat**: in the framework repo, findings are acted on in the framework source (`.specify/templates/`, `skills/`, `.specify/scripts/`, `.specify/shared/`, `src/`), never in `.specify/` mirrors (two-hats rule: Constitution XI). In a client project, findings about a custom unit are acted on in that unit's own files.
 
 ### Path B — 打包上送 (Package For The Framework Upstream)
 
 Everything the feedback points at the framework upstream. This is the sending side, and it never sends anything itself — delivery stays manual.
-
-**Reached automatically only from a client project.** In the framework project the router does not select this path, because there is no upstream to deliver to — a zip packaged here is addressed to this same repository. It stays reachable there by an explicit `package` request (for example to hand a bundle to another maintainer, or to reset the counter via `mark-submitted`), and the run says plainly that it was taken on request rather than by judgment.
 
 1. **Status view**: `--action status` (count / threshold / should_prompt)。若因阈值提示进入本命令:Path A 的 § Introspection 可先跑一遍再打包——建议而非强制,跳过不影响任何后续步骤。
 2. **Summary view**: `--action list --limit 0` with filters as requested — `--slice <commands|skills|host-custom|...>`, `--kind <internal|external>`, `--disposition <processed|ignored|open>`, plus the pre-existing `--unit-id/--since/--contains`. Parse the `{"count": N, "matches": [...]}` envelope documented in the Routing flow's inventory step, never a bare array.
@@ -199,7 +191,7 @@ External-probe feedback is **client-project-local** (the client project's own us
 - Path A operates on both stores — the local store `.specify/memory/feedback/` and the `feedback/` intake directory (read-only until A5's atomic cleanup). Path B operates only on the local store. Never edit store files by hand.
 - Exit code 2 from the engine is a verdict — report it, do not argue around it.
 - Probe truth source: `.specify/shared/definitions/probe-definitions.md` (+ project `probes/`); derived views (`probe-map.md`) are rebuilt, never hand-edited.
-- **The routing judgment is reported, not assumed**: state which hat the repo wears and how that was determined, how many items landed on each side, whether Path B was selected by judgment or taken on an explicit request, and any entry whose route the content analysis moved away from its `kind`-based first cut.
+- The routing judgment is reported, not assumed: state which hat the repo wears, how many items landed on each side, and any entry whose route the content analysis moved away from its `kind`-based first cut.
 
 ## Documentation
 
@@ -207,7 +199,23 @@ At the same wrap-up point as the Feedback step, apply the docs-sync evaluation p
 
 ## Feedback
 
-At wrap-up (the same lifecycle point where this command prompts for a Git commit), run the feedback self-reflection step per the canonical convention in `.specify/shared/workflow/feedback-step.md`: agent self-reflection only — **never** solicit feedback content from the user; skip trivial or no-op runs; keep strictly to this command's scope; persist one entry via `feedback-utils.py --action record --unit-id "/speckit.feedback" --unit-type command`. Non-blocking (非阻塞) and never any 自动传输 — delivery stays manual. That file owns every rule of this step — reflection, scope, dedup, persistence, the submission prompt, the abort and nesting clauses; do not restate any of them here.
+At wrap-up (the same lifecycle point where this command prompts for a Git commit), perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
+
+1. **Gate on qualification & completion.** Only proceed if this command reached its wrap-up stage. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
+2. **Reflect (no user input).** Review this run against `/speckit.feedback`'s declared purpose and produce a short review plus ≥1 concrete, command-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`
+3. **Scope guard.** Keep strictly to this command's operation; do NOT produce a global/whole-project assessment (that is `/speckit.review`'s job). Entries are `scope: local`.
+4. **Dedup guard.** Use a stable `run_id`; if a nested skill/command already recorded feedback for this same `(unit_id, run_id)`, the engine no-ops.
+5. **Persist** via the engine:
+   ```bash
+   python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
+     --unit-id "/speckit.feedback" --unit-type command \
+     --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
+     --review "<review prose>" --points-file "<points file>"
+   ```
+   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay client-project-local and never enter upstream packages.
+6. **Consolidated submission prompt(非阻塞).** If the returned `should_prompt` is `true`, append ONE non-blocking line to the wrap-up report inviting submission (point the user to the `/speckit.feedback package` command — the user-facing path; never paste the raw `feedback-utils.py` engine call into the user-facing line); it MUST NOT block the wrap-up flow and MUST NOT trigger any 自动传输 (manual delivery only; `--action mark-submitted` runs only if the user initiates submission). Below threshold, do not prompt.
+
+**Abort / partial-run rule.** If the run failed before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.
 
 ## Handoffs
 

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20260915T061004Z",
+  "rendered_at": "20260920T105926Z",
   "entries": {
     ".claude/agents/skill-verifier.md": {
       "source": "templates/skill-verifier.agent.md",

@@ -171,23 +171,18 @@ Flag these as migration candidates and apply this Migration Mapping table:
 ### Feedback-section conformance
 
 Verify the Skill carries a `## Feedback` section as its final workflow section, beginning with
-the **runtime-mode gate** (`.specify/shared/workflow/runtime-mode.md`), and that the rest of
-the section is the **skill reference form** owned by
-`.specify/shared/workflow/feedback-step.md` § *Embedded reference forms* — a pointer plus
-this Skill's unit id, never a copy of the rules.
+the **runtime-mode gate** (`.specify/shared/workflow/runtime-mode.md`).
 
-- **Missing** → append the skill reference form from
-  `.specify/shared/workflow/feedback-step.md` § *Embedded reference forms*, substituting
-  only `skill:<name>`.
-- **Malformed** → realign to that form. Malformed means any of: missing runtime-mode gate,
-  missing pointer to `feedback-step.md`, wrong or missing `--unit-id "skill:<name>"` /
-  `--unit-type skill`, or a section that **restates** the owner's rules (the reflection
-  steps, submission-prompt semantics, abort/partial rule, nesting rule, token-efficiency
-  self-assessment) instead of pointing at them. A restatement is drift in waiting: repair it
-  by deleting the copy and leaving the pointer, never by re-wording the copy to agree.
+- **Missing** → append the canonical block from `.specify/shared/workflow/feedback-step.md`,
+  substituting `skill:<name>` / `--unit-type skill`.
+- **Malformed** → realign to the canonical block. Malformed means any of: missing runtime-mode
+  gate, missing qualification/completion gate, missing no-user-input reflection rule, missing
+  scope guard vs `/speckit.review`, missing stable-`run_id` dedup guard, missing
+  `feedback-utils.py --action record` invocation, or missing consolidated threshold-prompt
+  behavior.
 - Apply the fix to **both** `skills/<name>/SKILL.md` and `.specify/skills/<name>/SKILL.md`.
 - **Standalone-mode exception** — for a Skill in a standalone (non–Spec Kit) skills directory
-  (no `.specify/` at the working-directory root) the engine-backed section is NOT required: a
+  (no `.specify/` at the working-directory root) the engine-backed block is NOT required: a
   self-contained gated reflection section is conformant, the dual-copy rule does not apply,
   and no registry/agent propagation repair should be attempted.
 

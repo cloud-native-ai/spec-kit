@@ -119,13 +119,20 @@ RED_LINES = [
             # "soft" is a context signal that triggers only when the skill shows NO
             # focus-safe vocabulary at all (a documented, announced headed/direct-binary
             # exception inside an otherwise focus-safe skill is presumed sanctioned).
-            (r"bringToFront|bring_to_front", "re-activates the window; capture is CDP-based and needs no focus", "hard"),
-            (r"--start-maximized|--start-fullscreen|--kiosk", "claims the whole screen", "hard"),
-            (r"osascript[^\n]*\bactivate\b|tell application[^\n]*\bactivate\b", "AppleScript activate steals foreground", "hard"),
-            (r"\b(xdotool|wmctrl)\s+(?:window\w+|search|activate|-[a-zA-Z])", "invokes xdotool/wmctrl window activation (racy, fires after the WM already activated)", "hard"),
-            (r"nohup\s+[^\n]*Chrome|\"\$\{CHROME_MACOS\}\"|Google Chrome\.app/Contents/MacOS", "direct binary launch activates Chrome on macOS", "soft"),
-            (r"open\s+-[a-zA-Z]*a\b(?![^\n]*\s-g)", "`open` without -g brings the app to the foreground", "soft"),
-            (r"headless\s*[:=]\s*(false|False)", "headed launch maps a real window (F2 — must be announced + focus-safe)", "soft"),
+            (r"bringToFront|bring_to_front",
+             "re-activates the window; capture is CDP-based and needs no focus", "hard"),
+            (r"--start-maximized|--start-fullscreen|--kiosk",
+             "claims the whole screen", "hard"),
+            (r"osascript[^\n]*\bactivate\b|tell application[^\n]*\bactivate\b",
+             "AppleScript activate steals foreground", "hard"),
+            (r"\b(xdotool|wmctrl)\s+(?:window\w+|search|activate|-[a-zA-Z])",
+             "invokes xdotool/wmctrl window activation (racy, fires after the WM already activated)", "hard"),
+            (r"nohup\s+[^\n]*Chrome|\"\$\{CHROME_MACOS\}\"|Google Chrome\.app/Contents/MacOS",
+             "direct binary launch activates Chrome on macOS", "soft"),
+            (r"open\s+-[a-zA-Z]*a\b(?![^\n]*\s-g)",
+             "`open` without -g brings the app to the foreground", "soft"),
+            (r"headless\s*[:=]\s*(false|False)",
+             "headed launch maps a real window (F2 — must be announced + focus-safe)", "soft"),
         ],
         "compliance": [
             r"open\s+-g", r"chrome_open_\w*_quiet", r"chrome_open_quiet",
@@ -144,9 +151,11 @@ RED_LINES = [
     },
 ]
 
-SKIP_DIRS = {"node_modules", "__pycache__", ".git", ".venv", "venv", ".mypy_cache", ".pytest_cache"}
+SKIP_DIRS = {"node_modules", "__pycache__", ".git",
+             ".venv", "venv", ".mypy_cache", ".pytest_cache"}
 POLICY_DENYLIST = {"redline-check.py", "red-lines.md"}
-SCAN_EXT = {".md", ".py", ".sh", ".js", ".ts", ".mjs", ".cjs", ".yaml", ".yml", ".json"}
+SCAN_EXT = {".md", ".py", ".sh", ".js", ".ts",
+            ".mjs", ".cjs", ".yaml", ".yml", ".json"}
 
 
 def _iter_files(root: str, file_only: bool, scan_all: bool, entry: str):
@@ -191,7 +200,8 @@ def evaluate(texts: dict, attributes: dict) -> list:
             entry["reason"] = f"attribute '{attr}' not detected — red line does not fire"
             results.append(entry)
             continue
-        vpats = [(re.compile(p, re.IGNORECASE), note, kind) for p, note, kind in rl["violation"]]
+        vpats = [(re.compile(p, re.IGNORECASE), note, kind)
+                 for p, note, kind in rl["violation"]]
         cpats = [re.compile(p, re.IGNORECASE) for p in rl["compliance"]]
         hard, soft, prohibitions, compliance = [], [], [], []
         for path, body in texts.items():
@@ -272,14 +282,17 @@ def render(report: dict) -> str:
     triggered = 0
     out.append("  红线 red lines:")
     for r in report["redLines"]:
-        mark = {"not-applicable": "—", "compliant": "✓", "review": "✗", "gap": "✗"}[r["status"]]
-        out.append(f"    {mark} [{r['id']}] {r['status']} (attr={r['attribute']}) — {r['reason']}")
+        mark = {"not-applicable": "—", "compliant": "✓",
+                "review": "✗", "gap": "✗"}[r["status"]]
+        out.append(
+            f"    {mark} [{r['id']}] {r['status']} (attr={r['attribute']}) — {r['reason']}")
         if r["status"] in ("review", "gap"):
             triggered += 1
             out.append(f"      invariant   : {r['invariant']}")
             out.append(f"      remediation : {r['remediation']} (MANDATORY)")
             for v in r.get("violations", [])[:8]:
-                out.append(f"      evidence  : [{v.get('kind','?')}] {v['file']}:{v['line']} — {v['note']}")
+                out.append(
+                    f"      evidence  : [{v.get('kind', '?')}] {v['file']}:{v['line']} — {v['note']}")
                 out.append(f"                  {v['text']}")
     verdict = "TRIGGERED — remediation required" if triggered else "PASS — no red line triggered"
     out.append(f"  判定 verdict: {verdict}")
@@ -293,14 +306,17 @@ def main(argv=None) -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__,
     )
     ap.add_argument("skill_md", help="path to the target SKILL.md")
-    ap.add_argument("--scan-all", action="store_true", help="also scan references/ (deeper, noisier audit)")
-    ap.add_argument("--file-only", action="store_true", help="scan only the SKILL.md, not its directory")
+    ap.add_argument("--scan-all", action="store_true",
+                    help="also scan references/ (deeper, noisier audit)")
+    ap.add_argument("--file-only", action="store_true",
+                    help="scan only the SKILL.md, not its directory")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args(argv)
 
     if not os.path.isfile(args.skill_md):
-        print(json.dumps({"error": f"not a file: {args.skill_md}"}), file=sys.stderr)
+        print(json.dumps(
+            {"error": f"not a file: {args.skill_md}"}), file=sys.stderr)
         return 2
 
     texts = load_texts(args.skill_md, args.file_only, args.scan_all)
@@ -315,7 +331,8 @@ def main(argv=None) -> int:
         "verdict": "triggered" if triggered else "pass",
     }
     if not args.quiet:
-        print(json.dumps(report, ensure_ascii=False, indent=2) if args.json else render(report))
+        print(json.dumps(report, ensure_ascii=False, indent=2)
+              if args.json else render(report))
     return 1 if triggered else 0
 
 

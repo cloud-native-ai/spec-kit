@@ -658,14 +658,8 @@ def merge_seed_into(state: dict, seed: dict, notes: list) -> None:
             state["rules"].append(materialize_rule(seed_rule))
             continue
         refreshed = []
-        # `provenance` belongs in the refresh set even though it is not wording: it is a
-        # derived pointer into the seed's anchor section, never a user-tuned field. Left
-        # to setdefault it silently keeps quoting text the owner no longer contains, and
-        # no reader compares the index back against the seed to notice.
-        for field in ("rationale", "invocation", "provenance"):
-            if field not in seed_rule:
-                continue
-            if current.get(field) != seed_rule[field]:
+        for field in ("rationale", "invocation"):
+            if current.get(field) != seed_rule.get(field):
                 current[field] = seed_rule[field]
                 refreshed.append(field)
         if refreshed:
@@ -679,6 +673,7 @@ def merge_seed_into(state: dict, seed: dict, notes: list) -> None:
             current["situationId"] = seed_rule.get("situationId", current.get("situationId"))
         else:
             notes.append(f"seed refresh {rid}: local tuning preserved (V2.3)")
+        current.setdefault("provenance", seed_rule.get("provenance"))
     state["rules"].sort(key=lambda r: r["ruleId"])
 
 
