@@ -26,6 +26,16 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = ROOT / "templates" / "commands" / "feedback.md"
 
+# The generated copies, not just the source: rewrite_paths only runs on them, so
+# a criterion that is correct in the template can be inverted in every copy an
+# agent actually reads.
+COPIES = [
+    ROOT / ".claude" / "commands" / "speckit.feedback.md",
+    ROOT / ".qoder" / "commands" / "speckit.feedback.md",
+    ROOT / ".opencode" / "command" / "speckit.feedback.md",
+    ROOT / ".github" / "prompts" / "speckit.feedback.prompt.md",
+]
+
 OUTLINE = "## Outline"
 PATH_A = "### Path A"
 PATH_B = "### Path B"
@@ -67,21 +77,81 @@ def test_outline_is_substantive():
 
 
 @pytest.mark.contract
-def test_framework_hat_gate_is_structural_and_scoped_to_intake():
+def test_hat_is_the_primary_discriminator():
+    """The bug this test exists for: `kind` alone cannot decide the route, because
+    "points at this project" is a relation between an entry and the repo you are
+    standing in. In the framework repo every entry points at this project, so a
+    kind-based router recommends packaging feedback for manual delivery to yourself.
+    """
     outline = _outline()
-    for needle in ("templates/", "skills/", "src/specify_cli/"):
-        assert needle in outline, f"the hat gate no longer names {needle}"
+    assert "hat decides first" in outline, (
+        "the Outline must state that the hat is the primary discriminator and "
+        "kind the secondary one"
+    )
+    for needle in ("templates", "skills", "src/specify_cli"):
+        assert needle in outline, f"the hat criterion no longer names {needle}"
     assert "Do NOT gate on `feedback/` directory existence" in outline, (
-        "the gate must keep its caveat — a client project can have a feedback/ "
-        "directory for unrelated purposes, so its existence proves nothing"
+        "the hat criterion must keep its caveat — a client project can have a "
+        "feedback/ directory for unrelated purposes, so its existence proves nothing"
     )
-    # The correction this rewrite made: the gate scopes A1 only. Without it a
-    # client project is told the digest path is not for it and stops, even
-    # though it has its own external entries to process.
-    assert "never disables Path A" in outline, (
-        "the hat gate must scope only the intake sub-step — a client project "
-        "still has kind: external entries for Path A to digest"
+    # Framework project => everything is Path A material, and Path B is not selected.
+    assert "Path B is not selected" in outline or "Path B is reachable only by an explicit" in outline, (
+        "in the framework project the router must not select Path B on its own"
     )
+
+
+@pytest.mark.contract
+def test_framework_project_does_not_auto_package():
+    text = _text()
+    path_b = _slice(PATH_B, INJECTION)
+    assert "Reached automatically only from a client project" in path_b, (
+        "Path B must declare that the framework project reaches it only on request — "
+        "a zip packaged in the framework repo is addressed to that same repository"
+    )
+    assert "taken on request rather than by judgment" in path_b
+
+
+@pytest.mark.contract
+def test_hat_criterion_survives_the_per_tool_path_rewrite():
+    """`regen-command-copies.py` runs `rewrite_paths`, which turns any `templates/`,
+    `shared/`, `scripts/` or `memory/` reference that starts a path into its
+    `.specify/` mirror form. That is correct for a doc path a reader opens at
+    runtime and **inverts the meaning** of a criterion that tests for framework
+    *source* directories: `.specify/templates/` exists in every client project, so
+    the gate would pass everywhere. This assertion reads the generated copies —
+    the artifacts an agent actually runs — not the source template.
+    """
+    for copy in COPIES:
+        assert copy.is_file(), f"missing generated copy: {copy}"
+        text = copy.read_text(encoding="utf-8")
+        gate_line = next(
+            (ln for ln in text.splitlines() if "hat this repo wears" in ln), None
+        )
+        assert gate_line, f"{copy.name}: the hat criterion line is missing"
+        assert ".specify/templates" not in gate_line, (
+            f"{copy.name}: the hat criterion was rewritten to the runtime mirror, so "
+            "it now passes in every client project. Name the source directories "
+            "without a trailing slash — rewrite_paths only matches `segment/`."
+        )
+        for needle in ("`templates`", "`skills`", "`src/specify_cli`"):
+            assert needle in gate_line, f"{copy.name}: hat criterion lost {needle}"
+
+
+@pytest.mark.contract
+def test_owning_hat_rule_is_not_contradicted_by_the_rewrite():
+    """Same hazard, second instance: the Path A rule says "act on the framework
+    source, never in the .specify/ mirror". Rewritten, it listed .specify/templates/
+    as the source and then forbade .specify/ mirrors — self-contradictory guidance
+    in every copy an agent reads."""
+    for copy in COPIES:
+        text = copy.read_text(encoding="utf-8")
+        line = next((ln for ln in text.splitlines() if "Fix at the owning hat" in ln), None)
+        assert line, f"{copy.name}: the owning-hat rule is missing"
+        assert ".specify/templates" not in line, (
+            f"{copy.name}: the owning-hat rule names the runtime mirror as the "
+            "framework source and then forbids editing mirrors"
+        )
+        assert "never in the `.specify/` runtime mirror" in line
 
 
 @pytest.mark.contract
@@ -140,16 +210,20 @@ def test_undecidable_input_asks_exactly_one_question():
 
 @pytest.mark.contract
 def test_package_is_an_explicit_shortcut():
-    """/speckit.feedback package must stay a valid user-facing invocation —
-    it is the path every command's and skill's wrap-up submission prompt names,
-    and two of feature 051's preserved literals quote it."""
-    text = _text()
+    """`package` must stay a valid user-facing invocation.
+
+    It is no longer what the wrap-up prompt names — the prompt points at
+    `/speckit.feedback` and lets the command judge, because naming a disposition the
+    judgment has not made is how the framework project ended up being told to package a
+    zip addressed to itself. What stays load-bearing is that an explicit request still
+    reaches Path B in either hat.
+    """
     user_input = _slice("## User Input", "## Glossary")
     assert "package" in user_input, "the short-circuit must be documented at the entry point"
-    assert "`/speckit.feedback package`" in text, (
-        "the canonical user-facing invocation must appear verbatim somewhere in "
-        "the command — the wrap-up prompt in 21 command templates and 36 skills "
-        "points users at exactly this form"
+    path_b = _slice(PATH_B, INJECTION)
+    assert "explicit `package` request" in path_b, (
+        "Path B must state that an explicit request still reaches it — including from the "
+        "framework project, where the router never selects it on its own"
     )
 
 

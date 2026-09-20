@@ -2,22 +2,26 @@
 
 Single entry point for every operation on the local feedback store (`.specify/memory/feedback/`) and the probe truth source (`.specify/shared/definitions/probe-definitions.md`). The command does not ask the caller to pick a mode by keyword: it reads the store, judges **where each item points**, and routes itself to one of **two execution paths**. An explicit `package` request short-circuits to Path B; probe injection stays an explicitly-requested capability because a target unit id cannot be inferred from repo state.
 
-The discriminator is the stored `kind` field, which the engine resolves from the probe registry at record time and already enforces at three layers: `kind: external` (recorded against a `custom:<owner>/<name>` unit, `slice: host-custom`) points at this project and is excluded from upstream packages by contract; `kind: internal` points at the framework upstream. Content analysis may refine an `internal` entry toward this project, but never an `external` entry toward upstream — the engine's report validation rejects that outright.
+**Which hat the repo wears decides first; the stored `kind` decides second.** "Points at this project" is a relation between an entry and the repo you are standing in, not a property of the entry. In the **framework project** this repo *is* the upstream, so every entry points here and all of them are digested in place — packaging would produce a zip addressed to the repository that produced it. In a **client project** the `kind` field does the splitting: `kind: external` (recorded against a `custom:<owner>/<name>` unit, `slice: host-custom`) is about that project's own units, while `kind: internal` is about the framework and is what a package carries upstream. The engine resolves `kind` from the probe registry at record time and enforces the split at three layers. Content analysis may refine an `internal` entry toward this project, but never an `external` entry toward upstream — the engine's report validation rejects that outright.
 
 ```text
 /speckit.feedback                    # judge and route
-/speckit.feedback package            # go straight to Path B
+/speckit.feedback package            # go straight to Path B (the only way to reach it in the framework project)
 ```
 
 ## Routing
 
-| Feedback points at | Path | What happens |
-|---|---|---|
-| **This project** — `kind: external` entries, plus inbound bundles in the `feedback/` intake directory when this repo is the framework source | **Path A — digest in place** | inventory → introspection → route to this project's own improvement channels → dispose → cleanup |
-| **The framework upstream** (normally Spec Kit itself) — `kind: internal` | **Path B — package for manual delivery** | status → package → print the zip and the delivery guidance → `mark-submitted` → post-package cleanup |
-| Injecting a probe for a custom unit | *(outside the automatic router)* | see [Probe Injection](#probe-injection-explicit-request-only) |
+| Repo hat | Feedback | Path | What happens |
+|---|---|---|---|
+| **Framework project** | every entry, whatever its `kind` | **Path A — digest in place** | inventory → introspection → route to this project's own improvement channels → dispose → cleanup |
+| **Framework project** | inbound bundles in the `feedback/` intake directory | **Path A** | same, starting from the intake step |
+| **Client project** | `kind: external` (its own custom units) | **Path A** | same |
+| **Client project** | `kind: internal` (about the framework) | **Path B — package for manual delivery** | status → package → print the zip and the delivery guidance → `mark-submitted` → post-package cleanup |
+| either | injecting a probe for a custom unit | *(outside the automatic router)* | see [Probe Injection](#probe-injection-explicit-request-only) |
 
-Both sides non-empty → Path A runs first, then Path B, in the same session. Nothing in scope → the empty inventory is reported and the run ends normally without writing a report file.
+Path B is reached automatically only from a client project; in the framework project it stays available on an explicit `package` request and the run says plainly that it was taken on request rather than by judgment. Both sides non-empty → Path A runs first, then Path B, in the same session. Nothing in scope → the empty inventory is reported and the run ends normally without writing a report file.
+
+The hat test is mechanical: the repository root owns the canonical framework **source** directories `templates`, `skills`, `shared`, `scripts` and `src/specify_cli`. It is deliberately **not** gated on a `feedback/` directory existing, because a client project could have one for unrelated purposes.
 
 The **inventory** step is where the old probe overview lives — a step the judgment needs, not a destination of its own. It prints every probe placed in the current project as a vertical tree: kind (internal/external) → class (target slice, collection, processing) → objects (unit @ lifecycle point), rendered from the merged truth source and never a hand-maintained list.
 
@@ -33,7 +37,7 @@ python3 .specify/scripts/python/feedback-utils.py --action list --disposition op
 
 ## Path A — Digest In This Project
 
-**A1 Intake** (framework hat only — `templates/` + `skills/` + `src/specify_cli/` at root; the gate scopes this sub-step, never the whole path): enumerate `feedback/feedback-*.zip`, process ALL bundles as ONE consolidated batch, and cross-check every filename against `consume-log.md` so a re-delivered copy is named as such instead of being re-routed. A client project skips A1/A2 and starts at A3.
+**A1 Intake** (framework hat only, per the hat test in [Routing](#routing) — the hat scopes this sub-step, and a client project skips A1/A2 and starts at A3): enumerate `feedback/feedback-*.zip`, process ALL bundles as ONE consolidated batch, and cross-check every filename against `consume-log.md` so a re-delivered copy is named as such instead of being re-routed.
 
 **A2 Read**: small batches inline via `unzip -p`; larger batches extract to a temp dir and dispatch balanced parallel read-only verifiers returning a compact verdict table. Bundle identity comes from the MANIFEST (`Install source`, `Generated`, entry-file set), which catches a re-delivery the filename check cannot.
 
@@ -58,6 +62,8 @@ python3 .specify/scripts/python/feedback-utils.py --action dispose --id <entry-i
 ```
 
 ## Path B — Package For The Framework Upstream
+
+Reached automatically only from a **client project**. In the framework project the router never selects this path — there is no upstream to deliver to — and it runs only on an explicit `package` request.
 
 Status → summary → dispose → package → post-package cleanup → `mark-submitted`:
 
