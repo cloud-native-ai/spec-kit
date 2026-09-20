@@ -205,12 +205,23 @@ def test_command_template_names_both_routes_without_restating_the_budget():
         "Route R2 must require a scripted migration — hand transcription "
         "silently drops items and the drop is invisible afterwards"
     )
-    # R1's substance: the precondition that makes compression non-lossy.
-    assert "actually carries the detail" in text, (
-        "Route R1 must require verifying the pointer target before compressing"
-    )
     # Action 6's attribution rule.
     assert "attribution" in text, "Action 6's attribution rule is missing"
+
+    # R1's substance: the two filters that keep "live is bigger than template"
+    # from being read as drift. Found by executing the route — its raw size
+    # comparison flagged Documentation Map, Tech Stack & Resources and Project
+    # Overview on a mature project, all three of which are scaffolds the project
+    # is supposed to fill, so compressing them would have deleted real content.
+    assert "Exclude project-filled sections first" in text, (
+        "R1 must exclude sections whose template version is still a placeholder "
+        "scaffold; without this filter R1 flags the largest correct sections in "
+        "the file"
+    )
+    assert "not** an R1 candidate" in text, (
+        "R1 must state the negative outcome of its pointer check — a section "
+        "thicker because no owner holds the detail is a gap in the owner, not drift"
+    )
 
     # One owner for the number: the command template references the script's
     # report and MUST NOT carry a second copy of the value.
