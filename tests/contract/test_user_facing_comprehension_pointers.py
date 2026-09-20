@@ -140,10 +140,19 @@ CONVERGED_RESTATED_FRAGMENTS = RULE_FRAGMENTS + ANTIPATTERN_FRAGMENTS
 # C-10: three preserved passages in feedback-step.md (exact literals), and the one line
 # that MUST be rewritten. `:115` is deliberately NOT in the preserve set — see the contract's
 # B-09 correction: preserving it would contradict its own rewrite obligation.
+#
+# RE-PINNED 2026-09-20 (after feature 051 closed): literals 1 and 3 originally named
+# `/speckit.feedback package`. The hat-primary routing correction made that wrong — the
+# wrap-up notification is emitted before any judgment about where the accumulated feedback
+# points, so naming the package path pre-announces a disposition the entry point has not
+# made (and in the framework project it recommends packaging a zip addressed to the repo
+# that produced it). Both literals now name `/speckit.feedback`. The substance this pin
+# guards is unchanged: the user-facing line references a command path, never the raw
+# engine path.
 PRESERVED_FEEDBACK = (
-    "`/speckit.feedback package` command — the user-facing path; never paste the raw",
+    "`/speckit.feedback` command — the user-facing path; never paste the raw",
     "Present the choices in user-facing terms: the notification references the",
-    "`/speckit.feedback package` command, never the raw `feedback-utils.py` engine path.",
+    "`/speckit.feedback` command, never the raw `feedback-utils.py` engine path.",
     "(engine detail — do not paste the bare flag into the user-facing line).",
 )
 REWRITTEN_FEEDBACK_LINE = '(Embedded copies that still say only "invite the user to submit" defer to this section):'

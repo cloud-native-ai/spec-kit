@@ -15,6 +15,7 @@ TEAM_CMD = REPO_ROOT / "templates" / "commands" / "team.md"
 SKILL = REPO_ROOT / "skills" / "create-team" / "SKILL.md"
 CREATE_MODE = REPO_ROOT / "skills" / "create-team" / "references" / "create-mode.md"
 EXEC_GUIDE = REPO_ROOT / "skills" / "create-team" / "references" / "execution-guide.md"
+FEEDBACK_STEP = REPO_ROOT / "shared" / "workflow" / "feedback-step.md"
 
 BLOCKING_PHRASES = (
     "MUST NOT execute before confirmation",
@@ -62,10 +63,21 @@ def test_run_mode_preview_execute_shape() -> None:
 
 
 def test_wrapup_submission_prompt_nonblocking() -> None:
-    text = read(SKILL)
-    assert "非阻塞" in text, "wrap-up submission prompt must be non-blocking"
-    assert "/speckit.feedback package" in text, "user-facing submission path must be disclosed"
-    assert "自动传输" in text and "MUST NOT" in text, "no-auto-transmission red line missing"
+    """The wrap-up prompt's semantics are owned by shared/workflow/feedback-step.md.
+
+    create-team embeds a pointer to that owner rather than a copy, so this guard reads
+    the substance where it lives and additionally checks the pointer chain is intact —
+    a broken pointer would silently leave the team flow with no prompt semantics at all.
+    """
+    owner = read(FEEDBACK_STEP)
+    assert "非阻塞" in owner, "wrap-up submission prompt must be non-blocking"
+    assert "/speckit.feedback" in owner, "user-facing submission path must be disclosed"
+    assert "自动传输" in owner and "MUST NOT" in owner, "no-auto-transmission red line missing"
+    skill = read(SKILL)
+    assert "## Feedback" in skill and "feedback-step.md" in skill, (
+        "create-team's Feedback section must point at the owner that carries the "
+        "non-blocking / no-auto-transmission semantics"
+    )
 
 
 def test_continuous_tiered_gates_untouched() -> None:

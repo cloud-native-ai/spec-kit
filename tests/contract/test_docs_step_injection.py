@@ -46,11 +46,25 @@ def test_c2_injection_scope_counts():
     assert len(SIMPLE_COMMANDS) == 4
 
 
+def heading_offset(text: str, heading: str) -> int:
+    """Offset of `heading` matched as a WHOLE line, or -1.
+
+    A bare ``text.find("## Documentation")`` also matches prose that names a *different*
+    heading — `## Documentation Map` is a real section of the instructions template and
+    Route R1 refers to it by name — which silently reorders the comparison and reports a
+    section-order violation in a file whose order is correct.
+    """
+    m = re.search(rf"(?m)^{re.escape(heading)}[ \t]*$", text)
+    return m.start() if m else -1
+
+
 @pytest.mark.contract
 @pytest.mark.parametrize("cmd", COMPLEX_COMMANDS)
 def test_c3_c4_documentation_section_position_and_reference(cmd: str):
     text = (COMMANDS_DIR / f"{cmd}.md").read_text(encoding="utf-8")
-    fb, doc, ho = text.find("## Feedback"), text.find("## Documentation"), text.find("## Handoffs")
+    fb = heading_offset(text, "## Feedback")
+    doc = heading_offset(text, "## Documentation")
+    ho = heading_offset(text, "## Handoffs")
     assert doc != -1, f"{cmd}.md missing ## Documentation"
     assert fb != -1 and fb < doc, f"{cmd}.md: ## Documentation must follow ## Feedback"
     assert ho == -1 or doc < ho, f"{cmd}.md: ## Documentation must precede ## Handoffs"

@@ -34,7 +34,9 @@ Feedback attaches only to long-running, qualifying flows — never to trivial on
 
 The authoritative classification lives in the feature's
 `contracts/command-classification.md`; the canonical step text lives at
-`.specify/shared/workflow/feedback-step.md`.
+`.specify/shared/workflow/feedback-step.md`. Embedding units **reference** that file —
+each embedded `## Feedback` section is one of its two short pointer forms (command shape
+or skill shape) carrying only that unit's id, never a copy of the rules.
 
 | Command | Class | Command | Class |
 |---------|-------|---------|-------|
