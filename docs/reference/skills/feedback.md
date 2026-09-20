@@ -129,7 +129,7 @@ Four facts govern the whole mechanism (canonical statement in
    recurring issue was worked around.
 
 Between recording and packaging sits the optional **introspection(自省)** stage
-(`/speckit.feedback introspect`, req 047): scenario-grounded verification and
+(Path A step A3 of `/speckit.feedback`, req 047): scenario-grounded verification and
 root-cause clustering in the client project, so upstream packages carry
 facts + evidence + root causes + proposals instead of bare facts. It adds no
 transmission path — red line 3 is unchanged.
@@ -163,8 +163,8 @@ python3 .specify/scripts/python/feedback-utils.py --action package
   stays in `packages/` as the delivery artifact; after the batch is dealt with (sent
   or deliberately discarded) and `mark-submitted` has reset the counter, remove the
   zip from `packages/` — store, outbox, and counter all return to zero.
-- On the framework side, `/speckit.feedback consume` likewise ends with a mandatory
-  cleanup: after the routing report is confirmed, the batch's intake bundles are
+- On the framework side, `/speckit.feedback` Path A likewise ends with a mandatory
+  cleanup: once the routing report is confirmed, the batch's intake bundles are
   deleted and one `consume-log.md` row (routings + conflicts) is the durable record.
 
 The `packages/` directory is not git-ignored: like the entries, a zip is user data, and
