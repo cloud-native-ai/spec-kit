@@ -29,6 +29,14 @@ fi
 TARGET_FILE=".specify/instructions.md"
 TARGET_DIR=".specify"
 
+# Size budget for the generated instruction file, in bytes. Host AI agent CLIs
+# warn once the instruction chain they load reaches this size, so the generator
+# reports it here instead of leaving the operator to relay the host's warning
+# back into /speckit.instructions by hand. This constant is the ONLY definition
+# of the number: the command template references the script's report and never
+# restates the value.
+INSTRUCTIONS_BUDGET_BYTES=32768
+
 mkdir -p "$TARGET_DIR"
 
 # Generate JSON tool manifests
@@ -55,6 +63,56 @@ render_template() {
     -e "s/{{PROJECT_ROOT}}/$SAFE_PROJECT_ROOT/g" \
     -e "s/{{DATE}}/$SAFE_DATE/g" \
     "$input_file"
+}
+
+# Report the generated file's size against INSTRUCTIONS_BUDGET_BYTES, with a
+# per-section breakdown when it has reached the budget. Advisory by design and
+# always exit 0: this script runs inside `specify init` for every downstream
+# project, so failing here would leave an over-budget project unable to
+# initialize or refresh its instructions at all. Converging the file is
+# /speckit.instructions Action 5's job (two routes: compress a framework
+# section back to the template's own shape; promote an over-thick
+# project-specific section to a docs/ owner document).
+report_instructions_budget() {
+  local target="$1"
+  local budget_out
+  budget_out="$(python3 - "$target" "$INSTRUCTIONS_BUDGET_BYTES" <<'PYEOF'
+import re
+import sys
+
+path, budget = sys.argv[1], int(sys.argv[2])
+text = open(path, encoding="utf-8").read()
+size = len(text.encode("utf-8"))
+print("BUDGET: {} {} {}".format(size, budget, "over" if size >= budget else "within"))
+if size < budget:
+    sys.exit(0)
+
+# Same section granularity as the additive reconcile below, so the measurement
+# and the injection logic cannot disagree about what counts as one section.
+parts = re.split(r"(?m)^(## .+)$", text)
+sections = []
+if len(parts) > 1:
+    preamble = len(parts[0].encode("utf-8"))
+    if preamble:
+        sections.append((preamble, "(before the first ## heading)"))
+    for i in range(1, len(parts) - 1, 2):
+        body = parts[i] + parts[i + 1]
+        sections.append((len(body.encode("utf-8")), parts[i].lstrip("# ").strip()))
+for nbytes, name in sorted(sections, reverse=True)[:8]:
+    print("SECTION: {} {}".format(nbytes, name))
+PYEOF
+  )"
+  local size budget_n verdict
+  size="$(printf '%s\n' "$budget_out" | sed -n 's/^BUDGET: \([0-9]*\) .*/\1/p')"
+  budget_n="$(printf '%s\n' "$budget_out" | sed -n 's/^BUDGET: [0-9]* \([0-9]*\) .*/\1/p')"
+  verdict="$(printf '%s\n' "$budget_out" | sed -n 's/^BUDGET: [0-9]* [0-9]* \(.*\)$/\1/p')"
+  if [ "$verdict" = "over" ]; then
+    log warning "Instructions size ${size} B has reached the ${budget_n} B budget (over by $((size - budget_n)) B). Largest sections:"
+    printf '%s\n' "$budget_out" | sed -n 's/^SECTION: \([0-9]*\) \(.*\)$/    \1 B  \2/p'
+    log warning "Large instructions may impact agent performance. Run /speckit.instructions to converge the file (Action 5 owns both routes)."
+  else
+    log info "Instructions size: ${size} B (budget ${budget_n} B, $((budget_n - size)) B headroom)"
+  fi
 }
 
 # T007: Backup + establish refresh base + additive section reconcile
@@ -190,6 +248,9 @@ else
   log info "Generating new instructions file from template..."
   render_template "$TEMPLATE_FILE" >"$TARGET_FILE"
 fi
+
+# One call site after the branch, so a first-time bootstrap reports its size too.
+report_instructions_budget "$TARGET_FILE"
 
 # Initialize the project glossary (non-destructive; create only if absent).
 # The glossary anchors project vocabulary and corrects voice/dictated input;
