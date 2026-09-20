@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-19T02:25:11Z",
+  "updated": "2026-09-20T06:46:46Z",
   "threshold": 10,
-  "count_since_submission": 22,
+  "count_since_submission": 23,
   "submitted_at": null,
   "entries": [
+    {
+      "id": "20260920T064646Z-speckit-instructions",
+      "file": "20260920T064646Z-speckit-instructions.md",
+      "unit_id": "/speckit.instructions",
+      "unit_type": "command",
+      "run_id": "instructions-20260920T1429-budget-first-run",
+      "probe": "speckit-instructions-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-20T06:46:46Z",
+      "summary": "First real exercise of the size-budget control added earlier the same day, run on the framework repo itself with empty arguments (full reconcile). The control worked end to end: the setup script opene"
+    },
     {
       "id": "20260919T022511Z-speckit-implement",
       "file": "20260919T022511Z-speckit-implement.md",
