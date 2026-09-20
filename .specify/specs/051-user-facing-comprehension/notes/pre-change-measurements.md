@@ -18,6 +18,33 @@ BASE_SHA=925badb60860fdbbb8a5fade24cecb01627fbc6f
 
 Re-derive: `git rev-parse gitlab/master` — the commit this feature's branch sits on.
 
+**Range closed 2026-09-20** — the feature reached `Implemented` and was merged to `master`, so
+the comparison now has an upper bound as well:
+
+```
+FEATURE_END_SHA=f8a287bef7b49007320123bd5b9306a540a1e705
+```
+
+Re-derive: `git rev-parse f8a287be` — this feature's last commit (its wrap-up glossary entry).
+
+**Why the end bound was added.** `BASE_SHA` alone defines a half-open range: `git diff BASE_SHA`
+compares the base against the **live working tree**, so it stays true only for as long as nothing
+else in the repository ever touches the compared paths. Once this feature closed, that reading
+turned two of its own guards into assertions about all future work rather than about itself —
+`gate-neutrality` C-5 ("this feature adds no executable scripts outside `tests/contract/`") and
+C-6 ("`src/specify_cli/`, `scripts/`, `templates/plan-template.md` are zero-change surfaces") both
+went red the first time a later change legitimately edited `scripts/`, while the feature they were
+written to judge had not changed at all. Both clauses are **historical** claims about one commit
+span; the range now says so. Measured over the closed span `BASE_SHA..FEATURE_END_SHA` both hold
+(0 files on the zero-change surfaces, 0 executables outside `tests/contract/`), and C-5's
+anti-vacuity sentinel still finds this feature's own six test files inside the span — so bounding
+the range preserves exactly what was being asserted and drops only the part that was never meant
+to outlive the run.
+
+**This does NOT re-freeze `BASE_SHA`.** Re-freezing the start would have made both clauses
+unfalsifiable about the feature they document (a base equal to the present reports no changes by
+construction). The start stays as frozen below, including through any future rebase of the branch.
+
 **Re-frozen 2026-09-18 after the rebase onto `gitlab/master`** (supersedes the original
 freeze `710c7179fc1896d85b5d7d0c8ad52719af18f558`, recorded at US1 kickoff). The rebase
 replayed all 32 feature commits onto the new base, so every pre-rebase commit SHA — including

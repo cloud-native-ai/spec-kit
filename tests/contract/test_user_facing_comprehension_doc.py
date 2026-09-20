@@ -129,18 +129,46 @@ def _base_sha() -> str:
     return m.group(1)
 
 
-def _changed_files(base: str, paths: list[str]) -> list[str]:
-    """Paths added or modified since ``base``, **including still-untracked ones**.
+def _end_sha() -> str:
+    """Upper bound of this feature's commit span, recorded when it closed.
 
-    ``git diff <sha>`` reaches tracked paths only, so a brand-new file joins the change
-    set only once committed. C-5 and C-6 both run mid-feature, when this feature's own
-    artifacts are precisely the uncommitted ones — omitting untracked paths would leave
-    both clauses blind in the only window where they can fire.
+    Required, not optional: an absent end bound silently degrades C-5/C-6 back to
+    `git diff BASE_SHA` against the **live worktree**, which is a claim about every
+    future change to those paths rather than about this feature. That half-open form
+    is what made both clauses go red on the first later edit to `scripts/` after this
+    feature was merged — green for the feature they judged, red for work they never
+    saw. Failing loudly here keeps the range honest.
     """
+    m = re.search(r"^FEATURE_END_SHA=([0-9a-f]{40})$", _text(NOTES), re.M)
+    assert m, (
+        f"FEATURE_END_SHA not recorded in {NOTES.relative_to(ROOT)} — the feature's "
+        "comparison range has no upper bound, so C-5/C-6 would judge the live worktree "
+        "instead of this feature's commit span"
+    )
+    return m.group(1)
+
+
+def _changed_files(base: str, paths: list[str], end: str | None = None) -> list[str]:
+    """Paths added or modified between ``base`` and ``end``, or against the live worktree
+    when ``end`` is None.
+
+    ``end`` given (the normal case once a feature has closed): a bounded ``base..end``
+    diff, which is a historical fact about that span and stays true forever.
+
+    ``end`` None (mid-feature): ``git diff <sha>`` reaches tracked paths only, so a
+    brand-new file joins the change set only once committed — and mid-feature, this
+    feature's own artifacts are precisely the uncommitted ones. Omitting untracked
+    paths would leave both clauses blind in the only window where they can fire, so
+    the untracked half is unioned in.
+    """
+    revision = f"{base}..{end}" if end else base
     tracked = subprocess.run(
-        ["git", "diff", "--name-only", "--no-renames", "--diff-filter=ACMR", base, "--", *paths],
+        ["git", "diff", "--name-only", "--no-renames", "--diff-filter=ACMR", revision, "--", *paths],
         cwd=ROOT, capture_output=True, text=True, check=True,
     ).stdout
+    if end:
+        # An untracked file is in no commit, so it cannot belong to a closed range.
+        return sorted({ln for ln in tracked.splitlines() if ln.strip()})
     untracked = subprocess.run(
         ["git", "ls-files", "--others", "--exclude-standard", "--", *paths],
         cwd=ROOT, capture_output=True, text=True, check=True,
@@ -554,9 +582,12 @@ def test_gn_c3_scanner_constants_unmodified():
 
 @pytest.mark.contract
 def test_gn_c5_no_new_executable_scripts():
-    """Whole-repo probe: this feature adds no executable scripts outside tests/contract."""
-    base = _base_sha()
-    changed = _changed_files(base, ["."])
+    """Whole-repo probe: this feature added no executable scripts outside tests/contract.
+
+    Bounded to the feature's own commit span, so it stays a true statement about that
+    span instead of becoming a prohibition on every later change to the repository.
+    """
+    changed = _changed_files(_base_sha(), ["."], _end_sha())
     offenders = [
         p for p in changed
         if re.search(r"\.(py|sh)$", p) and not p.startswith("tests/contract/")
@@ -565,21 +596,23 @@ def test_gn_c5_no_new_executable_scripts():
     assert offenders == [], f"new executable scripts outside tests/contract/: {offenders}"
     added_tests = [p for p in changed if p.startswith("tests/contract/") and p.endswith(".py")]
     assert added_tests, (
-        "sanity: this feature's own test files should appear as additions against BASE_SHA; "
-        "an empty set suggests the baseline SHA is wrong rather than that nothing was added"
+        "sanity: this feature's own test files should appear as additions across its span; "
+        "an empty set suggests the recorded BASE_SHA/FEATURE_END_SHA pair is wrong rather "
+        "than that nothing was added"
     )
 
 
 @pytest.mark.contract
 def test_gn_c6_zero_change_surfaces_untouched():
-    """Compared against BASE_SHA, never HEAD.
+    """Compared against a bounded BASE_SHA..FEATURE_END_SHA range, never HEAD.
 
     `git diff HEAD` is blind to this feature's own commits (the commit discipline requires
     committing per task) and is unconditionally vacuous under CI, where a clean checkout
     makes the worktree equal to HEAD. No extension filter either: templates/plan-template.md
     is a .md and scripts/ holds non-py/sh tracked files that a filter would let escape.
+    The upper bound is what keeps this a claim about the feature rather than about the
+    live tree — see _end_sha().
     """
-    base = _base_sha()
     surfaces = ["src/specify_cli/", "scripts/", "templates/plan-template.md"]
-    changed = _changed_files(base, surfaces)
+    changed = _changed_files(_base_sha(), surfaces, _end_sha())
     assert changed == [], f"zero-change surfaces were modified: {changed}"
