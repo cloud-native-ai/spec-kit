@@ -1,8 +1,27 @@
-"""Contract test: /speckit.docs command template structure (spec 033).
+"""Contract tests for the /speckit.docs domain: command template + skill pair.
 
-Driven by ``.specify/specs/033-docs-command/contracts/docs-command-template.md``
-(C-1…C-12). Since the 2026-08-10 revision the command is a thin dispatch
-layer; the engine semantics are pinned on the ``create-docs`` skill.
+Single home for the docs trio after consolidation. It merges what were three
+files reading overlapping slices of the same domain:
+
+* ``test_docs_command_template.py`` — the command template structure, driven by
+  ``.specify/specs/033-docs-command/contracts/docs-command-template.md`` (C-1…C-12).
+  Since the 2026-08-10 revision the command is a thin dispatch layer; the engine
+  semantics are pinned on the ``create-docs`` skill.
+* ``test_docs_reconcile_orchestration.py`` — additive reconcile orchestration
+  (requirement 048, US3; contract
+  ``.specify/specs/049-docs-reconcile/contracts/docs-command-orchestration.md``).
+  Only its two non-duplicating propositions survive: the
+  discovery-routing/alias prohibition and the reference-doc reference-not-copy
+  negative. Its exact-top-level-shape pin and its ``R0 需求解析`` negative were
+  byte-for-byte re-assertions of C-3/C-7 here; its managed-block literals are
+  owned by ``test_docs_target_structure_declaration.py``.
+* ``test_docs_skill_pair.py`` — the create-docs / improve-docs pair (spec 033,
+  C-18). The docs domain follows the same create/improve split as tools, agents
+  and teams: ``create-X`` owns creation plus structure, ``improve-X`` owns
+  evidence-driven refinement of the existing artifact, and improving the *skills
+  themselves* stays with ``improve-skills``. Those boundary pins survive; the
+  mirror-byte-identity and frontmatter/Feedback/unit-id assertions it repeated
+  are asserted once here.
 """
 from __future__ import annotations
 
@@ -14,12 +33,14 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SOURCE = REPO_ROOT / "templates" / "commands" / "docs.md"
 TARGET_TEMPLATE = REPO_ROOT / "templates" / "docs-target-structure-template.md"
+REFERENCE = REPO_ROOT / "docs" / "reference" / "commands" / "docs.md"
+INSTRUCTIONS = REPO_ROOT / ".specify" / "instructions.md"
 # 2026-08-17: the .specify/templates/commands/ mirror is retired — per-tool
 # copies are generated straight from templates/commands/.
 SKILL = REPO_ROOT / "skills" / "create-docs" / "SKILL.md"
-SKILL_MIRROR = REPO_ROOT / ".specify" / "skills" / "create-docs" / "SKILL.md"
-IMPROVE_SKILL = REPO_ROOT / "skills" / "improve-docs" / "SKILL.md"
-IMPROVE_SKILL_MIRROR = REPO_ROOT / ".specify" / "skills" / "improve-docs" / "SKILL.md"
+
+PAIR = ("create-docs", "improve-docs")
+MAX_LINES = 500
 
 SECTION_ORDER = [
     "## User Input",
@@ -42,6 +63,20 @@ def source_text() -> str:
 def skill_text() -> str:
     assert SKILL.is_file(), "skills/create-docs/SKILL.md missing"
     return SKILL.read_text(encoding="utf-8")
+
+
+def pair_skill_path(name: str) -> Path:
+    return REPO_ROOT / "skills" / name / "SKILL.md"
+
+
+def pair_mirror_path(name: str) -> Path:
+    return REPO_ROOT / ".specify" / "skills" / name / "SKILL.md"
+
+
+def pair_skill_text(name: str) -> str:
+    path = pair_skill_path(name)
+    assert path.is_file(), f"skills/{name}/SKILL.md missing"
+    return path.read_text(encoding="utf-8")
 
 
 @pytest.mark.contract
@@ -161,28 +196,124 @@ def test_c10_runtime_copies_exist_for_every_present_tool():
 
 @pytest.mark.contract
 def test_c11_reference_doc_and_quickstart_row():
-    ref = REPO_ROOT / "docs" / "reference" / "commands" / "docs.md"
-    assert ref.is_file(), "docs/reference/commands/docs.md reference doc missing"
+    assert REFERENCE.is_file(), "docs/reference/commands/docs.md reference doc missing"
     quickstart = (REPO_ROOT / "docs" / "tutorials" / "quickstart.md").read_text(encoding="utf-8")
     assert "/speckit.docs" in quickstart, "quickstart command table missing /speckit.docs"
 
 
 @pytest.mark.contract
-def test_c12_skill_source_mirror_and_feedback():
-    assert SKILL.is_file(), "skills/create-docs/SKILL.md missing"
-    assert SKILL_MIRROR.is_file(), ".specify/skills/create-docs/SKILL.md mirror missing"
-    assert SKILL.read_bytes() == SKILL_MIRROR.read_bytes(), "skill mirror drift"
-    text = skill_text()
-    assert text.startswith("---\n"), "skill frontmatter missing"
-    fm = text.split("---", 2)[1]
-    assert "name: create-docs" in fm
-    assert "description:" in fm
-    assert "skill_id" in fm
-    assert "## Feedback" in text
-    assert '"skill:create-docs"' in text, "skill feedback unit-id must be skill:create-docs"
-    assert IMPROVE_SKILL.is_file(), "skills/improve-docs/SKILL.md missing"
-    assert IMPROVE_SKILL_MIRROR.is_file(), ".specify/skills/improve-docs/SKILL.md mirror missing"
-    assert IMPROVE_SKILL.read_bytes() == IMPROVE_SKILL_MIRROR.read_bytes(), "improve-docs mirror drift"
-    improve = IMPROVE_SKILL.read_text(encoding="utf-8")
-    assert "## Feedback" in improve
-    assert '"skill:improve-docs"' in improve
+def test_c11a_reference_doc_does_not_copy_static_baseline_enumerations():
+    """Reference-not-copy: the reference doc reaches the baseline by path.
+
+    A restated enumeration here is a second roster that drifts the moment the
+    owner (``skills/create-docs/SKILL.md``) changes — C-9 pins the owner's copy.
+    """
+    text = REFERENCE.read_text(encoding="utf-8")
+    assert "README.md" not in text
+    assert "concepts/ tutorials/ tasks/ reference/ decisions/ contribute/" not in text
+    assert "title/created/expires/status/target/tags" not in text
+
+
+@pytest.mark.contract
+def test_c11b_discovery_routes_index_refresh_and_forbids_alias_edits():
+    """The one docs.md rule with a real blast radius: alias files are symlinks.
+
+    Editing a compatibility alias directly severs the link and the affected AI
+    agent CLI silently diverges, so the command must route the refresh through
+    ``/speckit.instructions`` and say so.
+    """
+    text = source_text()
+    assert "human index" in text.lower()
+    assert "/speckit.instructions" in text
+    assert ".specify/instructions.md" in text
+    assert "Documentation Map" in text
+    assert "must not edit compatibility instruction aliases" in text.lower()
+
+
+@pytest.mark.contract
+def test_c12_skill_source_mirror_byte_identity():
+    """Source → ``.specify/skills/`` projection for both halves of the pair.
+
+    Frontmatter, ``## Feedback`` and the feedback unit-id are pinned per member by
+    ``test_c18_pair_member_shape``, so this asserts only byte-identity and the two
+    cannot drift apart about who owns what.
+    """
+    for name in PAIR:
+        src, mirror = pair_skill_path(name), pair_mirror_path(name)
+        assert src.is_file(), f"skills/{name}/SKILL.md missing"
+        assert mirror.is_file(), f".specify/skills/{name}/SKILL.md mirror missing"
+        assert src.read_bytes() == mirror.read_bytes(), f"{name}: skill mirror drift"
+
+
+# --------------------------------------------------------------------------
+# C-18 — the create-docs / improve-docs pair (merged from test_docs_skill_pair)
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.contract
+@pytest.mark.parametrize("name", PAIR)
+def test_c18_pair_member_shape(name: str):
+    text = pair_skill_text(name)
+    assert text.startswith("---\n"), f"{name}: frontmatter missing"
+    frontmatter = text.split("---", 2)[1]
+    assert f"name: {name}" in frontmatter, f"{name}: frontmatter name must match the directory"
+    assert "description:" in frontmatter, f"{name}: description missing"
+    assert f'skill_id: "<SKILL:.specify/skills/{name}/SKILL.md>"' in frontmatter, \
+        f"{name}: skill_id must be the canonical resource id"
+    assert "Use this when the user mentions" in frontmatter, f"{name}: description needs triggers"
+    assert "## Feedback" in text, f"{name}: mandatory Feedback section missing"
+    assert f'"skill:{name}"' in text, f"{name}: feedback unit-id must be skill:{name}"
+    assert len(text.splitlines()) < MAX_LINES, f"{name}: SKILL.md exceeds {MAX_LINES} lines"
+
+
+@pytest.mark.contract
+def test_c18_registry_rows_must_not_return_to_instructions():
+    """Registry retired (2026-08-17): the skills directory is the discovery surface."""
+    instructions = INSTRUCTIONS.read_text(encoding="utf-8")
+    rows = [
+        line
+        for name in PAIR
+        for line in instructions.splitlines()
+        if line.startswith(f"| {name} |")
+    ]
+    assert not rows, f"skill registry rows must not return to instructions.md: {rows}"
+
+
+@pytest.mark.contract
+def test_c18_improve_docs_targets_documents_not_the_skill():
+    """The improve half refines documentation artifacts; skill self-improvement is improve-skills."""
+    text = pair_skill_text("improve-docs")
+    assert "improve-skills" in text, \
+        "improve-docs must route skill self-improvement to improve-skills"
+    assert "one existing document" in text.lower(), \
+        "improve-docs must declare a single existing document as its target"
+
+
+@pytest.mark.contract
+def test_c18_improve_docs_does_not_own_structure():
+    """Creation, placement, moves and archiving stay with create-docs."""
+    text = pair_skill_text("improve-docs")
+    assert "create-docs" in text, "improve-docs must name create-docs as the structure owner"
+    for obligation in ("Never create, move, rename, or archive", "hand off"):
+        assert obligation in text, f"improve-docs must state the boundary obligation: {obligation}"
+    assert "never rewrite" in text.lower(), \
+        "improve-docs must forbid rewriting decision history"
+
+
+@pytest.mark.contract
+def test_c18_create_docs_keeps_structural_ownership():
+    """The create half remains the desired-state/structure authority for the space."""
+    text = pair_skill_text("create-docs")
+    assert "Desired-State Baseline" in text, "create-docs must keep the desired-state baseline"
+    assert "Bootstrap" in text, "create-docs must keep bootstrap ownership"
+
+
+@pytest.mark.contract
+def test_c18_improve_docs_excludes_target_contract_and_names_run_artifacts_precisely():
+    text = pair_skill_text("improve-docs")
+    assert ".specify/docs/target-structure.md" in text
+    assert "cross-run non-document contract" in text
+    assert "never edit" in text.lower()
+    assert ".specify/docs/plans/" in text
+    assert ".specify/docs/audit/" in text
+    assert ".specify/docs/**` run artifacts" not in text

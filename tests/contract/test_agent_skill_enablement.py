@@ -8,7 +8,11 @@ Assertions are grouped by contract clause / user story:
       ``## Skill Enablement`` heading.
   US2 (C-5 T-3, T-4 / C-4): every declared slug resolves to an installed skill and no
       slug is a member of the non-declarable set.
-  US3 (C-3): each ``agent-role-*-template.md`` mirrors the same additions.
+
+C-3 ("the generator templates mirror the same additions") is satisfied by US1/US2
+themselves: since Feature 044 the subject of the enablement contract *is* the
+generator template (``skills/create-agent/templates/agent-capacity-<slug>-template.md``),
+so a separate parity block could only re-read the same file and compare it to itself.
 """
 
 import re
@@ -17,7 +21,6 @@ import yaml
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SHIPPED_AGENTS_DIR = REPO_ROOT / "agents"
 SKILLS_DIR = REPO_ROOT / "skills"
 ROLE_TEMPLATES_DIR = REPO_ROOT / "skills" / "create-agent" / "templates"
 
@@ -129,26 +132,4 @@ class TestAgentSkillEnablement:
         assert union, "no skills declared across any agent"
         assert union.issubset(declarable), (
             f"declared skills not in the declarable installed set: {sorted(union - declarable)}"
-        )
-
-    # ---- US3: generator templates mirror the additions (C-3 parity) ----
-
-    @pytest.mark.parametrize("slug", PRESET_ROLES)
-    def test_role_template_has_skills_and_section(self, slug):
-        """C-3: each ``agent-role-<slug>-template.md`` declares a ``skills:`` list and a
-        ``## Skill Enablement`` section, so a regenerated agent inherits skill enablement.
-
-        Uses string checks (not YAML parse) because template frontmatter contains
-        ``{{PLACEHOLDER}}`` tokens that are not valid YAML.
-        """
-        path = ROLE_TEMPLATES_DIR / f"agent-capacity-{slug}-template.md"
-        assert path.exists(), f"role template missing: {path}"
-        parts = path.read_text(encoding="utf-8").split("---", 2)
-        assert len(parts) >= 3, f"{slug} template: malformed frontmatter"
-        frontmatter, body = parts[1], parts[2]
-        assert re.search(r"^skills:\s*\[", frontmatter, flags=re.MULTILINE), (
-            f"{slug} template: frontmatter missing 'skills:' list"
-        )
-        assert re.search(r"^##\s+Skill Enablement\s*$", body, flags=re.MULTILINE), (
-            f"{slug} template: body missing '## Skill Enablement' heading"
         )

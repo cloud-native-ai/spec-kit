@@ -1,13 +1,17 @@
-"""Contract tests for the archive-session rework (039-session-export, T002).
+"""Contract tests for the archive-session export skill (039-session-export).
 
-Contract: .specify/specs/039-session-export/contracts/export-skill-rework.contract.md
+Contracts: ``.specify/specs/039-session-export/contracts/export-skill-rework.contract.md``
+(T002 rework + T009 genericity — the two were split across
+``test_export_skill_rework.py`` and ``test_export_skill_genericity.py`` and are
+merged here, since both read the same two files against the same contract).
 
-Pins: the six-tool PARSERS convergence (STR-002), zero residue of the six
-removed products, the zip→directory product shape, --name grammar and
-conflict handling, probe-style adapters for copilot/hermes (exit 4 + honest
-declaration), the five-value exit-code semantics, and the read-only discipline
-on host session storage. The CLI is exercised black-box via subprocess with a
-synthetic HOME so no real session store is touched.
+Pins: the six-tool PARSERS convergence (STR-002), zero residue of the six removed
+products and of the platform-specific (aone-open) dependency lineage in **both**
+skill files, the network-free guarantee, the zip→directory product shape, --name
+grammar and conflict handling, probe-style adapters for copilot/hermes (exit 4 +
+honest declaration), the five-value exit-code semantics, and the read-only
+discipline on host session storage. The CLI is exercised black-box via subprocess
+with a synthetic HOME so no real session store is touched.
 """
 
 from __future__ import annotations
@@ -32,11 +36,18 @@ pytestmark = pytest.mark.contract
 #: STR-002 — exactly six, normative tool names.
 SIX_TOOLS = {"claude-code", "codex-cli", "qoder-cli", "copilot", "opencode", "hermes"}
 
-#: Identifier-level residue markers of the six removed products.
+#: Identifier-level residue markers of the six removed products — zero residue in
+#: BOTH the engine and the skill document (one list, one owner).
 REMOVED_MARKERS = [
     "qwen-code", "qwen_", "_qwen_", "qoderwork", "oh-my-pi", "_omp_root",
     "kimi-code", "kimi_", "_kimi_", "codex-app", "codexapp",
 ]
+
+#: Platform-specific dependency markers (aone-open lineage).
+PLATFORM_MARKERS = ["a1 skill report", "x-source", "aone-open", "aone_open"]
+
+#: The two generalized surfaces every residue/genericity claim is read from.
+GENERICITY_SURFACES = (ENGINE, SKILL)
 
 
 def _engine():
@@ -88,13 +99,51 @@ def test_parsers_converge_to_exactly_six_tools():
     assert set(module.PARSERS.keys()) == SIX_TOOLS
 
 
+def test_support_matrix_is_exactly_the_six_tools():
+    """The agent-facing matrix in SKILL.md must name the same six the engine parses.
+
+    ``PARSERS`` is the machine-checkable owner (equality-pinned above); this is the
+    doc side, plus the broader legacy-name negative — bare ``qwen``/``kimi`` are not
+    covered by REMOVED_MARKERS, whose entries are all identifier-shaped.
+    """
+    text = SKILL.read_text(encoding="utf-8")
+    for tool in SIX_TOOLS:
+        assert f"`{tool}`" in text, f"matrix row missing for {tool}"
+    # removed tool names must not appear even as prose
+    for legacy in ("qwen", "kimi", "oh-my-pi", "qoderwork"):
+        assert legacy not in text.lower(), f"legacy tool {legacy!r} mentioned in SKILL.md"
+
+
 @pytest.mark.parametrize("marker", REMOVED_MARKERS)
 def test_removed_products_leave_zero_residue(marker):
-    # T003 scope is export.py only; SKILL.md stays legacy until the T010 rewrite,
-    # and its residue is pinned by T009's test_export_skill_genericity.py.
-    for path in (ENGINE,):
+    """The six removed products must be gone from the engine *and* the skill doc.
+
+    Both halves were pinned once each with byte-identical marker lists; one list
+    read over both files is the same proposition with one owner.
+    """
+    for path in GENERICITY_SURFACES:
         text = path.read_text(encoding="utf-8")
         assert marker not in text, f"{marker!r} residue in {path.name}"
+
+
+# --------------------------------------------------------------------------
+# §1b genericity: no platform-specific lineage, network-free (was T009)
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("marker", PLATFORM_MARKERS)
+def test_no_platform_specific_dependency_residue(marker):
+    for path in GENERICITY_SURFACES:
+        text = path.read_text(encoding="utf-8")
+        assert marker not in text, f"platform dependency {marker!r} in {path.name}"
+
+
+def test_no_outbound_network_calls():
+    for path in GENERICITY_SURFACES:
+        text = path.read_text(encoding="utf-8")
+        assert "http://" not in text and "https://" not in text, (
+            f"outbound URL in {path.name} — the skill must be network-free"
+        )
 
 
 # --------------------------------------------------------------------------
@@ -181,3 +230,22 @@ def test_export_does_not_touch_the_host_store(fake_home):
     result = run_cli(home, project, "--name", "ro-check", "--tool", "claude-code")
     assert result.returncode == 0, result.stderr
     assert _sha(src) == before, "host session storage must stay byte-identical"
+
+
+# --------------------------------------------------------------------------
+# §7 SKILL.md documents what the CLI above actually does
+# --------------------------------------------------------------------------
+
+def test_skill_describes_the_directory_product_shape():
+    text = SKILL.read_text(encoding="utf-8")
+    assert "SESSION.md" in text, "description doc flow must be documented"
+    assert "session-meta.json" in text, "meta output must be documented"
+    assert ".session-export" in text, "export root must be documented"
+
+
+def test_skill_documents_the_name_argument_and_exit_codes():
+    """Exit codes 0 and 5 are documented-only — no CLI case above exercises them."""
+    text = SKILL.read_text(encoding="utf-8")
+    assert "--name" in text
+    for code in ("0", "2", "3", "4", "5"):
+        assert f"| {code} |" in text, f"exit-code row missing: {code}"

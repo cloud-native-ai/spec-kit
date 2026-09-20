@@ -1,8 +1,15 @@
 """Unit test for tier classification (T028).
 
-Asserts _ASSISTANT_TIERS classifies 4 CLI tools as Tier 1 and 2 non-CLI
-tools as Tier 2, all keys are in _OFFICIAL_ASSISTANT_KEYS, and
-get_assistant_profile() returns a valid tier field.
+Asserts that the tier assignment covers exactly the official assistants, that
+``get_assistant_profile()`` exposes a valid ``tier`` for each of them, and that the
+CLI-form tools are the ones classified Tier 1.
+
+Deliberately free of count pins: ``len(_ASSISTANT_TIERS) == 6`` and
+``len(tier1) == 4`` broke every time an assistant was legitimately added (see the
+recorded failure of ``test_tiers_has_six_entries`` in
+``.specify/memory/feedback/last-regression-failed.txt``), while catching nothing that
+the derived set equalities below miss. ``test_ai_tools_support_matrix.py`` owns the
+authoritative pin of the official assistant roster itself.
 """
 
 from specify_cli import (
@@ -15,24 +22,16 @@ TIER1_KEYS = {"claude", "codex", "qoder", "opencode"}
 TIER2_KEYS = {"hermes", "copilot"}
 
 
-def test_tiers_has_six_entries():
-    assert len(_ASSISTANT_TIERS) == 6
+def test_tier_assignment_covers_exactly_the_official_assistants():
+    """Every official assistant has a tier entry, and no stray key does.
 
-
-def test_all_tier_keys_in_official_list():
-    for key in TIER1_KEYS | TIER2_KEYS:
-        assert key in _OFFICIAL_ASSISTANT_KEYS, f"{key} not in official list"
-
-
-def test_tier1_count_is_four():
-    tier1 = [k for k, v in _ASSISTANT_TIERS.items() if v == "tier1"]
-    assert len(tier1) == 4
-
-
-def test_tier2_count_is_two():
-    tier2 = [k for k, v in _ASSISTANT_TIERS.items() if v == "tier2"]
-    assert len(tier2) == 2
-    assert set(tier2) == TIER2_KEYS
+    Derived rather than counted, so a seventh official assistant does not break it —
+    but a tier entry for a key that is not official (dead config), or a missing entry
+    for one that is, does.
+    """
+    assert set(_ASSISTANT_TIERS) == set(_OFFICIAL_ASSISTANT_KEYS)
+    tier2 = {k for k, v in _ASSISTANT_TIERS.items() if v == "tier2"}
+    assert tier2 == TIER2_KEYS
 
 
 def test_profile_tier_field_for_each_tool():
@@ -46,8 +45,3 @@ def test_tier1_tools_profile_tier():
     for key in TIER1_KEYS:
         profile = get_assistant_profile(key)
         assert profile["tier"] == "tier1", f"{key} should be tier1"
-
-
-def test_copilot_is_tier2():
-    profile = get_assistant_profile("copilot")
-    assert profile["tier"] == "tier2"

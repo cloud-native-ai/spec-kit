@@ -1,11 +1,24 @@
-"""Contract tests for the goal-utils `targets` action group (038-goal-target, T005).
+"""Contract tests for the goal-utils `targets` action group (038-goal-target, T005)
+and the `/speckit.goal` command surface that delivers it (037-goal-registry, T019).
 
-Contract: .specify/specs/038-goal-target/contracts/targets-engine.contract.md
+Contracts:
+  .specify/specs/038-goal-target/contracts/targets-engine.contract.md
+  .specify/specs/037-goal-registry/contracts/goal-command.contract.md
 
-Pins §1 CLI grammar, §2 the validation table row by row (exit codes included),
-§3 rendering invariants, §4 the D6 history notation verbatim, and the four-value
-exit-code semantics. The CLI is exercised in-process through main() so exit
-codes are asserted directly.
+Engine half — pins §1 CLI grammar, §2 the validation table row by row (exit codes
+included), §3 rendering invariants, §4 the D6 history notation verbatim, and the
+four-value exit-code semantics. The CLI is exercised in-process through main() so
+exit codes are asserted directly.
+
+Command-surface half (merged from the former `test_goal_command_surface.py`) —
+pins the delivery fan-out (source → 4 per-tool copies), the engine mirror
+byte-identity, the reference-doc convention, and FR-021's option-collision
+prohibition. The prose-wording pins that file also carried are gone: a bare word
+like `view`/`confirm`/`annex` in a 10 KB command template passes no matter what
+the mode table says. What survives below names a machine identifier (a CLI
+grammar example, a table-row literal, a config key, the concept-authority path)
+or a file/parity property. Wording-level propositions are owned by the engine
+half of this same file, which executes `main()` rather than grepping for a word.
 """
 
 from __future__ import annotations
@@ -64,10 +77,12 @@ def test_contract_exists():
     assert CONTRACT.is_file(), f"contract missing: {CONTRACT}"
 
 
-def test_contract_declares_the_three_target_states():
-    text = CONTRACT.read_text(encoding="utf-8")
-    for state in ("open", "done", "dropped"):
-        assert state in text
+# test_contract_declares_the_three_target_states removed: asserting that the words
+# "open"/"done"/"dropped" occur somewhere in a contract document about Target
+# states is true by construction. The three states are owned behaviorally below —
+# test_add_issues_open_target_and_renders_the_section (open),
+# test_illegal_transition_is_rejected_exit_2 (done -> dropped is illegal),
+# test_list_output_is_machine_parsable (exact `T-00N\topen\t...` rows).
 
 
 # --------------------------------------------------------------------------
@@ -261,3 +276,107 @@ def test_validate_still_owns_exit_code_4(repo):
 def test_ok_path_returns_zero(repo):
     assert _run("targets", "sliced-goal", "--add", "合法切片",
                 "--repo-root", str(repo)) == 0
+
+
+# ==========================================================================
+# /speckit.goal command surface (037-goal-registry, T019) — merged from the
+# former tests/contract/test_goal_command_surface.py
+# ==========================================================================
+
+GOAL_CANONICAL = REPO_ROOT / "templates/commands/goal.md"
+GOAL_PER_TOOL_COPIES = (
+    REPO_ROOT / ".claude/commands/speckit.goal.md",
+    REPO_ROOT / ".github/prompts/speckit.goal.prompt.md",
+    REPO_ROOT / ".qoder/commands/speckit.goal.md",
+    REPO_ROOT / ".opencode/command/speckit.goal.md",
+)
+REFERENCE_DOC = REPO_ROOT / "docs/reference/commands/goal.md"
+ENGINE_MIRROR = REPO_ROOT / ".specify/scripts/python/goal-utils.py"
+
+AUTHORITY = ".specify/shared/definitions/goal-definitions.md"
+
+
+def test_canonical_source_exists():
+    assert GOAL_CANONICAL.is_file(), f"command source of truth missing: {GOAL_CANONICAL}"
+
+
+def test_canonical_has_frontmatter_with_a_description():
+    text = GOAL_CANONICAL.read_text(encoding="utf-8")
+    assert text.startswith("---\n"), "command template must open with frontmatter"
+    head = text.split("---", 2)[1]
+    assert "description:" in head
+
+
+# test_mirror_is_byte_identical removed 2026-08-17: the .specify/templates/commands/
+# mirror is retired — per-tool copies are generated straight from templates/commands/.
+
+
+@pytest.mark.parametrize("path", GOAL_PER_TOOL_COPIES, ids=lambda p: p.name)
+def test_per_tool_copy_exists_and_is_generated(path):
+    assert path.is_file(), f"generated copy missing: {path}"
+    text = path.read_text(encoding="utf-8")
+    assert "AUTO-GENERATED" in text, f"{path.name} lacks the AUTO-GENERATED header"
+    assert "templates/commands/goal.md" in text, (
+        f"{path.name} does not name its source template"
+    )
+
+
+def test_reference_doc_joins_the_one_per_command_convention():
+    """docs/reference/commands/ holds one file per command and no index."""
+    docs = sorted(p.name for p in (REPO_ROOT / "docs/reference/commands").glob("*.md"))
+    assert "goal.md" in docs
+    assert "README.md" not in docs, "nested README.md is a reserved-name violation"
+
+
+def test_engine_exists_with_its_mirror():
+    assert ENGINE.is_file()
+    assert ENGINE_MIRROR.is_file(), "run sync-mirrors.py --write"
+    assert ENGINE.read_bytes() == ENGINE_MIRROR.read_bytes()
+
+
+# --------------------------------------------------------------------------
+# FR-021 — no colliding option name
+# --------------------------------------------------------------------------
+
+def test_no_new_goal_option_is_introduced():
+    """`--goal` is already claimed with two different meanings, so identity is positional."""
+    for path in (GOAL_CANONICAL, ENGINE):
+        text = path.read_text(encoding="utf-8")
+        assert "--goal " not in text and '"--goal"' not in text, (
+            f"{path.name} introduces a --goal option, colliding with "
+            "build-summary-input.py (goal identity) and match-team-preset.py (goal text)"
+        )
+
+
+# --------------------------------------------------------------------------
+# Concept-authority discipline (GC-8)
+# --------------------------------------------------------------------------
+
+def test_command_links_to_the_concept_authority():
+    text = GOAL_CANONICAL.read_text(encoding="utf-8")
+    assert AUTHORITY in text or "goal-definitions.md" in text, (
+        "the command must link to the concept authority"
+    )
+
+
+# --------------------------------------------------------------------------
+# 038 — the targets action group on the command surface
+# --------------------------------------------------------------------------
+
+def test_targets_mode_row_is_documented():
+    text = GOAL_CANONICAL.read_text(encoding="utf-8")
+    assert "| `targets` |" in text, "Modes table must carry a targets row"
+
+
+def test_engine_invocation_examples_cover_the_targets_action_group():
+    text = GOAL_CANONICAL.read_text(encoding="utf-8")
+    for example in ("targets <goal-slug> --add", "targets <goal-slug> --list",
+                    "targets <goal-slug> --set"):
+        assert example in text, f"engine example missing: {example}"
+
+
+@pytest.mark.parametrize("path", GOAL_PER_TOOL_COPIES, ids=lambda p: p.name)
+def test_per_tool_copies_carry_the_targets_content(path):
+    """Derived from the same GOAL_PER_TOOL_COPIES fixture — no second copy list."""
+    text = path.read_text(encoding="utf-8")
+    assert "targets <goal-slug> --add" in text, f"{path.name} lacks targets content"

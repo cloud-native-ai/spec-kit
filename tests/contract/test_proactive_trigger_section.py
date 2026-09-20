@@ -1,12 +1,60 @@
-"""Contract tests for the Proactive Flow Trigger instructions section (spec 050).
+"""Contract tests for the Proactive Flow Trigger shipped surfaces (spec 050).
 
-Maps to ``contracts/trigger-section.md`` clauses C-1 … C-12. Assertion style
-follows ``test_task_complexity_rubric.py`` (dual surface + byte-identical mirror
-+ project-neutrality), extended with the additive-reconcile behavior and the
-full agent-path coverage that FR-003 makes a hard prerequisite.
+Two faces of one mechanism, one file:
 
-Per C-10, THIS file is the sole authority for the instruction-path enumeration
-and count; other artifacts reference it rather than restating it.
+1. **Instructions-section face** — maps to ``contracts/trigger-section.md``
+   clauses C-1 … C-12. Assertion style follows ``test_task_complexity_rubric.py``
+   (dual surface + byte-identical mirror + project-neutrality), extended with the
+   additive-reconcile behavior and the full agent-path coverage that FR-003 makes
+   a hard prerequisite. These tests run the real ``generate-instructions.sh`` and
+   the real ``scan-confirmation-gates.py``.
+
+   Per C-10, THIS file is the sole authority for the instruction-path enumeration
+   and count; other artifacts reference it rather than restating it.
+
+2. **Discipline-doc face** — merged from the former
+   ``test_proactive_trigger_discipline_doc.py``; maps to
+   ``contracts/discipline-doc.md``. Only the *structural* clauses survive here
+   (C-1 dual surface + byte-identical mirror, C-2 closed and ordered `## `
+   section set, C-3 zero BLOCKING_PATTERNS hits and no governance-path exemption,
+   C-4 reference-not-restate negatives, C-5 escalation-table shape, C-6 project
+   neutrality, C-7 the reverse pointer the doc must carry).
+
+   The former C-8…C-16 prose pins are gone. They asserted, through an
+   any-of-these-wordings helper, that a natural-language phrase occurred in a
+   `## ` section — a wording pin fails on a harmless rewrite and passes for any
+   doc containing a common phrase. Every normative proposition they claimed to
+   stake is owned by a suite that executes the real engine
+   (``scripts/python/trigger-utils.py``):
+
+   - ``tests/contract/test_trigger_engine.py`` — envelope key set, closed action
+     / flag / exit-code sets (C-9/C-10/C-22), `--compliance-done` default and the
+     `ordering-violation` verdict, probe-only evidence reads, bounded payload and
+     suggestion key set, session repeat-suppression, threshold promotion and
+     single-decline reset, destructive-never-promotes, auto-execute is only a
+     flag, default config shape (`threshold` 3, `telemetryWindow` 200).
+   - ``tests/integration/test_trigger_promotion.py`` — SC-009 disabled produces
+     no suggestion and no auto-execution, disabled state survives instructions
+     regeneration, re-enabling clears session suppression, reset/downgrade paths.
+   - ``tests/integration/test_trigger_telemetry.py`` — one row per assess, row
+     count never exceeds the window, append-then-truncate, rotation loses no rule
+     state, escalation rate and budget flag.
+   - ``tests/integration/test_trigger_tuning.py`` — the four evidence kinds
+     (decline/ignore/miss/accept), the small-sample guard and its configurability,
+     proposals are candidates handed back not decided, `tune` alone changes
+     nothing, `tune-apply` moves the proposed→ratified→applied state machine and
+     leaves an evidence trail.
+   - ``tests/contract/test_trigger_seed_derivation.py`` — the seed is a derived
+     copy of the `## Handoffs` prose: C-6/C-7 open the provenance target and
+     assert the verbatim quote and flow name are still there, and C-8 pins the
+     closed situation vocabulary. That file owns "editing a source section means
+     syncing the seed"; its own docstring states the fix is to sync the seed,
+     never to loosen the test.
+
+   The confirmation-gate budget total is pinned once, below, by
+   ``test_c11_gate_scan_total_unchanged`` against the real scanner's output and
+   the frozen ``baseline-gates.json``. The discipline-doc face never re-asserts
+   that total; it only asserts this doc contributes zero hits to it.
 """
 
 from __future__ import annotations
@@ -30,6 +78,8 @@ SCANNER = ROOT / "scripts" / "python" / "scan-confirmation-gates.py"
 BASELINE_GATES = (
     ROOT / ".specify" / "specs" / "050-proactive-flow-trigger" / "baseline-gates.json"
 )
+
+pytestmark = pytest.mark.contract
 
 HEADING = "## Proactive Flow Trigger"
 DOC_LINK = "shared/guidelines/proactive-trigger.md"
@@ -330,3 +380,209 @@ def test_c12_every_declared_value_is_created(installed_project: Path):
         if not (installed_project / rel).exists()
     ]
     assert not missing, f"declared but never generated: {missing}"
+
+
+# ==========================================================================
+# Discipline-doc face (contracts/discipline-doc.md) — merged from the former
+# tests/contract/test_proactive_trigger_discipline_doc.py. Structural clauses
+# only; see the module docstring for where each normative proposition is owned.
+# ==========================================================================
+
+DISCIPLINE_DOC = ROOT / "shared" / "guidelines" / "proactive-trigger.md"
+DISCIPLINE_DOC_MIRROR = ROOT / ".specify" / "shared" / "guidelines" / "proactive-trigger.md"
+GATES_OWNER = ROOT / "shared" / "guidelines" / "confirmation-gates.md"
+
+# doc C-2: closed set, exact order. Additive reconcile propagates whole `## `
+# sections, so a dropped or reordered section is a delivery defect, not a rewrite.
+DOC_SECTIONS = [
+    "Ownership",
+    "Evaluation Cadence",
+    "Evidence Budget & Escalation",
+    "Suggestion Shape",
+    "Ordering Contract",
+    "Promotion & Safety Boundary",
+    "Telemetry & Retention",
+    "Tuning Protocol",
+    "Global Switch",
+    "Maintenance Duties",
+]
+
+# doc C-6: shipped surface must stay project-neutral (shared/ is copied into every
+# downstream project by init).
+DOC_FORBIDDEN = [
+    "spec-kit",
+    "specify-cli",
+    "specify_cli",
+    "Feature 0",
+    "cloud-native-ai",
+    ".specify/specs/0",
+    "requirement 0",
+]
+
+
+def _doc_h2_headings(text: str) -> list[str]:
+    return [line[3:].strip() for line in text.splitlines() if line.startswith("## ")]
+
+
+def _doc_section(text: str, title: str) -> str:
+    """Body of the `## <title>` section, up to the next `## ` heading."""
+    lines = text.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if line.startswith("## ") and line[3:].strip() == title:
+            start = i
+            break
+    assert start is not None, f"section {title!r} not found"
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if lines[j].startswith("## ") or lines[j].startswith("# "):
+            end = j
+            break
+    return "\n".join(lines[start:end])
+
+
+# --- doc C-1: dual surface + byte-identical mirror ---
+
+
+def test_doc_c1_exists_with_byte_identical_mirror():
+    assert DISCIPLINE_DOC.is_file(), f"missing discipline doc: {DISCIPLINE_DOC}"
+    assert DISCIPLINE_DOC_MIRROR.is_file(), (
+        f"missing discipline doc mirror: {DISCIPLINE_DOC_MIRROR}"
+    )
+    assert DISCIPLINE_DOC.read_bytes() == DISCIPLINE_DOC_MIRROR.read_bytes(), (
+        "discipline doc mirror drift"
+    )
+
+
+# --- doc C-2: closed section set, exact order ---
+
+
+def test_doc_c2_section_set_closed_and_ordered():
+    found = _doc_h2_headings(read(DISCIPLINE_DOC))
+    assert found == DOC_SECTIONS, (
+        f"`## ` heading set must be exactly {DOC_SECTIONS} in order; got {found}"
+    )
+
+
+# --- doc C-3: contributes zero hits to the gate budget, and is not exempt ---
+
+
+def test_doc_c3_zero_blocking_pattern_hits():
+    blocking_re = _load_scanner().BLOCKING_RE
+    text = read(DISCIPLINE_DOC)
+    hits = []
+    for lineno, line in enumerate(text.splitlines(), 1):
+        for m in blocking_re.finditer(line):
+            hits.append(f"L{lineno}: {m.group(0)!r}")
+    assert not hits, (
+        "discipline doc must not trip any BLOCKING_PATTERNS literal "
+        f"(integer headroom on the gate budget is 0); hits: {hits}"
+    )
+
+
+def test_doc_c3_scanner_reports_no_gate_in_this_doc():
+    """The doc lives under shared/ (in SCAN_DIRS) and matches no governance path."""
+    scanner = _load_scanner()
+    rel = DISCIPLINE_DOC.relative_to(ROOT)
+    assert not scanner.GOVERNANCE_RE.search(rel.as_posix()), (
+        "unexpected: this doc now matches a governance path pattern, "
+        "which would silently exempt its hits from the budget"
+    )
+
+
+# --- doc C-4: reference, not restate ---
+
+
+def test_doc_c4_does_not_restate_confirmation_gates_tables():
+    body = read(DISCIPLINE_DOC)
+    gates = read(GATES_OWNER)
+    # The governance-kept table header and the destructive-list bullets are the
+    # two enumerations that must never be copied.
+    header = "| 门控 | 所在面 | 保留理由 |"
+    assert header in gates, "fixture assumption broke: header not in the owner doc"
+    assert header not in body, "governance-kept classification table restated"
+    for bullet in (
+        "- 删除文件或数据(delete / 清空存储)",
+        "- 移动/归档既有工件(move / archive / restructure)",
+        "- 覆盖用户既有内容",
+    ):
+        assert bullet not in body, f"destructive list restated: {bullet!r}"
+    assert "shared/guidelines/confirmation-gates.md" in body, (
+        "the destructive criteria must be reached by path reference"
+    )
+
+
+def test_doc_c4_does_not_restate_seed_rule_or_situation_table():
+    body = read(DISCIPLINE_DOC)
+    # Situation/rule identifier rows belong to the seed file + data model only.
+    assert not re.search(r"(?m)^\|\s*s[0-9]{2}\s*\|", body), (
+        "named-situation table restated (situation rows `| sNN |` must not appear)"
+    )
+    assert not re.search(r"\br-0[0-9]{2}\b", body), (
+        "seed rule ids restated; the doc references the seed by path only"
+    )
+    assert "templates/proactive-trigger-seed.json" in body, (
+        "the seed file must be named as the owner of the rule/situation data"
+    )
+
+
+def test_doc_c4_does_not_restate_engine_envelope_keys():
+    body = read(DISCIPLINE_DOC)
+    for key in (
+        "semanticJudgmentPending",
+        "workspaceRoot",
+        "generatedAt",
+        "semanticChecksPending",
+    ):
+        assert key not in body, f"engine envelope key restated: {key!r}"
+    assert "contracts/trigger-engine.md" in body, (
+        "envelope/CLI detail must be reached by reference to the engine contract"
+    )
+
+
+# --- doc C-5: the escalation ladder is a well-formed P1-P5 table ---
+
+
+def test_doc_c5_escalation_table_p1_to_p5_complete():
+    sec = _doc_section(read(DISCIPLINE_DOC), "Evidence Budget & Escalation")
+    for pid in ("P1", "P2", "P3", "P4", "P5"):
+        assert re.search(rf"(?m)^\|\s*\**{pid}\**\s*\|", sec), (
+            f"escalation criteria row {pid} missing from the P1-P5 table"
+        )
+    rows = [l for l in sec.splitlines() if re.match(r"^\|\s*\**P[1-5]\**\s*\|", l)]
+    assert len(rows) == 5, f"P1-P5 table must have exactly 5 rows, got {len(rows)}"
+    for row in rows:
+        cells = [c.strip() for c in row.strip().strip("|").split("|")]
+        assert len(cells) >= 2 and all(cells[:2]), (
+            f"each escalation row needs a condition and a probe target: {row!r}"
+        )
+
+
+# --- doc C-6: project neutral ---
+
+
+def test_doc_c6_project_neutral():
+    low = read(DISCIPLINE_DOC).lower()
+    for token in DOC_FORBIDDEN:
+        assert token.lower() not in low, f"project-specific token {token!r} leaked"
+
+
+# --- doc C-7: the reverse pointer ---
+#
+# The template -> doc direction is owned by test_c1_heading_and_pointer_on_both_
+# surfaces above; this asserts the complementary doc -> template direction, so the
+# two do not duplicate a fact. The former first assertion of this test ("either
+# the doc never mentions the Documentation Map, or it also says 'not the only' /
+# '唯一'") is gone: a single common word satisfied it, so it passed no matter what.
+
+
+def test_doc_c7_names_the_template_section_that_carries_its_pointer():
+    body = read(DISCIPLINE_DOC)
+    # The doc must state how it is reached: a pointer from the instructions
+    # template's own `## ` section.
+    assert DOC_LINK in body or "instructions-template.md" in body, (
+        "the doc must name the pointer surface that makes it reachable"
+    )
+    assert "`## Proactive Flow Trigger`" in body or "## Proactive Flow Trigger" in body, (
+        "the doc must name the template section that carries its pointer"
+    )

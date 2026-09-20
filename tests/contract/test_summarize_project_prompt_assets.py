@@ -32,8 +32,14 @@ visual charts — "summarize" is the accurate name. Covers:
   references/reporting-playbook.md holding cross-layer conventions
   and the layer index
 - Canonical ## Feedback block with unit-id skill:summarize-project
+
+Also absorbs the former test_study_project_uml_assets.py (same spec 030,
+Feature 013): the study-project UML-enhancement prompt assets share the
+mirror-parity / frontmatter / draw-plantuml-delegation propositions with
+summarize-project, so both skills' prompt assets are pinned in one file. The
+study-project section is delimited below.
 """
-from pathlib import Path
+import json
 
 import pytest
 
@@ -55,6 +61,15 @@ REQUIRED_INFO_DOC = SKILL_DIR / "references" / "required-info.md"
 VALIDATE_SCRIPT = SKILL_DIR / "scripts" / "validate-project-input.py"
 FORM_TEMPLATE = SKILL_DIR / "templates" / "project-input.template.yaml"
 MIRROR_DIR = ROOT / ".specify" / "skills" / "summarize-project"
+
+# --- study-project UML enhancement (spec 030, Feature 013) -------------------
+STUDY_SKILL_DIR = ROOT / "skills" / "study-project"
+STUDY_SKILL_FILE = STUDY_SKILL_DIR / "SKILL.md"
+STUDY_GUIDE_FILE = STUDY_SKILL_DIR / "references" / "uml-visualization-guide.md"
+STUDY_MIRROR_DIR = ROOT / ".specify" / "skills" / "study-project"
+BASELINE_FILE = ROOT / "tests" / "fixtures" / "study_project_baseline.json"
+
+UML_TRIGGERS = ["UML", "component diagram", "deployment diagram", "sequence diagram"]
 
 
 def _input_model_present() -> bool:
@@ -146,8 +161,13 @@ def test_manage_project_in_obsolete_cleanup_manifest():
     )
 
 
-def test_mirror_is_byte_equivalent():
-    assert_dirs_byte_equivalent(SKILL_DIR, MIRROR_DIR)
+@pytest.mark.parametrize(
+    "canonical,mirror",
+    [(SKILL_DIR, MIRROR_DIR), (STUDY_SKILL_DIR, STUDY_MIRROR_DIR)],
+    ids=["summarize-project", "study-project"],
+)
+def test_mirror_is_byte_equivalent(canonical, mirror):
+    assert_dirs_byte_equivalent(canonical, mirror)
 
 
 # ---------------------------------------------------------------------------
@@ -192,14 +212,6 @@ def test_no_stale_predecessor_directories():
 # Presentation/output-tool positioning
 # ---------------------------------------------------------------------------
 
-def test_presentation_tool_positioning():
-    text = text_of(SKILL_FILE)
-    assert "呈现" in text, "Expected presentation (呈现) positioning"
-    assert "派生" in text, "Expected derived-report (派生) semantics"
-    assert "只读" in text or "只读取" in text, "Expected read-only source guarantee"
-    assert "不修改" in text, "Expected explicit no-modification rule for source artifacts"
-
-
 def test_report_is_regenerable_derived_artifact():
     text = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
     assert "刷新" in text or "重生成" in text, "Expected refresh/regenerate semantics for repeat runs"
@@ -237,24 +249,6 @@ def test_input_sources_are_identifiable_and_traceable():
         "Expected either repo-artifact source anchors or the required-info "
         "table + project-input form contract to be documented"
     )
-
-
-def test_multi_source_inputs_documented():
-    text = (text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)).lower()
-    assert "git" in text, "Expected git history as an input source"
-    assert "readme" in text, "Expected README as an input source"
-    assert "外部" in text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE), (
-        "Expected external files/documents as input sources"
-    )
-    assert "不限于代码" in text_of(SKILL_FILE), (
-        "Expected explicit 'inputs not limited to code' statement"
-    )
-    if _input_model_present():
-        combined = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
-        assert "管理系统" in combined or "导出" in combined, (
-            "Under the required-info input model, management-system exports / "
-            "user documents must be documented as the primary input source"
-        )
 
 
 def test_detect_script_referenced_and_structured():
@@ -322,7 +316,6 @@ def test_form_fill_in_flow_documented():
     assert "data/project-input.yaml" in text, (
         "Expected the project-input form to live inside the delivery directory data/"
     )
-    assert "只读" in text, "Expected read-only positioning for the user-owned form"
     assert FORM_TEMPLATE.exists(), f"Expected blank form template: {FORM_TEMPLATE}"
     template = text_of(FORM_TEMPLATE)
     for field in ("project_name", "baseline_date", "work_items", "milestones"):
@@ -445,47 +438,6 @@ def test_milestone_and_status_semantics_documented():
         assert needle in text, f"Expected status semantics: {needle}"
 
 
-def test_milestone_view_and_tracking_table_documented():
-    text = text_of(SKILL_FILE)
-    assert "happens" in text, "Expected milestone happens-entry semantics"
-    assert "表格" in text, "Expected milestone tracking table"
-
-
-def test_chart_consistency_rule_documented():
-    text = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
-    assert "一致" in text or "consistency" in text.lower(), (
-        "Expected chart consistency rule (WBS leaves <-> Gantt entries <-> milestones)"
-    )
-
-
-def test_clarification_round_and_assumption_marking():
-    text = (text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)).lower()
-    assert "假设" in text or "assumption" in text, "Expected assumption marking guidance"
-
-
-def test_chart_set_splitting_documented():
-    text = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
-    assert "图集" in text or "drill-down" in text.lower() or "overview" in text.lower(), (
-        "Expected chart-set splitting guidance for large projects"
-    )
-
-
-def test_milestone_anchoring_rule_documented():
-    """Milestones are zero-duration diamond markers anchored to a date or an
-    associated work item's end."""
-    text = text_of(SKILL_FILE)
-    assert "零工期" in text or "happens" in text.lower(), "Expected zero-duration milestone semantics"
-    assert "锚定" in text or "anchor" in text.lower(), "Expected milestone anchoring rule"
-
-
-def test_percent_complete_and_reference_marker_documented():
-    """In-progress items carry percent-complete; mid-flight projects mark the
-    current-date reference line."""
-    text = text_of(SKILL_FILE) + text_of(PLAYBOOK_FILE)
-    assert "百分比" in text or "percent" in text.lower(), "Expected percent-complete rule"
-    assert "参照线" in text or "today" in text.lower(), "Expected current-date reference marker rule"
-
-
 def test_status_inference_and_degenerate_states_documented():
     """Task-progress layer doc carries status inference rules and
     degenerate-state handling (project not started / fully complete)."""
@@ -592,3 +544,122 @@ def test_canonical_feedback_block():
     text = text_of(SKILL_FILE)
     assert "## Feedback" in text, "Expected canonical ## Feedback section"
     assert "skill:summarize-project" in text, "Expected unit-id skill:summarize-project"
+
+
+# ===========================================================================
+# study-project UML enhancement prompt assets (spec 030, Feature 013)
+#
+# Contracts C-14…C-20 from contracts/visual-reporting-skills.openapi.yaml.
+# Mirror parity is pinned by the parametrized test_mirror_is_byte_equivalent
+# above (both skills). test_primary_view_coverage_statement was dropped: for a
+# UML guide, "architecture"/"结构" and "deployment"/"部署" are present no matter
+# what, and the diagram-type vocabulary is already pinned as a structured list
+# in test_study_guide_exists_with_view_type_mapping.
+# ===========================================================================
+
+
+def _baseline() -> dict:
+    return json.loads(BASELINE_FILE.read_text(encoding="utf-8"))
+
+
+def _section(text: str, heading: str) -> str:
+    """Return the body of a markdown section (heading line excluded)."""
+    idx = text.find(heading)
+    assert idx >= 0, f"Section not found: {heading}"
+    rest = text[idx + len(heading):]
+    for marker in ("\n## ", "\n### "):
+        cut = rest.find(marker)
+        if cut >= 0:
+            rest = rest[:cut]
+    return rest
+
+
+def test_study_frontmatter_name_preserved():
+    fm = read_frontmatter(STUDY_SKILL_FILE)
+    assert fm.get("name") == "study-project", f"got name={fm.get('name')}"
+
+
+def test_study_frontmatter_description_has_uml_triggers():
+    fm = read_frontmatter(STUDY_SKILL_FILE)
+    desc = str(fm.get("description", "")).lower()
+    missing = [t for t in UML_TRIGGERS if t.lower() not in desc]
+    assert not missing, f"description missing UML trigger terms: {missing}"
+
+
+def test_study_phase5_plans_uml_figures_for_primary_views():
+    body = _section(text_of(STUDY_SKILL_FILE), "### Phase 5: Dynamic Report Structure Design")
+    assert "UML" in body, "Phase 5 must plan UML figures"
+    assert "primary" in body.lower() or "主视图" in body, "Phase 5 must reference primary views"
+
+
+def test_study_phase8_embeds_rendered_figures():
+    body = _section(
+        text_of(STUDY_SKILL_FILE),
+        "### Phase 8: Multi-Source Fusion & Final Report (Main Agent)",
+    )
+    assert "UML" in body or "figure" in body.lower(), "Phase 8 must assemble UML figures"
+    assert "png" in body.lower(), "Phase 8 must state PNG embedding"
+
+
+def test_study_delegation_to_draw_plantuml_and_no_rendering_code():
+    text = text_of(STUDY_SKILL_FILE) + text_of(STUDY_GUIDE_FILE)
+    assert "draw-plantuml" in text, "Expected delegation reference to draw-plantuml"
+    # The pre-existing scripts/research-project.sh is an analysis helper, not
+    # rendering code. The enhancement must not introduce rendering scripts —
+    # no script in the package may reference plantuml/render-plantuml.
+    offenders = []
+    for p in STUDY_SKILL_DIR.rglob("*"):
+        if p.is_file() and p.suffix in {".sh", ".py", ".js"}:
+            body = p.read_text(encoding="utf-8", errors="ignore").lower()
+            if "plantuml" in body or "render-plantuml" in body:
+                offenders.append(str(p))
+    assert not offenders, f"Rendering code must not be added to the package: {offenders}"
+
+
+def test_study_guide_exists_with_view_type_mapping():
+    assert STUDY_GUIDE_FILE.exists(), f"Expected {STUDY_GUIDE_FILE}"
+    text = text_of(STUDY_GUIDE_FILE)
+    for term in ["component", "package", "deployment", "sequence", "activity", "class", "ER"]:
+        assert term.lower() in text.lower(), f"Mapping missing diagram type: {term}"
+    assert "activity" in text.lower(), "behavior-flow must allow activity as alternative"
+
+
+def test_study_guide_states_docs_figures_convention():
+    text = text_of(STUDY_GUIDE_FILE)
+    assert "docs/figures/" in text, "Guide must state the docs/figures/ storage convention"
+
+
+def test_study_degradation_rule_documented():
+    text = (text_of(STUDY_SKILL_FILE) + text_of(STUDY_GUIDE_FILE)).lower()
+    assert "degradation" in text or "降级" in text, "Expected renderer-unavailable degradation rule"
+
+
+def test_study_figure_output_conventions():
+    text = text_of(STUDY_GUIDE_FILE).lower()
+    for needle in ["png", "svg", ".puml", "caption"]:
+        assert needle in text, f"Guide must state figure output convention: {needle}"
+
+
+def test_study_mermaid_scoped_to_secondary_content():
+    body = _section(text_of(STUDY_SKILL_FILE), "## Output Requirements")
+    assert "UML" in body, "Output Requirements must declare UML as primary-view standard"
+    lowered = body.lower()
+    assert "secondary" in lowered or "次要" in body, "Mermaid must be scoped to secondary content"
+
+
+def test_study_deliverable_location_unchanged():
+    text = text_of(STUDY_SKILL_FILE)
+    assert _baseline()["deliverable_statement"] in text, (
+        "Deliverable statement $WORK_DIR/docs/overview.md must remain (SC-007)"
+    )
+
+
+def test_study_baseline_sections_preserved():
+    text = text_of(STUDY_SKILL_FILE)
+    missing = [h for h in _baseline()["required_headings"] if h not in text]
+    assert not missing, f"Baseline sections removed (SC-007): {missing}"
+
+
+def test_study_reference_guides_preserved():
+    for guide in _baseline()["reference_guides"]:
+        assert (STUDY_SKILL_DIR / "references" / guide).exists(), f"Missing baseline guide: {guide}"

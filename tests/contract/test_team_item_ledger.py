@@ -12,6 +12,7 @@ grammar. Two layers, per Constitution Principle VII:
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
 import subprocess
@@ -28,20 +29,32 @@ MAPPING_MIRROR = REPO_ROOT / ".specify/skills/create-team/references/summary-map
 SUMMARIZE_SCRIPTS = REPO_ROOT / "skills/summarize-project/scripts"
 PROJECT_DB = SUMMARIZE_SCRIPTS / "project-db.py"
 
-# LC-4 grammar
-EXPLICIT_ITEM_ID = re.compile(r"^TI-[0-9]{4}$")
+GENERATOR = REPO_ROOT / "skills/create-team/scripts/build-summary-input.py"
+
+
+def _load_generator():
+    """Load the real generator module (hyphenated filename → importlib).
+
+    LC-2 (fold), LC-5 (DDL grammar) and FR-027 (inferred-id hashing) are owned
+    by the generator; the behavioural tests below assert against the real
+    functions rather than a local reimplementation, so they grade product code.
+    """
+    spec = importlib.util.spec_from_file_location("bsi_ledger", GENERATOR)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["bsi_ledger"] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+bsi = _load_generator()
+
+# LC-4 — the documented inferred-id form. The generator hashes inferred ids into
+# `TIX-<8hex>` (bsi.inferred_item_id); explicit ids carry no TI-nnnn regex in
+# product code — they are constrained only by the upstream DDL grammar
+# (bsi.DDL_IDENTIFIER), enforced by project-db.py with exit 3.
 INFERRED_ITEM_ID = re.compile(r"^TIX-[0-9a-f]{8}$")
-# LC-5 — the upstream DDL identifier constraint
-DDL_IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.\-]*$")
 
-LEDGER_STATES = {"completed", "in-progress", "delayed", "not-started", "unknown"}
 REQUIRED_KEYS = {"item_id", "title", "phase_ref", "state", "provenance", "ts", "identity"}
-
-# LC-3 — provenance that is not tracked in version control
-INADMISSIBLE_PREFIXES = (
-    ".specify/teams/.work/",
-    ".specify/agents/execution/logs/",
-)
 
 
 pytestmark = pytest.mark.contract
@@ -82,96 +95,23 @@ def test_identifier_grammar_is_documented(path: Path) -> None:
 
 
 # --------------------------------------------------------------------------
-# Line-level validation of ledger rows (LC-3, LC-4, LC-5, LC-7)
+# Behavioural: identifier hashing enforced by the real generator (LC-4, LC-5,
+# FR-027). The former local `validate_ledger_line` reimplementation and its
+# self-grading unit tests were removed: the DDL grammar is enforced upstream by
+# project-db.py (exit 3 — see the loader tests below), the inferred-id hash by
+# bsi.inferred_item_id, and provenance/state admissibility by the generator
+# (pinned in test_summary_writeset.py / test_summary_form_generator.py).
 # --------------------------------------------------------------------------
 
 
-def validate_ledger_line(row: dict) -> list[str]:
-    """Return a list of contract violations for one ledger row."""
-    problems: list[str] = []
-
-    missing = REQUIRED_KEYS - row.keys()
-    if missing:
-        problems.append(f"missing required keys: {sorted(missing)}")
-        return problems
-
-    identity = row["identity"]
-    if identity not in {"explicit", "inferred"}:
-        problems.append(f"LC-4: identity must be explicit|inferred, got {identity!r}")
-    else:
-        pattern = EXPLICIT_ITEM_ID if identity == "explicit" else INFERRED_ITEM_ID
-        if not pattern.match(row["item_id"]):
-            problems.append(
-                f"LC-4: item_id {row['item_id']!r} does not match {pattern.pattern} "
-                f"for identity={identity}"
-            )
-
-    if not DDL_IDENTIFIER.match(row["item_id"]):
-        problems.append(f"LC-5: item_id {row['item_id']!r} violates the DDL grammar")
-
-    if row["state"] not in LEDGER_STATES:
-        problems.append(f"LC-7: state {row['state']!r} outside {sorted(LEDGER_STATES)}")
-
-    provenance = row["provenance"]
-    if provenance.startswith(INADMISSIBLE_PREFIXES) or provenance.startswith("/"):
-        problems.append(f"LC-3: provenance {provenance!r} is not a tracked path")
-
-    return problems
-
-
-def test_validator_accepts_a_conforming_row() -> None:
-    row = {
-        "item_id": "TI-0007",
-        "title": "P7 sync-mirrors 单入口",
-        "phase_ref": "PH-0002",
-        "state": "completed",
-        "provenance": ".specify/teams/demo/runs/20260730T094500Z-report.md#deliverables",
-        "ts": "2026-07-30T09:45:00Z",
-        "identity": "explicit",
-        "maturity_at_event": "L1",
-    }
-    assert validate_ledger_line(row) == []
-
-
-@pytest.mark.parametrize(
-    "mutation,expected_tag",
-    [
-        ({"item_id": "TI-7"}, "LC-4"),
-        ({"item_id": "改进点 7", "identity": "explicit"}, "LC-4"),
-        ({"identity": "inferred"}, "LC-4"),
-        ({"state": "done"}, "LC-7"),
-        ({"provenance": ".specify/teams/.work/demo/parallel-result-a.md"}, "LC-3"),
-        ({"provenance": ".specify/agents/execution/logs/a.live.log"}, "LC-3"),
-        ({"provenance": "/tmp/spec-kit-dispatch/a.status"}, "LC-3"),
-    ],
-)
-def test_validator_rejects_violations(mutation: dict, expected_tag: str) -> None:
-    row = {
-        "item_id": "TI-0007",
-        "title": "demo",
-        "phase_ref": "PH-0001",
-        "state": "completed",
-        "provenance": ".specify/teams/demo/runs/r.md",
-        "ts": "2026-07-30T09:45:00Z",
-        "identity": "explicit",
-    }
-    row.update(mutation)
-    problems = validate_ledger_line(row)
-    assert problems, f"expected a {expected_tag} violation for {mutation}"
-    assert any(expected_tag in p for p in problems), problems
-
-
 def test_inferred_identifier_is_a_truncated_hash_not_a_title() -> None:
-    """FR-027 / LC-5: derived identity must be hashed, because a CJK title is
-    rejected by the upstream DDL (measured — see the loader test below)."""
-    import hashlib
-
+    """FR-027 / LC-5: the real generator hashes derived identity, because a CJK
+    title is rejected by the upstream DDL (measured — see the loader test below)."""
     title, phase = "洞察台账条目", "PH-0001"
-    digest = hashlib.sha256(f"{title}\x00{phase}".encode()).hexdigest()[:8]
-    item_id = f"TIX-{digest}"
-    assert INFERRED_ITEM_ID.match(item_id)
-    assert DDL_IDENTIFIER.match(item_id)
-    assert not DDL_IDENTIFIER.match(title), "a CJK title must not be usable as an id"
+    item_id = bsi.inferred_item_id(title, phase)
+    assert INFERRED_ITEM_ID.match(item_id), item_id
+    assert bsi.DDL_IDENTIFIER.match(item_id), item_id
+    assert not bsi.DDL_IDENTIFIER.match(title), "a CJK title must not be usable as an id"
 
 
 # --------------------------------------------------------------------------
@@ -293,7 +233,7 @@ sources:
 
 
 def test_ledger_fold_takes_the_last_event_per_item(tmp_path: Path) -> None:
-    """LC-2: current state is the last event for an item_id, ordered by ts."""
+    """LC-2: the real generator's fold keeps the last event per item_id, by ts."""
     lines = [
         {"item_id": "TI-0001", "title": "a", "phase_ref": "PH-0001", "state": "not-started",
          "provenance": ".specify/teams/d/runs/r1.md", "ts": "2026-07-01T00:00:00Z",
@@ -305,14 +245,15 @@ def test_ledger_fold_takes_the_last_event_per_item(tmp_path: Path) -> None:
          "provenance": ".specify/teams/d/runs/r3.md", "ts": "2026-07-03T00:00:00Z",
          "identity": "explicit"},
     ]
-    ledger = tmp_path / "items.jsonl"
-    ledger.write_text("\n".join(json.dumps(r) for r in lines) + "\n", encoding="utf-8")
+    (tmp_path / "items.jsonl").write_text(
+        "\n".join(json.dumps(r) for r in lines) + "\n", encoding="utf-8"
+    )
 
-    rows = [json.loads(line) for line in ledger.read_text(encoding="utf-8").splitlines()]
-    folded: dict[str, dict] = {}
-    for row in sorted(rows, key=lambda r: r["ts"]):
-        folded[row["item_id"]] = row
+    team = bsi.Team(tmp_path, {"slug": "d"})
+    gaps: list[str] = []
+    folded = bsi.fold_ledger(team, gaps)
 
+    assert gaps == [], gaps
     assert len(folded) == 1
-    assert folded["TI-0001"]["state"] == "completed"
-    assert all(validate_ledger_line(r) == [] for r in rows)
+    assert folded[0]["item_id"] == "TI-0001"
+    assert folded[0]["state"] == "completed"

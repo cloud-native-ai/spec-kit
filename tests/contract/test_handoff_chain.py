@@ -1,4 +1,14 @@
-"""Contract tests: workflow handoff chain between role-based agent templates."""
+"""Contract tests: workflow handoff chain between role-based agent templates.
+
+``test_role_templates.py`` pins that the seven role templates *have* a
+``## Upstream (Inputs)`` and a ``## Downstream (Outputs)`` section. What this file
+pins is the chain itself: those sections are non-empty, and every declared edge
+names the role it hands off to. A template edit that drops an edge silently breaks
+the workflow, and there is no runtime to exercise — hence the structural test.
+
+Both blocks are table-driven over one slug list and one edge list; adding a role or
+an edge is a one-line data change, not a new hand-written test function.
+"""
 
 import pytest
 from pathlib import Path
@@ -15,98 +25,64 @@ ROLE_SLUGS = [
     "knowledge-manager",
 ]
 
+UPSTREAM = "## Upstream (Inputs)"
+DOWNSTREAM = "## Downstream (Outputs)"
+SECTIONS = {"up": UPSTREAM, "down": DOWNSTREAM}
+
+# The directed edges of the handoff DAG: (source slug, direction, role the section
+# must name). Mirrors the bullet lists the templates themselves carry.
+HANDOFF_EDGES = [
+    ("requirements-analyst", "down", "System Designer"),
+    ("system-designer", "up", "Requirements Analyst"),
+    ("system-designer", "down", "Module Designer"),
+    ("system-designer", "down", "QA Engineer"),
+    ("module-designer", "up", "System Designer"),
+    ("module-designer", "down", "Test Engineer"),
+    ("test-engineer", "up", "Module Designer"),
+    # feedback loop: test results flow back to the module designer
+    ("test-engineer", "down", "Module Designer"),
+    ("test-engineer", "down", "QA Engineer"),
+    ("qa-engineer", "up", "System Designer"),
+    ("qa-engineer", "up", "Test Engineer"),
+    # gap feedback: systemic quality issues flow back to the requirements analyst
+    ("qa-engineer", "down", "Requirements Analyst"),
+]
+
 
 def _read_template(slug):
     return (TEMPLATES_DIR / f"agent-capacity-{slug}-template.md").read_text()
 
 
-@pytest.mark.contract
-class TestUpstreamDownstreamSections:
-    """T025: Verify each role template has non-empty upstream/downstream sections."""
+def _section(slug, heading):
+    """Return ``heading``'s slice, bounded by the next ``## `` heading.
 
-    @pytest.mark.parametrize("slug", ROLE_SLUGS)
-    def test_upstream_section_non_empty(self, slug):
-        content = _read_template(slug)
-        idx = content.index("## Upstream (Inputs)")
-        next_section = content.index("## ", idx + 1)
-        section_body = content[idx:next_section].strip()
-        lines = [l for l in section_body.split("\n")[1:] if l.strip()]
-        assert len(lines) > 0, f"{slug}: Upstream section is empty"
-
-    @pytest.mark.parametrize("slug", ROLE_SLUGS)
-    def test_downstream_section_non_empty(self, slug):
-        content = _read_template(slug)
-        idx = content.index("## Downstream (Outputs)")
-        next_section = content.index("## ", idx + 1)
-        section_body = content[idx:next_section].strip()
-        lines = [l for l in section_body.split("\n")[1:] if l.strip()]
-        assert len(lines) > 0, f"{slug}: Downstream section is empty"
+    Bounded on both sides so a renamed heading cannot collapse the slice to the
+    whole file (which would make every membership check pass for nothing).
+    """
+    content = _read_template(slug)
+    idx = content.index(heading)
+    next_section = content.index("## ", idx + 1)
+    return content[idx:next_section]
 
 
 @pytest.mark.contract
-class TestHandoffChainCompleteness:
-    """T026: Verify the handoff chain references are complete and correct."""
+class TestHandoffChain:
+    """T025 + T026: each role template declares a non-empty, correctly-wired chain."""
 
-    def test_requirements_analyst_downstream_mentions_system_designer(self):
-        content = _read_template("requirements-analyst")
-        downstream = content[content.index("## Downstream (Outputs)"):]
-        assert "System Designer" in downstream
+    @pytest.mark.parametrize("heading", [UPSTREAM, DOWNSTREAM])
+    @pytest.mark.parametrize("slug", ROLE_SLUGS)
+    def test_section_non_empty(self, slug, heading):
+        body = _section(slug, heading)
+        lines = [line for line in body.split("\n")[1:] if line.strip()]
+        assert len(lines) > 0, f"{slug}: {heading} section is empty"
 
-    def test_system_designer_upstream_mentions_requirements_analyst(self):
-        content = _read_template("system-designer")
-        upstream = content[content.index("## Upstream (Inputs)"):content.index("## Downstream (Outputs)")]
-        assert "Requirements Analyst" in upstream
-
-    def test_system_designer_downstream_mentions_module_designer(self):
-        content = _read_template("system-designer")
-        downstream = content[content.index("## Downstream (Outputs)"):]
-        assert "Module Designer" in downstream
-
-    def test_system_designer_downstream_mentions_qa_engineer(self):
-        content = _read_template("system-designer")
-        downstream = content[content.index("## Downstream (Outputs)"):]
-        assert "QA Engineer" in downstream
-
-    def test_module_designer_upstream_mentions_system_designer(self):
-        content = _read_template("module-designer")
-        upstream = content[content.index("## Upstream (Inputs)"):content.index("## Downstream (Outputs)")]
-        assert "System Designer" in upstream
-
-    def test_module_designer_downstream_mentions_test_engineer(self):
-        content = _read_template("module-designer")
-        downstream = content[content.index("## Downstream (Outputs)"):]
-        assert "Test Engineer" in downstream
-
-    def test_test_engineer_upstream_mentions_module_designer(self):
-        content = _read_template("test-engineer")
-        upstream = content[content.index("## Upstream (Inputs)"):content.index("## Downstream (Outputs)")]
-        assert "Module Designer" in upstream
-
-    def test_test_engineer_downstream_mentions_module_designer_feedback(self):
-        content = _read_template("test-engineer")
-        downstream = content[content.index("## Downstream (Outputs)"):]
-        assert "Module Designer" in downstream
-
-    def test_test_engineer_downstream_mentions_qa_engineer(self):
-        content = _read_template("test-engineer")
-        downstream = content[content.index("## Downstream (Outputs)"):]
-        assert "QA Engineer" in downstream
-
-    def test_qa_engineer_upstream_mentions_system_designer(self):
-        content = _read_template("qa-engineer")
-        upstream = content[content.index("## Upstream (Inputs)"):content.index("## Downstream (Outputs)")]
-        assert "System Designer" in upstream
-
-    def test_qa_engineer_upstream_mentions_test_engineer(self):
-        content = _read_template("qa-engineer")
-        upstream = content[content.index("## Upstream (Inputs)"):content.index("## Downstream (Outputs)")]
-        assert "Test Engineer" in upstream
-
-    def test_qa_engineer_downstream_mentions_requirements_analyst(self):
-        content = _read_template("qa-engineer")
-        downstream = content[content.index("## Downstream (Outputs)"):]
-        assert "Requirements Analyst" in downstream
-
-    def test_knowledge_manager_references_all_roles(self):
-        content = _read_template("knowledge-manager")
-        assert "All roles" in content or "all roles" in content
+    @pytest.mark.parametrize(
+        "slug,direction,role",
+        HANDOFF_EDGES,
+        ids=[f"{s}-{d}-{r.replace(' ', '')}" for s, d, r in HANDOFF_EDGES],
+    )
+    def test_edge_names_the_role_it_hands_off_to(self, slug, direction, role):
+        heading = SECTIONS[direction]
+        assert role in _section(slug, heading), (
+            f"{slug}: {heading} no longer names {role} — the handoff chain lost an edge"
+        )

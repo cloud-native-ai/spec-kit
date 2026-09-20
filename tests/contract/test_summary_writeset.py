@@ -7,8 +7,10 @@ source of truth.
 
 from __future__ import annotations
 
+import importlib.util
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -21,39 +23,31 @@ WRITESET_CONTRACT = SPEC_DIR / "contracts/summary-writeset.contract.md"
 MAPPING_CANONICAL = REPO_ROOT / "skills/create-team/references/summary-mapping.md"
 MAPPING_MIRROR = REPO_ROOT / ".specify/skills/create-team/references/summary-mapping.md"
 
+GENERATOR = REPO_ROOT / "skills/create-team/scripts/build-summary-input.py"
+
+
+def _load_generator():
+    """Load the real generator module (hyphenated filename → importlib).
+
+    The provenance-admissibility rule (WS-5/6/7) is owned by the generator; the
+    tests below assert against `bsi.is_admissible_provenance` rather than a
+    local reimplementation, so they grade product code, not the test's own copy.
+    """
+    spec = importlib.util.spec_from_file_location("bsi_writeset", GENERATOR)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["bsi_writeset"] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+bsi = _load_generator()
+
 pytestmark = pytest.mark.contract
 
 
 # --------------------------------------------------------------------------
-# WS-5 / WS-6 / WS-7 — provenance admissibility
+# WS-5 / WS-6 / WS-7 — provenance admissibility (real generator function)
 # --------------------------------------------------------------------------
-
-INADMISSIBLE_DIR_PREFIXES = (
-    ".specify/teams/.work/",
-    ".specify/agents/execution/logs/",
-)
-
-ADMISSIBLE_EXECUTION_PREFIXES = (
-    ".specify/agents/execution/configs/",
-    ".specify/agents/execution/scripts/",
-)
-
-
-def is_admissible_provenance(path: str) -> bool:
-    """WS-5: provenance must be a repository-relative tracked path.
-
-    WS-6 lists the inadmissible locations exhaustively; WS-7 carves the tracked
-    execution-layer subdirectories back in.
-    """
-    if path.startswith(ADMISSIBLE_EXECUTION_PREFIXES):
-        return True
-    if path.startswith(INADMISSIBLE_DIR_PREFIXES):
-        return False
-    if path.startswith("/") or path.startswith("~"):
-        return False
-    if path.startswith("../"):
-        return False
-    return True
 
 
 @pytest.mark.parametrize(
@@ -69,7 +63,7 @@ def is_admissible_provenance(path: str) -> bool:
     ],
 )
 def test_tracked_paths_are_admissible(path: str) -> None:
-    assert is_admissible_provenance(path), path
+    assert bsi.is_admissible_provenance(path), path
 
 
 @pytest.mark.parametrize(
@@ -86,7 +80,7 @@ def test_tracked_paths_are_admissible(path: str) -> None:
     ],
 )
 def test_untracked_or_outside_paths_are_inadmissible(path: str) -> None:
-    assert not is_admissible_provenance(path), path
+    assert not bsi.is_admissible_provenance(path), path
 
 
 def test_inadmissible_locations_are_actually_git_ignored() -> None:
@@ -197,10 +191,6 @@ def test_annotation_preservation_is_delegated_not_reimplemented() -> None:
 # --------------------------------------------------------------------------
 
 import json  # noqa: E402
-import subprocess  # noqa: E402
-import sys  # noqa: E402
-
-GENERATOR = REPO_ROOT / "skills/create-team/scripts/build-summary-input.py"
 
 requires_generator = pytest.mark.skipif(
     not GENERATOR.is_file(), reason="generator not implemented"
@@ -340,7 +330,7 @@ def test_every_emitted_value_carries_resolvable_tracked_provenance(ws_sandbox: P
     for row in doc["work_items"]:
         source = row.get("source", "")
         assert source, f"work item without provenance: {row}"
-        assert is_admissible_provenance(source), f"inadmissible provenance emitted: {source}"
+        assert bsi.is_admissible_provenance(source), f"inadmissible provenance emitted: {source}"
         assert (ws_sandbox / source.split("#")[0]).exists(), f"provenance does not resolve: {source}"
     for row in doc.get("milestones") or []:
         assert row.get("source"), f"milestone without provenance: {row}"

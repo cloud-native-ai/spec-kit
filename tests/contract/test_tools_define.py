@@ -1,5 +1,11 @@
 """Contract tests for tool definition creation (defineNewTool), tool type validation,
-and behavioral rules format — T011, T012, T013."""
+and behavioral rules format — T011, T012, T013.
+
+Also carries the discovery-draft → record conversion (T015): a draft is a *define*
+entry point, so its one substantive proposition (``DiscoveryDraft.to_record()``) lives
+here rather than in a separate file. What a draft must NOT do — invent a ``Verified``
+status or a user confirmation — is asserted by the ``status == "Draft"`` line below.
+"""
 
 from tests.script_api import tools_utils
 
@@ -146,3 +152,20 @@ def test_define_tool_conflict_same_name():
         tools_utils.save_record(tools_dir, record2)
         loaded = tools_utils.load_record(tools_dir, "deploy")
         assert loaded is not None
+
+
+def test_discovery_draft_converts_to_record_with_discovery_origin():
+    """T015: a discovery draft becomes an unconfirmed record, never a verified one."""
+    draft = DiscoveryDraft(
+        proposed_name="jq",
+        proposed_type="system-binary",
+        proposed_source="/usr/bin/jq",
+        proposed_description="JSON processor",
+    )
+    record = draft.to_record()
+    assert record.name == "jq"
+    assert record.tool_type == "system-binary"
+    assert record.source_identifier == "/usr/bin/jq"
+    assert record.description == "JSON processor"
+    assert record.discovery_origin == "discovery-assisted"
+    assert record.status == "Draft"

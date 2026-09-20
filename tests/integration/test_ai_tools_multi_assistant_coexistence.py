@@ -1,7 +1,12 @@
 """Integration tests for multi-assistant coexistence in one workspace.
 
-Validates that three or more AI tools can coexist in one project without
-interfering with each other's assets (US3).
+Validates that every official AI tool can coexist in one project without
+interfering with the others' assets (US3).
+
+One test, driven off ``_OFFICIAL_ASSISTANT_KEYS``: a hand-picked three-assistant
+subset of it asserted nothing the full set does not, and the per-root isolation it
+also checked is asserted strictly (full file-set equality) by
+``test_ai_tools_refresh_isolation.py``.
 """
 
 from pathlib import Path
@@ -10,42 +15,10 @@ import pytest
 
 pytestmark = pytest.mark.integration
 
-_THREE_ASSISTANTS = ["claude", "hermes", "opencode"]
-
 
 class TestMultiAssistantCoexistence:
-    def test_three_assistants_can_coexist(self, monkeypatch, tmp_path: Path):
-        """Three assistants should be configurable in one workspace."""
-        resource_root = tmp_path / "resource"
-        from fixtures.ai_tools_support import make_resource_with_skills
-
-        make_resource_with_skills(resource_root)
-        monkeypatch.setattr("specify_cli.get_resource_path", lambda: resource_root)
-
-        from specify_cli import copy_local_templates
-
-        project = tmp_path / "multi"
-        copy_local_templates(project, "copilot", "sh")
-
-        # Add second
-        copy_local_templates(project, "claude", "sh", is_current_dir=True)
-        # Add third
-        copy_local_templates(project, "opencode", "sh", is_current_dir=True)
-
-        # All three assistant roots must exist
-        assert (project / ".github").is_dir(), ".github/ missing"
-        assert (project / ".claude").is_dir(), ".claude/ missing"
-        assert (project / ".opencode").is_dir(), ".opencode/ missing"
-
-        # .specify must exist with full core
-        assert (project / ".specify").is_dir()
-        assert (project / ".specify" / "memory").is_dir()
-        assert (project / ".specify" / "scripts").is_dir()
-        assert (project / ".specify" / "skills").is_dir()
-        assert (project / ".specify" / "templates").is_dir()
-
-    def test_six_assistants_can_coexist(self, monkeypatch, tmp_path: Path):
-        """All six official assistants should coexist in one workspace."""
+    def test_all_official_assistants_can_coexist(self, monkeypatch, tmp_path: Path):
+        """Every official assistant should coexist in one workspace."""
         resource_root = tmp_path / "resource"
         from fixtures.ai_tools_support import make_resource_with_skills
 
@@ -74,43 +47,9 @@ class TestMultiAssistantCoexistence:
             root_dir = project / profile[assistant]
             assert root_dir.is_dir(), f"{assistant} root {profile[assistant]} missing"
 
-    def test_adding_assistant_does_not_affect_other_roots(
-        self, monkeypatch, tmp_path: Path
-    ):
-        """Adding a new assistant must not modify other assistant roots."""
-        resource_root = tmp_path / "resource"
-        from fixtures.ai_tools_support import make_resource_with_skills
-
-        make_resource_with_skills(resource_root)
-        monkeypatch.setattr("specify_cli.get_resource_path", lambda: resource_root)
-
-        from specify_cli import copy_local_templates
-
-        project = tmp_path / "isolated"
-        copy_local_templates(project, "copilot", "sh")
-        copy_local_templates(project, "claude", "sh", is_current_dir=True)
-
-        # Snapshot claude root
-        claude_files_before = sorted(
-            str(p.relative_to(project))
-            for p in (project / ".claude").rglob("*")
-            if p.is_file()
-        )
-
-        # Add opencode
-        copy_local_templates(project, "opencode", "sh", is_current_dir=True)
-
-        claude_files_after = sorted(
-            str(p.relative_to(project))
-            for p in (project / ".claude").rglob("*")
-            if p.is_file()
-        )
-
-        # Claude files unchanged
-        for f in claude_files_before:
-            assert f in claude_files_after, f"Claude file {f} was removed"
-
-        # No new unexpected files in claude root
-        assert len(claude_files_before) == len(claude_files_after), (
-            f"Claude root changed: {len(claude_files_before)} -> {len(claude_files_after)}"
-        )
+        # Six inits into one workspace must leave the shared core complete —
+        # `templates/` included, which the per-assistant init tests do not assert
+        # on a fresh workspace.
+        assert (project / ".specify").is_dir()
+        for core in ("memory", "scripts", "skills", "templates"):
+            assert (project / ".specify" / core).is_dir(), f".specify/{core} missing"
