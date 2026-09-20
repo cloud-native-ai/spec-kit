@@ -6,6 +6,7 @@ structure, ## Feedback + ## Documentation steps.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -34,11 +35,20 @@ class TestFeedbackCommandTemplate:
     def test_template_exists(self):
         assert TEMPLATE.is_file(), "templates/commands/feedback.md missing"
 
-    def test_three_execution_modes_present(self):
+    def test_two_execution_paths_present(self):
         text = TEMPLATE.read_text(encoding="utf-8")
-        for needle in ("Mode 1", "Mode 2", "Mode 3",
+        for needle in ("Path A", "Path B",
                        "--action", "probes", "cleanup", "probe-inject"):
             assert needle in text, f"template missing: {needle}"
+
+    def test_mode_numbering_is_gone(self):
+        """The five input-keyed modes were replaced by an auto-selected route.
+        A leftover `### Mode N` heading would mean half the command still asks
+        the caller to pick a mode by keyword."""
+        text = TEMPLATE.read_text(encoding="utf-8")
+        leftovers = re.findall(r"(?m)^#{2,4} Mode \d", text)
+        assert not leftovers, f"mode-numbered headings survived: {leftovers}"
+        assert "five execution modes" not in text
 
     def test_feedback_and_documentation_steps(self):
         text = TEMPLATE.read_text(encoding="utf-8")
@@ -57,7 +67,12 @@ class TestFeedbackCommandTemplate:
             head = "\n".join(copy.read_text(encoding="utf-8").splitlines()[:5])
             assert "AUTO-GENERATED" in head, f"{copy} missing AUTO-GENERATED header"
 
-    def test_default_mode_is_probe_overview(self):
+    def test_default_with_no_arguments_is_the_routing_decision(self):
         text = TEMPLATE.read_text(encoding="utf-8")
         assert "no arguments" in text or "不带参数" in text, \
-            "template must state that Mode 1 is the no-argument default"
+            "template must state what an empty invocation does"
+        assert "Routing flow" in text, (
+            "an empty invocation must run the routing decision — the command "
+            "judges where the feedback points instead of defaulting to a "
+            "read-only overview the caller then has to act on"
+        )

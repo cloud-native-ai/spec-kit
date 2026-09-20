@@ -1370,8 +1370,9 @@ CLEANUP_LOG_NAME = "cleanup-log.md"
 
 
 def action_cleanup(args: argparse.Namespace) -> Dict[str, Any]:
-    """Post-package cleanup (req 041 Mode 2): remove entries that a package
-    already archived — the zip is the record; the active store converges.
+    """Post-package cleanup (req 041; /speckit.feedback Path B): remove entries
+    that a package already archived — the zip is the record; the active store
+    converges.
 
     Scope is strictly the packaged batch (engine-cli C-5): only entry files
     actually inside the named zip are removed, never un-packaged entries.
@@ -1536,8 +1537,9 @@ def action_migrate_legacy(args: argparse.Namespace) -> Dict[str, Any]:
 
 
 def action_probe_inject(args: argparse.Namespace) -> Dict[str, Any]:
-    """Mode 3 (req 041, engine-cli C-6): inject an external probe for a
-    host-project custom unit into the project-side registry."""
+    """/speckit.feedback § Probe Injection (req 041, engine-cli C-6): inject an
+    external probe for a client-project custom unit into the project-side
+    registry."""
     workspace_root = resolve_workspace_root(args.workspace_root)
     unit = ((getattr(args, "unit", None) or getattr(args, "unit_id", None) or "")).strip()
     if not _CUSTOM_UNIT_RE.match(unit):
@@ -1749,7 +1751,7 @@ def render_text(action: str, payload: Dict[str, Any]) -> str:
                             f"  - {o.get('object_id')}   ({o.get('unit')} @ "
                             f"{o.get('lifecycle_point')})")
                 else:
-                    lines.append("  - (0 objects — 尚无实例;外部类经模式三注入)")
+                    lines.append("  - (0 objects — 尚无实例;外部类经 /speckit.feedback § Probe Injection 注入)")
             lines.append("")
         return "\n".join(lines).rstrip()
     if action == "package":

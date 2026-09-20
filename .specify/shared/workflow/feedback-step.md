@@ -119,7 +119,7 @@ discipline named in the header pointer, which owns this wording rule; this secti
 its class-③ instance):
 
 1. **Package for manual delivery** — the user-facing path is `/speckit.feedback
-   package` (Mode 2 of the feedback command); when the user picks this choice, run:
+   package` (Path B of the feedback command); when the user picks this choice, run:
    ```bash
    python3 .specify/scripts/python/feedback-utils.py --action package
    ```
@@ -166,7 +166,7 @@ workaround applied. This is a read-only aid — it never gates execution.
   `.specify/shared/workflow/runtime-mode.md`. Commands (`/speckit.*`) only ever run
   inside a Spec Kit project, so the gate is a no-op for them.
 - **Skills**: `--unit-id "skill:<name>"`, `--unit-type skill`.
-- **External custom units** (host-project skills/agents/commands with an injected `ext-*` probe): `--unit-id custom:<owner>/<name>`, `--unit-type custom-unit`. Entries stay host-project-local (never packaged upstream) — see `/speckit.feedback` Mode 3. The section is the last
+- **External custom units** (host-project skills/agents/commands with an injected `ext-*` probe): `--unit-id custom:<owner>/<name>`, `--unit-type custom-unit`. Entries stay host-project-local (never packaged upstream) — see `/speckit.feedback` § Probe Injection. The section is the last
   workflow section of `SKILL.md`.
 - **Complex commands**: `--unit-id "/speckit.<command>"`, `--unit-type command`. Place the
   section next to `## Optional: Git Commit`, never mid-flow.

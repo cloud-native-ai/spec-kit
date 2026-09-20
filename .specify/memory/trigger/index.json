@@ -1,7 +1,7 @@
 {
   "store": ".specify/memory/trigger/",
   "schemaVersion": 1,
-  "updated": "2026-09-08T15:19:51Z",
+  "updated": "2026-09-20T04:13:23Z",
   "config": {
     "enabled": true,
     "threshold": 3,
@@ -502,8 +502,8 @@
       "ruleId": "r-010",
       "situationId": "s10",
       "flow": "/speckit.feedback",
-      "invocation": "/speckit.feedback introspect",
-      "rationale": "Introspect the accumulated feedback in this project before packaging it.",
+      "invocation": "/speckit.feedback",
+      "rationale": "Open feedback entries are awaiting introspection — the command judges where they point and routes them itself.",
       "confirmationClass": "reversible",
       "origin": "seed",
       "priority": 130,
@@ -527,7 +527,7 @@
         "file": "templates/commands/feedback.md",
         "anchorKind": "owning-section",
         "anchor": "Outline",
-        "quote": "| `introspect` | 5 — Introspect Feedback(自省) | Any client project |"
+        "quote": "Run § Introspection over the open `internal` entries"
       }
     },
     {

@@ -140,7 +140,7 @@ unit: custom:<owner>/<name>  # MUST 匹配 ^custom:[a-z0-9._/-]+$
 lifecycle_point: wrap-up
 ```
 
-- 注入路径:`/speckit.feedback` 模式三(引擎 `--action probe-inject`)。
+- 注入路径:`/speckit.feedback` § Probe Injection(引擎 `--action probe-inject`)。
 - 外部条目(`kind: external`)保留在宿主项目本地,**永不进入**框架上送打包路径
   (engine `--action package` 100% 排除,见 contracts/engine-cli.md C-4)。
 - 校验:`--action probes --validate` 覆盖本文件 Classes/Objects 与外部 probe 文件。
