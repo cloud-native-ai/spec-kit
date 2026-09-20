@@ -69,15 +69,27 @@ def test_no_skill_mentions_sdd_workflow():
 
 
 def test_skills_use_installed_absolute_shared_form():
-    """Sibling skills reference shared docs via the installed-absolute shared path."""
+    """Sibling skills reference shared docs via the installed-absolute shared path.
+
+    Scans every markdown file in a skill, not just SKILL.md: the references/ files ship
+    into `.specify/skills/<name>/` too, and a bare `shared/<type>/` path there is just as
+    unresolvable in a client project. Scanning only the top-level file left three of them
+    undetected while the test was red for an unrelated reason.
+    """
     import re
 
     offenders = []
+    scanned = 0
     bare = re.compile(r"(?<![\w./])shared/(" + "|".join(SHARED_TYPES) + r")/")
-    for f in _iter_files("skills/*/SKILL.md"):
+    for f in _iter_files("skills/**/*.md"):
+        scanned += 1
         text = f.read_text(encoding="utf-8")
         if bare.search(text):
             offenders.append(str(f.relative_to(ROOT)))
+    assert scanned > 100, (
+        f"only {scanned} skill markdown files scanned — the glob looks truncated, which "
+        f"would let an empty offender list pass without proving anything"
+    )
     assert not offenders, f"skills must use .specify/shared/<type>/ form: {offenders}"
 
 

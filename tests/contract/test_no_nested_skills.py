@@ -33,7 +33,20 @@ SKILL_ROOTS = ["skills", ".specify/skills"]
 
 # Vendored / generated trees may legitimately contain files named SKILL.md
 # (e.g. node_modules/playwright-core ships two). They are not skills.
-VENDOR_DIRS = {"node_modules", "__pycache__", ".git", ".venv"}
+VENDOR_DIRS = {"node_modules", "__pycache__", ".git", ".venv", ".migration-backups"}
+
+# Directories under a skills root that are not themselves skills. Excluding them from
+# VENDOR_DIRS is not enough: the enumeration walks every child directory, so
+# `.migration-backups` would be treated as a skill whose payload is the parked
+# `layout-*/SKILL.md` copies. create-new-skill.sh writes that directory on every legacy
+# migration, so a real client project hits this false positive too.
+NON_SKILL_DIRS = {".migration-backups"}
+
+
+def _skill_dirs(root: Path):
+    return sorted(
+        p for p in root.iterdir() if p.is_dir() and p.name not in NON_SKILL_DIRS
+    )
 
 
 def _nested_skill_files(skill_dir: Path):
@@ -58,7 +71,7 @@ class TestNoNestedSkills:
             pytest.skip(f"{root_name} not present")
 
         offenders = []
-        for skill_dir in sorted(p for p in root.iterdir() if p.is_dir()):
+        for skill_dir in _skill_dirs(root):
             offenders.extend(_nested_skill_files(skill_dir))
 
         assert not offenders, (
@@ -75,7 +88,7 @@ class TestNoNestedSkills:
         root = ROOT / "skills"
         missing = [
             d.name
-            for d in sorted(p for p in root.iterdir() if p.is_dir())
+            for d in _skill_dirs(root)
             if not (d / "SKILL.md").is_file()
         ]
         assert not missing, f"skill dirs without a root SKILL.md: {missing}"

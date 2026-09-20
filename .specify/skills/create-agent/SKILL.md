@@ -10,7 +10,7 @@ skill_id: "<SKILL:.specify/skills/create-agent/SKILL.md>"
 
 Author a **single agent artifact** for the Spec Kit agent system — a **capacity** template, a capacity-scoped **supervisor**, a **custom** `.agent.md`, or a **project-custom** agent. This skill is the single authoring engine invoked by `/speckit.agents` for single-agent work; the command gathers project context and delegates here rather than rendering templates inline. Multi-agent teams (organizing/running several agents) are out of scope — see `/speckit.team` and the `create-team` skill.
 
-> **Class → Instance**: a template here is an **abstract agent Class** — a `agent-capacity-<X>-template.md` with unfilled `{{PLACEHOLDERS}}`. Authoring **instantiates** that Class: `create-agent` fills the placeholders and writes a **concrete agent definition** into its layer's store under `.specify/agents/` (role Templates → `templates/`, responsibility-bound Instances → `instances/`; see § Layer Targeting). At runtime, `/speckit.agents run` spawns a **live instance (object)** from that definition — many instances from one definition, each independent. This skill operates at the Class/definition layer, never on running instances. In the canonical Agent taxonomy (`shared/definitions/agent-definitions.md`) these three layers are **Agent Template → Agent Instance → Agent Execution**; the Execution layer's dispatch modes are governed by `shared/definitions/subagent-definitions.md`.
+> **Class → Instance**: a template here is an **abstract agent Class** — a `agent-capacity-<X>-template.md` with unfilled `{{PLACEHOLDERS}}`. Authoring **instantiates** that Class: `create-agent` fills the placeholders and writes a **concrete agent definition** into its layer's store under `.specify/agents/` (role Templates → `templates/`, responsibility-bound Instances → `instances/`; see § Layer Targeting). At runtime, `/speckit.agents run` spawns a **live instance (object)** from that definition — many instances from one definition, each independent. This skill operates at the Class/definition layer, never on running instances. In the canonical Agent taxonomy (`.specify/shared/definitions/agent-definitions.md`) these three layers are **Agent Template → Agent Instance → Agent Execution**; the Execution layer's dispatch modes are governed by `.specify/shared/definitions/subagent-definitions.md`.
 
 > **Conceptual Model**: the multi-agent Role × Stage × Type + Team/Loop model is defined once in the team domain — see `skills/create-team/references/conceptual-model.md`. This skill authors the single **capacity** Classes that fill a team's Role seats.
 
@@ -20,7 +20,7 @@ Canonical template home: `skills/create-agent/templates/` (installed mirror: `.s
 
 ## Layer Targeting (mandatory, explicit)
 
-Every operation of this skill MUST declare which **agent layer** it operates on (taxonomy: `shared/definitions/agent-definitions.md`). Never infer the layer silently — if the request does not state it and the `kind` does not imply it unambiguously, ask the user before writing anything.
+Every operation of this skill MUST declare which **agent layer** it operates on (taxonomy: `.specify/shared/definitions/agent-definitions.md`). Never infer the layer silently — if the request does not state it and the `kind` does not imply it unambiguously, ask the user before writing anything.
 
 | Layer | Project directory | What lives there | Operated by |
 |-------|-------------------|------------------|-------------|
@@ -179,7 +179,7 @@ A project-custom agent MUST always carry both the `project:` frontmatter marker 
 
 ## Execution Config Capability
 
-Use this capability (`kind: execution-config`) to author the **execution-layer artifacts** for an agent — the durable dispatch configuration (and optional wrapper script) that turns an Agent Instance/Template into a repeatable **Agent Execution** (see `shared/definitions/subagent-definitions.md` for the three execution modes and the External Dispatch Visibility Contract).
+Use this capability (`kind: execution-config`) to author the **execution-layer artifacts** for an agent — the durable dispatch configuration (and optional wrapper script) that turns an Agent Instance/Template into a repeatable **Agent Execution** (see `.specify/shared/definitions/subagent-definitions.md` for the three execution modes and the External Dispatch Visibility Contract).
 
 ### Directory contract
 

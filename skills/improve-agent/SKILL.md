@@ -16,7 +16,7 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 
 The input is a description of the agent to improve and what went wrong or could be better. Parse:
 
-- **Layer (mandatory, explicit)**: which agent layer the improvement targets — `template` / `instance` / `execution` (taxonomy: `shared/definitions/agent-definitions.md`). Never infer the layer silently; if the request does not state it and the target identifier does not imply it unambiguously, ask the user before editing anything.
+- **Layer (mandatory, explicit)**: which agent layer the improvement targets — `template` / `instance` / `execution` (taxonomy: `.specify/shared/definitions/agent-definitions.md`). Never infer the layer silently; if the request does not state it and the target identifier does not imply it unambiguously, ask the user before editing anything.
 - **Target identifier**: Resolve to exactly one artifact of a supported kind (see § Target Classification):
   - `.specify/agents/templates/*.agent.md` (an installed role Template)
   - `skills/create-agent/templates/agent-capacity-*-template.md` (an abstract capacity Class)
@@ -36,7 +36,7 @@ Before the workflow, classify the target by **layer + kind** and route to the ma
 | template | capacity Class | `agent-capacity-*-template.md` | Workflow steps 1–6 (root-cause on the six mandatory sections) |
 | template | supervision snippet | `agent-supervision-delegation.md` | Workflow steps 3–5; WARN that changes affect every supervisor (single source) |
 | instance | custom / project-custom | `.specify/agents/instances/*.agent.md` | Workflow steps 1–6 against the generated file's own structure; keep the Template reference (`capacity-scope:`) intact — capability gaps route to the template layer instead |
-| execution | dispatch config / script | `.specify/agents/execution/{configs,scripts}/*` | Workflow steps 2–6 driven by log evidence; preserve the Visibility Contract (`shared/definitions/subagent-definitions.md`); logs themselves are read-only evidence, never a target |
+| execution | dispatch config / script | `.specify/agents/execution/{configs,scripts}/*` | Workflow steps 2–6 driven by log evidence; preserve the Visibility Contract (`.specify/shared/definitions/subagent-definitions.md`); logs themselves are read-only evidence, never a target |
 
 If the identifier matches multiple kinds or none, ask one clarifying question. A misbehaving **running** execution is out of scope — terminate/re-dispatch it; the durable fix lands in one of the three layers above.
 

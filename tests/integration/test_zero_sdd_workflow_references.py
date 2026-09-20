@@ -13,9 +13,12 @@ ROOT = Path(__file__).resolve().parents[2]
 SCAN_TREES = ["src", "scripts", "templates", "skills", "agents"]
 SCAN_FILES = ["pyproject.toml", "README.md"]
 
-# docs/ is scanned except history + the refactor proposal (legitimate historical/spec content).
-DOCS_EXCLUDE_DIRS = {"history"}
-DOCS_EXCLUDE_FILES = {"summary/03-sdd-workflow-refactor-proposal.md"}
+# docs/ is scanned except its dated-record zones (legitimate historical/spec content).
+# Matched against ANY path component, not just the first: these zones move when the docs
+# tree is reorganized (history went docs/history -> docs/reference/history, the proposal
+# went docs/summary -> docs/archive) and a parts[0] match silently stopped excluding them,
+# which is what turned this test red without any live reference appearing.
+DOCS_EXCLUDE_DIRS = {"history", "archive"}
 
 TEXT_SUFFIXES = {".md", ".py", ".sh", ".toml", ".txt", ".json"}
 TOKEN = "sdd-workflow"
@@ -58,16 +61,21 @@ def _scan_paths():
             if p.suffix not in TEXT_SUFFIXES or not p.is_file():
                 continue
             rel = p.relative_to(docs)
-            if rel.parts and rel.parts[0] in DOCS_EXCLUDE_DIRS:
-                continue
-            if rel.as_posix() in DOCS_EXCLUDE_FILES:
+            if DOCS_EXCLUDE_DIRS.intersection(rel.parts):
                 continue
             yield p
 
 
 def test_no_sdd_workflow_reference_in_source():
     offenders = []
-    for p in _scan_paths():
+    scanned = list(_scan_paths())
+    # Anti-vacuity: an exclusion that swallowed the docs tree, or a renamed SCAN_TREES
+    # entry, would empty the scan and pass without proving anything.
+    assert len(scanned) > 500, f"scan covered only {len(scanned)} files — looks truncated"
+    assert any("docs/" in str(p.relative_to(ROOT)) for p in scanned), (
+        "no docs/ file was scanned at all; DOCS_EXCLUDE_DIRS has swallowed the tree"
+    )
+    for p in scanned:
         try:
             text = p.read_text(encoding="utf-8")
         except (UnicodeDecodeError, OSError):

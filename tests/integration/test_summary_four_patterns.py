@@ -5,9 +5,16 @@ generator → validate-project-input.py → project-db.py --load → --check
 Covers SC-001 (a team per pattern produces a summary from tracked artifacts alone)
 and SC-002 (R-tier complete with zero manual form editing).
 
-Real teams supply `continuous` and `iteration`; fixtures supply `serial` and
-`parallel`, because the repository has no team of those patterns. Everything runs
-inside a temporary repo root so the real `.specify/project/` is never written.
+All four patterns come from `tests/fixtures/teams/`. The generator derives
+`project.baseline_date` from the latest ledger/report timestamp (FG-6 — never the
+system clock), so a team with no run history produces an empty baseline and the
+validator blocks it, correctly. Real teams under `.specify/teams/` mostly have no
+ledger, which made this test's outcome depend on whichever real team happened to
+exist: it went red when `.specify/teams/draw-two-layer-structure` was added and
+shadowed the serial fixture. Fixtures keep it deterministic.
+
+Everything runs inside a temporary repo root so the real `.specify/project/` is
+never written.
 """
 
 from __future__ import annotations
@@ -43,8 +50,14 @@ def _pattern_of(team_md: Path) -> str:
 
 
 def _teams_by_pattern() -> dict[str, Path]:
+    """Fixtures first, real teams only as a fallback for a pattern with no fixture.
+
+    The order is load-bearing: REAL_TEAMS first let a real team shadow the fixture the
+    docstring says supplies that pattern, so adding any team to `.specify/teams/` could
+    silently change which data this chain runs against.
+    """
     found: dict[str, Path] = {}
-    for root in (REAL_TEAMS, FIXTURE_TEAMS):
+    for root in (FIXTURE_TEAMS, REAL_TEAMS):
         if not root.is_dir():
             continue
         for team_md in sorted(root.glob("*/team.md")):
