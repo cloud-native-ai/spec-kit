@@ -24,6 +24,12 @@
 
 容器环境里,`mkdir` 出的目录(如 `docs/summary/`、`docs/team/`)以及 `.specify/agents/`、部分 guide 目录会变成 **root 属主**,当前用户无法写入或删除。表现:写文件报权限错、`rm` 交互式确认或失败。处理:重建为当前用户属主(755/644),或经 Docker 修复 ownership 后再操作。
 
+**延伸到镜像文件**:同一成因会让 `sync-mirrors.py --write` 逐文件失败。下面这条来自 `.specify/instructions.md` 的常驻节,2026-09-20 按 Route R2 迁入本节(原文逐字保留,便于与旧快照对照):
+
+- Container dirs created via `mkdir` can become root-owned and unwritable — recreate as current user before editing. This extends to **mirror files**: root-owned leftovers under `.specify/` make `sync-mirrors.py --write` fail per file — the engine now collects failures, keeps syncing the rest, and exits 1 with a `FAIL` summary (`sudo chown -R $USER <dir>` then re-run); a green-looking pass with stale mirrors is the defect this guard exists to prevent.
+
+同类还有 **git 对象库**:见 § 二十(root 属主的 `.git/objects/<xx>/` 桶阻塞提交,修法与目录不同)。
+
 ## 四、Bash 工具每次是全新 shell
 
 `source .venv/bin/activate` 等**不跨调用持久**。要么用绝对路径解释器,要么在同一次调用内 `source && cmd` 串联。
@@ -88,6 +94,38 @@ mirror 文件时 `cp` 被 alias 成 `cp -i`,遇到已存在目标会**静默跳�
 - `git diff <sha> -- <path>` → 对**未跟踪**的新增文件是盲区(第 3 条)。并入 `git ls-files --others --exclude-standard -- <path>`。
 
 另两条配套约束:**MUST NOT 按扩展名过滤代替按路径过滤**——`templates/plan-template.md` 是 `.md`,而 `scripts/` 下另有 70 个非 `.py`/`.sh` 的受跟踪文件,扩展名过滤会让它们结构性逃逸;**MUST NOT 在 `&&` 链里把合法结果为"零"的命令(`grep -c`、`diff -q`、`comm`、`test -d`)放在必须执行的命令之前**——`grep -c` 零命中时退出码为 1,链会静默中断,其后的提交动作根本不会发生,而检查本身还报告成功。用 `;` 或补 `|| true`,并确认链尾真的执行了。
+
+## 十四、改既有 spec 用追加,不要重跑覆盖式脚手架
+
+- **In-place amend ≠ re-scaffold**: `create-new-plan.sh` unconditionally overwrites `plan.md`; do NOT run overwrite scaffolding when amending existing specs. Append tasks (e.g. T032–T057) instead of regenerating, to preserve history.
+
+## 十五、`templates/` 保持项目中立
+
+- **Template neutrality**: keep generic `templates/` (esp. `constitution-template.md`) project-agnostic; do NOT push spec-kit-specific content into shared scaffolding. Project-specific rules belong in `.specify/memory/constitution.md` or this file.
+
+## 十六、文档引用方向是单向的
+
+- **Documentation reference direction is one-way**: `README.md` → `docs/tutorials/quickstart.md` → `docs/reference/commands/*.md`. Sink detail into `docs/`; keep README a lean entry point. Avoid reverse/circular references.
+
+## 十七、删除前两步核验,AND 条件缺一不可
+
+- **Removal safety**: before removing a dependency or deleting a file, verify it is truly unused in two steps (no code `import`, no shell invocation) and that any stated delete conditions ALL hold — when conditions are an AND, any one failing means do NOT delete.
+
+## 十八、重命名/退役必须登记 init 回收
+
+- **Rename/retire → register init reclaim**: whenever a command, skill, or script is renamed or deprecated, register the old name in the matching obsolete-asset registry in `src/specify_cli/__init__.py` (`_OBSOLETE_SKILLS` / `_OBSOLETE_COMMANDS` / `_OBSOLETE_TEMPLATES`, inside the `OBSOLETE-ASSET-REGISTRY` markers), extend `tests/contract/test_cleanup_obsolete_assets.py` to cover it, and remove the stale mirror directory under `.specify/skills/` (sync-mirrors never deletes). Init's additive copytree never deletes stale files, so an unregistered rename leaves dead structure in every upgraded workspace (e.g. `extension-e2e-test→browser-extension`).
+
+## 十九、`yaml.safe_dump()` 默认把 CJK 转义成 `\uXXXX`
+
+- `yaml.safe_dump()` defaults to `allow_unicode=False` (escapes CJK to `\uXXXX`) — pass `allow_unicode=True` for Chinese YAML frontmatter.
+
+## 二十、root 属主的 `.git/objects/<xx>/` 桶会间歇性阻塞提交
+
+- A root-owned `.git/objects/<xx>/` hash-bucket dir intermittently blocks commits (tree hashes land in buckets probabilistically). Root fix: `mv` the bucket aside, recreate it as the current user, copy the blobs back — do NOT mutate file content to dodge the hash.
+
+## 二十一、重构命令/引擎必须端到端实跑其真实管线
+
+- When restructuring a command/engine, **execute its real pipeline end-to-end** (create → view → invoke, or collect → compare) as a mandatory step — "files exist / headings present" checks miss latent defects that only surface at runtime (four such defects found in one tools restructure).
 
 ---
 

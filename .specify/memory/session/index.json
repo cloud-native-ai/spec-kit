@@ -1,7 +1,25 @@
 {
   "scope": "session",
-  "updated": "2026-08-15T06:18:15Z",
+  "updated": "2026-09-20T06:44:20Z",
   "entries": [
+    {
+      "id": "20260920T064420Z-34059-28168-b-route-r2-19-lesson-route-r1-7904e80a",
+      "file": "20260920T064420Z-34059-28168-b-route-r2-19-lesson-route-r1-7904e80a.md",
+      "scope": "session",
+      "source": "/speckit.instructions",
+      "feature": "",
+      "tags": [
+        "instructions",
+        "size-budget",
+        "reconcile",
+        "route-r1",
+        "route-r2",
+        "one-source-of-truth"
+      ],
+      "title": "指令文件体积预算收敛:34059→28168 B,Route R2 迁移 19 条 lesson,并查出 Route R1 的假阳性缺陷",
+      "created": "2026-09-20T06:44:20Z",
+      "summary": "运行目标"
+    },
     {
       "id": "20260815T061815Z-instructions-refresh-2026-08-15-numeric-fact-reconcile-3-sta",
       "file": "20260815T061815Z-instructions-refresh-2026-08-15-numeric-fact-reconcile-3-sta.md",

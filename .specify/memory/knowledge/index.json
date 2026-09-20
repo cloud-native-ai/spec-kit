@@ -1,7 +1,24 @@
 {
   "scope": "knowledge",
-  "updated": "2026-08-13T11:42:25Z",
+  "updated": "2026-09-20T06:44:41Z",
   "entries": [
+    {
+      "id": "mem-041c0dc2",
+      "file": "mem-041c0dc2.md",
+      "scope": "knowledge",
+      "source": "/speckit.instructions",
+      "feature": "",
+      "tags": [
+        "instructions",
+        "size-budget",
+        "route-r1",
+        "placeholder",
+        "convention"
+      ],
+      "title": "指令节体积比较必须排除模板占位符骨架节(否则把正确的项目填充判为漂移)",
+      "created": "2026-09-20T06:44:41Z",
+      "summary": "**约定(2026-09-20 实测确立)**:比较活动指令文件与模板的同名节体积时,**模板版本仍含占位符 token(`[Bracketed ...]`、`{{VAR}}`)的节 MUST 被排除**——那是项目本来就该填大的骨架,「活动侧比模板大」是它的正确终态而非漂移。"
+    },
     {
       "id": "feedback-intake-repo-root-feedback-holds-feedback-zip-proces",
       "file": "feedback-intake-repo-root-feedback-holds-feedback-zip-proces.md",
