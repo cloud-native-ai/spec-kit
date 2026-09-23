@@ -30,7 +30,7 @@ Create interactive data visualizations using D3.js (Data-Driven Documents), outp
 
    **复刻型 SDS**（`fidelity_intent: reproduction`）携带**源图实测线宽/字号/色值**，实测值**覆盖**上表默认——照抄实测，不得归一化回默认档位。
 3. **几何**：d3js 是**绝对坐标引擎** → **MUST 精确兑现 SDS 的每个 box，预期零偏离**（不启力导向重排、不用 margin 约定平移已声明坐标）；运行时不可避免项（字体度量致文本溢出）先在 box 内近似，再量化声明。
-4. 像素测量管线、viewBox 对齐、固定坐标 data-join、锚点计算、坐标校验（`validateCoords` + `validateAgainstSDS`）、偏离策略：[references/sds-realization.md](references/sds-realization.md)。
+4. 像素测量管线、viewBox 对齐、固定坐标 data-join、锚点计算、校验三关（`validateCoords` + `validateAgainstSDS` + 复刻型的渲染读回 ↔ 源图差量）、偏离策略：[references/sds-realization.md](references/sds-realization.md)。
 
 ## Core Principles
 
@@ -189,7 +189,7 @@ For multi-chart dashboards:
    - What the visualization shows
    - How to interact with it (if interactive)
    - How to modify the data (where in the code to update values)
-   - How to reproduce/embed: the file opens directly in a browser and renders with no build step (CDN mode needs network; split/vendored mode works offline); when review embedding matters, optionally attach a headless-browser-exported PNG snapshot of the figure
+   - How to reproduce/embed: the file opens directly in a browser and renders with no build step (CDN mode needs network; split/vendored mode works offline); when review embedding matters, optionally attach a headless-browser-exported PNG snapshot of the figure — that snapshot's window height (content height **plus** a margin) and the clipping judgement are owned by the delivery contract's D6「渲染证据几何」row ([../draw-diagram/references/delivery-contract.md](../draw-diagram/references/delivery-contract.md)); the margin value is not restated here, and a non-blank PNG alone is **not** render evidence
 
 ## Output Requirements
 
@@ -211,7 +211,7 @@ For multi-chart dashboards:
 
 | Document | Content |
 |----------|---------|  
-| [sds-realization.md](references/sds-realization.md) | **SDS 实现技术所有者**：输入契约与不可改写边界、档位线宽/深浅/字号落地理由、像素测量管线、viewBox 与 canvas 1:1、固定坐标 data-join、锚点计算、`validateCoords` + `validateAgainstSDS`、复刻型实测覆盖、偏离策略 |
+| [sds-realization.md](references/sds-realization.md) | **SDS 实现技术所有者**：输入契约与不可改写边界、档位线宽/深浅/字号落地理由、像素测量管线、viewBox 与 canvas 1:1、固定坐标 data-join、锚点计算、`validateCoords` + `validateAgainstSDS` + 复刻型渲染读回差量（§4 关三）、复刻型实测覆盖、偏离策略 |
 | [d3js-guide.md](references/d3js-guide.md) | D3.js v7 quick reference: scales, axes, shapes, layouts, transitions, data-join pattern, and common chart recipes (incl. dense/reproducible force graphs, state machine, hand-drawn sequence diagram, tree/layered model, heatmap direction conventions) |
 | [d3js-official-docs.md](references/d3js-official-docs.md) | D3.js official documentation: core concepts, module architecture, data-join philosophy. Load on-demand for deeper understanding |
 | [cycle3-reproduction-lessons.md](references/cycle3-reproduction-lessons.md) | Dated record（cycle 3 R1，复刻竞技场）：当次重绘的强制修正与不可动不变量；通用化的质量实践已收入 sds-realization.md §5，本文件不作为当前规范引用 |
@@ -229,6 +229,12 @@ For multi-chart dashboards:
 ## Quality Checklist
 
 Before delivering the final HTML file, verify:
+
+**总则（复刻优先）**：`fidelity_intent=reproduction` 时，源图忠实度**高于本清单**。某条与源图冲突
+（源图没有图例色块、源图的边标签是常显的等）→ 该条 MUST 显式标 **N/A**，并写明该语义在源图里由谁
+承载（如面板标题、`<title>` 属性、tooltip）；MUST NOT 为了凑满清单而偏离源图。既未兑现又未标 N/A
+的条目按缺项计。
+
 - [ ] 受委派时读了调用方给的 SDS，没有重推语义（元素/分区/档位归属未改写）
 - [ ] SDS 几何逐 box 兑现、零偏离（`validateAgainstSDS` 无 delta；未启力导向重排；未套 margin 平移）
 - [ ] 线宽按档位落地且单调递减（T1>T2>T3>T4，非全图单一线宽）；关键路径只抬色相、粗细 ≤ T2

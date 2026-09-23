@@ -204,7 +204,7 @@ For dark theme:
 
 1. Save the HTML file to the user's specified path (or suggest a reasonable default like `./output/chart.html`)
 2. **Structural verification (program-first, no browser needed)**: run `node scripts/verify-deliverable.mjs <file>.html` — it checks (a) any referenced `vendor/echarts.min.js` actually exists and is non-empty, (b) the ECharts loader does not use `document.write`, (c) `*.config.js`/`*.config.json` pairs are in sync, (d) fixed-layout graph coordinates have no out-of-bounds nodes or overlaps (canvas size from config `meta.canvasWidth/Height`). Fix all reported problems before delivery
-3. **Local open verification (渲染证明)**: open the HTML in a browser and confirm the chart actually renders (canvas is not blank, no console errors). For offline-critical deliverables, re-open with network disabled (or `file://` with no CDN access) to prove the vendored copy renders. If a headless browser is available, capture a screenshot, e.g. `chromium --headless --screenshot=out.png --window-size=1440,900 <file>.html`; verify the PNG is not a blank canvas
+3. **Local open verification (渲染证明)**: open the HTML in a browser and confirm the chart actually renders (canvas is not blank, no console errors). For offline-critical deliverables, re-open with network disabled (or `file://` with no CDN access) to prove the vendored copy renders. If a headless browser is available, capture a screenshot, e.g. `chromium --headless --screenshot=out.png --window-size=<w>,<h> <file>.html` — the window height (content height **plus** a margin) and the clipping judgement are owned by the delivery contract's D6「渲染证据几何」row ([../draw-diagram/references/delivery-contract.md](../draw-diagram/references/delivery-contract.md)); the margin value is not restated here, and a non-blank PNG alone is **not** render evidence
 4. **Static snapshot export**: for offline-critical or review-facing deliverables, export a static PNG/SVG of each chart (toolbox "保存为图片", or `chart.getDataURL({ type: 'png', pixelRatio: 2 })`, or the headless screenshot) and deliver it **alongside the HTML** as render evidence — reviewers without a browser or network can verify the actual visual result offline
 5. Provide a brief explanation of:
    - What the visualization shows
@@ -321,20 +321,4 @@ python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action
 running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills
 directory) — skip this entire Feedback step: no engine call, no feedback entry.
 
-At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
-
-1. **Gate on qualification & completion.** Only proceed if this run reached a meaningful wrap-up. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
-2. **Reflect (no user input).** Review this run against this skill's declared purpose and produce a short review plus ≥1 concrete, skill-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`
-3. **Scope guard.** Keep strictly to this skill's operation; do NOT produce a global/whole-project assessment (that is `/speckit.review`'s job). Entries are `scope: local`.
-4. **Dedup guard.** Use a stable `run_id`; if a parent flow already recorded feedback for this same `(unit_id, run_id)`, the engine no-ops.
-5. **Persist** via the engine:
-   ```bash
-   python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
-     --unit-id "skill:draw-echarts" --unit-type skill \
-     --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
-     --review "<review prose>" --points-file "<points file>"
-   ```
-   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
-6. **Consolidated submission prompt(非阻塞).** If the returned `should_prompt` is `true`, append ONE non-blocking line to the wrap-up report inviting submission (point the user to the `/speckit.feedback package` command — the user-facing path; never paste the raw `feedback-utils.py` engine call into the user-facing line); it MUST NOT block the wrap-up flow and MUST NOT trigger any 自动传输 (manual delivery only; `--action mark-submitted` runs only if the user initiates submission). Below threshold, do not prompt.
-
-**Abort / partial-run rule.** If the run failed before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.
+At wrap-up, run the feedback self-reflection step per the canonical convention in `.specify/shared/workflow/feedback-step.md`: agent self-reflection only — **never** solicit feedback content from the user; skip trivial or no-op runs; keep strictly to this skill's scope; persist one entry via `feedback-utils.py --action record --unit-id "skill:draw-echarts" --unit-type skill`. Non-blocking (非阻塞) and never any 自动传输 — delivery stays manual. That file owns every rule of this step — reflection, scope, dedup, persistence, the submission prompt, the abort and nesting clauses; do not restate any of them here.

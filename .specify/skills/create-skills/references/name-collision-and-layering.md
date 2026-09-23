@@ -71,6 +71,10 @@ commands, internal service names) that must not be published.
   which one to edit.
 - Keep the counting/coverage numbers that differ between layers (public vs
   local surface) in the front door, with the command that reproduces them.
+- Pressure-testing a front door has its own scenario rule — the request must be
+  one whose **lower-layer `description` clues point the wrong way**, or the RED
+  and GREEN arms cannot diverge. The rule and its inconclusive verdict are owned
+  by [pressure-testing.md](pressure-testing.md) §0; not restated here.
 
 **Wiring rule**: point every load directory at the **front door only**. Linking
 both layers into the same agent restores the ambiguity the split was meant to

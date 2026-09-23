@@ -679,10 +679,10 @@ const url = chart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#1a
 Or capture a headless screenshot when a browser is available:
 
 ```bash
-chromium --headless --screenshot=out.png --window-size=1440,900 <file>.html
+chromium --headless --screenshot=out.png --window-size=<w>,<h> <file>.html
 ```
 
-Verify the exported image is not a blank canvas (check file size / open it) before delivering.
+The window height (content height **plus** the render-evidence margin) and the clipping judgement are owned by the delivery contract's D6「渲染证据几何」row ([../../draw-diagram/references/delivery-contract.md](../../draw-diagram/references/delivery-contract.md)) — the margin value is not restated here. Verify the exported image against that row before delivering; a non-blank image alone is **not** render evidence.
 
 ### External Data / Config Separation (Regeneration)
 

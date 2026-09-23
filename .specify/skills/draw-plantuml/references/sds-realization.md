@@ -101,6 +101,8 @@ PlantUML（UML/ER 类）走 graphviz 自动布局：**没有绝对坐标输入�
 
 > 布局陷阱（LTR 下 `-right->` 被重解释、actor→zone 内元素致 zone 膨胀、嵌套 rectangle 内 `together{}` 失效、note 撑大 zone）见 [howto/10-layout-planning.md §三](howto/10-layout-planning.md) 与 [guide/layout.md §五](guide/layout.md)——它们直接决定几何逼近的可达上限。
 
+**硬规则（与 §1.3 同形；来自实测，违反即静默翻车）**：同一对节点之间**已有可见边**时，MUST NOT 再叠加反向的 hidden 边（`A --> B` 之上再写 `B -[hidden]- A`）——两者构成 **2-环**，而 dot 对 2-环的反转**不确定**：这对节点的上下关系由引擎自行决定，源码控制不了，加锚点的意图落空，且看不出是这条 hidden 边造成的。要表达 rank 差（谁在谁上方）改用**不可见锚点列 + hidden down 链**：以 `<<ph>>` 透明占位节点（上表「撑高/撑宽某区」行）单成一列，用 `-[hidden]down-` 串成锚点链，真实节点挂到链上——rank 由锚点链给出，不与真实边构成环。本条是**图结构性质**（两条边同时存在才成立），落在上表「单条隐藏边：意图 → 手段 → 实测边界」的表达范围之外，故单列于此。
+
 ### 2.2 量测（偏离必须"量出来"，不许目测）
 
 - **WBS / 甘特图**：用 [../scripts/measure-svg-layout.py](../scripts/measure-svg-layout.py) 量三判据（有效字号 ≥12px、长宽比 1.2~1.8、标签不越时间轴右边界），`--compare` 做 A/B 判断某写法有没有改写排期。

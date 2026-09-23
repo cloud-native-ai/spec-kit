@@ -1,7 +1,7 @@
 # SDS 实现（draw-d3js 语法层技术）
 
 > 本文是 draw-d3js 作为**语法层**实现 SDS 的技术所有者：像素测量、viewBox、固定坐标 data-join、
-> 坐标校验、档位线宽/深浅/字号的 D3 落地、偏离逼近。
+> 校验三关（坐标 / SDS / 渲染读回）、档位线宽/深浅/字号的 D3 落地、偏离逼近。
 >
 > **不属于本文的事实（只引用，不复制）**：SDS schema、`weight_plan` 相对档位表、几何构建纪律、
 > Deviation Declaration 规则的语义所有者是 `draw-diagram`（`../../draw-diagram/references/semantic-model.md`；
@@ -141,9 +141,10 @@ function edgePoint(from, to, gap = 0) {
 6. **数据分离**：把 `PANELS/NODES/EDGES` 抽成 `<script type="application/json">` 块或外置 `data-*.js`，
    让校验器无需解析 JS 即可点数（cycle3 mandatory fix #2）；渲染逻辑从该块读取。
 
-## 4. 坐标校验（渲染前跑，绿了才交付）
+## 4. 校验三关（渲染前跑，绿了才交付）
 
-两道关：**内部一致性**（重叠/越界）与 **SDS 一致性**（逐 box 偏差）。
+三道关：**内部一致性**（重叠/越界）、**SDS 一致性**（逐 box 偏差）与**渲染读回 ↔ 源图差量**
+（复刻型，见本节末「关三」）。前两关只比对数字，全绿也不代表图**像**源图。
 
 ```javascript
 // 关一：手工/实测坐标的重叠与分区越界检查；分区栅格规则记在数据文件头
@@ -180,6 +181,31 @@ function validateAgainstSDS(rendered, sds, tol = 1) {
 
 清点校验同样属于这一关：元素/边/分区**数量**与 SDS 一致（复刻例：21 nodes / 5 edges / 3 zones）。
 
+**关三：渲染读回 ↔ 源图差量**（`fidelity_intent=reproduction` 必过；新建型不适用）
+
+忠实度 MUST 由**渲染结果读回后与源图对齐**判定，不得以「并排目视像不像」充当结论：
+
+1. **读回**：无头浏览器导出 PNG，或对渲染后的 SVG 逐元素取 `getBoundingClientRect()` / `getBBox()`。
+   导出窗口的几何（窗口高 = 内容高 + 余量）与裁切判据的 owner 是
+   [../../draw-diagram/references/delivery-contract.md](../../draw-diagram/references/delivery-contract.md)
+   D6「渲染证据几何」行，此处不重述数值 —— 底部被裁掉的读回图会让差量**假绿**。
+2. **连通域对齐**：源图与读回图各自二值化后取连通域（每盒 / 每分区 / 每线束一个），按位置配对，
+   量每对的中心偏移与重叠率（IoU）；配不上的连通域即漏画或多画，逐项进差量清单。
+3. **像素差量**：同缩放下逐像素比（灰度化 + 阈值二值化），统计差异像素占比。
+4. **量化命中容差**（MUST 给数，禁止「看起来像」）：几何维沿用关二的 `tol`；中心偏移、重叠率、
+   差异像素占比三项的容差**没有可继承的默认值**，MUST 在本轮交付说明里写明具体数值与量法，
+   实测值一并写入；超容差项按 §6 量化声明。
+5. **迭代收敛**：超容差 → 修实现（不改源图、不改 SDS）→ 重读回重量，直到三项同时命中。
+   报「收敛」MUST 附最后一轮的实测数；单次通过不算收敛。
+6. **线宽读回实测**：stroke 的实测值 MUST 从渲染结果量出来（SVG `stroke-width`，或同一元素两次
+   `getBoundingClientRect()` 之差）；视觉裁判的「读感 ~1.5px」MUST NOT 充当实测值。T2/T3 须确认
+   真的落实为 SDS 声明的实测值（含 stroke-centering 补偿）。
+7. **差量与页面 QA 同源**：本关结果 MUST 折进 in-page QA 表（machine-checkable manifest），与偏离
+   声明（`deviation-manifest.md`）同源同数，不得两处各写一份。
+
+> 第 6、7 条收编自 [cycle4-improvements.md](cycle4-improvements.md) 的 R1 待办（dated record，
+> 不再作为待办来源）——本关即其落地点。
+
 ## 5. 复刻型 SDS：源实测覆盖规则
 
 **规则**：`fidelity_intent: reproduction` 时，SDS 携带从源图实测的线宽、字号、色值、dash 与几何；
@@ -211,4 +237,5 @@ dated record，不作为当前规范引用）：
    - 仍放不下 → 在交付说明里**量化声明**（偏离维度 + 幅度 + 原因，例：`node-07 label 超宽 6px，字号 13→12`）；
    - **绝不**为容纳文本而移动或放大 box——那是改写语义几何。
 3. **未声明的偏离按 semantic-fidelity 扣分**；已声明的偏离计入语法实现质量，不算语义层缺陷。
-4. 自查：交付前跑 §4 两道关 + 浏览器控制台无报错 + 导出 PNG 目视比对（复刻型与源图并排看）。
+4. 自查：交付前跑 §4 三关 + 浏览器控制台无报错。复刻型的忠实度以**关三的量化差量**为准；
+   「与源图并排看」只用来定位差量该往哪儿查，MUST NOT 充当结论。

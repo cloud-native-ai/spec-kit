@@ -47,7 +47,7 @@ series: [
 
 1. **目标像素测量**（语义层职责）：复刻类 SDS 由 draw-diagram 从源图测量产出 canvas、每图元盒位、每角色实测线宽；语法层只消费测量值。仅当无 SDS 直接调用复刻需求时，本层才自行测量（量像素，不目测）。
 2. **config JSON**（唯一权威）：全部节点坐标/尺寸/分区/边折点落进 `*.config.json`（含 `meta.canvasWidth/Height` 与栅格规则）；`*.config.js` 包装由 `node scripts/sync-config.mjs <file>.config.json` 生成（禁止手工双写；`scripts/` 相对技能根目录）；交付前 `node scripts/check-layout.mjs <config>` 查越界/重叠。
-3. **render.mjs 确定性导出**：为交付物写一个小 Node 导出脚本（`render.mjs`，随交付物存放，非本技能 scripts/ 固定资产）：ECharts SSR（`echarts.init(null, null, { renderer: 'svg', ssr: true })`）或 headless chromium（`--screenshot=render.png --window-size=<canvas w,h>`）；导出时 `animation: false`、`toolbox: { show: false }`、固定 `pixelRatio` → 同 config 必得同图（确定性）。PNG 随 HTML 一并交付作渲染证明。
+3. **render.mjs 确定性导出**：为交付物写一个小 Node 导出脚本（`render.mjs`，随交付物存放，非本技能 scripts/ 固定资产）：ECharts SSR（`echarts.init(null, null, { renderer: 'svg', ssr: true })`）或 headless chromium（`--screenshot=render.png --window-size=<canvas w>,<canvas h + 证据余量>`；余量数值与裁切判据的 owner 是 [../../draw-diagram/references/delivery-contract.md](../../draw-diagram/references/delivery-contract.md) D6「渲染证据几何」行，此处不重述）；导出时 `animation: false`、`toolbox: { show: false }`、固定 `pixelRatio` → 同 config 必得同图（确定性）。PNG 随 HTML 一并交付作渲染证明。
 
 ## 6. Tier 映射理据与复刻覆盖规则
 
