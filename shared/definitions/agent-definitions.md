@@ -47,7 +47,7 @@ Classify by **content form and lifecycle, not by directory**:
 - Filled, responsibility- or project-bound, referenced by runs and rosters → **Instance**.
 - Has a session/PID and a turn budget being consumed → **Execution** (durable form: its dispatch config under `execution/configs/`).
 
-**Dogfooding note**: in the spec-kit repository itself, source `agents/` and `.specify/agents/templates/` are byte-identical by design (`sync-mirrors.py`). The seven shipped role agents are pre-filled for this project, so they double as ready-to-run definitions; their *distribution role* across projects remains Template.
+**Dogfooding note**: in the spec-kit repository itself, source `agents/` and `.specify/agents/templates/` are byte-identical by design (`sync-mirrors.py`). The shipped role agents are pre-filled for this project, so they double as ready-to-run definitions; their *distribution role* across projects remains Template. Which agents ship is enumerated by the `agents/` directory listing — the count is deliberately not restated here, because a pinned number goes stale the moment an agent is added or retired.
 
 ## Mapping to Existing Framework Vocabulary
 

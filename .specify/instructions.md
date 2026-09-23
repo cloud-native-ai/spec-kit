@@ -8,7 +8,7 @@ This project documentation is distributed across several key files. You MUST ref
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
 | **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | Numbered Core Principles + governance rules; that file is the authoritative roster, count, and version — not restated here |
-| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | Per-feature status for /speckit.* commands, AI tool support, skills, and core capabilities; the authoritative count is the auto-derived `Total Features` header (maintained by `scripts/bash/update-feature-index.sh`) |
+| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | Per-feature status for /speckit.* commands, AI tool support, skills, and core capabilities; **hand-maintained** — no script regenerates it, so the `Total Features` header and the rows are edited together by the /speckit.* commands (recording duties: `.specify/shared/workflow/feature-integration.md`) |
 | **Feature Details** | `.specify/memory/features/<ID>.md` | Per-feature deep dives | Overview, key changes, implementation notes, status criteria |
 | **Glossary** | `.specify/memory/glossary.md` | Project vocabulary anchor & domain dictionary | Canonical terms, homophone/confusable variants, meanings; voice-input correction source (protocol: `.specify/shared/workflow/glossary.md`) |
 | **Readme** | `README.md` | Project entry point | Spec-Driven Development overview, supported AI agents, feature list, installation pointer |

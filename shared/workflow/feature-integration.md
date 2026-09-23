@@ -55,7 +55,7 @@ Before advancing to `Implemented`:
 When `/speckit.requirements` creates a new spec:
 
 1. **Scan for existing Feature**:
-   - Search by context: Scan `memory/features/*.md` and `memory/feature-index.md`
+   - Search by context: Scan `memory/features/*.md` and `memory/features.md`
    - Search by ID: Check `SPECIFY_FEATURE` env, git branch name, numeric prefix in BRANCH_NAME
    - **Binding-precedent heuristic**: for each candidate Feature, check its sibling specs (prior spec directories already bound to it, e.g. via its detail file's Related Files/history). A Feature whose siblings repeatedly absorbed similar work is strong evidence for **bind**; a candidate with no topical siblings is evidence for **create**. Surface the precedent when recommending bind-vs-create.
 
@@ -65,7 +65,8 @@ When `/speckit.requirements` creates a new spec:
 
 3. **Integration responsibilities**:
    - Ensure corresponding Feature entry exists
-   - Update `memory/feature-index.md`: keep Status at least `Planned`, update Spec Path, refresh date
+   - Update `memory/features.md`: set Status to the transition this command owns (§ Status State Machine — the requirements phase lands `Draft`, never `Planned`), update Spec Path, refresh date
+   - The index is **hand-maintained**: no script regenerates it, so the `Total Features` header and the rows MUST be edited together in the same pass — a header edited alone, or rows edited without it, leaves the file self-inconsistent while still looking well-formed
    - Never create duplicate Feature IDs
 
 ## Feature Continuous Evolution

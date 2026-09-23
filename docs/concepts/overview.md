@@ -262,10 +262,9 @@ flowchart TD
     F --> H[/speckit.tasks 生成 tasks.md]
     H --> I[check-prerequisites.sh]
     I --> J[/speckit.implement]
-    D --> K[update-feature-index.sh]
-    F --> K
-    H --> K
-    K --> L[.specify/memory/features.md]
+    D --> L[.specify/memory/features.md]
+    F --> L
+    H --> L
 ```
 
 #### 关键设计

@@ -113,9 +113,9 @@ class TestInstructionPreservation:
     def test_modified_features_md_is_preserved(self, monkeypatch, tmp_path: Path):
         """Adding an assistant must not overwrite an already-modified features.md.
 
-        features.md is both machine-maintained (``update-feature-index.sh``) and
-        hand-edited, so a second init that regenerated it would silently discard the
-        user's entries — and the file would still look well-formed afterwards.
+        features.md is hand-maintained by the /speckit.* commands, so a second init
+        that regenerated it would silently discard the user's entries — and the file
+        would still look well-formed afterwards.
         """
         resource_root = tmp_path / "resource"
         from fixtures.ai_tools_support import make_resource_with_skills
