@@ -47,7 +47,7 @@ Body sections (all mandatory):
 
 ## Matching protocol
 
-1. Run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<the user's goal text>"`. It scores every preset's `signals` + `pattern` keywords against the goal and returns JSON (`matches[]` with `preset_id`, `score`, `confidence`, `reasons`).
+1. Run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<the user's goal text>"`. It scores every preset's `signals` + `pattern` keywords against the goal and returns JSON: top-level `confidence`, `presetsScanned`, `goalChars`, and `matches[]` whose entries carry `presetId`, `score` and the match-evidence fields (`matchedSignals`, `matchedPatternKeywords`, `patternKeywordsOnly`). The script's own output is the authoritative field list.
 2. Act on `confidence` — **the script scores, the agent decides**:
    - `high` — present the top preset with its goal skeleton, roster and pattern, **recommend reusing it, and proceed with reuse**; the user can adapt or start from scratch afterwards via modify (no blocking choice point).
    - `medium` — present the top 2 candidates alongside the from-scratch option, without recommending.
@@ -65,7 +65,7 @@ A preset is referenced from more places than its own file. When one is dissolved
 
 1. **Register the removal** — add every deleted preset file to `_OBSOLETE_SKILL_FILES` in `src/specify_cli/__init__.py` (OBSOLETE-ASSET-REGISTRY markers) and extend `tests/contract/test_cleanup_obsolete_assets.py`. Init's additive copytree never deletes; an unregistered removal leaves dead presets in every upgraded workspace.
 2. **Sweep live instances** — `.specify/teams/*/team.md` frontmatter `preset:` fields referencing the old id: repoint to the successor preset (with a dated note) or drop it with a `## Lineage` note; bump `updated`. A dangling `preset:` reference is silent rot — nothing validates it.
-3. **Update coupling surfaces** — `SKILL.md` Resources table, `templates/commands/team.md` (then regenerate per-tool copies via `regen-command-copies.py`), the governance-kept table in `shared/guidelines/confirmation-gates.md`, `GOVERNANCE_PATH_PATTERNS` in `scripts/python/scan-confirmation-gates.py`, and `tests/contract/test_confirmation_gates_team_flow.py`.
+3. **Update coupling surfaces** — `SKILL.md` Resources table, `templates/commands/team.md` (then regenerate per-tool copies via `regen-command-copies.py`), the governance-kept table in `.specify/shared/guidelines/confirmation-gates.md`, `GOVERNANCE_PATH_PATTERNS` in `scripts/python/scan-confirmation-gates.py`, and `tests/contract/test_confirmation_gates_sweep.py`.
 4. **Sync and prune mirrors** — run `sync-mirrors.py --write`, then delete the stale mirror copies under `.specify/skills/create-team/templates/teams/` by hand; mirror sync never deletes.
 5. **Do not rewrite history** — specs, `docs/notes/`, and team `runs/` keep the old names; they are point-in-time records.
 6. **Re-validate matching** — run `match-team-preset.py` against the surviving presets' canonical use-case phrasings; a consolidation that merges two presets must not leave either intent unmatched (check `confidence` for both lineages).

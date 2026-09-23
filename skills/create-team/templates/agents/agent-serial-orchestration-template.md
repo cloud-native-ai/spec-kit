@@ -5,7 +5,7 @@ description: "Serial chain orchestration for {{WORKFLOW_NAME}}"
 
 # Serial Chain Orchestration: {{WORKFLOW_NAME}}
 
-> **Model alignment**: this is a **serial Loop** in the Role/Stage/Type model. Each stage agent is a **Worker** running at the `executor` stage; the **Lead** (optional quality gate between stages) is the **Team Supervisor** (Meta role).
+> **Model alignment**: this is a **serial Loop** in the Role/Stage/Type model. Each stage agent is a **Worker** running at the `executor` stage; the **Lead** (optional quality gate between stages) is the **Team Supervisor** (Meta role). 当本链的交付物是 agent / skill / team 定义(canonical 写面)时,Lead 席位由**可选**变为**必需** —— Worker 只产补丁到工作区,canonical 落盘由唯一 Meta 执行;消解条款见 `references/conceptual-model.md` § 消解条款。
 
 ## Configuration
 
@@ -57,6 +57,7 @@ Input artifacts for stage [current_stage_id]:
 ### Step 4: Validate Stage Output (Quality Gate)
 
 - Verify all declared `outputs` files exist and are non-empty
+- Existence is necessary, not sufficient — also clear the **substance floor** owned by `references/patterns.md` § Serial Chain (a program-decidable byte lower bound, or retrievability of every declared scope name in the artifact); a stub that merely exists MUST NOT unlock downstream stages
 - If `quality_gate` is defined:
   - Evaluate the condition (LLM judgment on output quality)
   - If PASS → proceed to Step 5

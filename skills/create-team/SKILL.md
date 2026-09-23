@@ -55,10 +55,20 @@ After **every** run, write `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md
 ```markdown
 # Team Run Report: <name>
 - **Team**: <slug> · **Goal**: <goal> · **Pattern**: <pattern> · **Outcome**: <outcome>
-## Result Summary ## Deliverables ## Execution Detail ## Run Workspace ## Summary
+## Result Summary ## Deliverables ## Verification ## Execution Detail ## Run Workspace ## Summary
 Summary: produced | skipped(cadence) | skipped(budget) | declined(no-material); Overlap: none | contested(<n>) | undecidable(<team,…>)
 First activation: declare the summary mechanism has activated and the cadence now in force (首次激活需声明).
 ```
+
+### Verification(必填段,本节为该口径的唯一真源)
+
+`## Verification` 是**必填**段:run 报告的验证结论 MUST 是**可复算的口径**,不是散文自评 —— 有界 pattern(parallel / serial / iteration)与 continuous 一律适用,continuous 的独立验证者纪律(`references/operating-loops.md` §6)叠加在本节之上,不替代它。三条口径:
+
+1. **回归数字注明口径** — 每个测试 / 检查数字 MUST 标明是**全量**还是**过滤子集**,子集 MUST 附过滤表达式(如 `-k <expr>`);子集数字 MUST NOT 当作整体基线陈述。
+2. **仓库存在长期既存失败时** — 独立验证的最小充分形式是「**同口径** A/B 失败集求差 + 差集逐项归因」:A、B 两侧用同一条命令、同一过滤口径跑,只对**失败集差集**逐项归因,不对两侧的绝对数字作比较。worktree A/B 的差集项 MUST 先排除 **git-ignored 残留**归因 —— worktree 不复制 git-ignored 文件,运行工作区、构建产物、本地缓存一类路径在两侧天然不对称,由此产生的差异不是本次改动造成的,把它记成改动效果就是假阳。
+3. **One-Source-Of-Truth 类验收** — MUST 先从**落盘产物**提取实际出现的短语,再以这些短语为查询集反向计数;MUST NOT 以「我以为写了的短语」为查询集 —— 那样复写检查必然假阴(查询集与被查集不同源)。机械判据见 `.specify/shared/guidelines/one-source-of-truth.md` § Reference, don't copy。
+
+Stage 级批量判定的实读证据下限由 `references/patterns.md` § Serial Chain → Substance floor 持有,不在此复述。
 
 ## Pattern Selection (Decision Tree)
 
@@ -153,7 +163,7 @@ All patterns share file-path-only handoffs, progress tracking, structured result
 - **Context isolation** — each agent invocation is a fresh subagent; the continuous **verifier MUST be a separate sub-agent** from the implementer
 - **Idempotent execution** — stages/iterations/cycles can be re-run safely
 - **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory. Every team additionally keeps the tracked item ledger `items.jsonl`, and continuous teams also keep tracked `constraints.md` / `STATE.md` / `run-log.jsonl`, in the team directory. The summary delivery directory is **not** in the team directory — it belongs to the goal index `.specify/goal/<goal-slug>/summary/`
-- **Every run writes a dated report** to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` per the Report contract
+- **Every run writes a dated report** to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` per the Report contract, including its mandatory `## Verification` section (口径见上,不复述)
 - **Every persisted team contains `## Self-Improvement Contract` exactly once**; one-shot teams do not claim subject identity
 
 ## Resources

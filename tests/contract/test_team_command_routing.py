@@ -142,6 +142,77 @@ def test_preset_matching_reuses_the_existing_mechanism():
     assert "match-team-preset.py" in text, "preset matching script must be reused"
 
 
+# --------------------------------------------------------------------------
+# preset matcher verdict (F-15): pattern vocabulary alone is not a preset match
+# --------------------------------------------------------------------------
+
+MATCHER = REPO_ROOT / "skills/create-team/scripts/match-team-preset.py"
+
+
+def _fixture_presets(tmp_path) -> Path:
+    """A preset directory the test owns, so the verdicts below never drift with
+    the shipped presets' signal lists."""
+    d = tmp_path / "presets"
+    d.mkdir()
+    (d / "fixture-arena.md").write_text(
+        "---\n"
+        "preset_id: fixture-arena\n"
+        "name: fixture arena\n"
+        "pattern: continuous\n"
+        "summary: fixture\n"
+        "when_to_use: fixture\n"
+        "signals:\n"
+        "  - 竞技场\n"
+        "  - 效果验证\n"
+        "---\n\n# fixture\n",
+        encoding="utf-8")
+    return d
+
+
+def _match(goal: str, presets: Path):
+    return subprocess.run(
+        [sys.executable, str(MATCHER), "--goal", goal,
+         "--presets-dir", str(presets)],
+        capture_output=True, text=True)
+
+
+def test_keyword_only_goal_never_recommends_a_preset(tmp_path):
+    """A goal matching pattern keywords but zero preset signals scores > 0, so it
+    used to come back as `confidence: medium` — which create-mode step 2 turns into
+    "present the top 2 candidates". Pattern vocabulary is shared by every preset of
+    that pattern, so it cannot discriminate one preset from another.
+    """
+    presets = _fixture_presets(tmp_path)
+    out = _match("持续 长期 运营 每天 周期性推进", presets)
+    assert out.returncode == 0, out.stderr + out.stdout
+    payload = json.loads(out.stdout)
+    # anti-vacuity: the goal really did score, so `none` is a cap, not an empty scan
+    assert payload["presetsScanned"] == 1
+    assert payload["matches"], "the keyword-only goal matched nothing at all"
+    assert all(m["matchedSignals"] == [] for m in payload["matches"])
+    assert all(m["matchedPatternKeywords"] for m in payload["matches"])
+    assert all(m["patternKeywordsOnly"] for m in payload["matches"]), (
+        "a keyword-only candidate is not flagged patternKeywordsOnly"
+    )
+    assert payload["confidence"] == "none", (
+        f"keyword-only match still carries a recommendation: {payload['confidence']}"
+    )
+
+
+def test_signal_backed_goal_keeps_its_confidence(tmp_path):
+    """Over-cap guard: the keyword-only cap must not swallow a real signal match."""
+    presets = _fixture_presets(tmp_path)
+    out = _match("在竞技场里持续对技能做效果验证", presets)
+    assert out.returncode == 0, out.stderr + out.stdout
+    payload = json.loads(out.stdout)
+    top = payload["matches"][0]
+    assert top["matchedSignals"], "the fixture's own signals did not match"
+    assert not top["patternKeywordsOnly"]
+    assert payload["confidence"] != "none", (
+        "a signal-backed match was capped to none — the cap is over-broad"
+    )
+
+
 def test_goal_md_zero_write_red_line_is_stated():
     """C-5 write confinement: the create branch never writes goal.md."""
     text = _text()
@@ -262,6 +333,48 @@ def test_non_path_entries_never_intersect(tmp_path):
     ])
     out = _verify(repo, proposal)
     assert out.returncode == 0, "non_path entries are listed for arbitration, never intersected"
+
+
+def test_proposal_relisting_a_landed_team_is_not_a_self_conflict(tmp_path):
+    """The checked set is proposed ∪ existing same-`goal_slug` teams, so one slug can
+    legitimately sit on both sides (a re-proposal of an already-landed team). Such a
+    pair is one party, not two: its scope always intersects itself, and reporting
+    that as `overlap` blocked the re-proposal with exit 4.
+    """
+    repo = tmp_path / "repo"
+    _team_dir(repo, "g-t001", [
+        "slug: g-t001", "goal_slug: g", "territory:", "  write:", "    - src/a/",
+    ])
+    proposal = _proposal(tmp_path, [
+        {"slug": "g-t001", "write": ["src/a/"], "read": [], "forbidden": [], "non_path": []},
+        {"slug": "g-t002", "write": ["src/b/"], "read": [], "forbidden": [], "non_path": []},
+    ])
+    out = _verify(repo, proposal)
+    assert out.returncode == 0, out.stderr + out.stdout
+    payload = json.loads(out.stdout)
+    assert payload["summary"]["pairs"] == 2, payload["summary"]
+    assert not [v for v in payload["verdicts"] if v["a"] == v["b"]], (
+        "a self-pair survived: a scope always intersects itself"
+    )
+
+
+def test_real_overlap_with_a_landed_team_is_still_contested(tmp_path):
+    """Over-skip guard: dropping self-pairs must not drop cross-party pairs that
+    involve the same landed team."""
+    repo = tmp_path / "repo"
+    _team_dir(repo, "g-t001", [
+        "slug: g-t001", "goal_slug: g", "territory:", "  write:", "    - src/a/",
+    ])
+    proposal = _proposal(tmp_path, [
+        {"slug": "g-t003", "write": ["src/a/x.py"], "read": [], "forbidden": [], "non_path": []},
+    ])
+    out = _verify(repo, proposal)
+    assert out.returncode == 4, out.stderr + out.stdout
+    payload = json.loads(out.stdout)
+    contested = [v for v in payload["verdicts"] if v["verdict"] == "overlap"]
+    assert contested and any("src/a" in str(v.get("contested")) for v in contested), (
+        "the genuine overlap with the landed team was skipped away"
+    )
 
 
 def test_verdicts_match_direct_detect_overlaps(tmp_path):

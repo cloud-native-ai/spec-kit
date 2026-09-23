@@ -9,7 +9,7 @@
 | **一次性（one-time）** | 把某物从 A 提升到 B，**一次达标即止** | 达到目标质量（或有限轮次）即交付 | 一次 **iteration** 到阈值即停；或串行「评估 → 改进 → 复核」 |
 | **持续（continuous）** | **不断提升 / 长期维持**某质量 | 达到高标准阈值，或收敛 / 资源上限 | **continuous** 运营循环（见 [`operating-loops.md`](operating-loops.md)）：按 cadence 长期运行，从 L1 起步，需可复现、可复盘、有护栏 |
 
-**判定**：goal 含「持续 / 不断 / 长期维持 / keep improving」→ 持续；否则按一次性处理。
+**判定**：词面**初筛** —— goal 含「持续 / 不断 / 长期维持 / keep improving」→ 倾向持续；否则按一次性处理。**词面命中不等于 continuous 团队形态**：最终判据（工作主体是按 cadence 到达的流 / 被长期维持的质量，还是一次性交付物改动）由 [`patterns.md`](patterns.md) § Q1 判据 持有，本节与它冲突时以它为准 —— 一个措辞长期、工作主体却是有界交付物的 goal 走一次性形态，长期性由 Goal lifecycle 承载。
 
 ## 2. 持续优化的两种策略
 

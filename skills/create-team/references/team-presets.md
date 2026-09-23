@@ -47,7 +47,7 @@ Body sections (all mandatory):
 
 ## Matching protocol
 
-1. Run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<the user's goal text>"`. It scores every preset's `signals` + `pattern` keywords against the goal and returns JSON (`matches[]` with `preset_id`, `score`, `confidence`, `reasons`).
+1. Run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<the user's goal text>"`. It scores every preset's `signals` + `pattern` keywords against the goal and returns JSON: top-level `confidence`, `presetsScanned`, `goalChars`, and `matches[]` whose entries carry `presetId`, `score` and the match-evidence fields (`matchedSignals`, `matchedPatternKeywords`, `patternKeywordsOnly`). The script's own output is the authoritative field list.
 2. Act on `confidence` — **the script scores, the agent decides**:
    - `high` — present the top preset with its goal skeleton, roster and pattern, **recommend reusing it, and proceed with reuse**; the user can adapt or start from scratch afterwards via modify (no blocking choice point).
    - `medium` — present the top 2 candidates alongside the from-scratch option, without recommending.

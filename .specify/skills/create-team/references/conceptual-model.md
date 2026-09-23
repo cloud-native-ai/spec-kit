@@ -51,6 +51,14 @@ There is **no if-and-only-if** between a role (or stage) and `Meta`. Two inferen
 
 So the practical rule when building a roster: decide **what the member writes to**, then let that determine Type — never the role name. If a member needs to modify team config, agent definitions, or skill definitions, it must be `Meta`; if it only reads and reports on those things without writing them, judge it by its operating object like any other member.
 
+### 消解条款:「每席皆 Worker」vs canonical 写权(本节为该消解的唯一真源)
+
+一个 pattern 的**每个执行席位都是 Worker**(serial 链的常态,见 `templates/agents/agent-serial-orchestration-template.md`)与上面的写权门并不冲突,因为二者约束的是**不同的写目标**。消解规则:
+
+- **Worker 只产补丁到工作区** —— 交付物落在业务路径或运行工作区(`.specify/teams/.work/<slug>/`);这是 Worker 的合法写面,不需要 Meta 身份。
+- **交付物本身就是 agent / skill / team 定义时**,花名册 MUST 含**唯一 Meta supervisor**(Team Supervisor),由它把 Worker 产出的补丁落到 canonical 路径;Worker MUST NOT 直接写 canonical 定义文件。
+- 因此「每席皆 Worker」的模板只在交付物为**业务制品**时成立;交付物为定义类文件时,模板里的 Lead 席位不再是可选质量门,而是**必需的 Meta 落盘者**。缺它时该 team 无法合法完成交付,应在 create 阶段补齐,而不是让某个 Worker 越权写 canonical。
+
 ## Static vs Dynamic structure
 
 - **Team (static structure)** — a **Role × Stage × Type** matrix describing the roster: which agents participate, in what role, at what stage, and of what type. This is what a persisted team's `## Static Structure` section renders.

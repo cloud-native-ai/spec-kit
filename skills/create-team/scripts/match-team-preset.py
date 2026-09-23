@@ -15,7 +15,14 @@ Options:
 Output: JSON on stdout
   {"goalChars": int, "presetsScanned": int, "confidence": "high|medium|low|none",
    "matches": [{"presetId","name","pattern","score","matchedSignals":[...],
-                "matchedPatternKeywords":[...],"summary","whenToUse","file"}]}
+                "matchedPatternKeywords":[...],"patternKeywordsOnly":bool,
+                "summary","whenToUse","file"}]}
+
+`patternKeywordsOnly` marks a candidate whose score comes from pattern-level
+vocabulary alone (zero of the preset's own `signals` matched). Such a candidate
+never carries a preset recommendation: when the top-ranked one is keyword-only,
+`confidence` is `none` — pattern vocabulary is shared by every preset of that
+pattern, so it cannot discriminate one preset from another.
 
 Exit codes: 0 ok, 2 usage error, 3 preset directory unreadable.
 """
@@ -99,6 +106,8 @@ def score_preset(goal_lower: str, fields: dict) -> tuple[float, list[str], list[
 def confidence_of(matches: list[dict]) -> str:
     if not matches or matches[0]["score"] <= 0:
         return "none"
+    if matches[0].get("patternKeywordsOnly"):
+        return "none"
     top = matches[0]["score"]
     runner_up = matches[1]["score"] if len(matches) > 1 else 0.0
     if top >= HIGH_CONFIDENCE_SCORE and (top - runner_up) >= HIGH_CONFIDENCE_MARGIN:
@@ -144,6 +153,7 @@ def main(argv: list[str]) -> int:
             "score": round(score, 2),
             "matchedSignals": sig,
             "matchedPatternKeywords": pat,
+            "patternKeywordsOnly": bool(pat) and not sig,
             "summary": fields.get("summary", ""),
             "whenToUse": fields.get("when_to_use", ""),
             "file": str(path),

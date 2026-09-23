@@ -28,6 +28,14 @@ The team domain has **four** collaboration patterns, each with a distinct priori
    → NO: Consider Serial Chain with parallel stages
 ```
 
+### Q1 判据(本节为该判据的唯一真源)
+
+Q1 问的是**工作形态**,不是 goal 的措辞。判 YES 需两条同时成立:①工作主体是**按 cadence 到达的流**(新 PR / CI 失败 / 依赖更新)或**被长期维持的一项质量**;②团队自身持有终止条件(cadence 之外的收敛判据 / 预算 / kill-switch)。
+
+**工作主体是一次性交付物改动、"长期性"只体现在 goal 不设终止阈值 → Q1 判否**,继续 Q2。这种长期性由 **Goal lifecycle** 承载(goal 长期 `open`、其下 Target 逐个关闭),不由团队形态承载。这不是措辞偏好而是硬约束:continuous **强制 L1 起步**(仅报告、不派 worker — `references/operating-loops.md` §1 与 §9),把有界交付物工作误判为 continuous,它就停在报告态,除非另走 `improve-team` 晋级。
+
+「优化」类 goal 的一次性 vs 持续分类见 `references/optimization-goals.md` §1;那里的词面判定(含「持续 / 不断 / 长期维持 / keep improving」)只是**初筛**,与本节冲突时以本节为准 —— 词面命中的 goal 仍须通过上面两条判据才落 continuous。
+
 | Scenario | Pattern | Priority | Signals |
 |----------|---------|----------|---------|
 | Independent tasks, no shared state | Parallel Dispatch | 效率优先 | "并行", "同时", "independent", "parallel", "效率" |
@@ -99,6 +107,7 @@ Per-Agent Payload:
 | `territory` | Write Scope + Read Scope |
 | `forbidden_files` | Files this agent MUST NOT modify |
 | `output_convention` | Where to write status + intermediates (`.specify/teams/.work/<slug>/`) vs. final deliverables (declared target path) |
+| `incremental_landing` | **必填** — 该席位的落盘形态:一次性落盘写 `single`;分批落盘写「本 stage 由 N 次派发累积:N=<数>,依据=<`outputs` 目录文件计数>」并给出每批边界。「逐步推进」一类不可判定的话不合格(粒度纪律见 § Serial Chain → Stage granularity discipline) |
 | `model_hint` | Suggested model tier (light / standard / heavy) |
 | `fast_fail_clause` | The fast-fail injection clause, byte-identical to its owner literal in `.specify/shared/guidelines/fast-fail.md` § 子代理派发注入 — carried, never re-typed here |
 
@@ -190,6 +199,11 @@ Monitor each agent's output manifest at `.specify/teams/.work/<slug>/parallel-re
 - Dependency graph: which stages depend on which
 - Outputs: what each stage produces
 
+**Stage granularity discipline(本节为该纪律的唯一真源;落盘 `team.md` 前必做,判据程序可判定):**
+
+- **按受影响规模校验粒度** — 对每个 stage 的 `outputs` 所覆盖的目录做**文件计数**(`find <dir> -type f | wc -l` 一类程序步骤,不是 LLM 估读),计数超出单次派发可承载的规模即**拆分该 stage**。确需由多次派发累积完成时,MUST 在 `team.md` 的该 stage 行显式声明「本 stage 由 N 次派发累积」并给出 N 的依据,同时写进派发载荷的 `incremental_landing` 字段(§ Parallel Dispatch Pattern → Per-Agent Payload)。**累积与 retry 是两件事**:累积是设计,retry 是失败恢复(见 § Failure Recovery 的 `retry` 行),MUST NOT 用 retry 预算承载累积 —— 混用会把"没做完"记成"做失败重试了"。
+- **一个 stage 只承载一种任务类型** — attribution(逐项归因)与 reconciliation(跨条目对账/汇总)的预算量级不同,MUST NOT 同 stage。混装时派发预算按较小的一类估算,较大的一类于是静默做不完,而 stage 仍以"产物存在"通过 VALIDATE。
+
 **2. Generate AgentWorkflow JSON:**
 
 ```json
@@ -224,7 +238,8 @@ For each stage in topological order:
 1. CHECK: All blockedBy stages completed? (read progress file)
 2. BUILD CONTEXT: Gather upstream output paths from inputs_from
 3. INVOKE: Spawn subagent with agent_kind role
-4. VALIDATE: Check outputs exist; run the stage's quality_gate
+4. VALIDATE: Check outputs exist AND clear the substance floor below; run the
+   stage's quality_gate
 5. VERIFY HANDOFF: run a simple verification that this step's output is
    consistent with its predecessor's (the quality-first per-handoff gate) —
    on fail, apply Failure Recovery before unlocking downstream stages
@@ -233,6 +248,15 @@ For each stage in topological order:
 ```
 
 > **Per-handoff verification is mandatory** in the serial pattern — it is what makes this the quality-first form. Keep it lightweight (a targeted check that the handoff artifact satisfies the downstream stage's `inputs_from` contract), not a full re-evaluation.
+
+**Substance floor(本节为该下限的唯一真源;「存在」不等于「做了」):**
+
+`outputs exist` 是必要非充分条件 —— 一个 1476 字节的桩文件同样"存在",同样能解锁下游。VALIDATE MUST 至少跑一条**程序可判定**的实质性检查:
+
+- **字节下限** — 产物字节数 ≥ 该 stage 声明的下限,下限由 `incremental_landing` 的批规模推出(不是拍脑袋常数);或
+- **声明范围可检索** — 派发中每个已声明判定范围的目录名在产物中可被检索到(`grep -c <dir-name> <artifact>`);缺席即判该范围未覆盖,不得记为完成。
+
+**整批判定的证据下限**:一个 stage 声称「整批完成」时,判定 MUST 附 **≥2 个实读文件**的证据(路径 + 从该文件读到的具体事实),MUST NOT 以产物条目数或子代理自述充当覆盖度。这是 `.specify/shared/guidelines/fast-fail.md` § 判据同样覆盖机器给出的绿 在 stage 级的实例:一个在被守物坏掉时不会变红的检查,不构成证据。
 
 ### Summary Boundary
 

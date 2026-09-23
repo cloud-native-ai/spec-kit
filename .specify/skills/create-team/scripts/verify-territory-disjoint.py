@@ -9,7 +9,10 @@ second grammar (042 creation-territory-disjoint.contract.md §Authority).
 Checked set = proposed teams ∪ existing teams under the same `goal_slug`
 (read from `.specify/teams/*/team.md` frontmatter; an undeclared territory is
 `undecidable`, never guessed). A valid repo root without `.specify/teams/` is
-a fresh project: zero existing teams, proposals only.
+a fresh project: zero existing teams, proposals only. A slug present on BOTH
+sides is one party, not two: such a self-pair is skipped, because a scope
+always intersects itself and reporting that as `overlap` would block a
+re-proposal of an already-landed team.
 
 Exit codes: 0 all `no-overlap` / 2 invalid input JSON or schema / 3 repo root
 does not exist / 4 any `overlap` (contested paths listed) or `undecidable`
@@ -128,6 +131,8 @@ def main(argv: list[str] | None = None) -> int:
         for j in range(i + 1, len(all_teams)):
             slug_a, terr_a = all_teams[i]
             slug_b, terr_b = all_teams[j]
+            if slug_a == slug_b:
+                continue
             finding = bsi.overlap_verdict(slug_a, terr_a, slug_b, terr_b)
             contested = sorted({path for pair in finding.get("entries", [])
                                 for path in pair})

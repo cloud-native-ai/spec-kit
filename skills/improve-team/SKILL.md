@@ -26,7 +26,7 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 
 1. **Resolve target** — load `team.md` from `.specify/teams/<slug>/team.md`. If none exists → report **"team not found"** and offer to **create** one (hand off to `create-team` via `/speckit.team create`). Never silently create a team.
 2. **Gather evidence (evidence-step A/B)** — execute Step A/B per `.specify/shared/workflow/evidence-step.md`: reuse or collect findings via `evidence-utils.py --action latest|collect --target project --lanes runs,feedback`, then use the **runs-lane** evidence items (per-team run-report counts, critique notes, cycle/escalation signals) to identify convergence/oscillation, territory conflicts, and stale/broken member references before proposing changes. Triage by `evidenceState` and freeze the candidate list; `Unobserved` items are recorded only, never fixed.
-3. **Attribute root cause** — map each issue to the responsible part (roster, pattern, config/thresholds, member territories/DAG).
+3. **Attribute root cause** — map each issue to the responsible part (roster, pattern, config/thresholds, member territories/DAG). 归因量化 MUST **可复算** —— 附命令与输出片段,让读者重跑得到同一数字;**产物条目数不是覆盖度**(条目多不代表目标范围被覆盖),对照 `../create-team/references/operating-loops.md` §1 的「不可自标绿」条款:散文自评的达标声明不构成证据。
 4. **Apply targeted edits** — make the **minimal, evidence-based** change that fixes the issue while **preserving the parts of the team that already work** (SC-005). Do not touch unaffected fields — they must remain byte-identical.
 5. **Re-persist** — write the updated `team.md` and **bump the `updated` date**; leave `created` and all unaffected frontmatter/members untouched. Run intermediates stay in the git-ignored workspace `.specify/teams/.work/<slug>/`; if editing a legacy team, repoint any stale `progress_file` there.
 6. **Report** — list each change and the evidence that motivated it, and recommend a `run` to validate.
@@ -39,6 +39,7 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 | Score oscillates | Ambiguous evaluator criteria | Tighten the evaluator rubric (via the moved stage templates in `create-team/templates/`) |
 | Parallel file conflicts | Overlapping territories | Repartition `territories`; move shared files to forbidden-write |
 | Serial stage stalls | Broken/missing handoff dependency | Fix `blockedBy` edges / handoff file path |
+| Serial stage 反复撞派发轮次上限,产物只覆盖目标的一小部分 | **交付粒度超预算** — stage 的 `outputs` 规模超过单次派发可承载量 | 按目录规模拆 stage,或降为目录级 + 例外清单;粒度纪律见 `../create-team/references/patterns.md` § Serial Chain |
 | Stale member | Agent renamed/deleted | Repoint or remove the member; surface the broken reference |
 | Missing a role (e.g. no QA gate) | Roster gap | Add a member (e.g. a `qa-engineer`) without altering existing members |
 | Goal drifted / team doing off-target work | Goal stale or never made explicit | Redefine the `goal` (verifiable form) and **realign** roster + pattern to it — see `references/goal-editing.md` |

@@ -1438,13 +1438,21 @@ def test_i12_channel_two_bounded_set():
 
 
 def test_i13_channel_three_payload_sixth_field_row():
-    """C-13: the team Per-Agent Payload table gained the sixth field row."""
+    """C-13: the team Per-Agent Payload table gained the sixth field row.
+
+    Row budget: 5 original + `fast_fail_clause` (C-13) + `incremental_landing`
+    (serial stage granularity — the landing form a dispatch carries, without
+    which "incremental landing" stays an undecidable sentence in the brief).
+    """
     text = _text(TEAM_PATTERNS)
     m = re.search(r"Per-Agent Payload:(.*?)Context Isolation Rules:", text, re.S)
     assert m, "C-13: the Per-Agent Payload / Context Isolation Rules block is gone"
     rows = re.findall(r"^\| `([a-z_]+)` \|", m.group(1), re.M)
     assert "fast_fail_clause" in rows, f"C-13: the payload table lacks fast_fail_clause; rows are {rows}"
-    assert len(rows) == 6, f"C-13: the payload table has {len(rows)} field rows; expected 6 (5 before + 1)"
+    assert "incremental_landing" in rows, (
+        f"the payload table lacks incremental_landing; rows are {rows}"
+    )
+    assert len(rows) == 7, f"C-13: the payload table has {len(rows)} field rows; expected 7 (5 before + fast_fail_clause + incremental_landing)"
     tail = text[text.index("Context Isolation Rules:"):]
     assert DOC_REL in tail[:2000] or "fast-fail" in m.group(1), (
         "C-13: the new field row does not point at the clause owner"

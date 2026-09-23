@@ -26,7 +26,7 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 
 1. **Resolve target** — load `team.md` from `.specify/teams/<slug>/team.md`. If none exists → report **"team not found"** and offer to **create** one (hand off to `create-team` via `/speckit.team create`). Never silently create a team.
 2. **Gather evidence (evidence-step A/B)** — execute Step A/B per `.specify/shared/workflow/evidence-step.md`: reuse or collect findings via `evidence-utils.py --action latest|collect --target project --lanes runs,feedback`, then use the **runs-lane** evidence items (per-team run-report counts, critique notes, cycle/escalation signals) to identify convergence/oscillation, territory conflicts, and stale/broken member references before proposing changes. Triage by `evidenceState` and freeze the candidate list; `Unobserved` items are recorded only, never fixed.
-3. **Attribute root cause** — map each issue to the responsible part (roster, pattern, config/thresholds, member territories/DAG).
+3. **Attribute root cause** — map each issue to the responsible part (roster, pattern, config/thresholds, member territories/DAG). 归因量化 MUST **可复算** —— 附命令与输出片段,让读者重跑得到同一数字;**产物条目数不是覆盖度**(条目多不代表目标范围被覆盖),对照 `../create-team/references/operating-loops.md` §1 的「不可自标绿」条款:散文自评的达标声明不构成证据。
 4. **Apply targeted edits** — make the **minimal, evidence-based** change that fixes the issue while **preserving the parts of the team that already work** (SC-005). Do not touch unaffected fields — they must remain byte-identical.
 5. **Re-persist** — write the updated `team.md` and **bump the `updated` date**; leave `created` and all unaffected frontmatter/members untouched. Run intermediates stay in the git-ignored workspace `.specify/teams/.work/<slug>/`; if editing a legacy team, repoint any stale `progress_file` there.
 6. **Report** — list each change and the evidence that motivated it, and recommend a `run` to validate.
@@ -39,6 +39,7 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 | Score oscillates | Ambiguous evaluator criteria | Tighten the evaluator rubric (via the moved stage templates in `create-team/templates/`) |
 | Parallel file conflicts | Overlapping territories | Repartition `territories`; move shared files to forbidden-write |
 | Serial stage stalls | Broken/missing handoff dependency | Fix `blockedBy` edges / handoff file path |
+| Serial stage 反复撞派发轮次上限,产物只覆盖目标的一小部分 | **交付粒度超预算** — stage 的 `outputs` 规模超过单次派发可承载量 | 按目录规模拆 stage,或降为目录级 + 例外清单;粒度纪律见 `../create-team/references/patterns.md` § Serial Chain |
 | Stale member | Agent renamed/deleted | Repoint or remove the member; surface the broken reference |
 | Missing a role (e.g. no QA gate) | Roster gap | Add a member (e.g. a `qa-engineer`) without altering existing members |
 | Goal drifted / team doing off-target work | Goal stale or never made explicit | Redefine the `goal` (verifiable form) and **realign** roster + pattern to it — see `references/goal-editing.md` |
@@ -73,20 +74,4 @@ Start every run with SI-0 from `.specify/shared/workflow/self-improvement-workfl
 running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills
 directory) — skip this entire Feedback step: no engine call, no feedback entry.
 
-At the end of a substantial run of this skill, perform an agent self-reflection step (never solicit feedback content from the user), following the canonical convention in `.specify/shared/workflow/feedback-step.md`:
-
-1. **Gate on qualification & completion.** Only proceed if this run reached a meaningful wrap-up. Skip trivial/no-op runs; for an aborted run use the abort/partial rule below.
-2. **Reflect (no user input).** Review this run against this skill's declared purpose and produce a short review plus ≥1 concrete, skill-specific optimization point. If the run was clean, use exactly: `No significant optimization points identified this run.`
-3. **Scope guard.** Keep strictly to this skill's operation; do NOT produce a global/whole-project assessment (that is `/speckit.review`'s job). Entries are `scope: local`.
-4. **Dedup guard.** Use a stable `run_id`; if a parent flow already recorded feedback for this same `(unit_id, run_id)`, the engine no-ops.
-5. **Persist** via the engine:
-   ```bash
-   python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
-     --unit-id "skill:improve-team" --unit-type skill \
-     --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
-     --review "<review prose>" --points-file "<points file>"
-   ```
-   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
-6. **Consolidated submission prompt(非阻塞).** If the returned `should_prompt` is `true`, append ONE non-blocking line to the wrap-up report inviting submission (point the user to the `/speckit.feedback package` command — the user-facing path; never paste the raw `feedback-utils.py` engine call into the user-facing line); it MUST NOT block the wrap-up flow and MUST NOT trigger any 自动传输 (manual delivery only; `--action mark-submitted` runs only if the user initiates submission). Below threshold, do not prompt.
-
-**Abort / partial-run rule.** If the run failed before wrap-up, either skip recording or record with `--partial` and a `## Review` beginning `**Partial run** — `.
+At wrap-up, run the feedback self-reflection step per the canonical convention in `.specify/shared/workflow/feedback-step.md`: agent self-reflection only — **never** solicit feedback content from the user; skip trivial or no-op runs; keep strictly to this skill's scope; persist one entry via `feedback-utils.py --action record --unit-id "skill:improve-team" --unit-type skill`. Non-blocking (非阻塞) and never any 自动传输 — delivery stays manual. That file owns every rule of this step — reflection, scope, dedup, persistence, the submission prompt, the abort and nesting clauses; do not restate any of them here.
