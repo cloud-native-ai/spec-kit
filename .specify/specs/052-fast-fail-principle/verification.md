@@ -6,8 +6,8 @@ run_command=/speckit.implement
 run_date=2026-09-23
 run_outcome=partial-completion
 tasks_total=63
-tasks_closed=58
-tasks_open=5
+tasks_closed=62
+tasks_open=1
 tasks_deferred=0
 
 # -- Baseline (recorded once, BEFORE any /speckit.implement work changed the tree) --
@@ -156,7 +156,7 @@ GATE-5_note=`test_fast_fail_discipline.py` **105 passed**;`test_constitution_dou
 GATE-6_status=pass
 GATE-6_note=`cmp shared/guidelines/fast-fail.md .specify/shared/guidelines/fast-fail.md` 静默 → BYTE-IDENTICAL。
 GATE-7_status=fail
-GATE-7_note=仍有 5 个任务为 `[ ]`(T058 的完整审计、T060、T061、T062 与 T054 的 SC-001 第三轮义务);故本项**不满足**,不得报为完成。
+GATE-7_note=`grep -cE '^- \[[ >]\]' tasks.md` 返回 **1**,不是 0:仅 **T058**(穷尽式派生命令审计)仍为 `[ ]`。该行已完成 19 项代表性派生命令的复跑且**零不符**(见 `notes/` 与本文件 final_* 各值全部取自实跑),但任务要求的是"全部制品中印出的**每一条**派生命令",穷尽扫描未做完,故保持开放而不虚报闭合。T060/T061/T062 已闭合;SC-001 的第三轮复跑义务记在 SC-001_unblock 而非任务行上。
 GATE-8_status=pass
 GATE-8_note=本文件覆盖 SC-001…SC-015 全部 15 条,每条含 status / value / note 三字段;deferred 两条各附 `deferred_reason`。
 GATE-9_status=pass
