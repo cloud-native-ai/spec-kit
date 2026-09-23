@@ -47,6 +47,7 @@ NEW_TEMPLATE_TITLES = (STR006_TITLE, STR003_TITLE)
 DOUBLE_LANDING_WATCHLIST = (
     "User-Facing Comprehension (No Jargon, With Context)",
     "One Source of Truth (Authority & Reference Discipline)",
+    "Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)",
 )
 
 # C-8: numeral-agnostic matchers. `[IVXLC0-9]+` accepts roman or arabic; nothing pins a value.
@@ -62,10 +63,10 @@ LIVE_TITLE_RE = TEMPLATE_TITLE_RE
 # C-9: the pre-existing command-side entry that shares a substring with STR-006.
 CODE_SSOT_NAME = "Code as the Single Source of Truth"
 
-TEMPLATE_COUNT = 13     # 11 pre-existing + 2 landed here
-LIVE_COUNT = 15         # 14 pre-existing + 1 (XIV already carries STR-006)
-COMMAND_COUNT = 7       # 5 pre-existing + 2
-MIN_VERSION = (1, 12)   # floor semantics, never an equality pin
+TEMPLATE_COUNT = 14     # 11 pre-existing + 2 (Feature 051) + 1 landed here (Feature 052)
+LIVE_COUNT = 16         # 14 pre-existing + 1 (XIV already carries STR-006) + 1 (XVI landed here)
+COMMAND_COUNT = 8       # 5 pre-existing + 2 (Feature 051) + 1 landed here (Feature 052)
+MIN_VERSION = (1, 13)   # floor semantics, never an equality pin
 
 
 def _text(path: Path) -> str:
@@ -431,6 +432,16 @@ def test_c12_live_constitution_version_and_sync_impact_report():
     assert re.search(r"Version change:.*→", head), "the report must state the version change"
     assert STR003_TITLE.split(" (")[0] in head, (
         "the report must name the principle this amendment added"
+    )
+    # The assertion above is pinned to Feature 051's title, so on its own it stays green for any
+    # later amendment that never names its own principle -- a check whose output is not about the
+    # proposition it was written to judge. Derive the newest watchlist entry so the report has to
+    # name the principle the CURRENT amendment added. Adding an entry to the watchlist is what
+    # keeps this assertion pointed at the latest landing.
+    newest = DOUBLE_LANDING_WATCHLIST[-1]
+    assert newest.split(" (")[0] in head, (
+        f"the Sync Impact Report must name the principle THIS amendment added ({newest!r}); "
+        "a fixed older title alone would let any later amendment pass without naming its own"
     )
 
 

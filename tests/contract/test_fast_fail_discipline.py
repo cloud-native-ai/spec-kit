@@ -792,95 +792,255 @@ def test_a19_channel_one_unobservable_self_statement():
 
 # --- constitution-export.md C-1..C-23 (bodies land in T025 / T050) ---------
 
+PRINCIPLE_TITLE = "Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)"
+TPL_HEADING = f"### XIV. {PRINCIPLE_TITLE}"
+LIVE_HEADING = f"### XVI. {PRINCIPLE_TITLE}"
+PRINCIPLE_RE = re.compile(r"^### ([IVXLC0-9]+)\. (.+)$", re.M)
+REJECTED_MECHANISMS = ("anomaly-detection engine", "triage scorer", "maturity report", "ledger")
+PLAN_NO_HARDCODE = "Do NOT hard-code principle names here"
+PLAN_ENUMERATE = "enumerate every heading matching"
+
+
+def _principle_block(text: str, heading: str) -> str:
+    lines = text.splitlines()
+    assert heading in lines, f"principle block {heading!r} is absent"
+    i = lines.index(heading)
+    j = next((k for k in range(i + 1, len(lines)) if lines[k].startswith("### ") or lines[k].startswith("## ")), len(lines))
+    return "\n".join(lines[i:j])
+
 
 def test_x1_template_principle_xiv():
-    _text(CONST_TPL)
-    _unimplemented("X-1", "T025")
+    """C-1: the template carries principle XIV under the exact title."""
+    text = _text(CONST_TPL)
+    assert text.count(TPL_HEADING) == 1, (
+        f"C-1: {TPL_HEADING!r} appears {text.count(TPL_HEADING)}x in {CONST_TPL.relative_to(ROOT)}"
+    )
 
 
 def test_x2_command_must_include_entry():
-    _text(CONST_CMD)
-    _unimplemented("X-2", "T025")
+    """C-2: the command's MUST-include list carries the same title."""
+    text = _text(CONST_CMD)
+    needle = f'**MUST include** a principle for "{PRINCIPLE_TITLE}"'
+    assert text.count(needle) == 1, (
+        f"C-2: the MUST-include entry appears {text.count(needle)}x in {CONST_CMD.relative_to(ROOT)}"
+    )
 
 
 def test_x3_double_landing_neither_side_missing():
-    _text(CONST_TPL)
-    _unimplemented("X-3 (drill: delete either side -> red)", "T025")
+    """C-3: neither side may be missing -- the title lands verbatim on both.
+
+    The delete-either-side mutation drill is carried by the pre-existing guard
+    tests/contract/test_constitution_double_landing.py, which already probes the
+    watchlist (its DOUBLE_LANDING_WATCHLIST gains this title in T023). Restating
+    the drill here would make two owners of one proposition.
+    """
+    tpl, cmd = _text(CONST_TPL), _text(CONST_CMD)
+    assert PRINCIPLE_TITLE in tpl, "C-3: the template side is missing the title"
+    assert PRINCIPLE_TITLE in cmd, "C-3: the command side is missing the title"
+    # the two occurrences must be the SAME string, not two near-misses
+    tpl_titles = set(PRINCIPLE_RE.findall(tpl))
+    assert any(title == PRINCIPLE_TITLE for _num, title in tpl_titles), (
+        "C-3: the template heading title does not match the command entry title verbatim"
+    )
 
 
 def test_x4_live_constitution_principle_xvi():
-    _text(CONST_LIVE)
-    _unimplemented("X-4", "T025")
+    """C-4: the live constitution carries the corresponding principle."""
+    text = _text(CONST_LIVE)
+    assert text.count(LIVE_HEADING) == 1, (
+        f"C-4: {LIVE_HEADING!r} appears {text.count(LIVE_HEADING)}x in {CONST_LIVE.relative_to(ROOT)}"
+    )
 
 
 def test_x5_live_version_minor_bump():
-    _text(CONST_LIVE)
-    _unimplemented("X-5", "T025")
+    """C-5: the live version took the MINOR bump to 1.13.0."""
+    text = _text(CONST_LIVE)
+    m = re.search(r"^\*\*Version\*\*:\s*([0-9.]+)", text, re.M)
+    assert m, "C-5: no anchored `**Version**:` line found"
+    assert m.group(1) == "1.13.0", f"C-5: live version is {m.group(1)}; expected 1.13.0"
+    # anchored on purpose: an unanchored scan matches the Sync Impact Report's
+    # "Version change: 1.11.0 ->" line and reports a stale value.
 
 
 def test_x6_sync_impact_report_prepended():
-    _text(CONST_LIVE)
-    _unimplemented("X-6", "T025")
+    """C-6: a Sync Impact Report block is prepended, in the house form."""
+    lines = _lines(CONST_LIVE)
+    head = "\n".join(lines[:40])
+    assert "Sync Impact Report" in head, "C-6: no Sync Impact Report in the first 40 lines"
+    assert re.search(r"Version change:.*→", head), "C-6: the report does not state the version change"
+    for field in ("- Added principles:", "- Modified principles:", "- Removed sections:",
+                  "- Templates requiring updates:", "- Follow-up TODOs:", "- Preserved by design:"):
+        assert field in head, f"C-6: the report is missing the {field!r} field"
+    assert "✅" in head, "C-6: the report carries no per-item ✅ / ⚠ status"
+    assert PRINCIPLE_TITLE.split(" (")[0] in head, "C-6: the report does not name the added principle"
 
 
 def test_x7_version_three_segment_form():
-    _text(CONST_LIVE)
-    _unimplemented("X-7", "T025")
+    """C-7: the version is a 3-segment number (upstream's 4-segment rule is a recorded divergence)."""
+    m = re.search(r"^\*\*Version\*\*:\s*([0-9.]+)", _text(CONST_LIVE), re.M)
+    assert m, "C-7: no `**Version**:` line"
+    parts = m.group(1).split(".")
+    assert len(parts) == 3 and all(p.isdigit() for p in parts), (
+        f"C-7: version {m.group(1)!r} is not 3 numeric segments"
+    )
 
 
 def test_x8_principle_block_structure():
-    _text(CONST_TPL)
-    _unimplemented("X-8", "T025")
+    """C-8: both new blocks follow the house structure."""
+    for path, heading in ((CONST_TPL, TPL_HEADING), (CONST_LIVE, LIVE_HEADING)):
+        block = _principle_block(_text(path), heading)
+        lines = block.splitlines()
+        assert lines[0] == heading, "C-8: the block does not start with its heading"
+        # The claim sentence is hard-wrapped (<100 chars per line, C-10), so it spans
+        # every line between the heading and the first bullet -- the colon terminates
+        # the SENTENCE, not the first line. House Principle XIII wraps the same way.
+        body = lines[1:]
+        cut = next((k for k, l in enumerate(body) if l.startswith("- ")), len(body))
+        claim = " ".join(l.strip() for l in body[:cut] if l.strip())
+        assert claim.endswith(":"), f"C-8: the claim sentence does not end in a colon: {claim[-70:]!r}"
+        bullets = [l for l in lines if l.startswith("- ")]
+        assert bullets, "C-8: the block has no `- ` bullets"
+        joined = "\n".join(bullets)
+        assert "MUST" in joined and "MUST NOT" in joined, "C-8: the bullets carry no MUST / MUST NOT"
+        assert "Rationale:" in block, "C-8: no Rationale paragraph"
+        # exactly one blank line immediately before Rationale: the separator must be
+        # "\n\n" and not "\n\n\n". (An earlier form of this check rstripped the text and
+        # then asserted it did not end in a newline -- vacuously true, i.e. a blind check.)
+        pre = block[: block.index("Rationale:")]
+        assert pre.endswith("\n\n"), f"C-8: Rationale is not preceded by a blank line: {pre[-40:]!r}"
+        assert not pre.endswith("\n\n\n"), f"C-8: more than one blank line before Rationale: {pre[-40:]!r}"
 
 
 def test_x9_principle_block_pointer_and_no_new_mechanism():
-    _text(CONST_TPL)
-    _unimplemented("X-9", "T025")
+    """C-9: each block carries a pointer bullet and a no-new-mechanism bullet."""
+    for path, heading in ((CONST_TPL, TPL_HEADING), (CONST_LIVE, LIVE_HEADING)):
+        block = _principle_block(_text(path), heading)
+        assert DOC_REL in block or f".specify/{DOC_REL}" in block, (
+            f"C-9(a): {path.name}'s block does not cite the discipline doc by path"
+        )
+        assert "reference it" in block and "do not restate it" in block, (
+            f"C-9(a): {path.name}'s pointer bullet does not state reference-not-restate"
+        )
+        missing = [m for m in REJECTED_MECHANISMS if m not in block]
+        assert not missing, f"C-9(b): {path.name}'s block does not name the rejected mechanisms {missing}"
 
 
 def test_x10_principle_block_lines_under_100():
-    _text(CONST_TPL)
-    _unimplemented("X-10", "T025")
+    """C-10: every line of both new blocks is hard-wrapped under 100 characters."""
+    for path, heading in ((CONST_TPL, TPL_HEADING), (CONST_LIVE, LIVE_HEADING)):
+        block = _principle_block(_text(path), heading)
+        over = [(len(l), l[:50]) for l in block.splitlines() if len(l) >= 100]
+        assert not over, f"C-10: {path.name}'s block has lines >= 100 chars: {over[:3]}"
 
 
 def test_x11_principle_block_no_restated_content():
-    _text(CONST_TPL)
-    _unimplemented("X-11", "T025")
+    """C-11: the blocks reference the discipline; they do not restate it."""
+    for path, heading in ((CONST_TPL, TPL_HEADING), (CONST_LIVE, LIVE_HEADING)):
+        block = _principle_block(_text(path), heading)
+        for needle, what in (
+            (MECHANICAL_TEST_FIX, "STR-005 mechanical test"),
+            (BLIND_CHECK_SENTINEL, "STR-006 blind-check sentinel"),
+            ("- **FF-", "fast-fail list entries"),
+            ("- **RP-", "in-passing repair list entries"),
+            (CLAUSE_BEGIN, "the injection clause owner literal"),
+        ):
+            assert needle not in block, f"C-11: {path.name}'s block restates {what}"
+        inlined = [h for h in SECTION_HEADINGS if h in block]
+        assert not inlined, f"C-11: {path.name}'s block inlines truth-source section headings {inlined}"
 
 
 def test_x12_principle_block_project_neutral():
-    _text(CONST_TPL)
-    _unimplemented("X-12", "T025")
+    """C-12: the template block ships downstream, so no repo-specific names."""
+    block = _principle_block(_text(CONST_TPL), TPL_HEADING).lower()
+    hits = [n for n in FORBIDDEN_NAMES if n.lower() in block]
+    assert hits == [], f"C-12: project-specific names in the template principle block: {hits}"
 
 
 def test_x13_double_landing_three_count_pins():
-    _text(DOUBLE_LANDING_TEST)
-    _unimplemented("X-13", "T025")
+    """C-13: the three count pins were raised in the same batch."""
+    src = _text(DOUBLE_LANDING_TEST)
+    for name, want in (("TEMPLATE_COUNT", 14), ("LIVE_COUNT", 16), ("COMMAND_COUNT", 8)):
+        m = re.search(rf"^{name} = (\d+)", src, re.M)
+        assert m, f"C-13: {name} not found in the guard"
+        assert int(m.group(1)) == want, f"C-13: {name} is {m.group(1)}; expected {want}"
+    # and the counts are true of the artifacts, not just of the pins
+    assert len(PRINCIPLE_RE.findall(_text(CONST_TPL))) == 14, "C-13: the template does not actually hold 14"
+    assert len(PRINCIPLE_RE.findall(_text(CONST_LIVE))) == 16, "C-13: the live constitution does not hold 16"
+    assert len(re.findall(r'\*\*MUST include\*\* a principle for "([^"]+)"', _text(CONST_CMD))) == 8, (
+        "C-13: the command list does not actually hold 8 entries"
+    )
 
 
 def test_x14_min_version_floor_semantics():
-    _text(DOUBLE_LANDING_TEST)
-    _unimplemented("X-14", "T025")
+    """C-14: MIN_VERSION is a floor, raised to (1, 13), and compared with >=."""
+    src = _text(DOUBLE_LANDING_TEST)
+    m = re.search(r"^MIN_VERSION = \((\d+),\s*(\d+)\)", src, re.M)
+    assert m, "C-14: MIN_VERSION not found"
+    assert (int(m.group(1)), int(m.group(2))) == (1, 13), (
+        f"C-14: MIN_VERSION is ({m.group(1)}, {m.group(2)}); expected (1, 13)"
+    )
+    assert re.search(r"got >= MIN_VERSION", src), (
+        "C-14: MIN_VERSION is no longer used as a floor (>=); floor semantics are the point of the pin"
+    )
 
 
 def test_x15_watchlist_gains_principle_title():
-    _text(DOUBLE_LANDING_TEST)
-    _unimplemented("X-15", "T025")
+    """C-15: the double-landing watchlist gained this title (2 -> 3)."""
+    src = _text(DOUBLE_LANDING_TEST)
+    m = re.search(r"DOUBLE_LANDING_WATCHLIST = \((.*?)\n\)", src, re.S)
+    assert m, "C-15: DOUBLE_LANDING_WATCHLIST not found"
+    entries = re.findall(r'"([^"]+)"', m.group(1))
+    assert PRINCIPLE_TITLE in entries, f"C-15: the watchlist lacks {PRINCIPLE_TITLE!r}"
+    assert len(entries) == 3, f"C-15: the watchlist holds {len(entries)} entries; expected 3"
 
 
 def test_x16_plan_template_zero_change():
-    _text(PLAN_TPL)
-    _unimplemented("X-16", "T025")
+    """C-16: plan-template.md needed no edit -- it enumerates dynamically.
+
+    The git-level zero-change proof is GATE-3 (a diff against the frozen BASE_SHA
+    literal); a test cannot own a SHA. What a test CAN own is the substance: the
+    template hard-codes no principle name, so a new principle reaches every
+    downstream plan gate without an edit here.
+    """
+    text = _text(PLAN_TPL)
+    assert PRINCIPLE_TITLE not in text, (
+        "C-16: plan-template.md now hard-codes this principle's name -- it is supposed to enumerate "
+        "dynamically, so any hard-coded name is drift waiting to happen"
+    )
+    known = [t for _n, t in PRINCIPLE_RE.findall(_text(CONST_LIVE))]
+    hard = [t for t in known if t in text]
+    assert hard == [], f"C-16: plan-template.md hard-codes live principle names: {hard}"
 
 
 def test_x17_plan_template_enumeration_sentinel():
-    _text(PLAN_TPL)
-    _unimplemented("X-17", "T025")
+    """C-17: anti-vacuity for C-16 -- the enumeration instruction is still there."""
+    text = _text(PLAN_TPL)
+    assert PLAN_NO_HARDCODE in text, (
+        f"C-17 sentinel: {PLAN_NO_HARDCODE!r} is gone, so 'zero change' may mean the mechanism was deleted"
+    )
+    assert PLAN_ENUMERATE in text, f"C-17 sentinel: {PLAN_ENUMERATE!r} instruction is gone"
+    assert "### <roman-or-arabic-numeral>. <name>" in text or re.search(r"###\s*<[^>]*numeral[^>]*>", text), (
+        "C-17 sentinel: the heading pattern the enumeration keys on is no longer stated"
+    )
 
 
 def test_x18_downstream_gate_rows_15_to_16():
-    _text(PLAN_TPL)
-    _unimplemented("X-18", "T025")
+    """C-18: rendering the enumeration logic gives 16 rows, up from 15."""
+    live = _text(CONST_LIVE)
+    rows = PRINCIPLE_RE.findall(live)
+    assert len(rows) == 16, f"C-18: the enumeration yields {len(rows)} gate rows; expected 16"
+    # the 15 side is measured, not asserted from memory: drop this principle's block
+    lines = live.splitlines()
+    i = lines.index(LIVE_HEADING)
+    j = next(k for k in range(i + 1, len(lines)) if lines[k].startswith("## "))
+    sample = "\n".join(lines[:i] + lines[j:])
+    before = PRINCIPLE_RE.findall(sample)
+    assert len(before) == 15, f"C-18: without this principle the enumeration yields {len(before)}; expected 15"
+    # sentinel: the enumeration is not returning 16 for a trivial reason
+    assert any(title == PRINCIPLE_TITLE for _n, title in rows), "C-18 sentinel: this principle is not among the rows"
+    assert not any(title == PRINCIPLE_TITLE for _n, title in before), (
+        "C-18 sentinel: the sample still contains the principle, so the 15 is not a real before-state"
+    )
 
 
 def test_x19_ufc_class_eleven_gains_fast_fail_path():

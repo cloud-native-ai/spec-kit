@@ -146,6 +146,24 @@ Follow this execution flow:
        needs in order to act, and reach everything else by path reference.
      - This principle adds a way of writing, not machinery: it MUST NOT justify a jargon linter, a
        wording scorer, a maturity report, or any other new tracking system.
+   - **MUST include** a principle for "Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)" that mandates:
+     - An anomaly found mid-run is triaged before it is acted on, so a wrong premise stops where it
+       is discovered instead of spreading into every artifact built on it.
+     - The full discipline (binary triage criterion, the two closed lists, the surface-report form,
+       the bidirectional growth rule, the boundaries with adjacent disciplines) lives at
+       `.specify/shared/guidelines/fast-fail.md` and MUST be referenced, not restated.
+     - Triage is binary and decidable — correction (exactly one reading consistent with the recorded
+       intent) is repaired in passing and disclosed; decision (choosing between readings, or
+       inventing intent no artifact records) halts at the anomaly point and hands the user a
+       surface report. A severity scale or an undecidable middle tier MUST NOT be substituted, and
+       a list hit is not a licence: the criteria outrank list membership.
+     - A green check is a claim, not evidence: where a check would not go red if its subject broke,
+       that pass is reported as a fast fail rather than cited as proof.
+     - Subagents are injected at dispatch — a standing instruction layer cannot reach them, so the
+       caller carries the clause into every dispatch and requires an explicit anomaly line on
+       return.
+     - This principle adds a way of triaging, not machinery: it MUST NOT justify an anomaly-detection
+       engine, a triage scorer, a maturity report, or any new ledger or registry.
    - Ensure Governance section lists amendment procedure, versioning policy, and compliance review expectations.
 
 4. Consistency propagation checklist (convert prior checklist into active validations):

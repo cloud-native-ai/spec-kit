@@ -191,6 +191,33 @@ Rationale: an unreadable prompt does not fail loudly. A reader who has to decode
 and then acts confidently on the wrong meaning, and a reader who has to page away for context
 answers a different question — both look like a completed flow while the decision goes wrong.
 
+### XIV. Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)
+An anomaly found mid-run MUST be triaged before it is acted on, so that a wrong premise stops at
+the point where it is discovered instead of spreading into every artifact built on it:
+- The discipline — the binary triage criterion, the two closed lists, the surface-report form, the
+  bidirectional growth rule, and the boundaries with adjacent disciplines — is defined once in
+  `.specify/shared/guidelines/fast-fail.md`; consumers MUST reference it, do not restate it.
+- Triage MUST be binary and decidable: resolving the anomaly either needs correction, meaning
+  exactly one reading is consistent with the recorded intent, or it needs decision, meaning a
+  choice between readings or intent that no artifact records. Correction is repaired in passing
+  and disclosed at wrap-up; decision halts at the anomaly point and hands the user a surface
+  report. A severity scale or an undecidable middle tier MUST NOT be substituted for that
+  question, and a list hit MUST NOT be read as a licence — the criteria outrank list membership.
+- A green check MUST be treated as a claim, not as evidence: where a check would not go red if
+  its subject broke, that pass MUST be reported as a fast fail rather than cited as proof.
+- Subagents MUST be injected at dispatch: a standing instruction layer cannot reach them, because
+  a subagent's prompt derives from its own definition and dispatch payload rather than from the
+  orchestrator's conversation. The caller MUST carry the clause into every dispatch and MUST
+  require an explicit anomaly line on return, so silence is never read as clean.
+- This principle adds a way of triaging, not machinery: it MUST NOT be used to justify an
+  anomaly-detection engine, a triage scorer, a maturity report, or any new ledger or registry.
+
+Rationale: a silently repaired anomaly yields a green run and a wrong artifact, and the wrong
+artifact is then cited downstream as a verified premise. Repairing in passing is right for a
+correction and catastrophic for a decision, yet the two look identical to anyone who only sees
+the green — so the distinction has to be made at the moment of discovery, by a criterion that
+two independent reviewers can apply and agree on.
+
 ## [SECTION_2_NAME]
 <!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 
