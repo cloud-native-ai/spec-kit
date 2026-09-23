@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-23T14:14:36Z",
+  "updated": "2026-09-23T17:44:33Z",
   "threshold": 10,
-  "count_since_submission": 1,
+  "count_since_submission": 2,
   "submitted_at": "2026-09-23T12:55:38Z",
   "entries": [
+    {
+      "id": "20260923T174433Z-speckit-feedback",
+      "file": "20260923T174433Z-speckit-feedback.md",
+      "unit_id": "/speckit.feedback",
+      "unit_type": "command",
+      "run_id": "feedback-consume-20260923T120035Z-items9-13",
+      "probe": "speckit-feedback-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "052-fast-fail-principle",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-09-23T17:44:33Z",
+      "summary": "本轮是 2026-09-23 consume 消化的**授权续跑**(用户批准待决项 1–8 后,再批准 9–13),覆盖五项:**9** 建路由死信载体、**10** 写两处文档、**11** 回写 052 的子代理注入样本、**12** 补完 T058 并推进 052 状态、**13** 补全命令分类契约表。**项目 9**:新建 `.specify/memory/feedback/backl"
+    },
     {
       "id": "20260923T141436Z-speckit-requirements",
       "file": "20260923T141436Z-speckit-requirements.md",
