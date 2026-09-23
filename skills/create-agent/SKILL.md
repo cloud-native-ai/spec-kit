@@ -103,6 +103,7 @@ Write `skills/create-agent/templates/agent-capacity-<slug>-template.md` followin
 
 - Templates MUST follow the established role-based structure (six mandatory sections)
 - Every persistent Template/Instance MUST include `## Self-Improvement Contract` exactly once; temporary Executions/configs MUST NOT claim a separate subject identity
+- Every Agent definition that can be dispatched as a subagent MUST carry the fast-fail injection clause inside its paired delimiters, byte-identical to the owner literal in `.specify/shared/guidelines/fast-fail.md` § 子代理派发注入; the definition MUST reference that owner and MUST NOT re-type the clause
 - Templates MUST use only approved `{{PLACEHOLDER}}` variables
 - Frontmatter uses Qoder-compatible fields — `model` (default `auto`, Qoder smart routing), `tools`/`disallowedTools`, `maxTurns`/`timeoutMins`, `skills`/`mcpServers`, `permissionMode`, `background`, `isolation`, `color`. Only `name` and `description` are strictly required; set `model`/`tools`/`maxTurns` for every role and leave the rest unset unless needed.
 - Role instructions MUST be written in first-person professional identity

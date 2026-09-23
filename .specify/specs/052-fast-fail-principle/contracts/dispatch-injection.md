@@ -35,7 +35,7 @@
 
 **C-10** **通道二 · 出厂预设**:`agents/skill-verifier.agent.md` 与 `agents/structure-adjuster.agent.md`(实测 `agents/*.agent.md` 恰为 **2** 份)MUST 各含**恰好一对** C-1 的定界符,且区间内文本与真源文档拥有者区间**逐字节相等**(V2)。〔制品类〕
 
-**C-11** **通道二 · 镜像与按工具副本**:C-10 的两份源文件 MUST 与 `.specify/agents/templates/` 下的同名文件逐字节相等(改前实测该对为 `ok (2 files)`);三棵按工具 agent 树(`.claude/agents/`、`.qoder/agents/`、`.github/agents/`,实测各 2 条目;`.opencode/agent` 为 0)由既有渲染路径再生,MUST NOT 手工编辑。〔制品类〕
+**C-11** **通道二 · 镜像与按工具副本**:C-10 的两份源文件 MUST 与 `.specify/agents/templates/` 下的同名文件逐字节相等(改前实测该对为 `ok (2 files)`);**四棵**按工具 agent 树(`.claude/agents/`、`.qoder/agents/`、`.github/agents/`、`.opencode/agents/`,实测各 **2** 条目)由既有渲染路径再生,MUST NOT 手工编辑。渲染入口是 `src/specify_cli/__init__.py` 的 `render_agents_for_tool(project_path, tool)`,其 `tool` 键取自 `_AGENT_METADATA_MAPPING`:**`qoder` / `claude` / `copilot` / `opencode`**——注意 `.github/agents` 的键是 **`copilot`** 而不是 `github`,且该函数对未知键**静默返回 `rendered: 0` 而不报错**,故传错键会表现为"渲染成功但副本没变"。实现期订正:实为**四棵**(`.claude/agents`、`.qoder/agents`、`.github/agents`、`.opencode/agents`,各 2 条目);规划期误记为三棵,且把第四棵路径写成单数 `.opencode/agent` 而测得 0。〔制品类〕
 
 **C-12** **通道二 · 有界性**:守卫的断言对象 MUST 是 C-10 枚举的**有界集合**(2 份出厂预设 + C-8/C-9 的两处创作要求文本),MUST NOT 试图枚举 `.specify/agents/instances/`(实测为空且由用户日后创建)。枚举一个无界集合的守卫要么漏要么恒红(FR-061 / D-3 裁定)。〔制品类〕
 

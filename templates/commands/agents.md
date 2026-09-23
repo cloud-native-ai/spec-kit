@@ -72,6 +72,8 @@ The **run** mode turns the **Agent Instance** definition into a new, independent
 3. **Dispatch** — launch the agent as a subagent with its configured `capability-tools`, `model-tier`, and `run-turn-budget`, and system prompt. Choose the execution mode per `.specify/shared/definitions/subagent-definitions.md` (**native** when the runtime supports subagents, **virtual** in-session when it does not, **external** CLI process for long-running/parallel work or per-dispatch model overrides); external CLI dispatch MUST follow that document's Visibility Contract (stream-json + compact filter + `.live.log`/`.jsonl`/`.status` triplet) — never redirect print-mode output into a silent log. The subagent executes the task autonomously within its defined scope.
 4. **Report** — relay the subagent's result back to the user. If the subagent fails or hits its turn limit, report the partial result and the failure reason.
 
+**Dispatch-time injection**: before dispatching, verify the outgoing prompt carries the fast-fail injection clause — its owner literal lives in `.specify/shared/guidelines/fast-fail.md` § 子代理派发注入 — and require an explicit anomaly line in the returned message. A return without that line is incomplete and its conclusions MUST NOT be consumed. Found missing **before** dispatch → repair in passing and disclose at wrap-up; found **after** dispatch → fast fail, because the agent already ran ungoverned and editing the prompt cannot undo that.
+
 **Scope boundary**: Run mode executes a **single** agent on a **single** task. For multi-agent orchestration (parallel dispatch, serial chains, iteration loops), use `/speckit.team`.
 
 ### Ambiguous or Unsupported Intent

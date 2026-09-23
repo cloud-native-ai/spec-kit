@@ -26,6 +26,7 @@ make its token select nothing, and an empty selection passes silently.
 from __future__ import annotations
 
 import importlib.util
+import pathlib
 import re
 from pathlib import Path
 
@@ -492,13 +493,67 @@ def test_c17_surface_report_and_disclosure():
 
 
 def test_c18_growth_loop_marker_and_bidirectional():
-    _text(DOC)
-    _unimplemented("C-18 (a)-(f)", "T042")
+    """C-18 (a)-(f): the growth-loop section, plus the independence key.
+
+    The key assertion at the end is the other half of the 2026-09-23 adjudication:
+    test_c10 requires the RECURRENCE key to exclude 发现点, and this one requires the
+    INDEPENDENCE key to include it. Neither alone can catch the two being merged back
+    into a single key, which is the one regression path that adjudication left open.
+    """
+    sec = _section(_text(DOC), SECTION_HEADINGS[5])
+    assert sec.strip(), f"C-18: section {SECTION_HEADINGS[5]!r} is empty"
+
+    # (a) observation marker
+    assert MARKER_OBS in sec, f"C-18(a): the observation marker {MARKER_OBS!r} is absent"
+
+    # (b) the two red lines
+    assert re.search(r"干净[^\n]{0,40}MUST NOT 追加空洞", sec), (
+        "C-18(b): the no-hollow-observation-entry red line is absent"
+    )
+    assert "编造数值" in sec, "C-18(b): the no-fabricated-numbers red line is absent"
+
+    # (c) bidirectional growth -- both sides, with symmetric evidence qualification
+    assert "升到快速失败清单" in sec and "降到顺手修复清单" in sec, (
+        "C-18(c): only one direction of list movement is stated -- a one-way ratchet"
+    )
+    assert "同一套" in sec, "C-18(c): the two directions are not stated to share one evidence bar"
+    assert re.search(r"两次独立观察", sec) and re.search(r"一次用户直接纠正", sec), (
+        "C-18(c): the evidence qualifications are not both stated"
+    )
+    assert "MUST NOT 只存在朝" in sec, "C-18(c): the prohibition on a stop-only channel is absent"
+
+    # (d) trace requirement
+    assert "反馈条目 ID" in sec and "提交号" in sec, "C-18(d): the trace requirement is absent"
+
+    # (e) no silent retuning
+    assert "静默调参" in sec, "C-18(e): the no-silent-retuning prohibition is absent"
+
+    # (f) probe and self-reflection by pointer, no new mechanism claimed
+    assert "probe" in sec and "自省" in sec, "C-18(f): probe / self-reflection are not referenced"
+    assert "MUST NOT 声明新增 probe 类" in sec, (
+        "C-18(f): the section does not disclaim adding a new probe class or object"
+    )
+
+    # the independence key MUST contain 发现点 (the mirror of C-10(g)'s exclusion)
+    assert "独立键" in sec, "C-18: the independence key is not named"
+    assert "发现点" in sec and "被证伪的预期" in sec, (
+        "C-18: the independence key is not the (发现点, 被证伪的预期) tuple -- merging it with the "
+        "recurrence key would make FR-044's independence test meaningless"
+    )
+    assert "MUST NOT 混用" in sec, "C-18: the two keys are not stated to be non-interchangeable"
 
 
 def test_c19_growth_loop_three_numbers():
-    _text(DOC)
-    _unimplemented("C-19", "T042")
+    """C-19: SC-015's three numbers, derived from existing stores, with no new mechanism."""
+    sec = _section(_text(DOC), SECTION_HEADINGS[5])
+    for name in ("快速失败率", "用户推翻率", "清单净生长方向"):
+        assert name in sec, f"C-19: the metric {name!r} is absent"
+    assert "既有存据导出" in sec, "C-19: the metrics are not stated to be derived from existing stores"
+    assert re.search(r"MUST NOT[^\n]{0,30}新增(计数器|台账)", sec), (
+        "C-19: the section does not forbid adding a counter or ledger for these metrics"
+    )
+    # sentinel: three distinct metrics, not one name repeated
+    assert len({"快速失败率", "用户推翻率", "清单净生长方向"}) == 3
 
 
 def test_c21_project_neutral():
@@ -1070,125 +1125,351 @@ def test_x23_surface_report_ownership_split():
 
 # --- dispatch-injection.md C-1..C-23, C-26 (bodies land in T036) -----------
 
+CLAUSE_BEGIN_LIT = "<!-- fast-fail-clause:begin -->"
+CLAUSE_END_LIT = "<!-- fast-fail-clause:end -->"
+AGENT_TREES = (
+    (".claude/agents", "{slug}.md"),
+    (".qoder/agents", "{slug}.agent.md"),
+    (".github/agents", "{slug}.agent.md"),
+    (".opencode/agents", "{slug}.md"),
+)
+PRESET_SLUGS = ("skill-verifier", "structure-adjuster")
+DISPATCH_WRAPPER = ROOT / "skills" / "create-team" / "scripts" / "dispatch.sh"
+OWNER_SECTION = "## 子代理派发注入"
+VISIBILITY_HEADING = "## External Dispatch Visibility Contract"
+GOVERNANCE_HEADING = "## Dispatch-Time Governance Obligation"
+
+
+def _clause_interval(text: str) -> str:
+    assert text.count(CLAUSE_BEGIN_LIT) == 1, (
+        f"expected exactly one '{CLAUSE_BEGIN_LIT}', found {text.count(CLAUSE_BEGIN_LIT)}"
+    )
+    assert text.count(CLAUSE_END_LIT) == 1, (
+        f"expected exactly one '{CLAUSE_END_LIT}', found {text.count(CLAUSE_END_LIT)}"
+    )
+    begin = text.index(CLAUSE_BEGIN_LIT) + len(CLAUSE_BEGIN_LIT)
+    end = text.index(CLAUSE_END_LIT)
+    assert begin < end, "the delimiter pair is inverted"
+    return text[begin:end]
+
 
 def test_i1_exactly_one_delimiter_pair():
-    _text(DOC)
-    _unimplemented("I-1", "T036")
+    """C-1: exactly one paired-delimiter block, and its interval is non-empty."""
+    interval = _clause_interval(_text(DOC))
+    assert interval.strip(), "C-1: the delimiter interval is empty"
 
 
 def test_i2_clause_identifier_present():
-    _text(DOC)
-    _unimplemented("I-2", "T036")
+    """C-2: the interval carries the clause identifier, making presence a substring test."""
+    interval = _clause_interval(_text(DOC))
+    assert MARKER_CLAUSE in interval, f"C-2: {MARKER_CLAUSE!r} is absent from the clause interval"
 
 
 def test_i3_three_mandatory_contents():
-    _text(DOC)
-    _unimplemented("I-3 (a)-(c)", "T036")
+    """C-3: all three mandatory contents, each asserted independently."""
+    interval = _clause_interval(_text(DOC))
+    assert "纠正" in interval and "裁定" in interval, "C-3(a): the binary triage criterion is absent"
+    assert "停在本层" in interval and "回抛编排者" in interval, (
+        "C-3(b): the halt-at-this-layer-and-return obligation is absent"
+    )
+    assert "MUST NOT 就地修平" in interval, "C-3(b): the no-silent-repair prohibition is absent"
+    assert MARKER_RETURN in interval, f"C-3(c): the return prefix {MARKER_RETURN!r} is absent"
+    assert "行首" in interval, "C-3(c): the line-initial criterion for the return prefix is absent"
 
 
 def test_i4_path_may_not_substitute():
-    _text(DOC)
-    _unimplemented("I-4", "T036")
+    """C-4: the doc path may appear but must not stand in for the three contents."""
+    interval = _clause_interval(_text(DOC))
+    # strip every path mention, then re-run C-3's three checks on the residue
+    residue = interval.replace(DOC_REL, "").replace(f".specify/{DOC_REL}", "")
+    assert "纠正" in residue and "裁定" in residue, (
+        "C-4: the binary criterion exists only as a path reference -- the path substituted for it"
+    )
+    assert "停在本层" in residue and "回抛编排者" in residue, (
+        "C-4: the halt-and-return obligation exists only as a path reference"
+    )
+    assert MARKER_RETURN in residue, "C-4: the return prefix exists only as a path reference"
 
 
 def test_i5_clause_within_10_lines_1200_bytes():
-    _text(DOC)
-    _unimplemented("I-5", "T036")
+    """C-5: the interval is <= 10 lines and <= 1200 bytes."""
+    interval = _clause_interval(_text(DOC))
+    lines = [l for l in interval.splitlines() if l.strip()]
+    nbytes = len(interval.encode("utf-8"))
+    assert len(lines) <= 10, f"C-5: the clause interval is {len(lines)} non-blank lines; the ceiling is 10"
+    assert nbytes <= 1200, f"C-5: the clause interval is {nbytes} bytes; the ceiling is 1200"
 
 
 def test_i6_clause_lines_zero_blocking_hits():
-    _text(DOC)
-    _unimplemented("I-6", "T036")
+    """C-6: no line of the interval hits the scanner's blocking regex (loaded, not re-typed)."""
+    interval = _clause_interval(_text(DOC))
+    blocking = _blocking_re()
+    hits = [l[:70] for l in interval.splitlines() if blocking.search(l)]
+    assert hits == [], f"C-6: clause lines hit BLOCKING_RE (each would add 1 to the gate total): {hits}"
 
 
 def test_i7_clause_size_and_hits_anti_vacuity_sentinels():
-    _text(DOC)
-    _unimplemented("I-7", "T036")
+    """C-7: both C-5 and C-6 are upper-bound/empty-set claims, so each needs a companion."""
+    interval = _clause_interval(_text(DOC))
+    lines = [l for l in interval.splitlines() if l.strip()]
+    assert len(lines) >= 3, (
+        f"C-7 sentinel: the interval is only {len(lines)} non-blank lines, so '<=10 lines' could be "
+        "satisfied by a near-empty clause"
+    )
+    scanner = _scanner()
+    assert len(scanner.BLOCKING_PATTERNS) == 17, (
+        f"C-7 sentinel: BLOCKING_PATTERNS has {len(scanner.BLOCKING_PATTERNS)} entries, not 17 -- "
+        "'zero hits' could be the result of an empty regex rather than clean wording"
+    )
+    assert scanner.BLOCKING_RE.pattern.strip(), "C-7 sentinel: BLOCKING_RE is empty"
 
 
 def test_i8_channel_two_command_authoring_requirement():
-    _text(AGENTS_CMD)
-    _unimplemented("I-8", "T036")
+    """C-8: the agents command's Run Mode carries an injection duty; its prior text is intact."""
+    text = _text(AGENTS_CMD)
+    lines = text.splitlines()
+    assert "### Run Mode (subagent dispatch)" in lines, "C-8: the Run Mode section is gone"
+    i = lines.index("### Run Mode (subagent dispatch)")
+    j = next((k for k in range(i + 1, len(lines)) if lines[k].startswith("### ")), len(lines))
+    sec = "\n".join(lines[i:j])
+    assert DOC_REL in sec or f".specify/{DOC_REL}" in sec, (
+        "C-8: the Run Mode section carries no injection duty pointing at the discipline doc"
+    )
+    for step in ("Resolve", "Dispatch", "Report"):
+        assert step in sec, f"C-8: the pre-existing Run Mode step {step!r} is missing"
+    assert "**Scope boundary**: Run mode executes a **single** agent on a **single** task." in sec, (
+        "C-8: the pre-existing Scope boundary paragraph was altered"
+    )
 
 
 def test_i9_channel_two_skill_authoring_requirement():
-    _text(CREATE_AGENT_SKILL)
-    _unimplemented("I-9", "T036")
+    """C-9: create-agent's authoring contract requires the clause; its prior rules are intact."""
+    text = _text(CREATE_AGENT_SKILL)
+    assert "fast-fail injection clause" in text or "注入子句" in text, (
+        "C-9: create-agent's authoring contract does not require the injection clause"
+    )
+    assert DOC_REL in text or f".specify/{DOC_REL}" in text, "C-9: the requirement does not point at the owner"
+    assert "six mandatory body sections" in text, "C-9: the pre-existing six-body-section rule was altered"
+    assert text.count("MUST include `## Self-Improvement Contract` exactly once") == 1, (
+        "C-9: the pre-existing Self-Improvement-Contract exactly-once rule was altered"
+    )
 
 
 def test_i10_channel_two_factory_presets_byte_equal():
-    _text(FACTORY_PRESETS[0])
-    _unimplemented("I-10", "T036")
+    """C-10: both factory presets carry exactly one pair, byte-identical to the owner."""
+    owner = _clause_interval(_text(DOC))
+    assert len(FACTORY_PRESETS) == 2, f"C-10: expected 2 factory presets, the constant holds {len(FACTORY_PRESETS)}"
+    assert sorted(ROOT.glob("agents/*.agent.md")) == sorted(FACTORY_PRESETS), (
+        "C-10: the bounded preset set no longer matches agents/*.agent.md -- update the enumeration deliberately"
+    )
+    for preset in FACTORY_PRESETS:
+        assert _clause_interval(_text(preset)) == owner, (
+            f"C-10: {preset.name}'s clause interval is not byte-identical to the owner literal"
+        )
 
 
 def test_i11_channel_two_mirrors_and_per_tool_copies():
-    _text(FACTORY_PRESETS[0])
-    _unimplemented("I-11", "T036")
+    """C-11: the mirror and all four per-tool trees carry the identical clause."""
+    owner = _clause_interval(_text(DOC))
+    for preset in FACTORY_PRESETS:
+        mirror = ROOT / ".specify" / "agents" / "templates" / preset.name
+        assert mirror.is_file(), f"C-11: missing mirror {mirror.relative_to(ROOT)}"
+        assert mirror.read_bytes() == preset.read_bytes(), (
+            f"C-11: {mirror.relative_to(ROOT)} differs from its source"
+        )
+    for tree, naming in AGENT_TREES:
+        d = ROOT / tree
+        assert d.is_dir(), f"C-11: per-tool agent tree {tree} is missing"
+        for slug in PRESET_SLUGS:
+            copy = d / naming.format(slug=slug)
+            assert copy.is_file(), f"C-11: {copy.relative_to(ROOT)} was not rendered"
+            assert _clause_interval(_text(copy)) == owner, (
+                f"C-11: {copy.relative_to(ROOT)}'s clause interval is not byte-identical to the owner"
+            )
 
 
 def test_i12_channel_two_bounded_set():
-    _text(DOC)
-    _unimplemented("I-12 (MUST NOT enumerate .specify/agents/instances/)", "T036")
+    """C-12: the guard asserts a BOUNDED set; it must not enumerate the instances directory."""
+    own_source = pathlib.Path(__file__).read_text(encoding="utf-8")
+    # The needle is assembled from parts, and the diagnostic below deliberately does not
+    # spell the path: an earlier form of this sentinel searched its own module for the
+    # literal and then tripped on the string inside its OWN assertion message -- a check
+    # that reported a violation caused by its own wording.
+    needle = "agents" + "/" + "instances"
+    assert needle not in own_source, (
+        "C-12: this guard enumerates the project-local agent-instance directory, which is an "
+        "unbounded, user-created set; a guard over it either misses entries or stays red forever"
+    )
+    # sentinel for the sentinel: the needle really is absent, and the scan really read a module
+    assert len(own_source) > 1000, "C-12 sentinel: this module read as near-empty, so the scan is blind"
+    assert "FACTORY_PRESETS" in own_source, "C-12 sentinel: the bounded enumeration constant is gone"
+    bounded = list(FACTORY_PRESETS) + [AGENTS_CMD, CREATE_AGENT_SKILL]
+    assert len(bounded) == 4, f"C-12: the bounded set should be 2 presets + 2 authoring texts, got {len(bounded)}"
+    for p in bounded:
+        assert p.is_file(), f"C-12: a member of the bounded set does not exist: {p.relative_to(ROOT)}"
 
 
 def test_i13_channel_three_payload_sixth_field_row():
-    _text(TEAM_PATTERNS)
-    _unimplemented("I-13", "T036")
+    """C-13: the team Per-Agent Payload table gained the sixth field row."""
+    text = _text(TEAM_PATTERNS)
+    m = re.search(r"Per-Agent Payload:(.*?)Context Isolation Rules:", text, re.S)
+    assert m, "C-13: the Per-Agent Payload / Context Isolation Rules block is gone"
+    rows = re.findall(r"^\| `([a-z_]+)` \|", m.group(1), re.M)
+    assert "fast_fail_clause" in rows, f"C-13: the payload table lacks fast_fail_clause; rows are {rows}"
+    assert len(rows) == 6, f"C-13: the payload table has {len(rows)} field rows; expected 6 (5 before + 1)"
+    tail = text[text.index("Context Isolation Rules:"):]
+    assert DOC_REL in tail[:2000] or "fast-fail" in m.group(1), (
+        "C-13: the new field row does not point at the clause owner"
+    )
 
 
 def test_i14_context_isolation_rules_unchanged():
-    _text(TEAM_PATTERNS)
-    _unimplemented("I-14", "T036")
+    """C-14: the Context Isolation Rules that follow the table are intact."""
+    text = _text(TEAM_PATTERNS)
+    tail = text[text.index("Context Isolation Rules:"):]
+    bullets = [l for l in tail.splitlines()[1:12] if l.startswith("- ")]
+    assert len(bullets) >= 4, f"C-14: expected at least 4 isolation rules, found {len(bullets)}"
+    assert "territory manifest" in tail, "C-14: the territory-manifest isolation rule was altered"
 
 
 def test_i15_channel_one_inline_prompt_landing():
-    _text(DOC)
-    _unimplemented("I-15", "T036")
+    """C-15: the doc fixes where and how the clause lands in a hand-written prompt."""
+    sec = _section(_text(DOC), OWNER_SECTION)
+    assert "通道一" in sec, "C-15: channel one is not named"
+    assert re.search(r"通道一[^\n]{0,120}(落点|置于|开头)", sec), (
+        "C-15: the doc does not fix the landing point of the clause in an inline prompt"
+    )
 
 
 def test_i16_three_channels_not_mutually_exclusive():
-    _text(DOC)
-    _unimplemented("I-16", "T036")
+    """C-16: the doc states the three channels are not mutually exclusive."""
+    sec = _section(_text(DOC), OWNER_SECTION)
+    for n in ("通道一", "通道二", "通道三"):
+        assert n in sec, f"C-16: {n} is not named"
+    assert "MUST NOT 被当作互斥" in sec or "不互斥" in sec, (
+        "C-16: the doc does not declare the three channels non-exclusive"
+    )
 
 
 def test_i17_subagent_definitions_dispatch_section():
-    _text(SUBAGENT_DEFS)
-    _unimplemented("I-17", "T036")
+    """C-17: the definitions doc gained a parallel section; the 5 obligations are verbatim."""
+    text = _text(SUBAGENT_DEFS)
+    lines = text.splitlines()
+    assert VISIBILITY_HEADING in lines, "C-17: the pre-existing visibility contract heading is gone"
+    assert GOVERNANCE_HEADING in lines, f"C-17: the new section {GOVERNANCE_HEADING!r} is absent"
+    v = lines.index(VISIBILITY_HEADING)
+    g = lines.index(GOVERNANCE_HEADING)
+    term = lines.index("## Terminology Boundaries")
+    assert v < g < term, "C-17: the new section is not parallel (it must sit between the two)"
+    between = lines[v:g]
+    numbered = [l for l in between if re.match(r"^[1-5]\. ", l)]
+    assert len(numbered) == 5, (
+        f"C-17: the visibility contract should keep its 5 numbered obligations, found {len(numbered)}"
+    )
+    assert any(l.startswith("**Reference implementation**:") for l in between), (
+        "C-17: the Reference implementation line was altered"
+    )
 
 
 def test_i18_visibility_vs_governance_split():
-    _text(SUBAGENT_DEFS)
-    _unimplemented("I-18", "T036")
+    """C-18: the new section states the split and restates none of the 5 obligations."""
+    text = _text(SUBAGENT_DEFS)
+    lines = text.splitlines()
+    g = lines.index(GOVERNANCE_HEADING)
+    term = lines.index("## Terminology Boundaries")
+    sec = "\n".join(lines[g:term])
+    assert "observable" in sec and "governed" in sec, (
+        "C-18: the new section does not state the observable-vs-governed split"
+    )
+    assert DOC_REL in sec or f".specify/{DOC_REL}" in sec, "C-18: the section does not point at the owner"
+    for fragment in ("--output-format stream-json", ".live.log", "DISPATCH_CLI", "stall threshold"):
+        assert fragment not in sec, f"C-18: the section restates the visibility contract ({fragment!r})"
 
 
 def test_i19_pre_dispatch_probe_obligation():
-    _text(DOC)
-    _unimplemented("I-19", "T036")
+    """C-19: the pre-dispatch probe with both time-point dispositions."""
+    sec = _section(_text(DOC), OWNER_SECTION)
+    assert "派发前" in sec and "自检" in sec, "C-19: the pre-dispatch probe obligation is absent"
+    assert "派发前发现" in sec and "派发后才发现" in sec, (
+        "C-19: the two time-point dispositions are not both stated"
+    )
+    assert re.search(r"派发后才发现[^\n]{0,120}快速失败", sec), (
+        "C-19: the post-dispatch case is not classified as a fast fail"
+    )
+    assert "MUST NOT 把该子代理" in sec or "不当作可信证据" in sec or "MUST NOT 把该子代理的产出当作可信证据" in sec, (
+        "C-19: the prohibition on consuming an ungoverned subagent's output is absent"
+    )
 
 
 def test_i20_anomaly_return_line_obligation():
-    _text(DOC)
-    _unimplemented("I-20", "T036")
+    """C-20: the return line, and a missing line is itself an anomaly."""
+    sec = _section(_text(DOC), OWNER_SECTION)
+    assert MARKER_RETURN in sec, f"C-20: the return prefix {MARKER_RETURN!r} is absent"
+    assert MARKER_CLEAN in sec, f"C-20: the clean-run literal {MARKER_CLEAN!r} is absent"
+    assert "行首" in sec, "C-20: the line-initial criterion is absent"
+    assert "缺少异常行本身就是一次异常" in sec or "缺行即" in sec, (
+        "C-20: a missing anomaly line is not itself declared an anomaly"
+    )
+    assert "不完整" in sec and "MUST NOT 消费其结论" in sec, (
+        "C-20: an incomplete return is not barred from being consumed"
+    )
 
 
 def test_i21_anomaly_halt_excluded_from_failure_rules():
-    _text(DOC)
-    _unimplemented("I-21", "T036")
+    """C-21: an anomaly halt is excluded from ALL THREE pre-existing failure rules."""
+    sec = _section(_text(DOC), OWNER_SECTION)
+    for phrase, rule in (
+        ("两振停滞", "the two-strike stagnation cap"),
+        ("连续两次派发失败", "the two-consecutive-dispatch-failures downgrade"),
+        ("非并行任务失败即停", "halt-on-non-parallel-failure / continue-successful-parallel"),
+    ):
+        assert phrase in sec, f"C-21: {rule} is not excluded (missing {phrase!r})"
+    assert "MUST NOT 被计入既有的任何一条失败规则" in sec or "MUST NOT 被计入" in sec, (
+        "C-21: the exclusion itself is not stated"
+    )
+    assert "MUST NOT 是原样重派" in sec or "MUST NOT 原样重派" in sec, (
+        "C-21: the correct follow-up (surface / record as open) is not contrasted with re-dispatch"
+    )
 
 
 def test_i22_three_modes_equally_bound():
-    _text(DOC)
-    _unimplemented("I-22", "T036")
+    """C-22: all three execution modes bound; virtual not exempt; caller-side, not wrapper."""
+    sec = _section(_text(DOC), OWNER_SECTION)
+    assert "native / virtual / external" in sec, "C-22: the three execution modes are not named"
+    assert "同等成立" in sec, "C-22: the modes are not stated to be equally bound"
+    assert "virtual 模式 MUST NOT" in sec, "C-22: virtual mode is not explicitly non-exempt"
+    assert "调用方" in sec and "MUST NOT 被实现进派发包装器" in sec, (
+        "C-22: the obligation is not stated as caller-side content rather than wrapper behaviour"
+    )
+    # the wrapper really is untouched in substance: it must not contain the clause
+    wrapper = _text(DISPATCH_WRAPPER)
+    assert MARKER_CLAUSE not in wrapper and CLAUSE_BEGIN_LIT not in wrapper, (
+        "C-22: the clause was implemented into the dispatch wrapper -- it must stay a caller-side duty"
+    )
 
 
 def test_i23_per_hop_reinjection_and_precedence():
-    _text(DOC)
-    _unimplemented("I-23", "T036")
+    """C-23: per-hop reinjection, clause precedence, and the conflict itself is an anomaly."""
+    sec = _section(_text(DOC), OWNER_SECTION)
+    assert "每一跳" in sec and "重新注入" in sec, "C-23: per-hop reinjection is absent"
+    assert "注入子句优先于 Agent 定义正文" in sec, "C-23: the precedence rule is absent"
+    assert "冲突本身 MUST 作为一次异常回抛" in sec, (
+        "C-23: a clause-vs-definition conflict is not itself declared an anomaly to return"
+    )
+    assert "MUST NOT 由子代理自行择一" in sec, "C-23: the subagent is not barred from picking a side"
 
 
 def test_i26_channel_one_enforced_by_review():
-    _text(DOC)
-    _unimplemented("I-26", "T036")
+    """C-26: channel one's compliance is enforced by review, and the doc says so."""
+    sec = _section(_text(DOC), OWNER_SECTION)
+    assert "不落盘" in sec, "C-26: the doc does not state that channel one leaves no artifact"
+    assert re.search(r"(无法|不可)[^\n]{0,40}(断言|观测)", sec), (
+        "C-26: the doc does not state that channel one cannot be asserted by a contract test"
+    )
+    assert "评审" in sec, "C-26: the doc does not name review as the enforcing surface"
+    assert "MUST NOT 声称三条通道均由守卫覆盖" in sec, (
+        "C-26: the doc does not forbid claiming that all three channels are guarded"
+    )
 
 
 # --- gate-neutrality.md C-1..C-17 (bodies land in T050) --------------------

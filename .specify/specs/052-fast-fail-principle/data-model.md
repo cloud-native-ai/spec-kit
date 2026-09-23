@@ -273,7 +273,7 @@
 
 ## E16 Agent 定义制品 (Agent Definition Artifact)
 
-**物化位置**: `agents/*.agent.md`(源,实测 **2** 份)→ `.specify/agents/templates/`(镜像)→ 三棵按工具 agent 树(实测 `.claude/agents`、`.qoder/agents`、`.github/agents` 各 2 条目;`.opencode/agent` 为 0)  
+**物化位置**: `agents/*.agent.md`(源,实测 **2** 份)→ `.specify/agents/templates/`(镜像)→ 四棵按工具 agent 树(实测 `.claude/agents`、`.qoder/agents`、`.github/agents`、`.opencode/agents` 各 2 条目;`.opencode/agent` 为 0)  
 **基数**: 出厂预设 2(**有界**);用户自建 Instance 0…n(**无界**,实测 `.specify/agents/instances/` 与 `execution/configs/` 今天均为空)
 
 | 字段 | 形态 | 约束 | 来源 FR |

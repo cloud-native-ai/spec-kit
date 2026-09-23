@@ -142,7 +142,7 @@ src/specify_cli/                   # 不改动
 - `sync-mirrors.py --check` 全树:`DRIFT detected`,**EXIT=2**(大量 `.specify/skills/*` DIFF + `.specify/scripts/python/trigger-utils.py` + `.specify/shared/workflow/{feedback-step,runtime-mode}.md`);`agents/ == .specify/agents/templates/ (2 files)` 为 `ok`。
 - `sync-mirrors.py --check --only shared`:`scope --only: shared`,**恰 2 条 DIFF**(`feedback-step.md`、`runtime-mode.md`),**EXIT=2**。
 - `regen-command-copies.py --check`:列出大量 `.qoder/commands/*` 为待再生(既有漂移)。
-- 四棵按工具命令树各 **25** 文件;三棵按工具 agent 树各 **2** 条目(`.opencode/agent` 为 0);指令兼容性符号链接实测 **4** 条(`AGENTS.md`、`CLAUDE.md`、`QODER.md` → `.specify/instructions.md`;`.github/copilot-instructions.md` → `../.specify/instructions.md`)。
+- 四棵按工具命令树各 **25** 文件;四棵按工具 agent 树各 **2** 条目(`.claude/agents`、`.qoder/agents`、`.github/agents`、`.opencode/agents`)。实现期订正:实为**四棵**(`.claude/agents`、`.qoder/agents`、`.github/agents`、`.opencode/agents`,各 2 条目);规划期误记为三棵,且把第四棵路径写成单数 `.opencode/agent` 而测得 0;指令兼容性符号链接实测 **4** 条(`AGENTS.md`、`CLAUDE.md`、`QODER.md` → `.specify/instructions.md`;`.github/copilot-instructions.md` → `../.specify/instructions.md`)。
 
 ⇒ **判据一律为"本特性触及的对/树上无新增漂移",MUST NOT 用绝对判据**(全绿 / EXIT=0)——既有漂移先于本特性存在,绝对判据在本仓不可通过,写下去就是发运一条没人度量过的判据。
 
@@ -156,7 +156,7 @@ src/specify_cli/                   # 不改动
 | `templates/commands/agents.md` | 同上四棵按工具树的 `speckit.agents.*` | 同上;Run Mode 的既有 4 步序列与 `**Scope boundary**` 逐字未变,仅新增注入义务 |
 | `skills/create-team/references/patterns.md` | `.specify/skills/create-team/references/patterns.md`(`("skills", ".specify/skills", False, {"site"})` 对) | `--check --only skills` 相对改前无新增漂移;Per-Agent Payload 表由 5 行变 6 行,Context Isolation Rules 4 条逐字未变 |
 | `skills/create-agent/SKILL.md` | `.specify/skills/create-agent/SKILL.md`(同上 `skills` 对) | 同上;既有"六个必备正文节"与 Self-Improvement Contract 恰好一次的要求逐字未变 |
-| `agents/skill-verifier.agent.md`、`agents/structure-adjuster.agent.md` | ① `.specify/agents/templates/`(`("agents", ".specify/agents/templates", False, set())` 对);② 三棵按工具 agent 树 `.claude/agents/`、`.qoder/agents/`、`.github/agents/`(各 2 条目;`.opencode/agent` 为 0) | `--check --only agents` 改后为 `ok`(改前即 `ok`,2 files);两份预设各含**恰好一对**定界符且区间内文本与真源文档拥有者字面量逐字节相等 |
+| `agents/skill-verifier.agent.md`、`agents/structure-adjuster.agent.md` | ① `.specify/agents/templates/`(`("agents", ".specify/agents/templates", False, set())` 对);② **四棵**按工具 agent 树 `.claude/agents/`、`.qoder/agents/`、`.github/agents/`、`.opencode/agents/`(各 2 条目)——实现期订正:规划期误记为三棵且把第四棵路径写成单数 `.opencode/agent` 而测得 0;渲染键为 `claude`/`qoder`/**`copilot`**/`opencode`(`.github/agents` 的键是 `copilot`,且未知键静默返回 `rendered: 0`) | `--check --only agents` 改后为 `ok`(改前即 `ok`,2 files);两份预设各含**恰好一对**定界符且区间内文本与真源文档拥有者字面量逐字节相等 |
 | `tests/contract/test_fast_fail_discipline.py`(**新**) | 无镜像 | `pytest -m contract` 该文件全绿;全量套件名字级回归 `comm -13 baseline current` 输出为空 |
 | `tests/contract/test_constitution_double_landing.py`、`tests/contract/test_user_facing_comprehension_doc.py` | 无镜像 | 上调后各自全绿;`MIN_VERSION` 为下限语义(`>=`),1.13.0 本就通过,上调至 `(1,13)` 是为把下限推到本特性之后 |
 

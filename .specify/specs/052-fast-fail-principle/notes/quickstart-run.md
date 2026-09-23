@@ -104,3 +104,58 @@ test_constitution_double_landing.py exit=0 (captured without a pipe)
 **判定**: 模板原则 **14** ✓;活动宪章原则 **16** ✓;命令 `MUST include` **8** ✓;版本 **1.13.0** ✓;双落点标题两处各 **1**(逐字一致)✓;新原则块超长行 **0** ✓;`plan-template.md` 对冻结 BASE_SHA 的 `git diff --stat` **为空**(零改动)✓,而 C-18 实测其动态枚举渲染出的门控行数为 **16**、去掉 XVI 后为 **15** ✓;`test_constitution_double_landing.py` **19 passed / exit 0**(退出码不经管道捕获)✓ —— 与场景 3 的改后期望逐项相符。
 
 > ⚠️ 版本行号已由 `:254` 后移,因为 T022 在文件顶部**前置**了一份新的 Sync Impact Report 注释块(051 的原块逐字保留在其下方,含其仍未关闭的 Follow-up TODOs)。场景 3 的期望只钉版本号不钉行号,故不受影响。
+---
+
+## 场景 5 — 注入子句:一份拥有者、多份字节相等的副本(T038,改后判据)
+
+```
+owner delimiter pairs   = 1
+agents/skill-verifier.agent.md:1
+agents/structure-adjuster.agent.md:1
+owner lines/bytes: 6 801
+agents/skill-verifier.agent.md byte-identical: True
+agents/structure-adjuster.agent.md byte-identical: True
+--- four per-tool trees (implementation-period correction: four, not three) ---
+  .claude/agents/skill-verifier.md: exists=True byte-identical=True
+  .claude/agents/structure-adjuster.md: exists=True byte-identical=True
+  .qoder/agents/skill-verifier.agent.md: exists=True byte-identical=True
+  .qoder/agents/structure-adjuster.agent.md: exists=True byte-identical=True
+  .github/agents/skill-verifier.agent.md: exists=True byte-identical=True
+  .github/agents/structure-adjuster.agent.md: exists=True byte-identical=True
+  .opencode/agents/skill-verifier.md: exists=True byte-identical=True
+  .opencode/agents/structure-adjuster.md: exists=True byte-identical=True
+payload field rows = 6
+MIRROR-OK skill-verifier
+MIRROR-OK structure-adjuster
+```
+
+
+**判定**: 拥有者定界符 **1** 对;两份出厂预设各 **1** 对;`owner lines/bytes` = **6 / 801**(≤ 10 / ≤ 1200);两份预设与**四棵按工具树的全部 8 个副本**均 `byte-identical: True`;载荷字段行 **6**;两份镜像 `MIRROR-OK` —— 与场景 5 的改后期望逐项相符,且**四棵树**这一实现期订正已并入本场景的实跑输出。
+
+---
+
+## 场景 8 — 观察标记可检索,且真实存据未被污染(T043,改后判据)
+
+```
+# 一次性 workspace(/tmp/ffdrill)内 record → list
+  "count_since_submission": 1,
+  "threshold": 10,
+  "should_prompt": false
+{
+  "count": 1,
+  "matches": [
+    {
+      "id": "20260923T101127Z-speckit-plan",
+# 真实存据(按标记过滤)——反空真哨兵
+{
+  "count": 0,
+  "matches": []
+}
+ls: cannot access '/tmp/ffdrill': No such file or directory
+[exit=0]
+```
+
+**判定**: 一次性根内 `record` 返回 `id` 与 `path`、`list` 得 `count: 1`(≥1)✓;**真实存据仍为 `{"count": 0, "matches": []}`** ✓ —— 这是本场景的反空真哨兵:它证明"隔离生效"而不是"查询本身读空了";`rm -rf` 后目录不存在 ✓;exit **0** ✓。命令块由 `quickstart.md` 逐字提取执行,未重打。
+
+> ⚠️ 本场景 MUST NOT 用 `--action cleanup` 清理未打包条目(该 action 要求 `--package`,`feedback-utils.py:1389` 会抛 `FeedbackError`),`--action dispose` 亦不适用(只翻元数据、不删文件)。改用 `--workspace-root` 一次性根,已实跑验证。
+

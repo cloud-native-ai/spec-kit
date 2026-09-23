@@ -103,7 +103,7 @@
 | ⑧ | 面向外部读者的项目总结报告 | `skills/summarize-project/references/reporting-playbook.md` | `skills/summarize-project/references/project-overview.md` |
 | ⑨ | 词汇表校正的对外呈现 | `shared/workflow/glossary.md` | — |
 | ⑩ | 流程收尾报告 | `shared/guidelines/confirmation-gates.md` | — |
-| ⑪ | 失败如实报告 | `shared/guidelines/confirmation-gates.md` | — |
+| ⑪ | 失败如实报告 | `shared/guidelines/confirmation-gates.md`, `shared/guidelines/fast-fail.md` | — |
 
 `reader_baseline_override` 列非空即表示该类**登记**了一处更严的读者基准覆盖站点;缺省(—)即适用 § 基准读者与覆盖协议 的全局基准。登记项按**类**计:同一类的多处命中算一个登记项。**该列是覆盖处数的唯一计数来源**,本文档不另写数字。
 

@@ -124,3 +124,39 @@ test_x20_ufc_c14_pin_raised_to_nine    -> 含 c14_
 | 全文件 | 105 | **105** | MATCH |
 
 > 这两处缺陷是**同一根因**的两种表现:把一个按子串工作的选择器当成按标识符工作的选择器用。它属于本特性要点名的失效形态 —— 检查返回 0(收集成功、退出码正常),但其输出并不关于它被写来判定的命题。故已一并记入 T062 的教训候选。
+
+---
+
+# 变异演练取证(T039 / T051 — 行为类条款 C-24 / C-25)
+
+`dispatch-injection.md` C-24 / C-25 是**行为类**条款:编排者与子代理在运行期的动作无落盘制品可断言,故 MUST 由实跑演练取证,且形态 MUST 为「把被守物弄坏 → 确认变红 → 复原 → 确认恢复绿」,而不是"当前树上通过"。
+
+**取证方式(可复现)**:四个场景的命令块由 `quickstart.md` **逐字提取后执行**,不重打——
+`re.search(r'^## 场景 N .+?(?=^## 场景 |\Z)')` 取节,再取 `**改后期望**` 之后最后一个 ```bash 块,写入 `/tmp/scenN.sh` 后 `bash` 执行。这样"我跑的就是制品印的那条命令"是可核验的,而不是靠记忆重写一遍。
+
+| 场景 | 被演练的命题 | 实跑输出 | 期望 | 判定 |
+|---|---|---|---|---|
+| 6 | 派发前自检确实在派发**之前**发生(FR-053) | `prompt bytes: 931`;子句命中数 **3 → 0 → restored 且 3**;`ls: cannot access '/tmp/ffdrill': No such file or directory` | ≥1 → 0 → `restored` 且 ≥1 → 目录不存在 | ✓ |
+| 10 | 缺异常行的回传被判为**不完整**(FR-066) | `有异常: anomaly-halt` / `无异常: clean` / `缺异常行: incomplete` / `行内提及: incomplete`;`doc carries the rule: True` | 第四例(行内提及 `ANOMALY:`)**不得**判为 clean | ✓ |
+| 11 | 异常停 MUST NOT 被原样重派(FR-055) | `next action: surface-to-user \| allowed: True \| forbidden: False`;`doc names '两振': True` / `'派发失败': True` / `'非并行': True` | 同左;三条既有失败规则都 MUST 被点名 | ✓ |
+| 12 | 干净运行也显式说一句(FR-067) | `repairs=0 fails=0 -> True` / `repairs=2 fails=0 -> False` / `repairs=0 fails=1 -> False`;`doc owns the literal: True` | **True / False / False**(只有干净运行需要该陈述) | ✓ |
+
+四个场景 exit code 均为 **0**。
+
+**C-25 的删净复核**:场景 6 与场景 10 各自 `rm -rf /tmp/ffdrill` 后再 `ls`,输出均为 `No such file or directory`,即演练制品计数归零;本文件与仓库内均无残留(`git status` 于 Phase 6 提交前为空)。
+
+**场景 10 第四例的实质**:回传里**行内提及** `ANOMALY:`(例如复述自己被要求怎么做)MUST NOT 被读作一次异常停——这正是 C-20 把判据定为**行首**前缀而非"含该子串"的理由。若按子串判定,这一例会误报为 anomaly-halt;演练证明按行首判定它落到 `incomplete`(既不是干净、也不是异常停),分类正确。
+
+---
+
+# 实现期新查出的自身缺陷(T039 同批,附变异演练)
+
+## 缺陷三:自指哨兵被自己的诊断文本触发
+
+`test_i12_channel_two_bounded_set`(C-12 有界性)的形态是"读取本测试模块自身的源码,断言其中不含对 `.specify/agents/instances/` 的枚举"。初版把该路径**逐字写进了断言的失败消息**,于是哨兵在自己的诊断文本上命中,恒红。
+
+- 根因:一个"扫描自身源码"的检查,其**探针字符串与被禁字符串是同一个字面量**。
+- 订正:把 needle 由片段拼出(`"agents" + "/" + "instances"`),并把诊断消息改写为不含该路径的散文("the project-local agent-instance directory");再为该哨兵配一条伴生断言(模块源码长度 > 1000 且 `FACTORY_PRESETS` 仍在场),使"没命中因为对"与"没命中因为读空了"可区分。
+- 变异演练:把该守卫改成真的去 `glob` 那个无界目录 → `test_i12` **变红**并印出 C-12 的理由 → 从备份复原 → **恢复绿** → 重新编译通过、收集数仍为 **105**。演练备份用 `\cp -f` 复原(alias-proof),复核方式为重跑该用例而非只看 `cp` 的退出码。
+
+> 这一条形态与首轮查出的 `-k` 子串泄漏同源:**把一个按文本工作的机制当作按标识符工作的机制用**。扫描自身源码时,扫描器读到的包括它自己的报错文案。已记入 T062 的教训候选。

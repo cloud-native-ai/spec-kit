@@ -72,6 +72,14 @@ Every external subagent dispatch MUST therefore:
 
 **Reference implementation**: `skills/create-team/scripts/dispatch.sh` (+ `stream-filter.py`) — a generic, CLI-agnostic wrapper implementing the four observability points above (works with `qodercli` and `claude`; override via `DISPATCH_CLI`; the label convention of point 5 is the caller's responsibility). Team runbooks and command workflows SHOULD reuse it instead of re-rolling per-run dispatch scripts.
 
+## Dispatch-Time Governance Obligation
+
+The Visibility Contract above owns whether a dispatch is **observable**. This section owns whether it is **governed** — the two are complementary and neither substitutes for the other. A dispatch you can watch but not triage still runs an ungoverned agent; a dispatch you can triage but not watch still hides a stall.
+
+Every dispatch MUST carry the fast-fail injection clause, because a subagent's prompt derives from its own definition and dispatch payload rather than from the orchestrator's conversation, so no standing instruction layer reaches it. The clause's owner literal, its three channels, the pre-dispatch probe, the anomaly return line, and the rule that an anomaly halt is not an ordinary failure are all defined once in `.specify/shared/guidelines/fast-fail.md` § 子代理派发注入; this section MUST reference it and MUST NOT restate it.
+
+The obligation binds all three execution modes (native / virtual / external) equally, and virtual mode is not exempt merely because the session itself holds a standing instruction layer. It is a **caller-side content** duty, deliberately NOT implemented in the reference wrapper below: a discipline that depends on one execution path can be bypassed by choosing another, so the wrapper stays generic and unchanged.
+
 ## Terminology Boundaries
 
 | Term | Meaning | Where defined |

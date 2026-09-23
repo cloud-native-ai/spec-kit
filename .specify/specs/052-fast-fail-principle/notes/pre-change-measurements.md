@@ -116,7 +116,9 @@ done
 | 16 | UFC C-14 钉子 | `grep -o 'len(deduped) == [0-9]*' tests/contract/test_user_facing_comprehension_doc.py` | **8** | 9 |
 | 17 | UFC C-18a override 上限 | `grep -o '<= 2' tests/contract/test_user_facing_comprehension_doc.py` | **2** | 2(不变) |
 | 18 | 按工具命令树(4 棵) | `for d in .claude/commands .github/prompts .qoder/commands .opencode/command; do ls -1 "$d" \| wc -l; done` | **25 / 25 / 25 / 25** | 各 25(不变) |
-| 19 | 按工具 agent 树 | `for d in .claude/agents .qoder/agents .github/agents .opencode/agent; do ls -1 "$d" 2>/dev/null \| wc -l; done` | **2 / 2 / 2 / 0** | 不变 |
+| 19 | 按工具 agent 树 | `for d in .claude/agents .qoder/agents .github/agents .opencode/agent; do ls -1 "$d" 2>/dev/null \| wc -l; done` | **2 / 2 / 2 / 0** ⚠️ 见下方订正 | 四棵各 2 |
+
+> ⚠️ **第 19 行的路径写错了,冻结值本身如实保留(它是当时那条命令的真实输出)**:第四个路径应为**复数** `.opencode/agents`,它改前即有 **2** 个受跟踪副本,故按工具 agent 树是**四棵**而非三棵。写错的后果不是"少数了一棵树"这么轻:T034 会据它少渲染一棵,而 `.github/agents` 的渲染键是 `copilot`(不是 `github`),`render_agents_for_tool` 对未知键**静默返回 `rendered: 0`**——两处叠加会让"渲染已执行"与"副本已更新"脱节,而命令都返回成功。实现期已实测四棵各 2 条目、8 个副本全部携一份字节相等的注入子句。
 | 20 | 指令兼容性符号链接 | `for f in AGENTS.md CLAUDE.md QODER.md .github/copilot-instructions.md; do test -L "$f"; done` | **4** 条,均为 symlink(前三 → `.specify/instructions.md`,第四 → `../.specify/instructions.md`) | 仍为 4 条 symlink |
 | 21 | 活动指令文件字节 / 预算 | `wc -c < .specify/instructions.md`;`sed -n '38p' scripts/bash/generate-instructions.sh` | **28168 / 32768**(余量 **4600**) | ≤ 32768 |
 | 22 | 规格与契约规模 | `grep -c` 系列(见下) | FR **78** / SC **15** / STR **13** / 条款 **107** / quickstart 场景 **12** / data-model `## E` **19**、V **7**、S **3** | 条款仍 **107**(本文件的实现期订正只增子项,不增条款号) |

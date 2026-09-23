@@ -397,11 +397,30 @@ def test_c14_surface_class_table():
     paths = re.findall(r"`([a-z0-9_./-]+\.md)`", " ".join(r[src] for r in data_rows))
     assert paths, "C-14: no repo-relative rule-source paths found in the table"
     deduped = sorted(set(paths))
-    assert len(deduped) == 8, (
-        f"C-14: expected 8 deduplicated rule-source paths, found {len(deduped)}: {deduped}"
+    assert len(deduped) == 9, (
+        f"C-14: expected 9 deduplicated rule-source paths, found {len(deduped)}: {deduped}"
     )
     missing = [p for p in deduped if not (ROOT / p).is_file()]
     assert not missing, f"C-14: rule-source paths that do not exist: {missing}"
+
+    # Feature 052 cross-discipline registration (constitution-export.md C-19): interface
+    # class 11 gains a second rule source. The override column must stay untouched, so
+    # C-18a's cap is unaffected -- assert both halves here, where the row is already parsed.
+    cls_col = _column(header, "类")
+    ovr_col = _column(header, "reader_baseline_override")
+    row11 = next((r for r in data_rows if r[cls_col].strip() == "⑪"), None)
+    assert row11 is not None, "C-19: interface class ⑪ row not found in the table"
+    sources = re.findall(r"`([a-z0-9_./-]+\.md)`", row11[src])
+    assert "shared/guidelines/fast-fail.md" in sources, (
+        f"C-19: class ⑪ does not list the fast-fail discipline as a rule source: {sources}"
+    )
+    assert "shared/guidelines/confirmation-gates.md" in sources, (
+        f"C-19: class ⑪ lost its pre-existing rule source: {sources}"
+    )
+    assert row11[ovr_col].strip() == "—", (
+        f"C-21: class ⑪ gained a reader_baseline_override ({row11[ovr_col]!r}); it must stay '—', "
+        "which is why C-18a's cap of 2 is unaffected by this registration"
+    )
 
     assert re.search(r"封闭集|closed set", body), "C-14: the class set must be declared closed"
     assert re.search(r"只经修订|only by revising", body), (
