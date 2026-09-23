@@ -191,6 +191,8 @@ cmp agents/skill-verifier.agent.md .specify/agents/templates/skill-verifier.agen
 ```
 **期望**:拥有者文件中定界符 **1** 对;两份预设各 **1** 对;`owner lines/bytes` ≤ **10 / 1200**(实测草稿为 8 / 933);两行 `byte-identical: True`;载荷字段行 **6**(5 + 1);`MIRROR-OK`。
 
+> *⚠️ 载荷字段行的 **6** 是本特性落地时点(2026-09-23)的值。2026-09-24 复核:该表此后由**本特性之外**的改动增入 `incremental_landing` 一行,今实测为 **7**;守卫 `test_i13` 已同批把钉子改为 7 并要求 `fast_fail_clause` 与 `incremental_landing` 两行同时在场(故本场景的判据仍绿,只是行数的拥有者已是该守卫而非本行)。*
+
 > *副本属"守卫钉死的合法重复",**不是**机器可再生副本——无引擎会再生 `patterns.md` 或 `.agent.md`(`research.md` D-9)。故字节相等的修复路径是从拥有者手工重灌,由 `dispatch-injection.md` C-10 / V2 断言。*
 
 ---
@@ -295,7 +297,7 @@ rm -rf /tmp/ffdrill; ls /tmp/ffdrill 2>&1 | tail -1
 ```
 **期望**:`record` 返回一个 `id` 与 `path`;一次性 workspace 内 `list` 的 `count` ≥ **1**;**真实存据仍为 `{"count": 0, "matches": []}`**(即改前基线未被污染);末行 `No such file or directory`。
 
-> *⚠️ **MUST NOT 用 `--action cleanup` 清理演练条目**:实测该 action 要求 `--package <zip|latest>`(`scripts/python/feedback-utils.py:1389` `raise FeedbackError("--package <zip-path|latest> is required.")`),其作用域严格限于**已打包**的批次;一条未打包的演练条目会让它抛错。`--action dispose` 亦不适用——它只翻元数据,`body never rewritten`,条目文件仍在。本计划初版曾开出这条不可用的清理命令,若不订正,照它执行会把一条演练条目**永久留在真实存据里**,从而**伪化本文件基线总表第 18 行的 `count: 0`**,让下一个执行者撞上一条他自己没造成的基线冲突。故改为 `--workspace-root` 隔离:该形态已于 2026-09-23 实跑验证(一次性根内 `count: 1`、真实存据仍 `count: 0`、`rm -rf` 后目录不存在)。*
+> *⚠️ **MUST NOT 用 `--action cleanup` 清理演练条目**:实测该 action 要求 `--package <zip|latest>`(`scripts/python/feedback-utils.py:1390` `raise FeedbackError("--package <zip-path|latest> is required.")`),其作用域严格限于**已打包**的批次;一条未打包的演练条目会让它抛错。`--action dispose` 亦不适用——它只翻元数据,`body never rewritten`,条目文件仍在。本计划初版曾开出这条不可用的清理命令,若不订正,照它执行会把一条演练条目**永久留在真实存据里**,从而**伪化本文件基线总表第 18 行的 `count: 0`**,让下一个执行者撞上一条他自己没造成的基线冲突。故改为 `--workspace-root` 隔离:该形态已于 2026-09-23 实跑验证(一次性根内 `count: 1`、真实存据仍 `count: 0`、`rm -rf` 后目录不存在)。*
 >
 > ***第二条(互斥性)是纯字符串运算,不依赖任何制品**,故它在 red-first 阶段即可断言——这是 `discipline-doc.md` C-20 特意选它作首条可断言条款的原因。*
 

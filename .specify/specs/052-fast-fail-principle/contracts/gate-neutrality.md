@@ -2,7 +2,7 @@
 
 **Feature**: 052 快速失败纪律(Fast Fail)  
 **Guards**: `requirements.md` FR-036…FR-039, FR-064, FR-065, FR-078  
-**Test files**: `tests/contract/test_fast_fail_discipline.py`(函数名 `test_gN_*`)、既有 `test_proactive_trigger_section.py:352`、既有 `test_user_facing_comprehension_doc.py:557`、既有 `test_confirmation_gates_sweep.py:162`(三者即 C-10 枚举的钉子集合)  
+**Test files**: `tests/contract/test_fast_fail_discipline.py`(函数名 `test_gN_*`)、既有 `test_proactive_trigger_section.py:352`、既有 `test_user_facing_comprehension_doc.py:576`、既有 `test_confirmation_gates_sweep.py:162`(三者即 C-10 枚举的钉子集合)  
 **Date**: 2026-09-23
 
 条款号在本文件内独立编号;跨文件引用 MUST 写作 `gate-neutrality.md C-N`。
@@ -68,7 +68,7 @@ violations (reversible gates still blocking): 0
 
 | # | 钉子 | 位置 | 形态 | 若日后需合法 +1,各自的解除路径 |
 |---|---|---|---|---|
-| 一 | 硬编码相等 | `tests/contract/test_user_facing_comprehension_doc.py:557` | `assert payload["total"] == 23`(字面量) | 改该测试的字面量 |
+| 一 | 硬编码相等 | `tests/contract/test_user_facing_comprehension_doc.py:576`(行号随该文件增删而漂移,定位以 C-10(a) 的形态特征为准) | `assert payload["total"] == 23`(字面量) | 改该测试的字面量 |
 | 二 | 对冻结基线相等 | `tests/contract/test_proactive_trigger_section.py:352` | `assert payload["total"] == frozen["total"]`,`frozen` 取自 `.specify/specs/050-proactive-flow-trigger/baseline-gates.json`;断言消息自陈 `the integer headroom on the budget is 0` | 重冻该 JSON(C-11 禁止本特性这么做) |
 | 三 | 上限(cap) | `tests/contract/test_confirmation_gates_sweep.py:162` | `assert payload["total"] <= cap`,`cap = baseline["total"] * 0.25`,`baseline` 取自 `.specify/specs/044-reduce-confirmation-flows/baseline.json`(`total: 93` ⇒ `cap = 23.25` ⇒ 可通过的最大整数为 **23**) | 改 044 的基线(与本特性无关的第三方制品) |
 

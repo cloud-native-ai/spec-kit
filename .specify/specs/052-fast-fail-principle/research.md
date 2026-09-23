@@ -15,7 +15,7 @@
 **为何需要裁定**:该文件的位置被两处既有守卫约束,插错位置会直接转红。
 
 **实测**:
-- `test_user_facing_comprehension_section.py:51-52` 定义 `PREV_HEADING = "## Token Efficiency Discipline"`、`NEXT_HEADING = "## Dogfooding Practice"`。
+- `test_user_facing_comprehension_section.py:50-51` 定义 `PREV_HEADING = "## Token Efficiency Discipline"`、`NEXT_HEADING = "## Dogfooding Practice"`。
 - 其 `test_c8_section_sits_after_token_efficiency_and_before_dogfooding`(`:207-218`)断言的是 **`i_prev < i_new < i_next`(严格排序)**,**不是相邻**。故在 UFC 与 Dogfooding 之间插入一节,UFC 的 `i_prev=6 < i_new=7 < i_next=9` 仍成立。
 - `test_c7_pinned_position_window_is_undisturbed`(`:195-205`)要求 `## Documentation Map` / `## Proactive Flow Trigger` / `## Fact, Correctness & Logic Checks (Input Sanity)` 三者**连续且有序**(模板 idx 1/2/3),并禁止 UFC 落在该窗口内。本插入点在 idx 8,不影响。
 - 现状章节序(实测 `grep -n '^## '`,18 节):… `:66` Token Efficiency、`:74` User-Facing Comprehension、`:86` Dogfooding Practice …
