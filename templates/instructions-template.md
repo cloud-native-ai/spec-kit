@@ -83,6 +83,20 @@ Every user-facing output has to be readable by someone who did not take part in 
 
 Should the owner document be missing from a project, it ships with the framework: refresh the project instructions to restore it together with its mirror copy. Do not reconstruct the rules from memory or act on a summary of them.
 
+## Fast Fail Discipline
+
+An anomaly found mid-run must never be quietly patched over — a wrong premise that nobody sees spreads into every artifact built on it. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/fast-fail.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+
+- **One binary question (一个问题,二值答案)**: does resolving this need *correction* — exactly one reading consistent with the recorded intent, local and reversible, no downstream premise falsified, blast radius inside the declared scope — or *decision*, meaning choosing between readings or inventing intent no artifact records? Correction is repaired in passing and disclosed at wrap-up; decision halts at the anomaly point and hands the user a surface report. There is no severity scale and no middle tier, because neither is decidable.
+- **The mechanical test (机械测试)**: if the explanation of a fix has to contain the word "assumed", it was not a repair — it was a fast fail.
+- **Two closed lists (两份封闭清单)**: which anomaly classes must be surfaced and which may be repaired in passing are enumerated in the owner and grow only by revising it — never per command template or skill.
+- **Criteria outrank list membership (判据优先于清单命中)**: a list hit is not a licence. Doubtful cases go the strict way; an anomaly that recurs within one run escalates.
+- **A green check is a claim, not evidence (机器给出的绿同样受判据约束)**: a check that would not go red when its subject breaks proves nothing. The two companion techniques are named by the owner, not reinvented here.
+- **Subagents are injected at dispatch (子代理在派发那一刻注入)**: this ambient layer cannot reach a subagent, because a subagent's prompt derives from its own definition and dispatch payload rather than from the orchestrator's conversation. The owner holds the clause; callers carry it into every dispatch and require an explicit anomaly line on return, so silence is never read as clean.
+- **Nothing to report is still something to say (无事可报也要明说)**: a run with no anomaly and no in-passing repair states that explicitly, so an ungoverned run cannot be mistaken for a clean one.
+
+Should the owner document be missing from a project, it ships with the framework: re-run the CLI's project initialization (`specify init`), whose asset-copy step is what actually creates `.specify/shared/guidelines/`. Refreshing the project instructions does **not** copy guideline files, so it cannot restore this one. Do not reconstruct the rules from memory or act on a summary of them.
+
 ## Dogfooding Practice
 
 Dogfooding — the people who build a product also rely on it in their real daily work, so a smooth **use → feedback → iterate** loop forms naturally — proves development-assistance capabilities the way self-hosting proves a compiler. Two loops already exist and add no new tools, steps, or storage:

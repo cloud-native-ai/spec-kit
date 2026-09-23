@@ -140,11 +140,20 @@ git diff --stat -- scripts/python/scan-confirmation-gates.py
 ```bash
 cd /storage/project/cloud-native-ai/spec-kit
 python3 scripts/python/scan-confirmation-gates.py
-python3 scripts/python/scan-confirmation-gates.py --baseline .specify/specs/050-proactive-flow-trigger/baseline-gates.json; echo "EXIT=$?"
+python3 - << 'SCANPY'
+import json, subprocess
+frozen = json.load(open(".specify/specs/050-proactive-flow-trigger/baseline-gates.json"))["confirmationGates"]["total"]
+out = subprocess.run(["python3", "scripts/python/scan-confirmation-gates.py", "--json"], capture_output=True, text=True).stdout
+p = json.loads(out)
+print("frozen:", frozen, "live:", p["total"], "violations:", len(p["violations"]))
+print("TOTAL-EQUAL" if p["total"] == frozen and not p["violations"] else "FAIL")
+SCANPY
 git diff --stat -- scripts/python/scan-confirmation-gates.py
 python3 -m pytest tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged -q 2>&1 | tail -2
 ```
-**期望**:`total` 仍为 **23**(相等,非 ≤)、violations **0**;`EXIT=0`;`git diff --stat` 仍**为空**;该测试 **passed**。
+**期望**:`total` 仍为 **23**(相等,非 ≤)、violations **0**;第二段输出 `frozen: 23 live: 23 violations: 0` 与 **`TOTAL-EQUAL`**;`git diff --stat` 仍**为空**;该测试 **passed**。
+
+> ⚠️ **`--baseline` 旗标 MUST NOT 用作相等判据(实现期变异演练实证,2026-09-23)**。本场景初版印的是 `scan-confirmation-gates.py --baseline <050 基线>; echo "EXIT=$?"` 并期望 `EXIT=0`。实测该形式**双重失明**:① 旗标读基线文件的**顶层** `total` 键,而 050 基线把该值嵌在 `confirmationGates` 之下,故其 `baseline delta total` 恒为 `+23`(实为与 `0` 相比);② 其退出码逻辑是 `if args.baseline and violations: return 2`——**只反映 violations,完全不反映 total**。变异演练:把冻结值改成 `99` 后,`--baseline` 形式仍 `EXIT=0`,而上面第二段的直接比较正确报 `FAIL`。该旗标的这两个缺陷属**上游**(`scripts/` 在本特性零改动面内),MUST 单独上报,MUST NOT 由本特性改写扫描器。
 
 > *本场景是全部场景中唯一"改后判据在改前即可完整实跑"的一个——因为它的判据是**不变量**(total 相等、扫描器零改动)。这也是它最危险的地方:新增文本里任何一行命中即 +1,同时打爆 `gate-neutrality.md` C-10 枚举的全部既有钉子(其位置与形态由该条单点拥有,本行不重抄)。两类必踩陷阱见 `gate-neutrality.md` C-6 / C-7。*
 
