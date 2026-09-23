@@ -100,6 +100,7 @@ Per-Agent Payload:
 | `forbidden_files` | Files this agent MUST NOT modify |
 | `output_convention` | Where to write status + intermediates (`.specify/teams/.work/<slug>/`) vs. final deliverables (declared target path) |
 | `model_hint` | Suggested model tier (light / standard / heavy) |
+| `fast_fail_clause` | The fast-fail injection clause, byte-identical to its owner literal in `.specify/shared/guidelines/fast-fail.md` § 子代理派发注入 — carried, never re-typed here |
 
 Context Isolation Rules:
 - NO conversation history passed to child agents
