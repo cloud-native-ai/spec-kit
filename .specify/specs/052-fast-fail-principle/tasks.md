@@ -213,7 +213,7 @@ description: "Task list for Feature 052 — 快速失败纪律(Fast Fail)"
 
 - [ ] T040 [US5] [blockedBy: T028] 在 `shared/guidelines/fast-fail.md` 填写 `## 生长闭环` 节:观察标记字面量 `[fast-fail]`(带方括号定界)与检索形态、两条红线(干净运行 MUST NOT 追加空洞观察条目、MUST NOT 编造数值)、**双向**生长规则(升级与降级证据资格对称;≥2 次独立观察或 1 次用户直接纠正;以修订本文档的形式;移动后原处措辞收敛为指针)、留痕要求(指向反馈条目 ID / 提交 / 会话原话)、MUST NOT 静默调参、以指针引用既有 probe 与自省入口(不声明新增 probe 类/对象或自省流程)、以及 SC-015 三个数(快速失败率 / 用户推翻率 / 清单净生长方向)与"由既有存据导出、MUST NOT 新增计数器或台账"的声明;并载明上送件**自身携标记**使观察不依赖运行活到收尾
 - [ ] T041 [US5] [blockedBy: T040] 同步镜像:`python3 scripts/python/sync-mirrors.py --write --only shared`,核验 `cmp` 逐字节相等且 `--check --only shared` 的 DIFF 集是 T001 冻结集的**子集**(集合包含判据,见 GATE-4;`--write --only shared` 会同步整个 scope,故实测该集已由 2 条降为 0 条)
-- [ ] T042 [US5] [blockedBy: T041] 在 `tests/contract/test_fast_fail_discipline.py` 中实现 `discipline-doc.md` C-18、C-19 的断言体(`test_c18_*`、`test_c19_*`):标记字面量在场、两条红线、双向规则(断言文本同时含升级与降级两侧且不只有单向通道)、留痕、禁止静默调参、以指针引用 probe 与自省入口、三个数与其零新增机制声明;并核验 T005 已实现的 C-20 仍绿(标记字面量改动后互斥性 MUST 重新成立)
+- [ ] T042 [US5] [blockedBy: T041] 在 `tests/contract/test_fast_fail_discipline.py` 中实现 `discipline-doc.md` C-18、C-19 的断言体(`test_c18_*`、`test_c19_*`):标记字面量在场、两条红线、双向规则(断言文本同时含升级与降级两侧且不只有单向通道)、留痕、禁止静默调参、以指针引用 probe 与自省入口、三个数与其零新增机制声明;并**断言生长闭环侧使用的是独立键 `(发现点, 被证伪的预期)` 二元组**——它 MUST 含发现点,与 `test_c10` 断言的复发键(不含发现点)构成一对**互不替代**的守卫;二者任一侧被合并回单键都必须变红(2026-09-23 用户裁定的回归路径,见 T063);并核验 T005 已实现的 C-20 仍绿(标记字面量改动后互斥性 MUST 重新成立)
 - [ ] T043 [US5] [blockedBy: T042] 核验 US5 分区转绿:`python3 -m pytest tests/contract/test_fast_fail_discipline.py -q -k "c18_ or c19_ or c20_"`(C-20 一并复核,因标记字面量在 T040 落地后互斥性 MUST 重新成立),期望全绿;随后实跑 `quickstart.md` 场景 8:在 `--workspace-root /tmp/ffdrill` 一次性根内 record → list 得 `count ≥ 1`,随后断言**真实存据仍为 `count: 0`**(反空真哨兵),`rm -rf` 后目录不存在。⚠️ MUST NOT 用 `--action cleanup` 清理未打包条目(该 action 要求 `--package`,`feedback-utils.py:1389` 会抛 `FeedbackError`);`--action dispose` 亦不适用(只翻元数据、不删文件)
 
 ## Phase 8: User Story 6 - 边界落位、既有实例收敛与门控预算中立 (Priority: P2)
@@ -246,6 +246,10 @@ description: "Task list for Feature 052 — 快速失败纪律(Fast Fail)"
 - [ ] T060 [blockedBy: T059] 对着**当前树**重跑 GATE-1…GATE-9 全部九项,逐条记录命令、实际输出与判定到 `verification.md`;任一项不满足 MUST 就地修复后重跑,连续三次重跑无新进展则停止并上送(MUST NOT 继续重试)
 - [ ] T061 [blockedBy: T060] Feature 列表复审:确认本特性**未暴露新 Feature、未使既有 Feature 失效**;把实现期的关键变更与跨 Feature 交付效应(对 051 的类 ⑪ 登记与 C-14 上调)记入 `.specify/memory/features/052.md` 的 Latest Review;核验 `.specify/memory/features.md` 索引行的 Spec Path 未变、Status 仍为 `Planned`(推进到 `Implemented` 归 `/speckit.implement`,本命令 MUST NOT 落该状态)
 - [ ] T062 [blockedBy: T061] 把实现期查出的**自身缺陷**与推广教训追加进 `docs/reference/history/00-cross-cutting-lessons.md` 的相应小节(若有新形态),或如实记录"无新形态";MUST NOT 为了让本行有产出而发明教训
+
+### 实现期中途用户裁定落地(追加,不重编号)
+
+- [X] T063 [blockedBy: T013] 落地 2026-09-23 用户对 **FR-014 同一性键**的裁定(甲案:拆成两个键),并重跑 S9 双评审复核。裁定原文与理由已逐字追加进 `requirements.md` › `## Clarifications` › `### Session 2026-09-23`(append-only,行数 12 → 13 已核验)。级联改动五处:`requirements.md`(FR-014 复发键 / FR-044 独立键 / Key Entities › 异常)、`data-model.md` E2、`contracts/discipline-doc.md` C-10(g)、真源文档 `### 三条裁决顺序` 的两振升级条、`test_c10` 断言体;另扩 T042 使 `test_c18` 断言独立键含发现点。**新守卫 MUST 非空真**:已做变异演练——把真源文档的「不含发现点」改为「含发现点」(即模拟两键被合并回去)→ `test_c10` 变红并印出回归路径说明 → 复原 → 恢复绿,镜像复核逐字节相等。**复核义务**:以同一份 12 场景表重跑 SC-001 双评审,要求 S9 的**规则级**依据由「退回存疑从严」变为「直接命中两振升级」,规则级一致率由 11/12 升到 **12/12**;两次结果 MUST 并列记入 `notes/sc001-dual-review.md`,MUST NOT 覆盖首轮记录
 
 ## Dependencies & Execution Order
 

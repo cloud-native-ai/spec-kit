@@ -329,9 +329,18 @@ def test_c10_triage_criteria_seven_items():
     # (g) FR-014 two-strike escalation + the identity key that makes 'same' decidable
     assert "两振" in sec, "C-10(g): the two-strike escalation rule is absent"
     assert "第二次" in sec, "C-10(g): the escalation trigger ('second occurrence') is not stated"
-    assert "发现点" in sec and "被证伪的预期" in sec, (
-        "C-10(g): the (发现点, 被证伪的预期) identity key is absent, so 'the same anomaly' is undecidable"
+    # Recurrence key: the falsified expectation ALONE. Two independent reviewers found
+    # that the original (发现点, 被证伪的预期) tuple makes this rule unreachable, because a
+    # recurrence almost always surfaces at a different discovery point. Adjudicated
+    # 2026-09-23: FR-014 uses the single-key recurrence form; FR-044's independence key
+    # keeps the tuple (asserted in test_c18_*).
+    assert "被证伪的预期" in sec, "C-10(g): the recurrence key is absent"
+    assert re.search(r"不含发现点", sec), (
+        "C-10(g): the recurrence key is not stated to EXCLUDE 发现点. Merging it back with "
+        "FR-044's independence key silently makes two-strike escalation unreachable for "
+        "cross-point recurrence -- a string-presence assertion alone cannot catch that."
     )
+    assert re.search(r"复发键|单键", sec), "C-10(g): the recurrence key is not named as a single key"
     # (f) and (d) must be independently locatable -- they are different precedence rules
     d_at = sec.index("判据优先于清单命中")
     f_at = sec.index("上送极优先")
