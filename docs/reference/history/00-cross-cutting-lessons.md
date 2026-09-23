@@ -80,6 +80,11 @@ mirror 文件时 `cp` 被 alias 成 `cp -i`,遇到已存在目标会**静默跳�
 3. **命令的可达范围小于命题的范围**。`git diff <sha>` 只达**受跟踪**路径,而特性自己的制品在 Phase 边界提交前全是未跟踪的,于是"本特性新增了哪些可执行脚本"这个问题在唯一能起作用的窗口内看不见任何答案(一个新增的 `.sh` 会被静默放过)。修法:并入 `git ls-files --others --exclude-standard`。
 4. **断言瞄准了错误的树**。指针文本写的是运行时副本 `.specify/shared/guidelines/<name>.md`(读者解析的就是它),而守卫去校验框架源树 `shared/guidelines/<name>.md`。本仓两棵树都在,故二者偶然同真;下游项目只有运行时副本,于是该守卫对**它被写来防的那一种失效**结构性不可见。实测:移走运行时副本后该用例仍报 `1 passed`。这是「两顶帽子」陷阱(见 AGENTS.md 同名节)在测试侧的变体。
 
+**实现期新增的两种成因(Feature 052,2026-09-23)**:上列四种之外的同族形态,一并归入盲检类。
+
+5. **选择器按子串工作,却被当作按标识符工作**。`pytest -k` 的每个 token 按**子串**匹配测试 id,且**同时匹配 slug**:裸 `c1` 会选中 `test_c10_*`…`test_c19_*`,而名为 `test_g8_c6_c7_...` 的函数会因 slug 含 `c6_` 被另一阶段的 token 选中。实测(5 个桩)`-k "c1 or c2"` 收集 5 个,`-k "c1_ or c2_"` 收集 2 个。修法:token 一律带尾下划线、函数名一律 `test_<前缀><编号>_<描述>`(编号后紧跟下划线),并**断言收集数等于认领的条款数**——否则空选恒绿,而空选正是"分区表达式写错"的默认结果。
+6. **自指哨兵被自己的诊断文本触发**。一个"扫描自身源码断言不含某禁用字面量"的守卫,若把该字面量逐字写进自己的失败消息,就会在自己的报错文案上恒红。修法:needle 由片段拼出(`"agents" + "/" + "instances"`),诊断消息改用不含该字面量的散文,并为哨兵再配一条伴生断言(源码长度非零、被扫常量仍在场)。
+
 **两个配套手法**:
 
 - **变异演练(mutation drill)**:凡守卫负面命题的用例,取证 MUST 含一次「把被守物弄坏 → 确认变红 → 复原 → 确认恢复绿」的实跑,而不是只看它在当前树上通过。"今天绿"只证明当前树没问题,不证明该用例能发现问题。演练用的临时文件 MUST 删净并复核(计数归零)。
@@ -126,6 +131,13 @@ mirror 文件时 `cp` 被 alias 成 `cp -i`,遇到已存在目标会**静默跳�
 ## 二十一、重构命令/引擎必须端到端实跑其真实管线
 
 - When restructuring a command/engine, **execute its real pipeline end-to-end** (create → view → invoke, or collect → compare) as a mandatory step — "files exist / headings present" checks miss latent defects that only surface at runtime (four such defects found in one tools restructure).
+
+## 二十二、分区认领、渲染入口与阶段边界的三个形态陷阱(Feature 052 实现期实测)
+
+- **一个测试文件被多阶段分区认领时,判据 MUST 写成"集合"而不是"条数"**。镜像与副本的既有漂移先于本特性存在,故判据只能是"触及的面上无**新增**成员";写成"DIFF 行数等于 N"会让一次**改善**反而判为失败——实测 `sync-mirrors.py --write --only shared` 同步的是**整个 scope**,把该 scope 的既有漂移一并治好(2 → 0),相等判据随即不成立。同族陷阱:`skills` 的 DIFF 条数改前改后都是 38,而**成员已换手**(一增一减相互抵消),只有集合比较能暴露。
+- **对未知参数静默返回成功的渲染入口,其返回值 MUST 被断言**。`src/specify_cli/__init__.py` 的 `render_agents_for_tool(project_path, tool)` 对不存在的 tool 键返回 `rendered: 0` 而**不报错**;`.github/agents` 的键是 `copilot` 而不是 `github`。传错键的表现是"命令成功、副本没变",退出码与日志都不报警。凡调用此类入口,MUST 断言 `rendered > 0`(或逐一核对目标文件已变),MUST NOT 只看退出码。同类:`regen-command-copies.py` 只有全量模式,无窄作用域;而 `sync-mirrors.py --only <path>` 支持窄前缀,其文档明写该旗标的存在理由就是"避免把无关漂移拖进改动面"——两者混用时 MUST 对**每个**被编辑的源文件逐个核对其镜像已同步。
+- **阶段边界不总能满足"回归差集为空"**。新建一个纪律真源文档、而其常驻指针要到下一阶段才落地时,既有的可达性守卫(`test_user_facing_comprehension_section.py::test_c11_no_dangling_guideline_pointer_on_either_instruction_surface`,其 C-11(b) 余集断言)会在这中间**合法地**变红——新文档在 `shared/guidelines/` 里,却还没有任何指令面指向它。此时 MUST 把两个阶段合成**一个**提交单元,而不是提交一个已知红的增量;归因也 MUST 写清"既不是被测物缺陷、也不是断言缺陷,而是任务排序产生的合法瞬态"。
+
 
 ---
 

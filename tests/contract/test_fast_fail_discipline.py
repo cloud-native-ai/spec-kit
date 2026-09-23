@@ -566,8 +566,22 @@ def test_c21_project_neutral():
 
 
 def test_c22_scope_limits_and_accepted_cost():
-    _text(DOC)
-    _unimplemented("C-22", "T050")
+    """C-22: the scope-limit clause names four rejected mechanisms and the accepted cost."""
+    sec = _section(_text(DOC), SECTION_HEADINGS[8])
+    assert sec.strip(), f"C-22: section {SECTION_HEADINGS[8]!r} is empty"
+    for mech in ("异常检测引擎", "分流评分器", "成熟度报告", "台账或注册表"):
+        assert mech in sec, f"C-22: the rejected mechanism {mech!r} is not named"
+    assert "已接受的代价" in sec, "C-22: the accepted-cost clause is absent"
+    assert "设计规避" in sec, "C-22: the design-avoidance choice is not named as the reason"
+    # gate-neutrality C-1(a): the scanner's own output line must never be pasted into a
+    # scanned file -- it contains 'confirmation gate' and would add 1 to the total.
+    assert "blocking confirmation gates" not in _text(DOC), (
+        "C-22 / gate-neutrality C-1(a): the scanner's output line was pasted into the truth-source "
+        "doc, which is inside the scan surface -- that alone raises the gate total by 1"
+    )
+    assert "语义漂移" in sec or "MUST NOT 通过改写" in sec, (
+        "C-22: the clause does not bar achieving zero hits by changing semantics rather than wording"
+    )
 
 
 # --- ambient-section.md C-1..C-19 (bodies land in T016 / T050) -------------
@@ -735,19 +749,69 @@ def test_a12_no_speckit_command_form():
     assert found == [], f"C-12: command invocation forms in the ambient section: {found}"
 
 
+SPEC_DIR = ROOT / ".specify" / "specs" / "052-fast-fail-principle"
+DRILL_NOTES = SPEC_DIR / "notes" / "red-first-evidence.md"
+# The house sentence that promises a restore capability the generator does not have:
+# generate-instructions.sh reconciles whole SECTIONS only and performs no mirror copy,
+# so refreshing instructions cannot restore a guideline file. Measured, not assumed.
+FORBIDDEN_RESTORE_RE = re.compile(
+    r"refresh the project instructions to restore it together with its mirror copy"
+    r"|刷新项目指令[^\n]{0,20}镜像副本[^\n]{0,10}恢复"
+)
+
+
 def test_a13_recovery_path_names_real_cli_asset():
-    _text(INSTR)
-    _unimplemented("A-13", "T050")
+    """C-13: the section names the recovery path that actually exists."""
+    sec = "\n".join(_section_of(INSTR))
+    assert re.search(r"initialization|init", sec), (
+        "C-13: the section does not name the CLI's project initialization as the recovery path"
+    )
+    assert "asset-copy" in sec or "asset copy" in sec or "copy" in sec, (
+        "C-13: the recovery path is not identified as the CLI's asset-copy step"
+    )
+    # and it must say plainly that refreshing instructions does NOT do it
+    assert re.search(r"does \*\*not\*\* copy|does not copy|cannot restore", sec, re.I), (
+        "C-13: the section does not disclaim the instructions-refresh path"
+    )
 
 
 def test_a14_no_refresh_instructions_restores_mirror():
-    _text(INSTR)
-    _unimplemented("A-14", "T050")
+    """C-14: the false 'refresh restores the mirror' sentence is absent."""
+    for path in (INSTR, INSTR_LIVE):
+        sec = "\n".join(_section_of(path))
+        assert not FORBIDDEN_RESTORE_RE.search(sec), (
+            f"C-14: {path.relative_to(ROOT)} carries the false restore promise "
+            f"{FORBIDDEN_RESTORE_RE.pattern[:48]!r}..."
+        )
+    # the mechanism claim behind C-14 is itself measured here, not taken on faith
+    gen = ROOT / "scripts" / "bash" / "generate-instructions.sh"
+    body = _text(gen)
+    assert "shared/guidelines" not in body, (
+        "C-14: generate-instructions.sh now copies shared/guidelines -- if that is intentional, "
+        "the false-promise prohibition needs re-deriving rather than being left stale"
+    )
 
 
 def test_a15_forbidden_sentence_mutation_drill():
-    _text(INSTR)
-    _unimplemented("A-15 (drill evidenced in T051)", "T050")
+    """C-15: A-14 is a negative proposition, so it needs a recorded mutation drill.
+
+    The substantive half (the sentence is absent, and the generator really cannot do
+    it) is asserted above and is always checkable. The drill EVIDENCE lives in the
+    spec's notes; it is asserted when present and skipped when the spec directory has
+    been archived, rather than being allowed to pass silently on a missing file.
+    """
+    if not DRILL_NOTES.is_file():
+        pytest.skip(f"drill evidence file archived or absent: {DRILL_NOTES.relative_to(ROOT)}")
+    body = _text(DRILL_NOTES)
+    assert "C-14" in body or "刷新项目指令" in body, (
+        "C-15: no recorded mutation drill for the A-14 negative proposition"
+    )
+    assert re.search(r"(变红|RED|goes red)", body), (
+        "C-15: the drill record does not state that the assertion went red"
+    )
+    assert re.search(r"(复原|restor|恢复绿)", body), (
+        "C-15: the drill record does not state that the mutation was reverted and green restored"
+    )
 
 
 def test_a16_instance_points_one_pointer_each():
@@ -1099,28 +1163,92 @@ def test_x18_downstream_gate_rows_15_to_16():
 
 
 def test_x19_ufc_class_eleven_gains_fast_fail_path():
-    _text(UFC_DOC_TEST)
-    _unimplemented("X-19", "T048 (assertion lives in the UFC doc test)")
+    """C-19 DELEGATION GUARD: the real assertion lives in the UFC doc test.
+
+    constitution-export.md C-19..C-22 are carried by the pre-existing
+    tests/contract/test_user_facing_comprehension_doc.py (T048), because that file
+    already owns the interface-class table -- adding a second assertion here would
+    create a second definition point. This function guards the DELEGATION itself: if
+    the delegate assertion is ever removed, the delegation silently breaks while this
+    file stays green.
+    """
+    src = _text(UFC_DOC_TEST)
+    assert "shared/guidelines/fast-fail.md" in src, (
+        "C-19 delegation broken: the UFC doc test no longer mentions this discipline"
+    )
+    assert re.search(r"C-19: class ⑪ does not list the fast-fail discipline", src), (
+        "C-19 delegation broken: the class-⑪ assertion is no longer in the UFC doc test"
+    )
+    # and the delegate really does pass -- run it, do not assume it
+    import subprocess
+    r = subprocess.run(
+        ["python3", "-m", "pytest", str(UFC_DOC_TEST.relative_to(ROOT)), "-q", "-k", "c14 or c18a"],
+        capture_output=True, text=True, cwd=str(ROOT),
+    )
+    assert r.returncode == 0, f"C-19 delegate is red:\n{r.stdout[-700:]}"
 
 
 def test_x20_ufc_dedup_pin_raised_to_nine():
-    _text(UFC_DOC_TEST)
-    _unimplemented("X-20", "T048 (pin raise lives in the UFC doc test)")
+    """C-20 DELEGATION GUARD: the dedup pin was raised 8 -> 9 in the UFC doc test."""
+    src = _text(UFC_DOC_TEST)
+    assert "len(deduped) == 9" in src, (
+        "C-20 delegation broken: the deduplicated rule-source pin is not 9"
+    )
+    assert "len(deduped) == 8" not in src, "C-20: the stale pin value 8 is still present"
+    # the pin must be TRUE of the artifact, not just written down
+    ufc = _text(UFC_DOC)
+    paths = set()
+    for line in ufc.splitlines():
+        if not line.startswith("|"):
+            continue
+        cols = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cols) >= 4:
+            paths.update(re.findall(r"`([a-z0-9_./-]+\.md)`", cols[-2]))
+    assert len(paths) == 9, f"C-20: the class table yields {len(paths)} deduped rule sources, not 9"
 
 
 def test_x21_ufc_override_column_unchanged():
-    _text(UFC_DOC_TEST)
-    _unimplemented("X-21", "T048 (carried by the existing test_c18a)")
+    """C-21 DELEGATION GUARD: the override cap stays 2 and class ⑪'s column stays '—'."""
+    src = _text(UFC_DOC_TEST)
+    assert re.search(r"<= 2", src), "C-21 delegation broken: the override cap of 2 is gone"
+    assert re.search(r"C-21: class ⑪ gained a reader_baseline_override", src), (
+        "C-21 delegation broken: the per-row override assertion is no longer in the UFC doc test"
+    )
+    import subprocess
+    r = subprocess.run(
+        ["python3", "-m", "pytest", str(UFC_DOC_TEST.relative_to(ROOT)), "-q", "-k", "c18a"],
+        capture_output=True, text=True, cwd=str(ROOT),
+    )
+    assert r.returncode == 0, f"C-21 delegate (test_c18a) is red:\n{r.stdout[-700:]}"
 
 
 def test_x22_cross_discipline_change_recorded():
-    _text(UFC_DOC)
-    _unimplemented("X-22 (four-place trace verified in T049)", "T050")
+    """C-22: this is the only change to a Feature-051-owned artifact, traced in four places."""
+    traces = (
+        SPEC_DIR / "plan.md",
+        SPEC_DIR / "feature-ref.md",
+        ROOT / ".specify" / "memory" / "features" / "051.md",
+        ROOT / ".specify" / "memory" / "features" / "052.md",
+    )
+    for tr in traces:
+        assert tr.is_file(), f"C-22: trace location missing: {tr.relative_to(ROOT)}"
+        body = _text(tr)
+        assert "⑪" in body, f"C-22: {tr.relative_to(ROOT)} does not record the class-⑪ registration"
+        assert re.search(r"8 *→ *9|8→9|C-14", body), (
+            f"C-22: {tr.relative_to(ROOT)} does not record the pin raise"
+        )
 
 
 def test_x23_surface_report_ownership_split():
-    _text(DOC)
-    _unimplemented("X-23", "T050")
+    """C-23: the doc states the ownership split for class ⑪."""
+    text = _text(DOC)
+    assert "四要素内容下限" in text, "C-23: the doc does not claim the four-element content floor"
+    assert "措辞与上下文规则仍归其既有拥有者" in text, (
+        "C-23: the doc does not leave the wording/context rules with their existing owner"
+    )
+    assert "MUST NOT 成为该类的第二套规则真源" in text or "MUST NOT 成为" in text, (
+        "C-23: the doc does not disclaim being a second rule source for the class"
+    )
 
 
 # --- dispatch-injection.md C-1..C-23, C-26 (bodies land in T036) -----------
@@ -1474,93 +1602,331 @@ def test_i26_channel_one_enforced_by_review():
 
 # --- gate-neutrality.md C-1..C-17 (bodies land in T050) --------------------
 
+SIX_UNCHANGED_PATHS = (
+    "scripts/python/sync-mirrors.py",
+    "scripts/python/regen-command-copies.py",
+    "scripts/bash/generate-instructions.sh",
+    "scripts/python/feedback-utils.py",
+    "skills/create-team/scripts/dispatch.sh",
+    "src/specify_cli/__init__.py",
+)
+FEATURE_WRITE_SURFACE = (
+    "shared/guidelines/fast-fail.md",
+    "shared/definitions/subagent-definitions.md",
+    "shared/guidelines/user-facing-comprehension.md",
+    "templates/instructions-template.md",
+    "templates/constitution-template.md",
+    "templates/commands/constitution.md",
+    "templates/commands/agents.md",
+    "templates/commands/implement.md",
+    "skills/create-team/references/patterns.md",
+    "skills/create-team/references/create-mode.md",
+    "skills/create-agent/SKILL.md",
+    "skills/draw-diagram/SKILL.md",
+    "agents/skill-verifier.agent.md",
+)
+
+
+def _scan_json():
+    import json
+    import subprocess
+    r = subprocess.run(
+        ["python3", str(SCANNER.relative_to(ROOT)), "--json"],
+        capture_output=True, text=True, cwd=str(ROOT),
+    )
+    assert r.returncode == 0, f"the gate scanner failed to run: {r.stderr[-400:]}"
+    return json.loads(r.stdout)
+
 
 def test_g1_prechange_baseline_frozen_relative():
-    _text(GATE_BASELINE)
-    _unimplemented("G-1 (incl. C-1(a): the quoted scanner line never lands in a scanned file)", "T050")
+    """G-1 + C-1(a): a frozen baseline exists, and the scanner's own output line never leaks."""
+    assert GATE_BASELINE.is_file(), f"G-1: frozen baseline missing: {GATE_BASELINE.relative_to(ROOT)}"
+    import json
+    frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+    assert frozen["total"] == 23, f"G-1: the frozen total is {frozen['total']}, not 23"
+    assert frozen["integerHeadroom"] == 0, "G-1: the frozen headroom is not 0"
+    # C-1(a): the quoted scanner output line hits 'confirmation gate' itself, so it must
+    # never be copied into a scanned file.
+    leaked = []
+    for rel in FEATURE_WRITE_SURFACE:
+        path = ROOT / rel
+        if path.is_file() and "blocking confirmation gates" in _text(path):
+            leaked.append(rel)
+    assert leaked == [], f"C-1(a): the scanner's output line was copied into scanned files: {leaked}"
 
 
 def test_g2_scanner_zero_change():
-    _text(SCANNER)
-    _unimplemented("G-2", "T050")
+    """G-2: the scanner's three internals are unchanged (loaded, never re-typed)."""
+    m = _scanner()
+    assert len(m.POLICY_DOCS) == 2, f"G-2: POLICY_DOCS has {len(m.POLICY_DOCS)} entries, expected 2"
+    assert str(m.SELF_REL) == "shared/guidelines/confirmation-gates.md", f"G-2: SELF_REL is {m.SELF_REL}"
+    assert len(m.BLOCKING_PATTERNS) == 17, (
+        f"G-2: BLOCKING_PATTERNS has {len(m.BLOCKING_PATTERNS)} entries, expected 17 -- "
+        "widening the exemption set is the rejected alternative to design avoidance"
+    )
 
 
-def test_g3_counting_unit_is_matching_lines():
-    _text(SCANNER)
-    _unimplemented("G-3", "T050")
+def test_g3_counting_unit_is_matching_lines(tmp_path):
+    """G-3: the scanner counts matching LINES, not files or gates."""
+    d = tmp_path / "templates" / "commands"
+    d.mkdir(parents=True)
+    (d / "x.md").write_text(
+        "# t\n\nwait for user confirmation\n\nsome prose\n\nstop and confirm\n", encoding="utf-8"
+    )
+    import json
+    import subprocess
+    r = subprocess.run(
+        ["python3", str(SCANNER), "--root", str(tmp_path), "--json"],
+        capture_output=True, text=True,
+    )
+    assert r.returncode == 0, r.stderr
+    payload = json.loads(r.stdout)
+    assert payload["total"] == 2, (
+        f"G-3: one file with two matching lines counted as {payload['total']}; the unit must be the line"
+    )
+
+
+# gate-neutrality.md C-4 names exactly one written path that is OUTSIDE the scan
+# surface, and requires it to be written zero-hit anyway because it fans out through
+# the mirror and the per-tool trees. Everything else this feature writes is scanned.
+OUTSIDE_SCAN_SURFACE = ("agents/skill-verifier.agent.md", "agents/structure-adjuster.agent.md")
+# Markers identifying a line this feature added. Scoping the zero-hit check to these lines
+# is what keeps pre-existing governance-kept gates out of the proposition.
+FEATURE_LINE_MARKERS = (
+    "Fast Fail 实例指针",
+    "Fast Fail Discipline",
+    "Fast Fail (Surface Load-Bearing",
+    "fast-fail-clause",
+    "fast-fail.md",
+    "Dispatch-Time Governance Obligation",
+    "Dispatch-Time Injection Clause",
+    "Dispatch-time injection",
+    "快速失败",
+)
 
 
 def test_g4_scan_surface_covers_new_text():
-    _text(SCANNER)
-    _unimplemented("G-4", "T050")
+    """G-4: every written path is classified, and every scanned one is zero-hit."""
+    m = _scanner()
+    dirs = tuple(str(d) for d in m.SCAN_DIRS)
+    roots = tuple(r + "/" for r in (str(d) for d in m.SCAN_ROOT_FILES))
+    blocking = m.BLOCKING_RE
+    unclassified, scanned_hit = [], []
+    for rel in FEATURE_WRITE_SURFACE:
+        path = ROOT / rel
+        if not path.is_file():
+            continue
+        covered = rel.startswith(dirs) or rel.startswith(roots)
+        if not covered and rel not in OUTSIDE_SCAN_SURFACE:
+            unclassified.append(rel)
+        # The proposition is that the lines THIS FEATURE adds are zero-hit -- not that
+        # every file it touches is hit-free. templates/commands/implement.md legitimately
+        # carries a pre-existing governance-kept gate (its checklist-waiver prompt matches
+        # the proceed/yes-no pattern) and is one of the frozen 23. Demanding a hit-free
+        # file here would force "fixing" correct pre-existing work to satisfy a wrong
+        # assertion, so the check is scoped to lines bearing a fast-fail marker.
+        ours = [l for l in _text(path).splitlines() if any(k in l for k in FEATURE_LINE_MARKERS)]
+        hits = [l[:70] for l in ours if blocking.search(l)]
+        if hits:
+            scanned_hit.append((rel, hits[:2]))
+    assert unclassified == [], (
+        f"G-4: written paths that are neither scanned nor in the declared outside-set: {unclassified}"
+    )
+    assert scanned_hit == [], f"G-4: scanned text hits BLOCKING_RE (each line adds 1 to total): {scanned_hit}"
+    assert len(dirs) >= 3 and len(roots) >= 1, "G-4 sentinel: the scan surface collapsed"
+    # sentinel: the classification is not vacuous -- something really is scanned, and the
+    # marker scoping really does find this feature's lines (otherwise "zero hits" would mean
+    # "we never looked at any line")
+    assert any((ROOT / rel).is_file() and rel.startswith(dirs + tuple(roots))
+               for rel in FEATURE_WRITE_SURFACE), "G-4 sentinel: nothing was classified as scanned"
+    seen = 0
+    for rel in FEATURE_WRITE_SURFACE:
+        path = ROOT / rel
+        if path.is_file():
+            seen += sum(1 for l in _text(path).splitlines()
+                        if any(k in l for k in FEATURE_LINE_MARKERS))
+    assert seen >= 20, f"G-4 sentinel: only {seen} feature-authored lines were examined"
 
 
 def test_g5_specify_dir_skipped():
-    _text(SCANNER)
-    _unimplemented("G-5", "T050")
+    """G-5: .specify is skipped, which is why contract files may quote the scanner line."""
+    m = _scanner()
+    assert ".specify" in {str(x) for x in m.SKIP_DIR_PARTS}, "G-5: .specify is no longer skipped"
+    # and the payload really contains no .specify path
+    files = {g["file"] for g in _scan_json()["gates"]}
+    assert not any(f.startswith(".specify/") for f in files), "G-5: a .specify path was counted"
 
 
 def test_g6_adjacent_discipline_name_avoided():
-    _text(DOC)
-    _unimplemented("G-6", "T050")
+    """G-6: the adjacent discipline is named by path, never by its Chinese name."""
+    text = _text(DOC)
+    for banned in ("确认门控治理", "确认门禁"):
+        assert banned not in text, f"G-6: {banned!r} appears literally and would add 1 to the gate total"
+    assert "shared/guidelines/confirmation-gates.md" in text, (
+        "G-6: the adjacent discipline is no longer referenced by path either"
+    )
 
 
 def test_g7_stop_semantics_zero_hit():
-    _text(DOC)
-    _unimplemented("G-7", "T050")
+    """G-7: the whole truth-source doc is line-by-line free of blocking hits."""
+    blocking = _blocking_re()
+    lines = _lines(DOC)
+    hits = [(i + 1, l[:70]) for i, l in enumerate(lines) if blocking.search(l)]
+    assert hits == [], f"G-7: the truth-source doc hits BLOCKING_RE: {hits}"
 
 
 def test_g8_stop_semantics_anti_vacuity_sentinels():
-    _text(DOC)
-    _unimplemented("G-8", "T050")
+    """G-8: G-6 and G-7 are empty-set claims, so each needs a companion non-empty claim."""
+    text = _text(DOC)
+    assert len(text) > 4000, f"G-8 sentinel: the doc is only {len(text)} bytes -- the scan may be blind"
+    # the doc really does express stop semantics, just in non-matching wording
+    assert "停在异常点" in text, "G-8 sentinel: the doc no longer expresses the stop semantics at all"
+    assert "上送件" in text, "G-8 sentinel: the surface report is gone, so 'zero hits' means nothing"
+    assert len(_scanner().BLOCKING_PATTERNS) == 17, "G-8 sentinel: the pattern list is empty"
 
 
 def test_g9_total_equals_frozen_baseline():
-    _text(GATE_BASELINE)
-    _unimplemented("G-9", "T050")
+    """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+    import json
+    frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+    payload = _scan_json()
+    assert payload["total"] == frozen["total"], (
+        f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+        "the integer headroom on the budget is 0"
+    )
+    assert payload["violations"] == [], f"G-9: violations: {payload['violations']}"
 
 
 def test_g10_three_pins_independently_locatable():
-    """C-10 + C-10(a): the pin table's three rows each resolve to a real assert.
-
-    Forms differ per row -- a literal ``== 23``, an equality against the frozen
-    baseline, and a derived ``<= cap``. Searching for ``== 23`` alone finds only
-    the first; that is how the third pin went uncounted during planning.
-    """
-    _text(UFC_DOC_TEST)
-    _unimplemented("G-10 / C-10(a)", "T050")
+    """C-10 + C-10(a): each of the three pins resolves to a real assertion of its own form."""
+    ufc = _text(UFC_DOC_TEST)
+    assert re.search(r'payload\["total"\] == 23', ufc), "C-10 row one: the hard-coded == 23 literal is gone"
+    proactive = _text(PROACTIVE_TEST)
+    assert re.search(r'payload\["total"\] == frozen\["total"\]', proactive), (
+        "C-10 row two: the equality-against-frozen-baseline assertion is gone"
+    )
+    sweep = _text(SWEEP_TEST)
+    assert re.search(r'payload\["total"\] <= cap', sweep), "C-10 row three: the derived cap assertion is gone"
+    assert re.search(r'baseline\["total"\] \* 0\.25', sweep), "C-10 row three: the cap derivation changed"
+    # the two frozen sources still hold the values those pins compare against
+    import json
+    assert json.loads(_text(GATE_BASELINE))["confirmationGates"]["total"] == 23, "C-10 row two source moved"
+    assert json.loads(_text(SWEEP_BASELINE))["total"] == 93, "C-10 row three source moved (93 x 0.25 = 23.25)"
 
 
 def test_g11_pins_and_baselines_not_modified():
-    _text(GATE_BASELINE)
-    _unimplemented("G-11", "T050")
+    """G-11: neither baseline was re-frozen to disguise a breached budget."""
+    import json
+    gate = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+    assert (gate["total"], gate["destructive"], gate["governanceKept"]) == (23, 13, 10), (
+        f"G-11: the frozen gate baseline was altered: {gate}"
+    )
+    frozen_at = json.loads(_text(GATE_BASELINE))["frozenAt"]  # top level, not inside confirmationGates
+    assert frozen_at == "2026-09-08", (
+        f"G-11: the frozen baseline's date moved to {frozen_at} -- re-freezing disguises a breach "
+        "as the new normal"
+    )
+    assert json.loads(_text(SWEEP_BASELINE))["total"] == 93, "G-11: the 044 baseline total moved"
 
 
 def test_g12_avoidance_is_wording_only():
-    _text(DOC)
-    _unimplemented("G-12", "T050")
+    """G-12: zero hits was achieved by wording, not by weakening semantics."""
+    text = _text(DOC)
+    # the semantics that a lazy rewrite would drop are all still present
+    for frag, what in (
+        ("停在异常点", "the halt obligation"),
+        ("上送件四要素", "the four-element surface report"),
+        ("仅不可撤销动作方可通过", "the irreversible-action list entry"),
+        ("shared/guidelines/confirmation-gates.md", "the delegation target"),
+        ("MUST NOT 重定义", "the boundary non-redefinition rule"),
+    ):
+        assert frag in text, f"G-12: achieving zero hits cost us {what} ({frag!r} is gone)"
 
 
 def test_g13_rewording_triggers_consistency_rerun():
-    _text(DOC)
-    _unimplemented("G-13", "T050")
+    """G-13: an avoidance-driven rewording carries the SC-001 rerun obligation."""
+    if not (SPEC_DIR / "notes" / "sc001-dual-review.md").is_file():
+        pytest.skip("the SC-001 record lives with the spec and has been archived")
+    body = _text(SPEC_DIR / "notes" / "sc001-dual-review.md")
+    assert "第二轮" in body, "G-13: only one review round is recorded"
+    assert "规则级" in body, "G-13: the record does not separate verdict-level from rule-level agreement"
+    doc = _text(DOC)
+    assert "双评审者一致性复跑" in doc or "双评审者" in doc, (
+        "G-13: the truth-source doc does not carry the rerun obligation for avoidance rewording"
+    )
 
 
 def test_g14_accepted_cost_in_scope_limits():
-    _text(DOC)
-    _unimplemented("G-14", "T050")
+    """G-14: the accepted cost is stated in the doc's scope-limit section, in prose."""
+    sec = _section(_text(DOC), SECTION_HEADINGS[8])
+    assert "已接受的代价" in sec, "G-14: the accepted-cost clause is absent"
+    assert "整数余量为零" in sec or "余量为零" in sec, "G-14: the zero-headroom reason is absent"
+    assert "设计规避" in sec, "G-14: design avoidance is not named as the chosen disposition"
+    assert "永久受制" in sec, "G-14: the permanence of the cost is not stated"
 
 
 def test_g15_cost_not_only_in_spec_mutation_drill():
-    _text(INSTR_LIVE)
-    _unimplemented("G-15 (drill evidenced in T051)", "T050")
+    """G-15: the cost is part of the doc, not only of the spec -- drill recorded in T051."""
+    doc = _text(DOC)
+    live = _text(INSTR_LIVE)
+    assert "已接受的代价" in doc, "G-15: the cost is not in the truth-source doc"
+    # the doc, not the spec, is where a downstream reader will find it
+    spec_plan = SPEC_DIR / "plan.md"
+    if spec_plan.is_file():
+        assert "已接受的代价" in doc, "G-15: the cost exists only in spec artifacts"
+    if not DRILL_NOTES.is_file():
+        pytest.skip("drill evidence archived with the spec directory")
+    body = _text(DRILL_NOTES)
+    assert "C-14" in body and re.search(r"(变红|RED)", body) and re.search(r"(复原|恢复绿|restor)", body), (
+        "G-15: the recorded drill does not show red-then-restored-green"
+    )
 
 
 def test_g16_six_engines_zero_change():
-    _text(SCANNER)
-    _unimplemented("G-16", "T050")
+    """G-16: the six engines exist and are non-empty (the anti-vacuity half of C-16).
+
+    The git-level zero-change proof is GATE-3, a diff against the frozen BASE_SHA
+    literal; a test cannot own a SHA. What it CAN own is that the paths are real and
+    that their load-bearing invariants are intact.
+    """
+    for rel in SIX_UNCHANGED_PATHS:
+        path = ROOT / rel
+        assert path.is_file(), f"G-16: {rel} is missing"
+        assert len(_text(path)) > 200, f"G-16: {rel} read as near-empty"
+    # invariants that a "fix" to the gate budget would have to break
+    wrapper = _text(ROOT / "skills" / "create-team" / "scripts" / "dispatch.sh")
+    assert MARKER_CLAUSE not in wrapper, (
+        "G-16: the injection clause was implemented into the dispatch wrapper -- it must stay caller-side"
+    )
 
 
 def test_g17_mirrors_produced_by_engines_only():
-    _text(ROOT / "scripts" / "python" / "sync-mirrors.py")
-    _unimplemented("G-17", "T050")
+    """G-17: the mirror pairs are unchanged, and mirrors are byte-identical to sources."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "_ff_sync_mirrors", ROOT / "scripts" / "python" / "sync-mirrors.py"
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    pairs = [(s, d) for s, d, _strict, _ex in mod.MIRROR_PAIRS]
+    assert ("shared", ".specify/shared") in pairs, "G-17: the shared mirror pair is gone"
+    assert ("agents", ".specify/agents/templates") in pairs, "G-17: the agents mirror pair is gone"
+    assert ("templates", ".specify/templates") in pairs, "G-17: the templates mirror pair is gone"
+    assert len(mod.MIRROR_PAIRS) == 5, f"G-17: MIRROR_PAIRS has {len(mod.MIRROR_PAIRS)} entries, expected 5"
+    # every artifact this feature mirrored is byte-identical to its source
+    for src, mirror in (
+        (DOC, DOC_MIRROR),
+        (ROOT / "shared" / "definitions" / "subagent-definitions.md",
+         ROOT / ".specify" / "shared" / "definitions" / "subagent-definitions.md"),
+        (ROOT / "shared" / "guidelines" / "user-facing-comprehension.md",
+         ROOT / ".specify" / "shared" / "guidelines" / "user-facing-comprehension.md"),
+        (ROOT / "templates" / "instructions-template.md",
+         ROOT / ".specify" / "templates" / "instructions-template.md"),
+        (ROOT / "templates" / "constitution-template.md",
+         ROOT / ".specify" / "templates" / "constitution-template.md"),
+    ):
+        assert mirror.is_file(), f"G-17: mirror missing for {src.relative_to(ROOT)}"
+        assert src.read_bytes() == mirror.read_bytes(), (
+            f"G-17: {mirror.relative_to(ROOT)} was hand-edited or is stale vs {src.relative_to(ROOT)}"
+        )
+

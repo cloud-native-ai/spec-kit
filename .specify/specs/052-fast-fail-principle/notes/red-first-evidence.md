@@ -160,3 +160,24 @@ test_x20_ufc_c14_pin_raised_to_nine    -> 含 c14_
 - 变异演练:把该守卫改成真的去 `glob` 那个无界目录 → `test_i12` **变红**并印出 C-12 的理由 → 从备份复原 → **恢复绿** → 重新编译通过、收集数仍为 **105**。演练备份用 `\cp -f` 复原(alias-proof),复核方式为重跑该用例而非只看 `cp` 的退出码。
 
 > 这一条形态与首轮查出的 `-k` 子串泄漏同源:**把一个按文本工作的机制当作按标识符工作的机制用**。扫描自身源码时,扫描器读到的包括它自己的报错文案。已记入 T062 的教训候选。
+
+---
+
+# C-15 / A-14 变异演练取证(T051)
+
+**被演练的命题**:`ambient-section.md` C-14 —— 常驻章节 MUST NOT 含"刷新项目指令即连同其镜像副本一并恢复"一类句式。这是**负面命题**,故 MUST 配变异演练,不能只看它在当前树上通过。
+
+**四步实跑**(对象:`templates/instructions-template.md` 的 `## Fast Fail Discipline` 节;断言:`test_a14_no_refresh_instructions_restores_mirror`)
+
+| 步 | 动作 | 实跑结果 |
+|---|---|---|
+| 0 | 演练前基线 | `pytest -k "a14_"` → `1 passed`,exit **0** |
+| 1 | 把房式假承诺句 `refresh the project instructions to restore it together with its mirror copy` 插入本章节 | `pytest -k "a14_"` → exit **1**,`AssertionError: C-14: templates/instructions-template.md carries the false restore promise ...` ⇒ **变红** |
+| 2 | 移除该句(以精确字符串反向替换,并 `assert count == 1` 确认只命中一处) | — |
+| 3 | 复核恢复 | `pytest -k "a14_"` → `1 passed`,exit **0** ⇒ **恢复绿**;`git diff --stat -- templates/instructions-template.md` 输出 **0 行**;`git diff --quiet` 退出 0 ⇒ 文件与 HEAD **逐字节相同**,演练零残留 |
+
+**为何 C-14 成立(机制侧实测,不靠断言自证)**:`scripts/bash/generate-instructions.sh` 全文不含 `shared/guidelines`,`test_a14` 把这一点作为断言的一部分——若日后该脚本真的开始复制 guideline 文件,这条断言会变红并提示"假承诺禁令需要重新推导",而不是继续守一条已经过时的禁令。
+
+**顺带查明的上游缺陷(按 FR-077 上报,不改写)**:活动指令文件 `.specify/instructions.md` 中该假承诺句式**仍存在 1 处**,归属 **Feature 051 的 `## User-Facing Comprehension` 节**(实测:命中行所属的最近 `## ` 标题即该节;本特性的 `## Fast Fail Discipline` 节区间内命中数为 **0**)。FR-077 明文规定该同类问题属上游缺陷、MUST 单独上报、MUST NOT 由本特性顺手改写(那会是一次未获授权的爆炸半径越界),故本特性只保证**自己那一节**不含该句式。
+
+> 复原动作一律用精确字符串替换并以 `assert count == 1` 自证只命中一处,不用 `cp` 回填——本轮早先一次演练正因 `cp` 被 alias 成交互模式且后接 `&& rm -f` 而删掉备份、留下残留(见上文"实现期新查出的自身缺陷"一节之后的记录)。

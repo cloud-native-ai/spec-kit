@@ -159,3 +159,92 @@ ls: cannot access '/tmp/ffdrill': No such file or directory
 
 > ⚠️ 本场景 MUST NOT 用 `--action cleanup` 清理未打包条目(该 action 要求 `--package`,`feedback-utils.py:1389` 会抛 `FeedbackError`),`--action dispose` 亦不适用(只翻元数据、不删文件)。改用 `--workspace-root` 一次性根,已实跑验证。
 
+---
+
+## 场景 4 与场景 9 — 门控预算中立 + 类 ⑪ 跨纪律登记(T053,改后判据)
+
+### 场景 4(命令块由 quickstart.md 逐字提取执行)
+
+```
+blocking confirmation gates: 23
+  destructive: 13
+  governance_kept: 10
+violations (reversible gates still blocking): 0
+frozen: 23 live: 23 violations: 0
+TOTAL-EQUAL
+.                                                                        [100%]
+1 passed in 0.35s
+[exit=0]
+```
+
+### 场景 9(命令块由 quickstart.md 逐字提取执行)
+
+```
+106:| ⑪ | 失败如实报告 | `shared/guidelines/confirmation-gates.md`, `shared/guidelines/fast-fail.md` | — |
+400:    assert len(deduped) == 9, (
+1
+1
+.......................                                                  [100%]
+23 passed in 0.36s
+[exit=0]
+```
+
+**判定(场景 4)**: `total` = **23**(destructive 13 / governance_kept 10)、violations **0**;第二段实跑输出 `frozen: 23 live: 23 violations: 0` 与 **`TOTAL-EQUAL`**;`git diff --stat -- scripts/python/scan-confirmation-gates.py` **为空**;`test_c11_gate_scan_total_unchanged` **1 passed**;exit **0** ✓ —— 与改后期望逐项相符。
+
+**判定(场景 9)**: 类 ⑪ 行的规则真源列**同时含** `shared/guidelines/confirmation-gates.md` 与 `shared/guidelines/fast-fail.md`(`:106`)✓;钉子 `len(deduped) == 9`(`:400`)✓;`fast-fail.md` 在该文件命中 **1** ✓;该行 `reader_baseline_override` 列仍为 `—`(命中 1)✓;`test_user_facing_comprehension_doc.py` **23 passed**(含 `test_c18a` 上限 2 未受影响)、exit **0** ✓。
+---
+
+## 场景 6 / 10 / 11 / 12 — 四条变异演练(T054 补记;首次执行见 T039 与 `red-first-evidence.md`)
+
+### 场景 6
+
+**期望**: 步骤 0 输出 `prompt bytes: <非零>`;步骤 1–4 依次为 **≥1 → 0 → `restored` 且 ≥1 → `No such file or directory`**;演练目录计数归零。
+
+```
+prompt bytes: 931
+3
+0
+restored
+3
+ls: cannot access '/tmp/ffdrill': No such file or directory
+[exit=0]
+```
+
+### 场景 10
+
+**期望**: 四例依次为 **anomaly-halt / clean / incomplete / clean-or-incomplete 中判为 incomplete 者不得为 clean**;末行 `doc carries the rule: True`;`No such file or directory`。
+
+```
+有异常: anomaly-halt
+无异常: clean
+缺异常行: incomplete
+行内提及: incomplete
+doc carries the rule: True
+ls: cannot access '/tmp/ffdrill': No such file or directory
+[exit=0]
+```
+
+### 场景 11
+
+**期望**: `next action: surface-to-user | allowed: True | forbidden: False`;三条 `doc names …: True`(FR-071 要求排除覆盖既有的**全部**失败规则,故三者都 MUST 被点名)。
+
+```
+next action: surface-to-user | allowed: True | forbidden: False
+doc names '两振': True
+doc names '派发失败': True
+doc names '非并行': True
+[exit=0]
+```
+
+### 场景 12
+
+**期望**: 三行依次为 **True / False / False**(只有干净运行需要该显式陈述);`doc owns the literal: True`。
+
+```
+repairs=0 fails=0 -> explicit-statement-present: True
+repairs=2 fails=0 -> explicit-statement-present: False
+repairs=0 fails=1 -> explicit-statement-present: False
+doc owns the literal: True
+[exit=0]
+```
+
