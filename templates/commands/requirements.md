@@ -27,10 +27,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 
 ## Glossary
 
-Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Documentation Map) and apply the protocol in `.specify/shared/workflow/glossary.md`:
-
-- **Before acting on the user input**, map any recorded homophone/confusable variant to its canonical term (correcting voice/dictated input); surface each correction so the user can override it, and defer to the user on ambiguous variants.
-- **At wrap-up**, propose any new project-specific terms (`origin=auto`, `status=proposed`), excluding common words; run conflict detection; non-conflicting new terms MUST be written directly and merged into the wrap-up report (non-blocking); only writes that conflict with or overwrite an existing user entry MUST still pause for user confirmation. User-authored entries are authoritative.
+Apply the glossary protocol in `.specify/shared/workflow/glossary.md`, reading the project glossary at `.specify/memory/glossary.md` (ambient via the Documentation Map). That file owns every rule of this step and this section restates none of them: input correction and anchoring, **including the constraint-side reading of a registered term** (§1); progressive enrichment at wrap-up (§2); conflict detection and which writes proceed directly (§3); manual edits and user precedence (§4).
 
 ## Outline
 
@@ -50,14 +47,15 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
    1. Parse user description. If empty: ERROR. **Conceptual/idea-level input** (long-form essays, methodology explanations, advocacy material): first distill it into landable requirement slices — identify the landing level(s) the material maps to (e.g. the framework/tool itself vs. the downstream projects adopting it) and draft stories for each level separately, instead of transcribing the material's own structure into the spec.
    2. Extract key concepts: actors, actions, data, constraints.
    3. Initialize `Related Feature`: `Feature ID: Need clarification`, `Feature Name: Need clarification` (resolved by `/speckit.clarify`).
-   4. **Peek at house conventions (bounded, summary-first)**: sample the highest-numbered existing spec under `.specify/specs/` with targeted excerpts — heading structure (`grep -n '^#'`), one user story, a few FR/SC lines — instead of reading the whole spec (see `.specify/shared/guidelines/token-efficiency.md`); match its language, section conventions (e.g. Assumptions subsection), and Shared Strings usage. Aligning with the most recent merged spec reduces convention drift at zero clarification cost.
-   5. **Reserved identifier check**: if the spec names any new identifier (env var, macro, CLI flag, config key), grep the codebase for that name before drafting — a collision with an existing/reserved identifier (e.g. a build env var) must be surfaced with a proposed alternate name and an explicit user-override note, not silently adopted.
-   6. **Port/integration input hygiene**: when the feature ports or integrates an external codebase, (a) treat the upstream's docs/roadmap as claims and verify capability statements against its **source code** before they shape story priorities (docs routinely lag code); (b) write any fact still pending async verification (inventory sizes, entry counts, platform matrices) in "dynamically probed at runtime" phrasing from the first draft — hard-coded point-in-time numbers force multi-section rewrites when verification returns.
-   7. For unclear aspects: make informed guesses. Only use `[NEEDS CLARIFICATION: question]` if choice significantly impacts scope/UX, multiple interpretations exist, and no reasonable default. **Max 3 markers.**
-   8. Fill User Scenarios & Testing — write as many stories as the feature decomposes into (the template's three slots are open-ended scaffolding, not a quota; delete unused slots).
-   9. Generate testable Functional Requirements.
-   10. Define measurable, technology-agnostic Success Criteria.
-   11. Identify Key Entities (if data involved).
+   4. **Peek at house conventions (bounded, summary-first)**: sample the highest-numbered existing spec directory under `.specify/specs/<NNN>-<slug>/` and read its **`requirements.md`** — the same artifact filename this command writes (SPEC_FILE, step 3), and the same one `templates/requirements-template.md` scaffolds — with targeted excerpts: heading structure (`grep -n '^#'`), one user story, a few FR/SC lines, instead of reading the whole spec (see `.specify/shared/guidelines/token-efficiency.md`). Match its language, section conventions (e.g. Assumptions subsection), and Shared Strings usage. Aligning with the most recent merged spec reduces convention drift at zero clarification cost.
+   5. **Concept-owner check**: when a requirement introduces, constrains, or redefines a concept the framework already defines, locate that concept's owner document under `shared/definitions/` **before drafting** and write to the owner's definition — not to recall of it, and not to a paraphrase from training knowledge. A concept with no locatable owner is a **new** concept: say so in the spec instead of defining it inline. Concept *names* additionally go through the glossary's constraint-side reading (`## Glossary` above).
+   6. **Reserved identifier check**: if the spec names any new identifier (env var, macro, CLI flag, config key), grep the codebase for that name before drafting — a collision with an existing/reserved identifier (e.g. a build env var) must be surfaced with a proposed alternate name and an explicit user-override note, not silently adopted.
+   7. **Port/integration input hygiene**: when the feature ports or integrates an external codebase, (a) treat the upstream's docs/roadmap as claims and verify capability statements against its **source code** before they shape story priorities (docs routinely lag code); (b) write any fact still pending async verification (inventory sizes, entry counts, platform matrices) in "dynamically probed at runtime" phrasing from the first draft — hard-coded point-in-time numbers force multi-section rewrites when verification returns.
+   8. For unclear aspects: make informed guesses. Only use `[NEEDS CLARIFICATION: question]` if choice significantly impacts scope/UX, multiple interpretations exist, and no reasonable default. **Max 3 markers.**
+   9. Fill User Scenarios & Testing — write as many stories as the feature decomposes into (the template's three slots are open-ended scaffolding, not a quota; delete unused slots).
+   10. Generate testable Functional Requirements.
+   11. Define measurable, technology-agnostic Success Criteria.
+   12. Identify Key Entities (if data involved).
 
 6. **Write spec** to SPEC_FILE. Preserve section order. Keep `Related Feature` with default "Need clarification" values.
 

@@ -30,6 +30,17 @@ easily-confused words).
   literal input.
 - If a variant is **ambiguous** (maps to more than one canonical term) or unrecognized, do
   **not** guess — defer to the user.
+- **Constraint-side reading (约束侧读取)**: the glossary is not only a correction table. A
+  registered term may also carry what the project already fixed about that concept — a
+  **mechanical ceiling** (a count, size, or budget limit), an **established disposition** (the
+  handling the project settled on), or a **named anti-pattern** (a shape the project ruled
+  out). When work introduces, constrains, or redefines a registered term, read that term's
+  entry for these three and write inside them: a ceiling registered against a term does not
+  stop binding because the current task finds it inconvenient, and an anti-pattern named for a
+  term is a ruling, not a suggestion. Read **by topic domain** — pull the entries for the
+  domain the input is about rather than the whole table (summary-first) — and reach an entry's
+  full record through `.specify/memory/glossary.md`; a command step names this obligation and
+  MUST NOT restate its conditions.
 
 ## 2. Progressive enrichment (at checkpoints)
 
