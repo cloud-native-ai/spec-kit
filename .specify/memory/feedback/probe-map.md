@@ -90,9 +90,6 @@
 - **适用插入位置**: wrap-up
 - **Objects** (34):
   - `skill-archive-session-wrapup` — skill:archive-session @ wrap-up
-  - `skill-browser-extension-wrapup` — skill:browser-extension @ wrap-up
-  - `skill-browser-utils-wrapup` — skill:browser-utils @ wrap-up
-  - `skill-clone-website-ui-wrapup` — skill:clone-website-ui @ wrap-up
   - `skill-code-review-wrapup` — skill:code-review @ wrap-up
   - `skill-collect-evidence-wrapup` — skill:collect-evidence @ wrap-up
   - `skill-create-agent-wrapup` — skill:create-agent @ wrap-up
@@ -110,6 +107,8 @@
   - `skill-draw-excalidraw-wrapup` — skill:draw-excalidraw @ wrap-up
   - `skill-draw-mermaid-wrapup` — skill:draw-mermaid @ wrap-up
   - `skill-draw-plantuml-wrapup` — skill:draw-plantuml @ wrap-up
+  - `skill-git-fleet-wrapup` — skill:git-fleet @ wrap-up
+  - `skill-git-server-init-wrapup` — skill:git-server-init @ wrap-up
   - `skill-git-submodule-edit-wrapup` — skill:git-submodule-edit @ wrap-up
   - `skill-git-workflow-wrapup` — skill:git-workflow @ wrap-up
   - `skill-improve-agent-wrapup` — skill:improve-agent @ wrap-up
@@ -120,6 +119,7 @@
   - `skill-manage-agents-wrapup` — skill:manage-agents @ wrap-up
   - `skill-memory-recall-wrapup` — skill:memory-recall @ wrap-up
   - `skill-memory-record-wrapup` — skill:memory-record @ wrap-up
+  - `skill-merge-skills-wrapup` — skill:merge-skills @ wrap-up
   - `skill-study-project-wrapup` — skill:study-project @ wrap-up
   - `skill-summarize-project-wrapup` — skill:summarize-project @ wrap-up
   - `skill-think-skills-wrapup` — skill:think-skills @ wrap-up
@@ -195,9 +195,6 @@ graph TD
   class_skill_gate --> obj_gate_summarize_project_structure_freeze[gate-summarize-project-structure-freeze]
   kind_internal --> class_skill_wrapup[skill-wrapup]
   class_skill_wrapup --> obj_skill_archive_session_wrapup[skill-archive-session-wrapup]
-  class_skill_wrapup --> obj_skill_browser_extension_wrapup[skill-browser-extension-wrapup]
-  class_skill_wrapup --> obj_skill_browser_utils_wrapup[skill-browser-utils-wrapup]
-  class_skill_wrapup --> obj_skill_clone_website_ui_wrapup[skill-clone-website-ui-wrapup]
   class_skill_wrapup --> obj_skill_code_review_wrapup[skill-code-review-wrapup]
   class_skill_wrapup --> obj_skill_collect_evidence_wrapup[skill-collect-evidence-wrapup]
   class_skill_wrapup --> obj_skill_create_agent_wrapup[skill-create-agent-wrapup]
@@ -215,6 +212,8 @@ graph TD
   class_skill_wrapup --> obj_skill_draw_excalidraw_wrapup[skill-draw-excalidraw-wrapup]
   class_skill_wrapup --> obj_skill_draw_mermaid_wrapup[skill-draw-mermaid-wrapup]
   class_skill_wrapup --> obj_skill_draw_plantuml_wrapup[skill-draw-plantuml-wrapup]
+  class_skill_wrapup --> obj_skill_git_fleet_wrapup[skill-git-fleet-wrapup]
+  class_skill_wrapup --> obj_skill_git_server_init_wrapup[skill-git-server-init-wrapup]
   class_skill_wrapup --> obj_skill_git_submodule_edit_wrapup[skill-git-submodule-edit-wrapup]
   class_skill_wrapup --> obj_skill_git_workflow_wrapup[skill-git-workflow-wrapup]
   class_skill_wrapup --> obj_skill_improve_agent_wrapup[skill-improve-agent-wrapup]
@@ -225,6 +224,7 @@ graph TD
   class_skill_wrapup --> obj_skill_manage_agents_wrapup[skill-manage-agents-wrapup]
   class_skill_wrapup --> obj_skill_memory_recall_wrapup[skill-memory-recall-wrapup]
   class_skill_wrapup --> obj_skill_memory_record_wrapup[skill-memory-record-wrapup]
+  class_skill_wrapup --> obj_skill_merge_skills_wrapup[skill-merge-skills-wrapup]
   class_skill_wrapup --> obj_skill_study_project_wrapup[skill-study-project-wrapup]
   class_skill_wrapup --> obj_skill_summarize_project_wrapup[skill-summarize-project-wrapup]
   class_skill_wrapup --> obj_skill_think_skills_wrapup[skill-think-skills-wrapup]
@@ -287,9 +287,6 @@ graph TD
 | `gate-summarize-project-four-gates` | skill-gate | internal | skill:summarize-project @ gate-summarize-project-four-gates | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-summarize-project-structure-freeze` | skill-gate | internal | skill:summarize-project @ gate-summarize-project-structure-freeze | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `skill-archive-session-wrapup` | skill-wrapup | internal | skill:archive-session @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-browser-extension-wrapup` | skill-wrapup | internal | skill:browser-extension @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-browser-utils-wrapup` | skill-wrapup | internal | skill:browser-utils @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-clone-website-ui-wrapup` | skill-wrapup | internal | skill:clone-website-ui @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-code-review-wrapup` | skill-wrapup | internal | skill:code-review @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-collect-evidence-wrapup` | skill-wrapup | internal | skill:collect-evidence @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-create-agent-wrapup` | skill-wrapup | internal | skill:create-agent @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
@@ -307,6 +304,8 @@ graph TD
 | `skill-draw-excalidraw-wrapup` | skill-wrapup | internal | skill:draw-excalidraw @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-draw-mermaid-wrapup` | skill-wrapup | internal | skill:draw-mermaid @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-draw-plantuml-wrapup` | skill-wrapup | internal | skill:draw-plantuml @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-git-fleet-wrapup` | skill-wrapup | internal | skill:git-fleet @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-git-server-init-wrapup` | skill-wrapup | internal | skill:git-server-init @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-git-submodule-edit-wrapup` | skill-wrapup | internal | skill:git-submodule-edit @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-git-workflow-wrapup` | skill-wrapup | internal | skill:git-workflow @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-improve-agent-wrapup` | skill-wrapup | internal | skill:improve-agent @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
@@ -317,6 +316,7 @@ graph TD
 | `skill-manage-agents-wrapup` | skill-wrapup | internal | skill:manage-agents @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-memory-recall-wrapup` | skill-wrapup | internal | skill:memory-recall @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-memory-record-wrapup` | skill-wrapup | internal | skill:memory-record @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-merge-skills-wrapup` | skill-wrapup | internal | skill:merge-skills @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-study-project-wrapup` | skill-wrapup | internal | skill:study-project @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-summarize-project-wrapup` | skill-wrapup | internal | skill:summarize-project @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-think-skills-wrapup` | skill-wrapup | internal | skill:think-skills @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
