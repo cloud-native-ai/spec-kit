@@ -1,11 +1,11 @@
 ---
 id: "introspection-20260923T120035Z"
 created: "2026-09-23T12:00:35Z"
-status: "draft"
+status: "confirmed"
 scope_filter: "disposition=open (all kinds; framework hat ⇒ no outward side)"
 scope_entries: ["20260914T022757Z-speckit-feedback", "20260914T062401Z-speckit-feedback", "20260914T180702Z-skill-draw-echarts", "20260914T180923Z-skill-draw-plantuml", "20260914T181701Z-skill-draw-d3js", "20260915T065348Z-skill-create-skills", "20260916T032108Z-speckit-goal", "20260916T053329Z-skill-create-team", "20260916T061041Z-skill-create-team", "20260916T075612Z-skill-improve-team", "20260916T102352Z-skill-create-team", "20260916T135237Z-speckit-goal", "20260917T113354Z-speckit-goal", "20260917T121200Z-skill-create-team", "20260917T123109Z-speckit-requirements", "20260917T130112Z-speckit-clarify", "20260917T135437Z-speckit-plan", "20260917T145341Z-speckit-tasks", "20260917T180529Z-speckit-analyze", "20260918T065831Z-speckit-analyze", "20260918T114151Z-speckit-implement", "20260919T022511Z-speckit-implement", "20260920T064646Z-speckit-instructions", "20260922T070724Z-speckit-requirements", "20260922T101630Z-speckit-requirements", "20260922T131753Z-speckit-clarify", "20260923T023816Z-speckit-plan", "20260923T035059Z-speckit-tasks", "20260923T063219Z-speckit-analyze", "20260923T102013Z-speckit-implement", "20260923T110528Z-speckit-implement", "20260923T113303Z-speckit-feedback"]
 supersedes: null
-confirmed_at: null
+confirmed_at: "2026-09-23T12:17:38Z"
 ---
 
 # Introspection Report: introspection-20260923T120035Z

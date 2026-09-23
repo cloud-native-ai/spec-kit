@@ -8,10 +8,12 @@ probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "052-fast-fail-principle"
+disposition: "processed"
 partial: true
 created: "2026-09-23T10:20:13Z"
 summary: "**Partial run** — Phase 1–8 部分完成:63 个任务中 50 个已闭合(Phase 1–7 全部 + Phase 8 的 T044–T049),13 个仍为 `[ ]`(T050–T062),因上下文预算耗尽而停在一个**已提交、树洁净、门禁全绿**的检查点上,不是失败也不是移交。已完成部分逐项有实跑取证:契约套件相对冻结名字级基线 `comm -13` 的 26 条新增"
 introspection_ref: "introspection-20260923T120035Z#F-08"
+disposition_reason: "introspection:introspection-20260923T120035Z#F-08"
 ---
 
 ## Review

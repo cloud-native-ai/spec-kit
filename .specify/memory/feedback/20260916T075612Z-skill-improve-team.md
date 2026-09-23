@@ -8,10 +8,12 @@ probe: "skill-improve-team-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "draw-two-layer-structure"
+disposition: "processed"
 partial: false
 created: "2026-09-16T07:56:12Z"
 summary: "证据驱动的结构编辑:依据 run 2026-09-16T060815Z 的量化根因,把单 stage S1-refactor 拆为 S1a-S1e 五个 stage,并把交付粒度从逐文件改为目录级归属+例外清单。DAG 用程序校验(抽 workflow JSON → 悬空引用检查 → 拓扑排序判环 → write∩forbidden 求交),四项全过;拓扑序暴露 S1a 与 S1c 是并发根,原设"
 introspection_ref: "introspection-20260923T120035Z#F-16"
+disposition_reason: "introspection:introspection-20260923T120035Z#F-16"
 ---
 
 ## Review

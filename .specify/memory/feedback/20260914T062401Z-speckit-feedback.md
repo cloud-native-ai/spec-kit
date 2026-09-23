@@ -7,10 +7,12 @@ scope: "local"
 probe: "speckit-feedback-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-09-14T06:24:01Z"
 summary: "Mode 4 resumed run: the previous invocation had completed Steps 1-3 (4 parallel read-only verifiers over 21 self-dogfooding entries → 64 points: 35 STILL-VALID / 13 PARTIAL / 13 ALREADY-FIXED / 3 ack "
 introspection_ref: "introspection-20260923T120035Z#F-12"
+disposition_reason: "introspection:introspection-20260923T120035Z#F-12"
 ---
 
 ## Review

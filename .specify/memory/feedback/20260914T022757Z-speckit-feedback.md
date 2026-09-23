@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-feedback-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-09-14T02:27:57Z"
 summary: "Mode 2 package closed loop: status (21/10, should_prompt) → list projection (21 entries, all internal, all open, no partial, zero introspection_ref — so no --include-introspection proposal needed; Mod"
+disposition_reason: "clean-run-no-points (introspection-20260923T120035Z Excluded)"
 ---
 
 ## Review

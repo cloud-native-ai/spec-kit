@@ -8,10 +8,12 @@ probe: "skill-create-team-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "draw-two-layer-structure"
+disposition: "processed"
 partial: false
 created: "2026-09-16T05:33:29Z"
 summary: "Goal-Based create 分支一次跑通:引擎枚举精确命中 draw-two-layer-structure(active/3 判据) → 四要素分析(既有 Target 全 dropped、open=0 → 成组路径不可用,走单团队) → preset 匹配 confidence low 不复用 → pattern 决策树 Q3 命中 serial → territory verify "
 introspection_ref: "introspection-20260923T120035Z#F-15"
+disposition_reason: "introspection:introspection-20260923T120035Z#F-15"
 ---
 
 ## Review

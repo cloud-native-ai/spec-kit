@@ -7,10 +7,12 @@ scope: "local"
 probe: "skill-draw-plantuml-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-09-14T18:09:23Z"
 summary: "Cycle-3 复刻任务（三域部署拓扑 target.png）完成交付：puml/SVG/PNG/HTML 齐备，远端渲染一次通过校验（viewBox 11012、PNG 2750x1884、附录与磁盘 puml 逐字节一致）。主要成本花在渲染后端差异试错：服务器忽略 <style> 块、packageStyle rectangle 抑制 dashed、hidden 边 rank 语义与 2-环反"
 introspection_ref: "introspection-20260923T120035Z#F-20"
+disposition_reason: "introspection:introspection-20260923T120035Z#F-20"
 ---
 
 ## Review

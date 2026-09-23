@@ -8,10 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "052-fast-fail-principle"
+disposition: "processed"
 partial: false
 created: "2026-09-22T10:16:30Z"
 summary: "追加输入轮(收尾后到达的 scope addendum):用户要求重点关注子代理面,理由是子代理启动后不受控、须在启动时注入规则。按 user-input-protocol § Mid-Run Addendum Input 处理——落在上游工件 requirements.md 并重跑验证门一次,不新起调用。补一轮定向调研后核实用户判断成立且理由更硬:子代理提示派生自其 Agent 定义与派发载荷而"
 introspection_ref: "introspection-20260923T120035Z#F-10"
+disposition_reason: "introspection:introspection-20260923T120035Z#F-10"
 ---
 
 ## Review

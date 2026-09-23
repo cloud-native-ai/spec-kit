@@ -8,10 +8,12 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "051-user-facing-comprehension"
+disposition: "processed"
 partial: false
 created: "2026-09-18T06:58:31Z"
 summary: "Rerun after the first remediation batch. Same-author condition held, so detection was delegated to three fresh-context detectors on disjoint artifact-pair scopes and validation to 13 fresh-context val"
 introspection_ref: "introspection-20260923T120035Z#F-06"
+disposition_reason: "introspection:introspection-20260923T120035Z#F-06"
 ---
 
 ## Review

@@ -8,10 +8,12 @@ probe: "skill-create-team-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "draw-two-layer-structure"
+disposition: "processed"
 partial: false
 created: "2026-09-16T06:10:41Z"
 summary: "run 模式 serial 链首跑:S1-refactor 两次派发均撞 15 轮上限,gate 判 FAIL(六技能只覆盖 1 个),链停在 S1、S2/S3 保持 locked,canonical 零改动。按 failure_strategy retry-once-then-escalate 走完并 escalate。四项机制缺陷:serial stage 粒度与派发预算无对齐要求(根因,16"
 introspection_ref: "introspection-20260923T120035Z#F-16"
+disposition_reason: "introspection:introspection-20260923T120035Z#F-16"
 ---
 
 ## Review

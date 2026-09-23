@@ -8,10 +8,12 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "051-user-facing-comprehension"
+disposition: "processed"
 partial: false
 created: "2026-09-17T18:05:29Z"
 summary: "严格只读,零制品修改。因全部工件均为同一会话内自己撰写(经 requirements/clarify/plan/tasks 四次命令),自审证据力弱,故按 Feature 050 先例把检测与验证都委派 fresh-context 子代理:3 个检测代理(规格↔计划↔研究一致性 / 计划↔契约↔任务覆盖 / Feature 链接与宪章对齐)+ 12 个验证代理(每个 CRITICAL/HIGH 一"
 introspection_ref: "introspection-20260923T120035Z#F-07"
+disposition_reason: "introspection:introspection-20260923T120035Z#F-07"
 ---
 
 ## Review

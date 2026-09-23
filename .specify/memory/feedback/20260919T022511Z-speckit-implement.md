@@ -8,10 +8,12 @@ probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "051-user-facing-comprehension"
+disposition: "processed"
 partial: false
 created: "2026-09-19T02:25:11Z"
 summary: "Continuation run closing the remaining 50 of 63 task rows (US2-US5 + Polish) after rebasing the feature branch onto gitlab/master. All nine Completion Gate items were re-executed against the working t"
 introspection_ref: "introspection-20260923T120035Z#F-08"
+disposition_reason: "introspection:introspection-20260923T120035Z#F-08"
 ---
 
 ## Review

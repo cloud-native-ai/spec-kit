@@ -8,10 +8,12 @@ probe: "skill-create-team-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "draw-two-layer-structure"
+disposition: "processed"
 partial: false
 created: "2026-09-17T12:12:00Z"
 summary: "run 模式第 7 次运行:落地用户五条 UX 要求。新建 skills/draw-diagram/references/delivery-contract.md(91 行)作为交付形态与面向用户文字规则的唯一 owner(D1 自足 HTML/D2 逐引擎源文件与渲染图保留表/D3 without jargon+with context 图内与正文同规/D4 MUST NOT 描述图表本身含图例"
 introspection_ref: "introspection-20260923T120035Z#F-17"
+disposition_reason: "introspection:introspection-20260923T120035Z#F-17"
 ---
 
 ## Review
