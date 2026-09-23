@@ -47,7 +47,7 @@ BINDING = {
 
 NOT_BINDING = ["todo", "session", "feature", "constitution", "implement", "tasks"]
 
-# The seven gate rules, by bold label. Asserted as labels, never as a count --
+# The eight gate rules, by bold label. Asserted as labels, never as a count --
 # a count would be a second fact free to drift from the list it summarizes.
 GATE_RULES = [
     "Split by disjoint artifact scope",
@@ -57,13 +57,17 @@ GATE_RULES = [
     "Keep detection and validation disjoint",
     "Report the condition and the downgrade rate",
     "Subagent-unavailable fallback",
+    "Derive every briefing premise mechanically before dispatch",
 ]
 
 # Rules 1-6 are exclusively the owner's. Rule 7's label is deliberately NOT in
 # this list: "Subagent-unavailable fallback" pre-exists as local content in the
 # validation sections of analyze.md, review.md and plan.md, where it governs the
 # validation wave rather than detection. Asserting its absence would demand
-# deleting rules that were correct before this gate existed.
+# deleting rules that were correct before this gate existed. Rule 8 (briefing
+# premises machine-derived) is likewise outside the first six: it binds the
+# orchestrator's dispatch brief, and a command MAY name it locally without
+# copying the owner's body -- the slice stays the six detection-delegation rules.
 #
 # Matched as bare phrases, not as `**label**`: bold punctuation varies (a label
 # may carry its period inside the markers), and an assertion that only passes on
@@ -278,3 +282,66 @@ def test_owner_doc_stays_project_neutral():
     text = _read(SOURCE)
     for token in FORBIDDEN:
         assert token not in text, f"shipped surface leaks a project-specific identifier: {token}"
+
+
+# --- F-06: the detection contract gains an emitted field, not just prose -------
+#
+# Rule 3's propagation-surface answer used to exist only as a prose obligation, so
+# the orchestrator could not machine-check that a detector applied it. These pins
+# guard the two halves of the fix: the owner states the OUTPUT FORM (rule 3) and the
+# briefing-premise rule (rule 8), and analyze.md emits the field as a report column
+# with a matching intake rule and a stable, scope-free ID scheme.
+
+
+@pytest.mark.contract
+def test_owner_rule3_states_the_propagation_surface_output_form():
+    text = _read(SOURCE)
+    # The finding row's first field is the propagation surface; severity is derived from it.
+    assert "Output form" in text, "rule 3 lost its output-form sentence"
+    assert "FIRST field" in text, "rule 3 must fix the propagation surface as the row's first field"
+    assert "DERIVED" in text, "rule 3 must state severity is derived from the propagation surface"
+
+
+@pytest.mark.contract
+def test_owner_rule8_requires_machine_derived_briefing_premises():
+    text = _read(SOURCE)
+    # A wrong premise in the brief aims the whole pass at the wrong target, so every
+    # count/structural premise is machine-derived; what cannot be derived is an open question.
+    assert "machine-derived before dispatch" in text
+    assert "open question" in text
+    assert "never as an assertion" in text
+
+
+@pytest.mark.contract
+def test_analyze_report_form_emits_propagation_surface():
+    text = _read(COMMANDS_DIR / "analyze.md")
+    # F-06①: the §6 report table carries a propagation_surface column, placed BEFORE
+    # Severity so the row reads as "severity derived from propagation surface".
+    header = next(
+        (l for l in text.splitlines() if l.startswith("| ID | Category |")),
+        "",
+    )
+    cols = [c.strip() for c in header.strip().strip("|").split("|")]
+    assert "propagation_surface" in cols, f"§6 table lost the propagation_surface column: {cols}"
+    # anti-vacuity: the pre-existing columns are still there, so the order claim is meaningful
+    for c in ("ID", "Category", "Severity", "Recommendation"):
+        assert c in cols, f"§6 table lost a pre-existing column {c!r}: {cols}"
+    assert cols.index("propagation_surface") < cols.index("Severity"), (
+        f"propagation_surface must precede Severity (severity is derived from it): {cols}"
+    )
+    # F-06④: IDs are category-initial prefixed and stable; scope lives in Category, never in the ID.
+    assert "category initial" in text, "§6 lost the category-initial ID rule"
+    assert "MUST NOT carry a scope-letter prefix" in text, (
+        "§6 lost the no-scope-letter ID rule the rerun delta depends on"
+    )
+    # F-06⑤: a cluster-level slot that aggregates MEDIUM findings without re-tiering any row.
+    assert "Systemic Observations" in text, "§6 lost the Systemic Observations slot"
+    assert "WITHOUT raising any single row's severity" in text, (
+        "Systemic Observations must not become a licence to inflate a single severity"
+    )
+    # F-06①: §5.5 intake -- a `none` propagation_surface row is capped at MEDIUM and is
+    # never dispatched to the validation wave as CRITICAL/HIGH.
+    assert "Propagation-surface intake" in text, "§5.5 lost the propagation-surface intake rule"
+    assert "MUST NOT be dispatched to this wave as CRITICAL/HIGH" in text, (
+        "§5.5 intake must bar a `none` row from the CRITICAL/HIGH validation wave"
+    )

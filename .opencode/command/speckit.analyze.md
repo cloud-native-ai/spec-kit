@@ -103,6 +103,8 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 
 Analyze's split of the artifact set into disjoint scopes — an application of the owner's rule 1 to this artifact set, not a restatement of it: (a) spec ↔ plan ↔ research consistency — duplication, ambiguity, underspecification, count and cross-reference drift; (b) plan ↔ contracts ↔ data-model ↔ tasks coverage — every requirement reaches a task, every task maps back, every claimed mapping is true; (c) feature linkage + registry + constitution alignment.
 
+**Stale-copy decision test**: when a finding's claim is that a fact is duplicated or stale, the detector applies the One-Source-of-Truth decision test before reporting it — is the second copy one of the legitimate kinds that discipline allows, or a drifting copy that must be converted into a reference? Cite `.specify/shared/guidelines/one-source-of-truth.md` for the conditions that separate the two; do not restate them here. A copy that qualifies as legitimate is not a finding.
+
 #### A. Duplication Detection
 - Near-duplicate requirements → mark lower-quality for consolidation
 
@@ -153,6 +155,7 @@ Feature-specific severity rules:
 
 Before reporting, every **CRITICAL** and **HIGH** finding MUST be confirmed by an independent read-only validation subagent:
 
+- **Propagation-surface intake**: a row whose `propagation_surface` (§6) is `none` is capped at MEDIUM by §4's propagation-surface rule, so it MUST NOT be dispatched to this wave as CRITICAL/HIGH — MEDIUM/LOW skip validation. A `none` row that nonetheless arrives marked CRITICAL/HIGH is a severity-derivation error: re-tier it against its propagation surface (§6) rather than spend a validator confirming a cap violation.
 - **Fresh context**: the validator receives ONLY the finding (id, category, claim, severity) and its evidence location(s) — never the detection reasoning or the other findings.
 - **Task**: re-read the cited artifacts and return one verdict — `confirm` (evidence supports the claim), `reject` (claim not supported — state why), or `downgrade` (real but overstated — propose severity) — plus both **evidence-boundary fields**: `evidence_supported` (what the cited artifacts actually substantiate, with locations) and `evidence_not_supported` (what the claim asserts beyond that, or what the validator could not observe). A verdict returned without both fields is incomplete; ask for them again rather than reporting the severity alone.
 - **Constitution carve-out**: `downgrade` never applies to a Constitution finding — severity precedence is owned by Operating Constraints § **Constitution Authority**, not by this pass. When a validator confirms a principle conflict but proposes a lower severity, keep CRITICAL and adopt only its evidence-boundary fields as the row's scope note.
@@ -173,12 +176,14 @@ Before reporting, every **CRITICAL** and **HIGH** finding MUST be confirmed by a
 
 Output Markdown report (no file writes):
 
-| ID | Category | Severity | Location(s) | Summary | Recommendation |
-|----|----------|----------|-------------|---------|----------------|
+| ID | Category | propagation_surface | Severity | Location(s) | Summary | Recommendation |
+|----|----------|---------------------|----------|-------------|---------|----------------|
 
-One row per finding; stable IDs prefixed by category initial.
+One row per finding. **IDs** are stable across reruns and always prefixed by the category initial (e.g. `C-01`, `H-02`); the analysis scope is recorded in the **Category** column, and an ID MUST NOT carry a scope-letter prefix or scope numbering — a scope-lettered ID cannot be matched between two runs, which is exactly what the rerun delta below depends on. **`propagation_surface`** names the downstream artifact(s) that inherit the finding, or the literal `none` when nothing downstream inherits it; **Severity** is derived from that field and sits to its right (§4's propagation-surface cap; owner `.specify/shared/workflow/objective-analysis-gate.md` rule 3).
 
-Also include: **Coverage Summary Table**, **Feature Linkage Summary Table**, **Constitution Alignment Issues**, **Unmapped Tasks**, **Metrics** (Total Reqs, Tasks, Coverage %, Feature Linkage %, Ambiguity/Duplication/Inconsistency/Critical counts).
+Also include: **Coverage Summary Table**, **Feature Linkage Summary Table**, **Constitution Alignment Issues**, **Unmapped Tasks**, **Systemic Observations**, **Metrics** (Total Reqs, Tasks, Coverage %, Feature Linkage %, Ambiguity/Duplication/Inconsistency/Critical counts).
+
+**Systemic Observations** (report-skeleton slot): aggregate several MEDIUM findings that point at the same weak surface into one cluster-level observation here, WITHOUT raising any single row's severity — a cluster is a pattern across rows, not a licence to re-tier one of them. This is where cluster-level signal lands instead of being lost or smuggled into an inflated per-row severity.
 
 **Rerun delta (post-remediation runs)**: when a prior analysis of the same requirement is available (an earlier report in context or one supplied by the user), the report MUST separate the two directions of change instead of presenting one flat list:
 
