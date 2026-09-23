@@ -102,6 +102,8 @@ Activated ONLY when the user explicitly requests it (e.g. "run to completion", "
    - **Stagnation two-strike**: at each iteration boundary compare closed-task count to `last_closed_count`; no new closure → `stagnation_strikes += 1`, else reset to 0. Two consecutive strikes → STOP and escalate (something is structurally blocked; more iterations won't fix it).
 5. **Exit**: on any stop (success, cap, stagnation, user interrupt), delete the state file and report: iterations used, tasks closed per iteration, gate status, and remaining open/deferred tasks.
 
+> **Fast Fail 实例指针**:本文件中"即停 / 即中止 / 不得静默降级"一类规则是快速失败纪律的既有**实例**;其判据与两份清单的唯一真源是 `.specify/shared/guidelines/fast-fail.md`(本文件引用它,MUST NOT 复述它)。
+
 ## Feature Integration
 
 Apply [Feature Integration Protocol](shared/workflow/feature-integration.md). This command's transition: `Planned → Implemented` (requires gate pass).

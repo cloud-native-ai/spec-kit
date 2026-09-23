@@ -172,6 +172,8 @@ For each batch (auto-executed after its presentation):
 
 If `$ARGUMENTS` contains background context, apply it as constraints when interpreting block content and generating task descriptions.
 
+> **Fast Fail 实例指针**:本文件中"即停 / 即中止 / 不得静默降级"一类规则是快速失败纪律的既有**实例**;其判据与两份清单的唯一真源是 `.specify/shared/guidelines/fast-fail.md`(本文件引用它,MUST NOT 复述它)。
+
 ## Insertion Mode Workflow
 
 Triggered when `$ARGUMENTS` contains `--insert` or explicitly requests TODO insertion.
