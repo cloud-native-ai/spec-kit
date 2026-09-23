@@ -375,6 +375,25 @@ def test_engine_invocation_examples_cover_the_targets_action_group():
         assert example in text, f"engine example missing: {example}"
 
 
+def test_command_block_is_grouped_by_read_and_write():
+    """F-13 ②: the command surface declares which actions write, and reaches the
+    flag set by reference instead of restating it."""
+    text = GOAL_CANONICAL.read_text(encoding="utf-8")
+    assert "读组" in text and "写组" in text, "the command block lost its read/write split"
+    assert "--help" in text, "the flag owner must be named, not copied"
+
+
+def test_command_names_the_destructive_write_and_its_bucket_owner():
+    """F-13 ③: goal's destructive write is registered, and the command reaches the
+    bucket owner by reference. The wording MUST stay off the scanner's blocking
+    patterns — the gate budget's integer headroom is 0, so the only route back to
+    green is rewording, never re-freezing a baseline."""
+    text = GOAL_CANONICAL.read_text(encoding="utf-8")
+    assert "--clear" in text, "the explicit empty-overwrite flag is not disclosed"
+    assert "破坏性动作清单" in text, "the bucket owner is not referenced"
+    assert "exit 2" in text, "the argument-less rejection is not disclosed"
+
+
 @pytest.mark.parametrize("path", GOAL_PER_TOOL_COPIES, ids=lambda p: p.name)
 def test_per_tool_copies_carry_the_targets_content(path):
     """Derived from the same GOAL_PER_TOOL_COPIES fixture — no second copy list."""

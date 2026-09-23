@@ -193,3 +193,32 @@ def test_json_terminal_carries_verdict_goal_terminal(terminal_repo, capsys):
                 "--repo-root", str(terminal_repo), "--json") == 4
     payload = json.loads(capsys.readouterr().out)
     assert payload.get("verdict") == "goal-terminal"
+
+
+# --------------------------------------------------------------------------
+# F-14 — every verdict declares what it actually judged
+# --------------------------------------------------------------------------
+
+def test_json_verdicts_declare_their_scope(repo, capsys):
+    """A verdict with no scope declaration reads as broader than it is."""
+    assert _run("targets", "sliced-goal", "--check", VALID,
+                "--repo-root", str(repo), "--json") == 0
+    ok = json.loads(capsys.readouterr().out)
+    assert ok.get("scope") == goal_utils.TARGET_CHECK_SCOPE
+
+    assert _run("targets", "sliced-goal", "--check", "首先做 A，然后做 B",
+                "--repo-root", str(repo), "--json") == 2
+    bad = json.loads(capsys.readouterr().out)
+    assert bad.get("scope") == goal_utils.TARGET_CHECK_SCOPE, (
+        "the rejected verdict must declare the same scope as the green one"
+    )
+
+
+def test_check_scope_is_distinct_from_the_standalone_shape_probe(repo, capsys):
+    """The two dry-runs judge different things, so they must not advertise the
+    same coverage — `check-statement` has no goal and cannot see the criteria."""
+    assert _run("check-statement", VALID, "--repo-root", str(repo), "--json") == 0
+    shape_only = json.loads(capsys.readouterr().out)["scope"]
+    assert _run("targets", "sliced-goal", "--check", VALID,
+                "--repo-root", str(repo), "--json") == 0
+    assert json.loads(capsys.readouterr().out)["scope"] != shape_only

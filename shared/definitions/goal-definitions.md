@@ -6,11 +6,16 @@ Canonical definition of the **Goal** concept in Spec Kit, its boundary against *
 
 A **Goal** is a **project-level, first-class concept**: an **authored fact source** (never a derived artifact) that states a desired end state and how to tell it has been reached. Its **object is unrestricted**: a Goal may describe any desired outcome in any dimension — it is not limited to what the project's code implements (see Goal Dimensions below). It is persisted under `.specify/goal/<goal-slug>/` and is composed of exactly three parts:
 
-1. **Goal narrative** — the desired end **outcome** (north star). Outcome, not steps: a Goal MUST NOT be written as a task list or an implementation plan.
+1. **Goal narrative** — the desired end **outcome** (north star). Outcome, not steps: a Goal MUST NOT be written as a task list, an implementation plan, or a sequence of phases.
 2. **Verifiable success criteria** — thresholds / satisfaction conditions that an evaluator (a program or a scoring agent) can measure progress against.
 3. **Lifecycle state** — `active` / `achieved` / `abandoned`. Terminal Goals are retained, never deleted (see Goal Archive).
 
 A Goal MAY additionally carry a **Target decomposition** (see Target Decomposition below). Like timestamps, Targets are an **annex** around the concept — never a fourth composition part.
+
+Also annexes, on the same footing as Targets and timestamps — optional, never composition parts:
+
+- **Readable title** — a presentation-layer heading. **Identity stays the directory slug**: a title is never a second identifier, never takes part in resolution, binding, or reference, and its absence simply leaves the slug as the heading.
+- **Boundaries** — the exclusions the author states as out of scope for this Goal. They narrow *interpretation*, never the objective, and never substitute for a Target: an exclusion is what the Goal is not, a Target is a slice of what it is. An absent Boundaries annex records that no exclusion was stated — not that nothing is excluded.
 
 Two operating properties follow:
 

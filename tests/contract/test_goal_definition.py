@@ -185,3 +185,73 @@ def test_terminal_state_retains_the_file(tmp_path):
     goal_utils.set_status(path, "abandoned")
     assert path.is_file()
     assert re.search(r"^status: abandoned$", path.read_text(encoding="utf-8"), re.M)
+
+
+# --------------------------------------------------------------------------
+# CLI guards (F-13): a missing argument is a malformed write, never a read
+# --------------------------------------------------------------------------
+
+def _run(*argv) -> int:
+    return goal_utils.main(list(argv))
+
+
+def test_bare_criteria_is_exit_2_and_leaves_the_file_untouched(tmp_path):
+    """The in-the-wild defect: an argument-less `criteria` emptied the set silently."""
+    path = goal_utils.create_goal(tmp_path, "guarded", "An outcome.", ["keep me"])
+    before = path.read_bytes()
+    assert _run("criteria", "guarded", "--repo-root", str(tmp_path)) == 2
+    assert path.read_bytes() == before, "the definition MUST NOT be rewritten"
+    assert goal_utils.parse_goal(path)["criteria"] == ["keep me"]
+
+
+def test_criteria_clear_is_the_only_route_to_an_empty_set(tmp_path):
+    path = goal_utils.create_goal(tmp_path, "cleared", "An outcome.", ["keep me"])
+    assert _run("criteria", "cleared", "--clear", "--repo-root", str(tmp_path)) == 0
+    data = goal_utils.parse_goal(path)
+    assert data["criteria"] == []
+    assert "prior value: keep me" in data["history"], "a destructive write stays traceable"
+
+
+def test_criteria_still_writes_when_a_criterion_is_given(tmp_path):
+    goal_utils.create_goal(tmp_path, "normal", "An outcome.", ["old"])
+    assert _run("criteria", "normal", "--criterion", "new",
+                "--repo-root", str(tmp_path)) == 0
+    assert goal_utils.parse_goal(
+        goal_utils.definition_path(tmp_path, "normal"))["criteria"] == ["new"]
+
+
+def test_criteria_unknown_slug_is_still_exit_3(tmp_path):
+    """Not-found keeps precedence, matching the sibling `targets` action."""
+    assert _run("criteria", "no-such-goal", "--repo-root", str(tmp_path)) == 3
+
+
+def test_objective_action_writes_and_traces(tmp_path):
+    goal_utils.create_goal(tmp_path, "objact", "The first outcome.", ["c1"])
+    assert _run("objective", "objact", "--set", "The revised outcome.",
+                "--repo-root", str(tmp_path)) == 0
+    data = goal_utils.parse_goal(goal_utils.definition_path(tmp_path, "objact"))
+    assert data["objective"] == "The revised outcome."
+    assert "prior value: The first outcome." in data["history"]
+
+
+def test_objective_demands_its_flag(tmp_path):
+    """`--set` is required=True — the same guard `status` already carried."""
+    goal_utils.create_goal(tmp_path, "objguard", "An outcome.", [])
+    with pytest.raises(SystemExit) as exc:
+        _run("objective", "objguard", "--repo-root", str(tmp_path))
+    assert exc.value.code == 2
+
+
+def test_help_labels_every_action_read_or_write(capsys):
+    """F-13 ②: the engine's own help declares each action's write-ness."""
+    with pytest.raises(SystemExit):
+        goal_utils.main(["--help"])
+    out = capsys.readouterr().out
+    for action in ("create", "validate", "check-statement", "list", "status",
+                   "objective", "criteria", "migrate", "targets"):
+        line = next((l for l in out.splitlines()
+                     if l.strip().startswith(action + " ")), None)
+        assert line, f"--help lost the {action} row"
+        assert line.split()[1].startswith(("read", "write")), (
+            f"{action} carries no read/write label in --help: {line.strip()!r}"
+        )

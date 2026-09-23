@@ -164,6 +164,23 @@ def test_residual_total_within_sc002_target() -> None:
     )
 
 
+GOAL_SURFACES = (
+    REPO_ROOT / "templates" / "commands" / "goal.md",
+    REPO_ROOT / "shared" / "definitions" / "goal-definitions.md",
+)
+
+
+@pytest.mark.parametrize("surface", GOAL_SURFACES, ids=lambda p: p.name)
+def test_goal_surface_adds_nothing_to_the_gate_count(surface: Path) -> None:
+    """F-13 ③ registers goal's destructive write *by reference*, and the budget's
+    integer headroom is 0 — one blocking-pattern hit in either surface moves the total
+    off all three pins at once. Zero-hit wording is the only route back to green."""
+    payload = run_scanner()
+    rel = surface.relative_to(REPO_ROOT).as_posix()
+    hits = [g for g in payload["gates"] if g["file"] == rel]
+    assert not hits, f"{rel} entered the gate count: {hits}"
+
+
 @pytest.mark.parametrize("rel_path,marker", KEEP_LIST)
 def test_protected_gate_preserved(rel_path: str, marker: str) -> None:
     path = REPO_ROOT / rel_path
@@ -211,6 +228,18 @@ def test_destructive_list_floor(doc_text: str) -> None:
     assert len(bullets) >= 4, "destructive list must be conservative and enumerable (>=4)"
     for item in DESTRUCTIVE_MIN_ITEMS:
         assert any(item in b for b in bullets), f"destructive list missing: {item}"
+
+
+def test_goal_empty_overwrite_is_registered_as_destructive(doc_text: str) -> None:
+    """F-13 ③: goal's empty-overwrite of an authored criteria set is enumerated in the
+    bucket, so it is classified by the list rather than by the 存疑从严 fallback.
+    Registered inside the existing 覆盖 bullet — the list enumerates action *classes*,
+    and this is one instance of 覆盖用户既有内容, exactly as glossary and session are.
+    It MUST NOT migrate into 治理保留清单: a row there would claim a gate surface
+    goal.md does not carry (the guard is the engine's exit 2), and the row count is
+    frozen by C-4 of test_user_facing_comprehension_pointers.py."""
+    body = next(b for s, b in _section_bodies(doc_text).items() if "破坏性动作清单" in s)
+    assert "goal 判据" in body, "goal's criteria empty-overwrite is not registered"
 
 
 def test_governance_kept_list_floor(doc_text: str) -> None:

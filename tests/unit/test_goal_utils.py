@@ -439,3 +439,97 @@ def test_set_target_status_unknown_id_raises_not_found(tmp_path):
     path = _active_goal(tmp_path)
     with pytest.raises(goal_utils.GoalNotFound):
         goal_utils.set_target_status(path, "T-999", "done")
+
+
+# ==========================================================================
+# F-14 — objective replacement, readable title, Boundaries annex, phased GD-2
+# ==========================================================================
+
+def test_set_objective_records_the_prior_value(tmp_path):
+    path = goal_utils.create_goal(tmp_path, "objx", "The first outcome holds.", ["c1"])
+    goal_utils.set_objective(path, "The revised outcome holds.")
+    data = goal_utils.parse_goal(path)
+    assert data["objective"] == "The revised outcome holds."
+    assert "objective changed; prior value: The first outcome holds." in data["history"]
+
+
+def test_set_objective_refuses_a_terminal_goal(tmp_path):
+    path = goal_utils.create_goal(tmp_path, "objterm", "An outcome.", [])
+    goal_utils.set_status(path, "achieved")
+    with pytest.raises(goal_utils.GoalError) as exc:
+        goal_utils.set_objective(path, "Another outcome.")
+    assert "终态 goal 只读" in str(exc.value)
+
+
+def test_set_objective_applies_the_same_shape_grammar(tmp_path):
+    path = goal_utils.create_goal(tmp_path, "objshape", "An outcome.", [])
+    for bad in ("1. do a\n2. do b", "Green the build and also rewrite the docs."):
+        with pytest.raises(goal_utils.GoalError):
+            goal_utils.set_objective(path, bad)
+
+
+def test_title_defaults_to_the_slug_and_round_trips(tmp_path):
+    plain = goal_utils.create_goal(tmp_path, "plain", "An outcome.", [])
+    assert goal_utils.parse_goal(plain)["title"] == "plain"
+    titled = goal_utils.create_goal(tmp_path, "titled", "An outcome.", [], title="可读标题")
+    assert "# Goal: 可读标题" in titled.read_text(encoding="utf-8")
+    data = goal_utils.parse_goal(titled)
+    assert data["title"] == "可读标题"
+    assert data["slug"] == "titled", "identity stays the directory name"
+
+
+def test_title_survives_an_unrelated_write(tmp_path):
+    """Every write re-renders the file; none of them may downgrade the title."""
+    path = goal_utils.create_goal(tmp_path, "kept", "An outcome.", [], title="可读标题")
+    goal_utils.add_target(path, "一个切片")
+    goal_utils.set_criteria(path, ["c1"])
+    goal_utils.set_objective(path, "A revised outcome.")
+    goal_utils.set_status(path, "abandoned")
+    assert goal_utils.parse_goal(path)["title"] == "可读标题"
+
+
+def test_boundaries_annex_is_absent_when_unstated(tmp_path):
+    path = goal_utils.create_goal(tmp_path, "nobound", "An outcome.", ["c1"])
+    assert "## Boundaries" not in path.read_text(encoding="utf-8")
+    assert goal_utils.parse_goal(path)["boundaries"] == []
+
+
+def test_boundaries_render_round_trip_and_survive_a_write(tmp_path):
+    path = goal_utils.create_goal(
+        tmp_path, "bounded", "An outcome.", ["c1"],
+        boundaries=["不含性能调优", "不含依赖升级"],
+    )
+    assert goal_utils.parse_goal(path)["boundaries"] == ["不含性能调优", "不含依赖升级"]
+    goal_utils.set_status(path, "achieved")
+    assert goal_utils.parse_goal(path)["boundaries"] == ["不含性能调优", "不含依赖升级"]
+    ok, problems = goal_utils.validate_goal(path)
+    assert ok, problems
+
+
+@pytest.mark.parametrize(
+    "statement",
+    [
+        "第一阶段完成迁移",
+        "阶段一:先做配置梳理",
+        "分阶段推进平台收敛",
+        "Phase 2 delivery lands",
+        "stage 3 complete",
+        "第一步梳理依赖",
+        "第三步上线",
+    ],
+)
+def test_phased_wording_is_rejected_as_gd2(statement):
+    """GD-2's word list missed phased wording — a phase sequence is a plan."""
+    with pytest.raises(goal_utils.GoalError) as exc:
+        goal_utils._reject_bad_target_statement(statement)
+    assert "GD-2" in str(exc.value)
+
+
+@pytest.mark.parametrize(
+    "statement",
+    ["日志组件拆分完成", "阶段按团队命名空间化", "所有服务在生产环境稳定运行"],
+)
+def test_ordinary_use_of_phase_vocabulary_is_not_rejected(statement):
+    """Inverse of the pin above, and the reason the detector is ordinal-qualified:
+    a bare 阶段/phase pattern would also reject every `migrate` of an inline goal."""
+    goal_utils._reject_bad_target_statement(statement)  # must not raise

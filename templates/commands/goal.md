@@ -26,7 +26,7 @@ Consult `.specify/memory/glossary.md` and apply `.specify/shared/workflow/glossa
 
 ## Modes
 
-Mode is inferred from `$ARGUMENTS`; the inferred mode is disclosed with every run, and execution proceeds directly (可逆动作自动执行,判据:`shared/guidelines/confirmation-gates.md`). Ambiguous input resolves to `view`, which is read-only.
+Mode is inferred from `$ARGUMENTS`; the inferred mode is disclosed with every run, and execution proceeds directly for reversible actions (可逆动作自动执行,判据:`shared/guidelines/confirmation-gates.md`) — the single destructive write, named in step 4, is the exception. Ambiguous input resolves to `view`, which is read-only.
 
 | Mode | Purpose | Writes |
 |------|---------|--------|
@@ -47,23 +47,31 @@ Mode is inferred from `$ARGUMENTS`; the inferred mode is disclosed with every ru
 
 3. **Preview → execute.** Before any write, show: the mode, the target path, and the exact content to be written (or the diff for a modify) — then write directly (preview is disclosure, not a blocking gate; 事后修改经 `/speckit.goal` modify). `view` stays read-only.
 
-4. **Execute via the engine** — never hand-write a definition file:
+4. **Execute via the engine** — never hand-write a definition file. The block below fixes only the **read/write grouping**; every action's full flag set and defaults are owned by `python3 scripts/python/goal-utils.py --help` and are not restated here.
 
    ```bash
-   python3 scripts/python/goal-utils.py create <goal-slug> \
-     --objective "<desired end outcome>" \
-     --criterion "<verifiable condition>" --criterion "<...>" --json
+   # 读组 — zero writes
    python3 scripts/python/goal-utils.py list    # archive listing (no `view` action)
    python3 scripts/python/goal-utils.py validate <goal-slug>
-   python3 scripts/python/goal-utils.py status <goal-slug> --set achieved
-   python3 scripts/python/goal-utils.py criteria <goal-slug> --criterion "<new>"
-   python3 scripts/python/goal-utils.py targets <goal-slug> --add "<sub-outcome statement>"
-   python3 scripts/python/goal-utils.py targets <goal-slug> --check "<sub-outcome statement>"
+   python3 scripts/python/goal-utils.py check-statement "<sub-outcome statement>"
    python3 scripts/python/goal-utils.py targets <goal-slug> --list
+   python3 scripts/python/goal-utils.py targets <goal-slug> --check "<sub-outcome statement>"
+
+   # 写组 — mutates the one definition file
+   python3 scripts/python/goal-utils.py create <goal-slug> --objective "<desired end outcome>"
+   python3 scripts/python/goal-utils.py objective <goal-slug> --set "<revised outcome>"
+   python3 scripts/python/goal-utils.py criteria <goal-slug> --criterion "<new>"
+   python3 scripts/python/goal-utils.py status <goal-slug> --set achieved
+   python3 scripts/python/goal-utils.py targets <goal-slug> --add "<sub-outcome statement>"
    python3 scripts/python/goal-utils.py targets <goal-slug> --set done --id T-001
+   python3 scripts/python/goal-utils.py migrate <team-slug>
    ```
 
    Exit codes: `0` ok · `2` input error (rejection) · `3` not found · `4` validation failed. A non-zero exit is a **verdict**: report it, never argue around it.
+
+   **破坏性写入**(桶归属见 `shared/guidelines/confirmation-gates.md` §破坏性动作清单):`criteria <goal-slug> --clear` 以空值覆盖既有判据集。引擎对缺参的 `criteria` 调用一律 exit 2——它 MUST NOT 被读成查看入口,也不会静默清空;传 `--clear` 之前 MUST 先取得用户明示批准。其余写入均为可逆动作:直接执行,按执行报告呈现,事后经 `/speckit.goal` modify 修改。
+
+   `create` 另接受两个可选附注——`--title`(可读标题,身份仍是 slug)与 `--boundary`(排除项):仅在用户自行陈述时携带,MUST NOT 为此发问,step 5 的收集集不因它们扩张。概念见 `shared/definitions/goal-definitions.md`。
 
    `targets` notes: the engine renders the `## Targets` section (never hand-edit it); statements pass the same GD-2/GD-3 shape check at slice scale and must not restate a success criterion; terminal goals are read-only; terminal Target identities are never reused. A terminal-state Target reported by a run is a **review bifurcation**: verify by hand — if genuinely done, stop; if evidence contradicts, reopen via `targets <slug> --set open --id <T-nnn>` and re-issue the run. There is no terminal-execution bypass.
 

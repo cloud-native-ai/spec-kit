@@ -13,14 +13,21 @@ timestamps are change-traceability metadata, never a fourth part.
 Concept authority: shared/definitions/goal-definitions.md (read-only).
 File contract:  .specify/specs/037-goal-registry/contracts/goal-definition.contract.md
 
-Actions:
-  create   <slug> --objective TEXT [--criterion TEXT ...]
-  validate <path|slug>
+Actions, grouped by whether they write:
+
+Read group (zero writes):
   list
-  status   <slug> --set STATE
-  criteria <slug> --criterion TEXT ...
-  migrate  <team-slug> [--keep-inline/--drop-inline]
-  targets  <slug> --add TEXT | --list | --set STATE --id T-nnn
+  validate        <path|slug>
+  check-statement <statement>
+  targets         <slug> --list | --check STATEMENT
+
+Write group (mutates one definition file):
+  create    <slug> --objective TEXT [--title TEXT] [--criterion TEXT ...] [--boundary TEXT ...]
+  status    <slug> --set STATE
+  objective <slug> --set TEXT
+  criteria  <slug> --criterion TEXT ... | --clear
+  targets   <slug> --add TEXT | --set STATE --id T-nnn
+  migrate   <team-slug> [--keep-inline/--drop-inline]
 
 Exit codes: 0 ok | 2 input error | 3 not found | 4 validation failed
 """
@@ -54,8 +61,11 @@ NO_CRITERIA_MARKER = "None provided."
 
 _SECTION_OBJECTIVE = "## Objective"
 _SECTION_CRITERIA = "## Success Criteria"
+_SECTION_BOUNDARIES = "## Boundaries"
 _SECTION_HISTORY = "## History"
 _SECTION_TARGETS = "## Targets"
+
+_TITLE_LINE = re.compile(r"^#\s+Goal:\s*(.+?)\s*$", re.M)
 
 #: Target (038): run-assignable scope slices under a goal. [[STR-002]] three states.
 TARGET_STATES = ("open", "done", "dropped")
@@ -75,6 +85,19 @@ TARGET_LEGAL_TRANSITIONS = {
 #: GD-2 — an objective states an outcome. Numbered/bulleted steps are a task list.
 _TASKLIST = re.compile(r"(?m)^\s*(?:\d+[.)]\s+|[-*+]\s+)")
 _STEP_VERBS = ("首先", "然后", "接着", "step 1", "then ", "next, ")
+
+#: GD-2 — phased wording is a plan's timeline wearing an outcome's clothes. Ordinal-
+#: qualified on purpose: a bare 阶段/phase is ordinary domain vocabulary, so matching
+#: it would reject legitimate objectives (and every `migrate` of an inline goal).
+_PHASED = re.compile(
+    r"分阶段|阶段\s*[一二三四五六七八九十\d]|第\s*[一二三四五六七八九十\d]+\s*(?:阶段|步)"
+    r"|phase\s*\d|stage\s*\d",
+    re.IGNORECASE,
+)
+
+#: What `targets <slug> --check` judges. Declared on every verdict so a green is never
+#: read as broader than it is; `check-statement`'s narrower "shape-only" is the sibling.
+TARGET_CHECK_SCOPE = "shape+criteria-restatement"
 
 #: GD-3 — one goal, one objective. Conjunctions joining independent clauses.
 _COMPOSITE = re.compile(
@@ -142,7 +165,8 @@ def target_transition_allowed(current: str, target: str) -> bool:
 
 def _bad_shape(text: str) -> str | None:
     """Shared GD-2/GD-3 detection — one grammar for objectives and target slices."""
-    if _TASKLIST.search(text) or any(v in text.lower() for v in _STEP_VERBS):
+    if (_TASKLIST.search(text) or _PHASED.search(text)
+            or any(v in text.lower() for v in _STEP_VERBS)):
         return "GD-2"
     if _COMPOSITE.search(text):
         return "GD-3"
@@ -232,13 +256,18 @@ def _today() -> str:
 
 def _render(objective: str, criteria: list[str], status: str, created: str,
             updated: str, history: list[str], title: str,
-            targets: list[dict] | None = None) -> str:
+            targets: list[dict] | None = None,
+            boundaries: list[str] | None = None) -> str:
     if criteria:
         body = "\n".join(f"{i}. {c}" for i, c in enumerate(criteria, 1))
     else:
         body = NO_CRITERIA_MARKER
     hist = "\n".join(history)
-    # Section absent entirely when the goal has no targets (SC-002: byte-identical).
+    # Section absent entirely when the goal has no boundaries / no targets
+    # (SC-002: byte-identical to the pre-annex rendering).
+    boundaries_block = (f"{_SECTION_BOUNDARIES}\n\n"
+                        + "\n".join(f"- {b}" for b in boundaries) + "\n\n"
+                        if boundaries else "")
     targets_block = (f"{_SECTION_TARGETS}\n\n{_render_targets_table(targets)}\n\n"
                      if targets else "")
     return (
@@ -246,6 +275,7 @@ def _render(objective: str, criteria: list[str], status: str, created: str,
         f"# Goal: {title}\n\n"
         f"{_SECTION_OBJECTIVE}\n\n{objective.strip()}\n\n"
         f"{_SECTION_CRITERIA}\n\n{body}\n\n"
+        f"{boundaries_block}"
         f"{targets_block}"
         f"{_SECTION_HISTORY}\n\n{hist}\n"
     )
@@ -280,6 +310,21 @@ def _section(body: str, heading: str) -> str:
     return "\n".join(out).strip()
 
 
+def _parse_bullets(raw: str) -> list[str]:
+    """Parse a `- ` bullet annex; blank lines carry no entry."""
+    out: list[str] = []
+    for line in (raw or "").splitlines():
+        stripped = re.sub(r"^\s*[-*+]\s*", "", line).strip()
+        if stripped:
+            out.append(stripped)
+    return out
+
+
+def _title_from_body(body: str) -> str:
+    match = _TITLE_LINE.search(body)
+    return match.group(1).strip() if match else ""
+
+
 def parse_goal(path: Path) -> dict:
     text = Path(path).read_text(encoding="utf-8")
     meta, body = _split_frontmatter(text)
@@ -292,6 +337,8 @@ def parse_goal(path: Path) -> dict:
                 criteria.append(stripped)
     return {
         "slug": Path(path).parent.name,
+        # Parsed back so an unrelated write never downgrades a --title to the slug.
+        "title": _title_from_body(body) or Path(path).parent.name,
         "status": meta.get("status", ""),
         "created": meta.get("created", ""),
         "updated": meta.get("updated", ""),
@@ -299,6 +346,7 @@ def parse_goal(path: Path) -> dict:
         "criteria": criteria,
         "history": _section(body, _SECTION_HISTORY),
         "criteria_count": len(criteria),
+        "boundaries": _parse_bullets(_section(body, _SECTION_BOUNDARIES)),
         "targets": _parse_targets_text(_section(body, _SECTION_TARGETS)),
     }
 
@@ -395,7 +443,9 @@ def _validate_targets_section(raw: str) -> list[str]:
 # --------------------------------------------------------------------------
 
 def create_goal(repo_root: Path, slug: str, objective: str,
-                criteria: list[str] | None = None) -> Path:
+                criteria: list[str] | None = None, *,
+                title: str | None = None,
+                boundaries: list[str] | None = None) -> Path:
     if not is_valid_identity(slug):
         raise GoalError(
             f"identity {slug!r} is invalid: the first character must be alphanumeric, "
@@ -406,13 +456,17 @@ def create_goal(repo_root: Path, slug: str, objective: str,
     if path.exists():
         raise GoalError(
             f"goal {slug!r} already exists at {path}; use the modify path "
-            "(`status` / `criteria`) — the existing definition is never overwritten"
+            "(`objective` / `status` / `criteria`) — the existing definition is never "
+            "overwritten"
         )
     today = _today()
+    # Identity stays the slug; the title is presentation and collapses to one line.
+    heading = " ".join((title or "").split()) or slug
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         _render(objective, list(criteria or []), "active", today, today,
-                [f"- {today} — created."], slug),
+                [f"- {today} — created."], heading,
+                boundaries=[b.strip() for b in (boundaries or []) if b.strip()] or None),
         encoding="utf-8",
     )
     return path
@@ -432,7 +486,26 @@ def set_status(path: Path, target: str) -> Path:
     history.append(f"- {today} — status {current} -> {target}.")
     path.write_text(
         _render(data["objective"], data["criteria"], target, data["created"],
-                today, history, data["slug"], data["targets"]),
+                today, history, data["title"], data["targets"], data["boundaries"]),
+        encoding="utf-8",
+    )
+    return path
+
+
+def set_objective(path: Path, objective: str) -> Path:
+    """Deliberate objective replacement — `set_criteria`'s change discipline:
+    the prior value stays traceable, `updated` bumps, terminal goals stay read-only."""
+    path = Path(path)
+    data = parse_goal(path)
+    _assert_goal_mutable(data, "the objective cannot be replaced")
+    _reject_bad_objective(objective)
+    today = _today()
+    history = [line for line in data["history"].splitlines() if line.strip()]
+    previous = " ".join(data["objective"].split())
+    history.append(f"- {today} — objective changed; prior value: {previous}")
+    path.write_text(
+        _render(objective, data["criteria"], data["status"], data["created"],
+                today, history, data["title"], data["targets"], data["boundaries"]),
         encoding="utf-8",
     )
     return path
@@ -450,18 +523,19 @@ def set_criteria(path: Path, criteria: list[str]) -> Path:
     )
     path.write_text(
         _render(data["objective"], list(criteria), data["status"], data["created"],
-                today, history, data["slug"], data["targets"]),
+                today, history, data["title"], data["targets"], data["boundaries"]),
         encoding="utf-8",
     )
     return path
 
 
-def _assert_goal_mutable(data: dict) -> None:
+def _assert_goal_mutable(data: dict,
+                         consequence: str = "targets cannot be added or transitioned") -> None:
     """Terminal goals are read-only — no new targets, no transitions (038)."""
     if data["status"] in TERMINAL_STATES:
         raise GoalError(
             f"goal is in terminal state {data['status']!r} and read-only "
-            "(终态 goal 只读); targets cannot be added or transitioned"
+            f"(终态 goal 只读); {consequence}"
         )
 
 
@@ -494,7 +568,7 @@ def add_target(path: Path, statement: str) -> str:
     history.append(f"- {today} target {tid} added: {statement}")
     path.write_text(
         _render(data["objective"], data["criteria"], data["status"], data["created"],
-                today, history, data["slug"], targets),
+                today, history, data["title"], targets, data["boundaries"]),
         encoding="utf-8",
     )
     return tid
@@ -524,7 +598,7 @@ def set_target_status(path: Path, tid: str, new_status: str) -> Path:
     history.append(f"- {today} target {tid} {current}→{new_status}")
     path.write_text(
         _render(data["objective"], data["criteria"], data["status"], data["created"],
-                today, history, data["slug"], targets),
+                today, history, data["title"], targets, data["boundaries"]),
         encoding="utf-8",
     )
     return path
@@ -726,41 +800,59 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="action", required=True)
 
     p_create = sub.add_parser("create", parents=[common],
-                              help="archive a new goal definition")
+                              help="write: archive a new goal definition")
     p_create.add_argument("slug")
     p_create.add_argument("--objective", required=True)
+    p_create.add_argument("--title", default=None, metavar="TEXT",
+                          help="human-readable heading; falls back to the slug")
     p_create.add_argument("--criterion", action="append", default=[])
+    p_create.add_argument("--boundary", action="append", default=[], metavar="TEXT",
+                          help="an explicit exclusion, rendered under ## Boundaries")
 
     p_validate = sub.add_parser("validate", parents=[common],
-                                help="validate one definition")
+                                help="read: validate one definition")
     p_validate.add_argument("target", help="goal slug or path to goal.md")
 
     p_check_stmt = sub.add_parser(
         "check-statement", parents=[common],
-        help="standalone dry-run shape validation of one Target statement "
+        help="read: standalone dry-run shape validation of one Target statement "
              "(GD-2/GD-3); requires NO goal — usable before `create`")
     p_check_stmt.add_argument("statement", help="candidate Target statement")
 
-    sub.add_parser("list", parents=[common], help="enumerate the archive")
+    sub.add_parser("list", parents=[common], help="read: enumerate the archive")
 
-    p_status = sub.add_parser("status", parents=[common], help="change lifecycle state")
+    p_status = sub.add_parser("status", parents=[common],
+                              help="write: change lifecycle state")
     p_status.add_argument("slug")
     p_status.add_argument("--set", dest="target_state", required=True,
                           choices=LIFECYCLE_STATES)
 
-    p_criteria = sub.add_parser("criteria", parents=[common],
-                               help="replace criteria, recording the prior value")
+    p_objective = sub.add_parser("objective", parents=[common],
+                                 help="write: replace the objective, recording the prior value")
+    p_objective.add_argument("slug")
+    p_objective.add_argument("--set", dest="new_objective", required=True, metavar="TEXT",
+                             help="the replacement objective (outcome-shaped; GD-2/GD-3 apply)")
+
+    p_criteria = sub.add_parser(
+        "criteria", parents=[common],
+        help="write: replace criteria, recording the prior value "
+             "(destructive when emptied via --clear)")
     p_criteria.add_argument("slug")
     p_criteria.add_argument("--criterion", action="append", default=[])
+    p_criteria.add_argument("--clear", dest="clear_criteria", action="store_true",
+                            help="deliberately empty the criteria set — overwrites the "
+                                 f"existing criteria with {NO_CRITERIA_MARKER!r}")
 
     p_migrate = sub.add_parser("migrate", parents=[common],
-                               help="derive a definition from a team's inline goal and reference it")
+                               help="write: derive a definition from a team's inline goal "
+                                    "and reference it")
     p_migrate.add_argument("team_slug")
     p_migrate.add_argument("--drop-inline", action="store_true",
                            help="remove the team's inline goal after migrating (default: keep)")
 
     p_targets = sub.add_parser("targets", parents=[common],
-                               help="authorize/list/transition Targets of one goal (038)")
+                               help="read (--list/--check) | write (--add/--set): the "
+                                    "Targets of one goal (038)")
     p_targets.add_argument("slug")
     p_targets.add_argument("--add", dest="add_statement", default=None,
                            metavar="STATEMENT", help="append a new open Target")
@@ -779,7 +871,8 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         if args.action == "create":
-            path = create_goal(repo_root, args.slug, args.objective, args.criterion)
+            path = create_goal(repo_root, args.slug, args.objective, args.criterion,
+                               title=args.title, boundaries=args.boundary)
             result = {"created": str(path.relative_to(repo_root))}
         elif args.action == "validate":
             path = _resolve(repo_root, args.target)
@@ -797,13 +890,31 @@ def main(argv: list[str] | None = None) -> int:
                 return EXIT_NOT_FOUND
             set_status(path, args.target_state)
             result = {"slug": args.slug, "status": args.target_state}
+        elif args.action == "objective":
+            path = _resolve(repo_root, args.slug)
+            if not path.is_file():
+                _emit({"error": f"goal not found: {args.slug}"}, args.json)
+                return EXIT_NOT_FOUND
+            set_objective(path, args.new_objective)
+            result = {"slug": args.slug,
+                      "objective": " ".join(args.new_objective.split())}
         elif args.action == "criteria":
             path = _resolve(repo_root, args.slug)
             if not path.is_file():
                 _emit({"error": f"goal not found: {args.slug}"}, args.json)
                 return EXIT_NOT_FOUND
-            set_criteria(path, args.criterion)
-            result = {"slug": args.slug, "criteria": args.criterion}
+            # Exit 2, never a read fallback: `criteria` is a write, so an argument-less
+            # call is a malformed write — silently downgrading it to a read would hide
+            # the dropped flag and leave the caller believing the criteria were shown.
+            if not args.criterion and not args.clear_criteria:
+                _emit({"error": "criteria replaces the whole set: pass --criterion at "
+                                "least once, or --clear to empty it deliberately. "
+                                "An argument-less call would overwrite the existing "
+                                "criteria with an empty set."}, args.json)
+                return EXIT_INPUT_ERROR
+            set_criteria(path, list(args.criterion))
+            result = {"slug": args.slug, "criteria": list(args.criterion),
+                      "cleared": bool(args.clear_criteria)}
         elif args.action == "migrate":
             created, identity = migrate_team(
                 repo_root, args.team_slug, keep_inline=not args.drop_inline)
@@ -854,9 +965,11 @@ def main(argv: list[str] | None = None) -> int:
                 try:
                     _validate_target_statement(data, args.check_statement)
                 except GoalError as exc:
-                    _emit({"verdict": "rejected", "error": str(exc)}, args.json)
+                    _emit({"verdict": "rejected", "error": str(exc),
+                           "scope": TARGET_CHECK_SCOPE}, args.json)
                     return EXIT_INPUT_ERROR
-                result = {"slug": args.slug, "verdict": "ok"}
+                result = {"slug": args.slug, "verdict": "ok",
+                          "scope": TARGET_CHECK_SCOPE}
             elif args.list_targets:
                 targets = parse_goal(path)["targets"]
                 if args.json:

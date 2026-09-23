@@ -85,7 +85,9 @@ RULE_SOURCES = (
 # start hashing the wrong text.
 FROZEN_SECTIONS = {
     "两级判据": "089071c2c24bc8e4d8dd2ba10f4f24765f43a34b1fdb70a0d466543e17b2c5bf",
-    "破坏性动作清单": "3eda7d3bbae14a675bbe1c39f413cc53c153557544a88003708c3ef88d8391a6",
+    # Re-frozen 2026-09-23 for the F-13 destructive-bucket registration (goal criteria
+    # emptied by an argument-less call). Deliberate, not silent: only this section moved.
+    "破坏性动作清单": "7f876df208df63bfd5041219ef10062f9e77c76f2204b51601a5a72281cfd9c9",
     "治理保留清单": "92c1c367428a34d038de9c0e85ef37c346dee00d49e7653421e5a64aae91d703",
     "存疑从严": "c1f18db4b9eedf55036cdcb77ef7fd9b41791c4bc292b2d57de346e1744facea",
     "回流约束": "ae1711acd3a325334150051f1193f47631eb043ad336e156b02fa4eca6583af7",
