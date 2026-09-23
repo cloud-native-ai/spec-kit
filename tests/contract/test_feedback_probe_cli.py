@@ -235,6 +235,18 @@ class TestCleanupAction:
         out = json.loads(capsys.readouterr().out)
         assert rc == 0 and out["dry_run"] is True
         assert len(out["would_remove"]) == 1
+        # F-12②: the dry run has to be consumable as a summary. Without the two
+        # count keys the caller must swallow the whole id list to learn anything.
+        assert out["would_remove_count"] == len(out["would_remove"]) == 1
+        assert out["remaining_after"] == out["remaining_entries"] - out["would_remove_count"], (
+            "a dry run never touches the index, so remaining_after must be the "
+            f"projection, not the unchanged count: {out}"
+        )
+        # The pre-existing keys are a published surface — consumers read them.
+        assert set(out) >= {
+            "package", "dry_run", "would_remove", "would_remove_count",
+            "removed", "remaining_entries", "remaining_after",
+        }, f"cleanup output lost keys: {sorted(out)}"
 
         capsys.readouterr()
         rc = feedback_utils.main([
@@ -246,6 +258,10 @@ class TestCleanupAction:
         assert len(out["removed"]) == 1
         assert not list(store.glob("2*.md")), "active entry file not removed"
         assert (store / "cleanup-log.md").is_file()
+        # On a real run the projection and the re-read must agree — a disagreement
+        # means one of the two is measuring the wrong moment.
+        assert out["would_remove_count"] == len(out["removed"]) == 1
+        assert out["remaining_after"] == out["remaining_entries"] == 0, out
 
         import json as _j
         index = _j.loads((store / "index.json").read_text(encoding="utf-8"))

@@ -50,6 +50,8 @@ BEHAVIOR = "## Behavior Rules"
 CLEANUP = "#### A5 — Cleanup"
 INTROSPECTION = "#### A3 — Introspection"
 ROUTE_STEP = "#### A4 — Reconcile and route findings"
+BUNDLES_STEP = "#### A1 — Enumerate pending bundles"
+EXTRACT_STEP = "#### A2 — Extract and read entries"
 
 
 def _text() -> str:
@@ -273,6 +275,107 @@ def test_cleanup_confirmation_literal_is_inside_the_cleanup_step():
     # pre-delete confirmation owned by this file.
     assert "Orphan preserve-first precondition" in cleanup
     assert "consume-log.md" in cleanup
+
+
+@pytest.mark.contract
+def test_path_b_cleanup_is_hat_aware():
+    """F-12①: Path B's closing cleanup used to be hat-blind. In the framework
+    project a package has no recipient, so the default "the zip is the record,
+    empty the store" leaves the entries' only actionable form inside a zip nobody
+    can deliver — and the store can no longer answer `--action list`.
+
+    The negative half (the framework branch is NOT the default) is what makes the
+    paired branch labels load-bearing rather than decorative.
+    """
+    path_b = _path_b()
+    step = next(
+        (ln for ln in path_b.splitlines() if "Post-package cleanup" in ln), None
+    )
+    assert step, "Path B lost its post-package cleanup step"
+    assert "hat-aware" in step, (
+        "the cleanup step must declare that it branches on the hat — an unqualified "
+        "'default closing step' reads as unconditional in the framework repo"
+    )
+    # The criterion is reached by reference; a second copy here would drift from
+    # Routing flow step 2 (and from dogfooding-definitions § 2.1 behind it).
+    assert "step-2 criterion" in step and "not restated here" in step, (
+        "the hat test must be a pointer to the Routing flow's own criterion, "
+        "never a restatement of it"
+    )
+
+    client = path_b.index("**Client project (the default)**")
+    framework = path_b.index("**Framework project**:")
+    assert client < framework, (
+        "the client branch must stay the labelled default and the framework branch "
+        "the exception — reversed, the framework repo empties an active store again"
+    )
+
+    framework_branch = path_b[framework:]
+    assert "only when the user's request for this same run also asked for `mark-submitted`" in (
+        framework_branch
+    ), "the framework branch must gate cleanup on the mark-submitted pairing"
+    assert "keep the entries in the store" in framework_branch, (
+        "without the pairing the entries must stay in the active store"
+    )
+    assert "待定 (pending)" in framework_branch, (
+        "a retained batch must be reported as pending — silently keeping it leaves "
+        "the user unable to tell a decision from an omission"
+    )
+    # The client default keeps its preview-then-remove shape.
+    client_branch = path_b[client:framework]
+    assert "--action cleanup --package <zip|latest> --dry-run" in client_branch
+    assert "run without `--dry-run` in the same session as packaging" in client_branch
+
+
+@pytest.mark.contract
+def test_a5_cleanup_runs_as_one_uninterrupted_sequence():
+    """F-12③: the consume-log row is a batch's only persistent marker and it is
+    written last, so an interruption before it leaves removed bundles with no
+    record that they were ever routed."""
+    cleanup = _slice(CLEANUP, "#### A6")
+    rule = next((ln for ln in cleanup.splitlines() if "Uninterrupted sequence" in ln), None)
+    assert rule, "A5 lost the uninterrupted-sequence rule"
+    assert "one uninterrupted sequence" in rule
+    # The three beats, in the order they must run.
+    assert rule.index("preserve") < rule.index("remove the bundles") < rule.index(
+        "consume-log row"
+    ), f"the sequence beats are out of order: {rule}"
+    assert "only** persistent marker" in rule, (
+        "the rule must say why the order matters — the log row is the only marker"
+    )
+    assert "*last* step" in rule
+    assert "no other work inserted between its steps" in rule
+    # Wired to the A1 rule that has to clean up after a violation.
+    assert "interrupted-run recognition" in rule, (
+        "A5 must name the A1 rule its interruption would trigger, otherwise the "
+        "two halves of the lifecycle contract are not connected"
+    )
+
+
+@pytest.mark.contract
+def test_a1_recognizes_an_interrupted_run_instead_of_rerouting_it():
+    """F-12③, the other half: an unlogged bundle in the intake is ambiguous —
+    new input, or a confirmed batch awaiting cleanup. Defaulting to 'new input'
+    re-routes a batch the user already routed."""
+    a1 = _slice(BUNDLES_STEP, EXTRACT_STEP)
+    rule = next((ln for ln in a1.splitlines() if "Interrupted-run recognition" in ln), None)
+    assert rule, "A1 lost the interrupted-run recognition rule"
+    assert "no** matching `Bundles` row" in rule, (
+        "the firing condition must be mechanical — a bundle the consume-log does "
+        "not name — not a judgement about whether the run 'looks' interrupted"
+    )
+    assert "writes it **last**" in rule, "the rule must state why the marker can be missing"
+    assert "**one** question" in rule, "resumption must cost one question, not a loop"
+    assert "已确认待清理" in rule, "the question must name the resumption reading"
+    assert "do NOT re-route it as new input by default" in rule
+    assert "Record the answer in that batch's consume-log row" in rule, (
+        "the answer must be persisted — an answer kept only in the conversation "
+        "leaves the next run facing the same ambiguity"
+    )
+    # It is the mirror case of the existing cross-check, and says so.
+    crosscheck = next((ln for ln in a1.splitlines() if "Already-consumed cross-check" in ln), None)
+    assert crosscheck, "A1 lost the already-consumed cross-check"
+    assert "mirror case" in rule
 
 
 @pytest.mark.contract

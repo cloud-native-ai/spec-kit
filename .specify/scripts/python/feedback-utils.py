@@ -1428,13 +1428,18 @@ def action_cleanup(args: argparse.Namespace) -> Dict[str, Any]:
         with log_path.open("a", encoding="utf-8") as fh:
             fh.write("\n".join(lines) + "\n")
     would_remove = [e.get("id", e["file"]) for e in targeted]
+    remaining_entries = len(load_index(workspace_root)["entries"])
     return {
         "package": zip_path.relative_to(workspace_root).as_posix()
         if zip_path.is_relative_to(workspace_root) else str(zip_path),
         "dry_run": dry_run,
         "would_remove": would_remove if dry_run else [],
+        "would_remove_count": len(would_remove),
         "removed": removed,
-        "remaining_entries": len(load_index(workspace_root)["entries"]),
+        "remaining_entries": remaining_entries,
+        # A dry run never touches the index, so the post-cleanup figure has to be
+        # projected here — otherwise the summary keys read as "nothing changes".
+        "remaining_after": remaining_entries - len(would_remove) if dry_run else remaining_entries,
     }
 
 
