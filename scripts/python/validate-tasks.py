@@ -14,10 +14,17 @@ Checks performed:
   blockedBy       every [blockedBy: Txxx,Tyyy] reference resolves to an
                   existing task ID (dangling/self references are errors;
                   references to LATER tasks are warnings)
-  parallel-safe   two [P] tasks in the same phase must not name the same file
-                  path (warning: path extraction from prose is heuristic —
-                  confirm whether the overlap is a write conflict, then drop
-                  [P] from one of the rows or re-target one of them)
+  parallel-safe   two [P] tasks in the same phase must not WRITE the same file
+                  path (warning: path extraction from prose is heuristic, and a
+                  row's paths are split into write targets and pointer targets —
+                  a path governed by an explicit read-only marker (a cite
+                  governor such as `per` / `see` / `against` / `owner` / `指向`,
+                  `read-only`, or a `grep` / `diff -` probe in the preceding
+                  window) is a pointer target, so two rows that merely cite the
+                  same owner do not conflict. Confirm each reported overlap
+                  against the rows' actual write targets, then drop [P] from one
+                  row or re-target it — never silence a warning by deleting the
+                  cited path from the row text)
   story-labels    inside a `## Phase ... User Story ...` phase every row
                   carries exactly one [US<n>] label; NON-story phases
                   (Setup / Foundational / Polish / anything else) carry zero
@@ -56,16 +63,53 @@ PARALLEL_MARKER = re.compile(r"(?<!\S)\[P\](?!\S)")
 PATH_TOKEN = re.compile(
     r"(?:[\w.@+~-]+/)+[\w.@+~/-]+|[\w@+~-]+\.(?:py|sh|bash|md|ya?ml|json|toml|txt|js|mjs|ts|tsx|ini|cfg|tpl|sql|go|rs|java|c|h|cpp)\b"
 )
+# A path token governed by one of these is a POINTER target (read/cited), not a
+# WRITE target. Deliberately a closed list of unambiguous read-only governors:
+# ambiguous ones (`from`, `via`, `in`) also head write phrases, so a token they
+# govern keeps the default classification and the overlap is still reported.
+POINTER_GOVERNOR = re.compile(
+    r"(?:\b(?:per|see|against|cite|cited|cites|owner|owned)\b|"
+    r"read-only|readonly|只读|指向|参见|详见|MUST NOT edit|(?:do not|never) edit)"
+    r"[\s`'\"(:,、。]*$",
+    re.IGNORECASE,
+)
+# A read-only probe named in the window preceding the token also demotes it --
+# covers `grep <pat> in <path>`, where the governor word (`in`) is ambiguous and
+# so cannot be used on its own.
+POINTER_CONTEXT = re.compile(
+    r"\bgrep\b|\brg\b|\bdiff\s+-|\bgit diff\b|no matches",
+    re.IGNORECASE,
+)
+# A write verb inside that same window cancels the demotion: `grep X in a.md then
+# rewrite b.py` must keep b.py a write target, or the guard loses real conflicts.
+WRITE_VERB = re.compile(
+    r"\b(?:create|write|add|update|edit|rewrite|extend|insert|rename|remove|"
+    r"delete|author|fill|implement|modify|append|replace|patch|port|copy|sync)\b|"
+    r"新建|写入|新增|插入|扩写|改写|修改|重写|追加|替换|同步",
+    re.IGNORECASE,
+)
+POINTER_WINDOW = 40
 
 
-def _extract_paths(text: str) -> set:
-    paths = set()
+def _classify_paths(text: str):
+    """Split a row's path tokens into (write targets, pointer targets).
+
+    The default is WRITE: only an unambiguous read-only governor immediately
+    before the token, or a read-only probe in the preceding window with no write
+    verb in it, demotes a token. Two [P] rows that merely cite the same owner
+    therefore stop being reported as a write conflict, while every overlap the
+    guard reported before is still reported.
+    """
+    write, pointer = set(), set()
     for m in PATH_TOKEN.finditer(text):
         tok = m.group(0).strip(".,;:()")
         if "[" in tok or "]" in tok:  # template placeholder, not a real path
             continue
-        paths.add(tok)
-    return paths
+        before = text[max(0, m.start() - POINTER_WINDOW):m.start()]
+        governed = bool(POINTER_GOVERNOR.search(before))
+        probed = bool(POINTER_CONTEXT.search(before)) and not WRITE_VERB.search(before)
+        (pointer if (governed or probed) else write).add(tok)
+    return write, pointer
 
 
 def validate(path: Path):
@@ -75,7 +119,7 @@ def validate(path: Path):
     except OSError as exc:
         return [f"0: cannot read {path}: {exc}"], []
 
-    tasks = {}          # id -> {line, phase, parallel, paths, order}
+    tasks = {}          # id -> {line, phase, parallel, write_paths, pointer_paths, order}
     order = 0
     phase_name = None
     phase_is_story = False
@@ -125,13 +169,15 @@ def validate(path: Path):
                 )
                 continue
             order += 1
+            write_paths, pointer_paths = _classify_paths(rest)
             tasks[tid] = {
                 "line": lineno,
                 "state": state,
                 "phase": phase_name,
                 "phase_is_story": phase_is_story,
                 "parallel": bool(PARALLEL_MARKER.search(rest)),
-                "paths": _extract_paths(rest),
+                "write_paths": write_paths,
+                "pointer_paths": pointer_paths,
                 "order": order,
                 "blocked_by": [
                     t.strip() for t in re.split(r"[,\s]+", (BLOCKED_BY.search(rest).group(1) if BLOCKED_BY.search(rest) else "")) if t.strip()
@@ -196,13 +242,33 @@ def validate(path: Path):
             for j in range(i + 1, len(rows)):
                 tid_a, a = rows[i]
                 tid_b, b = rows[j]
-                shared = a["paths"] & b["paths"]
-                if shared:
+                phase_label = (phase or "<no phase>")[:60]
+                both_write = a["write_paths"] & b["write_paths"]
+                if both_write:
                     warnings.append(
                         f"{a['line']}: parallel-safe: [P] tasks {tid_a} (line {a['line']}) and "
-                        f"{tid_b} (line {b['line']}) both name {sorted(shared)} in phase "
-                        f"`{(phase or '<no phase>')[:60]}` — [P] requires different files; "
-                        f"if both write it, drop [P] from one"
+                        f"{tid_b} (line {b['line']}) both WRITE {sorted(both_write)} in phase "
+                        f"`{phase_label}` — [P] requires different write targets; drop [P] from "
+                        f"one row or re-target it, never by deleting the cited path"
+                    )
+                    continue
+                # One row writes what the other only cites: a real ordering
+                # hazard, but weaker than two writers, so it is labelled
+                # distinctly and the two-writer remedy is not offered for it.
+                # Reported per direction — both directions can hold at once.
+                a_writes = a["write_paths"] & b["pointer_paths"]
+                b_writes = b["write_paths"] & a["pointer_paths"]
+                for writer, wline, reader, rline, paths in (
+                    (tid_a, a["line"], tid_b, b["line"], a_writes),
+                    (tid_b, b["line"], tid_a, a["line"], b_writes),
+                ):
+                    if not paths:
+                        continue
+                    warnings.append(
+                        f"{wline}: parallel-safe: [P] task {writer} (line {wline}) WRITES "
+                        f"{sorted(paths)} while {reader} (line {rline}) only references it as a "
+                        f"read-only target in phase `{phase_label}` — the reader may observe a "
+                        f"half-written file; sequence the pair with [blockedBy:] or drop [P]"
                     )
 
     # stable file order: each entry starts with "<lineno>: "
