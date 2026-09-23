@@ -98,13 +98,13 @@ python3 .specify/scripts/python/feedback-utils.py --action record \
 - 触发方式仅手动按需;`check` 参数止于 Present,不进入 Confirm。
 - 台账累积语义:重复运行新发现并入、未处置发现保留状态、外部修复后未检出自动收敛(resolved)。
 
-## Documentation
-
-At the same wrap-up point as the Feedback step, apply the docs-sync evaluation per the canonical convention in `shared/workflow/docs-step.md`: assess whether this run produced information needing entry into the documentation space, and conclude with exactly one of `需记录(目标文档 + 要点)` or `无需记录`. Never block wrap-up; incremental judgment only.
-
 ## Feedback
 
 At wrap-up (the same lifecycle point where this command prompts for a Git commit), run the feedback self-reflection step per the canonical convention in `.specify/shared/workflow/feedback-step.md`: agent self-reflection only — **never** solicit feedback content from the user; skip trivial or no-op runs; keep strictly to this command's scope; persist one entry via `feedback-utils.py --action record --unit-id "/speckit.sanitize" --unit-type command`. Non-blocking (非阻塞) and never any 自动传输 — delivery stays manual. That file owns every rule of this step — reflection, scope, dedup, persistence, the submission prompt, the abort and nesting clauses; do not restate any of them here.
+
+## Documentation
+
+At the same wrap-up point as the Feedback step, apply the docs-sync evaluation per the canonical convention in `shared/workflow/docs-step.md`: assess whether this run produced information needing entry into the documentation space, and conclude with exactly one of `需记录(目标文档 + 要点)` or `无需记录`. Never block wrap-up; incremental judgment only.
 
 ## Handoffs
 

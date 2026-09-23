@@ -47,6 +47,8 @@ Consult the project glossary (`.specify/memory/glossary.md`) and apply the proto
    ```
 
    Render the merged probe truth source (framework Classes/Objects + project external probes) as a tree: kind → class (with target slice, collection, processing) → objects (unit @ lifecycle point). Mark internal vs external. The overview MUST be rendered from the truth source — never a hand-maintained list. Empty external section: show the `external-custom` class with its zero-object marker, no error. With `--format json` the list action emits `{"count": N, "matches": [...]}` where each match carries `id`, `file`, `unit_id`, `unit_type`, `run_id`, `probe`, `kind`, `slice`, `disposition`, `introspection_ref`, `partial`, `created`, `summary`, `path` — parse that shape, never a bare array.
+
+   **Read the routing backlog** (`.specify/memory/feedback/backlog.md`) — the single carrier for findings prior consume runs routed but did not execute. Report how many rows are `open`, `open-unverified` and `carried-by-spec-*`. An `open-unverified` row is **not** a to-do: its underlying defect MUST be re-measured against current framework source before anyone acts on it, because most such rows were fixed by later work and acting on a stale point wastes a whole improvement cycle. A row still `open` across two or more consume runs is itself a finding — name it in the digest report.
 4. **Classify by where each item points, hat first.** In the **framework project**, every entry in the local store points at this project regardless of its `kind`, and every inbound bundle in `feedback/` does too — all of it is Path A material, and Path B is not selected. In a **client project**, the stored `kind` field is the discriminator; the engine resolves it from the probe registry at record time and already enforces it at three layers, so the router reads a fact rather than forming an opinion: `kind: external` (`slice: host-custom`, recorded against a `custom:<owner>/<name>` unit) points at this project → Path A; `kind: internal` points at the framework upstream → Path B.
 5. **Refine by content, in one direction only** (client projects only — in the framework project there is no outward side to refine toward). Run § Introspection over the open `internal` entries: a finding whose root cause turns out to be *this* project's own configuration or usage routes `local-sink` even though its `kind` is `internal`. The refinement is **one-directional**, because the engine's report validation rejects any `upstream-bound` finding that contains a `kind: external` member (exit 2) — so content analysis may move an internal entry toward this project, but can never move an external entry upstream. Report the classification, including any entry whose route the analysis moved. In the framework project, § Introspection still runs, but its output feeds **A4's channel routing** (which improvement channel owns each finding), not a side selection that has already been settled by the hat.
 6. **Path A — 就地消化** for everything that points at this project: in the framework project that is the whole store plus any inbound bundles; in a client project it is the `kind: external` entries plus any `internal` entry step 5 moved.
@@ -134,6 +136,8 @@ Route each finding to the channel that owns it:
 
 Produce a **digest report** for the user: findings table, routing decisions, conflicts found, proposed cleanup list, and the A1/A2 identity marks per bundle (re-delivered copy / second copy / orphan).
 
+**Write the backlog, not only the log**: every finding routed to a channel that is NOT executed in this run MUST gain a row in `.specify/memory/feedback/backlog.md` (routed date, source, finding, channel, owner file(s), status). The consume-log row records where a finding was *sent*; the backlog records what is still *owed*. A routing that lives only in the consume-log is a dead letter — that has already happened once here. The recurrence test for closing a backlog row is that the **named owner file actually changed** (a commit, or a measurement of the owner showing the defect gone), never that the row exists.
+
 #### A5 — Cleanup (mandatory closing step of the digest run)
 
 The user confirms the **routing decisions** in the digest report — confirmation of the report, NOT completion of every downstream routed run (findings routed to later `improve-*` / `/speckit.requirements` runs carry their input from the report and the log row below). On that confirmation, cleanup runs before the command ends:
@@ -207,14 +211,15 @@ External-probe feedback is **client-project-local** (the client project's own us
 - Exit code 2 from the engine is a verdict — report it, do not argue around it.
 - Probe truth source: `.specify/shared/definitions/probe-definitions.md` (+ project `probes/`); derived views (`probe-map.md`) are rebuilt, never hand-edited.
 - **The routing judgment is reported, not assumed**: state which hat the repo wears and how that was determined, how many items landed on each side, whether Path B was selected by judgment or taken on an explicit request, and any entry whose route the content analysis moved away from its `kind`-based first cut.
-
-## Documentation
-
-At the same wrap-up point as the Feedback step, apply the docs-sync evaluation per the canonical convention in `.specify/shared/workflow/docs-step.md`: assess whether information produced by this run (new capabilities, key decisions, structural changes) needs to be recorded into the project documentation space, and conclude with exactly one of `需记录（目标文档 + 要点）` or `无需记录`. Never block wrap-up; incremental judgment only (no full reconcile sweep); when a move/archive-level change is needed, recommend running `/speckit.docs` instead of executing it here.
+- **Routed ≠ done**: `.specify/memory/feedback/backlog.md` is the single carrier for findings routed but not executed — read at inventory, written at A4, and a row closes only on evidence that its named owner file changed. The consume-log is a batch audit trail; it does not carry work forward.
 
 ## Feedback
 
 At wrap-up (the same lifecycle point where this command prompts for a Git commit), run the feedback self-reflection step per the canonical convention in `.specify/shared/workflow/feedback-step.md`: agent self-reflection only — **never** solicit feedback content from the user; skip trivial or no-op runs; keep strictly to this command's scope; persist one entry via `feedback-utils.py --action record --unit-id "/speckit.feedback" --unit-type command`. Non-blocking (非阻塞) and never any 自动传输 — delivery stays manual. That file owns every rule of this step — reflection, scope, dedup, persistence, the submission prompt, the abort and nesting clauses; do not restate any of them here.
+
+## Documentation
+
+At the same wrap-up point as the Feedback step, apply the docs-sync evaluation per the canonical convention in `.specify/shared/workflow/docs-step.md`: assess whether information produced by this run (new capabilities, key decisions, structural changes) needs to be recorded into the project documentation space, and conclude with exactly one of `需记录（目标文档 + 要点）` or `无需记录`. Never block wrap-up; incremental judgment only (no full reconcile sweep); when a move/archive-level change is needed, recommend running `/speckit.docs` instead of executing it here.
 
 ## Handoffs
 

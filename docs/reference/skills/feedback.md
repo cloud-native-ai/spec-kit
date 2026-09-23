@@ -59,6 +59,7 @@ or skill shape) carrying only that unit's id, never a copy of the rules.
 .specify/memory/feedback/
   <YYYYMMDDTHHMMSSZ>-<unit-slug>.md   # one file per recorded run
   introspection/<report-id>.md        # introspection reports (req 047; subdir keeps them out of reindex's root glob)
+  backlog.md                          # single carrier for findings routed but NOT executed (read at inventory, written at A4)
   index.json                          # store metadata + entry mirror (+ introspections[] records)
   .gitkeep                            # keeps the store dir version-tracked
 ```
@@ -135,6 +136,39 @@ Between recording and packaging sits the optional **introspection(自省)** stag
 root-cause clustering in the client project, so upstream packages carry
 facts + evidence + root causes + proposals instead of bare facts. It adds no
 transmission path — red line 3 is unchanged.
+
+### Authoring an introspection report (the schema is engine-enforced)
+
+`--action introspect-register` validates structure and exits 2 listing every violation. The
+command template deliberately does not restate the engine's rules, so three constraints are
+recorded here — each cost a rejection round-trip in the run that first hit them:
+
+- **A finding's field lines are a closed set**: `根因`, `证据锚点`, `成员条目`, `分流决定`,
+  `优化方案`, `建议处置` (plus `用户覆盖` where the user overrode a routing). Any other
+  `- **…**:` line inside a finding is rejected (C-7). Content with no field of its own — an
+  escalation note, an already-fixed list, a decision the report surfaces — goes **inside**
+  `优化方案`, not into an invented field.
+- **`## Excluded` must be the last section.** Everything after it is parsed as excluded rows, so a
+  trailing summary or coverage-sentinel section is reported as `malformed Excluded row (C-8)` —
+  the error names the wrong thing. Put coverage accounting **above** `## Findings`.
+- **An excluded row is `- <entry-id> — <reason>`** with the entry id **unbolded**; bolding it
+  breaks id extraction.
+
+Two adjacent operating facts:
+
+- **A red `--action probes --reconcile` does not block a consume run.** It reports embed↔object
+  drift in the probe registry (an embed with no object, or an object whose unit no longer exists).
+  `kind`/`slice` were resolved at record time, so stored entries still route correctly. Treat it as
+  a reportable finding for the registry owner (`.specify/shared/definitions/probe-definitions.md`,
+  reached via `/speckit.instructions`), not as a reason to stop. `--validate` can pass while
+  `--reconcile` fails — the two check different things.
+- **`dispose --ref` accepts only `introspection-<ts>#F-<nn>`.** An entry listed under `## Excluded`
+  therefore cannot reference its own report section; carry the report id in `--reason` instead.
+
+**Routed ≠ done.** `backlog.md` exists because a routing recorded only in `consume-log.md` became a
+dead letter once already — recorded, never executed, and independently rediscovered nine days later.
+The recurrence test for closing a backlog row is that the named owner file actually changed, not that
+the row exists: `docs/reference/history/00-cross-cutting-lessons.md` § 二十三.
 
 ## Processing side: package → manual send
 
