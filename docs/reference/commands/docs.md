@@ -112,5 +112,5 @@ The canonical command template is distributed through the standard command-gener
 - Existing-content owner: `.specify/skills/improve-docs/SKILL.md`
 - Optional publishing owner: `.specify/skills/create-pages/SKILL.md`
 - Reconcile pattern: `.specify/shared/patterns/reconcile-pattern.md`
-- Instructions refresh command: `.specify/templates/commands/instructions.md`
+- Instructions refresh command: `/speckit.instructions`
 - Deterministic engine contract: `.specify/specs/033-docs-command/contracts/docs-utils-cli.md`

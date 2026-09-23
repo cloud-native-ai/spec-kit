@@ -46,6 +46,11 @@ mirror 文件时 `cp` 被 alias 成 `cp -i`,遇到已存在目标会**静默跳�
 
 动手前先跑全量测试记录基线(如 `375 passed / 7 pre-existing failures`)。本项目长期存在一批**与改动无关的预存失败测试**,典型是断言 `docs/usage.md`(已是空 redirect stub)、`templates/plan-template.md` 含 "Claude Code"/"Qoder" 字符串的用例,以及 `test_create_new_skill_contract`。判断回归时务必对照 baseline,别把它们误算作自己引入的。
 
+两条配套纪律(2026-09-23 反馈消化轮补):
+
+- **同口径才可求差**。仓库存在长期既存失败时,绝对通过数不可比;独立验证的最小充分形式是**同一条命令、同一过滤口径**跑 A/B,只对失败集的差集逐项归因。任何回归数字 MUST 标注它是全量还是过滤子集(含 `-k` 表达式)——子集数字不得当整体基线陈述。基线 MUST 记**名字**而非只记计数(`run-tests.sh --names-out` + `comm -13`),否则"零新增失败"只能靠数数考古,而计数相等会掩盖成员变化。
+- **套件红先按被测单元归因**。多个同族单元被并行编辑时,先 `pytest --tb=line` 读每条断言指向哪个单元,区分既有负债与本次回归,并把归因命令与结论一起写进完成报告——只说"套件红了"等于把归因义务推给读者。owner:`skills/create-skills/SKILL.md` §6。
+
 ## 八、命名带数字的测试是脆弱信号
 
 `test_five_official_assistants`(硬编码 5)、coexistence 测试里硬编码的 profile dict、fixture 里硬编码的工具列表——工具数从 5→6 时全线打破(`KeyError: 'codex'`)。**测试名/断言里出现具体数字,就是未来扩展会踩的雷**。
@@ -84,6 +89,12 @@ mirror 文件时 `cp` 被 alias 成 `cp -i`,遇到已存在目标会**静默跳�
 
 5. **选择器按子串工作,却被当作按标识符工作**。`pytest -k` 的每个 token 按**子串**匹配测试 id,且**同时匹配 slug**:裸 `c1` 会选中 `test_c10_*`…`test_c19_*`,而名为 `test_g8_c6_c7_...` 的函数会因 slug 含 `c6_` 被另一阶段的 token 选中。实测(5 个桩)`-k "c1 or c2"` 收集 5 个,`-k "c1_ or c2_"` 收集 2 个。修法:token 一律带尾下划线、函数名一律 `test_<前缀><编号>_<描述>`(编号后紧跟下划线),并**断言收集数等于认领的条款数**——否则空选恒绿,而空选正是"分区表达式写错"的默认结果。
 6. **自指哨兵被自己的诊断文本触发**。一个"扫描自身源码断言不含某禁用字面量"的守卫,若把该字面量逐字写进自己的失败消息,就会在自己的报错文案上恒红。修法:needle 由片段拼出(`"agents" + "/" + "instances"`),诊断消息改用不含该字面量的散文,并为哨兵再配一条伴生断言(源码长度非零、被扫常量仍在场)。
+
+**消费期新增的三种成因(反馈消化轮,2026-09-23)**:同族形态,来自对 32 条历史反馈条目的核验与 16 项修复。
+
+7. **"非空白即通过"的证据关**。渲染证明关只校验截图存在且非空白,而无头 Chrome 的布局视口比 `--window-size` 声明值矮 ~87–88px,底部被裁时该关照样绿——两个绘图引擎各自独立实测到同一差值,是本轮唯一有**两个独立报告者**的缺陷。修法:窗口高 = 内容高 + 余量,或先读回绘制 bbox 再判裁切;余量数值的 owner 是 `skills/draw-diagram/references/delivery-contract.md` D6「渲染证据几何」行,其余处只写指针。
+8. **A/B 两侧对 git-ignored 路径天然不对称**。worktree 不复制被忽略的文件(运行工作区、构建产物、本地缓存),于是差集里混进环境差异,被记成改动效果(假阳)。修法:差集项归因前 MUST 先排除 ignored 残留。
+9. **用过滤后的视图当作内容命题的证据**。要断言一个工件的内容,就读那个文件本身;`git diff -- <path>`、`grep -A/-B`、`--stat` 只呈现被筛过的子集,其形状与被筛集合并不匹配(即上面第 1 条的一般形态)。用它取证等于让过滤器替你决定什么算证据——diff 用来定位改动范围,文件用来判定内容命题。
 
 **两个配套手法**:
 
@@ -127,6 +138,7 @@ mirror 文件时 `cp` 被 alias 成 `cp -i`,遇到已存在目标会**静默跳�
 ## 二十、root 属主的 `.git/objects/<xx>/` 桶会间歇性阻塞提交
 
 - A root-owned `.git/objects/<xx>/` hash-bucket dir intermittently blocks commits (tree hashes land in buckets probabilistically). Root fix: `mv` the bucket aside, recreate it as the current user, copy the blobs back — do NOT mutate file content to dodge the hash.
+- **提交前探测桶可写性,比一次失败提交 + 三轮诊断便宜**:`obj="$(git rev-parse --git-path objects)"`,对待写入的 hash 前缀桶 `b="$obj/<xx>"` 跑 `if [ -e "$b" ]; then test -w "$b"; else test -w "$(dirname "$b")"; fi`。桶**缺失是正常态**(git 按需创建),故必须回落父目录——裸 `test -w "$b"` 会误报。探测 MUST 在 `git add` 之前:一次失败的提交会把索引留在半写状态,诊断成本远高于一次 `test -w`。
 
 ## 二十一、重构命令/引擎必须端到端实跑其真实管线
 
