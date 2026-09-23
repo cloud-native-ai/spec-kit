@@ -11,6 +11,7 @@ feature: "draw-two-layer-structure"
 partial: false
 created: "2026-09-16T10:23:52Z"
 summary: "serial 链第 2 次 run:S1a 与 S1c 并发派发双双 PASS(产物 150 行/21618 字节、179 行/25547 字节,0 UNCLEAR),证明上轮改的目录级粒度有效;S1b 撞 15 轮上限只落 10 行桩、gate 五条全不过 → escalate,S1d/S1e/S2/S3 保持 locked,canonical 零改动。诊断:S1b 的技能比 S1a 更轻(52"
+introspection_ref: "introspection-20260923T120035Z#F-16"
 ---
 
 ## Review

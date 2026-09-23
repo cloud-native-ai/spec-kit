@@ -11,6 +11,7 @@ feature: "052-fast-fail-principle"
 partial: false
 created: "2026-09-23T11:33:03Z"
 summary: "本轮 /speckit.feedback 以显式 `package` 参数进入,按 Routing flow 第 1 步短路至 Path B(跳过步骤 2–5 的帽子/清单判定作为路由依据,但仍执行了帽子取证:根级 templates/skills/shared/scripts/src-specify_cli 五个目录实测存在,`src/specify_cli` 仅在根级——框架项目成立)。清单实"
+introspection_ref: "introspection-20260923T120035Z#F-12"
 ---
 
 ## Review

@@ -11,6 +11,7 @@ feature: "viz-skill-arena"
 partial: false
 created: "2026-09-14T18:07:02Z"
 summary: "Cycle-3 arena draw: recreated target.png (three dashed zones 用户网络/Aone/ASO/阿里云, 21 rounded-rect nodes, 5 solid arrows) as a fixed-layout ECharts graph plus graphic zone layer, config-driven (config.js"
+introspection_ref: "introspection-20260923T120035Z#F-18"
 ---
 
 ## Review

@@ -11,6 +11,7 @@ feature: "051-user-facing-comprehension"
 partial: false
 created: "2026-09-18T11:41:51Z"
 summary: "MVP 范围(Phase 1 Setup + Phase 2 US1,13/63 任务)按用户预授权完成并提交(82d95e2d / d6100ef2 / 49f9746e / 8b25e24e)。落地真源文档 + 常驻章节 + 34 个结构契约用例,全量契约回归相对冻结基线零新增(26 == 26,comm -13 空),门控预算 23 不变且扫描器零改动,9 条 Completion Gate"
+introspection_ref: "introspection-20260923T120035Z#F-05"
 ---
 
 ## Review

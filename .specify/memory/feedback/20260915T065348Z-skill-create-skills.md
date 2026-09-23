@@ -11,6 +11,7 @@ feature: "draw-diagram-front-door"
 partial: false
 created: "2026-09-15T06:53:48Z"
 summary: "Created skills/draw-diagram front door (semantic LDM + exclusivity registry + delegation) over five draw-* specialists; mirror and host load-dir wired; conformance suite attributed failures to pre-exi"
+introspection_ref: "introspection-20260923T120035Z#F-21"
 ---
 
 ## Review

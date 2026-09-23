@@ -11,6 +11,7 @@ feature: "051-user-facing-comprehension"
 partial: false
 created: "2026-09-17T13:01:12Z"
 summary: "Mode A on requirements.md. 11 类 taxonomy 扫描:Feature Linkage = Missing(高优先),3 类 Partial、7 类 Clear。提问 4 个(5 上限内),因四者互不为对方选项集设前提,按 batching rule 合并为一次提示;四项均获批准推荐项。集成按「target artifact first, Feature regis"
+introspection_ref: "introspection-20260923T120035Z#F-07"
 ---
 
 ## Review

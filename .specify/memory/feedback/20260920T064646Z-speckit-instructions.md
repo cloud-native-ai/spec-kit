@@ -10,6 +10,7 @@ slice: "commands"
 partial: false
 created: "2026-09-20T06:46:46Z"
 summary: "First real exercise of the size-budget control added earlier the same day, run on the framework repo itself with empty arguments (full reconcile). The control worked end to end: the setup script opene"
+introspection_ref: "introspection-20260923T120035Z#F-11"
 ---
 
 ## Review

@@ -11,6 +11,7 @@ feature: "051-user-facing-comprehension"
 partial: false
 created: "2026-09-17T12:31:09Z"
 summary: "原则级概念输入按 guidelines 的概念型输入规则先蒸馏为可落地切片(框架自身 vs 下游项目两个落地层级),再分片为 5 个 story(3xP1+2xP2),未抄写用户原话句式。有界调研(单次 Explore 委派 + summary-first + 定向 peek 050 头尾)产出带 file:line 的现状清单,核心基线「38 处独立措辞 / 0 真源 / 0 统一名字」为实测值"
+introspection_ref: "introspection-20260923T120035Z#F-03"
 ---
 
 ## Review
