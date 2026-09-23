@@ -66,9 +66,6 @@
 | speckit-todo-wrapup | command-wrapup | /speckit.todo | wrap-up |
 | speckit-tools-wrapup | command-wrapup | /speckit.tools | wrap-up |
 | skill-archive-session-wrapup | skill-wrapup | skill:archive-session | wrap-up |
-| skill-browser-extension-wrapup | skill-wrapup | skill:browser-extension | wrap-up |
-| skill-browser-utils-wrapup | skill-wrapup | skill:browser-utils | wrap-up |
-| skill-clone-website-ui-wrapup | skill-wrapup | skill:clone-website-ui | wrap-up |
 | skill-code-review-wrapup | skill-wrapup | skill:code-review | wrap-up |
 | skill-collect-evidence-wrapup | skill-wrapup | skill:collect-evidence | wrap-up |
 | skill-create-agent-wrapup | skill-wrapup | skill:create-agent | wrap-up |
@@ -86,6 +83,8 @@
 | skill-draw-excalidraw-wrapup | skill-wrapup | skill:draw-excalidraw | wrap-up |
 | skill-draw-mermaid-wrapup | skill-wrapup | skill:draw-mermaid | wrap-up |
 | skill-draw-plantuml-wrapup | skill-wrapup | skill:draw-plantuml | wrap-up |
+| skill-git-fleet-wrapup | skill-wrapup | skill:git-fleet | wrap-up |
+| skill-git-server-init-wrapup | skill-wrapup | skill:git-server-init | wrap-up |
 | skill-git-submodule-edit-wrapup | skill-wrapup | skill:git-submodule-edit | wrap-up |
 | skill-git-workflow-wrapup | skill-wrapup | skill:git-workflow | wrap-up |
 | skill-improve-agent-wrapup | skill-wrapup | skill:improve-agent | wrap-up |
@@ -96,6 +95,7 @@
 | skill-manage-agents-wrapup | skill-wrapup | skill:manage-agents | wrap-up |
 | skill-memory-recall-wrapup | skill-wrapup | skill:memory-recall | wrap-up |
 | skill-memory-record-wrapup | skill-wrapup | skill:memory-record | wrap-up |
+| skill-merge-skills-wrapup | skill-wrapup | skill:merge-skills | wrap-up |
 | skill-study-project-wrapup | skill-wrapup | skill:study-project | wrap-up |
 | skill-summarize-project-wrapup | skill-wrapup | skill:summarize-project | wrap-up |
 | skill-think-skills-wrapup | skill-wrapup | skill:think-skills | wrap-up |
