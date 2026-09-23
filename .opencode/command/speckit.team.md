@@ -139,6 +139,14 @@ The **run** mode MUST follow this sequence; the preview is disclosure, and the t
 - Canonical store: the team **directory** `.specify/teams/<slug>/` — definition at `.specify/teams/<slug>/team.md`, accumulating run reports under `.specify/teams/<slug>/runs/`. No per-tool symlink — teams are a framework-internal concept. Run intermediates live in the git-ignored `.specify/teams/.work/<slug>/`, never in the team directory.
 - Each persisted team carries frontmatter (`slug`, `name`, `description`, `goal`, `pattern`, `members`, `config`, `created`, `updated`), a `## Goal` section (the team's overall final objective + success criteria), a `## Static Structure` section, and a `## Dynamic Structure` section (see `skills/create-team/SKILL.md` and the data model). The `## Goal` section is authored first — the static and dynamic sections are organized to serve it.
 
+## Feedback
+
+At wrap-up (the same lifecycle point where this command prompts for a Git commit), run the feedback self-reflection step per the canonical convention in `.specify/shared/workflow/feedback-step.md`: agent self-reflection only — **never** solicit feedback content from the user; skip trivial or no-op runs; keep strictly to this command's scope; persist one entry via `feedback-utils.py --action record --unit-id "/speckit.team" --unit-type command`. Non-blocking (非阻塞) and never any 自动传输 — delivery stays manual. That file owns every rule of this step — reflection, scope, dedup, persistence, the submission prompt, the abort and nesting clauses; do not restate any of them here.
+
+## Documentation
+
+At the same wrap-up point as the Feedback step, apply the docs-sync evaluation per the canonical convention in `.specify/shared/workflow/docs-step.md`: assess whether information produced by this run (new capabilities, key decisions, structural changes) needs to be recorded into the project documentation space, and conclude with exactly one of `需记录（目标文档 + 要点）` or `无需记录`. Never block wrap-up; incremental judgment only (no full reconcile sweep); when a move/archive-level change is needed, recommend running `/speckit.docs` instead of executing it here.
+
 ## Handoffs
 
 **Before**: Optional `/speckit.agents` to author or refine the single agents that will become team members.

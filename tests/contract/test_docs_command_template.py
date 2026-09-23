@@ -165,8 +165,10 @@ def test_c8_feedback_step_conformance():
     assert '"/speckit.docs"' in text, "feedback unit-id must be /speckit.docs"
     classification = runpy.run_path(str(REPO_ROOT / "tests" / "contract" / "test_feedback_command_classification.py"))
     assert "docs" in classification["COMPLEX_COMMANDS"]
-    assert len(classification["COMPLEX_COMMANDS"]) == 19
-    assert len(classification["SIMPLE_COMMANDS"]) == 4
+    # The two list lengths are deliberately NOT restated here: their owner is
+    # test_feedback_command_classification.py::test_classification_counts, and a second
+    # pin would turn every reclassification into a two-file edit. This test's subject is
+    # docs.md's own conformance, which the membership assertion above already covers.
 
 
 @pytest.mark.contract

@@ -62,6 +62,7 @@
 | speckit-session-wrapup | command-wrapup | /speckit.session | wrap-up |
 | speckit-skills-wrapup | command-wrapup | /speckit.skills | wrap-up |
 | speckit-tasks-wrapup | command-wrapup | /speckit.tasks | wrap-up |
+| speckit-team-wrapup | command-wrapup | /speckit.team | wrap-up |
 | speckit-todo-wrapup | command-wrapup | /speckit.todo | wrap-up |
 | speckit-tools-wrapup | command-wrapup | /speckit.tools | wrap-up |
 | skill-archive-session-wrapup | skill-wrapup | skill:archive-session | wrap-up |

@@ -21,7 +21,7 @@ pytestmark = pytest.mark.integration
 REPO_ROOT = Path(__file__).resolve().parents[2]
 COMMANDS_DIR = REPO_ROOT / "templates" / "commands"
 FEEDBACK_MARKER = "feedback-utils.py"
-SIMPLE_COMMANDS = ["agents", "constitution", "feature", "team"]
+SIMPLE_COMMANDS = ["agents", "constitution", "feature"]
 
 
 def test_complex_command_records_command_scoped_entry(feedback_store: Path):

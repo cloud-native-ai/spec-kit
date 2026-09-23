@@ -2,8 +2,8 @@
 
 Driven by ``.specify/specs/033-docs-command/contracts/docs-step-injection.md``
 (C-1…C-9): single source of truth ``shared/workflow/docs-step.md``, injected as
-a reference-only ``## Documentation`` section into all 14 complex command
-templates (adjacent to ``## Feedback``, before ``## Handoffs``); the 4 simple
+a reference-only ``## Documentation`` section into all 17 complex command
+templates (adjacent to ``## Feedback``, before ``## Handoffs``); the 3 simple
 templates stay clean.
 """
 from __future__ import annotations
@@ -23,8 +23,12 @@ COMPLEX_COMMANDS = [
     "analyze", "checklist", "review", "research",
     "instructions", "tools", "skills", "todo", "docs",
     "interview", "derive",
+    # `team` reclassified simple → complex on 2026-09-23 (user-adjudicated,
+    # introspection-20260923T120035Z#F-02); see
+    # tests/contract/test_feedback_command_classification.py for the criteria.
+    "team",
 ]
-SIMPLE_COMMANDS = ["agents", "constitution", "feature", "team"]
+SIMPLE_COMMANDS = ["agents", "constitution", "feature"]
 
 
 def section(text: str, heading: str) -> str:
@@ -42,8 +46,8 @@ def test_c1_single_source_and_mirror():
 
 @pytest.mark.contract
 def test_c2_injection_scope_counts():
-    assert len(COMPLEX_COMMANDS) == 16
-    assert len(SIMPLE_COMMANDS) == 4
+    assert len(COMPLEX_COMMANDS) == 17
+    assert len(SIMPLE_COMMANDS) == 3
 
 
 def heading_offset(text: str, heading: str) -> int:

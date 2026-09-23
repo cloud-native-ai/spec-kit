@@ -36,11 +36,12 @@ A command meeting NONE of these is **simple** and MUST NOT carry the feedback st
 | `agents` | ❌ | — | — | **Simple** | Self-contained `.agent.md` authoring; no script, no per-run flow I/O. |
 | `constitution` | ❌ | — | — | **Simple** | Interactive editing of a shared registry doc; not a per-run producer/consumer flow. |
 | `feature` | ❌ | — | — | **Simple** | Feature-index registry editing; not a scripted / chained flow. |
-| `team` | ❌ | — | — | **Simple** | Team-config authoring; delegates to `create-team`/`improve-team` skills which carry feedback. |
+| `team` | ✅ | run, goal coordinate, improve-team | goal | **Complex** | Reclassified 2026-09-23 (introspection-20260923T120035Z#F-02, user-adjudicated). Not a thin wrapper: `templates/commands/team.md` invokes 4 distinct scripts directly (`scripts/python/goal-utils.py`, `skills/create-team/scripts/match-team-preset.py`, `skills/create-team/scripts/verify-territory-disjoint.py`, `build-summary-input.py`), emits `.specify/teams/<slug>/team.md` + `runs/` consumed by `/speckit.team run`, `/speckit.goal coordinate` and `improve-team`, and consumes the bound goal's `## Targets`. All three criteria hold, so the delegation rationale below the table does not apply. |
 
-**Result**: 13 complex (feedback-bearing) · 4 simple (excluded).
+**Result**: 14 complex (feedback-bearing) · 3 simple (excluded).
 
 ## Maintenance
 
 - If a command later starts invoking a script or joining the producer/consumer chain, re-run this rule and update both this table and the command template.
 - The conformance test in `tests/contract/` MUST read this table (or an equivalent list) so classification drift is caught automatically.
+- **Known gap (recorded 2026-09-23, not fixed here)**: this table covers 17 commands, while `templates/commands/` currently holds 25. The 8 unlisted commands (`goal`, `interview`, `feedback`, `sanitize`, `derive`, `session`, `history`, `todo`'s siblings as applicable) were added after Feature 028 and are classified only by the conformance tests' own lists. Re-deriving the full table against the current tree is a separate task; until then the tests' `COMPLEX_COMMANDS` lists — not this table — are the operative enumeration.

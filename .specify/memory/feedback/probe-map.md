@@ -27,7 +27,7 @@
 - **收集内容**: 命令单次运行的回顾与 ≥1 条单元级优化点
 - **处理流程**: record→threshold→package→manual→mark-submitted
 - **适用插入位置**: wrap-up
-- **Objects** (21):
+- **Objects** (22):
   - `speckit-analyze-wrapup` — /speckit.analyze @ wrap-up
   - `speckit-checklist-wrapup` — /speckit.checklist @ wrap-up
   - `speckit-clarify-wrapup` — /speckit.clarify @ wrap-up
@@ -47,6 +47,7 @@
   - `speckit-session-wrapup` — /speckit.session @ wrap-up
   - `speckit-skills-wrapup` — /speckit.skills @ wrap-up
   - `speckit-tasks-wrapup` — /speckit.tasks @ wrap-up
+  - `speckit-team-wrapup` — /speckit.team @ wrap-up
   - `speckit-todo-wrapup` — /speckit.todo @ wrap-up
   - `speckit-tools-wrapup` — /speckit.tools @ wrap-up
 
@@ -169,6 +170,7 @@ graph TD
   class_command_wrapup --> obj_speckit_session_wrapup[speckit-session-wrapup]
   class_command_wrapup --> obj_speckit_skills_wrapup[speckit-skills-wrapup]
   class_command_wrapup --> obj_speckit_tasks_wrapup[speckit-tasks-wrapup]
+  class_command_wrapup --> obj_speckit_team_wrapup[speckit-team-wrapup]
   class_command_wrapup --> obj_speckit_todo_wrapup[speckit-todo-wrapup]
   class_command_wrapup --> obj_speckit_tools_wrapup[speckit-tools-wrapup]
   kind_internal --> class_skill_evaluation_form[skill-evaluation-form]
@@ -263,6 +265,7 @@ graph TD
 | `speckit-session-wrapup` | command-wrapup | internal | /speckit.session @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-skills-wrapup` | command-wrapup | internal | /speckit.skills @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-tasks-wrapup` | command-wrapup | internal | /speckit.tasks @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `speckit-team-wrapup` | command-wrapup | internal | /speckit.team @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-todo-wrapup` | command-wrapup | internal | /speckit.todo @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-tools-wrapup` | command-wrapup | internal | /speckit.tools @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-draw-d3js-evaluation-form` | skill-evaluation-form | internal | skill:draw-d3js @ evaluation-form | 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果 | record→threshold→package→manual→mark-submitted |

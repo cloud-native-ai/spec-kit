@@ -122,9 +122,9 @@ unit and substitute only the unit id (`/speckit.<command>` for a command templat
 `skill:<name>` for a skill). Nothing else is per-surface: no rule, threshold, engine
 flag or red line is restated in an embedded section, because a copy is what drifts.
 
-**Command templates** — complex commands only (the four simple commands carry no
-`## Feedback` section at all). Place it next to `## Optional: Git Commit`, never
-mid-flow:
+**Command templates** — complex commands only (the simple commands enumerated in
+§ *Notes for embedders* carry no `## Feedback` section at all). Place it next to
+`## Optional: Git Commit`, never mid-flow:
 
 ```markdown
 ## Feedback
@@ -217,6 +217,6 @@ workaround applied. This is a read-only aid — it never gates execution.
 - **Skills**: `--unit-id "skill:<name>"`, `--unit-type skill`.
 - **Complex commands**: `--unit-id "/speckit.<command>"`, `--unit-type command`.
 - **External custom units** (host-project skills/agents/commands with an injected `ext-*` probe): `--unit-id custom:<owner>/<name>`, `--unit-type custom-unit`. Entries stay host-project-local (never packaged upstream) — see `/speckit.feedback` § Probe Injection.
-- **Simple commands** (`agents`, `constitution`, `feature`, `team`): omit this step entirely.
+- **Simple commands** (`agents`, `constitution`, `feature`): omit this step entirely. This list is *derived* from the complexity criterion at the top of this file — when a command gains or loses script invocations, or starts or stops producing or consuming another flow's artifact, re-derive the list rather than editing it alone.
 - The engine store lives at `.specify/memory/feedback/`; threshold defaults to `10`
   (`--threshold` / `SPECKIT_FEEDBACK_THRESHOLD`).

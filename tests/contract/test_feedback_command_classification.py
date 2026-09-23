@@ -1,8 +1,8 @@
 """Contract test (US2): command feedback-step classification.
 
-Driven by ``contracts/command-classification.md``: each of the 19 **complex**
-command templates contains the feedback step; each of the 4 **simple** templates
-(``agents``, ``constitution``, ``feature``, ``team``) does NOT.
+Driven by ``contracts/command-classification.md``: each of the 20 **complex**
+command templates contains the feedback step; each of the 3 **simple** templates
+(``agents``, ``constitution``, ``feature``) does NOT.
 """
 from __future__ import annotations
 
@@ -21,13 +21,19 @@ COMPLEX_COMMANDS = [
     "analyze", "checklist", "review", "research",
     "instructions", "tools", "skills", "todo", "docs", "goal",
     "interview", "feedback", "sanitize", "derive",
+    # `team` reclassified simple → complex on 2026-09-23 (user-adjudicated,
+    # introspection-20260923T120035Z#F-02): it invokes 4 distinct scripts,
+    # emits .specify/teams/<slug>/team.md consumed by run / goal coordinate /
+    # improve-team, and consumes the bound goal's Targets — all three criteria
+    # of the classification rule hold. Recorded in the contract's table.
+    "team",
 ]
-SIMPLE_COMMANDS = ["agents", "constitution", "feature", "team"]
+SIMPLE_COMMANDS = ["agents", "constitution", "feature"]
 
 
 def test_classification_counts():
-    assert len(COMPLEX_COMMANDS) == 19
-    assert len(SIMPLE_COMMANDS) == 4
+    assert len(COMPLEX_COMMANDS) == 20
+    assert len(SIMPLE_COMMANDS) == 3
 
 
 @pytest.mark.contract
