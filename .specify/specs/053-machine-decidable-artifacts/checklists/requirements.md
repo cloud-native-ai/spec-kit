@@ -3,7 +3,7 @@
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-09-23
 **Feature**: [requirements.md](../requirements.md) · Feature 053 · Status `Draft`
-**Validation runs**: 1 — 初稿。本清单在 `/speckit.clarify` 回写后 MUST 重新核验一次(依据:`shared/guidelines/requirements-guidelines.md` § Validation Process,以及本规格 FR-013 自己要求的「清单更新置于澄清回写之后」)。
+**Validation runs**: 2 — ① 2026-09-23 初稿(15/16,唯一未过项为 FR-027 的活动标记);② 2026-09-24 `/speckit.clarify` Mode A 回写**之后**复验(16/16)。本次复验即 FR-013 自己要求的「清单更新置于澄清回写之后」,依据 `shared/guidelines/requirements-guidelines.md` § Validation Process。
 
 ## Content Quality
 
@@ -14,7 +14,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -32,10 +32,27 @@
 
 ## Notes
 
-### 未完成项(1 项)
+### 未完成项(0 项 — 初稿的 1 项已于第 2 轮关闭)
 
-- **`No [NEEDS CLARIFICATION] markers remain` → 未完成**:FR-027 保留 **1** 个活动标记(上限 3),问的是覆盖核算对既有 52 个 spec 的适用性——「仅对本特性之后新建的 spec 强制」与「对既有 spec 提供只读不合规清单而不阻断」两种读法都成立,工件无记录,且二者对范围的影响相差 110 份既有契约文件。该标记 MUST 由 `/speckit.clarify` 解决后才进 `/speckit.plan`。
-  计数方式:只数**带冒号且未被反引号包裹**的实例(实测 1);被反引号包裹的提及不计入。这正是 FR-010 规定的形态,本清单按该形态自证。
+- **`No [NEEDS CLARIFICATION] markers remain` → 初稿未完成,现已通过**:FR-027 的活动标记已由 2026-09-24 `/speckit.clarify` Mode A 经用户裁定为「**冻结名字级基线,只对新增未覆盖项阻断**」并改写为该判据;`## Related Feature` 亦由同一轮裁定为**新建 Feature 053(Draft)**。实测活动标记 **0**。
+  计数方式:只数**带冒号且未被反引号包裹**的实例——这正是 FR-010 规定的形态,本清单按该形态自证。
+  附带处置:模板的 `ACTION REQUIRED`(「Keep the default values as "Need clarification"」)注释在绑定解析后按房子先例移除(050 / 051 / 052 三份规格均在解析后移除;全仓 44 份里仅 9 份仍保留,即绑定尚未解析者)。
+
+### 第 2 轮(clarify 回写后)新查出并订正的规格自身缺陷
+
+同作者检测已按 `.specify/shared/workflow/objective-analysis-gate.md` **委托**给 3 个新鲜上下文只读子代理(规格由同一 agent 在同一会话写成)。三路回传收敛为 4 个用户裁定问题 + **13 项纠正**,其中 **5 项是初稿的事实缺陷**,均经编排者复跑源码确认:
+
+| # | 初稿所印 | 实测 | 证据 |
+|---|---|---|---|
+| 1 | `validate-tasks.py` 检查面 **5** 项 | **6** 项(漏 `dod-format`) | 该项由 `b4fb16cb`(2026-09-11)落地,**早于初稿自陈的实测日期 12 天** |
+| 2 | 该脚本契约钉子 **0 个** | **2 处**(标签集钉 `EXPECTED_CHECKS` `:75-82` 由 `:314` 断言;退出码表钉 `test_c5_exit_code_table` `:346`) | `git merge-base --is-ancestor 46760e37 7c5598c0` 为真 ⇒ 钉子的提交是初稿提交的**祖先**,「零钉子」在写下那一刻就是假的 |
+| 3 | FR-027 分母「既有 **52** 个 spec」 | **44** 个 spec 目录(42 个含 `contracts/`) | 52 是 `features.md` 的 `Total Features`,两个计数被混用 |
+| 4 | FR-028:10 份 `.yaml` 可「解析其 operations」 | 分属**两种**语法:9 份 OpenAPI(条款全集 = `paths:` 下 HTTP 方法键,共 **39** 个;文件内**无**字面 `operations:` 键)+ 1 份 `assertions[].id`(**6** 条,文件名却是 `.openapi.yaml`) | 逐文件解析实测 |
+| 5 | US2 验收场景 2 要求「exit 码为『有 WARN 无 ERROR』对应的那一档」 | **该档不存在**:既有表只有「无 ERROR → 0(警告不单独成档)」「有 ERROR → 1」 | `test_c5_exit_code_table:353,356` |
+
+另 8 项纠正:术语归一(`校验器` 20 处 → 已登记的 Key Entity 名 `检查器`;第 6 行 `**Input**` 逐字记录按「日期化记录不作为当前现实被引用」豁免保留)· 两处对 `fast-fail.md` 的引用**指向不存在的条款名**(「机器绿条款」在 owner 里零命中,真名 `§ 判据同样覆盖机器给出的绿`)· 一处对已登记术语 `盲检 (Blind Check)` 另造 `假绿` · Shared Strings 的 `Consumed by` 列 **7** 处「点名了某 FR/SC 但该处未写出 `[[STR-NNN]]`」,其中 2 处把字面量**重打**了一遍(SC-008 的 `not-evaluated`、SC-007 的 `run-checks`),正是模板引用公约明令禁止的形态 · A-2 暗示 CI 是许可通道,与 FR-048 的封闭两通道集矛盾且实测本仓无任何 CI 配置 · STR-004 标注为**新造字面量**(实测在 `goal-utils.py` 零命中,有效词表是 STR-006 ∪ {STR-004}),STR-006 的 7 个字面量逐个实测命中 · 补 2 条边界情形(检查器从镜像副本被调用时的自定位自匹配、「可解析但抽出零条款」)· FR-022 补落点约束(`SCAN_DIRS` 含 `shared`,故新建在 `shared/definitions/` 下的 owner 文档从第一稿起就在零余量门控预算内)。
+
+**一处编排者自身缺陷已订正**:整合第 4 个裁定时先写成 `FR-003a`,而本规格的边界情形明令「编号带字母后缀 MUST 判为形态违例」——规格违反了自己的规则。已折叠进 FR-003 本体,残留复核为 0。
 
 ### 三项判为通过但需说明理由的项
 
@@ -56,17 +73,25 @@
 
 | 命题 | 实测值 | 判据 |
 |---|---|---|
-| FR 编号连续且按文档序 | 48 条,FR-001…FR-048,`ORDER BREAK` 0 | FR-007 / FR-008 |
-| SC 编号连续且按文档序 | 12 条,SC-001…SC-012,`ORDER BREAK` 0 | FR-007 / FR-008 |
-| `[[STR-NNN]]` 引用可解析 | 引用集 = 定义集 = {001…010},不可解析 0,定义而未被引用 0 | FR-009 |
-| 活动标记计数 | 1(上限 3) | FR-010 |
-| 模板占位符残留 | 0 | — |
-| 必备节齐备且有序 | 7 个 H2 全部在场,序与模板一致 | — |
-| 用户故事数与优先级分布 | 5(P1×2、P2×2、P3×1),无占位故事 | — |
-| Edge Cases | 8 条,含门控预算余量为 0 这一条 | — |
+| FR 编号连续且按文档序 | 48 条,FR-001…FR-048,`ORDER BREAK` **0** | FR-007 / FR-008 |
+| SC 编号连续且按文档序 | 12 条,SC-001…SC-012,`ORDER BREAK` **0** | FR-007 / FR-008 |
+| `[[STR-NNN]]` **正向**可解析 | 引用集 = 定义集 = {001…010},不可解析 **0**,定义而未被引用 **0** | FR-009 |
+| `[[STR-NNN]]` **反向**一致(表内点名 → 该处确有引用) | 不符 **0**(初稿为 **7**,已全部改为引用形) | 模板 § Citation convention |
+| 活动标记计数 | **0**(上限 3;初稿为 1) | FR-010 |
+| 模板占位符残留 | **0** | — |
+| 必备节齐备且有序 | **7** 个 H2 全部在场,序与模板一致 | — |
+| 用户故事数与优先级分布 | **5**(P1×2、P2×2、P3×1),无占位故事 | — |
+| Edge Cases | **10** 条(初稿 8,新增自定位自匹配与「可解析但抽出零条款」),含门控预算余量为 0 这一条 | — |
+| `## Related Feature` 绑定 | 已解析为 **Feature 053**(全文件对 `Need clarification` 命中 **0**) | feature-integration.md § Feature Binding Rules |
+| `## Clarifications` 回写 | `### Session 2026-09-24` 下 **4** 条 bullet,一条对应一个被接受的裁定 | clarify Mode A 步骤 5 |
+
+**复验时间**:2026-09-24(clarify 回写之后)。以上每行均由程序实跑得出,非目测——初稿正是把这 11 行里的第 1、2 行写错了(检查面 5→6、钉子 0→2),而散文读起来完全通顺。
 
 ### 交给下一阶段的依赖
 
-- `/speckit.clarify` MUST 解决 FR-027 的活动标记,并按 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules 完成 `Related Feature` 绑定(本命令按约定保留 `Need clarification`,不自行绑定)。候选核验时注意:本特性**消费** `validate-tasks.py`、`goal-utils.py`、`clarify-taxonomy.md` 三处既有 owner,但为它们各新增能力,与 Feature 028(Feedback Mechanism)、040(Token Efficiency Discipline)的关系需按同胞吸收启发式逐个核验。
+- ~~`/speckit.clarify` MUST 解决 FR-027 的活动标记并完成 `Related Feature` 绑定~~ — **已于 2026-09-24 完成**,4 项裁定的 Q→A 痕迹记在规格 `## Clarifications` > `### Session 2026-09-24`,绑定判定与逐候选排除理由记在规格 `## Related Feature` 与 `.specify/memory/features/053.md`。
 - `/speckit.plan` MUST 承接 FR-014 的债务:US1 落地时移除 `shared/constants/clarify-taxonomy.md` 的过渡 awk 抽取式与「Until that validator ships」一句。
-- `/speckit.plan` MUST 把 FR-022 的条款语法 owner 归属作为一个显式设计决策处理(实测 110 份契约文件、仅 21 份采用 `**C-N**` 形态、当前无 owner)。
+- `/speckit.plan` MUST 把 **FR-022 的条款语法 owner 归属**作为一个显式设计决策处理。实测输入已订正为:110 份契约里只有 **31** 份有机器可抽取形态(21 份 `**C-N**` + 9 份 OpenAPI/39 operation + 1 份结构化断言/6 条),**79 份 `.md` 一份都没有**;且 owner 文档若新建在 `shared/definitions/` 下,从第一稿起就落在门控扫描面内(`SCAN_DIRS` 含 `shared`)而预算整数余量为 **0**。
+- `/speckit.plan` MUST 把 **FR-028 的 `.yaml` 处置**作为设计选择处理(两种语法各写一个抽取器,或逐个点名跳过并计入 FR-023 的伴生量)——本阶段只订正了其事实前提,未替 plan 做选择。
+- `/speckit.plan` MUST 承接 **FR-027 裁定产生的新制品**:一份冻结的未覆盖项**名字级**基线文件,落在本特性目录(与 SC-012 的测试名字级基线同类但不同物),采集时机见 `### Measurement Sources & Collection Methods` 的 `FR-027 基线 Source` 行。
+- **范围外但已实测的两笔欠账**(记在 `.specify/memory/features/053.md` § Future Evolution Suggestions,plan MUST NOT 顺手纳入):① `scripts/python/` 下四个脚本各自重复定义同一张 `EXIT_*` 表而 `shared/`、`templates/`、`docs/` 对该表的命中数为 **0**(无 owner),`skills/create-team/scripts/build-summary-input.py` 另有第五套且 3/4 语义相左;② `Consumed by` 列的**反向**检查全仓无守卫,US1 检查器是其最自然的落点。
