@@ -4,6 +4,7 @@ Verifies that shell scripts resolve spec paths consistently across the
 .specify/scripts/bash/ layer (Feature 022 / T017).
 """
 
+import json
 import re
 import subprocess
 from pathlib import Path
@@ -98,15 +99,27 @@ class TestSpecifyScriptPaths:
             f"check-prerequisites.sh printed usage, so a flag was not accepted: {combined[:300]}"
         )
         if result.returncode == 0:
-            for key in (
-                "REQUIREMENTS_DIR",
-                "FEATURE_ID",
-                "FEATURE_NAME",
-                "requirements.md",
-                "plan.md",
-                "tasks.md",
-            ):
-                assert key in result.stdout, f"missing {key} in the JSON output"
+            payload = json.loads(result.stdout)
+            # Keys the script always emits once it has resolved a feature. These
+            # are independent of which optional artifacts happen to exist.
+            for key in ("REQUIREMENTS_DIR", "FEATURE_ID", "FEATURE_NAME", "MODE", "WRITABLE"):
+                assert key in payload, f"missing {key} in the JSON output"
+            docs = payload["AVAILABLE_DOCS"]
+            assert "requirements.md" in docs, (
+                "--require-spec succeeded but requirements.md is absent from AVAILABLE_DOCS"
+            )
+            # plan.md / tasks.md are listed iff they exist on disk. Asserting them
+            # unconditionally would re-bind this test to repo state -- the exact
+            # defect the docstring rules out -- and would go red throughout every
+            # /speckit.plan -> /speckit.tasks window, where plan.md exists and
+            # tasks.md does not. The flag was still acted on: --include-plan is what
+            # puts plan.md in the list at all.
+            spec_dir = Path(payload["REQUIREMENTS_DIR"])
+            for name in ("plan.md", "tasks.md"):
+                assert (name in docs) == (spec_dir / name).is_file(), (
+                    f"AVAILABLE_DOCS disagrees with the filesystem about {name}: "
+                    f"listed={name in docs} exists={(spec_dir / name).is_file()}"
+                )
         else:
             # Anti-vacuity: the tolerated non-zero exit must be the missing-artifact
             # form the --include flags themselves produce, not some other failure.
