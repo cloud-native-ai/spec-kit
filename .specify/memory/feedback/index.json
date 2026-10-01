@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-09-24T03:23:40Z",
+  "updated": "2026-10-01T19:44:25Z",
   "threshold": 10,
-  "count_since_submission": 3,
+  "count_since_submission": 4,
   "submitted_at": "2026-09-23T12:55:38Z",
   "entries": [
+    {
+      "id": "20261001T194425Z-speckit-plan",
+      "file": "20261001T194425Z-speckit-plan.md",
+      "unit_id": "/speckit.plan",
+      "unit_type": "command",
+      "run_id": "053-machine-decidable-artifacts-plan-20261002",
+      "probe": "speckit-plan-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "053-machine-decidable-artifacts",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-10-01T19:44:25Z",
+      "summary": "Phase 0 derived Technical Context from the codebase (no research.md existed) via 3 fresh-context read-only exploration subagents split US1 / US2+US3 / US4+US5, each carrying the fast-fail dispatch-inj"
+    },
     {
       "id": "20260924T032340Z-speckit-clarify",
       "file": "20260924T032340Z-speckit-clarify.md",
