@@ -3,7 +3,7 @@
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-09-23
 **Feature**: [requirements.md](../requirements.md) · Feature 053 · Status `Draft`
-**Validation runs**: 2 — ① 2026-09-23 初稿(15/16,唯一未过项为 FR-027 的活动标记);② 2026-09-24 `/speckit.clarify` Mode A 回写**之后**复验(16/16)。本次复验即 FR-013 自己要求的「清单更新置于澄清回写之后」,依据 `shared/guidelines/requirements-guidelines.md` § Validation Process。
+**Validation runs**: 3 — ① 2026-09-23 初稿(15/16,唯一未过项为 FR-027 的活动标记);② 2026-09-24 `/speckit.clarify` Mode A 回写**之后**复验(16/16);③ **2026-10-02** `/speckit.plan` Phase 0 上游修订**之后**复验(16/16)——该轮按用户裁定把 FR-018 扩为覆盖两个命题并给 US2 增验收场景 6,依 `/speckit.plan` 的上游优先规则「先重构 requirements.md、复验其清单一次,再填计划模板」执行。第 ② 轮即 FR-013 自己要求的「清单更新置于澄清回写之后」,依据 `shared/guidelines/requirements-guidelines.md` § Validation Process。
 
 ## Content Quality
 
@@ -83,15 +83,17 @@
 | 用户故事数与优先级分布 | **5**(P1×2、P2×2、P3×1),无占位故事 | — |
 | Edge Cases | **10** 条(初稿 8,新增自定位自匹配与「可解析但抽出零条款」),含门控预算余量为 0 这一条 | — |
 | `## Related Feature` 绑定 | 已解析为 **Feature 053**(全文件对 `Need clarification` 命中 **0**) | feature-integration.md § Feature Binding Rules |
-| `## Clarifications` 回写 | `### Session 2026-09-24` 下 **4** 条 bullet,一条对应一个被接受的裁定 | clarify Mode A 步骤 5 |
+| `## Clarifications` 回写 | **两个** session 小节共 **5** 条 bullet:`### Session 2026-09-24` 下 4 条来自 `/speckit.clarify` Mode A,`### Session 2026-10-02` 下 1 条来自 `/speckit.plan` Phase 0(FR-018 扩围裁定,按追加而非替换记入) | clarify Mode A 步骤 5 |
+| US2 验收场景数 | **6**(第 ③ 轮由 5 增为 6,新增场景对应 FR-018(b)) | FR-018 |
+| FR-018 覆盖的命题数 | **2**((a) 同条款同区间 · (b) 同测试路径且绿点不同),规格明文要求二者 MUST 分列 | FR-018 |
 
-**复验时间**:2026-09-24(clarify 回写之后)。以上每行均由程序实跑得出,非目测——初稿正是把这 11 行里的第 1、2 行写错了(检查面 5→6、钉子 0→2),而散文读起来完全通顺。
+**复验时间**:2026-10-02(第 ③ 轮,`/speckit.plan` Phase 0 上游修订之后;FR 仍 48、SC 仍 12,编号未变故无需重编号)。以上每行均由程序实跑得出,非目测——初稿正是把这 11 行里的第 1、2 行写错了(检查面 5→6、钉子 0→2),而散文读起来完全通顺。
 
 ### 交给下一阶段的依赖
 
 - ~~`/speckit.clarify` MUST 解决 FR-027 的活动标记并完成 `Related Feature` 绑定~~ — **已于 2026-09-24 完成**,4 项裁定的 Q→A 痕迹记在规格 `## Clarifications` > `### Session 2026-09-24`,绑定判定与逐候选排除理由记在规格 `## Related Feature` 与 `.specify/memory/features/053.md`。
 - `/speckit.plan` MUST 承接 FR-014 的债务:US1 落地时移除 `shared/constants/clarify-taxonomy.md` 的过渡 awk 抽取式与「Until that validator ships」一句。
-- `/speckit.plan` MUST 把 **FR-022 的条款语法 owner 归属**作为一个显式设计决策处理。实测输入已订正为:110 份契约里只有 **31** 份有机器可抽取形态(21 份 `**C-N**` + 9 份 OpenAPI/39 operation + 1 份结构化断言/6 条),**79 份 `.md` 一份都没有**;且 owner 文档若新建在 `shared/definitions/` 下,从第一稿起就落在门控扫描面内(`SCAN_DIRS` 含 `shared`)而预算整数余量为 **0**。
+- `/speckit.plan` MUST 把 **FR-022 的条款语法 owner 归属**作为一个显式设计决策处理。实测输入已订正为:110 份契约里至少 **5** 种机器可辨形态,可解析面 **57 / 110**、残余 **53** 份(闭合粗体 21 / 括注粗体 1 / `## C-N` 标题形 25 / OpenAPI 9 / 结构化断言 1);**残余数是 owner 声明覆盖面的函数,不是定值**——plan MUST 让 owner 显式声明其覆盖的形态;且 owner 文档若新建在 `shared/definitions/` 下,从第一稿起就落在门控扫描面内(`SCAN_DIRS` 含 `shared`)而预算整数余量为 **0**。
 - `/speckit.plan` MUST 把 **FR-028 的 `.yaml` 处置**作为设计选择处理(两种语法各写一个抽取器,或逐个点名跳过并计入 FR-023 的伴生量)——本阶段只订正了其事实前提,未替 plan 做选择。
 - `/speckit.plan` MUST 承接 **FR-027 裁定产生的新制品**:一份冻结的未覆盖项**名字级**基线文件,落在本特性目录(与 SC-012 的测试名字级基线同类但不同物),采集时机见 `### Measurement Sources & Collection Methods` 的 `FR-027 基线 Source` 行。
 - **范围外但已实测的两笔欠账**(记在 `.specify/memory/features/053.md` § Future Evolution Suggestions,plan MUST NOT 顺手纳入):① `scripts/python/` 下四个脚本各自重复定义同一张 `EXIT_*` 表而 `shared/`、`templates/`、`docs/` 对该表的命中数为 **0**(无 owner),`skills/create-team/scripts/build-summary-input.py` 另有第五套且 3/4 语义相左;② `Consumed by` 列的**反向**检查全仓无守卫,US1 检查器是其最自然的落点。
