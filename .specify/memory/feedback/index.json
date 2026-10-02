@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-10-01T19:44:25Z",
+  "updated": "2026-10-02T02:58:11Z",
   "threshold": 10,
-  "count_since_submission": 4,
+  "count_since_submission": 5,
   "submitted_at": "2026-09-23T12:55:38Z",
   "entries": [
+    {
+      "id": "20261002T025811Z-speckit-tasks",
+      "file": "20261002T025811Z-speckit-tasks.md",
+      "unit_id": "/speckit.tasks",
+      "unit_type": "command",
+      "run_id": "053-machine-decidable-artifacts-tasks-20261002",
+      "probe": "speckit-tasks-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "053-machine-decidable-artifacts",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-10-02T02:58:11Z",
+      "summary": "First-time generation from complete design artifacts: 49 tasks / 8 phases (Setup 2, Foundational 4, US1 10, US2 7, US3 6, US4 8, US5 6, Polish 6), 18 [P] markers, 36 blockedBy rows, IDs contiguous, va"
+    },
     {
       "id": "20261001T194425Z-speckit-plan",
       "file": "20261001T194425Z-speckit-plan.md",
