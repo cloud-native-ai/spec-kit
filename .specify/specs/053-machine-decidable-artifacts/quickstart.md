@@ -120,7 +120,7 @@ REORDER_EOF
 sed 's/\[\[STR-005\]\]/[[STR-999]]/' $src > $tmp/b3.md
 # 破坏 4:活动标记(插入一个带冒号、未被反引号包裹的标记)
 sed '0,/^## Overview/s//## Overview\n\n[NEEDS CLARIFICATION: probe]/' $src > $tmp/b4.md
-for f in $tmp/b1.md $tmp/b3.md $tmp/b4.md; do
+for f in $tmp/b1.md $tmp/b2.md $tmp/b3.md $tmp/b4.md; do
   python3 scripts/python/validate-requirements.py "$f"; echo "EXIT=$?"
 done
 ```
@@ -256,7 +256,7 @@ comm -13 <(sort -u $b) <(sort -u $c) | wc -l
 > - 基线 MUST 连同**当轮 owner 声明覆盖哪些形态**一起记录,否则「可解析文件数」在两个 owner 定义之间不可比
 > - MUST NOT 复制 `scan-confirmation-gates.py --baseline` 的比较形态(它读基线**顶层** `total` 而冻结值嵌在 `confirmationGates` 下,退出码只反映 `violations`,作为相等门不可用;该缺陷已记录两次而上游仍未修)
 
-**预期结果**(改后 MUST 实测):`comm -13 coverage-baseline.txt <(当前未覆盖集)` 为空即通过;基线内既有项不阻断但每轮印出计数。
+**预期结果**(改后 MUST 实测):`comm -13 .specify/specs/053-machine-decidable-artifacts/coverage-baseline.txt <(当前未覆盖集)` 为空 **且** 同一轮印出的「本特性已认领条款数」非空——两条成对才构成通过(C-21 于 2026-10-03 增:未覆盖集为空而认领为零,是「空因为盲」不是「空因为对」)。基线 MUST 在**排除本特性自己目录**的语料上冻结(FR-027 § 基线面),故 053 自己的条款与 FR 恒在基线之外、只能被认领不能被豁免;基线内既有项不阻断,但每轮印出其计数。
 
 ---
 
@@ -370,7 +370,10 @@ python3 scripts/python/scan-confirmation-gates.py --summary
 
 # 11c 镜像无新增漂移(FR-047):逐对给出判据,不用全树绝对判据
 for p in scripts/python shared/definitions shared/guidelines shared/constants \
-         templates/tasks-template.md templates/commands; do
+         templates/tasks-template.md templates/commands templates skills \
+         skills/create-team/references/execution-guide.md \
+         skills/create-team/references/goal.md \
+         skills/create-team/scripts/build-summary-input.py; do
   out=$(python3 scripts/python/sync-mirrors.py --check --only "$p" 2>&1); code=$?
   printf '%-30s EXIT=%s\n' "$p" "$code"
 done
@@ -387,7 +390,10 @@ python3 scripts/python/regen-command-copies.py --check; echo "regen EXIT=$?"
 | `shared/constants` | 0 `ok (3 files)` | 绝对 |
 | `templates/tasks-template.md` | 0 `ok (1 files)` | 绝对 |
 | `templates/commands` | 0 | 绝对 |
-| **全树**(不带 `--only`) | **2** DRIFT(既有 `skills/summarize-project`、`skills/think-skills`、`scripts/python/trigger-utils` 三处) | MUST NOT 用绝对判据 |
+| `templates`(整对;2026-10-03 由第二轮 `/speckit.analyze` 补测) | **2** —— **2** 处 DIFF(`.specify/templates/proactive-trigger-seed.json`、`.specify/templates/skills-template.md`,皆先于本特性,最后提交 2026-09-20) | **相对**:无新增漂移(本特性不写这两个文件;T023 的 `--write --only templates` 会把它们一并同步,见 plan.md 订正记录 4) |
+| `skills`(整对;2026-10-03 由 `/speckit.analyze` 补测——初版**从未测过这一对**,因为它不在计划表里) | **2** —— **30** 处 DIFF(皆先于本特性,含同目录的 `operating-loops.md`、`summary-mapping.md`) | **相对**:无新增漂移 |
+| `skills/create-team/references/execution-guide.md`、`.../references/goal.md`、`.../scripts/build-summary-input.py`(2026-10-03 补测) | 三个**单文件**各自 **0** —— 当前与各自镜像逐字节相同 | 绝对;这三处正是 T034/T041 的写入面 |
+| **全树**(不带 `--only`) | **2** DRIFT,实测 **33** 处 = `skills` **30** + `templates` **2** + `scripts/python` **1**(初版记为「三处」并把余下 30 处全归给 `skills`,漏了 `templates` 对里的 2 处) | MUST NOT 用绝对判据 |
 | `regen-command-copies.py --check` | **0**「OK: all per-tool command copies match the source templates.」 | 绝对 |
 
 **⚠ 测量陷阱(本轮踩到并已订正)**:经 `| tail` 取 `$?` 得到的是 `tail` 的退出码而非脚本的——第一次测量因此把 `scripts/python` 的 EXIT=2 误报为 0。MUST 用 `PIPESTATUS` 或如上例那样先赋值再取码。

@@ -27,7 +27,7 @@
 
 **C-8** [制品类] 暴露面实测:`SCAN_DIRS = ("templates/commands", "skills", "shared")`(`:35`)与 `SCAN_ROOT_FILES = ("templates",)`(`:36`,glob `templates/*.md` 的非目录项,`:90-95`)意味着本特性触及的以下落点**全部在扫描面内**——`shared/definitions/contract-clause-definitions.md`(新建)、`shared/definitions/goal-definitions.md`、`shared/guidelines/requirements-guidelines.md`、`shared/constants/clarify-taxonomy.md`、`templates/tasks-template.md`、`templates/commands/requirements.md`、`templates/commands/tasks.md`。`SKIP_DIR_PARTS`(`:37`)含 `.specify`,故本 spec 目录下的契约文件**不在**扫描面内。(FR-045、D-16)
 
-**C-9** [制品类] 措辞回避的判据是 `BLOCKING_PATTERNS`(`:46-64`,实测 **18** 条)与 `BLOCKING_RE`(`:65`):每个在扫描面内落盘的新增/修改文件 MUST 逐条对 `BLOCKING_RE` 实跑核验为 **0** 命中后才算落地。判据:核验命令与输出记入本特性 `verification.md`。(FR-045)
+**C-9** [制品类] 措辞回避的判据是 `BLOCKING_PATTERNS`(`:46-64`,实测 **17** 条)与 `BLOCKING_RE`(`:65`):每个在扫描面内落盘的新增/修改文件 MUST 逐条对 `BLOCKING_RE` 实跑核验为 **0** 命中后才算落地。判据:核验命令与输出记入本特性 `verification.md`。(FR-045)(2026-10-03 订正:此处曾印 **18** 条——该数在本仓已被订正过两次(`051` 记录 18→17、`052` 全程用 17、且有测试断言 `== 17`),而 `plan.md` § 第三轮缺陷清单第 2 项声称「7 个位置已全部订正」,本契约正是那 7 个位置里唯一漏改的一处,故此处不只是数字错、还证伪了一条完成性声明。AST `literal_eval` 实测:`len(BLOCKING_PATTERNS) == 17`。)
 
 **C-10** [行为类] 扫描器本身 MUST 在本特性窗口内**零改动**。判据:对 `scripts/python/scan-confirmation-gates.py` 与其镜像做 `git diff`,窗口内为空(与 052 的同名判据同形)。(FR-045)
 

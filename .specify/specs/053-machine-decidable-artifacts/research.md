@@ -324,6 +324,7 @@ def test_help_labels_every_action_read_or_write(capsys):
 - **A-4**(子代理对 `.yaml` 形态的误判):探查子代理报「10 份 `.yaml` 全部是 OpenAPI」且判据为「无字面 `operations:` 键」。**编排者重导后证伪**:实为 9 份 OpenAPI + 1 份 `assertions[].id` 结构化断言(文件名恰为 `.openapi.yaml`),而 OpenAPI 的 operation 是 `paths:` 下的 HTTP 方法键、本就不是一个字面键名。**处置:已订正**,并回写进规格 FR-028(MUST NOT 以 `operations:` 键名作探测条件)。
 - **A-5**(子代理对「三处钉子」的表述):形态数 3 正确、站点数不止 3。**处置:已订正**为 9 个断言站点 + 4 个元钉子,见 D-16。
 - **A-6**(`goal-utils.py` 的第 8 个 verdict 字面量 `rejected`):不在 STR-006 的 7 个字面量内。**处置:已订正**——经实测确认 `rejected` 只由 `check-statement`/`targets --check` 发出、与五项检查无关,故 STR-006 的「7 个」是 `run-checks` 的词表而非该二进制的全词表;该精度已回写进规格 STR-006 行,MUST NOT 因本特性删改 `rejected`。
+- **A-7**(FR 侧有没有一份基线 — 2026-10-03 第二轮 `/speckit.analyze` 的校验波提出,登记而未裁定):C-21 冻结的名字集按 `contracts/*` 的**条款名**建键,故它天然只承载条款侧;而 T025 要求「两侧都 empty-beyond-baseline」、FR-027 § 基线面 也只写了条款侧。于是既有 spec 的 **FR 欠账没有豁免通道**。实测(本轮自己跑的,不继承子代理的数;抽取按 C-2 的三条规则:块边界 + 引用组 + 区间展开):44 个 spec 目录都声明了 FR,FR 定义行合计 **812** 条;其中 **38** 个目录的契约里**没有任何引用组提到 FR**(即 FR 侧全集几乎全部未覆盖,按 FR-026 的新读法会永久报红)。**两种读法都成立、都需要一个新决定**:① 给 FR 侧另立一份以 `<spec 目录>/FR-nnn` 限名的基线(代价:要与 FR-027 首句「MUST NOT 要求改造既有 spec 的契约文件」并存,并给 C-21/C-23 加一个第二名单);② 把 FR 侧核算限定在 `--spec-dir` 指定的单个 spec 内、并从 T025 的措辞里去掉「beyond-baseline」(代价:FR 侧从此没有跨仓欠账视图)。**处置:上送**——本特性不在 analyze 阶段发明未记录的意图;`data-model.md` E-3c 的 `universe` 字段已就地标注此未决点。
 
 ### 编排者自身在本轮查出并订正的缺陷
 

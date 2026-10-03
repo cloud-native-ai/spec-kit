@@ -25,11 +25,11 @@
 | ↳ 制品类 / 行为类 | **139 / 43**(未标注 **0**) | 同上,分别加 ` \[制品类\]` / ` \[行为类\]` 后缀 |
 | 条款 id 逐文件连续 | **7 / 7** 文件均为 `C-1…C-n` 无缺号 | 逐文件抽取 id 序列比对 `range(1, n+1)` |
 | FR 总数 | **48** | 对 `requirements.md` 数 `^- \*\*FR-[0-9]+\*\*` |
-| 有 ≥1 条款的 FR | **48**(**未覆盖 0**) | 反向索引:条款正文里**代码跨度之外**的 `FR-\d+` 引用 → 按 FR 聚合 |
-| FR→条款引用总数(**去重**) | **166** 个唯一 `(文档, C-N)` 对 | 上述聚合后取集合大小 |
-| FR→条款引用总数(**含重复**) | **192** | 下表第 3 列求和 |
-| 不引用任何 FR 的条款 | **16** | 逐条检查正文(代码跨度之外)是否含 `FR-\d+` |
-| SC 总数 / 有 ≥1 条款的 SC | **12 / 12**(未覆盖 **0**) | 同法按 `SC-\d+` 聚合 |
+| 有 ≥1 条款的 FR | **48**(**未覆盖 0**) | 反向索引:每条款的**引用组**(C-2:块内最后一个含 FR/SC id 的括号,容忍一层嵌套、`FR-a…FR-b` 区间展开;组外的同形字样按「提及」处理)→ 按 FR 聚合 |
+| FR→条款引用总数(**去重**) | **165** 个唯一 `(文档, C-N)` 对 | 上述聚合后取集合大小 |
+| FR→条款引用总数(**含重复**) | **188** | 下表第 3 列求和 |
+| 不引用任何 FR 的条款 | **17**(其中 **9** 条连 SC 也不引用) | 逐条检查其**引用组**是否含 `FR-\d+` |
+| SC 总数 / 有 ≥1 条款的 SC | **12 / 12**(未覆盖 **0**;去重 **26** / 含重复 **29**) | 同法按 `SC-\d+` 聚合 |
 | 含重复引用的行(同一条款被列两次) | **0** | 逐行按 `(文档, C-N)` 对去重后比对长度 |
 
 **生成这两张表时踩到并修掉的两个提取缺陷**(二者都是 US1 检查器 MUST 实现的规则,故在此留证):
@@ -39,9 +39,11 @@
 
 这两条一起构成一个**互相抵消**的错误对:缺陷 1 多算一次引用、缺陷 2 少算一次,含重复总数因此一度看起来正确(190),而两行都是错的。**只有按 `(文档, C-N)` 对去重后逐行核对才暴露得出来**——单看总数看不出来。
 
-**两个计数为什么不同(去重 166 vs 含重复 192)**:一条条款可以服务多条 FR(例:`checker-form` C-13 同时被 FR-005 与 FR-043 引用),故按 FR 求和会重复计入。**166 是唯一 `(文档, C-N)` 对数,192 是下表第 3 列的和**;报覆盖时必须说明用的是哪一个——052 plan 期曾因混用二者而印出 85 而非实际的 78。
+**(2026-10-03 第三处缺陷与本次重导)**:上面两张表此前由一条**没有写下来的规则**生成——它按「条款块的整段正文里任何位置的 `FR-nn`」计数,于是把散文中的**权限引用**(如某条判据里写「依据 FR-015/FR-016」)也算成覆盖,并且对同一条款给出 190/192/193 三种总数中的一种。现在规则写在 `contracts/clause-coverage.md` C-2(块边界 = 到下一个标记或下一个章节标题先到者;引用组 = 块内最后一个含 FR/SC id 的括号,容忍一层嵌套、区间展开),本表按该规则整表重导:含重复 **188**、去重 **165**、不引用 FR 的条款 **17**。改动波及 **18** 行(FR-014 少一条 `requirements-checker` C-21——那个 `FR-014` 只出现在中间的章节标题里;FR-025 多一条 `clause-coverage` C-21;其余为组外提及被剔除)。 durable 生成器 = 本特性的 `scripts/python/clause_extract.py`(T005)+ `account-clause-coverage.py`(T025);本文件是它的**发布视图**,MUST NOT 手工增删行。
 
-**16 条不引用 FR 的条款并非孤儿**:它们逐条可追溯到一条 SC、一个边界情形、或 `research.md` 的一个决策/上送项(例:`checker-form` C-18 → SC-001;`run-checks` C-16 → 边界情形「五项里有一项自身抛异常」;`clause-coverage` C-25 → `research.md` A-3 上送项)。
+**两个计数为什么不同(去重 165 vs 含重复 188)**:一条条款可以服务多条 FR(例:`checker-form` C-13 同时被 FR-005 与 FR-043 引用),故按 FR 求和会重复计入。**165 是唯一 `(文档, C-N)` 对数,188 是下表第 3 列的和**(重导前为 166 / 192);报覆盖时必须说明用的是哪一个——052 plan 期曾因混用二者而印出 85 而非实际的 78。
+
+**17 条不引用 FR 的条款并非孤儿**(其中 9 条连 SC 也不引用):它们逐条可追溯到一条 SC、一个边界情形、或 `research.md` 的一个决策/上送项(例:`checker-form` C-18 → SC-001;`run-checks` C-16 → 边界情形「五项里有一项自身抛异常」;`clause-coverage` C-25 → `research.md` A-3 上送项)。
 
 ## FR → 契约条款映射
 
@@ -50,30 +52,30 @@
 | FR | 主题(规格原文前 44 字) | 条款数 | 契约条款 |
 |---|---|---|---|
 | FR-001 | 每个新增的确定性检查器 MUST 是单一入口的可执行脚本,以被校验制品的路径为参数,以退… | 2 | `checker-form` C-1,C-2 |
-| FR-002 | 每个**新增**检查器的模块 docstring MUST 按 STR 的形态声明其 P… | 4 | `checker-form` C-4,C-5,C-6; `run-checks` C-25 |
+| FR-002 | 每个**新增**检查器的模块 docstring MUST 按 STR 的形态声明其 P… | 3 | `checker-form` C-4,C-5,C-6 |
 | FR-003 | 每个**新增**检查器 MUST 同时提供人读输出与 `--json` 机读输出,且二者… | 5 | `checker-form` C-3,C-7,C-8,C-9,C-33 |
 | FR-004 | 检查器 MUST 对「被校验文件不存在」「被校验文件不可解析」「被校验文件为空或仅含模板… | 3 | `checker-form` C-10,C-11,C-12 |
 | FR-005 | 所有检查器 MUST 是只读的:判定只经 stdout 与退出码表达,MUST NOT … | 2 | `checker-form` C-13,C-14 |
 | FR-006 | 系统 MUST 提供一个校验 `requirements.md` 的确定性检查器,其检查… | 3 | `requirements-checker` C-1,C-2,C-3 |
-| FR-007 | 编号连续性检查 MUST 按前缀分序列独立进行(`FR-` 与 `SC-` 各自成序),… | 4 | `requirements-checker` C-2,C-4,C-5,C-29 |
-| FR-008 | 文档序检查 MUST 锚定在**定义行**上,而不是在 ID 的每次出现上;其违例输出形… | 5 | `requirements-checker` C-5,C-7,C-8,C-9,C-10 |
-| FR-009 | 引用可解析检查 MUST 覆盖 `FR-\d+`、`SC-\d+` 与 `[[STR-\… | 6 | `requirements-checker` C-11,C-12,C-14,C-15,C-28,C-29 |
-| FR-010 | 活动标记计数 MUST 只统计**带冒号且未被反引号包裹**的实例。依据:一份讨论澄清机… | 2 | `requirements-checker` C-16,C-17 |
+| FR-007 | 编号连续性检查 MUST 按前缀分序列独立进行(`FR-` 与 `SC-` 各自成序),… | 3 | `requirements-checker` C-2,C-4,C-5 |
+| FR-008 | 文档序检查 MUST 锚定在**定义行**上,而不是在 ID 的每次出现上;其违例输出形… | 6 | `requirements-checker` C-2,C-5,C-7,C-8,C-9,C-10 |
+| FR-009 | 引用可解析检查 MUST 覆盖 `FR-\d+`、`SC-\d+` 与 `[[STR-\… | 7 | `requirements-checker` C-2,C-11,C-12,C-14,C-15,C-28,C-29 |
+| FR-010 | 活动标记计数 MUST 只统计**带冒号且未被反引号包裹**的实例。依据:一份讨论澄清机… | 3 | `requirements-checker` C-2,C-16,C-17 |
 | FR-011 | 检查器 MUST 对同一 ID 被定义两次报 ERROR,且与「引用不可解析」分列(二者… | 3 | `requirements-checker` C-2,C-13,C-29 |
-| FR-012 | `/speckit.requirements` MUST 在写完规格后调用该检查器,并在… | 4 | `neutrality-budget` C-2,C-15; `requirements-checker` C-18,C-19 |
-| FR-013 | `shared/guidelines/requirements-guidelines.m… | 3 | `neutrality-budget` C-15; `requirements-checker` C-20,C-21 |
-| FR-014 | US1 落地后,`shared/constants/clarify-taxonomy.m… | 6 | `requirements-checker` C-21,C-22,C-23,C-24,C-26,C-27 |
-| FR-015 | tasks 模板 MUST 定义一个行内归属声明面,其字面形态为 STR;一行任务 MA… | 5 | `green-point-claim` C-1,C-2,C-3,C-5; `neutrality-budget` C-2 |
+| FR-012 | `/speckit.requirements` MUST 在写完规格后调用该检查器,并在… | 3 | `neutrality-budget` C-15; `requirements-checker` C-18,C-19 |
+| FR-013 | `shared/guidelines/requirements-guidelines.m… | 2 | `requirements-checker` C-20,C-21 |
+| FR-014 | US1 落地后,`shared/constants/clarify-taxonomy.m… | 5 | `requirements-checker` C-22,C-23,C-24,C-26,C-27 |
+| FR-015 | tasks 模板 MUST 定义一个行内归属声明面,其字面形态为 STR;一行任务 MA… | 4 | `green-point-claim` C-1,C-2,C-3,C-5 |
 | FR-016 | `validate-tasks.py` MUST 把 STR 形态的声明解析为 `(契约… | 5 | `green-point-claim` C-6,C-7,C-9,C-10,C-11 |
 | FR-017 | `validate-tasks.py` MUST 增一项 **WARN** 级检查:某条… | 3 | `green-point-claim` C-12,C-13,C-14 |
 | FR-018 | 归属声明的冲突检查 MUST 覆盖**两个**命题;二者相关但不是同一个检查,故 MUS… | 5 | `green-point-claim` C-15,C-16,C-17,C-18,C-19 |
 | FR-019 | 归属声明 MUST 与既有的行形态检查正交:一行只声明归属而不声明文件路径时,既有检查 … | 5 | `green-point-claim` C-20,C-21,C-22,C-23,C-24 |
-| FR-020 | 出现在**围栏代码块内**的 STR 形态 MUST NOT 被当作真实归属声明解析。… | 3 | `green-point-claim` C-8; `requirements-checker` C-28,C-29 |
+| FR-020 | 出现在**围栏代码块内**的 STR 形态 MUST NOT 被当作真实归属声明解析。… | 1 | `green-point-claim` C-8 |
 | FR-021 | 归属声明面 MUST 项目中立:MUST NOT 含本仓专有名词,其形态说明 MUST … | 2 | `green-point-claim` C-4; `neutrality-budget` C-3 |
 | FR-022 | 系统 MUST 为契约的**条款语法**指定唯一 owner:要么指定一份既有文档为 o… | 6 | `clause-coverage` C-1,C-2,C-3,C-4,C-5; `green-point-claim` C-11 |
 | FR-023 | 核算脚本 MUST 按 owner 定义的形态抽出条款全集;对无法按该形态解析的文件 M… | 5 | `clause-coverage` C-7,C-8,C-9,C-13,C-14 |
 | FR-024 | 核算 MUST 以**集合差**表达结果:全集减去被认领子集,印出未覆盖集,前缀形态为 … | 1 | `clause-coverage` C-16 |
-| FR-025 | 未覆盖集为空时,脚本 MUST 同时印出至少一个**必须非空**的伴生量(已认领条款数、… | 1 | `clause-coverage` C-17 |
+| FR-025 | 未覆盖集为空时,脚本 MUST 同时印出至少一个**必须非空**的伴生量(已认领条款数、… | 2 | `clause-coverage` C-17,C-21 |
 | FR-026 | 条款未覆盖与 FR 未覆盖 MUST 分列,二者的全集来源不同,MUST NOT 合并为… | 1 | `clause-coverage` C-18 |
 | FR-027 | 覆盖核算 MUST NOT 要求改造既有 spec 的契约文件。对既有 **44** 个… | 6 | `clause-coverage` C-20,C-21,C-22,C-23,C-24; `neutrality-budget` C-17 |
 | FR-028 | `.yaml` 形态的契约(实测 **10** 份)MUST 被覆盖核算显式处置:MUS… | 5 | `clause-coverage` C-10,C-11,C-12,C-13,C-26 |
@@ -112,12 +114,12 @@
 | SC-004 | 悬空归属(指向不存在的契约文件或条款 id)被判为 ERROR 而非 WARN,… | 3 | `green-point-claim` C-9,C-10,C-14 |
 | SC-005 | 覆盖核算以集合差表达:对一份 3 条款契约、2 条被认领的最小 spec,印出的… | 3 | `clause-coverage` C-16,C-19; `neutrality-budget` C-18 |
 | SC-006 | 条款语法有唯一 owner:owner 文档存在、声明其覆盖的形态、并被核算脚本… | 2 | `clause-coverage` C-7,C-27 |
-| SC-007 | [[STR-005]] 一次调用输出五条 check 且字段齐备;对一个 goa… | 2 | `run-checks` C-3,C-28 |
+| SC-007 | [[STR-005]] 一次调用输出五条 check 且字段齐备;对一个 goa… | 1 | `run-checks` C-28 |
 | SC-008 | 短路项不报绿:构造一个使某项检查前置条件不成立的团队,该条 verdict 为 … | 1 | `run-checks` C-13 |
 | SC-009 | 指代形的价值可被直接看见:对同一主体集合分别用指代形与成员枚举写两条判据,在目录… | 1 | `criterion-subject` C-13 |
-| SC-010 | 向后兼容:本特性落地前后,对仓内**全部**既有 goal 定义跑一次解析,失败… | 4 | `clause-coverage` C-24; `criterion-subject` C-11,C-12; `neutrality-budget` C-18 |
+| SC-010 | 向后兼容:本特性落地前后,对仓内**全部**既有 goal 定义跑一次解析,失败… | 2 | `criterion-subject` C-11; `neutrality-budget` C-18 |
 | SC-011 | 「机器给出的绿」的证据纪律被执行:本特性新增的检查项**逐项**都有逆样本,逆样… | 3 | `checker-form` C-16,C-17; `green-point-claim` C-27 |
-| SC-012 | 预算与中立性保持:落地后 `scan-confirmation-gates.py… | 7 | `clause-coverage` C-24; `neutrality-budget` C-1,C-4,C-16,C-17,C-18,C-19 |
+| SC-012 | 预算与中立性保持:落地后 `scan-confirmation-gates.py… | 6 | `neutrality-budget` C-1,C-4,C-16,C-17,C-18,C-19 |
 
 ## 交付面清单
 

@@ -14,7 +14,7 @@
 
 范围边界(承自规格):不做语义正确性判断(仍归 `/speckit.analyze` 与 `/speckit.clarify`);不新增门控停等点、不改阶段划分或状态机、不引入守护进程或文件监听;检查器只由命令在其既有步骤内调用或由测试直接调用。
 
-**Phase 0 产出**:18 条决策(D-1…D-18)+ 6 条上送异常(A-1…A-6)落在 [research.md](./research.md),每条附实测命令与行号。其中 **3 条经用户裁定**(D-1 条款语法 owner 的形态、D-2 `.yaml` 的处置、D-3 FR-018 的辖域);D-3 扩大了 FR-018 的范围,故按上游优先规则**先改 `requirements.md`**(FR-018 改写、US2 增验收场景 6、`## Clarifications` 追加第 5 条)并复验清单一次(16/16),再填本模板。
+**Phase 0 产出**:18 条决策(D-1…D-18)+ 7 条上送异常(A-1…A-7;A-7 由 2026-10-03 第二轮 `/speckit.analyze` 增)落在 [research.md](./research.md),每条附实测命令与行号。其中 **3 条经用户裁定**(D-1 条款语法 owner 的形态、D-2 `.yaml` 的处置、D-3 FR-018 的辖域);D-3 扩大了 FR-018 的范围,故按上游优先规则**先改 `requirements.md`**(FR-018 改写、US2 增验收场景 6、`## Clarifications` 追加第 5 条)并复验清单一次(16/16),再填本模板。
 
 ## Technical Context
 
@@ -112,7 +112,7 @@
 ```text
 .specify/specs/053-machine-decidable-artifacts/
 ├── plan.md              # 本文件(/speckit.plan 输出)
-├── research.md          # Phase 0 输出:18 条决策 D-1…D-18 + 6 条上送异常 A-1…A-6
+├── research.md          # Phase 0 输出:18 条决策 D-1…D-18 + 7 条上送异常 A-1…A-7
 ├── data-model.md        # Phase 1 输出:8 个实体标题 + 3 个派生实体 / 40 条校验规则 V-1…V-40
 ├── quickstart.md        # Phase 1 输出:12 个场景(10 个含改前已实跑的真实输出)/ 7 处逐例前提清单
 ├── contracts/           # Phase 1 输出:7 份文档 / 182 条条款(139 制品类 + 43 行为类)
@@ -174,12 +174,18 @@ tests/contract/                     # 改 3 个既有测试 + 新增 4 组钉子
 | `templates/commands/requirements.md`(改) | `.claude/commands/speckit.requirements.md`、`.github/prompts/speckit.requirements.prompt.md`、`.qoder/commands/speckit.requirements.md`、`.opencode/command/speckit.requirements.md` | `regen-command-copies.py --check`;改前 **EXIT=0**「OK: all per-tool command copies match the source templates.」⇒ 绝对判据可用 |
 | `templates/commands/tasks.md`(改) | 同上 4 个逐工具副本(`speckit.tasks`) | 同上(同一命令) |
 | `templates/commands/team.md`(改,增 `run-checks` 调用形式) | 同上 4 个逐工具副本(`speckit.team`) | 同上 |
+| `skills/create-team/references/execution-guide.md`、`skills/create-team/references/goal.md`(改,US4 的义务落点)、`skills/create-team/scripts/build-summary-input.py`(改,退出码表对齐) | `.specify/skills/create-team/references/execution-guide.md`、`.specify/skills/create-team/references/goal.md`、`.specify/skills/create-team/scripts/build-summary-input.py` —— `skills` 是 `sync-mirrors.py` `MIRROR_PAIRS`(`:72-78`,顺序为 templates, skills, agents, scripts, shared)的**第二**对,初版把这行整条漏了(见订正记录 3) | 逐文件判据:`--check --only <该文件>`。改前 2026-10-03 实测三个**单文件**均为 **EXIT=0**(与镜像逐字节相同),故这三处**绝对判据可用**;但整对 `--only skills` 改前为 **EXIT=2 / 30 DIFF**(先于本特性,含同目录的 `operating-loops.md`、`summary-mapping.md` 两个兄弟文件),故**对级判据 MUST 取关系形**,改前名字清单由 T002 落进 `notes/pre-change-measurements.md`,此后只对新增 DIFF 阻断 |
+| `templates/` 对里的两个既有欠账文件(本特性不写它们,但 T023 的 `sync-mirrors.py --write --only templates` 按**对**复制,会把它们一并同步) | `.specify/templates/proactive-trigger-seed.json`、`.specify/templates/skills-template.md` | `--check --only templates`;改前实测 **EXIT=2 / 2 DIFF**(2026-10-03;先于本特性,`templates/` 与其镜像最后提交 2026-09-20)⇒ **对级判据 MUST 取关系形**,改前名单由 T002 采集。本行是 2026-10-03 第二轮 `/speckit.analyze` 补的漏项(订正记录 4):此前 DoD-4 的「every other pair absolute」在读到本对时会默认它们干净,而写侧范围大于所有被认领的读侧范围 |
 
-**全树判据 MUST NOT 用绝对形**:不带 `--only` 的 `sync-mirrors.py --check` 改前为 **EXIT=2 DRIFT**,三处既有 DIFF(`.specify/skills/summarize-project/SKILL.md`、`.specify/skills/think-skills/SKILL.md`、`.specify/scripts/python/trigger-utils.py`)皆先于本特性存在。
+**全树判据 MUST NOT 用绝对形**:不带 `--only` 的 `sync-mirrors.py --check` 改前为 **EXIT=2 DRIFT**,实测 **33** 处 DIFF(2026-10-03 重跑,退出码经赋值后取)。初版记为「三处既有 DIFF」并只点名 `.specify/skills/summarize-project/SKILL.md`、`.specify/skills/think-skills/SKILL.md`、`.specify/scripts/python/trigger-utils.py` 三个文件——这三处确在列,但**逐对分解是 `skills` 30 + `templates` 2 + `scripts/python` 1 = 33**:初版把余下 30 处全归给 `skills`,而其中 **2 处在 `templates` 对内**(`.specify/templates/proactive-trigger-seed.json`、`.specify/templates/skills-template.md`),该对当时在表里根本没有行(2026-10-03 由第二轮 `/speckit.analyze` 查出并补,见下表与订正记录 4)。33 处皆先于本特性存在——依据是 `skills/` 与其镜像的最后提交 **2026-09-23**、`templates/` 与其镜像的最后提交 **2026-09-20**,两者都早于本特性的任何编辑;此处原先写的「工作树干净」是**假前提**(本轮整改自己就有 6 个未提交文件),结论靠提交日期成立,不靠工作树状态。
 
 **订正一处旧结论**:052 的 plan 记录称 `regen-command-copies.py --check`「有大量既有待再生项」;本轮实测为 **EXIT=0** 全清(该批待再生项已在此间的反馈轮里再生完毕)。本特性 MUST NOT 继承那句旧结论。
 
 **测量陷阱(本轮踩到并已订正)**:经 `| tail` 取 `$?` 得到的是 `tail` 的退出码而非脚本的,第一次测量因此把 `scripts/python` 的 EXIT=2 误报为 0。MUST 用 `PIPESTATUS` 或先赋值再取码。
+
+**订正记录 3 — `/speckit.analyze`(2026-10-03)在本表查出两个缺陷,二者同根**:(E-04)表里**没有 `skills` 行**,而 T034/T041 要写 `skills/create-team/` 下的三个文件,该目录确有运行时镜像(`sync-mirrors.py:74`)且三个文件的镜像**当前逐字节相同**——于是本特性会在一对无人观察的镜像上制造新漂移,GATE-2 与 DoD-4 都会照常报绿。(F-03)本表所属的全树计数写作 3、实为 33。**同根**在两处缺陷都出自同一条纪律的反面:该表被 research.md 声明为镜像义务的**唯一拥有者**,于是表里的漏项与错数会被下游无条件采信;而漏项之所以发生,是因为「哪些目录有镜像」被当作**记忆**写而不是当**实测**写(`MIRROR_PAIRS` 有 5 对:templates / skills / agents / scripts / shared;初版表只覆盖其中 **3** 对的方向——scripts、shared、templates——漏掉 skills,agents 本特性不写故漏之无害)。据此本表增 `skills` 行,并 MUST 由 T037/T043 携带 `--only skills` 的同步与 GATE-2 的逐文件复核。
+
+**订正记录 4 — 第一轮整改自己复现了它要修的缺陷(2026-10-03 第二轮 `/speckit.analyze`)**:上面那条「增 `skills` 行」的整改是 PARTIAL——它把 `--only skills` 加进了 GATE-2/T002/T037/T043 与 quickstart 场景 11,却把全树 33 处的**分解**写成「余下 30 处全在 `skills` 对内」。实测分解是 30(`skills`)+ 2(`templates`)+ 1(`scripts/python`):那 2 处是 `.specify/templates/proactive-trigger-seed.json` 与 `.specify/templates/skills-template.md`,而 `templates` 对**在表里同样没有行**——与订正记录 3 完全同形的漏项,只是换了一对。后果不是新漂移而是**范围越界**:T023 跑 `--write --only templates` 时按对复制,会把这两个无人认领的文件一并同步,DoD-4 又会把「every other pair」读成绝对判据而默认它们干净。据此本表再增 `templates` 对一行(对级关系判据 + 基线名单由 T002 采集),并订正 `requirements.md` 的 FR-027 Source 行、`tasks.md` 的 DoD-6(它把基线采集路径委托给一个**已退役**目录 `.specify/templates/commands/`,而 `MIRROR_PAIRS` 的 templates 对明确排除 `commands/`)、DoD-4 的措辞与 GATE-9 的判据形。根因写在这里供后来者复用:**改一条规则 = 改所有承载它的界面**,而「我改完了」这句话必须由逐界面复测的命令输出证明,不能由改写者的记忆证明。
 
 ## Complexity Tracking
 
@@ -193,11 +199,11 @@ tests/contract/                     # 改 3 个既有测试 + 新增 4 组钉子
 
 | Artifact | Path | Count / Scope | 导出命令 |
 |----------|------|---------------|----------|
-| Phase 0 研究 | [`research.md`](./research.md) | **18** 条决策(D-1…D-18)+ **6** 条上送异常(A-1…A-6);其中 **3** 条经用户裁定 | `grep -c '^## D-' research.md` → 18;`grep -c '^- \*\*A-[0-9]' research.md` → 6 |
+| Phase 0 研究 | [`research.md`](./research.md) | **18** 条决策(D-1…D-18)+ **7** 条上送异常(A-1…A-7,A-7 由 2026-10-03 第二轮 analyze 增记:FR 侧基线未裁定);其中 **3** 条经用户裁定 | `grep -c '^## D-' research.md` → 18;`grep -c '^- \*\*A-[0-9]' research.md` → 7(2026-10-03 重跑,先前印 6) |
 | Data model | [`data-model.md`](./data-model.md) | **8** 个实体标题(E-1…E-8)+ **3** 个派生实体(E-3a/b/c)= **11** 个实体;**40** 条校验规则 V-1…V-40(连续无缺号) | `grep -cE '^## E-[0-9]' data-model.md` → 8;`grep -oE '\*\*V-[0-9]+\*\*' \| sort -u \| wc -l` → 40 |
 | Contracts | [`contracts/`](./contracts/) | **7** 份文档 / **182** 条条款(**139** 制品类 + **43** 行为类,**0** 条未标注);逐文件条款 id 均连续无缺号 | `cd .specify/specs/053-machine-decidable-artifacts && ls contracts/*.md \| wc -l` → 7;`cat contracts/*.md \| grep -cE '^\*\*C-[0-9]+\*\*'` → 182(**这两条 MUST 从本 spec 目录跑**:其 glob 是 spec 目录相对路径,从仓根跑得 0 并伴一条 `ls` 报错。注意这与 `notes/clause-form-census.md` 的普查命令**相反**——后者的 glob 是仓根相对,从 spec 目录跑会静默返回 `(0, 0)` 而不报错。两者的 cwd 前提各自写在各自行内,MUST NOT 互相推断) |
 | Quickstart | [`quickstart.md`](./quickstart.md) | **12** 个场景;**10** 个含改前已实跑的真实输出(✅5 + ◐5)、**2** 个纯不可实跑(❌);**8** 处逐例前提清单(7 纯 + 1 混合),**0** 处文件级免责 | `grep -c '^## 场景 [0-9]' quickstart.md` → 12(**MUST 用该精确式**:裸 `'^## 场景'` 会同时匹配 `## 场景覆盖表` 而给出 13);`grep -cE '^> \*\*.*改前不可实跑' quickstart.md` → **8**(8 处逐例块:7 处纯「不可实跑」免责 + 1 处「构造命令可实跑但验证不可」的混合式,后者在场景 3;初版印 7 是因为写作时还没有那处混合块) |
-| Feature reference | [`feature-ref.md`](./feature-ref.md) | FR→条款映射 **48** 行(**未覆盖 0**)/ SC→度量映射 **12** 行(**未覆盖 0**)/ 交付面 **26** 行(初版印 22,而拥有者实为 21;本轮补齐 5 个「义务已写进契约却无落点行」的缺口后为 26);条款引用去重 **166** 个唯一 `(文档, C-N)` 对、含重复 **192**、不引用任何 FR 的条款 **16** 条 | `grep -c '^\| FR-' feature-ref.md` → 48;`grep -c '^\| SC-' feature-ref.md` → 12;`awk '/^## 交付面清单/,/^## 交叉引用/' feature-ref.md \| grep '^\| ' \| grep -vc '^\| 类别'` → 26 |
+| Feature reference | [`feature-ref.md`](./feature-ref.md) | FR→条款映射 **48** 行(**未覆盖 0**)/ SC→度量映射 **12** 行(**未覆盖 0**)/ 交付面 **26** 行(初版印 22,而拥有者实为 21;本轮补齐 5 个「义务已写进契约却无落点行」的缺口后为 26);条款引用去重 **165** 个唯一 `(文档, C-N)` 对、含重复 **188**、不引用 FR 的条款 **17**(2026-10-03 由第二轮 analyze 按 C-2 新记录的引用组规则整表重导;重导前印的是 166 / 192 / 16,那三个数出自一条从未写下来的抽取规则)| `grep -c '^\| FR-' feature-ref.md` → 48;`grep -c '^\| SC-' feature-ref.md` → 12;`awk '/^## 交付面清单/,/^## 交叉引用/' feature-ref.md \| grep '^\| ' \| grep -vc '^\| 类别'` → 26 |
 
 **与 Phase 0 期望的漂移**:两处,均已订正而非掩盖——
 
