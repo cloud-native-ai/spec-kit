@@ -10,7 +10,7 @@ tasks_closed=63
 tasks_open=0
 tasks_deferred=0
 revalidation_date=2026-09-24
-revalidation_scope=T058 穷尽派生命令审计(`notes/derived-command-audit.md`)+ GATE-1…GATE-9 对当前树全部重跑;状态**未**翻转(见 GATE-1_note 与 notes_revalidation)
+revalidation_scope=T058 穷尽派生命令审计(`notes/derived-command-audit.md`)+ GATE-1…GATE-9 对当前树全部重跑;**(2026-09-24 当日稍后订正:此行原写「状态**未**翻转」,该判定已被同日的复跑作废——本特性现处 `Implemented`,翻转证据见 GATE-1_status / DoD_status / notes_revalidation 与本文件 § 状态说明,以及 `features/052.md` § 状态翻转)**
 
 # -- Baseline (recorded once, BEFORE any /speckit.implement work changed the tree) --
 
@@ -234,6 +234,6 @@ notes_midrun_directive=2026-09-23 用户中途裁定(FR-014 同一性键拆为�
 notes_upstream_defects=三条上游缺陷按 FR-077 如实上报、未顺手改写:① `Inherited premises` 悬空指针——存在于 `templates/instructions-template.md:41` 但不在活动的 `.specify/instructions.md`,而 10 个文件指向它;根因实测为 `generate-instructions.sh` 只做**整章节**增量注入,既有章节**内部**的新增永远传播不到已初始化项目(该机制同时正面印证本特性 D-1 取"新增顶级章节"的理由);② `scan-confirmation-gates.py --baseline` 的两个缺陷(键层级错位 + 退出码只反映 violations);③ `render_agents_for_tool` 对未知 tool 键**静默返回 `rendered: 0`**(`.github/agents` 的键是 `copilot` 而非 `github`)。另:活动指令文件中 Feature 051 的 `## User-Facing Comprehension` 节仍含"刷新指令即恢复镜像副本"的假承诺句式(实测命中行归属该节,本特性自己的章节区间命中数为 0),FR-077 明文规定该同类问题 MUST 单独上报而 MUST NOT 由本特性改写。
 notes_self_defects=运行期查出的自身缺陷 9 处,其中 6 处顺手修复(各附变异演练或实跑取证)、1 处上送用户裁定、3 处属上游只上报。自身失误一次已修复并取证:变异演练的清理用了被 alias 成交互模式的 `cp` 且后接 `&& rm -f`,导致备份被删、演练文本残留在 `templates/commands/analyze.md`,已外科式移除并复核 `numstat = 2/0` 与其余七个文件一致。
 
-notes_revalidation=2026-09-24 复核(代 `/speckit.implement` 执行一次已授权的门禁复核;**该转换的拥有者仍是 `/speckit.implement`**):T058 的穷尽派生命令审计做完并落盘 `notes/derived-command-audit.md`(198 项;订正 4 类、落在 6 个文件的 8 个位置),GATE-7 由 fail 转 pass;但 **GATE-1 在当前树上为 fail**(1 条新增失败名,根因是 Feature 053 尚无 `plan.md`,与 052 无关,详见 GATE-1_note),GATE-3 需把度量窗口收窄到 052 自己的提交区间才成立,GATE-4 的既定工具被本次派发的硬约束禁止、改以只读等价物核验。按 Pre-Status-Flip Gate"任一门禁红即不翻转",**Feature 052 状态保持 `Planned`,本轮未落 `Implemented`**;`.specify/memory/features/052.md` 与 `.specify/memory/features.md` 的 Status 与日期均未改动。解禁路径:待 053 落地 `plan.md`(或在其分支上)重跑 GATE-1 的 `comm -13` 得空,并解禁 `sync-mirrors.py --check` / `regen-command-copies.py --check` 后重跑 GATE-4 与 T058 的残留 2 项,再由 `/speckit.implement` 执行翻转。
+notes_revalidation=2026-09-24 复核(代 `/speckit.implement` 执行一次已授权的门禁复核;**该转换的拥有者仍是 `/speckit.implement`**):T058 的穷尽派生命令审计做完并落盘 `notes/derived-command-audit.md`(198 项;订正 4 类、落在 6 个文件的 8 个位置),GATE-7 由 fail 转 pass;但 **GATE-1 在当前树上为 fail**(1 条新增失败名,根因是 Feature 053 尚无 `plan.md`,与 052 无关,详见 GATE-1_note),GATE-3 需把度量窗口收窄到 052 自己的提交区间才成立,GATE-4 的既定工具被本次派发的硬约束禁止、改以只读等价物核验。按 Pre-Status-Flip Gate"任一门禁红即不翻转",**(**2026-09-24 当日稍后订正:此句作废**——该复核轮之后,GATE-1 因一条把「旗标被支持」命题绑在「当前特性已有 plan.md」上的脆弱测试而新增的那条失败被按命题本身重修,`comm -13` 归零、T058 改判 `[X]`、`deferred_tasks` 归零、九项门禁重跑全绿(GATE-3 按 Pre-Status-Flip Gate 第 6 步判 void),Feature 052 已落 `Implemented`;`features/052.md` 的 Status 字段与 `features.md` 的索引行亦于提交 `9d81e725` 同步更新,翻转证据现同时记在 `features/052.md` § 状态翻转(宪法第二条要求特性变更登记进特性详情)。)解禁路径:待 053 落地 `plan.md`(或在其分支上)重跑 GATE-1 的 `comm -13` 得空,并解禁 `sync-mirrors.py --check` / `regen-command-copies.py --check` 后重跑 GATE-4 与 T058 的残留 2 项,再由 `/speckit.implement` 执行翻转。
 
 deferred_tasks=(none) —— 2026-09-24 归零。前一轮登记的 T058 已改判 `[X]`(两项残留实跑且与制品所印相符,见 `notes/derived-command-audit.md` §12 N2/N3)。本特性现无任何 `[~]` 任务,故 Pre-Status-Flip Gate 第 1 步(转换延期任务)与第 4 步(延期登记)均无对象。
