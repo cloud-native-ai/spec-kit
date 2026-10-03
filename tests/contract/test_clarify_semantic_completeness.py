@@ -17,9 +17,11 @@ count in the quality checklist. Three obligations close that:
 * **C-6** — the four surfaces this change writes add no blocking-gate wording, against a
   confirmation-gate budget with zero integer headroom.
 
-The machine implementation of C-4 is deliberately **not** built here: the report assigns
-it to the deterministic requirements validator, a separately scheduled feature, so this
-file pins the obligation text and the interim extraction the owner document carries.
+The machine implementation of C-4 **has shipped** (Feature 053): the deterministic
+requirements validator is ``scripts/python/validate-requirements.py``, and the interim
+extraction copy the owner document used to carry is gone. This file therefore pins the
+obligation text and asserts the two anchors **against the checker**, which is now the
+single implementation — pinning prose that no longer exists would guard nothing.
 
 Pin hygiene: every zero-hit assertion carries a non-empty companion, so a needle that
 stopped matching fails loudly instead of passing vacuously.
@@ -28,6 +30,8 @@ from __future__ import annotations
 
 import importlib.util
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -37,6 +41,7 @@ pytestmark = pytest.mark.contract
 ROOT = Path(__file__).resolve().parents[2]
 TAXONOMY = ROOT / "shared" / "constants" / "clarify-taxonomy.md"
 SCANNER = ROOT / "scripts" / "python" / "scan-confirmation-gates.py"
+CHECKER = ROOT / "scripts" / "python" / "validate-requirements.py"
 
 # The four framework sources this change writes. All four are inside the gate
 # scanner's scope (SCAN_DIRS covers `shared` and `templates/commands`).
@@ -308,38 +313,76 @@ def test_c4_document_order_invariant_beside_append_only():
     )
 
 
-def test_c4_extraction_is_definition_anchored_and_history_excluded():
-    """Both anchors are load-bearing; the owner text must say why.
+def _doc_order_findings(text, tmp_path, name="spec.md"):
+    p = tmp_path / name
+    p.write_text(text, encoding="utf-8")
+    r = subprocess.run(
+        [sys.executable, str(CHECKER), str(p)], capture_output=True, text=True
+    )
+    return [l for l in r.stdout.splitlines() if re.match(r"^\d+: doc-order", l)]
+
+
+def test_c4_extraction_is_definition_anchored_and_history_excluded(tmp_path):
+    """Both anchors are load-bearing, and they now live in the checker rather than in prose.
 
     Measured, not assumed. On a clean spec, comparing every ``FR-\\d+`` *occurrence*
     instead of every *definition* reports five false breaks (cross-references are
     legitimately out of order); including ``## Clarifications`` turns append-only history
     that quotes pre-renumbering definition lines into a sixth. Dropping either anchor
-    makes the assertion fire on correct artifacts, which trains the next agent to ignore
-    it.
+    makes the assertion fire on correct artifacts, which trains the next agent to ignore it.
+
+    A positive control runs first: without it, the two "no findings" assertions below could
+    pass because the check never fired at all (checker-form C-21).
     """
     rules = _rules_section(_mode_a(_text(TAXONOMY)))
     region = rules[rules.index("Document-order invariant"):]
-    block = re.search(r"```bash\n(.*?)```", region, re.S)
-    assert block, "the interim extraction block is gone from the document-order invariant"
-    cmd = block.group(1)
-    assert r"^- \*\*(FR|SC)-[0-9]+\*\*" in cmd, (
-        "the extraction stopped anchoring on definition lines"
+    assert "validate-requirements.py" in region, (
+        "the invariant no longer names the checker that owns the document-order verdict"
     )
-    assert "## Clarifications" in cmd, "the extraction stopped excluding the history section"
+    assert "```awk" not in region, "the transitional extraction copy is back"
     assert "load-bearing" in rules, (
         "the two anchors are no longer documented as load-bearing, so the next edit "
         "'simplifies' the extraction and reintroduces the false breaks"
     )
+    assert CHECKER.is_file(), "the checker that owns this invariant is missing"
+
+    head = "# S\n\n## Requirements\n\n- **FR-001**: a\n- **FR-002**: b\n"
+    # positive control: a genuinely reordered definition row MUST be reported
+    reordered = head + "- **FR-004**: d\n- **FR-003**: c\n"
+    control = _doc_order_findings(reordered, tmp_path, "control.md")
+    assert control and "ORDER BREAK: FR-003 after FR-004" in control[0], control
+
+    # anchor 1: a cross-reference in prose is legitimately out of order
+    prose = head + "\nElsewhere FR-009 and FR-002 are cited out of order on purpose.\n"
+    assert _doc_order_findings(prose, tmp_path, "prose.md") == []
+
+    # anchor 2: append-only history quoting a pre-renumbering row is not a break
+    history = head + "\n## Clarifications\n\n### Session 2026-01-01\n\n- Q: x → A: y\n- **FR-009**: quoted history row\n"
+    assert _doc_order_findings(history, tmp_path, "history.md") == []
 
 
 def test_c4_shared_implementation_with_the_requirements_validator_is_declared():
+    """The declaration must name the implementation that exists NOW, not a future one.
+
+    The pre-053 wording promised a validator that would ship later; a promise is not a shared
+    implementation, and nothing failed while the two surfaces drifted. So this asserts the
+    present tense three ways: the invariant names the checker, the naming partner is still
+    cited, and the partner command actually invokes that same file.
+    """
     rules = _rules_section(_mode_a(_text(TAXONOMY)))
     assert "shares one implementation" in rules, (
         "the invariant no longer declares a shared implementation with /speckit.requirements' "
         "validator, so the two commands are free to drift about what 'in order' means"
     )
     assert "/speckit.requirements" in rules, "the sharing partner is unnamed"
+    assert "validate-requirements.py" in rules, (
+        "the shared implementation is not named — a declaration without a file to point at is "
+        "the future-tense form this test exists to prevent"
+    )
+    command = (ROOT / "templates" / "commands" / "requirements.md").read_text(encoding="utf-8")
+    assert "validate-requirements.py" in command, (
+        "the partner command does not invoke the checker, so the two are not actually sharing"
+    )
 
 
 # --- C-5: the derived-count revisit ---

@@ -102,8 +102,11 @@ python3 scripts/python/validate-requirements.py <spec-dir>/requirements.md --jso
 
 ```bash
 tmp=$(mktemp -d); src=.specify/specs/053-machine-decidable-artifacts/requirements.md
-# 破坏 1:编号跳号(删掉 FR-023 的定义行)
-grep -v '^- \*\*FR-023\*\*' $src > $tmp/b1.md
+# 破坏 1:编号跳号(删掉 FR-030 的定义行)
+# 2026-10-03 实现期订正:原先删 FR-023。实测 FR-023 被 FR-026 与 FR-028 两行**散文引用**,
+# 删掉它的定义行会同时触发 ref-resolvable,即 SC-001 要求排除的「交叉遮蔽」——而该场景的
+# 前提块此前只核过「缺号确实出现」,没核过「只有一类检查会报」。FR-030 经实测零散文引用。
+grep -v '^- \*\*FR-030\*\*' $src > $tmp/b1.md
 # 破坏 2:文档序(把 SC-002 的定义行移到 SC-005 之后)——可复跑的重排命令,不手改
 python3 - "$src" "$tmp/b2.md" <<'REORDER_EOF'
 import sys, re
@@ -125,7 +128,7 @@ for f in $tmp/b1.md $tmp/b2.md $tmp/b3.md $tmp/b4.md; do
 done
 ```
 
-> **这四份破坏副本的构造命令本身改前即可实跑**(本轮已实跑),但**用检查器验证它们**改前不可实跑。构造命令所依赖的前提:被破坏的源文件是本规格自己的 `requirements.md`(48 FR / 12 SC 连续,故删掉 FR-023 的定义行恰好制造一个缺号);四份副本各自**只**含一类缺陷,本轮实跑复核为 `b1` FR 缺号 = `[23]`、`b2` SC 文档序 = `[1,3,4,5,2,6,…]` 且 `ORDER BREAK` 对 = `[(5,2)]`、`b3` 悬挂 `STR-999` = 1 处、`b4` 活动标记 = 1 个,四者互不污染——这正是 SC-001「4/4 且零交叉遮蔽」可被验证的前提。清理:`\rm -rf $tmp` 后残留计数 MUST 为 0(本轮实测 0)。
+> **这四份破坏副本的构造命令本身改前即可实跑**(本轮已实跑),但**用检查器验证它们**改前不可实跑。构造命令所依赖的前提:被破坏的源文件是本规格自己的 `requirements.md`(48 FR / 12 SC 连续,故删掉 FR-030 的定义行恰好制造一个缺号;FR-030 经实测无任何散文引用,故 b1 只触发 `id-contiguous` 一类——原选的 FR-023 被两行散文引用,会同时触发 `ref-resolvable` 而构成交叉遮蔽);四份副本各自**只**含一类缺陷,本轮实跑复核为 `b1` FR 缺号 = `[30]`、`b2` SC 文档序 = `[1,3,4,5,2,6,…]` 且 `ORDER BREAK` 对 = `[(5,2)]`、`b3` 悬挂 `STR-999` = 1 处、`b4` 活动标记 = 1 个,四者互不污染——这正是 SC-001「4/4 且零交叉遮蔽」可被验证的前提。清理:`\rm -rf $tmp` 后残留计数 MUST 为 0(本轮实测 0)。
 
 **预期结果**(检查器部分改后 MUST 实测并粘贴真实输出,MUST NOT 沿用本行):`b1` → `id-contiguous` 且 exit 1;`b2` → `doc-order`,输出 STR-002 形态的 `ORDER BREAK: SC-002 after SC-005`,exit 1;`b3` → `ref-resolvable` 点名 `STR-999` 与行号且 exit 1;`b4` → `marker-count` 报 1 且 exit 1(或按 D-6 的 verdict 表达);**每份只报出自己那一类**(零交叉遮蔽)。
 

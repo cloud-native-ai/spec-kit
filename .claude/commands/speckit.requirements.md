@@ -47,11 +47,11 @@ EOF
 
 6. **Write spec** to SPEC_FILE. Preserve section order. Keep `Related Feature` with default "Need clarification" values.
 
-7. **Quality Validation**: Follow the validation process in `.specify/shared/guidelines/requirements-guidelines.md`:
+7. **Quality Validation**: run the deterministic checker FIRST — `python3 .specify/scripts/python/validate-requirements.py SPEC_FILE` — and present its output **verbatim** (do not paraphrase or condense it). If it reports any ERROR, **STOP** and fix the spec, re-running until it exits 0: the checklist and the clarification loop both come after, and neither may start while an ERROR stands. Then follow the validation process in `.specify/shared/guidelines/requirements-guidelines.md`:
    - Create checklist at `FEATURE_DIR/checklists/requirements.md`
    - Validate spec against each item
    - Handle failures (max 3 iterations) and remaining clarifications (max 3 questions with table format)
-   - Update checklist with pass/fail status
+   - Update checklist with pass/fail status **after** the clarification write-back — every count and reference resolution the checklist records derives from a checker run, never hand-typed, so re-run the checker once the write-back has landed
 
 8. **Report**: Branch name, spec file path, checklist results, next phase readiness.
 
