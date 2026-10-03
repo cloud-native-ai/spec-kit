@@ -149,7 +149,11 @@ def test_c09_precedent_four_keys_are_not_migrated():
     """The existing validate-tasks.py keeps its four-key JSON and MUST NOT grow a verdict array."""
     r = _run("validate-tasks.py", [str(SPEC / "tasks.md"), "--json"], expect=0)
     payload = json.loads(r.stdout)
-    assert set(payload) == {"file", "errors", "warnings", "status"}
+    # C-9's criterion is that the four keys are still PRESENT; it was first written
+    # as an exact key set, which over-pinned the clause and collided with
+    # green-point-claim.md C-6 (a parsed-claim array in this same payload). Presence
+    # plus the anti-migration assertion below is what the clause actually states.
+    assert {"file", "errors", "warnings", "status"} <= set(payload), sorted(payload)
     assert "checks" not in payload
 
 

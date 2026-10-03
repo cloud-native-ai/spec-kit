@@ -31,6 +31,23 @@ Checks performed:
                   `[US` markers (placeholders like [US-none] are violations)
   dod-format      no checkbox-syntax line (`- [ ]` / `- [x]` ...) inside the
                   `## Definition of Done` section (reserved for task rows)
+  green-dangling  a `[green: <contract>#<clause>]` attribution whose contract
+                  file does not exist, whose file declares no machine-decidable
+                  clause form, or whose clause id that file does not contain
+                  (error: a claim nobody can resolve is a claim nobody can
+                  honour, which is worse than one that lands a phase late)
+  green-cross-phase  on one contract, the clause ordinals of the claims run
+                  backwards against the rows' monotonic order, so the earlier row
+                  cannot leave that contract green at its own phase (warning;
+                  compares the same `order` counter blockedBy uses — this script
+                  has no numeric phase index and MUST NOT grow one)
+  green-clause-collision  two rows claim the same contract clause, i.e. the
+                  clause partition (条款分区 (Clause Partition),
+                  `.specify/memory/glossary.md`) was cut over the same clause
+                  twice (warning)
+  green-path-divergence  one write target is claimed green by two rows at two
+                  different green points, so the pair cannot each be the row that
+                  turns that file green (warning)
 
 Usage:
   python3 scripts/python/validate-tasks.py <path/to/tasks.md> [--json]
@@ -44,6 +61,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
@@ -90,6 +108,97 @@ WRITE_VERB = re.compile(
 )
 POINTER_WINDOW = 40
 
+# An inline green-point attribution: `[green: <contract>#<clause>]` (STR-001; the surface
+# is declared in templates/tasks-template.md § Format). The separator is the FIRST `#` and
+# everything up to the closing bracket is the clause id, so the id forms the corpus
+# actually uses (`C-1`, `C-01`, `C-001`, `C-3.4`) all survive intact.
+GREEN_CLAIM = re.compile(r"\[green:\s*([^\]#]+)#([^\]]+)\]")
+# Clause ids are not uniform in width and may carry a dotted sub-number, so the ordering
+# key is the tuple of their number groups. An id with no digits at all (a
+# `yaml-assertions` name) has no order and is skipped rather than guessed at.
+CLAUSE_ORDINAL = re.compile(r"\d+")
+
+# WHY green claims are extracted before classification, and NOT taught to POINTER_GOVERNOR:
+# PATH_TOKEN's trailing character class has no `#`, so inside
+# `[green: contracts/x.md#C-1]` it matches `contracts/x.md` — and the bracket skip in
+# _classify_paths (`if "[" in tok or "]" in tok: continue`) cannot protect it, because
+# the brackets are outside the match. Adding `[green:` to POINTER_GOVERNOR would silence
+# the symptom and break that table's contract, which is a closed list of read-only
+# governor WORDS (`per`, `see`, `owner`, …); `[green:` is a label prefix, not a word.
+# Extracting first makes the orthogonality a construction property instead of a regex
+# special case, and yields the parsed claim tuples as a by-product.
+_CLAUSE_EXTRACT = None
+
+
+def _clause_extract():
+    """The sibling clause extractor, loaded by path rather than by `import`.
+
+    This script runs both as `python3 scripts/python/validate-tasks.py` (where its own
+    directory is `sys.path[0]`) and under `importlib` from a contract test (where it is
+    not). Resolving the sibling next to `__file__` also keeps a `.specify/` mirror copy
+    on the mirror's own extractor instead of reaching back into the source tree.
+    """
+    global _CLAUSE_EXTRACT
+    if _CLAUSE_EXTRACT is None:
+        sibling = Path(__file__).resolve().with_name("clause_extract.py")
+        spec = importlib.util.spec_from_file_location("_clause_extract_sibling", sibling)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+        _CLAUSE_EXTRACT = module
+    return _CLAUSE_EXTRACT
+
+
+def _strip_claims(source: str, rest: str):
+    """((contract, clause) pairs, residual row text) for one task row.
+
+    `source` is the row as seen through the DECLARATION view: fenced lines blanked, and
+    the content of each inline code span dropped. A form inside a ``` block is an example
+    and a form inside backticks is a mention of the tag, so neither is a declaration.
+    `rest` is the raw row text, and is what the path classifier sees next. When the row
+    declares nothing, `rest` is returned byte-identical — a claim-free file is classified
+    exactly as it was before this surface existed.
+    """
+    found = [(m.group(1).strip(), m.group(2).strip()) for m in GREEN_CLAIM.finditer(source)]
+    if not found:
+        return [], rest
+    return found, GREEN_CLAIM.sub(" ", rest)
+
+
+def _repo_root_of(tasks_path: Path):
+    for base in tasks_path.resolve().parents:
+        if (base / ".git").exists():
+            return base
+    return None
+
+
+def _resolve_contract(claim_path: str, tasks_path: Path):
+    """Locate a claimed contract file, or None.
+
+    Two spellings are both legitimate, so both are tried: a spec's own tasks.md reaches
+    its contracts as `contracts/<name>.md` beside itself, and a claim about another
+    feature's contract is written from the repository root. The working directory is the
+    last base so a scratch file outside any repository still resolves.
+    """
+    resolved = tasks_path.resolve().parent
+    bases = [resolved]
+    root = _repo_root_of(tasks_path)
+    if root is not None and root not in bases:
+        bases.append(root)
+    cwd = Path.cwd()
+    if cwd not in bases:
+        bases.append(cwd)
+    for base in bases:
+        candidate = base / claim_path
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def _clause_ordinal(clause_id: str):
+    numbers = tuple(int(n) for n in CLAUSE_ORDINAL.findall(clause_id))
+    return numbers or None
+
 
 def _classify_paths(text: str):
     """Split a row's path tokens into (write targets, pointer targets).
@@ -112,7 +221,13 @@ def _classify_paths(text: str):
     return write, pointer
 
 
-def validate(path: Path):
+def validate(path: Path, claims_out: list | None = None):
+    """(errors, warnings) for one tasks.md.
+
+    `claims_out` is an optional list the caller passes to receive the parsed
+    `[green:]` declarations (four E-4 fields each); `validate()` keeps returning a
+    2-tuple so every existing caller and contract pin is unaffected.
+    """
     errors, warnings = [], []
     try:
         lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
@@ -120,6 +235,8 @@ def validate(path: Path):
         return [f"0: cannot read {path}: {exc}"], []
 
     tasks = {}          # id -> {line, phase, parallel, write_paths, pointer_paths, order}
+    claims = []         # parsed [green:] attributions, in row order
+    claim_view = None   # fence-blanked + code-span-stripped lines, built on first need
     order = 0
     phase_name = None
     phase_is_story = False
@@ -169,6 +286,20 @@ def validate(path: Path):
                 )
                 continue
             order += 1
+            # extract the green-point claims BEFORE the residual text is classified
+            # (see the note by POINTER_WINDOW); a form inside a ``` fence is an example
+            # and a form inside an inline code span is a MENTION of the tag, not a
+            # declaration of it — the same distinction FR-009 draws for references, and
+            # without it a row that merely names the tag (or the template that defines
+            # it) reports a dangling claim for a clause nobody ever asserted
+            if "[green:" in line and claim_view is None:
+                extractor = _clause_extract()
+                claim_view = [
+                    extractor.strip_code_spans(text)
+                    for text in extractor.strip_fences(lines)
+                ]
+            source = line if claim_view is None else claim_view[lineno - 1]
+            row_claims, rest = _strip_claims(source, rest)
             write_paths, pointer_paths = _classify_paths(rest)
             tasks[tid] = {
                 "line": lineno,
@@ -183,6 +314,15 @@ def validate(path: Path):
                     t.strip() for t in re.split(r"[,\s]+", (BLOCKED_BY.search(rest).group(1) if BLOCKED_BY.search(rest) else "")) if t.strip()
                 ],
             }
+            for contract_file, clause_id in row_claims:
+                claims.append({
+                    "contract_file": contract_file,
+                    "clause_id": clause_id,
+                    "task_id": tid,
+                    "phase": phase_name,
+                    "line": lineno,
+                    "order": order,
+                })
             # story-label placement
             labels = STORY_LABEL.findall(rest)
             any_us = ANY_US_MARKER.search(rest)
@@ -271,6 +411,118 @@ def validate(path: Path):
                         f"half-written file; sequence the pair with [blockedBy:] or drop [P]"
                     )
 
+    # --- green-point attribution claims ------------------------------------
+    # Resolvability is judged by the clause-syntax owner's forms via the sibling
+    # extractor, never by a private regex here: a second definition of "what counts
+    # as a clause" is exactly the drift the owner document exists to prevent.
+    resolved = []
+    if claims:
+        extractor = _clause_extract()
+        for claim in claims:
+            target = _resolve_contract(claim["contract_file"], path)
+            if target is None:
+                errors.append(
+                    f"{claim['line']}: green-dangling: {claim['task_id']} declares "
+                    f"[green: {claim['contract_file']}#{claim['clause_id']}] but no such "
+                    f"contract file exists (looked beside {path.name}, then the repository "
+                    f"root, then the working directory) — correct the path or drop the claim"
+                )
+                continue
+            if extractor.form_of(target) == "md-none":
+                errors.append(
+                    f"{claim['line']}: green-dangling: {claim['task_id']} declares "
+                    f"{claim['contract_file']}#{claim['clause_id']} but that file declares "
+                    f"no machine-decidable clause form, so nothing can check the claim "
+                    f"(forms: shared/definitions/contract-clause-definitions.md) — give the "
+                    f"contract a machine-decidable clause form or drop the claim"
+                )
+                continue
+            if not extractor.resolvable(target, claim["clause_id"]):
+                errors.append(
+                    f"{claim['line']}: green-dangling: {claim['task_id']} declares "
+                    f"{claim['contract_file']}#{claim['clause_id']} but that file contains "
+                    f"no clause {claim['clause_id']} — name a clause id the file declares"
+                )
+                continue
+            resolved.append(dict(claim, resolved=str(target)))
+
+    if resolved:
+        # cross-phase: within one contract the clause ordinals must not run backwards
+        # against the rows' monotonic order. `order` is the comparison quantity, the same
+        # one the blockedBy forward-dependency warning above uses; this script has no
+        # numeric phase index and MUST NOT grow one (the heading numbers are prose).
+        per_contract = {}
+        for claim in resolved:
+            per_contract.setdefault(claim["resolved"], []).append(claim)
+        for group in per_contract.values():
+            group.sort(key=lambda c: c["order"])
+            for earlier, later in zip(group, group[1:]):
+                ord_a = _clause_ordinal(earlier["clause_id"])
+                ord_b = _clause_ordinal(later["clause_id"])
+                if ord_a is None or ord_b is None or ord_b >= ord_a:
+                    continue
+                warnings.append(
+                    f"{earlier['line']}: green-cross-phase: {earlier['task_id']} "
+                    f"(line {earlier['line']}, `{(earlier['phase'] or '<no phase>')[:60]}`, "
+                    f"order {earlier['order']}) claims "
+                    f"{earlier['contract_file']}#{earlier['clause_id']} while the later "
+                    f"{later['task_id']} (line {later['line']}, "
+                    f"`{(later['phase'] or '<no phase>')[:60]}`, order {later['order']}) "
+                    f"claims #{later['clause_id']} — the clause order runs backwards against "
+                    f"the row order, so {earlier['task_id']} cannot leave that contract green "
+                    f"at its own phase; move the earlier clause's row up or re-cut the partition"
+                )
+
+        # one clause claimed by two rows: the clause partition was cut over it twice
+        # (条款分区 (Clause Partition), `.specify/memory/glossary.md`)
+        first_claim = {}
+        for claim in sorted(resolved, key=lambda c: c["order"]):
+            key = (claim["resolved"], claim["clause_id"])
+            previous = first_claim.get(key)
+            if previous is None:
+                first_claim[key] = claim
+                continue
+            warnings.append(
+                f"{previous['line']}: green-clause-collision: {previous['task_id']} "
+                f"(line {previous['line']}) and {claim['task_id']} (line {claim['line']}) both "
+                f"claim {claim['contract_file']}#{claim['clause_id']} — one clause belongs to "
+                f"one row, so re-cut the partition (条款分区 (Clause Partition), "
+                f".specify/memory/glossary.md) rather than dropping one of the two claims"
+            )
+
+        # one write target claimed green at two different points by two rows: the pair
+        # cannot each be the row that turns that file green
+        row_points = {}
+        for claim in resolved:
+            row_points.setdefault(claim["task_id"], set()).add(
+                f"{claim['contract_file']}#{claim['clause_id']}"
+            )
+        writers = {}
+        for tid, t in tasks.items():
+            for write_target in t["write_paths"]:
+                writers.setdefault(write_target, []).append(tid)
+        for write_target, tids in sorted(writers.items()):
+            claiming = [tid for tid in tids if row_points.get(tid)]
+            for i in range(len(claiming)):
+                for j in range(i + 1, len(claiming)):
+                    tid_a, tid_b = claiming[i], claiming[j]
+                    if row_points[tid_a] == row_points[tid_b]:
+                        continue  # a shared path with the SAME green point is not divergence
+                    warnings.append(
+                        f"{tasks[tid_a]['line']}: green-path-divergence: {tid_a} "
+                        f"(line {tasks[tid_a]['line']}) and {tid_b} "
+                        f"(line {tasks[tid_b]['line']}) both write {write_target} but claim "
+                        f"different green points ({sorted(row_points[tid_a])} vs "
+                        f"{sorted(row_points[tid_b])}) — two rows cannot each be the one that "
+                        f"turns this file green; partition the clauses between them or "
+                        f"sequence the pair with [blockedBy:]"
+                    )
+
+    if claims_out is not None:
+        claims_out.extend({
+            k: claim[k] for k in ("contract_file", "clause_id", "task_id", "phase")
+        } for claim in claims)
+
     # stable file order: each entry starts with "<lineno>: "
     errors.sort(key=lambda e: int(e.split(":", 1)[0]))
     warnings.sort(key=lambda w: int(w.split(":", 1)[0]))
@@ -282,7 +534,8 @@ def main(argv=None) -> int:
         prog="validate-tasks.py",
         description="Deterministic structural validator for a feature's tasks.md "
                     "(row format, ID uniqueness, blockedBy resolvability, [P] "
-                    "parallel safety, story-label placement, DoD format).",
+                    "parallel safety, story-label placement, DoD format, and the "
+                    "four green-point attribution checks).",
         epilog="Exit codes: 0 = no errors (warnings possible), 1 = errors found, "
                "2 = file missing / no task rows.",
     )
@@ -296,7 +549,8 @@ def main(argv=None) -> int:
         print(f"FAIL: {path} does not exist", file=sys.stderr)
         return 2
 
-    errors, warnings = validate(path)
+    claims: list = []
+    errors, warnings = validate(path, claims_out=claims)
     unparseable = any(e.startswith("0:") for e in errors)
 
     if args.json:
@@ -305,6 +559,9 @@ def main(argv=None) -> int:
             "errors": errors,
             "warnings": warnings,
             "status": "FAIL" if (errors or unparseable) else "PASS",
+            # the parsed `[green:]` declarations, four fields each; the verdicts on
+            # them travel in errors/warnings under the four green-* labels
+            "green_claims": claims,
         }, ensure_ascii=False, indent=2))
     else:
         for w in warnings:

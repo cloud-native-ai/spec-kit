@@ -79,6 +79,13 @@ EXPECTED_CHECKS = {
     "parallel-safe",
     "story-labels",
     "dod-format",
+    # the four green-point attribution checks (contracts/green-point-claim.md C-25);
+    # extended in the same commit as the script's docstring roster, because C-4 below
+    # extracts the labels FROM that docstring and asserts the two sets are equal
+    "green-dangling",
+    "green-cross-phase",
+    "green-clause-collision",
+    "green-path-divergence",
 }
 
 
@@ -104,6 +111,16 @@ def _write_tasks(tmp_path: Path, name: str, rows: list[str]) -> Path:
 
 def _parallel_warnings(messages: list[str]) -> list[str]:
     return [m for m in messages if "parallel-safe" in m]
+
+
+def _write_contract(tmp_path: Path, name: str = "x.md",
+                    clauses: tuple[str, ...] = ("C-1", "C-2")) -> str:
+    """A minimal `md-bold-closed` contract beside the tasks.md, for `[green:]` samples."""
+    directory = tmp_path / "contracts"
+    directory.mkdir(exist_ok=True)
+    body = "".join(f"\n**{c}** clause {c}.\n" for c in clauses)
+    (directory / name).write_text(f"# Contract: {name}\n{body}", encoding="utf-8")
+    return f"contracts/{name}"
 
 
 def _anti_vacuity(mod, path: Path, expected_ids: set[str]) -> None:
@@ -301,11 +318,13 @@ def test_c3_write_versus_cite_is_still_reported(tmp_path):
 # --- C-4: the check roster is pinned as labels, not as a count ------------
 
 
-def test_c4_check_roster_is_unchanged_by_this_fix():
-    """This fix refines `parallel-safe`; it adds no check and removes none.
+def test_c4_check_roster_is_pinned_as_labels_not_a_count():
+    """Every check the script documents is declared here, by name.
 
-    Pinned as a label set so a future check must be declared here deliberately
-    rather than slipping in silently.
+    Pinned as a label set so a future check must be added here deliberately rather
+    than slipping in silently — and so a count can never drift from the list it
+    summarizes. The set is extracted from the script's OWN docstring, which is why
+    growing the roster means editing both in one commit.
     """
     mod = _load_validator()
     doc = mod.__doc__ or ""
@@ -367,6 +386,36 @@ def test_c5_exit_code_table(tmp_path, capsys):
 
     missing = tmp_path / "absent.md"
     assert mod.main([str(missing)]) == 2, "2 = file missing"
+
+    # --- the green-point tiers (contracts/green-point-claim.md C-26) ----------
+    # The four tiers above keep their exact semantics; a dangling attribution is
+    # an ERROR and joins tier 1, while the three WARN-class green checks join
+    # tier 0. No third tier is added for warnings.
+    green_contract = _write_contract(tmp_path)
+
+    dangling_green = _write_tasks(tmp_path, "green_dangling.md", [
+        "- [ ] T001 Pin a clause [green: contracts/nope.md#C-1]",
+    ])
+    assert mod.main([str(dangling_green)]) == 1, "green-dangling is an ERROR → 1"
+
+    warn_green = tmp_path / "green_warn.md"
+    warn_green.write_text(
+        "# Tasks\n\n"
+        "## Phase 1: Setup\n\n"
+        f"- [ ] T001 Pin clause two [green: {green_contract}#C-2]\n\n"
+        "## Phase 2: And more\n\n"
+        f"- [ ] T002 Pin clause one [green: {green_contract}#C-1]\n",
+        encoding="utf-8",
+    )
+    _, green_warnings = mod.validate(warn_green)
+    assert green_warnings, (
+        "sentinel: the green warn-only sample produced no warning, so exit 0 below "
+        "would only show that no green check ran"
+    )
+    assert mod.main([str(warn_green)]) == 0, (
+        "green-cross-phase / green-clause-collision / green-path-divergence are all "
+        "WARN, and a warning-only file still exits 0"
+    )
     capsys.readouterr()
 
 

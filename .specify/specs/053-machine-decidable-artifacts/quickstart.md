@@ -180,8 +180,12 @@ NEG: WARN  3: parallel-safe: [P] tasks T001 (line 3) and T002 (line 4) both WRIT
 ## 场景 5: US2 四项新检查的逆样本——**改前不可实跑**
 
 ```bash
-python3 scripts/python/validate-tasks.py <spec-dir>/notes/samples/<case>.md --json
+tmp=$(mktemp -d)   # 逆样本 MUST 建在临时目录:MUST NOT 落在 `.specify/specs/` 下,
+                   # 演练后残留计数 MUST 为 0(checker-form.md C-17、FR-041)
+python3 scripts/python/validate-tasks.py $tmp/<case>.md --json
 ```
+
+> **(2026-10-04 订正)** 本场景原先把样本路径写成 `<spec-dir>/notes/samples/<case>.md`,与 `contracts/checker-form.md` C-17「逆样本 MUST 建在临时目录,MUST NOT 落在 `.specify/specs/` 下」直接冲突——按原路径落地会在被校验的 spec 目录里留下 7 份坏制品,正是 SC-001 Source 的反空真哨兵要区分的残留。改为 `mktemp -d`,并在收尾以 `\rm -rf $tmp; ls -d $tmp 2>/dev/null | wc -l` → **0** 取证。
 
 > **本例改前不可实跑**——四项检查尚不存在。所依赖的前提:
 > - 新标签为 `green-dangling`(ERROR)、`green-cross-phase`(WARN)、`green-clause-collision`(WARN)、`green-path-divergence`(WARN)(D-5)
