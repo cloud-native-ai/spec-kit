@@ -79,3 +79,110 @@ independently re-derived: 053's own contracts hold 182 clause ids
 So the scenario's expected result is **not yet satisfiable, and that is the correct state at T027**: the criterion is "delta empty **AND** this feature's claimed count non-empty", and both halves fail for the same reason — the claims only land at T045. What this run proves is the stronger property the criterion exists for: the delta is *exactly* this feature's own 182 clauses and nothing else, so the baseline exempts the pre-existing 483 items of other specs while exempting **none** of 053's own. The gate is red now, for the right reason, and T045 is what turns it green — a gate that had been green all along would have been the defect FR-027 § 基线面 was amended to prevent.
 
 **A second measured defect, in the idiom rather than the tool.** The first `comm -13` attempt printed `comm: file 1 is not in sorted order` and then reported a delta of **665** instead of 182 — a wrong verdict that still looked like output. Cause: the names are codepoint-sorted (Python's `sorted`), but glibc collation ignores `#`, `/` and `.` at the first level, so under `en_US.UTF-8` the two `#`-prefixed header lines sort *after* digit-initial names. `LC_ALL=C sort -c` accepts the file and the ambient locale rejects it at line 3. Disposition: the idiom is specified with `LC_ALL=C` in three places that a reader could reach it from — the baseline header itself, the script's docstring, and `tasks.md` GATE-8 — and pinned twice in `test_clause_coverage.py` (`test_c24…` now runs `comm` under `LC_ALL=C` with **both** sides non-empty, because with an empty baseline `comm -13` echoes all of file 2 whatever the ordering and my first version of that test passed for that weak reason; `test_c24b…` pins the file as C-sorted with exactly two header lines). The script's internal delta is a set difference and is locale-independent, so it stayed authoritative throughout — the two agreed at 182 once the locale was fixed.
+
+## 场景 8 — US4 的 `run-checks` 五项 verdict 与零写入(改后实跑,2026-10-04,T036)
+
+### The real tree, read-only: census first, because C-28 makes the sample availability a measured fact
+
+```text
+goals: 1 -> draw-two-layer-structure            status=active
+teams: 6 directories + hidden .work/            teams declaring goal_slug: 2
+  draw-two-layer-structure -> goal 'draw-two-layer-structure'          definition exists: yes
+  viz-skill-arena          -> goal 'visualization-skill-selection'     definition exists: NO
+```
+
+**So C-28's contingency fires and is recorded rather than papered over**: the only real goal is
+`active`, therefore **no real terminal-state goal exists** and SC-007's "对一个 goal 已终态的真实
+团队跑" has no real sample. That tier was constructed in a throwaway copy of the real tree
+(`mktemp -d` + `\cp -r .specify/goal .specify/teams`), never by mutating a real definition, and
+the copy was deleted afterwards (residue **0**). No verdict below is fabricated: each is pasted
+from a run, and the tier it belongs to is named.
+
+### R1–R4: the real tree, all five exit tiers except 4
+
+| run | verdict | blocked | exit | what it proves |
+|---|---|---|---|---|
+| `run-checks draw-two-layer-structure` | `ok` | false | **0** | C-7: with no target, ②③④ are `not-evaluated` while ①⑤ are really evaluated (both `ok`) |
+| `run-checks draw-two-layer-structure --target T-001` | `target-terminal` | **true** | **5** | a REAL blocked sample — T-001 is genuinely `dropped` in the live definition; ③ fires, ①② evaluated `ok`, ④ `not-evaluated` (a local-form reference raises no cross-goal question) |
+| `run-checks cws-workspace-cluster` | `no-goal-definition` | false | **0** | team.md check 1's own sentence, observable: no goal definition blocks **only** when a `--target` was named |
+| `run-checks no-such-team` | `{"error": "team not found: no-such-team"}` | — | **3** | not-found stays its own tier, folded into neither 2 nor 5 |
+
+R2's real message, pasted verbatim — it carries the review bifurcation rather than a bare label
+(Principle XV / checker-form C-33):
+
+```text
+3. target-terminal  target-terminal — Target T-001 处于终态 'dropped',run 停止——复核二分:
+   属实则返回报告结束;证据不符则经 /speckit.goal targets --set open --id T-001 重开后重新
+   发起 run。不提供终态执行旁路
+```
+
+### The 2 / 4 / 5 tiers, constructed in a throwaway copy
+
+```text
+TIER 2  --target not-a-target            verdict=input-error  blocked=False  EXIT=2
+        checks: 1 ok · 2 not-evaluated · 3 not-evaluated · 4 not-evaluated · 5 ok
+TIER 4  goal.md status: finished         {"error": "goal definition 'draw-two-layer-structure'
+        (outside the lifecycle set)       declares status 'finished', outside the lifecycle set
+                                          ('active','achieved','abandoned') — the goal-terminal
+                                          check has no decidable subject"}                EXIT=4
+TIER 5  goal.md status: achieved         verdict=goal-terminal  blocked=True   EXIT=5
+        — with NO --target at all, so ⑤ blocks on its own
+```
+
+C-18's three tiers are therefore mutually distinguishable on the same team definition: **5**
+(a check judged the run blocked), **2** (the argument matched neither grammar), **4** (the
+definition could not be interpreted). The tier-5 run also settles the one semantic question
+this phase had to resolve: ⑤ goal-terminal blocks with or without a target, because team.md's
+check 5 ("终态 goal 只读") is a property of the goal and carries none of the target-scoping
+sentence that check 1 carries — and SC-007 expects `blocked` true for a terminal-goal team
+without saying whether it has a focus. Both readings of SC-007 are satisfied by this choice;
+only one is satisfied by scoping ⑤ to targets.
+
+### Zero writes (C-3 / SC-007 Source), measured as a byte checksum
+
+```text
+md5 over every file in .specify/goal/ and .specify/teams/, stable order:
+  before all runs  dad5e7c5f584e0efe82e533b965d3485
+  after  all runs  dad5e7c5f584e0efe82e533b965d3485      BYTE-IDENTICAL
+```
+
+That checksum was taken across R1–R4, the whole-team sweep below, and every constructed tier
+(each of which ran against the copy, with `--repo-root` pointing at it). The real definitions
+were never opened for writing — `run_checks` contains no write point at all, which
+`test_run_checks.py::test_c3…` asserts both by checksum and by a write-point scan.
+
+### A real repo finding this action surfaced on its first run
+
+`viz-skill-arena` declares `goal_slug: visualization-skill-selection`, and **no such definition
+exists**. Before this action the dangling binding was invisible: nothing enumerated team
+bindings against the archive. Now one read-only call names it, and names the remedy:
+
+```text
+run-checks viz-skill-arena                -> goal-binding: no-goal-definition, blocked=false, EXIT=0
+    message: 绑定 goal 'visualization-skill-selection' 无定义文件;先经 /speckit.goal migrate 落为定义
+run-checks viz-skill-arena --target T-001 -> goal-binding: no-goal-definition, blocked=TRUE,  EXIT=5
+```
+
+The pair is the target-scoping rule demonstrated on live data: the same verdict, blocking only
+once a Target is named. **Not fixed here** — repairing another feature's team binding is outside
+053's declared scope, and the tool's job is to make it visible, which it now does. Recorded for
+`/speckit.team` or `improve-team` to act on. The remaining four teams declare no `goal_slug`
+at all, so their identity resolves to `none` and they report the same non-blocking verdict:
+`cws-workspace-cluster`, `draw-plantuml-optimizer`, `requirement-implement-monitor`,
+`summarize-project-optimizer`.
+
+### A pre-existing defect found while wiring this, escalated not fixed (A-9)
+
+`--json` and `--repo-root` are declared on a parser shared by the top level and every subparser,
+and the source comment claimed that made them position-independent. **Measured false**: argparse
+lets a subparser overwrite a namespace attribute the top level already set, so `--json list`
+emits the human form and `--repo-root X list` resolves to the cwd. Evidence: the same `list`
+action observed through `_emit` gives `as_json=False` for `["--json","list"]` and `True` for
+`["list","--json"]`. Fixing it (suppressing the subparser defaults) would change flag precedence
+for all ten actions, which is outside FR-029…FR-034 — so it is escalated as `research.md` **A-9**
+and handled the way A-1 was: the false comment and the false Tool-record line
+(`.specify/memory/tools/goal-utils.py.md`, which said "accepted **both before and after** the
+subcommand") are corrected to state the measured behaviour, `contracts/run-checks.md` C-11's
+falsified premise is annotated in place, and `test_run_checks.py` pins **both directions** so a
+future fix and a further regression both fail loudly. Every invocation in this record passes the
+flags after the action.

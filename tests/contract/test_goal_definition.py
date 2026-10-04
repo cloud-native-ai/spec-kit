@@ -248,7 +248,7 @@ def test_help_labels_every_action_read_or_write(capsys):
         goal_utils.main(["--help"])
     out = capsys.readouterr().out
     for action in ("create", "validate", "check-statement", "list", "status",
-                   "objective", "criteria", "migrate", "targets"):
+                   "objective", "criteria", "migrate", "targets", "run-checks"):
         line = next((l for l in out.splitlines()
                      if l.strip().startswith(action + " ")), None)
         assert line, f"--help lost the {action} row"

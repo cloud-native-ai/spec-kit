@@ -34,7 +34,7 @@
 
 **C-10** [制品类] check 的 `name` 与其 `verdict` 是**两个字段、两种角色**——`name` 说明「跑的是哪一项检查」,`verdict` 说明「该项得出什么结论」——MUST NOT 互相替代。**实测(订正)**:二者**并非**互斥集合,五项 `name` 里有 **4** 个同时也是 `goal-utils.py` 发出的 verdict 字面量(`dangling` `:665`、`target-terminal` `:669`、`cross-goal` `:643`、`goal-terminal` `:660`),只有 `goal-binding` 是纯 name(其 verdict 为 `no-goal-definition`)。故判据 MUST NOT 写成「两个集合交集为空」——那在当前源码下**不可满足**,照它写的测试一落地即红。可判定的判据取两条:(a) 至少存在一项检查,其 `name` **不属于** verdict 词表(实测即 `goal-binding`),证明两个字段不可互换;(b) 每项检查的 `name` → **可能 verdict 集**的映射被逐项钉住(依 D-11 的五个产出点),使「name 恰是该检查的某个 verdict」这一巧合不被误当作可依赖的不变量。(FR-031、FR-032、V-9)
 
-**C-11** [制品类] `--json` MUST 已由**共享父解析器**提供(`:794`),故置于 action 前后皆可;每个 action 以 `_emit(result, args.json)`(`:1000`)收尾,`_emit`(`:1004-1024`)在 `--json` 下 `json.dumps(..., ensure_ascii=False, indent=2)`。新 action MUST 沿用同一路径,MUST NOT 自行 `print(json.dumps(...))`。(FR-031)
+**C-11** [制品类] `--json` MUST 已由**共享父解析器**提供(`:794`),故置于 action 前后皆可;每个 action 以 `_emit(result, args.json)`(`:1000`)收尾,`_emit`(`:1004-1024`)在 `--json` 下 `json.dumps(..., ensure_ascii=False, indent=2)`。新 action MUST 沿用同一路径,MUST NOT 自行 `print(json.dumps(...))`。**(2026-10-04 US4 实跑订正:前半句「置于 action 前后皆可」为假,已被实测推翻并上送为 A-9。)** argparse 允许子解析器用**自己的默认值**覆盖顶层已写入 namespace 的值,故 `--json <action>` 静默输出人读形态、`--repo-root X <action>` 静默回落为 cwd;取证是同一 `list` 动作两种次序经 `_emit` 观察 `as_json` 得 `False` / `True`。修它要改**全部十个 action** 的旗标优先级,超出本特性声明范围,故 MUST NOT 顺手改(与 A-1 同一处置);落地形态为:源码注释与 Tool 记录按实测订正,契约测试把**两个方向都钉住**(action 后出 JSON、action 前出人读形态),使将来的修复与进一步的退化都不静默。**本条的规范部分不受影响且已满足**:输出经 `_emit`、无自行 `print(json.dumps(...))`。(FR-031)
 
 ## verdict 词表
 
