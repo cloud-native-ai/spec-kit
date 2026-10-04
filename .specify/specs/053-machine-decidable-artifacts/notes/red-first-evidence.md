@@ -252,3 +252,135 @@ forbids it. The row's real intent (paste the counter-sample battery, since there
 claims of this feature's own to demonstrate until T045) is unaffected and is what the tables
 above do. Annotated on the row rather than worked around; this is the same measurement
 `/speckit.analyze` recorded as F-25.
+
+## T024 — `tests/contract/test_clause_coverage.py` red first (2026-10-04)
+
+Command: `python3 -m pytest tests/contract/test_clause_coverage.py -q`, before T025 landed:
+
+```text
+27 failed, 10 passed in 0.81s
+FAILED …::test_c7_relational_sentinel_is_printed_and_holds_never_a_literal_total
+FAILED …::test_c8_named_count_tracks_the_owner_coverage_and_is_printed_with_the_form_set
+FAILED …::test_c9_named_list_is_collapsible_behind_an_explicit_flag
+FAILED …::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+FAILED …::test_c12_no_pyyaml_dependency_anywhere_in_the_chain
+FAILED …::test_c13_parse_doubt_yaml_is_named_and_never_guessed_zero
+FAILED …::test_c15_parseable_but_zero_clause_file_is_named_with_a_companion
+FAILED …::test_c16_uncovered_is_a_set_difference_with_the_str009_prefix_both_directions
+FAILED …::test_c17_an_empty_uncovered_set_carries_a_non_empty_companion
+FAILED …::test_c17b_a_zero_denominator_turns_the_sentinel_red
+FAILED …::test_c18_the_two_lanes_are_separate_sections_with_separate_counts
+FAILED …::test_c18b_deleting_one_citation_from_a_group_makes_that_fr_uncovered
+FAILED …::test_c19_uncovered_names_are_sorted_one_per_line_and_comm_consumable
+FAILED …::test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus
+FAILED …::test_c21_baseline_discipline_comm_delta_paired_with_a_non_empty_claim
+FAILED …::test_c22_baseline_internal_items_still_print_their_count
+FAILED …::test_c23_the_baseline_header_records_the_form_set_and_the_freeze_context
+FAILED …::test_c24_the_idiom_is_a_sorted_name_list_consumed_by_comm_not_a_second_form
+FAILED …::test_c25_the_baseline_is_not_the_gate_scanner_broken_json_shape
+FAILED …::test_c26_every_yaml_contract_is_explicitly_disposed
+FAILED …::test_c27_the_sc006_evidence_form_is_three_numbers_and_a_sum_assertion
+FAILED …::test_form_str008_attribution_and_four_label_docstring_body
+FAILED …::test_form_exit_code_table
+FAILED …::test_form_json_key_set_verdict_array_and_status_vocabulary
+FAILED …::test_form_human_tail_line_is_the_str003_shape
+FAILED …::test_form_positional_artifact_path_is_accepted
+FAILED …::test_form_the_script_is_read_only_by_write_point_scan
+```
+
+**The 10 green-before, each with what turns it red.** C-1…C-6 are the *owner document*'s clauses
+and it landed in Phase 2 (T003); C-11 and C-14 pin `clause_extract.py`, which landed in Phase 2
+(T005); the last two pin artifacts that predate this feature:
+
+| test | green before T025 because | goes red when |
+|---|---|---|
+| `test_c1_owner_doc_exists_declares_ownership_and_points_at_uic` | T003 landed the owner doc | the self-declaration is reworded away, or the UFC pointer becomes a copy of its class table |
+| `test_c2_owner_doc_declares_all_six_forms_and_the_three_block_rules` | same | a form or one of the three block rules (boundary / citation group / mentions) is dropped |
+| `test_c3_exactly_one_canonical_form_and_legacy_forms_are_read_only` | same | a second form is declared canonical |
+| `test_c4_owner_doc_copies_no_clause_body_from_any_contract` | same | the owner doc starts carrying clause bodies (sentinel: it compares >100 clause bodies, so an empty offender list is not an empty scan) |
+| `test_c5_gate_budget_is_unchanged_by_the_owner_document` | measured 23 / 0 | any `shared/` wording trips a BLOCKING pattern — integer headroom is 0 |
+| `test_c6_the_cap_is_pinned_in_three_forms_with_meta_pins` | pins predate this feature | a pin's wording is edited, which is what the meta-pins exist to catch |
+| `test_c11_the_misnamed_yaml_is_judged_by_content_and_yields_its_six_ids` | T005 landed the extractor | the form decision starts using the file extension |
+| `test_c14_the_paren_form_file_contributes_the_clauses_a_closed_regex_would_drop` | same | the extractor regresses to the closed-bold regex only (sentinel asserts the fixture still fails that regex) |
+| `test_form_ships_via_the_force_include_mapping` | `pyproject.toml` predates this feature | the wheel mapping stops covering `scripts/` |
+| `test_the_contract_still_has_the_clause_count_this_suite_pins` | the contract is authored | clause-coverage.md's count moves off 27 |
+
+**Two assertion defects found by the red run, both fixed on the assertion side** (the subjects
+were already correct — this is the failure-attribution step, stated so the fix is not read as
+"making the subject satisfy a wrong assertion"):
+
+- C-2's regex needles were double-escaped (`r"\*\*C-\\d"`), so they searched for a literal
+  backslash-`d` that no document contains. Changed to plain substring checks.
+- C-4's probe was "the first 40 characters of the clause body appear in the owner doc". That
+  matched `051-user-facing-comprehension/contracts/discipline-doc.md#C-2`, whose body *begins
+  with the user-facing-comprehension path* — the same path C-1 **requires** the owner doc to
+  carry. C-4 exempts citation forms, so the probe now strips code spans before comparing and
+  requires ≥40 characters of prose, plus a sentinel that >100 clause bodies were compared.
+
+## T025/T026/T027/T028 — US3 landed, real output (2026-10-04)
+
+Suite state after T025 + T026: `test_clause_coverage.py` → **39 passed, 0 failed**.
+
+### T028's three counter-samples (temp dir, residue 0)
+
+One corpus, four contract files, each planted to break exactly one proposition:
+
+```text
+scanned 4 files: parsed 2 + named-unparseable 2 == 4  [relational sentinel OK]
+  per form: md-bold-closed 1 files/1 clauses; yaml-openapi 1 files/0 clauses;
+            yaml-assertions 1 files/6 clauses; md-none 1 files/0 clauses
+  zero-clause-but-parseable (parse doubt): 1
+  .yaml: parsed 1 / total 2 / named 1
+  NAMED: 001-alpha/contracts/flow.openapi.yaml
+  NAMED: 001-alpha/contracts/prose.md
+  [clause-unparsable] fail (2) — 2 files yield no clause id under the owner's forms;
+      1 of them declares a positive form, which is parse doubt and is never read as
+      zero-and-covered
+FR universe: 1 | FR claimed: 1 | FR uncovered: 0
+6 error(s), 1 warning(s)   status: uncovered   ACC_EXIT=1
+残留计数: 0        (after `\rm -rf $tmp`; `ls -d $tmp | wc -l` → 0)
+```
+
+Per-file, form and ids judged by **content**:
+
+| planted file | suffix | form | ids | which clause it breaks |
+|---|---|---|---|---|
+| `flow.openapi.yaml` — `paths: {/v1/x: {get: …}}` all on one line | `.yaml` | `yaml-openapi` | **0** | **C-13**: stream-style yaml is parse doubt, so it is NAMED and drives `clause-unparsable` to **fail**; it is never counted as "0 clauses, therefore covered" |
+| `prose.md` — headings and prose, no clause marker | `.md` | `md-none` | **0** | **C-15**: parseable but zero clauses, so it appears in the named set instead of vanishing from the denominator |
+| `definitely-not-openapi.yaml` — the real `013-…` file, **renamed** | `.yaml` | `yaml-assertions` | **6** | **C-11**: the misnomer resolves by content, not by name; its six ids (`no-tool-discovery-step`, `no-tool-template-boilerplate`, `no-mandatory-tool-manifests`, `no-refresh-tools-in-script`, `mirror-parity`, `no-tool-manifest-in-checklist`) entered the universe and surfaced as six real `UNCOVERED:` names |
+| `c.md` — the control | `.md` | `md-bold-closed` | **1** | positive control: a well-formed contract parses and its clause is claimed by T001, so `claimed clauses 1` is non-zero and the three rows above are not "nothing parsed at all" |
+
+The control matters: without `c.md` a run where the extractor simply crashed on every file would
+print the same `named 2` / `parsed 0` shape and look like a pass (checker-form C-21).
+
+### Two defects found by running US3, both written back rather than worked around
+
+1. **The universe silently lost 24 clauses** (`clause universe: 665` against 689 extracted ids).
+   Cause and disposition are in `notes/quickstart-run.md` § 场景 6 and escalated as `research.md`
+   **A-8**; the owner document now records the non-uniqueness and the duty to print both numbers,
+   without changing the declared syntax (that is the owner's call, not an implementation run's).
+2. **`comm -13` reported a delta of 665 where the truth was 182**, with a warning on stderr that
+   a piped check would have swallowed. Cause: codepoint-sorted names versus glibc collation, which
+   ignores `#`/`/`/`.` — the baseline's two header lines sort after digit-initial names under
+   `en_US.UTF-8`. Fixed by specifying `LC_ALL=C` at all three reachability points (baseline header,
+   script docstring, `tasks.md` GATE-8), pinned by `test_c24b…`, and `test_c24…` was strengthened:
+   its first version compared against an **empty** baseline, where `comm -13` echoes all of file 2
+   whatever the ordering — so it passed for a reason that had nothing to do with the idiom working.
+   It now runs with both sides non-empty. `contracts/clause-coverage.md` C-19 was amended to say
+   which ordering "已排序" means; its citation group is unchanged (`(SC-005、D-10)`), verified by
+   re-running the extractor, so `feature-ref.md`'s published mapping does not move.
+
+### Scope note: the accountant is not in `test_checker_form.py`'s per-artifact battery
+
+`NEW_CHECKERS` in that suite listed `account-clause-coverage.py`, and its `_SKIP_ALLOWED` entry was
+the only reason that stayed invisible — the skip hid a premise that execution falsifies. That battery
+hands a checker one artifact file and expects a verdict on *that file*: `main([requirements.md]) == 0`,
+a `skeleton` status for a placeholder-only file, exit 1 for an FR gap. The accountant takes a spec
+directory and accounts a whole corpus (FR-023…FR-028), it has no skeleton concept, and FR-gap
+detection is `validate-requirements.py`'s job — duplicating it here would create a second owner for
+one rule. Its exit-0 state is also unreachable until T045 retro-fits this feature's own claims, so
+pinning it there would have been a permanently red test rather than a guard. What it *does* share
+with every new script (STR-008 attribution, docstring label body, zero write points, packaging) is
+asserted in that suite's `ALL_NEW_SCRIPTS` set, and its own form obligations — label set, exit table,
+JSON key set with a verdict array, STR-003 tail, positional-artifact form — are pinned here, which is
+what that suite's docstring already claimed.

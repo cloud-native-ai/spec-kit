@@ -6,9 +6,11 @@ This suite MUST NOT claim a behavior-class clause is "covered by a guard" — wh
 behavior-class clause has an observable artifact-side proxy, the test name says which
 clause and which proxy, and the proxy is asserted instead of the claim.
 
-Skips are explicit and named, never silent passes: `account-clause-coverage.py` (T025) does
-not exist during US1, and `goal-utils.py`'s new action (T031) does not exist during US1/US3.
-Their own form obligations are pinned by tests/contract/test_clause_coverage.py (T024) and
+No test in this suite skips. A named subject that has not landed is an AssertionError, because
+a skip is indistinguishable from a pass in a summary line — and a skip entry is exactly what
+hid `NEW_CHECKERS` listing a script this battery cannot judge (see `ALL_NEW_SCRIPTS` below for
+the split and its reason). `account-clause-coverage.py`'s own form obligations are pinned by
+tests/contract/test_clause_coverage.py (T024), and `goal-utils.py`'s new action by
 tests/contract/test_run_checks.py (T030).
 
 Red-first: this suite is red until scripts/python/validate-requirements.py lands (T009).
@@ -51,7 +53,27 @@ VR_CHECKS = _sibling_pin("test_requirements_checker.py", "REQUIREMENTS_CHECKS")
 
 NEW_CHECKERS = {
     "validate-requirements.py": VR_CHECKS,
-    "account-clause-coverage.py": None,  # label set owned by T024's suite
+}
+
+# Every script this feature adds, whatever its interface. The obligations that do NOT depend
+# on judging one artifact file — STR-008 attribution (C-4), a docstring label body in the
+# house's extractable form (C-5), zero write points (C-13) — hold for all of them and are
+# asserted here.
+#
+# `account-clause-coverage.py` is in this set and deliberately NOT in NEW_CHECKERS above.
+# NEW_CHECKERS is the per-artifact battery: it hands a checker one file and expects a verdict
+# on that file (`main([requirements.md]) == 0`, a skeleton status for a placeholder-only file,
+# exit 1 for an FR gap). The accountant takes a spec directory and accounts a whole corpus
+# (FR-023…FR-028), has no skeleton concept, and FR-gap detection belongs to
+# validate-requirements.py — a second implementation would give one rule two owners. Its
+# exit-0 state is also unreachable until T045 retro-fits this feature's own claims, so pinning
+# it here would have been a permanently red test, not a guard. Its own form obligations (label
+# set, exit table, JSON key set with a verdict array, STR-003 tail, positional-artifact form)
+# are pinned by test_clause_coverage.py, which owns ACCOUNTANT_CHECKS as the single source.
+# This was invisible during US1 only because a skip entry masked the file's absence.
+ALL_NEW_SCRIPTS = {
+    "validate-requirements.py": VR_CHECKS,
+    "account-clause-coverage.py": _sibling_pin("test_clause_coverage.py", "ACCOUNTANT_CHECKS"),
 }
 
 
@@ -67,16 +89,11 @@ def _exists(name: str) -> bool:
     return (SCRIPTS / name).is_file()
 
 
-# A checker this phase is responsible for MUST fail loudly when absent — a skip is not red.
-# Only the accountant (T025, a later phase) is allowed to skip, and the skip names its owner.
-_SKIP_ALLOWED = {"account-clause-coverage.py": "T024/T025 (US3) pin it; see module docstring"}
-
-
+# A checker this suite names MUST fail loudly when absent — a skip is not red, and a skip
+# entry is what hid NEW_CHECKERS listing a script whose interface this battery cannot judge.
 def _require(name: str):
     if not _exists(name):
-        if name in _SKIP_ALLOWED:
-            pytest.skip(f"{name} not landed yet — {_SKIP_ALLOWED[name]}")
-        raise AssertionError(f"{name} is missing: this suite's subject has not landed (T009)")
+        raise AssertionError(f"{name} is missing: a subject of this suite has not landed")
     return _load(name)
 
 
@@ -161,21 +178,21 @@ def test_c09_precedent_four_keys_are_not_migrated():
 # C-4 / C-5 / C-6 — Program-First attribution and the docstring label body
 # --------------------------------------------------------------------------- #
 
-@pytest.mark.parametrize("name", sorted(NEW_CHECKERS))
+@pytest.mark.parametrize("name", sorted(ALL_NEW_SCRIPTS))
 def test_c04_docstring_names_the_owner_file(name):
     _require(name)
     src = (SCRIPTS / name).read_text(encoding="utf-8")
     assert STR008 in src
 
 
-@pytest.mark.parametrize("name,labels", sorted(NEW_CHECKERS.items()))
+@pytest.mark.parametrize("name,labels", sorted(ALL_NEW_SCRIPTS.items()))
 def test_c05_docstring_label_body_matches_the_pinned_set(name, labels):
     mod = _require(name)
     extracted = set(LABEL_DOC_RE.findall(mod.__doc__ or ""))
-    if labels is None:
-        assert extracted, "label body present but its set is pinned by T024's suite"
-    else:
-        assert extracted == labels
+    assert extracted, "sentinel: no label body parsed from the docstring"
+    assert extracted == labels, (
+        f"{name}'s docstring roster drifted from the set its own suite owns: {sorted(extracted)}"
+    )
 
 
 def test_c06_proxy_existing_attribution_form_is_untouched():
@@ -249,7 +266,7 @@ def test_c12_proxy_skeleton_criterion_is_written_down():
 # C-13 / C-14 — read-only
 # --------------------------------------------------------------------------- #
 
-@pytest.mark.parametrize("name", sorted(NEW_CHECKERS))
+@pytest.mark.parametrize("name", sorted(ALL_NEW_SCRIPTS))
 def test_c13_new_checkers_have_zero_write_points(name):
     _require(name)
     src = (SCRIPTS / name).read_text(encoding="utf-8")
