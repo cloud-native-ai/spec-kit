@@ -42,7 +42,7 @@ Create or update a requirements specification from a natural-language feature de
    - Marks critical unknowns with `[NEEDS CLARIFICATION]` (maximum 3 markers)
    - Prioritizes by impact: scope > security/privacy > user experience > technical details
 
-8. **Quality validation** — Generates a quality checklist at `checklists/requirements.md` and validates the spec against it. If `[NEEDS CLARIFICATION]` markers remain, presents options to the user (max 3 questions) and updates the spec with answers.
+8. **Quality validation** — Runs the deterministic checker `.specify/scripts/python/validate-requirements.py <spec>` first and presents its output verbatim, stopping on any ERROR rather than proceeding to the next phase; the checker owns the structural propositions (numbering contiguity and document order, reference resolvability, active-marker counts, duplicate ids) so they are judged by a program instead of re-read by the agent each run. Then generates a quality checklist at `checklists/requirements.md` and validates the spec against it. If `[NEEDS CLARIFICATION]` markers remain, presents options to the user (max 3 questions) and updates the spec with answers.
 
 9. **Feature integration** — Scans the feature registry (`.specify/memory/features.md`) for a matching feature. Binds the spec to an existing feature or creates a new one.
 
