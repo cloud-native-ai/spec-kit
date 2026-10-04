@@ -186,3 +186,81 @@ subcommand") are corrected to state the measured behaviour, `contracts/run-check
 falsified premise is annotated in place, and `test_run_checks.py` pins **both directions** so a
 future fix and a further regression both fail loudly. Every invocation in this record passes the
 flags after the action.
+
+## 场景 9 — US5 的 SC-009 双向演示与三档失败(改后实跑,2026-10-04,T042)
+
+Built in `mktemp -d` with `\cp -r skills $repo/skills` — a copy of the **real** skills tree, so the
+member set is the seven real `draw-*` skills and not a synthetic stand-in. The goal definition carries
+two criteria over the *same* subject set, one in each form, which is what makes the difference visible
+in one output rather than across two runs. The real tree is only ever read (verified at the end).
+
+```text
+BEFORE   derived: skills/draw-d3js, draw-diagram, draw-drawio, draw-echarts,
+                  draw-excalidraw, draw-mermaid, draw-plantuml        state=ok   (7 members)
+         enumeration text: "Seven skills (draw-diagram and draw-{d3js,drawio,excalidraw,
+                  mermaid,plantuml}) each ask for feedback."
+
+REMOVE skills/draw-d3js
+         derived: draw-diagram, draw-drawio, draw-echarts, draw-excalidraw,
+                  draw-mermaid, draw-plantuml                          state=ok   (6 members)
+         enumeration text: UNCHANGED — still "Seven skills (… draw-{d3js,…})"
+
+ADD skills/draw-xyz
+         derived: … draw-plantuml, draw-xyz                            state=ok   (7 members)
+         enumeration text: UNCHANGED — still names the old six, and still says "Seven"
+```
+
+**This is SC-009 and it is the whole argument in one table.** After the removal the enumeration
+criterion asserts a member that no longer exists; after the addition it omits one that does — and in
+both cases it still says "Seven", which is now true only by accident (7 ≠ the 6 it names, then 7 ≠ the
+7 it names). The derived set is right at every step without anyone editing the criterion. That is the
+churn `.specify/goal/draw-two-layer-structure/goal.md`'s own `## History` records having actually
+happened (「六个绘图技能」→「七个绘图技能」), so the demonstration reproduces a real defect on real
+data rather than a constructed one.
+
+### The three failure tiers, each with its positive control
+
+| counter-sample | real output (decisive line) | EXIT |
+|---|---|---|
+| `SUBJECT MISSING:` | `criterion 1 references [subjects: nope/nothing-*], whose literal prefix does not exist in the repository — a reference that denotes nothing is not the same fact as one denoting an empty set; fix the glob or restore the directory` | **4** |
+| `SUBJECT EMPTY:` | `criterion 1 references [subjects: skills/zzz-*], which exists but matches nothing — an empty subject set would make 'every subject satisfies this' vacuously true; widen the glob or populate the directory` | **4** |
+| `SUBJECT CONFLICT:` | `criterion 1 carries both the reference form [subjects: skills/draw-*] and a brace-expanded member list — one subject set must have one source, so drop the retyped members or drop the reference` | **4** |
+| **positive control** | the same criterion with the brace enumeration removed → `valid` | **0** |
+
+The two "nothing there" tiers share an exit code and differ by **prefix**, which is the distinction
+C-5 actually requires ("退出码/verdict … 互相可区分"): the remedies are opposite (fix the glob vs.
+look at the directory), so collapsing them would leave the author unable to act. The positive control
+is what makes the three meaningful — without it, a parser that reported every criterion invalid would
+produce the same three lines.
+
+### The second parser (C-14's disposition, executed)
+
+```text
+build-summary-input.load_goal_definition(...).criteria[0] =
+  Every skill under (subjects: skills/draw-diagram, skills/draw-drawio, skills/draw-echarts,
+  skills/draw-excalidraw, skills/draw-mermaid, skills/draw-plantuml, skills/draw-xyz)
+  delegates its rendering to one engine.
+```
+
+Same seven members as the engine derived, and no opaque tag left in front of a summary reader. The
+derivation is local by design — `load_goal_definition`'s own comment records that a cross-tree import
+of `goal-utils.py` breaks once installed — so the price is two derivations, and the sync is pinned by
+`test_criterion_subject.py::test_c15…` rather than left to memory. The owner document names the file
+and this disposition, and also records that the same script keeps a **fifth** exit-code convention in
+this repository (`EXIT_NO_MATERIAL = 3`, `EXIT_SERIALIZED = 4`) whose 3/4 mean something different from
+`goal-utils.py`'s `EXIT_NOT_FOUND`/`EXIT_INVALID`; that divergence is documented, not unified (C-16).
+
+### Backward compatibility and the residue
+
+```text
+$ python3 scripts/python/goal-utils.py validate draw-two-layer-structure
+valid                                     real goal EXIT=0
+residue: 0                                (after \rm -rf $tmp; ls -d $tmp | wc -l → 0)
+```
+
+The only real definition is pure enumeration, so it derives no subject set at all
+(`parse_goal(...)["subjects"] == []`) and validates exactly as before — SC-010's name-level comparison,
+whose anti-vacuity companion (C-12: at least one definition scanned, and a member set actually
+produced) is asserted in the same test rather than assumed from an empty delta. Suite state after US5:
+`test_criterion_subject.py` + `test_run_checks.py` + `test_goal_definition.py` + `tests/unit/test_goal_utils.py`
+→ **165 passed, 0 failed**, so the pre-existing goal suites are unaffected.

@@ -366,6 +366,102 @@ def _title_from_body(body: str) -> str:
     return match.group(1).strip() if match else ""
 
 
+#: 053 FR-035 — the criterion-subject reference form. Single definition point; the literal
+#: itself is owned by shared/definitions/goal-definitions.md § 判据主体指代形 (Criterion
+#: Subject Reference), which also states the two failure tiers and the conflict rule below.
+SUBJECT_REF = re.compile(r"\[subjects:\s*([^\]]+)\]")
+#: The only machine-decidable member-enumeration marker: a brace expansion holding a comma.
+#: A PROSE enumeration ("所有绘图技能") carries no marker at all and is therefore NOT
+#: detected — the owner document states that boundary explicitly instead of claiming
+#: coverage it does not have, which is what the artifact/behavior clause split forbids.
+BRACE_ENUM = re.compile(r"\{[^}]*,[^}]*\}")
+
+#: STR-010 and its two siblings. Distinct prefixes, because "the path is not there" and
+#: "the path is there and matches nothing" have opposite remedies; both exit 4, so the
+#: prefix is what tells them apart.
+SUBJECT_PROBLEM_PREFIXES = {
+    "missing": "SUBJECT MISSING:",
+    "empty": "SUBJECT EMPTY:",
+    "conflict": "SUBJECT CONFLICT:",
+}
+#: Closed state vocabulary of derive_subjects. `absent` is the state every pre-existing
+#: pure-enumeration criterion stays in, which is what keeps their parse byte-identical.
+SUBJECT_STATES = ("absent", "ok", "missing", "empty", "conflict")
+
+_WILDCARD_CHARS = "*?["
+
+
+def _repo_root_for(path: Path) -> Path:
+    """The repository root a definition path lives under, or the cwd if none does."""
+    for parent in Path(path).resolve().parents:
+        if (parent / ".specify").is_dir():
+            return parent
+    return Path.cwd()
+
+
+def _glob_literal_prefix(pattern: str, repo_root: Path) -> Path:
+    """The leading wildcard-free part of a glob — what "the path does not exist" means."""
+    segments = []
+    for segment in pattern.replace("\\", "/").split("/"):
+        if any(ch in segment for ch in _WILDCARD_CHARS):
+            break
+        segments.append(segment)
+    return repo_root.joinpath(*segments) if segments else repo_root
+
+
+def derive_subjects(criterion: str, repo_root: Path) -> dict:
+    """The subject set one criterion's reference form derives to, at parse time.
+
+    Returns {"glob", "paths", "state"} with state in SUBJECT_STATES. Deriving the set here
+    rather than trusting members retyped into the criterion text is the whole point: a
+    derived set cannot go stale, which is the churn this repository's own goal History shows
+    (the same criterion rewritten from six skills to seven and back as the directory moved).
+
+    An empty derivation is NOT a pass — "every one of zero subjects satisfies this" is
+    vacuously true — so it is reported, and separately from a glob whose literal prefix does
+    not exist, because the two have opposite remedies.
+    """
+    repo_root = Path(repo_root)
+    matches = SUBJECT_REF.findall(criterion)
+    if not matches:
+        return {"glob": None, "paths": [], "state": "absent"}
+    pattern = matches[0].strip()
+    if len(matches) > 1 or BRACE_ENUM.search(criterion):
+        return {"glob": pattern, "paths": [], "state": "conflict"}
+    if not _glob_literal_prefix(pattern, repo_root).exists():
+        return {"glob": pattern, "paths": [], "state": "missing"}
+    paths = sorted({p.relative_to(repo_root).as_posix() for p in repo_root.glob(pattern)})
+    return {"glob": pattern, "paths": paths, "state": "ok" if paths else "empty"}
+
+
+def _subject_problems(criteria: list, repo_root: Path) -> list:
+    problems = []
+    for index, criterion in enumerate(criteria, start=1):
+        derived = derive_subjects(criterion, repo_root)
+        state = derived["state"]
+        if state == "absent" or state == "ok":
+            continue
+        glob = f"[subjects: {derived['glob']}]"
+        if state == "conflict":
+            problems.append(
+                f"{SUBJECT_PROBLEM_PREFIXES['conflict']} criterion {index} carries both the "
+                f"reference form {glob} and a brace-expanded member list — one subject set "
+                "must have one source, so drop the retyped members or drop the reference")
+        elif state == "missing":
+            problems.append(
+                f"{SUBJECT_PROBLEM_PREFIXES['missing']} criterion {index} references {glob}, "
+                "whose literal prefix does not exist in the repository — a reference that "
+                "denotes nothing is not the same fact as one denoting an empty set; fix the "
+                "glob or restore the directory")
+        elif state == "empty":
+            problems.append(
+                f"{SUBJECT_PROBLEM_PREFIXES['empty']} criterion {index} references {glob}, "
+                "which exists but matches nothing — an empty subject set would make 'every "
+                "subject satisfies this' vacuously true; widen the glob or populate the "
+                "directory")
+    return problems
+
+
 def parse_goal(path: Path) -> dict:
     text = Path(path).read_text(encoding="utf-8")
     meta, body = _split_frontmatter(text)
@@ -389,10 +485,18 @@ def parse_goal(path: Path) -> dict:
         "criteria_count": len(criteria),
         "boundaries": _parse_bullets(_section(body, _SECTION_BOUNDARIES)),
         "targets": _parse_targets_text(_section(body, _SECTION_TARGETS)),
+        # 053 FR-035: subject sets derived at parse time, one entry per criterion that
+        # carries a reference form. A pure-enumeration criterion derives nothing, so this
+        # list is empty for every definition that predates the form.
+        "subjects": [
+            derived for derived in
+            (derive_subjects(c, _repo_root_for(path)) for c in criteria)
+            if derived["state"] != "absent"
+        ],
     }
 
 
-def validate_goal(path: Path) -> tuple[bool, list[str]]:
+def validate_goal(path: Path, repo_root: Path | None = None) -> tuple[bool, list[str]]:
     path = Path(path)
     problems: list[str] = []
     if not path.is_file():
@@ -430,6 +534,12 @@ def validate_goal(path: Path) -> tuple[bool, list[str]]:
 
     if _SECTION_TARGETS in body:
         problems.extend(_validate_targets_section(_section(body, _SECTION_TARGETS)))
+
+    # 053 FR-035/FR-036: the criterion-subject reference form. The criteria list comes from
+    # parse_goal rather than a second extraction here, so validation and parsing can never
+    # disagree about which criteria exist.
+    root = Path(repo_root) if repo_root is not None else _repo_root_for(path)
+    problems.extend(_subject_problems(parse_goal(path)["criteria"], root))
     return (not problems), problems
 
 
@@ -1150,7 +1260,7 @@ def main(argv: list[str] | None = None) -> int:
             result = {"created": str(path.relative_to(repo_root))}
         elif args.action == "validate":
             path = _resolve(repo_root, args.target)
-            ok, problems = validate_goal(path)
+            ok, problems = validate_goal(path, repo_root)
             result = {"valid": ok, "problems": problems, "path": str(path)}
             if not ok:
                 _emit(result, args.json)

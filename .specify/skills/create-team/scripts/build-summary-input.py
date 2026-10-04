@@ -350,6 +350,30 @@ def _parse_targets_section(raw: str) -> list[dict[str, str]]:
     return targets
 
 
+#: 053 FR-035 — the criterion-subject reference form, understood LOCALLY. The literal and
+#: its semantics are owned by shared/definitions/goal-definitions.md § 判据主体指代形; the
+#: agreement between this derivation and goal-utils.py's is pinned by
+#: tests/contract/test_criterion_subject.py rather than left to memory.
+SUBJECT_REF = re.compile(r"\[subjects:\s*([^\]]+)\]")
+
+
+def expand_subjects(criterion: str, repo_root: Path) -> str:
+    """Render a criterion's `[subjects: <glob>]` reference as the members it derives to.
+
+    A summary reader has no way to resolve a bare reference form, so it must never reach
+    them as one. A criterion without the form is returned byte-identically — this is a
+    rendering step for the new form only, never a rewrite of existing criteria.
+    """
+    match = SUBJECT_REF.search(criterion)
+    if not match:
+        return criterion
+    root = Path(repo_root)
+    pattern = match.group(1).strip()
+    members = sorted({p.relative_to(root).as_posix() for p in root.glob(pattern)})
+    rendered = ", ".join(members) if members else "(no member matched — see goal-utils validate)"
+    return SUBJECT_REF.sub(f"(subjects: {rendered})", criterion)
+
+
 def load_goal_definition(repo_root: Path, goal_slug: str) -> dict[str, Any] | None:
     """Read the archived definition's objective and criteria, or None if absent.
 
@@ -358,6 +382,16 @@ def load_goal_definition(repo_root: Path, goal_slug: str) -> dict[str, Any] | No
     different relative depths, so a cross-tree import breaks once installed into a
     consuming project. The reader is deliberately minimal and read-only —
     `goal-utils.py` stays the single writer and the single validator.
+
+    The same reasoning applies to the criterion-subject reference form (053 FR-035):
+    `expand_subjects` above derives the member set locally instead of importing the
+    engine's `derive_subjects`. That is a deliberate second derivation, not an oversight,
+    and its cost is stated where it can be acted on — the owner document
+    (`shared/definitions/goal-definitions.md` § 判据主体指代形) records the disposition, and
+    `tests/contract/test_criterion_subject.py` asserts the two derivations agree on the
+    same input, because a sync left to memory is the failure mode this form exists to end.
+    This reader renders the reference into member names and never validates it: an
+    unresolvable or empty subject set is `goal-utils.py validate`'s to report.
     """
     path = repo_root / ARCHIVE_DIRNAME / goal_slug / "goal.md"
     if not path.is_file():
@@ -384,7 +418,7 @@ def load_goal_definition(repo_root: Path, goal_slug: str) -> dict[str, Any] | No
         for line in raw.splitlines():
             stripped = re.sub(r"^\s*(?:\d+[.)]|[-*+])\s*", "", line).strip()
             if stripped:
-                criteria.append(stripped)
+                criteria.append(expand_subjects(stripped, repo_root))
     return {
         "relpath": f"{ARCHIVE_DIRNAME}/{goal_slug}/goal.md",
         "objective": " ".join(section("## Objective").split()),

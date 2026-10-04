@@ -384,3 +384,43 @@ with every new script (STR-008 attribution, docstring label body, zero write poi
 asserted in that suite's `ALL_NEW_SCRIPTS` set, and its own form obligations — label set, exit table,
 JSON key set with a verdict array, STR-003 tail, positional-artifact form — are pinned here, which is
 what that suite's docstring already claimed.
+
+## T038 — `tests/contract/test_criterion_subject.py` red first (2026-10-04)
+
+Command: `python3 -m pytest tests/contract/test_criterion_subject.py -q`, before T039/T040/T041 landed:
+
+```text
+14 failed, 5 passed in 1.14s
+FAILED …::test_c1_owner_doc_gains_a_criterion_subject_section
+FAILED …::test_c2_the_literal_is_defined_once_and_reached_by_one_regex
+FAILED …::test_c3_the_section_is_an_addition_and_no_existing_form_was_rewritten
+FAILED …::test_c5_and_c6_the_two_failure_states_are_distinguishable
+FAILED …::test_c6_empty_subjects_is_reported_with_the_str010_prefix
+FAILED …::test_c7_both_tiers_have_counter_samples_and_a_positive_control
+FAILED …::test_c8_reference_plus_brace_enumeration_is_a_conflict
+FAILED …::test_c10_the_undetectable_case_is_documented_and_not_claimed
+FAILED …::test_c11_and_c12_existing_definitions_parse_identically_with_a_nonzero_companion
+FAILED …::test_c13_the_reference_form_moves_and_the_enumeration_does_not
+FAILED …::test_c14_the_second_parser_is_named_with_its_disposition
+FAILED …::test_c15_the_local_parser_stays_local_and_the_two_derivations_agree
+FAILED …::test_c16_the_fifth_exit_code_convention_is_recorded_not_unified
+FAILED …::test_c17_the_regex_and_states_are_pinned_as_a_table_not_as_prose
+```
+
+**The 5 green-before, and what turns each red** — all five are facts about artifacts that already
+existed, or "must not change" obligations, so green-before is the correct state for them:
+
+| test | green before T039 because | goes red when |
+|---|---|---|
+| `test_c4_the_owner_doc_is_still_linked_not_parsed_and_its_pins_still_hold` | the engine's docstring already names the concept authority and the AUTHORITY pin already passes | the new section is added by *rewriting* an existing one, or the engine's reference is dropped |
+| `test_c9_the_real_enumeration_criterion_is_the_evidence_for_that_rule` | the real goal.md already carries a brace expansion and its History already records the six→seven churn | the conflict rule's evidence disappears from the corpus, i.e. the rule was derived from nothing |
+| `test_c18_the_engine_suite_that_reads_the_owner_doc_stays_green` | `test_goal_targets_engine.py` was green before US5 | the new section breaks the AUTHORITY assertion — it did go red mid-phase, from an unsynced mirror, and came back green at T043 (a legitimate ordering transient, not a subject defect) |
+| `test_c19_the_gate_budget_survives_the_new_section` | 23 / 0 before US5 | the new section's wording trips a BLOCKING pattern — measured 0 hits, budget still 23 after landing |
+| `test_the_mirror_of_the_owner_doc_matches_and_the_clause_count_holds` | source and mirror were identical before the edit | T039 edits the source without T043 syncing it (this is the one that *did* go red mid-phase, by design) |
+
+**One assertion defect found by the red run, fixed on the assertion side.** `test_c2` extracted the
+parser's regex with `re\.compile\(r?"?"?"?(\[subjects:…)`, which cannot match the source: the source
+text begins `re.compile(r"\[subjects:` — a literal backslash before the bracket — while the pattern's
+`\[` matches a bare bracket. It reported "0 regexes reference the form" against a file that had exactly
+one. Replaced with a line-level scan plus a direct `SUBJECT_REF.pattern` equality assertion, which is
+both simpler and actually pins the shape.
