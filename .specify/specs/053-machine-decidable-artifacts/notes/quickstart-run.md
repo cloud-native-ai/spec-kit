@@ -187,7 +187,7 @@ falsified premise is annotated in place, and `test_run_checks.py` pins **both di
 future fix and a further regression both fail loudly. Every invocation in this record passes the
 flags after the action.
 
-## 场景 9 — US5 的 SC-009 双向演示与三档失败(改后实跑,2026-10-04,T042)
+## 场景 10 — US5 的 SC-009 双向演示与三档失败(改后实跑,2026-10-04,T042)
 
 Built in `mktemp -d` with `\cp -r skills $repo/skills` — a copy of the **real** skills tree, so the
 member set is the seven real `draw-*` skills and not a synthetic stand-in. The goal definition carries
@@ -264,3 +264,141 @@ whose anti-vacuity companion (C-12: at least one definition scanned, and a membe
 produced) is asserted in the same test rather than assumed from an empty delta. Suite state after US5:
 `test_criterion_subject.py` + `test_run_checks.py` + `test_goal_definition.py` + `tests/unit/test_goal_utils.py`
 → **165 passed, 0 failed**, so the pre-existing goal suites are unaffected.
+
+## 场景 9 — US4 的钉子(改后实跑,2026-10-04,T047)
+
+The house form this feature was told to copy, read straight out of `test_trigger_engine.py`:
+
+```text
+:48   EXIT_CODES = {
+:292      for name, value in EXIT_CODES.items():
+:395      assert sorted(action.choices) == sorted(ACTIONS), (
+```
+
+**The "改前可实跑" absence proof is now false, and that is the point.** The scenario's pre-change
+evidence was that `goal_utils.EXIT` had zero hits in `tests/` — i.e. the binary's exit table had no
+pin at all. After T030 the same grep finds it in **2** files (`test_run_checks.py`, which owns the
+new closed table pin, and `test_checker_form.py`, whose C-26 conditional references the needle).
+The new pin is closed in both directions:
+
+```text
+EXIT_CODES = {"EXIT_OK": 0, "EXIT_INPUT_ERROR": 2, "EXIT_NOT_FOUND": 3,
+              "EXIT_INVALID": 4, "EXIT_BLOCKED": 5}
+test_c17  per-constant loop + each constant defined exactly once + no EXIT_USAGE=1 appeared
+test_c22  the module's own EXIT_* set == EXIT_CODES, so an added or removed constant fails
+test_c22b every action in the closed 10-name roster has a read:/write: help label
+```
+
+`test_goal_definition.py`'s hardcoded tuple is now **10** names ending `"targets", "run-checks"`
+(T032), the docstring exit line reads `0 ok | 2 input error | 3 not found | 4 validation failed |
+5 blocked` (C-24), and C-25's MUST-NOT holds both ways: the inline-paren attribution
+`Fixed rules belong in a program, not in a model` still has **1** hit while the STR-008 named-owner
+form has **0** — the existing binary was not converted to the new checkers' form.
+
+## 场景 1 / 1b / 1c / 1d — 改前基线采集(冻结于 T002,改后复核于 T047)
+
+The four groups were frozen at implement start and are landed in the spec dir; their pre-change
+values are owned by `notes/pre-change-measurements.md` and are not restated here. What T047
+re-measured is whether each frozen artifact is still the one the gates consume:
+
+| group | frozen artifact | post-change check |
+|---|---|---|
+| 1a test-name failure set | `baseline-failed.txt` | **65** names, sorted, md5 `02177c0e6e5961c880f73d932007df92` — identical to the pre-change reference C-19 records, so the baseline was re-frozen and re-recorded rather than inherited |
+| 1b gate total | scanner summary | **23 / 13 / 10 / 0** — see 场景 11b |
+| 1c clause-form census | `notes/clause-form-census.md` | re-derived through `clause_extract.py`: `excl-053 (110, 507)`, `all (117, 689 ids / 665 distinct names)`; the census's own per-form id column was corrected this run (312 → **311** for `md-bold-closed`, the one id the census had already named as a non-first-cell cross-reference) |
+| 1d mirror drift | per-pair DIFF name lists | still `scripts/python` **1**, `templates` **2**, `skills` **30**, whole tree **33** — see 场景 11c |
+
+1c is the group where the re-measurement actually found something: the census's corrected total
+(507) contradicted its own per-form column (which summed to 508), and the file is the declared owner
+of both. Fixed in the owner, not worked around downstream.
+
+## 场景 2 — FR-014 的债务偿清判据(改后实跑,2026-10-04,T047)
+
+```text
+transitional awk blocks in shared/constants/clarify-taxonomy.md : 0
+"Until that validator ships"                                    : 0
+validate-requirements.py mentioned in that file                 : 2
+the old pass-condition string "the interim extraction block is gone" : 0   (it WAS the assertion)
+"shares one implementation"                                     : 1
+tests/contract/test_clarify_semantic_completeness.py            : 13 passed
+```
+
+All four legs of the payoff criterion hold: the transitional copy is gone, the sentence promising a
+future validator is gone, the document-order invariant now points at the checker that exists, and the
+two tests that used to assert the copy's *presence* as their pass condition were rewritten in the same
+commit (D-9). The suite that owns them is green.
+
+## 场景 3 — US1 检查器对真实规格 + 四份破坏副本(改后重跑,2026-10-04,T047)
+
+```text
+001-unify-command-handoffs   EXIT=0
+003-speckit-agents-command   EXIT=0
+006-add-qoder-support        EXIT=0
+b1 (FR-030 definition row deleted)   EXIT=1  labels={id-contiguous}
+b2 (SC-002 row moved after SC-005)   EXIT=1  labels={doc-order}
+b3 (a citation to FR-777 planted)    EXIT=1  labels={ref-resolvable}
+b4 (FR-001 definition row doubled)   EXIT=1  labels={dup-id}
+residue: 0        (after \rm -rf $tmp)
+```
+
+SC-001's criterion met exactly: **4/4**, each broken copy naming **only** its own class, so no copy
+cross-masks another. First recorded at T010/T016 in `notes/red-first-evidence.md`; re-run here
+end-to-end because T047 asks for the whole quickstart, and the four labels are now also load-bearing
+for T045's claims (a mis-parsed clause id would have shown up as `green-dangling`).
+
+## 场景 4 / 场景 5 — US2 的假告警与四项逆样本
+
+Recorded in `notes/red-first-evidence.md` under **T019/T020/T022**, with the full tables: 场景 4's
+POS/NEG pair (POS still warns `both WRITE ['docs/a.md']`, NEG completely clean, so D-7's false alarm
+is gone without the guard being weakened) and 场景 5's seven counter-samples each hitting exactly its
+own label with residue 0. Not restated here — one owner per fact.
+
+## 场景 11 — 收尾三判据(改后实跑,2026-10-04,T047/T049)
+
+**11b 门控中立**: `blocking confirmation gates: 23` / `destructive: 13` / `governance_kept: 10` /
+`violations (reversible gates still blocking): 0` — unchanged, with integer headroom still zero.
+
+**11c 逐对镜像判据**, each pair judged by its own form (relative for the three pre-dirty pairs,
+absolute for the rest), measured without a pipe so the exit code is the script's:
+
+| pair | EXIT | DIFF/MISS | criterion | verdict |
+|---|---|---|---|---|
+| `scripts/python` | 2 | **1** | relative vs T002's recorded list (`trigger-utils.py`) | **no NEW drift** |
+| `shared/definitions` | 0 | 0 | absolute | ok |
+| `shared/guidelines` | 0 | 0 | absolute | ok |
+| `shared/constants` | 0 | 0 | absolute | ok |
+| `templates/tasks-template.md` | 0 | 0 | absolute | ok |
+| `templates/commands` | 0 | 0 | absolute | ok (pair excludes `commands/`; the per-tool copies are its distribution) |
+| `templates` | 2 | **2** | relative vs T002's list | **no NEW drift** |
+| `skills` | 2 | **30** | relative vs T002's list | **no NEW drift** |
+| `skills/create-team/references/execution-guide.md` | 0 | 0 | absolute | ok |
+| `skills/create-team/references/goal.md` | 0 | 0 | absolute | ok |
+| `skills/create-team/scripts/build-summary-input.py` | 0 | 0 | absolute | ok |
+| `regen-command-copies.py --check` | 0 | — | absolute | "OK: all per-tool command copies match the source templates." |
+| whole tree (no `--only`) | 2 | **33** | MUST NOT be used absolutely | = 1 + 2 + 30, reconciles exactly |
+
+**11c caught a real drift this run.** The first pass reported `scripts/python` at **2** DIFFs and the
+whole tree at **34**, not the recorded 1 and 33: the `green-path-divergence` narrowing made during
+T045 had edited `scripts/python/validate-tasks.py` after its last sync, so the mirror was stale.
+Re-synced that one file; the pair is back to its single pre-existing `trigger-utils.py` DIFF and the
+whole tree back to 33. That is the per-pair relative criterion earning its keep — an absolute
+whole-tree criterion would have reported failure and given no idea which of the 34 was new.
+
+**11a 名字级回归**: see 场景 12's companion entry below and `verification.md`; captured with
+`run-tests.sh --names-out` and compared with `LC_ALL=C comm -13`, with both side counts printed so an
+empty delta cannot be confused with two empty files.
+
+## 场景 12 — 演练残留清零(改后实跑,2026-10-04,T047)
+
+```text
+A  untracked drill artifacts inside the spec dir            = 0
+C  positive control: plant $D/b9.md, re-run A               = 1     (the probe can go red)
+C  after \rm -f and re-check                                = 0
+A  re-check after the control                               = 0
+B  mktemp dirs created this run (场景 3/5/8/9/10 + drills)   = 0     (each \rm -rf'd and re-listed at the time)
+```
+
+C is not optional and was run: without it, A's `0` is indistinguishable from a pattern that matches
+nothing. Both of the scenario's two forbidden criterion forms stay avoided — `git status --porcelain
+.specify/specs/ | wc -l` would count this feature's own legitimate artifacts, and `find -name
+'*probe*'` would count four tracked files belonging to other features.

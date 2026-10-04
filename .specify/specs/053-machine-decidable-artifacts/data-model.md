@@ -113,7 +113,7 @@
 | `task_id` | `T<NNN>[letter]` | 取自所在行 |
 | `phase` | 字符串 | 取自最近的 `## Phase` 标题(`PHASE_HEADING`) |
 | `order` | 整数 | 单调行序;跨阶段判定的比较量(D-8) |
-| `test_paths` | 路径集 | 同行经路径分类后的**写入目标**集;`green-path-divergence` 的判据之一 |
+| `test_paths` | 路径集 | 同行经路径分类后的写入目标集中的**测试路径**子集(路径段含 `tests` 或文件名以 `test_` 起首);`green-path-divergence` 的判据之一。**(2026-10-04 订正:原文写作「写入目标集」,与本字段名自相矛盾,且按它实现会在 T045 落地认领后对本特性自己的 `tasks.md` 报 3 条假违例——三行把取证追加进同一个 `notes/red-first-evidence.md`,而一个只追加的汇集文件不是任何一行的绿点。辖域的 owner 是 `contracts/green-point-claim.md` C-16,本行只承接其定义。)** |
 
 **字面形态**:`[green: <contract>#<clause>]`(STR-001)。一行 MAY 声明零到多条(FR-015)。
 

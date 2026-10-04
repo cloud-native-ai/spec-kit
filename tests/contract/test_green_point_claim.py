@@ -581,6 +581,43 @@ def test_c16_path_divergence_is_about_differing_green_points_not_a_shared_path(t
     )
 
 
+def test_c16b_a_shared_sink_is_not_a_shared_green_point(tmp_path):
+    """The narrowing dogfooding forced, pinned in both directions.
+
+    Every row that pastes into an append-only evidence log writes that log, so scoping the
+    check to all write targets reported a divergence between rows that merely share a sink —
+    three false findings on this feature's own tasks.md the moment T045 landed its claims.
+    FR-018(b), C-16 and the prose obligation all say *test path*, so that is the scope; the
+    positive control below is what keeps the narrowing from becoming a deletion.
+    """
+    mod = _validator()
+    rel = _contract(tmp_path, clauses=("C-1", "C-2"))
+
+    sink = _tasks(tmp_path,
+                  _phase(1, 1, [f"- [ ] T001 [US1] Pin clause one, paste into notes/evidence.md [green: {rel}#C-1]"])
+                  + "\n"
+                  + _phase(2, 2, [f"- [ ] T002 [US2] Pin clause two, paste into notes/evidence.md [green: {rel}#C-2]"]),
+                  name="sink.md")
+    _anti_vacuity(mod, sink, {"T001", "T002"})
+    _, warnings = _run(mod, sink)
+    assert _labels(warnings, "green-path-divergence") == [], (
+        f"two rows appending to one evidence log do not compete to turn it green: {warnings}"
+    )
+
+    # positive control: the same two rows, same differing green points, but the shared write
+    # target is a test file — that IS the unsatisfiable pair, and it must still warn
+    real = _tasks(tmp_path,
+                  _phase(1, 1, [f"- [ ] T001 [US1] Pin clause one in tests/contract/test_x.py [green: {rel}#C-1]"])
+                  + "\n"
+                  + _phase(2, 2, [f"- [ ] T002 [US2] Pin clause two in tests/contract/test_x.py [green: {rel}#C-2]"]),
+                  name="real.md")
+    _anti_vacuity(mod, real, {"T001", "T002"})
+    _, warnings2 = _run(mod, real)
+    assert _labels(warnings2, "green-path-divergence"), (
+        f"the narrowing removed the check rather than scoping it: {warnings2}"
+    )
+
+
 def test_c17_the_two_collision_labels_are_separately_counted(tmp_path):
     """Each fixture fires exactly one of the pair — the other's count must be 0."""
     mod = _validator()

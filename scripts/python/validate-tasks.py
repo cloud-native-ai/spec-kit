@@ -45,9 +45,11 @@ Checks performed:
                   clause partition (条款分区 (Clause Partition),
                   `.specify/memory/glossary.md`) was cut over the same clause
                   twice (warning)
-  green-path-divergence  one write target is claimed green by two rows at two
+  green-path-divergence  one TEST path is claimed green by two rows at two
                   different green points, so the pair cannot each be the row that
-                  turns that file green (warning)
+                  turns that file green (warning; scoped to test paths because an
+                  append-only sink such as an evidence log is written by every row
+                  that pastes into it and is nobody's green point)
 
 Usage:
   python3 scripts/python/validate-tasks.py <path/to/tasks.md> [--json]
@@ -198,6 +200,27 @@ def _resolve_contract(claim_path: str, tasks_path: Path):
 def _clause_ordinal(clause_id: str):
     numbers = tuple(int(n) for n in CLAUSE_ORDINAL.findall(clause_id))
     return numbers or None
+
+
+def _is_test_path(token: str) -> bool:
+    """Whether a write target is a TEST path, for green-path-divergence only.
+
+    FR-018(b) and green-point-claim.md C-16 both scope that check to a test path appearing
+    in two verification rows, and the prose obligation it mechanizes says "any test path"
+    too. Recognizing one is a structural fact rather than a guess: `tests/` is the location
+    the house's own template declares (templates/tasks-template.md § Path Conventions), and
+    `test_*` is the collection prefix pytest uses.
+
+    The distinction is load-bearing, and dogfooding is what proved it: an append-only
+    evidence log such as `notes/red-first-evidence.md` is a write target of every row that
+    pastes into it, so scoping the check to all write targets reported a divergence between
+    rows that merely share a sink — three false findings on this feature's own tasks.md.
+    A sink is not a green point, so no row is claiming to be the one that turns it green.
+    `parallel-safe` is deliberately unaffected: two [P] rows writing one file really do
+    conflict whatever the file is for.
+    """
+    parts = token.replace("\\", "/").split("/")
+    return "tests" in parts or parts[-1].startswith("test_")
 
 
 def _classify_paths(text: str):
@@ -500,6 +523,8 @@ def validate(path: Path, claims_out: list | None = None):
         writers = {}
         for tid, t in tasks.items():
             for write_target in t["write_paths"]:
+                if not _is_test_path(write_target):
+                    continue    # a shared sink is not a shared green point (see _is_test_path)
                 writers.setdefault(write_target, []).append(tid)
         for write_target, tids in sorted(writers.items()):
             claiming = [tid for tid in tids if row_points.get(tid)]
