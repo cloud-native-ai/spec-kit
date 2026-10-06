@@ -1,7 +1,23 @@
 {
   "scope": "knowledge",
-  "updated": "2026-09-20T06:44:41Z",
+  "updated": "2026-10-06T17:29:13Z",
   "entries": [
+    {
+      "id": "instructions-md-specify-teams-4bf9e650",
+      "file": "instructions-md-specify-teams-4bf9e650.md",
+      "scope": "knowledge",
+      "source": "/speckit.instructions",
+      "feature": "",
+      "tags": [
+        "convention",
+        "teams",
+        "instructions",
+        "discovery"
+      ],
+      "title": "约定：团队不在 instructions.md 登记，可发现性由 .specify/teams/ 目录承载",
+      "created": "2026-10-06T17:29:13Z",
+      "summary": "新建或修改团队后跑 /speckit.instructions **不会**、也**不需要**在 .specify/instructions.md 里登记该团队。依据：① .specify/shared/definitions/framework-map.md 的 Teams 行是**位置行**（`.specify/teams/<slug>/` — team definitions + runs/"
+    },
     {
       "id": "mem-041c0dc2",
       "file": "mem-041c0dc2.md",

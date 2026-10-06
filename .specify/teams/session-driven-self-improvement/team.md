@@ -110,7 +110,10 @@ members:
       S4 主动触发命令——产出 templates/commands/improve.md 补丁，实现 D9 细节 2 的 why → what → how
       （why：当前问题是什么，由 session 历史获取；what：需提升哪些方面；how：分析问题、探索思路、
       实施改造），消费 S2 的运行判定引擎。按 command-logic-as-classified-skills T-003 出生即为
-      入口+委派的薄壳，实现细节落技能侧。本 stage 由 2 次派发累积（N=2 的依据见动态结构小节的
+      入口+委派的薄壳：命令文本只记录该调用哪些技能、如何调用、**以及每个技能的输入与产出**，
+      实现细节全部落技能侧（T-003 原文含「每个技能的输入和产出」子句；2026-10-07 补齐——此前
+      本文件四处渲染 T-003 均漏该子句，而对方团队 S3 按裁定跳过 improve.md，本 stage 是该文件
+      唯一的判定门，漏掉即无人守）。本 stage 由 2 次派发累积（N=2 的依据见动态结构小节的
       粒度声明）。不直接写 canonical。
     blockedBy: [judgment-engine-implementer]
   - agent: agent-stage-evaluator-template
@@ -234,7 +237,7 @@ graph LR
 | judgment-contract-designer | executor | 运行判定契约：四个量的判定口径与输出形态、三个证据来源的读取面与摘要口径、两个触发器各自的消费点、对 feedback-step 三层无名判断的推广方式、命令与 memory 的 SI-4 归口 | goal.md、interview 账本、`shared/workflow/feedback-step.md`、`shared/workflow/self-improvement-workflow.md` | `.specify/teams/.work/session-driven-self-improvement/outputs/judgment-contract.md` | — | 契约同时点名四个量与三个来源，且为被动/主动各指明一个消费点；四量口径与「四量口径裁定」小节逐条一致（正确性只做制品正确性、满意度含窄例外、名称用运行判定），MUST NOT 重新发明；命令与 memory 的归口有明确结论或明确记为待定并说明由谁裁定 |
 | judgment-engine-implementer | executor | 按契约把固定规则判断实现为 `scripts/python/` 下的确定性程序 + 单测 | judgment-contract.md | `.specify/teams/.work/session-driven-self-improvement/outputs/engine.patch`、`outputs/engine-tests.patch` | judgment-contract-designer | 程序可判定（非 LLM 估读）；对 evidence/ 的读取走摘要而非原文转储，产物中可检索到该口径的声明 |
 | passive-trigger-wirer | executor | 运行判定结果 → feedback 流程的接线补丁，含被动模式「不得面面俱到、超出者落 spec/todo」的约束 | judgment-contract.md、engine.patch | `.specify/teams/.work/session-driven-self-improvement/outputs/passive.patch` | judgment-engine-implementer | 四条红线逐条对照未被破坏（尤其 never-solicit 与零自动传输）；改点落为 sensor 而非平行干预台账；约束条款可在补丁中检索到；**落盘前跑 `python3 scripts/python/scan-confirmation-gates.py` 且 total ≤ 23**（本文件落在 SCAN_DIRS 内，预算余量 0） |
-| active-trigger-author | executor | `templates/commands/improve.md` 薄壳 + 承载逻辑的技能侧文本，实现 why → what → how | judgment-contract.md、engine.patch | `.specify/teams/.work/session-driven-self-improvement/outputs/active-command.patch`、`outputs/active-skill.patch` | judgment-engine-implementer | why/what/how 三段各有落点且消费运行判定引擎；命令文本为入口+委派（无实现细节内联），符合 command-logic-as-classified-skills T-003；**落盘前跑 `python3 scripts/python/scan-confirmation-gates.py` 且 total ≤ 23**（templates/commands 在 SCAN_DIRS 内，预算余量 0）；技能侧落点名经 S1 契约定下后，MUST 先经 `/speckit.team` modify 把该**具名**目录追加进本团队 write **并**在对方团队 forbidden 中排除它，才可派发第二次累积 —— 对方 write 含 `skills/*/SKILL.md`、`skills/*/references|templates|scripts/**`，与本团队将来的具名技能目录构成**已知的前向冲突**，处置路径与 improve.md 同（用户授权 + forbidden 排除），MUST NOT 静默双写 |
+| active-trigger-author | executor | `templates/commands/improve.md` 薄壳 + 承载逻辑的技能侧文本，实现 why → what → how | judgment-contract.md、engine.patch | `.specify/teams/.work/session-driven-self-improvement/outputs/active-command.patch`、`outputs/active-skill.patch` | judgment-engine-implementer | why/what/how 三段各有落点且消费运行判定引擎；命令文本为入口+委派（无实现细节内联），且**逐个记录被调用技能的输入与产出**，完整符合 command-logic-as-classified-skills T-003 原文（「每个技能的输入和产出」子句于 2026-10-07 补齐，此前四处渲染均漏；对方团队 S3 已裁定跳过 improve.md，故本 gate 是该文件唯一的 T-003 判定门）；**落盘前跑 `python3 scripts/python/scan-confirmation-gates.py` 且 total ≤ 23**（templates/commands 在 SCAN_DIRS 内，预算余量 0）；技能侧落点名经 S1 契约定下后，MUST 先经 `/speckit.team` modify 把该**具名**目录追加进本团队 write **并**在对方团队 forbidden 中排除它，才可派发第二次累积 —— 对方 write 含 `skills/*/SKILL.md`、`skills/*/references|templates|scripts/**`，与本团队将来的具名技能目录构成**已知的前向冲突**，处置路径与 improve.md 同（用户授权 + forbidden 排除），MUST NOT 静默双写 |
 | contract-verifier | evaluator | 独立验证 S3/S4 落盘结果 | passive.patch、active-command.patch、active-skill.patch、progress.md | `.specify/teams/session-driven-self-improvement/runs/<UTC>-verification.md` | passive-trigger-wirer, active-trigger-author | 见 Verification 口径（回归数字注明全量/子集；既存失败走同口径 A/B 差集归因；One-Source-Of-Truth 类验收从落盘产物反查） |
 
 **粒度声明**（`references/patterns.md` § Serial Chain → Stage granularity discipline，落盘前已按文件计数校验）：

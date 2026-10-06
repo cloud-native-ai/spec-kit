@@ -1,7 +1,23 @@
 {
   "scope": "session",
-  "updated": "2026-09-20T06:44:20Z",
+  "updated": "2026-10-06T17:29:13Z",
   "entries": [
+    {
+      "id": "20261006T172913Z-2026-10-07-ef2f5930",
+      "file": "20261006T172913Z-2026-10-07-ef2f5930.md",
+      "scope": "session",
+      "source": "/speckit.instructions",
+      "feature": "",
+      "tags": [
+        "instructions",
+        "reconcile",
+        "teams",
+        "residual-report"
+      ],
+      "title": "2026-10-07 指令刷新：团队可发现性为无操作，全部节在容忍带内",
+      "created": "2026-10-06T17:29:13Z",
+      "summary": "残余报告（partial update，用户请求＝同步新建团队 command-logic-as-classified-skills 的可发现性）。**converged：无**——setup 脚本 exit 0，报「live instructions already carry all template sections」，且未改动任何被跟踪文件（live 与新建备份 instructions."
+    },
     {
       "id": "20260920T064420Z-34059-28168-b-route-r2-19-lesson-route-r1-7904e80a",
       "file": "20260920T064420Z-34059-28168-b-route-r2-19-lesson-route-r1-7904e80a.md",
