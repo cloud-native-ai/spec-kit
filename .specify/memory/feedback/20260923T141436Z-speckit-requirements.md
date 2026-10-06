@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "053-machine-decidable-artifacts"
+disposition: "processed"
 partial: false
 created: "2026-09-23T14:14:36Z"
 summary: "本轮 /speckit.requirements 达成其声明目的:把一份由 /speckit.feedback consume 自省报告路由而来的**五项合并输入**(F-03 requirements 校验器 / F-05 条款→任务绿点归属 / F-04③ 覆盖核算 / F-14次生根 goal 判据主体指代形 / F-16次生根 run-checks)蒸馏为一个可落地特性 053「机器可判定"
+introspection_ref: "introspection-20261006T140432Z#F-04"
+disposition_reason: "introspection:introspection-20261006T140432Z#F-04"
 ---
 
 ## Review

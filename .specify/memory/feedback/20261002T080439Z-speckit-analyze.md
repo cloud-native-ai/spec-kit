@@ -8,9 +8,12 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "053-machine-decidable-artifacts"
+disposition: "processed"
 partial: false
 created: "2026-10-02T08:04:39Z"
 summary: "本轮按 §4 同作者委托把检测拆成三个互不重叠的界面(spec↔plan↔research / plan↔contracts↔data-model↔tasks / 特性登记与宪法对齐),交 3 个 fresh-context 只读子代理执行,共回传 52 行发现;再由 16 个与检测者互不相交的校验子代理逐条复测全部 CRITICAL/HIGH。检出 1 项宪法 MUST 违规(Feature 0"
+introspection_ref: "introspection-20261006T140432Z#F-06"
+disposition_reason: "introspection:introspection-20261006T140432Z#F-06"
 ---
 
 ## Review

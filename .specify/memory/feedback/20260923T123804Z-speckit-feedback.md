@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-feedback-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-09-23T12:38:04Z"
 summary: "本轮 /speckit.feedback 以显式 `consume` 参数进入,按 Routing flow 判为 Path A(就地消化),非 package、非探针注入。帽子取证:根级五个源目录实测存在且 `src/specify_cli` 仅在根级 ⇒ 框架项目,故 32 条条目**全部**归 Path A、零条归 Path B。入站目录 `feedback/feedback-*.zip` "
+introspection_ref: "introspection-20261006T140432Z#F-04"
+disposition_reason: "introspection:introspection-20261006T140432Z#F-04"
 ---
 
 ## Review

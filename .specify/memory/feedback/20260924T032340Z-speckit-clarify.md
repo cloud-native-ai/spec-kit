@@ -8,9 +8,12 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "053-machine-decidable-artifacts"
+disposition: "processed"
 partial: false
 created: "2026-09-24T03:23:40Z"
 summary: "Mode A run on 053 with same-author detection delegated to 3 fresh-context read-only scanners (12 taxonomy categories split 4/4/4, question budget 2/2/1, each brief carrying the fast-fail dispatch-inje"
+introspection_ref: "introspection-20261006T140432Z#F-05"
+disposition_reason: "introspection:introspection-20261006T140432Z#F-05"
 ---
 
 ## Review
