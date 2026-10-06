@@ -1,0 +1,19 @@
+# Interview Ledger: .specify/goal/session-driven-self-improvement/goal.md
+
+- **Started**: 2026-10-05
+- **Target artifact**: .specify/goal/session-driven-self-improvement/goal.md
+- **Mode**: special
+- **Branches**: objective, criteria, targets
+- **Recording**: overwrite-style; latest round wins
+- **Status legend**: ⬜ open / 🔄 asked / ✅ settled / ⏭ deferred / ↩︎ retracted
+
+| ID | Round | Branch | Question | dependsOn | Status | Decision | Artifact span | Superseded by |
+|----|-------|--------|----------|-----------|--------|----------|---------------|---------------|
+| D1 | 2 | objective | 目标终态:这个目标达成时,项目里成立的是什么 | — | ✅ | 用户澄清(第 7 轮):本 Goal 的对象收窄 —— 只**建立**一套能主动触发的 improve 流程,而不是**进行** improve。判据是「框架中形成一套能主动触发的 improve 流程」;/speckit.improve 命令只是该目标的一个载体,不是目标本身。原 D1 文本「会充分利用…进行自我提升」断言的是提升**发生**,与收窄后的对象矛盾,故撤回。 |  |  |
+| D2 | 8 | criteria | 成功判据:如何按程度判定终态达成(可为零条) | D1 | ✅ | 判据=**使用新的断言机制统一「token 消耗」「耗时」「正确性」「满意度」四个量**。注意:原 D2 的第 1 条(token/耗时 经验值)与第 2 条(满意度判定逻辑)均被替换 —— 四个量不再各自设阈值,而是收归一个统一机制。「问题没有解决」在本轮被改称「正确性」。旧两条经 criteria 替换写入,前值记入 ## History(可逆,未用 --clear)。 | .specify/goal/session-driven-self-improvement/goal.md ## Success Criteria |  |
+| D7 | 8 | objective | 收窄后的终态:「框架中形成一套能主动触发的 improve 流程」这句话,完整说来是什么 | — | ✅ | 终态=框架中**有一套 improve 流程**,含两个方面:(1) **主动触发** —— 通过 improve 命令;(2) **被动触发** —— 通过断言的结果触发 feedback 流程。=> 对象是流程的**存在**,不是提升的**发生**。/speckit.improve 命令只是载体(用户原话「一个体系」,读作载体),属 Requirement 平面。注意本轮对被动触发给了**新定义**:D1 原说「与现有流程一致的被动或预制提升流程」,D7 改为「断言的结果触发 feedback 流程」—— 按最新一轮为准。 | .specify/goal/session-driven-self-improvement/goal.md ## Objective |  |
+| D4 | 8 | criteria | 判据 B(满意度)的断言形态:它断言终态,还是断言一次干预 | D2 | ✅ | **仍然有效**。D2 已重决,D4 的阻塞解除。理由不变:收窄后整个 Goal 的对象就是「建立一套流程」,即整体就是一次干预断言,D4 从例外变成与目标同性。 | (no span — 结论被 D7 吸收:整个 Goal 就是一次干预断言) |  |
+| D3 | 7 | targets | Target 切片:本目标下的子结果(可为零条) | D1 | ✅ | **仍然有效**(I6 分类:答案不依赖于被撤回的前提)。理由:D3 的依据是 goal-definitions.md 属性 2(Target 为无序集,序号不承载执行顺序)与用户 2026-09-16 的同一判定,两者都与「本 Goal 的对象是建立流程还是进行提升」无关。故 why/what/how 依旧不进 Target 集,零个 Target 的处置保持。引擎把 D3 归入 invalidated 是机械默认(它读不出语义),此处按模型职责改判。遗留:若收窄后的终态需要「建立流程」的切片(而非「运行流程」的阶段),那是一次新的 Target 授权,不是 D3 的翻供。 | (no span — zero Targets; ## Targets section absent) |  |
+| D5 | 8 | criteria | 改点记录的归属:观察 sensor(feedback 存储,已被 SI 文档认可)还是干预台账(与 SI-7 的 intervention.json 竞争) | D4 | ✅ | **needs-confirmation → 已确认**。D7 明写被动触发是「通过断言的结果**触发 feedback 流程**」,即 sensor 角色,与 D5 原判(改点=自我提升流程内的观察 sensor,不充当干预台账)同构,故确认。三处结构冲突的调查结论作为**事实**继续成立(红线 2 可删除性、红线 3 打包上送会把仅本仓可解析的 run id 带进上游 bundle、sensor never a mutation authority),因此 wholesale 归一 self-improvement→feedback 仍不做。 | (no span — 结论落在 D7 的被动触发定义里) |  |
+| D8 | 9 | criteria | 「断言」的命名:与本仓既有含义(契约测试断言)冲突,如何处置 | D2, D7 | ✅ | 用户澄清:「断言」指的只是**判断逻辑**,且 feedback 流程里早有同类概念(判断何时该生成 feedback),只是从未被明确概念化。=> 经查证成立:feedback-step.md 有三层判断,其中两层无名(头部的 complex iff 分类规则、step 1 的 Gate on qualification & completion),一层有名且程序化(step 6 的 should_prompt)。故本目标的机制是该 gate 从「一个二值判断」到「四个量」的**推广**,不是新机制。处置:两处文本改用用户自己的 gloss「判断逻辑」,**不新造术语**(命名权在用户,且 proactive-trigger 纪律明写词表扩展 MUST 走批准通道、MUST NOT 临场造词);避开与本仓既有「断言」(契约测试断言:四条归因轴之一、空真断言、反空真哨兵、可断言面,以及 053 特性主题)的冲突。概念仍**无名**,命名推迟。 | .specify/goal/session-driven-self-improvement/goal.md ## Objective + ## Success Criteria |  |
+| D9 | 9 | objective | 收窄后的 Objective 是否保留 D1 里的流程内部细节(证据来源、why/what/how、被动模式不得面面俱到的约束) | D7 | ✅ | **不保留**细节。用户将在当前 session 直接创建对应的 team 承接 —— 与 2026-09-16 的处置同构(阶段与编排归 team,Goal 不定义阶段)。=> 证据来源(session 历史/用户输入/大语言模型调查结论)、主动流程的 why→what→how 内部形状、被动模式「不得面面俱到,可落 spec/todo」的约束,以及「包括但不限于命令、skills、memory」这个开放集合,全部**不写回** ## Objective;它们随 team 编排落地。D1 全文仍逐字保存于 ## History(dated record,不作为当前现实被引用)。 | (no span — ## Objective 维持 D7 的单句,不写回细节) |  |
