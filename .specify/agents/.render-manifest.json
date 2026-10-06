@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "tool": "opencode",
-  "rendered_at": "20260923T100330Z",
+  "tool": "qoder",
+  "rendered_at": "20261004T174402Z",
   "entries": {
     ".claude/agents/skill-verifier.md": {
       "source": "templates/skill-verifier.agent.md",
@@ -10,14 +10,6 @@
     ".claude/agents/structure-adjuster.md": {
       "source": "templates/structure-adjuster.agent.md",
       "sha256": "c4fa7672f0fcc06c0d22c074e78e13e9b2c6614882d7ec42d938ffe5dbccee63"
-    },
-    ".qoder/agents/skill-verifier.agent.md": {
-      "source": "templates/skill-verifier.agent.md",
-      "sha256": "3cbf70044b7a4a83ab2c71a655f4e2b6bcbd0515438650e49fd62a7f31290f62"
-    },
-    ".qoder/agents/structure-adjuster.agent.md": {
-      "source": "templates/structure-adjuster.agent.md",
-      "sha256": "814992a68c22826375f8a3e0233d703a8d1e75e454d6e0cc7e14b83ef0e82991"
     },
     ".github/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",
@@ -34,6 +26,14 @@
     ".opencode/agents/structure-adjuster.md": {
       "source": "templates/structure-adjuster.agent.md",
       "sha256": "f623563319ac80a29d8b430ec9fb6a859865850cb1be14c424f4b2c57f28a984"
+    },
+    ".qoder/agents/skill-verifier.agent.md": {
+      "source": "templates/skill-verifier.agent.md",
+      "sha256": "3cbf70044b7a4a83ab2c71a655f4e2b6bcbd0515438650e49fd62a7f31290f62"
+    },
+    ".qoder/agents/structure-adjuster.agent.md": {
+      "source": "templates/structure-adjuster.agent.md",
+      "sha256": "814992a68c22826375f8a3e0233d703a8d1e75e454d6e0cc7e14b83ef0e82991"
     }
   }
 }

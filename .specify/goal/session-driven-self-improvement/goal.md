@@ -1,18 +1,19 @@
 ---
 status: active
 created: 2026-10-05
-updated: 2026-10-05
+updated: 2026-10-06
 ---
 
 # Goal: session-driven-self-improvement
 
 ## Objective
 
-终态是框架中有一套 improve 流程,具体包含两个方面:主动触发(通过 improve 命令)与被动触发(通过判断逻辑的结果触发 feedback 流程)。
+终态是框架中有一套 improve 流程,具体包含两个方面:主动触发(通过 improve 命令)与被动触发(通过运行判定的结果触发 feedback 流程)。
 
 ## Success Criteria
 
-1. 一套新的判断逻辑,统一「token 消耗」「耗时」「正确性」与「满意度」四个量。
+1. 一套新的运行判定,统一「token 消耗」「耗时」「正确性」与「满意度」四个量;其中「正确性」只涵盖**制品正确性**(名字级失败集差集为空,且每条返回绿的检查留有红先行取证或变异演练),语义正确性不在本判据内。
+2. 本目标为长期目标,不设算出的终止判据:achieved 是一次刻意的人工判定,而非由度量得出的结论。
 
 ## History
 
@@ -23,3 +24,5 @@ updated: 2026-10-05
 - 2026-10-05 — criteria changed; prior value: token 消耗与耗时各定一个经验值作为目标,该值可随时调整。 | 用户满意度有一条判定逻辑(落在 instructions 文档中):用户输入延续之前话题且为否定式,大部分情况即为对结果不满意;用户换了话题或结束了 session,则视为结果被接受。每次判定产出一条改点信息,作为整个自我提升流程的一部分(观察 sensor),不单独作为一条 feedback。
 - 2026-10-05 — objective changed; prior value: 终态是框架中有一套 improve 流程,具体包含两个方面:主动触发(通过 improve 命令)与被动触发(通过断言的结果触发 feedback 流程)。
 - 2026-10-05 — criteria changed; prior value: 一套新的断言机制统一「token 消耗」「耗时」「正确性」与「满意度」四个量。
+- 2026-10-06 — objective changed; prior value: 终态是框架中有一套 improve 流程,具体包含两个方面:主动触发(通过 improve 命令)与被动触发(通过判断逻辑的结果触发 feedback 流程)。
+- 2026-10-06 — criteria changed; prior value: 一套新的判断逻辑,统一「token 消耗」「耗时」「正确性」与「满意度」四个量。

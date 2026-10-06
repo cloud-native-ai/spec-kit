@@ -217,43 +217,4 @@ A rendered documentation site is a Harness output, not an Execution Subject by d
 running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills
 directory) — skip this entire Feedback step: no engine call, no feedback entry.
 
-At wrap-up (the same lifecycle point where this unit would prompt for a Git commit),
-run this self-reflection step. It is agent self-reflection — **never** solicit feedback
-content from the user.
-
-1. **Gate on qualification & completion.** Only proceed if this run reached wrap-up and
-   did substantial work. Skip entirely for trivial/no-op runs. If the run was aborted or
-   failed before wrap-up, follow the *Abort / partial-run rule* below.
-2. **Reflect (no user input).** Review the just-completed run against this unit's declared
-   purpose/description. Produce a short prose review plus **≥1 concrete, unit-specific
-   optimization point**. If the run was clean, record exactly one line:
-   `No significant optimization points identified this run.`
-   **Token 效率自评**(纪律定义见 `.specify/shared/guidelines/token-efficiency.md`)——同步自查三问:本次运行是否发生 (1) **原文转储**(机器管理数据文件整体注入上下文)、(2) LLM **代做确定性工作**(固定规则判断未交程序)、(3) **重复读取**同一内容?有发现 → 对应优化点条目行 MUST 内嵌字面量 `token-efficiency`(稳定标记,供 `--action list --contains token-efficiency` 检索聚合);干净运行 MUST NOT 追加空洞的 Token 观察条目。量化口径:定性描述或行/字节代理指标,精确 Token 计数不可得时 MUST **不编造**具体数值。
-3. **Scope guard.** Keep strictly to *this* unit's operation. Do NOT produce a
-   global/whole-project assessment — that is `/speckit.review`'s job. Every entry is
-   `scope: local`.
-4. **Dedup guard.** Choose a stable `run_id` for this run (e.g. the feature key + a run
-   timestamp). If a parent flow already recorded feedback for this same `(unit_id, run_id)`,
-   the engine will no-op — do not force a duplicate.
-5. **Persist** via the engine:
-   ```bash
-   python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \
-     --unit-id "skill:create-pages" --unit-type skill \
-     --run-id "<stable-run-id>" --feature "<feature-key-if-any>" \
-     --review "<review prose>" --points-file "<points file>"
-   ```
-   Probe attribution: the engine resolves the unit to its probe object automatically — the entry inherits kind/slice from the probe registry. External custom units record via `--unit-id custom:<owner>/<name> --unit-type custom-unit`; their entries stay host-project-local and never enter upstream packages.
-6. **Consolidated submission prompt.** Read `should_prompt` from the `record` output
-   (or run `--action status`). When it is `true`, surface a **single** consolidated
-   non-blocking notification inviting submission (point the user to the `/speckit.feedback package` command — the user-facing path; never paste the raw `feedback-utils.py` engine call into the user-facing line); the wrap-up MUST NOT pause for the choice and MUST NOT trigger any automated transmission (silence = skip). Below threshold, do NOT prompt.
-   The detailed prompt semantics (package → manual send → mark-submitted, plus the
-   skip / silence options) live in the canonical protocol:
-   `.specify/shared/workflow/feedback-step.md` § *Threshold prompt protocol*.
-
-**Abort / partial-run rule.** If the run failed or was interrupted before wrap-up, either
-skip recording OR record with `--partial` and a `## Review` that begins with
-`**Partial run** — `. Never present a partial run as a complete review.
-
-**Nesting rule.** When a command invokes a skill (or a skill invokes a skill), each
-qualifying unit records feedback for **its own** scope only, keyed by its own
-`(unit_id, run_id)`.
+At wrap-up, run the feedback self-reflection step per the canonical convention in `.specify/shared/workflow/feedback-step.md`: agent self-reflection only — **never** solicit feedback content from the user; skip trivial or no-op runs; keep strictly to this skill's scope; persist one entry via `feedback-utils.py --action record --unit-id "skill:create-pages" --unit-type skill`. Non-blocking (非阻塞) and never any 自动传输 — delivery stays manual. That file owns every rule of this step — reflection, scope, dedup, persistence, the submission prompt, the abort and nesting clauses; do not restate any of them here.

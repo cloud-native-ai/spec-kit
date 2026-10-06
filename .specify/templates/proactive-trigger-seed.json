@@ -334,8 +334,8 @@
       "ruleId": "r-009",
       "situationId": "s09",
       "flow": "/speckit.feedback",
-      "invocation": "/speckit.feedback package",
-      "rationale": "Accumulated feedback reached the threshold — package it for manual delivery.",
+      "invocation": "/speckit.feedback",
+      "rationale": "Accumulated feedback reached the threshold — let the command judge where it points and route itself.",
       "confirmationClass": "reversible",
       "origin": "seed",
       "priority": 120,
@@ -343,7 +343,7 @@
         "file": "shared/workflow/feedback-step.md",
         "anchorKind": "owning-section",
         "anchor": "Threshold prompt protocol",
-        "quote": "`/speckit.feedback package` command, never the raw `feedback-utils.py` engine path."
+        "quote": "`/speckit.feedback` command, never the raw `feedback-utils.py` engine path."
       }
     },
     {
