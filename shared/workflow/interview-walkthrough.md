@@ -32,7 +32,7 @@ One unit at a time. Never batch two units into one interview.
 
 ### Stage 1 — Interview (访谈)
 
-- **Show the real artifact**: open the real running page via browser-utils (screenshot/snapshot), or present the actual file / diagram / data — let the user "look at it while deciding" instead of describing from memory.
+- **Show the real artifact**: open the real running page via the project's browser-automation skill (screenshot/snapshot), or present the actual file / diagram / data — let the user "look at it while deciding" instead of describing from memory.
 - **Open main question first**: "What changes does this unit need?" — then targeted follow-ups on specific elements (navigation, controls, fields, flows). Never preset the answer space.
 - **Strict granularity**: discuss only the currently open unit; if the user drifts to another unit, note it in that unit's ledger row and return.
 - **Drift check first**: before showing the artifact, verify the environment baseline has not drifted (branch switched, generated artifacts reset by an external process, dependency rolled back). If drifted: restore first, record the incident as a follow-up with a root-cause owner, then interview — never interview against a corrupted artifact.

@@ -69,10 +69,7 @@ src/specify_cli/_source_commit.json
 # evidence is recorded in the spec's verification.md instead.
 .specify/memory/sanitize/
 
-# 046: browser-utils site memory is runtime data owned by the caller project
 # (FR-003); never committed in the framework repo, excluded from wheel and
 # mirror sync (see contracts/framework-exclusions.md).
-skills/browser-utils/site/
-.specify/skills/browser-utils/site/
-# proactive flow trigger: per-turn telemetry churns, learning state must not
+.specify/# proactive flow trigger: per-turn telemetry churns, learning state must not
 .specify/memory/trigger/telemetry.jsonl

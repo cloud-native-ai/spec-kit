@@ -9,7 +9,7 @@ build proceeds; write failure FAILS the build (never ship a wheel whose
 provenance face is silently missing).
 
 Also registers the skills/ tree via build_data["force_include"] from a staged
-copy that drops every `site` path component: browser-utils site memory is
+copy that drops every `site` path component: a skill's site memory is
 caller-owned runtime data and must never ship in the wheel (FR-003 of spec
 046). Hatchling's target-level `exclude` does not filter force-include
 content (verified empirically, see specs/046-browser-site-memory/research.md

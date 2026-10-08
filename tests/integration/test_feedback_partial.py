@@ -45,7 +45,7 @@ def test_partial_flag_still_counts_toward_threshold(feedback_store: Path, capsys
     capsys.readouterr()
     feedback_utils.main([
         "--action", "record", "--workspace-root", str(feedback_store),
-        "--unit-id", "skill:browser-utils", "--unit-type", "skill",
+        "--unit-id", "skill:create-skills", "--unit-type", "skill",
         "--run-id", "partial-count", "--review", "Partial.", "--points", "P",
         "--partial",
     ])
