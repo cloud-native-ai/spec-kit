@@ -126,7 +126,7 @@ class TestListAction:
     def test_list_json_returns_matches(self, feedback_store: Path, capsys):
         feedback_utils.main([
             "--action", "record", "--workspace-root", str(feedback_store),
-            "--unit-id", "skill:browser-utils", "--unit-type", "skill",
+            "--unit-id", "skill:create-skills", "--unit-type", "skill",
             "--run-id", "list-test-run", "--review", "R", "--points", "P",
         ])
         capsys.readouterr()

@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: ux-analyst
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Write, Edit]
-skills: [browser-extension, browser-utils, document-utils, draw-echarts, draw-d3js]
+skills: [document-utils, draw-echarts, draw-d3js]
 run-turn-budget: 10
 display-color: cyan
 ---
@@ -109,8 +109,6 @@ Framework skills and agent definitions install together, so every skill I declar
 
 | Skill | When to use |
 |-------|-------------|
-| browser-utils | Inspect UIs, capture screenshots, and test responsive/interaction behavior |
 | document-utils | Produce UX analysis reports and deliverables |
 | draw-echarts | Visualize UX metrics and findings with ECharts |
 | draw-d3js | Build interactive D3.js visualizations of UX data |
-| browser-extension | Drive browser-extension UI surfaces (popup/options) |

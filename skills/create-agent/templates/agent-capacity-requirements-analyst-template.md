@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: requirements-analyst
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
-skills: [draw-plantuml, draw-mermaid, memory-recall, memory-record, think-skills, browser-utils]
+skills: [draw-plantuml, draw-mermaid, memory-recall, memory-record, think-skills]
 run-turn-budget: 25
 display-color: blue
 ---
@@ -123,4 +123,3 @@ Framework skills and agent definitions install together, so every skill I declar
 | memory-recall | Recall prior requirements, clarifications, and decisions before analyzing a new request |
 | memory-record | Persist clarifications, assumptions, and requirement decisions for later reuse |
 | think-skills | Mentally simulate requirement logic and edge cases before finalizing the spec |
-| browser-utils | Open the real running page (screenshot/snapshot) during interviews so the user decides while looking at the actual artifact |

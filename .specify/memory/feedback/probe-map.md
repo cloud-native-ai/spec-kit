@@ -88,7 +88,7 @@
 - **收集内容**: 技能单次运行的回顾与 ≥1 条单元级优化点
 - **处理流程**: record→threshold→package→manual→mark-submitted
 - **适用插入位置**: wrap-up
-- **Objects** (34):
+- **Objects** (31):
   - `skill-archive-session-wrapup` — skill:archive-session @ wrap-up
   - `skill-code-review-wrapup` — skill:code-review @ wrap-up
   - `skill-collect-evidence-wrapup` — skill:collect-evidence @ wrap-up

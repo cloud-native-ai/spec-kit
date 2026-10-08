@@ -146,7 +146,7 @@ RED_LINES = [
                         "bringToFront(); keep any genuinely-headed window announced, small and "
                         "fixed. Foreground/direct-binary launch is allowed ONLY as an announced "
                         "human-in-the-loop exception and must be gated + documented as such."),
-        "refs": ["browser-utils references/focus-safe-launch.md",
+        "refs": ["xuanji-extension .specify/skills/browser-utils/references/focus-safe-launch.md",
                  "profiles-browsers SKILL.md § 焦点红线"],
     },
 ]
