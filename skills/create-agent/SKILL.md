@@ -110,7 +110,7 @@ Write `skills/create-agent/templates/agent-capacity-<slug>-template.md` followin
 - Layer discipline: template-layer output goes to `.specify/agents/templates/`, instance-layer output to `.specify/agents/instances/`, execution-layer output to `.specify/agents/execution/{configs,scripts}/`; abstract capacity Classes stay in `skills/create-agent/templates/`. Never write across layers, and never write logs anywhere but `.specify/agents/execution/logs/` (gitignored)
 - An instance-layer agent derived from a role MUST reference its Template (`capacity-scope:` frontmatter) instead of restating capability
 - `project-custom` agents MUST carry the `project:` frontmatter marker and the mandatory `## Project Scope Guard` section (see § Project-Custom Capability)
-- The full framework frontmatter field set is: `user-invocable`, `disable-model-invocation`, `supervisor`, `capacity-scope`, `project` (the last used only by `project-custom` agents)
+- The full framework frontmatter field set is: `user-invocable`, `disable-model-invocation`, `supervisor`, `capacity-scope`, `project` (the last used only by `project-custom` agents), `role-scope`, `team-scope` (framework-only keys, never rendered to tools; `team-scope` marks seat instances created by the `create-team` flow — taxonomy pointer: `.specify/shared/definitions/agent-definitions.md`; key semantics live in the CLI's neutral key set)
 
 ## Agent Lifecycle (temporary vs persistent)
 
@@ -119,12 +119,12 @@ Every agent this skill can produce has one of two lifecycles. Choose the lifecyc
 | Lifecycle | Where it lives | When to use | Tool config |
 |-----------|----------------|-------------|-------------|
 | **temporary** | Context-only — never written to disk | A worker/stage agent spawned for a single run; discarded when the run ends | None; it exists only in the invoking context (FR-011) |
-| **persistent** | `.specify/agents/templates/<slug>.agent.md` (template layer) or `.specify/agents/instances/<slug>.agent.md` (instance layer) — the canonical stores | A reusable role or supervisor the project keeps across sessions | Per-file symlinked into every officially supported tool's agent config directory on initialization (FR-010/012) |
+| **persistent** | `.specify/agents/templates/<slug>.agent.md` (template layer) or `.specify/agents/instances/<slug>.agent.md` (instance layer) — the canonical stores | A reusable role or supervisor the project keeps across sessions | Rendered into every officially supported render-mode tool's agent config directory as real files by the specify CLI (FR-010/012); update the host surface with `specify render-agents --ai <tool>` |
 
 **Persistent generation rules**:
 
 - Write the generated agent to its layer's canonical store: role Templates to `.specify/agents/templates/<slug>.agent.md`, responsibility-bound Instances to `.specify/agents/instances/<slug>.agent.md` (single source of truth per layer).
-- On initialization the CLI (re)creates a **per-file** symlink for each `*.agent.md` under `.specify/agents/{templates,instances}/` inside every officially supported tool's agent config dir — e.g. `.qoder/agents/<slug>.agent.md → ../../.specify/agents/templates/<slug>.agent.md`, plus `.github/agents`, `.opencode/agents`, `.hermes/agents`. On a filename collision the instance wins. Each tool `agents/` is a real directory of per-file links (so tools may add their own overrides beside the framework links); never write tool-specific copies of framework agents.
+- The specify CLI renders each `*.agent.md` under `.specify/agents/{templates,instances}/` into every officially supported render-mode tool's agent config directory as **renderer-produced real files** — e.g. `.qoder/agents/<slug>.agent.md` — replacing any legacy per-file symlinks. On a filename collision the instance wins. Each tool `agents/` directory may also hold the user's own agents beside the rendered ones (user assets are never pruned); never hand-write tool-specific copies of framework agents. After authoring or refining a definition, run `specify render-agents --ai <tool>` to update the host registration surface; `specify init` is the first-install entry, not the re-render path.
 - Agents are discovered by globbing `.specify/agents/{templates,instances}/*.agent.md` and reading each file's frontmatter `name`/`description`; no separate registry file is maintained. The `execution/` directory holds no agent definitions and is never globbed for discovery.
 
 **Temporary generation rules**:
