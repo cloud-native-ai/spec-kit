@@ -18,6 +18,8 @@ This project documentation is distributed across several key files. You MUST ref
 | **Project Documents** | `docs/` | High-level architecture | Architecture and design documentation |
 | **Confirmation Gates** | `.specify/shared/guidelines/confirmation-gates.md` | Confirmation-gate governance criteria | Two-level taxonomy (destructive/irreversible → front-loaded confirmation; reversible → auto-execute + execution report), destructive list, governance-kept list, doubtful-strict rule, anti-backflow constraint |
 | **Objective Analysis** | `.specify/shared/workflow/objective-analysis-gate.md` | Same-author detection delegation criteria | When the artifacts under analysis were written by the agent now analyzing them, detection MUST be delegated to fresh-context read-only subagents; firing condition, the gate rules, severity-cap discipline, scope limits |
+| **Critique and Self-Critique** | `docs/concepts/critique-and-self-critique.md` + `.specify/shared/guidelines/critique-and-self-critique.md` | Proposal-qualification discipline at the head of the improve flow | Closes 盲目改进 / 反复改进 / 越改越差; every proposed change carries one executed falsification attempt before dispatch; acceptability criteria, rejected forms, verdict handling, the self-critique half, failure-mode→rule mapping |
+| **TODO-in-Context** | `.specify/shared/guidelines/todo-in-context.md` | Embedding todos at the code location they refer to | Marker form ownership (fence vs comment), context-completed interpretation, perception obligations for other workflows, insert→perceive→collect→execute→remove lifecycle |
 | [Other Doc] | [Path] | [Purpose] | [Summary] |
 
 > **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
@@ -130,6 +132,14 @@ Three ideas, one loop — **acquire → retain → keep reachable**. Each closes
 
 Full philosophy, the load-bearing criteria, and where each kind of answer belongs: `.specify/shared/guidelines/ask-record-repeat.md`.
 
+## ID Register (编号登记)
+
+Every durable identifier — a decision (D-…), open item (OI-…), team stage (S…), goal target (T-…), finding (F-…), adjudicated criterion (B-…) — MUST be recorded in the project's ID register at the moment the identifier is coined, and MUST NOT live only in session history, a git-ignored run workspace, or conversation context. An identifier absent from the register is uninterpretable to any later session, and citing it as if the reader already knew it is exactly the silent-context failure this register closes.
+
+- **One file**: `.specify/memory/register.md` is the single index. Every entry is pointer-shaped — identifier → one-line meaning → authority path (where the full statement lives) → status — and MUST NOT restate the decision content (One Source Of Truth).
+- **At birth, not at recall**: the row is written when the ID is coined, not when someone later fails to decode it.
+- **Durable test**: a label that never outlives its turn (a throwaway enumeration inside one reply) stays out; anything cited by a tracked artifact or still pending is durable and MUST be registered.
+
 ## Tech Stack & Resources
 - **Project Name**: {{PROJECT_NAME}}
 - **Root Path**: {{PROJECT_ROOT}}
@@ -152,12 +162,7 @@ Full philosophy, the load-bearing criteria, and where each kind of answer belong
 - Treat Constitution as the authority for architecture and workflow constraints.
 - **Reuse a Tool before generating a script**: before writing script code for a complex or repeatable action, look for an existing **Tool** under `.specify/memory/tools/` and reuse it — its behavioral rules outrank your training knowledge, and its environment applicability (verified version / version differences / platform / architecture / fallback / preflight) tells you the form that actually holds here. No Tool for the capability? Writing the code is the expected outcome. See `.specify/shared/workflow/tool-reuse-gate.md` (Constitution Principle XII).
 
-### Terminology: "tools" means three different things
-- **Tool** (unqualified, in the tools domain) — a pre-verified reusable capability record at `.specify/memory/tools/<name>.md`, ID form `<TOOL:...>`, owned by `/speckit.tools`.
-- **AI agent CLI** — a supported coding agent (Claude Code, Codex CLI, Qoder CLI, …). Prefer "AI agent CLI" over "AI tool" when precision matters.
-- **Tool-call list** — the `tools:` frontmatter key on an agent (`Read`, `Grep`, `Bash`, …), i.e. the LLM's callable surface.
-
-Note also: the regenerated discovery inventories are `.specify/tools/{system,shell,project}.json` (machine-generated, never hand-edited); `.specify/memory/tools/` (directory) holds the authoritative definition records. `.specify/memory/tools.md` (singular file) is a separate hand-maintained MCP-server index, not the tools inventory. Ownership and the exact regeneration path: `.specify/shared/definitions/tool-definitions.md`.
+> **Terminology**: "tools" means three different things here — the **Tool record** (`.specify/memory/tools/<name>.md`, owned by `/speckit.tools`), the **AI agent CLI**, and the **tool-call list** (`tools:` frontmatter key). Disambiguation, the discovery inventories, the `.specify/memory/tools.md`-singular vs `tools/`-directory trap, and the regeneration path are owned by `shared/definitions/tool-definitions.md` § Terminology — read it before writing anything tool-related.
 
 ## AI Tool Compatibility
 - **Supported Agents**: Claude Code, opencode, Qoder, Codex CLI, Hermes Agent, GitHub Copilot

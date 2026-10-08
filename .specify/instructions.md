@@ -29,6 +29,7 @@ This project documentation is distributed across several key files. You MUST ref
 | **Recurring Lessons** | `docs/reference/history/00-cross-cutting-lessons.md` | Cross-session operational gotchas | Authoritative body of the lessons the ambient `## Recurring Operational Lessons` section names by topic only; per-domain siblings `01`–`05` in the same directory |
 | **Skills Docs** | `docs/reference/skills/` | Skills system reference | Specification, troubleshooting, VS Code integration |
 | **Agent Tools** | `docs/reference/cli/` | Supported agent tool reference | Per-tool CLI reference docs for every supported agent (Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode, Hermes Agent) |
+| **TODO-in-Context** | `docs/concepts/todo-in-context.md` + `.specify/shared/guidelines/todo-in-context.md` | Embedding todos at the code location they refer to | Marker form ownership (fence vs comment), context-completed interpretation, perception obligations for other workflows (do not silently remove / take into account / report), insert→perceive→collect→execute→remove lifecycle, Park store boundary |
 
 > **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
 
@@ -139,6 +140,14 @@ Three ideas, one loop — **acquire → retain → keep reachable**. Each closes
 
 Full philosophy, the load-bearing criteria, and where each kind of answer belongs: `.specify/shared/guidelines/ask-record-repeat.md`.
 
+## ID Register (编号登记)
+
+Every durable identifier — a decision (D-…), open item (OI-…), team stage (S…), goal target (T-…), finding (F-…), adjudicated criterion (B-…) — MUST be recorded in the project's ID register at the moment the identifier is coined, and MUST NOT live only in session history, a git-ignored run workspace, or conversation context. An identifier absent from the register is uninterpretable to any later session, and citing it as if the reader already knew it is exactly the silent-context failure this register closes.
+
+- **One file**: `.specify/memory/register.md` is the single index. Every entry is pointer-shaped — identifier → one-line meaning → authority path (where the full statement lives) → status — and MUST NOT restate the decision content (One Source Of Truth).
+- **At birth, not at recall**: the row is written when the ID is coined, not when someone later fails to decode it.
+- **Durable test**: a label that never outlives its turn (a throwaway enumeration inside one reply) stays out; anything cited by a tracked artifact or still pending is durable and MUST be registered.
+
 ## Tech Stack & Resources
 - **Project Name**: spec-kit (distributed as `specify-cli`)
 - **Root Path**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
@@ -155,7 +164,7 @@ Full philosophy, the load-bearing criteria, and where each kind of answer belong
   - `tests/`: `contract/`, `contracts/`, `integration/`, `scenarios/`, `unit/`, with shared `conftest.py`, `fixtures/`, `script_api.py`.
   - `memory/`: Default in-package memory shipped with the CLI; the canonical project memory lives at `.specify/memory/` (constitution, features, features/<ID>.md, plus the dynamic memory-as-files layer under `session/` and `knowledge/`).
   - `docs/`: User-facing documentation (see Documentation Map above).
-  - `feedback/`: **Inbound feedback intake** — the single central place where feedback collected from users is stored, one bundle per file as `feedback/feedback-*.zip` (produced downstream by `feedback-utils.py --action package`: entry Markdown files + `MANIFEST.md`; delivered manually per Dogfooding Loop A). Root `.gitignore` ignores `*.zip`, and `feedback/.gitignore` re-includes `feedback-*.zip` so bundles stay trackable. **Process all pending bundles as one consolidated batch, never one zip at a time** — reconciling claims across bundles is what surfaces factual conflicts between reporters and keeps one mechanism fitting every reporting user's environment.
+  - `feedback/`: **Inbound feedback intake** — one bundle per file as `feedback/feedback-*.zip` (produced by `feedback-utils.py --action package`, delivered manually per Dogfooding Loop A; `feedback/.gitignore` re-includes the zips the root `.gitignore` ignores). The process-all-bundles-as-one-batch discipline is owned by the feedback command.
   - `.specify/`: Project runtime — `instructions.md` (this file), `memory/`, `skills/`, `agents/`, `scripts/`, `specs/<NNN-feature-slug>/`, `templates/`. Treat as the canonical workspace; ignore any `.specify/` inside subdirectories.
 
 # Tool And Skills Usage Guide
@@ -167,16 +176,10 @@ Full philosophy, the load-bearing criteria, and where each kind of answer belong
 - Treat Constitution as the authority for architecture and workflow constraints.
 - **Reuse a Tool before generating a script**: before writing script code for a complex or repeatable action, look for an existing **Tool** under `.specify/memory/tools/` and reuse it — its behavioral rules outrank your training knowledge, and its environment applicability (verified version / version differences / platform / architecture / fallback / preflight) tells you the form that actually holds here. No Tool for the capability? Writing the code is the expected outcome. See `.specify/shared/workflow/tool-reuse-gate.md` (Constitution Principle XII).
 
-### Terminology: "tools" means three different things
-- **Tool** (unqualified, in the tools domain) — a pre-verified reusable capability record at `.specify/memory/tools/<name>.md`, ID form `<TOOL:...>`, owned by `/speckit.tools`.
-- **AI agent CLI** — a supported coding agent (Claude Code, Codex CLI, Qoder CLI, …). Prefer "AI agent CLI" over "AI tool" when precision matters.
-- **Tool-call list** — the `tools:` frontmatter key on an agent (`Read`, `Grep`, `Bash`, …), i.e. the LLM's callable surface.
-
-Note also: the regenerated discovery inventories are `.specify/tools/{system,shell,project}.json` (machine-generated, never hand-edited); `.specify/memory/tools/` (directory) holds the authoritative definition records. `.specify/memory/tools.md` (singular file) is a separate hand-maintained MCP-server index, not the tools inventory. Ownership and the exact regeneration path: `.specify/shared/definitions/tool-definitions.md`.
+> **Terminology**: "tools" means three different things here — the **Tool record** (`.specify/memory/tools/<name>.md`, owned by `/speckit.tools`), the **AI agent CLI**, and the **tool-call list** (`tools:` frontmatter key). Disambiguation, the discovery inventories, the `.specify/memory/tools.md`-singular vs `tools/`-directory trap, and the regeneration path are owned by `shared/definitions/tool-definitions.md` § Terminology — read it before writing anything tool-related.
 
 ## AI Tool Compatibility
-- **Supported Agents**: Tier 1 (CLI 形态) — Claude Code, Codex CLI, Qoder CLI, opencode; Tier 2 (非 CLI 形态) — Hermes Agent, GitHub Copilot. The canonical list lives in `AGENT_CONFIG` / `_ASSISTANT_TIERS` in `src/specify_cli/__init__.py`.
-- **Agent-specific configuration & CLI arguments**: For any tool-specific configuration, command-line arguments, authentication, or installation details, consult the **official documentation** — do not guess flags or config keys. Start from `docs/reference/cli/supported-agent-tools.md`, which links each tool's official docs source; verify deeper specifics against the upstream documentation.
+- **Supported Agents**: the canonical list lives in `AGENT_CONFIG` / `_ASSISTANT_TIERS` (`src/specify_cli/__init__.py`); per-tool config and CLI arguments: `docs/reference/cli/supported-agent-tools.md` — never guess flags or config keys.
 - **Instructions Refresh**: Run `/speckit.instructions` to regenerate this file and compatibility symlinks.
 
 ## Spec Kit Framework Map
