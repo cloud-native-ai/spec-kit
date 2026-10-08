@@ -89,7 +89,7 @@ def measured_feedback_carriers() -> set[str]:
 def test_classification_counts():
     # The one place these literals are pinned (test_docs_command_template.py::test_c8
     # deliberately does not restate them, to keep a reclassification a one-file edit).
-    assert len(COMPLEX_COMMANDS) == 22
+    assert len(COMPLEX_COMMANDS) == 23
     assert len(SIMPLE_COMMANDS) == 3
 
 

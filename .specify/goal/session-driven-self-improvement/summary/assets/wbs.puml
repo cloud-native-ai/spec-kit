@@ -1,0 +1,31 @@
+@startwbs
+skinparam dpi 300
+scale 4
+skinparam shadowing false
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 16
+<style>
+wbsDiagram {
+  LineColor #4A6C7A
+  LineThickness 1.4
+  RoundCorner 10
+  node { FontSize 16; Padding 12; Margin 8; MaximumWidth 170 }
+  rootNode { BackgroundColor #24485A; FontColor white; FontStyle bold; FontSize 20; Padding 20; MaximumWidth 300 }
+}
+</style>
+caption 材料未记录条目状态信息，全图不着四态状态色（状态记为未知，非未开始）；材料无细粒度完成度，节点不带 NN% 行
+* session-driven-self-improvement\n（基准日 2026-10-08 · goal 终态 achieved 2026-10-08）
+** session-driven-self-improvement · stage 1
+*** run 20261005T172252Z ◆M1 ◆M2\n【未记录】
+** session-driven-self-improvement · stage 2
+*** run 20261007T170045Z\n【未记录】
+** session-driven-self-improvement · stage 3
+*** run 20261008T025904Z\n【未记录】
+** session-driven-self-improvement · stage 4
+*** run 20261008T073900Z\n【未记录】
+** session-driven-self-improvement · stage 5
+*** run 20261008T090000Z\n【未记录】
+legend bottom
+  <size:18> ◆Mn = 里程碑锚点（M1/M2 名称对照见《项目里程碑》跟踪表）    【姓名】= 负责人  </size>
+endlegend
+@endwbs

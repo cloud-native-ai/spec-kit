@@ -1,7 +1,7 @@
 ---
-status: active
+status: achieved
 created: 2026-10-05
-updated: 2026-10-06
+updated: 2026-10-08
 ---
 
 # Goal: session-driven-self-improvement
@@ -26,3 +26,4 @@ updated: 2026-10-06
 - 2026-10-05 — criteria changed; prior value: 一套新的断言机制统一「token 消耗」「耗时」「正确性」与「满意度」四个量。
 - 2026-10-06 — objective changed; prior value: 终态是框架中有一套 improve 流程,具体包含两个方面:主动触发(通过 improve 命令)与被动触发(通过判断逻辑的结果触发 feedback 流程)。
 - 2026-10-06 — criteria changed; prior value: 一套新的判断逻辑,统一「token 消耗」「耗时」「正确性」与「满意度」四个量。
+- 2026-10-08 — status active -> achieved.

@@ -47,6 +47,9 @@ COMPLEX_COMMANDS = [
     # `## Feedback`, which C-3's adjacency forbids; the sections were swapped in the
     # templates, and test_c2a then forced this list to be updated rather than drift.
     "feedback", "sanitize",
+    # Added 2026-10-08 with the command itself (S4, session-driven-self-improvement):
+    # `## Feedback` < `## Documentation` < `## Handoffs` holds in improve.md as landed.
+    "improve",
 ]
 SIMPLE_COMMANDS = ["agents", "constitution", "feature"]
 

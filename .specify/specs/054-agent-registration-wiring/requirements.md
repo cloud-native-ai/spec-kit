@@ -7,8 +7,8 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification  
-**Feature Name**: Need clarification
+**Feature ID**: 044  
+**Feature Name**: Agent Metadata Portability
 
 ## Overview
 
@@ -58,15 +58,16 @@
 
 **Why this priority**: 这是本特性的核心损失所在 —— 框架定义的 agent 能力(无论 team 席位还是独立 agent)实际不可原生派发,观察面上的「永远只有 general-purpose」正是其症状。与 US1 同为 P1;设计裁定已在本 spec 起草时由用户落定(选 b),plan 阶段直接实现。
 
-**Independent Test**: 在一个演示项目里建一个引用 stage 帧的团队,确认每个被引用席位已实例化(`.specify/agents/instances/` 出现对应文件且占位符已填、带所属团队来源追溯),再走文档所述渲染触发,断言 4 个渲染模式工具的宿主 agent 目录出现该席位的注册类型;对经 `/speckit.agents create` 产生的持久定义重复同样的注册面断言。
+**Independent Test**: 在一个演示项目里建一个引用 stage 帧的团队,确认每个被引用席位已实例化(`.specify/agents/instances/` 出现对应文件且占位符已填、带所属团队来源追溯),断言建队流程已直接执行渲染触发且 4 个渲染模式工具的宿主 agent 目录出现该席位的注册类型;对经 `/speckit.agents create` 产生的持久定义重复同样的注册面断言。
 
 **Acceptance Scenarios**:
 
-1. **Given** 一个 team.md `agent:` 字段引用 stage 帧的团队经 `/speckit.team create` 建立,**When** 建队流程完成,**Then** 每个被引用的席位已实例化为 `.specify/agents/instances/` 下的定义(占位符全部解析),且经文档所述渲染触发后,4 个渲染模式工具的宿主注册面出现该席位的注册类型。
+1. **Given** 一个 team.md `agent:` 字段引用 stage 帧的团队经 `/speckit.team create` 建立,**When** 建队流程完成,**Then** 每个被引用的席位已实例化为 `.specify/agents/instances/` 下的定义(占位符全部解析),且建队流程已执行渲染触发,4 个渲染模式工具的宿主注册面出现该席位的注册类型。
 2. **Given** 席位已上注册面,**When** 编排者派发该席位,**Then** 派发以其注册类型进行,`capability-tools`/`model-tier`/`run-turn-budget` 与 system prompt 由注册类型承载(如 `.qoder/agents/` 产物的 frontmatter 所示),而非 `general-purpose` + 散文注入。
 3. **Given** 任一带未解析 `{{PLACEHOLDER}}` 的作者模板,**When** 它将进入渲染输入,**Then** 渲染器拒绝并点名(既有不变量保持)。
 4. **Given** 由建队流程实例化的席位实例,**When** 检查其实例文件,**Then** 其携带可机读的所属团队来源追溯,使团队解散后的孤儿实例可被检测。
 5. **Given** 建队前 `.specify/agents/instances/` 为空,**When** `/speckit.team create` 完成,**Then** 只实例化该团队实际用到的席位 —— 未被引用的帧与 capacity 类不被安装。
+6. **Given** 一个 (b) 落地前已存在、席位未实例化的团队,**When** 使用者对其执行 `/speckit.team modify`,**Then** 缺失席位被补实例化(占位符已填、来源追溯齐备)并已上宿主注册面;未被 modify 触及的其他存量团队不受影响。
 
 ---
 
@@ -105,7 +106,7 @@
 ### Edge Cases
 
 - 建队实例化时占位符未填全 → 渲染器拒绝(`:303-307` 既有行为);实例化步骤 MUST 产出占位符全部解析的实例(FR-006)。
-- **(b) 落地前已存在的团队**(team.md 引用未实例化的 stage 帧)→ 其成员不自动可解析;是否提供刷新/重建路径补实例化由 plan 阶段裁定,本 spec 不强制回填(存量团队仍按现行 general-purpose 载体派发,与现状一致)。
+- **(b) 落地前已存在的团队**(team.md 引用未实例化的 stage 帧)→ 不自动回填;`/speckit.team modify` 刷新席位解析时 MUST 补实例化缺失的席位(opt-in:modify 本身由用户显式发起)(FR-014)。未经 modify 的存量团队继续按现行 `general-purpose` 载体派发,与现状一致。
 - 团队解散/退役后的席位实例成为孤儿 → FR-013 的来源追溯使其可检测;清理形态由 plan 决定。
 - 实例与模板同名 slug 冲突 → instance 优先(既有语义,不因本特性改变);建队实例化遇到与既有持久定义同名时 MUST 冲突披露而非静默覆写。
 - 用户手改渲染产物(如直接编辑 `.qoder/agents/` 文件)→ 渲染 manifest 备份后覆写(既有语义);守卫不得把用户资产当作待修复漂移。
@@ -125,7 +126,7 @@
 
 #### 注册链闭合(US2,方案 (b) 已裁定)
 
-- **FR-004**: `create-team` 建队流程 MUST 经 `create-agent` 把 team.md `agent:` 字段实际引用的每个席位实例化到 `.specify/agents/instances/`;经 `/speckit.agents create` 产生的持久定义天然落中性层,无需额外步骤。建队流程的终点 MUST 使使用者得知(或直接执行)使实例到达宿主注册面所需的渲染触发步骤。
+- **FR-004**: `create-team` 建队流程 MUST 经 `create-agent` 把 team.md `agent:` 字段实际引用的每个席位实例化到 `.specify/agents/instances/`,并在流程终点**直接执行**使实例到达宿主注册面的渲染触发(2026-10-08 裁定:建队流程拥有该步,而非仅教授步骤;触发机制的具体形态属 plan 设计);触发失败 MUST 披露而非静默跳过。经 `/speckit.agents create` 产生的持久定义天然落中性层,无需额外步骤。
 - **FR-005**: 闭合后的派发 MUST 保留 `templates/commands/agents.md` 既有派发要求所列容量 —— `capability-tools`、`model-tier`、`run-turn-budget` 与 system prompt 由宿主注册类型承载,而非散文注入。
 - **FR-006**: 带未解析 `{{PLACEHOLDER}}` 的作者模板 MUST NOT 进入渲染输入(既有不变量);建队实例化路径 MUST 产出占位符全部解析的实例(方案 (b) 天然满足)。
 - **FR-007**: 断点 1+2 的修法采用方案 (b)(2026-10-08 用户裁定):`create-team` 建队时经 `create-agent` 实例化实际用到的席位,不采用 (a) 的 init 预安装、也不采用 (c) 的判别降级。裁定理由:与三层分类法自带的 Template→Instance 转化链一致;占位符在建队时被填掉,天然满足渲染器对作者模板的拒绝不变量;只实例化实际用到的席位,不向每个项目预装全部帧与 capacity 类。
@@ -145,11 +146,15 @@
 - **FR-012**: MUST 有契约测试钉住链路闭合:断言「建队 → 席位实例化(`.specify/agents/instances/` 出现占位符已填的席位定义)→ 渲染触发 → 宿主注册面出现席位类型」;守卫 MUST 附变异演练取证(植错一字 → 红 → 精确复原 → 字节相等)。
 - **FR-013**: 由建队流程实例化的席位实例 MUST 携带可机读的所属团队来源追溯,使团队解散/退役后的孤儿实例可被检测;检测与清理的执行形态由 plan 阶段决定。
 
+#### 存量回填(US2)
+
+- **FR-014**: `/speckit.team modify` 刷新席位解析时 MUST 补实例化 team.md 引用而 `.specify/agents/instances/` 缺失的席位(占位符全部解析,同 FR-006),并在 modify 完成后执行渲染触发(同 FR-004);MUST NOT 自动扫描未被 modify 触及的团队。
+
 ### Key Entities *(include if requirement involves data)*
 
 - **Agent Template / Agent Instance / Agent Execution**: 三层分类法由 `.specify/shared/definitions/agent-definitions.md` 拥有(词汇表已确认),本 spec 引用不重定义。
 - **席位实例 (seat instance)**: Agent Instance 的一种 —— 由 `create-team` 建队流程从 stage 帧实例化而来,携带所属团队来源追溯(FR-013);分类法归属 agent-definitions.md。
-- **宿主注册面 (host registration surface)**: **新概念** —— 某工具实际读取 agent 定义的目录(如 qoder 的项目级 `.qoder/agents/`,CLI 与 IDE 共享),渲染的目标面;现无 owner,建议 plan 阶段归入 agent-definitions.md 或 symlink-model.md。
+- **宿主注册面 (host registration surface)**: **新概念** —— 某工具实际读取 agent 定义的目录(如 qoder 的项目级 `.qoder/agents/`,CLI 与 IDE 共享),渲染的目标面;owner 为 `.specify/shared/definitions/agent-definitions.md`(2026-10-08 裁定;plan 在该文档落地定义,symlink-model.md 保留 FR-009 的 CLI/IDE 关系陈述并互指)。
 - **渲染清单 (render manifest)**: 既有机制(`.render-manifest.json`),drift 检测/备份/修剪语义由渲染器 docstring 拥有,本特性沿用。
 
 ## Success Criteria *(mandatory)*
@@ -157,15 +162,15 @@
 ### Measurable Outcomes
 
 - **SC-001**: 教学三面零处教授已退役的 per-file 符号链接模型 —— grep 断言由契约测试钉住(基线:agents.md:25、SKILL.md:122、SKILL.md:127 三处)。
-- **SC-002**: 「建一个引用 stage 帧的团队 → 走文档所述渲染触发 → 派发该席位」的端到端演示中,席位以其注册类型被派发(占位符已填、容量由注册类型承载),`general-purpose` 通用载体不再是席位派发的必需路径。
-- **SC-003**: 修复后渲染模式工具的宿主 agent 目录内容与 `.specify/agents/{templates,instances}/` 的持久定义集一一对应(渲染产物 = 定义集的投影),抽样核对无「定义存在而注册面缺失」项。
+- **SC-002**: 「建一个引用 stage 帧的团队 → 建队流程执行渲染触发 → 派发该席位」的端到端演示中,席位以其注册类型被派发(占位符已填、容量由注册类型承载),`general-purpose` 通用载体不再是席位派发的必需路径。
+- **SC-003**: 修复后渲染模式工具宿主 agent 目录中的**框架渲染产物**(渲染清单所记录的文件)与 `.specify/agents/{templates,instances}/` 的持久定义集一一对应(渲染产物 = 定义集的投影;用户自有/第三方 agent 不计入,见边界情形),抽样核对无「定义存在而注册面缺失」项。
 - **SC-004**: F-A02 死信(backlog 2026-10-07 行)在验收时具备核销条件:三个面的修正均已落地、各有守卫钉住、核销动作可在 feedback 台账留痕。
 
 ### Measurement Sources & Collection Methods
 
 - **SC-001 Source**: 契约测试(FR-011)对教学三面的 grep 断言 + 变异演练记录;基线三处,验收时零处。
 - **SC-002 Source**: 端到端演示项目(或本仓 dogfooding 团队)的宿主 agent 目录清单 + 派发记录(如 run report 的席位派发面),对照 FR-007 裁定形态。
-- **SC-003 Source**: `.specify/agents/{templates,instances}/` 与 `.qoder/agents/` 的目录对照脚本(可复用渲染器 stats 输出),抽样断言。
+- **SC-003 Source**: `.specify/agents/{templates,instances}/` 与 `.qoder/agents/` 的目录对照脚本(可复用渲染器 stats 输出与渲染清单,排除非框架产物),抽样断言。
 - **SC-004 Source**: feedback 台账的核销记录与 backlog 行状态;契约测试全绿。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
@@ -179,3 +184,11 @@
 ## Clarifications
 
 - Q: 断点 1+2 的修法选 (a) init 安装、(b) create-team 实例化、还是 (c) seat_kind 判别 + 撤回承诺? → A: **(b) create-team 建队时经 create-agent 实例化实际用到的席位**(2026-10-08,用户于本 spec 起草流程裁定;理由记录于 FR-007)。
+
+### Session 2026-10-08
+
+- Q: Feature 绑定:spec 054 绑到哪个 Feature? → A: **绑 044 Agent Metadata Portability**(渲染器是 044 的交付物,其 scope 明文已拥有三个模板目录的分类法,本 spec 补它未接完的链;与既绑 spec 040 并列)。
+- Q: FR-004 的「得知(或直接执行)」双读法收敛为哪个? → A: **建队流程直接执行渲染触发**(触发机制的具体形态属 plan);触发失败 MUST 披露。
+- Q: (b) 落地前已存在的团队怎么办? → A: **`/speckit.team modify` 刷新席位解析时 opt-in 回填**(FR-014);不自动扫描未被 modify 触及的团队。
+- Q: 新概念「宿主注册面」的定义归哪个 owner 文档? → A: **`agent-definitions.md`**(plan 落地定义;symlink-model.md 保留 FR-009 的 CLI/IDE 关系陈述并互指)。
+- 就地纠正(澄清扫描发现,fast-fail 纠正类):SC-003 的「一一对应」与边界情形「第三方 agent 共存」内部矛盾 —— 唯一一致读法为限定到框架渲染产物(渲染清单记录的文件),已按此改写 SC-003 及其 Source。

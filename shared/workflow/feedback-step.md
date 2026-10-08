@@ -65,10 +65,14 @@ content from the user.
 
 1. **Gate on qualification & completion.** Only proceed if this run reached wrap-up and
    did substantial work. Skip entirely for trivial/no-op runs. If the run was aborted or
-   failed before wrap-up, follow the *Abort / partial-run rule* below.
+   failed before wrap-up, follow the *Abort / partial-run rule* below. Where a 运行判定
+   record exists for this run, its `qualification` field **is** this gate's answer — read
+   it instead of re-judging (§ *Run Determination* below).
 2. **Reflect (no user input).** Review the just-completed run against this unit's declared
    purpose/description. Produce a short prose review plus **≥1 concrete, unit-specific
-   optimization point**. If the run was clean, record exactly one line:
+   optimization point**. Where a 运行判定 record exists, write both from its measured axes
+   rather than from impression (§ *Run Determination* below). If the run was clean, record
+   exactly one line:
    `No significant optimization points identified this run.`
    **Token 效率自评**(纪律定义见 `.specify/shared/guidelines/token-efficiency.md`)——同步自查三问:本次运行是否发生 (1) **原文转储**(机器管理数据文件整体注入上下文)、(2) LLM **代做确定性工作**(固定规则判断未交程序)、(3) **重复读取**同一内容?有发现 → 对应优化点条目行 MUST 内嵌字面量 `token-efficiency`(稳定标记,供 `--action list --contains token-efficiency` 检索聚合);干净运行 MUST NOT 追加空洞的 Token 观察条目。量化口径:定性描述或行/字节代理指标,精确 Token 计数不可得时 MUST **不编造**具体数值。
 3. **Scope guard.** Keep strictly to *this* unit's operation. Do NOT produce a
@@ -103,7 +107,10 @@ content from the user.
    addressed to the repo that produced it. The wrap-up MUST NOT pause for the choice
    and MUST NOT trigger any automated transmission (自动传输); silence = skip. Below
    threshold, do NOT prompt. The three choices and their semantics: § *Threshold prompt
-   protocol* below.
+   protocol* below. Where a 运行判定 record exists for this run, its routing bit composes
+   with `should_prompt` and both MUST be true before this notification is surfaced; absent
+   a record for this `(unit_id, run_id)`, `should_prompt` alone governs exactly as before
+   (§ *Run Determination* below).
 
 **Abort / partial-run rule.** If the run failed or was interrupted before wrap-up, either
 skip recording OR record with `--partial` and a `## Review` that begins with
@@ -112,6 +119,101 @@ skip recording OR record with `--partial` and a `## Review` that begins with
 **Nesting rule.** When a command invokes a skill (or a skill invokes a skill), each
 qualifying unit records feedback for **its own** scope only, keyed by its own
 `(unit_id, run_id)`. The same unit+run MUST NOT be recorded twice.
+
+---
+
+## Run Determination (canonical measured input for steps 1, 2 and 6)
+
+This section is the landed owner of exactly four facts: where 运行判定 (Run Determination)
+enters the Reflection procedure, how its routing bit composes with step 6, what the
+passive path MUST NOT do, and where its record lands. It owns **no** value domain, no
+reason set and no decision table — those are code's. Everything else below reaches its
+owner by path.
+
+**Engine and code-side owner.** `.specify/scripts/python/run-determination.py` (framework
+source `scripts/python/run-determination.py`) owns the record schema, every value domain
+the program branches on, the routing-bit derivation (`derive_trigger_feedback`) and the
+CLI flag set. No invocation is written out here on purpose: the parser generates the
+engine's own `--help`, so a flag list copied into prose could only drift. The record *is*
+the 改点 — term owner `.specify/memory/glossary.md`. The four red lines and the
+never-solicit rule at the top of this file govern everything below unchanged and are not
+restated here.
+
+**Consumption point — the step 1 → step 2 boundary.**
+
+- **Step 1** runs the engine's `determine` action at wrap-up. Its `qualification` field is
+  this gate's answer, so the gate becomes a lookup instead of a fresh judgment. Supplying
+  the current turn's class on that same call is what settles the *previous* run's
+  satisfaction axis: settlement rides the next wrap-up, so there is no second call site
+  and no hook to install.
+- **Step 2** writes its review and its optimization points from the record's measured axes
+  instead of from impression, and its Token 三问 now cites a measured token axis rather
+  than a guess. The three questions themselves are unchanged and stay owned by step 2.
+- **Steps 3, 4 and 5** are unchanged. The record is not a feedback entry: it never enters
+  the step-5 call, never reaches the counter and never influences `should_prompt`.
+
+**Composition at step 6.** The routing bit `passive_trigger.trigger_feedback` and the
+feedback engine's `should_prompt` compose; neither replaces the other. The property a
+reader MUST NOT miss is its asymmetry: a **single** regressed comparison axis does not
+fire the passive path — it is recorded, and the active improve flow picks it up later.
+Only a run that broke something, that the user rejected, or that regressed on **both**
+comparison axes at once reaches step 6's notification. Requiring the two booleans together
+is what holds the noise floor where red line 2 needs it.
+
+**Absent record — degrade, never fabricate.** When no record exists for this
+`(unit_id, run_id)` (the engine did not run, or this unit is outside its scope), step 6
+governs on `should_prompt` alone exactly as it did before, and the wrap-up says plainly
+that the determination was not evaluated. An absent record is neither a clean run nor a
+veto, and MUST NOT be reported as either. This is the house response to a missing sensor —
+continue on available run evidence, never fabricate — per
+`.specify/shared/workflow/self-improvement-workflow.md` § Failure and Degradation.
+
+**Unresolved-red input — engine exit codes only.** The satisfaction axis's red-adjacency
+exception has exactly one producer: a non-zero exit from an engine this run invoked,
+reported through the exit-code table the `scripts/python/` engines share. The producer
+formerly named beside it — an anomaly the agent surfaced and the user never answered
+(`surfaced_anomaly_unanswered`) — is **dropped**, not deferred, and MUST NOT be declared.
+The per-turn telemetry store `.specify/memory/trigger/telemetry.jsonl` MUST NOT be read
+for this state: its row schema is a closed set owned by another feature and carries no key
+able to express an unresolved red. Seam owner: `OI9_RED_STATE_INPUT` / `read_red_state()`.
+
+**Where the record lands.** Through the existing memory engine
+(`.specify/scripts/python/memory-utils.py`) into the `session` scope, tagged
+`run-determination`; the determination engine's own `history` action is the read side and
+returns a projection, never record bodies. No new store, no new directory, no second
+database beside SI-7's ledger. That memory engine's enforced `--source` contract accepts
+the command and skill forms of `unit_id` and nothing else, so a `custom:<owner>/<name>`
+unit has **no** accepted source form. The engine therefore fails closed — record emitted,
+`persisted: false`, reason stated — and MUST NOT invent a source string to make the write
+succeed; widening that contract is its owner's act, not this flow's. Seam owner:
+`OI2_PERSISTENCE_ADAPTER` / `PERSISTENCE_ADAPTERS`.
+
+**Passive non-exhaustiveness.** The passive path MUST NOT be exhaustive, because acting on
+everything it can see would disturb the very run it is measuring. In scope for this turn:
+a finding whose unit is this unit and whose axis was actually evaluated in this run —
+those, and only those, feed the routing bit. Everything else is recorded in the same
+record's `out_of_scope[]`, one bounded line each, with **no carrier assigned**
+(`parked_via: none`); assigning one belongs to the **active** improve flow, which chooses
+between two carriers that already exist — `/speckit.todo` Park Mode (the default: a
+free-floating improvement idea; mode, store path and frontmatter owned by
+`templates/commands/todo.md`) and a new spec through `/speckit.requirements` (when the
+finding constrains what this project's source must implement, which is the Requirement
+plane's call, not this flow's). The passive turn names carriers; it MUST NOT open either
+flow, widen the current turn, or emit anything beyond the single non-blocking notification
+step 6 already owns.
+
+**改点 is a sensor, not a ledger.** The record carries no disposition, no threshold and no
+mutation authority, and it is never written under `.specify/memory/feedback/`. It feeds
+SI-7's `intervention.json`, which stays in the baseline evidence run directory keyed by its
+own fields; the join is one-way, and the record never replaces or duplicates that ledger.
+Boundary and flow position: `.specify/shared/workflow/self-improvement-workflow.md` SI-1,
+SI-7, SI-8.
+
+**Never solicited.** The passive path **infers**. It classifies a user turn that already
+happened, from context the agent already holds, and only that closed classification ever
+crosses into the engine — never raw user text. No question is put to the user, no prompt is
+added and no new user-facing surface class appears. That is why this wiring stays on the
+inference side of the never-solicit rule above.
 
 ---
 

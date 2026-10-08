@@ -14,7 +14,7 @@
 | S3b | 追加阶段:批评与自我批评概念文档(SI-3C 落点) | 同上 team.md DAG(critique-concept-author 席位) | completed(2026-10-08) |
 | OI-1…OI-9 | S1 设计契约的 9 个开放项,各项自带选项与 decider,禁止静默解决 | `.specify/teams/session-driven-self-improvement/runs/2026-10-06-S1-judgment-contract.md` § Open items(**tracked** 副本;工作区原件在 git-ignored `outputs/`) | 见下逐项 |
 | OI-1 | 「绿但无红先行取证」的 verdict 映射:契约选 (a) `not_evaluated/green_unproven`,已实现;备选 (b) `regressed` 为一行映射改动 | 同上 | resolved(用户裁定 (a) 并已实现;`scripts/python/run-determination.py:201` 单点) |
-| OI-2 | 判定记录的持久落点:契约选 (a) 经 `memory-utils.py` 落 `.specify/memory/session/`;**实现期发现该路径不可达**(`SCOPES` 封闭、slug 剥除 `/`、reindex 非递归),S3 停等用户裁定 → 即下述 **D-A** | 同上 + `runs/20261007T170045Z-report.md` § 4 | **pending(D-A)** |
+| OI-2 | 判定记录的持久落点:契约选 (a) 经 `memory-utils.py` 落 `.specify/memory/session/`;**实现期发现该路径不可达**(`SCOPES` 封闭、slug 剥除 `/`、reindex 非递归),S3 停等用户裁定 → 即下述 **D-A** | 同上 + `runs/20261007T170045Z-report.md` § 4 | resolved(扁平落点随 S3 落地) |
 | OI-3 | token/耗时的绝对目标值(相对比较之外的将来项) | Open items § OI-3 | open,不阻塞(decider:用户经 /speckit.goal modify) |
 | OI-4 | 语义正确性作为将来独立轴(本轮明确不设计,不留占位轴) | Open items § OI-4 | open,不阻塞 |
 | OI-5 | goal.md 旧术语「判断逻辑」的修正 | Open items § OI-5 | resolved(commit 0206e021 经 /speckit.goal 落地) |
@@ -22,9 +22,11 @@
 | OI-7 | SI-2 悬空的 `/better-harness` 引用处置 | Open items § OI-7 | open,阻塞 S5 检查单 |
 | OI-8 | 比较轴容差带(v1 以结构性手段替代数值容差) | Open items § OI-8 | resolved-for-v1 |
 | OI-9 | 引擎的未解决红状态输入面(遥测七键 schema 承载不了,引擎留 `OI9_RED_STATE_INPUT` 隔离缝待裁) | Open items § OI-9 + `runs/20261007T170045Z-report.md` | open,与 S3 落地相关 |
-| **D-A** | = OI-2 的续裁定:落点不可达后怎么走 —— (i) 拓宽 `memory-utils.py` 放开子目录(与该引擎封闭 scope 契约相抵);(ii) 引擎自写子目录(证伪契约 §15,红五道已落地守卫);(iii) 维持今日扁平 session+tag 落点(契约备选 (b) 证据目录并置为另一候选) | `runs/20261007T170045Z-report.md` § 4 + 契约 § Open items OI-2 | **pending,阻塞 S3 落地**;decider:用户 |
-| **D-B** | 引擎与已落地规范文本的两行分歧:`run-determination.py` 的 `green_unproven` 映射(朱印 `:201` 单点) vs 规范文本要求;修法 = 引擎两行 + `tests/contract/test_run_determination_engine.py:1038,1044` 一行 | `runs/20261007T170045Z-report.md` § 4 | **pending,阻塞 S3 落地**;decider:用户(引擎已落地,落地后修改需明示授权) |
+| **D-A** | 【已追认 2026-10-08】= OI-2 的续裁定:落点不可达后怎么走 —— (i) 拓宽 `memory-utils.py` 放开子目录(与该引擎封闭 scope 契约相抵);(ii) 引擎自写子目录(证伪契约 §15,红五道已落地守卫);(iii) 维持今日扁平 session+tag 落点(契约备选 (b) 证据目录并置为另一候选) | `runs/20261007T170045Z-report.md` § 4 + 契约 § Open items OI-2 | resolved-ratified(扁平 session+tag 落点随 S3 落地生效;S3 补丁 :93 即其实现) |
+| **D-B** | 【已 void 2026-10-08,前提证伪】引擎与已落地规范文本的两行分歧:`run-determination.py` 的 `green_unproven` 映射(朱印 `:201` 单点) vs 规范文本要求;修法 = 引擎两行 + `tests/contract/test_run_determination_engine.py:1038,1044` 一行 | `runs/20261007T170045Z-report.md` § 4 | resolved-void(SI-3C 证伪:契约 §5.0 值域容纳现行形态;改动会撤销 OI-1 裁定 (a);见收官 run report §1) |
 | T-001/T-002/T-003 | goal `command-logic-as-classified-skills` 的三个 Target:T-001 技能内外部标注字段、T-002 技能名称/描述/触发定义、T-003 命令瘦身(命令=入口+委派,细节落技能侧,含「每个技能的输入与产出」子句) | `.specify/goal/command-logic-as-classified-skills/goal.md` § Targets | open(并行团队在执行) |
 | SI-0…SI-9 | 自我提升工作流的步骤编号(SI-2 证据限定、SI-3 诊断、**SI-3C 批评后派发**、SI-4 路由、SI-5 落地、SI-6 验证、SI-7 台账、SI-8 对比、SI-9 收束) | `shared/workflow/self-improvement-workflow.md` | active |
 | F-A02 | 死信发现:2026-09-11 分流给 improve-skills 的修复从未执行,同一错误主张(per-file 符号链接模型)已从 `skills/create-agent/SKILL.md` 扩散进 `templates/commands/agents.md` | `.specify/memory/feedback/backlog.md`(2026-10-07 行)+ `consume-log.md` | open |
 | F-01…F-07 / M-1 / M-2 / D-01 | 自省报告 introspection-20261006T140432Z 的 7 个发现 + 2 个元观察 + `--limit` 截断陷阱;各自分流与处置见报告与 backlog | `.specify/memory/feedback/introspection/introspection-20261006T140432Z.md` + `backlog.md` | mixed(详见 backlog 各行状态) |
+
+| goal.session-driven-self-improvement | goal 于 2026-10-08 经 `goal-utils.py status --set achieved` 收官(用户收官指令 = 判据 2 的人工判定;判据 1 证据见收官 report §5);终态 summary 交付 `.specify/goal/session-driven-self-improvement/summary/` | `.specify/goal/session-driven-self-improvement/goal.md` + `runs/20261008T090000Z-report.md` | closed-achieved |

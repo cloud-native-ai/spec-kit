@@ -52,6 +52,7 @@
 | speckit-goal-wrapup | command-wrapup | /speckit.goal | wrap-up |
 | speckit-history-wrapup | command-wrapup | /speckit.history | wrap-up |
 | speckit-implement-wrapup | command-wrapup | /speckit.implement | wrap-up |
+| speckit-improve-wrapup | command-wrapup | /speckit.improve | wrap-up |
 | speckit-instructions-wrapup | command-wrapup | /speckit.instructions | wrap-up |
 | speckit-interview-wrapup | command-wrapup | /speckit.interview | wrap-up |
 | speckit-plan-wrapup | command-wrapup | /speckit.plan | wrap-up |

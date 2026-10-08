@@ -1,0 +1,160 @@
+{
+  "tool": "validate-project-input/v2",
+  "input": ".specify/goal/session-driven-self-improvement/summary/data/project-input.yaml",
+  "status": "ready",
+  "entity_counts": {
+    "phases": 5,
+    "work_items": 5,
+    "milestones": 2,
+    "people": 3,
+    "features": 0,
+    "sources": 1
+  },
+  "baseline_date": "2026-10-08",
+  "missing_required": [],
+  "inferable": [
+    {
+      "field": "work_items[0].status",
+      "inferred_value": null,
+      "inferred_from": "缺失且无勾选计数 → 状态记 `未知`（非 not-started）"
+    },
+    {
+      "field": "work_items[0].depends_on",
+      "inferred_value": null,
+      "inferred_from": "缺失则不画依赖虚线（不虚构依赖）"
+    },
+    {
+      "field": "work_items[1].status",
+      "inferred_value": null,
+      "inferred_from": "缺失且无勾选计数 → 状态记 `未知`（非 not-started）"
+    },
+    {
+      "field": "work_items[1].depends_on",
+      "inferred_value": null,
+      "inferred_from": "缺失则不画依赖虚线（不虚构依赖）"
+    },
+    {
+      "field": "work_items[2].status",
+      "inferred_value": null,
+      "inferred_from": "缺失且无勾选计数 → 状态记 `未知`（非 not-started）"
+    },
+    {
+      "field": "work_items[2].depends_on",
+      "inferred_value": null,
+      "inferred_from": "缺失则不画依赖虚线（不虚构依赖）"
+    },
+    {
+      "field": "work_items[3].status",
+      "inferred_value": null,
+      "inferred_from": "缺失且无勾选计数 → 状态记 `未知`（非 not-started）"
+    },
+    {
+      "field": "work_items[3].depends_on",
+      "inferred_value": null,
+      "inferred_from": "缺失则不画依赖虚线（不虚构依赖）"
+    },
+    {
+      "field": "work_items[4].status",
+      "inferred_value": null,
+      "inferred_from": "缺失且无勾选计数 → 状态记 `未知`（非 not-started）"
+    },
+    {
+      "field": "work_items[4].depends_on",
+      "inferred_value": null,
+      "inferred_from": "缺失则不画依赖虚线（不虚构依赖）"
+    },
+    {
+      "field": "milestones[0].status",
+      "inferred_value": null,
+      "inferred_from": "缺失由引擎按锚定日与基准日判定"
+    },
+    {
+      "field": "milestones[1].status",
+      "inferred_value": null,
+      "inferred_from": "缺失由引擎按锚定日与基准日判定"
+    }
+  ],
+  "optional_gaps": [
+    {
+      "field": "milestones.actual_date",
+      "count": 2,
+      "consequence": "缺失且无达成依据 → 视为未达成"
+    },
+    {
+      "field": "milestones.owner_id",
+      "count": 2,
+      "consequence": "缺失时负责人记 `未记录`"
+    },
+    {
+      "field": "milestones.planned_date",
+      "count": 2,
+      "consequence": "两者皆缺 → `unknown-schedule`，不判逾期"
+    },
+    {
+      "field": "project.project_start",
+      "count": 1,
+      "consequence": "缺失时引擎取全部日期最早者并标推断起点"
+    },
+    {
+      "field": "project.repos",
+      "count": 1,
+      "consequence": "不声明 = 不做任何 repo 取材（默认）"
+    },
+    {
+      "field": "work_items.actual_end",
+      "count": 5,
+      "consequence": "缺失 → 已完成项无法判定是否按期"
+    },
+    {
+      "field": "work_items.actual_start",
+      "count": 5,
+      "consequence": "缺失不影响判定，仅少一条实际轨迹"
+    },
+    {
+      "field": "work_items.owner_id",
+      "count": 5,
+      "consequence": "缺失时负责人记 `未记录`（合法终态）"
+    },
+    {
+      "field": "work_items.planned_end",
+      "count": 5,
+      "consequence": "缺失 → 引擎给 `unknown-schedule`，不判延期、不上红"
+    },
+    {
+      "field": "work_items.planned_start",
+      "count": 5,
+      "consequence": "缺失则该项无计划起点，甘特条形按可得日期退化"
+    },
+    {
+      "field": "work_items.progress_pct",
+      "count": 5,
+      "consequence": "缺失则进度为 null，报告写 `-（无可计数依据）`"
+    }
+  ],
+  "fk_errors": [],
+  "id_errors": [],
+  "date_errors": [],
+  "structure_errors": [],
+  "db_constraint_errors": [],
+  "constraint_owner": "外键 / `*_id` 全局唯一 / 日期字面量与日历日 / 枚举 / 非空 / 条件必填组合一律由数据库约束保证（见 schema/project.sql）；用 --db 装载即校验，或跑 project-db.py --load 与 --check",
+  "db": null,
+  "db_schema_version": "project-db/v1",
+  "db_checked": false,
+  "sources": [
+    {
+      "source_id": "S-0001",
+      "source_kind": "user-form",
+      "source_ref": ".specify/teams/session-driven-self-improvement/",
+      "covers": [
+        "work_items",
+        "phases",
+        "people"
+      ]
+    }
+  ],
+  "repos": [],
+  "repo_derive_fields": [],
+  "repo_optin": false,
+  "next_action": "R 档齐备 → 装载进数据库（约束即校验）后进入技能自身流程",
+  "form_skeleton": null
+}

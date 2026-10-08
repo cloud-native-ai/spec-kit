@@ -21,6 +21,9 @@ territory:
     - templates/instructions-template.md           # 运行判定规则的框架源落点（Two Hats：不是 .specify/instructions.md）
     - scripts/python/**                            # 运行判定引擎的 canonical 家；本团队新增一个引擎，MUST NOT 改动契约外的既有引擎
     - tests/contract/**                            # 新机制的结构契约测试
+    - docs/concepts/critique-and-self-critique.md  # 批评与自我批评:导览面(对齐 better-harness 双件套形态)
+    - shared/guidelines/critique-and-self-critique.md   # 同概念的规范 owner;**在 SCAN_DIRS 内**,门控预算 23/23 余量 0
+    - skills/self-improvement/**            # S4 累积 2 落点;用户 2026-10-08 run 入参授权(S4-2 在序列中);具名目录,非 skills/** 通配
     - .specify/teams/session-driven-self-improvement/**
   read:
     - .specify/memory/session/**                   # 证据来源 1：session 历史记录（10 文件）
@@ -54,7 +57,7 @@ territory:
     - { type: cross-goal, target: /speckit.improve 命令属 Requirement 平面（litmus test 5：约束本项目源码实现什么），其规格入口是 /speckit.requirements；本团队只按既有约定落其框架源文本，不代替该平面做需求决策 }
 pattern: serial
 created: 2026-10-06
-updated: 2026-10-06
+updated: 2026-10-08
 members:
   - agent: agent-team-supervisor-template
     role: team-supervisor
@@ -128,6 +131,25 @@ members:
       判定对象是业务制品（落盘的定义文件与测试结果），故为 evaluator 阶段的 Worker，不是 Meta。
       不用 skill-verifier：其容量是「审技能执行证据」，窄于本席所需的红线/镜像/契约三类判定。
     blockedBy: [passive-trigger-wirer, active-trigger-author]
+  - agent: agent-stage-executor-template
+    role: critique-concept-author
+    stage: executor
+    type: Worker
+    lifecycle: temporary
+    responsibility: >
+      S3b 批评与自我批评概念 —— 产出两份文档:`docs/concepts/critique-and-self-critique.md`(导览面)
+      与 `shared/guidelines/critique-and-self-critique.md`(规范 owner;命令与技能引用它,MUST NOT 复述它),
+      形态对齐既有 better-harness 双件套(51 行导览 + 83 行规范)。**核心纪律**:批评步骤的输出 MUST 是
+      「每个拟议改动一条可证伪尝试」——即「什么测量能证明这次改动让事情变糟」——而不是一份关切清单;
+      一条自身无法失败的批评步骤,正是它要防的盲检类。证据基础取自本团队本 session 的实测三型:
+      盲目改进(B3 的遥测可导出性、OI-2 的专用子目录,均由散文推断而后被实现证伪,各耗一次派发才发现)、
+      反复改进(goal.md 的 ## History 在一轮内留下 4 次判据变更与 2 次 objective 变更,术语经
+      断言 → 判断逻辑 → 运行判定 三迁)、越改越差(F-A02 于 2026-09-11 分流给 improve-skills 后从未执行,
+      同一错误主张反而从技能扩散进 templates/commands/agents.md —— 已分流未执行的修复不是静止的,它会传播)。
+      约束:`shared/guidelines` 在 SCAN_DIRS 内且门控预算余量为 0,产物 MUST NOT 引入任何 BLOCKING_PATTERNS
+      命中(含 confirmation gate、确认门禁、确认门控、after confirmation、Confirm before 一类散文误踩),
+      落笔后 MUST 自行跑 `python3 scripts/python/scan-confirmation-gates.py` 并回报 total。
+    blockedBy: [judgment-engine-implementer]
 config:
   handoff_protocol: file-path-only
   progress_file: .specify/teams/.work/session-driven-self-improvement/progress.md
@@ -137,9 +159,10 @@ config:
   dag:
     - { stage: judgment-contract-designer, blockedBy: [] }
     - { stage: judgment-engine-implementer, blockedBy: [judgment-contract-designer] }
+    - { stage: critique-concept-author, blockedBy: [judgment-engine-implementer] }
     - { stage: passive-trigger-wirer, blockedBy: [judgment-engine-implementer] }
-    - { stage: active-trigger-author, blockedBy: [judgment-engine-implementer] }
-    - { stage: contract-verifier, blockedBy: [passive-trigger-wirer, active-trigger-author] }
+    - { stage: active-trigger-author, blockedBy: [judgment-engine-implementer, critique-concept-author] }
+    - { stage: contract-verifier, blockedBy: [passive-trigger-wirer, active-trigger-author, critique-concept-author] }
   summary:
     enabled: true
     every: 1
@@ -183,7 +206,7 @@ config:
 
 **B4 — `templates/commands/improve.md` 写权归本团队**：详见 `territory.non_path` 的 `type: cross-goal-write`。对方团队的排除条目已落盘，故 S4 照常交付薄壳本身，不再降级为「只交技能 + 薄壳规格」。
 
-> **待办（不在本团队权限内）**：goal 定义的判据文本仍写「一套新的**判断逻辑**」、objective 仍写「通过**判断逻辑**的结果触发 feedback 流程」—— 二者都需经 `/speckit.goal` modify 采纳新名「运行判定」，并按 B2 收窄「正确性」。本团队 **MUST NOT** 写 `goal.md`：它在 `territory.forbidden` 内，且 `/speckit.goal` 是 goal 归档的唯一作者入口。在该修正落地前，本文件与 goal 定义之间存在一处**已知的术语分歧**，以本节的用户裁定为准。
+> **已解决（2026-10-08 核对）**：上段待办的三项 —— 判据文本改用「运行判定」、objective 改用「运行判定」、判据按 B2 收窄「正确性」—— 均已由 goal 定义当前文本满足（commit 0206e021 经 /speckit.goal 引擎落地），本文件与 goal 定义之间不再有术语分歧。goal 定义现明写「achieved 是一次刻意的人工判定」，此前记录的「无 achieved 判定条款」缺口同样已闭合。
 
 ### 判据
 
@@ -199,6 +222,7 @@ Role × Stage × Type（Type 按**写目标**判定，不按 stage 名判定）�
 | judgment-contract-designer | executor | Worker | temporary | 工作区补丁 |
 | judgment-engine-implementer | executor | Worker | temporary | 工作区补丁 |
 | passive-trigger-wirer | executor | Worker | temporary | 工作区补丁 |
+| critique-concept-author | executor | Worker | temporary | 工作区补丁(两份文档:导览面 + 规范 owner) |
 | active-trigger-author | executor | Worker | temporary | 工作区补丁 |
 | contract-verifier | evaluator | Worker | temporary | 验证记录（判定业务制品，不写 agent/skill/team 定义） |
 

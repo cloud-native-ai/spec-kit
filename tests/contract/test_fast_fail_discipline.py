@@ -698,12 +698,12 @@ def test_a6_not_inside_three_section_window():
     assert not (idx[0] < ff < idx[2]), "C-6: the new section was inserted inside the contiguous window"
 
 
-def test_a7_section_counts_19_to_20_and_20_to_21():
-    """C-7: top-level counts -- template 20, live 21 (19/20 measured before; +1 = ID Register, 2026-10-08)."""
+def test_a7_section_counts_20_to_21_and_21_to_22():
+    """C-7: top-level counts -- template 21, live 22 (20/21 before; +2 = ID Register + Run Determination, 2026-10-08)."""
     tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
     live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
-    assert tpl == 20, f"C-7: template has {tpl} top-level sections; expected 20 (19 before + 1)"
-    assert live == 21, f"C-7: live file has {live} top-level sections; expected 21 (20 before + 1)"
+    assert tpl == 21, f"C-7: template has {tpl} top-level sections; expected 21 (20 before + 1)"
+    assert live == 22, f"C-7: live file has {live} top-level sections; expected 22 (21 before + 1)"
     tpl_set = {l for l in _lines(INSTR) if l.startswith("## ")}
     live_set = {l for l in _lines(INSTR_LIVE) if l.startswith("## ")}
     assert tpl_set <= live_set, f"C-7: template sections missing from live: {sorted(tpl_set - live_set)}"

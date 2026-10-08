@@ -37,7 +37,9 @@ territory:
     - templates/constitution-template.md   # 模板中立性 + 不在本目标范围
     - templates/skills-template.md
     - templates/agents/**
-    - templates/commands/improve.md        # 跨 goal 写权裁定 2026-10-06（用户明示授权本次修改）：该文件归 session-driven-self-improvement 团队 S4；本团队 T-003 命令瘦身扫 templates/commands/*.md 时 MUST 跳过它，其薄壳形态已在对方 S4 responsibility 中按本团队 T-003 约定预对齐（该预对齐原缺 T-003 的「每个技能的输入和产出」子句，2026-10-07 已补齐对方 S4 的 responsibility 与 gate）
+    - templates/commands/improve.md
+    - skills/self-improvement/**           # 跨团队写权排除 2026-10-08(用户 run 入参授权 S4-2 序列):该具名目录归 session-driven-self-improvement 团队 S4 累积 2;本团队 T-002 技能标注扫描 skills/*/SKILL.md 时 MUST 跳过它,标注面由属主团队随落地补齐
+        # 跨 goal 写权裁定 2026-10-06（用户明示授权本次修改）：该文件归 session-driven-self-improvement 团队 S4；本团队 T-003 命令瘦身扫 templates/commands/*.md 时 MUST 跳过它，其薄壳形态已在对方 S4 responsibility 中按本团队 T-003 约定预对齐（该预对齐原缺 T-003 的「每个技能的输入和产出」子句，2026-10-07 已补齐对方 S4 的 responsibility 与 gate）
     - skills/draw-mermaid/server/**        # vendored（13232 文件），非技能契约面
     - scripts/**                           # 引擎：本目标不改引擎（只读 + 执行，不写）
     - .specify/scripts/**

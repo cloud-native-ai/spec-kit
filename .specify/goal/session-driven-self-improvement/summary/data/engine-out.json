@@ -1,0 +1,839 @@
+{
+  "engine": "progress-engine/v1",
+  "input_schema": "project-input/v1",
+  "baseline": "2026-10-08",
+  "input": ".specify/goal/session-driven-self-improvement/summary/data/project.db",
+  "options": {
+    "count_deferred": false,
+    "strict": false
+  },
+  "thresholds": {
+    "weak_git_commits": 10,
+    "weak_git_span_days": 7,
+    "milestone_view_min_count": 4,
+    "milestone_view_min_span_days": 61,
+    "gantt_split_bars": 20
+  },
+  "project": {
+    "name": "session-driven-self-improvement",
+    "status_counts": {
+      "unknown": 10
+    },
+    "progress": {
+      "basis": null,
+      "progress_pct": null,
+      "formula": null,
+      "reason": "无勾选比、无材料明写百分比 → 整体进度无可计数依据，只报状态计数",
+      "alternatives": [],
+      "buckets": null,
+      "bucket_closure": null
+    },
+    "counts": {
+      "items": 12,
+      "work_items": 10,
+      "leaves": 5,
+      "milestones": 2,
+      "delayed": 0,
+      "unknown_schedule": 10,
+      "unquantified_progress": 10
+    },
+    "delayed_items": [],
+    "delay_days_max": null,
+    "progress_bar": null,
+    "schedule_state": "unknown-schedule",
+    "current_phase": null,
+    "unknown_schedule_items": [
+      "session-driven-self-improvement.PH-0001",
+      "session-driven-self-improvement.PH-0002",
+      "session-driven-self-improvement.PH-0003",
+      "session-driven-self-improvement.PH-0004",
+      "session-driven-self-improvement.PH-0005",
+      "session-driven-self-improvement.TIX-3dfddbb0",
+      "session-driven-self-improvement.TIX-6730c24c",
+      "session-driven-self-improvement.TIX-4e67a199",
+      "session-driven-self-improvement.TIX-6ccb2680",
+      "session-driven-self-improvement.TIX-3344086d"
+    ],
+    "unquantified_progress_items": [
+      "session-driven-self-improvement.PH-0001",
+      "session-driven-self-improvement.PH-0002",
+      "session-driven-self-improvement.PH-0003",
+      "session-driven-self-improvement.PH-0004",
+      "session-driven-self-improvement.PH-0005",
+      "session-driven-self-improvement.TIX-3dfddbb0",
+      "session-driven-self-improvement.TIX-6730c24c",
+      "session-driven-self-improvement.TIX-4e67a199",
+      "session-driven-self-improvement.TIX-6ccb2680",
+      "session-driven-self-improvement.TIX-3344086d"
+    ],
+    "window": {
+      "earliest_date": null,
+      "latest_date": null,
+      "span_days": null
+    }
+  },
+  "items": [
+    {
+      "id": "session-driven-self-improvement.PH-0001",
+      "name": "session-driven-self-improvement · stage 1",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "session-driven-self-improvement.TIX-3dfddbb0"
+      ],
+      "status": "unknown",
+      "status_source": "none",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期",
+        "1 项子项进度未量化，未计入本项进度分母"
+      ],
+      "source": ".specify/teams/session-driven-self-improvement/（user-form）",
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "session-driven-self-improvement.TIX-3dfddbb0"
+        ],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": null
+    },
+    {
+      "id": "session-driven-self-improvement.PH-0002",
+      "name": "session-driven-self-improvement · stage 2",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "session-driven-self-improvement.TIX-6730c24c"
+      ],
+      "status": "unknown",
+      "status_source": "none",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期",
+        "1 项子项进度未量化，未计入本项进度分母"
+      ],
+      "source": ".specify/teams/session-driven-self-improvement/（user-form）",
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "session-driven-self-improvement.TIX-6730c24c"
+        ],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": null
+    },
+    {
+      "id": "session-driven-self-improvement.PH-0003",
+      "name": "session-driven-self-improvement · stage 3",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "session-driven-self-improvement.TIX-4e67a199"
+      ],
+      "status": "unknown",
+      "status_source": "none",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期",
+        "1 项子项进度未量化，未计入本项进度分母"
+      ],
+      "source": ".specify/teams/session-driven-self-improvement/（user-form）",
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "session-driven-self-improvement.TIX-4e67a199"
+        ],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": null
+    },
+    {
+      "id": "session-driven-self-improvement.PH-0004",
+      "name": "session-driven-self-improvement · stage 4",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "session-driven-self-improvement.TIX-6ccb2680"
+      ],
+      "status": "unknown",
+      "status_source": "none",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期",
+        "1 项子项进度未量化，未计入本项进度分母"
+      ],
+      "source": ".specify/teams/session-driven-self-improvement/（user-form）",
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "session-driven-self-improvement.TIX-6ccb2680"
+        ],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": null
+    },
+    {
+      "id": "session-driven-self-improvement.PH-0005",
+      "name": "session-driven-self-improvement · stage 5",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "session-driven-self-improvement.TIX-3344086d"
+      ],
+      "status": "unknown",
+      "status_source": "none",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期",
+        "1 项子项进度未量化，未计入本项进度分母"
+      ],
+      "source": ".specify/teams/session-driven-self-improvement/（user-form）",
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "session-driven-self-improvement.TIX-3344086d"
+        ],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": null
+    },
+    {
+      "id": "session-driven-self-improvement.TIX-3dfddbb0",
+      "name": "run 20261005T172252Z",
+      "type": "work-item",
+      "parent": "session-driven-self-improvement.PH-0001",
+      "phase_id": "session-driven-self-improvement.PH-0001",
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "unknown",
+      "status_source": "none",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/session-driven-self-improvement/runs/20261005T172252Z-report.md",
+      "progress_bar": null
+    },
+    {
+      "id": "session-driven-self-improvement.TIX-6730c24c",
+      "name": "run 20261007T170045Z",
+      "type": "work-item",
+      "parent": "session-driven-self-improvement.PH-0002",
+      "phase_id": "session-driven-self-improvement.PH-0002",
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "unknown",
+      "status_source": "none",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/session-driven-self-improvement/runs/20261007T170045Z-report.md",
+      "progress_bar": null
+    },
+    {
+      "id": "session-driven-self-improvement.TIX-4e67a199",
+      "name": "run 20261008T025904Z",
+      "type": "work-item",
+      "parent": "session-driven-self-improvement.PH-0003",
+      "phase_id": "session-driven-self-improvement.PH-0003",
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "unknown",
+      "status_source": "none",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/session-driven-self-improvement/runs/20261008T025904Z-report.md",
+      "progress_bar": null
+    },
+    {
+      "id": "session-driven-self-improvement.TIX-6ccb2680",
+      "name": "run 20261008T073900Z",
+      "type": "work-item",
+      "parent": "session-driven-self-improvement.PH-0004",
+      "phase_id": "session-driven-self-improvement.PH-0004",
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "unknown",
+      "status_source": "none",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/session-driven-self-improvement/runs/20261008T073900Z-report.md",
+      "progress_bar": null
+    },
+    {
+      "id": "session-driven-self-improvement.TIX-3344086d",
+      "name": "run 20261008T090000Z",
+      "type": "work-item",
+      "parent": "session-driven-self-improvement.PH-0005",
+      "phase_id": "session-driven-self-improvement.PH-0005",
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "unknown",
+      "status_source": "none",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/session-driven-self-improvement/runs/20261008T090000Z-report.md",
+      "progress_bar": null
+    },
+    {
+      "id": "MS-0001",
+      "name": "一套新的运行判定,统一「token 消耗」「耗时」「正确性」与「满意度」四个量;其中「正确性」只涵盖**制品正确性**(",
+      "type": "milestone",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "unknown-schedule",
+      "status_source": "milestone-judgement",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "锚定 session-driven-self-improvement.TIX-3dfddbb0 但该工作项无计划/实际完成日，锚定日不可换算",
+        "无计划日期（无绝对锚定日、无可换算的锚定工作项），无法判定延期"
+      ],
+      "source": ".specify/goal/session-driven-self-improvement/goal.md",
+      "progress_bar": null
+    },
+    {
+      "id": "MS-0002",
+      "name": "本目标为长期目标,不设算出的终止判据:achieved 是一次刻意的人工判定,而非由度量得出的结论。",
+      "type": "milestone",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "unknown-schedule",
+      "status_source": "milestone-judgement",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "锚定 session-driven-self-improvement.TIX-3dfddbb0 但该工作项无计划/实际完成日，锚定日不可换算",
+        "无计划日期（无绝对锚定日、无可换算的锚定工作项），无法判定延期"
+      ],
+      "source": ".specify/goal/session-driven-self-improvement/goal.md",
+      "progress_bar": null
+    }
+  ],
+  "groups": [
+    {
+      "id": "session-driven-self-improvement.PH-0001",
+      "name": "session-driven-self-improvement · stage 1",
+      "status": "unknown",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_bar": null,
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "session-driven-self-improvement.TIX-3dfddbb0"
+        ],
+        "weights": null,
+        "weight_sum": null
+      }
+    },
+    {
+      "id": "session-driven-self-improvement.PH-0002",
+      "name": "session-driven-self-improvement · stage 2",
+      "status": "unknown",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_bar": null,
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "session-driven-self-improvement.TIX-6730c24c"
+        ],
+        "weights": null,
+        "weight_sum": null
+      }
+    },
+    {
+      "id": "session-driven-self-improvement.PH-0003",
+      "name": "session-driven-self-improvement · stage 3",
+      "status": "unknown",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_bar": null,
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "session-driven-self-improvement.TIX-4e67a199"
+        ],
+        "weights": null,
+        "weight_sum": null
+      }
+    },
+    {
+      "id": "session-driven-self-improvement.PH-0004",
+      "name": "session-driven-self-improvement · stage 4",
+      "status": "unknown",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_bar": null,
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "session-driven-self-improvement.TIX-6ccb2680"
+        ],
+        "weights": null,
+        "weight_sum": null
+      }
+    },
+    {
+      "id": "session-driven-self-improvement.PH-0005",
+      "name": "session-driven-self-improvement · stage 5",
+      "status": "unknown",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_bar": null,
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "session-driven-self-improvement.TIX-3344086d"
+        ],
+        "weights": null,
+        "weight_sum": null
+      }
+    }
+  ],
+  "milestones": {
+    "counts": {
+      "total": 2,
+      "achieved": 0,
+      "pending": 0,
+      "at_risk": 0,
+      "unknown_schedule": 2
+    },
+    "achieved_numerator": 0,
+    "achieved_denominator": 0,
+    "achieved_pct": null,
+    "achieved_formula": null,
+    "achieved_bar": null,
+    "delay_days_max": null,
+    "overdue": [],
+    "achieved_late": [],
+    "unknown_schedule_ids": [
+      "MS-0001",
+      "MS-0002"
+    ],
+    "narrative": "2 个里程碑：已达成 0、逾期 0、待达成 0、无计划日期 2",
+    "view": {
+      "count": 2,
+      "first_anchor": null,
+      "last_anchor": null,
+      "span_days": null,
+      "standalone_condition_a": false,
+      "thresholds": {
+        "min_count": 4,
+        "min_span_days": 61
+      }
+    }
+  },
+  "gantt": {
+    "project_start": null,
+    "project_start_source": null,
+    "today_offset_days": null,
+    "bar_count": 0,
+    "split_recommended": false,
+    "schedule_material": {
+      "has_planned_dates": false,
+      "git_span_days": null,
+      "git_commit_count": null,
+      "git_window": null,
+      "weak_git_material": false,
+      "gantt_recommended": false,
+      "reason": "无任何计划日期或工期依据 → 甘特不出图"
+    }
+  },
+  "timeline": [],
+  "coverage": {
+    "source_label": "团队条目台账 items.jsonl",
+    "candidate_total": 5,
+    "excluded": 0,
+    "granularity_truncated": 0,
+    "unattributed": 0,
+    "tree_items": 5,
+    "phase_nodes": 5,
+    "closure_equation": "5 − 0 − 0 = 5",
+    "closure_ok": true,
+    "closure_note": "闭合成立：候选全集减去剔除/截断项等于分解树条目数",
+    "coverage_formula": "5/5 = 100.0%",
+    "progress_denominator_set": "团队条目台账 items.jsonl（5 项，已扣除剔除项 0）"
+  },
+  "people": {
+    "roster": [
+      {
+        "owner_id": "agent-team-supervisor-template",
+        "owner_name": "未记录",
+        "owner_role": "team-supervisor"
+      },
+      {
+        "owner_id": "agent-stage-executor-template",
+        "owner_name": "未记录",
+        "owner_role": "judgment-contract-designer"
+      },
+      {
+        "owner_id": "agent-stage-evaluator-template",
+        "owner_name": "未记录",
+        "owner_role": "contract-verifier"
+      }
+    ],
+    "coverage_numerator": 0,
+    "coverage_denominator": 12,
+    "coverage_pct": 0.0,
+    "coverage_formula": "0/12 = 0.0%",
+    "unassigned_ids": [
+      "session-driven-self-improvement.PH-0001",
+      "session-driven-self-improvement.PH-0002",
+      "session-driven-self-improvement.PH-0003",
+      "session-driven-self-improvement.PH-0004",
+      "session-driven-self-improvement.PH-0005",
+      "session-driven-self-improvement.TIX-3dfddbb0",
+      "session-driven-self-improvement.TIX-6730c24c",
+      "session-driven-self-improvement.TIX-4e67a199",
+      "session-driven-self-improvement.TIX-6ccb2680",
+      "session-driven-self-improvement.TIX-3344086d",
+      "MS-0001",
+      "MS-0002"
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "S-0001",
+      "source_kind": "user-form",
+      "source_ref": ".specify/teams/session-driven-self-improvement/",
+      "covers": [
+        "people",
+        "phases",
+        "work_items"
+      ]
+    }
+  ],
+  "inferred_fields": [
+    {
+      "field": "phases[session-driven-self-improvement.PH-0001].source",
+      "inferred_value": ".specify/teams/session-driven-self-improvement/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[session-driven-self-improvement.PH-0002].source",
+      "inferred_value": ".specify/teams/session-driven-self-improvement/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[session-driven-self-improvement.PH-0003].source",
+      "inferred_value": ".specify/teams/session-driven-self-improvement/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[session-driven-self-improvement.PH-0004].source",
+      "inferred_value": ".specify/teams/session-driven-self-improvement/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[session-driven-self-improvement.PH-0005].source",
+      "inferred_value": ".specify/teams/session-driven-self-improvement/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    }
+  ],
+  "diagnostics": {
+    "unmapped_statuses": {},
+    "warnings": [],
+    "declarations": [
+      "10 个工作项无计划完成日，无法判定延期（session-driven-self-improvement.PH-0001、session-driven-self-improvement.PH-0002、session-driven-self-improvement.PH-0003、session-driven-self-improvement.PH-0004、session-driven-self-improvement.PH-0005、session-driven-self-improvement.TIX-3dfddbb0、session-driven-self-improvement.TIX-6730c24c、session-driven-self-improvement.TIX-4e67a199…）——报告须显式声明，不上逾期色",
+      "2 个里程碑无计划日期，无法判定延期（MS-0001、MS-0002）——报告须显式声明，不上逾期色",
+      "10 个工作项进度无可计数依据，记 `-（无可计数依据）`，未计入任何百分比分母",
+      "排期材料不足：无任何计划日期或工期依据 → 甘特不出图"
+    ]
+  },
+  "baseline_source": "--baseline",
+  "db": ".specify/goal/session-driven-self-improvement/summary/data/project.db",
+  "db_schema_version": "project-db/v1"
+}

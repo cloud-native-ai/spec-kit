@@ -73,6 +73,16 @@ LLM token usage efficiency is a framework-level quality attribute. The full disc
 - **Summary-First (摘要优先)**: never inject the whole raw content of machine-managed data files (feedback, memory, evidence, history stores, run artifacts, inventories) into LLM context; consume digests, field projections, or targeted excerpts, escalating per the discipline doc's escalation ladder (exceptions: edit target, small-file threshold, recorded justification).
 - **Consumption Observation (消耗观察)**: at feedback wrap-up, self-assess avoidable token spend; findings carry the stable `token-efficiency` marker (retrievable via `feedback-utils.py --action list --contains token-efficiency`); never fabricate token counts.
 
+## Run Determination
+
+Once per completed run, at wrap-up, a program measures how that run went and the result routes into the existing feedback flow. The wiring is defined in a single source of truth — `.specify/shared/workflow/feedback-step.md` § Run Determination (do NOT copy its rules; reference the file) — which owns the consumption point, the composition with the wrap-up notification, the missing-record degradation and the passive non-exhaustiveness constraint. The engine `.specify/scripts/python/run-determination.py` is the code-side owner of the record schema, every value domain and the routing-bit derivation:
+
+- **One run, one record (每轮一条)**: the record is the 改点 — an observation sensor inside the improve flow. It is not a feedback entry, not an intervention ledger, and it authorizes no mutation.
+- **Measured, not impressed (测量而非印象)**: the four quantities are token 消耗, 耗时, 制品正确性 and 满意度. A quantity with no source reports itself as not evaluated — never as fine, never as zero, never as a fabricated number.
+- **Passive, never exhaustive (被动而不面面俱到)**: only this run's own evaluated findings feed the flow; everything else is recorded with no carrier assigned and left for the active improve path. A single regressed comparison axis is recorded, not fired.
+- **Inference, not solicitation (推断而非征询)**: the passive path classifies a user turn that already happened. It never asks the user for feedback content and adds no user-facing surface.
+- **Sibling, not twin (与情境评估相邻而不同)**: 情境评估 asks, every turn, what is worth running next; 运行判定 asks, once, how the run that just finished went. Neither calls the other.
+
 ## User-Facing Comprehension
 
 Every user-facing output has to be readable by someone who did not take part in the run. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/user-facing-comprehension.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
@@ -134,11 +144,10 @@ Full philosophy, the load-bearing criteria, and where each kind of answer belong
 
 ## ID Register (编号登记)
 
-Every durable identifier — a decision (D-…), open item (OI-…), team stage (S…), goal target (T-…), finding (F-…), adjudicated criterion (B-…) — MUST be recorded in the project's ID register at the moment the identifier is coined, and MUST NOT live only in session history, a git-ignored run workspace, or conversation context. An identifier absent from the register is uninterpretable to any later session, and citing it as if the reader already knew it is exactly the silent-context failure this register closes.
+Every durable identifier — a decision (D-…), open item (OI-…), stage (S…), target (T-…), finding (F-…), criterion (B-…) — MUST be recorded in `.specify/memory/register.md` **at the moment the ID is coined**, never left only in session history, a git-ignored workspace, or conversation: an unregistered ID is uninterpretable to any later session, and citing it as known is the silent-context failure this register closes.
 
-- **One file**: `.specify/memory/register.md` is the single index. Every entry is pointer-shaped — identifier → one-line meaning → authority path (where the full statement lives) → status — and MUST NOT restate the decision content (One Source Of Truth).
-- **At birth, not at recall**: the row is written when the ID is coined, not when someone later fails to decode it.
-- **Durable test**: a label that never outlives its turn (a throwaway enumeration inside one reply) stays out; anything cited by a tracked artifact or still pending is durable and MUST be registered.
+- **Pointer shape**: identifier → one-line meaning → authority path → status; MUST NOT restate the decision content (One Source Of Truth).
+- **Durable test**: anything cited by a tracked artifact or still pending registers; a throwaway enumeration inside one reply does not.
 
 ## Tech Stack & Resources
 - **Project Name**: {{PROJECT_NAME}}

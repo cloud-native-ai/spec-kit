@@ -1,0 +1,82 @@
+schema: project-input/v1
+project:
+  project_name: session-driven-self-improvement
+  project_desc: 终态是框架中有一套 improve 流程,具体包含两个方面:主动触发(通过 improve 命令)与被动触发(通过运行判定的结果触发 feedback 流程)。
+  baseline_date: '2026-10-08'
+  repos: []
+phases:
+- phase_id: session-driven-self-improvement.PH-0001
+  phase_name: session-driven-self-improvement · stage 1
+  phase_order: 1
+- phase_id: session-driven-self-improvement.PH-0002
+  phase_name: session-driven-self-improvement · stage 2
+  phase_order: 2
+- phase_id: session-driven-self-improvement.PH-0003
+  phase_name: session-driven-self-improvement · stage 3
+  phase_order: 3
+- phase_id: session-driven-self-improvement.PH-0004
+  phase_name: session-driven-self-improvement · stage 4
+  phase_order: 4
+- phase_id: session-driven-self-improvement.PH-0005
+  phase_name: session-driven-self-improvement · stage 5
+  phase_order: 5
+work_items:
+- item_id: session-driven-self-improvement.TIX-3dfddbb0
+  item_name: run 20261005T172252Z
+  phase_id: session-driven-self-improvement.PH-0001
+  status: ''
+  source: .specify/teams/session-driven-self-improvement/runs/20261005T172252Z-report.md
+- item_id: session-driven-self-improvement.TIX-6730c24c
+  item_name: run 20261007T170045Z
+  phase_id: session-driven-self-improvement.PH-0002
+  status: ''
+  source: .specify/teams/session-driven-self-improvement/runs/20261007T170045Z-report.md
+- item_id: session-driven-self-improvement.TIX-4e67a199
+  item_name: run 20261008T025904Z
+  phase_id: session-driven-self-improvement.PH-0003
+  status: ''
+  source: .specify/teams/session-driven-self-improvement/runs/20261008T025904Z-report.md
+- item_id: session-driven-self-improvement.TIX-6ccb2680
+  item_name: run 20261008T073900Z
+  phase_id: session-driven-self-improvement.PH-0004
+  status: ''
+  source: .specify/teams/session-driven-self-improvement/runs/20261008T073900Z-report.md
+- item_id: session-driven-self-improvement.TIX-3344086d
+  item_name: run 20261008T090000Z
+  phase_id: session-driven-self-improvement.PH-0005
+  status: ''
+  source: .specify/teams/session-driven-self-improvement/runs/20261008T090000Z-report.md
+milestones:
+- milestone_id: MS-0001
+  milestone_name: 一套新的运行判定,统一「token 消耗」「耗时」「正确性」与「满意度」四个量;其中「正确性」只涵盖**制品正确性**(
+  anchor_item_id: session-driven-self-improvement.TIX-3dfddbb0
+  source: .specify/goal/session-driven-self-improvement/goal.md
+- milestone_id: MS-0002
+  milestone_name: 本目标为长期目标,不设算出的终止判据:achieved 是一次刻意的人工判定,而非由度量得出的结论。
+  anchor_item_id: session-driven-self-improvement.TIX-3dfddbb0
+  source: .specify/goal/session-driven-self-improvement/goal.md
+people:
+- owner_id: agent-team-supervisor-template
+  owner_name: 未记录
+  owner_role: team-supervisor
+- owner_id: agent-stage-executor-template
+  owner_name: 未记录
+  owner_role: judgment-contract-designer
+- owner_id: agent-stage-evaluator-template
+  owner_name: 未记录
+  owner_role: contract-verifier
+features: []
+sources:
+- source_id: S-0001
+  source_kind: user-form
+  source_ref: .specify/teams/session-driven-self-improvement/
+  covers:
+  - work_items
+  - phases
+  - people
+coverage:
+  candidate_total: 5
+  excluded: 0
+  granularity_truncated: 0
+  unattributed: 0
+  source_label: 团队条目台账 items.jsonl

@@ -181,6 +181,27 @@ def test_goal_surface_adds_nothing_to_the_gate_count(surface: Path) -> None:
     assert not hits, f"{rel} entered the gate count: {hits}"
 
 
+#: The 运行判定 passive-trigger wiring (S3) lands inside two scanned surfaces:
+#: ``shared`` is in SCAN_DIRS and ``templates/*.md`` is in SCAN_ROOT_FILES. The
+#: budget's integer headroom is still 0, so the wording was designed around the
+#: pattern tuple instead of negotiated with it — including step 6's verb, whose
+#: neighbouring form the tuple already carries.
+RUN_DETERMINATION_SURFACES = (
+    REPO_ROOT / "shared" / "workflow" / "feedback-step.md",
+    REPO_ROOT / "templates" / "instructions-template.md",
+)
+
+
+@pytest.mark.parametrize("surface", RUN_DETERMINATION_SURFACES, ids=lambda p: p.name)
+def test_run_determination_surface_adds_nothing_to_the_gate_count(surface: Path) -> None:
+    """Same guard shape as goal's above, extended rather than duplicated: one scanner
+    measurement, one assertion per surface, and no second phrase list anywhere."""
+    payload = run_scanner()
+    rel = surface.relative_to(REPO_ROOT).as_posix()
+    hits = [g for g in payload["gates"] if g["file"] == rel]
+    assert not hits, f"{rel} entered the gate count: {hits}"
+
+
 @pytest.mark.parametrize("rel_path,marker", KEEP_LIST)
 def test_protected_gate_preserved(rel_path: str, marker: str) -> None:
     path = REPO_ROOT / rel_path
