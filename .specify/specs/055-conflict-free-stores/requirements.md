@@ -2,7 +2,7 @@
 
 **Requirement Branch**: `055-conflict-free-stores`
 **Created**: 2026-10-08
-**Status**: Draft
+**Status**: Implemented(direct implementation per user ruling ③;分支 `055-conflict-free-stores`,提交 cb46460d + 61076392;验证记录见 `features/055.md` § Status Criteria)
 **Input**: User description: "在其他项目中使用 speckit 经常会遇到 .specify/memory/feedback/index.json 文件导致的 git 合并冲突, 需要针对这一点做优化, 尽可能不要使用统一文件来记录可能被多个流程同时更新的信息."
 
 **用户裁定(2026-10-08,三项约束)**:① 改造范围 = feedback 库 + memory 库同轮(evidence 库无维护型索引,不受影响);② 存量过渡 = 首次写入自动迁移(写侧落地 state/ 后删除 index.json 并在返回值披露 `migrated`;读取侧对旧 index.json 只读回退、绝不再写);③ 治理 = 登记特性 055 直接实现,本规格为轻量记录(不走完整 SDD 仪式)。
