@@ -35,3 +35,13 @@ Verdict: 6/6 red after marker tightening. First run was 5/6 red — test_c4 was 
 
 Green: `scripts/bash/run-tests.sh tests/contract/test_seat_instantiation_flow.py` → `6 passed in 0.02s` after T015 (create-team SKILL.md step 4 seat-instantiation + new step 7 render trigger with failure-disclosure + guidance line; create-mode.md step 4, new step 7, schema-note member-resolution clause rewritten) and T016 (improve-team new step 6 seat backfill + step 7 report distinguishing existing/backfilled/render-stats + guidance line); T017 mirror sync (3 files), `--check` all ok, no NEW drift vs baseline.
 Mutation drill: plant `render-agentz` (1-char) in skills/create-team/SKILL.md → guard RED on exactly test_c8_create_team_create_flow_runs_render_trigger (1 failed, 5 passed) → EXACT reverse substitution count==1 → `diff -q` BYTE-EQUAL vs pre-mutation copy → mirror re-synced → recovery `6 passed`.
+
+## T019 red capture — 2026-10-08
+
+Command: `scripts/bash/run-tests.sh tests/contract/test_agent_surface_docs.py`
+Verdict: 5/5 red (concept section absent from agent-definitions.md; provenance URLs + date absent from symlink-model.md; qoder agent-surface note absent from supported-agent-tools.md).
+
+## T024 green + mutation drill — 2026-10-08
+
+Green: `scripts/bash/run-tests.sh tests/contract/test_agent_surface_docs.py` → `5 passed in 0.02s` after T020 (agent-definitions.md gains `## Host Registration Surface` owner section + Seat Instance taxonomy entry), T021 (symlink-model.md agent-surface bullet with both provenance URLs + verification date + owner pointer), T022 (supported-agent-tools.md qoder agent-surface section — inserted mid-sentence on first attempt, caught by re-reading and relocated after the Tier 2 bullet, disclosed), T023 (shared mirror sync 2 files, `--check` all ok, no NEW drift).
+Mutation drill: planted a C-8 violation (restated the `## Host Registration Surface` heading inside symlink-model.md) → guard RED on exactly test_c8_pointer_discipline_no_restatement (1 failed, 4 passed) → exact reverse restore → `diff -q` BYTE-EQUAL → mirror re-synced → recovery `5 passed`.

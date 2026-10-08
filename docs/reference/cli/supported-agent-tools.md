@@ -32,6 +32,10 @@ upstream source for the latest details.
 - **Tier 2** — non-CLI-form tools (IDE-based / platform agents); supported
   targets with a narrower validation surface.
 
+### Agent surface notes (Qoder)
+
+For Qoder, agent definitions render into the project-level `.qoder/agents/` directory as real files (concept: `shared/definitions/agent-definitions.md` → Host Registration Surface). That directory is **shared between Qoder CLI and Qoder IDE**, so one render reaches both (verified 2026-10-08 against https://docs.qoder.com/extensions/subagent and https://docs.qoder.com/cli/subagent); the user-level `~/.qoder/agents/` also exists but belongs to the user and is never touched by the framework; and a filename does not define the agent name — the frontmatter `name` field does. Update the surface after authoring/refining agent definitions with `specify render-agents --ai qoder`.
+
 Only these officially supported agents may be added (Constitution Principle V);
 config parsing rejects unknown providers.
 
