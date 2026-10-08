@@ -54,9 +54,7 @@ def test_mark_submitted_resets_and_stamps(feedback_store: Path, capsys):
     assert result["reset_from"] == 3
     assert result["submitted_at"] is not None
 
-    index = json.loads(
-        (feedback_store / ".specify/memory/feedback/index.json").read_text(encoding="utf-8")
-    )
+    index = feedback_utils.load_index(feedback_store)
     assert index["count_since_submission"] == 0
     assert index["submitted_at"] == result["submitted_at"]
 

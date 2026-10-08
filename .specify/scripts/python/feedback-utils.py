@@ -10,8 +10,20 @@ Layout (relative to workspace root):
 
     .specify/memory/feedback/
         <created-ts>-<unit-slug>.md   # one file per recorded run
-        index.json                    # store metadata + entry mirror
+        state/<scalar>.json           # one tiny file per store scalar
+                                       # (threshold / submitted-at / upstream-repo)
         .gitkeep                      # already present
+
+Conflict-free store discipline (req 055): information that multiple flows
+may update concurrently never lives in one shared file. Entries are the
+record itself (append-only, one file per run); the entry list is derived
+on demand by scanning ``*.md`` frontmatter — never persisted. The only
+mutable state is three scalars, each in its own ``state/`` file whose
+absence means the default. ``record`` touches nothing but the new entry
+file, so concurrent records across branches cannot conflict. A legacy
+``index.json`` is read as a read-only fallback and retired (deleted) on
+the first mutating action; the return value discloses ``"migrated": true``
+when that happened.
 
 An entry's ``unit_id`` must name a Spec Kit command or skill
 (``/speckit.<command>`` | ``skill:<name>``); ``record`` rejects any other id.
@@ -47,11 +59,20 @@ from typing import Any, Dict, List, Optional, Tuple
 
 FEEDBACK_SUBDIR = Path(".specify") / "memory" / "feedback"
 PACKAGES_DIRNAME = "packages"
+STATE_DIRNAME = "state"
+# Legacy single-file index (pre-055): kept only as a read-only fallback
+# source for the three store scalars, and deleted on first mutation.
 INDEX_NAME = "index.json"
 STORE_NAME = "feedback"
 DEFAULT_THRESHOLD = 10
 NO_OP_POINT = "No significant optimization points identified this run."
 DIST_NAME = "specify-cli"
+
+_STATE_FILES = {
+    "threshold": "threshold.json",
+    "submitted_at": "submitted-at.json",
+    "upstream_repo": "upstream-repo.json",
+}
 
 # A unit id is valid only when it names a Spec Kit command or skill.
 _UNIT_ID_RE = re.compile(r"^(?:/speckit\.[a-z0-9._-]+|skill:[a-z0-9._-]+)$")
@@ -232,43 +253,171 @@ def index_path(workspace_root: Path) -> Path:
     return feedback_dir(workspace_root) / INDEX_NAME
 
 
-def empty_index() -> Dict[str, Any]:
-    return {
-        "store": STORE_NAME,
-        "updated": None,
-        "threshold": DEFAULT_THRESHOLD,
-        "count_since_submission": 0,
-        "submitted_at": None,
-        "entries": [],
-        "introspections": [],
-    }
+def state_dir(workspace_root: Path) -> Path:
+    return feedback_dir(workspace_root) / STATE_DIRNAME
 
 
-def load_index(workspace_root: Path) -> Dict[str, Any]:
-    path = index_path(workspace_root)
-    if not path.exists():
-        return empty_index()
+def write_text_atomic(path: Path, text: str) -> None:
+    part = path.with_name(path.name + ".part")
+    part.write_text(text, encoding="utf-8")
+    try:
+        os.replace(part, path)
+    except OSError:
+        part.unlink(missing_ok=True)
+        raise
+
+
+def write_state_file(workspace_root: Path, key: str, value: Any) -> None:
+    """Persist one store scalar into its own tiny state file (req 055).
+
+    One file per scalar, absence = default: concurrent flows that touch
+    different scalars never share a write target.
+    """
+    filename = _STATE_FILES[key]
+    ensure_feedback_dir(workspace_root)
+    sdir = state_dir(workspace_root)
+    sdir.mkdir(parents=True, exist_ok=True)
+    write_text_atomic(sdir / filename, json.dumps({key: value}, ensure_ascii=False) + "\n")
+
+
+def read_state_file(workspace_root: Path, key: str) -> Any:
+    path = state_dir(workspace_root) / _STATE_FILES[key]
+    if not path.is_file():
+        return None
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (ValueError, OSError):
-        return empty_index()
-    if not isinstance(data, dict) or not isinstance(data.get("entries"), list):
-        return empty_index()
-    base = empty_index()
-    base.update(data)
-    return base
+        return None
+    return data.get(key) if isinstance(data, dict) else None
 
 
-def save_index(workspace_root: Path, index: Dict[str, Any]) -> None:
-    index["entries"] = sorted(
-        index.get("entries", []), key=lambda e: e.get("created", ""), reverse=True
-    )
-    index["store"] = STORE_NAME
-    index["updated"] = now_iso()
-    ensure_feedback_dir(workspace_root)
-    index_path(workspace_root).write_text(
-        json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+def _read_legacy_index(workspace_root: Path) -> Optional[Dict[str, Any]]:
+    path = index_path(workspace_root)
+    if not path.is_file():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, OSError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def scan_entries(workspace_root: Path) -> List[Dict[str, Any]]:
+    """Derive the entry list from the ``*.md`` files themselves.
+
+    Bookkeeping files (backlog / cleanup-log / migration-log / probe-map / …)
+    carry no frontmatter and are skipped by the ``if not meta`` guard.
+    """
+    target = feedback_dir(workspace_root)
+    entries: List[Dict[str, Any]] = []
+    if not target.is_dir():
+        return entries
+    for path in sorted(target.glob("*.md")):
+        meta, _ = parse_frontmatter(path.read_text(encoding="utf-8"))
+        if not meta:
+            continue
+        entries.append(entry_meta(meta, path.name))
+    entries.sort(key=lambda e: e.get("created", ""), reverse=True)
+    return entries
+
+
+def scan_introspections(workspace_root: Path) -> List[Dict[str, Any]]:
+    """Derive the introspection roster from ``introspection/*.md`` frontmatter."""
+    target = feedback_dir(workspace_root) / INTROSPECTION_DIRNAME
+    records: List[Dict[str, Any]] = []
+    if not target.is_dir():
+        return records
+    for path in sorted(target.glob("*.md")):
+        meta, _ = parse_frontmatter(path.read_text(encoding="utf-8"))
+        if not meta or not meta.get("id"):
+            continue
+        try:
+            scope_entries = _list_value(meta.get("scope_entries", []))
+        except FeedbackError:
+            scope_entries = []
+        records.append({
+            "id": str(meta.get("id", "")),
+            "file": f"{INTROSPECTION_DIRNAME}/{path.name}",
+            "created": str(meta.get("created", "")),
+            "status": str(meta.get("status", "")),
+            "supersedes": meta.get("supersedes") or None,
+            "entries": list(scope_entries),
+        })
+    records.sort(key=lambda r: r.get("created", ""), reverse=True)
+    return records
+
+
+def load_store_state(workspace_root: Path) -> Dict[str, Any]:
+    """Scan-derived store truth: entries + introspections + three scalars.
+
+    Scalar precedence: ``state/<scalar>.json`` first; a legacy ``index.json``
+    (when present and parseable) is the read-only fallback and sets
+    ``legacy: True``. Entries and introspections always come from the scan —
+    never from the legacy index — so a stale mirror cannot lie.
+    """
+    entries = scan_entries(workspace_root)
+    introspections = scan_introspections(workspace_root)
+    legacy_data = _read_legacy_index(workspace_root)
+
+    def scalar(key: str) -> Any:
+        value = read_state_file(workspace_root, key)
+        if value is None and legacy_data is not None:
+            value = legacy_data.get(key)
+        return value
+
+    submitted_at = scalar("submitted_at")
+    return {
+        "entries": entries,
+        "introspections": introspections,
+        "threshold": scalar("threshold"),
+        "submitted_at": submitted_at,
+        "upstream_repo": scalar("upstream_repo"),
+        "count_since_submission": count_since_submission(entries, submitted_at),
+        "legacy": legacy_data is not None,
+    }
+
+
+def migrate_legacy_index(workspace_root: Path) -> bool:
+    """Retire a legacy ``index.json`` (req 055): materialize its scalars into
+    ``state/`` files (only when the state file is absent — state wins over a
+    legacy value), then delete the index. Idempotent; returns True when a
+    legacy index was retired by this call."""
+    legacy_data = _read_legacy_index(workspace_root)
+    if legacy_data is None:
+        return False
+    if (legacy_data.get("threshold") is not None
+            and read_state_file(workspace_root, "threshold") is None):
+        write_state_file(workspace_root, "threshold", legacy_data["threshold"])
+    if legacy_data.get("submitted_at") and read_state_file(workspace_root, "submitted_at") is None:
+        write_state_file(workspace_root, "submitted_at", legacy_data["submitted_at"])
+    if legacy_data.get("upstream_repo") and read_state_file(workspace_root, "upstream_repo") is None:
+        write_state_file(workspace_root, "upstream_repo", legacy_data["upstream_repo"])
+    try:
+        index_path(workspace_root).unlink()
+    except OSError:
+        pass
+    return True
+
+
+def load_index(workspace_root: Path) -> Dict[str, Any]:
+    """Legacy-shape projection of the scan-derived store state.
+
+    Kept for in-process callers (tests, packaging helpers); the values are
+    fully derived — ``updated`` is never persisted. Writing this shape back
+    is no longer supported (``save_index`` was removed with req 055).
+    """
+    state = load_store_state(workspace_root)
+    return {
+        "store": STORE_NAME,
+        "updated": None,
+        "threshold": (state["threshold"] if state["threshold"] is not None
+                      else DEFAULT_THRESHOLD),
+        "count_since_submission": state["count_since_submission"],
+        "submitted_at": state["submitted_at"],
+        "entries": state["entries"],
+        "introspections": state["introspections"],
+        "upstream_repo": state["upstream_repo"],
+    }
 
 
 def entry_meta(meta: Dict[str, Any], filename: str) -> Dict[str, Any]:
@@ -575,10 +724,10 @@ def action_record(args: argparse.Namespace) -> Dict[str, Any]:
                 )
             raise FeedbackError(f"no probe object for unit: {unit_id}")
 
-    index = load_index(workspace_root)
-    threshold = resolve_threshold(args.threshold, index.get("threshold"))
-    index["threshold"] = threshold
-    entries = index["entries"]
+    state = load_store_state(workspace_root)
+    stored_threshold = state["threshold"]
+    threshold = resolve_threshold(args.threshold, stored_threshold)
+    entries = state["entries"]
 
     existing = next(
         (e for e in entries if e.get("unit_id") == unit_id and e.get("run_id") == run_id),
@@ -586,7 +735,7 @@ def action_record(args: argparse.Namespace) -> Dict[str, Any]:
     )
     if existing:
         rel = (FEEDBACK_SUBDIR / existing["file"]).as_posix()
-        count = index.get("count_since_submission", 0)
+        count = state["count_since_submission"]
         return {
             "id": existing.get("id", ""),
             "path": rel,
@@ -594,6 +743,7 @@ def action_record(args: argparse.Namespace) -> Dict[str, Any]:
             "count_since_submission": count,
             "threshold": threshold,
             "should_prompt": should_prompt(count, threshold),
+            "migrated": False,
         }
 
     created = now_iso()
@@ -628,11 +778,14 @@ def action_record(args: argparse.Namespace) -> Dict[str, Any]:
         compose_entry(meta, review, points, partial), encoding="utf-8"
     )
 
-    entries.append(entry_meta(meta, filename))
-    index["count_since_submission"] = index.get("count_since_submission", 0) + 1
-    save_index(workspace_root, index)
+    # FR-003 (req 055): persist a threshold only when explicitly requested and
+    # different from what is stored — resolution from env/defaults stays
+    # ephemeral, so concurrent records never fight over this file.
+    if args.threshold is not None and args.threshold != stored_threshold:
+        write_state_file(workspace_root, "threshold", threshold)
 
-    count = index["count_since_submission"]
+    migrated = migrate_legacy_index(workspace_root)
+    count = state["count_since_submission"] + 1
     rel = (FEEDBACK_SUBDIR / filename).as_posix()
     return {
         "id": entry_id,
@@ -641,23 +794,25 @@ def action_record(args: argparse.Namespace) -> Dict[str, Any]:
         "count_since_submission": count,
         "threshold": threshold,
         "should_prompt": should_prompt(count, threshold),
+        "migrated": migrated,
     }
 
 
 def action_status(args: argparse.Namespace) -> Dict[str, Any]:
     workspace_root = resolve_workspace_root(args.workspace_root)
-    index = load_index(workspace_root)
-    threshold = resolve_threshold(args.threshold, index.get("threshold"))
-    count = index.get("count_since_submission", 0)
-    entries = index.get("entries", [])
+    state = load_store_state(workspace_root)
+    threshold = resolve_threshold(args.threshold, state["threshold"])
+    count = state["count_since_submission"]
+    entries = state["entries"]
     return {
         "count_since_submission": count,
         "threshold": threshold,
         "should_prompt": should_prompt(count, threshold),
         "total_entries": len(entries),
-        "submitted_at": index.get("submitted_at"),
+        "submitted_at": state["submitted_at"],
         "legacy_remaining": sum(1 for e in entries if not e.get("probe")),
         "external_count": sum(1 for e in entries if e.get("kind") == "external"),
+        "legacy": state["legacy"],
     }
 
 
@@ -673,7 +828,7 @@ def action_list(args: argparse.Namespace) -> Dict[str, Any]:
     disposition = (getattr(args, "disposition", None) or "").strip()
 
     items: List[Dict[str, Any]] = []
-    for entry in load_index(workspace_root).get("entries", []):
+    for entry in load_store_state(workspace_root)["entries"]:
         if unit_id and entry.get("unit_id") != unit_id:
             continue
         if unit_type and entry.get("unit_type") != unit_type:
@@ -721,15 +876,10 @@ def action_dispose(args: argparse.Namespace) -> Dict[str, Any]:
     if ref and not _INTROSPECTION_REF_RE.match(ref):
         raise FeedbackError(
             "--ref must match introspection-<ts>#F-<nn> (engine-cli C-8).")
-    index = load_index(workspace_root)
-    for entry in index.get("entries", []):
+    entries = load_store_state(workspace_root)["entries"]
+    for entry in entries:
         if entry.get("id") != entry_id:
             continue
-        entry["disposition"] = target_state
-        if reason:
-            entry["disposition_reason"] = reason
-        if ref:
-            entry["introspection_ref"] = ref
         entry_file = feedback_dir(workspace_root) / entry.get("file", "")
         if entry_file.is_file():
             meta, body = parse_frontmatter(entry_file.read_text(encoding="utf-8"))
@@ -738,12 +888,12 @@ def action_dispose(args: argparse.Namespace) -> Dict[str, Any]:
                 meta["disposition_reason"] = reason
             if ref:
                 meta["introspection_ref"] = ref
-            entry_file.write_text(
+            write_text_atomic(
+                entry_file,
                 dump_frontmatter(meta) + "\n\n" + body.strip() + "\n",
-                encoding="utf-8",
             )
-        save_index(workspace_root, index)
-        return {"id": entry_id, "disposition": target_state}
+        migrated = migrate_legacy_index(workspace_root)
+        return {"id": entry_id, "disposition": target_state, "migrated": migrated}
     raise FeedbackError(f"no entry with id: {entry_id}")
 
 
@@ -757,55 +907,49 @@ def action_mark_submitted(args: argparse.Namespace) -> Dict[str, Any]:
     bookkeeping — it does NOT upload or transmit anything.
     """
     workspace_root = resolve_workspace_root(args.workspace_root)
-    index = load_index(workspace_root)
-    reset_from = index.get("count_since_submission", 0)
+    state = load_store_state(workspace_root)
+    reset_from = state["count_since_submission"]
 
-    submitted_at = index.get("submitted_at")
-    entries = index.get("entries", [])
+    submitted_at = state["submitted_at"]
+    entries = state["entries"]
     if submitted_at:
         selected = [e for e in entries if str(e.get("created", "")) > submitted_at]
     else:
         selected = list(entries)
     selected.sort(key=lambda e: e.get("created", ""))
-    package = write_package(workspace_root, index, selected,
-                            notes=getattr(args, "notes", None))
+    package = write_package(workspace_root, {
+        "upstream_repo": state["upstream_repo"],
+        "introspections": state["introspections"],
+    }, selected,
+        notes=getattr(args, "notes", None))
 
     new_submitted_at = now_iso()
-    index["count_since_submission"] = 0
-    index["submitted_at"] = new_submitted_at
-    save_index(workspace_root, index)
+    write_state_file(workspace_root, "submitted_at", new_submitted_at)
+    migrated = migrate_legacy_index(workspace_root)
     return {
         "submitted_at": new_submitted_at,
         "reset_from": reset_from,
         "packaged": package.get("packaged", 0),
         "zip": package.get("zip"),
+        "migrated": migrated,
     }
 
 
 def action_reindex(args: argparse.Namespace) -> Dict[str, Any]:
+    """Explicit store reconciliation and migration entry point (req 055).
+
+    The entry list is always derived from the ``*.md`` files, so reindex is
+    a no-op for entries; what it materializes are the store scalars into
+    ``state/`` and the retirement of a legacy ``index.json``. Idempotent —
+    a second run reports ``migrated: false`` and writes nothing.
+    """
     workspace_root = resolve_workspace_root(args.workspace_root)
-    prior = load_index(workspace_root)
-    submitted_at = prior.get("submitted_at")
-    threshold = resolve_threshold(args.threshold, prior.get("threshold"))
-
-    target = feedback_dir(workspace_root)
-    entries: List[Dict[str, Any]] = []
-    if target.exists():
-        for path in sorted(target.glob("*.md")):
-            meta, _ = parse_frontmatter(path.read_text(encoding="utf-8"))
-            if not meta:
-                continue
-            entries.append(entry_meta(meta, path.name))
-
-    index = empty_index()
-    index["threshold"] = threshold
-    index["submitted_at"] = submitted_at
-    if prior.get("upstream_repo"):
-        index["upstream_repo"] = prior["upstream_repo"]
-    index["entries"] = entries
-    index["count_since_submission"] = count_since_submission(entries, submitted_at)
-    save_index(workspace_root, index)
-    return {"reindexed": len(entries)}
+    state = load_store_state(workspace_root)
+    if args.threshold is not None and args.threshold != state["threshold"]:
+        write_state_file(workspace_root, "threshold", args.threshold)
+    migrated = migrate_legacy_index(workspace_root)
+    entries = scan_entries(workspace_root)
+    return {"reindexed": len(entries), "migrated": migrated}
 
 
 # --------------------------------------------------------------------------- #
@@ -822,7 +966,8 @@ def _speckit_version() -> str:
 def detect_upstream(index: Dict[str, Any]) -> Dict[str, Any]:
     """Resolve the upstream repo URL for manual feedback delivery.
 
-    Priority: user-configured ``upstream_repo`` in index.json > PEP 610
+    Priority: user-configured ``upstream_repo`` ( callers pass the scan-derived
+    store state / ``state/upstream-repo.json`` value) > PEP 610
     ``direct_url.json`` install metadata (records the git URL the custom
     spec-kit build was installed from) > none (user must ``--set``).
     Detection only reads local files; it never touches the network.
@@ -873,12 +1018,12 @@ def _send_guidance(upstream: Dict[str, Any]) -> List[str]:
 
 def action_upstream(args: argparse.Namespace) -> Dict[str, Any]:
     workspace_root = resolve_workspace_root(args.workspace_root)
-    index = load_index(workspace_root)
+    state = load_store_state(workspace_root)
     set_url = (args.set_url or "").strip()
     if set_url:
-        index["upstream_repo"] = set_url
-        save_index(workspace_root, index)
-    return detect_upstream(index)
+        write_state_file(workspace_root, "upstream_repo", set_url)
+        migrate_legacy_index(workspace_root)
+    return detect_upstream({"upstream_repo": set_url or state["upstream_repo"]})
 
 
 def write_package(
@@ -992,9 +1137,9 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
     surfaced as an ``excluded_external`` count.
     """
     workspace_root = resolve_workspace_root(args.workspace_root)
-    index = load_index(workspace_root)
-    submitted_at = index.get("submitted_at")
-    entries = index.get("entries", [])
+    state = load_store_state(workspace_root)
+    submitted_at = state["submitted_at"]
+    entries = state["entries"]
     if not args.all and submitted_at:
         selected = [e for e in entries if str(e.get("created", "")) > submitted_at]
     else:
@@ -1003,12 +1148,16 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
     excluded_external = sum(1 for e in selected if e.get("kind") == "external")
     selected = [e for e in selected if e.get("kind") != "external"]
 
-    result = write_package(workspace_root, index, selected,
+    result = write_package(workspace_root, {
+        "upstream_repo": state["upstream_repo"],
+        "introspections": state["introspections"],
+    }, selected,
                            include_introspection=bool(
                                getattr(args, "include_introspection", False)))
     result["excluded_external"] = excluded_external
     if not result.get("zip"):
-        result["upstream"] = detect_upstream(index)
+        result["upstream"] = detect_upstream(
+            {"upstream_repo": state["upstream_repo"]})
         return result
     result["next_steps"] = _send_guidance(result["upstream"]) + [
         "After you have dealt with the batch (sent or deliberately ignored), "
@@ -1401,10 +1550,11 @@ def action_cleanup(args: argparse.Namespace) -> Dict[str, Any]:
         packaged = {n for n in names if n.endswith(".md")
                     and n not in ("MANIFEST.md", "SUBMISSION-NOTES.md")}
 
-    index = load_index(workspace_root)
-    targeted = [e for e in index.get("entries", []) if e.get("file") in packaged]
+    entries = load_store_state(workspace_root)["entries"]
+    targeted = [e for e in entries if e.get("file") in packaged]
     dry_run = bool(getattr(args, "dry_run", False))
     removed: List[str] = []
+    migrated = False
     if not dry_run:
         store = feedback_dir(workspace_root)
         for entry in targeted:
@@ -1412,11 +1562,7 @@ def action_cleanup(args: argparse.Namespace) -> Dict[str, Any]:
             if source.is_file():
                 source.unlink()
             removed.append(entry.get("id", entry["file"]))
-        index["entries"] = [e for e in index.get("entries", [])
-                            if e.get("file") not in packaged]
-        index["count_since_submission"] = count_since_submission(
-            index["entries"], index.get("submitted_at"))
-        save_index(workspace_root, index)
+        migrated = migrate_legacy_index(workspace_root)
         log_path = store / CLEANUP_LOG_NAME
         stamp = now_iso()
         lines = [f"## {stamp} — {zip_path.name}"]
@@ -1428,7 +1574,7 @@ def action_cleanup(args: argparse.Namespace) -> Dict[str, Any]:
         with log_path.open("a", encoding="utf-8") as fh:
             fh.write("\n".join(lines) + "\n")
     would_remove = [e.get("id", e["file"]) for e in targeted]
-    remaining_entries = len(load_index(workspace_root)["entries"])
+    remaining_entries = len(scan_entries(workspace_root))
     return {
         "package": zip_path.relative_to(workspace_root).as_posix()
         if zip_path.is_relative_to(workspace_root) else str(zip_path),
@@ -1437,9 +1583,10 @@ def action_cleanup(args: argparse.Namespace) -> Dict[str, Any]:
         "would_remove_count": len(would_remove),
         "removed": removed,
         "remaining_entries": remaining_entries,
-        # A dry run never touches the index, so the post-cleanup figure has to be
+        # A dry run never touches the store, so the post-cleanup figure has to be
         # projected here — otherwise the summary keys read as "nothing changes".
         "remaining_after": remaining_entries - len(would_remove) if dry_run else remaining_entries,
+        "migrated": migrated,
     }
 
 
@@ -1481,8 +1628,8 @@ def action_migrate_legacy(args: argparse.Namespace) -> Dict[str, Any]:
             raise FeedbackError(f"unknown disposition {action!r} for {entry_id}")
         directives.append((entry_id, action))
 
-    index = load_index(workspace_root)
-    by_id = {e.get("id"): e for e in index.get("entries", [])}
+    entries = load_store_state(workspace_root)["entries"]
+    by_id = {e.get("id"): e for e in entries}
     unknown = [eid for eid, _ in directives if eid not in by_id]
     if unknown:
         raise FeedbackError("plan references unknown entry ids: " + ", ".join(unknown))
@@ -1497,7 +1644,6 @@ def action_migrate_legacy(args: argparse.Namespace) -> Dict[str, Any]:
         if action == "delete":
             if entry_file.is_file():
                 entry_file.unlink()
-            index["entries"] = [e for e in index["entries"] if e.get("id") != entry_id]
             deleted.append(entry_id)
             log_lines.append(
                 f"- {entry_id} | delete | rationale: per approved plan | "
@@ -1515,29 +1661,25 @@ def action_migrate_legacy(args: argparse.Namespace) -> Dict[str, Any]:
             meta["kind"] = probe["kind"]
             meta["slice"] = probe["slice"]
             meta["migrated_from"] = entry_id
-            entry_file.write_text(
+            write_text_atomic(
+                entry_file,
                 dump_frontmatter(meta) + "\n\n" + body.strip() + "\n",
-                encoding="utf-8",
             )
-            mirror = next(e for e in index["entries"] if e.get("id") == entry_id)
-            mirror.update({"probe": probe["object_id"], "kind": probe["kind"],
-                           "slice": probe["slice"]})
             re_registered.append(entry_id)
             log_lines.append(
                 f"- {entry_id} | re-register | probe {probe['object_id']} "
                 f"| unit {meta.get('unit_id', '?')}")
 
-    index["count_since_submission"] = count_since_submission(
-        index["entries"], index.get("submitted_at"))
-    save_index(workspace_root, index)
+    migrated = migrate_legacy_index(workspace_root)
     with (store / MIGRATION_LOG_NAME).open("a", encoding="utf-8") as fh:
         fh.write("\n".join(log_lines) + "\n")
-    remaining = sum(1 for e in index["entries"] if not e.get("probe"))
+    remaining = sum(1 for e in scan_entries(workspace_root) if not e.get("probe"))
     return {
         "deleted": deleted,
         "re_registered": re_registered,
         "legacy_remaining": remaining,
         "log": (FEEDBACK_SUBDIR / MIGRATION_LOG_NAME).as_posix(),
+        "migrated": migrated,
     }
 
 
@@ -1604,15 +1746,9 @@ def action_probe_inject(args: argparse.Namespace) -> Dict[str, Any]:
     }
 
 
-def _apply_disposition(workspace_root: Path, index: Dict[str, Any],
-                       entry: Dict[str, Any], state: str,
-                       reason: str, ref: str) -> None:
+def _apply_disposition(workspace_root: Path, entry: Dict[str, Any],
+                       state: str, reason: str, ref: str) -> None:
     """dispose-equivalent write used by introspect-register --confirm (C-3)."""
-    entry["disposition"] = state
-    if reason:
-        entry["disposition_reason"] = reason
-    if ref:
-        entry["introspection_ref"] = ref
     entry_file = feedback_dir(workspace_root) / entry.get("file", "")
     if entry_file.is_file():
         meta, body = parse_frontmatter(entry_file.read_text(encoding="utf-8"))
@@ -1621,13 +1757,14 @@ def _apply_disposition(workspace_root: Path, index: Dict[str, Any],
             meta["disposition_reason"] = reason
         if ref:
             meta["introspection_ref"] = ref
-        entry_file.write_text(
+        write_text_atomic(
+            entry_file,
             dump_frontmatter(meta) + "\n\n" + body.strip() + "\n",
-            encoding="utf-8")
+        )
 
 
 def action_introspect_register(args: argparse.Namespace) -> Dict[str, Any]:
-    """Register an introspection report: validate → link entries → index.
+    """Register an introspection report: validate → link entries → reports.
 
     With --confirm (user ratified in-session): flip the report to confirmed and
     apply each finding's 建议处置 rows as batch dispositions (engine-cli C-3).
@@ -1645,10 +1782,10 @@ def action_introspect_register(args: argparse.Namespace) -> Dict[str, Any]:
         raise FeedbackError("report validation failed:\n- "
                             + "\n- ".join(violations))
 
-    index = load_index(workspace_root)
+    store_state = load_store_state(workspace_root)
     meta = report["meta"]
     report_id = meta["id"]
-    by_id = {e.get("id"): e for e in index.get("entries", [])}
+    by_id = {e.get("id"): e for e in store_state["entries"]}
 
     linked = 0
     for finding in report["findings"]:
@@ -1657,7 +1794,7 @@ def action_introspect_register(args: argparse.Namespace) -> Dict[str, Any]:
             entry = by_id.get(eid)
             if entry is None:
                 continue
-            _apply_disposition(workspace_root, index, entry,
+            _apply_disposition(workspace_root, entry,
                                entry.get("disposition", "") or "",
                                "", ref)
             linked += 1
@@ -1670,7 +1807,7 @@ def action_introspect_register(args: argparse.Namespace) -> Dict[str, Any]:
                 entry = by_id.get(eid)
                 if entry is None:
                     continue
-                _apply_disposition(workspace_root, index, entry, state,
+                _apply_disposition(workspace_root, entry, state,
                                    f"introspection:{ref}", ref)
                 disposed += 1
         meta["status"] = "confirmed"
@@ -1687,29 +1824,13 @@ def action_introspect_register(args: argparse.Namespace) -> Dict[str, Any]:
                 prior["meta"]["status"] = "superseded"
                 write_report(prior_path, prior)
 
-    introspections = index.setdefault("introspections", [])
-    record = {"id": report_id,
-              "file": f"{INTROSPECTION_DIRNAME}/{report_id}.md",
-              "created": meta["created"], "status": meta["status"],
-              "supersedes": meta.get("supersedes") or None,
-              "entries": list(meta["scope_entries"])}
-    for i, existing in enumerate(introspections):
-        if existing.get("id") == report_id:
-            # re-register without --confirm never reopens a confirmed report
-            if existing.get("status") == "confirmed" and not getattr(
-                    args, "confirm", False):
-                record["status"] = "confirmed"
-                record["confirmed_at"] = existing.get("confirmed_at")
-            introspections[i] = {**existing, **record}
-            break
-    else:
-        introspections.append(record)
-    for r in introspections:
-        if r.get("id") == superseded:
-            r["status"] = "superseded"
-    save_index(workspace_root, index)
+    # The introspection roster is derived by scanning introspection/*.md
+    # (req 055) — nothing to maintain in an index. A re-register without
+    # --confirm never reopens a confirmed report: the report file itself
+    # carries status=confirmed and is only rewritten under --confirm.
+    migrated = migrate_legacy_index(workspace_root)
     return {"report_id": report_id, "linked": linked, "disposed": disposed,
-            "superseded": superseded}
+            "superseded": superseded, "migrated": migrated}
 
 
 # --------------------------------------------------------------------------- #

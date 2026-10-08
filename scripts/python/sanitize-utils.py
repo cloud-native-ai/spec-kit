@@ -426,7 +426,6 @@ def check_dead_references(root: Path) -> list:
 
 
 FEATURES_ROW_RE = re.compile(r"^\| (\d{3}) \|")
-FEEDBACK_ENTRY_RE = re.compile(r"^\d{8}T\d{6}Z-")
 
 
 def check_index_consistency(root: Path) -> list:
@@ -458,11 +457,25 @@ def check_index_consistency(root: Path) -> list:
                         "index-inconsistency", path.relative_to(root).as_posix(),
                         f"features/{fid}.md 存在而索引无对应行(反向缺项)"))
 
-    # feedback + evidence families (C-7/C-8)
-    for store_name, key_field in (("feedback", "file"), ("evidence", "runId")):
-        index_path = memory / store_name / "index.json"
-        if not index_path.is_file():
-            continue
+    # feedback/session/knowledge families (C-7, req 055): these stores are
+    # scan-on-read — a legacy index.json is transitional residue (old-engine
+    # machines may legitimately recreate it during mixed-version windows).
+    # Its presence is one repair-suggestion finding per file pointing at the
+    # owning engine's reindex; sanitize never deletes it.
+    for rel in ("feedback", "session", "knowledge"):
+        idx = memory / rel / "index.json"
+        if idx.is_file():
+            engine = ("feedback-utils.py" if rel == "feedback"
+                      else "memory-utils.py")
+            findings.append(_finding(
+                "index-inconsistency", idx.relative_to(root).as_posix(),
+                f"legacy index 过期残留(req 055):{rel} 存储已扫描派生,旧索引为过渡期残"
+                f"留 —— 修复:python3 .specify/scripts/python/{engine} --action reindex"
+                f"(落 state 后退役旧文件)"))
+
+    # evidence family (C-8): maintained-index store, bidirectional
+    index_path = memory / "evidence" / "index.json"
+    if index_path.is_file():
         rel_index = index_path.relative_to(root).as_posix()
         try:
             index = json.loads(index_path.read_text(encoding="utf-8"))
@@ -470,37 +483,19 @@ def check_index_consistency(root: Path) -> list:
         except (ValueError, OSError):
             findings.append(_finding(
                 "index-inconsistency", rel_index,
-                f"{store_name} 索引不可解析(单条发现,不逐条展开)"))
-            continue
-        indexed = set()
-        for entry in entries:
-            value = entry.get(key_field) if isinstance(entry, dict) else None
-            if not value:
-                continue
-            indexed.add(value)
-            if key_field == "file":
-                target_path = memory / store_name / value
-                if not target_path.is_file():
-                    findings.append(_finding(
-                        "index-inconsistency", f"{rel_index}#{value}",
-                        f"feedback 索引条目 {entry.get('id', value)} 指向不存在的 {value}"))
-            else:
-                if not (memory / store_name / value).is_dir():
+                "evidence 索引不可解析(单条发现,不逐条展开)"))
+        else:
+            indexed = set()
+            for entry in entries:
+                value = entry.get("runId") if isinstance(entry, dict) else None
+                if not value:
+                    continue
+                indexed.add(value)
+                if not (memory / "evidence" / value).is_dir():
                     findings.append(_finding(
                         "index-inconsistency", f"{rel_index}#{value}",
                         f"evidence 索引条目 {value} 指向不存在的运行目录"))
-        store_dir = memory / store_name
-        if key_field == "file":
-            # only timestamp-named entry files count on disk; bookkeeping files
-            # (cleanup-log / consume-log / migration-log / probe-map / ...) are
-            # store scaffolding, not feedback entries
-            for path in sorted(store_dir.glob("*.md")):
-                if path.name not in indexed and FEEDBACK_ENTRY_RE.match(path.name):
-                    findings.append(_finding(
-                        "index-inconsistency", path.relative_to(root).as_posix(),
-                        f"feedback 条目文件 {path.name} 存在而索引无登记(反向缺项)"))
-        else:
-            for path in sorted(store_dir.glob("ev-*")):
+            for path in sorted((memory / "evidence").glob("ev-*")):
                 if path.is_dir() and path.name not in indexed:
                     findings.append(_finding(
                         "index-inconsistency", path.relative_to(root).as_posix(),

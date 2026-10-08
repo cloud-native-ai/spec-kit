@@ -18,7 +18,7 @@
 
 ## Description
 
-The feedback-as-files engine: persists local, unit-scoped feedback entries produced at the wrap-up of a qualifying flow (every skill; complex commands only) into `.specify/memory/feedback/` as Markdown plus a lightweight JSON index, and reports when the consolidated submission threshold is reached. Since requirement 041 it is also the probe engine: loads the Feedback Probe truth source (`.specify/shared/definitions/probe-definitions.md` + project `probes/`), auto-resolves every entry's probe/kind/slice, filters by slice/kind/disposition, rebuilds the derived probe map, executes approved legacy migrations, injects external probes for host-project custom units, and excludes external entries from upstream packages.
+The feedback-as-files engine: persists local, unit-scoped feedback entries produced at the wrap-up of a qualifying flow (every skill; complex commands only) into `.specify/memory/feedback/` as Markdown plus per-scalar `state/` files (req 055 — no shared mutable index; the entry list is scan-derived), and reports when the consolidated submission threshold is reached. Since requirement 041 it is also the probe engine: loads the Feedback Probe truth source (`.specify/shared/definitions/probe-definitions.md` + project `probes/`), auto-resolves every entry's probe/kind/slice, filters by slice/kind/disposition, rebuilds the derived probe map, executes approved legacy migrations, injects external probes for host-project custom units, and excludes external entries from upstream packages.
 
 ## Resource ID
 
@@ -61,9 +61,10 @@ The feedback-as-files engine: persists local, unit-scoped feedback entries produ
 | `id` | The created entry identifier |
 | `path` | Path of the written feedback Markdown file |
 | `duplicate` | `true` when the `(unit_id, run_id)` pair was already recorded (no-op) |
-| `count_since_submission` | Entries accumulated since the last submission |
+| `count_since_submission` | Entries accumulated since the last submission (scan-derived) |
 | `threshold` | Current consolidated-submission threshold |
 | `should_prompt` | Whether the caller should surface the consolidated submission prompt |
+| `migrated` | `true` when this mutating action retired a legacy `index.json` (req 055); read actions instead report `legacy: true` while a fallback index is present |
 
 ## Environment Applicability
 
@@ -102,6 +103,9 @@ The feedback-as-files engine: persists local, unit-scoped feedback entries produ
 - MUST auto-resolve `record`'s unit to its probe object when the registry is installed (entry inherits probe/kind/slice; unresolvable unit → exit 2 "no probe object for unit"); registry absent (un-upgraded workspace) → legacy record without probe fields, never a hard failure
 - MUST exclude `kind: external` entries from `package` (upstream submission) — they are host-project-local; `MANIFEST.md` carries probe/slice columns
 - MUST treat `--action map` output as a derived artifact: deterministic whole-file rebuild, byte-identical on unchanged truth source
+- MUST treat the store as conflict-free (req 055): `record` writes nothing but the new entry `.md` file — the entry list and introspection roster are derived by scanning, the three store scalars live in their own `state/` files, and `updated`/`count_since_submission` are never persisted; do not hand-create or edit any shared index file in the store
+- MUST persist a threshold only via an explicit `--threshold` that differs from the stored value (env/default resolution stays ephemeral)
+- MUST treat `reindex` as the migration entry point: it materializes scalars into `state/`, retires a legacy `index.json`, reports `migrated`, and is idempotent
 - MUST be run with a `--run-id` that is stable for the run, so re-invocation de-duplicates instead of double-recording
 - MUST keep `--feature` (requirement key) and `--feature-id` (Feature registry ID) as distinct fields — never overload one with the other
 - MUST treat `mark-submitted` as archive-then-reset: the pending batch is zipped into `packages/` (with optional `--notes` as `SUBMISSION-NOTES.md`) before the counter resets, so every reset leaves an auditable package artifact

@@ -69,10 +69,13 @@ def test_record_writes_file_and_index(tmp_path: Path):
     assert meta["feature"] == "012-auth"
     assert "Decided JWT" in body
 
-    index = json.loads((tmp_path / ".specify/memory/session/index.json").read_text(encoding="utf-8"))
+    # req 055: the entry list is scan-derived — load_index projects the scan
+    # into the legacy shape; no index.json is written.
+    index = memory_utils.load_index(tmp_path, "session")
     assert index["scope"] == "session"
     assert len(index["entries"]) == 1
     assert index["entries"][0]["source"] == "/speckit.tasks"
+    assert not (tmp_path / ".specify/memory/session/index.json").exists()
 
 
 def test_stable_slug_disambiguates_non_ascii_titles():
@@ -118,7 +121,7 @@ def test_knowledge_upsert_merges_tags(tmp_path: Path):
     assert set(meta["tags"]) == {"style", "review"}
     assert "Second" in body
 
-    index = json.loads((knowledge_dir / "index.json").read_text(encoding="utf-8"))
+    index = memory_utils.load_index(tmp_path, "knowledge")
     assert len(index["entries"]) == 1
 
 
@@ -198,13 +201,13 @@ def test_reindex_rebuilds_from_files(tmp_path: Path):
     memory_utils.action_record(_namespace(action="record", workspace_root=str(tmp_path),
                                            scope="knowledge", source="skill:x",
                                            title="Durable", content="body", tags="k"))
-    index_file = tmp_path / ".specify/memory/knowledge/index.json"
-    index_file.unlink()  # simulate corruption/loss
-
+    # req 055: no index.json exists to lose — reindex is the migration entry
+    # point; the entry list is always scan-derived.
     result = memory_utils.action_reindex(_namespace(action="reindex", workspace_root=str(tmp_path),
                                                     scope="knowledge"))
     assert result["reindexed"]["knowledge"] == 1
-    rebuilt = json.loads(index_file.read_text(encoding="utf-8"))
+    assert result["migrated"] == []
+    rebuilt = memory_utils.load_index(tmp_path, "knowledge")
     assert rebuilt["entries"][0]["title"] == "Durable"
     assert rebuilt["entries"][0]["tags"] == ["k"]
 

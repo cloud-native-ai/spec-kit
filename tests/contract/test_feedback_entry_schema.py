@@ -83,21 +83,21 @@ def test_index_entries_sorted_created_desc(feedback_store: Path):
     _record(feedback_store, unit_id="/speckit.plan", run_id="r1")
     _record(feedback_store, unit_id="/speckit.tasks", run_id="r2")
     _record(feedback_store, unit_id="/speckit.implement", run_id="r3")
-    index = json.loads(
-        (feedback_store / ".specify/memory/feedback/index.json").read_text(encoding="utf-8")
-    )
+    # req 055: the entry list is scan-derived — load_index projects the scan
+    # into the legacy shape (sorted created desc), no index.json is written.
+    index = feedback_utils.load_index(feedback_store)
     assert index["store"] == "feedback"
     created = [e["created"] for e in index["entries"]]
+    assert len(created) == 3
     assert created == sorted(created, reverse=True)
+    assert not (feedback_store / ".specify/memory/feedback/index.json").exists()
 
 
 @pytest.mark.contract
 def test_count_since_submission_invariant(feedback_store: Path):
     _record(feedback_store, unit_id="/speckit.plan", run_id="c1")
     _record(feedback_store, unit_id="/speckit.tasks", run_id="c2")
-    index = json.loads(
-        (feedback_store / ".specify/memory/feedback/index.json").read_text(encoding="utf-8")
-    )
+    index = feedback_utils.load_index(feedback_store)
     assert index["count_since_submission"] == 2
 
 
@@ -120,16 +120,13 @@ def test_reindex_preserves_submitted_at(feedback_store: Path):
     feedback_utils.main([
         "--action", "mark-submitted", "--workspace-root", str(feedback_store),
     ])
-    index_before = json.loads(
-        (feedback_store / ".specify/memory/feedback/index.json").read_text(encoding="utf-8")
-    )
-    submitted_at = index_before["submitted_at"]
+    state_file = (feedback_store / ".specify/memory/feedback/state/submitted-at.json")
+    submitted_at = json.loads(state_file.read_text(encoding="utf-8"))["submitted_at"]
     assert submitted_at is not None
 
     feedback_utils.main([
         "--action", "reindex", "--workspace-root", str(feedback_store),
     ])
-    index_after = json.loads(
-        (feedback_store / ".specify/memory/feedback/index.json").read_text(encoding="utf-8")
-    )
-    assert index_after["submitted_at"] == submitted_at
+    after = json.loads(state_file.read_text(encoding="utf-8"))["submitted_at"]
+    assert after == submitted_at
+    assert feedback_utils.load_index(feedback_store)["submitted_at"] == submitted_at
