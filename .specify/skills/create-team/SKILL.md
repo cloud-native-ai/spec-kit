@@ -27,9 +27,10 @@ Produce a team from a user **goal** and persist it as `.specify/teams/<slug>/tea
 1. **Establish the goal** — extract/establish a verifiable goal from `$ARGUMENTS`/context.
 2. **Match presets** — run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<text>"` and act on its `confidence`.
 3. **Select the pattern** — derive from the goal via the decision tree in [`references/patterns.md`](references/patterns.md).
-4. **Build the roster** — a Role × Stage × Type matrix; judge `Type` by operating object (`references/conceptual-model.md`).
+4. **Build the roster** — a Role × Stage × Type matrix; judge `Type` by operating object (`references/conceptual-model.md`). Member resolution: prefer existing agents under `.specify/agents/{templates,instances}/`; for a seat with no persistent definition, perform **seat instantiation (席位实例化)** — delegate to `create-agent` (kind: instance) to instantiate the seat from its stage frame, resolving ALL frame placeholders and setting `team-scope: <team-slug>` (the framework-only seat-provenance key; no `capacity-scope` for stage-frame seats); a same-slug collision with an existing persistent definition MUST be disclosed and that seat halted, never silently overwritten.
 5. **Build the pattern config** — parallelism/territories, DAG/blockedBy, iteration thresholds, or continuous operating config.
 6. **直接落盘并呈现** — **直接写入** `team.md`(不设阻塞式停等),随后呈现 goal + roster + pattern 与修改途径(`/speckit.team` modify / `improve-team`),按执行报告约定收尾。
+7. **渲染触发** — `team.md` 与席位实例落盘后,直接执行 `specify render-agents --ai <当前宿主工具>` 使席位到达宿主注册面(渲染模式工具:qoder/claude/copilot/opencode);stats 摘要(rendered/backups/unmapped)进执行报告;渲染触发失败 MUST 披露原因并作为流程异常上送,不得静默跳过。存量团队经一次 modify 即可让席位上注册面。
 
 `goal_slug` identifies the **goal**, not the team slug; it is a different axis from `slug` (the team's identity). See `references/goal.md` and `references/summary-mapping.md`.
 

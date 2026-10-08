@@ -25,3 +25,13 @@ Real output: `10 failed, 1 passed in 0.06s`. Red set: 5× retired-symlink-senten
 Green: `scripts/bash/run-tests.sh tests/contract/test_teaching_surfaces.py` → `11 passed in 0.02s` (mirror synced first: `sync-mirrors.py --write --only skills` → 1 file DIFF; `--check` all ok, no NEW drift vs 2026-10-08 baseline).
 Loose-assertion fix en route (disclosed): test_c1 first used "real files" (incidentally green — the phrase pre-existed elsewhere); tightened to the distinctive fragment "renderer-produced real files", full-red confirmed (11 failed) before landing T010.
 Mutation drill: plant `real filez` (1-char) in templates/commands/agents.md → guard RED on exactly test_c1_real_model_taught_in_agents_command (1 failed, 10 passed) → EXACT reverse substitution with count==1 asserted → `diff -q` vs pre-mutation copy BYTE-EQUAL → recovery re-run `11 passed`; the file's remaining `git diff` (2 insertions/2 deletions) is the T010 teaching edit itself, not the mutation.
+
+## T014 red capture — 2026-10-08
+
+Command: `scripts/bash/run-tests.sh tests/contract/test_seat_instantiation_flow.py`
+Verdict: 6/6 red after marker tightening. First run was 5/6 red — test_c4 was incidentally green because its two markers ("create-agent", "team-scope") pre-exist in create-team SKILL.md ("team-scoped responsibility" at :17 substring-matches "team-scope"); disclosed and fixed on the assertion side by pinning the new step's distinctive name "seat instantiation" (count 0 pre-authoring), full-red confirmed. All markers absent: no seat-instantiation step, no render trigger, no failure-disclosure wording; create-mode schema note has neither team-scope nor the two-form member clause; improve-team has no backfill step; guidance line absent from both.
+
+## T018 green + mutation drill — 2026-10-08
+
+Green: `scripts/bash/run-tests.sh tests/contract/test_seat_instantiation_flow.py` → `6 passed in 0.02s` after T015 (create-team SKILL.md step 4 seat-instantiation + new step 7 render trigger with failure-disclosure + guidance line; create-mode.md step 4, new step 7, schema-note member-resolution clause rewritten) and T016 (improve-team new step 6 seat backfill + step 7 report distinguishing existing/backfilled/render-stats + guidance line); T017 mirror sync (3 files), `--check` all ok, no NEW drift vs baseline.
+Mutation drill: plant `render-agentz` (1-char) in skills/create-team/SKILL.md → guard RED on exactly test_c8_create_team_create_flow_runs_render_trigger (1 failed, 5 passed) → EXACT reverse substitution count==1 → `diff -q` BYTE-EQUAL vs pre-mutation copy → mirror re-synced → recovery `6 passed`.
