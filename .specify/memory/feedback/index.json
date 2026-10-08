@@ -1,10 +1,28 @@
 {
   "store": "feedback",
-  "updated": "2026-10-08T13:51:21Z",
+  "updated": "2026-10-08T14:00:28Z",
   "threshold": 10,
-  "count_since_submission": 11,
-  "submitted_at": "2026-10-06T18:35:50Z",
+  "count_since_submission": 0,
+  "submitted_at": "2026-10-08T14:00:28Z",
   "entries": [
+    {
+      "id": "20261008T140013Z-speckit-feedback",
+      "file": "20261008T140013Z-speckit-feedback.md",
+      "unit_id": "/speckit.feedback",
+      "unit_type": "command",
+      "run_id": "feedback:20261008-merge-readiness",
+      "probe": "speckit-feedback-wrapup",
+      "kind": "internal",
+      "slice": "commands",
+      "feature": "",
+      "feature_id": "",
+      "disposition": "",
+      "introspection_ref": "",
+      "disposition_reason": "",
+      "partial": false,
+      "created": "2026-10-08T14:00:13Z",
+      "summary": "按建议处理 feedback 双路径完成:①055 合并就绪验证(见第 1 条,试验后已清理,零残留);②打包路径启动前先做 status 核对(11/10 过阈值),打包产出见 wrap-up 报告。"
+    },
     {
       "id": "20261008T135121Z-speckit-review",
       "file": "20261008T135121Z-speckit-review.md",
