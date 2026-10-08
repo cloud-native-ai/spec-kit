@@ -1,8 +1,9 @@
 """Unit tests: index-consistency and broken-symlink checkers (requirement 045 / Feature 047).
 
-Pins contracts/sanitize-detection-rules.md §2 C-6..C-9 (features / feedback /
-evidence index families, bidirectional) and §3 C-10 (compat symlink set,
-three failure states, delegate disposition).
+Pins contracts/sanitize-detection-rules.md §2 C-6..C-9 (features / evidence
+index families, bidirectional; feedback/session/knowledge as the req-055
+legacy-residue rule) and §3 C-10 (compat symlink set, three failure states,
+delegate disposition).
 """
 from __future__ import annotations
 
@@ -48,9 +49,11 @@ def test_features_disk_file_without_index_row(tmp_path):
     assert any("077" in f["target"] for f in findings)
 
 
-# --- feedback family (C-7) -----------------------------------------------------------
+# --- feedback/session/knowledge families (C-7, req 055 residue rule) --------
 
-def test_feedback_index_entry_without_file(tmp_path):
+def test_feedback_legacy_index_is_residue_finding(tmp_path):
+    """A legacy feedback index.json is transitional residue: presence alone
+    is one repair-suggestion finding pointing at reindex — never deleted."""
     ws = make_ws(tmp_path)
     fb = ws / ".specify" / "memory" / "feedback"
     fb.mkdir(parents=True, exist_ok=True)
@@ -59,36 +62,49 @@ def test_feedback_index_entry_without_file(tmp_path):
         "entries": [{"id": "e1", "file": "20260820T000000Z-unit.md"}],
     }), encoding="utf-8")
     findings = su.check_index_consistency(ws)
-    assert any("feedback" in f["target"] and "e1" in f["target"] + f["summary"] for f in findings)
+    fb_findings = [f for f in findings if "feedback" in f["target"]]
+    assert len(fb_findings) == 1
+    assert fb_findings[0]["target"] == ".specify/memory/feedback/index.json"
+    assert fb_findings[0]["disposition"] == "repair"
+    assert "reindex" in fb_findings[0]["summary"]
 
 
-def test_feedback_disk_entry_without_index(tmp_path):
+def test_session_and_knowledge_legacy_indexes_also_flagged(tmp_path):
+    ws = make_ws(tmp_path)
+    for scope in ("session", "knowledge"):
+        d = ws / ".specify" / "memory" / scope
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "index.json").write_text(json.dumps({"scope": scope, "entries": []}),
+                                      encoding="utf-8")
+    findings = su.check_index_consistency(ws)
+    targets = {f["target"] for f in findings}
+    assert ".specify/memory/session/index.json" in targets
+    assert ".specify/memory/knowledge/index.json" in targets
+
+
+def test_scan_store_without_index_is_clean(tmp_path):
+    """The req 055 end state: entries on disk, no index — zero findings,
+    even when an index would have gone stale (disk has extra entries)."""
     ws = make_ws(tmp_path)
     fb = ws / ".specify" / "memory" / "feedback"
     fb.mkdir(parents=True, exist_ok=True)
-    (fb / "index.json").write_text(json.dumps({
-        "store": "feedback", "updated": "x", "threshold": 10, "count_since_submission": 0,
-        "entries": [],
-    }), encoding="utf-8")
     (fb / "20260820T000000Z-unit.md").write_text("# entry\n", encoding="utf-8")
     findings = su.check_index_consistency(ws)
-    assert any("20260820T000000Z-unit.md" in f["target"] for f in findings)
+    assert not any("feedback" in f["target"] for f in findings)
 
 
 def test_feedback_bookkeeping_files_exempt(tmp_path):
-    """Store scaffolding (logs / probe-map) is not feedback entries."""
+    """Store scaffolding (logs / probe-map) produces no findings of its own;
+    with a legacy index present the only finding is the residue itself."""
     ws = make_ws(tmp_path)
     fb = ws / ".specify" / "memory" / "feedback"
     fb.mkdir(parents=True, exist_ok=True)
-    (fb / "index.json").write_text(json.dumps({
-        "store": "feedback", "updated": "x", "threshold": 10, "count_since_submission": 0,
-        "entries": [],
-    }), encoding="utf-8")
+    (fb / "index.json").write_text(json.dumps({"entries": []}), encoding="utf-8")
     for name in ("cleanup-log.md", "consume-log.md", "migration-log.md",
                  "migration-plan.md", "probe-map.md"):
         (fb / name).write_text("# bookkeeping\n", encoding="utf-8")
     findings = su.check_index_consistency(ws)
-    assert not any(name in f["target"] for f in findings)
+    assert not any(name in f["target"] for f in findings if "index.json" not in f["target"])
 
 
 # --- evidence family (C-8) -----------------------------------------------------------
@@ -118,6 +134,8 @@ def test_evidence_dir_without_index(tmp_path):
 # --- unparseable index (C-9) -----------------------------------------------------------
 
 def test_unparseable_index_is_single_finding(tmp_path):
+    """A corrupt feedback index.json is subsumed by the residue rule: its
+    presence — parseable or not — is exactly one finding (req 055)."""
     ws = make_ws(tmp_path)
     fb = ws / ".specify" / "memory" / "feedback"
     fb.mkdir(parents=True, exist_ok=True)

@@ -134,10 +134,12 @@ class TestFeedbackLane:
         assert recurring[0]["evidenceRefs"], "recurrence item must reference entry paths"
 
     def test_index_missing_fallback_partial(self, tmp_path):
+        """req 055: the feedback store carries no index — entry files alone
+        make the lane fully available."""
         ws = make_workspace(tmp_path, feedback_entries=4, with_index=False)
         result = run_cli("--action", "collect", "--target", "project", "--lanes", "feedback", cwd=ws)
         out = json.loads(result.stdout)
-        assert out["lanes"]["feedback"] == "partial"
+        assert out["lanes"]["feedback"] == "available"
 
 
 class TestNoNodeDegradation:
@@ -176,9 +178,8 @@ class TestCompareBasics:
                 f"scope: local\nfeature: \"\"\npartial: false\ncreated: 2026-01-07T00:00:0{i}Z\n"
                 f"summary: d{i}\n---\n\n## Review\nok\n\n## Optimization Points\n- tighten reference extraction step\n",
                 encoding="utf-8")
-        # index is now stale → lane goes partial but still counts files? No: index used as-is.
-        # Remove index to force full scan of all 4 files.
-        (fb / "index.json").unlink()
+        # req 055: the lane always scans entry files — no index to go stale;
+        # adding two entries changes the signals on the next collect.
         r2 = run_cli("--action", "collect", "--target", "project", "--lanes", "feedback", cwd=ws)
         assert r2.returncode == 0
         result = run_cli("--action", "compare", "--target", "project", cwd=ws)

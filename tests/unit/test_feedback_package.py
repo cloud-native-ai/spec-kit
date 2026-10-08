@@ -208,8 +208,11 @@ def test_action_upstream_persists_set_url(tmp_path):
     args = argparse.Namespace(workspace_root=str(tmp_path), set_url="https://x.example/r.git")
     out = fu.action_upstream(args)
     assert out["url"] == "https://x.example/r.git"
-    saved = json.loads(fu.index_path(tmp_path).read_text(encoding="utf-8"))
+    # req 055: the scalar persists in its own state file, not a shared index
+    saved = json.loads(
+        (fu.state_dir(tmp_path) / "upstream-repo.json").read_text(encoding="utf-8"))
     assert saved["upstream_repo"] == "https://x.example/r.git"
+    assert not fu.index_path(tmp_path).exists()
 
 
 # --------------------------------------------------------------------------- #

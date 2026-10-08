@@ -8,7 +8,8 @@ optimization points. Once enough accumulate, it raises a single consolidated pro
 inviting the user to submit the collected feedback to the Spec Kit developers.
 
 The engine reuses the proven memory-as-files pattern (`memory-utils.py`): a stdlib-only
-`feedback-utils.py` writes Markdown entries plus a local `index.json`. There is **no
+`feedback-utils.py` writes Markdown entries plus per-scalar `state/` files (req 055 —
+no shared mutable index). There is **no
 database and no vector store**.
 
 ## Feedback Trigger Policy
@@ -58,17 +59,28 @@ or skill shape) carrying only that unit's id, never a copy of the rules.
 ```
 .specify/memory/feedback/
   <YYYYMMDDTHHMMSSZ>-<unit-slug>.md   # one file per recorded run
-  introspection/<report-id>.md        # introspection reports (req 047; subdir keeps them out of reindex's root glob)
+  introspection/<report-id>.md        # introspection reports (req 047; subdir keeps them out of the root scan)
   backlog.md                          # single carrier for findings routed but NOT executed (read at inventory, written at A4)
-  index.json                          # store metadata + entry mirror (+ introspections[] records)
+  state/threshold.json                # {"threshold": N} — present only when explicitly set (req 055)
+  state/submitted-at.json             # {"submitted_at": "..."} — written by mark-submitted
+  state/upstream-repo.json            # {"upstream_repo": "..."} — written by upstream --set
   .gitkeep                            # keeps the store dir version-tracked
 ```
 
 Each entry is Markdown with YAML frontmatter (`id, unit_id, unit_type, run_id, scope,
 feature, partial, created, summary`) plus a body with `## Review` and
 `## Optimization Points` (≥1 bullet, or the explicit no-op line). Every entry is
-`scope: local`. The `index.json` mirrors each entry plus `threshold`,
-`count_since_submission`, and `submitted_at`.
+`scope: local`.
+
+Conflict-free store discipline (req 055): information updated concurrently by
+multiple flows never lives in one shared file. The entry list (and the
+introspection roster) is **derived on demand** by scanning `*.md` frontmatter —
+never persisted, so no two branches can conflict over it. The only mutable
+store state is three scalars, each in its own tiny `state/` file whose absence
+means the default; `record` writes nothing but the new entry file. A legacy
+`index.json` is read as a read-only fallback and retired (deleted, with a
+`migrated: true` disclosure) on the first mutating action or an explicit
+`reindex`.
 
 ## Engine (`feedback-utils.py`)
 
@@ -82,8 +94,8 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 | `status` | Read counters; `should_prompt = count_since_submission >= threshold`. |
 | `list` | List recent entries (filters: `--unit-id`, `--unit-type`, `--since`, `--limit` — `0` = no limit; `--contains <text>` case-insensitive substring over entry summary + body, engine-side read, summary-level output; plus `--slice`, `--kind`, `--disposition`). |
 | `dispose` | Mark one entry's disposition (`--id` + `--to processed|ignored`; optional `--reason`/`--ref` provenance); index and entry frontmatter both updated, body never rewritten. |
-| `mark-submitted` | Reset `count_since_submission` to 0 and stamp `submitted_at` (entries are kept). Local bookkeeping only — NOT an upload. |
-| `reindex` | Rebuild `index.json` from entry files; preserves `submitted_at` and `upstream_repo`. |
+| `mark-submitted` | Reset `count_since_submission` to 0 and stamp `submitted_at` (written to `state/submitted-at.json`; entries are kept). Local bookkeeping only — NOT an upload. |
+| `reindex` | Explicit reconciliation and migration entry point (req 055): derives entries from the entry files, materializes store scalars into `state/`, retires a legacy `index.json`, and reports `migrated`. Idempotent. |
 | `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. `--include-introspection` additionally packs the introspection reports covering the selected entries (plus a `## Introspection Reports` MANIFEST section). |
 | `cleanup` | After packaging, remove the entries contained in a given zip from the active store (`--package <zip|latest>`, `--dry-run` preview first); every removal is logged to `cleanup-log.md`. |
 | `probes` | Print the merged probe registry (framework Classes/Objects + project external probes) as a tree; `--validate` schema-checks (exit 2), `--reconcile` audits embeds two-way. |
@@ -91,7 +103,7 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 | `migrate-legacy` | One-shot convergence of legacy entries per an approved plan file (`--plan-file`, one `<entry-id> -> delete|re-register` per line); every outcome lands in the migration log. |
 | `probe-inject` | Inject an external probe object for a client-project custom unit (`--unit custom:<owner>/<name>`, `--notes-file`); writes `.specify/memory/feedback/probes/ext-<slug>.md`. |
 | `upstream` | Show (or `--set`) the upstream repo URL used for manual delivery guidance. |
-| `introspect-register` | Validate an introspection report (`--report-file`), link its member entries (`introspection_ref`), record it in `index.json.introspections[]`, and flip `supersedes` targets; `--confirm` (after user ratification) flips the report to `confirmed` and applies each finding's `建议处置` rows as batch dispositions. Validation failure exits 2 listing every violation. `dispose` also accepts optional `--reason`/`--ref` provenance fields. |
+| `introspect-register` | Validate an introspection report (`--report-file`), link its member entries (`introspection_ref`), and flip `supersedes` targets; the report roster is derived by scanning `introspection/*.md` (req 055 — nothing to maintain in an index); `--confirm` (after user ratification) flips the report to `confirmed` and applies each finding's `建议处置` rows as batch dispositions. Validation failure exits 2 listing every violation. `dispose` also accepts optional `--reason`/`--ref` provenance fields. |
 
 - `--unit-id` must match `^(?:/speckit\.[a-z0-9._-]+|skill:[a-z0-9._-]+)$` (else exit code 2).
 - A `record` with an empty `--review` or empty `--points` exits with code 2.
@@ -103,7 +115,9 @@ The canonical Reflect step (`.specify/shared/workflow/feedback-step.md`) include
 ## Threshold behavior
 
 Entries accumulate across runs. The threshold defaults to **10** (overridable via
-`--threshold` or `SPECKIT_FEEDBACK_THRESHOLD`, persisted into the index). When
+`--threshold` or `SPECKIT_FEEDBACK_THRESHOLD`). Only an **explicit** `--threshold`
+that differs from the stored value is persisted — into `state/threshold.json`
+(req 055; env/CLI resolution stays ephemeral). When
 `count_since_submission >= threshold`, `record`/`status` return `should_prompt: true`,
 and the agent surfaces a **single** consolidated prompt. On confirmation, `mark-submitted`
 resets the counter. Below threshold, no prompt appears.
@@ -186,7 +200,7 @@ python3 .specify/scripts/python/feedback-utils.py --action package
   `MANIFEST.md` (entry list, time range, spec-kit version, install source). **Source
   entry files are never modified.**
 - Prints the detected **upstream repo** and manual-send guidance. Detection priority:
-  the user-configured `upstream_repo` in `index.json` > PEP 610 install metadata
+  the user-configured `upstream_repo` in `state/upstream-repo.json` > PEP 610 install metadata
   (`direct_url.json`, i.e. the git URL this custom spec-kit build was installed from) >
   none (then run `--action upstream --set <repo-url>` once). GitHub → attach the zip to
   an issue; GitLab → issue attachment or an MR adding the zip to the upstream repo's

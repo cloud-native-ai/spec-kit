@@ -1320,19 +1320,19 @@ class TestNoNewStore:
 
     def test_record_lands_in_the_session_scope_with_the_declared_tags(self, eng, ws, capsys):
         run_cli(eng, determine_args(ws, run_id="run-tag"), capsys)
-        index = json.loads((ws / ".specify" / "memory" / "session" / "index.json")
-                           .read_text(encoding="utf-8"))
-        assert len(index["entries"]) == 1
-        entry = index["entries"][0]
+        entries = eng.sibling_engine("memory-utils.py").load_index(
+            ws, "session")["entries"]
+        assert len(entries) == 1
+        entry = entries[0]
         assert entry["source"] == "/speckit.plan"
         assert "run-determination" in entry["tags"]
         assert "run-tag" in entry["tags"]
 
     def test_summary_frontmatter_carries_one_line(self, eng, ws, capsys):
         run_cli(eng, determine_args(ws, run_id="run-a"), capsys)
-        index = json.loads((ws / ".specify" / "memory" / "session" / "index.json")
-                           .read_text(encoding="utf-8"))
-        summary = index["entries"][0]["summary"]
+        entries = eng.sibling_engine("memory-utils.py").load_index(
+            ws, "session")["entries"]
+        summary = entries[0]["summary"]
         assert "\n" not in summary
         assert "/speckit.plan" in summary
         for word in ("token", "elapsed", "artifact", "satisfaction"):
@@ -1341,10 +1341,10 @@ class TestNoNewStore:
     def test_settle_creates_no_second_entry(self, eng, ws, capsys):
         run_cli(eng, determine_args(ws, run_id="run-a"), capsys)
         run_cli(eng, settle_args(ws, run_id="run-a"), capsys)
-        index = json.loads((ws / ".specify" / "memory" / "session" / "index.json")
-                           .read_text(encoding="utf-8"))
-        assert len(index["entries"]) == 1
-        assert index["entries"][0]["summary"].count("not_evaluated") == 3
+        entries = eng.sibling_engine("memory-utils.py").load_index(
+            ws, "session")["entries"]
+        assert len(entries) == 1
+        assert entries[0]["summary"].count("not_evaluated") == 3
 
 
 # ---------------------------------------------------------------------------
@@ -1568,16 +1568,11 @@ class TestLaneProjections:
     def test_history_skips_entries_that_are_not_determinations(self, eng, ws, capsys):
         run_cli(eng, determine_args(ws, run_id="run-a"), capsys)
         session = ws / ".specify" / "memory" / "session"
+        # req 055: the scan picks this junk entry up by itself — no index to
+        # patch; history must skip it via body parsing.
         (session / "junk.md").write_text(
             "---\nid: junk\nsource: \"/speckit.plan\"\ntags: [\"run-determination\"]\n"
             "---\n\nnot a determination record\n", encoding="utf-8")
-        index_path = session / "index.json"
-        index = json.loads(index_path.read_text(encoding="utf-8"))
-        index["entries"].append({"id": "junk", "file": "junk.md", "scope": "session",
-                                 "source": "/speckit.plan", "feature": "",
-                                 "tags": ["run-determination"], "title": "junk",
-                                 "created": "2026-10-06T00:00:00Z", "summary": "junk"})
-        index_path.write_text(json.dumps(index), encoding="utf-8")
         rc, payload, _ = run_cli(eng, history_args(ws), capsys)
         assert rc == 0
         assert [r["run_id"] for r in payload["records"]] == ["run-a"]

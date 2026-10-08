@@ -22,7 +22,7 @@
 双向判定,每个索引族一组规则:
 
 - C-6 features 族:`features.md` 表行(ID、Feature Details 路径、Spec Path)↔ 磁盘文件,双向:行指向的文件缺失 / 磁盘存在 `features/<ID>.md` 而索引无行。
-- C-7 feedback 族:`feedback/index.json` 的 `entries[].file` ↔ 条目文件,双向;磁盘侧只统计**时间戳命名形态**(`YYYYMMDDTHHMMSSZ-*.md`)的条目文件——簿记文件(cleanup-log/consume-log/migration-log/migration-plan/probe-map)是存储脚手架而非条目,豁免。
+- C-7(需求 055 修订)feedback/session/knowledge 族:三库均已改为**扫描派生**(req 055),维护型索引不复存在;对应 `index.json` **存在本身**即一条 index-inconsistency 发现(target=该文件,处置 repair,修复指向所属引擎 `--action reindex`——落 state 后退役旧文件)。混合版本过渡期旧引擎机器可能合法重建该文件,故 sanitize 只提示、绝不代删;旧的双向判定与簿记文件豁免规则随维护型索引一并废止(条目由引擎扫描识别)。
 - C-8 evidence 族:`evidence/index.json` 登记的运行目录 ↔ `ev-*` 目录,双向。
 - C-9 索引 JSON 自身不可解析 → 单条 index-inconsistency(target=索引文件),不逐条展开。
 

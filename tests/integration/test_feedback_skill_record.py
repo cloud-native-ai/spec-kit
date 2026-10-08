@@ -47,8 +47,6 @@ def test_skill_record_accepts_no_op_sentence(feedback_store: Path):
         "--review", "Clean run against the diagram-authoring purpose.",
         "--points", "No significant optimization points identified this run.",
     ])
-    index = json.loads(
-        (feedback_store / ".specify/memory/feedback/index.json").read_text(encoding="utf-8")
-    )
+    index = feedback_utils.load_index(feedback_store)
     assert index["entries"][0]["unit_type"] == "skill"
     assert index["count_since_submission"] == 1

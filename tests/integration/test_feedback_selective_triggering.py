@@ -46,8 +46,6 @@ def test_qualifying_flow_records_exactly_one(feedback_store: Path, capsys):
         "--unit-id", "skill:draw-echarts", "--unit-type", "skill",
         "--run-id", "one-shot", "--review", "R", "--points", "P",
     ])
-    index = json.loads(
-        (feedback_store / ".specify/memory/feedback/index.json").read_text(encoding="utf-8")
-    )
+    index = feedback_utils.load_index(feedback_store)
     assert index["count_since_submission"] == 1
     assert len(index["entries"]) == 1

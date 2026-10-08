@@ -17,17 +17,18 @@ def _record(workspace: Path, run_id: str, kind: str | None = None) -> str:
         "--points", "point",
     ])
     assert rc == 0
-    index = json.loads(
-        (workspace / ".specify/memory/feedback/index.json").read_text())
-    eid = index["entries"][-1]["id"]
-    if kind:  # simulate an external entry by patching kind end-to-end
-        entry_file = workspace / ".specify/memory/feedback" / index["entries"][-1]["file"]
-        text = entry_file.read_text(encoding="utf-8")
-        entry_file.write_text(text.replace('kind: ""', f'kind: "{kind}"'),
-                              encoding="utf-8")
-        index["entries"][-1]["kind"] = kind
-        (workspace / ".specify/memory/feedback/index.json").write_text(
-            json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
+    # req 055: the entry list is scan-derived (newest first); kind is patched
+    # directly in the entry file — there is no index to mirror.
+    entry = feedback_utils.scan_entries(workspace)[0]
+    eid = entry["id"]
+    if kind:  # simulate an external entry by patching kind in the entry file
+        entry_file = workspace / ".specify/memory/feedback" / entry["file"]
+        meta, body = feedback_utils.parse_frontmatter(
+            entry_file.read_text(encoding="utf-8"))
+        meta["kind"] = kind
+        entry_file.write_text(
+            feedback_utils.dump_frontmatter(meta) + "\n\n" + body.strip() + "\n",
+            encoding="utf-8")
     return eid
 
 

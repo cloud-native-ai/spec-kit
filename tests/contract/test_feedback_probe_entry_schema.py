@@ -71,11 +71,9 @@ class TestRecordProbeResolution:
     def test_index_mirror_carries_probe_keys(self, workspace: Path, capsys):
         capsys.readouterr()
         assert _record(workspace) == 0
-        import json
-        index = json.loads(
-            (workspace / ".specify" / "memory" / "feedback" / "index.json")
-            .read_text(encoding="utf-8"))
-        entry = index["entries"][-1]
+        # req 055: load_index projects the scan-derived entry list
+        from tests.script_api import feedback_utils
+        entry = feedback_utils.load_index(workspace)["entries"][0]
         assert entry["probe"] == "speckit-plan-wrapup"
         assert entry["kind"] == "internal"
         assert entry["slice"] == "commands"

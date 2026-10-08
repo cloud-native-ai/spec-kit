@@ -33,9 +33,7 @@ def test_complex_command_records_command_scoped_entry(feedback_store: Path):
         "--review", "Plan run reflected against its planning purpose.",
         "--points", "Clarify the classification table earlier",
     ])
-    index = json.loads(
-        (feedback_store / ".specify/memory/feedback/index.json").read_text(encoding="utf-8")
-    )
+    index = feedback_utils.load_index(feedback_store)
     assert len(index["entries"]) == 1
     entry = index["entries"][0]
     assert entry["unit_type"] == "command"

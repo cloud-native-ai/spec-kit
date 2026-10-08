@@ -7,7 +7,7 @@ skills, so later sessions can build on prior decisions, preferences, and working
 
 The design borrows the "memory as files" idea from
 [agentscope-ai/ReMe](https://github.com/agentscope-ai/ReMe) but intentionally omits the
-heavy parts: there is **no vector store** — retrieval uses a plain local JSON index with
+heavy parts: there is **no vector store** — retrieval scans the entry files'
 keyword/tag scoring.
 
 ## Terminology (ADR-0003)
@@ -43,10 +43,9 @@ engine enforces the boundary: every `record` must carry a `--source` of the form
 .specify/memory/
   session/            # short-term / working memory (append-only)
     <UTC-ts>-<slug>.md
-    index.json
   knowledge/          # long-term / distilled memory (upsert by slug)
     <slug>.md
-    index.json
+  state/              # none — the memory store has no scalar state (req 055)
 ```
 
 - **session** — ephemeral working context of a current effort (progress, in-flight state).
@@ -55,8 +54,11 @@ engine enforces the boundary: every `record` must carry a `--source` of the form
   lasting decisions). Re-recording the same title updates the existing entry.
 
 Each entry is a Markdown file with YAML frontmatter (`id, scope, source, feature, tags,
-title, created, session_id, summary`) plus a body. The per-scope `index.json` mirrors the
-metadata + summary so search never has to open every file.
+title, created, session_id, summary`) plus a body. Conflict-free store discipline
+(req 055): the per-scope entry list is **derived on demand** by scanning `*.md`
+frontmatter — never persisted — so concurrent records across branches never share a
+write target. A legacy per-scope `index.json` is read as a read-only fallback and
+retired on the first mutating action or `reindex`.
 
 ### What NOT to store
 
@@ -71,11 +73,11 @@ The engine is a shared, standard-library-only script at
 
 | Action | Purpose |
 |--------|---------|
-| `record` | Write one entry to `session` or `knowledge`; updates the index. Requires a valid `--source`. |
+| `record` | Write one entry to `session` or `knowledge` (the only write target is the entry file itself). Requires a valid `--source`. |
 | `recall` | Search by `--query` keywords + `--tags` / `--source` / `--feature` / `--since` filters; ranks by keyword overlap and recency. |
 | `list` | List the most recent entries in a scope (no query). |
 | `prune` | Bound short-term memory via `--max-entries` and/or `--max-age-days`. |
-| `reindex` | Rebuild `index.json` from files if it is lost or stale. |
+| `reindex` | Explicit migration entry point (req 055): derives entries from the files and retires a legacy per-scope `index.json`. Idempotent. |
 
 Example:
 

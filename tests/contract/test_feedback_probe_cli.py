@@ -167,10 +167,7 @@ class TestListFiltersAndDispose:
     def test_dispose_sets_disposition_and_filter_finds_it(
         self, mixed_workspace: Path, capsys
     ):
-        index = json.loads(
-            (mixed_workspace / ".specify" / "memory" / "feedback" / "index.json")
-            .read_text(encoding="utf-8"))
-        target = index["entries"][0]["id"]
+        target = feedback_utils.load_index(mixed_workspace)["entries"][0]["id"]
         capsys.readouterr()
         rc = feedback_utils.main([
             "--action", "dispose", "--id", target, "--to", "processed",
@@ -188,10 +185,7 @@ class TestListFiltersAndDispose:
         assert out["matches"][0]["id"] == target
 
     def test_dispose_rejects_bad_state(self, mixed_workspace: Path, capsys):
-        index = json.loads(
-            (mixed_workspace / ".specify" / "memory" / "feedback" / "index.json")
-            .read_text(encoding="utf-8"))
-        target = index["entries"][0]["id"]
+        target = feedback_utils.load_index(mixed_workspace)["entries"][0]["id"]
         capsys.readouterr()
         rc = feedback_utils.main([
             "--action", "dispose", "--id", target, "--to", "yolo",
@@ -263,9 +257,9 @@ class TestCleanupAction:
         assert out["would_remove_count"] == len(out["removed"]) == 1
         assert out["remaining_after"] == out["remaining_entries"] == 0, out
 
-        import json as _j
-        index = _j.loads((store / "index.json").read_text(encoding="utf-8"))
-        assert index["entries"] == []
+        # req 055: the store has no index.json — emptiness is scan-derived
+        assert feedback_utils.load_index(probe_workspace)["entries"] == []
+        assert not (store / "index.json").exists()
 
     def test_cleanup_scopes_to_packaged_batch_only(
         self, probe_workspace: Path, capsys

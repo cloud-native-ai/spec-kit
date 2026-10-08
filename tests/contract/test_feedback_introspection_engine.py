@@ -16,8 +16,8 @@ from tests.script_api import feedback_utils
 
 
 def _index(workspace: Path) -> dict:
-    return json.loads(
-        (workspace / ".specify/memory/feedback/index.json").read_text())
+    # req 055: legacy-shape projection of the scan-derived store state
+    return feedback_utils.load_index(workspace)
 
 
 def _register(workspace: Path, report_path: Path, *extra: str) -> int:
@@ -41,9 +41,15 @@ class TestRegisterValidation:
         rc = _register(feedback_store, path)
         assert rc == 2
         assert "C-9" in capsys.readouterr().err
-        assert _index(feedback_store).get("introspections", []) == []
+        # C-15 "nothing written": the engine performed no writes of its own.
+        # req 055: the roster is scan-derived, so the (test-authored, invalid)
+        # report file itself is visible in it — what the engine must NOT have
+        # done is link it: no entry carries an introspection_ref.
         entry = _index(feedback_store)["entries"][0]
         assert not entry.get("introspection_ref")
+        meta, _body = feedback_utils.parse_frontmatter(path.read_text(encoding="utf-8"))
+        assert meta["status"] == "draft"
+        assert not meta.get("confirmed_at")
 
 
 @pytest.mark.contract
@@ -204,24 +210,24 @@ class TestRegisterConfirm:
         path = _write_report(feedback_store, report_id, text)
         assert _register(feedback_store, path) == 0
         assert _register(feedback_store, path, "--confirm") == 0
-        # rewrite the file back to draft and re-register without --confirm:
-        # index must keep confirmed, dispositions must not be reapplied
+        entry = _index(feedback_store)["entries"][0]
+        assert entry["disposition"] == "processed"
+        # Regress the report file back to draft and reset the entry
+        # disposition, then re-register WITHOUT --confirm: nothing may be
+        # reapplied or flipped. req 055 removed the index's shadow status —
+        # the report file is the authority, and a non-confirm register
+        # performs no status writes of its own.
         write_text = path.read_text(encoding="utf-8").replace(
             'status: "confirmed"', 'status: "draft"')
         path.write_text(write_text, encoding="utf-8")
-        entry = _index(feedback_store)["entries"][0]
         entry_file = feedback_store / ".specify/memory/feedback" / entry["file"]
         text_e = entry_file.read_text(encoding="utf-8")
         entry_file.write_text(
             text_e.replace('disposition: "processed"', 'disposition: ""'),
             encoding="utf-8")
-        index = _index(feedback_store)
-        index["entries"][0]["disposition"] = ""
-        (feedback_store / ".specify/memory/feedback/index.json").write_text(
-            json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
         assert _register(feedback_store, path) == 0
         index = _index(feedback_store)
-        assert index["introspections"][0]["status"] == "confirmed"
+        assert index["introspections"][0]["status"] == "draft"
         assert index["entries"][0]["disposition"] == ""
 
 
