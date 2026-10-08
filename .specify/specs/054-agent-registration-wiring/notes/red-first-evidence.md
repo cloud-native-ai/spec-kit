@@ -45,3 +45,14 @@ Verdict: 5/5 red (concept section absent from agent-definitions.md; provenance U
 
 Green: `scripts/bash/run-tests.sh tests/contract/test_agent_surface_docs.py` → `5 passed in 0.02s` after T020 (agent-definitions.md gains `## Host Registration Surface` owner section + Seat Instance taxonomy entry), T021 (symlink-model.md agent-surface bullet with both provenance URLs + verification date + owner pointer), T022 (supported-agent-tools.md qoder agent-surface section — inserted mid-sentence on first attempt, caught by re-reading and relocated after the Tier 2 bullet, disclosed), T023 (shared mirror sync 2 files, `--check` all ok, no NEW drift).
 Mutation drill: planted a C-8 violation (restated the `## Host Registration Surface` heading inside symlink-model.md) → guard RED on exactly test_c8_pointer_discipline_no_restatement (1 failed, 4 passed) → exact reverse restore → `diff -q` BYTE-EQUAL → mirror re-synced → recovery `5 passed`.
+
+## T025–T027 aggregate guards + drills — 2026-10-08
+
+T025 front-loaded closure (subjects landed in Phases 2/4; component reds captured at T004/T009/T014): `scripts/bash/run-tests.sh tests/contract/test_agent_chain_guards.py` → `4 passed in 0.10s` — chain closure (seat renders onto `.qoder/agents/` with tools/maxTurns + manifest entry), manifest↔definition correspondence (glob-derived, no hand list), foreign-file edge (user asset neither in manifest nor pruned by re-render).
+
+T026 mutation drills (all plant → red → exact restore → byte-equal → green):
+- CLI guard: `rendered `→`renderd` (1-char, src/specify_cli summary) → `2 failed, 7 passed` (test_c4 + test_c3) → restored → `9 passed`.
+- Chain guard wiring: first attempt `seat instantiation`→`…instantiationz` did NOT go red — substring assertions are insensitive to suffix-append mutations (drill finding, disclosed); re-drilled with the deletion form `…instantiatio` → `1 failed, 3 passed` (test_c9) → restored → mirror re-synced → `10 passed` (both wiring files).
+- C-10 correspondence: dropped layer prefix from source recording (`f"{layer}/{entry.name}"`→`f"{entry.name}"`) → `2 failed, 2 passed` (both correspondence tests) → restored count==1 → `diff -q` BYTE-EQUAL → chain guards + existing test_agent_render.py `19 passed` (no regression in the pre-existing suite).
+
+T027 suite green: all five guard files in one run → see the line pasted at the top of this block.
