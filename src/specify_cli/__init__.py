@@ -133,18 +133,21 @@ NEUTRAL_AGENT_METADATA_KEYS = {
     # Framework assembly keys — never rendered to any tool (C-6).
     # `role-scope` is the team-domain counterpart of `capacity-scope`
     # (used by agent-team-supervisor-template.md); `project` marks
-    # project-custom agents (agent-project-custom-template.md).
+    # project-custom agents (agent-project-custom-template.md);
+    # `team-scope` is the seat-provenance key on instances instantiated
+    # by the create-team flow (which team a seat belongs to).
     "supervisor": ("bool", False, False),
     "capacity-scope": (None, None, False),
     "role-scope": (None, None, False),
     "project": (None, None, False),
+    "team-scope": (None, None, False),
 }
 
 NEUTRAL_AGENT_REQUIRED_KEYS = ("name", "description")
 
 # Keys reserved for framework assembly; excluded from tool rendering (C-6).
 NEUTRAL_AGENT_FRAMEWORK_KEYS = frozenset(
-    {"supervisor", "capacity-scope", "role-scope", "project"}
+    {"supervisor", "capacity-scope", "role-scope", "project", "team-scope"}
 )
 
 # Tool-dialect vocabulary forbidden anywhere in agent metadata (C-4).
@@ -3031,6 +3034,42 @@ def check():
 
     if not any(agent_results.values()):
         console.print("[dim]Tip: Install an AI assistant for the best experience[/dim]")
+
+
+@app.command()
+def render_agents(
+    ai_assistant: str = typer.Option(
+        ...,
+        "--ai",
+        help="Render agent definitions for this tool's registration surface: qoder, claude, copilot, opencode",
+    ),
+):
+    """Render validated agent definitions into the target tool's agent directory.
+
+    Narrow render-only entry: delegates to the same pipeline `specify init`
+    uses (real files, render manifest, legacy symlink replacement) without
+    any other init side effects.
+    """
+    row = _AGENT_METADATA_MAPPING.get(ai_assistant)
+    if not row or row["mode"] != "render":
+        legal = sorted(
+            tool for tool, r in _AGENT_METADATA_MAPPING.items() if r["mode"] == "render"
+        )
+        raise typer.BadParameter(
+            f"unknown or non-render tool {ai_assistant!r}; legal values: {', '.join(legal)}"
+        )
+    project_path = Path.cwd()
+    try:
+        render_stats = render_agents_for_tool(project_path, ai_assistant)
+    except AgentMetadataError as exc:
+        console.print(f"[bold red]Agent metadata error:[/bold red] {exc}")
+        raise typer.Exit(code=1)
+    summary = f"rendered {render_stats['rendered']} agent(s) for {ai_assistant}"
+    if render_stats["backups"]:
+        summary += f" ({len(render_stats['backups'])} hand-edited backups)"
+    if render_stats["unmapped"]:
+        summary += f"; unmapped intents on {len(render_stats['unmapped'])} agent(s)"
+    console.print(summary)
 
 
 def main():

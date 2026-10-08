@@ -132,6 +132,7 @@ def test_c6_framework_keys_are_marked_non_rendering():
         "capacity-scope",
         "role-scope",
         "project",
+        "team-scope",
     }
     for key in NEUTRAL_AGENT_FRAMEWORK_KEYS:
         _domain, _default, renders = NEUTRAL_AGENT_METADATA_KEYS[key]
