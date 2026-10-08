@@ -19,7 +19,7 @@
 - DoD-5: Code reviewed and approved — mirror obligations all verified (sync-mirrors --check no NEW drift vs 2026-10-08 baseline; per-tool copies regenerated and contain the edit)
 - DoD-6: Changes validated against success criteria SC-001..SC-004 from requirements.md, recorded in verification.md
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Completion Gate
 
@@ -152,10 +152,10 @@ Single project: `src/`, `tests/`, `templates/`, `skills/`, `shared/`, `docs/` at
 
 **Purpose**: Full-suite regression, quickstart validation, feature registry sync, F-A02 dead-letter closure conditions.
 
-- [ ] T028 Full-suite regression: `scripts/bash/run-tests.sh tests/contract/ --names-out <current>` then `comm -13 baseline-failed.txt current` — empty (zero NEW failures); paste summary into verification.md. [blockedBy: T027]
-- [ ] T029 [P] Execute quickstart.md scenario 3 (executable part) with real output into `notes/quickstart-run.md` (mirror check + retired-literal grep + guard run); teardown = none (read-only checks). [blockedBy: T027]
-- [ ] T030 [P] Update Feature registry: `features/044.md` Key Changes notes gain the implementation outcome; `features.md` 044 row Last Updated; status stays Implemented (no regression — Principle VII). [blockedBy: T028]
-- [ ] T031 Record F-A02 dead-letter closure condition in verification.md: three surfaces fixed (T010/T011/T012), guard pinned (T013), closure actionable in the feedback ledger (consumption-side step, not code). [green: contracts/teaching-and-guards.md#C-12] [blockedBy: T028]
+- [X] T028 Full-suite regression: `scripts/bash/run-tests.sh tests/contract/ --names-out <current>` then `comm -13 baseline-failed.txt current` — empty (zero NEW failures); paste summary into verification.md. [blockedBy: T027]
+- [X] T029 [P] Execute quickstart.md scenario 3 (executable part) with real output into `notes/quickstart-run.md` (mirror check + retired-literal grep + guard run); teardown = none (read-only checks). [blockedBy: T027]
+- [X] T030 [P] Update Feature registry: `features/044.md` Key Changes notes gain the implementation outcome; `features.md` 044 row Last Updated; status stays Implemented (no regression — Principle VII). [blockedBy: T028]
+- [X] T031 Record F-A02 dead-letter closure condition in verification.md: three surfaces fixed (T010/T011/T012), guard pinned (T013), closure actionable in the feedback ledger (consumption-side step, not code). [green: contracts/teaching-and-guards.md#C-12] [blockedBy: T028]
 
 ---
 
