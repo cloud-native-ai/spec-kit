@@ -7,12 +7,12 @@ Frozen 2026-10-08 at tasks generation (never-cache: re-capture at /speckit.imple
 - Command: `scripts/bash/run-tests.sh tests/contract/ --names-out .specify/specs/054-agent-registration-wiring/baseline-failed.txt`
 - Real output (verbatim tail): `49 failed, 2574 passed, 2 skipped in 58.52s` + `# failed-name list written: ... (49 entries)`
 - baseline-failed.txt: 49 entries; first three: `test_agent_skill_enablement.py::…[qa-engineer]`, `[requirements-analyst]`, `[test-engineer]`
-- Regression criterion: zero NEW failures — `comm -13 baseline current` empty. The 49 are pre-existing reds (agent-skill-enablement, neutrality-budget, no-nested-skills classes), not caused by this feature.
+- Regression criterion: zero NEW failures — `comm -13 baseline current` empty. The 49 are pre-existing reds (per-file classes: 36x test_browser_site_memory, 4x test_agent_specific_config_skills, 1x browser_site_exclusions, 1x test_goal_migration, 7x the three classes first named — agent-skill-enablement/neutrality-budget/no-nested-skills), not caused by this feature.
 
 ## STR-001 retired literal (grep, source + tool copies)
 
 - Command: `grep -rn "Tool-specific directories are symlinks" templates/commands/agents.md skills/create-agent/SKILL.md .qoder/commands/speckit.agents.md`
-- Real hits (2026-10-08): `templates/commands/agents.md:25` and `.qoder/commands/speckit.agents.md:19` (both carry the sentence verbatim); zero hits in skills/create-agent/SKILL.md — the SKILL carries a DIFFERENT retired wording (two distinct literal classes; the C-7 guard pins both).
+- Real hits (2026-10-08): `templates/commands/agents.md:25` and `.qoder/commands/speckit.agents.md:19` (both carry the sentence verbatim); zero hits in skills/create-agent/SKILL.md — the SKILL carries a DIFFERENT retired wording (two distinct literal classes; the teaching-and-guards C-4 guard pins both).
 
 ## SKILL.md retired phrases (verbatim, sed)
 

@@ -1,6 +1,6 @@
 # Red-First Evidence — 054
 
-Every guard: red output (command + exit status) at authoring time; green output after its subject lands; mutation drills (plant-err → red → restore → byte-equal).
+Every guard carries red output (command + exit status) at authoring time, green output after its subject lands, and mutation drills (plant-err → red → restore → byte-equal) — with one disclosed exception: the T025 aggregate guard family (test_agent_chain_guards.py) was authored after its subjects (front-loaded closure; component reds captured at T004/T009/T014) and compensates with source-side drills. (Header amended 2026-10-08 after review F7.)
 
 ## T004 red capture — 2026-10-08
 
@@ -55,4 +55,4 @@ T026 mutation drills (all plant → red → exact restore → byte-equal → gre
 - Chain guard wiring: first attempt `seat instantiation`→`…instantiationz` did NOT go red — substring assertions are insensitive to suffix-append mutations (drill finding, disclosed); re-drilled with the deletion form `…instantiatio` → `1 failed, 3 passed` (test_c9) → restored → mirror re-synced → `10 passed` (both wiring files).
 - C-10 correspondence: dropped layer prefix from source recording (`f"{layer}/{entry.name}"`→`f"{entry.name}"`) → `2 failed, 2 passed` (both correspondence tests) → restored count==1 → `diff -q` BYTE-EQUAL → chain guards + existing test_agent_render.py `19 passed` (no regression in the pre-existing suite).
 
-T027 suite green: all five guard files in one run → see the line pasted at the top of this block.
+T027 suite green (command verbatim): `scripts/bash/run-tests.sh tests/contract/test_render_trigger_cli.py tests/contract/test_teaching_surfaces.py tests/contract/test_seat_instantiation_flow.py tests/contract/test_agent_surface_docs.py tests/contract/test_agent_chain_guards.py` → `35 passed in 0.17s` (arithmetic: 9+11+6+5+4). The same five-file aggregate is re-run verbatim in notes/quickstart-run.md.
