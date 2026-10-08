@@ -1,8 +1,8 @@
-# Contract: `search-todo.sh` CLI
+# Contract: `search-todo.py` CLI
 
 ## 1. Scope
 
-This contract governs the CLI surface, I/O semantics, discovery behavior, and diagnostic protocol of `.specify/scripts/bash/search-todo.sh` — a pure-bash+awk workspace scanner that locates `SPECKIT TODO` fenced blocks in eligible text files and emits structured JSON or human-readable key:value output. The contract defines flag syntax, exit codes, output schemas, discovery rules, and context extraction rules. It does not govern prompt-layer grouping, plan synthesis, or automatic execution.
+This contract governs the CLI surface, I/O semantics, discovery behavior, and diagnostic protocol of `scripts/python/search-todo.py` (mirrored to `.specify/scripts/python/search-todo.py`) — a pure-Python workspace scanner that locates `SPECKIT TODO` blocks in eligible text files and emits structured JSON or human-readable key:value output. The contract defines flag syntax, exit codes, output schemas, discovery rules (fenced form and comment form), and context extraction rules. It does not govern prompt-layer grouping, plan synthesis, or automatic execution.
 
 ## 2. Invocation
 
@@ -54,12 +54,13 @@ TOTAL_BLOCKS:    12
 MALFORMED:       1
 EXCLUDED_FILES:  7
 SCANNED_AT:      2026-06-23T14:22:11Z
-BLOCK[0]:        src/foo.md:42:58:heading "Authentication service"
-BLOCK[1]:        docs/bar.md:11:27:heading "Deployment flow"
+BLOCK[0]:        src/foo.md:42:58:heading "Authentication service":form fence
+BLOCK[1]:        docs/bar.md:11:27:heading "Deployment flow":form fence
+BLOCK[2]:        src/api.py:17:21:heading null:form comment
 MALFORMED[0]:    src/bad.md:99:unclosed_fence
 ```
 
-Each `BLOCK[i]` line: `<workspace-rel-file>:<opening_line>:<closing_line>:heading <heading|null>`.
+Each `BLOCK[i]` line: `<workspace-rel-file>:<opening_line>:<closing_line>:heading <heading|null>:form <fence|comment>`.
 
 Each `MALFORMED[i]` line: `<workspace-rel-file>:<opening_line>:<reason>` where reason ∈ `unclosed_fence`, `nested_fence`, `unparseable`, `encoding_error`.
 
@@ -87,9 +88,21 @@ One JSON object, single line, printed to stdout.
       "opening_line": 42,
       "closing_line": 58,
       "content": "<raw body, original formatting preserved>",
+      "form": "fence",
       "context_heading": "Authentication service",
       "prologue": "<up to --context-depth lines above the block, or up to first blank line / section heading>",
       "epilogue": "<up to --context-depth lines below the block>"
+    },
+    {
+      "block_id": "src/api.py:17:0",
+      "source_file": "src/api.py",
+      "opening_line": 17,
+      "closing_line": 21,
+      "content": "<comment payloads with the line-comment tokens stripped>",
+      "form": "comment",
+      "context_heading": null,
+      "prologue": "<up to --context-depth non-blank lines above the block, blank line terminates>",
+      "epilogue": "<up to --context-depth non-blank lines below the block>"
     }
   ],
   "malformed": [
@@ -108,9 +121,11 @@ One JSON object, single line, printed to stdout.
 }
 ```
 
-- `blocks` order MUST be deterministic: `(source_file ASC, opening_line ASC)`.
+- `blocks` order MUST be deterministic: `(source_file ASC, opening_line ASC)` — across both forms (D-12).
 - All string fields MUST be UTF-8; control characters MUST be JSON-escaped.
-- `block_id` format: `<source_file>:<opening_line>:<zero-based-index-within-file>`.
+- `block_id` format: `<source_file>:<opening_line>:<zero-based-index-within-file>`; the index sequence is shared by both forms within a file (D-12).
+- `form` MUST be present on every block entry: `"fence"` (D-1..D-4) or `"comment"` (D-9..D-11).
+- For comment-form blocks, `content` carries the comment payloads with the line-comment tokens stripped (D-11); `closing_line` MAY equal `opening_line`.
 
 ## 5. Discovery Rules (normative)
 
@@ -123,16 +138,22 @@ One JSON object, single line, printed to stdout.
 | **D-5** | Files listed in the default excludes (`.git/`, `.venv/`, `node_modules/`, `__pycache__/`, built artifact dirs, and other generated outputs) or matching any `--exclude` pattern MUST NOT be scanned. |
 | **D-6** | Binary files (content not decodable as UTF-8 within the first 8192 bytes) MUST be reported in `excluded_files` with reason `encoding_error` and MUST NOT be scanned. |
 | **D-7** | Files larger than 16 MB MUST be reported in `excluded_files` with reason `too_large` and MUST NOT be scanned. |
-| **D-8** | The marker substring match MUST be case-exact: `speckit todo`, `Speckit Todo`, and all other case variants MUST NOT match. |
+| **D-8** | The marker substring match MUST be case-exact: `speckit todo`, `Speckit Todo`, and all other case variants MUST NOT match. This applies to both forms (fence and comment). |
+| **D-9** | Comment-form detection is enabled ONLY in files that are not of the Markdown family (extensions `.md`, `.markdown`, `.mdown`, `.mkd`, `.mdx`); files without an extension (e.g. `Dockerfile`, `Makefile`) are eligible. In Markdown-family files a `# SPECKIT TODO` line is a heading, not a comment block, and MUST be ignored. |
+| **D-10** | A comment-form block opens at a line matching `^\s*(#|//|--)\s+SPECKIT TODO` — a line-comment token from the closed set `#`, `//`, `--`, followed by at least one whitespace character, with the payload starting with the exact substring `SPECKIT TODO`. Constructs without the separating whitespace (`---`, `-->`, `#SPECKIT TODO`) MUST NOT open a block. |
+| **D-11** | A comment-form block continues through consecutive lines that, after stripping leading whitespace, begin with the same comment token; it terminates at the first blank line, the first line that is not a same-token comment line (including fence lines), or end-of-file. A single-line block is valid and has `closing_line == opening_line`. The comment form is structurally incapable of being malformed: it has no closing syntax, so no new malformed reason is introduced. |
+| **D-12** | Inside an open fence no comment-form detection happens, and an open comment-form block is finalized before fence state tracking resumes. Within one file, fence-form and comment-form blocks share one block-index sequence; `blocks` ordering remains `(source_file ASC, opening_line ASC)` across both forms. |
 
 ## 6. Context Rules (normative)
 
 | Rule | Text |
 |------|------|
-| **C-1** | `context_heading` is the text of the nearest Markdown heading (line beginning with `#`, `##`, `###`, …) **above** the opening fence. If no such heading exists in the file, the value MUST be `null`. |
+| **C-1** | `context_heading` is the text of the nearest Markdown heading (line beginning with `#`, `##`, `###`, …) **above** the opening fence, tracked only in Markdown-family files. If no such heading exists in the file, the value MUST be `null` (see C-6 for non-Markdown files). |
 | **C-2** | `prologue` is the sequence of non-blank lines above the opening fence, up to (but not including) the first blank line or Markdown section heading, capped at `--context-depth`. |
 | **C-3** | `epilogue` is the sequence of non-blank lines below the closing fence, up to (but not including) the first blank line or Markdown section heading, capped at `--context-depth`. |
 | **C-4** | If `--context-only-headings` is set, `prologue` and `epilogue` MUST include only the nearest heading line and MUST be empty if no such heading exists. |
+| **C-5** | For comment-form blocks, `prologue` is the sequence of non-blank lines above the opening line, up to (but not including) the first blank line, capped at `--context-depth`; same-token adjacent comment lines count as context (they are not terminators). `epilogue` is symmetric below the closing line. Under `--context-only-headings`, both MUST be empty strings. |
+| **C-6** | `context_heading` for comment-form blocks MUST be `null`: heading tracking applies only to Markdown-family files (C-1). In non-Markdown files the fence-form blocks also report `context_heading` as `null`. |
 
 ## 7. Error Messages (normative)
 
@@ -171,9 +192,9 @@ TOTAL_BLOCKS:    3
 MALFORMED:       0
 EXCLUDED_FILES:  4
 SCANNED_AT:      2026-06-23T10:00:00Z
-BLOCK[0]:        docs/auth.md:12:22:heading "Token refresh"
-BLOCK[1]:        src/api.py:45:60:heading "Rate limiter"
-BLOCK[2]:        tests/integration.rs:88:95:heading null
+BLOCK[0]:        docs/auth.md:12:22:heading "Token refresh":form fence
+BLOCK[1]:        src/api.py:45:60:heading null:form fence
+BLOCK[2]:        tests/integration.rs:88:95:heading null:form fence
 ```
 
 ### Example 2 — JSON invocation
@@ -184,7 +205,7 @@ BLOCK[2]:        tests/integration.rs:88:95:heading null
 
 Output (stdout, single-line JSON):
 ```json
-{"repository":"/path/to/workspace","branch":"feature/xyz","scanned_at":"2026-06-23T10:00:00Z","counters":{"total_files_scanned":18,"total_blocks_found":3,"malformed_blocks":0,"excluded_files_count":4},"blocks":[{"block_id":"docs/auth.md:12:0","source_file":"docs/auth.md","opening_line":12,"closing_line":22,"content":"...","context_heading":"Token refresh","prologue":"...","epilogue":"..."}],"malformed":[],"excluded_files":["node_modules/pkg/index.js"]}
+{"repository":"/path/to/workspace","branch":"feature/xyz","scanned_at":"2026-06-23T10:00:00Z","counters":{"total_files_scanned":18,"total_blocks_found":3,"malformed_blocks":0,"excluded_files_count":4},"blocks":[{"block_id":"docs/auth.md:12:0","source_file":"docs/auth.md","opening_line":12,"closing_line":22,"content":"...","form":"fence","context_heading":"Token refresh","prologue":"...","epilogue":"..."}],"malformed":[],"excluded_files":["node_modules/pkg/index.js"]}
 ```
 
 ### Example 3 — Invocation with custom excludes
@@ -227,6 +248,26 @@ JSON mode includes the malformed entry:
 {"malformed":[{"source_file":"src/broken.md","opening_line":99,"reason":"unclosed_fence","content_snippet":"...","line_after_eof":true}]}
 ```
 
+### Example 6 — Comment-form block in a source file
+
+Given `src/api.py` contains:
+
+```python
+def get_users():
+    """Retrieve all users from database"""
+    pass
+
+
+# SPECKIT TODO
+# Optimize database queries:
+# - Add indexing for user_id and email fields
+# - Implement connection pooling
+
+# FIXME: keep this comment as prologue context
+```
+
+The scanner reports one `form: "comment"` block: `opening_line` at the `# SPECKIT TODO` line, `closing_line` at the last same-token comment line, `content` equal to the payloads with the `#` tokens stripped, `context_heading` `null`, and `prologue`/`epilogue` bounded by blank lines only (the `# FIXME` line below is epilogue context, not a terminator).
+
 ## 9. Traceability Mapping
 
 | Rule | Maps to FR | Maps to SC |
@@ -239,10 +280,16 @@ JSON mode includes the malformed entry:
 | D-6 | FR-003 | SC-002 |
 | D-7 | FR-003 | SC-002 |
 | D-8 | FR-004, FR-006 | SC-001, SC-002 |
+| D-9 | FR-014 | SC-001, SC-002 |
+| D-10 | FR-014, FR-006 | SC-001, SC-002 |
+| D-11 | FR-014 | SC-001 |
+| D-12 | FR-004, FR-014 | SC-001 |
 | C-1 | FR-005 | SC-003 |
 | C-2 | FR-005 | SC-003 |
 | C-3 | FR-005 | SC-003 |
 | C-4 | FR-005 | SC-003 |
+| C-5 | FR-005, FR-014 | SC-003 |
+| C-6 | FR-005, FR-014 | SC-003 |
 | Exit 1 (arg errors) | FR-001 | SC-001 |
 | Exit 2 (root undefined) | FR-001 | SC-001 |
 | Exit 3 (I/O error) | FR-001, FR-003 | SC-001, SC-002 |

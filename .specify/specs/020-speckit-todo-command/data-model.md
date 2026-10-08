@@ -10,8 +10,8 @@
 
 ## Glossary
 
-- **TodoBlock** — a single well-formed fenced `SPECKIT TODO` body extracted from one source file, together with its structural and paragraph-boundary context.
-- **MalformedBlock** — a diagnostic record for a fence that could not be cleanly parsed (unclosed, nested, or unparseable); excluded from automatic planning.
+- **TodoBlock** — a single well-formed `SPECKIT TODO` body extracted from one source file — fenced form or comment form — together with its structural and paragraph-boundary context.
+- **MalformedBlock** — a diagnostic record for a fence that could not be cleanly parsed (unclosed, nested, or unparseable); excluded from automatic planning. The comment form is structurally incapable of being malformed.
 - **TodoGroup** — a logical cluster of one or more `TodoBlock`s that share an affinity (same file, same heading, or same topic) and are planned/executed together.
 - **TodoPlan** — the top-level reviewable artifact produced by one run of `/speckit.todo`: a scan summary plus an ordered sequence of `ExecutionBatch`es.
 - **ExecutionBatch** — a bounded, sequential unit of review and execution containing up to 5 `TodoGroup`s (per FR-013) with a well-defined lifecycle status.
@@ -28,19 +28,20 @@ A well-formed, successfully parsed marked TODO block.
 |--------------------|-------------------|-----------------------------------------------------------------------------|
 | `block_id`         | string            | **Required, unique** within a scan run. Deterministic, e.g. `<file>:<opening_line>:<block_index>`. |
 | `source_file`      | string            | **Required.** Workspace-relative path. MUST resolve to a location inside the current workspace root. |
-| `opening_line`     | integer           | **Required.** 1-based line of the opening fence.                            |
-| `closing_line`     | integer           | **Required.** 1-based line of the closing fence. MUST satisfy `opening_line < closing_line`. |
-| `content`          | string            | **Required, non-empty.** The raw fenced block body with original formatting preserved. |
-| `context_heading`  | string \| null    | Optional. The nearest enclosing Markdown heading above the block, if any.   |
-| `prologue`         | string            | **Required.** Contextual text immediately *above* the block, bounded by the nearest blank line or section heading. May be the empty string when no such text exists. |
-| `epilogue`         | string            | **Required.** Contextual text immediately *below* the block, bounded by the nearest blank line or section heading. May be the empty string when no such text exists. |
+| `opening_line`     | integer           | **Required.** 1-based line of the opening fence / opening comment line.     |
+| `closing_line`     | integer           | **Required.** 1-based line of the closing fence / last comment line. MUST satisfy `opening_line <= closing_line` (equality only for a single-line comment-form block). |
+| `content`          | string            | **Required, non-empty.** The raw fenced block body with original formatting preserved; for comment form, the comment payloads with the line-comment tokens stripped. |
+| `form`             | enum              | **Required.** One of: `fence`, `comment`.                                   |
+| `context_heading`  | string \| null    | Optional. The nearest enclosing Markdown heading above the block, tracked only in Markdown-family files; `null` for comment-form blocks and for all blocks in non-Markdown files. |
+| `prologue`         | string            | **Required.** Contextual text immediately *above* the block, bounded by the nearest blank line or section heading (fence form) or the nearest blank line only (comment form). May be the empty string when no such text exists. |
+| `epilogue`         | string            | **Required.** Contextual text immediately *below* the block, bounded symmetrically to `prologue`. May be the empty string when no such text exists. |
 
 Validation rules:
 
 - `source_file` MUST resolve inside the workspace (no upward traversal, no absolute escapes).
-- `opening_line < closing_line`.
-- `content` MUST be non-empty after trimming of the fence lines themselves.
-- `block_id` MUST be unique within a scan run; determinism implies two identical runs over the same workspace produce the same set of IDs.
+- `opening_line <= closing_line` (comment form may collapse to one line; fence form always spans at least two).
+- `content` MUST be non-empty after trimming of the fence lines themselves (fence form) or of the comment tokens (comment form).
+- `block_id` MUST be unique within a scan run; determinism implies two identical runs over the same workspace produce the same set of IDs. The block index is shared by both forms within a file.
 
 ### 2. MalformedBlock
 

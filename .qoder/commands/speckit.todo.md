@@ -2,6 +2,10 @@
 description: TODO 管家：列出、扫描、插入 TODO 块并寄存搁置想法
 ---
 <!-- AUTO-GENERATED from templates/commands/todo.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
+## Philosophy
+
+A SPECKIT TODO block lives **at the code or document location it refers to** — the surrounding context completes a short intent, and every other workflow that passes the spot reads it as a declared future change. The full discipline (form ownership, interpretation rules, perception obligations, lifecycle) is owned by .specify/shared/guidelines/todo-in-context.md — reference it, do not restate it here.
+
 ## User Input
 
 ```text
@@ -42,9 +46,9 @@ Present two tables, then counts:
 
 ```
 ## Workspace TODO Blocks (<N>)
-| # | Source | Context | First line |
-|---|--------|---------|-----------|
-| 1 | <file>:<line> | <context_heading or -> | <first line of content> |
+| # | Source | Form | Context | First line |
+|---|--------|------|---------|-----------|
+| 1 | <file>:<line> | fence/comment | <context_heading or -> | <first line of content> |
 
 ## Parked Ideas (<M>)
 | Title | Status | Parked | Tags | File |
@@ -115,6 +119,8 @@ For each valid block, create a **work item** with:
 3. **Task**: Parse `content` to extract the actionable work description
 4. **Scope**: Infer affected files/modules from content and context
 
+**Context completion (上下文补全)**: block content states a short intent; the context around it completes the reading. When the content alone is terse or admits more than one reading, resolve it FIRST from the block's context — `prologue`/`epilogue` (adjacent code, comments, statements), `context_heading`, and the source file's surrounding structure (per .specify/shared/guidelines/todo-in-context.md). Only when two readings survive the context does the run stop and ask the user which one applies — never guess between them.
+
 Group work items by:
 - Related source files or modules
 - Common themes or dependencies
@@ -151,8 +157,9 @@ For each group/batch, present:
 For each batch (auto-executed after its presentation):
 1. Execute tasks in the presented order
 2. After each task, verify the change is correct
-3. Report completion status per task
-4. If a task fails, stop and report — do NOT continue to subsequent tasks
+3. Remove the completed TODO block from its source file in the same step: delete the whole block (both fence lines for fence form; the full comment run for comment form) plus the blank line the insertion rules added, preserving all other content. The landed change plus git history is the record — a stale marker would send the next run re-planning finished work (lifecycle: .specify/shared/guidelines/todo-in-context.md)
+4. Report completion status per task
+5. If a task fails, stop and report — do NOT continue to subsequent tasks, and do NOT remove the block of a failed or unverified task
 
 If `$ARGUMENTS` contains background context, apply it as constraints when interpreting block content and generating task descriptions.
 
@@ -177,13 +184,26 @@ Extract from `$ARGUMENTS`:
 
 ### Step 3: Insert Block
 
-Insert a conforming SPECKIT TODO block at the specified location:
+Insert a conforming SPECKIT TODO block at the specified location, choosing the form by target file type (per .specify/shared/guidelines/todo-in-context.md):
+
+- **Markdown-family target** (`.md`, `.markdown`, `.mdown`, `.mkd`, `.mdx`) — fenced form:
 
 ````markdown
 ```SPECKIT TODO
 <content from user>
 ```
 ````
+
+- **Source code target** (any other file) — comment form using that language's line-comment token (`#`, `//`, `--`); NEVER insert a fenced block into a source file — a fence is a syntax error there:
+
+```text
+# SPECKIT TODO
+# <content from user>
+```
+
+**Placement (就位原则)**: the block MUST sit at the exact code or document element it refers to — above the function/statement/module it concerns, or inside the section it concerns — never dumped at file head or tail. When `$ARGUMENTS` does not pin the location, derive it from what the TODO is about.
+
+**Content (内容原则)**: a short intent statement is enough — surrounding context completes it. Do not pad the block with details the location already shows.
 
 Rules:
 - Preserve ALL surrounding file content unchanged

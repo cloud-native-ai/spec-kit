@@ -75,7 +75,7 @@ A Spec Kit user needs predictable behavior when no TODO blocks are present durin
 
 ### Functional Requirements
 
-- **FR-001**: The system MUST provide a user-invocable `/speckit.todo` command that operates in two modes: collection mode (no arguments) and insertion mode (with description argument).
+- **FR-001**: The system MUST provide a user-invocable `/speckit.todo` command that operates in four modes: list mode (read-only enumeration, the default), collection mode (`--collect`), insertion mode (`--insert`), and park mode (`--park`).
 - **FR-002**: In collection mode (no arguments), the command MUST use the repository-provided TODO search script identified by `[[STR-003]]` to discover all marked TODO blocks in eligible text files.
 - **FR-003**: The search behavior in collection mode MUST scan eligible text files in the workspace and exclude binary files, dependency directories, generated outputs, and files ignored by normal project ignore rules.
 - **FR-004**: The marker format MUST identify fenced multiline blocks whose opening fence contains the marker string `[[STR-002]]` (anywhere on the opening fence line) and whose content continues until the next matching closing fence.
@@ -88,6 +88,9 @@ A Spec Kit user needs predictable behavior when no TODO blocks are present durin
 - **FR-011**: In insertion mode, the command MUST preserve surrounding file content and MUST NOT modify any content other than inserting the new TODO block.
 - **FR-012**: In collection mode, the command MUST provide a clear no-op result when no valid marked TODO blocks are found.
 - **FR-013**: When more than 10 valid TODO blocks are discovered in a single scan, the command MUST split the resulting groups into batches of at most 5 groups per batch and present each batch sequentially for review and confirmation before execution.
+- **FR-014**: In collection and list mode, the system MUST additionally recognize a comment-form marker — a run of consecutive same-token line comments (`#`, `//`, `--`) whose first line's payload starts with `[[STR-002]]` — in files that are not of the Markdown family, and MUST report each such block with `form: comment`. Comment-form markers in Markdown-family files MUST NOT be recognized.
+- **FR-015**: In insertion mode, the command MUST choose the marker form by target file type: a fenced block for Markdown-family files, and a comment-form block using that language's line-comment token for source files; it MUST NOT insert a fenced block into a source code file. The block MUST be placed at the code or document element it refers to, and the content MAY be a short intent statement — surrounding context completes it.
+- **FR-016**: In collection mode, when a TODO block's work has been executed and verified, the command MUST remove the completed block from its source file as part of the same execution step; the landed change plus git history is the record, so a stale marker MUST NOT be left behind.
 
 ### Key Entities
 
@@ -98,8 +101,8 @@ A Spec Kit user needs predictable behavior when no TODO blocks are present durin
 
 ### Assumptions
 
-- The provisional marker is a fenced block whose opening fence line contains the string `SPECKIT TODO` (anywhere on that line), and the block ends at the next matching closing triple-backtick fence. The exact position of the marker string on the opening fence line is not prescribed.
-- Contextual text for each block extends upward to the nearest blank line or section heading and downward to the next blank line or section heading (paragraph-boundary).
+- The provisional marker has two forms. Fenced form: a block whose opening fence line contains the string `SPECKIT TODO` (anywhere on that line), ending at the next matching closing triple-backtick fence; the exact position of the marker string on the opening fence line is not prescribed. Comment form: a run of consecutive same-token line comments (`#`, `//`, `--`) whose first line's payload starts with `SPECKIT TODO`, recognized only in non-Markdown files (a fence inside a source file is a syntax error, which is why the comment form exists).
+- Contextual text for each block extends upward to the nearest blank line or section heading and downward to the next blank line or section heading (paragraph-boundary); for comment-form blocks the boundary is the nearest blank line only, so adjacent same-token comments count as context.
 - The command operates on the current workspace by default.
 - “Text files” means files that can be safely read as text after honoring project ignore rules and common generated/dependency exclusions.
 - Execution follows existing Spec Kit agent safety expectations: reviewable plans first, bounded changes, and validation evidence after changes.
@@ -129,7 +132,7 @@ A Spec Kit user needs predictable behavior when no TODO blocks are present durin
 |-----------|------------------|-------------|
 | `STR-001` | `/speckit.todo` | FR-001, user documentation, command template, acceptance tests |
 | `STR-002` | `SPECKIT TODO` | FR-004, search behavior, fixtures, acceptance tests |
-| `STR-003` | `search-todo.sh` | FR-002, command template, script lookup tests |
+| `STR-003` | `search-todo.py` | FR-002, command template, script lookup tests |
 
 **Citation convention**: When an FR, contract, task, or test references one of these strings, write `[[STR-NNN]]` instead of copy-pasting the literal. CI / `/speckit.analyze` can then verify that every `[[STR-NNN]]` reference resolves to a row in this section.
 
