@@ -3,7 +3,7 @@
 feature=044 Agent Metadata Portability
 requirement=054-agent-registration-wiring
 implemented=2026-10-08
-commits=3e673e16,38c19d1e,b95b5818,fb3432e9,77e041cb,d58a600e,219811cd (review-fix commit appended post-review)
+commits=3e673e16,38c19d1e,b95b5818,fb3432e9,77e041cb,d58a600e,219811cd(review report),7267c46a(user-side sweep of demo artifacts + feedback ledger),b4f2b8cb(review roadmap fixes; carries this file — resolve the landing commit via `git log -- <spec-dir>/verification.md`)
 baseline=49 pre-existing failed (captured 2026-10-08, name-level, baseline-failed.txt)
 regression=comm -13 baseline current → empty at every phase boundary (Phases 2,3,4,5,6) and at the post-review re-check; final full-suite summary 2026-10-08 (post-review re-run, verbatim): `49 failed, 2609 passed, 2 skipped in 59.03s` — the 49 == the pre-existing baseline set, name-compared via comm -13 (empty)
 gate_rejections=0
