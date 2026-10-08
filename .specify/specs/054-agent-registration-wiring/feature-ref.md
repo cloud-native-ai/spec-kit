@@ -17,13 +17,13 @@
 
 | FR | 契约/制品 | 实现落点 |
 |---|---|---|
-| FR-001..003 | `contracts/teaching-and-guards.md` A-1..A-3 | `templates/commands/agents.md`(+4 工具副本)、`skills/create-agent/SKILL.md` |
-| FR-004(实例化)/FR-006/008/013 | `contracts/seat-instantiation.md` C-1..C-5 | `skills/create-team/`、`skills/create-agent/SKILL.md`(键集段)、`src/specify_cli/__init__.py`(键集) |
-| FR-004(触发)/FR-005 | `contracts/render-trigger-cli.md` C-1..C-5 | `src/specify_cli/__init__.py`(子命令) |
+| FR-001..003 | `contracts/teaching-and-guards.md` C-1..C-3 | `templates/commands/agents.md`(+4 工具副本)、`skills/create-agent/SKILL.md` |
+| FR-004(实例化)/FR-006/008/013 | `contracts/seat-instantiation.md` C-1..C-10 | `skills/create-team/`、`skills/create-agent/SKILL.md`(键集段)、`src/specify_cli/__init__.py`(键集) |
+| FR-004(触发)/FR-005 | `contracts/render-trigger-cli.md` C-1..C-6 | `src/specify_cli/__init__.py`(子命令) |
 | FR-007 | (裁定记录)spec FR-007 + Clarifications;`teaching-and-guards.md` §D 引用 | 无新落点(方案 b 已是全计划前提) |
-| FR-009/010 | `contracts/teaching-and-guards.md` B-1..B-4 | `shared/definitions/agent-definitions.md`、`shared/workflow/symlink-model.md`、`docs/reference/cli/supported-agent-tools.md` |
-| FR-011/012(+SC-003 守卫化) | `contracts/teaching-and-guards.md` C-7..C-10 | `tests/contract/`(守卫 + 变异演练取证) |
-| FR-014 | `contracts/modify-backfill.md` C-1..C-4 | `skills/improve-team/`(modify 流程) |
+| FR-009/010 | `contracts/teaching-and-guards.md` C-5..C-8 | `shared/definitions/agent-definitions.md`、`shared/workflow/symlink-model.md`、`docs/reference/cli/supported-agent-tools.md` |
+| FR-011/012(+SC-003 守卫化) | `contracts/teaching-and-guards.md` C-4、C-9..C-11 | `tests/contract/`(守卫 + 变异演练取证) |
+| FR-014 | `contracts/modify-backfill.md` C-1..C-8 | `skills/improve-team/`(modify 流程) |
 
 ## Feature 登记义务(本计划执行)
 

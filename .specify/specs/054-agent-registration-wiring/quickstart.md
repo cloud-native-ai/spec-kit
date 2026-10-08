@@ -4,7 +4,7 @@
 
 ## Scenario 1: 建一个引用 stage 帧的团队,席位直达宿主注册面
 
-**未实现**(依赖:`seat-instantiation.md` C-1/C-2 落地 + `render-trigger-cli.md` 子命令实现)。
+**未实现**(依赖:`seat-instantiation.md` C-4..C-8 落地 + `render-trigger-cli.md` 子命令实现)。
 
 步骤(实现后):
 
@@ -12,7 +12,7 @@
 2. 建队流程终点**自动**执行渲染触发(对当前宿主工具)。前提:`specify render-agents --ai <tool>` 已实现,`--ai` 值为当前工具(qoder/claude/copilot/opencode 之一)。
 3. 验证席位已上注册面。前提(以 qoder 为例):`ls .qoder/agents/` 含席位文件,frontmatter `name`/`tools`/`maxTurns` 由中性键渲染而来。
 
-预期(实现后,依契约 C-2.3):流程报告含 stats 摘要;数值以实跑为准,本文不预写。
+预期(实现后,依契约 seat-instantiation C-8):流程报告含 stats 摘要;数值以实跑为准,本文不预写。
 
 ## Scenario 2: 存量团队经一次 modify 补齐席位(opt-in 回填)
 
@@ -35,7 +35,7 @@ ok    shared/ == .specify/shared/ (46 files)
 (exit 0)
 ```
 
-实现后的核验(前提:守卫测试 `teaching-and-guards.md` C-7..C-10 已落地):
+实现后的核验(前提:守卫测试 `teaching-and-guards.md` C-4、C-9..C-11 已落地):
 
 ```text
 $ python3 -m pytest tests/contract/ -k "agent_registration"   # 守卫名以 tasks 阶段定形为准
@@ -44,4 +44,4 @@ $ grep -rn "[[STR-001]]" templates/commands/ skills/create-agent/ .qoder/command
 
 (`[[STR-001]]` 为引用形态——实际执行时以 spec Shared Strings 表中的 verbatim 值代入,连同 SKILL.md 的两条专属退役措辞一起检索。)
 
-前提与预期:退役字面**今日**在 `templates/commands/agents.md:25`、`.qoder/commands/speckit.agents.md:19` 及 SKILL.md :122/:127 有命中(实测;源与副本同步携带);实现后 C-7 守卫断言零命中(该预期由契约测试钉住,非本文口头声明)。pytest 的 `-k` 选择串以 tasks 阶段实际落地的测试命名为准,本文不预写测试文件名。
+前提与预期:退役字面**今日**在 `templates/commands/agents.md:25`、`.qoder/commands/speckit.agents.md:19` 及 SKILL.md :122/:127 有命中(实测;源与副本同步携带);实现后 C-4 守卫断言零命中(该预期由契约测试钉住,非本文口头声明)。pytest 的 `-k` 选择串以 tasks 阶段实际落地的测试命名为准,本文不预写测试文件名。

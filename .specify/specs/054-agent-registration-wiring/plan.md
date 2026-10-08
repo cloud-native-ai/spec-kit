@@ -39,7 +39,7 @@ Feature 044(spec 040)交付了中性元数据 → 各工具真实格式的渲染
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | 每项设计裁定回溯 spec FR-004..014;`requirements.md` 2026-10-08 澄清后形态,校验器 0 error |
 | II | Feature-Centric Development | ✅ Pass | 绑定 Feature 044(clarify 2026-10-08);044 详情与索引行已更新;plan 阶段继续维护(见 Feature Integration) |
 | III | Intent-Driven Development | ✅ Pass | what/why 先于 how;三处断点 + 损失陈述在 spec Overview,机制选择在本计划 Technical Context 带理由 |
-| IV | Test-First & Contract-Driven Implementation | ✅ Pass | 守卫先行写进契约(`contracts/teaching-and-guards.md` C-7..C-9:STR-001 缺席钉、链路闭合、变异演练);render-agents 子命令配 pytest 契约测试 |
+| IV | Test-First & Contract-Driven Implementation | ✅ Pass | 守卫先行写进契约(`contracts/teaching-and-guards.md` C-4 缺席钉、C-9 链路闭合、C-11 变异演练);render-agents 子命令配 pytest 契约测试 |
 | V | AI Agent Integration Standards | ✅ Pass | 不新增 agent;工具面沿 `AGENT_CONFIG`/`_ASSISTANT_TIERS` 既有 roster;`--ai` 值域取自 `_AGENT_METADATA_MAPPING` |
 | VI | Continuous Quality & Observability | ✅ Pass | render-agents 输出 stats(rendered/backups/unmapped,既有 `:615` 返回值),失败非零退出;镜像漂移由 sync-mirrors 核 |
 | VII | Specification-Plan-Task-Implementation Workflow (NON-NEGOTIABLE) | ✅ Pass | 复用优先绑定既有 Feature 044;044 状态保持 Implemented(无回退);Pre-Status-Flip 门留给 implement 阶段 |
@@ -124,7 +124,7 @@ N/A — Constitution Check 无 Fail/Partial 行(经子代理复核确认,见 Pos
 
 2026-10-08 — 设计制品(data-model.md、contracts/ ×4、quickstart.md、feature-ref.md)落盘后,新上下文只读子代理对 16 项原则逐行独立评分并执行完整性门。结果:
 
-- **宪法 16/16 ✅ Pass,与预评零分歧**(子代理逐行给出证据;IX 的「子命令是否过度工程」经独立论证维持 Pass——三替代各有证据拒绝;XIV 记一条残留观察:FR-010 使 supported-agent-tools.md 对 IDE 共享路径作第二处 authored 陈述,系 spec 已批准、受 B-4 指针形约束、可判定,不破下游)。
+- **宪法 16/16 ✅ Pass,与预评零分歧**(子代理逐行给出证据;IX 的「子命令是否过度工程」经独立论证维持 Pass——三替代各有证据拒绝;XIV 记一条残留观察:FR-010 使 supported-agent-tools.md 对 IDE 共享路径作第二处 authored 陈述,系 spec 已批准、受 teaching-and-guards C-8 指针形约束、可判定,不破下游)。
 - **完整性门 4/4**:plan 无残留 `[UPPER_SNAKE_CASE]` 占位符(扫描空);恰一个 `# Implementation Plan:` 顶标题;Requirement→Feature 戳记在位(line 4);模板自指 Note 行已移除。
 - **推敲标记扫描**:8 类标记跨全部制品零命中。
 - **跨制品一致性**:FR-001..014 全部在 feature-ref 映射(无漏);`[[STR-001]]` 引用形态在契约面完整;quickstart 免责示例均带前提;契约间无实质矛盾。
