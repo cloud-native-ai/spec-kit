@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20261004T174402Z",
+  "rendered_at": "20261008T134130Z",
   "entries": {
     ".claude/agents/skill-verifier.md": {
       "source": "templates/skill-verifier.agent.md",
@@ -26,6 +26,10 @@
     ".opencode/agents/structure-adjuster.md": {
       "source": "templates/structure-adjuster.agent.md",
       "sha256": "f623563319ac80a29d8b430ec9fb6a859865850cb1be14c424f4b2c57f28a984"
+    },
+    ".qoder/agents/dogfood-executor.agent.md": {
+      "source": "instances/dogfood-executor.agent.md",
+      "sha256": "d529c60cf5399ce40979b4336ffab56f8ffe8a3ac3f56176b7b85f2c5d4f58f1"
     },
     ".qoder/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",
