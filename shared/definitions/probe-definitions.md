@@ -84,10 +84,8 @@
 | skill-draw-excalidraw-wrapup | skill-wrapup | skill:draw-excalidraw | wrap-up |
 | skill-draw-mermaid-wrapup | skill-wrapup | skill:draw-mermaid | wrap-up |
 | skill-draw-plantuml-wrapup | skill-wrapup | skill:draw-plantuml | wrap-up |
-| skill-git-fleet-wrapup | skill-wrapup | skill:git-fleet | wrap-up |
-| skill-git-server-init-wrapup | skill-wrapup | skill:git-server-init | wrap-up |
-| skill-git-submodule-edit-wrapup | skill-wrapup | skill:git-submodule-edit | wrap-up |
-| skill-git-workflow-wrapup | skill-wrapup | skill:git-workflow | wrap-up |
+| skill-git-workspace-wrapup | skill-wrapup | skill:git-workspace | wrap-up |
+| gate-git-workflow-tiered-mode | skill-gate | skill:git-workspace | gate-git-workflow-tiered-mode |
 | skill-improve-agent-wrapup | skill-wrapup | skill:improve-agent | wrap-up |
 | skill-improve-docs-wrapup | skill-wrapup | skill:improve-docs | wrap-up |
 | skill-improve-skills-wrapup | skill-wrapup | skill:improve-skills | wrap-up |
@@ -116,8 +114,7 @@
 | gate-create-team-presence-loop | skill-gate | skill:create-team | gate-create-team-presence-loop |
 | gate-create-team-noninteractive-call | skill-gate | skill:create-team | gate-create-team-noninteractive-call |
 | gate-create-tools-no-execute | skill-gate | skill:create-tools | gate-create-tools-no-execute |
-| gate-git-workflow-tiered-mode | skill-gate | skill:git-workflow | gate-git-workflow-tiered-mode |
-| gate-git-workflow-remote-ops | skill-gate | skill:git-workflow | gate-git-workflow-remote-ops |
+| gate-git-workflow-remote-ops | skill-gate | skill:git-workspace | gate-git-workflow-remote-ops |
 | gate-improve-tools-no-test-invoke | skill-gate | skill:improve-tools | gate-improve-tools-no-test-invoke |
 | gate-summarize-project-four-gates | skill-gate | skill:summarize-project | gate-summarize-project-four-gates |
 | gate-summarize-project-structure-freeze | skill-gate | skill:summarize-project | gate-summarize-project-structure-freeze |

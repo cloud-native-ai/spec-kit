@@ -190,7 +190,7 @@ Full table with per-row notes: `.specify/shared/definitions/framework-map.md`. A
 Full model (per-consumer notes incl. Qoder CLI vs IDE, detection commands, regeneration behavior): `.specify/shared/workflow/symlink-model.md`.
 
 ## Git Workflow
-Branch roles (MAIN / PRE / DEV) are machine-maintained by the `git-workflow` skill in **`.specify/git-workflow.md`** — that managed block is the **single source of truth** for every git operation in this project. Do not edit it by hand and do not record branch information anywhere else; the operational procedure (pre-checks, rebase sequences, push strategy, `.gitexcludes` subroutine, safety rules) lives in the skill and its references.
+Branch roles (MAIN / PRE / DEV) are machine-maintained by the `git-workspace` skill (scope A) in **`docs/git-workflow.md`** — that managed block is the **single source of truth** for every git operation in this project. Do not edit it by hand and do not record branch information anywhere else; the operational procedure (pre-checks, rebase sequences, push strategy, `.gitexcludes` subroutine, safety rules) lives in the skill and its references.
 
 ## Skills & Tools
 No registration tables are maintained — agents discover resources natively from the filesystem:

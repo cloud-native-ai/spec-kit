@@ -12,7 +12,7 @@ This is a **map, not a manual**: it tells you *what* exists and *where* it lives
 | Installed skills | `.specify/skills/` | one directory per skill (`SKILL.md` + references/ + scripts/) |
 | Skills system guide | `.specify/skills.md` | how skills are discovered and created — no registry |
 | Tools system guide | `.specify/tools.md` | how tools are recorded and discovered — no registry |
-| Git workflow state | `.specify/git-workflow.md` | branch-role managed block, machine-maintained by the `git-workflow` skill |
+| Git workflow state | `docs/git-workflow.md` | branch-role managed block, machine-maintained by the `git-workflow` skill |
 | **Agent Templates** | `.specify/agents/templates/` | capability descriptions — shipped role set installed by `specify init`; each `.agent.md` is self-contained |
 | **Agent Instances** | `.specify/agents/instances/` | responsibility-bound agents authored in this project; reference a Template |
 | **Agent Execution** | `.specify/agents/execution/` | dispatch `configs/` + `scripts/` (tracked); runtime `logs/` (gitignored, never committed) |

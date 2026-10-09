@@ -38,7 +38,7 @@ Generate or update project instructions and compatibility symlinks, ensuring a c
 4. **Update instructions content**:
    - Fills placeholders with concrete details from analysis
    - Updates Documentation Map with correct file references
-   - Preserves user-authored content; supersedes machine-maintained legacy sections (registry tables are replaced by the `## Skills & Tools` pointer; an inline `## Git Workflow` block's branch roles migrate to `.specify/git-workflow.md` before removal)
+   - Preserves user-authored content; supersedes machine-maintained legacy sections (registry tables are replaced by the `## Skills & Tools` pointer; an inline `## Git Workflow` block's branch roles migrate to `docs/git-workflow.md` before removal)
    - Incorporates user input for targeted sections
 
 5. **Reintegrate preserved blocks** (only if step 2 ran):

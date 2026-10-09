@@ -76,7 +76,7 @@ KEEP_LIST = [
     ("templates/commands/implement.md", "only execute on explicit user approval"),
     ("templates/commands/implement.md", "CONFIRM"),
     ("templates/commands/tools.md", "confirm"),
-    ("skills/git-workflow/SKILL.md", "force-with-lease"),
+    ("skills/git-workspace/SKILL.md", "force-with-lease"),
     ("shared/workflow/glossary.md", "--confirmed-resolution"),
     ("shared/definitions/tool-definitions.md", "Execution never happens before user confirmation via preview gate"),
     ("skills/create-team/references/operating-loops.md", "分级确认"),

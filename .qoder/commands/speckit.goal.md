@@ -12,7 +12,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 
 ## Positioning
 
-`/speckit.goal` is the **sole authoring entry** for project-level goal definitions. It owns create, view, modify, migrate, and coordinate. No skill, script, or other command may write into the goal archive.
+`/speckit.goal` is the **sole authoring entry** for project-level goal definitions. It owns create, view, modify, migrate, and coordinate. No skill, script, or other command may write into the goal archive **directly** — the goal engine (`goal-utils.py`) is its sole writing path, whether driven by this entry or carried as delegated logic behind it.
 
 A **Goal** is a project-level authored fact source. Its concept — composition, lifecycle, boundary against Requirement, criteria authority, singularity, and the team binding — is defined once in `.specify/shared/definitions/goal-definitions.md`. **Link to that document; never restate it here.** This command owns only the *operations*.
 
