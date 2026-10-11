@@ -26,6 +26,8 @@ territory:
     - tests/**                             # run-2 扩面：引用面/契约测试适配
     - docs/**                              # B2 系列写面：根层状态/声明文件（git-workflow.md、target-structure.md 等）与 docs/reference/** 文档页；docs/public 为构建产物，不直改
     - templates/skills.md                  # run-2 扩面：分发模型说明的模板源
+    - templates/docs-target-structure-template.md   # B2b：迁出至 skills/create-docs/assets/（无内容重写）
+    - .specify/docs/**                     # B2b：旧工作区迁出至 docs/.speckit/（仅迁移）
     - templates/instructions-template.md   # B2a 引用面：Git Workflow 指针句
     - shared/workflow/artifact-commit-step.md   # B2a 引用面
     - shared/definitions/framework-map.md       # B2a 引用面
@@ -49,7 +51,7 @@ territory:
     - skills/self-improvement/**           # 跨团队写权排除 2026-10-08(用户 run 入参授权 S4-2 序列):该具名目录归 session-driven-self-improvement 团队 S4 累积 2;本团队 T-002 技能标注扫描 skills/*/SKILL.md 时 MUST 跳过它,标注面由属主团队随落地补齐
         # 跨 goal 写权裁定 2026-10-06（用户明示授权本次修改）：该文件归 session-driven-self-improvement 团队 S4；本团队 T-003 命令瘦身扫 templates/commands/*.md 时 MUST 跳过它，其薄壳形态已在对方 S4 responsibility 中按本团队 T-003 约定预对齐（该预对齐原缺 T-003 的「每个技能的输入和产出」子句，2026-10-07 已补齐对方 S4 的 responsibility 与 gate）
     - skills/draw-mermaid/server/**        # vendored（13232 文件），非技能契约面
-    - scripts/**                           # 引擎：本目标不改引擎（只读 + 执行，不写）——唯一例外：scripts/python/sync-mirrors.py（run-2 扩面，仅层映射）；其余含 scripts/python/ 全量仍禁
+    - scripts/**                           # 引擎：本目标不改引擎（只读 + 执行，不写）——例外：scripts/python/sync-mirrors.py（run-2 扩面，仅层映射）与 scripts/python/docs-utils.py 的迁出（B2b，git mv 至 skills/create-docs/scripts/，无内容重写）；其余含 scripts/python/ 全量仍禁
     - .specify/scripts/**
     - .specify/instructions.md             # 经 /speckit.instructions 再生；唯一例外：B2a 引用迁移期经 generate-instructions.sh 的指针同步（2026-10-09 用户 D1 范围；附备份 + git diff 复核）；结构性再生仍走命令
     - .specify/memory/feedback/probe-map.md   # 派生物：由 feedback-utils.py --action map 重建，禁手编
@@ -72,6 +74,7 @@ territory:
     - { type: run-2-ruling-boundary, target: 2026-10-09 用户裁定（明示）：goal.md Boundaries 的「留待后续」差异化处理现已启动，本轮范围为「技能内外分层 + 安装/可见性分流」——internal = 一切配合 .specify 结构的技能（含全部工作流技能），external = 与 .specify 无关的通用技能；internal 对客户 agent 不可见（输出至 `.specify/skills/internal/`，由 /speckit.* 工作流按显式路径引用），external 经 .qoder/skills 等既有机制扩散到用户 agent。goal.md 文本仍不可经引擎改写（无 boundary 动作），本裁定只在此记账（先例 2026-10-07） }
     - { type: run-2-ruling-a1, target: 2026-10-09 用户裁定：A1（templates/commands/goal.md :17「No skill, script, or other command may write into the goal archive」）按「授权顺手修复」处置——该句已就地补注（sole writing path = 引擎；经其承载的委派逻辑不排除）；S0 裁定表 #10（manage-goal）条件解除 }
     - { type: run-3-ruling-classification-v2, target: 2026-10-09 用户修订指令（明示，D1–D5）：分类终态改判——git-workflow/create-docs/improve-docs/create-skills/improve-skills 转 external（后两组须拆除 .specify 依赖；git-workflow 状态面迁 docs/git-workflow.md）；archive-session/code-review/manage-agents/study-project 暂列 internal（后转只需改注记）；git-fleet+git-server-init+git-submodule-edit+git-workflow 合并为 git-workspace（external，按 merge-skills 纪律，合并作为减膨胀手段）。终态 32 实体：external 17 / internal 15；20 个新建候选全 internal。判定与拆除/合并方向见 S-layer/classification.md v2 }
+    - { type: handover-out, target: 2026-10-09 用户指令（「使用 /speckit.goal 和 /speckit.team 命令经剩余工作转换为 goal 和 team，其中 team 需要进行多 subagent 协作，并发处理」）：本团队 run-2 扩展切片的**剩余批次 B2c/B2e/B3/B4/B5/B6/B7 移交**新 goal `skill-layer-install-separation`（同名新团队；serial + 阶段内 native 并发）；已完成批次 B1/B2a/B2b/B2d 的产线与记录保留在本团队。本团队此后聚焦 S1–S3；S1 起点跨团队依赖新团队 S-B 落地 }
 pattern: serial
 created: 2026-10-06
 updated: 2026-10-09
@@ -258,7 +261,7 @@ flowchart LR
 
 **跨会话续跑**：progress 文件存在即解析 stage 表定位状态，从第一个未完成 stage 继续；每个 stage 的累积批次以「已声明批次名在产物中可检索」为准，桩文件不算完成。
 
-**run-2 扩展切片（2026-10-09 用户裁定）**：新增「技能内外分层 + 安装/可见性分流」工作切片——源树 `skills/` 增 `internal/`+`external/` 层；internal 技能输出至 `.specify/skills/internal/`（对客户 agent 不可见），由 /speckit.* 工作流按显式路径引用；external 维持既有分发机制。实施序：**S-layer（分层迁移 + 镜像/发现/引用/测试适配 + 安装分流）先行，S1 起新技能直落分层树**。裁定记账见 non_path 的 `run-2-ruling-boundary` / `run-2-ruling-a1` 两条；设计产物见工作区 `.specify/teams/.work/command-logic-as-classified-skills/layering-design.md`。目标层追踪（T-004）由用户经 `/speckit.goal targets --add` 决定，本团队不代拟。分类经 2026-10-09 修订（v2）：external 17 / internal 15，并含 git 四技能 → `git-workspace` 合并（记账见 non_path `run-3-ruling-classification-v2`）。
+**run-2 扩展切片（2026-10-09 用户裁定）**：新增「技能内外分层 + 安装/可见性分流」工作切片——源树 `skills/` 增 `internal/`+`external/` 层；internal 技能输出至 `.specify/skills/internal/`（对客户 agent 不可见），由 /speckit.* 工作流按显式路径引用；external 维持既有分发机制。实施序：**S-layer（分层迁移 + 镜像/发现/引用/测试适配 + 安装分流）先行，S1 起新技能直落分层树**。裁定记账见 non_path 的 `run-2-ruling-boundary` / `run-2-ruling-a1` 两条；设计产物见工作区 `.specify/teams/.work/command-logic-as-classified-skills/layering-design.md`。目标层追踪（T-004）由用户经 `/speckit.goal targets --add` 决定，本团队不代拟。分类经 2026-10-09 修订（v2）：external 17 / internal 15，并含 git 四技能 → `git-workspace` 合并（记账见 non_path `run-3-ruling-classification-v2`）。**2026-10-09 用户指令：该扩展切片的剩余批次（B2c/B2e/B3–B7）移交新 goal/团队 `skill-layer-install-separation`（native 并发团队）；本团队保留 S1–S3，S1 起点依赖其 S-B 落地（跨团队依赖，看对方 progress）。**
 
 **Summary 刷新**：每个 stage 交接验证通过后刷新一次（`every: 1`），交付目录 `.specify/goal/command-logic-as-classified-skills/summary/`（由 `goal_slug` 派生，不由团队 slug 派生），非交互调用。门控顺序与状态行口径由 `skills/create-team/SKILL.md` §Summary Refresh 持有，run report 里 MUST 出现且只出现一条 `Summary:` 状态行。
 

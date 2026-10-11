@@ -1,0 +1,38 @@
+@startwbs
+skinparam dpi 300
+scale 4
+skinparam shadowing false
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 16
+<style>
+wbsDiagram {
+  LineColor #78909C
+  RoundCorner 10
+  node {
+    Padding 12
+    Margin 8
+    MaximumWidth 320
+  }
+  .done {
+    BackgroundColor #C6E9CB
+    LineColor #3E9256
+  }
+}
+</style>
+caption 全部工作项均已完成（✓）；无进行中/延期/未开始实例；【未记录】=负责人缺失
+* 技能分层与安装分流
+**< S-A 技能对去 .specify 化 ✓ <<done>>
+*** 技能对去 .specify 化 ✓ ◆M1 ◆M2\n【未记录】\n100% <<done>>
+**< S-B 源树重家与引用适配 ✓ <<done>>
+*** 源树重家与引用适配 ✓\n【未记录】\n100% <<done>>
+** S-C 工具链分流 ✓ <<done>>
+*** 工具链分流 ✓\n【未记录】\n100% <<done>>
+**> S-D 测试适配与守卫 ✓ <<done>>
+*** 测试适配与守卫 ✓\n【未记录】\n100% <<done>>
+**> S-E 运行时刷新与终验 ✓ <<done>>
+*** 运行时刷新与终验 ✓\n【未记录】\n100% <<done>>
+*** 收尾闭合 ✓\n【未记录】\n100% <<done>>
+legend bottom
+  <back:#C6E9CB>    </back> 已完成 ✓
+endlegend
+@endwbs

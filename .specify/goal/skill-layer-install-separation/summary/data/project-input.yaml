@@ -1,0 +1,122 @@
+schema: project-input/v1
+project:
+  project_name: skill-layer-install-separation
+  project_desc: spec-kit 的技能完成 internal/external 分层落地与安装分流:源树按内外两层组织、全仓引用一致;客户项目只获得并注册 external 技能,internal
+    技能以 .specify/skills/internal/ 嵌套下发、对客户 agent 不可见、仅供 /speckit.* 工作流按显式路径消费;框架自身两态齐备,镜像、安装
+  baseline_date: '2026-10-11'
+  repos: []
+phases:
+- phase_id: skill-layer-install-separation.S-A-skill-pair-decouple
+  phase_name: skill-layer-install-separation · stage decouple
+  phase_order: 1
+- phase_id: skill-layer-install-separation.S-B-rehome-and-refs
+  phase_name: skill-layer-install-separation · stage refs
+  phase_order: 2
+- phase_id: skill-layer-install-separation.S-C-toolchain-split
+  phase_name: skill-layer-install-separation · stage split
+  phase_order: 3
+- phase_id: skill-layer-install-separation.S-D-tests-and-guards
+  phase_name: skill-layer-install-separation · stage guards
+  phase_order: 4
+- phase_id: skill-layer-install-separation.S-E-runtime-refresh
+  phase_name: skill-layer-install-separation · stage refresh
+  phase_order: 5
+work_items:
+- item_id: skill-layer-install-separation.TI-0001
+  item_name: S-A 技能对去 .specify 化(create-skills + improve-skills;virtual 降级执行,verifier PASS)
+  phase_id: skill-layer-install-separation.S-A-skill-pair-decouple
+  status: 已完成
+  source: .specify/teams/skill-layer-install-separation/runs/20261009T080933Z-report.md#result-summary
+- item_id: skill-layer-install-separation.TI-0002
+  item_name: S-B 源树重家(32→17/15)+ 全引用面适配(命令树/技能包/文档面;G1 裁定放行)
+  phase_id: skill-layer-install-separation.S-B-rehome-and-refs
+  status: 已完成
+  source: .specify/teams/skill-layer-install-separation/runs/20261009T181458Z-report.md#result-summary
+- item_id: skill-layer-install-separation.TI-0003
+  item_name: S-C 工具链分流(sync-mirrors 两对/CLI 两层复制+迁移+rewrite 两分支/打包验证;verifier 5/5)
+  phase_id: skill-layer-install-separation.S-C-toolchain-split
+  status: 已完成
+  source: .specify/teams/skill-layer-install-separation/runs/20261009T181458Z-report.md#result-summary
+- item_id: skill-layer-install-separation.TI-0004
+  item_name: S-D 测试面全量适配 + 两条守卫(红绿演练)+ 全量 A/B 零新增(verifier 4/4)
+  phase_id: skill-layer-install-separation.S-D-tests-and-guards
+  status: 已完成
+  source: .specify/teams/skill-layer-install-separation/runs/20261009T181458Z-report.md#result-summary
+- item_id: skill-layer-install-separation.TI-0005
+  item_name: S-E 运行时刷新与 goal 判据终验(ACCEPT 2/2)
+  phase_id: skill-layer-install-separation.S-E-runtime-refresh
+  status: 已完成
+  source: .specify/teams/skill-layer-install-separation/runs/20261009T181458Z-report.md#result-summary
+- item_id: skill-layer-install-separation.TI-0006
+  item_name: 收尾闭合:终检全绿 + T1 关闭(clarify frontmatter 内部技能按名引用删除)+ /tmp 泄漏回收 43G + pycache 清理
+  phase_id: skill-layer-install-separation.S-E-runtime-refresh
+  status: 已完成
+  source: .specify/teams/skill-layer-install-separation/runs/20261011T021003Z-report.md#result-summary
+milestones:
+- milestone_id: MS-0001
+  milestone_name: '源树与运行时双布局按内外两层一致落地:全仓引用与所在层匹配;镜像、安装、打包三引擎按两层映射工作,各自 --check '
+  anchor_item_id: skill-layer-install-separation.TI-0001
+  source: .specify/goal/skill-layer-install-separation/goal.md
+- milestone_id: MS-0002
+  milestone_name: 分流行为可验证:平铺发现面只注册 external 技能、internal 技能经 .specify/skills/in
+  anchor_item_id: skill-layer-install-separation.TI-0001
+  source: .specify/goal/skill-layer-install-separation/goal.md
+people:
+- owner_id: agent-team-supervisor-template
+  owner_name: 未记录
+  owner_role: team-supervisor
+- owner_id: framework-engineer
+  owner_name: framework-engineer
+  owner_role: framework-engineer
+- owner_id: structure-adjuster
+  owner_name: Structure Adjuster
+  owner_role: structure-aligner
+- owner_id: skill-verifier
+  owner_name: Skill Verifier
+  owner_role: contract-checker
+features: []
+sources:
+- source_id: S-0001
+  source_kind: user-form
+  source_ref: .specify/teams/skill-layer-install-separation/
+  covers:
+  - work_items
+  - phases
+  - people
+coverage:
+  candidate_total: 6
+  excluded: 0
+  granularity_truncated: 0
+  unattributed: 0
+  source_label: 团队条目台账 items.jsonl
+targets:
+  goal_slug: skill-layer-install-separation
+  axis_note: 切片轴(范围覆盖度)——与判据轴分列,不推导 achieved
+  items:
+  - id: T-001
+    statement: create-skills 与 improve-skills 完成去 .specify 化,技能以通用 skills 根为主、Spec Kit 集成为可选
+    authored_status: open
+    attributed_items: 0
+    completed_items: 0
+    pending_approval: false
+  - id: T-002
+    statement: 技能源树完成 internal/external 双层重家(32 实体各归其位),重家后引用面完成全量适配
+    authored_status: open
+    attributed_items: 0
+    completed_items: 0
+    pending_approval: false
+  - id: T-003
+    statement: 镜像、安装与打包工具链完成两层映射与旧装迁移,两布局各自自洽
+    authored_status: open
+    attributed_items: 0
+    completed_items: 0
+    pending_approval: false
+  - id: T-004
+    statement: 测试适配、两条守卫测试与本仓自用运行时刷新全部落地
+    authored_status: open
+    attributed_items: 0
+    completed_items: 0
+    pending_approval: false
+  coverage: 0/4 done
+  unattributed_to_target: 6
+  invalid_refs: 0
