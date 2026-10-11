@@ -1,6 +1,6 @@
 # Subagent Definitions Reference
 
-Canonical definition of a **Subagent**, its three execution modes, the mode-selection rules, and the visibility contract for external CLI dispatch. This file is the single source of truth for the Subagent concept; other documents (`/speckit.agents`, `/speckit.team`, `skills/create-team`) link here rather than re-defining it.
+Canonical definition of a **Subagent**, its three execution modes, the mode-selection rules, and the visibility contract for external CLI dispatch. This file is the single source of truth for the Subagent concept; other documents (`/speckit.agents`, `/speckit.team`, `skills/internal/create-team`) link here rather than re-defining it.
 
 **Position in the Agent taxonomy**: a subagent is the **Agent Execution** layer of the three-layer model defined in [`agent-definitions.md`](agent-definitions.md) — *Agent Template → Agent Instance → Agent Execution* — viewed from the orchestrator that delegated it. This document governs only the Execution layer: how an Agent Instance's definition becomes a live run, and how that run stays observable.
 
@@ -70,7 +70,7 @@ Every external subagent dispatch MUST therefore:
    - give every dispatch a stable **label** (`<team-slug>--<run-stamp>--<member-role>`) that names the triplet files, and open the dispatched prompt with that label as a prefix line so the session's own transcript is self-identifying;
    - record the dispatch mapping (label → CLI → member → workspace) in the run report — the mapping table, not a renamed session, is the canonical cross-reference surface.
 
-**Reference implementation**: `skills/create-team/scripts/dispatch.sh` (+ `stream-filter.py`) — a generic, CLI-agnostic wrapper implementing the four observability points above (works with `qodercli` and `claude`; override via `DISPATCH_CLI`; the label convention of point 5 is the caller's responsibility). Team runbooks and command workflows SHOULD reuse it instead of re-rolling per-run dispatch scripts.
+**Reference implementation**: `skills/internal/create-team/scripts/dispatch.sh` (+ `stream-filter.py`) — a generic, CLI-agnostic wrapper implementing the four observability points above (works with `qodercli` and `claude`; override via `DISPATCH_CLI`; the label convention of point 5 is the caller's responsibility). Team runbooks and command workflows SHOULD reuse it instead of re-rolling per-run dispatch scripts.
 
 ## Dispatch-Time Governance Obligation
 
@@ -85,8 +85,8 @@ The obligation binds all three execution modes (native / virtual / external) equ
 | Term | Meaning | Where defined |
 |------|---------|---------------|
 | **Agent Template / Instance / Execution** | The three-layer Agent taxonomy; a subagent is the Execution layer | `shared/definitions/agent-definitions.md` |
-| **Agent Instance** (a.k.a. agent definition) | Responsibility-bound `.agent.md` (under `.specify/agents/instances/`) a subagent is launched from | `agent-definitions.md`; authored via `/speckit.agents`, `skills/create-agent` |
+| **Agent Instance** (a.k.a. agent definition) | Responsibility-bound `.agent.md` (under `.specify/agents/instances/`) a subagent is launched from | `agent-definitions.md`; authored via `/speckit.agents`, `skills/internal/create-agent` |
 | **Subagent** (this document) | A running, task-scoped delegated Agent Execution | here |
-| **Team** | Multi-agent structure orchestrating several subagents | `/speckit.team`, `skills/create-team` |
+| **Team** | Multi-agent structure orchestrating several subagents | `/speckit.team`, `skills/internal/create-team` |
 | **Tool** | Pre-verified reusable capability record (`.specify/memory/tools/`) | `shared/definitions/tool-definitions.md` |
 | **AI agent CLI** | A supported coding agent binary (`qodercli`, `claude`, …) | `docs/reference/cli/` |

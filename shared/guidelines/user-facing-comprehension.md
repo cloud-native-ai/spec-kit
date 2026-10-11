@@ -23,13 +23,13 @@
 同为**封闭条件集**:命中下列任一条即违规,无「视情况」档。
 
 1. **存在用户视角途径时的引擎/脚本/函数内部调用形态**——同一件事有面向用户的入口(命令、菜单项、编辑入口)却写出内部调用形式。依据:读者无法照做,且内部形态会随重构失效。
-2. **内部标识**渗入面向读者的正文——内部代号、分级码、字段名、库表列名、脚本名、章节编号等只对本仓维护者有意义的标识符。本条的**实例来源**为 `.specify/skills/summarize-project/references/reporting-playbook.md` §1.7:该处已在真实报告中沉淀出一份可判定的内部标识清单与「读者向改写映射」(把内部值翻译成读者能据以行动的散文)。该清单 MUST 被提升进本节作为实例,提升后原处 MUST 收敛为指针,MUST NOT 保留第二份独立黑名单。
+2. **内部标识**渗入面向读者的正文——内部代号、分级码、字段名、库表列名、脚本名、章节编号等只对本仓维护者有意义的标识符。本条的**实例来源**为 `.specify/skills/internal/summarize-project/references/reporting-playbook.md` §1.7:该处已在真实报告中沉淀出一份可判定的内部标识清单与「读者向改写映射」(把内部值翻译成读者能据以行动的散文)。该清单 MUST 被提升进本节作为实例,提升后原处 MUST 收敛为指针,MUST NOT 保留第二份独立黑名单。
 3. **在该消费单元内首次出现却无就地注解的缩写**——注解义务按消费单元计,MUST NOT 按会话计(定义见 § 基准读者与覆盖协议)。
 4. **以代码符号名充当行为概念名**——用函数名、类名或配置键指代一个行为概念来提问或陈述。依据:读者要读代码才知道这个概念是什么,而本纪律的前提是他不读代码。
 
 改写方向一律是「读者能据以行动的散文」,MUST NOT 是「更短的内部词」。
 
-**条目 ② 的实例来源**(由 `skills/summarize-project/references/reporting-playbook.md` §1.7 提升而来):该处已在真实报告运行中沉淀出一份可判定的类别枚举与读者向改写映射,提升后原处 MUST 以指针接入本节、MUST NOT 保留第二份独立黑名单。类别枚举:
+**条目 ② 的实例来源**(由 `skills/internal/summarize-project/references/reporting-playbook.md` §1.7 提升而来):该处已在真实报告运行中沉淀出一份可判定的类别枚举与读者向改写映射,提升后原处 MUST 以指针接入本节、MUST NOT 保留第二份独立黑名单。类别枚举:
 
 - **分级代号**:`T1`–`T5`(信息源 tier)、`E1`–`E5`(构建/CI 证据分级)
 - **处理与门禁编号**:`RC-1`~`RC-5`(诚实处理编号)、`CG-COVERAGE`、`CG-1`~`CG-11`(覆盖/自洽门禁名)、规则文档的 `§编号`
@@ -100,7 +100,7 @@
 | ⑤ | 澄清提问与选项表 | `templates/commands/clarify.md`、`shared/guidelines/requirements-guidelines.md` | — |
 | ⑥ | 主动流程建议行 | `shared/guidelines/proactive-trigger.md` | — |
 | ⑦ | 面向干系人的需求/规划/任务工件 | `shared/guidelines/requirements-guidelines.md` | `shared/guidelines/requirements-guidelines.md` |
-| ⑧ | 面向外部读者的项目总结报告 | `skills/summarize-project/references/reporting-playbook.md` | `skills/summarize-project/references/project-overview.md` |
+| ⑧ | 面向外部读者的项目总结报告 | `skills/internal/summarize-project/references/reporting-playbook.md` | `skills/internal/summarize-project/references/project-overview.md` |
 | ⑨ | 词汇表校正的对外呈现 | `shared/workflow/glossary.md` | — |
 | ⑩ | 流程收尾报告 | `shared/guidelines/confirmation-gates.md` | — |
 | ⑪ | 失败如实报告 | `shared/guidelines/confirmation-gates.md`, `shared/guidelines/fast-fail.md` | — |

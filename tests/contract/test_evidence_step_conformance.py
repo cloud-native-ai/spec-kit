@@ -13,17 +13,17 @@ pytestmark = pytest.mark.contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-COLLECT_SKILL = REPO_ROOT / "skills" / "collect-evidence" / "SKILL.md"
-COLLECT_SKILL_MIRROR = REPO_ROOT / ".specify" / "skills" / "collect-evidence" / "SKILL.md"
-CONTRACT_REF = REPO_ROOT / "skills" / "collect-evidence" / "references" / "evidence-contract.md"
-DISCIPLINE_REF = REPO_ROOT / "skills" / "collect-evidence" / "references" / "evidence-discipline.md"
+COLLECT_SKILL = REPO_ROOT / "skills" / "internal" / "collect-evidence" / "SKILL.md"
+COLLECT_SKILL_MIRROR = REPO_ROOT / ".specify" / "skills" / "internal" / "collect-evidence" / "SKILL.md"
+CONTRACT_REF = REPO_ROOT / "skills" / "internal" / "collect-evidence" / "references" / "evidence-contract.md"
+DISCIPLINE_REF = REPO_ROOT / "skills" / "internal" / "collect-evidence" / "references" / "evidence-discipline.md"
 EVIDENCE_STEP = REPO_ROOT / ".specify" / "shared" / "workflow" / "evidence-step.md"
 EVIDENCE_STEP_SRC = REPO_ROOT / "shared" / "workflow" / "evidence-step.md"
 
 IMPROVE_SKILLS = {
-    "improve-skills": REPO_ROOT / "skills" / "improve-skills" / "SKILL.md",
-    "improve-agent": REPO_ROOT / "skills" / "improve-agent" / "SKILL.md",
-    "improve-team": REPO_ROOT / "skills" / "improve-team" / "SKILL.md",
+    "improve-skills": REPO_ROOT / "skills" / "external" / "improve-skills" / "SKILL.md",
+    "improve-agent": REPO_ROOT / "skills" / "internal" / "improve-agent" / "SKILL.md",
+    "improve-team": REPO_ROOT / "skills" / "internal" / "improve-team" / "SKILL.md",
 }
 
 SEVEN_STATES = [
@@ -131,7 +131,9 @@ class TestImproveSkillIntegration:
 
     def test_mirror_identical(self, skill):
         name, path, text = skill
-        mirror = REPO_ROOT / ".specify" / "skills" / name / "SKILL.md"
+        flat = REPO_ROOT / ".specify" / "skills" / name / "SKILL.md"
+        nested = REPO_ROOT / ".specify" / "skills" / "internal" / name / "SKILL.md"
+        mirror = flat if flat.is_file() else nested
         assert mirror.is_file(), f"{name} mirror missing"
         assert path.read_bytes() == mirror.read_bytes()
 

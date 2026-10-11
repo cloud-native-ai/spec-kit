@@ -18,7 +18,9 @@ SCAN_FILES = ["pyproject.toml", "README.md"]
 # tree is reorganized (history went docs/history -> docs/reference/history, the proposal
 # went docs/summary -> docs/archive) and a parts[0] match silently stopped excluding them,
 # which is what turned this test red without any live reference appearing.
-DOCS_EXCLUDE_DIRS = {"history", "archive"}
+# `.speckit` is the docs machine zone (audit/plans snapshots, engine-generated and
+# timestamp-named) — dated records, never cited as current reality.
+DOCS_EXCLUDE_DIRS = {"history", "archive", ".speckit"}
 
 TEXT_SUFFIXES = {".md", ".py", ".sh", ".toml", ".txt", ".json"}
 TOKEN = "sdd-workflow"

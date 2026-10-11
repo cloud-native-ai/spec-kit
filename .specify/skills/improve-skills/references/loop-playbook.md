@@ -171,13 +171,13 @@ Flag these as migration candidates and apply this Migration Mapping table:
 ### Feedback-section conformance
 
 Verify the Skill carries a `## Feedback` section as its final workflow section, beginning with
-the **runtime-mode gate** (`.specify/shared/workflow/runtime-mode.md`), and that the rest of
-the section is the **skill reference form** owned by
-`.specify/shared/workflow/feedback-step.md` § *Embedded reference forms* — a pointer plus
+the **runtime-mode gate** (rule owner: `.specify/shared/workflow/runtime-mode.md`, when present), and that the rest of
+the section is the **skill reference form** owned by the shared feedback-step doc
+(`.specify/shared/workflow/feedback-step.md` § *Embedded reference forms*, when present) — a pointer plus
 this Skill's unit id, never a copy of the rules.
 
-- **Missing** → append the skill reference form from
-  `.specify/shared/workflow/feedback-step.md` § *Embedded reference forms*, substituting
+- **Missing** → append the skill reference form from the shared feedback-step doc
+  (`.specify/shared/workflow/feedback-step.md` § *Embedded reference forms*, when present), substituting
   only `skill:<name>`.
 - **Malformed** → realign to that form. Malformed means any of: missing runtime-mode gate,
   missing pointer to `feedback-step.md`, wrong or missing `--unit-id "skill:<name>"` /
@@ -185,7 +185,7 @@ this Skill's unit id, never a copy of the rules.
   steps, submission-prompt semantics, abort/partial rule, nesting rule, token-efficiency
   self-assessment) instead of pointing at them. A restatement is drift in waiting: repair it
   by deleting the copy and leaving the pointer, never by re-wording the copy to agree.
-- Apply the fix to **both** `skills/<name>/SKILL.md` and `.specify/skills/<name>/SKILL.md`.
+- Apply the fix to **both** the canonical source and its mirror projection when a mirror discipline exists (Spec Kit: `skills/<name>/SKILL.md` and `.specify/skills/<name>/SKILL.md`).
 - **Standalone-mode exception** — for a Skill in a standalone (non–Spec Kit) skills directory
   (no `.specify/` at the working-directory root) the engine-backed section is NOT required: a
   self-contained gated reflection section is conformant, the dual-copy rule does not apply,
@@ -274,7 +274,7 @@ every downstream pointer moves with it. In this repo:
 5. Fix stale pointers in artifacts the old skill dogfooded (e.g. report headers naming the
    predecessor skill).
 
-Sync the `skills/<name>/` ↔ `.specify/skills/<name>/` mirror with `\cp -rf` (plain `cp` may be
+Sync the canonical↔mirror pair when one exists (Spec Kit: `skills/<name>/` ↔ `.specify/skills/<name>/`) with `\cp -rf` (plain `cp` may be
 aliased to `cp -i` and silently skip overwrites) and verify byte-equivalence with `diff -rq`.
 
 **Move-then-edit order**: when a rename uses `git mv`, re-read the file at its NEW path before
@@ -294,7 +294,7 @@ counts is not sufficient. Prove zero regression with a **failure-set diff**:
 
 Prefer `git worktree add <tmp> HEAD` for the clean baseline: it is read-only with respect to
 the working tree and immune to concurrent writers (a running continuous team writing into
-`.specify/teams/` mid-run can block `git stash pop` and strand a stash entry). Use
+tracked team state (`.specify/teams/` in Spec Kit projects) mid-run can block `git stash pop` and strand a stash entry). Use
 `git stash -u` + rerun + `git stash pop` only when worktrees are unavailable.
 
 If a combined validation command returns only partial output or omits later checks, rerun the
@@ -302,7 +302,7 @@ missing checks individually before concluding validation passed.
 
 **Metadata validation detail**: when `skill_id` is added or corrected, ensure the directory
 name and frontmatter `name` agree and no other skill directory carries the same `name`
-(there is no registration table — see `.specify/skills.md`).
+(there is no registration table — see the skills guide `.specify/skills.md` when present).
 
 ### Recorded exception (shape gate)
 
@@ -311,7 +311,7 @@ body is over the L1 budget or trips a blocking shape rule. Finishing a loop on a
 legitimate under exactly two cases:
 
 - **Contract-mandated inline section** — a feature spec or contract test requires a section to
-  stay inline in `SKILL.md` (grep `.specify/specs/**` and `tests/contract/**` before claiming
+  stay inline in `SKILL.md` (grep the governing spec tree (`.specify/specs/**` in Spec Kit projects) and `tests/contract/**` before claiming
   this case), and keeping it inline pushes the controllable body past budget. The report names
   the mandating file.
 - **Pre-existing over-budget baseline** — the step-2 gate run already exited `10` before this
@@ -349,8 +349,8 @@ shape rather than retried harder.
 ### Batch triage ownership
 
 A unit naming a Skill absent from *this* repo is not automatically out of scope. First resolve
-where the Skill actually lives — host skills dirs (`~/.qoder/skills/`), sibling project roots'
-`.specify/skills/`, hardlink/write-through copies — and process it *there* when the user owns
+where the Skill actually lives — host skills dirs (`~/.qoder/skills/`), sibling project roots' skills trees
+(incl. `.specify/skills/` when present), hardlink/write-through copies — and process it *there* when the user owns
 that location (e.g. the framework developer handling cross-project feedback). Only mark a unit
 out of scope after its install location is unknown or owned elsewhere.
 

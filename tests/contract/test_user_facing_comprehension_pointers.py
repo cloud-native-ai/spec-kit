@@ -63,7 +63,7 @@ INTERVIEW = ROOT / "shared" / "patterns" / "interview-pattern.md"
 CLARIFY_CMD = ROOT / "templates" / "commands" / "clarify.md"
 REQ_GUIDELINES = ROOT / "shared" / "guidelines" / "requirements-guidelines.md"
 PROACTIVE = ROOT / "shared" / "guidelines" / "proactive-trigger.md"
-PLAYBOOK = ROOT / "skills" / "summarize-project" / "references" / "reporting-playbook.md"
+PLAYBOOK = ROOT / "skills" / "internal" / "summarize-project" / "references" / "reporting-playbook.md"
 GLOSSARY = ROOT / "shared" / "workflow" / "glossary.md"
 REGEN = ROOT / "scripts" / "python" / "regen-command-copies.py"
 
@@ -75,7 +75,7 @@ RULE_SOURCES = (
     ("templates/commands/clarify.md", "⑤"),
     ("shared/guidelines/requirements-guidelines.md", "⑤⑦"),
     ("shared/guidelines/proactive-trigger.md", "⑥"),
-    ("skills/summarize-project/references/reporting-playbook.md", "⑧"),
+    ("skills/internal/summarize-project/references/reporting-playbook.md", "⑧"),
     ("shared/workflow/glossary.md", "⑨"),
 )
 
@@ -88,7 +88,11 @@ FROZEN_SECTIONS = {
     # Re-frozen 2026-09-23 for the F-13 destructive-bucket registration (goal criteria
     # emptied by an argument-less call). Deliberate, not silent: only this section moved.
     "破坏性动作清单": "7f876df208df63bfd5041219ef10062f9e77c76f2204b51601a5a72281cfd9c9",
-    "治理保留清单": "92c1c367428a34d038de9c0e85ef37c346dee00d49e7653421e5a64aae91d703",
+    # Re-frozen 2026-10-09 for the skill-layer merge follow-through (D5: git-workflow
+    # merged into git-workspace) — the row's owner cell now names the merged skill in
+    # its layered source form. Deliberate, not silent: only the owner cell moved, the
+    # gate wording is unchanged (row count still pinned below).
+    "治理保留清单": "29274c053b4047c32aea24a917b06e32bd4575c8639ad5bff5e86b523b8f1eea",
     "存疑从严": "c1f18db4b9eedf55036cdcb77ef7fd9b41791c4bc292b2d57de346e1744facea",
     "回流约束": "ae1711acd3a325334150051f1193f47631eb043ad336e156b02fa4eca6583af7",
 }
@@ -445,7 +449,7 @@ def test_c12_no_independent_blacklist_copy():
     assert any("读者用语纪律已过" in ln for ln in pb), (
         "reporting-playbook.md's landing-gate checklist item was deleted — C-12 requires it kept"
     )
-    po = _text(ROOT / "skills" / "summarize-project" / "references" / "project-overview.md")
+    po = _text(ROOT / "skills" / "internal" / "summarize-project" / "references" / "project-overview.md")
     assert "无内部黑话" in po and "外部读者不读代码也能看懂" in po, (
         "project-overview.md's landing check was deleted — C-12 requires it kept"
     )

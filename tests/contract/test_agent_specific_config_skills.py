@@ -6,9 +6,9 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 
 SKILL_DIRS = [
-    ROOT / "skills" / "create-agent",
-    ROOT / "skills" / "improve-agent",
-    ROOT / "skills" / "improve-skills",
+    ROOT / "skills" / "internal" / "create-agent",
+    ROOT / "skills" / "internal" / "improve-agent",
+    ROOT / "skills" / "external" / "improve-skills",
 ]
 
 REQUIRED_SECTION_HEADINGS = [

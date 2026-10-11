@@ -24,11 +24,11 @@ tags: []
 ## Lifecycle automation
 
 ```bash
-python3 scripts/python/docs-utils.py --action scan --root .
-python3 scripts/python/docs-utils.py --action expire --root .
-python3 scripts/python/docs-utils.py --action clean [--yes] --root .
-python3 scripts/python/docs-utils.py --action archive-check --root .
-python3 scripts/python/docs-utils.py --action stats --root .
+python3 skills/external/create-docs/scripts/docs-utils.py --action scan --root .
+python3 skills/external/create-docs/scripts/docs-utils.py --action expire --root .
+python3 skills/external/create-docs/scripts/docs-utils.py --action clean [--yes] --root .
+python3 skills/external/create-docs/scripts/docs-utils.py --action archive-check --root .
+python3 skills/external/create-docs/scripts/docs-utils.py --action stats --root .
 ```
 
 ## What belongs here / not

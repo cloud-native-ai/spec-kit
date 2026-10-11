@@ -45,9 +45,9 @@ draft --past expires-------> expired --confirmed delete--> removed (notes zone o
 expired --renew------------> draft (new expires)
 ```
 
-Deterministic automation: `python3 scripts/python/docs-utils.py --action scan|expire|clean|archive-check|stats|validate|audit` (contract: `.specify/specs/033-docs-command/contracts/docs-utils-cli.md`). Three safeguards — frontmatter metadata, engine automation, and the `/speckit.docs` reconcile loop — keep `notes/` from becoming a landfill.
+Deterministic automation: `python3 skills/external/create-docs/scripts/docs-utils.py --action scan|expire|clean|archive-check|stats|validate|audit` (contract: `.specify/specs/033-docs-command/contracts/docs-utils-cli.md`). Three safeguards — frontmatter metadata, engine automation, and the `/speckit.docs` reconcile loop — keep `notes/` from becoming a landfill.
 
 ## Consistency maintenance
 
 - **Incremental**: every complex `/speckit.*` command ends with the docs-sync evaluation step (`shared/workflow/docs-step.md`): 需记录（目标文档 + 要点） or 无需记录.
-- **Convergent**: `/speckit.docs` reconciles the whole space on demand (tolerance band, dry-run plan, tiered confirmation, archive-not-delete, audit trail in `.specify/docs/`).
+- **Convergent**: `/speckit.docs` reconciles the whole space on demand (tolerance band, dry-run plan, tiered confirmation, archive-not-delete, audit trail in `docs/.speckit/`).

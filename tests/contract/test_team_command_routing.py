@@ -70,7 +70,7 @@ PER_TOOL_COPIES = tuple(p for p in _COPY_CANDIDATES if p.is_file())
 
 STR_GOAL_UNDEFINED = "goal 未定义:"  # [[STR-003]]
 
-VERIFY = REPO_ROOT / "skills/create-team/scripts/verify-territory-disjoint.py"
+VERIFY = REPO_ROOT / "skills/internal/create-team/scripts/verify-territory-disjoint.py"
 
 pytestmark = pytest.mark.contract
 
@@ -146,7 +146,7 @@ def test_preset_matching_reuses_the_existing_mechanism():
 # preset matcher verdict (F-15): pattern vocabulary alone is not a preset match
 # --------------------------------------------------------------------------
 
-MATCHER = REPO_ROOT / "skills/create-team/scripts/match-team-preset.py"
+MATCHER = REPO_ROOT / "skills/internal/create-team/scripts/match-team-preset.py"
 
 
 def _fixture_presets(tmp_path) -> Path:
@@ -380,7 +380,7 @@ def test_real_overlap_with_a_landed_team_is_still_contested(tmp_path):
 def test_verdicts_match_direct_detect_overlaps(tmp_path):
     """Grammar-parity pin: the wrapper must not fork the overlap grammar."""
     spec = importlib.util.spec_from_file_location(
-        "bsi_parity", REPO_ROOT / "skills/create-team/scripts/build-summary-input.py")
+        "bsi_parity", REPO_ROOT / "skills/internal/create-team/scripts/build-summary-input.py")
     bsi = importlib.util.module_from_spec(spec)
     sys.modules["bsi_parity"] = bsi
     spec.loader.exec_module(bsi)

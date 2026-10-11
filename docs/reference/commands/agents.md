@@ -53,7 +53,7 @@ When creating an agent, `create-agent` supports several **modes** (`kind`). If t
 
 Different projects often need very different agents, so `project-custom` creation follows a **flexible flow** (not a fixed sequence). Two things are always mandatory:
 
-- **Project marking** — the agent is generated from `skills/create-agent/templates/agent-project-custom-template.md` and MUST record its bound project in the `project:` frontmatter field.
+- **Project marking** — the agent is generated from `skills/internal/create-agent/templates/agent-project-custom-template.md` and MUST record its bound project in the `project:` frontmatter field.
 - **Project Scope Guard** — the agent keeps a `## Project Scope Guard` section that, at invocation, resolves the current project (from `.specify/instructions.md`, the constitution, or `README.md`) and compares it to the bound project. On a mismatch it warns the user prominently and requests explicit confirmation before proceeding, rather than running silently in a project it was not built for.
 
 Everything else (purpose, workflow, output format) is free-form and adapts to the project.
@@ -100,7 +100,7 @@ Each tool's `agents/` directory holds **rendered real files** translated at `spe
 
 ## Companion Skills
 
-- `create-agent` — author new role-based, custom, or project-custom agents (canonical templates in `skills/create-agent/templates/`)
+- `create-agent` — author new role-based, custom, or project-custom agents (canonical templates in `skills/internal/create-agent/templates/`)
 - `improve-agent` — iteratively improve an existing agent from execution feedback
 - Team orchestration (parallel / serial / iteration / continuous) is owned by [`/speckit.team`](team.md) via the `create-team` / `improve-team` skills
 
@@ -191,7 +191,7 @@ Each tool's `agents/` directory holds **rendered real files** translated at `spe
 
 ## Companion Skills
 
-- `create-agent` — author new role-based or custom agents (canonical templates in `skills/create-agent/templates/`)
+- `create-agent` — author new role-based or custom agents (canonical templates in `skills/internal/create-agent/templates/`)
 - `improve-agent` — iteratively improve an existing agent from execution feedback
 - Team orchestration (parallel / serial / iteration / continuous) is owned by [`/speckit.team`](team.md) via the `create-team` / `improve-team` skills
 

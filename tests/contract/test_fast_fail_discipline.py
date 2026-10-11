@@ -45,8 +45,8 @@ INSTR_LIVE = ROOT / ".specify" / "instructions.md"
 
 SUBAGENT_DEFS = ROOT / "shared" / "definitions" / "subagent-definitions.md"
 UFC_DOC = ROOT / "shared" / "guidelines" / "user-facing-comprehension.md"
-TEAM_PATTERNS = ROOT / "skills" / "create-team" / "references" / "patterns.md"
-CREATE_AGENT_SKILL = ROOT / "skills" / "create-agent" / "SKILL.md"
+TEAM_PATTERNS = ROOT / "skills" / "internal" / "create-team" / "references" / "patterns.md"
+CREATE_AGENT_SKILL = ROOT / "skills" / "internal" / "create-agent" / "SKILL.md"
 AGENTS_CMD = ROOT / "templates" / "commands" / "agents.md"
 CONST_TPL = ROOT / "templates" / "constitution-template.md"
 CONST_CMD = ROOT / "templates" / "commands" / "constitution.md"
@@ -611,8 +611,8 @@ INSTANCE_POINTS = {
     "templates/commands/docs.md": "MUST NOT truncate or silently defer the tail",
     "templates/commands/clarify.md": "If no `requirements.md` at all",
     "templates/commands/interview.md": "Surface conflicts; never resolve them silently",
-    "skills/create-team/references/create-mode.md": "MUST NOT silently degrade to inline goal creation",
-    "skills/draw-diagram/SKILL.md": "静默降级",
+    "skills/internal/create-team/references/create-mode.md": "MUST NOT silently degrade to inline goal creation",
+    "skills/external/draw-diagram/SKILL.md": "静默降级",
 }
 
 
@@ -1262,7 +1262,7 @@ AGENT_TREES = (
     (".opencode/agents", "{slug}.md"),
 )
 PRESET_SLUGS = ("skill-verifier", "structure-adjuster")
-DISPATCH_WRAPPER = ROOT / "skills" / "create-team" / "scripts" / "dispatch.sh"
+DISPATCH_WRAPPER = ROOT / "skills" / "internal" / "create-team" / "scripts" / "dispatch.sh"
 OWNER_SECTION = "## 子代理派发注入"
 VISIBILITY_HEADING = "## External Dispatch Visibility Contract"
 GOVERNANCE_HEADING = "## Dispatch-Time Governance Obligation"
@@ -1615,7 +1615,7 @@ SIX_UNCHANGED_PATHS = (
     "scripts/python/regen-command-copies.py",
     "scripts/bash/generate-instructions.sh",
     "scripts/python/feedback-utils.py",
-    "skills/create-team/scripts/dispatch.sh",
+    "skills/internal/create-team/scripts/dispatch.sh",
     "src/specify_cli/__init__.py",
 )
 FEATURE_WRITE_SURFACE = (
@@ -1627,10 +1627,10 @@ FEATURE_WRITE_SURFACE = (
     "templates/commands/constitution.md",
     "templates/commands/agents.md",
     "templates/commands/implement.md",
-    "skills/create-team/references/patterns.md",
-    "skills/create-team/references/create-mode.md",
-    "skills/create-agent/SKILL.md",
-    "skills/draw-diagram/SKILL.md",
+    "skills/internal/create-team/references/patterns.md",
+    "skills/internal/create-team/references/create-mode.md",
+    "skills/internal/create-agent/SKILL.md",
+    "skills/external/draw-diagram/SKILL.md",
     "agents/skill-verifier.agent.md",
 )
 
@@ -1902,7 +1902,7 @@ def test_g16_six_engines_zero_change():
         assert path.is_file(), f"G-16: {rel} is missing"
         assert len(_text(path)) > 200, f"G-16: {rel} read as near-empty"
     # invariants that a "fix" to the gate budget would have to break
-    wrapper = _text(ROOT / "skills" / "create-team" / "scripts" / "dispatch.sh")
+    wrapper = _text(ROOT / "skills" / "internal" / "create-team" / "scripts" / "dispatch.sh")
     assert MARKER_CLAUSE not in wrapper, (
         "G-16: the injection clause was implemented into the dispatch wrapper -- it must stay caller-side"
     )
@@ -1920,7 +1920,7 @@ def test_g17_mirrors_produced_by_engines_only():
     assert ("shared", ".specify/shared") in pairs, "G-17: the shared mirror pair is gone"
     assert ("agents", ".specify/agents/templates") in pairs, "G-17: the agents mirror pair is gone"
     assert ("templates", ".specify/templates") in pairs, "G-17: the templates mirror pair is gone"
-    assert len(mod.MIRROR_PAIRS) == 5, f"G-17: MIRROR_PAIRS has {len(mod.MIRROR_PAIRS)} entries, expected 5"
+    assert len(mod.MIRROR_PAIRS) == 6, f"G-17: MIRROR_PAIRS has {len(mod.MIRROR_PAIRS)} entries, expected 6 (skills split into external+internal)"
     # every artifact this feature mirrored is byte-identical to its source
     for src, mirror in (
         (DOC, DOC_MIRROR),

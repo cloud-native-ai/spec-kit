@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-GENERATOR = REPO_ROOT / "skills/create-team/scripts/build-summary-input.py"
+GENERATOR = REPO_ROOT / "skills/internal/create-team/scripts/build-summary-input.py"
 GOAL_UTILS = REPO_ROOT / "scripts/python/goal-utils.py"
 
 pytestmark = pytest.mark.integration

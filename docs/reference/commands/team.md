@@ -10,7 +10,7 @@ The single entry point for **all team operations** — create, modify, and run a
 
 ## Conceptual Model
 
-A **team** has two structures (defined once in `skills/create-team/references/conceptual-model.md`):
+A **team** has two structures (defined once in `skills/internal/create-team/references/conceptual-model.md`):
 
 - **Static structure** — a **Role × Stage × Type** roster (who participates, in what role, at what stage, Worker or Meta).
 - **Dynamic structure** — the collaboration **pattern** (parallel / serial / iteration / continuous) with its parallelism / DAG / iteration / operating settings and an execution flow. Each pattern encodes a priority: **parallel** = 效率优先 (throughput), **serial** = 质量优先 (quality, verified handoffs), **iteration** = 目标收敛 (converge then stop), **continuous** = 长期运营 (operate on a cadence).
@@ -45,7 +45,7 @@ When the input names a goal that is already archived under `.specify/goal/` (exa
 1. **Load & restate** — the definition (objective, criteria, lifecycle, existing Targets) is loaded via the `goal-utils.py` engine and restated for your confirmation. A dangling name stops with the verbatim error prefix `goal 未定义:` and points to `/speckit.goal create`; a terminal goal (`achieved`/`abandoned`) is refused outright.
 2. **Four-element analysis** — dimension, criteria coverage (missing criteria declared, never invented), existing Targets, and single-team achievability, each with rationale. The conclusion is advisory: you adjudicate single-team vs decomposition.
 3. **Decomposition proposal (optional)** — on the decomposition path, a proposal set is drafted (outcome-form statements, no criteria restatement), each statement dry-run validated by `goal-utils.py targets <slug> --check` (zero writes) before presentation; one merged confirmation lands them per-statement via the existing `targets --add` authorization surface. The team side never writes `goal.md`.
-4. **One team per Target (N teams : 1 Goal)** — each open Target gets a team: all declare the same `goal_slug`, each carries `focus_target: T-<nnn>` (its default focus), slugs derive as `<goal-slug>-t<nnn>` with uniqueness checks, and a pairwise-disjoint territory proposal is verified by `skills/create-team/scripts/verify-territory-disjoint.py` before landing — known overlaps are disclosed and handed to `/speckit.goal coordinate`, never landed silently.
+4. **One team per Target (N teams : 1 Goal)** — each open Target gets a team: all declare the same `goal_slug`, each carries `focus_target: T-<nnn>` (its default focus), slugs derive as `<goal-slug>-t<nnn>` with uniqueness checks, and a pairwise-disjoint territory proposal is verified by `skills/internal/create-team/scripts/verify-territory-disjoint.py` before landing — known overlaps are disclosed and handed to `/speckit.goal coordinate`, never landed silently.
 
 Concepts (Goal / Target / binding / decomposition) are defined once in `.specify/shared/definitions/goal-definitions.md`.
 
@@ -141,7 +141,7 @@ goal identity, so pre-existing teams need no migration. Editing the goal prose n
 the delivery directory, because identity is declared rather than derived. Concurrent
 refreshes of one goal serialize into a single atomic write.
 
-Details: `skills/create-team/references/summary-mapping.md`.
+Details: `skills/internal/create-team/references/summary-mapping.md`.
 
 ## Companion Skills
 

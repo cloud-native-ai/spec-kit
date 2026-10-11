@@ -48,9 +48,10 @@ class TestScriptsDistributionParity:
     def test_skills_pair_stays_lenient(self):
         """skills/ may legitimately hold project-local skills in the mirror."""
         pairs = {src: strict for src, _dst, strict, _excl in sm.MIRROR_PAIRS}
-        assert pairs.get("skills") is False, (
-            "skills/ must stay lenient so project-local skills are not flagged"
-        )
+        for pair_name in ("skills/external", "skills/internal"):
+            assert pairs.get(pair_name) is False, (
+                f"{pair_name}/ must stay lenient so project-local skills are not flagged"
+            )
 
     def test_compare_pair_reports_mirror_only_file_as_extra(self, tmp_path):
         """Unit-level proof that the orphan direction is actually detected."""

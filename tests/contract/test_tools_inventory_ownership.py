@@ -31,8 +31,8 @@ SURFACES = [
     "templates/instructions-template.md",
     "templates/tools.md",
     "templates/commands/tools.md",
-    "skills/create-tools/SKILL.md",
-    "skills/improve-tools/SKILL.md",
+    "skills/internal/create-tools/SKILL.md",
+    "skills/internal/improve-tools/SKILL.md",
 ]
 
 INVENTORIES = ".specify/tools/{system,shell,project}.json"

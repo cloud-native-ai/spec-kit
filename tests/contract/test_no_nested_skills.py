@@ -6,8 +6,8 @@ A skill directory that itself contains a second ``SKILL.md`` means another skill
 was copied or linked *inside* it. The usual cause is a shell operation whose
 destination already existed as a directory::
 
-    ln -s /path/to/yuque-workspace skills/draw-echarts   # -> skills/draw-echarts/yuque-workspace
-    cp -R /path/to/yuque-workspace skills/draw-echarts   # same nesting
+    ln -s /path/to/yuque-workspace skills/external/draw-echarts   # -> skills/external/draw-echarts/yuque-workspace
+    cp -R /path/to/yuque-workspace skills/external/draw-echarts   # same nesting
 
 Verified on macOS/BSD ``ln``: when the destination is a **real directory**,
 neither ``-f`` nor ``-n`` prevents this and the command still exits 0, so the
@@ -15,7 +15,7 @@ mistake is silent. (``-n`` only helps when the destination is a symlink to a
 directory.) Python's ``Path.symlink_to`` / ``os.symlink`` raise FileExistsError
 instead, so this trap is shell-specific.
 
-Why a test rather than a one-off cleanup: `skills/draw-echarts/yuque-workspace`
+Why a test rather than a one-off cleanup: `skills/external/draw-echarts/yuque-workspace`
 entered the source tree in 8da8b853 (2026-05-18) and was removed from the source
 in 21604dd5 (2026-05-24) -- but `specify init` distributes with
 ``copytree(dirs_exist_ok=True)``, an additive merge that never deletes. Every
@@ -44,9 +44,27 @@ NON_SKILL_DIRS = {".migration-backups"}
 
 
 def _skill_dirs(root: Path):
-    return sorted(
+    """Actual skill directories under a (two-layer aware) skills root.
+
+    Flat external skills live at ``root/<name>/`` (runtime mirror shape); layer
+    subtrees hold skills one level deeper (``root/internal/<name>/`` and, in the
+    source tree, ``root/external/<name>/``). Layer dirs themselves are not skills.
+    """
+    out = []
+    for child in sorted(
         p for p in root.iterdir() if p.is_dir() and p.name not in NON_SKILL_DIRS
-    )
+    ):
+        if (child / "SKILL.md").is_file():
+            out.append(child)
+        elif child.name in {"internal", "external"}:
+            out.extend(
+                gc
+                for gc in sorted(child.iterdir())
+                if gc.is_dir()
+                and gc.name not in NON_SKILL_DIRS
+                and (gc / "SKILL.md").is_file()
+            )
+    return out
 
 
 def _nested_skill_files(skill_dir: Path):
@@ -84,11 +102,26 @@ class TestNoNestedSkills:
         )
 
     def test_every_skill_has_exactly_one_root_skill_file(self):
-        """Sanity anchor: each skill dir owns a SKILL.md at its root."""
+        """Sanity anchor: every skill dir owns a SKILL.md at its root.
+
+        Two-layer aware: a top-level entry is either a flat skill (runtime mirror's
+        external face) or a layer dir whose children are the skills.
+        """
         root = ROOT / "skills"
-        missing = [
-            d.name
-            for d in _skill_dirs(root)
-            if not (d / "SKILL.md").is_file()
-        ]
+        missing = []
+        for child in sorted(
+            p for p in root.iterdir() if p.is_dir() and p.name not in NON_SKILL_DIRS
+        ):
+            if (child / "SKILL.md").is_file():
+                continue  # flat skill
+            if child.name in {"internal", "external"}:
+                missing.extend(
+                    f"{child.name}/{gc.name}"
+                    for gc in sorted(child.iterdir())
+                    if gc.is_dir()
+                    and gc.name not in NON_SKILL_DIRS
+                    and not (gc / "SKILL.md").is_file()
+                )
+                continue
+            missing.append(child.name)
         assert not missing, f"skill dirs without a root SKILL.md: {missing}"

@@ -1,9 +1,9 @@
 """Contract test: the multi-agent Conceptual Model is defined exactly once (SC-006).
 
 Enforces migration contract M2:
-  - The Conceptual Model lives in `skills/create-team/references/conceptual-model.md`
+  - The Conceptual Model lives in `skills/internal/create-team/references/conceptual-model.md`
     (the team domain, single source of truth).
-  - It is NOT embedded in `skills/create-agent/SKILL.md` — that skill may only carry
+  - It is NOT embedded in `skills/internal/create-agent/SKILL.md` — that skill may only carry
     a one-line pointer to the team-domain reference, never a re-definition.
 """
 
@@ -12,15 +12,15 @@ import pytest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-CONCEPTUAL_MODEL = REPO_ROOT / "skills" / "create-team" / "references" / "conceptual-model.md"
-CREATE_AGENT = REPO_ROOT / "skills" / "create-agent" / "SKILL.md"
+CONCEPTUAL_MODEL = REPO_ROOT / "skills" / "internal" / "create-team" / "references" / "conceptual-model.md"
+CREATE_AGENT = REPO_ROOT / "skills" / "internal" / "create-agent" / "SKILL.md"
 
 
 @pytest.mark.contract
 class TestSingleConceptualModel:
     def test_model_defined_in_team_domain(self):
         assert CONCEPTUAL_MODEL.exists(), (
-            "the Conceptual Model must live in skills/create-team/references/conceptual-model.md"
+            "the Conceptual Model must live in skills/internal/create-team/references/conceptual-model.md"
         )
         content = CONCEPTUAL_MODEL.read_text(encoding="utf-8")
         assert "Role" in content and "Stage" in content and "Type" in content, (

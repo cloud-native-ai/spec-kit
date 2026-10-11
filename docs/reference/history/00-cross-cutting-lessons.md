@@ -9,7 +9,8 @@
 | 源(权威) | 运行时镜像 | 说明 |
 |-----------|-----------|------|
 | `templates/` | `.specify/templates/` | 模板改动必须双写 |
-| `skills/<name>/` | `.specify/skills/<name>/` | **两者都是独立 git 副本,不是 symlink**;改完用 `diff -rq` 或目录树 md5 校验字节一致 |
+| `skills/external/<name>/` | `.specify/skills/<name>/`(平铺,宿主可发现) | **两者都是独立 git 副本,不是 symlink**;改完用 `diff -rq` 或目录树 md5 校验字节一致 |
+| `skills/internal/<name>/` | `.specify/skills/internal/<name>/`(嵌套,仅供 `/speckit.*` 按路径消费) | 同上;`internal` 是内部层的**保留命名空间**,故 sync-mirrors 在 external 对上把它排除(否则该子树会被永久误报为镜像多余文件) |
 | `templates/commands/<cmd>.md` | `.claude/commands/speckit.<cmd>.md`、`.github/prompts/*.prompt.md`、`.qoder/commands/*.md` | 运行时命令 = 源模板去 frontmatter + 路径重写(`templates/`→`.specify/templates/`),约 25 行差异;各工具一份,需分别改 |
 
 - `.github/skills`、`.github/agents` **才是** 指向 `.specify/` 的 symlink;而 `.specify/skills/`、`.specify/agents/` 本身是实体副本。
@@ -53,7 +54,7 @@ mirror 文件时 `cp` 被 alias 成 `cp -i`,遇到已存在目标会**静默跳�
   - **最小可复现例(可当场重跑)**:`printf 'a.py\nab\nb.py\n'` 经 `LC_ALL=C sort` 得 `a.py ab b.py`,经默认 `sort` 得 `ab a.py b.py`——顺序真的相反(C 里 `.` < `b`,glibc 忽略 `.` 后比 `apy` vs `ab`)。把 C-排序的那份喂给默认 locale 的 `comm -13`,得到错成员 + `file 1 is not in sorted order` + exit 1。
   - **日期化实例(as-of 2026-10-04 T027,MUST NOT 今日重导)**:覆盖核算的 `comm -13` 印出 delta **665**,真值是 **182**;665 正是当时活名单的**全集**,即"表头两行在 en_US 下排到数字名之后 → comm 从第 3 行起判无序 → 把整个 file 2 当差集"。该两数只在 T027 那一刻成立:T045 落下认领后,今日的两侧同为 483 名、两个 locale 都得 delta 0。
   - **判据**:通过的形态是 delta 为空 **且** stderr 为空 **且** exit 0,三者缺一即无结论;只给 `comm` 加前缀而 `sort` 不加(或反之)同样错。落点须覆盖**读者能到达该惯用法的全部位置**——Feature 053 把它写进基线文件表头、脚本 docstring 与 GATE 行三处,并由契约测试钉住(`test_c24b…` 钉该文件为 C-有序且恰两行表头;`test_c24…` 两侧均非空,因为对**空**基线 `comm -13` 无论有序与否都会回显 file 2 全部,其首版正是因此以一个与惯用法无关的理由通过)。
-- **套件红先按被测单元归因**。多个同族单元被并行编辑时,先 `pytest --tb=line` 读每条断言指向哪个单元,区分既有负债与本次回归,并把归因命令与结论一起写进完成报告——只说"套件红了"等于把归因义务推给读者。owner:`skills/create-skills/SKILL.md` §6。
+- **套件红先按被测单元归因**。多个同族单元被并行编辑时,先 `pytest --tb=line` 读每条断言指向哪个单元,区分既有负债与本次回归,并把归因命令与结论一起写进完成报告——只说"套件红了"等于把归因义务推给读者。owner:`skills/external/create-skills/SKILL.md` §6。
 
 ## 八、命名带数字的测试是脆弱信号
 
@@ -96,7 +97,7 @@ mirror 文件时 `cp` 被 alias 成 `cp -i`,遇到已存在目标会**静默跳�
 
 **消费期新增的三种成因(反馈消化轮,2026-09-23)**:同族形态,来自对 32 条历史反馈条目的核验与 16 项修复。
 
-7. **"非空白即通过"的证据关**。渲染证明关只校验截图存在且非空白,而无头 Chrome 的布局视口比 `--window-size` 声明值矮 ~87–88px,底部被裁时该关照样绿——两个绘图引擎各自独立实测到同一差值,是本轮唯一有**两个独立报告者**的缺陷。修法:窗口高 = 内容高 + 余量,或先读回绘制 bbox 再判裁切;余量数值的 owner 是 `skills/draw-diagram/references/delivery-contract.md` D6「渲染证据几何」行,其余处只写指针。
+7. **"非空白即通过"的证据关**。渲染证明关只校验截图存在且非空白,而无头 Chrome 的布局视口比 `--window-size` 声明值矮 ~87–88px,底部被裁时该关照样绿——两个绘图引擎各自独立实测到同一差值,是本轮唯一有**两个独立报告者**的缺陷。修法:窗口高 = 内容高 + 余量,或先读回绘制 bbox 再判裁切;余量数值的 owner 是 `skills/external/draw-diagram/references/delivery-contract.md` D6「渲染证据几何」行,其余处只写指针。
 8. **A/B 两侧对 git-ignored 路径天然不对称**。worktree 不复制被忽略的文件(运行工作区、构建产物、本地缓存),于是差集里混进环境差异,被记成改动效果(假阳)。修法:差集项归因前 MUST 先排除 ignored 残留。
 9. **用过滤后的视图当作内容命题的证据**。要断言一个工件的内容,就读那个文件本身;`git diff -- <path>`、`grep -A/-B`、`--stat` 只呈现被筛过的子集,其形状与被筛集合并不匹配(即上面第 1 条的一般形态)。用它取证等于让过滤器替你决定什么算证据——diff 用来定位改动范围,文件用来判定内容命题。
 
@@ -159,7 +160,7 @@ mirror 文件时 `cp` 被 alias 成 `cp -i`,遇到已存在目标会**静默跳�
 
 一轮消化把发现分流到某个改进通道、并在账本(`consume-log.md`)里写下"已分流",这件事**看起来**像是完成了工作,其实只完成了记录。账本是**批次审计轨迹**,它按批次组织、写完即封闭,没有任何机制把"排期到下一轮"的项带到下一轮。于是被分流的项静默失效——不是被否决,而是被遗忘。
 
-**已实证的复发**(2026-09-14 → 2026-09-23):`consume-log.md` 的 `2026-09-14 (batch 2)` 行把「create-skills Step 6 缺测试基线纪律」分流给 `improve-skills`,并另记「22 queued direct-fix(下一轮执行)」。九天后的一轮消化实测:`skills/create-skills/` 全目录对 `baseline` 与 `基线` **零命中**,其套件行源自 79080d35(2026-07-29,早于该条目),期间只有两次与此无关的改动——即该分流**从未执行**,而同一根因再次被独立发现并重新分流了一次。
+**已实证的复发**(2026-09-14 → 2026-09-23):`consume-log.md` 的 `2026-09-14 (batch 2)` 行把「create-skills Step 6 缺测试基线纪律」分流给 `improve-skills`,并另记「22 queued direct-fix(下一轮执行)」。九天后的一轮消化实测:`skills/external/create-skills/` 全目录对 `baseline` 与 `基线` **零命中**,其套件行源自 79080d35(2026-07-29,早于该条目),期间只有两次与此无关的改动——即该分流**从未执行**,而同一根因再次被独立发现并重新分流了一次。
 
 **判据(复发的检测方式)**:一项路由是否真的落地,只看**被点名的 owner 文件是否发生了对应变更**(一次提交,或对 owner 的一次实测显示缺陷已消失)。**不看**账本里是否有那一行,也不看是否有"下一轮执行"的计划。以行存在为证据,正是这条教训要拦的形态——它与 § 十二 的盲检同构:输出为真,但不是关于它被写来判定的那个命题。
 

@@ -20,8 +20,8 @@ import pytest
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-GENERATOR = REPO_ROOT / "skills/create-team/scripts/build-summary-input.py"
-SUMMARIZE_SCRIPTS = REPO_ROOT / "skills/summarize-project"
+GENERATOR = REPO_ROOT / "skills/internal/create-team/scripts/build-summary-input.py"
+SUMMARIZE_SCRIPTS = REPO_ROOT / "skills/internal/summarize-project"
 GOAL = "sliced-goal"
 
 pytestmark = pytest.mark.integration

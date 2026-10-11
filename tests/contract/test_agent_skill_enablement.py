@@ -11,7 +11,7 @@ Assertions are grouped by contract clause / user story:
 
 C-3 ("the generator templates mirror the same additions") is satisfied by US1/US2
 themselves: since Feature 044 the subject of the enablement contract *is* the
-generator template (``skills/create-agent/templates/agent-capacity-<slug>-template.md``),
+generator template (``skills/internal/create-agent/templates/agent-capacity-<slug>-template.md``),
 so a separate parity block could only re-read the same file and compare it to itself.
 """
 
@@ -22,7 +22,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILLS_DIR = REPO_ROOT / "skills"
-ROLE_TEMPLATES_DIR = REPO_ROOT / "skills" / "create-agent" / "templates"
+ROLE_TEMPLATES_DIR = REPO_ROOT / "skills" / "internal" / "create-agent" / "templates"
 
 PRESET_ROLES = [
     "requirements-analyst",
@@ -65,7 +65,7 @@ def _agent_content(slug):
 
 
 def _installed_skill_slugs():
-    return {p.parent.name for p in SKILLS_DIR.glob("*/SKILL.md")}
+    return {p.parent.name for p in SKILLS_DIR.glob("*/*/SKILL.md")}
 
 
 @pytest.mark.contract

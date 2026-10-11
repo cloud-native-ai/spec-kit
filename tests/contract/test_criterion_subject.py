@@ -2,7 +2,7 @@
 
 Subjects: ``shared/definitions/goal-definitions.md`` (the concept owner, which gains one
 section) and ``scripts/python/goal-utils.py`` (which derives the member set at parse time).
-A third file is named by C-14 — ``skills/create-team/scripts/build-summary-input.py`` keeps
+A third file is named by C-14 — ``skills/internal/create-team/scripts/build-summary-input.py`` keeps
 its own local criteria reader, and this suite pins the disposition the owner doc records for
 it rather than letting the two derivations drift apart silently.
 
@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[2]
 GOAL_UTILS = ROOT / "scripts" / "python" / "goal-utils.py"
 OWNER_DOC = ROOT / "shared" / "definitions" / "goal-definitions.md"
 OWNER_DOC_MIRROR = ROOT / ".specify" / "shared" / "definitions" / "goal-definitions.md"
-SUMMARY_SCRIPT = ROOT / "skills" / "create-team" / "scripts" / "build-summary-input.py"
+SUMMARY_SCRIPT = ROOT / "skills" / "internal" / "create-team" / "scripts" / "build-summary-input.py"
 CONTRACT = (
     ROOT / ".specify" / "specs" / "053-machine-decidable-artifacts" / "contracts"
     / "criterion-subject.md"
@@ -446,7 +446,7 @@ def test_c14_the_second_parser_is_named_with_its_disposition():
             named_in.append(path.name)
     assert named_in, (
         "C-14 forbids silence: the owner doc or this contract must name "
-        "skills/create-team/scripts/build-summary-input.py and state what it does about the "
+        "skills/internal/create-team/scripts/build-summary-input.py and state what it does about the "
         "reference form"
     )
     text = OWNER_DOC.read_text(encoding="utf-8")

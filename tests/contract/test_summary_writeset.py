@@ -20,10 +20,10 @@ SPEC_DIR = REPO_ROOT / ".specify/specs/036-team-summary"
 REQUIREMENTS = SPEC_DIR / "requirements.md"
 WRITESET_CONTRACT = SPEC_DIR / "contracts/summary-writeset.contract.md"
 
-MAPPING_CANONICAL = REPO_ROOT / "skills/create-team/references/summary-mapping.md"
-MAPPING_MIRROR = REPO_ROOT / ".specify/skills/create-team/references/summary-mapping.md"
+MAPPING_CANONICAL = REPO_ROOT / "skills/internal/create-team/references/summary-mapping.md"
+MAPPING_MIRROR = REPO_ROOT / ".specify/skills/internal/create-team/references/summary-mapping.md"
 
-GENERATOR = REPO_ROOT / "skills/create-team/scripts/build-summary-input.py"
+GENERATOR = REPO_ROOT / "skills/internal/create-team/scripts/build-summary-input.py"
 
 
 def _load_generator():
@@ -156,7 +156,7 @@ def test_write_whitelist_is_the_goal_directory_not_the_team_directory() -> None:
     assertion keeps 036's wording — its subject is goal-indexed vs team-indexed,
     which the historical path satisfies just as well. The *live* write-set truth is
     pinned separately by tests/contract/test_goal_writeset.py against
-    skills/create-team/references/summary-mapping.md.
+    skills/internal/create-team/references/summary-mapping.md.
     """
     text = WRITESET_CONTRACT.read_text(encoding="utf-8")
     whitelist = text.split("## Write whitelist", 1)[1].split("## Byte-invariance", 1)[0]

@@ -10,7 +10,9 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SCRIPT = ROOT / "skills" / "manage-agents" / "scripts" / "config-agent.sh"
+# manage-agents is an internal-layer skill (skills/internal/) since the
+# skill-layer rehome; the runtime mirror form is .specify/skills/internal/.
+SCRIPT = ROOT / "skills" / "internal" / "manage-agents" / "scripts" / "config-agent.sh"
 
 
 def _bash(snippet: str, home: Path) -> subprocess.CompletedProcess:

@@ -13,4 +13,4 @@
    ```bash
    python3 scripts/python/regen-command-copies.py --check
    ```
-4. Editing skills/shared docs? Mirror-sync map lives in `.specify/instructions.md` (`AGENTS.md`).
+4. Editing skill or shared docs? Mirror-sync map lives in `.specify/instructions.md` (`AGENTS.md`).

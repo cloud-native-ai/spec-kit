@@ -13,7 +13,7 @@ an edge is a one-line data change, not a new hand-written test function.
 import pytest
 from pathlib import Path
 
-TEMPLATES_DIR = Path(__file__).resolve().parents[2] / "skills" / "create-agent" / "templates"
+TEMPLATES_DIR = Path(__file__).resolve().parents[2] / "skills" / "internal" / "create-agent" / "templates"
 
 ROLE_SLUGS = [
     "requirements-analyst",

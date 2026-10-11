@@ -46,10 +46,10 @@ This owner-first rule prevents scattered near-duplicates and contradictory copie
 ## Desired-State Layering
 
 - **Static baseline**: owned only by `.specify/skills/create-docs/SKILL.md` § Desired-State Baseline. Open that owner for operative naming, taxonomy, lifecycle, and threshold rules; this reference does not copy them.
-- **Project layer**: persisted in `.specify/docs/target-structure.md` as the **Target structure declaration**. It records project shape, readers, project-specific extensions, topic placement, and fixed discovery routes.
+- **Project layer**: persisted in `docs/.speckit/target-structure.md` as the **Target structure declaration**. It records project shape, readers, project-specific extensions, topic placement, and fixed discovery routes.
 - **Run layer**: the current repository state plus this run's input and evidence.
 
-The target declaration uses `templates/docs-target-structure-template.md` and preserves bytes outside its managed block.
+The target declaration uses `skills/external/create-docs/assets/docs-target-structure-template.md` and preserves bytes outside its managed block.
 
 ## Three-Stage Execution Flow
 
@@ -77,13 +77,13 @@ Evidence-backed content actions run one document at a time in sequence. There is
 ## Deterministic Engine
 
 ```bash
-python3 .specify/scripts/python/docs-utils.py --action scan --root .
-python3 .specify/scripts/python/docs-utils.py --action expire --root .
-python3 .specify/scripts/python/docs-utils.py --action clean [--yes] --root .
-python3 .specify/scripts/python/docs-utils.py --action archive-check --root .
-python3 .specify/scripts/python/docs-utils.py --action stats --root .
-python3 .specify/scripts/python/docs-utils.py --action validate --root . [--allow-special NAME ...]
-python3 .specify/scripts/python/docs-utils.py --action audit --root . --scope <s> --summary <text>
+python3 .specify/skills/create-docs/scripts/docs-utils.py --action scan --root .
+python3 .specify/skills/create-docs/scripts/docs-utils.py --action expire --root .
+python3 .specify/skills/create-docs/scripts/docs-utils.py --action clean [--yes] --root .
+python3 .specify/skills/create-docs/scripts/docs-utils.py --action archive-check --root .
+python3 .specify/skills/create-docs/scripts/docs-utils.py --action stats --root .
+python3 .specify/skills/create-docs/scripts/docs-utils.py --action validate --root . [--allow-special NAME ...]
+python3 .specify/skills/create-docs/scripts/docs-utils.py --action audit --root . --scope <s> --summary <text>
 ```
 
 The engine supplies deterministic findings and audit output. It does not own or rewrite the target declaration.
@@ -96,10 +96,10 @@ Presentation and publishing remain optional and are owned by `create-pages`. Sit
 
 | Artifact | Location | Lifecycle |
 |----------|----------|-----------|
-| Target structure declaration | `.specify/docs/target-structure.md` | cross-run, confirmed project contract |
+| Target structure declaration | `docs/.speckit/target-structure.md` | cross-run, confirmed project contract |
 | Observation snapshot | inline | per run |
-| Dry-run plan | `.specify/docs/plans/` | per run when a confirmable action exists |
-| Audit log | `.specify/docs/audit/` | every run, including no-op |
+| Dry-run plan | `docs/.speckit/plans/` | per run when a confirmable action exists |
+| Audit log | `docs/.speckit/audit/` | every run, including no-op |
 | Residual report | inline | per run |
 
 ## Tool Support

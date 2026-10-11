@@ -20,14 +20,14 @@ OLD_PATH_NEEDLE = "project/goal"
 
 #: Faces that MUST NOT retain a reference after the migration.
 LIVE_SURFACES = (
-    "skills/create-team/SKILL.md",
-    "skills/create-team/references/summary-mapping.md",
-    "skills/create-team/scripts/build-summary-input.py",
+    "skills/internal/create-team/SKILL.md",
+    "skills/internal/create-team/references/summary-mapping.md",
+    "skills/internal/create-team/scripts/build-summary-input.py",
     "templates/commands/team.md",
     # 2026-08-17: .specify/templates/commands/ mirror retired.
-    ".specify/skills/create-team/SKILL.md",
-    ".specify/skills/create-team/references/summary-mapping.md",
-    ".specify/skills/create-team/scripts/build-summary-input.py",
+    ".specify/skills/internal/create-team/SKILL.md",
+    ".specify/skills/internal/create-team/references/summary-mapping.md",
+    ".specify/skills/internal/create-team/scripts/build-summary-input.py",
     ".claude/commands/speckit.team.md",
     ".github/prompts/speckit.team.prompt.md",
     ".qoder/commands/speckit.team.md",
@@ -42,6 +42,10 @@ HISTORICAL_PREFIXES = (
     ".specify/specs/037-goal-registry/",
     ".specify/memory/feedback/",
     ".specify/memory/features",
+    # Team run workspaces (.specify/teams/.work/**) are git-ignored scratch that may
+    # hold dated copies of live files (e.g. s3-sweep test snapshots); they are records,
+    # not live faces — same rationale as the feedback store above.
+    ".specify/teams/.work/",
 )
 
 #: The sanitize findings ledger (Feature 047) is a machine-generated observation

@@ -20,7 +20,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SKILL_DIR = REPO_ROOT / "skills" / "create-pages"
+SKILL_DIR = REPO_ROOT / "skills" / "external" / "create-pages"
 MIRROR_DIR = REPO_ROOT / ".specify" / "skills" / "create-pages"
 SKILL_MD = SKILL_DIR / "SKILL.md"
 SCRIPT = SKILL_DIR / "scripts" / "scaffold-hugo.py"
@@ -31,7 +31,7 @@ ASSETS = SKILL_DIR / "assets" / "hugo"
 BOOK_ASSETS = SKILL_DIR / "assets" / "book"
 REFERENCE = SKILL_DIR / "references" / "hugo-site.md"
 
-CREATE_DOCS_MD = REPO_ROOT / "skills" / "create-docs" / "SKILL.md"
+CREATE_DOCS_MD = REPO_ROOT / "skills" / "external" / "create-docs" / "SKILL.md"
 
 EXPECTED_ASSETS = (
     "hugo.toml.tmpl",
@@ -77,8 +77,12 @@ def test_site_layer_is_optional_for_the_structure_skill():
     assert "scaffold-hugo.py" not in text, \
         "create-docs must not invoke the site scaffolder; site work belongs to create-pages"
     assert "create-pages" in text, "create-docs must name create-pages as the site owner"
-    assert not (REPO_ROOT / "skills" / "create-docs" / "assets").exists(), \
+    # narrowed to SITE-layer carriers: create-docs may own non-site assets (the
+    # target-structure bootstrap template), but never Hugo/site tooling.
+    assert not (REPO_ROOT / "skills" / "external" / "create-docs" / "assets" / "hugo").exists(), \
         "site assets must not live under create-docs"
+    assert not (REPO_ROOT / "skills" / "external" / "create-docs" / "scripts" / "scaffold-hugo.py").exists(), \
+        "site scaffolder must not live under create-docs"
 
 
 @pytest.mark.contract
@@ -143,7 +147,7 @@ def test_titles_render_through_the_fallback_partial():
 @pytest.mark.contract
 def test_ci_adapter_registry_rejects_gitlab():
     """aoneci is the internal platform; open-source gitlab is not a target here."""
-    assert CI_SCRIPT.is_file(), "skills/create-pages/scripts/scaffold-ci.sh missing"
+    assert CI_SCRIPT.is_file(), "skills/external/create-pages/scripts/scaffold-ci.sh missing"
     registry = (CI_TEMPLATES / "README.md").read_text(encoding="utf-8")
     assert "| aoneci |" in registry, "aoneci must stay registered as implemented"
     assert not (CI_TEMPLATES / "gitlab").exists(), \
@@ -157,7 +161,7 @@ def test_ci_adapter_registry_rejects_gitlab():
 @pytest.mark.contract
 @requires_mount_mode
 def test_scaffold_script_and_assets_present():
-    assert REFERENCE.is_file(), "skills/create-pages/references/hugo-site.md missing"
+    assert REFERENCE.is_file(), "skills/external/create-pages/references/hugo-site.md missing"
     missing = [rel for rel in EXPECTED_ASSETS if not (ASSETS / rel).is_file()]
     assert not missing, f"missing Hugo asset templates: {missing}"
 

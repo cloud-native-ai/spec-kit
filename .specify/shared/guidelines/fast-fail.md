@@ -70,7 +70,7 @@ MUST NOT 以"改动的文件数"或"改动的行数"定量代替该判定:改一
 - **FF-8 `git diff` 形态三:对未跟踪新增的盲区** — 判据:命题涉及本次新增的文件,而命令只达受跟踪路径,未跟踪的新增被静默放过 | 实证:同上 §十三
 - **FF-9 `&&` 链中合法结果为零导致静默截断** — 判据:链中某命令的合法结果是零计数或空匹配(`grep -c`、`diff -q`、`comm`、`test -d`),其非零退出码中断链尾,而检查自身仍报告成功 | 实证:`docs/reference/history/00-cross-cutting-lessons.md` §十三 末段
 - **FF-10 意图缺口** — 判据:补齐它需要在两种以上合理读法之间选择,或需要发明工件未记录的意图 | 实证:`shared/patterns/interview-pattern.md`
-- **FF-11 爆炸半径越界** — 判据:本次修复会触及的工件集合超出当前动作声明的范围(定义见 § 分流判据) | 实证:`skills/create-team/references/patterns.md` 的 `territory` / `forbidden_files` 字段
+- **FF-11 爆炸半径越界** — 判据:本次修复会触及的工件集合超出当前动作声明的范围(定义见 § 分流判据) | 实证:`skills/internal/create-team/references/patterns.md` 的 `territory` / `forbidden_files` 字段
 - **FF-12 两顶帽子错位** — 判据:改动落在了错误的那棵树(框架源 vs 项目运行时副本),因而到不了它本该抵达的一方 | 实证:`shared/definitions/dogfooding-definitions.md` § 2.1
 - **FF-13 覆盖式脚手架将清空既有制品** — 判据:准备执行的命令会无条件覆盖一个已存在且携有历史的制品 | 实证:`docs/reference/history/00-cross-cutting-lessons.md` §十四
 - **FF-14 两振停滞** — 判据:同一异常在一次运行内第二次出现,或同一循环连续两轮无新进展 | 实证:`templates/commands/implement.md` 长跑模式的 Stagnation two-strike 上限

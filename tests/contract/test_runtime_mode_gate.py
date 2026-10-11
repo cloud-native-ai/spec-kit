@@ -81,7 +81,7 @@ def test_feedback_step_canonical_block_carries_mode_gate():
 
 @pytest.mark.contract
 def test_create_skills_documents_standalone_mode():
-    text = (REPO_ROOT / "skills" / "create-skills" / "SKILL.md").read_text(
+    text = (REPO_ROOT / "skills" / "external" / "create-skills" / "SKILL.md").read_text(
         encoding="utf-8"
     )
     assert "Detect the runtime mode" in text, (

@@ -17,7 +17,7 @@ Agent 框架用**一个统一的概念模型**消除 Agent 定义上的几类混
 4. **循环（Loop）动态结构显式化**：多 Agent 在运行时形成的迭代循环被统一定义，每个循环跨越
    多个阶段。
 5. **模板归位**：所有 `agent-*` 模板与 create-agent 技能形成整体，集中在
-   `skills/create-agent/templates/`。
+   `skills/internal/create-agent/templates/`。
 
 下面各节即为这一模型与其落地结构。
 
@@ -41,7 +41,7 @@ Agent 框架用**一个统一的概念模型**消除 Agent 定义上的几类混
 > 历史修订：旧的 "Type-follows-Stage"（evaluator/optimizer 一律 Meta）已被本判据取代。
 > 该耦合会把**业务层评估者**系统性误标为 Meta（例：评估各仓库状态的 consistency-checker
 > 实为 evaluator 阶段的 Worker）。唯一保留的耦合是 **Team Supervisor 恒为 Meta**——
-> 它的操作对象天然是 agent 系统。判据详见 `skills/create-team/references/conceptual-model.md`。
+> 它的操作对象天然是 agent 系统。判据详见 `skills/internal/create-team/references/conceptual-model.md`。
 
 > **Meta 与写权限是单向蕴含,不是充要关系**:只有 `Meta` 类型的 Agent 才能修改**团队自身配置**
 > (team.md)、**Agent 定义**(`.specify/agents/{templates,instances}/*.agent.md`、角色/阶段模板)与 **Skill 定义**
@@ -63,7 +63,7 @@ Agent 框架用**一个统一的概念模型**消除 Agent 定义上的几类混
 **每一列代表工作过程中的一个 Stage**，**整张表格整体代表一个团队**。
 行列交叉的单元格用 **Worker** / **Meta** 表示该 Agent 在对应阶段的 Type 属性。
 
-下表的角色与阶段均来自 `skills/create-agent/templates/` 中的能力（Capacity）模板（`agent-capacity-*`）
+下表的角色与阶段均来自 `skills/internal/create-agent/templates/` 中的能力（Capacity）模板（`agent-capacity-*`）
 与阶段模板（`agent-stage-*`）：
 
 | Agent 角色（Role） \ Stage | 执行者（Executor） | 评估者（Evaluator） | 优化者（Optimizer） |
@@ -91,7 +91,7 @@ Agent 框架用**一个统一的概念模型**消除 Agent 定义上的几类混
 
 ## 四、Agent 的两种生命周期
 
-> **Class → Instance（类与实例）**：`skills/create-agent/templates/agent-capacity-<X>-template.md` 是一个**抽象的 Agent 类**——带有未填充的 `{{占位符}}`，描述该 Agent **能做什么**（Capacity）。调用 `create-agent` 是**实例化**过程：填充占位符，产出一份**具体的 Agent 定义**写入所属层目录（Template → `.specify/agents/templates/<slug>.agent.md`，Instance → `.specify/agents/instances/<slug>.agent.md`）。运行时 `/speckit.agents run` 再从该定义**派生出活动实例（object）**——同一定义可派生多个互相独立的实例。三层关系：**能力模板（抽象类）→ 落地定义（具体类）→ 运行实例（对象）**，规范术语为 **Agent Template → Agent Instance → Agent Execution**（分类法真源：`shared/definitions/agent-definitions.md`；Execution 层的三种派发模式见 `shared/definitions/subagent-definitions.md`）。`create-agent` / `improve-agent` 只作用于前两层，从不触碰运行实例。
+> **Class → Instance（类与实例）**：`skills/internal/create-agent/templates/agent-capacity-<X>-template.md` 是一个**抽象的 Agent 类**——带有未填充的 `{{占位符}}`，描述该 Agent **能做什么**（Capacity）。调用 `create-agent` 是**实例化**过程：填充占位符，产出一份**具体的 Agent 定义**写入所属层目录（Template → `.specify/agents/templates/<slug>.agent.md`，Instance → `.specify/agents/instances/<slug>.agent.md`）。运行时 `/speckit.agents run` 再从该定义**派生出活动实例（object）**——同一定义可派生多个互相独立的实例。三层关系：**能力模板（抽象类）→ 落地定义（具体类）→ 运行实例（对象）**，规范术语为 **Agent Template → Agent Instance → Agent Execution**（分类法真源：`shared/definitions/agent-definitions.md`；Execution 层的三种派发模式见 `shared/definitions/subagent-definitions.md`）。`create-agent` / `improve-agent` 只作用于前两层，从不触碰运行实例。
 
 1. **临时 Agent（temporary）**：仅在当前上下文中记录，随会话结束而消失。
 2. **持久化 Agent（persistent）**：保存到项目的分层 Agent 目录 `.specify/agents/templates/`（角色模板）或 `.specify/agents/instances/`（实例），可跨会话复用。
@@ -115,7 +115,7 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 > 概念、四模式语义、目录布局与操作细节均在**团队文档集**：
 > [`docs/teams/overview.md`](../teams/overview.md)、[`docs/teams/orchestration.md`](../teams/orchestration.md)、[`docs/teams/continuous-operations.md`](../teams/continuous-operations.md)；
-> 单一真相源为 [`skills/create-team/references/conceptual-model.md`](../../../skills/create-team/references/conceptual-model.md) 与 [`operating-loops.md`](../../../skills/create-team/references/operating-loops.md)。
+> 单一真相源为 [`skills/internal/create-team/references/conceptual-model.md`](../../../skills/internal/create-team/references/conceptual-model.md) 与 [`operating-loops.md`](../../../skills/internal/create-team/references/operating-loops.md)。
 > 本框架文档只保留「团队 = 静态 Team 矩阵 + 动态 Loop」这一**概念**（见 §二、§三），不再复述编排操作。
 
 ## 六、实现结构
@@ -150,15 +150,15 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 ### 6.3 模板归位
 
-所有 `agent-*` 模板集中在 **`skills/create-agent/templates/`**，作为 create-agent 技能的一部分；
-安装时镜像到 `.specify/skills/create-agent/templates/`。完整模板目录见 [templates-and-agents.md](./templates-and-agents.md)。
+所有 `agent-*` 模板集中在 **`skills/internal/create-agent/templates/`**，作为 create-agent 技能的一部分；
+安装时镜像到 `.specify/skills/internal/create-agent/templates/`。完整模板目录见 [templates-and-agents.md](./templates-and-agents.md)。
 
 ### 6.4 技能赋能（Skill Enablement）
 
 技能与 Agent 定义同步安装，因此每个内置 Agent 都可调用任意已安装技能。七个内置角色 Agent 将这一能力**显式化、一致化**：优先使用与角色相关的框架技能，而非手工重复同类操作。每个角色 Agent 及其 `agent-capacity-*`（Capacity）模板都声明两部分：
 
 - **`skills:` 前置字段**：该角色相关的已安装技能规范 slug 列表（如需求分析师 → `draw-plantuml`；模块设计师 → `study-project`）。元 / 框架创作类技能（`create-agent`、`improve-agent`、`create-skills`、`improve-skills`、`create-team`、`improve-team`）为**不可声明**，不出现在任何角色列表中。
-- **`## Skill Enablement` 正文小节**：共享的偏好协议（单一事实来源 `skills/create-agent/templates/agent-skill-enablement.md`，各 Agent 组合复用而非各自改写）+ 与 `skills:` 一致的 `| Skill | When to use |` 表格。协议要求：优先选用适用技能；多个适用时选最贴合角色者；无适用技能或技能不可用 / 失败时，直接完成操作并暴露失败。
+- **`## Skill Enablement` 正文小节**：共享的偏好协议（单一事实来源 `skills/internal/create-agent/templates/agent-skill-enablement.md`，各 Agent 组合复用而非各自改写）+ 与 `skills:` 一致的 `| Skill | When to use |` 表格。协议要求：优先选用适用技能；多个适用时选最贴合角色者；无适用技能或技能不可用 / 失败时，直接完成操作并暴露失败。
 
 契约测试 `tests/contract/test_agent_skill_enablement.py` 校验该约定（每个 Agent ≥1 技能、引用均已安装、无不可声明 slug、小节存在、模板与 Agent 保持一致）。约定细节见 [command-and-skills.md](./command-and-skills.md)。
 
@@ -166,6 +166,6 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 本文档以仓库中的**活制品**为规范来源，而非任何单份规格文档：
 
-- **模板目录**：`skills/create-agent/templates/`（单 Agent）与 `skills/create-team/templates/agents/`（多 Agent）。
+- **模板目录**：`skills/internal/create-agent/templates/`（单 Agent）与 `skills/internal/create-team/templates/agents/`（多 Agent）。
 - **持久化 Agent**：`.specify/agents/{templates,instances}/*.agent.md`。
 - **守卫测试**：`tests/contract/test_agent_skill_enablement.py`（技能赋能约定）、`tests/unit/test_agent_deprecated_terms.py`（术语规范，持续保证 `Stage` / `optimizer` 等命名在所有 live 制品中成立）。

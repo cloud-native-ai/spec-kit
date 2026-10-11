@@ -2,8 +2,8 @@
 name: draw-drawio
 description: |
   Realization engine for draw.io / mxGraph: turns an already-decided diagram semantics into an uncompressed `.drawio` (mxGraph XML) artifact, and can export it to SVG/PNG/PDF through the draw.io Desktop CLI.
-  Axis position (a one-line statement only; the values and their justifications are owned by skills/draw-diagram/references/routing-matrix.md §0, which is the authority if the two ever differ): no dynamic-chart capability / free-form layout / weak semantics and weak drawing constraints. Rendering locality (axis ②) is deliberately NOT asserted here: it is being re-decided in a separate flow, and §0 registers no axis-② value yet.
-  Trigger on engine-identity terms only — never on generic diagram-class vocabulary; diagram-class intent and engine selection belong to the front door (skills/draw-diagram/SKILL.md).
+  Axis position (a one-line statement only; the values and their justifications are owned by skills/external/draw-diagram/references/routing-matrix.md §0, which is the authority if the two ever differ): no dynamic-chart capability / free-form layout / weak semantics and weak drawing constraints. Rendering locality (axis ②) is deliberately NOT asserted here: it is being re-decided in a separate flow, and §0 registers no axis-② value yet.
+  Trigger on engine-identity terms only — never on generic diagram-class vocabulary; diagram-class intent and engine selection belong to the front door (skills/external/draw-diagram/SKILL.md).
   Use when the user mentions "drawio", "draw.io", ".drawio", "mxgraph", "mxGraphModel", "mxGraph XML".
 skill_id: "<SKILL:.specify/skills/draw-drawio/SKILL.md>"
 ---
@@ -20,9 +20,9 @@ skill_id: "<SKILL:.specify/skills/draw-drawio/SKILL.md>"
 
 | 问题 | Owner（打开它；不要从这里复制） |
 |------|--------------------------------|
-| 语义模型（实体、层级、结构、关联；SDS/LDM schema） | `skills/draw-diagram/references/semantic-model.md`（**现存**） |
-| **引擎选择**——含本引擎与他引擎的取舍、`drawio` ↔ `excalidraw` 可判优先序、独占登记、tie-break、反路由红线 | `skills/draw-diagram/references/routing-matrix.md`（**现存**：§0 能力轴层 / §1 独占 / §2 图类矩阵 / §3 tie-break / §4 红线） |
-| 语义分析、图类选择、版面规划、样式配色、内容措辞、类专属约定 | 前门 `skills/draw-diagram/SKILL.md`（**现存**）。这些问题的**专章参考文件**（`references/howto/*`、`references/guide/*`、`references/document/*`）由 stage S1d 规划、**尚未落盘**——今日该 `references/` 树下只有上两行那两个文件。故此处**不预建具体路径**；在专章落盘前一律回前门 `SKILL.md`，不在本技能内自答 |
+| 语义模型（实体、层级、结构、关联；SDS/LDM schema） | `skills/external/draw-diagram/references/semantic-model.md`（**现存**） |
+| **引擎选择**——含本引擎与他引擎的取舍、`drawio` ↔ `excalidraw` 可判优先序、独占登记、tie-break、反路由红线 | `skills/external/draw-diagram/references/routing-matrix.md`（**现存**：§0 能力轴层 / §1 独占 / §2 图类矩阵 / §3 tie-break / §4 红线） |
+| 语义分析、图类选择、版面规划、样式配色、内容措辞、类专属约定 | 前门 `skills/external/draw-diagram/SKILL.md`（**现存**）。这些问题的**专章参考文件**（`references/howto/*`、`references/guide/*`、`references/document/*`）由 stage S1d 规划、**尚未落盘**——今日该 `references/` 树下只有上两行那两个文件。故此处**不预建具体路径**；在专章落盘前一律回前门 `SKILL.md`，不在本技能内自答 |
 
 > **本技能不含任何路由叙事。** 「何时该选我而不选别的引擎」属引擎选择策略，owner 是 `routing-matrix.md`。绕开前门直接调用本技能不在其职责范围内。
 
@@ -85,7 +85,7 @@ skill_id: "<SKILL:.specify/skills/draw-drawio/SKILL.md>"
 - **几何事实**：`.drawio` 格式自身**不做任何布局计算**——vertex 必须携带显式 `x/y/width/height`。但布局与走线 pass 是**可选叠加**的：默认内建 router 很基础（直线或简单直角，**无避障**，连线会直接穿过中间的形状）。
 - **三个 pass 的调用面尚未确证**：`routing=libavoid` / `postLayout=elk` / `applyLayouts` 在官方文档中是 **MCP server `create_diagram` 的参数名**；其在 Desktop CLI 上的等价开关**只确证了 `--layout`**。首次真实出图前不得把这三者当作 CLI 开关直接调用——详见 `./references/render-and-export.md` §4 未决项 9。
 
-> **轴②「渲染位置」不在本技能内声明。** 渲染方式（本地 / 远端 / 共享渲染服务）正在另一条流程中重新裁定；本文件与其 references 只登记**引擎能力事实**，不声明本套件采用哪条渲染路径。选路判据的 owner 是 `skills/draw-diagram/references/routing-matrix.md` §0。
+> **轴②「渲染位置」不在本技能内声明。** 渲染方式（本地 / 远端 / 共享渲染服务）正在另一条流程中重新裁定；本文件与其 references 只登记**引擎能力事实**，不声明本套件采用哪条渲染路径。选路判据的 owner 是 `skills/external/draw-diagram/references/routing-matrix.md` §0。
 
 ## 交付形态（Delivery）
 
@@ -115,12 +115,12 @@ skill_id: "<SKILL:.specify/skills/draw-drawio/SKILL.md>"
 
 ## Self-Improvement Contract
 
-- Canonical owner: `skills/draw-drawio/`（镜像 `.specify/skills/draw-drawio/` 由 sync-mirrors 生成，不手改）
+- Canonical owner: `skills/external/draw-drawio/`（镜像 `.specify/skills/draw-drawio/` 由 sync-mirrors 生成，不手改）
 - Own-run observation: 每次生成产物的结构自检结果（§自检清单逐项）、导出是否成功、被前门再委派/退回的次数、用户评价单条目
 - Mutation route: `improve-skills`（XML 结构错、样式 key 误用、导出命令失效、未决项被新证据消解，均走此路由修订本技能）
 - Validation route: 结构类修订用官方 XSD 与 §自检清单校验一份真实产物；纪律类修订按 create-skills 压力测试法 RED-GREEN
 - Comparison signal: 同类请求的"产物一次校验通过率 ↑、导出失败次数 ↓、前门退回次数 ↓"
-- Escalation boundary: 语义错配与图类误判不归本技能——回 `skills/draw-diagram`（前门）的反馈单元；渲染路径选型（轴②）不归本技能——归另一条渲染流程
+- Escalation boundary: 语义错配与图类误判不归本技能——回 `skills/external/draw-diagram`（前门）的反馈单元；渲染路径选型（轴②）不归本技能——归另一条渲染流程
 
 ## Evaluation Form(绘制评价单)
 

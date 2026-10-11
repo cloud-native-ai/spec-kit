@@ -34,8 +34,8 @@ AGENTS_COMMAND_COPIES = [
 ]
 
 SKILL_COPIES = [
-    REPO_ROOT / "skills" / "create-agent" / "SKILL.md",
-    REPO_ROOT / ".specify" / "skills" / "create-agent" / "SKILL.md",
+    REPO_ROOT / "skills" / "internal" / "create-agent" / "SKILL.md",
+    REPO_ROOT / ".specify" / "skills" / "internal" / "create-agent" / "SKILL.md",
 ]
 
 
@@ -59,12 +59,12 @@ def test_c3_trigger_truth_taught_in_agents_command():
 
 
 def test_c3_trigger_truth_taught_in_create_agent_skill():
-    text = (REPO_ROOT / "skills" / "create-agent" / "SKILL.md").read_text(encoding="utf-8")
+    text = (REPO_ROOT / "skills" / "internal" / "create-agent" / "SKILL.md").read_text(encoding="utf-8")
     assert "specify render-agents" in text
 
 
 def test_seat_c3_team_scope_key_listed_in_authoring_keys():
-    text = (REPO_ROOT / "skills" / "create-agent" / "SKILL.md").read_text(encoding="utf-8")
+    text = (REPO_ROOT / "skills" / "internal" / "create-agent" / "SKILL.md").read_text(encoding="utf-8")
     assert "team-scope" in text
 
 

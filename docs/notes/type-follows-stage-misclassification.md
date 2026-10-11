@@ -3,7 +3,7 @@ title: "问题诊断:Type-follows-Stage 规则将流程阶段与抽象层次错�
 created: 2026-07-30
 expires: 2026-09-28
 status: resolved
-target: "skills/create-team/references/conceptual-model.md"
+target: "skills/internal/create-team/references/conceptual-model.md"
 tags: [conceptual-model, agent-team, type-system, diagnosis]
 ---
 
@@ -38,7 +38,7 @@ Meta 与 Worker 的区分是**抽象层次**(纵向分层),不是任务分工(�
 
 ### 3.1 直接原因(源头规则)
 
-`skills/create-team/references/conceptual-model.md:11` 定义了 Type-follows-Stage
+`skills/internal/create-team/references/conceptual-model.md:11` 定义了 Type-follows-Stage
 派生规则:
 
 > **Type** — `Worker` or `Meta`, **derived from Stage** (Type-follows-Stage):
@@ -80,9 +80,9 @@ evaluator-stage 的 Worker。对照组:team-supervisor 抽查 subAgent 结论的
 
 | 层 | 文件 | 问题点 |
 |----|------|--------|
-| 规范 | `skills/create-team/references/conceptual-model.md:11`(+ `.specify/` 镜像) | 派生规则本体 |
-| 模板 | `skills/create-team/templates/agent-stage-evaluator-template.md:14`(+ 镜像) | 固化 `Type: Meta` |
-| 模板 | `skills/create-team/templates/agent-triad-orchestration-template.md:25`(+ 镜像) | 复述派生规则 |
+| 规范 | `skills/internal/create-team/references/conceptual-model.md:11`(+ `.specify/` 镜像) | 派生规则本体 |
+| 模板 | `skills/internal/create-team/templates/agent-stage-evaluator-template.md:14`(+ 镜像) | 固化 `Type: Meta` |
+| 模板 | `skills/internal/create-team/templates/agent-triad-orchestration-template.md:25`(+ 镜像) | 复述派生规则 |
 | 预置 | `teams/workspace-cluster.md`、`artifact-optimizer.md`、`process-monitor.md`(+ 镜像) | evaluator 成员标 Meta |
 | 实例 | `.specify/teams/cws-workspace-cluster/team.md:24` | consistency-checker 误标 Meta |
 | 实例 | `.specify/teams/draw-plantuml-optimizer/team.md` | 需逐成员按操作对象重判 |

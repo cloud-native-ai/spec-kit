@@ -65,7 +65,7 @@ def test_invalid_identities_are_rejected(slug):
 
 def test_identity_grammar_matches_the_generator(self_check=None):
     """FR-003: one grammar, not two. The generator's rule is the reference."""
-    generator = REPO_ROOT / "skills/create-team/scripts/build-summary-input.py"
+    generator = REPO_ROOT / "skills/internal/create-team/scripts/build-summary-input.py"
     text = generator.read_text(encoding="utf-8")
     assert "A-Za-z0-9" in text, "generator identity grammar not found for comparison"
     # Both sides must agree on the same accept/reject verdicts.

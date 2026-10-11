@@ -13,9 +13,9 @@ line (Feature 044):
 
 | Directory | Category | Content | Placeholders | Directly runnable | Producer → Consumer |
 |-----------|----------|---------|--------------|-------------------|---------------------|
-| `agents/` | **Meta Agent preset set** | framework-maintenance agents operating on skills/agents/structure | none | yes | framework maintainers → init render pipeline → tool agent dirs |
-| `skills/create-agent/templates/` | **Worker capability templates** | problem-domain agents along the capability dimension | `{{…}}` whitelist | no (instantiate first) | `create-agent` → team building / single-agent authoring |
-| `skills/create-team/templates/agents/` | **Worker responsibility templates** | problem-domain agents along the team-responsibility dimension (stage seats, orchestration contracts) | `{{…}}` whitelist | no | `create-team` → team building |
+| `agents/` | **Meta Agent preset set** | framework-maintenance agents operating on the framework's skills, agents, and structure | none | yes | framework maintainers → init render pipeline → tool agent dirs |
+| `skills/internal/create-agent/templates/` | **Worker capability templates** | problem-domain agents along the capability dimension | `{{…}}` whitelist | no (instantiate first) | `create-agent` → team building / single-agent authoring |
+| `skills/internal/create-team/templates/agents/` | **Worker responsibility templates** | problem-domain agents along the team-responsibility dimension (stage seats, orchestration contracts) | `{{…}}` whitelist | no | `create-team` → team building |
 
 **Team pickup rule**: when composing a Team, Meta Agents are picked from `agents/`;
 Worker Agents are instantiated from the capability/responsibility templates.
@@ -35,12 +35,12 @@ is ambiguous across the three locations.
 ## Canonical template catalog
 
 Agent templates are split by domain. This document covers the **single-agent** families, which
-live at **`skills/create-agent/templates/`** (installed mirror:
-`.specify/skills/create-agent/templates/`). The **multi-agent** templates — the Team Supervisor,
+live at **`skills/internal/create-agent/templates/`** (installed mirror:
+`.specify/skills/internal/create-agent/templates/`). The **multi-agent** templates — the Team Supervisor,
 the three EEI stages, the parallel/serial/triad orchestration templates, and the workflow schema —
-live at **`skills/create-team/templates/agents/`** and are catalogued in the team docs
+live at **`skills/internal/create-team/templates/agents/`** and are catalogued in the team docs
 ([`docs/teams/orchestration.md`](../teams/orchestration.md); normative source
-[`conceptual-model.md`](../../../skills/create-team/references/conceptual-model.md)).
+[`conceptual-model.md`](../../../skills/internal/create-team/references/conceptual-model.md)).
 
 ### Capacity templates (`agent-capacity-*`)
 
@@ -59,7 +59,7 @@ The seven Worker roles. Each Worker role template carries `supervisor: true` and
 
 > The eighth role, **Team Supervisor** (the single Meta role, Meta at all stages), is a
 > multi-agent template: `agent-team-supervisor-template.md` lives in
-> `skills/create-team/templates/agents/`. See [`docs/teams/`](../teams/overview.md).
+> `skills/internal/create-team/templates/agents/`. See [`docs/teams/`](../teams/overview.md).
 
 > Every role template enforces **six mandatory sections** (Identity & Responsibilities,
 > Project Context, Workflow, Upstream, Downstream, Output Format), uses only approved
@@ -79,7 +79,7 @@ The seven Worker roles. Each Worker role template carries `supervisor: true` and
 The Stage templates (`agent-stage-{executor,evaluator,optimizer}`), the orchestration templates
 (`agent-{parallel,serial,triad}-orchestration-template.md`), the Team Supervisor template, and the
 `agent-workflow-schema.md` (the `AgentWorkflow` JSON schema used by serial orchestration) are all
-**multi-agent** artifacts under `skills/create-team/templates/agents/`. They are documented in
+**multi-agent** artifacts under `skills/internal/create-team/templates/agents/`. They are documented in
 [`docs/teams/orchestration.md`](../teams/orchestration.md), not here.
 
 ## Persisted agents (`.specify/agents/`)
@@ -94,7 +94,7 @@ of truth**. The Meta Agent preset set ships active:
 
 The seven former preset role agents (Requirements Analyst, UX Analyst, System Designer,
 Module Designer, Test Engineer, QA Engineer, Knowledge Manager) are Worker agents by the
-operating-object criterion; they were relocated to `skills/create-agent/templates/`
+operating-object criterion; they were relocated to `skills/internal/create-agent/templates/`
 (`agent-capacity-<slug>-template.md`) and are distributed via instantiation, no longer as
 presets (Feature 044).
 
@@ -184,7 +184,7 @@ no purpose).
 
 ## Traceability
 
-Normative source: the template catalog under `skills/create-agent/templates/` and
-`skills/create-team/templates/agents/`, and the persisted agents under `.specify/agents/`. The
+Normative source: the template catalog under `skills/internal/create-agent/templates/` and
+`skills/internal/create-team/templates/agents/`, and the persisted agents under `.specify/agents/`. The
 deprecated-term guard `tests/unit/test_agent_deprecated_terms.py` keeps the `Stage`/`optimizer`
 naming enforced across all templates and persisted agents.

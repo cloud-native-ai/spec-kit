@@ -1,6 +1,6 @@
 # Goal Definitions Reference
 
-Canonical definition of the **Goal** concept in Spec Kit, its boundary against **Requirement**, the criteria authority rule, the singularity rule, the **Target** decomposition, and the Goal–Team binding. This file is the single source of truth for the Goal concept; other documents (`/speckit.team`, `skills/create-team`, the glossary) link here rather than re-defining it. It sits alongside the other concept anchors: `tool-definitions.md`, `agent-definitions.md`, `subagent-definitions.md`.
+Canonical definition of the **Goal** concept in Spec Kit, its boundary against **Requirement**, the criteria authority rule, the singularity rule, the **Target** decomposition, and the Goal–Team binding. This file is the single source of truth for the Goal concept; other documents (`/speckit.team`, `skills/internal/create-team`, the glossary) link here rather than re-defining it. It sits alongside the other concept anchors: `tool-definitions.md`, `agent-definitions.md`, `subagent-definitions.md`.
 
 ## What a Goal Is
 
@@ -98,7 +98,7 @@ Success-shaped statements exist in both worlds; their authority is disjoint (dec
 
 ### 第二个解析器的处置
 
-`skills/create-team/scripts/build-summary-input.py` 有自己的**本地** goal 判据读取器,其 `load_goal_definition` 的注释明写:该脚本与 `scripts/python/goal-utils.py` 分属两棵镜像树(`skills/` 与 `scripts/`)且相对深度不同,跨树 import 在安装到消费项目后即断,故刻意本地解析。**处置:让它同样理解指代形**——就地做同一导出,并把指代形渲染成成员名再交给总结,使读者不会看到一个自己无从解析的裸标记;MUST NOT 靠加一个 import 来解决。**代价明示**:于是仓内并存两处导出实现,二者的一致性由 `tests/contract/test_criterion_subject.py` 对同一输入断言两侧成员一致来钉住,而不是靠人记得同步——把同步交给记忆,正是本节要消灭的失效模式。
+`skills/internal/create-team/scripts/build-summary-input.py` 有自己的**本地** goal 判据读取器,其 `load_goal_definition` 的注释明写:该脚本与 `scripts/python/goal-utils.py` 分属两棵镜像树(`skills/` 与 `scripts/`)且相对深度不同,跨树 import 在安装到消费项目后即断,故刻意本地解析。**处置:让它同样理解指代形**——就地做同一导出,并把指代形渲染成成员名再交给总结,使读者不会看到一个自己无从解析的裸标记;MUST NOT 靠加一个 import 来解决。**代价明示**:于是仓内并存两处导出实现,二者的一致性由 `tests/contract/test_criterion_subject.py` 对同一输入断言两侧成员一致来钉住,而不是靠人记得同步——把同步交给记忆,正是本节要消灭的失效模式。
 
 ### 退出码约定在本仓并不统一
 
@@ -167,7 +167,7 @@ Four defining properties:
 | **Requirement** | Feature-bound spec of testable clauses (FR/SC) driving plan → tasks → implement → verification | `.specify/specs/<ID>-<slug>/requirements.md`; `/speckit.requirements` |
 | **Feature** | Long-lived capability entry in the feature index | `.specify/memory/features.md` |
 | **Success Criteria (SC-xxx)** | Per-feature measurable outcomes — authority limited to their Feature | requirements spec of that Feature |
-| **Team** | Multi-agent structure organized around (exactly one) Goal | `/speckit.team`, `skills/create-team` |
+| **Team** | Multi-agent structure organized around (exactly one) Goal | `/speckit.team`, `skills/internal/create-team` |
 | **Target** (this document) | Run-assignable sub-outcome (scope slice) under exactly one Goal — an annex to the definition, unordered, authored via `/speckit.goal` | here; persisted in `.specify/goal/<goal-slug>/goal.md` (`## Targets`) |
-| **`target_ref`** | A ledger work item's attribution to a Target (`T-<nnn>`) | `items.jsonl` contract (`skills/create-team`, summary mapping) |
+| **`target_ref`** | A ledger work item's attribution to a Target (`T-<nnn>`) | `items.jsonl` contract (`skills/internal/create-team`, summary mapping) |
 | **"target" elsewhere** | `optimization_target` / `co_targets` (the artifact an iteration loop mutates), a territory entry's `target` field, the `--target` flags of the evidence/interview engines — all **unrelated** to Goal Targets | their owning docs; glossary disambiguation |

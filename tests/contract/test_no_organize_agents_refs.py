@@ -107,10 +107,27 @@ def _iter_source_files():
 
 
 def _skill_dirs(root: Path):
-    """Immediate sub-directories under `root` that contain a SKILL.md."""
+    """Skill names under a (two-layer aware) skills root.
+
+    Flat skills sit directly under `root` (the mirror's external face); layer
+    subtrees hold skills one level deeper (`root/internal/<name>/`; the source
+    tree also uses `root/external/<name>/`). Layer dirs are not skills.
+    """
     if not root.exists():
         return set()
-    return {d.name for d in root.iterdir() if d.is_dir() and (d / "SKILL.md").is_file()}
+    names = set()
+    for d in root.iterdir():
+        if not d.is_dir():
+            continue
+        if (d / "SKILL.md").is_file():
+            names.add(d.name)
+        elif d.name in {"internal", "external"}:
+            names.update(
+                gc.name
+                for gc in d.iterdir()
+                if gc.is_dir() and (gc / "SKILL.md").is_file()
+            )
+    return names
 
 
 @pytest.mark.contract

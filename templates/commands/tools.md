@@ -31,7 +31,7 @@ That buys **stability** (same behavior across runs, sessions, and agents), **eff
 
 > **Terminology**: unqualified "tool" here means the record above. A supported coding agent (Claude Code, Codex CLI, …) is an **AI agent CLI**; the `tools:` frontmatter key on an agent is its **tool-call list**.
 
-Every record has four canonical types (`project-script`, `system-binary`, `shell-function`, `webhook`), an optional `## Environment Applicability` block (verified version, version differences, platform, architecture, fallback, preflight check), and a two-state lifecycle (`Draft` → `Verified`); only `Verified` records may be invoked. Type semantics, the RFC 2119 behavioral-rules format, environment applicability, the reuse gate, edge cases, and the invocation preview contract are defined once in `shared/definitions/tool-definitions.md`. The authoring templates live inside the owning skill at `skills/create-tools/templates/`.
+Every record has four canonical types (`project-script`, `system-binary`, `shell-function`, `webhook`), an optional `## Environment Applicability` block (verified version, version differences, platform, architecture, fallback, preflight check), and a two-state lifecycle (`Draft` → `Verified`); only `Verified` records may be invoked. Type semantics, the RFC 2119 behavioral-rules format, environment applicability, the reuse gate, edge cases, and the invocation preview contract are defined once in `shared/definitions/tool-definitions.md`. The authoring templates live inside the owning skill at `skills/internal/create-tools/templates/`.
 
 ### Modes → Capability Routing
 
@@ -124,7 +124,7 @@ If you cannot identify your agent, skip Step 2 and proceed with the standard flo
 Check whether a guide exists for the routed skill at:
 
 ```
-.specify/skills/<create-tools|improve-tools>/references/<agent-slug>-guide.md
+.specify/skills/internal/<create-tools|improve-tools>/references/<agent-slug>-guide.md
 ```
 
 If it exists, apply its tool mappings and pitfall avoidances during execution. Otherwise proceed with the standard flow. For shared operational guidance, see `shared/workflow/agent-configuration.md`.

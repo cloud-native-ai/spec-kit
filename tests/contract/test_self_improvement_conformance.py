@@ -10,6 +10,12 @@ GUIDELINE = ROOT / "shared/guidelines/self-improvement.md"
 PATTERN = ROOT / "shared/patterns/self-improvement-pattern.md"
 WORKFLOW = ROOT / "shared/workflow/self-improvement-workflow.md"
 
+
+def _skill_md(name: str) -> Path:
+    """Layer-aware skill file path: internal skills nest, others live in external/."""
+    internal = ROOT / "skills" / "internal" / name / "SKILL.md"
+    return internal if internal.is_file() else ROOT / "skills" / "external" / name / "SKILL.md"
+
 CREATE_SKILLS = {
     "create-agent",
     "create-docs",
@@ -79,37 +85,45 @@ def test_c4_canonical_shared_files_are_mirrored_byte_identically():
 
 
 def test_c5_all_create_and_improve_skills_reference_canonical_workflow():
-    discovered_create = {path.parent.name for path in (ROOT / "skills").glob("create-*/SKILL.md")}
-    discovered_improve = {path.parent.name for path in (ROOT / "skills").glob("improve-*/SKILL.md")}
+    discovered_create = {
+        p.parent.name
+        for p in (ROOT / "skills").glob("*/*/SKILL.md")
+        if p.parent.name.startswith("create-")
+    }
+    discovered_improve = {
+        p.parent.name
+        for p in (ROOT / "skills").glob("*/*/SKILL.md")
+        if p.parent.name.startswith("improve-")
+    }
     assert CREATE_SKILLS <= discovered_create
     assert IMPROVE_SKILLS <= discovered_improve
     for name in sorted(discovered_create | discovered_improve):
-        text = read(ROOT / "skills" / name / "SKILL.md")
+        text = read(_skill_md(name))
         assert ".specify/shared/workflow/self-improvement-workflow.md" in text, name
 
 
 def test_c6_subject_creators_install_a_self_improvement_contract():
     for creator, improver in SUBJECT_CREATORS.items():
-        text = read(ROOT / "skills" / creator / "SKILL.md")
+        text = read(_skill_md(creator))
         assert "Self-Improvement Contract" in text, creator
         assert improver in text, creator
-    assert (ROOT / "skills/create-agent/templates/agent-self-improvement.md").is_file()
-    assert (ROOT / "skills/create-tools/templates/tool-self-improvement.md").is_file()
+    assert (ROOT / "skills/internal/create-agent/templates/agent-self-improvement.md").is_file()
+    assert (ROOT / "skills/internal/create-tools/templates/tool-self-improvement.md").is_file()
     assert "## Self-Improvement Contract" in read(
-        ROOT / "skills/create-team/references/create-mode.md"
+        ROOT / "skills/internal/create-team/references/create-mode.md"
     )
 
 
 def test_c7_non_subject_flows_do_not_claim_artifact_self_improvement():
     for name in NON_SUBJECT_FLOWS:
-        text = read(ROOT / "skills" / name / "SKILL.md")
+        text = read(_skill_md(name))
         assert "Execution Subject" in text and "by default" in text, name
         assert "Assisted Improvement" in text, name
 
 
 def test_c8_improvers_classify_origin_and_defer_outcome_claims():
     for name in sorted(IMPROVE_SKILLS - {"improve-docs"}):
-        text = read(ROOT / "skills" / name / "SKILL.md")
+        text = read(_skill_md(name))
         assert "Assisted Improvement" in text, name
         assert "origin=`self`" in text, name
         assert "outcome" in text.lower() and "pending" in text.lower(), name
@@ -125,13 +139,9 @@ def test_c9_create_tools_engines_compose_the_contract_fragment():
 
 
 def test_c10_runtime_skill_mirrors_are_current():
-    names = {
-        path.parent.name
-        for pattern in ("create-*/SKILL.md", "improve-*/SKILL.md")
-        for path in (ROOT / "skills").glob(pattern)
-    }
-    for name in sorted(names):
-        source = ROOT / "skills" / name / "SKILL.md"
-        mirror = ROOT / ".specify/skills" / name / "SKILL.md"
-        assert mirror.is_file(), f"missing Skill mirror: {name}"
-        assert source.read_bytes() == mirror.read_bytes(), f"Skill mirror drift: {name}"
+    for source in sorted((ROOT / "skills").glob("*/*/SKILL.md")):
+        name, layer = source.parent.name, source.parent.parent.name
+        rel = f"{layer}/{name}" if layer == "internal" else name
+        mirror = ROOT / ".specify/skills" / rel / "SKILL.md"
+        assert mirror.is_file(), f"missing Skill mirror: {rel}"
+        assert source.read_bytes() == mirror.read_bytes(), f"Skill mirror drift: {rel}"

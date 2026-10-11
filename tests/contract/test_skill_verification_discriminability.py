@@ -31,7 +31,7 @@ import pytest
 pytestmark = pytest.mark.contract
 
 ROOT = Path(__file__).resolve().parents[2]
-CREATE = ROOT / "skills" / "create-skills"
+CREATE = ROOT / "skills" / "external" / "create-skills"
 SKILL = CREATE / "SKILL.md"
 PRESSURE = CREATE / "references" / "pressure-testing.md"
 LAYERING = CREATE / "references" / "name-collision-and-layering.md"

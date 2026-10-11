@@ -1,10 +1,10 @@
 """Contract test: single-agent skills contain no team/orchestration content (SC-003).
 
 Enforces migration contract M4:
-  - `skills/create-agent/SKILL.md` retains only single-agent authoring modes
+  - `skills/internal/create-agent/SKILL.md` retains only single-agent authoring modes
     (`role`, `supervisor`, `custom`, `project-custom`) and no `triad` /
     `team-supervisor` modes or orchestration content.
-  - `skills/improve-agent/SKILL.md` contains no Triad/orchestration refinement
+  - `skills/internal/improve-agent/SKILL.md` contains no Triad/orchestration refinement
     content (those move to `improve-team`).
 """
 
@@ -13,8 +13,8 @@ import pytest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-CREATE_AGENT = REPO_ROOT / "skills" / "create-agent" / "SKILL.md"
-IMPROVE_AGENT = REPO_ROOT / "skills" / "improve-agent" / "SKILL.md"
+CREATE_AGENT = REPO_ROOT / "skills" / "internal" / "create-agent" / "SKILL.md"
+IMPROVE_AGENT = REPO_ROOT / "skills" / "internal" / "improve-agent" / "SKILL.md"
 
 # Multi-agent / orchestration tokens that must not appear in the single-agent skills.
 FORBIDDEN_TOKENS = [

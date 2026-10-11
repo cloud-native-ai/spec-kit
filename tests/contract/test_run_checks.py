@@ -38,8 +38,8 @@ ROOT = Path(__file__).resolve().parents[2]
 GOAL_UTILS = ROOT / "scripts" / "python" / "goal-utils.py"
 TEAM_CMD = ROOT / "templates" / "commands" / "team.md"
 TEAM_DOC = ROOT / "docs" / "reference" / "commands" / "team.md"
-EXEC_GUIDE = ROOT / "skills" / "create-team" / "references" / "execution-guide.md"
-GOAL_GUIDE = ROOT / "skills" / "create-team" / "references" / "goal.md"
+EXEC_GUIDE = ROOT / "skills" / "internal" / "create-team" / "references" / "execution-guide.md"
+GOAL_GUIDE = ROOT / "skills" / "internal" / "create-team" / "references" / "goal.md"
 TOOL_RECORD = ROOT / ".specify" / "memory" / "tools" / "goal-utils.py.md"
 QUICKSTART_RUN = (
     ROOT / ".specify" / "specs" / "053-machine-decidable-artifacts" / "notes"

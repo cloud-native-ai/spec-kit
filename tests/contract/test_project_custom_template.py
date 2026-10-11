@@ -6,7 +6,7 @@ single reusable scaffold. This guards two invariants:
 1. The scaffold `agent-project-custom-template.md` exists with valid YAML
    frontmatter, carries the `project:` binding marker + Qoder-compatible fields,
    and contains the mandatory `## Project Scope Guard` section.
-2. `skills/create-agent/SKILL.md` documents the `project-custom` capability and
+2. `skills/internal/create-agent/SKILL.md` documents the `project-custom` capability and
    its scope-guard behavior so the command can route to it.
 """
 
@@ -14,8 +14,8 @@ import pytest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-TEMPLATES_DIR = ROOT / "skills" / "create-agent" / "templates"
-SKILL = ROOT / "skills" / "create-agent" / "SKILL.md"
+TEMPLATES_DIR = ROOT / "skills" / "internal" / "create-agent" / "templates"
+SKILL = ROOT / "skills" / "internal" / "create-agent" / "SKILL.md"
 SCAFFOLD = TEMPLATES_DIR / "agent-project-custom-template.md"
 
 

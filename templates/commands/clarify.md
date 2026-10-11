@@ -14,8 +14,6 @@ handoffs:
     agent: speckit.implement
     prompt: Start the implementation after tasks are clarified.
     send: true
-skills:
-  - study-project
 scripts:
   sh: scripts/bash/check-prerequisites.sh --json --paths-only
 ---

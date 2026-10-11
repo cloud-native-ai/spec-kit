@@ -55,9 +55,9 @@ FEEDBACK_STEP = REPO_ROOT / "shared" / "workflow" / "feedback-step.md"
 TEAM_CMD = REPO_ROOT / "templates" / "commands" / "team.md"
 TEAM_SURFACES = (
     TEAM_CMD,
-    REPO_ROOT / "skills" / "create-team" / "SKILL.md",
-    REPO_ROOT / "skills" / "create-team" / "references" / "create-mode.md",
-    REPO_ROOT / "skills" / "create-team" / "references" / "execution-guide.md",
+    REPO_ROOT / "skills" / "internal" / "create-team" / "SKILL.md",
+    REPO_ROOT / "skills" / "internal" / "create-team" / "references" / "create-mode.md",
+    REPO_ROOT / "skills" / "internal" / "create-team" / "references" / "execution-guide.md",
 )
 
 # (file, marker) — every protected gate MUST keep a stable textual anchor.
@@ -76,10 +76,10 @@ KEEP_LIST = [
     ("templates/commands/implement.md", "only execute on explicit user approval"),
     ("templates/commands/implement.md", "CONFIRM"),
     ("templates/commands/tools.md", "confirm"),
-    ("skills/git-workspace/SKILL.md", "force-with-lease"),
+    ("skills/external/git-workspace/SKILL.md", "force-with-lease"),
     ("shared/workflow/glossary.md", "--confirmed-resolution"),
     ("shared/definitions/tool-definitions.md", "Execution never happens before user confirmation via preview gate"),
-    ("skills/create-team/references/operating-loops.md", "分级确认"),
+    ("skills/internal/create-team/references/operating-loops.md", "分级确认"),
     ("templates/commands/sanitize.md", "等待用户确认后才执行"),
 ]
 
@@ -112,7 +112,7 @@ GOVERNANCE_KEPT_MIN_ROWS = [
 # Every auto-executed flow surface must disclose the execution-report convention.
 AUTO_EXEC_SURFACES = [
     REPO_ROOT / "templates" / "commands" / "team.md",
-    REPO_ROOT / "skills" / "create-team" / "SKILL.md",
+    REPO_ROOT / "skills" / "internal" / "create-team" / "SKILL.md",
     REPO_ROOT / "templates" / "commands" / "goal.md",
     REPO_ROOT / "templates" / "commands" / "todo.md",
     REPO_ROOT / "templates" / "commands" / "agents.md",
@@ -375,7 +375,7 @@ def test_wrapup_submission_prompt_nonblocking() -> None:
     assert "非阻塞" in owner, "wrap-up submission prompt must be non-blocking"
     assert "/speckit.feedback" in owner, "user-facing submission path must be disclosed"
     assert "自动传输" in owner and "MUST NOT" in owner, "no-auto-transmission red line missing"
-    skill = (REPO_ROOT / "skills" / "create-team" / "SKILL.md").read_text(encoding="utf-8")
+    skill = (REPO_ROOT / "skills" / "internal" / "create-team" / "SKILL.md").read_text(encoding="utf-8")
     assert "## Feedback" in skill and "feedback-step.md" in skill, (
         "create-team's Feedback section must point at the owner that carries the "
         "non-blocking / no-auto-transmission semantics"
@@ -386,8 +386,8 @@ def test_continuous_tiered_gates_untouched() -> None:
     """Continuous loops keep their tiered gates — both paths are in the scanner's
     ``GOVERNANCE_PATH_PATTERNS``, so losing the wording would drop the gate count
     without tripping the reversible-gate check."""
-    ops = REPO_ROOT / "skills" / "create-team" / "references" / "operating-loops.md"
-    ws = REPO_ROOT / "skills" / "create-team" / "templates" / "teams" / "project-cluster.md"
+    ops = REPO_ROOT / "skills" / "internal" / "create-team" / "references" / "operating-loops.md"
+    ws = REPO_ROOT / "skills" / "internal" / "create-team" / "templates" / "teams" / "project-cluster.md"
     for path in (ops, ws):
         assert path.is_file(), f"missing source surface: {path}"
         text = path.read_text(encoding="utf-8")

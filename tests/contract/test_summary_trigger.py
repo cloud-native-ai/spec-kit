@@ -15,8 +15,8 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-SKILL_CANONICAL = REPO_ROOT / "skills/create-team/SKILL.md"
-SKILL_MIRROR = REPO_ROOT / ".specify/skills/create-team/SKILL.md"
+SKILL_CANONICAL = REPO_ROOT / "skills/internal/create-team/SKILL.md"
+SKILL_MIRROR = REPO_ROOT / ".specify/skills/internal/create-team/SKILL.md"
 CMD_CANONICAL = REPO_ROOT / "templates/commands/team.md"
 # CMD_MIRROR retired: the .specify/templates/commands/ mirror is intentionally no
 # longer maintained (see scripts/python/sync-mirrors.py header) — per-tool copies
@@ -28,7 +28,7 @@ PER_TOOL_COPIES = [
     REPO_ROOT / ".qoder/commands/speckit.team.md",
     REPO_ROOT / ".opencode/command/speckit.team.md",
 ]
-PRESETS = sorted((REPO_ROOT / "skills/create-team/templates/teams").glob("*.md"))
+PRESETS = sorted((REPO_ROOT / "skills/internal/create-team/templates/teams").glob("*.md"))
 
 # STR-005 — the four permitted summary outcomes
 STATUS_VOCAB = ["produced", "skipped(cadence)", "skipped(budget)", "declined(no-material)"]

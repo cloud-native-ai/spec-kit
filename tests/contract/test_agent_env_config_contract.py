@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
-SKILL_MD = ROOT / "skills" / "manage-agents" / "references" / "intents" / "agent-setup.md"
+SKILL_MD = ROOT / "skills" / "internal" / "manage-agents" / "references" / "intents" / "agent-setup.md"
 
 UNIFIED_VARIABLES = [
     "AGENT_API_KEY",
@@ -31,7 +31,7 @@ SIX_TOOLS = ["claude", "codex", "qoder", "opencode"]
 
 @pytest.fixture(scope="module")
 def skill_text() -> str:
-    assert SKILL_MD.exists(), "skills/manage-agents/references/intents/agent-setup.md does not exist"
+    assert SKILL_MD.exists(), "skills/internal/manage-agents/references/intents/agent-setup.md does not exist"
     return SKILL_MD.read_text(encoding="utf-8")
 
 

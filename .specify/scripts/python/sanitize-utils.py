@@ -555,11 +555,21 @@ def parse_mirror_drift_lines(text: str) -> list:
     return items
 
 
-# Orphan-dir detection is scoped to the skills pair: `agents/` mirrors only
+# Orphan-dir detection is scoped to the skills pairs: `agents/` mirrors only
 # *.agent.md files while `.specify/agents/` additionally carries legitimate
 # runtime structure (templates/instances/execution per agent-definitions),
-# so source-less dirs there are not rename residue.
-MIRROR_DIR_PAIRS = [("skills", ".specify/skills")]
+# so source-less dirs there are not rename residue. Two source layers map to
+# two runtime shapes (external flat, internal nested) — keep in step with
+# sync-mirrors.py MIRROR_PAIRS.
+MIRROR_DIR_PAIRS = [
+    ("skills/external", ".specify/skills"),
+    ("skills/internal", ".specify/skills/internal"),
+]
+
+# `internal` is the internal layer's RESERVED runtime namespace, nested inside
+# the external mirror root; that subtree is sibling-pair-owned, so it is never
+# rename residue (same release as sync-mirrors' exclude_parts).
+RESERVED_MIRROR_DIR_NAMES = {"internal"}
 
 
 def find_orphan_mirror_dirs(root: Path, registry: set) -> list:
@@ -570,6 +580,8 @@ def find_orphan_mirror_dirs(root: Path, registry: set) -> list:
             continue  # client projects have no source root — pair not applicable
         for child in sorted(mirror.iterdir()):
             if not child.is_dir() or (src / child.name).exists():
+                continue
+            if child.name in RESERVED_MIRROR_DIR_NAMES:
                 continue
             if child.name in registry:
                 findings.append(_finding(
@@ -619,8 +631,16 @@ def check_mirror_drift(root: Path) -> list:
 def check_docs_lane(root: Path):
     """Docs-tree dead references reuse docs-utils (Tool Reuse, contract C-4)."""
     try:
-        spec = importlib.util.spec_from_file_location(
-            "sanitize_docs_utils", Path(__file__).with_name("docs-utils.py"))
+        # docs-utils ships with the create-docs skill; resolve in source, mirror, or client layout.
+        candidates = [
+            Path(__file__).with_name("docs-utils.py"),
+            root / "skills" / "external" / "create-docs" / "scripts" / "docs-utils.py",
+            root / ".specify" / "skills" / "create-docs" / "scripts" / "docs-utils.py",
+        ]
+        engine_path = next((p for p in candidates if p.is_file()), None)
+        if engine_path is None:
+            return None
+        spec = importlib.util.spec_from_file_location("sanitize_docs_utils", engine_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         return module.broken_links(root)

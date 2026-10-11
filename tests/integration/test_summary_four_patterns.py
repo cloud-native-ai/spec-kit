@@ -29,8 +29,8 @@ import pytest
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-GENERATOR = REPO_ROOT / "skills/create-team/scripts/build-summary-input.py"
-SUMMARIZE = REPO_ROOT / "skills/summarize-project/scripts"
+GENERATOR = REPO_ROOT / "skills/internal/create-team/scripts/build-summary-input.py"
+SUMMARIZE = REPO_ROOT / "skills/internal/summarize-project/scripts"
 REAL_TEAMS = REPO_ROOT / ".specify/teams"
 FIXTURE_TEAMS = REPO_ROOT / "tests/fixtures/teams"
 

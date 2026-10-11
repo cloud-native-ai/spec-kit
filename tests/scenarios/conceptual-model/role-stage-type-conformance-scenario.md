@@ -5,7 +5,7 @@ Contract: [conceptual-model-contract.md](../../../.specify/specs/.archive/023-ag
 
 ## Scenario Description
 
-Every agent template under `skills/create-agent/templates/` is inspected to confirm it
+Every agent template under `skills/internal/create-agent/templates/` is inspected to confirm it
 expresses the **Role × Stage × Type** model with unified terminology, and that the
 **Type-by-operating-object criterion** holds (superseding the former Type-follows-Stage
 coupling from contract C3). No template may use the deprecated dimension name

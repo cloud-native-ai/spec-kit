@@ -411,8 +411,8 @@ get_template_file() {
     # fallback for installs predating the move.
     local candidate
     for candidate in \
-        "$ROOT_DIR/.specify/skills/create-tools/templates/$template_name" \
-        "$ROOT_DIR/skills/create-tools/templates/$template_name" \
+        "$ROOT_DIR/.specify/skills/internal/create-tools/templates/$template_name" \
+        "$ROOT_DIR/skills/internal/create-tools/templates/$template_name" \
         "$ROOT_DIR/.specify/templates/$template_name" \
         "$ROOT_DIR/templates/$template_name"; do
         if [ -f "$candidate" ]; then
@@ -444,8 +444,8 @@ create_tool_record() {
     local self_improvement_template=""
     local candidate
     for candidate in \
-        "$ROOT_DIR/.specify/skills/create-tools/templates/tool-self-improvement.md" \
-        "$ROOT_DIR/skills/create-tools/templates/tool-self-improvement.md"; do
+        "$ROOT_DIR/.specify/skills/internal/create-tools/templates/tool-self-improvement.md" \
+        "$ROOT_DIR/skills/internal/create-tools/templates/tool-self-improvement.md"; do
         if [ -f "$candidate" ]; then
             self_improvement_template="$candidate"
             break

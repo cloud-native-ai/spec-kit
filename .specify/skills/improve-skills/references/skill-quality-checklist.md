@@ -6,7 +6,7 @@ Use this checklist when improving a Skill after a real execution. The focus is e
 
 - Target Skill and execution window are clear.
 - For self-improvement of `improve-skills`, the reviewed window is the latest improvement loop and duplicate lessons are not re-added without new evidence.
-- The canonical `.specify/skills/<name>/SKILL.md` was re-read before editing if recent edits, formatters, or refresh scripts may have changed it.
+- The resolved canonical SKILL.md was re-read before editing if recent edits, formatters, or refresh scripts may have changed it.
 - User feedback, corrections, and requested behavior changes are captured.
 - Tool failures, test failures, terminal errors, or validation gaps are captured when relevant.
 - Changed files and manual fixes from the execution are reviewed, with generated manifests separated from hand-edited Skill files.
@@ -48,7 +48,7 @@ Use this checklist when improving a Skill after a real execution. The focus is e
 - `description` includes both capability and trigger keywords.
 - `description` is changed only when real trigger/discovery feedback shows it is needed.
 - Optional fields are absent unless they change real behavior.
-- `skill_id`, when present, points to the canonical `.specify/skills/<name>/SKILL.md` path.
+- `skill_id`, when present, points to the canonical resolved path path.
 
 ## Discoverability
 
@@ -88,12 +88,12 @@ Use this checklist when improving a Skill after a real execution. The focus is e
 
 ## Compatibility and Discoverability
 
-- `.specify/skills/<name>/` is the primary copy.
+- The Skill's resolved root is the primary copy (Spec Kit installs: `.specify/skills/<name>/`).
 - `.github/skills/<name>` is a compatibility entrypoint, preferably a symlink or placeholder, not an independent divergent copy; a directory-level `.github/skills -> ../.specify/skills` symlink is also valid.
-- No registration table exists (see `.specify/skills.md`): discoverability means `.specify/skills/<name>/SKILL.md` exists, its frontmatter `name` matches the directory, and no other skill directory carries the same `name` value.
+- No registration table exists (see the skills guide `.specify/skills.md` when present): discoverability means the Skill exists at its resolved root, its frontmatter `name` matches the directory, and no other skill directory carries the same `name` value.
 - If `skill_id` metadata is added or corrected, re-verify that discoverability in the same improvement loop.
 
-## Token Efficiency (纪律引用: `.specify/shared/guidelines/token-efficiency.md`)
+## Token Efficiency (discipline owner: `.specify/shared/guidelines/token-efficiency.md`, when present)
 
 - Improvements preserve or restore token-efficiency program-first: fixed-rule judgments stay delegated to scripts/engines; no change moves deterministic work back into LLM context.
 - Improvements preserve or restore token-efficiency summary-first: no change introduces whole-file injection of machine-managed data; summary/projection access modes are preferred.

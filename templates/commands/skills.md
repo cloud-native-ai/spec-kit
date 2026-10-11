@@ -34,7 +34,7 @@ Check `.specify/skills/<name>/SKILL.md` exists (canonical source).
 ### Step 3: Route
 
 **If NOT exists** → delegate to `create-skills` skill:
-- Read `skills/create-skills/SKILL.md` for full workflow
+- Read `skills/external/create-skills/SKILL.md` for full workflow
 - New Skill MUST conform to current spec (directory layout, frontmatter, `${SKILL_HOME}`/`${SKILL_WORKDIR}` conventions)
 - Use `templates/skills-template.md` as starting point
 
@@ -50,14 +50,14 @@ Check `.specify/skills/<name>/SKILL.md` exists (canonical source).
 
 2. **Phase B — User-requested refinement**: Standard `improve-skills` workflow.
 
-For detailed path conventions (`${SKILL_HOME}` / `${SKILL_WORKDIR}` semantics, computation idioms, nested invocations), see `skills/create-skills/SKILL.md`.
+For detailed path conventions (`${SKILL_HOME}` / `${SKILL_WORKDIR}` semantics, computation idioms, nested invocations), see `skills/external/create-skills/SKILL.md`.
 
 ### Step 4: Propagate to built-in agents (create path only)
 
 After a **new** Skill is created (skip on the `improve-skills` path), wire it into the built-in role agents so they prefer it for role-relevant work (Skill Enablement convention: the `## Skill Enablement` section pattern carried by the built-in role agents under `.specify/agents/templates/`).
 
 1. **Guard**: skip if the new Skill is non-declarable (reference-only/meta: `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `create-team`, `improve-team`). Normal user-created Skills proceed.
-2. **Analyze**: read the Meta Agent preset set from `.specify/agents/templates/` and the 7 Worker role capability templates from `skills/create-agent/templates/` (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`). Judge each agent's role (Identity & Responsibilities) against the new Skill's capability + trigger keywords.
+2. **Analyze**: read the Meta Agent preset set from `.specify/agents/templates/` and the 7 Worker role capability templates from `skills/internal/create-agent/templates/` (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`). Judge each agent's role (Identity & Responsibilities) against the new Skill's capability + trigger keywords.
 3. **Match**: select the agents whose role operations the Skill covers and draft a one-line "when to use" per match. If none match, report "no role-relevant agents" and skip edits (no forced use).
 4. **Propose**: present a `| Agent | Skill | When to use |` table as disclosure (non-blocking).
 5. **Apply** (directly after the proposal is presented; edits are reversible via later edits): for each matched agent, edit BOTH `agents/<slug>.agent.md` and `.specify/agents/templates/<slug>.agent.md`:

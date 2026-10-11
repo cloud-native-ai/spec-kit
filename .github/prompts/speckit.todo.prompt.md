@@ -108,7 +108,7 @@ Execute `.specify/scripts/python/search-todo.py --json` from repo root. The scri
 
 ### Step 3: Group and Organize Blocks
 
-**Recall prior memory first** (native `memory-recall` skill): search `.specify/memory/session/` and `.specify/memory/knowledge/` for prior TODO-run outcomes and durable preferences (suggested queries: `todo`, `convention`, `preference`, `decision`, `veto`), and list `.specify/memory/todo/` for parked ideas whose theme matches the current blocks. Apply recalled entries as non-derivable inputs below — e.g. a recorded user veto or deferral of a recurring block, a preferred grouping/batching convention, or a standing scope constraint. When a block clearly implements a parked idea, mark the parked record `promoted` (see Park Mode Step 4). Never contradict a recalled user decision — pause and ask the user first (user-decision protection, kept).
+**Recall prior memory first** (native `memory-recall` skill, `.specify/skills/internal/memory-recall/SKILL.md`): search `.specify/memory/session/` and `.specify/memory/knowledge/` for prior TODO-run outcomes and durable preferences (suggested queries: `todo`, `convention`, `preference`, `decision`, `veto`), and list `.specify/memory/todo/` for parked ideas whose theme matches the current blocks. Apply recalled entries as non-derivable inputs below — e.g. a recorded user veto or deferral of a recurring block, a preferred grouping/batching convention, or a standing scope constraint. When a block clearly implements a parked idea, mark the parked record `promoted` (see Park Mode Step 4). Never contradict a recalled user decision — pause and ask the user first (user-decision protection, kept).
 
 For each valid block, create a **work item** with:
 1. **Source**: `source_file:opening_line` (link to origin)
@@ -277,7 +277,7 @@ After execution, offer to commit the changes using `.specify/templates/commit-te
 
 ## Memory Record
 
-At wrap-up, invoke the native `memory-record` skill (skip for trivial no-op runs — zero blocks found, or a pure insertion with no decisions):
+At wrap-up, invoke the native `memory-record` skill (`.specify/skills/internal/memory-record/SKILL.md`; skip for trivial no-op runs — zero blocks found, or a pure insertion with no decisions):
 
 - **Session scope**: persist a working note of this run's outcome (blocks executed / deferred / vetoed and why, batches confirmed) so the next `/speckit.todo` run recalls what was already handled and avoids re-proposing it.
 - **Knowledge scope**: when the run surfaced a durable user preference, veto rule, or grouping/batching convention, upsert it as long-term knowledge so future runs apply it at Step 3.

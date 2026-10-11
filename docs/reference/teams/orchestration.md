@@ -4,10 +4,10 @@ Operational guide for coordinating multiple agents through the team domain. Ever
 entered through the single `/speckit.team` command and executed by the `create-team` skill.
 
 > **Scope**: this is the **doc-level operational guide**. The normative single source of truth
-> is the skill references — [`conceptual-model.md`](../../../skills/create-team/references/conceptual-model.md)
+> is the skill references — [`conceptual-model.md`](../../../skills/internal/create-team/references/conceptual-model.md)
 > (the Role × Stage × Type model and the four patterns) and, for the long-lived operating form,
 > [`continuous-operations.md`](./continuous-operations.md) (which points to
-> [`operating-loops.md`](../../../skills/create-team/references/operating-loops.md)). When this guide
+> [`operating-loops.md`](../../../skills/internal/create-team/references/operating-loops.md)). When this guide
 > and a reference disagree, the reference wins.
 
 ## Overview
@@ -297,7 +297,7 @@ circuit-breaker / kill-switch, a state spine, and Maker/Checker verification.
 
 > This guide intentionally does not duplicate that discipline. See
 > **[continuous-operations.md](./continuous-operations.md)** for the full operating model, and the
-> normative source [`operating-loops.md`](../../../skills/create-team/references/operating-loops.md).
+> normative source [`operating-loops.md`](../../../skills/internal/create-team/references/operating-loops.md).
 
 ---
 
@@ -362,9 +362,9 @@ total token cost by 40–60% compared to using high-capability models everywhere
 
 ## Multi-Agent Template Catalog
 
-The multi-agent authoring templates live at **`skills/create-team/templates/agents/`** (installed mirror:
-`.specify/skills/create-team/templates/agents/`). The single-agent role/custom templates stay in
-`skills/create-agent/templates/` (see [`docs/agents/templates-and-agents.md`](../agents/templates-and-agents.md)).
+The multi-agent authoring templates live at **`skills/internal/create-team/templates/agents/`** (installed mirror:
+`.specify/skills/internal/create-team/templates/agents/`). The single-agent role/custom templates stay in
+`skills/internal/create-agent/templates/` (see [`docs/agents/templates-and-agents.md`](../agents/templates-and-agents.md)).
 
 | Template | Purpose |
 |----------|---------|
@@ -388,9 +388,9 @@ The multi-agent authoring templates live at **`skills/create-team/templates/agen
 
 - Team concept, 4-pattern semantics, directory layout, authoritative-source index: [overview.md](./overview.md)
 - The long-lived operating discipline (maturity, constraints, budget, verifier, state spine): [continuous-operations.md](./continuous-operations.md)
-- Normative concept model (Role × Stage × Type, Team/Loop, merged Team Supervisor): [`conceptual-model.md`](../../../skills/create-team/references/conceptual-model.md)
+- Normative concept model (Role × Stage × Type, Team/Loop, merged Team Supervisor): [`conceptual-model.md`](../../../skills/internal/create-team/references/conceptual-model.md)
 - Command entry point (create / modify / run): [`templates/commands/team.md`](../commands/team.md)
 - The per-role quality loop iteration builds on: [quality-loop.md](../agents/quality-loop.md)
 
 Normative source: `.specify/specs/.archive/026-agent-team-management/` and the orchestration templates
-`skills/create-team/templates/agents/agent-{parallel,serial,triad}-orchestration-template.md`.
+`skills/internal/create-team/templates/agents/agent-{parallel,serial,triad}-orchestration-template.md`.

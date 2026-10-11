@@ -17,7 +17,7 @@ import pytest
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-GENERATOR = REPO_ROOT / "skills/create-team/scripts/build-summary-input.py"
+GENERATOR = REPO_ROOT / "skills/internal/create-team/scripts/build-summary-input.py"
 GOAL_UTILS = REPO_ROOT / "scripts/python/goal-utils.py"
 
 pytestmark = pytest.mark.integration
@@ -144,8 +144,8 @@ def test_one_goal_per_team_invariant_is_documented():
     prose-schema level like the rest of the team.md contract. Pin that it is stated,
     which is the honest verifiable form for a prose-governed rule.
     """
-    skill = (REPO_ROOT / "skills/create-team/SKILL.md").read_text(encoding="utf-8")
-    reference = (REPO_ROOT / "skills/create-team/references/goal.md").read_text(encoding="utf-8")
+    skill = (REPO_ROOT / "skills/internal/create-team/SKILL.md").read_text(encoding="utf-8")
+    reference = (REPO_ROOT / "skills/internal/create-team/references/goal.md").read_text(encoding="utf-8")
     authority = (
         REPO_ROOT / ".specify/shared/definitions/goal-definitions.md"
     ).read_text(encoding="utf-8")

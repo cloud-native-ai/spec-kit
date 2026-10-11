@@ -4,16 +4,19 @@
 
 ## Where skills live
 
-- Installed skills: `.specify/skills/` — one directory per skill: `SKILL.md` (YAML frontmatter `name` / `description` + body) plus optional `references/`, `scripts/`, `assets/`.
+Skills ship in two layers, each one directory per skill — `SKILL.md` (YAML frontmatter `name` / `description` + body) plus optional `references/`, `scripts/`, `assets/`:
+
+- **External skills** (for consuming projects and their agents): installed flat at `.specify/skills/<name>/`.
+- **Internal skills** (Spec Kit workflow machinery): installed nested at `.specify/skills/internal/<name>/`; not agent-visible — `/speckit.*` workflows consume them via explicit paths only.
 - `.github/skills` is a compatibility symlink to `.specify/skills/` for tools that discover skills there.
 
 ## Discovery — no registration table
 
-Supported AI agent CLIs discover skills natively (directory scan / skill loaders); Spec Kit maintains **no skill registry** in `instructions.md`. A skill exists iff its directory contains a valid `SKILL.md`. To enumerate installed skills:
+Supported AI agent CLIs discover skills natively (directory scan / skill loaders); Spec Kit maintains **no skill registry** in `instructions.md`. A skill exists iff its directory contains a valid `SKILL.md`. A one-level scan of `.specify/skills/` therefore sees external skills only; internal skills are never registered or discovered by agents. To enumerate installed external skills:
 
 ```bash
-ls .specify/skills/                       # skill directories
-head -n 8 .specify/skills/*/SKILL.md      # frontmatter name/description per skill
+ls .specify/skills/                       # external skill directories (one level)
+head -n 8 .specify/skills/*/SKILL.md      # frontmatter name/description per external skill
 ```
 
 ## Creating & improving
@@ -24,4 +27,4 @@ head -n 8 .specify/skills/*/SKILL.md      # frontmatter name/description per ski
 
 ## Mirrors (Spec Kit development repositories only)
 
-In repositories that develop skills upstream, canonical sources live in the root `skills/` directory and are mirrored to `.specify/skills/` by `scripts/python/sync-mirrors.py`. Edit the canonical source, never the mirror; run the sync engine after every change.
+In repositories that develop skills upstream, canonical sources live in the two root layers `skills/external/<name>/` and `skills/internal/<name>/`, mirrored to `.specify/skills/` by `scripts/python/sync-mirrors.py` (external flat, internal nested). Edit the canonical source, never the mirror; run the sync engine after every change.

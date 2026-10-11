@@ -28,8 +28,8 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-ENGINE = REPO_ROOT / "skills/archive-session/scripts/export.py"
-SKILL = REPO_ROOT / "skills/archive-session/SKILL.md"
+ENGINE = REPO_ROOT / "skills/internal/archive-session/scripts/export.py"
+SKILL = REPO_ROOT / "skills/internal/archive-session/SKILL.md"
 
 pytestmark = pytest.mark.contract
 

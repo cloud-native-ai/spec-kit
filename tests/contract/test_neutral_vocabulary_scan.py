@@ -1,7 +1,7 @@
 """Contract test: neutral vocabulary scan across the three agent directories.
 
 SC-001 / C-3 / C-4: every frontmatter key in agents/,
-skills/create-agent/templates/ and skills/create-team/templates/agents/
+skills/internal/create-agent/templates/ and skills/internal/create-team/templates/agents/
 must be a kebab-case member of the neutral key set; the tool-dialect
 vocabulary must have zero occurrences. Files without frontmatter (composable
 snippets, schema docs) carry no metadata and are vacuously compliant.
@@ -24,8 +24,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 SCAN_DIRS = [
     REPO_ROOT / "agents",
-    REPO_ROOT / "skills" / "create-agent" / "templates",
-    REPO_ROOT / "skills" / "create-team" / "templates" / "agents",
+    REPO_ROOT / "skills" / "internal" / "create-agent" / "templates",
+    REPO_ROOT / "skills" / "internal" / "create-team" / "templates" / "agents",
 ]
 
 

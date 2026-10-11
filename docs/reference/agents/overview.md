@@ -17,7 +17,7 @@ Agent 为准——这里描述的是当前**已实现**的机制，而非提案�
 - **技能（Skills）**：`create-agent`（创作单个 Agent）、`improve-agent`（优化单个 Agent）；
   团队编排（parallel / serial / iteration / continuous）由团队域的 `create-team` /
   `improve-team` 承载。
-- **制品（Artifacts）**：可复用模板位于 `skills/create-agent/templates/`，持久化 Agent 位于
+- **制品（Artifacts）**：可复用模板位于 `skills/internal/create-agent/templates/`，持久化 Agent 位于
   `.specify/agents/templates/`（预置角色）与 `.specify/agents/instances/`（项目实例），经逐文件软链接暴露给每个受支持工具。
 
 ```
@@ -29,7 +29,7 @@ Agent 为准——这里描述的是当前**已实现**的机制，而非提案�
    (author)          (refine)                    (define|run:              (refine team: stages/
         │                 │                        parallel|serial|          thresholds/maturity)
         ▼                 ▼                        iteration|continuous)
-   skills/create-agent/templates/*        .specify/agents/{templates,instances}/*.agent.md  ──(per-file symlink)──▶ .qoder/agents/, .github/agents/, …
+   skills/internal/create-agent/templates/*        .specify/agents/{templates,instances}/*.agent.md  ──(per-file symlink)──▶ .qoder/agents/, .github/agents/, …
    (Role × Stage × Type source)           (persisted Team members)
 ```
 
@@ -59,6 +59,6 @@ Agent 为准——这里描述的是当前**已实现**的机制，而非提案�
 
 ## 规范来源
 
-本文档以仓库中的活制品为准：模板 `skills/create-agent/templates/`、持久化 Agent
+本文档以仓库中的活制品为准：模板 `skills/internal/create-agent/templates/`、持久化 Agent
 `.specify/agents/`，以及守卫测试 `tests/contract/test_agent_skill_enablement.py` 与
 `tests/unit/test_agent_deprecated_terms.py`。概念细节见 [design.md](./design.md)。

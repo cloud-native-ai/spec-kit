@@ -20,7 +20,11 @@ FIXTURES = ROOT / "tests" / "fixtures" / "sanitize" / "correctness"
 def make_ws(tmp_path: Path) -> Path:
     (tmp_path / ".specify" / "memory" / "todo").mkdir(parents=True, exist_ok=True)
     (tmp_path / "scripts" / "python").mkdir(parents=True, exist_ok=True)
-    (tmp_path / "skills" / "create-docs").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "skills" / "external" / "create-docs" / "scripts").mkdir(parents=True, exist_ok=True)
+    engine = (Path(__file__).resolve().parents[2]
+              / "skills" / "external" / "create-docs" / "scripts" / "docs-utils.py")
+    (tmp_path / "skills" / "external" / "create-docs" / "scripts" / "docs-utils.py").write_text(
+        engine.read_text(encoding="utf-8"), encoding="utf-8")
     (tmp_path / "templates" / "commands").mkdir(parents=True, exist_ok=True)
     (tmp_path / "scripts" / "python" / "feedback-utils.py").write_text("#", encoding="utf-8")
     (tmp_path / "templates" / "commands" / "feedback.md").write_text("#", encoding="utf-8")

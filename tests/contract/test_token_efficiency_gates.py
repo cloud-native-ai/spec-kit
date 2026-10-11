@@ -15,11 +15,11 @@ pytestmark = pytest.mark.contract
 ROOT = Path(__file__).resolve().parents[2]
 
 GATE_FILES = [
-    "skills/create-skills/references/skill-creation-quality-checklist.md",
-    "skills/improve-skills/references/skill-quality-checklist.md",
-    "skills/create-agent/SKILL.md",
-    "skills/create-team/SKILL.md",
-    "skills/create-tools/SKILL.md",
+    "skills/external/create-skills/references/skill-creation-quality-checklist.md",
+    "skills/external/improve-skills/references/skill-quality-checklist.md",
+    "skills/internal/create-agent/SKILL.md",
+    "skills/internal/create-team/SKILL.md",
+    "skills/internal/create-tools/SKILL.md",
 ]
 
 
@@ -41,7 +41,10 @@ def test_ca3_gate_file_references_discipline_doc_not_copies(rel):
 @pytest.mark.parametrize("rel", GATE_FILES)
 def test_ca3_skill_mirror_identical(rel):
     src = ROOT / rel
-    mirror = ROOT / ".specify" / rel
+    # Runtime mirror shape: external flattens to .specify/skills/<name>/..., internal
+    # stays nested under .specify/skills/internal/<name>/...
+    mirror_rel = rel.replace("skills/external/", "skills/", 1)
+    mirror = ROOT / ".specify" / mirror_rel
     assert mirror.is_file(), f"missing mirror: {mirror}"
     assert src.read_bytes() == mirror.read_bytes(), f"mirror drift: {rel}"
 

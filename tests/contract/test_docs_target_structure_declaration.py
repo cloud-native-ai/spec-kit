@@ -8,9 +8,9 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 COMMAND = REPO_ROOT / "templates" / "commands" / "docs.md"
-TARGET_TEMPLATE = REPO_ROOT / "templates" / "docs-target-structure-template.md"
-BASELINE_OWNER = REPO_ROOT / "skills" / "create-docs" / "SKILL.md"
-DOCS_ENGINE = REPO_ROOT / "scripts" / "python" / "docs-utils.py"
+TARGET_TEMPLATE = REPO_ROOT / "skills" / "external" / "create-docs" / "assets" / "docs-target-structure-template.md"
+BASELINE_OWNER = REPO_ROOT / "skills" / "external" / "create-docs" / "SKILL.md"
+DOCS_ENGINE = REPO_ROOT / "skills" / "external" / "create-docs" / "scripts" / "docs-utils.py"
 
 START = "<!-- DOCS_TARGET_STRUCTURE_START -->"
 END = "<!-- DOCS_TARGET_STRUCTURE_END -->"
@@ -49,9 +49,9 @@ def _owned_baseline_tokens() -> set[str]:
 def test_target_declaration_has_stable_root_path_and_managed_block() -> None:
     command = _command()
     template = _target_template()
-    assert ".specify/docs/target-structure.md" in command
-    assert ".specify/docs/plans/target-structure.md" not in command
-    assert ".specify/docs/audit/target-structure.md" not in command
+    assert "docs/.speckit/target-structure.md" in command
+    assert "docs/.speckit/plans/target-structure.md" not in command
+    assert "docs/.speckit/audit/target-structure.md" not in command
     assert template.count(START) == 1
     assert template.count(END) == 1
     assert template.index(START) < template.index(END)
@@ -100,5 +100,5 @@ def test_substantive_drift_only_proposes_confirmed_redesign() -> None:
 @pytest.mark.contract
 def test_declaration_does_not_expand_docs_engine_actions() -> None:
     engine = DOCS_ENGINE.read_text(encoding="utf-8")
-    assert ".specify/docs/target-structure.md" not in engine
+    assert "docs/.speckit/target-structure.md" not in engine
     assert "DOCS_TARGET_STRUCTURE_START" not in engine

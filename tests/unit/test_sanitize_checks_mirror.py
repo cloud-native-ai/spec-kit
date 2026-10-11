@@ -45,8 +45,9 @@ def make_mirror_ws(tmp_path: Path, skills_dirs, source_dirs, registry=("register
     for d in skills_dirs:
         (mirror / d).mkdir(exist_ok=True)
         (mirror / d / "SKILL.md").write_text("#\n", encoding="utf-8")
-    src = tmp_path / "skills"
-    src.mkdir(exist_ok=True)
+    # The external pair's source root is skills/external/ (two-layer layout).
+    src = tmp_path / "skills" / "external"
+    src.mkdir(parents=True, exist_ok=True)
     for d in source_dirs:
         (src / d).mkdir(exist_ok=True)
         (src / d / "SKILL.md").write_text("#\n", encoding="utf-8")
@@ -81,6 +82,28 @@ def test_registered_orphan_is_medium_delegated(tmp_path):
     f = next(f for f in findings if f["target"] == ".specify/skills/registered-skill")
     assert f["severity"] == "medium"
     assert f["disposition"] == "delegate"
+
+
+def test_internal_pair_orphan_detected(tmp_path):
+    """The internal pair nests: skills/internal/<n> -> .specify/skills/internal/<n>."""
+    mirror = tmp_path / ".specify" / "skills" / "internal"
+    mirror.mkdir(parents=True)
+    (mirror / "ghost-int").mkdir()
+    (mirror / "ghost-int" / "SKILL.md").write_text("#\n", encoding="utf-8")
+    (tmp_path / "skills" / "internal").mkdir(parents=True)
+    findings = su.find_orphan_mirror_dirs(tmp_path, set())
+    targets = {f["target"] for f in findings}
+    assert ".specify/skills/internal/ghost-int" in targets
+
+
+def test_reserved_internal_layer_not_flagged(tmp_path):
+    """The reserved `internal` dir under the external pair's mirror is never an orphan."""
+    ws, _registry = make_mirror_ws(
+        tmp_path, skills_dirs=["live-skill"], source_dirs=["live-skill"], registry=())
+    (tmp_path / ".specify" / "skills" / "internal").mkdir(exist_ok=True)
+    (tmp_path / "skills" / "internal").mkdir(parents=True, exist_ok=True)
+    findings = su.find_orphan_mirror_dirs(ws, set())
+    assert all(f["target"] != ".specify/skills/internal" for f in findings)
 
 
 def test_orphan_check_skipped_without_source_root(tmp_path):

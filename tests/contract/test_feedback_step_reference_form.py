@@ -68,7 +68,7 @@ def _surfaces() -> list[tuple[Path, str, str]]:
     out: list[tuple[Path, str, str]] = []
     for path in sorted((REPO_ROOT / "templates" / "commands").glob("*.md")):
         out.append((path, "command", f"/speckit.{path.stem}"))
-    for path in sorted((REPO_ROOT / "skills").glob("*/SKILL.md")):
+    for path in sorted((REPO_ROOT / "skills").glob("*/*/SKILL.md")):
         out.append((path, "skill", f"skill:{path.parent.name}"))
     template = REPO_ROOT / "templates" / "skills-template.md"
     out.append((template, "skill", "skill:{{SKILL_NAME}}"))

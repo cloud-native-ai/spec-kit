@@ -51,7 +51,7 @@ the team domain — the `create-team` skill via `/speckit.team`. Operational det
 ### `create-agent` — authoring engine
 
 The single authoring engine. Given a `kind`, it produces the corresponding artifact from
-templates under `skills/create-agent/templates/`:
+templates under `skills/internal/create-agent/templates/`:
 
 | `kind` | Produces | Key source templates |
 |--------|----------|----------------------|
@@ -64,7 +64,7 @@ Key rules:
 - **Supervision is active by default** (`supervisor: true`); the delegation snippet is
   **composed at generation time**, never copied into role templates — edit it only in
   `agent-supervision-delegation.md` (single source of truth).
-- It targets an explicit **layer**: template (`.specify/agents/templates/`, `skills/create-agent/templates/`), instance (`.specify/agents/instances/`), or execution (`.specify/agents/execution/{configs,scripts}/`).
+- It targets an explicit **layer**: template (`.specify/agents/templates/`, `skills/internal/create-agent/templates/`), instance (`.specify/agents/instances/`), or execution (`.specify/agents/execution/{configs,scripts}/`).
 - It accepts an `AgentAuthoringRequest` (`kind`, `role_slug`, `task`, `scoring_dimensions[]`,
   `threshold`, `max_iterations`, environment/workspace paths, `project_context`) and returns
   an `AuthoringResult` (`artifact_paths`, `kind`, `status`).
@@ -148,7 +148,7 @@ they prefer a purpose-built framework skill over improvising the same operation.
    `create-skills`, `improve-skills`, `create-team`, `improve-team`) are **non-declarable** and never appear
    in a role agent's list.
 2. **A `## Skill Enablement` body section** — the shared preference protocol (single source of
-   truth at `skills/create-agent/templates/agent-skill-enablement.md`, composed rather than
+   truth at `skills/internal/create-agent/templates/agent-skill-enablement.md`, composed rather than
    reworded per agent) plus a `| Skill | When to use |` table whose skill set equals the
    `skills:` list. The protocol directs the agent to prefer an applicable skill, choose the most
    role-specific one when several apply, and degrade gracefully to direct execution (surfacing
@@ -167,6 +167,6 @@ for tool records.
 ## Traceability
 
 Normative source: the command template `templates/commands/agents.md` (installed as
-`/speckit.agents`) and the skill contracts `skills/create-agent/SKILL.md` and
-`skills/improve-agent/SKILL.md`. For team operations see the team skills
-`skills/create-team/SKILL.md` and `skills/improve-team/SKILL.md`.
+`/speckit.agents`) and the skill contracts `skills/internal/create-agent/SKILL.md` and
+`skills/internal/improve-agent/SKILL.md`. For team operations see the team skills
+`skills/internal/create-team/SKILL.md` and `skills/internal/improve-team/SKILL.md`.

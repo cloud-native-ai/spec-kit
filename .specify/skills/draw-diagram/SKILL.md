@@ -84,11 +84,11 @@ draw-* 专项技能渲染。**本技能不渲染任何图**，也不维护任何
 
 | 层 | 承载面 | 这一层做什么 |
 |----|--------|-------------|
-| **L1** | `skills/draw-diagram/SKILL.md`（本文件） | 分析语义逻辑，构建 LDM 与几何层，产出**整体逻辑图表设计**（Step 1） |
-| **L2** | `skills/draw-diagram/references/*.md` | 选型与判据分析：路由矩阵 / 独占登记 / tie-break / 能力轴（Step 2）、LDM schema 与覆盖检查、**交付契约**（交付形态 + 面向用户的文字规则） |
-| **L3** | 委派动作本身 | 选定后以 Skill 调用委派对应 `skills/draw-*` 引擎，传 SDS 路径 + `weight_plan` + 交付契约（Step 3） |
-| **L4** | `skills/draw-*/SKILL.md` | 针对**自身图表类型**做引擎侧逻辑设计：「SDS 实现与强弱落地」小节把语义档位落实为本引擎的绝对线宽/字号，并声明几何兑现义务 |
-| **L5** | `skills/draw-*/references/*.md` | 各层面完善并输出最终图表：语法/格式、渲染与导出、引擎指南与坑位 |
+| **L1** | `skills/external/draw-diagram/SKILL.md`（本文件） | 分析语义逻辑，构建 LDM 与几何层，产出**整体逻辑图表设计**（Step 1） |
+| **L2** | `skills/external/draw-diagram/references/*.md` | 选型与判据分析：路由矩阵 / 独占登记 / tie-break / 能力轴（Step 2）、LDM schema 与覆盖检查、**交付契约**（交付形态 + 面向用户的文字规则） |
+| **L3** | 委派动作本身 | 选定后以 Skill 调用委派对应 `skills/external/draw-*` 引擎，传 SDS 路径 + `weight_plan` + 交付契约（Step 3） |
+| **L4** | `skills/external/draw-*/SKILL.md` | 针对**自身图表类型**做引擎侧逻辑设计：「SDS 实现与强弱落地」小节把语义档位落实为本引擎的绝对线宽/字号，并声明几何兑现义务 |
+| **L5** | `skills/external/draw-*/references/*.md` | 各层面完善并输出最终图表：语法/格式、渲染与导出、引擎指南与坑位 |
 
 **当前落地状态（如实记录，不粉饰）**：
 
@@ -116,7 +116,7 @@ draw-* 专项技能渲染。**本技能不渲染任何图**，也不维护任何
 
 ## Self-Improvement Contract
 
-- Canonical owner: `skills/draw-diagram/`（镜像 `.specify/skills/draw-diagram/` 由 sync-mirrors 生成，不手改）
+- Canonical owner: `skills/external/draw-diagram/`（镜像 `.specify/skills/draw-diagram/` 由 sync-mirrors 生成，不手改）
 - Own-run observation: 每次委派的路由命中（独占/矩阵/tie-break/问用户）、验收覆盖结果、再委派次数
 - Mutation route: `improve-skills`（路由错配、矩阵缺口、LDM 字段不足均走此路由修订本技能）
 - Validation route: 路由判定用 arena 账本历史案例回放；纪律类修订按 create-skills 压力测试法 RED-GREEN

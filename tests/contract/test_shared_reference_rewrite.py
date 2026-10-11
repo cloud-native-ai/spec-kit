@@ -10,8 +10,11 @@ directory is subdivided by content type: ``workflow/`` (process protocols), ``gu
   root-relative form ``shared/<type>/<f>.md`` (install-time ``rewrite_paths`` upgrades these to
   ``.specify/shared/<type>/<f>.md``). Where a command template intentionally hard-codes the
   installed path, it uses ``.specify/shared/<type>/<f>.md``.
-- Sibling skills (``skills/*/SKILL.md``) use the installed-absolute form
-  ``.specify/shared/<type>/<f>.md``.
+- Sibling skills live in the two-layer source tree ``skills/{external,internal}/<name>/`` and
+  use the installed-absolute form ``.specify/shared/<type>/<f>.md``.
+- Install-time ``rewrite_paths`` maps the two-layer skills source layout onto its runtime
+  shape: ``skills/external/<name>/...`` flattens to ``.specify/skills/<name>/...`` while
+  ``skills/internal/<name>/...`` stays nested under ``.specify/skills/internal/<name>/...``.
 """
 
 from pathlib import Path
@@ -62,9 +65,15 @@ def test_no_command_template_mentions_sdd_workflow():
 
 def test_no_skill_mentions_sdd_workflow():
     offenders = []
-    for f in _iter_files("skills/*/SKILL.md"):
+    scanned = 0
+    for f in _iter_files("skills/*/*/SKILL.md"):
+        scanned += 1
         if "sdd-workflow" in f.read_text(encoding="utf-8"):
             offenders.append(str(f.relative_to(ROOT)))
+    assert scanned >= 32, (
+        f"only {scanned} skill SKILL.md files scanned — the two-layer glob "
+        f"skills/*/*/SKILL.md must see both layers (32 total)"
+    )
     assert not offenders, f"skills still mention sdd-workflow: {offenders}"
 
 
@@ -99,14 +108,17 @@ def test_shared_reference_targets_resolve():
 
     missing = []
     pattern = re.compile(r"shared/(" + "|".join(SHARED_TYPES) + r")/([a-z0-9-]+\.md)")
+    scanned = 0
     for f in _iter_files(
         "templates/commands/*.md",
         "templates/skills-template.md",
-        "skills/*/SKILL.md",
+        "skills/*/*/SKILL.md",
     ):
+        scanned += 1
         for subdir, name in pattern.findall(f.read_text(encoding="utf-8")):
             if not (ROOT / "shared" / subdir / name).exists():
                 missing.append((str(f.relative_to(ROOT)), f"{subdir}/{name}"))
+    assert scanned >= 32, f"only {scanned} files scanned — a vacuous glob proves nothing"
     assert not missing, f"references resolve to missing shared docs: {missing}"
 
 

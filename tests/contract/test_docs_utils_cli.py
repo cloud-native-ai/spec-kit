@@ -15,8 +15,8 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SCRIPT = REPO_ROOT / "scripts" / "python" / "docs-utils.py"
-MIRROR = REPO_ROOT / ".specify" / "scripts" / "python" / "docs-utils.py"
+SCRIPT = REPO_ROOT / "skills" / "external" / "create-docs" / "scripts" / "docs-utils.py"
+MIRROR = REPO_ROOT / ".specify" / "skills" / "create-docs" / "scripts" / "docs-utils.py"
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "docs_command"
 
 ACTIONS = {"scan", "expire", "clean", "archive-check", "stats", "validate", "audit"}
@@ -47,7 +47,7 @@ def messy_project(tmp_path: Path) -> Path:
 
 @pytest.mark.contract
 def test_c1_script_exists_with_fixed_action_set():
-    assert SCRIPT.is_file(), "scripts/python/docs-utils.py missing"
+    assert SCRIPT.is_file(), "skills/external/create-docs/scripts/docs-utils.py missing"
     source = SCRIPT.read_text(encoding="utf-8")
     for action in ACTIONS:
         assert f'"{action}"' in source, f"action {action} not declared"
@@ -157,7 +157,7 @@ def test_c8_audit_appends_record_even_for_noop(tmp_path: Path):
     assert audit_file.is_file()
     text = audit_file.read_text(encoding="utf-8")
     assert "full-sweep" in text and "all dimensions within tolerance" in text
-    assert ".specify/docs/audit" in str(audit_file).replace("\\", "/")
+    assert "docs/.speckit/audit" in str(audit_file).replace("\\", "/")
 
 
 @pytest.mark.contract

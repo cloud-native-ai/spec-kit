@@ -2,7 +2,7 @@
 
 Failure mode this prevents
 --------------------------
-`skills/draw-plantuml/references/sds-realization.md` §2.1 organises hidden
+`skills/external/draw-plantuml/references/sds-realization.md` §2.1 organises hidden
 scaffolding as "intent → means → measured boundary", one hidden edge at a time.
 A property of the *graph* — a visible `A --> B` plus a reverse `B -[hidden]- A`
 forming a 2-cycle, whose reversal dot leaves undecided — is not expressible in
@@ -26,7 +26,7 @@ import pytest
 pytestmark = pytest.mark.contract
 
 ROOT = Path(__file__).resolve().parents[2]
-PUML = ROOT / "skills" / "draw-plantuml" / "references"
+PUML = ROOT / "skills" / "external" / "draw-plantuml" / "references"
 OWNER = PUML / "sds-realization.md"
 LAYOUT = PUML / "guide" / "layout.md"
 PLAYBOOK = PUML / "guide" / "large-diagram-playbook.md"

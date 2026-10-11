@@ -18,9 +18,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TOOLS_CMD = REPO_ROOT / "templates" / "commands" / "tools.md"
-CREATE_TOOLS = REPO_ROOT / "skills" / "create-tools" / "SKILL.md"
-IMPROVE_TOOLS = REPO_ROOT / "skills" / "improve-tools" / "SKILL.md"
-TOOL_TEMPLATE_DIR = REPO_ROOT / "skills" / "create-tools" / "templates"
+CREATE_TOOLS = REPO_ROOT / "skills" / "internal" / "create-tools" / "SKILL.md"
+IMPROVE_TOOLS = REPO_ROOT / "skills" / "internal" / "improve-tools" / "SKILL.md"
+TOOL_TEMPLATE_DIR = REPO_ROOT / "skills" / "internal" / "create-tools" / "templates"
 TOOL_TEMPLATES = (
     "tool-project-script-template.md",
     "tool-system-binary-template.md",
@@ -87,11 +87,11 @@ class TestToolSkillPairPresence:
         [(CREATE_TOOLS, "create-tools"), (IMPROVE_TOOLS, "improve-tools")],
     )
     def test_skill_exists_with_correct_identity(self, skill_path, slug):
-        assert skill_path.exists(), f"skills/{slug}/SKILL.md must exist"
+        assert skill_path.exists(), f"skills/internal/{slug}/SKILL.md must exist"
         content = skill_path.read_text(encoding="utf-8")
         assert f"name: {slug}" in content, f"{slug} frontmatter must declare name: {slug}"
-        assert f'skill_id: "<SKILL:.specify/skills/{slug}/SKILL.md>"' in content, (
-            f"{slug} must declare the canonical skill_id"
+        assert f'skill_id: "<SKILL:.specify/skills/internal/{slug}/SKILL.md>"' in content, (
+            f"{slug} must declare the canonical skill_id (internal layer nests at runtime)"
         )
 
     @pytest.mark.parametrize(
@@ -99,10 +99,10 @@ class TestToolSkillPairPresence:
         [(CREATE_TOOLS, "create-tools"), (IMPROVE_TOOLS, "improve-tools")],
     )
     def test_skill_mirror_in_sync(self, skill_path, slug):
-        mirror = REPO_ROOT / ".specify" / "skills" / slug / "SKILL.md"
-        assert mirror.exists(), f".specify/skills/{slug}/SKILL.md mirror must exist"
+        mirror = REPO_ROOT / ".specify" / "skills" / "internal" / slug / "SKILL.md"
+        assert mirror.exists(), f".specify/skills/internal/{slug}/SKILL.md mirror must exist"
         assert mirror.read_text(encoding="utf-8") == skill_path.read_text(encoding="utf-8"), (
-            f"skills/{slug}/ and .specify/skills/{slug}/ must stay byte-identical"
+            f"skills/internal/{slug}/ and .specify/skills/internal/{slug}/ must stay byte-identical"
         )
 
 
@@ -208,7 +208,7 @@ class TestToolTemplatesLiveInsideSkill:
     @pytest.mark.parametrize("template", TOOL_TEMPLATES)
     def test_template_moved_into_create_tools(self, template):
         assert (TOOL_TEMPLATE_DIR / template).exists(), (
-            f"{template} must live in skills/create-tools/templates/"
+            f"{template} must live in skills/internal/create-tools/templates/"
         )
 
     @pytest.mark.parametrize("template", TOOL_TEMPLATES)
@@ -232,7 +232,7 @@ class TestToolTemplatesLiveInsideSkill:
 
     def test_record_creation_script_resolves_skill_templates(self):
         script = (REPO_ROOT / "scripts" / "bash" / "create-new-tools.sh").read_text(encoding="utf-8")
-        assert ".specify/skills/create-tools/templates/" in script, (
+        assert ".specify/skills/internal/create-tools/templates/" in script, (
             "create-new-tools.sh must resolve templates from the create-tools skill"
         )
         assert "tool-webhook-template.md" in script, (

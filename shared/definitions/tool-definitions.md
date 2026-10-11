@@ -128,7 +128,7 @@ Prompt: `Proceed with execution? (yes/no)`
 
 ## Self-Improvement Boundary
 
-A persisted Tool record qualifies as an Execution Subject; the external binary/function/webhook does not. Created records carry the compact contract composed from `skills/create-tools/templates/tool-self-improvement.md` and route evidence-backed changes through `improve-tools`. Concept and execution semantics live in `self-improvement-definitions.md` and `../workflow/self-improvement-workflow.md`; this file does not duplicate them.
+A persisted Tool record qualifies as an Execution Subject; the external binary/function/webhook does not. Created records carry the compact contract composed from `skills/internal/create-tools/templates/tool-self-improvement.md` and route evidence-backed changes through `improve-tools`. Concept and execution semantics live in `self-improvement-definitions.md` and `../workflow/self-improvement-workflow.md`; this file does not duplicate them.
 
 ## Output Requirements
 

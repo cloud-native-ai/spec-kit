@@ -9,12 +9,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-CREATE_SKILLS_FILE = ROOT / "skills" / "create-skills" / "SKILL.md"
+CREATE_SKILLS_FILE = ROOT / "skills" / "external" / "create-skills" / "SKILL.md"
 CREATE_SKILLS_MIRROR = ROOT / ".specify" / "skills" / "create-skills" / "SKILL.md"
 SKILLS_TEMPLATE = ROOT / "templates" / "skills-template.md"
 ORCHESTRATION_TEMPLATE = ROOT / "templates" / "commands" / "skills.md"
 SCAFFOLDING_SCRIPT = ROOT / "scripts" / "bash" / "create-new-skill.sh"
-QUALITY_CHECKLIST = ROOT / "skills" / "create-skills" / "references" / "skill-creation-quality-checklist.md"
+QUALITY_CHECKLIST = ROOT / "skills" / "external" / "create-skills" / "references" / "skill-creation-quality-checklist.md"
 QUALITY_CHECKLIST_MIRROR = (
     ROOT / ".specify" / "skills" / "create-skills" / "references" / "skill-creation-quality-checklist.md"
 )

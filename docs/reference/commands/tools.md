@@ -153,10 +153,10 @@ Rules are **authoritative** — when a tool has a definition record, the AI agen
 
 | Skill | Owns | Canonical path |
 |-------|------|----------------|
-| `create-tools` | Authoring a new record: intake, template selection, validation, persistence | `.specify/skills/create-tools/SKILL.md` |
-| `improve-tools` | Field-level refinement of an existing record: source/contract correction, rule hardening, alias/rename, `Draft` → `Verified` promotion | `.specify/skills/improve-tools/SKILL.md` |
+| `create-tools` | Authoring a new record: intake, template selection, validation, persistence | `.specify/skills/internal/create-tools/SKILL.md` |
+| `improve-tools` | Field-level refinement of an existing record: source/contract correction, rule hardening, alias/rename, `Draft` → `Verified` promotion | `.specify/skills/internal/improve-tools/SKILL.md` |
 
-The four type templates live inside the owning skill at `.specify/skills/create-tools/templates/` (`tool-project-script-template.md`, `tool-system-binary-template.md`, `tool-shell-function-template.md`, `tool-webhook-template.md`). Shared type semantics, the rules format, and the invocation preview contract are defined once in `.specify/shared/definitions/tool-definitions.md`.
+The four type templates live inside the owning skill at `.specify/skills/internal/create-tools/templates/` (`tool-project-script-template.md`, `tool-system-binary-template.md`, `tool-shell-function-template.md`, `tool-webhook-template.md`). Shared type semantics, the rules format, and the invocation preview contract are defined once in `.specify/shared/definitions/tool-definitions.md`.
 
 **Dogfooding**: Spec Kit manages its own core scripts through this command — see the records under `.specify/memory/tools/` and the discovery notes in `.specify/tools.md`.
 

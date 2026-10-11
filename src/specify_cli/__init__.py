@@ -31,7 +31,7 @@ if sys.version_info < (3, 8):
 
 # For cross-platform keyboard input
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import AbstractSet, Dict, List, Optional, Set, Tuple
 
 import httpx
 
@@ -940,6 +940,40 @@ _OBSOLETE_TEMPLATES = (
 )
 # OBSOLETE-ASSET-REGISTRY:END
 
+# ---------------------------------------------------------------------------
+# Framework-owned INTERNAL skills (structural migration on init/upgrade)
+#
+# The runtime layering contract (layer introduced 2026-10) nests framework-internal
+# skills at .specify/skills/internal/<name>/ so they stay invisible to the client's
+# flat discovery surface while /speckit.* workflows consume them by explicit path.
+# Installs that predate the layer carry these same skills FLAT at
+# .specify/skills/<name>/; migrate_flat_internal_skills() relocates them on upgrade.
+#
+# NOTE: this is a MIGRATION manifest, NOT a removal manifest — names here are moved
+# (never deleted), and it is deliberately kept OUTSIDE the OBSOLETE-ASSET-REGISTRY
+# markers above (that region is the sanctioned removal list). Every name is a
+# CURRENT, framework-owned internal skill; external framework skills and
+# user-authored skills are never listed and never touched. The roster mirrors the
+# skills/internal/ source layer.
+# ---------------------------------------------------------------------------
+_FRAMEWORK_INTERNAL_SKILLS = (
+    "archive-session",
+    "code-review",
+    "collect-evidence",
+    "create-agent",
+    "create-team",
+    "create-tools",
+    "improve-agent",
+    "improve-team",
+    "improve-tools",
+    "manage-agents",
+    "memory-recall",
+    "memory-record",
+    "self-improvement",
+    "study-project",
+    "summarize-project",
+)
+
 # Skills symlink assistants (those that need .<agent>/skills → .specify/skills link)
 _SKILLS_SYMLINK_ASSISTANTS = {
     "copilot",
@@ -1462,7 +1496,14 @@ def has_local_templates() -> bool:
 
 
 def rewrite_paths(content: str) -> str:
-    """Rewrite root-relative paths in content to use the .specify/ prefix."""
+    """Rewrite root-relative paths in content to use the .specify/ prefix.
+
+    Also maps the two-branch skills source layout onto its runtime shape:
+    ``skills/internal/<name>/...`` stays nested as
+    ``.specify/skills/internal/<name>/...`` while ``skills/external/<name>/...``
+    flattens to ``.specify/skills/<name>/...``. Skill names follow the
+    ``[a-z0-9-]+`` grammar; references outside it are left untouched.
+    """
     import re
 
     # Only rewrite a segment that STARTS a path reference. The lookbehind rejects
@@ -1470,6 +1511,21 @@ def rewrite_paths(content: str) -> str:
     # prefix and nested references such as `skills/<name>/templates/`.
     for segment in ("memory", "scripts", "templates", "shared"):
         content = re.sub(rf"(?<![\w./-]){segment}/", rf".specify/{segment}/", content)
+
+    # Two-branch skills layout, same lookbehind discipline: internal stays
+    # nested at runtime, external flattens into .specify/skills/<name>/.
+    # A second pass is a no-op because the rewritten forms are preceded by
+    # `.specify/` (the `.` and `/` are rejected by the lookbehind).
+    content = re.sub(
+        r"(?<![\w./-])skills/internal/([a-z0-9-]+)/",
+        r".specify/skills/internal/\1/",
+        content,
+    )
+    content = re.sub(
+        r"(?<![\w./-])skills/external/([a-z0-9-]+)/",
+        r".specify/skills/\1/",
+        content,
+    )
     return content
 
 
@@ -1945,6 +2001,123 @@ def cleanup_obsolete_framework_assets(
     return removed
 
 
+def migrate_flat_internal_skills(
+    project_path: Path,
+    tracker: Optional[StepTracker] = None,
+) -> dict:
+    """Relocate framework-INTERNAL skills a pre-layering install left flat.
+
+    The runtime contract (layer introduced 2026-10) nests framework-internal skills
+    at ``.specify/skills/internal/<name>/`` so they stay invisible to the client's
+    flat discovery surface while ``/speckit.*`` workflows consume them by explicit
+    path. Installs that predate the layer carry these same skills flat at
+    ``.specify/skills/<name>/``; on upgrade this moves each enumerated internal name
+    into the nested location.
+
+    Scope is exactly ``_FRAMEWORK_INTERNAL_SKILLS`` — framework-owned names. This is
+    a MIGRATION, never a removal:
+
+    * a flat directory is moved only when the nested target is ABSENT;
+    * when the nested target already exists (e.g. this run's two-layer copy step
+      already laid it down), the flat copy is LEFT IN PLACE and counted as ``kept``
+      so the supervisor's reclaim pass can retire it — nothing is overwritten;
+    * external framework skills and user-authored skills are never touched;
+    * nothing is ever deleted.
+
+    Returns ``{"moved": [...], "kept": [...]}`` of flat paths (relative to
+    ``project_path``) for reporting.
+    """
+    moved: List[str] = []
+    kept: List[str] = []
+    skills_dir = project_path / ".specify" / "skills"
+    internal_dir = skills_dir / "internal"
+
+    def _rel(p: Path) -> str:
+        try:
+            return str(p.relative_to(project_path))
+        except ValueError:
+            return str(p)
+
+    for name in _FRAMEWORK_INTERNAL_SKILLS:
+        flat = skills_dir / name
+        # Only a real directory is a migration candidate. A symlink (user alias)
+        # or a missing/non-dir path is left exactly as-is.
+        if flat.is_symlink() or not flat.is_dir():
+            continue
+        nested = internal_dir / name
+        if nested.exists():
+            # Nested target already present — never overwrite/delete; keep the flat
+            # copy and surface it so the reclaim pass can retire it.
+            kept.append(_rel(flat))
+            continue
+        # Lazy mkdir so a project with nothing to migrate never gains an empty
+        # .specify/skills/internal/ directory.
+        internal_dir.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(flat), str(nested))
+        moved.append(_rel(flat))
+
+    if tracker:
+        if moved or kept:
+            detail = f"migrated {len(moved)} flat internal skill(s) to nested"
+            if kept:
+                detail += f"; kept {len(kept)} (nested target exists)"
+            tracker.complete("local-templates", detail)
+        else:
+            tracker.complete("local-templates", "no flat internal skills to migrate")
+
+    return {"moved": moved, "kept": kept}
+
+
+# Junk entries never copied by copy_tree_with_rewrite (mirrors the sync-mirrors
+# IGNORE set minus .gitkeep: install must keep .gitkeep so target projects track
+# otherwise-empty scaffold dirs, matching plain shutil.copytree behavior).
+COPY_TREE_IGNORE_NAMES = frozenset({"__pycache__", "node_modules", ".DS_Store"})
+
+
+def copy_tree_with_rewrite(
+    src: Path,
+    dst: Path,
+    ignore_names: Optional[AbstractSet[str]] = None,
+) -> None:
+    """Copy the ``src`` tree into ``dst``, rewriting path references on the way.
+
+    Preserves ``shutil.copytree(dirs_exist_ok=True)`` merge semantics: files
+    present in ``src`` are added/overwritten; existing ``dst`` files absent
+    from ``src`` are never deleted. Every UTF-8-decodable file passes through
+    :func:`rewrite_paths` so source-form references (``memory/...``,
+    ``skills/external/<name>/...``, ...) land in their ``.specify/`` runtime
+    form; files that fail to decode are copied byte-identical. Junk entries in
+    ``ignore_names`` (default :data:`COPY_TREE_IGNORE_NAMES`) are skipped at
+    any depth.
+    """
+    ignored = COPY_TREE_IGNORE_NAMES if ignore_names is None else ignore_names
+    if not src.exists():
+        return
+    dst.mkdir(parents=True, exist_ok=True)
+    for src_item in sorted(src.rglob("*")):
+        rel = src_item.relative_to(src)
+        if any(part in ignored for part in rel.parts):
+            continue
+        dest_item = dst / rel
+        if src_item.is_dir():
+            dest_item.mkdir(parents=True, exist_ok=True)
+            continue
+        dest_item.parent.mkdir(parents=True, exist_ok=True)
+        raw = src_item.read_bytes()
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            dest_item.write_bytes(raw)
+            shutil.copystat(src_item, dest_item)
+            continue
+        rewritten = rewrite_paths(text)
+        if rewritten != text:
+            dest_item.write_text(rewritten, encoding="utf-8")
+            shutil.copystat(src_item, dest_item)
+        else:
+            shutil.copy2(src_item, dest_item)
+
+
 def copy_local_templates(
     project_path: Path,
     ai_assistant: str,
@@ -2032,10 +2205,9 @@ def copy_local_templates(
         if (resource_path / "scripts").exists():
             if tracker:
                 tracker.start("local-templates", "copying scripts")
-            shutil.copytree(
+            copy_tree_with_rewrite(
                 resource_path / "scripts",
                 specify_dir / "scripts",
-                dirs_exist_ok=True,
             )
 
             # Handle script type filtering if needed
@@ -2050,10 +2222,9 @@ def copy_local_templates(
             for item in (resource_path / "templates").iterdir():
                 if item.name != "commands":
                     if item.is_dir():
-                        shutil.copytree(
+                        copy_tree_with_rewrite(
                             item,
                             specify_dir / "templates" / item.name,
-                            dirs_exist_ok=True,
                         )
                     else:
                         specify_dir.mkdir(parents=True, exist_ok=True)
@@ -2116,11 +2287,15 @@ def copy_local_templates(
                     script_type,
                 )
             else:
-                # Fallback: copy commands to .specify/templates/commands
-                shutil.copytree(
+                # Fallback: copy commands to .specify/templates/commands for tools
+                # without a dedicated generate_commands branch. Routed through
+                # copy_tree_with_rewrite so source-form path refs (e.g.
+                # skills/{internal,external}/<name>/…) land in their .specify/
+                # runtime form, same as the generated branches; merge semantics
+                # match the previous copytree(dirs_exist_ok=True).
+                copy_tree_with_rewrite(
                     MODULE_DIR / "templates" / "commands",
                     specify_dir / "templates" / "commands",
-                    dirs_exist_ok=True,
                 )
 
         # Also copy any root-level files that might be in the original project structure
@@ -2175,21 +2350,29 @@ def copy_local_templates(
         if gitignore_specify_template.exists():
             shutil.copy2(gitignore_specify_template, specify_dir / ".gitignore")
 
-        # Copy skills directory
-        if (resource_path / "skills").exists():
+        # Copy skills directory (two-layer source layout):
+        #   skills/external/<name>/... -> .specify/skills/<name>/...   (flat)
+        #   skills/internal/<name>/... -> .specify/skills/internal/<name>/... (nested)
+        # Both layers go through copy_tree_with_rewrite so source-form refs
+        # (skills/external/..., skills/internal/..., memory/...) land in their
+        # .specify/ runtime form. Copies are additive; user-created skills in
+        # the destination are never deleted.
+        skills_src = resource_path / "skills"
+        skills_dest = project_path / ".specify" / "skills"
+        if (skills_src / "external").exists():
             if tracker:
-                tracker.start("local-templates", "copying skills")
-
-            skills_dest = project_path / ".specify" / "skills"
+                tracker.start("local-templates", "copying skills (external)")
             skills_dest.mkdir(parents=True, exist_ok=True)
-
-            shutil.copytree(
-                resource_path / "skills",
-                skills_dest,
-                dirs_exist_ok=True,
-            )
+            copy_tree_with_rewrite(skills_src / "external", skills_dest)
             if tracker:
-                tracker.complete("local-templates", "skills copied")
+                tracker.complete("local-templates", "skills (external) copied")
+        if (skills_src / "internal").exists():
+            if tracker:
+                tracker.start("local-templates", "copying skills (internal)")
+            (skills_dest / "internal").mkdir(parents=True, exist_ok=True)
+            copy_tree_with_rewrite(skills_src / "internal", skills_dest / "internal")
+            if tracker:
+                tracker.complete("local-templates", "skills (internal) copied")
 
         # Copy agents directory (shipped Agent Templates -> .specify/agents/templates/)
         if (resource_path / "agents").exists():
@@ -2198,10 +2381,12 @@ def copy_local_templates(
 
             agents_dest = ensure_agent_layer_dirs(project_path) / "templates"
 
-            shutil.copytree(
+            # Agent templates carry source-form refs (e.g. shared/guidelines/
+            # in the injected fast-fail clause) that need the .specify/ prefix
+            # in client projects; rewrite is a no-op for ref-free files.
+            copy_tree_with_rewrite(
                 resource_path / "agents",
                 agents_dest,
-                dirs_exist_ok=True,
             )
             if tracker:
                 tracker.complete("local-templates", "agents copied")
@@ -2214,10 +2399,9 @@ def copy_local_templates(
             shared_dest = project_path / ".specify" / "shared"
             shared_dest.mkdir(parents=True, exist_ok=True)
 
-            shutil.copytree(
+            copy_tree_with_rewrite(
                 resource_path / "shared",
                 shared_dest,
-                dirs_exist_ok=True,
             )
             if tracker:
                 tracker.complete("local-templates", "shared copied")
@@ -2306,6 +2490,16 @@ def copy_local_templates(
         if tracker:
             tracker.start("local-templates", "cleaning obsolete framework assets")
         cleanup_obsolete_framework_assets(project_path, ai_assistant, tracker)
+
+        # Structural migration: relocate framework-INTERNAL skills a pre-layering
+        # install left flat at .specify/skills/<name>/ into the nested runtime
+        # location .specify/skills/internal/<name>/ (layer introduced 2026-10).
+        # Scope is strictly the enumerated framework-owned internal names; external
+        # and user-authored skills are never touched, and nothing is deleted (a flat
+        # copy whose nested target already exists is kept and reported for reclaim).
+        if tracker:
+            tracker.start("local-templates", "migrating flat internal skills")
+        migrate_flat_internal_skills(project_path, tracker)
 
     except Exception as e:
         last_step = ""

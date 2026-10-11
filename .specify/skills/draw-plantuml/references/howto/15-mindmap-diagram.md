@@ -602,5 +602,5 @@ endlegend
 渲染命令：
 
 ```bash
-bash skills/draw-plantuml/scripts/render-plantuml.sh <input.puml> <outdir> <prefix>
+bash skills/external/draw-plantuml/scripts/render-plantuml.sh <input.puml> <outdir> <prefix>
 ```

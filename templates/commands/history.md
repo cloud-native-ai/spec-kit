@@ -121,4 +121,4 @@ At wrap-up (the same lifecycle point where this command prompts for a Git commit
 
 **After running this command**:
 - Run `/speckit.constitution` or `/speckit.instructions` if the distilled history surfaces conventions worth codifying.
-- Invoke `memory-record` to persist key distilled knowledge into long-term project memory.
+- Invoke `memory-record` (`skills/internal/memory-record/SKILL.md`) to persist key distilled knowledge into long-term project memory.

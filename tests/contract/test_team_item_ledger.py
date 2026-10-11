@@ -23,13 +23,13 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-MAPPING_CANONICAL = REPO_ROOT / "skills/create-team/references/summary-mapping.md"
-MAPPING_MIRROR = REPO_ROOT / ".specify/skills/create-team/references/summary-mapping.md"
+MAPPING_CANONICAL = REPO_ROOT / "skills/internal/create-team/references/summary-mapping.md"
+MAPPING_MIRROR = REPO_ROOT / ".specify/skills/internal/create-team/references/summary-mapping.md"
 
-SUMMARIZE_SCRIPTS = REPO_ROOT / "skills/summarize-project/scripts"
+SUMMARIZE_SCRIPTS = REPO_ROOT / "skills/internal/summarize-project/scripts"
 PROJECT_DB = SUMMARIZE_SCRIPTS / "project-db.py"
 
-GENERATOR = REPO_ROOT / "skills/create-team/scripts/build-summary-input.py"
+GENERATOR = REPO_ROOT / "skills/internal/create-team/scripts/build-summary-input.py"
 
 
 def _load_generator():

@@ -27,7 +27,7 @@ import pytest
 pytestmark = pytest.mark.contract
 
 ROOT = Path(__file__).resolve().parents[2]
-D3JS = ROOT / "skills" / "draw-d3js"
+D3JS = ROOT / "skills" / "external" / "draw-d3js"
 SDS = D3JS / "references" / "sds-realization.md"
 SKILL = D3JS / "SKILL.md"
 CYCLE4 = D3JS / "references" / "cycle4-improvements.md"

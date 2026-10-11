@@ -63,7 +63,7 @@ def test_c9_chain_closure_seat_reaches_host_surface(tmp_path):
     assert "tools" in content and "maxTurns" in content
     assert "Stage Executor" in content
     # wiring half also present on the shipped surface
-    skill = (REPO_ROOT / "skills" / "create-team" / "SKILL.md").read_text(encoding="utf-8")
+    skill = (REPO_ROOT / "skills" / "internal" / "create-team" / "SKILL.md").read_text(encoding="utf-8")
     assert "seat instantiation" in skill and "specify render-agents" in skill
 
 

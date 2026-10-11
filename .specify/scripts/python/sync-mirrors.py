@@ -4,7 +4,11 @@
 Canonical sources fan out to their runtime mirrors in one command:
 
   templates/            -> .specify/templates/   (excluding commands/, see below)
-  skills/<name>/        -> .specify/skills/<name>/   (repo skills/ may be empty placeholder)
+  skills/external/<name>/ -> .specify/skills/<name>/           (flat runtime layer;
+                           discoverable by host agents via the one-level scan)
+  skills/internal/<name>/ -> .specify/skills/internal/<name>/  (nested runtime layer;
+                           never registered for discovery, consumed by /speckit.*
+                           workflows via explicit paths)
   agents/               -> .specify/agents/templates/  (Agent Template layer; instances/
                            and execution/ are project-local, never mirrored)
   scripts/              -> .specify/scripts/
@@ -64,14 +68,21 @@ if REPO_ROOT.name == ".specify":
 # (source, mirror, strict_extras, exclude_parts) pairs; source is canonical.
 # strict_extras=True means a mirror-only file is an ERROR under --check: the tree
 # is entirely framework-owned, so an unsourced file can never reach downstream
-# projects via `specify init`. skills/ is intentionally lenient because a project
-# may legitimately keep its own local skills in the mirror. exclude_parts are
-# path components skipped on BOTH sides of the pair; the templates pair excludes
-# commands/ because the .specify/templates/commands mirror is retired (per-tool
-# copies come straight from templates/commands/ via regen-command-copies.py).
+# projects via `specify init`. Both skills pairs are intentionally lenient
+# because a project may legitimately keep its own local skills in the mirror.
+# The skills source is two layers with DIFFERENT runtime shapes: external
+# mirrors flat into .specify/skills/<name>/ (host discovery surface), internal
+# mirrors nested into .specify/skills/internal/<name>/ (path-referenced only).
+# exclude_parts are path components skipped on BOTH sides of the pair; the
+# templates pair excludes commands/ because the .specify/templates/commands
+# mirror is retired (per-tool copies come straight from templates/commands/
+# via regen-command-copies.py). The external pair additionally releases
+# `internal`: that name is the internal layer's RESERVED runtime namespace, so
+# .specify/skills/internal/** is sibling-pair-owned, never an unsourced extra.
 MIRROR_PAIRS = [
     ("templates", ".specify/templates", False, {"commands"}),
-    ("skills", ".specify/skills", False, {"site"}),
+    ("skills/external", ".specify/skills", False, {"site", "internal"}),
+    ("skills/internal", ".specify/skills/internal", False, {"site"}),
     ("agents", ".specify/agents/templates", False, set()),
     ("scripts", ".specify/scripts", True, set()),
     ("shared", ".specify/shared", False, set()),
@@ -162,7 +173,8 @@ def main() -> int:
         src_files = [f for f in iter_files(src, exclude_parts)
                      if in_scope(f, subs)]
         if not src_files:
-            # placeholder-only source (e.g. empty skills/): mirror is canonical, skip
+            # placeholder-only source (e.g. an empty skills/external/): mirror is
+            # canonical, skip
             print(f"skip  {src_name}/ (placeholder-only source; {dst_name}/ is canonical)")
             continue
         missing, differing, extra = compare_pair(src, dst, exclude_parts)

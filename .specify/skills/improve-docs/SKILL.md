@@ -45,10 +45,10 @@ Read the document in full before editing, and restate which single file you reso
 Prefer machine findings and quoted reader failures over impressions:
 
 ```bash
-python3 ${SKILL_WORKDIR}/.specify/scripts/python/docs-utils.py --action validate --root .   # broken links, oversize root entry, ADR gaps, notes frontmatter
-python3 ${SKILL_WORKDIR}/.specify/scripts/python/docs-utils.py --action scan --root .       # notes lifecycle state
+python3 ${SKILL_HOME}/../create-docs/scripts/docs-utils.py --action validate --root .   # broken links, oversize root entry, ADR gaps, notes frontmatter
+python3 ${SKILL_HOME}/../create-docs/scripts/docs-utils.py --action scan --root .       # notes lifecycle state
 python3 ${SKILL_WORKDIR}/.specify/scripts/python/feedback-utils.py --action list --contains "<topic>"
-python3 ${SKILL_WORKDIR}/.specify/skills/create-pages/scripts/scaffold-hugo.py --action build --root .   # only if a site layer exists — content that breaks rendering
+python3 ${SKILL_HOME}/../create-pages/scripts/scaffold-hugo.py --action build --root .   # only if a site layer exists — content that breaks rendering
 ```
 
 Other admissible evidence: a `/speckit.review` finding, a `memory-recall` hit, a distilled `.specify/history/` lesson, a user correction in this session, or a **verified** staleness signal — a path, command, flag, count, or version the document asserts that no longer holds. Verify each such claim against the repository (does the path exist? does `--help` still list the flag?) and record what you checked.
@@ -86,7 +86,7 @@ Change only what the evidence supports; preserve every untouched section verbati
 Append the audit entry so the change is traceable next to the space's other convergence records:
 
 ```bash
-python3 ${SKILL_WORKDIR}/.specify/scripts/python/docs-utils.py --action audit --root . \
+python3 ${SKILL_HOME}/../create-docs/scripts/docs-utils.py --action audit --root . \
   --scope improve-docs --summary "<one-line>"
 ```
 
@@ -100,7 +100,7 @@ Report: the document changed, the evidence behind each edit, class per edit, bef
 - **Never delete content as an improvement.** Superseded prose is corrected or annotated; removal at file scope goes through `create-docs` (archive-not-delete).
 - **Never assert what you did not verify.** An unverifiable claim is either dropped with a note or marked as needing confirmation — do not launder a guess into documentation.
 - **Never edit a generated file or a mirror.** Files carrying an `AUTO-GENERATED` header, `.specify/**` mirrors, and per-tool command copies are outputs: fix the canonical source, then run `python3 scripts/python/sync-mirrors.py --write`.
-- **Never touch non-document managed state as documentation.** `.specify/docs/target-structure.md` is a **cross-run non-document contract**: read only when context requires it and **never edit** it. `.specify/docs/plans/` and `.specify/docs/audit/` are run artifacts; `.specify/memory/**` is machine-managed data; `docs/public/` is generated presentation output.
+- **Never touch non-document managed state as documentation.** `docs/.speckit/target-structure.md` is a **cross-run non-document contract**: read only when context requires it and **never edit** it. `docs/.speckit/plans/` and `docs/.speckit/audit/` are run artifacts; `docs/git-workflow.md` is machine-maintained branch state; `.specify/memory/**` is machine-managed data; `docs/public/` is generated presentation output.
 - **Never restyle without a finding.** Cosmetic churn on an unfaulted document is a violation of the anti-churn discipline, not an improvement.
 - **Reserved filenames stay reserved** (`README.md` / `ARCHITECTURE.md` / `CONTRIBUTING.md` / `CHANGELOG.md` at the root only; directory indexes are `index.md`).
 - **Do not improve this skill or `create-docs` here** → `improve-skills`.
@@ -112,7 +112,7 @@ Report: the document changed, the evidence behind each edit, class per edit, bef
 
 ## Path Conventions
 
-- `${SKILL_HOME}/<relative-path>` — Skill-owned resources (none currently; this skill drives project engines).
+- `${SKILL_HOME}/<relative-path>` — Skill-owned resources. This skill owns none of its own; it consumes the pair-skill engines via **sibling-skill references** (`${SKILL_HOME}/../create-docs/scripts/docs-utils.py`, `${SKILL_HOME}/../create-pages/scripts/scaffold-hugo.py`) — sibling-relative so resolution holds identically in the source tree, the mirror, and client installs.
 - `${SKILL_WORKDIR}/<relative-path>` — runtime/user-facing paths (the documents being improved, the engines invoked).
 
 ## Resources
@@ -120,8 +120,8 @@ Report: the document changed, the evidence behind each edit, class per edit, bef
 | Path | Contents |
 |------|----------|
 | `.specify/skills/create-docs/SKILL.md` | Desired-state baseline (taxonomy, reserved names, notes lifecycle) — the structural authority this skill must not violate |
-| `.specify/scripts/python/docs-utils.py` | Deterministic findings: `validate`, `scan`, `fix-links`, `audit` |
-| `.specify/skills/create-pages/scripts/scaffold-hugo.py` | Site build check (`--action build`) for render defects — only when the optional site layer is installed |
+| `${SKILL_HOME}/../create-docs/scripts/docs-utils.py` | Deterministic findings: `validate`, `scan`, `fix-links`, `audit` |
+| `${SKILL_HOME}/../create-pages/scripts/scaffold-hugo.py` | Site build check (`--action build`) for render defects — only when the optional site layer is installed |
 | `.specify/scripts/python/feedback-utils.py` | Recorded feedback digest (`--action list --contains`) |
 | `.specify/shared/patterns/reconcile-pattern.md` | Tolerance-band and anti-churn semantics shared with `create-docs` |
 

@@ -60,7 +60,7 @@
 |---------|---------|---------|
 | **盲目改进**:前提读自散文,实现抵达时才被证伪,各耗一次派发 | 代码优先规则 + 派发前执行 | `scripts/python/trigger-utils.py:289-301` `shape_telemetry_row` 返回封闭七键字典,承载不了「未解决红状态」;`scripts/python/memory-utils.py:28` `SCOPES` 封闭、`slugify`(:53)剥除 `/`、`action_reindex`(:436)非递归 glob——「session 专用子目录」裁定无引擎路径可达 |
 | **反复改进**:判据与目标一轮内被反复重切,核心术语三迁 | 重切本身即提案(§ 在流程中的位置)+ 自我批评半侧第 1–2 条 | `.specify/goal/session-driven-self-improvement/goal.md` § History:2026-10-05 单轮留下 4 次判据变更 + 2 次 objective 变更;核心术语经 断言 → 判断逻辑 → 运行判定 三迁 |
-| **越改越差**:已分流未执行的修复反而扩散;流程自身仪表静默少报 | 交接判据(缺失即拒收)+ 仪表自检 | F-A02:2026-09-11 `.specify/memory/feedback/consume-log.md` 分流给 improve-skills 后从未执行,同一错误主张自 `skills/create-agent/SKILL.md:122,127` 扩散进 `templates/commands/agents.md:25`(现行渲染器 `src/specify_cli/__init__.py:618` 明写 "Real files only (no symlinks)");`scripts/python/feedback-utils.py:1883` `--limit` 缺省 5,而 `templates/commands/feedback.md:46` 的 inventory 调用未传 `--limit 0`,open 条目被静默截断 |
+| **越改越差**:已分流未执行的修复反而扩散;流程自身仪表静默少报 | 交接判据(缺失即拒收)+ 仪表自检 | F-A02:2026-09-11 `.specify/memory/feedback/consume-log.md` 分流给 improve-skills 后从未执行,同一错误主张自 `skills/internal/create-agent/SKILL.md:122,127` 扩散进 `templates/commands/agents.md:25`(现行渲染器 `src/specify_cli/__init__.py:618` 明写 "Real files only (no symlinks)");`scripts/python/feedback-utils.py:1883` `--limit` 缺省 5,而 `templates/commands/feedback.md:46` 的 inventory 调用未传 `--limit 0`,open 条目被静默截断 |
 
 ## 边界(本纪律不做什么)
 

@@ -15,7 +15,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SCRIPT = REPO_ROOT / "scripts" / "python" / "docs-utils.py"
+SCRIPT = REPO_ROOT / "skills" / "external" / "create-docs" / "scripts" / "docs-utils.py"
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "docs_command"
 
 TYPE_DIRS = ["concepts", "tutorials", "tasks", "reference", "decisions", "contribute", "notes"]
@@ -67,7 +67,7 @@ def test_sc002_repeat_run_zero_new_findings_but_audit_always_written(tmp_path: P
                     "--scope", "full", "--summary", "all dimensions within tolerance")
     a2 = run_engine("--action", "audit", "--root", str(tmp_path),
                     "--scope", "full", "--summary", "all dimensions within tolerance")
-    audit_dir = tmp_path / ".specify" / "docs" / "audit"
+    audit_dir = tmp_path / "docs" / ".speckit" / "audit"
     assert a1["written"] and a2["written"]
     assert len(list(audit_dir.glob("*.md"))) == 2, "every run must leave an audit trace"
 

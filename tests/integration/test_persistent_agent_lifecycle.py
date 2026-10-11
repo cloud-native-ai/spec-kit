@@ -107,7 +107,7 @@ class TestPersistentAgentLifecycle:
 
     def test_create_agent_skill_documents_lifecycle(self):
         """create-agent SKILL.md must document temporary vs persistent lifecycle (T029)."""
-        skill = (REPO_ROOT / "skills" / "create-agent" / "SKILL.md").read_text(encoding="utf-8")
+        skill = (REPO_ROOT / "skills" / "internal" / "create-agent" / "SKILL.md").read_text(encoding="utf-8")
         lowered = skill.lower()
         assert "temporary" in lowered, "SKILL.md must document the temporary (context-only) lifecycle"
         assert "persistent" in lowered, "SKILL.md must document the persistent (.specify/agents) lifecycle"

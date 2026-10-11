@@ -94,11 +94,13 @@ def make_resource_with_skills(
     scripts_dir.mkdir(parents=True, exist_ok=True)
     (scripts_dir / "common.sh").write_text("#!/usr/bin/env bash\necho ok\n")
 
-    # skills
-    skills_dir = root / "skills"
-    skills_dir.mkdir(parents=True, exist_ok=True)
-    (skills_dir / "study-project").mkdir(parents=True, exist_ok=True)
-    (skills_dir / "study-project" / "SKILL.md").write_text(
+    # skills (two-layer source layout; study-project is framework-internal,
+    # so it installs nested at .specify/skills/internal/study-project/ and
+    # stays invisible to the client agent's flat discovery face)
+    skills_internal = root / "skills" / "internal"
+    skills_internal.mkdir(parents=True, exist_ok=True)
+    (skills_internal / "study-project").mkdir(parents=True, exist_ok=True)
+    (skills_internal / "study-project" / "SKILL.md").write_text(
         "# Project Deep Analysis Skill\n", encoding="utf-8"
     )
 

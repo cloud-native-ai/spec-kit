@@ -53,20 +53,20 @@ from tests.contract.helpers_prompt_assets import (
     text_of,
 )
 
-SKILL_DIR = ROOT / "skills" / "summarize-project"
+SKILL_DIR = ROOT / "skills" / "internal" / "summarize-project"
 SKILL_FILE = SKILL_DIR / "SKILL.md"
 PLAYBOOK_FILE = SKILL_DIR / "references" / "reporting-playbook.md"
 DETECT_SCRIPT = SKILL_DIR / "scripts" / "detect-project-sources.py"
 REQUIRED_INFO_DOC = SKILL_DIR / "references" / "required-info.md"
 VALIDATE_SCRIPT = SKILL_DIR / "scripts" / "validate-project-input.py"
 FORM_TEMPLATE = SKILL_DIR / "templates" / "project-input.template.yaml"
-MIRROR_DIR = ROOT / ".specify" / "skills" / "summarize-project"
+MIRROR_DIR = ROOT / ".specify" / "skills" / "internal" / "summarize-project"
 
 # --- study-project UML enhancement (spec 030, Feature 013) -------------------
-STUDY_SKILL_DIR = ROOT / "skills" / "study-project"
+STUDY_SKILL_DIR = ROOT / "skills" / "internal" / "study-project"
 STUDY_SKILL_FILE = STUDY_SKILL_DIR / "SKILL.md"
 STUDY_GUIDE_FILE = STUDY_SKILL_DIR / "references" / "uml-visualization-guide.md"
-STUDY_MIRROR_DIR = ROOT / ".specify" / "skills" / "study-project"
+STUDY_MIRROR_DIR = ROOT / ".specify" / "skills" / "internal" / "study-project"
 BASELINE_FILE = ROOT / "tests" / "fixtures" / "study_project_baseline.json"
 
 UML_TRIGGERS = ["UML", "component diagram", "deployment diagram", "sequence diagram"]
@@ -178,7 +178,7 @@ def test_frontmatter_name_and_skill_id():
     fm = read_frontmatter(SKILL_FILE)
     assert fm.get("name") == "summarize-project", f"got name={fm.get('name')}"
     skill_id = fm.get("skill_id", "")
-    assert skill_id == "<SKILL:.specify/skills/summarize-project/SKILL.md>", (
+    assert skill_id == "<SKILL:.specify/skills/internal/summarize-project/SKILL.md>", (
         f"unexpected skill_id: {skill_id}"
     )
 
@@ -195,7 +195,7 @@ def test_frontmatter_description_trigger_keywords():
 # ---------------------------------------------------------------------------
 
 def test_skill_discoverable_via_directory():
-    skill_md = ROOT / ".specify" / "skills" / "summarize-project" / "SKILL.md"
+    skill_md = ROOT / ".specify" / "skills" / "internal" / "summarize-project" / "SKILL.md"
     assert skill_md.is_file(), "skills are discovered by directory — SKILL.md must exist"
     fm = read_frontmatter(skill_md)
     assert str(fm.get("name", "")) == "summarize-project", \

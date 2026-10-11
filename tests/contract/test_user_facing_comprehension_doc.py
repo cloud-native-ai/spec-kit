@@ -303,7 +303,7 @@ def test_c10_blacklist_floor_categories_and_instance_source():
         assert fragment in body, f"C-10: blacklist omits FR-006 category {fragment!r}"
     assert "该消费单元内" in body, "C-10: same qualifier constraint as C-9"
     # The instance source for category ② must be named, and it must be a real path.
-    m = re.search(r"(skills/summarize-project/references/reporting-playbook\.md)", body)
+    m = re.search(r"(skills/internal/summarize-project/references/reporting-playbook\.md)", body)
     assert m, "C-10: the blacklist must name category ②'s instance source"
     assert (ROOT / m.group(1)).is_file(), f"C-10: named instance source does not exist: {m.group(1)}"
     assert re.search(r"§\s*1\.7|1\.7", body), "C-10: name the section, not just the file"

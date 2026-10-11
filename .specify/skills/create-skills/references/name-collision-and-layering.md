@@ -6,7 +6,7 @@ often resolves into.
 
 ## 1. Cross-SSOT name collision
 
-`.specify/skills/<name>/SKILL.md` being absent does **not** mean the name is free.
+The Skill name being absent **at the detected root** does **not** mean the name is free.
 The same name may already be an entity in another single-source-of-truth (SSOT),
 with live wiring pointing at it. Creating a second entity silently produces two
 Skills with the same `name` and overlapping triggers — the agent then picks
@@ -19,10 +19,10 @@ project:
 
 | Where | What to look for |
 |-------|------------------|
-| `<project>/.specify/skills/<name>` | entity **or** symlink — resolve it (`readlink`) and note the real owner |
+| the detected project roots — `<project>/skills/<name>` (generic) and `<project>/.specify/skills/<name>` (Spec Kit, when present) | entity **or** symlink — resolve it (`readlink`) and note the real owner |
 | global/user skills library (e.g. a `config/skills/<name>` managed tree) | entity owned by a config repo rather than a code project |
 | agent load directories (`~/.<agent>/skills`, host app skill dirs) | links named `<name>` pointing at any of the above |
-| other code projects' `.specify/skills/<name>` | the same capability vendored per project |
+| other projects' skills roots (incl. their `.specify/skills/<name>` when present) | the same capability vendored per project |
 | name-field scan (every discovered `SKILL.md` frontmatter `name`, host app skill DBs/JSON) | a `name` value already claiming the word (directories are the registry — scan them) |
 
 Report the finding as **entity location + who references it**. That pair decides

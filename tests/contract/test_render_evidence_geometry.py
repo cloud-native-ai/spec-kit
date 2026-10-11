@@ -34,7 +34,7 @@ pytestmark = pytest.mark.contract
 ROOT = Path(__file__).resolve().parents[2]
 SKILLS = ROOT / "skills"
 
-OWNER = SKILLS / "draw-diagram" / "references" / "delivery-contract.md"
+OWNER = SKILLS / "external" / "draw-diagram" / "references" / "delivery-contract.md"
 OWNER_SECTION = "## D6"
 ROW_NAME = "渲染证据几何"
 MARGIN = "≥100px"
@@ -43,10 +43,10 @@ OWNER_LINK = "draw-diagram/references/delivery-contract.md"
 # The sites the introspection finding named, plus the engine guide that inlined
 # the same command with a literal window size.
 POINTER_SITES = (
-    "draw-echarts/SKILL.md",
-    "draw-echarts/references/sds-realization.md",
-    "draw-echarts/references/echarts-guide.md",
-    "draw-d3js/SKILL.md",
+    "external/draw-echarts/SKILL.md",
+    "external/draw-echarts/references/sds-realization.md",
+    "external/draw-echarts/references/echarts-guide.md",
+    "external/draw-d3js/SKILL.md",
 )
 
 VENDOR_DIRS = {"node_modules", "__pycache__", ".git", ".venv", ".migration-backups"}

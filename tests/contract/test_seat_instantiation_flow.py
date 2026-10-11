@@ -16,9 +16,9 @@ pytestmark = pytest.mark.contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-CREATE_TEAM_SKILL = REPO_ROOT / "skills" / "create-team" / "SKILL.md"
-CREATE_MODE = REPO_ROOT / "skills" / "create-team" / "references" / "create-mode.md"
-IMPROVE_TEAM_SKILL = REPO_ROOT / "skills" / "improve-team" / "SKILL.md"
+CREATE_TEAM_SKILL = REPO_ROOT / "skills" / "internal" / "create-team" / "SKILL.md"
+CREATE_MODE = REPO_ROOT / "skills" / "internal" / "create-team" / "references" / "create-mode.md"
+IMPROVE_TEAM_SKILL = REPO_ROOT / "skills" / "internal" / "improve-team" / "SKILL.md"
 
 GUIDANCE = "存量团队经一次 modify 即可让席位上注册面"
 

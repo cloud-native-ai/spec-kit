@@ -32,12 +32,12 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SOURCE = REPO_ROOT / "templates" / "commands" / "docs.md"
-TARGET_TEMPLATE = REPO_ROOT / "templates" / "docs-target-structure-template.md"
+TARGET_TEMPLATE = REPO_ROOT / "skills" / "external" / "create-docs" / "assets" / "docs-target-structure-template.md"
 REFERENCE = REPO_ROOT / "docs" / "reference" / "commands" / "docs.md"
 INSTRUCTIONS = REPO_ROOT / ".specify" / "instructions.md"
 # 2026-08-17: the .specify/templates/commands/ mirror is retired — per-tool
 # copies are generated straight from templates/commands/.
-SKILL = REPO_ROOT / "skills" / "create-docs" / "SKILL.md"
+SKILL = REPO_ROOT / "skills" / "external" / "create-docs" / "SKILL.md"
 
 PAIR = ("create-docs", "improve-docs")
 MAX_LINES = 500
@@ -61,12 +61,12 @@ def source_text() -> str:
 
 
 def skill_text() -> str:
-    assert SKILL.is_file(), "skills/create-docs/SKILL.md missing"
+    assert SKILL.is_file(), "skills/external/create-docs/SKILL.md missing"
     return SKILL.read_text(encoding="utf-8")
 
 
 def pair_skill_path(name: str) -> Path:
-    return REPO_ROOT / "skills" / name / "SKILL.md"
+    return REPO_ROOT / "skills" / "external" / name / "SKILL.md"
 
 
 def pair_mirror_path(name: str) -> Path:
@@ -119,8 +119,8 @@ def test_c4_scope_resolution_and_tiered_gates():
 @pytest.mark.contract
 def test_c4a_mandatory_delegation():
     text = source_text()
-    assert "skills/create-docs/SKILL.md" in text, "command must point at the structure owner"
-    assert "skills/improve-docs/SKILL.md" in text, "command must point at the content owner"
+    assert "skills/external/create-docs/SKILL.md" in text, "command must point at the structure owner"
+    assert "skills/external/improve-docs/SKILL.md" in text, "command must point at the content owner"
     assert text.count("single source of truth") >= 2, "command must name both ownership boundaries"
     assert "structure" in text.lower() and "content" in text.lower()
 
@@ -128,16 +128,16 @@ def test_c4a_mandatory_delegation():
 @pytest.mark.contract
 def test_c5_four_mandatory_artifacts_with_workspace_paths():
     skill = skill_text()
-    assert ".specify/docs/plans/" in skill
-    assert ".specify/docs/audit/" in skill
+    assert "docs/.speckit/plans/" in skill
+    assert "docs/.speckit/audit/" in skill
     for artifact in ["观察快照", "残差报告", "审计日志", "干跑计划"]:
         assert artifact in skill, f"mandatory artifact {artifact} missing from skill"
     assert "零收敛" in skill or "无净变化" in skill, "no-op audit rule missing"
     command = source_text()
     for artifact in ["观察快照", "残差报告", "审计日志", "干跑计划"]:
         assert artifact in command, f"command should name artifact {artifact}"
-    assert ".specify/docs/target-structure.md" in command
-    assert "templates/docs-target-structure-template.md" in command
+    assert "docs/.speckit/target-structure.md" in command
+    assert "skills/external/create-docs/assets/docs-target-structure-template.md" in command
     assert TARGET_TEMPLATE.is_file(), "target declaration template missing"
 
 
@@ -208,7 +208,7 @@ def test_c11a_reference_doc_does_not_copy_static_baseline_enumerations():
     """Reference-not-copy: the reference doc reaches the baseline by path.
 
     A restated enumeration here is a second roster that drifts the moment the
-    owner (``skills/create-docs/SKILL.md``) changes — C-9 pins the owner's copy.
+    owner (``skills/external/create-docs/SKILL.md``) changes — C-9 pins the owner's copy.
     """
     text = REFERENCE.read_text(encoding="utf-8")
     assert "README.md" not in text
@@ -313,9 +313,9 @@ def test_c18_create_docs_keeps_structural_ownership():
 @pytest.mark.contract
 def test_c18_improve_docs_excludes_target_contract_and_names_run_artifacts_precisely():
     text = pair_skill_text("improve-docs")
-    assert ".specify/docs/target-structure.md" in text
+    assert "docs/.speckit/target-structure.md" in text
     assert "cross-run non-document contract" in text
     assert "never edit" in text.lower()
-    assert ".specify/docs/plans/" in text
-    assert ".specify/docs/audit/" in text
-    assert ".specify/docs/**` run artifacts" not in text
+    assert "docs/.speckit/plans/" in text
+    assert "docs/.speckit/audit/" in text
+    assert "docs/.speckit/**` run artifacts" not in text

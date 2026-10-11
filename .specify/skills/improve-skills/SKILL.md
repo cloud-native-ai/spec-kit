@@ -10,7 +10,7 @@ skill_id: "<SKILL:.specify/skills/improve-skills/SKILL.md>"
 
 Continuously improve one existing local Skill from a user-provided Skill description and evidence from real executions. The expected result is a focused Skill update that fixes observed problems, captures reusable lessons, and makes the next execution more reliable.
 
-Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instrument — improving a Skill strengthens the **Controlled Execution** dimension (the supported, repeatable path the Skill provides) and closes the **Learning Capture** loop; goal model in `.specify/shared/guidelines/better-harness.md`.
+Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instrument — improving a Skill strengthens the **Controlled Execution** dimension (the supported, repeatable path the Skill provides) and closes the **Learning Capture** loop; goal model in the shared harness guide (`.specify/shared/guidelines/better-harness.md`, when present).
 
 ## Input Contract
 
@@ -31,7 +31,7 @@ Batch procedure, ownership resolution, and routing rationale: [`./references/loo
 
 1. **Identify the target Skill, optimization direction, and execution window**
    - Resolve the description to exactly one local Skill (`skill_id` / frontmatter `name` / canonical path / directory name). For “this Skill”, infer from the active file or recent conversation, then verify it resolves uniquely.
-   - Treat `.specify/skills/<name>/SKILL.md` as the canonical source of truth; `.github/skills/<name>` is only a compatibility entrypoint. **Re-read the canonical file before editing** — a user edit, formatter, or refresh script may have changed it.
+   - Treat the target's **resolved canonical path** as the source of truth (Spec Kit installs: `.specify/skills/<name>/SKILL.md`); a compatibility entrypoint (`.github/skills/<name>`) is never the canonical copy. **Re-read the canonical file before editing** — a user edit, formatter, or refresh script may have changed it.
    - Carry the optimization direction through evidence, analysis, edits, validation, and reporting. Define the execution window: current conversation, last run, failed command output, user correction, test failure, or recent edits.
    - When improving `improve-skills` itself, use the most recent improvement loop as the window and do not reapply a lesson already applied unless new evidence shows the previous fix was insufficient.
 
@@ -41,7 +41,7 @@ Batch procedure, ownership resolution, and routing rationale: [`./references/loo
    - Record a research note (strengths / weaknesses / optimization space) before any edit; every later keep/change/drop decision traces back to it. Conformance-only optimization without this research is theater. Method detail: [`./references/loop-playbook.md`](./references/loop-playbook.md) `## Step 2`.
 
 3. **调研证据 — measure execution effectiveness (evidence-step A/B)**
-   - Execute Step A/B per `.specify/shared/workflow/evidence-step.md` (single source of truth; do not restate its rules here): reuse fresh findings via `evidence-utils.py --action latest --target skill:<name>`, or collect via `--action collect --target skill:<name> --lanes all` (session + feedback lanes carry the strongest signals).
+   - **When the Spec Kit evidence stack is present** (`.specify/shared/workflow/evidence-step.md` + `evidence-utils.py`; single source of truth — do not restate its rules here): execute Step A/B per it — reuse fresh findings via `--action latest --target skill:<name>`, or collect via `--action collect --target skill:<name> --lanes all` (session + feedback lanes carry the strongest signals). **Standalone deployments** have no evidence engine: skip the lane machinery and build the candidate list from the execution-window evidence instead.
    - Triage findings by `evidenceState`, then **freeze the candidate list** — later steps must not add or drop candidates. Red lines: `Unobserved` items are recorded only and MUST NOT be treated as defects; counting signals MUST NOT directly generate optimization points.
    - Supplementary evidence from the execution window, runtime failures and silent under-extraction as first-class evidence, and the degenerate-evidence fallback: [`./references/loop-playbook.md`](./references/loop-playbook.md) `## Step 3`. If evidence is insufficient, ask one targeted question about what failed, what was inefficient, or what should happen differently next time.
 
@@ -55,7 +55,7 @@ Batch procedure, ownership resolution, and routing rationale: [`./references/loo
 5. **按规范优化 — correct the root causes with minimal changes**
    - Fix the instruction that caused the observed failure first (wrong arguments, nonexistent paths, invalid formats, missing prerequisite checks); for inefficiency, replace the step with a more direct method, deterministic script, or clearer decision branch. Prefer changing the failing step over adding broad new rules; convert repeated user corrections into explicit decision branches.
    - Apply transferred lessons from references, do not restate them here: DOM/live-surface hardening and ground-truth-over-label extraction → [`./references/hardening-examples.md`](./references/hardening-examples.md); constraint non-compliance → fix placement before wording per [`./references/constraint-placement.md`](./references/constraint-placement.md) (a generic "follow the constraints" reminder is a measured no-op).
-   - **Keep `SKILL.md` a contract — for content you REMOVE and for content you ADD.** New detail defaults to `./references/` or `./scripts/`; existing manual content moves out per [`./references/skill-slimming-principles.md`](./references/skill-slimming-principles.md), always **delete-and-absorb**, never delete-and-drop. **Never slim a section a feature spec or contract test mandates inline** — grep `.specify/specs/**` and `tests/contract/**` before moving any named heading. Defer environment-level recovery (auto-install, shell switching, OS branching) to the user — surface the error and the fix command, then stop.
+   - **Keep `SKILL.md` a contract — for content you REMOVE and for content you ADD.** New detail defaults to `./references/` or `./scripts/`; existing manual content moves out per [`./references/skill-slimming-principles.md`](./references/skill-slimming-principles.md), always **delete-and-absorb**, never delete-and-drop. **Never slim a section a feature spec or contract test mandates inline** — grep the governing spec tree (`.specify/specs/**` in Spec Kit projects) and `tests/contract/**` before moving any named heading. Defer environment-level recovery (auto-install, shell switching, OS branching) to the user — surface the error and the fix command, then stop.
    - **Codify deterministic logic; reserve natural language for judgment** — extract recurring deterministic prose (path derivation, validation, decision trees, transforms) into self-describing `${SKILL_HOME}/scripts/` scripts; judgment stays prose. Criteria and script requirements: [`./references/loop-playbook.md`](./references/loop-playbook.md) `## Step 5`.
 
 6. **按用户要求优化 — apply user-passed requirements with priority**
@@ -73,7 +73,7 @@ Batch procedure, ownership resolution, and routing rationale: [`./references/loo
    - **Run the shape gate on every `SKILL.md` you touched**: `python3 ${SKILL_HOME}/scripts/skill-shape.py <SKILL.md>` — exit `0` required, or the report carries a recorded exception per Hard Constraint 3, including the before/after controllable-token counts (step-2 baseline run vs this run) and their delta. Never finish a loop having grown a body past the gate without saying so.
    - **Re-run the red-line gate**: `python3 ${SKILL_HOME}/scripts/redline-check.py <SKILL.md>` must exit `0`, or the report records why each remaining signal is a sanctioned exception. A loop MUST NOT finish with a triggered red line left unremediated (see [`./references/red-lines.md`](./references/red-lines.md)).
    - **Reference code is executed, not eyeballed**: run or line-trace changed snippets/scripts against a real target; files-exist/links-resolve is not validation — if you cannot run it this loop, mark it as needing runtime validation rather than reporting it verified. When metadata changed, check frontmatter, resource paths, `skill_id`/directory/`name` agreement, and accept a directory-level `.github/skills -> ../.specify/skills` symlink as a valid compatibility entrypoint.
-   - **Structural edits run the affected contract tests** (`tests/contract/` of the governing feature) — heading greps are not proof. On a red suite, prove zero regression with a clean-baseline failure-set diff (prefer `git worktree` over `git stash`): [`./references/loop-playbook.md`](./references/loop-playbook.md) `## Step 8`. **Behavior-changing edits get a pressure re-test (RED-GREEN)** per `create-skills/references/pressure-testing.md`; wording-only or resource-path edits are exempt — state which case applied.
+   - **Structural edits run the affected contract tests** (`tests/contract/` of the governing feature) — heading greps are not proof. On a red suite, prove zero regression with a clean-baseline failure-set diff (prefer `git worktree` over `git stash`): [`./references/loop-playbook.md`](./references/loop-playbook.md) `## Step 8`. **Behavior-changing edits get a pressure re-test (RED-GREEN)** per `skills/external/create-skills/references/pressure-testing.md`; wording-only or resource-path edits are exempt — state which case applied.
    - Skill-owned executable resources belong in `./scripts/`, never documented as `.specify/scripts/`. **Intervention ledger (evidence-step Step E)**: when the run consumed findings evidence, write `intervention.json` into the baseline evidence-run directory (targetFinding / change / baselineRunId / expectedSignal); never claim "fixed" without the next-run before/after comparison.
 
 9. **Report the feedback-driven changes**
@@ -85,8 +85,8 @@ Use [the Skill quality checklist](./references/skill-quality-checklist.md) to st
 
 ## Resource ID
 
-- Canonical ID: `<SKILL:.specify/skills/improve-skills/SKILL.md>`
-- Canonical Path: `.specify/skills/improve-skills/SKILL.md`
+- Canonical ID: `<SKILL:<resolved-path>/SKILL.md>` — Spec Kit installs record `.specify/skills/improve-skills/SKILL.md`; other roots record their own resolved path.
+- Canonical Path: the same resolved path.
 
 ## Agent-Specific Configuration
 
@@ -111,7 +111,7 @@ If you identified your agent in Step 1, check if a guide exists at `${SKILL_HOME
 
 ### Step 3: Capture Execution Feedback
 
-On a genuine agent-specific obstacle (tool call unavailable, unexpected output format, workaround needed), write a feedback document to `.specify/memory/feedback/improve-skills-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md` carrying fields `**Source**: improve-skills`, `**Agent**`, `**Timestamp**` (ISO-8601), `**Outcome**` (`success-with-workaround | partial-failure | full-failure`) and sections `## Obstacle` / `## Workaround Applied` / `## Suggested Improvement`. Only generate feedback for a genuine obstacle.
+On a genuine agent-specific obstacle (tool call unavailable, unexpected output format, workaround needed), in a Spec Kit project write a feedback document to `.specify/memory/feedback/improve-skills-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md` (standalone deployments instead report the obstacle in the run report) carrying fields `**Source**: improve-skills`, `**Agent**`, `**Timestamp**` (ISO-8601), `**Outcome**` (`success-with-workaround | partial-failure | full-failure`) and sections `## Obstacle` / `## Workaround Applied` / `## Suggested Improvement`. Only generate feedback for a genuine obstacle.
 
 ## Resources
 
@@ -138,7 +138,7 @@ Objective conditions for finishing a loop. Each is checkable, not a matter of ju
 
 ## Self-Improvement Routing
 
-Start every run with SI-0 from `.specify/shared/workflow/self-improvement-workflow.md`. This skill is an Assisted Improvement executor by default; when the target Skill’s own completed run produced the initiating signal, preserve origin=`self` and use this Skill as the delegated improver. Workflow step 3 is SI-2, step 8 performs SI-6/SI-7, and a later comparable run performs SI-8. Report the current intervention as outcome pending; never call it “improved” before comparison. When improving `improve-skills` itself, keep the target and improver roles explicit and use a separate verifier execution for behavior-changing edits.
+When the shared self-improvement workflow is present (`.specify/shared/workflow/self-improvement-workflow.md`; Spec Kit deployments), start every run with SI-0 from it; standalone runs skip SI routing and keep the equivalent contract semantics embedded. This skill is an Assisted Improvement executor by default; when the target Skill’s own completed run produced the initiating signal, preserve origin=`self` and use this Skill as the delegated improver. Workflow step 3 is SI-2, step 8 performs SI-6/SI-7, and a later comparable run performs SI-8. Report the current intervention as outcome pending; never call it “improved” before comparison. When improving `improve-skills` itself, keep the target and improver roles explicit and use a separate verifier execution for behavior-changing edits.
 
 ## Feedback
 

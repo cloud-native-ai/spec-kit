@@ -36,7 +36,9 @@ def assemble(tmp_path: Path) -> Path:
     (ws / "scripts" / "python" / "feedback-utils.py").write_text("#\n", encoding="utf-8")
     (ws / "templates" / "commands").mkdir(parents=True, exist_ok=True)
     (ws / "templates" / "commands" / "feedback.md").write_text("#\n", encoding="utf-8")
-    (ws / "skills" / "create-docs").mkdir(parents=True, exist_ok=True)
+    # two-layer source layout: material.md's live skill ref points at
+    # skills/external/create-docs/ (external = flat mirror layer)
+    (ws / "skills" / "external" / "create-docs").mkdir(parents=True, exist_ok=True)
     # index-inconsistency: features row 099 points to a missing detail file
     (ws / ".specify" / "memory" / "features").mkdir(parents=True, exist_ok=True)
     (ws / ".specify" / "memory" / "features.md").write_text(
@@ -52,7 +54,8 @@ def assemble(tmp_path: Path) -> Path:
     for name in ("ghost-skill", "registered-skill", "live-skill"):
         (mirror / name).mkdir(exist_ok=True)
         (mirror / name / "SKILL.md").write_text("#\n", encoding="utf-8")
-    (ws / "skills" / "live-skill").mkdir(parents=True, exist_ok=True)
+    # live-skill pairs with its flat runtime mirror via the external source layer
+    (ws / "skills" / "external" / "live-skill").mkdir(parents=True, exist_ok=True)
     cli = ws / "src" / "specify_cli"
     cli.mkdir(parents=True, exist_ok=True)
     (cli / "__init__.py").write_text(
