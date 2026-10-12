@@ -15,13 +15,22 @@ class TestAgentsCommandTemplate:
             pytest.skip("agents.md template not found at expected path")
         return template_path.read_text()
 
+    @pytest.fixture
+    def run_agent_skill(self):
+        skill_path = Path(__file__).parent.parent.parent / "skills" / "internal" / "run-agent" / "SKILL.md"
+        if not skill_path.exists():
+            pytest.skip("run-agent skill not found at expected path")
+        return skill_path.read_text()
+
     def test_canonical_path_is_specify_agents(self, agents_template):
         assert ".specify/agents/templates/" in agents_template
         assert ".specify/agents/instances/" in agents_template
 
-    def test_execution_layer_documented(self, agents_template):
-        assert ".specify/agents/execution/" in agents_template
-        assert "gitignored" in agents_template
+    def test_execution_layer_documented(self, agents_template, run_agent_skill):
+        assert ".specify/agents/execution/" in run_agent_skill
+        # the gitignore discipline for execution/logs moved into the owning
+        # skill with the 2026-10 command thinning
+        assert "gitignored" in run_agent_skill
 
     def test_no_direct_github_agents_target(self, agents_template):
         lines_with_target = [
@@ -55,5 +64,8 @@ class TestAgentsCommandTemplate:
             if ".github/agents/" in line:
                 pytest.fail(f"agent_id still references .github/agents/: {line}")
 
-    def test_valid_file_locations_updated(self, agents_template):
-        assert "Canonical (workspace) scope:" in agents_template or "canonical layered stores" in agents_template.lower()
+    def test_valid_file_locations_updated(self, agents_template, run_agent_skill):
+        # the canonical-stores wording lives in the owning skill post-thinning
+        assert "Canonical:" in run_agent_skill
+        assert ".specify/agents/templates/" in run_agent_skill
+        assert ".specify/agents/instances/" in run_agent_skill

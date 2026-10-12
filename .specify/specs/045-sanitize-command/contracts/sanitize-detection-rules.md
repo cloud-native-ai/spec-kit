@@ -28,13 +28,24 @@
 
 ## 3. 符号链接有效性(broken-symlink)
 
-- C-10 固定链接集:`CLAUDE.md`、`QODER.md`、`AGENTS.md`、`.github/copilot-instructions.md`、`.github/skills`。判定:断链(链接存在而目标缺失)、形态漂移(被普通文件/目录替换)两种始终为发现;"缺失"仅在**对应工具面存在**时为发现(`CLAUDE.md`↔`.claude/`、`QODER.md`↔`.qoder/`、`AGENTS.md`↔`.specify/instructions.md`、`.github/*`↔`.github/`)——单一 CLI 初始化的客户工作区不得因其他 CLI 的链接缺失而报发现。处置一律 `delegate`(移交 /speckit.instructions 再生成,不在本命令修复)。
+- C-10 固定链接集:`CLAUDE.md`、`QODER.md`、`AGENTS.md`、`.github/copilot-instructions.md`、`.github/skills`、`.qoder/skills`、`.claude/skills`(2026-10-12 增补后两项,对齐 CLI `_SKILLS_SYMLINK_ASSISTANTS` 的技能链接面)。判定:断链(链接存在而目标缺失)、形态漂移(被普通文件/目录替换)两种始终为发现;"缺失"仅在**对应工具面存在**时为发现(`CLAUDE.md`↔`.claude/`、`QODER.md`↔`.qoder/`、`AGENTS.md`↔`.specify/instructions.md`、`.github/*`↔`.github/`、`.qoder/skills`↔`.qoder/`、`.claude/skills`↔`.claude/`)——单一 CLI 初始化的客户工作区不得因其他 CLI 的链接缺失而报发现。处置一律 `delegate`(移交 /speckit.instructions 再生成,不在本命令修复)。
 
 ## 4. 镜像漂移(mirror-drift)
 
 - C-11 复用 `sync-mirrors.py --check` 的 JSON 输出:MISS/DIFF/ORPHAN 项逐条映射为 mirror-drift 发现(处置:MISS/DIFF → delegate(sync-mirrors);ORPHAN(多余文件)→ delegate)。
 - C-12 孤儿目录补检(引擎自实现,sync-mirrors 不覆盖,**仅限 skills 镜像对**——`agents/` 源侧只镜像 `*.agent.md` 而 `.specify/agents/` 另含合法运行时结构 templates/instances/execution,按 agent-definitions 分类法,源侧无对应目录不构成改名残留):`.specify/skills/` 下存在而 `skills/` 源侧已无对应目录 → mirror-drift 发现;若该目录名未登记于 `src/specify_cli/__init__.py` 的 `_OBSOLETE_*` 注册表 → severity=high(未注册改名残留,对齐 AGENTS.md Rename/retire 纪律),处置 `delete`(破坏性,入清理计划)。
 - C-13 引擎自身 strict 镜像(`scripts/python/sanitize-utils.py` ↔ `.specify/scripts/python/`)漂移同样报告(自检不豁免镜像纪律)。
+
+## 4a. init 迁移残留(migration residue;2026-10-12 增补)
+
+跨代 `specify init` 之后,客户工作区可能残留前代结构。检查器 `check_legacy_install_residue` 与 `check_flat_internal_duplicates` 承载本节;全部确定性、全量 derivable(不依赖 LLM 判定):
+
+- C-22 **前代安装残留**(category `stale-residue`,处置一律 `archive`,severity 遵默认 high;apply 的 delete 拒绝非空目录且内容性残留遵循 archive-not-delete,故不经 delete):
+  - **旧代技能目录**:`.specify/skills/<name>/` 为真实目录(符号链接豁免)且 `<name>` ∈ 旧代退役技能名集;**仅客户工作区适用**——`skills/external/` 源侧存在(框架仓)时该面归 mirror-drift 孤儿检查(C-12)管辖,避免同目标双报冲突处置。名集解析梯级:框架仓内读 `src/specify_cli/__init__.py` 的 OBSOLETE-ASSET-REGISTRY 标记块(活真源);客户工作区(无 `src/`)退回引擎内置 `LEGACY_SKILL_NAMES` 常量(CLI 清单的镜像,契约测试钉住防漂移;引擎侧同样置于注册表标记区内,零退役引用扫描按同一豁免机制剥离)。已知后继者(draw-*×6→draw-diagram、git-*×4→git-workspace、manage-project/visualize-project→summarize-project、sdd-workflow→shared/workflow)在 summary 中点名,供归档后核对引用面迁移。**用户自建技能永不入候选**。
+  - **旧代 git-workflow 状态文件**:`.specify/git-workflow.md` 或 `.specify/memory/git-workflow.md` 存在,且 `docs/git-workflow.md` 已存在(新模型状态面已落地——guard:两态皆无或仅旧态时不报,避免误报未迁移的旧代项目);summary 指向 git-workspace bootstrap 核对分支状态迁移。
+  - **旧代工具记录目录**:`.specify/tools/` 为目录且新址 `.specify/memory/tools/` 已存在;summary 指向 `shared/definitions/tool-definitions.md` § Terminology(术语与消歧真源)。
+- C-23 **内部分层平铺重复**(category `redundant`,处置 `archive`,severity=medium):`.specify/skills/internal/<name>/` 存在且同名平铺目录 `.specify/skills/<name>/` 亦为真实目录——平铺副本即 init 平铺迁移降级态(init 语义:nested 已存在时 flat 判 stale)。可从运行时树直接推导,不依赖任何名集。summary 提示归档前抽查平铺副本无本地独有修改。
+- C-24 **注册表优先级**:框架仓内 `load_obsolete_registry` 非空时以其为准(与 CLI 同源);客户工作区退回内置常量。两清单的一致性由契约测试以"常量 ⊇ CLI 清单"钉住(CLI 删除条目属正常收敛,不强制反向)。
 
 ## 5. 语义证据包(stale-residue / redundant 的输入)
 
@@ -55,4 +66,5 @@
 ## 7. 契约测试锚点
 
 - 夹具 `tests/fixtures/sanitize/` 覆盖:死引用(链接/路径/命令/技能四形态 + 围栏豁免 + 占位符豁免)、索引双向缺项、断链/形态漂移链接、孤儿镜像目录(已注册/未注册两态)、真实案例复刻(过期 parked todo + 已合入提交,SC-001)。
+- 迁移残留(§4a,2026-10-12 增补)以 `tests/unit/test_sanitize_checks_migration.py` 承载:旧代技能目录(注册表/常量两解析梯级 + 符号链接豁免)、旧代状态文件(guard 两态)、旧代工具目录(guard 两态)、内部分层平铺重复(正/反例)、`.qoder/skills`/`.claude/skills` 形态漂移(C-10 增补)、LEGACY_SKILL_NAMES ⊇ CLI `_OBSOLETE_SKILLS` 漂移护栏。
 - 每条 C 规则至少一个正例断言;C-1/C-3 豁免规则须有反例夹具。

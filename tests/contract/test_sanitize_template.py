@@ -4,14 +4,24 @@ Pins contracts/sanitize-command-template.md: execution-flow anchors, engine
 invocations, red lines, the destructive-cleanup gate pointer (scanner-safe
 wording), Feedback/Documentation steps, delegation triage, and per-tool copy
 propagation.
+
+Since the 2026-10 command thinning (S3), execution detail lives in the owning
+skill `skills/internal/sanitize-materials/SKILL.md`; pins that guard execution
+logic follow their owner there. The template keeps frontmatter + lifecycle
+sections + the thin Skill-Delegation block.
 """
 from __future__ import annotations
 
 import re
 from pathlib import Path
 
+import pytest
+
+pytestmark = pytest.mark.contract
+
 ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = ROOT / "templates" / "commands" / "sanitize.md"
+SKILL = ROOT / "skills" / "internal" / "sanitize-materials" / "SKILL.md"
 
 COPIES = [
     ROOT / ".claude" / "commands" / "speckit.sanitize.md",
@@ -24,6 +34,11 @@ COPIES = [
 def template_text() -> str:
     assert TEMPLATE.is_file(), "command template must exist at templates/commands/sanitize.md"
     return TEMPLATE.read_text(encoding="utf-8")
+
+
+def skill_text() -> str:
+    assert SKILL.is_file(), "owning skill must exist at skills/internal/sanitize-materials/SKILL.md"
+    return SKILL.read_text(encoding="utf-8")
 
 
 def test_frontmatter_description_present():
@@ -44,16 +59,17 @@ def test_flow_stage_anchors_present():
 
 
 def test_engine_invocations_use_workspace_mirror_path():
-    text = template_text()
+    # Thinned template delegates; the invocations live in the owning skill.
+    text = skill_text()
     for action in ("collect", "record", "status", "apply"):
         assert f".specify/scripts/python/sanitize-utils.py --action {action}" in text, \
             f"engine invocation for {action} must use the workspace mirror path"
 
 
 def test_semantic_judgment_limited_to_evidence_pack():
-    text = template_text()
+    text = skill_text()
     assert "evidencePack" in text or "证据包" in text
-    assert "证据不足" in text
+    assert "insufficient evidence, no verdict" in text
 
 
 def test_delegation_triage_present():
@@ -66,13 +82,13 @@ def test_delegation_triage_present():
 # --- red lines (C-11..C-14) --------------------------------------------------------------
 
 def test_red_lines_explicit():
-    text = template_text()
-    assert "确认" in text and ("删除" in text and "移动" in text)
-    assert re.search(r"(不得|绝不|MUST NOT).{0,30}(删除|移动)", text) or \
-        re.search(r"(删除|移动).{0,30}(不得|绝不|MUST NOT|绝不发生)", text)
-    assert re.search(r"(不评估|不修改|不报告).{0,20}(用户|源代码|脚本|测试)", text) or \
-        re.search(r"(源代码|产品脚本|测试用例)", text)
-    assert "如实报告" in text
+    # Red lines moved into the owning skill (English form) with the thinning;
+    # the destructive-bucket rule and the engine's confirmation lock are the
+    # drift-guard anchors.
+    text = skill_text()
+    assert "destructive bucket" in text
+    assert "confirmed != true" in text
+    assert "Never evaluates, modifies, or reports" in text
 
 
 def test_scope_guard_against_user_code():
@@ -87,7 +103,7 @@ GATE_POINTER = "> Gate probe: gate-sanitize-destructive-cleanup — after the us
 
 
 def test_gate_probe_pointer_present_and_scanner_safe():
-    text = template_text()
+    text = skill_text()
     assert GATE_POINTER in text, "destructive-cleanup gate pointer line required"
     # the pointer must not read as a blocking gate itself (046 wording discipline)
     pointer_line = next(line for line in text.splitlines() if "gate-sanitize-destructive-cleanup" in line)
@@ -95,9 +111,9 @@ def test_gate_probe_pointer_present_and_scanner_safe():
 
 
 def test_gate_is_front_loaded_destructive_bucket():
-    text = template_text()
-    assert "破坏性" in text
-    assert "确认" in text
+    text = skill_text()
+    assert "destructive" in text
+    assert "confirmation" in text or "confirmed" in text
 
 
 # --- wrap-up steps (C-2, C-10) --------------------------------------------------------------
@@ -119,7 +135,7 @@ def test_documentation_step_present():
 
 def test_four_tool_copies_exist_with_same_content():
     text = template_text()
-    sentinel = "sanitize-utils.py --action collect"  # body content is copied verbatim (frontmatter stripped per regen convention)
+    sentinel = ".specify/skills/internal/sanitize-materials/SKILL.md"  # thin delegation block, copied verbatim
     assert sentinel in text
     for copy in COPIES:
         assert copy.is_file(), f"missing per-tool copy: {copy}"

@@ -63,6 +63,9 @@ MATERIAL_ROOTS = [
     ("mirror-agents", ".specify/agents"),
     ("mirror-shared", ".specify/shared"),
     ("mirror-scripts", ".specify/scripts"),
+    ("legacy-gitworkflow-state", ".specify/git-workflow.md"),
+    ("legacy-memory-gitworkflow-state", ".specify/memory/git-workflow.md"),
+    ("legacy-tools-registry", ".specify/tools"),
     ("docs", "docs"),
 ]
 MATERIAL_TARGET_PREFIXES = tuple(sorted({path for _, path in MATERIAL_ROOTS}))
@@ -72,6 +75,7 @@ SELF_EXEMPT_PREFIX = ".specify/memory/sanitize"
 COMPAT_SYMLINKS = [
     "CLAUDE.md", "QODER.md", "AGENTS.md",
     ".github/copilot-instructions.md", ".github/skills",
+    ".qoder/skills", ".claude/skills",
 ]
 # A compat link is EXPECTED only when its owning tool surface exists; a client
 # workspace initialized for one CLI must not be flagged for another CLI's link.
@@ -81,6 +85,8 @@ COMPAT_SYMLINK_EXPECTATIONS = {
     "AGENTS.md": ".specify/instructions.md",
     ".github/copilot-instructions.md": ".github",
     ".github/skills": ".github",
+    ".qoder/skills": ".qoder",
+    ".claude/skills": ".claude",
 }
 
 DELEGATE_COMMAND_RE = re.compile(r"speckit\.[a-z][a-z-]*|sync-mirrors|regen-command-copies")
@@ -613,6 +619,122 @@ def load_obsolete_registry(root: Path) -> set:
     return set(QUOTED_RE.findall(match.group(1)))
 
 
+# Legacy skill names for CLIENT workspaces (no src/ tree): the pre-layering
+# generations' retired framework skill directories that init's obsolete sweep
+# removes when it runs. Mirror of the CLI's _OBSOLETE_SKILLS — drift-guarded by
+# tests/unit/test_sanitize_checks_migration.py; here it is the fallback when
+# load_obsolete_registry() finds no framework source tree.
+# OBSOLETE-ASSET-REGISTRY:START (removal manifest, not a live reference —
+# same sanctioned exception as the CLI registry; zero-sdd scan strips this)
+LEGACY_SKILL_NAMES = (
+    "agent-cli-setup", "agent-setup", "cli-setup", "docx-utils",
+    "draw-d3js", "draw-drawio", "draw-echarts", "draw-excalidraw",
+    "draw-mermaid", "draw-plantuml", "export-session", "extension-e2e-test",
+    "git-fleet", "git-server-init", "git-submodule-edit", "git-workflow",
+    "manage-project", "mcp-creator", "mysql-utils", "notebooklm-utils",
+    "organize-agents", "pdf-utils", "playwright-utils", "postgres-utils",
+    "pptx-utils", "refresh-mcp-tools", "sdd-workflow", "skill-creator",
+    "theme-creator", "thought-experiment-verifier", "visualize-project",
+    "web-test", "xlsx-utils",
+)
+
+# Supersession hints for residue summaries (informational only).
+_SUCCESSOR_HINTS = {
+    "draw-d3js": "draw-diagram", "draw-drawio": "draw-diagram",
+    "draw-echarts": "draw-diagram", "draw-excalidraw": "draw-diagram",
+    "draw-mermaid": "draw-diagram", "draw-plantuml": "draw-diagram",
+    "git-fleet": "git-workspace", "git-server-init": "git-workspace",
+    "git-submodule-edit": "git-workspace", "git-workflow": "git-workspace",
+    "manage-project": "summarize-project", "visualize-project": "summarize-project",
+    "sdd-workflow": ".specify/shared/workflow",
+}
+# OBSOLETE-ASSET-REGISTRY:END
+
+
+def _legacy_names(root: Path) -> set:
+    registry = load_obsolete_registry(root)
+    return registry if registry else set(LEGACY_SKILL_NAMES)
+
+
+def check_legacy_install_residue(root: Path) -> list:
+    """Pre-layering install residue after a cross-generation `specify init`.
+
+    Detection-rules §4a C-22: legacy flat skill directories, the pre-B2a
+    git-workflow state files, and the old tools-registry directory. Disposition
+    is archive throughout — apply's delete refuses non-empty directories, and
+    content-bearing residue follows archive-not-delete; the summaries point at
+    the migration owner for each class.
+    """
+    findings = []
+    skills_dir = root / ".specify" / "skills"
+    # Client-workspace guard: when the two-layer skills SOURCE tree exists
+    # (framework repo), a flat legacy-named directory under .specify/skills/ is
+    # a MIRROR orphan — find_orphan_mirror_dirs (C-12) owns that surface;
+    # double-reporting the same target under stale-residue would publish
+    # conflicting dispositions (delegate vs archive). Install residue is the
+    # no-source (client) case only.
+    framework_source_present = (root / "skills" / "external").is_dir()
+    if skills_dir.is_dir() and not framework_source_present:
+        for name in sorted(_legacy_names(root)):
+            target = skills_dir / name
+            if target.is_symlink() or not target.is_dir():
+                continue
+            successor = _SUCCESSOR_HINTS.get(name)
+            summary = (
+                f"init 前代技能目录仍平铺残留(能力已由 {successor} 承载)——归档本目录,并确认引用面已迁移至后继技能"
+                if successor else
+                "init 前代技能目录仍平铺残留(框架已退役该技能)——归档清理"
+            )
+            findings.append(_finding(
+                "stale-residue", f".specify/skills/{name}", summary,
+                disposition="archive"))
+    docs_state = root / "docs" / "git-workflow.md"
+    if docs_state.is_file():
+        for rel in (".specify/git-workflow.md", ".specify/memory/git-workflow.md"):
+            if (root / rel).is_file():
+                findings.append(_finding(
+                    "stale-residue", rel,
+                    "旧代 git-workflow 状态文件:新模型状态面在 docs/git-workflow.md——"
+                    "归档本文件,并经 git-workspace 技能 bootstrap 核对分支状态已迁移",
+                    disposition="archive"))
+    legacy_tools = root / ".specify" / "tools"
+    if legacy_tools.is_dir() and (root / ".specify" / "memory" / "tools").is_dir():
+        findings.append(_finding(
+            "stale-residue", ".specify/tools",
+            "旧代工具记录目录:记录新址为 .specify/memory/tools/"
+            "(术语消歧见 shared/definitions/tool-definitions.md § Terminology)——"
+            "归档本目录前核对记录已迁移",
+            disposition="archive"))
+    return findings
+
+
+def check_flat_internal_duplicates(root: Path) -> list:
+    """Flat leftovers of the nested internal layer (detection-rules §4a C-23).
+
+    A flat `.specify/skills/<name>/` directory whose name is nested at
+    `.specify/skills/internal/<name>/` is a stale duplicate of a
+    framework-owned internal skill (the state init's flat-internal migration
+    degrades to when interrupted). Fully derivable — no name list involved.
+    """
+    findings = []
+    skills_dir = root / ".specify" / "skills"
+    internal_dir = skills_dir / "internal"
+    if not internal_dir.is_dir():
+        return findings
+    for child in sorted(internal_dir.iterdir()):
+        if not child.is_dir():
+            continue
+        flat = skills_dir / child.name
+        if flat.is_symlink() or not flat.is_dir():
+            continue
+        findings.append(_finding(
+            "redundant", f".specify/skills/{child.name}",
+            "分层运行时的平铺残留:同名技能已嵌套于 .specify/skills/internal/,"
+            "平铺副本为过期重复(归档前抽查其内容无本地独有修改)",
+            disposition="archive", severity="medium"))
+    return findings
+
+
 def check_mirror_drift(root: Path) -> list:
     findings = []
     try:
@@ -653,6 +775,8 @@ CHECKERS = [
     ("index-inconsistency", check_index_consistency),
     ("broken-symlink", check_broken_symlinks),
     ("mirror-drift", check_mirror_drift),
+    ("stale-residue", check_legacy_install_residue),
+    ("redundant", check_flat_internal_duplicates),
 ]
 
 
