@@ -1,0 +1,33 @@
+@startwbs
+skinparam dpi 300
+scale 4
+skinparam shadowing false
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 16
+<style>
+wbsDiagram {
+  LineColor #78909C
+  RoundCorner 10
+  node {
+    Padding 12
+    Margin 8
+    MaximumWidth 320
+  }
+  .done {
+    BackgroundColor #C6E9CB
+    LineColor #3E9256
+  }
+}
+</style>
+caption 全部工作项均已完成（✓）；无进行中/延期/未开始实例；【未记录】=负责人缺失
+* 重构后机制完整性
+** S1 修复与端态回归 ✓ <<done>>
+*** 修复与端态回归测试 ✓ ◆M1\n【未记录】\n100% <<done>>
+** S2 升级仿真独立验证 ✓ <<done>>
+*** 升级仿真独立验证 ✓\n【未记录】\n100% <<done>>
+** S3 判据对账与收口 ✓ <<done>>
+*** 判据对账与收口 ✓\n【未记录】\n100% <<done>>
+legend bottom
+  <back:#C6E9CB>    </back> 已完成 ✓
+endlegend
+@endwbs

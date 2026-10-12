@@ -65,9 +65,10 @@
 - **收集内容**: 保留确认点触发后的用户决定观察事实(门控必要性证据)
 - **处理流程**: record→threshold→package→manual→mark-submitted
 - **适用插入位置**: confirm-gate
-- **Objects** (11):
+- **Objects** (12):
   - `gate-create-docs-tiered-disposition` — skill:create-docs @ gate-create-docs-tiered-disposition
   - `gate-create-docs-write-plan` — skill:create-docs @ gate-create-docs-write-plan
+  - `gate-create-team-agent-reuse` — skill:create-team @ gate-create-team-agent-reuse
   - `gate-create-team-noninteractive-call` — skill:create-team @ gate-create-team-noninteractive-call
   - `gate-create-team-presence-loop` — skill:create-team @ gate-create-team-presence-loop
   - `gate-create-tools-no-execute` — skill:create-tools @ gate-create-tools-no-execute
@@ -166,6 +167,7 @@ graph TD
   kind_internal --> class_skill_gate[skill-gate]
   class_skill_gate --> obj_gate_create_docs_tiered_disposition[gate-create-docs-tiered-disposition]
   class_skill_gate --> obj_gate_create_docs_write_plan[gate-create-docs-write-plan]
+  class_skill_gate --> obj_gate_create_team_agent_reuse[gate-create-team-agent-reuse]
   class_skill_gate --> obj_gate_create_team_noninteractive_call[gate-create-team-noninteractive-call]
   class_skill_gate --> obj_gate_create_team_presence_loop[gate-create-team-presence-loop]
   class_skill_gate --> obj_gate_create_tools_no_execute[gate-create-tools-no-execute]
@@ -246,6 +248,7 @@ graph TD
 | `skill-draw-diagram-evaluation-form` | skill-evaluation-form | internal | skill:draw-diagram @ evaluation-form | 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果 | record→threshold→package→manual→mark-submitted |
 | `gate-create-docs-tiered-disposition` | skill-gate | internal | skill:create-docs @ gate-create-docs-tiered-disposition | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-create-docs-write-plan` | skill-gate | internal | skill:create-docs @ gate-create-docs-write-plan | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
+| `gate-create-team-agent-reuse` | skill-gate | internal | skill:create-team @ gate-create-team-agent-reuse | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-create-team-noninteractive-call` | skill-gate | internal | skill:create-team @ gate-create-team-noninteractive-call | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-create-team-presence-loop` | skill-gate | internal | skill:create-team @ gate-create-team-presence-loop | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-create-tools-no-execute` | skill-gate | internal | skill:create-tools @ gate-create-tools-no-execute | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |

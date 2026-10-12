@@ -1,0 +1,118 @@
+{
+  "schema": "project-input/v1",
+  "db_schema_version": "project-db/v1",
+  "project": {
+    "project_name": "post-refactor-mechanism-integrity",
+    "project_desc": "spec-kit 在经历大规模重构之后没有破坏原来的机制,保证功能正常",
+    "baseline_date": "2026-10-11",
+    "project_start": null,
+    "repos": []
+  },
+  "phases": [
+    {
+      "phase_id": "post-refactor-mechanism-integrity.S1-fix-and-regression",
+      "phase_name": "post-refactor-mechanism-integrity · stage regression",
+      "phase_order": 1
+    },
+    {
+      "phase_id": "post-refactor-mechanism-integrity.S2-upgrade-sim-verify",
+      "phase_name": "post-refactor-mechanism-integrity · stage verify",
+      "phase_order": 2
+    },
+    {
+      "phase_id": "post-refactor-mechanism-integrity.S3-criterion-reconcile",
+      "phase_name": "post-refactor-mechanism-integrity · stage reconcile",
+      "phase_order": 3
+    }
+  ],
+  "work_items": [
+    {
+      "item_id": "post-refactor-mechanism-integrity.TI-0001",
+      "item_name": "S1 修复 F1–F3(迁移时序前移/双存移除语义/端态回归测试,红→绿)",
+      "phase_id": "post-refactor-mechanism-integrity.S1-fix-and-regression",
+      "owner_id": null,
+      "status": "已完成",
+      "source": ".specify/teams/post-refactor-mechanism-integrity/runs/20261011T144202Z-report.md#result-summary"
+    },
+    {
+      "item_id": "post-refactor-mechanism-integrity.TI-0002",
+      "item_name": "S2 独立升级仿真验证(三场景 PASS;缺陷对照复现)",
+      "phase_id": "post-refactor-mechanism-integrity.S2-upgrade-sim-verify",
+      "owner_id": null,
+      "status": "已完成",
+      "source": ".specify/teams/post-refactor-mechanism-integrity/runs/20261011T144202Z-report.md#result-summary"
+    },
+    {
+      "item_id": "post-refactor-mechanism-integrity.TI-0003",
+      "item_name": "S3 判据对账(33 行/缺口 0)与收口(门 REJECT→返工→复检 PASS)",
+      "phase_id": "post-refactor-mechanism-integrity.S3-criterion-reconcile",
+      "owner_id": null,
+      "status": "已完成",
+      "source": ".specify/teams/post-refactor-mechanism-integrity/runs/20261011T144202Z-report.md#result-summary"
+    }
+  ],
+  "milestones": [
+    {
+      "milestone_id": "MS-0001",
+      "milestone_name": ".specify/ 目录下除 skills/ 外的所有目录与文件均在重构后的体系中有对应流程/脚本支撑,不存在无机制归属",
+      "owner_id": null,
+      "status": null,
+      "source": ".specify/goal/post-refactor-mechanism-integrity/goal.md",
+      "anchor_item_id": "post-refactor-mechanism-integrity.TI-0001"
+    }
+  ],
+  "people": [
+    {
+      "owner_id": "agent-team-supervisor-template",
+      "owner_name": "未记录",
+      "owner_role": "team-supervisor"
+    },
+    {
+      "owner_id": "framework-engineer",
+      "owner_name": "framework-engineer",
+      "owner_role": "framework-engineer"
+    },
+    {
+      "owner_id": "skill-verifier",
+      "owner_name": "Skill Verifier",
+      "owner_role": "contract-checker"
+    }
+  ],
+  "features": [],
+  "sources": [
+    {
+      "source_id": "S-0001",
+      "source_kind": "user-form",
+      "source_ref": ".specify/teams/post-refactor-mechanism-integrity/",
+      "covers": [
+        "people",
+        "phases",
+        "work_items"
+      ]
+    }
+  ],
+  "inferred_fields": [
+    {
+      "field": "phases[post-refactor-mechanism-integrity.S1-fix-and-regression].source",
+      "inferred_value": ".specify/teams/post-refactor-mechanism-integrity/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[post-refactor-mechanism-integrity.S2-upgrade-sim-verify].source",
+      "inferred_value": ".specify/teams/post-refactor-mechanism-integrity/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[post-refactor-mechanism-integrity.S3-criterion-reconcile].source",
+      "inferred_value": ".specify/teams/post-refactor-mechanism-integrity/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    }
+  ],
+  "coverage": {
+    "candidate_total": 3,
+    "excluded": 0,
+    "granularity_truncated": 0,
+    "unattributed": 0,
+    "source_label": "团队条目台账 items.jsonl"
+  }
+}
