@@ -24,7 +24,7 @@ visual charts — "summarize" is the accurate name. Covers:
 - Ordered six-step workflow (detect -> collect -> model -> charts ->
   render validation -> consistency + persist)
 - Charts embedded as PlantUML source blocks, rendering delegated to
-  draw-plantuml (@startwbs/@startgantt)
+  draw-diagram (@startwbs/@startgantt)
 - Milestone/progress semantics, scope/granularity, chart-set splitting
 - Layered references: one reference doc per presentation layer
   (project-overview, requirements-features, work-breakdown, milestones,
@@ -35,7 +35,7 @@ visual charts — "summarize" is the accurate name. Covers:
 
 Also absorbs the former test_study_project_uml_assets.py (same spec 030,
 Feature 013): the study-project UML-enhancement prompt assets share the
-mirror-parity / frontmatter / draw-plantuml-delegation propositions with
+mirror-parity / frontmatter / draw-diagram-delegation propositions with
 summarize-project, so both skills' prompt assets are pinned in one file. The
 study-project section is delimited below.
 """
@@ -379,7 +379,7 @@ def test_six_step_workflow_in_order():
 
 def test_delegates_rendering_to_draw_plantuml():
     text = text_of(SKILL_FILE)
-    assert "draw-plantuml" in text, "Expected delegation reference to draw-plantuml"
+    assert "draw-diagram" in text, "Expected delegation reference to draw-diagram"
     assert "@startwbs" in text, "Expected @startwbs WBS delegation reference"
     assert "@startgantt" in text, "Expected @startgantt Gantt delegation reference"
 
@@ -603,7 +603,7 @@ def test_study_phase8_embeds_rendered_figures():
 
 def test_study_delegation_to_draw_plantuml_and_no_rendering_code():
     text = text_of(STUDY_SKILL_FILE) + text_of(STUDY_GUIDE_FILE)
-    assert "draw-plantuml" in text, "Expected delegation reference to draw-plantuml"
+    assert "draw-diagram" in text, "Expected delegation reference to draw-diagram"
     # The pre-existing scripts/research-project.sh is an analysis helper, not
     # rendering code. The enhancement must not introduce rendering scripts —
     # no script in the package may reference plantuml/render-plantuml.

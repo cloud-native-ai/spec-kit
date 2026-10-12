@@ -17,7 +17,7 @@
 - ✅ 允许的形态：**单条只读命令 + 限定路径 + 只取被授权字段**（例：只为 `people.owner_name` 跑一次 `git shortlog -sne --no-merges`；只为 `milestones[].actual_date` 跑一次 `git tag` + `git for-each-ref … refs/tags`）。
 
 **边界（两条）**：
-1. 本文档只写**信息语义**（材料在哪、用什么命令定向取、怎么写溯源、取不到就退回合法终态）。它**不写**任何绘图规则（PlantUML 语法、字形、图例、版面量测），那些的唯一权威出处是 draw-plantuml。
+1. 本文档只写**信息语义**（材料在哪、用什么命令定向取、怎么写溯源、取不到就退回合法终态）。它**不写**任何绘图规则（PlantUML 语法、字形、图例、版面量测），那些的唯一权威出处是 draw-diagram。
 2. **一切日期与进度计算**在 `scripts/progress-engine.py`；本文档不含算式（见 [consistency-rules.md](consistency-rules.md) §0.1）。
 
 **推导结果的标注纪律（每条都要）**：从 repo 推导出的值一律带 `inferred: true` + `inferred_from: repo:<repo_id> <命令要点>`，进入引擎输出的 `inferred_fields`，并在报告 `## 元信息 · 推断字段清单` 逐条呈现。**repo 推导只影响 I / O 档字段**。

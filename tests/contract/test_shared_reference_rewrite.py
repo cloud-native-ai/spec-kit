@@ -70,9 +70,10 @@ def test_no_skill_mentions_sdd_workflow():
         scanned += 1
         if "sdd-workflow" in f.read_text(encoding="utf-8"):
             offenders.append(str(f.relative_to(ROOT)))
-    assert scanned >= 32, (
+    assert scanned >= 26, (
         f"only {scanned} skill SKILL.md files scanned — the two-layer glob "
-        f"skills/*/*/SKILL.md must see both layers (32 total)"
+        f"skills/*/*/SKILL.md must see both layers (26 total; was 32 before the six "
+        f"draw-* skills became draw-diagram engine layers on 2026-10-12)"
     )
     assert not offenders, f"skills still mention sdd-workflow: {offenders}"
 
@@ -118,7 +119,7 @@ def test_shared_reference_targets_resolve():
         for subdir, name in pattern.findall(f.read_text(encoding="utf-8")):
             if not (ROOT / "shared" / subdir / name).exists():
                 missing.append((str(f.relative_to(ROOT)), f"{subdir}/{name}"))
-    assert scanned >= 32, f"only {scanned} files scanned — a vacuous glob proves nothing"
+    assert scanned >= 26, f"only {scanned} files scanned — a vacuous glob proves nothing"
     assert not missing, f"references resolve to missing shared docs: {missing}"
 
 

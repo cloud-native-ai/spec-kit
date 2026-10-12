@@ -27,7 +27,7 @@
 - **收集内容**: 命令单次运行的回顾与 ≥1 条单元级优化点
 - **处理流程**: record→threshold→package→manual→mark-submitted
 - **适用插入位置**: wrap-up
-- **Objects** (22):
+- **Objects** (23):
   - `speckit-analyze-wrapup` — /speckit.analyze @ wrap-up
   - `speckit-checklist-wrapup` — /speckit.checklist @ wrap-up
   - `speckit-clarify-wrapup` — /speckit.clarify @ wrap-up
@@ -37,6 +37,7 @@
   - `speckit-goal-wrapup` — /speckit.goal @ wrap-up
   - `speckit-history-wrapup` — /speckit.history @ wrap-up
   - `speckit-implement-wrapup` — /speckit.implement @ wrap-up
+  - `speckit-improve-wrapup` — /speckit.improve @ wrap-up
   - `speckit-instructions-wrapup` — /speckit.instructions @ wrap-up
   - `speckit-interview-wrapup` — /speckit.interview @ wrap-up
   - `speckit-plan-wrapup` — /speckit.plan @ wrap-up
@@ -56,14 +57,8 @@
 - **收集内容**: 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果
 - **处理流程**: record→threshold→package→manual→mark-submitted
 - **适用插入位置**: evaluation-form
-- **Objects** (7):
-  - `skill-draw-d3js-evaluation-form` — skill:draw-d3js @ evaluation-form
+- **Objects** (1):
   - `skill-draw-diagram-evaluation-form` — skill:draw-diagram @ evaluation-form
-  - `skill-draw-drawio-evaluation-form` — skill:draw-drawio @ evaluation-form
-  - `skill-draw-echarts-evaluation-form` — skill:draw-echarts @ evaluation-form
-  - `skill-draw-excalidraw-evaluation-form` — skill:draw-excalidraw @ evaluation-form
-  - `skill-draw-mermaid-evaluation-form` — skill:draw-mermaid @ evaluation-form
-  - `skill-draw-plantuml-evaluation-form` — skill:draw-plantuml @ evaluation-form
 
 ### skill-gate  [slice: skills]
 
@@ -76,8 +71,8 @@
   - `gate-create-team-noninteractive-call` — skill:create-team @ gate-create-team-noninteractive-call
   - `gate-create-team-presence-loop` — skill:create-team @ gate-create-team-presence-loop
   - `gate-create-tools-no-execute` — skill:create-tools @ gate-create-tools-no-execute
-  - `gate-git-workflow-remote-ops` — skill:git-workflow @ gate-git-workflow-remote-ops
-  - `gate-git-workflow-tiered-mode` — skill:git-workflow @ gate-git-workflow-tiered-mode
+  - `gate-git-workflow-remote-ops` — skill:git-workspace @ gate-git-workflow-remote-ops
+  - `gate-git-workflow-tiered-mode` — skill:git-workspace @ gate-git-workflow-tiered-mode
   - `gate-improve-tools-no-test-invoke` — skill:improve-tools @ gate-improve-tools-no-test-invoke
   - `gate-summarize-project-degraded-gates` — skill:summarize-project @ gate-summarize-project-degraded-gates
   - `gate-summarize-project-four-gates` — skill:summarize-project @ gate-summarize-project-four-gates
@@ -88,7 +83,7 @@
 - **收集内容**: 技能单次运行的回顾与 ≥1 条单元级优化点
 - **处理流程**: record→threshold→package→manual→mark-submitted
 - **适用插入位置**: wrap-up
-- **Objects** (31):
+- **Objects** (26):
   - `skill-archive-session-wrapup` — skill:archive-session @ wrap-up
   - `skill-code-review-wrapup` — skill:code-review @ wrap-up
   - `skill-collect-evidence-wrapup` — skill:collect-evidence @ wrap-up
@@ -100,17 +95,8 @@
   - `skill-create-tools-wrapup` — skill:create-tools @ wrap-up
   - `skill-database-utils-wrapup` — skill:database-utils @ wrap-up
   - `skill-document-utils-wrapup` — skill:document-utils @ wrap-up
-  - `skill-draw-d3js-wrapup` — skill:draw-d3js @ wrap-up
   - `skill-draw-diagram-wrapup` — skill:draw-diagram @ wrap-up
-  - `skill-draw-drawio-wrapup` — skill:draw-drawio @ wrap-up
-  - `skill-draw-echarts-wrapup` — skill:draw-echarts @ wrap-up
-  - `skill-draw-excalidraw-wrapup` — skill:draw-excalidraw @ wrap-up
-  - `skill-draw-mermaid-wrapup` — skill:draw-mermaid @ wrap-up
-  - `skill-draw-plantuml-wrapup` — skill:draw-plantuml @ wrap-up
-  - `skill-git-fleet-wrapup` — skill:git-fleet @ wrap-up
-  - `skill-git-server-init-wrapup` — skill:git-server-init @ wrap-up
-  - `skill-git-submodule-edit-wrapup` — skill:git-submodule-edit @ wrap-up
-  - `skill-git-workflow-wrapup` — skill:git-workflow @ wrap-up
+  - `skill-git-workspace-wrapup` — skill:git-workspace @ wrap-up
   - `skill-improve-agent-wrapup` — skill:improve-agent @ wrap-up
   - `skill-improve-docs-wrapup` — skill:improve-docs @ wrap-up
   - `skill-improve-skills-wrapup` — skill:improve-skills @ wrap-up
@@ -120,6 +106,7 @@
   - `skill-memory-recall-wrapup` — skill:memory-recall @ wrap-up
   - `skill-memory-record-wrapup` — skill:memory-record @ wrap-up
   - `skill-merge-skills-wrapup` — skill:merge-skills @ wrap-up
+  - `skill-self-improvement-wrapup` — skill:self-improvement @ wrap-up
   - `skill-study-project-wrapup` — skill:study-project @ wrap-up
   - `skill-summarize-project-wrapup` — skill:summarize-project @ wrap-up
   - `skill-think-skills-wrapup` — skill:think-skills @ wrap-up
@@ -160,6 +147,7 @@ graph TD
   class_command_wrapup --> obj_speckit_goal_wrapup[speckit-goal-wrapup]
   class_command_wrapup --> obj_speckit_history_wrapup[speckit-history-wrapup]
   class_command_wrapup --> obj_speckit_implement_wrapup[speckit-implement-wrapup]
+  class_command_wrapup --> obj_speckit_improve_wrapup[speckit-improve-wrapup]
   class_command_wrapup --> obj_speckit_instructions_wrapup[speckit-instructions-wrapup]
   class_command_wrapup --> obj_speckit_interview_wrapup[speckit-interview-wrapup]
   class_command_wrapup --> obj_speckit_plan_wrapup[speckit-plan-wrapup]
@@ -174,13 +162,7 @@ graph TD
   class_command_wrapup --> obj_speckit_todo_wrapup[speckit-todo-wrapup]
   class_command_wrapup --> obj_speckit_tools_wrapup[speckit-tools-wrapup]
   kind_internal --> class_skill_evaluation_form[skill-evaluation-form]
-  class_skill_evaluation_form --> obj_skill_draw_d3js_evaluation_form[skill-draw-d3js-evaluation-form]
   class_skill_evaluation_form --> obj_skill_draw_diagram_evaluation_form[skill-draw-diagram-evaluation-form]
-  class_skill_evaluation_form --> obj_skill_draw_drawio_evaluation_form[skill-draw-drawio-evaluation-form]
-  class_skill_evaluation_form --> obj_skill_draw_echarts_evaluation_form[skill-draw-echarts-evaluation-form]
-  class_skill_evaluation_form --> obj_skill_draw_excalidraw_evaluation_form[skill-draw-excalidraw-evaluation-form]
-  class_skill_evaluation_form --> obj_skill_draw_mermaid_evaluation_form[skill-draw-mermaid-evaluation-form]
-  class_skill_evaluation_form --> obj_skill_draw_plantuml_evaluation_form[skill-draw-plantuml-evaluation-form]
   kind_internal --> class_skill_gate[skill-gate]
   class_skill_gate --> obj_gate_create_docs_tiered_disposition[gate-create-docs-tiered-disposition]
   class_skill_gate --> obj_gate_create_docs_write_plan[gate-create-docs-write-plan]
@@ -205,17 +187,8 @@ graph TD
   class_skill_wrapup --> obj_skill_create_tools_wrapup[skill-create-tools-wrapup]
   class_skill_wrapup --> obj_skill_database_utils_wrapup[skill-database-utils-wrapup]
   class_skill_wrapup --> obj_skill_document_utils_wrapup[skill-document-utils-wrapup]
-  class_skill_wrapup --> obj_skill_draw_d3js_wrapup[skill-draw-d3js-wrapup]
   class_skill_wrapup --> obj_skill_draw_diagram_wrapup[skill-draw-diagram-wrapup]
-  class_skill_wrapup --> obj_skill_draw_drawio_wrapup[skill-draw-drawio-wrapup]
-  class_skill_wrapup --> obj_skill_draw_echarts_wrapup[skill-draw-echarts-wrapup]
-  class_skill_wrapup --> obj_skill_draw_excalidraw_wrapup[skill-draw-excalidraw-wrapup]
-  class_skill_wrapup --> obj_skill_draw_mermaid_wrapup[skill-draw-mermaid-wrapup]
-  class_skill_wrapup --> obj_skill_draw_plantuml_wrapup[skill-draw-plantuml-wrapup]
-  class_skill_wrapup --> obj_skill_git_fleet_wrapup[skill-git-fleet-wrapup]
-  class_skill_wrapup --> obj_skill_git_server_init_wrapup[skill-git-server-init-wrapup]
-  class_skill_wrapup --> obj_skill_git_submodule_edit_wrapup[skill-git-submodule-edit-wrapup]
-  class_skill_wrapup --> obj_skill_git_workflow_wrapup[skill-git-workflow-wrapup]
+  class_skill_wrapup --> obj_skill_git_workspace_wrapup[skill-git-workspace-wrapup]
   class_skill_wrapup --> obj_skill_improve_agent_wrapup[skill-improve-agent-wrapup]
   class_skill_wrapup --> obj_skill_improve_docs_wrapup[skill-improve-docs-wrapup]
   class_skill_wrapup --> obj_skill_improve_skills_wrapup[skill-improve-skills-wrapup]
@@ -225,6 +198,7 @@ graph TD
   class_skill_wrapup --> obj_skill_memory_recall_wrapup[skill-memory-recall-wrapup]
   class_skill_wrapup --> obj_skill_memory_record_wrapup[skill-memory-record-wrapup]
   class_skill_wrapup --> obj_skill_merge_skills_wrapup[skill-merge-skills-wrapup]
+  class_skill_wrapup --> obj_skill_self_improvement_wrapup[skill-self-improvement-wrapup]
   class_skill_wrapup --> obj_skill_study_project_wrapup[skill-study-project-wrapup]
   class_skill_wrapup --> obj_skill_summarize_project_wrapup[skill-summarize-project-wrapup]
   class_skill_wrapup --> obj_skill_think_skills_wrapup[skill-think-skills-wrapup]
@@ -255,6 +229,7 @@ graph TD
 | `speckit-goal-wrapup` | command-wrapup | internal | /speckit.goal @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-history-wrapup` | command-wrapup | internal | /speckit.history @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-implement-wrapup` | command-wrapup | internal | /speckit.implement @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `speckit-improve-wrapup` | command-wrapup | internal | /speckit.improve @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-instructions-wrapup` | command-wrapup | internal | /speckit.instructions @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-interview-wrapup` | command-wrapup | internal | /speckit.interview @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-plan-wrapup` | command-wrapup | internal | /speckit.plan @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
@@ -268,20 +243,14 @@ graph TD
 | `speckit-team-wrapup` | command-wrapup | internal | /speckit.team @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-todo-wrapup` | command-wrapup | internal | /speckit.todo @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-tools-wrapup` | command-wrapup | internal | /speckit.tools @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-d3js-evaluation-form` | skill-evaluation-form | internal | skill:draw-d3js @ evaluation-form | 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果 | record→threshold→package→manual→mark-submitted |
 | `skill-draw-diagram-evaluation-form` | skill-evaluation-form | internal | skill:draw-diagram @ evaluation-form | 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-drawio-evaluation-form` | skill-evaluation-form | internal | skill:draw-drawio @ evaluation-form | 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-echarts-evaluation-form` | skill-evaluation-form | internal | skill:draw-echarts @ evaluation-form | 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-excalidraw-evaluation-form` | skill-evaluation-form | internal | skill:draw-excalidraw @ evaluation-form | 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-mermaid-evaluation-form` | skill-evaluation-form | internal | skill:draw-mermaid @ evaluation-form | 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-plantuml-evaluation-form` | skill-evaluation-form | internal | skill:draw-plantuml @ evaluation-form | 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果 | record→threshold→package→manual→mark-submitted |
 | `gate-create-docs-tiered-disposition` | skill-gate | internal | skill:create-docs @ gate-create-docs-tiered-disposition | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-create-docs-write-plan` | skill-gate | internal | skill:create-docs @ gate-create-docs-write-plan | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-create-team-noninteractive-call` | skill-gate | internal | skill:create-team @ gate-create-team-noninteractive-call | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-create-team-presence-loop` | skill-gate | internal | skill:create-team @ gate-create-team-presence-loop | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-create-tools-no-execute` | skill-gate | internal | skill:create-tools @ gate-create-tools-no-execute | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
-| `gate-git-workflow-remote-ops` | skill-gate | internal | skill:git-workflow @ gate-git-workflow-remote-ops | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
-| `gate-git-workflow-tiered-mode` | skill-gate | internal | skill:git-workflow @ gate-git-workflow-tiered-mode | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
+| `gate-git-workflow-remote-ops` | skill-gate | internal | skill:git-workspace @ gate-git-workflow-remote-ops | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
+| `gate-git-workflow-tiered-mode` | skill-gate | internal | skill:git-workspace @ gate-git-workflow-tiered-mode | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-improve-tools-no-test-invoke` | skill-gate | internal | skill:improve-tools @ gate-improve-tools-no-test-invoke | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-summarize-project-degraded-gates` | skill-gate | internal | skill:summarize-project @ gate-summarize-project-degraded-gates | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-summarize-project-four-gates` | skill-gate | internal | skill:summarize-project @ gate-summarize-project-four-gates | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
@@ -297,17 +266,8 @@ graph TD
 | `skill-create-tools-wrapup` | skill-wrapup | internal | skill:create-tools @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-database-utils-wrapup` | skill-wrapup | internal | skill:database-utils @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-document-utils-wrapup` | skill-wrapup | internal | skill:document-utils @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-d3js-wrapup` | skill-wrapup | internal | skill:draw-d3js @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-draw-diagram-wrapup` | skill-wrapup | internal | skill:draw-diagram @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-drawio-wrapup` | skill-wrapup | internal | skill:draw-drawio @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-echarts-wrapup` | skill-wrapup | internal | skill:draw-echarts @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-excalidraw-wrapup` | skill-wrapup | internal | skill:draw-excalidraw @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-mermaid-wrapup` | skill-wrapup | internal | skill:draw-mermaid @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-draw-plantuml-wrapup` | skill-wrapup | internal | skill:draw-plantuml @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-git-fleet-wrapup` | skill-wrapup | internal | skill:git-fleet @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-git-server-init-wrapup` | skill-wrapup | internal | skill:git-server-init @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-git-submodule-edit-wrapup` | skill-wrapup | internal | skill:git-submodule-edit @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-git-workflow-wrapup` | skill-wrapup | internal | skill:git-workflow @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-git-workspace-wrapup` | skill-wrapup | internal | skill:git-workspace @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-improve-agent-wrapup` | skill-wrapup | internal | skill:improve-agent @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-improve-docs-wrapup` | skill-wrapup | internal | skill:improve-docs @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-improve-skills-wrapup` | skill-wrapup | internal | skill:improve-skills @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
@@ -317,6 +277,7 @@ graph TD
 | `skill-memory-recall-wrapup` | skill-wrapup | internal | skill:memory-recall @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-memory-record-wrapup` | skill-wrapup | internal | skill:memory-record @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-merge-skills-wrapup` | skill-wrapup | internal | skill:merge-skills @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-self-improvement-wrapup` | skill-wrapup | internal | skill:self-improvement @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-study-project-wrapup` | skill-wrapup | internal | skill:study-project @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-summarize-project-wrapup` | skill-wrapup | internal | skill:summarize-project @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-think-skills-wrapup` | skill-wrapup | internal | skill:think-skills @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |

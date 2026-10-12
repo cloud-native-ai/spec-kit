@@ -1349,7 +1349,16 @@ def scan_embed_units(workspace_root: Path) -> Dict[str, str]:
                 found[f"/speckit.{path.stem}"] = path.relative_to(workspace_root).as_posix()
     skills_dir = workspace_root / "skills"
     if skills_dir.is_dir():
-        for path in sorted(skills_dir.glob("*/SKILL.md")):
+        # Two-layer aware: a skill lives at skills/<name>/ (flat runtime shape) or at
+        # skills/{external,internal}/<name>/ (source-tree layering). A one-level glob saw
+        # ZERO embeds in a layered repo, so --reconcile reported "probe object without
+        # embed" for every skill row and could neither enforce nor detect the
+        # rows<->embed contract. Same path-resolution trap class as the engine
+        # self-location rule in AGENTS.md.
+        candidates = list(skills_dir.glob("*/SKILL.md"))
+        for layer in ("external", "internal"):
+            candidates.extend((skills_dir / layer).glob("*/SKILL.md"))
+        for path in sorted(set(candidates)):
             if "## Feedback" in path.read_text(encoding="utf-8"):
                 found[f"skill:{path.parent.name}"] = path.relative_to(workspace_root).as_posix()
     return found

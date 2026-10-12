@@ -42,7 +42,7 @@ signals:
 inputs:
   - name: arena_targets
     required: true
-    description: 参赛能力单元清单(≥1,须同类可比——技能 vs 技能、命令 vs 命令、子代理 vs 子代理,如 draw-echarts / draw-d3js);=1 时进入变体模式,沿 variant_angles 生成候选
+    description: 参赛能力单元清单(≥1,须同类可比——技能 vs 技能、命令 vs 命令、子代理 vs 子代理,如 draw-diagram / draw-diagram);=1 时进入变体模式,沿 variant_angles 生成候选
   - name: task_source
     required: true
     description: 竞技任务来源(题库目录/选题规则/固定 benchmark);每周期由它抽取或轮转同一道题,保证可比

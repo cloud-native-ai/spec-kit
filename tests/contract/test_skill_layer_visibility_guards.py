@@ -22,12 +22,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 RUNTIME_SKILLS = ROOT / ".specify" / "skills"
 
-# Pinned census (classification v2): 17 external / 15 internal. These literals are a
+# Pinned census (classification v2): 11 external / 15 internal. These literals are a
 # drift detector for the split — update only together with the classification record.
+# 17 -> 11 on 2026-10-12: the six draw-* engine skills were merged into draw-diagram as
+# internal engine layers under draw-diagram/references/types/<engine>/ (capability
+# inheritance recorded in that skill's references/merge-provenance.md), so they are no
+# longer independently discovered skills.
 EXTERNAL_SKILLS = {
     "create-docs", "improve-docs", "create-skills", "improve-skills", "create-pages",
-    "database-utils", "document-utils", "draw-d3js", "draw-diagram", "draw-drawio",
-    "draw-echarts", "draw-excalidraw", "draw-mermaid", "draw-plantuml", "merge-skills",
+    "database-utils", "document-utils", "draw-diagram", "merge-skills",
     "think-skills", "git-workspace",
 }
 INTERNAL_SKILLS = {
@@ -70,8 +73,8 @@ def internal_resolution_gaps(
 def test_flat_discovery_surfaces_external_layer_only():
     seen, offenders = flat_discovery_offenders(RUNTIME_SKILLS, EXTERNAL_SKILLS)
     # Sentinels: the face is non-empty and the exclusion is meaningful.
-    assert len(seen) == 17, (
-        f"flat discovery saw {len(seen)} skills, expected exactly the 17 external "
+    assert len(seen) == 11, (
+        f"flat discovery saw {len(seen)} skills, expected exactly the 11 external "
         f"ones — a count both proves non-vacuity and pins the split: {seen}"
     )
     internal_dir = RUNTIME_SKILLS / "internal"

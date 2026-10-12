@@ -29,12 +29,12 @@ HTML 是**入口**，不是唯一产物。同一次交付 MUST 在**同一目录
 
 | 引擎 | 源文件（可再编辑） | 渲染图 | 说明 |
 |------|-------------------|--------|------|
-| `draw-plantuml` | `.puml` | `.svg` + `.png` | 二者都必须产出（PNG 供速览，SVG 供无损放大） |
-| `draw-mermaid` | `.mmd` | `.svg` + `.png` | 同上 |
-| `draw-excalidraw` | `.excalidraw` | `.svg` + `.png` | 场景 JSON 是可拖回继续编辑的白板源文件 |
-| `draw-drawio` | `.drawio` | `.svg` / `.png` / `.pdf` | 未压缩 mxGraph XML；导出图与源文件同目录 |
-| `draw-d3js` | `.html`（源即产物） | 图内联于 HTML | split 模式下另留 `data.js`/`data.json` 与本地 `vendor/d3.v7.min.js` |
-| `draw-echarts` | `.html`（源即产物） | 图内联于 HTML | 另留 `config.json`/`config.js` 与本地 `vendor/echarts.min.js` |
+| `plantuml` | `.puml` | `.svg` + `.png` | 二者都必须产出（PNG 供速览，SVG 供无损放大） |
+| `mermaid` | `.mmd` | `.svg` + `.png` | 同上 |
+| `excalidraw` | `.excalidraw` | `.svg` + `.png` | 场景 JSON 是可拖回继续编辑的白板源文件 |
+| `drawio` | `.drawio` | `.svg` / `.png` / `.pdf` | 未压缩 mxGraph XML；导出图与源文件同目录 |
+| `d3js` | `.html`（源即产物） | 图内联于 HTML | split 模式下另留 `data.js`/`data.json` 与本地 `vendor/d3.v7.min.js` |
+| `echarts` | `.html`（源即产物） | 图内联于 HTML | 另留 `config.json`/`config.js` 与本地 `vendor/echarts.min.js` |
 
 **通用要求**：
 

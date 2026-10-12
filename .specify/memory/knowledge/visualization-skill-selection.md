@@ -1,5 +1,9 @@
 # 可视化技能选择结论账本
 
+> **⚠️ 已超越（2026-10-12）**：本文件是 `viz-skill-arena` 竞技场的历史评测结论，其中把 `draw-plantuml` / `draw-mermaid` / `draw-echarts` / `draw-d3js` / `draw-excalidraw` / `draw-drawio` 作为**独立技能**比较。这六个技能已整体内置为 `draw-diagram` 的引擎层（`skills/external/draw-diagram/references/types/<engine>/`），不再单独注册。
+> 下文的**选型结论仍然有效**——它现在回答的是「draw-diagram 内部该走哪个引擎层」，其判据已收敛进 `skills/external/draw-diagram/references/routing-matrix.md`（该文件是选型的现行真源）。
+> 保留本文件作为竞技场证据，不改写其数据；引用时以 routing-matrix.md 为准。
+
 > 跨 cycle 累积的「需求类型 → 最优绘制技能」匹配知识。由 viz-skill-arena 团队每次 cycle 追加。
 
 ---

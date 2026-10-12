@@ -112,7 +112,7 @@ Use the `create-skills` skill to define new reusable workflows:
 Use the `improve-skills` skill to iterate on existing skills:
 
 ```text
-/improve-skills The draw-plantuml skill should support C4 model diagrams
+/improve-skills The draw-diagram skill should support C4 model diagrams
 ```
 
 ### Pre-installed Skills
@@ -120,9 +120,9 @@ Use the `improve-skills` skill to iterate on existing skills:
 Spec Kit ships with these skills ready to use:
 
 - `study-project` — Deep architecture analysis reports
-- `draw-plantuml` — System architecture diagrams via PlantUML
-- `draw-echarts` — Data visualizations via Apache ECharts
-- `draw-d3js` — Interactive D3.js visualizations
+- `draw-diagram` — System architecture diagrams via PlantUML
+- `draw-diagram` — Data visualizations via Apache ECharts
+- `draw-diagram` — Interactive D3.js visualizations
 - `create-skills` / `improve-skills` — Skill lifecycle management
 - `create-agent` / `improve-agent` — Agent template lifecycle management
 - `think-skills` — Dry-run simulation of skills

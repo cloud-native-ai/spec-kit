@@ -1,14 +1,14 @@
 # UML Visualization Guide — study-project
 
-Normative rules for expressing study-project report views as standard UML diagrams. Rendering is **delegated to the draw-plantuml skill** — this package contains no rendering code; draw-plantuml owns diagram syntax, its `scripts/render-plantuml.sh`, and image conventions.
+Normative rules for expressing study-project report views as standard UML diagrams. Rendering is **delegated to the draw-diagram skill** — this package contains no rendering code; draw-diagram owns diagram syntax, its `scripts/render-plantuml.sh`, and image conventions.
 
 ## 1. Primary views and required coverage
 
 The report's **primary views** MUST be expressed as rendered UML figures:
 
-| Analysis view | Primary diagram type | Acceptable alternative | draw-plantuml howto guide |
+| Analysis view | Primary diagram type | Acceptable alternative | draw-diagram howto guide |
 |---------------|----------------------|------------------------|---------------------------|
-| Architecture structure (subsystems, modules, boundaries) | component | package | `skills/external/draw-plantuml/references/howto/05-component-diagram.md` (or 07-package) |
+| Architecture structure (subsystems, modules, boundaries) | component | package | `skills/external/draw-diagram/references/types/plantuml/references/howto/05-component-diagram.md` (or 07-package) |
 | Key behavior flows (request/call chains, interactions) | sequence | activity (for business/process flows with decision branches) | `.../howto/04-sequence-diagram.md`, `.../howto/09-activity-diagram.md` |
 | Deployment topology (nodes, runtime, delivery) | deployment | — | `.../howto/06-deployment-diagram.md` |
 | Data structures (core entities, schemas) — where relevant | class | ER | `.../howto/08-class-diagram.md`, `.../howto/18-er-diagram.md` |
@@ -24,19 +24,19 @@ Mermaid inline sketches remain acceptable for **secondary, quick-glance content 
 ## 3. Figure output conventions
 
 - **Storage**: all figure files live under `$WORK_DIR/docs/figures/` (alongside the report at `$WORK_DIR/docs/overview.md`).
-- **Formats**: every figure ships as **PNG + SVG** — embed the PNG, link the SVG for lossless zoom (follow draw-plantuml's single-mechanism rule: all-inline-HTML `<a href=x.svg target="_blank" rel="noopener"><img src=x.png></a>`, or all-plain-Markdown if HTML is stripped).
+- **Formats**: every figure ships as **PNG + SVG** — embed the PNG, link the SVG for lossless zoom (follow draw-diagram's single-mechanism rule: all-inline-HTML `<a href=x.svg target="_blank" rel="noopener"><img src=x.png></a>`, or all-plain-Markdown if HTML is stripped).
 - **Sources**: keep the `.puml` source next to the images for future edits.
 - **Captions**: every figure carries a brief caption — what the view shows and what the reader should notice.
 - **References**: the report references figures by **relative paths** (`figures/<name>.png`); raw diagram source is never embedded in the reader-facing report.
-- **Chart sets**: when one figure would be unreadable (too many elements), split into an overview figure plus drill-down figures with consistent naming and cross-references, per draw-plantuml's large-diagram guidance.
+- **Chart sets**: when one figure would be unreadable (too many elements), split into an overview figure plus drill-down figures with consistent naming and cross-references, per draw-diagram's large-diagram guidance.
 
 ## 4. Rendering delegation
 
-For each planned figure: write the `.puml` source following the mapped draw-plantuml howto guide, then render via draw-plantuml's `scripts/render-plantuml.sh <input.puml> docs/figures <name>` (PNG and SVG produced together). UML diagram types here (component/deployment/sequence/class/activity/ER) may require Graphviz `dot` for local-jar rendering; the server backend needs no local dependency — see draw-plantuml's rendering documentation for backend selection.
+For each planned figure: write the `.puml` source following the mapped draw-diagram howto guide, then render via draw-diagram's `scripts/render-plantuml.sh <input.puml> docs/figures <name>` (PNG and SVG produced together). UML diagram types here (component/deployment/sequence/class/activity/ER) may require Graphviz `dot` for local-jar rendering; the server backend needs no local dependency — see draw-diagram's rendering documentation for backend selection.
 
 ## 5. Degradation rule
 
-If draw-plantuml rendering is unavailable during the run (server unreachable and no local jar, or Graphviz missing for the needed type):
+If draw-diagram rendering is unavailable during the run (server unreachable and no local jar, or Graphviz missing for the needed type):
 
 1. Fall back to a Mermaid inline sketch for each affected primary view.
 2. Add a visible **degradation note** next to each affected view, e.g. `> Note: UML rendering unavailable during this run; view shown as a Mermaid sketch.`

@@ -6,7 +6,7 @@
 
 ## 呈现要素
 
-- **进展甘特图**：`@startgantt`（源码落 `assets/gantt.puml` 文件，**不进报告正文**；正文只放渲染图片的相对路径引用 + 图说），遵循 draw-plantuml 的 `references/howto/14-gantt-diagram.md` 与下方「图形编码规范」——同时编码**任务（条）+ 阶段（分隔带）+ 人员（条形显示名后缀）+ 里程碑（菱形）+ 四态状态（颜色，含延期）+ 完成度（`is N% complete` 条内填充）+ 当前日期（today 线）+ 依赖（虚线箭头）**。
+- **进展甘特图**：`@startgantt`（源码落 `assets/gantt.puml` 文件，**不进报告正文**；正文只放渲染图片的相对路径引用 + 图说），遵循 draw-diagram 的 `references/howto/14-gantt-diagram.md` 与下方「图形编码规范」——同时编码**任务（条）+ 阶段（分隔带）+ 人员（条形显示名后缀）+ 里程碑（菱形）+ 四态状态（颜色，含延期）+ 完成度（`is N% complete` 条内填充）+ 当前日期（today 线）+ 依赖（虚线箭头）**。
 - **`### 进度叙述` 小节（强制，紧随甘特图说）**：四段固定内容——① **整体句**（整体完成度 `分子/分母 = 百分比%` + 分母口径 + 排期判断句 + 当前所处阶段）；② **分阶段进度表**「阶段 | 起止 | 状态 | 进度% | 逾期天数」；③ **完成度分布**（已完成 / 进行中 / 未开始<、状态未知><、本轮延后> 计数与总数）；④ **逾期**（逾期条目数与最长逾期天数；无逾期写"基准日左侧无未完成条目"）。数值**逐个取进度引擎字段**（项目级汇总 + 分组聚合），本小节不做任何计算；模板见 [progress-presentation.md](progress-presentation.md) 3.5。这是"项目整体进度安排"的文字答案，与甘特图互为印证且**同字段同值**。
   - **甘特不出图时本小节仍保留**（降级形态见 [degradation.md](degradation.md) 第 5 节）：整体句改为"进度未量化，仅报状态计数：…"，分阶段表的进度与逾期列写 `-（无可计数依据）` / `-`，并配段首材料声明句。
 
@@ -28,17 +28,17 @@
    - **延期不改条形位置**：条形起止只由记录层的计划日期决定，延期态只改颜色与标识——绝不为了"看起来延期"把条形右端拉到 today 之后。
      "计划窗口 vs 实际进度"的落差由 today 线与条内填充前沿的相对位置呈现（见下方「当前日期参照线」）。
 3. **负责人写进条形显示名（强制承载位，不用资源语法）**：任务写 `[任务名 ▪ 姓名] as [别名] …`，人员随条形显示；缺失写 ` ▪ 未记录`，**不得整段省略**。名称与 WBS `【…】` 第二行逐字一致。
-   - **不用 `on {资源}`**：资源语法**不会把人名画在条形上**（读者看不到负责人），而它带来的底部资源盒会吃掉 30%~50% 的图高（A/B 实测见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「实测结论：`on {}` 不改排期，但资源泳道极吃版面」）。本报告的处置见 [people-encoding.md](people-encoding.md) 第 3 节。
+   - **不用 `on {资源}`**：资源语法**不会把人名画在条形上**（读者看不到负责人），而它带来的底部资源盒会吃掉 30%~50% 的图高（A/B 实测见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「实测结论：`on {}` 不改排期，但资源泳道极吃版面」）。本报告的处置见 [people-encoding.md](people-encoding.md) 第 3 节。
    - **例外**：用户明确要求看人员负载分布时才用 `on {}`，且必须同时满足——图头 `hide resources footbox`（除非用户就是要看占用率）、每根条形保留显式 `starts <yyyy-mm-dd>`、图说解释占用率数字含义。
    - **替代排布**：人员视角需求更强时，把 `-- 阶段名 --` 换成 `-- 姓名（主要阶段）--` 按负责人分组，末组固定 `-- 未记录负责人 --`（示例见 [people-encoding.md](people-encoding.md) 7.6）；此时任务名不再带 ` ▪ 姓名` 后缀，阶段信息回落到图说。默认仍以阶段分组。
-4. **里程碑逐条复制自里程碑层，标签自带日期与符号**：同编号同名，标签形如 `[M2 设计评审 ✓2026-03-20]`（`✓` achieved / `◇` pending / `⚠` at-risk-逾期，字形规则见 `<draw-plantuml>/references/guide/style.md`「状态编码：颜色 + 符号冗余」）；锚定优先用原始形式 `happens at [别名]'s end`，绝对日期锚定写 `happens yyyy-mm-dd`；achieved 逐条覆盖为绿 `is colored in #43A047`、at-risk 覆盖为红 `#E53935`。里程碑的声明/着色写法（含两行标签串一致性）见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「里程碑」。**状态、锚定日与符号一律照抄引擎输出**（与里程碑层同一次运行，字段 `status` / `anchor_date` / `delay_days`；判定语义见 [consistency-rules.md](consistency-rules.md) §6）；引擎 `status=unknown-schedule` 的里程碑**无日期、不入时间轴**，只在跟踪表与声明句中出现。
+4. **里程碑逐条复制自里程碑层，标签自带日期与符号**：同编号同名，标签形如 `[M2 设计评审 ✓2026-03-20]`（`✓` achieved / `◇` pending / `⚠` at-risk-逾期，字形规则见 `<draw-diagram>/references/guide/style.md`「状态编码：颜色 + 符号冗余」）；锚定优先用原始形式 `happens at [别名]'s end`，绝对日期锚定写 `happens yyyy-mm-dd`；achieved 逐条覆盖为绿 `is colored in #43A047`、at-risk 覆盖为红 `#E53935`。里程碑的声明/着色写法（含两行标签串一致性）见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「里程碑」。**状态、锚定日与符号一律照抄引擎输出**（与里程碑层同一次运行，字段 `status` / `anchor_date` / `delay_days`；判定语义见 [consistency-rules.md](consistency-rules.md) §6）；引擎 `status=unknown-schedule` 的里程碑**无日期、不入时间轴**，只在跟踪表与声明句中出现。
 5. **日期一律 yyyy-mm-dd（呈现形态）**：`Project starts yyyy-mm-dd`、一切绝对起止日期、title 中的基准日、图说与叙述中的日期，全部 `yyyy-mm-dd`（PlantUML 接受该格式）——图源里的日期都是**照抄引擎输出字段**，其字面量合法性在入库时已由数据库约束把关（见 [`../schema/project.sql`](../schema/project.sql)），本节不重述输入侧格式规则。
 6. **today 参照线**：`today is N days after start and is colored in #1565C0`（饱和深蓝，浅色在白底不可见）——**`N` 取引擎 `gantt.today_offset_days`**（不在报告里做减法，也不依赖渲染环境时钟）；`title` 直接用引擎 `gantt.title_baseline` 串（如 `…（基准日 today = 2026-04-06，项目第 35 天）`），让蓝线自解释。
-7. **依赖用低调虚线**：跨阶段依赖写 `[A] -[dotted]-> [B]`（可带色 `-[#607D8B,dotted]->`），不与实心任务条抢视觉。依赖箭头的通用坑位（`<style>` 的 `arrow { }` 内不能写 `LineStyle`、`starts at [X]'s end` 的前向引用限制、**箭头可能改写排期**因而需 A/B 复核）见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「布局与美观技巧」；本报告要求条形位置只由记录层日期决定，故画箭头后必须复核排期未被改写。
+7. **依赖用低调虚线**：跨阶段依赖写 `[A] -[dotted]-> [B]`（可带色 `-[#607D8B,dotted]->`），不与实心任务条抢视觉。依赖箭头的通用坑位（`<style>` 的 `arrow { }` 内不能写 `LineStyle`、`starts at [X]'s end` 的前向引用限制、**箭头可能改写排期**因而需 A/B 复核）见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「布局与美观技巧」；本报告要求条形位置只由记录层日期决定，故画箭头后必须复核排期未被改写。
 8. **刻度匹配周期（起点取值是穷尽且不重叠的区间，不留"看情况"）**：项目跨度天数 `D`（取引擎时间轴首末日期之差）——
    `D ≤ 21` → `printscale daily`；`22 ≤ D ≤ 120` → `printscale weekly`；`D > 120` → `projectscale monthly`。
-   这是**起点值**；最终取值**按本图量测调参**，调参方向也是固定的：**有效字号不足 → 改粗一档刻度**（daily→weekly→monthly），**长宽比失衡 → 调 zoom**（zoom 只拉长宽比，不提高有效字号；字太小不能靠 zoom 解决，要改粗刻度或拆图）。实测矩阵与判据见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「刻度与 zoom 是量出来的，不是查表得的（实测）」。有明确工作日历依据时声明 `saturday/sunday are closed`；材料无依据时不虚构假日。
-9. **图例必配、含人员行、零实例退化**：`legend left`（嵌入甘特左下天然空白）列出图内实际出现的四态色（含延期 `#EF9A9A`）+ 里程碑三态色 + 人员标注说明行（` ▪ 姓名` = 任务负责人）；**每行同时写清"色块 + 该态的填充语义"**（如 `任务·延期 ⚠（条内填充 = 完成度 NN%，延期天数见跟踪表）`），让读者一次建立颜色与填充两条通道的对应；色块与任务条同字面量；图内零实例的状态**不列**（无延期条目就不列延期行），全图无人员标注时不列人员行（改由图说首句声明）。图例契约与自检脚本见 `<draw-plantuml>/references/guide/style.md`「图例契约」。
+   这是**起点值**；最终取值**按本图量测调参**，调参方向也是固定的：**有效字号不足 → 改粗一档刻度**（daily→weekly→monthly），**长宽比失衡 → 调 zoom**（zoom 只拉长宽比，不提高有效字号；字太小不能靠 zoom 解决，要改粗刻度或拆图）。实测矩阵与判据见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「刻度与 zoom 是量出来的，不是查表得的（实测）」。有明确工作日历依据时声明 `saturday/sunday are closed`；材料无依据时不虚构假日。
+9. **图例必配、含人员行、零实例退化**：`legend left`（嵌入甘特左下天然空白）列出图内实际出现的四态色（含延期 `#EF9A9A`）+ 里程碑三态色 + 人员标注说明行（` ▪ 姓名` = 任务负责人）；**每行同时写清"色块 + 该态的填充语义"**（如 `任务·延期 ⚠（条内填充 = 完成度 NN%，延期天数见跟踪表）`），让读者一次建立颜色与填充两条通道的对应；色块与任务条同字面量；图内零实例的状态**不列**（无延期条目就不列延期行），全图无人员标注时不列人员行（改由图说首句声明）。图例契约与自检脚本见 `<draw-diagram>/references/guide/style.md`「图例契约」。
 
 骨架示例（**已实测渲染通过**：四态含延期条 + 完成度双通道 + 人员后缀 + 里程碑日期与符号 + today + 依赖 + 图例，日期均为 yyyy-mm-dd；量测结果最小有效字号 12.2px、长宽比 1.87:1、最右标签未越界，三条几何判据全过）：
 
@@ -177,8 +177,8 @@ python3 ${SKILL_HOME}/scripts/progress-engine.py \
 - [ ] 所有绝对日期（Project starts、起止、title 基准日、叙述）均为 yyyy-mm-dd
 - [ ] `today` 相对项目起点显式定位、饱和深蓝着色、title 注明基准日；进行期项目有参照线
 - [ ] 里程碑条目与里程碑层同编号同名同锚定同状态色；**每个菱形标签带 yyyy-mm-dd + `✓/◇/⚠`**；依赖为 `-[dotted]->` 虚线且无前向引用；条目引用一律用别名
-- [ ] 图例含人员说明行、每行写清填充语义，且遵守零实例退化（无延期条目不列延期行）；已按 `<draw-plantuml>/references/guide/style.md`「图例契约」的自检脚本比对通过
-- [ ] 刻度与 zoom 已按 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」量测通过
+- [ ] 图例含人员说明行、每行写清填充语义，且遵守零实例退化（无延期条目不列延期行）；已按 `<draw-diagram>/references/guide/style.md`「图例契约」的自检脚本比对通过
+- [ ] 刻度与 zoom 已按 `<draw-diagram>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」量测通过
 - [ ] 估计性时间已在 `## 元信息` 逐条标注为假设
 - [ ] **`### 进度叙述` 小节在位**：整体句（完成度 + 分母口径 + 排期判断 + 当前阶段）、分阶段进度表、完成度分布、逾期条目数四段齐全；甘特不出图时该小节仍保留并配材料声明句
 - [ ] 进度叙述与分阶段表的数值逐个取引擎字段，本节无除法算式、无日期比较、无自算天数；与甘特图说结论句、《项目概览》进度摘要、《功能分解》阶段聚合表**同值同源同精度**

@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: ux-analyst
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Write, Edit]
-skills: [document-utils, draw-echarts, draw-d3js]
+skills: [document-utils, draw-diagram]
 run-turn-budget: 10
 display-color: cyan
 ---
@@ -110,5 +110,4 @@ Framework skills and agent definitions install together, so every skill I declar
 | Skill | When to use |
 |-------|-------------|
 | document-utils | Produce UX analysis reports and deliverables |
-| draw-echarts | Visualize UX metrics and findings with ECharts |
-| draw-d3js | Build interactive D3.js visualizations of UX data |
+| draw-diagram | Draw diagrams (UML / architecture / flow / sequence / data visualization / hand-drawn / whiteboard) via the unified front door, which routes to the best-fit internal engine layer |

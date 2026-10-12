@@ -2,7 +2,7 @@
 
 Failure mode this prevents
 --------------------------
-The draw-d3js reproduction pipeline fixed the *input* side (measure the source
+The draw-diagram reproduction pipeline fixed the *input* side (measure the source
 image into the SDS) and the *internal* side (validate coordinates against the
 SDS), but nothing ever connected the rendered pixels back to the source image.
 Fidelity could therefore only be *asserted* — "looks like the original" — and
@@ -27,9 +27,9 @@ import pytest
 pytestmark = pytest.mark.contract
 
 ROOT = Path(__file__).resolve().parents[2]
-D3JS = ROOT / "skills" / "external" / "draw-d3js"
+D3JS = ROOT / "skills" / "external" / "draw-diagram" / "references" / "types" / "d3js"
 SDS = D3JS / "references" / "sds-realization.md"
-SKILL = D3JS / "SKILL.md"
+SKILL = D3JS / "d3js.md"  # was SKILL.md before the draw-* merge
 CYCLE4 = D3JS / "references" / "cycle4-improvements.md"
 
 GATE_NAME = "关三：渲染读回 ↔ 源图差量"

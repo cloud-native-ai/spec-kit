@@ -66,4 +66,4 @@
 
 配套要求：backlog 项登记时必须显式标注**「需哪种执行证据可解锁」**（哪个场景跑通、哪类输出在手即可写），让后续 run 能定向采证，而不是留下泛泛的"待补"。
 
-> 淘汰式优化的可复用范例（draw-plantuml 复杂图表优化）以团队花名册形式持久化在 `.specify/teams/draw-plantuml-optimizer/team.md`——其中完整给出了评分规则（加权维度）、淘汰/精英保留策略与成员映射，可直接 re-run。完整的逐轮评分结果需实际执行该 iteration 后累积，届时每轮报告落在同目录 `runs/` 下。
+> 淘汰式优化的可复用范例（原 plantuml 绘图技能的复杂图表优化；该技能现已并入 draw-diagram 的 plantuml 引擎层）以团队花名册形式持久化在 `.specify/teams/draw-plantuml-optimizer/team.md`——其中完整给出了评分规则（加权维度）、淘汰/精英保留策略与成员映射，可直接 re-run。完整的逐轮评分结果需实际执行该 iteration 后累积，届时每轮报告落在同目录 `runs/` 下。

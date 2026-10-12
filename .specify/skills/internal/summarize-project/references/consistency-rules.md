@@ -458,7 +458,7 @@ python3 ${SKILL_HOME}/scripts/check-coherence.py <报告路径> --strict   # WAR
 
 > **正文（prose）口径**：数字 / 日期 / 编号 / 覆盖类检查一律在**正文**上做——正文 = 报告去掉全部 ```` ``` ```` 围栏代码块与内联 `<svg>…</svg>` 后的文本。这样残留源码里的 `is N% complete`、内联 SVG 的 `width="100%"` 与路径坐标数字**不再**被误报为裸百分比/裸编号。**图元 / 图例类检查读 `assets/*.puml` 图源文件**（源码已移出正文，图源即文件；`assets/` 无 `.puml` 时才退回读取正文残留的围栏块，兼容旧形态）；目录自包含类检查用报告全文 + `assets/` 目录列表。
 >
-> **数据侧几何校验另有其人**：本脚本只查"报告文本自洽"。"甘特条形起止是否等于记录层日期""里程碑菱形是否落在锚定日"这类**需要项目日期做真值**的图元几何校验由 `scripts/verify-chart-data.py` 承担；长宽比 / 有效字号 / 标签溢出等**通用版面量测**由 draw-plantuml 的 `measure-svg-layout.py` 承担（见 SKILL.md「脚本清单」）。三者职责不重叠。
+> **数据侧几何校验另有其人**：本脚本只查"报告文本自洽"。"甘特条形起止是否等于记录层日期""里程碑菱形是否落在锚定日"这类**需要项目日期做真值**的图元几何校验由 `scripts/verify-chart-data.py` 承担；长宽比 / 有效字号 / 标签溢出等**通用版面量测**由 draw-diagram 的 `measure-svg-layout.py` 承担（见 SKILL.md「脚本清单」）。三者职责不重叠。
 
 **CG-2 的处置有确定性裁决规则（不是"二选一"）**：
 
@@ -543,7 +543,7 @@ python3 ${SKILL_HOME}/scripts/check-coherence.py <报告路径> --strict   # WAR
 |---|----------------|----------|------|
 | W-1 | 交付目录本身（`.specify/project/summary/` / `docs/project-summary/` / 用户指定）：`summary.md` + `assets/` + `data/` | 本技能落盘 | 技能的唯一交付物（**整个目录**），重复运行整体刷新 |
 | W-2 | `${SKILL_WORKDIR}/.specify/memory/feedback/` | **只经** `feedback-utils.py` 引擎（不手写文件） | 技能自省通道，宿主框架资产 |
-| W-3 | 图源与渲染产物、计算/校验中间产物（图源 `*.puml` 与渲染出的 `*.svg` / `*.png` 同名落 `assets/`；**项目数据库 `project.db`、引擎输出 `engine-out.json`**、可选导出 `progress-data.json`、`expect.json`、门禁结果落 `data/`） | draw-plantuml 渲染流程 / `project-db.py` / `progress-engine.py` / 校验脚本 | 一律落**交付目录内**（`assets/` 或 `data/`，默认每次运行从事实源重建、随目录整体刷新，作为交付物一部分保留）；**绝不写入目标项目管理工件区**（目标项目 ≠ 宿主时交付目录外零写入） |
+| W-3 | 图源与渲染产物、计算/校验中间产物（图源 `*.puml` 与渲染出的 `*.svg` / `*.png` 同名落 `assets/`；**项目数据库 `project.db`、引擎输出 `engine-out.json`**、可选导出 `progress-data.json`、`expect.json`、门禁结果落 `data/`） | draw-diagram 渲染流程 / `project-db.py` / `progress-engine.py` / 校验脚本 | 一律落**交付目录内**（`assets/` 或 `data/`，默认每次运行从事实源重建、随目录整体刷新，作为交付物一部分保留）；**绝不写入目标项目管理工件区**（目标项目 ≠ 宿主时交付目录外零写入） |
 
 **白名单之外一律只读**，明确包括：`.specify/specs/**`（requirements / plan / tasks / verification / checklists）、`.specify/memory/features.md` 与 `features/**`、`.specify/memory/constitution.md`、`.specify/instructions.md`、`.specify/skills/**`、`.specify/agents/**`、`.specify/templates/**`、`.specify/history/**`、`.specify/memory/session|knowledge/**`、README/docs、源代码、git 仓库（不 commit、不 tag、不改 ref）。
 

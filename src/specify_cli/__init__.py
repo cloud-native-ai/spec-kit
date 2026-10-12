@@ -839,12 +839,22 @@ _ASSISTANT_ARG_FORMATS = {
 # thought-experiment-verifier→think-skills;
 # manage-project→visualize-project→summarize-project;
 # sdd-workflow→shared/workflow;
+# draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml}→draw-diagram
+#   (six engine skills became internal engine layers under
+#    draw-diagram/references/types/<engine>/; see that skill's
+#    references/merge-provenance.md for the capability-inheritance record);
 # mcp-creator/refresh-mcp-tools/notebooklm-utils/theme-creator removed).
 _OBSOLETE_SKILLS = (
     "agent-cli-setup",
     "agent-setup",
     "cli-setup",
     "docx-utils",
+    "draw-d3js",
+    "draw-drawio",
+    "draw-echarts",
+    "draw-excalidraw",
+    "draw-mermaid",
+    "draw-plantuml",
     "export-session",
     "extension-e2e-test",
     "git-fleet",

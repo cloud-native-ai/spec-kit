@@ -43,10 +43,10 @@ OWNER_LINK = "draw-diagram/references/delivery-contract.md"
 # The sites the introspection finding named, plus the engine guide that inlined
 # the same command with a literal window size.
 POINTER_SITES = (
-    "external/draw-echarts/SKILL.md",
-    "external/draw-echarts/references/sds-realization.md",
-    "external/draw-echarts/references/echarts-guide.md",
-    "external/draw-d3js/SKILL.md",
+    "external/draw-diagram/references/types/echarts/echarts.md",
+    "external/draw-diagram/references/types/echarts/references/sds-realization.md",
+    "external/draw-diagram/references/types/echarts/references/echarts-guide.md",
+    "external/draw-diagram/references/types/d3js/d3js.md",
 )
 
 VENDOR_DIRS = {"node_modules", "__pycache__", ".git", ".venv", ".migration-backups"}

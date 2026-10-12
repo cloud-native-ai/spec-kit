@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: knowledge-manager
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Write, Edit]
-skills: [document-utils, memory-record, memory-recall, draw-plantuml, draw-mermaid, draw-d3js, draw-echarts, create-docs, improve-docs]
+skills: [document-utils, memory-record, memory-recall, draw-diagram, create-docs, improve-docs]
 run-turn-budget: 10
 display-color: teal
 ---
@@ -131,7 +131,4 @@ Framework skills and agent definitions install together, so every skill I declar
 | document-utils | Produce and edit office documents (Word, PDF, PowerPoint, Excel) for deliverables |
 | memory-record | Capture decisions and knowledge into project memory |
 | memory-recall | Retrieve prior knowledge and decision records when updating docs |
-| draw-plantuml | Create UML / architecture diagrams for documentation |
-| draw-mermaid | Create UML / architecture diagrams for documentation (Mermaid) |
-| draw-d3js | Build interactive D3.js data visualizations for docs |
-| draw-echarts | Build ECharts data visualizations for docs |
+| draw-diagram | Draw diagrams (UML / architecture / flow / sequence / data visualization / hand-drawn / whiteboard) via the unified front door, which routes to the best-fit internal engine layer |

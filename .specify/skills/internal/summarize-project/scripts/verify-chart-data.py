@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """verify-chart-data.py — 甘特/里程碑图的**数据侧**校验（图元几何 ⇄ 记录层业务日期）。
 
-职责边界（与 draw-plantuml 的 measure-svg-layout.py 分工，见 SKILL.md「脚本清单」）
+职责边界（与 draw-diagram 的 measure-svg-layout.py 分工，见 SKILL.md「脚本清单」）
 --------------------------------------------------------------------------------
 本脚本**只做通用绘图引擎做不了的检查**：需要**项目业务数据做真值**、必须拿记录层
 （结构 B 任务日期 / 结构 C 里程碑锚定日期 / 进度百分比）与渲染出的图元几何逐条比对
 的正确性校验。它回答的是「图画对了吗」——条形起止是否落在记录层日期上、里程碑菱形
 是否落在锚定日上、进行中条形的结束边界是否与基准日自洽。
 
-**通用几何量测一律委托 draw-plantuml**（`skills/external/draw-plantuml/scripts/measure-svg-layout.py`
+**通用几何量测一律委托 draw-diagram**（`skills/external/draw-diagram/references/types/plantuml/scripts/measure-svg-layout.py`
 「量测自检：三条几何判据」）：长宽比、正文有效字号 / 内联可读性分档、标签越过时间轴
 右边界（溢出）、A/B 排期是否被改写——这些**不需要项目数据、纯几何/版面**的判据是绘图
 技能的权威量测，本脚本**不再重复实现**（曾经的 C2/C3/C4/C5/C7/C8 已删除，避免两套
@@ -226,7 +226,7 @@ def main():
 
     if a.kind in ("wbs", "mindmap"):
         rep.info("D0", "%s 图无时间轴/记录层日期真值，本脚本无数据侧检查项；"
-                 "版面/可读性判据请跑 draw-plantuml 的 measure-svg-layout.py" % a.kind)
+                 "版面/可读性判据请跑 draw-diagram 的 measure-svg-layout.py" % a.kind)
     elif not a.expect:
         rep.info("D0", "未提供 --expect（记录层期望值 JSON），无法做数据侧校验；"
                  "仅版面判据时请改跑 measure-svg-layout.py")
@@ -240,7 +240,7 @@ def main():
                               failed=rep.failed, items=rep.items), ensure_ascii=False, indent=2))
     else:
         print("=== 数据侧校验：%s (%s) viewBox %.0f×%.0f ===" % (a.svg, a.kind, svg["W"], svg["H"]))
-        print("（通用版面量测委托 draw-plantuml/measure-svg-layout.py，本脚本只比对图元几何 ⇄ 记录层日期）")
+        print("（通用版面量测委托 draw-diagram/measure-svg-layout.py，本脚本只比对图元几何 ⇄ 记录层日期）")
         for i in rep.items:
             print("[%s] %s %s" % (i["level"], i["code"], i["msg"]))
             if i["fix"]:

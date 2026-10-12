@@ -32,10 +32,10 @@
 [Mn 名称 <状态符号><yyyy-mm-dd>[ ▪负责人]]
 ```
 
-- 状态符号：`✓` achieved / `◇` pending / `⚠` at-risk（含逾期）。字形选择与"颜色 + 符号"冗余编码的通用规则见 `<draw-plantuml>/references/guide/style.md`「状态编码：颜色 + 符号冗余」。
+- 状态符号：`✓` achieved / `◇` pending / `⚠` at-risk（含逾期）。字形选择与"颜色 + 符号"冗余编码的通用规则见 `<draw-diagram>/references/guide/style.md`「状态编码：颜色 + 符号冗余」。
 - 锚定工作项结束点的里程碑，日期文本**照抄引擎 `anchor_date`**（换算由引擎完成，呈现层不自行换算），图说照引引擎 `evidence` 中的换算说明；引擎 `status=unknown-schedule` 时标签写 `未排期`，不编造日期。
 - 负责人后缀 ` ▪姓名`（缺失写 ` ▪未记录`）；里程碑视图横向空间充裕，人员信息应当上图，不要只留在表里。
-- 里程碑的声明/着色写法（`happens` 与 `is colored in` 两行标签串的一致性要求、别名用法）见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「里程碑」。
+- 里程碑的声明/着色写法（`happens` 与 `is colored in` 两行标签串的一致性要求、别名用法）见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「里程碑」。
 - 本报告采用的完整字面量表与成品示例见 [people-encoding.md](people-encoding.md) 第 1、4、7.4 节。
 
 ## 锚定与状态：数据里声明锚定，**状态由引擎判定**
@@ -78,10 +78,10 @@
 
 1. **只写 `happens` 条目**：图内除 `Project starts`、刻度、today 线、样式外，不出现任何 `requires/lasts` 任务条。本视图一律用**引擎给出的绝对锚定日** `happens <anchor_date>` 声明（引擎已把"锚定工作项结束点"换算成绝对日期，本文档不做换算）——因为本图没有可引用的任务条；换算关系在图说照引引擎 `evidence`（如"M3 锚定 [联调对接] 结束点，按当前排期为 2026-04-03"）。任务进展层的完整甘特中仍可用原始 `happens at [...]'s end` 锚定。`unknown-schedule` 的里程碑无锚定日，**不入本视图**。
 2. **标签自带日期、符号与负责人**：`[Mn 名称 ✓yyyy-mm-dd ▪姓名]`（见「图元编码规范」）。
-3. **三态着色**：`<style>` 的 `milestone { }` 承担 pending 琥珀 `#FFD54F`/`#F57F17`，对 **achieved** 与 **at-risk** 逐条用 `[标签串] is colored in #43A047` / `#E53935` 覆盖（`milestone { }` 只能统一着色、以及两行标签串必须逐字一致的语法事实见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「里程碑」）。
+3. **三态着色**：`<style>` 的 `milestone { }` 承担 pending 琥珀 `#FFD54F`/`#F57F17`，对 **achieved** 与 **at-risk** 逐条用 `[标签串] is colored in #43A047` / `#E53935` 覆盖（`milestone { }` 只能统一着色、以及两行标签串必须逐字一致的语法事实见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「里程碑」）。
 4. **today 参照线必画**：`today is N days after start and is colored in #1565C0`，**`N` 取引擎 `gantt.today_offset_days`**（不在文档/报告里做减法，也不依赖渲染环境时钟）——线左侧的菱形应当都是 `✓`，线右侧是 `◇`/`⚠`，图面自证一致性。
-5. **刻度与留白**：里程碑视图行数天生很少、成图容易细长，**不要用 zoom 撑宽**（zoom 只放大画布、不提高有效字号），偏细长时把刻度调粗（`printscale weekly` → `projectscale monthly`）。刻度/zoom 的实测矩阵、右侧留白手法与量测判据见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「刻度与 zoom 是量出来的，不是查表得的（实测）」「量测自检：三条几何判据」与「里程碑视图（紧凑）」。
-6. **图例带符号列并遵守零实例退化**：`legend left` 用「颜色 | 符号 | 状态」三列；本图不存在的状态**不列**（如全部里程碑均已达成时不列 `◇`/`⚠` 行）。图例契约与自检脚本见 `<draw-plantuml>/references/guide/style.md`「图例契约」。
+5. **刻度与留白**：里程碑视图行数天生很少、成图容易细长，**不要用 zoom 撑宽**（zoom 只放大画布、不提高有效字号），偏细长时把刻度调粗（`printscale weekly` → `projectscale monthly`）。刻度/zoom 的实测矩阵、右侧留白手法与量测判据见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「刻度与 zoom 是量出来的，不是查表得的（实测）」「量测自检：三条几何判据」与「里程碑视图（紧凑）」。
+6. **图例带符号列并遵守零实例退化**：`legend left` 用「颜色 | 符号 | 状态」三列；本图不存在的状态**不列**（如全部里程碑均已达成时不列 `◇`/`⚠` 行）。图例契约与自检脚本见 `<draw-diagram>/references/guide/style.md`「图例契约」。
 
 示例（**已实测渲染通过**，可直接套用的骨架）：
 
@@ -127,7 +127,7 @@ end legend
 
 - [ ] 每个里程碑可溯源；状态列取引擎 `status`，依据列文本照引引擎 `evidence`（逾期类写 `逾期 N 天`，N 取引擎 `delay_days`，未在报告里相减日期）
 - [ ] 全部里程碑有 M 编号；名称简洁（≤10 汉字，符号/日期/负责人不计入）
-- [ ] **每个菱形标签自带 `yyyy-mm-dd` + 状态符号 `✓/◇/⚠`**；字形合规与两行标签串一致性按 `<draw-plantuml>/references/guide/style.md`「状态编码：颜色 + 符号冗余」与 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「里程碑」检查
+- [ ] **每个菱形标签自带 `yyyy-mm-dd` + 状态符号 `✓/◇/⚠`**；字形合规与两行标签串一致性按 `<draw-diagram>/references/guide/style.md`「状态编码：颜色 + 符号冗余」与 `<draw-diagram>/references/howto/14-gantt-diagram.md`「里程碑」检查
 - [ ] **里程碑进度汇总表在位**（置于跟踪表之前）：达成率（`分子/分母 = 百分比%`）、已达成 / 逾期 / 待达成、最大逾期天数三行齐全，数值均取引擎里程碑汇总字段；无里程碑材料时整表未出（未写"达成率 0%"）
 - [ ] 跟踪表八列齐全（编号 | 里程碑 | 锚定 | 状态 | **达成进度** | **延期天数** | 负责人 | 依据）；负责人取值为规范名 / `规范名（推断）` / `未记录`，与结构 D 一致；达成进度/延期天数取引擎 `progress_pct` / `delay_days`，`null` 已写成 `-（无可计数依据）` / `-`，未用 0 顶替
 - [ ] 已跑过 `scripts/progress-engine.py`（`--baseline` = 全报告基准日），本节所有状态/日期/天数均可在引擎输出逐字找到，**报告内无手工日期比较**；引擎判为 at-risk 的未被改回 pending；引擎 `unknown-schedule` 的里程碑已声明「无计划日期，无法判定延期」且**未上红**
@@ -136,7 +136,7 @@ end legend
 - [ ] 视图 `happens` 条目与跟踪表逐行对应；绝对日期全部 yyyy-mm-dd
 - [ ] 视图内无任务条；三态颜色 + 符号双通道编码并有图例；图例遵守零实例退化（不列图内不存在的状态）
 - [ ] today 线以 `N days after start` 显式定位（`N` = 引擎 `gantt.today_offset_days`）；线左侧无 `◇`、右侧无 `✓`（否则回查库中数据并重跑引擎）
-- [ ] 刻度与 zoom 已按 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」量测通过（行数少时改粗刻度而非加 zoom；最右菱形标签未越过时间轴右边界）
+- [ ] 刻度与 zoom 已按 `<draw-diagram>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」量测通过（行数少时改粗刻度而非加 zoom；最右菱形标签未越过时间轴右边界）
 - [ ] 独立成图判定已执行并记入元信息；不独立时本节有「合并进甘特图」指引一行
 - [ ] 达成叙述给出总数 / 已达成数 / **达成率百分比** / 逾期数与最长逾期天数 / 待达成数 / 无计划日期个数（计数取引擎 `milestones.counts`），且与汇总表、《项目概览》进度摘要**同值同源同精度**
 - [ ] 全部条目已复制进进展甘特图（同编号/名/锚定/状态色/符号）；WBS ◆Mn 标记一致

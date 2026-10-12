@@ -3,7 +3,7 @@
 `summarize-project` 的**跨层强制规范**：人员（负责人）在报告与各图中的承载位、缺失时的显式声明位、里程碑图元的日期与三态编码、里程碑视图的独立成图判定。工作流主框架见 [../SKILL.md](../SKILL.md)；记录层 schema 见 [data-model.md](data-model.md)；其余跨层公约见 [reporting-playbook.md](reporting-playbook.md)。
 
 **边界（两条）**：
-1. **通用绘图规则不在此**：字形与冗余编码、图例契约、版面/刻度/zoom 量测、渲染踩坑——权威出处在 draw-plantuml：`<draw-plantuml>/references/guide/style.md`、`<draw-plantuml>/references/howto/13-wbs-diagram.md`、`<draw-plantuml>/references/howto/14-gantt-diagram.md`、`<draw-plantuml>/references/howto/15-mindmap-diagram.md`。
+1. **通用绘图规则不在此**：字形与冗余编码、图例契约、版面/刻度/zoom 量测、渲染踩坑——权威出处在 draw-diagram：`<draw-diagram>/references/guide/style.md`、`<draw-diagram>/references/howto/13-wbs-diagram.md`、`<draw-diagram>/references/howto/14-gantt-diagram.md`、`<draw-diagram>/references/howto/15-mindmap-diagram.md`。
 2. **日期与进度的计算不在此**：状态判定、延期判定、天数差、进度百分比、父项聚合、today 偏移，全部由 `scripts/progress-engine.py` 完成；本文档只写**引擎输出字段如何呈现**（哪张图承载什么、什么状态配什么颜色/符号/文案），**不含任何日期比较、算式或判定步骤**。
 
 **本文档存在的原因**：采集阶段登记了「负责人」，但如果五个呈现层面都没有人员的落点，这份数据就被静默丢弃——报告读者看不到"谁在负责"，采集也就白做。因此本文档规定：**人员是与状态、日期同级的一等呈现维度，每张图与报告正文都有强制承载位；缺失也必须显式说明，不得静默省略。**
@@ -45,7 +45,7 @@
 | 里程碑 at-risk/逾期 | `⚠`（U+26A0）+ 饱和红 `#E53935` | 同上 | `[M3 联调完成 ⚠2026-04-03]` |
 | WBS 里程碑锚点 | `◆Mn`（U+25C6） | WBS 节点标题行**最末尾**（状态符号在前、`◆Mn` 在后） | `** 需求与设计 ✓ ◆M1 ◆M2` |
 
-> 字形选择（为何用 `✓` U+2713 而非 `✔` U+2714、为何禁用 emoji、可用字形白名单 `✓◆◇●○▲■★☆⚠`）与"颜色 + 符号"冗余编码的通用规则见 `<draw-plantuml>/references/guide/style.md`「状态编码：颜色 + 符号冗余」；本表只固定本报告采用哪个字面量。
+> 字形选择（为何用 `✓` U+2713 而非 `✔` U+2714、为何禁用 emoji、可用字形白名单 `✓◆◇●○▲■★☆⚠`）与"颜色 + 符号"冗余编码的通用规则见 `<draw-diagram>/references/guide/style.md`「状态编码：颜色 + 符号冗余」；本表只固定本报告采用哪个字面量。
 
 **长度与一致性比对纪律**：状态符号、`NN%`、`（延期 N 天）`、`【负责人】`、`◆Mn` 均为**附加标注**，不计入节点名 ≤12 汉字 / 里程碑名 ≤10 汉字的长度上限，也不参与跨图"逐字一致"比对（只比对名称本体）——与里程碑标签"日期与符号不计入比对"是同一条规则。
 
@@ -125,7 +125,7 @@ caption 本项目材料未记录任何负责人信息，全图不含人员标注
 
 ## 3. 甘特图人员编码：负责人写进条形显示名
 
-PlantUML 甘特原生有资源语法 `[任务] on {张三}`。**本技能默认不用它**，改用条形显示名后缀 ` ▪ 姓名`。理由（A/B 实测见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「实测结论：`on {}` 不改排期，但资源泳道极吃版面」）：
+PlantUML 甘特原生有资源语法 `[任务] on {张三}`。**本技能默认不用它**，改用条形显示名后缀 ` ▪ 姓名`。理由（A/B 实测见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「实测结论：`on {}` 不改排期，但资源泳道极吃版面」）：
 
 - **资源名不会画在条形上**——本报告要的是"读者一眼看见谁负责"，`on {}` 帮不上这个忙；
 - **代价是底部资源盒**：资源盒吃掉成图高度的 **30%~50%**（任务行越少占比越高），且打印占用率数字，外部读者易读作"严重超载"告警；
@@ -139,7 +139,7 @@ PlantUML 甘特原生有资源语法 `[任务] on {张三}`。**本技能默认�
 ```
 
 - 显示名带人员，`as [别名]` 供后续引用——**后续所有引用（依赖、里程碑锚定、着色、百分比）一律用别名**，避免重复长串中文；
-- 人名拼进标签会让最右标签越过时间轴右边界，处置（缩短标签、或用几乎无色的着色区间把时间轴向右延长）见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」；
+- 人名拼进标签会让最右标签越过时间轴右边界，处置（缩短标签、或用几乎无色的着色区间把时间轴向右延长）见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」；
 - 需要压缩标签时，缩短的是**任务名**（≤12 汉字规则），不是删人名。
 
 **例外（仅当用户明确要求看人员负载分布）**：才允许 `on {姓名}`，此时**必须**同时满足：① 图头写 `hide resources footbox`（除非用户就是要看占用率）；② 每根条形仍写显式 `starts <yyyy-mm-dd>`（保持条形位置由记录层日期唯一决定）；③ 图说说明占用率数字的含义。
@@ -160,7 +160,7 @@ PlantUML 甘特原生有资源语法 `[任务] on {张三}`。**本技能默认�
 
 - **日期强制**：菱形只有位置没有日期文本时，读者必须靠数横轴格子推日期——里程碑视图与甘特图中的每个菱形都必须带 `yyyy-mm-dd`。标签里的日期**一律照抄引擎的 `anchor_date`**：锚定工作项结束点的里程碑，其绝对日期由引擎按当前排期换算（文档不做换算），图说照引引擎 `evidence` 中的换算说明（如"M3 锚定 [联调对接] 结束点，按当前排期为 2026-04-03"）。引擎 `status=unknown-schedule`（无计划日期）时，标签写 `未排期` 而非任何日期。
 - 名称本体仍守 ≤10 汉字；日期与符号、负责人不计入名称长度比对（一致性只比对 `Mn 名称` 部分）。
-- 里程碑的声明/着色/引用写法（`happens` 与 `is colored in` 两行标签串的一致性要求、别名用法、只放 `happens` 的紧凑视图约束）见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「里程碑」。
+- 里程碑的声明/着色/引用写法（`happens` 与 `is colored in` 两行标签串的一致性要求、别名用法、只放 `happens` 的紧凑视图约束）见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「里程碑」。
 
 ### 4.2 三态与逾期：状态**取自引擎输出**，本节只管怎么呈现
 
@@ -205,7 +205,7 @@ python3 ${SKILL_HOME}/scripts/progress-engine.py \
 
 **判定顺序固定**：先判 (a)/(b)/(c) 任一成立 → 再判 (i)/(ii)/(iii) 任一成立 → 两级都过才出独立视图。判定结论（出/不出 + 命中的是哪几条）写入 `## 元信息`，使同一输入两次运行必得同一结论。
 
-**版面**：独立视图是扁平时间带、行数天生很少，**不要用 zoom 撑宽**（zoom 只放大画布、不提高有效字号）；成图偏细长时把刻度调粗（`printscale weekly` → `projectscale monthly`）。实测矩阵与判据见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「刻度与 zoom 是量出来的，不是查表得的（实测）」与「里程碑视图（紧凑）」。
+**版面**：独立视图是扁平时间带、行数天生很少，**不要用 zoom 撑宽**（zoom 只放大画布、不提高有效字号）；成图偏细长时把刻度调粗（`printscale weekly` → `projectscale monthly`）。实测矩阵与判据见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「刻度与 zoom 是量出来的，不是查表得的（实测）」与「里程碑视图（紧凑）」。
 
 ### 4.4 里程碑/目标进度可视化（百分比 + 表格 + 进度图）
 
@@ -229,7 +229,7 @@ python3 ${SKILL_HOME}/scripts/progress-engine.py \
 
 - **进度条列的格子串取引擎 `progress_bar` 字段**（定长，默认 10 格 `█` U+2588 / `░` U+2591）；引擎未提供该字段时该列只写 `NN%`——**不允许**在报告里由百分比推算格数。
 - 「达成进度」= 该里程碑所锚定工作项的完成度（引擎 `progress_pct`），与「状态」是两条独立信息：`◇ pending` 也可能已推进 25%，`⚠ at-risk` 也可能已推进 70%——两列并排正是本形态的信息增量。
-- 进度条使用的 `█`/`░` 是**纯 Markdown 文本**，不进任何 PlantUML 图元，因此不受 draw-plantuml 字形白名单约束；反之这两个字符**不得**用在图内（图内一律用白名单符号 + 色块）。
+- 进度条使用的 `█`/`░` 是**纯 Markdown 文本**，不进任何 PlantUML 图元，因此不受 draw-diagram 字形白名单约束；反之这两个字符**不得**用在图内（图内一律用白名单符号 + 色块）。
 - 无 `progress_pct` 数据（引擎给 `null`）→ 该行进度列写 `-（无可计数依据）`，并在图说/元信息声明；**不得**用 0% 冒充"未推进"。
 
 #### 形态 B：里程碑达成进度图（PlantUML，条件出图）
@@ -245,9 +245,9 @@ python3 ${SKILL_HOME}/scripts/progress-engine.py \
 - 两种形态的分工：达成进度图是**进度视角**（长度 = 窗口、填充 = 完成度），里程碑视图是**节点视角**（一串菱形）。
 - **着色纪律**：条色取工作项四态色板浅色（`#C6E9CB` / `#BBD8EE` / `#EF9A9A` / `#ECEFF1`），符号取里程碑三态（`✓ ◇ ⚠`）——颜色回答"推进得怎么样"、符号回答"节点是否达成"，图例必须把这两条通道分开写明。`progress_pct = 0` 的条**不写** `is N% complete` 子句（写了会得到一根空白条），直接整条浅灰着色，与甘特"未开始条"约定一致。
 
-## 5. 图例契约（遵循 draw-plantuml）
+## 5. 图例契约（遵循 draw-diagram）
 
-图例的通用契约——**零实例退化 / 双向完备 / 单编码退化 / 色块与声明同字面量**，以及落盘前必跑的确定性自检脚本——见 `<draw-plantuml>/references/guide/style.md`「图例契约」，本技能不再重述。
+图例的通用契约——**零实例退化 / 双向完备 / 单编码退化 / 色块与声明同字面量**，以及落盘前必跑的确定性自检脚本——见 `<draw-diagram>/references/guide/style.md`「图例契约」，本技能不再重述。
 
 **本报告特有的一条**：**人员图例行仅在图内确有人员标注时出现**——图内至少一个节点/条形带人员标注 → 列 `【姓名】= 负责人，【未记录】= 材料未记录`（或甘特的 ` ▪ 姓名` 说明行）；全图无人员标注 → 不列该行，改由 `caption` 承担声明（见 2.2）。
 
@@ -262,17 +262,17 @@ python3 ${SKILL_HOME}/scripts/progress-engine.py \
   2. 第二行 = `【负责人】`；
   3. 第三行 = `NN%` 完成度（引擎 `progress_pct`），延期条目追加 `（延期 N 天）`（引擎 `delay_days`）。
   `progress_pct` 为 `null` 时**整行不写**（不写 `0%`——那是断言"未推进"），并在 `caption`/图说声明该维度缺失。
-  阶段（非叶子）节点只打状态类 + 状态符号，不带 `【】` 与 `NN%`（避免与子节点重复）；**阶段的 `status`（含 `delayed`）用引擎已聚合好的输出**（聚合在引擎内完成，本文档不重述真值表、也不在呈现层现算聚合），语义见 [consistency-rules.md](consistency-rules.md) §2，通用绘图侧的同一约束见 `<draw-plantuml>/references/howto/13-wbs-diagram.md`「父节点状态由子节点聚合时，聚合规则必须覆盖混合态」。
-- **特性概览脑图**：同样四类 + 一个中性 `.group` 类（`#CFD8DC`/`#78909C`）给分组节点用；叶子节点在名称后依次接状态符号与 ` ▪姓名`；根节点不打任何状态类（保留 `rootNode` 深底白字）。分组节点为何必须用中性色（而非状态色）见 `<draw-plantuml>/references/howto/15-mindmap-diagram.md`「节点的四类语义角色」。
-- **里程碑视图**：用里程碑三态（不是工作项四态）——pending 由 `<style>` 的 `milestone { }` 默认琥珀承担，achieved 绿、at-risk 红逐条 `is colored in` 覆盖（`milestone { }` 只能统一着色、非默认态需逐条覆盖的语法事实见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「里程碑」）。
+  阶段（非叶子）节点只打状态类 + 状态符号，不带 `【】` 与 `NN%`（避免与子节点重复）；**阶段的 `status`（含 `delayed`）用引擎已聚合好的输出**（聚合在引擎内完成，本文档不重述真值表、也不在呈现层现算聚合），语义见 [consistency-rules.md](consistency-rules.md) §2，通用绘图侧的同一约束见 `<draw-diagram>/references/howto/13-wbs-diagram.md`「父节点状态由子节点聚合时，聚合规则必须覆盖混合态」。
+- **特性概览脑图**：同样四类 + 一个中性 `.group` 类（`#CFD8DC`/`#78909C`）给分组节点用；叶子节点在名称后依次接状态符号与 ` ▪姓名`；根节点不打任何状态类（保留 `rootNode` 深底白字）。分组节点为何必须用中性色（而非状态色）见 `<draw-diagram>/references/howto/15-mindmap-diagram.md`「节点的四类语义角色」。
+- **里程碑视图**：用里程碑三态（不是工作项四态）——pending 由 `<style>` 的 `milestone { }` 默认琥珀承担，achieved 绿、at-risk 红逐条 `is colored in` 覆盖（`milestone { }` 只能统一着色、非默认态需逐条覆盖的语法事实见 `<draw-diagram>/references/howto/14-gantt-diagram.md`「里程碑」）。
 - **零实例退化**：图内没有某一态的条目 → 不定义该样式类、图例不列该行（无延期条目就没有 `.late`）。
 - **状态数据整体缺失**时：整图不打状态类（全部默认色），并用 `caption` 声明"材料未记录状态信息"；**禁止**只给部分节点着色而其余留白（会造成"未着色=某种状态"的误读）。
 
 ## 7. 实测验证的完整示例（可直接套用）
 
-以下示例均已用 `<draw-plantuml>/scripts/render-plantuml.sh` 渲染验证（零退出 + SVG 含 `<svg` 根元素 + 目检无缺字/无裁切）。它们是**本报告的成品模板**（图元字面量、人员承载位、里程碑编码、图例结构）。
+以下示例均已用 `<draw-diagram>/scripts/render-plantuml.sh` 渲染验证（零退出 + SVG 含 `<svg` 根元素 + 目检无缺字/无裁切）。它们是**本报告的成品模板**（图元字面量、人员承载位、里程碑编码、图例结构）。
 
-> 示例中的 `printscale` / `zoom` 取值只对这几份示例数据成立；套到真实项目后必须按 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」重新量测调参。
+> 示例中的 `printscale` / `zoom` 取值只对这几份示例数据成立；套到真实项目后必须按 `<draw-diagram>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」重新量测调参。
 
 ### 7.1 WBS：四态（含延期）+ 状态符号 + 人员 + 完成度 + 里程碑锚点 + 图例
 
@@ -579,9 +579,9 @@ end legend
 - **怎么读**：条右端 = 锚定日；条内深色填充 = 该里程碑关联工作项的完成度；浅绿 `✓` 已达成、浅红 `⚠` 延期未达成、浅蓝 `◇` 待达成且已推进、浅灰 `◇` 待达成且未启动；蓝竖线 = 基准日。
 - **结论**：M1/M2 已达成，M3 锚定日已在基准日之前且仍差 30% 未完（引擎判为延期 3 天），M4/M5 尚在基准日之后。
 
-### 7.8 渲染踩坑清单（见 draw-plantuml）
+### 7.8 渲染踩坑清单（见 draw-diagram）
 
-通用渲染踩坑（`✔` 字形、`on {}` 资源盒、着色区间、里程碑刻度与 zoom、别名引用、里程碑两行标签等）见 `<draw-plantuml>/references/howto/13-wbs-diagram.md`、`<draw-plantuml>/references/howto/14-gantt-diagram.md` 与 `<draw-plantuml>/references/guide/style.md`。
+通用渲染踩坑（`✔` 字形、`on {}` 资源盒、着色区间、里程碑刻度与 zoom、别名引用、里程碑两行标签等）见 `<draw-diagram>/references/howto/13-wbs-diagram.md`、`<draw-diagram>/references/howto/14-gantt-diagram.md` 与 `<draw-diagram>/references/guide/style.md`。
 
 ## 8. 落笔检查（人员与图元维度）
 
@@ -591,7 +591,7 @@ end legend
 - [ ] WBS 任务级节点、甘特条形、里程碑标签三处均有人员标注；部分缺失写 `未记录`，全量缺失有 `caption`/图说声明
 - [ ] 人员名称四处逐字一致：结构 D 规范名 = WBS `【…】` = 甘特 ` ▪ 姓名` = 里程碑 ` ▪姓名`（推断后缀 `（推断）` 只出现在表格与元信息）
 - [ ] 甘特未使用 `on {}`（除用户明确要求负载视图，且已按第 3 节例外条件处理）
-- [ ] 每个里程碑菱形标签自带 `yyyy-mm-dd` + 三态符号（`✓`/`◇`/`⚠`），日期照抄引擎 `anchor_date`；字形合规按 `<draw-plantuml>/references/guide/style.md`「状态编码：颜色 + 符号冗余」检查
+- [ ] 每个里程碑菱形标签自带 `yyyy-mm-dd` + 三态符号（`✓`/`◇`/`⚠`），日期照抄引擎 `anchor_date`；字形合规按 `<draw-diagram>/references/guide/style.md`「状态编码：颜色 + 符号冗余」检查
 - [ ] 已跑过 `scripts/progress-engine.py`（同一 `--baseline` 与全报告基准日一致）；图内颜色/符号与跟踪表状态列逐条等于引擎 `status`，依据列文本取自引擎 `delay_days` / `evidence`（逾期写 `逾期 N 天`），**报告内无任何手工日期比较或天数差计算**
 - [ ] 引擎 `status=unknown-schedule` 的里程碑：标签写 `未排期`、颜色为琥珀（**未上红**），依据列与图说写「无计划日期，无法判定延期」，并已记入 `## 元信息 · 材料缺口`
 - [ ] today 蓝线左侧无 `◇ pending`、右侧无 `✓ achieved`（否则回查锚定日或达成依据）
@@ -601,5 +601,5 @@ end legend
 - [ ] 四态零实例退化已执行：无延期条目时未定义 `.late`、图例未列该行；`#EF9A9A` 未出现在任何图内
 - [ ] 里程碑进度已呈现（第 4.4 节）：达成率声明 + 达成率表（进度条格串取引擎 `progress_bar`，无该字段则只写 `NN%`）；里程碑图按 4.4 的**单一决策阶梯**出图（**至多一张**），命中的步骤号已记入 `## 元信息`
 - [ ] 人员标注的落法按 2.4 的确定性裁决执行（未授权 / 单作者 / 多作者 / 路径级授权四行之一），**未**在"标注该作者"与"全图未记录"之间自行取舍
-- [ ] 图例双向对齐：已按 `<draw-plantuml>/references/guide/style.md`「图例契约」的自检脚本逐图执行并判读通过；人员图例行仅在图内确有人员标注时出现
+- [ ] 图例双向对齐：已按 `<draw-diagram>/references/guide/style.md`「图例契约」的自检脚本逐图执行并判读通过；人员图例行仅在图内确有人员标注时出现
 - [ ] 里程碑视图的独立成图判定已按 4.3 执行；不独立时 `## 项目里程碑` 有合并指引一行

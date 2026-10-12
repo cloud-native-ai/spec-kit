@@ -2,7 +2,7 @@
 
 `summarize-project` 技能的**跨层公共约定**：跨层图表呈现公约（四态色板 / yyyy-mm-dd 日期 / 图题图说 / 渲染契约）、**进度呈现公约（进度贯穿五章节）**、报告结构、刷新规则、图集拆分、三图一致性清单、范围与粒度控制、落盘检查单、外部文档取材。各呈现层面的细则已分解到独立层参考文档（见下方索引）；工作流主框架见 [../SKILL.md](../SKILL.md)。
 
-**边界（两条）**：① **日期与进度的计算**（状态判定、延期、天数差、百分比、聚合、today 偏移、出图判据）由 `scripts/progress-engine.py` 独家承担，本手册与各层文档只写"取哪个字段、怎么呈现"（见 [consistency-rules.md](consistency-rules.md) §0.1）。② 本手册只写**本报告的信息语义约定**（哪张图承载什么、报告结构与门禁）；通用绘图规则——PlantUML 语法、字形与冗余编码、图例契约、版面/刻度/zoom 量测、渲染踩坑——权威出处在 draw-plantuml：`<draw-plantuml>/references/guide/style.md`、`<draw-plantuml>/references/guide/large-diagram-playbook.md`、`<draw-plantuml>/references/howto/13-wbs-diagram.md`、`<draw-plantuml>/references/howto/14-gantt-diagram.md`、`<draw-plantuml>/references/howto/15-mindmap-diagram.md`、`<draw-plantuml>/references/howto/12-rendering-and-output.md`。同一条规则只有一个权威出处，本手册不重述通用规则。
+**边界（两条）**：① **日期与进度的计算**（状态判定、延期、天数差、百分比、聚合、today 偏移、出图判据）由 `scripts/progress-engine.py` 独家承担，本手册与各层文档只写"取哪个字段、怎么呈现"（见 [consistency-rules.md](consistency-rules.md) §0.1）。② 本手册只写**本报告的信息语义约定**（哪张图承载什么、报告结构与门禁）；通用绘图规则——PlantUML 语法、字形与冗余编码、图例契约、版面/刻度/zoom 量测、渲染踩坑——权威出处在 draw-diagram：`<draw-diagram>/references/guide/style.md`、`<draw-diagram>/references/guide/large-diagram-playbook.md`、`<draw-diagram>/references/howto/13-wbs-diagram.md`、`<draw-diagram>/references/howto/14-gantt-diagram.md`、`<draw-diagram>/references/howto/15-mindmap-diagram.md`、`<draw-diagram>/references/howto/12-rendering-and-output.md`。同一条规则只有一个权威出处，本手册不重述通用规则。
 
 ## 0. 层参考文档索引（一层一文档）
 
@@ -63,7 +63,7 @@
 - 在此色板之外不为状态另造颜色；非状态语义（如阶段分组带、脑图分组节点）用中性灰系，不与四态色冲突。
 - **零实例退化优先于"色板完整"**：项目没有延期条目时，`<style>` 不定义 `.late`、图例不列延期行；同理适用于其余三态（图例契约见 §1.6）。
 - **四张图一律着色，不允许灰白单色**：WBS、特性概览脑图、里程碑视图、进展甘特全部按本色板编码状态；只有"材料完全没有状态信息"才整图不着色，且必须显式声明（见 [people-encoding.md](people-encoding.md) 第 6 节）。
-- **里程碑三态必须同时带 `✓ / ◇ / ⚠` 符号**（本报告的冗余编码约定；字面量见 [people-encoding.md](people-encoding.md) 第 1 节）。为什么颜色要与符号冗余、以及字形选择规则（可用字形白名单 `✓◆◇●○▲■★☆⚠`、`✔`/`✗` 与 emoji 一律禁用）见 `<draw-plantuml>/references/guide/style.md`「状态编码：颜色 + 符号冗余」。
+- **里程碑三态必须同时带 `✓ / ◇ / ⚠` 符号**（本报告的冗余编码约定；字面量见 [people-encoding.md](people-encoding.md) 第 1 节）。为什么颜色要与符号冗余、以及字形选择规则（可用字形白名单 `✓◆◇●○▲■★☆⚠`、`✔`/`✗` 与 emoji 一律禁用）见 `<draw-diagram>/references/guide/style.md`「状态编码：颜色 + 符号冗余」。
 
 ### 1.2 日期格式公约（yyyy-mm-dd）
 
@@ -81,14 +81,14 @@
   3. **结论**：一句当前状态判断（如"整体完成约 45%，today 线左侧无未完成条，进度贴合计划"）。
 - 禁止"只贴图不解释"；图说与图互为印证，图说中的数字须能从图或表中复核。
 
-### 1.4 渲染契约（委托 draw-plantuml，失败必须可见）
+### 1.4 渲染契约（委托 draw-diagram，失败必须可见）
 
-- **逐图渲染**：每张图的源码单独成一个 `assets/<图名>.puml` 文件（**源码只以文件形态存在，不进 `summary.md` 正文**），经 draw-plantuml 的 `render-plantuml.sh` 渲染为 SVG 与 PNG（命令见第 5 节）。**正文一律引用 `.svg`**（`.png` 作为 `assets/` 内的同名配对产物交付，正文不另写「png 备选」字样——否则同一报告两次运行的图位文字会不同）。**成功标准**三条同时满足：命令零退出、产物为含 `<svg` 根元素的非空文件、渲染结果中无 `Syntax Error` / 错误红字。
-- **失败修正 ≤2 轮**：按报错行修正源码后重渲。常见语法诱因（前向引用、`<style>` 的 `arrow { }` 内写 `LineStyle`、`happens at` 引用未声明的任务、`<style>` 多属性挤在一行、`legend` 未闭合、日期格式非法等）见 `<draw-plantuml>/references/howto/14-gantt-diagram.md`、`<draw-plantuml>/references/howto/13-wbs-diagram.md` 与 `<draw-plantuml>/references/guide/style.md`，本手册不重述。修正若触及门禁冻结内容，回对应门禁重新确认。
+- **逐图渲染**：每张图的源码单独成一个 `assets/<图名>.puml` 文件（**源码只以文件形态存在，不进 `summary.md` 正文**），经 draw-diagram 的 `render-plantuml.sh` 渲染为 SVG 与 PNG（命令见第 5 节）。**正文一律引用 `.svg`**（`.png` 作为 `assets/` 内的同名配对产物交付，正文不另写「png 备选」字样——否则同一报告两次运行的图位文字会不同）。**成功标准**三条同时满足：命令零退出、产物为含 `<svg` 根元素的非空文件、渲染结果中无 `Syntax Error` / 错误红字。
+- **失败修正 ≤2 轮**：按报错行修正源码后重渲。常见语法诱因（前向引用、`<style>` 的 `arrow { }` 内写 `LineStyle`、`happens at` 引用未声明的任务、`<style>` 多属性挤在一行、`legend` 未闭合、日期格式非法等）见 `<draw-diagram>/references/howto/14-gantt-diagram.md`、`<draw-diagram>/references/howto/13-wbs-diagram.md` 与 `<draw-diagram>/references/guide/style.md`，本手册不重述。修正若触及门禁冻结内容，回对应门禁重新确认。
 - **失败不可静默**：2 轮修正仍失败时，**不得**删图、不得以旧渲染结果冒充——`.puml` 源文件保留在 `assets/` 内，在报告该图位置写图题 + 显式告示行 `> ⚠ 本图渲染失败：<一句原因>`（并注明图源文件名，读者可自行渲染），并计入元信息渲染状态清单。
 - **渲染状态清单**：`## 元信息` 逐图记录「图名 | ok / failed（原因） 」；存在 failed 时报告仍可落盘，但自包含检查按"带失败告示"通过，不算静默缺图。
-- **渲染后量测自检**：成功产物还须按 `<draw-plantuml>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」执行（有效字号 / 长宽比 / 标签不越界），可用其 `scripts/measure-svg-layout.py` 量测；另目检本报告特有项——图例完整可见、today 线可辨、WBS 左右阶段顺序正确、无文字截断重叠。**版面不合格按"调参重渲"处理**（刻度/zoom、MaximumWidth、Margin/Padding、legend 位置），不占用 2 轮语法修正额度、也不出失败告示。
-- **两支量测各司其职（渲染后，判据不重叠）**：**通用版面几何**（长宽比 / 有效字号 / 标签溢出 / A–B 排期比对）以 `<draw-plantuml>/scripts/measure-svg-layout.py` 为权威引擎；**数据侧几何**（甘特条形起止 ⇄ 记录层日期、里程碑菱形 ⇄ 锚定日、进行中条结束边界 ⇄ 基准日——需项目日期做真值）由本技能 `scripts/verify-chart-data.py --svg <图.svg> --kind gantt --expect <记录层.json>` 承担——其 `--expect` 真值**直接由引擎输出转出**（`bars` 取各条目的 `planned_start`/`planned_end`/`progress_pct`，`milestones` 取 `anchor_date`，`project_start`/`today` 取 `gantt.project_start` 与 `baseline`），因此"图画在哪一天"与"报告写哪一天"共用同一份计算结果。两支输入不同、量测对象不同，不重复实现同一量测（通用几何不在本技能重造）。
+- **渲染后量测自检**：成功产物还须按 `<draw-diagram>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」执行（有效字号 / 长宽比 / 标签不越界），可用其 `scripts/measure-svg-layout.py` 量测；另目检本报告特有项——图例完整可见、today 线可辨、WBS 左右阶段顺序正确、无文字截断重叠。**版面不合格按"调参重渲"处理**（刻度/zoom、MaximumWidth、Margin/Padding、legend 位置），不占用 2 轮语法修正额度、也不出失败告示。
+- **两支量测各司其职（渲染后，判据不重叠）**：**通用版面几何**（长宽比 / 有效字号 / 标签溢出 / A–B 排期比对）以 `<draw-diagram>/scripts/measure-svg-layout.py` 为权威引擎；**数据侧几何**（甘特条形起止 ⇄ 记录层日期、里程碑菱形 ⇄ 锚定日、进行中条结束边界 ⇄ 基准日——需项目日期做真值）由本技能 `scripts/verify-chart-data.py --svg <图.svg> --kind gantt --expect <记录层.json>` 承担——其 `--expect` 真值**直接由引擎输出转出**（`bars` 取各条目的 `planned_start`/`planned_end`/`progress_pct`，`milestones` 取 `anchor_date`，`project_start`/`today` 取 `gantt.project_start` 与 `baseline`），因此"图画在哪一天"与"报告写哪一天"共用同一份计算结果。两支输入不同、量测对象不同，不重复实现同一量测（通用几何不在本技能重造）。
 
 ### 1.5 人员承载公约（人员是一等呈现维度）
 
@@ -101,9 +101,9 @@
 - **名称跨图逐字一致**：结构 D 规范名 = WBS `【…】` = 甘特 ` ▪ 姓名` = 里程碑 ` ▪姓名`；`（推断）` 后缀只出现在表格与元信息，不进图内。
 - **隐私收敛**：对外报告的人员表默认不呈现邮箱（结构 D 的「别名/邮箱」列折叠为 `-`）。
 
-### 1.6 图例契约（遵循 draw-plantuml）
+### 1.6 图例契约（遵循 draw-diagram）
 
-- 图例的通用契约——**零实例退化 / 双向完备 / 单编码退化 / 色块与声明同字面量**，以及落盘前必跑的确定性自检脚本——见 `<draw-plantuml>/references/guide/style.md`「图例契约」，本手册不重述。
+- 图例的通用契约——**零实例退化 / 双向完备 / 单编码退化 / 色块与声明同字面量**，以及落盘前必跑的确定性自检脚本——见 `<draw-diagram>/references/guide/style.md`「图例契约」，本手册不重述。
 - **本报告特有的一条**：人员图例行仅在图内确有人员标注时出现；全图无人员标注时不列该行，改由 `caption`（或图说首句）承担声明。
 
 ### 1.7 读者用语纪律（内部标识不得渗入正文）
@@ -233,10 +233,10 @@
 
 ## 4. 大项目图集拆分
 
-- **触发（三条判据，任一成立即拆；全部可机械判定）**：① WBS 深度 ≥2 节点数 >15（`check-coherence.py` 的 CG-6 判据）；② 引擎 `gantt.split_recommended` 为 `true`（甘特条目数超阈值，阈值在引擎内）；③ 渲染后 `<draw-plantuml>/scripts/measure-svg-layout.py` 的**长宽比判据不通过**。**不使用「看起来失衡」这类主观判断**；命中的判据编号记入 `## 元信息`。
+- **触发（三条判据，任一成立即拆；全部可机械判定）**：① WBS 深度 ≥2 节点数 >15（`check-coherence.py` 的 CG-6 判据）；② 引擎 `gantt.split_recommended` 为 `true`（甘特条目数超阈值，阈值在引擎内）；③ 渲染后 `<draw-diagram>/scripts/measure-svg-layout.py` 的**长宽比判据不通过**。**不使用「看起来失衡」这类主观判断**；命中的判据编号记入 `## 元信息`。
 - **结构**：1 张概览图（只到阶段层）+ 每阶段 1 张下钻子图；概览图标注「▶ 见 图N」交叉引用。每张子图各自一份 `assets/<名称>.puml` 源文件 + 渲染产物，在正文各占一个图位（图片引用 + 图说）。
 - **一致性**：图集内命名、配色、编号、字号跨图一致；每张子图自足（不读其他图也能看懂该阶段）。
-- 拆分的**绘图技术**（语义折叠、弱化管线、字号层级、长文本移出画布、按子树拆成多张 WBS）见 `<draw-plantuml>/references/guide/large-diagram-playbook.md` 与 `<draw-plantuml>/references/howto/13-wbs-diagram.md`「按子树拆成多张 WBS」。
+- 拆分的**绘图技术**（语义折叠、弱化管线、字号层级、长文本移出画布、按子树拆成多张 WBS）见 `<draw-diagram>/references/guide/large-diagram-playbook.md` 与 `<draw-diagram>/references/howto/13-wbs-diagram.md`「按子树拆成多张 WBS」。
 
 ## 5. 三图一致性自检清单（落盘前必过）
 
@@ -247,13 +247,13 @@
 - [ ] 负责人四处一致：结构 D 规范名 = WBS `【…】` 第二行 = 甘特条形 ` ▪ 姓名` 后缀 = 里程碑标签 ` ▪姓名`（`（推断）` 后缀只在表格与元信息出现）
 - [ ] `### 人员与分工` 小节存在且首句为覆盖率声明；部分缺失的条目写 `未记录`，全量缺失有 `caption`/图说显式声明（不静默省略）
 - [ ] 甘特未使用 `on {资源}`（除用户明确要求负载视图并按例外条件处理）
-- [ ] 每个里程碑菱形（视图与甘特两处）标签自带 `yyyy-mm-dd` + 三态符号 `✓/◇/⚠`；字形合规按 `<draw-plantuml>/references/guide/style.md`「状态编码：颜色 + 符号冗余」检查
+- [ ] 每个里程碑菱形（视图与甘特两处）标签自带 `yyyy-mm-dd` + 三态符号 `✓/◇/⚠`；字形合规按 `<draw-diagram>/references/guide/style.md`「状态编码：颜色 + 符号冗余」检查
 - [ ] 状态/延期一律取引擎输出：里程碑 `status`（`at-risk` 红 `⚠` 且未被改回 pending、`unknown-schedule` 琥珀 `◇` + 「无计划日期，无法判定延期」且**不上红**）、依据列照引 `evidence`（逾期类写 `逾期 N 天`，N 取 `delay_days`，报告内无日期相减）；today 线左侧无 `◇`、右侧无 `✓`（目检，不做计算）
 - [ ] **延期态编码四处一致**：引擎 `status = delayed` 的工作项在 WBS（`.late` 浅红 `#EF9A9A` + `⚠`）、进展甘特（`#EF9A9A/#C62828` + 标签 `⚠` + `is N% complete`）、任务记录表（状态列 `delayed` + 延期天数列）、叙述四处同时体现，无一处漏标
 - [ ] **完成度与延期天数是引擎字段的转录**：图内 `is N% complete`、WBS 第三行 `NN%`、表格的进度/延期天数列逐一对应引擎输出的 `progress_pct` / `delay_days`；报告正文**没有**日期先后比较、天数差或百分比算式
 - [ ] **四态零实例退化已执行**：无延期条目时 `<style>` 未定义 `.late`、图例未列延期行、`#EF9A9A` 未出现在任何图内（其余三态同理）
 - [ ] WBS / 特性脑图 / 里程碑视图 / 进展甘特四图均按统一色板着色（无灰白单色图）；脑图分组节点用中性 `.group` 色
-- [ ] 图例双向对齐：已按 `<draw-plantuml>/references/guide/style.md`「图例契约」的自检脚本逐图执行并判读通过；人员图例行仅在图内确有人员标注时出现
+- [ ] 图例双向对齐：已按 `<draw-diagram>/references/guide/style.md`「图例契约」的自检脚本逐图执行并判读通过；人员图例行仅在图内确有人员标注时出现
 - [ ] 里程碑视图的独立成图判定已按 [people-encoding.md](people-encoding.md) 4.3 执行；不独立时 `## 项目里程碑` 有合并指引一行
 - [ ] **跨章节进度口径一致**（[progress-presentation.md](progress-presentation.md) §5 清单逐行）：整体完成度、完成度分布计数、阶段进度、里程碑达成率、逾期条目数/天数在各章节**同值、同源、同精度**（图说结论句也算一处）；发现不一致已回引擎重取，未人工调平
 - [ ] **进度数字均引用引擎输出字段**：报告中每个进度数字都能在 `## 元信息 · 进度数据来源` 的字段 → 呈现位对照中指名到一个字段；报告正文无百分比算式、无日期先后比较、无自算天数
@@ -263,7 +263,7 @@
 - [ ] 四态（completed / in-progress / delayed / not-started）在图与叙述中口径一致，且取值一律来自引擎 `status` 字段（正文无日期比较/天数差/百分比算式）
 - [ ] 特性清单表格的每一行都有来源出处，与 `## 需求与特性` 叙述一致
 - [ ] 所有估计性时间/状态都已在 `## 元信息` 假设区显式标注
-- [ ] `assets/` 内每个 `.puml` 图源都通过 draw-plantuml 渲染校验（成功标准见第 1.4 节）；失败图带显式 `> ⚠` 告示且已记入元信息渲染状态
+- [ ] `assets/` 内每个 `.puml` 图源都通过 draw-diagram 渲染校验（成功标准见第 1.4 节）；失败图带显式 `> ⚠` 告示且已记入元信息渲染状态
 - [ ] **图源与渲染产物同名配对**：正文每个相对路径图片引用在 `assets/` 内有同名 `.puml` 图源（反向亦然——每个 `.puml` 都被正文引用，或带 `> ⚠` 失败告示），每张图后有图说三要素；**正文无残留 ```plantuml 源码块**
 - [ ] 目录自包含：报告内相对路径引用的文件全部存在于交付目录内（`assets/`、`data/`）；不存在指向交付目录外的引用（绝对路径 / `..` 逃逸）与外链图片 URL（目录整体可移动分发）
 
@@ -272,8 +272,8 @@
 ```bash
 # 图源即文件：生成阶段直接写 assets/<图名>.puml（不再从 summary.md 提取源码块）
 ls assets/*.puml
-# 逐个渲染校验（render-plantuml.sh 路径以 draw-plantuml 技能安装位置为准）
-for p in assets/*.puml; do f=$(basename "$p" .puml); <draw-plantuml>/scripts/render-plantuml.sh "$p" assets "$f"; done
+# 逐个渲染校验（render-plantuml.sh 路径以 draw-diagram 技能安装位置为准）
+for p in assets/*.puml; do f=$(basename "$p" .puml); <draw-diagram>/scripts/render-plantuml.sh "$p" assets "$f"; done
 # 成功判据（第 1.4 节）：零退出 + 产物含 <svg 根元素 + 无 Syntax Error 红字
 for p in assets/*.puml; do f=$(basename "$p" .puml); [ -s "assets/$f.svg" ] && head -c 200 "assets/$f.svg" | grep -q "<svg" && echo "$f: svg ok" || echo "$f: RENDER FAILED"; done
 # 配对自证：每个 .puml 都被 summary.md 引用，且正文无残留源码块
@@ -298,14 +298,14 @@ grep -c '^```plantuml' summary.md   # 期望 0（源码不进正文）
 - [ ] 全部图表符合「跨层图表呈现公约」：统一四态色板、yyyy-mm-dd 日期、图例同字面量
 - [ ] 人员维度已承载：`### 人员与分工` 小节含覆盖率声明；WBS/甘特/里程碑三处人员标注与结构 D 规范名逐字一致；缺失均已显式声明（`未记录` 或 `caption`）
 - [ ] 里程碑图元合规：每个菱形带 `yyyy-mm-dd`（照抄引擎 `anchor_date`）+ `✓/◇/⚠`；逾期结论与天数取引擎 `status`/`delay_days`（依据列原样引用天数），`unknown-schedule` 条目按「无计划日期，无法判定延期」呈现且未上红
-- [ ] 图例契约已过：逐图跑过 `<draw-plantuml>/references/guide/style.md`「图例契约」的自检脚本，无零实例行、无缺失行；人员图例行的条件按本手册 1.6 节
+- [ ] 图例契约已过：逐图跑过 `<draw-diagram>/references/guide/style.md`「图例契约」的自检脚本，无零实例行、无缺失行；人员图例行的条件按本手册 1.6 节
 - [ ] 元信息齐全：生成日期、信息源清单、估计假设（assumptions）、渲染状态清单
 - [ ] 既有 `## 附注` 节（若有）原样保留
 - [ ] PlantUML 源码以 `assets/<图名>.puml` 文件交付（**正文零源码块**）且全部通过渲染校验（失败图带 `> ⚠` 告示）；正文每个图位为「相对路径图片引用（**固定 `.svg`**）+ 图说」，`assets/` 内 `.puml`/`.svg`/`.png` 同名配对齐全、图源永不删除
 - [ ] **进度引擎已跑且被引用**（[consistency-rules.md](consistency-rules.md) §0.1、CG-11）：`python3 ${SKILL_HOME}/scripts/progress-engine.py --db <交付目录>/data/project.db --baseline <D0>` 退出码 0；报告里每个百分比/天数/延期结论都能在引擎输出中逐字找到，**无任何手工日期比较或算式**；引擎运行记录已写入 `## 元信息`；数据库与引擎输出落在交付目录 `data/`，未写入目标项目管理工件
 - [ ] **落盘前自洽性门禁已跑**：`python3 ${SKILL_HOME}/scripts/check-coherence.py <报告>` 结果 **FAIL=0**（覆盖状态计数/日期公约/自包含/裸编号/分解树覆盖声明等）；WARN 已人工判读并把结论写入元信息（判读纪律见 [consistency-rules.md](consistency-rules.md) §8.1）
 - [ ] **分解树覆盖完整性已声明**（[consistency-rules.md](consistency-rules.md) §11）：候选全集穷尽、残差清单有名有数、进度百分比分母集合＝分解树覆盖范围、覆盖闭合等式成立；含 WBS 的报告必须有此声明（残差为空也显式写），机械兜底由 `check-coherence.py` 承担
-- [ ] **数据侧图元校验已跑**（有甘特/里程碑图时）：`python3 ${SKILL_HOME}/scripts/verify-chart-data.py --svg <甘特.svg> --kind gantt --expect <由引擎输出转出的 expect.json>` 无 FAIL（条形起止 ⇄ 引擎日期、里程碑菱形 ⇄ `anchor_date` 一致）；通用版面判据另由 `<draw-plantuml>/scripts/measure-svg-layout.py` 过检（§1.4）
+- [ ] **数据侧图元校验已跑**（有甘特/里程碑图时）：`python3 ${SKILL_HOME}/scripts/verify-chart-data.py --svg <甘特.svg> --kind gantt --expect <由引擎输出转出的 expect.json>` 无 FAIL（条形起止 ⇄ 引擎日期、里程碑菱形 ⇄ `anchor_date` 一致）；通用版面判据另由 `<draw-diagram>/scripts/measure-svg-layout.py` 过检（§1.4）
 - [ ] **读者用语纪律已过**（§1.7）：五个面向读者章节及其图题/图说/正文表格无内部标识渗入（类别枚举与读者向改写映射见 §1.7 所指的本纪律真源黑名单节，此处 MUST NOT 复述）——这些只出现在 `## 元信息` 或技能内部文档
 - [ ] 交付目录位置与检测脚本给出的默认路径一致（或用户已指定）；**目录自包含**——报告内相对路径引用的文件全部存在于交付目录内，无目录外引用、无外链图片 URL，目录整体移动或外发后仍可完整阅读
 - [ ] 材料缺口已在 `## 元信息` 的 `### 材料缺口` 小节汇总（三列：缺什么 / 已检索来源 / 报告影响）；各章节的缺失均有 `> 材料声明：` 句或图内 caption 呼应（[degradation.md](degradation.md) 第 2、6 节）

@@ -1,6 +1,6 @@
 ---
 name: study-project
-description: Deep study of the current project as it exists today — what is implemented and why — producing professional architecture reports illustrated with standard UML diagrams (component diagram, deployment diagram, sequence diagram) rendered via draw-plantuml. Use when the user mentions "study this project", "explain this project", "analyze project", "analyze repository", "source code analysis", "architecture analysis", "code analysis", "UML图", "UML diagram", "架构图", "component diagram", "deployment diagram", "sequence diagram"
+description: Deep study of the current project as it exists today — what is implemented and why — producing professional architecture reports illustrated with standard UML diagrams (component diagram, deployment diagram, sequence diagram) rendered via draw-diagram. Use when the user mentions "study this project", "explain this project", "analyze project", "analyze repository", "source code analysis", "architecture analysis", "code analysis", "UML图", "UML diagram", "架构图", "component diagram", "deployment diagram", "sequence diagram"
 skill_id: "<SKILL:.specify/skills/internal/study-project/SKILL.md>"
 ---
 
@@ -184,7 +184,7 @@ Detailed prompt templates at [module-analysis-guide.md](references/module-analys
    - Narrative coherence: organize by narrative line, use natural transitions
    - Preserve the recommended chapter order: architecture → tech stack → modules → git evolution → deployment, unless the project clearly demands a different narrative
 4. **Segmented writing**: final report typically exceeds 500 lines; Write first 2-3 chapters (200-300 lines), then Edit to append
-5. **UML figure rendering & embedding**: render the UML figures planned in Phase 5 by delegating to the draw-plantuml skill (PNG default + SVG available, `.puml` sources kept); store figure files under `$WORK_DIR/docs/figures/`; embed each figure with a brief caption using relative paths; never embed raw diagram source in the report
+5. **UML figure rendering & embedding**: render the UML figures planned in Phase 5 by delegating to the draw-diagram skill (PNG default + SVG available, `.puml` sources kept); store figure files under `$WORK_DIR/docs/figures/`; embed each figure with a brief caption using relative paths; never embed raw diagram source in the report
 6. Coverage summary to `drafts/08-coverage.md` (not included in final report)
 7. Output single markdown file: `$WORK_DIR/docs/overview.md`
 
@@ -200,10 +200,10 @@ Detailed prompt templates at [module-analysis-guide.md](references/module-analys
 
 ## Output Requirements
 
-- **UML figures as the standard for primary views**: architecture structure, key behavior flows, and deployment topology MUST be expressed as standard UML diagrams rendered via the draw-plantuml skill — see [uml-visualization-guide.md](references/uml-visualization-guide.md) for the view-to-diagram-type mapping
+- **UML figures as the standard for primary views**: architecture structure, key behavior flows, and deployment topology MUST be expressed as standard UML diagrams rendered via the draw-diagram skill — see [uml-visualization-guide.md](references/uml-visualization-guide.md) for the view-to-diagram-type mapping
 - **Mermaid diagrams remain for secondary content only**: quick-glance sketches, minor flows, small data illustrations
 - **Figure conventions**: figure files stored under `$WORK_DIR/docs/figures/` (PNG + SVG + `.puml` sources), embedded with brief captions via relative paths; no raw diagram source in the reader-facing report
-- **Degradation**: if draw-plantuml rendering is unavailable during the run, primary views fall back to Mermaid sketches and the report carries a visible degradation note per affected view
+- **Degradation**: if draw-diagram rendering is unavailable during the run, primary views fall back to Mermaid sketches and the report carries a visible degradation note per affected view
 - Default output in **Chinese** (follow user's language if different)
 - Critical thinking: compare with industry practice, point out real issues, don't dodge defects
 - Code as evidence: all conclusions backed by code, cite `file path` or `file path:line range`

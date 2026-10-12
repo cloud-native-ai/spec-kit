@@ -77,13 +77,7 @@
 | skill-create-tools-wrapup | skill-wrapup | skill:create-tools | wrap-up |
 | skill-database-utils-wrapup | skill-wrapup | skill:database-utils | wrap-up |
 | skill-document-utils-wrapup | skill-wrapup | skill:document-utils | wrap-up |
-| skill-draw-d3js-wrapup | skill-wrapup | skill:draw-d3js | wrap-up |
 | skill-draw-diagram-wrapup | skill-wrapup | skill:draw-diagram | wrap-up |
-| skill-draw-drawio-wrapup | skill-wrapup | skill:draw-drawio | wrap-up |
-| skill-draw-echarts-wrapup | skill-wrapup | skill:draw-echarts | wrap-up |
-| skill-draw-excalidraw-wrapup | skill-wrapup | skill:draw-excalidraw | wrap-up |
-| skill-draw-mermaid-wrapup | skill-wrapup | skill:draw-mermaid | wrap-up |
-| skill-draw-plantuml-wrapup | skill-wrapup | skill:draw-plantuml | wrap-up |
 | skill-git-workspace-wrapup | skill-wrapup | skill:git-workspace | wrap-up |
 | gate-git-workflow-tiered-mode | skill-gate | skill:git-workspace | gate-git-workflow-tiered-mode |
 | skill-improve-agent-wrapup | skill-wrapup | skill:improve-agent | wrap-up |
@@ -95,6 +89,7 @@
 | skill-memory-recall-wrapup | skill-wrapup | skill:memory-recall | wrap-up |
 | skill-memory-record-wrapup | skill-wrapup | skill:memory-record | wrap-up |
 | skill-merge-skills-wrapup | skill-wrapup | skill:merge-skills | wrap-up |
+| skill-self-improvement-wrapup | skill-wrapup | skill:self-improvement | wrap-up |
 | skill-study-project-wrapup | skill-wrapup | skill:study-project | wrap-up |
 | skill-summarize-project-wrapup | skill-wrapup | skill:summarize-project | wrap-up |
 | skill-think-skills-wrapup | skill-wrapup | skill:think-skills | wrap-up |
@@ -120,12 +115,6 @@
 | gate-summarize-project-structure-freeze | skill-gate | skill:summarize-project | gate-summarize-project-structure-freeze |
 | gate-summarize-project-degraded-gates | skill-gate | skill:summarize-project | gate-summarize-project-degraded-gates |
 | skill-draw-diagram-evaluation-form | skill-evaluation-form | skill:draw-diagram | evaluation-form |
-| skill-draw-d3js-evaluation-form | skill-evaluation-form | skill:draw-d3js | evaluation-form |
-| skill-draw-drawio-evaluation-form | skill-evaluation-form | skill:draw-drawio | evaluation-form |
-| skill-draw-echarts-evaluation-form | skill-evaluation-form | skill:draw-echarts | evaluation-form |
-| skill-draw-excalidraw-evaluation-form | skill-evaluation-form | skill:draw-excalidraw | evaluation-form |
-| skill-draw-mermaid-evaluation-form | skill-evaluation-form | skill:draw-mermaid | evaluation-form |
-| skill-draw-plantuml-evaluation-form | skill-evaluation-form | skill:draw-plantuml | evaluation-form |
 
 ## External Probe 登记契约
 
