@@ -2024,21 +2024,24 @@ def migrate_flat_internal_skills(
     ``.specify/skills/<name>/``; on upgrade this moves each enumerated internal name
     into the nested location.
 
-    Scope is exactly ``_FRAMEWORK_INTERNAL_SKILLS`` — framework-owned names. This is
-    a MIGRATION, never a removal:
+    Scope is exactly ``_FRAMEWORK_INTERNAL_SKILLS`` — framework-owned names. The
+    skill itself is never lost:
 
     * a flat directory is moved only when the nested target is ABSENT;
-    * when the nested target already exists (e.g. this run's two-layer copy step
-      already laid it down), the flat copy is LEFT IN PLACE and counted as ``kept``
-      so the supervisor's reclaim pass can retire it — nothing is overwritten;
+    * when the nested target already exists (e.g. a prior layered install left
+      one behind), the flat copy is a stale duplicate of a framework-owned
+      name and is REMOVED, counted as ``removed_stale`` — the nested copy is
+      never overwritten; if the removal raises OSError, the attempt degrades
+      to the legacy ``kept`` counter instead of crashing the install;
     * external framework skills and user-authored skills are never touched;
-    * nothing is ever deleted.
+    * no user content is ever deleted.
 
-    Returns ``{"moved": [...], "kept": [...]}`` of flat paths (relative to
-    ``project_path``) for reporting.
+    Returns ``{"moved": [...], "kept": [...], "removed_stale": [...]}`` of flat
+    paths (relative to ``project_path``) for reporting.
     """
     moved: List[str] = []
     kept: List[str] = []
+    removed_stale: List[str] = []
     skills_dir = project_path / ".specify" / "skills"
     internal_dir = skills_dir / "internal"
 
@@ -2056,9 +2059,17 @@ def migrate_flat_internal_skills(
             continue
         nested = internal_dir / name
         if nested.exists():
-            # Nested target already present — never overwrite/delete; keep the flat
-            # copy and surface it so the reclaim pass can retire it.
-            kept.append(_rel(flat))
+            # Nested target already present — the flat copy is a stale duplicate
+            # of a framework-owned name: remove it (counted as removed_stale)
+            # rather than keeping a second, older, visible copy. The nested copy
+            # is never overwritten. An OSError degrades to the legacy kept
+            # counter so the install never crashes over a stale duplicate.
+            try:
+                shutil.rmtree(flat)
+            except OSError:
+                kept.append(_rel(flat))
+                continue
+            removed_stale.append(_rel(flat))
             continue
         # Lazy mkdir so a project with nothing to migrate never gains an empty
         # .specify/skills/internal/ directory.
@@ -2067,15 +2078,19 @@ def migrate_flat_internal_skills(
         moved.append(_rel(flat))
 
     if tracker:
-        if moved or kept:
+        if moved or kept or removed_stale:
             detail = f"migrated {len(moved)} flat internal skill(s) to nested"
+            if removed_stale:
+                detail += (
+                    f"; removed {len(removed_stale)} stale flat duplicate(s)"
+                )
             if kept:
-                detail += f"; kept {len(kept)} (nested target exists)"
+                detail += f"; kept {len(kept)} (stale duplicate removal failed)"
             tracker.complete("local-templates", detail)
         else:
             tracker.complete("local-templates", "no flat internal skills to migrate")
 
-    return {"moved": moved, "kept": kept}
+    return {"moved": moved, "kept": kept, "removed_stale": removed_stale}
 
 
 # Junk entries never copied by copy_tree_with_rewrite (mirrors the sync-mirrors
@@ -2360,6 +2375,20 @@ def copy_local_templates(
         if gitignore_specify_template.exists():
             shutil.copy2(gitignore_specify_template, specify_dir / ".gitignore")
 
+        # Structural migration: relocate framework-INTERNAL skills a pre-layering
+        # install left flat at .specify/skills/<name>/ into the nested runtime
+        # location .specify/skills/internal/<name>/ (layer introduced 2026-10).
+        # ORDER MATTERS: this must run BEFORE the two-layer skills copy below —
+        # if the copy ran first, its internal layer would pre-create every nested
+        # target and the whole migration would degrade to its "nested target
+        # exists" branch, keeping all stale flat copies (the kept-15 upgrade
+        # defect). The copy afterwards refreshes the relocated content in place.
+        # Scope is strictly the enumerated framework-owned internal names;
+        # external and user-authored skills are never touched.
+        if tracker:
+            tracker.start("local-templates", "migrating flat internal skills")
+        migrate_flat_internal_skills(project_path, tracker)
+
         # Copy skills directory (two-layer source layout):
         #   skills/external/<name>/... -> .specify/skills/<name>/...   (flat)
         #   skills/internal/<name>/... -> .specify/skills/internal/<name>/... (nested)
@@ -2500,16 +2529,6 @@ def copy_local_templates(
         if tracker:
             tracker.start("local-templates", "cleaning obsolete framework assets")
         cleanup_obsolete_framework_assets(project_path, ai_assistant, tracker)
-
-        # Structural migration: relocate framework-INTERNAL skills a pre-layering
-        # install left flat at .specify/skills/<name>/ into the nested runtime
-        # location .specify/skills/internal/<name>/ (layer introduced 2026-10).
-        # Scope is strictly the enumerated framework-owned internal names; external
-        # and user-authored skills are never touched, and nothing is deleted (a flat
-        # copy whose nested target already exists is kept and reported for reclaim).
-        if tracker:
-            tracker.start("local-templates", "migrating flat internal skills")
-        migrate_flat_internal_skills(project_path, tracker)
 
     except Exception as e:
         last_step = ""

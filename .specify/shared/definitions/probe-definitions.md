@@ -108,6 +108,7 @@
 | gate-create-docs-write-plan | skill-gate | skill:create-docs | gate-create-docs-write-plan |
 | gate-create-team-presence-loop | skill-gate | skill:create-team | gate-create-team-presence-loop |
 | gate-create-team-noninteractive-call | skill-gate | skill:create-team | gate-create-team-noninteractive-call |
+| gate-create-team-agent-reuse | skill-gate | skill:create-team | gate-create-team-agent-reuse |
 | gate-create-tools-no-execute | skill-gate | skill:create-tools | gate-create-tools-no-execute |
 | gate-git-workflow-remote-ops | skill-gate | skill:git-workspace | gate-git-workflow-remote-ops |
 | gate-improve-tools-no-test-invoke | skill-gate | skill:improve-tools | gate-improve-tools-no-test-invoke |

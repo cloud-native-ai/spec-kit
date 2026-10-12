@@ -37,7 +37,7 @@ capability, .md                     responsibility, .md                         
     └── logs/        # runtime logs — gitignored, never committed
 ```
 
-Agent definition files are **self-contained** — there is no shared-assets directory under the agent stores; anything a definition depends on is either inlined or referenced from its owning document (`shared/`, skill references). Tool directories (`.qoder/agents/`, `.github/agents/`, …) hold per-file symlinks aggregated from `templates/` + `instances/` (instance wins on filename collision); `execution/` is never linked. The mirror `sync-mirrors.py` maps source `agents/` → `.specify/agents/templates/` only; `instances/` and `execution/` are project-local.
+Agent definition files are **self-contained** — there is no shared-assets directory under the agent stores; anything a definition depends on is either inlined or referenced from its owning document (`shared/`, skill references). Tool directories (`.qoder/agents/`, `.github/agents/`, …) hold **renderer-produced real files** aggregated from `templates/` + `instances/` (instance wins on filename collision) — never symlinks, never hand-written copies (see § Host Registration Surface below); `execution/` is never rendered. The mirror `sync-mirrors.py` maps source `agents/` → `.specify/agents/templates/` only; `instances/` and `execution/` are project-local.
 
 ## Layer Discriminator
 
