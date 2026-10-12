@@ -15,7 +15,7 @@
 
 - Use `Write` for new agent files, `Edit` for modifications — `Write` on existing files overwrites the entire content without warning
 - Always read the existing agent file before editing to avoid stale `old_string` matches
-- After creating an agent, verify it's discoverable by checking symlink directories
+- After creating an agent, verify it's discoverable by checking the tool's rendered agent directory (e.g. `.github/agents/`), produced by `specify render-agents`
 - Use `Agent` tool to test the new agent in a sandboxed context before reporting success
 
 ## Known Pitfalls
@@ -23,10 +23,10 @@
 - **Write vs Edit confusion**: Using `Write` on an existing .agent.md replaces all content. Always check existence first with `Bash` tool, then use `Edit` for updates
 - **Frontmatter parsing**: Claude Code's `Read` tool shows line numbers that must NOT be included in `old_string` for `Edit` operations
 - **Agent tool subagent_type**: When testing with `Agent` tool, the `subagent_type` parameter cannot reference custom .agent.md files directly — it uses registered agent types
-- **Symlink verification**: Per-file symlinks (`.github/agents/<slug>.agent.md → .specify/agents/templates/…`) may not exist if `specify init` hasn't been run for all tools
+- **Render verification**: The tool agent directory (`.github/agents/<slug>.agent.md`) holds **renderer-produced real files**, not symlinks; it may be missing or stale if `specify render-agents --ai <tool>` (or `specify init`) hasn't been run for that tool
 
 ## Capability Notes
 
-- **Supported**: Full YAML frontmatter validation, file creation/editing, symlink verification, agent testing via Agent tool
+- **Supported**: Full YAML frontmatter validation, file creation/editing, render verification, agent testing via Agent tool
 - **Limited**: Cannot test agent behavior in Copilot/Qoder context — only tests in Claude Code's own agent framework
 - **Unsupported**: Creating agents for unsupported providers; interactive agent picker testing

@@ -14,6 +14,10 @@ surfaced only downstream. Four entry points close that:
 * **D-4** — that owner carries the constraint-side reading obligation the pointer names.
 * **D-5** — the user-input protocol disposes of input that arrives *after* wrap-up.
 
+The S3 command thinning moved the executable outline into
+``skills/internal/create-requirements/SKILL.md``; the D-1/D-2 pins follow the content to
+that new owner (the command keeps entry, input wiring, and the wrap-up lifecycle only).
+
 No gate-budget guard lives here: the sibling
 ``test_clarify_semantic_completeness.py`` C-6 already pins all four surfaces this change
 writes (including ``shared/constants/clarify-taxonomy.md``) as zero-hit against the
@@ -34,6 +38,7 @@ pytestmark = pytest.mark.contract
 
 ROOT = Path(__file__).resolve().parents[2]
 REQUIREMENTS = ROOT / "templates" / "commands" / "requirements.md"
+REQUIREMENTS_SKILL = ROOT / "skills" / "internal" / "create-requirements" / "SKILL.md"
 GLOSSARY_PROTOCOL = ROOT / "shared" / "workflow" / "glossary.md"
 USER_INPUT = ROOT / "shared" / "workflow" / "user-input-protocol.md"
 
@@ -78,8 +83,13 @@ def _section(text: str, heading: str) -> str:
 
 
 def _outline_step(text: str, lead: str) -> str:
-    """The numbered Outline sub-step (three-space indent) whose text carries `lead`."""
-    steps = re.findall(r"^   \d+\..*?(?=^   \d+\.|\Z)", text, re.M | re.S)
+    """The numbered generation sub-step (0-3 space indent) whose text carries `lead`.
+
+    The S3 thinning moved requirements' outline into the create-requirements skill, whose
+    step list starts at column 0 (the command's old outline indented three spaces) — the
+    pin follows the content, so both indents parse.
+    """
+    steps = re.findall(r"^ {0,3}\d+\..*?(?=^ {0,3}\d+\.|\Z)", text, re.M | re.S)
     assert steps, "sentinel: no indented Outline sub-steps were parsed at all"
     match = [s for s in steps if lead in s]
     assert match, f"no Outline sub-step carries {lead!r}"
@@ -90,7 +100,7 @@ def _outline_step(text: str, lead: str) -> str:
 
 
 def test_d1_convention_step_names_the_artifact_file():
-    text = _text(REQUIREMENTS)
+    text = _text(REQUIREMENTS_SKILL)
     step = _outline_step(text, "**Peek at house conventions")
     assert "`requirements.md`" in step, (
         "the convention-sampling step does not name the artifact file it samples, so the "
@@ -113,7 +123,7 @@ def test_d1_convention_step_names_the_artifact_file():
 
 
 def test_d2_concept_owner_check_present_and_precedes_drafting():
-    text = _text(REQUIREMENTS)
+    text = _text(REQUIREMENTS_SKILL)
     assert "**Concept-owner check**" in text, "the concept-owner check step is gone"
     assert "shared/definitions/" in text, (
         "the concept-owner check names no directory to look in, which is the gap D-2 closes"
@@ -128,7 +138,7 @@ def test_d2_concept_owner_check_present_and_precedes_drafting():
 
 
 def test_d2_unlocatable_owner_is_declared_a_new_concept():
-    text = _text(REQUIREMENTS)
+    text = _text(REQUIREMENTS_SKILL)
     step = _outline_step(text, "**Concept-owner check**")
     assert "new** concept" in step, (
         "the step does not say what to do when no owner can be located, so the fallback is "

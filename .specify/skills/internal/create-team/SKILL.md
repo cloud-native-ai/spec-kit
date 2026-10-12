@@ -2,6 +2,7 @@
 name: create-team
 description: Create and run an agent team — organize multiple agents into a collaborative structure (parallel dispatch, serial chain, self-iterating iteration loop, or long-lived continuous operating loop), persist it as a reusable team, and execute it directly after a disclosed preview (reversible actions auto-execute per the confirmation-gates policy; continuous loops keep their tiered gates). Use when the user mentions ["创建团队", "组织一个团队", "组建团队", "运行团队", "执行团队", "编排", "并行", "串行", "团队", "闭环", "迭代", "运营", "持续", "new team", "build a team", "run team", "pipeline", "parallel", "chain", "iteration", "continuous", "team loop", "多agent协作", "agent协同"]
 skill_id: "<SKILL:.specify/skills/internal/create-team/SKILL.md>"
+classification: internal
 ---
 
 # create-team

@@ -214,18 +214,31 @@ def test_c6_the_cap_is_pinned_in_three_forms_with_meta_pins_over_them():
 
 
 def test_c7_the_only_legal_route_is_wording_not_relaxation():
-    """MUST NOT widen the scanned set, raise the cap, edit a baseline, or reword a pin."""
+    """MUST NOT widen the scanned set, raise the cap, edit a baseline, or reword a pin.
+
+    The cap's owners (the scanner and the two frozen baselines) are guarded by the
+    053 window diff as before. The three cap-pin test files were legitimately
+    rewired by later features after 053's window closed (path moves, added guard
+    surfaces — none touching cap semantics), so the stale untouched-since-BASE
+    claim is replaced by the direct anti-relaxation guard: each file must still
+    carry its cap-pin literal verbatim, the same literals C-6 meta-pins."""
     for path in ("scripts/python/scan-confirmation-gates.py",
                  ".specify/specs/044-reduce-confirmation-flows/baseline.json",
-                 ".specify/specs/050-proactive-flow-trigger/baseline-gates.json",
-                 "tests/contract/test_user_facing_comprehension_doc.py",
-                 "tests/contract/test_proactive_trigger_section.py",
-                 "tests/contract/test_confirmation_gates_sweep.py"):
+                 ".specify/specs/050-proactive-flow-trigger/baseline-gates.json"):
         diff = _window_diff(path)
         assert diff == "", (
             f"{path} changed inside this feature's window; the budget may only be met by "
             f"designing wording that does not match a blocking pattern:\n{diff[:600]}"
         )
+    ufc = (ROOT / "tests" / "contract" / "test_user_facing_comprehension_doc.py").read_text(
+        encoding="utf-8")
+    trigger = (ROOT / "tests" / "contract" / "test_proactive_trigger_section.py").read_text(
+        encoding="utf-8")
+    sweep = (ROOT / "tests" / "contract" / "test_confirmation_gates_sweep.py").read_text(
+        encoding="utf-8")
+    assert 'payload["total"] == 23' in ufc, "cap pin ① was relaxed"
+    assert 'payload["total"] == frozen["total"]' in trigger, "cap pin ② was relaxed"
+    assert 'baseline["total"] * 0.25' in sweep, "cap pin ③ was relaxed"
 
 
 def test_c8_the_scanned_surface_reaches_every_landing_point_and_skips_the_spec_dir():
@@ -337,20 +350,33 @@ def test_c14_the_two_channel_trigger_set_is_closed_and_ci_is_not_available():
 
 
 def test_c15_the_wiring_lands_inside_existing_steps_not_a_new_phase():
-    req = (ROOT / "templates" / "commands" / "requirements.md").read_text(encoding="utf-8")
-    assert "validate-requirements.py" in req, (
-        "FR-012's wiring must be present in the requirements command"
+    """S3 thinning moved the requirements generation steps into the create-requirements
+    skill; the wiring pin follows the owner. The tasks-side pin stays on the command
+    template, which still carries the structural-validation invocation itself."""
+    skill = (ROOT / "skills" / "internal" / "create-requirements" / "SKILL.md").read_text(
+        encoding="utf-8")
+    assert "validate-requirements.py" in skill, (
+        "FR-012's wiring must be present in the requirements generation skill"
     )
     # it must sit inside the existing numbered validation step, not in a step of its own
-    steps = re.findall(r"(?m)^(\d+)\.\s+\*\*(.+?)\*\*", req)
-    assert steps, "sentinel: the command's numbered steps were not found"
-    hosting = [n for n, heading in steps
-               if n and _step_body(req, n).find("validate-requirements.py") >= 0]
+    steps = re.findall(r"(?m)^###\s+(\d+)\.\s+", skill)
+    assert steps, "sentinel: the skill's numbered steps were not found"
+    hosting = [n for n in steps
+               if _skill_step_body(skill, n).find("validate-requirements.py") >= 0]
     assert len(hosting) == 1, (
         f"the invocation must live in exactly one existing step, found in {hosting}"
     )
     tasks = (ROOT / "templates" / "commands" / "tasks.md").read_text(encoding="utf-8")
     assert "validate-tasks.py" in tasks, "US2 reuses the existing structural-validation step"
+
+
+def _skill_step_body(text: str, number: str) -> str:
+    """The text of one `### N.` step in a skill, up to the next step or section heading."""
+    start = re.search(rf"(?m)^###\s+{number}\.\s+", text)
+    if not start:
+        return ""
+    nxt = re.search(r"(?m)^###\s+\d+\.\s+", text[start.end():])
+    return text[start.start():start.end() + (nxt.start() if nxt else len(text))]
 
 
 def _step_body(text: str, number: str) -> str:
@@ -360,7 +386,6 @@ def _step_body(text: str, number: str) -> str:
         return ""
     nxt = re.search(rf"(?m)^\d+\.\s+\*\*", text[start.end():])
     return text[start.start():start.end() + (nxt.start() if nxt else len(text))]
-
 
 # =========================================================================== #
 # C-16 … C-19 — the three name-level baselines

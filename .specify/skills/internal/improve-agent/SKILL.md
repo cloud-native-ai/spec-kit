@@ -2,6 +2,7 @@
 name: improve-agent
 description: General-purpose skill to improve a single Spec Kit agent artifact — role template, supervisor, supervision snippet, or custom agent — from execution feedback, user corrections, and behavioral observations. Use this when the user mentions ["improve agent", "refine agent", "fix agent", "agent feedback", "agent not working", "优化agent", "改进agent", "agent执行反馈"]
 skill_id: "<SKILL:.specify/skills/internal/improve-agent/SKILL.md>"
+classification: internal
 ---
 
 # improve-agent

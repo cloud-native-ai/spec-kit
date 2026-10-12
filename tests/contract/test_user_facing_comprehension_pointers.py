@@ -72,7 +72,7 @@ RULE_SOURCES = (
     ("shared/guidelines/confirmation-gates.md", "①②⑩⑪"),
     ("shared/workflow/feedback-step.md", "③"),
     ("shared/patterns/interview-pattern.md", "④"),
-    ("templates/commands/clarify.md", "⑤"),
+    ("skills/internal/clarify-artifact/SKILL.md", "⑤"),
     ("shared/guidelines/requirements-guidelines.md", "⑤⑦"),
     ("shared/guidelines/proactive-trigger.md", "⑥"),
     ("skills/internal/summarize-project/references/reporting-playbook.md", "⑧"),
@@ -261,8 +261,10 @@ def test_c2_confirmation_gates_pointer_is_in_the_header_ownership_area():
 
 def test_c3_mirrors_are_byte_identical():
     # `templates/commands/` has NO `.specify/` mirror — sync-mirrors.py's templates pair
-    # excludes `commands` (retired), and C-14 forbids recreating it. So C-3 covers the seven
-    # sources under the `shared` and `skills` pairs; clarify.md's copies are C-14's subject.
+    # excludes `commands` (retired), and C-14 forbids recreating it. So C-3 covers all
+    # eight sources under the `shared` and `skills` pairs; clarify.md's rule source moved
+    # to the `clarify-artifact` skill in the S3 command thinning (per-tool command copies
+    # remain C-14's subject).
     drifted = []
     for rel, _ in RULE_SOURCES:
         if not rel.startswith(("shared/", "skills/")):

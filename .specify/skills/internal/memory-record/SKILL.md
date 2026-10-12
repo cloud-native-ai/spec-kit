@@ -2,6 +2,7 @@
 name: memory-record
 description: Persist a durable, structured record of a Spec Kit conversation into project memory (memory-as-files). Use when a /speckit.* command or skill produces a decision, user preference, review outcome, or working-state note worth remembering. Records short-term working context to .specify/memory/session/ and long-term distilled knowledge to .specify/memory/knowledge/. Only records conversations driven by a Spec Kit command or skill. Triggers include "记住", "记录记忆", "save to memory", "remember this", "record decision".
 skill_id: "<SKILL:.specify/skills/internal/memory-record/SKILL.md>"
+classification: internal
 ---
 
 # memory-record

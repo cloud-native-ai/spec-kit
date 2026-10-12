@@ -9,10 +9,16 @@ belongs to code, so the owner document points here instead of restating the list
 Two shapes of drift are guarded:
 
 * the gate stops being reachable -- the owner doc, its mirror, its Documentation
-  Map row, or a binding command's pointer goes missing;
-* the gate stops being owned -- a command template restates the owner's rule body
-  instead of linking it, or the owner starts carrying per-command severity
-  vocabulary that each template already owns.
+  Map row, or a binding consumer's pointer goes missing;
+* the gate stops being owned -- a consumer restates the owner's rule body
+  instead of linking it, or the owner starts carrying per-consumer severity
+  vocabulary that each consumer already owns.
+
+Since the S3 command thinning, each binding command's execution (and with it the
+gate pointer and its local cap) is owned by the command's skill under
+``skills/internal/``; this suite pins the skill side. The roster below stays
+keyed by command name -- this test remains the authoritative roster of binding
+commands.
 """
 from __future__ import annotations
 
@@ -34,9 +40,9 @@ MAP_ROW_LABEL = "| **Objective Analysis** |"
 MAP_ROW_TARGET = ".specify/shared/workflow/objective-analysis-gate.md"
 
 # cmd -> the literal cap token its own pointer must name. Severity vocabulary is
-# owned by each command template, so the owner doc states the cap only as "the
-# command's mid tier" and each pointer supplies its local literal. Commands with
-# no tier vocabulary name the local analogue instead.
+# owned by each consumer skill since S3, so the owner doc states the cap only as
+# "the command's mid tier" and each pointer supplies its local literal. Consumers
+# with no tier vocabulary name the local analogue instead.
 BINDING = {
     "analyze": "MEDIUM",
     "review": "P1",
@@ -45,7 +51,28 @@ BINDING = {
     "checklist": "CHK",
 }
 
+# cmd -> the skill that owns the command's execution (and with it the gate
+# pointer) since the S3 command thinning.
+BINDING_SKILL_DIRS = {
+    "analyze": "analyze-artifacts",
+    "review": "review-sdd-process",
+    "clarify": "clarify-artifact",
+    "plan": "create-plan",
+    "checklist": "create-checklist",
+}
+
+# cmd -> the skill that owns the command's execution, for commands the gate
+# must NOT reach.
 NOT_BINDING = ["todo", "session", "feature", "constitution", "implement", "tasks"]
+
+NOT_BINDING_SKILL_DIRS = {
+    "todo": "manage-todo",
+    "session": "archive-session",
+    "feature": "manage-features",
+    "constitution": "manage-constitution",
+    "implement": "implement-feature",
+    "tasks": "create-tasks",
+}
 
 # The eight gate rules, by bold label. Asserted as labels, never as a count --
 # a count would be a second fact free to drift from the list it summarizes.
@@ -80,9 +107,17 @@ FORBIDDEN = [
     "cloud-native-ai", ".specify/specs/0",
 ]
 
-# A pointer region is one line. Bounded so the reference cannot quietly grow into
-# a copy of the owner's rule body (same bound as test_docs_step_injection.py).
+# A pointer region is one line (command templates) or a LINK line plus a small
+# bounded tail (skill-side wrapped pointers, see _skill_pointer_regions). Bounded
+# so the reference cannot quietly grow into a copy of the owner's rule body (same
+# bound as test_docs_step_injection.py).
 MAX_POINTER_REGION = 1500
+
+# Skill-side pointers wrap across lines (the old command templates carried the
+# pointer as a single unwrapped line; the S3 skills re-flow it), so the region is
+# the LINK line plus a bounded tail. The local cap literal lands within four
+# wrapped lines of the LINK line in every binding skill.
+POINTER_TAIL_LINES = 6
 
 
 def _read(path: Path) -> str:
@@ -90,16 +125,29 @@ def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def _pointer_regions(text: str) -> list[str]:
-    """The lines that carry the pointer.
+def _skill_files(skill_dir: Path) -> list[Path]:
+    files = [skill_dir / "SKILL.md"]
+    refs = skill_dir / "references"
+    if refs.is_dir():
+        files.extend(sorted(refs.glob("*.md")))
+    return [p for p in files if p.is_file()]
 
-    Measured per line, not per paragraph: a pointer may sit inside a nested list
-    (plan.md's Constitution Check step) where the surrounding block has no blank
-    lines, so paragraph-splitting would measure unrelated list content and the
-    length bound would test the wrong thing. Every pointer is written as a single
-    unwrapped markdown line, so the line is the faithful unit.
+
+def _skill_pointer_regions(cmd: str) -> list[str]:
+    """The regions that carry the pointer in the binding command's skill.
+
+    Each LINK line is joined with a small fixed tail because the skill pointers
+    are wrapped markdown (the local cap sits a few lines below the LINK line).
+    The tail keeps the region bounded against growing into a copy of the owner's
+    rules.
     """
-    return [line for line in text.splitlines() if LINK in line]
+    regions: list[str] = []
+    for path in _skill_files(REPO_ROOT / "skills" / "internal" / BINDING_SKILL_DIRS[cmd]):
+        lines = path.read_text(encoding="utf-8").splitlines()
+        for i, line in enumerate(lines):
+            if LINK in line:
+                regions.append("\n".join(lines[i:i + 1 + POINTER_TAIL_LINES]))
+    return regions
 
 
 def _load_scanner():
@@ -206,24 +254,28 @@ def test_documentation_map_row_reach_is_not_overclaimed():
     )
 
 
-# --- binding commands: pointer present, names its local cap, stays a reference ---
+# --- binding consumers: pointer present, names its local cap, stays a reference
 
 
 @pytest.mark.contract
 @pytest.mark.parametrize("cmd", sorted(BINDING))
 def test_binding_command_carries_the_pointer(cmd: str):
-    assert LINK in _read(COMMANDS_DIR / f"{cmd}.md"), (
-        f"{cmd}.md must reference the objective-analysis gate"
+    skill = REPO_ROOT / "skills" / "internal" / BINDING_SKILL_DIRS[cmd] / "SKILL.md"
+    assert LINK in _read(skill), (
+        f"{BINDING_SKILL_DIRS[cmd]}/SKILL.md must reference the objective-analysis gate "
+        f"(the /speckit.{cmd} execution is skill-owned since S3)"
     )
 
 
 @pytest.mark.contract
 @pytest.mark.parametrize("cmd,cap", sorted(BINDING.items()))
 def test_pointer_names_its_own_local_cap(cmd: str, cap: str):
-    regions = _pointer_regions(_read(COMMANDS_DIR / f"{cmd}.md"))
-    assert regions, f"{cmd}.md references the gate but not from an identifiable paragraph"
+    regions = _skill_pointer_regions(cmd)
+    assert regions, (
+        f"{BINDING_SKILL_DIRS[cmd]} references the gate but not from an identifiable region"
+    )
     assert any(cap in r for r in regions), (
-        f"{cmd}.md's pointer must name its own literal cap ({cap!r}); "
+        f"{BINDING_SKILL_DIRS[cmd]}'s pointer must name its own literal cap ({cap!r}); "
         "the owner states the cap only as 'the command's mid tier'"
     )
 
@@ -231,9 +283,9 @@ def test_pointer_names_its_own_local_cap(cmd: str, cap: str):
 @pytest.mark.contract
 @pytest.mark.parametrize("cmd", sorted(BINDING))
 def test_pointer_references_not_copies(cmd: str):
-    for region in _pointer_regions(_read(COMMANDS_DIR / f"{cmd}.md")):
+    for region in _skill_pointer_regions(cmd):
         assert len(region) < MAX_POINTER_REGION, (
-            f"{cmd}.md's pointer grew into a copy of the owner's rules "
+            f"{BINDING_SKILL_DIRS[cmd]}'s pointer grew into a copy of the owner's rules "
             f"({len(region)} chars); link the owner instead"
         )
 
@@ -241,11 +293,14 @@ def test_pointer_references_not_copies(cmd: str):
 @pytest.mark.contract
 @pytest.mark.parametrize("label", RESTATED_IN_COMMANDS_FORBIDDEN)
 def test_owned_rule_labels_are_not_restated_in_any_command(label: str):
-    offenders = sorted(
-        p.name for p in COMMANDS_DIR.glob("*.md") if label in p.read_text(encoding="utf-8")
-    )
+    # The rule body's consumers are the skills since S3; the thin command
+    # templates are still scanned so a re-grown template cannot restate either.
+    surfaces = sorted(COMMANDS_DIR.glob("*.md")) + sorted(
+        (REPO_ROOT / "skills" / "internal").glob("*/SKILL.md")
+    ) + sorted((REPO_ROOT / "skills" / "internal").glob("*/references/*.md"))
+    offenders = sorted(p.name for p in surfaces if label in p.read_text(encoding="utf-8"))
     assert not offenders, (
-        f"these command templates restate an owned rule body ({label}): {offenders} -- "
+        f"these command/skill surfaces restate an owned rule body ({label}): {offenders} -- "
         "a restated rule is a copy free to drift; link the owner doc instead"
     )
 
@@ -256,6 +311,12 @@ def test_non_binding_commands_stay_clean(cmd: str):
     assert LINK not in _read(COMMANDS_DIR / f"{cmd}.md"), (
         f"{cmd}.md must not carry the gate -- it produces no findings about self-authored artifacts"
     )
+    skill_dir = REPO_ROOT / "skills" / "internal" / NOT_BINDING_SKILL_DIRS[cmd]
+    for path in _skill_files(skill_dir):
+        assert LINK not in path.read_text(encoding="utf-8"), (
+            f"{NOT_BINDING_SKILL_DIRS[cmd]} must not carry the gate -- it produces no "
+            "findings about self-authored artifacts"
+        )
 
 
 # --- wording safety and neutrality on shipped surfaces ---
@@ -272,9 +333,9 @@ def test_owner_doc_is_gate_neutral():
 @pytest.mark.contract
 @pytest.mark.parametrize("cmd", sorted(BINDING))
 def test_pointer_regions_are_gate_neutral(cmd: str):
-    for region in _pointer_regions(_read(COMMANDS_DIR / f"{cmd}.md")):
+    for region in _skill_pointer_regions(cmd):
         hits = _blocking_hits(region)
-        assert not hits, f"{cmd}.md's pointer adds blocking-gate wording: {hits[:3]}"
+        assert not hits, f"{BINDING_SKILL_DIRS[cmd]}'s pointer adds blocking-gate wording: {hits[:3]}"
 
 
 @pytest.mark.contract
@@ -314,11 +375,18 @@ def test_owner_rule8_requires_machine_derived_briefing_premises():
 
 @pytest.mark.contract
 def test_analyze_report_form_emits_propagation_surface():
-    text = _read(COMMANDS_DIR / "analyze.md")
+    # S3: the §6 report form is owned by the analyze-artifacts skill reference.
+    raw = _read(
+        REPO_ROOT / "skills" / "internal" / "analyze-artifacts"
+        / "references" / "validation-and-report.md"
+    )
+    # Skill references wrap long rules, so phrase pins match against
+    # whitespace-normalized text (case-folded only to tolerate bold/casing).
+    text = " ".join(raw.split()).lower()
     # F-06①: the §6 report table carries a propagation_surface column, placed BEFORE
     # Severity so the row reads as "severity derived from propagation surface".
     header = next(
-        (l for l in text.splitlines() if l.startswith("| ID | Category |")),
+        (l for l in raw.splitlines() if l.startswith("| ID | Category |")),
         "",
     )
     cols = [c.strip() for c in header.strip().strip("|").split("|")]
@@ -331,17 +399,17 @@ def test_analyze_report_form_emits_propagation_surface():
     )
     # F-06④: IDs are category-initial prefixed and stable; scope lives in Category, never in the ID.
     assert "category initial" in text, "§6 lost the category-initial ID rule"
-    assert "MUST NOT carry a scope-letter prefix" in text, (
+    assert "must not carry a scope-letter prefix" in text, (
         "§6 lost the no-scope-letter ID rule the rerun delta depends on"
     )
     # F-06⑤: a cluster-level slot that aggregates MEDIUM findings without re-tiering any row.
-    assert "Systemic Observations" in text, "§6 lost the Systemic Observations slot"
-    assert "WITHOUT raising any single row's severity" in text, (
+    assert "systemic observations" in text, "§6 lost the Systemic Observations slot"
+    assert "without raising any single row's severity" in text, (
         "Systemic Observations must not become a licence to inflate a single severity"
     )
     # F-06①: §5.5 intake -- a `none` propagation_surface row is capped at MEDIUM and is
     # never dispatched to the validation wave as CRITICAL/HIGH.
-    assert "Propagation-surface intake" in text, "§5.5 lost the propagation-surface intake rule"
-    assert "MUST NOT be dispatched to this wave as CRITICAL/HIGH" in text, (
+    assert "propagation-surface intake" in text, "§5.5 lost the propagation-surface intake rule"
+    assert "must not be dispatched to this wave as critical/high" in text, (
         "§5.5 intake must bar a `none` row from the CRITICAL/HIGH validation wave"
     )

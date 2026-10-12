@@ -2,6 +2,7 @@
 name: create-tools
 description: Author a tool definition record for the Spec Kit tools system — a project-script, system-binary, shell-function, or webhook tool with explicit authoritative behavioral rules. Definition is the primary action; discovery only bootstraps a draft. Use this when the user mentions ["define a tool", "create a tool", "add a tool", "register a tool", "new tool", "tool record", "behavioral rules", "定义工具", "创建工具", "新增工具", "注册工具", "工具记录"]
 skill_id: "<SKILL:.specify/skills/internal/create-tools/SKILL.md>"
+classification: internal
 ---
 
 # create-tools

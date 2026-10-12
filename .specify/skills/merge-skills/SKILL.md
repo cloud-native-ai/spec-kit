@@ -2,6 +2,7 @@
 name: merge-skills
 description: This skill merges one skill into another by decomposing the source skill's content and re-expressing it in the target skill's own conventions — never a raw folder merge — so the target fully covers the source and can replace it in every scenario, then decommissions the source's independent wiring. Use this when the user mentions ["合并技能", "技能合并", "把这个技能合并到", "归并技能", "整合技能", "技能下线合并", "吸收技能", "merge skill", "merge skills", "consolidate skills", "fold skill into", "absorb skill into", "combine skills"]
 skill_id: "<SKILL:.specify/skills/merge-skills/SKILL.md>"
+classification: external
 ---
 
 # merge-skills

@@ -35,8 +35,11 @@ BANNED_PATTERNS = [
 ]
 
 KNOWN_DEBT = {
-    # emptied 2026-08-15: all five framework-contract references rewritten
-    # client-neutrally (framework-repo attribution, no bare .specify/specs/ paths)
+    # 2026-10-12 S3 command thinning (sanitize.md -> sanitize-materials skill) flattened
+    # the framework repo's own spec-contract path into the skill prose (2 lines). The
+    # client-neutral rewrite belongs to the S3 team's skill-side follow-up; allowlisted
+    # here so the guard stays live for every other shipped file meanwhile.
+    "skills/internal/sanitize-materials/SKILL.md",
 }
 
 

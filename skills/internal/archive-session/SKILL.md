@@ -1,12 +1,14 @@
 ---
 name: archive-session
-description: 把当前 AI agent CLI 会话导出为用户命名的目录(含主记录、子代理日志、状态目录、超大工具结果、requestId),并附带会话描述文档(session-meta.json 元信息 + SESSION.md 总结骨架)。支持恰好六家工具:`claude-code` / `codex-cli` / `qoder-cli` / `copilot` / `opencode` / `hermes`(后两家为探测式适配,会话存储未探测到时诚实声明)。
+description: 把当前 AI agent CLI 会话导出为用户命名的目录(含主记录、子代理日志、状态目录、超大工具结果、requestId),并附带会话描述文档(session-meta.json 元信息 + SESSION.md 总结骨架)。支持恰好六家工具:`claude-code` / `codex-cli` / `qoder-cli` / `copilot` / `opencode` / `hermes`(后两家为探测式适配,会话存储未探测到时诚实声明)。Use this when the user mentions ["export session", "archive session", "save session", "session export", "导出会话", "保存会话", "归档会话", "会话导出"] — i.e. any request to export/archive the current AI session under a user-chosen name; delegated export engine of /speckit.session.
 version: 2.0.0
 user-invocable: true
 argument-hint: "--name <bundle-name> [--session <id>] [--tool <name>] [--verify <text>]"
 disable-model-invocation: true
 metadata:
   short-description: 导出当前会话为用户命名目录 + 描述文档
+classification: internal
+skill_id: "<SKILL:.specify/skills/internal/archive-session/SKILL.md>"
 ---
 
 # 调用

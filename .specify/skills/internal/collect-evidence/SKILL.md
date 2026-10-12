@@ -2,6 +2,7 @@
 name: collect-evidence
 description: Public evidence-collection orchestration skill (consumer-neutral evidence layer). Runs the deterministic evidence engine (evidence-utils.py) to gather normalized findings.json evidence across five lanes (session/project/assets via Node engine; runs/feedback native Python) for a target unit, presents capability tables and evidenceState distributions, and declares observation boundaries. Never interprets evidence or emits improvement suggestions. Use when the user mentions ["collect evidence", "evidence collection", "采集证据", "证据采集", "findings.json", "证据泳道", "evidence lanes", "doctor 能力表"]
 skill_id: "<SKILL:.specify/skills/internal/collect-evidence/SKILL.md>"
+classification: internal
 ---
 
 # collect-evidence

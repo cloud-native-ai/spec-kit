@@ -1,0 +1,180 @@
+schema: project-input/v1
+project:
+  project_name: command-logic-as-classified-skills
+  project_desc: spec-kit 的命令核心逻辑尽可能由技能承载 —— 命令模板只保留入口与委派,可执行的核心逻辑落在 skills/ 下的技能里;每个技能的元数据都带 internal
+    或 external 标注,标注如实表达它与 spec-kit 的依赖关系(internal:只服务 spec-kit 框架自身逻辑;external:与 spec-kit 无依赖,任何项目皆可直接使用),使后续按标注分流的处理有据可依
+  baseline_date: '2026-10-12'
+  repos: []
+phases:
+- phase_id: command-logic-as-classified-skills.S0-command-census
+  phase_name: command-logic-as-classified-skills · S0 命令普查裁定
+  phase_order: 1
+- phase_id: command-logic-as-classified-skills.S-layer
+  phase_name: command-logic-as-classified-skills · S-layer 分层与分流(run-2 扩展切片)
+  phase_order: 2
+- phase_id: command-logic-as-classified-skills.S1-extract-annotate
+  phase_name: command-logic-as-classified-skills · S1 提炼建技能并标注
+  phase_order: 3
+- phase_id: command-logic-as-classified-skills.S2a-contract-conformance
+  phase_name: command-logic-as-classified-skills · S2a 契约齐备
+  phase_order: 4
+- phase_id: command-logic-as-classified-skills.S2b-structure-alignment
+  phase_name: command-logic-as-classified-skills · S2b 结构对齐
+  phase_order: 5
+- phase_id: command-logic-as-classified-skills.S3-command-thinning
+  phase_name: command-logic-as-classified-skills · S3 命令瘦身
+  phase_order: 6
+work_items:
+- item_id: command-logic-as-classified-skills.TI-0001
+  item_name: S0 命令普查裁定(25 命令 × 5 批;20 新建行 + 5 维持行)
+  phase_id: command-logic-as-classified-skills.S0-command-census
+  owner_id: agent-stage-executor-template
+  actual_start: 2026-10-09
+  actual_end: 2026-10-09
+  status: 已完成
+  source: .specify/teams/command-logic-as-classified-skills/runs/20261009T032057Z-report.md#deliverables
+- item_id: command-logic-as-classified-skills.TIX-d3aa82b0
+  item_name: S-layer 分层与分流实施(B1/B2a/B2b/B2d 完成;余批移交 skill-layer-install-separation)
+  phase_id: command-logic-as-classified-skills.S-layer
+  owner_id: agent-stage-executor-template
+  actual_start: 2026-10-09
+  status: 进行中
+  risk_note: 剩余批次 B2c/B2e/B3–B7 经 2026-10-09 用户指令移交 goal skill-layer-install-separation;移交件已由承接团队完成并判 achieved(2026-10-11;runs/20261012T115331Z-report.md 同记)。本条目按团队 Stage Progress 表最新状态信号记进行中
+  source: .specify/teams/.work/command-logic-as-classified-skills/progress.md#stage-progress
+- item_id: command-logic-as-classified-skills.TI-0002
+  item_name: S1 完成:20 技能包(17 新批 + 3 存量)落 skills/internal/ + 25 存量 SKILL.md 补 classification 标注
+  phase_id: command-logic-as-classified-skills.S1-extract-annotate
+  depends_on: [command-logic-as-classified-skills.TI-0001]
+  owner_id: agent-stage-executor-template
+  actual_start: 2026-10-12
+  actual_end: 2026-10-12
+  status: 已完成
+  source: .specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s1
+- item_id: command-logic-as-classified-skills.TI-0003
+  item_name: S2a 完成:46 技能契约齐备判定(45 pass/1 gap,archive-session 描述补丁落地)
+  phase_id: command-logic-as-classified-skills.S2a-contract-conformance
+  depends_on: [command-logic-as-classified-skills.TI-0002]
+  owner_id: agent-stage-executor-template
+  actual_start: 2026-10-12
+  actual_end: 2026-10-12
+  status: 已完成
+  source: .specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2a
+- item_id: command-logic-as-classified-skills.TI-0004
+  item_name: S2b 完成:46 技能结构对齐判定(8 补丁落地:draw-diagram 运行模式门/manage-agents×3/archive-session skill_id/improve-docs/git-workspace/pycache)
+  phase_id: command-logic-as-classified-skills.S2b-structure-alignment
+  depends_on: [command-logic-as-classified-skills.TI-0003]
+  owner_id: structure-adjuster
+  actual_start: 2026-10-12
+  actual_end: 2026-10-12
+  status: 已完成
+  source: .specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2b
+- item_id: command-logic-as-classified-skills.TI-0005
+  item_name: S3 完成:25 命令模板瘦身(净 −2368 行)+ 123 契约测试归因修复,终态 2051 passed/0 failed
+  phase_id: command-logic-as-classified-skills.S3-command-thinning
+  depends_on: [command-logic-as-classified-skills.TI-0004]
+  owner_id: agent-stage-executor-template
+  actual_start: 2026-10-12
+  actual_end: 2026-10-12
+  status: 已完成
+  source: .specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s3
+milestones:
+- milestone_id: MS-0001
+  milestone_name: command 中只包含该调用哪些 skill 以及如何调用 skill,不包含具体的实现细节,所有的细节都在 skill 中(目标判据 1)
+  actual_date: 2026-10-12
+  anchor_item_id: command-logic-as-classified-skills.TI-0005
+  achieved_evidence: S3 判定 contract-checker PASS;终态契约测试 2051 passed / 0 failed;goal 判据咨询评估「已达成」(runs/20261012T115331Z-report.md,2026-10-12)
+  source: .specify/goal/command-logic-as-classified-skills/goal.md#success-criteria
+people:
+- owner_id: agent-team-supervisor-template
+  owner_name: 未记录
+  owner_role: team-supervisor(serial Lead 与唯一 Meta 落盘者)
+- owner_id: agent-stage-executor-template
+  owner_name: 未记录
+  owner_role: skill-author(S0/S1/S2a/S3 产出者)
+- owner_id: structure-adjuster
+  owner_name: Structure Adjuster
+  owner_role: structure-aligner(S2b 结构对齐)
+- owner_id: agent-stage-evaluator-template
+  owner_name: 未记录
+  owner_role: contract-checker(每次交接独立判定席)
+features:
+- feature_id: F-001
+  feature_name: 命令核心逻辑技能化 —— 20 个新技能包落位 skills/internal/
+  status: 已完成
+  source: .specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s1
+- feature_id: F-002
+  feature_name: 全量技能分类标注 —— 25 个存量 SKILL.md 补 classification(internal 14 / external 11)
+  status: 已完成
+  source: .specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s1
+- feature_id: F-003
+  feature_name: 命令模板瘦身 —— 25 个命令改写为「技能调用 + 输入产出」,模板净减 2,368 行
+  status: 已完成
+  source: .specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s3
+- feature_id: F-004
+  feature_name: 技能内外分层改造 —— B1 分类 sweep v2、B2a git-workflow 状态面迁移、B2b create-docs/improve-docs 去 .specify 化、B2d git-workspace 四合一
+  status: 进行中
+  source: .specify/teams/.work/command-logic-as-classified-skills/progress.md#s-layer
+sources:
+- source_id: S-0001
+  source_kind: user-form
+  source_ref: .specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)
+  covers:
+  - phases
+  - work_items
+  - milestones
+  - people
+- source_id: S-0002
+  source_kind: user-form
+  source_ref: .specify/teams/.work/command-logic-as-classified-skills/progress.md(git-ignored 工作区进度文件;本次刷新经调度方明确授权作为补填源)
+  covers:
+  - work_items
+  - features
+  - milestones
+- source_id: S-0003
+  source_kind: user-form
+  source_ref: .specify/goal/command-logic-as-classified-skills/goal.md(目标定义,判据与 Target 权威)
+  covers:
+  - milestones
+coverage:
+  candidate_total: 10
+  excluded: 0
+  granularity_truncated: 0
+  unattributed: 0
+  source_label: 团队条目台账 items.jsonl(5 条显式)+ 台账未及条目回填(1 条推断:S-layer,两态交接)+ 交付类目 features(4 条)
+inferred_fields:
+- field: project.project_desc
+  inferred_value: goal.md Objective 全文
+  inferred_from: .specify/goal/command-logic-as-classified-skills/goal.md §Objective(生成器 frontmatter 解析失败回退到内联 goal 且截断,按定义修正)
+- field: project.baseline_date
+  inferred_value: '2026-10-12'
+  inferred_from: 本次总结刷新触发日(生成日期 = 基准日 D0;生成器原取最近台账事件日 2026-10-09)
+- field: work_items[command-logic-as-classified-skills.TIX-d3aa82b0]
+  inferred_value: S-layer 分层与分流实施(进行中,起 2026-10-09)
+  inferred_from: 两态交接回填 —— .specify/teams/.work/command-logic-as-classified-skills/progress.md Stage Progress 表(台账 items.jsonl 尚无该条目显式行);TIX = sha256(title+NUL+phase_ref) 前 8 位
+- field: work_items[TI-0002..TI-0005]
+  inferred_value: 台账并发追加的 4 条显式行(S1/S2a/S2b/S3 完成)
+  inferred_from: 刷新进行期间团队 cycle 并发落盘 items.jsonl TI-0002..TI-0005 与 runs/20261012T115331Z-report.md(tracked);按「每次从全部团队台账重新折叠」重新装载,显式身份为权威,先前的 4 条推断身份(TIX-ff531ace/39cc250d/44c744f5/0ff78b5d)按两态交接归并、不再呈现
+- field: work_items[*].actual_start/actual_end
+  inferred_value: 各阶段起讫日
+  inferred_from: progress.md Stage Progress 表 Started/Completed 列;S0 起讫取 runs/20261009T032057Z-report.md 执行时间戳
+- field: work_items[*].depends_on
+  inferred_value: S0→S1→S2a→S2b→S3 串行链
+  inferred_from: team.md Dynamic Structure DAG(无环线性链),非日期推断
+- field: work_items[*].owner_id
+  inferred_value: S0/S1/S2a/S3/S-layer → agent-stage-executor-template;S2b → structure-adjuster
+  inferred_from: team.md Dynamic Structure 各 stage 的 agent_kind 指派(S-layer 记主产出席 skill-author,supervisor 为落盘者)
+- field: people[agent-team-supervisor-template/agent-stage-executor-template/agent-stage-evaluator-template].owner_name
+  inferred_value: 未记录
+  inferred_from: FR-004 —— 三席为 create-team 临时模板,skills/internal/create-team/templates/agents/ 定义 frontmatter name 为占位符({{AGENT_NAME}}),无持久可解析名
+- field: people[structure-adjuster].owner_name
+  inferred_value: Structure Adjuster
+  inferred_from: .specify/agents/templates/structure-adjuster.agent.md frontmatter name(summary-mapping §5 解析顺序第 2 级)
+- field: milestones[MS-0001].anchor_item_id
+  inferred_value: command-logic-as-classified-skills.TI-0005(S3)
+  inferred_from: 'team.md config.target_map —— T-003 映射 [S3-command-thinning];目标判据 1 对应 T-003/S3;生成器原锚 TI-0001 系单条目时的兜底'
+- field: features[F-001..F-004]
+  inferred_value: 四类交付物目
+  inferred_from: runs/20261012T115331Z-report.md 与 progress.md S-layer 批计划 的交付类目归集(20 包 / 25 标注 / 25 命令瘦身 / B1+B2a+B2b+B2d)
+- field: targets.items[].attributed_items/completed_items
+  inferred_value: T-001 2/2、T-002 2/2、T-003 1/1
+  inferred_from: team.md config.target_map(台账行未打 target_ref,生成器按台账计 0;此处按团队显式 stage→Target 映射归属)

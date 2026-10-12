@@ -22,21 +22,31 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 RUNTIME_SKILLS = ROOT / ".specify" / "skills"
 
-# Pinned census (classification v2): 11 external / 15 internal. These literals are a
+# Pinned census (classification v3): 11 external / 35 internal. These literals are a
 # drift detector for the split — update only together with the classification record.
 # 17 -> 11 on 2026-10-12: the six draw-* engine skills were merged into draw-diagram as
 # internal engine layers under draw-diagram/references/types/<engine>/ (capability
 # inheritance recorded in that skill's references/merge-provenance.md), so they are no
 # longer independently discovered skills.
+# 15 -> 35 on 2026-10 (S3 command thinning): the executable logic of twenty /speckit.*
+# commands moved into command-carrier internal skills (analyze-artifacts, create-plan,
+# manage-constitution, ...), all nesting under .specify/skills/internal/<name>/ and
+# none surfacing on the flat discovery face — which is exactly what these guards pin.
 EXTERNAL_SKILLS = {
     "create-docs", "improve-docs", "create-skills", "improve-skills", "create-pages",
     "database-utils", "document-utils", "draw-diagram", "merge-skills",
     "think-skills", "git-workspace",
 }
 INTERNAL_SKILLS = {
-    "collect-evidence", "create-agent", "create-team", "create-tools", "improve-agent",
-    "improve-team", "improve-tools", "memory-recall", "memory-record", "self-improvement",
-    "summarize-project", "archive-session", "code-review", "manage-agents", "study-project",
+    "analyze-artifacts", "archive-session", "clarify-artifact", "code-review",
+    "collect-evidence", "create-agent", "create-checklist", "create-plan",
+    "create-requirements", "create-tasks", "create-team", "create-tools",
+    "derive-architecture", "implement-feature", "improve-agent", "improve-team",
+    "improve-tools", "manage-agents", "manage-constitution", "manage-features",
+    "manage-feedback", "manage-goal", "manage-history", "manage-instructions",
+    "manage-todo", "memory-recall", "memory-record", "research-feature",
+    "review-sdd-process", "run-agent", "run-interview", "sanitize-materials",
+    "self-improvement", "study-project", "summarize-project",
 }
 
 
@@ -80,8 +90,8 @@ def test_flat_discovery_surfaces_external_layer_only():
     internal_dir = RUNTIME_SKILLS / "internal"
     assert internal_dir.is_dir(), "internal/ subtree missing — guard 1's exclusion is vacuous"
     internal_nested = [d for d in internal_dir.iterdir() if (d / "SKILL.md").is_file()]
-    assert len(internal_nested) == 15, (
-        f"internal subtree carries {len(internal_nested)} skills, expected 15 — "
+    assert len(internal_nested) == 35, (
+        f"internal subtree carries {len(internal_nested)} skills, expected 35 — "
         f"guard 1 only proves something when internal skills actually exist"
     )
     assert offenders == [], f"flat discovery leaked non-external skills: {offenders}"

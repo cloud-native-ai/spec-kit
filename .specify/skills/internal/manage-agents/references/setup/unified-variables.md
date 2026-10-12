@@ -73,7 +73,7 @@ export AGENT_MODEL="glm-5.2"
 export AGENT_BASE_URL="https://<host>/compatible-mode/v1"
 export AGENT_ANTHROPIC_BASE_URL="https://<host>/apps/anthropic"   # only if configuring claude
 
-source .specify/skills/agent-setup/scripts/config-agent.sh
+source .specify/skills/internal/manage-agents/scripts/config-agent.sh
 config_agent_env_validate --all   # no files written
 config_agent_env_apply --all      # writes each tool's own config file
 ```

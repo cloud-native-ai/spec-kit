@@ -29,56 +29,13 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 
 Apply the glossary protocol in `.specify/shared/workflow/glossary.md`, reading the project glossary at `.specify/memory/glossary.md` (ambient via the Documentation Map). That file owns every rule of this step and this section restates none of them: input correction and anchoring, **including the constraint-side reading of a registered term** (§1); progressive enrichment at wrap-up (§2); conflict detection and which writes proceed directly (§3); manual edits and user precedence (§4).
 
-## Outline
+## Delegation
 
-1. **Generate short name** (2-4 words, action-noun format, e.g., "user-auth", "fix-payment-timeout").
+Create or update the feature's Requirements from the feature description — branch-numbered, house-convention-aligned, deterministic-checker-validated. The entire executable flow is delegated to one internal skill; this command keeps entry, input wiring, `{SCRIPT}`, and the wrap-up lifecycle only.
 
-2. **Check existing branches**:
-   - `git fetch --all --prune`
-   - Derive the next number from `.specify/specs/` directories (INCLUDING `.specify/specs/.archive/` — archived specs keep their numbers and a globally-max archived number would otherwise collide) plus branch names in the exact top-level `<NNN>-<slug>` form ONLY. Slash-namespaced remote branches (e.g. `origin/community/4059-*`, `origin/fix/4198-*`) are NOT spec numbering — their trailing digits must be excluded, or the next number gets inflated (e.g. 200 instead of 045)
-   - Next number = highest + 1 (or 1 if none found)
-
-3. **Run script** `{SCRIPT}` from repo root (replace `<SHORT_NAME>`). Parse JSON for BRANCH_NAME and SPEC_FILE. Run only once.
-   - Note: the script **pre-creates SPEC_FILE** with template placeholder content — you MUST `Read` it before writing (or overwrite via `Edit`); a blind `Write` fails with "File has not been read yet".
-
-4. **Load** `templates/requirements-template.md` for required sections.
-
-5. **Execute spec generation**:
-   1. Parse user description. If empty: ERROR. **Conceptual/idea-level input** (long-form essays, methodology explanations, advocacy material): first distill it into landable requirement slices — identify the landing level(s) the material maps to (e.g. the framework/tool itself vs. the downstream projects adopting it) and draft stories for each level separately, instead of transcribing the material's own structure into the spec.
-   2. Extract key concepts: actors, actions, data, constraints.
-   3. Initialize `Related Feature`: `Feature ID: Need clarification`, `Feature Name: Need clarification` (resolved by `/speckit.clarify`).
-   4. **Peek at house conventions (bounded, summary-first)**: sample the highest-numbered existing spec directory under `.specify/specs/<NNN>-<slug>/` and read its **`requirements.md`** — the same artifact filename this command writes (SPEC_FILE, step 3), and the same one `templates/requirements-template.md` scaffolds — with targeted excerpts: heading structure (`grep -n '^#'`), one user story, a few FR/SC lines, instead of reading the whole spec (see `.specify/shared/guidelines/token-efficiency.md`). Match its language, section conventions (e.g. Assumptions subsection), and Shared Strings usage. Aligning with the most recent merged spec reduces convention drift at zero clarification cost.
-   5. **Concept-owner check**: when a requirement introduces, constrains, or redefines a concept the framework already defines, locate that concept's owner document under `shared/definitions/` **before drafting** and write to the owner's definition — not to recall of it, and not to a paraphrase from training knowledge. A concept with no locatable owner is a **new** concept: say so in the spec instead of defining it inline. Concept *names* additionally go through the glossary's constraint-side reading (`## Glossary` above).
-   6. **Reserved identifier check**: if the spec names any new identifier (env var, macro, CLI flag, config key), grep the codebase for that name before drafting — a collision with an existing/reserved identifier (e.g. a build env var) must be surfaced with a proposed alternate name and an explicit user-override note, not silently adopted.
-   7. **Port/integration input hygiene**: when the feature ports or integrates an external codebase, (a) treat the upstream's docs/roadmap as claims and verify capability statements against its **source code** before they shape story priorities (docs routinely lag code); (b) write any fact still pending async verification (inventory sizes, entry counts, platform matrices) in "dynamically probed at runtime" phrasing from the first draft — hard-coded point-in-time numbers force multi-section rewrites when verification returns.
-   8. For unclear aspects: make informed guesses. Only use `[NEEDS CLARIFICATION: question]` if choice significantly impacts scope/UX, multiple interpretations exist, and no reasonable default. **Max 3 markers.**
-   9. Fill User Scenarios & Testing — write as many stories as the feature decomposes into (the template's three slots are open-ended scaffolding, not a quota; delete unused slots).
-   10. Generate testable Functional Requirements.
-   11. Define measurable, technology-agnostic Success Criteria.
-   12. Identify Key Entities (if data involved).
-
-6. **Write spec** to SPEC_FILE. Preserve section order. Keep `Related Feature` with default "Need clarification" values.
-
-7. **Quality Validation**: run the deterministic checker FIRST — `python3 scripts/python/validate-requirements.py SPEC_FILE` — and present its output **verbatim** (do not paraphrase or condense it). If it reports any ERROR, **STOP** and fix the spec, re-running until it exits 0: the checklist and the clarification loop both come after, and neither may start while an ERROR stands. Then follow the validation process in `shared/guidelines/requirements-guidelines.md`:
-   - Create checklist at `FEATURE_DIR/checklists/requirements.md`
-   - Validate spec against each item
-   - Handle failures (max 3 iterations) and remaining clarifications (max 3 questions with table format)
-   - Update checklist with pass/fail status **after** the clarification write-back — every count and reference resolution the checklist records derives from a checker run, never hand-typed, so re-run the checker once the write-back has landed
-
-8. **Report**: Branch name, spec file path, checklist results, next phase readiness.
-
-## Feature Integration
-
-Apply [Feature Integration Protocol](shared/workflow/feature-integration.md) § Feature Binding Rules for lookup rules and integration responsibilities. **Binding timing**: this command does NOT create or bind Features itself — it always initializes `Related Feature` with `Need clarification` values (Outline steps 3/6) and defers the actual Feature lookup/creation/binding to the `/speckit.clarify` checkpoint, where the Binding Rules are applied.
-
-## Guidelines
-
-For detailed quality validation, success criteria guidelines (including the reader baseline these artifacts are written for), and AI generation best practices, see `shared/guidelines/requirements-guidelines.md`.
-
-Key rules:
-- Focus on WHAT and WHY, not HOW
-- No embedded checklists (separate command)
-- Max 3 [NEEDS CLARIFICATION] markers
+- **Skill**: `create-requirements` — runtime path `.specify/skills/internal/create-requirements/SKILL.md`.
+- **Inputs**: the feature description (this command's `$ARGUMENTS`, wired by `## User Input` above); the scaffold script from the frontmatter `scripts:` slot, run by the skill from repo root (`BRANCH_NAME`, `SPEC_FILE` parsed from its JSON); glossary anchoring runs first inside the skill.
+- **Outputs**: `requirements.md` at the skill-resolved SPEC_FILE (`Related Feature` initialized to "Need clarification"), the quality checklist at `FEATURE_DIR/checklists/requirements.md`, and the report (branch name, spec file path, checklist results, next phase readiness).
 
 ## Feedback
 

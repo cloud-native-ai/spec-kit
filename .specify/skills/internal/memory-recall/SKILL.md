@@ -2,6 +2,7 @@
 name: memory-recall
 description: Retrieve relevant prior memory before or during a Spec Kit task, using a lightweight local file index (no vectors). Searches short-term working notes in .specify/memory/session/ and long-term knowledge in .specify/memory/knowledge/ by keyword, tag, source, feature, and date, then injects the most relevant entries into context. Pairs with memory-record. Triggers include "回忆", "查找记忆", "recall memory", "what do we know about", "prior decisions".
 skill_id: "<SKILL:.specify/skills/internal/memory-recall/SKILL.md>"
+classification: internal
 ---
 
 # memory-recall

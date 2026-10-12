@@ -1,0 +1,36 @@
+@startwbs
+skinparam dpi 300
+scale 4
+skinparam shadowing false
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 16
+<style>
+wbsDiagram {
+  LineColor #4A6C7A
+  LineThickness 1.4
+  RoundCorner 10
+  node { FontSize 16; Padding 10; Margin 6; MaximumWidth 160 }
+  rootNode { BackgroundColor #24485A; FontColor white; FontStyle bold; FontSize 20; Padding 16; MaximumWidth 340 }
+  .done  { BackgroundColor #C6E9CB; LineColor #3E9256 }
+  .doing { BackgroundColor #BBD8EE; LineColor #2E6E9E }
+}
+</style>
+* command-logic-as-classified-skills\n(基准日 2026-10-12)
+** S0 命令普查裁定 ✓ <<done>>
+*** S0 命令普查裁定(25 命令 × 5 批;20 新建行 + 5 维持行) ✓\n【未记录】\n100% <<done>>
+** S-layer 分层与分流 ● <<doing>>
+*** S-layer 分层与分流实施(B1/B2a/B2b/B2d 完成;\n余批移交 skill-layer-install-\nseparation) ●\n【未记录】 <<doing>>
+** S1 提炼建技能并标注 ✓ <<done>>
+*** S1 完成:20 技能包(17 新批 + 3 存量)落 skills/internal/ + 25 存量 SKILL.md 补 classification 标注 ✓\n【未记录】\n100% <<done>>
+** S2a 契约齐备 ✓ <<done>>
+*** S2a 完成:46 技能契约齐备判定(45 pass/1 gap,archive-session 描述补丁落地) ✓\n【未记录】\n100% <<done>>
+** S2b 结构对齐 ✓ <<done>>
+*** S2b 完成:46 技能结构对齐判定(8 补丁落地:draw-diagram\n运行模式门/manage-\nagents×3/archive-session\nskill_id/improve-docs/\ngit-workspace/pycache) ✓\n【Structure Adjuster】\n100% <<done>>
+** S3 命令瘦身 ✓ ◆M1 <<done>>
+*** S3 完成:25 命令模板瘦身(净 −2368 行)+ 123 契约测试归因修复,终态 2051 passed/0 failed ✓ ◆M1\n【未记录】\n100% <<done>>
+legend bottom
+  <size:18>  <back:#C6E9CB>        </back> ✓ 已完成 completed    <back:#BBD8EE>        </back> ● 进行中 in-progress  </size>
+  <size:18>  第三行 NN% = 完成度（无计数依据时不显示）  </size>
+  <size:18>  ◆M1 = 里程碑锚点（M1 目标判据 1）    【姓名】= 负责人  </size>
+endlegend
+@endwbs

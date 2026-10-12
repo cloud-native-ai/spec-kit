@@ -41,9 +41,18 @@ pytestmark = pytest.mark.contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 VALIDATOR = REPO_ROOT / "scripts" / "python" / "validate-tasks.py"
-TASKS_CMD = REPO_ROOT / "templates" / "commands" / "tasks.md"
-PLAN_CMD = REPO_ROOT / "templates" / "commands" / "plan.md"
+# S3 command thinning moved the generation-side duties out of templates/commands/tasks.md
+# into the create-tasks skill (S0 ruling #22: tasks.md sinks whole); the pins follow the
+# owner. plan.md's execution-verify duty likewise moved to the create-plan skill (#15).
+TASKS_CMD = REPO_ROOT / "skills" / "internal" / "create-tasks" / "SKILL.md"
+PLAN_CMD = REPO_ROOT / "skills" / "internal" / "create-plan" / "SKILL.md"
 PLAN_TPL = REPO_ROOT / "templates" / "plan-template.md"
+
+
+def _norm(text: str) -> str:
+    """Whitespace-normalize a skill body: the skills hard-wrap their prose, and the
+    pinned phrases below are prose spans, not layout."""
+    return " ".join(text.split())
 
 # --- literals under guard --------------------------------------------------
 
@@ -65,7 +74,7 @@ NOTES_LANDING_POINTS = (
 )
 REFREEZE_LITERAL = "**Re-freeze timing**"
 
-EXEC_VERIFY_SCOPE = "any artifact this command produces"
+EXEC_VERIFY_SCOPE = "any artifact this run produces"
 TEARDOWN_DUTY = "**Teardown is verified to the same standard as setup**"
 DISCLAIMER_PREMISES = "A disclaimer MUST also list the premises that example rests on"
 TPL_RUN_AND_PASTE = "Every derived command printed here MUST have been actually run"
@@ -436,7 +445,7 @@ def test_c5b_json_mode_reports_the_same_verdict(tmp_path, capsys):
 
 
 def test_c6_tasks_command_carries_the_write_target_adjudication_duty():
-    text = TASKS_CMD.read_text(encoding="utf-8")
+    text = _norm(TASKS_CMD.read_text(encoding="utf-8"))
     assert "actual write targets" in text, (
         "step 5 must tell the adjudicator to judge a parallel-safe WARN by the "
         "rows' actual write targets, since the machine classification is heuristic"
@@ -452,35 +461,36 @@ def test_c6_tasks_command_carries_the_write_target_adjudication_duty():
 
 
 def test_c7_tasks_command_points_at_the_baseline_owner_without_copying_it():
-    text = TASKS_CMD.read_text(encoding="utf-8")
+    text = _norm(TASKS_CMD.read_text(encoding="utf-8"))
     assert BASELINE_POINTER in text, (
-        "tasks.md must point at implement.md's `**Test runs**` bullet, the owner "
-        "of the failing-test baseline path"
+        "the tasks generation skill must point at implement.md's `**Test runs**` "
+        "bullet, the owner of the failing-test baseline path"
     )
     assert BASELINE_OWNER_CMD in text, "the pointer must name the owner file"
     assert BASELINE_PATH_LITERAL not in text, (
-        "tasks.md restated the baseline path literal — that is a second copy of a "
-        "fact owned by implement.md and will drift from it"
+        "the tasks generation skill restated the baseline path literal — that is a "
+        "second copy of a fact owned by implement.md and will drift from it"
     )
 
 
 def test_c8_tasks_command_pins_the_notes_landing_points_and_refreeze_timing():
-    text = TASKS_CMD.read_text(encoding="utf-8")
+    text = _norm(TASKS_CMD.read_text(encoding="utf-8"))
     for point in NOTES_LANDING_POINTS:
-        assert point in text, f"tasks.md lost the fixed evidence landing point {point!r}"
+        assert point in text, f"the tasks skill lost the fixed evidence landing point {point!r}"
     assert REFREEZE_LITERAL in text, (
-        "tasks.md must state when a frozen measurement is re-captured, otherwise "
+        "the tasks skill must state when a frozen measurement is re-captured, otherwise "
         "the landing point is written once and cited stale forever"
     )
 
 
 def test_c9_plan_surfaces_carry_the_run_and_paste_duty_once():
-    """Owner/placement split: plan.md owns the duty, the template specializes it."""
-    cmd = PLAN_CMD.read_text(encoding="utf-8")
+    """Owner/placement split: the plan-generation skill owns the duty, the template
+    specializes it."""
+    cmd = _norm(PLAN_CMD.read_text(encoding="utf-8"))
     tpl = PLAN_TPL.read_text(encoding="utf-8")
 
     assert EXEC_VERIFY_SCOPE in cmd, (
-        "execution-verify must cover every artifact this command produces, not a "
+        "execution-verify must cover every artifact the plan run produces, not a "
         "named subset — an unlisted artifact is where an unrun command survives"
     )
     assert TEARDOWN_DUTY in cmd, "teardown must be verified to the same standard as setup"
@@ -495,16 +505,16 @@ def test_c9_plan_surfaces_carry_the_run_and_paste_duty_once():
         "the pattern can also match non-target lines"
     )
     assert TPL_OWNER_POINTER in tpl, (
-        "the template must reach plan.md's execution-verify rule by pointer rather "
+        "the template must reach the plan generation rule by pointer rather "
         "than restate it"
     )
     assert cmd.count(TEARDOWN_DUTY) == 1 and tpl.count(TEARDOWN_DUTY) == 0, (
-        "the teardown duty must live in exactly one place — plan.md"
+        "the teardown duty must live in exactly one place — the plan-generation skill"
     )
 
 
 def test_c10_tasks_premise_command_must_actually_run():
-    text = TASKS_CMD.read_text(encoding="utf-8")
+    text = _norm(TASKS_CMD.read_text(encoding="utf-8"))
     assert "MUST be actually run at generation time" in text, (
         "the premise re-derivation command must be executed at generation time "
         "with its real output pasted — a printed command is a claim, not a measurement"

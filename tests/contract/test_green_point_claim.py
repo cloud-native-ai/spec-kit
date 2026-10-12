@@ -46,6 +46,9 @@ SCRIPTS = REPO_ROOT / "scripts" / "python"
 VALIDATOR = SCRIPTS / "validate-tasks.py"
 TASKS_TPL = REPO_ROOT / "templates" / "tasks-template.md"
 TASKS_CMD = REPO_ROOT / "templates" / "commands" / "tasks.md"
+# S3 command thinning: the tasks command's executable body (and with it the green-point
+# prose self-check) moved into the create-tasks skill — the drift guard follows it.
+TASKS_SKILL = REPO_ROOT / "skills" / "internal" / "create-tasks" / "SKILL.md"
 QUICKSTART = (
     REPO_ROOT / ".specify" / "specs" / "053-machine-decidable-artifacts" / "quickstart.md"
 )
@@ -656,11 +659,11 @@ def test_c18_implementation_cites_the_registered_glossary_term():
 
 
 def test_c19_the_prose_self_check_points_at_the_check_and_keeps_one_criterion():
-    text = TASKS_CMD.read_text(encoding="utf-8")
+    text = TASKS_SKILL.read_text(encoding="utf-8")
     assert "green-path-divergence" in text, (
-        "the prose obligation at templates/commands/tasks.md ('flags any test path "
-        "appearing in two verification rows with different green points') must "
-        "point at the check that now performs it"
+        "the prose obligation (now in the create-tasks skill after the S3 command thinning: "
+        "'flags any test path appearing in two verification rows with different green "
+        "points') must point at the check that performs it"
     )
     sentences = [s for s in re.split(r"(?<=[.;。])\s+", text) if "different green points" in s]
     assert sentences, "sentinel: the prose obligation was deleted rather than re-pointed"

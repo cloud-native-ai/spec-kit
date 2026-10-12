@@ -67,8 +67,19 @@ def test_generate_instructions_invokes_glossary_init():
 
 
 def test_instructions_command_has_glossary_seeding_guidance():
-    text = read(ROOT / "templates" / "commands" / "instructions.md")
-    assert "## Glossary Initialization" in text, "seeding guidance missing in command template"
+    # S3 command thinning moved the seeding guidance into the delegated skill; the
+    # drift guard re-points to that owner: the command template must still name the
+    # manage-instructions skill (its reachability face), and the skill itself must
+    # carry the `## Glossary Initialization` section.
+    command = read(ROOT / "templates" / "commands" / "instructions.md")
+    assert ".specify/skills/internal/manage-instructions/SKILL.md" in command, (
+        "command template no longer delegates to manage-instructions — the seeding "
+        "guidance would be unreachable from the command"
+    )
+    skill = read(ROOT / "skills" / "internal" / "manage-instructions" / "SKILL.md")
+    assert "## Glossary Initialization" in skill, (
+        "seeding guidance missing from the delegated manage-instructions skill"
+    )
 
 
 # --- Protocol doc (glossary-protocol.md) ---

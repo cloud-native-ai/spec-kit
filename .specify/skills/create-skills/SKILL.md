@@ -2,6 +2,7 @@
 name: create-skills
 description: This skill can create new Spec Kit Skills from user input or conversation history. Use this when the user mentions ["create a skill", "new skill", "make a skill", "skill creation", "添加技能", "创建skill", "新建skill"]
 skill_id: "<SKILL:.specify/skills/create-skills/SKILL.md>"
+classification: external
 ---
 
 # create-skills

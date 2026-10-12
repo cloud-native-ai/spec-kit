@@ -33,7 +33,11 @@ pytestmark = pytest.mark.contract
 
 ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = ROOT / "templates" / "constitution-template.md"
-COMMAND = ROOT / "templates" / "commands" / "constitution.md"
+# S3 (command-logic-as-classified-skills): the command template was thinned to a
+# delegation and the MUST-include payload moved into the generator skill, which is
+# installed downstream exactly like the command was. The command-side half of this
+# double-landing guard follows the content to its owner file.
+SKILL = ROOT / "skills" / "internal" / "manage-constitution" / "SKILL.md"
 LIVE = ROOT / ".specify" / "memory" / "constitution.md"
 SCANNER = ROOT / "scripts" / "python" / "scan-confirmation-gates.py"
 
@@ -54,12 +58,11 @@ DOUBLE_LANDING_WATCHLIST = (
 # `re.M` is load-bearing: without it `^`/`$` anchor to the whole string and the title set comes
 # back empty, which reads as "the principles are missing" rather than "the matcher is broken".
 TEMPLATE_TITLE_RE = re.compile(r"^### ([IVXLC0-9]+)\. (.+)$", re.M)
-COMMAND_NAME_RE = re.compile(r'\*\*MUST include\*\* a principle for "([^"]+)"')
-# The list entries are indented sub-bullets, so a form check must tolerate leading whitespace.
-COMMAND_ENTRY_RE = re.compile(r'^\s*- \*\*MUST include\*\* a principle for "([^"]+)" that mandates:\s*$', re.M)
-COMMAND_ENTRY_END_RE = r"^\s*(?:- \*\*MUST include\*\*|- Ensure )"
+# S3: the generator skill lists the mandatory principles as uniformly-formed
+# sub-entries `- **<Title>** — …` under one `- **MUST include**` bullet; set
+# membership is extracted from that form (never from substring containment).
+SKILL_ENTRY_RE = re.compile(r"^  - \*\*(.+?)\*\* —", re.M)
 LIVE_TITLE_RE = TEMPLATE_TITLE_RE
-
 # C-9: the pre-existing command-side entry that shares a substring with STR-006.
 CODE_SSOT_NAME = "Code as the Single Source of Truth"
 
@@ -92,8 +95,30 @@ def _template_numerals(text: str) -> list[str]:
     return [m.group(1) for m in TEMPLATE_TITLE_RE.finditer(text)]
 
 
-def _command_names(text: str) -> set[str]:
-    return {m.group(1).strip() for m in COMMAND_NAME_RE.finditer(text)}
+def _must_include_block(text: str) -> str:
+    """The generator skill's mandatory-principles block: the top-level
+    `- **MUST include**` bullet plus its indented sub-entries, ending at the next
+    top-level bullet (`- Ensure …`)."""
+    lines = text.splitlines()
+    start = None
+    for i, ln in enumerate(lines):
+        if ln.startswith("- **MUST include**"):
+            start = i
+            break
+    assert start is not None, (
+        "manage-constitution SKILL.md lost its `- **MUST include**` "
+        "mandatory-principles block"
+    )
+    body = []
+    for ln in lines[start + 1:]:
+        if ln.startswith("- "):
+            break
+        body.append(ln)
+    return "\n".join([lines[start]] + body)
+
+
+def _skill_entry_names(text: str) -> set[str]:
+    return {m.group(1).strip() for m in SKILL_ENTRY_RE.finditer(_must_include_block(text))}
 
 
 def _principle_block(text: str, title: str) -> str:
@@ -246,45 +271,45 @@ def test_c4_new_principle_declares_no_new_machinery(title):
 
 
 def test_c5_command_must_include_list_has_both_entries():
-    text = _text(COMMAND)
-    names = _command_names(text)
+    text = _text(SKILL)
+    names = _skill_entry_names(text)
     missing = [t for t in NEW_TEMPLATE_TITLES if t not in names]
-    assert not missing, f"command MUST-include list is missing: {missing}"
-    # The list total counts *entries*, not entries in one particular phrasing: the
-    # pre-existing "Documentation-First" entry reads `… that is ordered ABOVE any …` rather
-    # than `… that mandates:`, so a form-strict count returns 6 and hides the seventh.
+    assert not missing, f"generator MUST-include list is missing: {missing}"
     assert len(names) == COMMAND_COUNT, (
-        f"command MUST-include list has {len(names)} entries, expected {COMMAND_COUNT}: "
+        f"generator MUST-include list has {len(names)} entries, expected {COMMAND_COUNT}: "
         f"{sorted(names)}"
     )
-    # The verbatim form C-5 requires applies to the two entries this feature adds.
-    verbatim = set(COMMAND_ENTRY_RE.findall(text))
+    # The uniform sub-entry form C-5 requires applies to the two entries this feature
+    # adds: each must be carried as a `- **<Title>** — …` bullet of the list.
+    block = _must_include_block(text)
     for title in NEW_TEMPLATE_TITLES:
-        assert title in verbatim, (
-            f"the new entry for {title!r} is not in the required verbatim form "
-            "`- **MUST include** a principle for \"<title>\" that mandates:`"
+        assert re.search(rf"^  - \*\*{re.escape(title)}\*\* —", block, re.M), (
+            f"the entry for {title!r} is not carried in the list's uniform form "
+            "`  - **<title>** — …`"
         )
 
 
-def _command_entry_body(text: str, title: str) -> str:
+def _skill_entry_body(text: str, title: str) -> str:
+    block = _must_include_block(text)
     m = re.search(
-        rf'^\s*- \*\*MUST include\*\* a principle for "{re.escape(title)}"[^\n]*$'
-        rf'(.*?)(?={COMMAND_ENTRY_END_RE}|\Z)',
-        text, re.M | re.S,
+        rf"^  - \*\*{re.escape(title)}\*\* —.*?(?=^  - \*\*|^- |\Z)",
+        block, re.M | re.S,
     )
-    assert m, f"command entry for {title!r} not found"
-    return m.group(1)
+    assert m, f"mandatory-principles entry for {title!r} not found"
+    return m.group(0)
 
 
 @pytest.mark.parametrize("title", NEW_TEMPLATE_TITLES)
 def test_c6_command_entry_has_anchor_and_scope_sub_bullets(title):
-    body = _flat(_command_entry_body(_text(COMMAND), title))
+    """S3: the skill flattens the old anchor/scope sub-bullets into the entry text
+    itself, so the obligations are asserted against the flattened entry body."""
+    body = _flat(_skill_entry_body(_text(SKILL), title))
     assert ".specify/shared/guidelines/" in body, f"{title}: no truth-document anchor"
     assert "MUST be referenced, not restated" in body, (
-        f"{title}: the anchor sub-bullet must carry the referenced-not-restated rule"
+        f"{title}: the entry must carry the referenced-not-restated rule"
     )
     assert re.search(r"not machinery|MUST NOT justify", body), (
-        f"{title}: missing the no-new-machinery sub-bullet"
+        f"{title}: missing the no-new-machinery obligation"
     )
 
 
@@ -293,16 +318,17 @@ def test_c6_command_entry_has_anchor_and_scope_sub_bullets(title):
 
 def test_c7_watchlist_principles_land_on_both_sides():
     template_titles = _template_titles(_text(TEMPLATE))
-    command_names = _command_names(_text(COMMAND))
+    generator_names = _skill_entry_names(_text(SKILL))
     for title in DOUBLE_LANDING_WATCHLIST:
         assert title in template_titles, (
             f"watchlist principle {title!r} is absent from templates/constitution-template.md — "
             "a single-sided landing: the live constitution may carry it, but no downstream "
             "project generated from the template ever will"
         )
-        assert title in command_names, (
-            f"watchlist principle {title!r} is absent from templates/commands/constitution.md's "
-            "MUST-include list — the generator is never told to emit it"
+        assert title in generator_names, (
+            f"watchlist principle {title!r} is absent from "
+            "skills/internal/manage-constitution/SKILL.md's MUST-include list — the "
+            "generator is never told to emit it"
         )
 
 
@@ -329,7 +355,7 @@ def test_c8_matcher_is_numeral_agnostic():
     assert STR006_TITLE in parsed, "the title matcher does not accept arabic numerals"
     assert "Alpha Principle" in parsed
     assert _template_numerals(synthetic) == ["VII", "XLII", "9"]
-    for literal in (TEMPLATE_TITLE_RE.pattern, COMMAND_NAME_RE.pattern):
+    for literal in (TEMPLATE_TITLE_RE.pattern, SKILL_ENTRY_RE.pattern):
         assert not re.search(r"\b(XIV|XV|XII|XIII)\b", literal), (
             f"a roman numeral is pinned in a matcher: {literal}"
         )
@@ -339,9 +365,9 @@ def test_c8_matcher_is_numeral_agnostic():
 
 
 def test_c9_code_ssot_and_str006_are_not_merged():
-    names = _command_names(_text(COMMAND))
+    names = _skill_entry_names(_text(SKILL))
     assert CODE_SSOT_NAME in names, (
-        f"the pre-existing command entry {CODE_SSOT_NAME!r} disappeared"
+        f"the pre-existing generator entry {CODE_SSOT_NAME!r} disappeared"
     )
     assert STR006_TITLE in names, f"{STR006_TITLE!r} missing from the command name set"
     assert CODE_SSOT_NAME != STR006_TITLE
@@ -378,22 +404,24 @@ def test_c10_removing_a_watchlist_principle_breaks_c7(side, tmp_path):
         )
         assert victim in _template_titles(text), "anti-vacuity: the real template must carry it"
     else:
-        mutant = tmp_path / "constitution.md"
-        text = _text(COMMAND)
+        mutant = tmp_path / "manage-constitution.md"
+        text = _text(SKILL)
         mutant.write_text(
             re.sub(
-                rf'^\s*- \*\*MUST include\*\* a principle for "{re.escape(victim)}" that mandates:\s*$.*?(?={COMMAND_ENTRY_END_RE}|\Z)',
+                rf"^  - \*\*{re.escape(victim)}\*\* —.*?(?=^  - \*\*|^- |\Z)",
                 "", text, flags=re.M | re.S,
             ),
             encoding="utf-8",
         )
-        assert victim not in _command_names(mutant.read_text(encoding="utf-8")), (
+        assert victim not in _skill_entry_names(mutant.read_text(encoding="utf-8")), (
             "the mutation did not take effect — this probe would pass vacuously"
         )
-        assert victim in _command_names(text), "anti-vacuity: the real command must carry it"
+        assert victim in _skill_entry_names(text), (
+            "anti-vacuity: the real generator skill must carry it"
+        )
     # The mutant is a temp copy; the repository files are untouched.
     assert victim in _template_titles(_text(TEMPLATE))
-    assert victim in _command_names(_text(COMMAND))
+    assert victim in _skill_entry_names(_text(SKILL))
 
 
 # --- C-11 / C-12: this repository's own constitution ---

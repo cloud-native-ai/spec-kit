@@ -26,6 +26,12 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 GENERATOR = REPO_ROOT / "scripts" / "bash" / "generate-instructions.sh"
 COMMAND_TEMPLATE = REPO_ROOT / "templates" / "commands" / "instructions.md"
+# S3 command thinning moved the reconcile engine — including Routes R1/R2, the
+# observation snapshot and the backup retention rule — into the manage-instructions
+# skill (S0 ruling #13); the command keeps entry, user input and lifecycle only.
+# The route/step pins below therefore follow the owner into the skill, while the
+# one-owner-for-the-number invariant keeps covering BOTH surfaces.
+SKILL = REPO_ROOT / "skills" / "internal" / "manage-instructions" / "SKILL.md"
 
 # The script owns the number; the test derives it rather than pinning a second
 # copy (precedent: test_dogfooding_practice.py extracts the engine's action
@@ -322,11 +328,11 @@ def test_report_is_idempotent(tmp_path: Path):
 
 @pytest.mark.contract
 def test_command_template_names_both_routes_without_restating_the_budget():
-    text = COMMAND_TEMPLATE.read_text(encoding="utf-8")
+    text = " ".join(SKILL.read_text(encoding="utf-8").split())
     budget = _budget_bytes()
 
     for needle in ("Route R1", "Route R2"):
-        assert needle in text, f"{needle} is not documented in the command template"
+        assert needle in text, f"{needle} is not documented in the owning skill"
     # R2's substance: a threshold, an owner document, and a mechanical
     # (never transcribed) migration with assertions in both directions.
     assert "4 KB" in text, "Route R2's relocation threshold is missing"
@@ -352,22 +358,35 @@ def test_command_template_names_both_routes_without_restating_the_budget():
         "thicker because no owner holds the detail is a gap in the owner, not drift"
     )
 
-    # One owner for the number: the command template references the script's
-    # report and MUST NOT carry a second copy of the value.
+    # One owner for the number: the skill references the script's report and MUST
+    # NOT carry a second copy of the value.
     assert str(budget) not in text, (
-        f"the command template restates the budget literal {budget}; the script's "
+        f"the owning skill restates the budget literal {budget}; the script's "
         "INSTRUCTIONS_BUDGET_BYTES is the only definition point"
     )
     assert "INSTRUCTIONS_BUDGET_BYTES" in text, (
-        "the command template must name the owning constant instead of the value"
+        "the owning skill must name the constant instead of the value"
+    )
+    # The thinned command keeps the routes by pointer and inherits the same
+    # non-restatement duty — neither surface may grow a second copy of the value.
+    cmd = COMMAND_TEMPLATE.read_text(encoding="utf-8")
+    assert "R1" in cmd and "R2" in cmd, (
+        "the command template no longer points at the size-budget routes"
+    )
+    assert str(budget) not in cmd, (
+        f"the command template restates the budget literal {budget}; the script's "
+        "INSTRUCTIONS_BUDGET_BYTES is the only definition point"
     )
 
 
 # --------------------------------------------------------------------------------------
 # The command side of the same contract: the table the script emits has to be *consumed*
-# as an artifact. Every assertion below is scoped to the one line that carries the rule,
-# because "the phrase appears somewhere in a 200-line command" is a pin that keeps
-# passing after the rule has drifted out of the step that needs it.
+# as an artifact. Every assertion below is scoped to the one step that carries the rule,
+# because "the phrase appears somewhere in a 200-line procedure" is a pin that keeps
+# passing after the rule has drifted out of the step that needs it. The steps now live
+# in the manage-instructions skill (S3 thinning), where prose hard-wraps — so the
+# carrier is extracted as one bullet *block* (marker line plus its wrapped continuation)
+# and whitespace-normalized, keeping the same one-step scope as the old one-line pin.
 # --------------------------------------------------------------------------------------
 
 ARTIFACT_COMMIT_PEER = REPO_ROOT / "templates" / "commands" / "requirements.md"
@@ -379,6 +398,23 @@ def _line(text: str, marker: str) -> str:
     hits = [ln for ln in text.splitlines() if marker in ln]
     assert len(hits) == 1, f"expected exactly one line carrying {marker!r}, got {len(hits)}"
     return hits[0]
+
+
+def _block(text: str, marker: str) -> str:
+    """The single bullet block carrying ``marker``: its line plus every wrapped
+    continuation line indented deeper than it, joined into one whitespace-normalized
+    string. A second match still means the rule was restated."""
+    lines = text.splitlines()
+    hits = [i for i, ln in enumerate(lines) if marker in ln]
+    assert len(hits) == 1, f"expected exactly one block carrying {marker!r}, got {len(hits)}"
+    start = hits[0]
+    indent = len(lines[start]) - len(lines[start].lstrip())
+    body = [lines[start].strip()]
+    for ln in lines[start + 1:]:
+        if not ln.strip() or len(ln) - len(ln.lstrip()) <= indent:
+            break
+        body.append(ln.strip())
+    return " ".join(body)
 
 
 def _section(text: str, heading: str, end: str) -> str:
@@ -393,8 +429,8 @@ def test_action_2_consumes_the_script_table_as_the_observation_snapshot():
     """F-11②: the snapshot is a transcription of the script's table plus one
     agent-supplied column. Without this the sizes and both classifications get
     re-derived by eye, and R1/R2 each derive them a third and fourth time."""
-    text = COMMAND_TEMPLATE.read_text(encoding="utf-8")
-    inventory = _line(text, "**Inventory sections (mandatory artifact — observation snapshot)**")
+    text = SKILL.read_text(encoding="utf-8")
+    inventory = _block(text, "**Inventory sections (mandatory artifact — observation snapshot)**")
 
     assert "Action 1's section table" in inventory, (
         "Action 2 must name the script's table as the snapshot's source"
@@ -418,8 +454,8 @@ def test_action_2_consumes_the_script_table_as_the_observation_snapshot():
 def test_r1_opens_with_the_machine_checked_filter():
     """F-11③: the placeholder filter is the route's first act and reads a column,
     so it cannot be skipped by starting from a size-ranked shortlist."""
-    text = COMMAND_TEMPLATE.read_text(encoding="utf-8")
-    r1 = _line(text, "- **Route R1 —")
+    text = SKILL.read_text(encoding="utf-8")
+    r1 = _block(text, "- **Route R1 —")
 
     assert "Filter before reading any prose" in r1
     assert "`placeholder=yes`" in r1 and "`project-owned=yes`" in r1
@@ -437,8 +473,8 @@ def test_r1_opens_with_the_machine_checked_filter():
 
 @pytest.mark.contract
 def test_r2_reads_its_pool_from_the_project_owned_column():
-    text = COMMAND_TEMPLATE.read_text(encoding="utf-8")
-    r2 = _line(text, "- **Route R2 —")
+    text = SKILL.read_text(encoding="utf-8")
+    r2 = _block(text, "- **Route R2 —")
     assert "`project-owned=yes`" in r2, (
         "Route R2's pool is the table's project-owned rows; re-deriving it from "
         "'headings the template lacks' is the second derivation F-11 removes"
@@ -449,12 +485,12 @@ def test_r2_reads_its_pool_from_the_project_owned_column():
 def test_action_3_carries_the_backup_retention_rule():
     """F-11⑤: which backups are still load-bearing, and where the rest are named.
 
-    The keep-set literal (``newest 5``) is pinned here deliberately — the command
-    template is its only definition point, and a silent retune should fail a test
+    The keep-set literal (``newest 5``) is pinned here deliberately — the owning
+    skill is its only definition point, and a silent retune should fail a test
     rather than pass unnoticed.
     """
-    text = COMMAND_TEMPLATE.read_text(encoding="utf-8")
-    retention = _line(text, "**Backup retention rule**")
+    text = SKILL.read_text(encoding="utf-8")
+    retention = _block(text, "**Backup retention rule**")
 
     assert "keep-set" in retention
     assert "newest 5" in retention
@@ -464,14 +500,14 @@ def test_action_3_carries_the_backup_retention_rule():
     )
     assert "residual report" in retention, "the complement must be named in the report"
     assert "prunable set" in retention
-    # Non-destructive: the command names the prunable set, it does not prune.
+    # Non-destructive: the skill names the prunable set, it does not prune.
     assert "never removes a backup itself" in retention, (
-        "pruning backups is a destructive action this command does not carry; "
+        "pruning backups is a destructive action this procedure does not carry; "
         "dropping this clause would turn a report line into a deletion"
     )
     # Action 7 is the slot the naming lands in, and it points back rather than
     # restating the rule.
-    report_slot = _line(text, "**Name the prunable backups**")
+    report_slot = _block(text, "**Name the prunable backups**")
     assert "Action 3" in report_slot, (
         "Action 7 must reach the retention rule by reference — restating it would "
         "give the keep-set two owners"

@@ -34,6 +34,7 @@ CONTRACT = SPEC / "contracts" / "requirements-checker.md"
 TAXONOMY = ROOT / "shared" / "constants" / "clarify-taxonomy.md"
 GUIDELINES = ROOT / "shared" / "guidelines" / "requirements-guidelines.md"
 CMD_TEMPLATE = ROOT / "templates" / "commands" / "requirements.md"
+CMD_SKILL = ROOT / "skills" / "internal" / "create-requirements" / "SKILL.md"
 CLARIFY_TESTS = ROOT / "tests" / "contract" / "test_clarify_semantic_completeness.py"
 
 # C-2: the label set is the pin, never a count (checker-form C-22).
@@ -256,13 +257,15 @@ def test_c17_the_regex_uses_a_negative_lookbehind_and_an_inner_colon():
 # --------------------------------------------------------------------------- #
 
 def test_c18_the_command_template_invokes_the_checker_and_stops_on_error():
-    text = CMD_TEMPLATE.read_text(encoding="utf-8")
+    # [行为类] proxy = the artifact-side owner of the invocation. The S3 thinning moved the
+    # checker invocation from the command into create-requirements; the pin follows it.
+    text = CMD_SKILL.read_text(encoding="utf-8")
     assert "validate-requirements.py" in text
     assert re.search(r"STOP|停止|do not proceed|MUST NOT proceed", text), "no stop obligation"
 
 
 def test_c19_proxy_output_is_presented_verbatim_not_summarized():
-    text = CMD_TEMPLATE.read_text(encoding="utf-8")
+    text = CMD_SKILL.read_text(encoding="utf-8")
     assert re.search(r"verbatim|原样呈现", text)
     assert "summarize the findings" not in text
 

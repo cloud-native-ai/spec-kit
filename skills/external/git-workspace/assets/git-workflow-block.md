@@ -9,7 +9,7 @@
 
 Machine-maintained by the `git-workspace` skill (scope A) — the managed block below is the
 **single source of truth** for branch roles in this project; do not edit it by hand.
-`.specify/instructions.md` carries only a pointer to this file.
+In a Spec Kit deployment, `.specify/instructions.md` carries only a pointer to this file.
 
 <!-- GIT_WORKFLOW_START -->
 <!-- Record one row per branch role (MAIN / PRE / DEV). While no workflow is established, keep the `None yet.` row. -->

@@ -1,0 +1,1270 @@
+{
+  "engine": "progress-engine/v1",
+  "input_schema": "project-input/v1",
+  "baseline": "2026-10-12",
+  "input": "data/project.db",
+  "options": {
+    "count_deferred": false,
+    "strict": false
+  },
+  "thresholds": {
+    "weak_git_commits": 10,
+    "weak_git_span_days": 7,
+    "milestone_view_min_count": 4,
+    "milestone_view_min_span_days": 61,
+    "gantt_split_bars": 20
+  },
+  "project": {
+    "name": "command-logic-as-classified-skills",
+    "status_counts": {
+      "completed": 13,
+      "in-progress": 3
+    },
+    "progress": {
+      "basis": null,
+      "progress_pct": null,
+      "formula": null,
+      "reason": "无勾选比、无材料明写百分比 → 整体进度无可计数依据，只报状态计数",
+      "alternatives": [],
+      "buckets": null,
+      "bucket_closure": null
+    },
+    "counts": {
+      "items": 17,
+      "work_items": 16,
+      "leaves": 10,
+      "milestones": 1,
+      "delayed": 0,
+      "unknown_schedule": 16,
+      "unquantified_progress": 3
+    },
+    "delayed_items": [],
+    "delay_days_max": null,
+    "progress_bar": null,
+    "schedule_state": "unknown-schedule",
+    "current_phase": "command-logic-as-classified-skills · S-layer 分层与分流(run-2 扩展切片)",
+    "unknown_schedule_items": [
+      "command-logic-as-classified-skills.S0-command-census",
+      "command-logic-as-classified-skills.S-layer",
+      "command-logic-as-classified-skills.S1-extract-annotate",
+      "command-logic-as-classified-skills.S2a-contract-conformance",
+      "command-logic-as-classified-skills.S2b-structure-alignment",
+      "command-logic-as-classified-skills.S3-command-thinning",
+      "command-logic-as-classified-skills.TI-0001",
+      "command-logic-as-classified-skills.TIX-d3aa82b0",
+      "command-logic-as-classified-skills.TI-0002",
+      "command-logic-as-classified-skills.TI-0003",
+      "command-logic-as-classified-skills.TI-0004",
+      "command-logic-as-classified-skills.TI-0005",
+      "F-001",
+      "F-002",
+      "F-003",
+      "F-004"
+    ],
+    "unquantified_progress_items": [
+      "command-logic-as-classified-skills.S-layer",
+      "command-logic-as-classified-skills.TIX-d3aa82b0",
+      "F-004"
+    ],
+    "window": {
+      "earliest_date": "2026-10-09",
+      "latest_date": "2026-10-12",
+      "span_days": 3
+    }
+  },
+  "items": [
+    {
+      "id": "command-logic-as-classified-skills.S0-command-census",
+      "name": "command-logic-as-classified-skills · S0 命令普查裁定",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "command-logic-as-classified-skills.TI-0001"
+      ],
+      "status": "completed",
+      "status_source": "aggregated（1 个子项）",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 100.0 / 子项数 1 = 100.0%",
+      "progress_basis": "aggregated（等权平均）",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": "2026-10-09",
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": true,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "状态由 1 个子项聚合得出：completed",
+        "进度由 1 个子项聚合得出：Σ子项进度 100.0 / 子项数 1 = 100.0%",
+        "子项全部完成，实际完成日取最晚子项实际完成日 2026-10-09",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "aggregation": {
+        "children": 1,
+        "denominator": 1,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "command-logic-as-classified-skills.S-layer",
+      "name": "command-logic-as-classified-skills · S-layer 分层与分流(run-2 扩展切片)",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "command-logic-as-classified-skills.TIX-d3aa82b0"
+      ],
+      "status": "in-progress",
+      "status_source": "aggregated（1 个子项）",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期",
+        "状态由 1 个子项聚合得出：in-progress",
+        "1 项子项进度未量化，未计入本项进度分母"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "command-logic-as-classified-skills.TIX-d3aa82b0"
+        ],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": null
+    },
+    {
+      "id": "command-logic-as-classified-skills.S1-extract-annotate",
+      "name": "command-logic-as-classified-skills · S1 提炼建技能并标注",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "command-logic-as-classified-skills.TI-0002"
+      ],
+      "status": "completed",
+      "status_source": "aggregated（1 个子项）",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 100.0 / 子项数 1 = 100.0%",
+      "progress_basis": "aggregated（等权平均）",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": "2026-10-12",
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": true,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "状态由 1 个子项聚合得出：completed",
+        "进度由 1 个子项聚合得出：Σ子项进度 100.0 / 子项数 1 = 100.0%",
+        "子项全部完成，实际完成日取最晚子项实际完成日 2026-10-12",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "aggregation": {
+        "children": 1,
+        "denominator": 1,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "command-logic-as-classified-skills.S2a-contract-conformance",
+      "name": "command-logic-as-classified-skills · S2a 契约齐备",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "command-logic-as-classified-skills.TI-0003"
+      ],
+      "status": "completed",
+      "status_source": "aggregated（1 个子项）",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 100.0 / 子项数 1 = 100.0%",
+      "progress_basis": "aggregated（等权平均）",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": "2026-10-12",
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": true,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "状态由 1 个子项聚合得出：completed",
+        "进度由 1 个子项聚合得出：Σ子项进度 100.0 / 子项数 1 = 100.0%",
+        "子项全部完成，实际完成日取最晚子项实际完成日 2026-10-12",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "aggregation": {
+        "children": 1,
+        "denominator": 1,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "command-logic-as-classified-skills.S2b-structure-alignment",
+      "name": "command-logic-as-classified-skills · S2b 结构对齐",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "command-logic-as-classified-skills.TI-0004"
+      ],
+      "status": "completed",
+      "status_source": "aggregated（1 个子项）",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 100.0 / 子项数 1 = 100.0%",
+      "progress_basis": "aggregated（等权平均）",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": "2026-10-12",
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": true,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "状态由 1 个子项聚合得出：completed",
+        "进度由 1 个子项聚合得出：Σ子项进度 100.0 / 子项数 1 = 100.0%",
+        "子项全部完成，实际完成日取最晚子项实际完成日 2026-10-12",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "aggregation": {
+        "children": 1,
+        "denominator": 1,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "command-logic-as-classified-skills.S3-command-thinning",
+      "name": "command-logic-as-classified-skills · S3 命令瘦身",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "command-logic-as-classified-skills.TI-0005"
+      ],
+      "status": "completed",
+      "status_source": "aggregated（1 个子项）",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 100.0 / 子项数 1 = 100.0%",
+      "progress_basis": "aggregated（等权平均）",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": "2026-10-12",
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": true,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "状态由 1 个子项聚合得出：completed",
+        "进度由 1 个子项聚合得出：Σ子项进度 100.0 / 子项数 1 = 100.0%",
+        "子项全部完成，实际完成日取最晚子项实际完成日 2026-10-12",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "aggregation": {
+        "children": 1,
+        "denominator": 1,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "command-logic-as-classified-skills.TI-0001",
+      "name": "S0 命令普查裁定(25 命令 × 5 批;20 新建行 + 5 维持行)",
+      "type": "work-item",
+      "parent": "command-logic-as-classified-skills.S0-command-census",
+      "phase_id": "command-logic-as-classified-skills.S0-command-census",
+      "owner_id": "agent-stage-executor-template",
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "completed",
+      "status_source": "status_raw:已完成",
+      "progress_pct": 100.0,
+      "progress_formula": "100/100 = 100.0%",
+      "progress_basis": "status:completed",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": "2026-10-09",
+      "actual_end": "2026-10-09",
+      "date_meta": {
+        "actual_start": {
+          "precision": "day",
+          "inferred": false
+        },
+        "actual_end": {
+          "precision": "day",
+          "inferred": false
+        }
+      },
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261009T032057Z-report.md#deliverables",
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "command-logic-as-classified-skills.TIX-d3aa82b0",
+      "name": "S-layer 分层与分流实施(B1/B2a/B2b/B2d 完成;余批移交 skill-layer-install-separation)",
+      "type": "work-item",
+      "parent": "command-logic-as-classified-skills.S-layer",
+      "phase_id": "command-logic-as-classified-skills.S-layer",
+      "owner_id": "agent-stage-executor-template",
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "in-progress",
+      "status_source": "status_raw:进行中",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": "2026-10-09",
+      "actual_end": null,
+      "date_meta": {
+        "actual_start": {
+          "precision": "day",
+          "inferred": false
+        }
+      },
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/.work/command-logic-as-classified-skills/progress.md#stage-progress",
+      "progress_bar": null
+    },
+    {
+      "id": "command-logic-as-classified-skills.TI-0002",
+      "name": "S1 完成:20 技能包(17 新批 + 3 存量)落 skills/internal/ + 25 存量 SKILL.md 补 classification 标注",
+      "type": "work-item",
+      "parent": "command-logic-as-classified-skills.S1-extract-annotate",
+      "phase_id": "command-logic-as-classified-skills.S1-extract-annotate",
+      "owner_id": "agent-stage-executor-template",
+      "owner_name": "未记录",
+      "depends_on": [
+        "command-logic-as-classified-skills.TI-0001"
+      ],
+      "is_leaf": true,
+      "children": [],
+      "status": "completed",
+      "status_source": "status_raw:已完成",
+      "progress_pct": 100.0,
+      "progress_formula": "100/100 = 100.0%",
+      "progress_basis": "status:completed",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": "2026-10-12",
+      "actual_end": "2026-10-12",
+      "date_meta": {
+        "actual_start": {
+          "precision": "day",
+          "inferred": false
+        },
+        "actual_end": {
+          "precision": "day",
+          "inferred": false
+        }
+      },
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s1",
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "command-logic-as-classified-skills.TI-0003",
+      "name": "S2a 完成:46 技能契约齐备判定(45 pass/1 gap,archive-session 描述补丁落地)",
+      "type": "work-item",
+      "parent": "command-logic-as-classified-skills.S2a-contract-conformance",
+      "phase_id": "command-logic-as-classified-skills.S2a-contract-conformance",
+      "owner_id": "agent-stage-executor-template",
+      "owner_name": "未记录",
+      "depends_on": [
+        "command-logic-as-classified-skills.TI-0002"
+      ],
+      "is_leaf": true,
+      "children": [],
+      "status": "completed",
+      "status_source": "status_raw:已完成",
+      "progress_pct": 100.0,
+      "progress_formula": "100/100 = 100.0%",
+      "progress_basis": "status:completed",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": "2026-10-12",
+      "actual_end": "2026-10-12",
+      "date_meta": {
+        "actual_start": {
+          "precision": "day",
+          "inferred": false
+        },
+        "actual_end": {
+          "precision": "day",
+          "inferred": false
+        }
+      },
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2a",
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "command-logic-as-classified-skills.TI-0004",
+      "name": "S2b 完成:46 技能结构对齐判定(8 补丁落地:draw-diagram 运行模式门/manage-agents×3/archive-session skill_id/improve-docs/git-workspace/pycache)",
+      "type": "work-item",
+      "parent": "command-logic-as-classified-skills.S2b-structure-alignment",
+      "phase_id": "command-logic-as-classified-skills.S2b-structure-alignment",
+      "owner_id": "structure-adjuster",
+      "owner_name": "Structure Adjuster",
+      "depends_on": [
+        "command-logic-as-classified-skills.TI-0003"
+      ],
+      "is_leaf": true,
+      "children": [],
+      "status": "completed",
+      "status_source": "status_raw:已完成",
+      "progress_pct": 100.0,
+      "progress_formula": "100/100 = 100.0%",
+      "progress_basis": "status:completed",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": "2026-10-12",
+      "actual_end": "2026-10-12",
+      "date_meta": {
+        "actual_start": {
+          "precision": "day",
+          "inferred": false
+        },
+        "actual_end": {
+          "precision": "day",
+          "inferred": false
+        }
+      },
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2b",
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "command-logic-as-classified-skills.TI-0005",
+      "name": "S3 完成:25 命令模板瘦身(净 −2368 行)+ 123 契约测试归因修复,终态 2051 passed/0 failed",
+      "type": "work-item",
+      "parent": "command-logic-as-classified-skills.S3-command-thinning",
+      "phase_id": "command-logic-as-classified-skills.S3-command-thinning",
+      "owner_id": "agent-stage-executor-template",
+      "owner_name": "未记录",
+      "depends_on": [
+        "command-logic-as-classified-skills.TI-0004"
+      ],
+      "is_leaf": true,
+      "children": [],
+      "status": "completed",
+      "status_source": "status_raw:已完成",
+      "progress_pct": 100.0,
+      "progress_formula": "100/100 = 100.0%",
+      "progress_basis": "status:completed",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": "2026-10-12",
+      "actual_end": "2026-10-12",
+      "date_meta": {
+        "actual_start": {
+          "precision": "day",
+          "inferred": false
+        },
+        "actual_end": {
+          "precision": "day",
+          "inferred": false
+        }
+      },
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s3",
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "MS-0001",
+      "name": "command 中只包含该调用哪些 skill 以及如何调用 skill,不包含具体的实现细节,所有的细节都在 skill 中(目标判据 1)",
+      "type": "milestone",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "achieved",
+      "status_source": "milestone-judgement",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": "2026-10-12",
+      "date_meta": {
+        "actual_end": {
+          "precision": "day",
+          "inferred": false
+        }
+      },
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": "2026-10-12",
+      "schedule_status": "on-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "锚定 command-logic-as-classified-skills.TI-0005（S3 完成:25 命令模板瘦身(净 −2368 行)+ 123 契约测试归因修复,终态 2051 passed/0 failed）结束点，按当前排期换算为 2026-10-12",
+        "已达成：S3 判定 contract-checker PASS;终态契约测试 2051 passed / 0 failed;goal 判据咨询评估「已达成」(runs/20261012T115331Z-report.md,2026-10-12)；达成日 2026-10-12；不晚于锚定日 2026-10-12"
+      ],
+      "source": ".specify/goal/command-logic-as-classified-skills/goal.md#success-criteria",
+      "progress_bar": null
+    },
+    {
+      "id": "F-001",
+      "name": "命令核心逻辑技能化 —— 20 个新技能包落位 skills/internal/",
+      "type": "feature",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "completed",
+      "status_source": "status_raw:已完成",
+      "progress_pct": 100.0,
+      "progress_formula": "100/100 = 100.0%",
+      "progress_basis": "status:completed",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s1",
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "F-002",
+      "name": "全量技能分类标注 —— 25 个存量 SKILL.md 补 classification(internal 14 / external 11)",
+      "type": "feature",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "completed",
+      "status_source": "status_raw:已完成",
+      "progress_pct": 100.0,
+      "progress_formula": "100/100 = 100.0%",
+      "progress_basis": "status:completed",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s1",
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "F-003",
+      "name": "命令模板瘦身 —— 25 个命令改写为「技能调用 + 输入产出」,模板净减 2,368 行",
+      "type": "feature",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "completed",
+      "status_source": "status_raw:已完成",
+      "progress_pct": 100.0,
+      "progress_formula": "100/100 = 100.0%",
+      "progress_basis": "status:completed",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s3",
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "F-004",
+      "name": "技能内外分层改造 —— B1 分类 sweep v2、B2a git-workflow 状态面迁移、B2b create-docs/improve-docs 去 .specify 化、B2d git-workspace 四合一",
+      "type": "feature",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "in-progress",
+      "status_source": "status_raw:进行中",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无勾选比/无材料明写百分比 → 进度无可计数依据（不臆造数字）",
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/.work/command-logic-as-classified-skills/progress.md#s-layer",
+      "progress_bar": null
+    }
+  ],
+  "groups": [
+    {
+      "id": "command-logic-as-classified-skills.S0-command-census",
+      "name": "command-logic-as-classified-skills · S0 命令普查裁定",
+      "status": "completed",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 100.0 / 子项数 1 = 100.0%",
+      "progress_bar": "██████████",
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 1,
+        "denominator": 1,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      }
+    },
+    {
+      "id": "command-logic-as-classified-skills.S-layer",
+      "name": "command-logic-as-classified-skills · S-layer 分层与分流(run-2 扩展切片)",
+      "status": "in-progress",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_bar": null,
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 1,
+        "denominator": 0,
+        "excluded_unquantified": 1,
+        "excluded_ids": [
+          "command-logic-as-classified-skills.TIX-d3aa82b0"
+        ],
+        "weights": null,
+        "weight_sum": null
+      }
+    },
+    {
+      "id": "command-logic-as-classified-skills.S1-extract-annotate",
+      "name": "command-logic-as-classified-skills · S1 提炼建技能并标注",
+      "status": "completed",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 100.0 / 子项数 1 = 100.0%",
+      "progress_bar": "██████████",
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 1,
+        "denominator": 1,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      }
+    },
+    {
+      "id": "command-logic-as-classified-skills.S2a-contract-conformance",
+      "name": "command-logic-as-classified-skills · S2a 契约齐备",
+      "status": "completed",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 100.0 / 子项数 1 = 100.0%",
+      "progress_bar": "██████████",
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 1,
+        "denominator": 1,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      }
+    },
+    {
+      "id": "command-logic-as-classified-skills.S2b-structure-alignment",
+      "name": "command-logic-as-classified-skills · S2b 结构对齐",
+      "status": "completed",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 100.0 / 子项数 1 = 100.0%",
+      "progress_bar": "██████████",
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 1,
+        "denominator": 1,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      }
+    },
+    {
+      "id": "command-logic-as-classified-skills.S3-command-thinning",
+      "name": "command-logic-as-classified-skills · S3 命令瘦身",
+      "status": "completed",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 100.0 / 子项数 1 = 100.0%",
+      "progress_bar": "██████████",
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 1,
+        "denominator": 1,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      }
+    }
+  ],
+  "milestones": {
+    "counts": {
+      "total": 1,
+      "achieved": 1,
+      "pending": 0,
+      "at_risk": 0,
+      "unknown_schedule": 0
+    },
+    "achieved_numerator": 1,
+    "achieved_denominator": 1,
+    "achieved_pct": 100.0,
+    "achieved_formula": "1/1 = 100.0%",
+    "achieved_bar": "██████████",
+    "delay_days_max": null,
+    "overdue": [],
+    "achieved_late": [],
+    "unknown_schedule_ids": [],
+    "narrative": "1 个里程碑：已达成 1、逾期 0、待达成 0、无计划日期 0",
+    "view": {
+      "count": 1,
+      "first_anchor": "2026-10-12",
+      "last_anchor": "2026-10-12",
+      "span_days": null,
+      "standalone_condition_a": false,
+      "thresholds": {
+        "min_count": 4,
+        "min_span_days": 61
+      }
+    }
+  },
+  "gantt": {
+    "project_start": "2026-10-09",
+    "project_start_source": "全部日期中的最早者（推断起点）",
+    "today_offset_days": 3,
+    "bar_count": 0,
+    "split_recommended": false,
+    "schedule_material": {
+      "has_planned_dates": false,
+      "git_span_days": null,
+      "git_commit_count": null,
+      "git_window": null,
+      "weak_git_material": false,
+      "gantt_recommended": false,
+      "reason": "无任何计划日期或工期依据 → 甘特不出图"
+    },
+    "today_directive": "today is 3 days after start",
+    "title_baseline": "基准日 today = 2026-10-12，项目第 3 天"
+  },
+  "timeline": [
+    {
+      "date": "2026-10-09",
+      "item_id": "command-logic-as-classified-skills.S0-command-census",
+      "kind": "actual_end",
+      "label": "command-logic-as-classified-skills · S0 命令普查裁定",
+      "status": "completed",
+      "derived": true
+    },
+    {
+      "date": "2026-10-09",
+      "item_id": "command-logic-as-classified-skills.TI-0001",
+      "kind": "actual_end",
+      "label": "S0 命令普查裁定(25 命令 × 5 批;20 新建行 + 5 维持行)",
+      "status": "completed",
+      "derived": false
+    },
+    {
+      "date": "2026-10-12",
+      "item_id": "MS-0001",
+      "kind": "milestone",
+      "label": "command 中只包含该调用哪些 skill 以及如何调用 skill,不包含具体的实现细节,所有的细节都在 skill 中(目标判据 1)",
+      "status": "achieved",
+      "derived": false
+    },
+    {
+      "date": "2026-10-12",
+      "item_id": "command-logic-as-classified-skills.S1-extract-annotate",
+      "kind": "actual_end",
+      "label": "command-logic-as-classified-skills · S1 提炼建技能并标注",
+      "status": "completed",
+      "derived": true
+    },
+    {
+      "date": "2026-10-12",
+      "item_id": "command-logic-as-classified-skills.S2a-contract-conformance",
+      "kind": "actual_end",
+      "label": "command-logic-as-classified-skills · S2a 契约齐备",
+      "status": "completed",
+      "derived": true
+    },
+    {
+      "date": "2026-10-12",
+      "item_id": "command-logic-as-classified-skills.S2b-structure-alignment",
+      "kind": "actual_end",
+      "label": "command-logic-as-classified-skills · S2b 结构对齐",
+      "status": "completed",
+      "derived": true
+    },
+    {
+      "date": "2026-10-12",
+      "item_id": "command-logic-as-classified-skills.S3-command-thinning",
+      "kind": "actual_end",
+      "label": "command-logic-as-classified-skills · S3 命令瘦身",
+      "status": "completed",
+      "derived": true
+    },
+    {
+      "date": "2026-10-12",
+      "item_id": "command-logic-as-classified-skills.TI-0002",
+      "kind": "actual_end",
+      "label": "S1 完成:20 技能包(17 新批 + 3 存量)落 skills/internal/ + 25 存量 SKILL.md 补 classification 标注",
+      "status": "completed",
+      "derived": false
+    },
+    {
+      "date": "2026-10-12",
+      "item_id": "command-logic-as-classified-skills.TI-0003",
+      "kind": "actual_end",
+      "label": "S2a 完成:46 技能契约齐备判定(45 pass/1 gap,archive-session 描述补丁落地)",
+      "status": "completed",
+      "derived": false
+    },
+    {
+      "date": "2026-10-12",
+      "item_id": "command-logic-as-classified-skills.TI-0004",
+      "kind": "actual_end",
+      "label": "S2b 完成:46 技能结构对齐判定(8 补丁落地:draw-diagram 运行模式门/manage-agents×3/archive-session skill_id/improve-docs/git-workspace/pycache)",
+      "status": "completed",
+      "derived": false
+    },
+    {
+      "date": "2026-10-12",
+      "item_id": "command-logic-as-classified-skills.TI-0005",
+      "kind": "actual_end",
+      "label": "S3 完成:25 命令模板瘦身(净 −2368 行)+ 123 契约测试归因修复,终态 2051 passed/0 failed",
+      "status": "completed",
+      "derived": false
+    }
+  ],
+  "coverage": {
+    "source_label": "团队条目台账 items.jsonl(5 条显式)+ 台账未及条目回填(1 条推断:S-layer,两态交接)+ 交付类目 features(4 条)",
+    "candidate_total": 10,
+    "excluded": 0,
+    "granularity_truncated": 0,
+    "unattributed": 0,
+    "tree_items": 10,
+    "phase_nodes": 6,
+    "closure_equation": "10 − 0 − 0 = 10",
+    "closure_ok": true,
+    "closure_note": "闭合成立：候选全集减去剔除/截断项等于分解树条目数",
+    "coverage_formula": "10/10 = 100.0%",
+    "progress_denominator_set": "团队条目台账 items.jsonl(5 条显式)+ 台账未及条目回填(1 条推断:S-layer,两态交接)+ 交付类目 features(4 条)（10 项，已扣除剔除项 0）"
+  },
+  "people": {
+    "roster": [
+      {
+        "owner_id": "agent-team-supervisor-template",
+        "owner_name": "未记录",
+        "owner_role": "team-supervisor(serial Lead 与唯一 Meta 落盘者)"
+      },
+      {
+        "owner_id": "agent-stage-executor-template",
+        "owner_name": "未记录",
+        "owner_role": "skill-author(S0/S1/S2a/S3 产出者)"
+      },
+      {
+        "owner_id": "structure-adjuster",
+        "owner_name": "Structure Adjuster",
+        "owner_role": "structure-aligner(S2b 结构对齐)"
+      },
+      {
+        "owner_id": "agent-stage-evaluator-template",
+        "owner_name": "未记录",
+        "owner_role": "contract-checker(每次交接独立判定席)"
+      }
+    ],
+    "coverage_numerator": 6,
+    "coverage_denominator": 17,
+    "coverage_pct": 35.3,
+    "coverage_formula": "6/17 = 35.3%",
+    "unassigned_ids": [
+      "command-logic-as-classified-skills.S0-command-census",
+      "command-logic-as-classified-skills.S-layer",
+      "command-logic-as-classified-skills.S1-extract-annotate",
+      "command-logic-as-classified-skills.S2a-contract-conformance",
+      "command-logic-as-classified-skills.S2b-structure-alignment",
+      "command-logic-as-classified-skills.S3-command-thinning",
+      "MS-0001",
+      "F-001",
+      "F-002",
+      "F-003",
+      "F-004"
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "S-0001",
+      "source_kind": "user-form",
+      "source_ref": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)",
+      "covers": [
+        "milestones",
+        "people",
+        "phases",
+        "work_items"
+      ]
+    },
+    {
+      "source_id": "S-0002",
+      "source_kind": "user-form",
+      "source_ref": ".specify/teams/.work/command-logic-as-classified-skills/progress.md(git-ignored 工作区进度文件;本次刷新经调度方明确授权作为补填源)",
+      "covers": [
+        "features",
+        "milestones",
+        "work_items"
+      ]
+    },
+    {
+      "source_id": "S-0003",
+      "source_kind": "user-form",
+      "source_ref": ".specify/goal/command-logic-as-classified-skills/goal.md(目标定义,判据与 Target 权威)",
+      "covers": [
+        "milestones"
+      ]
+    }
+  ],
+  "inferred_fields": [
+    {
+      "field": "targets.items[].attributed_items/completed_items",
+      "inferred_value": "T-001 2/2、T-002 2/2、T-003 1/1",
+      "inferred_from": "team.md config.target_map(台账行未打 target_ref,生成器按台账计 0;此处按团队显式 stage→Target 映射归属)"
+    },
+    {
+      "field": "features[F-001..F-004]",
+      "inferred_value": "四类交付物目",
+      "inferred_from": "runs/20261012T115331Z-report.md 与 progress.md S-layer 批计划 的交付类目归集(20 包 / 25 标注 / 25 命令瘦身 / B1+B2a+B2b+B2d)"
+    },
+    {
+      "field": "milestones[MS-0001].anchor_item_id",
+      "inferred_value": "command-logic-as-classified-skills.TI-0005(S3)",
+      "inferred_from": "team.md config.target_map —— T-003 映射 [S3-command-thinning];目标判据 1 对应 T-003/S3;生成器原锚 TI-0001 系单条目时的兜底"
+    },
+    {
+      "field": "people[structure-adjuster].owner_name",
+      "inferred_value": "Structure Adjuster",
+      "inferred_from": ".specify/agents/templates/structure-adjuster.agent.md frontmatter name(summary-mapping §5 解析顺序第 2 级)"
+    },
+    {
+      "field": "people[agent-team-supervisor-template/agent-stage-executor-template/agent-stage-evaluator-template].owner_name",
+      "inferred_value": "未记录",
+      "inferred_from": "FR-004 —— 三席为 create-team 临时模板,skills/internal/create-team/templates/agents/ 定义 frontmatter name 为占位符({{AGENT_NAME}}),无持久可解析名"
+    },
+    {
+      "field": "work_items[*].owner_id",
+      "inferred_value": "S0/S1/S2a/S3/S-layer → agent-stage-executor-template;S2b → structure-adjuster",
+      "inferred_from": "team.md Dynamic Structure 各 stage 的 agent_kind 指派(S-layer 记主产出席 skill-author,supervisor 为落盘者)"
+    },
+    {
+      "field": "work_items[*].depends_on",
+      "inferred_value": "S0→S1→S2a→S2b→S3 串行链",
+      "inferred_from": "team.md Dynamic Structure DAG(无环线性链),非日期推断"
+    },
+    {
+      "field": "work_items[*].actual_start/actual_end",
+      "inferred_value": "各阶段起讫日",
+      "inferred_from": "progress.md Stage Progress 表 Started/Completed 列;S0 起讫取 runs/20261009T032057Z-report.md 执行时间戳"
+    },
+    {
+      "field": "work_items[TI-0002..TI-0005]",
+      "inferred_value": "台账并发追加的 4 条显式行(S1/S2a/S2b/S3 完成)",
+      "inferred_from": "刷新进行期间团队 cycle 并发落盘 items.jsonl TI-0002..TI-0005 与 runs/20261012T115331Z-report.md(tracked);按「每次从全部团队台账重新折叠」重新装载,显式身份为权威,先前的 4 条推断身份(TIX-ff531ace/39cc250d/44c744f5/0ff78b5d)按两态交接归并、不再呈现"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TIX-d3aa82b0]",
+      "inferred_value": "S-layer 分层与分流实施(进行中,起 2026-10-09)",
+      "inferred_from": "两态交接回填 —— .specify/teams/.work/command-logic-as-classified-skills/progress.md Stage Progress 表(台账 items.jsonl 尚无该条目显式行);TIX = sha256(title+NUL+phase_ref) 前 8 位"
+    },
+    {
+      "field": "project.baseline_date",
+      "inferred_value": "2026-10-12",
+      "inferred_from": "本次总结刷新触发日(生成日期 = 基准日 D0;生成器原取最近台账事件日 2026-10-09)"
+    },
+    {
+      "field": "project.project_desc",
+      "inferred_value": "goal.md Objective 全文",
+      "inferred_from": ".specify/goal/command-logic-as-classified-skills/goal.md §Objective(生成器 frontmatter 解析失败回退到内联 goal 且截断,按定义修正)"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S0-command-census].source",
+      "inferred_value": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S-layer].source",
+      "inferred_value": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S1-extract-annotate].source",
+      "inferred_value": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S2a-contract-conformance].source",
+      "inferred_value": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S2b-structure-alignment].source",
+      "inferred_value": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S3-command-thinning].source",
+      "inferred_value": ".specify/teams/command-logic-as-classified-skills/(team.md、items.jsonl、runs/*-report.md,tracked)（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    }
+  ],
+  "diagnostics": {
+    "unmapped_statuses": {},
+    "warnings": [],
+    "declarations": [
+      "16 个工作项无计划完成日，无法判定延期（command-logic-as-classified-skills.S0-command-census、command-logic-as-classified-skills.S-layer、command-logic-as-classified-skills.S1-extract-annotate、command-logic-as-classified-skills.S2a-contract-conformance、command-logic-as-classified-skills.S2b-structure-alignment、command-logic-as-classified-skills.S3-command-thinning、command-logic-as-classified-skills.TI-0001、command-logic-as-classified-skills.TIX-d3aa82b0…）——报告须显式声明，不上逾期色",
+      "3 个工作项进度无可计数依据，记 `-（无可计数依据）`，未计入任何百分比分母",
+      "排期材料不足：无任何计划日期或工期依据 → 甘特不出图"
+    ]
+  },
+  "baseline_source": "--baseline",
+  "db": "data/project.db",
+  "db_schema_version": "project-db/v1"
+}

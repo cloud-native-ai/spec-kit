@@ -16,6 +16,7 @@ description: |
   "文档构建", "页面部署", "CI配置", "静态网站", "文档站点", "文档网站",
   "对外呈现", "发布文档", "本地预览", "主题", "导航", "侧边栏", "目录结构"]
 skill_id: "<SKILL:.specify/skills/create-pages/SKILL.md>"
+classification: external
 ---
 
 # Create Pages — doc library → Hugo site → pages service

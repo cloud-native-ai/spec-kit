@@ -20,6 +20,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 CANONICAL = REPO_ROOT / "templates" / "commands" / "derive.md"
+SKILL = REPO_ROOT / "skills" / "internal" / "derive-architecture" / "SKILL.md"
 PER_TOOL_COPIES = (
     REPO_ROOT / ".claude" / "commands" / "speckit.derive.md",
     REPO_ROOT / ".github" / "prompts" / "speckit.derive.prompt.md",
@@ -145,20 +146,31 @@ def test_command_states_reference_not_restate():
         "the command must declare the link-not-restate rule"
 
 
-def test_command_states_the_degradation_clause():
-    assert "no-online-capability" in CANONICAL.read_text(encoding="utf-8")
+def test_degradation_clause_is_stated_by_the_owning_skill():
+    """The S3 thinning moved the executable flow into derive-architecture; the degradation
+    clause (no-online-capability) is pinned at that owner. The command keeps the pointer.
+    """
+    assert "no-online-capability" in SKILL.read_text(encoding="utf-8")
+    assert "能力降级规则" in CANONICAL.read_text(encoding="utf-8"), (
+        "the command must keep pointing at the degradation rules it delegates"
+    )
 
 
-def test_command_states_the_boundary_vs_research():
-    text = CANONICAL.read_text(encoding="utf-8")
-    assert "/speckit.research" in text
-    assert "Boundary" in text, "the template must draw the /speckit.derive vs /speckit.research line"
+def test_boundary_vs_research_is_drawn_by_the_owning_skill():
+    skill = SKILL.read_text(encoding="utf-8")
+    assert "/speckit.research" in skill
+    assert "Boundaries" in skill, "the owning skill must draw the /speckit.derive vs /speckit.research line"
+    # the command keeps a reference-form pointer to the line it no longer restates
+    command = CANONICAL.read_text(encoding="utf-8")
+    assert "/speckit.research" in command, "the command must still name /speckit.research in its boundary pointer"
 
 
-def test_command_uses_slug_and_never_topic():
-    text = CANONICAL.read_text(encoding="utf-8")
-    assert "--slug" in text, "the engine flag is --slug"
-    assert "--topic" not in text, "--topic was removed from the engine; the template must not use it"
+def test_engine_flag_is_slug_and_never_topic():
+    """`--slug` is the engine flag; the pin follows the invocation examples into the skill,
+    and neither surface may reintroduce the removed `--topic`."""
+    assert "--slug" in SKILL.read_text(encoding="utf-8"), "the engine flag is --slug"
+    assert "--topic" not in SKILL.read_text(encoding="utf-8"), "--topic was removed from the engine"
+    assert "--topic" not in CANONICAL.read_text(encoding="utf-8"), "--topic was removed from the engine"
 
 
 def test_template_has_zero_blocking_confirmation_gates():

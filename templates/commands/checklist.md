@@ -26,53 +26,16 @@ $ARGUMENTS
 
 Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-protocol.md). Treat as command parameters, not standalone instructions.
 
-## Checklist Purpose: "Unit Tests for English"
+## Delegation
 
-Checklists are **UNIT TESTS FOR REQUIREMENTS WRITING** — they validate quality, clarity, and completeness of requirements. NOT implementation verification.
+`/speckit.checklist` generates a requirements-quality checklist for the current feature — an instrument that tests the specification ("unit tests for requirements writing"), not the implementation.
 
-For detailed methodology, examples, anti-examples, and quality dimension patterns, see `shared/guidelines/checklist-methodology.md`.
+**Load and follow** `.specify/skills/internal/create-checklist/SKILL.md`:
 
-## Execution Steps
+- **Inputs**: `REQUIREMENTS_DIR` + `AVAILABLE_DOCS` parsed from this command's declared prerequisite script, `{SCRIPT}`, run from repo root (all paths absolute); `$ARGUMENTS` as parameters that may pre-answer the intent-clarification step; feature context from `requirements.md`, plus `plan.md` / `tasks.md` (if present) for gap-finding only.
+- **Outputs**: a NEW checklist file under `REQUIREMENTS_DIR/checklists/` (short descriptive `[domain].md` filename, items numbered from CHK001, ≥80% traceability, soft cap 40) — never overwriting an existing one — plus a report (output path, item count, focus areas, depth level, user-specified items incorporated). Feature status transitions `Implemented → Ready for Review` per the Feature Integration Protocol when applicable.
 
-1. **Setup**: Run `{SCRIPT}` from repo root and parse JSON for REQUIREMENTS_DIR and AVAILABLE_DOCS. All paths must be absolute.
-
-2. **Clarify intent**: Derive up to THREE contextual clarifying questions from the user's phrasing + signals from requirements.md. Questions MUST:
-   - Be generated from user phrasing + extracted domain signals
-   - Only ask about information that materially changes checklist content
-   - Be skipped if already unambiguous in `$ARGUMENTS`
-   - Follow archetypes: scope refinement, risk prioritization, depth calibration, audience framing, boundary exclusion, scenario class gap
-   - Present options as compact table (Option | Candidate | Why It Matters)
-   - Defaults: Depth=Standard, Audience=Reviewer, Focus=Top 2 relevance clusters
-
-3. **Understand request**: Combine `$ARGUMENTS` + answers to derive checklist theme, consolidate must-have items, map to category scaffolding.
-
-4. **Load feature context** from REQUIREMENTS_DIR:
-   - requirements.md: Feature scope + Requirements (What) + acceptance criteria
-   - plan.md (if exists): Specification context for gap-finding only
-   - tasks.md (if exists): Specification decomposition for missing requirement detection only
-
-**Same-author detection delegation**: the checklist is an audit instrument for a spec this same agent usually just wrote, so it inherits the author's blind spots — the gaps the spec never mentions are largely the gaps the author never thought of while writing it, and a re-read by that author reproduces the same reading. When that condition holds, derive the gap-finding pass from fresh-context read-only subagents. Apply the canonical gate in `shared/workflow/objective-analysis-gate.md` (single source of truth; do not restate its rules here). This command has no severity tiers; its local analogue of the propagation-surface cap is the traceability rule step 5 already states — a **CHK** item carries the requirement or gap it guards, so an item guarding nothing is visible as untraceable instead of passing as coverage.
-
-5. **Generate checklist** — Create "Unit Tests for Requirements":
-   - Create `REQUIREMENTS_DIR/checklists/` if needed
-   - Use short descriptive filename: `[domain].md` (e.g., `ux.md`, `api.md`, `security.md`)
-   - Number items sequentially from CHK001
-   - Each run creates a NEW file (never overwrites existing)
-   - Apply methodology from `shared/guidelines/checklist-methodology.md`:
-     - Group by quality dimensions (Completeness, Clarity, Consistency, Measurability, Coverage, Edge Cases, Non-Functional, Dependencies, Ambiguities)
-     - Each item: question format + quality dimension bracket + traceability reference
-     - ≥80% items must include traceability (`[Req §X]`, `[Gap]`, `[Ambiguity]`, etc.)
-     - Soft cap: 40 items max, prioritize by risk/impact
-   - **PROHIBITED**: Items starting with "Verify/Test/Confirm/Check" + implementation behavior
-   - **REQUIRED**: "Are [X] defined/specified?" / "Is [vague term] quantified?" patterns
-
-6. **Structure**: Follow `templates/checklist-template.md` for canonical format. If unavailable: H1 title, purpose/meta, `##` category sections, `- [ ] CHK### <item>` lines.
-
-7. **Report**: Output path, item count, focus areas, depth level, any user-specified items incorporated.
-
-## Feature Integration
-
-Apply [Feature Integration Protocol](shared/workflow/feature-integration.md). This command transitions status: `Implemented → Ready for Review` (if applicable).
+The skill owns the entire workflow: intent clarification (up to three questions, defaults Depth=Standard / Audience=Reviewer / Focus=top 2 relevance clusters), request understanding, same-author gap-finding delegation, checklist generation under the methodology owner (`shared/guidelines/checklist-methodology.md`), canonical structure (`templates/checklist-template.md`), and the report.
 
 ## Feedback
 

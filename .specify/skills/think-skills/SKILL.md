@@ -3,6 +3,7 @@ name: think-skills
 description: |
   This skill can mentally simulate a Skill or prompt to verify likely execution behavior without real side effects. Use this when the user mentions ["thought experiment", "mental dry run", "simulate a skill", "simulate a prompt", "pretend to run", "dry-run prompt", "verify prompt logic", "验证技能执行效果", "思想实验", "不要真的执行"].
 skill_id: "<SKILL:.specify/skills/think-skills/SKILL.md>"
+classification: external
 ---
 
 # think-skills

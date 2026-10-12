@@ -3,6 +3,7 @@ name: code-review
 description: |
   Command-line code review workflow built around git-delta. Covers the full four-phase closed loop — pre-submission (author self-check, PR-size guard), review execution (structured P0–P6 dimension checks in a tests-first order, delta-rendered side-by-side diffs), feedback & iteration (six-level severity taxonomy: blocking/important/suggestion/nitpick/question/praise, convergence rules), and merge & knowledge precipitation (merge gate, metrics). Deterministic work (rendering diffs, recording notes, aggregating reports, merge-gate verdicts) is delegated to `${SKILL_HOME}/scripts/git-delta-review.sh`; judgment work (reading code, writing review comments) stays with the human/LLM reviewer. Use this when the user mentions ["code review", "review diff", "review PR", "review MR", "代码审查", "代码评审", "审查代码", "review 代码", "git-delta", "delta diff", "side-by-side diff", "PR review", "MR 审查", "合并前审查", "review 工作流", "code review workflow", "审查意见", "review comments", "合入门禁", "merge gate"]
 skill_id: "<SKILL:.specify/skills/internal/code-review/SKILL.md>"
+classification: internal
 ---
 
 # code-review

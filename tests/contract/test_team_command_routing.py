@@ -56,6 +56,15 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 TEAM_CMD = REPO_ROOT / "templates" / "commands" / "team.md"
 AGENTS_CMD = REPO_ROOT / "templates" / "commands" / "agents.md"
 
+# S3 command thinning: team.md keeps the three-mode routing table and the
+# goal-based-branch ENTRY (deterministic recognition + rejections); the branch
+# procedure behind the entry (slug derivation, territory verify, zero-write red
+# line) and the run execution details are owned by the create-team skill.
+CREATE_TEAM_SKILL = REPO_ROOT / "skills" / "internal" / "create-team"
+CREATE_MODE_REF = CREATE_TEAM_SKILL / "references" / "create-mode.md"
+GOAL_REF = CREATE_TEAM_SKILL / "references" / "goal.md"
+EXECUTION_GUIDE_REF = CREATE_TEAM_SKILL / "references" / "execution-guide.md"
+
 # Per-tool copy list is derived from the tree: the six assistant dirs the regen
 # script fans out to, filtered down to those that actually hold a copy today.
 _COPY_CANDIDATES = (
@@ -214,8 +223,12 @@ def test_signal_backed_goal_keeps_its_confidence(tmp_path):
 
 
 def test_goal_md_zero_write_red_line_is_stated():
-    """C-5 write confinement: the create branch never writes goal.md."""
-    text = _text()
+    """C-5 write confinement: the goal-based create branch never writes goal.md.
+
+    Branch-procedure content moved into the create-team skill at S3 (team.md's
+    entry delegates to it), so the red line is pinned at its new owner.
+    """
+    text = GOAL_REF.read_text(encoding="utf-8")
     assert "goal.md" in text, "goal.md write-face rule missing"
     assert "零写入" in text or "零写" in text, (
         "the create branch MUST declare zero writes to goal.md"
@@ -223,17 +236,24 @@ def test_goal_md_zero_write_red_line_is_stated():
 
 
 def test_team_slug_derivation_pattern_is_pinned():
-    """US3: derived team slugs live under `.specify/teams/<goal-slug>-t<nnn>`."""
-    text = _text()
+    """US3: derived team slugs live under `.specify/teams/<goal-slug>-t<nnn>`.
+
+    Owned by the skill's create-mode procedure since S3. The uniqueness check is
+    pinned as the `.specify/teams/` scope plus the uniqueness wording — the
+    pre-thinning literal `查重` was prose, not a machine identifier.
+    """
+    text = CREATE_MODE_REF.read_text(encoding="utf-8")
     assert "-t<nnn>" in text, "the <goal-slug>-t<nnn> derivation pattern missing"
-    assert "查重" in text, "slug uniqueness check against .specify/teams/ missing"
+    assert "uniqueness" in text, "slug uniqueness check missing"
+    assert ".specify/teams/" in text, "uniqueness scope (existing teams dir) missing"
 
 
 def test_territory_verify_script_is_named_and_mandatory():
-    """US3: the disjointness verifier below must actually be wired into the command."""
-    text = _text()
+    """US3: the disjointness verifier must actually be wired into the branch
+    procedure (skill-owned since S3), with the no-silent-overlap-landing rule."""
+    text = CREATE_MODE_REF.read_text(encoding="utf-8")
     assert "verify-territory-disjoint.py" in text, "the verify script must be named"
-    assert "静默落盘" in text, "the no-silent-overlap-landing rule missing"
+    assert "never silently land" in text, "the no-silent-overlap-landing rule missing"
 
 
 # --------------------------------------------------------------------------
@@ -411,15 +431,30 @@ def test_verdicts_match_direct_detect_overlaps(tmp_path):
 
 @pytest.mark.parametrize("path", PER_TOOL_COPIES, ids=lambda p: p.name)
 def test_per_tool_copies_carry_the_goal_based_branch(path):
+    """Entry face travels with every generated copy: the verbatim STR-003 error
+    prefix (team.md keeps it as the goal-based-branch entry). The four-element
+    analysis disclosure (`判据覆盖`) is branch-procedure content and moved into
+    the create-team skill at S3 — pinned at its new owner below."""
     assert path.is_file(), f"generated copy missing: {path}"
     text = path.read_text(encoding="utf-8")
     assert STR_GOAL_UNDEFINED in text, f"{path.name} lacks the STR-003 prefix"
-    assert "判据覆盖" in text, f"{path.name} lacks the analysis disclosure"
+
+
+def test_goal_based_branch_analysis_disclosure_is_pinned():
+    text = (CREATE_TEAM_SKILL / "SKILL.md").read_text(encoding="utf-8")
+    assert "判据覆盖" in text, "create-team SKILL.md lacks the analysis disclosure"
 
 
 @pytest.mark.parametrize("path", PER_TOOL_COPIES, ids=lambda p: p.name)
 def test_per_tool_copies_carry_target_validation(path):
+    """--target is entry face and stays on every generated copy; the `本次
+    Target:` disclosure form is run-execution detail owned by the create-team
+    execution guide since S3 — pinned at its new owner below."""
     assert path.is_file(), f"generated copy missing: {path}"
     text = path.read_text(encoding="utf-8")
     assert "--target" in text, f"{path.name} lacks --target content"
-    assert "本次 Target:" in text, f"{path.name} lacks the disclosure line"
+
+
+def test_target_disclosure_line_is_pinned():
+    text = EXECUTION_GUIDE_REF.read_text(encoding="utf-8")
+    assert "本次 Target:" in text, "execution guide lacks the disclosure line"

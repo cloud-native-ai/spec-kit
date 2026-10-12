@@ -3,6 +3,7 @@ name: improve-docs
 description: |
   This skill can improve an existing document in the project documentation space — correct inaccurate or stale content, close a completeness gap, restructure an unreadable page, repair broken links and anchors, fix content that breaks the site build, promote a matured note, or annotate a superseded decision — driven by reader feedback, review findings, and deterministic engine findings rather than taste. Use this when the user mentions ["improve docs", "improve documentation", "fix the doc", "update the doc", "doc is wrong", "doc is outdated", "documentation feedback", "doc quality", "rewrite this doc", "split this doc", "supersede decision", "annotate ADR", "改进文档", "优化文档", "修正文档", "文档过时", "文档不准确", "文档看不懂", "文档反馈", "文档质量", "补充文档", "拆分文档", "废弃决策", "笔记转正"]
 skill_id: "<SKILL:.specify/skills/improve-docs/SKILL.md>"
+classification: external
 ---
 
 # improve-docs
@@ -47,7 +48,7 @@ Prefer machine findings and quoted reader failures over impressions:
 ```bash
 python3 ${SKILL_HOME}/../create-docs/scripts/docs-utils.py --action validate --root .   # broken links, oversize root entry, ADR gaps, notes frontmatter
 python3 ${SKILL_HOME}/../create-docs/scripts/docs-utils.py --action scan --root .       # notes lifecycle state
-python3 ${SKILL_WORKDIR}/.specify/scripts/python/feedback-utils.py --action list --contains "<topic>"
+python3 ${SKILL_WORKDIR}/.specify/scripts/python/feedback-utils.py --action list --contains "<topic>"   # Spec Kit 项目模式专用（${SKILL_WORKDIR}/.specify/ 存在时）；standalone 部署跳过本行，用其余机器源与 Other admissible evidence 补位
 python3 ${SKILL_HOME}/../create-pages/scripts/scaffold-hugo.py --action build --root .   # only if a site layer exists — content that breaks rendering
 ```
 

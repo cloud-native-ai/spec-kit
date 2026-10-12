@@ -17,7 +17,7 @@ A four-tuple is **available** when ALL of the following are true:
 
 ## Dynamic Availability Matrix
 
-The script `${SKILL_HOME}/scripts/agent-setup.sh` computes availability at runtime by checking environment variables. The table below documents the expected availability under normal credential loading.
+The script `${SKILL_HOME}/scripts/config-agent.sh` computes availability at runtime by checking environment variables. The table below documents the expected availability under normal credential loading.
 
 ### idealab Availability
 

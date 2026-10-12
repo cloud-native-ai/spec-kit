@@ -48,8 +48,15 @@ UFC_DOC = ROOT / "shared" / "guidelines" / "user-facing-comprehension.md"
 TEAM_PATTERNS = ROOT / "skills" / "internal" / "create-team" / "references" / "patterns.md"
 CREATE_AGENT_SKILL = ROOT / "skills" / "internal" / "create-agent" / "SKILL.md"
 AGENTS_CMD = ROOT / "templates" / "commands" / "agents.md"
+# S3 re-point: the agents command's Run Mode / Default Behavior sections moved
+# verbatim into the run-agent skill (the command keeps entry + delegation).
+RUN_AGENT_SKILL = ROOT / "skills" / "internal" / "run-agent" / "SKILL.md"
 CONST_TPL = ROOT / "templates" / "constitution-template.md"
-CONST_CMD = ROOT / "templates" / "commands" / "constitution.md"
+# S3 re-point: the constitution command's mandatory-principles MUST-include
+# list moved into the manage-constitution skill (the command keeps entry +
+# delegation only); the command-side double-landing pins follow the content to
+# that new owner, in the same extraction form the double-landing guard uses.
+CONST_SKILL = ROOT / "skills" / "internal" / "manage-constitution" / "SKILL.md"
 CONST_LIVE = ROOT / ".specify" / "memory" / "constitution.md"
 PLAN_TPL = ROOT / "templates" / "plan-template.md"
 
@@ -602,15 +609,25 @@ HOUSE_LEAD_TAIL = "(do NOT copy its rules; reference the file) — and binds all
 
 # ambient-section.md C-16's closed enumeration, located BY FILENAME (never by
 # line number -- inserting a line silently shifts every number below it). Each
-# value is a fragment of that file's own pre-existing behaviour text, so the
-# guard can tell "only a pointer was added" from "the body was rewritten".
+# value is a fragment of that file's own behaviour text, so the guard can tell
+# "only a pointer was added" from "the body was rewritten".
+#
+# S3 command-thinning re-point: the executable bodies of the thinned commands
+# moved into ``skills/internal/<name>/SKILL.md`` and the fast-fail instance
+# pointer moved with them, so the enumeration follows the behaviour text's new
+# home (per-SKILL pins for implement / todo / clarify / interview). analyze
+# keeps its command-side pin -- the prerequisite-abort duty belongs to the
+# command-owned ``{SCRIPT}`` entry run and was restored into the thin template
+# together with the pointer blockquote. docs stays command-side too: its
+# dispatch-tail rule never left the command (fragment re-pinned to the current
+# in-place wording after the S3 rewrite).
 INSTANCE_POINTS = {
-    "templates/commands/implement.md": "Writability pre-probe",
-    "templates/commands/todo.md": "Scanner exit code",
+    "skills/internal/implement-feature/SKILL.md": "Writability pre-probe",
+    "skills/internal/manage-todo/SKILL.md": "Scanner exit code",
     "templates/commands/analyze.md": "Abort with an error message if any required file is missing",
-    "templates/commands/docs.md": "MUST NOT truncate or silently defer the tail",
-    "templates/commands/clarify.md": "If no `requirements.md` at all",
-    "templates/commands/interview.md": "Surface conflicts; never resolve them silently",
+    "templates/commands/docs.md": "No per-run cap, no truncation of the tail",
+    "skills/internal/clarify-artifact/SKILL.md": "If no `requirements.md` at all",
+    "skills/internal/run-interview/SKILL.md": "Surface conflicts; never resolve them silently",
     "skills/internal/create-team/references/create-mode.md": "MUST NOT silently degrade to inline goal creation",
     "skills/external/draw-diagram/SKILL.md": "静默降级",
 }
@@ -937,11 +954,11 @@ def test_x1_template_principle_xiv():
 
 
 def test_x2_command_must_include_entry():
-    """C-2: the command's MUST-include list carries the same title."""
-    text = _text(CONST_CMD)
-    needle = f'**MUST include** a principle for "{PRINCIPLE_TITLE}"'
+    """C-2: the generator skill's MUST-include list carries the same title."""
+    text = _text(CONST_SKILL)
+    needle = f"- **{PRINCIPLE_TITLE}** —"
     assert text.count(needle) == 1, (
-        f"C-2: the MUST-include entry appears {text.count(needle)}x in {CONST_CMD.relative_to(ROOT)}"
+        f"C-2: the MUST-include entry appears {text.count(needle)}x in {CONST_SKILL.relative_to(ROOT)}"
     )
 
 
@@ -952,14 +969,17 @@ def test_x3_double_landing_neither_side_missing():
     tests/contract/test_constitution_double_landing.py, which already probes the
     watchlist (its DOUBLE_LANDING_WATCHLIST gains this title in T023). Restating
     the drill here would make two owners of one proposition.
+
+    S3 re-point: the command side of the double landing is now the generator
+    skill's mandatory-principles list (the command keeps entry + delegation).
     """
-    tpl, cmd = _text(CONST_TPL), _text(CONST_CMD)
+    tpl, skill = _text(CONST_TPL), _text(CONST_SKILL)
     assert PRINCIPLE_TITLE in tpl, "C-3: the template side is missing the title"
-    assert PRINCIPLE_TITLE in cmd, "C-3: the command side is missing the title"
+    assert PRINCIPLE_TITLE in skill, "C-3: the skill side is missing the title"
     # the two occurrences must be the SAME string, not two near-misses
     tpl_titles = set(PRINCIPLE_RE.findall(tpl))
     assert any(title == PRINCIPLE_TITLE for _num, title in tpl_titles), (
-        "C-3: the template heading title does not match the command entry title verbatim"
+        "C-3: the template heading title does not match the skill entry title verbatim"
     )
 
 
@@ -1085,9 +1105,12 @@ def test_x13_double_landing_three_count_pins():
     # and the counts are true of the artifacts, not just of the pins
     assert len(PRINCIPLE_RE.findall(_text(CONST_TPL))) == 14, "C-13: the template does not actually hold 14"
     assert len(PRINCIPLE_RE.findall(_text(CONST_LIVE))) == 16, "C-13: the live constitution does not hold 16"
-    assert len(re.findall(r'\*\*MUST include\*\* a principle for "([^"]+)"', _text(CONST_CMD))) == 8, (
-        "C-13: the command list does not actually hold 8 entries"
-    )
+    # S3 re-point: the command list became the generator skill's MUST-include
+    # sub-entry block (same block extraction the double-landing guard uses).
+    m = re.search(r"^- \*\*MUST include\*\*.*?(?=^- )", _text(CONST_SKILL), re.M | re.S)
+    assert m, "C-13: the skill lost its `- **MUST include**` mandatory-principles block"
+    entries = re.findall(r"^  - \*\*(.+?)\*\* —", m.group(0), re.M)
+    assert len(entries) == 8, "C-13: the skill's MUST-include list does not actually hold 8 entries"
 
 
 def test_x14_min_version_floor_semantics():
@@ -1353,8 +1376,14 @@ def test_i7_clause_size_and_hits_anti_vacuity_sentinels():
 
 
 def test_i8_channel_two_command_authoring_requirement():
-    """C-8: the agents command's Run Mode carries an injection duty; its prior text is intact."""
-    text = _text(AGENTS_CMD)
+    """C-8: the run-agent skill's Run Mode carries an injection duty; its prior text is intact.
+
+    S3 re-point: the agents command's Run Mode section moved verbatim into the
+    run-agent skill (``Canonical extraction source: templates/commands/agents.md
+    § Run Mode``); the command keeps entry + delegation only, so the pin follows
+    the section to its new owner.
+    """
+    text = _text(RUN_AGENT_SKILL)
     lines = text.splitlines()
     assert "### Run Mode (subagent dispatch)" in lines, "C-8: the Run Mode section is gone"
     i = lines.index("### Run Mode (subagent dispatch)")

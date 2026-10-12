@@ -41,7 +41,10 @@ def test_template_git_workflow_section_is_a_pointer():
 
 @pytest.mark.contract
 def test_instructions_command_owns_the_migration_path():
-    text = INSTRUCTIONS_CMD.read_text(encoding="utf-8")
+    # S3 command thinning moved the instructions command's executable body (scope zones,
+    # actions, migration steps) into the manage-instructions skill; the migration-path
+    # ownership guard follows the content.
+    text = (REPO_ROOT / "skills" / "internal" / "manage-instructions" / "SKILL.md").read_text(encoding="utf-8")
     assert "docs/git-workflow.md" in text, "scope zones must name the state file"
     assert "git-workspace` skill" in text, "the state file's owner must be named"
     assert "MUST NOT be lost" in text, \

@@ -379,9 +379,12 @@ def test_c4_shared_implementation_with_the_requirements_validator_is_declared():
         "the shared implementation is not named — a declaration without a file to point at is "
         "the future-tense form this test exists to prevent"
     )
-    command = (ROOT / "templates" / "commands" / "requirements.md").read_text(encoding="utf-8")
-    assert "validate-requirements.py" in command, (
-        "the partner command does not invoke the checker, so the two are not actually sharing"
+    # S3 command thinning: the requirements command's executable body (including the
+    # checker invocation) moved into the create-requirements skill.
+    skill = (ROOT / "skills" / "internal" / "create-requirements" / "SKILL.md").read_text(encoding="utf-8")
+    assert "validate-requirements.py" in skill, (
+        "the partner command's execution body (create-requirements skill) does not invoke "
+        "the checker, so the two are not actually sharing"
     )
 
 

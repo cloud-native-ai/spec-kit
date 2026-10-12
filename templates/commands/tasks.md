@@ -34,204 +34,26 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 - **Before acting on the user input**, map any recorded homophone/confusable variant to its canonical term (correcting voice/dictated input); surface each correction so the user can override it, and defer to the user on ambiguous variants.
 - **At wrap-up**, propose any new project-specific terms (`origin=auto`, `status=proposed`), excluding common words; run conflict detection; non-conflicting new terms MUST be written directly and merged into the wrap-up report (non-blocking); only writes that conflict with or overwrite an existing user entry MUST still pause for user confirmation. User-authored entries are authoritative.
 
-## Outline
+## Delegation
 
-1. **Setup**: Run `{SCRIPT}` from repo root and parse REQUIREMENTS_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+`/speckit.tasks` delegates the entire generation to the `create-tasks` skill — the command captures entry context and lifecycle; the skill owns Outline steps 1–6 and the Task Generation Rules. One sentence of intent: turn the feature's design artifacts into an immediately executable, dependency-ordered `tasks.md`.
 
-2. **Load design documents**: Read from REQUIREMENTS_DIR:
-   - **Required**: plan.md (tech stack, libraries, structure), requirements.md (user stories with priorities)
-   - **Optional**: data-model.md (entities), contracts/ (API endpoints), research.md (decisions), quickstart.md (test scenarios)
-   - Note: Not all projects have all documents. Generate tasks based on what's available.
+**Skill**: `create-tasks` — runtime path `.specify/skills/internal/create-tasks/SKILL.md`; special phase shapes (asset-migration / doc-feature): `.specify/skills/internal/create-tasks/references/phase-shapes.md`.
 
-3. **Generate task list workflow**:
-   - **Analyze $ARGUMENTS input type**: Determine if input contains background context, task outline, or additional task items
-   - Load plan.md and extract tech stack, libraries, project structure
-   - Load requirements.md and extract user stories with their priorities (P1, P2, P3, etc.)
-   - If data-model.md exists: Extract entities and map to user stories
-   - If contracts/ exists: Map endpoints to user stories
-   - If research.md exists: Extract decisions for setup tasks
-   - **Integrate $ARGUMENTS content**: 
-     - For background info: Apply as contextual constraints in task generation
-     - For task outlines: Use as primary organizational structure
-     - For additional tasks: Parse, standardize, and merge into appropriate phases
-   - Generate tasks organized by user story (see Task Generation Rules below)
-   - Generate dependency graph showing user story completion order
-   - Create parallel execution examples per user story
-   - Validate task completeness (each user story has all needed tasks, independently testable)
-   - Validate story-label placement mechanically: every task row inside a User Story phase carries exactly one `[US*]` label, and NON-story phases (Setup / Foundational / Polish) carry ZERO `[US` markers — placeholder labels like `[US-none]` are format violations (enforced by the structural validator in step 5; do not rely on remembering the rule)
+**Inputs** (command-provided):
 
-4. **Generate tasks.md**: Use `.specify/templates/tasks-template.md` as structure, fill with:
-   - Correct feature name from plan.md
-   - Phase 1: Setup tasks (project initialization)
-   - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
-   - Phase 3+: One phase per user story (in priority order from requirements.md)
-   - Each phase includes: story goal, independent test criteria, tests (if requested), implementation tasks
-   - Final Phase: Polish & cross-cutting concerns
-   - All tasks must follow the strict checklist format (see Task Generation Rules below)
-   - Clear file paths for each task
-   - Dependencies section showing story completion order
-   - Parallel execution examples per story
-   - Implementation strategy section (MVP first, incremental delivery)
+- `{SCRIPT}` prerequisite run from repo root → `REQUIREMENTS_DIR` and `AVAILABLE_DOCS` (all paths absolute).
+- `$ARGUMENTS` (already processed above) — the skill re-classifies it as background info / task outline / additional task entries and applies the matching integration strategy.
+- Design artifacts in `REQUIREMENTS_DIR`: plan.md + requirements.md (required); data-model.md, contracts/, research.md, quickstart.md (optional — generate from what is available).
 
-5. **Mechanical structural validation (program-first — see `.specify/shared/guidelines/token-efficiency.md`)**: run `python3 .specify/scripts/python/validate-tasks.py <path-to-generated-tasks.md>` on the written file (also valid on rerun against an existing tasks.md). The validator owns the fixed structural rules — task-row single-line contract, ID uniqueness, `blockedBy` resolvability, `[P]` parallel safety (two parallel tasks **writing** the same file; a task that only points at a file is not a write target), story-label placement, and the DoD format rule (`## Definition of Done` uses ONLY the `- DoD-N:` prefix; no line in that section may match `^\- \[[ xX~]\]` checkbox syntax) — never hand-roll these checks per run. Fix every ERROR (including rewriting any checkbox-formatted DoD items with the `- DoD-N:` prefix) and re-run until exit 0; resolve or explicitly justify each WARN in the report. Adjudicate every `parallel-safe` WARN **by the rows' actual write targets** — the machine classifies pointer targets heuristically, so the verdict is yours: two rows that only read or cite the same file are not a conflict, and two rows that both write it are, whatever the prose says. MUST NOT silence a WARN by deleting the referenced path from a row's text — that removes the evidence of the conflict without removing the conflict, and leaves the row without the file path the format rule requires.
+**Outputs** (skill-owned):
 
-6. **Report**: Output path to generated tasks.md and summary:
-   - Total task count
-   - Task count per user story
-   - Parallel opportunities identified
-   - Independent test criteria for each story
-   - Suggested MVP scope (typically just User Story 1)
-   - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
-   - Structural validator status: final `validate-tasks.py` verdict (exit code, error/warning counts, justification for any remaining WARN)
+- A dependency-ordered `tasks.md` filled from `.specify/templates/tasks-template.md`: organized by user story, Constitution-driven tests-mode banner, strict checklist format, runtime-evidence notes at their fixed landing points.
+- Mechanical structural validation: `python3 .specify/scripts/python/validate-tasks.py <path-to-generated-tasks.md>` run on the written file until exit 0 (the invocation instruction stays in the skill; fix every ERROR, adjudicate each WARN).
+- The run report: total/per-story task counts, parallel opportunities, independent test criteria, MVP scope, and the final validator verdict.
+- Feature-list review per the Feature Integration Protocol (the tasks phase MUST review the Feature list — new or invalidated features update `.specify/memory/features.md` and detail files synchronously).
 
-Context for task generation: 
-- Design documents from REQUIREMENTS_DIR: {AVAILABLE_DOCS}
-- User input analysis result: {ARGUMENTS_ANALYSIS_RESULT}
-- Input type handling strategy: {INPUT_HANDLING_STRATEGY}
-
-The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context. When $ARGUMENTS contains additional task items, ensure they are properly integrated with correct formatting, sequential IDs, and appropriate story labels.
-
-## Feature Integration
-
-Apply [Feature Integration Protocol](shared/workflow/feature-integration.md). This command maintains status from planning phase. Additionally, **the tasks phase MUST review the Feature list** — task breakdown may expose new Features or invalidate old ones. Update `.specify/memory/features.md` and detail files synchronously if changes are discovered.
-
-## Task Generation Rules
-
-**CRITICAL**: Tasks MUST be organized by user story to enable independent implementation and testing.
-
-**Tests are Constitution-driven (NOT a fixed default)**: Before generating tasks, detect test-mandating principles **deterministically** (token-efficiency program-first — see `.specify/shared/guidelines/token-efficiency.md`): run `grep -nE 'MUST|MANDATORY|NON-NEGOTIABLE|Test-First|TDD|Contract-Driven' .specify/memory/constitution.md` and consume only the matched principle headings/lines — do NOT read the whole constitution into context for this keyword check.
-
-- **Tests default ON** if any such principle exists, OR if the feature specification / `$ARGUMENTS` explicitly requests TDD. In ON mode you MUST emit test tasks (contract, unit, integration as applicable) per user story BEFORE the corresponding implementation tasks. If the constitution defines distinct testing layers (e.g. Layer-1 generator unit tests + Layer-2 build/smoke validation), emit tasks for EVERY layer it mandates.
-  - **Migration/regression exception**: tests that port or guard *existing* behavior (migrated suites, regression nets) can only go green after the consumer code they exercise has been updated — place such a test task AFTER its implementation task with an explicit `[blockedBy: T<impl>]` tag. Only new-behavior contract tests are strictly red-first. This resolves the otherwise-contradictory "tests precede implementation" vs "Task ID sequential in execution order" pairing for migration scenarios.
-- **Tests default OFF** only when no test-mandating principle is found AND the spec is silent on TDD.
-
-At the top of the generated `tasks.md`, you MUST print a one-line banner declaring which mode was chosen and cite the constitution principle (or absence thereof) that drove the decision. Example:
-
-```text
-**Tests Mode**: ON (Constitution Principle IV "Test-First Development" is NON-NEGOTIABLE; Layer-1 unit + Layer-2 validation required)
-```
-
-or
-
-```text
-**Tests Mode**: OFF (constitution.md declares no test-mandating principle; spec did not request TDD)
-```
-
-**Template-only / doc-feature gate**: if the constitution (or plan.md's Constitution Check) carries a *template-only features* principle (e.g. a Principle VII-style rule that template/prompt/doc artifacts are governed by structural contract tests rather than runtime tests), cite THAT gate in the banner and emit **structural contract tests** (content/heading/mirror-parity assertions on the artifact) — not unit/integration tests, which have nothing to run against. Do not re-derive this from feature history each run.
-
-### Environment Prerequisites (probe at generation time)
-
-When any generated task depends on an external environment (docker daemon, network-pullable images, a live cluster, special hardware):
-
-1. **Probe availability now**: check each required environment during task generation (e.g. `docker info`, a registry pull check) instead of letting `/speckit.implement` discover the gap mid-run. Probe results are NEVER cached across sessions or runs — re-probe on every generation and every rerun.
-2. **Single landing point**: record every probe conclusion exactly ONCE, in the generated tasks.md's `## Environment Prerequisites` section (see `.specify/templates/tasks-template.md`). Per-phase prerequisites and `[~]` task notes MUST reference that section instead of restating verdicts — two hand-synced copies of the same conclusion drift apart.
-3. **Pre-validate named targets**: any concrete build/smoke target named in a task MUST have a locally satisfiable dependency chain (base images pullable, toolchain present). If unsatisfiable, either substitute a satisfiable target up front or pre-flag the task `[~]`-eligible in Notes with the substitution guidance.
-4. **Cross-artifact drift check**: after probing, grep this feature's sibling artifacts for environment assertions; any stale claim contradicting the fresh probe result MUST be corrected or flagged in the same run, so artifacts never disagree about the environment.
-
-### Rerun contract (tasks.md already exists)
-
-Regenerating over an existing tasks.md is destructive; a rerun is a **validate-and-amend** pass instead. Keep existing task IDs stable — never renumber (dependency graphs, feature records, and run history cite those IDs); drive incremental corrections from the step-5 structural validator and fresh premise/environment re-measurement; and append genuinely new work as new IDs at the end, mirroring `/speckit.implement`'s "Append tasks, never renumber" precedent. Regenerate from scratch only on explicit user request.
-
-### Premise verification (all task rows)
-
-Factual premises embedded in ANY task row — file existence, counts, "fill/extend existing file X", "diff against pre-change output" — are governed by the **Inherited premises** bullet of `.specify/instructions.md` § "Fact, Correctness & Logic Checks (Input Sanity)": they are hypotheses to re-measure at generation time, for every task type, not only rows that author tests. A row whose premise is a count carries the reproducible re-derivation command. **That command MUST be actually run at generation time, with its real output pasted next to the count it yields** — a printed re-derivation command that was never executed is a claim, not a measurement, and it is exactly the route by which a wrong number enters `tasks.md` and is then inherited as fact by every downstream row. **When a more naive form of the same measurement would return a different answer, write the trap form down too**: name the naive variant alongside the number it yields, so a reader can tell the measurement was taken deliberately rather than by luck. Two recurring trap shapes: counting the *lines* that match a pattern when the unit is an *occurrence* (a wrapped row makes the two disagree — the same defect step 5's row-format rule reports), and comparing *positions* in an artifact a generator is free to reorder (a paired +1/−1 positional delta is a reordering, not a regression). The Pin Hygiene rules below are the test-authoring specialization of this same duty.
-
-### Pin Hygiene (test-authoring rule)
-
-Tasks that author or modify tests MUST follow pin-hygiene so the project's own next increment does not break its own contracts:
-
-1. **Version pins use floor semantics**: assert `parsed >= (MAJOR, MINOR)`, never `startswith("X.Y")` — a later legitimate bump must not fail an unrelated contract.
-2. **Surface-file lists must be real**: every file path listed in a test fixture/surface list MUST be existence-checked at authoring time (or the list derived from the tree); a phantom entry turns the whole test into a permanent FileNotFoundError.
-3. **Counts are contracts, not conveniences**: hard-code a count only when the count itself is the contract (then update it in the same task that changes the population); otherwise derive it with `len(...)` from a glob.
-
-### Checklist Format (REQUIRED)
-
-Every task MUST strictly follow this format:
-
-```text
-- [ ] [TaskID] [P?] [Story?] Description with file path
-```
-
-**One line per task (mechanical-validation contract)**: the ENTIRE task row — checkbox, ID, labels, description, and file path — MUST stay on a single line. Format validators and downstream tooling inspect only the row's first line; wrapping the description or the file path onto a continuation line makes the path invisible to the gate and forces manual re-verification.
-
-**Format Components**:
-
-1. **Checkbox**: ALWAYS start with `- [ ]` (markdown checkbox)
-2. **Task ID**: Sequential number (T001, T002, T003...) in execution order
-3. **[P] marker**: Include ONLY if task is parallelizable (different files, no dependencies on incomplete tasks)
-4. **[Story] label**: REQUIRED for user story phase tasks only
-   - Format: [US1], [US2], [US3], etc. (maps to user stories from requirements.md)
-   - Setup phase: NO story label
-   - Foundational phase: NO story label  
-   - User Story phases: MUST have story label
-   - Polish phase: NO story label
-5. **Description**: Clear action with exact file path
-6. **[blockedBy: Txxx,Tyyy] tag**: REQUIRED whenever a task depends on specific earlier tasks (derived from plan/data-model/contract dependencies). Use the tag, not prose ("depends on T012") — `/speckit.implement` orders execution topologically from these tags and refuses to start a task whose blockers are not `[X]`. Omit the tag when only phase order applies.
-
-**Examples**:
-
-- ✅ CORRECT: `- [ ] T001 Create project structure per implementation plan`
-- ✅ CORRECT: `- [ ] T005 [P] Implement authentication middleware in src/middleware/auth.py`
-- ✅ CORRECT: `- [ ] T012 [P] [US1] Create User model in src/models/user.py`
-- ✅ CORRECT: `- [ ] T014 [US1] Implement UserService in src/services/user_service.py`
-- ❌ WRONG: `- [ ] Create User model` (missing ID and Story label)
-- ❌ WRONG: `T001 [US1] Create model` (missing checkbox)
-- ❌ WRONG: `- [ ] [US1] Create User model` (missing Task ID)
-- ❌ WRONG: `- [ ] T001 [US1] Create model` (missing file path)
-
-### Task Organization
-
-1. **From User Stories (requirements.md)** - PRIMARY ORGANIZATION:
-   - Each user story (P1, P2, P3...) gets its own phase
-   - Map all related components to their story:
-     - Models needed for that story
-     - Services needed for that story
-     - Endpoints/UI needed for that story
-     - If tests requested: Tests specific to that story
-   - Mark story dependencies (most stories should be independent)
-
-2. **From Contracts**:
-   - Map each contract/endpoint → to the user story it serves
-   - If tests requested: Each contract → contract test task [P] before implementation in that story's phase
-   - Prefer one test file per contract document rather than per story: when multiple stories append to a single shared test file, [P] parallel markers become invalid and stories serialize on that file
-   - **When one test file is legitimately claimed by verification tasks in more than one phase** (one contract document whose clauses span several stories, so a single test file is correct), the two rules above are not sufficient: partition that file's clause ranges across the verification rows so each row names the clauses it is responsible for turning green, or assign the file to a single phase and have later rows reference it read-only. Otherwise two rows demand the same file be "all green" at different times and the pair is unsatisfiable in the prescribed order — the executor is left either ticking a row against a partially-green file or overriding the schedule. Declare the partition with the `[green: <contract>#<clause>]` attribution tag (defined in `.specify/templates/tasks-template.md` § Format) and let the validator judge it: its `green-path-divergence` check flags any test path appearing in two verification rows with different green points, so this is one machine criterion and MUST NOT also be carried as a second, hand-run one.
-
-3. **From Data Model**:
-   - Map each entity to the user story(ies) that need it
-   - If entity serves multiple stories: Put in earliest story or Setup phase
-   - Relationships → service layer tasks in appropriate story phase
-
-4. **From Setup/Infrastructure**:
-   - Shared infrastructure → Setup phase (Phase 1)
-   - Foundational/blocking tasks → Foundational phase (Phase 2)
-   - Story-specific setup → within that story's phase
-
-### Phase Structure
-
-- **Phase 1**: Setup (project initialization)
-- **Phase 2**: Foundational (blocking prerequisites - MUST complete before user stories)
-- **Phase 3+**: User Stories in priority order (P1, P2, P3...)
-  - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
-  - Each phase should be a complete, independently testable increment
-- **Final Phase**: Polish & Cross-Cutting Concerns
-
-**Runtime-evidence landing points (Setup / Foundational rows — fixed, never re-invented per run)**: run-time evidence produced by a Setup or Foundational row lands at a fixed path. Without a written landing point each tasks round imitates a neighbouring spec and each implement round has to guess where the previous phase put the file:
-
-- **Failing-test baseline name list** — its path, its capture flag, and its name-level comparison form are owned by `/speckit.implement` step 6's `**Test runs**` bullet (`templates/commands/implement.md`). MUST NOT be restated, re-derived, or given a second path here; a Setup/Foundational row that captures or consumes that baseline points at that owner.
-- `<spec-dir>/notes/red-first-evidence.md` — for every test that MUST go red before its subject exists: the command, its real output, and its exit status.
-- `<spec-dir>/notes/quickstart-run.md` — the real output of actually running this feature's `quickstart.md` scenario, its teardown steps included.
-- `<spec-dir>/notes/pre-change-measurements.md` — the pre-change side of every "diff against pre-change output" premise: the measured value, the command that produced it, and the capture date.
-
-Create `notes/` in Phase 1 (Setup) so that Phase 2 (Foundational) rows already have somewhere to write. **Re-freeze timing**: these files are frozen measurements, so they inherit the never-cache rule the Environment Prerequisites probes above already state — re-capture on every generation and every rerun of this command, and re-capture at the start of `/speckit.implement` whenever the tree has advanced since generation. A row whose re-capture yields a different value carries the new value; MUST NOT keep citing the stale frozen one.
-
-**Asset-migration phase shape (porting/vendoring an external code subset)**: when a spec copies an external codebase subset in as a hosted asset, split the copy from its acceptance: the **physical copy + static dependency-closure check** is Foundational (Phase 2 — it blocks everything), while **governance artifacts** (provenance ledger, license, ported regression tests, mirrors) belong to the user story that owns the asset. Two standard acceptance actions for the copy task: (1) grep-assert every import resolves to the runtime's builtins or inside the subset; (2) **actually resolve all entry modules with the runtime** (e.g. `node -e "await import(...)"` per entry) — checklist-driven copying misses transitive dependencies that only real module resolution exposes.
-
-**Doc-feature phase shape (template-only / documentation / prompt-framework specs)**: when the spec's deliverables are templates, docs, prompts, or skills rather than runtime code, "Models → Services → Endpoints" does not apply — do not force it. Switch the within-story order to the doc-feature taxonomy:
-1. **author-section** — write/edit the template or document section itself
-2. **mirror-parity** — every row of plan.md's *Mirror Obligations* table MUST be covered by an explicit write task and an explicit verify task: rows that share one fan-out command (e.g. a single `sync-mirrors.py --write`) MAY share the write task (one per phase, not one per row), but each verify task MUST enumerate the rows it covers (`diff -q` for mirrors; grep-for-the-edit for regenerated per-tool copies). Mirror pairs are first-class tasks, never implicit side-effects of the authoring task.
-3. **render-verify** — actually render/execute the artifact (render the diagram, run the template through its consumer) and inspect the output
-4. **refresh-verify** — re-run the artifact's refresh/regeneration path to confirm repeatability
-The app-shaped examples in the tasks template are illustrative, not mandatory; pick the taxonomy that matches the spec's actual deliverables.
+Run the skill's Workflow as written; it also owns the rerun **validate-and-amend** contract when tasks.md already exists (never renumber; regenerate from scratch only on explicit user request).
 
 ## Feedback
 

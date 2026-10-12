@@ -10,8 +10,9 @@ Installs that predate the layer carry these same skills FLAT at
   * move ONLY the enumerated framework-owned internal names (flat -> nested);
   * never touch external framework skills (they stay flat);
   * never touch user-authored skills (red line);
-  * never delete anything — when the nested target already exists the flat copy is
-    KEPT in place and counted, so a supervisor reclaim pass can retire it.
+  * when the nested target already exists, the flat copy is a stale framework
+    duplicate: it is REMOVED and counted as ``removed_stale`` (the nested copy
+    is never overwritten; an OSError degrades to the legacy ``kept`` counter).
 """
 
 from pathlib import Path
@@ -61,27 +62,27 @@ def test_moves_flat_internal_leaves_external_and_user(tmp_path):
 
 
 @pytest.mark.contract
-def test_keeps_flat_when_nested_target_exists(tmp_path):
-    """Flat internal with an existing nested target is kept (never overwritten) + counted."""
+def test_removes_stale_flat_when_nested_target_exists(tmp_path):
+    """Flat internal duplicate of an existing nested target is REMOVED, not kept."""
     skills = tmp_path / ".specify" / "skills"
     # Flat pre-layering copy ...
     _write(skills / "create-team" / "SKILL.md", "# flat create-team\n")
-    # ... and the nested target already present (e.g. this run's copy step laid it)
+    # ... and the nested target already present (e.g. a prior layered install
+    # left one behind)
     _write(skills / "internal" / "create-team" / "SKILL.md", "# nested create-team\n")
 
     result = migrate_flat_internal_skills(tmp_path)
 
-    # Flat copy left in place; nested copy untouched (no overwrite, no delete)
-    assert (skills / "create-team" / "SKILL.md").read_text(
-        encoding="utf-8"
-    ) == "# flat create-team\n"
+    # Stale flat duplicate removed; nested copy intact (never overwritten)
+    assert not (skills / "create-team").exists()
     assert (skills / "internal" / "create-team" / "SKILL.md").read_text(
         encoding="utf-8"
     ) == "# nested create-team\n"
-    # Counted as kept, not moved
-    assert any("create-team" in p for p in result["kept"])
-    assert len(result["kept"]) == 1
+    # Counted as removed_stale, not moved
+    assert any("create-team" in p for p in result["removed_stale"])
+    assert len(result["removed_stale"]) == 1
     assert result["moved"] == []
+    assert result["kept"] == []
 
 
 @pytest.mark.contract
@@ -124,7 +125,7 @@ def test_no_skills_dir_is_noop(tmp_path):
     """A project without .specify/skills/ must not error or create empty dirs."""
     result = migrate_flat_internal_skills(tmp_path)
 
-    assert result == {"moved": [], "kept": []}
+    assert result == {"moved": [], "kept": [], "removed_stale": []}
     # Nothing to migrate -> no empty nested dir is conjured into existence
     assert not (tmp_path / ".specify" / "skills" / "internal").exists()
 

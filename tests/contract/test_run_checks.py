@@ -40,6 +40,7 @@ TEAM_CMD = ROOT / "templates" / "commands" / "team.md"
 TEAM_DOC = ROOT / "docs" / "reference" / "commands" / "team.md"
 EXEC_GUIDE = ROOT / "skills" / "internal" / "create-team" / "references" / "execution-guide.md"
 GOAL_GUIDE = ROOT / "skills" / "internal" / "create-team" / "references" / "goal.md"
+CREATE_MODE = ROOT / "skills" / "internal" / "create-team" / "references" / "create-mode.md"
 TOOL_RECORD = ROOT / ".specify" / "memory" / "tools" / "goal-utils.py.md"
 QUICKSTART_RUN = (
     ROOT / ".specify" / "specs" / "053-machine-decidable-artifacts" / "notes"
@@ -288,9 +289,12 @@ def test_c3_a_call_writes_no_byte_of_the_goal_or_team_trees(tmp_path):
                  ("run-checks", "nope")):
         _run(root, *args)
     assert _checksum(root) == before, "run-checks modified .specify/goal/ or .specify/teams/"
-    # and on the REAL tree, read-only paths only (C-28's fallback evidence form)
+    # and on the REAL tree, read-only paths only (C-28's fallback evidence form). No exit
+    # expectation here: the real goal draw-two-layer-structure was deliberately closed
+    # (`achieved`), so the run now legitimately blocks (5) — the measured state is pinned
+    # by test_the_real_bound_team_reports_the_measured_state. C-3's subject is the bytes.
     real_before = _checksum(ROOT)
-    _run(ROOT, "run-checks", REAL_TEAM_BOUND, expect=0)
+    _run(ROOT, "run-checks", REAL_TEAM_BOUND)
     assert _checksum(ROOT) == real_before, "a run against the real tree wrote something"
 
 
@@ -602,20 +606,27 @@ def test_c19_one_code_never_means_two_things_across_actions():
 
 
 def test_c20_the_existing_zero_and_two_branches_still_hold(tmp_path):
-    text = TEAM_CMD.read_text(encoding="utf-8")
-    for needle in ("MUST 已通过(exit 0)", "MUST NOT 以 exit-2 状态进入批准呈现",
-                   "exit 2 的拒绝被**原样上报**"):
+    # S3 thinning moved team.md's goal-based create branch into create-team's create-mode
+    # reference; the dry-run gate's 0/2 branch semantics are pinned at that new owner so
+    # C-17's code choices stay compatible with their documented caller.
+    text = CREATE_MODE.read_text(encoding="utf-8")
+    for needle in ("MUST pass (exit 0) before it is presented",
+                   "exit-2 rejection is reported verbatim",
+                   "never bypass the engine"):
         assert needle in text, (
-            f"team.md's dry-run gate branches on 0 and 2; the branch text moved or was "
+            f"the dry-run gate branches on 0 and 2; the branch text moved or was "
             f"rewritten, so C-17's code choices would no longer be compatible: {needle!r}"
         )
     mod = _load()
     assert mod.EXIT_OK == 0 and mod.EXIT_INPUT_ERROR == 2, (
         "the meanings of 0 and 2 must be untouched for the existing caller"
     )
-    # behaviorally, on the real read-only dry-run path
+    # behaviorally, on the real read-only dry-run path. The old probe goal
+    # (draw-two-layer-structure) was deliberately closed (`achieved`), and a terminal goal
+    # refuses the dry run with the INVALID tier (4), so the live 0/2 probe targets the one
+    # still-active real goal; 0 = candidate accepted, 2 = rejected verbatim.
     root = ROOT
-    good = _run(root, "targets", REAL_GOAL, "--check", "T-001")
+    good = _run(root, "targets", "command-logic-as-classified-skills", "--check", "T-001")
     assert good.returncode in (0, 2), good.returncode
 
 
@@ -806,15 +817,21 @@ def test_the_composed_verdict_agrees_with_preview_target_check(tmp_path):
 
 def test_the_real_bound_team_reports_the_measured_state():
     """A real-tree run, read-only, asserting only what was measured — never a fabricated
-    verdict. The single real goal is `active` with three `dropped` Targets, so:
-    no target -> all evaluated checks ok; a dropped Target -> target-terminal and blocked.
+    verdict. The real goal draw-two-layer-structure was deliberately closed (`achieved`;
+    T-001 done, T-002/T-003 dropped — see the 2026-10-12 goal-close commit), so the
+    goal-terminal check now blocks every run against it: no target -> goal-terminal and
+    blocked; a done Target -> target-terminal on top; the unbound team stays unblocked,
+    because no goal definition blocks only when a --target is specified.
     """
-    p = _checks(ROOT, "run-checks", REAL_TEAM_BOUND, expect=0)
+    p = _checks(ROOT, "run-checks", REAL_TEAM_BOUND, expect=5)
     assert p["goal_slug"] == REAL_GOAL and p["identity_kind"] == "explicit"
     assert p["resolution"]["source"] == "none"
     got = _by_name(p)
     assert got["goal-binding"]["verdict"] == "ok"
-    assert got["goal-terminal"]["verdict"] == "ok", "the real goal is `active`, not terminal"
+    assert got["goal-terminal"]["verdict"] == "goal-terminal", (
+        "the real goal is `achieved`, a terminal state, so the check must fire"
+    )
+    assert p["blocked"] is True
 
     blocked = _checks(ROOT, "run-checks", REAL_TEAM_BOUND, "--target", "T-001", expect=5)
     assert _by_name(blocked)["target-terminal"]["verdict"] == "target-terminal"

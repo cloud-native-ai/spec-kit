@@ -2,6 +2,7 @@
 name: improve-skills
 description: This skill continuously improves one local Skill from a user-provided Skill description, execution history, user feedback, failure cases, and observed inefficiencies. Use this when the user mentions ["improve skills after use", "skill execution feedback", "refine SKILL.md", "skill retrospective", "skill iteration", "技能执行反馈", "基于执行问题优化skill", "持续改进Skill"]
 skill_id: "<SKILL:.specify/skills/improve-skills/SKILL.md>"
+classification: external
 ---
 
 # improve-skills

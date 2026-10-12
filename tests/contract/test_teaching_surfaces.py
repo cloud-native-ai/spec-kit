@@ -68,7 +68,9 @@ def test_seat_c3_team_scope_key_listed_in_authoring_keys():
     assert "team-scope" in text
 
 
-def test_c1_real_model_taught_in_agents_command():
-    text = (REPO_ROOT / "templates" / "commands" / "agents.md").read_text(encoding="utf-8")
+def test_c1_real_model_taught_in_create_agent_skill():
+    # S3 command thinning moved the render-model teaching out of the agents command into
+    # its owning skill; the drift guard follows the content (rule-source re-point).
+    text = (REPO_ROOT / "skills" / "internal" / "create-agent" / "SKILL.md").read_text(encoding="utf-8")
     # pin the distinctive fragment of the replacement teaching (C-1)
     assert "renderer-produced real files" in text

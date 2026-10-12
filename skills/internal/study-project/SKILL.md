@@ -2,6 +2,7 @@
 name: study-project
 description: Deep study of the current project as it exists today — what is implemented and why — producing professional architecture reports illustrated with standard UML diagrams (component diagram, deployment diagram, sequence diagram) rendered via draw-diagram. Use when the user mentions "study this project", "explain this project", "analyze project", "analyze repository", "source code analysis", "architecture analysis", "code analysis", "UML图", "UML diagram", "架构图", "component diagram", "deployment diagram", "sequence diagram"
 skill_id: "<SKILL:.specify/skills/internal/study-project/SKILL.md>"
+classification: internal
 ---
 
 # Project Deep Analysis Skill

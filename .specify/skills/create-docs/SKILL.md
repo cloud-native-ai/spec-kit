@@ -3,6 +3,7 @@ name: create-docs
 description: |
   This skill can standardize, create, and manage the **basic structure** of the project documentation space (root entry files + docs/ tree) as a single reconcile engine — observe, diff through a tolerance band, dry-run plan, converge with archive-not-delete, verify — and author new baseline-compliant documents from a writing commission. Structure only: content quality of an existing document belongs to improve-docs, and site presentation/publishing is an optional higher-order capability owned by create-pages. Use this when the user mentions ["create docs", "new document", "write documentation", "documentation structure", "docs skeleton", "写文档", "新增文档", "文档写作", "整理文档", "文档结构", "文档空间", "ADR", "决策记录", "notes lifecycle", "笔记生命周期", "docs reconcile", "文档调谐", "authoring flow", "documentation taxonomy", "六类文档"]
 skill_id: "<SKILL:.specify/skills/create-docs/SKILL.md>"
+classification: external
 ---
 
 # create-docs

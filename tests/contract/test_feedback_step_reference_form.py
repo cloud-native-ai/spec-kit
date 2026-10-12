@@ -109,6 +109,18 @@ def _slice_section(text: str, heading: str, where: str) -> str:
     return "".join(lines[start:])
 
 
+def _flat(text: str) -> str:
+    """Collapse whitespace so a phrase hard-wrapped across lines still matches.
+
+    The <100-char wrap discipline breaks fixed phrases such as
+    `--unit-id "skill:<name>"` across a newline; matching the raw text would report a
+    missing unit id that is present. Same rationale as `_flat` in
+    test_constitution_double_landing.py. Structural assertions (byte size, heading
+    adjacency) still run on the raw text.
+    """
+    return re.sub(r"\s+", " ", text)
+
+
 def _section(path: Path) -> str:
     return _slice_section(
         path.read_text(encoding="utf-8"), "## Feedback",
@@ -136,19 +148,20 @@ def test_simple_command_carries_no_section(name: str):
 def test_embedded_section_is_a_reference(path: Path, kind: str, unit: str):
     rel = path.relative_to(REPO_ROOT)
     body = _section(path)
+    flat = _flat(body)
 
-    assert OWNER_CITE in body, f"{rel}: the section must cite its owner"
+    assert OWNER_CITE in flat, f"{rel}: the section must cite its owner"
     assert len(body.encode()) < MAX_SECTION_BYTES, (
         f"{rel}: '## Feedback' is {len(body.encode())} B — a reference section stays under "
         f"{MAX_SECTION_BYTES} B; this one has grown back into a copy of the owner's rules"
     )
-    assert f'--unit-id "{unit}"' in body, (
+    assert f'--unit-id "{unit}"' in flat, (
         f"{rel}: the unit id is the one per-surface fact; expected {unit!r}"
     )
-    assert f"--unit-type {kind}" in body, f"{rel}: unit type must match the surface class"
-    assert "feedback-utils.py" in body, f"{rel}: the engine name must survive (embed marker)"
+    assert f"--unit-type {kind}" in flat, f"{rel}: unit type must match the surface class"
+    assert "feedback-utils.py" in flat, f"{rel}: the engine name must survive (embed marker)"
 
-    restated = [lit for lit in OWNER_ONLY_LITERALS if lit in body]
+    restated = [lit for lit in OWNER_ONLY_LITERALS if lit in flat]
     assert not restated, (
         f"{rel}: the section restates the owner's rules {restated[:3]} — repair by deleting "
         f"the copy and leaving the pointer, not by re-wording it to agree"

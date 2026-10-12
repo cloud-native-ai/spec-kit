@@ -13,6 +13,12 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = REPO_ROOT / "templates" / "commands" / "feedback.md"
+# S3 command thinning: the two paths' engine-action details (probe injection, packaging
+# cleanup) moved into the manage-feedback skill's Path-B reference — the drift guard for
+# those literals follows the content.
+PATH_B_REF = (
+    REPO_ROOT / "skills" / "internal" / "manage-feedback" / "references" / "path-b-and-probe.md"
+)
 
 # Per-tool copies only for tool dirs that exist in THIS repo (mirrors
 # regen-command-copies.py's present-dirs behavior; codex/hermes are generated
@@ -37,9 +43,11 @@ class TestFeedbackCommandTemplate:
 
     def test_two_execution_paths_present(self):
         text = TEMPLATE.read_text(encoding="utf-8")
-        for needle in ("Path A", "Path B",
-                       "--action", "probes", "cleanup", "probe-inject"):
+        for needle in ("Path A", "Path B", "--action"):
             assert needle in text, f"template missing: {needle}"
+        skill_ref = PATH_B_REF.read_text(encoding="utf-8")
+        for needle in ("probes", "cleanup", "probe-inject"):
+            assert needle in skill_ref, f"manage-feedback Path-B reference missing: {needle}"
 
     def test_mode_numbering_is_gone(self):
         """The five input-keyed modes were replaced by an auto-selected route.

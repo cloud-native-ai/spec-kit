@@ -2,6 +2,7 @@
 name: improve-tools
 description: Improve an existing tool definition record — correct a wrong source or contract, add or sharpen behavioral rules, add aliases, rename, or promote Draft to Verified — driven by invocation evidence and user corrections. Use this when the user mentions ["modify a tool", "improve a tool", "fix a tool record", "update tool rules", "add tool alias", "verify a tool", "promote tool", "修改工具", "优化工具", "更新工具", "工具规则", "工具别名"]
 skill_id: "<SKILL:.specify/skills/internal/improve-tools/SKILL.md>"
+classification: internal
 ---
 
 # improve-tools

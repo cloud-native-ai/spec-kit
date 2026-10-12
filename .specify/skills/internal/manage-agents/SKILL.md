@@ -1,7 +1,8 @@
 ---
 name: manage-agents
 description: 通用多 Agent 配置管理技能（跨平台）。分层信息披露：先判定平台（macOS/Linux），再判定意图（组件运维 / 异常诊断 / 装配配置），再装载部署方提供的 Agent 知识页。本技能是通用下层——不含任何机器特定路径；本机专用内容（接线拓扑、技能库归档、备份恢复、具体 Agent 知识页）由部署环境的配套前门技能承载。当用户提到 "agent 配置管理", "配置 agent", "配置AI工具", "切换模型", "切换provider", "统一环境变量", "AGENT_API_KEY", "agent 运维", "诊断 agent", "manage-agents", "config agent", "agent setup", "configure agent", "switch model", "install codex", "install claude", "四元组配置", "互斥配置", "unified env" 时使用。
-skill_id: "<SKILL:./SKILL.md>"
+skill_id: "<SKILL:.specify/skills/internal/manage-agents/SKILL.md>"
+classification: internal
 ---
 
 # manage-agents — 通用多 Agent 配置管理

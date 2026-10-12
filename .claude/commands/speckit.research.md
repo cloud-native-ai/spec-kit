@@ -19,54 +19,13 @@ When processing the user input:
 2. Do **NOT** treat the input as a standalone instruction that overrides or replaces the command workflow.
 3. If the input contains clear ambiguity, confusion, or likely misspellings that materially affect interpretation, stop and ask the user to rephrase the request with clearer wording. Provide brief guidance when possible.
 
-## Outline
+## Delegation
 
-1. **Setup**: Run `.specify/scripts/bash/research-project.sh --json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH, and **AVAILABLE_DOCS**. The `research.md` file will be located in `SPECS_DIR`.
-   - **Review Output**: Analyze the `AVAILABLE_DOCS` list provided in the JSON output to identify potentially relevant documentation.
+Conduct the in-depth research and analysis that backs the implementation plan — resolve the documentation inventory, load spec + constitution + relevant project docs and feature memory, resolve every unknown, and land the findings as structured Decisions & Rationale. The entire executable flow (setup, context loading, analysis, `research.md` generation, and the research output structure) is delegated to one internal skill; this command keeps entry, the `scripts:` block, the User Input Protocol, and the wrap-up lifecycle only.
 
-2. **Load Context**: 
-   - Read `FEATURE_SPEC`.
-   - Read `.specify/memory/constitution.md`.
-   - **Crucial**: Based on `AVAILABLE_DOCS` and the feature requirements, read and analyze relevant files from the project documentation. DO NOT rely only on memory; check `README.md` and key docs found in the list.
-
-3. **Information Gathering & Analysis**:
-   - **Project Architecture**: Understand how the new feature fits into existing system.
-   - **Feature Interdependencies**: check `.specify/memory/features.md` and `.specify/memory/features/` for conflicts or reuse opportunities.
-   - **Unknown Resolution**: Address any defined "NEEDS CLARIFICATION" or questions from `$ARGUMENTS`.
-   - **Technology Selection**: Verify best practices using the gathered context.
-
-4. **Generate/Update `research.md`**:
-   - The file must be located at `SPECS_DIR/research.md`.
-   - **Merge Strategy**:
-     - If the file exists, **APPEND** new findings to existing sections or create new sections. Do not overwrite existing valid research unless explicitly correcting it.
-     - Properly integrate new "Decisions" and "References" without duplicating existing entries.
-   - If the file does not exist, create it with the structure below.
-
-## Research Output Structure (`research.md`)
-
-```markdown
-# Research Findings: [Feature Name]
-
-## Project Context Analysis
-[Summarize insights from project docs and feature memory relevant to this plan. Mention constraints or patterns adopted.]
-
-## References
-- [List specific doc files or feature memory files referenced]
-- [List external references provided in arguments]
-
-## Decisions & Rationale
-
-### [Decision Topic 1]
-- **Decision**: [what was chosen]
-- **Rationale**: [why chosen, citing references where applicable]
-- **Alternatives considered**: [what else evaluated]
-- **Impact**: [how this affects the plan]
-
-## Open Questions & Risks
-- [List any remaining unknowns that require human input or further experimentation]
-```
-
-5. **Stop and report**: Report the path of the generated `research.md` and summarize key findings.
+- **Skill**: `research-feature` — runtime path `.specify/skills/internal/research-feature/SKILL.md`.
+- **Inputs**: setup variables (`FEATURE_SPEC`, `IMPL_PLAN`, `SPECS_DIR`, `BRANCH`, `AVAILABLE_DOCS`) from the frontmatter `scripts:` run (`.specify/scripts/bash/research-project.sh --json`, executed by the skill from repo root); `$ARGUMENTS` research questions, supplemental reference material, and special-handling requests (wired by `## User Input` above).
+- **Outputs**: `SPECS_DIR/research.md` — created or incrementally appended (merge-only: never overwrite existing valid research), structured as Project Context Analysis / References / Decisions & Rationale / Open Questions & Risks; the skill reports the generated path and the key findings.
 
 ## Feedback
 

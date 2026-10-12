@@ -2,6 +2,7 @@
 name: create-agent
 description: General-purpose authoring skill for single Spec Kit agents — creates role, supervisor, custom, or project-specific (project-custom) agents. Use this when the user mentions ["create an agent", "new agent", "add agent role", "agent template", "supervisor agent", "project-specific agent", "custom project agent", "创建agent", "新建agent", "添加角色", "项目自定义agent", "项目专属agent"]
 skill_id: "<SKILL:.specify/skills/internal/create-agent/SKILL.md>"
+classification: internal
 ---
 
 # create-agent
@@ -76,8 +77,10 @@ Analyze the conversation history and project context to infer a useful role:
 ### 2. Validate against existing templates
 
 - Check `skills/internal/create-agent/templates/agent-capacity-*-template.md` for existing roles
+- **Reuse-first (复用优先)**: before authoring anything new, check the persistent stores `.specify/agents/{templates,instances}/` for an existing definition that already fits the requested capacity. In most cases the right outcome is to **select an existing agent** (or refine it via `improve-agent`), not to create a fresh one — a new agent per request is the exception, not the default.
 - If a similar role exists, suggest updating it via `improve-agent` instead
 - Ensure the new role does not overlap significantly with the seven preset roles
+- **Abstract from real execution**: when a genuinely new persistent agent IS warranted, it SHOULD be abstracted from real execution evidence — e.g. a `virtual`/temporary seat that proved its worth across actual runs gets promoted into a persistent Template/Instance — so the definition accumulates 实战经验 rather than encoding an invented shape. Record the source execution evidence (which run/team the shape was distilled from) in the authoring report; when invoked from the `create-team` seat-resolution flow, that flow's `gate-create-team-agent-reuse` probe carries the same evidence (non-blocking).
 
 ### 3. Create the template file
 

@@ -2,6 +2,7 @@
 name: improve-team
 description: Adjust and optimize an existing agent team — add/remove members, change the collaboration pattern, tune thresholds/parallelism/quality dimensions, or operate a continuous loop (promote/demote maturity L1→L2→L3, tune budget/constraints/cadence/verifier) — with targeted, evidence-based, structure-preserving edits. Use when the user mentions ["调整团队", "优化团队", "优化 team", "修改团队", "升级成熟度", "降级成熟度", "调预算", "improve team", "adjust team", "refine team", "tune team", "promote maturity", "给团队增加", "给团队减少"]
 skill_id: "<SKILL:.specify/skills/internal/improve-team/SKILL.md>"
+classification: internal
 ---
 
 # improve-team

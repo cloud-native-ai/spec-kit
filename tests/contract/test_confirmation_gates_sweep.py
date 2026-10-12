@@ -65,22 +65,24 @@ TEAM_SURFACES = (
 # must never be "simplified away": dropping one silently removes a pre-delete
 # confirmation the scanner cannot re-derive.
 KEEP_LIST = [
-    ("templates/commands/feedback.md", "confirmation of the report"),
+    # S3 command thinning: the guard sentence moved into the owning skill; the pin
+    # follows the owner so the drift guard keeps covering the same gate.
+    ("skills/internal/manage-feedback/references/path-a-digest.md", "The user confirms the **routing decisions** in the digest report"),
     ("templates/commands/docs.md", "stop-and-confirm"),
     ("templates/commands/session.md", "same-name"),
     ("templates/commands/feature.md", "status"),
-    ("templates/commands/analyze.md", "explicitly approve"),
+    ("skills/internal/analyze-artifacts/SKILL.md", "the user must approve, and any follow-up editing command is invoked"),
     ("templates/commands/interview.md", "confirm"),
     ("templates/constitution-template.md", "irreversible"),
-    ("templates/commands/todo.md", "only execute on explicit user approval"),
-    ("templates/commands/implement.md", "only execute on explicit user approval"),
-    ("templates/commands/implement.md", "CONFIRM"),
+    ("skills/internal/manage-todo/SKILL.md", "only execute on explicit user approval"),
+    ("skills/internal/implement-feature/SKILL.md", "only execute on explicit user approval"),
+    ("skills/internal/implement-feature/SKILL.md", "CONFIRM"),
     ("templates/commands/tools.md", "confirm"),
     ("skills/external/git-workspace/SKILL.md", "force-with-lease"),
     ("shared/workflow/glossary.md", "--confirmed-resolution"),
     ("shared/definitions/tool-definitions.md", "Execution never happens before user confirmation via preview gate"),
     ("skills/internal/create-team/references/operating-loops.md", "分级确认"),
-    ("templates/commands/sanitize.md", "等待用户确认后才执行"),
+    ("skills/internal/sanitize-materials/SKILL.md", "for user confirmation before any execution"),
 ]
 
 REQUIRED_SECTIONS = [
@@ -110,13 +112,16 @@ GOVERNANCE_KEPT_MIN_ROWS = [
 ]
 
 # Every auto-executed flow surface must disclose the execution-report convention.
+# S3 thinning moved each command's executable flow (and the disclosure riding in it)
+# into the owning skill, so the surfaces below follow the flow's new owner.
 AUTO_EXEC_SURFACES = [
     REPO_ROOT / "templates" / "commands" / "team.md",
     REPO_ROOT / "skills" / "internal" / "create-team" / "SKILL.md",
     REPO_ROOT / "templates" / "commands" / "goal.md",
-    REPO_ROOT / "templates" / "commands" / "todo.md",
-    REPO_ROOT / "templates" / "commands" / "agents.md",
-    REPO_ROOT / "templates" / "commands" / "skills.md",
+    REPO_ROOT / "skills" / "internal" / "manage-todo" / "SKILL.md",
+    REPO_ROOT / "skills" / "internal" / "run-agent" / "SKILL.md",
+    REPO_ROOT / "skills" / "external" / "create-skills" / "SKILL.md",
+    REPO_ROOT / "skills" / "external" / "improve-skills" / "SKILL.md",
 ]
 
 

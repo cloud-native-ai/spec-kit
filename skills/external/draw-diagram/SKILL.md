@@ -27,6 +27,7 @@ description: |
   "redraw", "image to diagram", "plantuml", "JSON可视化", "JSON数据图", "json diagram", "YAML可视化",
   "YAML显示", "yaml diagram", "配置可视化", "数据结构图", "salt", "图片转UML", "image to UML".
 skill_id: "<SKILL:.specify/skills/draw-diagram/SKILL.md>"
+classification: external
 ---
 
 # 统一绘图入口（draw-diagram）
@@ -179,6 +180,8 @@ skill_id: "<SKILL:.specify/skills/draw-diagram/SKILL.md>"
 ## Evaluation Form(绘制评价单)
 
 **定位与边界。** 本节是交付结果后的 Evaluation Form(绘制评价单)，专门承载用户对本次**已交付的渲染结果**的评价；它不是 `## Feedback`，也不替代或改变该节的 agent 自省。`## Feedback` 保持其既有的「不向用户征询」规则，本节只处理用户主动给出的绘制评价。合并前六个引擎技能各有一份本节，现统一为此一份，**引擎维度改由条目内的引擎名承载**（见下）。
+
+**运行模式门。** 若 `${SKILL_WORKDIR}/.specify/` 不存在（standalone 模式）：本节保留交付时的一次性非阻塞征询与「无评价即满意」规则，但**跳过全部反馈引擎读写**——不执行下方 probe 记录与 `--action list` 查询，用户评价仅保留在当次运行报告中，不创建反馈条目；Spec Kit 项目模式（`${SKILL_WORKDIR}/.specify/` 存在）按本节原文执行。
 
 **触发与一次性征询。** 仅在 Step 4 已验收并回报实际交付的产物路径、选定引擎层、路由理由和 LDM 摘要之后，随该次交付附上一句非阻塞征询：`已交付渲染结果（引擎:<engine>）；如愿意，请评价这张结果是否准确、清晰且适合用途，或说明希望调整之处。` 不得在路由、渲染开始或中间结果时征询；不得等待回复、重复询问或因沉默降低交付结果。
 

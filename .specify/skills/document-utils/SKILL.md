@@ -10,6 +10,7 @@ description: |
   office document files.
 skill_id: "<SKILL:.specify/skills/document-utils/SKILL.md>"
 license: Proprietary. LICENSE.txt has complete terms
+classification: external
 ---
 
 # Document Utilities

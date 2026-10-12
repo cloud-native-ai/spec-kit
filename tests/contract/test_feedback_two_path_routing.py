@@ -20,6 +20,18 @@ out of the cleanup step and lost its meaning, so its position is re-asserted
 here. And the one-directional refinement rule is the only thing stopping a
 future edit from routing a client project's own feedback upstream, which the
 engine would reject at exit 2 but only after the agent had already promised it.
+
+S3 thinning re-point: the executable routing logic moved out of
+``templates/commands/feedback.md`` into the manage-feedback skill package
+(``skills/internal/manage-feedback/`` — the routing judgment in SKILL.md, the
+two paths in ``references/``); the command keeps only its lifecycle surfaces
+plus a Skill-Delegation block. Every pin below follows the content to its new
+owner: skill SOURCES for wording (the edit surface, as the template was), and
+the ``.specify/skills/`` MIRRORS for the rewrite hazard —
+``copy_tree_with_rewrite`` runs ``rewrite_paths`` on those at init, which is
+the same generated-copy hazard the four per-tool COPIES used to carry. The
+COPIES are now checked for what they still own: the delegation link to the
+skill that carries the step.
 """
 
 from __future__ import annotations
@@ -34,7 +46,8 @@ TEMPLATE = ROOT / "templates" / "commands" / "feedback.md"
 
 # The generated copies, not just the source: rewrite_paths only runs on them, so
 # a criterion that is correct in the template can be inverted in every copy an
-# agent actually reads.
+# agent actually reads. Post-thinning they carry only the delegation, which is
+# what TestGeneratedCopies pins on them now.
 COPIES = [
     ROOT / ".claude" / "commands" / "speckit.feedback.md",
     ROOT / ".qoder" / "commands" / "speckit.feedback.md",
@@ -42,58 +55,143 @@ COPIES = [
     ROOT / ".github" / "prompts" / "speckit.feedback.prompt.md",
 ]
 
-OUTLINE = "## Outline"
-PATH_A = "### Path A"
-PATH_B = "### Path B"
-INJECTION = "### Probe Injection"
+# New owners of the routing content (S3 thinning): SKILL.md carries the routing
+# judgment, references/ carry the two execution paths. Sources are the edit
+# surface; the mirrors under .specify/skills/ are the runtime artifacts that
+# rewrite_paths is applied to at init.
+SKILL = ROOT / "skills" / "internal" / "manage-feedback" / "SKILL.md"
+PATH_A_DOC = (
+    ROOT / "skills" / "internal" / "manage-feedback" / "references" / "path-a-digest.md"
+)
+PATH_B_DOC = (
+    ROOT / "skills" / "internal" / "manage-feedback" / "references" / "path-b-and-probe.md"
+)
+SKILL_MIRROR = ROOT / ".specify" / "skills" / "internal" / "manage-feedback" / "SKILL.md"
+PATH_A_MIRROR = (
+    ROOT
+    / ".specify"
+    / "skills"
+    / "internal"
+    / "manage-feedback"
+    / "references"
+    / "path-a-digest.md"
+)
+
+# Slice keys, re-keyed to the new owners' headings. OUTLINE now names the
+# judgment owner's opening section in SKILL.md; the A-steps dropped from ####
+# (template) to ## (reference file) level.
+OUTLINE = "## Goal"
 BEHAVIOR = "## Behavior Rules"
-CLEANUP = "#### A5 — Cleanup"
-INTROSPECTION = "#### A3 — Introspection"
-ROUTE_STEP = "#### A4 — Reconcile and route findings"
-BUNDLES_STEP = "#### A1 — Enumerate pending bundles"
-EXTRACT_STEP = "#### A2 — Extract and read entries"
+BOUNDARIES = "## Boundaries"
+PATH_A = "# Path A — 就地消化 (Digest In This Project)"
+PATH_B = "## Path B — 打包上送 (Package For The Framework Upstream)"
+INJECTION = "## Probe Injection (explicit request only)"
+BUNDLES_STEP = "## A1 — Enumerate pending bundles"
+EXTRACT_STEP = "## A2 — Extract and read entries"
+INTROSPECTION = "## A3 — Introspection"
+ROUTE_STEP = "## A4 — Reconcile and route findings"
+CLEANUP = "## A5 — Cleanup"
+A6 = "## A6 — Dispose local entries"
+
+
+def _read(path: Path) -> str:
+    assert path.is_file(), f"owner file missing: {path}"
+    return path.read_text(encoding="utf-8")
+
+
+def _norm(text: str) -> str:
+    """Whitespace-collapsed view of a markdown file. The skill files wrap their
+    lines at ~90 columns; the pinned literals guard wording, not line breaks,
+    so multi-word needles match the collapsed form."""
+    return " ".join(text.split())
+
+
+def _slice_in(text: str, start: str, end: str, owner: str) -> str:
+    """Bounded slice, with the bounds asserted so a renamed heading cannot
+    silently collapse this to an empty or whole-file slice."""
+    i = text.find(start)
+    j = text.find(end)
+    assert i >= 0, f"{owner}: section missing: {start!r}"
+    assert j > i, f"{owner}: section {end!r} does not follow {start!r}"
+    return text[i:j]
+
+
+def _tail(text: str, start: str, owner: str) -> str:
+    """Unbounded slice: everything from `start` to the end of `owner`."""
+    i = text.find(start)
+    assert i >= 0, f"{owner}: section missing: {start!r}"
+    return text[i:]
+
+
+def _block(text: str, marker: str) -> str:
+    """The wrapped markdown block that opens at the line carrying `marker` —
+    through its continuation lines, stopping at the next blank line, list item
+    or heading. Returned whitespace-collapsed, since the pinned literals guard
+    the block's wording rather than its line breaks."""
+    lines = text.splitlines()
+    i = next((k for k, ln in enumerate(lines) if marker in ln), -1)
+    assert i >= 0, f"block marker missing: {marker!r}"
+    j = i + 1
+    while j < len(lines) and lines[j].strip() and not re.match(
+        r"\s*(?:[-*+] |\d+\. |#{1,6} )", lines[j]
+    ):
+        j += 1
+    return _norm(" ".join(lines[i:j]))
 
 
 def _text() -> str:
     return TEMPLATE.read_text(encoding="utf-8")
 
 
-def _slice(start: str, end: str) -> str:
-    """Bounded slice, with the bounds asserted so a renamed heading cannot
-    silently collapse this to an empty or whole-file slice."""
-    text = _text()
-    i = text.find(start)
-    j = text.find(end)
-    assert i >= 0, f"section missing: {start!r}"
-    assert j > i, f"section {end!r} does not follow {start!r}"
-    return text[i:j]
+def _skill() -> str:
+    return _read(SKILL)
+
+
+def _path_a_doc() -> str:
+    text = _read(PATH_A_DOC)
+    assert text.startswith(PATH_A), "path-a-digest.md lost its Path A heading"
+    return text
+
+
+def _path_b_doc() -> str:
+    return _read(PATH_B_DOC)
 
 
 def _outline() -> str:
-    return _slice(OUTLINE, BEHAVIOR)
+    return _slice_in(_skill(), OUTLINE, BEHAVIOR, "SKILL.md")
 
 
 def _path_a() -> str:
-    return _slice(PATH_A, PATH_B)
+    return _path_a_doc()
 
 
 def _path_b() -> str:
-    return _slice(PATH_B, INJECTION)
+    return _slice_in(_path_b_doc(), PATH_B, INJECTION, "path-b-and-probe.md")
 
 
 def _introspection() -> str:
-    return _slice(INTROSPECTION, ROUTE_STEP)
+    return _slice_in(_path_a_doc(), INTROSPECTION, ROUTE_STEP, "path-a-digest.md")
+
+
+def _cleanup() -> str:
+    return _slice_in(_path_a_doc(), CLEANUP, A6, "path-a-digest.md")
+
+
+def _a1() -> str:
+    return _slice_in(_path_a_doc(), BUNDLES_STEP, EXTRACT_STEP, "path-a-digest.md")
 
 
 @pytest.mark.contract
 def test_outline_is_substantive():
-    """Anti-vacuity sentinel: every assertion below reads a slice of ## Outline,
-    so an accidentally empty slice would make them all pass for nothing."""
+    """Anti-vacuity sentinel: every assertion below reads a slice of the
+    routing judgment, so an accidentally empty slice would make them all pass
+    for nothing."""
     outline = _outline()
-    assert len(outline) > 4000, f"the Outline section is suspiciously thin: {len(outline)} chars"
+    assert len(outline) > 4000, f"the routing judgment is suspiciously thin: {len(outline)} chars"
     assert outline.count("\n1. ") + outline.count("\n2. ") >= 2, "the routing flow is not numbered"
-    for path in (PATH_A, PATH_B, INJECTION):
-        assert path in _text(), f"missing section: {path}"
+    assert PATH_A in _path_a_doc(), f"missing section: {PATH_A}"
+    for path in (PATH_B, INJECTION):
+        assert path in _path_b_doc(), f"missing section: {path}"
 
 
 @pytest.mark.contract
@@ -105,56 +203,52 @@ def test_hat_is_the_primary_discriminator():
     """
     outline = _outline()
     assert "hat decides first" in outline, (
-        "the Outline must state that the hat is the primary discriminator and "
+        "the routing judgment must state that the hat is the primary discriminator and "
         "kind the secondary one"
     )
     for needle in ("templates", "skills", "src/specify_cli"):
         assert needle in outline, f"the hat criterion no longer names {needle}"
-    assert "Do NOT gate on `feedback/` directory existence" in outline, (
+    norm = _norm(outline)
+    assert "Do NOT gate on `feedback/` directory existence" in norm, (
         "the hat criterion must keep its caveat — a client project can have a "
         "feedback/ directory for unrelated purposes, so its existence proves nothing"
     )
     # Framework project => everything is Path A material, and Path B is not selected.
-    assert "Path B is not selected" in outline or "Path B is reachable only by an explicit" in outline, (
+    assert "Path B is not selected" in norm or "Path B is reachable only by an explicit" in norm, (
         "in the framework project the router must not select Path B on its own"
     )
 
 
 @pytest.mark.contract
 def test_framework_project_does_not_auto_package():
-    text = _text()
-    path_b = _slice(PATH_B, INJECTION)
+    path_b = _path_b()
     assert "Reached automatically only from a client project" in path_b, (
         "Path B must declare that the framework project reaches it only on request — "
         "a zip packaged in the framework repo is addressed to that same repository"
     )
-    assert "taken on request rather than by judgment" in path_b
+    assert "taken on request rather than by judgment" in _norm(path_b)
 
 
 @pytest.mark.contract
 def test_hat_criterion_survives_the_per_tool_path_rewrite():
-    """`regen-command-copies.py` runs `rewrite_paths`, which turns any `templates/`,
-    `shared/`, `scripts/` or `memory/` reference that starts a path into its
-    `.specify/` mirror form. That is correct for a doc path a reader opens at
-    runtime and **inverts the meaning** of a criterion that tests for framework
-    *source* directories: `.specify/templates/` exists in every client project, so
-    the gate would pass everywhere. This assertion reads the generated copies —
-    the artifacts an agent actually runs — not the source template.
+    """`regen-command-copies.py` and the init flow run `rewrite_paths`, which turns
+    any `templates/`, `shared/`, `scripts/` or `memory/` reference that starts a
+    path into its `.specify/` mirror form. That is correct for a doc path a reader
+    opens at runtime and **inverts the meaning** of a criterion that tests for
+    framework *source* directories: `.specify/templates/` exists in every client
+    project, so the gate would pass everywhere. Post-thinning the criterion lives
+    in the manage-feedback skill, so this reads the skill MIRROR — the artifact
+    `copy_tree_with_rewrite` actually ships — not the source skill.
     """
-    for copy in COPIES:
-        assert copy.is_file(), f"missing generated copy: {copy}"
-        text = copy.read_text(encoding="utf-8")
-        gate_line = next(
-            (ln for ln in text.splitlines() if "hat this repo wears" in ln), None
-        )
-        assert gate_line, f"{copy.name}: the hat criterion line is missing"
-        assert ".specify/templates" not in gate_line, (
-            f"{copy.name}: the hat criterion was rewritten to the runtime mirror, so "
-            "it now passes in every client project. Name the source directories "
-            "without a trailing slash — rewrite_paths only matches `segment/`."
-        )
-        for needle in ("`templates`", "`skills`", "`src/specify_cli`"):
-            assert needle in gate_line, f"{copy.name}: hat criterion lost {needle}"
+    text = _read(SKILL_MIRROR)
+    gate_block = _block(text, "hat this repo wears")
+    assert ".specify/templates" not in gate_block, (
+        "SKILL mirror: the hat criterion was rewritten to the runtime mirror, so "
+        "it now passes in every client project. Name the source directories "
+        "without a trailing slash — rewrite_paths only matches `segment/`."
+    )
+    for needle in ("`templates`", "`skills`", "`src/specify_cli`"):
+        assert needle in gate_block, f"SKILL mirror: hat criterion lost {needle}"
 
 
 @pytest.mark.contract
@@ -162,16 +256,15 @@ def test_owning_hat_rule_is_not_contradicted_by_the_rewrite():
     """Same hazard, second instance: the Path A rule says "act on the framework
     source, never in the .specify/ mirror". Rewritten, it listed .specify/templates/
     as the source and then forbade .specify/ mirrors — self-contradictory guidance
-    in every copy an agent reads."""
-    for copy in COPIES:
-        text = copy.read_text(encoding="utf-8")
-        line = next((ln for ln in text.splitlines() if "Fix at the owning hat" in ln), None)
-        assert line, f"{copy.name}: the owning-hat rule is missing"
-        assert ".specify/templates" not in line, (
-            f"{copy.name}: the owning-hat rule names the runtime mirror as the "
-            "framework source and then forbids editing mirrors"
-        )
-        assert "never in the `.specify/` runtime mirror" in line
+    in every runtime copy an agent reads. Read the skill reference's MIRROR, which
+    is what ships through copy_tree_with_rewrite."""
+    text = _read(PATH_A_MIRROR)
+    line = _block(text, "Fix at the owning hat")
+    assert ".specify/templates" not in line, (
+        "path-a mirror: the owning-hat rule names the runtime mirror as the "
+        "framework source and then forbids editing mirrors"
+    )
+    assert "never in the `.specify/` runtime mirror" in line
 
 
 @pytest.mark.contract
@@ -202,18 +295,17 @@ def test_content_refinement_is_one_directional():
 
 @pytest.mark.contract
 def test_both_sides_non_empty_runs_a_then_b():
-    outline = _outline()
-    assert "Path A then Path B" in outline, (
+    norm = _norm(_outline())
+    assert "Path A then Path B" in norm, (
         "when both sides have work, the order must be stated — digestion can "
         "change what is left to package"
     )
-    assert "Never silently drop one side" in outline
+    assert "Never silently drop one side" in norm
 
 
 @pytest.mark.contract
 def test_empty_scope_writes_no_report_file():
-    outline = _outline()
-    assert "Do NOT write an empty report file" in outline, (
+    assert "Do NOT write an empty report file" in _norm(_outline()), (
         "an empty run must not leave an artifact behind; a report file with no "
         "findings is indistinguishable from a report nobody read"
     )
@@ -221,11 +313,11 @@ def test_empty_scope_writes_no_report_file():
 
 @pytest.mark.contract
 def test_undecidable_input_asks_exactly_one_question():
-    outline = _outline()
-    assert "one** elicitation question" in outline or "ONE elicitation question" in outline, (
+    norm = _norm(_outline())
+    assert "one** elicitation question" in norm or "ONE elicitation question" in norm, (
         "an undecidable target must produce a single question, not a loop"
     )
-    assert "do not guess silently" in outline.lower() or "do NOT guess silently" in outline
+    assert "do not guess silently" in norm.lower() or "do NOT guess silently" in norm
 
 
 @pytest.mark.contract
@@ -238,9 +330,9 @@ def test_package_is_an_explicit_shortcut():
     zip addressed to itself. What stays load-bearing is that an explicit request still
     reaches Path B in either hat.
     """
-    user_input = _slice("## User Input", "## Glossary")
+    user_input = _slice_in(_text(), "## User Input", "## Glossary", "feedback.md")
     assert "package" in user_input, "the short-circuit must be documented at the entry point"
-    path_b = _slice(PATH_B, INJECTION)
+    path_b = _path_b()
     assert "explicit `package` request" in path_b, (
         "Path B must state that an explicit request still reaches it — including from the "
         "framework project, where the router never selects it on its own"
@@ -249,8 +341,7 @@ def test_package_is_an_explicit_shortcut():
 
 @pytest.mark.contract
 def test_probe_injection_is_declared_outside_the_router_with_a_reason():
-    text = _text()
-    injection = _slice(INJECTION, BEHAVIOR)
+    injection = _tail(_path_b_doc(), INJECTION, "path-b-and-probe.md")
     assert "cannot be inferred" in injection, (
         "injection sits outside the automatic router for a stated reason — an "
         "unexplained exception invites the next edit to fold it back in"
@@ -264,8 +355,8 @@ def test_probe_injection_is_declared_outside_the_router_with_a_reason():
 def test_cleanup_confirmation_literal_is_inside_the_cleanup_step():
     """Position, not just presence: the sweep test's KEEP_LIST only checks the
     string exists in the file."""
-    cleanup = _slice(CLEANUP, "#### A6")
-    assert "confirmation of the report" in cleanup, (
+    cleanup = _cleanup()
+    assert "confirmation of the report" in _norm(cleanup), (
         "the pinned literal must stay in Path A's cleanup step, where it means "
         "'the user confirms the routing decisions, not that every routed run "
         "finished' — elsewhere in the file it guards nothing"
@@ -288,10 +379,10 @@ def test_path_b_cleanup_is_hat_aware():
     paired branch labels load-bearing rather than decorative.
     """
     path_b = _path_b()
-    step = next(
-        (ln for ln in path_b.splitlines() if "Post-package cleanup" in ln), None
-    )
-    assert step, "Path B lost its post-package cleanup step"
+    assert "Post-package cleanup" in path_b, "Path B lost its post-package cleanup step"
+    # The step's lead-in paragraph (through its wrapped continuation lines, up to
+    # the first branch sub-bullet) carries the hat declaration and the pointer.
+    step = _block(path_b, "Post-package cleanup")
     assert "hat-aware" in step, (
         "the cleanup step must declare that it branches on the hat — an unqualified "
         "'default closing step' reads as unconditional in the framework repo"
@@ -310,21 +401,21 @@ def test_path_b_cleanup_is_hat_aware():
         "the exception — reversed, the framework repo empties an active store again"
     )
 
-    framework_branch = path_b[framework:]
+    framework_norm = _norm(path_b[framework:])
     assert "only when the user's request for this same run also asked for `mark-submitted`" in (
-        framework_branch
+        framework_norm
     ), "the framework branch must gate cleanup on the mark-submitted pairing"
-    assert "keep the entries in the store" in framework_branch, (
+    assert "keep the entries in the store" in framework_norm, (
         "without the pairing the entries must stay in the active store"
     )
-    assert "待定 (pending)" in framework_branch, (
+    assert "待定 (pending)" in framework_norm, (
         "a retained batch must be reported as pending — silently keeping it leaves "
         "the user unable to tell a decision from an omission"
     )
     # The client default keeps its preview-then-remove shape.
-    client_branch = path_b[client:framework]
-    assert "--action cleanup --package <zip|latest> --dry-run" in client_branch
-    assert "run without `--dry-run` in the same session as packaging" in client_branch
+    client_norm = _norm(path_b[client:framework])
+    assert "--action cleanup --package <zip|latest> --dry-run" in client_norm
+    assert "run without `--dry-run` in the same session as packaging" in client_norm
 
 
 @pytest.mark.contract
@@ -332,9 +423,7 @@ def test_a5_cleanup_runs_as_one_uninterrupted_sequence():
     """F-12③: the consume-log row is a batch's only persistent marker and it is
     written last, so an interruption before it leaves removed bundles with no
     record that they were ever routed."""
-    cleanup = _slice(CLEANUP, "#### A6")
-    rule = next((ln for ln in cleanup.splitlines() if "Uninterrupted sequence" in ln), None)
-    assert rule, "A5 lost the uninterrupted-sequence rule"
+    rule = _block(_cleanup(), "Uninterrupted sequence")
     assert "one uninterrupted sequence" in rule
     # The three beats, in the order they must run.
     assert rule.index("preserve") < rule.index("remove the bundles") < rule.index(
@@ -357,9 +446,8 @@ def test_a1_recognizes_an_interrupted_run_instead_of_rerouting_it():
     """F-12③, the other half: an unlogged bundle in the intake is ambiguous —
     new input, or a confirmed batch awaiting cleanup. Defaulting to 'new input'
     re-routes a batch the user already routed."""
-    a1 = _slice(BUNDLES_STEP, EXTRACT_STEP)
-    rule = next((ln for ln in a1.splitlines() if "Interrupted-run recognition" in ln), None)
-    assert rule, "A1 lost the interrupted-run recognition rule"
+    a1 = _a1()
+    rule = _block(a1, "Interrupted-run recognition")
     assert "no** matching `Bundles` row" in rule, (
         "the firing condition must be mechanical — a bundle the consume-log does "
         "not name — not a judgement about whether the run 'looks' interrupted"
@@ -373,14 +461,13 @@ def test_a1_recognizes_an_interrupted_run_instead_of_rerouting_it():
         "leaves the next run facing the same ambiguity"
     )
     # It is the mirror case of the existing cross-check, and says so.
-    crosscheck = next((ln for ln in a1.splitlines() if "Already-consumed cross-check" in ln), None)
-    assert crosscheck, "A1 lost the already-consumed cross-check"
+    assert "Already-consumed cross-check" in a1, "A1 lost the already-consumed cross-check"
     assert "mirror case" in rule
 
 
 @pytest.mark.contract
 def test_judgment_is_reported_not_assumed():
-    behavior = _slice(BEHAVIOR, "## Documentation")
+    behavior = _slice_in(_skill(), BEHAVIOR, BOUNDARIES, "SKILL.md")
     assert "reported, not assumed" in behavior, (
         "the run must state which hat it detected, how many items landed on "
         "each side, and anything the content analysis moved — otherwise a "
@@ -421,16 +508,15 @@ def test_command_template_carries_no_blocking_gate_wording():
 
 
 # --------------------------------------------------------------------------------------
-# Path A's introspection step (#### A3), merged from test_feedback_command_introspect.py.
+# Path A's introspection step (A3), merged from test_feedback_command_introspect.py.
 #
 # Originally pinned req 047's ``### Mode 5``. The five input-keyed modes were collapsed
 # into two auto-selected paths on 2026-09-20, so the section keys moved — ``### Mode 5``
-# is now ``#### A3 — Introspection`` inside ``### Path A``, and ``### Mode 2`` is now
-# ``### Path B``. Every substance assertion the mode-keyed version made is kept here;
-# only the way the slices are located changed. Re-keying without carrying the substance
-# over would have turned this block into a tautology, which is the failure mode this
-# repo's blind-check lesson (docs/reference/history/00-cross-cutting-lessons.md § 十二)
-# is about.
+# is now ``A3 — Introspection`` inside the Path A reference. Every substance assertion
+# the mode-keyed version made is kept here; only the way the slices are located changed.
+# Re-keying without carrying the substance over would have turned this block into a
+# tautology, which is the failure mode this repo's blind-check lesson
+# (docs/reference/history/00-cross-cutting-lessons.md § 十二) is about.
 # --------------------------------------------------------------------------------------
 
 
@@ -439,9 +525,9 @@ class TestIntrospectionPresenceAndPosition:
     """The analysis step exists, sits inside Path A, and precedes deletion."""
 
     def test_introspection_section_present_inside_path_a(self):
-        text = _text()
+        text = _path_a_doc()
         assert text.find(INTROSPECTION) > 0, "introspection section missing"
-        assert text.find(PATH_A) > 0, "Path A section missing"
+        assert text.find(PATH_A) == 0, "Path A section missing"
         assert text.find(PATH_A) < text.find(INTROSPECTION), (
             "introspection must live inside Path A — it is the digest path's "
             "analysis step, not a separately-triggered mode"
@@ -450,7 +536,7 @@ class TestIntrospectionPresenceAndPosition:
     def test_analysis_precedes_cleanup(self):
         """Req 047 pinned Mode 5 before Mode 4 for the same reason: the routing
         analysis must be stated before the step that deletes the intake."""
-        text = _text()
+        text = _path_a_doc()
         assert text.find(INTROSPECTION) < text.find(CLEANUP), (
             "introspection must precede Path A's cleanup step — routing is "
             "decided before anything is deleted"
@@ -468,7 +554,8 @@ class TestIntrospectionDiscipline:
     """Token discipline + both red lines + external-never-upstream."""
 
     def test_token_efficiency_note(self):
-        assert "摘要优先" in _text() or "Token 效率" in _text()
+        tree = _skill() + _path_a_doc() + _path_b_doc()
+        assert "摘要优先" in tree or "Token 效率" in tree
 
     def test_red_lines_stated(self):
         scope = _path_a()
@@ -488,14 +575,20 @@ class TestIntrospectionDiscipline:
 
 @pytest.mark.contract
 class TestGeneratedCopies:
-    """All four per-tool copies carry the introspection step."""
+    """All four per-tool copies still reach the introspection step — post-thinning
+    via the delegation they carry, with the step itself pinned on the skill side."""
 
     @pytest.mark.parametrize("copy", COPIES, ids=[p.parts[-2] for p in COPIES])
     def test_copy_contains_introspection(self, copy: Path):
         assert copy.exists(), f"missing generated copy: {copy}"
         text = copy.read_text(encoding="utf-8")
-        assert INTROSPECTION in text
-        assert PATH_A in text and PATH_B in text
+        assert "manage-feedback" in text, (
+            f"{copy.name}: the copy lost its delegation to the manage-feedback skill — "
+            "the tool it serves silently loses the whole routing capability"
+        )
+        # The step the copy delegates to must actually exist on the skill side.
+        assert INTROSPECTION in _path_a_doc()
+        assert PATH_A in _path_a_doc() and PATH_B in _path_b_doc()
 
 
 @pytest.mark.contract
