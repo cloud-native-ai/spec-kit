@@ -1,0 +1,9 @@
+{
+  "targetFinding": "ev-005",
+  "change": "merge-skills: merge proofs are now committed into the target instead of dying with the scratch dir. coverage_probe.py gained --emit-baseline (freeze the proven token set, allow-file reasons folded in, refuses while lossy or while an allowance carries no reason) and --baseline (re-verify a merged target later with no scratch). New provenance_check.py re-checks a merged target's committed record: baselines clean, capability destinations resolve, no pending row, no unreasoned dropped. New references/provenance-record.md defines the record schema. SKILL.md gained completion criterion (c) and rewired phases 5/6/8, including gating scratch cleanup on the record being committed. Three soundness defects found by pressure testing and repaired in passing: extraction is not idempotent so baselines load verbatim; tokens beginning with '#' vanished on re-read and are now backtick-quoted; provenance artifacts were inside their own corpus, making re-verification unconditionally green.",
+  "baselineRunId": "ev-20261011-132006-merge-skills",
+  "expectedSignal": {
+    "signalKey": "mergedTargetsWithCommittedProvenanceRecord",
+    "direction": "improve"
+  }
+}

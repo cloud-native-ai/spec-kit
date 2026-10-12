@@ -1,0 +1,30 @@
+{
+  "runId": "ev-20261011-132006-merge-skills",
+  "target": "skill:merge-skills",
+  "created": "2026-10-11T13:20:06Z",
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 11
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 43
+    }
+  },
+  "engine": {
+    "engineSubsetPath": "scripts/js/better-harness",
+    "upstreamCommit": "b2e621d",
+    "nodeVersion": "26.3.0"
+  },
+  "findingsDigest": "sha256:d1405d0483152f539b65c07c5ea045cfc702dbb2767368d112951171721802cc"
+}

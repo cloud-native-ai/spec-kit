@@ -28,7 +28,10 @@ Read the target's `SKILL.md` and **1–2 representative `references/` docs**, an
 - **File inventory + form classification** (see `content-extraction.md`): Markdown / HTML /
   scripts / assets / frontmatter.
 - **Content inventory**: capability families, command groups, fact tables, enumerated values,
-  workflows. This is the checklist Phase 5 later proves survived.
+  workflows. This is the checklist Phase 5 later proves survived **and** the row set of the
+  Phase-6 inheritance record, so enumerate capability families as scenarios a user could ask
+  the source to handle — not as file titles. The record has to keep making sense after the
+  source's file layout is gone, which a row named `inventory-schema.md` never will.
 - **Trigger keywords** from the source's `description` — these must migrate into the target's
   `description` so the source's invocation scenarios now route to the target.
 

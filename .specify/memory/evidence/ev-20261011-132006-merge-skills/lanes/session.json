@@ -1,0 +1,395 @@
+{
+  "schemaVersion": 3,
+  "kind": "session-core-facts",
+  "scope": {
+    "platform": "qoder",
+    "workspace": "spec-kit",
+    "until": "2026-10-11T13:20:06.407Z",
+    "selection": "stratified",
+    "eligibleSessions": 107,
+    "selectedSessions": 40,
+    "sampled": true
+  },
+  "candidateSelection": {
+    "strategy": "agent-work-loop-portfolio-v1",
+    "availableClasses": {
+      "validation-repair": 6,
+      "boundary-change": 5,
+      "lifecycle-demand": 2,
+      "operation-control": 22,
+      "change-gap": 13,
+      "read-only-work": 5
+    },
+    "emittedClasses": {
+      "validation-repair": 3,
+      "boundary-change": 2,
+      "lifecycle-demand": 1,
+      "operation-control": 5,
+      "change-gap": 1,
+      "read-only-work": 1
+    }
+  },
+  "admission": {
+    "taskEpisodes": 492,
+    "candidateEpisodes": 25,
+    "distinctRequests": 22,
+    "emittedCandidates": 5
+  },
+  "populationCoverage": {
+    "withChanges": 15,
+    "withChecks": 6,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 4,
+    "withFrictionConsequence": 0
+  },
+  "observationCoverage": {
+    "withChanges": 3,
+    "withChecks": 3,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 3,
+    "withFrictionConsequence": 0
+  },
+  "admissionSupport": {
+    "semanticGuardrails": [
+      "occurrences-not-distinct-episodes",
+      "coverage-not-suggestion",
+      "omitted-details-not-signal-evidence",
+      "project-capability-inventory-unobserved"
+    ],
+    "sharedFrictionConsequences": []
+  },
+  "candidates": [
+    {
+      "ref": "E1",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "Continue into Phase 4 (US2)",
+        "key": "req:bdc749c55f2f",
+        "occurrences": 1,
+        "followUp": "This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation. Summary:…",
+        "observedTurns": 2,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 1,
+        "files": 1
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "boundary-change",
+        "operation-control"
+      ],
+      "acceptanceSignals": [
+        "project-change",
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 151,
+        "classifiedReads": 99
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "execute",
+          "change",
+          "execute",
+          "check"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 6
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "after-final-change-unreviewed"
+        },
+        {
+          "kind": "pytest",
+          "status": "passed",
+          "relation": "after-final-change-unreviewed"
+        }
+      ],
+      "closure": "check-observed-relevance-unresolved",
+      "mechanisms": [
+        "hook:PreToolUse",
+        "hook:PostToolUse",
+        "hook:Stop"
+      ]
+    },
+    {
+      "ref": "E2",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation. Summary: 1. **Primary Request and Intent:** The session continues an SDD (Spec-Driven De…",
+        "key": "req:8a6fed800692",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "operation-control",
+        "read-only-work"
+      ],
+      "acceptanceSignals": [
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 582,
+        "classifiedReads": 242
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "execute",
+          "execute",
+          "check",
+          "execute"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 35
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "no-change-context"
+        },
+        {
+          "kind": "pytest",
+          "status": "passed",
+          "relation": "no-change-context"
+        }
+      ],
+      "friction": {
+        "executionFailures": 9,
+        "permissionDenials": 0
+      },
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "hook:UserPromptSubmit",
+        "hook:SessionStart",
+        "hook:PreToolUse"
+      ]
+    },
+    {
+      "ref": "E3",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "继续把 T050–T062 做完",
+        "key": "req:88cac996e893",
+        "occurrences": 1,
+        "intermediate": "This session is being continued from a previous conversation that ran out of context. The summary below covers the earli…",
+        "followUp": "以此授权执行:1,2,3,4,5,6,7,8 剩下的等完成之后再规划",
+        "observedTurns": 4,
+        "omittedTurns": 1
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "boundary-change",
+        "lifecycle-demand",
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "friction": {
+        "executionFailures": 1,
+        "permissionDenials": 0
+      },
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "skill:speckit.requirements"
+      ],
+      "lifecycle": [
+        {
+          "intent": "testing-verification",
+          "family": "debug-test-verification",
+          "dimensionId": "change-validation",
+          "checkId": "relevant-check",
+          "confidence": "High"
+        },
+        {
+          "intent": "setup-isolation",
+          "family": "setup-isolation",
+          "dimensionId": "controlled-execution",
+          "checkId": "instruction-led-start",
+          "confidence": "High"
+        }
+      ]
+    },
+    {
+      "ref": "E4",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "按照建议修复掉所有的阻塞问题",
+        "key": "req:d7e3b5dc3cff",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 1,
+        "files": 1
+      },
+      "evidenceClasses": [
+        "operation-control",
+        "change-gap"
+      ],
+      "acceptanceSignals": [
+        "project-change"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 17
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "change",
+          "execute",
+          "change"
+        ]
+      },
+      "checks": [],
+      "friction": {
+        "executionFailures": 2,
+        "permissionDenials": 0
+      },
+      "closure": "changed-without-check",
+      "mechanisms": [
+        "hook:UserPromptSubmit",
+        "hook:PreToolUse",
+        "hook:PostToolUse"
+      ]
+    },
+    {
+      "ref": "E5",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "continue",
+        "key": "req:e256ee8e7aff",
+        "occurrences": 3,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 1,
+        "files": 1
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "operation-control"
+      ],
+      "acceptanceSignals": [
+        "project-change",
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 204,
+        "classifiedReads": 154
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "execute",
+          "inspect",
+          "execute",
+          "change"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 28
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "not-after-final-change"
+        },
+        {
+          "kind": "agent-lint",
+          "status": "passed",
+          "relation": "not-after-final-change"
+        },
+        {
+          "kind": "node---test",
+          "status": "observed",
+          "relation": "not-after-final-change"
+        },
+        {
+          "kind": "node---test",
+          "status": "passed",
+          "relation": "not-after-final-change"
+        }
+      ],
+      "closure": "check-observed-relevance-unresolved",
+      "mechanisms": [
+        "hook:SessionStart",
+        "hook:UserPromptSubmit",
+        "hook:PreToolUse"
+      ],
+      "omittedChecks": 4
+    }
+  ],
+  "omitted": {
+    "noRequest": 464,
+    "selfAnalysis": 0,
+    "lowSignal": 3,
+    "duplicateRequests": 3,
+    "candidateBudget": 17,
+    "checkBudget": 4,
+    "activeSessions": 1,
+    "homeSessionOnly": 0
+  },
+  "warningCodes": [
+    "missing-optional-root",
+    "disabled-source-root"
+  ],
+  "excludes": [
+    "assistantText",
+    "rawPrompts",
+    "commands",
+    "toolOutput",
+    "paths",
+    "rawIds",
+    "secrets"
+  ],
+  "diagnosticFlags": [
+    "sampled-selection",
+    "portfolio-truncated",
+    "population-portfolio-divergence",
+    "no-reviewed-relevant-check-evidence",
+    "no-result-evidence"
+  ],
+  "cost": {
+    "serializedBytes": 6641,
+    "estimatedTokens": 1671
+  }
+}
