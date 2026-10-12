@@ -1,7 +1,7 @@
 ---
-status: active
+status: achieved
 created: 2026-10-09
-updated: 2026-10-09
+updated: 2026-10-12
 ---
 
 # Goal: skill-layer-install-separation
@@ -19,10 +19,10 @@ spec-kit 的技能完成 internal/external 分层落地与安装分流:源树按
 
 | ID | Target | Status |
 |----|--------|--------|
-| T-001 | create-skills 与 improve-skills 完成去 .specify 化,技能以通用 skills 根为主、Spec Kit 集成为可选 | open |
-| T-002 | 技能源树完成 internal/external 双层重家(32 实体各归其位),重家后引用面完成全量适配 | open |
-| T-003 | 镜像、安装与打包工具链完成两层映射与旧装迁移,两布局各自自洽 | open |
-| T-004 | 测试适配、两条守卫测试与本仓自用运行时刷新全部落地 | open |
+| T-001 | create-skills 与 improve-skills 完成去 .specify 化,技能以通用 skills 根为主、Spec Kit 集成为可选 | done |
+| T-002 | 技能源树完成 internal/external 双层重家(32 实体各归其位),重家后引用面完成全量适配 | done |
+| T-003 | 镜像、安装与打包工具链完成两层映射与旧装迁移,两布局各自自洽 | done |
+| T-004 | 测试适配、两条守卫测试与本仓自用运行时刷新全部落地 | done |
 
 ## History
 
@@ -34,3 +34,8 @@ spec-kit 的技能完成 internal/external 分层落地与安装分流:源树按
 - 2026-10-09 target T-003 added: 镜像、安装与打包工具链完成两层映射与旧装迁移,两布局各自自洽
 - 2026-10-09 target T-004 added: 测试适配、两条守卫测试与本仓自用运行时刷新全部落地
 - 2026-10-09 — criteria changed; prior value: 分流行为可验证:平铺发现面只注册 external 技能、internal 技能经 .specify/skills/internal/ 显式路径可解析(两条守卫测试为证);全量测试同口径 A/B 零新增失败,门控扫描 total ≤ 23
+- 2026-10-12 target T-001 open→done
+- 2026-10-12 target T-002 open→done
+- 2026-10-12 target T-003 open→done
+- 2026-10-12 target T-004 open→done
+- 2026-10-12 — status active -> achieved.

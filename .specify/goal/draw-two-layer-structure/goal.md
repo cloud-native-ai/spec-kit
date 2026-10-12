@@ -1,5 +1,5 @@
 ---
-status: active
+status: achieved
 created: 2026-09-16
 updated: 2026-10-12
 ---
@@ -40,3 +40,4 @@ updated: 2026-10-12
 - 2026-10-12 target T-001 open→done
 - 2026-10-12 — objective changed; prior value: 绘图能力呈两层自治结构：skills/draw-diagram 是唯一绘图入口，用户不必告知「画什么」—— 它据上下文与用户的补充说明自行分析语义，辨识层级、依赖与上下关系，抽象出图表并选定合适的结构类型，再把渲染委派给唯一最合适的引擎；用户面对 skills/draw-{d3js,echarts,excalidraw,mermaid,plantuml} 时不必告知布局、线段绘制与渲染等实现细节，语法知识各自归位于引擎层；每次出图后用户的评价被主动征询并据以调整，使一次绘图请求的完成不依赖用户补齐任何一层的知识。
 - 2026-10-12 — criteria changed; prior value: 七个绘图技能（draw-diagram 与 draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml}）在交付产物后都主动征询用户评价，评价以 evaluation form 承载：复用 speckit 现有 feedback 链路与机制，但与该技能内遵循 .specify/shared/workflow/feedback-step.md 红线与规则的标准 feedback 分立为两物，不混称。 | 用户未提出评价即视为本次绘制满意；用户提出评价则该条目经 feedback probe 进入 .specify/memory/feedback 并被持续处置，处置结论反哺对应技能。 | 达成程度以「绘制运行中无评价（=满意）的占比」与「已提出评价中被处置的占比」按程度衡量，不设固定阈值：本目标为长期目标，achieved 是一次刻意的人工判定而非算出的结论。
+- 2026-10-12 — status active -> achieved.
