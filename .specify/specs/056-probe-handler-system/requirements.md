@@ -7,17 +7,12 @@
 
 ## Related Feature *(mandatory)*
 
-<!--
-  ACTION REQUIRED: Keep the default values as "Need clarification" in the initial draft.
-  /speckit.clarify must resolve this section to the final Feature binding before planning.
--->
-
-**Feature ID**: Need clarification  
-**Feature Name**: Need clarification
+**Feature ID**: 056  
+**Feature Name**: Probe-Handler 体系（伞形：Probe / Handler / HandlerBinding 基础设施）
 
 ## Overview
 
-Probe（插点）目前只在 feedback 域完成实体化：`shared/definitions/probe-definitions.md` 以 Probe Class × Probe Object 两层模型登记 6 Class / 72 内部 Object，由 `feedback-utils.py --action probes`（查询/校验/对账/map/probe-inject）消费，契约测试钉死。其余探测→反应机制（触发升级探测、运行判定四轴、证据 lane 探测、满意度识别等）全部硬编码在引擎代码里——无 id、无注册表、无查询面，无法回答"框架现在有哪些 probe"，也无法被客户项目扩展。
+Probe（插点）目前只在 feedback 域完成实体化：`shared/definitions/probe-definitions.md` 以 Probe Class × Probe Object 两层模型登记 6 Class / 72 内部 Object，由 `feedback-utils.py --action probes`（查询/校验/对账/map/probe-inject）消费，契约测试钉死。其余探测→反应机制（触发升级探测、运行判定四轴、证据 lane 探测、满意度识别等）全部硬编码在引擎代码里——无 id、无注册表、无查询面，无法回答"框架现在有哪些 probe"，宿主项目也无法查询；handler 注册面则始终在框架侧（Q6 裁定：宿主只读，见 FR-021）。
 
 同时，wrap-up 收尾点的反应面已经自发演化出多个机制：feedback 记录 + 阈值提示（028/041/047/055）、token 自评（040）、运行判定（S2 引擎）、docs-sync 评估（033/037）、wrap-up 反思（dogfooding 惯例）。它们的接线形态是**手工嵌入段**——每个机制各自往命令模板与技能文件里塞独立小节，行为规则分散在 `feedback-step.md` 与 `docs-step.md` 两个 shared convention 内部组合。实测代价：Feature 040 一次 wrap-up 机制修订的传播足迹为 194 个文件；每个新机制 = 全框架模板手术。
 
@@ -131,6 +126,7 @@ Probe（插点）目前只在 feedback 域完成实体化：`shared/definitions/
 ### Edge Cases
 
 - **engine handler 的 action 引用不存在的 action** → `--validate` exit 2，指名 handler_id 与非法 action。
+- **handler 的 behavior_owner 路径不可达（错误/缺失/拼写）** → validate exit 2 指名不可达路径（与非法 action 同级，指针腐化禁止静默）。
 - **同一单元同一生命周期点两条 binding 的 order 值相同** → validate exit 2（order 在生效 binding 集内必须唯一；编译期消歧等于引入隐式次序，禁止）。
 - **外部 probe（`ext-` 前缀，宿主自定义单元）**：其单元不在框架模板/技能面内 → compile 跳过并在输出中披露 skipped 清单，不报错。
 - **用户手工编辑编译产物** → AUTO-GENERATED 横幅 + 既有 regen 先例语义（regen 覆盖，编辑丢失即用户责任）；对账测试对"产物 ≠ 编译重跑结果"转红。
@@ -153,30 +149,32 @@ Probe（插点）目前只在 feedback 域完成实体化：`shared/definitions/
 #### Handler 实体与 Binding（US2）
 
 - **FR-005**: Handler schema MUST 为六字段封闭集：`handler_id`（全局唯一，[[STR-004]] 前缀）、`kind`（`engine`/`agent`/`gate`）、`action`、`mode`（`non-blocking`/`blocking`，缺省 `non-blocking`）、`order`、`behavior_owner`（行为真源路径指针）。注册表 MUST NOT 复述 behavior_owner 的行为规则（One Source Of Truth）。
-- **FR-006**: HandlerBinding MUST 以 selector 声明订阅：`@point:<lifecycle_point>` + `scope`（`complex-commands`/`skills`/`all`），或逐 `object_id`；per-unit 覆盖（排除/变体）MUST 显式登记。一个 Probe Object MUST 可被多个 Binding 订阅（1 ⇒ N）；每个 Binding 恰指一个 Handler。
-- **FR-007**: kind=engine 的 action MUST 引用真实引擎 action（封闭集对账）；kind=agent 的 action MUST 是行为真源锚点；kind=gate MUST 对应 confirmation-gates.md 治理条目。
+- **FR-006**: HandlerBinding MUST 以 selector 声明订阅：`@point:<lifecycle_point>` + `scope`（`complex-commands`/`skills`/`all`），或逐 `object_id`；per-unit 覆盖（排除/变体）MUST 显式登记。`@point:` 为注册表字面 selector 语法，`lifecycle_point` 值域为封闭集 `wrap-up`/`situation`/`phase-boundary`/`confirm-gate`（Q4 裁定）。一个 Probe Object MUST 可被多个 Binding 订阅（1 ⇒ N）；每个 Binding 恰指一个 Handler。Binding 身份 = (`handler_id`, `selector`, `scope`) 三元组，validate MUST 拒绝完全重复的 Binding；同一 Handler 经多条 selector 命中同一单元同一生命周期点时 MUST 合并为单一编译条目（位于该 Handler 自身的 order 位置），order 冲突错误仅适用于不同 Handler（order 载于 Handler，见 FR-005）。
+- **FR-007**: kind=engine 的 action MUST 引用真实引擎 action（封闭集对账）；kind=agent 的 action MUST 是行为真源锚点；kind=gate MUST 对应 confirmation-gates.md 治理条目。任一 Handler 的 behavior_owner 路径 MUST 可达（validate exit 2 指名不可达路径，与非法 action 同级）。
 - **FR-008**: MVP 首批 handler MUST 至少含 h-run-determination（engine）、h-feedback-record（engine）、h-threshold-notice（agent）、h-token-reflection（agent）、h-docs-sync-eval（agent），全部绑定 `@point:wrap-up`；生效次序 MUST 保证 h-run-determination 先于 h-feedback-record 与 h-threshold-notice。
 
 #### 共享引擎与编译（US2/US3）
 
-- **FR-009**: 新建共享引擎 [[STR-002]]（stdlib-only，双镜像同 feedback-utils.py 分布），承载自 `feedback-utils.py` 抽出的 probe 族动作（probes/validate/reconcile/map/probe-inject，行为不变）与新动作（handlers 列表/过滤/validate、[[STR-003]]）；`feedback-utils.py` 保留 feedback 领域动作，其 action 封闭集契约 MUST 同步修订。
-- **FR-010**: [[STR-003]] MUST 从真源渲染每单元单一收尾段（[[STR-001]]，AUTO-GENERATED 横幅标记）：按 order 顶序列出该单元生效 handler 的调用形式；真源未变时两次编译逐字节一致（041 C-6 同型派生不变量）。收尾段标题取新段名 [[STR-001]]（Clarifications Q1 裁定）：041 C-5 对账与既有契约测试的标题钉点 MUST 在同一变更内迁移。
-- **FR-011**: 编译产物传播 MUST 走既有 `regen-command-copies.py` 与 `sync-mirrors.py` 机制；MUST NOT 新建传播器。
-- **FR-012**: [[STR-002]] 的 `--action handlers` MUST 支持列表与按 point/scope/kind/mode 过滤及 `--validate`；其 `--action probes` MUST 覆盖新 Class 的查询。
+- **FR-009**: 新建共享引擎 [[STR-002]]（stdlib-only，双镜像同 feedback-utils.py 分布），承载自 `feedback-utils.py` 抽出的 probe 族动作——`probes`/`map`/`probe-inject` 三个 action（`--validate`/`--reconcile` 为 `probes` 的 flag；引擎实测修正澄清前的列举口径），行为不变——与新动作（handlers 列表/过滤/validate、[[STR-003]]）；`feedback-utils.py` 保留 feedback 领域动作，其 action 封闭集契约 MUST 同步修订。外部 probe 存储目录（`.specify/memory/feedback/probes/`）仍归 feedback 域，[[STR-002]] 仅读写，零迁移。
+- **FR-010**: [[STR-003]] MUST 从真源渲染每单元单一收尾段（[[STR-001]]，AUTO-GENERATED 横幅标记）：按 order 顶序列出该单元生效 handler 的调用形式；调用形式按 kind 固定派生（Q4 裁定）——kind=engine 渲染一行 CLI 调用（引擎文件 + action），kind=agent 渲染一行行为真源锚点引用（behavior_owner 路径 + 锚点名），kind=gate 渲染一行治理条目引用（confirmation-gates.md 条目）；真源未变时两次编译逐字节一致（041 C-6 同型派生不变量）。收尾段标题取新段名 [[STR-001]]（Clarifications Q1 裁定）：041 C-5 对账与既有契约测试的标题钉点 MUST 在同一变更内迁移。
+- **FR-011**: 编译写入 templates/ 与 skills/ 源面后，产物传播 MUST 走既有 `regen-command-copies.py` 与 `sync-mirrors.py` 机制，执行次序固定为 compile → regen → sync（contract test 钉住次序）；MUST NOT 新建传播器。
+- **FR-012**: [[STR-002]] 的 `--action handlers` MUST 支持列表与按 point/scope/kind/mode 过滤及 `--validate`；其 `--action probes` MUST 覆盖新 Class 的查询。[[STR-003]] MUST 提供 `--check` 漂移预检模式并原子写产物（与 regen-command-copies.py / sync-mirrors.py 姊妹机制同型，drift exit 1）。查询面（probes / handlers 列表）对宿主项目只读可用，注册与编译写面仅框架真源侧（Q6 裁定，见 FR-021）。
 
 #### 语义保持与预算（US3/US4）
 
 - **FR-013**: 迁移 MUST 实现五项语义零回退：threshold 提示永不阻塞、agent 自省 never solicit、外部 probe 本地隔离不上送、技能 runtime-mode gate、简单命令排除集（agents/constitution/feature）——全部由既有契约测试继续钉住，零新增失败。
 - **FR-014**: 次序依赖 MUST 由 order 字段声明并经契约测试钉住（h-run-determination 在前，阈值提示消费其判定结果）。
 - **FR-015**: 一切生成措辞 MUST 零 `BLOCKING_PATTERNS` 命中；门控扫描 MUST 保持 total 23 / violations 0（预算整数余量 0，不得以改 baseline 换通过）。
-- **FR-016**: 迁移完成态：命令模板与技能收尾面 MUST 全部由编译产出，手工 `## Feedback` 嵌入段与 docs-sync 手工段在源模板面清零（[[STR-001]] 收尾段为唯一形态）。
+- **FR-016**: 迁移完成态：凡存在收尾段的单元，该段必为编译产出（[[STR-001]] 为唯一形态）；手工 `## Feedback` 嵌入段与 docs-sync 手工段在源模板面清零；零生效 handler 的单元不输出收尾段（Q5 裁定，简单命令与外部单元保持现状无段形态）。
 
 #### 对账、二期与词汇表（US4/US5）
 
 - **FR-017**: 编译产物（[[STR-003]] 输出）↔ 真源 MUST 双向零缺漏（孤儿 handler、缺失 handler、非法 action、order 冲突均为 exit 2 错误）；对账复用并扩展 041 C-5 的嵌入点对账机制。
 - **FR-018**: 二期 binding（situation / phase-boundary / confirm-gate）入册后 MUST 走与 US3 相同的编译/对账规则；confirm-gate 的 19 个既有 Object 挂 h-gate-evidence，044 门控证据契约零回退。
-- **FR-019**: 词汇表 MUST 新增三个术语：Probe（伞形）、Handler、HandlerBinding（origin=auto, status=proposed 起步）；Feedback Probe 条目 MUST 改写为伞形下的域实例表述；「埋点」消歧条目 MUST 重写指向伞形定义。
-- **FR-020**: `docs/reference/` 的 probe 体系文档 MUST 更新（伞形模型、handlers CLI、编译流程）；行为真源文件（feedback-step.md / docs-step.md / proactive-trigger.md）MUST 保持不动。
+- **FR-019**: 词汇表 MUST 新增三个术语：Probe（伞形）、Handler、HandlerBinding（origin=auto, status=proposed 起步）；既有 Probe Class 与 Probe Object 条目 MUST 随伞形落定改写（当前表述自定义为 Feedback Probe 的两层，改写为伞形的两层）；Feedback Probe 条目 MUST 改写为伞形下的域实例表述；「埋点」消歧条目 MUST 重写指向伞形定义。
+- **FR-020**: 行为真源文件（feedback-step.md / docs-step.md / proactive-trigger.md）的**行为规则** MUST 保持不动；其嵌入位置、段标题等**接线引用类字面量** MUST 随收尾段标题迁移同步更新（Q3 裁定：冻结不适用于接线指针——标题迁移必然触及 feedback-step.md 嵌入参考形态与 docs-step.md 放置行，二者不能同时成立，已裁决接线编辑胜出）。
+- **FR-021**: 宿主项目（客户项目）对 probe/handler 体系的访问面为**只读**（Q6 裁定）：MAY 运行 [[STR-002]] 查询面（probes / handlers 列表）回答"本安装面有哪些探测点与 handler"；MUST NOT 获得 Handler/HandlerBinding 注册或编译写面——注册仅框架真源侧，宿主扩展留作 Future Evolution 记入 Feature 详情文件。
+- **FR-022**: `docs/reference/` 的 probe 体系文档 MUST 更新（伞形模型、handlers CLI、编译流程）。
 
 ### Key Entities *(include if requirement involves data)*
 
@@ -202,12 +200,12 @@ Probe（插点）目前只在 feedback 域完成实体化：`shared/definitions/
 ### Measurement Sources & Collection Methods
 
 - **SC-001 Source**: 实现后运行 `probe-utils.py --action probes --validate`（对照迁移前 `feedback-utils.py --action probes --validate` 输出 6/72 基线）；频次 = 实现期 + 回归。
-- **SC-002 Source**: 测试内演示性注册临时 handler + binding 后运行 compile-embeds，`git diff --stat` 对模板面计数为 0；频次 = 契约测试常驻。
+- **SC-002 Source**: 测试内演示性注册临时 handler + binding 后运行 compile-embeds，`git diff --stat` 对**模板面全路径集**（templates/ + skills/ 源面及全部镜像/工具副本面）计数为 0；频次 = 契约测试常驻。
 - **SC-003 Source**: 契约测试（编译幂等断言 + 五类破损变异用例）；频次 = 每次真源或编译器变更。
 - **SC-004 Source**: 迁移前后全量 pytest 名字级 `comm -13` 为空（零新增失败）+ FR-013 五项的具名测试清单核对；频次 = 每个 phase 边界。
 - **SC-005 Source**: `scan-confirmation-gates.py` 输出与迁移前实测值（total 23 / violations 0）比对；频次 = 每个 phase 边界。
 - **SC-006 Source**: 契约测试 import 两引擎 action 枚举与真源 handler 行双向集合相等；频次 = 每次引擎变更。
-- **SC-007 Source**: 迁移前后对 23 个命令模板收尾面行数实测对比（改前值冻结于 plan 期基线）；频次 = 一次性（迁移完成时）。
+- **SC-007 Source**: 计数规则 = 收尾面**非空行数**（`## Feedback` + docs-sync 两段合计 vs [[STR-001]] 单段，源模板面）；迁移前数值冻结于 plan.md 具名小节（格式仿 044 基线先例）；频次 = 一次性（迁移完成时）。
 - **SC-008 Source**: 真源目录节检查（条目形态 = 路径 + 一行语义）+ 对账计数排除断言；频次 = 契约测试常驻。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
@@ -229,3 +227,11 @@ Format: - Q: <question> → A: <answer>
 -->
 
 - Q1: 编译产物收尾段的标题用什么？（现状 wrap-up 反应由 `## Feedback` + docs-sync 两个手工段承载，041 C-5 对账与多个契约测试钉在 `## Feedback` 标题上） → A: 新段名 `## Wrap-up`（[[STR-001]]）——收尾段承载 N 个 handler，语义不只 feedback；标题钉点的迁移在本特性同一变更内完成（用户裁定，2026-10-13）。
+
+### Session 2026-10-13
+
+- Q2: 特性 056 绑定到哪个 Feature（Related Feature 解析）？ → A: **新建 Feature 056**（伞形：Probe / Handler / HandlerBinding 基础设施）——无既有 Feature 以全框架 probe 基础设施为 scope；028 是 feedback 域（其 sibling specs 吸收的均为 feedback 工作），绑定 028 会与 FR-019「Feedback Probe 降为域实例」的归属方向矛盾；050 的 scope 是主动触发本身。注册表义务：新增 Draft 行 + 详情文件 + 028 反向交叉引用。
+- Q3: FR-020 行为真源冻结与标题迁移冲突（feedback-step.md 嵌入参考形态、docs-step.md 放置行都钉着 `## Feedback` 字面量，与「MUST 保持不动」不能同时成立）？ → A: 修订 FR-020——行为规则不动，**接线引用类最小编辑允许**；冻结条款改写为行为规则维度的冻结。
+- Q4: 编译产物中 handler「调用形式」如何从六字段 schema 派生？ → A: **按 kind 固定形态**——engine→CLI 调用行（引擎文件+action）、agent→行为真源锚点引用行、gate→治理条目引用行；零 schema 变更。同时裁定 `@point:` 为字面 selector 语法，lifecycle_point 值域封闭集 {wrap-up, situation, phase-boundary, confirm-gate}。
+- Q5: 零生效 handler 的单元（简单命令 agents/constitution/feature、外部 probe 单元）编译输出空段还是无段？ → A: **不输出段**——与现状一致（这些单元本无嵌入段），041 C-5 嵌入计数语义零变化；FR-016 改写为「凡存在收尾段必为编译产出」。
+- Q6: 宿主项目注册 Handler 在本特性范围内吗（Overview 曾把"无法被客户项目扩展"列为痛点）？ → A: **宿主只读**——宿主 MAY 运行查询面（probes / handlers 列表），MUST NOT 获得注册/编译写面；新增 FR-021；宿主 handler 注册留作 Future Evolution 记入 Feature 详情文件。

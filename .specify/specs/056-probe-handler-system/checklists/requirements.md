@@ -2,8 +2,8 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-10-13
-**Feature**: [requirements.md](../requirements.md) · Related Feature `Need clarification`（绑定由 /speckit.clarify 解决） · Status `Draft`
-**Validation runs**: 1 — ① 2026-10-13 初稿（确定性检查器 exit 0 后、Q1 澄清回写同批落地，16/16）
+**Feature**: [requirements.md](../requirements.md) · Related Feature `056`（Probe-Handler 体系伞形，Q2 绑定） · Status `Draft`
+**Validation runs**: 2 — ① 2026-10-13 初稿（确定性检查器 exit 0 后、Q1 澄清回写同批落地，16/16）；② 2026-10-13 /speckit.clarify 澄清后（Q2–Q6 回写、FR 20→22、derived counts 已重测，16/16 维持）
 
 ## Content Quality
 
@@ -39,4 +39,4 @@
 
 ### 确定性检查器记录
 
-`validate-requirements.py` 首轮 8 error（STR 引用未落在消费行内 ×8 / 活动标记 ×1）→ 修正后 exit 0：id-contiguous / doc-order / ref-resolvable / marker-count / dup-id 全 pass，28 definition rows、4 shared strings。
+`validate-requirements.py` 首轮 8 error（STR 引用未落在消费行内 ×8 / 活动标记 ×1）→ 修正后 exit 0：id-contiguous / doc-order / ref-resolvable / marker-count / dup-id 全 pass。**运行 ②（澄清后实测）**：30 definition rows（FR 22 + SC 8）、4 shared strings，exit 0 全 pass。
