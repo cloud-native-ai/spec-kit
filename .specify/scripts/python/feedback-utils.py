@@ -1176,6 +1176,33 @@ _PROBE_KINDS = ("internal", "external")
 _CLASS_FIELDS = ("class_id", "kind", "collection", "target_slice",
                  "processing", "insertion_type")
 _OBJECT_FIELDS = ("object_id", "class_id", "unit", "lifecycle_point")
+_SCRIPT_UNIT_RE = re.compile(r"^scripts/(?:bash|python)/[a-z0-9][a-z0-9._-]*\.(?:py|sh)$")
+_CATALOG_HEADING = "非实体 probe 目录"
+_CATALOG_ENTRY_RE = re.compile(r"^- `([^`]+)` — .+$")
+
+
+def _catalog_entries(text: str) -> List[Tuple[str, str]]:
+    """Parse the non-entity probe catalog chapter as (path, raw-line) tuples.
+
+    The catalog is pointer-only and MUST NOT participate in any registry
+    counting — this helper is consumed solely for reachability validation.
+    """
+    lines = text.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if line.strip() == f"## {_CATALOG_HEADING}":
+            start = i + 1
+            break
+    if start is None:
+        return []
+    out: List[Tuple[str, str]] = []
+    for line in lines[start:]:
+        if line.strip().startswith("## "):
+            break
+        m = _CATALOG_ENTRY_RE.match(line.strip())
+        if m:
+            out.append((m.group(1), line.strip()))
+    return out
 
 
 def probe_defs_path(workspace_root: Path) -> Path:
@@ -1258,6 +1285,7 @@ def load_probe_registry(workspace_root: Path) -> Dict[str, Any]:
             if c.get("kind", "") not in _PROBE_KINDS:
                 errors.append(f"class '{cid}': kind must be one of internal|external")
         class_ids = {c.get("class_id", "") for c in classes}
+        class_slice = {c.get("class_id", ""): c.get("target_slice", "") for c in classes}
         seen_objects = set()
         for o in objects:
             oid = o.get("object_id", "")
@@ -1268,9 +1296,18 @@ def load_probe_registry(workspace_root: Path) -> Dict[str, Any]:
             seen_objects.add(oid)
             if o.get("class_id", "") not in class_ids:
                 errors.append(f"object '{oid}': unknown class '{o.get('class_id', '')}'")
-            if not validate_unit_id(o.get("unit", "")):
+            if class_slice.get(o.get("class_id", "")) == "scripts":
+                if not _SCRIPT_UNIT_RE.match(o.get("unit", "")):
+                    errors.append(
+                        f"object '{oid}': unit '{o.get('unit', '')}' must be an engine "
+                        "script path (scripts/python/*.py or scripts/bash/*.sh) for "
+                        "scripts-slice classes")
+            elif not validate_unit_id(o.get("unit", "")):
                 errors.append(
                     f"object '{oid}': unit '{o.get('unit', '')}' must be /speckit.* or skill:*")
+        for rel, _entry in _catalog_entries(text):
+            if not (workspace_root / rel).is_file():
+                errors.append(f"non-entity catalog entry unreachable: {rel}")
         external = _load_external_probes(workspace_root, errors)
         class_kind = {c.get("class_id", ""): c.get("kind", "") for c in classes}
         for e in external:
@@ -1378,6 +1415,7 @@ def action_probes(args: argparse.Namespace) -> Dict[str, Any]:
                 c.get("class_id", "")
                 for c in registry["classes"]
                 if c.get("insertion_type", "") == "wrap-up"
+                and c.get("target_slice", "") != "scripts"
             }
             for unit in sorted(u for u in embeds if u not in declared):
                 errors.append(f"embed without probe object: {unit} ({embeds[unit]})")

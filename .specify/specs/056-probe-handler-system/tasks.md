@@ -132,16 +132,16 @@ python3 scripts/python/sync-mirrors.py --check
 
 > 写在实现前，先证明其红（对账测试以变异演练证明能红；注册表扩格前对账测试因锚点缺失而红即自然红起点，红证据落 `notes/red-first-evidence.md`）。
 
-- [ ] T003 [P] [US1] 编写契约测试 `tests/contract/test_probe_registry_umbrella.py`（红优先）：注册表伞形结构校验（Class/Object 两层 + 代码锚点列）+ 对 trigger-utils.py（P1–P5 升级探测具名函数）、run-determination.py（四轴 + 可用性探测具名函数/常量）、evidence-utils.py（lane 探测具名行）的双向对账（锚点存在⇔注册行存在），变异可红设计（删锚点/删注册行均须转红）
-- [ ] T004 [P] [US1] 编写契约测试 `tests/contract/test_probe_nonentity_catalog.py`（红优先）：非实体 probe 目录节纯指针形态校验（每条目 = 路径 + 一行语义，禁行为规则复述）+ 微探针 exclusion 计数（writability/probe-links/git probe 等按 One Source of Truth code-first 不入册，仅目录化）
+- [X] T003 [P] [US1] 编写契约测试 `tests/contract/test_probe_registry_umbrella.py`（红优先）：注册表伞形结构校验（Class/Object 两层 + 代码锚点列）+ 对 trigger-utils.py（P1–P5 升级探测具名函数）、run-determination.py（四轴 + 可用性探测具名函数/常量）、evidence-utils.py（lane 探测具名行）的双向对账（锚点存在⇔注册行存在），变异可红设计（删锚点/删注册行均须转红）
+- [X] T004 [P] [US1] 编写契约测试 `tests/contract/test_probe_nonentity_catalog.py`（红优先）：非实体 probe 目录节纯指针形态校验（每条目 = 路径 + 一行语义，禁行为规则复述）+ 微探针 exclusion 计数（writability/probe-links/git probe 等按 One Source of Truth code-first 不入册，仅目录化）
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] [blockedBy: T003,T004] 伞形扩格 `shared/definitions/probe-definitions.md`：头部声明升格为全框架 Probe 真源；既有 feedback 6 Class / 72 Object 行零改动；新增散布探测点 Class 与 Object 行（id / 代码锚点 / 归属切片），锚点以 T003 对账测试实际通过为准；履行 [C1] 迁移义务
-- [ ] T006 [US1] [blockedBy: T005] 新增 `shared/definitions/probe-definitions.md` 「非实体 probe 目录」节：纯指针条目（writability / probe-links / git probe 等，路径 + 一行语义），满足 T004 指针形态校验
-- [ ] T007 [US1] [blockedBy: T006] `scripts/python/feedback-utils.py` probes 动作适配：validate/reconcile 覆盖非实体目录节（指针可达性校验）与 scripts 切片（`--action probes` 输出含新 Class，行为向后兼容）；`.specify/scripts/python/` 镜像暂不动（T008 统一传播）
-- [ ] T008 [US1] [blockedBy: T007] 镜像双写验证：`python3 scripts/python/sync-mirrors.py --write --only registry,scripts`（或等价 --only 选择器）+ `--check` 无 NEW drift；`python3 scripts/python/feedback-utils.py --action probes --validate` exit 0
-- [ ] T009 [US1] [blockedBy: T008] US1 故事验证：`pytest tests/contract/test_probe_registry_umbrella.py tests/contract/test_probe_nonentity_catalog.py` 绿；变异演练（删除一个已入册代码锚点 → 对账测试转红指名锚点，恢复后复绿）证据落 `notes/red-first-evidence.md`；`--action probes` 清单含全部新 Class
+- [X] T005 [US1] [blockedBy: T003,T004] 伞形扩格 `shared/definitions/probe-definitions.md`：头部声明升格为全框架 Probe 真源；既有 feedback 6 Class / 72 Object 行零改动；新增散布探测点 Class 与 Object 行（id / 代码锚点 / 归属切片），锚点以 T003 对账测试实际通过为准；履行 [C1] 迁移义务
+- [X] T006 [US1] [blockedBy: T005] 新增 `shared/definitions/probe-definitions.md` 「非实体 probe 目录」节：纯指针条目（writability / probe-links / git probe 等，路径 + 一行语义），满足 T004 指针形态校验
+- [X] T007 [US1] [blockedBy: T006] `scripts/python/feedback-utils.py` probes 动作适配：validate/reconcile 覆盖非实体目录节（指针可达性校验）与 scripts 切片（`--action probes` 输出含新 Class，行为向后兼容）；`.specify/scripts/python/` 镜像暂不动（T008 统一传播）
+- [X] T008 [US1] [blockedBy: T007] 镜像双写验证：`python3 scripts/python/sync-mirrors.py --write --only registry,scripts`（或等价 --only 选择器）+ `--check` 无 NEW drift；`python3 scripts/python/feedback-utils.py --action probes --validate` exit 0
+- [X] T009 [US1] [blockedBy: T008] US1 故事验证：`pytest tests/contract/test_probe_registry_umbrella.py tests/contract/test_probe_nonentity_catalog.py` 绿；变异演练（删除一个已入册代码锚点 → 对账测试转红指名锚点，恢复后复绿）证据落 `notes/red-first-evidence.md`；`--action probes` 清单含全部新 Class
 
 **Checkpoint**: probe 成为可查询全框架实体——一次 `--action probes` 得到跨域清单，对账零漂移。MVP 完成，STOP 验证。
 
