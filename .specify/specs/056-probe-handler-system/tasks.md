@@ -25,7 +25,7 @@
 - DoD-7: 词汇表三新术语（Probe 伞形 / Handler / HandlerBinding，Feedback Probe 降为域实例，「埋点」消歧重写）与 `docs/reference/` probe 体系文档更新完成（FR-019 / FR-022）
 - DoD-8: `verification.md` 覆盖 requirements.md 全部 SC-001..008，含诚实 partial（如有）
 
-**DoD Status**: pending
+**DoD Status**: green — Completion Gate GATE-1..7 re-validated against the tree 2026-10-14 (verification.md)
 
 ## Completion Gate
 
@@ -229,8 +229,8 @@ python3 scripts/python/sync-mirrors.py --check
 
 - [X] T032 [US5] [blockedBy: T031] 注册表二期 binding 落行：`shared/definitions/probe-definitions.md` ## HandlerBinding 章追加三类 binding（situation / phase-boundary / confirm-gate + h-gate-evidence 行，data-model.md 为准）；`--action probes --validate` 覆盖新点
 - [X] T033 [US5] [blockedBy: T032] 二期编译与对账：`compile-embeds --write` + reconcile 绿；044 既有门控证据契约零回退（`pytest tests/ -k gate_evidence` 或对应既有测试文件）；GATE-6 复测
-- [ ] T034 [P] [US5] [blockedBy: T009] 词汇表更新 `.specify/memory/glossary.md`（宿主面，无镜像对）：新增 Probe（伞形）/ Handler / HandlerBinding 三术语（origin=auto status=proposed 起步、本轮内由本运行确认），Feedback Probe 条目降为域实例表述，「埋点」消歧条目重写指向伞形定义
-- [ ] T035 [P] [US5] [blockedBy: T017] docs/reference 更新：probe 体系文档（probe 五动作 CLI 面、Handler/HandlerBinding 模型、宿主只读边界 Q6）落 `docs/reference/skills/probe.md`（或按 Documentation Map 既有 probe 文档位修正），保持 One Source of Truth 指针形态
+- [X] T034 [P] [US5] [blockedBy: T009] 词汇表更新 `.specify/memory/glossary.md`（宿主面，无镜像对）：新增 Probe（伞形）/ Handler / HandlerBinding 三术语（origin=auto status=proposed 起步、本轮内由本运行确认），Feedback Probe 条目降为域实例表述，「埋点」消歧条目重写指向伞形定义
+- [X] T035 [P] [US5] [blockedBy: T017] docs/reference 更新：probe 体系文档（probe 五动作 CLI 面、Handler/HandlerBinding 模型、宿主只读边界 Q6）落 `docs/reference/skills/probe.md`（或按 Documentation Map 既有 probe 文档位修正），保持 One Source of Truth 指针形态
 
 **Checkpoint**: 全生命周期点订阅面与词汇/文档接线完成。
 
@@ -238,9 +238,9 @@ python3 scripts/python/sync-mirrors.py --check
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T036 [P] 全量契约测试回归：`python3 -m pytest tests/ -m contract` 对比 T002 基线零新增失败（含既有 feedback 域 14→11 动作面、028 六 Class 语义、041/044/050/053/055 交叉特性契约）
-- [ ] T037 [P] quickstart.md 四场景全程走查（注册+重编译 / 漂移预检+对账 / 零生效单元 / 动作集对账），结论落 `notes/quickstart-run.md`
-- [ ] T038 终检 sweep：GATE-1..GATE-7 逐条执行并记录输出（sync-mirrors --check / regen --check 双绿、compile-embeds --check exit 0、门控 total 23/violations 0、手工段清零、tasks.md 开放行 0）
+- [X] T036 [P] 全量契约测试回归：`python3 -m pytest tests/ -m contract` 对比 T002 基线零新增失败（含既有 feedback 域 14→11 动作面、028 六 Class 语义、041/044/050/053/055 交叉特性契约）
+- [X] T037 [P] quickstart.md 四场景全程走查（注册+重编译 / 漂移预检+对账 / 零生效单元 / 动作集对账），结论落 `notes/quickstart-run.md`
+- [X] T038 终检 sweep：GATE-1..GATE-7 逐条执行并记录输出（sync-mirrors --check / regen --check 双绿、compile-embeds --check exit 0、门控 total 23/violations 0、手工段清零、tasks.md 开放行 0）
 
 ## Dependencies & Execution Order
 

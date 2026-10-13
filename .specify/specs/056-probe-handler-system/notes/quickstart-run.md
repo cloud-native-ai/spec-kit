@@ -60,3 +60,21 @@
 迁移完成态成立：加机制 = 注册一行 + 重编译 + 固定次序传播；漂移由 `--check` exit 1
 先行；零生效单元保持无段；措辞零 BLOCKING 命中且门控预算不动。编译段为唯一收尾形态
 （模板占位段除外，已登记）。
+
+## 7. T037 全程走查补录（2026-10-14）
+
+- **Scenario 1**（注册+重编译+传播）：T031–T033 走全链（8 handlers / 50 bindings → validate
+  绿 → compile 0 written（指纹投影不变量）→ regen/sync --check 双绿）。
+- **Scenario 2**（漂移预检+对账）：实树演练 —— 改镜像注册表 order 40→45 → `--check` **exit 1**
+  （stale 可再生漂移，69/69 列名）→ `probes --reconcile` → 重编译 69 written → `--check` 归零
+  → sync 恢复注册表 → 重编译复位 → 复绿。
+- **Scenario 3**（零生效单元）：agents/constitution/feature grep = 0/0/0（T026 已录）。
+- **Scenario 4**（动作封闭集对账）：probe-utils 5 / feedback-utils 11 / probes --validate
+  9 classes 106 objects（T026 已录）。
+
+### 走查发现并修复的缺陷（T037 实测产出）
+
+`scan_embed_units` 仍以 `## Feedback` 字面量为 embed 判据 —— 迁移完成态下 69 单元仅 9 个
+含该字面（围栏示例/散文残留），`probes --reconcile` 因此报 ~60 个「probe object without
+embed」。修复：判据迁移为编译面 `## Wrap-up`（引擎 + 3 处测试 fixture 字面同步）；修复后
+reconcile zero-gap（69 embeds）。归因：T014/T021 迁移遗漏的对账面，属主体缺陷非断言缺陷。

@@ -98,10 +98,8 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 | `reindex` | Explicit reconciliation and migration entry point (req 055): derives entries from the entry files, materializes store scalars into `state/`, retires a legacy `index.json`, and reports `migrated`. Idempotent. |
 | `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. `--include-introspection` additionally packs the introspection reports covering the selected entries (plus a `## Introspection Reports` MANIFEST section). |
 | `cleanup` | After packaging, remove the entries contained in a given zip from the active store (`--package <zip|latest>`, `--dry-run` preview first); every removal is logged to `cleanup-log.md`. |
-| `probes` | Print the merged probe registry (framework Classes/Objects + project external probes) as a tree; `--validate` schema-checks (exit 2), `--reconcile` audits embeds two-way. |
-| `map` | Rebuild the rendered `probe-map.md` deterministically from the registry truth source. |
+| `probes` / `map` / `probe-inject` | Migrated to the shared probe engine (056): run them on `probe-utils.py` — see [probe.md](probe.md) for the probe-family CLI, the Handler/HandlerBinding model, and the read-only host boundary. |
 | `migrate-legacy` | One-shot convergence of legacy entries per an approved plan file (`--plan-file`, one `<entry-id> -> delete|re-register` per line); every outcome lands in the migration log. |
-| `probe-inject` | Inject an external probe object for a client-project custom unit (`--unit custom:<owner>/<name>`, `--notes-file`); writes `.specify/memory/feedback/probes/ext-<slug>.md`. |
 | `upstream` | Show (or `--set`) the upstream repo URL used for manual delivery guidance. |
 | `introspect-register` | Validate an introspection report (`--report-file`), link its member entries (`introspection_ref`), and flip `supersedes` targets; the report roster is derived by scanning `introspection/*.md` (req 055 — nothing to maintain in an index); `--confirm` (after user ratification) flips the report to `confirmed` and applies each finding's `建议处置` rows as batch dispositions. Validation failure exits 2 listing every violation. `dispose` also accepts optional `--reason`/`--ref` provenance fields. |
 
