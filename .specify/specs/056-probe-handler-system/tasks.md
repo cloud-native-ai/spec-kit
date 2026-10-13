@@ -203,13 +203,13 @@ python3 scripts/python/sync-mirrors.py --check
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T027 [P] [US4] 编写契约测试 `tests/contract/test_compile_reconcile_guards.py`（红优先，五类变异矩阵）：孤儿 handler（产物含未注册 handler → exit 2）、缺失 handler（binding 声明但产物没有 → exit 2）、非法 action（engine handler 引用不存在 action → exit 2 指名 handler_id）、order 冲突（同点同生命周期两条 binding 同 order → exit 2）、措辞命中（生成段含阻塞语气句 → 转红）；order 次序契约（h-run-determination 先于 h-feedback-record / h-threshold-notice）钉住
+- [X] T027 [P] [US4] 编写契约测试 `tests/contract/test_compile_reconcile_guards.py`（红优先，五类变异矩阵）：孤儿 handler（产物含未注册 handler → exit 2）、缺失 handler（binding 声明但产物没有 → exit 2）、非法 action（engine handler 引用不存在 action → exit 2 指名 handler_id）、order 冲突（同点同生命周期两条 binding 同 order → exit 2）、措辞命中（生成段含阻塞语气句 → 转红）；order 次序契约（h-run-determination 先于 h-feedback-record / h-threshold-notice）钉住
 
 ### Implementation for User Story 4
 
-- [ ] T028 [US4] [blockedBy: T027] `scripts/python/probe-utils.py` 补全对账守卫逻辑：reconcile（产物↔注册表双向）、handlers --validate 的 action 封闭集 import 对账（[C4] 消费引擎真实 action 集）、order 唯一性、behavior_owner 可达性校验（错误/缺失/拼写 → exit 2 指名不可达路径）、BLOCKING_PATTERNS 集成；镜像随 T030
-- [ ] T029 [US4] [blockedBy: T028] US4 变异演练：五类破损逐一构造 → 对应测试转红且指名错误（证据落 `notes/red-first-evidence.md`）→ 正向树全绿；门控预算不变复测（total 23 / violations 0）
-- [ ] T030 [US4] [blockedBy: T029] 镜像双写验证：sync-mirrors 传播 scripts 对 + `--check` 无 NEW drift
+- [X] T028 [US4] [blockedBy: T027] `scripts/python/probe-utils.py` 补全对账守卫逻辑：reconcile（产物↔注册表双向）、handlers --validate 的 action 封闭集 import 对账（[C4] 消费引擎真实 action 集）、order 唯一性、behavior_owner 可达性校验（错误/缺失/拼写 → exit 2 指名不可达路径）、BLOCKING_PATTERNS 集成；镜像随 T030
+- [X] T029 [US4] [blockedBy: T028] US4 变异演练：五类破损逐一构造 → 对应测试转红且指名错误（证据落 `notes/red-first-evidence.md`）→ 正向树全绿；门控预算不变复测（total 23 / violations 0）
+- [X] T030 [US4] [blockedBy: T029] 镜像双写验证：sync-mirrors 传播 scripts 对 + `--check` 无 NEW drift
 
 **Checkpoint**: 编译产物静默漂移被结构性排除——快速失败纪律对"机器给出的绿"同样成立。
 
@@ -223,12 +223,12 @@ python3 scripts/python/sync-mirrors.py --check
 
 ### Tests for User Story 5 (MANDATORY) ⚠️
 
-- [ ] T031 [P] [US5] [blockedBy: T029] 编写契约测试 `tests/contract/test_phase2_bindings.py`（红优先）：`@point:situation` / `@point:phase-boundary` / `@point:confirm-gate` binding 注册行结构校验 + 044 既有 19 个 gate Object 与 h-gate-evidence binding 对账（零缺漏）
+- [X] T031 [P] [US5] [blockedBy: T029] 编写契约测试 `tests/contract/test_phase2_bindings.py`（红优先）：`@point:situation` / `@point:phase-boundary` / `@point:confirm-gate` binding 注册行结构校验 + 044 既有 19 个 gate Object 与 h-gate-evidence binding 对账（零缺漏）
 
 ### Implementation for User Story 5
 
-- [ ] T032 [US5] [blockedBy: T031] 注册表二期 binding 落行：`shared/definitions/probe-definitions.md` ## HandlerBinding 章追加三类 binding（situation / phase-boundary / confirm-gate + h-gate-evidence 行，data-model.md 为准）；`--action probes --validate` 覆盖新点
-- [ ] T033 [US5] [blockedBy: T032] 二期编译与对账：`compile-embeds --write` + reconcile 绿；044 既有门控证据契约零回退（`pytest tests/ -k gate_evidence` 或对应既有测试文件）；GATE-6 复测
+- [X] T032 [US5] [blockedBy: T031] 注册表二期 binding 落行：`shared/definitions/probe-definitions.md` ## HandlerBinding 章追加三类 binding（situation / phase-boundary / confirm-gate + h-gate-evidence 行，data-model.md 为准）；`--action probes --validate` 覆盖新点
+- [X] T033 [US5] [blockedBy: T032] 二期编译与对账：`compile-embeds --write` + reconcile 绿；044 既有门控证据契约零回退（`pytest tests/ -k gate_evidence` 或对应既有测试文件）；GATE-6 复测
 - [ ] T034 [P] [US5] [blockedBy: T009] 词汇表更新 `.specify/memory/glossary.md`（宿主面，无镜像对）：新增 Probe（伞形）/ Handler / HandlerBinding 三术语（origin=auto status=proposed 起步、本轮内由本运行确认），Feedback Probe 条目降为域实例表述，「埋点」消歧条目重写指向伞形定义
 - [ ] T035 [P] [US5] [blockedBy: T017] docs/reference 更新：probe 体系文档（probe 五动作 CLI 面、Handler/HandlerBinding 模型、宿主只读边界 Q6）落 `docs/reference/skills/probe.md`（或按 Documentation Map 既有 probe 文档位修正），保持 One Source of Truth 指针形态
 

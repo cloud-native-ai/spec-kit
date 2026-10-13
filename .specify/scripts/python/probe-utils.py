@@ -39,11 +39,21 @@ class FeedbackError(ValueError):
 
 
 class CheckDriftError(Exception):
-    """compile-embeds --check found drift (exit code 1, writes nothing)."""
+    """compile-embeds --check found drift (writes nothing).
+
+    Exit code: 1 for regenerable drift (a stale render of an older registry
+    state — recompile fixes it); 2 for structural classes (orphan/missing
+    handler lines in an artifact whose banner fingerprint claims currency —
+    hand corruption, review before recompiling)."""
 
     def __init__(self, payload: Dict[str, Any]):
-        super().__init__("; ".join(payload.get("drift", [])) or "drift")
+        parts = payload.get("structural", []) + payload.get("drift", [])
+        super().__init__("; ".join(parts) or "drift")
         self.payload = payload
+
+    @property
+    def exit_code(self) -> int:
+        return 2 if self.payload.get("structural") else 1
 
 
 def validate_unit_id(unit_id: str) -> bool:
@@ -350,11 +360,15 @@ def _embed_candidate_paths(workspace_root: Path) -> List[Tuple[str, Path]]:
 
 
 def scan_embed_units(workspace_root: Path) -> Dict[str, str]:
-    """unit_id → file, from ``## Feedback`` embeds (framework repo layout)."""
+    """unit_id → file, from the wrap-up face (framework repo layout).
+
+    Post-056 the face is the compiled `## Wrap-up`; the pre-056 `## Feedback`
+    literal is dead on a migrated tree, so the reconcile must not key on it
+    (keying on it reports every migrated unit as embed-less)."""
     return {
         unit_id: path.relative_to(workspace_root).as_posix()
         for unit_id, path in _embed_candidate_paths(workspace_root)
-        if "## Feedback" in path.read_text(encoding="utf-8")
+        if "## Wrap-up" in path.read_text(encoding="utf-8")
     }
 
 
@@ -602,7 +616,8 @@ _ORDER_RE = re.compile(r"-?\d+")
 # kind=engine action closure = the REAL argparse choices / action constants of
 # the engine scripts sitting next to this file (source copy and .specify mirror
 # each resolve their own siblings — never a hand-copied list).
-_ENGINE_SIBLINGS = ("feedback-utils.py", "run-determination.py", "probe-utils.py")
+_ENGINE_SIBLINGS = ("feedback-utils.py", "run-determination.py", "probe-utils.py",
+                    "trigger-utils.py")
 
 
 def _engine_action_union() -> set:
@@ -613,7 +628,8 @@ def _engine_action_union() -> set:
         if not path.is_file():
             continue
         src = path.read_text(encoding="utf-8")
-        if name == "run-determination.py":
+        if name in ("run-determination.py", "trigger-utils.py"):
+            # Both engines declare their action closure as an ACTIONS tuple.
             m = re.search(r"^ACTIONS = \(([^)]*)\)", src, re.MULTILINE)
             if m:
                 actions |= set(re.findall(r'"([^"]+)"', m.group(1)))
@@ -894,6 +910,39 @@ def render_wrap_up_section(handlers: List[Dict[str, str]], unit_id: str,
     return "\n".join(lines)
 
 
+_CALL_ENGINE_RE = re.compile(r"^\d+\. .+? — `python3 (\S+) --action (\S+)")
+_CALL_ANCHOR_RE = re.compile(r'^\d+\. .+? — `([^`]+)` § "(.+)"$')
+_FINGERPRINT_RE = re.compile(r"fingerprint: ([0-9a-f]{12})")
+
+
+def _banner_fingerprint(text: str) -> Optional[str]:
+    m = _FINGERPRINT_RE.search(text)
+    return m.group(1) if m else None
+
+
+def _parse_call_lines(section_text: str) -> List[Tuple[str, str]]:
+    """(runtime-owner, action) pairs from a compiled section's call lines."""
+    pairs: List[Tuple[str, str]] = []
+    for line in section_text.splitlines():
+        m = _CALL_ENGINE_RE.match(line)
+        if m:
+            pairs.append((m.group(1), m.group(2)))
+            continue
+        m = _CALL_ANCHOR_RE.match(line)
+        if m:
+            pairs.append((m.group(1), m.group(2)))
+    return pairs
+
+
+def _compiled_section_body(text: str) -> str:
+    """The current file's `## Wrap-up` section body, or '' when absent."""
+    lines = text.splitlines()
+    for start, end in _section_spans(lines):
+        if lines[start].strip() == _WRAP_UP_HEADING:
+            return "\n".join(lines[start:end])
+    return ""
+
+
 def _section_spans(lines: List[str]) -> List[Tuple[int, int]]:
     """[start, end) line spans of H2 Feedback / Documentation / Wrap-up
     sections; a span ends at the next H1/H2 heading (H3 subsections stay
@@ -992,19 +1041,30 @@ def action_compile_embeds(args: argparse.Namespace) -> Dict[str, Any]:
     for obj in registry["objects"]:
         unit_objects.setdefault(obj.get("unit", ""), set()).add(
             obj.get("object_id", ""))
-    fingerprint = _fingerprint(handlers, bindings)
-    plans: List[Tuple[str, Path, Optional[str]]] = []
+    fingerprint = _fingerprint(
+        [h for h in handlers
+         if h.get("handler_id", "") in {b.get("handler_id", "")
+                                        for b in bindings
+                                        if b.get("selector", "") == "@point:wrap-up"}],
+        [b for b in bindings if b.get("selector", "") == "@point:wrap-up"])
+    # The banner fingerprint identifies the registry state the WRAP-UP faces
+    # render from: only the wrap-up projection (its bindings + their handlers).
+    # Phase-2 points (situation / phase-boundary / confirm-gate) declare
+    # runtime subscriptions without touching compiled output — folding them in
+    # would stale-date every banner on any phase-2 registry edit.
+    plans: List[Tuple[str, Path, Optional[str], set]] = []
     for unit_id, path in sorted(scan_compile_units(workspace_root).items()):
         is_skill = unit_id.startswith("skill:")
         effective = _effective_handlers(
             unit_id, is_skill, unit_objects.get(unit_id, set()),
             handlers, bindings, "wrap-up")
+        effective_ids = {h.get("handler_id", "") for h in effective}
         section = (render_wrap_up_section(effective, unit_id, is_skill,
                                           fingerprint) if effective else None)
-        plans.append((unit_id, path, section))
+        plans.append((unit_id, path, section, effective_ids))
     wording_hits = []
     blocking = _blocking_re()
-    for unit_id, _path, section in plans:
+    for unit_id, _path, section, _ids in plans:
         if section:
             m = blocking.search(section)
             if m:
@@ -1015,18 +1075,54 @@ def action_compile_embeds(args: argparse.Namespace) -> Dict[str, Any]:
         raise FeedbackError(
             "compile-embeds refused (wording gate):\n- " + "\n- ".join(wording_hits))
     if args.check:
-        drift = []
-        for unit_id, path, section in plans:
+        structural: List[str] = []
+        drift: List[str] = []
+        resolvable = {
+            (_runtime_path(h.get("behavior_owner", "")),
+             h.get("action", "").strip("`")): h.get("handler_id", "")
+            for h in handlers
+        }
+        for unit_id, path, section, effective_ids in plans:
             current = path.read_text(encoding="utf-8")
-            if _replace_sections(current, section) != current:
+            if _replace_sections(current, section) == current:
+                continue
+            if _banner_fingerprint(current) != fingerprint:
+                # A render of an older registry state: regenerable, recompile fixes it.
                 drift.append(unit_id)
-        if drift:
-            raise CheckDriftError(
-                {"ok": False, "check": True, "units": len(plans), "drift": drift})
-        return {"ok": True, "check": True, "units": len(plans), "drift": []}
+                continue
+            # The banner claims currency — any line-level difference is hand corruption.
+            present = _parse_call_lines(_compiled_section_body(current))
+            expected_pairs = {
+                (_runtime_path(h.get("behavior_owner", "")),
+                 h.get("action", "").strip("`"))
+                for h in handlers if h.get("handler_id", "") in effective_ids}
+            problems: List[str] = []
+            for owner, action in present:
+                hid = resolvable.get((owner, action))
+                if hid is None:
+                    problems.append(
+                        f"orphan handler line: {owner} --action {action} "
+                        "(no such registered handler)")
+                elif hid not in effective_ids:
+                    problems.append(
+                        f"orphan handler line: {owner} --action {action} "
+                        "(registered but not subscribed to this unit)")
+            for owner, action in sorted(expected_pairs - set(present)):
+                problems.append(
+                    f"missing handler line: {owner} --action {action} "
+                    "(subscribed but absent from the artifact)")
+            if problems:
+                structural.extend(f"{unit_id}: {p}" for p in problems)
+            else:
+                drift.append(unit_id)
+        if structural or drift:
+            raise CheckDriftError({"ok": False, "check": True, "units": len(plans),
+                                   "structural": structural, "drift": drift})
+        return {"ok": True, "check": True, "units": len(plans),
+                "structural": [], "drift": []}
     written: List[str] = []
     unchanged = 0
-    for unit_id, path, section in plans:
+    for unit_id, path, section, _ids in plans:
         current = path.read_text(encoding="utf-8")
         expected = _replace_sections(current, section)
         if expected == current:
@@ -1041,7 +1137,7 @@ def action_compile_embeds(args: argparse.Namespace) -> Dict[str, Any]:
         "units": len(plans),
         "written": written,
         "unchanged": unchanged,
-        "zero_section": [u for u, _p, s in plans if s is None],
+        "zero_section": [u for u, _p, s, _i in plans if s is None],
     }
 
 
@@ -1198,12 +1294,24 @@ def main(argv: Optional[List[str]] = None) -> int:
         if args.format == "json":
             print(json.dumps(exc.payload, ensure_ascii=False, indent=2))
         else:
+            structural = exc.payload.get("structural", [])
             drift = exc.payload.get("drift", [])
-            print(f"compile-embeds drift in {len(drift)} of "
-                  f"{exc.payload.get('units')} units (--check; nothing written):")
-            for unit_id in drift:
-                print(f"- {unit_id}")
-        return 1
+            if structural:
+                print(f"compile-embeds --check: STRUCTURAL drift in "
+                      f"{len(structural)} of {exc.payload.get('units')} units "
+                      "(exit 2 — review before recompiling; nothing written):")
+                for line in structural:
+                    print(f"- {line}")
+                if drift:
+                    print(f"plus regenerable drift in {len(drift)} units:")
+                    for unit_id in drift:
+                        print(f"- {unit_id}")
+            else:
+                print(f"compile-embeds drift in {len(drift)} of "
+                      f"{exc.payload.get('units')} units (--check; nothing written):")
+                for unit_id in drift:
+                    print(f"- {unit_id}")
+        return exc.exit_code
     if args.format == "json":
         print(json.dumps(payload, ensure_ascii=False, indent=2))
     elif args.action == "handlers" and args.bindings and not payload.get("ok"):

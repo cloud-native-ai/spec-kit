@@ -58,10 +58,10 @@ def _external_probe(tmp_path: Path, name: str, body: str) -> Path:
 def _embed_workspace(tmp_path: Path) -> Path:
     cmds = tmp_path / "templates" / "commands"
     cmds.mkdir(parents=True, exist_ok=True)
-    (cmds / "plan.md").write_text("# plan\n\n## Feedback\n\nstep\n", encoding="utf-8")
+    (cmds / "plan.md").write_text("# plan\n\n## Wrap-up\n\nstep\n", encoding="utf-8")
     skill = tmp_path / "skills" / "study-project"
     skill.mkdir(parents=True, exist_ok=True)
-    (skill / "SKILL.md").write_text("# study\n\n## Feedback\n\nstep\n", encoding="utf-8")
+    (skill / "SKILL.md").write_text("# study\n\n## Wrap-up\n\nstep\n", encoding="utf-8")
     return tmp_path
 
 
@@ -235,7 +235,7 @@ class TestProbesReconcile:
     ):
         _embed_workspace(tmp_path)
         cmds = tmp_path / "templates" / "commands"
-        (cmds / "todo.md").write_text("# todo\n\n## Feedback\n\nstep\n",
+        (cmds / "todo.md").write_text("# todo\n\n## Wrap-up\n\nstep\n",
                                       encoding="utf-8")
         capsys.readouterr()
         rc = probe_utils.main([

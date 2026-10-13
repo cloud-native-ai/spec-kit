@@ -26,10 +26,13 @@ _ENGINE_COPIES = (
     "feedback-utils.py",
     "scan-confirmation-gates.py",
     "run-determination.py",
+    "trigger-utils.py",
 )
 _OWNER_COPIES = (
     ("shared/workflow/feedback-step.md", "shared/workflow"),
     ("shared/workflow/docs-step.md", "shared/workflow"),
+    ("skills/internal/create-team/SKILL.md", "skills/internal/create-team"),
+    ("shared/guidelines/confirmation-gates.md", "shared/guidelines"),
 )
 
 _UNIT_A = """---
@@ -103,8 +106,17 @@ def _build_workspace(tmp_path: Path, registry_text: str) -> Path:
             dest.write_text((REPO_ROOT / target).read_text(encoding="utf-8"),
                             encoding="utf-8")
     for rel, _dir in _OWNER_COPIES:
-        (ws / rel).write_text((REPO_ROOT / rel).read_text(encoding="utf-8"),
-                              encoding="utf-8")
+        dest = ws / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        body = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        if rel.startswith(("templates/", "skills/")):
+            # Owner copies under a scan path must not become compile units of
+            # their own: strip the compiled Wrap-up face (owner validation only
+            # needs the anchor headings).
+            idx = body.find("\n## Wrap-up")
+            if idx != -1:
+                body = body[:idx] + "\n"
+        dest.write_text(body, encoding="utf-8")
     for name in _ENGINE_COPIES:
         (ws / "scripts" / "python" / name).write_text(
             (REPO_ROOT / "scripts" / "python" / name).read_text(encoding="utf-8"),

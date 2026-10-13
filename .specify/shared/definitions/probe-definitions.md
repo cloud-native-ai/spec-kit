@@ -184,6 +184,9 @@
 | h-threshold-notice | agent | Threshold prompt protocol (canonical semantics for step 6) | non-blocking | 30 | shared/workflow/feedback-step.md |
 | h-token-reflection | agent | Reflection procedure (the embedded step points here) | non-blocking | 40 | shared/workflow/feedback-step.md |
 | h-docs-sync-eval | agent | Evaluation procedure (the embedded step points here) | non-blocking | 50 | shared/workflow/docs-step.md |
+| h-situation-assess | engine | assess | non-blocking | 10 | scripts/python/trigger-utils.py |
+| h-team-phase-summary | agent | Summary Refresh (all patterns) | non-blocking | 20 | skills/internal/create-team/SKILL.md |
+| h-gate-evidence | gate | 门控观察协议 (Gate Observation Protocol) | non-blocking | 30 | shared/guidelines/confirmation-gates.md |
 
 ## HandlerBinding
 
@@ -194,6 +197,30 @@
 
 | handler_id | selector | scope | 覆盖说明 |
 |------------|----------|-------|----------|
+| h-situation-assess | @point:situation | all | 050 情境评估:每回合环境评估与建议遥测(trigger-utils.py assess);非单元编译面,声明性订阅 |
+| h-team-phase-summary | @point:phase-boundary | skill-create-team-wrapup | 036 团队阶段边界总结:create-team 驱动的团队执行流在阶段边界刷新 goal 级总结 |
+| h-gate-evidence | @point:confirm-gate | gate-create-docs-tiered-disposition | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-create-docs-write-plan | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-create-team-agent-reuse | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-create-team-noninteractive-call | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-create-team-presence-loop | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-create-tools-no-execute | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-feature-status-regression | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-git-workflow-remote-ops | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-git-workflow-tiered-mode | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-glossary-user-entry-overwrite | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-implement-checklist-waiver | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-improve-tools-no-test-invoke | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-rubric-high-stakes | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-sanitize-destructive-cleanup | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-session-export-overwrite | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-summarize-project-degraded-gates | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-summarize-project-four-gates | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-summarize-project-structure-freeze | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-tools-invoke-entry | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-tools-invoke-mode | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-tools-invoke-prompt | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-tools-invoke-rule | 044 门控必要性证据(逐 gate Object) |
 | h-run-determination | @point:wrap-up | all | T019 实测更正 MVP 骨架:owner 链 feedback-step.md § Run Determination「Step 1 runs the engine's `determine` action at wrap-up」⇒ 69/69 单元生效 |
 | h-feedback-record | @point:wrap-up | all | 69 单元现均有反馈记录面 |
 | h-threshold-notice | @point:wrap-up | all | 消费 h-run-determination 判定结果(order 10 → 30 次序约束 FR-008/FR-014) |

@@ -44,6 +44,13 @@ def _rundet_actions() -> set[str]:
     return set(re.findall(r'"([^"]+)"', m.group(1)))
 
 
+def _trigger_actions() -> set[str]:
+    src = (p_run := Path(__file__).resolve().parents[2] / "scripts" / "python" / "trigger-utils.py").read_text(encoding="utf-8")
+    m = re.search(r"^ACTIONS = \(([^)]*)\)", src, re.MULTILINE)
+    assert m, "trigger-utils.py: ACTIONS constant not found"
+    return set(re.findall(r'"([^"]+)"', m.group(1)))
+
+
 def test_probe_utils_action_set_exact() -> None:
     assert PROBE_SCRIPT.is_file(), "probe-utils.py missing — probe family not migrated"
     got = _action_choices(PROBE_SCRIPT)
@@ -96,7 +103,8 @@ def _registered_engine_actions() -> list[tuple[str, str]]:
 
 
 def test_registered_engine_actions_hit_real_engine_union() -> None:
-    union = _action_choices(FEEDBACK_SCRIPT) | _rundet_actions()
+    union = (_action_choices(FEEDBACK_SCRIPT) | _rundet_actions()
+             | _trigger_actions())
     if PROBE_SCRIPT.is_file():
         union |= _action_choices(PROBE_SCRIPT)
     registered = _registered_engine_actions()

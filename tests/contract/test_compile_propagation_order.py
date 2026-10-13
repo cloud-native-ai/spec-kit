@@ -30,7 +30,14 @@ def _fingerprint_of_runtime_registry() -> str:
             / "probe-definitions.md").read_text(encoding="utf-8")
     handlers = probe_utils._table_rows(text, "Handler")
     bindings = probe_utils._table_rows(text, "HandlerBinding")
-    return probe_utils._fingerprint(handlers, bindings)
+    # Banners carry the WRAP-UP projection fingerprint (phase-2 rows do not
+    # touch compiled output — see probe-utils.py action_compile_embeds).
+    wrapup_bindings = [b for b in bindings
+                       if b.get("selector", "") == "@point:wrap-up"]
+    referenced = {b.get("handler_id", "") for b in wrapup_bindings}
+    return probe_utils._fingerprint(
+        [h for h in handlers if h.get("handler_id", "") in referenced],
+        wrapup_bindings)
 
 
 def test_compiled_fingerprints_match_the_runtime_registry():

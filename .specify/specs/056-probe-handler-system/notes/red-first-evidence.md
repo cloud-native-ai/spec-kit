@@ -111,3 +111,35 @@
 
 - `test_dogfooding_practice.py` C4：`ENGINE_ACTIONS` 字面钉的是迁移前 14-action 集 → 拆分 `FEEDBACK_ENGINE_ACTIONS`（11）+ `PROBE_ENGINE_ACTIONS`（5），choices 钉住改指 feedback 11 集，doc-real 检查改用并集（doc 可引用两引擎的 action）。
 - `test_store_state_protocol.py` TestTwoBranchMerge：fixture 仓只拷 feedback-utils.py 单文件 → feedback-utils 现于模块加载期 import 兄弟 probe-utils.py（056 引擎拆分）→ fixture 补拷成对文件。
+
+## 记录（T027–T030 · 2026-10-13）
+
+**红优先（T027）**：`tests/contract/test_compile_reconcile_guards.py` 落位即红 —— 首轮
+5 failed / 3 passed（orphan/missing 分类缺失 ×2 + 两个变异模式未命中的假红 ×2 + wording
+变异行内插腐化 ×1）；修正变异构造后真红 = 3（orphan / missing / wording），5 绿为既有守卫
+（illegal action、order conflict、stale→exit 1、FR-008/014 次序、clean tree）。
+
+**实现（T028）**：`probe-utils.py` --check 升级为指纹判据分类 —— 产物横幅指纹 == 当前
+注册表指纹时，行级差异分解为 orphan（存在行不可解析/未订阅）与 missing（订阅行缺席）
+→ exit 2 结构类；指纹不等 → stale 可再生漂移 → exit 1。`CheckDriftError.exit_code` +
+payload {structural, drift}；main 文本输出分类列名。变异构造陷阱登记：注册表行内插
+（substring 落进带覆盖说明的行）会腐化单元格且 `_table_rows` 静默丢弃错列数行 —— 测试
+变异 MUST 锚定表头分隔行插入（drill 5 同）。
+
+**实树变异演练（T029，逐一构造 → 转红 → 精确恢复 → 复绿）**：
+
+| 类 | 变异 | 守卫输出（指名） | 恢复 |
+|----|------|------------------|------|
+| 孤儿 handler | todo.md 编译段内追加 ghost 调用行 | exit 2：`/speckit.todo: orphan handler line: … --action ghost-action (no such registered handler)` | `git checkout --` + check 复绿 |
+| 缺失 handler | todo.md 删除 Feedback Record 行（指纹仍当前） | exit 2：`missing handler line: … --action record (subscribed but absent)` | 同上 |
+| 非法 action | 镜像注册表 action determine→ghost-action | exit 2：`handler 'h-run-determination': kind=engine action 'ghost-action' is not a real engine action` | `sync-mirrors --only` 恢复 |
+| order 冲突 | 镜像注册表 feedback-record order 20→10 | exit 2：`order conflict at @wrap-up: h-feedback-record and h-run-determination both order 10` | 同上 |
+| 措辞命中 | 源 owner 追加阻塞标题 + 注册行 | exit 2：`compile-embeds refused (wording gate)` 逐单元指名；**写入 0 文件** | `git checkout` + sync 恢复 |
+
+首演陷阱：drill 1 初版把 ghost 行追加到文件末尾（编译段 span 之外）→ 守卫 0 漂移 ——
+孤儿类的作用域 = 编译段内部，段外引擎行属普通文档内容。变异构造归因：演练缺陷，非守卫缺陷。
+
+**门控预算复测**：total 23（destructive 16 + governance_kept 7）/ violations 0 —— 不变。
+
+**镜像双写（T030）**：T028 引擎变更经 `sync-mirrors.py` 传播 `.specify/scripts/python/
+probe-utils.py`；`--check` 全对无 NEW drift；`test_compile_propagation_order` 双绿。
