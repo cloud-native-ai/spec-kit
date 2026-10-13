@@ -1,7 +1,7 @@
 ---
 name: git-workspace
 description: |
-  Unified git workspace governance skill — one reconcile family across FOUR scopes: (A) single-repo three-tier branch workflow (trunk/pre-release/dev recorded in `docs/git-workflow.md`, rebase sync, selective merge, `.gitexcludes`); (B) multi-environment coordination of one developer's many checkouts plus the inter-repo dependency graph and dependency-first sequencing; (C) disciplined submodule editing (project-named branches + ledgered gitlink bumps); (D) plain-SSH server provisioning into a git server (git user, bare repos, authorized keys, ssh config Host entry). Formerly four separate skills (git-workflow, git-fleet, git-server-init, git-submodule-edit), merged with content preserved. Runs as a single **reconcile engine** (see `.specify/shared/patterns/reconcile-pattern.md`): the desired state is the declared three-tier branch structure + sync relations + per-branch `.gitexcludes` rules; every invocation observes the current repo state, diffs, and converges — bootstrap (interactive branch naming + creation + .gitexcludes init when the block is absent or unfilled), health-check (structure/sync/.gitexcludes observation + residual report), and directed convergence (rebase sync, merge, and safe push with automatic .gitexcludes enforcement) are the same engine under different inputs. Covers pre-checks, rebase synchronization, conflict resolution, force-with-lease push strategies, and per-branch file exclusion via `.gitexcludes`. Use this when the user mentions ["git workflow", "branch sync", "rebase sync", "分支同步", "git rebase", "force-with-lease", "发布流程", "分支策略", "主干分支", "预发分支", "开发分支", "three-tier git", "git workflow setup", "创建git工作流", "工作流维护", "workflow health check", "工作流检查", "selective merge", "选择性合并", "排除文件", "忽略配置文件", "分支排除", "branch-exclusive", ".gitexcludes", "开发专属文件", "merge filter", "调谐工作流", "git 调谐", "git workspace", "git-workspace", "工作区治理", "multi-machine git", "跨机器 git", "多环境 git", "环境 × 仓库", "git fleet", "依赖图", "dependency graph", "受影响消费方", "affected consumers", "依赖优先顺序", "topological order", "checkout inventory", "git server", "git 服务器", "搭建git服务", "bare repository", "裸仓库", "创建git用户", "配置git远程", "edit submodule", "子模块修改", "submodule branch", "gitlink bump"]
+  Unified git workspace governance skill — one reconcile family across FOUR scopes: (A) single-repo branch workflow governance (the project's declared branch model — single-branch / dual-branch / trunk-based with short-lived feature branches / MAIN-PRE-DEV three-tier — recorded in `docs/git-workflow.md`; sync/merge discipline, selective merge, `.gitexcludes`); (B) multi-environment coordination of one developer's many checkouts plus the inter-repo dependency graph and dependency-first sequencing; (C) disciplined submodule editing (project-named branches + ledgered gitlink bumps); (D) plain-SSH server provisioning into a git server (git user, bare repos, authorized keys, ssh config Host entry). Formerly four separate skills (git-workflow, git-fleet, git-server-init, git-submodule-edit), merged with content preserved. Runs as a single **reconcile engine** (see `.specify/shared/patterns/reconcile-pattern.md`): the desired state is the declared branch model + sync relations + per-branch `.gitexcludes` rules; every invocation observes the current repo state, diffs, and converges — bootstrap (model selection + interactive branch naming + creation + .gitexcludes init when the block is absent or unfilled), health-check (structure/sync/.gitexcludes observation + residual report), and directed convergence (rebase sync, merge, and safe push with automatic .gitexcludes enforcement) are the same engine under different inputs. Covers pre-checks, rebase synchronization, conflict resolution, force-with-lease push strategies, and per-branch file exclusion via `.gitexcludes`. Use this when the user mentions ["git workflow", "branch sync", "rebase sync", "分支同步", "git rebase", "force-with-lease", "发布流程", "分支策略", "主干分支", "预发分支", "开发分支", "three-tier git", "git workflow setup", "创建git工作流", "工作流维护", "workflow health check", "工作流检查", "selective merge", "选择性合并", "排除文件", "忽略配置文件", "分支排除", "branch-exclusive", ".gitexcludes", "开发专属文件", "merge filter", "工作流模型", "分支模型", "trunk-based", "单分支开发", "双分支开发", "短命特性分支", "调谐工作流", "git 调谐", "git workspace", "git-workspace", "工作区治理", "multi-machine git", "跨机器 git", "多环境 git", "环境 × 仓库", "git fleet", "依赖图", "dependency graph", "受影响消费方", "affected consumers", "依赖优先顺序", "topological order", "checkout inventory", "git server", "git 服务器", "搭建git服务", "bare repository", "裸仓库", "创建git用户", "配置git远程", "edit submodule", "子模块修改", "submodule branch", "gitlink bump"]
 skill_id: "<SKILL:.specify/skills/git-workspace/SKILL.md>"
 classification: external
 ---
@@ -14,18 +14,29 @@ classification: external
 
 | 作用域 | 覆盖 | 细节入口 |
 |--------|------|----------|
-| **A — 三层分支工作流** | 单仓 MAIN/PRE/DEV 分支结构、rebase 同步、选择性合并、`.gitexcludes`、强推纪律；状态面 `docs/git-workflow.md` 托管块 | 本文件下方 Workflow + `references/` 的 `bootstrap-commands` / `health-check-commands` / `execute-commands` / `gitexcludes-subroutine` / `instructions-lookup` / `troubleshooting` |
+| **A — 单仓分支工作流** | 单仓分支工作流治理，模型可选（见下方工作流模型菜单：单分支 / 双分支 / 活跃主干+短命特性分支 / MAIN/PRE/DEV 三层）、同步与合并纪律、选择性合并、`.gitexcludes`、强推纪律；状态面 `docs/git-workflow.md` 托管块 | 本文件下方 Workflow + `references/` 的 `bootstrap-commands` / `health-check-commands` / `execute-commands` / `gitexcludes-subroutine` / `instructions-lookup` / `troubleshooting` |
 | **B — 多环境协调** | 同一批仓库跨多台机器的巡检、危险分级、仓库间依赖图与依赖优先排序 | `references/fleet-workflow.md` + `fleet-inventory-schema` / `fleet-hazard-taxonomy` / `fleet-coordination-playbook` / `fleet-dependency-model`；引擎 `scripts/git_fleet.py` |
 | **C — 子模块编辑** | 子模块内改代码纪律（`project-<PARENT_SLUG>/*` 分支）+ gitlink 抬升台账 | `references/submodule-workflow.md` + `submodule-command-recipes`；`scripts/record-bump.sh`；`assets/ledger-template.md` |
 | **D — 服务器置备** | 纯 SSH 服务器 → Git 服务器（D1–D4 四期望态） | `references/server-workflow.md` + `server-ssh-config-entry` / `server-reference-architecture` / `server-troubleshooting`；`scripts/provision-git-server.sh` / `scripts/ssh_config_insert.py` |
 
 跨作用域硬约束：① 环境无关——主机名/绝对路径一律由调用方 inventory 或参数提供；② 高影响动作（写远端、强推等）的分级确认口径以本文件下方分级确认表与各作用域自身规则为准；③ 数据源唯一——分支信息只在 `docs/git-workflow.md` 托管块，子模块台账只在 `${SKILL_WORKDIR}/submodule-edits.md`。
 
-### 作用域 A — 三层分支工作流
+### 作用域 A — 单仓分支工作流（模型可选）
 
-三层 Git 开发工作流管理。**只有一个运行模式——调谐（Reconcile）**，遵循 [`.specify/shared/patterns/reconcile-pattern.md`](../../shared/patterns/reconcile-pattern.md)：
+单仓 Git 开发工作流管理。**Git 工作流是项目级建议项（为更好地管理代码库服务），不是普适强制**；不同项目采用不同模型，本技能维护托管块**所声明的那个模型**，不把任何单一模型强加给项目。
 
-- **期望态（spec）** = `docs/git-workflow.md` 的 Git Workflow 托管块（`<!-- GIT_WORKFLOW_START -->` … `<!-- GIT_WORKFLOW_END -->`）声明的三层分支结构（MAIN/PRE/DEV 存在且 tracking 正确）+ 固定 rebase 同步关系（无积压分叉）+ 各分支 `.gitexcludes` 规则就位且被排除路径未被跟踪 + 本次用户操作指令。
+**工作流模型菜单**（Bootstrap 时按项目形态推荐并确认；声明后写入托管块 `Workflow model` 行）：
+
+| 模型 | 形态 | 典型场景 |
+|------|------|----------|
+| **单分支** | 仅一条主干分支，直接开发 | 个人小项目、一次性脚本仓 |
+| **双分支** | 两条长期分支：一条日常开发，另一条归档或跟踪上游 | 维护型项目、需跟踪上游的 fork |
+| **活跃主干 + 短命特性分支**（trunk-based） | 单主干；每次开发切临时分支，完成即合入主干并删除 | 大部分 SDD 模式开发的项目 |
+| **MAIN/PRE/DEV 三层** | 主干/预发/开发三层长期分支 + 固定 rebase 链（角色定义见下方「三层模型的分支角色」） | 需版本集成与环境验证的发布型项目 |
+
+**只有一个运行模式——调谐（Reconcile）**，遵循 [`.specify/shared/patterns/reconcile-pattern.md`](../../shared/patterns/reconcile-pattern.md)：
+
+- **期望态（spec）** = `docs/git-workflow.md` 的 Git Workflow 托管块（`<!-- GIT_WORKFLOW_START -->` … `<!-- GIT_WORKFLOW_END -->`）声明的**工作流模型 + 该模型的分支结构**（如三层模型要求 MAIN/PRE/DEV 存在且 tracking 正确）+ 该模型声明的同步/合并关系（无积压分叉）+ 各分支 `.gitexcludes` 规则就位且被排除路径未被跟踪 + 本次用户操作指令。
 - **当前态（status）** = 仓库实际分支结构、同步状态、`.gitexcludes` 分布。
 - **调谐** = 观测 → diff（过容忍带）→ 收敛（分级确认）→ 校验。
 
@@ -33,7 +44,7 @@ classification: external
 
 | 输入 | 作用域 | 行为 |
 |------|--------|------|
-| `docs/git-workflow.md` 缺失，或其托管块仍是 `None yet.` 占位行 | **Bootstrap** | 交互确认分支名、创建分支、初始化 `.gitexcludes`、写入 Git Workflow 块 |
+| `docs/git-workflow.md` 缺失，或其托管块仍是 `None yet.` 占位行 | **Bootstrap** | 交互选择工作流模型与分支名、创建分支、初始化 `.gitexcludes`、写入 Git Workflow 块 |
 | 块已填写 且 无操作参数 | **全维度体检** | R1 观测 + R3 diff + 残差汇报，不自动收敛 |
 | 块已填写 且 有操作参数 | **定向收敛** | 用户指令并入期望态，执行具体 git 操作（自动尊重 `.gitexcludes`） |
 
@@ -50,7 +61,9 @@ classification: external
 
 **强制产物**：体检的「工作流维护报告」同时充当观测快照与残差汇报；定向收敛的审计由 git 提交历史天然承担。
 
-### 分支角色
+### 分支角色（三层模型的角色定义）
+
+以下三角色是**三层模型**（菜单选项之一）的角色定义；其余模型的分支约定由托管块自行声明。
 
 | 角色 | 含义 | 说明 |
 |------|------|------|
@@ -60,14 +73,14 @@ classification: external
 
 > **重要**：分支名称因项目而异（如 `master` / `xuanji/prepub`，或 `main` / `staging` / `dev`）。本技能在执行时**动态确认**实际分支名，将其记录到`docs/git-workflow.md` 的 Git Workflow 托管块（`${SKILL_WORKDIR}/docs/git-workflow.md`），后续操作以该块为准。
 
-核心链路（角色代号）：
+三层模型核心链路（角色代号）：
 
 ```
 代码同步：MAIN -> PRE -> DEV
 代码合入：MAIN <- PRE <- DEV
 ```
 
-固定 rebase 关系：`PRE` 基于 `MAIN` rebase；`DEV` 基于 `PRE` rebase。
+三层模型固定 rebase 关系：`PRE` 基于 `MAIN` rebase；`DEV` 基于 `PRE` rebase。其余模型的同步/合并关系由托管块声明（如 trunk-based：特性分支自主干切出、合回主干、随即删除；双分支：日常分支与归档/上游跟踪分支之间的同步节奏）。
 
 ---
 
@@ -90,13 +103,17 @@ classification: external
 
 ### Bootstrap 调谐（Setup）— 建立工作流
 
-当`docs/git-workflow.md` 的 Git Workflow 托管块缺失或仍是占位行时进入：期望态 = 完整三层工作流骨架，通过最少必要问题（逐一确认，不臆造分支名）+ 自动探测补齐信息。命令序列见 [bootstrap-commands.md](./references/bootstrap-commands.md)。
+当`docs/git-workflow.md` 的 Git Workflow 托管块缺失或仍是占位行时进入：期望态 = 用户选定模型的工作流骨架（不预设任何一个模型，尤其不得默认三层），通过最少必要问题（逐一确认，不臆造模型与分支名）+ 自动探测补齐信息。命令序列见 [bootstrap-commands.md](./references/bootstrap-commands.md)。
+
+#### 1.0 选择工作流模型
+
+先于一切分支问题，按上方菜单向用户推荐并确认**工作流模型**（每次只问一个问题；结合项目形态给推荐与理由，如 SDD 项目通常推荐「活跃主干 + 短命特性分支」）。选三层则继续 1.1–1.5 的三层实例化；选其他模型则按该模型形态确认其分支约定（单分支：仅确认主干名；双分支：确认两条长期分支的名字与角色分工；trunk-based：确认主干名与特性分支命名惯例），随后同样走 1.4（写入托管块，含 `Workflow model` 声明行）；`.gitexcludes` 仅在模型存在长期并行层（如三层）时初始化（1.5）。
 
 #### 1.1 检测现有分支
 
 命令见 [bootstrap-commands.md#分支检测](./references/bootstrap-commands.md#分支检测)。
 
-#### 1.2 交互式确认分支名
+#### 1.2 交互式确认分支名（三层模型）
 
 逐一向用户确认（每次只问一个问题），不臆造分支名：
 
@@ -110,7 +127,7 @@ classification: external
 
 #### 1.4 写入 Git Workflow 块
 
-读取模板 `${SKILL_HOME}/assets/git-workflow-block.md`，替换 `<MAIN>` / `<PRE>` / `<DEV>`（分支名）、`<MAIN_TRACKING>` / `<PRE_TRACKING>` / `<DEV_TRACKING>`（各分支 upstream，无则 `-`）、`<DATE>`（运行日期），写入`docs/git-workflow.md` 的 Git Workflow 托管块。
+读取模板 `${SKILL_HOME}/assets/git-workflow-block.md`，按选定模型渲染后写入`docs/git-workflow.md` 的 Git Workflow 托管块：先填 `Workflow model` 声明行（模型名）；三层模型再替换 `<MAIN>` / `<PRE>` / `<DEV>`（分支名）、`<MAIN_TRACKING>` / `<PRE_TRACKING>` / `<DEV_TRACKING>`（各分支 upstream，无则 `-`）、`<DATE>`（运行日期）；其他模型按其形态填写主干/特性分支约定等声明行（模板注释给出各模型最小行集）。
 
 - 目标文件固定为 `${SKILL_WORKDIR}/docs/git-workflow.md`；定位与写入规则见 [instructions-lookup.md](./references/instructions-lookup.md)。
 - 文件已存在且含 `<!-- GIT_WORKFLOW_START -->` … `<!-- GIT_WORKFLOW_END -->` 标记：**只替换标记之间的内容**，标记与块外内容字节保持。
@@ -129,11 +146,11 @@ classification: external
 
 #### 2.1 加载配置
 
-从`docs/git-workflow.md` 的 Git Workflow 托管块读取分支映射：表格中 `MAIN` / `PRE` / `DEV` 行的 `Branch` 列即三层分支名（反引号内），`Tracking` 列为各自 upstream。
+从`docs/git-workflow.md` 的 Git Workflow 托管块读取分支映射：三层模型取表格中 `MAIN` / `PRE` / `DEV` 行的 `Branch` 列（反引号内）；其他模型取 `Workflow model` 声明行与该模型的分支约定行（主干名、特性分支惯例等）。
 
 #### 2.2 分支结构检查
 
-命令见 [health-check-commands.md#分支结构检查](./references/health-check-commands.md#分支结构检查)。检查项：MAIN/PRE/DEV 分支是否存在于本地和远端、tracking 关系是否正确。
+命令见 [health-check-commands.md#分支结构检查](./references/health-check-commands.md#分支结构检查)。检查项随声明模型而定：三层模型查 MAIN/PRE/DEV 是否存在于本地和远端、tracking 是否正确；其他模型查其声明行对应的分支是否与实际一致。
 
 #### 2.3 同步状态检查
 
@@ -146,7 +163,7 @@ classification: external
 #### 2.5 Git Workflow 块一致性检查
 
 - 块中记录的分支名与实际分支是否一致（不一致属实质偏离，进入收敛建议）
-- 块结构完整（MAIN/PRE/DEV 三行齐备、`Tracking` 与实际 upstream 相符、`Last updated` 存在）
+- `Workflow model` 声明行存在且块结构与声明模型一致（三层模型须 MAIN/PRE/DEV 三行齐备、`Tracking` 与实际 upstream 相符；其他模型须其约定行齐备）、`Last updated` 存在
 - 标记 `<!-- GIT_WORKFLOW_START -->` / `<!-- GIT_WORKFLOW_END -->` 成对存在（缺失会破坏"只替换标记之间内容"的写入规则）
 - 不存在第二个数据源：`.specify/instructions.md` 内旧版 `## Git Workflow` 托管块、遗留 `.specify/git-workflow.md` 或 `.specify/memory/git-workflow.md` 若仍在，报告为冗余并按迁移规则处理
 
@@ -163,7 +180,7 @@ classification: external
 
 #### 3.1 加载配置
 
-同全维度体检 Step 2.1，从 `## Git Workflow` 块的表格读取 `MAIN` / `PRE` / `DEV` 分支名。
+同全维度体检 Step 2.1，从 `## Git Workflow` 块读取 `Workflow model` 声明行与分支映射（三层模型取 `MAIN` / `PRE` / `DEV` 表行；其他模型取其声明行）。
 
 #### 3.2 前置校验
 
@@ -181,7 +198,7 @@ classification: external
 
 #### 3.4 解析并执行操作
 
-根据用户指令匹配预定义操作：
+根据用户指令匹配预定义操作。**操作 A–C 是三层模型的预定义操作**（触发词命中且声明模型为三层时使用）；其他模型（trunk-based / 双分支 / 单分支）按托管块声明的同步/合并关系理解指令，走操作 E 的通用拆解路径。
 
 ##### 操作 A: 代码同步（MAIN → PRE → DEV）
 

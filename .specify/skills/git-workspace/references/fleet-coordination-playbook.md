@@ -61,7 +61,7 @@ git push                              # requires confirmation: shared state
 
 **`DIVERGENT_UNPUSHED` / true fork (`ahead>0 && behind>0`)** — do not resolve here.
 Branch-role semantics (which tier may merge into which, when force-with-lease is
-acceptable, the team sync window) belong to **scope A — the three-tier branch workflow**. This scope's job ends
+acceptable, the team sync window) belong to **scope A — the single-repo branch workflow (model choice declared in the managed block)**. This scope's job ends
 at "these two environments have forked; here is the evidence".
 
 **`SUBMODULE_DRIFT`** — do not bump the gitlink here. Editing inside a submodule,
@@ -98,7 +98,7 @@ before relying on propagation order.
 | Collect state across environments; decide *which* environment acts | **scope B — this workflow** |
 | Sequence remediation across environments | **scope B — this workflow** |
 | `fetch`, ff-pull, stash-protect, backup branch | **scope B — this workflow** (SAFE set) |
-| Branch roles, rebase sync, merges, force-with-lease, `.gitexcludes` | **scope A — three-tier branch workflow** |
+| Branch roles, rebase sync, merges, force-with-lease, `.gitexcludes` | **scope A — single-repo branch workflow (model choice)** |
 | Anything inside a submodule; gitlink bumps; bump ledger | **scope C — submodule editing** |
 | Reviewing the diff itself | **code-review** (separate skill) |
 

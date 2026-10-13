@@ -1,6 +1,6 @@
 # Git Workflow 状态文件定位与写入
 
-本技能把三层分支信息写入独立状态文件 **`${SKILL_WORKDIR}/docs/git-workflow.md`** 的 Git Workflow 托管块，不写入 instructions 文件，也不生成其他工作流文档（`.specify/instructions.md` 的 `## Git Workflow` 章节只保留指向本文件的指针，由 `/speckit.instructions` 维护）。
+本技能把项目声明的分支工作流信息写入独立状态文件 **`${SKILL_WORKDIR}/docs/git-workflow.md`** 的 Git Workflow 托管块，不写入 instructions 文件，也不生成其他工作流文档（`.specify/instructions.md` 的 `## Git Workflow` 章节只保留指向本文件的指针，由 `/speckit.instructions` 维护）。工作流模型是项目级选择（菜单见 SKILL.md 作用域 A）；块内首行 `Workflow model` 声明所选模型，其后的行随模型形态而异——下文示例为三层模型的填充形态。
 
 ## 目标文件
 
@@ -16,7 +16,7 @@ grep -q '<!-- GIT_WORKFLOW_START -->' "${SKILL_WORKDIR:-.}/docs/git-workflow.md"
 
 - **文件已存在**：只替换 `<!-- GIT_WORKFLOW_START -->` 与 `<!-- GIT_WORKFLOW_END -->` **之间**的内容；标记本身与块外内容保持字节不变。
 - **文件不存在**：读取 `${SKILL_HOME}/assets/git-workflow-block.md`，替换占位符后整文件写入。
-- **占位状态**：未建立工作流时块内保留 `| None yet. | - | - | - |` 行——这一行即 Bootstrap 作用域的判定依据。
+- **占位状态**：未建立工作流时 `Workflow model` 声明行保留 `None yet.`——这一行即 Bootstrap 作用域的判定依据。
 - **单一数据源**：分支信息只写入该文件。不要写进 instructions 文件，也不要另建 `.specify/git-workflow.md` 或 `.specify/memory/git-workflow.md`。
 
 ## 旧版块迁移（升级场景）
@@ -31,11 +31,12 @@ grep -q '<!-- GIT_WORKFLOW_START -->' "${SKILL_WORKDIR:-.}/.specify/instructions
 
 ## 块内容
 
-模板见 `${SKILL_HOME}/assets/git-workflow-block.md`。填充后的形态：
+模板见 `${SKILL_HOME}/assets/git-workflow-block.md`。填充后的形态（**三层模型示例**；其他模型以 `Workflow model` 声明行 + 该模型自己的约定行替代角色表）：
 
 ```markdown
 <!-- GIT_WORKFLOW_START -->
-<!-- Record one row per branch role (MAIN / PRE / DEV). While no workflow is established, keep the `None yet.` row. -->
+<!-- Workflow model is a per-project choice (menu: single-branch / dual-branch / trunk-based with short-lived feature branches / MAIN-PRE-DEV three-tier); the declaration below records THIS project's choice, followed by its operating rules. -->
+- **Workflow model**: MAIN/PRE/DEV 三层
 | Role | Branch | Tracking | Purpose |
 |------|--------|----------|---------|
 | MAIN | `master` | `origin/master` | 上游主干，只接收已通过版本验证的代码 |
@@ -51,7 +52,7 @@ grep -q '<!-- GIT_WORKFLOW_START -->' "${SKILL_WORKDIR:-.}/.specify/instructions
 ## 读取（体检与定向收敛的数据源）
 
 ```bash
-# 提取三层分支名（Branch 列反引号内的值）
+# 提取三层模型的分支名（Branch 列反引号内的值；仅声明模型为三层时使用）
 awk '/<!-- GIT_WORKFLOW_START -->/,/<!-- GIT_WORKFLOW_END -->/' "${SKILL_WORKDIR:-.}/docs/git-workflow.md" \
   | awk -F'|' '$2 ~ /MAIN|PRE|DEV/ {gsub(/[ `]/, "", $2); gsub(/[ `]/, "", $3); print $2"="$3}'
 ```

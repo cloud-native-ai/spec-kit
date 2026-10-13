@@ -1,6 +1,6 @@
 # Bootstrap 调谐命令序列
 
-Phase 0（遗留配置迁移）与 Phase 1（分支检测、创建、`.gitexcludes` 初始化、写入 Git Workflow 块）的完整命令序列。SKILL.md 保留步骤骨架与交互决策逻辑，此处承载操作细节。
+Phase 0（遗留配置迁移）与 Phase 1（模型选择、分支检测、创建、`.gitexcludes` 初始化、写入 Git Workflow 块）的完整命令序列。SKILL.md 保留步骤骨架与交互决策逻辑，此处承载操作细节。**本页 Phase 1 命令默认三层模型**（建层分支、层间 upstream）；用户选定其他模型时，仅迁移检测与分支检测通用，建分支/写块按该模型形态执行（命令同型，分支参数来自该模型的约定确认）。
 
 ## 遗留配置迁移
 
@@ -16,7 +16,7 @@ for legacy in "${SKILL_WORKDIR}/.specify/memory/git-workflow.md" "${SKILL_WORKDI
 done
 ```
 
-把提取到的 `main_branch` / `pre_branch` / `dev_branch` 写入块的 MAIN / PRE / DEV 行，并刷新 `Last updated`。
+把提取到的 `main_branch` / `pre_branch` / `dev_branch` 写入块的 `Workflow model` 声明行（三层）与 MAIN / PRE / DEV 行，并刷新 `Last updated`（旧格式块无声明行，迁移时补上）。
 
 - 迁移完成后，遗留文件即为**冗余数据源**：在报告中列出其路径并建议用户删除或归档，**不要自动删除**（可能含用户手写的补充内容，删除不可逆）。
 - 旧版 instructions.md 内联的 `## Git Workflow` 块也是遗留来源：把其中分支表迁入 `docs/git-workflow.md` 托管块后，将 instructions.md 中该节替换为指向新文件的指针句（由 `/speckit.instructions` 收敛，不要手改整份文件）。

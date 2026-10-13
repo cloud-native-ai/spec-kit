@@ -57,8 +57,10 @@ def test_state_file_carries_the_managed_block():
     assert START in text and END in text, "state file is missing the managed block"
     assert text.index(START) < text.index(END), "markers out of order"
     block = text[text.index(START):text.index(END)]
-    assert "| Role | Branch | Tracking | Purpose |" in block, "block needs the fixed table header"
+    assert "**Workflow model**:" in block, \
+        "block must declare the project's chosen workflow model (per-project choice)"
     assert "None yet." in block, "unestablished workflow must keep the placeholder row"
+    assert "**Last updated**:" in block, "block must be dated"
 
 
 @pytest.mark.contract
@@ -87,8 +89,10 @@ def test_block_asset_is_a_full_file_template():
     assert BLOCK_ASSET.is_file(), "assets/git-workflow-block.md missing"
     asset = BLOCK_ASSET.read_text(encoding="utf-8")
     assert START in asset and END in asset, "block asset must ship the markers"
-    assert "# Git Workflow Branch Roles" in asset, \
+    assert "# Git Workflow" in asset, \
         "asset must render the whole state file, header included"
+    assert "<MODEL>" in asset and "<MODEL_SPECIFIC_LINES>" in asset, \
+        "asset must carry the model-declaration placeholders (per-project model choice)"
     for placeholder in ("<MAIN>", "<PRE>", "<DEV>", "<MAIN_TRACKING>", "<DATE>"):
         assert placeholder in asset, f"block asset missing placeholder {placeholder}"
 
