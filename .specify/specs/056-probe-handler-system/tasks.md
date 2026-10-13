@@ -115,8 +115,8 @@ python3 scripts/python/sync-mirrors.py --check
 
 ## Phase 1: Setup
 
-- [ ] T001 创建运行期证据落点文件 `.specify/specs/056-probe-handler-system/notes/red-first-evidence.md`、`notes/quickstart-run.md`、`notes/pre-change-measurements.md`（三个空骨架，标题行 + 字段占位，按 `.specify/templates/tasks-template.md` 运行期证据约定）
-- [ ] T002 改前基线捕获：重跑本文件 § Premise Measurements 的 PM-1..PM-5 全部命令，将真实输出冻结进 `notes/pre-change-measurements.md`（含 failing-test 基线采集：`python3 -m pytest tests/ -m contract` 全量一次，记录失败集；基线 owner：`templates/commands/implement.md` § Test runs；后续所有"零新增失败"对比以此为准）
+- [X] T001 创建运行期证据落点文件 `.specify/specs/056-probe-handler-system/notes/red-first-evidence.md`、`notes/quickstart-run.md`、`notes/pre-change-measurements.md`（三个空骨架，标题行 + 字段占位，按 `.specify/templates/tasks-template.md` 运行期证据约定）
+- [X] T002 改前基线捕获：重跑本文件 § Premise Measurements 的 PM-1..PM-5 全部命令，将真实输出冻结进 `notes/pre-change-measurements.md`（含 failing-test 基线采集：`python3 -m pytest tests/ -m contract` 全量一次，记录失败集；基线 owner：`templates/commands/implement.md` § Test runs；后续所有"零新增失败"对比以此为准）
 
 **Checkpoint**: 基线冻结完成，后续所有对比有据可查。
 
