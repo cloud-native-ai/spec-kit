@@ -13,6 +13,7 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FEEDBACK_HEADING = "## Feedback"
+WRAPUP_HEADING = "## Wrap-up"  # 056: the compiled face (AUTO-GENERATED banner)
 
 
 def _skill_files(base: Path):
@@ -31,9 +32,9 @@ def test_every_source_skill_carries_feedback_section():
     missing = [
         f.parent.name
         for f in _skill_files(skills_dir)
-        if FEEDBACK_HEADING not in f.read_text(encoding="utf-8")
+        if WRAPUP_HEADING not in f.read_text(encoding="utf-8")
     ]
-    assert not missing, f"skills/ SKILL.md missing '## Feedback': {missing}"
+    assert not missing, f"skills/ SKILL.md missing the compiled '{WRAPUP_HEADING}': {missing}"
 
 
 @pytest.mark.contract
@@ -44,6 +45,6 @@ def test_every_runtime_mirror_skill_carries_feedback_section():
     missing = [
         f.parent.name
         for f in _skill_files(skills_dir)
-        if FEEDBACK_HEADING not in f.read_text(encoding="utf-8")
+        if WRAPUP_HEADING not in f.read_text(encoding="utf-8")
     ]
-    assert not missing, f".specify/skills/ SKILL.md missing '## Feedback': {missing}"
+    assert not missing, f".specify/skills/ SKILL.md missing the compiled '{WRAPUP_HEADING}': {missing}"

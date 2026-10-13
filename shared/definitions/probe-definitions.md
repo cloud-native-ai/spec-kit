@@ -194,11 +194,32 @@
 
 | handler_id | selector | scope | 覆盖说明 |
 |------------|----------|-------|----------|
-| h-run-determination | @point:wrap-up | complex-commands | MVP 骨架(T012);skills 侧与简单命令排除集由 T019 实测矩阵落行(T020 补全) |
+| h-run-determination | @point:wrap-up | all | T019 实测更正 MVP 骨架:owner 链 feedback-step.md § Run Determination「Step 1 runs the engine's `determine` action at wrap-up」⇒ 69/69 单元生效 |
 | h-feedback-record | @point:wrap-up | all | 69 单元现均有反馈记录面 |
 | h-threshold-notice | @point:wrap-up | all | 消费 h-run-determination 判定结果(order 10 → 30 次序约束 FR-008/FR-014) |
-| h-token-reflection | @point:wrap-up | all | |
-| h-docs-sync-eval | @point:wrap-up | skills | MVP 骨架(T012);complex-commands 侧由 T019 实测矩阵落行(T020 补全) |
+| h-token-reflection | @point:wrap-up | all | owner 链:Token 效率自评在 Reflection procedure step 2 |
+| h-docs-sync-eval | @point:wrap-up | speckit-analyze-wrapup | /speckit.analyze 的 Documentation 面(T019 矩阵;正枚举,免扣减语义) |
+| h-docs-sync-eval | @point:wrap-up | speckit-checklist-wrapup | /speckit.checklist 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-clarify-wrapup | /speckit.clarify 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-derive-wrapup | /speckit.derive 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-docs-wrapup | /speckit.docs 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-feedback-wrapup | /speckit.feedback 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-goal-wrapup | /speckit.goal 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-implement-wrapup | /speckit.implement 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-improve-wrapup | /speckit.improve 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-instructions-wrapup | /speckit.instructions 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-interview-wrapup | /speckit.interview 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-plan-wrapup | /speckit.plan 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-requirements-wrapup | /speckit.requirements 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-research-wrapup | /speckit.research 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-review-wrapup | /speckit.review 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-sanitize-wrapup | /speckit.sanitize 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-session-wrapup | /speckit.session 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-skills-wrapup | /speckit.skills 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-tasks-wrapup | /speckit.tasks 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-team-wrapup | /speckit.team 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-todo-wrapup | /speckit.todo 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-tools-wrapup | /speckit.tools 的 Documentation 面 |
 
 ## 非实体 probe 目录
 

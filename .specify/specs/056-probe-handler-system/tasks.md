@@ -181,15 +181,15 @@ python3 scripts/python/sync-mirrors.py --check
 
 > 编译器本体已于 T015 落地，本故事测试为迁移守卫（migration/regression exception：随实现后落位并钉住既有行为语义）。
 
-- [ ] T018 [P] [US3] [blockedBy: T015] 编写契约测试 `tests/contract/test_compile_embeds.py`（守卫，随实现落位）：确定性（两次编译 byte-identical，[C3] 对应 test_compile_embeds_determinism）、零生效单元无段（test_compile_embeds_zero_handler_no_section）、`--check` 语义（干净树 exit 0 / 产物漂移 exit 1）、横幅与标题迁移义务（[C3] title-migration duty）
-- [ ] T019 [US3] [blockedBy: T002] 从 69 单元实测推导 per-unit 差异矩阵：逐单元标注 scope 归属（complex-commands / skills / 排除）与 per-unit 覆盖项（技能 runtime-mode gate、简单命令 agents/constitution/feature 排除、23 vs 26 的 3 个无反馈节命令模板），追加至 `notes/pre-change-measurements.md` § per-unit matrix
-- [ ] T020 [US3] [blockedBy: T019] 按 per-unit 矩阵完善注册表 binding：scope 行与 per-unit override 行落 `shared/definitions/probe-definitions.md` ## HandlerBinding 章（T012 的 MVP 骨架补全为全量 69 单元覆盖）
-- [ ] T021 [US3] [blockedBy: T018,T020] 执行迁移编译：`python3 scripts/python/probe-utils.py --action compile-embeds --write` 对全部生效单元；两次运行 byte-identical；BLOCKING_PATTERNS 命中 → 拒写并修措辞（PM-3）
-- [ ] T022 [US3] [blockedBy: T021] 标题迁移义务落地（[C3]）：既有标题 pinning 测试迁移更新——`tests/contract/test_feedback_step_reference_form.py`、`test_docs_step_injection.py`、`test_feedback_command_template.py`、`test_dogfooding_practice.py` 及 041 C-5 同型断言中 `## Feedback` 字面量随标题迁移更新为 `## Wrap-up`（回归例外：随实现后修正，[blockedBy] 已体现）
-- [ ] T023 [US3] [blockedBy: T021] 行为真源最小接线编辑（FR-020 裁定）：`shared/workflow/feedback-step.md` § Embedded reference forms 与 `shared/workflow/docs-step.md` 放置行中的接线引用字面量更新（行为规则零改动）
-- [ ] T024 [US3] [blockedBy: T022,T023] 传播：`python3 scripts/python/regen-command-copies.py` + `python3 scripts/python/sync-mirrors.py --write`；`--check` 双绿（GATE-2 语义）
-- [ ] T025 [P] [US3] [blockedBy: T024] 守卫测试落位：`tests/contract/test_compile_propagation_order.py`（compile → regen → sync 次序钉住）、`tests/contract/test_wrap_up_wording_gate_safe.py`（生成措辞零 BLOCKING_PATTERNS + 门控 total 23/violations 0）、`tests/contract/test_wrap_up_line_budget.py`（SC-007 ≤ 853 非空行预算，PM-1 计数规则）
-- [ ] T026 [P] [US3] [blockedBy: T024] US3 故事验证：GATE-5 语义的手工段清零 grep（命令模板 + 技能面命中 0，编译产物内出现由 AUTO-GENERATED 横幅声明）；抽一个复杂命令（含阈值提示/自省/docs-sync 评估/运行判定）按 quickstart.md 路线走收尾流程与 T002 改前证据逐项比对，结论落 `notes/quickstart-run.md`
+- [X] T018 [P] [US3] [blockedBy: T015] 编写契约测试 `tests/contract/test_compile_embeds.py`（守卫，随实现落位）：确定性（两次编译 byte-identical，[C3] 对应 test_compile_embeds_determinism）、零生效单元无段（test_compile_embeds_zero_handler_no_section）、`--check` 语义（干净树 exit 0 / 产物漂移 exit 1）、横幅与标题迁移义务（[C3] title-migration duty）
+- [X] T019 [US3] [blockedBy: T002] 从 69 单元实测推导 per-unit 差异矩阵：逐单元标注 scope 归属（complex-commands / skills / 排除）与 per-unit 覆盖项（技能 runtime-mode gate、简单命令 agents/constitution/feature 排除、23 vs 26 的 3 个无反馈节命令模板），追加至 `notes/pre-change-measurements.md` § per-unit matrix
+- [X] T020 [US3] [blockedBy: T019] 按 per-unit 矩阵完善注册表 binding：scope 行与 per-unit override 行落 `shared/definitions/probe-definitions.md` ## HandlerBinding 章（T012 的 MVP 骨架补全为全量 69 单元覆盖）
+- [X] T021 [US3] [blockedBy: T018,T020] 执行迁移编译：`python3 scripts/python/probe-utils.py --action compile-embeds --write` 对全部生效单元；两次运行 byte-identical；BLOCKING_PATTERNS 命中 → 拒写并修措辞（PM-3）
+- [X] T022 [US3] [blockedBy: T021] 标题迁移义务落地（[C3]）：既有标题 pinning 测试迁移更新——`tests/contract/test_feedback_step_reference_form.py`、`test_docs_step_injection.py`、`test_feedback_command_template.py`、`test_dogfooding_practice.py` 及 041 C-5 同型断言中 `## Feedback` 字面量随标题迁移更新为 `## Wrap-up`（回归例外：随实现后修正，[blockedBy] 已体现）
+- [X] T023 [US3] [blockedBy: T021] 行为真源最小接线编辑（FR-020 裁定）：`shared/workflow/feedback-step.md` § Embedded reference forms 与 `shared/workflow/docs-step.md` 放置行中的接线引用字面量更新（行为规则零改动）
+- [X] T024 [US3] [blockedBy: T022,T023] 传播：`python3 scripts/python/regen-command-copies.py` + `python3 scripts/python/sync-mirrors.py --write`；`--check` 双绿（GATE-2 语义）
+- [X] T025 [P] [US3] [blockedBy: T024] 守卫测试落位：`tests/contract/test_compile_propagation_order.py`（compile → regen → sync 次序钉住）、`tests/contract/test_wrap_up_wording_gate_safe.py`（生成措辞零 BLOCKING_PATTERNS + 门控 total 23/violations 0）、`tests/contract/test_wrap_up_line_budget.py`（SC-007 ≤ 853 非空行预算，PM-1 计数规则）
+- [X] T026 [P] [US3] [blockedBy: T024] US3 故事验证：GATE-5 语义的手工段清零 grep（命令模板 + 技能面命中 0，编译产物内出现由 AUTO-GENERATED 横幅声明）；抽一个复杂命令（含阈值提示/自省/docs-sync 评估/运行判定）按 quickstart.md 路线走收尾流程与 T002 改前证据逐项比对，结论落 `notes/quickstart-run.md`
 
 **Checkpoint**: 模板手术税消除——69 单元收尾面为编译产物，既有行为零回退。
 

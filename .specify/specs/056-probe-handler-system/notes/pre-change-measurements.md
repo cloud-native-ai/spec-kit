@@ -66,6 +66,37 @@ ok    shared/ == .specify/shared/ (46 files)
 - 基线文件：`.specify/specs/056-probe-handler-system/baseline-failed.txt`（**0 条**）
 - 判据形态：基线为空集 ⇒ 后续任何失败均为新增失败（绝对判据）；相界回归对比 `comm -13 baseline current` 必须为空。
 
-## per-unit 差异矩阵（T019 前占位）
+## per-unit 差异矩阵（T019 实测，2026-10-13）
 
-> T019 从 69 单元实测推导后追加于本节之后。
+> 测量方法（program-first）：脚本枚举 `_embed_candidate_paths` 全集（26 命令 + 46 技能
+> = 72 候选）+ H2 face 扫描 + 注册表 Objects 表 `unit → object_id` 解析（106 objects：
+> 92 unit-facing + 14 script-facing）。69/69 单元均有注册 Object（reconcile zero-gap）。
+
+### 面分布（实测）
+
+- 单元全集 = **69**（23 命令 + 46 技能）；69/69 带 `## Feedback`；**22 带 `## Documentation`（全部命令面，技能面 0）**；0 个 doc-only；0 个既有 `## Wrap-up`。
+- 手工 Feedback 段形态唯一：69/69 同一段式（canonical convention 指针段，仅 `--unit-id` 字面随单元变化；命令面 692–700 字符，技能面 866–876 = 段式 + runtime-mode gate 行）。
+- **runtime-mode gate 行：46/46 技能齐备**（编译期 `_SKILL_GATE_LINE` 复刻，FR-013 变体保留）。
+- 无反馈面命令 = `agents` / `constitution` / `feature` 3 个 → **结构性无面，非单元**，Q5 零段语义天然覆盖，**无需排除行**。
+- `/speckit.history` = 唯一有 Feedback 而无 Documentation 的命令。
+- 多 Object 单元 12 个（如 implement/instructions/sanitize/session/tools 并存 confirm-gate 类 Object）；docs-sync 行取各单元 command-wrapup 类 Object。
+
+### handler 适用性（实测 → T020 落行依据）
+
+| handler | 实测适用面 | 依据 |
+|---------|-----------|------|
+| h-feedback-record | `all`（69/69） | 69/69 均有反馈记录面 |
+| h-threshold-notice | `all` | owner 链：threshold protocol = feedback-step.md step 6，随步执行；单元级 0 处独立接线 |
+| h-token-reflection | `all` | owner 链：Token 效率自评内嵌于 Reflection procedure step 2 |
+| h-run-determination | `all` | owner 链：feedback-step.md § Run Determination "Step 1 runs the engine's `determine` action at wrap-up"；improve 路径 2 处提及均为 `--action history` 读侧（why 步），非 wrap-up 接线 |
+| h-docs-sync-eval | 22 命令单元（逐 object_id） | Documentation 面 = 22 命令（技能 0）；正枚举落行，免引擎扣减语义 |
+
+### T020 落行裁定（实测更正 MVP 骨架）
+
+1. h-run-determination：`complex-commands` → **`all`**（原骨架行依据"命令面复杂命令"的预判被实测否定——判定引擎经 owner 链在全部 69 单元的 wrap-up 生效）。
+2. h-docs-sync-eval：`skills` → **作废，重落 22 条逐 `object_id` 行**（object 取各单元 `speckit-<stem>-wrapup`；`/speckit.history` 无 Documentation 面，不在列）。
+3. **排除语义裁定**：实测矩阵零排除需求 → 引擎 additive 命中语义即实现态；data-model 编译算法第 2 步「扣减覆盖」按空排除集执行（no-op）；"排除"以更窄 scope 的正枚举表达。
+
+### 引擎语义注记（供 T027 守卫设计）
+
+零生效单元的编译会同时移除其手工 Feedback/Documentation 面（wrap-up 段位归编译所有）。当前矩阵下 69 单元均有生效 handler，该状态不可达；守卫设计时按「迁移完成态手工面重现 = 异常」处理（FR-016 唯一形态）。

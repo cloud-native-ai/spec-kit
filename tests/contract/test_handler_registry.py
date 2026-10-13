@@ -180,6 +180,11 @@ def test_order_unique_within_each_point() -> None:
         owners = per_point.setdefault(point, {})
         assert hid not in owners or owners[hid] == order
         for other, other_order in owners.items():
+            # One handler bound through many selectors/scopes merges into a single
+            # entry at its own order (data-model 合并规则): conflicts fire only
+            # across DIFFERENT handlers.
+            if other == hid:
+                continue
             assert other_order != order, (
                 f"order conflict at @{point}: {hid} and {other} both order {order}"
             )

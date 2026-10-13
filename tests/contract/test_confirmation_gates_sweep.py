@@ -381,8 +381,8 @@ def test_wrapup_submission_prompt_nonblocking() -> None:
     assert "/speckit.feedback" in owner, "user-facing submission path must be disclosed"
     assert "自动传输" in owner and "MUST NOT" in owner, "no-auto-transmission red line missing"
     skill = (REPO_ROOT / "skills" / "internal" / "create-team" / "SKILL.md").read_text(encoding="utf-8")
-    assert "## Feedback" in skill and "feedback-step.md" in skill, (
-        "create-team's Feedback section must point at the owner that carries the "
+    assert "## Wrap-up" in skill and "feedback-step.md" in skill, (
+        "create-team's compiled wrap-up face must point at the owner that carries the "
         "non-blocking / no-auto-transmission semantics"
     )
 

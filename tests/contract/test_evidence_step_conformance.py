@@ -54,7 +54,7 @@ class TestCollectEvidenceSkill:
             assert marker in text, marker
 
     def test_feedback_section_present(self):
-        assert "## Feedback" in COLLECT_SKILL.read_text(encoding="utf-8")
+        assert "## Wrap-up" in COLLECT_SKILL.read_text(encoding="utf-8")
 
     def test_neutrality_no_verdict_language(self):
         text = COLLECT_SKILL.read_text(encoding="utf-8")

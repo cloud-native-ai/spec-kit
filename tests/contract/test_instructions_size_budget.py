@@ -522,7 +522,9 @@ def test_command_template_embeds_artifact_commit_in_the_shared_pointer_form():
     restatement of its rules is exactly the drift the owner exists to prevent."""
     text = COMMAND_TEMPLATE.read_text(encoding="utf-8")
     assert "## Artifact Commit" in text, "the Artifact Commit step is missing"
-    assert text.index("## Documentation") < text.index("## Artifact Commit") < text.index(
+    # 056 compiled the manual Feedback/Documentation faces into one `## Wrap-up`,
+    # which now occupies the slot before Artifact Commit.
+    assert text.index("## Wrap-up") < text.index("## Artifact Commit") < text.index(
         "## Handoffs"
     ), "Artifact Commit must sit in the same slot the peer commands use"
 
