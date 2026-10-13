@@ -167,6 +167,39 @@
 | skill-run-interview-wrapup | skill-wrapup | skill:run-interview | wrap-up |
 | skill-sanitize-materials-wrapup | skill-wrapup | skill:sanitize-materials | wrap-up |
 
+## Handler
+
+> 反应层实体(056):一个探测点(Probe Object)经 HandlerBinding 可挂接 N 个已注册反应。
+> 六字段封闭集。kind=engine 的 action MUST 命中真实引擎 action 封闭集(对账面:
+> contracts/engine-action-sets.md,校验见 `probe-utils.py --action handlers --validate`);
+> kind=agent 的 action 为 behavior_owner 文件 `##` 级标题原文;kind=gate 的 action 为
+> confirmation-gates.md 治理条目名。behavior_owner 仅路径指针——本表 MUST NOT
+> 复述行为规则(One Source Of Truth)。order 冲突判定:同一 lifecycle point 内
+> 不同 Handler 不得同序。
+
+| handler_id | kind | action | mode | order | behavior_owner |
+|------------|------|--------|------|-------|----------------|
+| h-run-determination | engine | determine | non-blocking | 10 | scripts/python/run-determination.py |
+| h-feedback-record | engine | record | non-blocking | 20 | scripts/python/feedback-utils.py |
+| h-threshold-notice | agent | Threshold prompt protocol (canonical semantics for step 6) | non-blocking | 30 | shared/workflow/feedback-step.md |
+| h-token-reflection | agent | Reflection procedure (the embedded step points here) | non-blocking | 40 | shared/workflow/feedback-step.md |
+| h-docs-sync-eval | agent | Evaluation procedure (the embedded step points here) | non-blocking | 50 | shared/workflow/docs-step.md |
+
+## HandlerBinding
+
+> 订阅行:selector = 字面 `@point:<lifecycle_point>`(封闭集 wrap-up / situation /
+> phase-boundary / confirm-gate);scope = complex-commands / skills / all 或逐
+> object_id;身份 = (handler_id, selector, scope) 三元组,validate 拒绝完全重复。
+> 一个 Probe Object 可被多个 Binding 订阅(1 ⇒ N)。
+
+| handler_id | selector | scope | 覆盖说明 |
+|------------|----------|-------|----------|
+| h-run-determination | @point:wrap-up | complex-commands | MVP 骨架(T012);skills 侧与简单命令排除集由 T019 实测矩阵落行(T020 补全) |
+| h-feedback-record | @point:wrap-up | all | 69 单元现均有反馈记录面 |
+| h-threshold-notice | @point:wrap-up | all | 消费 h-run-determination 判定结果(order 10 → 30 次序约束 FR-008/FR-014) |
+| h-token-reflection | @point:wrap-up | all | |
+| h-docs-sync-eval | @point:wrap-up | skills | MVP 骨架(T012);complex-commands 侧由 T019 实测矩阵落行(T020 补全) |
+
 ## 非实体 probe 目录
 
 > 纯代码微探针按 One Source of Truth 的 code-first 原则**不入册**——它们不是

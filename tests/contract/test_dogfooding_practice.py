@@ -105,7 +105,12 @@ SECTION_HEADING = "## Dogfooding Practice"
 # Amended by requirement 041-refactor-feedback-probe: the engine action set
 # legitimately grows (probes + map/cleanup/migrate-legacy/probe-inject as they land).
 # Amended by requirement 047-feedback-introspection: + introspect-register.
-ENGINE_ACTIONS = {"record", "status", "list", "dispose", "mark-submitted", "reindex", "package", "upstream", "probes", "map", "cleanup", "migrate-legacy", "probe-inject", "introspect-register"}
+# Amended by requirement 056-probe-handler-system: the probe family (probes /
+# map / probe-inject) moved to scripts/python/probe-utils.py — closed sets
+# pinned both ways by tests/contract/test_probe_engine_action_sets.py.
+FEEDBACK_ENGINE_ACTIONS = {"record", "status", "list", "dispose", "mark-submitted", "reindex", "package", "upstream", "cleanup", "migrate-legacy", "introspect-register"}
+PROBE_ENGINE_ACTIONS = {"probes", "map", "probe-inject", "handlers", "compile-embeds"}
+ENGINE_ACTIONS = FEEDBACK_ENGINE_ACTIONS | PROBE_ENGINE_ACTIONS
 # Project identifiers that MUST NOT leak into a project-neutral shared section.
 FORBIDDEN = ["spec-kit", "specify-cli", "specify_cli", "Feature 036", "032-dogfooding-practice", "cloud-native-ai"]
 
@@ -221,7 +226,8 @@ def test_c4_engine_action_set_unchanged():
     m = re.search(r'choices=\[([^\]]+)\]', src)
     assert m, "argparse --action choices not found"
     actions = set(re.findall(r'"([a-z-]+)"', m.group(1)))
-    assert actions == ENGINE_ACTIONS, f"engine action set changed: {actions ^ ENGINE_ACTIONS}"
+    assert actions == FEEDBACK_ENGINE_ACTIONS, (
+        f"feedback engine action set changed: {actions ^ FEEDBACK_ENGINE_ACTIONS}")
 
 
 def test_c4_engine_mirror_untouched():

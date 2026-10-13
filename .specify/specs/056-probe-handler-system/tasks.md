@@ -155,17 +155,17 @@ python3 scripts/python/sync-mirrors.py --check
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T010 [P] [US2] 编写契约测试 `tests/contract/test_handler_registry.py`（红优先）：Handler 六字段封闭集（handler_id `h-` 前缀 / kind∈{engine,agent,gate} / action / mode∈{non-blocking,blocking} / order / behavior_owner 按 kind 派生形态）、HandlerBinding selector 语法（`@point:` 封闭集 + scope 封闭集）、per-unit 覆盖与 identity=(handler_id,selector,scope)、order 在生效 binding 集内唯一（重复 → exit 2）——对 [C2] 六条校验规则逐条
-- [ ] T011 [P] [US2] 编写契约测试 `tests/contract/test_probe_engine_action_sets.py`（红优先）：[C4] 两个封闭集全文钉死——probe-utils.py 允许集 {probes,map,probe-inject,handlers,compile-embeds}、feedback-utils.py 允许集 {record,status,list,dispose,mark-submitted,reindex,package,cleanup,upstream,migrate-legacy,introspect-register}，双方超集/缺集均红（对 argparse choices 行解析）
+- [X] T010 [P] [US2] 编写契约测试 `tests/contract/test_handler_registry.py`（红优先）：Handler 六字段封闭集（handler_id `h-` 前缀 / kind∈{engine,agent,gate} / action / mode∈{non-blocking,blocking} / order / behavior_owner 按 kind 派生形态）、HandlerBinding selector 语法（`@point:` 封闭集 + scope 封闭集）、per-unit 覆盖与 identity=(handler_id,selector,scope)、order 在生效 binding 集内唯一（重复 → exit 2）——对 [C2] 六条校验规则逐条
+- [X] T011 [P] [US2] 编写契约测试 `tests/contract/test_probe_engine_action_sets.py`（红优先）：[C4] 两个封闭集全文钉死——probe-utils.py 允许集 {probes,map,probe-inject,handlers,compile-embeds}、feedback-utils.py 允许集 {record,status,list,dispose,mark-submitted,reindex,package,cleanup,upstream,migrate-legacy,introspect-register}，双方超集/缺集均红（对 argparse choices 行解析）
 
 ### Implementation for User Story 2
 
-- [ ] T012 [US2] [blockedBy: T009,T010] 注册表新增章节：`shared/definitions/probe-definitions.md` 增加 `## Handler` 与 `## HandlerBinding` 两章 + MVP seed 五行 handler（h-run-determination order 10 / h-feedback-record 20 / h-threshold-notice 30 / h-token-reflection 40 / h-docs-sync-eval 50，data-model.md § MVP Seed Data 为准，behavior_owner 指向 feedback-step.md / docs-step.md / run-determination.py / feedback-utils.py 实锚点）+ wrap-up 点五行 binding（scope 承载 T019 矩阵前的 MVP 骨架：complex-commands + skills 两 selector）
-- [ ] T013 [US2] [blockedBy: T011,T012] 新建 `scripts/python/probe-utils.py`（stdlib-only，与 feedback-utils.py 同分布）：自 feedback-utils.py 迁出 probes/map/probe-inject 三 action（行为逐项不变，--validate/--reconcile 为 probes 的 flag）+ 新增 `--action handlers`（list/--point/--scope/--kind/--mode/--validate/--bindings，[C2]）；导出公共代码锚点供对账
-- [ ] T014 [P] [US2] [blockedBy: T013] `scripts/python/feedback-utils.py` 收缩：argparse choices 移除 probes/map/probe-inject（PM-2 的 14 → 11），probe 族实现函数随迁（feedback 侧零残留）；既有 11 action 行为不变
-- [ ] T015 [US2] [blockedBy: T013] 实现 `--action compile-embeds` 于 probe-utils.py：data-model.md § 7 步编译算法 + [C3]（解析 selector → 匹配单元 → 渲染单一 AUTO-GENERATED `## Wrap-up` 段 → 原子写）；零生效 handler 单元不输出段（Q5）；`--check` exit 1 漂移 / 五类 exit 2 拒写（BLOCKING_PATTERNS 命中拒绝写入——PM-3 硬约束）
-- [ ] T016 [US2] [blockedBy: T014,T015] US2 引擎验证：T011 封闭集契约绿；feedback-utils.py 迁移前后对同参数输出逐字节比对（用 T002 捕获的基线输出）；`--action handlers --point wrap-up --validate` 对 seed 五行 exit 0；临时 handler+binding 注册沙箱演练（测试内）目标单元产物含新 handler、既有单元零影响
-- [ ] T017 [US2] [blockedBy: T016] 镜像双写验证：sync-mirrors 传播 `scripts/` 对 + `--check` 无 NEW drift；`.specify/scripts/python/probe-utils.py` 就位且可独立调用
+- [X] T012 [US2] [blockedBy: T009,T010] 注册表新增章节：`shared/definitions/probe-definitions.md` 增加 `## Handler` 与 `## HandlerBinding` 两章 + MVP seed 五行 handler（h-run-determination order 10 / h-feedback-record 20 / h-threshold-notice 30 / h-token-reflection 40 / h-docs-sync-eval 50，data-model.md § MVP Seed Data 为准，behavior_owner 指向 feedback-step.md / docs-step.md / run-determination.py / feedback-utils.py 实锚点）+ wrap-up 点五行 binding（scope 承载 T019 矩阵前的 MVP 骨架：complex-commands + skills 两 selector）
+- [X] T013 [US2] [blockedBy: T011,T012] 新建 `scripts/python/probe-utils.py`（stdlib-only，与 feedback-utils.py 同分布）：自 feedback-utils.py 迁出 probes/map/probe-inject 三 action（行为逐项不变，--validate/--reconcile 为 probes 的 flag）+ 新增 `--action handlers`（list/--point/--scope/--kind/--mode/--validate/--bindings，[C2]）；导出公共代码锚点供对账
+- [X] T014 [P] [US2] [blockedBy: T013] `scripts/python/feedback-utils.py` 收缩：argparse choices 移除 probes/map/probe-inject（PM-2 的 14 → 11），probe 族实现函数随迁（feedback 侧零残留）；既有 11 action 行为不变
+- [X] T015 [US2] [blockedBy: T013] 实现 `--action compile-embeds` 于 probe-utils.py：data-model.md § 7 步编译算法 + [C3]（解析 selector → 匹配单元 → 渲染单一 AUTO-GENERATED `## Wrap-up` 段 → 原子写）；零生效 handler 单元不输出段（Q5）；`--check` exit 1 漂移 / 五类 exit 2 拒写（BLOCKING_PATTERNS 命中拒绝写入——PM-3 硬约束）
+- [X] T016 [US2] [blockedBy: T014,T015] US2 引擎验证：T011 封闭集契约绿；feedback-utils.py 迁移前后对同参数输出逐字节比对（用 T002 捕获的基线输出）；`--action handlers --point wrap-up --validate` 对 seed 五行 exit 0；临时 handler+binding 注册沙箱演练（测试内）目标单元产物含新 handler、既有单元零影响
+- [X] T017 [US2] [blockedBy: T016] 镜像双写验证：sync-mirrors 传播 `scripts/` 对 + `--check` 无 NEW drift；`.specify/scripts/python/probe-utils.py` 就位且可独立调用
 
 **Checkpoint**: "加一个 wrap-up 反应 = 注册一行 + 重编译"的机制面就绪；引擎动作封闭集双方钉死。
 

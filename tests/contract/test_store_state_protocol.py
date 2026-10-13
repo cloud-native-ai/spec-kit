@@ -296,6 +296,10 @@ class TestTwoBranchMerge:
         scripts_dir = repo / "scripts/python"
         scripts_dir.mkdir(parents=True)
         shutil.copy(Path(fu.__file__), scripts_dir / "feedback-utils.py")
+        # feedback-utils imports its sibling probe-utils at module load (056
+        # engine split) — the fixture repo must carry the pair, not the lone file.
+        shutil.copy(Path(fu.__file__).parent / "probe-utils.py",
+                    scripts_dir / "probe-utils.py")
         (repo / ".specify").mkdir()
         # Entry filenames carry second granularity: two branches recording
         # the SAME unit within the same wall-clock second collide on the

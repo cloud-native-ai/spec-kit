@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.script_api import ROOT, feedback_utils
+from tests.script_api import ROOT, probe_utils
 DEFS = ROOT / "shared" / "definitions" / "probe-definitions.md"
 
 # Drift-detector pins (legitimate literal duplicate per One Source of Truth:
@@ -143,13 +143,13 @@ def test_objects_for_new_classes_use_script_units() -> None:
 
 
 def test_feedback_utils_probe_validate_still_green() -> None:
-    registry = feedback_utils.load_probe_registry(ROOT)
+    registry = probe_utils.load_probe_registry(ROOT)
     assert registry["available"], "probe-definitions.md missing at framework root"
     assert registry["errors"] == [], f"registry structural errors: {registry['errors']}"
 
 
 def test_registry_counts_unchanged_for_feedback_domain() -> None:
-    registry = feedback_utils.load_probe_registry(ROOT)
+    registry = probe_utils.load_probe_registry(ROOT)
     internal = len(registry["objects"])
     external = len(registry["external"])
     assert internal >= 72 and external == 0, (

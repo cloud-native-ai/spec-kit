@@ -57,6 +57,25 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+# Probe-family functions live in the shared engine (requirement 056). The
+# hyphenated engine filename is not import-qualified, so load it by path —
+# reusing an already-registered instance (tests load it via script_api) and
+# resolving the sibling next to THIS file, which keeps the source copy and the
+# .specify mirror each self-consistent.
+if "probe_utils" in sys.modules:
+    _probe_utils = sys.modules["probe_utils"]
+else:
+    import importlib.util as _ilutil
+    _spec = _ilutil.spec_from_file_location(
+        "probe_utils", str(Path(__file__).resolve().parent / "probe-utils.py"))
+    _probe_utils = _ilutil.module_from_spec(_spec)
+    sys.modules["probe_utils"] = _probe_utils
+    _spec.loader.exec_module(_probe_utils)
+load_probe_registry = _probe_utils.load_probe_registry
+probe_defs_path = _probe_utils.probe_defs_path
+resolve_probe = _probe_utils.resolve_probe
+_CUSTOM_UNIT_RE = _probe_utils._CUSTOM_UNIT_RE
+
 FEEDBACK_SUBDIR = Path(".specify") / "memory" / "feedback"
 PACKAGES_DIRNAME = "packages"
 STATE_DIRNAME = "state"
@@ -1165,403 +1184,6 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
     return result
 
 
-# --------------------------------------------------------------------------- #
-# Probe registry (requirement 041 — Feedback Probe 化重构)
-# --------------------------------------------------------------------------- #
-PROBE_DEFS_REL = Path(".specify") / "shared" / "definitions" / "probe-definitions.md"
-EXTERNAL_PROBES_DIRNAME = "probes"
-_PROBE_ID_RE = re.compile(r"^[a-z][a-z0-9-]*$")
-_CUSTOM_UNIT_RE = re.compile(r"^custom:[a-z0-9._/-]+$")
-_PROBE_KINDS = ("internal", "external")
-_CLASS_FIELDS = ("class_id", "kind", "collection", "target_slice",
-                 "processing", "insertion_type")
-_OBJECT_FIELDS = ("object_id", "class_id", "unit", "lifecycle_point")
-_SCRIPT_UNIT_RE = re.compile(r"^scripts/(?:bash|python)/[a-z0-9][a-z0-9._-]*\.(?:py|sh)$")
-_CATALOG_HEADING = "非实体 probe 目录"
-_CATALOG_ENTRY_RE = re.compile(r"^- `([^`]+)` — .+$")
-
-
-def _catalog_entries(text: str) -> List[Tuple[str, str]]:
-    """Parse the non-entity probe catalog chapter as (path, raw-line) tuples.
-
-    The catalog is pointer-only and MUST NOT participate in any registry
-    counting — this helper is consumed solely for reachability validation.
-    """
-    lines = text.splitlines()
-    start = None
-    for i, line in enumerate(lines):
-        if line.strip() == f"## {_CATALOG_HEADING}":
-            start = i + 1
-            break
-    if start is None:
-        return []
-    out: List[Tuple[str, str]] = []
-    for line in lines[start:]:
-        if line.strip().startswith("## "):
-            break
-        m = _CATALOG_ENTRY_RE.match(line.strip())
-        if m:
-            out.append((m.group(1), line.strip()))
-    return out
-
-
-def probe_defs_path(workspace_root: Path) -> Path:
-    return workspace_root / PROBE_DEFS_REL
-
-
-def _table_rows(text: str, heading: str) -> List[Dict[str, str]]:
-    """Parse the first pipe table under ``## <heading>``; keys = header cells."""
-    lines = text.splitlines()
-    start = None
-    for i, line in enumerate(lines):
-        if line.strip().lower() == f"## {heading}".lower():
-            start = i + 1
-            break
-    if start is None:
-        return []
-    headers: Optional[List[str]] = None
-    rows: List[Dict[str, str]] = []
-    for line in lines[start:]:
-        stripped = line.strip()
-        if stripped.startswith("## "):
-            break
-        if not stripped.startswith("|"):
-            continue
-        cells = [c.strip() for c in stripped.strip("|").split("|")]
-        if headers is None:
-            headers = cells
-            continue
-        if all(set(c) <= {"-", ":"} for c in cells):
-            continue
-        if len(cells) == len(headers):
-            rows.append(dict(zip(headers, cells)))
-    return rows
-
-
-def _load_external_probes(workspace_root: Path,
-                          errors: List[str]) -> List[Dict[str, str]]:
-    out: List[Dict[str, str]] = []
-    probes_dir = feedback_dir(workspace_root) / EXTERNAL_PROBES_DIRNAME
-    if not probes_dir.is_dir():
-        return out
-    for path in sorted(probes_dir.glob("*.md")):
-        meta, _body = parse_frontmatter(path.read_text(encoding="utf-8"))
-        obj = {f: str(meta.get(f, "")).strip() for f in _OBJECT_FIELDS}
-        if not obj["object_id"]:
-            errors.append(f"external probe {path.name}: missing object_id")
-            continue
-        out.append(obj)
-    return out
-
-
-def load_probe_registry(workspace_root: Path) -> Dict[str, Any]:
-    """Load + structurally validate the merged probe truth source.
-
-    ``available`` is False when the framework definitions file is absent
-    (un-upgraded workspace): callers fall back to legacy behavior instead of
-    hard-failing, per red line 2 (the mechanism must never block work).
-    """
-    errors: List[str] = []
-    classes: List[Dict[str, str]] = []
-    objects: List[Dict[str, str]] = []
-    defs = probe_defs_path(workspace_root)
-    available = defs.is_file()
-    external: List[Dict[str, str]] = []
-    if available:
-        text = defs.read_text(encoding="utf-8")
-        classes = _table_rows(text, "Classes")
-        objects = _table_rows(text, "Objects")
-        seen_classes = set()
-        for c in classes:
-            cid = c.get("class_id", "")
-            for field in _CLASS_FIELDS:
-                if not c.get(field, "").strip():
-                    errors.append(f"class '{cid or '?'}': field '{field}' must be non-empty")
-            if not _PROBE_ID_RE.match(cid):
-                errors.append(f"class '{cid}': id must match ^[a-z][a-z0-9-]*$")
-            if cid in seen_classes:
-                errors.append(f"class '{cid}': duplicate class_id")
-            seen_classes.add(cid)
-            if c.get("kind", "") not in _PROBE_KINDS:
-                errors.append(f"class '{cid}': kind must be one of internal|external")
-        class_ids = {c.get("class_id", "") for c in classes}
-        class_slice = {c.get("class_id", ""): c.get("target_slice", "") for c in classes}
-        seen_objects = set()
-        for o in objects:
-            oid = o.get("object_id", "")
-            if not _PROBE_ID_RE.match(oid):
-                errors.append(f"object '{oid}': id must match ^[a-z][a-z0-9-]*$")
-            if oid in seen_objects:
-                errors.append(f"object '{oid}': duplicate object_id")
-            seen_objects.add(oid)
-            if o.get("class_id", "") not in class_ids:
-                errors.append(f"object '{oid}': unknown class '{o.get('class_id', '')}'")
-            if class_slice.get(o.get("class_id", "")) == "scripts":
-                if not _SCRIPT_UNIT_RE.match(o.get("unit", "")):
-                    errors.append(
-                        f"object '{oid}': unit '{o.get('unit', '')}' must be an engine "
-                        "script path (scripts/python/*.py or scripts/bash/*.sh) for "
-                        "scripts-slice classes")
-            elif not validate_unit_id(o.get("unit", "")):
-                errors.append(
-                    f"object '{oid}': unit '{o.get('unit', '')}' must be /speckit.* or skill:*")
-        for rel, _entry in _catalog_entries(text):
-            if not (workspace_root / rel).is_file():
-                errors.append(f"non-entity catalog entry unreachable: {rel}")
-        external = _load_external_probes(workspace_root, errors)
-        class_kind = {c.get("class_id", ""): c.get("kind", "") for c in classes}
-        for e in external:
-            oid = e.get("object_id", "")
-            if not oid.startswith("ext-"):
-                errors.append(f"external probe '{oid}': object_id MUST start with 'ext-'")
-            if oid in seen_objects:
-                errors.append(f"external probe '{oid}': duplicate object_id")
-            seen_objects.add(oid)
-            kind = class_kind.get(e.get("class_id", ""), "")
-            if kind != "external":
-                errors.append(
-                    f"external probe '{oid}': class '{e.get('class_id', '')}' "
-                    "must be kind=external")
-            if not _CUSTOM_UNIT_RE.match(e.get("unit", "")):
-                errors.append(
-                    f"external probe '{oid}': unit '{e.get('unit', '')}' must match custom:<owner>/<name>")
-    return {
-        "available": available,
-        "defs_path": defs.as_posix(),
-        "classes": classes,
-        "objects": objects,
-        "external": external,
-        "errors": errors,
-    }
-
-
-def _class_index(registry: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
-    return {c.get("class_id", ""): c for c in registry["classes"]}
-
-
-def merged_probe_objects(registry: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Internal + external objects with class features merged in."""
-    classes = _class_index(registry)
-
-    def _merge(obj: Dict[str, str], is_external: bool) -> Dict[str, Any]:
-        c = classes.get(obj.get("class_id", ""), {})
-        return {
-            "object_id": obj.get("object_id", ""),
-            "class_id": obj.get("class_id", ""),
-            "unit": obj.get("unit", ""),
-            "lifecycle_point": obj.get("lifecycle_point", ""),
-            "kind": c.get("kind", ""),
-            "slice": c.get("target_slice", ""),
-            "collection": c.get("collection", ""),
-            "processing": c.get("processing", ""),
-            "external": is_external,
-        }
-
-    out = [_merge(o, False) for o in registry["objects"]]
-    out += [_merge(e, True) for e in registry["external"]]
-    return out
-
-
-def resolve_probe(
-    registry: Dict[str, Any], unit_id: str, lifecycle_point: Optional[str] = None
-) -> Optional[Dict[str, Any]]:
-    if lifecycle_point:
-        for obj in merged_probe_objects(registry):
-            if obj["unit"] == unit_id and obj["lifecycle_point"] == lifecycle_point:
-                return obj
-        return None
-    for obj in merged_probe_objects(registry):
-        if obj["unit"] == unit_id:
-            return obj
-    return None
-
-
-def scan_embed_units(workspace_root: Path) -> Dict[str, str]:
-    """unit_id → file, from ``## Feedback`` embeds (framework repo layout)."""
-    found: Dict[str, str] = {}
-    cmd_dir = workspace_root / "templates" / "commands"
-    if cmd_dir.is_dir():
-        for path in sorted(cmd_dir.glob("*.md")):
-            if "## Feedback" in path.read_text(encoding="utf-8"):
-                found[f"/speckit.{path.stem}"] = path.relative_to(workspace_root).as_posix()
-    skills_dir = workspace_root / "skills"
-    if skills_dir.is_dir():
-        # Two-layer aware: a skill lives at skills/<name>/ (flat runtime shape) or at
-        # skills/{external,internal}/<name>/ (source-tree layering). A one-level glob saw
-        # ZERO embeds in a layered repo, so --reconcile reported "probe object without
-        # embed" for every skill row and could neither enforce nor detect the
-        # rows<->embed contract. Same path-resolution trap class as the engine
-        # self-location rule in AGENTS.md.
-        candidates = list(skills_dir.glob("*/SKILL.md"))
-        for layer in ("external", "internal"):
-            candidates.extend((skills_dir / layer).glob("*/SKILL.md"))
-        for path in sorted(set(candidates)):
-            if "## Feedback" in path.read_text(encoding="utf-8"):
-                found[f"skill:{path.parent.name}"] = path.relative_to(workspace_root).as_posix()
-    return found
-
-
-def action_probes(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = resolve_workspace_root(args.workspace_root)
-    registry = load_probe_registry(workspace_root)
-    errors = list(registry["errors"])
-    if args.validate or args.reconcile:
-        if not registry["available"]:
-            raise FeedbackError(f"probe registry not found: {probe_defs_path(workspace_root)}")
-        if args.reconcile:
-            embeds = scan_embed_units(workspace_root)
-            declared = {o.get("unit", ""): o for o in registry["objects"]}
-            wrapup_classes = {
-                c.get("class_id", "")
-                for c in registry["classes"]
-                if c.get("insertion_type", "") == "wrap-up"
-                and c.get("target_slice", "") != "scripts"
-            }
-            for unit in sorted(u for u in embeds if u not in declared):
-                errors.append(f"embed without probe object: {unit} ({embeds[unit]})")
-            for obj in registry["objects"]:
-                if obj.get("class_id", "") not in wrapup_classes:
-                    continue
-                if obj.get("unit", "") not in embeds:
-                    errors.append(
-                        f"probe object without embed: {obj.get('object_id', '')} "
-                        f"({obj.get('unit', '')})")
-        if errors:
-            raise FeedbackError("probe registry invalid:\n- " + "\n- ".join(errors))
-        return {
-            "ok": True,
-            "reconciled": bool(args.reconcile),
-            "classes": len(registry["classes"]),
-            "objects": len(registry["objects"]),
-            "external_objects": len(registry["external"]),
-            "embeds": len(scan_embed_units(workspace_root)) if args.reconcile else None,
-        }
-    return {
-        "available": registry["available"],
-        "classes": registry["classes"],
-        "objects": merged_probe_objects(registry),
-    }
-
-
-PROBE_MAP_NAME = "probe-map.md"
-
-
-def _map_slug(name: str) -> str:
-    """Deterministic Mermaid node id: keep [a-zA-Z0-9_] only."""
-    return _SLUG_RE.sub("_", name).strip("_")
-
-
-def compose_probe_map(registry: Dict[str, Any]) -> str:
-    """Render the derived probe map (deterministic: sorted, no timestamps).
-
-    Rebuilding from an unchanged truth source MUST be byte-identical — that
-    invariant is what makes drift detectable (SC-003).
-    """
-    classes = _class_index(registry)
-    objects = merged_probe_objects(registry)
-    lines: List[str] = [
-        "# Feedback Probe Map(反馈插点结构图)",
-        "",
-        "> **派生物** — 由 `--action map` 自 probe 真源整体重建,禁止手工编辑;",
-        "> 真源:`shared/definitions/probe-definitions.md` + 项目外部 probe。",
-        "",
-    ]
-    for kind, kind_label in (("internal", "internal(内部 — 目标为 Spec Kit 框架)"),
-                             ("external", "external(外部 — 目标为宿主项目自定义单元)")):
-        group = sorted((o for o in objects if o.get("kind") == kind),
-                       key=lambda o: (o.get("class_id", ""), o.get("object_id", "")))
-        by_class: Dict[str, List[Dict[str, Any]]] = {}
-        for o in group:
-            by_class.setdefault(o.get("class_id", ""), []).append(o)
-        # render EVERY class of this kind — zero-object classes stay visible
-        kind_classes = sorted(
-            (c for c in registry["classes"]
-             if c.get("kind") == kind and c.get("class_id")),
-            key=lambda c: c.get("class_id", ""))
-        if not kind_classes:
-            continue
-        lines.append(f"## {kind_label}")
-        lines.append("")
-        for cid in [c.get("class_id", "") for c in kind_classes]:
-            c = classes.get(cid, {})
-            members = sorted(by_class.get(cid, []),
-                             key=lambda x: x.get("object_id", ""))
-            lines.append(f"### {cid}  [slice: {c.get('target_slice', '-')}]")
-            lines.append("")
-            lines.append(f"- **收集内容**: {c.get('collection', '-')}")
-            lines.append(f"- **处理流程**: {c.get('processing', '-')}")
-            lines.append(f"- **适用插入位置**: {c.get('insertion_type', '-')}")
-            if members:
-                lines.append(f"- **Objects** ({len(members)}):")
-                for o in members:
-                    lines.append(
-                        f"  - `{o.get('object_id')}` — {o.get('unit')} @ "
-                        f"{o.get('lifecycle_point')}")
-            else:
-                lines.append("- **Objects** (0 — 尚无实例;外部类经模式三注入)")
-            lines.append("")
-    lines.append("## 结构总览(Mermaid)")
-    lines.append("")
-    lines.append("```mermaid")
-    lines.append("graph TD")
-    lines.append("  root[Feedback Probe]")
-    for kind in ("internal", "external"):
-        group = [o for o in objects if o.get("kind") == kind]
-        kind_classes = sorted(
-            (c for c in registry["classes"]
-             if c.get("kind") == kind and c.get("class_id")),
-            key=lambda c: c.get("class_id", ""))
-        if not group and not kind_classes:
-            continue
-        kind_node = _map_slug(f"kind {kind}")
-        lines.append(f"  root --> {kind_node}[{kind}]")
-        by_class: Dict[str, List[Dict[str, Any]]] = {}
-        for o in group:
-            by_class.setdefault(o.get("class_id", ""), []).append(o)
-        for cid in [c.get("class_id", "") for c in kind_classes]:
-            class_node = _map_slug(f"class {cid}")
-            lines.append(f"  {kind_node} --> {class_node}[{cid}]")
-            for o in sorted(by_class.get(cid, []), key=lambda x: x.get("object_id", "")):
-                obj_node = _map_slug(f"obj {o.get('object_id', '')}")
-                lines.append(f"  {class_node} --> {obj_node}[{o.get('object_id')}]")
-    lines.append("```")
-    lines.append("")
-    lines.append("## 明细表")
-    lines.append("")
-    lines.append("| Object | Class | Kind | 插入位置(unit @ lifecycle) | 收集内容 | 处理流程 |")
-    lines.append("|--------|-------|------|------------------------------|----------|----------|")
-    for o in sorted(objects, key=lambda x: (x.get("kind", ""), x.get("class_id", ""),
-                                            x.get("object_id", ""))):
-        c = classes.get(o.get("class_id", ""), {})
-        lines.append(
-            f"| `{o.get('object_id')}` | {o.get('class_id')} | {o.get('kind')} "
-            f"| {o.get('unit')} @ {o.get('lifecycle_point')} "
-            f"| {c.get('collection', '-')} | {c.get('processing', '-')} |")
-    lines.append("")
-    return "\n".join(lines)
-
-
-def action_map(args: argparse.Namespace) -> Dict[str, Any]:
-    workspace_root = resolve_workspace_root(args.workspace_root)
-    registry = load_probe_registry(workspace_root)
-    if not registry["available"]:
-        raise FeedbackError(f"probe registry not found: {probe_defs_path(workspace_root)}")
-    if registry["errors"]:
-        raise FeedbackError(
-            "probe registry invalid (run --action probes --validate):\n- "
-            + "\n- ".join(registry["errors"][:10]))
-    target_dir = ensure_feedback_dir(workspace_root)
-    (target_dir / PROBE_MAP_NAME).write_text(
-        compose_probe_map(registry), encoding="utf-8")
-    rel = (FEEDBACK_SUBDIR / PROBE_MAP_NAME).as_posix()
-    return {
-        "map": rel,
-        "classes": len(registry["classes"]),
-        "objects": len(registry["objects"]),
-        "external_objects": len(registry["external"]),
-    }
-
-
 CLEANUP_LOG_NAME = "cleanup-log.md"
 
 
@@ -1730,69 +1352,6 @@ def action_migrate_legacy(args: argparse.Namespace) -> Dict[str, Any]:
     }
 
 
-def action_probe_inject(args: argparse.Namespace) -> Dict[str, Any]:
-    """/speckit.feedback § Probe Injection (req 041, engine-cli C-6): inject an
-    external probe for a client-project custom unit into the project-side
-    registry."""
-    workspace_root = resolve_workspace_root(args.workspace_root)
-    unit = ((getattr(args, "unit", None) or getattr(args, "unit_id", None) or "")).strip()
-    if not _CUSTOM_UNIT_RE.match(unit):
-        raise FeedbackError("--unit must match custom:<owner>/<name>.")
-    registry = load_probe_registry(workspace_root)
-    if not registry["available"]:
-        raise FeedbackError(f"probe registry not found: {probe_defs_path(workspace_root)}")
-    external_classes = [c for c in registry["classes"]
-                        if c.get("kind") == "external" and c.get("class_id")]
-    if not external_classes:
-        raise FeedbackError("registry declares no kind=external class to instantiate.")
-    class_id = external_classes[0]["class_id"]
-    lifecycle = (getattr(args, "lifecycle_point", None) or "wrap-up").strip()
-
-    slug = _SLUG_RE.sub("-", unit.removeprefix("custom:")).strip("-")
-    object_id = f"ext-{slug}"
-    probes_dir = feedback_dir(workspace_root) / EXTERNAL_PROBES_DIRNAME
-    probes_dir.mkdir(parents=True, exist_ok=True)
-    target = probes_dir / f"{object_id}.md"
-    if target.exists():
-        raise FeedbackError(
-            f"probe object already exists: {object_id} ({target.name})")
-
-    notes = ""
-    notes_file = getattr(args, "notes_file", None)
-    if notes_file:
-        notes = Path(notes_file).read_text(encoding="utf-8").strip()
-    elif getattr(args, "notes", None):
-        notes = str(args.notes).strip()
-
-    meta = {
-        "object_id": object_id,
-        "class_id": class_id,
-        "unit": unit,
-        "lifecycle_point": lifecycle,
-    }
-    fm = "\n".join(f"{k}: {json.dumps(v, ensure_ascii=False)}"
-                   for k, v in meta.items())
-    target.write_text(
-        f"---\n{fm}\n---\n\n{notes or 'External probe for a host-project custom unit.'}\n",
-        encoding="utf-8",
-    )
-    # validate the registry still passes with the new object
-    recheck = load_probe_registry(workspace_root)
-    if recheck["errors"]:
-        target.unlink(missing_ok=True)
-        raise FeedbackError(
-            "injection would invalidate the registry:\n- "
-            + "\n- ".join(recheck["errors"]))
-    return {
-        "object_id": object_id,
-        "class_id": class_id,
-        "path": (FEEDBACK_SUBDIR / EXTERNAL_PROBES_DIRNAME
-                 / f"{object_id}.md").as_posix(),
-        "note": "external probe feedback stays host-project-local; "
-                "it is excluded from upstream packages.",
-    }
-
-
 def _apply_disposition(workspace_root: Path, entry: Dict[str, Any],
                        state: str, reason: str, ref: str) -> None:
     """dispose-equivalent write used by introspect-register --confirm (C-3)."""
@@ -1884,49 +1443,6 @@ def action_introspect_register(args: argparse.Namespace) -> Dict[str, Any]:
 # Rendering / CLI
 # --------------------------------------------------------------------------- #
 def render_text(action: str, payload: Dict[str, Any]) -> str:
-    if action == "probes":
-        if payload.get("ok"):
-            scope = "reconciled zero-gap" if payload.get("reconciled") else "valid"
-            return (f"Probe registry {scope}: {payload.get('classes')} classes, "
-                    f"{payload.get('objects')} internal + "
-                    f"{payload.get('external_objects')} external objects"
-                    + (f", {payload.get('embeds')} embeds" if payload.get("reconciled") else ""))
-        if not payload.get("available"):
-            return ("No probe registry found at "
-                    ".specify/shared/definitions/probe-definitions.md — "
-                    "run /speckit.instructions to install it.")
-        lines = ["# Probe overview", ""]
-        objects = payload.get("objects", [])
-        classes = payload.get("classes", [])
-        for kind in ("internal", "external"):
-            kind_classes = sorted(
-                (c for c in classes
-                 if c.get("kind") == kind and c.get("class_id")),
-                key=lambda c: c.get("class_id", ""))
-            if not kind_classes:
-                continue
-            lines.append(f"## {kind}")
-            lines.append("")
-            by_class: Dict[str, List[Dict[str, Any]]] = {}
-            for o in objects:
-                if o.get("kind") == kind:
-                    by_class.setdefault(o.get("class_id", ""), []).append(o)
-            for c in kind_classes:
-                cid = c.get("class_id", "")
-                members = sorted(by_class.get(cid, []),
-                                 key=lambda x: x.get("object_id", ""))
-                lines.append(
-                    f"- {cid}  [slice: {c.get('target_slice', '-')}] — "
-                    f"{c.get('collection', '-')} → {c.get('processing', '-')}")
-                if members:
-                    for o in members:
-                        lines.append(
-                            f"  - {o.get('object_id')}   ({o.get('unit')} @ "
-                            f"{o.get('lifecycle_point')})")
-                else:
-                    lines.append("  - (0 objects — 尚无实例;外部类经 /speckit.feedback § Probe Injection 注入)")
-            lines.append("")
-        return "\n".join(lines).rstrip()
     if action == "package":
         if not payload.get("zip"):
             return payload.get("note", "Nothing to package.")
@@ -1972,7 +1488,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--action",
         required=True,
         choices=["record", "status", "list", "dispose", "mark-submitted", "reindex",
-                 "package", "cleanup", "upstream", "probes", "map", "migrate-legacy", "probe-inject",
+                 "package", "cleanup", "upstream", "migrate-legacy",
                  "introspect-register"],
     )
     parser.add_argument("--package", default=None,
@@ -1989,14 +1505,9 @@ def build_parser() -> argparse.ArgumentParser:
                         help="introspect-register: user has ratified the "
                              "report; flip to confirmed and apply batch "
                              "dispositions from 建议处置 rows")
-    parser.add_argument("--unit", default=None,
-                        help="probe-inject: target custom unit custom:<owner>/<name>")
     parser.add_argument("--lifecycle-point", default=None,
                         help="record: resolve the probe object by (unit, lifecycle_point), "
-                             "e.g. gate-<slug> for gate probes; "
-                             "probe-inject: lifecycle point (default wrap-up)")
-    parser.add_argument("--notes-file", default=None,
-                        help="probe-inject: collection-intent note file")
+                             "e.g. gate-<slug> for gate probes")
     parser.add_argument("--plan-file", default=None,
                         help="migrate-legacy: approved disposition plan, one "
                              "'<entry-id> -> delete|re-register' per line")
@@ -2021,13 +1532,6 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--ref", default=None,
                         help="dispose: optional introspection ref "
                              "(introspection-<ts>#F-<nn>)")
-    parser.add_argument("--validate", action="store_true",
-                        help="probes: structurally validate the merged probe "
-                             "registry (exit 2 listing every violation)")
-    parser.add_argument("--reconcile", action="store_true",
-                        help="probes: additionally reconcile internal probe "
-                             "objects against live ## Feedback embeds "
-                             "(two-way zero-gap required)")
     parser.add_argument("--workspace-root", default=None)
     parser.add_argument("--unit-id", default=None)
     parser.add_argument("--unit-type", default=None)
@@ -2071,11 +1575,8 @@ _ACTIONS = {
     "reindex": action_reindex,
     "package": action_package,
     "upstream": action_upstream,
-    "probes": action_probes,
-    "map": action_map,
     "cleanup": action_cleanup,
     "migrate-legacy": action_migrate_legacy,
-    "probe-inject": action_probe_inject,
     "introspect-register": action_introspect_register,
 }
 

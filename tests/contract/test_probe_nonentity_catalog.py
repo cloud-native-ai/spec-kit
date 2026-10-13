@@ -13,7 +13,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from tests.script_api import ROOT, feedback_utils
+from tests.script_api import ROOT, probe_utils
 DEFS = ROOT / "shared" / "definitions" / "probe-definitions.md"
 CATALOG_HEADING = "非实体 probe 目录"
 
@@ -85,7 +85,7 @@ def test_catalog_entries_stay_pointer_shaped() -> None:
 
 
 def test_catalog_does_not_participate_in_registry_counts() -> None:
-    registry = feedback_utils.load_probe_registry(ROOT)
+    registry = probe_utils.load_probe_registry(ROOT)
     internal = len(registry["objects"])
     external = len(registry["external"])
     assert registry["errors"] == [], f"registry structural errors: {registry['errors']}"

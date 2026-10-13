@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.script_api import feedback_utils
+from tests.script_api import probe_utils
 
 VALID_REGISTRY = """# Feedback Probe Definitions
 
@@ -69,7 +69,7 @@ def _embed_workspace(tmp_path: Path) -> Path:
 class TestProbesValidate:
     def test_validate_ok_on_valid_registry(self, tmp_path: Path, capsys):
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--validate",
             "--workspace-root", str(_workspace(tmp_path)),
         ])
@@ -81,7 +81,7 @@ class TestProbesValidate:
             "| command-wrapup | internal |  |",
         )
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--validate",
             "--workspace-root", str(_workspace(tmp_path, broken)),
         ])
@@ -92,7 +92,7 @@ class TestProbesValidate:
             "| skill-wrapup | internal |", "| skill-wrapup | hybrid |"
         )
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--validate",
             "--workspace-root", str(_workspace(tmp_path, broken)),
         ])
@@ -103,7 +103,7 @@ class TestProbesValidate:
             "| skill-study-wrapup | skill-wrapup | skill:other | wrap-up |\n"
         )
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--validate",
             "--workspace-root", str(_workspace(tmp_path, broken)),
         ])
@@ -114,7 +114,7 @@ class TestProbesValidate:
             "| orphan-object | no-such-class | /speckit.todo | wrap-up |\n"
         )
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--validate",
             "--workspace-root", str(_workspace(tmp_path, broken)),
         ])
@@ -125,7 +125,7 @@ class TestProbesValidate:
             "| bad-unit | command-wrapup | speckit.plan | wrap-up |\n"
         )
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--validate",
             "--workspace-root", str(_workspace(tmp_path, broken)),
         ])
@@ -136,7 +136,7 @@ class TestProbesValidate:
 class TestProbesListing:
     def test_probes_json_lists_merged_view(self, tmp_path: Path, capsys):
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--format", "json",
             "--workspace-root", str(_workspace(tmp_path)),
         ])
@@ -161,7 +161,7 @@ class TestProbesListing:
             "lifecycle_point: wrap-up\n---\n\nTargets our custom deploy skill.\n",
         )
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--format", "json",
             "--workspace-root", str(_workspace(tmp_path)),
         ])
@@ -184,7 +184,7 @@ class TestExternalProbeValidation:
             "lifecycle_point: wrap-up\n---\n",
         )
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--validate",
             "--workspace-root", str(_workspace(tmp_path)),
         ])
@@ -198,7 +198,7 @@ class TestExternalProbeValidation:
             "unit: custom:myteam/deploy-skill\nlifecycle_point: wrap-up\n---\n",
         )
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--validate",
             "--workspace-root", str(_workspace(tmp_path)),
         ])
@@ -212,7 +212,7 @@ class TestExternalProbeValidation:
             "unit: /speckit.plan\nlifecycle_point: wrap-up\n---\n",
         )
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--validate",
             "--workspace-root", str(_workspace(tmp_path)),
         ])
@@ -224,7 +224,7 @@ class TestProbesReconcile:
     def test_reconcile_zero_gap_exit0(self, tmp_path: Path, capsys):
         _embed_workspace(tmp_path)
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--reconcile",
             "--workspace-root", str(_workspace(tmp_path)),
         ])
@@ -238,7 +238,7 @@ class TestProbesReconcile:
         (cmds / "todo.md").write_text("# todo\n\n## Feedback\n\nstep\n",
                                       encoding="utf-8")
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--reconcile",
             "--workspace-root", str(_workspace(tmp_path)),
         ])
@@ -252,7 +252,7 @@ class TestProbesReconcile:
             "| speckit-ghost-wrapup | command-wrapup | /speckit.ghost | wrap-up |\n"
         )
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--reconcile",
             "--workspace-root", str(_workspace(tmp_path, orphan)),
         ])
@@ -286,7 +286,7 @@ class TestGateProbeObjects:
 
     def test_validate_accepts_confirm_gate_class(self, tmp_path: Path, capsys):
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--validate",
             "--workspace-root", str(_workspace(tmp_path, GATE_REGISTRY)),
         ])
@@ -297,7 +297,7 @@ class TestGateProbeObjects:
     ):
         _embed_workspace(tmp_path)
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--reconcile",
             "--workspace-root", str(_workspace(tmp_path, GATE_REGISTRY)),
         ])
@@ -311,7 +311,7 @@ class TestGateProbeObjects:
             "| speckit-ghost-wrapup | command-wrapup | /speckit.ghost | wrap-up |\n"
         )
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--reconcile",
             "--workspace-root", str(_workspace(tmp_path, orphan)),
         ])

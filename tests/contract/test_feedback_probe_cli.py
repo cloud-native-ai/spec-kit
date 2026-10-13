@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.script_api import feedback_utils
+from tests.script_api import feedback_utils, probe_utils
 
 VALID_REGISTRY = """# Feedback Probe Definitions
 
@@ -48,7 +48,7 @@ def probe_workspace(tmp_path: Path) -> Path:
 class TestMapAction:
     def test_map_writes_probe_map_md(self, probe_workspace: Path, capsys):
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "map", "--workspace-root", str(probe_workspace),
         ])
         assert rc == 0
@@ -61,10 +61,10 @@ class TestMapAction:
         capsys.readouterr()
         map_path = (probe_workspace / ".specify" / "memory" / "feedback"
                     / "probe-map.md")
-        feedback_utils.main([
+        probe_utils.main([
             "--action", "map", "--workspace-root", str(probe_workspace)])
         first = map_path.read_bytes()
-        feedback_utils.main([
+        probe_utils.main([
             "--action", "map", "--workspace-root", str(probe_workspace)])
         second = map_path.read_bytes()
         assert first == second
@@ -73,7 +73,7 @@ class TestMapAction:
         self, probe_workspace: Path, capsys
     ):
         capsys.readouterr()
-        feedback_utils.main([
+        probe_utils.main([
             "--action", "map", "--workspace-root", str(probe_workspace)])
         text = (probe_workspace / ".specify" / "memory" / "feedback"
                 / "probe-map.md").read_text(encoding="utf-8")
@@ -85,7 +85,7 @@ class TestMapAction:
 
     def test_map_contains_mermaid_block(self, probe_workspace: Path, capsys):
         capsys.readouterr()
-        feedback_utils.main([
+        probe_utils.main([
             "--action", "map", "--workspace-root", str(probe_workspace)])
         text = (probe_workspace / ".specify" / "memory" / "feedback"
                 / "probe-map.md").read_text(encoding="utf-8")
@@ -93,7 +93,7 @@ class TestMapAction:
 
     def test_map_json_output_shape(self, probe_workspace: Path, capsys):
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "map", "--format", "json",
             "--workspace-root", str(probe_workspace),
         ])
@@ -413,7 +413,7 @@ class TestProbeInjectAndExclusion:
         notes.write_text("Collect deploy friction for our custom skill.\n",
                          encoding="utf-8")
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probe-inject", "--unit", "custom:myteam/deploy-skill",
             "--notes-file", str(notes),
             "--format", "json", "--workspace-root", str(probe_workspace),
@@ -426,14 +426,14 @@ class TestProbeInjectAndExclusion:
         assert ext_file.is_file()
         # merged view + map now include it
         capsys.readouterr()
-        feedback_utils.main([
+        probe_utils.main([
             "--action", "probes", "--format", "json",
             "--workspace-root", str(probe_workspace)])
         listing = json.loads(capsys.readouterr().out)
         assert any(o["object_id"] == out["object_id"]
                    and o["kind"] == "external" for o in listing["objects"])
         capsys.readouterr()
-        feedback_utils.main([
+        probe_utils.main([
             "--action", "map", "--workspace-root", str(probe_workspace)])
         map_text = (probe_workspace / ".specify" / "memory" / "feedback"
                     / "probe-map.md").read_text(encoding="utf-8")
@@ -445,9 +445,9 @@ class TestProbeInjectAndExclusion:
         args = ["--action", "probe-inject", "--unit", "custom:myteam/deploy",
                 "--notes-file", str(notes), "--workspace-root", str(probe_workspace)]
         capsys.readouterr()
-        assert feedback_utils.main(args) == 0
+        assert probe_utils.main(args) == 0
         capsys.readouterr()
-        assert feedback_utils.main(args) == 2
+        assert probe_utils.main(args) == 2
 
     def test_package_excludes_external_entries(
         self, probe_workspace: Path, capsys, tmp_path: Path
@@ -490,7 +490,7 @@ class TestSmokeRemediationContracts:
         self, probe_workspace: Path, capsys
     ):
         capsys.readouterr()
-        rc = feedback_utils.main([
+        rc = probe_utils.main([
             "--action", "probes", "--workspace-root", str(probe_workspace),
         ])
         out = capsys.readouterr().out
