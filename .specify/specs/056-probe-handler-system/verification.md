@@ -11,7 +11,7 @@ baseline_registry=6 classes / 72 objects
 baseline_engine_actions=14 (pre-split feedback-utils)
 
 implementation_date=2026-10-14
-post_change_commit=pending-user-commit
+post_change_commit=1e9ff866 (phase-4 face efa7812d; guards+bindings f5973848; closure 1e9ff866)
 post_change_test_failures=0
 post_change_wrapup_face_lines=413
 post_change_gate_total=23
