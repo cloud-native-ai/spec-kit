@@ -14,7 +14,7 @@ baseline_pytest_failed_names=4
 # -- /speckit.implement results --
 
 implementation_date=2026-10-14
-post_change_commit=[STAMPED_AT_WRAPUP]
+post_change_commit=f80dd747
 post_change_mirror_diff_count=1
 post_change_gate_scan_total=23
 post_change_probe_units=71

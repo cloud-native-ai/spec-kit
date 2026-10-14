@@ -119,7 +119,7 @@ tests/contract/test_run_skills_wiring.py # NEW — 结构契约测试(本特性�
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
 | Data model | [data-model.md](data-model.md) | 4 实体(Skill Descriptor / Skill Location Search Order / Team Run Flow Obligation Set / Probe Registry Object-row) |
-| Contracts | [contracts/](contracts/) | 2 文件:run-skills-wiring.md(C-1…C-9)、run-team-parity.md(P-1…P-10 义务对映表) |
+| Contracts | [contracts/](contracts/) | 2 文件:run-skills-wiring.md(C-1…C-12)、run-team-parity.md(P-1…P-10 义务对映表) |
 | Quickstart | [quickstart.md](quickstart.md) | 3 场景(run-skills 未注册目标 / run-team 平价 / skills 路由) |
 | Feature binding | [feature-ref.md](feature-ref.md) | Feature 057 映射 + 状态推进记录 |
 
