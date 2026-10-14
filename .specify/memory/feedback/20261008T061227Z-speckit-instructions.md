@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-instructions-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-08T06:12:27Z"
 summary: "R1+map-not-manual 收敛 1191 B(32768 预算下余 1871,恰好容下 S3 未落地的 1752 B 小节);ID Register 规则+登记册+三词条落地并提交。一条机制面发现如下。"
+introspection_ref: "introspection-20261013T155006Z#F-06"
+disposition_reason: "introspection:introspection-20261013T155006Z#F-06"
 ---
 
 ## Review

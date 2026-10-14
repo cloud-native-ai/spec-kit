@@ -8,9 +8,12 @@ probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "055-conflict-free-stores"
+disposition: "processed"
 partial: false
 created: "2026-10-08T13:38:25Z"
 summary: "spec 055 direct implementation: conflict-free feedback/memory stores landed on branch 055-conflict-free-stores (scan-on-read entries, per-scalar state/ files, first-write legacy-index migration, atomi"
+introspection_ref: "introspection-20261013T155006Z#F-01"
+disposition_reason: "introspection:introspection-20261013T155006Z#F-01"
 ---
 
 ## Review

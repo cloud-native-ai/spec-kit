@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-08T13:51:21Z"
 summary: "roadmap Now-tier 三项全部闭环:F1 选「补演示」路径——dogfood-executor 席位按新流程真实走完建队实例化→渲染触发(实跑 rendered 3)+ 按注册类型语义派发(run report §3 派发记录 + 席位任务 success),SC-002 以 Source 点名的证据形态(宿主目录清单+派发记录)重立 pass;F2 quickstart 全部命令逐字"
+introspection_ref: "introspection-20261013T155006Z#F-01"
+disposition_reason: "introspection:introspection-20261013T155006Z#F-01"
 ---
 
 ## Review

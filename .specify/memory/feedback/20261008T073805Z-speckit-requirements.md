@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-08T07:38:05Z"
 summary: "spec 054 起草:三断点+IDE 官方取证入 Overview,设计裁定 (b) 建队实例化经用户裁定回写,校验器两轮(3 error→0),16/16 清单,制品已提交 5e970dce。一条机制面发现如下。"
+introspection_ref: "introspection-20261013T155006Z#F-06"
+disposition_reason: "introspection:introspection-20261013T155006Z#F-06"
 ---
 
 ## Review

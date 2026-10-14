@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-08T13:34:57Z"
 summary: "spec 054 过程评审落地:同作者门下诊断双委派(制品面 10 项 + 工作流面 6 项),两个 P0 经不相交验证者——F1 confirm(SC-002 pass 建立在弱于判据的证据上)、F2 downgrade P1(证据值真实但命令行转写);报告 13 findings + 7 recommendations + 三级 roadmap,提交为 review.md;工作流面确认六个阶段"
+introspection_ref: "introspection-20261013T155006Z#F-01"
+disposition_reason: "introspection:introspection-20261013T155006Z#F-01"
 ---
 
 ## Review

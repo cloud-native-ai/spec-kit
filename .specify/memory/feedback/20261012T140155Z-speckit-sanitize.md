@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-sanitize-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-12T14:01:55Z"
 summary: "本次为 sanitize 增加 init 迁移残留检测(C-22/23/24 + C-10 扩链):过程中发现系统性盲区——tests/contract/ 多个文件无 @pytest.mark.contract 装饰器,-m contract 门从未选中它们,S3 的 123 项归因修复漏掉了 sanitize_template ×5 / confirmation_gates_sweep ×10 "
+disposition_reason: "introspection-20261013T155006Z#excluded — ALREADY-FIXED: C-12/C-22 double-report boundary implemented+contracted+pinned (sanitize-utils.py:670-677, 045 contracts :36,44, test_sanitize_checks_migration.py:73,97)"
 ---
 
 ## Review

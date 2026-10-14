@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-merge-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-12T07:47:36Z"
 summary: "Ran the full 8-phase merge of six draw-* engine skills into draw-diagram, and this was the first real use of the provenance mechanism added a day earlier. Both directions of the coverage gate proved t"
+introspection_ref: "introspection-20261013T155006Z#F-03"
+disposition_reason: "introspection:introspection-20261013T155006Z#F-03"
 ---
 
 ## Review

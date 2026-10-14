@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-feedback-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-08T14:00:13Z"
 summary: "按建议处理 feedback 双路径完成:①055 合并就绪验证(见第 1 条,试验后已清理,零残留);②打包路径启动前先做 status 核对(11/10 过阈值),打包产出见 wrap-up 报告。"
+disposition_reason: "introspection-20261013T155006Z#excluded — NOT-OURS: 054<->055 index.json modify/delete merge done, file retired; residual merge-tree lesson carried as meta row"
 ---
 
 ## Review

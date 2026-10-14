@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-08T09:33:19Z"
 summary: "Mode A 四项裁定全部回写(绑 044/直接执行渲染触发/modify 时 opt-in 回填 FR-014/宿主注册面 owner=agent-definitions.md),SC-003 内部矛盾就地纠正,校验器复跑 0 error,append-only 与派生计数断言全过;但 wrap-up 提交发生跨会话卷入(见 Optimization Points 第 1 条),已按 fast-"
+introspection_ref: "introspection-20261013T155006Z#F-04"
+disposition_reason: "introspection:introspection-20261013T155006Z#F-04"
 ---
 
 ## Review

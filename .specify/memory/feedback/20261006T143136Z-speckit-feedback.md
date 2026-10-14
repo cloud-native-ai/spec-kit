@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-feedback-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-06T14:31:36Z"
 summary: "Path A 一次完整走通,零执行。帽子判定:框架项目(root 实测 templates/skills/shared/scripts/src/specify_cli 五个源目录俱在,且按命令要求以不带尾斜杠的形式测于 root 而非 .specify/ 镜像);入站 feedback/ 实测零包,故 A1/A2 无对象、无 re-delivered/second-copy/orphan 标记可命"
+introspection_ref: "introspection-20261013T155006Z#F-11"
+disposition_reason: "introspection:introspection-20261013T155006Z#F-11"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-improve-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-11T13:51:47Z"
 summary: "Ran a full improvement loop on merge-skills against a user requirement (retain a functional record and verifiable capability checklist of pre-merge skills inside the merged target). Research preceded "
+introspection_ref: "introspection-20261013T155006Z#F-01"
+disposition_reason: "introspection:introspection-20261013T155006Z#F-01"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-summarize-project-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-12T12:30:30Z"
 summary: "summarize-project 刷新运行（goal command-logic-as-classified-skills,非交互）:五章节报告+四态 WBS 落盘,check-coherence FAIL=0;运行中发现 build-summary-input.py 对含「空格+冒号」的 team.md frontmatter 解析失败并静默回退(身份误标/描述截断/Scope 未声明),本次"
+introspection_ref: "introspection-20261013T155006Z#F-02"
+disposition_reason: "introspection:introspection-20261013T155006Z#F-02"
 ---
 
 ## Review

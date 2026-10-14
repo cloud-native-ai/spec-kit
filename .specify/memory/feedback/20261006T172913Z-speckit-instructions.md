@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-instructions-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-06T17:29:13Z"
 summary: "partial update 运行（用户请求＝同步新建团队的可发现性）。结论为无操作：setup 脚本 exit 0、未改动任何被跟踪文件（live 与新建备份逐字节相同）、20 个节全在容忍带内、尺寸 30944/32768 B 余量 1824 B 未触发收敛、17 个备份的标题集合差只有已被取代的 ## Resource Registry（归因为收敛非丢失）。团队可发现性经三处依据判定为无需登"
+introspection_ref: "introspection-20261013T155006Z#F-12"
+disposition_reason: "introspection:introspection-20261013T155006Z#F-12"
 ---
 
 ## Review
