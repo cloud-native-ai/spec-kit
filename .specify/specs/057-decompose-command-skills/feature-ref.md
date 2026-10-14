@@ -9,9 +9,9 @@
 | FR 群 | 计划落点 | Feature 义务 |
 |-------|----------|--------------|
 | FR-001/002(两新 internal 技能 + 注册例外) | skills/internal/{run-skills,run-team}/SKILL.md;probe 注册表 2 行;templates/skills.md + .specify/skills.md 例外条目 | 技能分类标注约束侧:标注 + 配合 .specify 结构 |
-| FR-003…008(run-skills 行为) | run-skills SKILL.md(解析/信任边界/执行/门控)+ contracts/run-skills-wiring.md C-1…C-9 | run 语义入口;尽力检测;降级路径 |
+| FR-003…008(run-skills 行为) | run-skills SKILL.md(解析/信任边界/执行/门控)+ contracts/run-skills-wiring.md C-1…C-12 | run 语义入口;尽力检测;降级路径 |
 | FR-009…012(run-team 提取与平价) | run-team SKILL.md + team.md 瘦身 + contracts/run-team-parity.md P-1…P-10 | 命令只留入口与委派(goal T-003) |
-| FR-013…015(接线核查与封口) | agents.md 核查(C-6)、skills.md 路由 5 行(C-3)、命令模板细节清零(C-5) | 不新建重复语义技能 |
+| FR-013…015(接线核查与封口) | agents.md 核查(C-11)、skills.md 路由 5 行(C-10)、命令模板细节清零(C-5/C-6) | 不新建重复语义技能 |
 
 ## 状态推进记录
 

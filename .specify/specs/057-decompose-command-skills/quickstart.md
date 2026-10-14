@@ -10,7 +10,7 @@
 run-skills my-draft
 ```
 
-- **Premises(实现期重测)**:①调用语法 `run-skills <名称|路径>` 由契约 C-3 钉住;②解析顺序 = data-model § Skill Location Search Order(canonical 优先,已裁定);③`my-draft` 位于某已知位置集内且带合法 SKILL.md;④零命中时输出逐项列出 4 个已搜索位置(FR-004)。
+- **Premises(实现期重测)**:①调用语法 `run-skills <名称|路径>` 由契约 C-10 钉住;②解析顺序 = data-model § Skill Location Search Order(canonical 优先,已裁定);③`my-draft` 位于某已知位置集内且带合法 SKILL.md;④零命中时输出逐项列出 4 个已搜索位置(FR-004)。
 - **预期**:解析披露所选路径 → 加载并按其 SKILL.md 正文执行 → 转述该技能产出;若目标已被宿主发现,附「可能可直接斜杠调用」非阻断提示(FR-007 尽力检测)。
 - **边界**:越界显式路径 / SKILL.md 无效 / 非 Spec-Kit 部署下 internal 目标 → 快速失败并给可行动错误(FR-004/FR-008)。
 
