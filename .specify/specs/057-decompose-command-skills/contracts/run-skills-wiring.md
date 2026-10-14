@@ -8,7 +8,7 @@
 
 - **C-1 probe 注册行**:`shared/definitions/probe-definitions.md` Object 表含 `skill:run-skills` 与 `skill:run-team` 的 skill-wrapup 行(单元 `skill:<name>` × lifecycle_point `wrap-up`);该文件与 `.specify/shared/definitions/` 镜像逐字节一致。
 - **C-2 run-skills 存在与镜像一致**:[[STR-001]]/SKILL.md 存在;`.specify/skills/internal/run-skills/SKILL.md` 与 canonical 逐字节一致。
-- **C-3 run-skills frontmatter**:[[STR-001]]/SKILL.md frontmatter 含 `classification: internal` 与 `skill_id: "<SKILL:.specify/skills/internal/run-skills/SKILL.md>"`(run-agent 先例形态);name 与目录名一致。
+- **C-3 run-skills frontmatter 与自足正文**:[[STR-001]]/SKILL.md frontmatter 含 `classification: internal` 与 `skill_id: "<SKILL:.specify/skills/internal/run-skills/SKILL.md>"`(run-agent 先例形态),name 与目录名一致;正文内联最小操作事实(FR-006)——位置搜索顺序(4 位置、canonical 优先)、信任边界(显式路径限已知位置集)、runtime-mode 门控(internal 目标离开 `.specify/` 拒执)。
 - **C-4 指南例外条目**:`templates/skills.md` 与 `.specify/skills.md` 字节一致,且均载明——run-skills 为「internal 技能不被 agent 发现」规则的具名例外,及多宿主降级路径(`/speckit.skills` run 意图路由显式路径加载)。
 - **C-5 team.md 路由与 run 指向**:`templates/commands/team.md` 中**所有** run 语义的技能指向改为 run-team([[STR-002]])——Modes → Capability Routing 表 run 行、Routing flow 编号步骤中的 run 步、Ambiguous or Unsupported Intent 能力列举中的 run 行;不再有任何 run → create-team 执行路径引用;create → create-team、modify → improve-team 两行不变。
 - **C-6 team.md Run Mode 程序性清零**:team.md 的 Run Mode 节不含程序性编号步骤与祈使流程,仅存路由指引与 run-team 的输入/产出说明;散布于其他节的 run 执行指引随 C-5 改指向后不得残留执行细节(判据边界:team.md 其余节——Outline 引言/Modes 表/Default Behavior/Ambiguous Intent/Goal-Based Create/Persistence/Wrap-up/Handoffs——保持各自的信息结构,本条只约束其中 run 执行细节的清零)。

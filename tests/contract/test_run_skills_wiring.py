@@ -88,10 +88,9 @@ def test_c3_run_skills_body_search_order_and_boundary():
     for needle in [
         "skills/internal/", "skills/external/",
         ".specify/skills/internal/", ".specify/skills/",
-        "canonical", "run-skills <名称|路径>",
+        "canonical", "信任边界", "runtime-mode",
     ]:
         assert needle in text, f"run-skills body missing operational fact: {needle}"
-    assert "runtime-mode" in text.lower()
 
 
 # --- C-4: guide exception entries, dual copies byte-identical ---

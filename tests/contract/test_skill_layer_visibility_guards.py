@@ -90,8 +90,9 @@ def test_flat_discovery_surfaces_external_layer_only():
     internal_dir = RUNTIME_SKILLS / "internal"
     assert internal_dir.is_dir(), "internal/ subtree missing — guard 1's exclusion is vacuous"
     internal_nested = [d for d in internal_dir.iterdir() if (d / "SKILL.md").is_file()]
-    assert len(internal_nested) == 35, (
-        f"internal subtree carries {len(internal_nested)} skills, expected 35 — "
+    # 35 既有 + 057 run-skills（Phase 3 落地）= 36；T012 落 run-team 后由同任务更新为 37
+    assert len(internal_nested) == 36, (
+        f"internal subtree carries {len(internal_nested)} skills, expected 36 — "
         f"guard 1 only proves something when internal skills actually exist"
     )
     assert offenders == [], f"flat discovery leaked non-external skills: {offenders}"
