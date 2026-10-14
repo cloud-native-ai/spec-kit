@@ -165,6 +165,8 @@
 | skill-review-sdd-process-wrapup | skill-wrapup | skill:review-sdd-process | wrap-up |
 | skill-run-agent-wrapup | skill-wrapup | skill:run-agent | wrap-up |
 | skill-run-interview-wrapup | skill-wrapup | skill:run-interview | wrap-up |
+| skill-run-skills-wrapup | skill-wrapup | skill:run-skills | wrap-up |
+| skill-run-team-wrapup | skill-wrapup | skill:run-team | wrap-up |
 | skill-sanitize-materials-wrapup | skill-wrapup | skill:sanitize-materials | wrap-up |
 
 ## Handler

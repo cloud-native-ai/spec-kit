@@ -47,7 +47,7 @@
 
 **Purpose**: 为后续阶段准备证据落点
 
-- [ ] T001 Create spec notes directory and red-first evidence placeholder at .specify/specs/057-decompose-command-skills/notes/red-first-evidence.md
+- [X] T001 Create spec notes directory and red-first evidence placeholder at .specify/specs/057-decompose-command-skills/notes/red-first-evidence.md
 
 ---
 
@@ -58,9 +58,9 @@
 **Generation-time premise measurements(2026-10-14 实跑,生成期复测与 plan 阶段一致)**:
 `python3 scripts/python/sync-mirrors.py --check` → EXIT=2,恰 1 条既有 DIFF(`.specify/skills/git-workspace/scripts/git_fleet.py`);`python3 .specify/scripts/python/scan-confirmation-gates.py` → total 23(16 destructive + 7 governance_kept),violations 0;`python3 scripts/python/probe-utils.py --action compile-embeds --check` → 69 units, zero drift;`python3 scripts/python/regen-command-copies.py --check` → OK。
 
-- [ ] T002 [P] Write structural contract test tests/contract/test_run_skills_wiring.py covering clauses C-1…C-12 of contracts/run-skills-wiring.md (red-first: both skills and edits absent) and record each clause's failing evidence (command, real output, exit status) in .specify/specs/057-decompose-command-skills/notes/red-first-evidence.md
-- [ ] T003 [P] Capture pre-change baselines into .specify/specs/057-decompose-command-skills/notes/pre-change-measurements.md by running the four engine checks listed in this phase preamble and pasting real outputs (re-freeze: re-run, never inherit)
-- [ ] T004 [P] Add two skill-wrapup Object rows (units skill:run-skills and skill:run-team, lifecycle_point wrap-up) to the Object table in shared/definitions/probe-definitions.md, then mirror-sync via `python3 scripts/python/sync-mirrors.py --write --only shared` [green: contracts/run-skills-wiring.md#C-1]
+- [X] T002 [P] Write structural contract test tests/contract/test_run_skills_wiring.py covering clauses C-1…C-12 of contracts/run-skills-wiring.md (red-first: both skills and edits absent) and record each clause's failing evidence (command, real output, exit status) in .specify/specs/057-decompose-command-skills/notes/red-first-evidence.md
+- [X] T003 [P] Capture pre-change baselines into .specify/specs/057-decompose-command-skills/notes/pre-change-measurements.md by running the four engine checks listed in this phase preamble and pasting real outputs (re-freeze: re-run, never inherit)
+- [X] T004 [P] Add two skill-wrapup Object rows (units skill:run-skills and skill:run-team, lifecycle_point wrap-up) to the Object table in shared/definitions/probe-definitions.md, then mirror-sync via `python3 scripts/python/sync-mirrors.py --write --only shared` [green: contracts/run-skills-wiring.md#C-1]
 
 **Checkpoint**: 契约测试红(制品缺失态)已取证;注册基础设施就绪——用户故事可开始
 

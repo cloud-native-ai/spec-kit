@@ -1,0 +1,4 @@
+tests/contract/test_compile_propagation_order.py::test_propagation_chain_is_green_in_canonical_order
+tests/contract/test_git_workflow_instructions_block.py::test_skill_mirror_is_byte_identical
+tests/contract/test_scripts_distribution_parity.py::TestScriptsDistributionParity::test_repo_has_no_orphan_or_drifted_scripts
+tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean
