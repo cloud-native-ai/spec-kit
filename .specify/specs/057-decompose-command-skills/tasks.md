@@ -111,10 +111,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T016 [US3] Extend templates/commands/skills.md Delegation routing table from 2 to 5 rows per C-3 (create / improve / merge / think / run — run row runtime path skills/internal/run-skills/SKILL.md with input note pinning grammar `run-skills <名称|路径>`)
-- [ ] T017 [US3] [blockedBy: T016] Fan out skills.md per-tool copies via `python3 scripts/python/regen-command-copies.py` and verify `--check` OK plus copies contain the 5-row table
-- [ ] T018 [P] [US3] Audit templates/commands/agents.md 3-row intent table against existing skills run-agent/create-agent/improve-agent (fix routing line only if drift found; expected no change) and confirm referenced runtime paths exist
-- [ ] T019 [US3] [blockedBy: T016,T017,T018] Verify US3: `python3 -m pytest tests/contract/test_run_skills_wiring.py -k "c10 or c11 or c12" -q` green [green: contracts/run-skills-wiring.md#C-10] [green: contracts/run-skills-wiring.md#C-11] [green: contracts/run-skills-wiring.md#C-12]
+- [X] T016 [US3] Extend templates/commands/skills.md Delegation routing table from 2 to 5 rows per C-3 (create / improve / merge / think / run — run row runtime path skills/internal/run-skills/SKILL.md with input note pinning grammar `run-skills <名称|路径>`)
+- [X] T017 [US3] [blockedBy: T016] Fan out skills.md per-tool copies via `python3 scripts/python/regen-command-copies.py` and verify `--check` OK plus copies contain the 5-row table
+- [X] T018 [P] [US3] Audit templates/commands/agents.md 3-row intent table against existing skills run-agent/create-agent/improve-agent (fix routing line only if drift found; expected no change) and confirm referenced runtime paths exist
+- [X] T019 [US3] [blockedBy: T016,T017,T018] Verify US3: `python3 -m pytest tests/contract/test_run_skills_wiring.py -k "c10 or c11 or c12" -q` green [green: contracts/run-skills-wiring.md#C-10] [green: contracts/run-skills-wiring.md#C-11] [green: contracts/run-skills-wiring.md#C-12]
 
 **Checkpoint**: 三个命令面路由全族指向既有技能;无重复语义技能目录
 

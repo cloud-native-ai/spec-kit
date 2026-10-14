@@ -31,7 +31,10 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 | Condition | Skill | Runtime path |
 |-----------|-------|--------------|
 | NOT exists | `create-skills` | `skills/external/create-skills/SKILL.md` |
-| EXISTS | `improve-skills` | `skills/external/improve-skills/SKILL.md` |
+| EXISTS(常规改优/两阶段合规) | `improve-skills` | `skills/external/improve-skills/SKILL.md` |
+| merge 意图(把一个技能合并进另一个) | `merge-skills` | `skills/external/merge-skills/SKILL.md` |
+| think / 思想演练意图(心智模拟一次执行) | `think-skills` | `skills/external/think-skills/SKILL.md` |
+| run 意图(运行技能,含未被宿主注册者) | `run-skills` | `skills/internal/run-skills/SKILL.md` |
 
 ### `create-skills` — new Skill
 
@@ -47,6 +50,11 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 - **Output**: the updated Skill package with `improve-skills`' final-check verdicts (shape gate, red-line gate, contract suite).
 
 For detailed path conventions (`${SKILL_HOME}` / `${SKILL_WORKDIR}` semantics, computation idioms, nested invocations), see `skills/external/create-skills/SKILL.md`. For agent-specific operational guidance, see `shared/workflow/agent-configuration.md`.
+
+### `run-skills` — run a Skill (including unregistered ones)
+
+- **Input**: `run-skills <名称|路径>` — a skill name or canonical path; resolution, trust boundary, best-effort registration hint, and runtime-mode gating are the skill's own procedure (self-contained body).
+- **Output**: the target skill executed per its own `SKILL.md`, its outputs relayed back; a non-blocking hint when the target may be slash-invocable directly.
 
 ## Wrap-up
 
