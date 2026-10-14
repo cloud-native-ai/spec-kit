@@ -630,14 +630,21 @@ def run_git(target: str, transport: str, path: str, gitargs: list[str],
     cmd = ["git", "-C", path, *gitargs]
     if not apply:
         return 0, "DRY-RUN " + (f"ssh {target} " if transport == "ssh" else "") + " ".join(cmd)
-    if transport == "local":
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-    else:
-        if not TARGET_RE.match(target):
-            return 99, f"REFUSED (unsafe ssh target): {target}"
-        proc = subprocess.run(["ssh", *SSH_OPTS, target,
-                               " ".join(shlex.quote(c) for c in cmd)],
-                              capture_output=True, text=True, timeout=timeout)
+    # Remote hosts may emit non-UTF-8 bytes (e.g. GBK locale git output);
+    # decode errors must not abort the whole fleet run.
+    sub_kwargs = {"capture_output": True, "text": True, "timeout": timeout,
+                  "encoding": "utf-8", "errors": "replace"}
+    try:
+        if transport == "local":
+            proc = subprocess.run(cmd, **sub_kwargs)
+        else:
+            if not TARGET_RE.match(target):
+                return 99, f"REFUSED (unsafe ssh target): {target}"
+            proc = subprocess.run(["ssh", *SSH_OPTS, target,
+                                   " ".join(shlex.quote(c) for c in cmd)],
+                                  **sub_kwargs)
+    except subprocess.TimeoutExpired:
+        return 99, f"TIMEOUT after {timeout}s: git {joined}"
     return proc.returncode, ((proc.stdout or "") + (proc.stderr or "")).strip()[:400]
 
 
