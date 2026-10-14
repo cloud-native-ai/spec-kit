@@ -19,7 +19,7 @@
 - DoD-5: 相对判据收尾复测无新增漂移(镜像仍恰 1 条既有 DIFF;门控 total 仍 23;compile 71 单元零漂移;regen 全 OK)
 - DoD-6: verification.md 对 SC-001…SC-005 逐条记录状态
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Completion Gate
 
@@ -124,11 +124,11 @@
 
 **Purpose**: 全量绿、实跑留痕、相对判据收尾
 
-- [ ] T020 [P] Run the full structural contract suite `python3 -m pytest tests/contract/test_run_skills_wiring.py -q` — all C-1…C-12 green
-- [ ] T021 [P] Execute quickstart.md scenarios A/B/C with real outputs (including scenario B pre/post parity comparison and every teardown step) into .specify/specs/057-decompose-command-skills/notes/quickstart-run.md
-- [ ] T022 Fresh-context self-containment record for SC-001/SC-002: dispatch a new-context agent to run one unregistered fixture skill via run-skills alone (no ambient instructions) and record resolution/executon/disclosure evidence in .specify/specs/057-decompose-command-skills/notes/quickstart-run.md appendix
-- [ ] T023 Re-run relative-criteria baselines (GATE-2/5/6/7 commands) and record per-SC status rows (SC-001…SC-005) in .specify/specs/057-decompose-command-skills/verification.md
-- [ ] T024 [blockedBy: T020,T021,T022,T023] Sweep Definition of Done + Completion Gate, flip DoD Status, confirm zero open `[ ]`/`[>]` rows in tasks.md
+- [X] T020 [P] Run the full structural contract suite `python3 -m pytest tests/contract/test_run_skills_wiring.py -q` — all C-1…C-12 green
+- [X] T021 [P] Execute quickstart.md scenarios A/B/C with real outputs (including scenario B pre/post parity comparison and every teardown step) into .specify/specs/057-decompose-command-skills/notes/quickstart-run.md
+- [X] T022 Fresh-context self-containment record for SC-001/SC-002: dispatch a new-context agent to run one unregistered fixture skill via run-skills alone (no ambient instructions) and record resolution/executon/disclosure evidence in .specify/specs/057-decompose-command-skills/notes/quickstart-run.md appendix
+- [X] T023 Re-run relative-criteria baselines (GATE-2/5/6/7 commands) and record per-SC status rows (SC-001…SC-005) in .specify/specs/057-decompose-command-skills/verification.md
+- [X] T024 [blockedBy: T020,T021,T022,T023] Sweep Definition of Done + Completion Gate, flip DoD Status, confirm zero open `[ ]`/`[>]` rows in tasks.md
 
 ---
 

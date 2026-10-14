@@ -124,8 +124,10 @@ def test_c6_team_md_run_mode_procedural_zero():
     assert "run-team" in body, "Run Mode section must route to run-team"
     numbered = [ln for ln in body.splitlines() if __import__("re").match(r"^\d+\.\s", ln)]
     assert numbered == [], f"procedural numbered steps remain in Run Mode: {numbered[:3]}"
+    # IO 描述(Target 指派 字段名、present & execute 阶段名)按 C-6 属输入/产出说明,不算程序;
+    # 被禁的是执行细节:引擎调用形、解析顺序细节、逐字指派行、退出码语义。
     for forbidden in ["goal-utils.py run-checks", "preview → execute", "focus_target",
-                      "Target 指派", "present & execute"]:
+                      "resolve_effective_target", "not-evaluated", "本次 Target:"]:
         assert forbidden not in body, f"run procedure detail remains: {forbidden}"
 
 
