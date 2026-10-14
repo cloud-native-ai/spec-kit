@@ -194,18 +194,25 @@ def test_presets_declare_a_summary_cadence(preset: Path) -> None:
 # --------------------------------------------------------------------------
 
 
+# 057 提取:run 语义的真源面从 team.md § Run Mode 移到 run-team SKILL.md(+镜像);
+# 披露义务守卫随真源迁移——参数化面改为 run face 的两副本(canonical + installed 镜像)。
+RUN_FACE = REPO_ROOT / "skills/internal/run-team/SKILL.md"
+RUN_FACE_MIRROR = REPO_ROOT / ".specify/skills/internal/run-team/SKILL.md"
+
+
 @pytest.mark.parametrize(
-    "path", [CMD_CANONICAL, *PER_TOOL_COPIES], ids=lambda p: p.name
+    "path", [RUN_FACE, RUN_FACE_MIRROR], ids=lambda p: p.name
 )
 def test_present_and_execute_discloses_the_summary_decision(path: Path) -> None:
-    """TG-13/TG-14/TG-18 must reach every tool copy, not just the canonical source.
+    """TG-13/TG-14/TG-18 must reach the run face, not just one copy.
 
     044: the confirmation gate became a present-and-execute disclosure; the summary
-    decision disclosure obligation is unchanged, only the section anchor moved.
+    decision disclosure obligation is unchanged — 057 moved its home to the run-team
+    skill, so the guard follows the truth source and its installed mirror.
     """
     text = path.read_text(encoding="utf-8")
     assert re.search(r"summar", text, re.I), f"{path.name} never mentions the summary"
-    region = text.split("Present & execute", 1)
+    region = text.split("### 5. Present & Execute", 1)
     assert len(region) > 1, f"{path.name} has no present-and-execute section"
     window = region[1][:2500]
     assert re.search(r"summar", window, re.I), (
@@ -214,7 +221,7 @@ def test_present_and_execute_discloses_the_summary_decision(path: Path) -> None:
 
 
 @pytest.mark.parametrize(
-    "path", [CMD_CANONICAL, *PER_TOOL_COPIES], ids=lambda p: p.name
+    "path", [RUN_FACE, RUN_FACE_MIRROR], ids=lambda p: p.name
 )
 def test_gate_discloses_goal_identity_and_target_directory(path: Path) -> None:
     text = path.read_text(encoding="utf-8")

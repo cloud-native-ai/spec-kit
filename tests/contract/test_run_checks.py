@@ -42,6 +42,8 @@ EXEC_GUIDE = ROOT / "skills" / "internal" / "create-team" / "references" / "exec
 GOAL_GUIDE = ROOT / "skills" / "internal" / "create-team" / "references" / "goal.md"
 CREATE_MODE = ROOT / "skills" / "internal" / "create-team" / "references" / "create-mode.md"
 TOOL_RECORD = ROOT / ".specify" / "memory" / "tools" / "goal-utils.py.md"
+# 057 提取:五查调用的真源面移到 run-team SKILL.md——守卫随真源迁移。
+RUN_TEAM_SKILL = ROOT / "skills" / "internal" / "run-team" / "SKILL.md"
 QUICKSTART_RUN = (
     ROOT / ".specify" / "specs" / "053-machine-decidable-artifacts" / "notes"
     / "quickstart-run.md"
@@ -715,9 +717,9 @@ def test_c25_the_existing_inline_attribution_form_is_not_rewritten():
 
 
 def test_c26_the_five_check_block_carries_one_cli_invocation():
-    text = TEAM_CMD.read_text(encoding="utf-8")
-    block = text.split("Resolve the effective Target, then run the five checks")[1]
-    block = block.split("\n3. **Restate the Goal**")[0]
+    text = RUN_TEAM_SKILL.read_text(encoding="utf-8")
+    block = text.split("### 2. Preview")[1]
+    block = block.split("### 3.")[0]
     invocations = [l for l in block.splitlines()
                    if "goal-utils.py" in l and "run-checks" in l]
     assert invocations, (
@@ -731,7 +733,7 @@ def test_c26_the_five_check_block_carries_one_cli_invocation():
 
 
 def test_c27_every_prose_surface_points_at_the_same_invocation():
-    for path in (TEAM_DOC, EXEC_GUIDE, GOAL_GUIDE, TOOL_RECORD):
+    for path in (RUN_TEAM_SKILL, TEAM_DOC, EXEC_GUIDE, GOAL_GUIDE, TOOL_RECORD):
         assert path.is_file(), f"sentinel: {path} moved"
         assert "run-checks" in path.read_text(encoding="utf-8"), (
             f"{path.relative_to(ROOT)} describes the five checks but does not name the "
@@ -743,10 +745,11 @@ def test_c27_every_prose_surface_points_at_the_same_invocation():
     assert r.returncode == 0, f"per-tool copies drifted from the source: {r.stdout}"
     source = TEAM_CMD.read_text(encoding="utf-8")
     for copy in PER_TOOL_COPIES:
-        assert "run-checks" in copy.read_text(encoding="utf-8"), (
-            f"{copy.relative_to(ROOT)} did not receive the regenerated invocation line"
+        # 057 提取后:调用形迁往 run-team 技能;命令面各副本必须携带指向它的路由。
+        assert "run-team" in copy.read_text(encoding="utf-8"), (
+            f"{copy.relative_to(ROOT)} did not receive the regenerated run-team routing"
         )
-    assert source.count("run-checks") >= 1
+    assert "run-team" in source
 
 
 def test_c28_the_sc007_evidence_is_a_real_run_and_the_real_trees_are_untouched():

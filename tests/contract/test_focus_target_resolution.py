@@ -25,7 +25,9 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENGINE = REPO_ROOT / "scripts/python/goal-utils.py"
-CANONICAL = REPO_ROOT / "templates/commands/team.md"
+# 057 提取:run 语义真源面从 team.md § Run Mode 移到 run-team SKILL.md——
+# 下述六个 template-face 守卫随真源迁移,判定对象改为 run-team(canonical)。
+CANONICAL = REPO_ROOT / "skills/internal/run-team/SKILL.md"
 
 STR_TEAM_DEFAULT = "(团队默认)"  # [[STR-001]]
 
