@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20261009T080316Z",
+  "rendered_at": "20261014T121844Z",
   "entries": {
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",

@@ -7,12 +7,12 @@
 Skills ship in two layers, each one directory per skill — `SKILL.md` (YAML frontmatter `name` / `description` + body) plus optional `references/`, `scripts/`, `assets/`:
 
 - **External skills** (for consuming projects and their agents): installed flat at `.specify/skills/<name>/`.
-- **Internal skills** (Spec Kit workflow machinery): installed nested at `.specify/skills/internal/<name>/`; not agent-visible — `/speckit.*` workflows consume them via explicit paths only.
+- **Internal skills** (Spec Kit workflow machinery): installed nested at `.specify/skills/internal/<name>/`; by default not agent-visible — `/speckit.*` workflows consume them via explicit paths only. **Named exception**: `run-skills` is registered to agents so it can be invoked directly — it is the entry point for running unregistered skills, and an entry point must itself be reachable (see its SKILL.md for resolution and runtime-mode gating). On hosts whose discovery cannot surface internal skills, the same capability stays reachable via `/speckit.skills`' run intent (explicit-path loading).
 - `.github/skills` is a compatibility symlink to `.specify/skills/` for tools that discover skills there.
 
 ## Discovery — no registration table
 
-Supported AI agent CLIs discover skills natively (directory scan / skill loaders); Spec Kit maintains **no skill registry** in `instructions.md`. A skill exists iff its directory contains a valid `SKILL.md`. A one-level scan of `.specify/skills/` therefore sees external skills only; internal skills are never registered or discovered by agents. To enumerate installed external skills:
+Supported AI agent CLIs discover skills natively (directory scan / skill loaders); Spec Kit maintains **no skill registry** in `instructions.md`. A skill exists iff its directory contains a valid `SKILL.md`. A one-level scan of `.specify/skills/` therefore sees external skills only; internal skills are not part of that one-level face (hosts that scan deeper, or the per-agent `skills` symlinks that expose the whole tree, may surface them — the default consumption path stays explicit path references, with `run-skills` as the named exception above). To enumerate installed external skills:
 
 ```bash
 ls .specify/skills/                       # external skill directories (one level)
