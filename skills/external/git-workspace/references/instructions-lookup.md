@@ -35,7 +35,7 @@ grep -q '<!-- GIT_WORKFLOW_START -->' "${SKILL_WORKDIR:-.}/.specify/instructions
 
 ```markdown
 <!-- GIT_WORKFLOW_START -->
-<!-- Workflow model is a per-project choice (menu: single-branch / dual-branch / trunk-based with short-lived feature branches / MAIN-PRE-DEV three-tier); the declaration below records THIS project's choice, followed by its operating rules. -->
+<!-- Workflow model is a per-project choice (menu: single-branch / dual-branch / temp-branch / MAIN-PRE-DEV three-tier); the declaration below records THIS project's choice, followed by its operating rules. -->
 - **Workflow model**: MAIN/PRE/DEV 三层
 | Role | Branch | Tracking | Purpose |
 |------|--------|----------|---------|
