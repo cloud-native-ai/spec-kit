@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "056-probe-handler-system"
+disposition: "processed"
 partial: false
 created: "2026-10-13T06:39:20Z"
 summary: "**Review**: /speckit.requirements run for feature 056-probe-handler-system (qualified per run-determination record 056-probe-handler-system-requirements-20261013). Flow: short-name + branch numbering "
+introspection_ref: "introspection-20261015T081832Z#F-05"
+disposition_reason: "introspection:introspection-20261015T081832Z#F-05"
 ---
 
 ## Review

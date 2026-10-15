@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-15T04:42:33Z"
 summary: "058 实现完成：32 [X] + T031 [~]（演练待用户目标）。GATE-1 三轮收敛至 comm 空（11 failed 与基线名字级全等、3745 passed）；三轮修复归因：compile-embeds 注册缺口（T033：绑定+嵌入源+计数钉 71→72）、D-7 扫描面前提证伪（gate-012 措辞修正）、shared 镜像失同步。并发会话卷入提交两次均拆分修复（路径限定提交"
+introspection_ref: "introspection-20261015T081832Z#F-01"
+disposition_reason: "introspection:introspection-20261015T081832Z#F-01"
 ---
 
 ## Review

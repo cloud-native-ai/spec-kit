@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-draw-diagram-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-14T17:34:28Z"
 summary: "gen-1 真实执行证据(团队 run,verifier 以采纳副本按 Step 1→4 全程):路由走 §2 矩阵默认引擎(echarts),无歧义未问用户;D7 交互交付、SSR+后端 9700 双执行、回归 mermaid 静态路径全过。执行中暴露并已修:①sds-realization §3 角锚点承诺与 echarts 5.6.0 实测不符(zoom 1.25 补偿,已写入 §3/§7)"
+introspection_ref: "introspection-20261015T081832Z#F-11"
+disposition_reason: "introspection:introspection-20261015T081832Z#F-11"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-instructions-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-14T16:08:08Z"
 summary: "定向部分更新（用户请求=区分 shared/docs 文档面）：两处编辑，其余章节逐字节未动；24 行路径核验全过；标题集合双向零丢失；制品提交 5ca10ec6。"
+introspection_ref: "introspection-20261015T081832Z#F-02"
+disposition_reason: "introspection:introspection-20261015T081832Z#F-02"
 ---
 
 ## Review

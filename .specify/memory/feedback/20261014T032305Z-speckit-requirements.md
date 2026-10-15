@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "057-decompose-command-skills"
+disposition: "processed"
 partial: false
 created: "2026-10-14T03:23:05Z"
 summary: "/speckit.requirements run for feature 057-decompose-command-skills (qualified per run-determination record 20261014T032027Z-requirements-057). Flow: short-name decompose-command-skills + branch number"
+introspection_ref: "introspection-20261015T081832Z#F-05"
+disposition_reason: "introspection:introspection-20261015T081832Z#F-05"
 ---
 
 ## Review

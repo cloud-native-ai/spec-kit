@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "057-sdd-loop-driver"
+disposition: "processed"
 partial: false
 created: "2026-10-14T14:40:15Z"
 summary: "Requirements for 057-sdd-loop-driver created from team brief with G1-G6 pre-ratified; checker exit 0 after fixing mention-vs-citation form of STR refs; checklist 16/16 first pass via in-session sancti"
+introspection_ref: "introspection-20261015T081832Z#F-05"
+disposition_reason: "introspection:introspection-20261015T081832Z#F-05"
 ---
 
 ## Review

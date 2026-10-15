@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-feedback-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-13T17:01:50Z"
 summary: "框架帽子(五源目录俱在,batch 3 同)⇒ 全 Path A。14 条物料:本地 2(含 1 条外来污染)+ 孤儿包 12(客户项目 @23617b8a=HEAD~2,框架文件逐字节同 ⇒ 零 ALREADY-FIXED)。1 并行只读核验器对框架源取证(注入 fast-fail 子句,1 ANOMALY/0 静默)+ 编排者直接核验本地 2 条;33 点 = 21 STILL-VALID/2"
+introspection_ref: "introspection-20261015T081832Z#F-03"
+disposition_reason: "introspection:introspection-20261015T081832Z#F-03"
 ---
 
 ## Review

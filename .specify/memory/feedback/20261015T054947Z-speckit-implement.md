@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-15T05:49:47Z"
 summary: "FR-026 前置检查族扩展（Implemented 后范围扩展，无状态回退）：requirements FR-026+Session、契约 C-14、T034 追加、Preflight 章节落地（五族命令形态+不确定即上送+状态脊前置段）；21 项条款测试全绿、validator 0/0、镜像重投影；触及套件 46 passed。提交 74907271。"
+introspection_ref: "introspection-20261015T081832Z#F-01"
+disposition_reason: "introspection:introspection-20261015T081832Z#F-01"
 ---
 
 ## Review

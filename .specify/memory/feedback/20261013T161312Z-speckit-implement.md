@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-13T16:13:12Z"
 summary: "Run review: 38/38 tasks closed, SC-001..008 all pass, GATE-1..7 re-validated green (3722 tests, zero new failures vs empty baseline). Notable in-run repairs: scan_embed_units keyed on the dead ## Feed"
+introspection_ref: "introspection-20261015T081832Z#F-07"
+disposition_reason: "introspection:introspection-20261015T081832Z#F-07"
 ---
 
 ## Review

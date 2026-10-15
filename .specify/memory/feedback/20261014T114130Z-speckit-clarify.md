@@ -8,9 +8,12 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "057-decompose-command-skills"
+disposition: "processed"
 partial: false
 created: "2026-10-14T11:41:30Z"
 summary: "/speckit.clarify run for feature 057-decompose-command-skills, Mode A (post-requirements, target requirements.md; qualified per run-determination record). Same-author gate fired (requirements written "
+introspection_ref: "introspection-20261015T081832Z#F-08"
+disposition_reason: "introspection:introspection-20261015T081832Z#F-08"
 ---
 
 ## Review
