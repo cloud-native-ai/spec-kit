@@ -48,8 +48,8 @@
 
 **Purpose**: 基线冻结与证据落点就绪（re-freeze 纪律：每次生成/重跑/ implement 开工均重测）
 
-- [ ] T001 冻结改前基线到 .specify/specs/058-sdd-loop-driver/notes/pre-change-measurements.md——逐项实跑并粘贴真实输出：① `bash scripts/bash/run-tests.sh tests/contract/test_run_skills_wiring.py -q`（改前预期 12 passed）；② `python3 scripts/python/sync-mirrors.py --check --only skills/external`（改前预期恰 2 条 git-workspace DIFF + DRIFT 提示）；③ `python3 scripts/python/validate-requirements.py .specify/specs/058-sdd-loop-driver/requirements.md`（预期 exit 0）；④ 全量套件失败集名字级清单（`bash scripts/bash/run-tests.sh -q` 的 failed 节点名，供 GATE-1 comm 比对）；⑤ 陷阱注记：`--only skills/external/sdd-loop-driver`（不存在子域）会命中 placeholder-only 跳过分支，基线测量必须取外层对
-- [ ] T002 [P] 创建证据目录 .specify/specs/058-sdd-loop-driver/notes/（含 red-first-evidence.md 空表头与 quickstart-run.md 空表头，供后续行写入）
+- [X] T001 冻结改前基线到 .specify/specs/058-sdd-loop-driver/notes/pre-change-measurements.md——逐项实跑并粘贴真实输出：① `bash scripts/bash/run-tests.sh tests/contract/test_run_skills_wiring.py -q`（改前预期 12 passed）；② `python3 scripts/python/sync-mirrors.py --check --only skills/external`（改前预期恰 2 条 git-workspace DIFF + DRIFT 提示）；③ `python3 scripts/python/validate-requirements.py .specify/specs/058-sdd-loop-driver/requirements.md`（预期 exit 0）；④ 全量套件失败集名字级清单（`bash scripts/bash/run-tests.sh -q` 的 failed 节点名，供 GATE-1 comm 比对）；⑤ 陷阱注记：`--only skills/external/sdd-loop-driver`（不存在子域）会命中 placeholder-only 跳过分支，基线测量必须取外层对
+- [X] T002 [P] 创建证据目录 .specify/specs/058-sdd-loop-driver/notes/（含 red-first-evidence.md 空表头与 quickstart-run.md 空表头，供后续行写入）
 
 ## Phase 2: User Story 4 — Skill 手册承载机制与执行侧可移植 (Priority: P1) 🎯 MVP
 
@@ -59,16 +59,16 @@
 
 ### Tests for User Story 4 (MANDATORY ⚠ red-first)
 
-- [ ] T003 [US4] Author 结构契约测试 C-1/C-2/C-3（frontmatter 四字段断言、张力注解存在、H2 章节集断言）append 到 tests/contract/test_sdd_loop_driver_skill.py [blockedBy: T002]
-- [ ] T004 [US4] Red-first 取证：运行 T003 测试记录 FAIL（3 项）真实输出到 notes/red-first-evidence.md [blockedBy: T003]
+- [X] T003 [US4] Author 结构契约测试 C-1/C-2/C-3（frontmatter 四字段断言、张力注解存在、H2 章节集断言）append 到 tests/contract/test_sdd_loop_driver_skill.py [blockedBy: T002]
+- [X] T004 [US4] Red-first 取证：运行 T003 测试记录 FAIL（3 项）真实输出到 notes/red-first-evidence.md [blockedBy: T003]
 
 ### Implementation for User Story 4 (author-section)
 
-- [ ] T005 [US4] Author skills/external/sdd-loop-driver/SKILL.md——frontmatter（name: sdd-loop-driver / description 含触发词「使用SDD开发模式」「无人值守」/ skill_id `<SKILL:.specify/skills/sdd-loop-driver/SKILL.md>` / classification: external）+ 张力注解首行 + H2 章节集（What This Skill Does / When to Load / The Loop (U0–U6) / Hard Requirements / Discipline Defaults / References / Boundary）+ 路由到 references/ 两文件（内容取材 data-model E-1 与 plan Summary）[blockedBy: T004]
+- [X] T005 [US4] Author skills/external/sdd-loop-driver/SKILL.md——frontmatter（name: sdd-loop-driver / description 含触发词「使用SDD开发模式」「无人值守」/ skill_id `<SKILL:.specify/skills/sdd-loop-driver/SKILL.md>` / classification: external）+ 张力注解首行 + H2 章节集（What This Skill Does / When to Load / The Loop (U0–U6) / Hard Requirements / Discipline Defaults / References / Boundary）+ 路由到 references/ 两文件（内容取材 data-model E-1 与 plan Summary）[blockedBy: T004]
 
 ### Verification for User Story 4
 
-- [ ] T006 [US4] Verify C-1/C-2/C-3 绿：运行 `bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_skill.py -q` 全绿并记录 [green: contracts/skill-structure.md#C-1] [green: contracts/skill-structure.md#C-2] [green: contracts/skill-structure.md#C-3] [blockedBy: T004,T005]
+- [X] T006 [US4] Verify C-1/C-2/C-3 绿：运行 `bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_skill.py -q` 全绿并记录 [green: contracts/skill-structure.md#C-1] [green: contracts/skill-structure.md#C-2] [green: contracts/skill-structure.md#C-3] [blockedBy: T004,T005]
 
 **Checkpoint**: skill 骨架可被宿主按 frontmatter 发现、章节路由成立（US4 独立可测）
 
