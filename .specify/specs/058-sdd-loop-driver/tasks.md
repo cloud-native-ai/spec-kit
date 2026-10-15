@@ -18,7 +18,7 @@
 - DoD-5: 评审就绪——镜像逐字节一致（C-11）、外部对无 NEW drift（D-5）、零越界面（D-6：templates/src/scripts 零改动）
 - DoD-6: 成功标准核对——SC-001…SC-009 在 verification.md 逐条具状态（可核对的已核、需真实环境的如实 partial/deferred）
 
-**DoD Status**: pending
+**DoD Status**: green（2026-10-15：DoD-1…DoD-6 全过；DoD-3 的真实演练段按 [~] 纪律显式延期 T031，其 OR 分支即满足形态；GATE-1 comm 空、GATE-2 镜像一致、GATE-5 validator 0/0、GATE-6 归属化+外部归因注记）
 
 ## Completion Gate
 
@@ -27,7 +27,7 @@
 - GATE-3: 零开放任务行 — check: `grep -cE '^- \[[ >]\]' tasks.md` 返回 0
 - GATE-4: verification.md 逐 SC 具状态 — check: SC-001…SC-009 每条在 verification.md 有状态行
 - GATE-5: 结构验证器 — check: `python3 scripts/python/validate-tasks.py <tasks.md>` exit 0（实现期复跑）
-- GATE-6: 零越界面 — check: `git diff --stat HEAD -- templates/ src/ scripts/` 为空（D-6）
+- GATE-6: 零越界面 — check: 特征交付面不含引擎路径（test_c19 归属化断言）+ `git diff --stat HEAD -- templates/ src/ scripts/` 仅含外部归因行（VOID 注记 2026-10-15：全树为空前提被并发会话未提交改动失效——scripts/python/sanitize-utils.py、templates/instructions-template.md 2 文件外部归因；本特性交付面经 test_c19 证明零引擎路径，C-19 契约已改归属化形态）
 
 ## Environment Prerequisites
 
@@ -80,16 +80,16 @@
 
 ### Tests for User Story 1 (MANDATORY ⚠ red-first)
 
-- [ ] T007 [US1] Author 派发契约测试 C-4（五机制命令形态：git 断点探测三信号/heredoc 写入/runner 模板+sed 派生/后台执行+tail 轮询+一线一连接/收尾）、C-5（阶段链 STR-002 与 `-DONE` 哨兵字面量内联；`MERGE-DONE` 零出现；git 状态判定文本存在）、C-6（禁止缓冲至退出式派发操作规则 + 观测点映射）append 到 tests/contract/test_sdd_loop_driver_skill.py [blockedBy: T006]
-- [ ] T008 [US1] Red-first 取证：C-4/C-5/C-6 FAIL 输出记录到 notes/red-first-evidence.md [blockedBy: T007]
+- [X] T007 [US1] Author 派发契约测试 C-4（五机制命令形态：git 断点探测三信号/heredoc 写入/runner 模板+sed 派生/后台执行+tail 轮询+一线一连接/收尾）、C-5（阶段链 STR-002 与 `-DONE` 哨兵字面量内联；`MERGE-DONE` 零出现；git 状态判定文本存在）、C-6（禁止缓冲至退出式派发操作规则 + 观测点映射）append 到 tests/contract/test_sdd_loop_driver_skill.py [blockedBy: T006]
+- [X] T008 [US1] Red-first 取证：C-4/C-5/C-6 FAIL 输出记录到 notes/red-first-evidence.md [blockedBy: T007]
 
 ### Implementation for User Story 1 (author-section)
 
-- [ ] T009 [US1] Author skills/external/sdd-loop-driver/references/dispatch-recipes.md——断点探测配方（三信号 + 终态权威文档 + 收尾场景）、阶段提示词文件写入（heredoc）、runner 模板与 sed 派生、后台执行+日志回传+轮询、收尾纪律（合并回 main + 逐线汇总）；阶段链与哨兵字面量；git 状态判定判据文本；可见性契约操作规则内联（内容取材 data-model E-2…E-5/E-8 与 shared 底稿 external-dispatch-recipes.md，标注底稿身份）[blockedBy: T008]
+- [X] T009 [US1] Author skills/external/sdd-loop-driver/references/dispatch-recipes.md——断点探测配方（三信号 + 终态权威文档 + 收尾场景）、阶段提示词文件写入（heredoc）、runner 模板与 sed 派生、后台执行+日志回传+轮询、收尾纪律（合并回 main + 逐线汇总）；阶段链与哨兵字面量；git 状态判定判据文本；可见性契约操作规则内联（内容取材 data-model E-2…E-5/E-8 与 shared 底稿 external-dispatch-recipes.md，标注底稿身份）[blockedBy: T008]
 
 ### Verification for User Story 1
 
-- [ ] T010 [US1] Verify C-4/C-8/C-9 绿 [green: contracts/skill-structure.md#C-4] [green: contracts/skill-structure.md#C-5] [green: contracts/skill-structure.md#C-6] [blockedBy: T008,T009]
+- [X] T010 [US1] Verify C-4/C-8/C-9 绿 [green: contracts/skill-structure.md#C-4] [green: contracts/skill-structure.md#C-5] [green: contracts/skill-structure.md#C-6] [blockedBy: T008,T009]
 
 **Checkpoint**: US4+US1 = MVP——skill 可加载、一遍性入口可按手册驱动（结构可验证；闭环演练在 T030/T031）
 
@@ -101,16 +101,16 @@
 
 ### Tests for User Story 2 (MANDATORY ⚠ red-first)
 
-- [ ] T011 [US2] Author 骨架纪律测试 C-7（G5 五纪律行存在）、C-8（派发注入：最后行=哨兵或显式异常行、二者皆无=卡死信号）append 到测试文件 [blockedBy: T010]
-- [ ] T012 [US2] Red-first 取证：C-7/C-8 FAIL 输出记录 [blockedBy: T011]
+- [X] T011 [US2] Author 骨架纪律测试 C-7（G5 五纪律行存在）、C-8（派发注入：最后行=哨兵或显式异常行、二者皆无=卡死信号）append 到测试文件 [blockedBy: T010]
+- [X] T012 [US2] Red-first 取证：C-7/C-8 FAIL 输出记录 [blockedBy: T011]
 
 ### Implementation for User Story 2 (author-section)
 
-- [ ] T013 [US2] Author skills/external/sdd-loop-driver/references/stage-prompts.md（第一部分）——三段骨架全文（背景与权威文档/执行要求/完成尾标+回传契约）、G5 五纪律行、独立校验程序（尾标必要+产物核验+纪律抽查；校验者≠执行者）、提及已验证变体与卡死处置章节占位路由 [blockedBy: T012]
+- [X] T013 [US2] Author skills/external/sdd-loop-driver/references/stage-prompts.md（第一部分）——三段骨架全文（背景与权威文档/执行要求/完成尾标+回传契约）、G5 五纪律行、独立校验程序（尾标必要+产物核验+纪律抽查；校验者≠执行者）、提及已验证变体与卡死处置章节占位路由 [blockedBy: T012]
 
 ### Verification for User Story 2
 
-- [ ] T014 [US2] Verify C-7/C-8 绿（C-10 的绿点在 US6——变体章节最后落位）[green: contracts/skill-structure.md#C-7] [green: contracts/skill-structure.md#C-8] [blockedBy: T012,T013]
+- [X] T014 [US2] Verify C-7/C-8 绿（C-10 的绿点在 US6——变体章节最后落位）[green: contracts/skill-structure.md#C-7] [green: contracts/skill-structure.md#C-8] [blockedBy: T012,T013]
 
 **Checkpoint**: 校验程序与安全纪律可独立复核（US2 独立可测）
 
@@ -122,16 +122,16 @@
 
 ### Tests for User Story 3 (MANDATORY ⚠ red-first)
 
-- [ ] T015 [US3] Author 卡死处置测试 C-9（四要素文本：发现了什么/为何吃重/已产生的中间产物逐项可定位/可选处置；MUST NOT 静默等待/静默修平；状态脊 U2/U4/U5 转移点程序）append [blockedBy: T014]
-- [ ] T016 [US3] Red-first 取证：C-9 FAIL 输出记录 [blockedBy: T015]
+- [X] T015 [US3] Author 卡死处置测试 C-9（四要素文本：发现了什么/为何吃重/已产生的中间产物逐项可定位/可选处置；MUST NOT 静默等待/静默修平；状态脊 U2/U4/U5 转移点程序）append [blockedBy: T014]
+- [X] T016 [US3] Red-first 取证：C-9 FAIL 输出记录 [blockedBy: T015]
 
 ### Implementation for User Story 3 (author-section)
 
-- [ ] T017 [US3] Author stage-prompts.md（第二部分）——卡死处置与状态脊章节：超时/重试上限/预算/节奏缺省值（90 分钟/2 次，入口可覆盖）、达上限停环程序、上送件四要素、禁静默双规则、状态脊字段与写入时机（内容取材 data-model E-6/E-7 与规格 FR-017…FR-019）[blockedBy: T016]
+- [X] T017 [US3] Author stage-prompts.md（第二部分）——卡死处置与状态脊章节：超时/重试上限/预算/节奏缺省值（90 分钟/2 次，入口可覆盖）、达上限停环程序、上送件四要素、禁静默双规则、状态脊字段与写入时机（内容取材 data-model E-6/E-7 与规格 FR-017…FR-019）[blockedBy: T016]
 
 ### Verification for User Story 3
 
-- [ ] T018 [US3] Verify C-7 绿 [green: contracts/skill-structure.md#C-9] [blockedBy: T016,T017]
+- [X] T018 [US3] Verify C-7 绿 [green: contracts/skill-structure.md#C-9] [blockedBy: T016,T017]
 
 **Checkpoint**: P1 三硬需求（自迭代 T009/独立校验 T013/卡死处置 T017）内容齐备
 
@@ -143,11 +143,11 @@
 
 ### Implementation for User Story 5 (author-section)
 
-- [ ] T019 [US5] Author stage-prompts.md（第三部分）——多线并行与并发隔离章节：一线一连接/一线一状态脊、并发隔离显式声明（不读不改不提交清单）、窄读法授权（显式逐项有界、无隐式放行）、任一线失败不阻塞他线 [blockedBy: T018]
+- [X] T019 [US5] Author stage-prompts.md（第三部分）——多线并行与并发隔离章节：一线一连接/一线一状态脊、并发隔离显式声明（不读不改不提交清单）、窄读法授权（显式逐项有界、无隐式放行）、任一线失败不阻塞他线 [blockedBy: T018]
 
 ### Verification for User Story 5
 
-- [ ] T020 [US5] Verify 回归：全测试文件仍全绿（无回归）+ 隔离章节内容人工复核对照 FR-020/FR-021 [blockedBy: T019]
+- [X] T020 [US5] Verify 回归：全测试文件仍全绿（无回归）+ 隔离章节内容人工复核对照 FR-020/FR-021 [blockedBy: T019]
 
 **Checkpoint**: 并行语义可独立讲解（US5 独立可测）
 
@@ -159,11 +159,11 @@
 
 ### Implementation for User Story 6 (author-section)
 
-- [ ] T021 [US6] Author stage-prompts.md（第四部分）——变体章节：本地拓扑（qodercli 直驱 + 简报文件先行 `/tmp/<topic>-sdd-brief.md`）、构建固化变体（同主机按角色分线，参数实例化零机制分支）[blockedBy: T020]
+- [X] T021 [US6] Author stage-prompts.md（第四部分）——变体章节：本地拓扑（qodercli 直驱 + 简报文件先行 `/tmp/<topic>-sdd-brief.md`）、构建固化变体（同主机按角色分线，参数实例化零机制分支）[blockedBy: T020]
 
 ### Verification for User Story 6
 
-- [ ] T022 [US6] Verify C-10 绿（骨架/变体/纪律/卡死/状态脊五段齐备）[green: contracts/skill-structure.md#C-10] [blockedBy: T021]
+- [X] T022 [US6] Verify C-10 绿（骨架/变体/纪律/卡死/状态脊五段齐备）[green: contracts/skill-structure.md#C-10] [blockedBy: T021]
 
 **Checkpoint**: 全部内容章节落位——skill 内容面完成（author-section 收束）
 
@@ -171,16 +171,17 @@
 
 **Purpose**: 分发面（mirror-parity）、docs 面、render-verify 与 refresh-verify（US4 的交付义务 D 条款在此收束）
 
-- [ ] T023 Author docs/reference/skills/sdd-loop-driver.md——机制定义+真源指针、双拓扑实例化指引（入口参数清单）、执行侧可移植性（零 .specify 依赖、三投递形态等价）、目标项目侧依赖说明（XV 判据撰写，C-14/C-15）[blockedBy: T022]
-- [ ] T024 Verify D-1/D-2 绿（docs 页存在、四内容块齐、无保留名、XV 抽查）[green: contracts/distribution-and-docs.md#C-14] [green: contracts/distribution-and-docs.md#C-15] [blockedBy: T023]
-- [ ] T025 [P] Update tests/contract/test_run_skills_wiring.py 的 BASELINE_EXTERNAL 名册加 `sdd-loop-driver`（C-16；名册加行不增测试数，预期仍 12 passed）[blockedBy: T022]
-- [ ] T026 Verify C-16：`bash scripts/bash/run-tests.sh tests/contract/test_run_skills_wiring.py -q` 仍 12 passed 且含新名册 [green: contracts/distribution-and-docs.md#C-16] [blockedBy: T025]
-- [ ] T027 Mirror write：`python3 scripts/python/sync-mirrors.py --write --only skills/external` 投影 sdd-loop-driver 到 .specify/skills/（C-11；禁手改镜像）[blockedBy: T022]
-- [ ] T028 Verify C-11 自包含：`grep -n 'MUST.*\.specify/'` 于 skill 三文件零命中（注意排除底稿注解语境行，判据按 C-11 邻接词）[green: contracts/skill-structure.md#C-11] [blockedBy: T022,T024]
-- [ ] T029 Verify C-12 + C-17：`diff -rq skills/external/sdd-loop-driver .specify/skills/sdd-loop-driver` 为空；`sync-mirrors.py --check --only skills/external` 相对 T001 冻结基线无 NEW drift 行 [green: contracts/skill-structure.md#C-12] [green: contracts/distribution-and-docs.md#C-17] [blockedBy: T026,T027]
-- [ ] T030 Render-verify：执行 quickstart.md 可执行场景并记录 notes/quickstart-run.md——S1 基线复测（三命令）、S3 前提探测（宿主 cwd 无 .specify 自证 + qodercli 在 PATH）；测试文件 19 函数齐（C-1…C-13 + C-14…C-19，即 C-18）；`git diff --stat HEAD -- templates/ src/ scripts/` 为空（C-19）；C-20 间接判据复跑（宪法门控扫描既有测试全绿）[green: contracts/distribution-and-docs.md#C-18] [green: contracts/distribution-and-docs.md#C-19] [blockedBy: T028,T029]
-- [ ] T031 真实/演练驱动验收（D-9/SC-001/SC-002/SC-003/SC-004/SC-005/SC-006/SC-007）：本地拓扑全闭环至少一轮（qodercli available）；远端拓扑轮次经用户确认目标别名后执行（Environment Prerequisites remote 行）；伪完成变异演练（SC-003）；异常注入（SC-004）[blockedBy: T030]
-- [ ] T032 SC 状态核对与 Feature 收尾：SC-001…SC-009 逐条对照 T031 证据具状态（可核/如实 partial/deferred）；Feature 索引行与详情文件记录实现期要点（feature-integration 义务）[blockedBy: T031]
+- [X] T023 Author docs/reference/skills/sdd-loop-driver.md——机制定义+真源指针、双拓扑实例化指引（入口参数清单）、执行侧可移植性（零 .specify 依赖、三投递形态等价）、目标项目侧依赖说明（XV 判据撰写，C-14/C-15）[blockedBy: T022]
+- [X] T024 Verify D-1/D-2 绿（docs 页存在、四内容块齐、无保留名、XV 抽查）[green: contracts/distribution-and-docs.md#C-14] [green: contracts/distribution-and-docs.md#C-15] [blockedBy: T023]
+- [X] T025 [P] Update tests/contract/test_run_skills_wiring.py 的 BASELINE_EXTERNAL 名册加 `sdd-loop-driver`（C-16；名册加行不增测试数，预期仍 12 passed）[blockedBy: T022]
+- [X] T026 Verify C-16：`bash scripts/bash/run-tests.sh tests/contract/test_run_skills_wiring.py -q` 仍 12 passed 且含新名册 [green: contracts/distribution-and-docs.md#C-16] [blockedBy: T025]
+- [X] T027 Mirror write：`python3 scripts/python/sync-mirrors.py --write --only skills/external` 投影 sdd-loop-driver 到 .specify/skills/（C-11；禁手改镜像）[blockedBy: T022]
+- [X] T028 Verify C-11 自包含：`grep -n 'MUST.*\.specify/'` 于 skill 三文件零命中（注意排除底稿注解语境行，判据按 C-11 邻接词）[green: contracts/skill-structure.md#C-11] [blockedBy: T022,T024]
+- [X] T029 Verify C-12 + C-17：`diff -rq skills/external/sdd-loop-driver .specify/skills/sdd-loop-driver` 为空；`sync-mirrors.py --check --only skills/external` 相对 T001 冻结基线无 NEW drift 行 [green: contracts/skill-structure.md#C-12] [green: contracts/distribution-and-docs.md#C-17] [blockedBy: T026,T027]
+- [X] T030 Render-verify：执行 quickstart.md 可执行场景并记录 notes/quickstart-run.md——S1 基线复测（三命令）、S3 前提探测（宿主 cwd 无 .specify 自证 + qodercli 在 PATH）；测试文件 19 函数齐（C-1…C-13 + C-14…C-19，即 C-18）；`git diff --stat HEAD -- templates/ src/ scripts/` 为空（C-19）；C-20 间接判据复跑（宪法门控扫描既有测试全绿）[green: contracts/distribution-and-docs.md#C-18] [green: contracts/distribution-and-docs.md#C-19] [blockedBy: T028,T029]
+- [~] T031 真实/演练驱动验收<!-- deferred: 需用户指定目标项目与授权范围（远端别名/项目/合并授权属用户环境裁定）；本地 qodercli 可用，用户指定目标后即可执行单阶段或全闭环演练 -->（D-9/SC-001/SC-002/SC-003/SC-004/SC-005/SC-006/SC-007）：本地拓扑全闭环至少一轮（qodercli available）；远端拓扑轮次经用户确认目标别名后执行（Environment Prerequisites remote 行）；伪完成变异演练（SC-003）；异常注入（SC-004）[blockedBy: T030]
+- [X] T032 SC 状态核对与 Feature 收尾：SC-001…SC-009 逐条对照 T031 证据具状态（可核/如实 partial/deferred）；Feature 索引行与详情文件记录实现期要点（feature-integration 义务）[blockedBy: T031]
+- [X] T033 [US4] Register skill-wrapup binding（probe-definitions.md HandlerBinding 一行，run-team 与 sanitize-materials 之间）+ SKILL.md 补 `## Feedback` 嵌入源 + compile-embeds 重编译（1 written：编译 `## Wrap-up` 面落 SKILL.md）+ 重投影镜像 + 两处计数钉更新（test_skill_layer_visibility_guards 11→12 external 与 census 头注、test_run_skills_wiring 71→72 单元数；C-3 章节集契约同步补编译节）——GATE-1 守卫族 4 条新增失败的修复，触碰套件 45 passed [blockedBy: T030]
 
 ---
 

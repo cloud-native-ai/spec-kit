@@ -94,8 +94,8 @@
 | skill-database-utils-wrapup | skill-wrapup | skill:database-utils | wrap-up |
 | skill-document-utils-wrapup | skill-wrapup | skill:document-utils | wrap-up |
 | skill-draw-diagram-wrapup | skill-wrapup | skill:draw-diagram | wrap-up |
-| skill-git-workspace-wrapup | skill-wrapup | skill:git-workspace | wrap-up |
-| gate-git-workflow-tiered-mode | skill-gate | skill:git-workspace | gate-git-workflow-tiered-mode |
+| skill-git-utils-wrapup | skill-wrapup | skill:git-utils | wrap-up |
+| gate-git-workflow-tiered-mode | skill-gate | skill:git-utils | gate-git-workflow-tiered-mode |
 | skill-improve-agent-wrapup | skill-wrapup | skill:improve-agent | wrap-up |
 | skill-improve-docs-wrapup | skill-wrapup | skill:improve-docs | wrap-up |
 | skill-improve-skills-wrapup | skill-wrapup | skill:improve-skills | wrap-up |
@@ -126,7 +126,7 @@
 | gate-create-team-noninteractive-call | skill-gate | skill:create-team | gate-create-team-noninteractive-call |
 | gate-create-team-agent-reuse | skill-gate | skill:create-team | gate-create-team-agent-reuse |
 | gate-create-tools-no-execute | skill-gate | skill:create-tools | gate-create-tools-no-execute |
-| gate-git-workflow-remote-ops | skill-gate | skill:git-workspace | gate-git-workflow-remote-ops |
+| gate-git-workflow-remote-ops | skill-gate | skill:git-utils | gate-git-workflow-remote-ops |
 | gate-improve-tools-no-test-invoke | skill-gate | skill:improve-tools | gate-improve-tools-no-test-invoke |
 | gate-summarize-project-four-gates | skill-gate | skill:summarize-project | gate-summarize-project-four-gates |
 | gate-summarize-project-structure-freeze | skill-gate | skill:summarize-project | gate-summarize-project-structure-freeze |

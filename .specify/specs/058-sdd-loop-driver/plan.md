@@ -43,7 +43,7 @@
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 强化维度显式记录于 feature-ref.md：Controlled Execution（阶段化派发+独立校验）与 Reliable Delivery（收尾纪律+状态脊） |
 | XIV | One Source of Truth (Authority & Reference Discipline) | ⚠ Partial — see Complexity Tracking | skill 内联框架纪律操作要点与 shared 文档内容——物理自包含约束下内联是唯一可行形态（执行侧零依赖）；以契约测试钉死关键操作字面量，shared 文档声明为撰写底稿而非运行时真源 |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | docs 参考页面向人类读者（按 XV 判据撰写）；SKILL.md 面向执行 agent（XV 界面类封闭集不含 agent 手册）；一遍性入口话术不变（G4） |
-| XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | skill 内联 052 异常分流操作要点（FR-018，C-7）与派发注入义务（宪法 XVI：每派发回传哨兵或显式异常行——C-13 内联操作文本 + E-4 回传契约）；本 plan 自身按门执行（可写性探测已过、示例执行核验在质量门） |
+| XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | skill 内联 052 异常分流操作要点（FR-018，C-9）与派发注入义务（宪法 XVI：每派发回传哨兵或显式异常行——C-8 内联操作文本 + E-4 回传契约）；本 plan 自身按门执行（可写性探测已过、示例执行核验在质量门） |
 
 **Gates Status**: ⚠ 两项 Partial（IV、XIV）均带 Complexity Tracking 论证；无 Fail。
 
@@ -101,7 +101,7 @@ tests/contract/test_run_skills_wiring.py      # 修改：BASELINE_EXTERNAL 名�
 | IV ⚠ Partial（template-only 门，宪法 :117 明文豁免形态） | 零可执行运行时代码——交付物是 SKILL.md/references/docs 页/契约测试，无单元/集成代码测试对象 | 加一个"可执行内核"换 Pass 正是 Principle IX 禁止的投机基础设施；结构契约 + 真实演练 dogfood 是该门明文豁免形态（051/053 先例） |
 | XIV ⚠ Partial（skill 内联框架纪律与 shared 文档内容） | 自包含硬约束（FR-002/FR-011/FR-018；SC-009 零依赖）使执行侧无法解析框架路径——内联是物理唯一可行形态 | 三类合法副本（机器再生/测试钉死/日期化记录）皆不适用此形态，但引用真源在执行侧物理不可达；缓解 = 契约测试钉死关键操作字面量（052 四要素、禁止缓冲至退出式派发、G5 纪律行）+ shared 文档标注为撰写底稿。这是"reference 不可达"约束下的受控例外，非第二真源（框架侧 owner 对框架上下文仍唯一） |
 
-**复核结论**（fresh-context 评分子代理，2026-10-15）：16 行逐行复验——**15 行维持**（子代理实测复核了全部承重代码引用：MIRROR_PAIRS :84、SCAN_ROOT_FILES :36、BASELINE_EXTERNAL :28、宪法 :117/:181 原文）；**1 行降级后修复**：XVI 初判 Pass 的证据含无承载子句（「派发注入义务」全规格零条款钉死、E-4 骨架缺异常回传行）→ 诚实降级 Partial（承载物 = contracts/skill-structure.md）；修复 = 新增 **C-13**（注入义务内联 + 回传契约）与 E-4 骨架回传契约注记，承载具名后恢复 Pass。Gates Status 随之：无 Fail、2 Partial（IV、XIV）。**ANOMALY 顺手修复**：IV 行原引「Principle VII :95」为 051 时代陈旧指针（v1.13.0 实文在 :117），已订正。
+**复核结论**（fresh-context 评分子代理，2026-10-15）：16 行逐行复验——**15 行维持**（子代理实测复核了全部承重代码引用：MIRROR_PAIRS :84、SCAN_ROOT_FILES :36、BASELINE_EXTERNAL :28、宪法 :117/:181 原文）；**1 行降级后修复**：XVI 初判 Pass 的证据含无承载子句（「派发注入义务」全规格零条款钉死、E-4 骨架缺异常回传行）→ 诚实降级 Partial（承载物 = contracts/skill-structure.md）；修复 = 新增派发注入条款（tasks 阶段重编号后为 **C-8**；重编前曾名 C-13）与 E-4 骨架回传契约注记，承载具名后恢复 Pass。Gates Status 随之：无 Fail、2 Partial（IV、XIV）。**ANOMALY 顺手修复**：IV 行原引「Principle VII :95」为 051 时代陈旧指针（v1.13.0 实文在 :117），已订正。**tasks 阶段契约重编号披露（2026-10-15）**：validate-tasks 首跑暴露 D 条款 id 不符条款语法真源（id 形态 MUST 为 `C-<数字>`，实跑 extractor 对 distribution 文件返回 md-none 0 条款）；两契约按交付顺序整体重编号（skill-structure C-1…C-13 重排、distribution D-1…D-9 → C-14…C-22），实现未开始、零下游引用存活。
 
 **Re-check after Phase 1**: 2026-10-15 — 上述 fresh-context 逐行复验即本次设计后复核；结论 15 维持 + 1 修复后 Pass，两行 Partial 的 Complexity Tracking 论证经受住独立复核（XIV 缓解栏经子代理确认落入"literal pinned in a test"合法副本形态的逐条款应用）。
 
