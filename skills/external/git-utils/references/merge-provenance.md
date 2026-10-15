@@ -1,13 +1,19 @@
-# Merge Provenance — git-workspace
+# Merge Provenance — git-utils
 
 Capability-inheritance record for the four skills merged into this one on 2026-10-09
 (merge B2d). Committed, not scratch: it is the standing evidence that this skill still
 covers what its sources could do.
 
+> **2026-10-15 rename**: this skill was renamed `git-workspace` → `git-utils` when the
+> code-hosting-platform scope (GitHub/Gitee/Aone Code) split out into a separate local
+> skill. The four frozen baselines under `references/merge-provenance/` record the
+> 2026-10-09 merge event verbatim and intentionally retain their pre-rename unit-id
+> strings — they are historical snapshots, not live references.
+
 Re-verify with:
 
 ```bash
-python3 skills/external/merge-skills/scripts/provenance_check.py skills/external/git-workspace
+python3 skills/external/merge-skills/scripts/provenance_check.py skills/external/git-utils
 ```
 
 The method and flow below are this skill's own; only the **responsibility** is inherited.

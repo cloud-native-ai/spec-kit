@@ -72,6 +72,8 @@ Every external subagent dispatch MUST therefore:
 
 **Reference implementation**: `skills/internal/create-team/scripts/dispatch.sh` (+ `stream-filter.py`) — a generic, CLI-agnostic wrapper implementing the four observability points above (works with `qodercli` and `claude`; override via `DISPATCH_CLI`; the label convention of point 5 is the caller's responsibility). Team runbooks and command workflows SHOULD reuse it instead of re-rolling per-run dispatch scripts.
 
+**Topology recipes**: for the concrete command shapes of driving an external subagent — remote `ssh + su` into a host, stage prompt files, runner derivation, background execution with log polling, and the local direct-drive variant — see [`../workflow/external-dispatch-recipes.md`](../workflow/external-dispatch-recipes.md). This document owns the contract; that document owns the recipes; when they disagree, the contract wins.
+
 ## Dispatch-Time Governance Obligation
 
 The Visibility Contract above owns whether a dispatch is **observable**. This section owns whether it is **governed** — the two are complementary and neither substitutes for the other. A dispatch you can watch but not triage still runs an ungoverned agent; a dispatch you can triage but not watch still hides a stall.

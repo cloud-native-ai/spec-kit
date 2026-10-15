@@ -103,7 +103,7 @@ pre-layering leftovers (legacy skill directories, the old git-workflow state fil
 old tools-registry directory, flat duplicates of nested internal skills) and the
 symlink-form check covers `.<agent>/skills` links. Residue dispositions are
 `archive` (apply's delete refuses non-empty directories; content-bearing residue follows
-archive-not-delete) — each finding's summary names its migration owner (git-workspace
+archive-not-delete) — each finding's summary names its migration owner (git-utils
 bootstrap / `.specify/shared/definitions/tool-definitions.md` § Terminology). User-authored
 skills are never candidates.
 

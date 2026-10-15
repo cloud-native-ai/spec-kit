@@ -1,4 +1,4 @@
-<!-- Full-file template rendered by the git-workspace skill (scope A) into
+<!-- Full-file template rendered by the git-utils skill (scope A) into
      ${SKILL_WORKDIR}/docs/git-workflow.md (created when absent; when the file
      already exists, only the managed block between the markers below is replaced —
      see references/instructions-lookup.md).
@@ -17,7 +17,7 @@
      peers, remote roles) as ⚠ lines when they exist. Keep the marker comments byte-exact. -->
 # Git Workflow
 
-Machine-maintained by the `git-workspace` skill (scope A) — the managed block below is the
+Machine-maintained by the `git-utils` skill (scope A) — the managed block below is the
 **single source of truth** for this project's declared git workflow model and branch
 conventions; do not edit it by hand.
 `.specify/instructions.md` carries only a pointer to this file.

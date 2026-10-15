@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""git-workspace scope-B engine — multi-environment git state collection and dependency graph (merged from git-fleet).
+"""git-utils scope-B engine — multi-environment git state collection and dependency graph (merged from git-fleet).
 
 Environment-agnostic by construction: every machine-specific fact (host names,
 directory roots, transports) comes from an inventory file supplied by the caller.
@@ -595,7 +595,7 @@ def build_plan(cos: list[dict]) -> list[tuple[str, str, str]]:
         q = shlex.quote(c["path"])
         if c["behind"] > 0 and c["ahead"] == 0:
             if c["tracked"] + c["untracked"] > 0:
-                steps.append(("SAFE", c["env"], f"git -C {q} stash push -u -m git-workspace"))
+                steps.append(("SAFE", c["env"], f"git -C {q} stash push -u -m git-utils"))
             steps.append(("SAFE", c["env"], f"git -C {q} pull --ff-only"))
         elif c["behind"] > 0 and c["ahead"] > 0:
             steps.append(("GATED", c["env"],
@@ -630,21 +630,14 @@ def run_git(target: str, transport: str, path: str, gitargs: list[str],
     cmd = ["git", "-C", path, *gitargs]
     if not apply:
         return 0, "DRY-RUN " + (f"ssh {target} " if transport == "ssh" else "") + " ".join(cmd)
-    # Remote hosts may emit non-UTF-8 bytes (e.g. GBK locale git output);
-    # decode errors must not abort the whole fleet run.
-    sub_kwargs = {"capture_output": True, "text": True, "timeout": timeout,
-                  "encoding": "utf-8", "errors": "replace"}
-    try:
-        if transport == "local":
-            proc = subprocess.run(cmd, **sub_kwargs)
-        else:
-            if not TARGET_RE.match(target):
-                return 99, f"REFUSED (unsafe ssh target): {target}"
-            proc = subprocess.run(["ssh", *SSH_OPTS, target,
-                                   " ".join(shlex.quote(c) for c in cmd)],
-                                  **sub_kwargs)
-    except subprocess.TimeoutExpired:
-        return 99, f"TIMEOUT after {timeout}s: git {joined}"
+    if transport == "local":
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    else:
+        if not TARGET_RE.match(target):
+            return 99, f"REFUSED (unsafe ssh target): {target}"
+        proc = subprocess.run(["ssh", *SSH_OPTS, target,
+                               " ".join(shlex.quote(c) for c in cmd)],
+                              capture_output=True, text=True, timeout=timeout)
     return proc.returncode, ((proc.stdout or "") + (proc.stderr or "")).strip()[:400]
 
 
@@ -851,7 +844,7 @@ def render_project_doc(key: str, node: dict, graph: dict, snap_path: Path,
                        cross_ref: str | None, docs_dir: Path | None = None) -> str:
     """Per-project document with BOTH dependency directions stored explicitly."""
     lines = [f"# {key}", "",
-             "> 本文档由 git-workspace(作用域 B)`deps` 子命令从**工作区一手证据**生成"
+             "> 本文档由 git-utils(作用域 B)`deps` 子命令从**工作区一手证据**生成"
              "（`.gitmodules` + gitlink + manifest 声明）。",
              f"> 证据快照：`{snap_path.name}` · 生成于 {graph.get('generated_at', '?')}",
              "> 证据分级：实测（.gitmodules 声明且 gitlink 锁定）/ 半实测（manifest 声明未解析到检出）。",

@@ -78,7 +78,7 @@ KEEP_LIST = [
     ("skills/internal/implement-feature/SKILL.md", "only execute on explicit user approval"),
     ("skills/internal/implement-feature/SKILL.md", "CONFIRM"),
     ("templates/commands/tools.md", "confirm"),
-    ("skills/external/git-workspace/SKILL.md", "force-with-lease"),
+    ("skills/external/git-utils/SKILL.md", "force-with-lease"),
     ("shared/workflow/glossary.md", "--confirmed-resolution"),
     ("shared/definitions/tool-definitions.md", "Execution never happens before user confirmation via preview gate"),
     ("skills/internal/create-team/references/operating-loops.md", "分级确认"),

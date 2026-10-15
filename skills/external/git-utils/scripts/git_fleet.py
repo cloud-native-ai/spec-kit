@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""git-workspace scope-B engine — multi-environment git state collection and dependency graph (merged from git-fleet).
+"""git-utils scope-B engine — multi-environment git state collection and dependency graph (merged from git-fleet).
 
 Environment-agnostic by construction: every machine-specific fact (host names,
 directory roots, transports) comes from an inventory file supplied by the caller.
@@ -595,7 +595,7 @@ def build_plan(cos: list[dict]) -> list[tuple[str, str, str]]:
         q = shlex.quote(c["path"])
         if c["behind"] > 0 and c["ahead"] == 0:
             if c["tracked"] + c["untracked"] > 0:
-                steps.append(("SAFE", c["env"], f"git -C {q} stash push -u -m git-workspace"))
+                steps.append(("SAFE", c["env"], f"git -C {q} stash push -u -m git-utils"))
             steps.append(("SAFE", c["env"], f"git -C {q} pull --ff-only"))
         elif c["behind"] > 0 and c["ahead"] > 0:
             steps.append(("GATED", c["env"],
@@ -844,7 +844,7 @@ def render_project_doc(key: str, node: dict, graph: dict, snap_path: Path,
                        cross_ref: str | None, docs_dir: Path | None = None) -> str:
     """Per-project document with BOTH dependency directions stored explicitly."""
     lines = [f"# {key}", "",
-             "> 本文档由 git-workspace(作用域 B)`deps` 子命令从**工作区一手证据**生成"
+             "> 本文档由 git-utils(作用域 B)`deps` 子命令从**工作区一手证据**生成"
              "（`.gitmodules` + gitlink + manifest 声明）。",
              f"> 证据快照：`{snap_path.name}` · 生成于 {graph.get('generated_at', '?')}",
              "> 证据分级：实测（.gitmodules 声明且 gitlink 锁定）/ 半实测（manifest 声明未解析到检出）。",

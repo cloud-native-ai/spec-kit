@@ -43,7 +43,7 @@ git pull --ff-only
 **`BEHIND_DIRTY`** — SAFE but ordered; the stash is not returned automatically:
 ```
 git fetch --all --prune
-git stash push -u -m git-workspace        # protect
+git stash push -u -m git-utils        # protect
 git pull --ff-only
 # then hand the stash back yourself, deliberately:
 git stash list                        # note the ref

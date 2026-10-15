@@ -1,12 +1,12 @@
 ---
-name: git-workspace
+name: git-utils
 description: |
-  Unified git workspace governance skill — one reconcile family across FOUR scopes: (A) single-repo branch workflow governance (the project's declared branch model — single-branch / dual-branch / temp-branch (trunk + short-lived feature branches) / MAIN-PRE-DEV three-tier — recorded in `docs/git-workflow.md`; sync/merge discipline, selective merge, `.gitexcludes`); (B) multi-environment coordination of one developer's many checkouts plus the inter-repo dependency graph and dependency-first sequencing; (C) disciplined submodule editing (project-named branches + ledgered gitlink bumps); (D) plain-SSH server provisioning into a git server (git user, bare repos, authorized keys, ssh config Host entry). Formerly four separate skills (git-workflow, git-fleet, git-server-init, git-submodule-edit), merged with content preserved. Runs as a single **reconcile engine** (see `.specify/shared/patterns/reconcile-pattern.md`): the desired state is the declared branch model + sync relations + per-branch `.gitexcludes` rules; every invocation observes the current repo state, diffs, and converges — bootstrap (model selection + interactive branch naming + creation + .gitexcludes init when the block is absent or unfilled), health-check (structure/sync/.gitexcludes observation + residual report), and directed convergence (rebase sync, merge, and safe push with automatic .gitexcludes enforcement) are the same engine under different inputs. Covers pre-checks, rebase synchronization, conflict resolution, force-with-lease push strategies, and per-branch file exclusion via `.gitexcludes`. Use this when the user mentions ["git workflow", "branch sync", "rebase sync", "分支同步", "git rebase", "force-with-lease", "发布流程", "分支策略", "主干分支", "预发分支", "开发分支", "three-tier git", "git workflow setup", "创建git工作流", "工作流维护", "workflow health check", "工作流检查", "selective merge", "选择性合并", "排除文件", "忽略配置文件", "分支排除", "branch-exclusive", ".gitexcludes", "开发专属文件", "merge filter", "工作流模型", "分支模型", "trunk-based", "单分支开发", "双分支开发", "临时分支", "短命特性分支", "调谐工作流", "git 调谐", "git workspace", "git-workspace", "工作区治理", "multi-machine git", "跨机器 git", "多环境 git", "环境 × 仓库", "git fleet", "依赖图", "dependency graph", "受影响消费方", "affected consumers", "依赖优先顺序", "topological order", "checkout inventory", "git server", "git 服务器", "搭建git服务", "bare repository", "裸仓库", "创建git用户", "配置git远程", "edit submodule", "子模块修改", "submodule branch", "gitlink bump"]
-skill_id: "<SKILL:.specify/skills/git-workspace/SKILL.md>"
+  Unified git workspace governance skill — one reconcile family across FOUR scopes: (A) single-repo branch workflow governance (the project's declared branch model — single-branch / dual-branch / temp-branch (trunk + short-lived feature branches) / MAIN-PRE-DEV three-tier — recorded in `docs/git-workflow.md`; sync/merge discipline, selective merge, `.gitexcludes`); (B) multi-environment coordination of one developer's many checkouts plus the inter-repo dependency graph and dependency-first sequencing; (C) disciplined submodule editing (project-named branches + ledgered gitlink bumps); (D) plain-SSH server provisioning into a git server (git user, bare repos, authorized keys, ssh config Host entry). Formerly four separate skills (git-workflow, git-fleet, git-server-init, git-submodule-edit), merged with content preserved. Host-platform-agnostic and free of personal/environment-specific data — host names, absolute paths, and inventories all come from caller-provided parameters; code-hosting-platform automation (GitHub/Gitee/Aone Code) is deliberately out of scope. Runs as a single **reconcile engine** (see `.specify/shared/patterns/reconcile-pattern.md`): the desired state is the declared branch model + sync relations + per-branch `.gitexcludes` rules; every invocation observes the current repo state, diffs, and converges — bootstrap (model selection + interactive branch naming + creation + .gitexcludes init when the block is absent or unfilled), health-check (structure/sync/.gitexcludes observation + residual report), and directed convergence (rebase sync, merge, and safe push with automatic .gitexcludes enforcement) are the same engine under different inputs. Covers pre-checks, rebase synchronization, conflict resolution, force-with-lease push strategies, and per-branch file exclusion via `.gitexcludes`. Use this when the user mentions ["git workflow", "branch sync", "rebase sync", "分支同步", "git rebase", "force-with-lease", "发布流程", "分支策略", "主干分支", "预发分支", "开发分支", "three-tier git", "git workflow setup", "创建git工作流", "工作流维护", "workflow health check", "工作流检查", "selective merge", "选择性合并", "排除文件", "忽略配置文件", "分支排除", "branch-exclusive", ".gitexcludes", "开发专属文件", "merge filter", "工作流模型", "分支模型", "trunk-based", "单分支开发", "双分支开发", "临时分支", "短命特性分支", "调谐工作流", "git 调谐", "git workspace", "git-utils", "工作区治理", "multi-machine git", "跨机器 git", "多环境 git", "环境 × 仓库", "git fleet", "依赖图", "dependency graph", "受影响消费方", "affected consumers", "依赖优先顺序", "topological order", "checkout inventory", "git server", "git 服务器", "搭建git服务", "bare repository", "裸仓库", "创建git用户", "配置git远程", "edit submodule", "子模块修改", "submodule branch", "gitlink bump"]
+skill_id: "<SKILL:.specify/skills/git-utils/SKILL.md>"
 classification: external
 ---
 
-# git-workspace
+# git-utils
 
 ## Overview
 
@@ -20,6 +20,8 @@ classification: external
 | **D — 服务器置备** | 纯 SSH 服务器 → Git 服务器（D1–D4 四期望态） | `references/server-workflow.md` + `server-ssh-config-entry` / `server-reference-architecture` / `server-troubleshooting`；`scripts/provision-git-server.sh` / `scripts/ssh_config_insert.py` |
 
 跨作用域硬约束：① 环境无关——主机名/绝对路径一律由调用方 inventory 或参数提供；② 高影响动作（写远端、强推等）的分级确认口径以本文件下方分级确认表与各作用域自身规则为准；③ 数据源唯一——分支信息只在 `docs/git-workflow.md` 托管块，子模块台账只在 `${SKILL_WORKDIR}/submodule-edits.md`。
+
+> **边界：本技能不承载代码托管平台（GitHub/Gitee/Aone Code）自动化。** 本技能只管本地 git 状态与自建 git 服务器，与具体托管平台无关、不含任何个人/环境私有数据；托管平台侧的对象操作（建库/PR·MR/issue/release/成员/webhook 等）属另一独立本地技能，不在此处。
 
 ### 作用域 A — 单仓分支工作流（模型可选）
 
@@ -276,8 +278,8 @@ python3 "${SKILL_HOME}/scripts/git_fleet.py" --inventory <inventory.yaml> --stat
 
 ## Resource ID
 
-- Canonical ID: `<SKILL:.specify/skills/git-workflow/SKILL.md>`
-- Canonical Path: `.specify/skills/git-workflow/SKILL.md`
+- Canonical ID: `<SKILL:.specify/skills/git-utils/SKILL.md>`
+- Canonical Path: `.specify/skills/git-utils/SKILL.md`
 
 ## Path Conventions
 
@@ -314,7 +316,7 @@ python3 "${SKILL_HOME}/scripts/git_fleet.py" --inventory <inventory.yaml> --stat
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
-1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:git-workspace" --unit-type skill`
-2. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:git-workspace" --unit-type skill`
+1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:git-utils" --unit-type skill`
+2. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:git-utils" --unit-type skill`
 3. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 4. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"

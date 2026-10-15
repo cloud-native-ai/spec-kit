@@ -17,12 +17,12 @@ TEMPLATE = REPO_ROOT / "templates" / "instructions-template.md"
 INSTRUCTIONS_CMD = REPO_ROOT / "templates" / "commands" / "instructions.md"
 LIVE_INSTRUCTIONS = REPO_ROOT / ".specify" / "instructions.md"
 STATE_FILE = REPO_ROOT / "docs" / "git-workflow.md"
-SKILL_DIR = REPO_ROOT / "skills" / "external" / "git-workspace"
+SKILL_DIR = REPO_ROOT / "skills" / "external" / "git-utils"
 SKILL_MD = SKILL_DIR / "SKILL.md"
 BLOCK_ASSET = SKILL_DIR / "assets" / "git-workflow-block.md"
 LOOKUP_REF = SKILL_DIR / "references" / "instructions-lookup.md"
 BOOTSTRAP_REF = SKILL_DIR / "references" / "bootstrap-commands.md"
-MIRROR_DIR = REPO_ROOT / ".specify" / "skills" / "git-workspace"
+MIRROR_DIR = REPO_ROOT / ".specify" / "skills" / "git-utils"
 
 START = "<!-- GIT_WORKFLOW_START -->"
 END = "<!-- GIT_WORKFLOW_END -->"
@@ -46,7 +46,7 @@ def test_instructions_command_owns_the_migration_path():
     # ownership guard follows the content.
     text = (REPO_ROOT / "skills" / "internal" / "manage-instructions" / "SKILL.md").read_text(encoding="utf-8")
     assert "docs/git-workflow.md" in text, "scope zones must name the state file"
-    assert "git-workspace` skill" in text, "the state file's owner must be named"
+    assert "git-utils` skill" in text, "the state file's owner must be named"
     assert "MUST NOT be lost" in text, \
         "legacy branch-role migration into the state file must be data-preserving"
 

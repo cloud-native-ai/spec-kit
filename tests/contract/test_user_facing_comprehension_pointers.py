@@ -88,11 +88,11 @@ FROZEN_SECTIONS = {
     # Re-frozen 2026-09-23 for the F-13 destructive-bucket registration (goal criteria
     # emptied by an argument-less call). Deliberate, not silent: only this section moved.
     "破坏性动作清单": "7f876df208df63bfd5041219ef10062f9e77c76f2204b51601a5a72281cfd9c9",
-    # Re-frozen 2026-10-09 for the skill-layer merge follow-through (D5: git-workflow
-    # merged into git-workspace) — the row's owner cell now names the merged skill in
-    # its layered source form. Deliberate, not silent: only the owner cell moved, the
-    # gate wording is unchanged (row count still pinned below).
-    "治理保留清单": "29274c053b4047c32aea24a917b06e32bd4575c8639ad5bff5e86b523b8f1eea",
+    # Re-frozen 2026-10-15 for the git-workspace→git-utils skill split (the generic
+    # git scopes stayed public and were renamed git-utils; the owner cell of the
+    # git-workflow gate row now names git-utils). Deliberate, not silent: only the
+    # owner cell moved, the gate wording is unchanged (row count still pinned below).
+    "治理保留清单": "cbb560543ec883aa6b19e37099b2b0e420d91926314148120bef42a090664107",
     "存疑从严": "c1f18db4b9eedf55036cdcb77ef7fd9b41791c4bc292b2d57de346e1744facea",
     "回流约束": "ae1711acd3a325334150051f1193f47631eb043ad336e156b02fa4eca6583af7",
 }
