@@ -1,43 +1,55 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20261014T121844Z",
+  "rendered_at": "20261015T074120Z",
   "entries": {
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
       "sha256": "df2a294cbd80e89420cd11f4398e8ee0040d8551738acf0ed6ddd3b28d65eb19"
     },
+    ".claude/agents/framework-engineer.md": {
+      "source": "instances/framework-engineer.agent.md",
+      "sha256": "faf6bbdc94324fd93a164be33bf710abf80b753e160bbcbaf1c869ec52432886"
+    },
     ".claude/agents/skill-verifier.md": {
       "source": "templates/skill-verifier.agent.md",
-      "sha256": "3b41ae12ff8f488aeb0b5604c8562212d06213e74dc65a7c90462a47c4dc7324"
+      "sha256": "3969ea56c44d0ea6023a9aedc20201c80399f59555f421ed9387b3edf6d67d9c"
     },
     ".claude/agents/structure-adjuster.md": {
       "source": "templates/structure-adjuster.agent.md",
-      "sha256": "c4fa7672f0fcc06c0d22c074e78e13e9b2c6614882d7ec42d938ffe5dbccee63"
+      "sha256": "2cea357cd65248db2a06730122ed702977e044f6408b13141e550daa5e0d0164"
     },
     ".github/agents/dogfood-executor.agent.md": {
       "source": "instances/dogfood-executor.agent.md",
       "sha256": "6884fda2d026cd784f06ef6e8a864c16ec0307110a6237474fb97c61eeb7cdf1"
     },
+    ".github/agents/framework-engineer.agent.md": {
+      "source": "instances/framework-engineer.agent.md",
+      "sha256": "77448954698b9bb1231555533f68ce2c7d2491a49a53064607963eebeb2750f6"
+    },
     ".github/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",
-      "sha256": "1fb39891cc98b4035eafb920f4555b51e97d413802f06b5ab355a2648fd37db7"
+      "sha256": "1b6d75964ecfaea28558185a2ff483e88377a4da6c44ba819c7dc7604cd57425"
     },
     ".github/agents/structure-adjuster.agent.md": {
       "source": "templates/structure-adjuster.agent.md",
-      "sha256": "a1701bcc28a4b862bb2c4c5d50f50a67234d5f56b8862e26da9b670d71202bf6"
+      "sha256": "faf5f5cb5e075ede24920646ce340c9c368d9acb63697801d5099cc14ac9b594"
     },
     ".opencode/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
       "sha256": "2ef1f829ad912c8a33a43b03fad2851a1ec4c04258e7ab4444f029a84c090842"
     },
+    ".opencode/agents/framework-engineer.md": {
+      "source": "instances/framework-engineer.agent.md",
+      "sha256": "e8c97939cb1021bf562a0c743230759aa54f89619b4690bfa1dcc69425a24a6c"
+    },
     ".opencode/agents/skill-verifier.md": {
       "source": "templates/skill-verifier.agent.md",
-      "sha256": "02858600a0cf1ea587d74cb9218e7c606ea23889189a360da03739f6cfa4ca3b"
+      "sha256": "597ec62637e32d8ae4a50b47a04e15c9c785975396256b4c775bc1ef2b646c83"
     },
     ".opencode/agents/structure-adjuster.md": {
       "source": "templates/structure-adjuster.agent.md",
-      "sha256": "f623563319ac80a29d8b430ec9fb6a859865850cb1be14c424f4b2c57f28a984"
+      "sha256": "d9179c3525a84520c795fc6041d887297e88ebcfc3e78327f54371cc08bc334c"
     },
     ".qoder/agents/dogfood-executor.agent.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -49,11 +61,11 @@
     },
     ".qoder/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",
-      "sha256": "3cbf70044b7a4a83ab2c71a655f4e2b6bcbd0515438650e49fd62a7f31290f62"
+      "sha256": "56d0cb2dffef1272ee6943f0f91df5a2bf27586fb1b9655f6242bb3b8ff0f0fb"
     },
     ".qoder/agents/structure-adjuster.agent.md": {
       "source": "templates/structure-adjuster.agent.md",
-      "sha256": "814992a68c22826375f8a3e0233d703a8d1e75e454d6e0cc7e14b83ef0e82991"
+      "sha256": "034ba320d8fe145e95b1853424dbe11160a9c74eb80becdf5615213512396040"
     }
   }
 }
