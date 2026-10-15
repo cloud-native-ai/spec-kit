@@ -26,7 +26,7 @@ Usage:
     provenance_check.py <target-skill-dir>
 
     <target-skill-dir>  the merged skill's own directory (the one holding SKILL.md and
-                        references/merge-provenance.md), e.g. .specify/skills/git-workspace
+                        references/merge-provenance.md), e.g. .specify/skills/git-utils
 
 Exit code:
     0  record complete: every baseline clean, every destination resolves, every row

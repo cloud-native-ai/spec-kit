@@ -149,3 +149,9 @@
 | run-skills | - | internal 技能(skills/internal/run-skills,需求 057):运行未被宿主 agent 注册的技能的统一入口——按技能位置搜索顺序解析名称/路径并加载执行其 SKILL.md;自身注册到 agent,是「internal 技能不被 agent 发现」规则的具名例外 | auto | proposed |
 | run-team | - | internal 技能(skills/internal/run-team,需求 057):/speckit.team run 模式的承载技能——从命令模板提取的团队运行全流程(五查预检→目标重述→渲染→present & execute→报告),验收基线为行为平价 | auto | proposed |
 | 可交互图表 | - | 图表可根据用户输入做出调整的交付形态(通常为网页格式);「动态」是交互的结果,不含动画/动图/视频等形式上的动态——该消歧由 goal draw-diagram-interactive 的 Boundaries 载明。变体「动态图表」按本条读,不指形式上的动态。 | auto | proposed |
+| SDD 循环驱动 | sdd-loop-driver, unattended SDD loop driver, 无人值守 SDD 循环驱动 | 无人值守一遍性入口驱动的 SDD 全流程循环推进机制（058）：自包含、可移植的 skill 唯一承载（G1 修订 2026-10-15——执行侧宿主 agent 零 `.specify/` 依赖，原 Team 承载裁决被取代）；真源 specs/058-sdd-loop-driver/requirements.md（机制行为真源随实现落 skill） | auto | proposed |
+| 断点探测 | breakpoint probe, breakpoint detection | 循环驱动机制登录后自动判定目标项目当前所处 SDD 阶段（git 状态 + specs 目录 + 终态权威文档），含 review 后仅剩合并的收尾场景（058 FR-005） | auto | proposed |
+| 阶段尾标 | stage sentinel, STAGE-DONE, 完成尾标 | 阶段完成哨兵：子代理最后一行输出的大写阶段名 + -DONE（[[STR-001]]，058）；仅是完成必要条件，充分条件由独立 verifier 产物核验补齐 | auto | proposed |
+| 窄读法授权 | narrow-read authorization | 多线/多 spec 并行时对已声明并发隔离项的显式、逐项、有界放行机制（058 FR-021；源自 xuanji-images 沉淀的并行纪律）；不存在隐式放行 | auto | proposed |
+| 状态脊 | - | 跨周期唯一记忆的落盘状态文件：循环/长跑机制在每个状态转移点先写状态后行动，续环与重入仅凭状态脊恢复、不依赖会话记忆（先例 project-cluster 约束；058 线状态实体为其实例化） | auto | proposed |
+| 一遍性入口 | - | 用户以单条提示词声明目标与起点（哪个项目、断点在哪、终态权威文档）发起无人值守推进的入口形态；执行细节全部由机制内部承接，不要求用户学新话术或逐次提醒（058 G4 裁决） | auto | proposed |

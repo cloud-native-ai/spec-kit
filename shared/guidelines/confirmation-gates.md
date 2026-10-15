@@ -32,7 +32,7 @@
 | 宪章不可撤销动作确认 | constitution-template.md | 宪章自身要求(intrinsic) |
 | git commit 显式批准 | todo.md / implement.md 收尾 | 与宿主安全规范对齐(governance-kept) |
 | implement gate.yaml CONFIRM 判定 | implement.md | 机械安全门禁(governance-kept) |
-| git-workflow 远程操作门控 | skills/external/git-workspace | 远程推送属破坏性桶 |
+| git-workflow 远程操作门控 | skills/external/git-utils | 远程推送属破坏性桶 |
 | tools invoke 预览门控 | tools.md / tool-definitions.md | 任意脚本执行,存疑从严(governance-kept) |
 | feedback consume 删除前确认 | feedback.md | 前置原子删除,破坏性桶 |
 | docs 移动/归档/删除分级 | docs.md | 破坏性桶(reconcile R4/R5) |

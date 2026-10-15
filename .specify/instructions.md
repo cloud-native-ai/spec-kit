@@ -5,6 +5,8 @@
 ## Documentation Map
 This project documentation is distributed across several key files. You MUST refer to these documents for specific details:
 
+> **shared 与 docs 的边界**: `.specify/shared/`（框架源 `shared/` 的运行时投影）是随框架**对外分发**的使用手册层——客户项目 init 时整体获得，使用框架时可直接参考其中 guidelines / workflow / definitions 的大量文档说明；`docs/` 是 spec-kit 自身作为代码项目的**开发文档**，**不随框架分发**（仅为本项目文档站的内容源），只有在开发 spec-kit 源代码时才需要参考。
+
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
 | **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | Numbered Core Principles + governance rules; that file is the authoritative roster, count, and version — not restated here |
@@ -173,7 +175,7 @@ Every durable identifier — a decision (D-…), open item (OI-…), stage (S…
   - `agents/`: Role-based agent definitions (`*.agent.md`) mirrored to `.specify/agents/`.
   - `tests/`: `contract/`, `contracts/`, `integration/`, `scenarios/`, `unit/`, with shared `conftest.py`, `fixtures/`, `script_api.py`.
   - `memory/`: Default in-package memory shipped with the CLI; the canonical project memory lives at `.specify/memory/` (constitution, features, features/<ID>.md, plus the dynamic memory-as-files layer under `session/` and `knowledge/`).
-  - `docs/`: User-facing documentation (see Documentation Map above).
+  - `docs/`: spec-kit 自身的开发文档，不随框架分发（shared/docs 边界见 Documentation Map）。
   - `feedback/`: **Inbound feedback intake** — one bundle per file as `feedback/feedback-*.zip` (produced by `feedback-utils.py --action package`, delivered manually per Dogfooding Loop A; `feedback/.gitignore` re-includes the zips the root `.gitignore` ignores). The process-all-bundles-as-one-batch discipline is owned by the feedback command.
   - `.specify/`: Project runtime — `instructions.md` (this file), `memory/`, `skills/`, `agents/`, `scripts/`, `specs/<NNN-feature-slug>/`, `templates/`. Treat as the canonical workspace; ignore any `.specify/` inside subdirectories.
 

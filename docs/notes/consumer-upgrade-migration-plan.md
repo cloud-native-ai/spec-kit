@@ -109,7 +109,7 @@ cd /tmp/upgrade-sim && /tmp/sim-venv/bin/specify init . --ai qoder --force --no-
   1. 升级命令:`specify init . --force --ai <tool>`(幂等;用户内容与 memory 存量不被覆盖,见 §4);
   2. 自检片段:§5 一键脚本(期望输出 `OK`:平铺内部名 0 / `internal/` 15 个齐 / 用户技能原样);
   3. 建议:升级后重跑 `/speckit.instructions` 刷新指令面(`skills.md`/`tools.md` 为 create-if-absent 语义,老文件不会自动刷新,见 §6 对应行)。
-- **提交/推送步骤(占位,发布时执行)**:① 提交引擎与测试改动(F1/F2 落 `src/specify_cli/__init__.py`;F3 落 `tests/contract/test_upgrade_end_state.py` + `tests/contract/test_flat_internal_skill_migration.py` 用例修订);② 版本升位提交;③ 构建与发布(`pip wheel` 构建;uv tool / pipx 安装渠道);④ 分支与推送依 `docs/git-workflow.md` 管理块(git-workspace 技能 scope)。
+- **提交/推送步骤(占位,发布时执行)**:① 提交引擎与测试改动(F1/F2 落 `src/specify_cli/__init__.py`;F3 落 `tests/contract/test_upgrade_end_state.py` + `tests/contract/test_flat_internal_skill_migration.py` 用例修订);② 版本升位提交;③ 构建与发布(`pip wheel` 构建;uv tool / pipx 安装渠道);④ 分支与推送依 `docs/git-workflow.md` 管理块(git-utils 技能 scope)。
 - **已知遗留**:
   - c7 窗口项(中立性预算红,另案、不阻塞发布):见 `.specify/memory/register.md` c7 行——待 053 流程的刻意重锚/复核裁定;
   - 并发会话的 merge-skills 批次(`skills/external/merge-skills/**` + 其 `.specify/skills/` 镜像 + evidence 归档)独立归其所属流程,不并入本发布批次;

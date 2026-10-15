@@ -643,8 +643,8 @@ _SUCCESSOR_HINTS = {
     "draw-d3js": "draw-diagram", "draw-drawio": "draw-diagram",
     "draw-echarts": "draw-diagram", "draw-excalidraw": "draw-diagram",
     "draw-mermaid": "draw-diagram", "draw-plantuml": "draw-diagram",
-    "git-fleet": "git-workspace", "git-server-init": "git-workspace",
-    "git-submodule-edit": "git-workspace", "git-workflow": "git-workspace",
+    "git-fleet": "git-utils", "git-server-init": "git-utils",
+    "git-submodule-edit": "git-utils", "git-workflow": "git-utils",
     "manage-project": "summarize-project", "visualize-project": "summarize-project",
     "sdd-workflow": ".specify/shared/workflow",
 }
@@ -695,7 +695,7 @@ def check_legacy_install_residue(root: Path) -> list:
                 findings.append(_finding(
                     "stale-residue", rel,
                     "旧代 git-workflow 状态文件:新模型状态面在 docs/git-workflow.md——"
-                    "归档本文件,并经 git-workspace 技能 bootstrap 核对分支状态已迁移",
+                    "归档本文件,并经 git-utils 技能 bootstrap 核对分支状态已迁移",
                     disposition="archive"))
     legacy_tools = root / ".specify" / "tools"
     if legacy_tools.is_dir() and (root / ".specify" / "memory" / "tools").is_dir():

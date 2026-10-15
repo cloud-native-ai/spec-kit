@@ -95,8 +95,8 @@
   - `gate-create-team-noninteractive-call` — skill:create-team @ gate-create-team-noninteractive-call
   - `gate-create-team-presence-loop` — skill:create-team @ gate-create-team-presence-loop
   - `gate-create-tools-no-execute` — skill:create-tools @ gate-create-tools-no-execute
-  - `gate-git-workflow-remote-ops` — skill:git-workspace @ gate-git-workflow-remote-ops
-  - `gate-git-workflow-tiered-mode` — skill:git-workspace @ gate-git-workflow-tiered-mode
+  - `gate-git-workflow-remote-ops` — skill:git-utils @ gate-git-workflow-remote-ops
+  - `gate-git-workflow-tiered-mode` — skill:git-utils @ gate-git-workflow-tiered-mode
   - `gate-improve-tools-no-test-invoke` — skill:improve-tools @ gate-improve-tools-no-test-invoke
   - `gate-summarize-project-degraded-gates` — skill:summarize-project @ gate-summarize-project-degraded-gates
   - `gate-summarize-project-four-gates` — skill:summarize-project @ gate-summarize-project-four-gates
@@ -127,7 +127,7 @@
   - `skill-derive-architecture-wrapup` — skill:derive-architecture @ wrap-up
   - `skill-document-utils-wrapup` — skill:document-utils @ wrap-up
   - `skill-draw-diagram-wrapup` — skill:draw-diagram @ wrap-up
-  - `skill-git-workspace-wrapup` — skill:git-workspace @ wrap-up
+  - `skill-git-utils-wrapup` — skill:git-utils @ wrap-up
   - `skill-implement-feature-wrapup` — skill:implement-feature @ wrap-up
   - `skill-improve-agent-wrapup` — skill:improve-agent @ wrap-up
   - `skill-improve-docs-wrapup` — skill:improve-docs @ wrap-up
@@ -265,7 +265,7 @@ graph TD
   class_skill_wrapup --> obj_skill_derive_architecture_wrapup[skill-derive-architecture-wrapup]
   class_skill_wrapup --> obj_skill_document_utils_wrapup[skill-document-utils-wrapup]
   class_skill_wrapup --> obj_skill_draw_diagram_wrapup[skill-draw-diagram-wrapup]
-  class_skill_wrapup --> obj_skill_git_workspace_wrapup[skill-git-workspace-wrapup]
+  class_skill_wrapup --> obj_skill_git_utils_wrapup[skill-git-utils-wrapup]
   class_skill_wrapup --> obj_skill_implement_feature_wrapup[skill-implement-feature-wrapup]
   class_skill_wrapup --> obj_skill_improve_agent_wrapup[skill-improve-agent-wrapup]
   class_skill_wrapup --> obj_skill_improve_docs_wrapup[skill-improve-docs-wrapup]
@@ -357,8 +357,8 @@ graph TD
 | `gate-create-team-noninteractive-call` | skill-gate | internal | skill:create-team @ gate-create-team-noninteractive-call | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-create-team-presence-loop` | skill-gate | internal | skill:create-team @ gate-create-team-presence-loop | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-create-tools-no-execute` | skill-gate | internal | skill:create-tools @ gate-create-tools-no-execute | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
-| `gate-git-workflow-remote-ops` | skill-gate | internal | skill:git-workspace @ gate-git-workflow-remote-ops | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
-| `gate-git-workflow-tiered-mode` | skill-gate | internal | skill:git-workspace @ gate-git-workflow-tiered-mode | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
+| `gate-git-workflow-remote-ops` | skill-gate | internal | skill:git-utils @ gate-git-workflow-remote-ops | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
+| `gate-git-workflow-tiered-mode` | skill-gate | internal | skill:git-utils @ gate-git-workflow-tiered-mode | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-improve-tools-no-test-invoke` | skill-gate | internal | skill:improve-tools @ gate-improve-tools-no-test-invoke | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-summarize-project-degraded-gates` | skill-gate | internal | skill:summarize-project @ gate-summarize-project-degraded-gates | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-summarize-project-four-gates` | skill-gate | internal | skill:summarize-project @ gate-summarize-project-four-gates | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
@@ -382,7 +382,7 @@ graph TD
 | `skill-derive-architecture-wrapup` | skill-wrapup | internal | skill:derive-architecture @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-document-utils-wrapup` | skill-wrapup | internal | skill:document-utils @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-draw-diagram-wrapup` | skill-wrapup | internal | skill:draw-diagram @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-git-workspace-wrapup` | skill-wrapup | internal | skill:git-workspace @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-git-utils-wrapup` | skill-wrapup | internal | skill:git-utils @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-implement-feature-wrapup` | skill-wrapup | internal | skill:implement-feature @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-improve-agent-wrapup` | skill-wrapup | internal | skill:improve-agent @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-improve-docs-wrapup` | skill-wrapup | internal | skill:improve-docs @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |

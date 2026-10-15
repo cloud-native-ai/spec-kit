@@ -1,6 +1,6 @@
 # Git Workflow
 
-Machine-maintained by the `git-workspace` skill (scope A) — the managed block below is the
+Machine-maintained by the `git-utils` skill (scope A) — the managed block below is the
 **single source of truth** for this project's declared git workflow model and branch
 conventions; do not edit it by hand.
 `.specify/instructions.md` carries only a pointer to this file.

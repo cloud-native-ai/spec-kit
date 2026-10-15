@@ -89,7 +89,7 @@ current state), and partial update is directed convergence.
 - **Archive-not-delete**: user-authored content is never dropped; superseded snapshots live on
   as `.specify/instructions.md-<TIMESTAMP>` backups, and lost content is recovered from them
   (Action 3).
-- **Scope zones**: `docs/git-workflow.md` is owned by the `git-workspace` skill (scope A) —
+- **Scope zones**: `docs/git-workflow.md` is owned by the `git-utils` skill (scope A) —
   observed but never converged here. No managed registry ranges exist in the current template:
   skills and tools are discovered via their directories (`.specify/skills/`,
   `.specify/memory/tools/`), not registered.
@@ -333,7 +333,7 @@ empty-of-user-content, so its sections are simply filled in.
   **machine-maintained, not user-authored** — they no longer belong in the file. Converge
   them, don't preserve them:
   - Migrate the inline `## Git Workflow` block's branch roles into `docs/git-workflow.md`
-    first (create it from the `git-workspace` skill's asset template if absent — the branch
+    first (create it from the `git-utils` skill's asset template if absent — the branch
     table is real data and MUST NOT be lost), then replace the section with the template's
     pointer paragraph.
   - Replace the registry tables with the template's `## Skills & Tools` pointer section. The
