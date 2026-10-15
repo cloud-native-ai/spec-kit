@@ -51,6 +51,7 @@ SC-009_note=机制层验证通过：临时目录（无 .specify/、无 spec-kit�
 # -- Deferred Tasks --
 
 deferred_tasks=T031
+scope_revision_20261015=FR-026 前置检查族（运行后扩展）：requirements/contract C-14/T034/dispatch-recipes Preflight 章节落地，21 项条款测试全绿，镜像重投影；Feature 状态保持 Implemented（无回退）
 
 # -- Notes --
 

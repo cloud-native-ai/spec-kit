@@ -2,6 +2,20 @@
 
 > 本文件是宿主 agent 驱动外部子代理的**操作手册**：全部命令形态自包含可用，不依赖任何框架文档（对撰写底稿的引用仅为溯源注解）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。
 
+## Preflight — 前置检查（真正流程执行之前，U0 与 U1 之间）
+
+> 五族前置检查是机制能否正确运行的先决条件；任一项无法自动核验或核验结果不确定时，**停在前置阶段、提示用户补充**该信息，MUST NOT 猜测续跑。检查结论（逐项 ok / fail / uncertain）写入该线状态脊的**前置检查段**，失败项附修复动作。
+
+| # | 检查 | 命令形态 | 判定 |
+|---|------|----------|------|
+| ① | SSH 连通性（**本地拓扑跳过**） | `ssh -o ConnectTimeout=5 -o BatchMode=yes <alias> true` | 限时内返回 0 = ok；超时/拒绝 = fail（附修复：网络/凭证/别名） |
+| ② | 非 root 运行用户存在性 | `ssh <alias> "id <run-user>"` | 输出含 `uid=` 且 `uid=<n>` 中 n ≠ 0 = ok；用户不存在或 uid=0 = fail（root 不能作为运行身份） |
+| ③ | 子代理 CLI 可用性与版本 | `ssh <alias> "su - <run-user> -c '<cli> --version'"` | 版本串输出 = ok（记录版本号进状态脊）；命令不存在/不在执行身份 PATH = fail |
+| ④ | 大语言模型配置 | 经宿主 CLI 配置面核验：模型（model）、context size、effort 三项当前生效值 | 三项齐备且可读 = ok（记录进状态脊）；配置面不可读或项缺失 = **uncertain → 提示用户补充**（形态因 CLI 而异，不猜测） |
+| ⑤ | spec-kit 框架可用性（目标项目侧） | `ssh <alias> "cd <project-dir> && test -d .specify && test -f .specify/memory/constitution.md && cat .specify/source.json 2>/dev/null"` | `.specify/` 存在且宪法在位 = 初始化 ok；`source.json` 提供框架版本 provenance（缺失 = 版本未知，报告）；未安装/未初始化 = fail（对应边界：不自动初始化，停线上送） |
+
+程序：五项逐条执行 → 结论（ok / fail / uncertain + 证据）写入状态脊前置检查段 → 全 ok 才进入 Recipe 0；存在 fail = 停线并按上送件四要素报告；存在 uncertain = 停线并列出**待用户补充的信息清单**，用户补充后重入前置检查。
+
 ## Recipe 0 — 断点探测（Breakpoint Probe）
 
 派发前探测目标项目当前所处 SDD 阶段，未声明阶段时**必须探测、禁止猜测**：

@@ -405,3 +405,32 @@ def test_c19_feature_deliverables_never_touch_engine_dirs():
         assert not rel.startswith(ENGINE_PREFIXES), (
             f"feature deliverable intrudes into engine dirs: {rel}"
         )
+
+
+# ---------------------------------------------------------------- C-14
+
+
+def test_c14_preflight_checks_inlined():
+    text = _recipes_text()
+    # preflight section exists and precedes the breakpoint-probe recipe
+    pre = text.find("前置检查")
+    probe = text.find("Recipe 0")
+    assert pre != -1 and probe != -1 and pre < probe, (
+        "preflight section must exist before the breakpoint-probe recipe"
+    )
+    # ① ssh connectivity with timeout, local-topology skip note
+    assert "ConnectTimeout" in text
+    assert "本地拓扑" in text
+    # ② non-root run-user existence
+    assert "id <run-user>" in text or "id <运行用户>" in text
+    assert "uid" in text
+    # ③ subagent CLI availability and version
+    assert "--version" in text
+    # ④ LLM configuration (model / context size / effort)
+    assert "模型" in text and "effort" in text
+    assert "context" in text.lower()
+    # ⑤ spec-kit framework availability on the target project
+    assert "source.json" in text and "constitution" in text
+    # uncertainty escalates to the user; verdicts land in the state spine
+    assert "提示用户补充" in text or "上送用户补充" in text
+    assert "状态脊" in text

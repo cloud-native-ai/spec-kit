@@ -181,7 +181,8 @@
 - [X] T030 Render-verify：执行 quickstart.md 可执行场景并记录 notes/quickstart-run.md——S1 基线复测（三命令）、S3 前提探测（宿主 cwd 无 .specify 自证 + qodercli 在 PATH）；测试文件 19 函数齐（C-1…C-13 + C-14…C-19，即 C-18）；`git diff --stat HEAD -- templates/ src/ scripts/` 为空（C-19）；C-20 间接判据复跑（宪法门控扫描既有测试全绿）[green: contracts/distribution-and-docs.md#C-18] [green: contracts/distribution-and-docs.md#C-19] [blockedBy: T028,T029]
 - [~] T031 真实/演练驱动验收<!-- deferred: 需用户指定目标项目与授权范围（远端别名/项目/合并授权属用户环境裁定）；本地 qodercli 可用，用户指定目标后即可执行单阶段或全闭环演练 -->（D-9/SC-001/SC-002/SC-003/SC-004/SC-005/SC-006/SC-007）：本地拓扑全闭环至少一轮（qodercli available）；远端拓扑轮次经用户确认目标别名后执行（Environment Prerequisites remote 行）；伪完成变异演练（SC-003）；异常注入（SC-004）[blockedBy: T030]
 - [X] T032 SC 状态核对与 Feature 收尾：SC-001…SC-009 逐条对照 T031 证据具状态（可核/如实 partial/deferred）；Feature 索引行与详情文件记录实现期要点（feature-integration 义务）[blockedBy: T031]
-- [X] T033 [US4] Register skill-wrapup binding（probe-definitions.md HandlerBinding 一行，run-team 与 sanitize-materials 之间）+ SKILL.md 补 `## Feedback` 嵌入源 + compile-embeds 重编译（1 written：编译 `## Wrap-up` 面落 SKILL.md）+ 重投影镜像 + 两处计数钉更新（test_skill_layer_visibility_guards 11→12 external 与 census 头注、test_run_skills_wiring 71→72 单元数；C-3 章节集契约同步补编译节）——GATE-1 守卫族 4 条新增失败的修复，触碰套件 45 passed [blockedBy: T030]
+- [X] T033 Register skill-wrapup binding（US4 范围）（probe-definitions.md HandlerBinding 一行，run-team 与 sanitize-materials 之间）+ SKILL.md 补 `## Feedback` 嵌入源 + compile-embeds 重编译（1 written：编译 `## Wrap-up` 面落 SKILL.md）+ 重投影镜像 + 两处计数钉更新（test_skill_layer_visibility_guards 11→12 external 与 census 头注、test_run_skills_wiring 71→72 单元数；C-3 章节集契约同步补编译节）——GATE-1 守卫族 4 条新增失败的修复，触碰套件 45 passed [blockedBy: T030]
+- [X] T034 运行后扩展（FR-026，US1 范围）：author 契约测试 C-14（前置检查五族命令形态 + 不确定即上送 + 状态脊前置段）append 到 tests/contract/test_sdd_loop_driver_skill.py——先红；再 author dispatch-recipes.md「前置检查（Preflight）」章节（位于断点探测之前，内容取材 FR-026 五族 + 本地拓扑跳过规则）——转绿；重投影镜像 [blockedBy: T030]
 
 ---
 

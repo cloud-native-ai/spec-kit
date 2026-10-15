@@ -25,6 +25,7 @@
 - **C-11 自包含断言**: SKILL.md 与 references/ 全文不构成对框架路径的运行时必读——对 `.specify/...` 的每次出现都处于「撰写底稿/背景注解」语境（以「底稿」「背景」「先例」邻接词判定），无「MUST 读 / 必须先读 <框架路径>」形态的运行时义务句。
 - **C-12 镜像一致**: `.specify/skills/sdd-loop-driver/` 下 SKILL.md 与 references/*.md 与框架源逐字节一致（sync-mirrors 投影，禁手改）。
 - **C-13 external 名册与目录**: `skills/external/` 存在 `sdd-loop-driver/` 目录（SKILL.md + references/）；`tests/contract/test_run_skills_wiring.py` 的 `BASELINE_EXTERNAL` 名册含 `sdd-loop-driver`（roster↔目录集合断言随之成立）。
+- **C-14 前置检查族内联（2026-10-15 运行后扩展，FR-026）**: `references/dispatch-recipes.md` 存在「前置检查（Preflight）」章节且位于断点探测配方之前，内联五检查族的命令形态——① SSH 连通性（`ConnectTimeout` 限时；标注本地拓扑跳过）、② 非 root 运行用户存在性（`id <run-user>` 且 uid ≠ 0）、③ 子代理 CLI 可用性与版本（`--version`）、④ 大语言模型配置核验（模型 + context size + effort，形态因 CLI 而异）、⑤ spec-kit 框架可用性（`.specify/` 安装/初始化/必要结构/版本 provenance）；并内联「不确定即上送用户补充」程序与「结论写入线状态脊前置检查段」程序。注：本文件与 distribution-and-docs.md 的 C 编号各自文件内唯一（条款语法真源 §1），引用按文件限定。
 
 ## Behavior-class Clauses（B-1…B-4，不进测试钉死）
 
@@ -51,3 +52,4 @@
 | FR-022/FR-023 | C-10（变体内联） |
 | FR-024 | C-12, C-13（+ distribution 契约 C-14…C-19） |
 | FR-025 | C-11 |
+| FR-026 | C-14 |
