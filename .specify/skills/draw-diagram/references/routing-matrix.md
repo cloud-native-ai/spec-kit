@@ -81,7 +81,7 @@
 ## 3. Tie-break 顺序（artifact_intent 优先）
 
 1. `editable-whiteboard` → excalidraw
-2. `interactive-dashboard` → echarts
+2. `interactive-dashboard`（仪表板/联动）/ `interactive-html`（交付物 = 交互式网页）→ echarts
 3. `repo-text` → mermaid
 4. `pixel-reproduction` → d3js
 5. `uml-strict` / `static-embed` → plantuml

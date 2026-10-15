@@ -74,7 +74,8 @@ classification: external
 1. 吃透上下文（文档/代码/目标图）：先产出**带出处的上下文摘要**（组件、关系、分区、核心流程），LDM 只从摘要与用户意图构建，**不臆造元素**
 2. 构建 LDM（schema 与覆盖检查定义见 [./references/semantic-model.md](./references/semantic-model.md)）：
    `diagram_class / elements / relations / zones / layout_intent / style_intent / weight_plan / artifact_intent / fidelity_intent / interactivity_intent / editability_intent`；
-   含多层结构的图**必须填 `weight_plan`**（语义视觉强弱：大模块边界 > 小模块边界 > 数据流；前门决定「什么该更显眼」，引擎决定「怎么画粗」）
+   含多层结构的图**必须填 `weight_plan`**（语义视觉强弱：大模块边界 > 小模块边界 > 数据流；前门决定「什么该更显眼」，引擎决定「怎么画粗」）；
+   `interactivity_intent` 按**交互语义规约**落为 level + forms（形式分类、档位与默认值见 [./references/semantic-model.md](./references/semantic-model.md) § 交互语义与验收），要求交互时 `artifact_intent` 同步取 `interactive-html`
 3. 产出**几何层**（语义决策，语法层实现）：canvas 尺寸、每图元 `box{x,y,w,h}`、分区盒与布局语义（equal-height/stack/grid/free）、关系锚点与间隙；复刻类从源图测量（像素或比例），新建类先规划网格再落坐标（schema 见 semantic-model.md Geometry）
 4. 复刻类请求（给了现有图/文档要求重画）：`fidelity_intent=reproduction`——保留源结构与版面语义（含源图实测的每角色线宽，覆盖默认档位），不得"顺手优化"布局
 
@@ -91,7 +92,8 @@ classification: external
 > （一引擎一专用端口 **9696-9701**：plantuml 9696 / mermaid 9697 / excalidraw 9698 / drawio 9699 /
 > echarts 9700 / d3 9701，**无网关 / 无聚合 / 无代理**）。**并非所有执行环境都能访问 `xuanji-render.aliyun-inc.com`**——
 > 它依赖该执行环境的内网 DNS / `/etc/hosts` 映射与 docker 主机。完整契约 + 自部署步骤见附件
-> [./references/self-deploy-render-service.md](./references/self-deploy-render-service.md)。**委派引擎渲染（Step 3）前先过此 preflight**：
+> [./references/self-deploy-render-service.md](./references/self-deploy-render-service.md)。**委派引擎渲染（Step 3）前先过此 preflight**
+> （**纯 HTML 交互交付不经此后端**——解耦语义 owner 是 [./references/delivery-contract.md](./references/delivery-contract.md) § D7.2，本节不复述）：
 
 1. **探测可用性**：`curl -sf --max-time 5 http://xuanji-render.aliyun-inc.com:9697/healthz`（任一 Node 引擎端口的 `/healthz` 即代表后端可用）。
    **可用** → 一切按既定流程执行，进入 Step 3 委派，**不做任何部署动作**。
@@ -102,14 +104,14 @@ classification: external
 
 ### Step 3: 分派到引擎层
 
-- 读选定引擎的入口文档 `references/types/<engine>/<engine>.md`，按其自身流程渲染；传入 **SDS 文件路径**（SDS = Semantic Drawing Spec，即 LDM + Geometry 的落盘形态，schema 见 [./references/semantic-model.md](./references/semantic-model.md)）+ 目标/输出要求 + **交付契约**（[./references/delivery-contract.md](./references/delivery-contract.md)：HTML 包装、源文件与图片保留、面向用户的文字规则）；尽量 file-path-only handoff。**`weight_plan` 随 SDS 一并传递**，由引擎层按其「强弱实现」小节落地（各引擎线宽/边框语法归引擎层自有）
+- 读选定引擎的入口文档 `references/types/<engine>/<engine>.md`，按其自身流程渲染；传入 **SDS 文件路径**（SDS = Semantic Drawing Spec，即 LDM + Geometry 的落盘形态，schema 见 [./references/semantic-model.md](./references/semantic-model.md)）+ 目标/输出要求 + **交付契约**（[./references/delivery-contract.md](./references/delivery-contract.md)：HTML 包装、源文件与图片保留、面向用户的文字规则、交互式网页交付 § D7（interactivity_intent ≠ none 时适用））；尽量 file-path-only handoff。**`weight_plan` 随 SDS 一并传递**，由引擎层按其「强弱实现」小节落地（各引擎线宽/边框语法归引擎层自有）；**`interactivity_intent` 同随 SDS 传递**，由引擎层按其「交互实现」小节落地（当前 d3js / echarts 设有该节；`level: none` 时无交互义务）
 - 引擎层的 `scripts/` 按其文档给定的调用形式执行：`${SKILL_HOME}` 指本技能根目录，故引擎脚本路径形如 `${SKILL_HOME}/references/types/<engine>/scripts/<script>`
 - 前门层不渲染、不手改引擎产物、不改引擎脚本（score = f(target) 纪律在引擎层各自生效）
 - **只加载选定引擎那一层**：不得为了「参考」而把其它引擎层的文档读进上下文
 
 ### Step 4: 验收与回报
 
-1. 对照 LDM 做覆盖检查：元素与标签、关系集合（含方向）、分组边界、产物形态、**强弱层级（weight_plan 在产物中可辨：边框按档递减、流线最细、关键路径仅色相抬升）**
+1. 对照 LDM 做覆盖检查：元素与标签、关系集合（含方向）、分组边界、产物形态、**强弱层级（weight_plan 在产物中可辨：边框按档递减、流线最细、关键路径仅色相抬升）**、**交互（interactivity_intent.level ≠ none 时逐声明 form 复现一次「输入 → 可见变化」，判据见 semantic-model.md § 交互语义与验收；level = none 零交互义务）**
 2. **对照交付契约做验收**（[./references/delivery-contract.md](./references/delivery-contract.md) 的 D6 自检表，逐项核对）：D1/D2 交付形态在盘、D3–D5 面向用户的文字规则成立（图内文字与 HTML 正文同规）。**条文与示例只在契约里，本节不复写**；任一项不过 = 不覆盖
 3. 不覆盖 → 带 delta 说明重渲染一次（上限 1 次）；仍不覆盖 → 如实回报产物与缺口
 4. 回报：产物路径（HTML + 源文件 + 图片）、**选定引擎层** + 路由理由（命中独占/矩阵行/tie-break）、LDM 摘要
@@ -154,6 +156,7 @@ classification: external
 | **交付形态**（HTML 包装、源文件与渲染图保留）**与面向用户的文字规则** | [./references/delivery-contract.md](./references/delivery-contract.md) |
 | 共享渲染后端可用性 preflight / 自部署（**环境特定**：xuanji-render.aliyun-inc.com:9696-9701） | [./references/self-deploy-render-service.md](./references/self-deploy-render-service.md) |
 | 语义视觉强弱（weight_plan 档位与验收） | [./references/semantic-model.md](./references/semantic-model.md) `weight_plan`；引擎落地见各引擎层「强弱实现」小节 |
+| 可交互图表（交互形式分类/档位/验收判据；交互交付形态） | [./references/semantic-model.md](./references/semantic-model.md) § 交互语义与验收；交付侧 [./references/delivery-contract.md](./references/delivery-contract.md) § D7；引擎落地见 d3js / echarts「交互实现」小节 |
 | 引擎语法、渲染、坑位、脚本 | `references/types/<engine>/`（入口 `<engine>.md`，详见其 `references/`） |
 | 六引擎的能力继承与无损证据 | [./references/merge-provenance.md](./references/merge-provenance.md) |
 | 路由证据（竞技场结论） | `${SKILL_WORKDIR}/.specify/memory/knowledge/visualization-skill-selection.md` |

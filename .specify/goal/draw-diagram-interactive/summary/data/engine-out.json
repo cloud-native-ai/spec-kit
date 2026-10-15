@@ -1,0 +1,396 @@
+{
+  "engine": "progress-engine/v1",
+  "input_schema": "project-input/v1",
+  "baseline": "2026-10-14",
+  "input": ".specify/goal/draw-diagram-interactive/summary/data/project.db",
+  "options": {
+    "count_deferred": false,
+    "strict": false
+  },
+  "thresholds": {
+    "weak_git_commits": 10,
+    "weak_git_span_days": 7,
+    "milestone_view_min_count": 4,
+    "milestone_view_min_span_days": 61,
+    "gantt_split_bars": 20
+  },
+  "project": {
+    "name": "draw-diagram-interactive",
+    "status_counts": {
+      "completed": 4
+    },
+    "progress": {
+      "basis": null,
+      "progress_pct": null,
+      "formula": null,
+      "reason": "无勾选比、无材料明写百分比 → 整体进度无可计数依据，只报状态计数",
+      "alternatives": [],
+      "buckets": null,
+      "bucket_closure": null
+    },
+    "counts": {
+      "items": 5,
+      "work_items": 4,
+      "leaves": 3,
+      "milestones": 1,
+      "delayed": 0,
+      "unknown_schedule": 4,
+      "unquantified_progress": 0
+    },
+    "delayed_items": [],
+    "delay_days_max": null,
+    "progress_bar": null,
+    "schedule_state": "unknown-schedule",
+    "current_phase": null,
+    "unknown_schedule_items": [
+      "draw-diagram-interactive.PH-0001",
+      "draw-diagram-interactive.TI-0001",
+      "draw-diagram-interactive.TI-0002",
+      "draw-diagram-interactive.TI-0003"
+    ],
+    "unquantified_progress_items": [],
+    "window": {
+      "earliest_date": null,
+      "latest_date": null,
+      "span_days": null
+    }
+  },
+  "items": [
+    {
+      "id": "draw-diagram-interactive.PH-0001",
+      "name": "draw-diagram-interactive · generation 1",
+      "type": "phase",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": false,
+      "children": [
+        "draw-diagram-interactive.TI-0001",
+        "draw-diagram-interactive.TI-0002",
+        "draw-diagram-interactive.TI-0003"
+      ],
+      "status": "completed",
+      "status_source": "aggregated（3 个子项）",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 300.0 / 子项数 3 = 100.0%",
+      "progress_basis": "aggregated（等权平均）",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期",
+        "状态由 3 个子项聚合得出：completed",
+        "进度由 3 个子项聚合得出：Σ子项进度 300.0 / 子项数 3 = 100.0%"
+      ],
+      "source": ".specify/teams/draw-diagram-interactive/（user-form）",
+      "aggregation": {
+        "children": 3,
+        "denominator": 3,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      },
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "draw-diagram-interactive.TI-0001",
+      "name": "gen-1 可交互图表能力建设:interactivity_intent 语义规约 + 交付契约 D7 + d3js/echarts 交互实现义务",
+      "type": "work-item",
+      "parent": "draw-diagram-interactive.PH-0001",
+      "phase_id": "draw-diagram-interactive.PH-0001",
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "completed",
+      "status_source": "status_raw:已完成",
+      "progress_pct": 100.0,
+      "progress_formula": "100/100 = 100.0%",
+      "progress_basis": "status:completed",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/draw-diagram-interactive/runs/20261014T1710Z-report.md#deliverables",
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "draw-diagram-interactive.TI-0002",
+      "name": "gen-1 verifier 以目标副本真实执行 draw-diagram 并三维评分:weighted_total 0.885(交互 0.88/正确 0.90/整合 0.88)≥ 0.8,静态路径回归 PASS",
+      "type": "work-item",
+      "parent": "draw-diagram-interactive.PH-0001",
+      "phase_id": "draw-diagram-interactive.PH-0001",
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "completed",
+      "status_source": "status_raw:已完成",
+      "progress_pct": 100.0,
+      "progress_formula": "100/100 = 100.0%",
+      "progress_basis": "status:completed",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/draw-diagram-interactive/runs/20261014T1710Z-report.md#verification",
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "draw-diagram-interactive.TI-0003",
+      "name": "gen-1 采纳前轻量收敛轮:sds-realization §3 实测事实(zoom 1.25 补偿)+ routing-matrix §3 interactive-html/interactive-dashboard tie-break 词汇",
+      "type": "work-item",
+      "parent": "draw-diagram-interactive.PH-0001",
+      "phase_id": "draw-diagram-interactive.PH-0001",
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "completed",
+      "status_source": "status_raw:已完成",
+      "progress_pct": 100.0,
+      "progress_formula": "100/100 = 100.0%",
+      "progress_basis": "status:completed",
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "无计划完成日，无法判定延期"
+      ],
+      "source": ".specify/teams/draw-diagram-interactive/runs/20261014T1710Z-report.md#execution-detail",
+      "progress_bar": "██████████"
+    },
+    {
+      "id": "MS-0001",
+      "name": "通过 draw-diagram 技能能够绘制出可交互的图表(通常是网页格式)",
+      "type": "milestone",
+      "parent": null,
+      "phase_id": null,
+      "owner_id": null,
+      "owner_name": "未记录",
+      "depends_on": [],
+      "is_leaf": true,
+      "children": [],
+      "status": "unknown-schedule",
+      "status_source": "milestone-judgement",
+      "progress_pct": null,
+      "progress_formula": null,
+      "progress_basis": null,
+      "planned_start": null,
+      "planned_end": null,
+      "actual_start": null,
+      "actual_end": null,
+      "date_meta": {},
+      "weight": null,
+      "weight_source": null,
+      "duration_days": null,
+      "dates_derived": false,
+      "anchor_date": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "days_to_planned_end": null,
+      "evidence": [
+        "锚定 draw-diagram-interactive.TI-0001 但该工作项无计划/实际完成日，锚定日不可换算",
+        "无计划日期（无绝对锚定日、无可换算的锚定工作项），无法判定延期"
+      ],
+      "source": ".specify/goal/draw-diagram-interactive/goal.md",
+      "progress_bar": null
+    }
+  ],
+  "groups": [
+    {
+      "id": "draw-diagram-interactive.PH-0001",
+      "name": "draw-diagram-interactive · generation 1",
+      "status": "completed",
+      "progress_pct": 100.0,
+      "progress_formula": "Σ子项进度 300.0 / 子项数 3 = 100.0%",
+      "progress_bar": "██████████",
+      "planned_start": null,
+      "planned_end": null,
+      "schedule_status": "unknown-schedule",
+      "delay_days": null,
+      "aggregation": {
+        "children": 3,
+        "denominator": 3,
+        "excluded_unquantified": 0,
+        "excluded_ids": [],
+        "weights": null,
+        "weight_sum": null
+      }
+    }
+  ],
+  "milestones": {
+    "counts": {
+      "total": 1,
+      "achieved": 0,
+      "pending": 0,
+      "at_risk": 0,
+      "unknown_schedule": 1
+    },
+    "achieved_numerator": 0,
+    "achieved_denominator": 0,
+    "achieved_pct": null,
+    "achieved_formula": null,
+    "achieved_bar": null,
+    "delay_days_max": null,
+    "overdue": [],
+    "achieved_late": [],
+    "unknown_schedule_ids": [
+      "MS-0001"
+    ],
+    "narrative": "1 个里程碑：已达成 0、逾期 0、待达成 0、无计划日期 1",
+    "view": {
+      "count": 1,
+      "first_anchor": null,
+      "last_anchor": null,
+      "span_days": null,
+      "standalone_condition_a": false,
+      "thresholds": {
+        "min_count": 4,
+        "min_span_days": 61
+      }
+    }
+  },
+  "gantt": {
+    "project_start": null,
+    "project_start_source": null,
+    "today_offset_days": null,
+    "bar_count": 0,
+    "split_recommended": false,
+    "schedule_material": {
+      "has_planned_dates": false,
+      "git_span_days": null,
+      "git_commit_count": null,
+      "git_window": null,
+      "weak_git_material": false,
+      "gantt_recommended": false,
+      "reason": "无任何计划日期或工期依据 → 甘特不出图"
+    }
+  },
+  "timeline": [],
+  "coverage": {
+    "source_label": "团队条目台账 items.jsonl",
+    "candidate_total": 3,
+    "excluded": 0,
+    "granularity_truncated": 0,
+    "unattributed": 0,
+    "tree_items": 3,
+    "phase_nodes": 1,
+    "closure_equation": "3 − 0 − 0 = 3",
+    "closure_ok": true,
+    "closure_note": "闭合成立：候选全集减去剔除/截断项等于分解树条目数",
+    "coverage_formula": "3/3 = 100.0%",
+    "progress_denominator_set": "团队条目台账 items.jsonl（3 项，已扣除剔除项 0）"
+  },
+  "people": {
+    "roster": [
+      {
+        "owner_id": "agent-team-supervisor-template",
+        "owner_name": "未记录",
+        "owner_role": "team-supervisor"
+      },
+      {
+        "owner_id": "agent-stage-executor-template",
+        "owner_name": "未记录",
+        "owner_role": "capability-builder"
+      },
+      {
+        "owner_id": "skill-verifier",
+        "owner_name": "Skill Verifier",
+        "owner_role": "capability-verifier"
+      }
+    ],
+    "coverage_numerator": 0,
+    "coverage_denominator": 5,
+    "coverage_pct": 0.0,
+    "coverage_formula": "0/5 = 0.0%",
+    "unassigned_ids": [
+      "draw-diagram-interactive.PH-0001",
+      "draw-diagram-interactive.TI-0001",
+      "draw-diagram-interactive.TI-0002",
+      "draw-diagram-interactive.TI-0003",
+      "MS-0001"
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "S-0001",
+      "source_kind": "user-form",
+      "source_ref": ".specify/teams/draw-diagram-interactive/",
+      "covers": [
+        "people",
+        "phases",
+        "work_items"
+      ]
+    }
+  ],
+  "inferred_fields": [
+    {
+      "field": "phases[draw-diagram-interactive.PH-0001].source",
+      "inferred_value": ".specify/teams/draw-diagram-interactive/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    }
+  ],
+  "diagnostics": {
+    "unmapped_statuses": {},
+    "warnings": [],
+    "declarations": [
+      "4 个工作项无计划完成日，无法判定延期（draw-diagram-interactive.PH-0001、draw-diagram-interactive.TI-0001、draw-diagram-interactive.TI-0002、draw-diagram-interactive.TI-0003）——报告须显式声明，不上逾期色",
+      "1 个里程碑无计划日期，无法判定延期（MS-0001）——报告须显式声明，不上逾期色",
+      "排期材料不足：无任何计划日期或工期依据 → 甘特不出图"
+    ]
+  },
+  "baseline_source": "--baseline",
+  "db": ".specify/goal/draw-diagram-interactive/summary/data/project.db",
+  "db_schema_version": "project-db/v1"
+}

@@ -1,0 +1,28 @@
+{
+  "svg": ".specify/goal/draw-diagram-interactive/summary/assets/wbs.svg",
+  "diagramType": "WBS",
+  "viewBox": {
+    "w": 10262.0,
+    "h": 10900.0
+  },
+  "aspect": 0.941,
+  "font": {
+    "sizesInViewBoxUnits": {
+      "200.0": 146,
+      "225.0": 5,
+      "250.0": 10
+    },
+    "distinctSizes": 3
+  },
+  "display": {
+    "widthPx": 1400,
+    "effectiveBodyFontPx": 27.29,
+    "effectiveSmallestFontPx": 27.29,
+    "minFontPxThreshold": 12,
+    "readable": true,
+    "widthPxNeededForBodyThreshold": 616
+  },
+  "checks": [
+    "OK: 可读性与长宽比均在阈值内。"
+  ]
+}

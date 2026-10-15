@@ -39,6 +39,33 @@ ECharts provides built-in interactivity (tooltip, legend toggle, zoom, data high
 
 映射理据、固定坐标复刻管线（目标像素测量 → config JSON → render.mjs 确定性导出）、bounds-fit 角锚点与边线 lines-series-压节点技巧、渲染质量清单：[references/sds-realization.md](references/sds-realization.md)。
 
+## 交互实现（interactivity_intent → ECharts 交互）
+
+语义层在 SDS 中声明**要什么交互**（`interactivity_intent.level` + `forms`；形式分类、档位、默认值与逐 form 验收判据 owner：[semantic-model.md](../../semantic-model.md) § 交互语义与验收，此处不复写）。本节只拥有**怎么实现**。MUST NOT 增删或改判声明的 forms。
+
+**与「Rich Interactivity by Default」的关系**：tooltip / legend toggle / toolbox 保存为图片是本引擎的既有默认，对任何交付保持——`level: none` 不撤默认、也不新增交互义务；`level ≠ none` 时在默认之上把声明的 forms 逐一兑现。既有默认**不足以**充当某个已声明 form 的实现，除非它确实满足该 form 的判据（如声明 `hover` 且 tooltip formatter 输出实质内容即满足；声明 `dashboard` 则不得以「默认已开 tooltip」充数）。
+
+### 形式 → ECharts 配方（引擎语法，本节 owner）
+
+| form | ECharts 实现配方族 |
+|------|-------------------|
+| `hover` | `tooltip`（formatter 输出实质内容，非空壳）+ `emphasis` 高亮 |
+| `click` | `chart.on('click', …)` 选中态/详情；`legendselectchanged` 系列开关 |
+| `filter` | legend 开关 / `dataZoom` / 自定义控件 → `setOption` 更新数据集合 |
+| `expand-collapse` | `tree` 系列原生 `expandAndCollapse`；固定布局分区用 graphic 分组显隐重绘 |
+| `zoom-pan` | `dataZoom`（`inside`/`slider`）在坐标系内缩放平移 |
+| `brush` | `brush` 组件 + `brushSelected` 驱动筛选/高亮 |
+| `linked-highlight` | 多实例 `echarts.connect(group)` 联动；或事件驱动他图 `dispatchAction` 高亮 |
+| `dashboard` | `toolbox`（保存为图片/数据视图/类型切换）+ connect 联动 + 多图共享 design tokens |
+
+### 义务与产物形态
+
+1. **链路闭合**：每个声明 form 必须组件/事件注册 → 状态变化 → `setOption`/`dispatchAction` 生效三环齐全；缺环 = 该 form 未实现（"控件在而无效不算实现"）。
+2. **库加载按交付契约 § D7.1 三选一并声明**：既有 pinned 版本 + vendor-first loader（`scripts/vendor-echarts.sh` 真实落盘、`scripts/verify-deliverable.mjs` 校验）即「本地 vendor」策略的既定实现；仅在线查看可选 CDN（仍须固定版本）。声明与实际一致性并入 D6 自检。
+3. **动画不是交互**：ECharts 默认 `animation` 是输入无关的入场动效，**不得作为任何 form 的达标形态**；判据认的是输入驱动的状态变化。
+4. **toolbox「保存为图片」不计为 form 实现**：它是既有默认 + 静态渲染证据通道（与 Step 5 静态快照义务衔接），声明 `dashboard` 时 toolbox 是组合件之一，但单靠它不构成 dashboard 判据。
+5. **交付说明**：列出实际具备的交互与触发方式（使用说明不属于交付契约 D4 禁止的图例式解说；其余文字规则 D3–D5 照常适用）。
+
 ## Workflow
 
 This skill creates ECharts data visualizations based on user-provided data and requirements. Follow the steps below in order.

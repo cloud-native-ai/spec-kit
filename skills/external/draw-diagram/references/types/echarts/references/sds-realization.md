@@ -22,7 +22,9 @@
 
 ## 3. Bounds-fit 角锚点（消除死白）
 
-固定坐标 graph 的包围盒由数据点自动拟合，导出视口与内容错位会产生底部/侧边死白（cycle3 实测 ~15% 底部空带）。技法：加入 **4 个隐形 1×1 角锚点节点**，坐标 `(0,0) (W,0) (0,H) (W,H)`（W/H = canvas 尺寸），样式 `itemStyle.opacity: 0`、`label.show: false`、不参与 tooltip/legend。效果：graph 包围盒 ≡ canvas，导出视口按内容包围盒裁切即与 SDS 画布恒等（bounds-fit identity）。**此 4 锚点是必需项，不得删除**。
+固定坐标 graph 的包围盒由数据点自动拟合，导出视口与内容错位会产生底部/侧边死白（cycle3 实测 ~15% 底部空带）。技法：加入 **4 个隐形 1×1 角锚点节点**，坐标 `(0,0) (W,0) (0,H) (W,H)`（W/H = canvas 尺寸），样式 `itemStyle.opacity: 0`、`label.show: false`、不参与 tooltip/legend。效果（echarts 5.6.x 实测修正）：**仅靠角锚点不达成恒等**——graph 视图默认 0.8 fit 因子不因锚点消失，渲染包围盒仍缩在画布 80% 区域内（1280×620 canvas 实测锚点偏移 128×62px）；须叠加 **`series.zoom: 1.25`**（0.8 fit 因子的倒数）补偿，才恢复 graph 包围盒 ≡ canvas，导出视口按内容包围盒裁切即与 SDS 画布恒等（bounds-fit identity，实测锚点落画布角 ±0.5px）。**此 4 锚点是必需项，不得删除**。
+
+**zoom 补偿的副作用**：节点 symbol 外接盒放大 ~1.15 倍（实测 150×60 → 172.5×69、170×60 → 195.5×69，circle 与 roundRect 同；config/SDS 原值不变，放大发生在渲染期）。处置：该偏离按 §1 偏离策略量化声明（偏离维度 = symbol 外接盒尺寸、幅度 = ×1.15、原因 = 0.8 fit 因子补偿），SDS 盒位规划按渲染后尺寸预留相邻间隙。
 
 ## 4. 边线 lines-series 压节点（精确落点）
 
@@ -60,6 +62,7 @@ series: [
 - [ ] 每条有向边有可见箭头，落点在目标盒边中点、方向沿线（不进盒底、不落盒角）
 - [ ] 导出图（render.png）**无任何 UI chrome**：toolbox saveAsImage 按钮隐藏或导出期关闭
 - [ ] 无死白：导出视口 = 内容包围盒；4 角锚点在位
+- [ ] bounds-fit 恒等（echarts 5.6.x）：`series.zoom: 1.25` 补偿在位（角锚点单独不达成恒等）；symbol 外接盒 ×1.15 偏离已按 §1 量化声明
 - [ ] 无投影：`shadowBlur`/`shadowColor`/`shadowOffset` 全禁用，干净单线描边
 - [ ] 所有边 `lineStyle.opacity: 1`
 - [ ] SDS 元素/边/分区全量在位、标签正确（覆盖检查归前门，本层不自减）

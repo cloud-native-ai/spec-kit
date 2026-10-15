@@ -1,0 +1,58 @@
+schema: project-input/v1
+project:
+  project_name: draw-diagram-interactive
+  project_desc: draw-diagram 技能具备绘制可交互图表的能力:图表可根据用户输入做出调整
+  baseline_date: '2026-10-14'
+  repos: []
+phases:
+- phase_id: draw-diagram-interactive.PH-0001
+  phase_name: draw-diagram-interactive · generation 1
+  phase_order: 1
+work_items:
+- item_id: draw-diagram-interactive.TI-0001
+  item_name: gen-1 可交互图表能力建设:interactivity_intent 语义规约 + 交付契约 D7 + d3js/echarts 交互实现义务
+  phase_id: draw-diagram-interactive.PH-0001
+  status: 已完成
+  source: .specify/teams/draw-diagram-interactive/runs/20261014T1710Z-report.md#deliverables
+- item_id: draw-diagram-interactive.TI-0002
+  item_name: gen-1 verifier 以目标副本真实执行 draw-diagram 并三维评分:weighted_total 0.885(交互 0.88/正确 0.90/整合 0.88)≥
+    0.8,静态路径回归 PASS
+  phase_id: draw-diagram-interactive.PH-0001
+  status: 已完成
+  source: .specify/teams/draw-diagram-interactive/runs/20261014T1710Z-report.md#verification
+- item_id: draw-diagram-interactive.TI-0003
+  item_name: gen-1 采纳前轻量收敛轮:sds-realization §3 实测事实(zoom 1.25 补偿)+ routing-matrix §3 interactive-html/interactive-dashboard
+    tie-break 词汇
+  phase_id: draw-diagram-interactive.PH-0001
+  status: 已完成
+  source: .specify/teams/draw-diagram-interactive/runs/20261014T1710Z-report.md#execution-detail
+milestones:
+- milestone_id: MS-0001
+  milestone_name: 通过 draw-diagram 技能能够绘制出可交互的图表(通常是网页格式)
+  anchor_item_id: draw-diagram-interactive.TI-0001
+  source: .specify/goal/draw-diagram-interactive/goal.md
+people:
+- owner_id: agent-team-supervisor-template
+  owner_name: 未记录
+  owner_role: team-supervisor
+- owner_id: agent-stage-executor-template
+  owner_name: 未记录
+  owner_role: capability-builder
+- owner_id: skill-verifier
+  owner_name: Skill Verifier
+  owner_role: capability-verifier
+features: []
+sources:
+- source_id: S-0001
+  source_kind: user-form
+  source_ref: .specify/teams/draw-diagram-interactive/
+  covers:
+  - work_items
+  - phases
+  - people
+coverage:
+  candidate_total: 3
+  excluded: 0
+  granularity_truncated: 0
+  unattributed: 0
+  source_label: 团队条目台账 items.jsonl

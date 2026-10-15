@@ -1,0 +1,4 @@
+=== 数据侧校验：.specify/goal/draw-diagram-interactive/summary/assets/wbs.svg (wbs) viewBox 10262×10900 ===
+（通用版面量测委托 draw-diagram/measure-svg-layout.py，本脚本只比对图元几何 ⇄ 记录层日期）
+[INFO] D0 wbs 图无时间轴/记录层日期真值，本脚本无数据侧检查项；版面/可读性判据请跑 draw-diagram 的 measure-svg-layout.py
+=== 结论：全部通过 ===

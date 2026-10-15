@@ -20,6 +20,31 @@ Create interactive data visualizations using D3.js (Data-Driven Documents), outp
 3. **几何**：d3js 是**绝对坐标引擎** → **MUST 精确兑现 SDS 的每个 box，预期零偏离**（不启力导向重排、不用 margin 约定平移已声明坐标）；运行时不可避免项（字体度量致文本溢出）先在 box 内近似，再量化声明。
 4. 像素测量管线、viewBox 对齐、固定坐标 data-join、锚点计算、校验三关（`validateCoords` + `validateAgainstSDS` + 复刻型的渲染读回 ↔ 源图差量）、偏离策略：[references/sds-realization.md](references/sds-realization.md)。
 
+## 交互实现（interactivity_intent → D3 交互）
+
+语义层在 SDS 中声明**要什么交互**（`interactivity_intent.level` + `forms`；形式分类、档位、默认值与逐 form 验收判据 owner：[semantic-model.md](../../semantic-model.md) § 交互语义与验收，此处不复写）。本节只拥有**怎么实现**：form → D3 配方、产物形态、实现义务。MUST NOT 增删或改判声明的 forms；`level: none` 时零交互义务（不顺手加交互，与 Core Principle 4 一致）。
+
+### 形式 → D3 配方（引擎语法，本节 owner）
+
+| form | D3 实现配方族 |
+|------|--------------|
+| `hover` | `selection.on('mouseover'/'mousemove'/'mouseout')` 驱动 tooltip 元素或高亮 class |
+| `click` | 点击选中态（class toggle / 详情面板）；图例项点击 → 该系列 data-join 重绘 |
+| `filter` | 筛选控件（checkbox/select）→ 更新绑定数据 → `enter/update/exit` 重绘 |
+| `expand-collapse` | 分区容器显隐切换或子树重算，折叠状态持久在状态对象中 |
+| `zoom-pan` | `d3.zoom()` 绑定 svg，作用于 viewBox / `<g>` transform |
+| `brush` | `d3.brush()` → 范围内图元高亮，或作为筛选条件驱动重绘 |
+| `linked-highlight` | 多面板共享状态对象，一处事件更新其他面板的 class/筛选 |
+| `dashboard` | 多 SVG 共享筛选状态 + 上述形式的组合 |
+
+### 义务与产物形态
+
+1. **链路闭合**：每个声明 form 必须事件绑定 → 状态更新 → 渲染更新三环齐全；缺环 = 该 form 未实现（验收判据见 semantic-model § 交互语义与验收，"控件在而无效不算实现"）。
+2. **库加载按交付契约 § D7.1 三选一并声明**：single-file 模式默认 CDN（`https://d3js.org/d3.v7.min.js`）须在复现性附录声明「首开需联网」；离线交付走 split/vendored 模式（既有 Core Principle 2 的两种输出模式即该表两种策略的本引擎实现）。
+3. **过渡不是交互**：`d3.transition` 等动效只作反馈增强，不作为任何 form 的达标形态（无输入驱动的自动播放不满足判据）。
+4. **既有交互长处与声明 forms 并存**：常显边标签开关、`?clean=1` 静态快照、导出 SVG/PNG 等既有能力照常提供；声明之内的 forms 一个都不能少，声明之外的不作为验收点。
+5. **交付说明**：列出实际具备的交互与触发方式（使用说明不属于交付契约 D4 禁止的图例式解说；其余文字规则 D3–D5 照常适用）。
+
 ## Core Principles
 
 ### 1. Data-Driven Design

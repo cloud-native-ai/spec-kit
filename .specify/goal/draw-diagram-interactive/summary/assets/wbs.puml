@@ -1,0 +1,27 @@
+@startwbs
+skinparam dpi 300
+scale 4
+skinparam shadowing false
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 16
+<style>
+wbsDiagram {
+  LineColor #4A6C7A
+  LineThickness 1.4
+  RoundCorner 10
+  node { FontSize 16; Padding 12; Margin 8; MaximumWidth 320 }
+  rootNode { BackgroundColor #24485A; FontColor white; FontStyle bold; FontSize 20; Padding 20; MaximumWidth 420 }
+  .done  { BackgroundColor #C6E9CB; LineColor #3E9256 }
+}
+</style>
+* draw-diagram-interactive 交付\n（基准日 2026-10-14）
+** draw-diagram-interactive · generation 1 ✓ <<done>>
+*** gen-1 可交互图表能力建设:interactivity_intent 语义规约 + 交付契约 D7 + d3js/echarts 交互实现义务 ✓ ◆M1\n【未记录】\n100% <<done>>
+*** gen-1 verifier 以目标副本真实执行 draw-diagram 并三维评分:weighted_total 0.885(交互 0.88/正确 0.90/整合 0.88)≥ 0.8,静态路径回归 PASS ✓\n【未记录】\n100% <<done>>
+*** gen-1 采纳前轻量收敛轮:sds-realization §3 实测事实(zoom 1.25 补偿)+ routing-matrix §3 interactive-html/interactive-dashboard tie-break 词汇 ✓\n【未记录】\n100% <<done>>
+legend bottom
+  <size:18>  <back:#C6E9CB>        </back> ✓ 已完成 completed  </size>
+  <size:18>  第三行 NN% = 完成度    【未记录】= 材料未记录条目级负责人  </size>
+  <size:18>  ◆M1 = 里程碑锚点：M1 通过 draw-diagram 技能能够绘制出可交互的图表(通常是网页格式)  </size>
+endlegend
+@endwbs
