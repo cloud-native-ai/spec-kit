@@ -7,13 +7,10 @@
 
 ## Related Feature *(mandatory)*
 
-<!--
-  ACTION REQUIRED: Keep the default values as "Need clarification" in the initial draft.
-  /speckit.clarify must resolve this section to the final Feature binding before planning.
--->
+**Feature ID**: 058  
+**Feature Name**: 无人值守 SDD 循环驱动机制
 
-**Feature ID**: Need clarification  
-**Feature Name**: Need clarification
+> 绑定裁定（2026-10-15 clarify）：本 spec 绑定现有 Feature 058（Draft）——编号 1:1 对应，绑定先例启发式核验 039/042/046/050/052 等候选均无本能力归属；集成义务已履行（本 spec 在 features/058.md Related Specifications 在册、索引行 Last Updated 带跟进注记）。
 
 ## Overview
 
@@ -21,13 +18,15 @@
 
 **定性**：这是 spec-kit 框架的能力补全需求——把 2026-10-14 在多个项目里被反复手工验证有效的驱动模式，固化为**一等公民机制**，使任何项目都能一键发起无人值守的 SDD 推进。
 
-**承载形态（G1/G2 裁决，见 Clarifications）**：机制主体由 **Team** 承载——自迭代环（iteration pattern）+ 独立 verifier + budget/cadence，这是无人值守的三个硬需求（自迭代、阶段校验、卡死处置）的原生能力面；知识层退居 **Skill**——阶段提示词模板、五大执行机制、已验证变体、纪律条款固化为手册（skill），供 team 成员引用。知识归 skill、无人值守运行归 team；单 skill（循环纪律靠模型自觉、长跑后断环）与单 agent（本模式的工人已是远端 qodercli，跨项目并行 + 循环编排不是单 agent 形态）均不满足硬需求——选型对比全文见需求简报 §6，此处不再复述。
+**承载形态（G1 修订裁决 2026-10-15 + G2，见 Clarifications Session 2026-10-15）**：机制由 **Skill 唯一承载**——阶段提示词模板、五大执行机制、已验证变体、纪律条款，以及自迭代 / 独立校验 / 卡死处置三个硬需求的运行规则，全部固化为一个**自包含、可移植**的 skill 手册；执行 loop 的主代理是**任意宿主 agent**（不要求安装 spec-kit 框架），以它原生的技能机制加载该 skill 即可运行。决定性约束是**执行侧可移植性**：通常执行 loop 的 agent 不安装 spec-kit，而 team 功能（/speckit.team、preset 机制、goal-utils 等引擎）依赖执行侧 `.specify/` 目录结构，脱离框架即不可用；被驱动子代理所在的目标项目才需要具备 `.specify/`（执行 /speckit.* 阶段命令）。原 G1 的 Team 承载结论据此被修订取代；选型对比原文见需求简报 §6（其结论部分已过时，保留作历史记录）。
 
 **来源**：2026-10-14 从本机全天会话历史（84 个会话段 / 67 个有效会话）提炼；代表执行包括 profiles-04 一条提示词并行驱动两条线全程无提醒、isv-substrate 本地 loop 驱动远端容器内 qodercli 约 6 小时持续推进（长时无人值守已实证可行）、xuanji-images 两条 SDD 线并行全链路沉淀的并发隔离/窄读法授权/审后提交纪律、profiles-12 用户明确表达的循环诉求原话（「需要使用一个循环来完成这项工作，而不是每次由我提醒你『重试』或者『继续』」）。
 
 ### 现状锚点（以源码实测为准，2026-10-14）
 
-- 团队预设现有 2 个：`capability-arena`、`project-cluster`（`skills/internal/create-team/templates/teams/`）；预设机制真源为 `skills/internal/create-team/references/team-presets.md`（preset_id / pattern ∈ {parallel, serial, iteration, continuous} / signals / config / provenance 契约）。**无任何 SDD 流程驱动类预设**。
+- 团队预设现有 2 个：`capability-arena`、`project-cluster`（`skills/internal/create-team/templates/teams/`）；预设机制真源为 `skills/internal/create-team/references/team-presets.md`（preset_id / pattern ∈ {parallel, serial, iteration, continuous} / signals / config / provenance 契约）。**无任何 SDD 流程驱动类预设**（2026-10-15 G1 修订后本特性不再新增预设，见 Clarifications）。
+- **team 功能的框架依赖（承载改选的决定性约束，2026-10-15 补测）**：team 相关功能（`/speckit.team` 命令、preset 匹配、`goal-utils.py` / `run-team` 等引擎）全部位于执行侧 `.specify/`（`.specify/skills/` + `.specify/scripts/`）——执行 loop 的主代理若不安装 spec-kit（无 `.specify/`），team 路径整体不可用；而 skill 是自包含文件形态（SKILL.md + references），可经宿主 agent 原生技能机制加载或直接作为文档投喂，天然可脱离 `.specify/` 运行。
+- 2026-10-15 本特性的通用知识层已先行沉淀入 shared 分发层：`shared/patterns/unattended-loop-pattern.md`（无人值守循环模式：U0–U6、边界口诀、独立校验与卡死处置语义）与 `shared/workflow/external-dispatch-recipes.md`（外部派发配方：双拓扑、断点探测、prompt 骨架、runner 派生、后台轮询）；skill MUST **内联**其操作要点（执行侧无法解析框架文档路径，引用形态不可用——FR-002/FR-011/FR-018），两份 shared 文档是撰写时的底稿而非运行时依赖。
 - 外部子代理派发已有可见性契约：`.specify/shared/definitions/subagent-definitions.md` External Dispatch Visibility Contract（明令禁止 `qodercli -p "<prompt>" > agent.log 2>&1 &` 缓冲至退出式派发），参考实现 `skills/internal/create-team/scripts/dispatch.sh` + `stream-filter.py`（`DISPATCH_CLI` 缺省 `qodercli`）。
 - 确认门控：**push / force-push / 远程分支操作在破坏性动作清单**（`confirmation-gates.md` § 破坏性动作清单第 3 条）——任何远程推送属门控对象，与 G5「不要 push（除非明确授权）」一致。
 - 六阶段命令模板齐备：`templates/commands/` 下 `requirements.md` / `clarify.md` / `plan.md` / `tasks.md` / `implement.md` / `review.md` 全部存在。
@@ -38,9 +37,9 @@
 ### Assumptions
 
 - **子代理 CLI**：qodercli 为缺省子代理（入口话术明示），但机制不把它硬编码为唯一——遵循框架既有派发抽象（`DISPATCH_CLI` 可覆盖）；本地拓扑即主代理本机直驱 qodercli。
-- **收尾哨兵**：合并 main 完成以 `MERGE-DONE` 尾标标记——简报只定义了 `<STAGE>-DONE` 阶段哨兵，合并是阶段链（[[STR-002]]）之外的收尾步，沿用同一哨兵约定（informed guess，实现期可修正）。
-- **默认预算与节奏**（G1 要求 preset 携默认值；简报未给数值，按相邻先例 informed guess，全部可经入口覆盖）：阶段超时缺省 90 分钟（isv-substrate 约 6 小时 / 34 turns 的多阶段实测，单阶段为数十分钟量级）；同阶段重试上限缺省 2 次（承 039 P12 两振停滞先例）；预算降级语义沿用 `project-cluster` 形态（on_80pct report-only / on_100pct halt）。
-- **skill 分类标注**：本特性新增 skill 按 `internal` 处理（它编排 spec-kit 自身的 SDD 流程，与 spec-kit 语义强耦合；分类定义见 glossary「技能分类标注」条），最终以 plan 阶段裁决为准。
+- **收尾哨兵**：合并 main 完成不设哨兵字符串，采用 **git 状态判定**（2026-10-15 clarify 裁决，取代原 MERGE-DONE informed guess）——判定条件与 FR-013 条款一致；原「`MERGE-DONE` 沿用阶段哨兵约定」的读法作废。
+- **默认预算与节奏**（G1 修订后由 skill 固化缺省值、入口可覆盖；简报未给数值，按相邻先例 informed guess，全部可经入口覆盖）：阶段超时缺省 90 分钟（isv-substrate 约 6 小时 / 34 turns 的多阶段实测，单阶段为数十分钟量级）；同阶段重试上限缺省 2 次（承 039 P12 两振停滞先例）；预算降级语义沿用 `project-cluster` 形态（on_80pct report-only / on_100pct halt）。
+- **skill 分类标注**：**external**（2026-10-15 clarify 裁决，依依赖轴——skill 自身零 spec-kit 依赖、任何宿主可直接加载，与 G1 修订可移植性同轴，且框架项目内宿主发现面可见使一遍性入口零摩擦）。词面张力（external「与 spec-kit 无关」vs 内容编排 spec-kit SDD 流程）经 frontmatter 注解消解：分类依依赖轴判定，内容语义的 spec-kit 耦合在注解中显式声明。
 - **Feature 登记**：按用户指令，本特性于 requirements 阶段先行落册（features.md Draft 行 + 详情文件）；spec 内 `Related Feature` 仍按 create-requirements 缺省值保留，由 `/speckit.clarify` 复核确认绑定。
 - **review 未过的循环语义**：review 阶段判定未通过 = 该阶段未完成，按重试语义回到修复（受重试上限约束），达上限后走卡死处置上报，不无限返工。
 
@@ -67,7 +66,7 @@
 需要使用一个循环来完成这项工作，而不是每次由我提醒你"重试"或者"继续"。
 ```
 
-主代理据此实例化 SDD 循环驱动团队：对每条项目线，先做断点探测（G6 默认能力——入口不声明阶段时自动探测），再按阶段链（[[STR-002]]）逐阶段派发远端 qodercli 子代理，阶段完成后自动写下一阶段提示词并续环，直到 review 完成并合并回 main，全程零用户提醒。
+主代理加载 SDD 循环驱动 skill 手册（G1 修订：skill 唯一承载），对每条项目线先做断点探测（G6 默认能力——入口不声明阶段时自动探测），再按阶段链（[[STR-002]]）逐阶段派发远端 qodercli 子代理，阶段完成后自动写下一阶段提示词并续环，直到 review 完成并合并回 main，全程零用户提醒。
 
 **Why this priority**: 这是用户核心诉求的直接落点（profiles-12 原话）与验收主场景（简报 §8 验收方向）；G1/G4/G6 三条裁决共同指向此切片。
 
@@ -81,17 +80,17 @@
 
 ---
 
-### User Story 2 - 独立 verifier 阶段校验与默认安全纪律 (Priority: P1)
+### User Story 2 - 独立校验的阶段判定与默认安全纪律 (Priority: P1)
 
-每个阶段的「完成」不由执行者自报：阶段尾标（[[STR-001]]）出现只是必要条件，独立 verifier 还须核验产物（git log 新增阶段提交、spec 文件存在性）与纪律合规，双条件齐备才判定阶段完成并续环。阶段提示词骨架把默认安全纪律（G5）固化进每一次派发：直接执行不要确认、访谈式问题自行裁决并记录假设、只提交本特性产物、既有脏文件不提交不还原、不 push（除非明确授权）。
+每个阶段的「完成」不由执行者自报：阶段尾标（[[STR-001]]）出现只是必要条件，独立校验步骤（由循环执行侧执行，或由其另行派发的校验代理执行——校验者不是阶段执行者）还须核验产物（git log 新增阶段提交、spec 文件存在性）与纪律合规，双条件齐备才判定阶段完成并续环。校验判据与程序由 skill 固化（G1 修订后不再依赖 team verifier 席位）。阶段提示词骨架把默认安全纪律（G5）固化进每一次派发：直接执行不要确认、访谈式问题自行裁决并记录假设、只提交本特性产物、既有脏文件不提交不还原、不 push（除非明确授权）。
 
-**Why this priority**: 阶段校验是无人值守三硬需求之一（简报 §6）——没有独立校验，循环会在伪完成上静默推进；G5 纪律是机制默认行为而非可选附件。
+**Why this priority**: 阶段校验是无人值守三硬需求之一（简报 §6）——没有独立校验，循环会在伪完成上静默推进；G5 纪律是机制默认行为而非可选附件。校验独立性的最小保证是「判定者 ≠ 阶段执行者」，由 skill 的循环程序承载，不依赖框架引擎。
 
-**Independent Test**: 构造「尾标在而产物缺」的伪完成样本与「尾标在且产物齐」的真完成样本各若干，verifier 判定结果可由第二位复核者独立复现；对演练全程做 git 审计核对纪律合规。
+**Independent Test**: 构造「尾标在而产物缺」的伪完成样本与「尾标在且产物齐」的真完成样本各若干，校验判定结果可由第二位复核者独立复现；对演练全程做 git 审计核对纪律合规。
 
 **Acceptance Scenarios**:
 
-1. **Given** 某阶段子代理输出了完成尾标但未产生该阶段的任何提交或产物文件，**When** verifier 校验，**Then** 判定为未完成，循环不写下一阶段提示词。
+1. **Given** 某阶段子代理输出了完成尾标但未产生该阶段的任何提交或产物文件，**When** 独立校验执行，**Then** 判定为未完成，循环不写下一阶段提示词。
 2. **Given** 某阶段子代理在推进中遇到本应自行裁决的访谈式问题，**When** 阶段完成被校验，**Then** 该阶段的假设记录存在于其产物或提示词要求的位置，且未发生等待用户的行为。
 3. **Given** 目标仓库存在与本项目无关的既有脏文件，**When** 全部阶段跑完，**Then** git 审计显示脏文件既未被提交也未被还原。
 
@@ -108,24 +107,24 @@
 **Acceptance Scenarios**:
 
 1. **Given** 某阶段子代理持续超时，**When** 达到重试上限，**Then** 机制停止该线推进、状态落盘、上送件产出，且不静默丢弃已产生的中间产物。
-2. **Given** 预算在中途触顶，**When** 降级语义生效（on_80pct / on_100pct），**Then** 行为与 preset config 声明一致且对用户可见。
+2. **Given** 预算在中途触顶，**When** 降级语义生效（on_80pct / on_100pct），**Then** 行为与 skill 固化的缺省值声明一致且对用户可见。
 3. **Given** 一次异常被处置完毕，**When** 另一个 Agent 无上下文接手该线，**Then** 仅凭落盘状态即可恢复推进（零上下文可接手）。
 
 ---
 
-### User Story 4 - 知识层 Skill 手册固化（G2） (Priority: P1)
+### User Story 4 - Skill 手册承载机制与执行侧可移植（G1 修订 + G2） (Priority: P1)
 
-阶段提示词骨架（背景与权威文档 / 执行要求 / 完成尾标三段）、五大执行机制（断点探测、阶段化 prompt 文件、runner 与派生、后台执行 + 日志回传 + 轮询、收尾纪律）、已验证变体、纪律条款固化为一个 skill（手册层），供 team 成员与主代理引用。Team preset 引用 skill 而不内联复制行为知识——知识归 skill、无人值守运行归 team（G2 裁决）；新项目/新线的实例化只读手册、只填参数，不改机制。
+机制的全部知识——阶段提示词骨架（背景与权威文档 / 执行要求 / 完成尾标三段）、五大执行机制（断点探测、阶段化 prompt 文件、runner 与派生、后台执行 + 日志回传 + 轮询、收尾纪律）、已验证变体、纪律条款，以及自迭代 / 独立校验 / 卡死处置三个硬需求的运行规则——固化为**一个自包含、可移植的 skill**：它不依赖执行侧 `.specify/` 目录、`/speckit.*` 命令或任何 spec-kit 引擎，任意宿主 agent 以其原生技能机制加载（或直接作为文档投喂）即可驱动循环；被驱动子代理所在的目标项目才需要 `.specify/`（执行阶段命令）。新项目/新线的实例化只读手册、只填参数，不改机制。
 
-**Why this priority**: G2 是六条用户裁决之一，且 skill 是本特性两大交付物之一（简报 §8 范围：team 定义 + 配套 skill）；没有知识层，team 成员无提示词骨架可引用，US1–US3 无法按裁决形态运行。
+**Why this priority**: G1 修订裁决（2026-10-15）的核心——执行 loop 的主代理通常不安装 spec-kit，承载物必须是脱离 `.specify/` 仍可执行的形态；skill 是本特性唯一交付物（简报 §8 的「team 定义 + 配套 skill」中 team 定义被修订移除）。没有它，US1–US3 无运行规则可依。
 
-**Independent Test**: 单独核验 skill 存在且四类内容（骨架/五机制/变体/纪律）齐备；核验 preset 与阶段派发引用 skill 而非复制其内容（改 skill 一处即全局生效，无第二真源）。
+**Independent Test**: 在一个**无 `.specify/`** 的宿主环境仅加载 skill 文件发起演练并完成闭环（执行侧 spec-kit 依赖数 = 0）；单独核验 skill 五类内容齐备（阶段骨架 / 五大机制 / 变体 / 纪律条款 / 三硬需求运行规则）；核验无第二真源（改 skill 一处即全局生效）。
 
 **Acceptance Scenarios**:
 
-1. **Given** 机制安装完毕，**When** 打开 skill 手册，**Then** 阶段提示词骨架、五大执行机制、已验证变体、纪律条款四类内容齐备且与需求简报 §3–§5 一致。
+1. **Given** 机制安装完毕，**When** 打开 skill 手册，**Then** 五类内容齐备（阶段提示词骨架 / 五大执行机制 / 已验证变体 / 纪律条款 / 三硬需求运行规则）且与需求简报 §3–§5 一致（不要求读者具备 spec-kit 框架知识）。
 2. **Given** 需要调整某阶段的提示词骨架，**When** 只编辑 skill 一处，**Then** 后续所有线/所有项目的阶段派发使用新骨架（无散落副本需要逐一修改）。
-3. **Given** 一个新目标项目首次接入，**When** 用户只提供入口参数，**Then** 实例化过程不修改机制文件（preset/skill 零改动）。
+3. **Given** 一个新目标项目首次接入，**When** 用户只提供入口参数，**Then** 实例化过程不修改机制文件（skill 零改动）。
 
 ---
 
@@ -168,7 +167,7 @@
 - 子代理 CLI 不存在、不在执行身份的可执行路径或版本不匹配时，预检拦截并给出修复动作。
 - 同一目标项目被两条线同时指向时，机制检出写重叠并拒绝第二线（写重叠不得停留在双方都可写）。
 - 合并 main 遇冲突时，停线上报冲突详情，不自动强合、不静默丢弃任一侧。
-- 完成尾标出现在日志正文（如历史回显）而非本次阶段输出末尾时，verifier 以产物核验为准，尾标仅作必要条件——防止以 grep 尾标判完成的假阳性。
+- 完成尾标出现在日志正文（如历史回显）而非本次阶段输出末尾时，校验步骤以产物核验为准，尾标仅作必要条件——防止以 grep 尾标判完成的假阳性。
 - 轮询日志无限增长时，消费侧按有界窗口（tail）读取，不整读无限日志。
 - 预算在阶段中段耗尽时，落状态保留中间产物后停止，不弃中途产物也不继续消耗。
 - 用户在循环进行中插入新指令时，当前阶段完成后尊重新指令（循环可中断、可改道），已派发阶段不被半途撕毁。
@@ -178,11 +177,11 @@
 
 ### Functional Requirements
 
-#### 承载与入口（G1/G2/G3/G4）
+#### 承载与入口（G1 修订/G2/G3/G4）
 
-- **FR-001**: 框架 MUST 新增 team preset [[STR-003]]（落位与契约遵循预设机制真源 `skills/internal/create-team/references/team-presets.md`）：`pattern: iteration`（自迭代环）；成员角色封闭集至少含循环主导者（编排断点探测、阶段派发、续环与收尾）、线执行者（单条项目线的阶段派发载体）、线校验者（独立 verifier，见 FR-015）；config MUST 携带 `verifier: independent`、budget/cadence 默认值（FR-017）与 kill_switch 键。provenance MUST 引用 2026-10-14 实测运行（需求简报 §2 的真实会话记录），满足「预设只从真实运行过的团队蒸馏」的预设契约。
-- **FR-002**: 框架 MUST 新增配套 skill [[STR-003]]（知识层手册）：固化阶段提示词骨架（FR-008）、五大执行机制（FR-005/FR-007/FR-010/FR-011/FR-013）、已验证变体（FR-022/FR-023）、纪律条款（FR-008）；team preset 与阶段派发 MUST 引用该 skill 而非内联复制其内容——知识归 skill、无人值守运行归 team（G2 裁决），无第二真源。
-- **FR-003**: 机制 MUST 不绑定特定项目族或工作区命名规则：登录别名、登录用户、项目路径、执行身份、终态权威文档路径、断点阶段全部经入口参数声明（G3 裁决）；机制文件（preset/skill）MUST 零硬编码项目名、主机别名或路径。
+- **FR-001**: 机制 MUST 由 skill [[STR-003]] **唯一承载**（G1 修订裁决 2026-10-15）：skill 为自包含、可移植的文件形态（SKILL.md + references），MUST 可脱离 `.specify/` 目录、`/speckit.*` 命令与一切 spec-kit 引擎被宿主 agent 加载执行——执行侧 spec-kit 依赖 = 0；MUST NOT 依赖 team 机制（preset、成员席位、goal-utils 等引擎）。被驱动子代理所在的目标项目 MUST 具备 `.specify/`（执行 [[STR-002]] 阶段命令），该依赖属目标项目侧而非执行侧。自迭代（FR-012）、独立校验（FR-015）、卡死处置（FR-017/FR-018）三个硬需求的运行规则 MUST 全部固化于 skill 内容，由 skill 纪律承载，不依赖框架引擎强制。
+- **FR-002**: skill [[STR-003]] MUST 固化五类内容：阶段提示词骨架（FR-008）、五大执行机制（FR-005/FR-007/FR-010/FR-011/FR-013）、已验证变体（FR-022/FR-023）、纪律条款（FR-008）、三硬需求运行规则（FR-012/FR-015/FR-017/FR-018）——它是机制行为的唯一真源，无第二真源；对框架纪律（fast-fail / confirmation-gates / artifact-commit 等）的对齐以**引用其名并内联其操作要点**的方式写入 skill（执行侧无法解析框架文档路径）。
+- **FR-003**: 机制 MUST 不绑定特定项目族或工作区命名规则：登录别名、登录用户、项目路径、执行身份、终态权威文档路径、断点阶段全部经入口参数声明（G3 裁决）；机制文件（skill）MUST 零硬编码项目名、主机别名或路径。
 - **FR-004**: 机制 MUST 以需求简报 §3 的一句话模板为一遍性入口（G4 裁决：入口不变）：入口只声明目标与起点（目标项目、登录方式、断点位置、终态权威文档），不要求用户学新话术，不要求用户声明执行细节。
 
 #### 断点探测与阶段推进（US1）
@@ -193,24 +192,24 @@
 - **FR-008**: 阶段提示词 MUST 遵循固定三段骨架（固化于 FR-002 的 skill）：① 背景与权威文档（终态文档 / 宪法 / 上一阶段提交号）；② 执行要求（G5 默认纪律）：直接执行不要确认、访谈式问题自行裁决并记录假设、只提交本特性产物、仓库既有脏文件不提交不还原、不要 push（除非明确授权）；③ 完成尾标要求：最后一行输出 `<STAGE>-DONE`（后缀 [[STR-001]]）。
 - **FR-009**: 每阶段完成判定 MUST 消费阶段尾标：子代理提示词要求其最后一行输出大写阶段名 + [[STR-001]]（如 PLAN-DONE）；尾标是阶段完成的必要条件（充分条件由 FR-015 的独立校验补齐）。
 - **FR-010**: 阶段执行 MUST 经 runner 脚本派发，已验证形态（示例）：runner 内容为 `cd /cws_work/<项目> && qodercli -w /cws_work/<项目> --permission-mode auto -p "$(cat /home/develop/prompt-<项目>-<阶段>.md)"`；下一阶段 runner MUST 由上一阶段 runner 经文件名替换派生（如 sed 替换提示词文件名），避免重复维护整套脚本。
-- **FR-011**: 阶段执行 MUST 后台化并以日志轮询驱动续环（已验证形态）：远端经 `ssh ... "su - develop -c 'bash /home/develop/run-<项目>-<阶段>.sh'"` 把输出回传到本地日志文件，主代理轮询日志尾部，出现完成尾标即进入校验（FR-015）与下一阶段派发（FR-012）；派发形态 MUST 遵守既有 External Dispatch Visibility Contract（真源 `.specify/shared/definitions/subagent-definitions.md`）——禁止缓冲至退出、进度不可见的派发（该契约四观测点到 ssh + su 远端形态的映射在 plan 阶段核对）。
-- **FR-012**: 阶段完成经校验通过后，机制 MUST 立即写下一阶段提示词并派发（自迭代），不等用户任何形式的「继续」指令（G1 裁决：自迭代）。
+- **FR-011**: 阶段执行 MUST 后台化并以日志轮询驱动续环（已验证形态）：远端经 `ssh ... "su - develop -c 'bash /home/develop/run-<项目>-<阶段>.sh'"` 把输出回传到本地日志文件，主代理轮询日志尾部，出现完成尾标即进入校验（FR-015）与下一阶段派发（FR-012）；派发形态 MUST 遵守既有 External Dispatch Visibility Contract 的观测要求（契约真源 `.specify/shared/definitions/subagent-definitions.md`）——禁止缓冲至退出、进度不可见的派发；其操作规则（含四观测点到 ssh + su 远端形态的映射）MUST 内联进 skill（执行侧不解析框架文档），映射核对在 plan 阶段完成。
+- **FR-012**: 阶段完成经校验通过后，机制 MUST 立即写下一阶段提示词并派发（自迭代，G1 修订裁决——由 skill 循环纪律承载），不等用户任何形式的「继续」指令。
 
 #### 收尾（US1）
 
-- **FR-013**: 每条线 MUST 以合并回 main 收尾（review 完成后）；**push 与远程分支操作缺省不执行**——它们属确认门控破坏性动作清单（真源 `confirmation-gates.md`），仅当入口显式授权 push 时才推送特性分支到远程再合并（G5 裁决：不要 push 除非明确授权；需求简报 §4.5「推特性分支到 origin 再合并」的缺省读法据此修正，本地合并为缺省收尾）。
+- **FR-013**: 每条线 MUST 以合并回 main 收尾（review 完成后）；合并完成判定采用 **git 状态判定**（2026-10-15 clarify 裁决）：特性分支的提交已包含于 main（或入口声明的集成分支）且工作树无该分支的未合并/冲突残留，即判合并完成，不设完成哨兵字符串；**push 与远程分支操作缺省不执行**——它们属确认门控破坏性动作清单（真源 `confirmation-gates.md`），仅当入口显式授权 push 时才推送特性分支到远程再合并（G5 裁决：不要 push 除非明确授权；需求简报 §4.5「推特性分支到 origin 再合并」的缺省读法据此修正，本地合并为缺省收尾）。
 - **FR-014**: 全部线收束后，机制 MUST 向用户汇总各线终态（每线：终态阶段、合并结果、遗留异常与证据指针）——无人值守结束于一份可处置的汇总，而非沉默。
 
 #### 独立校验（US2）
 
-- **FR-015**: 阶段完成判定 MUST 由独立 verifier 执行，不靠执行者自报（G1 裁决：阶段校验）：判定条件 = [[STR-001]] 尾标出现（FR-009）+ 产物核验（git log 新增该阶段提交、该阶段 spec 文件存在性）+ 纪律合规抽查（FR-008 的执行要求段未被违反），多条件同时成立方判完成。
-- **FR-016**: verifier 判据 MUST 可被第二位复核者独立复现（承 052 异常分流的可复现性要求）；「尾标在而产物缺」的伪完成 MUST 判未完成——判据以产物为准，[[STR-001]] 尾标仅是必要条件（对应 Edge Case 第 7 条）。
+- **FR-015**: 阶段完成判定 MUST 由独立校验步骤执行，不靠执行者自报（G1 修订裁决：阶段校验——校验者 MUST NOT 是该阶段的执行子代理，可由循环执行侧自身或其另行派发的校验代理承担）：判定条件 = [[STR-001]] 尾标出现（FR-009）+ 产物核验（git log 新增该阶段提交、该阶段 spec 文件存在性）+ 纪律合规抽查（FR-008 的执行要求段未被违反），多条件同时成立方判完成。
+- **FR-016**: 校验判据 MUST 可被第二位复核者独立复现（承 052 异常分流的可复现性要求）；「尾标在而产物缺」的伪完成 MUST 判未完成——判据以产物为准，[[STR-001]] 尾标仅是必要条件（对应 Edge Case 第 7 条）。
 
 #### 卡死处置（US3）
 
-- **FR-017**: preset config MUST 承载卡死处置四类缺省值键并可经入口参数覆盖：阶段超时（缺省 90 分钟）、同阶段重试上限（缺省 2 次）、预算（budget：单线阶段推进上限与每日上限，降级语义沿用 on_80pct report-only / on_100pct halt 形态）、节奏（cadence：连续循环模式的轮询间隔与空闲上限）；数值为 informed guess（见 Assumptions），plan 阶段可修正。
-- **FR-018**: 异常处置 MUST 对齐快速失败纪律（真源 `shared/guidelines/fast-fail.md`）：达重试上限后停环、落线状态、出上送件（052 上送件四要素：发现了什么 / 为何吃重 / 已产生的中间产物逐项可定位 / 可选处置）；MUST NOT 静默等待、MUST NOT 静默修平异常后继续。
-- **FR-019**: 线状态 MUST 落盘为状态脊（当前阶段、已试次数、断点判定、证据指针），跨阶段持久、零上下文可接手（承 `project-cluster`「状态脊是跨周期唯一记忆」约束）——循环 MUST NOT 依赖会话记忆续环。
+- **FR-017**: 卡死处置四类缺省值 MUST 由 skill 固化并可经入口参数覆盖：阶段超时（缺省 90 分钟）、同阶段重试上限（缺省 2 次）、预算（budget：单线阶段推进上限与每日上限，降级语义沿用 on_80pct report-only / on_100pct halt 形态）、节奏（cadence：连续循环模式的轮询间隔与空闲上限）；数值为 informed guess（见 Assumptions），plan 阶段可修正。
+- **FR-018**: 异常处置 MUST 对齐快速失败纪律：达重试上限后停环、落线状态、出上送件（052 上送件四要素：发现了什么 / 为何吃重 / 已产生的中间产物逐项可定位 / 可选处置）；上送件四要素与停环程序 MUST **内联写入 skill**（执行侧无法解析框架文档，不得要求运行时读取 `shared/guidelines/fast-fail.md`）；MUST NOT 静默等待、MUST NOT 静默修平异常后继续。
+- **FR-019**: 线状态 MUST 落盘为状态脊（当前阶段、已试次数、断点判定、证据指针），跨阶段持久、零上下文可接手——循环 MUST NOT 依赖会话记忆续环；状态脊格式与写入时机由 skill 固化（先例：`project-cluster` 预设「状态脊是跨周期唯一记忆」约束）。
 
 #### 多线并行（US5）
 
@@ -221,7 +220,8 @@
 
 - **FR-022**: 本地拓扑 MUST 支持：项目在本机时 qodercli 子代理直接以本地项目为工作目录；需求上下文 MUST 先写成简报文件（形如 `/tmp/<特性>-sdd-brief.md`），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」——不把全部上下文内联进提示词（已验证变体）。
 - **FR-023**: 构建固化变体 MUST 经参数实例化：同一主机按角色分线（不同系统用户在各自目录固化不同层，如基础设施侧与构建配置侧），机制仅经入口参数（执行身份、路径、目标差异）区分两线，MUST NOT 为变体新增机制分支或硬编码角色名。
-- **FR-024**: 机制 MUST 完成注册面与文档面同步：preset 与 skill（[[STR-003]]）进入既有预设/技能注册与匹配机制（`match-team-preset.py` 的匹配面），docs 参考面增补机制说明（双拓扑实例化指引）；注册与文档同步方式遵循框架既有传播机制，不新建传播器。
+- **FR-024**: 机制 MUST 完成注册面与文档面同步：skill（[[STR-003]]）进入框架技能注册与发现面（框架源 `skills/` + `.specify/skills/` 镜像，目录发现机制自动可见）；docs 参考面增补机制说明（双拓扑实例化指引、执行侧可移植性说明）；注册与文档同步方式遵循框架既有传播机制（sync-mirrors / regen-command-copies），不新建传播器。
+- **FR-025**: skill MUST 自包含到「手动放置即可用」，投递形态无关（2026-10-15 clarify 裁决）：宿主原生技能安装、提示词内嵌/粘贴、文件路径引用三种投递形态等价，机制 MUST NOT 绑定任何投递器、MUST NOT 引入下载/安装/版本化分发机制；SC-009 的演练设置据此可复现（宿主环境预先手动放置 skill 文件即为合法投递）。
 
 ### 显式排除项（Out of Scope）
 
@@ -234,13 +234,13 @@
 
 ### Key Entities *(include if requirement involves data)*
 
-- **循环驱动团队（Loop Driver Team）**：preset [[STR-003]] 的实例，承载自迭代环运行；成员含循环主导者、线执行者（每线一个）、线校验者；config 携带校验/预算/节奏默认值。
+- **Skill 手册（Loop Driver Skill）**：机制唯一承载（[[STR-003]]，FR-001）——自包含、可移植的手册，固化阶段骨架 / 五大机制 / 变体 / 纪律条款 / 三硬需求运行规则；执行侧宿主 agent 以原生技能机制加载，零 `.specify/` 依赖。
 - **项目线（Project Line）**：一条目标项目的一次无人值守推进；属性含登录参数、项目路径、终态权威文档、断点判定结果、当前阶段、已试次数；多线并行时彼此隔离（FR-020/FR-021）。
 - **断点（Breakpoint）**：目标项目当前所处的 SDD 阶段判定；由断点探测（FR-005）产出，含「全部阶段已完成仅剩合并」的收尾形态。
 - **阶段提示词文件（Stage Prompt File）**：单阶段的完整指令落盘文件，三段骨架（FR-008）；每阶段一份，随线与阶段命名区分。
 - **Runner 脚本（Runner Script）**：单阶段的子代理执行包装；下一阶段由上一阶段派生（FR-010）。
 - **线状态（Line State）**：状态脊实体（FR-019），落盘持久、零上下文可接手；卡死处置与重入都消费它。
-- **校验结论（Verification Verdict）**：verifier 对单阶段完成判定的可复现结论（FR-015/FR-016），含证据指针。
+- **校验结论（Verification Verdict）**：独立校验步骤对单阶段完成判定的可复现结论（FR-015/FR-016），含证据指针。
 - **收尾汇总（Final Summary）**：全部线收束后的终态报告（FR-014），逐线给出阶段终态、合并结果与遗留异常。
 
 ## Success Criteria *(mandatory)*
@@ -249,12 +249,13 @@
 
 - **SC-001**: 以一次真实或演练驱动作验收（简报 §8 验收方向）：一句话入口发起后到全部线收束，用户「重试/继续」类提醒次数 = 0。
 - **SC-002**: 断点探测正确率 100%：演练注入 ≥3 种断点形态（含「review 后只剩合并 main」收尾场景与「无任何 SDD 制品」首推场景），判定的续跑阶段全部正确。
-- **SC-003**: 伪完成拒绝率 100%：对「尾标在而产物缺」的构造样本，verifier 全部判未完成（变异演练证明校验能红，非恒绿盲检）。
+- **SC-003**: 伪完成拒绝率 100%：对「尾标在而产物缺」的构造样本，校验步骤全部判未完成（变异演练证明校验能红，非恒绿盲检）。
 - **SC-004**: 卡死处置闭环率 100%：注入超时与反复失败场景后，机制自动重试恰达上限、状态落盘、上送件四要素齐备，静默等待时长 = 0。
 - **SC-005**: 双拓扑等价：同一形态的一句话入口在远端（ssh + su + 远端 qodercli）与本地（直驱）两种拓扑下均完成闭环演练。
 - **SC-006**: 纪律合规 100%：演练全程 git 审计显示零越界提交（无关脏文件未被提交/未被还原）、零未授权 push 与远程分支操作。
 - **SC-007**: 多线并行零串扰：≥2 条线并行演练中，各线提交、日志、状态按线隔离，跨线写次数 = 0。
-- **SC-008**: 跨项目零改动实例化：新目标项目仅经入口参数接入并完成演练，机制文件（preset/skill）改动数 = 0。
+- **SC-008**: 跨项目零改动实例化：新目标项目仅经入口参数接入并完成演练，机制文件（skill）改动数 = 0。
+- **SC-009**: 执行侧可移植（G1 修订验收）：在无 `.specify/` 目录、不安装 spec-kit 的宿主环境中，仅加载 skill 文件即完成一次演练闭环，执行侧 spec-kit 依赖数 = 0（目标项目侧的 `.specify/` 依赖不受此限）。
 
 ### Measurement Sources & Collection Methods
 
@@ -265,15 +266,16 @@
 - **SC-005 Source**: 两次拓扑各一次演练的闭环记录（各阶段尾标日志 + 合并结果），归档于特性目录。
 - **SC-006 Source**: 演练前后 git 状态审计（脏文件清单比对 + 远程分支操作审计）。
 - **SC-007 Source**: 并行演练的逐线日志与提交归属核对（每笔提交归属唯一线）。
-- **SC-008 Source**: 实例化前后机制文件（preset/skill）的 diff 审计 + 新项目演练闭环记录。
+- **SC-008 Source**: 实例化前后机制文件（skill）的 diff 审计 + 新项目演练闭环记录。
+- **SC-009 Source**: 演练宿主环境的前置探测记录（无 `.specify/`、无 spec-kit 安装的证据）+ 该环境加载 skill 后的闭环演练记录；依赖审计以执行侧进程对 spec-kit 路径的访问记录为准。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
 
 | String ID | Value (verbatim) | Consumed by |
 |-----------|------------------|-------------|
-| `STR-001` | `-DONE` | FR-008, FR-009, FR-015, FR-016, preset（config/骨架引用）, skill 手册（完成尾标哨兵后缀；完整哨兵 = 大写阶段名 + 本值） |
-| `STR-002` | `requirements → clarify → plan → tasks → implement → review` | FR-005, FR-007, preset（Dynamic Structure 阶段链）, skill 手册（SDD 阶段链规范顺序） |
-| `STR-003` | `sdd-loop-driver` | FR-001, FR-002, FR-024, docs（preset id 与 skill 名共用的机制标识） |
+| `STR-001` | `-DONE` | FR-008, FR-009, FR-015, FR-016, skill 手册（完成尾标哨兵后缀；完整哨兵 = 大写阶段名 + 本值） |
+| `STR-002` | `requirements → clarify → plan → tasks → implement → review` | FR-001, FR-005, FR-007, skill 手册（SDD 阶段链规范顺序） |
+| `STR-003` | `sdd-loop-driver` | FR-001, FR-002, FR-024, docs（skill 名，机制标识） |
 
 **Citation convention**: When an FR, contract, task, or test references one of these strings, write `[[STR-NNN]]` instead of copy-pasting the literal. CI / `/speckit.analyze` can then verify that every `[[STR-NNN]]` reference resolves to a row in this section.
 
@@ -295,3 +297,22 @@ Format: - Q: <question> → A: <answer>
 - Q5: 入口不声明阶段时机制的行为？ → A: **G6 断点续跑是默认能力**——机制必须能自动探测断点并从该阶段继续，含「已到 review 后只剩合并 main」的收尾场景。落点：FR-005、FR-006、FR-019。
 
 > 残留待澄清项：0。全文无活动澄清标记；本轮六条裁决覆盖简报全部开放决策，剩余数值类缺省（阶段超时/重试上限等）以 informed guess 记录于 Assumptions 与 FR-017，属 plan 阶段可修正项而非用户待决项。
+
+### Session 2026-10-15（G1 修订）
+
+- Q1(修订): 机制承载由 Team 改为 Skill——执行侧必须能在脱离 `.specify` 框架与目录结构的情况下运行？ → A: **G1 修订裁决（2026-10-15，取代 Session 2026-10-14 的 G1 Team 承载结论）**。用户理由：通常执行 loop 的主代理**不安装 spec-kit 框架**，team 相关功能（/speckit.team、preset 机制、goal-utils 等引擎）依赖执行侧 `.specify/` 目录，没有 `.specify/` 就无法使用；被驱动子代理所工作的目标项目目录才需要具备 `.specify/` 结构。因此：机制以 skill **唯一承载**（自包含、可移植，经宿主 agent 原生技能机制加载或直接投喂，执行侧 spec-kit 依赖 = 0）；原 G1 的「无人值守三硬需求由 team 的自迭代环 + verifier + budget/cadence 引擎承载」改为「三硬需求的**运行规则**固化进 skill、由 skill 纪律承载」（独立性的最小保证 = 校验者 ≠ 阶段执行者）；原 G2 的「知识归 skill、无人值守运行归 team」收敛为「知识与运行规则都归 skill」。G3–G6 各裁决不受影响。落点：FR-001（唯一承载 + 可移植）、FR-002（五类内容 + 框架纪律内联）、FR-012/FR-015/FR-017/FR-018（运行规则固化）、FR-024（注册面）、US4（重写）、SC-009（新增可移植验收）。
+
+> 残留待澄清项：0（Session 2026-10-15 后）。
+
+### Session 2026-10-15（clarify，Mode A）
+
+> 覆盖扫描经 fresh-context 只读子代理执行（同作者条件成立：本会话完成 G1 修订）；7 项发现中 2 项为规格自身条款唯一决定的顺手修复（现状锚点「引用或内联」统一为内联、US4 计数口径统一为五类），1 条 ANOMALY 为注册表兄弟制品机械残留（已修：features.md 行 SC 计数与 057/058 表述、features/058.md 头部日期与 verifier 残词），余 4 项进入下述裁定。
+
+- Q1: Related Feature 绑定哪个 Feature？ → A: **绑定现有 Feature 058**（编号 1:1 对应；039/042/046/050/052 等候选经绑定先例启发式核验均无本能力归属）。落点：Related Feature 已填 058；注册表义务履行（features/058.md 在册 + 索引行注记）。
+- Q2: 合并 main 的完成哨兵 `MERGE-DONE`（原 Assumption 的 informed guess，FR-005/Edge 11 消费但无条款定义）如何处置？ → A: **git 状态判定，不设哨兵字符串**——合并完成判定条件：特性分支提交已包含于集成分支且无未合并/冲突残留（FR-013 补条款）；不新增 STR 行。原 MERGE-DONE 读法作废（Assumptions 已改写）。
+- Q3: skill 文件如何到达零 spec-kit 的宿主 agent（SC-009 假定「仅加载 skill 文件」但无投递条款）？ → A: **投递形态无关 + 手动投递在范围内**——宿主技能安装/粘贴/路径引用三形态等价，MUST NOT 绑定投递器或引入下载/版本化分发机制（FR-025 新增）；SC-009 演练设置=宿主环境预先手动放置 skill 文件。
+- Q4: skill 分类标注 internal vs external（glossary 两判据指向相反）？ → A: **external**（依依赖轴：skill 自身零 spec-kit 依赖、任何宿主可加载，与 G1 修订同轴；框架项目内宿主发现面可见使一遍性入口零摩擦）。词面张力经 frontmatter 注解消解（Assumptions 已改写）；plan 阶段按 external 落位注册面。
+
+> 和解注记（原 G1 修订遗留张力）：简报 §6 反对单 skill 的理由「循环纪律靠模型自觉、长跑后可能断环」在本架构下的答案是 **FR-019 状态脊**——循环状态每步落盘、零上下文可接手，续环不依赖会话记忆，断环即从状态脊重入；skill 纪律承载的是「写状态脊」的程序义务而非模型自觉。
+
+> 残留待澄清项：0（Session 2026-10-15 clarify 后）。
