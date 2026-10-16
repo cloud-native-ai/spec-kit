@@ -19,7 +19,7 @@
 - DoD-5: 边界隔离零违例(SC-004:打包产物零含量化记录、全部记录凭据形值零出现)且采不到字段 100% 显式未采标记(SC-002)
 - DoD-6: 验证对照 `requirements.md` SC-001..004 逐条留痕于 `verification.md`(implement 期产出)
 
-**DoD Status**: pending
+**DoD Status**: met(2026-10-16 implement 期末复验——DoD-1 契约测试 48/48 绿;DoD-2 全套件 3240 passed、`comm -13` 对冻结基线为空(10 失败名与基线逐名全等);DoD-3 `notes/quickstart-run.md` 五场景实跑留痕、`notes/red-first-evidence.md` 三节取证;DoD-4 注册表双 validate exit 0(10 classes/112 objects/9 handlers/51 bindings)+ 行预算与传播序测试绿 + 双镜像 `--check` exit 0;DoD-5 打包产物零量化条目、全记录凭据形值零命中、未采字段 100% 显式标记(5 not_evaluated/0 null/0 empty);DoD-6 `verification.md` SC-001..004 全 pass 留痕)
 
 ## Completion Gate
 
@@ -136,7 +136,7 @@ A `/speckit.implement` run is considered complete when **zero `[ ]` or `[>]` row
 
 > **Regression-net note**: these clauses guard behavior already implemented in US1/US2 (cap, credential scan, carried consistency, non-blocking were built with T005; append-only is structural). Per the migration/regression exception they are authored AFTER their subjects, pinned by `[blockedBy: T011]` — not red-first; no red evidence is owed.
 
-- [ ] T013 [US3] [blockedBy: T011] Append the boundary regression clauses to `tests/contract/test_exec_quant_engine.py` (this file's US3 partition = `contracts/exec-quant-cli.md` 交叉约束 + data-model.md V4–V8; T003/T010 partitions untouched): V4 append-only (no action rewrites or reorders existing records.jsonl / scores.jsonl lines), V5 64 KiB cap (an oversized serialized record is truncated per-field and `truncated` is non-empty iff truncation happened), V6 credential-shape defense scan (zero credential-shaped values — api key / token / secret / authorization shapes — in any record, SC-004), V7 carried consistency (`run_id_resolution` explicit/adopted → carried values match the determination record exactly; `synthesized` → all carried fields are `not_evaluated`), V8 non-blocking (collection/write failure → exit 1 + visible stderr, no exception propagates into the caller), plus the packaging structural-exclusion premise re-check per quickstart scenario 4 ⑪ (feedback `package` reads only the feedback store — behavior asserted via the existing `tests/integration/test_feedback_*.py` suite, not re-derived here)
+- [X] T013 [US3] [blockedBy: T011] Append the boundary regression clauses to `tests/contract/test_exec_quant_engine.py` (this file's US3 partition = `contracts/exec-quant-cli.md` 交叉约束 + data-model.md V4–V8; T003/T010 partitions untouched): V4 append-only (no action rewrites or reorders existing records.jsonl / scores.jsonl lines), V5 64 KiB cap (an oversized serialized record is truncated per-field and `truncated` is non-empty iff truncation happened), V6 credential-shape defense scan (zero credential-shaped values — api key / token / secret / authorization shapes — in any record, SC-004), V7 carried consistency (`run_id_resolution` explicit/adopted → carried values match the determination record exactly; `synthesized` → all carried fields are `not_evaluated`), V8 non-blocking (collection/write failure → exit 1 + visible stderr, no exception propagates into the caller), plus the packaging structural-exclusion premise re-check per quickstart scenario 4 ⑪ (feedback `package` reads only the feedback store — behavior asserted via the existing `tests/integration/test_feedback_*.py` suite, not re-derived here)
 
 ### Implementation for User Story 3
 
@@ -151,7 +151,7 @@ A `/speckit.implement` run is considered complete when **zero `[ ]` or `[>]` row
 
 **Purpose**: 跨故事的收尾义务;不改行为。
 
-- [ ] T016 Docs adjudication (docs-step discipline — adjudicate, never blind-edit): review `docs/reference/skills/probe.md` against the new registry rows (scripts-slice Class exec-quant, Handler h-exec-quant + Binding @point:wrap-up/all) and decide whether its pointer/index content needs an update; record the decision and its rationale during implement wrap-up in `.specify/specs/059-exec-quant-recording/verification.md`; update the doc only if its own governance requires the change (plan Source-Structure note: 「实现期 docs-step 裁定,不盲改」)
+- [X] T016 Docs adjudication (docs-step discipline — adjudicate, never blind-edit): review `docs/reference/skills/probe.md` against the new registry rows (scripts-slice Class exec-quant, Handler h-exec-quant + Binding @point:wrap-up/all) and decide whether its pointer/index content needs an update; record the decision and its rationale during implement wrap-up in `.specify/specs/059-exec-quant-recording/verification.md`; update the doc only if its own governance requires the change (plan Source-Structure note: 「实现期 docs-step 裁定,不盲改」)
 
 ---
 
