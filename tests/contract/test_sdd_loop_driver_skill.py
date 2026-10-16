@@ -20,6 +20,7 @@ SKILL_MD = SKILL_DIR / "SKILL.md"
 
 PINNED_H2_SECTIONS = [
     "What This Skill Does",
+    "Driver Topology（驱动拓扑，反嵌套红线）",
     "When to Load",
     "The Loop (U0–U6)",
     "Hard Requirements",
@@ -434,3 +435,24 @@ def test_c14_preflight_checks_inlined():
     # uncertainty escalates to the user; verdicts land in the state spine
     assert "提示用户补充" in text or "上送用户补充" in text
     assert "状态脊" in text
+
+
+# ---------------------------------------------------------------- C-20
+# Driver Topology anti-nesting redline (defect fix 2026-10-16: a session
+# fed the manual to a subagent, which spawned its own subagent — driver
+# hierarchy escaped and the session's loop was silently bypassed).
+
+
+def test_c20_driver_topology_redline_pinned():
+    text = _skill_text()
+    assert "## Driver Topology（驱动拓扑，反嵌套红线）" in text
+    assert "加载本手册的宿主 agent 就是驱动者" in text
+    assert "禁止嵌套驱动" in text
+    assert "循环层级恒为 1" in text
+    assert "MUST NOT 加载本手册" in text
+    # HR-6 carries the same rule in the Hard Requirements list
+    hr6 = re.search(r"^6\. \*\*驱动拓扑\*\*.*$", text, re.MULTILINE)
+    assert hr6, "Hard Requirement 6 (driver topology) missing"
+    # the redline is restated at both dispatch surfaces
+    assert "不得引用本技能" in _recipes_text()
+    assert "禁止引用 sdd-loop-driver" in _prompts_text()

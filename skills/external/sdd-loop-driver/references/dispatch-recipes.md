@@ -2,19 +2,19 @@
 
 > 本文件是宿主 agent 驱动外部子代理的**操作手册**：全部命令形态自包含可用，不依赖任何框架文档（对撰写底稿的引用仅为溯源注解）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。
 
-## Preflight — 前置检查（真正流程执行之前，U0 与 U1 之间）
+## Preflight — 前置检查（本技能独立运行所必需；U0 与 U1 之间）
 
-> 五族前置检查是机制能否正确运行的先决条件；任一项无法自动核验或核验结果不确定时，**停在前置阶段、提示用户补充**该信息，MUST NOT 猜测续跑。检查结论（逐项 ok / fail / uncertain）写入该线状态脊的**前置检查段**，失败项附修复动作。
+> 五族前置检查是机制能否正确运行的先决条件，**由本技能自持**（与 sdd-project-setup 各自独立、互不强依赖）。任一项无法自动核验或核验结果不确定时，停在前置阶段、提示用户补充或按失败分类处置。检查结论（逐项 ok / fail / uncertain）以**每项 ≤3 行摘要**写入该线状态脊的前置检查段。
 
 | # | 检查 | 命令形态 | 判定 |
 |---|------|----------|------|
-| ① | SSH 连通性（**本地拓扑跳过**） | `ssh -o ConnectTimeout=5 -o BatchMode=yes <alias> true` | 限时内返回 0 = ok；超时/拒绝 = fail（附修复：网络/凭证/别名） |
-| ② | 非 root 运行用户存在性 | `ssh <alias> "id <run-user>"` | 输出含 `uid=` 且 `uid=<n>` 中 n ≠ 0 = ok；用户不存在或 uid=0 = fail（root 不能作为运行身份） |
-| ③ | 子代理 CLI 可用性与版本 | `ssh <alias> "su - <run-user> -c '<cli> --version'"` | 版本串输出 = ok（记录版本号进状态脊）；命令不存在/不在执行身份 PATH = fail |
-| ④ | 大语言模型配置 | 经宿主 CLI 配置面核验：模型（model）、context size、effort 三项当前生效值 | 三项齐备且可读 = ok（记录进状态脊）；配置面不可读或项缺失 = **uncertain → 提示用户补充**（形态因 CLI 而异，不猜测） |
-| ⑤ | spec-kit 框架可用性（目标项目侧） | `ssh <alias> "cd <project-dir> && test -d .specify && test -f .specify/memory/constitution.md && cat .specify/source.json 2>/dev/null"` | `.specify/` 存在且宪法在位 = 初始化 ok；`source.json` 提供框架版本 provenance（缺失 = 版本未知，报告）；未安装/未初始化 = fail（对应边界：不自动初始化，停线上送） |
+| ① | SSH 连通性（**本地拓扑跳过**） | `ssh -o ConnectTimeout=5 -o BatchMode=yes <alias> true` | 限时内 0 = ok；超时/拒绝 = fail |
+| ② | 非 root 运行用户存在性 | `ssh <alias> "id <run-user>"` | uid≠0 = ok；不存在或 uid=0 = fail |
+| ③ | 子代理 CLI 可用性与版本 | `ssh <alias> "su - <run-user> -c '<cli> --version'"` | 版本串 = ok（记录进状态脊）；不在 PATH = fail |
+| ④ | 大语言模型配置 | 经宿主 CLI 配置面核验 model/context/effort 三项 | 齐备可读 = ok；不可读 = **uncertain → 列待补清单**（形态因 CLI 而异，不猜测） |
+| ⑤ | spec-kit 框架可用性（目标项目侧） | `ssh <alias> "cd <project-dir> && test -d .specify && test -f .specify/memory/constitution.md && cat .specify/source.json 2>/dev/null"` | 在位 = ok；缺失/退化 = **fail → handoff sdd-project-setup**（见下） |
 
-程序：五项逐条执行 → 结论（ok / fail / uncertain + 证据）以**每项 ≤3 行摘要**写入状态脊前置检查段（不全量回显）→ 全 ok 才进入 Recipe 0；存在 fail = 停线并按上送件四要素报告；存在 uncertain = 停线并列出**待用户补充的信息清单**，用户补充后重入前置检查。
+**失败处置的软协同**：⑤ fail（`.specify/` 缺失或宪法不在位）时，**handoff 给 sdd-project-setup 技能**处置（缺失=install 模式、退化=refresh 模式）——本技能不执行框架初始化；处置完成回本循环重跑 preflight。①②③ fail 停线并按上送件四要素报告；④ uncertain 列出待用户补充的信息清单。与 sdd-project-setup 的完整边界见其 setup-recipes.md「软协同契约」。
 
 ## Recipe 0 — 断点探测（Breakpoint Probe）
 
@@ -36,7 +36,7 @@ ssh <alias> "cat > /home/<run-user>/prompt-<line>-<stage>.md" <<'EOF'
 EOF
 ```
 
-提示词三段骨架（背景与权威文档 / 执行要求 / 完成尾标与回传契约）见 `stage-prompts.md`——本配方只管落盘。
+提示词三段骨架（背景与权威文档 / 执行要求 / 完成尾标与回传契约）见 `stage-prompts.md`——本配方只管落盘。**红线：提示词体不得引用本技能（sdd-loop-driver）或任何驱动/循环机制**——子代理只执行阶段命令，不加载技能、不感知循环（反嵌套拓扑见 SKILL.md「Driver Topology」节）。
 
 ## Recipe 2 — Runner 脚本与派生（Runner & Derivation）
 
@@ -58,7 +58,7 @@ rc=$?; kill $HB 2>/dev/null; exit $rc
 ```bash
 # 1) 远端侧脱离派发：nohup 使子代理脱离 ssh 会话存活；日志重定向在 su -c 内层，
 #    归属 run-user（外层重定向会以本地身份落盘，run-user 不可 tail）
-ssh <alias> "nohup su - <run-user> -c 'bash /home/<run-user>/run-<line>-<stage>.sh > /home/<run-user>/log-<line>-<stage>.log 2>&1' &"
+ssh <alias> "nohup su - <run-user> -c 'bash /home/<run-user>/run-<line>-<stage>.sh > /home/<run-user>/log-<line>-<stage>.log 2>&1' < /dev/null > /dev/null 2>&1 &"
 # 2) 主代理按 cadence 主动检查（一次调用合并心跳+日志两路信号，输出 ≤4 行）：
 ssh <alias> "tail -1 /home/<run-user>/heartbeat-<line>-<stage>.log; tail -3 /home/<run-user>/log-<line>-<stage>.log"
 ```
@@ -66,6 +66,7 @@ ssh <alias> "tail -1 /home/<run-user>/heartbeat-<line>-<stage>.log; tail -3 /hom
 要点：
 
 - **脱离（detached）优先于前台**：`nohup … &` 让远端进程独立于 ssh 连接存活；派发命令立即返回，主代理随后按间隔发起独立的检查连接。简化变体（本地 ssh 后台 `ssh … "su - …" > 本地日志 2>&1 &`）仅适用于短阶段且连接稳定时——连接断开会杀掉子代理，故**缺省用脱离形态**。
+- **外层三重重定向必须**：`nohup` 任务本体之外再带 `< /dev/null > /dev/null 2>&1`——缺省时后台任务继承 ssh 通道的 stdio，本地 ssh 挂起直到超时（实测 2026-10-16：每次派发白烧一次 2 分钟本地超时，进程虽照常启动但驱动者节拍被打断）。
 - **心跳即存活信号**：阶段日志受 `-p` 缓冲影响在退出前静默，心跳文件是「进程活着」的确定信号；**心跳停跳且进程消失** = 卡死判定信号（单看任一都不是）。
 - **cadence 分级（入口可覆盖）**：requirements/clarify/tasks 建议 120–240s；plan/implement/review 建议 300–600s——长阶段高频轮询只烧驱动者预算不增信息。
 - **多线批查**：一次 ssh 调用合并检查多条线（各自 tail 心跳+日志），**判定仍逐线独立做**；检查输出只保留心跳行与日志尾部 ≤4 行/线，哨兵未现且进程存活时无需更多输出。
