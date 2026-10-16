@@ -155,3 +155,4 @@
 | 窄读法授权 | narrow-read authorization | 多线/多 spec 并行时对已声明并发隔离项的显式、逐项、有界放行机制（058 FR-021；源自 xuanji-images 沉淀的并行纪律）；不存在隐式放行 | auto | proposed |
 | 状态脊 | - | 跨周期唯一记忆的落盘状态文件：循环/长跑机制在每个状态转移点先写状态后行动，续环与重入仅凭状态脊恢复、不依赖会话记忆（先例 project-cluster 约束；058 线状态实体为其实例化） | auto | proposed |
 | 一遍性入口 | - | 用户以单条提示词声明目标与起点（哪个项目、断点在哪、终态权威文档）发起无人值守推进的入口形态；执行细节全部由机制内部承接，不要求用户学新话术或逐次提醒（058 G4 裁决） | auto | proposed |
+| 执行量化记录 | - | spec-kit 对「agent 程序+LLM」执行的量化遥测记录:每受测单元每次执行一条,身份 (unit_id, unit_type, run_id),三字段组=agent 程序/LLM 详细/质量(时长·token·错误次数)+可选打分;Recording-Only(分析/报表/聚合为后续特性);落独立持久存储,不入 feedback store、永不自动上送;采不到的字段显式 not_evaluated,禁臆造;与运行判定并行组合、按 run 关联携带。真源 .specify/specs/059-exec-quant-recording/requirements.md | auto | proposed |
