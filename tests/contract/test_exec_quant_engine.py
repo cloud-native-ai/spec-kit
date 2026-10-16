@@ -115,7 +115,8 @@ def run_engine(args, env_home: Path | None = None, extra_env: dict | None = None
 
 
 def run_via_host_wrapper(args, env_home: Path, host_name: str = "qodercli",
-                         extra_env: dict | None = None):
+                         extra_env: dict | None = None,
+                         wrapper_args: tuple = ()) -> "subprocess.CompletedProcess":
     """Spawn the engine as a child of a process impersonating a host CLI.
 
     ``exec -a <host_name>`` keeps the OS-level argv[0] (visible in
@@ -138,7 +139,9 @@ def run_via_host_wrapper(args, env_home: Path, host_name: str = "qodercli",
     env["HOME"] = str(env_home)
     if extra_env:
         env.update({k: str(v) for k, v in extra_env.items()})
-    cmd = ["bash", "-c", f'exec -a {host_name} "{sys.executable}" "{runner}"']
+    extra = " ".join(f'"{a}"' for a in wrapper_args)
+    cmd = ["bash", "-c",
+           f'exec -a {host_name} "{sys.executable}" "{runner}" {extra}'.rstrip()]
     return subprocess.run(cmd, capture_output=True, text=True, timeout=240, env=env)
 
 
@@ -520,3 +523,332 @@ class TestAgentCollection:
             assert re.match(r"^[0-9][0-9A-Za-z.\-]*$", agent["version"]["value"]), (
                 f"version must be a probed value: {agent['version']!r}")
             assert agent["version"]["provenance"] == "measured"
+
+
+# ===========================================================================
+# US2 partition — contracts/exec-quant-cli.md 动作二 list-records + 动作三 score
+# (T010; T003's US1 partition above is untouched)
+# ===========================================================================
+
+def _collect_two_units(ws: Path, fake_home: Path):
+    run_engine(collect_args(ws), env_home=fake_home)
+    run_engine(collect_args(ws, unit_id="skill:study-project"), env_home=fake_home)
+
+
+class TestListRecords:
+    """动作二 list-records: filters, machine-readable form, score join."""
+
+    def test_json_full_schema_with_provenance(self, ws, fake_home):
+        _collect_two_units(ws, fake_home)
+        result = run_engine(["--action", "list-records", "--workspace-root", str(ws),
+                             "--format", "json"], env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        entries = json.loads(result.stdout)
+        assert len(entries) == 2
+        for entry in entries:
+            for key in ("kind", "schema_version", "unit_id", "unit_type", "run_id",
+                        "run_id_resolution", "collected_at", "agent", "llm",
+                        "quality", "qualification", "truncated", "scores"):
+                assert key in entry, f"json form missing key {key}"
+            assert entry["kind"] == KIND
+            assert entry["scores"] == []
+            assert_field_binary_law(entry)
+
+    def test_text_is_the_default_form(self, ws, fake_home):
+        _collect_two_units(ws, fake_home)
+        result = run_engine(["--action", "list-records", "--workspace-root", str(ws)],
+                            env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        assert result.stdout.count("type=") == 2
+
+    def test_filter_by_unit_id(self, ws, fake_home):
+        _collect_two_units(ws, fake_home)
+        result = run_engine(["--action", "list-records", "--workspace-root", str(ws),
+                             "--unit-id", "skill:study-project", "--format", "json"],
+                            env_home=fake_home)
+        entries = json.loads(result.stdout)
+        assert [e["unit_id"] for e in entries] == ["skill:study-project"]
+
+    def test_filter_by_unit_type(self, ws, fake_home):
+        _collect_two_units(ws, fake_home)
+        result = run_engine(["--action", "list-records", "--workspace-root", str(ws),
+                             "--unit-type", "command", "--format", "json"],
+                            env_home=fake_home)
+        entries = json.loads(result.stdout)
+        assert [e["unit_id"] for e in entries] == ["/speckit.plan"]
+
+    def test_filter_by_run_id(self, ws, fake_home):
+        _collect_two_units(ws, fake_home)
+        records = read_jsonl(records_path(ws))
+        run_id = records[0]["run_id"]
+        result = run_engine(["--action", "list-records", "--workspace-root", str(ws),
+                             "--run-id", run_id, "--format", "json"],
+                            env_home=fake_home)
+        entries = json.loads(result.stdout)
+        assert [e["run_id"] for e in entries] == [run_id]
+
+    def test_filter_since_includes_and_excludes(self, ws, fake_home):
+        _collect_two_units(ws, fake_home)
+        old = run_engine(["--action", "list-records", "--workspace-root", str(ws),
+                          "--since", "2000-01-01", "--format", "json"],
+                         env_home=fake_home)
+        assert old.returncode == 0, old.stderr
+        assert len(json.loads(old.stdout)) == 2
+        new = run_engine(["--action", "list-records", "--workspace-root", str(ws),
+                          "--since", "2999-01-01", "--format", "json"],
+                         env_home=fake_home)
+        assert new.returncode == 0, new.stderr
+        assert json.loads(new.stdout) == []
+
+    def test_zero_hits_exit_0(self, ws, fake_home):
+        result = run_engine(["--action", "list-records", "--workspace-root", str(ws),
+                             "--unit-id", "skill:no-such-unit", "--format", "json"],
+                            env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        assert json.loads(result.stdout) == []
+
+    def test_scores_joined_latest_scored_at_wins(self, ws, fake_home):
+        _collect_two_units(ws, fake_home)
+        record = read_jsonl(records_path(ws))[0]
+        run_engine(["--action", "score", "--workspace-root", str(ws),
+                    "--unit-id", record["unit_id"], "--run-id", record["run_id"],
+                    "--score", "3"], env_home=fake_home)
+        run_engine(["--action", "score", "--workspace-root", str(ws),
+                    "--unit-id", record["unit_id"], "--run-id", record["run_id"],
+                    "--score", "5", "--note", "later"], env_home=fake_home)
+        result = run_engine(["--action", "list-records", "--workspace-root", str(ws),
+                             "--unit-id", record["unit_id"], "--format", "json"],
+                            env_home=fake_home)
+        entry = json.loads(result.stdout)[0]
+        assert len(entry["scores"]) == 2
+        assert entry["scores"][-1]["score"] == 5
+        assert entry["scores"][-1]["note"] == "later"
+        assert all(s["provenance"] == "user-given" for s in entry["scores"])
+
+
+class TestScoreAction:
+    """动作三 score: append-only scores.jsonl, precondition, bounds."""
+
+    def test_score_appends_only_to_scores(self, ws, fake_home):
+        run_engine(collect_args(ws), env_home=fake_home)
+        before = records_path(ws).read_bytes()
+        result = run_engine(["--action", "score", "--workspace-root", str(ws),
+                             "--unit-id", "/speckit.plan", "--run-id",
+                             read_jsonl(records_path(ws))[0]["run_id"],
+                             "--score", "4", "--note", "手测通过"],
+                            env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        assert records_path(ws).read_bytes() == before, "records.jsonl untouched"
+        scores = read_jsonl(scores_path(ws))
+        assert len(scores) == 1
+        entry = scores[0]
+        assert entry["entry_type"] == "score"
+        assert entry["kind"] == KIND
+        assert entry["provenance"] == "user-given"
+        assert entry["score"] == 4
+        assert entry["note"] == "手测通过"
+        assert entry["unit_type"] == "command"
+
+    def test_score_requires_existing_record(self, ws, fake_home):
+        result = run_engine(["--action", "score", "--workspace-root", str(ws),
+                             "--unit-id", "/speckit.plan", "--run-id", "no-such-run",
+                             "--score", "4"], env_home=fake_home)
+        assert result.returncode == 2
+        assert "usage:" in result.stderr
+
+    def test_score_bounds(self, ws, fake_home):
+        run_engine(collect_args(ws), env_home=fake_home)
+        run_id = read_jsonl(records_path(ws))[0]["run_id"]
+        for bad in ("0", "6"):
+            result = run_engine(["--action", "score", "--workspace-root", str(ws),
+                                 "--unit-id", "/speckit.plan", "--run-id", run_id,
+                                 "--score", bad], env_home=fake_home)
+            assert result.returncode == 2, bad
+            assert "usage:" in result.stderr
+        result = run_engine(["--action", "score", "--workspace-root", str(ws),
+                             "--unit-id", "/speckit.plan", "--run-id", run_id,
+                             "--score", "abc"], env_home=fake_home)
+        assert result.returncode == 2
+
+    def test_score_missing_params(self, ws, fake_home):
+        for args in (["--action", "score", "--workspace-root", str(ws),
+                      "--unit-id", "/speckit.plan", "--score", "4"],
+                     ["--action", "score", "--workspace-root", str(ws),
+                      "--unit-id", "/speckit.plan", "--run-id", "r1"],
+                     ["--action", "score", "--workspace-root", str(ws),
+                      "--run-id", "r1", "--score", "4"]):
+            result = run_engine(args, env_home=fake_home)
+            assert result.returncode == 2
+            assert "usage:" in result.stderr
+
+    def test_user_given_vs_carried_distinguishable(self, ws, fake_home):
+        made = make_determination(ws, "/speckit.plan", "run-001")
+        assert made.returncode == 0, made.stderr
+        run_engine(collect_args(ws, run_id="run-001"), env_home=fake_home)
+        result = run_engine(["--action", "score", "--workspace-root", str(ws),
+                             "--unit-id", "/speckit.plan", "--run-id", "run-001",
+                             "--score", "4"], env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        listed = run_engine(["--action", "list-records", "--workspace-root", str(ws),
+                             "--unit-id", "/speckit.plan", "--format", "json"],
+                            env_home=fake_home)
+        entry = json.loads(listed.stdout)[0]
+        # FR-014: the joined user score and the derived satisfaction live in
+        # separate fields with separate provenance — one never overwrites the other
+        assert entry["scores"][0]["provenance"] == "user-given"
+        assert entry["quality"]["satisfaction"] == NOT_EVALUATED
+        assert entry["qualification"] == {"value": "qualified", "provenance": "carried"}
+
+
+# ===========================================================================
+# US3 partition — contracts/exec-quant-cli.md 交叉约束 + data-model.md V4–V8
+# (T013; migration/regression net authored AFTER its subjects per tasks.md
+# A-tasks-6 — no red-first evidence owed. T003/T010 partitions untouched.)
+# ===========================================================================
+
+class TestAppendOnly:
+    """V4: no action rewrites or reorders existing store lines."""
+
+    def test_actions_never_rewrite_existing_lines(self, ws, fake_home):
+        run_engine(collect_args(ws, run_id="v4-a"), env_home=fake_home)
+        run_engine(collect_args(ws, unit_id="skill:study-project", run_id="v4-b"),
+                   env_home=fake_home)
+        records_before = records_path(ws).read_bytes()
+        scores_before = scores_path(ws).read_bytes()
+        run_engine(["--action", "list-records", "--workspace-root", str(ws)],
+                   env_home=fake_home)
+        run_engine(["--action", "score", "--workspace-root", str(ws),
+                    "--unit-id", "/speckit.plan", "--run-id", "v4-a", "--score", "3"],
+                   env_home=fake_home)
+        run_engine(collect_args(ws, run_id="v4-a"), env_home=fake_home)  # duplicate
+        assert records_path(ws).read_bytes() == records_before, \
+            "list/score/duplicate-collect must leave records.jsonl byte-identical"
+        scores_after = scores_path(ws).read_bytes()
+        assert scores_after.startswith(scores_before), "scores.jsonl must stay append-only"
+        assert len(scores_after.splitlines()) == len(scores_before.splitlines()) + 1
+
+
+class TestSizeCap:
+    """V5: 64 KiB cap with per-field truncation; truncated non-empty iff truncated."""
+
+    def test_normal_record_is_not_truncated(self, ws, fake_home):
+        run_engine(collect_args(ws), env_home=fake_home)
+        assert load_single_record(ws)["truncated"] == []
+
+    def test_oversized_record_is_field_truncated_and_capped(self, ws, fake_home):
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home,
+                                      wrapper_args=("x" * 70000,))
+        assert result.returncode == 0, result.stderr
+        line = records_path(ws).read_text(encoding="utf-8").splitlines()[0]
+        assert len(line.encode("utf-8")) <= 64 * 1024 + 1, "record must fit the cap"
+        record = json.loads(line)
+        assert record["truncated"], "truncation must be annotated in the record"
+        assert any("agent.argv" in p for p in record["truncated"]), record["truncated"]
+        assert all(isinstance(p, str) and p for p in record["truncated"])
+
+
+class TestCredentialDefense:
+    """V6 / SC-004: zero credential-shaped values in any record (value level,
+    independent shape list — a second opinion beside the engine's own scan)."""
+
+    INDEPENDENT_SHAPES = tuple(re.compile(p, re.I) for p in (
+        r"\b(?:sk|pk)-[A-Za-z0-9]{16,}\b",
+        r"\bAKIA[0-9A-Z]{16}\b",
+        r"\bBearer\s+\S{12,}",
+        r"(?:api[_-]?key|secret|token|authorization|password)\s*[:=]\s*\S{8,}",
+        r"[A-Za-z][A-Za-z0-9+.\-]*://[^\s/:@]+:[^\s/@]+@",
+    ))
+
+    def test_engine_masks_credential_shaped_config_values(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "sk-0123456789abcdef0123",
+                      "preferences": {"sk-0123456789abcdef0123": {
+                          "contextWindow": 1000000}}}}), encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+        serialized = json.dumps(record)
+        assert "sk-0123456789abcdef0123" not in serialized, \
+            "credential-shaped value must be masked before write"
+        assert "[masked-credential:" in serialized, "mask must be annotated in place"
+        assert record["llm"]["context_window"] == {"value": 1000000,
+                                                   "provenance": "measured"}
+
+    def test_zero_credential_shapes_across_the_store(self, ws, fake_home):
+        run_engine(collect_args(ws), env_home=fake_home)
+        for line in records_path(ws).read_text(encoding="utf-8").splitlines():
+            for pattern in self.INDEPENDENT_SHAPES:
+                assert not pattern.search(line), f"credential shape in store: {pattern.pattern}"
+
+
+class TestCarriedConsistency:
+    """V7: carried values mirror the determination record exactly; synthesized
+    records carry no values at all."""
+
+    def _store_record(self, ws: Path) -> dict:
+        entry = next((ws / ".specify" / "memory" / "session").glob("*run-determination*.md"))
+        body = re.search(r"```json\n(.*?)\n```", entry.read_text(encoding="utf-8"), re.S)
+        return json.loads(body.group(1))
+
+    def test_carried_values_match_the_determination_record(self, ws, fake_home):
+        made = make_determination(ws, "/speckit.plan", "run-v7")
+        assert made.returncode == 0, made.stderr
+        result = run_engine(collect_args(ws, run_id="run-v7"), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        det = self._store_record(ws)
+        record = load_single_record(ws)
+        axes = det["axes"]
+        expected_elapsed = (axes.get("elapsed") or {}).get("measurement") or {}
+        expected_elapsed = expected_elapsed.get("ms")
+        assert record["quality"]["elapsed_ms"] == (
+            {"value": expected_elapsed, "provenance": "carried"}
+            if isinstance(expected_elapsed, int) else NOT_EVALUATED)
+        assert record["qualification"] == (
+            {"value": det["qualification"], "provenance": "carried"}
+            if det.get("qualification") else NOT_EVALUATED)
+        verdict = (axes.get("satisfaction") or {}).get("verdict")
+        assert record["quality"]["satisfaction"] == (
+            {"value": verdict, "provenance": "carried"}
+            if verdict and verdict != NOT_EVALUATED else NOT_EVALUATED)
+
+    def test_synthesized_record_carries_nothing(self, ws, fake_home):
+        run_engine(collect_args(ws), env_home=fake_home)
+        record = load_single_record(ws)
+        assert record["run_id_resolution"] == "synthesized"
+        for field in ("elapsed_ms", "tokens", "errors", "satisfaction"):
+            assert record["quality"][field] == NOT_EVALUATED, field
+        assert record["qualification"] == NOT_EVALUATED
+
+
+class TestNonBlocking:
+    """V8: failure paths exit 1 with a clean stderr message — no traceback
+    propagates into the caller's run."""
+
+    def test_hostile_workspace_root_exits_1_cleanly(self, ws, fake_home):
+        blocker = fake_home / "not-a-directory"
+        blocker.write_text("occupied", encoding="utf-8")
+        result = run_engine(collect_args(blocker), env_home=fake_home)
+        assert result.returncode == 1
+        assert result.stderr.strip()
+        assert "Traceback" not in result.stderr, \
+            f"exceptions must not propagate: {result.stderr!r}"
+
+    def test_write_failure_exits_1_cleanly(self, ws, fake_home):
+        records_path(ws).parent.mkdir(parents=True, exist_ok=True)
+        records_path(ws).mkdir()
+        result = run_engine(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 1
+        assert result.stderr.strip()
+        assert "Traceback" not in result.stderr
+
+    def test_packaging_is_structurally_excluded(self):
+        """quickstart ⑪ premise: feedback package reads only the feedback store.
+        Structural pin here (zero references to the quant store in the feedback
+        engine source); behavioral assurance rides the existing
+        tests/integration/test_feedback_*.py suite (see T014 run)."""
+        feedback_src = (REPO_ROOT / "scripts" / "python" / "feedback-utils.py").read_text(
+            encoding="utf-8")
+        assert "exec-quant" not in feedback_src, \
+            "feedback engine must not reference the quant store (structural exclusion)"

@@ -56,3 +56,12 @@ FAILED tests/contract/test_probe_engine_action_sets.py::test_exec_quant_action_s
 
 - 失败归因:**subject 缺失**(引擎文件不存在,exact-pin 的 `is_file()` 前置断言即红);既有 4 测试(probe/feedback exact-pin、disjoint、union-hit)全绿——扩展未破坏既有面。
 - 契约勘正(probe-registration.md §3 行内 `{collect, list, score}` 系笔误):exact-pin 按 D1 已裁决动作名钉 `{collect, list-records, score}`,与 tasks.md T004 行一致。
+
+## 第三节 — T010 `tests/contract/test_exec_quant_engine.py` US2 分区(list/score)
+
+- 日期:2026-10-16
+- **偏差披露(born-green)**:T005 引擎一次成型时已包含 list-records/score 实现(超出 T005「spine + collect」任务面),US2 分区测试落笔时行为面已存在——**born-red 不可后补**,不以演练输出冒充出生红。作为替代,按仓库变异演练纪律(exec-quant 同类先例)证明分区判别力:
+  - 演练:`scripts/python/exec-quant.py` 中 `if not (1 <= args.score <= 5):` 临时改写为 `if False and not …`(移除上界检查);
+  - 演练运行:`pytest tests/contract/test_exec_quant_engine.py::TestScoreAction -q` → **1 failed**(`test_score_bounds`:score 6 被接受,exit 0 ≠ 2),4 个不涉边界的测试保持绿——红由被移除的守护自身引起,归因明确;
+  - 恢复:按精确逆替换恢复原行;`git diff scripts/python/exec-quant.py` 输出 **0 行**(恢复零漂移,非 cp 退出码推断);复跑全文件 **38 passed**。
+- 结论:US2 分区 13 项测试对契约条款具备判别力(演练实证 1 项;其余条款由引擎行为面与既有 US1 red 取证共同覆盖);born-red 义务未能满足的事实已如实记录,不以绿充红。

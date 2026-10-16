@@ -46,3 +46,31 @@ V2 field binary law: PASS
 SC-002 判定:已知采不到字段(未设置的 reasoning effort、生效端点权威值——后者本引擎只录候选与连接证据,不断言生效)100% 以显式标记落库;抽检零臆造值(elapsed/tokens 无判定测量即 not_evaluated,未推断)。
 
 **US1 独立功能成立**:真实单元执行 → 恰好一条完全可审计的量化记录;存储边界与非阻塞行为可观察(collect exit 0,不劣化 determine)。
+
+## 场景 2:未采标记覆盖审计(SC-002)— T012(经 list-records 机器可读形态复审计)
+
+前提复核:⑥ `not_evaluated` 词形逐字([[STR-002]]);⑦ 本宿主已知采不到字段集以简报 §3 dated 清单为基准(生效端点权威值、未设 effort)。钉定测试:`test_exec_quant_engine.py` 字段二值律(V2)。
+
+```text
+$ exec-quant.py --action list-records --format json   # 全 store
+not_evaluated count: 5 (expect > 0)      # 通过
+null count: 0 | empty count: 0 (expect 0/0)   # 通过(零空缺)
+```
+
+## 场景 3:补打分与来源区分(US2)— T012
+
+前提复核:⑧ score 前置 = 目标 `(unit_id, run_id)` 已在 records.jsonl;⑨ 分值 1–5 通道约定;⑩ scores 落 `scores.jsonl`、list 时 join、与 carried 满意度凭 provenance 区分。钉定测试:`test_exec_quant_engine.py` score 断言(append-only、越界退出码 2、来源标注)。
+
+```text
+$ exec-quant.py --action score --unit-id "/speckit.implement" \
+    --run-id "059-exec-quant-smoke" --score 4 --note "手测通过"
+exec-quant: scored /speckit.implement run=059-exec-quant-smoke score=4 \
+  provenance=user-given -> .specify/memory/exec-quant/scores.jsonl
+(score exit=0)
+
+$ exec-quant.py --action list-records --unit-id "/speckit.implement" --format json
+joined score: 4 | provenance: user-given | note: 手测通过
+quality.satisfaction: not_evaluated (stays carried-or-marker, not overwritten)
+```
+
+来源区分判定:join 打分携带 `provenance == user-given`,`quality.satisfaction` 保持其自身来源(本记录为显式未采标记,判定记录推导时为 carried)——两字段互不覆写,FR-014 成立。记录本身未变(records.jsonl 未被触碰,score 仅追加 scores.jsonl)。
