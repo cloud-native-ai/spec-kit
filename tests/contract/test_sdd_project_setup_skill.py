@@ -29,6 +29,7 @@ PINNED_H2_SECTIONS = [
     "Hard Requirements",
     "Discipline Defaults",
     "References",
+    "Subagent Delegation（子代理委派说明——2026-10-16 裁定）",  # 060 C-32: delegation section
     "Boundary",
     "Wrap-up",  # compiled section (probe registry; AUTO-GENERATED)
 ]
@@ -214,8 +215,9 @@ def test_c8_handoff_twin_in_loop_driver():
     ld_recipes = (
         REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "references" / "dispatch-recipes.md"
     ).read_text(encoding="utf-8")
-    assert "handoff 给 sdd-project-setup" in ld_recipes, (
-        "sdd-loop-driver preflight must name the handoff target"
+    # 060 C-27: preflight ownership moved to run-agent — the handoff twin now lives there
+    assert "handoff 给 sdd-project-setup" in ld_recipes or "dispatch-preflight.md" in ld_recipes, (
+        "sdd-loop-driver must reference the preflight authority carrying the handoff"
     )
     ld_skill = (
         REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "SKILL.md"

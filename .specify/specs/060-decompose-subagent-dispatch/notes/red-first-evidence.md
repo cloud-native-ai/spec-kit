@@ -42,3 +42,9 @@ FAILED test_c8_cross_layer_change_ban
 ```
 1 failed, 1 passed（C-23 边界既有即绿；C-22 证据形态缺——红）
 ```
+
+## T030 — C-24/C-25 Polish 验证（2026-10-17）
+```
+sync-mirrors --check: DIFF/DRIFT 计数 0（既有 instructions-template DIFF 已被 T005 批量 --write 按源侧收敛——超出基线的改善，披露）
+compile-embeds --check: 73 units, zero drift（C-25 维持 73 基线 ✓）
+```

@@ -20,13 +20,14 @@ SKILL_MD = SKILL_DIR / "SKILL.md"
 
 PINNED_H2_SECTIONS = [
     "What This Skill Does",
-    "Driver Topology（驱动拓扑，反嵌套红线）",
+    "Driver Topology（驱动拓扑——义务真源：run-agent 派发治理）",  # 060 C-26: obligation moved to run-agent
     "When to Load",
     "The Loop (U0–U6)",
     "Hard Requirements",
     "Discipline Defaults",
     "References",
     "Boundary",
+    "Subagent Create & Dispatch Delegation（子代理创建与派发委派）",  # 060 C-29: delegation section
     "Wrap-up",  # compiled section (probe registry; AUTO-GENERATED)
 ]
 
@@ -121,7 +122,7 @@ def test_c3_skill_md_section_set():
 RECIPES_MD = SKILL_DIR / "references" / "dispatch-recipes.md"
 
 STAGE_CHAIN = (
-    "requirements → clarify → plan → tasks → implement → review"
+    "requirements → clarify → plan → tasks → checklist → analyze → implement → review"
 )
 
 
@@ -134,28 +135,17 @@ def _recipes_text() -> str:
 
 def test_c4_dispatch_recipes_inline_five_mechanisms():
     text = _recipes_text()
-    # breakpoint probe signals
-    assert "git branch --show-current" in text
-    assert "git log --oneline -3" in text
-    assert "ls .specify/specs/" in text
-    # staged prompt file via heredoc
-    assert "cat >" in text and "EOF" in text
-    # runner template and derivation
-    assert '--permission-mode auto' in text
-    assert '-p "$(cat' in text
-    assert "sed" in text
-    # detached-mode dispatch (user ruling 2026-10-15): the subagent runs in
-    # the background on its own and the orchestrator checks at intervals
-    assert "nohup" in text or "setsid" in text, (
-        "detached dispatch (nohup/setsid) must be the default recipe"
+    # 060 C-27: same-shape mechanics collapsed to references, deltas retained
+    assert ".specify/shared/workflow/external-dispatch-recipes.md" in text, (
+        "recipes truth-source reference missing (collapse)"
     )
-    assert "间隔" in text or "interval" in text, (
-        "interval-based checking must be prescribed, not tight polling"
-    )
-    # background execution + log polling + one connection per line
-    assert "su -" in text
-    assert "tail -" in text
-    # closure discipline
+    assert "dispatch-preflight.md" in text, "preflight reference missing (collapse)"
+    # retained deltas: heartbeat mechanism + detached dispatch authority (H-04) + intervals
+    assert "heartbeat" in text or "心跳" in text, "heartbeat delta must be retained"
+    assert "nohup" in text, "nohup detached dispatch is the authority here (H-04 ruling)"
+    assert "间隔" in text or "interval" in text
+    assert "sed" in text, "runner derivation delta must be retained"
+    # closure discipline (orchestration body, retained)
     assert "main" in text
     assert "收尾汇总" in text or "终态" in text
 
@@ -419,21 +409,10 @@ def test_c14_preflight_checks_inlined():
     assert pre != -1 and probe != -1 and pre < probe, (
         "preflight section must exist before the breakpoint-probe recipe"
     )
-    # ① ssh connectivity with timeout, local-topology skip note
-    assert "ConnectTimeout" in text
-    assert "本地拓扑" in text
-    # ② non-root run-user existence
-    assert "id <run-user>" in text or "id <运行用户>" in text
-    assert "uid" in text
-    # ③ subagent CLI availability and version
-    assert "--version" in text
-    # ④ LLM configuration (model / context size / effort)
-    assert "模型" in text and "effort" in text
-    assert "context" in text.lower()
-    # ⑤ spec-kit framework availability on the target project
-    assert "source.json" in text and "constitution" in text
-    # uncertainty escalates to the user; verdicts land in the state spine
-    assert "提示用户补充" in text or "上送用户补充" in text
+    # 060 C-27: preflight ownership moved to run-agent — the section references it
+    assert "dispatch-preflight.md" in text, "preflight authority reference missing"
+    assert "ConnectTimeout" not in text, "five-family table still self-held (060 collapse violated)"
+    assert "handoff" in text.lower() or "sdd-project-setup" in text, "⑤ handoff semantics must be stated"
     assert "状态脊" in text
 
 
@@ -445,14 +424,15 @@ def test_c14_preflight_checks_inlined():
 
 def test_c20_driver_topology_redline_pinned():
     text = _skill_text()
-    assert "## Driver Topology（驱动拓扑，反嵌套红线）" in text
+    # 060 C-26: the obligation owner moved to run-agent; this file keeps the
+    # driver-perspective self-check line and a reference to the authority
+    assert "## Driver Topology（驱动拓扑——义务真源：run-agent 派发治理）" in text
     assert "加载本手册的宿主 agent 就是驱动者" in text
-    assert "禁止嵌套驱动" in text
-    assert "循环层级恒为 1" in text
-    assert "MUST NOT 加载本手册" in text
+    assert "自检" in text, "loop-perspective self-check must be retained"
+    assert "run-agent" in text, "authority reference missing"
+    assert "MUST NOT 加载本手册" not in text, "owner literal still self-held (060 C-26 violated)"
+    # the owner literal now lives in run-agent's governance section
+    assert "反嵌套" in (REPO_ROOT / "skills" / "internal" / "run-agent" / "SKILL.md").read_text(encoding="utf-8")
     # HR-6 carries the same rule in the Hard Requirements list
     hr6 = re.search(r"^6\. \*\*驱动拓扑\*\*.*$", text, re.MULTILINE)
     assert hr6, "Hard Requirement 6 (driver topology) missing"
-    # the redline is restated at both dispatch surfaces
-    assert "不得引用本技能" in _recipes_text()
-    assert "禁止引用 sdd-loop-driver" in _prompts_text()

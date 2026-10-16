@@ -100,9 +100,9 @@
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T028 全量镜像验证：`python3 scripts/python/sync-mirrors.py --check` 触碰对（agents/internal/skills/shared）零 NEW drift——既有 instructions-template DIFF 1 条不计入（C-24）[blockedBy: T005,T010,T014,T024,T027]
-- [ ] T029 编译面复核：`python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check` 零漂移 + unit 认领面复核（73 units 基线对照）（C-25）[blockedBy: T028]
-- [ ] T030 Verify C-24/C-25 绿并记录 [green: contracts/skill-enhancements.md#C-24] [green: contracts/skill-enhancements.md#C-25] [blockedBy: T028,T029]
+- [X] T028 全量镜像验证：`python3 scripts/python/sync-mirrors.py --check` 触碰对（agents/internal/skills/shared）零 NEW drift——既有 instructions-template DIFF 1 条不计入（C-24）[blockedBy: T005,T010,T014,T024,T027]
+- [X] T029 编译面复核：`python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check` 零漂移 + unit 认领面复核（73 units 基线对照）（C-25）[blockedBy: T028]
+- [X] T030 Verify C-24/C-25 绿并记录 [green: contracts/skill-enhancements.md#C-24] [green: contracts/skill-enhancements.md#C-25] [blockedBy: T028,T029]
 - [ ] T031 quickstart 复跑留痕到 `.specify/specs/060-decompose-subagent-dispatch/notes/quickstart-run.md`——S1 内容判据（对 sdd-executor 复跑预期空输出）、S2 三组检索复测（恰 1 落点判定，scope=框架源侧 skills/ shared/ 排除镜像）、S3 引擎复跑；S4/S5 段由 T034–T036 回填 [blockedBy: T030]
 - [ ] T032 全套件 name-level 对比：`python3.14 -m pytest tests/contract/ tests/integration/ -q` 与 T001 冻结名单 comm 零新增（消费义务见 /speckit.implement `**Test runs**` bullet）[blockedBy: T030]
 - [ ] T033 feature-ref 交付清单对账（14 项逐项存在性检查）+ Feature 列表复审（无新 Feature、无既有失效，状态维持 Planned 不越权）[blockedBy: T023,T024]
