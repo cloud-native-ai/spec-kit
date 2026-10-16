@@ -218,6 +218,37 @@ correction and catastrophic for a decision, yet the two look identical to anyone
 the green — so the distinction has to be made at the moment of discovery, by a criterion that
 two independent reviewers can apply and agree on.
 
+### XV. Single-Run Evidence (Capture Once, Consume Many)
+An expensive execution — a long-running test suite, a build, a bulk query, a remote call —
+is a one-time evidence-gathering opportunity: the run itself is what costs, and its complete
+output is nearly free to keep. The same evidence MUST NOT be paid for twice:
+- The full discipline — what counts as an expensive execution, the capture obligations
+  (command line, exit status, complete output, duration), the diagnostics requirement, the
+  re-run legitimacy test, and the scope boundary — is defined once in
+  `.specify/shared/guidelines/single-run-evidence.md`; consumers MUST reference it, do not
+  restate it.
+- **Capture is an obligation, not a nicety**: the output of an expensive run MUST be
+  preserved whole at execution time. Filtered views MUST be derived from that preserved
+  record; a pipeline that filters away the original output discards evidence and violates
+  this principle.
+- **Consume the record, not the run**: any follow-up question about a completed execution —
+  why it was slow, what failed, how it compares to a baseline — MUST be answered from the
+  record. Re-execution is legitimate only to obtain NEW evidence (verifying a fix,
+  exercising changed state); re-executing to recover information the first run already
+  produced is the canonical anti-pattern.
+- Performance claims MUST rest on timing data present in the record, never on memory,
+  intuition, or a re-run performed merely to answer the question.
+
+This principle adds a capture discipline, not machinery: it MUST NOT be used to justify a
+logging framework, a run registry, or any other tracking engine.
+
+Rationale: the economics are asymmetric — re-running an expensive command costs its entire
+execution time again and may not even reproduce the first run, while capturing the full
+output costs nearly nothing. Discarding output mid-pipeline is a quiet form of evidence
+destruction: nothing looks deleted, yet the only remaining path to the answer is a full
+re-execution. One captured run answers many follow-up questions, and that gain compounds
+across every question the work will produce.
+
 ## [SECTION_2_NAME]
 <!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 
