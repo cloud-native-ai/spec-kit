@@ -457,3 +457,34 @@ def test_c35_parity_map_complete():
     for pid, body in rows:
         cells = [c.strip() for c in body.split("|")]
         assert len(cells) >= 4 and all(cells[:4]), f"{pid}: empty 新落点/强度/追溯 cell"
+
+
+# ================================================================ US4 (C-22..C-23)
+
+IMPROVE_AGENT_SKILL = REPO_ROOT / "skills" / "internal" / "improve-agent" / "SKILL.md"
+
+
+def _improve_agent_skill() -> str:
+    return _read(IMPROVE_AGENT_SKILL)
+
+
+# ---------------------------------------------------------------- C-22
+
+
+def test_c22_evidence_input_forms():
+    """Input Contract 增执行证据输入形态：三元组/日志/异常回传行/失败模式。"""
+    text = _improve_agent_skill()
+    assert "三元组" in text or "triplet" in text, "visibility triplet evidence form missing"
+    assert "异常回传行" in text or "anomaly return line" in text.lower(), "anomaly return line form missing"
+    assert "失败模式" in text or "failure mode" in text.lower(), "failure-mode form missing"
+
+
+# ---------------------------------------------------------------- C-23
+
+
+def test_c23_execution_not_self_edited():
+    """Self-Improvement 边界保持：Execution 是证据不是自改对象。"""
+    text = _improve_agent_skill()
+    assert re.search(r"never edit", text, re.IGNORECASE) or "永不编辑" in text or "不可编辑" in text, (
+        "execution-logs-never-edited boundary missing"
+    )

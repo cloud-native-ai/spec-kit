@@ -94,9 +94,9 @@
 
 **Independent Test**: 以一次已知失败执行记录走 improve-agent 流程产出定向修正且 Execution 产物零改动。
 
-- [ ] T025 [US4] Author improve-agent 契约测试 C-22..C-23（证据输入形态、Self-Improvement 边界保持）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红 [blockedBy: T011,T015]
-- [ ] T026 [US4] Enhance `skills/internal/improve-agent/SKILL.md`——Input Contract 增执行证据输入形态（C-22）+ Self-Improvement 边界不动自审（C-23）[blockedBy: T002]
-- [ ] T027 [US4] Verify C-22..C-23 绿 + 镜像同步（internal 对）[green: contracts/skill-enhancements.md#C-22] [green: contracts/skill-enhancements.md#C-23] [blockedBy: T025,T026]
+- [X] T025 [US4] Author improve-agent 契约测试 C-22..C-23（证据输入形态、Self-Improvement 边界保持）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红 [blockedBy: T011,T015]
+- [X] T026 [US4] Enhance `skills/internal/improve-agent/SKILL.md`——Input Contract 增执行证据输入形态（C-22）+ Self-Improvement 边界不动自审（C-23）[blockedBy: T002]
+- [X] T027 [US4] Verify C-22..C-23 绿 + 镜像同步（internal 对）[green: contracts/skill-enhancements.md#C-22] [green: contracts/skill-enhancements.md#C-23] [blockedBy: T025,T026]
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 

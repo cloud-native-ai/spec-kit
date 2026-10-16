@@ -37,3 +37,8 @@ FAILED test_c8_cross_layer_change_ban
 ```
 10 failed（C-26..C-35 全红——两技能仍自持机制段）
 ```
+
+## T025 — C-22..C-23 improve-agent 契约测试（2026-10-17）
+```
+1 failed, 1 passed（C-23 边界既有即绿；C-22 证据形态缺——红）
+```
