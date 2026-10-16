@@ -8,22 +8,22 @@
 
 | FR | 条款 | 主要设计落点 | 契约 |
 |----|------|--------------|------|
-| FR-001 | S-1/S-2/S-3 | agent-definitions.md 接线段（引用不复制） | concept-and-sources.md |
-| FR-002 | S-7/S-8 | 层界三行判定 + 越层禁令 | concept-and-sources.md |
-| FR-003 | A-1/A-2/A-3/A-6 | agents/sdd-executor.agent.md + 内容判据入 create-agent | skill-enhancements.md |
-| FR-004 | A-4 | 多职责实例化说明（capacity-scope 引用） | skill-enhancements.md |
-| FR-005 | A-4 | 一实例一职责 + 演进分流 | skill-enhancements.md |
-| FR-006 | R-1/R-2, S-4 | 拓扑声明输入形态 + 冲突拒收 | skill-enhancements.md, concept-and-sources.md |
-| FR-007 | R-7 | 既有模态/可见性/注入规则零改写 | skill-enhancements.md |
-| FR-008 | R-5 | 配方引用不复制 | skill-enhancements.md |
-| FR-009 | R-6, S-6, D-1 | 反嵌套上收为公用派发义务 | skill-enhancements.md 等 |
-| FR-010 | D-4/D-7 | 两技能委派说明段（057 瘦身先例） | delegation-parity.md |
-| FR-011 | P 表, D-9 | 义务平价映射 15 行下限 + 自足可加载 | delegation-parity.md |
-| FR-012 | R-3/R-4, D-2/D-5/D-6 | 前置检查+处置链→run-agent；形态/配方→STR-006（Session 2026-10-16 裁定，plan 不重裁） | skill-enhancements.md, delegation-parity.md |
-| FR-013 | S-2, D-3/D-4/D-6 | 编排本体保留清单 | concept-and-sources.md, delegation-parity.md |
-| FR-014 | I-1/I-2 | 执行证据输入形态 + Self-Improvement 边界不动 | skill-enhancements.md |
-| FR-015 | D-8, R-7 | 外部行为零变更（frontmatter/认领/team 体系零改动） | delegation-parity.md |
-| FR-016 | A-5 | 退役规则（retired 保留、先解引用） | skill-enhancements.md |
+| FR-001 | C-1/C-2/C-3 | agent-definitions.md 接线段（引用不复制） | concept-and-sources.md |
+| FR-002 | C-7/C-8 | 层界三行判定 + 越层禁令 | concept-and-sources.md |
+| FR-003 | C-9/C-10/C-11/C-14 | agents/sdd-executor.agent.md + 内容判据入 create-agent | skill-enhancements.md |
+| FR-004 | C-12 | 多职责实例化说明（capacity-scope 引用） | skill-enhancements.md |
+| FR-005 | C-12 | 一实例一职责 + 演进分流 | skill-enhancements.md |
+| FR-006 | C-15/C-16, C-4 | 拓扑声明输入形态 + 冲突拒收 | skill-enhancements.md, concept-and-sources.md |
+| FR-007 | C-21 | 既有模态/可见性/注入规则零改写 | skill-enhancements.md |
+| FR-008 | C-19 | 配方引用不复制 | skill-enhancements.md |
+| FR-009 | C-20, C-6, C-26 | 反嵌套上收为公用派发义务 | skill-enhancements.md 等 |
+| FR-010 | C-29/C-32 | 两技能委派说明段（057 瘦身先例） | delegation-parity.md |
+| FR-011 | C-35, C-34 | 义务平价映射 15 行下限 + 自足可加载 | delegation-parity.md |
+| FR-012 | C-17/C-18, C-27/C-30/C-31 | 前置检查+处置链→run-agent；形态/配方→STR-006（Session 2026-10-16 裁定，plan 不重裁） | skill-enhancements.md, delegation-parity.md |
+| FR-013 | C-2, C-28/C-29/C-31 | 编排本体保留清单 | concept-and-sources.md, delegation-parity.md |
+| FR-014 | C-22/C-23 | 执行证据输入形态 + Self-Improvement 边界不动 | skill-enhancements.md |
+| FR-015 | C-33, C-21 | 外部行为零变更（frontmatter/认领/team 体系零改动） | delegation-parity.md |
+| FR-016 | C-13 | 退役规则（retired 保留、先解引用） | skill-enhancements.md |
 
 ## SC → 验证映射
 
@@ -55,7 +55,7 @@ docs/reference/skills/sdd-project-setup.md                      # 更新：同�
 tests/contract/test_agent_dispatch_mechanism.py                 # 新增：S/A/R/I/X/D 条款契约测试
 ```
 
-**不触碰**（D-8 边界）：`.specify/shared/workflow/external-dispatch-recipes.md`（配方正文零改动——已拥有"how"，不接收检查表）、`/speckit.team` 与 create-team 体系、各 `/speckit.*` 命令模板、两技能 frontmatter 与 probe-registry 认领。
+**不触碰**（C-33 边界）：`.specify/shared/workflow/external-dispatch-recipes.md`（配方正文零改动——已拥有"how"，不接收检查表）、`/speckit.team` 与 create-team 体系、各 `/speckit.*` 命令模板、两技能 frontmatter 与 probe-registry 认领。
 
 ## 基线记录（2026-10-16 实测，实现期相对判据的参照）
 
