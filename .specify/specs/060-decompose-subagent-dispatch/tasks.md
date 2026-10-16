@@ -103,9 +103,9 @@
 - [X] T028 全量镜像验证：`python3 scripts/python/sync-mirrors.py --check` 触碰对（agents/internal/skills/shared）零 NEW drift——既有 instructions-template DIFF 1 条不计入（C-24）[blockedBy: T005,T010,T014,T024,T027]
 - [X] T029 编译面复核：`python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check` 零漂移 + unit 认领面复核（73 units 基线对照）（C-25）[blockedBy: T028]
 - [X] T030 Verify C-24/C-25 绿并记录 [green: contracts/skill-enhancements.md#C-24] [green: contracts/skill-enhancements.md#C-25] [blockedBy: T028,T029]
-- [ ] T031 quickstart 复跑留痕到 `.specify/specs/060-decompose-subagent-dispatch/notes/quickstart-run.md`——S1 内容判据（对 sdd-executor 复跑预期空输出）、S2 三组检索复测（恰 1 落点判定，scope=框架源侧 skills/ shared/ 排除镜像）、S3 引擎复跑；S4/S5 段由 T034–T036 回填 [blockedBy: T030]
-- [ ] T032 全套件 name-level 对比：`python3.14 -m pytest tests/contract/ tests/integration/ -q` 与 T001 冻结名单 comm 零新增（消费义务见 /speckit.implement `**Test runs**` bullet）[blockedBy: T030]
-- [ ] T033 feature-ref 交付清单对账（14 项逐项存在性检查）+ Feature 列表复审（无新 Feature、无既有失效，状态维持 Planned 不越权）[blockedBy: T023,T024]
+- [X] T031 quickstart 复跑留痕到 `.specify/specs/060-decompose-subagent-dispatch/notes/quickstart-run.md`——S1 内容判据（对 sdd-executor 复跑预期空输出）、S2 三组检索复测（恰 1 落点判定，scope=框架源侧 skills/ shared/ 排除镜像）、S3 引擎复跑；S4/S5 段由 T034–T036 回填 [blockedBy: T030]
+- [X] T032 全套件 name-level 对比：`python3.14 -m pytest tests/contract/ tests/integration/ -q` 与 T001 冻结名单 comm 零新增（消费义务见 /speckit.implement `**Test runs**` bullet）[blockedBy: T030]
+- [X] T033 feature-ref 交付清单对账（14 项逐项存在性检查）+ Feature 列表复审（无新 Feature、无既有失效，状态维持 Planned 不越权）[blockedBy: T023,T024]
 
 ---
 
@@ -113,9 +113,9 @@
 
 > SC-001/002/004 的验收证据此前零任务承载（analyze H-02）：三行落在对应故事的 Verify 之后，产出直接供 verification.md 逐 SC 记录（DoD-6/GATE-4 的证据来源）。
 
-- [ ] T034 [US1] SC-001 实跑：经 create-agent 从 sdd-executor 实例化 ≥2 个职责实例（sdd-setup-executor / sdd-requirements-executor），并按 SC-001 判据审计——实例体对模板能力的复述零命中（grep capacity-scope 引用计数 + 能力描述句检索），证据落 `verification.md` [blockedBy: T010]
-- [ ] T035 [US2] SC-002 实跑：同一实例以本地拓扑完成一次真实执行 + 远端拓扑以派发命令形态逐要素审计（ssh/su/CLI/目录）；两形态下 Template/Instance 制品 diff 为空判定，证据落 `verification.md` [blockedBy: T014]
-- [ ] T036 [US3] SC-004 端到端：经 run-agent 派发一个阶段实例在本地项目完成一个 SDD 阶段，回传三条件核验（完成尾标/产物在位/显式异常行）+ 子代理输入文件反嵌套审计（驱动技能引用零命中），证据落 `verification.md`；末次执行后回填 quickstart S4/S5 免责段为实跑留痕（M-06 同批：S2 判定 scope=框架源侧）[blockedBy: T014,T024]
+- [X] T034 [US1] SC-001 实跑：经 create-agent 从 sdd-executor 实例化 ≥2 个职责实例（sdd-setup-executor / sdd-requirements-executor），并按 SC-001 判据审计——实例体对模板能力的复述零命中（grep capacity-scope 引用计数 + 能力描述句检索），证据落 `verification.md` [blockedBy: T010]
+- [X] T035 [US2] SC-002 实跑：同一实例以本地拓扑完成一次真实执行 + 远端拓扑以派发命令形态逐要素审计（ssh/su/CLI/目录）；两形态下 Template/Instance 制品 diff 为空判定，证据落 `verification.md` [blockedBy: T014]
+- [X] T036 [US3] SC-004 端到端：经 run-agent 派发一个阶段实例在本地项目完成一个 SDD 阶段，回传三条件核验（完成尾标/产物在位/显式异常行）+ 子代理输入文件反嵌套审计（驱动技能引用零命中），证据落 `verification.md`；末次执行后回填 quickstart S4/S5 免责段为实跑留痕（M-06 同批：S2 判定 scope=框架源侧）[blockedBy: T014,T024]
 
 ---
 
