@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20261016T170013Z",
+  "rendered_at": "20261016T172729Z",
   "entries": {
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -62,6 +62,14 @@
     ".qoder/agents/sdd-executor.agent.md": {
       "source": "templates/sdd-executor.agent.md",
       "sha256": "0b9645f8d96fe81c0bb14aab1a6b02672b87412fd0df8d40de0706e8e93a25e0"
+    },
+    ".qoder/agents/sdd-requirements-executor.agent.md": {
+      "source": "instances/sdd-requirements-executor.agent.md",
+      "sha256": "228aa9ee0985eec37527299d47bc00fc3582f89cc9bc487b1b36011b7a2127f5"
+    },
+    ".qoder/agents/sdd-setup-executor.agent.md": {
+      "source": "instances/sdd-setup-executor.agent.md",
+      "sha256": "bde9a2fc219af4db8b154fcdb6bf5529a9bbaabbb1bf95a0f349ae887a90df8b"
     },
     ".qoder/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",

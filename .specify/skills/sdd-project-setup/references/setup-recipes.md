@@ -65,7 +65,7 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --here --ai 
 
 ## S4 VERIFY（五族前置检查 + 矩阵 + 链接）
 
-**五族前置检查**（Feature 060 上收——权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`，本节引用不复写；结论每项 ≤3 行摘要写入凭证。本技能处置后仍缺 = ⑤ fail 语义）。
+**五族前置检查**（2026-10-16 上收——权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`，本节引用不复写；结论每项 ≤3 行摘要写入凭证。本技能处置后仍缺 = ⑤ fail 语义）。
 
 加上：机制矩阵复扫达 complete（或 partial 且缺口已声明）、compat 链接核验 `find <project-dir> -maxdepth 2 -type l ! -exec test -e {} \; -print` 为空。三者齐备才进 S5。
 

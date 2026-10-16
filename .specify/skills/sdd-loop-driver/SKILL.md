@@ -1,6 +1,6 @@
 ---
 name: sdd-loop-driver
-description: 无人值守 SDD 循环驱动手册——以一条一遍性提示词驱动主代理完成「登录环境 → 以 qodercli 为子代理 → 按阶段推进 SDD 全流程（requirements → clarify → plan → tasks → implement → review）→ 合并 main」的完整闭环，全程循环自推进、零用户提醒。当用户说「使用SDD开发模式推动 <项目>」「无人值守推进」「sdd-loop-driver」「需要使用一个循环来完成这项工作，而不是每次由我提醒你重试或继续」时加载本手册。执行细节（断点探测 / 阶段化 prompt 文件 / runner 与派生 / 后台执行+日志轮询 / 收尾纪律）全部由本手册承接，入口只声明目标与起点。
+description: 无人值守 SDD 循环驱动手册——以一条一遍性提示词驱动主代理完成「登录环境 → 以 qodercli 为子代理 → 按阶段推进 SDD 完整流程（requirements → clarify → plan → tasks → checklist → analyze → implement → review）→ 合并 main」的完整闭环，全程循环自推进、零用户提醒。当用户说「使用SDD开发模式推动 <项目>」「无人值守推进」「sdd-loop-driver」「需要使用一个循环来完成这项工作，而不是每次由我提醒你重试或继续」时加载本手册。执行细节（断点探测 / 阶段化 prompt 文件 / runner 与派生 / 后台执行+日志轮询 / 收尾纪律）全部由本手册承接，入口只声明目标与起点。
 skill_id: "<SKILL:.specify/skills/sdd-loop-driver/SKILL.md>"
 classification: external
 ---
@@ -11,9 +11,11 @@ classification: external
 
 把 2026-10-14 起在多个项目被反复手工验证有效的「无人值守 SDD 驱动」模式固化为可执行手册：宿主 agent（不需要安装 spec-kit）加载本手册后，对每条项目线执行「断点探测 → 阶段派发 → 日志轮询 → 独立校验 → 续环」的循环，直到 review 完成并合并收尾。三条硬需求——自迭代、独立校验、卡死处置——的运行规则全部内置于本手册（见下文与 references/）。
 
+**完整流程纪律（2026-10-17 修订）**：本手册编排的是**完整版** SDD 流程——`speckit.checklist`、`speckit.analyze`、`speckit.review` 等日常手动开发常被省略的非必须质量门，在无人值守循环中一律必经、不可省略、不可跳阶段（编排与门判据见 dispatch-recipes.md Recipe 4）。
+
 **软协同关系**：本技能与 sdd-project-setup **非强绑定、各自可独立运行**。本技能保留自有的必要 preflight（五族前置检查，见 dispatch-recipes.md）；检查不通过且属框架安装/调协问题时，handoff 给 sdd-project-setup 处置，处置完成后回到循环。sdd-project-setup 调协完成后产出的候选工作清单（未完成 feature / 大改进 feedback / TODO 事项）是本技能建议的输入来源之一，但未经用户或上游流程确认不自动启动循环。
 
-**职责切分线**：框架调协（install/reconcile/verify/候选清单）= sdd-project-setup；SDD 六阶段循环 = 本技能。
+**职责切分线**：框架调协（install/reconcile/verify/候选清单）= sdd-project-setup；SDD 完整阶段循环（含 checklist/analyze 质量门）= 本技能。
 
 ## Driver Topology（驱动拓扑——义务真源：run-agent 派发治理）
 
@@ -62,13 +64,13 @@ U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归
 ## Boundary
 
 - 收尾动作的合并/push 维持确认门控破坏性分类：缺省本地合并；push 须经入口显式授权。
-- 本手册编排阶段为不透明单元：不改 requirements/clarify/plan/tasks/implement/review 各命令的内部流程。
+- 本手册编排阶段为不透明单元：不改 requirements/clarify/plan/tasks/checklist/analyze/implement/review 各命令的内部流程。
 - 不绑定特定项目族或工作区命名规则：别名、用户、路径、CLI、断点阶段全部入口参数化。
 - 目标项目未安装 spec-kit（无 `.specify/`）时：**委托 sdd-project-setup** 处置（本技能不执行初始化），处置完成并取得就绪凭证后重入循环。
 
 ## Subagent Create & Dispatch Delegation（子代理创建与派发委派）
 
-本手册是**编排者**：它不自带派发机制，而是委派两个承接技能完成驱动子代理的任务（Feature 060 委派化）：
+本手册是**编排者**：它不自带派发机制，而是委派两个承接技能完成驱动子代理的任务（2026-10-16 委派化裁定）：
 
 - **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 能力模板按职责实例化阶段执行实例（一实例一职责，`capacity-scope` 引用绑定）；输入=职责声明，产出=`.specify/agents/instances/<slug>.agent.md`。
 - **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：以 Execution 拓扑声明（本地/远端，见 subagent-definitions § Execution Topology Declaration）+ 实例引用发起执行；输入=实例+拓扑+阶段提示词，产出=执行结果或可见性三元组。前置检查（五族）与失败处置链见其 `references/dispatch-preflight.md`。
