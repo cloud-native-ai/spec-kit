@@ -39,7 +39,7 @@
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [ ] T001 冻结改前基线到 `.specify/specs/060-decompose-subagent-dispatch/notes/pre-change-measurements.md`——逐项实跑并粘贴真实输出：① quickstart S2 三组副本检索（ConnectTimeout 成组共现/nohup su -/反嵌套字面——基线含 2 个 git-utils 误中样本注记）；② 条款计数再派生（contracts 三文件 C-1..C-35 = 8+17+10、P 表 15 行、data-model V-E 13 条——`grep -cE` 实跑）；③ 全量契约套件失败名单（`python3.14 -m pytest tests/contract/ -q` 的 FAILED 名单，供 GATE-1 comm 比对；消费义务属 /speckit.implement `**Test runs**` bullet）；④ 三引擎基线（sync-mirrors --check 既有 DIFF 1 条 / compile-embeds --check 73 units 零漂移 / regen-command-copies --check OK）
+- [X] T001 冻结改前基线到 `.specify/specs/060-decompose-subagent-dispatch/notes/pre-change-measurements.md`——逐项实跑并粘贴真实输出：① quickstart S2 三组副本检索（ConnectTimeout 成组共现/nohup su -/反嵌套字面——基线含 2 个 git-utils 误中样本注记）；② 条款计数再派生（contracts 三文件 C-1..C-35 = 8+17+10、P 表 15 行、data-model V-E 13 条——`grep -cE` 实跑）；③ 全量契约套件失败名单（`python3.14 -m pytest tests/contract/ -q` 的 FAILED 名单，供 GATE-1 comm 比对；消费义务属 /speckit.implement `**Test runs**` bullet）；④ 三引擎基线（sync-mirrors --check 既有 DIFF 1 条 / compile-embeds --check 73 units 零漂移 / regen-command-copies --check OK）
 
 ## Phase 2: Foundational (Blocking Prerequisites — 真源深化 C-1..C-8)
 
