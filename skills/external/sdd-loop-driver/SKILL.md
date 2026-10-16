@@ -15,12 +15,10 @@ classification: external
 
 **职责切分线**：框架调协（install/reconcile/verify/候选清单）= sdd-project-setup；SDD 六阶段循环 = 本技能。
 
-## Driver Topology（驱动拓扑，反嵌套红线）
+## Driver Topology（驱动拓扑——义务真源：run-agent 派发治理）
 
 - **加载本手册的宿主 agent 就是驱动者**：U0–U6（探测/派发/轮询/校验/续环/收尾）全部由加载者在自己的会话里亲自执行，不得委托给任何 subagent。
-- **驱动者直接派发阶段执行子代理**：按 Recipes 1–3 向目标项目派发 headless 子代理（qodercli 或入口指定的等价 CLI）；子代理的唯一输入是阶段提示词文件（三段骨架），只执行当前 `/speckit.*` 阶段命令。
-- **子代理 MUST NOT 加载本手册**：派发提示词不得引用 sdd-loop-driver 或任何驱动/循环技能——不出现技能名、不指示加载技能、不包含循环逻辑；子代理不需要知道自己身处循环，「只推进当前阶段；下一阶段由主代理派发」是它唯一需要知道的循环事实（已含于第②段纪律行）。
-- **禁止嵌套驱动**：不得把本手册整体喂给一个 subagent、让它代为执行 U0–U6。实测缺陷（2026-10-16）：会话派 subagent 加载本手册 → subagent 按其要求再派自己的 subagent——驱动层级失控、原会话的循环静默旁路。循环层级恒为 1：驱动者 → 阶段执行者，不存在第三层。
+- **派发治理义务已上收（analyze C-26）**：子代理提示词不引用驱动/循环技能、不指示加载技能、不含循环逻辑；嵌套驱动禁止、循环层级恒为 1——义务全文与派发前拦截见 `skills/internal/run-agent/SKILL.md` 派发治理节与 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation（本节改为引用，义务本体单一落点）。
 - **自检**：若加载本手册时发现自己处于 subagent 上下文且被赋予的任务是「代为驱动循环」，按显式异常行上报并停在前置阶段——嵌套驱动永不是合法形态。
 
 ## When to Load
@@ -50,7 +48,7 @@ U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归
 3. **卡死处置**：达重试上限（缺省 2 次）或阶段超时（缺省 90 分钟）→ 停环、落状态脊、出上送件四要素（发现了什么 / 为何吃重 / 已产生的中间产物逐项可定位 / 可选处置）。
 4. **状态脊**：每线状态文件在 U2/U4/U5 三个转移点先写后动；续环与重入只认状态脊，不依赖会话记忆。
 5. **驱动者生命周期**：U3 是驱动者自身的主动 sleep-循环，驱动者必须存活到全线收束或显式停线上送；「挂监视器后等待通知/恢复」不是合法形态——会话式宿主中驱动者确须结束时，唯一合法路径是把状态脊写为 stalled/reentry-required 并显式上报（重入是常态路径，程序见 stage-prompts.md）。
-6. **驱动拓扑**：加载者即驱动者，亲自执行 U0–U6；阶段执行子代理只收三段骨架提示词、不加载本手册；禁止把本手册喂给 subagent 嵌套驱动（循环层级恒为 1，全文见「Driver Topology」节）。
+6. **驱动拓扑**：加载者即驱动者，亲自执行 U0–U6；阶段执行子代理只收三段骨架提示词；反嵌套义务（不引用驱动/循环技能、不指示加载技能、不含循环逻辑）的真源在 run-agent 派发治理——本手册于 U2 派发前按其自检，全文见「Driver Topology」节。
 
 ## Discipline Defaults
 
@@ -67,6 +65,14 @@ U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归
 - 本手册编排阶段为不透明单元：不改 requirements/clarify/plan/tasks/implement/review 各命令的内部流程。
 - 不绑定特定项目族或工作区命名规则：别名、用户、路径、CLI、断点阶段全部入口参数化。
 - 目标项目未安装 spec-kit（无 `.specify/`）时：**委托 sdd-project-setup** 处置（本技能不执行初始化），处置完成并取得就绪凭证后重入循环。
+
+## Subagent Create & Dispatch Delegation（子代理创建与派发委派）
+
+本手册是**编排者**：它不自带派发机制，而是委派两个承接技能完成驱动子代理的任务（Feature 060 委派化）：
+
+- **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 能力模板按职责实例化阶段执行实例（一实例一职责，`capacity-scope` 引用绑定）；输入=职责声明，产出=`.specify/agents/instances/<slug>.agent.md`。
+- **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：以 Execution 拓扑声明（本地/远端，见 subagent-definitions § Execution Topology Declaration）+ 实例引用发起执行；输入=实例+拓扑+阶段提示词，产出=执行结果或可见性三元组。前置检查（五族）与失败处置链见其 `references/dispatch-preflight.md`。
+- **编排本体在本手册**：阶段序列（U0–U6）、状态脊、哨兵与独立校验、卡死处置、收尾合并——三技能不承接这些（职责切分线见 agent-definitions § Driving Subagents via the Three Layers）。
 
 ## Wrap-up
 

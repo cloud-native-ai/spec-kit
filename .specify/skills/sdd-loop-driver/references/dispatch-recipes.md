@@ -1,44 +1,28 @@
 # Dispatch Recipes — 五大执行机制命令形态（sdd-loop-driver）
 
 > 本文件是宿主 agent 驱动外部子代理的**操作手册**：全部命令形态自包含可用，不依赖任何框架文档（对撰写底稿的引用仅为溯源注解）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。
+>
+> **委派化声明（Feature 060）**：与配方真源 `.specify/shared/workflow/external-dispatch-recipes.md` 同型的机制段已坍缩为引用；本文件保留 **loop-driver 特有差异面**（心跳机制、脱离形态权威落点、阶段链与收尾编排）与对真源的引用——单一事实落点，重复即漂移。
 
-## Preflight — 前置检查（本技能独立运行所必需；U0 与 U1 之间）
+## Preflight — 前置检查（引用 run-agent 公用承载；U0 与 U1 之间）
 
-> 五族前置检查是机制能否正确运行的先决条件，**由本技能自持**（与 sdd-project-setup 各自独立、互不强依赖）。任一项无法自动核验或核验结果不确定时，停在前置阶段、提示用户补充或按失败分类处置。检查结论（逐项 ok / fail / uncertain）以**每项 ≤3 行摘要**写入该线状态脊的前置检查段。
-
-| # | 检查 | 命令形态 | 判定 |
-|---|------|----------|------|
-| ① | SSH 连通性（**本地拓扑跳过**） | `ssh -o ConnectTimeout=5 -o BatchMode=yes <alias> true` | 限时内 0 = ok；超时/拒绝 = fail |
-| ② | 非 root 运行用户存在性 | `ssh <alias> "id <run-user>"` | uid≠0 = ok；不存在或 uid=0 = fail |
-| ③ | 子代理 CLI 可用性与版本 | `ssh <alias> "su - <run-user> -c '<cli> --version'"` | 版本串 = ok（记录进状态脊）；不在 PATH = fail |
-| ④ | 大语言模型配置 | 经宿主 CLI 配置面核验 model/context/effort 三项 | 齐备可读 = ok；不可读 = **uncertain → 列待补清单**（形态因 CLI 而异，不猜测） |
-| ⑤ | spec-kit 框架可用性（目标项目侧） | `ssh <alias> "cd <project-dir> && test -d .specify && test -f .specify/memory/constitution.md && cat .specify/source.json 2>/dev/null"` | 在位 = ok；缺失/退化 = **fail → handoff sdd-project-setup**（见下） |
-
-**失败处置的软协同**：⑤ fail（`.specify/` 缺失或宪法不在位）时，**handoff 给 sdd-project-setup 技能**处置（缺失=install 模式、退化=refresh 模式）——本技能不执行框架初始化；处置完成回本循环重跑 preflight。①②③ fail 停线并按上送件四要素报告；④ uncertain 列出待用户补充的信息清单。与 sdd-project-setup 的完整边界见其 setup-recipes.md「软协同契约」。
+> 五族前置检查表与失败处置链已上收至 `skills/internal/run-agent/references/dispatch-preflight.md`（Feature 060 上收，本表唯一权威落点在彼处）——检查先于 U1 派发；结论（逐项 ok / fail / uncertain）以**每项 ≤3 行摘要**写入该线状态脊的前置检查段。⑤ fail（`.specify/` 缺失/退化）handoff sdd-project-setup（缺失=install、退化=refresh）的软协同语义随表迁移；①②③ fail 停线上送、④ uncertain 列待补清单的处置链同见该文件。
 
 ## Recipe 0 — 断点探测（Breakpoint Probe）
 
-派发前探测目标项目当前所处 SDD 阶段，未声明阶段时**必须探测、禁止猜测**：
+派发前探测目标项目当前所处 SDD 阶段，未声明阶段时**必须探测、禁止猜测**。命令形态（三信号：分支名 / 近期提交 / specs 目录）见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 1——本配方坍缩为引用。
 
-```bash
-ssh <alias> "cd <project-dir> && git branch --show-current; git log --oneline -3; ls .specify/specs/ 2>/dev/null"
-```
-
-三信号（分支名 / 近期提交 / specs 目录）与终态权威文档路径一起判定续跑阶段。判定结果写入该线状态脊。必须覆盖收尾场景：review 已完成、只剩合并——此时直接进入收尾配方。
+两条本技能纪律保留：三信号与终态权威文档路径一起判定续跑阶段，判定结果写入该线状态脊；必须覆盖收尾场景——review 已完成、只剩合并时直接进入收尾配方（Recipe 4）。
 
 ## Recipe 1 — 阶段提示词文件（Stage Prompt File）
 
-每阶段把完整指令经 heredoc 写为远端文件（不内联进命令行）：
+每阶段把完整指令经 heredoc 写为远端文件（不内联进命令行）。落盘命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 2——本配方坍缩为引用。
 
-```bash
-ssh <alias> "cat > /home/<run-user>/prompt-<line>-<stage>.md" <<'EOF'
-<prompt body>
-EOF
-```
+两条本技能纪律保留：提示词三段骨架（背景与权威文档 / 执行要求 / 完成尾标与回传契约）见 `stage-prompts.md`——骨架内容是本技能的编排本体；反嵌套红线义务真源在 run-agent 派发治理（`skills/internal/run-agent/SKILL.md`），派发前自检涵盖本配方。
 
-提示词三段骨架（背景与权威文档 / 执行要求 / 完成尾标与回传契约）见 `stage-prompts.md`——本配方只管落盘。**红线：提示词体不得引用本技能（sdd-loop-driver）或任何驱动/循环机制**——子代理只执行阶段命令，不加载技能、不感知循环（反嵌套拓扑见 SKILL.md「Driver Topology」节）。
+## Recipe 2 — Runner 脚本与派生（Runner & Derivation）——**心跳差异面**
 
-## Recipe 2 — Runner 脚本与派生（Runner & Derivation）
+基础 runner 形态（`cd` + `<cli> -w` + `-p "$(cat …)"` + sed 派生）见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。本技能差异面——**心跳文件机制**（无人值守长跑的存活判定依赖）：
 
 ```bash
 # /home/<run-user>/run-<line>-<stage>.sh
@@ -51,9 +35,9 @@ rc=$?; kill $HB 2>/dev/null; exit $rc
 
 下一阶段 runner 用 `sed` 替换上一阶段 runner 的提示词文件名派生——runner 形态跨阶段恒同，避免重复维护整套脚本。
 
-## Recipe 3 — 脱离模式派发 + 定时间隔检查（Detached Dispatch & Interval Check，缺省形态）
+## Recipe 3 — 脱离模式派发 + 定时间隔检查（Detached Dispatch & Interval Check，缺省形态）——**nohup 权威落点**
 
-**让子代理在后台自己跑，主代理按一定时间间隔检查结果**——派发连接断开不中断子代理：
+**让子代理在后台自己跑，主代理按一定时间间隔检查结果**——派发连接断开不中断子代理。本形态是 loop-driver 实测独有差异面（analyze H-04 裁定：权威落点在本文件，不迁配方真源）：
 
 ```bash
 # 1) 远端侧脱离派发：nohup 使子代理脱离 ssh 会话存活；日志重定向在 su -c 内层，
@@ -73,7 +57,7 @@ ssh <alias> "tail -1 /home/<run-user>/heartbeat-<line>-<stage>.log; tail -3 /hom
 - **观察面纪律（底稿注解：External Dispatch Visibility Contract，`subagent-definitions.md`）**：禁止**缓冲至退出**式派发——`qodercli -p "<prompt>" > agent.log 2>&1 &` 这种「输出缓冲到进程退出才落盘」的形态让运行期零可见性，是明令禁止的反模式。本机制的观察面是**阶段粒度**（哨兵出现在输出末尾）：`-p` 缓冲意味着阶段结束前日志静默——间隔检查等的就是哨兵行；若需阶段内进度/卡死检测，把 runner 换成流式输出（`--output-format stream-json`）形态。
 - 哨兵出现 `<STAGE>-DONE` → 进入独立校验（见 stage-prompts.md）→ 通过则派发下一阶段（回到 Recipe 1/2/3）。
 
-## Recipe 4 — 阶段链与收尾（Stage Chain & Closure）
+## Recipe 4 — 阶段链与收尾（Stage Chain & Closure）——编排本体
 
 - 阶段链固定顺序：`requirements → clarify → plan → tasks → implement → review`；每阶段完成哨兵 = 大写阶段名 + `-DONE`（如 `PLAN-DONE`）。尾标是完成的必要条件，充分条件由独立校验补齐。
 - **合并收尾（git 状态判定，不设哨兵）**：review 后合并回 main——判定条件为特性分支的提交已包含于集成分支、且工作树无该分支的未合并/冲突残留；两项齐备即该线合并完成。push 与远程分支操作缺省不执行（确认门控破坏性动作；仅入口显式授权时先推后合）。
@@ -92,12 +76,12 @@ ssh <alias> "tail -1 /home/<run-user>/heartbeat-<line>-<stage>.log; tail -3 /hom
 
 ## Recipe 5 — 本地拓扑与变体
 
-- **本地拓扑**：项目在本机时省略 ssh/su，直接以本地项目为工作目录执行 runner；需求上下文先写简报文件（`/tmp/<topic>-sdd-brief.md`），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」。
-- **构建固化变体**：同一主机按角色分线（不同系统用户在各自目录固化不同层），仅经入口参数（执行身份、路径）区分，机制零新增分支。
+- **本地拓扑**：项目在本机时省略 ssh/su，直接以本地项目为工作目录执行 runner；需求上下文先写简报文件（`/tmp/<topic>-sdd-brief.md`），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」——命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5（本配方坍缩为引用）。
+- **构建固化变体**：同一主机按角色分线（不同系统用户在各自目录固化不同层），仅经入口参数（执行身份、路径）区分，机制零新增分支——形态见同文件 § Recipe 6。
 
 ## Boundary
 
-- 远端不可达 / 凭证失效 / 子代理 CLI 不在执行身份路径：派发前预检拦截并给修复动作，不裸报错弃线。
+- 远端不可达 / 凭证失效 / 子代理 CLI 不在执行身份路径：前置检查（run-agent dispatch-preflight.md）拦截并给修复动作，不裸报错弃线。
 - 目标项目无 `.specify/`：报告停线，不自动初始化。
 - 断点无法判定：停线上送用户裁定，不猜起步阶段。
-- 撰写底稿注解：本文件操作要点撰写时取材于 shared 层 `external-dispatch-recipes.md` 与 `unattended-loop-pattern.md` 底稿；运行时零依赖。
+- 撰写底稿注解：本文件操作要点撰写时取材于 shared 层 `external-dispatch-recipes.md` 与 `unattended-loop-pattern.md` 底稿；运行时零依赖。同型机制段已按 Feature 060 委派化坍缩为引用（Preflight→run-agent、R0/R1/R5→配方真源），保留面=心跳/脱离形态权威落点/阶段链收尾。

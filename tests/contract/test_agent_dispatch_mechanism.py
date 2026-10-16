@@ -330,3 +330,130 @@ def test_c21_existing_rules_unchanged():
     assert "Visibility Contract" in text
     assert "fast-fail injection" in text or "子代理派发注入" in text or "注入" in text
     assert "/speckit.team" in text, "single-agent boundary must remain"
+
+
+# ================================================================ US3 (C-26..C-35)
+
+LOOP_DRIVER_SKILL = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "SKILL.md"
+LOOP_DRIVER_RECIPES = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "references" / "dispatch-recipes.md"
+LOOP_DRIVER_PROMPTS = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "references" / "stage-prompts.md"
+SETUP_RECIPES = REPO_ROOT / "skills" / "external" / "sdd-project-setup" / "references" / "setup-recipes.md"
+SETUP_SKILL = REPO_ROOT / "skills" / "external" / "sdd-project-setup" / "SKILL.md"
+
+
+# ---------------------------------------------------------------- C-26
+
+
+def test_c26_driver_topology_referenced():
+    """Driver Topology 改引用+自检行：义务本体移交 run-agent，循环视角自检保留。"""
+    text = _read(LOOP_DRIVER_SKILL)
+    assert "run-agent" in text, "delegation reference missing from Driver Topology"
+    assert "自检" in text, "loop-perspective self-check line must be retained"
+    assert "MUST NOT 加载本手册" not in text, (
+        "obligation owner literal still in loop-driver (should have moved to run-agent)"
+    )
+
+
+# ---------------------------------------------------------------- C-27
+
+
+def test_c27_preflight_and_recipes_collapsed():
+    """dispatch-recipes：Preflight 清零引用、同型配方段坍缩引用、差异面保留。"""
+    text = _read(LOOP_DRIVER_RECIPES)
+    assert "ConnectTimeout" not in text, "five-family table still self-held (C-27 violation)"
+    assert "dispatch-preflight.md" in text, "preflight reference missing"
+    assert ".specify/shared/workflow/external-dispatch-recipes.md" in text, "recipes reference missing"
+    assert "心跳" in text or "heartbeat" in text, "loop-driver-specific delta (heartbeat) must be retained"
+    assert "阶段链" in text or "收尾" in text, "Recipe 4 stage-chain (orchestration body) must be retained"
+
+
+# ---------------------------------------------------------------- C-28
+
+
+def test_c28_skeleton_kept_mechanics_referenced():
+    """stage-prompts：三段骨架内容保留，机制红线改引用。"""
+    text = _read(LOOP_DRIVER_PROMPTS)
+    for marker in ["第①段", "第②段", "第③段"]:
+        assert marker in text, f"skeleton segment missing: {marker}"
+    assert "run-agent" in text, "mechanism redline must reference run-agent obligation"
+    assert "禁止引用 sdd-loop-driver" not in text, "owner literal still self-held (C-28 violation)"
+
+
+# ---------------------------------------------------------------- C-29
+
+
+def test_c29_orchestration_body_retained():
+    """编排本体保留 + 委派说明段落位。"""
+    skill = _read(LOOP_DRIVER_SKILL)
+    for marker in ["状态脊", "哨兵", "卡死", "U0", "U6"]:
+        assert marker in skill, f"orchestration body marker missing: {marker}"
+    assert "create-agent" in skill, "delegation section must name create-agent"
+
+
+# ---------------------------------------------------------------- C-30
+
+
+def test_c30_setup_preflight_collapsed():
+    """setup-recipes S4 五族检查表清零引用。"""
+    text = _read(SETUP_RECIPES)
+    assert "ConnectTimeout" not in text, "five-family table still self-held in setup-recipes"
+    assert "dispatch-preflight.md" in text, "preflight reference missing"
+
+
+# ---------------------------------------------------------------- C-31
+
+
+def test_c31_remote_forms_referenced():
+    """远端命令形态坍缩引用配方真源。"""
+    text = _read(SETUP_RECIPES)
+    assert ".specify/shared/workflow/external-dispatch-recipes.md" in text, "recipes reference missing"
+    assert "nohup su -" not in text, "remote command form still self-held (C-31 violation)"
+
+
+# ---------------------------------------------------------------- C-32
+
+
+def test_c32_setup_delegation_section():
+    """sdd-project-setup SKILL.md 委派说明段落位。"""
+    text = _read(SETUP_SKILL)
+    assert "run-agent" in text, "delegation section must name run-agent"
+    assert "create-agent" in text or "盘点" in text
+
+
+# ---------------------------------------------------------------- C-33
+
+
+def test_c33_external_behavior_unchanged():
+    """入口/frontmatter/probe 认领零变更。"""
+    for path, name in [(LOOP_DRIVER_SKILL, "sdd-loop-driver"), (SETUP_SKILL, "sdd-project-setup")]:
+        fm = _read(path).split("---")[1]
+        assert f"name: {name}" in fm or f'name: "{name}"' in fm or name in fm, f"{name}: frontmatter name changed"
+        assert "classification: external" in fm, f"{name}: classification changed"
+        assert f"skill:sdd-{name.split('sdd-')[1]}" in fm or "skill_id" in fm, f"{name}: skill_id changed"
+    team_md = REPO_ROOT / "templates" / "commands" / "team.md"
+    assert team_md.exists(), "team command template missing (must remain untouched)"
+
+
+# ---------------------------------------------------------------- C-34
+
+
+def test_c34_skills_still_self_contained():
+    """委派化后两技能自足可加载：引用 + 内联最小事实。"""
+    skill = _read(LOOP_DRIVER_SKILL)
+    assert "状态脊" in skill and "哨兵" in skill
+    setup = _read(SETUP_RECIPES)
+    assert "机制矩阵" in setup and "候选" in setup
+
+
+# ---------------------------------------------------------------- C-35
+
+
+def test_c35_parity_map_complete():
+    """义务平价映射逐行填实：≥15 行且无空落点。"""
+    parity = REPO_ROOT / ".specify" / "specs" / "060-decompose-subagent-dispatch" / "contracts" / "delegation-parity.md"
+    text = _read(parity)
+    rows = re.findall(r"^\| (P-\d{2}) \|(.+)$", text, re.MULTILINE)
+    assert len(rows) >= 15, f"parity map has {len(rows)} rows, expected >=15"
+    for pid, body in rows:
+        cells = [c.strip() for c in body.split("|")]
+        assert len(cells) >= 4 and all(cells[:4]), f"{pid}: empty 新落点/强度/追溯 cell"

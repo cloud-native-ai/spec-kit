@@ -51,7 +51,15 @@ S5 SUGGEST   产出候选工作清单（三个内部来源：未完成 feature /
 
 ## References
 
-- `references/setup-recipes.md` — 五步执行细则：机制矩阵维度定义、状态分级判据、init/refresh 命令形态（本地与远端）、S3 调协序列触发条件、五族前置检查表、符号链接核验、S5 候选工作清单 schema 与三个内部来源、与 sdd-loop-driver 的软协同契约。
+- `references/setup-recipes.md` — 五步执行细则：机制矩阵维度定义、状态分级判据、init/refresh 命令形态（本地与远端）、S3 调协序列触发条件、五族前置检查引用（权威落点 run-agent dispatch-preflight.md）、符号链接核验、S5 候选工作清单 schema 与三个内部来源、与 sdd-loop-driver 的软协同契约。
+
+## Subagent Delegation（子代理委派说明——Feature 060）
+
+本手册是**编排者**：调协动作的执行主体按需委派承接技能（可选形态——本技能独立运行时不强制）：
+
+- **盘点与验证的执行**：`scripts/mechanism-inventory.py` 由编排者直接运行（只读脚本，无需子代理）；远端盘点经 `ssh + su` 形态执行（占位约定同 `.specify/shared/workflow/external-dispatch-recipes.md`）。
+- **S2/S3 治理命令的派发**：`specify init` / `/speckit.*` 治理命令如需以子代理承载，经 **run-agent**（`skills/internal/run-agent/SKILL.md`）以拓扑声明派发——前置检查与失败处置链随其 `references/dispatch-preflight.md`；独立运行时编排者亦可亲自执行治理命令（等价路径）。
+- **职责切分线**：框架调协（install/reconcile/verify/候选清单）= 本技能；SDD 六阶段循环 = sdd-loop-driver；创建/派发/修正 = create-agent / run-agent / improve-agent（见 `shared/definitions/agent-definitions.md` § Driving Subagents via the Three Layers）。
 
 ## Boundary
 

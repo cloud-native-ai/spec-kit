@@ -31,3 +31,9 @@ FAILED test_c8_cross_layer_change_ban
 ```
 7 failed（C-15..C-21 全红——拓扑输入/preflight/反嵌套尚未落地）
 ```
+
+## T015 — C-26..C-35 委派化契约测试（2026-10-17）
+
+```
+10 failed（C-26..C-35 全红——两技能仍自持机制段）
+```

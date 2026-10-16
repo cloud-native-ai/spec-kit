@@ -65,17 +65,11 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --here --ai 
 
 ## S4 VERIFY（五族前置检查 + 矩阵 + 链接）
 
-**五族前置检查**（自 sdd-loop-driver/dispatch-recipes.md 迁入——原 Preflight 节，远端形态）：
-
-| # | 检查 | 命令形态 | 判定 |
-|---|------|----------|------|
-| ① | SSH 连通性（本地拓扑跳过） | `ssh -o ConnectTimeout=5 -o BatchMode=yes <alias> true` | 限时内 0 = ok |
-| ② | 非 root 运行用户 | `ssh <alias> "id <run-user>"` | uid≠0 = ok |
-| ③ | 子代理 CLI 可用性 | `ssh <alias> "su - <run-user> -c '<cli> --version'"` | 版本串 = ok（记录进凭证） |
-| ④ | 大模型配置 | 经宿主 CLI 配置面核验 model/context/effort | 三项齐备 = ok；不可读 = uncertain → 列待补清单 |
-| ⑤ | spec-kit 框架可用性 | `test -d .specify && test -f .specify/memory/constitution.md && cat .specify/source.json` | 在位 = ok；本技能处置后仍缺 = fail |
+**五族前置检查**（Feature 060 上收——权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`，本节引用不复写；结论每项 ≤3 行摘要写入凭证。本技能处置后仍缺 = ⑤ fail 语义）。
 
 加上：机制矩阵复扫达 complete（或 partial 且缺口已声明）、compat 链接核验 `find <project-dir> -maxdepth 2 -type l ! -exec test -e {} \; -print` 为空。三者齐备才进 S5。
+
+**远端命令形态与占位约定**（`<alias>`/`<run-user>`/`<project-dir>`/`<tool>`）同 `.specify/shared/workflow/external-dispatch-recipes.md`（远端拓扑）——本文件仅保留 setup 特有命令（specify init / 机制盘点脚本），通用派发形态坍缩为引用（analyze C-31）。
 
 ## S5 候选工作清单（建议而非强制）
 
@@ -104,7 +98,7 @@ suggestion: >-
 
 ## 软协同契约（与 sdd-loop-driver）
 
-- **非强绑定**：两技能各自可独立运行。本技能不要求 sdd-loop-driver 存在，sdd-loop-driver 也不依赖本技能先行——其自有必要 preflight（见其 dispatch-recipes.md），检查不通过时才 handoff 给本技能。
+- **非强绑定**：两技能各自可独立运行。本技能不要求 sdd-loop-driver 存在，sdd-loop-driver 也不依赖本技能先行——其 preflight 已上收 run-agent 公用承载（`skills/internal/run-agent/references/dispatch-preflight.md`，analyze C-30），⑤ fail 时经该处置链 handoff 给本技能。
 - **本技能 → sdd-loop-driver**：S5 候选工作清单是建议入口之一；sdd-loop-driver 的输入源除清单外还包括用户明确指定的特性/切片。
 - **sdd-loop-driver → 本技能**：其 preflight 发现 `.specify/` 缺失/宪法不在位/机制退化时，把处置 handoff 给本技能（模式由探测定：缺失=install，退化=refresh），处置完成后回到循环。
 - 职责切分线：**框架调协（install/reconcile/verify/候选清单）** = 本技能；**SDD 六阶段循环/状态脊/收尾纪律** = sdd-loop-driver。互不越界，互不强依赖。

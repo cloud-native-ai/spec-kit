@@ -77,14 +77,14 @@
 
 **Independent Test**: 对任一目标项目（本地拓扑）驱动一个 SDD 阶段与一个调协步骤，行为平价；副本归零检索达标（SC-003/SC-004）。
 
-- [ ] T015 [US3] Author 委派化契约测试 C-26..C-35（拓扑改引用、Preflight/配方坍缩、骨架保留+机制引用、编排本体保留、setup 两侧坍缩、委派说明段、外部行为零变更、自足可加载、P 表逐行填实）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红（对当前树副本仍在，天然红）[blockedBy: T011]
-- [ ] T016 [US3] Rewrite `skills/external/sdd-loop-driver/SKILL.md`——Driver Topology 节改引用+循环视角自检行、HR-6 同步改写（C-26）[blockedBy: T014]
-- [ ] T017 [P] [US3] Rewrite `skills/external/sdd-loop-driver/references/dispatch-recipes.md`——Preflight 节清零引用 run-agent dispatch-preflight.md、Recipe 0/1/2/3/5 同型机制段坍缩引用 [[STR-006]]、保留差异面（心跳/定间隔分级/多线批查/双线隔离）并注明（C-27）[blockedBy: T014]
-- [ ] T018 [P] [US3] Rewrite `skills/external/sdd-loop-driver/references/stage-prompts.md`——三段骨架内容保留、机制红线段改引用 run-agent 反嵌套义务（C-28）[blockedBy: T014]
-- [ ] T019 [US3] Enhance `skills/external/sdd-loop-driver/SKILL.md`——增补「子代理创建与派发委派」说明段（实例创建→create-agent、阶段派发→run-agent，输入/产出说明）（C-29）[blockedBy: T010,T014,T016]
-- [ ] T020 [P] [US3] Rewrite `skills/external/sdd-project-setup/references/setup-recipes.md`——S4 五族检查表清零引用、软协同 handoff 段收敛单侧引用、远端命令形态坍缩引用（C-30/C-31）[blockedBy: T014]
-- [ ] T021 [US3] Enhance `skills/external/sdd-project-setup/SKILL.md`——增补委派说明段（盘点脚本执行主体、S2/S3 治理命令派发经 run-agent 可选形态）（C-32）[blockedBy: T010,T014,T020]
-- [ ] T022 [US3] 义务平价对账：`contracts/delegation-parity.md` § P 表 P-01..P-15 逐行填实（新落点/强度/追溯三列以实存证据填齐，更严处注明），发现额外义务按同格式追加（C-35，绿点由 T023 认领）[blockedBy: T016,T017,T018,T019,T020,T021]
+- [X] T015 [US3] Author 委派化契约测试 C-26..C-35（拓扑改引用、Preflight/配方坍缩、骨架保留+机制引用、编排本体保留、setup 两侧坍缩、委派说明段、外部行为零变更、自足可加载、P 表逐行填实）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红（对当前树副本仍在，天然红）[blockedBy: T011]
+- [X] T016 [US3] Rewrite `skills/external/sdd-loop-driver/SKILL.md`——Driver Topology 节改引用+循环视角自检行、HR-6 同步改写（C-26）[blockedBy: T014]
+- [X] T017 [P] [US3] Rewrite `skills/external/sdd-loop-driver/references/dispatch-recipes.md`——Preflight 节清零引用 run-agent dispatch-preflight.md、Recipe 0/1/2/3/5 同型机制段坍缩引用 [[STR-006]]、保留差异面（心跳/定间隔分级/多线批查/双线隔离）并注明（C-27）[blockedBy: T014]
+- [X] T018 [P] [US3] Rewrite `skills/external/sdd-loop-driver/references/stage-prompts.md`——三段骨架内容保留、机制红线段改引用 run-agent 反嵌套义务（C-28）[blockedBy: T014]
+- [X] T019 [US3] Enhance `skills/external/sdd-loop-driver/SKILL.md`——增补「子代理创建与派发委派」说明段（实例创建→create-agent、阶段派发→run-agent，输入/产出说明）（C-29）[blockedBy: T010,T014,T016]
+- [X] T020 [P] [US3] Rewrite `skills/external/sdd-project-setup/references/setup-recipes.md`——S4 五族检查表清零引用、软协同 handoff 段收敛单侧引用、远端命令形态坍缩引用（C-30/C-31）[blockedBy: T014]
+- [X] T021 [US3] Enhance `skills/external/sdd-project-setup/SKILL.md`——增补委派说明段（盘点脚本执行主体、S2/S3 治理命令派发经 run-agent 可选形态）（C-32）[blockedBy: T010,T014,T020]
+- [X] T022 [US3] 义务平价对账：`contracts/delegation-parity.md` § P 表 P-01..P-15 逐行填实（新落点/强度/追溯三列以实存证据填齐，更严处注明），发现额外义务按同格式追加（C-35，绿点由 T023 认领）[blockedBy: T016,T017,T018,T019,T020,T021]
 - [ ] T023 [US3] Verify C-26..C-34 绿 + 镜像同步（skills 对）[green: contracts/delegation-parity.md#C-26] [green: contracts/delegation-parity.md#C-27] [green: contracts/delegation-parity.md#C-28] [green: contracts/delegation-parity.md#C-29] [green: contracts/delegation-parity.md#C-30] [green: contracts/delegation-parity.md#C-31] [green: contracts/delegation-parity.md#C-32] [green: contracts/delegation-parity.md#C-33] [green: contracts/delegation-parity.md#C-34] [green: contracts/delegation-parity.md#C-35] [blockedBy: T015,T016,T017,T018,T019,T020,T021]
 - [ ] T024 [US3] Update `docs/reference/skills/sdd-loop-driver.md` 与 `docs/reference/skills/sdd-project-setup.md`——机制归属说明（派发机制真源已迁 run-agent/配方真源；软协同契约不变）[blockedBy: T019,T021,T023]
 
