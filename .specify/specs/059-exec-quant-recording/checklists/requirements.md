@@ -33,5 +33,5 @@
 
 - 确定性校验器（`scripts/python/validate-requirements.py`）结果:status ok,0 error / 0 warning;19 个定义行、2 个共享字符串、0 个 `[NEEDS CLARIFICATION]` 标记(2026-10-16 运行,exit 0)。
 - 简报四个开放点(单元粒度/打分通道/存放位置/触发挂点)均已在规格 Assumptions 节(A1–A4)裁决并记录理由,故零澄清标记、checklist 一次全绿(in-session 先行裁决合规路径)。
-- 「Related Feature: Need clarification」为有意保留的 pending 态,由 `/speckit.clarify` 完成 Feature 绑定。
-- 机制名词(HandlerBinding / probe 注册表 / 运行判定)为本框架既有概念(概念归属检查已对照真源),非实现泄漏;引擎名 `exec-quant.py` 标注为提议(A5),记录类型字面量以 Shared Strings 为锚。
+- (2026-10-16 clarify 更新)「Related Feature」已由 `/speckit.clarify` 绑定定案:本 Feature 059 自身,注册行与详情文件同批补落(requirements 会话顺延登记,属上游偏差,已披露于规格 Clarifications)。
+- (2026-10-16 clarify 更新)引擎名 `exec-quant.py` 已定名锁定(clarify Q2,全仓同名冲突实测为零),记录类型字面量以 Shared Strings 为锚;机制名词结论不变。

@@ -7,13 +7,8 @@
 
 ## Related Feature *(mandatory)*
 
-<!--
-  ACTION REQUIRED: Keep the default values as "Need clarification" in the initial draft.
-  /speckit.clarify must resolve this section to the final Feature binding before planning.
--->
-
-**Feature ID**: Need clarification  
-**Feature Name**: Need clarification
+**Feature ID**: 059  
+**Feature Name**: Agent+LLM 执行量化记录(Execution Quant Recording)
 
 ## Overview
 
@@ -34,7 +29,7 @@
 - **A2 记录存放 = 独立持久存储,不入 feedback store。** 理由:feedback 红线 1(定位为「框架摩擦」的改进条目,非中性遥测)与红线 3(打包上送路径——量化记录含执行环境细节,永不自动上送);运行判定记录落 session 短期存储、身份是改进流程的改点 sensor,且其四轴契约已登记于多处真源,不宜膨胀承载环境遥测。故新设专属 durable 存储,由记录引擎自有,append-only、机器可读。
 - **A3 触发挂点 = 既有 wrap-up probe 点。** 经 HandlerBinding 注册 engine-kind 非阻塞 handler(同 h-run-determination 模式),不新增每命令模板面、不新增确认门(确认门控预算零消耗)。
 - **A4 打分输入通道 = 两者并存、按来源区分。** 用户手动(经引擎显式动作对既有记录补录打分)+ 运行判定推导(同 run 记录的 satisfaction 判定按 run_id 关联);两者凭字段来源标注区分,无打分即显式无,不臆造。
-- **A5 引擎命名提议 `exec-quant.py`(scripts 层,框架源 → 运行时镜像)。** 最终命名 plan 阶段可调;跨制品引用的记录类型字面量以 Shared Strings 为唯一锚点。
+- **A5 引擎定名 `exec-quant.py`(scripts 层,框架源 → 运行时镜像)。** 2026-10-16 clarify Q2 锁定,plan 阶段不再重开命名(全仓同名冲突实测为零;如实现期发现冲突按快速失败上抛,不静默改名);跨制品引用的记录类型字面量以 Shared Strings 为唯一锚点。
 - **A6 与运行判定的组合 = 并行携带、标注来源。** token 消耗与时长**不重复测量**:记录字段自同 run 的运行判定记录携带并标注来源;无对应记录时落显式未采标记。运行判定记录的 schema 与改进流程契约不变;运行判定记录仍是这两个量的唯一权威,量化记录中的携带值是程序写入、标注来源的机器副本(dated execution artifact),不作为现行事实被引用。
 
 ## User Scenarios & Testing *(mandatory)*
@@ -103,8 +98,8 @@
 #### 承载与触发（US1）
 
 - **FR-001**: System MUST, for every completed execution of a covered unit (command / skill / custom-unit — the same unit semantics as Run Determination), produce exactly one execution quant record (record kind [[STR-001]]), identified by `(unit_id, unit_type, run_id)`
-- **FR-002**: 采集 MUST 由 scripts 层的确定性程序执行(提议名 `exec-quant.py`),不得由 LLM 判断替代(Program-First)
-- **FR-003**: 采集 MUST 挂既有 wrap-up probe 点、经 HandlerBinding 注册 engine-kind 非阻塞 handler 触发;MUST 在同一 lifecycle point 上先于运行判定 handler 之后的次序执行,使携带值反映同 run 的判定记录;MUST NOT 新增每命令模板面, MUST NOT 新增确认门
+- **FR-002**: 采集 MUST 由 scripts 层的确定性程序执行(定名 `exec-quant.py`),不得由 LLM 判断替代(Program-First)
+- **FR-003**: 采集 MUST 挂既有 wrap-up probe 点、经 HandlerBinding 注册 engine-kind 非阻塞 handler 触发;MUST 在同一 lifecycle point 上于运行判定 handler 之后执行,使携带值反映同 run 的判定记录;MUST NOT 新增每命令模板面, MUST NOT 新增确认门
 - **FR-004**: 新增 probe 实体(scripts 切片的 Class + Objects)MUST 按伞形 probe 注册表真源的登记契约入册,派生视图重建而非手抄
 
 #### 采集内容（US1）
@@ -170,11 +165,13 @@
 | `STR-001` | "speckit.exec-quant" | FR-001, FR-013 |
 | `STR-002` | "not_evaluated" | FR-006, FR-007 |
 
-**Citation convention**: When an FR, contract, task, or test references one of these strings, write `[[STR-NNN]]` instead of copy-pasting the literal. CI / `/speckit.analyze` can then verify that every `[[STR-NNN]]` reference resolves to a row in this section. STR-001 为提议命名(A5);旋转只需编辑本节一行。STR-002 复用运行判定既有「未评」值域词形,不新造第三套标记词表;下游 contracts/tests 引用同一锚点。
+**Citation convention**: When an FR, contract, task, or test references one of these strings, write `[[STR-NNN]]` instead of copy-pasting the literal. CI / `/speckit.analyze` can then verify that every `[[STR-NNN]]` reference resolves to a row in this section. STR-001 已随 A5 定名锁定(clarify Q2);旋转仍只需编辑本节一行。STR-002 复用运行判定既有「未评」值域词形,不新造第三套标记词表;下游 contracts/tests 引用同一锚点。
 
 ## Clarifications
 
-<!-- 
-This section will be populated by /speckit.clarify command with questions and answers.
-Format: - Q: <question> → A: <answer>
--->
+### Session 2026-10-16
+
+<!-- 无人值守运行:封闭式澄清问题由执行代理按简报 §4(Recording Only)与「测量而非印象」原则自行裁决,裁决理由随行记录。 -->
+
+- Q: Related Feature 绑定到哪个 Feature? → A: **本 Feature 059 自身**(新建落册)。编号已由分支 `059-exec-quant-recording` 与规格目录预分配;注册表当时无 059 行(requirements 会话仅提交规格 + 清单、未落注册行,登记义务顺延本轮补齐,记为上游偏差并披露)。绑定先例启发式核验:候选 028(Feedback 域)、055(存储拓扑)、056(Probe-Handler 基础设施)无一拥有「执行环境遥测采集」同类同胞——056 的同胞吸收面是 handler 注册类改动而非本能力;运行判定经注册表全文核验无归属特性行,无可绑定对象。按 feature-integration § Feature Binding Rules 走 create 分支:索引行(Draft)+ `features/059.md` 详情 + 表头计数同批更新。
+- Q: 引擎命名(A5)维持「plan 阶段可调」还是本阶段锁定? → A: **本阶段定名 `exec-quant.py` 锁定**,plan 阶段不再重开。理由:全仓(scripts / src / .specify/scripts)同名冲突实测为零;记录类型字面量已由 STR-001 锚定;锁定消除本规格唯一一处「以 plan 为裁决者」的欠指定(tasks 生成期直接引用定名,消除改名返工面)。
