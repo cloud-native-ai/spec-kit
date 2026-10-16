@@ -49,7 +49,7 @@ When in doubt: **native first, virtual as fallback, external when isolation/para
 
 ## Execution Topology Declaration (执行拓扑声明)
 
-An Agent Execution is parameterized by a **topology declaration** — the environment facts that turn an instance reference into a concrete run. Every element is entry-level; nothing here hardcodes a workspace naming rule, a host, or a user ( Feature 060 ruling).
+An Agent Execution is parameterized by a **topology declaration** — the environment facts that turn an instance reference into a concrete run. Every element is entry-level; nothing here hardcodes a workspace naming rule, a host, or a user.
 
 | Element | Local topology（本地） | Remote topology（远端） |
 |---------|----------------|-----------------|
@@ -58,7 +58,7 @@ An Agent Execution is parameterized by a **topology declaration** — the enviro
 | Login target | none (direct drive) | `<alias>` or host IP (`ssh`) |
 | Run identity | current user | `<run-user>` (`su`/`sudo`, uid ≠ 0) |
 
-**Dual input forms, equivalent**: the declaration may arrive as (a) **inline parameters** given at call time, or (b) an **execution config file** in the project's agent-execution config store (schema owned by `skills/internal/create-agent/SKILL.md` § Execution Config Capability). The two forms are interchangeable; when BOTH are given and any element disagrees, the dispatch MUST be **rejected at parse time with the conflicting fields listed**（拒收报错并列冲突字段 — fast-fail discipline; never a silent pick）. A missing/invalid referenced template fails fast the same way — no silent degradation to an inline substitute.
+**Dual input forms, equivalent（双形态等价）**: the declaration may arrive as (a) **inline parameters（内联参数）** given at call time, or (b) an **execution config file（执行配置文件）** in the project's agent-execution config store (schema owned by `skills/internal/create-agent/SKILL.md` § Execution Config Capability). The two forms are interchangeable; when BOTH are given and any element disagrees, the dispatch MUST be **rejected at parse time with the conflicting fields listed**（拒收报错并列冲突字段 — fast-fail discipline; never a silent pick）. A missing/invalid referenced template fails fast the same way — no silent degradation to an inline substitute.
 
 **Division of labor (unchanged)**: this section owns *what must be declared*; `../workflow/external-dispatch-recipes.md` owns *how the declaration is executed* (concrete command shapes). When they disagree, this contract wins（分歧时契约赢）.
 
