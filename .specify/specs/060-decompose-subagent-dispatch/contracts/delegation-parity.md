@@ -34,7 +34,7 @@
 | P-03 | 断点探测三信号 | loop-driver Recipe 0 ≈ STR-006 Recipe 1 | [[STR-006]]（引用） | 同等 | C-27 |
 | P-04 | 阶段提示词文件落盘机制 | loop-driver Recipe 1 ≈ STR-006 Recipe 2 | [[STR-006]]（引用） | 同等 | C-27 |
 | P-05 | runner 脚本与 sed 派生 | loop-driver Recipe 2 ≈ STR-006 Recipe 3 | [[STR-006]]（引用） | 同等 | C-27 |
-| P-06 | 脱离派发+定间隔轮询 | loop-driver Recipe 3（nohup 形态独有+心跳） | [[STR-006]]（引用）+ loop-driver 保留差异注 | 同等（心跳/分级为更严差异，保留） | C-27 |
+| P-06 | 脱离派发+定间隔轮询 | loop-driver Recipe 3（nohup 形态独有+心跳） | **loop-driver 保留差异段（权威落点——analyze H-04 裁定：nohup 脱离形态为其实测独有，不迁入 STR-006）**；共性前台+轮询形态引 [[STR-006]] | 同等（心跳/分级为更严差异，保留） | C-27 |
 | P-07 | 提示词三段骨架内容 | loop-driver stage-prompts.md | 保留（编排本体） | 同等 | C-28 |
 | P-08 | 反嵌套红线 | loop-driver SKILL.md Driver Topology+HR-6+两处红线 | run-agent 派发治理（上收）+原处引用行 | **更严**（公用面拦截+派发前自检扩展） | C-20, C-26 |
 | P-09 | 状态脊先写后动 | loop-driver SKILL.md/stage-prompts | 保留（编排本体） | 同等 | C-29 |
@@ -45,9 +45,9 @@
 | P-14 | 驱动者生命周期（HR-5） | loop-driver SKILL.md | 保留（编排本体） | 同等 | C-29 |
 | P-15 | 实例创建语义（原两技能内联的"谁来执行"描述） | 两技能 SKILL.md 散述 | create-agent（sdd-executor 模板+实例化） | **更严**（引用绑定替代散述，复述为零） | C-12 |
 
-**副本归零检索判据**（SC-003 机械面，实现期执行并记录模式误中率）：
-- 五族检查表：`grep -rn "ConnectTimeout" skills/ .specify/skills/` 成组出现（与 `id <run-user>`/`--version`/`source.json` 同文件共现）恰 1 处（run-agent dispatch-preflight.md）；
-- ssh+su 形态：`nohup su -` 形态恰 1 处权威落点（[[STR-006]]）；
+**副本归零检索判据**（SC-003 机械面，实现期执行并记录模式误中率；**统一 scope=框架源侧 `skills/`、`shared/`，排除 `.specify/` 镜像副本——analyze M-06 修复**）：
+- 五族检查表：`grep -rn "ConnectTimeout" skills/` 成组出现（与 `id <run-user>`/`--version`/`source.json` 同文件共现）恰 1 处（run-agent dispatch-preflight.md）；
+- ssh+su 形态：`nohup su -` 形态恰 1 处权威落点（**loop-driver dispatch-recipes.md 保留段**——analyze H-04 裁定；检索 scope=框架源侧 `skills/`、`shared/`，排除 `.specify/` 镜像）；
 - 提示词骨架机制红线："禁止引用 sdd-loop-driver" 字面恰 1 处义务落点（run-agent），其余为引用行。
 
 ## 可追溯性
