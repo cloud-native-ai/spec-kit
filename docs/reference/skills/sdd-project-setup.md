@@ -41,6 +41,12 @@ S5 SUGGEST   候选工作清单（未完成 feature / 大改进 feedback / TODO 
 - **sdd-loop-driver → 本技能**：其 preflight ⑤ 框架检查 fail 时把处置 handoff 过来，处置完成后回到循环。
 - 职责切分线：框架调协（install/reconcile/verify/候选清单）= 本技能；SDD 六阶段循环 = sdd-loop-driver。
 
+## 机制归属（Feature 060 委派化）
+
+- **前置检查（五族）与失败处置链**：权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`（本技能 S4 引用，不复写）。
+- **通用远端命令形态**：`shared/workflow/external-dispatch-recipes.md`（本技能保留 setup 特有命令：specify init、机制盘点脚本）。
+- **治理命令的子代理派发**：经 run-agent（可选形态——独立运行时编排者亦可亲自执行）。
+
 ## 边界
 
 - 不做任何 SDD 阶段推进（requirements 等六阶段归 sdd-loop-driver）；S3 只调用治理类命令。

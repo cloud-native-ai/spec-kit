@@ -25,6 +25,15 @@ skill 本体是**自包含手册**（SKILL.md + references/），三种投递形
 - 投递后宿主按手册驱动循环：断点探测 → 阶段派发（脱离模式后台自跑 + 定时间隔检查）→ 哨兵与独立校验 → 续环 → git 状态判定合并收尾。
 - **目标项目侧依赖**：仅当子代理要在目标项目执行 `/speckit.*` 阶段命令时，目标项目才需要具备 `.specify/` 结构；目标项目无 `.specify/` 时机制报告停线、不自动初始化。
 
+## 机制归属（Feature 060 委派化）
+
+驱动子代理的公用机制已上收，本技能保留编排本体：
+
+- **前置检查（五族）与失败处置链**：权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`（本技能引用）。
+- **反嵌套义务**：权威落点 run-agent 派发治理 + `shared/definitions/subagent-definitions.md`（本技能 Driver Topology 节保留循环视角自检行）。
+- **通用派发配方**（断点探测/提示词落盘/runner/本地变体）：`shared/workflow/external-dispatch-recipes.md`；本技能保留差异面——心跳机制、nohup 脱离形态权威落点、阶段链与收尾编排。
+- **实例创建**：经 create-agent（`agents/sdd-executor.agent.md` 模板 → 职责实例）。
+
 ## 边界
 
 - push / 远程分支操作维持破坏性确认门控（缺省本地合并）。

@@ -85,8 +85,8 @@
 - [X] T020 [P] [US3] Rewrite `skills/external/sdd-project-setup/references/setup-recipes.md`——S4 五族检查表清零引用、软协同 handoff 段收敛单侧引用、远端命令形态坍缩引用（C-30/C-31）[blockedBy: T014]
 - [X] T021 [US3] Enhance `skills/external/sdd-project-setup/SKILL.md`——增补委派说明段（盘点脚本执行主体、S2/S3 治理命令派发经 run-agent 可选形态）（C-32）[blockedBy: T010,T014,T020]
 - [X] T022 [US3] 义务平价对账：`contracts/delegation-parity.md` § P 表 P-01..P-15 逐行填实（新落点/强度/追溯三列以实存证据填齐，更严处注明），发现额外义务按同格式追加（C-35，绿点由 T023 认领）[blockedBy: T016,T017,T018,T019,T020,T021]
-- [ ] T023 [US3] Verify C-26..C-34 绿 + 镜像同步（skills 对）[green: contracts/delegation-parity.md#C-26] [green: contracts/delegation-parity.md#C-27] [green: contracts/delegation-parity.md#C-28] [green: contracts/delegation-parity.md#C-29] [green: contracts/delegation-parity.md#C-30] [green: contracts/delegation-parity.md#C-31] [green: contracts/delegation-parity.md#C-32] [green: contracts/delegation-parity.md#C-33] [green: contracts/delegation-parity.md#C-34] [green: contracts/delegation-parity.md#C-35] [blockedBy: T015,T016,T017,T018,T019,T020,T021]
-- [ ] T024 [US3] Update `docs/reference/skills/sdd-loop-driver.md` 与 `docs/reference/skills/sdd-project-setup.md`——机制归属说明（派发机制真源已迁 run-agent/配方真源；软协同契约不变）[blockedBy: T019,T021,T023]
+- [X] T023 [US3] Verify C-26..C-34 绿 + 镜像同步（skills 对）[green: contracts/delegation-parity.md#C-26] [green: contracts/delegation-parity.md#C-27] [green: contracts/delegation-parity.md#C-28] [green: contracts/delegation-parity.md#C-29] [green: contracts/delegation-parity.md#C-30] [green: contracts/delegation-parity.md#C-31] [green: contracts/delegation-parity.md#C-32] [green: contracts/delegation-parity.md#C-33] [green: contracts/delegation-parity.md#C-34] [green: contracts/delegation-parity.md#C-35] [blockedBy: T015,T016,T017,T018,T019,T020,T021]
+- [X] T024 [US3] Update `docs/reference/skills/sdd-loop-driver.md` 与 `docs/reference/skills/sdd-project-setup.md`——机制归属说明（派发机制真源已迁 run-agent/配方真源；软协同契约不变）[blockedBy: T019,T021,T023]
 
 ## Phase 6: User Story 4 - 执行证据回流（Priority: P2）
 
