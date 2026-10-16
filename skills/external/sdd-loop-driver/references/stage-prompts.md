@@ -52,7 +52,7 @@
 阶段完成判定由**独立校验步骤**执行——校验者不是该阶段的执行子代理（由主代理自身核验，或另行派发一个校验子代理）。三条件同时成立才判完成：
 
 1. **哨兵（必要条件）**：本次阶段输出的最后一行是 `<STAGE>-DONE`。日志正文中出现的历史回显不算——只认本次输出末尾。
-2. **产物核验（充分条件之一）**：`git log` 出现该阶段的新增提交；该阶段的 spec 产物文件存在（requirements 阶段 → requirements.md；plan 阶段 → plan.md；tasks 阶段 → tasks.md；implement 阶段 → 代码提交与测试；review 阶段 → review 产物）。
+2. **产物核验（充分条件之一）**：`git log` 出现该阶段的新增提交；该阶段的 spec 产物文件存在（requirements 阶段 → requirements.md；plan 阶段 → plan.md；tasks 阶段 → tasks.md；checklist 阶段 → checklists/ 目录新增清单文件；analyze 阶段 → findings 报告正文输出于本次阶段日志——只读命令不产新提交，哨兵 + 报告正文即产物，git log 新增提交对该阶段不作要求；implement 阶段 → 代码提交与测试；review 阶段 → review 产物）。
 3. **纪律合规抽查（充分条件之二）**：第②段的执行要求未被违反——脏文件未被提交/还原、无未授权 push、假设已记录。
 
 **伪完成判未完成**：尾标在而产物缺 = 未完成，循环不派发下一阶段。校验结论含逐项证据指针，可被第二位复核者独立复现。

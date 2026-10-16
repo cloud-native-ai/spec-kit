@@ -9,6 +9,7 @@ Clauses are authored incrementally per user story; each story's tests go
 red-first (notes/red-first-evidence.md records the red runs).
 """
 
+import filecmp
 import re
 from pathlib import Path
 
@@ -20,7 +21,8 @@ SKILL_MD = SKILL_DIR / "SKILL.md"
 
 PINNED_H2_SECTIONS = [
     "What This Skill Does",
-    "Driver Topology（驱动拓扑——义务真源：run-agent 派发治理）",  # 060 C-26: obligation moved to run-agent
+    # 060 C-26: obligation moved to run-agent
+    "Driver Topology（驱动拓扑——义务真源：run-agent 派发治理）",
     "When to Load",
     "The Loop (U0–U6)",
     "Hard Requirements",
@@ -28,6 +30,7 @@ PINNED_H2_SECTIONS = [
     "References",
     "Boundary",
     "Subagent Create & Dispatch Delegation（子代理创建与派发委派）",  # 060 C-29: delegation section
+    "Feedback & Probe Points（反馈与探针采集点）",  # 060: in-loop framework-feedback capture points
     "Wrap-up",  # compiled section (probe registry; AUTO-GENERATED)
 ]
 
@@ -267,7 +270,8 @@ def test_c10_stage_prompts_sections_replace_placeholders():
     for section in ["Stall Handling & State Spine", "Concurrency Isolation", "Variants"]:
         idx = text.find(f"## {section}")
         assert idx != -1, f"section missing: {section}"
-        following = text[idx:text.find("\n## ", idx + 4) if text.find("\n## ", idx + 4) != -1 else len(text)]
+        following = text[idx:text.find(
+            "\n## ", idx + 4) if text.find("\n## ", idx + 4) != -1 else len(text)]
         assert "（本章节由" not in following, f"section {section} still carries a placeholder"
 
 
@@ -326,8 +330,6 @@ def test_c17_roster_baseline_updated():
 
 # ---------------------------------------------------------------- C-18
 
-import filecmp
-
 
 def test_c18_mirror_pair_no_drift():
     src = SKILL_DIR
@@ -339,10 +341,7 @@ def test_c18_mirror_pair_no_drift():
         )
 
 
-
-
 # ---------------------------------------------------------------- C-11 / C-12 / C-13
-
 FEATURE_DELIVERABLE_PATHS = [
     "skills/external/sdd-loop-driver/SKILL.md",
     "skills/external/sdd-loop-driver/references/dispatch-recipes.md",
@@ -363,7 +362,8 @@ def test_c11_self_containment_no_runtime_framework_reads():
         text = (SKILL_DIR / rel).read_text(encoding="utf-8")
         for lineno, line in enumerate(text.splitlines(), 1):
             if ".specify/" in line:
-                context = line + "|" + text.splitlines()[lineno - 2] if lineno > 1 else line
+                context = line + "|" + \
+                    text.splitlines()[lineno - 2] if lineno > 1 else line
                 assert not re.search(r"MUST[^.]*\.specify/|必须先读|运行时必读", context), (
                     f"{rel}:{lineno} reads like a runtime obligation on a framework path"
                 )
@@ -412,7 +412,8 @@ def test_c14_preflight_checks_inlined():
     # 060 C-27: preflight ownership moved to run-agent — the section references it
     assert "dispatch-preflight.md" in text, "preflight authority reference missing"
     assert "ConnectTimeout" not in text, "five-family table still self-held (060 collapse violated)"
-    assert "handoff" in text.lower() or "sdd-project-setup" in text, "⑤ handoff semantics must be stated"
+    assert "handoff" in text.lower(
+    ) or "sdd-project-setup" in text, "⑤ handoff semantics must be stated"
     assert "状态脊" in text
 
 
@@ -432,7 +433,8 @@ def test_c20_driver_topology_redline_pinned():
     assert "run-agent" in text, "authority reference missing"
     assert "MUST NOT 加载本手册" not in text, "owner literal still self-held (060 C-26 violated)"
     # the owner literal now lives in run-agent's governance section
-    assert "反嵌套" in (REPO_ROOT / "skills" / "internal" / "run-agent" / "SKILL.md").read_text(encoding="utf-8")
+    assert "反嵌套" in (REPO_ROOT / "skills" / "internal" /
+                     "run-agent" / "SKILL.md").read_text(encoding="utf-8")
     # HR-6 carries the same rule in the Hard Requirements list
     hr6 = re.search(r"^6\. \*\*驱动拓扑\*\*.*$", text, re.MULTILINE)
     assert hr6, "Hard Requirement 6 (driver topology) missing"
