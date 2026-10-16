@@ -6,7 +6,7 @@
 
 ## Summary
 
-把 sdd-loop-driver 与 sdd-project-setup 各自内联的「驱动子代理」机制按 057 技能化分解方法上收为公用机制：深化 Agent 三层分类法（Template→Instance→Execution）的层界语义于两份既有真源，增强 create-agent/improve-agent/run-agent 三技能承接面（新增 `agents/sdd-executor.agent.md` 能力模板、多职责实例化、Execution 拓扑声明与冲突拒收、五族前置检查表与失败处置链上收、反嵌套治理上收），两技能机制段坍缩为引用并按义务平价映射逐条对账。交付面全部为 Markdown 制品 + 结构契约测试，无运行时代码。FR-012 真源归属已在 clarify 裁定（检查表+处置链→run-agent；形态/配方→[[STR-006]]），本 plan 直接拆解、不重裁。
+把 sdd-loop-driver 与 sdd-project-setup 各自内联的「驱动子代理」机制按 057 技能化分解方法上收为公用机制：深化 Agent 三层分类法（Template→Instance→Execution）的层界语义于两份既有真源，增强 create-agent/improve-agent/run-agent 三技能承接面（新增 `agents/sdd-executor.agent.md` 能力模板、多职责实例化、Execution 拓扑声明与冲突拒收、五族前置检查表与失败处置链上收、反嵌套治理上收），两技能机制段坍缩为引用并按义务平价映射逐条对账。交付面全部为 Markdown 制品 + 结构契约测试，无运行时代码。FR-012 真源归属已在 clarify 裁定（见 requirements.md FR-012），本 plan 直接拆解、不重裁。
 
 ## Technical Context
 
@@ -18,7 +18,7 @@
 **Project Type**: 框架源（两顶帽子：改动全部落框架源 `skills/`、`agents/`、`shared/`，镜像经 sync-mirrors 同步）
 **Performance Goals**: N/A（Markdown 制品；可观测性义务由可见性契约与前置检查记录承载）
 **Constraints**: FR-012 归属不重裁（Session 2026-10-16 裁定）；编排本体不外移（FR-013）；`/speckit.team` 与 create-team 体系零改动（FR-015）；既有漂移 1 条（instructions-template.md 镜像 DIFF）不属本特性修复面，Verify 用相对判据
-**Scale/Scope**: 14 个交付面文件（feature-ref.md 交付清单）；契约条款 C-1..C-35（S×8 + A6/R7/I2/X2 + D9 + 平价锚 1）+ 平价映射 P×15 行
+**Scale/Scope**: 14 个交付面文件（feature-ref.md 交付清单）；契约条款与平价映射计数由 `contracts/` 制品承载（`clause_extract` 可派生），本文不复写
 
 ## Constitution Check
 
@@ -31,7 +31,7 @@
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | 全部设计决策溯源 requirements.md FR-001..016（feature-ref.md 映射表逐行） |
 | II | Feature-Centric Development | ✅ Pass | Feature 060 已注册（features.md + features/060.md），绑定 1:1，plan 不改状态越权 |
 | III | Intent-Driven Development | ✅ Pass | 三层语义按"能做什么/为谁做什么/在哪怎么跑"意图分层，未跳到实现细节 |
-| IV | Test-First & Contract-Driven Implementation | ⚠ Partial — see Complexity Tracking | 交付面为 Markdown 制品（template-only 形态），依 VII 门判 Partial（正当化）；仍落 35 条结构契约测试（先红后绿） |
+| IV | Test-First & Contract-Driven Implementation | ⚠ Partial — see Complexity Tracking | 交付面为 Markdown 制品（template-only 形态），依 VII 门判 Partial（正当化）；结构契约测试覆盖契约全条款（计数见 Phase 1 Summary 及其派生命令） |
 | V | AI Agent Integration Standards | ✅ Pass | CLI 集不变（qodercli/claude，A3 排除新增）；渲染经既有 `_AGENT_METADATA_MAPPING`，无 provider 变更 |
 | VI | Continuous Quality & Observability | ✅ Pass | 反嵌套/可见性三元组/前置检查记录承载可观测性；新行为已反映 spec/plan/contracts |
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass (NON-NEGOTIABLE gates) | 特性注册先于 plan；状态 Draft→Planned 由本 plan 推进，不越权 Implemented |
@@ -85,7 +85,7 @@ docs/reference/skills/                     # 两技能 docs 页更新（机制�
 tests/contract/                            # 新增 test_agent_dispatch_mechanism.py
 ```
 
-**Structure Decision**: 本特性落在既有框架源布局内，无新顶层目录——能力模板入既有 `agents/` 角色集（现有 skill-verifier/structure-adjuster 两文件的兄弟位），前置检查入 run-agent 的既有 references/ 面，真源深化入既有 shared/definitions/ 两文档。
+**Structure Decision**: 本特性落在既有框架源布局内，无新顶层目录——能力模板入既有 `agents/` 角色集（现有 skill-verifier/structure-adjuster 两文件的兄弟位），前置检查以新文件入 run-agent 的 references/ 面，真源深化入既有 shared/definitions/ 两文档。
 
 ### Mirror Obligations *(mandatory)*
 
@@ -104,7 +104,7 @@ tests/contract/                            # 新增 test_agent_dispatch_mechanis
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| IV Test-First 判 ⚠ Partial | 本特性交付面为 Markdown 制品（技能体/真源/模板），无纯函数与运行时行为可单测；按宪法 VII 门"template-only features judge Test-First as Partial (justified)"处理 | 把技能体改写为可执行运行时以换取"完整单测覆盖"——违反 IX（框架非运行时平台），且 058 先例已确立"结构契约测试承载条款验证"的形态（35 条款测试仍会写，test-first 红绿对 Markdown 结构可行） |
+| IV Test-First 判 ⚠ Partial | 本特性交付面为 Markdown 制品（技能体/真源/模板），无纯函数与运行时行为可单测；按宪法 VII 门"template-only features judge Test-First as Partial (justified)"处理 | 把技能体改写为可执行运行时以换取"完整单测覆盖"——违反 IX（框架非运行时平台），且 058 先例已确立"结构契约测试承载条款验证"的形态（契约全条款测试仍会写，test-first 红绿对 Markdown 结构可行） |
 
 ## Phase 0: Research Review
 
@@ -121,7 +121,7 @@ tests/contract/                            # 新增 test_agent_dispatch_mechanis
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
 | Data model | [`data-model.md`](data-model.md) | 6 实体（E1 模板 / E2 实例 / E3 拓扑声明 / E4 前置检查记录 / E5 义务集 / E6 平价映射）+ 13 条校验规则（V-E1×3 + V-E2×3 + V-E3×3 + V-E4×2 + V-E5×2） |
-| Contracts | [`contracts/`](contracts/) | 3 文件：concept-and-sources.md（C-1..C-8）+ skill-enhancements.md（C-9..C-25）+ delegation-parity.md（C-26..C-35 + P-01..P-15 义务平价映射）——35 条款 + 15 行平价底册 |
+| Contracts | [`contracts/`](contracts/) | 3 文件：concept-and-sources.md（C-1..C-8）+ skill-enhancements.md（C-9..C-25）+ delegation-parity.md（C-26..C-35 + P-01..P-15 义务平价映射）。条款计数以 `clause_extract` 派生为准：`python3 -c "import sys; sys.path.insert(0,'.specify/scripts/python'); from clause_extract import extract_clauses; [print(f, len(extract_clauses('.specify/specs/060-decompose-subagent-dispatch/contracts/'+f))) for f in ['concept-and-sources.md','skill-enhancements.md','delegation-parity.md']]"`——2026-10-17 实跑：8 / 17 / 10，合计 35 |
 | Quickstart | [`quickstart.md`](quickstart.md) | 5 场景（S1–S3 实跑留痕 / S4–S5 逐条免责+前提清单） |
 | Feature ref | [`feature-ref.md`](feature-ref.md) | FR 16/16 映射 + SC 6/6 映射 + 14 项交付清单 + 基线记录 |
 

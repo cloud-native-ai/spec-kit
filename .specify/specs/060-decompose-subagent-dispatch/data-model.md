@@ -58,7 +58,7 @@
 | 登录目标 | 无 | `<alias>` 或 IP（ssh） | FR-006 |
 | 运行身份 | 当前用户 | `<run-user>`（su/sudo，uid≠0） | FR-006 |
 | 输入来源 | 内联提示词 / 简报文件（Recipe 5） | prompt 文件（Recipe 2） | [[STR-006]] 配方 |
-| 执行形态 | 前台或后台+轮询 | 脱离派发（nohup）+定间隔轮询 | [[STR-006]] Recipe 3/4 |
+| 执行形态 | 前台或后台+轮询 | 脱离派发（nohup）+定间隔轮询——**权威落点=loop-driver 保留差异段**（nohup 形态为其实测独有，analyze H-04 裁定；共性的前台+轮询形态引 [[STR-006]] Recipe 3/4） |
 
 **双形态与冲突域**（FR-006, Session 2026-10-16）:
 - 形态 A：内联参数（调用时给出要素值）；形态 B：执行配置文件（`.specify/agents/execution/configs/<slug>.yaml`，既有 schema：agent/mode/cli/per-dispatch 覆盖/log_dir）。
@@ -85,7 +85,7 @@
 **唯一落点**：`skills/internal/run-agent/references/dispatch-preflight.md`（新文件，承载表与处置链）——`skills/external/sdd-loop-driver/references/dispatch-recipes.md` 与 `skills/external/sdd-project-setup/references/setup-recipes.md` 的同型表删除并改为引用；`external-dispatch-recipes.md` 维持"只有 how 配方、无检查"的既有边界，不改。
 
 **校验规则**:
-- V-E4-1: 全仓检索五族检查表条目原文（`ConnectTimeout`、`id <run-user>`、`--version`、`source.json` 等判据字面量的成组出现）恰一处权威落点（SC-003 判据；grep 模式须注明是否可能误中非目标行）。
+- V-E4-1: 全仓检索五族检查表条目原文（`ConnectTimeout`、`id <run-user>`、`--version`、`source.json` 等判据字面量的**成组共现**）在**框架源侧**（`skills/`、`shared/`——排除 `.specify/` 镜像副本）恰 1 处权威落点（SC-003 判据；镜像由 sync-mirrors 保证一致，不计入检索面——analyze M-06 修复）。
 - V-E4-2: 结论以每项 ≤3 行摘要写入调用方状态脊，不全文回显（平价保留既有义务）。
 
 ## E5 — 派发义务集（Obligation Set）
@@ -106,17 +106,11 @@
 
 ## E6 — 义务平价映射（Parity Map）
 
-**定位**: 改造验收的对账底册（057 SC-003 先例）——每条既有派发义务 → 承接落点 → 证据。
+**定位**: 改造验收的对账底册——**唯一权威落点 = `contracts/delegation-parity.md` § P 表（P-01..P-15，嵌套超集形态：既覆盖 FR-011 的九项义务枚举，也含编排本体保留行与更严行）**。本节不复写其行集，仅登记列语义与对账程序（analyze M-02 修复：来源标注订正）。
 
-| 列 | 含义 |
-|----|------|
-| 义务 | 改造前两技能承载的义务（逐条枚举，改造前冻结于 tasks 前提测量） |
-| 原落点 | sdd-loop-driver / sdd-project-setup 的具体文件节 |
-| 新落点 | run-agent / STR-006 / 两技能保留段 |
-| 强度 | 同等 / 更严（更严处注明） |
-| 追溯 | 契约条款号 + 契约测试名 |
+对账程序（tasks T022 执行）：以 T001 冻结的改造前原文清单为分母，P 表逐行填实"新落点/强度/追溯"三列；实现期发现额外义务按同格式追加行。
 
-**义务枚举下限**（来自规格 FR-011，实现时以改造前原文清单冻结）：五族前置检查、断点探测、三段骨架、runner 派生、脱离派发+轮询、哨兵与独立校验、状态脊先写后动、push 门控、脏文件纪律、并发隔离、窄读法授权。
+**义务枚举下限**（指针——行集以 P 表为唯一承载）：FR-011 列名的九项 + 编排本体保留与更严项，全量见 `contracts/delegation-parity.md` § C-35 节。
 
 ## 实体关系
 

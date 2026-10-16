@@ -1,6 +1,6 @@
 # Contract: 三技能承接面增强（skill-enhancements）
 
-**Feature**: 060 | **FR 覆盖**: FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-012（承接侧）, FR-014, FR-016
+**Feature**: 060 | **FR 覆盖**: FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-012（承接侧）, FR-014, FR-015, FR-016（以本文件可追溯性表为准）
 **性质**: 结构契约——条款由契约测试机械判定。
 
 ## C-9..C-14 节：create-agent 增强（US1 + 生命周期）
@@ -14,7 +14,7 @@
 
 ## C-15..C-21 节：run-agent 增强（US2 + FR-012 承接）
 
-- **C-15**: run-agent SKILL.md 的 Run Mode MUST 增补 Execution 拓扑声明输入形态：本地（项目目录+CLI）/远端（目标+身份+目录+CLI）参数集，内联参数与执行配置文件双形态等价（配置 schema 沿用既有 execution-config）。
+- **C-15**: run-agent SKILL.md 的 Run Mode MUST 增补 Execution 拓扑声明输入形态：本地（项目目录+CLI）/远端（目标+身份+目录+CLI）参数集，内联参数与执行配置文件双形态等价（配置 schema 沿用既有 execution-config）；实例引用的模板缺失或无效时 MUST 快速失败停机、MUST NOT 静默降级为内联替代（analyze L-03 承载：requirements Edge Case 5）。
 - **C-16**: 冲突消解条款 MUST 成文：两形态同给且任一要素不一致 → 解析期拒收报错并列冲突字段，MUST NOT 静默取舍（V-E3-3）。
 - **C-17**: 新文件 `skills/internal/run-agent/references/dispatch-preflight.md` MUST 存在并承载五族前置检查表+失败处置链（数据模型 E4 全表：①SSH/②非 root/③CLI 版本/④LLM 配置/⑤框架可用性；处置：①②③ fail 停线上送、④ uncertain 列待补清单、⑤ fail handoff sdd-project-setup）。
 - **C-18**: run-agent SKILL.md MUST 以引用形态把 dispatch-preflight.md 纳入 Run Mode 程序（检查先于派发；结论 ≤3 行/项入调用方状态脊），MUST NOT 在 SKILL.md 复制检查表正文。
@@ -30,7 +30,7 @@
 ## C-24..C-25 节：镜像与接线（全契约通用）
 
 - **C-24**: 本契约涉及的全部技能源文件变更 MUST 同步镜像：`skills/internal/*` ↔ `.specify/skills/internal/*`、`skills/external/*` ↔ `.specify/skills/*`（sync-mirrors MIRROR_PAIRS）。
-- **C-25**: run-agent 新增 reference 文件不改变 probe-registry 认领面（unit 数 73 → 74，因 run-agent 的 references 不新增 unit——unit 按 SKILL.md 计）；compile-embeds --check MUST 维持零漂移。
+- **C-25**: run-agent 新增 reference 文件不改变 probe-registry 认领面——unit 认领数维持 73 基线（run-agent 的 references 不新增 unit，unit 按 SKILL.md 计；analyze M-07 修复：原文"73 → 74"与理由及基线矛盾）；compile-embeds --check MUST 维持零漂移。
 
 ## 可追溯性
 
@@ -45,6 +45,6 @@
 | C-17/C-18 | FR-012 | test_c17_preflight_reference_file / test_c18_preflight_owned_by_run_agent |
 | C-19 | FR-008 | test_c19_recipes_referenced_not_copied |
 | C-20 | FR-009 | test_c20_anti_nesting_in_run_agent |
-| C-21 | FR-015 | test_c21_existing_rules_unchanged |
+| C-21 | FR-007, FR-015 | test_c21_existing_rules_unchanged |
 | C-22/C-23 | FR-014 | test_c22_evidence_input_forms / test_c23_execution_not_self_edited |
 | C-24/C-25 | FR-003, FR-012 | test_c24_mirrors_synced / test_c25_unit_count_and_zero_drift |

@@ -1,6 +1,6 @@
 # Contract: 概念真源深化（concept-and-sources）
 
-**Feature**: 060 | **FR 覆盖**: FR-001, FR-002, FR-009（真源侧条款）
+**Feature**: 060 | **FR 覆盖**: FR-001, FR-002, FR-006, FR-009, FR-013（真源侧条款——以本文件可追溯性表为准）
 **性质**: 结构契约——条款由契约测试机械判定（tests/contract/test_agent_dispatch_mechanism.py，实现期落位）。
 
 ## S 节：agent-definitions.md 扩格

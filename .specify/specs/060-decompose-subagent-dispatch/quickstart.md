@@ -25,7 +25,7 @@ grep -inE "([0-9]{1,3}\.){3}[0-9]{1,3}|/Users/|/home/[a-z]|192\.168|10\.[0-9]+\.
 
 ```bash
 grep -rln "ConnectTimeout" skills/external/ | sort
-grep -rln "nohup su -" skills/ shared/ | sort
+grep -rln "nohup su -" skills/ shared/ | sort    # scope=框架源侧，排除 .specify/ 镜像（analyze M-06）
 grep -rn "不得引用本技能\|禁止引用 sdd-loop-driver" skills/ | cut -d: -f1 | sort | uniq -c
 ```
 
@@ -79,11 +79,11 @@ compile-embeds --check: 73 units, zero drift
 # run-agent 以本地拓扑派发 sdd-requirements-executor 到目标项目
 ```
 
-预期形态（未验证）：模板落 `agents/` 源并经 `specify render-agents --ai qoder` 渲染至 `.qoder/agents/`；两实例落 `.specify/agents/instances/`；派发结果回传含完成尾标与显式异常行（SC-004 三条件）。实现期以真实运行替换本段。
+预期形态（未验证）：模板落 `agents/` 源并经 `specify render-agents --ai qoder` 渲染至 `.qoder/agents/`；两实例落 `.specify/agents/instances/`；派发结果回传含完成尾标与显式异常行（SC-004 三条件）。**实跑承载：tasks T034（SC-001 引用审计）/ T035（SC-002 双拓扑）/ T036（SC-004 端到端）——实现期由其实跑输出替换本段并回填此处。**
 
 ## S5 — 退役走查（未实现——逐条免责）
 
 > **免责（仅覆盖本条）**：create-agent 的退役规则（FR-016）尚未实现。
 > **前提**：退役实现为 create-agent 生命周期操作；「活引用」判定可枚举（运行中执行/团队席位/capacity-scope 引用三来源）。
 
-预期形态：对被活引用实例发起退役 → 拒绝并列待解引用清单；解引用后退役 → 实例标记 retired、制品保留。实现期以真实操作留痕。
+预期形态：对被活引用实例发起退役 → 拒绝并列待解引用清单；解引用后退役 → 实例标记 retired、制品保留。**实跑承载：T034–T036 完成后的退役走查（属 FR-016 验收），由其实跑输出替换本段。**

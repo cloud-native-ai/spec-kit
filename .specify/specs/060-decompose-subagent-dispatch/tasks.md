@@ -6,7 +6,7 @@
 
 **Tests Mode**: ON（Constitution Principle IV "Test-First & Contract-Driven Implementation" 命中测试强制关键词；交付面为 Markdown 制品——依 Principle VII template-only 门以**结构契约测试**承载：34 条款 C-1..C-34 逐条先红后绿 + C-35 平价底册锚点，全部落在 `tests/contract/test_agent_dispatch_mechanism.py`）
 
-**Organization**: 本特性为 doc-feature（交付物 = 技能体 + 真源文档 + 模板 + docs 页 + 契约测试），相位内采用 doc-feature 分类：author-section → mirror-parity → render-verify → refresh-verify；不适用 Models→Services→Endpoints。测试函数分四批 append 到同一测试文件——Author 行以 [blockedBy] 串行化（同文件写入），绿点由独立 Verify 行认领（Verify 行不写测试文件，无 green-path-divergence；每条款恰认领一次）。
+**Organization**: 本特性为 doc-feature（交付物 = 技能体 + 真源文档 + 模板 + docs 页 + 契约测试），相位内采用 doc-feature 分类：author-section → mirror-parity → render-verify → refresh-verify；不适用 Models→Services→Endpoints。测试函数分四批 append 到同一测试文件——Author 行以 [blockedBy] 串行化（同文件写入），绿点由 Verify 行与完成行认领（T022 认领 C-35，其余 Verify 行认领；每条款恰认领一次）。
 
 ## Definition of Done (DoD)
 
@@ -44,8 +44,8 @@
 ## Phase 2: Foundational (Blocking Prerequisites — 真源深化 C-1..C-8)
 
 - [ ] T002 Author 真源契约测试 C-1..C-8（agent-definitions 接线段存在+职责切分线+无第三 owner、拓扑声明段+分工不变+反嵌套引用、层界三行判定+越层禁令）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红，红证据记录 `.specify/specs/060-decompose-subagent-dispatch/notes/red-first-evidence.md` [blockedBy: T001]
-- [ ] T003 [P] Author `.specify/shared/definitions/agent-definitions.md` 驱动子代理接线段（Transformation Chain 后：创建经 create-agent/派发经 run-agent/修正经 improve-agent）+ 职责切分线 + 层界三行判定 + 越层禁令（C-1/C-2/C-7/C-8）[blockedBy: T002]
-- [ ] T004 [P] Author `.specify/shared/definitions/subagent-definitions.md` Execution 拓扑声明段（本地/远端要素表+内联/配置双形态+冲突拒收）+ 分工不变声明 + Dispatch-Time Governance 反嵌套引用行（C-4/C-5/C-6）[blockedBy: T002]
+- [ ] T003 [P] Author `shared/definitions/agent-definitions.md` 驱动子代理接线段（Transformation Chain 后：创建经 create-agent/派发经 run-agent/修正经 improve-agent）+ 职责切分线 + 层界三行判定 + 越层禁令（C-1/C-2/C-7/C-8）[blockedBy: T002]
+- [ ] T004 [P] Author `shared/definitions/subagent-definitions.md` Execution 拓扑声明段（本地/远端要素表+内联/配置双形态+冲突拒收）+ 分工不变声明 + Dispatch-Time Governance 反嵌套引用行（C-4/C-5/C-6）[blockedBy: T002]
 - [ ] T005 Verify C-1..C-8 绿：`python3.14 -m pytest tests/contract/test_agent_dispatch_mechanism.py -q` 全绿并记录 + shared 镜像同步（`python3 scripts/python/sync-mirrors.py --write`）+ shared 对零 NEW drift [green: contracts/concept-and-sources.md#C-1] [green: contracts/concept-and-sources.md#C-2] [green: contracts/concept-and-sources.md#C-3] [green: contracts/concept-and-sources.md#C-4] [green: contracts/concept-and-sources.md#C-5] [green: contracts/concept-and-sources.md#C-6] [green: contracts/concept-and-sources.md#C-7] [green: contracts/concept-and-sources.md#C-8] [blockedBy: T002,T003,T004]
 
 ## Phase 3: User Story 1 - 从能力模板到职责实例的创建面（Priority: P1） 🎯
@@ -84,8 +84,8 @@
 - [ ] T019 [US3] Enhance `skills/external/sdd-loop-driver/SKILL.md`——增补「子代理创建与派发委派」说明段（实例创建→create-agent、阶段派发→run-agent，输入/产出说明）（C-29）[blockedBy: T010,T014,T016]
 - [ ] T020 [P] [US3] Rewrite `skills/external/sdd-project-setup/references/setup-recipes.md`——S4 五族检查表清零引用、软协同 handoff 段收敛单侧引用、远端命令形态坍缩引用（C-30/C-31）[blockedBy: T014]
 - [ ] T021 [US3] Enhance `skills/external/sdd-project-setup/SKILL.md`——增补委派说明段（盘点脚本执行主体、S2/S3 治理命令派发经 run-agent 可选形态）（C-32）[blockedBy: T010,T014,T020]
-- [ ] T022 [US3] 义务平价对账：`contracts/delegation-parity.md` § P 表 P-01..P-15 逐行填实（新落点/强度/追溯三列以实存证据填齐，更严处注明），发现额外义务按同格式追加（C-35）[blockedBy: T016,T017,T018,T019,T020,T021]
-- [ ] T023 [US3] Verify C-26..C-34 绿 + 镜像同步（skills 对）[green: contracts/delegation-parity.md#C-26] [green: contracts/delegation-parity.md#C-27] [green: contracts/delegation-parity.md#C-28] [green: contracts/delegation-parity.md#C-29] [green: contracts/delegation-parity.md#C-30] [green: contracts/delegation-parity.md#C-31] [green: contracts/delegation-parity.md#C-32] [green: contracts/delegation-parity.md#C-33] [green: contracts/delegation-parity.md#C-34] [blockedBy: T015,T016,T017,T018,T019,T020,T021]
+- [ ] T022 [US3] 义务平价对账：`contracts/delegation-parity.md` § P 表 P-01..P-15 逐行填实（新落点/强度/追溯三列以实存证据填齐，更严处注明），发现额外义务按同格式追加（C-35，绿点由 T023 认领）[blockedBy: T016,T017,T018,T019,T020,T021]
+- [ ] T023 [US3] Verify C-26..C-34 绿 + 镜像同步（skills 对）[green: contracts/delegation-parity.md#C-26] [green: contracts/delegation-parity.md#C-27] [green: contracts/delegation-parity.md#C-28] [green: contracts/delegation-parity.md#C-29] [green: contracts/delegation-parity.md#C-30] [green: contracts/delegation-parity.md#C-31] [green: contracts/delegation-parity.md#C-32] [green: contracts/delegation-parity.md#C-33] [green: contracts/delegation-parity.md#C-34] [green: contracts/delegation-parity.md#C-35] [blockedBy: T015,T016,T017,T018,T019,T020,T021]
 - [ ] T024 [US3] Update `docs/reference/skills/sdd-loop-driver.md` 与 `docs/reference/skills/sdd-project-setup.md`——机制归属说明（派发机制真源已迁 run-agent/配方真源；软协同契约不变）[blockedBy: T019,T021,T023]
 
 ## Phase 6: User Story 4 - 执行证据回流（Priority: P2）
@@ -94,7 +94,7 @@
 
 **Independent Test**: 以一次已知失败执行记录走 improve-agent 流程产出定向修正且 Execution 产物零改动。
 
-- [ ] T025 [US4] Author improve-agent 契约测试 C-22..C-23（证据输入形态、Self-Improvement 边界保持）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红 [blockedBy: T011]
+- [ ] T025 [US4] Author improve-agent 契约测试 C-22..C-23（证据输入形态、Self-Improvement 边界保持）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红 [blockedBy: T011,T015]
 - [ ] T026 [US4] Enhance `skills/internal/improve-agent/SKILL.md`——Input Contract 增执行证据输入形态（C-22）+ Self-Improvement 边界不动自审（C-23）[blockedBy: T002]
 - [ ] T027 [US4] Verify C-22..C-23 绿 + 镜像同步（internal 对）[green: contracts/skill-enhancements.md#C-22] [green: contracts/skill-enhancements.md#C-23] [blockedBy: T025,T026]
 
@@ -103,9 +103,19 @@
 - [ ] T028 全量镜像验证：`python3 scripts/python/sync-mirrors.py --check` 触碰对（agents/internal/skills/shared）零 NEW drift——既有 instructions-template DIFF 1 条不计入（C-24）[blockedBy: T005,T010,T014,T024,T027]
 - [ ] T029 编译面复核：`python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check` 零漂移 + unit 认领面复核（73 units 基线对照）（C-25）[blockedBy: T028]
 - [ ] T030 Verify C-24/C-25 绿并记录 [green: contracts/skill-enhancements.md#C-24] [green: contracts/skill-enhancements.md#C-25] [blockedBy: T028,T029]
-- [ ] T031 quickstart 复跑留痕到 `.specify/specs/060-decompose-subagent-dispatch/notes/quickstart-run.md`——S1 内容判据（对 sdd-executor 复跑预期空输出）、S2 三组检索复测（恰 1 落点判定）、S3 引擎复跑；S4/S5 免责状态记录 [blockedBy: T030]
+- [ ] T031 quickstart 复跑留痕到 `.specify/specs/060-decompose-subagent-dispatch/notes/quickstart-run.md`——S1 内容判据（对 sdd-executor 复跑预期空输出）、S2 三组检索复测（恰 1 落点判定，scope=框架源侧 skills/ shared/ 排除镜像）、S3 引擎复跑；S4/S5 段由 T034–T036 回填 [blockedBy: T030]
 - [ ] T032 全套件 name-level 对比：`python3.14 -m pytest tests/contract/ tests/integration/ -q` 与 T001 冻结名单 comm 零新增（消费义务见 /speckit.implement `**Test runs**` bullet）[blockedBy: T030]
 - [ ] T033 feature-ref 交付清单对账（14 项逐项存在性检查）+ Feature 列表复审（无新 Feature、无既有失效，状态维持 Planned 不越权）[blockedBy: T023,T024]
+
+---
+
+## Phase 8: User Story Acceptance Evidence（SC-001/002/004 实跑承载——analyze H-02 修复）
+
+> SC-001/002/004 的验收证据此前零任务承载（analyze H-02）：三行落在对应故事的 Verify 之后，产出直接供 verification.md 逐 SC 记录（DoD-6/GATE-4 的证据来源）。
+
+- [ ] T034 [US1] SC-001 实跑：经 create-agent 从 sdd-executor 实例化 ≥2 个职责实例（sdd-setup-executor / sdd-requirements-executor），并按 SC-001 判据审计——实例体对模板能力的复述零命中（grep capacity-scope 引用计数 + 能力描述句检索），证据落 `verification.md` [blockedBy: T010]
+- [ ] T035 [US2] SC-002 实跑：同一实例以本地拓扑完成一次真实执行 + 远端拓扑以派发命令形态逐要素审计（ssh/su/CLI/目录）；两形态下 Template/Instance 制品 diff 为空判定，证据落 `verification.md` [blockedBy: T014]
+- [ ] T036 [US3] SC-004 端到端：经 run-agent 派发一个阶段实例在本地项目完成一个 SDD 阶段，回传三条件核验（完成尾标/产物在位/显式异常行）+ 子代理输入文件反嵌套审计（驱动技能引用零命中），证据落 `verification.md`；末次执行后回填 quickstart S4/S5 免责段为实跑留痕（M-06 同批：S2 判定 scope=框架源侧）[blockedBy: T014,T024]
 
 ---
 
