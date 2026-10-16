@@ -81,7 +81,7 @@ U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归
 本技能频繁驱动完整 SDD 流程，是 speckit 框架摩擦的最佳观察者——框架级观察 MUST 有落点，MUST NOT 随收尾汇总蒸发。三个采集点（本技能不加新采集机器——状态脊、收尾汇总与既有引擎就是载体，IX）：
 
 1. **每线观察点（U4/U6）**：独立校验与收尾时，把观察到的 **speckit 框架级摩擦**记入该线状态脊的「框架观察」段——结构化三要素：现象 / 框架位置（哪个阶段命令、模板、命令面）/ 对驱动的影响。范围限框架本身（阶段命令行为、模板缺口、哨兵与校验误报）；目标项目的业务问题不属此类。
-2. **收尾落库点（U6）**：收尾汇总 MUST 携带「框架反馈候选」清单（自各线「框架观察」段聚合）。宿主工作区存在 `.specify/` 时，经 `feedback-utils.py --action record --unit-id "skill:sdd-loop-driver" --unit-type skill` 逐条落宿主反馈库（runtime-mode 门控沿用编译 Wrap-up 节的 gate）；宿主无 `.specify/`（standalone）时，候选清单随收尾汇总交付用户，由用户决定投递去向——**不自动上送**（feedback 红线：manual 投递，绝不自动传输）。
+2. **收尾落库点（U6）**：收尾汇总 MUST 携带「框架反馈候选」清单（自各线「框架观察」段聚合）。落库形态分两种：宿主工作区具备规格库结构（`.specify/` 在位）时，候选逐条经 `feedback-utils.py --action record --unit-id "skill:sdd-loop-driver" --unit-type skill` 落宿主反馈库（runtime-mode 门控沿用编译 Wrap-up 节的 gate）；宿主无该结构（standalone）时，候选清单随收尾汇总交付用户，由用户决定投递去向——**不自动上送**（feedback 红线：manual 投递，绝不自动传输）。
 3. **skill 收尾点（run 结束）**：编译 `## Wrap-up` 节既有的五步引擎链（run determination → exec quant → feedback record → threshold notice → token reflection；probe-registry `@point:wrap-up scope=all` 绑定，73 units 全覆盖）——run 结束照单执行，本节不重复其步骤。
 
 ## Wrap-up
