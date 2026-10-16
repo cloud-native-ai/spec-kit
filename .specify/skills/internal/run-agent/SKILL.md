@@ -44,6 +44,27 @@ spawns a fresh Execution — the same Instance can be run multiple times (sequen
 concurrently), and each Execution is isolated from the definition and from every other
 Execution.
 
+### Execution Topology (拓扑声明输入)
+
+The dispatch is parameterized by an **Execution topology declaration** per
+`.specify/shared/definitions/subagent-definitions.md` § Execution Topology Declaration:
+
+- **本地拓扑（local）**: `<project-dir>` + `<cli>` — the orchestrator drives the CLI directly
+  with the local project as working directory.
+- **远端拓扑（remote）**: `<alias>`（or host IP）+ `<run-user>`（uid≠0）+ `<project-dir>` + `<cli>`
+  via `ssh` → `su` — long-running/parallel work that must outlive the session.
+- **双形态等价（dual input forms）**: the declaration arrives as **内联参数（inline）** or an
+  **执行配置文件（execution config）**; when BOTH are given and any element disagrees, the
+  dispatch is **rejected at parse time with the conflicting fields listed**（拒收报错并列冲突字段）—
+  never a silent pick. A missing/invalid referenced template fails fast the same way —
+  no silent degradation to an inline substitute.
+- **前置检查先于派发**: run the five-family preflight with its failure-handling chain from
+  `references/dispatch-preflight.md` — this SKILL.md references that table and MUST NOT copy it.
+- **拓扑配方引用**: concrete command shapes (breakpoint probe, stage prompt files, runner
+  derivation, detached dispatch + polling, local variant) come from
+  `shared/workflow/external-dispatch-recipes.md` — referenced, never copied here; a shape the
+  recipes do not cover fails fast instead of being improvised.
+
 1. **Resolve the target agent** — per the Input Contract above.
 2. **Present & dispatch** — present the agent's `name`, `description`, and the task, then
    dispatch directly. The presentation is **disclosure, not a blocking gate**（用户可随时叫停）.
@@ -65,6 +86,15 @@ line in the returned message. A return without that line is **incomplete**, and 
 conclusions MUST NOT be consumed. Found missing **before** dispatch → repair in passing and
 disclose at wrap-up; found **after** dispatch → fast fail, because the agent already ran
 ungoverned and editing the prompt cannot undo that.
+
+**Anti-nesting obligation (反嵌套，派发前拦截)**: the outgoing prompt MUST NOT reference any
+driver/loop skill (e.g. `sdd-loop-driver`), MUST NOT instruct the subagent to load any skill,
+and MUST NOT contain loop logic — the loader of a driver manual is the driver itself, and a
+subagent that receives the manual becomes a second driver, so the hierarchy escapes (循环层级
+恒为 1：驱动者 → 阶段执行者，不存在第三层). The pre-dispatch probe extends to this obligation:
+a prompt that names a driver skill fails the probe and MUST NOT be dispatched. Provenance:
+the sdd-loop-driver Driver Topology defect fix (2026-10-16); obligation declared in
+`.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation.
 
 **Scope boundary**: Run mode executes a **single** agent on a **single** task. For
 multi-agent orchestration (parallel dispatch, serial chains, iteration loops, long-running

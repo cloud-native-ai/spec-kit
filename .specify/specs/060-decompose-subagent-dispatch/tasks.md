@@ -66,10 +66,10 @@
 
 **Independent Test**: 对任一既有实例以本地拓扑发起真实执行并以命令形态审计远端形态（SC-002 判据），不依赖两技能改造。
 
-- [ ] T011 [US2] Author run-agent 契约测试 C-15..C-21（拓扑输入形态、冲突拒收、preflight 文件与 SKILL 接线、配方引用不复制、反嵌套义务、既有规则零改写）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红 [blockedBy: T006]
-- [ ] T012 [P] [US2] Author `skills/internal/run-agent/references/dispatch-preflight.md`——五族前置检查表+失败处置链上收（内容取材 loop-driver Preflight 现行正文，行为平价搬家；本地拓扑跳过注记保留）（C-17）[blockedBy: T001]
-- [ ] T013 [P] [US2] Enhance `skills/internal/run-agent/SKILL.md`——Run Mode 增拓扑声明输入（C-15）+ 冲突拒收（C-16）+ preflight 接线（C-18）+ 配方引用 [[STR-006]]（C-19）+ 派发治理增反嵌套义务（C-20）+ 既有边界条文零改写自审（C-21）[blockedBy: T002]
-- [ ] T014 [US2] Verify C-15..C-21 绿 + 镜像同步（internal 对）[green: contracts/skill-enhancements.md#C-15] [green: contracts/skill-enhancements.md#C-16] [green: contracts/skill-enhancements.md#C-17] [green: contracts/skill-enhancements.md#C-18] [green: contracts/skill-enhancements.md#C-19] [green: contracts/skill-enhancements.md#C-20] [green: contracts/skill-enhancements.md#C-21] [blockedBy: T011,T012,T013]
+- [X] T011 [US2] Author run-agent 契约测试 C-15..C-21（拓扑输入形态、冲突拒收、preflight 文件与 SKILL 接线、配方引用不复制、反嵌套义务、既有规则零改写）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红 [blockedBy: T006]
+- [X] T012 [P] [US2] Author `skills/internal/run-agent/references/dispatch-preflight.md`——五族前置检查表+失败处置链上收（内容取材 loop-driver Preflight 现行正文，行为平价搬家；本地拓扑跳过注记保留）（C-17）[blockedBy: T001]
+- [X] T013 [P] [US2] Enhance `skills/internal/run-agent/SKILL.md`——Run Mode 增拓扑声明输入（C-15）+ 冲突拒收（C-16）+ preflight 接线（C-18）+ 配方引用 [[STR-006]]（C-19）+ 派发治理增反嵌套义务（C-20）+ 既有边界条文零改写自审（C-21）[blockedBy: T002]
+- [X] T014 [US2] Verify C-15..C-21 绿 + 镜像同步（internal 对）[green: contracts/skill-enhancements.md#C-15] [green: contracts/skill-enhancements.md#C-16] [green: contracts/skill-enhancements.md#C-17] [green: contracts/skill-enhancements.md#C-18] [green: contracts/skill-enhancements.md#C-19] [green: contracts/skill-enhancements.md#C-20] [green: contracts/skill-enhancements.md#C-21] [blockedBy: T011,T012,T013]
 
 ## Phase 5: User Story 3 - 两技能的委派化改造（Priority: P1） 🎯
 

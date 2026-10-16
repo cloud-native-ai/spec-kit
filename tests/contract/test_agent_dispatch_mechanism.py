@@ -234,3 +234,99 @@ def test_c14_mirror_pair_byte_identical():
     assert EXECUTOR.read_bytes() == EXECUTOR_MIRROR.read_bytes(), (
         "agents/sdd-executor.agent.md mirror drift"
     )
+
+
+# ================================================================ US2 (C-15..C-21)
+
+RUN_AGENT_SKILL = REPO_ROOT / "skills" / "internal" / "run-agent" / "SKILL.md"
+PREFLIGHT = REPO_ROOT / "skills" / "internal" / "run-agent" / "references" / "dispatch-preflight.md"
+
+
+def _run_agent_skill() -> str:
+    return _read(RUN_AGENT_SKILL)
+
+
+# ---------------------------------------------------------------- C-15
+
+
+def test_c15_topology_input_forms():
+    """Run Mode 增拓扑声明输入：本地/远端参数集 + 双形态 + 模板缺失快速失败。"""
+    text = _run_agent_skill()
+    assert "拓扑" in text, "topology declaration input missing from run-agent"
+    assert "本地" in text and "远端" in text
+    assert "内联" in text and "配置" in text, "dual input forms missing"
+    assert "快速失败" in text and ("模板缺失" in text or "缺失" in text), (
+        "template-missing fast-fail rule missing"
+    )
+
+
+# ---------------------------------------------------------------- C-16
+
+
+def test_c16_conflict_rejection():
+    """双形态冲突 → 解析期拒收并列冲突字段。"""
+    text = _run_agent_skill()
+    assert "拒收" in text
+    assert "冲突字段" in text
+
+
+# ---------------------------------------------------------------- C-17
+
+
+def test_c17_dispatch_preflight_reference_file():
+    """dispatch-preflight.md 承载五族前置检查表 + 失败处置链。"""
+    assert PREFLIGHT.exists(), "references/dispatch-preflight.md missing"
+    text = _read(PREFLIGHT)
+    # five families, each with its decisive literal
+    assert "ConnectTimeout" in text and "本地拓扑" in text          # ① ssh
+    assert "id <run-user>" in text and "uid" in text                # ② run user
+    assert "--version" in text                                       # ③ CLI
+    assert "effort" in text and "context" in text.lower()           # ④ LLM config
+    assert "source.json" in text and "constitution" in text         # ⑤ framework
+    # handling chain
+    assert "待补" in text or "待用户补充" in text                    # ④ uncertain
+    assert "handoff" in text and "sdd-project-setup" in text        # ⑤ fail handoff
+    assert "停线" in text or "上送" in text                          # ①②③ fail
+
+
+# ---------------------------------------------------------------- C-18
+
+
+def test_c18_preflight_wired_by_reference():
+    """SKILL.md 以引用接线 preflight，不复制检查表正文。"""
+    text = _run_agent_skill()
+    assert "dispatch-preflight.md" in text, "preflight reference missing from SKILL.md"
+    assert "ConnectTimeout" not in text, "five-family table copied into SKILL.md (C-18 violation)"
+
+
+# ---------------------------------------------------------------- C-19
+
+
+def test_c19_recipes_referenced_not_copied():
+    """拓扑配方引用 [[STR-006]]，配方正文不复制。"""
+    text = _run_agent_skill()
+    assert "external-dispatch-recipes.md" in text, "recipes reference missing"
+    assert "nohup" not in text, "recipe body copied into run-agent (C-19 violation)"
+
+
+# ---------------------------------------------------------------- C-20
+
+
+def test_c20_anti_nesting_in_run_agent():
+    """反嵌套义务上收为公用派发义务：派发前拦截。"""
+    text = _run_agent_skill()
+    assert "反嵌套" in text or "嵌套" in text, "anti-nesting obligation missing"
+    assert "循环层级" in text or "层级" in text
+    assert "派发前" in text, "pre-dispatch interception must be named"
+
+
+# ---------------------------------------------------------------- C-21
+
+
+def test_c21_existing_rules_unchanged():
+    """既有规则零改写：模态选择/可见性契约/注入子句/单代理边界全部在位。"""
+    text = _run_agent_skill()
+    assert "native" in text and "virtual" in text and "external" in text
+    assert "Visibility Contract" in text
+    assert "fast-fail injection" in text or "子代理派发注入" in text or "注入" in text
+    assert "/speckit.team" in text, "single-agent boundary must remain"

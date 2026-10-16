@@ -25,3 +25,9 @@ FAILED test_c8_cross_layer_change_ban
 ```
 6 failed, 8 passed（C-9..C-14 全红——模板与 SKILL.md 增强尚未落地）
 ```
+
+## T011 — C-15..C-21 run-agent 契约测试（2026-10-17）
+
+```
+7 failed（C-15..C-21 全红——拓扑输入/preflight/反嵌套尚未落地）
+```
