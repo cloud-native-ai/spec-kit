@@ -47,6 +47,21 @@ Choose per dispatch, per member, by scenario — not by habit:
 
 When in doubt: **native first, virtual as fallback, external when isolation/parallelism/observability requirements exceed what the session can provide.**
 
+## Execution Topology Declaration (执行拓扑声明)
+
+An Agent Execution is parameterized by a **topology declaration** — the environment facts that turn an instance reference into a concrete run. Every element is entry-level; nothing here hardcodes a workspace naming rule, a host, or a user ( Feature 060 ruling).
+
+| Element | Local topology | Remote topology |
+|---------|----------------|-----------------|
+| Project directory | `<project-dir>` | `<project-dir>` (remote path) |
+| Subagent CLI | `<cli>` (e.g. `qodercli`, `claude`) | `<cli>` |
+| Login target | none (direct drive) | `<alias>` or host IP (`ssh`) |
+| Run identity | current user | `<run-user>` (`su`/`sudo`, uid ≠ 0) |
+
+**Dual input forms, equivalent**: the declaration may arrive as (a) **inline parameters** given at call time, or (b) an **execution config file** (`.specify/agents/execution/configs/<slug>.yaml`). The two forms are interchangeable; when BOTH are given and any element disagrees, the dispatch MUST be **rejected at parse time with the conflicting fields listed**（拒收报错并列冲突字段 — fast-fail discipline; never a silent pick）. A missing/invalid referenced template fails fast the same way — no silent degradation to an inline substitute.
+
+**Division of labor (unchanged)**: this section owns *what must be declared*; `../workflow/external-dispatch-recipes.md` owns *how the declaration is executed* (concrete command shapes). When they disagree, this contract wins（分歧时契约赢）.
+
 ## External Dispatch Visibility Contract
 
 **The silent anti-pattern** (observed in real team runs):
@@ -79,6 +94,8 @@ Every external subagent dispatch MUST therefore:
 The Visibility Contract above owns whether a dispatch is **observable**. This section owns whether it is **governed** — the two are complementary and neither substitutes for the other. A dispatch you can watch but not triage still runs an ungoverned agent; a dispatch you can triage but not watch still hides a stall.
 
 Every dispatch MUST carry the fast-fail injection clause, because a subagent's prompt derives from its own definition and dispatch payload rather than from the orchestrator's conversation, so no standing instruction layer reaches it. The clause's owner literal, its three channels, the pre-dispatch probe, the anomaly return line, and the rule that an anomaly halt is not an ordinary failure are all defined once in `.specify/shared/guidelines/fast-fail.md` § 子代理派发注入; this section MUST reference it and MUST NOT restate it.
+
+**Anti-nesting obligation (反嵌套)**: the dispatching prompt MUST NOT reference any driver/loop skill (e.g. `sdd-loop-driver`), MUST NOT instruct the subagent to load any skill, and MUST NOT contain loop logic — the loader of a driver manual is the driver; a subagent that receives the manual becomes a second driver and the hierarchy escapes (loop depth is always 1: driver → stage executor). The operational enforcement lives in `skills/internal/run-agent/SKILL.md` dispatch governance (pre-dispatch probe extended to this obligation); the ruling's provenance is the sdd-loop-driver Driver Topology defect fix (2026-10-16).
 
 The obligation binds all three execution modes (native / virtual / external) equally, and virtual mode is not exempt merely because the session itself holds a standing instruction layer. It is a **caller-side content** duty, deliberately NOT implemented in the reference wrapper below: a discipline that depends on one execution path can be bypassed by choosing another, so the wrapper stays generic and unchanged.
 

@@ -43,10 +43,10 @@
 
 ## Phase 2: Foundational (Blocking Prerequisites — 真源深化 C-1..C-8)
 
-- [ ] T002 Author 真源契约测试 C-1..C-8（agent-definitions 接线段存在+职责切分线+无第三 owner、拓扑声明段+分工不变+反嵌套引用、层界三行判定+越层禁令）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红，红证据记录 `.specify/specs/060-decompose-subagent-dispatch/notes/red-first-evidence.md` [blockedBy: T001]
-- [ ] T003 [P] Author `shared/definitions/agent-definitions.md` 驱动子代理接线段（Transformation Chain 后：创建经 create-agent/派发经 run-agent/修正经 improve-agent）+ 职责切分线 + 层界三行判定 + 越层禁令（C-1/C-2/C-7/C-8）[blockedBy: T002]
-- [ ] T004 [P] Author `shared/definitions/subagent-definitions.md` Execution 拓扑声明段（本地/远端要素表+内联/配置双形态+冲突拒收）+ 分工不变声明 + Dispatch-Time Governance 反嵌套引用行（C-4/C-5/C-6）[blockedBy: T002]
-- [ ] T005 Verify C-1..C-8 绿：`python3.14 -m pytest tests/contract/test_agent_dispatch_mechanism.py -q` 全绿并记录 + shared 镜像同步（`python3 scripts/python/sync-mirrors.py --write`）+ shared 对零 NEW drift [green: contracts/concept-and-sources.md#C-1] [green: contracts/concept-and-sources.md#C-2] [green: contracts/concept-and-sources.md#C-3] [green: contracts/concept-and-sources.md#C-4] [green: contracts/concept-and-sources.md#C-5] [green: contracts/concept-and-sources.md#C-6] [green: contracts/concept-and-sources.md#C-7] [green: contracts/concept-and-sources.md#C-8] [blockedBy: T002,T003,T004]
+- [X] T002 Author 真源契约测试 C-1..C-8（agent-definitions 接线段存在+职责切分线+无第三 owner、拓扑声明段+分工不变+反嵌套引用、层界三行判定+越层禁令）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红，红证据记录 `.specify/specs/060-decompose-subagent-dispatch/notes/red-first-evidence.md` [blockedBy: T001]
+- [X] T003 [P] Author `shared/definitions/agent-definitions.md` 驱动子代理接线段（Transformation Chain 后：创建经 create-agent/派发经 run-agent/修正经 improve-agent）+ 职责切分线 + 层界三行判定 + 越层禁令（C-1/C-2/C-7/C-8）[blockedBy: T002]
+- [X] T004 [P] Author `shared/definitions/subagent-definitions.md` Execution 拓扑声明段（本地/远端要素表+内联/配置双形态+冲突拒收）+ 分工不变声明 + Dispatch-Time Governance 反嵌套引用行（C-4/C-5/C-6）[blockedBy: T002]
+- [X] T005 Verify C-1..C-8 绿：`python3.14 -m pytest tests/contract/test_agent_dispatch_mechanism.py -q` 全绿并记录 + shared 镜像同步（`python3 scripts/python/sync-mirrors.py --write`）+ shared 对零 NEW drift [green: contracts/concept-and-sources.md#C-1] [green: contracts/concept-and-sources.md#C-2] [green: contracts/concept-and-sources.md#C-3] [green: contracts/concept-and-sources.md#C-4] [green: contracts/concept-and-sources.md#C-5] [green: contracts/concept-and-sources.md#C-6] [green: contracts/concept-and-sources.md#C-7] [green: contracts/concept-and-sources.md#C-8] [blockedBy: T002,T003,T004]
 
 ## Phase 3: User Story 1 - 从能力模板到职责实例的创建面（Priority: P1） 🎯
 

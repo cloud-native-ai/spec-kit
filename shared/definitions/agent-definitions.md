@@ -25,6 +25,26 @@ capability, .md                     responsibility, .md                         
 - **Edit routing**: `refine` operations (`improve-agent`, `improve-team`) act on Templates and Instances — never on Executions. A misbehaving Execution is terminated or re-dispatched; the fix lands in the layer below.
 - **Self-Improvement boundary**: Templates and Instances may be Execution Subjects; an Execution is own-run evidence, never the self-edited target. Persistent agents reference `shared/workflow/self-improvement-workflow.md` through the contract composed by `create-agent`.
 
+## Driving Subagents via the Three Layers (驱动子代理的公用机制接线)
+
+Orchestration skills that need to **drive subagents** (驱动子代理 — e.g. `sdd-loop-driver`, `sdd-project-setup`) do not carry their own dispatch mechanics; they exercise the three layers through the three single-agent skills:
+
+- **Create** (Template → Instance): delegated to `skills/internal/create-agent/SKILL.md` — author the capacity template, then instantiate duty-bound instances from it.
+- **Dispatch** (Instance → Execution): delegated to `skills/internal/run-agent/SKILL.md` — resolve the definition, accept the Execution topology declaration (see `subagent-definitions.md` § Execution Topology Declaration), and launch per the mode rules and the External Dispatch Visibility Contract.
+- **Improve** (evidence → Template/Instance): delegated to `skills/internal/improve-agent/SKILL.md` — execution evidence (logs, visibility triplet, anomaly return lines, failure modes) refines the definition layers.
+
+Concrete command shapes for driving an external subagent live in `shared/workflow/external-dispatch-recipes.md`; what a dispatch must satisfy lives in `subagent-definitions.md`. This section wires the consumers to those owners — it does not restate their rules.
+
+**职责切分线 (responsibility divide)**: **orchestration（编排）** (the SDD six-stage loop, the reconcile sequence, state spines, candidate lists) stays with the driving skill's own body; **create / dispatch / improve** belong to the three承接 skills. Neither side absorbs the other.
+
+**Layer-boundary rules (层界判定，三行)**:
+
+- **Agent Template — 能力面**: answers "what can this kind of agent do" (e.g. work in a project directory, load project context, run `/speckit.*` stage commands). A change is Template-layer iff it alters the capability face.
+- **Agent Instance — 职责绑定**: answers "what is this agent for, here" (one duty per instance, bound via `capacity-scope` reference — never a capability restatement). A change is Instance-layer iff it alters the duty binding.
+- **Agent Execution — 运行拓扑**: answers "where and how does it run" (local path or ssh target + run user + CLI + project directory). A change is Execution-layer iff it alters the topology declaration.
+
+**Cross-layer change ban (越层禁令)**: 改能力不去改拓扑，改拓扑不去改能力 — a single change's diff must not span the Template/Instance face and the Execution topology face; a change that needs both is two changes, landed separately in their own layers.
+
 ## Storage Layout
 
 ```

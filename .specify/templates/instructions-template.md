@@ -73,6 +73,14 @@ LLM token usage efficiency is a framework-level quality attribute. The full disc
 - **Summary-First (摘要优先)**: never inject the whole raw content of machine-managed data files (feedback, memory, evidence, history stores, run artifacts, inventories) into LLM context; consume digests, field projections, or targeted excerpts, escalating per the discipline doc's escalation ladder (exceptions: edit target, small-file threshold, recorded justification).
 - **Consumption Observation (消耗观察)**: at feedback wrap-up, self-assess avoidable token spend; findings carry the stable `token-efficiency` marker (retrievable via `feedback-utils.py --action list --contains token-efficiency`); never fabricate token counts.
 
+## Single-Run Evidence Discipline
+
+An expensive execution (long-running tests, builds, bulk queries, remote calls) is a one-time evidence-gathering opportunity: the run itself is what costs, and its complete output is nearly free to keep. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/single-run-evidence.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+
+- **Capture-in-Full (执行时全量捕获)**: the command line, exit status, complete stdout/stderr, and duration of an expensive run are persisted to an artifact at execution time; filtered views derive from that record, never from an in-flight pipeline that discards the original.
+- **Diagnostics-Before-the-Run (诊断开关前置)**: opt-in, side-effect-free diagnostics (per-item durations, verbose logging) are enabled before an expensive run — once the run finishes without them, that information is gone for good.
+- **Consume-the-Record (消费留痕而非重跑)**: follow-up questions about a completed execution are answered from the record; re-running to recover information the first run already produced is the canonical anti-pattern — the full cost is paid a second time, with non-reproducibility risk on top.
+
 ## Run Determination
 
 Once per completed run, at wrap-up, a program measures how that run went and the result routes into the existing feedback flow. The wiring is defined in a single source of truth — `.specify/shared/workflow/feedback-step.md` § Run Determination (do NOT copy its rules; reference the file) — which owns the consumption point, the composition with the wrap-up notification, the missing-record degradation and the passive non-exhaustiveness constraint. The engine `.specify/scripts/python/run-determination.py` is the code-side owner of the record schema, every value domain and the routing-bit derivation:
