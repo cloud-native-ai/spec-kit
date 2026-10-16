@@ -1,6 +1,6 @@
 ---
 name: sdd-project-setup
-description: SDD 项目框架调协手册（可独立运行）——把目标项目（本地或远端）以调协模式推进到 spec-kit 框架预期的最佳状态：机制盘点（确定性脚本分级 absent/degraded/partial/complete）、specify init / instructions 刷新、调协序列（constitution → sanitize → feature → instructions → docs，按需逐项）、五族前置检查与兼容符号链接验证，最后产出候选工作清单（未完成 feature / 大改进 feedback / TODO 事项——建议而非强制地供 sdd-loop-driver 等下游选用；两技能互不强依赖）。当用户说「初始化 spec-kit」「项目接入 SDD」「框架就绪检查」「调协项目框架」「sdd-project-setup」，或 sdd-loop-driver 的 preflight 发现目标项目无 .specify/ 或机制退化时加载本手册。
+description: SDD 项目框架调协手册（可独立运行）——把目标项目（本地或远端）以调协模式推进到 spec-kit 框架预期的最佳状态：机制盘点（确定性脚本分级 absent/degraded/partial/complete）、specify init / instructions 刷新、调协序列（constitution → sanitize → feature → instructions → docs，按需逐项）、强化序列（history → docs → research → feature → goal——会话历史蒸馏补料、深度调研、特性列表生成、定义 3–5 个项目目标）、五族前置检查与兼容符号链接验证，最后产出候选工作清单（未完成 feature / 大改进 feedback / TODO 事项——建议而非强制地供 sdd-loop-driver 等下游选用；两技能互不强依赖）。当用户说「初始化 spec-kit」「项目接入 SDD」「框架就绪检查」「调协项目框架」「sdd-project-setup」，或 sdd-loop-driver 的 preflight 发现目标项目无 .specify/ 或机制退化时加载本手册。
 skill_id: "<SKILL:.specify/skills/sdd-project-setup/SKILL.md>"
 classification: external
 ---
@@ -10,6 +10,10 @@ classification: external
 ## What This Skill Does
 
 spec-kit 本地 fork（master）在上游 SDD 之上扩充了大量机制——feature 注册表（37/41 真实项目采用）、feedback 库、memory-as-files、glossary、ID register、evidence、probe 体系等。这些机制只有被正确安装、激活、验证后才能兑现价值。本手册把「让一个项目达到 spec-kit 框架预期的最佳状态」固化为**调协模式**五步程序：先盘点定缺口，再按需调协，最终验证；调协完成后产出候选工作清单供下一步 SDD 开发选用（可选 handoff sdd-loop-driver，非强制）。
+
+调协分两层：**基础调协**（机制盘点/安装/修复/验证，S1–S4）让框架就绪；**强化序列**（机制就绪后的增值建设，S3+，按需逐项）用框架内容类命令把项目从「机制可用」推进到「知识与规划在位」——history 蒸馏会话历史为文档与知识库补料、research 深度调研、feature 生成特性列表、goal 定义 3–5 个项目目标。
+
+**幂等契约**：本技能对同一项目可多次执行——每次执行先 S1 盘点定缺口，S2/S3/S3+ 只执行缺口项；**稳定态（机制 complete 且无内容缺口）上的重复执行零结构写动作、零内容重建**，仅刷新 S5 候选清单。收敛语义与逐命令重入行为见 setup-recipes.md「幂等与重入语义」。
 
 ## When to Load
 
@@ -24,9 +28,13 @@ S1 ASSESS    机制盘点：scripts/mechanism-inventory.py 扫描 .specify/ → 
              （absent / partial / degraded / complete）+ 框架版本 provenance
 S2 INSTALL   absent → specify init . --here --ai <tool> [--force]；
              partial/degraded → /speckit.instructions 刷新（recover 模式）
-S3 RECONCILE 调协模式（按 S1 缺口按需逐项，惯常次序）：
+S3 RECONCILE 基础调协（按 S1 缺口按需逐项，惯常次序）：
              /speckit.constitution → /speckit.sanitize → /speckit.feature →
              /speckit.instructions → /speckit.docs
+S3+ STRENGTHEN 强化序列（机制就绪后的增值建设，按需逐项，细则见
+             setup-recipes.md）：/speckit.history → /speckit.docs 深化 →
+             /speckit.research → /speckit.feature 特性生成 →
+             /speckit.goal（定义 3–5 个项目目标）
 S4 VERIFY    五族前置检查（SSH/运行用户/CLI/LLM 配置/spec-kit 可用性）+
              机制完备度矩阵复扫 + 兼容符号链接核验 → 全绿才算调协完成
 S5 SUGGEST   产出候选工作清单（三个内部来源：未完成 feature / 大规模改进
@@ -41,12 +49,13 @@ S5 SUGGEST   产出候选工作清单（三个内部来源：未完成 feature /
 3. **调协按需、不整建**：S3 只执行 S1 判定缺失的项，每项一个治理命令，命中即停；不存在的机制不预建（tools/register 等低频机制按项目需要，缺≠错）。
 4. **声明式缺口**：S3 调协的每一项在产出中登记（执行/已存在/跳过+理由）；未被处理的项必须出现在「未处理清单」——静默省略视为违规。
 5. **建议而非强制**：S5 的候选工作清单是提示（有哪些可做的事），不携带任何「必须调用 sdd-loop-driver」的语义；调用与否由用户或上游流程决定。
+6. **幂等收敛**：S2/S3/S3+ 的每一动作 MUST 幂等——同一稳定态上重复执行不产生新的写动作；每项动作执行前 MUST 以本次 S1 盘点结果为缺口凭据，禁止凭上次执行的记忆跳过或重做（幂等与重入语义见 setup-recipes.md）。
 
 ## Discipline Defaults
 
 - 直接执行不要确认；访谈式问题自行裁决并记录假设（产出附「假设与裁决」节）。
 - 远端形态时既有脏文件不提交不还原（与 sdd-loop-driver 同一纪律）。
-- 本技能**不做任何 SDD 阶段推进**（requirements 等六阶段归 sdd-loop-driver）；S3 的 /speckit.* 调用仅限治理类（constitution/sanitize/feature/instructions/docs）。
+- 本技能**不做任何 SDD 阶段推进**（requirements 等开发阶段归 sdd-loop-driver）；调协与强化的 /speckit.* 调用仅限治理与建设类（constitution/sanitize/feature/instructions/docs/history/research/goal）。
 - 不 push（除非入口显式授权）。
 
 ## References
@@ -59,7 +68,7 @@ S5 SUGGEST   产出候选工作清单（三个内部来源：未完成 feature /
 
 - **盘点与验证的执行**：`scripts/mechanism-inventory.py` 由编排者直接运行（只读脚本，无需子代理）；远端盘点经 `ssh + su` 形态执行（占位约定同 `.specify/shared/workflow/external-dispatch-recipes.md`）。
 - **S2/S3 治理命令的派发**：`specify init` / `/speckit.*` 治理命令如需以子代理承载，经 **run-agent**（`skills/internal/run-agent/SKILL.md`）以拓扑声明派发——前置检查与失败处置链随其 `references/dispatch-preflight.md`；独立运行时编排者亦可亲自执行治理命令（等价路径）。
-- **职责切分线**：框架调协（install/reconcile/verify/候选清单）= 本技能；SDD 六阶段循环 = sdd-loop-driver；创建/派发/修正 = create-agent / run-agent / improve-agent（见 `.specify/shared/definitions/agent-definitions.md` § Driving Subagents via the Three Layers）。
+- **职责切分线**：框架调协（install/reconcile/strengthen/verify/候选清单）= 本技能；SDD 完整阶段循环 = sdd-loop-driver；创建/派发/修正 = create-agent / run-agent / improve-agent（见 `.specify/shared/definitions/agent-definitions.md` § Driving Subagents via the Three Layers）。
 
 ## Boundary
 
