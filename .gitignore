@@ -73,3 +73,5 @@ src/specify_cli/_source_commit.json
 # mirror sync (see contracts/framework-exclusions.md).
 .specify/# proactive flow trigger: per-turn telemetry churns, learning state must not
 .specify/memory/trigger/telemetry.jsonl
+
+**/*.egg-info/

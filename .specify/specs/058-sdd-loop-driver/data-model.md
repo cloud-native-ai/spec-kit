@@ -31,7 +31,7 @@
 
 目标项目当前所处 SDD 阶段的判定结果（FR-005/FR-006 产出）。
 
-- **取值域**：[[STR-002]] 六阶段之一，或「review 后仅剩合并」收尾态（G6 收尾场景）；或 `undetermined`（探测失败 → 停线上送，Edge Case 1，禁止猜测）。
+- **取值域**：[[STR-002]] 八阶段之一（2026-10-17 修订：六 → 八，纳入 checklist/analyze 质量门），或「review 后仅剩合并」收尾态（G6 收尾场景）；或 `undetermined`（探测 失败 → 停线上送，Edge Case 1，禁止猜测）。
 - **证据字段**：`git branch --show-current` 输出、`git log --oneline -3` 输出、`.specify/specs/` 目录清单、终态权威文档存在性。
 - **生命周期**：入口/重入时探测一次 → 写入 E-6 状态脊 → 作为 U2 派发起点的输入。
 

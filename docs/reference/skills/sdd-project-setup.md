@@ -24,6 +24,9 @@ S2 INSTALL   absent → specify init . --here --ai <tool>；
              partial/degraded → /speckit.instructions 刷新（recover 模式）
 S3 RECONCILE 按缺口按需逐项：constitution → sanitize → feature →
              instructions → docs（次序固定、只执行缺项、不整建）
+S3+ STRENGTHEN 强化序列（机制就绪后的增值建设，按需逐项）：
+             history → docs 深化 → research → feature 特性生成 →
+             goal（定义 3–5 个项目目标）
 S4 VERIFY    五族前置检查 + 机制矩阵复扫 + 兼容符号链接核验，全绿才算完成
 S5 SUGGEST   候选工作清单（未完成 feature / 大改进 feedback / TODO 事项）
 ```
@@ -39,7 +42,7 @@ S5 SUGGEST   候选工作清单（未完成 feature / 大改进 feedback / TODO 
 - **非强绑定**：两技能各自可独立运行，互不强依赖。
 - **本技能 → sdd-loop-driver**：S5 候选工作清单是建议入口之一（有哪些可做的事），调用与否由用户或上游流程决定。
 - **sdd-loop-driver → 本技能**：其 preflight ⑤ 框架检查 fail 时把处置 handoff 过来，处置完成后回到循环。
-- 职责切分线：框架调协（install/reconcile/verify/候选清单）= 本技能；SDD 六阶段循环 = sdd-loop-driver。
+- 职责切分线：框架调协（install/reconcile/strengthen/verify/候选清单）= 本技能；SDD 完整阶段循环 = sdd-loop-driver。
 
 ## 机制归属（Feature 060 委派化）
 

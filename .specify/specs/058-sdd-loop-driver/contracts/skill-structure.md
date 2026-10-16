@@ -7,7 +7,7 @@
 | String ID | Value (verbatim) | 消费条款 |
 |-----------|------------------|----------|
 | STR-001 | `-DONE` | C-5 |
-| STR-002 | `requirements → clarify → plan → tasks → implement → review` | C-4, C-5 |
+| STR-002 | `requirements → clarify → plan → tasks → checklist → analyze → implement → review` | C-4, C-5 |
 | STR-003 | `sdd-loop-driver` | C-1, C-2 |
 
 ## Artifact-class Clauses（C-1…C-13，编号 = 交付顺序）
@@ -16,7 +16,7 @@
 - **C-2 分类张力注解**: `SKILL.md` frontmatter 之后的第一段正文为注解行，声明「分类依依赖轴判定为 external；内容编排 spec-kit SDD 流程的语义耦合在此显式声明」（clarify Q4 消解义务）。
 - **C-3 SKILL.md 章节集**: `SKILL.md` 的 H2 章节集合恰为：`## What This Skill Does`、`## When to Load`、`## The Loop (U0–U6)`、`## Hard Requirements`、`## Discipline Defaults`、`## References`（路由到 references/ 两文件）、`## Boundary`，以及编译生成的 `## Wrap-up`（AUTO-GENERATED，probe-registry 驱动、含 Feedback 嵌入面——implement 期发现补充）。章节内为摘要+路由形态，命令细节不进 SKILL.md。
 - **C-4 dispatch-recipes 内联五机制**: `references/dispatch-recipes.md` 存在且内联五大执行机制的命令形态——断点探测（`git branch --show-current` / `git log --oneline -3` / `ls .specify/specs/`）、heredoc 阶段提示词写入、runner 模板（`-p "$(cat ...)"`）与 sed 派生、后台执行 + 日志轮询（`su -` 执行 + `tail` 轮询 + 一线一连接）且**脱离模式为缺省**（用户 2026-10-15 运行中裁定：远端 `nohup`/`setsid` 脱离形态自跑 + 定时间隔检查，连接断开不中断子代理）、收尾纪律（合并回 main + 逐线汇总）。
-- **C-5 阶段链与哨兵字面量内联**: 阶段链 [[STR-002]] 与哨兵约定（大写阶段名 + [[STR-001]]，如 PLAN-DONE）以字面量内联于 `references/dispatch-recipes.md`；**全文不出现 `MERGE-DONE`**（clarify Q2 裁决：合并完成 = git 状态判定，判据文本：特性分支提交已包含于集成分支且无未合并/冲突残留）。
+- **C-5 阶段链与哨兵字面量内联**: 阶段链 [[STR-002]] 与哨兵约定（大写阶段名 + [[STR-001]]，如 PLAN-DONE）以字面量内联于 `references/dispatch-recipes.md`；**全文不出现 `MERGE-DONE`**（clarify Q2 裁决：合并完成 = git 状态判定，判据文本：特性分支提交已包含于集成分支且无未合并/冲突残留）。（2026-10-17 修订：STR-002 六阶段 → 八阶段，纳入 checklist/analyze 质量门——用户需求：无人值守循环必经全部质量门；门判据与一轮有界回环规则见 dispatch-recipes.md Recipe 4 质量门编排节。）
 - **C-6 观测要求操作规则内联**: `references/dispatch-recipes.md` 内联 External Dispatch Visibility Contract 的操作规则（禁止 `qodercli -p ... > log 2>&1 &` 式缓冲至退出派发；观测点：流式/日志增长/liveness/label 溯源）及其到 ssh + su 远端形态的映射说明；对契约真源仅作「撰写底稿」注解。
 - **C-7 G5 纪律行逐字内联**: `references/stage-prompts.md` 含 G5 默认纪律的执行要求段：直接执行不要确认；访谈式问题自行裁决并记录假设；只提交本特性产物；既有脏文件不提交不还原；不要 push（除非明确授权）。
 - **C-8 派发注入义务内联**: `references/dispatch-recipes.md` 或 `references/stage-prompts.md` 内联子代理派发注入义务的操作文本——每次阶段派发的提示词骨架要求子代理**最后一行输出完成哨兵或显式异常行**（二者皆无 = 卡死信号，进 U5）；注入义务的对齐真源以注解行引用（宪法 XVI / `.specify/shared/guidelines/fast-fail.md` § 子代理派发注入——执行侧不解析框架路径，操作文本内联）。

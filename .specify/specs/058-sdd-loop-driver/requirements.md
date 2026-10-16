@@ -29,7 +29,7 @@
 - 2026-10-15 本特性的通用知识层已先行沉淀入 shared 分发层：`shared/patterns/unattended-loop-pattern.md`（无人值守循环模式：U0–U6、边界口诀、独立校验与卡死处置语义）与 `shared/workflow/external-dispatch-recipes.md`（外部派发配方：双拓扑、断点探测、prompt 骨架、runner 派生、后台轮询）；skill MUST **内联**其操作要点（执行侧无法解析框架文档路径，引用形态不可用——FR-002/FR-011/FR-018），两份 shared 文档是撰写时的底稿而非运行时依赖。
 - 外部子代理派发已有可见性契约：`.specify/shared/definitions/subagent-definitions.md` External Dispatch Visibility Contract（明令禁止 `qodercli -p "<prompt>" > agent.log 2>&1 &` 缓冲至退出式派发），参考实现 `skills/internal/create-team/scripts/dispatch.sh` + `stream-filter.py`（`DISPATCH_CLI` 缺省 `qodercli`）。
 - 确认门控：**push / force-push / 远程分支操作在破坏性动作清单**（`confirmation-gates.md` § 破坏性动作清单第 3 条）——任何远程推送属门控对象，与 G5「不要 push（除非明确授权）」一致。
-- 六阶段命令模板齐备：`templates/commands/` 下 `requirements.md` / `clarify.md` / `plan.md` / `tasks.md` / `implement.md` / `review.md` 全部存在。
+- 八阶段命令模板齐备（2026-10-17 修订：完整流程纳入 checklist/analyze 质量门）：`templates/commands/` 下 `requirements.md` / `clarify.md` / `plan.md` / `tasks.md` / `checklist.md` / `analyze.md` / `implement.md` / `review.md` 全部存在。
 - 名字核验：全仓 grep 无 `sdd-loop` / `sdd_loop` 占用；预设 id、skill 名、阶段尾标后缀 [[STR-001]] 均无既有占用（reserved identifier check 通过）。
 - 编号空间：`.specify/specs/` 现至 056（无 `.archive/`），带编号分支仅 `048-derive-command`；下一编号 057。**改号记录（2026-10-14）**：上游 057-decompose-command-skills 先行合入占用 057，本特性 rebase 时依 feature-integration.md「Never create duplicate Feature IDs」（框架不支持同号不同名：features/<ID>.md 按裸编号键控、detect-feature-context.sh 仅取数字前缀）改号为 058，规格目录与本分支名同步改名。
 - 相邻既有机制（均不承载本能力）：039 P10 Loop Card（技能/团队模板内的循环纪律卡，无派发与校验面）、039 P12 implement 长跑模式（单命令进程内循环，非跨项目外部子代理编排）、`project-cluster` 预设（continuous 巡检协作，不驱动 SDD 阶段链）。
@@ -275,7 +275,7 @@
 | String ID | Value (verbatim) | Consumed by |
 |-----------|------------------|-------------|
 | `STR-001` | `-DONE` | FR-008, FR-009, FR-015, FR-016, skill 手册（完成尾标哨兵后缀；完整哨兵 = 大写阶段名 + 本值） |
-| `STR-002` | `requirements → clarify → plan → tasks → implement → review` | FR-001, FR-005, FR-007, skill 手册（SDD 阶段链规范顺序） |
+| `STR-002` | `requirements → clarify → plan → tasks → checklist → analyze → implement → review` | FR-001, FR-005, FR-007, skill 手册（SDD 阶段链规范顺序；2026-10-17 修订：纳入 checklist/analyze 质量门） |
 | `STR-003` | `sdd-loop-driver` | FR-001, FR-002, FR-024, docs（skill 名，机制标识） |
 
 **Citation convention**: When an FR, contract, task, or test references one of these strings, write `[[STR-NNN]]` instead of copy-pasting the literal. CI / `/speckit.analyze` can then verify that every `[[STR-NNN]]` reference resolves to a row in this section.
