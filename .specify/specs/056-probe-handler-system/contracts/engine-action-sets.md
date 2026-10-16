@@ -25,6 +25,14 @@ package  cleanup  upstream  migrate-legacy  introspect-register
 - 14（实测）− 3（probe 族迁出）= 11，行为逐字节不变。
 - 封闭集契约测试随迁移同步修订（旧调用方：契约测试与 docs 记载的 CLI 形态，requirements 边缘案例 L135）。
 
+### exec-quant.py — 3 个 action
+
+collect  list-records  score
+
+- 059 新引擎;动作闭包自引擎 argparse choices 实读(choices 路径,与
+  feedback/probe 同);exact-pin 与跨引擎动作名零交集断言钉住
+  (test_probe_engine_action_sets.py 扩展)。
+
 ## 对账义务
 
 1. **双向钉住**：两个脚本各自的 `--action` choices 被契约测试逐一断言；任一侧多出/缺失 action 即失败。

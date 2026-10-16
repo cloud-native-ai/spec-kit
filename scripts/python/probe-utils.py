@@ -617,7 +617,7 @@ _ORDER_RE = re.compile(r"-?\d+")
 # the engine scripts sitting next to this file (source copy and .specify mirror
 # each resolve their own siblings — never a hand-copied list).
 _ENGINE_SIBLINGS = ("feedback-utils.py", "run-determination.py", "probe-utils.py",
-                    "trigger-utils.py")
+                    "trigger-utils.py", "exec-quant.py")
 
 
 def _engine_action_union() -> set:

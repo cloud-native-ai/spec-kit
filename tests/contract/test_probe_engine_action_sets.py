@@ -21,6 +21,7 @@ DEFS = ROOT / "shared" / "definitions" / "probe-definitions.md"
 FEEDBACK_SCRIPT = ROOT / "scripts" / "python" / "feedback-utils.py"
 PROBE_SCRIPT = ROOT / "scripts" / "python" / "probe-utils.py"
 RUNDET_SCRIPT = ROOT / "scripts" / "python" / "run-determination.py"
+EXECQUANT_SCRIPT = ROOT / "scripts" / "python" / "exec-quant.py"
 
 FEEDBACK_ALLOWED = {
     "record", "status", "list", "dispose", "mark-submitted", "reindex",
@@ -51,6 +52,14 @@ def _trigger_actions() -> set[str]:
     return set(re.findall(r'"([^"]+)"', m.group(1)))
 
 
+def _execquant_actions() -> set[str]:
+    src = EXECQUANT_SCRIPT.read_text(encoding="utf-8")
+    m = re.search(r"^ACTIONS = \(([^)]*)\)", src, re.MULTILINE)
+    assert m, "exec-quant.py: ACTIONS constant not found"
+    actions = set(re.findall(r'"([^"]+)"', m.group(1)))
+    return actions | _action_choices(EXECQUANT_SCRIPT)
+
+
 def test_probe_utils_action_set_exact() -> None:
     assert PROBE_SCRIPT.is_file(), "probe-utils.py missing — probe family not migrated"
     got = _action_choices(PROBE_SCRIPT)
@@ -72,6 +81,18 @@ def test_engine_action_sets_disjoint() -> None:
     probe = _action_choices(PROBE_SCRIPT) if PROBE_SCRIPT.is_file() else set()
     overlap = _action_choices(FEEDBACK_SCRIPT) & probe
     assert not overlap, f"probe/feedback engine action sets overlap: {sorted(overlap)}"
+
+
+def test_exec_quant_action_set_exact() -> None:
+    """059 exact-pin: the new engine's action closure, read BOTH ways
+    (ACTIONS constant + argparse choices), is exactly the D1 closed set."""
+    assert EXECQUANT_SCRIPT.is_file(), "exec-quant.py missing — engine not implemented"
+    got = _execquant_actions()
+    expected = {"collect", "list-records", "score"}
+    assert got == expected, (
+        f"exec-quant.py action set drifted: extra={sorted(got - expected)} "
+        f"missing={sorted(expected - got)}"
+    )
 
 
 def _registered_engine_actions() -> list[tuple[str, str]]:
@@ -107,6 +128,8 @@ def test_registered_engine_actions_hit_real_engine_union() -> None:
              | _trigger_actions())
     if PROBE_SCRIPT.is_file():
         union |= _action_choices(PROBE_SCRIPT)
+    if EXECQUANT_SCRIPT.is_file():
+        union |= _execquant_actions()
     registered = _registered_engine_actions()
     assert registered, "no kind=engine Handler rows registered"
     for hid, action in registered:

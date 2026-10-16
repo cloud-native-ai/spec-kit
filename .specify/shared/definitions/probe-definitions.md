@@ -38,6 +38,7 @@
 | trigger-escalation | internal | 050 主动流程触发的 P1–P5 升级探测(确定性存在性/计数/差集,永不读制品正文) | scripts | assess→suggest(非阻塞建议行) | situation | `scripts/python/trigger-utils.py`:`run_probes` |
 | run-determination | internal | 运行判定四轴测量与两个可用性探测(token/elapsed/artifact_correctness/satisfaction;session store / evidence lane) | scripts | determine→session-record→route-into-feedback | wrap-up | `scripts/python/run-determination.py`:`AXES`,`probe_session_store`,`probe_evidence_lane` |
 | evidence-lane | internal | 证据引擎 lane 的可用性探测(node 运行时 / session store / 平台存储清单) | scripts | collect→findings.json | collect | `scripts/python/evidence-utils.py`:`LANE_NAMES`,`probe_node`,`probe_session_store`,`probe_platforms` |
+| exec-quant | internal | 受测单元执行的环境与质量遥测采集(agent 程序 / LLM 详细 / 质量指标;exec-quant durable store,Recording Only) | scripts | collect→durable-record | wrap-up | `scripts/python/exec-quant.py`:`ACTIONS`,`build_record`,`resolve_run_identity` |
 
 ## Objects
 
@@ -146,6 +147,10 @@
 | evidence-probe-node | evidence-lane | scripts/python/evidence-utils.py | collect |
 | evidence-probe-session-store | evidence-lane | scripts/python/evidence-utils.py | collect |
 | evidence-probe-platforms | evidence-lane | scripts/python/evidence-utils.py | collect |
+| eq-collect-execution | exec-quant | scripts/python/exec-quant.py | wrap-up |
+| eq-probe-host-process | exec-quant | scripts/python/exec-quant.py | wrap-up |
+| eq-probe-host-config | exec-quant | scripts/python/exec-quant.py | wrap-up |
+| eq-probe-determination-link | exec-quant | scripts/python/exec-quant.py | wrap-up |
 | skill-analyze-artifacts-wrapup | skill-wrapup | skill:analyze-artifacts | wrap-up |
 | skill-clarify-artifact-wrapup | skill-wrapup | skill:clarify-artifact | wrap-up |
 | skill-create-checklist-wrapup | skill-wrapup | skill:create-checklist | wrap-up |
@@ -182,6 +187,7 @@
 | handler_id | kind | action | mode | order | behavior_owner |
 |------------|------|--------|------|-------|----------------|
 | h-run-determination | engine | determine | non-blocking | 10 | scripts/python/run-determination.py |
+| h-exec-quant | engine | collect | non-blocking | 15 | scripts/python/exec-quant.py |
 | h-feedback-record | engine | record | non-blocking | 20 | scripts/python/feedback-utils.py |
 | h-threshold-notice | agent | Threshold prompt protocol (canonical semantics for step 6) | non-blocking | 30 | shared/workflow/feedback-step.md |
 | h-token-reflection | agent | Reflection procedure (the embedded step points here) | non-blocking | 40 | shared/workflow/feedback-step.md |
@@ -224,6 +230,7 @@
 | h-gate-evidence | @point:confirm-gate | gate-tools-invoke-prompt | 044 门控必要性证据(逐 gate Object) |
 | h-gate-evidence | @point:confirm-gate | gate-tools-invoke-rule | 044 门控必要性证据(逐 gate Object) |
 | h-run-determination | @point:wrap-up | all | T019 实测更正 MVP 骨架:owner 链 feedback-step.md § Run Determination「Step 1 runs the engine's `determine` action at wrap-up」⇒ 69/69 单元生效 |
+| h-exec-quant | @point:wrap-up | all | 059 执行量化采集:每受测单元 wrap-up 落一条量化记录;在运行判定(order 10)之后、反馈记录(order 20)之前,同 run 携带不重测 |
 | h-feedback-record | @point:wrap-up | all | 69 单元现均有反馈记录面 |
 | h-threshold-notice | @point:wrap-up | all | 消费 h-run-determination 判定结果(order 10 → 30 次序约束 FR-008/FR-014) |
 | h-token-reflection | @point:wrap-up | all | owner 链:Token 效率自评在 Reflection procedure step 2 |
