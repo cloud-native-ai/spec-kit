@@ -117,7 +117,7 @@ Write `skills/internal/create-agent/templates/agent-capacity-<slug>-template.md`
 
 ## Template Distribution Layer (模板分发层内容判据)
 
-A capacity Template authored for cross-project use lands in ONE of two distribution layers, decided by a **content criterion** (Feature 060 ruling, 2026-10-16):
+A capacity Template authored for cross-project use lands in ONE of two distribution layers, decided by a **content criterion** (ruling dated 2026-10-16; provenance in the spec chain):
 
 - **不含用户/环境/项目专用信息** (no user names, host IPs, environment aliases, or project-specific paths) → the **framework distribution role set（框架分发角色集）** (`agents/` source directory; `specify init` installs it into every consuming project, `specify render-agents --ai <tool>` renders the host surface).
 - **含项目专属信息** (project-specific duty bindings, environment facts, workspace conventions) → a **project-side capacity template（项目侧容量模板）** (`.specify/agents/templates/` of the consuming project only).
@@ -154,7 +154,7 @@ Every agent this skill can produce has one of two lifecycles. Choose the lifecyc
 **Multi-Duty Instantiation (多职责实例化)** — one capacity Template serves many duty-bound Instances:
 
 - From the same template, instantiate ≥2 responsibility-bound Instances (e.g. one per stage duty), each binding the template via `capacity-scope:` and adding ONLY its duty binding — **一实例一职责** (one instance, one duty); the instance MUST NOT restate the template's capability face.
-- Duty evolution lands on the instance; capability evolution lands on the template — the two surfaces split along the layer boundary (see `shared/definitions/agent-definitions.md` § Driving Subagents via the Three Layers).
+- Duty evolution lands on the instance; capability evolution lands on the template — the two surfaces split along the layer boundary (see `.specify/shared/definitions/agent-definitions.md` § Driving Subagents via the Three Layers).
 - **Key exclusivity**: a seat instance produced by the `create-team` flow carries the framework-only `team-scope:` key; a duty instance produced here carries `capacity-scope:`. The two keys are mutually exclusive on one definition — an instance bound to a team seat is not a free-standing duty instance, and vice versa.
 
 ## Supervisor Capability

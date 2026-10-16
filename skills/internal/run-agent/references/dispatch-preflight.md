@@ -1,6 +1,6 @@
 # Dispatch Preflight — 派发前置检查（run-agent 公用承载）
 
-> 本文件是 run-agent 派发任何外部子代理前的**前置检查表与失败处置链**（Feature 060 上收落点——原 sdd-loop-driver 自持表与 sdd-project-setup S4 表坍缩至此，行集行为平价）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。检查先于派发：任一项不通过，MUST NOT 进入派发。
+> 本文件是 run-agent 派发任何外部子代理前的**前置检查表与失败处置链**（上收落点——原 sdd-loop-driver 自持表与 sdd-project-setup S4 表坍缩至此，行集行为平价；裁定日期 2026-10-16，provenance 见规格链）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。检查先于派发：任一项不通过，MUST NOT 进入派发。
 
 ## 五族前置检查
 
@@ -23,4 +23,4 @@
 
 ## 参数占位约定
 
-`<alias>`（登录别名或 IP）/ `<run-user>`（运行身份，uid≠0）/ `<project-dir>`（目标项目目录）/ `<cli>`（子代理 CLI：qodercli/claude）——与 `shared/workflow/external-dispatch-recipes.md` 的占位约定一致。
+`<alias>`（登录别名或 IP）/ `<run-user>`（运行身份，uid≠0）/ `<project-dir>`（目标项目目录）/ `<cli>`（子代理 CLI：qodercli/claude）——与 `.specify/shared/workflow/external-dispatch-recipes.md` 的占位约定一致。

@@ -44,10 +44,9 @@ spawns a fresh Execution — the same Instance can be run multiple times (sequen
 concurrently), and each Execution is isolated from the definition and from every other
 Execution.
 
-### Execution Topology (拓扑声明输入)
-
-The dispatch is parameterized by an **Execution topology declaration** per
-`.specify/shared/definitions/subagent-definitions.md` § Execution Topology Declaration:
+**Execution Topology (拓扑声明输入)** — the dispatch is parameterized by an Execution
+topology declaration per `.specify/shared/definitions/subagent-definitions.md` § Execution
+Topology Declaration:
 
 - **本地拓扑（local）**: `<project-dir>` + `<cli>` — the orchestrator drives the CLI directly
   with the local project as working directory.
@@ -55,15 +54,15 @@ The dispatch is parameterized by an **Execution topology declaration** per
   via `ssh` → `su` — long-running/parallel work that must outlive the session.
 - **双形态等价（dual input forms）**: the declaration arrives as **内联参数（inline）** or an
   **执行配置文件（execution config）**; when BOTH are given and any element disagrees, the
-  dispatch is **rejected at parse time with the conflicting fields listed**（拒收报错并列冲突字段）—
-  never a silent pick. A missing/invalid referenced template fails fast the same way —
+  dispatch is **rejected at parse time with the conflicting fields listed**（拒收报错并列冲突字段）
+  — never a silent pick. A missing/invalid referenced template is a **快速失败**（模板缺失即停）—
   no silent degradation to an inline substitute.
 - **前置检查先于派发**: run the five-family preflight with its failure-handling chain from
   `references/dispatch-preflight.md` — this SKILL.md references that table and MUST NOT copy it.
 - **拓扑配方引用**: concrete command shapes (breakpoint probe, stage prompt files, runner
   derivation, detached dispatch + polling, local variant) come from
-  `shared/workflow/external-dispatch-recipes.md` — referenced, never copied here; a shape the
-  recipes do not cover fails fast instead of being improvised.
+  `.specify/shared/workflow/external-dispatch-recipes.md` — referenced, never copied here; a
+  shape the recipes do not cover fails fast instead of being improvised.
 
 1. **Resolve the target agent** — per the Input Contract above.
 2. **Present & dispatch** — present the agent's `name`, `description`, and the task, then

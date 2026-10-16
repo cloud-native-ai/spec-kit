@@ -72,6 +72,7 @@ SWEEP_TEST = ROOT / "tests" / "contract" / "test_confirmation_gates_sweep.py"
 FACTORY_PRESETS = (
     ROOT / "agents" / "skill-verifier.agent.md",
     ROOT / "agents" / "structure-adjuster.agent.md",
+    ROOT / "agents" / "sdd-executor.agent.md",  # 060: SDD executor template (deliberate enumeration update)
 )
 
 # --- literals (Shared Strings of requirements.md are the owner) ------------
@@ -1415,7 +1416,7 @@ def test_i9_channel_two_skill_authoring_requirement():
 def test_i10_channel_two_factory_presets_byte_equal():
     """C-10: both factory presets carry exactly one pair, byte-identical to the owner."""
     owner = _clause_interval(_text(DOC))
-    assert len(FACTORY_PRESETS) == 2, f"C-10: expected 2 factory presets, the constant holds {len(FACTORY_PRESETS)}"
+    assert len(FACTORY_PRESETS) == 3, f"C-10: expected 3 factory presets, the constant holds {len(FACTORY_PRESETS)}"
     assert sorted(ROOT.glob("agents/*.agent.md")) == sorted(FACTORY_PRESETS), (
         "C-10: the bounded preset set no longer matches agents/*.agent.md -- update the enumeration deliberately"
     )
@@ -1461,7 +1462,7 @@ def test_i12_channel_two_bounded_set():
     assert len(own_source) > 1000, "C-12 sentinel: this module read as near-empty, so the scan is blind"
     assert "FACTORY_PRESETS" in own_source, "C-12 sentinel: the bounded enumeration constant is gone"
     bounded = list(FACTORY_PRESETS) + [AGENTS_CMD, CREATE_AGENT_SKILL]
-    assert len(bounded) == 4, f"C-12: the bounded set should be 2 presets + 2 authoring texts, got {len(bounded)}"
+    assert len(bounded) == 5, f"C-12: the bounded set should be 3 presets + 2 authoring texts, got {len(bounded)}"  # 060: sdd-executor joins the preset set
     for p in bounded:
         assert p.is_file(), f"C-12: a member of the bounded set does not exist: {p.relative_to(ROOT)}"
 

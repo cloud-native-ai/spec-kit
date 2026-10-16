@@ -255,13 +255,25 @@ All tasks `[X]` or `[~]` (no `[ ]` remaining). Features match spec. Tests pass.
   commit unit whose criterion is that the MERGED `comm -13 baseline current` is empty, and
   attribute it explicitly as an ordering transient (neither a subject defect nor an
   assertion defect).
-- **Approval routing**: each phase-boundary commit goes through ONE explicit approval
-  point — present the phase's commit command and wait for the user's go-ahead, UNLESS the
-  user pre-authorized commits for this run (e.g. "直接提交" / long-run mode), in which
-  case commit without re-asking. A run MUST NOT end with the feature entirely uncommitted
-  while commit commands were never presented: if every approval point was declined or
-  skipped, the wrap-up MUST prominently list the pending uncommitted state and the exact
-  commit command(s) as the final actionable item.
+- **Approval routing**: phase-boundary commits are pre-authorized by default in
+  multi-phase runs; single-phase runs keep the explicit approval point.
+  - **Multi-phase runs (the long-run shape — 任务多、相位多)**: when tasks.md parses
+    into more than one phase, every phase-boundary commit is pre-authorized — commit
+    WITHOUT presenting an approval question, provided the same safety gates hold as
+    for any commit (deletion-surface audit reconciled; that phase's name-level
+    regression diff `comm -13 baseline current` empty). Do NOT open a run-start
+    question about how phase commits should be authorized (e.g. "长跑的相位边界提交
+    如何授权？") — for this shape, pre-authorization IS the rule, not a recommendation
+    to offer; only a user who explicitly demands per-phase confirmation gets asked per
+    phase.
+  - **Explicit pre-authorization (any shape)**: a user statement like "直接提交" /
+    long-run mode activation pre-authorizes the run the same way.
+  - **Single-phase runs**: present the phase's commit command and wait for the user's
+    go-ahead (ONE explicit approval point).
+  A run MUST NOT end with the feature entirely uncommitted while commit commands were
+  never presented: if every approval point was declined or skipped, the wrap-up MUST
+  prominently list the pending uncommitted state and the exact commit command(s) as the
+  final actionable item.
 - **Deletion-surface audit (mechanical, before every phase commit)**: run
   `git diff --cached --diff-filter=D --name-only` (and the same for the unstaged tree
   before staging) — every listed deletion MUST reconcile against a task row or a
