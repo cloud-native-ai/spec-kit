@@ -51,7 +51,7 @@ When in doubt: **native first, virtual as fallback, external when isolation/para
 
 An Agent Execution is parameterized by a **topology declaration** — the environment facts that turn an instance reference into a concrete run. Every element is entry-level; nothing here hardcodes a workspace naming rule, a host, or a user ( Feature 060 ruling).
 
-| Element | Local topology | Remote topology |
+| Element | Local topology（本地） | Remote topology（远端） |
 |---------|----------------|-----------------|
 | Project directory | `<project-dir>` | `<project-dir>` (remote path) |
 | Subagent CLI | `<cli>` (e.g. `qodercli`, `claude`) | `<cli>` |
