@@ -65,6 +65,7 @@ Use this checklist when improving a Skill after a real execution. The focus is e
 - History collection, evidence organization, root-cause analysis, Skill update, and validation appear as an explicit loop.
 - The body contains operational instructions, not general background.
 - The main `SKILL.md` stays below 500 lines.
+- New failure/lesson knowledge (pitfall rows, troubleshooting sections) is **add-and-wired**: the main flow routes problem-time readers to it (loop-playbook `## Step 7`); knowledge the main flow never reaches is dead weight.
 
 ## SKILL.md Slimming
 

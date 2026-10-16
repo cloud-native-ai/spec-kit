@@ -25,6 +25,7 @@ keep/change/drop 决策有据可依。
 
 - 承重机制——哪些步骤/规则真正防止了观察到的失败(保留并强化);
 - 死重——哪些章节每次运行都被跳过、哪些规则从未触发过任何决策(精简候选);
+- 知识接线——pitfalls/排障/教训类知识文档存在,主流程却不在问题时刻路由到它(接线缺口:先补一行问题时刻指针,再谈别的);
 - 决策泄漏——工作流在哪里把本该确定的判断推给了执行者自由发挥(结构化/脚本化候选);
 - 伪装的确定性——哪些散文段落其实是确定性逻辑(提取为脚本的候选);
 - 优化空间——结构(章节顺序/分层)、效率(可省略的读/写)、证据纪律(可机械化的检查)。
@@ -258,7 +259,7 @@ one-off trivial checks can stay inline.
 
 ---
 
-## Step 7 — Rename/removal downstream-wiring checklist
+## Step 7 — Downstream wiring checklists (rename/removal · new-knowledge add-and-wire)
 
 When an improvement renames, consolidates, or removes a skill, the edit is not done until
 every downstream pointer moves with it. In this repo:
@@ -280,6 +281,14 @@ aliased to `cp -i` and silently skip overwrites) and verify byte-equivalence wit
 **Move-then-edit order**: when a rename uses `git mv`, re-read the file at its NEW path before
 editing — file-editing tools reject writes to paths not yet read in-session, so edits aimed at
 the old path land nowhere.
+
+**Add-and-wire (new failure/lesson knowledge)**: when the loop adds or changes pitfall /
+troubleshooting / lesson knowledge (new rows in a symptom→cause→fix table, a new pitfalls or
+diagnose section), the edit is not done until the target's main flow routes a **problem-time
+reader** to it — one pointer line at the flow step where problems actually surface（"遇异常先查
+X §Y"），never a restatement of the table. Knowledge landed in `references/` that the main flow
+never reaches is unwired: it exists but is never consulted when it matters. This is the
+add-side twin of delete-and-absorb (HC8).
 
 ---
 
