@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20261015T074120Z",
+  "rendered_at": "20261016T170013Z",
   "entries": {
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -59,13 +59,17 @@
       "source": "instances/framework-engineer.agent.md",
       "sha256": "df62d9e37fa198162a76ed17656067260cd6f5c6821dae7f9ff68f61c70afef9"
     },
+    ".qoder/agents/sdd-executor.agent.md": {
+      "source": "templates/sdd-executor.agent.md",
+      "sha256": "0b9645f8d96fe81c0bb14aab1a6b02672b87412fd0df8d40de0706e8e93a25e0"
+    },
     ".qoder/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",
-      "sha256": "56d0cb2dffef1272ee6943f0f91df5a2bf27586fb1b9655f6242bb3b8ff0f0fb"
+      "sha256": "3cbf70044b7a4a83ab2c71a655f4e2b6bcbd0515438650e49fd62a7f31290f62"
     },
     ".qoder/agents/structure-adjuster.agent.md": {
       "source": "templates/structure-adjuster.agent.md",
-      "sha256": "034ba320d8fe145e95b1853424dbe11160a9c74eb80becdf5615213512396040"
+      "sha256": "814992a68c22826375f8a3e0233d703a8d1e75e454d6e0cc7e14b83ef0e82991"
     }
   }
 }

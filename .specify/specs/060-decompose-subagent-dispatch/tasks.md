@@ -54,11 +54,11 @@
 
 **Independent Test**: 仅凭本故事即可创建模板与 ≥2 实例并审计引用关系（SC-001 判据），不依赖派发面。
 
-- [ ] T006 [US1] Author create-agent 契约测试 C-9..C-14（模板合法性与职责零命中、内容判据机械面、判据入 SKILL.md、多职责实例化、退役生命周期、agents 镜像对）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红 [blockedBy: T002]
-- [ ] T007 [P] [US1] Author `agents/sdd-executor.agent.md`——中性词表 frontmatter（name/description/user-invocable: false/model-tier/capability-tools/skills/run-turn-budget）+ 三要素能力面 + 职责字样与专用信息字面量零命中（C-9/C-10）[blockedBy: T002]
-- [ ] T008 [P] [US1] Enhance `skills/internal/create-agent/SKILL.md`——模板分发层内容判据（C-11）+ 多职责实例化与 team-scope 互斥说明（C-12）+ Agent Lifecycle 节退役规则扩格（C-13）[blockedBy: T002]
-- [ ] T009 [US1] render-verify：`specify render-agents --ai qoder` 实跑 + `.qoder/agents/sdd-executor.agent.md` 生成入 render-manifest 检查 [blockedBy: T007]
-- [ ] T010 [US1] Verify C-9..C-14 绿 + 镜像同步（agents 对 + internal 对）[green: contracts/skill-enhancements.md#C-9] [green: contracts/skill-enhancements.md#C-10] [green: contracts/skill-enhancements.md#C-11] [green: contracts/skill-enhancements.md#C-12] [green: contracts/skill-enhancements.md#C-13] [green: contracts/skill-enhancements.md#C-14] [blockedBy: T006,T007,T008,T009]
+- [X] T006 [US1] Author create-agent 契约测试 C-9..C-14（模板合法性与职责零命中、内容判据机械面、判据入 SKILL.md、多职责实例化、退役生命周期、agents 镜像对）append 到 `tests/contract/test_agent_dispatch_mechanism.py`——先红 [blockedBy: T002]
+- [X] T007 [P] [US1] Author `agents/sdd-executor.agent.md`——中性词表 frontmatter（name/description/user-invocable: false/model-tier/capability-tools/skills/run-turn-budget）+ 三要素能力面 + 职责字样与专用信息字面量零命中（C-9/C-10）[blockedBy: T002]
+- [X] T008 [P] [US1] Enhance `skills/internal/create-agent/SKILL.md`——模板分发层内容判据（C-11）+ 多职责实例化与 team-scope 互斥说明（C-12）+ Agent Lifecycle 节退役规则扩格（C-13）[blockedBy: T002]
+- [X] T009 [US1] render-verify：`specify render-agents --ai qoder` 实跑 + `.qoder/agents/sdd-executor.agent.md` 生成入 render-manifest 检查 [blockedBy: T007]
+- [X] T010 [US1] Verify C-9..C-14 绿 + 镜像同步（agents 对 + internal 对）[green: contracts/skill-enhancements.md#C-9] [green: contracts/skill-enhancements.md#C-10] [green: contracts/skill-enhancements.md#C-11] [green: contracts/skill-enhancements.md#C-12] [green: contracts/skill-enhancements.md#C-13] [green: contracts/skill-enhancements.md#C-14] [blockedBy: T006,T007,T008,T009]
 
 ## Phase 4: User Story 2 - 拓扑声明与执行派发面（Priority: P1） 🎯
 

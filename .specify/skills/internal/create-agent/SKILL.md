@@ -115,6 +115,23 @@ Write `skills/internal/create-agent/templates/agent-capacity-<slug>-template.md`
 - `project-custom` agents MUST carry the `project:` frontmatter marker and the mandatory `## Project Scope Guard` section (see § Project-Custom Capability)
 - The full framework frontmatter field set is: `user-invocable`, `disable-model-invocation`, `supervisor`, `capacity-scope`, `project` (the last used only by `project-custom` agents), `role-scope`, `team-scope` (framework-only keys, never rendered to tools; `team-scope` marks seat instances created by the `create-team` flow — taxonomy pointer: `.specify/shared/definitions/agent-definitions.md`; key semantics live in the CLI's neutral key set)
 
+## Template Distribution Layer (模板分发层内容判据)
+
+A capacity Template authored for cross-project use lands in ONE of two distribution layers, decided by a **content criterion** (Feature 060 ruling, 2026-10-16):
+
+- **不含用户/环境/项目专用信息** (no user names, host IPs, environment aliases, or project-specific paths) → the **framework distribution role set（框架分发角色集）** (`agents/` source directory; `specify init` installs it into every consuming project, `specify render-agents --ai <tool>` renders the host surface).
+- **含项目专属信息** (project-specific duty bindings, environment facts, workspace conventions) → a **project-side capacity template（项目侧容量模板）** (`.specify/agents/templates/` of the consuming project only).
+
+The mechanical face of the criterion: the template text must contain zero special-info literals (IPv4, home-directory prefixes, internal hostnames) to qualify for framework distribution.
+
+**First application**: `agents/sdd-executor.agent.md` — its capability face (project directory + project context + `/speckit.*` stage execution) is generic, so it ships in the framework distribution role set.
+
+**Retirement (退役)** — the third lifecycle state for persistent Templates and Instances (an Execution is a live run and is never retired):
+
+- A retired artifact is marked `retired` and **kept for audit** — archive-not-delete; the definition file is never physically removed by this skill.
+- **Dereference before retire (先解引用)**: an artifact still carrying a live reference — a running Execution, a team roster seat, or another instance's `capacity-scope:` reference — MUST NOT be retired; refuse and emit the list of references to clear first.
+- The retire operation is an authoring-layer lifecycle action: it edits the definition's state, never the Execution's logs or products.
+
 ## Agent Lifecycle (temporary vs persistent)
 
 Every agent this skill can produce has one of two lifecycles. Choose the lifecycle before generating files.
@@ -133,6 +150,12 @@ Every agent this skill can produce has one of two lifecycles. Choose the lifecyc
 **Temporary generation rules**:
 
 - Do NOT write the agent under `.specify/agents/` and do NOT create tool config links. A team orchestrator instantiates it from a role template into its own context for the duration of the run only (FR-011).
+
+**Multi-Duty Instantiation (多职责实例化)** — one capacity Template serves many duty-bound Instances:
+
+- From the same template, instantiate ≥2 responsibility-bound Instances (e.g. one per stage duty), each binding the template via `capacity-scope:` and adding ONLY its duty binding — **一实例一职责** (one instance, one duty); the instance MUST NOT restate the template's capability face.
+- Duty evolution lands on the instance; capability evolution lands on the template — the two surfaces split along the layer boundary (see `shared/definitions/agent-definitions.md` § Driving Subagents via the Three Layers).
+- **Key exclusivity**: a seat instance produced by the `create-team` flow carries the framework-only `team-scope:` key; a duty instance produced here carries `capacity-scope:`. The two keys are mutually exclusive on one definition — an instance bound to a team seat is not a free-standing duty instance, and vice versa.
 
 ## Supervisor Capability
 
