@@ -74,3 +74,41 @@ quality.satisfaction: not_evaluated (stays carried-or-marker, not overwritten)
 ```
 
 来源区分判定:join 打分携带 `provenance == user-given`,`quality.satisfaction` 保持其自身来源(本记录为显式未采标记,判定记录推导时为 carried)——两字段互不覆写,FR-014 成立。记录本身未变(records.jsonl 未被触碰,score 仅追加 scores.jsonl)。
+
+## 场景 4:边界隔离(SC-004 / US3)— T014
+
+前提复核:⑪ package 前置 = feedback store 存在 pending 条目(实测 `--action status`:count_since_submission=39,非空);空 store 行为未单测(本 store 非空,行为前提以既有 `tests/integration/test_feedback_*.py` 套件为准——T015 全量运行覆盖)。**quickstart 路径前提勘正**:场景 4 所写 `unzip -l feedback/feedback-*.zip` 已过时——package 实际产物落 `.specify/memory/feedback/packages/feedback-<ts>.zip`(056 迁移后行为,以 `--action package` 实际输出为准),本节按实测路径执行。⑫ 验证 zip 于验证后移除,不与真实打包产物混淆(本 run 之前 packages/ 目录为空,移除后复归为空)。⑬ 凭据判定以值级防御扫描为准(引擎内置 D9);quickstart 的 jq 形态按字面会命中**字段名**(`quality.tokens` 含 "token")而非值级,故人读复核按值级适配执行(仅扫叶子字符串值,不扫键名),勘正记录于此。
+
+```text
+$ python3 .specify/scripts/python/feedback-utils.py --action package
+Packaged 39 feedback entries (sources untouched):
+  zip: .specify/memory/feedback/packages/feedback-20261016T053231Z.zip
+(package exit=0)
+
+$ unzip -l .specify/memory/feedback/packages/feedback-20261016T053231Z.zip
+  ... 88512 bytes, 40 files
+exec-quant hits in listing: 0        # 打包产物零量化记录(结构性排除)
+entries mentioning quant: 0
+
+$ exec-quant.py --action list-records --format json   # 值级凭据复核
+records: 1 | credential-shaped value hits: 0 (expect 0)
+```
+
+(zip 已按 ⑫ 移除;打包来源条目 untouched。)
+
+## 场景 5:非回归与基线比对(SC-003 / US3)— T015
+
+基线 = T002 于 implement 开工日冻结的 `baseline-failed.txt`(canonical runner `--names-out` 形态;本 run 连续执行,基线不重冻——重冻会把特性引入的失败误作既有)。非回归基面 25 文件(20 contract + 5 integration,data-model §4)经 `--collect-only` 核实全部实际收集(433 项,无静默跳过);有意扩展的 `test_probe_engine_action_sets.py` 先于比对落定且自身绿(T004→T005→T008 链)。
+
+```text
+$ bash scripts/bash/run-tests.sh --names-out /tmp/current-failed-t015.txt \
+    tests/contract tests/integration -q
+10 failed, 3240 passed in (≈100s)
+
+$ comm -13 baseline-failed.txt /tmp/current-failed-t015.txt
+(空 — 零新增失败名)
+$ comm -31 baseline-failed.txt /tmp/current-failed-t015.txt | wc -l
+0   # 双向一致:失败集合与基线逐名完全相同
+```
+
+**SC-003 判定:通过** — name-level 房式判据(非计数),比对覆盖全部 contract + integration 套件(⊇ 基面 25 文件)。中途全量比对共执行 4 次(Phase 2 提交门两次、Phase 3 一次、本节末次),每次 `comm -13` 均为空。
