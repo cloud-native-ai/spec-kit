@@ -59,8 +59,8 @@ def test_orphan_handler_line_is_structural_exit_2(tmp_path, capsys):
     ws = _compile(tmp_path, capsys)
     p = _unit_a(ws)
     p.write_text(p.read_text(encoding="utf-8").replace(
-        "4. Token Reflection",
-        "4. Token Reflection"), encoding="utf-8")  # no-op keeps ordering explicit
+        "5. Token Reflection",
+        "5. Token Reflection"), encoding="utf-8")  # no-op keeps ordering explicit
     text = p.read_text(encoding="utf-8")
     orphan = ("\n5. Ghost Handler — `python3 .specify/scripts/python/feedback-utils.py "
               "--action ghost-action --unit-id \"/speckit.sandbox-a\" "
@@ -84,7 +84,7 @@ def test_missing_handler_line_is_structural_exit_2(tmp_path, capsys):
     text = p.read_text(encoding="utf-8")
     # Registry unchanged ⇒ the artifact's fingerprint is still current; dropping a
     # subscribed call line is hand corruption, not a stale render.
-    removed = re.sub(r"^2\. Feedback Record.*\n", "", text, flags=re.M)
+    removed = re.sub(r"^3\. Feedback Record.*\n", "", text, flags=re.M)
     assert removed != text, "mutation must actually remove the Feedback Record line"
     p.write_text(removed, encoding="utf-8")
     rc, payload = _compile_check(ws, capsys)
@@ -160,7 +160,7 @@ def test_wording_hit_refuses_the_write(tmp_path, capsys):
         "| h-run-determination | engine | determine | non-blocking | 10 | "
         "scripts/python/run-determination.py |\n"
         "| h-stop-and-confirm | agent | stop and confirm the draft | non-blocking "
-        "| 15 | shared/workflow/feedback-step.md |")
+        "| 25 | shared/workflow/feedback-step.md |")
     # Anchor at the table header separator: inserting mid-row (substring inside a
     # row carrying a 覆盖说明 cell) would corrupt the row's cells.
     registry = registry.replace(
