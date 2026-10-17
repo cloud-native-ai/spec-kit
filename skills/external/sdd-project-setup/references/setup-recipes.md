@@ -36,16 +36,58 @@
 
 ## S2 INSTALL
 
-**absent → 全新安装**：
+S2 分两层，**CLI 层先于项目层**：S2-0 python 运行时解析 → S2-1 specify CLI ensure/安装 → S2-2 项目 init / 刷新。
+
+**执行侧界定**：S2 全部命令运行在**执行侧**（目标项目所在环境；远端形态经 `ssh <alias> "su - <run-user> -c '...'"` 在远端执行），编排侧本地宿主只做盘点派发、不安装 speckit、不误触发安装链——两侧角色划分、安装归属与反模式清单的真源见 `.specify/shared/workflow/execution-topology.md`（执行拓扑模型），本节只保留 S2 的应用。
+
+### S2-0 Python 运行时解析（CLI 层前置）
+
+specify CLI 依赖环境提供的 Python 运行时，按以下**解析阶梯**确定本次所有 pip/specify 操作绑定的 python，逐级回退：
+
+| 级 | 来源 | 判定形式 |
+|----|------|----------|
+| 1 | 项目虚拟环境 | `<project-dir>/.venv/bin/python` 存在且可执行 |
+| 2 | PATH 首个 | `command -v python3` 解析到的第一个（失败再试 `command -v python`） |
+| 3 | 系统已装最新 | 枚举标准 bin 目录（`/usr/bin` `/usr/local/bin` `/opt/homebrew/bin` 等）下已安装的 `python3*`，取版本最高者 |
+
+**失败即停**：三级全缺 → **报错退出，绝不自动安装 Python**——缺运行时是环境缺口，自动安装会掩盖环境问题且不可控（fast-fail）。解析成功后以 `<python> -m pip --version` 验证 pip 可用；pip 缺失同样报错退出（不代装）。前置还包括 `git` 可用（安装源均为 git+https）。
+
+选定环境后，可执行文件落在该环境的 bin 目录（venv 情形为 `<project-dir>/.venv/bin/`）——后续 `specify` 调用以该 bin 目录优先（`PATH=<bin>:$PATH` 或全路径调用），不得假设裸 `specify` 一定指向刚安装的环境。
+
+### S2-1 specify CLI 安装（ensure / install 语义）
+
+> 固化来源：cws-lib-bash/scripts/313_specify.sh（2026-10-17 版）。
+
+- **ensure（幂等门）**：`command -v specify` 在位 → 跳过安装（clean reinstall 仅限入口显式要求升级 CLI 时）。
+- **install（clean reinstall + 三源回退）**：
+  1. 先跑 S2-0 解析 python；
+  2. 清理旧装：`<python> -m pip uninstall -y specify-cli`（包名 `specify-cli`，命令名 `specify`；未安装视为成功，非致命）；
+  3. 按序尝试三个安装源，**网络预检先行、首成功即止**：
+
+| 优先级 | 安装源 | 预检主机 |
+|--------|--------|----------|
+| 1 | `git+https://gitlab.alibaba-inc.com/cloud-native-ai/spec-kit.git@master` | gitlab.alibaba-inc.com |
+| 2 | `git+https://gitee.com/cloud-native-ai/spec-kit.git@master` | gitee.com |
+| 3 | `git+https://github.com/cloud-native-ai/spec-kit.git@master` | github.com |
+
+     每源先做连通性预检（如 `curl -sI --max-time 10 https://<主机>`，不可达跳过该源），可达则 `<python> -m pip install --timeout 20 <源>`；失败/不可达 → 下一源。**三源全败 → 缺口报告并停止**。
+- **验证**：`specify check`（框架自带依赖检查）——失败视为安装未完成：回 S2-1 重装一次，仍败则停止。
+- **远端形态**：以上判定与安装命令整体经 `ssh <alias> "su - <run-user> -c '...'"` 在执行侧运行（占位约定同 S4）；python 解析阶梯同样在执行侧判定。
+
+### S2-2 项目 init / 刷新
+
+**absent → 全新安装（specify init）**——命令形态与脚本对齐（`<project-dir>` 默认 `.`）：
 
 ```bash
-# 本地
-specify init . --here --ai <tool> --ignore-agent-tools [--force] [--no-git]
+# 本地，单工具；--ignore-agent-tools 规则：claude/opencode/qoder 加，copilot 不加
+specify init <project-dir> --ai <tool> --script sh --no-git --force --skip-tls [--ignore-agent-tools]
 # 远端（经 su 与 sdd-loop-driver 同约定）
-ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --here --ai <tool> --force'"
+ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --ai <tool> --script sh --no-git --force --skip-tls [--ignore-agent-tools]'"
 ```
 
-要点：`--here` 在当前目录初始化、`--force` 跳过非空确认、本地模板直拷（无网络下载）、可选 git 初始化。安装后立即跑一次 S1 复扫确认 baseline。
+**`--ai all` 一次性全 agent（默认推荐，用户惯例）**：一次性更新所有 agent 的 init 产物——roster 固定 `claude → copilot → opencode → qoder` 逐工具执行同一命令，其中 **claude/opencode/qoder 加 `--ignore-agent-tools`、copilot 不加**（保留其 agent 工具检查，脚本原行为）。本地多 agent 工作站默认 all；远端/单工具场景按入口指定。
+
+要点：`--force` 跳过非空确认、`--no-git` 不动 git、`--script sh` 选 POSIX shell 脚本、`--skip-tls` 容忍内网证书、`--ignore-agent-tools` 跳过对应 agent CLI 在位检查。安装后立即跑一次 S1 复扫确认 baseline。
 
 **partial/degraded → 刷新**：走 `/speckit.instructions`（在目标项目以对应 agent 执行）——非破坏性 reconcile（自定义内容恢复、共享文件先备份、兼容符号链接重建）。**禁止**手工整目录覆盖 `.specify/`。
 
@@ -91,7 +133,9 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --here --ai 
 
 | 命令 | 就绪态重入行为 | 保证 |
 |------|----------------|------|
-| `specify init`（S2） | **不执行**——触发条件仅 S1=absent；非 absent 项目 **MUST NOT** 带 `--force` 重跑（会覆盖既有 `.specify/`，破坏性） | 结构不重建 |
+| python 解析（S2-0） | 每次执行都按阶梯重新解析（结果绑定本次 pip/specify 操作）；三级全缺 → 报错退出 | 无隐藏状态 |
+| CLI 安装（S2-1） | `specify` 在位 → **不重装**（clean reinstall 仅限显式升级请求）；三源全败 → 缺口停止 | 环境不重建 |
+| `specify init`（S2-2） | **不执行**——触发条件仅 S1=absent；非 absent 项目 **MUST NOT** 带 `--force` 重跑（会覆盖既有 `.specify/`，破坏性） | 结构不重建 |
 | `/speckit.instructions`（S2/S3） | 非破坏性 reconcile：自定义内容恢复、共享文件先备份、符号链接重建——重跑安全 | 幂等收敛 |
 | `/speckit.constitution`（S3） | 宪法在位 → 跳过（仅 bootstrap 缺失项）；不重写已 ratify 的宪法 | 内容不覆盖 |
 | `/speckit.sanitize`（S3） | 可重入——陈旧残留按两级判据清理，无残留则零动作 | 天然幂等 |
@@ -109,7 +153,7 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --here --ai 
 
 加上：机制矩阵复扫达 complete（或 partial 且缺口已声明）、compat 链接核验 `find <project-dir> -maxdepth 2 -type l ! -exec test -e {} \; -print` 为空。三者齐备才进 S5。
 
-**远端命令形态与占位约定**（`<alias>`/`<run-user>`/`<project-dir>`/`<tool>`）同 `.specify/shared/workflow/external-dispatch-recipes.md`（远端拓扑）——本文件仅保留 setup 特有命令（specify init / 机制盘点脚本），通用派发形态坍缩为引用（analyze C-31）。
+**远端命令形态与占位约定**（`<alias>`/`<run-user>`/`<project-dir>`/`<tool>`）同 `.specify/shared/workflow/external-dispatch-recipes.md`（远端拓扑）——本文件仅保留 setup 特有命令（python 解析 / CLI 安装 / specify init / 机制盘点脚本），通用派发形态坍缩为引用（analyze C-31）。
 
 ## S5 候选工作清单（建议而非强制）
 
