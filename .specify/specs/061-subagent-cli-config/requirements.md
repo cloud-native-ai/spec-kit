@@ -245,7 +245,7 @@ run-agent 在派发前解析并展示配置、external 派发把 `cli_args` 透�
 本轮为 analyze 第一轮 HIGH=4 的有界上游修复；以下四项为已裁定项（无人值守，不自创用户裁定）。
 
 - **F-01（auto vs 能力矩阵）** → A: 能力矩阵的 `quantification_methods` 约束 MUST 只校验 **resolved** 方法；`auto` 是请求层选择器，先按 FR-009 顺序解析，再接受矩阵校验，MUST NOT 因不在列表中直接被拒。落点：FR-008、FR-009；plan 侧 C-EC-08/C-EC-09、data-model E4/E5；测试义务 T004/T007 补 qodercli/claude 的 `auto` 正向用例。
-- **F-02（SC-006 不可达）** → A: 采纳 plan decision 3 的双路径：`claude + none` 正向解析（effective config / `cli_args` / 派发记录中 qoder 默认值计数 0）与 `claude + declared` 拒收错误面（错误消息中 qoder 默认值计数 0）。「qoder 默认值」字面集 MUST 恰为 {`DeepSeek-Flash`, `max`, `1000000`, `qodercli`}；`auto` MUST NOT 计入（它是合法请求层值，可出现在 `method_requested`）。落点：SC-006、SC-006 Source；feature-ref SC-006 映射；C-EC-09；T011 的 `claude + none` 零泄漏记录证据。
+- **F-02（SC-006 不可达）** → A: 采纳 plan decision 3 的双路径：`claude + none` 正向解析（effective config / `cli_args` / 派发记录的 `config` 组中 qoder 默认值计数 0；记录的 `agent` 组是宿主证据，不计入）与 `claude + declared` 拒收错误面（错误消息中 qoder 默认值计数 0）。「qoder 默认值」字面集 MUST 恰为 {`DeepSeek-Flash`, `max`, `1000000`, `qodercli`}；`auto` MUST NOT 计入（它是合法请求层值，可出现在 `method_requested`）。落点：SC-006、SC-006 Source；feature-ref SC-006 映射；C-EC-09；T011 的 `claude + none` 零泄漏记录证据。
 - **F-03（默认层 mode 与覆盖优先级）** → A: 代理/内联覆盖触发的 external MUST 优先于低层默认 `mode: native|virtual`——默认层 `mode` 被覆盖，`requires_external=true`；显式（代理/内联）`mode: native|virtual` + 任一覆盖仍 MUST 拒收。落点：FR-002、FR-003；plan Phase 0 decision 1；C-EC-06/C-EC-07；data-model E2；T004/T007 测试义务。
 - **C-01（运行时默认层无人播种）** → A: tasks 新增 T033，在本仓通过 `ensure_agent_layer_dirs` / `specify init` 播种 `.specify/agents/execution/configs/_defaults.yaml` 并断言存在；T030 记录驱动者实际派发路径（本线为直接 runner）与运行时默认层存在性，作为 FR-027 的前置证据。落点：tasks T030/T033、依赖、DoD-7、GATE-7；FR-027 判定字段。
 
