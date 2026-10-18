@@ -7,8 +7,8 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification  
-**Feature Name**: Need clarification
+**Feature ID**: 061  
+**Feature Name**: 子代理 CLI 配置管理与按派发量化（Subagent CLI Config Management & Per-Dispatch Quantification）
 
 ## 现状锚点（2026-10-18 以源码实测为准；dated record，仅作可行性输入，非运行时保证）
 
@@ -22,12 +22,12 @@
 
 ## Assumptions（对输入中开放点的缺省裁决，clarify 阶段可推翻）
 
-- **Feature 绑定目标已由用户输入指定为 Feature 061**；按 `create-requirements` 的绑定时机约束，本阶段 `Related Feature` 保持 `Need clarification`，由 `/speckit.clarify` 落定绑定与注册。060/059 保持 Implemented 不变。
-- 解析引擎的**名称**沿用简报建议值 [[STR-002]]，plan 阶段可在保持「scripts 层、stdlib-only、三动作」不变的前提下定名。
-- [[STR-015]] 在配置快照 `config_id` 与本次解析结果不一致时，按**非阻塞且可见**的失败处理：输出失败原因、不写入声称该配置的记录；clarify 可收紧或放宽该处置。
-- `quantification.method` 未声明或声明为 `auto` 时走 auto 解析；「显式覆盖」只统计代理层与内联层，默认层不算。
+- **Feature 绑定已落定（Clarifications Session 2026-10-18）**：新建 Feature 061「子代理 CLI 配置管理与按派发量化」；060/059 保持 Implemented 不变。
+- 解析引擎名称已锁定为 [[STR-002]] `scripts/python/execution-config.py`（stdlib-only，三动作 `resolve / validate / list-configs`）；plan 不得改名，若确需改名须走范围修订并同步 [[STR-002]]。全仓同名冲突实测为零（2026-10-18）。
+- [[STR-015]] 在配置快照 `config_id` 与本次解析结果不一致时，按**非阻塞且可见**的失败处理：输出失败原因并以非零退出报告、不写入声称该配置的记录、不阻塞派发结果；存储保持 append-only。
+- `quantification.method` 未声明或声明为 `auto` 时走 auto 解析；「显式覆盖」只统计代理层与内联层中显式设置且未被清除哨兵（`""` / `auto`）清空的 `model / reasoning_effort / context_window / extra_flags / log_dir` 任一字段，默认层与 `quantification.method` 键本身不计入。
 - 真实 qodercli 端到端派发属**可选验证**，需显式授权；未授权时以生成的 `cli_args` 与确定性引擎测试满足验收。
-- 「默认层整体跳过」适用于代理层或内联层选择了非 qodercli 的全部情形；跳过时默认层的 model/effort/context/cli 一律不参与合并。
+- 「默认层整体跳过」适用于代理层或内联层选择了非 qodercli 的全部情形；跳过时默认层的全部键（`model / reasoning_effort / context_window / extra_flags / quantification.method / log_dir / cli`）一律不参与合并，`skipped_layers` MUST 记录该层被跳过。
 - 本特性不新增 CLI 适配器，也不接线 create-team / run-team。
 
 ## User Scenarios & Testing *(mandatory)*
@@ -107,15 +107,16 @@ run-agent 在派发前解析并展示配置、external 派发把 `cli_args` 透�
 ### Edge Cases
 
 - 默认层文件存在但语法非法（tab、列表、未知键、更深嵌套）→ 与缺失同级的快速失败，指明文件与违规行/键。
-- 代理配置选择非 qodercli 而未显式写 `cli` → 若默认层 `cli=qodercli` 作为默认值生效则沿用 qoder；一旦代理层或内联层显式声明其它 CLI，默认层整体跳过，禁止 qoder 默认值泄漏。
+- 代理配置选择非 qodercli 而未显式写 `cli` → 若默认层 `cli=qodercli` 作为默认值生效则沿用 qoder；一旦代理层或内联层显式声明其它 CLI，默认层整层（全部键，含 `quantification.method`）跳过并在 `skipped_layers` 记录，禁止 qoder 默认值（含量化方法）泄漏。
 - `extra_flags` 含换行或托管旗标（`-m` / `--model` / `--reasoning-effort` / `--context-window`）→ 校验期拒收，不得透传到 CLI。
 - `context_window` 为 0、负数、布尔值或非整数 → 校验期拒收。
 - `log_dir` 解析后落在 `.specify/agents/execution/logs` 之外 → 校验期拒收。
 - 显式 `declared` 但 effective config 缺任一 model/effort/context → exit 2，不降级为其它方法。
+- 代理层或内联层仅以 `extra_flags` / `log_dir` 构成显式覆盖（auto 解析落到 `declared`），但 effective config 缺 model/effort/context → 按 FR-010 exit 2，不降级为 `qoder-settings` / `none`。
 - 显式 `qoder-settings` 但宿主不是 qodercli → exit 2。
 - auto 解析落到 `none` → 记录照常落库并输出 warning，不阻塞派发。
 - 同一 `(unit_id, run_id)` 并发重复采集 → 幂等键保证至多一行（实现需避免竞态写入）。
-- 配置快照缺失、不可读或 `config_id` 与本次解析不一致 → 非阻塞可见失败，不写入声称该配置的记录。
+- 配置快照缺失、不可读或 `config_id` 与本次解析不一致 → 非阻塞可见失败：[[STR-015]] 输出原因并以非零退出报告、不写入声称该配置的记录、不阻塞派发结果；存储保持 append-only。
 - stream result 缺 `duration_ms`、status 文件缺失、usage 缺输入或输出 token → 对应叶子落显式未采标记，不臆造。
 - 记录序列化超过 64 KiB → 按既有策略截断并标注，不丢失身份字段。
 - 记录含凭据型值 → 按既有脱敏模式掩码后再落库。
@@ -127,23 +128,23 @@ run-agent 在派发前解析并展示配置、external 派发把 `cli_args` 透�
 #### 配置分层与解析（US1）
 
 - **FR-001**: 配置覆盖字段集 MUST 恰为 `model / reasoning_effort / context_window / extra_flags / quantification.method / log_dir`；合并优先级 MUST 为默认层 [[STR-001]] < 代理配置 `configs/<slug>.yaml` < 内联派发参数。缺省键 MUST 继承低层值；显式空串（`""`）或 `auto` MUST 清除低层值（清除后的字段不进入 effective config、不生成 CLI 旗标）；非空值 MUST 覆盖低层值。
-- **FR-002**: `mode` 与 `cli` MUST 作为拓扑身份字段按 060 的声明语义处理，而非普通覆盖字段：内联与代理配置同时声明且不一致时 MUST 在解析期拒收并列出冲突字段；默认层的 `cli` 只是默认值而非声明——代理或内联选择其它 CLI 时，默认层 MUST 整体跳过，任何 qoder 默认值 MUST NOT 泄漏到 claude/codex 等其它 CLI 的 effective config、`cli_args` 或量化记录。
+- **FR-002**: `mode` 与 `cli` MUST 作为拓扑身份字段按 060 的声明语义处理，而非普通覆盖字段：内联与代理配置同时声明且不一致时 MUST 在解析期拒收并列出冲突字段；默认层的 `cli` 只是默认值而非声明——代理或内联选择其它 CLI 时，默认层 MUST 整体跳过，任何 qoder 默认值 MUST NOT 泄漏到 claude/codex 等其它 CLI 的 effective config、`cli_args` 或量化记录。「整体跳过」MUST 覆盖默认层的全部键（`model / reasoning_effort / context_window / extra_flags / quantification.method / log_dir / cli`），并 MUST 在 `skipped_layers` 中记录该层被跳过。
 - **FR-003**: `mode` 枚举 MUST NOT 新增 `auto`；未声明时 MUST 遵循 060 的自动选择（native 优先）。内联层或代理层存在任一覆盖字段（不含默认层）时 `requires_external` MUST 为 true；显式 `mode: native|virtual` 且存在覆盖 MUST 拒收并提示改用 external。
 - **FR-004**: 默认层文件 [[STR-001]] 缺失时，解析 MUST 快速失败并指明路径与 `specify init` 修复方式；MUST NOT 内置静默默认值。
-- **FR-005**: 配置解析 MUST 由 scripts 层新增的确定性引擎承担（拟定名 [[STR-002]]，stdlib-only），提供 `resolve / validate / list-configs` 三个动作；YAML 子集 MUST 仅支持注释、`key: value` 与一层 `quantification:` 嵌套，tab、列表、更深嵌套 MUST 被拒绝。
+- **FR-005**: 配置解析 MUST 由 scripts 层新增的确定性引擎 [[STR-002]] 承担（stdlib-only），提供 `resolve / validate / list-configs` 三个动作；引擎名已锁定，plan 不得改名。YAML 子集 MUST 仅支持注释、`key: value` 与一层 `quantification:` 嵌套，tab、列表、更深嵌套 MUST 被拒绝。
 - **FR-006**: `resolve` MUST 输出 effective config、`config_id`（effective 字段 canonical JSON 的 sha256 前 16 位）、`source_chain`、`skipped_layers`、`cli_args`、`requires_external`、配置快照路径，以及 `quantification{requested,resolved}`。
 - **FR-007**: `validate` MUST 拒绝未知/重复键、类型不符、枚举外值、非正整数的 `context_window`、不在 `.specify/agents/execution/logs` 内的 `log_dir`、含换行或托管旗标（`-m` / `--model` / `--reasoning-effort` / `--context-window`）的 `extra_flags`。
 - **FR-008**: CLI 能力矩阵 MUST 在代码侧拥有唯一 owner（解析引擎内的单一数据表），其它位置只引用：`qodercli` 支持 external 派发与 `--model` / `--reasoning-effort` / `--context-window` 全量旗标，量化方法 `qoder-settings / declared / none`；`claude` 支持 external 派发（受 060 可见性契约约束），model/effort/context 旗标未在仓库验证，显式值 MUST 被拒收，量化 `declared / none`；`codex` / `opencode` 的 external stream-json 未验证，external MUST 被拒收并保留能力扩展点；其它 CLI MUST 被拒收。未验证的参数组合 MUST 以 exit 2 结束并列出「字段 + 支持集」。
 
 #### 量化方法（US1 / US2）
 
-- **FR-009**: 量化方法注册集 MUST 恰为 `auto / declared / qoder-settings / none`；未声明或声明 `auto` 时 MUST 按以下顺序解析：external 且存在显式覆盖（代理层或内联层，不含默认层）→ `declared`；external 且无显式覆盖、CLI=qodercli → `qoder-settings`；native/virtual 且宿主为 qodercli → `qoder-settings`；其余 → `none` 并输出 warning。
+- **FR-009**: 量化方法注册集 MUST 恰为 `auto / declared / qoder-settings / none`；未声明或声明 `auto` 时 MUST 按以下顺序解析：external 且存在显式覆盖（代理层或内联层，不含默认层）→ `declared`；external 且无显式覆盖、CLI=qodercli → `qoder-settings`；native/virtual 且宿主为 qodercli → `qoder-settings`；其余 → `none` 并输出 warning。「显式覆盖」MUST 指代理层或内联层显式设置且未被清除哨兵（`""` / `auto`）清空的 `model / reasoning_effort / context_window / extra_flags / log_dir` 任一字段；默认层与 `quantification.method` 键本身 MUST NOT 计入。
 - **FR-010**: 显式 `declared` MUST 要求 effective config 的 model / reasoning_effort / context_window 三项齐全；显式 `qoder-settings` MUST 要求 qoder 宿主；不兼容组合 MUST 以 exit 2 结束，MUST NOT 降级到其它方法。
 
 #### 按派发量化记录（US2）
 
 - **FR-011**: [[STR-003]] MUST 升级到 `schema_version = 2`：provenance 取值集新增 `configured`；`unit_type` 新增 `agent`；`unit_id` MUST 接受 [[STR-014]] 形式的 `agent:<slug>`。
-- **FR-012**: [[STR-003]] MUST 新增动作 [[STR-015]]：入参 `unit_id=agent:<slug>`、`run_id=派发 label`（execution_id），使用显式解析；幂等键 MUST 为 `(unit_id, run_id)`，重复调用不得写入第二行；采集前 MUST 校验配置快照的 `config_id` 与本次派发解析结果一致。
+- **FR-012**: [[STR-003]] MUST 新增动作 [[STR-015]]：入参 `unit_id=agent:<slug>`、`run_id=派发 label`（execution_id），使用显式解析；幂等键 MUST 为 `(unit_id, run_id)`，重复调用不得写入第二行；采集前 MUST 校验配置快照的 `config_id` 与本次派发解析结果一致；不一致时 MUST 非阻塞失败：输出原因并以非零退出报告、不写入声称该配置的记录、不改变派发结果。
 - **FR-013**: [[STR-003]] 的记录 MUST 新增 `config` 组，字段恰为 `config_id / source_chain / method_requested / method_resolved / mode / cli / model / reasoning_effort / context_window / extra_flags / snapshot`。
 - **FR-014**: `llm` 组 MUST 按 `method_resolved` 取值：`declared` → 回显配置值并以 `configured` 标注来源；`qoder-settings` → 复用既有 qoder settings 适配器并以 `measured` 标注；`none` → 全部字段为显式未采标记。
 - **FR-015**: `quality` MUST 新增 `exit_code`；`elapsed_ms` MUST 优先取 stream result 的 `duration_ms`，否则取 status 文件 mtime 与快照 `resolved_at` 之差，两者皆无时落显式未采标记；`tokens` MUST 仅在 usage 的输入与输出 token 均为整数时取值；exit 0 → `errors=[]`，非 0 → 一条 `dispatch.exit_code`，无 status 文件 → 相关字段落显式未采标记。
@@ -228,7 +229,12 @@ run-agent 在派发前解析并展示配置、external 派发把 `cli_args` 透�
 
 ## Clarifications
 
-<!-- 
-This section will be populated by /speckit.clarify command with questions and answers.
-Format: - Q: <question> → A: <answer>
--->
+### Session 2026-10-18
+
+无人值守裁决：以下每问均采纳 Recommended 选项。
+
+- Q: 本规格应绑定既有 Feature（059/060）还是新建 Feature？ → A: 新建 Feature 061「子代理 CLI 配置管理与按派发量化」；059/060 保持 Implemented 不变。依据：简报 §2.1 的已裁定范围，配置管理/按派发量化是可独立注册的新能力面。
+- Q: 配置解析引擎名是否锁定为 `scripts/python/execution-config.py`？ → A: 锁定 [[STR-002]]（stdlib-only，动作 `resolve / validate / list-configs`）；plan 不得改名，确需改名须走范围修订并同步 [[STR-002]]。全仓同名冲突实测为零（2026-10-18）。
+- Q: `auto` 方法解析中的「显式覆盖」统计哪些字段？ → A: 代理层或内联层显式设置且未被清除哨兵（`""` / `auto`）清空的 `model / reasoning_effort / context_window / extra_flags / log_dir` 任一字段；默认层与 `quantification.method` 键本身不计入。仅 `extra_flags` / `log_dir` 覆盖也会使 external 的 auto 落到 `declared`；若 effective config 缺 `model / reasoning_effort / context_window`，则 exit 2，不降级。
+- Q: 默认层「整体跳过」时跳过哪些键？ → A: 整层全部键（`model / reasoning_effort / context_window / extra_flags / quantification.method / log_dir / cli`）均不参与合并，并记录到 `skipped_layers`；禁止任何 qoder 默认值（含量化方法）泄漏到非 qoder CLI。
+- Q: 配置快照 `config_id` 与本次解析不一致时如何处置？ → A: 非阻塞可见失败：[[STR-015]] 输出原因并以非零退出报告、不写入声称该配置的记录、不阻塞派发结果；存储保持 append-only。
