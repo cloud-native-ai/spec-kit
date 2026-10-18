@@ -97,7 +97,7 @@ GATE-7_note=Commit surface: `git show --stat --name-only be491b33` lists exactly
 | same | identity fixtures | collect rejects agent:; --unit-type agent accepted for listing |
 | tests/contract/test_probe_engine_action_sets.py | exec-quant exact action set | + collect-dispatch |
 
-All eight extensions are same-nodeid edits; none surfaced as a new failing nodeid.
+Eight existing-nodeid extensions were edited in place; the FAILED-nodeid comparison surfaced no new failing nodeids. Two **new test methods** were also added — `TestCapabilityMatrix::test_claude_none_positive_zero_qoder_leak` and `TestCapabilityMatrix::test_claude_declared_rejection_zero_qoder_leak` — which are new test nodeids but not new failing nodes; they are part of the intentional-extension disclosure (review F16).
 
 # -- T028: 7 pre-existing affected-file failures, before/after --
 
@@ -143,7 +143,7 @@ None is counted as a regression; none was silently dropped.
 1. **Re-read surfaces**: `skills/internal/run-agent/SKILL.md` (Run Mode), `skills/internal/run-agent/references/dispatch-preflight.md` (row ④), `shared/definitions/subagent-definitions.md` (Execution Topology Declaration).
 2. **Contract diff**: run-agent gains a mandatory configuration-resolution step (resolve → disclose → stop on non-zero → external `-- <cli_args>` pass-through with absolute `DISPATCH_LOG_DIR` → post-dispatch `collect-dispatch`, target-side for remote). Preflight ④ changes from host-CLI config-face inspection to “resolved configuration” (resolve exit 0 + non-empty `config_id`; external requires `requires_external=true`), retaining the `model`/`effort`/`context`/`待补` literals. `subagent-definitions` adds the three-layer precedence, coverage-vs-conflict, defaults whole-layer skip, and snapshot/quantification provenance, and repoints the schema to `references/execution-config.md`. The Visibility Contract, fast-fail injection, and anti-nesting obligations are unchanged.
 3. **Driver's actual dispatch path**: this line runs a **direct runner** (`/tmp/run-061-implement.sh`, per `.specify/agents/execution/logs/061-line-state.md`), which bypasses `run-agent`; the loop-driver's `dispatch-recipes.md` also provides direct ssh/qodercli shapes and only references preflight ④ by pointer. So the updated run-agent resolve/collect sequence was not on this line's dispatch path.
-4. **Affected? verdict**: the driver's dispatch shape is **not broken** — it neither calls the new resolver nor the new collect action, and preflight ④ still accepts its existing evidence form under the new “resolved configuration” wording once a defaults layer exists. Verdict: **compatible, no fast-fail**. Runtime defaults layer (from T033) exists as the FR-027 prerequisite; a future run-agent-mediated dispatch will resolve successfully because the file is present.
+4. **Affected? verdict**: the driver's dispatch shape is **not broken for the direct runner**, which bypasses `run-agent` and therefore neither calls the new resolver nor the new collect action. The updated preflight ④ was **not exercised** on this line's dispatch path; it now requires `resolve` exit 0 + non-empty `config_id`. That prerequisite was independently exercised for a future run-agent-mediated dispatch: `python3 .specify/scripts/python/execution-config.py --action resolve --agent sdd-executor --mode external --workspace-root . --format json` → exit 0, `config_id=72ae1cc218e8aca8`, `cli_args=[--model DeepSeek-Flash --reasoning-effort max --context-window 1000000]`, source chain = defaults (`_defaults.yaml`). Verdict: **direct-runner compatible, no fast-fail; new path prerequisite verified**. This separates bypass from compatibility (review F3 / REC-W3).
 
 # -- T031: plan decisions and open points --
 
@@ -184,3 +184,14 @@ None is counted as a regression; none was silently dropped.
   `records.jsonl`, `glossary.md`, session/feedback records, progress-reporting guideline) were
   not modified by this run and are excluded from the 061 commits.
 - No push was performed.
+
+# -- Review finding dispositions (2026-10-18) --
+
+| Review finding | Severity | Disposition |
+|---|---|---|
+| F3 driver bypass / T030 overclaim | P1 | corrected above: the direct runner bypass is recorded separately; the new path's prerequisite was verified with a real `resolve` (exit 0, `config_id=72ae1cc218e8aca8`) |
+| F7 baseline is a dirty-tree parked-file measurement | P1 | baseline header corrected with the parked/dirty-tree method and the name-level-only comparison note; a clean-worktree baseline remains a framework follow-up (REC-A2) |
+| F8 `DoD Status: pending` vs `Implemented` | P1 | `tasks.md` DoD Status flipped to `green` after DoD-1..7 evidence landed |
+| F13 stale waiver (36 open CHK rows) | P2 | `waivers.md` rewritten with Scope / Basis / Disposition / Closed; `config-quant.md` is 0 open after the M-03 refresh |
+| F16 “all eight extensions are same-nodeid edits” | P2 | corrected: eight in-place pin edits plus two new test methods; FAILED-nodeid comparison remains empty |
+| F1 / F2 / framework-level REC-* | P1/P2 | out of 061 scope; recorded in `review.md` and the feedback store, not fixed in this feature |

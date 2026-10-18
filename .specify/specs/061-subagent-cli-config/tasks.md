@@ -36,7 +36,7 @@ Re-measured immediately before writing this file; commands and real output are r
 - DoD-6: Only 061 framework sources, generated mirrors, tests, docs, spec artifacts, and the seeded runtime defaults layer (`.specify/agents/execution/configs/_defaults.yaml`, T033) were touched; no unrelated dirty file entered any 061 commit.
 - DoD-7: The repository's runtime defaults layer exists at `.specify/agents/execution/configs/_defaults.yaml` (seeded by T033, byte-equal to the template, idempotent), and T030 records the driver's actual dispatch path plus the runtime defaults existence as the FR-027 prerequisite evidence in `verification.md`.
 
-**DoD Status**: pending
+**DoD Status**: green (DoD-1..7 satisfied; flipped during review remediation 2026-10-18)
 
 ## Completion Gate
 

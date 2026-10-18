@@ -1,7 +1,11 @@
 # Baseline failed nodeids — Feature 061 implementation freeze (dated record)
 
-- Date: 2026-10-18 (implementation start, BEFORE any 061 source edit; captured with the
-  three new 061 files parked so the tree matched pre-061 reality)
+- Date: 2026-10-18 (implementation start; the three new 061 files were created by the implement
+  stage and parked aside for this capture. The worktree also carried unrelated dirty files —
+  the progress-reporting guideline + instructions mirrors — so this is a dirty-tree, parked-file
+  measurement, not a clean-worktree measurement reproducible from the commit. The gate uses the
+  name-level FAILED-nodeid comparison only; the absolute pass count (3288) is specific to this
+  parked/dirty tree and MUST NOT be compared as a clean-tree number. See review F7 / REC-A2.)
 - Command: `/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract tests/integration -q --no-header -p no:cacheprovider`
 - Result: 3288 passed / 24 failed / 1 skipped (171.78s).
 - Relation to the plan-time 25-list (preserved in notes/pre-change-measurements.md): the
