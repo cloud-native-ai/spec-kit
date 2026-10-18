@@ -124,7 +124,7 @@ N/A — Constitution Check 无 Fail / Partial。
 - **生成面基线**：三连实测全绿（见 Mirror Obligations 开头）；当前工作树既有脏文件为 `.specify/memory/exec-quant/records.jsonl`、`.specify/memory/glossary.md` 及运行侧 session/feedback 产物——**不属于本特性提交面**，不提交、不还原。
 - **qodercli 实测**：`qodercli 1.1.73`；`--help` 含 `-m, --model <model>`、`--reasoning-effort <level>`、`--context-window <size>`；`~/.qoder/settings.json` 的 `model.name = dfmodel`。宿主进程探测复用 `exec-quant.collect_agent()`（依赖 `/proc`，macOS 返回 `unresolved`），因此 native/virtual 的 `qoder-settings` 自动解析需要 `--host-cli` / `SPECKIT_HOST_CLI` 显式覆盖；external 规则不依赖宿主探测。
 - **设计裁定（plan 期，须在 implement 前复核）**：
-  1. **不引入「显式 cli 单独触发 external」**：`mode` 缺省仍按 060 native 优先（FR-003）。external 由显式/默认层 `mode: external`、或代理/内联非清除覆盖触发；显式 `cli` 与生效 native/virtual 同时出现属身份矛盾 → 拒收。默认层可提供 `mode` 作为默认值（层参与时生效、层跳过时一并跳过）。SC-001「只有默认层且选择 qodercli」由默认层声明 `mode: external` + `cli: qodercli` 满足：source_chain 全部指向默认层，`cli_args` 恰为 STR-013。
+  1. **不引入「显式 cli 单独触发 external」**：`mode` 缺省仍按 060 native 优先（FR-003）。external 由显式/默认层 `mode: external`、或代理/内联非清除覆盖触发；**覆盖触发的 external 优先于默认层 `mode: native|virtual`——默认层 `mode` 被覆盖，`requires_external=true`**；显式 `cli` 与生效 native/virtual 同时出现属身份矛盾 → 拒收。默认层可提供 `mode` 作为默认值（层参与且无覆盖时生效、层跳过时一并跳过）。SC-001「只有默认层且选择 qodercli」由默认层声明 `mode: external` + `cli: qodercli` 满足：source_chain 全部指向默认层，`cli_args` 恰为 STR-013。
   2. 显式 `mode: native|virtual` 与代理/内联任一非清除覆盖同时出现 → 拒收并提示 external（FR-003）；与显式 `cli` 同时出现同样拒收。
   3. **claude + declared 的规格张量已显式记录**：FR-008 / US1-5 要求 claude 的显式 model/effort/context 一律 exit 2，因此 `declared` 在 claude 上当前不可达（缺三项即 exit 2）。本 plan 采纳显式验收条款优先（FR-008/US1-5），矩阵仍登记 `declared / none` 作为旗标验证后的扩展位。SC-006 的可机械计数目标由两条路径共同满足：`claude + none` 正向解析（effective/cli_args/记录中 qoder 默认值计数 0）与 `claude + declared` 拒收路径（错误面 qoder 默认值计数 0）。这是本 plan 在无人值守下的显式裁定，不是静默改写；implement/review 可据实际旗标验证结果修订。
   4. `quality.exit_code` 采用与 059 相同的可测量叶子形态：`{"value": <int>, "provenance": "measured"}` 或 `not_evaluated`，纳入 `MEASURABLE_PATHS`；`quality.errors` 条目保持 059 的精确形状 `{source, count}`（退出码已在 `quality.exit_code`，不新增键）。
@@ -177,7 +177,7 @@ Phase 0 预期 vs 实际：实体 7（预估 6–8 ✓）；契约 3（预估 3 
 ## Risks & Fast-Fail Points
 
 1. **stream-json 字段未验证**：`duration_ms` / `usage.input_tokens` / `usage.output_tokens` 的嵌套形态未经本机验证。采集采用「递归按键存在才取，取最后一个匹配；缺一即 `not_evaluated`」，不猜测事件顺序或字段路径；契约 C-EQ-06 固定该规则。
-2. **默认层跨 CLI 泄漏**：默认层整层跳过必须覆盖 `cli/model/reasoning_effort/context_window/extra_flags/quantification.method/log_dir`。SC-006 用 `claude + none` 正向路径与 `claude + declared` 拒收路径双路径做字面量计数，零容忍。
+2. **默认层跨 CLI 泄漏**：默认层整层跳过必须覆盖 `mode/cli/model/reasoning_effort/context_window/extra_flags/quantification.method/log_dir`。SC-006 用 `claude + none` 正向路径与 `claude + declared` 拒收路径双路径做字面量计数（字面集 {`DeepSeek-Flash`, `max`, `1000000`, `qodercli`}，`auto` 不计入），零容忍。
 3. **驱动循环自依赖**：本特性修改 run-agent / preflight / exec-quant，而无人值守驱动循环依赖这些面派发后续阶段。implement 完成后、派发 review 之前 MUST 重新读取更新后的派发契约；若契约变化影响 driver 派发形态，按快速失败停线上送，不得静默适配（FR-027）。
 4. **claude declared 不可达**：见 Phase 0 裁定 3；实现与评审须确认这是 FR-008/US1-5 的直接结果，而非遗漏。若后续验证 claude 旗标，扩展矩阵即可恢复。
 5. **macOS 无 `/proc`**：native/virtual 的 `qoder-settings` 自动解析依赖 `--host-cli`/`SPECKIT_HOST_CLI`；external + qodercli 不受影响。未提供时 auto 解析为 `none` + warning，不猜测宿主。

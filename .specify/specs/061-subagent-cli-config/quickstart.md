@@ -51,7 +51,7 @@ Test baseline (route a, executed 2026-10-18; repo `.venv` lacks pytest, so the m
 /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract tests/integration -q --no-header -p no:cacheprovider
 ```
 
-Actual result: `3278 passed, 25 failed, 1 skipped in 193.94s`. The sorted failed nodeids are frozen in [notes/baseline-failed.txt](notes/baseline-failed.txt). After implementation the same command MUST be re-run; `comm -13` against the frozen list MUST be empty except the registered intentional extensions.
+Actual result: `3278 passed, 25 failed, 1 skipped in 193.94s`. The sorted failed nodeids are frozen in [notes/baseline-failed.txt](notes/baseline-failed.txt). After implementation the same command MUST be re-run; `comm -13` against the frozen list MUST be empty — the T012/T013 pin edits are same-nodeid edits and are registered separately in `verification.md`, not as a gate exception.
 
 ---
 

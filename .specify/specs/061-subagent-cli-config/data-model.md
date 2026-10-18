@@ -40,8 +40,8 @@
 
 | Field | Type | Rule |
 |-------|------|------|
-| `mode` | `native` \| `virtual` \| `external` | 代理/内联显式值 > 默认层默认值（层参与时）> 覆盖推导（external）> native（060） |
-| `cli` | string \| null | 已知 CLI 名；显式声明不得与 native/virtual 共存；默认层值可生效但 native/virtual 不生成旗标 |
+| `mode` | `native` \| `virtual` \| `external` | 代理/内联显式值 > 覆盖推导（external，优先于默认层默认值）> 默认层默认值（层参与且无覆盖时）> native（060） |
+| `cli` | string \| null | 已知 CLI 名；显式声明不得与 native/virtual 共存；默认层值可生效但 native/virtual 不生成旗标；`mode=external` 时不得为 null（exit 2） |
 | `model` | string \| null | 非空覆盖值；清除哨兵后为 null |
 | `reasoning_effort` | string \| null | 同上 |
 | `context_window` | positive int \| null | 同上；不得为 bool/0/负数/非整数 |
@@ -55,14 +55,15 @@
 2. **清除哨兵**：`""` 与 `auto` 对 `model / reasoning_effort / context_window / extra_flags / log_dir` 表示“清除低层值”。effective config **恒含全部 8 个键**；被清除或从未提供的字段值为 `null`。清除字段不生成 CLI 旗标、不写入 `source_chain`。
 3. `quantification.method` 的 `auto` 是合法方法值，不是清除哨兵；空串对它是非法枚举。
 4. 所有被加载层的值在合并前先做字段级校验（类型/枚举/log_dir/extra_flags）；任一非法值即使会被高层覆盖也拒收（确定性优先）。
-5. 默认层整层跳过时，其全部键（含 `cli` 与 `quantification.method`）不参与合并，并记入 `skipped_layers`。
+5. 默认层整层跳过时，其全部键（含 `mode`、`cli` 与 `quantification.method`）不参与合并，并记入 `skipped_layers`。
 
 **Identity fields（`mode` / `cli`）**:
 
 - 代理层与内联层同时声明且不一致 → exit 2，消息列出字段名（`mode` / `cli`）。
 - 默认层 `cli` 不是声明：代理/内联显式选择不同 CLI → 默认层整层跳过；相同 → 正常参与。
-- `mode` 缺省时按 060 native 优先：存在代理/内联非清除覆盖 → `external`；否则 `native`。**显式 `cli` 不单独触发 external**。默认层可提供 `mode` 作为默认值（层参与时生效，层跳过时一并跳过）。
+- `mode` 缺省时按 060 native 优先：存在代理/内联非清除覆盖 → `external`，且该覆盖触发的 external **优先于默认层 `mode: native|virtual`**（默认层 mode 被覆盖）；无覆盖时采用参与中的默认层 `mode`（若声明），否则 `native`。**显式 `cli` 不单独触发 external**。默认层可提供 `mode` 作为默认值（层参与且无覆盖时生效，层跳过时一并跳过）。
 - 显式 `cli` 与生效的 `native`/`virtual` 同时出现 → exit 2（`cli` 仅用于 external，属身份矛盾）。
+- `mode=external` 且无生效 `cli` → exit 2（列出 `cli` 与支持集）。
 - 显式 `mode: native|virtual` + 代理/内联任一非清除覆盖 → exit 2，提示改用 external。
 
 **`source_chain`**: `{<field>: {"layer": "defaults"|"agent-config"|"inline"|"derived"}}`，文件层额外带 `"path": <workspace-relative path>`；覆盖 effective config 中每个非 null 字段以及 `quantification.method`。inline/derived 来源**省略 `path` 键**（不写 null），以满足 059 记录律。`skipped_layers`: `["defaults"]`（字符串数组）。
@@ -99,6 +100,8 @@ Shape per CLI:
 
 Current behavior is specified in [contract C-EC-08](contracts/execution-config-cli.md#c-ec-08-cli-capability-matrix-single-owner-in-code) as a dated design specification; the runtime values live only in `CAPABILITY_MATRIX`. Consult C-EC-08 for the exact per-CLI list; this file does not restate it.
 
+`quantification_methods` constrains the **resolved** method only. `auto` is the request-layer selector (E5): it is resolved first, and then the resolved method is checked against the matrix; `requested=auto` MUST NOT be rejected by the matrix merely because it is not listed.
+
 **`cli_args` generation**: 仅 `mode=external` 生成；顺序固定 `--model <v> --reasoning-effort <v> --context-window <v>`，随后 `extra_flags` 的 `shlex.split` token。native/virtual 恒为 `[]`。
 
 ## E5 — Quantification Method Resolution
@@ -118,10 +121,10 @@ Current behavior is specified in [contract C-EC-08](contracts/execution-config-c
 
 **Explicit method constraints**:
 
-- `declared`: effective config 必须同时具备 `model / reasoning_effort / context_window`；缺一 → exit 2，不降级。
+- `declared`: effective config 必须同时具备 `model / reasoning_effort / context_window`（显式请求或 auto 解析产生均适用）；缺一 → exit 2，不降级。
 - `qoder-settings`: 必须由 qodercli 支持（external qodercli，或 native/virtual 且宿主为 qodercli）；否则 exit 2。
 - `none`: 合法，不要求任何字段。
-- 方法同时受 E4 的 `quantification_methods` 约束。
+- **resolved** 方法同时受 E4 的 `quantification_methods` 约束；`requested=auto` 本身不受矩阵拒绝。
 
 **Explicit override definition**（规则 1 与 FR-003 共用）：代理层或内联层显式设置且未被清除哨兵清空的五个覆盖字段任一；默认层与 `quantification.method` 本身不计入。
 
@@ -195,7 +198,7 @@ Current behavior is specified in [contract C-EC-08](contracts/execution-config-c
 | V7 | `extra_flags` 单行；`shlex.split` 失败或含 `-m` / `--model` / `--reasoning-effort` / `--context-window`（含 `=` 形式） | exit 2 |
 | V8 | `quantification.method ∈ {auto,declared,qoder-settings,none}`；`quantification` 只允许 `method` | exit 2 |
 | V9 | `agent`（若声明）必须等于请求 slug | exit 2 |
-| V10 | `mode`/`cli` 跨层冲突、native/virtual + 显式 cli、native/virtual + 覆盖、external + 未验证 CLI/旗标 | exit 2，列字段 + 支持集 |
+| V10 | `mode`/`cli` 跨层冲突、native/virtual + 显式 cli、native/virtual + 覆盖、external + 未验证 CLI/旗标、external + 无生效 `cli` | exit 2，列字段 + 支持集 |
 | V11 | 显式 `declared` 缺任一 model/effort/context；显式 `qoder-settings` 非 qoder 支持 | exit 2，不降级 |
 | V12 | 默认层缺失或非法 | exit 2，指明路径与 `specify init` 修复方式 |
 | V13 | 快照缺失/不可读/kind 或 schema 不符/config_id 重算不一致 | collect-dispatch exit 1，不写记录 |

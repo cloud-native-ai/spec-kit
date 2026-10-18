@@ -50,21 +50,22 @@ Values MAY be bare or wrapped in one matching pair of single/double quotes. Inli
 - For `model, reasoning_effort, context_window, extra_flags, log_dir`: a missing key inherits the lower layer; a non-empty value overrides; the clear sentinels `""` and `auto` remove the lower-layer value. The effective config MUST always contain all eight keys; a cleared or absent field MUST be `null`. A cleared field MUST NOT appear in `source_chain` or `cli_args`.
 - `quantification.method=auto` is a method value, never a clear sentinel; `""` for the method is an invalid enum.
 - `source_chain` MUST map every non-null effective field (and `quantification.method`) to `{layer}` with layer ∈ `defaults|agent-config|inline|derived`; file-layer entries additionally carry `path` (workspace-relative). Inline/derived entries MUST omit the `path` key (no null, no empty string).
-- When the defaults layer is skipped, `skipped_layers` MUST contain `"defaults"` and none of its keys (including `cli` and `quantification.method`) may participate.
+- When the defaults layer is skipped, `skipped_layers` MUST contain `"defaults"` and none of its keys (including `mode`, `cli` and `quantification.method`) may participate.
 
 ## C-EC-06 Topology identity (`mode` / `cli`)
 
 - `mode ∈ {native, virtual, external}`; no `auto` value is added.
 - If agent-config and inline both declare `mode` differently, or both declare `cli` differently, `resolve` MUST exit 2 naming the conflicting field(s).
-- `mode` is resolved as: explicit agent-config/inline value; else the defaults layer's `mode` while that layer participates; else `external` when any non-clear override exists at agent-config or inline; else `native` (060 native-first). An explicit `cli` alone MUST NOT switch the mode to external.
+- `mode` is resolved as: an explicit agent-config/inline value; else `external` when any non-clear override exists at agent-config or inline — **this override-triggered external takes priority over a participating defaults layer's `mode: native|virtual`, which is thereby overridden (and `requires_external=true`)**; else the defaults layer's `mode` while that layer participates; else `native` (060 native-first). An explicit `cli` alone MUST NOT switch the mode to external.
 - An explicit `cli` combined with an effectively `native`/`virtual` mode MUST be rejected (exit 2): `cli` applies to external dispatch only, so the pair is an identity contradiction. Callers that want qodercli external dispatch MUST declare `mode: external` explicitly (or set it in the participating defaults layer).
+- An effective `mode=external` with no effective `cli` MUST be rejected (exit 2), naming field `cli` and the supported set: external dispatch cannot run without a CLI.
 - An explicit `mode: native|virtual` combined with any non-clear override from agent-config or inline MUST be rejected (exit 2) with a message directing the caller to `external`.
 - The defaults layer's `cli` is a default value, not a declaration: when an explicit `cli` differs from it, the whole defaults layer (including its `mode` and `quantification.method`) is skipped; when equal or absent, defaults participate.
 - A `mode` declared in the defaults layer MUST NOT trigger the cross-layer conflict rule; only agent-config vs inline declarations are compared.
 
 ## C-EC-07 `requires_external`
 
-`requires_external` MUST be `true` exactly when the effective `mode` is `external`. The mode is external when (a) agent-config/inline declares `mode: external`, (b) the participating defaults layer declares `mode: external` and no higher layer overrides it, or (c) no layer declares `mode` and any non-clear override exists at agent-config or inline. Otherwise the mode is the effective explicit/default `native`/`virtual` value when present, else `native`; `requires_external` is `false`.
+`requires_external` MUST be `true` exactly when the effective `mode` is `external`. The mode is external when (a) agent-config/inline declares `mode: external`, (b) no agent-config/inline `mode` is declared and any non-clear override exists at agent-config or inline — this takes priority over a participating defaults layer's `mode: native|virtual`, which is overridden — or (c) no agent-config/inline `mode` and no override exists, and the participating defaults layer declares `mode: external`. Otherwise the mode is the effective explicit/default `native`/`virtual` value when present, else `native`; `requires_external` is `false`.
 
 ## C-EC-08 CLI capability matrix (single owner in code)
 
@@ -75,6 +76,7 @@ Values MAY be bare or wrapped in one matching pair of single/double quotes. Inli
   - `codex` / `opencode`: external stream-json unverified; `requires_external=true` MUST be rejected (exit 2); capability extension point retained.
   - Any other CLI value MUST be rejected (exit 2).
 - Every rejection message MUST name the offending field and the supported set (CLI or flag or method list), e.g. `field 'model' is not supported by cli 'claude' (supported: none for model; see qodercli)`; no silent drop.
+- The `quantification_methods` list constrains the **resolved** method only. `auto` is the request-layer selector (C-EC-09): it MUST be resolved first and then the resolved method is checked; `requested=auto` MUST NOT be rejected merely because it is not listed in `quantification_methods`.
 
 ## C-EC-09 Quantification resolution
 
@@ -83,10 +85,10 @@ Values MAY be bare or wrapped in one matching pair of single/double quotes. Inli
 - Auto order MUST be: (1) external + any non-clear override at agent/inline → `declared`; (2) external + no explicit override + `cli=qodercli` → `qoder-settings`; (3) native/virtual + qoder host → `qoder-settings`; (4) otherwise `none` with a warning.
 - The "explicit override" set for (1) is exactly `model, reasoning_effort, context_window, extra_flags, log_dir` set to non-clear values at agent/inline; defaults and `quantification.method` do not count.
 - Host detection order: `--host-cli` → `SPECKIT_HOST_CLI` → `exec-quant.collect_agent()` (when `/proc` is available) → `unknown`. `unknown` is not qoder and yields `none` + warning.
-- Explicit `declared` requires effective model + reasoning_effort + context_window; missing any → exit 2, no downgrade.
+- `declared` — whether explicitly requested or produced by auto resolution — requires effective model + reasoning_effort + context_window; missing any → exit 2, no downgrade.
 - Explicit `qoder-settings` requires qoder support (external qodercli, or native/virtual with qoder host); otherwise exit 2, no downgrade.
-- A method outside the selected CLI's `quantification_methods` MUST be rejected (exit 2).
-- Consequence (documented adjudication): because C-EC-08 rejects explicit model/effort/context on claude, `declared` on claude is unreachable and always exits 2 (missing values or rejected values). The matrix still registers it for a future flag verification. SC-006's zero-leak goal is therefore tested on two paths: `claude + none` positive resolution (effective config/cli_args/record contain zero qoder defaults) and `claude + declared` rejection (error surface contains zero qoder defaults).
+- The capability check applies to the **resolved** method only; `auto` is a request-layer selector, MUST be resolved first, and MUST NOT be rejected by the matrix merely for being absent from `quantification_methods`.
+- Consequence (documented adjudication): because C-EC-08 rejects explicit model/effort/context on claude, `declared` on claude is unreachable and always exits 2 (missing values or rejected values). The matrix still registers it for a future flag verification. SC-006's zero-leak goal is therefore tested on two paths: `claude + none` positive resolution (effective config/`cli_args`/record `config` group contain zero qoder defaults) and `claude + declared` rejection (the declared-missing-values error surface contains zero qoder defaults). For this counting, the "qoder defaults" literal set is exactly `DeepSeek-Flash`, `max`, `1000000`, `qodercli`; `auto` MUST NOT be counted — it is a legal request-layer value that may appear in `method_requested`; the record's `agent` group is host evidence and is out of scope.
 
 ## C-EC-10 `cli_args`
 

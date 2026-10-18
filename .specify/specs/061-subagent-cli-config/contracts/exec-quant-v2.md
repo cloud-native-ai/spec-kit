@@ -111,4 +111,4 @@ Intentional extensions in existing pins (register each in `verification.md`):
 | same | unit-id/type domain fixtures | add `agent:` / `agent` |
 | `tests/contract/test_probe_engine_action_sets.py` | exec-quant exact action set | add `collect-dispatch` |
 
-Existing pre-baseline failures (frozen in `notes/baseline-failed.txt`) MUST NOT be counted as regressions; the implementation MUST compare sorted nodeids and only accept the registered intentional extensions as newly passing/failing nodes.
+Existing pre-baseline failures (frozen in `notes/baseline-failed.txt`) MUST NOT be counted as regressions; the implementation MUST compare sorted nodeids and require an empty `comm -13` diff. The registered intentional extensions are same-nodeid pin edits and MUST NOT appear as newly failing nodeids; they are disclosed separately in `verification.md`, never accepted through a gate exception.

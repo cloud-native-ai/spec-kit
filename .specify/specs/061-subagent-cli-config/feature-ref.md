@@ -34,7 +34,7 @@
 | FR-023 | init 播种 `_defaults.yaml`（永不覆盖） | E7 | C-DW-07 |
 | FR-024 | qoder-cli / templates-and-agents 文档补录 | C-DW-08 | C-DW-08 |
 | FR-025 | 059/060/probe/preflight 零新增失败；有意扩展逐条登记 | C-DW-10 | C-DW-10, C-EQ-11 |
-| FR-026 | `compile-embeds → regen-command-copies → sync-mirrors` 全绿 | C-DW-09 | C-DW-09 |
+| FR-026 | `compile-embeds → regen-command-copies → sync-mirrors` 相对 2026-10-18 基线零 NEW drift | C-DW-09 | C-DW-09 |
 | FR-027 | 实现后重读派发契约；不兼容时快速失败 | C-DW-11 | C-DW-11 |
 
 ## SC → 验证映射
@@ -46,13 +46,13 @@
 | SC-003 | 一次派发（或夹具产物）后查询存储、重复采集、`--unit-type agent --config-id` | `tests/contract/test_exec_quant_dispatch.py`（S4）；verification.md |
 | SC-004 | 冻结基线 sorted nodeids + `comm` 比较；有意扩展逐条登记 | `notes/baseline-failed.txt`；verification.md |
 | SC-005 | 生成三连实跑；init 播种/幂等字节比较 | C-DW-09；`tests/integration/test_init_execution_config.py`（S1/S5）；verification.md |
-| SC-006 | `claude + none` 正向夹具（effective/cli_args/记录）与 `claude + declared` 拒收路径（错误面）分别做 qoder 默认值字面量检索，计数均为 0 | `tests/contract/test_execution_config_engine.py`；verification.md |
+| SC-006 | `claude + none` 正向夹具（effective/cli_args/记录 `config` 组）与 `claude + declared` 拒收路径（declared 缺项错误面）分别按 requirements SC-006 的字面集 {`DeepSeek-Flash`, `max`, `1000000`, `qodercli`} 检索，计数均为 0（`auto` 与记录的 `agent` 组不计入） | `tests/contract/test_execution_config_engine.py`、`tests/contract/test_exec_quant_dispatch.py`；verification.md |
 
 ## 设计裁定（plan 期，供 implement/review 复核）
 
-1. **不引入「显式 cli 单独触发 external」**：`mode` 缺省按 060 native 优先（FR-003）；external 由显式/默认层 `mode: external` 或非清除覆盖触发；显式 `cli` + 生效 native/virtual 拒收。默认层可提供 `mode` 作为默认值；SC-001 由默认层 `mode: external` + `cli: qodercli` 满足（source_chain 全默认层）。
-2. **native/virtual + 显式 cli 拒收**：身份矛盾，不静默选择。
-3. **claude + declared 当前不可达**：FR-008/US1-5 拒绝显式 model/effort/context，导致 declared 缺项 exit 2；矩阵保留 `declared` 作为旗标验证后的扩展位。SC-006 由 `claude + none` 正向路径与 `claude + declared` 拒收路径双路径验证零泄漏。这是显式裁定，不是静默改写。
+1. **不引入「显式 cli 单独触发 external」**：`mode` 缺省按 060 native 优先（FR-003）；external 由显式/默认层 `mode: external` 或非清除覆盖触发；覆盖触发的 external 优先于默认层 `mode: native|virtual`（默认层 mode 被覆盖，`requires_external=true`）；显式 cli + 生效 native/virtual 拒收。默认层可提供 `mode` 作为默认值；SC-001 由默认层 `mode: external` + `cli: qodercli` 满足（source_chain 全默认层）。
+2. **native/virtual + 显式 cli 拒收**：身份矛盾，不静默选择；`mode=external` 且无生效 `cli` 同样拒收。
+3. **claude + declared 当前不可达**：FR-008/US1-5 拒绝显式 model/effort/context，导致 declared 缺项 exit 2；矩阵保留 `declared` 作为旗标验证后的扩展位。SC-006 由 `claude + none` 正向路径与 `claude + declared` 拒收路径双路径验证零泄漏，字面集为 {`DeepSeek-Flash`, `max`, `1000000`, `qodercli`}（`auto` 不计入，它是合法请求层值）。这是显式裁定，不是静默改写。
 4. **`quality.exit_code` 为可测量叶子**（`{value, provenance}` / `not_evaluated`），纳入 `MEASURABLE_PATHS`；`quality.errors` 保持 059 的 `{source, count}` 形状。
 5. **macOS 宿主探测**：`/proc` 不可用；native/virtual 的 `qoder-settings` 需 `--host-cli` / `SPECKIT_HOST_CLI`；unknown → `none` + warning。
 6. **并发幂等**：POSIX `fcntl.flock` 包裹查重 + append；非 POSIX 记录降级语义。
