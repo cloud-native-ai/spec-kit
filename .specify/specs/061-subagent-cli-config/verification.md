@@ -10,7 +10,7 @@ baseline_skipped=1
 baseline_affected_file_nodes=7
 
 implementation_date=2026-10-18
-post_change_commit=pending (this run's 061 commit; the SHA is recorded in the follow-up metadata commit)
+post_change_commit=be491b33
 
 post_change_failed_nodeids=24 (the baseline set exactly; comm -13 empty, comm -23 empty)
 post_change_passed=3417
@@ -82,7 +82,7 @@ GATE-6_status=pass
 GATE-6_note=notes/quickstart-run.md carries `## S1`–`## S5` (5 sections) and the explicit S6 not-executed authorization note.
 
 GATE-7_status=pass
-GATE-7_note=Commit surface: the 061 commit contains only the feature spec, framework sources, generated mirrors, tests, docs, and the runtime defaults layer; no excluded dirty file. `test -f .specify/agents/execution/configs/_defaults.yaml` exit 0. T030's four FR-027 fields are recorded below. The actual commit SHA is filled in the follow-up metadata commit (L-02 resolution).
+GATE-7_note=Commit surface: `git show --stat --name-only be491b33` lists exactly the 42 intended files — feature spec, framework sources, generated mirrors, tests, docs, and the runtime defaults layer; no excluded dirty file. `test -f .specify/agents/execution/configs/_defaults.yaml` exit 0. T030's four FR-027 fields are recorded above.
 
 # -- Intentional extensions (registered, never gate exceptions) --
 
