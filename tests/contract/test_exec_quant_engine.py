@@ -51,10 +51,10 @@ RUN_DETERMINATION = REPO_ROOT / "scripts" / "python" / "run-determination.py"
 #: explicit --workspace-root, so nothing may land here as a side effect).
 FRAMEWORK_STORE = REPO_ROOT / ".specify" / "memory" / "exec-quant"
 
-ACTIONS_CLOSED_SET = {"collect", "list-records", "score"}
+ACTIONS_CLOSED_SET = {"collect", "list-records", "score", "collect-dispatch"}
 KIND = "speckit.exec-quant"  # [[STR-001]]
 NOT_EVALUATED = "not_evaluated"  # [[STR-002]]
-PROVENANCE_DOMAIN = {"measured", "carried", "user-given"}
+PROVENANCE_DOMAIN = {"measured", "carried", "user-given", "configured"}
 
 #: Declared measurable fields (data-model §1.1): each is either the literal
 #: ``not_evaluated`` or a ``{"value", "provenance"}`` object.
@@ -64,6 +64,7 @@ MEASURABLE_PATHS = (
     ("llm", "model"), ("llm", "context_window"), ("llm", "reasoning_effort"),
     ("llm", "config_source"), ("llm", "connection_evidence"),
     ("quality", "elapsed_ms"), ("quality", "tokens"), ("quality", "satisfaction"),
+    ("quality", "exit_code"),
     ("qualification",),
 )
 
@@ -260,11 +261,18 @@ class TestCollectContract:
         assert records_path(ws).is_file()
         assert scores_path(ws).is_file()
         record = load_single_record(ws)
-        # V3: kind literal + schema_version
+        # V3: kind literal + schema_version (061 v2)
         assert record["kind"] == KIND
-        assert record["schema_version"] == 1
+        assert record["schema_version"] == 2
         assert record["unit_id"] == "/speckit.plan"
         assert record["unit_type"] == "command"
+        # 061 v2: config group + exit_code leaves are explicit markers
+        assert set(record["config"].keys()) == {
+            "config_id", "source_chain", "method_requested", "method_resolved",
+            "mode", "cli", "model", "reasoning_effort", "context_window",
+            "extra_flags", "snapshot"}
+        assert all(value == NOT_EVALUATED for value in record["config"].values())
+        assert record["quality"]["exit_code"] == NOT_EVALUATED
         # V1: run_id non-empty
         assert isinstance(record["run_id"], str) and record["run_id"]
         # collect text output names run_id and the landing path
@@ -402,6 +410,19 @@ class TestIdentityForms:
         result = run_engine(collect_args(ws, unit_id="custom:myowner/myunit",
                                          unit_type="custom-unit"), env_home=fake_home)
         assert result.returncode == 0, result.stderr
+
+    def test_collect_rejects_agent_form(self, ws, fake_home):
+        result = run_engine(collect_args(ws, unit_id="agent:qoder-guide"),
+                            env_home=fake_home)
+        assert result.returncode == 2
+        assert "collect-dispatch" in result.stderr
+
+    def test_agent_unit_type_is_a_valid_listing_choice(self, ws, fake_home):
+        result = run_engine(["--action", "list-records", "--workspace-root", str(ws),
+                             "--unit-type", "agent", "--format", "json"],
+                            env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        assert json.loads(result.stdout) == []
 
 
 class TestFieldBinaryLaw:
@@ -547,7 +568,7 @@ class TestListRecords:
         assert len(entries) == 2
         for entry in entries:
             for key in ("kind", "schema_version", "unit_id", "unit_type", "run_id",
-                        "run_id_resolution", "collected_at", "agent", "llm",
+                        "run_id_resolution", "collected_at", "agent", "config", "llm",
                         "quality", "qualification", "truncated", "scores"):
                 assert key in entry, f"json form missing key {key}"
             assert entry["kind"] == KIND

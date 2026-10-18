@@ -31,7 +31,7 @@
 
 ## Notes
 
-- Deterministic checker run (2026-10-18, `scripts/python/validate-requirements.py`): status `ok`; `id-contiguous`, `doc-order`, `ref-resolvable`, `marker-count`, `dup-id` all pass; 241 lines, 33 definition rows, 15 shared strings; 0 errors, 0 warnings.
+- Deterministic checker run (2026-10-18, after the analyze remediation, `scripts/python/validate-requirements.py`): status `ok`; `id-contiguous`, `doc-order`, `ref-resolvable`, `marker-count`, `dup-id` all pass; **253 lines**, 33 definition rows, 15 shared strings; 0 errors, 0 warnings. (The earlier 241-line note predated the remediation and was stale.)
 - Clarify session 2026-10-18: 5 问全答（Feature 绑定 / 引擎定名 / 显式覆盖字段集 / 默认层跳过范围 / 快照不一致处置），全部采纳 Recommended；裁决写入 `## Clarifications` > `### Session 2026-10-18`，对应整合进 `Related Feature`、FR-002/005/009/012、Edge Cases 与 Assumptions；复跑 checker 后计数不变（33 定义行 / 15 shared strings），无残留澄清标记。
 - `Related Feature` 已绑定 Feature 061；注册行与 `.specify/memory/features/061.md` 详情文件已落册（2026-10-18）。
 - Scope boundary: 059 and 060 remain Implemented; this feature adds 061 without redefining the Agent taxonomy.

@@ -35,7 +35,7 @@
 | FR-024 | qoder-cli / templates-and-agents 文档补录 | C-DW-08 | C-DW-08 |
 | FR-025 | 059/060/probe/preflight 零新增失败；有意扩展逐条登记 | C-DW-10 | C-DW-10, C-EQ-11 |
 | FR-026 | `compile-embeds → regen-command-copies → sync-mirrors` 相对 2026-10-18 基线零 NEW drift | C-DW-09 | C-DW-09 |
-| FR-027 | 实现后重读派发契约；不兼容时快速失败 | C-DW-11 | C-DW-11 |
+| FR-027 | 实现后重读派发契约；记录四个判定字段（重读面 / 契约差异 / 驱动者实际派发路径 / 是否影响 + 结论）与运行时默认层前置证据；不兼容时快速失败 | C-DW-11, T030 | C-DW-11 |
 
 ## SC → 验证映射
 

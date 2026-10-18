@@ -1,10 +1,19 @@
 # Baseline failed nodeids — Feature 061 implementation freeze (dated record)
 
-- Date: 2026-10-18 (plan phase, BEFORE any 061 implementation edit)
+- Date: 2026-10-18 (implementation start, BEFORE any 061 source edit; captured with the
+  three new 061 files parked so the tree matched pre-061 reality)
 - Command: `/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract tests/integration -q --no-header -p no:cacheprovider`
-- Result: 3278 passed / 25 failed / 1 skipped (193.94s); these 25 are pre-existing on branch 061-subagent-cli-config before 061 edits.
-- Repo `.venv` has no pytest; the profiles venv interpreter is the measured baseline environment. Implementation MUST re-run the same command and compare sorted nodeids (`comm -13 baseline current` must be empty).
-- Intentional extensions (schema_version 1→2, action-set union, provenance, MEASURABLE_PATHS, preflight wording) change assertions in named files; the corresponding nodes MUST be re-baselined deliberately and registered in verification.md, not silently dropped.
+- Result: 3288 passed / 24 failed / 1 skipped (171.78s).
+- Relation to the plan-time 25-list (preserved in notes/pre-change-measurements.md): the
+  plan-time `test_instructions_section_propagation.py::test_c1_live_instructions_carry_all_template_sections`
+  node is absent here (consistent with the excluded dirty instructions changes), and the
+  generation-time transient `test_goal_migration.py::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path`
+  node passes on a clean tree. No 061-caused node is in this list.
+- Repo `.venv` has no pytest; the profiles venv interpreter is the measured baseline environment.
+  T027 MUST re-run the same command and require `comm -13 baseline current` to be empty.
+- Intentional extensions (schema_version 1→2, action-set union, provenance, MEASURABLE_PATHS)
+  change assertions in named files; those nodes MUST stay green after the deliberate pin
+  updates and are registered in verification.md.
 
 ## Failed nodeids (sorted)
 
@@ -26,7 +35,6 @@ FAILED tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors
 FAILED tests/contract/test_fast_fail_discipline.py::test_x13_double_landing_three_count_pins
 FAILED tests/contract/test_fast_fail_discipline.py::test_x19_ufc_class_eleven_gains_fast_fail_path
 FAILED tests/contract/test_fast_fail_discipline.py::test_x21_ufc_override_column_unchanged
-FAILED tests/contract/test_instructions_section_propagation.py::test_c1_live_instructions_carry_all_template_sections
 FAILED tests/contract/test_neutrality_budget.py::test_c4_budget_total_and_violations_after_the_feature_landed
 FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
 FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged

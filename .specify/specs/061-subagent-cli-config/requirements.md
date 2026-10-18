@@ -195,7 +195,7 @@ run-agent 在派发前解析并展示配置、external 派发把 `cli_args` 透�
 - **SC-003**: 一次 external 派发后，专属存储中恰有一条该 `(agent:<slug>, 派发 label)` 记录，`config` 组与 `method_resolved` 齐备，可测的质量字段有值、不可测字段为显式未采标记；同一 label 重复调用 [[STR-015]] 不新增行；`list-records --unit-type agent --config-id` 能查回该记录。
 - **SC-004**: 契约与集成测试的排序后失败 nodeid 名单与实现前基线逐名比对零新增；所有有意扩展项 MUST 在 `verification.md` 中逐条登记（`red-first-evidence.md` 只作过程证据，不承担登记）。
 - **SC-005**: `compile-embeds → regen-command-copies → sync-mirrors` 在受影响面（模板、命令、技能、`scripts`、`shared/definitions`）上相对 2026-10-18 基线零 NEW drift；`specify init` 在缺失时播种 [[STR-001]]、在已存在时逐字节不变（幂等）。
-- **SC-006**: 非 qoder CLI 的双路径零泄漏，按「qoder 默认值」字面集 {`DeepSeek-Flash`, `max`, `1000000`, `qodercli`} 机械计数（`auto` MUST NOT 计入——它是合法请求层值，可出现在 `method_requested`）：(a) `claude + none` 正向解析——effective config、`cli_args` 与该派发记录的 `config` 组中该字面集出现次数均为 0（记录的 `agent` 组是宿主证据，不属于默认层泄漏面）；(b) `claude + declared` 拒收路径——exit 2 的错误面（declared 缺项错误）中该字面集出现次数为 0。
+- **SC-006**: 非 qoder CLI 的双路径零泄漏，按「qoder 默认值」字面集 {`DeepSeek-Flash`, `max`, `1000000`, `qodercli`} 机械计数（`auto` MUST NOT 计入——它是合法请求层值，可出现在 `method_requested`）：(a) `claude + none` 正向解析——该夹具 MUST 声明 `mode: external`（显式 `cli` 与生效 native/virtual 共存会被拒收），effective config、`cli_args` 与该派发记录的 `config` 组中该字面集出现次数均为 0（记录的 `agent` 组是宿主证据，不属于默认层泄漏面）；(b) `claude + declared` 拒收路径——exit 2 的错误面（declared 缺项错误）中该字面集出现次数为 0。
 
 ### Measurement Sources & Collection Methods
 
@@ -204,7 +204,7 @@ run-agent 在派发前解析并展示配置、external 派发把 `cli_args` 透�
 - **SC-003 Source**: 一次 external 派发（未授权时以夹具派发产物替代）后以 `list-records --format json` 查询专属存储；重复调用 [[STR-015]] 后核对行数；实现后一次性采集。
 - **SC-004 Source**: 开工前冻结基线失败 nodeid 名单，收尾时全量运行契约与集成测试并以 `comm` 比较；有意扩展项登记在 `verification.md`。
 - **SC-005 Source**: 依次执行生成/镜像三连并与 2026-10-18 基线比较零 NEW drift；在临时项目上连续两次 init，对默认层文件做字节比较。
-- **SC-006 Source**: 以 `claude + none` 夹具解析并由 `collect-dispatch` 消费其快照产出夹具记录、以 `claude + declared` 夹具执行解析，对 effective config、`cli_args`、记录的 `config` 组与错误面按「qoder 默认值」字面集检索并计数；`auto` 不计入；`agent` 组不参与计数；实现后一次性采集。
+- **SC-006 Source**: 以 `claude + none` 夹具（MUST 声明 `mode: external`：显式 `cli` 与生效 native/virtual 共存会被拒收）解析并由 `collect-dispatch` 消费其快照产出夹具记录、以 `claude + declared` 夹具执行解析，对 effective config、`cli_args`、记录的 `config` 组与错误面按「qoder 默认值」字面集检索并计数；`auto` 不计入；`agent` 组不参与计数；实现后一次性采集。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
 

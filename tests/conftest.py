@@ -52,6 +52,9 @@ def qoder_minimal_resource_path(tmp_path: Path) -> Path:
         "# [COMMAND_NAME]\n\nAgent: [AGENT_NAME]\nArgs: [ARGUMENTS]",
         encoding="utf-8",
     )
+    (resource_root / "templates" / "execution-config-defaults.yaml").write_text(
+        "cli: qodercli\nmodel: fixture-model\n", encoding="utf-8"
+    )
     (resource_root / "memory").mkdir(parents=True)
     (resource_root / "memory" / "constitution.md").write_text(
         "# Constitution", encoding="utf-8"
@@ -71,6 +74,9 @@ def claude_minimal_resource_path(tmp_path: Path) -> Path:
     (resource_root / "templates" / "commands" / "requirements.md").write_text(
         "# [COMMAND_NAME]\n\nAgent: [AGENT_NAME]\nArgs: [ARGUMENTS]",
         encoding="utf-8",
+    )
+    (resource_root / "templates" / "execution-config-defaults.yaml").write_text(
+        "cli: qodercli\nmodel: fixture-model\n", encoding="utf-8"
     )
     (resource_root / "templates" / "claudeignore-template").write_text(
         "__pycache__/\n.venv/\n!.specify/specs/\n",
@@ -95,6 +101,9 @@ def codex_minimal_resource_path(tmp_path: Path) -> Path:
     (resource_root / "templates" / "commands" / "requirements.md").write_text(
         "# [COMMAND_NAME]\n\nAgent: [AGENT_NAME]\nArgs: [ARGUMENTS]",
         encoding="utf-8",
+    )
+    (resource_root / "templates" / "execution-config-defaults.yaml").write_text(
+        "cli: qodercli\nmodel: fixture-model\n", encoding="utf-8"
     )
     (resource_root / "templates" / "codexignore-template").write_text(
         "__pycache__/\n.venv/\n!.specify/specs/\n",

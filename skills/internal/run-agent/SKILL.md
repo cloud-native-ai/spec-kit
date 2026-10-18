@@ -64,6 +64,22 @@ Topology Declaration:
   `.specify/shared/workflow/external-dispatch-recipes.md` — referenced, never copied here; a
   shape the recipes do not cover fails fast instead of being improvised.
 
+**Configuration resolution (mandatory before dispatch)** — the deterministic engine
+`.specify/scripts/python/execution-config.py` is the ONLY configuration resolver; this skill
+MUST NOT merge or normalize configuration itself:
+
+- **Resolve**: `python3 .specify/scripts/python/execution-config.py --action resolve --agent
+  <slug> [inline overrides] --workspace-root <project-dir> --format json`. The inline
+  argument names are exactly `--mode`, `--cli`, `--model`, `--reasoning-effort`,
+  `--context-window`, `--extra-flags`, `--log-dir`, `--quantification-method`; pass the same
+  values the dispatch will use, including the topology declaration inputs.
+- **Disclose** (disclosure, not a blocking gate): `config_id`, `mode`, `cli`, the effective
+  `model / reasoning_effort / context_window`, `source_chain`, `skipped_layers`,
+  `quantification.{requested,resolved}`, and `requires_external`.
+- **Stop on resolve failure**: a non-zero `resolve` exit stops the dispatch — report the
+  engine's field/support-set message. A missing defaults layer points at `specify init`.
+- Keep the returned `snapshot` path and `config_id` for the post-dispatch record.
+
 1. **Resolve the target agent** — per the Input Contract above.
 2. **Present & dispatch** — present the agent's `name`, `description`, and the task, then
    dispatch directly. The presentation is **disclosure, not a blocking gate**（用户可随时叫停）.
@@ -75,7 +91,21 @@ Topology Declaration:
    ⚠️ External CLI dispatch MUST follow that document's **Visibility Contract** (stream-json +
    compact filter + `.live.log` / `.jsonl` / `.status` triplet) — never redirect print-mode
    output into a silent log. The Execution works autonomously within its defined scope.
-4. **Report** — relay the result back to the user. If the subagent fails or hits its turn
+   For an **external** dispatch, reuse `skills/internal/create-team/scripts/dispatch.sh`:
+   `DISPATCH_CLI=<cli> DISPATCH_LOG_DIR=<absolute-log-dir> bash <dispatch.sh> <label>
+   <workdir> <prompt-file> -- <cli_args...>`. Pass the engine's `cli_args` array verbatim
+   after `--` — never reorder, re-quote, or filter them. `DISPATCH_LOG_DIR` MUST be absolute
+   (resolve the snapshot's workspace-relative `log_dir` against the target project directory,
+   or use `.specify/agents/execution/logs`); the dispatch label is used verbatim as `run_id`.
+   For **remote** topology, run `resolve` (before) and `collect-dispatch` (after) on the
+   **target project side** through the same `ssh` family, so the snapshot, logs, and store
+   belong to the target project.
+4. **Collect (external only)** — after `dispatch.sh` returns, invoke
+   `python3 .specify/scripts/python/exec-quant.py --action collect-dispatch --unit-id
+   agent:<slug> --run-id <label> --snapshot <snapshot> --config-id <config_id>
+   --workspace-root <project-dir>`. A non-zero exit is reported with its reason and MUST NOT
+   change the dispatch result, re-run the dispatch, or delete any artifact.
+5. **Report** — relay the result back to the user. If the subagent fails or hits its turn
    limit, report the **partial result and the failure reason** — not a summary that hides it.
 
 **Dispatch-time injection (mandatory)**: before dispatching, verify the outgoing prompt

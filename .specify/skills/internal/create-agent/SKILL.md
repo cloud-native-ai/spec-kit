@@ -218,11 +218,12 @@ Use this capability (`kind: execution-config`) to author the **execution-layer a
 
 ### Config schema (`configs/<slug>.yaml`)
 
-Field-level schema in [`./references/execution-config.md`](./references/execution-config.md) — `agent`, `mode` (native | virtual | external), `cli`, per-dispatch overrides (`model`, `reasoning_effort`, `context_window`, `extra_flags`), and `log_dir`.
+Field-level schema in [`./references/execution-config.md`](./references/execution-config.md) — the schema authority for the three layers (defaults < agent config < inline), clear sentinels, identity-vs-override fields, conflict rejection, the defaults-layer skip, quantification methods, defaults seeding, and snapshot semantics. The CLI capability values are owned only by `CAPABILITY_MATRIX` in `scripts/python/execution-config.py`; the reference points at it and does not copy the table.
 
 ### Rules
 
 - The config references an existing agent definition; if `<slug>` resolves to neither `templates/` nor `instances/`, stop and report instead of inventing one.
+- **Write then validate**: after writing or editing `configs/<slug>.yaml`, run `python3 .specify/scripts/python/execution-config.py --action validate --agent <slug> --workspace-root <project-dir>`. A non-zero exit (2) is a failed write — report the engine's field/support-set errors and do not report success.
 - External-mode configs MUST honor the Visibility Contract — dispatch through the stream-json + filter pipeline (reference implementation `skills/internal/create-team/scripts/dispatch.sh` with `DISPATCH_LOG_DIR` pointed at `log_dir`); silent `cli -p … > log 2>&1` dispatch is prohibited.
 - Logs are runtime evidence, not deliverables: never commit them, never edit them, and point `log_dir` only inside `execution/logs/`.
 

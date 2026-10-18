@@ -78,6 +78,11 @@ def make_resource_with_skills(
         "node_modules/\n", encoding="utf-8"
     )
 
+    # templates/execution-config-defaults.yaml (Feature 061 init seeding)
+    (root / "templates" / "execution-config-defaults.yaml").write_text(
+        "cli: qodercli\nmodel: fixture-model\n", encoding="utf-8"
+    )
+
     # memory
     memory_dir = root / "memory"
     memory_dir.mkdir(parents=True, exist_ok=True)

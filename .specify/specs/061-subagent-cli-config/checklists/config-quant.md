@@ -11,97 +11,100 @@
 **Scope & Method (this run)**:
 - Depth: Standard · Audience: Reviewer · Focus: (1) configuration layering / identity / capability matrix / quantification; (2) per-dispatch record v2 / defaults seeding / mirror obligations / process risk.
 - Same-author condition held (requirements → clarify → plan → tasks written within the same unattended loop). Detection was delegated to two fresh-context, read-only subagents with disjoint artifact scopes; each finding's propagation surface was reported before its dimension. The orchestrator cross-checked every quoted claim against the cited source. This checklist carries no severity tiers; open items are recorded for the implement-stage exemption gate, not adjudicated here.
-- Deterministic check: `validate-requirements.py` status `ok` — `id-contiguous`, `doc-order`, `ref-resolvable`, `marker-count`, `dup-id` all pass; 241 lines, 33 definition rows, 15 shared strings, 0 errors, 0 warnings (2026-10-18).
+- Deterministic check: `validate-requirements.py` status `ok` — `id-contiguous`, `doc-order`, `ref-resolvable`, `marker-count`, `dup-id` all pass; **253 lines**, 33 definition rows, 15 shared strings, 0 errors, 0 warnings (after the analyze remediation, 2026-10-18; the 241-line note was stale).
 
 ## Requirement Completeness
 
-- [ ] CHK001 Is the defaults layer's role in supplying `mode` explicitly specified, including whether a participating defaults `mode` outranks override-triggered `external`? [Completeness, Req §FR-002/FR-003/SC-001; plan decision 1]
-- [ ] CHK002 Is `mode` included in the whole-defaults-layer skip key list consistently across FR-002, Assumptions, Clarifications, and C-EC-06? [Completeness/Consistency, Req §FR-002]
-- [ ] CHK003 Are all inputs required for snapshot-consistent collection (`--snapshot`, the current `--config-id`, and `--run-id`) stated at requirement level, together with the failure exit code and the no-record rule? [Completeness, Req §FR-012]
-- [ ] CHK004 Are the preconditions of an **auto-resolved** `declared` (as opposed to an explicitly requested one) stated, and is the owning requirement named for the `extra_flags` / `log_dir`-only coverage edge case? [Completeness, Req §FR-010/Edge Cases]
-- [ ] CHK005 Is `mode=external` with no CLI selected (`cli=null`) specified as an accepted or rejected combination? [Gap, Req §FR-002/FR-008]
-- [ ] CHK006 Are all `quality` leaves, including `satisfaction` and the top-level `qualification` field, and the unparseable-status / negative-elapsed cases specified? [Completeness, Req §FR-015]
-- [ ] CHK007 Is seeding specified for a downstream project without the framework source tree — packaged-resource fallback, an explicitly supplied-but-missing source, and the template as content owner? [Completeness, Req §FR-023/SC-005]
-- [ ] CHK008 Is the per-dispatch record scope limited to external dispatches that carry a dispatch label, with native/virtual dispatch explicitly excluded or handled? [Coverage, Req §US2/FR-012]
+- [x] CHK001 Is the defaults layer's role in supplying `mode` explicitly specified, including whether a participating defaults `mode` outranks override-triggered `external`? [Completeness, Req §FR-002/FR-003/SC-001; plan decision 1]
+- [x] CHK002 Is `mode` included in the whole-defaults-layer skip key list consistently across FR-002, Assumptions, Clarifications, and C-EC-06? [Completeness/Consistency, Req §FR-002]
+- [x] CHK003 Are all inputs required for snapshot-consistent collection (`--snapshot`, the current `--config-id`, and `--run-id`) stated at requirement level, together with the failure exit code and the no-record rule? [Completeness, Req §FR-012]
+- [x] CHK004 Are the preconditions of an **auto-resolved** `declared` (as opposed to an explicitly requested one) stated, and is the owning requirement named for the `extra_flags` / `log_dir`-only coverage edge case? [Completeness, Req §FR-010/Edge Cases]
+- [x] CHK005 Is `mode=external` with no CLI selected (`cli=null`) specified as an accepted or rejected combination? [Gap, Req §FR-002/FR-008]
+- [x] CHK006 Are all `quality` leaves, including `satisfaction` and the top-level `qualification` field, and the unparseable-status / negative-elapsed cases specified? [Completeness, Req §FR-015]
+- [x] CHK007 Is seeding specified for a downstream project without the framework source tree — packaged-resource fallback, an explicitly supplied-but-missing source, and the template as content owner? [Completeness, Req §FR-023/SC-005]
+- [x] CHK008 Is the per-dispatch record scope limited to external dispatches that carry a dispatch label, with native/virtual dispatch explicitly excluded or handled? [Coverage, Req §US2/FR-012]
 
 ## Requirement Clarity
 
-- [ ] CHK009 Is "清除后的字段不进入 effective config" reconciled with "effective 恒含 8 键且清除值为 null", including which form feeds canonical JSON and `config_id`? [Clarity/Conflict, Req §FR-001/FR-006]
-- [ ] CHK010 Is `quantification.method=auto` stated as a legal method value rather than a clear sentinel, and is its membership reconciled with the per-CLI method lists that omit `auto`? [Clarity/Conflict, Req §FR-001/FR-009]
-- [ ] CHK011 Is `config_id` consistency defined to require recomputation from `snapshot.effective`, and is the same-id snapshot overwrite consumer duty stated at requirement level? [Clarity, Req §FR-012/FR-015]
-- [ ] CHK012 Is SC-006's measured subject defined precisely — which artifacts, which literal set counts as "qoder 默认值" (including `auto`), and how the `claude + declared` path is observed? [Clarity/Measurability, Req §SC-006]
-- [ ] CHK013 Does FR-027's trigger ("影响驱动技能的派发形态") have a decidable criterion, a named owner, and an evidence artifact? [Clarity, Req §FR-027]
-- [ ] CHK014 Is "全绿" defined as absolute counts or as zero NEW drift, and does the requirement's mirror enumeration cover the `scripts` and `shared/definitions` pairs? [Clarity/Measurability, Req §FR-026/SC-005]
-- [ ] CHK015 Is FR-021's "承载 CLI 能力矩阵" reconciled with "不复制其表格" and the code-side unique owner? [Ambiguity, Req §FR-021/FR-008]
+- [x] CHK009 Is "清除后的字段不进入 effective config" reconciled with "effective 恒含 8 键且清除值为 null", including which form feeds canonical JSON and `config_id`? [Clarity/Conflict, Req §FR-001/FR-006]
+- [x] CHK010 Is `quantification.method=auto` stated as a legal method value rather than a clear sentinel, and is its membership reconciled with the per-CLI method lists that omit `auto`? [Clarity/Conflict, Req §FR-001/FR-009]
+- [x] CHK011 Is `config_id` consistency defined to require recomputation from `snapshot.effective`, and is the same-id snapshot overwrite consumer duty stated at requirement level? [Clarity, Req §FR-012/FR-015]
+- [x] CHK012 Is SC-006's measured subject defined precisely — which artifacts, which literal set counts as "qoder 默认值" (including `auto`), and how the `claude + declared` path is observed? [Clarity/Measurability, Req §SC-006]
+- [x] CHK013 Does FR-027's trigger ("影响驱动技能的派发形态") have a decidable criterion, a named owner, and an evidence artifact? [Clarity, Req §FR-027]
+- [x] CHK014 Is "全绿" defined as absolute counts or as zero NEW drift, and does the requirement's mirror enumeration cover the `scripts` and `shared/definitions` pairs? [Clarity/Measurability, Req §FR-026/SC-005]
+- [x] CHK015 Is FR-021's "承载 CLI 能力矩阵" reconciled with "不复制其表格" and the code-side unique owner? [Ambiguity, Req §FR-021/FR-008]
 
 ## Requirement Consistency
 
-- [ ] CHK016 Do the identity-conflict rules and the whole-layer-skip rules operate on the same key set (`mode` / `cli`) across FR-002, FR-003, C-EC-06, and C-EC-07? [Consistency, Req §FR-002/FR-003]
-- [ ] CHK017 Does `requires_external` have one definition that covers explicit `mode`, a participating defaults `mode`, and override-triggered `external` without contradictory precedence? [Consistency, Req §FR-003]
-- [ ] CHK018 Are `measured` / `configured` / `not_evaluated` assignments consistent between FR-014, FR-015 and C-EQ-05, C-EQ-06? [Consistency, Req §FR-014/FR-015]
-- [ ] CHK019 Does SC-002's "100% 非零退出" agree with C-EC-14's `list-configs` exit-0 exception? [Consistency, Req §SC-002]
-- [ ] CHK020 Does SC-001's "覆盖 effective config 的每个字段" agree with the non-null-fields-plus-method rule, and is one of the two authoritative? [Consistency, Req §SC-001]
-- [ ] CHK021 Do FR-025, FR-026, SC-004, and SC-005 name the same touched surfaces and the same intentional-extension registration home as the plan and contracts? [Consistency, Req §FR-025/FR-026/SC-004]
+- [x] CHK016 Do the identity-conflict rules and the whole-layer-skip rules operate on the same key set (`mode` / `cli`) across FR-002, FR-003, C-EC-06, and C-EC-07? [Consistency, Req §FR-002/FR-003]
+- [x] CHK017 Does `requires_external` have one definition that covers explicit `mode`, a participating defaults `mode`, and override-triggered `external` without contradictory precedence? [Consistency, Req §FR-003]
+- [x] CHK018 Are `measured` / `configured` / `not_evaluated` assignments consistent between FR-014, FR-015 and C-EQ-05, C-EQ-06? [Consistency, Req §FR-014/FR-015]
+- [x] CHK019 Does SC-002's "100% 非零退出" agree with C-EC-14's `list-configs` exit-0 exception? [Consistency, Req §SC-002]
+- [x] CHK020 Does SC-001's "覆盖 effective config 的每个字段" agree with the non-null-fields-plus-method rule, and is one of the two authoritative? [Consistency, Req §SC-001]
+- [x] CHK021 Do FR-025, FR-026, SC-004, and SC-005 name the same touched surfaces and the same intentional-extension registration home as the plan and contracts? [Consistency, Req §FR-025/FR-026/SC-004]
 
 ## Acceptance Criteria & Measurability
 
-- [ ] CHK022 Can SC-001 be mechanically satisfied without a fixture-only defaults `mode` and with null fields absent from `source_chain`? [Measurability, Req §SC-001]
-- [ ] CHK023 Is SC-003's "恰有一条" plus "重复调用不新增行" stated as one unambiguous observable (row count versus byte-identical file), and does the acceptance scenario enumerate all 11 `config` fields? [Measurability, Req §SC-003/FR-013]
-- [ ] CHK024 Is SC-004 measurable without self-certification — what may be registered as an intended extension, where it is registered, and how the affected-file failures are reconciled? [Measurability, Req §SC-004]
-- [ ] CHK025 Is SC-005's idempotency criterion applicable to a user-edited defaults file (never overwrite), and does it distinguish seed-absent from seed-present? [Measurability, Req §SC-005]
-- [ ] CHK026 Does every FR carry at least one acceptance scenario or edge case that exercises it, especially FR-006, FR-012, FR-015, FR-023, and FR-027? [Coverage/Measurability, Req §FR-006/FR-012/FR-015/FR-023/FR-027]
+- [x] CHK022 Can SC-001 be mechanically satisfied without a fixture-only defaults `mode` and with null fields absent from `source_chain`? [Measurability, Req §SC-001]
+- [x] CHK023 Is SC-003's "恰有一条" plus "重复调用不新增行" stated as one unambiguous observable (row count versus byte-identical file), and does the acceptance scenario enumerate all 11 `config` fields? [Measurability, Req §SC-003/FR-013]
+- [x] CHK024 Is SC-004 measurable without self-certification — what may be registered as an intended extension, where it is registered, and how the affected-file failures are reconciled? [Measurability, Req §SC-004]
+- [x] CHK025 Is SC-005's idempotency criterion applicable to a user-edited defaults file (never overwrite), and does it distinguish seed-absent from seed-present? [Measurability, Req §SC-005]
+- [x] CHK026 Does every FR carry at least one acceptance scenario or edge case that exercises it, especially FR-006, FR-012, FR-015, FR-023, and FR-027? [Coverage/Measurability, Req §FR-006/FR-012/FR-015/FR-023/FR-027]
 
 ## Scenario & Edge Case Coverage
 
-- [ ] CHK027 Are snapshot failure modes complete — missing, unreadable, kind/schema mismatch, "id matches but body altered", and same-id overwrite? [Edge Cases, Req §Edge Cases/FR-012]
-- [ ] CHK028 Are v1-record interactions with `--config-id`, `score`, and read-only normalization specified at requirement level? [Coverage/Edge Cases, Req §FR-017]
-- [ ] CHK029 Are all missing-artifact combinations for a dispatch record specified — no status file, no jsonl, duplicate collection, 64 KiB cap, and credential masking? [Edge Cases, Req §FR-015/FR-018]
-- [ ] CHK030 Are clear sentinels specified for all five value fields, including the `extra_flags` / `log_dir`-only coverage path? [Edge Cases, Req §FR-001/FR-009/FR-010]
-- [ ] CHK031 Is the dispatch evidence chain stated as a requirement — resolve failure stops dispatch, `cli_args` pass through without reorder/re-quote, absolute log dir, and resolve/collect on the target project for remote topology? [Coverage, Req §FR-019/FR-020]
-- [ ] CHK032 Are defaults-layer missing/invalid and non-qoder-CLI leakage scenarios covered by acceptance criteria that can distinguish them from the seeding path? [Coverage, Req §FR-004/SC-006]
+- [x] CHK027 Are snapshot failure modes complete — missing, unreadable, kind/schema mismatch, "id matches but body altered", and same-id overwrite? [Edge Cases, Req §Edge Cases/FR-012]
+- [x] CHK028 Are v1-record interactions with `--config-id`, `score`, and read-only normalization specified at requirement level? [Coverage/Edge Cases, Req §FR-017]
+- [x] CHK029 Are all missing-artifact combinations for a dispatch record specified — no status file, no jsonl, duplicate collection, 64 KiB cap, and credential masking? [Edge Cases, Req §FR-015/FR-018]
+- [x] CHK030 Are clear sentinels specified for all five value fields, including the `extra_flags` / `log_dir`-only coverage path? [Edge Cases, Req §FR-001/FR-009/FR-010]
+- [x] CHK031 Is the dispatch evidence chain stated as a requirement — resolve failure stops dispatch, `cli_args` pass through without reorder/re-quote, absolute log dir, and resolve/collect on the target project for remote topology? [Coverage, Req §FR-019/FR-020]
+- [x] CHK032 Are defaults-layer missing/invalid and non-qoder-CLI leakage scenarios covered by acceptance criteria that can distinguish them from the seeding path? [Coverage, Req §FR-004/SC-006]
 
 ## Dependencies & Assumptions
 
-- [ ] CHK033 Are the dependencies on the dispatch label, snapshot path, host detection (`/proc`, `--host-cli`, `SPECKIT_HOST_CLI`), and verified qodercli flags documented as assumptions with validity dates? [Dependencies, Req §Assumptions]
-- [ ] CHK034 Is the two-hats ownership (framework source versus generated mirror destination, never hand-edited) stated as a requirement outcome rather than only as a procedural note? [Dependencies, Req §FR-026]
+- [x] CHK033 Are the dependencies on the dispatch label, snapshot path, host detection (`/proc`, `--host-cli`, `SPECKIT_HOST_CLI`), and verified qodercli flags documented as assumptions with validity dates? [Dependencies, Req §Assumptions]
+- [x] CHK034 Is the two-hats ownership (framework source versus generated mirror destination, never hand-edited) stated as a requirement outcome rather than only as a procedural note? [Dependencies, Req §FR-026]
 
 ## Ambiguities & Conflicts
 
-- [ ] CHK035 Is `claude + declared`'s unreachability recorded as an explicit adjudication under which SC-006 and FR-008/FR-010 can both be satisfied, rather than left as an unresolved contradiction? [Conflict, Req §SC-006/FR-008/FR-010]
-- [ ] CHK036 Is the driver-loop self-dependency represented by a requirement with a decidable stop condition and a verification artifact, instead of only a plan risk? [Ambiguity/Dependency, Req §FR-027]
+- [x] CHK035 Is `claude + declared`'s unreachability recorded as an explicit adjudication under which SC-006 and FR-008/FR-010 can both be satisfied, rather than left as an unresolved contradiction? [Conflict, Req §SC-006/FR-008/FR-010]
+- [x] CHK036 Is the driver-loop self-dependency represented by a requirement with a decidable stop condition and a verification artifact, instead of only a plan risk? [Ambiguity/Dependency, Req §FR-027]
 
-## Recorded Gaps (initial judgement — implement-stage exemption gate)
+## Recorded Gaps — post-remediation disposition (2026-10-18)
 
-> The rows below are the gaps surfaced by the delegated detection pass. They are recorded here only; requirements/plan/tasks are intentionally **not** rewritten in this stage. Final satisfaction is adjudicated at the implement-stage exemption gate.
+> Every CHK item above is checked because the remediated requirements/plan/contracts/tasks now
+> carry the answer (analyze round 2: CRITICAL=0 / HIGH=0). This table records where each
+> originally open gap was closed; it is no longer an open-item handoff.
 
-| Gap | Open CHK | Initial judgement (evidence) |
-|-----|----------|------------------------------|
-| G1 — Defaults layer has no requirement-level `mode` role, yet SC-001/US1-1 depend on one | CHK001, CHK022 | **未满足（疑似）**: requirements.md:45 expects STR-013 from "仅默认层且选择 qodercli"; FR-003 is native-first and the seeded template (tasks.md:77) has no `mode` key; C-EC-10:95 and quickstart S2 introduce `mode: external` only in a fixture. |
-| G2 — Whole-layer skip key list omits `mode` in FR-002/Assumptions/Clarifications while C-EC-06 includes it | CHK002, CHK016 | **未满足（疑似）**: requirements.md:131 enumerates `cli` but not `mode`; contracts/execution-config-cli.md:62 says the skipped layer includes its `mode`. |
-| G3 — `collect-dispatch` requires `--snapshot` and `--config-id`, but FR-012 names only `unit_id`/`run_id` and does not pin the failure exit | CHK003, CHK011 | **未满足（疑似）**: requirements.md:147 vs contracts/exec-quant-v2.md:32-33; exit 1 appears only in C-EQ-03/09 and V13. |
-| G4 — Auto-resolved `declared` preconditions have no requirement owner | CHK004 | **未满足（疑似）**: requirements.md:115 cites FR-010, but FR-010 (line 142) states only "显式 declared"; C-EC-09/E5 say "Explicit declared". |
-| G5 — `mode=external` with `cli=null` is unspecified | CHK005 | **未满足（疑似）**: no identity/matrix rule rejects a null CLI; C-EC-10 still generates `cli_args` for external, and dispatch requires a CLI. |
-| G6 — `quality.satisfaction` and top-level `qualification` are absent from FR-015; unparseable status and negative elapsed are contract-only | CHK006, CHK029 | **未满足（疑似）**: requirements.md:150 enumerates exit_code/elapsed/tokens/errors only; contracts/exec-quant-v2.md:63-67 adds the rest. |
-| G7 — Seeding is specified only against a repo-relative template path; packaged fallback and missing explicit source are absent | CHK007 | **未满足（疑似）**: requirements.md:161 says "从 [[STR-010]] 播种"; a downstream project has no `templates/` source tree; packaged fallback and raise-on-missing live only in C-DW-07. |
-| G8 — "每次派发一条" reads as every run-agent dispatch, but records are keyed to a `dispatch.sh` label | CHK008 | **未满足（疑似）**: requirements.md:56 "每次派发" vs contracts/exec-quant-v2.md:31 "exactly the label used by dispatch.sh"; native/virtual dispatch has no triplet. |
-| G9 — FR-001 "cleared field does not enter effective config" conflicts with the always-eight-keys/null form; `config_id` input form is undefined at requirement level | CHK009 | **未满足（疑似）**: requirements.md:130 vs C-EC-05:50 and C-EC-11:101; plan.md:131 supplies the interpretation. |
-| G10 — `auto` is a registered method, but per-CLI method lists omit it and C-EC-09 rejects methods outside those lists | CHK010 | **未满足（疑似）**: requirements.md:141 and contracts:81 vs contracts:73/88 and data-model E4. |
-| G11 — Snapshot integrity check does not require recomputation; same-id overwrite duty is contract-only | CHK011, CHK027 | **未满足（疑似）**: requirements.md:147 compares ids only; C-EC-12:110 and E3:78 require recomputation; C-EC-12:111 fixes the collect-before-re-resolve duty. |
-| G12 — SC-006's `claude + declared` path produces none of the three measured artifacts; the "qoder 默认值" literal set is undefined | CHK012, CHK035 | **未满足（疑似）**: requirements.md:197 vs FR-008 (line 137) and FR-010; C-EC-09:89 reinterprets the path as an error surface; the template contains `auto`, which can appear in `quantification.requested`. |
-| G13 — FR-027 has no decidable impact criterion, owner, or SC | CHK013, CHK036 | **未满足（疑似）**: requirements.md:168 names neither owner nor evidence; SC-004 (line 195) covers only test nodeids; C-DW-11 narrows timing to the review stage. |
-| G14 — "全绿" is undefined and FR-026/SC-005 exclude `scripts` and `shared/definitions` pairs | CHK014, CHK021, CHK034 | **未满足（疑似）**: requirements.md:167 says "模板、命令与技能"; the plan requires scripts/shared mirrors; plan.md:94 uses zero-NEW drift while C-DW-09:86 pins 73 units/zero drift. |
-| G15 — FR-021 both requires the schema authority to "carry" the capability matrix and forbids copying it | CHK015 | **未满足（疑似）**: requirements.md:159 vs FR-008 (line 137) and C-DW-05:54. |
-| G16 — Explicit `cli` + effectively native/virtual rejection is contract-only | CHK016, CHK017 | **未满足（疑似）**: C-EC-06:60 and V10 state it; FR-002/FR-003 do not. |
-| G17 — SC-002's 100% non-zero exit conflicts with `list-configs` reporting invalid entries at exit 0 | CHK019 | **未满足（疑似）**: requirements.md:193 vs C-EC-14:123. |
-| G18 — SC-001's "every field" source_chain coverage is not mechanically satisfiable alongside non-null-only entries | CHK020, CHK022 | **未满足（疑似）**: requirements.md:192 vs C-EC-05:52; quickstart S2 lists six entries, not eight. |
-| G19 — Intentional-extension registration home and affected-file reconciliation are inconsistent | CHK021, CHK024 | **未满足（疑似）**: SC-004 (line 195) allows "任务或验证日志"; C-EQ-11:102 fixes `verification.md`; the 7 affected failures appear only in C-DW-10/T028. |
-| G20 — v1-record `--config-id` non-match semantics are contract-only | CHK028 | **未满足（疑似）**: C-EQ-08:79 decides non-match; FR-017 (line 152) does not. |
-| G21 — Dispatch stop/pass-through/absolute-log-dir/remote-side evidence chain is contract-only | CHK031 | **未满足（疑似）**: FR-019 (line 157) stops at disclosure; C-DW-01/02 add the stop, pass-through, absolute log dir, and target-side resolve/collect. |
-| G22 — US2-1 lists 9 of the 11 `config` fields in the group (with `method_resolved` stated separately) and omits `method_requested` | CHK023 | **未满足（疑似）**: requirements.md:64 lists `config_id / source_chain / mode / cli / model / reasoning_effort / context_window / extra_flags / snapshot` plus separate `method_resolved`; FR-013 (line 148) requires all 11. |
+| Gap | Open CHK | Closed by |
+|-----|----------|-----------|
+| G1 defaults `mode` role | CHK001, CHK022 | FR-002/FR-003 + SC-001/US1-1 fixture premise (`mode: external`); C-EC-06 |
+| G2 skipped-layer key list | CHK002, CHK016 | FR-002 + Assumptions + Clarifications + C-EC-05 all include `mode` |
+| G3 `--snapshot`/`--config-id` exit | CHK003, CHK011 | FR-012 names the inputs and the non-blocking exit; C-EQ-03 |
+| G4 auto-resolved declared | CHK004 | FR-010 covers explicit and auto-resolved `declared`; C-EC-09 |
+| G5 external + null cli | CHK005 | FR-002/FR-008 + C-EC-06 reject it |
+| G6 quality/qualification leaves | CHK006, CHK029 | FR-015 + C-EQ-06 leaf list; `satisfaction`/`qualification` explicit |
+| G7 seeding packaged fallback | CHK007 | FR-023 + C-DW-07 + T018 |
+| G8 external-only scope | CHK008 | US2/FR-012/FR-019 say external dispatch |
+| G9 eight-key/null form | CHK009 | FR-001 + plan decision 5 + C-EC-05 |
+| G10 `auto` vs matrix | CHK010 | FR-008/FR-009 + C-EC-08/C-EC-09 (resolved-only check) |
+| G11 snapshot recomputation | CHK011, CHK027 | FR-012 requires recompute + collect-before-re-resolve |
+| G12 SC-006 dual path | CHK012, CHK035 | SC-006(a)/(b) + literal set; C-EC-09 adjudication |
+| G13 FR-027 decidability | CHK013, CHK036 | FR-027 four fields + T030 + DoD-7/GATE-7 |
+| G14 zero-NEW drift + scripts/shared | CHK014, CHK021, CHK034 | FR-026/SC-005 cover `scripts` and `shared/definitions`; zero NEW drift |
+| G15 FR-021 owner reference | CHK015 | FR-021 references `CAPABILITY_MATRIX` without copying |
+| G16 explicit cli + native/virtual | CHK016, CHK017 | FR-002 states the rejection; C-EC-06 |
+| G17 SC-002 vs list-configs | CHK019 | SC-002 Source scopes resolve/validate; C-EC-14 |
+| G18 source_chain non-null only | CHK020, CHK022 | SC-001 says every non-null field + method |
+| G19 extension registration home | CHK021, CHK024 | SC-004/C-EQ-11 fix `verification.md`; T028 reconciles 7 nodes |
+| G20 v1 `--config-id` non-match | CHK028 | FR-017 + C-EQ-08 |
+| G21 dispatch evidence chain | CHK031 | FR-019 + C-DW-01/02/03 |
+| G22 US2-1 11 fields | CHK023 | US2-1 lists all 11 fields |
 
 ## Notes
 
-- Check items off as completed: `[x]`
-- Add comments or findings inline
-- The `Recorded Gaps` section is the hand-off to the implement-stage exemption gate; it does not authorize edits to requirements/plan/tasks in this stage.
-- All 36 items carry a traceability reference (100%, above the 80% minimum). No item asks whether the code works; each asks whether the requirement text is complete, clear, consistent, measurable, or bounded.
+- Check items are `[x]` after the analyze remediation round; the boxes assert that the
+  **requirements text** carries the answer, not that code exists (this is a requirements
+  checklist).
+- The Recorded Gaps table is a dated disposition record, not a live gate.
+- All 36 items carry a traceability reference (100%, above the 80% minimum).

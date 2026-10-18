@@ -1,24 +1,31 @@
 #!/usr/bin/env python3
-"""exec-quant.py — Agent+LLM execution quant recording engine (Feature 059).
+"""exec-quant.py — Agent+LLM execution quant recording engine (Feature 059; v2 in 061).
 
 Recording Only: every completed execution of a covered unit (the same unit
 semantics as run-determination) lands ONE quant record — agent program fields,
 LLM detail fields, quality fields — into the engine-owned durable store
 ``.specify/memory/exec-quant/`` (records.jsonl + scores.jsonl, append-only).
 
-Design adjudications live in the feature plan (D1–D12); behavior truth is this
-file. Law of the record (data-model §1.1): every measurable field is either a
-``{"value", "provenance"}`` object or the literal ``not_evaluated`` — zero
-null, zero empty string, zero missing key. A quantity with no source is never
-guessed (测量而非印象).
+v2 (Feature 061): schema_version=2, ``unit_type=agent`` via ``agent:<slug>``,
+the ``collect-dispatch`` action (one record per external dispatch label), an
+11-field ``config`` group, ``quality.exit_code`` and the ``configured``
+provenance. Unit records (``collect``) keep 059 semantics and additionally gain
+an all-``not_evaluated`` config group.
 
-Non-blocking (FR-012): any failure path exits 1 with a message on stderr and
-never raises into the caller's run.
+Design adjudications live in the feature plans (059 D1–D12; 061 E6); behavior
+truth is this file. Law of the record (data-model §1.1): every measurable field
+is either a ``{"value", "provenance"}`` object or the literal ``not_evaluated``
+— zero null, zero empty string, zero missing key. A quantity with no source is
+never guessed (测量而非印象).
+
+Non-blocking (059 FR-012, 061 FR-018): any failure path exits 1 with a message
+on stderr and never raises into the caller's run.
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -30,15 +37,23 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
-ACTIONS = ("collect", "list-records", "score")
+ACTIONS = ("collect", "list-records", "score", "collect-dispatch")
 
 KIND = "speckit.exec-quant"  # [[STR-001]]
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 NOT_EVALUATED = "not_evaluated"  # [[STR-002]]
-PROVENANCES = ("measured", "carried", "user-given")
-UNIT_TYPES = ("command", "skill", "custom-unit")
+PROVENANCES = ("measured", "carried", "user-given", "configured")
+UNIT_TYPES = ("command", "skill", "custom-unit", "agent")
 RESOLUTIONS = ("explicit", "adopted", "synthesized")
 AGENT_RESOLUTIONS = ("resolved", "ambiguous", "unresolved")
+
+SNAPSHOT_KIND = "speckit.execution-config-snapshot"
+SNAPSHOT_SCHEMA_VERSION = 1
+
+#: Exactly the 11 config-group fields (061 C-EQ-04). Order is the write order.
+CONFIG_FIELDS = ("config_id", "source_chain", "method_requested", "method_resolved",
+                 "mode", "cli", "model", "reasoning_effort", "context_window",
+                 "extra_flags", "snapshot")
 
 #: plan D2 single adjudication: adoption window for a same-unit determination
 #: record when the caller passes no --run-id (bounded against stale binding).
@@ -50,11 +65,13 @@ RECORD_SIZE_CAP_BYTES = 64 * 1024
 STORAGE_REL = Path(".specify") / "memory" / "exec-quant"
 RECORDS_NAME = "records.jsonl"
 SCORES_NAME = "scores.jsonl"
+DEFAULT_DISPATCH_LOG_DIR = Path(".specify") / "agents" / "execution" / "logs"
 
 _UNIT_ID_RE = re.compile(
     r"^(?:/speckit\.[a-z0-9][a-z0-9._-]*"
     r"|skill:[a-z0-9][a-z0-9._-]*"
-    r"|custom:[a-z0-9][a-z0-9._-]*/[a-z0-9][a-z0-9._-]*)$"
+    r"|custom:[a-z0-9][a-z0-9._-]*/[a-z0-9][a-z0-9._-]*"
+    r"|agent:[a-z0-9][a-z0-9._-]*)$"
 )
 
 #: D8 known host-CLI process-name patterns (framework-supported agents).
@@ -136,9 +153,11 @@ def unit_type_of(unit_id: str) -> str:
         return "skill"
     if uid.startswith("custom:"):
         return "custom-unit"
+    if uid.startswith("agent:"):
+        return "agent"
     raise InputError(
         f"invalid --unit-id: {unit_id!r} — expected /speckit.<command>, "
-        f"skill:<name> or custom:<owner>/<name>")
+        f"skill:<name>, custom:<owner>/<name> or agent:<slug>")
 
 
 def storage_dir(workspace_root: Path) -> Path:
@@ -401,27 +420,18 @@ def qoder_settings_path() -> Path:
     return Path.home() / ".qoder" / "settings.json"
 
 
-def collect_llm(agent: Dict[str, Any], pid: Optional[int]) -> Dict[str, Any]:
+def qoder_settings_llm() -> Dict[str, Any]:
+    """Measured Qoder settings leaves (D7), independent of the parent chain."""
     group: Dict[str, Any] = {
         "model": NOT_EVALUATED, "context_window": NOT_EVALUATED,
         "reasoning_effort": NOT_EVALUATED, "config_source": NOT_EVALUATED,
-        "endpoint_candidates": NOT_EVALUATED, "connection_evidence": NOT_EVALUATED,
     }
-    if agent.get("resolution") != "resolved":
-        return group
-    host_name = ""
-    name = agent.get("name")
-    if isinstance(name, dict):
-        host_name = str(name.get("value") or "")
-    group["endpoint_candidates"] = collect_endpoint_candidates(pid)
-    group["connection_evidence"] = collect_connection_evidence(pid)
-    if "qodercli" not in host_name.lower():
-        return group
+    path = qoder_settings_path()
     try:
-        data = json.loads(qoder_settings_path().read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return group
-    group["config_source"] = {"value": str(qoder_settings_path()), "provenance": "measured"}
+    group["config_source"] = {"value": str(path), "provenance": "measured"}
     model = data.get("model") if isinstance(data, dict) else None
     model_name = model.get("name") if isinstance(model, dict) else None
     preferences = model.get("preferences") if isinstance(model, dict) else None
@@ -439,6 +449,26 @@ def collect_llm(agent: Dict[str, Any], pid: Optional[int]) -> Dict[str, Any]:
     return group
 
 
+def collect_llm(agent: Dict[str, Any], pid: Optional[int]) -> Dict[str, Any]:
+    group: Dict[str, Any] = {
+        "model": NOT_EVALUATED, "context_window": NOT_EVALUATED,
+        "reasoning_effort": NOT_EVALUATED, "config_source": NOT_EVALUATED,
+        "endpoint_candidates": NOT_EVALUATED, "connection_evidence": NOT_EVALUATED,
+    }
+    if agent.get("resolution") != "resolved":
+        return group
+    host_name = ""
+    name = agent.get("name")
+    if isinstance(name, dict):
+        host_name = str(name.get("value") or "")
+    group["endpoint_candidates"] = collect_endpoint_candidates(pid)
+    group["connection_evidence"] = collect_connection_evidence(pid)
+    if "qodercli" not in host_name.lower():
+        return group
+    group.update(qoder_settings_llm())
+    return group
+
+
 # ---------------------------------------------------------------------------
 # quality carried fields (A6 + D5)
 # ---------------------------------------------------------------------------
@@ -447,6 +477,7 @@ def collect_quality(record: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     group: Dict[str, Any] = {
         "elapsed_ms": NOT_EVALUATED, "tokens": NOT_EVALUATED,
         "errors": NOT_EVALUATED, "satisfaction": NOT_EVALUATED,
+        "exit_code": NOT_EVALUATED,
     }
     if not record:
         return group
@@ -497,6 +528,10 @@ def build_record(workspace_root: Path, unit_id: str, unit_type: str,
     return assemble_record(unit_id, unit_type, run_id, resolution, determination)
 
 
+def empty_config_group() -> Dict[str, Any]:
+    return {field: NOT_EVALUATED for field in CONFIG_FIELDS}
+
+
 def assemble_record(unit_id: str, unit_type: str, run_id: str, resolution: str,
                     determination: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     agent, host_pid, _host_name = collect_agent()
@@ -510,6 +545,7 @@ def assemble_record(unit_id: str, unit_type: str, run_id: str, resolution: str,
         "run_id_resolution": resolution,
         "collected_at": now_iso(),
         "agent": agent,
+        "config": empty_config_group(),
         "llm": collect_llm(agent, host_pid),
         "quality": collect_quality(None if synthesized else determination),
         "qualification": (NOT_EVALUATED if synthesized
@@ -588,6 +624,265 @@ def existing_record(records_path: Path, unit_id: str, run_id: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# dispatch records (Feature 061, C-EQ-03..C-EQ-07)
+# ---------------------------------------------------------------------------
+
+def load_snapshot(path_value: str, workspace_root: Path,
+                  expected_config_id: str) -> Tuple[Dict[str, Any], Path]:
+    candidate = Path(path_value)
+    if not candidate.is_absolute():
+        candidate = workspace_root / candidate
+    try:
+        data = json.loads(candidate.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ExecQuantError(f"cannot read config snapshot {candidate}: {exc}") from exc
+    if not isinstance(data, dict):
+        raise ExecQuantError(f"config snapshot is not a JSON object: {candidate}")
+    if data.get("kind") != SNAPSHOT_KIND:
+        raise ExecQuantError(
+            f"config snapshot kind mismatch: expected {SNAPSHOT_KIND!r}, "
+            f"got {data.get('kind')!r}")
+    if data.get("schema_version") != SNAPSHOT_SCHEMA_VERSION:
+        raise ExecQuantError(
+            f"config snapshot schema_version mismatch: expected "
+            f"{SNAPSHOT_SCHEMA_VERSION}, got {data.get('schema_version')!r}")
+    effective = data.get("effective")
+    if not isinstance(effective, dict):
+        raise ExecQuantError("config snapshot has no 'effective' object")
+    canonical = json.dumps(effective, sort_keys=True, separators=(",", ":"),
+                           ensure_ascii=False)
+    recomputed = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+    if recomputed != data.get("config_id"):
+        raise ExecQuantError(
+            "config snapshot integrity check failed: recomputed config_id "
+            f"{recomputed} does not match snapshot config_id {data.get('config_id')!r}")
+    if recomputed != expected_config_id:
+        raise ExecQuantError(
+            f"--config-id {expected_config_id!r} does not match the current "
+            f"resolution ({recomputed}); no record written")
+    return data, candidate
+
+
+def dispatch_config(snapshot: Dict[str, Any], config_id: str,
+                    snapshot_rel: str) -> Dict[str, Any]:
+    effective = snapshot.get("effective") or {}
+    quant = effective.get("quantification") if isinstance(effective.get("quantification"), dict) else {}
+
+    def leaf(name: str) -> Any:
+        value = effective.get(name)
+        return NOT_EVALUATED if value in (None, "") else value
+
+    method_requested = quant.get("requested")
+    method_resolved = quant.get("resolved")
+    source_chain = snapshot.get("source_chain")
+    return {
+        "config_id": config_id,
+        "source_chain": source_chain if isinstance(source_chain, dict) else {},
+        "method_requested": method_requested or NOT_EVALUATED,
+        "method_resolved": method_resolved or NOT_EVALUATED,
+        "mode": leaf("mode"),
+        "cli": leaf("cli"),
+        "model": leaf("model"),
+        "reasoning_effort": leaf("reasoning_effort"),
+        "context_window": leaf("context_window"),
+        "extra_flags": leaf("extra_flags"),
+        "snapshot": snapshot_rel,
+    }
+
+
+def dispatch_llm(effective: Dict[str, Any], config_id: str,
+                 resolved: str) -> Dict[str, Any]:
+    group: Dict[str, Any] = {
+        "model": NOT_EVALUATED, "context_window": NOT_EVALUATED,
+        "reasoning_effort": NOT_EVALUATED, "config_source": NOT_EVALUATED,
+        "endpoint_candidates": NOT_EVALUATED, "connection_evidence": NOT_EVALUATED,
+    }
+    if resolved == "declared":
+        for field in ("model", "reasoning_effort", "context_window"):
+            value = effective.get(field)
+            if value not in (None, ""):
+                group[field] = {"value": value, "provenance": "configured"}
+        group["config_source"] = {"value": f"execution-config:{config_id}",
+                                  "provenance": "configured"}
+    elif resolved == "qoder-settings":
+        group.update(qoder_settings_llm())
+    return group
+
+
+def _iter_json_objects(path: Path):
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            node = json.loads(line)
+        except ValueError:
+            continue
+        if isinstance(node, dict):
+            yield node
+
+
+def _find_int_fields(node: Any, names: Tuple[str, ...],
+                     found: Dict[str, int]) -> None:
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key in names and isinstance(value, int) and not isinstance(value, bool):
+                found[key] = value
+            _find_int_fields(value, names, found)
+    elif isinstance(node, list):
+        for item in node:
+            _find_int_fields(item, names, found)
+
+
+def _last_duration_ms(path: Path) -> Optional[int]:
+    last = None
+    for obj in _iter_json_objects(path):
+        found: Dict[str, int] = {}
+        _find_int_fields(obj, ("duration_ms",), found)
+        if "duration_ms" in found:
+            last = found["duration_ms"]
+    return last
+
+
+def _last_token_total(path: Path) -> Optional[int]:
+    last = None
+    for obj in _iter_json_objects(path):
+        found: Dict[str, int] = {}
+        _find_int_fields(obj, ("input_tokens", "output_tokens"), found)
+        if "input_tokens" in found and "output_tokens" in found:
+            last = found["input_tokens"] + found["output_tokens"]
+    return last
+
+
+_EXIT_RE = re.compile(r"exit=(-?\d+)")
+
+
+def _read_exit_code(path: Path) -> Optional[int]:
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    matches = _EXIT_RE.findall(text)
+    if not matches:
+        return None
+    try:
+        return int(matches[-1])
+    except ValueError:
+        return None
+
+
+def dispatch_quality(snapshot: Dict[str, Any], log_dir: Path, label: str) -> Dict[str, Any]:
+    group: Dict[str, Any] = {
+        "exit_code": NOT_EVALUATED, "elapsed_ms": NOT_EVALUATED,
+        "tokens": NOT_EVALUATED, "errors": NOT_EVALUATED,
+        "satisfaction": NOT_EVALUATED,
+    }
+    status_path = log_dir / f"{label}.status"
+    exit_code = _read_exit_code(status_path)
+    if exit_code is not None:
+        group["exit_code"] = {"value": exit_code, "provenance": "measured"}
+        group["errors"] = ([] if exit_code == 0
+                           else [{"source": "dispatch.exit_code", "count": 1}])
+    jsonl_path = log_dir / f"{label}.jsonl"
+    duration = _last_duration_ms(jsonl_path)
+    if duration is not None and duration >= 0:
+        group["elapsed_ms"] = {"value": duration, "provenance": "measured"}
+    elif status_path.is_file():
+        resolved = _parse_iso(snapshot.get("resolved_at"))
+        try:
+            mtime = status_path.stat().st_mtime
+        except OSError:
+            mtime = None
+        if resolved is not None and mtime is not None:
+            delta = (datetime.fromtimestamp(mtime, timezone.utc)
+                     - resolved).total_seconds() * 1000
+            if delta >= 0:
+                group["elapsed_ms"] = {"value": int(round(delta)),
+                                       "provenance": "measured"}
+    tokens = _last_token_total(jsonl_path)
+    if tokens is not None and tokens >= 0:
+        group["tokens"] = {"value": tokens, "provenance": "measured"}
+    return group
+
+
+def assemble_dispatch_record(unit_id: str, run_id: str, snapshot: Dict[str, Any],
+                             snapshot_rel: str, log_dir: Path) -> Dict[str, Any]:
+    effective = snapshot.get("effective") or {}
+    quant = effective.get("quantification") if isinstance(
+        effective.get("quantification"), dict) else {}
+    resolved = quant.get("resolved") or NOT_EVALUATED
+    agent, _pid, _host = collect_agent()
+    config_id = snapshot.get("config_id")
+    return {
+        "kind": KIND,
+        "schema_version": SCHEMA_VERSION,
+        "unit_id": unit_id,
+        "unit_type": "agent",
+        "run_id": run_id,
+        "run_id_resolution": "explicit",
+        "collected_at": now_iso(),
+        "agent": agent,
+        "config": dispatch_config(snapshot, config_id, snapshot_rel),
+        "llm": dispatch_llm(effective, config_id, resolved),
+        "quality": dispatch_quality(snapshot, log_dir, run_id),
+        "qualification": NOT_EVALUATED,
+        "truncated": [],
+    }
+
+
+def append_record_locked(records_path: Path, record: Dict[str, Any],
+                         unit_id: str, run_id: str) -> bool:
+    """Check-then-append under one POSIX flock (C-EQ-07).
+
+    On platforms without ``fcntl`` the operation degrades to the same
+    check-then-append sequence without claiming atomicity.
+    """
+    lock_path = records_path.with_name(records_path.name + ".lock")
+    lock_handle = None
+    locked = False
+    try:
+        lock_handle = lock_path.open("a", encoding="utf-8")
+        try:
+            import fcntl
+            fcntl.flock(lock_handle, fcntl.LOCK_EX)
+            locked = True
+        except ImportError:  # documented non-POSIX degradation
+            locked = False
+        if existing_record(records_path, unit_id, run_id):
+            return False
+        with records_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(record, ensure_ascii=False) + "\n")
+        return True
+    finally:
+        if lock_handle is not None:
+            if locked:
+                try:
+                    import fcntl
+                    fcntl.flock(lock_handle, fcntl.LOCK_UN)
+                except Exception:
+                    pass
+            lock_handle.close()
+
+
+def normalize_record_view(record: Dict[str, Any]) -> Dict[str, Any]:
+    """v1 records participate read-only via an output-only shape upgrade."""
+    config = record.get("config")
+    if isinstance(config, dict):
+        record["config"] = {field: config.get(field, NOT_EVALUATED)
+                            for field in CONFIG_FIELDS}
+    else:
+        record["config"] = empty_config_group()
+    quality = record.get("quality")
+    if isinstance(quality, dict) and "exit_code" not in quality:
+        quality["exit_code"] = NOT_EVALUATED
+    return record
+
+
+# ---------------------------------------------------------------------------
 # actions
 # ---------------------------------------------------------------------------
 
@@ -597,6 +892,10 @@ def action_collect(args: argparse.Namespace) -> int:
     if not validate_unit_id(unit_id):
         raise InputError(f"invalid --unit-id: {args.unit_id!r}")
     resolved_type = unit_type_of(unit_id)
+    if resolved_type == "agent":
+        raise InputError(
+            "collect does not accept agent: units — agent records are written "
+            "only by collect-dispatch")
     if args.unit_type and args.unit_type != resolved_type:
         raise InputError(
             f"--unit-type {args.unit_type!r} contradicts the unit-id form "
@@ -620,6 +919,48 @@ def action_collect(args: argparse.Namespace) -> int:
         raise ExecQuantError(f"cannot append to {records_path}: {exc}") from exc
     print(f"exec-quant: recorded {unit_id} run={record['run_id']} "
           f"resolution={resolution} -> {records_path}")
+    return 0
+
+
+def action_collect_dispatch(args: argparse.Namespace) -> int:
+    workspace_root = resolve_workspace_root(args.workspace_root)
+    unit_id = (args.unit_id or "").strip()
+    if not unit_id.startswith("agent:") or not validate_unit_id(unit_id):
+        raise InputError(
+            "collect-dispatch requires --unit-id agent:<slug> "
+            "(agent records only describe external dispatches)")
+    if args.unit_type and args.unit_type != "agent":
+        raise InputError(
+            f"--unit-type {args.unit_type!r} contradicts the agent unit id {unit_id!r}")
+    if not args.run_id:
+        raise InputError("collect-dispatch requires --run-id <dispatch-label>")
+    if not args.snapshot:
+        raise InputError("collect-dispatch requires --snapshot <path>")
+    if not args.config_id:
+        raise InputError("collect-dispatch requires --config-id <id>")
+    snapshot, snapshot_path = load_snapshot(args.snapshot, workspace_root,
+                                            args.config_id)
+    log_dir_value = snapshot.get("log_dir") or DEFAULT_DISPATCH_LOG_DIR.as_posix()
+    log_dir = Path(str(log_dir_value))
+    if not log_dir.is_absolute():
+        log_dir = workspace_root / log_dir
+    try:
+        snapshot_rel = snapshot_path.resolve().relative_to(
+            workspace_root.resolve()).as_posix()
+    except ValueError:
+        snapshot_rel = snapshot_path.as_posix()
+    records_path, _scores_path = bootstrap_storage(workspace_root)
+    record = assemble_dispatch_record(unit_id, args.run_id, snapshot, snapshot_rel,
+                                      log_dir)
+    record = mask_credentials(record)
+    truncated = enforce_size_cap(record)
+    record["truncated"] = truncated
+    if not append_record_locked(records_path, record, unit_id, args.run_id):
+        print(f"exec-quant: duplicate record for ({unit_id}, {args.run_id}); "
+              f"no second row written -> {records_path}")
+        return 0
+    print(f"exec-quant: recorded {unit_id} run={args.run_id} "
+          f"config_id={record['config']['config_id']} -> {records_path}")
     return 0
 
 
@@ -690,6 +1031,10 @@ def action_list_records(args: argparse.Namespace) -> int:
             continue
         if args.run_id and record.get("run_id") != args.run_id:
             continue
+        if args.config_id:
+            config = record.get("config")
+            if not isinstance(config, dict) or config.get("config_id") != args.config_id:
+                continue
         collected = _parse_iso(record.get("collected_at"))
         if since and collected and collected < since:
             continue
@@ -697,7 +1042,7 @@ def action_list_records(args: argparse.Namespace) -> int:
                    if s.get("unit_id") == record.get("unit_id")
                    and s.get("run_id") == record.get("run_id")]
         matches.sort(key=lambda s: (str(s.get("scored_at") or ""),))
-        entry = dict(record)
+        entry = normalize_record_view(dict(record))
         entry["scores"] = matches
         joined.append(entry)
     if args.format == "json":
@@ -777,21 +1122,23 @@ def action_score(args: argparse.Namespace) -> int:
 
 USAGE_LINE = ("usage: exec-quant.py --action {" + ",".join(ACTIONS) + "} "
               "[--unit-id ID] [--unit-type TYPE] [--run-id ID] [--score 1-5] "
-              "[--note TEXT] [--since DATE] [--format text|json] "
-              "[--workspace-root PATH]")
+              "[--note TEXT] [--since DATE] [--snapshot PATH] [--config-id ID] "
+              "[--format text|json] [--workspace-root PATH]")
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="exec-quant.py", allow_abbrev=False)
     parser.add_argument("--workspace-root", default=None)
     parser.add_argument("--action", required=True,
-                        choices=["collect", "list-records", "score"])
+                        choices=["collect", "list-records", "score", "collect-dispatch"])
     parser.add_argument("--unit-id", default=None)
     parser.add_argument("--unit-type", default=None, choices=list(UNIT_TYPES))
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--score", type=int, default=None)
     parser.add_argument("--note", default=None)
     parser.add_argument("--since", default=None)
+    parser.add_argument("--snapshot", default=None)
+    parser.add_argument("--config-id", dest="config_id", default=None)
     parser.add_argument("--format", default="text", choices=["text", "json"])
     return parser
 
@@ -802,6 +1149,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     try:
         if args.action == "collect":
             return action_collect(args)
+        if args.action == "collect-dispatch":
+            return action_collect_dispatch(args)
         if args.action == "list-records":
             return action_list_records(args)
         return action_score(args)

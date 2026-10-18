@@ -88,7 +88,7 @@ def test_exec_quant_action_set_exact() -> None:
     (ACTIONS constant + argparse choices), is exactly the D1 closed set."""
     assert EXECQUANT_SCRIPT.is_file(), "exec-quant.py missing — engine not implemented"
     got = _execquant_actions()
-    expected = {"collect", "list-records", "score"}
+    expected = {"collect", "list-records", "score", "collect-dispatch"}
     assert got == expected, (
         f"exec-quant.py action set drifted: extra={sorted(got - expected)} "
         f"missing={sorted(expected - got)}"

@@ -182,6 +182,20 @@ directory under the agent stores; the former `AGENTS.md`/`MEMORY.md`/`SOUL.md`/`
 shared files have been removed (agent runtime context is per chat-session, so they served
 no purpose).
 
+## Execution configuration & per-dispatch quantification
+
+- **Three layers**, in precedence order: `.specify/agents/execution/configs/_defaults.yaml`
+  (seeded once by `specify init`; content owner `templates/execution-config-defaults.yaml`),
+  `configs/<slug>.yaml`, and inline dispatch parameters.
+- **Schema authority**: `skills/internal/create-agent/references/execution-config.md`. The
+  runtime resolver is `scripts/python/execution-config.py`; CLI capability values are owned
+  only by its `CAPABILITY_MATRIX` and are never copied into this document.
+- Each successful resolve writes a config snapshot under
+  `.specify/agents/execution/logs/config-snapshots/`. After an **external** dispatch,
+  `scripts/python/exec-quant.py --action collect-dispatch` records one `agent:<slug>` row
+  per dispatch label, including the 11-field config group and the quantification method
+  (`requested` vs `resolved`).
+
 ## Traceability
 
 Normative source: the template catalog under `skills/internal/create-agent/templates/` and

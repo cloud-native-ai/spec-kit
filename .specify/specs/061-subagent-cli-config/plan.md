@@ -15,7 +15,7 @@
 **Storage**: 文件即存储——`.specify/agents/execution/configs/`（tracked 配置）、`.specify/agents/execution/logs/`（gitignored 运行证据 + `config-snapshots/<config_id>.json`）、`.specify/memory/exec-quant/{records,scores}.jsonl`（append-only）
 **Testing**: `pytest`（`contract` / `integration` 标记）；新增 `tests/contract/test_execution_config_engine.py`、`tests/contract/test_exec_quant_dispatch.py`、`tests/integration/test_init_execution_config.py`；有意扩展 `test_exec_quant_engine.py`、`test_probe_engine_action_sets.py`；实现开工前冻结失败基线
 **Target Platform**: macOS arm64（本机实测）/ Linux；宿主 CLI = qodercli 1.1.73（旗标已验证）；`/proc` 宿主探测仅 Linux，macOS 走显式 `--host-cli` 覆盖
-**Project Type**: 框架源仓库 + 自托管客户端（两顶帽子）——实现改动全部落 `scripts/`、`skills/`、`shared/`、`templates/`、`src/specify_cli/`、`docs/`、`tests/`
+**Project Type**: 框架源仓库 + 自托管客户端（两顶帽子）——实现改动全部落 `scripts/`、`skills/`、`shared/`、`templates/`、`src/specify_cli/`、`docs/`、`tests/`，plus the seeded runtime defaults layer `.specify/agents/execution/configs/_defaults.yaml`（T033 client-runtime 播种）
 **Performance Goals**: resolve/validate 为本地文件解析（毫秒级、无网络）；collect-dispatch 为一次顺序读 + 一行 append；任何采集失败不阻塞派发
 **Constraints**: 引擎名 `scripts/python/execution-config.py` 锁定（FR-005）；能力矩阵代码侧单一 owner（FR-008）；默认层缺失快速失败、无内置静默默认值（FR-004）；059/060 已实现行为与生命周期零改动；不执行真实外部派发（除非显式授权）；不手改任何生成物
 **Scale/Scope**: 1 个新引擎（约 500 行）、1 个引擎扩展（约 +250 行）、1 个模板、5 个技能/真源面、2 份文档、3 个新测试文件 + 2 个既有测试文件的有意扩展
@@ -38,7 +38,7 @@
 | VIII | Code as the Single Source of Truth | ✅ Pass | 能力矩阵以引擎常量 `CAPABILITY_MATRIX` 为唯一 owner；qodercli 旗标以本机 1.1.73 实测校准 |
 | IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | stdlib-only 单文件引擎；无新服务/调度器/聚合报表；复用既有派发器与存储（YAGNI） |
 | X | Documentation Naming & Location Conventions | ✅ Pass | 新脚本 `scripts/python/execution-config.py`、新模板 `templates/execution-config-defaults.yaml`；docs 走既有 `docs/reference/{cli,agents}/` |
-| XI | Dogfooding (Self-Application) | ✅ Pass | 两顶帽子：实现全部落框架源，`.specify/` 镜像由 `sync-mirrors.py` 投影；不手改镜像 |
+| XI | Dogfooding (Self-Application) | ✅ Pass | 两顶帽子：实现全部落框架源，`.specify/` 镜像由 `sync-mirrors.py` 投影；不手改镜像；plus the seeded runtime defaults layer `.specify/agents/execution/configs/_defaults.yaml`（T033 经 init 播种机制的 client-runtime 落点，非手改镜像） |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | 复用 dispatch.sh / memory-utils / exec-quant 宿主探测 / 三个生成脚本；未另造派发器或存储 |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 强化 Controlled Execution（配置真正到达 CLI）与 Learning Capture（按派发证据）两个维度 |
 | XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 运行时能力矩阵唯一 owner = 引擎 `CAPABILITY_MATRIX`；`contracts/` 是设计规格（dated），schema/真源/开发文档只引用代码 owner；默认层内容 owner = `templates/execution-config-defaults.yaml`，E7 仅作 dated record |
@@ -178,7 +178,7 @@ Phase 0 预期 vs 实际：实体 7（预估 6–8 ✓）；契约 3（预估 3 
 
 1. **stream-json 字段未验证**：`duration_ms` / `usage.input_tokens` / `usage.output_tokens` 的嵌套形态未经本机验证。采集采用「递归按键存在才取，取最后一个匹配；缺一即 `not_evaluated`」，不猜测事件顺序或字段路径；契约 C-EQ-06 固定该规则。
 2. **默认层跨 CLI 泄漏**：默认层整层跳过必须覆盖 `mode/cli/model/reasoning_effort/context_window/extra_flags/quantification.method/log_dir`。SC-006 用 `claude + none` 正向路径与 `claude + declared` 拒收路径双路径做字面量计数（字面集 {`DeepSeek-Flash`, `max`, `1000000`, `qodercli`}，`auto` 不计入），零容忍。
-3. **驱动循环自依赖**：本特性修改 run-agent / preflight / exec-quant，而无人值守驱动循环依赖这些面派发后续阶段。implement 完成后、派发 review 之前 MUST 重新读取更新后的派发契约；若契约变化影响 driver 派发形态，按快速失败停线上送，不得静默适配（FR-027）。
+3. **驱动循环自依赖**：本特性修改 run-agent / preflight / exec-quant，而无人值守驱动循环依赖这些面派发后续阶段。implement 完成后、派发 review 之前 MUST 重新读取更新后的派发契约；T030 记录四个可判定字段（重读面 / 契约差异 / 驱动者实际派发路径 / 是否影响驱动形态 + 结论），并以运行时默认层 `.specify/agents/execution/configs/_defaults.yaml` 的存在（T033）作为 FR-027 前置证据；若契约变化影响 driver 派发形态，按快速失败停线上送，不得静默适配（FR-027）。
 4. **claude declared 不可达**：见 Phase 0 裁定 3；实现与评审须确认这是 FR-008/US1-5 的直接结果，而非遗漏。若后续验证 claude 旗标，扩展矩阵即可恢复。
 5. **macOS 无 `/proc`**：native/virtual 的 `qoder-settings` 自动解析依赖 `--host-cli`/`SPECKIT_HOST_CLI`；external + qodercli 不受影响。未提供时 auto 解析为 `none` + warning，不猜测宿主。
 6. **并发重复采集**：`collect-dispatch` 在「查重 + append」窗口使用 POSIX `fcntl.flock` 锁（`<records>.lock`）；非 POSIX 平台退化为既有查重语义并在契约中声明。

@@ -1894,7 +1894,8 @@ def ensure_specify_symlink(
     link_path.symlink_to(relative_target, target_is_directory=True)
 
 
-def ensure_agent_layer_dirs(root_path: Path) -> Path:
+def ensure_agent_layer_dirs(root_path: Path,
+                            defaults_source: Optional[Path] = None) -> Path:
     """Ensure the three-layer agent directory skeleton under ``.specify/agents/``.
 
     Layout (canonical taxonomy: ``shared/definitions/agent-definitions.md``):
@@ -1908,6 +1909,14 @@ def ensure_agent_layer_dirs(root_path: Path) -> Path:
     ``.specify/agents/*.agent.md`` predates the layered layout and is moved into
     ``templates/`` — everything ``specify init`` installed at the top level was the
     shipped template set.
+
+    Defaults layer seeding (Feature 061): when
+    ``execution/configs/_defaults.yaml`` is absent, it is copied from
+    ``defaults_source`` when given, else from the packaged
+    ``templates/execution-config-defaults.yaml``. An existing file is never
+    overwritten; an explicitly supplied missing source raises (packaging defect
+    must stay visible). Without any available source, nothing is fabricated.
+
     Returns the ``.specify/agents`` root.
     """
     agents_root = root_path / ".specify" / "agents"
@@ -1921,6 +1930,23 @@ def ensure_agent_layer_dirs(root_path: Path) -> Path:
             shutil.move(str(legacy), str(target))
         else:
             legacy.unlink()
+
+    defaults_target = agents_root / "execution" / "configs" / "_defaults.yaml"
+    if not defaults_target.exists():
+        source = defaults_source
+        if source is not None:
+            if not source.is_file():
+                raise RuntimeError(
+                    f"execution-config defaults template not found: {source}"
+                )
+        else:
+            resource_path = get_resource_path()
+            if resource_path is not None:
+                packaged = resource_path / "templates" / "execution-config-defaults.yaml"
+                if packaged.is_file():
+                    source = packaged
+        if source is not None:
+            shutil.copy2(source, defaults_target)
 
     return agents_root
 
@@ -2418,7 +2444,10 @@ def copy_local_templates(
             if tracker:
                 tracker.start("local-templates", "copying agents")
 
-            agents_dest = ensure_agent_layer_dirs(project_path) / "templates"
+            agents_dest = ensure_agent_layer_dirs(
+                project_path,
+                defaults_source=resource_path / "templates" / "execution-config-defaults.yaml",
+            ) / "templates"
 
             # Agent templates carry source-form refs (e.g. shared/guidelines/
             # in the injected fast-fail clause) that need the .specify/ prefix

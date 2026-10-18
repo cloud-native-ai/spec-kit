@@ -77,6 +77,22 @@ Per the CLI memory docs (docs.qoder.com/cli/memory), `qodercli` loads project-le
 - When `AGENTS.md` and `.qoder/rules/` coexist, **both are injected** (additive context). The CLI docs define **no override priority** between them; the "rules win on conflict" statement exists only in the **IDE** docs.
 - **`.qoder/project_rules.md` is not a CLI source.** It is the Qoder IDE's old format and does not appear in the CLI docs — there is no CLI-side priority relationship between it and `AGENTS.md`, because the CLI simply never reads it.
 
+## Verified dispatch flags & settings (dated record, 2026-10-18)
+
+Observed on `qodercli 1.1.73` (macOS arm64). This is a **dated record, not a runtime
+guarantee**; the runtime owner for per-CLI capabilities is `CAPABILITY_MATRIX` in
+`scripts/python/execution-config.py`.
+
+- `qodercli --help` lists `-m, --model <model>`, `--reasoning-effort <level>`, and
+  `--context-window <size>` — the three flags a resolved external dispatch may pass.
+- The host settings file `~/.qoder/settings.json` carries the current model selection
+  (`model.name`), the per-model context window
+  (`model.preferences[<name>].contextWindow`), and the per-model reasoning effort
+  (`model.preferences[<name>].reasoning.effort`, when set).
+- Per-dispatch configuration resolution is owned by `scripts/python/execution-config.py`;
+  the resolved configuration is recorded per dispatch by
+  `scripts/python/exec-quant.py --action collect-dispatch`.
+
 ## Spec Kit integration
 
 Spec Kit renders `/speckit.*` commands into `.qoder/commands/*.md`. The canonical
