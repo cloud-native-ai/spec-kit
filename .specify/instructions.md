@@ -84,6 +84,24 @@ LLM token usage efficiency is a framework-level quality attribute. The full disc
 - **Summary-First (摘要优先)**: never inject the whole raw content of machine-managed data files (feedback, memory, evidence, history stores, run artifacts, inventories) into LLM context; consume digests, field projections, or targeted excerpts, escalating per the discipline doc's escalation ladder (exceptions: edit target, small-file threshold, recorded justification).
 - **Consumption Observation (消耗观察)**: at feedback wrap-up, self-assess avoidable token spend; findings carry the stable `token-efficiency` marker (retrievable via `feedback-utils.py --action list --contains token-efficiency`); never fabricate token counts.
 
+## Single-Run Evidence Discipline
+
+An expensive execution (long-running tests, builds, bulk queries, remote calls) is a one-time evidence-gathering opportunity: the run itself is what costs, and its complete output is nearly free to keep. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/single-run-evidence.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+
+- **Capture-in-Full (执行时全量捕获)**: the command line, exit status, complete stdout/stderr, and duration of an expensive run are persisted to an artifact at execution time; filtered views derive from that record, never from an in-flight pipeline that discards the original.
+- **Diagnostics-Before-the-Run (诊断开关前置)**: opt-in, side-effect-free diagnostics (per-item durations, verbose logging) are enabled before an expensive run — once the run finishes without them, that information is gone for good.
+- **Consume-the-Record (消费留痕而非重跑)**: follow-up questions about a completed execution are answered from the record; re-running to recover information the first run already produced is the canonical anti-pattern — the full cost is paid a second time, with non-reproducibility risk on top.
+
+## Progress Reporting Discipline
+
+A long-running task owes the user a periodic sign of life: many minutes of silence is indistinguishable from a hang, and the only recovery the user has is to interrupt work that may be nearly finished. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/progress-reporting.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+
+- **Rhythm (沉默有上限)**: while a long-running task runs, a progress report is emitted every **15 minutes by default**, anchored on the task's start rather than on the previous report; the interval is a ceiling on silence, never a floor on chatter — a milestone, blocker, or change of direction MAY be reported sooner, while a report is never skipped for lack of news. A user-supplied interval replaces the default for that run.
+- **Content floor (四要素)**: one to three lines carrying where the run stands, what changed since the last report, what remains with a rough completion estimate, and any blocker — with "no blocker" stated explicitly rather than left to inference.
+- **Measured, not invented (数字须可溯源)**: a progress figure comes from an artifact this run actually produced (a counter, a progress line, a finished-item list); when no such sensor exists, the report says the progress cannot be quantified instead of inventing a percentage, and an estimate is labelled as one.
+- **Boundary-respecting (不打断原子步骤、不当确认门)**: a report never splits an indivisible step — it lands at the next step boundary and says it is late; nor does reporting ever pause the run for an answer, because a report is a statement (陈述), not an approval request (确认门), and approving a destructive action keeps its own front-loaded criterion.
+- **Exemptions and precedence (短任务豁免、异常优先)**: a task that ends before the first interval produces no periodic report, its result being the report; an anomaly found mid-run is surfaced immediately per the Fast Fail Discipline, ahead of the cadence; and an orchestrator carries the reporting duty into every long-running subagent dispatch, since ambient instructions never reach a subagent.
+
 ## Run Determination
 
 Once per completed run, at wrap-up, a program measures how that run went and the result routes into the existing feedback flow. The wiring is defined in a single source of truth — `.specify/shared/workflow/feedback-step.md` § Run Determination (do NOT copy its rules; reference the file) — which owns the consumption point, the composition with the wrap-up notification, the missing-record degradation and the passive non-exhaustiveness constraint. The engine `.specify/scripts/python/run-determination.py` is the code-side owner of the record schema, every value domain and the routing-bit derivation:
