@@ -1,0 +1,35 @@
+# Baseline failed nodeids — Feature 061 implementation freeze (dated record)
+
+- Date: 2026-10-18 (plan phase, BEFORE any 061 implementation edit)
+- Command: `/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract tests/integration -q --no-header -p no:cacheprovider`
+- Result: 3278 passed / 25 failed / 1 skipped (193.94s); these 25 are pre-existing on branch 061-subagent-cli-config before 061 edits.
+- Repo `.venv` has no pytest; the profiles venv interpreter is the measured baseline environment. Implementation MUST re-run the same command and compare sorted nodeids (`comm -13 baseline current` must be empty).
+- Intentional extensions (schema_version 1→2, action-set union, provenance, MEASURABLE_PATHS, preflight wording) change assertions in named files; the corresponding nodes MUST be re-baselined deliberately and registered in verification.md, not silently dropped.
+
+## Failed nodeids (sorted)
+
+FAILED tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+FAILED tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+FAILED tests/contract/test_constitution_double_landing.py::test_c1_template_carries_both_new_principles
+FAILED tests/contract/test_criterion_subject.py::test_c19_the_gate_budget_survives_the_new_section
+FAILED tests/contract/test_exec_quant_engine.py::TestAgentCollection::test_resolved_agent_fields_from_wrapper_host
+FAILED tests/contract/test_exec_quant_engine.py::TestCredentialDefense::test_engine_masks_credential_shaped_config_values
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_endpoint_candidates_origin_only
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_missing_config_face_degrades_to_marker
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_config_face
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_per_model_effort_when_set
+FAILED tests/contract/test_exec_quant_engine.py::TestSizeCap::test_oversized_record_is_field_truncated_and_capped
+FAILED tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+FAILED tests/contract/test_fast_fail_discipline.py::test_x13_double_landing_three_count_pins
+FAILED tests/contract/test_fast_fail_discipline.py::test_x19_ufc_class_eleven_gains_fast_fail_path
+FAILED tests/contract/test_fast_fail_discipline.py::test_x21_ufc_override_column_unchanged
+FAILED tests/contract/test_instructions_section_propagation.py::test_c1_live_instructions_carry_all_template_sections
+FAILED tests/contract/test_neutrality_budget.py::test_c4_budget_total_and_violations_after_the_feature_landed
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+FAILED tests/contract/test_user_facing_comprehension_doc.py::test_gn_c2_gate_scan_total_unchanged
+FAILED tests/contract/test_wrap_up_wording_gate_safe.py::test_confirmation_gate_budget_unchanged
