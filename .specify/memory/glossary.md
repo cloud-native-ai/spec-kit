@@ -156,3 +156,7 @@
 | 状态脊 | - | 跨周期唯一记忆的落盘状态文件：循环/长跑机制在每个状态转移点先写状态后行动，续环与重入仅凭状态脊恢复、不依赖会话记忆（先例 project-cluster 约束；058 线状态实体为其实例化） | auto | proposed |
 | 一遍性入口 | - | 用户以单条提示词声明目标与起点（哪个项目、断点在哪、终态权威文档）发起无人值守推进的入口形态；执行细节全部由机制内部承接，不要求用户学新话术或逐次提醒（058 G4 裁决） | auto | proposed |
 | 执行量化记录 | - | spec-kit 对「agent 程序+LLM」执行的量化遥测记录:每受测单元每次执行一条,身份 (unit_id, unit_type, run_id),三字段组=agent 程序/LLM 详细/质量(时长·token·错误次数)+可选打分;Recording-Only(分析/报表/聚合为后续特性);落独立持久存储,不入 feedback store、永不自动上送;采不到的字段显式 not_evaluated,禁臆造;与运行判定并行组合、按 run 关联携带。真源 .specify/specs/059-exec-quant-recording/requirements.md | auto | proposed |
+| 量化方法 | quantification method | 派发量化记录中决定 LLM 字段取值方式的方法：auto / declared / qoder-settings / none；auto 按派发覆盖与宿主 CLI 解析，declared 回显配置值、qoder-settings 复用 qoder 实测适配器、none 全部落未采标记（需求 061） | auto | proposed |
+| 配置快照 | config snapshot | 配置解析引擎在派发前落盘的 effective config 及其身份（config_id、source_chain、resolved_at）；派发量化记录经 config_id 引用快照作为「本次用了什么配置」的凭据（需求 061） | auto | proposed |
+| 默认层 | defaults layer | 子代理 CLI 配置的最低优先级层 .specify/agents/execution/configs/_defaults.yaml，由 specify init 从模板播种且永不覆盖；其 cli 只是默认值，代理或内联选择其它 CLI 时整层跳过（需求 061） | auto | proposed |
+| CLI 能力矩阵 | CLI capability matrix | 每个受支持子代理 CLI 的可派发形态、可接受旗标与可用量化方法的单一代码侧 owner 表；文档只引用不复制，未验证组合以 exit 2 拒收并列出字段与支持集（需求 061） | auto | proposed |
