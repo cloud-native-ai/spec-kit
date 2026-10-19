@@ -1,0 +1,22 @@
+[
+  {
+    "sentence": "这次网关升级的结果值得单独说明。",
+    "basis": "输入蕴含：输入即本次网关升级的结果数据，句子仅作引入，无新事实"
+  },
+  {
+    "sentence": "两项核心指标同时好转：",
+    "basis": "输入蕴含：延迟与错误率两项下降是输入原句的直接内容"
+  },
+  {
+    "sentence": "由部署流水线注入。",
+    "basis": "输入蕴含：占位符由部署流水线注入属严格可推出的背景说明"
+  },
+  {
+    "sentence": "日常运维用 `gatewayctl reload` 即可。",
+    "basis": "输入蕴含：reload 命令即日常运维操作，无新命令"
+  },
+  {
+    "sentence": "更多说明见 https://docs.example.com/gateway 。",
+    "basis": "输入蕴含：输入原句「详见 https://docs.example.com/gateway」的同义改写，无新信息"
+  }
+]

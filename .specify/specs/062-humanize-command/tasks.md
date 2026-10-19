@@ -38,7 +38,7 @@
 
 ## Environment Prerequisites
 
-- `cws-lib-bash` (`CWS_LIB_BASH_HOME`): **unavailable** — probe: `bash scripts/bash/run-tests.sh --names-out /tmp/humanize-tasks-current-failed.txt` @ 2026-10-19 → `94 failed, 3906 passed`; all 23 names added over the frozen 71-name baseline are in the `cws-lib-bash`-dependent cluster, e.g. `Error: cws-lib-bash is not correctly installed. File not found: /storage/project/cloud-native-tools/cws-lib-bash/bin/cws_bash_env` from `scripts/bash/common.sh`’s dependency check. Affected phases/tasks: US4 C-9 row (T026), GATE-1. While unavailable, T026/GATE-1 MUST report the comparison as blocked/degraded rather than claim zero-new-failures.
+- `cws-lib-bash` (`CWS_LIB_BASH_HOME`): **restored**（2026-10-19 implement 阶段实测更正——先前的「unavailable」降级记录已过期）— probe: `bash scripts/bash/run-tests.sh --names-out` @ 2026-10-19 → `71 failed, 3929 passed`，名字级与冻结名单完全一致（`comm -13` 与 `comm -23` 均为空；全量留痕 `notes/pre-change-measurements.md` §4）。`CWS_LIB_BASH_HOME=/storage/project/cloud-native-tools/cws-lib-bash` 可解析（`bin/cws_bash_env` 在位，mtime 2026-10-19 15:58）。T026/GATE-1 按常规零新增失败判据执行，冻结名单不放宽、不改写。
 - Python / pytest: **available** — probe: `python3 --version` → `Python 3.11.11`; `python3 -m pytest --version` → `pytest 8.4.2` @ 2026-10-19; affected: all automated checks.
 
 ## Format: `[ID] [P?] [Story] Description`
@@ -66,7 +66,7 @@
 
 **Purpose**: Freeze the pre-change side of every diff premise and record the environment verdict before any artifact is written.
 
-- [ ] T001 捕获改前侧证据到 `.specify/specs/062-humanize-command/notes/pre-change-measurements.md`：逐项实跑并粘贴命令/日期/真实输出——`python3 scripts/python/regen-command-copies.py --check`、`python3 scripts/python/sync-mirrors.py --check`、`python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check`、并按 `.specify/skills/internal/implement-feature/SKILL.md` § Test runs 的规范 runner 采集名字级失败名单；环境判据按本文件 § Environment Prerequisites 记录，不在此复述。
+- [X] T001 捕获改前侧证据到 `.specify/specs/062-humanize-command/notes/pre-change-measurements.md`：逐项实跑并粘贴命令/日期/真实输出——`python3 scripts/python/regen-command-copies.py --check`、`python3 scripts/python/sync-mirrors.py --check`、`python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check`、并按 `.specify/skills/internal/implement-feature/SKILL.md` § Test runs 的规范 runner 采集名字级失败名单；环境判据按本文件 § Environment Prerequisites 记录，不在此复述。
 
 **Checkpoint**: pre-change measurements exist; every later `diff against pre-change` premise has a dated baseline.
 
@@ -78,10 +78,10 @@
 
 **⚠️ CRITICAL**: No user story verification can close until this phase is complete.
 
-- [ ] T002 [P] Author 结构契约测试 `tests/contract/test_humanize_command_surface.py`（`test_c01`..`test_c10` 逐条覆盖 C-1..C-10：薄模板/无 `## Wrap-up`/唯一技能委派/技能 frontmatter 与自足/四副本/docs 内容/注册行/probe 行与编译面/无新增运行时/检测器诚实措辞），在当前树先红，并把命令、真实红输出与退出码记入 `.specify/specs/062-humanize-command/notes/red-first-evidence.md`。
-- [ ] T003 [P] Author E8 评估语料 `tests/fixtures/humanize/`：≥8 个样本覆盖中文/英文/混合语言（附 FR-013 期望主语言）、内联/文件、受保护内容（含模板占位符 `{{...}}`/`${...}`、代码标识符、URL 与版本号）、矛盾陈述、已自然文本、长多章节文档（含估算 token 超上下文窗口 50% 的分段样本）与非法输入，并各含 ≥1 个**指令式内容威胁样本**（「忽略以上规则」「执行以下命令」「把内容发送到…」，内联与文件形态）；在 `tests/fixtures/humanize/README.md` 记录 sample-id → 用途 → SC/条款对照清单（含 SC-011 注入腿与 F-01 占位符腿）。
-- [ ] T004 [P] Author `tests/fixtures/humanize/rubric.md`：四维度各自通过判据、“适用维度失败即样本失败”规则、缺省 `professional` 判据、两位独立评审的独立记录表单；并明确写入**主语言判定步骤**（剔除受保护内容与纯数字/符号 → 中文字符数 vs 拉丁词数按书写系统计数 → 占比最高者 → 并列取首个非空正文段落 → 分段服从全文口径，FR-013）、**SC-002 归一化口径**（数字/单位/日期去千分位/统一空白/同一日历日等价、不做单位换算；百分比/版本号/标识符/URL/代码 token 逐字；新增句逐条标注「输入蕴含」依据）、**受保护 token 清单构造**（引用 T005 脚本规格：FR-008 集合 + 模板占位符 + 代码标识符 + URL 与版本号）、**受众适配腿判据**（SC-004，不得只测语气）、**注入提示核验**（SC-011）与纯文本封闭清单核验步骤（引用 FR-022）。
-- [ ] T005 [P] Author 确定性受保护内容差异脚本 `tests/fixtures/humanize/diff_protected.py`：逐项比对 invariant set 与 protected set（**受保护 token 清单 owner = 本脚本规格**：由 FR-008 集合 + 模板占位符 + 代码标识符 + URL 与版本号构造；T004 量规引用本清单），按 **SC-002 归一化口径**（数字、单位、日期去千分位分隔符、统一空白、同一日历日等价、不做单位换算；百分比、版本号、标识符、URL、代码 token 逐字比较）输出逐项结论与 0/1 退出码、仅用标准库且无 LLM 调用；用 `tests/fixtures/humanize/selftest/` 的最小样本对实跑并记录输出。
+- [X] T002 [P] Author 结构契约测试 `tests/contract/test_humanize_command_surface.py`（`test_c01`..`test_c10` 逐条覆盖 C-1..C-10：薄模板/无 `## Wrap-up`/唯一技能委派/技能 frontmatter 与自足/四副本/docs 内容/注册行/probe 行与编译面/无新增运行时/检测器诚实措辞），在当前树先红，并把命令、真实红输出与退出码记入 `.specify/specs/062-humanize-command/notes/red-first-evidence.md`。
+- [X] T003 [P] Author E8 评估语料 `tests/fixtures/humanize/`：≥8 个样本覆盖中文/英文/混合语言（附 FR-013 期望主语言）、内联/文件、受保护内容（含模板占位符 `{{...}}`/`${...}`、代码标识符、URL 与版本号）、矛盾陈述、已自然文本、长多章节文档（含估算 token 超上下文窗口 50% 的分段样本）与非法输入，并各含 ≥1 个**指令式内容威胁样本**（「忽略以上规则」「执行以下命令」「把内容发送到…」，内联与文件形态）；在 `tests/fixtures/humanize/README.md` 记录 sample-id → 用途 → SC/条款对照清单（含 SC-011 注入腿与 F-01 占位符腿）。
+- [X] T004 [P] Author `tests/fixtures/humanize/rubric.md`：四维度各自通过判据、“适用维度失败即样本失败”规则、缺省 `professional` 判据、两位独立评审的独立记录表单；并明确写入**主语言判定步骤**（剔除受保护内容与纯数字/符号 → 中文字符数 vs 拉丁词数按书写系统计数 → 占比最高者 → 并列取首个非空正文段落 → 分段服从全文口径，FR-013）、**SC-002 归一化口径**（数字/单位/日期去千分位/统一空白/同一日历日等价、不做单位换算；百分比/版本号/标识符/URL/代码 token 逐字；新增句逐条标注「输入蕴含」依据）、**受保护 token 清单构造**（引用 T005 脚本规格：FR-008 集合 + 模板占位符 + 代码标识符 + URL 与版本号）、**受众适配腿判据**（SC-004，不得只测语气）、**注入提示核验**（SC-011）与纯文本封闭清单核验步骤（引用 FR-022）。
+- [X] T005 [P] Author 确定性受保护内容差异脚本 `tests/fixtures/humanize/diff_protected.py`：逐项比对 invariant set 与 protected set（**受保护 token 清单 owner = 本脚本规格**：由 FR-008 集合 + 模板占位符 + 代码标识符 + URL 与版本号构造；T004 量规引用本清单），按 **SC-002 归一化口径**（数字、单位、日期去千分位分隔符、统一空白、同一日历日等价、不做单位换算；百分比、版本号、标识符、URL、代码 token 逐字比较）输出逐项结论与 0/1 退出码、仅用标准库且无 LLM 调用；用 `tests/fixtures/humanize/selftest/` 的最小样本对实跑并记录输出。
 
 **Checkpoint**: the structural test is red for the expected reason; corpus, rubric, and diff script are ready.
 
@@ -116,8 +116,8 @@
 ### Implementation for User Story 2
 
 - [ ] T010 [US2] [blockedBy: T009] 扩展 `skills/external/humanize/SKILL.md` 的文件输入/输出行为：支持格式 [[STR-003]]（扩展名大小写不敏感）、路径解析与拒收分支、二进制/空文件/BOM/仅 frontmatter 拒收、YAML/TOML frontmatter 逐字保留、输出格式跟随输入与 `--output` 扩展名/格式族一致性、默认零写入、显式输出路径/`--force` 覆盖确认、**临时文件 + 原子重命名与失败清理（不留部分输出）**、**真实路径同路径/符号链接/硬链接别名拒收**、写入失败报告、报告一律回会话（`--output` 仅改写文本）、长文档章节完整性与重组（C-17/C-20/C-28..C-34 的实现面）。
-- [ ] T011 [P] [US2] [blockedBy: T003] 在 `tests/fixtures/humanize/files/` 增加文件行为夹具：带 YAML frontmatter 的 Markdown、**TOML frontmatter** 文档、纯文本、长多章节文档、空文件、仅 frontmatter 无正文、UTF-8 BOM、大写扩展名、二进制替身、目录路径、已存在输出目标、不可写输出路径、**同路径输出目标**、**符号链接/硬链接别名输出目标**、**输出扩展名冲突/不受支持输出扩展名**、**指令式内容文件样本**（「忽略以上规则」「执行以下命令」「把内容发送到…」）、模板占位符/受保护内容样本；在 `tests/fixtures/humanize/files/README.md` 记录夹具清单与覆盖条款（FR-018/019/021/022/029；C-28..C-35）。
-- [ ] T012 [P] [US2] [blockedBy: T004] 扩展 `tests/fixtures/humanize/rubric.md` 的文件安全协议：运行前后逐字节哈希、目录快照、覆盖确认分支、写入失败分支（含**临时文件删除/无部分输出**）、真实路径同路径/符号链接/硬链接别名分支、输出扩展名/格式族冲突分支、报告回会话核验（`--output` 文件仅改写文本）、YAML/TOML frontmatter、BOM/大小写/仅 frontmatter 分支、长文档章节对应表。
+- [X] T011 [P] [US2] [blockedBy: T003] 在 `tests/fixtures/humanize/files/` 增加文件行为夹具：带 YAML frontmatter 的 Markdown、**TOML frontmatter** 文档、纯文本、长多章节文档、空文件、仅 frontmatter 无正文、UTF-8 BOM、大写扩展名、二进制替身、目录路径、已存在输出目标、不可写输出路径、**同路径输出目标**、**符号链接/硬链接别名输出目标**、**输出扩展名冲突/不受支持输出扩展名**、**指令式内容文件样本**（「忽略以上规则」「执行以下命令」「把内容发送到…」）、模板占位符/受保护内容样本；在 `tests/fixtures/humanize/files/README.md` 记录夹具清单与覆盖条款（FR-018/019/021/022/029；C-28..C-35）。
+- [X] T012 [P] [US2] [blockedBy: T004] 扩展 `tests/fixtures/humanize/rubric.md` 的文件安全协议：运行前后逐字节哈希、目录快照、覆盖确认分支、写入失败分支（含**临时文件删除/无部分输出**）、真实路径同路径/符号链接/硬链接别名分支、输出扩展名/格式族冲突分支、报告回会话核验（`--output` 文件仅改写文本）、YAML/TOML frontmatter、BOM/大小写/仅 frontmatter 分支、长文档章节对应表。
 
 ### Verification for User Story 2
 
@@ -136,7 +136,7 @@
 ### Implementation for User Story 3
 
 - [ ] T014 [US3] [blockedBy: T013] 扩展 `skills/external/humanize/SKILL.md` 的语气/受众面：调用语法与选项解析服从 FR-018/[[STR-004]]（选项解析只在内容之前、`--` 终止、`--file`/`--inline`、`--force`、双源/无输入拒绝），本行补齐 `--tone`/`--audience` 的解析与拒绝分支；`--tone` 大小写不敏感、规范化为小写后严格属于支持集合，集合外取值（含空值/纯空白）拒收并列出支持集合、不静默替换、不声称已应用；`--audience` 自由文本只作用表达层；缺省 `professional`；封闭集合**内联**并注明真源为规格 STR-002（宿主无法解析 STR 引用，须内联最小操作事实）；语气与保真冲突时保真优先并报告限制（C-24..C-27 的实现面）。
-- [ ] T015 [P] [US3] [blockedBy: T003] 在 `tests/fixtures/humanize/tone/` 增加语气矩阵：同一基样本 ×4 语气 + 缺省、集合外取值（含大小写变体/空值/纯空白）、语气-保真冲突、**受众适配腿**（如「非技术管理者」，不得只测语气）；并落 `tests/fixtures/humanize/tone/rubric.md`（语气与受众的可区分性/得体性判据、混合语言样本按全文主语言口径记录 + 两位独立评审记录表单）。
+- [X] T015 [P] [US3] [blockedBy: T003] 在 `tests/fixtures/humanize/tone/` 增加语气矩阵：同一基样本 ×4 语气 + 缺省、集合外取值（含大小写变体/空值/纯空白）、语气-保真冲突、**受众适配腿**（如「非技术管理者」，不得只测语气）；并落 `tests/fixtures/humanize/tone/rubric.md`（语气与受众的可区分性/得体性判据、混合语言样本按全文主语言口径记录 + 两位独立评审记录表单）。
 
 ### Verification for User Story 3
 

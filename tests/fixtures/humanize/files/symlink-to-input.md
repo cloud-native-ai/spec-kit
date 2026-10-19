@@ -1,0 +1,1 @@
+input-for-same-path.md
