@@ -69,7 +69,7 @@ Expected: each seed REC- id has a register.md pointer row in the same commit; ta
 
 ```bash
 # in an isolated worktree; substitute <…> placeholders per the face's convention line
-python3 .specify/scripts/python/run-determination.py --action determine --unit-id "/speckit.plan" --unit-type command --run-id s63-test-$(date -u +%Y%m%dT%H%M%SZ) --complexity standard
+python3 .specify/scripts/python/run-determination.py --action determine --unit-id "/speckit.plan" --unit-type command --run-id s63-test-$(date -u +%Y%m%dT%H%M%SZ) --complexity complex
 python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "/speckit.plan" --unit-type command --run-id s63-test-x --review "test" --points "No significant optimization points identified this run."
 python3 .specify/scripts/python/run-determination.py --action determine --unit-id x --unit-type y        # missing ≥2 → ONE error listing all
 python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check                           # zero drift after recompile
