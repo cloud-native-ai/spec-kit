@@ -38,6 +38,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import string
 import sys
 import unicodedata
 from collections import Counter
@@ -163,12 +164,15 @@ def protected_spans(text: str) -> list[tuple[int, int]]:
     return spans
 
 
+_BLANK_KEEP = set(string.punctuation) | {"\n"}
+
+
 def strip_protected(text: str) -> str:
     spans = protected_spans(text)
     chars = list(text)
     for a, b in spans:
         for i in range(a, min(b, len(chars))):
-            if chars[i] != "\n":  # newline-preserving: keeps line/sentence segmentation
+            if chars[i] not in _BLANK_KEEP:  # keep newlines AND punctuation: blanking must not remove sentence terminators (e.g. the `?` inside a URL) or add them — raw/blanked segmentation stays identical
                 chars[i] = " "
     stripped = "".join(chars)
     # length-preserving number blank-out (keeps raw/stripped sentence index alignment)

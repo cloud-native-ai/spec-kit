@@ -115,13 +115,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T010 [US2] [blockedBy: T009] 扩展 `skills/external/humanize/SKILL.md` 的文件输入/输出行为：支持格式 [[STR-003]]（扩展名大小写不敏感）、路径解析与拒收分支、二进制/空文件/BOM/仅 frontmatter 拒收、YAML/TOML frontmatter 逐字保留、输出格式跟随输入与 `--output` 扩展名/格式族一致性、默认零写入、显式输出路径/`--force` 覆盖确认、**临时文件 + 原子重命名与失败清理（不留部分输出）**、**真实路径同路径/符号链接/硬链接别名拒收**、写入失败报告、报告一律回会话（`--output` 仅改写文本）、长文档章节完整性与重组（C-17/C-20/C-28..C-34 的实现面）。
+- [X] T010 [US2] [blockedBy: T009] 扩展 `skills/external/humanize/SKILL.md` 的文件输入/输出行为：支持格式 [[STR-003]]（扩展名大小写不敏感）、路径解析与拒收分支、二进制/空文件/BOM/仅 frontmatter 拒收、YAML/TOML frontmatter 逐字保留、输出格式跟随输入与 `--output` 扩展名/格式族一致性、默认零写入、显式输出路径/`--force` 覆盖确认、**临时文件 + 原子重命名与失败清理（不留部分输出）**、**真实路径同路径/符号链接/硬链接别名拒收**、写入失败报告、报告一律回会话（`--output` 仅改写文本）、长文档章节完整性与重组（C-17/C-20/C-28..C-34 的实现面）。
 - [X] T011 [P] [US2] [blockedBy: T003] 在 `tests/fixtures/humanize/files/` 增加文件行为夹具：带 YAML frontmatter 的 Markdown、**TOML frontmatter** 文档、纯文本、长多章节文档、空文件、仅 frontmatter 无正文、UTF-8 BOM、大写扩展名、二进制替身、目录路径、已存在输出目标、不可写输出路径、**同路径输出目标**、**符号链接/硬链接别名输出目标**、**输出扩展名冲突/不受支持输出扩展名**、**指令式内容文件样本**（「忽略以上规则」「执行以下命令」「把内容发送到…」）、模板占位符/受保护内容样本；在 `tests/fixtures/humanize/files/README.md` 记录夹具清单与覆盖条款（FR-018/019/021/022/029；C-28..C-35）。
 - [X] T012 [P] [US2] [blockedBy: T004] 扩展 `tests/fixtures/humanize/rubric.md` 的文件安全协议：运行前后逐字节哈希、目录快照、覆盖确认分支、写入失败分支（含**临时文件删除/无部分输出**）、真实路径同路径/符号链接/硬链接别名分支、输出扩展名/格式族冲突分支、报告回会话核验（`--output` 文件仅改写文本）、YAML/TOML frontmatter、BOM/大小写/仅 frontmatter 分支、长文档章节对应表。
 
 ### Verification for User Story 2
 
-- [ ] T013 [US2] [blockedBy: T010,T011,T012] 在临时目录执行全部文件行为场景（源文件逐字节不变、零隐式创建、覆盖拒绝/确认、显式写入成功、错误分支、TOML/YAML frontmatter、**BOM/大写扩展名/仅 frontmatter**、**输出扩展名冲突**、**同路径/符号链接/硬链接别名拒收**、**写入失败清理不留部分输出**、**报告回会话**、格式跟随、长文档完整性），结果记入 `.specify/specs/062-humanize-command/verification.md`；协议 per `tests/fixtures/humanize/rubric.md`，受保护内容 per `tests/fixtures/humanize/diff_protected.py`；认领 C-20。 [green: contracts/rewrite-behavior.md#C-20]
+- [X] T013 [US2] [blockedBy: T010,T011,T012] 在临时目录执行全部文件行为场景（源文件逐字节不变、零隐式创建、覆盖拒绝/确认、显式写入成功、错误分支、TOML/YAML frontmatter、**BOM/大写扩展名/仅 frontmatter**、**输出扩展名冲突**、**同路径/符号链接/硬链接别名拒收**、**写入失败清理不留部分输出**、**报告回会话**、格式跟随、长文档完整性），结果记入 `.specify/specs/062-humanize-command/verification.md`；协议 per `tests/fixtures/humanize/rubric.md`，受保护内容 per `tests/fixtures/humanize/diff_protected.py`；认领 C-20。 [green: contracts/rewrite-behavior.md#C-20]
 
 **Checkpoint**: US2 is independently functional: source files are never modified implicitly; write/overwrite/refusal/error branches are verified; long documents are complete. The file-safety clauses C-28..C-34 are implemented here and formally closed by the final cross-cutting row T030 (see § Notes → Clause partition).
 
