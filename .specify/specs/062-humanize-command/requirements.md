@@ -233,6 +233,7 @@
 - **SC-008 Source**: 改动前用 `scripts/bash/run-tests.sh --names-out <file>` 冻结的排序失败节点名单，改动后用同一命令输出并以 `comm -13 baseline current` 断言为空；镜像检查用 `sync-mirrors.py --check` 与生成脚本的 `--check` 模式对照冻结基线。
 - **SC-009 Source**: 对命令模板、技能文档、参考文档与命令输出做全量文本检索，逐条核对检测器措辞。
 - **SC-010 Source**: 依赖清单差异、源码中新增网络调用检索，以及无额外网络能力的执行演练。
+- **SC-011 Source**: 固定语料注入样本（内联腿与文件腿各一）的运行记录：逐项核对命令行为改变数与外发/越权动作数（均为 0），加会话报告注入提示的存在性检查（100% 覆盖）。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
 

@@ -59,6 +59,7 @@
 ├── research.md          # 无独立文件——Phase 0 发现内联于本文件 § Phase 0（<50 行且全内部证据）
 ├── requirements.md      # /speckit.requirements 产物（已澄清）
 ├── checklists/requirements.md  # 质量清单（requirements 阶段 16/16 pass）
+├── checklists/requirements-quality.md  # 调查清单（checklist 阶段新增，f2fe4027）
 ├── data-model.md        # Phase 1 output — 8 实体（E1–E8）+ 30 条校验规则
 ├── quickstart.md        # Phase 1 output — 8 场景（S1–S6 实跑留痕 + S7–S8 逐例免责）
 ├── contracts/           # Phase 1 output — 3 文件 35 条款
@@ -66,13 +67,14 @@
 │   ├── rewrite-behavior.md         # C-11..C-23 + C-35：四维度改写行为、保真与注入防线
 │   └── tone-input-file.md          # C-24..C-34：语气、输入解析与文件行为
 ├── feature-ref.md       # Phase 1 output — FR 29/29 映射 + SC 11/11 映射 + 交付清单 + 基线记录
-├── notes/               # 冻结基线（本 plan 产出，6 文件）
+├── notes/               # 冻结基线（本 plan 产出，6 文件）+ 后续阶段新增记录（source-requirement.md[requirements 修复轮]；pre-change-measurements.md、red-first-evidence.md、e8-run/[implement 期]）
 │   ├── baseline-regen-check.txt       # 生成面基线（零漂移）
 │   ├── baseline-mirror-check.txt      # 镜像基线（209 条既有 DIFF；第 181 行为触碰对 probe-definitions.md）
 │   ├── baseline-test-run.txt          # 测试基线全量日志（`*.log` 被 git 忽略，取 .txt 可提交形态）
 │   ├── baseline-failed-tests.txt      # 71 条排序失败节点名单（SC-008 对照基线）
 │   ├── baseline-compile-check.txt     # 编译面基线（73/73 旧指纹漂移，逐单元名单）
-│   └── baseline-compile-unit-no-scope.txt  # `--unit` 不限定 compile-embeds 范围的实测留痕
+│   ├── baseline-compile-unit-no-scope.txt  # `--unit` 不限定 compile-embeds 范围的实测留痕
+│   └── source-requirement.md          # 语义权威与源需求原文 dated record（requirements 修复轮归档）
 ├── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 └── verification.md     # Implementation output (/speckit.implement command)
 ```
