@@ -201,7 +201,7 @@
 - **FR-029**: watcher MUST 把流式进度只当作可见性信号：进度行数/增长 MUST NOT 单独产生 `DONE` 或 `TIMEOUT`；完成仍须哨兵加 U4 独立校验，超时仍只由阶段 deadline 产生。既有判定与退出码 MUST 保持不变。[[STR-001]]
 - **FR-030**: 若 CLI 不支持 stream-json 或派生失败，runner MUST 回退到既有缓冲模式，在状态脊记录 [[STR-004]] 及原因，并继续以退出记录 + 哨兵 + deadline 判定；回退 MUST NOT 自行产生伪完成或阶段失败。
 - **FR-031**: 阶段派发 MUST 在本地与远端两种拓扑下都完全脱离驱动会话：以 `nohup` 启动 runner，stdin 接 `/dev/null`，stdout/stderr 重定向到文件，使驱动 agent 进程/会话结束（远端 SSH 断开或本地进程退出）MUST NOT 向阶段子代理发送终止信号或关闭其 stdio。脱离 MUST 是默认形态，不是可选变体。
-- **FR-032**: 脱离后驱动 MUST 仍能监听、校验与重入：四件套（pid / status / log / heartbeat）与状态脊字段保持；新会话 MUST 能用 `--once` 快照接管；已完成的阶段 MUST 被核验而非重新派发。脱离 MUST NOT 削弱 U3/U4。[[STR-005]]
+- **FR-032**: 脱离后驱动 MUST 仍能监听、校验与重入：四件套（pid / status / log / heartbeat）与状态脊字段保持；新会话 MUST 能用 `--once` 快照接管；已完成的阶段 MUST 被核验而非重新派发。脱离 MUST NOT 削弱 U3/U4。
 - **FR-033**: watcher MUST 支持把派生实时日志作为哨兵来源，并保留 raw stream 作为证据；其自测 MUST 覆盖：非终止事件中的哨兵字样不计、终止结果事件中的哨兵计、派生失败降级不伪完成、脱离 runner 在驱动退出后存活。[[STR-002]]
 - **FR-034**: 进度可见 MUST 减少盲轮询：驱动等待 MUST 仍是既有长轮询窗口，实时日志只在窗口内被读取用于可见性；MUST NOT 新增独立 `sleep` 回合或按固定节奏空转的 agent 循环。
 - **FR-035**: raw stream 与派生实时日志 MUST 作为 U4/U5 与事后审计证据保留，沿用运行既有产物约定；MUST NOT 引入新的常驻服务、守护进程或外部依赖。
@@ -282,7 +282,7 @@
 | `STR-002` | "-DONE" | FR-028, FR-033 |
 | `STR-003` | "checklist=skipped(fast-lane)" | FR-004, FR-005 |
 | `STR-004` | "progress=degraded" | FR-030 |
-| `STR-005` | "ANOMALY:" | FR-021, FR-032 |
+| `STR-005` | "ANOMALY:" | FR-021 |
 
 **Citation convention**: When an FR, contract, task, or test references one of these strings, write `[[STR-NNN]]` instead of copy-pasting the literal. CI / `/speckit.analyze` can then verify that every `[[STR-NNN]]` reference resolves to a row in this section.
 
