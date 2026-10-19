@@ -178,3 +178,46 @@ Notable records:
 - **BOM / upper-case / TOML**: BOM tolerated and not counted as body (rewrite PASS, 7 items); `.MD` extension matched case-insensitively (23 items); TOML `+++` frontmatter preserved verbatim (17 items).
 
 **T010/T013 closure**: SC-005 file-behavior legs all green (source byte-identity 100%, zero implicit files, overwrite refusal 100%, explicit write complete 100%, invalid-input clean rejection 100%); C-20 claimed; C-17/C-28..C-34 implementation+execution evidence complete. **s11 补正记录**：本节初稿曾声称 s11 已 PASS 而实际未执行——发现后立即补跑：`inline/s11-plain-zh.txt` → `notes/e8-run/s11-rewritten.txt`，diff PASS（20 items，发布窗口 11月3日→11月10日、3.7万元、v5.5.3 等全部保留），`--plaintext-check` 零候选。以本行记录为准。
+
+---
+
+## 语气与受众矩阵 — SC-004 两评审判定 + 修复轮 (T016, 2026-10-19)
+
+Method: 8 legs（T-default / T-professional / T-humorous / T-empathetic / T-colloquial / T-audience / T-external / T-conflict）同输入 `tests/fixtures/humanize/tone/base-sample.md`；两位 fresh-context 只读评审（A/B，无共享草稿，非输出作者）按 `tests/fixtures/humanize/tone/rubric.md` 独立判定；每腿保真以 `diff_protected.py` 佐证。输出归档 `notes/e8-run/tone/T-*.md`；拒收/冲突腿记录 `notes/e8-run/tone/external-legs.log`。
+
+### 第一轮评审评分表（原始记录）
+
+| 腿 | A：可区分(盲评) | A：得体 | A：保真 diff | A 判定 | B：可区分(盲评) | B：得体 | B：保真 diff | B 判定 |
+|----|----------------|---------|--------------|--------|----------------|---------|--------------|--------|
+| T-default | ✓ | ✓ | exit 0 (10/10) | pass | ✓ | ✓ | exit 0 | pass |
+| T-professional | ✓ | ✓ | exit 0 | pass | ✓ | ✓ | exit 0 | pass |
+| T-humorous | ✓ | ✓ | exit 0 | pass | ✓ | ✓ | exit 0 | pass |
+| T-empathetic | ✓（负面事实未弱化） | ✓ | exit 0 | pass | ✓ | ✓ | exit 0 | pass |
+| T-colloquial | ✓（术语保留） | ✓ | exit 0 | pass | ✓ | ✓ | exit 0 | pass |
+| T-audience | —（不适用盲评） | ✓ 文本本身适配 | exit 0 | **FAIL** | — | ✓ | exit 0 | **FAIL** |
+| T-external | 拒收 ✓ 支持集合字面 ✓ | — | —（无输出文本） | pass | ✓ | — | — | pass |
+| T-conflict | 保真优先 ✓ 限制报告 ✓ | — | exit 0 | pass | ✓ | — | exit 0 | pass |
+
+- 盲评配对：两位评审均 5/5 正确（判据 1 pass）。
+- **T-audience FAIL（两位评审一致）**：
+  - 评审 A ANOMALY：`T-audience-annotations.json 仅含标题 1 条注记，未覆盖任一正文新增框架句（如「换句话说，响应速度仍是客户离开的主要原因之一，这是下阶段要优先解决的问题。」，该句后半亦缺输入蕴含依据）`——rubric 判据 3「新增句逐条有输入蕴含依据」适用判据 fail 即该腿 fail。
+  - 评审 B ANOMALY（两条）：注记仅覆盖标题；「这是下阶段要优先解决的问题」构成新增事实（输入未含的前瞻承诺，FR-004 禁止）。
+  - 两位评审一致认定：输出文本本身的受众适配（白话解释、术语处理）合格，注记产物补全后可翻案。
+- 分歧解决：无——两份判定一致，rubric 分歧程序未触发。
+
+### 修复轮（T016 内闭环）
+
+1. **删除无依据承诺句**：T-audience.md 句尾「，这是下阶段要优先解决的问题。」移除（输入未含的前瞻承诺）；句改为「换句话说，响应速度仍是客户离开的主要原因之一。」（由「12 家中 7 家提到响应时效不达标」严格可推）。
+2. **注记扩全**：`T-audience-annotations.json` 1 条 → 8 条，逐句给出输入蕴含依据（标题、概括句、工单白话解释、首响体验改述、流失率句、换句话句、自助率白话解释、培训期句）；每条 basis 均引用输入中真实存在的事实。
+3. **确定性复跑**：`diff_protected.py --annotations` → EXIT=0，RESULT: PASS (16 item lines)，10/10 数字不变量 preserved。
+
+### 复审（第三位 fresh-context 只读评审，2026-10-19）
+
+- 逐字盘点 10 句：无残留前瞻承诺（`下阶段|优先解决|接下来|计划|承诺` 零命中）。
+- 8 条注记全部命中且 basis 诚实（逐条核验引用事实存在于输入）；唯一未注记句「我们对 12 家流失客户做了访谈…」判定为输入访谈句的近一对一改写（12/7/归因全保留），非新增。
+- 受众适配 pass（4 处技术指标均配非技术受众白话解释）；diff EXIT=0。
+- **最终判定：T-audience 翻案为 pass；复审回传异常行：未发现异常。**
+
+### SC-004 结论
+
+判据 1 盲评 5/5×2 评审 ✓；判据 2 得体性全腿 ✓（empathetic 未弱化流失率、colloquial 术语保留）；判据 3 T-audience 修复后逐条蕴含 ✓；判据 4 全腿 diff exit 0（事实/结论改变数 0）；判据 5 T-external 三取值（funny/空串/纯空白）全拒收并含支持集合字面 ✓；判据 6 T-conflict 保真优先+限制报告 ✓。默认语气被判定为专业自然的比例为 8 腿矩阵中 T-default 腿两位评审一致判定（2/2）；任何语气与受众组合下事实或结论改变数为 0。**SC-004 判定：pass**（两位评审 + 修复轮 + 独立复审全记录在案）。

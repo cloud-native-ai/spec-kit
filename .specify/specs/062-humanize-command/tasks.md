@@ -135,12 +135,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T014 [US3] [blockedBy: T013] 扩展 `skills/external/humanize/SKILL.md` 的语气/受众面：调用语法与选项解析服从 FR-018/[[STR-004]]（选项解析只在内容之前、`--` 终止、`--file`/`--inline`、`--force`、双源/无输入拒绝），本行补齐 `--tone`/`--audience` 的解析与拒绝分支；`--tone` 大小写不敏感、规范化为小写后严格属于支持集合，集合外取值（含空值/纯空白）拒收并列出支持集合、不静默替换、不声称已应用；`--audience` 自由文本只作用表达层；缺省 `professional`；封闭集合**内联**并注明真源为规格 STR-002（宿主无法解析 STR 引用，须内联最小操作事实）；语气与保真冲突时保真优先并报告限制（C-24..C-27 的实现面）。
+- [X] T014 [US3] [blockedBy: T013] 扩展 `skills/external/humanize/SKILL.md` 的语气/受众面：调用语法与选项解析服从 FR-018/[[STR-004]]（选项解析只在内容之前、`--` 终止、`--file`/`--inline`、`--force`、双源/无输入拒绝），本行补齐 `--tone`/`--audience` 的解析与拒绝分支；`--tone` 大小写不敏感、规范化为小写后严格属于支持集合，集合外取值（含空值/纯空白）拒收并列出支持集合、不静默替换、不声称已应用；`--audience` 自由文本只作用表达层；缺省 `professional`；封闭集合**内联**并注明真源为规格 STR-002（宿主无法解析 STR 引用，须内联最小操作事实）；语气与保真冲突时保真优先并报告限制（C-24..C-27 的实现面）。
 - [X] T015 [P] [US3] [blockedBy: T003] 在 `tests/fixtures/humanize/tone/` 增加语气矩阵：同一基样本 ×4 语气 + 缺省、集合外取值（含大小写变体/空值/纯空白）、语气-保真冲突、**受众适配腿**（如「非技术管理者」，不得只测语气）；并落 `tests/fixtures/humanize/tone/rubric.md`（语气与受众的可区分性/得体性判据、混合语言样本按全文主语言口径记录 + 两位独立评审记录表单）。
 
 ### Verification for User Story 3
 
-- [ ] T016 [US3] [blockedBy: T014,T015] 执行语气矩阵并由两位 fresh-context 只读评审独立判定（四语气 + 缺省 + **受众适配**均可区分且得体、事实/结论零改变、集合外取值被拒且不声称已应用）；两份评分表与结论记入 `.specify/specs/062-humanize-command/verification.md`；判定 per `tests/fixtures/humanize/tone/rubric.md`；认领 C-24..C-27。 [green: contracts/tone-input-file.md#C-24] [green: contracts/tone-input-file.md#C-25] [green: contracts/tone-input-file.md#C-26] [green: contracts/tone-input-file.md#C-27]
+- [X] T016 [US3] [blockedBy: T014,T015] 执行语气矩阵并由两位 fresh-context 只读评审独立判定（四语气 + 缺省 + **受众适配**均可区分且得体、事实/结论零改变、集合外取值被拒且不声称已应用）；两份评分表与结论记入 `.specify/specs/062-humanize-command/verification.md`；判定 per `tests/fixtures/humanize/tone/rubric.md`；认领 C-24..C-27。 [green: contracts/tone-input-file.md#C-24] [green: contracts/tone-input-file.md#C-25] [green: contracts/tone-input-file.md#C-26] [green: contracts/tone-input-file.md#C-27]
 
 **Checkpoint**: US3 is independently functional: all four tones and the default are distinguishable and appropriate, with fidelity intact.
 
