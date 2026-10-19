@@ -88,6 +88,23 @@
 - **watcher**：判定表与退出码不变；可选 `--raw-stream` 只输出成长/字节证据；自测覆盖非终止哨兵、终止哨兵、派生失败、脱离存活。
 - **脱离**：远端保留 `ssh+su+nohup`；本地 `nohup ... </dev/null >runner-log 2>&1 &`（可用时 `setsid`）；派发记录 `detached`；重入 `--once` 只核验不重派。
 
+### Verification & Mutation Plan (red-first)
+
+- **Red-first**：5 个新脚本（`admission-check.py`、`derive-live-log.py`、`audit-test-budget.py`、`audit-plan-changes.py`、`stage-runner.sh`）与 watch-target 扩展均先写失败测试，再实现；每个 red 运行的时间、命令与失败断言记入 `verification.md`，不事后补记。
+- **变异演练**（实现期逐项执行、立即还原、记录证据；任一项未变红即视为该测试不设防）：
+
+| 目标 | 变异 | 必须变红的测试 |
+|------|------|----------------|
+| admission-check | 放宽 FR/任务区间端点；把 SC 行计入 FR；删去 (c)/(d) 扫描；接受多行 lines manifest | `test_admission_check.py` 边界/计数/路径/单线用例 |
+| derive-live-log | 对非终止事件输出裸哨兵；在 result 之前追加结果文本；删除 result 提取 | `test_derive_live_log.py` 三类哨兵用例 |
+| audit-test-budget | 允许第三个槽位；缺 `exception_reason` 仍通过；用计数比较替代名称级差集；忽略日志扫描命中 | `test_audit_test_budget.py` 槽位/例外/差集/扫描用例 |
+| audit-plan-changes | 忽略未提交改动；忽略空声明仍判 declared | `test_audit_plan_changes.py` 未声明/未提交用例 |
+| stage-runner | stream 能力可用时强选 buffered；跳过 status 写入；去掉 detached 记录 | runner 集成测试（stream/degraded/detached） |
+| watch-target | 让进度增长产生 DONE；从 raw 直接读哨兵 | `watch-target.sh --self-test` 与 stream 用例 |
+
+- **既有断言的有意更新**：C-3 的 H2 集合新增 `Efficiency Optimizations` 一节；C-4 的 `sed` 派生断言改为 `stage-runner.sh`。两项在 tasks 中以独立任务记录理由，禁止静默删除。
+- **镜像与基线**：每个脚本落盘后跑 `sync-mirrors.py --write --only skills/external`，以 `--check` 本对零 drift 为验收；全量测试的 name-level 基线在 implement 起点冻结，变异演练后复跑并确认零新增失败。
+
 ## Project Structure
 
 ### Documentation (this spec)
