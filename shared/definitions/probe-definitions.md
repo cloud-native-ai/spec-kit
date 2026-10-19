@@ -96,6 +96,7 @@
 | skill-document-utils-wrapup | skill-wrapup | skill:document-utils | wrap-up |
 | skill-draw-diagram-wrapup | skill-wrapup | skill:draw-diagram | wrap-up |
 | skill-git-utils-wrapup | skill-wrapup | skill:git-utils | wrap-up |
+| skill-humanize-wrapup | skill-wrapup | skill:humanize | wrap-up |
 | gate-git-workflow-tiered-mode | skill-gate | skill:git-utils | gate-git-workflow-tiered-mode |
 | skill-improve-agent-wrapup | skill-wrapup | skill:improve-agent | wrap-up |
 | skill-improve-docs-wrapup | skill-wrapup | skill:improve-docs | wrap-up |
@@ -234,6 +235,7 @@
 | h-feedback-record | @point:wrap-up | all | 69 单元现均有反馈记录面 |
 | h-threshold-notice | @point:wrap-up | all | 消费 h-run-determination 判定结果(order 10 → 30 次序约束 FR-008/FR-014) |
 | h-token-reflection | @point:wrap-up | all | owner 链:Token 效率自评在 Reflection procedure step 2 |
+| h-docs-sync-eval | @point:wrap-up | skill-humanize-wrapup | humanize 技能的 Documentation 面(062;技能侧首个 docs 绑定) |
 | h-docs-sync-eval | @point:wrap-up | speckit-analyze-wrapup | /speckit.analyze 的 Documentation 面(T019 矩阵;正枚举,免扣减语义) |
 | h-docs-sync-eval | @point:wrap-up | speckit-checklist-wrapup | /speckit.checklist 的 Documentation 面 |
 | h-docs-sync-eval | @point:wrap-up | speckit-clarify-wrapup | /speckit.clarify 的 Documentation 面 |

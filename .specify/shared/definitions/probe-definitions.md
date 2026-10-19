@@ -1,7 +1,7 @@
 # Probe Definitions(全框架探测点真源·伞形)
 
 > **Single source of truth** for Probe(探测点)definitions across the whole
-> framework — canonical at `.specify/shared/definitions/probe-definitions.md`, mirrored
+> framework — canonical at `shared/definitions/probe-definitions.md`, mirrored
 > to `.specify/shared/definitions/`. 伞形定位:本文件是全框架唯一 Probe 真源;
 > **Feedback Probe(反馈插点)是其首个域实例**(commands/skills 收尾面,
 > 既有 Class×Object 行语义不变),散布的引擎侧探测点(050 升级探测 / 运行判定
@@ -35,10 +35,10 @@
 | command-gate | internal | 保留确认点触发后的用户决定观察事实(门控必要性证据) | commands | record→threshold→package→manual→mark-submitted | confirm-gate | — |
 | skill-gate | internal | 保留确认点触发后的用户决定观察事实(门控必要性证据) | skills | record→threshold→package→manual→mark-submitted | confirm-gate | — |
 | skill-evaluation-form | internal | 绘图技能交付产物后由用户主动给出的 Evaluation Form(绘制评价单),用于评价该次已交付结果 | skills | record→threshold→package→manual→mark-submitted | evaluation-form | — |
-| trigger-escalation | internal | 050 主动流程触发的 P1–P5 升级探测(确定性存在性/计数/差集,永不读制品正文) | scripts | assess→suggest(非阻塞建议行) | situation | `.specify/scripts/python/trigger-utils.py`:`run_probes` |
-| run-determination | internal | 运行判定四轴测量与两个可用性探测(token/elapsed/artifact_correctness/satisfaction;session store / evidence lane) | scripts | determine→session-record→route-into-feedback | wrap-up | `.specify/scripts/python/run-determination.py`:`AXES`,`probe_session_store`,`probe_evidence_lane` |
-| evidence-lane | internal | 证据引擎 lane 的可用性探测(node 运行时 / session store / 平台存储清单) | scripts | collect→findings.json | collect | `.specify/scripts/python/evidence-utils.py`:`LANE_NAMES`,`probe_node`,`probe_session_store`,`probe_platforms` |
-| exec-quant | internal | 受测单元执行的环境与质量遥测采集(agent 程序 / LLM 详细 / 质量指标;exec-quant durable store,Recording Only) | scripts | collect→durable-record | wrap-up | `.specify/scripts/python/exec-quant.py`:`ACTIONS`,`build_record`,`resolve_run_identity` |
+| trigger-escalation | internal | 050 主动流程触发的 P1–P5 升级探测(确定性存在性/计数/差集,永不读制品正文) | scripts | assess→suggest(非阻塞建议行) | situation | `scripts/python/trigger-utils.py`:`run_probes` |
+| run-determination | internal | 运行判定四轴测量与两个可用性探测(token/elapsed/artifact_correctness/satisfaction;session store / evidence lane) | scripts | determine→session-record→route-into-feedback | wrap-up | `scripts/python/run-determination.py`:`AXES`,`probe_session_store`,`probe_evidence_lane` |
+| evidence-lane | internal | 证据引擎 lane 的可用性探测(node 运行时 / session store / 平台存储清单) | scripts | collect→findings.json | collect | `scripts/python/evidence-utils.py`:`LANE_NAMES`,`probe_node`,`probe_session_store`,`probe_platforms` |
+| exec-quant | internal | 受测单元执行的环境与质量遥测采集(agent 程序 / LLM 详细 / 质量指标;exec-quant durable store,Recording Only) | scripts | collect→durable-record | wrap-up | `scripts/python/exec-quant.py`:`ACTIONS`,`build_record`,`resolve_run_identity` |
 
 ## Objects
 
@@ -96,6 +96,7 @@
 | skill-document-utils-wrapup | skill-wrapup | skill:document-utils | wrap-up |
 | skill-draw-diagram-wrapup | skill-wrapup | skill:draw-diagram | wrap-up |
 | skill-git-utils-wrapup | skill-wrapup | skill:git-utils | wrap-up |
+| skill-humanize-wrapup | skill-wrapup | skill:humanize | wrap-up |
 | gate-git-workflow-tiered-mode | skill-gate | skill:git-utils | gate-git-workflow-tiered-mode |
 | skill-improve-agent-wrapup | skill-wrapup | skill:improve-agent | wrap-up |
 | skill-improve-docs-wrapup | skill-wrapup | skill:improve-docs | wrap-up |
@@ -133,24 +134,24 @@
 | gate-summarize-project-structure-freeze | skill-gate | skill:summarize-project | gate-summarize-project-structure-freeze |
 | gate-summarize-project-degraded-gates | skill-gate | skill:summarize-project | gate-summarize-project-degraded-gates |
 | skill-draw-diagram-evaluation-form | skill-evaluation-form | skill:draw-diagram | evaluation-form |
-| trigger-p1-feature-dir | trigger-escalation | .specify/scripts/python/trigger-utils.py | situation |
-| trigger-p2-clarification-markers | trigger-escalation | .specify/scripts/python/trigger-utils.py | situation |
-| trigger-p3-tasks-state | trigger-escalation | .specify/scripts/python/trigger-utils.py | situation |
-| trigger-p4-feedback-threshold | trigger-escalation | .specify/scripts/python/trigger-utils.py | situation |
-| trigger-p5-instructions-staleness | trigger-escalation | .specify/scripts/python/trigger-utils.py | situation |
-| rd-axis-token-consumption | run-determination | .specify/scripts/python/run-determination.py | wrap-up |
-| rd-axis-elapsed | run-determination | .specify/scripts/python/run-determination.py | wrap-up |
-| rd-axis-artifact-correctness | run-determination | .specify/scripts/python/run-determination.py | wrap-up |
-| rd-axis-satisfaction | run-determination | .specify/scripts/python/run-determination.py | wrap-up |
-| rd-probe-session-store | run-determination | .specify/scripts/python/run-determination.py | wrap-up |
-| rd-probe-evidence-lane | run-determination | .specify/scripts/python/run-determination.py | wrap-up |
-| evidence-probe-node | evidence-lane | .specify/scripts/python/evidence-utils.py | collect |
-| evidence-probe-session-store | evidence-lane | .specify/scripts/python/evidence-utils.py | collect |
-| evidence-probe-platforms | evidence-lane | .specify/scripts/python/evidence-utils.py | collect |
-| eq-collect-execution | exec-quant | .specify/scripts/python/exec-quant.py | wrap-up |
-| eq-probe-host-process | exec-quant | .specify/scripts/python/exec-quant.py | wrap-up |
-| eq-probe-host-config | exec-quant | .specify/scripts/python/exec-quant.py | wrap-up |
-| eq-probe-determination-link | exec-quant | .specify/scripts/python/exec-quant.py | wrap-up |
+| trigger-p1-feature-dir | trigger-escalation | scripts/python/trigger-utils.py | situation |
+| trigger-p2-clarification-markers | trigger-escalation | scripts/python/trigger-utils.py | situation |
+| trigger-p3-tasks-state | trigger-escalation | scripts/python/trigger-utils.py | situation |
+| trigger-p4-feedback-threshold | trigger-escalation | scripts/python/trigger-utils.py | situation |
+| trigger-p5-instructions-staleness | trigger-escalation | scripts/python/trigger-utils.py | situation |
+| rd-axis-token-consumption | run-determination | scripts/python/run-determination.py | wrap-up |
+| rd-axis-elapsed | run-determination | scripts/python/run-determination.py | wrap-up |
+| rd-axis-artifact-correctness | run-determination | scripts/python/run-determination.py | wrap-up |
+| rd-axis-satisfaction | run-determination | scripts/python/run-determination.py | wrap-up |
+| rd-probe-session-store | run-determination | scripts/python/run-determination.py | wrap-up |
+| rd-probe-evidence-lane | run-determination | scripts/python/run-determination.py | wrap-up |
+| evidence-probe-node | evidence-lane | scripts/python/evidence-utils.py | collect |
+| evidence-probe-session-store | evidence-lane | scripts/python/evidence-utils.py | collect |
+| evidence-probe-platforms | evidence-lane | scripts/python/evidence-utils.py | collect |
+| eq-collect-execution | exec-quant | scripts/python/exec-quant.py | wrap-up |
+| eq-probe-host-process | exec-quant | scripts/python/exec-quant.py | wrap-up |
+| eq-probe-host-config | exec-quant | scripts/python/exec-quant.py | wrap-up |
+| eq-probe-determination-link | exec-quant | scripts/python/exec-quant.py | wrap-up |
 | skill-analyze-artifacts-wrapup | skill-wrapup | skill:analyze-artifacts | wrap-up |
 | skill-clarify-artifact-wrapup | skill-wrapup | skill:clarify-artifact | wrap-up |
 | skill-create-checklist-wrapup | skill-wrapup | skill:create-checklist | wrap-up |
@@ -186,15 +187,15 @@
 
 | handler_id | kind | action | mode | order | behavior_owner |
 |------------|------|--------|------|-------|----------------|
-| h-run-determination | engine | determine | non-blocking | 10 | .specify/scripts/python/run-determination.py |
-| h-exec-quant | engine | collect | non-blocking | 15 | .specify/scripts/python/exec-quant.py |
-| h-feedback-record | engine | record | non-blocking | 20 | .specify/scripts/python/feedback-utils.py |
-| h-threshold-notice | agent | Threshold prompt protocol (canonical semantics for step 6) | non-blocking | 30 | .specify/shared/workflow/feedback-step.md |
-| h-token-reflection | agent | Reflection procedure (the embedded step points here) | non-blocking | 40 | .specify/shared/workflow/feedback-step.md |
-| h-docs-sync-eval | agent | Evaluation procedure (the embedded step points here) | non-blocking | 50 | .specify/shared/workflow/docs-step.md |
-| h-situation-assess | engine | assess | non-blocking | 10 | .specify/scripts/python/trigger-utils.py |
-| h-team-phase-summary | agent | Summary Refresh (all patterns) | non-blocking | 20 | .specify/skills/internal/create-team/SKILL.md |
-| h-gate-evidence | gate | 门控观察协议 (Gate Observation Protocol) | non-blocking | 30 | .specify/shared/guidelines/confirmation-gates.md |
+| h-run-determination | engine | determine | non-blocking | 10 | scripts/python/run-determination.py |
+| h-exec-quant | engine | collect | non-blocking | 15 | scripts/python/exec-quant.py |
+| h-feedback-record | engine | record | non-blocking | 20 | scripts/python/feedback-utils.py |
+| h-threshold-notice | agent | Threshold prompt protocol (canonical semantics for step 6) | non-blocking | 30 | shared/workflow/feedback-step.md |
+| h-token-reflection | agent | Reflection procedure (the embedded step points here) | non-blocking | 40 | shared/workflow/feedback-step.md |
+| h-docs-sync-eval | agent | Evaluation procedure (the embedded step points here) | non-blocking | 50 | shared/workflow/docs-step.md |
+| h-situation-assess | engine | assess | non-blocking | 10 | scripts/python/trigger-utils.py |
+| h-team-phase-summary | agent | Summary Refresh (all patterns) | non-blocking | 20 | skills/internal/create-team/SKILL.md |
+| h-gate-evidence | gate | 门控观察协议 (Gate Observation Protocol) | non-blocking | 30 | shared/guidelines/confirmation-gates.md |
 
 ## HandlerBinding
 
@@ -234,6 +235,7 @@
 | h-feedback-record | @point:wrap-up | all | 69 单元现均有反馈记录面 |
 | h-threshold-notice | @point:wrap-up | all | 消费 h-run-determination 判定结果(order 10 → 30 次序约束 FR-008/FR-014) |
 | h-token-reflection | @point:wrap-up | all | owner 链:Token 效率自评在 Reflection procedure step 2 |
+| h-docs-sync-eval | @point:wrap-up | skill-humanize-wrapup | humanize 技能的 Documentation 面(062;技能侧首个 docs 绑定) |
 | h-docs-sync-eval | @point:wrap-up | speckit-analyze-wrapup | /speckit.analyze 的 Documentation 面(T019 矩阵;正枚举,免扣减语义) |
 | h-docs-sync-eval | @point:wrap-up | speckit-checklist-wrapup | /speckit.checklist 的 Documentation 面 |
 | h-docs-sync-eval | @point:wrap-up | speckit-clarify-wrapup | /speckit.clarify 的 Documentation 面 |
@@ -265,11 +267,11 @@
 > MUST NOT 参与任何对账计数(probes --validate / reconcile 的计数断言排除本节)。
 > requirements 输入例举的「git probe」未定位到具名代码探针,故本目录不含虚构条目。
 
-- `.specify/scripts/bash/check-prerequisites.sh` — writability:L149 起的 write-bit 预探针(命令前置 fail-fast 可写性探测)
-- `.specify/scripts/python/derive-utils.py` — probe-links:`probe_links`(L819)URL 可达性微探针,derive 核实前置
-- `.specify/scripts/python/sanitize-utils.py` — probe-roots:`probe_roots`(L267)材料根清点微探针,sanitize 域内消费
-- `.specify/scripts/python/validate-tasks.py` — read-only governor:L87–92 只读指向检测探针(引用形命令识别)
-- `.specify/scripts/python/clause_extract.py` — mutual-exclusion:L16/L148 三正交则互斥探测微探针
+- `scripts/bash/check-prerequisites.sh` — writability:L149 起的 write-bit 预探针(命令前置 fail-fast 可写性探测)
+- `scripts/python/derive-utils.py` — probe-links:`probe_links`(L819)URL 可达性微探针,derive 核实前置
+- `scripts/python/sanitize-utils.py` — probe-roots:`probe_roots`(L267)材料根清点微探针,sanitize 域内消费
+- `scripts/python/validate-tasks.py` — read-only governor:L87–92 只读指向检测探针(引用形命令识别)
+- `scripts/python/clause_extract.py` — mutual-exclusion:L16/L148 三正交则互斥探测微探针
 
 ## External Probe 登记契约
 

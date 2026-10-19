@@ -2,7 +2,7 @@
 
 Driven by ``contracts/command-classification.md``: every **complex** command
 template carries the feedback step; every **simple** template (``agents``,
-``constitution``, ``feature``) does NOT.
+``constitution``, ``feature``, ``humanize``) does NOT.
 
 Since the 2026-09-24 Known-Gap closure the two lists below are **derived from the
 contract table**, not hand-maintained beside it — the table is the operative
@@ -92,7 +92,7 @@ def test_classification_counts():
     # The one place these literals are pinned (test_docs_command_template.py::test_c8
     # deliberately does not restate them, to keep a reclassification a one-file edit).
     assert len(COMPLEX_COMMANDS) == 23
-    assert len(SIMPLE_COMMANDS) == 3
+    assert len(SIMPLE_COMMANDS) == 4
 
 
 def test_table_covers_every_command_template():

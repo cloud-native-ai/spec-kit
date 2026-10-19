@@ -25,9 +25,10 @@ PROBE_DEFS_MIRROR = REPO_ROOT / ".specify" / "shared" / "definitions" / "probe-d
 
 # C-12 pin: baseline skill rosters measured 2026-10-14 (see spec notes/pre-change-measurements.md).
 # A pinned list is the sanctioned "literal pinned in a test" duplicate (Constitution XIV).
+# Updated 2026-10-19: humanize added as an external skill (feature 062).
 BASELINE_EXTERNAL = [
     "create-docs", "create-pages", "create-skills", "database-utils", "document-utils",
-    "draw-diagram", "git-utils", "improve-docs", "improve-skills", "merge-skills",
+    "draw-diagram", "git-utils", "humanize", "improve-docs", "improve-skills", "merge-skills",
     "sdd-loop-driver", "sdd-project-setup", "think-skills",
 ]
 BASELINE_INTERNAL = [
@@ -148,16 +149,16 @@ def test_c8_run_team_frontmatter_classification_and_skill_id():
     assert 'skill_id: "<SKILL:.specify/skills/internal/run-team/SKILL.md>"' in text
 
 
-# --- C-9: compiled wrap-up embeds, zero drift, 73 units ---
+# --- C-9: compiled wrap-up embeds, zero drift, 74 units (73 + humanize, feature 062) ---
 
-def test_c9_compile_embeds_zero_drift_73_units():
+def test_c9_compile_embeds_zero_drift_74_units():
     out = subprocess.run(
         ["python3", "scripts/python/probe-utils.py", "--action", "compile-embeds", "--check"],
         cwd=REPO_ROOT, capture_output=True, text=True,
     )
     combined = out.stdout + out.stderr
     assert out.returncode == 0, f"compile-embeds --check not clean:\n{combined[-800:]}"
-    assert "73 units" in combined, f"expected 73 units, got: {combined[-400:]}"
+    assert "74 units" in combined, f"expected 74 units, got: {combined[-400:]}"
     assert "zero drift" in combined
     for skill in (RUN_SKILLS, RUN_TEAM):
         assert "## Wrap-up" in _read(skill), f"missing compiled Wrap-up in {skill}"

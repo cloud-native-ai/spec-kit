@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 RUNTIME_SKILLS = ROOT / ".specify" / "skills"
 
-# Pinned census (classification v3): 13 external / 35 internal. These literals are a
+# Pinned census (classification v3): 14 external / 35 internal. These literals are a
 # drift detector for the split — update only together with the classification record.
 # 17 -> 11 on 2026-10-12: the six draw-* engine skills were merged into draw-diagram as
 # internal engine layers under draw-diagram/references/types/<engine>/ (capability
@@ -34,10 +34,12 @@ RUNTIME_SKILLS = ROOT / ".specify" / "skills"
 # none surfacing on the flat discovery face — which is exactly what these guards pin.
 # 12 -> 13 on 2026-10-16: sdd-project-setup added as an external skill (companion to
 # sdd-loop-driver; soft-collaboration contract, both independently runnable).
+# 13 -> 14 on 2026-10-19: humanize added as an external skill (feature 062 — generic
+# content-rewriting capability, no spec-kit-internal dependencies).
 EXTERNAL_SKILLS = {
     "create-docs", "improve-docs", "create-skills", "improve-skills", "create-pages",
     "database-utils", "document-utils", "draw-diagram", "merge-skills",
-    "think-skills", "git-utils", "sdd-loop-driver", "sdd-project-setup",
+    "think-skills", "git-utils", "sdd-loop-driver", "sdd-project-setup", "humanize",
 }
 INTERNAL_SKILLS = {
     "analyze-artifacts", "archive-session", "clarify-artifact", "code-review",
@@ -85,8 +87,8 @@ def internal_resolution_gaps(
 def test_flat_discovery_surfaces_external_layer_only():
     seen, offenders = flat_discovery_offenders(RUNTIME_SKILLS, EXTERNAL_SKILLS)
     # Sentinels: the face is non-empty and the exclusion is meaningful.
-    assert len(seen) == 13, (
-        f"flat discovery saw {len(seen)} skills, expected exactly the 13 external "
+    assert len(seen) == 14, (
+        f"flat discovery saw {len(seen)} skills, expected exactly the 14 external "
         f"ones — a count both proves non-vacuity and pins the split: {seen}"
     )
     internal_dir = RUNTIME_SKILLS / "internal"
