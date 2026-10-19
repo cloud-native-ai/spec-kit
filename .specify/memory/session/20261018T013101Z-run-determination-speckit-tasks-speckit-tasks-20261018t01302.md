@@ -20,7 +20,7 @@ summary: "/speckit.tasks run=speckit-tasks-20261018T013026Z token=not_evaluated 
   "feature": null,
   "feature_id": null,
   "determined_at": "2026-10-18T01:31:01Z",
-  "settled_at": null,
+  "settled_at": "2026-10-19T08:06:37Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -83,7 +83,7 @@ summary: "/speckit.tasks run=speckit-tasks-20261018T013026Z token=not_evaluated 
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "unknown",
@@ -159,8 +159,8 @@ summary: "/speckit.tasks run=speckit-tasks-20261018T013026Z token=not_evaluated 
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -190,7 +190,7 @@ summary: "/speckit.tasks run=speckit-tasks-20261018T013026Z token=not_evaluated 
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }
