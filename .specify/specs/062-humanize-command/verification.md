@@ -134,7 +134,7 @@ Reviewer non-failing observations (recorded for honesty): s01 praise-clause dele
 
 ## E8-Files — file-behavior execution (T013, 2026-10-19)
 
-Protocol per `tests/fixtures/humanize/rubric.md` § 文件安全协议；full decision log archived at `notes/e8-run/files-branches.log` (temp workspace, deleted after run). Skill surface for all file legs = T007/T010 (Stage 1/2/3/7).
+Protocol per `tests/fixtures/humanize/rubric.md` § 文件安全协议；full decision log archived at `notes/e8-run/files-branches.md` (temp workspace, deleted after run). Skill surface for all file legs = T007/T010 (Stage 1/2/3/7).
 
 ### Branch legs (15 decisions + mechanical post-state assertions)
 
@@ -183,7 +183,7 @@ Notable records:
 
 ## 语气与受众矩阵 — SC-004 两评审判定 + 修复轮 (T016, 2026-10-19)
 
-Method: 8 legs（T-default / T-professional / T-humorous / T-empathetic / T-colloquial / T-audience / T-external / T-conflict）同输入 `tests/fixtures/humanize/tone/base-sample.md`；两位 fresh-context 只读评审（A/B，无共享草稿，非输出作者）按 `tests/fixtures/humanize/tone/rubric.md` 独立判定；每腿保真以 `diff_protected.py` 佐证。输出归档 `notes/e8-run/tone/T-*.md`；拒收/冲突腿记录 `notes/e8-run/tone/external-legs.log`。
+Method: 8 legs（T-default / T-professional / T-humorous / T-empathetic / T-colloquial / T-audience / T-external / T-conflict）同输入 `tests/fixtures/humanize/tone/base-sample.md`；两位 fresh-context 只读评审（A/B，无共享草稿，非输出作者）按 `tests/fixtures/humanize/tone/rubric.md` 独立判定；每腿保真以 `diff_protected.py` 佐证。输出归档 `notes/e8-run/tone/T-*.md`；拒收/冲突腿记录 `notes/e8-run/tone/external-legs.md`。
 
 ### 第一轮评审评分表（原始记录）
 
