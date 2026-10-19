@@ -76,7 +76,7 @@ bash scripts/bash/run-tests.sh --names-out .specify/specs/062-humanize-command/n
 
 解读：71 个失败节点全部为 master 既有欠账（主体为镜像字节一致类，与 S2 的 209 条 DIFF 同源；含 `test_compile_propagation_order` 两项，与 S3 同源）。SC-008 的非回归判据：实现后同命令复跑，`comm -13 notes/baseline-failed-tests.txt <new-list>` 为空（零新增失败节点）；既有失败数允许减少（欠账被顺带修复），不允许增加。
 
-## S5 — 契约条款与 FR 覆盖（已实跑）
+## S5 — 契约条款与 FR 覆盖（已实跑，repair round 1 复跑）
 
 ```bash
 python3 -c "
@@ -87,24 +87,26 @@ for f in ['command-surface.md','rewrite-behavior.md','tone-input-file.md']:
     p='.specify/specs/062-humanize-command/contracts/'+f
     cs=extract_clauses(p)
     total+=len(cs)
-    print(f, len(cs), (cs[0]+'..'+cs[-1]) if cs else 'NONE')
+    print(f, len(cs), ','.join(cs) if cs else 'NONE')
 print('TOTAL', total)
 "
 ```
 
-实跑输出（2026-10-19）：
+实跑输出（2026-10-19 repair round 1；逐条列出条款 ID，不以首尾区间概写）：
 
 ```text
-command-surface.md 10 C-1..C-10
-rewrite-behavior.md 13 C-11..C-23
-tone-input-file.md 11 C-24..C-34
-TOTAL 34
+command-surface.md 10 C-1,C-2,C-3,C-4,C-5,C-6,C-7,C-8,C-9,C-10
+rewrite-behavior.md 14 C-11,C-12,C-13,C-14,C-15,C-16,C-17,C-18,C-19,C-20,C-21,C-22,C-23,C-35
+tone-input-file.md 11 C-24,C-25,C-26,C-27,C-28,C-29,C-30,C-31,C-32,C-33,C-34
+TOTAL 35
 ```
 
-FR 覆盖自检（`clause_blocks` 逐条款正文检索 FR 引用）实跑输出：
+解读：C-35（提示注入防线）落 rewrite-behavior.md 末节（repair round 1 裁定），故该文件条款为 C-11..C-23 + C-35 的非连续并集——上表逐条列出以避免「首..尾」区间概写掩盖非连续形态。
+
+FR 覆盖自检（`clause_blocks` 逐条款正文检索 FR 引用，FR-001..FR-029 全集）实跑输出（2026-10-19 repair round 1）：
 
 ```text
-covered: 28 missing: NONE
+covered: 29 missing: NONE
 ```
 
 ## S6 — 需求规格校验器（已实跑）
@@ -113,16 +115,17 @@ covered: 28 missing: NONE
 python3 .specify/scripts/python/validate-requirements.py .specify/specs/062-humanize-command/requirements.md
 ```
 
-实跑输出（2026-10-19）：
+实跑输出（2026-10-19 repair round 1 复跑）：
 
 ```text
+file: .specify/specs/062-humanize-command/requirements.md
 status: ok
   [id-contiguous] pass (0)
   [doc-order] pass (0)
   [ref-resolvable] pass (0)
   [marker-count] pass (0)
   [dup-id] pass (0)
-scanned: 244 lines, 38 definition rows, 3 shared strings
+scanned: 264 lines, 40 definition rows, 4 shared strings
 0 error(s), 0 warning(s)
 ```
 
@@ -131,7 +134,7 @@ scanned: 244 lines, 38 definition rows, 3 shared strings
 **免责（仅覆盖本场景，不外溢）**: 以下多步管线在命令与技能落盘前**无法执行**——`/speckit.humanize` 尚不存在，`skill-humanize-wrapup` 单元未注册。此免责即本场景对「命令尚不可运行」的全部声明范围；S1–S6 的已实跑示例不在免责内。
 
 **前提清单（实现期须逐项复测而非继承）**:
-1. `probe-definitions.md` 接受 `skill-wrapup` 类单元行与 `h-docs-sync-eval` 绑定行（既有 50 个技能同型行在册，2026-10-19 实测形态一致）；humanize 命令为 **Simple**，不注册命令单元（027 分类规则）。源侧编辑落点为框架源 `shared/definitions/probe-definitions.md`（两顶帽子：镜像经步骤 4 同步）。
+1. `probe-definitions.md` 接受 `skill-wrapup` 类单元行与 `h-docs-sync-eval` 绑定行（既有技能 wrap-up 注册行程序实测 48 条：`grep -cE '^\| skill-[a-z0-9-]+-wrapup \|' shared/definitions/probe-definitions.md`；编译单元 73 = 23 命令 + 50 技能——两项既有技能有编译面无注册行，属既有状态；2026-10-19 实测，计数取程序口径不手写）；humanize 命令为 **Simple**，不注册命令单元（027 分类规则）。源侧编辑落点为框架源 `shared/definitions/probe-definitions.md`（两顶帽子：镜像经步骤 4 同步）。
 2. `compile-embeds` 对「目标文件存在 + 单元已注册」的新技能单元会创建其 `## Wrap-up` 节（`_replace_sections` 语义，实现期以落盘结果验证）。
 3. `regen-command-copies.py` 从模板源生成 4 个副本（S1 已验证引擎工作正常，新命令副本形态为前提而非实测）。
 4. `sync-mirrors.py --write --only <prefix>` 接受可重复的 repo-relative 前缀（`--help` 实测文档形态：`--only scripts/python/feedback-utils.py` 例），特性限定同步不拖入无关漂移。
@@ -170,7 +173,9 @@ python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check
 **前提清单**: S7 的管线已完成（命令可被宿主加载）；E8 语料与 `rubric.md` 已落盘；两位独立评审可用。
 
 验证形态（对 E8 语料逐样本）：
-1. 内联样本：按 `rubric.md` 量规由两位独立评审独立判定四维度（C-11..C-15）；受保护内容由确定性差异脚本比对（C-16、C-17；改变数=0、编造数=0）。
-2. 文件样本：临时目录内执行，运行前后逐字节哈希比对源文件与未获确认的输出目标（C-30、C-31）；测试自身的临时目录清理步骤同样纳入验证（teardown 与 setup 同标准）。
-3. 长文档样本：章节对应性与完整性报告检查（C-20；SC-006）。
-4. 全部记录落 `verification.md`（/speckit.implement 产出）。
+1. 内联样本：按 `rubric.md` 量规由两位独立评审独立判定四维度（C-11..C-15）；受保护内容由确定性差异脚本按 SC-002 归一化口径比对（C-16、C-17；改变数=0、编造数=0、新增句逐条标注「输入蕴含」依据）；混合语言样本的主语言判定过程与结果随记录落档（C-22，FR-013 可复现判定）。
+2. 语气与受众矩阵：四种语气 + 缺省 + 受众适配腿（SC-004 的受众适配判定不得缺席；C-24..C-27）。
+3. 文件样本：临时目录内执行，运行前后逐字节哈希比对源文件与未获确认的输出目标（C-30、C-31）；真实路径同路径/符号链接别名分支与原子写入失败清理（不留部分输出）纳入断言；测试自身的临时目录清理步骤同样纳入验证（teardown 与 setup 同标准）。
+4. 注入防线样本：指令式内容威胁样本行为改变数 0、外发/越权动作数 0、100% 在会话报告中提示（C-35；FR-029/SC-011）。
+5. 长文档样本：章节对应性与完整性报告检查（C-20；SC-006，含 50% 窗口分段触发与估算依据报告）。
+6. 全部记录落 `verification.md`（/speckit.implement 产出）。

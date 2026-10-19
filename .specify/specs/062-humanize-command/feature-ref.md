@@ -15,44 +15,46 @@
 | FR-005 | C-14 | 格式与可读性优化 | rewrite-behavior.md |
 | FR-006 | C-15, C-10 | 降低 AI 痕迹 + 检测器诚实措辞 | rewrite-behavior.md, command-surface.md |
 | FR-007 | C-16, C-3 | 保真底线（最高优先级）+ 技能体落点 | rewrite-behavior.md, command-surface.md |
-| FR-008 | C-17, C-33 | 受保护内容逐字保留 + frontmatter 文件级实例 | rewrite-behavior.md, tone-input-file.md |
+| FR-008 | C-17, C-33 | 受保护内容（含模板占位符）逐字保留 + frontmatter（YAML/TOML）文件级实例 | rewrite-behavior.md, tone-input-file.md |
 | FR-009 | C-18 | 最小改动 | rewrite-behavior.md |
 | FR-010 | C-19 | 矛盾保留与报告 | rewrite-behavior.md |
-| FR-011 | C-20 | 完整性（不静默截断） | rewrite-behavior.md |
+| FR-011 | C-20 | 完整性（不静默截断；估算 token 超窗口 50% 分段触发） | rewrite-behavior.md |
 | FR-012 | C-21 | 完整改写文本为主要输出 | rewrite-behavior.md |
-| FR-013 | C-22 | 语言保持 | rewrite-behavior.md |
+| FR-013 | C-22 | 语言保持（主语言可复现判定：书写系统计数、并列取首个非空正文段落、分段服从全文口径） | rewrite-behavior.md |
 | FR-014 | C-24 | 缺省语气 `professional` | tone-input-file.md |
 | FR-015 | C-25, C-3 | 封闭语气集合 + 自由文本受众（[[STR-002]]） | tone-input-file.md, command-surface.md |
 | FR-016 | C-26 | 语气不覆盖保真 | tone-input-file.md |
 | FR-017 | C-27 | 集合外语气值拒收 | tone-input-file.md |
-| FR-018 | C-28 | 单输入源 + 空内联拒收 | tone-input-file.md |
+| FR-018 | C-1, C-28 | 确定性调用语法（[[STR-004]]、`--` 终止、文件/内联判定）+ 单输入源/空内联拒收 | command-surface.md, tone-input-file.md |
 | FR-019 | C-29 | 文件格式与路径解析（[[STR-003]]） | tone-input-file.md |
-| FR-020 | C-30, C-3 | 默认不写文件 + 技能体落点 | tone-input-file.md, command-surface.md |
-| FR-021 | C-31 | 显式输出路径 + 覆盖确认 + 失败报告 | tone-input-file.md |
-| FR-022 | C-32 | 输出格式跟随输入 | tone-input-file.md |
-| FR-023 | C-20 | 长文档跨章节一致与重组 | rewrite-behavior.md |
+| FR-020 | C-30, C-3 | 默认不写文件 + 真实路径同路径判定（含符号链接/硬链接别名）+ 技能体落点 | tone-input-file.md, command-surface.md |
+| FR-021 | C-31 | 显式输出路径 + `--force` 覆盖确认 + 临时文件/原子重命名 + 失败清理 + 报告回会话 | tone-input-file.md |
+| FR-022 | C-32 | 输出格式跟随输入 + `--output` 扩展名/格式族一致 + 纯文本封闭清单 | tone-input-file.md |
+| FR-023 | C-20, C-22 | 长文档跨章节一致与重组；分段语言判定服从全文主语言口径 | rewrite-behavior.md |
 | FR-024 | C-1, C-2, C-3 | 薄入口、单一技能、技能体自足 | command-surface.md |
 | FR-025 | C-4, C-5, C-6, C-7 | 按工具副本、docs 页、注册行、编译面 | command-surface.md |
 | FR-026 | C-9, C-23 | 确定性契约测试 + 行为评估协议 | command-surface.md, rewrite-behavior.md |
 | FR-027 | C-5, C-10 | 文档义务 + 检测器诚实措辞 | command-surface.md |
 | FR-028 | C-8, C-34 | 零新增运行时 + 数据不外传 | command-surface.md, tone-input-file.md |
+| FR-029 | C-35, C-5 | 输入按数据处理（提示注入防线：不改行为、不跳过保真/拒收/零外传、会话提示）+ docs 声明面 | rewrite-behavior.md, command-surface.md |
 
-映射完整性：FR-001..FR-028 共 28 条全部被条款正文引用（`clause_blocks` 逐条款检索实跑：covered 28 / missing NONE，2026-10-19）。
+映射完整性：FR-001..FR-029 共 29 条全部被条款正文引用（`clause_blocks` 逐条款检索实跑：covered 29 / missing NONE，2026-10-19 repair round 1 复跑）。
 
 ## SC → 验证映射
 
 | SC | 验证方式 | 证据落点 |
 |----|----------|----------|
 | SC-001 | E8 语料（≥8 样本）+ `rubric.md` 两位独立评审量规判定 | verification.md（实现期） |
-| SC-002 | 确定性差异脚本逐项比对（invariant set 改变数=0、编造数=0、蕴含标注） | verification.md + 差异脚本输出 |
-| SC-003 | 语言矩阵夹具复核 + 受保护 token 清单比对 | verification.md |
-| SC-004 | 语气矩阵（同夹具 ×4 语气 + 缺省）两位评审区分度判定 | verification.md |
+| SC-002 | 确定性差异脚本按归一化口径逐项比对（invariant set 改变数=0、编造数=0、新增句逐条蕴含标注；数字/单位/日期归一化、百分比/版本号/标识符/URL/代码 token 逐字） | verification.md + 差异脚本输出 |
+| SC-003 | 语言矩阵夹具复核（混合语言按 FR-013 可复现判定，判定过程与结果进验证记录）+ 受保护 token 清单比对（清单由 FR-008 集合 + 模板占位符 + 代码标识符 + URL/版本号构造） | verification.md |
+| SC-004 | 语气与受众矩阵（同夹具 ×4 语气 + 缺省 + 受众适配腿）两位评审区分度与得体性判定 | verification.md |
 | SC-005 | 临时目录文件行为测试：逐字节哈希、目录快照、覆盖确认与错误分支断言 | 契约测试运行记录 + verification.md |
 | SC-006 | 长文档样本章节对应性检查 + 未处理部分报告断言 | verification.md |
 | SC-007 | 命令面清点（模板/4 副本/docs/注册行）+ `regen-command-copies.py --check` | quickstart S1 判据 + 契约测试 |
 | SC-008 | `comm -13 notes/baseline-failed-tests.txt <新名单>` 为空；两处下游钉扎测试（C-9：`test_feedback_command_classification.py` 分类表含 humanize=Simple、`test_skill_layer_visibility_guards.py` 外部技能普查 +1）复跑绿；镜像触碰对绝对字节一致、不触碰对零 NEW drift（C-4） | notes/baseline-failed-tests.txt（71 条冻结名单）+ verification.md |
 | SC-009 | 模板/技能/docs/输出全量文本检索逐条核对检测器措辞 | 契约测试（test_c10）+ verification.md |
 | SC-010 | 依赖清单差异 + 新增网络调用检索 + 无网络环境演练声明 | verification.md |
+| SC-011 | 注入防线腿：固定语料指令式内容样本行为改变数 0、外发/越权动作数 0、会话报告提示 100%（确定性断言 + 评审/记录核对） | verification.md + 文件行为/评估记录 |
 
 **交付面清单（17 项，实现期按此对账）**
 
