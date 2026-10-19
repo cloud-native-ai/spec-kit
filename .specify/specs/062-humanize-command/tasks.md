@@ -100,8 +100,8 @@
 
 ### Verification for User Story 1
 
-- [ ] T008 [US1] [blockedBy: T006,T007] 执行 E8 内联样本（中文/英文/单句/受保护内容/矛盾/已自然）并逐例记录输入、输出与量规判定到 `.specify/specs/062-humanize-command/verification.md`；受保护内容 per `tests/fixtures/humanize/diff_protected.py` 逐项比对；认领 C-11..C-19。 [green: contracts/rewrite-behavior.md#C-11] [green: contracts/rewrite-behavior.md#C-12] [green: contracts/rewrite-behavior.md#C-13] [green: contracts/rewrite-behavior.md#C-14] [green: contracts/rewrite-behavior.md#C-15] [green: contracts/rewrite-behavior.md#C-16] [green: contracts/rewrite-behavior.md#C-17] [green: contracts/rewrite-behavior.md#C-18] [green: contracts/rewrite-behavior.md#C-19]
-- [ ] T009 [US1] [blockedBy: T008] 由两位 fresh-context 只读评审 per `tests/fixtures/humanize/rubric.md` 独立评分 US1 内联样本（适用维度失败即样本失败）；两份评分表与修复复跑结论记入 `verification.md`；任一失败先修技能并重跑 T008 后再关闭本行。
+- [X] T008 [US1] [blockedBy: T006,T007] 执行 E8 内联样本（中文/英文/单句/受保护内容/矛盾/已自然）并逐例记录输入、输出与量规判定到 `.specify/specs/062-humanize-command/verification.md`；受保护内容 per `tests/fixtures/humanize/diff_protected.py` 逐项比对；认领 C-11..C-19。 [green: contracts/rewrite-behavior.md#C-11] [green: contracts/rewrite-behavior.md#C-12] [green: contracts/rewrite-behavior.md#C-13] [green: contracts/rewrite-behavior.md#C-14] [green: contracts/rewrite-behavior.md#C-15] [green: contracts/rewrite-behavior.md#C-16] [green: contracts/rewrite-behavior.md#C-17] [green: contracts/rewrite-behavior.md#C-18] [green: contracts/rewrite-behavior.md#C-19]
+- [X] T009 [US1] [blockedBy: T008] 由两位 fresh-context 只读评审 per `tests/fixtures/humanize/rubric.md` 独立评分 US1 内联样本（适用维度失败即样本失败）；两份评分表与修复复跑结论记入 `verification.md`；任一失败先修技能并重跑 T008 后再关闭本行。
 
 **Checkpoint**: US1 is independently functional: inline rewriting meets the four dimensions and fidelity on the fixed corpus; default tone and language behavior are verified.
 
