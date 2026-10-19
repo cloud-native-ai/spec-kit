@@ -108,3 +108,66 @@ test_c15_top_command_list_includes_review
 ```
 
 Red is valid: every failure names content that has not landed yet.
+
+## US3 — T023/T024 red run (2026-10-20, implement attempt 2 续跑)
+
+Command:
+
+```
+python3 -m pytest tests/contract/test_probe_engine_action_sets.py tests/contract/test_engine_face_contract.py -q
+```
+
+Result: **17 failed, 7 passed** (exit 1). The 7 green legs are the C-24
+"must-remain byte-for-byte" pins (duplicate → `{"duplicate": true}` exit 0,
+no second record, no run-id minting — existing behavior already satisfies the
+clause, so green-before-and-after is the correct shape for an idempotivity
+pin) plus the renderer-no-handwritten-table structural pin over the CURRENT
+renderer.
+
+Failed (artifact-missing reasons, verbatim assertion tails):
+
+```
+test_feedback_utils_action_set_exact
+  AssertionError: feedback-utils.py --action set drifted: missing=['args-manifest']
+test_rundet_action_set_exact
+  AssertionError: run-determination.py ACTIONS set drifted: missing=['args-manifest']
+test_exec_quant_action_set_exact
+  AssertionError: exec-quant.py action set drifted: missing=['args-manifest']
+test_c22_all_wrap_up_engines_expose_args_manifest
+  AssertionError: run-determination.py --action args-manifest failed (rc=2):
+  … error: argument --action: invalid choice: 'args-manifest' (choose from 'determine', 'settle', 'history')
+test_c22_manifest_flags_live_on_the_engine_parser
+  (same missing-action cause)
+test_c22_determine_manifest_carries_the_normative_sets
+  (same missing-action cause)
+test_c22_record_manifest_required_set
+  (same missing-action cause)
+test_c20_face_renders_required_and_source_placeholders
+  AssertionError: the determine line MUST render the required set as placeholders
+  (rendered line today: `… --action determine --unit-id "/speckit.sandbox-a" --unit-type command` — no args tail)
+test_c20_convention_is_declared_in_the_registry_note
+  AssertionError: the placeholder convention MUST be declared in the registry § Handler note
+test_c20_convention_line_rendered_once_verbatim
+  (no convention line rendered today)
+test_c20_no_placeholder_free_section_carries_no_convention
+  (registry note lacks the declaration the negative leg reads)
+test_c21_rendered_flags_are_exactly_the_manifest_set
+  (manifests missing; rendered set today = base pair + --action only)
+test_c22_missing_manifest_fails_the_compile_loudly
+  AssertionError: mutation must actually strip the manifest action
+  (engines carry no "args-manifest" literal yet — the strip is a no-op)
+test_c20_repo_compiled_face_carries_the_full_argument_form
+  AssertionError: '--run-id <RUN_ID>' in <templates/commands/implement.md ## Wrap-up> is False
+test_c23_determine_lists_all_missing_args_in_one_error
+  AssertionError: '--complexity' in 'error: --run-id is required: the key is (unit_id, run_id)' is False
+  (sequential one-at-a-time error today — the exact C-23 defect)
+test_c23_determine_missing_unit_id_joins_the_one_error
+  (same sequential cause)
+test_c23_record_lists_all_missing_args_in_one_error
+  AssertionError: missing --review MUST be named in the one error:
+  error: --run-id is required.  (sequential one-at-a-time error today)
+```
+
+Red is valid: every failure names a mechanism that has not landed yet
+(args-manifest actions, manifest-driven rendering, registry convention
+declaration, one-shot missing-arg errors), not a mis-written assertion.

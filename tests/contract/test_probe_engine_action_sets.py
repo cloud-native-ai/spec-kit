@@ -4,11 +4,18 @@ Pins BOTH migration sides exactly (bidirectional: extra or missing action fails)
 - ``probe-utils.py`` allowed set: probes, map, probe-inject, handlers, compile-embeds
 - ``feedback-utils.py`` retained set: record, status, list, dispose, mark-submitted,
   reindex, package, cleanup, upstream, migrate-legacy, introspect-register
+- ``run-determination.py`` ACTIONS closure: determine, settle, history
+
+Amended by Feature 063 (C-22, 2026-10-20): each wrap-up engine (run-determination,
+feedback-utils, exec-quant) gains ``args-manifest`` — the machine-readable argument
+manifest the compile-embeds renderer consumes. The manifest action joins the engine
+action closed set; the owner contract (056 contracts/engine-action-sets.md) is
+updated in the same change.
 
 Also owns [C2] rule 5 for the registry side: every kind=engine Handler action
-must hit the REAL engine action union (feedback-utils 11 + run-determination
-ACTIONS + probe-utils 5), parsed from the argparse/constant literals — never a
-hand-copied list.
+must hit the REAL engine action union (feedback-utils + run-determination ACTIONS
++ probe-utils), parsed from the argparse/constant literals — never a hand-copied
+list.
 """
 from __future__ import annotations
 
@@ -26,8 +33,11 @@ EXECQUANT_SCRIPT = ROOT / "scripts" / "python" / "exec-quant.py"
 FEEDBACK_ALLOWED = {
     "record", "status", "list", "dispose", "mark-submitted", "reindex",
     "package", "cleanup", "upstream", "migrate-legacy", "introspect-register",
+    "args-manifest",
 }
 PROBE_ALLOWED = {"probes", "map", "probe-inject", "handlers", "compile-embeds"}
+# 063 C-22: the wrap-up engine's ACTIONS closure, exact-pinned both ways.
+RUNDET_ALLOWED = {"determine", "settle", "history", "args-manifest"}
 
 
 def _action_choices(path: Path) -> set[str]:
@@ -77,6 +87,16 @@ def test_feedback_utils_action_set_exact() -> None:
     )
 
 
+def test_rundet_action_set_exact() -> None:
+    """063 C-22: run-determination's ACTIONS closure, exact-pinned both ways
+    (args-manifest is a member of the closed set, not an out-of-band surface)."""
+    got = _rundet_actions()
+    assert got == RUNDET_ALLOWED, (
+        f"run-determination.py ACTIONS set drifted: extra={sorted(got - RUNDET_ALLOWED)} "
+        f"missing={sorted(RUNDET_ALLOWED - got)}"
+    )
+
+
 def test_engine_action_sets_disjoint() -> None:
     probe = _action_choices(PROBE_SCRIPT) if PROBE_SCRIPT.is_file() else set()
     overlap = _action_choices(FEEDBACK_SCRIPT) & probe
@@ -84,11 +104,12 @@ def test_engine_action_sets_disjoint() -> None:
 
 
 def test_exec_quant_action_set_exact() -> None:
-    """059 exact-pin: the new engine's action closure, read BOTH ways
-    (ACTIONS constant + argparse choices), is exactly the D1 closed set."""
+    """059 exact-pin + 063 C-22: the engine's action closure, read BOTH ways
+    (ACTIONS constant + argparse choices), is exactly the closed set."""
     assert EXECQUANT_SCRIPT.is_file(), "exec-quant.py missing — engine not implemented"
     got = _execquant_actions()
-    expected = {"collect", "list-records", "score", "collect-dispatch"}
+    expected = {"collect", "list-records", "score", "collect-dispatch",
+                "args-manifest"}
     assert got == expected, (
         f"exec-quant.py action set drifted: extra={sorted(got - expected)} "
         f"missing={sorted(expected - got)}"

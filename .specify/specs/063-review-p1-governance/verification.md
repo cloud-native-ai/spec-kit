@@ -219,6 +219,54 @@ batch (`compile-embeds --check` → 74 units zero drift, no write needed; `regen
   (32 baseline failures disappeared with the mirror sync — disappearances are not
   regressions; the 63-name baseline file is untouched).
 
+## US3 — T028 (C-20, C-21, C-22, C-23, C-24)
+
+- Targeted suites: `python3 -m pytest tests/contract/test_engine_face_contract.py
+  tests/contract/test_probe_engine_action_sets.py tests/contract/test_compile_embeds.py
+  tests/contract/test_compile_reconcile_guards.py tests/contract/test_phase2_bindings.py
+  tests/contract/test_run_determination_engine.py tests/contract/test_dogfooding_practice.py
+  tests/contract/test_run_skills_wiring.py -q` → **266 passed** (18/18 in the new
+  `test_engine_face_contract.py`; the pre-existing suites stay green under the
+  extended faces — `_CALL_ENGINE_RE` anchors on the `python3 <owner> --action <action>`
+  prefix, so the inline placeholder tails keep every structural consumer working).
+- Live face shape (per-tool `/speckit.implement` copy, post-recompile): the Run
+  Determination line carries `--run-id <RUN_ID> --complexity <COMPLEXITY>` inline plus
+  `` `；source args when available: `` `--session-file <SESSION_FILE> … --red-source <RED_SOURCE>`;
+  the registry-declared convention line renders once after the first placeholder-carrying
+  line; Exec Quant carries the source-only `--run-id <RUN_ID>`; Feedback Record carries
+  `--run-id <RUN_ID> --review <REVIEW> --points <POINTS>`. Banner fingerprint updated
+  by the recompile (`7877db82c58c`).
+- Intermediate projection (D-T8, forced inside US3): registry sync (`--only shared`) →
+  `compile-embeds` 74 units written → `regen-command-copies` → touched-mirror sync
+  (skills sub-prefixes synced per touched source prefix; the bare `--only skills` form
+  is a silent no-op — the pair names are `skills/external`/`skills/internal`, disclosed
+  here as an engine UX trap, not fixed in passing: it is a cross-feature engine
+  interface, out of this feature's declared scope).
+- Post-projection checks: `compile-embeds --check` → ok, 74 units, zero drift;
+  `regen-command-copies.py --check` → OK; `sync-mirrors.py --check` → 3 DIFF (all
+  pre-existing `.specify/agents` baseline drift, untouched prefix), 0 NEW vs the
+  202-DIFF `notes/baseline-mirror-check.txt`; touched pairs (shared/, scripts/,
+  skills/, templates→per-tool copies) absolutely consistent.
+- In-passing corrections disclosed (byte-budget amendments, same amendment shape as
+  the D-T8 forced recompile): C-20/C-21's inline manifest rendering grew the largest
+  compiled face to 2135 B, tripping three `1500 B` reference-not-copy budgets
+  (`test_feedback_step_reference_form.py::MAX_SECTION_BYTES`, and the inline `< 1500`
+  asserts in `test_docs_step_injection.py` + `test_derive_command_surface.py`) and
+  surfacing one stale closed-set pin (`test_exec_quant_engine.py::ACTIONS_CLOSED_SET`,
+  which had already drifted at 059 — collect-dispatch landed without the write-back).
+  All four amended with dated 063 comments; the reference-not-copy intent is unchanged
+  (OWNER_ONLY_LITERALS + docs-step cite assertions still enforce it); the C-21
+  mutation-drill guards in `test_engine_face_contract.py` prove the rendered set is
+  the engine manifest, not a hand-written copy. `scan-confirmation-gates.py` → 0
+  violations (rendered faces pass the wording gate).
+- Full-suite name-level comparison after the amendments: `run-tests.sh --names-out`
+  → 21 failed / 4050 passed; `comm -13 baseline-failed-tests.txt <names>` → **0 NEW**
+  (42 of the 63 baseline failures disappeared with the mirror sync; the remaining 21
+  are pre-existing baseline failures, not this feature's repair surface).
+- 062 read-only invariant: `git diff --stat -- .specify/specs/062-humanize-command/`
+  → empty. Symlinks 9/9 intact. `gate-check.py` over all 288 US3 write paths → exit 0.
+- Claim: C-20..C-24 green (clause partition row T028).
+
 # -- Free-form notes --
 
-notes=US1 complete (C-1..C-10 claimed by T011..T014). US2 complete (C-11..C-15 claimed by T022): C-12 adjudication landed via /speckit.instructions Action 5 (a8c3c1f0) with mechanism descriptions aligned this run; the 3 pre-existing contract failures reconciled (c27/c14 via regen+sync, c12 via the 053-window closure amendment, disclosed above). US3–US6 + Polish remain.
+notes=US1 complete (C-1..C-10 claimed by T011..T014). US2 complete (C-11..C-15 claimed by T022): C-12 adjudication landed via /speckit.instructions Action 5 (a8c3c1f0) with mechanism descriptions aligned this run; the 3 pre-existing contract failures reconciled (c27/c14 via regen+sync, c12 via the 053-window closure amendment, disclosed above). US3 complete (C-20..C-24 claimed by T028): args-manifest on all three wrap-up engines, one-shot missing-arg errors, manifest-driven renderer + registry convention line, 18/18 new face-contract suite, D-T8 forced intermediate projection, byte-budget/closed-set amendments disclosed above; full suite 21 failed / 4050 passed, 0 NEW vs the frozen baseline. US4–US6 + Polish remain.

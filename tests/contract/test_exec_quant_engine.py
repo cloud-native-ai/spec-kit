@@ -51,7 +51,11 @@ RUN_DETERMINATION = REPO_ROOT / "scripts" / "python" / "run-determination.py"
 #: explicit --workspace-root, so nothing may land here as a side effect).
 FRAMEWORK_STORE = REPO_ROOT / ".specify" / "memory" / "exec-quant"
 
-ACTIONS_CLOSED_SET = {"collect", "list-records", "score", "collect-dispatch"}
+# 063 C-22 (2026-10-20): args-manifest joins every wrap-up engine's closed set
+# (same-batch amendment; the docstring below had already drifted at 059 —
+# collect-dispatch landed without a write-back, per the 056 owner contract's
+# historical note).
+ACTIONS_CLOSED_SET = {"collect", "list-records", "score", "collect-dispatch", "args-manifest"}
 KIND = "speckit.exec-quant"  # [[STR-001]]
 NOT_EVALUATED = "not_evaluated"  # [[STR-002]]
 PROVENANCE_DOMAIN = {"measured", "carried", "user-given", "configured"}
@@ -235,7 +239,8 @@ def load_single_record(ws: Path) -> dict:
 # ===========================================================================
 
 class TestActionClosedSet:
-    """argparse choices closed set == {collect, list-records, score}."""
+    """argparse choices closed set == the engine's ACTIONS (4 domain actions from
+    059/047 + args-manifest per 063 C-22; see ACTIONS_CLOSED_SET above)."""
 
     def test_choices_exact(self):
         result = run_engine(["--action", "totally-bogus"])

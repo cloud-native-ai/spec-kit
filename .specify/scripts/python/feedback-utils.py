@@ -693,10 +693,70 @@ def write_report(path: Path, report: Dict[str, Any]) -> None:
 # --------------------------------------------------------------------------- #
 # Actions
 # --------------------------------------------------------------------------- #
+# Argument manifest (063 C-22): per-action required/source classification.
+# "required" = flags this engine itself validates as required (the same
+# classification the one-shot missing-argument check consumes — C-23);
+# "source" = this engine's DECLARED run-evidence input set (undeclared = []).
+# `--action args-manifest` verifies every listed flag against build_parser()'s
+# LIVE option strings before emitting — the parser stays the single source of
+# truth; the compile-embeds renderer consumes this and holds no table of its
+# own (063 C-21).
+ARG_MANIFEST = {
+    "record": {
+        "required": ["--unit-id", "--run-id", "--review", "--points"],
+        "source": [],
+    },
+    "status": {"required": [], "source": []},
+    "list": {"required": [], "source": ["--since", "--limit", "--contains",
+                                        "--slice", "--kind", "--disposition"]},
+    "dispose": {"required": ["--id", "--to"],
+                "source": ["--reason", "--ref"]},
+    "mark-submitted": {"required": [], "source": ["--notes"]},
+    "reindex": {"required": [], "source": []},
+    "package": {"required": [], "source": ["--include-introspection", "--all"]},
+    "cleanup": {"required": ["--package"], "source": ["--dry-run"]},
+    "upstream": {"required": [], "source": ["--set"]},
+    "migrate-legacy": {"required": ["--plan-file"], "source": []},
+    "introspect-register": {"required": ["--report-file"], "source": ["--confirm"]},
+    "args-manifest": {"required": [], "source": []},
+}
+
+# One-shot missing-argument error tails (C-23): the load-bearing guidance the
+# old sequential errors carried, kept per slot inside the SINGLE message.
+_RECORD_MISSING_GUIDANCE = {
+    "--unit-id": ("expected '/speckit.<command>', 'skill:<name>' or "
+                  "'custom:<owner>/<name>'"),
+    "--run-id": "the entry key is (unit_id, run_id)",
+    "--review / --review-file": "record requires a non-empty review",
+    "--points / --points-file": "at least one line; use '{NO_OP_POINT}' for a clean run",
+}
+
+
 def action_record(args: argparse.Namespace) -> Dict[str, Any]:
     workspace_root = resolve_workspace_root(args.workspace_root)
     unit_id = (args.unit_id or "").strip()
     unit_type = (args.unit_type or "").strip()
+    # C-23 (063): collect EVERY missing required argument first, then raise ONE
+    # FeedbackError naming them all — replaces the sequential one-at-a-time
+    # checks; the input-error exit code stays 2.
+    missing: List[str] = []
+    if not unit_id:
+        missing.append("--unit-id")
+    run_id = (args.run_id or "").strip()
+    if not run_id:
+        missing.append("--run-id")
+    review = read_review(args)
+    if not review.strip():
+        missing.append("--review / --review-file")
+    points = read_points(args)
+    if not points:
+        missing.append("--points / --points-file")
+    if missing:
+        raise FeedbackError(
+            "record is missing required arguments: "
+            + "; ".join(
+                f"{slot} ({_RECORD_MISSING_GUIDANCE[slot].format(NO_OP_POINT=NO_OP_POINT)})"
+                for slot in missing))
     if unit_id.startswith("custom:"):
         if not _CUSTOM_UNIT_RE.match(unit_id):
             raise FeedbackError(
@@ -713,19 +773,6 @@ def action_record(args: argparse.Namespace) -> Dict[str, Any]:
                 "--unit-type 'custom-unit' requires a 'custom:' --unit-id.")
         if unit_type not in ("skill", "command"):
             raise FeedbackError("--unit-type must be 'skill' or 'command'.")
-    run_id = (args.run_id or "").strip()
-    if not run_id:
-        raise FeedbackError("--run-id is required.")
-
-    review = read_review(args)
-    if not review.strip():
-        raise FeedbackError("record requires a non-empty --review / --review-file.")
-    points = read_points(args)
-    if not points:
-        raise FeedbackError(
-            "record requires --points / --points-file with at least one line "
-            f"(use '{NO_OP_POINT}' for a clean run)."
-        )
 
     # Probe resolution (requirement 041): with the registry installed, every
     # entry MUST carry probe attribution (engine-resolved; never caller-set).
@@ -1489,7 +1536,7 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         choices=["record", "status", "list", "dispose", "mark-submitted", "reindex",
                  "package", "cleanup", "upstream", "migrate-legacy",
-                 "introspect-register"],
+                 "introspect-register", "args-manifest"],
     )
     parser.add_argument("--package", default=None,
                         help="cleanup: path to the package zip (workspace-"
@@ -1566,6 +1613,32 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def action_args_manifest(args: argparse.Namespace) -> Dict[str, Any]:
+    """C-22 (063): machine-readable per-action argument manifest, BUILT FROM
+    this engine's own parser — every classified flag is verified against the
+    live parser's option strings before emitting. Pure query face: no
+    workspace access, no write."""
+    parser = build_parser()
+    live = {opt for act in parser._actions for opt in act.option_strings}
+    manifest: Dict[str, Any] = {}
+    for action in ("record", "status", "list", "dispose", "mark-submitted",
+                   "reindex", "package", "cleanup", "upstream", "migrate-legacy",
+                   "introspect-register", "args-manifest"):
+        spec = ARG_MANIFEST.get(action)
+        if spec is None:
+            raise FeedbackError(
+                f"args-manifest: action {action!r} has no manifest spec")
+        for key in ("required", "source"):
+            unknown = [f for f in spec[key] if f not in live]
+            if unknown:
+                raise FeedbackError(
+                    f"args-manifest: {action} {key} flags are not options of "
+                    f"this engine's parser: {unknown}")
+        manifest[action] = {"required": list(spec["required"]),
+                            "source": list(spec["source"])}
+    return manifest
+
+
 _ACTIONS = {
     "record": action_record,
     "status": action_status,
@@ -1578,6 +1651,7 @@ _ACTIONS = {
     "cleanup": action_cleanup,
     "migrate-legacy": action_migrate_legacy,
     "introspect-register": action_introspect_register,
+    "args-manifest": action_args_manifest,
 }
 
 
@@ -1627,7 +1701,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     except FeedbackError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
-    if args.format == "json" or args.action in ("record", "status", "mark-submitted", "reindex"):
+    if args.format == "json" or args.action in (
+            "record", "status", "mark-submitted", "reindex", "args-manifest"):
+        # args-manifest (063 C-22): pure JSON regardless of --format — the
+        # machine face the compile-embeds renderer consumes.
         print(json.dumps(payload, ensure_ascii=False, indent=2))
     else:
         print(render_text(args.action, payload))

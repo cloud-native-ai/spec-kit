@@ -123,7 +123,10 @@ def test_documentation_section_position_and_reference():
     body = _section(text, "## Wrap-up")
     assert "Docs Sync Eval" in body, "compiled wrap-up must carry the docs-sync call line"
     assert "docs-step.md" in body, "docs-sync line must cite the canonical docs-step convention"
-    assert len(body) < 1500, "Wrap-up must reference, not copy, the docs-sync rules"
+    # 063 C-20/C-21 amendment (2026-10-20): engine lines render the full
+    # args-manifest inline; budget raised 1500 -> 2500 with the reference-not-copy
+    # intent unchanged (docs-step.md cite assertion above unchanged).
+    assert len(body) < 2500, "Wrap-up must reference, not copy, the docs-sync rules"
     # The conclusion contract moved wholly into the owner when the manual section was
     # compiled away (056): the per-unit call line no longer restates it.
     owner = (REPO_ROOT / "shared" / "workflow" / "docs-step.md").read_text(encoding="utf-8")

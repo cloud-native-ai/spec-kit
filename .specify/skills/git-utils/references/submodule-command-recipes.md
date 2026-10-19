@@ -40,7 +40,7 @@ git -C <path> commit -m "[${PARENT_SLUG}] <what changed and why>"
 
 ```bash
 git add <path>                               # stages the new submodule SHA in the parent
-.specify/scripts/record-bump.sh <path>                # or ${SKILL_HOME}/scripts/record-bump.sh <path>
+scripts/record-bump.sh <path>                # or ${SKILL_HOME}/scripts/record-bump.sh <path>
 git commit -m "chore(submodule): bump <path> to $(git -C <path> rev-parse --short HEAD) (validating <topic>)"
 ```
 
@@ -48,7 +48,7 @@ git commit -m "chore(submodule): bump <path> to $(git -C <path> rev-parse --shor
 
 ```bash
 # run parent build/tests/app, then:
-.specify/scripts/record-bump.sh --status pass <path>   # or: fail
+scripts/record-bump.sh --status pass <path>   # or: fail
 ```
 
 ## 5. Hand off upstream

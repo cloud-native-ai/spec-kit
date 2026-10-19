@@ -23,6 +23,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -865,6 +866,75 @@ def _handler_label(handler_id: str) -> str:
     return " ".join(w.capitalize() for w in handler_id[2:].split("-"))
 
 
+# --- compiled-face argument rendering (063 C-20 / C-21 / C-22) ---------------
+# The renderer holds NO argument table of its own (C-21): every flag it renders
+# comes from the owner engine's args-manifest, fetched at compile time by
+# running the engine itself (C-22). The convention (placeholder syntax,
+# substitution rule, rendered-set membership) is declared ONCE in the registry
+# § Handler note — never per command hand-written (C-20).
+_IDENTITY_FLAGS = ("--unit-id", "--unit-type")
+_PLACEHOLDER_RE = re.compile(r"--[a-z-]+ <[A-Z_]+>")
+_CONVENTION_RE = re.compile(r"Compiled-face convention line[:：]\s*(.+)")
+
+
+def _placeholder(flag: str) -> str:
+    """Placeholder syntax per the registry § Handler note: flag name sans `--`,
+    hyphens → underscores, uppercased (`--run-id` ⇒ `<RUN_ID>`)."""
+    return "<" + flag.lstrip("-").replace("-", "_").upper() + ">"
+
+
+def _handler_note_convention(defs_text: str) -> Optional[str]:
+    m = _CONVENTION_RE.search(defs_text)
+    return m.group(1).strip() if m else None
+
+
+def _engine_script(workspace_root: Path, owner: str) -> Optional[Path]:
+    """The owner engine as an executable script: framework-source face first,
+    runtime face (.specify/) second — downstream projects only have the latter."""
+    for candidate in (workspace_root / owner,
+                      workspace_root / ".specify" / owner):
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def _engine_manifests(workspace_root: Path, owner: str, handler_id: str,
+                      cache: Dict[str, Any]) -> Dict[str, Any]:
+    """C-22 (063): the owner engine's argument manifest, obtained FROM the
+    engine at compile time (`--action args-manifest`). Any divergence — engine
+    missing, action absent, unparsable output — is a LOUD compile refusal;
+    never a silent unit-id-only fallback (registry/engine divergence is a
+    fast-fail surface)."""
+    key = f"{workspace_root.resolve()}|{owner}"
+    if key in cache:
+        return cache[key]
+    script = _engine_script(workspace_root, owner)
+    if script is None:
+        raise FeedbackError(
+            f"handler '{handler_id}': behavior_owner engine not found for the "
+            f"manifest fetch: {owner} (looked under the workspace root and "
+            f".specify/)")
+    proc = subprocess.run(
+        [sys.executable, str(script), "--action", "args-manifest"],
+        capture_output=True, text=True, check=False)
+    if proc.returncode != 0:
+        raise FeedbackError(
+            f"handler '{handler_id}': engine {owner} --action args-manifest "
+            f"failed (rc={proc.returncode}): {proc.stderr.strip()[:300]}")
+    try:
+        manifest = json.loads(proc.stdout)
+    except ValueError as exc:
+        raise FeedbackError(
+            f"handler '{handler_id}': engine {owner} args-manifest output is "
+            f"not JSON: {exc}")
+    if not isinstance(manifest, dict) or not manifest:
+        raise FeedbackError(
+            f"handler '{handler_id}': engine {owner} emits an empty "
+            "args-manifest")
+    cache[key] = manifest
+    return manifest
+
+
 def _fingerprint(handlers: List[Dict[str, str]],
                  bindings: List[Dict[str, str]]) -> str:
     blob = json.dumps([handlers, bindings], ensure_ascii=False, sort_keys=True)
@@ -872,7 +942,8 @@ def _fingerprint(handlers: List[Dict[str, str]],
 
 
 def _render_call_line(handler: Dict[str, str], unit_id: str, unit_type: str,
-                      index: int) -> str:
+                      index: int, workspace_root: Path,
+                      manifest_cache: Dict[str, Any]) -> str:
     kind = handler.get("kind", "")
     action = handler.get("action", "").strip("`")
     label = _handler_label(handler.get("handler_id", ""))
@@ -880,6 +951,26 @@ def _render_call_line(handler: Dict[str, str], unit_id: str, unit_type: str,
     if kind == "engine":
         cli = (f"python3 {owner} --action {action} "
                f"--unit-id \"{unit_id}\" --unit-type {unit_type}")
+        # C-20/C-21: the rendered argument tail is exactly the engine's own
+        # manifest — required set inline, declared source args as the
+        # "when available" clause; identity pair already carries real values.
+        manifest = _engine_manifests(workspace_root,
+                                     handler.get("behavior_owner", ""),
+                                     handler.get("handler_id", ""),
+                                     manifest_cache)
+        spec = manifest.get(action)
+        if not isinstance(spec, dict):
+            raise FeedbackError(
+                f"handler '{handler.get('handler_id', '')}': engine "
+                f"{handler.get('behavior_owner', '')} has no args-manifest "
+                f"entry for action '{action}' — registry/engine divergence")
+        req = [f for f in spec.get("required", []) if f not in _IDENTITY_FLAGS]
+        src = [f for f in spec.get("source", []) if f not in _IDENTITY_FLAGS]
+        if req:
+            cli += " " + " ".join(f"{f} {_placeholder(f)}" for f in req)
+        if src:
+            cli += ("`；source args when available: `"
+                    + " ".join(f"{f} {_placeholder(f)}" for f in src))
         return f"{index}. {label} — `{cli}`"
     if kind in ("agent", "gate"):
         return f"{index}. {label} — `{owner}` § \"{action}\""
@@ -887,10 +978,16 @@ def _render_call_line(handler: Dict[str, str], unit_id: str, unit_type: str,
 
 
 def render_wrap_up_section(handlers: List[Dict[str, str]], unit_id: str,
-                           is_skill: bool, fingerprint: str) -> str:
+                           is_skill: bool, fingerprint: str,
+                           workspace_root: Path,
+                           manifest_cache: Dict[str, Any],
+                           convention: Optional[str]) -> str:
     """One AUTO-GENERATED `## Wrap-up` section: banner, skill runtime-mode
     gate (FR-013), then one kind-derived call line per effective handler in
-    ascending order. Deterministic — same registry + unit ⇒ same bytes."""
+    ascending order. C-20 (063): when any engine line carries a placeholder,
+    exactly ONE convention line (text declared in the registry § Handler note)
+    renders right after that line. Deterministic — same registry + unit ⇒
+    same bytes."""
     lines = [
         _WRAP_UP_HEADING,
         "",
@@ -904,8 +1001,15 @@ def render_wrap_up_section(handlers: List[Dict[str, str]], unit_id: str,
         lines += [_SKILL_GATE_LINE, ""]
     unit_type = "skill" if is_skill else "command"
     ordered = sorted(handlers, key=lambda h: int(h.get("order", "") or 0))
+    convention_emitted = False
     for i, handler in enumerate(ordered, 1):
-        lines.append(_render_call_line(handler, unit_id, unit_type, i))
+        line = _render_call_line(handler, unit_id, unit_type, i,
+                                 workspace_root, manifest_cache)
+        lines.append(line)
+        if (convention and not convention_emitted
+                and _PLACEHOLDER_RE.search(line)):
+            lines.append(f"   {convention}")
+            convention_emitted = True
     lines.append("")
     return "\n".join(lines)
 
@@ -1052,6 +1156,8 @@ def action_compile_embeds(args: argparse.Namespace) -> Dict[str, Any]:
     # Phase-2 points (situation / phase-boundary / confirm-gate) declare
     # runtime subscriptions without touching compiled output — folding them in
     # would stale-date every banner on any phase-2 registry edit.
+    convention = _handler_note_convention(text)
+    manifest_cache: Dict[str, Any] = {}
     plans: List[Tuple[str, Path, Optional[str], set]] = []
     for unit_id, path in sorted(scan_compile_units(workspace_root).items()):
         is_skill = unit_id.startswith("skill:")
@@ -1060,8 +1166,20 @@ def action_compile_embeds(args: argparse.Namespace) -> Dict[str, Any]:
             handlers, bindings, "wrap-up")
         effective_ids = {h.get("handler_id", "") for h in effective}
         section = (render_wrap_up_section(effective, unit_id, is_skill,
-                                          fingerprint) if effective else None)
+                                          fingerprint, workspace_root,
+                                          manifest_cache, convention)
+                   if effective else None)
         plans.append((unit_id, path, section, effective_ids))
+    # C-20 (063): a placeholder-carrying face without a registry-declared
+    # convention is registry divergence — refuse loudly, never render a
+    # per-command hand-written convention.
+    for unit_id, _path, section, _ids in plans:
+        if section and _PLACEHOLDER_RE.search(section) and not convention:
+            raise FeedbackError(
+                f"compile-embeds refused: {unit_id} renders engine-line "
+                "placeholders but the registry § Handler note declares no "
+                "'Compiled-face convention line' (063 C-20 — the convention "
+                "MUST be declared in the registry, not hand-written)")
     wording_hits = []
     blocking = _blocking_re()
     for unit_id, _path, section, _ids in plans:

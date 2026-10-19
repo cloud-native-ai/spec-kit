@@ -263,7 +263,12 @@ class TestEngineSurface:
                 eng.EXIT_NOT_FOUND, eng.EXIT_INVALID) == (0, 2, 3, 4)
 
     def test_action_set_is_closed(self, eng):
-        assert tuple(eng.ACTIONS) == ("determine", "settle", "history")
+        # Amended by Feature 063 (C-22, 2026-10-20): the wrap-up engine gains
+        # `args-manifest` (the machine-readable argument manifest the
+        # compile-embeds renderer consumes). Exact pin updated same-batch;
+        # bidirectional ownership: tests/contract/test_probe_engine_action_sets.py.
+        assert tuple(eng.ACTIONS) == ("determine", "settle", "history",
+                                      "args-manifest")
 
     def test_unknown_action_exits_2(self, eng, ws):
         with pytest.raises(SystemExit) as exc:

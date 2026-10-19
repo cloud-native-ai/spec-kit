@@ -147,18 +147,18 @@
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T023 [P] [US3] 扩展 `tests/contract/test_probe_engine_action_sets.py`：`args-manifest` 加入三个 wrap-up 引擎（`scripts/python/run-determination.py`、`scripts/python/feedback-utils.py`、`scripts/python/exec-quant.py`）的 action 封闭集，并同步更新其 owner 契约（per `.specify/specs/056-probe-handler-system/contracts/engine-action-sets.md`，同批变更）（C-22 钉）；当前树先红，red 输出由 T025 统一落盘 per `notes/red-first-evidence.md`。
-- [ ] T024 [P] [US3] 新建 `tests/contract/test_engine_face_contract.py`：钉渲染器行为（kind=engine handler 行渲染该 action 必填参数全集 + 源参数、run 域值尖括号占位、约定行由 registry 声明而非逐命令手写、拒收参数不渲染且渲染器无手写参数表）、缺 ≥2 必填参数一次全列（两引擎、输入错误退出码 2 保持）、幂等变异演练（`(unit_id, run_id)` 重复返回 `duplicate: true` 且引擎任何路径不铸造/派生/替换 run-id）（C-20/C-21/C-23/C-24 钉）；当前树先红，red 输出由 T025 统一落盘 per `notes/red-first-evidence.md`。
-- [ ] T025 [US3] [blockedBy: T023,T024] 运行上述两个测试文件确认按预期红，把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
+- [X] T023 [P] [US3] 扩展 `tests/contract/test_probe_engine_action_sets.py`：`args-manifest` 加入三个 wrap-up 引擎（`scripts/python/run-determination.py`、`scripts/python/feedback-utils.py`、`scripts/python/exec-quant.py`）的 action 封闭集，并同步更新其 owner 契约（per `.specify/specs/056-probe-handler-system/contracts/engine-action-sets.md`，同批变更）（C-22 钉）；当前树先红，red 输出由 T025 统一落盘 per `notes/red-first-evidence.md`。
+- [X] T024 [P] [US3] 新建 `tests/contract/test_engine_face_contract.py`：钉渲染器行为（kind=engine handler 行渲染该 action 必填参数全集 + 源参数、run 域值尖括号占位、约定行由 registry 声明而非逐命令手写、拒收参数不渲染且渲染器无手写参数表）、缺 ≥2 必填参数一次全列（两引擎、输入错误退出码 2 保持）、幂等变异演练（`(unit_id, run_id)` 重复返回 `duplicate: true` 且引擎任何路径不铸造/派生/替换 run-id）（C-20/C-21/C-23/C-24 钉）；当前树先红，red 输出由 T025 统一落盘 per `notes/red-first-evidence.md`。
+- [X] T025 [US3] [blockedBy: T023,T024] 运行上述两个测试文件确认按预期红，把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] [blockedBy: T025] 实现 C-22+C-23：`scripts/python/run-determination.py`、`scripts/python/feedback-utils.py`、`scripts/python/exec-quant.py` 各暴露由自身 parser 派生的机器可读参数清单 action（`--action args-manifest`，输出 JSON `{action: {required: [...], source: [...]}}`，parser 为唯一真源、无手写副本）；同批把 `run-determination.py` 与 `feedback-utils.py` 的逐参单错校验替换为一次调用列出全部缺失必填参数的单个错误（`InputError`/`FeedbackError` 单报全列；输入错误退出码约定保持：两引擎均 2）。
-- [ ] T027 [US3] [blockedBy: T026] 实现 C-20+C-21：`scripts/python/probe-utils.py` `--action compile-embeds` 渲染器在编译期从各 handler 的引擎取得 args manifest（无 manifest 的引擎/action 对响亮失败编译——fast-fail 面，不静默退回 unit-id-only 渲染），按占位约定渲染必填参数全集 + 源参数与 run 域占位值，渲染面仅在其引擎行含占位符时携带一行约定说明；占位约定（语法、代入规则「尖括号为本轮运行时值——代入后照抄执行」、渲染集合成员资格）声明进 `shared/definitions/probe-definitions.md` § Handler note（registry 拥有约定，非逐命令手写）。
+- [X] T026 [US3] [blockedBy: T025] 实现 C-22+C-23：`scripts/python/run-determination.py`、`scripts/python/feedback-utils.py`、`scripts/python/exec-quant.py` 各暴露由自身 parser 派生的机器可读参数清单 action（`--action args-manifest`，输出 JSON `{action: {required: [...], source: [...]}}`，parser 为唯一真源、无手写副本）；同批把 `run-determination.py` 与 `feedback-utils.py` 的逐参单错校验替换为一次调用列出全部缺失必填参数的单个错误（`InputError`/`FeedbackError` 单报全列；输入错误退出码约定保持：两引擎均 2）。
+- [X] T027 [US3] [blockedBy: T026] 实现 C-20+C-21：`scripts/python/probe-utils.py` `--action compile-embeds` 渲染器在编译期从各 handler 的引擎取得 args manifest（无 manifest 的引擎/action 对响亮失败编译——fast-fail 面，不静默退回 unit-id-only 渲染），按占位约定渲染必填参数全集 + 源参数与 run 域占位值，渲染面仅在其引擎行含占位符时携带一行约定说明；占位约定（语法、代入规则「尖括号为本轮运行时值——代入后照抄执行」、渲染集合成员资格）声明进 `shared/definitions/probe-definitions.md` § Handler note（registry 拥有约定，非逐命令手写）。
 
 ### Verification for User Story 3
 
-- [ ] T028 [US3] [blockedBy: T026,T027] 运行 `tests/contract/test_engine_face_contract.py` 与 `tests/contract/test_probe_engine_action_sets.py` 全绿（fixture manifest 渲染断言含拒收参数不渲染、缺 ≥2 参一次全列 fixture、duplicate/idempotency 变异；per quickstart S6 前提，全单元重编译收口在 T044），结果记入 `verification.md`；认领 C-20、C-21、C-22、C-23、C-24。 [green: contracts/engine-face-contract.md#C-20] [green: contracts/engine-face-contract.md#C-21] [green: contracts/engine-face-contract.md#C-22] [green: contracts/engine-face-contract.md#C-23] [green: contracts/engine-face-contract.md#C-24]
+- [X] T028 [US3] [blockedBy: T026,T027] 运行 `tests/contract/test_engine_face_contract.py` 与 `tests/contract/test_probe_engine_action_sets.py` 全绿（fixture manifest 渲染断言含拒收参数不渲染、缺 ≥2 参一次全列 fixture、duplicate/idempotency 变异；per quickstart S6 前提，全单元重编译收口在 T044），结果记入 `verification.md`；认领 C-20、C-21、C-22、C-23、C-24。 [green: contracts/engine-face-contract.md#C-20] [green: contracts/engine-face-contract.md#C-21] [green: contracts/engine-face-contract.md#C-22] [green: contracts/engine-face-contract.md#C-23] [green: contracts/engine-face-contract.md#C-24]
 
 **Checkpoint**: US3 independently testable: 渲染契约、一次全列、幂等不变全部由契约测试钉住；全单元重编译与 backlog 收口在 Polish T044 闭合。
 
@@ -374,6 +374,7 @@ Total: 34 clauses, each claimed exactly once. 分区随行序使每份契约的�
 - **D-T5 (2026-10-19; 生成期冻结记录)**: 本 tasks 生成阶段实际重冻/首冻两项测量——`notes/baseline-failed-tests.txt` 重捕获 63 名（`git diff` 与 plan 阶段冻结集合逐一相等，见 § measured premises）；`coverage-baseline.txt` 首冻（FR-004 首次全树核算，base-sha `bf88f2c63857`）。implement 开工时树若已前进，按 C-29 预检重捕获并把新值写回引用行（MUST NOT 沿用过期冻结值）。
 - **D-T6 (2026-10-19; MVP)**: MVP = US1，依据 requirements § User Story 1 的 Why this priority（F1/F2 同根、直接决定 analyze 门可信度）。
 - **D-T7 (2026-10-20; C-12 传播机制裁定，supersede D-T3 的机制腿)**: 用户裁定——活动 `.specify/instructions.md` 的 `REC-` 行由 `/speckit.instructions`（manage-instructions Action 5 内容刷新）承担；不扩展 `generate-instructions.sh`（其 additive-only 行为由 `test_instructions_section_propagation` C-2 钉住）。D-T3 的「生成器在 US2 内运行使 C-12 转绿」被本裁定取代；T045 保留的生成器运行仅作终态幂等确认，不承担 C-12 传播。裁定记录于 requirements § Clarifications Session 2026-10-20；C-12/T018/quickstart S5/plan Mirror Obligations 行与 `test_c12_live_instructions_received_rec_via_content_refresh`（更名自 …_through_the_generator）已对齐。
+- **D-T8 (2026-10-20; D-T2 中间重编译修正，in-passing 纠正记录)**: T027 渲染器/注册表落位后，US3 内**必须**执行一次中间 compile → regen → sync（已执行：74 units 重编译、per-tool 副本再生成、touched 镜像同步）——否则 `tests/contract/test_run_skills_wiring.py::test_c9_compile_embeds_zero_drift_74_units`（冻结基线外的既有 green 钉）会因源侧编译面变化而红，构成基线规则禁止的 NEW failure。该修正不改变 D-T2 的收口义务：C-25 的全单元重编译 + backlog 第 89 行翻转仍在 T044（blockedBy T027,T032 不变，T032 的 gate 行会再次改动注册表投影）。
 
 ### Measured premises (commands actually run at generation time, 2026-10-19)
 

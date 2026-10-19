@@ -37,7 +37,28 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
-ACTIONS = ("collect", "list-records", "score", "collect-dispatch")
+ACTIONS = ("collect", "list-records", "score", "collect-dispatch", "args-manifest")
+
+# Argument manifest (063 C-22): per-action required/source classification.
+# "required" = flags this engine itself validates as required for the action;
+# "source" = this engine's DECLARED run-evidence input set (undeclared = []).
+# `--action args-manifest` verifies every listed flag against build_parser()'s
+# LIVE option strings before emitting — the parser stays the single source of
+# truth; the compile-embeds renderer consumes this and holds no table of its
+# own (063 C-21). Note: `collect` synthesizes a run-id when absent (existing
+# 059 semantics, untouched by 063 C-24 — that clause is scoped to
+# run-determination's (unit_id, run_id) lock), so --run-id is declared SOURCE,
+# not required.
+ARG_MANIFEST = {
+    "collect": {"required": ["--unit-id"], "source": ["--run-id"]},
+    "list-records": {"required": [], "source": ["--since", "--format"]},
+    "score": {"required": ["--unit-id", "--run-id", "--score"],
+              "source": ["--note"]},
+    "collect-dispatch": {"required": ["--unit-id", "--run-id", "--snapshot",
+                                      "--config-id"],
+                         "source": []},
+    "args-manifest": {"required": [], "source": []},
+}
 
 KIND = "speckit.exec-quant"  # [[STR-001]]
 SCHEMA_VERSION = 2
@@ -1130,7 +1151,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="exec-quant.py", allow_abbrev=False)
     parser.add_argument("--workspace-root", default=None)
     parser.add_argument("--action", required=True,
-                        choices=["collect", "list-records", "score", "collect-dispatch"])
+                        choices=["collect", "list-records", "score",
+                                 "collect-dispatch", "args-manifest"])
     parser.add_argument("--unit-id", default=None)
     parser.add_argument("--unit-type", default=None, choices=list(UNIT_TYPES))
     parser.add_argument("--run-id", default=None)
@@ -1143,6 +1165,30 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def action_args_manifest(args: argparse.Namespace) -> int:
+    """C-22 (063): machine-readable per-action argument manifest, BUILT FROM
+    this engine's own parser — every classified flag is verified against the
+    live parser's option strings before emitting. Pure query face: no
+    workspace access, no write."""
+    parser = build_parser()
+    live = {opt for act in parser._actions for opt in act.option_strings}
+    manifest: Dict[str, Any] = {}
+    for action in ACTIONS:
+        spec = ARG_MANIFEST.get(action)
+        if spec is None:
+            raise InputError(f"args-manifest: action {action!r} has no manifest spec")
+        for key in ("required", "source"):
+            unknown = [f for f in spec[key] if f not in live]
+            if unknown:
+                raise InputError(
+                    f"args-manifest: {action} {key} flags are not options of "
+                    f"this engine's parser: {unknown}")
+        manifest[action] = {"required": list(spec["required"]),
+                            "source": list(spec["source"])}
+    print(json.dumps(manifest, ensure_ascii=False, indent=2))
+    return 0
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -1153,6 +1199,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             return action_collect_dispatch(args)
         if args.action == "list-records":
             return action_list_records(args)
+        if args.action == "args-manifest":
+            return action_args_manifest(args)
         return action_score(args)
     except InputError as exc:
         print(USAGE_LINE, file=sys.stderr)

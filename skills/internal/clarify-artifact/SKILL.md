@@ -220,8 +220,9 @@ scaffolding:
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
-1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:clarify-artifact" --unit-type skill`
-2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:clarify-artifact" --unit-type skill`
-3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:clarify-artifact" --unit-type skill`
+1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:clarify-artifact" --unit-type skill --run-id <RUN_ID> --complexity <COMPLEXITY>`；source args when available: `--session-file <SESSION_FILE> --session-rows <SESSION_ROWS> --tool <TOOL> --proxy-paths <PROXY_PATHS> --token-note <TOKEN_NOTE> --elapsed-ms <ELAPSED_MS> --elapsed-note <ELAPSED_NOTE> --names-current <NAMES_CURRENT> --names-baseline <NAMES_BASELINE> --declared-check <DECLARED_CHECK> --green-check <GREEN_CHECK> --red-first-refs <RED_FIRST_REFS> --collected <COLLECTED> --prev-user-turn-class <PREV_USER_TURN_CLASS> --unresolved-red <UNRESOLVED_RED> --red-source <RED_SOURCE>`
+   尖括号为本轮运行时值——代入后照抄执行(占位 = 参数名去 --、转下划线、全大写;渲染集 = 引擎 manifest required + source,身份对已带实值)
+2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:clarify-artifact" --unit-type skill`；source args when available: `--run-id <RUN_ID>`
+3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:clarify-artifact" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"

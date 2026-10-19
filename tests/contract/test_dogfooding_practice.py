@@ -108,7 +108,10 @@ SECTION_HEADING = "## Dogfooding Practice"
 # Amended by requirement 056-probe-handler-system: the probe family (probes /
 # map / probe-inject) moved to scripts/python/probe-utils.py — closed sets
 # pinned both ways by tests/contract/test_probe_engine_action_sets.py.
-FEEDBACK_ENGINE_ACTIONS = {"record", "status", "list", "dispose", "mark-submitted", "reindex", "package", "upstream", "cleanup", "migrate-legacy", "introspect-register"}
+# Amended by requirement 063-review-p1-governance (C-22, 2026-10-20): the
+# wrap-up engine gains `args-manifest` (the machine-readable argument manifest
+# the compile-embeds renderer consumes). Closed-set pin updated same-batch.
+FEEDBACK_ENGINE_ACTIONS = {"record", "status", "list", "dispose", "mark-submitted", "reindex", "package", "upstream", "cleanup", "migrate-legacy", "introspect-register", "args-manifest"}
 PROBE_ENGINE_ACTIONS = {"probes", "map", "probe-inject", "handlers", "compile-embeds"}
 ENGINE_ACTIONS = FEEDBACK_ENGINE_ACTIONS | PROBE_ENGINE_ACTIONS
 # Project identifiers that MUST NOT leak into a project-neutral shared section.
