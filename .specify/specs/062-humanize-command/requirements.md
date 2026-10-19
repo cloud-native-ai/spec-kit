@@ -7,8 +7,8 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification  
-**Feature Name**: Need clarification
+**Feature ID**: 062  
+**Feature Name**: Humanize Command（人性化改写命令）
 
 ## 现状锚点（2026-10-19 以源码与制品实测为准；dated record，仅作可行性输入，非运行时保证）
 
@@ -22,7 +22,7 @@
 
 ## Assumptions（对输入中开放点的缺省裁决，clarify 阶段可推翻）
 
-- **Related Feature 按缺省值保留**：`/speckit.clarify` 负责绑定 Feature，并在 `.specify/memory/features.md` 落注册行、在 `.specify/memory/features/<ID>.md` 落详情文件；本阶段不先行绑定。
+- **Related Feature 已绑定**（clarify 2026-10-19 裁决）：新建 Feature 062「Humanize Command（人性化改写命令）」，注册行与详情文件同批落册；绑定依据见 `## Clarifications` 会话记录。
 - **执行技能分类**：按 `.specify/memory/glossary.md` 的技能分类标注，`humanize` 是无 spec-kit 内部依赖的通用内容能力，缺省归为 `external`；plan 若发现分类判据冲突可修订。
 - **默认语气**：未指定语气时使用 `professional`（专业、自然、面向一般读者），不注入强烈个性或情绪。
 - **默认落盘行为**：默认只把改写结果返回会话，不创建、不修改任何文件；仅在调用者显式给出输出路径时才写文件。
@@ -237,7 +237,7 @@
 
 ## Clarifications
 
-<!--
-This section will be populated by the /speckit.clarify command with questions and answers.
-Format: - Q: <question> → A: <answer>
--->
+### Session 2026-10-19
+
+- Q: Related Feature 绑定——绑定既有 Feature 还是新建？（候选盘点：60 个既有 Feature 中无一覆盖内容人性化改写； topical 最近的是 057「命令技能化分解补全」Implemented，但其范围是既有命令的技能化重构，不是新增命令） → A: **新建 Feature 062「Humanize Command（人性化改写命令）」**。依据：无既有 Feature 覆盖该能力；绑定先例——每个新命令各占一个 Feature（042 Interview Mode、049 Derivation Command 等）；分支名与规格目录均为 `062-humanize-command`，当前最大规格编号 061。落册义务同批 discharge：`.specify/memory/features.md` 注册行（Status: Draft）+ `Total Features` 60→61 + 详情文件 `.specify/memory/features/062.md`。
+- Q: 执行技能分类（internal / external）是否维持 Assumptions 缺省值 `external`？（该缺省条目把 plan 提名为潜在修订者，按 deferred-by-assumption 判据需澄清） → A: **维持 `external`**。词汇表「技能分类标注」判据唯一指向：internal = 只服务 spec-kit 框架自身逻辑，external = 与 spec-kit 无依赖、任何项目皆可直接使用——humanize 是对任意用户内容的通用改写能力，不依赖 spec-kit 内部制品，故判 external；plan 保留缺省条目中已记录的「判据冲突可修订」复核权，判据真源为 `.specify/memory/glossary.md`。
