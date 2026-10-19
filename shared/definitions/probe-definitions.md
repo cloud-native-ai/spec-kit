@@ -107,6 +107,7 @@
 | skill-memory-recall-wrapup | skill-wrapup | skill:memory-recall | wrap-up |
 | skill-memory-record-wrapup | skill-wrapup | skill:memory-record | wrap-up |
 | skill-merge-skills-wrapup | skill-wrapup | skill:merge-skills | wrap-up |
+| skill-sdd-loop-driver-wrapup | skill-wrapup | skill:sdd-loop-driver | wrap-up |
 | skill-self-improvement-wrapup | skill-wrapup | skill:self-improvement | wrap-up |
 | skill-study-project-wrapup | skill-wrapup | skill:study-project | wrap-up |
 | skill-summarize-project-wrapup | skill-wrapup | skill:summarize-project | wrap-up |
