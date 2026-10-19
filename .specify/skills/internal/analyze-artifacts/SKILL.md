@@ -18,7 +18,7 @@ The skill is **strictly read-only**: it modifies no file. (The single sanctioned
 is the wrap-up Feedback step's engine entry — local bookkeeping, not an artifact
 modification.)
 
-Canonical extraction source: `templates/commands/analyze.md` § Execution Steps 1–7,
+Canonical extraction source: `.specify/templates/commands/analyze.md` § Execution Steps 1–7,
 Operating Principles, and the do-not-flag list. The command template keeps entry +
 delegation only.
 

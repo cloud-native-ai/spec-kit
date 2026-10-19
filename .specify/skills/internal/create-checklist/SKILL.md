@@ -14,7 +14,7 @@ tests the *specification*, not the implementation. Every item is a question abou
 something is defined, specified, bounded or quantified — so that answering it is a
 judgement about the requirement text, never a run of the product.
 
-Canonical extraction source: `templates/commands/checklist.md` § Checklist Purpose and
+Canonical extraction source: `.specify/templates/commands/checklist.md` § Checklist Purpose and
 § Execution Steps 1–7. The command template keeps entry + delegation only.
 
 ## Input Contract
@@ -106,7 +106,7 @@ implementation behaviour.
 
 ### 6. Structure
 
-Follow `templates/checklist-template.md` for the canonical format. If it is unavailable: an
+Follow `.specify/templates/checklist-template.md` for the canonical format. If it is unavailable: an
 H1 title, a purpose/meta block, `##` category sections, and `- [ ] CHK### <item>` lines.
 
 ### 7. Report

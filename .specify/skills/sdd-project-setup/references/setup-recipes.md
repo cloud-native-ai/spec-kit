@@ -4,7 +4,7 @@
 
 ## 机制矩阵维度定义（S1）
 
-`scripts/mechanism-inventory.py` 对 `<project-dir>/.specify/` 输出以下维度（每个 ok/missing）：
+`.specify/scripts/mechanism-inventory.py` 对 `<project-dir>/.specify/` 输出以下维度（每个 ok/missing）：
 
 | 维度 | 判定 | 对应机制 |
 |------|------|----------|
@@ -149,7 +149,7 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --ai <tool> 
 
 ## S4 VERIFY（五族前置检查 + 矩阵 + 链接）
 
-**五族前置检查**（2026-10-16 上收——权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`，本节引用不复写；结论每项 ≤3 行摘要写入凭证。本技能处置后仍缺 = ⑤ fail 语义）。
+**五族前置检查**（2026-10-16 上收——权威落点 `.specify/skills/internal/run-agent/references/dispatch-preflight.md`，本节引用不复写；结论每项 ≤3 行摘要写入凭证。本技能处置后仍缺 = ⑤ fail 语义）。
 
 加上：机制矩阵复扫达 complete（或 partial 且缺口已声明）、compat 链接核验 `find <project-dir> -maxdepth 2 -type l ! -exec test -e {} \; -print` 为空。三者齐备才进 S5。
 
@@ -182,7 +182,7 @@ suggestion: >-
 
 ## 软协同契约（与 sdd-loop-driver）
 
-- **非强绑定**：两技能各自可独立运行。本技能不要求 sdd-loop-driver 存在，sdd-loop-driver 也不依赖本技能先行——其 preflight 已上收 run-agent 公用承载（`skills/internal/run-agent/references/dispatch-preflight.md`，analyze C-30），⑤ fail 时经该处置链 handoff 给本技能。
+- **非强绑定**：两技能各自可独立运行。本技能不要求 sdd-loop-driver 存在，sdd-loop-driver 也不依赖本技能先行——其 preflight 已上收 run-agent 公用承载（`.specify/skills/internal/run-agent/references/dispatch-preflight.md`，analyze C-30），⑤ fail 时经该处置链 handoff 给本技能。
 - **本技能 → sdd-loop-driver**：S5 候选工作清单是建议入口之一；sdd-loop-driver 的输入源除清单外还包括用户明确指定的特性/切片。
 - **sdd-loop-driver → 本技能**：其 preflight 发现 `.specify/` 缺失/宪法不在位/机制退化时，把处置 handoff 给本技能（模式由探测定：缺失=install，退化=refresh），处置完成后回到循环。
 - 职责切分线：**框架调协（install/reconcile/strengthen/verify/候选清单）** = 本技能；**SDD 完整阶段循环/状态脊/收尾纪律** = sdd-loop-driver。互不越界，互不强依赖。

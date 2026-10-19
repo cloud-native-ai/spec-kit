@@ -15,9 +15,9 @@ classification: external
 | 作用域 | 覆盖 | 细节入口 |
 |--------|------|----------|
 | **A — 单仓分支工作流** | 单仓分支工作流治理，模型可选（见下方工作流模型菜单：单分支 / 双分支 / 临时分支 / MAIN/PRE/DEV 三层）、同步与合并纪律、选择性合并、`.gitexcludes`、强推纪律；状态面 `docs/git-workflow.md` 托管块 | 本文件下方 Workflow + `references/` 的 `bootstrap-commands` / `health-check-commands` / `execute-commands` / `gitexcludes-subroutine` / `instructions-lookup` / `troubleshooting` |
-| **B — 多环境协调** | 同一批仓库跨多台机器的巡检、危险分级、仓库间依赖图与依赖优先排序 | `references/fleet-workflow.md` + `fleet-inventory-schema` / `fleet-hazard-taxonomy` / `fleet-coordination-playbook` / `fleet-dependency-model`；引擎 `scripts/git_fleet.py` |
-| **C — 子模块编辑** | 子模块内改代码纪律（`project-<PARENT_SLUG>/*` 分支）+ gitlink 抬升台账 | `references/submodule-workflow.md` + `submodule-command-recipes`；`scripts/record-bump.sh`；`assets/ledger-template.md` |
-| **D — 服务器置备** | 纯 SSH 服务器 → Git 服务器（D1–D4 四期望态） | `references/server-workflow.md` + `server-ssh-config-entry` / `server-reference-architecture` / `server-troubleshooting`；`scripts/provision-git-server.sh` / `scripts/ssh_config_insert.py` |
+| **B — 多环境协调** | 同一批仓库跨多台机器的巡检、危险分级、仓库间依赖图与依赖优先排序 | `references/fleet-workflow.md` + `fleet-inventory-schema` / `fleet-hazard-taxonomy` / `fleet-coordination-playbook` / `fleet-dependency-model`；引擎 `.specify/scripts/git_fleet.py` |
+| **C — 子模块编辑** | 子模块内改代码纪律（`project-<PARENT_SLUG>/*` 分支）+ gitlink 抬升台账 | `references/submodule-workflow.md` + `submodule-command-recipes`；`.specify/scripts/record-bump.sh`；`assets/ledger-template.md` |
+| **D — 服务器置备** | 纯 SSH 服务器 → Git 服务器（D1–D4 四期望态） | `references/server-workflow.md` + `server-ssh-config-entry` / `server-reference-architecture` / `server-troubleshooting`；`.specify/scripts/provision-git-server.sh` / `.specify/scripts/ssh_config_insert.py` |
 
 跨作用域硬约束：① 环境无关——主机名/绝对路径一律由调用方 inventory 或参数提供；② 高影响动作（写远端、强推等）的分级确认口径以本文件下方分级确认表与各作用域自身规则为准；③ 数据源唯一——分支信息只在 `docs/git-workflow.md` 托管块，子模块台账只在 `${SKILL_WORKDIR}/submodule-edits.md`。
 
@@ -247,11 +247,11 @@ python3 "${SKILL_HOME}/scripts/git_fleet.py" --inventory <inventory.yaml> --stat
 
 ### 作用域 C — 子模块编辑（原 git-submodule-edit）
 
-两条纪律：① 子模块内每次编辑都在 `project-<PARENT_SLUG>/<topic>` 分支上（自当前 gitlink 检出，绝不 detached HEAD / main）；② 父仓 gitlink 每次抬升追加一行到 `${SKILL_WORKDIR}/submodule-edits.md` 台账（旧→新 SHA、子模块分支、验证父仓分支/提交、验证状态）。全流程（进入 → 编辑 → 抬升 → 验证 → 上游回收）见 `references/submodule-workflow.md`，即用命令见 `references/submodule-command-recipes.md`；台账助手 `scripts/record-bump.sh`，模板 `assets/ledger-template.md`。
+两条纪律：① 子模块内每次编辑都在 `project-<PARENT_SLUG>/<topic>` 分支上（自当前 gitlink 检出，绝不 detached HEAD / main）；② 父仓 gitlink 每次抬升追加一行到 `${SKILL_WORKDIR}/submodule-edits.md` 台账（旧→新 SHA、子模块分支、验证父仓分支/提交、验证状态）。全流程（进入 → 编辑 → 抬升 → 验证 → 上游回收）见 `references/submodule-workflow.md`，即用命令见 `references/submodule-command-recipes.md`；台账助手 `.specify/scripts/record-bump.sh`，模板 `assets/ledger-template.md`。
 
 ### 作用域 D — 服务器置备（原 git-server-init）
 
-把只有 SSH 的服务器置备成 Git 服务器——四期望态：D1 git 用户、D2 裸仓库、D3 授权公钥、D4 本机 ssh config Host 条目（first-match-wins 陷阱见 `references/server-ssh-config-entry.md`）。可移植契约：MUST NOT 内嵌主机清单/IP/内部主机名/绝对用户目录；服务器身份一律由调用方参数传入。流程见 `references/server-workflow.md`；脚本 `scripts/provision-git-server.sh`（远端 D1–D3 观察/收敛）与 `scripts/ssh_config_insert.py`（本机 D4）；架构与排查见 `references/server-reference-architecture.md` / `references/server-troubleshooting.md`。
+把只有 SSH 的服务器置备成 Git 服务器——四期望态：D1 git 用户、D2 裸仓库、D3 授权公钥、D4 本机 ssh config Host 条目（first-match-wins 陷阱见 `references/server-ssh-config-entry.md`）。可移植契约：MUST NOT 内嵌主机清单/IP/内部主机名/绝对用户目录；服务器身份一律由调用方参数传入。流程见 `references/server-workflow.md`；脚本 `.specify/scripts/provision-git-server.sh`（远端 D1–D3 观察/收敛）与 `.specify/scripts/ssh_config_insert.py`（本机 D4）；架构与排查见 `references/server-reference-architecture.md` / `references/server-troubleshooting.md`。
 
 ---
 

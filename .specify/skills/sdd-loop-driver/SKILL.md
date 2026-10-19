@@ -25,7 +25,7 @@ classification: external
 
 - **加载本手册的宿主 agent 就是驱动者**：U0–U6（探测/派发/轮询/校验/续环/收尾）全部由加载者在自己的会话里亲自执行，不得委托给任何 subagent。
 - **流程不可替换**：加载者不得用 improve-skills/create-skills 等技能维护路径替代 U0–U6；详见 Hard Requirement 7。
-- **派发治理义务已上收（analyze C-26）**：子代理提示词不引用驱动/循环技能、不指示加载技能、不含循环逻辑；嵌套驱动禁止、循环层级恒为 1——义务全文与派发前拦截见 `skills/internal/run-agent/SKILL.md` 派发治理节与 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation（本节改为引用，义务本体单一落点）。
+- **派发治理义务已上收（analyze C-26）**：子代理提示词不引用驱动/循环技能、不指示加载技能、不含循环逻辑；嵌套驱动禁止、循环层级恒为 1——义务全文与派发前拦截见 `.specify/skills/internal/run-agent/SKILL.md` 派发治理节与 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation（本节改为引用，义务本体单一落点）。
 - **自检**：若加载本手册时发现自己处于 subagent 上下文且被赋予的任务是「代为驱动循环」，按显式异常行上报并停在前置阶段——嵌套驱动永不是合法形态。
 - **两侧环境模型**：本手册（编排侧）与阶段子代理（执行侧）通常运行在不同环境——speckit 框架（specify CLI / `.specify/`）只要求存在于执行侧（目标项目所在环境），编排侧宿主不需要安装 spec-kit、缺之不构成缺口；两侧角色划分、安装归属与误读纠正的真源见 `.specify/shared/workflow/execution-topology.md`（执行拓扑模型）。
 
@@ -97,7 +97,7 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 - `references/dispatch-recipes.md` — 五大执行机制的命令形态：断点探测、阶段化 prompt 文件、runner 与派生、后台执行 + 统一监听（长轮询窗口/批量多线）、收尾纪律；阶段链与哨兵字面量；派发可见性操作规则。
 - `references/watch-model.md` — 统一监听模型：信号源、判定状态机、事件优先机制阶梯、窗口与阶段期限的区分、`pgrep -c` 零匹配陷阱、多线 manifest、宿主适配与自测要求。
 - `references/stage-prompts.md` — 阶段提示词三段骨架全文、独立校验程序、已验证变体（本地简报先行 / 构建固化分线）、多线并发隔离与窄读法授权、卡死处置与状态脊程序。
-- `scripts/watch-target.sh` — 无框架依赖的长轮询 watcher 参考实现（单目标/多目标、快照与自测模式）。
+- `.specify/scripts/watch-target.sh` — 无框架依赖的长轮询 watcher 参考实现（单目标/多目标、快照与自测模式）。
 
 ## Boundary
 
@@ -110,8 +110,8 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 
 本手册是**编排者**：它不自带派发机制，而是委派两个承接技能完成驱动子代理的任务（2026-10-16 委派化裁定）：
 
-- **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 能力模板按职责实例化阶段执行实例（一实例一职责，`capacity-scope` 引用绑定）；输入=职责声明，产出=`.specify/agents/instances/<slug>.agent.md`。
-- **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：以 Execution 拓扑声明（本地/远端，见 subagent-definitions § Execution Topology Declaration）+ 实例引用发起执行；输入=实例+拓扑+阶段提示词，产出=执行结果或可见性三元组。前置检查（五族）与失败处置链见其 `references/dispatch-preflight.md`。
+- **实例创建 → create-agent**（`.specify/skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 能力模板按职责实例化阶段执行实例（一实例一职责，`capacity-scope` 引用绑定）；输入=职责声明，产出=`.specify/agents/instances/<slug>.agent.md`。
+- **阶段派发 → run-agent**（`.specify/skills/internal/run-agent/SKILL.md`）：以 Execution 拓扑声明（本地/远端，见 subagent-definitions § Execution Topology Declaration）+ 实例引用发起执行；输入=实例+拓扑+阶段提示词，产出=执行结果或可见性三元组。前置检查（五族）与失败处置链见其 `references/dispatch-preflight.md`。
 - **编排本体在本手册**：阶段序列（U0–U6）、状态脊、哨兵与独立校验、卡死处置、收尾合并——三技能不承接这些（职责切分线见 agent-definitions § Driving Subagents via the Three Layers）。
 
 ## Feedback & Probe Points（反馈与探针采集点）

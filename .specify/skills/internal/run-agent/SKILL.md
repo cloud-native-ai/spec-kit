@@ -15,7 +15,7 @@ arguments — tells the user what exists and what would be worth doing next. Thi
 owns the **authoring baseline** (the frontmatter vocabulary and validation rules) that the
 `create-agent` / `improve-agent` authoring skills enforce.
 
-Canonical extraction source: `templates/commands/agents.md` § Run Mode, § Default Behavior
+Canonical extraction source: `.specify/templates/commands/agents.md` § Run Mode, § Default Behavior
 (No Arguments), and the authoring-baseline block (Authoring Rules / Frontmatter Baseline /
 Valid File Locations / Validation). Content moved here verbatim in substance; the command
 template keeps entry + delegation only.
@@ -91,7 +91,7 @@ MUST NOT merge or normalize configuration itself:
    ⚠️ External CLI dispatch MUST follow that document's **Visibility Contract** (stream-json +
    compact filter + `.live.log` / `.jsonl` / `.status` triplet) — never redirect print-mode
    output into a silent log. The Execution works autonomously within its defined scope.
-   For an **external** dispatch, reuse `skills/internal/create-team/scripts/dispatch.sh`:
+   For an **external** dispatch, reuse `.specify/skills/internal/create-team/scripts/dispatch.sh`:
    `DISPATCH_CLI=<cli> DISPATCH_LOG_DIR=<absolute-log-dir> bash <dispatch.sh> <label>
    <workdir> <prompt-file> -- <cli_args...>`. Pass the engine's `cli_args` array verbatim
    after `--` — never reorder, re-quote, or filter them. `DISPATCH_LOG_DIR` MUST be absolute

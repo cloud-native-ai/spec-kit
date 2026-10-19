@@ -5,7 +5,7 @@ unit's compiled `## Wrap-up` section wires to (056: the section is rendered by
 `probe-utils.py --action compile-embeds`, not hand-embedded). The compiled section is
 the final workflow section of a skill; complex command templates carry it at their
 wrap-up / Git-commit-prompt stage. Simple commands carry no wrap-up face at all — a
-command is complex iff it invokes scripts/CLI tools, produces an artifact another flow
+command is complex iff it invokes .specify/scripts/CLI tools, produces an artifact another flow
 consumes, or consumes another flow's artifact.
 
 **Embedding units reference this file; they do not copy it.** Each embedded
@@ -132,7 +132,7 @@ reason set and no decision table — those are code's. Everything else below rea
 owner by path.
 
 **Engine and code-side owner.** `.specify/scripts/python/run-determination.py` (framework
-source `scripts/python/run-determination.py`) owns the record schema, every value domain
+source `.specify/scripts/python/run-determination.py`) owns the record schema, every value domain
 the program branches on, the routing-bit derivation (`derive_trigger_feedback`) and the
 CLI flag set. No invocation is written out here on purpose: the parser generates the
 engine's own `--help`, so a flag list copied into prose could only drift. The record *is*
@@ -171,7 +171,7 @@ continue on available run evidence, never fabricate — per
 
 **Unresolved-red input — engine exit codes only.** The satisfaction axis's red-adjacency
 exception has exactly one producer: a non-zero exit from an engine this run invoked,
-reported through the exit-code table the `scripts/python/` engines share. The producer
+reported through the exit-code table the `.specify/scripts/python/` engines share. The producer
 formerly named beside it — an anomaly the agent surfaced and the user never answered
 (`surfaced_anomaly_unanswered`) — is **dropped**, not deferred, and MUST NOT be declared.
 The per-turn telemetry store `.specify/memory/trigger/telemetry.jsonl` MUST NOT be read
@@ -197,7 +197,7 @@ record's `out_of_scope[]`, one bounded line each, with **no carrier assigned**
 (`parked_via: none`); assigning one belongs to the **active** improve flow, which chooses
 between two carriers that already exist — `/speckit.todo` Park Mode (the default: a
 free-floating improvement idea; mode, store path and frontmatter owned by
-`templates/commands/todo.md`) and a new spec through `/speckit.requirements` (when the
+`.specify/templates/commands/todo.md`) and a new spec through `/speckit.requirements` (when the
 finding constrains what this project's source must implement, which is the Requirement
 plane's call, not this flow's). The passive turn names carriers; it MUST NOT open either
 flow, widen the current turn, or emit anything beyond the single non-blocking notification
@@ -222,7 +222,7 @@ inference side of the never-solicit rule above.
 
 The embedded wrap-up section is **compiled, not hand-embedded** (056): `probe-utils.py
 --action compile-embeds` renders each unit's single AUTO-GENERATED `## Wrap-up` from the
-registry (`shared/definitions/probe-definitions.md` ## Handler / ## HandlerBinding) and
+registry (`.specify/shared/definitions/probe-definitions.md` ## Handler / ## HandlerBinding) and
 migrates away any manual `## Feedback` / `## Documentation` section it finds. They do
 not copy it — each call line points here; the agent executing the section follows its
 lines in order, which lands on this file's own sections. Nothing is per-surface beyond
@@ -318,7 +318,7 @@ workaround applied. This is a read-only aid — it never gates execution.
 ## Notes for embedders
 
 - **Which form**: command templates take the command form, `skills/*/SKILL.md` and
-  `templates/skills-template.md` take the skill form (its runtime-mode gate is
+  `.specify/templates/skills-template.md` take the skill form (its runtime-mode gate is
   mandatory — detection semantics live in `.specify/shared/workflow/runtime-mode.md`).
 - **Skills**: `--unit-id "skill:<name>"`, `--unit-type skill`.
 - **Complex commands**: `--unit-id "/speckit.<command>"`, `--unit-type command`.

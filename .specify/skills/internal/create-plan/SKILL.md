@@ -19,7 +19,7 @@ advanced to match. This skill owns the executable core of `/speckit.plan` — Ou
 `scripts:` block, the User Input Protocol, and the wrap-up lifecycle (Feedback /
 Documentation / Artifact Commit / Handoffs).
 
-Canonical extraction source: `templates/commands/plan.md` § Outline (steps 1–5), § Feature
+Canonical extraction source: `.specify/templates/commands/plan.md` § Outline (steps 1–5), § Feature
 Integration, § Phases (Phase 0 / Phase 1), and § Post-Generation Quality Gate. Content
 moved here verbatim in substance.
 
@@ -31,7 +31,7 @@ moved here verbatim in substance.
   fails fast on a stale or ambiguous spec).
 - **Setup variables**: FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH come from the command's
   `{SCRIPT}` prerequisite run (its `scripts:` entry resolves to
-  `scripts/bash/create-new-plan.sh --json`, run from repo root); all paths used below are
+  `.specify/scripts/bash/create-new-plan.sh --json`, run from repo root); all paths used below are
   absolute.
 - **User parameters**: arrive already processed by the command's User Input Protocol
   (parameters for the run, never a standalone instruction overriding the workflow); this
@@ -231,11 +231,11 @@ linked to their corresponding entries in the project's feature index.
 
 3. **Record feature binding** → `feature-ref.md`: the bound Feature ID/name and how this
    plan maps to it (see the plan template's Project Structure —
-   `templates/plan-template.md`).
+   `.specify/templates/plan-template.md`).
 
 **Output**: data-model.md, /contracts/*, quickstart.md, feature-ref.md (records the bound
 Feature ID/name and how this plan maps to it — see the plan template's Project Structure,
-`templates/plan-template.md`)
+`.specify/templates/plan-template.md`)
 
 ## Post-Generation Quality Gate: Contract Artifact Cleanup
 
@@ -303,7 +303,7 @@ After generating all Phase 1 artifacts (especially contract documents under
   (before/after command sequencing and next-command suggestions) are command surfaces,
   not skill content.
 - **Templates and shared conventions stay pointers**: the plan template being filled is
-  referenced via IMPL_PLAN (`templates/plan-template.md`); the feature status state
+  referenced via IMPL_PLAN (`.specify/templates/plan-template.md`); the feature status state
   machine is owned by `.specify/templates/feature-details-template.md`; the mid-run
   addendum protocol by `.specify/shared/workflow/user-input-protocol.md`; the
   same-author delegation gate by `.specify/shared/workflow/objective-analysis-gate.md`;

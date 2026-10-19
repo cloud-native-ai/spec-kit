@@ -16,7 +16,7 @@ skill owns the executable core of `/speckit.feature` — the reconcile model app
 and Actions 0–9 — while the command template keeps entry, user-input handling and
 lifecycle only.
 
-Canonical extraction source: `templates/commands/feature.md` § Outline (registry
+Canonical extraction source: `.specify/templates/commands/feature.md` § Outline (registry
 surfaces + feature classification), § Reconcile model, § Actions, and § Formatting
 Requirements. Content moved here verbatim in substance.
 

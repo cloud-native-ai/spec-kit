@@ -120,7 +120,7 @@ BLANK_FORM = """\
 # 字段类型/取值域/关联约束的权威是 schema/project.sql（DDL，由数据库强制）。
 # 档位：[R] 必填-阻断  [I] 可推断（留空即可，模型/装载器会推断并留痕）  [O] 可选
 # 日期一律 yyyy-mm-dd。留空 = 「本表未提供」，按档位处置，绝不臆造。
-# 本表由 scripts/project-db.py --load 装载进 SQLite；装载即校验（约束违规会报可读原因）。
+# 本表由 .specify/scripts/project-db.py --load 装载进 SQLite；装载即校验（约束违规会报可读原因）。
 
 schema: project-input/v1
 

@@ -16,9 +16,9 @@ Generation Rules — while the command template keeps entry, the `scripts:` bloc
 Input Protocol, the Glossary protocol step, and the wrap-up lifecycle (Feedback /
 Documentation / Artifact Commit / Handoffs).
 
-Canonical extraction source: `templates/commands/tasks.md` § Outline (steps 1–6) and §
+Canonical extraction source: `.specify/templates/commands/tasks.md` § Outline (steps 1–6) and §
 Task Generation Rules. Content moved here verbatim in substance; the structural validator
-(`scripts/python/validate-tasks.py`) and the structure template
+(`.specify/scripts/python/validate-tasks.py`) and the structure template
 (`.specify/templates/tasks-template.md`) are already externalized and stay
 invocation/pointer references.
 
@@ -33,7 +33,7 @@ invocation/pointer references.
   documents — generate tasks based on what's available.
 - **Setup variables**: REQUIREMENTS_DIR and AVAILABLE_DOCS come from the command's
   `{SCRIPT}` prerequisite run (its `scripts:` entry resolves to
-  `scripts/bash/check-prerequisites.sh --json`, run from repo root); all paths must be
+  `.specify/scripts/bash/check-prerequisites.sh --json`, run from repo root); all paths must be
   absolute.
 - **User input**: arrives already processed by the command's User Input Protocol; this
   skill still classifies content type per Workflow step 3 — background info, task outline,
@@ -358,7 +358,7 @@ each implement round has to guess where the previous phase put the file:
 
 - **Failing-test baseline name list** — its path, its capture flag, and its name-level
   comparison form are owned by `/speckit.implement` step 6's `**Test runs**` bullet
-  (`templates/commands/implement.md`). MUST NOT be restated, re-derived, or given a second
+  (`.specify/templates/commands/implement.md`). MUST NOT be restated, re-derived, or given a second
   path here; a Setup/Foundational row that captures or consumes that baseline points at
   that owner.
 - `<spec-dir>/notes/red-first-evidence.md` — for every test that MUST go red before its
@@ -403,7 +403,7 @@ breakdown may expose new Features or invalidate old ones. Update
   (before/after command sequencing and next-command suggestions) are command surfaces, not
   skill content.
 - **Externalized assets stay pointers** (per the S0 ruling): the structural validator
-  `scripts/python/validate-tasks.py` and the structure template
+  `.specify/scripts/python/validate-tasks.py` and the structure template
   `.specify/templates/tasks-template.md` are invoked and referenced, never re-implemented
   or copied — the validator owns the fixed structural checks, the template owns the
   section layout (Format, Environment Prerequisites, the `[green: <contract>#<clause>]`
@@ -412,7 +412,7 @@ breakdown may expose new Features or invalidate old ones. Update
 - **Shared conventions stay pointers**: the token-efficiency discipline
   (`.specify/shared/guidelines/token-efficiency.md`), the Feature Integration Protocol,
   `/speckit.implement`'s `**Test runs**` baseline owner
-  (`templates/commands/implement.md`), and the Input Sanity section of
+  (`.specify/templates/commands/implement.md`), and the Input Sanity section of
   `.specify/instructions.md` are referenced by path, never restated here.
 
 ## Wrap-up

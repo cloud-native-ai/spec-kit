@@ -18,7 +18,7 @@
 | 词 | 含义 | 本模型中的形态 |
 |----|------|----------------|
 | **Wait（等待）** | 驱动者暂停推进，直到终止事件或窗口到期 | 只允许发生在一次工具调用内部（长轮询）；或经 §6 探针证明可自动恢复的宿主通知 |
-| **Monitor（监视）** | 持续采样一个或多个目标的信号并给出判定 | `scripts/watch-target.sh`（无状态、可重入、只读） |
+| **Monitor（监视）** | 持续采样一个或多个目标的信号并给出判定 | `.specify/scripts/watch-target.sh`（无状态、可重入、只读） |
 | **Poll（轮询）** | 周期性重复采样 | **回退形态**：无法阻塞等待时使用；不是缺省 |
 | **Observe（观察）** | 读取日志/心跳/退出记录，不做判定 | watcher 内部动作，或 U3 的证据采集 |
 | **Watch window（监听窗口）** | 一次阻塞调用的最长持续时间 | `--window`；到期返回 `RUNNING`，驱动者立即重入下一窗口 |
@@ -40,7 +40,7 @@
 
 ## 3. 判定状态机（Verdict State Machine）
 
-判定按下列顺序短路；先命中者胜。`scripts/watch-target.sh` 是退出码的代码侧所有者（`--help` 与 `--self-test` 钉住）。
+判定按下列顺序短路；先命中者胜。`.specify/scripts/watch-target.sh` 是退出码的代码侧所有者（`--help` 与 `--self-test` 钉住）。
 
 | 判定 | 退出码 | 终止? | 触发条件（按优先级） | 驱动者动作 |
 |------|--------|-------|----------------------|------------|
@@ -157,7 +157,7 @@ label|pid_file|status_file|log|sentinel|heartbeat|deadline_epoch
 
 ## 10. 参考实现
 
-`scripts/watch-target.sh` — 无框架依赖的 bash 长轮询 watcher。
+`.specify/scripts/watch-target.sh` — 无框架依赖的 bash 长轮询 watcher。
 
 - 单目标与 `--manifest` 多目标；`--once` 快照；`--self-test` 回归用例。
 - 输出为单行 `WATCH label=… verdict=… pid=… heartbeat=… anomaly=… sentinel=… rc=… elapsed=… reason=…`；终止判定附带一行 `EVIDENCE …`。

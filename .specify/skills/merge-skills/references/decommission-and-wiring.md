@@ -84,8 +84,8 @@ and `skills/internal/` are canonical, mirroring to `.specify/skills/<name>/` and
 hand-copy, which is how the two trees silently diverge:
 
 ```bash
-python3 scripts/python/sync-mirrors.py --write  --only skills/<layer>/<target>
-python3 scripts/python/sync-mirrors.py --check  --only skills/<layer>/<target>   # must report no drift
+python3 .specify/scripts/python/sync-mirrors.py --write  --only skills/<layer>/<target>
+python3 .specify/scripts/python/sync-mirrors.py --check  --only skills/<layer>/<target>   # must report no drift
 ```
 
 `<layer>` is the layer the **target** lives in — `external` or `internal`. `--only` matches mirror

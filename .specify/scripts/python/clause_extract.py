@@ -3,7 +3,7 @@
 
 Program-First (程序优先): the clause-form rules are fixed, textual and decidable, so they
 live here as a program rather than as prose an agent re-derives per run. The single source
-of truth for WHAT the rules are is `shared/definitions/contract-clause-definitions.md`
+of truth for WHAT the rules are is `.specify/shared/definitions/contract-clause-definitions.md`
 (条款语法 owner); this module is its executable counterpart and MUST NOT grow a second,
 divergent reading of any rule.
 
@@ -22,7 +22,7 @@ Functions (the same `^  name  description` shape the house docstring convention 
 
 Read-only by contract (FR-005): this module opens files for reading only and has no write
 point of any kind. Stdlib only — no PyYAML (plan D-2); the hand-parse precedent in this repo
-is `scripts/python/gate-check.py`'s own gate-file reader.
+is `.specify/scripts/python/gate-check.py`'s own gate-file reader.
 
 Usage: python3 clause_extract.py <contract-file> [<contract-file> ...]
 """

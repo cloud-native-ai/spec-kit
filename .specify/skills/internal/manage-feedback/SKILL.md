@@ -18,7 +18,7 @@ explicitly-requested § Probe Injection capability. The owning command is
 its own wrap-up Feedback / Documentation / Handoffs steps) and delegates everything
 below to this skill.
 
-Canonical extraction source: `templates/commands/feedback.md` § Routing flow
+Canonical extraction source: `.specify/templates/commands/feedback.md` § Routing flow
 (steps 1–10), § Path A (A1–A6 + behavior rules), § Path B (steps 1–6),
 § Probe Injection, and § Behavior Rules. The routing judgment lives in this SKILL.md;
 the two execution paths and the probe capability live in `references/`. The engine

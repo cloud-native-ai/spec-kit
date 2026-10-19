@@ -44,7 +44,7 @@ Stage 3 targets — pick one, ask when the input does not say:
 |--------|-----------|--------|
 | `local` | A web server on this machine (`hugo serve`), for preview | works wherever `hugo` is installed |
 | `aoneci` | The Alibaba-internal, GitLab-like hosting platform's pages service | implemented (`--platform aoneci`) |
-| `github` | GitHub Actions + GitHub Pages (`gh-pages`) | **not implemented** — writes nothing and warns; contract in `scripts/ci-templates/github/README.md` |
+| `github` | GitHub Actions + GitHub Pages (`gh-pages`) | **not implemented** — writes nothing and warns; contract in `.specify/scripts/ci-templates/github/README.md` |
 
 `gitlab` means the open-source GitLab project and its hosting service. It is
 **not** a target here — do not treat `aoneci` as "gitlab", and do not accept

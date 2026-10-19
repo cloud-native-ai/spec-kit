@@ -50,7 +50,7 @@ uname -s   # Darwin → macOS；Linux → linux
 | `references/intents/` | agent-ops / agent-diagnose / agent-setup |
 | `references/setup/` | unified-variables / supported-tuples / available-tuples / permission-modes / usage-examples |
 | `references/agent-page-contract.md` | Agent 知识页结构契约 |
-| `scripts/` | config-agent.sh（统一环境变量装配） |
+| `.specify/scripts/` | config-agent.sh（统一环境变量装配） |
 
 ## Wrap-up
 

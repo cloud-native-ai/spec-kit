@@ -9,7 +9,7 @@
 # verifies it, so the deliverable renders without any network access.
 #
 # Usage:
-#   bash scripts/vendor-echarts.sh <target-dir> [version]
+#   bash .specify/scripts/vendor-echarts.sh <target-dir> [version]
 #     <target-dir>  deliverable directory that should contain vendor/
 #     [version]     pinned ECharts version, default 5.6.0
 #

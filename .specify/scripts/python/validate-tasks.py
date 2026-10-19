@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Deterministic structural validator for a feature's tasks.md.
 
-Program-First discipline (shared/guidelines/token-efficiency.md): the fixed
+Program-First discipline (.specify/shared/guidelines/token-efficiency.md): the fixed
 mechanical rules that /speckit.tasks must enforce are checked here, once,
 instead of being re-improvised as ad-hoc greps on every run.
 
@@ -52,7 +52,7 @@ Checks performed:
                   that pastes into it and is nobody's green point)
 
 Usage:
-  python3 scripts/python/validate-tasks.py <path/to/tasks.md> [--json]
+  python3 .specify/scripts/python/validate-tasks.py <path/to/tasks.md> [--json]
 
 Exit codes:
   0  no errors (warnings may still be reported)
@@ -111,7 +111,7 @@ WRITE_VERB = re.compile(
 POINTER_WINDOW = 40
 
 # An inline green-point attribution: `[green: <contract>#<clause>]` (STR-001; the surface
-# is declared in templates/tasks-template.md § Format). The separator is the FIRST `#` and
+# is declared in .specify/templates/tasks-template.md § Format). The separator is the FIRST `#` and
 # everything up to the closing bracket is the clause id, so the id forms the corpus
 # actually uses (`C-1`, `C-01`, `C-001`, `C-3.4`) all survive intact.
 GREEN_CLAIM = re.compile(r"\[green:\s*([^\]#]+)#([^\]]+)\]")
@@ -135,7 +135,7 @@ _CLAUSE_EXTRACT = None
 def _clause_extract():
     """The sibling clause extractor, loaded by path rather than by `import`.
 
-    This script runs both as `python3 scripts/python/validate-tasks.py` (where its own
+    This script runs both as `python3 .specify/scripts/python/validate-tasks.py` (where its own
     directory is `sys.path[0]`) and under `importlib` from a contract test (where it is
     not). Resolving the sibling next to `__file__` also keeps a `.specify/` mirror copy
     on the mirror's own extractor instead of reaching back into the source tree.
@@ -208,7 +208,7 @@ def _is_test_path(token: str) -> bool:
     FR-018(b) and green-point-claim.md C-16 both scope that check to a test path appearing
     in two verification rows, and the prose obligation it mechanizes says "any test path"
     too. Recognizing one is a structural fact rather than a guess: `tests/` is the location
-    the house's own template declares (templates/tasks-template.md § Path Conventions), and
+    the house's own template declares (.specify/templates/tasks-template.md § Path Conventions), and
     `test_*` is the collection prefix pytest uses.
 
     The distinction is load-bearing, and dogfooding is what proved it: an append-only
@@ -456,7 +456,7 @@ def validate(path: Path, claims_out: list | None = None):
                     f"{claim['line']}: green-dangling: {claim['task_id']} declares "
                     f"{claim['contract_file']}#{claim['clause_id']} but that file declares "
                     f"no machine-decidable clause form, so nothing can check the claim "
-                    f"(forms: shared/definitions/contract-clause-definitions.md) — give the "
+                    f"(forms: .specify/shared/definitions/contract-clause-definitions.md) — give the "
                     f"contract a machine-decidable clause form or drop the claim"
                 )
                 continue

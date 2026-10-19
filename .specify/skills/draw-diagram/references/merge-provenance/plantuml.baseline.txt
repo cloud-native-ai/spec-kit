@@ -416,7 +416,7 @@ ${SKILL_WORKDIR}/.specify/
 /etcd
 /extend
 /extend/generalization
-/external/draw-plantuml/scripts/render-plantuml.sh # path rewritten to skills/external/draw-diagram/references/types/plantuml/scripts/render-plantuml.sh; destination verified present
+/external/draw-plantuml/scripts/render-plantuml.sh # path rewritten to .specify/skills/draw-diagram/references/types/plantuml/scripts/render-plantuml.sh; destination verified present
 /font
 /frame
 /frame/rectangle/packageFontSize
@@ -1889,7 +1889,7 @@ scale=4/dpi=300
 scheduleChanged
 scheduleChanged: false
 sciiMath
-scripts/svg-to-png-cjk.cjs
+.specify/scripts/svg-to-png-cjk.cjs
 seCases
 searchItem
 searchProduct

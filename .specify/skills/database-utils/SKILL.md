@@ -181,7 +181,7 @@ If the match is ambiguous, run `--list` and ask the user which database to query
 | Permission warning | Run `chmod 600 connections.json` |
 | max_execution_time not supported | Upgrade to MySQL 5.7.8+ or MariaDB 10.1.1+ |
 | Unknown protocol | Add explicit `"protocol": "mysql"` or `"protocol": "postgres"` |
-| Handler not found | Ensure `query_mysql.py` and `query_postgres.py` exist in `scripts/` |
+| Handler not found | Ensure `query_mysql.py` and `query_postgres.py` exist in `.specify/scripts/` |
 | mysql-connector-python not installed | Run `pip install mysql-connector-python` |
 | psycopg2 not installed | Run `pip install psycopg2-binary` |
 
@@ -207,9 +207,9 @@ All script paths in this skill use `${SKILL_HOME}/scripts/` to remain portable.
 
 ## Resources
 
-- `scripts/query.py` — unified dispatcher (routes to protocol-specific handler)
-- `scripts/query_mysql.py` — MySQL protocol handler
-- `scripts/query_postgres.py` — PostgreSQL protocol handler
+- `.specify/scripts/query.py` — unified dispatcher (routes to protocol-specific handler)
+- `.specify/scripts/query_mysql.py` — MySQL protocol handler
+- `.specify/scripts/query_postgres.py` — PostgreSQL protocol handler
 - `references/setup-and-usage.md` — setup and usage guide
 - `connections.example.json` — example config with MySQL, PostgreSQL, ClickHouse, and Doris entries
 - `requirements.txt` — Python dependencies

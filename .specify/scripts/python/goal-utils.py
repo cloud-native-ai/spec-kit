@@ -10,7 +10,7 @@ A Goal is composed of exactly three parts: objective narrative, zero-or-more
 verifiable success criteria, and lifecycle state. Identity is the directory name;
 timestamps are change-traceability metadata, never a fourth part.
 
-Concept authority: shared/definitions/goal-definitions.md (read-only).
+Concept authority: .specify/shared/definitions/goal-definitions.md (read-only).
 File contract:  .specify/specs/037-goal-registry/contracts/goal-definition.contract.md
 
 Actions, grouped by whether they write:
@@ -48,7 +48,7 @@ EXIT_NOT_FOUND = 3
 EXIT_INVALID = 4
 #: 053 FR-033 — a run-precondition check judged the run blocked. The next free code: the
 #: four above keep their existing meanings byte for byte, so one code never carries two
-#: meanings across actions, and the 0/2 branches `templates/commands/team.md` already has
+#: meanings across actions, and the 0/2 branches `.specify/templates/commands/team.md` already has
 #: keep working unchanged.
 EXIT_BLOCKED = 5
 
@@ -367,7 +367,7 @@ def _title_from_body(body: str) -> str:
 
 
 #: 053 FR-035 — the criterion-subject reference form. Single definition point; the literal
-#: itself is owned by shared/definitions/goal-definitions.md § 判据主体指代形 (Criterion
+#: itself is owned by .specify/shared/definitions/goal-definitions.md § 判据主体指代形 (Criterion
 #: Subject Reference), which also states the two failure tiers and the conflict rule below.
 SUBJECT_REF = re.compile(r"\[subjects:\s*([^\]]+)\]")
 #: The only machine-decidable member-enumeration marker: a brace expansion holding a comma.

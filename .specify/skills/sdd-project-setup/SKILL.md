@@ -24,7 +24,7 @@ spec-kit 本地 fork（master）在上游 SDD 之上扩充了大量机制——f
 
 ```text
 S0 ENTRY     一遍性入口：目标、模式、目标工具
-S1 ASSESS    机制盘点：scripts/mechanism-inventory.py 扫描 .specify/ → 状态分级
+S1 ASSESS    机制盘点：.specify/scripts/mechanism-inventory.py 扫描 .specify/ → 状态分级
              （absent / partial / degraded / complete）+ 框架版本 provenance
 S2 INSTALL   （全部在执行侧=目标项目所在环境运行；编排侧本地宿主无需
              speckit，不误触发安装链——拓扑真源见
@@ -74,8 +74,8 @@ S5 SUGGEST   产出候选工作清单（三个内部来源：未完成 feature /
 
 本手册是**编排者**：调协动作的执行主体按需委派承接技能（可选形态——本技能独立运行时不强制）：
 
-- **盘点与验证的执行**：`scripts/mechanism-inventory.py` 由编排者直接运行（只读脚本，无需子代理）；远端盘点经 `ssh + su` 形态执行（占位约定同 `.specify/shared/workflow/external-dispatch-recipes.md`）。
-- **S2/S3 治理命令的派发**：`specify init` / `/speckit.*` 治理命令如需以子代理承载，经 **run-agent**（`skills/internal/run-agent/SKILL.md`）以拓扑声明派发——前置检查与失败处置链随其 `references/dispatch-preflight.md`；独立运行时编排者亦可亲自执行治理命令（等价路径）。
+- **盘点与验证的执行**：`.specify/scripts/mechanism-inventory.py` 由编排者直接运行（只读脚本，无需子代理）；远端盘点经 `ssh + su` 形态执行（占位约定同 `.specify/shared/workflow/external-dispatch-recipes.md`）。
+- **S2/S3 治理命令的派发**：`specify init` / `/speckit.*` 治理命令如需以子代理承载，经 **run-agent**（`.specify/skills/internal/run-agent/SKILL.md`）以拓扑声明派发——前置检查与失败处置链随其 `references/dispatch-preflight.md`；独立运行时编排者亦可亲自执行治理命令（等价路径）。
 - **职责切分线**：框架调协（install/reconcile/strengthen/verify/候选清单）= 本技能；SDD 完整阶段循环 = sdd-loop-driver；创建/派发/修正 = create-agent / run-agent / improve-agent（见 `.specify/shared/definitions/agent-definitions.md` § Driving Subagents via the Three Layers）。
 
 ## Boundary

@@ -24,7 +24,7 @@ Verify the likely behavior of another Skill, prompt, workflow, or instruction se
 
 1. **Identify target and scenario**
    - Determine the target Skill, prompt, or workflow to simulate.
-   - Identify whether the target Skill bundles executable scripts under its `scripts/` directory. If it does, those scripts are also part of the simulation target — trace their input/output contracts and execution effects, not just the natural-language flow.
+   - Identify whether the target Skill bundles executable scripts under its `.specify/scripts/` directory. If it does, those scripts are also part of the simulation target — trace their input/output contracts and execution effects, not just the natural-language flow.
    - Capture the user request, inputs, environment assumptions, allowed tools, forbidden actions, and desired output.
    - If critical target text or scenario data is missing, ask one targeted clarification question.
 

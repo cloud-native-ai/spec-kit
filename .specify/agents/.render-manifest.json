@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20261016T172729Z",
+  "rendered_at": "20261019T065729Z",
   "entries": {
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -10,6 +10,18 @@
     ".claude/agents/framework-engineer.md": {
       "source": "instances/framework-engineer.agent.md",
       "sha256": "faf6bbdc94324fd93a164be33bf710abf80b753e160bbcbaf1c869ec52432886"
+    },
+    ".claude/agents/sdd-executor.md": {
+      "source": "templates/sdd-executor.agent.md",
+      "sha256": "b6e3b8c02aa82cc6296219f0ca264d66d144a5285d0c1cfd88fe9ea0a74378df"
+    },
+    ".claude/agents/sdd-requirements-executor.md": {
+      "source": "instances/sdd-requirements-executor.agent.md",
+      "sha256": "03a47a4b12fecb4c67d4c8a27b4ae1a4944aa302bf4fce0617c432de48a3380a"
+    },
+    ".claude/agents/sdd-setup-executor.md": {
+      "source": "instances/sdd-setup-executor.agent.md",
+      "sha256": "d5928e633b2f16b8350bf55c60e194087a7a71850391769e512dea6c30a097df"
     },
     ".claude/agents/skill-verifier.md": {
       "source": "templates/skill-verifier.agent.md",
@@ -27,6 +39,18 @@
       "source": "instances/framework-engineer.agent.md",
       "sha256": "77448954698b9bb1231555533f68ce2c7d2491a49a53064607963eebeb2750f6"
     },
+    ".github/agents/sdd-executor.agent.md": {
+      "source": "templates/sdd-executor.agent.md",
+      "sha256": "86da7dfe08ee8c0544d643ce1f03ad8934161a8beffd878f7aafe0ba460dcde3"
+    },
+    ".github/agents/sdd-requirements-executor.agent.md": {
+      "source": "instances/sdd-requirements-executor.agent.md",
+      "sha256": "22dc4acf57b7ef5c6bc7132d249302f244dd388c798e23556902f323a0cfb7aa"
+    },
+    ".github/agents/sdd-setup-executor.agent.md": {
+      "source": "instances/sdd-setup-executor.agent.md",
+      "sha256": "b0a15e2d87a9bcb7517726aa3fe761b38f58719cc4800826553872219393e9d1"
+    },
     ".github/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",
       "sha256": "1b6d75964ecfaea28558185a2ff483e88377a4da6c44ba819c7dc7604cd57425"
@@ -42,6 +66,18 @@
     ".opencode/agents/framework-engineer.md": {
       "source": "instances/framework-engineer.agent.md",
       "sha256": "e8c97939cb1021bf562a0c743230759aa54f89619b4690bfa1dcc69425a24a6c"
+    },
+    ".opencode/agents/sdd-executor.md": {
+      "source": "templates/sdd-executor.agent.md",
+      "sha256": "7882d665d7bd4c668b3160c3334c92fa5a90b55518e0d2dc6601318ed4ecb118"
+    },
+    ".opencode/agents/sdd-requirements-executor.md": {
+      "source": "instances/sdd-requirements-executor.agent.md",
+      "sha256": "064b0a5c6495236a29416b5d4b18194c81865e55dadc87c7e9dad97925ce3db4"
+    },
+    ".opencode/agents/sdd-setup-executor.md": {
+      "source": "instances/sdd-setup-executor.agent.md",
+      "sha256": "4d0224b47efbecad548f0fe98f44df4d3695690a0be7054c5c7b28fedaf84024"
     },
     ".opencode/agents/skill-verifier.md": {
       "source": "templates/skill-verifier.agent.md",
@@ -61,7 +97,7 @@
     },
     ".qoder/agents/sdd-executor.agent.md": {
       "source": "templates/sdd-executor.agent.md",
-      "sha256": "0b9645f8d96fe81c0bb14aab1a6b02672b87412fd0df8d40de0706e8e93a25e0"
+      "sha256": "6c8238316c9ebecd526b23304a8f2ce0e29dd5145a5d0245232f7b7776d84cf2"
     },
     ".qoder/agents/sdd-requirements-executor.agent.md": {
       "source": "instances/sdd-requirements-executor.agent.md",
@@ -73,11 +109,11 @@
     },
     ".qoder/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",
-      "sha256": "3cbf70044b7a4a83ab2c71a655f4e2b6bcbd0515438650e49fd62a7f31290f62"
+      "sha256": "56d0cb2dffef1272ee6943f0f91df5a2bf27586fb1b9655f6242bb3b8ff0f0fb"
     },
     ".qoder/agents/structure-adjuster.agent.md": {
       "source": "templates/structure-adjuster.agent.md",
-      "sha256": "814992a68c22826375f8a3e0233d703a8d1e75e454d6e0cc7e14b83ef0e82991"
+      "sha256": "034ba320d8fe145e95b1853424dbe11160a9c74eb80becdf5615213512396040"
     }
   }
 }
