@@ -5,7 +5,7 @@
 **载体**: `references/efficiency-model.md`、`references/dispatch-recipes.md`、`references/watch-model.md`、`scripts/stage-runner.sh`、`scripts/derive-live-log.py`、`scripts/watch-target.sh`、`docs/reference/skills/sdd-loop-driver.md`
 
 - **PD-01（stream-json 主路径）**: 阶段 runner MUST 默认以 [[STR-001]] 调用阶段 CLI，并把原始事件流完整落盘为 raw stream 证据文件（`raw-<line>-<stage>.jsonl`）；stderr 单独落 runner-log，不混入 raw（FR-026）。
-- **PD-02（增量派生）**: runner MUST 有一个确定性派生步骤把 raw stream 在运行期增量转换为紧凑实时日志：每个有意义的进度事件输出一行可读进度，MUST NOT 缓冲到进程退出；实时日志 MUST 可追加读取与尾部跟踪。非终止事件只产生带前缀的进度行（FR-027）。
+- **PD-02（增量派生）**: runner MUST 有一个确定性派生步骤把 raw stream 在运行期增量转换为紧凑实时日志：每个有意义的进度事件输出一行可读进度，MUST NOT 缓冲到进程退出；实时日志 MUST 可追加读取与尾部跟踪。非终止事件只产生带前缀的进度行（FR-027）。每个有效进度事件从 runner 接收并写入 raw stream 的时刻，到对应派生行写入紧凑实时日志的时刻，延迟 MUST ≤120 秒（事件→派生行延迟）；无事件的静默区间不适用该阈值；每条派生行 MUST 可追溯到一条 raw 事件，阶段无事件时伪造进度行数 MUST 为 0（SC-007）。
 - **PD-03（哨兵契约）**: 阶段正常结束时，紧凑实时日志的最后一个非空行 MUST 恰好是阶段哨兵（大写阶段名 + [[STR-002]]）。派生 MUST 取 CLI 终止 `result` 事件的文本并在 EOF 时作为最后内容追加；MUST NOT 让 JSON 信封、事件元数据或非终止事件中的哨兵字样满足判定（FR-028）。
 - **PD-04（watcher 只做可见性）**: watcher MUST 把流式进度只当作可见性信号：进度行数/增长 MUST NOT 单独产生 `DONE` 或 `TIMEOUT`；完成仍须哨兵 + U4 独立校验，超时仍只由阶段 deadline 产生。既有判定顺序、退出码与窗口/deadline 语义 MUST 保持不变；判定表与退出码的精确值 owner 是 `scripts/watch-target.sh` 的 `--help` / `--self-test`，本契约不复写数值（FR-029）。
 - **PD-05（降级）**: CLI 不支持 stream-json（能力探测失败）或派生运行时缺失/派生失败时，runner MUST 回退既有缓冲模式，在状态记录 [[STR-004]] 与原因，并继续以退出记录 + 哨兵 + deadline 判定。派生失败后 runner 的收口 MUST 先跑一次性 `--finish` 从 raw 恢复终止 `result` 文本；恢复成功即写入 live log（最后非空行 = 哨兵）并记 `degraded:derivation-recovered`。若 raw 无终止 result 事件但最后一个非空行恰为哨兵（CLI 未按 stream 输出），MUST 走 buffered fallback 并记 `degraded:buffered-fallback`。两者皆无 → `sentinel=0`，按 INCOMPLETE 处理——这是缺失完成证据，不是降级导致的阶段失败。降级 MUST NOT 产生伪完成或阶段失败（FR-030）。

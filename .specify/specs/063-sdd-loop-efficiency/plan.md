@@ -6,7 +6,9 @@
 
 ## Summary
 
-在编排层为 `sdd-loop-driver` 增加四项吞吐优化，不修改任何框架阶段命令内部：① 中型特性快车道（入口 [[STR-006]] 显式启用，`tasks` 后以制品实测七判据裁决，跳过 `checklist` 但保留 `analyze`/`review`，fail-closed 回退）；② 每线两个全量测试槽位（implement 起点 baseline、review 后收口 closure），中间阶段与 review 只用确定性选择的定向集并留证据；③ plan 完成后「只小修、不重审」约束（编排层执行，U4 按最终 diff 分类，实质改动走两分支，框架内部硬执行显式排除）；④ 阶段 runner 默认 `--output-format stream-json`，原始事件流落盘，自包含派生紧凑实时日志，哨兵只认终止 `result` 文本；本地与远端都用 `nohup` 完全脱离驱动会话。
+在编排层为 `sdd-loop-driver` 增加四项吞吐优化，不修改任何框架阶段命令内部：① 中型特性快车道（入口 [[STR-006]] 显式启用，`tasks` 后以制品实测七判据裁决，跳过 `checklist` 但保留 `analyze`/`review`，fail-closed 回退；被跳过的 checklist 记 [[STR-008]]、不计入完整性分母）；② 每线两个全量测试槽位（implement 起点 baseline、review 后收口 closure），中间阶段与 review 只用固定程序 `targeted-set-v1` 选择的定向集并留证据；③ plan 完成后「只小修、不重审」约束（编排层执行，U4 按最终 diff 分类，实质改动走两分支；已批准需求基线锚定 `plan_commit` 中的 `requirements.md`，分类记录写 `approved_baseline_commit`，框架内部硬执行显式排除）；④ 阶段 runner 默认 `--output-format stream-json`，原始事件流落盘，自包含派生紧凑实时日志（事件→派生行延迟 ≤120s），哨兵只认终止 `result` 文本；本地与远端都用 `nohup` 完全脱离驱动会话。
+
+SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-007]]）为行为基线，收口归一化重放比较；名称级测试失败基线只服务 SC-012。镜像验收 = 本对零 drift + 全部镜像对相对 B-2 冻结清单零 NEW drift。
 
 交付面 = 1 个技能（3 份 references 更新 + 1 份新 owner 文档 + 5 个新脚本 + 1 个扩展脚本）+ docs 参考页 + 契约/单元/集成测试与夹具 + Feature 058 扩展记录。零新技能、零新命令、零常驻服务、零外部依赖、零模型 API。完成哨兵、watcher 判定状态机、退出码、确认门、独立校验与卡死处置保持不变。063 自身走完整阶段链，快车道只作用于未来运行。
 
@@ -14,11 +16,11 @@
 
 **Language/Version**: Markdown 技能面；Bash（runner/watcher，兼容 bash 3.2+ 的常见用法）；Python ≥3.8 仅标准库（准入/派生/台账审计/plan 改动判定）；测试为 pytest（仓库既有 contract/unit/integration 分层）
 **Primary Dependencies**: 既有 `git`、`bash`、`python3`；既有 `scripts/bash/run-tests.sh`（名称级基线）；既有 `scripts/python/sync-mirrors.py`（镜像）；既有 `skills/external/sdd-loop-driver/scripts/watch-target.sh`。**不新增任何依赖**，不引入 `jq`/网络/模型 API
-**Storage**: 文件即存储——状态脊 Markdown（准入记录、JSONL 台账围栏、plan 约束）、`<spec-dir>/test-evidence/<stage>.jsonl`、`baseline-failed.txt`/`final-failed.txt`、阶段产物 raw/live/pid/status/heartbeat/runner-log。无数据库、无新服务
+**Storage**: 文件即存储——状态脊 Markdown（准入记录、JSONL 台账围栏、plan 约束）、`<spec-dir>/test-evidence/<stage>.jsonl`、`baseline-failed.txt`/`final-failed.txt`、`notes/stall-behavior-baseline.json`（SC-010 行为基线）、阶段产物 raw/live/pid/status/heartbeat/runner-log。无数据库、无新服务
 **Testing**: Tests Mode **ON**。契约测试钉文档面与条款；单元测试钉四个 Python 脚本；集成测试钉 runner 脱离/降级与名称级回归；`watch-target.sh --self-test` 扩流式用例。既有契约测试 21/23 绿，2 红为既有镜像漂移（Phase 0 B-2），本特性修复为绿
 **Target Platform**: Linux 与 macOS 驱动/执行宿主；远端拓扑 = `ssh + su + nohup` + Linux 执行侧；macOS 无 `/proc` 的 watcher 分支按平台跳过或退化
 **Project Type**: 框架源（两顶帽子：改动落 `skills/external/`、`docs/`、`tests/`，镜像经 sync-mirrors 同步；`.specify/memory` 仅记录 Feature 扩展）
-**Performance Goals**: 每线全量套件恰 2 槽位（需求方报告的一次运行 6 次为 dated baseline，本 plan 未复测、不据此宣称提速百分比）；有事件到达时实时日志静默间隔 ≤120s；驱动零独立 `sleep` 回合；checklist 在中型夹具中派发 0 次
+**Performance Goals**: 每线全量套件恰 2 槽位（需求方报告的一次运行 6 次为 dated baseline，本 plan 未复测、不据此宣称提速百分比）；事件→派生行延迟 ≤120s（无事件区间不适用；伪造进度行数为 0）；驱动零独立 `sleep` 回合；checklist 在中型夹具中派发 0 次
 **Constraints**: 哨兵/判定状态机/退出码/确认门/独立校验/卡死处置不变；快车道默认关且仅显式启用；预算不得静默超支；plan 约束不改框架内部；无新服务/依赖/API；063 自身完整链
 **Scale/Scope**: 1 个技能；4 份 references（1 新）；6 个 scripts（5 新 + 1 扩）；1 个 docs 页；2 个契约测试文件（1 新 + 1 有意更新）；4 个单元测试；2 个集成测试；1 个夹具目录；Feature 058 两个登记面
 
@@ -33,7 +35,7 @@
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `feature-ref.md` FR-001…043 逐行映射到设计落点；每个设计决定在 `research.md` R-1…R-10 有理由与替代方案 |
 | II | Feature-Centric Development | ✅ Pass | 绑定 Feature 058（演化特性）；扩展切片规则：状态保持 `Implemented`，只更新 Feature detail 与索引 Last Updated；未新建 Feature |
 | III | Intent-Driven Development | ✅ Pass | 先定义「快车道何时可信、预算如何不丢回归、plan 约束边界、脱离后如何接管」，再给命令形态；四项优化的取舍与显式排除在 research/contracts |
-| IV | Test-First & Contract-Driven Implementation | ⚠ Partial — see Complexity Tracking | Tests Mode ON；5 个新脚本按 red-first 编写并配单元测试；49 个契约条款、决策表策略测试、FR-042(a)–(e) 夹具、名称级回归集成测试。LLM 驱动的端到端阶段序列无法在 CI 自动化，由实现期录制 trace 证明（见 Complexity Tracking） |
+| IV | Test-First & Contract-Driven Implementation | ⚠ Partial — see Complexity Tracking | Tests Mode ON；5 个新脚本按 red-first 编写并配单元测试；49 个契约条款、决策表策略测试、FR-042(a)–(e) 夹具、名称级回归集成测试。SC-010 卡死处置以 `ba2a18db` 冻结提交上的行为基线（[[STR-007]]）录制与归一化重放证明；名称级基线只服务 SC-012。LLM 驱动的端到端阶段序列无法在 CI 自动化，由实现期录制 trace 证明（见 Complexity Tracking） |
 | V | AI Agent Integration Standards | ✅ Pass | 不新增/变更 agent provider；沿用 qodercli/claude 的 stream-json 事件形状；`AGENT_CONFIG` 与 `_ASSISTANT_TIERS` 零改动 |
 | VI | Continuous Quality & Observability | ✅ Pass | raw/live 双证据、四件套、状态脊、准入记录、预算台账、plan 分类、收尾汇总；失败与降级均显式留痕 |
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass | Feature 058 已在册；本 plan 产出四件套 + research；不越权推进 `Implemented`；Pre-Status-Flip Gate 留给 implement |
@@ -69,7 +71,7 @@
 ### ② 两槽位测试预算
 
 - **槽位**：`baseline`（implement 首任务前，`run-tests.sh --names-out baseline-failed.txt`）与 `closure`（review 后合并前，`--names-out final-failed.txt` + `comm -13`）。
-- **中间阶段/review**：三条并集选定向集（改动路径覆盖、交付物契约测试、夹具改动测试），记录选择命令与充分性；空集且改可执行面 → 扩大或显式例外。
+- **中间阶段/review**：`targeted-set-v1` 固定程序选定向集——输入 `stage_base`、工作树改动与 `test_roots`，按三条并集（改动路径覆盖、交付物契约测试、夹具改动测试）做固定字符串映射，`LC_ALL=C sort -u` 输出每行一个测试路径；算法 owner = `contracts/test-budget.md` TB-05，`efficiency-model.md` §2.3 为实现载体。阶段记录完整命令、`stage_base`、输出与充分性；空集且改可执行面 → 扩大或显式例外。快车道授权跳过的 `checklist` 记 [[STR-008]]，不产生测试运行、不计入完整性分母。
 - **台账**：状态脊 JSONL 围栏（E2）+ 阶段证据文件（E3）；`audit-test-budget.py` 审计槽位、例外、环境失败与 unknown。
 - **修复循环**：收口新失败 → 修复或归因；修复重跑同一套件记 `in-slot-rerun`；实现阶段 closure-repair 重入不再消耗 baseline。
 
@@ -78,7 +80,7 @@
 - **生效**：plan U4 通过时状态脊 `plan_constraint=active`；下游四阶段提示词携带只小修块。
 - **声明**：任何 plan 制品改动须在哨兵前回传 `PLAN-EDIT:` 声明行；完整格式由 `references/efficiency-model.md` §3.2 单一 owner 定义（本 plan 不复写）。
 - **校验**：`audit-plan-changes.py` 机械输出 touched/declared；驱动按最终 diff 分类 minor/substantive/undeclared；未声明或实质 → 阶段门失败。
-- **分流**：修复既有缺陷且不变更批准面 → 一次完整 plan 重审 + U4 复验；改变批准面/新能力/无法判定 → 四要素上送。每次实质改动都按其分支处置并留痕；重复回环由既有 stall/retry 纪律兜底，不设人工次数上限。
+- **分流**：修复既有缺陷且不变更批准面 → 一次完整 plan 重审 + U4 复验；改变批准面/新能力/无法判定 → 四要素上送。判定比较对象 = E4 `plan_commit` 中 `requirements.md` 的 FR/SC 定义集合与语义；分类记录写 `approved_baseline_commit`（= `plan_commit`），不得用工作树文本或其它提交替代。每次实质改动都按其分支处置并留痕；重复回环由既有 stall/retry 纪律兜底，不设人工次数上限。
 - **显式排除**：框架命令内部硬执行不做；手工调用不受约束；若编排层不安全，另立特性。
 
 ### ④ 进度可见与脱离
@@ -91,6 +93,7 @@
 ### Verification & Mutation Plan (red-first)
 
 - **Red-first**：5 个新脚本（`admission-check.py`、`derive-live-log.py`、`audit-test-budget.py`、`audit-plan-changes.py`、`stage-runner.sh`）与 watch-target 扩展均先写失败测试，再实现；每个 red 运行的时间、命令与失败断言记入 `verification.md`，不事后补记。
+- **卡死行为基线（SC-010）**：实现首个行为面提交之前，在冻结提交 `ba2a18db` 上以三类场景夹具录制处置元组到 [[STR-007]]——超时 / 伪完成为 watcher 自动夹具，重试上限用录制 trace 并如实标注；录制不是全量测试运行，不消耗 FR-011 槽位。收口用同一组夹具重放，归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较，零差异为通过；名称级基线只服务 SC-012。
 - **变异演练**（实现期逐项执行、立即还原、记录证据；任一项未变红即视为该测试不设防）：
 
 | 目标 | 变异 | 必须变红的测试 |
@@ -103,7 +106,7 @@
 | watch-target | 让进度增长产生 DONE；从 raw 直接读哨兵 | `watch-target.sh --self-test` 与 stream 用例 |
 
 - **既有断言的有意更新**：C-3 的 H2 集合新增 `Efficiency Optimizations` 一节；C-4 的 `sed` 派生断言改为 `stage-runner.sh`。两项在 tasks 中以独立任务记录理由，禁止静默删除。
-- **镜像与基线**：每个脚本落盘后跑 `sync-mirrors.py --write --only skills/external`，以 `--check` 本对零 drift 为验收；全量测试的 name-level 基线在 implement 起点冻结，变异演练后复跑并确认零新增失败。
+- **镜像与基线**：每个脚本落盘后跑 `sync-mirrors.py --write --only skills/external/sdd-loop-driver`，以 `--check --only skills/external/sdd-loop-driver` 本对零 drift 为验收；另跑 `--check --only skills/external` 并与 `research.md` B-2 冻结清单（68 DIFF / 12 目录）比较，本特性面以外的既有 DIFF 不得新增（零 NEW drift）。全量测试的 name-level 基线在 implement 起点冻结，变异演练后复跑并确认零新增失败（只服务 SC-012）。
 
 ## Project Structure
 
@@ -113,7 +116,7 @@
 .specify/specs/063-sdd-loop-efficiency/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output — R-1…R-10 + 基线实测
-├── data-model.md        # Phase 1 output — E1…E8 + 30 条校验规则
+├── data-model.md        # Phase 1 output — E1…E8 + 32 条校验规则 + 卡死行为基线制品约束（SB-1…SB-4）
 ├── quickstart.md        # Phase 1 output — S1…S7（逐例前提与钉住者）
 ├── contracts/           # Phase 1 output — 5 文件 49 条款
 │   ├── fast-lane.md
@@ -148,11 +151,11 @@ tests/fixtures/sdd_loop_efficiency/              # 中型/大型 spec、stream �
 
 ### Mirror Obligations *(mandatory)*
 
-同步引擎：`scripts/python/sync-mirrors.py`（`skills/external` ↔ `.specify/skills` 对）。**基线漂移（2026-10-20 实测）**：`--check --only skills/external` 退出码 2，68 个 DIFF 跨 12 个技能目录；其中本特性拥有的 sdd-loop-driver 3 文件（SKILL.md、references/dispatch-recipes.md、references/watch-model.md）已 DIFF（镜像含 `.specify/` 前缀路径与不同 fingerprint），既有契约 C-12/C-18 因此红。完整清单见 `research.md` B-2。本特性 MUST 在实现期用 `sync-mirrors.py --write --only skills/external` 把 sdd-loop-driver 修复为源→镜像一致（契约测试为权威），并以「本对零 drift」为验收；其余 11 个目录的既有漂移不属本特性面，采用「零 NEW drift」相对判据并完整披露。
+同步引擎：`scripts/python/sync-mirrors.py`（`skills/external` ↔ `.specify/skills` 对）。**基线漂移（2026-10-20 实测）**：`--check --only skills/external` 退出码 2，68 个 DIFF 跨 12 个技能目录；其中本特性拥有的 sdd-loop-driver 3 文件（SKILL.md、references/dispatch-recipes.md、references/watch-model.md）已 DIFF（镜像含 `.specify/` 前缀路径与不同 fingerprint），既有契约 C-12/C-18 因此红。完整清单见 `research.md` B-2。本特性 MUST 在实现期用 `sync-mirrors.py --write --only skills/external/sdd-loop-driver` 把 sdd-loop-driver 修复为源→镜像一致（契约测试为权威），并以「本对零 drift」为验收；另以 `--check --only skills/external` 对照 B-2 冻结清单（2026-10-20，68 DIFF / 12 目录），其余 11 个目录的既有漂移不属本特性面，采用「零 NEW drift」相对判据并完整披露。
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `skills/external/sdd-loop-driver/SKILL.md`、`references/*.md`、`scripts/*` | `.specify/skills/sdd-loop-driver/` 同名文件 | `python3 scripts/python/sync-mirrors.py --write --only skills/external` 后 `--check --only skills/external` 输出 ok（本对零 drift）；新增脚本保持可执行位 |
+| `skills/external/sdd-loop-driver/SKILL.md`、`references/*.md`、`scripts/*` | `.specify/skills/sdd-loop-driver/` 同名文件 | `python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver` 后 `--check --only skills/external/sdd-loop-driver` exit 0（本对零 drift）；`--check --only skills/external` 相对 B-2 冻结清单零 NEW drift；新增脚本保持可执行位 |
 | `skills/external/sdd-loop-driver/SKILL.md` 的编译 `## Wrap-up` 面 | 同文件镜像 | 不编辑该面；`probe-utils.py --action compile-embeds --check` 零漂移（若 scan 认领不变） |
 | `docs/reference/skills/sdd-loop-driver.md` | 无镜像 | docs 漂移检查/文档结构测试 |
 | `tests/contract/*`、`tests/unit/*`、`tests/integration/*`、`tests/fixtures/*` | 无镜像（tests 不在 MIRROR_PAIRS） | pytest 直跑 |
@@ -162,7 +165,7 @@ tests/fixtures/sdd_loop_efficiency/              # 中型/大型 spec、stream �
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| IV Test-First 判 ⚠ Partial | 确定性组件（准入/派生/台账/plan 分类/脱离/名称级回归）全部有单元或集成测试；但端到端阶段序列由 LLM 按提示词执行，CI 无法真实重放 driver。实现期以录制编排 trace 作为该层证据，并在 verification.md 如实标注。 | 把 driver 改写成可自动调度的运行时以换取端到端 CI——违反宪法 IX（框架是提示词而非运行时平台），且会替换本特性要优化的对象；058 先例同样以录制演练 + 结构契约承载不可自动化的部分。 |
+| IV Test-First 判 ⚠ Partial | 确定性组件（准入/派生/台账/plan 分类/脱离/名称级回归）全部有单元或集成测试；SC-010 卡死处置以 `ba2a18db` 上的行为基线（[[STR-007]]）录制/归一化重放作为确定性证据；但端到端阶段序列由 LLM 按提示词执行，CI 无法真实重放 driver。实现期以录制编排 trace 作为该层证据，并在 verification.md 如实标注。 | 把 driver 改写成可自动调度的运行时以换取端到端 CI——违反宪法 IX（框架是提示词而非运行时平台），且会替换本特性要优化的对象；058 先例同样以录制演练 + 结构契约承载不可自动化的部分。 |
 
 ## Phase 0: Research Review
 
@@ -183,10 +186,36 @@ tests/fixtures/sdd_loop_efficiency/              # 中型/大型 spec、stream �
 
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
-| Data model | [`data-model.md`](data-model.md) | 8 实体（E1 准入记录 / E2 预算台账 / E3 定向证据 / E4 plan 约束 / E5 plan 改动分类 / E6 派发记录 / E7 raw-live 对 / E8 状态脊）+ 30 条校验规则（E1×5 + E2×6 + E3×3 + E4×3 + E5×4 + E6×3 + E7×3 + E8×3） |
+| Data model | [`data-model.md`](data-model.md) | 8 实体（E1 准入记录 / E2 预算台账 / E3 定向证据 / E4 plan 约束 / E5 plan 改动分类 / E6 派发记录 / E7 raw-live 对 / E8 状态脊）+ 32 条校验规则（E1×5 + E2×6 + E3×4 + E4×3 + E5×5 + E6×3 + E7×3 + E8×3）+ 卡死行为基线制品（SB-1…SB-4，非实体） |
 | Contracts | [`contracts/`](contracts/) | 5 文件 49 条款：fast-lane.md（FL-01…FL-10）、test-budget.md（TB-01…TB-10）、plan-constraint.md（PC-01…PC-10）、progress-decoupling.md（PD-01…PD-10）、delivery-and-invariants.md（DI-01…DI-09）；每文件带 FR/测试追溯表 |
 | Quickstart | [`quickstart.md`](quickstart.md) | 7 场景（S1 录取 / S2 拒绝 / S3 台账审计 / S4 派生哨兵 / S5 本地脱离 / S6 plan 分类 / S7 端到端录制演练）；每条带前提与钉住者 |
 | Feature ref | [`feature-ref.md`](feature-ref.md) | FR 43/43 + SC 13/13 映射；23 项交付清单；基线记录；显式排除；自应用声明 |
 | Research | [`research.md`](research.md) | R-1…R-10 + B-1…B-7 基线实测 |
 
-Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓）；契约文件 5（预估 4–5 ✓）；条款 49（预估 40–50 ✓）；quickstart 场景 7（预估 6–7 ✓）；无漂移需修正项。
+Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓）；契约文件 5（预估 4–5 ✓）；条款 49（预估 40–50 ✓）；quickstart 场景 7（预估 6–7 ✓）；初次产出无漂移需修正项（2026-10-20 analyze 门回环的 plan-owned 修复见文末 Plan Repair Record）。
+
+## Plan Repair Record（2026-10-20，analyze 门回环第 1 轮）
+
+**触发**：`/speckit.analyze` 报告（0 CRITICAL / 2 HIGH / 10 MEDIUM / 1 LOW）中的 plan-owned 项：U-01/CHK036、A-01/CHK021、I-03/CHK033、I-02/CHK016、I-04/CHK037、U-03/CHK005、U-02/CHK012、I-06，以及 I-01 的 plan 侧正则。上游口径由 requirements-repair 提交 `0c719b80` 冻结（Clarifications Session 2026-10-20 第二轮）。
+
+**PLAN-EDIT 声明**：
+
+- `PLAN-EDIT: plan.md — 传播 SC-010 行为基线（[[STR-007]]）、事件→派生行延迟、approved_baseline_commit、[[STR-008]] 跳过语义、镜像选择器收窄与零 NEW drift；分类=substantive（新增证据制品/计时对象/字段引用），理由=实施 FR-038/FR-012/FR-022/FR-040 的已批准口径，不改变需求范围或任务分解。`
+- `PLAN-EDIT: data-model.md — 新增 E1 lines.manifest 行语法 owner、E3 not-applicable-skipped-stage（V-E3-4）、E5 approved_baseline_commit（V-E5-5）、Stall Behavior Baseline 证据制品（SB-1…SB-4）；分类=substantive（字段面与证据制品扩展），理由=同上。`
+- `PLAN-EDIT: contracts/fast-lane.md — FL-03(a) 计数正则改为引用 requirements FR-003(a) owner，FL-03(e) 引用 data-model E1 行语法 owner；分类=minor（引用与一致性修复，消除 I-01 plan 侧漂移）。`
+- `PLAN-EDIT: contracts/test-budget.md — TB-05 固定选择程序 targeted-set-v1（输入/算法/排序/输出），TB-06/07 增加授权跳过语义与审计联结；分类=substantive（新增确定性算法与审计规则），理由=FR-013/FR-012/SC-005 已批准口径。`
+- `PLAN-EDIT: contracts/plan-constraint.md — PC-01/PC-06 绑定 approved_baseline_commit = plan_commit 并要求以该提交的 requirements.md 比较；分类=substantive（分类输入字段），理由=FR-022 已批准口径。`
+- `PLAN-EDIT: contracts/progress-decoupling.md — PD-02 增加事件→派生行延迟与派生行可追溯性；分类=substantive（计时对象与可追溯约束），理由=SC-007/FR-027 已批准口径。`
+- `PLAN-EDIT: contracts/delivery-and-invariants.md — DI-03 行为基线、DI-05 镜像判据、DI-06 基线证据形态；分类=substantive（判据细化），理由=FR-038/SC-010/SC-012 已批准口径。`
+- `PLAN-EDIT: feature-ref.md — FR-012/013/022/038/040 与 SC-005/007/010/012 映射更新，基线记录增加 [[STR-007]]；分类=minor（映射与引用一致性）。`
+- `PLAN-EDIT: research.md — B-5 规格校验行补充 requirements-repair 后实测值（313 lines / 8 shared strings）；分类=minor（dated record 的当前值注记，不改设计决定）。`
+- `PLAN-EDIT: quickstart.md — S1/S2 引用计数 owner、S3/S6 新口径、S7 补充卡死行为基线录制/重放；分类=minor（示例前提与引用更新，不新增场景编号）。`
+
+**FR-022 分类与不重审理由**：本轮改动是 analyze 门回环中 plan 阶段自身的修复，不是 plan 约束激活后的下游阶段编辑。改动只把 requirements-repair 已冻结的口径落到 plan 设计面；不改变已批准的需求范围/FR/SC 语义、架构方向或任务分解范围。数据模型与契约的字段面扩展（`approved_baseline_commit`、`not-applicable-skipped-stage`、`targeted-set-v1`、[[STR-007]]）是该口径的唯一可实现形态，属于 FR-022(a) 所称「修复既有缺陷所必需」。因此不触发嵌套的完整 plan 重审；本阶段完整性由随后重跑 `/speckit.analyze` 复核（FR-023）。若驱动判断存在其它读法，按 FR-022(b) 四要素上送。
+
+**假设**：
+
+- `ba2a18db` 之后至实现首个行为面提交之间只含规格/计划/清单文档（requirements-repair 的自述），故 SC-010 行为基线冻结提交取 `ba2a18db`；实现期若发现行为面改动，按 FR-038 改取首个行为面改动前的提交并在状态脊记录差异。
+- `lines.manifest` 行语法 owner 选择 `data-model.md` E1（而非契约），因为 E1 已拥有 `lines_manifest_ptr` 字段且准入脚本输入以 E1 为准；FL-03(e) 只引用。
+- `targeted-set-v1` 以现有 shell 工具实现，不新增脚本交付面；算法 owner 放 `contracts/test-budget.md` TB-05，`efficiency-model.md` §2.3 为实现载体并由契约测试钉住。
+- SC-010 行为重放不是全量测试运行，不消耗 FR-011 的两个槽位；重试上限驾驶使用录制 trace，并在 `verification.md` 如实标注。

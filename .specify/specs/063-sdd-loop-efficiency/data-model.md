@@ -31,10 +31,17 @@
 | `decided_at` | epoch 或 ISO-8601 | 裁决时间 |
 | `reversion`（可选） | `{trigger, evidence, at}` | 录取后判据失效/新事实时的回退触发；发生即必须记录 |
 
+**`lines.manifest` 行语法（owner）**：本小节是 `lines.manifest` 行语法的唯一 owner；FL-03(e)、quickstart 与夹具只引用本节，不复述语法。
+
+- 文件为 UTF-8 文本；空行忽略；以 `#` 开头的行是注释，不构成记录。
+- 每条记录行 = `<line-label>|<branch>`：恰一个 ASCII `|` 分隔符、两个非空字段，字段前后无空白。
+- `line-label` 匹配 `[A-Za-z0-9._-]+`；`branch` 是 git 分支引用名，不得含空白或 `|`。
+- 快车道准入要求文件恰有一条记录，且其 `branch` 等于 `--expected-branch`；零条、多条或分支不匹配 → 判据 (e) fail（fail-closed）。
+
 **校验规则**：
 - V-E1-1：`decision=fast-lane` 时七个判据全部为 `pass`，且每项 `evidence` 非空与可复算（SC-001）。
 - V-E1-2：`entry_evidence` 缺失 [[STR-006]] → MUST NOT 产生 `fast-lane`；自然语言声明不构成启用。
-- V-E1-3：`tasks.md` 缺失/不可解析、任一计数无法复算、`lines_manifest` 缺失或非单线 → `full-chain`（fail-closed），记录原因。
+- V-E1-3：`tasks.md` 缺失/不可解析、任一计数无法复算、`lines_manifest` 缺失、记录不符合本节「行语法」或非单线 → `full-chain`（fail-closed），记录原因。
 - V-E1-4：记录 MUST 在 `checklist` 派发前写入状态脊，并携带 [[STR-003]] 跳过标记（FR-004）。
 - V-E1-5：收尾汇总必须能由记录复现：裁决、逐条证据、实测计数、checklist 状态（跳过/执行）。
 
@@ -89,9 +96,9 @@
 | 字段 | 取值/形态 | 约束 |
 |------|-----------|------|
 | `stage` | 阶段名 | 一条记录只属一个阶段 |
-| `status` | `ran` \| `not-run-docs-only` \| `empty-selection-escalated` \| `unknown` | 不允许静默空证据 |
+| `status` | `ran` \| `not-run-docs-only` \| `empty-selection-escalated` \| `not-applicable-skipped-stage` \| `unknown` | 不允许静默空证据；`not-applicable-skipped-stage` 即 [[STR-008]] |
 | `command` | 命令行 | `ran` 必填 |
-| `selection_basis` | 规则编号 + 命令输出摘要 | 取 (a) 改动路径覆盖、(b) 交付物契约测试、(c) 夹具改动测试的并集 |
+| `selection_basis` | 规则编号 + 命令输出摘要 | 算法 owner = `contracts/test-budget.md` TB-05 `targeted-set-v1`；取 (a) 改动路径覆盖、(b) 交付物契约测试、(c) 夹具改动测试的并集 |
 | `selected_paths[]` | 测试路径列表 | 空集时按 FR-013 边界处置 |
 | `sufficiency` | 字符串 | 为何足以发现本阶段引入的回归 |
 | `rc` / `passed` / `failed` | 整数 | `ran` 必填；缺失 → `unknown` |
@@ -103,6 +110,7 @@
 - V-E3-1：`selected_paths` 为空且本阶段改动了可执行面 → `status=empty-selection-escalated`，必须扩大同族或按显式例外升级为全量（FR-013 边界）。
 - V-E3-2：`not-run-docs-only` 仅当改动集不含可执行/测试面时合法；必须附改动路径证据。
 - V-E3-3：缺命令、选择依据、rc、计数、新增失败、基线任一字段 → 收口审计报告 `unknown`（SC-005）。
+- V-E3-4：`status=not-applicable-skipped-stage`（[[STR-008]]）仅当 `stage=checklist`、E1 准入记录 `decision=fast-lane` 且状态脊含 [[STR-003]] 跳过标记时合法；该记录 MUST NOT 记为 `unknown`，MUST NOT 计入 SC-005 完整性分母；缺少上述联结证据的跳过 → `unknown` 并由收口审计报告。
 
 ## E4 — Plan Constraint State
 
@@ -112,7 +120,7 @@
 |------|-----------|------|
 | `plan_constraint` | `absent` \| `active` | plan U4 通过时置 `active` |
 | `activated_at` | epoch/ISO-8601 | 生效点 = plan 完成时 |
-| `plan_commit` | 提交号 | 约束基线 |
+| `plan_commit` | 提交号 | 约束基线；同时是「已批准需求基线」锚点（FR-022） |
 | `plan_owned_paths[]` | 路径列表 | `plan.md`、`data-model.md`、`contracts/`、`quickstart.md`、`research.md`、`feature-ref.md` |
 | `re_reviews[]` | 每次 `{trigger, at, plan_commit}` | 每次完整 plan 重审都必须记录；不设人工次数上限，重复回环由既有 stall/retry 纪律（90 分钟 / 2 次）兜底 |
 
@@ -128,6 +136,7 @@
 | 字段 | 取值/形态 | 约束 |
 |------|-----------|------|
 | `stage` / `base` / `head` | 阶段名 + 提交区间 | `base..head` 覆盖本阶段提交 |
+| `approved_baseline_commit` | 提交号 | MUST 等于 E4 `plan_commit`；分支 (a)/(b) 判定以该提交的 `requirements.md` FR/SC 定义集合与语义为比较对象；缺失或不一致 → 分类不可信、门失败 |
 | `touched_paths[]` | plan 拥有路径 | 由 `git diff --name-only <base>..HEAD` **加** `git status --porcelain -- <plan paths>`（未提交改动）机械派生 |
 | `declaration_lines[]` | 阶段回传中的 `PLAN-EDIT:` 行 | 缺失即未声明 |
 | `classification` | `none` \| `minor` \| `substantive` \| `undeclared` | 按**最终 diff** 判定，不按单次编辑措辞 |
@@ -139,6 +148,7 @@
 - V-E5-2：`substantive` 定义：改变范围、架构方向、数据模型语义、契约语义、FR/SC 内容或任务分解范围，或引入新能力/安全面。
 - V-E5-3：`minor` 仅限错别字/措辞、断链/引用修复、格式、行级一致性；多处小修合并后改变语义 → 按最终 diff 判 `substantive`。
 - V-E5-4：分流 `(a)` 仅在「修复既有缺陷且不变更上述任一项」时合法；无法判定或引入新面 → `(b)` 四要素上送（FR-022）。
+- V-E5-5：分类记录 MUST 含 `approved_baseline_commit`，其值 MUST 等于 E4 `plan_commit`；分支 (a) 的「不改变已批准需求」判定 MUST 以该提交的 `requirements.md` 为比较对象，MUST NOT 以工作树当前文本或其它提交替代（FR-022/SC-006）。
 
 ## E6 — Stage Dispatch Record
 
@@ -176,7 +186,7 @@
 
 **校验规则**：
 - V-E7-1：live log 的最后非空行必须等于 `<STAGE>-DONE` 才能作为完成正证据；中间事件中的哨兵字样不得成为裸最后一行。
-- V-E7-2：`derivation` 降级时 MUST 先尝试 `raw-finish` 从终止 result 事件恢复；恢复成功写入 live log 并记 `degraded:derivation-recovered`；只有 raw 无 result 且 raw 最后非空行恰为哨兵时才走 `buffered-fallback`；两者皆无 → `sentinel=0`，判 INCOMPLETE（缺失完成证据，不是降级导致阶段失败）。不得伪造进度行（SC-007/SC-009）。
+- V-E7-2：`derivation` 降级时 MUST 先尝试 `raw-finish` 从终止 result 事件恢复；恢复成功写入 live log 并记 `degraded:derivation-recovered`；只有 raw 无 result 且 raw 最后非空行恰为哨兵时才走 `buffered-fallback`；两者皆无 → `sentinel=0`，判 INCOMPLETE（缺失完成证据，不是降级导致阶段失败）。不得伪造进度行（SC-007/SC-009）；每条派生行 MUST 可追溯到一条 raw 事件，事件从 runner 接收并写入 raw stream 到对应派生行写入 live log 的延迟 MUST ≤120 秒，无事件区间不适用该阈值。
 - V-E7-3：raw 与 live 均须保留到 U4/U5 与收尾审计（FR-035）。
 
 ## E8 — Line State Spine
@@ -192,6 +202,7 @@
 | admission | E1 | checklist 派发前 |
 | test budget | E2 围栏 | 每次测试证据入账时 |
 | plan constraint | E4 | plan U4 后 |
+| stall baseline | [[STR-007]] 路径 + `base_commit` + 录制时间 | 实现首个行为面提交前 |
 | plan changes | E5 | 每个下游阶段 U4 后 |
 | verify/stall | U4 结论 / U5 上送四要素 | U4/U5 |
 
@@ -199,6 +210,26 @@
 - V-E8-1：所有状态转移先写状态脊后执行动作；续环不依赖会话记忆。
 - V-E8-2：多线并行时每线独立 E1/E2/E4/E6/E7，路径与槽位不得共享或互相覆盖（FR-011）。
 - V-E8-3：新会话接手先 `--once` 快照；已完成阶段只核验不重派（FR-032）。
+
+## Stall Behavior Baseline（卡死行为基线证据制品，非 E1–E8 实体）
+
+**定位**：SC-010 的行为比较对象。路径固定为 spec-dir 下的 [[STR-007]]，在实现首个行为面提交之前录制；它不是状态脊实体，不改变 E1–E8 实体计数，也不消耗全量测试预算槽位。
+
+**录制对象**：冻结提交 `ba2a18db`（若实现起点前另有行为面改动，以首个行为面改动前的提交为准，并在状态脊记录差异）上的三类场景：
+
+| 场景 | 处置结果 |
+|------|----------|
+| 超时（TIMEOUT） | watcher 判 TIMEOUT |
+| 重试上限（stalled） | 状态脊卡死状态 + 四要素上送件齐备 |
+| 伪完成（退出 rc=0 且哨兵缺失） | 判 INCOMPLETE，不派发下一阶段 |
+
+**每个元组字段**：`watcher_verdict`、`exit_code`、`spine_stall_state`、`retries_consumed`、`escalation_package_complete`（或 `not-applicable`）、`next_stage_dispatched`（`yes|no`）、`spine_write_before_action`（`yes|no`）、`evidence_ptr`。文件根字段：`base_commit`、`recorded_at`、`scenarios[]`。
+
+**录制与比较约束**：
+- SB-1：基线 MUST 在实现首个行为面提交之前录制；录制时点与 `base_commit` MUST 写入状态脊（E8 stall baseline 行）。
+- SB-2：超时与伪完成场景用 watcher 自动夹具录制；重试上限的驾驶过程用录制 trace，两类证据在验证记录中如实标注，MUST NOT 把 trace 冒充自动测试。
+- SB-3：收口 MUST 用同一组夹具在当前树上重放并生成 final 记录；比较前归一化剔除时间戳、PID、绝对路径与耗时。
+- SB-4：逐字段比较；任何字段差异 MUST 判回归并修复，MUST NOT 以归因豁免。名称级测试失败基线只服务 SC-012，MUST NOT 用于 SC-010。
 
 ## 实体关系
 
@@ -209,5 +240,6 @@ E8 State Spine (per line)
  ├─ E2 Test Budget Ledger (2 slots + reruns/exceptions)
  │    └─ evidence_ptr ──▶ E3 Targeted Evidence ×N (per stage)
  ├─ E4 Plan Constraint State (activated at plan completion)
- └─ E5 Plan Change Classification ×N (per downstream stage U4)
+ ├─ E5 Plan Change Classification ×N (per downstream stage U4)
+ └─ Stall Behavior Baseline ──▶ [[STR-007]] (recorded before first behavior commit)
 ```

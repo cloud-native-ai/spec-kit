@@ -34,7 +34,7 @@ BASE_LARGE=$(git -C "$FIXTURE_LARGE" rev-parse HEAD)
 PLAN_BASE=$(git -C "$FIXTURE_REPO" rev-parse HEAD)
 ```
 
-- **前提**：夹具树由 `tests/fixtures/sdd_loop_efficiency/` 提供；`medium` 含 12 条 FR / 25 条任务、全绿需求清单、`entry.md`（含 `fast-lane=opt-in`）与 `lines.manifest`（恰一行 `012-medium|012-medium`）；`large` 含 60 条任务；`state-spine-valid.md` 含 baseline/closure 台账围栏；`plan-repo` 含 plan 六件套。
+- **前提**：夹具树由 `tests/fixtures/sdd_loop_efficiency/` 提供；`medium` 含 12 条 FR / 25 条任务、全绿需求清单、`entry.md`（含 `fast-lane=opt-in`）与 `lines.manifest`（按 `data-model.md` E1「lines.manifest 行语法」实例化的恰一条本线记录）；`large` 含 60 条任务；`state-spine-valid.md` 含 baseline/closure 台账围栏；`plan-repo` 含 plan 六件套。
 - **钉住**：`tests/unit/test_admission_check.py` 的夹具构造与 `tests/unit/test_audit_test_budget.py` 的台账夹具。
 
 ## S1 — 中型特性快车道准入（录取）
@@ -50,7 +50,7 @@ python3 skills/external/sdd-loop-driver/scripts/admission-check.py \
   --json-out /tmp/063-admission.json
 ```
 
-- **前提**：七判据全部机械可判；FR 计数只数 `^- **FR-NNN**` 定义行（不数 SC）；任务计数只数 `^- [state] TNNN` 行；区间 owner 为 requirements.md FR-003，脚本常量为运行时 owner。
+- **前提**：七判据全部机械可判；FR 定义行与任务行的计数语法 owner 为 `requirements.md` FR-003(a)（本示例不复写正则），区间 owner 同为 FR-003，脚本常量为运行时 owner；`lines.manifest` 行语法 owner 为 `data-model.md` E1。
 - **预期**：exit 0；`/tmp/063-admission.json` 的 `decision=fast-lane`、七项判据齐全、`measured.fr_count=12`、`measured.task_count=25`。
 - **钉住**：`tests/unit/test_admission_check.py::test_medium_fixture_admitted` + `tests/contract/test_sdd_loop_driver_efficiency.py::test_fl_08_admission_script_interface`。
 - **清理**：`rm -f /tmp/063-admission.json`。
@@ -78,8 +78,8 @@ python3 skills/external/sdd-loop-driver/scripts/audit-test-budget.py \
   --spine /tmp/063-line-state.md --spec-dir "$FIXTURE/.specify/specs/012-medium"
 ```
 
-- **前提**：`/tmp/063-line-state.md` 由准备步骤复制；含 baseline 与 closure 两条 JSONL、closure 带 `comm -13` 结果；`<spec-dir>/baseline-failed.txt` 与 `final-failed.txt` 存在。
-- **预期**：exit 0；摘要 `slots=baseline:1 closure:1 reruns=N exceptions=0 unknown=0`。若增删槽位、缺 `exception_reason`、或用计数比较替代名称级差集，审计 MUST exit 1。
+- **前提**：`/tmp/063-line-state.md` 由准备步骤复制；含 baseline 与 closure 两条 JSONL、closure 带 `comm -13` 结果；`<spec-dir>/baseline-failed.txt` 与 `final-failed.txt` 存在。若夹具同时含快车道授权跳过的 checklist，E3 记 `not-applicable-skipped-stage`（[[STR-008]]），以 E1 准入记录与 [[STR-003]] 联结。
+- **预期**：exit 0；摘要 `slots=baseline:1 closure:1 reruns=N exceptions=0 unknown=0`；授权跳过阶段不得计入 `unknown` 或完整性分母。若增删槽位、缺 `exception_reason`、或用计数比较替代名称级差集，审计 MUST exit 1。
 - **钉住**：`tests/unit/test_audit_test_budget.py`（合法台账、槽外例外、槽内重跑、环境失败、缺证据 unknown、日志扫描未入账命中）。
 - **清理**：`rm -f /tmp/063-line-state.md`。
 
@@ -147,7 +147,7 @@ python3 skills/external/sdd-loop-driver/scripts/audit-plan-changes.py \
   --declarations /tmp/063-plan-edits.txt
 ```
 
-- **前提**：`PLAN_BASE..PLAN_HEAD` 内有一个提交修改 `plan.md`，阶段回传未包含 `PLAN-EDIT:` 行（`/tmp/063-plan-edits.txt` 为空）；六个 plan 拥有路径全部传入。
+- **前提**：`PLAN_BASE..PLAN_HEAD` 内有一个提交修改 `plan.md`，阶段回传未包含 `PLAN-EDIT:` 行（`/tmp/063-plan-edits.txt` 为空）；六个 plan 拥有路径全部传入；U4 分类记录写 `approved_baseline_commit` = E4 `plan_commit`，分流判定以该提交的 `requirements.md` 为比较对象。
 - **预期**：exit 1；输出 `touched_paths=["plan.md"]`、`undeclared=true`；驱动据此判该阶段门失败并进入 PC-06 分流。
 - **钉住**：`tests/unit/test_audit_plan_changes.py::test_undeclared_plan_change_flagged`（含未提交改动用例）。
 - **清理**：`rm -f /tmp/063-plan-edits.txt`。
@@ -157,6 +157,7 @@ python3 skills/external/sdd-loop-driver/scripts/audit-plan-changes.py \
 按 `references/efficiency-model.md` 的 U0–U6 流程，用一个中型夹具跑一次「入口携带 `fast-lane=opt-in` → tasks 后准入 → 跳过 checklist → analyze → implement（起点全量）→ review → 收口全量 → 合并」；同时跑一个未携带字面量的对照，确认完整链。记录派发序列、状态脊、台账与收尾汇总。
 
 - **证据形态**：实现期在 `verification.md` 粘贴两份录制 trace（快车道/完整链）的路径与要点；CI 只自动验证确定性组件与契约条款，不冒充端到端证明（better-harness 证据纪律）。SC-002/SC-003/SC-006/SC-008 的非自动部分以该 trace 为证据并如实标注。
+- **卡死行为基线（SC-010）**：在实现首个行为面提交之前，于冻结提交 `ba2a18db` 上录制 [[STR-007]] 的三类处置元组（超时 / 伪完成为 watcher 自动夹具，重试上限为录制 trace）；收口用同一组夹具重放，归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较，零差异为通过。该录制不是全量测试运行，不消耗两个全量槽位；名称级基线只服务 SC-012。
 - **钉住**：`tests/contract/test_sdd_loop_driver_efficiency.py::test_fl_10_self_application_exclusion` 只钉住「本特性自身不走快车道」；trace 本身不是 CI 测试。
 
 ## 清理（全部场景结束后）
@@ -174,9 +175,9 @@ rm -rf "${TMP063:-}" "${WORK063:-}"
 
 | 示例 | 路由 | 钉住者 | 前提清单 |
 |------|------|--------|----------|
-| S1/S2 | (b) 计划测试 | `test_admission_check.py` | 脚本 CLI、exit 语义、夹具 git 布局、lines manifest 格式、FR-only 计数 |
-| S3 | (b) 计划测试 | `test_audit_test_budget.py` | 台账围栏、JSONL 字段、names 文件、状态脊夹具 |
+| S1/S2 | (b) 计划测试 | `test_admission_check.py` | 脚本 CLI、exit 语义、夹具 git 布局、lines manifest 行语法 owner、FR-003(a) 计数 owner |
+| S3 | (b) 计划测试 | `test_audit_test_budget.py` | 台账围栏、JSONL 字段、names 文件、状态脊夹具、not-applicable 跳过语义 |
 | S4 | (b) 计划测试 | `test_derive_live_log.py` + self-test | 事件形状、result 字段、bash 调用、4b 日志-only 判定 |
 | S5 | (b) 计划测试 | runner 集成测试 | stub CLI 形状、nested bash 退出、nohup 形态、status 字段、删除前校验 |
 | S6 | (b) 计划测试 | `test_audit_plan_changes.py` | git 区间、六个 plan 路径、`PLAN-EDIT:` 声明格式 |
-| S7 | 录制证据（非 CI） | verification.md | 中型夹具、入口字面量、阶段链 |
+| S7 | 录制证据（非 CI） | verification.md | 中型夹具、入口字面量、阶段链、[[STR-007]] 行为基线录制/重放 |
