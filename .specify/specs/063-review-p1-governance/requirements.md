@@ -7,8 +7,8 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification  
-**Feature Name**: Need clarification
+**Feature ID**: 063  
+**Feature Name**: Review P1 Governance（评审 P1 治理）
 
 ## 现状锚点（2026-10-19 以源码与评审报告实测为准；dated record，仅作治理输入，非运行时保证）
 
@@ -20,7 +20,7 @@
 
 ## Assumptions（对输入中开放点的缺省裁决；clarify 阶段可推翻，推翻时 MUST 记录）
 
-- **Related Feature 暂不绑定**：本阶段保留 `Need clarification`；由 `/speckit.clarify` 按 Feature Binding Rules 绑定。brief 称本特性为“新框架治理特性”，但未指定 Feature ID，故不在此发明。
+- **Related Feature 绑定为新建 Feature 063**（clarify 会话 2026-10-19 裁定，收口本阶段早先的「暂不绑定」缺省）：候选 012 / 028 / 053 / 056 / 062 经绑定先例启发式核验均不覆盖 F1–F8 的跨命令治理束，brief 亦定性为「新框架治理特性」。登记见 `.specify/memory/features/063.md` 与 `.specify/memory/features.md` 索引行。
 - **治理范围是 F1–F8 的机制修复**，不是重做 062，也不是逐条复述评审建议。F5/F8 虽为 P2，仍在 brief 的 F1–F8 范围内。
 - **机制修复优先于实例修复**（宪法 XI）：每条 finding 的验收落在“产生该缺陷的模板/技能/命令/脚本/契约”上；`.specify/` 运行时副本经既有 sync/init 流程落位，MUST NOT 以手改运行时副本作为主要交付。
 - **062 的制品是证据，不是编辑对象**：本特性 MUST NOT 修改 `.specify/specs/062-humanize-command/` 下的 `requirements.md`、`plan.md`、`tasks.md` 或 `review.md` 来“消除” finding。`notes/red-first-evidence.md` 的 GATE 编号实例修复不在本特性范围内（F8 只要求机制侧不再产生裸 id 引用）。
@@ -30,7 +30,7 @@
 - **REC 的合法入口**：`shared/workflow/feedback-step.md` § Scope guard 保持本地 scope 规则不变，同时点名既有的 Mode 5 自省豁免路径为全局 review 建议的合法入口；不新建 intake 存储。
 - **历史回填不是机制修复的前置条件**：本特性前向强制“评审产生 REC 时同批登记”；对十份历史 review 的回填 MAY 作为有界迁移执行，但不构成验收前置，且 MUST NOT 演化为新的跟踪系统。
 - **checklist 关闭形态**：采用 append-only recheck 文件（061 的 REC-C5），不原地刷新原 checklist；waiver 采用 `Scope` / `Basis` / `Disposition` / `Closed` 四段（061 的 REC-C6）。原始未勾选项保留为历史记录。
-- **引用组花括号字符集**（F1）：`(` 与 `（` 是开组定界符，`)` 与 `）` 是对应闭组定界符；嵌套只要求同宽度匹配。跨宽度嵌套/不配对视为畸形组，MUST 由检查器报告，MUST NOT 被静默计为引用或静默计为 mention（缺省裁定，见 Clarifications）。
+- **引用组括号字符集**（F1）：`(` 与 `（` 是开组定界符，`)` 与 `）` 是对应闭组定界符；嵌套只要求同宽度匹配。跨宽度嵌套/不配对视为畸形组，MUST 由检查器报告，MUST NOT 被静默计为引用或静默计为 mention（缺省裁定，clarify 会话 2026-10-19 复核维持，见 Clarifications）。
 - **基线差异分类**（F7）：允许 `upstream repair` / `inherited` / `attributable to this feature` 三类之外增加 `undecidable`；无法归因时 MUST 报告 undecidable，MUST NOT 猜测。
 - **证据哈希算法**（F6）：requirements 层只要求“确定性内容哈希 + 模板记录算法”；具体算法（如 SHA-256）由 plan 选择，避免在需求层锁定实现。
 - **计数与枚举**：编译单元集合、baseline 文件集合、recognition 参数集合等易变集合 MUST 由引擎/目录派生或引用其 owner（宪法 XIV），MUST NOT 在需求或下游制品中手写固定条数。
@@ -175,9 +175,9 @@
 #### F2 — checklist 的责任阶段与关闭形态
 
 - **FR-005**: `/speckit.analyze` MUST 装载 feature 的 `checklists/*.md`；每个未勾选且带 `Gap` 标签的条目 MUST 被升格为 finding，或在门报告中给出明确 disposition 与理由。MUST NOT 出现“未勾选、未升格、未处置”的 `Gap`；disposition 形态 MUST 由 analyze 技能定义为确定性可检查的标记，而不是自由散文。
-- **FR-006**: checklist 的回答 MUST 采用 append-only recheck 记录（每轮一个 recheck 文件）：每个已回答条目 MUST 引用它所回答的 requirement 行；MUST NOT 原地刷新原 checklist。原 checklist 的未勾选行 MUST 保留为历史记录（lands 061 REC-C5）。
+- **FR-006**: checklist 的回答 MUST 采用 append-only recheck 记录（每轮一个 recheck 文件）：每个已回答条目 MUST 引用它所回答的 requirement 行；MUST NOT 原地刷新原 checklist。原 checklist 的未勾选行 MUST 保留为历史记录（lands 061 REC-C5）。该形态规则 MUST 声明在 `skills/internal/create-checklist/SKILL.md`（checklist 形态规则的 owner 技能，REC-C5 点名的落点）。
 - **FR-007**: `skills/internal/implement-feature/SKILL.md` § Step 2 — Checklist exemption gate MUST 增加第三分支：当后续阶段已经解决某条目的主题并按 FR-006 记录回答时，该条目 MUST 被视为已回答、不计入未完成；门只对真正未解决的条目触发。MUST NOT 继续让每个 feature 因“无阶段负责翻勾”而必然 waiver。
-- **FR-008**: waiver 记录 MUST 采用 `Scope` / `Basis` / `Disposition` / `Closed` 四段格式，并列出关闭该条目的上游制品编辑（lands 061 REC-C6）。缺少任一段的 waiver MUST 被视为不合规；`Closed` 必须说明是什么解决了它，而不是永远 open-ended。
+- **FR-008**: waiver 记录 MUST 采用 `Scope` / `Basis` / `Disposition` / `Closed` 四段格式，并列出关闭该条目的上游制品编辑（lands 061 REC-C6）。缺少任一段的 waiver MUST 被视为不合规；`Closed` 必须说明是什么解决了它，而不是永远 open-ended。该格式规则 MUST 声明在 `skills/internal/implement-feature/SKILL.md` § Step 2 — Checklist exemption gate（waiver 的产生面，REC-C6 点名的落点，与 FR-007 同面）。
 
 #### F3 — 评审建议的持久化与所有权
 
@@ -300,3 +300,11 @@
 - Q: checklist 的关闭形态由哪个阶段负责、是否原地刷新？ → A: **由解决该条目主题的阶段负责记录回答，写入 append-only recheck 文件；不原地刷新原 checklist。** implement 的豁免门增加“已回答”第三分支；waiver 采用 `Scope`/`Basis`/`Disposition`/`Closed`（FR-006/FR-007/FR-008）。该裁决同时落地 061 的 REC-C5/C6。
 - Q: 引用组遇到跨宽度嵌套或宽度不配对时怎么计？ → A: **视为畸形组并由检查器报告**，不静默计为引用，也不静默计为 mention。合法嵌套只要求同宽度匹配；这是 owner 未明说的边界，作为缺省裁定记录，clarify 可修订（FR-001/FR-002）。
 - Q: F8 是否要顺带修正 062 的 `notes/red-first-evidence.md` 中的 GATE 编号？ → A: **不修。** 本特性只落机制侧（逐字引用 gate 行，前向适用）；062 的 notes 属于证据，修改它会模糊“机制是否已修复”的判定（FR-025/FR-029）。
+
+### Session 2026-10-19（clarify 阶段：Feature 绑定与机制 owner 落点收口）
+
+> 模式 A（post-requirements），无人值守自裁决。同作者门不触发（规格由上一阶段派发产出、先于本会话），覆盖扫描在本上下文直接执行：12 类中 Feature Linkage（Missing）、Functional Scope（FR-006/FR-008 缺 owner 落点）、Terminology、Deferred-by-assumption 四类 Partial/Missing，其余 Clear。附带一处就地纠正：Assumptions 条目标题「引用组花括号字符集」→「引用组括号字符集」（花括号为笔误；条目内容与 FR-001/FR-002、Edge Cases 均为圆括号语义，恰有一种一致读法）。
+
+- Q: Related Feature 绑定既有还是新建？ → A: **新建 Feature 063（Review P1 Governance）。** 候选 012（review 命令本体，Completed，无兄弟规格承接跨命令治理）、028（feedback 层，仅 F3 入口切片）、053（机器可判定命题，F1 的机制先例但不含 F2–F8）、056（probe 体系，仅 F4/F6 的载体）、062（humanize，发现来源且本特性明确不重做）经绑定先例启发式核验均不覆盖 F1–F8 跨命令治理束；跨切面能力先例（056/057/060/061）均为新建，brief 亦定性为「新框架治理特性」。登记义务：`features.md` 索引行（Draft）+ `features/063.md` 详情 + 062 详情反向交叉引用。
+- Q: FR-006（append-only recheck 形态）与 FR-008（waiver 四段格式）的规则落点是哪个框架文件？ → A: **FR-006 落 `skills/internal/create-checklist/SKILL.md`（checklist 形态规则的 owner 技能，061 REC-C5 点名落点）；FR-008 落 `skills/internal/implement-feature/SKILL.md` § Step 2 — Checklist exemption gate（waiver 的产生面，REC-C6 点名落点，与 FR-007 同面）。** 已回写两条 FR。备选（两规则同落一个文件 / 留给 plan 裁决）被否：评审报告对两条规则已点名目标文件，且 brief 要求每条 finding 明确「所有者文档/机制」。
+- Q: 引用组跨宽度/不配对的缺省裁定（旧会话注明「clarify 可修订」）维持还是修订？ → A: **维持。** 畸形组由检查器报告，不静默计为引用也不静默计为 mention——owner 自述目的是让总数「成为规则的产物，不是读法的产物」，任何静默处理（无论计引用还是计 mention）都会重新引入读法依赖；Edge Cases 已按此编码，FR-001/FR-002 无需改动。
