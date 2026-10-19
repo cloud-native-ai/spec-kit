@@ -252,9 +252,9 @@
 
 - **SC-001**: 引用组字符集不再是一个未声明轴：对同一份同时含半角/全角引用组及同宽度嵌套的 fixture，ASCII-only 与双宽度实现的覆盖率总数差异为 0；owner 正文对定界符与嵌套规则的字面声明存在且可被契约测试断言；畸形跨宽度组被报告数为 100%。
 - **SC-002**: 条款覆盖核算成为 analyze 的固定步骤：带契约集的 fixture feature 在 analyze 运行中产生覆盖 verdict 的比例为 100%；`baseline-missing` 不再静默通过；每个含 `contracts/` 且经 `/speckit.tasks` 生成的 feature 都存在 `coverage-baseline.txt`（`find` 检查），缺失数为 0；无契约集 feature 的伪造基线数为 0。
-- **SC-003**: 对 checklist 中每个未勾选 `Gap` 条目，analyze 门报告中“升格为 finding 或显式 disposition”的覆盖率为 100%；“未勾选、未升格、未处置”的条目数为 0；以一个复刻 062 CHK005/CHK011 形态的 fixture 验证，同一 Gap 在首轮 analyze 即被消费，不再需要后续三提交修复环。
+- **SC-003**: 对至少含一条未勾选 `Gap` 的 seed checklist，analyze 门报告中“升格为 finding 或显式 disposition”的覆盖率为 100%；“未勾选、未升格、未处置”的条目数为 0；以一个复刻 062 CHK005/CHK011 形态的 fixture 验证，同一 Gap 在首轮 analyze 即被消费，不再需要后续三提交修复环。seed 的 `Gap` 条目数 MUST 非零，使该断言不是空真。
 - **SC-004**: 已被下游解决的 checklist 条目由 append-only recheck 记录回答的比例为 100%；因此被迫 waiver 的条目数为 0；原始 checklist 被原地刷新的次数为 0；缺少 `Scope`/`Basis`/`Disposition`/`Closed` 任一段的 waiver 数为 0。
-- **SC-005**: 新评审中 `REC-` 编号在 `register.md` 的同提交登记率为 100%（0 条未登记）；登记行可解析到报告锚点与状态；repo-relative 目标路径在干净 checkout 上可解析率为 100%；只有机器本地绝对路径的目标数为 0；全局建议有合法 feedback 入口的比例为 100%。
+- **SC-005**: 在至少含一条 `REC-` 的 seed 评审中，`REC-` 编号在 `register.md` 的同提交登记率为 100%（0 条未登记）；登记行可解析到报告锚点与状态；repo-relative 目标路径在干净 checkout 上可解析率为 100%；只有机器本地绝对路径的目标数为 0；全局建议有合法 feedback 入口的比例为 100%。seed 的 `REC-` 条数 MUST 非零，使该断言不是空真。
 - **SC-006**: 满足自身状态判据且 review 证据已提交的 feature 在同一运行中进入 `Ready for Review` 的比例为 100%；不满足条件的 feature 被误转的比例为 0%；转换表仍满足“每个命令恰好一个转换”。
 - **SC-007**: 逐字执行每个 command-unit 的 `## Wrap-up` 引擎调用，首次调用成功率 100%；缺参错误数为 0；因 face 未给出参数而落为 `not_evaluated` 的轴数为 0；`compile-embeds --check` 漂移为 0；2026-10-15 backlog 行状态为 closed。
 - **SC-008**: 对缺 2 个以上必填参数的调用，单次错误列出全部缺失参数的比例为 100%；逐参单错轮次为 0；已存在的 `(unit_id, run_id)` 记录不产生自动另铸 run-id 的次数为 0 例外（即自动另铸次数为 0）。

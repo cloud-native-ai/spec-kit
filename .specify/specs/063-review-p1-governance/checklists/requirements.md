@@ -31,7 +31,7 @@
 
 ## Notes
 
-- **Validator result (verbatim summary)**: `status: ok`; `[id-contiguous] pass (0)`, `[doc-order] pass (0)`, `[ref-resolvable] pass (0)`, `[marker-count] pass (0)`, `[dup-id] pass (0)`; scanned 308 lines, 44 definition rows, 3 shared strings; 0 error(s), 0 warning(s); EXIT=0. Counts are taken from the checker run, not hand-typed.
+- **Validator result (verbatim summary)**: `status: ok`; `[id-contiguous] pass (0)`, `[doc-order] pass (0)`, `[ref-resolvable] pass (0)`, `[marker-count] pass (0)`, `[dup-id] pass (0)`; scanned 303 lines, 44 definition rows, 3 shared strings; 0 error(s), 0 warning(s); EXIT=0. Counts are taken from the checker run after the final write-back, not hand-typed.
 - **Spec size**: 6 user stories; 30 functional requirements (FR-001..FR-030); 14 success criteria (SC-001..SC-014); 3 shared strings.
 - **Clarifications**: no active `[NEEDS CLARIFICATION` markers. The two decision-class anomalies that intersect this feature are adjudicated and recorded in the spec's `## Clarifications` session: E1 (`(unit_id, run_id)` idempotency — keep the lock, never auto-mint a run-id; fix face completeness) and E2 (`Implemented → Ready for Review` — owned by `/speckit.review`). Also recorded there: REC registration/intake shape, checklist closure shape, malformed cross-width citation groups, and F8's forward-only scope.
 - **Related Feature**: intentionally left as `Need clarification` for `/speckit.clarify` to bind. The brief calls this a new framework-governance feature but does not name a Feature ID; inventing one here would fabricate intent.
