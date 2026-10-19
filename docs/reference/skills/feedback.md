@@ -254,13 +254,25 @@ python3 .specify/scripts/python/feedback-utils.py --action list --unit-id "/spec
 
 Read-only; never gates execution.
 
-## Distinction from `/speckit.review`
+## Distinction from `/speckit.review` and `/speckit.analyze`
 
-`/speckit.review` remains the sole **global**, whole-project process report. Local
-Feedback Entries are bound to a single unit + run (`scope: local`) and MUST NOT duplicate
-that global perspective — they complement it. Even the `review` command's own wrap-up
-records only a *local* self-review of that run, kept distinct from the global report it
-produces.
+The conceptual boundary is owned by `.specify/shared/workflow/feedback-step.md`
+§ *Mechanism boundary — SDD-flow mechanisms vs framework feedback*; this section
+summarizes it.
+
+`/speckit.analyze` and `/speckit.review` are **SDD-flow mechanisms** whose input is the
+current feature: analyze is the read-only pre-implementation artifact-consistency gate,
+and review is the post-implementation critique of the SDD process that produced that
+feature. Review's report is **feature-scoped** — its "global" reach is the whole SDD
+process of that one feature, never a whole-framework assessment.
+
+Feedback is **not an SDD stage**. It targets the Spec Kit framework itself, attaches to
+the wrap-up of any qualifying unit, and accumulates across runs and units. Each entry
+stays `scope: local` (one unit + one run); a framework-wide view is the **aggregation**
+produced by Path A's introspection over recorded entries, not an independent zero-input
+audit. Review and framework-targeted feedback both serve framework maintainers, but
+their evidence bases differ: one feature's SDD execution history versus accumulated
+unit-run observations re-verified against the framework source.
 
 ## Dogfooding: this system is Loop A
 

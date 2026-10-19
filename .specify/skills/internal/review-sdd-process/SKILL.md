@@ -169,6 +169,10 @@ category), top 3 recommendations.
   read-only consistency pass **before** implementation (drift, coverage gaps, ambiguity);
   this skill critiques the process **after** implementation and feeds framework
   improvement, not artifact repair.
+- **Feedback is not this skill.** `/speckit.feedback` is a cross-cutting,
+  framework-targeted mechanism over accumulated unit-run entries; this skill is an
+  SDD-flow review of one feature's process. The boundary is owned by
+  `.specify/shared/workflow/feedback-step.md` § *Mechanism boundary*.
 - **Remediation is not this skill.** It produces findings and recommendations; applying
   improvements to .specify/templates/commands/scripts, or iterating requirements/plan, is a
   follow-up the maintainer or a later run performs.

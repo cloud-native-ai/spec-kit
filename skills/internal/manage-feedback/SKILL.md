@@ -197,8 +197,11 @@ prompt MUST NOT recommend it.
 - **Recording new feedback entries** is not this skill — every unit's own wrap-up
   Feedback step persists entries via the engine's record action; this skill consumes,
   routes, disposes, and packages what is already recorded.
-- **The global `/speckit.review`** is a separate review command over the SDD process,
-  not the feedback digest — do not merge the two.
+- **SDD-flow mechanisms are separate.** `/speckit.analyze` and `/speckit.review` take
+  the current feature as input and stay inside the SDD flow; feedback targets the
+  framework itself across units and runs. The normative boundary is
+  `.specify/shared/workflow/feedback-step.md` § *Mechanism boundary* — do not merge the
+  two, and do not describe review as a whole-framework report.
 - **Command-lifecycle surfaces** (User Input Protocol, the command's own Feedback /
   Documentation / Handoffs wrap-up steps) stay with `/speckit.feedback`; this skill is
   the execution core it delegates to.

@@ -27,8 +27,11 @@ when that happened.
 
 An entry's ``unit_id`` must name a Spec Kit command or skill
 (``/speckit.<command>`` | ``skill:<name>``); ``record`` rejects any other id.
-Each entry is local-scoped (``scope: local``) and stays strictly distinct from
-the global ``/speckit.review`` report.
+Each entry is local-scoped (``scope: local``: one unit + one run); a
+framework-wide view exists only as the aggregation built over recorded entries.
+``/speckit.review`` is a separate SDD-flow mechanism that reviews one feature's
+process — not a whole-framework report (boundary owner:
+``shared/workflow/feedback-step.md`` § Mechanism boundary).
 
 Positioning: feedback targets the Spec Kit framework itself (templates,
 commands, skills, scripts, docs) — never the LLM, agent CLI, harness, or the
