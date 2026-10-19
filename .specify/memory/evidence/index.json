@@ -1,6 +1,6 @@
 {
   "store": "evidence",
-  "updated": "2026-10-11T13:20:10Z",
+  "updated": "2026-10-19T06:37:11Z",
   "entries": [
     {
       "runId": "ev-20260729-073639-project",
@@ -235,6 +235,19 @@
         "feedback": "available"
       },
       "file": "ev-20261011-132006-merge-skills/findings.json"
+    },
+    {
+      "runId": "ev-20261019-063708-sdd-loop-driver",
+      "target": "skill:sdd-loop-driver",
+      "created": "2026-10-19T06:37:08Z",
+      "lanesSummary": {
+        "session": "available",
+        "project": "available",
+        "assets": "available",
+        "runs": "partial",
+        "feedback": "available"
+      },
+      "file": "ev-20261019-063708-sdd-loop-driver/findings.json"
     }
   ]
 }

@@ -1,0 +1,30 @@
+{
+  "runId": "ev-20261019-063708-sdd-loop-driver",
+  "target": "skill:sdd-loop-driver",
+  "created": "2026-10-19T06:37:08Z",
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 12
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 59
+    }
+  },
+  "engine": {
+    "engineSubsetPath": "scripts/js/better-harness",
+    "upstreamCommit": "b2e621d",
+    "nodeVersion": "26.3.0"
+  },
+  "findingsDigest": "sha256:30617792316a720359985031c7455b376b16a08f6967fd1680c90a8f7a39c557"
+}

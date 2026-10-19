@@ -1,0 +1,467 @@
+{
+  "kind": "agent-asset-baseline",
+  "schemaVersion": 1,
+  "status": "complete",
+  "scope": {
+    "provider": "qoder",
+    "workspace": ".",
+    "includeUserHome": false,
+    "includeMemories": true
+  },
+  "envelopes": {
+    "lint": {
+      "status": "available",
+      "data": {
+        "kind": "agent-lint",
+        "profile": "agent-assets-review",
+        "summary": {
+          "entrypoints": 1,
+          "documents": 1,
+          "links": 0,
+          "references": 0,
+          "missingReferences": 0,
+          "findings": 39,
+          "errors": 4,
+          "warnings": 12,
+          "advisories": 23
+        },
+        "assetInventory": {
+          "provider": "qoder",
+          "summary": {
+            "skills": 50,
+            "mcps": 0,
+            "commands": 26,
+            "hooks": 0,
+            "rules": 1,
+            "agents": 7,
+            "plugins": 0
+          }
+        },
+        "findings": {
+          "items": [
+            {
+              "id": "skill-missing-local-reference",
+              "severity": "error",
+              "assetKind": "skill",
+              "assetName": "create-docs",
+              "scope": "project",
+              "file": ".qoder/skills/create-docs/SKILL.md",
+              "line": 13,
+              "evidence": ".qoder/skills/create-docs/SKILL.md:13 points to missing local reference ../../shared/patterns/reconcile-pattern.md.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Skill Review"
+            },
+            {
+              "id": "skill-missing-local-reference",
+              "severity": "error",
+              "assetKind": "skill",
+              "assetName": "create-docs",
+              "scope": "project",
+              "file": ".qoder/skills/create-docs/SKILL.md",
+              "line": 74,
+              "evidence": ".qoder/skills/create-docs/SKILL.md:74 points to missing local reference ../../shared/patterns/explicit-implicit-pattern.md.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Skill Review"
+            },
+            {
+              "id": "skill-missing-local-reference",
+              "severity": "error",
+              "assetKind": "skill",
+              "assetName": "create-plan",
+              "scope": "project",
+              "file": ".qoder/skills/internal/create-plan/SKILL.md",
+              "line": 55,
+              "evidence": ".qoder/skills/internal/create-plan/SKILL.md:55 points to missing local reference .specify/shared/workflow/user-input-protocol.md.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Skill Review"
+            },
+            {
+              "id": "skill-missing-local-reference",
+              "severity": "error",
+              "assetKind": "skill",
+              "assetName": "git-utils",
+              "scope": "project",
+              "file": ".qoder/skills/git-utils/SKILL.md",
+              "line": 39,
+              "evidence": ".qoder/skills/git-utils/SKILL.md:39 points to missing local reference ../../shared/patterns/reconcile-pattern.md.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Skill Review"
+            },
+            {
+              "id": "custom-agent-invalid-name",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "SDD Executor",
+              "scope": "project",
+              "file": ".qoder/agents/sdd-executor.agent.md",
+              "evidence": ".qoder/agents/sdd-executor.agent.md declares a name that is not a lowercase hyphenated identifier.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-invalid-name",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "SDD Requirements Executor",
+              "scope": "project",
+              "file": ".qoder/agents/sdd-requirements-executor.agent.md",
+              "evidence": ".qoder/agents/sdd-requirements-executor.agent.md declares a name that is not a lowercase hyphenated identifier.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-invalid-name",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "SDD Setup Executor",
+              "scope": "project",
+              "file": ".qoder/agents/sdd-setup-executor.agent.md",
+              "evidence": ".qoder/agents/sdd-setup-executor.agent.md declares a name that is not a lowercase hyphenated identifier.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-invalid-name",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "Skill Verifier",
+              "scope": "project",
+              "file": ".qoder/agents/skill-verifier.agent.md",
+              "evidence": ".qoder/agents/skill-verifier.agent.md declares a name that is not a lowercase hyphenated identifier.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-invalid-name",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "Structure Adjuster",
+              "scope": "project",
+              "file": ".qoder/agents/structure-adjuster.agent.md",
+              "evidence": ".qoder/agents/structure-adjuster.agent.md declares a name that is not a lowercase hyphenated identifier.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-name-mismatch",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "dogfood-executor",
+              "scope": "project",
+              "file": ".qoder/agents/dogfood-executor.agent.md",
+              "evidence": ".qoder/agents/dogfood-executor.agent.md declares dogfood-executor, while the invocable filename is dogfood-executor.agent.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-name-mismatch",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "framework-engineer",
+              "scope": "project",
+              "file": ".qoder/agents/framework-engineer.agent.md",
+              "evidence": ".qoder/agents/framework-engineer.agent.md declares framework-engineer, while the invocable filename is framework-engineer.agent.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-name-mismatch",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "SDD Executor",
+              "scope": "project",
+              "file": ".qoder/agents/sdd-executor.agent.md",
+              "evidence": ".qoder/agents/sdd-executor.agent.md declares SDD Executor, while the invocable filename is sdd-executor.agent.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-name-mismatch",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "SDD Requirements Executor",
+              "scope": "project",
+              "file": ".qoder/agents/sdd-requirements-executor.agent.md",
+              "evidence": ".qoder/agents/sdd-requirements-executor.agent.md declares SDD Requirements Executor, while the invocable filename is sdd-requirements-executor.agent.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-name-mismatch",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "SDD Setup Executor",
+              "scope": "project",
+              "file": ".qoder/agents/sdd-setup-executor.agent.md",
+              "evidence": ".qoder/agents/sdd-setup-executor.agent.md declares SDD Setup Executor, while the invocable filename is sdd-setup-executor.agent.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-name-mismatch",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "Skill Verifier",
+              "scope": "project",
+              "file": ".qoder/agents/skill-verifier.agent.md",
+              "evidence": ".qoder/agents/skill-verifier.agent.md declares Skill Verifier, while the invocable filename is skill-verifier.agent.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            },
+            {
+              "id": "custom-agent-name-mismatch",
+              "severity": "warning",
+              "assetKind": "subagent",
+              "assetName": "Structure Adjuster",
+              "scope": "project",
+              "file": ".qoder/agents/structure-adjuster.agent.md",
+              "evidence": ".qoder/agents/structure-adjuster.agent.md declares Structure Adjuster, while the invocable filename is structure-adjuster.agent.",
+              "sourceLabel": "cloud-native-ai/spec-kit",
+              "rubricRef": "Custom Agent Review"
+            }
+          ],
+          "total": 39,
+          "omitted": 23
+        }
+      }
+    },
+    "inventory": {
+      "status": "available",
+      "data": {
+        "scope": {
+          "platform": "qoder",
+          "includeUserHome": false,
+          "includeMemories": true
+        },
+        "summary": {
+          "projectAssets": 4,
+          "userAssets": 0,
+          "pluginAssets": 0,
+          "sessionSourceHints": 1,
+          "memories": 0
+        },
+        "coverageRows": [
+          {
+            "surface": "Rules",
+            "scopes": [
+              "Project"
+            ],
+            "count": 1,
+            "paths": [
+              "AGENTS.md"
+            ]
+          },
+          {
+            "surface": "Skills",
+            "scopes": [
+              "Project"
+            ],
+            "count": 50,
+            "paths": [
+              ".qoder/skills/internal/analyze-artifacts/SKILL.md",
+              ".qoder/skills/internal/archive-session/SKILL.md",
+              ".qoder/skills/internal/clarify-artifact/SKILL.md",
+              ".qoder/skills/internal/code-review/SKILL.md",
+              ".qoder/skills/internal/collect-evidence/SKILL.md"
+            ]
+          },
+          {
+            "surface": "Commands",
+            "scopes": [
+              "Project"
+            ],
+            "count": 26,
+            "paths": [
+              ".qoder/commands/speckit.agents.md",
+              ".qoder/commands/speckit.analyze.md",
+              ".qoder/commands/speckit.checklist.md",
+              ".qoder/commands/speckit.clarify.md",
+              ".qoder/commands/speckit.constitution.md"
+            ]
+          },
+          {
+            "surface": "Custom Agents",
+            "scopes": [
+              "Project"
+            ],
+            "count": 7,
+            "paths": [
+              ".qoder/agents/dogfood-executor.agent.md",
+              ".qoder/agents/framework-engineer.agent.md",
+              ".qoder/agents/sdd-executor.agent.md",
+              ".qoder/agents/sdd-requirements-executor.agent.md",
+              ".qoder/agents/sdd-setup-executor.agent.md"
+            ]
+          }
+        ],
+        "ownerRoutes": {
+          "items": [
+            {
+              "kind": "rules",
+              "scope": "project",
+              "name": "AGENTS.md",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": "AGENTS.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "analyze-artifacts",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/internal/analyze-artifacts/SKILL.md"
+            },
+            {
+              "kind": "commands",
+              "scope": "project",
+              "name": "speckit.agents",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/commands/speckit.agents.md"
+            },
+            {
+              "kind": "agents",
+              "scope": "project",
+              "name": "dogfood-executor",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/agents/dogfood-executor.agent.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "archive-session",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/internal/archive-session/SKILL.md"
+            },
+            {
+              "kind": "commands",
+              "scope": "project",
+              "name": "speckit.analyze",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/commands/speckit.analyze.md"
+            },
+            {
+              "kind": "agents",
+              "scope": "project",
+              "name": "framework-engineer",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/agents/framework-engineer.agent.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "clarify-artifact",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/internal/clarify-artifact/SKILL.md"
+            },
+            {
+              "kind": "commands",
+              "scope": "project",
+              "name": "speckit.checklist",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/commands/speckit.checklist.md"
+            },
+            {
+              "kind": "agents",
+              "scope": "project",
+              "name": "SDD Executor",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/agents/sdd-executor.agent.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "code-review",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/internal/code-review/SKILL.md"
+            },
+            {
+              "kind": "commands",
+              "scope": "project",
+              "name": "speckit.clarify",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/commands/speckit.clarify.md"
+            },
+            {
+              "kind": "agents",
+              "scope": "project",
+              "name": "SDD Requirements Executor",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/agents/sdd-requirements-executor.agent.md"
+            },
+            {
+              "kind": "skills",
+              "scope": "project",
+              "name": "collect-evidence",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/skills/internal/collect-evidence/SKILL.md"
+            },
+            {
+              "kind": "commands",
+              "scope": "project",
+              "name": "speckit.constitution",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/commands/speckit.constitution.md"
+            },
+            {
+              "kind": "agents",
+              "scope": "project",
+              "name": "SDD Setup Executor",
+              "owner": "cloud-native-ai/spec-kit",
+              "route": ".qoder/agents/sdd-setup-executor.agent.md"
+            }
+          ],
+          "total": 84,
+          "omitted": 68
+        },
+        "memories": {
+          "included": true,
+          "contentPolicy": "raw-memory-content-not-read",
+          "categories": [],
+          "titleCount": 0
+        },
+        "warnings": []
+      }
+    },
+    "integrity": {
+      "status": "available",
+      "data": {
+        "kind": "asset-integrity-review",
+        "profile": "asset-integrity-review",
+        "status": "reviewed",
+        "contentPolicy": "memory-title-and-path-metadata-only",
+        "summary": {
+          "findingCount": 0,
+          "memories": {
+            "titleCount": 0,
+            "reviewedTitleCount": 0,
+            "truncated": false,
+            "exactCollisionGroups": 0,
+            "similarityCandidates": 0
+          },
+          "plugins": {
+            "enabledPluginCount": 0,
+            "nameCollisionGroups": 0,
+            "capabilityOverlapGroups": 0,
+            "familyCandidates": 0
+          },
+          "hooks": {
+            "enabledHookCount": 0,
+            "overRecommendedLimit": false,
+            "exactDuplicateGroups": 0,
+            "fanoutCandidates": 0
+          }
+        },
+        "findings": {
+          "items": [],
+          "total": 0,
+          "omitted": 0
+        }
+      }
+    }
+  },
+  "diagnostics": {
+    "sharedInventorySnapshot": true,
+    "compact": true,
+    "findingLimitPerEnvelope": 16,
+    "ownerRouteLimit": 16
+  }
+}

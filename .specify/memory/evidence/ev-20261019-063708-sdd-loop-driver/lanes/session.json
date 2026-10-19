@@ -1,0 +1,462 @@
+{
+  "schemaVersion": 3,
+  "kind": "session-core-facts",
+  "scope": {
+    "platform": "qoder",
+    "workspace": "spec-kit",
+    "until": "2026-10-19T06:37:08.456Z",
+    "selection": "stratified",
+    "eligibleSessions": 122,
+    "selectedSessions": 40,
+    "sampled": true
+  },
+  "candidateSelection": {
+    "strategy": "agent-work-loop-portfolio-v1",
+    "availableClasses": {
+      "validation-repair": 7,
+      "boundary-change": 5,
+      "lifecycle-demand": 5,
+      "operation-control": 24,
+      "change-gap": 10,
+      "read-only-work": 11
+    },
+    "emittedClasses": {
+      "validation-repair": 4,
+      "boundary-change": 2,
+      "lifecycle-demand": 2,
+      "operation-control": 5,
+      "change-gap": 1,
+      "read-only-work": 1
+    }
+  },
+  "admission": {
+    "taskEpisodes": 307,
+    "candidateEpisodes": 25,
+    "distinctRequests": 24,
+    "emittedCandidates": 5
+  },
+  "populationCoverage": {
+    "withChanges": 13,
+    "withChecks": 7,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 8,
+    "withFrictionConsequence": 0
+  },
+  "observationCoverage": {
+    "withChanges": 4,
+    "withChecks": 4,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 4,
+    "withFrictionConsequence": 0
+  },
+  "admissionSupport": {
+    "semanticGuardrails": [
+      "occurrences-not-distinct-episodes",
+      "coverage-not-suggestion",
+      "omitted-details-not-signal-evidence",
+      "project-capability-inventory-unobserved"
+    ],
+    "sharedFrictionConsequences": []
+  },
+  "candidates": [
+    {
+      "ref": "E1",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "将关于\"general-purpose\"问题的修复通过speckit.requirements命令新建一个requirement,然后后续走SDD流程进行处理. 建完spec之后回到\" OI-2 and OI-9 for S3, and the three new files from OI-1\"等处理流程.",
+        "key": "req:91a65388510d",
+        "occurrences": 1,
+        "intermediate": "1 是我执行的git add继续执行即可; 2 按Recommend实现; 3 按Recommend实现; 4 053-machine-decidable-artifacts 是过时的分支(已开发完的特性),检查一下所有的修改是否已经合并到…",
+        "followUp": "下一步要做什么",
+        "observedTurns": 7,
+        "omittedTurns": 4
+      },
+      "changes": {
+        "edits": 6,
+        "files": 4
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "boundary-change",
+        "lifecycle-demand",
+        "operation-control"
+      ],
+      "acceptanceSignals": [
+        "project-change",
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 683,
+        "classifiedReads": 441
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "execute",
+          "execute",
+          "change",
+          "execute"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 98
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "not-after-final-change"
+        },
+        {
+          "kind": "pytest",
+          "status": "passed",
+          "relation": "after-final-change-unreviewed"
+        },
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "after-final-change-unreviewed"
+        },
+        {
+          "kind": "pytest",
+          "status": "passed",
+          "relation": "after-final-change-unreviewed"
+        }
+      ],
+      "friction": {
+        "executionFailures": 2,
+        "permissionDenials": 0
+      },
+      "closure": "check-observed-relevance-unresolved",
+      "mechanisms": [
+        "hook:UserPromptSubmit",
+        "hook:PreToolUse",
+        "hook:PostToolUse"
+      ],
+      "lifecycle": [
+        {
+          "intent": "setup-isolation",
+          "family": "setup-isolation",
+          "dimensionId": "controlled-execution",
+          "checkId": "instruction-led-start",
+          "confidence": "High"
+        }
+      ],
+      "omittedChecks": 30
+    },
+    {
+      "ref": "E2",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "针对 \"Three decisions block the chain\"给出建议交给我审核, 然后继续S2.",
+        "key": "req:c4b613ae585c",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 22,
+        "files": 2
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "operation-control"
+      ],
+      "acceptanceSignals": [
+        "project-change",
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 249,
+        "classifiedReads": 33
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "execute",
+          "execute",
+          "check",
+          "execute"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 97
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "not-after-final-change"
+        },
+        {
+          "kind": "pytest",
+          "status": "passed",
+          "relation": "after-final-change-unreviewed"
+        },
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "after-final-change-unreviewed"
+        },
+        {
+          "kind": "pytest",
+          "status": "passed",
+          "relation": "after-final-change-unreviewed"
+        }
+      ],
+      "friction": {
+        "executionFailures": 2,
+        "permissionDenials": 0
+      },
+      "closure": "check-observed-relevance-unresolved",
+      "mechanisms": [
+        "hook:UserPromptSubmit",
+        "hook:PreToolUse",
+        "hook:PostToolUse"
+      ],
+      "omittedChecks": 64
+    },
+    {
+      "ref": "E3",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "不应该是fresh session, critique-and-self-critique适合当前的goal高度契合的",
+        "key": "req:99c12c08482d",
+        "occurrences": 1,
+        "followUp": "This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation. Summary:…",
+        "observedTurns": 2,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 4,
+        "files": 3
+      },
+      "evidenceClasses": [
+        "boundary-change",
+        "lifecycle-demand",
+        "operation-control",
+        "change-gap"
+      ],
+      "acceptanceSignals": [
+        "project-change"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 285,
+        "classifiedReads": 165
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "execute",
+          "execute",
+          "change",
+          "execute"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 11
+      },
+      "checks": [],
+      "friction": {
+        "executionFailures": 1,
+        "permissionDenials": 0
+      },
+      "closure": "changed-without-check",
+      "mechanisms": [
+        "hook:UserPromptSubmit",
+        "hook:PreToolUse",
+        "hook:PostToolUse"
+      ],
+      "lifecycle": [
+        {
+          "intent": "setup-isolation",
+          "family": "setup-isolation",
+          "dimensionId": "controlled-execution",
+          "checkId": "instruction-led-start",
+          "confidence": "High"
+        }
+      ]
+    },
+    {
+      "ref": "E4",
+      "contextGroup": "G2",
+      "request": {
+        "summary": "提交所有代码,然后pull上游进行merge,最后推送到所有remote",
+        "key": "req:cdb1043c1feb",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "operation-control",
+        "read-only-work"
+      ],
+      "acceptanceSignals": [
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 2270,
+        "classifiedReads": 1932
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "execute",
+          "change",
+          "execute",
+          "change"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 148
+      },
+      "checks": [
+        {
+          "kind": "jest",
+          "status": "observed",
+          "relation": "no-change-context"
+        },
+        {
+          "kind": "jest",
+          "status": "passed",
+          "relation": "no-change-context"
+        }
+      ],
+      "friction": {
+        "executionFailures": 3,
+        "permissionDenials": 0
+      },
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "hook:UserPromptSubmit",
+        "hook:PreToolUse",
+        "hook:PostToolUse"
+      ]
+    },
+    {
+      "ref": "E5",
+      "contextGroup": "G3",
+      "request": {
+        "summary": "continue",
+        "key": "req:e256ee8e7aff",
+        "occurrences": 2,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 1,
+        "files": 1
+      },
+      "evidenceClasses": [
+        "validation-repair",
+        "operation-control"
+      ],
+      "acceptanceSignals": [
+        "project-change",
+        "check-observed"
+      ],
+      "acceptanceEvidenceCeiling": "lead",
+      "frictionConsequenceSignals": [],
+      "activity": {
+        "toolCalls": 204,
+        "classifiedReads": 154
+      },
+      "workTrace": {
+        "steps": [
+          "execute",
+          "inspect",
+          "execute",
+          "inspect",
+          "execute",
+          "change"
+        ],
+        "gapAfter": 3,
+        "omittedSteps": 28
+      },
+      "checks": [
+        {
+          "kind": "pytest",
+          "status": "observed",
+          "relation": "not-after-final-change"
+        },
+        {
+          "kind": "agent-lint",
+          "status": "passed",
+          "relation": "not-after-final-change"
+        },
+        {
+          "kind": "node---test",
+          "status": "observed",
+          "relation": "not-after-final-change"
+        },
+        {
+          "kind": "node---test",
+          "status": "passed",
+          "relation": "not-after-final-change"
+        }
+      ],
+      "closure": "check-observed-relevance-unresolved",
+      "mechanisms": [
+        "hook:SessionStart",
+        "hook:UserPromptSubmit",
+        "hook:PreToolUse"
+      ],
+      "omittedChecks": 4
+    }
+  ],
+  "omitted": {
+    "noRequest": 282,
+    "selfAnalysis": 0,
+    "lowSignal": 0,
+    "duplicateRequests": 1,
+    "candidateBudget": 19,
+    "checkBudget": 98,
+    "activeSessions": 0,
+    "homeSessionOnly": 0
+  },
+  "warningCodes": [
+    "missing-optional-root",
+    "disabled-source-root"
+  ],
+  "excludes": [
+    "assistantText",
+    "rawPrompts",
+    "commands",
+    "toolOutput",
+    "paths",
+    "rawIds",
+    "secrets"
+  ],
+  "diagnosticFlags": [
+    "sampled-selection",
+    "portfolio-truncated",
+    "population-portfolio-divergence",
+    "no-reviewed-relevant-check-evidence",
+    "no-result-evidence"
+  ],
+  "cost": {
+    "serializedBytes": 7769,
+    "estimatedTokens": 1978
+  }
+}
