@@ -35,6 +35,7 @@ watch-target.sh — bounded long-poll watcher (read-only)
 Single target:
   watch-target.sh --label L --pid-file P --status-file S --log G \
                   [--sentinel STAGE-DONE] [--heartbeat H] \
+                  [--hook-fifo F | --hook-done F] \
                   [--deadline-epoch E | --timeout T] \
                   [--window N] [--interval N] [--start-grace N] \
                   [--heartbeat-max-age N] [--once] [--verbose]
@@ -62,8 +63,12 @@ Set the host tool timeout to window + 30s so the watcher can return first.
 --timeout T is relative to THIS invocation; for multi-window stages pass
 --deadline-epoch (absolute stage deadline) instead, or each window resets it.
 The watcher must run as the same identity as the runner (kill -0 permission).
+--hook-fifo F: block on F for each interval instead of sleep; a line is an
+              early completion signal only (hook=observed), never a verdict.
+--hook-done F: a non-empty F is a persistent early signal (same rule).
+Both are supplementary: sentinel/status/exit-record remain authoritative.
 --self-test runs zero-match / dead / zombie / pid-reuse / fake-done /
-anomaly / exit-code / timeout / manifest regression cases.
+anomaly / exit-code / timeout / hook / manifest regression cases.
 EOF
 }
 
@@ -102,6 +107,9 @@ WINDOW=300
 INTERVAL=3
 START_GRACE=30
 HEARTBEAT_MAX_AGE=120
+HOOK_FIFO=""
+HOOK_DONE=""
+HOOK_EVENT_SEEN=0
 ONCE=0
 MANIFEST=""
 VERBOSE=0
@@ -116,6 +124,8 @@ while [ "$#" -gt 0 ]; do
     --log) [ "$#" -ge 2 ] || die_usage "--log needs a value"; LOG_FILE="$2"; shift 2 ;;
     --sentinel) [ "$#" -ge 2 ] || die_usage "--sentinel needs a value"; SENTINEL="$2"; shift 2 ;;
     --heartbeat) [ "$#" -ge 2 ] || die_usage "--heartbeat needs a value"; HEARTBEAT="$2"; shift 2 ;;
+    --hook-fifo) [ "$#" -ge 2 ] || die_usage "--hook-fifo needs a value"; HOOK_FIFO="$2"; shift 2 ;;
+    --hook-done) [ "$#" -ge 2 ] || die_usage "--hook-done needs a value"; HOOK_DONE="$2"; shift 2 ;;
     --deadline-epoch) [ "$#" -ge 2 ] || die_usage "--deadline-epoch needs a value"; DEADLINE_EPOCH="$2"; shift 2 ;;
     --timeout) [ "$#" -ge 2 ] || die_usage "--timeout needs a value"; TIMEOUT="$2"; shift 2 ;;
     --window) [ "$#" -ge 2 ] || die_usage "--window needs a value"; WINDOW="$2"; shift 2 ;;
@@ -136,6 +146,9 @@ for name in WINDOW INTERVAL START_GRACE HEARTBEAT_MAX_AGE; do
   is_uint "$value" || die_usage "$name must be a non-negative integer, got '$value'"
 done
 [ "$INTERVAL" -gt 0 ] || die_usage "--interval must be > 0"
+if [ -n "$MANIFEST" ] && { [ -n "$HOOK_FIFO" ] || [ -n "$HOOK_DONE" ]; }; then
+  die_usage "hook flags are single-target only"
+fi
 if [ -n "$TIMEOUT" ]; then
   is_uint "$TIMEOUT" || die_usage "--timeout must be a non-negative integer"
   [ "$DEADLINE_EPOCH" -eq 0 ] || die_usage "use either --timeout or --deadline-epoch, not both"
@@ -211,7 +224,7 @@ last_nonempty_line() {
 }
 
 V_LABEL=""; V_VERDICT=""; V_CODE=0; V_REASON=""
-V_PID=""; V_HB=""; V_SENT=""; V_RC=""; V_LAST=""; V_STATUS_RAW=""; V_ELAPSED=0; V_ANOMALY="no"
+V_PID=""; V_HB=""; V_HOOK="none"; V_SENT=""; V_RC=""; V_LAST=""; V_STATUS_RAW=""; V_ELAPSED=0; V_ANOMALY="no"
 
 evaluate() {
   local label="$1" pidf="$2" statf="$3" logf="$4" sent="$5" hbf="$6" dl="$7"
@@ -251,6 +264,11 @@ evaluate() {
       hb_state="missing"
     fi
   fi
+
+  # Hook events are an early signal only; they never decide a verdict.
+  local hook_state="none"
+  if [ -n "$HOOK_DONE" ] && [ -s "$HOOK_DONE" ]; then HOOK_EVENT_SEEN=1; fi
+  [ "$HOOK_EVENT_SEEN" -eq 1 ] && hook_state="observed"
 
   if [ "$s_exists" -eq 1 ]; then
     if [ -n "$sent" ]; then
@@ -296,7 +314,7 @@ evaluate() {
   fi
 
   V_LABEL="$label"; V_VERDICT="$verdict"; V_CODE="$code"; V_REASON="$reason"
-  V_PID="$pid_state"; V_HB="$hb_state"; V_SENT="$sent_state"
+  V_PID="$pid_state"; V_HB="$hb_state"; V_HOOK="$hook_state"; V_SENT="$sent_state"
   V_RC="${s_rc:-na}"; V_LAST="$last"; V_STATUS_RAW=""
   [ "$anomaly" -eq 1 ] && V_ANOMALY="observed" || V_ANOMALY="no"
   [ "$s_exists" -eq 1 ] && V_STATUS_RAW="exit=$s_rc sentinel=${s_sent:-na}"
@@ -304,8 +322,8 @@ evaluate() {
 }
 
 format_verdict() {
-  printf 'WATCH label=%s verdict=%s pid=%s heartbeat=%s anomaly=%s sentinel=%s rc=%s elapsed=%s reason=%s' \
-    "$V_LABEL" "$V_VERDICT" "$V_PID" "$V_HB" "$V_ANOMALY" "$V_SENT" "$V_RC" "$V_ELAPSED" "$V_REASON"
+  printf 'WATCH label=%s verdict=%s pid=%s heartbeat=%s hook=%s anomaly=%s sentinel=%s rc=%s elapsed=%s reason=%s' \
+    "$V_LABEL" "$V_VERDICT" "$V_PID" "$V_HB" "$V_HOOK" "$V_ANOMALY" "$V_SENT" "$V_RC" "$V_ELAPSED" "$V_REASON"
 }
 
 format_evidence() {
@@ -344,7 +362,13 @@ run_single() {
     remaining=$((window_end - now))
     sleep_for=$INTERVAL
     [ "$sleep_for" -gt "$remaining" ] && sleep_for=$remaining
-    [ "$sleep_for" -gt 0 ] && sleep "$sleep_for"
+    if [ -n "$HOOK_FIFO" ] && [ -p "$HOOK_FIFO" ] && [ "$sleep_for" -gt 0 ]; then
+      if read -t "$sleep_for" _hook_line <> "$HOOK_FIFO"; then
+        HOOK_EVENT_SEEN=1
+      fi
+    else
+      [ "$sleep_for" -gt 0 ] && sleep "$sleep_for"
+    fi
   done
 }
 
@@ -450,6 +474,15 @@ self_test() {
       bad "$name" "missing verdict=$want_verdict; output: $out"
     else
       ok "$name"
+    fi
+  }
+
+  check_hook() {
+    local name="$1" want="$2" out="$3"
+    if printf '%s\n' "$out" | grep -q "hook=$want"; then
+      ok "$name"
+    else
+      bad "$name" "missing hook=$want; output: $out"
     fi
   }
 
@@ -599,7 +632,40 @@ PY
     ok "manifest"
   fi
 
-  # 14. demonstrate the pgrep -c zero-match trap (regression knowledge; the
+  # 14. hook done file: observed is an early signal, DONE still comes from the
+  # exit record + sentinel
+  printf 'PLAN-DONE\n' > "$base/log14"
+  printf 'exit=0 at=1 sentinel=1\n' > "$base/status14"
+  printf '{"hook_event_name":"Stop"}\n' > "$base/done14"
+  r=$(watch --label hookdone --pid-file "$base/pid1" --status-file "$base/status14" \
+    --log "$base/log14" --sentinel PLAN-DONE --hook-done "$base/done14" \
+    --window 0 --start-grace 0)
+  check hook-done 0 DONE "${r%%$'\n'*}" "${r#*$'\n'}"
+  check_hook hook-done-flag observed "${r#*$'\n'}"
+
+  # 15. hook FIFO event wakes the wait; it never fabricates a verdict
+  if command -v mkfifo >/dev/null 2>&1; then
+    sleep 5 & local hlive=$!
+    disown "$hlive" 2>/dev/null || true
+    ST_SPAWNED+=("$hlive")
+    local hticks=""
+    [ -r "/proc/$hlive/stat" ] && hticks=$(awk '{print $22}' "/proc/$hlive/stat")
+    printf 'pid=%s start=%s\n' "$hlive" "$hticks" > "$base/pid15"
+    mkfifo "$base/hook15.fifo"
+    ( sleep 0.5; printf 'STOP test 1\n' > "$base/hook15.fifo" ) &
+    local hwriter=$!
+    disown "$hwriter" 2>/dev/null || true
+    ST_SPAWNED+=("$hwriter")
+    r=$(watch --label hookfifo --pid-file "$base/pid15" --status-file "$base/none15" \
+      --log "$base/none15" --sentinel PLAN-DONE --hook-fifo "$base/hook15.fifo" \
+      --window 2 --interval 1 --start-grace 0)
+    check hook-fifo 10 RUNNING "${r%%$'\n'*}" "${r#*$'\n'}"
+    check_hook hook-fifo-flag observed "${r#*$'\n'}"
+  else
+    printf 'skip hook-fifo (mkfifo not found)\n'
+  fi
+
+  # 16. demonstrate the pgrep -c zero-match trap (regression knowledge; the
   # watcher itself never uses pgrep for liveness)
   if command -v pgrep >/dev/null 2>&1; then
     local zero

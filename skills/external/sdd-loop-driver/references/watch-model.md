@@ -37,6 +37,7 @@
 | **进度** | 日志增长 / `--output-format stream-json` 的 live log | 排障与卡死辅助 | `-p` 缓冲模式下日志在退出前静默，属预期 |
 | **异常行** | 日志最后一个非空行以 `ANOMALY:` 开头 | 显式失败回传（fast-fail） | 无 |
 | **阶段期限** | 状态脊中的 `stage_started_at + stage_timeout` | 唯一的 `TIMEOUT` 判据 | 入口必须提供，否则不得判超时 |
+| **Hook 事件** | `Stop`/`SubagentStop` hook 原子写 `hook-event-<stage>.json` + FIFO 行 | **提前完成信号**；只缩短等待，不单独构成判定 | `hook=na`（未配置）或 `none` |
 
 ## 3. 判定状态机（Verdict State Machine）
 
@@ -64,7 +65,8 @@
 
 按顺序选择；只有上一级不可用时才降级。降级必须在状态脊记录原因。
 
-1. **长轮询窗口（缺省）**：一次工具调用内跑一个远端/本地循环，每 `--interval`（缺省 3s）采样一次，命中终止判定或窗口到期即返回。等待期间**零模型回合、零 token**；事件检测延迟约为一个内部采样间隔。
+0. **Hook 事件补充（推荐，不改变回退路径）**：runner 注入 `Stop` hook，hook 原子写 `done.json` 并尝试写 FIFO；watcher 在同一窗口内优先 `--hook-done` 检查、再以 `--hook-fifo` 阻塞读（`read -t … <> fifo`，避免无写者时 open 阻塞）。事件到达只产生 `hook=observed`，判定仍由哨兵/退出记录给出。hook 未配置或未触发时，行为与第 1 级完全一致。
+1. **长轮询窗口（缺省回退）**：一次工具调用内跑一个远端/本地循环，每 `--interval`（缺省 3s）采样一次，命中终止判定或窗口到期即返回。等待期间**零模型回合、零 token**；事件检测延迟约为一个内部采样间隔。
 2. **宿主原生通知/监视器（仅作补充）**：当且仅当宿主能证明「通知会自动恢复同一驱动运行」时，可把原生监视器作为唤醒补充；每次唤醒仍要执行一次快照判定，且**不得在布置监视器后结束驱动者会话**（不变量 1）。宿主能力未经探针证明时，原生监视器只用于可见性，不用于等待。
 3. **间隔轮询（回退）**：无法长轮询（宿主无可用阻塞调用、工具超时上限过短、无 shell）时，用有界间隔检查；多线合并为一次检查；退避曲线见 §5。
 4. **禁止形态**：
@@ -157,10 +159,87 @@ label|pid_file|status_file|log|sentinel|heartbeat|deadline_epoch
 
 ## 10. 参考实现
 
-`scripts/watch-target.sh` — 无框架依赖的 bash 长轮询 watcher。
+`scripts/watch-target.sh` — 无框架依赖的 bash 长轮询 watcher（可选 hook 事件补充）。
 
 - 单目标与 `--manifest` 多目标；`--once` 快照；`--self-test` 回归用例。
-- 输出为单行 `WATCH label=… verdict=… pid=… heartbeat=… anomaly=… sentinel=… rc=… elapsed=… reason=…`；终止判定附带一行 `EVIDENCE …`。
-- 只读信号，不 kill、不写项目状态。
-- 退出码与判定表由 `--help` / `--self-test` 钉住；本文件的 §3 是语义映射，代码是精确值所有者。
+- hook 参数：`--hook-done F`（持久完成记录，先查）与 `--hook-fifo F`（窗口内阻塞读，事件到达即缩短等待）；仅单目标可用。
+- 输出为单行 `WATCH label=… verdict=… pid=… heartbeat=… hook=… anomaly=… sentinel=… rc=… elapsed=… reason=…`；终止判定附带一行 `EVIDENCE …`。
+- 只读信号，不 kill、不写项目状态；hook 事件只标记 `hook=observed`，从不由它直接产生 DONE。
+- 退出码与判定表由 `--help` / `--self-test` 钉住；本文件的 §3 是语义映射，代码是精确值所有者；自测覆盖 hook-done、hook-fifo、零匹配、僵尸、PID 复用与伪完成。
 - watcher 必须与 runner 以**同一执行身份**运行（`kill -0` 的权限前提）；远端拓扑两者都在 `<run-user>` 下。
+- 配套脚本：`scripts/hook-stop.sh`（Stop hook 模板，写 done JSON + 尽力写 FIFO）与 `scripts/watch-hook.sh`（远端同身份长读，先查 done、再读 FIFO，输出事件或 `HOOK_TIMEOUT`）。
+
+## 11. Hook 事件补充（Qoder CLI Stop / SubagentStop）
+
+Hook 是**提前完成信号**，不替代 U4 的哨兵与产物校验；它解决的是「阶段已完成但 watcher 还在采样」和「stdout 缓冲导致完成不可见」两类延迟。
+
+### 11.1 能力与配置
+
+- Qoder CLI 提供与 Claude Code 兼容的 hooks：`Stop`（主 agent 正常结束）、`SubagentStop`（子代理结束）、`SessionEnd`、`Notification` 等；支持异步/命令/HTTP 等类型。
+- 配置位置：`~/.qoder/settings.json`、`<project>/.qoder/settings.json`、`<project>/.qoder/settings.local.json`；**推荐按派发隔离**，在 runner 中用 `--settings <per-dispatch.json>` 注入，避免污染全局配置。
+- 先例：本机实测 Stop hook 通过 `--settings` 注入、写 FIFO 后 `read -t` 即时返回；API 崩溃时 Stop 不触发，仍由 status/exit 记录判 FAILED。
+
+### 11.2 runner 侧（本地/远端同构）
+
+```bash
+# 1) 每阶段独立 FIFO 与 settings（远端由 run-user 创建）
+mkfifo "$dir/hook-done-$line-$stage.fifo"
+cat > "$dir/hook-settings-$line-$stage.json" <<'JSON'
+{"hooks":{"Stop":[{"hooks":[{"type":"command",
+  "command":"/abs/path/hook-stop.sh","timeout":5}]}]}}
+JSON
+# 2) hook 读取 HOOK_EVENT_DIR / HOOK_STAGE / HOOK_FIFO
+HOOK_EVENT_DIR="$dir" HOOK_STAGE="$stage" HOOK_FIFO="$dir/hook-done-$line-$stage.fifo" \
+  qodercli -w "$project" --permission-mode auto \
+  --settings "$dir/hook-settings-$line-$stage.json" -p "$(cat "$dir/prompt-$line-$stage.md")"
+```
+
+- hook 必须先**原子写** `hook-event-<stage>.json`（含 `session_id`、`hook_event_name`、时间戳），再尽力写 FIFO；FIFO 写用 `timeout 5` 包裹，避免无读者时挂住。
+- `settings` 与脚本使用绝对路径、`umask 077`；不要改全局 settings。
+- 远端 runner 仍用 `nohup`/`setsid` 脱离；hook 与 FIFO 都留在 run-user 侧。
+
+### 11.3 watcher 侧
+
+```bash
+scripts/watch-target.sh --label "$line" \
+  --pid-file … --status-file … --log … --sentinel "$STAGE-DONE" --heartbeat … \
+  --hook-done "$dir/hook-event-$stage.json" \
+  --hook-fifo "$dir/hook-done-$stage.fifo" \
+  --deadline-epoch "$deadline" --window 540 --interval 3
+```
+
+- `--hook-done` 每轮先查（check-before-wait）；`--hook-fifo` 用 `read -t <interval> <> fifo` 等待，事件到达即进入下一轮判定。
+- `hook=observed` 只表示「提前信号已到」；DONE 仍要求退出记录/哨兵，U4 仍要求产物与纪律核验。
+- hook 未触发（崩溃、配置错误）时，watcher 的原有 PID/status/sentinel/deadline 路径不变。
+
+### 11.4 远端 SSH 拓扑
+
+```bash
+# 每个窗口：一次 ssh（与 runner 同一身份），长读远端 FIFO/done，工具超时 = window + 30s
+ssh -o BatchMode=yes -o ConnectTimeout=5 <alias> \
+  "su - <run-user> -c 'bash --noprofile --norc -c \
+    \"bash /home/<run-user>/watch-hook.sh <stage> <window> <deadline> \
+      /home/<run-user>/hook-done-<stage>.fifo \
+      /home/<run-user>/hook-event-<stage>.json\"'"
+# 事件返回后，仍需在远端跑一次 watch-target.sh --once 取得权威判定
+ssh <alias> "su - <run-user> -c 'bash --noprofile --norc -c \
+  \"bash /home/<run-user>/watch-target.sh ... --once\"'"
+```
+
+- SSH 断开**不杀远端进程**；下一窗口先查 `done.json`，再读 FIFO，丢失连接不丢事件。
+- 登录 shell 噪声：远端 watcher 统一 `bash --noprofile --norc` 并重定向 stderr；只解析最后一行/数字，空输出 = `UNKNOWN`，绝不当作 0/完成。
+- 多线：线数少时每线一个 SSH 长读；线数多时所有 hook 追加到单一 `hook-events.log`，本地用一条 `ssh ... "tail -F -n 0 hook-events.log"` 流式读取并按 `line/stage` 路由；`done.json` 仍按线持久化。manifest 模式目前不消费 hook 参数（单目标专用）。
+- 可选 `type:"http"` hook：远端 POST 到编排侧收集器再由本地 FIFO 唤醒；代价是入站网络、鉴权与监听器，SSH 长读无需入站。
+
+## 12. 观测侧故障矩阵（2026-10-19 复盘）
+
+| 故障 | 根因 | 规则 |
+|------|------|------|
+| 阶段完成仍判超时，空等 86 分钟 | `pgrep -c` 零匹配先打印 `0` 再以 1 退出，`\|\| echo 0` 追加第二个 0，数值比较失效 | **禁止用 `pgrep` 计数判存活/完成**；PID 文件 + `kill -0` + `/proc/<pid>/stat` start ticks/僵尸检查 |
+| 无关 qodercli 会话让 watcher 永不归零 | 按用户级 `pgrep -u agent -x qodercli -c` 计数，计入其他 cwd 的会话 | 每线每阶段独立 PID/status/log/heartbeat；匹配限定「本仓 + 本线」；不使用用户级普查 |
+| 阶段退出后 watcher 静默 | 登录 shell 报错文本混入 stdout，整段 `tr -d` 后永不等于 `0` | 远端 `bash --noprofile --norc` + stderr 重定向；只取最后一行/数字；**空输出 = UNKNOWN，继续轮询** |
+| 共享 `cws-lib-bash` 被 teardown 删除 | 临时脚本使用通用变量名 `ROOT`，被 `cws_bash_env` 覆盖后 `rm -rf "$ROOT"` | 禁止在 source 环境脚本中使用 `ROOT`/`HOME`/`PATH` 等通用名；`rm -rf` 前 `realpath` + 前缀断言；优先保留备份 |
+| 正常完成后 hook 未触发 | API/CLI 崩溃不会产生 Stop 事件 | **hook 只是补充**；status/exit 记录与哨兵必须独立判定；`EXITED_NO_SENTINEL` 回传最后一行、日志尾部、git 状态 |
+| 进程消失/日志静默被当作完成 | 观测面只有「没有信号」 | 完成必须来自退出记录或哨兵；`DEAD`/`NO_SIGNAL` 进 U5，不是 DONE |
+
+**双信号硬规则**：正常完成 = 退出记录 `rc=0` **且** 日志最后一行哨兵（或约定的等价正证据）；hook 事件只能缩短等待，不能替代任一信号。U4 的产物/纪律核验仍是最终充分条件。

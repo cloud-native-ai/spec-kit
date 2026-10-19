@@ -78,6 +78,12 @@ U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归
 
 U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计划；未产出前不得进入 U2，更不得直接编辑目标仓库——目标项目为本仓库时同样适用。
 
+### Hook completion backstop（Qoder CLI）
+
+- Qoder CLI 的 `Stop`/`SubagentStop` hooks 可作为**提前完成信号**：runner 用 `--settings` 注入 Stop hook，hook 原子写 `hook-event-<stage>.json` 并尽力写 FIFO；watcher 用 `--hook-done`/`--hook-fifo` 缩短等待。
+- hook 事件只产生 `hook=observed`；完成仍由退出记录 + 哨兵判定，U4 仍校验产物。API 崩溃时 Stop 不触发，status/exit 记录必须独立兜底。
+- 远端 SSH：hook 在 run-user 侧写 done/FIFO，本地以 `bash --noprofile --norc` 长读；断线后下一窗口先查 done。详见 `references/watch-model.md` §11–§12、`references/dispatch-recipes.md` Recipe 2–3。
+
 ## Hard Requirements
 
 1. **自迭代**：U4 通过后立即派发下一阶段（U2），不等用户任何形式的「继续」。
@@ -94,10 +100,11 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 
 ## References
 
-- `references/dispatch-recipes.md` — 五大执行机制的命令形态：断点探测、阶段化 prompt 文件、runner 与派生、后台执行 + 统一监听（长轮询窗口/批量多线）、收尾纪律；阶段链与哨兵字面量；派发可见性操作规则。
-- `references/watch-model.md` — 统一监听模型：信号源、判定状态机、事件优先机制阶梯、窗口与阶段期限的区分、`pgrep -c` 零匹配陷阱、多线 manifest、宿主适配与自测要求。
+- `references/dispatch-recipes.md` — 五大执行机制的命令形态：断点探测、阶段化 prompt 文件、runner 与派生、后台执行 + 统一监听（长轮询窗口/批量多线）、收尾纪律；阶段链与哨兵字面量；hook 注入与 SSH 远程窗口；派发可见性操作规则。
+- `references/watch-model.md` — 统一监听模型：信号源、判定状态机、事件优先机制阶梯、窗口与阶段期限的区分、`pgrep -c` 零匹配陷阱、多线 manifest、宿主适配与自测要求；hook 事件补充、SSH 远程读法与观测侧故障矩阵。
 - `references/stage-prompts.md` — 阶段提示词三段骨架全文、独立校验程序、已验证变体（本地简报先行 / 构建固化分线）、多线并发隔离与窄读法授权、卡死处置与状态脊程序。
-- `scripts/watch-target.sh` — 无框架依赖的长轮询 watcher 参考实现（单目标/多目标、快照与自测模式）。
+- `scripts/watch-target.sh` — 无框架依赖的长轮询 watcher 参考实现（单目标/多目标、快照与自测模式、`--hook-done`/`--hook-fifo` 事件补充）。
+- `scripts/hook-stop.sh` — Qoder CLI Stop hook 模板（原子写 done JSON + 尽力写 FIFO）；`scripts/watch-hook.sh` — 远端同身份长读（先查 done、再读 FIFO，输出事件或 `HOOK_TIMEOUT`）。
 
 ## Boundary
 

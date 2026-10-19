@@ -44,6 +44,12 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 - **多线批量**：manifest 模式一次连接检查多条线，任一线终止即返回全部快照。
 - **pgrep 陷阱**：`pgrep -c` 零匹配会先打印 0 再以退出码 1 结束，`|| echo 0` 会追加第二个 0；存活判据一律用 PID 文件 + `kill -0`，watcher 自测覆盖零匹配、僵尸、PID 复用等反向用例。
 
+### Hook 兜底与远程 SSH（2026-10-19 增强）
+
+- Qoder CLI 的 `Stop`/`SubagentStop` hooks 可作为**提前完成信号**：runner 用 `--settings` 按派发注入 Stop hook，hook 原子写 `hook-event-<stage>.json` 并尽力写 FIFO；watcher 用 `--hook-done`/`--hook-fifo` 缩短等待。hook 只产生 `hook=observed`，DONE 仍由退出记录 + 哨兵决定。
+- 远端 SSH：hook 在 run-user 侧写 done/FIFO；本地每个窗口用 `ssh … "su - <run-user> -c 'bash --noprofile --norc -c …'"` 长读 FIFO，事件返回后再跑 `watch-target.sh --once` 取权威判定。断线不杀远端进程，下一窗口先查 `done.json`。
+- 观测侧故障矩阵（pgrep 零匹配、无关会话作用域、登录 shell 噪声、共享目录误删、hook 未触发、进程消失≠完成）与双信号规则见 skill 手册 `references/watch-model.md` §11–§12。
+
 ## 触发与路由
 
 - 以 `/sdd-loop-driver` 给出功能/改进描述 = SDD 目标；目标项目可为当前仓库，**包括 sdd-loop-driver 自身**。
