@@ -18,7 +18,7 @@ The skill is **strictly read-only**: it modifies no file. (The single sanctioned
 is the wrap-up Feedback step's engine entry — local bookkeeping, not an artifact
 modification.)
 
-Canonical extraction source: `.specify/templates/commands/analyze.md` § Execution Steps 1–7,
+Canonical extraction source: `templates/commands/analyze.md` § Execution Steps 1–7,
 Operating Principles, and the do-not-flag list. The command template keeps entry +
 delegation only.
 
@@ -64,10 +64,26 @@ Load only the minimal necessary context — never the whole artifacts:
 | `requirements.md` | Overview/Context, functional + non-functional requirements, user stories, edge cases, feature metadata (ID / Name / linkage statements) |
 | `plan.md` | Architecture/stack choices, data-model references, phases, technical constraints |
 | `tasks.md` | Task IDs, descriptions, phase grouping, `[P]` markers, referenced file paths |
+| `checklists/*.md` | Item text, checked state (`- [ ]` / `- [X]`), and tags — `[Gap]` in particular |
 | feature registry | Index rows (ID, Name, Description, Status, Details link, Last Updated); the matching detail file; its spec-linkage fields |
 | constitution | `.specify/memory/constitution.md` for principle validation |
 
-### 3. Build semantic models
+### 3. Coverage accounting (fixed read-only step)
+
+Run the clause/FR coverage accountant once and surface its verdict in the report:
+
+```
+python3 scripts/python/account-clause-coverage.py --spec <spec-dir>
+```
+
+This step MUST NOT pass `--freeze` — freezing the baseline is `/speckit.tasks`'s duty
+(C-6), and the analyze side only consumes it. The run's `[fr-uncovered]` lane feeds the
+report's coverage summary. `status: baseline-missing` MUST appear as a phase-visible
+problem together with its remedy (re-run `/speckit.tasks` to freeze
+`coverage-baseline.txt`), never silently skipped. A feature without a contract set MUST
+record an explicit skip with its reason.
+
+### 4. Build semantic models
 
 Internal representations only — raw artifacts never appear in the output:
 
@@ -82,22 +98,34 @@ Internal representations only — raw artifacts never appear in the output:
   (high/medium/low), requirement↔feature intent mapping, and consistency signals (ID/name
   match, terminology match, status/path coherence).
 
-### 4. Detection passes
+### 5. Detection passes
 
 Seven passes (A duplication · B ambiguity · C underspecification · D constitution alignment
-· E coverage gaps · F inconsistency · G feature relevance & accuracy), the same-author
-delegation rule, the stale-copy decision test, and the do-not-flag noise floor:
+· E coverage gaps · F inconsistency · G feature relevance & accuracy) plus one checklist
+pass (H), the same-author delegation rule, the stale-copy decision test, and the
+do-not-flag noise floor:
 [`./references/detection-and-severity.md`](./references/detection-and-severity.md).
+
+**H — checklist accountability.** Every unchecked `[Gap]` item under
+`REQUIREMENTS_DIR/checklists/*.md` MUST be raised as a finding or carry an explicit
+disposition marker in the gate report. The marker form is machine-checkable; free prose
+MUST NOT satisfy it:
+
+- `CHK005 disposition: raised-as-finding H-01`
+- `CHK005 disposition: covered-by <artifact § anchor>`
+
+The report MUST make the count `unchecked + unraised + undispositioned = 0` observable;
+a non-zero count blocks the analyze gate.
 
 Limit to **50 findings**; aggregate the remainder in an overflow summary.
 
-### 5. Severity assignment
+### 6. Severity assignment
 
 Four severities (CRITICAL / HIGH / MEDIUM / LOW) with the general heuristic plus
 feature-specific rules, and the propagation-surface cap that governs them:
 [`./references/detection-and-severity.md`](./references/detection-and-severity.md).
 
-### 6. Validate CRITICAL/HIGH findings
+### 7. Validate CRITICAL/HIGH findings
 
 Every CRITICAL and HIGH finding MUST be confirmed by an independent read-only validation
 subagent before it is reported — fresh context, one verdict each
@@ -105,13 +133,13 @@ subagent before it is reported — fresh context, one verdict each
 detectors, with the downgrade rate reported as a metric:
 [`./references/validation-and-report.md`](./references/validation-and-report.md).
 
-### 7. Produce the report
+### 8. Produce the report
 
 One compact Markdown report — findings table, coverage/feature/linkage summaries, systemic
 observations, metrics, and the rerun delta when a prior report exists:
 [`./references/validation-and-report.md`](./references/validation-and-report.md).
 
-### 8. Next actions & remediation
+### 9. Next actions & remediation
 
 - CRITICAL issues → resolve before `/speckit.implement`.
 - LOW/MEDIUM only → proceed with suggestions.
@@ -123,7 +151,7 @@ observations, metrics, and the rerun delta when a prior report exists:
 
 - **Read-only**: never modify files.
 - **Self-authored artifacts are not self-auditable**: when this session produced them,
-  delegate detection as well as validation (§4's same-author delegation; owner
+  delegate detection as well as validation (§5's same-author delegation; owner
   `.specify/shared/workflow/objective-analysis-gate.md`).
 - **Actionable findings only**; ≤50 rows; summarize overflow.
 - **Constitution violations are always CRITICAL** and are never a `downgrade` candidate.
@@ -145,7 +173,7 @@ observations, metrics, and the rerun delta when a prior report exists:
 
 ## Wrap-up
 
-<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 71fc61d910c6 — do not edit; edit the registry, then recompile -->
+<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 7877db82c58c — do not edit; edit the registry, then recompile -->
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 

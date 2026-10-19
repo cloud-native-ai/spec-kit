@@ -6,7 +6,10 @@ Pins Feature 063 C-11..C-15 (F3, FR-009..FR-013 / SC-005, SC-006):
   every `REC-` is registered in `register.md` in the same commit, using the register's
   pointer-row form.
 * C-12 — the ID Register enumeration in `templates/instructions-template.md` adds
-  `REC-…`; the live `.specify/instructions.md` receives it through the generator.
+  `REC-…`; the live `.specify/instructions.md` receives it through the content-refresh
+  owner (`/speckit.instructions`, manage-instructions Action 5) — never by extending the
+  additive-only `generate-instructions.sh` out of its pinned C-2 contract (user
+  adjudication 2026-10-20).
 * C-13 — `feedback-step.md` § Scope guard keeps `scope: local` and names the existing
   legal intake (manage-feedback Path A digest § A3 自省(Introspection)).
 * C-14 — `review-template.md` § 5 and Replacement Rule 3 make the repo-relative path
@@ -77,13 +80,21 @@ def test_c12_id_register_enumeration_adds_rec():
     assert "REC-" in section, "the enumeration MUST add the recommendation identifier"
 
 
-def test_c12_live_instructions_received_rec_through_the_generator():
+def test_c12_live_instructions_received_rec_via_content_refresh():
+    """The live file carries REC- through the adjudicated content-refresh owner.
+
+    The propagation mechanism is `/speckit.instructions` (manage-instructions Action 5),
+    which owns live-file content updates; `generate-instructions.sh` stays additive-only
+    per its own C-2 contract (test_instructions_section_propagation) and is not the
+    carrier for in-section changes (user adjudication 2026-10-20).
+    """
     assert INSTRUCTIONS_LIVE.is_file()
     live = INSTRUCTIONS_LIVE.read_text(encoding="utf-8")
     m = re.search(r"(?ms)^## ID Register.*?(?=^## )", live)
     assert m, "live instructions have no ID Register section"
     assert "REC-" in m.group(0), (
-        "the live .specify/instructions.md MUST carry REC- (generated, never hand-edited)"
+        "the live .specify/instructions.md MUST carry REC- (via the manage-instructions "
+        "Action 5 content refresh, never a hand-edited runtime copy)"
     )
 
 

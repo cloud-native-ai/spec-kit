@@ -33,4 +33,4 @@ Produce a **self-contained, improvement-focused** review report for spec-kit fra
 
 **Before**: Run after `/speckit.implement` for complete artifact chain.
 
-**After**: Apply improvements to spec-kit .specify/templates/commands/scripts. Optionally iterate requirements/plan.
+**After**: Register every `REC-…` id coined in the report in `.specify/memory/register.md` **in the same commit** as the report, using the register's existing pointer-row form (id → one-line meaning → report anchor → status). The register owns the row form; this command owns the registration obligation. Then apply improvements to the spec-kit sources (`.specify/templates/`, `commands/`, `.specify/scripts/`); optionally iterate requirements/plan.

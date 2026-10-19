@@ -1,6 +1,6 @@
 # Phase Shapes (conditional overrides for create-tasks)
 
-Extracted from `.specify/templates/commands/tasks.md` § Task Generation Rules → Phase Structure.
+Extracted from `templates/commands/tasks.md` § Task Generation Rules → Phase Structure.
 These two shapes apply only when the spec's deliverables match their trigger case; the
 default within-story order (Tests → Models → Services → Endpoints → Integration) holds
 otherwise. Consulted on demand by the `create-tasks` skill (`.specify/skills/internal/create-tasks/SKILL.md`).

@@ -37,6 +37,18 @@ SPEC = ROOT / ".specify" / "specs" / "053-machine-decidable-artifacts"
 # notes/pre-change-measurements.md § 1 — an unanchored window is how 052's GATE-3 went void.
 BASE_SHA = "ad190d46de960efd70e61a4719a16561a89b7e9d"
 
+# 2026-10-20 amendment (Feature 063): C-12's freeze is scoped by its own contract to
+# 053's window ("在本特性窗口内逐字不变"), so the window CLOSES at 053's last commit —
+# the original open-ended ``BASE_SHA..HEAD`` form over-reached the clause it pins and
+# reddens on any later feature that legitimately edits the state machine (063 C-15 adds
+# the /speckit.review transition row per user adjudication E2, recorded in
+# .specify/specs/063-review-p1-governance/requirements.md § Clarifications). Same
+# amendment shape as test_c7's precedent: a claim that no longer holds is replaced by
+# the guard that still does — the closed window keeps the original protective claim
+# true forever (verified 2026-10-20: ``git diff ad190d46..cb0a190a -- <both files>``
+# is empty, i.e. 053's own window left the state machine untouched).
+C12_WINDOW_END = "cb0a190a"  # 053's last implement-window commit (wrap-up chore)
+
 GATE_TOTAL = 23
 GATE_VIOLATIONS = 0
 CAP_BASELINE_TOTAL = 93
@@ -302,11 +314,14 @@ def test_c10_the_scanner_and_its_mirror_are_untouched_in_the_window():
 
 
 def test_c12_the_status_state_machine_is_untouched():
+    # 053's own window only (BASE_SHA..C12_WINDOW_END, closed 2026-10-20): the freeze
+    # protects what 053 could have done, not what later features may legitimately add.
     for path in ("shared/workflow/feature-integration.md",
                  "templates/feature-details-template.md"):
-        diff = _window_diff(path)
+        diff = _git("diff", f"{BASE_SHA}..{C12_WINDOW_END}", "--", path).stdout
         assert diff == "", (
-            f"{path} owns a status state machine and changed inside this feature's window; "
+            f"{path} owns a status state machine and changed inside 053's window "
+            f"({BASE_SHA[:8]}..{C12_WINDOW_END[:8]}); "
             f"the feature adds checkers, not lifecycle states:\n{diff[:600]}"
         )
     text = (ROOT / "shared" / "workflow" / "feature-integration.md").read_text(encoding="utf-8")

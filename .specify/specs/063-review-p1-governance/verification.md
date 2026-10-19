@@ -158,32 +158,67 @@ store is introduced, and the four-part format is owned by implement Step 2 (C-10
 Recorded with the S6 run in `notes/quickstart-run.md` (T047); the decision and its command
 line are mirrored here when that run lands.
 
-## Blocked at T018 (C-12) — decision required (2026-10-19)
+## C-12/T018 — adjudication landed (2026-10-20, resumed run)
 
-T018 requires the live `.specify/instructions.md` to receive the `REC-` enumeration
-**through `scripts/bash/generate-instructions.sh`**, with the runtime copy never
-hand-edited. The measured behaviour of that script contradicts the premise:
+The attempt-1 halt is resolved by user adjudication (recorded in `requirements.md` §
+Clarifications, Session 2026-10-20): the live `.specify/instructions.md` receives the
+`REC-` enumeration through `/speckit.instructions` (manage-instructions Action 5 content
+refresh) — `generate-instructions.sh` stays additive-only per its pinned C-2 contract
+(`test_instructions_section_propagation`), never extended.
 
-- It keeps an existing `.specify/instructions.md` as the refresh base and injects only
-  **missing top-level sections**; existing sections are never touched (the script's
-  "T007: Backup + establish refresh base + additive section reconcile" block).
-- Its own comment routes deep section-content refresh to `/speckit.instructions`
-  (manage-instructions Action 5).
-- `tests/contract/test_instructions_section_propagation.py` C-2 pins the additive-only
-  behaviour ("never modifying or removing existing sections").
+- Landing facts: template row in `templates/instructions-template.md` (bd108d5a); live
+  file row at `.specify/instructions.md` line 176 via the instructions stage (a8c3c1f0);
+  ID Register section byte-identical to the rendered template; 9/9 compatibility
+  symlinks resolve; `git diff` on the symlink set empty.
+- Alignment edits this run: `contracts/template-mechanisms.md` C-12, `tasks.md` T018 +
+  decision D-T7 (supersedes D-T3's mechanism leg), `quickstart.md` S5 comment,
+  `plan.md` § Mirror Obligations row, and the test renamed to
+  `test_c12_live_instructions_received_rec_via_content_refresh` (docstring/assertion
+  message aligned to the content-refresh owner).
 
-The template edit landed in both `templates/instructions-template.md` and its runtime
-mirror. Running the generator exits 0 but leaves the live file unchanged, so
-`test_c12_live_instructions_received_rec_through_the_generator` remains red and T022
-cannot pass. This is a decision, not an in-passing correction: extending the generator's
-pinned contract, invoking `/speckit.instructions` (another stage), or reclassifying the
-C-12 mechanism each exceeds this stage's declared edit scope. No runtime copy was
-hand-edited; the anomaly is surfaced for adjudication.
+## US2 — T022 (C-11, C-12, C-13, C-14, C-15)
 
-Open tasks at halt: T018 (blocked by this decision), T022 (blocked by T018), T023–T051
-(not started; US3–US6 are independent edit surfaces, left for the resumed run under the
-declared phase order and the halt rule).
+- Command: `python3 -m pytest tests/contract/test_review_p1_review_loop.py -q`
+- Result: `10 passed` (0 failed) — includes the renamed C-12 live-file leg.
+- S5 seed drill (`/tmp/s63-s5-drill.*`, removed after the run): a fixture review with
+  `REC-s63-01..03` landed its `register.md` pointer rows (3/3) **in the same commit**
+  as the report (`git show --stat` shows `review.md` + `register.md` in one commit);
+  a clean clone resolves the repo-relative REC targets (`docs/rec-target-a.md`,
+  `docs/rec-target-b.md` — `test -f` green) while the no-repo-relative target stays
+  marked `external`; the live table carries
+  `| /speckit.review | Implemented → Ready for Review | review.md committed AND every deferred item resolved or waived |`
+  with the checklist row annotated "applies only when the checklist runs after
+  implement" (mirror, post-sync); `A3 自省(Introspection)` named in the synced
+  `feedback-step.md` mirror; `grep -n "REC-" .specify/instructions.md` → line 176.
+- Claim: C-11..C-15 green (clause partition row T022).
+
+## Pre-existing 3 contract failures — reconciled this run (2026-10-20)
+
+The resumed run's first act re-ran the fixed-order projection for the bd108d5a source
+batch (`compile-embeds --check` → 74 units zero drift, no write needed; `regen-command-copies.py` write;
+`sync-mirrors.py --write --only templates --only skills/internal --only shared --only scripts`):
+
+- `test_run_checks.py::test_c27_…` and `test_user_facing_comprehension_pointers.py::test_c14_…`
+  turned green by the regen/sync (per-tool copies + mirrors now match sources).
+- `test_neutrality_budget.py::test_c12_the_status_state_machine_is_untouched` was **not**
+  a mirror-staleness failure (the dispatch's stated cause does not hold for it): it pins a
+  `git diff ad190d46..HEAD` window over `shared/workflow/feature-integration.md`, which
+  bd108d5a's T021 (C-15 review row) legitimately changed. Reconciled by closing the
+  window at 053's last implement-window commit (`C12_WINDOW_END = cb0a190a`) in the test:
+  053's own contract scopes the freeze to "本特性窗口" (this feature's window), so the
+  open-ended HEAD form over-reached the clause it pins; the closed window keeps the
+  original protective claim true forever (`git diff ad190d46..cb0a190a -- <both files>`
+  verified empty 2026-10-20) while later features may legitimately extend the table.
+  Same amendment shape as that file's own `test_c7` precedent (stale untouched-since-BASE
+  claim replaced by the guard that still holds). The plan's § Research already listed
+  `test_neutrality_budget.py` among the existing contract tests 063 updates alongside the
+  mechanism they pin (FR-027); the research line "presence-only — safe" was a falsified
+  premise, disclosed here rather than worked around silently.
+- Full-suite name-level comparison after the projection: `run-tests.sh --names-out`
+  → 31 failed / 4021 passed; `comm -13 baseline-failed-tests.txt <names>` → **0 NEW**
+  (32 baseline failures disappeared with the mirror sync — disappearances are not
+  regressions; the 63-name baseline file is untouched).
 
 # -- Free-form notes --
 
-notes=US1 complete (C-1..C-10 claimed by T011..T014). US2 implementations C-11/C-13/C-14/C-15 landed; T018 (C-12 live-instructions leg) blocked by the generator capability mismatch recorded above, so T022 and T023..T051 remain open.
+notes=US1 complete (C-1..C-10 claimed by T011..T014). US2 complete (C-11..C-15 claimed by T022): C-12 adjudication landed via /speckit.instructions Action 5 (a8c3c1f0) with mechanism descriptions aligned this run; the 3 pre-existing contract failures reconciled (c27/c14 via regen+sync, c12 via the 053-window closure amendment, disclosed above). US3–US6 + Polish remain.

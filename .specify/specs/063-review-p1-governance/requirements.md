@@ -308,3 +308,9 @@
 - Q: Related Feature 绑定既有还是新建？ → A: **新建 Feature 063（Review P1 Governance）。** 候选 012（review 命令本体，Completed，无兄弟规格承接跨命令治理）、028（feedback 层，仅 F3 入口切片）、053（机器可判定命题，F1 的机制先例但不含 F2–F8）、056（probe 体系，仅 F4/F6 的载体）、062（humanize，发现来源且本特性明确不重做）经绑定先例启发式核验均不覆盖 F1–F8 跨命令治理束；跨切面能力先例（056/057/060/061）均为新建，brief 亦定性为「新框架治理特性」。登记义务：`features.md` 索引行（Draft）+ `features/063.md` 详情 + 062 详情反向交叉引用。
 - Q: FR-006（append-only recheck 形态）与 FR-008（waiver 四段格式）的规则落点是哪个框架文件？ → A: **FR-006 落 `skills/internal/create-checklist/SKILL.md`（checklist 形态规则的 owner 技能，061 REC-C5 点名落点）；FR-008 落 `skills/internal/implement-feature/SKILL.md` § Step 2 — Checklist exemption gate（waiver 的产生面，REC-C6 点名落点，与 FR-007 同面）。** 已回写两条 FR。备选（两规则同落一个文件 / 留给 plan 裁决）被否：评审报告对两条规则已点名目标文件，且 brief 要求每条 finding 明确「所有者文档/机制」。
 - Q: 引用组跨宽度/不配对的缺省裁定（旧会话注明「clarify 可修订」）维持还是修订？ → A: **维持。** 畸形组由检查器报告，不静默计为引用也不静默计为 mention——owner 自述目的是让总数「成为规则的产物，不是读法的产物」，任何静默处理（无论计引用还是计 mention）都会重新引入读法依赖；Edge Cases 已按此编码，FR-001/FR-002 无需改动。
+
+### Session 2026-10-20（implement attempt 2 续跑：用户对 C-12 活动面传播机制的裁定）
+
+> implement attempt 1 在 T018/C-12 因机制冲突按 fast-fail 停下（`generate-instructions.sh` 只注入缺失顶层章节、从不变更既有章节，由 `test_instructions_section_propagation` C-2 钉住）；本会话记录用户的裁定与后续落位，不改 F1–F8 范围。
+
+- Q: 活动 `.specify/instructions.md` 获得 `REC-` 枚举行的传播机制是哪一个？ → A: **`/speckit.instructions`（manage-instructions Action 5 内容刷新）承担；MUST NOT 扩展 `scripts/bash/generate-instructions.sh`，MUST NOT 改其 C-2 契约。** FR-010 的「经既有 refresh/sync 流程」由该内容刷新所有者满足；C-12/T018 的机制描述按此改写，`test_c12_live_instructions_received_rec_through_the_generator` 更名并对齐到新 owner（via content refresh）。落位事实：instructions 阶段已完成刷新并提交 `a8c3c1f0`（line 176 承载 `recommendation (`REC-…`)`，ID Register 与模板逐字节一致，9/9 符号链接正常）；implement attempt 2 只做机制描述对齐与 T018/T022 收口。备选（扩展生成器并改其契约 / 以 waiver 弱化 C-12）被否：前者证伪被钉住的既有契约，后者使 SC-005 失去常驻指令层证据。

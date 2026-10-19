@@ -5,7 +5,7 @@ unit's compiled `## Wrap-up` section wires to (056: the section is rendered by
 `probe-utils.py --action compile-embeds`, not hand-embedded). The compiled section is
 the final workflow section of a skill; complex command templates carry it at their
 wrap-up / Git-commit-prompt stage. Simple commands carry no wrap-up face at all — a
-command is complex iff it invokes .specify/scripts/CLI tools, produces an artifact another flow
+command is complex iff it invokes scripts/CLI tools, produces an artifact another flow
 consumes, or consumes another flow's artifact.
 
 **Embedding units reference this file; they do not copy it.** Each embedded
@@ -77,8 +77,11 @@ content from the user.
    `No significant optimization points identified this run.`
    **Token 效率自评**(纪律定义见 `.specify/shared/guidelines/token-efficiency.md`)——同步自查三问:本次运行是否发生 (1) **原文转储**(机器管理数据文件整体注入上下文)、(2) LLM **代做确定性工作**(固定规则判断未交程序)、(3) **重复读取**同一内容?有发现 → 对应优化点条目行 MUST 内嵌字面量 `token-efficiency`(稳定标记,供 `--action list --contains token-efficiency` 检索聚合);干净运行 MUST NOT 追加空洞的 Token 观察条目。量化口径:定性描述或行/字节代理指标,精确 Token 计数不可得时 MUST **不编造**具体数值。
 3. **Scope guard.** Keep strictly to *this* unit's operation. Do NOT produce a
-   global/whole-project assessment — that is `/speckit.review`'s job. Every entry is
-   `scope: local`.
+   global/whole-project assessment — that is `/speckit.review`'s job. Every wrap-up entry
+   is `scope: local`. A global review recommendation is not left without an intake: its
+   legal entry is the existing `/speckit.feedback` manage-feedback Path A digest
+   § A3 自省(Introspection) step. No new intake store, tracking engine, or scoring system
+   is introduced.
 4. **Dedup guard.** Choose a stable `run_id` for this run (e.g. the feature key + a run
    timestamp). If a parent flow already recorded feedback for this same `(unit_id, run_id)`,
    the engine will no-op — do not force a duplicate.
@@ -132,7 +135,7 @@ reason set and no decision table — those are code's. Everything else below rea
 owner by path.
 
 **Engine and code-side owner.** `.specify/scripts/python/run-determination.py` (framework
-source `.specify/scripts/python/run-determination.py`) owns the record schema, every value domain
+source `scripts/python/run-determination.py`) owns the record schema, every value domain
 the program branches on, the routing-bit derivation (`derive_trigger_feedback`) and the
 CLI flag set. No invocation is written out here on purpose: the parser generates the
 engine's own `--help`, so a flag list copied into prose could only drift. The record *is*
@@ -171,7 +174,7 @@ continue on available run evidence, never fabricate — per
 
 **Unresolved-red input — engine exit codes only.** The satisfaction axis's red-adjacency
 exception has exactly one producer: a non-zero exit from an engine this run invoked,
-reported through the exit-code table the `.specify/scripts/python/` engines share. The producer
+reported through the exit-code table the `scripts/python/` engines share. The producer
 formerly named beside it — an anomaly the agent surfaced and the user never answered
 (`surfaced_anomaly_unanswered`) — is **dropped**, not deferred, and MUST NOT be declared.
 The per-turn telemetry store `.specify/memory/trigger/telemetry.jsonl` MUST NOT be read
@@ -197,7 +200,7 @@ record's `out_of_scope[]`, one bounded line each, with **no carrier assigned**
 (`parked_via: none`); assigning one belongs to the **active** improve flow, which chooses
 between two carriers that already exist — `/speckit.todo` Park Mode (the default: a
 free-floating improvement idea; mode, store path and frontmatter owned by
-`.specify/templates/commands/todo.md`) and a new spec through `/speckit.requirements` (when the
+`templates/commands/todo.md`) and a new spec through `/speckit.requirements` (when the
 finding constrains what this project's source must implement, which is the Requirement
 plane's call, not this flow's). The passive turn names carriers; it MUST NOT open either
 flow, widen the current turn, or emit anything beyond the single non-blocking notification
@@ -222,7 +225,7 @@ inference side of the never-solicit rule above.
 
 The embedded wrap-up section is **compiled, not hand-embedded** (056): `probe-utils.py
 --action compile-embeds` renders each unit's single AUTO-GENERATED `## Wrap-up` from the
-registry (`.specify/shared/definitions/probe-definitions.md` ## Handler / ## HandlerBinding) and
+registry (`shared/definitions/probe-definitions.md` ## Handler / ## HandlerBinding) and
 migrates away any manual `## Feedback` / `## Documentation` section it finds. They do
 not copy it — each call line points here; the agent executing the section follows its
 lines in order, which lands on this file's own sections. Nothing is per-surface beyond
@@ -318,7 +321,7 @@ workaround applied. This is a read-only aid — it never gates execution.
 ## Notes for embedders
 
 - **Which form**: command templates take the command form, `skills/*/SKILL.md` and
-  `.specify/templates/skills-template.md` take the skill form (its runtime-mode gate is
+  `templates/skills-template.md` take the skill form (its runtime-mode gate is
   mandatory — detection semantics live in `.specify/shared/workflow/runtime-mode.md`).
 - **Skills**: `--unit-id "skill:<name>"`, `--unit-type skill`.
 - **Complex commands**: `--unit-id "/speckit.<command>"`, `--unit-type command`.

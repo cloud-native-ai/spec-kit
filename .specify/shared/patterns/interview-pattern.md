@@ -199,7 +199,7 @@ Rows are **structured columns**, not free text — and they are what makes confl
 
 #### Engine (程序优先)
 
-Graph reachability, ordering, and cycle detection are **fixed-rule computations**, so they belong to a program — never re-derived in prose by the model (Principle XII / token-efficiency Program-First). The engine is `.specify/scripts/python/interview-utils.py` (`<TOOL:.specify/memory/tools/interview-utils.py.md>`), backed by a JSON sidecar beside the markdown ledger (`interview-log.md` → `interview-log.dag.json`):
+Graph reachability, ordering, and cycle detection are **fixed-rule computations**, so they belong to a program — never re-derived in prose by the model (Principle XII / token-efficiency Program-First). The engine is `scripts/python/interview-utils.py` (`<TOOL:.specify/memory/tools/interview-utils.py.md>`), backed by a JSON sidecar beside the markdown ledger (`interview-log.md` → `interview-log.dag.json`):
 
 ```bash
 E=.specify/scripts/python/interview-utils.py; L=<ledger>.md

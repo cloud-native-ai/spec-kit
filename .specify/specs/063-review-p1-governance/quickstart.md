@@ -57,7 +57,7 @@ Fixture: a checklist whose `Gap` item was answered by a downstream stage via `ch
 ```bash
 # fixture: a seed review with 2-3 REC- ids; simulate the review stage's closure duty
 grep -c "REC-" .specify/memory/register.md          # ≥ seed count after registration; same commit (git show --stat)
-grep -n "REC-" .specify/instructions.md             # enumeration reached the live file via generate-instructions.sh
+grep -n "REC-" .specify/instructions.md             # enumeration reached the live file via /speckit.instructions content refresh (Action 5)
 grep -n "A3 自省" .specify/shared/workflow/feedback-step.md   # the named legal entry
 git clone --quiet . /tmp/s63-clean && test -f /tmp/s63-clean/<a REC target repo-relative path> && echo resolvable; rm -rf /tmp/s63-clean
 grep -n "speckit.review" .specify/shared/workflow/feature-integration.md   # the new transition row

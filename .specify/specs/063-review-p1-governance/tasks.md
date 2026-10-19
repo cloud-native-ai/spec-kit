@@ -126,14 +126,14 @@
 ### Implementation for User Story 2
 
 - [X] T017 [P] [US2] [blockedBy: T016] 实现 C-11：`templates/commands/review.md` § Handoffs "After" 以具名义务替换无所有者的 "Apply improvements to spec-kit templates/commands/scripts"——报告中每条 `REC-`（[[STR-003]]）在同一提交以既有指针行形态（per `.specify/memory/register.md`，编号 → 一行含义 → 报告锚点 → 状态）登记；行形态 owner 为 register，命令只拥有登记义务。
-- [ ] T018 [P] [US2] [blockedBy: T016] 实现 C-12：`templates/instructions-template.md` § ID Register 枚举句加入 `REC-`；运行 `bash scripts/bash/generate-instructions.sh` 使活动 `.specify/instructions.md` 经生成器获得该行（MUST NOT 手改运行时副本），并以 `grep -n "REC-" .specify/instructions.md` 验证落位、`git diff` 于符号链接集为空。
+- [X] T018 [P] [US2] [blockedBy: T016] 实现 C-12（机制经 2026-10-20 用户裁定改指内容刷新 owner）：`templates/instructions-template.md` § ID Register 枚举句加入 `REC-`（bd108d5a 落位）；活动 `.specify/instructions.md` 经 `/speckit.instructions`（manage-instructions Action 5）内容刷新获得该行（a8c3c1f0 落位，MUST NOT 手改运行时副本，MUST NOT 扩展 additive-only 的 `generate-instructions.sh`）；以 `grep -n "REC-" .specify/instructions.md` 验证落位（line 176）、`git diff` 于符号链接集为空。
 - [X] T019 [P] [US2] [blockedBy: T016] 实现 C-13：`shared/workflow/feedback-step.md` § Scope guard 保持 wrap-up 条目 `scope: local` 规则，并点名全局 review 建议的既有合法入口——`/speckit.feedback` manage-feedback Path A digest § A3 自省(Introspection)（评审报告 "Mode 5 自省" 为历史名）；不新建 intake 存储、跟踪引擎或评分系统。
 - [X] T020 [P] [US2] [blockedBy: T016] 实现 C-14：`templates/review-template.md` § 5 与 Replacement Rule 3 把 repo-relative 路径改为 REC 目标主形态（任意 checkout 可解析），绝对路径仅作括号补充；无 repo-relative 形态的外部目标标记 `external` 并给出理由；不回退到 061 的机器本地 absolute-only 形态。
 - [X] T021 [P] [US2] [blockedBy: T016] 实现 C-15：`shared/workflow/feature-integration.md` § Status State Machine 在 checklist 行后增加 `| /speckit.review | Implemented → Ready for Review | review.md committed AND every deferred item resolved or waived |`，checklist 行注记「仅在其于 implement 之后运行时适用」，文档头部命令清单加入 `/speckit.review`；「每个命令恰好拥有一个转换」保持成立（E2 裁决落位）。
 
 ### Verification for User Story 2
 
-- [ ] T022 [US2] [blockedBy: T017,T018,T019,T020,T021] 运行 `tests/contract/test_review_p1_review_loop.py` 全绿；按 quickstart S5 形态做 seed 演练（临时目录内 fixture review 含 2–3 条 `REC-` → register 副本指针行 + 同提交检查 + 干净 clone 上 repo-relative 目标解析演练 + 转换表行核对），结果记入 `verification.md`；认领 C-11、C-12、C-13、C-14、C-15。 [green: contracts/template-mechanisms.md#C-11] [green: contracts/template-mechanisms.md#C-12] [green: contracts/template-mechanisms.md#C-13] [green: contracts/template-mechanisms.md#C-14] [green: contracts/template-mechanisms.md#C-15]
+- [X] T022 [US2] [blockedBy: T017,T018,T019,T020,T021] 运行 `tests/contract/test_review_p1_review_loop.py` 全绿（10 passed，含更名后的 `test_c12_live_instructions_received_rec_via_content_refresh`）；按 quickstart S5 形态做 seed 演练（临时目录内 fixture review 含 3 条 `REC-` → register 副本指针行 3/3 + 同提交检查 `git show --stat` + 干净 clone 上 repo-relative 目标解析演练 + 转换表行核对），结果记入 `verification.md`；认领 C-11、C-12、C-13、C-14、C-15。 [green: contracts/template-mechanisms.md#C-11] [green: contracts/template-mechanisms.md#C-12] [green: contracts/template-mechanisms.md#C-13] [green: contracts/template-mechanisms.md#C-14] [green: contracts/template-mechanisms.md#C-15]
 
 **Checkpoint**: US2 independently testable: 登记义务、枚举、入口、目标形态、转换行全部可独立验证（quickstart S5）。
 
@@ -373,6 +373,7 @@ Total: 34 clauses, each claimed exactly once. 分区随行序使每份契约的�
 - **D-T4 (2026-10-19; owner-file 订正承继)**: 承 research D-9/D-10 的两处对码订正——C-18 的 red-first note 形态 owner 是 `skills/internal/create-tasks/SKILL.md`（FR-025 原文的条件指称无实指）；C-27 的技能侧锚点是 implement Step 9（技能无 per-feature GATE-8 编号）。两处均已回写契约条款，任务行按订正后 owner 落点。
 - **D-T5 (2026-10-19; 生成期冻结记录)**: 本 tasks 生成阶段实际重冻/首冻两项测量——`notes/baseline-failed-tests.txt` 重捕获 63 名（`git diff` 与 plan 阶段冻结集合逐一相等，见 § measured premises）；`coverage-baseline.txt` 首冻（FR-004 首次全树核算，base-sha `bf88f2c63857`）。implement 开工时树若已前进，按 C-29 预检重捕获并把新值写回引用行（MUST NOT 沿用过期冻结值）。
 - **D-T6 (2026-10-19; MVP)**: MVP = US1，依据 requirements § User Story 1 的 Why this priority（F1/F2 同根、直接决定 analyze 门可信度）。
+- **D-T7 (2026-10-20; C-12 传播机制裁定，supersede D-T3 的机制腿)**: 用户裁定——活动 `.specify/instructions.md` 的 `REC-` 行由 `/speckit.instructions`（manage-instructions Action 5 内容刷新）承担；不扩展 `generate-instructions.sh`（其 additive-only 行为由 `test_instructions_section_propagation` C-2 钉住）。D-T3 的「生成器在 US2 内运行使 C-12 转绿」被本裁定取代；T045 保留的生成器运行仅作终态幂等确认，不承担 C-12 传播。裁定记录于 requirements § Clarifications Session 2026-10-20；C-12/T018/quickstart S5/plan Mirror Obligations 行与 `test_c12_live_instructions_received_rec_via_content_refresh`（更名自 …_through_the_generator）已对齐。
 
 ### Measured premises (commands actually run at generation time, 2026-10-19)
 
