@@ -183,7 +183,7 @@
 
 - **FR-009**: `templates/commands/review.md` § Handoffs “After” MUST 具名所有者与可机械检查的义务：报告中每条 `REC-` 编号（[[STR-003]]）MUST 在同一个提交中登记到 `.specify/memory/register.md`，采用既有指针行形态（编号 → 一行含义 → 报告锚点 → 状态）。MUST NOT 保留“Apply improvements to spec-kit templates/commands/scripts”这类无所有者指令。
 - **FR-010**: `templates/instructions-template.md` § ID Register MUST 把 `REC-`（[[STR-003]]）加入持久编号枚举，使该义务可从常驻指令层发现；活动 `.specify/instructions.md` MUST 经既有 refresh/sync 流程获得该行，MUST NOT 以手改运行时副本作为主要落点。
-- **FR-011**: `shared/workflow/feedback-step.md` § Scope guard MUST 保留 wrap-up 条目的 `scope: local` 规则，同时点名全局 review 建议的合法入口（既有的 Mode 5 自省豁免路径）。MUST NOT 新建独立 intake 存储、跟踪引擎或评分系统（宪法 IX/XIII）；“那是 `/speckit.review` 的职责”MUST NOT 再等同于“没有任何机制跟踪它”。
+- **FR-011**: `shared/workflow/feedback-step.md` § Scope guard MUST 保留 wrap-up 条目的 `scope: local` 规则，同时点名全局 review 建议的合法入口（既有的 Mode 5 自省豁免路径）。*名称订正（B-03）：「Mode 5 自省」是评审报告中的历史名；代码库中的现行入口为 `/speckit.feedback` 的 manage-feedback Path A digest § A3 自省(Introspection)，实现与测试以该现行为准（C-13）。*MUST NOT 新建独立 intake 存储、跟踪引擎或评分系统（宪法 IX/XIII）；“那是 `/speckit.review` 的职责”MUST NOT 再等同于“没有任何机制跟踪它”。
 - **FR-012**: `templates/review-template.md` § 5 与 Replacement Rule 3 MUST 把 repo-relative 路径作为 REC 目标的主形态，绝对路径只作括号补充；该方向与 061 报告的做法相反，因为相对路径在任意 checkout 可解析。确实没有 repo-relative 形态的外部目标 MUST 标记 external 并给出理由。
 - **FR-013**: `shared/workflow/feature-integration.md` 的状态转换表 MUST 增加 `/speckit.review` 行：`Implemented → Ready for Review`，条件为“`review.md` 已提交且每个延期项已解决或豁免”；`/speckit.checklist` 行 MUST 注明其同一转换仅在 checklist 于 implement 之后运行时适用。“每个命令恰好拥有一个转换”的规则 MUST 保持成立。
 
@@ -192,7 +192,7 @@
 - **FR-014**: `scripts/python/probe-utils.py` 的 `--action compile-embeds` 渲染器 MUST 支持 handler 行的完整参数占位约定：为每个单元渲染其引擎 action 接受的必填参数全集（包含 run-scoped 值如 `--run-id`）以及源参数（该 action 当前接受的 `--session-file`、`--session-rows`、`--tool`、`--declared-check`、`--green-check` 等；权威集合以引擎 parser 为准）。action 不接受的参数 MUST NOT 被渲染。占位约定 MUST 声明在 registry/渲染契约中，而非逐命令手写。
 - **FR-015**: `scripts/python/run-determination.py` 与 `scripts/python/feedback-utils.py` MUST 在一次调用中报告全部缺失的必填参数（单个错误或结构化列表），MUST NOT 逐参单错；输入错误的退出码保持既有约定。
 - **FR-016**: 修复落地后，所有编译单元 MUST 经 `compile-embeds` 重编译，`--check` MUST 零漂移，适用时以 `--reconcile` 收口；`backlog.md` 中 2026-10-15 的该条 MUST 在同一提交翻转为 closed 并附证据。
-- **FR-017**: `run-determination.py` 的 `(unit_id, run_id)` 幂等语义 MUST 保持不变；框架 MUST NOT 自动另铸 run-id 来为既有欠测量记录补测。机制修复是首次调用即完整（FR-014/FR-015）；若调用者显式决定补测，该决定 MUST 在运行证据中记录，MUST NOT 成为引擎默认行为。
+- **FR-017**: `run-determination.py` 的 `(unit_id, run_id)` 幂等语义 MUST 保持不变；框架 MUST NOT 自动另铸 run-id 来为既有欠测量记录补测。机制修复是首次调用即完整（FR-014/FR-015）；若调用者显式决定补测，该决定 MUST 在运行证据中记录，MUST NOT 成为引擎默认行为。*运行证据载体（C-01）：引擎 store 记录（`run-determination.py` 写下的 `(unit_id, run_id)` 记录）＋同一提交的 `git show --stat`；载体集合的完整定义与判定落在 `verification.md`。*
 
 #### F5 — 环境判据载体的开放
 
@@ -201,12 +201,12 @@
 #### F6 — 声称到证据的绑定
 
 - **FR-019**: `templates/verification-log-template.md` MUST 在 `# -- /speckit.implement results --` 与 `# -- Success Criteria evaluation --` 之间增加结构化证据记录段：每个 evaluation sample 一行，承载 sample id → 归档工件路径 → 内容哈希 → verdict。模板 MUST 声明确定性哈希算法与“`pass` verdict 必须有完整证据行”的规则。
-- **FR-020**: `shared/definitions/probe-definitions.md` MUST 在既有 command-gate 行旁注册 `gate-implement-evidence-binding`（[[STR-001]]），object 为 `/speckit.implement`，class 为 `command-gate`；`skills/internal/implement-feature/SKILL.md` MUST 在 GATE-8 旁引用该 gate。检查内容：对每个记录为 `pass` 的样本，归档工件 MUST 存在、非空，且其计算哈希 MUST 等于记录哈希；缺失/为空/不匹配 MUST 判红。该 gate MUST 复用既有 gate-probe 机制，MUST NOT 新建子系统。
+- **FR-020**: `shared/definitions/probe-definitions.md` MUST 在既有 command-gate 行旁注册 `gate-implement-evidence-binding`（[[STR-001]]），object 为 `/speckit.implement`，class 为 `command-gate`；`skills/internal/implement-feature/SKILL.md` MUST 在 GATE-8 旁引用该 gate。*锚点订正（B-02）：技能侧并无 per-feature 的 GATE-8 编号；该 duty 在技能中的实际落点是 implement Step 9（见 C-27 / T032 的落位）。*检查内容：对每个记录为 `pass` 的样本，归档工件 MUST 存在、非空，且其计算哈希 MUST 等于记录哈希；缺失/为空/不匹配 MUST 判红。该 gate MUST 复用既有 gate-probe 机制，MUST NOT 新建子系统。
 - **FR-021**: 验证记录中的 `pass` 声明 MUST 由 FR-019 的结构化证据行支撑；没有证据行的 `pass` MUST 被视为 unverified，MUST NOT 作为通过证据引用。
 
 #### F7 — 冻结基线的消费侧义务
 
-- **FR-022**: `skills/internal/implement-feature/SKILL.md` MUST 在 Step 1 之前增加预检步骤：重新捕获 `<spec-dir>/notes/baseline-*` 的每个冻结基线（集合从目录派生，不手写条数）；重捕获值不同时，MUST 把新值写入引用它的行，并在任何漂移 verdict 之前用 `git log` provenance 把每处差异分类为 `upstream repair` / `inherited` / `attributable to this feature` / `undecidable`。`undecidable` MUST 显式报告，MUST NOT 猜测。
+- **FR-022**: `skills/internal/implement-feature/SKILL.md` MUST 在 Step 1 之前增加预检步骤：重新捕获 `<spec-dir>/notes/baseline-*` 的每个冻结基线（集合从目录派生，不手写条数）；*基线集合以 C-29 为准（`<spec-dir>/baseline-*`、`<spec-dir>/notes/baseline-*` 与覆盖基线三者），本行的 `notes/baseline-*` 单模式表述 superseded-by C-29。*重捕获值不同时，MUST 把新值写入引用它的行，并在任何漂移 verdict 之前用 `git log` provenance 把每处差异分类为 `upstream repair` / `inherited` / `attributable to this feature` / `undecidable`。`undecidable` MUST 显式报告，MUST NOT 猜测。
 - **FR-023**: `templates/commands/implement.md` MUST 陈述与 FR-022 相同的预检职责，使该义务到达命令面，而不只存在于技能内部。
 - **FR-024**: `skills/internal/create-tasks/SKILL.md` § Re-freeze timing MUST 指向 implement 侧的消费步骤；它保留生产侧的 re-capture 义务，但 MUST NOT 继续描述一个自己无法执行的“在 implement 开始时重捕获”职责而不给出消费者落点。
 
@@ -250,7 +250,7 @@
 
 ### Measurable Outcomes
 
-- **SC-001**: 引用组字符集不再是一个未声明轴：对同一份同时含半角/全角引用组及同宽度嵌套的 fixture，ASCII-only 与双宽度实现的覆盖率总数差异为 0；owner 正文对定界符与嵌套规则的字面声明存在且可被契约测试断言；畸形跨宽度组被报告数为 100%。
+- **SC-001**: 引用组字符集不再是一个未声明轴：对同一份同时含半角/全角引用组及同宽度嵌套的 fixture，**同一语料**在「仅 ASCII 读法（宽度支持前的实现）」与「双宽度读法」两种宽度实现下的覆盖率总数差异为 0（比较对象是同一语料、两种实现，不是两个语料）；纯 ASCII 语料在双宽度实现下总数不变（C-2 sample 4）；owner 正文对定界符与嵌套规则的字面声明存在且可被契约测试断言；畸形跨宽度组被报告数为 100%。
 - **SC-002**: 条款覆盖核算成为 analyze 的固定步骤：带契约集的 fixture feature 在 analyze 运行中产生覆盖 verdict 的比例为 100%；`baseline-missing` 不再静默通过；每个含 `contracts/` 且经 `/speckit.tasks` 生成的 feature 都存在 `coverage-baseline.txt`（`find` 检查），缺失数为 0；无契约集 feature 的伪造基线数为 0。
 - **SC-003**: 对至少含一条未勾选 `Gap` 的 seed checklist，analyze 门报告中“升格为 finding 或显式 disposition”的覆盖率为 100%；“未勾选、未升格、未处置”的条目数为 0；以一个复刻 062 CHK005/CHK011 形态的 fixture 验证，同一 Gap 在首轮 analyze 即被消费，不再需要后续三提交修复环。seed 的 `Gap` 条目数 MUST 非零，使该断言不是空真。
 - **SC-004**: 已被下游解决的 checklist 条目由 append-only recheck 记录回答的比例为 100%；因此被迫 waiver 的条目数为 0；原始 checklist 被原地刷新的次数为 0；缺少 `Scope`/`Basis`/`Disposition`/`Closed` 任一段的 waiver 数为 0。

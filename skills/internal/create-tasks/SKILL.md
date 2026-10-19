@@ -368,6 +368,12 @@ each implement round has to guess where the previous phase put the file:
 - `<spec-dir>/notes/pre-change-measurements.md` — the pre-change side of every "diff
   against pre-change output" premise: the measured value, the command that produced it,
   and the capture date.
+- `<spec-dir>/coverage-baseline.txt` — for a feature with a contract set, freeze it with
+  `python3 scripts/python/account-clause-coverage.py <spec-dir> --freeze > <spec-dir>/coverage-baseline.txt`
+  (the accountant's own default path is `coverage-baseline.txt`); the timing is the same
+  re-freeze timing stated below (first full-tree accounting per feature, not first
+  all-green). A feature without a contract set MUST skip with an explicit stated reason —
+  MUST NOT fabricate an empty baseline.
 
 Create `notes/` in Phase 1 (Setup) so that Phase 2 (Foundational) rows already have
 somewhere to write. **Re-freeze timing**: these files are frozen measurements, so they

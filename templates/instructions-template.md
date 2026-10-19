@@ -162,7 +162,7 @@ Full philosophy, the load-bearing criteria, and where each kind of answer belong
 
 ## ID Register (编号登记)
 
-Every durable identifier — a decision (D-…), open item (OI-…), stage (S…), target (T-…), finding (F-…), criterion (B-…) — MUST be recorded in `.specify/memory/register.md` **at the moment the ID is coined**, never left only in session history, a git-ignored workspace, or conversation: an unregistered ID is uninterpretable to any later session, and citing it as known is the silent-context failure this register closes.
+Every durable identifier — a decision (D-…), open item (OI-…), stage (S…), target (T-…), finding (F-…), criterion (B-…), recommendation (`REC-…`) — MUST be recorded in `.specify/memory/register.md` **at the moment the ID is coined**, never left only in session history, a git-ignored workspace, or conversation: an unregistered ID is uninterpretable to any later session, and citing it as known is the silent-context failure this register closes.
 
 - **Pointer shape**: identifier → one-line meaning → authority path → status; MUST NOT restate the decision content (One Source Of Truth).
 - **Durable test**: anything cited by a tracked artifact or still pending registers; a throwaway enumeration inside one reply does not.

@@ -77,8 +77,11 @@ content from the user.
    `No significant optimization points identified this run.`
    **Token 效率自评**(纪律定义见 `.specify/shared/guidelines/token-efficiency.md`)——同步自查三问:本次运行是否发生 (1) **原文转储**(机器管理数据文件整体注入上下文)、(2) LLM **代做确定性工作**(固定规则判断未交程序)、(3) **重复读取**同一内容?有发现 → 对应优化点条目行 MUST 内嵌字面量 `token-efficiency`(稳定标记,供 `--action list --contains token-efficiency` 检索聚合);干净运行 MUST NOT 追加空洞的 Token 观察条目。量化口径:定性描述或行/字节代理指标,精确 Token 计数不可得时 MUST **不编造**具体数值。
 3. **Scope guard.** Keep strictly to *this* unit's operation. Do NOT produce a
-   global/whole-project assessment — that is `/speckit.review`'s job. Every entry is
-   `scope: local`.
+   global/whole-project assessment — that is `/speckit.review`'s job. Every wrap-up entry
+   is `scope: local`. A global review recommendation is not left without an intake: its
+   legal entry is the existing `/speckit.feedback` manage-feedback Path A digest
+   § A3 自省(Introspection) step. No new intake store, tracking engine, or scoring system
+   is introduced.
 4. **Dedup guard.** Choose a stable `run_id` for this run (e.g. the feature key + a run
    timestamp). If a parent flow already recorded feedback for this same `(unit_id, run_id)`,
    the engine will no-op — do not force a duplicate.

@@ -46,12 +46,19 @@ must be absolute.
 If `REQUIREMENTS_DIR/checklists/` exists, check checklist status first:
 
 - Count total/completed/incomplete items per checklist.
-- If incomplete: STOP, show table, ask **"Proceed anyway? (yes/no)"**.
+- **Third branch — recheck answered**: an item whose subject a later stage resolved and
+  recorded in `checklists/recheck-<date>-<topic>.md` (the append-only C-8 shape) counts
+  as answered — not incomplete, no waiver needed. Subtract it before counting; the gate
+  fires only for genuinely unresolved items.
+- If genuinely unresolved items remain: STOP, show table, ask **"Proceed anyway? (yes/no)"**.
   > Gate probe: gate-implement-checklist-waiver — after the user decision, record firing
   > evidence per `.specify/shared/guidelines/confirmation-gates.md` §门控观察协议
   > (non-blocking).
-- If user proceeds: require waiver comment, record in `REQUIREMENTS_DIR/waivers.md`.
-- If all complete: proceed automatically.
+- If user proceeds: require a waiver recorded in `REQUIREMENTS_DIR/waivers.md` carrying
+  all four parts — `Scope`, `Basis`, `Disposition`, `Closed`. `Closed` MUST state what
+  solved the item (which upstream artifact edit closed it). A waiver missing any part is
+  non-compliant and MUST NOT be treated as closed evidence.
+- If all complete (or answered): proceed automatically.
 
 ### Step 3 — Load context (summary-first)
 

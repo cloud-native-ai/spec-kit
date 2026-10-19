@@ -4,7 +4,7 @@ This document defines the standard feature tracking integration used by SDD life
 
 ## Core Protocol
 
-Every SDD lifecycle command (`/speckit.requirements`, `/speckit.plan`, `/speckit.tasks`, `/speckit.implement`, `/speckit.checklist`) automatically integrates with the feature tracking system:
+Every SDD lifecycle command (`/speckit.requirements`, `/speckit.plan`, `/speckit.tasks`, `/speckit.implement`, `/speckit.checklist`, `/speckit.review`) automatically integrates with the feature tracking system:
 
 1. **Detect feature context**:
    - If `.specify/memory/features.md` exists, detect the current feature directory (format: `.specify/specs/[REQUIREMENTS_KEY]/`)
@@ -34,7 +34,8 @@ Each command owns exactly one transition:
 | `/speckit.plan` | `Draft → Planned` | MUST NOT land `Implemented` |
 | `/speckit.tasks` | Maintain `Planned` | Status unchanged |
 | `/speckit.implement` | `Planned → Implemented` | Requires Pre-Status-Flip Gate |
-| `/speckit.checklist` | `Implemented → Ready for Review` | If applicable |
+| `/speckit.checklist` | `Implemented → Ready for Review` | If applicable; applies only when the checklist runs after implement |
+| `/speckit.review` | `Implemented → Ready for Review` | review.md committed AND every deferred item resolved or waived |
 
 ## Pre-Status-Flip Gate (implement phase only)
 

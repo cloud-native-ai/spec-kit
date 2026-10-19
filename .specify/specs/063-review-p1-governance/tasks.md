@@ -72,7 +72,7 @@
 
 **Purpose**: Freeze the pre-change side of every diff/drift premise and record the environment verdict before any artifact is written.
 
-- [ ] T001 捕获改前侧证据：逐项实跑并写入 `.specify/specs/063-review-p1-governance/notes/pre-change-measurements.md`（命令、日期、真实输出）——`python3 scripts/python/regen-command-copies.py --check`（落盘 `notes/baseline-regen-check.txt`）、`python3 scripts/python/sync-mirrors.py --check`（落盘 `notes/baseline-mirror-check.txt`）、`python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check`（落盘 `notes/baseline-compile-check.txt`）、062 覆盖通道 dark 实测与 `find .specify/specs -name coverage-baseline.txt` 清点、`.specify/memory/register.md` 的 `REC-` 行数清点、`.specify/memory/feedback/backlog.md` 第 89 行状态快照；`notes/baseline-failed-tests.txt`（63 名）与 `coverage-baseline.txt` 已于本 tasks 生成阶段重冻/首冻（2026-10-19，见 § measured premises），本行只引用不重跑；环境判据一律指向本文件 § Environment Prerequisites，不在此复述。
+- [X] T001 捕获改前侧证据：逐项实跑并写入 `.specify/specs/063-review-p1-governance/notes/pre-change-measurements.md`（命令、日期、真实输出）——`python3 scripts/python/regen-command-copies.py --check`（落盘 `notes/baseline-regen-check.txt`）、`python3 scripts/python/sync-mirrors.py --check`（落盘 `notes/baseline-mirror-check.txt`）、`python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check`（落盘 `notes/baseline-compile-check.txt`）、062 覆盖通道 dark 实测与 `find .specify/specs -name coverage-baseline.txt` 清点、`.specify/memory/register.md` 的 `REC-` 行数清点、`.specify/memory/feedback/backlog.md` 第 89 行状态快照；`notes/baseline-failed-tests.txt`（63 名）与 `coverage-baseline.txt` 已于本 tasks 生成阶段重冻/首冻（2026-10-19，见 § measured premises），本行只引用不重跑；环境判据一律指向本文件 § Environment Prerequisites，不在此复述。
 
 **Checkpoint**: pre-change measurements exist; every later "diff against pre-change" premise has a dated baseline.
 
@@ -88,25 +88,25 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T002 [US1] 扩展 `tests/contract/test_clause_forms.py`：新增双宽度引用组确定性自测样本（≥1 全角组、≥1 同宽度一层嵌套组、≥1 跨宽度畸形组、1 个 ASCII-only 语料在双宽度实现下总数不变样本），并断言 owner 正文 § 4 rule 2 对定界字符集与同宽度嵌套规则的字面声明存在（per `shared/definitions/contract-clause-definitions.md`，C-1/C-2 钉；不并行：该只读断言对象由 T006 写入）；当前树先红，red 输出由 T005 统一落盘 per `notes/red-first-evidence.md`。
-- [ ] T003 [P] [US1] 扩展 `tests/contract/test_clause_coverage.py`：钉 analyze 固定步骤接线（技能与命令面以只读方式接入覆盖核算引擎 per `scripts/python/account-clause-coverage.py`，无 `--freeze`）、tasks 冻结义务（[[STR-002]] 经 `--freeze` 产出、无契约集 feature 显式 skip 不伪造空基线）、双侧同一路径形（`<spec-dir>/coverage-baseline.txt` 即 `--baseline` 缺省）、baseline-missing 作为阶段可见问题呈现（C-5/C-6/C-7 钉）；当前树先红，red 输出由 T005 统一落盘 per `notes/red-first-evidence.md`。
-- [ ] T004 [P] [US1] 新建两个互不重叠的钉文件：`tests/contract/test_review_p1_checklist_governance.py` 钉 `checklists/*.md` 装载行（load table 含 item text、checked state、tags）与 `[Gap]` 未勾选项升格/处置的确定性标记形态（自由散文不满足、「未勾选+未升格+未处置」计数可观察且为 0）（C-3/C-4 钉）；`tests/contract/test_review_p1_recheck_waiver.py` 钉 append-only recheck 形态（每轮新文件、回答引用 requirement 行、原 checklist 不原地刷新）、implement 豁免门第三分支（已回答条目不计未完成）与 waiver 四段格式缺一即不合规（C-8/C-9/C-10 钉）；当前树先红，red 输出由 T005 统一落盘 per `notes/red-first-evidence.md`。
-- [ ] T005 [US1] [blockedBy: T002,T003,T004] 运行上述四个测试文件确认按预期红（失败原因为制品缺失而非断言写错），把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
+- [X] T002 [US1] 扩展 `tests/contract/test_clause_forms.py`：新增双宽度引用组确定性自测样本（≥1 全角组、≥1 同宽度一层嵌套组、≥1 跨宽度畸形组、1 个 ASCII-only 语料在双宽度实现下总数不变样本），并断言 owner 正文 § 4 rule 2 对定界字符集与同宽度嵌套规则的字面声明存在（per `shared/definitions/contract-clause-definitions.md`，C-1/C-2 钉；不并行：该只读断言对象由 T006 写入）；当前树先红，red 输出由 T005 统一落盘 per `notes/red-first-evidence.md`。
+- [X] T003 [P] [US1] 扩展 `tests/contract/test_clause_coverage.py`：钉 analyze 固定步骤接线（技能与命令面以只读方式接入覆盖核算引擎 per `scripts/python/account-clause-coverage.py`，无 `--freeze`）、tasks 冻结义务（[[STR-002]] 经 `--freeze` 产出、无契约集 feature 显式 skip 不伪造空基线）、双侧同一路径形（`<spec-dir>/coverage-baseline.txt` 即 `--baseline` 缺省）、baseline-missing 作为阶段可见问题呈现（C-5/C-6/C-7 钉）；当前树先红，red 输出由 T005 统一落盘 per `notes/red-first-evidence.md`。
+- [X] T004 [P] [US1] 新建两个互不重叠的钉文件：`tests/contract/test_review_p1_checklist_governance.py` 钉 `checklists/*.md` 装载行（load table 含 item text、checked state、tags）与 `[Gap]` 未勾选项升格/处置的确定性标记形态（自由散文不满足、「未勾选+未升格+未处置」计数可观察且为 0）（C-3/C-4 钉）；`tests/contract/test_review_p1_recheck_waiver.py` 钉 append-only recheck 形态（每轮新文件、回答引用 requirement 行、原 checklist 不原地刷新）、implement 豁免门第三分支（已回答条目不计未完成）与 waiver 四段格式缺一即不合规（C-8/C-9/C-10 钉）；当前树先红，red 输出由 T005 统一落盘 per `notes/red-first-evidence.md`。
+- [X] T005 [US1] [blockedBy: T002,T003,T004] 运行上述四个测试文件确认按预期红（失败原因为制品缺失而非断言写错），把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
 
 ### Implementation for User Story 1
 
-- [ ] T006 [P] [US1] [blockedBy: T005] 实现 C-1+C-2：在 `shared/definitions/contract-clause-definitions.md` § 4 rule 2 增加规范性定界字符集句（开组 `(` 或 `（`、对应闭组 `)` 或 `）`、嵌套 MUST 同宽度匹配、跨宽度/不配对 = 畸形组由检查器报告且不得静默计为引用或 mention）；`scripts/python/clause_extract.py` 的 `parentheticals()` 按同一字符集实现双宽度 + 同宽度一层嵌套（既有深度语义保持），畸形组作为独立结果输出（既非引用亦非 mention）。
-- [ ] T007 [P] [US1] [blockedBy: T005] 实现 C-3+C-4+C-5：`skills/internal/analyze-artifacts/SKILL.md` § 2 装载表增加 `checklists/*.md` 行，检测遍增加 checklist 遍（未勾选 `[Gap]` 条目升格为 finding 或给出确定性 disposition 标记，报告使「未勾选+未升格+未处置」计数可观察且为 0），工作流增加固定步骤只读调用覆盖核算（per `scripts/python/account-clause-coverage.py`，`--spec <spec-dir>` 无 `--freeze`），`status: baseline-missing` 作为阶段可见问题与 remedy（重跑 `/speckit.tasks`）呈现，无契约集 feature 记录显式 skip 及理由；`templates/commands/analyze.md` § Delegation Inputs 具名 checklist 面与覆盖核算步骤。
-- [ ] T008 [P] [US1] [blockedBy: T005] 实现 C-6：`skills/internal/create-tasks/SKILL.md` § Runtime-evidence landing points 增加覆盖基线冻结义务——含契约集的 feature 经覆盖核算引擎冻结路径（per `scripts/python/account-clause-coverage.py` 的 `--freeze`，引擎缺省路径与 `BASELINE_NAME`）产出 [[STR-002]]，时机与既有 re-freeze timing 一致（每 feature 第一次全树核算，非首次全绿）；无契约集 feature 显式 skip 并说明理由，不伪造空基线。
-- [ ] T009 [P] [US1] [blockedBy: T005] 实现 C-8：`skills/internal/create-checklist/SKILL.md` § 5 Generate 声明 recheck 形态——答案落每轮一个 append-only recheck 文件（`checklists/recheck-<date>-<topic>.md`），每个已回答条目引用它所回答的 requirement 行，原 checklist MUST NOT 原地刷新、未勾选行保留为历史（061 REC-C5 落点）。
-- [ ] T010 [P] [US1] [blockedBy: T005] 实现 C-9+C-10：`skills/internal/implement-feature/SKILL.md` § Step 2 — Checklist exemption gate 增加第三分支（后续阶段已按 recheck 记录回答的条目计为已回答、不计未完成、无需 waiver，门只对真正未解决条目触发）与 waiver 四段格式（`Scope`/`Basis`/`Disposition`/`Closed`，`Closed` 说明是什么解决了它；缺任一段不合规、不得当作已关闭证据）（061 REC-C6 落点）。
+- [X] T006 [P] [US1] [blockedBy: T005] 实现 C-1+C-2：在 `shared/definitions/contract-clause-definitions.md` § 4 rule 2 增加规范性定界字符集句（开组 `(` 或 `（`、对应闭组 `)` 或 `）`、嵌套 MUST 同宽度匹配、跨宽度/不配对 = 畸形组由检查器报告且不得静默计为引用或 mention）；`scripts/python/clause_extract.py` 的 `parentheticals()` 按同一字符集实现双宽度 + 同宽度一层嵌套（既有深度语义保持），畸形组作为独立结果输出（既非引用亦非 mention）。
+- [X] T007 [P] [US1] [blockedBy: T005] 实现 C-3+C-4+C-5：`skills/internal/analyze-artifacts/SKILL.md` § 2 装载表增加 `checklists/*.md` 行，检测遍增加 checklist 遍（未勾选 `[Gap]` 条目升格为 finding 或给出确定性 disposition 标记，报告使「未勾选+未升格+未处置」计数可观察且为 0），工作流增加固定步骤只读调用覆盖核算（per `scripts/python/account-clause-coverage.py`，`--spec <spec-dir>` 无 `--freeze`），`status: baseline-missing` 作为阶段可见问题与 remedy（重跑 `/speckit.tasks`）呈现，无契约集 feature 记录显式 skip 及理由；`templates/commands/analyze.md` § Delegation Inputs 具名 checklist 面与覆盖核算步骤。
+- [X] T008 [P] [US1] [blockedBy: T005] 实现 C-6：`skills/internal/create-tasks/SKILL.md` § Runtime-evidence landing points 增加覆盖基线冻结义务——含契约集的 feature 经覆盖核算引擎冻结路径（per `scripts/python/account-clause-coverage.py` 的 `--freeze`，引擎缺省路径与 `BASELINE_NAME`）产出 [[STR-002]]，时机与既有 re-freeze timing 一致（每 feature 第一次全树核算，非首次全绿）；无契约集 feature 显式 skip 并说明理由，不伪造空基线。
+- [X] T009 [P] [US1] [blockedBy: T005] 实现 C-8：`skills/internal/create-checklist/SKILL.md` § 5 Generate 声明 recheck 形态——答案落每轮一个 append-only recheck 文件（`checklists/recheck-<date>-<topic>.md`），每个已回答条目引用它所回答的 requirement 行，原 checklist MUST NOT 原地刷新、未勾选行保留为历史（061 REC-C5 落点）。
+- [X] T010 [P] [US1] [blockedBy: T005] 实现 C-9+C-10：`skills/internal/implement-feature/SKILL.md` § Step 2 — Checklist exemption gate 增加第三分支（后续阶段已按 recheck 记录回答的条目计为已回答、不计未完成、无需 waiver，门只对真正未解决条目触发）与 waiver 四段格式（`Scope`/`Basis`/`Disposition`/`Closed`，`Closed` 说明是什么解决了它；缺任一段不合规、不得当作已关闭证据）（061 REC-C6 落点）。
 
 ### Verification for User Story 1
 
-- [ ] T011 [US1] [blockedBy: T006] 运行 `tests/contract/test_clause_forms.py` 全绿（双宽度/嵌套/畸形/ASCII 不变样本 + owner 正文断言），通过输出记入 `verification.md`；认领 C-1、C-2。 [green: contracts/template-mechanisms.md#C-1] [green: contracts/template-mechanisms.md#C-2]
-- [ ] T012 [US1] [blockedBy: T007] 按 quickstart S3 形态在 fixture（一条 `[覆盖/安全, Gap]` 未勾选项 + 一条无 Gap 未勾选项）上演练 checklist 装载与 Gap 消费（升格/处置标记、「未勾选+未升格+未处置」=0、无 Gap 条目无新义务），运行 `tests/contract/test_review_p1_checklist_governance.py` 相关腿全绿，结果记入 `verification.md`；认领 C-3、C-4。 [green: contracts/template-mechanisms.md#C-3] [green: contracts/template-mechanisms.md#C-4]
-- [ ] T013 [US1] [blockedBy: T007,T008] 按 quickstart S1/S2 形态演练双宽度语料单一总数（fixture 契约集含全/半角与同宽度嵌套）与 analyze 覆盖 verdict（只读运行 + baseline-missing 可见呈现 + 无契约集显式 skip），运行 `tests/contract/test_clause_coverage.py` 全绿并核对 analyze 消费侧与 tasks 冻结侧命名的同一文件路径形，结果记入 `verification.md`；认领 C-5、C-6、C-7。 [green: contracts/template-mechanisms.md#C-5] [green: contracts/template-mechanisms.md#C-6] [green: contracts/template-mechanisms.md#C-7]
-- [ ] T014 [US1] [blockedBy: T009,T010] 按 quickstart S4 形态演练 recheck 回答（fixture：下游阶段已答条目 → 豁免门计为已回答、原 checklist `git diff` 为空、无需 waiver）与四段 waiver（真未解决条目产生合规 waiver；缺任一段判不合规），运行 `tests/contract/test_review_p1_recheck_waiver.py` 全绿，结果记入 `verification.md`；认领 C-8、C-9、C-10。 [green: contracts/template-mechanisms.md#C-8] [green: contracts/template-mechanisms.md#C-9] [green: contracts/template-mechanisms.md#C-10]
+- [X] T011 [US1] [blockedBy: T006] 运行 `tests/contract/test_clause_forms.py` 全绿（双宽度/嵌套/畸形/ASCII 不变样本 + owner 正文断言），通过输出记入 `verification.md`；认领 C-1、C-2。 [green: contracts/template-mechanisms.md#C-1] [green: contracts/template-mechanisms.md#C-2]
+- [X] T012 [US1] [blockedBy: T007] 按 quickstart S3 形态在 fixture（一条 `[覆盖/安全, Gap]` 未勾选项 + 一条无 Gap 未勾选项）上演练 checklist 装载与 Gap 消费（升格/处置标记、「未勾选+未升格+未处置」=0、无 Gap 条目无新义务），运行 `tests/contract/test_review_p1_checklist_governance.py` 相关腿全绿，结果记入 `verification.md`；认领 C-3、C-4。 [green: contracts/template-mechanisms.md#C-3] [green: contracts/template-mechanisms.md#C-4]
+- [X] T013 [US1] [blockedBy: T007,T008] 按 quickstart S1/S2 形态演练双宽度语料单一总数（fixture 契约集含全/半角与同宽度嵌套）与 analyze 覆盖 verdict（只读运行 + baseline-missing 可见呈现 + 无契约集显式 skip），运行 `tests/contract/test_clause_coverage.py` 全绿并核对 analyze 消费侧与 tasks 冻结侧命名的同一文件路径形，结果记入 `verification.md`；认领 C-5、C-6、C-7。 [green: contracts/template-mechanisms.md#C-5] [green: contracts/template-mechanisms.md#C-6] [green: contracts/template-mechanisms.md#C-7]
+- [X] T014 [US1] [blockedBy: T009,T010] 按 quickstart S4 形态演练 recheck 回答（fixture：下游阶段已答条目 → 豁免门计为已回答、原 checklist `git diff` 为空、无需 waiver）与四段 waiver（真未解决条目产生合规 waiver；缺任一段判不合规），运行 `tests/contract/test_review_p1_recheck_waiver.py` 全绿，结果记入 `verification.md`；认领 C-8、C-9、C-10。 [green: contracts/template-mechanisms.md#C-8] [green: contracts/template-mechanisms.md#C-9] [green: contracts/template-mechanisms.md#C-10]
 
 **Checkpoint**: US1 independently testable: 双宽度单一总数、Gap 首轮消费、覆盖基线冻结/接线、recheck 免 waiver 全部可独立验证（quickstart S1–S4）。
 
@@ -120,16 +120,16 @@
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T015 [P] [US2] 新建 `tests/contract/test_review_p1_review_loop.py`：钉 review Handoffs 具名所有者与同提交登记义务（[[STR-003]] 编号 → 一行含义 → 报告锚点 → 状态，行形态 owner 为 ID Register）、常驻指令层枚举句含 `REC-`、feedback Scope guard 保持 `scope: local` 且点名 A3 自省(Introspection) 合法入口、review 模板 § 5/Replacement Rule 3 的 repo-relative 主形态与 external 标记、状态机转换表 review 行 + checklist 行注记 + 「每命令恰一转换」不变式（C-11..C-15 钉）；当前树先红，red 输出由 T016 统一落盘 per `notes/red-first-evidence.md`。
-- [ ] T016 [US2] [blockedBy: T015] 运行 `tests/contract/test_review_p1_review_loop.py` 确认按预期红，把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
+- [X] T015 [P] [US2] 新建 `tests/contract/test_review_p1_review_loop.py`：钉 review Handoffs 具名所有者与同提交登记义务（[[STR-003]] 编号 → 一行含义 → 报告锚点 → 状态，行形态 owner 为 ID Register）、常驻指令层枚举句含 `REC-`、feedback Scope guard 保持 `scope: local` 且点名 A3 自省(Introspection) 合法入口、review 模板 § 5/Replacement Rule 3 的 repo-relative 主形态与 external 标记、状态机转换表 review 行 + checklist 行注记 + 「每命令恰一转换」不变式（C-11..C-15 钉）；当前树先红，red 输出由 T016 统一落盘 per `notes/red-first-evidence.md`。
+- [X] T016 [US2] [blockedBy: T015] 运行 `tests/contract/test_review_p1_review_loop.py` 确认按预期红，把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
 
 ### Implementation for User Story 2
 
-- [ ] T017 [P] [US2] [blockedBy: T016] 实现 C-11：`templates/commands/review.md` § Handoffs "After" 以具名义务替换无所有者的 "Apply improvements to spec-kit templates/commands/scripts"——报告中每条 `REC-`（[[STR-003]]）在同一提交以既有指针行形态（per `.specify/memory/register.md`，编号 → 一行含义 → 报告锚点 → 状态）登记；行形态 owner 为 register，命令只拥有登记义务。
+- [X] T017 [P] [US2] [blockedBy: T016] 实现 C-11：`templates/commands/review.md` § Handoffs "After" 以具名义务替换无所有者的 "Apply improvements to spec-kit templates/commands/scripts"——报告中每条 `REC-`（[[STR-003]]）在同一提交以既有指针行形态（per `.specify/memory/register.md`，编号 → 一行含义 → 报告锚点 → 状态）登记；行形态 owner 为 register，命令只拥有登记义务。
 - [ ] T018 [P] [US2] [blockedBy: T016] 实现 C-12：`templates/instructions-template.md` § ID Register 枚举句加入 `REC-`；运行 `bash scripts/bash/generate-instructions.sh` 使活动 `.specify/instructions.md` 经生成器获得该行（MUST NOT 手改运行时副本），并以 `grep -n "REC-" .specify/instructions.md` 验证落位、`git diff` 于符号链接集为空。
-- [ ] T019 [P] [US2] [blockedBy: T016] 实现 C-13：`shared/workflow/feedback-step.md` § Scope guard 保持 wrap-up 条目 `scope: local` 规则，并点名全局 review 建议的既有合法入口——`/speckit.feedback` manage-feedback Path A digest § A3 自省(Introspection)（评审报告 "Mode 5 自省" 为历史名）；不新建 intake 存储、跟踪引擎或评分系统。
-- [ ] T020 [P] [US2] [blockedBy: T016] 实现 C-14：`templates/review-template.md` § 5 与 Replacement Rule 3 把 repo-relative 路径改为 REC 目标主形态（任意 checkout 可解析），绝对路径仅作括号补充；无 repo-relative 形态的外部目标标记 `external` 并给出理由；不回退到 061 的机器本地 absolute-only 形态。
-- [ ] T021 [P] [US2] [blockedBy: T016] 实现 C-15：`shared/workflow/feature-integration.md` § Status State Machine 在 checklist 行后增加 `| /speckit.review | Implemented → Ready for Review | review.md committed AND every deferred item resolved or waived |`，checklist 行注记「仅在其于 implement 之后运行时适用」，文档头部命令清单加入 `/speckit.review`；「每个命令恰好拥有一个转换」保持成立（E2 裁决落位）。
+- [X] T019 [P] [US2] [blockedBy: T016] 实现 C-13：`shared/workflow/feedback-step.md` § Scope guard 保持 wrap-up 条目 `scope: local` 规则，并点名全局 review 建议的既有合法入口——`/speckit.feedback` manage-feedback Path A digest § A3 自省(Introspection)（评审报告 "Mode 5 自省" 为历史名）；不新建 intake 存储、跟踪引擎或评分系统。
+- [X] T020 [P] [US2] [blockedBy: T016] 实现 C-14：`templates/review-template.md` § 5 与 Replacement Rule 3 把 repo-relative 路径改为 REC 目标主形态（任意 checkout 可解析），绝对路径仅作括号补充；无 repo-relative 形态的外部目标标记 `external` 并给出理由；不回退到 061 的机器本地 absolute-only 形态。
+- [X] T021 [P] [US2] [blockedBy: T016] 实现 C-15：`shared/workflow/feature-integration.md` § Status State Machine 在 checklist 行后增加 `| /speckit.review | Implemented → Ready for Review | review.md committed AND every deferred item resolved or waived |`，checklist 行注记「仅在其于 implement 之后运行时适用」，文档头部命令清单加入 `/speckit.review`；「每个命令恰好拥有一个转换」保持成立（E2 裁决落位）。
 
 ### Verification for User Story 2
 
@@ -285,7 +285,7 @@
 
 ### Parallel Opportunities
 
-- Phase 2: T002/T003/T004（四个测试文件互斥——T004 一次写两个）与 T006–T010（五个实现写目标互斥：clause 定义 + 抽取器 / analyze 技能+命令面 / create-tasks 技能 / create-checklist 技能 / implement 技能）内部并行；验证行 T011–T014 串行（共享 `verification.md`）。
+- Phase 2: T003/T004（测试文件互斥——T004 一次写两个）与 T006–T010（五个实现写目标互斥：clause 定义 + 抽取器 / analyze 技能+命令面 / create-tasks 技能 / create-checklist 技能 / implement 技能）内部并行；T002 不并行（其只读断言对象由 T006 写入，以其行内「不并行」说明为准）；验证行 T011–T014 串行（共享 `verification.md`）。
 - Phase 3: T017–T021（五个源文件互斥：review 命令面 / 指令模板+生成 / feedback-step / review 模板 / feature-integration）并行。
 - Phase 4: T023/T024（两个测试文件互斥）并行；T026 → T027 串行（渲染器消费 manifest）。
 - Phase 5: T031/T032（模板 vs 注册表+技能，互斥）并行。
@@ -298,8 +298,8 @@
 ## Parallel Example: User Story 1
 
 ```bash
-# Launch all red tests for US1 together (disjoint write targets):
-Task: "扩展 tests/contract/test_clause_forms.py（T002）"
+# Launch the disjoint red tests for US1 together (T002 is NOT parallel: its read-only
+# assertion target is written by T006, per T002's own inline note):
 Task: "扩展 tests/contract/test_clause_coverage.py（T003）"
 Task: "新建 tests/contract/test_review_p1_checklist_governance.py + tests/contract/test_review_p1_recheck_waiver.py（T004）"
 
@@ -387,7 +387,7 @@ Total: 34 clauses, each claimed exactly once. 分区随行序使每份契约的�
 - 覆盖通道: `python3 .specify/scripts/python/account-clause-coverage.py --spec .specify/specs/063-review-p1-governance` → `FR universe: 30 / FR claimed: 30 / FR uncovered: 0`，`status: baseline-missing`（首冻前）；`find .specify/specs -name coverage-baseline.txt` → 冻结前仅 `053-machine-decidable-artifacts`。
 - 覆盖基线首冻: `python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/063-review-p1-governance --freeze > .specify/specs/063-review-p1-governance/coverage-baseline.txt` → exit 0，497 行，`base-sha bf88f2c63857`（语料排除 063 自身契约；陷阱：该文件比较须 `LC_ALL=C comm -13`——文件头自述 glibc collation 下 locale 差异会使 comm 误报全量 delta）。
 - gate 注册形锚点: `shared/definitions/probe-definitions.md` L117 `| gate-implement-checklist-waiver | command-gate | /speckit.implement | … |`；`h-gate-evidence` 绑定行形 `| h-gate-evidence | @point:confirm-gate | <gate-id> | … |`（T032 按此同形落 [[STR-001]]）。
-- 任务面: 51 任务行（Setup 1 · US1 13 · US2 8 · US3 6 · US4 5 · US5 5 · US6 5 · Polish 8），`[P]` 25 项，`[green:]` 34 处（= C-1..C-34 每条款恰一次）。
+- 任务面: 51 任务行（Setup 1 · US1 13 · US2 8 · US3 6 · US4 5 · US5 5 · US6 5 · Polish 8），`[P]` 24 项，`[green:]` 34 处（= C-1..C-34 每条款恰一次）。
 
 ### Runtime-evidence landing points
 

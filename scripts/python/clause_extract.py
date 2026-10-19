@@ -16,6 +16,8 @@ Functions (the same `^  name  description` shape the house docstring convention 
   md_forms_hit       which of the three positive Markdown forms match (mutual-exclusion probe)
   extract_clauses    clause ids in document order
   clause_blocks      (id, body) pairs, body bounded per owner doc § 4.1
+  parentheticals     well-formed balanced groups (ASCII + full-width, same-width nesting)
+  malformed_parentheticals  cross-width / unpaired spans — reported, never cited
   clause_citations   id -> set of FR ids from that clause's citation group (owner doc § 4.2)
   resolvable         whether a clause id exists in a given contract file
   unparseable_names  files that yield no clause id — named, never silently counted as covered
@@ -122,22 +124,83 @@ def strip_code_spans(text: str) -> str:
     return "".join(out)
 
 
-def parentheticals(text: str):
-    """All balanced parenthetical groups, tolerating one nesting level."""
+OPEN_DELIMITERS = {"(": ")", "（": "）"}
+CLOSE_DELIMITERS = {")": "(", "）": "（"}
+
+
+def _without_spans(text: str, start: int, end: int, spans):
+    """The slice text[start:end] with every malformed span fully inside it removed."""
+    cut = []
+    for s, e in spans:
+        if s >= start and e <= end:
+            cut.append((s, e))
+    if not cut:
+        return text[start:end]
+    out = []
+    cursor = start
+    for s, e in sorted(cut):
+        if s < cursor:
+            continue
+        out.append(text[cursor:s])
+        cursor = e
+    out.append(text[cursor:end])
+    return "".join(out)
+
+
+def _scan_parentheticals(text: str):
+    """(well-formed group contents, malformed raw spans).
+
+    Delimiter set and rules are owned by `shared/definitions/contract-clause-definitions.md`
+    § 4 rule 2: an opener is `(` or `（`, its closer is `)` or `）`, nesting MUST match
+    within one width, and a cross-width pairing or an unpaired delimiter is a malformed
+    group reported here — never a citation, never a mention. Only the outermost balanced
+    group is emitted (the existing one-level-nesting semantics).
+    """
     groups = []
-    depth = 0
-    start = None
+    malformed_spans = []
+    stack = []  # (opener char, index)
     for i, ch in enumerate(text):
-        if ch == "(":
-            if depth == 0:
-                start = i
-            depth += 1
-        elif ch == ")":
-            if depth:
-                depth -= 1
-                if depth == 0 and start is not None:
-                    groups.append(text[start + 1:i])
-    return groups
+        if ch in OPEN_DELIMITERS:
+            stack.append((ch, i))
+            continue
+        if ch not in CLOSE_DELIMITERS:
+            continue
+        if not stack:
+            malformed_spans.append((i, i + 1))
+            continue
+        opener, start = stack[-1]
+        if OPEN_DELIMITERS[opener] != ch:
+            # cross-width pairing: the span is malformed as a whole
+            stack.pop()
+            malformed_spans.append((start, i + 1))
+            continue
+        stack.pop()
+        if not stack:
+            groups.append(_without_spans(text, start + 1, i, malformed_spans))
+    if stack:
+        # every opener still on the stack is unpaired; the outermost span is one malformed
+        # group (inner unmatched openers are part of that same span)
+        malformed_spans.append((stack[0][1], len(text)))
+        stack.clear()
+    return groups, [text[s:e] for s, e in malformed_spans]
+
+
+def parentheticals(text: str):
+    """Well-formed balanced parenthetical groups, tolerating one nesting level.
+
+    Accepts both delimiter widths (owner doc § 4 rule 2). A cross-width or unpaired
+    delimiter is malformed and is reported by `malformed_parentheticals()` instead.
+    """
+    return _scan_parentheticals(text)[0]
+
+
+def malformed_parentheticals(text: str):
+    """Raw spans of malformed groups (cross-width pairing or unpaired delimiter).
+
+    Owner doc § 4 rule 2: a malformed group is its own outcome — never a citation and
+    never a mention.
+    """
+    return _scan_parentheticals(text)[1]
 
 
 # --------------------------------------------------------------------------- #

@@ -92,6 +92,11 @@ an item guarding nothing is visible as *untraceable* instead of passing as cover
 - Use a short descriptive filename: `[domain].md` (e.g. `ux.md`, `api.md`, `security.md`).
 - Number items sequentially from **CHK001**.
 - **Each run creates a NEW file** — never overwrite an existing checklist.
+- **Recheck form (append-only)**: when a later round answers an earlier item, write the
+  answer to a NEW `checklists/recheck-<date>-<topic>.md` file — one file per round. Every
+  answered entry MUST quote the requirement line it answers (verbatim, with its
+  `requirements.md` anchor). The original checklist MUST NOT be refreshed in place: its
+  unchecked rows stay as history.
 - Apply the methodology: group by quality dimensions (**Completeness · Clarity ·
   Consistency · Measurability · Coverage · Edge Cases · Non-Functional · Dependencies ·
   Ambiguities**); each item is a *question* + a quality-dimension bracket + a traceability
