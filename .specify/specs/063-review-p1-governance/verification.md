@@ -267,6 +267,173 @@ batch (`compile-embeds --check` → 74 units zero drift, no write needed; `regen
   → empty. Symlinks 9/9 intact. `gate-check.py` over all 288 US3 write paths → exit 0.
 - Claim: C-20..C-24 green (clause partition row T028).
 
+## US4 — T033 (C-26, C-27, C-28)
+
+- Suite: `python3 -m pytest tests/contract/test_evidence_binding_contract.py -q`
+  → **19 passed** (red run recorded first: 17 failed / 2 passed, exit 1 — the 2 green
+  legs are the must-remain pins `test_c26_existing_sections_preserved_additive_only`
+  and `test_c27_reuses_the_existing_handler_no_new_subsystem`; verbatim tails in
+  `notes/red-first-evidence.md`).
+- C-26 landed (T031): `templates/verification-log-template.md` gains
+  `# -- Evidence records ... --` between the implement-results and SC-evaluation
+  markers — four declared fields (`sample_id` / `evidence_path` repo-relative /
+  `evidence_sha256` SHA-256 over the archived file's bytes, sha256sum-compatible /
+  `verdict`), the pass-requires-complete-evidence-row rule, the `unverified` class,
+  and the no-downgrade rule; pre-existing section set and order preserved (additive).
+- C-27 landed (T032): registry Object row
+  `| gate-implement-evidence-binding | command-gate | /speckit.implement | ... |`
+  directly beside `gate-implement-checklist-waiver`; HandlerBinding row
+  `| h-gate-evidence | @point:confirm-gate | gate-implement-evidence-binding | 063
+  证据绑定门:pass 声明绑定归档证据([[STR-001]]) |` — REUSING the existing
+  h-gate-evidence handler id (no new subsystem, pinned by
+  `test_c27_reuses_the_existing_handler_no_new_subsystem`); `implement-feature`
+  Step 9 references the gate with the full check semantics + 门控观察协议 +
+  `--lifecycle-point` firing-evidence path.
+- C-28 drills (T033, quickstart S8 shape, in the suite): the S8 fixture (four `pass`
+  samples — matching/missing/empty/mismatch + one `fail` sample) yields green only
+  for the matching sample; each red names the sample id and reason
+  (`SC-002 missing` / `SC-003 empty` / `SC-004 mismatch`); the `fail` sample carries
+  no binding duty; the no-evidence-section form marks every SC `pass` unverified
+  (green stays empty); an incomplete evidence row (`pass` missing `evidence_sha256`)
+  is unverified, never green, never mismatch-red. The checker derives its parser
+  from the template's declared section — a template without the section fails the
+  drills, so the red run was genuine and a declaration drift breaks its own gate
+  semantics.
+- Intermediate projection (D-T8 pattern, registry + template + skill edits):
+  `sync-mirrors --only shared` → `compile-embeds` (74 unchanged — the gate binding
+  sits at `@point:confirm-gate`, outside the wrap-up render, so faces and banner
+  fingerprint stayed identical) → `regen-command-copies` →
+  `sync --only skills/internal/implement-feature --only templates`. Post-state:
+  `compile-embeds --check` 74 units zero drift; regen OK; sync 3 DIFF (the
+  pre-existing `.specify/agents` baseline drift only, untouched prefix).
+- Registry consumers re-run green: `test_probe_engine_action_sets.py +
+  test_phase2_bindings.py + test_compile_embeds.py + test_run_skills_wiring.py +
+  test_evidence_binding_contract.py + test_review_p1_recheck_waiver.py` →
+  **55 passed**.
+- In-passing test-harness fixes disclosed (my new file, correction-class): the
+  field regexes were digit-blind (`[a-z_]` missed `evidence_sha256`'s digits),
+  blank lines failed to close a record block (records merged onto the last one),
+  and the no-section findall captured a 2-tuple where 1 group sufficed. All three
+  fixed before the green run; no fixture or assertion weakened.
+- Claim: C-26..C-28 green (clause partition row T033).
+
+## US5 — T038 (C-29, C-30)
+
+- Suite: `python3 -m pytest tests/contract/test_baseline_preflight_contract.py -q`
+  → **9 passed** (red run recorded first: 9 failed / 0 passed, exit 1 — verbatim tails
+  in `notes/red-first-evidence.md`; every leg failed on the absent pre-flight step /
+  absent command-face duty).
+- C-29 landed (T036): `implement-feature` SKILL.md gains `### Step 0 — Baseline
+  pre-flight (re-capture frozen values)` before Step 1 — the set is derived by glob
+  (`<spec-dir>/baseline-*`, `<spec-dir>/notes/baseline-*`) plus the coverage baseline
+  ([[STR-002]]), declared directory-derived never a hand-written count; differences
+  write back into the citing row; the four-way classification (`upstream repair` /
+  `inherited` / `attributable to this feature` / `undecidable`) via `git log`
+  provenance happens BEFORE any drift verdict; `undecidable` is reported explicitly
+  with no guessing; a missing baseline file is a first capture with provenance,
+  never zero drift.
+- C-30 landed (T037): `templates/commands/implement.md` Skill Delegation inputs gain
+  a **Baseline pre-flight** bullet BEFORE the "follow its steps 1–9" bullet, carrying
+  the same obligation shape (both glob roots, all four classes, the
+  undecidable-report and first-capture rules) — a reader of the command face alone
+  meets the duty.
+- S9 drill (T038, fixture git repo `/tmp/sdd-review-p1/s9-drill`, removed after
+  recording): frozen `notes/baseline-widget-count.txt` (value 5) no longer matched
+  the tree (2 widgets); `notes/baseline-probe-latency.txt` cited by a task row but
+  never captured. Pre-flight walk: (1) set derived by glob — notes glob found the
+  widget baseline, root glob found none, coverage baseline included per [[STR-002]],
+  citation discovery surfaced the missing probe-latency file; (2) re-capture: widget
+  5→2 DIFFERS, coverage 0=0 matches, probe-latency MISSING; (3) classification
+  BEFORE any verdict via `git log`: widget-count diff = `inherited` (post-freeze
+  upstream commit 3ab9c77, outside the 999-drill window — provenance-backed, no
+  guessing); probe-latency = first capture with provenance (citing row T001 in
+  freeze commit c659adb), NOT zero drift; (4) write-back: both citing rows in the
+  fixture `tasks.md` now carry the re-captured value 2 with the classification
+  (`git diff --stat`: 2 insertions, 2 deletions).
+- Projection for the T036/T037 source edits: `regen-command-copies` (per-tool
+  `speckit.implement.md` copies regenerated) + `sync --only
+  skills/internal/implement-feature`; post-state `compile-embeds --check` 74 units
+  zero drift, `regen-command-copies.py --check` OK.
+- In-passing disclosures: (a) two regex legs in the new suite needed
+  whitespace-flexible matching (the clause's own wording wraps mid-phrase —
+  "row that / cites it"); fixed in the test, not by re-flowing the owner text.
+  (b) The US4-boundary regression (24 failed) showed 2 transient NEW names
+  (`test_run_checks c27`, `test_user_facing_comprehension_pointers c14`) caused by
+  the US5 T037 edit landing while that regression was in flight — the per-tool
+  copies had not yet been regenerated for it. The US5 projection above closes the
+  gap; the final US4+US5-boundary regression below re-verifies 0 NEW.
+- Claim: C-29/C-30 green (clause partition row T038).
+
+## US6 — T043 (C-16, C-17, C-18, C-19)
+
+- Suite: `python3 -m pytest tests/contract/test_premise_carrier_contract.py -q`
+  → **11 passed** (red run recorded first: 9 failed / 2 passed, exit 1 — the 2 green
+  legs are the must-remain pins: the reference-not-restate duty survives the carrier
+  opening, and the producer-side re-capture obligation exists before the re-pointing;
+  verbatim tails in `notes/red-first-evidence.md`).
+- C-16 landed (T041): create-tasks SKILL § Environment probe rules item 2 now declares
+  the carrier duty OPEN — per-phase prerequisites, `[~]` task notes, assumption rows,
+  decision rows, and ANY free-prose row stating or implying an environment verdict;
+  "no carrier is exempt by being unlisted; the list cannot be closed".
+- C-17 landed (T042): `templates/tasks-template.md` § Environment Prerequisites ACTION
+  REQUIRED now requires ANY restating row (any carrier) to carry an ISO date stamp
+  TOGETHER WITH a `(see § Environment Prerequisites)` pointer — both together, neither
+  alone, either alone non-compliant.
+- C-18 landed (T041): the red-first note shape rule (create-tasks SKILL §
+  Runtime-evidence landing points — the content-prescription owner) now requires a
+  note binding a claim to a gate to quote the gate row verbatim (id + name + check
+  command); a bare gate id alone MUST NOT be used; declared forward-applicable only
+  with 062's note instance out of scope (never retro-edited).
+- C-19 landed (T041): § Re-freeze timing retains the producer-side obligation
+  (re-capture on every generation and every rerun) and points the implement-side
+  re-capture at its owner — `/speckit.implement`'s baseline pre-flight (Step 0 in
+  implement-feature SKILL, the C-29 consumer step).
+- S7 drills (T043, fixture `/tmp/sdd-review-p1/s7-drill`, removed after recording):
+  - Carrier rule: a seed `tasks.md` carried four restating rows. Mechanical probe of
+    the double requirement: D-T1 (no date, no pointer) → FLAG; D-T2 (date-only) →
+    FLAG; D-T3 (pointer-only) → FLAG; D-T4 (both) → PASS. Both required, neither
+    alone — exactly the Edge-Cases semantics.
+  - Renumbering leg (C-18): under a renumbering fixture (GATE-3 → registry-pull,
+    docker-build → GATE-4), the bare-id note still resolves but now names
+    `registry-pull` — a different gate: the binding silently points at the wrong
+    gate, an INVISIBLE mismatch. The verbatim-quote note (`GATE-3 | docker-build |
+    docker build -t t .`) resolves before renumbering and FAILS after — a VISIBLE
+    mismatch, the exact effect C-18 requires.
+- Projection for the T041/T042 source edits: `sync --only skills/internal/create-tasks
+  --only templates`; post-state compile-check 74 units zero drift, regen --check OK;
+  the three new suites re-run together → 39 passed.
+- Claim: C-16..C-19 green (clause partition row T043).
+
+## Polish — T044 (C-25)
+
+- Full-unit recompile (C-25, after T027 renderer/registry + T032 gate row landed):
+  `python3 .specify/scripts/python/probe-utils.py --action compile-embeds` →
+  `written: [], unchanged: 74, zero_section: []` — the US3 intermediate recompile
+  (D-T8) already carries the manifest-driven faces, and the US4/US6 registry edits
+  (gate row, sdd-project-setup row) sit outside the wrap-up render, so the recompile
+  confirms rather than rewrites.
+- Zero drift: `compile-embeds --check` → `{"ok": true, "units": 74, "structural": [],
+  "drift": []}`.
+- Reconcile closure: `probes --validate --reconcile` → `{"ok": true, "reconciled":
+  true, "classes": 10, "objects": 116, "external_objects": 0, "embeds": 74}` —
+  rows↔embeds bidirectional consistency holds.
+- **In-passing correction disclosed**: the first `--reconcile` run reported
+  `embed without probe object: skill:sdd-project-setup` — a registration gap that
+  predates this feature (commit 0a1dbf2f added the skill WITH a compiled wrap-up
+  face at fingerprint 466ed9a but no registry row; every subsequent recompile kept
+  compiling it as part of the 74 units). Registration row
+  `| skill-sdd-project-setup-wrapup | skill-wrapup | skill:sdd-project-setup | wrap-up |`
+  added (alphabetical, beside the other skill-wrapup rows) — the same
+  add-the-missing-row remedy 062's commit 92037f07 applied for `skill:humanize`;
+  one consistent reading, local and reversible, disclosed here. No other
+  `--reconcile` surface was touched.
+- Backlog flip (same commit as the recompile evidence): `.specify/memory/feedback/
+  backlog.md` line 89 (2026-10-15 introspection F-01, route direct-fix) flipped
+  `open(...)` → `closed(063 C-20..C-25 落位: ... --check 零漂移 ok:true units:74
+  structural:0 drift:0, --reconcile ok:true 116 objects/74 embeds; 证据 ... § US3/T028
+  与 § Polish/T044)`.
+- Claim: C-25 green (clause partition row T044).
+
 # -- Free-form notes --
 
-notes=US1 complete (C-1..C-10 claimed by T011..T014). US2 complete (C-11..C-15 claimed by T022): C-12 adjudication landed via /speckit.instructions Action 5 (a8c3c1f0) with mechanism descriptions aligned this run; the 3 pre-existing contract failures reconciled (c27/c14 via regen+sync, c12 via the 053-window closure amendment, disclosed above). US3 complete (C-20..C-24 claimed by T028): args-manifest on all three wrap-up engines, one-shot missing-arg errors, manifest-driven renderer + registry convention line, 18/18 new face-contract suite, D-T8 forced intermediate projection, byte-budget/closed-set amendments disclosed above; full suite 21 failed / 4050 passed, 0 NEW vs the frozen baseline. US4–US6 + Polish remain.
+notes=US1 complete (C-1..C-10 claimed by T011..T014). US2 complete (C-11..C-15 claimed by T022): C-12 adjudication landed via /speckit.instructions Action 5 (a8c3c1f0) with mechanism descriptions aligned this run; the 3 pre-existing contract failures reconciled (c27/c14 via regen+sync, c12 via the 053-window closure amendment, disclosed above). US3 complete (C-20..C-24 claimed by T028): args-manifest on all three wrap-up engines, one-shot missing-arg errors, manifest-driven renderer + registry convention line, 18/18 new face-contract suite, D-T8 forced intermediate projection, byte-budget/closed-set amendments disclosed above; full suite 21 failed / 4050 passed, 0 NEW vs the frozen baseline. US4 complete (C-26..C-28 claimed by T033): template evidence-record section, gate row + HandlerBinding (reusing h-gate-evidence) + Step 9 reference, 19/19 suite with S8-shape red-semantics drills; three test-harness fixes disclosed above. US5–US6 + Polish remain.

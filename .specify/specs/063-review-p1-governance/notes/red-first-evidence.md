@@ -171,3 +171,145 @@ test_c23_record_lists_all_missing_args_in_one_error
 Red is valid: every failure names a mechanism that has not landed yet
 (args-manifest actions, manifest-driven rendering, registry convention
 declaration, one-shot missing-arg errors), not a mis-written assertion.
+
+## US4 — T029/T030 red run (2026-10-20, implement attempt 2 续跑)
+
+Command:
+
+```
+python3 -m pytest tests/contract/test_evidence_binding_contract.py -q --no-header
+```
+
+Result: **17 failed, 2 passed** (exit 1).
+
+The 2 green legs are must-remain pins, not mis-written assertions:
+- `test_c26_existing_sections_preserved_additive_only` — the template's pre-existing
+  section set is intact (the additive-only baseline holds now and MUST hold after the
+  landing);
+- `test_c27_reuses_the_existing_handler_no_new_subsystem` — with the gate unregistered,
+  no new handler exists; after the landing it MUST stay green by reusing the existing
+  `h-gate-evidence` handler id.
+
+All 17 red legs fail for artifact-missing reasons (assertion tails, verbatim):
+
+- C-26 template legs (5) — `templates/verification-log-template.md` lacks the section:
+  - `test_c26_section_sits_between_results_and_sc_evaluation` →
+    `ValueError: substring not found` on `"# -- Evidence records"` (text.index)
+  - `test_c26_declares_the_four_record_fields` →
+    `AssertionError: verification-log-template.md lacks the `# -- Evidence records ... --`
+    section (C-26: it MUST sit between the implement-results and SC evaluation markers)`
+    (via `_evidence_section`)
+  - `test_c26_declares_sha256_over_the_archived_files_bytes` /
+    `test_c26_evidence_path_is_declared_repo_relative` /
+    `test_c26_pass_requires_a_complete_evidence_row` → same `_evidence_section` assertion
+- C-27 registration legs (4) — registry rows and skill reference absent:
+  - `test_c27_gate_row_registered_beside_the_checklist_waiver` →
+    `ValueError: '| gate-implement-evidence-binding | command-gate | /speckit.implement |
+    gate-implement-evidence-binding |' is not in list`
+  - `test_c27_handler_binding_row_at_confirm_gate` →
+    `AssertionError: the h-gate-evidence HandlerBinding MUST subscribe to this gate at
+    @point:confirm-gate`
+  - `test_c27_skill_step9_references_the_gate` →
+    `AssertionError: implement-feature Step 9 (the verification-log step) MUST reference
+    the gate — the skill has no per-feature GATE numbering; this step owns the evidence
+    the gate checks`
+  - `test_c27_skill_step9_states_the_check_and_the_observation_protocol` →
+    `AssertionError` on the exists/non-empty/SHA-256/门控观察协议/--lifecycle-point
+    declarations in Step 9
+- C-28 drill legs (8) — the checker derives its parser from the template's declared
+  section, so the absent section fails every drill:
+  - `test_c28_matching_pass_is_green_and_only_that` /
+    `test_c28_missing_artifact_is_red_naming_sample_and_reason` /
+    `test_c28_empty_artifact_is_red_naming_sample_and_reason` /
+    `test_c28_hash_mismatch_is_red_naming_sample_and_reason` /
+    `test_c28_non_pass_verdict_carries_no_binding_duty` /
+    `test_c28_pass_without_evidence_section_is_unverified` /
+    `test_c28_incomplete_evidence_row_is_unverified` →
+    `_evidence_section` assertion (the template lacks the declared section)
+  - `test_c28_red_is_not_downgraded_anywhere` → same `_evidence_section` assertion
+    (the no-downgrade rule cannot be read from a section that does not exist)
+
+Red is valid: every failure names a mechanism that has not landed yet (the template's
+evidence-record section, the registry gate row + HandlerBinding, the Step 9 gate
+reference), not a mis-written assertion.
+
+## US5 — T034/T035 red run (2026-10-20, implement attempt 2 续跑)
+
+Command:
+
+```
+python3 -m pytest tests/contract/test_baseline_preflight_contract.py -q --no-header
+```
+
+Result: **9 failed, 0 passed** (exit 1).
+
+All 9 legs fail for artifact-missing reasons (assertion tails, verbatim):
+
+- C-29 legs (8) — `skills/internal/implement-feature/SKILL.md` has no pre-flight step
+  before Step 1; every leg fails at `_preflight_step`:
+  `AssertionError: implement-feature SKILL.md lacks a pre-flight step before Step 1
+  (C-29: the baseline re-capture MUST run before any other workflow step)`
+  (legs: sits_before_step1 / directory_derived_set / write_back_citing_rows /
+  classification_before_verdict / git_log_provenance / undecidable_explicit /
+  missing_baseline_first_capture)
+- C-30 legs (2) — `templates/commands/implement.md` states no pre-flight duty:
+  - `test_c30_command_face_states_the_preflight_duty_before_the_how_to_call` →
+    `AssertionError: templates/commands/implement.md MUST state the pre-flight duty
+    in its Skill Delegation inputs (C-30)`
+  - `test_c30_command_face_carries_the_same_obligation_shape` →
+    `AssertionError: the pre-flight duty paragraph must be locatable in the command
+    face`
+
+Red is valid: every failure names a mechanism that has not landed yet (the skill's
+pre-flight step, the command-face duty statement), not a mis-written assertion.
+
+## US6 — T039/T040 red run (2026-10-20, implement attempt 2 续跑)
+
+Command:
+
+```
+python3 -m pytest tests/contract/test_premise_carrier_contract.py -q --no-header
+```
+
+Result: **9 failed, 2 passed** (exit 1).
+
+The 2 green legs are must-remain pins, not mis-written assertions:
+- `test_c16_item2_keeps_the_reference_instead_of_restate_duty` — the existing duty
+  survives now and MUST survive the carrier-list opening;
+- `test_c19_producer_side_recapture_obligation_retained` — the producer-side
+  re-capture obligation exists now and MUST be retained when the timing text is
+  re-pointed.
+
+All 9 red legs fail for artifact-missing reasons (assertion tails, verbatim):
+
+- C-16 (2) — item 2 still carries the closed enumeration and lacks the open carriers:
+  - `test_c16_item2_no_longer_names_only_the_two_closed_carriers` →
+    `AssertionError: item 2 still carries the closed two-carrier enumeration — the
+    duty must not be escapable by sitting in an unlisted carrier`
+  - `test_c16_item2_covers_assumption_decision_and_free_prose` →
+    `AssertionError: the open list MUST cover assumptions` (first missing carrier)
+- C-17 (3) — the ACTION REQUIRED comment lacks the date+pointer rule:
+  - `test_c17_action_required_declares_date_and_pointer` →
+    `AssertionError: the ISO date stamp MUST be required`
+  - `test_c17_both_together_neither_alone` →
+    `AssertionError: the rule MUST state both requirements together — either alone is
+    non-compliant (Edge Cases)`
+  - `test_c17_rule_reaches_any_carrier` →
+    `AssertionError: the date+pointer rule MUST apply to rows in ANY carrier, not only
+    the two originally listed`
+- C-18 (3) — the red-first note shape rule lacks the verbatim-quote duty:
+  - `test_c18_note_shape_rule_requires_verbatim_gate_row_quote` →
+    `AssertionError: a note binding a claim to a gate MUST quote the gate row verbatim`
+  - `test_c18_bare_gate_id_alone_is_forbidden` →
+    `AssertionError: a bare gate id alone MUST NOT be usable, so renumbering produces
+    a visible mismatch`
+  - `test_c18_forward_applicable_only_062_out_of_scope` →
+    `AssertionError: the rule MUST be declared forward-applicable only`
+- C-19 (1) — the timing text does not point at the implement-side consumer:
+  - `test_c19_refreeze_points_at_the_implement_preflight` →
+    `AssertionError: Re-freeze timing MUST point at the implement-side consumer step
+    (the C-29 pre-flight) instead of describing a duty this command cannot execute`
+
+Red is valid: every failure names a mechanism that has not landed yet (the open
+carrier list, the date+pointer rule, the verbatim gate-row quote, the consumer-side
+pointer), not a mis-written assertion.

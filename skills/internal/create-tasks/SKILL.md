@@ -201,9 +201,13 @@ network-pullable images, a live cluster, special hardware):
    re-probe on every generation and every rerun.
 2. **Single landing point**: record every probe conclusion exactly ONCE, in the generated
    tasks.md's `## Environment Prerequisites` section (see
-   `.specify/templates/tasks-template.md`). Per-phase prerequisites and `[~]` task notes
-   MUST reference that section instead of restating verdicts — two hand-synced copies of
-   the same conclusion drift apart.
+   `.specify/templates/tasks-template.md`). The "reference instead of restating" duty is
+   OPEN over carriers: per-phase prerequisites, `[~]` task notes, assumption rows,
+   decision rows, and ANY free-prose row that states or implies an environment verdict —
+   all MUST reference that section instead of restating verdicts. No carrier is exempt
+   by being unlisted; the list cannot be closed, so a verdict sitting in an unlisted
+   carrier is still a restatement. Two hand-synced copies of the same conclusion drift
+   apart.
 3. **Pre-validate named targets**: any concrete build/smoke target named in a task MUST
    have a locally satisfiable dependency chain (base images pullable, toolchain present).
    If unsatisfiable, either substitute a satisfiable target up front or pre-flag the task
@@ -362,7 +366,12 @@ each implement round has to guess where the previous phase put the file:
   path here; a Setup/Foundational row that captures or consumes that baseline points at
   that owner.
 - `<spec-dir>/notes/red-first-evidence.md` — for every test that MUST go red before its
-  subject exists: the command, its real output, and its exit status.
+  subject exists: the command, its real output, and its exit status. When the note binds
+  a claim to a gate, it MUST quote the gate row verbatim — id + name + check command;
+  a bare gate id alone MUST NOT be used, so a later renumbering produces a visible
+  mismatch rather than a silently dangling reference. Forward-applicable only:
+  pre-existing note instances (e.g. 062's) are out of scope and MUST NOT be
+  retro-edited.
 - `<spec-dir>/notes/quickstart-run.md` — the real output of actually running this
   feature's `quickstart.md` scenario, its teardown steps included.
 - `<spec-dir>/notes/pre-change-measurements.md` — the pre-change side of every "diff
@@ -378,10 +387,13 @@ each implement round has to guess where the previous phase put the file:
 Create `notes/` in Phase 1 (Setup) so that Phase 2 (Foundational) rows already have
 somewhere to write. **Re-freeze timing**: these files are frozen measurements, so they
 inherit the never-cache rule the Environment Prerequisites probes above already state —
-re-capture on every generation and every rerun of this command, and re-capture at the
-start of `/speckit.implement` whenever the tree has advanced since generation. A row whose
-re-capture yields a different value carries the new value; MUST NOT keep citing the stale
-frozen one.
+re-capture on every generation and every rerun of this command (the producer-side
+obligation, retained). The implement-side re-capture is not this command's duty to
+describe: it is owned by `/speckit.implement`'s baseline pre-flight (its Step 0 in
+`skills/internal/implement-feature/SKILL.md` — the implement-side consumer step),
+which re-captures every frozen baseline before any workflow step and classifies every
+difference. A row whose re-capture yields a different value carries the new value; MUST
+NOT keep citing the stale frozen one.
 
 **Special phase shapes**: two cases override the default "Models → Services → Endpoints"
 within-story order — **asset-migration** (porting/vendoring an external code subset: split

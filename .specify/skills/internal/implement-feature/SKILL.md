@@ -36,6 +36,21 @@ Optional: Git Commit. Content moved here verbatim in substance.
 
 ## Workflow (steps 1–9)
 
+### Step 0 — Baseline pre-flight (re-capture frozen values)
+
+Before any other workflow step, re-capture every frozen baseline this feature
+carries. The set is derived from the spec directory by glob —
+`<spec-dir>/baseline-*` and `<spec-dir>/notes/baseline-*` — plus the coverage
+baseline file (`<spec-dir>/coverage-baseline.txt`, [[STR-002]]); it is
+directory-derived, never a hand-written count. For each captured value that
+differs from the frozen file, the new value MUST be written into the row that
+cites it, and every difference MUST be classified — BEFORE any drift verdict is
+issued — using `git log` provenance into exactly one of: `upstream repair`,
+`inherited`, `attributable to this feature`, or `undecidable`. `undecidable`
+MUST be reported explicitly; you MUST NOT guess between the three attributed
+classes. A missing baseline file is handled as a first capture with its
+provenance recorded — never as zero drift.
+
 ### Step 1 — Prerequisites and paths
 
 Run `{SCRIPT}` from repo root; parse `REQUIREMENTS_DIR` and `AVAILABLE_DOCS`. All paths
@@ -300,6 +315,17 @@ Pre-Status-Flip Gate. Populate `REQUIREMENTS_DIR/verification.md` from
 `SC-NNN_status` vocabulary, so draw every status from the set it declares and MUST NOT
 narrow it to a subset (a gate or DoD row reading `pass|deferred` silently forbids an
 honest `partial`).
+
+> Gate probe: gate-implement-evidence-binding — after populating the evidence
+> records, run the binding check per the template's declared rules: every sample
+> recorded `pass` MUST have a complete evidence row whose archived artifact
+> exists, is non-empty, and whose computed SHA-256 equals the recorded hash;
+> missing/empty/mismatch is RED naming the sample id and the reason — the failure
+> MUST NOT be downgraded to "self-disclosed and continue". A `pass` without a
+> complete evidence row is `unverified` and MUST NOT be cited as passing evidence
+> anywhere downstream. Record firing evidence per
+> `.specify/shared/guidelines/confirmation-gates.md` § 门控观察协议 (non-blocking;
+> via the feedback engine `--lifecycle-point`).
 
 ### Mid-Run User Directives (scope changes DURING implement)
 

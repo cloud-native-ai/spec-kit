@@ -109,12 +109,14 @@
 | skill-merge-skills-wrapup | skill-wrapup | skill:merge-skills | wrap-up |
 | skill-sdd-loop-driver-wrapup | skill-wrapup | skill:sdd-loop-driver | wrap-up |
 | skill-self-improvement-wrapup | skill-wrapup | skill:self-improvement | wrap-up |
+| skill-sdd-project-setup-wrapup | skill-wrapup | skill:sdd-project-setup | wrap-up |
 | skill-study-project-wrapup | skill-wrapup | skill:study-project | wrap-up |
 | skill-summarize-project-wrapup | skill-wrapup | skill:summarize-project | wrap-up |
 | skill-think-skills-wrapup | skill-wrapup | skill:think-skills | wrap-up |
 | speckit-feedback-wrapup | command-wrapup | /speckit.feedback | wrap-up |
 | gate-feature-status-regression | command-gate | /speckit.feature | gate-feature-status-regression |
 | gate-implement-checklist-waiver | command-gate | /speckit.implement | gate-implement-checklist-waiver |
+| gate-implement-evidence-binding | command-gate | /speckit.implement | gate-implement-evidence-binding |
 | gate-sanitize-destructive-cleanup | command-gate | /speckit.sanitize | gate-sanitize-destructive-cleanup |
 | gate-session-export-overwrite | command-gate | /speckit.session | gate-session-export-overwrite |
 | gate-tools-invoke-entry | command-gate | /speckit.tools | gate-tools-invoke-entry |
@@ -228,6 +230,7 @@
 | h-gate-evidence | @point:confirm-gate | gate-git-workflow-tiered-mode | 044 门控必要性证据(逐 gate Object) |
 | h-gate-evidence | @point:confirm-gate | gate-glossary-user-entry-overwrite | 044 门控必要性证据(逐 gate Object) |
 | h-gate-evidence | @point:confirm-gate | gate-implement-checklist-waiver | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-implement-evidence-binding | 063 证据绑定门:pass 声明绑定归档证据([[STR-001]]) |
 | h-gate-evidence | @point:confirm-gate | gate-improve-tools-no-test-invoke | 044 门控必要性证据(逐 gate Object) |
 | h-gate-evidence | @point:confirm-gate | gate-rubric-high-stakes | 044 门控必要性证据(逐 gate Object) |
 | h-gate-evidence | @point:confirm-gate | gate-sanitize-destructive-cleanup | 044 门控必要性证据(逐 gate Object) |

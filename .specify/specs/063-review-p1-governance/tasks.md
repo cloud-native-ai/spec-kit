@@ -172,17 +172,17 @@
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T029 [P] [US4] 新建 `tests/contract/test_evidence_binding_contract.py`：钉验证日志模板证据段（位置：implement results 与 SC evaluation 之间；字段 `sample_id`/`evidence_path`/`evidence_sha256`/`verdict`；SHA-256 算法声明；`pass` 须完整证据行）、`gate-implement-evidence-binding`（[[STR-001]]）注册形态（`command-gate` 行 + `h-gate-evidence` HandlerBinding `@point:confirm-gate`，与既有 `gate-implement-checklist-waiver` 同形、复用 gate-probe 机制）与判红语义变异演练（缺失/为空/哈希不匹配三变异各自判红并点名样本 id 与原因、非 `pass` verdict 无绑定义务、无证据段的 `pass` = unverified 不得作为通过证据引用）（C-26/C-27/C-28 钉）；当前树先红，red 输出由 T030 统一落盘 per `notes/red-first-evidence.md`。
-- [ ] T030 [US4] [blockedBy: T029] 运行 `tests/contract/test_evidence_binding_contract.py` 确认按预期红，把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
+- [X] T029 [P] [US4] 新建 `tests/contract/test_evidence_binding_contract.py`：钉验证日志模板证据段（位置：implement results 与 SC evaluation 之间；字段 `sample_id`/`evidence_path`/`evidence_sha256`/`verdict`；SHA-256 算法声明；`pass` 须完整证据行）、`gate-implement-evidence-binding`（[[STR-001]]）注册形态（`command-gate` 行 + `h-gate-evidence` HandlerBinding `@point:confirm-gate`，与既有 `gate-implement-checklist-waiver` 同形、复用 gate-probe 机制）与判红语义变异演练（缺失/为空/哈希不匹配三变异各自判红并点名样本 id 与原因、非 `pass` verdict 无绑定义务、无证据段的 `pass` = unverified 不得作为通过证据引用）（C-26/C-27/C-28 钉）；当前树先红，red 输出由 T030 统一落盘 per `notes/red-first-evidence.md`。
+- [X] T030 [US4] [blockedBy: T029] 运行 `tests/contract/test_evidence_binding_contract.py` 确认按预期红，把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
 
 ### Implementation for User Story 4
 
-- [ ] T031 [P] [US4] [blockedBy: T030] 实现 C-26：`templates/verification-log-template.md` 在 `# -- /speckit.implement results --` 与 `# -- Success Criteria evaluation --` 之间增加结构化证据记录段（每 evaluation sample 一行：`sample_id` → 归档工件 repo-relative 路径 → 内容 SHA-256 → verdict），模板声明确定性哈希算法（对归档文件字节计算 SHA-256，`sha256sum` 兼容）与「`pass` verdict 必须有完整证据行」规则；既有段集与键值约定保持，新增段为增量。
-- [ ] T032 [P] [US4] [blockedBy: T030] 实现 C-27：`shared/definitions/probe-definitions.md` 在既有 command-gate 行旁注册 `gate-implement-evidence-binding`（[[STR-001]]，class `command-gate`、unit `/speckit.implement`）并增加 `h-gate-evidence` HandlerBinding 行 `@point:confirm-gate`（与 `gate-implement-checklist-waiver` 同形；复用既有 gate-probe 机制、触发证据经 feedback 引擎 `--lifecycle-point` 记录，不新增子系统）；`skills/internal/implement-feature/SKILL.md` 在填充 `verification.md` 的验证日志步骤（Step 9）旁引用该 gate（技能无 per-feature GATE 编号，锚点为拥有被检证据的步骤）。
+- [X] T031 [P] [US4] [blockedBy: T030] 实现 C-26：`templates/verification-log-template.md` 在 `# -- /speckit.implement results --` 与 `# -- Success Criteria evaluation --` 之间增加结构化证据记录段（每 evaluation sample 一行：`sample_id` → 归档工件 repo-relative 路径 → 内容 SHA-256 → verdict），模板声明确定性哈希算法（对归档文件字节计算 SHA-256，`sha256sum` 兼容）与「`pass` verdict 必须有完整证据行」规则；既有段集与键值约定保持，新增段为增量。
+- [X] T032 [P] [US4] [blockedBy: T030] 实现 C-27：`shared/definitions/probe-definitions.md` 在既有 command-gate 行旁注册 `gate-implement-evidence-binding`（[[STR-001]]，class `command-gate`、unit `/speckit.implement`）并增加 `h-gate-evidence` HandlerBinding 行 `@point:confirm-gate`（与 `gate-implement-checklist-waiver` 同形；复用既有 gate-probe 机制、触发证据经 feedback 引擎 `--lifecycle-point` 记录，不新增子系统）；`skills/internal/implement-feature/SKILL.md` 在填充 `verification.md` 的验证日志步骤（Step 9）旁引用该 gate（技能无 per-feature GATE 编号，锚点为拥有被检证据的步骤）。
 
 ### Verification for User Story 4
 
-- [ ] T033 [US4] [blockedBy: T031,T032] 按 quickstart S8 形态演练证据绑定门：fixture `verification.md`（四 `pass` 样本——证据存在且哈希匹配 / 归档文件缺失 / 空文件 / 哈希不匹配 + 一 `fail` verdict 样本 + 无证据段形态），运行 `tests/contract/test_evidence_binding_contract.py` 全绿，结果记入 `verification.md`；认领 C-26、C-27、C-28。 [green: contracts/evidence-baseline-contract.md#C-26] [green: contracts/evidence-baseline-contract.md#C-27] [green: contracts/evidence-baseline-contract.md#C-28]
+- [X] T033 [US4] [blockedBy: T031,T032] 按 quickstart S8 形态演练证据绑定门：fixture `verification.md`（四 `pass` 样本——证据存在且哈希匹配 / 归档文件缺失 / 空文件 / 哈希不匹配 + 一 `fail` verdict 样本 + 无证据段形态），运行 `tests/contract/test_evidence_binding_contract.py` 全绿，结果记入 `verification.md`；认领 C-26、C-27、C-28。 [green: contracts/evidence-baseline-contract.md#C-26] [green: contracts/evidence-baseline-contract.md#C-27] [green: contracts/evidence-baseline-contract.md#C-28]
 
 **Checkpoint**: US4 independently testable: 证据段、gate 注册、判红语义全部可独立验证（quickstart S8）。
 
@@ -196,17 +196,17 @@
 
 ### Tests for User Story 5 (MANDATORY) ⚠️
 
-- [ ] T034 [P] [US5] 新建 `tests/contract/test_baseline_preflight_contract.py`：钉 implement 预检步骤文本（位于 Step 1 之前；重捕获集合由目录派生 glob（C-29 的两个 glob 根 + [[STR-002]]）而非手写条数；差异先写回引用行、任何漂移 verdict 之前按 `git log` provenance 四分类；`undecidable` 显式报告不猜测；缺失基线按首次捕获记录 provenance 而非零漂移）与命令面同职责文本（C-29/C-30 钉）；当前树先红，red 输出由 T035 统一落盘 per `notes/red-first-evidence.md`。
-- [ ] T035 [US5] [blockedBy: T034] 运行 `tests/contract/test_baseline_preflight_contract.py` 确认按预期红，把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
+- [X] T034 [P] [US5] 新建 `tests/contract/test_baseline_preflight_contract.py`：钉 implement 预检步骤文本（位于 Step 1 之前；重捕获集合由目录派生 glob（C-29 的两个 glob 根 + [[STR-002]]）而非手写条数；差异先写回引用行、任何漂移 verdict 之前按 `git log` provenance 四分类；`undecidable` 显式报告不猜测；缺失基线按首次捕获记录 provenance 而非零漂移）与命令面同职责文本（C-29/C-30 钉）；当前树先红，red 输出由 T035 统一落盘 per `notes/red-first-evidence.md`。
+- [X] T035 [US5] [blockedBy: T034] 运行 `tests/contract/test_baseline_preflight_contract.py` 确认按预期红，把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
 
 ### Implementation for User Story 5
 
-- [ ] T036 [P] [US5] [blockedBy: T035] 实现 C-29：`skills/internal/implement-feature/SKILL.md` 在 Step 1 之前增加预检步骤——重新捕获该 feature 的每个冻结基线（集合按目录派生：`<spec-dir>/baseline-*` 与 `<spec-dir>/notes/baseline-*` 两个 glob 根 + [[STR-002]] 覆盖基线，不手写条数）；重捕获值不同时把新值写入引用它的行，并在任何漂移 verdict 之前用 `git log` provenance 把每处差异分类为 `upstream repair` / `inherited` / `attributable to this feature` / `undecidable`；`undecidable` 显式报告，不猜测；缺失基线文件按首次捕获处理并记录 provenance，不得当作零漂移。
-- [ ] T037 [P] [US5] [blockedBy: T035] 实现 C-30：`templates/commands/implement.md` 在 Skill Delegation inputs（「follow its steps 1–9」之前）陈述与 C-29 相同的预检职责，使义务抵达仅读命令面的读者，不只在技能内部。
+- [X] T036 [P] [US5] [blockedBy: T035] 实现 C-29：`skills/internal/implement-feature/SKILL.md` 在 Step 1 之前增加预检步骤——重新捕获该 feature 的每个冻结基线（集合按目录派生：`<spec-dir>/baseline-*` 与 `<spec-dir>/notes/baseline-*` 两个 glob 根 + [[STR-002]] 覆盖基线，不手写条数）；重捕获值不同时把新值写入引用它的行，并在任何漂移 verdict 之前用 `git log` provenance 把每处差异分类为 `upstream repair` / `inherited` / `attributable to this feature` / `undecidable`；`undecidable` 显式报告，不猜测；缺失基线文件按首次捕获处理并记录 provenance，不得当作零漂移。
+- [X] T037 [P] [US5] [blockedBy: T035] 实现 C-30：`templates/commands/implement.md` 在 Skill Delegation inputs（「follow its steps 1–9」之前）陈述与 C-29 相同的预检职责，使义务抵达仅读命令面的读者，不只在技能内部。
 
 ### Verification for User Story 5
 
-- [ ] T038 [US5] [blockedBy: T036,T037] 按 quickstart S9 形态演练预检（fixture：冻结名单与树不一致 + 一个缺失基线文件 → 数值重捕获、引用行写回 diff、逐差异分类或显式 `undecidable`、缺失按首次捕获处理非零漂移），运行 `tests/contract/test_baseline_preflight_contract.py` 全绿，结果记入 `verification.md`；认领 C-29、C-30。 [green: contracts/evidence-baseline-contract.md#C-29] [green: contracts/evidence-baseline-contract.md#C-30]
+- [X] T038 [US5] [blockedBy: T036,T037] 按 quickstart S9 形态演练预检（fixture：冻结名单与树不一致 + 一个缺失基线文件 → 数值重捕获、引用行写回 diff、逐差异分类或显式 `undecidable`、缺失按首次捕获处理非零漂移），运行 `tests/contract/test_baseline_preflight_contract.py` 全绿，结果记入 `verification.md`；认领 C-29、C-30。 [green: contracts/evidence-baseline-contract.md#C-29] [green: contracts/evidence-baseline-contract.md#C-30]
 
 **Checkpoint**: US5 independently testable: 预检、写回、四分类、命令面同职责全部可独立验证（quickstart S9）。
 
@@ -220,17 +220,17 @@
 
 ### Tests for User Story 6 (MANDATORY) ⚠️
 
-- [ ] T039 [P] [US6] 新建 `tests/contract/test_premise_carrier_contract.py`：钉载体清单开放（create-tasks SKILL item 2 的「MUST reference § Environment Prerequisites instead of restating verdicts」义务覆盖 per-phase prerequisites、`[~]` notes 与任何 assumption 或 decision 或自由散文行）、复述行双要件（ISO 日期 + `(see § Environment Prerequisites)` 指针，缺一不合规；tasks 模板 ACTION REQUIRED 同步扩展）、red-first note 逐字引用 gate 行（id + name + check command；裸 id 不可用；重编号产生可见不匹配）、re-freeze timing 指向 implement 消费侧步骤（C-16/C-17/C-18/C-19 钉）；当前树先红，red 输出由 T040 统一落盘 per `notes/red-first-evidence.md`。
-- [ ] T040 [US6] [blockedBy: T039] 运行 `tests/contract/test_premise_carrier_contract.py` 确认按预期红，把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
+- [X] T039 [P] [US6] 新建 `tests/contract/test_premise_carrier_contract.py`：钉载体清单开放（create-tasks SKILL item 2 的「MUST reference § Environment Prerequisites instead of restating verdicts」义务覆盖 per-phase prerequisites、`[~]` notes 与任何 assumption 或 decision 或自由散文行）、复述行双要件（ISO 日期 + `(see § Environment Prerequisites)` 指针，缺一不合规；tasks 模板 ACTION REQUIRED 同步扩展）、red-first note 逐字引用 gate 行（id + name + check command；裸 id 不可用；重编号产生可见不匹配）、re-freeze timing 指向 implement 消费侧步骤（C-16/C-17/C-18/C-19 钉）；当前树先红，red 输出由 T040 统一落盘 per `notes/red-first-evidence.md`。
+- [X] T040 [US6] [blockedBy: T039] 运行 `tests/contract/test_premise_carrier_contract.py` 确认按预期红，把命令、真实红输出与退出码粘贴进 `.specify/specs/063-review-p1-governance/notes/red-first-evidence.md`。
 
 ### Implementation for User Story 6
 
-- [ ] T041 [P] [US6] [blockedBy: T040] 实现 C-16+C-18+C-19（同一文件三节，一次写入）：`skills/internal/create-tasks/SKILL.md` § Environment probe rules item 2 以开放载体清单替换封闭枚举（义务覆盖任何 assumption 或 decision 或自由散文行）、§ Runtime-evidence landing points 的 red-first note 形态规则增加逐字引用 gate 行义务（id + name + check command；前向适用，062 的 note 实例不在本特性编辑范围）、§ Re-freeze timing 改为指向 implement 侧消费步骤（C-29 预检）并保留生产侧 re-capture 义务。
-- [ ] T042 [P] [US6] [blockedBy: T040] 实现 C-17：`templates/tasks-template.md` § Environment Prerequisites 的 ACTION REQUIRED 注释增加：任何复述环境 verdict 的行（任何载体）MUST 携带 ISO 日期戳与 `(see § Environment Prerequisites)` 指针，两者同时要求、缺一不合规。
+- [X] T041 [P] [US6] [blockedBy: T040] 实现 C-16+C-18+C-19（同一文件三节，一次写入）：`skills/internal/create-tasks/SKILL.md` § Environment probe rules item 2 以开放载体清单替换封闭枚举（义务覆盖任何 assumption 或 decision 或自由散文行）、§ Runtime-evidence landing points 的 red-first note 形态规则增加逐字引用 gate 行义务（id + name + check command；前向适用，062 的 note 实例不在本特性编辑范围）、§ Re-freeze timing 改为指向 implement 侧消费步骤（C-29 预检）并保留生产侧 re-capture 义务。
+- [X] T042 [P] [US6] [blockedBy: T040] 实现 C-17：`templates/tasks-template.md` § Environment Prerequisites 的 ACTION REQUIRED 注释增加：任何复述环境 verdict 的行（任何载体）MUST 携带 ISO 日期戳与 `(see § Environment Prerequisites)` 指针，两者同时要求、缺一不合规。
 
 ### Verification for User Story 6
 
-- [ ] T043 [US6] [blockedBy: T041,T042] 按 quickstart S7 形态演练载体规则（seed 行无日期/无指针 → 被标记直至双要件齐备；date-only 与 pointer-only 各自失败；裸 gate id 引用在重编号 fixture 上产生可见不匹配），运行 `tests/contract/test_premise_carrier_contract.py` 全绿，结果记入 `verification.md`；认领 C-16、C-17、C-18、C-19。 [green: contracts/template-mechanisms.md#C-16] [green: contracts/template-mechanisms.md#C-17] [green: contracts/template-mechanisms.md#C-18] [green: contracts/template-mechanisms.md#C-19]
+- [X] T043 [US6] [blockedBy: T041,T042] 按 quickstart S7 形态演练载体规则（seed 行无日期/无指针 → 被标记直至双要件齐备；date-only 与 pointer-only 各自失败；裸 gate id 引用在重编号 fixture 上产生可见不匹配），运行 `tests/contract/test_premise_carrier_contract.py` 全绿，结果记入 `verification.md`；认领 C-16、C-17、C-18、C-19。 [green: contracts/template-mechanisms.md#C-16] [green: contracts/template-mechanisms.md#C-17] [green: contracts/template-mechanisms.md#C-18] [green: contracts/template-mechanisms.md#C-19]
 
 **Checkpoint**: US6 independently testable: 载体开放、双要件、逐字 gate 引用全部可独立验证（quickstart S7）。
 
@@ -240,7 +240,7 @@
 
 **Purpose**: 收口 F4 的全单元重编译与 backlog 翻转、两顶帽子同步分发、全局回归对比、quickstart 端到端、跨切面证据与 Feature 状态推进。
 
-- [ ] T044 [blockedBy: T027,T032] 实现 C-25：渲染器与注册表变更全部落位后（见 § Dependencies），运行 `python3 .specify/scripts/python/probe-utils.py --action compile-embeds` 重编译全部编译单元；`--action compile-embeds --check` 零漂移；适用处以 `--reconcile` 收口（固定次序 compile → regen → sync）；同一提交把 `.specify/memory/feedback/backlog.md` 第 89 行（2026-10-15 direct-fix 行）状态翻转为 `closed` 并附 `--check` 输出为证据；结果记入 `verification.md`；认领 C-25。 [green: contracts/engine-face-contract.md#C-25]
+- [X] T044 [blockedBy: T027,T032] 实现 C-25：渲染器与注册表变更全部落位后（见 § Dependencies），运行 `python3 .specify/scripts/python/probe-utils.py --action compile-embeds` 重编译全部编译单元；`--action compile-embeds --check` 零漂移；适用处以 `--reconcile` 收口（固定次序 compile → regen → sync）；同一提交把 `.specify/memory/feedback/backlog.md` 第 89 行（2026-10-15 direct-fix 行）状态翻转为 `closed` 并附 `--check` 输出为证据；结果记入 `verification.md`；认领 C-25。 [green: contracts/engine-face-contract.md#C-25]
 - [ ] T045 [blockedBy: T044] 实现 C-31（两顶帽子同步）：按固定次序运行 `python3 scripts/python/regen-command-copies.py`（analyze/review/implement 四副本刷新）、`bash scripts/bash/generate-instructions.sh`（终态确认）、`python3 scripts/python/sync-mirrors.py --write --only templates --only skills/internal --only shared --only scripts`（源→镜像落位，本特性触碰的既有漂移对随写清除）；随后以 `--check` 对照 T001 落盘基线（per `notes/baseline-mirror-check.txt` 与 `notes/baseline-regen-check.txt`，2026-10-19，见 § Environment Prerequisites）确认零 NEW 漂移且触碰对字节一致；结果记入 `verification.md`；认领 C-31。 [green: contracts/cross-cutting-constraints.md#C-31]
 - [ ] T046 [blockedBy: T045] 实现 C-32：`bash scripts/bash/run-tests.sh --names-out /tmp/s63-after.txt` 后 `comm -13 .specify/specs/063-review-p1-governance/notes/baseline-failed-tests.txt /tmp/s63-after.txt` 输出为空（零新增失败；既有失败不属本特性修复面，基线不放宽不改写）；盘点逐机制变异演练清单（每条否定命题条款都有证明守卫在对象被破坏时转红的演练）并记入 `verification.md`；清理 `/tmp/s63-after.txt`；认领 C-32。 [green: contracts/cross-cutting-constraints.md#C-32]
 - [ ] T047 [blockedBy: T045] 按 `quickstart.md` 实跑 S1–S10 端到端（各场景含 teardown；S6 在隔离工作区逐字执行编译 face 引擎调用），把命令、真实输出与退出码记入 `.specify/specs/063-review-p1-governance/notes/quickstart-run.md`。

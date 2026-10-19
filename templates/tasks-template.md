@@ -89,10 +89,13 @@ description: "Task list template for feature implementation"
   (container runtime, image registry, live cluster, special hardware).
   This section is the SINGLE landing point for probe conclusions: /speckit.tasks
   probes at generation time (never cached across runs) and records each verdict
-  here ONCE with its probe command and date. Per-phase prerequisite notes and
-  [~] deferral notes on task rows MUST reference this section instead of
-  restating verdicts. Delete the section entirely when no external environment
-  dependency exists.
+  here ONCE with its probe command and date. Any row restating an environment
+  verdict — in ANY carrier (per-phase prerequisite notes, [~] deferral notes,
+  assumption rows, decision rows, or free prose) — MUST reference this section
+  instead of restating verdicts, and MUST carry an ISO date stamp together with
+  a `(see § Environment Prerequisites)` pointer; both together, neither alone —
+  either alone is non-compliant. Delete the section entirely when no external
+  environment dependency exists.
 -->
 
 - <dependency>: <available | partial | unavailable> — probe: `<command>` @ <date>; affected phases/tasks: <phase/task refs or none>
