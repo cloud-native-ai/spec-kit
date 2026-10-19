@@ -20,46 +20,93 @@
 
 两条本技能纪律保留：提示词三段骨架（背景与权威文档 / 执行要求 / 完成尾标与回传契约）见 `stage-prompts.md`——骨架内容是本技能的编排本体；反嵌套红线义务真源在 run-agent 派发治理（`skills/internal/run-agent/SKILL.md`），派发前自检涵盖本配方。
 
-## Recipe 2 — Runner 脚本与派生（Runner & Derivation）——**心跳差异面**
+## Recipe 2 — Runner 脚本与派生（Runner & Derivation）——**正证据四件套差异面**
 
-基础 runner 形态（`cd` + `<cli> -w` + `-p "$(cat …)"` + sed 派生）见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。本技能差异面——**心跳文件机制**（无人值守长跑的存活判定依赖）：
+基础 runner 形态（`cd` + `<cli> -w` + `-p "$(cat …)"` + sed 派生）见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。本技能差异面——**pid / status / log / heartbeat 正证据四件套**（无人值守长跑的完成判定与存活判定都依赖它们；模型见 `watch-model.md` §2）：
 
 ```bash
 # /home/<run-user>/run-<line>-<stage>.sh
-# 心跳：runner 启动即打点，进程活着的确定信号（不依赖 CLI 流式输出）
-(while true; do date +%FT%T >> /home/<run-user>/heartbeat-<line>-<stage>.log; sleep 30; done) &
-HB=$!
-cd <project-dir> && <cli> -w <project-dir> --permission-mode auto -p "$(cat /home/<run-user>/prompt-<line>-<stage>.md)"
-rc=$?; kill $HB 2>/dev/null; exit $rc
-```
+#!/usr/bin/env bash
+set -u
+line=<line>; stage=<stage>; sentinel="<STAGE>-DONE"
+dir=/home/<run-user>
+pidf="$dir/pid-$line-$stage"; status="$dir/status-$line-$stage"
+log="$dir/log-$line-$stage.log"; hb="$dir/heartbeat-$line-$stage.log"
+runner_pid=$$
+write_atomic() { local tmp="$1.tmp.$$"; printf '%s\n' "$2" > "$tmp" && mv "$tmp" "$1"; }
+start_ticks=$(awk '{print $22}' "/proc/$$/stat" 2>/dev/null || true)
+write_atomic "$pidf" "pid=$runner_pid start=$start_ticks at=$(date +%s)"
 
-下一阶段 runner 用 `sed` 替换上一阶段 runner 的提示词文件名派生——runner 形态跨阶段恒同，避免重复维护整套脚本。
+# 心跳随 runner 死亡而退出，避免孤儿心跳伪造存活
+( while kill -0 "$runner_pid" 2>/dev/null; do
+    write_atomic "$hb" "$(date +%s)"
+    sleep 30
+  done ) &
+hb_pid=$!
+disown "$hb_pid" 2>/dev/null || true
 
-## Recipe 3 — 脱离模式派发 + 定时间隔检查（Detached Dispatch & Interval Check，缺省形态）——**nohup 权威落点**
+finish() {
+  rc=$1
+  trap - EXIT
+  kill "$hb_pid" 2>/dev/null || true
+  last=$(tail -n 50 "$log" 2>/dev/null | awk 'NF{line=$0} END{print line}' | tr -d '\r' | sed 's/[[:space:]]*$//')
+  sent=0; [ "$last" = "$sentinel" ] && sent=1
+  write_atomic "$status" "exit=$rc at=$(date +%s) sentinel=$sent"
+  exit "$rc"
+}
+trap 'finish $?' EXIT
 
-**让子代理在后台自己跑，主代理按一定时间间隔检查结果**——派发连接断开不中断子代理。本形态是 loop-driver 实测独有差异面（analyze H-04 裁定：权威落点在本文件，不迁配方真源）：
-
-```bash
-# 1) 远端侧脱离派发：nohup 使子代理脱离 ssh 会话存活；日志重定向在 su -c 内层，
-#    归属 run-user（外层重定向会以本地身份落盘，run-user 不可 tail）
-ssh <alias> "nohup su - <run-user> -c 'bash /home/<run-user>/run-<line>-<stage>.sh > /home/<run-user>/log-<line>-<stage>.log 2>&1' < /dev/null > /dev/null 2>&1 &"
-# 2) 主代理按 cadence 主动检查（一次调用合并心跳+日志两路信号，输出 ≤4 行）：
-ssh <alias> "tail -1 /home/<run-user>/heartbeat-<line>-<stage>.log; tail -3 /home/<run-user>/log-<line>-<stage>.log"
+cd "<project-dir>" || exit 127
+"<cli>" -w "<project-dir>" --permission-mode auto -p "$(cat "$dir/prompt-$line-$stage.md")" > "$log" 2>&1
 ```
 
 要点：
 
-- **脱离（detached）优先于前台**：`nohup … &` 让远端进程独立于 ssh 连接存活；派发命令立即返回，主代理随后按间隔发起独立的检查连接。简化变体（本地 ssh 后台 `ssh … "su - …" > 本地日志 2>&1 &`）仅适用于短阶段且连接稳定时——连接断开会杀掉子代理，故**缺省用脱离形态**。
-- **外层三重重定向必须**：`nohup` 任务本体之外再带 `< /dev/null > /dev/null 2>&1`——缺省时后台任务继承 ssh 通道的 stdio，本地 ssh 挂起直到超时（实测 2026-10-16：每次派发白烧一次 2 分钟本地超时，进程虽照常启动但驱动者节拍被打断）。
-- **心跳即存活信号**：阶段日志受 `-p` 缓冲影响在退出前静默，心跳文件是「进程活着」的确定信号；**心跳停跳且进程消失** = 卡死判定信号（单看任一都不是）。
-- **cadence 分级（入口可覆盖）**：requirements/clarify/tasks/checklist/analyze 建议 120–240s（checklist/analyze 为轻量分析型质量门）；plan/implement/review 建议 300–600s——长阶段高频轮询只烧驱动者预算不增信息。
-- **多线批查**：一次 ssh 调用合并检查多条线（各自 tail 心跳+日志），**判定仍逐线独立做**；检查输出只保留心跳行与日志尾部 ≤4 行/线，哨兵未现且进程存活时无需更多输出。
-- **观察面纪律（底稿注解：External Dispatch Visibility Contract，`subagent-definitions.md`）**：禁止**缓冲至退出**式派发——`qodercli -p "<prompt>" > agent.log 2>&1 &` 这种「输出缓冲到进程退出才落盘」的形态让运行期零可见性，是明令禁止的反模式。本机制的观察面是**阶段粒度**（哨兵出现在输出末尾）：`-p` 缓冲意味着阶段结束前日志静默——间隔检查等的就是哨兵行；若需阶段内进度/卡死检测，把 runner 换成流式输出（`--output-format stream-json`）形态。
-- 哨兵出现 `<STAGE>-DONE` → 进入独立校验（见 stage-prompts.md）→ 通过则派发下一阶段（回到 Recipe 1/2/3）。
+- **退出记录是完成的主事件**：`status-…` 原子写入 `exit=<rc> at=<epoch> sentinel=<0|1>`；驱动者优先读退出记录，而不是猜测进程状态。
+- **PID 文件是存活的唯一权威**：`pid + start ticks` 供 `kill -0`、僵尸检测与 PID 复用校验；禁止用 `pgrep -c` 计数推断存活或完成（零匹配陷阱见 `watch-model.md` §7）。
+- **心跳只证明 runner 外壳活着**：心跳循环以 `kill -0 "$runner_pid"` 为条件，外壳死亡即停跳；子代理是否卡死仍由阶段 deadline 判定。
+- **日志最后非空行**是哨兵判据；`-p` 缓冲模式下日志在退出前静默属预期，由退出记录提供提前事件。
+- 下一阶段 runner 用 `sed` 替换上一阶段 runner 的提示词/哨兵字面量派生——runner 形态跨阶段恒同，避免重复维护整套脚本。
+
+## Recipe 3 — 脱离模式派发 + 统一监听（Detached Dispatch & Unified Watch，缺省形态）——**nohup 权威落点**
+
+**让子代理在后台自己跑，驱动者用长轮询窗口监听**——派发连接断开不中断子代理，等待期间不消耗模型回合。本形态是 loop-driver 实测独有差异面（analyze H-04 裁定：权威落点在本文件，不迁配方真源）；监听规则本体见 `watch-model.md`，本节只给命令形态：
+
+```bash
+# 0) 每主机一次：上传 watcher（与 runner 同一执行身份）
+ssh <alias> "cat > /home/<run-user>/watch-target.sh" < <skill-dir>/scripts/watch-target.sh
+ssh <alias> "chmod +x /home/<run-user>/watch-target.sh"
+
+# 1) 远端侧脱离派发：nohup 使 runner 脱离 ssh 会话存活；
+#    runner 的 stdout/stderr 在 su -c 内层落 runner-log（归属 run-user）；
+#    CLI 输出由 runner 内层再重定向到 log
+ssh <alias> "nohup su - <run-user> -c 'bash /home/<run-user>/run-<line>-<stage>.sh > /home/<run-user>/runner-log-<line>-<stage>.log 2>&1' < /dev/null > /dev/null 2>&1 &"
+
+# 2) 每个监听窗口：一次 ssh（与 runner 同一执行身份），命中终止判定或窗口到期即返回
+#    （工具超时设为 window+30s）
+ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
+  --label <line> --pid-file /home/<run-user>/pid-<line>-<stage> \
+  --status-file /home/<run-user>/status-<line>-<stage> \
+  --log /home/<run-user>/log-<line>-<stage>.log \
+  --sentinel <STAGE>-DONE --heartbeat /home/<run-user>/heartbeat-<line>-<stage>.log \
+  --deadline-epoch <stage_deadline_epoch> --window 300 --interval 3'"
+```
+
+要点：
+
+- **脱离（detached）优先于前台**：`nohup … &` 让远端进程独立于 ssh 连接存活；派发命令立即返回，驱动者随后发起独立的监听窗口。简化变体（本地 ssh 后台 `ssh … "su - …" > 本地日志 2>&1 &`）仅适用于短阶段且连接稳定时——连接断开会杀掉子代理，故**缺省用脱离形态**。
+- **外层三重重定向必须**：`nohup` 任务本体之外再带 `< /dev/null` 并把 ssh 通道的 stdout/stderr 重定向（`> /dev/null 2>&1`）——缺省时后台任务继承 ssh 通道的 stdio，本地 ssh 挂起直到超时（实测 2026-10-16：每次派发白烧一次 2 分钟本地超时，进程虽照常启动但驱动者节拍被打断）。runner 自身的 stdout/stderr 在 `su -c` 内层落 `runner-log`，保证归属 run-user 可读。
+- **监听机制阶梯（`watch-model.md` §4）**：长轮询窗口缺省 → 宿主原生通知仅作补充（且不得结束驱动者会话）→ 间隔轮询回退；**禁止**独立 `sleep N` 回合空等。
+- **窗口到期 ≠ 阶段超时**：watcher 返回 `RUNNING`（退出码 10）时立即发起下一窗口，不做 agent 侧等待；只有 `TIMEOUT`（阶段 deadline）进入 U5。这条把「监视器零匹配/窗口到期误判超时」与真正的阶段超时分开（2026-10 实测缺陷：`pgrep -c` 零匹配先输出 0 再被 `|| echo 0` 追加第二个 0，导致 clarify 已完成仍被误判超时）。
+- **正证据优先**：每轮一次读取退出记录 → PID 存活 → 日志尾行 → 心跳 mtime；进程消失、日志静默、`pgrep` 零匹配都**不是**完成。心跳只证明 runner 外壳活着，与 PID 一起看。
+- **多线批查**：一个窗口一次 ssh 检查多条线（`--manifest` 模式），任一线终止即返回全部线快照，**判定仍逐线独立做**；输出只保留判定行与必要证据，哨兵未现且进程存活时无需更多输出。
+- **观察面纪律（底稿注解：External Dispatch Visibility Contract，`subagent-definitions.md`）**：禁止**缓冲至退出**式派发——`qodercli -p "<prompt>" > agent.log 2>&1 &` 这种「输出缓冲到进程退出才落盘」的形态让运行期零可见性，是明令禁止的反模式。本机制的观察面是**阶段粒度**（哨兵出现在输出末尾）：`-p` 缓冲意味着阶段结束前日志静默——退出记录与窗口监听等的就是终止事件；若需阶段内进度/卡死检测，把 runner 换成流式输出（`--output-format stream-json`）形态。
+- 终止判定 `DONE` / `INCOMPLETE` → 独立校验（见 stage-prompts.md）；其余终止判定 → U5；通过则派发下一阶段（回到 Recipe 1/2/3）。
 
 ## Recipe 4 — 阶段链与收尾（Stage Chain & Closure）——编排本体
 
 - 阶段链固定顺序：`requirements → clarify → plan → tasks → checklist → analyze → implement → review`（2026-10-17 修订：纳入 checklist/analyze 质量门——无人值守循环执行完整版流程，日常手动开发常省略的非必须命令一律必经）；每阶段完成哨兵 = 大写阶段名 + `-DONE`（如 `PLAN-DONE`、`CHECKLIST-DONE`、`ANALYZE-DONE`）。尾标是完成的必要条件，充分条件由独立校验补齐。
+- **U3→U4 接线**：U3 的终止判定决定去向——`DONE` / `INCOMPLETE` 进 U4 独立校验（`INCOMPLETE` 按伪完成处理）；`ANOMALY` / `FAILED` / `DEAD` / `TIMEOUT` / `NO_SIGNAL` 直接进 U5。U4 通过后才派发下一阶段。
 - **质量门编排（checklist / analyze 两门位于 tasks 与 implement 之间）**：
   - **checklist 门**：产物 = `REQUIREMENTS_DIR/checklists/` 新增清单文件；清单项的满足判定不在本门裁决——由 implement 阶段的 checklist 豁免门接管（子代理按 G5 默认纪律自行裁决，waiver 记录进 waivers.md）。
   - **analyze 门**：产物 = findings 报告正文（只读命令，不产新提交）；门判据 = 报告中 CRITICAL/HIGH 发现为零或已处置。
@@ -80,7 +127,7 @@ ssh <alias> "tail -1 /home/<run-user>/heartbeat-<line>-<stage>.log; tail -3 /hom
 
 ## Recipe 5 — 本地拓扑与变体
 
-- **本地拓扑**：项目在本机时省略 ssh/su，直接以本地项目为工作目录执行 runner；需求上下文先写简报文件（`/tmp/<topic>-sdd-brief.md`），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」——命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5（本配方坍缩为引用）。
+- **本地拓扑**：项目在本机时省略 ssh/su，直接以本地项目为工作目录执行 runner；需求上下文先写简报文件（`/tmp/<topic>-sdd-brief.md`），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」——命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5（本配方坍缩为引用）。监听同样走 `watch-target.sh`，只是去掉 ssh/su 层（`watch-model.md` §6）。
 - **构建固化变体**：同一主机按角色分线（不同系统用户在各自目录固化不同层），仅经入口参数（执行身份、路径）区分，机制零新增分支——形态见同文件 § Recipe 6。
 
 ## Boundary

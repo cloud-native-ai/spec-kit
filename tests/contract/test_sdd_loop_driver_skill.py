@@ -438,3 +438,26 @@ def test_c20_driver_topology_redline_pinned():
     # HR-6 carries the same rule in the Hard Requirements list
     hr6 = re.search(r"^6\. \*\*驱动拓扑\*\*.*$", text, re.MULTILINE)
     assert hr6, "Hard Requirement 6 (driver topology) missing"
+
+
+# ---------------------------------------------------------------- routing guard
+# 2026-10-19 defect: a feature description passed to /sdd-loop-driver was
+# misrouted to improve-skills and edited the repo directly, skipping U0-U6.
+
+
+def test_trigger_routing_guard_pinned():
+    text = _skill_text()
+    for needle in [
+        "触发语义与路由",
+        "主导流程唯一",
+        "加载后的第一个动作",
+        "流程不可替换",
+        "U0.5 自检",
+        "improve-skills",
+        "create-skills",
+        "只做技能维护",
+        "当前工作目录含",
+    ]:
+        assert needle in text, f"trigger-routing guard missing: {needle}"
+    docs = DOCS_PAGE.read_text(encoding="utf-8")
+    assert "触发与路由" in docs
