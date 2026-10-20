@@ -10,7 +10,7 @@
 
 SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-007]]）为行为基线，收口用同一驱动侧可执行夹具归一化重放比较；名称级测试失败基线只服务 SC-012。镜像验收 = 本对零 drift + 全部镜像对相对 B-2 冻结清单零 NEW drift。
 
-**CLI 能力档案归属（2026-10-20 裁决）**：CLI 能力档案（集合、八维、`known`/`unknown`、U2/U4/U5 观测、probe/feedback、契约与测试）唯一归属于 Feature 064（`contracts/cli-profiles.md` CLP-01…CLP-17、`notes/063-overlap-adjudication.md`）。063 只保留 stream-json 输出默认（FR-026）与 nohup 脱离（FR-031），并只读引用 064 的 `references/cli/index.md`；不新增/修改 `references/cli/`、不注册 Probe Object、不定义 CP 契约或档案测试。
+**CLI 能力档案归属（2026-10-20 裁决）**：CLI 能力档案（集合、八维、`known`/`unknown`、U2/U4/U5 观测、probe/feedback、契约与测试）唯一归属于 Feature 064（`contracts/cli-profiles.md` CLP-01…CLP-17、`.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md`）。063 只保留 stream-json 输出默认（FR-026）与 nohup 脱离（FR-031），并只读引用 064 的 `references/cli/index.md`；不新增/修改 `references/cli/`、不注册 Probe Object、不定义 CP 契约或档案测试。
 
 交付面 = 1 个技能（3 份既有 references 更新 + 1 份效率 owner 文档 + 5 个新脚本 + 1 个扩展脚本）+ docs 参考页 + 契约/单元/集成测试与夹具（含驱动侧卡死夹具）+ Feature 058 扩展记录。零新技能、零新命令、零常驻服务、零外部依赖、零模型 API。完成哨兵、watcher 判定状态机、退出码、确认门、独立校验与卡死处置保持不变。063 自身走完整阶段链，快车道只作用于未来运行。CLI 能力档案不属于本交付面（064 owner）。
 
@@ -18,6 +18,7 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 
 **Language/Version**: Markdown 技能面；Bash（runner/watcher，兼容 bash 3.2+ 的常见用法）；Python ≥3.8 仅标准库（准入/派生/台账审计/plan 改动判定）；测试为 pytest（仓库既有 contract/unit/integration 分层）
 **Primary Dependencies**: 既有 `git`、`bash`、`python3`；既有 `scripts/bash/run-tests.sh`（名称级基线）；既有 `scripts/python/sync-mirrors.py`（镜像）；既有 `skills/external/sdd-loop-driver/scripts/watch-target.sh`。**不新增任何依赖**，不引入 `jq`/网络/模型 API
+**Dispatch Eligibility**: supported CLI = Feature 061 的 `CAPABILITY_MATRIX` eligible 集合（owner: `scripts/python/execution-config.py`；Feature 详情 `.specify/memory/features/061.md`；064 `contracts/cli-profiles.md` CLP-15 同口径）。CLI 能力档案存在不等于可派发；063 只决定 stream-json 输出模式默认与 nohup 形态，不定义派发资格。
 **Storage**: 文件即存储——状态脊 Markdown（准入记录、JSONL 台账围栏、plan 约束）、`<spec-dir>/test-evidence/<stage>.jsonl`、`baseline-failed.txt`/`final-failed.txt`、`notes/stall-behavior-baseline.json`（SC-010 行为基线）、阶段产物 raw/live/pid/status/heartbeat/runner-log。无数据库、无新服务。CLI 观测段与派发记录中的 CLI 查档字段由 064 的 `data-model.md` E10 扩展，本特性不定义。
 **Testing**: Tests Mode **ON**。契约测试钉文档面与条款（5 份契约 / 50 条款）；单元测试钉四个 Python 脚本与驱动侧卡死夹具；集成测试钉 runner 脱离/降级与名称级回归；`watch-target.sh --self-test` 扩流式用例。既有契约测试 23/23 绿（plan 期为 21/23，镜像漂移已由合并 064 关闭），本特性保持绿色
 **Target Platform**: Linux 与 macOS 驱动/执行宿主；远端拓扑 = `ssh + su + nohup` + Linux 执行侧；macOS 无 `/proc` 的 watcher 分支按平台跳过或退化
@@ -37,7 +38,7 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `feature-ref.md` FR-001…043 逐行映射到设计落点；每个设计决定在 `research.md` R-1…R-12 有理由与替代方案 |
 | II | Feature-Centric Development | ✅ Pass | 绑定 Feature 058（演化特性）；扩展切片规则：状态保持 `Implemented`，只更新 Feature detail 与索引 Last Updated；未新建 Feature |
 | III | Intent-Driven Development | ✅ Pass | 先定义「快车道何时可信、预算如何不丢回归、plan 约束边界、脱离后如何接管」，再给命令形态；四项优化的取舍和显式排除在 research/contracts。CLI 行为知识由 064 拥有，本特性只引用 |
-| IV | Test-First & Contract-Driven Implementation | ⚠ Partial — see Complexity Tracking | Tests Mode ON；5 个新脚本按 red-first 编写并配单元测试；49 个契约条款、决策表策略测试、FR-042(a)–(e) 夹具、名称级回归集成测试。SC-010 卡死处置以 `ba2a18db` 冻结提交上的行为基线（[[STR-007]]）录制与归一化重放证明；名称级基线只服务 SC-012。LLM 驱动的端到端阶段序列无法在 CI 自动化，由实现期录制 trace 证明（见 Complexity Tracking） |
+| IV | Test-First & Contract-Driven Implementation | ⚠ Partial — see Complexity Tracking | Tests Mode ON；5 个新脚本按 red-first 编写并配单元测试；50 个契约条款、决策表策略测试、FR-042(a)–(e) 夹具、名称级回归集成测试。SC-010 卡死处置以 `ba2a18db` 冻结提交上的行为基线（[[STR-007]]）录制与归一化重放证明；名称级基线只服务 SC-012。LLM 驱动的端到端阶段序列无法在 CI 自动化，由实现期录制 trace 证明（见 Complexity Tracking） |
 | V | AI Agent Integration Standards | ✅ Pass | 不新增/变更 agent provider；沿用 qodercli/claude 的 stream-json 事件形状；`AGENT_CONFIG` 与 `_ASSISTANT_TIERS` 零改动 |
 | VI | Continuous Quality & Observability | ✅ Pass | raw/live 双证据、四件套、状态脊、准入记录、预算台账、plan 分类、收尾汇总；失败与降级均显式留痕 |
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass | Feature 058 已在册；本 plan 产出四件套 + research；不越权推进 `Implemented`；Pre-Status-Flip Gate 留给 implement |
@@ -66,7 +67,7 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 
 - **启用**：U0 入口声明出现 [[STR-006]] 并原文入状态脊；无人值守唯一入口；交互式允许一次非阻塞提议。
 - **裁决点**：`tasks` U4 通过后、`checklist` 派发前；`scripts/admission-check.py` 输出七判据 JSON（全部机械判定，无自证项），任何解析失败 fail-closed。
-- **计数口径**：准入只使用 FR-003(a) 的窄模式（FR 定义行 `^- **FR-[0-9]{3}**:`；任务行 `^- \[[ xX]\] T[0-9]{3}`）；宽模式 `^- \[[ xX>~]\] T[0-9]{3}` 仅用于仓库任务记账（tasks.md 当前 52 行），MUST NOT 用于准入，两者不得混用；当前 requirements 为 43 条 FR 定义行（tasks-repair-2 收口 CLI-profile 条款后复算），准入夹具始终以窄模式为准。
+- **计数口径**：准入只使用 FR-003(a) 的窄模式（FR 定义行 `^- **FR-[0-9]{3}**:`；任务行 `^- \[[ xX]\] T[0-9]{3}`）；宽模式 `^- \[[ xX>~]\] T[0-9]{3}` 仅用于仓库任务记账（tasks.md 当前 53 行，tasks-repair-3 后），MUST NOT 用于准入，两者不得混用；当前 requirements 为 43 条 FR 定义行（tasks-repair-2 收口 CLI-profile 条款后复算），准入夹具始终以窄模式为准。
 - **录取**：状态脊写入 E1 记录 + [[STR-003]]；派发 `analyze`，跳过 `checklist`；`implement`/`review` 提示词携带跳过标记与准入证据指针。
 - **回退**：`analyze` 等阶段发现新引擎/安全面/任务越界 → 回退完整链，补派 `checklist`；若 `analyze` 已过则补派后重过 analyze 一次。
 - **不变量**：`analyze`/`review` 门判据、回环上限、独立校验完全不变。
@@ -97,7 +98,7 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 
 ### ⑤ CLI 行为知识边界（064 owner；本特性只读引用）
 
-- **归属**：CLI 能力档案的集合、八维、`known`/`unknown`、provenance、U2/U4/U5 观测、probe/feedback、契约与测试由 Feature 064 唯一拥有（`contracts/cli-profiles.md` CLP-01…CLP-17；`notes/063-overlap-adjudication.md`）。063 MUST NOT 新增/修改 `references/cli/`、复制档案内容、注册 Probe Object 或建立第二套 CP 契约/测试。
+- **归属**：CLI 能力档案的集合、八维、`known`/`unknown`、provenance、U2/U4/U5 观测、probe/feedback、契约与测试由 Feature 064 唯一拥有（`contracts/cli-profiles.md` CLP-01…CLP-17；`.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md`）。063 MUST NOT 新增/修改 `references/cli/`、复制档案内容、注册 Probe Object 或建立第二套 CP 契约/测试。
 - **本特性保留**：stream-json 输出默认（FR-026）与 nohup 脱离（FR-031）是 064 档案（CLP-02/04/08、CLP-13）记录的既有事实；064 只读引用，不改写本特性的输出模式默认。
 - **派发边界**：063 的 E6/E8 只保留基础派发与状态脊字段；CLI 查档字段与 `cli_observations` 由 064 `data-model.md` E10 定义。063 实现 stream-json/nohup 时可按 064 `references/cli/index.md` 只读查档，但不得把档案更新当作行为修复或改变当前阶段判定。
 
@@ -237,7 +238,7 @@ Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓）；契约文件 5（原
 
 ## Plan Repair Record（2026-10-20，plan-repair-2）
 
-**触发**：① analyze-rerun 报告（0 CRITICAL / 1 HIGH / 4 MEDIUM / 2 LOW）的 plan-owned 项：U-01R（驱动侧字段同义反复）、N-01（`state_spine_path` / 远端证据合并 / T002 与 D-T3 兜底措辞）、N-02（requirements 变更后的 re-anchoring）、N-03（`not-run-docs-only` 缩减字段集与 `stages=N complete=N`）、N-05（窄/宽任务计数边界）；② plan-repair-2 曾在用户授权下临时加入 CLI Capability Profiles 增量。该增量已在 tasks-repair-2 按 064 的 `notes/063-overlap-adjudication.md` 裁决迁入 064，并从本规格删除（见 Plan Repair Record 第 3 轮）。本轮保留的 plan 传播只覆盖 U-01R/N-01/N-02/N-03/N-05。
+**触发**：① analyze-rerun 报告（0 CRITICAL / 1 HIGH / 4 MEDIUM / 2 LOW）的 plan-owned 项：U-01R（驱动侧字段同义反复）、N-01（`state_spine_path` / 远端证据合并 / T002 与 D-T3 兜底措辞）、N-02（requirements 变更后的 re-anchoring）、N-03（`not-run-docs-only` 缩减字段集与 `stages=N complete=N`）、N-05（窄/宽任务计数边界）；② plan-repair-2 曾在用户授权下临时加入 CLI Capability Profiles 增量。该增量已在 tasks-repair-2 按 064 的 `.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md` 裁决迁入 064，并从本规格删除（见 Plan Repair Record 第 3 轮）。本轮保留的 plan 传播只覆盖 U-01R/N-01/N-02/N-03/N-05。
 
 **PLAN-EDIT 声明**：
 
@@ -280,17 +281,17 @@ Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓）；契约文件 5（原
 **N-05 传播（LOW）**：
 
 - **FL-03(a)/plan §①**：准入只用窄模式；宽模式只作仓库记账；两者不混用；重入文件出现 `[>]`/`[~]` 时宽模式会多计，准入仍按窄模式。
-- **tasks-repair-2 义务**：T001/T010/T013/T052 的计数说明必须区分窄/宽；当前 52/52 相同是巧合，不得写成"两者一致"。
+- **tasks-repair-2 义务**：T001/T010/T013/T052 的计数说明必须区分窄/宽；两者当时恰好同数是巧合，不得写成"两者一致"。
 
-**CLI Capability Profiles（已迁出）**：plan-repair-2 的临时 CLI-profile 增量已由 tasks-repair-2 按 064 `notes/063-overlap-adjudication.md` 迁入 064（`contracts/cli-profiles.md` CLP-01…CLP-17）。本规格不再保留档案、契约、观测、Probe Object 或测试条款；064 是唯一 owner。
+**CLI Capability Profiles（已迁出）**：plan-repair-2 的临时 CLI-profile 增量已由 tasks-repair-2 按 064 `.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md` 迁入 064（`contracts/cli-profiles.md` CLP-01…CLP-17）。本规格不再保留档案、契约、观测、Probe Object 或测试条款；064 是唯一 owner。
 
 **tasks-repair-2 承接的未同步项**（本轮只修改 `tasks.md`）：
 
 1. 不新增 US6 任务：CLI 档案/契约/测试/Probe Object 由 064 拥有；`tasks.md` 只记录指向 064 的边界说明，不出现 CLI-profile 实施任务。
 2. 更新 T001/T051：驱动侧可执行夹具、`initial_retries=0`、`exit_code` 双字段、禁止判定表转录；更新 T002/D-T3：`state_spine_path` 与 transport→merge 统一措辞。
 3. 更新 T025/T026/T027/T028/T052：PC-11 re-anchoring 与 E4 `rebaseline_events[]`；更新 T016/T019/T022/T052：`stages=N complete=N` 与 docs-only 缩减字段集；更新 T010/T013/T052：窄/宽计数边界。
-4. 更新 T044/T045/T046：C-3 只新增 `Efficiency Optimizations` 一节；`CLI Capability Profiles` 节由 064 拥有且已在该集合中，不得删除、复制或改写；DoD-3 保持 50 条款（含 PC-11，不含 CP）；任务行数保持 52，不新增 CLI 任务。
-5. 更新 tasks 的 `Measured premises`：requirements 为 43 FR / 13 SC / 8 STR；契约 5 文件 / 49 条；交付清单 24 项；数据模型 41 条 E 规则；quickstart 7 场景。
+4. 更新 T044/T045/T046：C-3 只新增 `Efficiency Optimizations` 一节；`CLI Capability Profiles` 节由 064 拥有且已在该集合中，不得删除、复制或改写；DoD-3 保持 50 条款（含 PC-11，不含 CP）；任务行数保持 52，不新增 CLI 任务（第 4 轮新增 T000 夹具作者行，非 CLI 任务）。
+5. 更新 tasks 的 `Measured premises`：requirements 为 43 FR / 13 SC / 8 STR；契约 5 文件 / 50 条（含 PC-11；本轮的 49 计数已在第 4 轮纠正）；交付清单 24 项；数据模型 41 条 E 规则；quickstart 7 场景。
 
 **本轮假设**：
 
@@ -301,17 +302,17 @@ Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓）；契约文件 5（原
 
 ## Plan Repair Record（2026-10-20，tasks-repair-2：CLI-profile 重叠收口）
 
-**触发**：Feature 064 的 `notes/063-overlap-adjudication.md` 与已实现资产（`references/cli/`、`contracts/cli-profiles.md`、Probe Object `skill-sdd-loop-driver-cli-profile`、`test_sdd_loop_driver_cli_profiles.py`）确认 064 是 CLI 能力档案的唯一 owner；063 的临时 CLI-profile 增量必须删除或改为指针，避免双 owner 与静默复制。本轮只做规格/规划收口，不实现代码。
+**触发**：Feature 064 的 `.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md` 与已实现资产（`references/cli/`、`contracts/cli-profiles.md`、Probe Object `skill-sdd-loop-driver-cli-profile`、`test_sdd_loop_driver_cli_profiles.py`）确认 064 是 CLI 能力档案的唯一 owner；063 的临时 CLI-profile 增量必须删除或改为指针，避免双 owner 与静默复制。本轮只做规格/规划收口，不实现代码。
 
 **裁决结果**：
 
 - 删除：063 的 provisional CLI-profile 契约（条款组与 Probe Object 注册设计，编号见 064）、US6、CLI-profile FR 条款组、SC 条款组、CLI 实体、CLI 边界用例、CLI 共享字符串、档案测试引用、CLI 档案与 README 交付项、最小 Probe Object 注册设计。
 - 保留：快车道（checklist 跳过准入/回退）、两槽位测试预算、plan 只小修约束、stream-json 输出默认与 nohup 脱离；064 对后两项只读引用（CLP-08/CLP-13）。
-- 指针：064 `requirements.md`（CLI 档案条款）、`contracts/cli-profiles.md` CLP-01…CLP-17、`notes/063-overlap-adjudication.md`、`data-model.md` E9/E10、`references/cli/index.md`。
+- 指针：064 `requirements.md`（CLI 档案条款）、`contracts/cli-profiles.md` CLP-01…CLP-17、`.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md`、`data-model.md` E9/E10、`references/cli/index.md`。
 
 **PLAN-EDIT 声明**：
 
-- `PLAN-EDIT: plan.md — 删除 §⑤ CLI Capability Profiles 设计、CLI 交付/镜像/Probe/测试条目与相关计数，新增“CLI 行为知识边界（064 owner）”指针与第 3 轮记录；分类=substantive（删除已迁出的能力面），理由=执行 064 的收编条款（CLP-17）与 `notes/063-overlap-adjudication.md` 的逐条裁决，不改变四项吞吐优化的范围。`
+- `PLAN-EDIT: plan.md — 删除 §⑤ CLI Capability Profiles 设计、CLI 交付/镜像/Probe/测试条目与相关计数，新增“CLI 行为知识边界（064 owner）”指针与第 3 轮记录；分类=substantive（删除已迁出的能力面），理由=执行 064 的收编条款（CLP-17）与 `.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md` 的逐条裁决，不改变四项吞吐优化的范围。`
 - `PLAN-EDIT: data-model.md — 删除 CLI Capability Profile 证据制品、CLI schema 规则组、E6 CLI 查档字段与其校验规则、E8 CLI observations 与其校验规则，改为指向 064 E9/E10；分类=substantive（字段面收窄），理由=同一裁决；E1–E8 基础实体与其余 41 条校验规则不变。`
 - `PLAN-EDIT: contracts/cli-profiles.md — 删除该 provisional 契约文件；分类=substantive（删除重复 owner），理由=064 是唯一 owner，仓库级守卫 `test_clp_17_no_063_duplicate_owner` 要求 063 不得保留第二份契约。`
 - `PLAN-EDIT: contracts/progress-decoupling.md — PD-01/PD-04 的 CLI 行为事实与工具超时改为指向 064 的 `references/cli/` 与 CLP-02/CLP-08；分类=minor（指针与引用修复），理由=CLI-profile 契约已迁出 064，063 只保留 stream-json/nohup 行为规则。`
@@ -326,3 +327,21 @@ Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓）；契约文件 5（原
 **纠正类发现（就地修复并披露）**：PC-11 已在 plan-repair-2 引入，但 tasks.md 的 DoD-3、T026、T046、T049、Clause partition 与 plan 的若干计数仍写 49 条款且遗漏 PC-11。本轮统一为 50 条款，并把 `test_pc_11_reanchoring` 纳入 T026 与 T046 的覆盖要求；同时把合并 064 后的实测值（镜像 62 DIFF / 本对 0；既有契约 23 passed；watcher 自测 28 passed / 0 failed）写回 tasks/feature-ref/research 的实测前提。以上均为可复算事实的纠正，不改变需求范围或设计。
 
 **不重审理由**：本轮是 plan 约束激活后的下游规格修复，但 CLI-profile 增量的迁出是 064 已记录的跨特性裁决，不是对已批准需求范围的改写；四项吞吐优化的 FR/SC 语义、架构、数据模型与任务分解均未改变。该情形属于 FR-022(a) 所称“修复既有缺陷所必需”，且 064 的 owner 地位是唯一一致读法；若驱动认为存在其它读法，按 FR-022(b) 四要素上送。
+
+## Plan Repair Record（2026-10-20，tasks-repair-3：analyze-rerun-2 聚焦修正）
+
+**触发**：`/speckit.analyze` 复核报告（0 CRITICAL / 1 HIGH U-01R / 6 MEDIUM / 3 LOW）中的 plan-owned 项：N-07（061 `CAPABILITY_MATRIX` 派发资格指针）、L-01（49→50）、L-02（064 裁决路径前缀）；tasks-owned 项（U-01R、N-06、N-01R/N-02R/N-03R、N-04、F-01 路由）由 tasks-repair-3 在 `tasks.md` 内承接，见 tasks.md § D-T10。
+
+**PLAN-EDIT 声明**：
+
+- `PLAN-EDIT: plan.md — Technical Context 增加 Dispatch Eligibility 行，点名 Feature 061 的 CAPABILITY_MATRIX 为派发资格唯一 owner（supported CLI = matrix eligible；档案存在 ≠ 可派发）；Constitution IV 证据 49→50；064 裁决路径补全为 .specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md；新增第 4 轮记录；分类=minor（指针/计数/路径纠正，不改设计或范围），理由=analyze-rerun-2 的 N-07/L-01/L-02 纠正项。`
+- `PLAN-EDIT: contracts/progress-decoupling.md — PD-01 增加 Feature 061 CAPABILITY_MATRIX 派发资格 owner 指针（064 CLP-15 同口径）；分类=minor（指针澄清），理由=N-07；不改变 PD-01 的 stream-json 行为规则。`
+- `PLAN-EDIT: tasks.md — 由 tasks 阶段承接 U-01R（T000 夹具作者、T001/T051 同一可执行夹具、initial_retries=0、exit_code={watcher,runner}、删除判定表转录/trace-only）、N-06（7 组/24 应用）、N-01R/N-02R/N-03R/N-04/N-05；分类=substantive（证据程序与覆盖修正），理由=实施 FR-038/FR-012/FR-022 已批准口径，不改变四项优化的范围。`
+
+**纠正与范围说明**：
+
+- N-07：061 的 `CAPABILITY_MATRIX`（`scripts/python/execution-config.py`）是派发资格唯一 owner；064 CLP-15 同口径。063 只决定 stream-json 输出默认与 nohup 形态。
+- L-01：plan 自身后文与当前契约计数均为 50（含 PC-11），Constitution IV 证据同步为 50。
+- L-02：plan 与 `contracts/progress-decoupling.md` 的点名统一使用 `.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md`。`requirements.md` 的同类指针不在本轮允许的修改面（tasks.md + plan-owned 小修），保留给 requirements-owned 阶段；这是范围披露，不是判据降低。
+
+**不重审理由**：本轮只纠正指针、计数与路径，并把 tasks 层证据程序对齐已冻结的 requirements/plan/data-model/contracts 口径；不改变已批准需求范围、FR/SC 语义、架构、数据模型、契约语义或任务分解，属于 FR-022(a) 所称“修复既有缺陷所必需”。
