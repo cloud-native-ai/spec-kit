@@ -1,0 +1,2 @@
+WATCH label=fixture verdict=INCOMPLETE pid=dead heartbeat=fresh anomaly=no sentinel=no rc=0 elapsed=0 reason=exit-record-no-sentinel stream=na line= run= stage= event=watcher-verdict at=1792501911 attribution=legacy
+EVIDENCE label=fixture last="" status="exit=0 sentinel=0" line= run= stage= event=watcher-verdict at=1792501911 attribution=legacy

@@ -600,9 +600,12 @@ def test_di_03_stall_handling_unchanged():
     baseline = json.loads((SPEC_DIR / "notes" / "stall-behavior-baseline.json")
                           .read_text(encoding="utf-8"))
     assert baseline["initial_retries"] == 0
-    assert len(baseline["scenarios"]) == 3
+    assert len(baseline["scenarios"]) == 4
+    assert {scenario["next_stage_dispatched"]
+            for scenario in baseline["scenarios"]} == {"yes", "no"}
     for scenario in baseline["scenarios"]:
         assert set(scenario["exit_code"]) == {"watcher", "runner"}
+        assert not scenario["evidence_ptr"].startswith(("/var/folders/", "/tmp/"))
     prompts = _text(PROMPTS)
     assert "四要素" in prompts and "状态脊" in prompts
 

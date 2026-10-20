@@ -1,0 +1,6 @@
+WRITE step=1 dispatch stage
+ACTION step=1 launch-runner
+WRITE step=2 verdict
+WRITE step=2 next_stage
+ACTION step=2 dispatch-next-stage
+WRITE step=3 retries_consumed

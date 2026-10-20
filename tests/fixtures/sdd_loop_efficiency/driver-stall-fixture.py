@@ -2,7 +2,7 @@
 """Driver-side stall observation fixture (SC-010, [[STR-007]]).
 
 This fixture is the single execution body for the stall behavior baseline. It
-drives three controlled scenarios against the real ``watch-target.sh`` of a
+drives four controlled scenarios against the real ``watch-target.sh`` of a
 supplied worktree, executes the documented U4/U5 driver program below, and
 reads the seven observed fields back from the artifacts it wrote.
 
@@ -11,6 +11,8 @@ Documented driver program (identical for record and replay)
 U2  write the dispatch marker to the line state spine, then start the stub
     runner (write-before-action).
 U3  run ``watch-target.sh`` in a bounded window and parse its verdict line.
+U4  DONE -> write ``verdict=done`` and ``next_stage=<stage>`` to the spine,
+    append ``next_stage=<stage>`` to ``dispatch.log``, then dispatch.
 U4  INCOMPLETE -> write ``verdict`` / ``stall_state=incomplete-fake-done`` to
     the spine; do not dispatch a next stage.
 U5  FAILED -> consume retries starting from ``--initial-retries`` (only 0 is
@@ -23,11 +25,17 @@ Field values are observed, never transcribed: the fixture does not contain an
 expected verdict/state tuple and never reads field values out of a baseline
 file except when comparing a replay against it (SB-5).
 
+Per-scenario artifacts (spine, events, dispatch log, watcher output, status,
+runner rc, escalation package) are copied to ``--evidence-dir`` (default: a
+durable sibling of ``--out``) before the temporary run root is deleted, so
+``evidence_ptr`` never points at a removed temp directory.
+
 Modes
 -----
   driver-stall-fixture.py --record --worktree PATH --out JSON
+                           [--evidence-dir DIR]
   driver-stall-fixture.py --replay --worktree PATH --baseline JSON --out JSON
-                           [--initial-retries 0]
+                           [--evidence-dir DIR] [--initial-retries 0]
   driver-stall-fixture.py --self-test
 
 Python >= 3.8, standard library only.
@@ -45,7 +53,8 @@ import time
 from pathlib import Path
 
 RETRY_LIMIT = 2
-SCENARIOS = ("timeout", "retry-limit", "fake-done")
+SCENARIOS = ("timeout", "retry-limit", "fake-done", "success")
+NEXT_STAGE = "review"
 WATCHER_REL = "skills/external/sdd-loop-driver/scripts/watch-target.sh"
 
 
@@ -116,6 +125,13 @@ case "$scenario" in
   fake-done)
     printf 'exit=0 at=%s sentinel=0\n' "$(date +%s)" > "$dir/status-$attempt.tmp"
     mv "$dir/status-$attempt.tmp" "$dir/status-$attempt"
+    printf 'runner_rc=0\n' > "$dir/runner-rc-$attempt"
+    exit 0
+    ;;
+  success)
+    printf 'exit=0 at=%s sentinel=1\n' "$(date +%s)" > "$dir/status-$attempt.tmp"
+    mv "$dir/status-$attempt.tmp" "$dir/status-$attempt"
+    printf 'FIXTURE-DONE\n' > "$dir/log-$attempt.log"
     printf 'runner_rc=0\n' > "$dir/runner-rc-$attempt"
     exit 0
     ;;
@@ -248,8 +264,15 @@ def run_scenario(worktree, scenario, root_dir, initial_retries):
         if verdict in ("DONE", "INCOMPLETE"):
             step += 1
             spine_write(spine_path, events_path, step, "verdict=%s" % verdict)
-            spine_write(spine_path, events_path, step,
-                        "stall_state=incomplete-fake-done")
+            if verdict == "DONE":
+                spine_write(spine_path, events_path, step,
+                            "next_stage=%s" % NEXT_STAGE)
+                append_text(dispatch_path, "next_stage=%s at=%s\n"
+                            % (NEXT_STAGE, now_epoch()))
+                spine_action(events_path, step, "dispatch-next-stage")
+            else:
+                spine_write(spine_path, events_path, step,
+                            "stall_state=incomplete-fake-done")
             break
         if verdict == "FAILED":
             if retries < RETRY_LIMIT:
@@ -334,8 +357,28 @@ def normalize_record(record):
     clone = json.loads(json.dumps(record))
     for scenario in clone.get("scenarios", []):
         pointer = scenario.get("evidence_ptr", "")
-        scenario["evidence_ptr"] = os.path.basename(pointer)
+        parts = Path(pointer).parts
+        scenario["evidence_ptr"] = "/".join(parts[-2:]) if len(parts) >= 2 else pointer
     return clone
+
+
+def persist_evidence(scenarios, evidence_root, out):
+    root = Path(evidence_root)
+    if root.exists():
+        shutil.rmtree(root)
+    root.mkdir(parents=True)
+    base = Path(out).resolve().parent
+    for scenario in scenarios:
+        temp_spine = Path(scenario["evidence_ptr"])
+        target = root / scenario["scenario"]
+        shutil.copytree(str(temp_spine.parent), str(target))
+        durable_spine = target / temp_spine.name
+        try:
+            scenario["evidence_ptr"] = os.path.relpath(
+                str(durable_spine.resolve()), str(base))
+        except ValueError:
+            scenario["evidence_ptr"] = str(durable_spine.resolve())
+    return scenarios
 
 
 def compare_records(baseline, replay):
@@ -354,10 +397,11 @@ def compare_records(baseline, replay):
     return differences
 
 
-def record(worktree, out):
+def record(worktree, out, evidence_dir):
     root_dir = tempfile.mkdtemp(prefix="stall-fixture-")
     try:
         scenarios = run_all_scenarios(worktree, root_dir, 0)
+        scenarios = persist_evidence(scenarios, evidence_dir, out)
         record_data = {
             "base_commit": git_commit(worktree),
             "recorded_at": now_epoch(),
@@ -370,11 +414,12 @@ def record(worktree, out):
         shutil.rmtree(root_dir, ignore_errors=True)
 
 
-def replay(worktree, baseline_path, out, initial_retries):
+def replay(worktree, baseline_path, out, initial_retries, evidence_dir):
     baseline = json.loads(Path(baseline_path).read_text(encoding="utf-8"))
     root_dir = tempfile.mkdtemp(prefix="stall-replay-")
     try:
         scenarios = run_all_scenarios(worktree, root_dir, initial_retries)
+        scenarios = persist_evidence(scenarios, evidence_dir, out)
         replay_data = {
             "base_commit": git_commit(worktree),
             "recorded_at": now_epoch(),
@@ -387,7 +432,7 @@ def replay(worktree, baseline_path, out, initial_retries):
         write_text(
             out,
             json.dumps(
-                {"differences": differences, "replay": normalized_replay},
+                {"differences": differences, "replay": replay_data},
                 indent=2,
                 ensure_ascii=False,
             ) + "\n",
@@ -403,6 +448,8 @@ def self_test():
     failures = []
     try:
         first = run_all_scenarios(str(repo_root), root_dir, 0)
+        baseline_out = Path(root_dir) / "baseline-a.json"
+        persist_evidence(first, Path(root_dir) / "evidence-a", baseline_out)
         second_root = tempfile.mkdtemp(prefix="stall-selftest-2-")
         try:
             second = run_all_scenarios(str(repo_root), second_root, 0)
@@ -422,6 +469,11 @@ def self_test():
                 failures.append("%s: watcher exit code not from the verdict table" % name)
             if not isinstance(scenario["exit_code"], dict) or "runner" not in scenario["exit_code"]:
                 failures.append("%s: exit_code must carry both watcher and runner" % name)
+            pointer = Path(scenario["evidence_ptr"])
+            if not pointer.is_absolute():
+                pointer = baseline_out.parent / pointer
+            if not pointer.is_file():
+                failures.append("%s: evidence_ptr does not resolve (%s)" % (name, pointer))
         if not failures:
             for scenario in first:
                 if scenario["watcher_verdict"] == "TIMEOUT":
@@ -432,6 +484,15 @@ def self_test():
                         failures.append("retry-limit: retries_consumed not at limit")
                     if scenario["escalation_package_complete"] != "true":
                         failures.append("retry-limit: escalation package incomplete")
+                elif scenario["watcher_verdict"] == "DONE":
+                    if scenario["next_stage_dispatched"] != "yes":
+                        failures.append("success: next stage not dispatched")
+                    dispatch = Path(scenario["evidence_ptr"])
+                    if not dispatch.is_absolute():
+                        dispatch = baseline_out.parent / dispatch
+                    dispatch = dispatch.parent / "dispatch.log"
+                    if "next_stage=" not in read_text(dispatch):
+                        failures.append("success: dispatch.log lacks next_stage=")
                 elif scenario["watcher_verdict"] == "INCOMPLETE":
                     if scenario["next_stage_dispatched"] != "no":
                         failures.append("fake-done: next stage dispatched")
@@ -442,6 +503,13 @@ def self_test():
         mutated["scenarios"][0]["watcher_verdict"] = "MUTATED"
         if not compare_records(normalize_record(record_a), mutated):
             failures.append("comparison did not flag a changed verdict")
+
+        mutated_dispatch = normalize_record({"initial_retries": 0, "scenarios": first})
+        for scenario in mutated_dispatch["scenarios"]:
+            if scenario["scenario"] == "success":
+                scenario["next_stage_dispatched"] = "no"
+        if not compare_records(normalize_record(record_a), mutated_dispatch):
+            failures.append("comparison did not flag a changed dispatch decision")
     finally:
         shutil.rmtree(root_dir, ignore_errors=True)
 
@@ -461,6 +529,7 @@ def main(argv=None):
     parser.add_argument("--worktree")
     parser.add_argument("--out")
     parser.add_argument("--baseline")
+    parser.add_argument("--evidence-dir")
     parser.add_argument("--initial-retries", type=int, default=0)
     args = parser.parse_args(argv)
 
@@ -475,12 +544,20 @@ def main(argv=None):
         return self_test()
     if not args.worktree or not args.out:
         parser.error("--worktree and --out are required")
+    base_dir = Path(args.out).resolve().parent
+    if args.evidence_dir:
+        evidence_dir = args.evidence_dir
+    elif args.record:
+        evidence_dir = str(base_dir / "stall-evidence")
+    else:
+        evidence_dir = str(base_dir / "stall-evidence-replay")
     if args.record:
-        record(args.worktree, args.out)
+        record(args.worktree, args.out, evidence_dir)
         return 0
     if not args.baseline:
         parser.error("--replay requires --baseline")
-    differences = replay(args.worktree, args.baseline, args.out, args.initial_retries)
+    differences = replay(args.worktree, args.baseline, args.out,
+                         args.initial_retries, evidence_dir)
     if differences:
         for difference in differences:
             print("DIFF: %s" % difference)

@@ -236,22 +236,24 @@ CLI 观测段（`cli_observations`）由 Feature 064 的 `data-model.md` E10 定
 
 **定位**：SC-010 的行为比较对象。路径固定为 spec-dir 下的 [[STR-007]]，在实现首个行为面提交之前录制；它不是状态脊实体，不改变 E1–E8 实体计数，也不消耗全量测试预算槽位。
 
-**录制对象**：实际行为基线提交 `a1aac7e5`（规格冻结读数 `ba2a18db` 不适用：其后的首个行为面提交为 `9e69f3de`，按 FR-038 取首个行为面改动前的父提交；差异记录于状态脊与 plan.md § Plan Repair Record 第 5 轮）上的三类场景：
+**录制对象**：实际行为基线提交 `a1aac7e5`（规格冻结读数 `ba2a18db` 不适用：其后的首个行为面提交为 `9e69f3de`，按 FR-038 取首个行为面改动前的父提交；差异记录于状态脊与 plan.md § Plan Repair Record 第 5 轮）上的三类卡死场景，外加一个成功完成的正控场景：
 
 | 场景 | 处置结果 |
 |------|----------|
 | 超时（TIMEOUT） | watcher 判 TIMEOUT |
 | 重试上限（stalled） | 状态脊卡死状态 + 四要素上送件齐备 |
 | 伪完成（退出 rc=0 且哨兵缺失） | 判 INCOMPLETE，不派发下一阶段 |
+| 成功（DONE） | 写 `next_stage=<stage>` 到 `dispatch.log` 并派发，`next_stage_dispatched=yes` |
 
 **每个元组字段**：`watcher_verdict`、`exit_code`（对象：`{"watcher": <int>, "runner": <int>}`，分别记录 watcher 判定退出码与 runner/CLI rc；MUST NOT 合并为一个值）、`spine_stall_state`、`retries_consumed`、`escalation_package_complete`（或 `not-applicable`）、`next_stage_dispatched`（`yes|no`）、`spine_write_before_action`（`yes|no`）、`evidence_ptr`。文件根字段：`base_commit`、`recorded_at`、`initial_retries`（固定为 `0`）、`scenarios[]`。
 
 **录制与比较约束**：
 - SB-1：基线 MUST 在实现首个行为面提交之前录制；录制时点、`base_commit` 与 `initial_retries=0` MUST 写入状态脊（E8 stall baseline 行）。
-- SB-2：三类场景（超时 / 重试上限 / 伪完成）MUST 统一由**驱动侧可执行夹具**（`tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py`）驱动并观测：stub runner 产生受控 pid/status/heartbeat/runner-log 与 rc，真实 `watch-target.sh` 提供 U3 判定，夹具执行文档化的 U4/U5 驱动侧程序（状态脊先写后动、重试消耗、四要素上送件、下一阶段派发决策）并从状态脊/status/退出记录读取七个字段。watcher 自动夹具只提供 U3 判定，不得被当作驱动侧字段来源；录制 trace 仅可作为端到端补充证据，MUST NOT 替代夹具观测。
-- SB-3：收口 MUST 用同一可执行夹具与同一 `initial_retries=0` 在当前树上重放并生成 final 记录；比较前归一化剔除时间戳、PID、绝对路径与耗时。
+- SB-2：三类卡死场景（超时 / 重试上限 / 伪完成）MUST 统一由**驱动侧可执行夹具**（`tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py`）驱动并观测：stub runner 产生受控 pid/status/heartbeat/runner-log 与 rc，真实 `watch-target.sh` 提供 U3 判定，夹具执行文档化的 U4/U5 驱动侧程序（状态脊先写后动、重试消耗、四要素上送件、下一阶段派发决策）并从状态脊/status/退出记录读取七个字段。另以一个成功完成场景作为正控，使 `next_stage_dispatched` 在 `yes` 与 `no` 两个方向都可观测；正控不替代三类卡死场景。watcher 自动夹具只提供 U3 判定，不得被当作驱动侧字段来源；录制 trace 仅可作为端到端补充证据，MUST NOT 替代夹具观测。
+- SB-3：收口 MUST 用同一可执行夹具与同一 `initial_retries=0` 在当前树上重放并生成 final 记录；比较前归一化剔除时间戳、PID、绝对路径与耗时，证据指针按「场景目录/文件名」比较。
 - SB-4：逐字段比较；任何字段差异 MUST 判回归并修复，MUST NOT 以归因豁免。名称级测试失败基线只服务 SC-012，MUST NOT 用于 SC-010。
 - SB-5（反转录）：夹具 MUST NOT 从判定表/场景→期望值映射填充字段，MUST NOT 从基线文件回填；字段值 MUST 由受控场景中的实际观测产生。夹具 MAY 断言内部一致性（如 `runner` 子字段等于 status 文件的 `exit`、`watcher` 子字段等于 watcher 进程退出码），但 MUST NOT 断言或写入硬编码的期望元组。`retries_consumed` MUST 从 `initial_retries=0` 起按实际重试逐步累加；`spine_write_before_action` MUST 由状态脊写入与动作执行的可复核顺序产生。
+- SB-6（证据持久化）：每场景的 spine/status/watcher/dispatch/escalation 等证据 MUST 在临时运行根删除前复制到 spec-dir notes 下的持久目录；`evidence_ptr` MUST 指向该持久位置的相对路径，MUST NOT 指向已删除的临时目录。
 
 ## CLI Capability Profile / CLI Observation（归属 064，仅指针）
 

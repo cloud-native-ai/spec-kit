@@ -27,7 +27,7 @@
 - DoD-9: Quickstart S1–S7 are executed; S7 is a recorded dry-run decision trace (no nested driver launch) and its non-CI status is stated.
 - DoD-10: Feature 058 detail and index are updated with the 063 implementation record **and the missing 063 checklist-stage record** (F-01 governance correction); status remains `Implemented`, never rolled back.
 
-**DoD Status**: green (2026-10-20) — 53/53 task rows closed, 24/24 deliverables present, 50/50 clauses covered by named tests, 24/24 mutation applications red-then-restored, SC-001…SC-013 recorded with evidence classes, SC-010 replayed with zero differences; closure full suite remains driver-owned after review.
+**DoD Status**: green (2026-10-20) — 53/53 task rows closed, 24/24 deliverables present, 50/50 clauses covered by named tests, 24/24 mutation applications red-then-restored, SC-001…SC-013 recorded with evidence classes, SC-010 replayed with zero differences; closure full suite remains driver-owned after review. **Post-review repair (2026-10-20)**: P0/F1 and P1/F2/F3/F6/F7 fixed; SC-003/SC-005/SC-012 are `pending` until the driver closure and E3 rows land (see `verification.md` § Post-Review Repair and `review.md` §9).
 
 ## Completion Gate
 

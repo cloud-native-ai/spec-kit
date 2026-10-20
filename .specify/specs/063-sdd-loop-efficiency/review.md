@@ -422,3 +422,36 @@
 ## 8. Feedback
 
 Please share the contents of this document with the spec-kit framework developers.
+
+## 9. Post-Review Repair Disposition (2026-10-20)
+
+This section records what changed after the review. Findings not listed here keep their original status; nothing was removed or downgraded.
+
+| Finding | Disposition | Evidence |
+|---------|-------------|----------|
+| F1 (P0) | **Closed** | `audit-test-budget.py` now iterates every `E3_STAGES` entry; a missing or empty evidence file stays in the denominator, reports `unknown`, and exits 1. `test_stages_complete_summary` now expects the full applicable denominator; new `test_missing_stage_evidence_fails`, `test_empty_stage_evidence_fails`, and `test_missing_evidence_directory_fails` cover the reverse direction. Unit suite: `25 passed`. Real 063 spec-dir output: `slots=baseline:1 closure:0 ... unknown=6`, `stages=6 complete=0`, `status=fail`, exit 1 (was `stages=0 complete=0`, `status=ok`). |
+| F2 (P1) | **Closed for this feature** | `verification.md` marks SC-003 and SC-012 `pending (driver closure)`; both files now carry explicit closing rules forbidding `pass` before the closure E2 row and `comm -13` evidence exist. `templates/commands/implement.md` was **not** modified — see plan.md § Plan Repair Record 第 6 轮 for the scope decision; the framework-level change needs its own feature. |
+| F3 + F7 (P1/P2) | **Closed** | Fixture adds a `success` scenario that writes `next_stage=review` to `dispatch.log`; `fake-done` keeps `next_stage_dispatched=no`, so the field is observed in both directions. Per-scenario artifacts are copied to `notes/stall-evidence/` before the temp root is deleted; `evidence_ptr` is a durable relative path. Baseline re-recorded on the frozen `a1aac7e5` worktree with four scenarios; replay on the current tree: `differences: []`. Self-test also mutates the dispatch decision and requires the comparison to fail. |
+| F6 (P2) | **Closed** | Root cause: `run_single` could end at the polling-window boundary before the deadline was observed, because the window was not extended until a TIMEOUT verdict appeared. The window now starts at `max(window, deadline+grace)` whenever a deadline and grace are configured. A zero-window regression case pins the behavior; six consecutive self-test runs report `34 passed, 0 failed` (33 prior cases + the new pin). GATE-2 is updated accordingly. |
+| F4 (P1) | **Open, now visible** | The feature's own run still has no E3 `stage-status` rows for clarify/plan/tasks/checklist/analyze/review. The F1 fix makes this impossible to hide: the real spec-dir audit reports `stages=6 complete=0`, exit 1. Closure must either write the E3 rows from the actual stage runs or record the failure; SC-005 stays pending until then. |
+| F5, F8–F12 | **Unchanged** | Still open at their original severity; this repair round did not touch their surfaces. |
+
+### Closing rules (applied from this review onward)
+
+1. An SC whose evidence class includes **driver closure** MUST be `pending (driver closure)` until the closure E2 row and the name-level `comm -13` artifact exist. It MUST NOT be reported as `pass` before then.
+2. An SC whose evidence is a live run of the feature's own lifecycle (for example SC-005's stage-evidence completeness) MUST remain `pending` until the corresponding E3 rows exist; automated tests prove the mechanism, not the run.
+3. Closing a P0/P1 code finding does not turn any pending SC green. Closing rules are restated in `verification.md` and are the review-side counterpart of the plan's scope decision.
+
+## 10. Efficiency Case Study Input (2026-10-20)
+
+The dated case study `notes/efficiency-case-study-2026-10-20.md` is part of this review's evidence and is committed with the feature. It records the measured cost of developing 063/064 in this run (063 wall-clock ≈20.5 h, three analyze runs and three repair passes, one restart after a suspected hang) and the root causes. It is a dated record, not a normative rule.
+
+Its key recommendations and their routing:
+
+1. **Large-feature decomposition gate** before plan: more than 30 FR or 40 tasks should split into subfeatures instead of driving the full chain in one line. 063 (43 FR / 53 tasks) and 064 (68 FR / 82 tasks) both exceeded the medium fast-lane interval; the fast lane correctly refused them, but there was no decomposition path. Route: future requirements/plan gate; not silently widened in this feature.
+2. **Cross-feature overlap pre-check** at requirements/clarify for shared skill assets, CLI profiles, and probe objects. Route: F10 / REC-W2; the 063/064 CLI-profile churn is the observed cost.
+3. **Per-task-group commits and stream-json/grace**: treat `TIMEOUT` as a budget verdict, not a kill signal, and treat hook timeouts as non-blocking warnings. Route: driver recipes/status surface (F11/F12 are adjacent).
+4. **Move deterministic checks earlier** (counts, references, clause/task mapping) to cut analyze repair loops. Route: F9 / REC-W3.
+5. **Dogfood the two-slot budget** with targeted sets between the two full runs, and pin the audit denominator with missing-evidence cases. The denominator pin is closed by F1 in this round; the two-slot dogfood remains a closure/next-feature obligation.
+6. **Keep independent review**: it found a real P0; do not merge with a P0 open.
+7. **Feedback markers**: the case is also recorded in the local feedback store with `sdd-loop-efficiency` and `token-efficiency`; the runtime feedback file is intentionally not committed.

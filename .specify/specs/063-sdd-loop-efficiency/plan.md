@@ -361,3 +361,19 @@ Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓）；契约文件 5（原
 - `tasks.md` 的 T001 兜底检测显式化为「先跑 git log 复核、确认 9e69f3de、取 a1aac7e5」，T022 增补「每适用阶段恰一条 stage-status」；tasks.md 不是 plan-owned 制品。
 
 **不重审理由**：本轮只纠正已披露基线的提交取值与措辞收窄，按 FR-038/SC-010 的既有兜底条款执行，不改变四项优化的范围、FR/SC 语义、架构、数据模型语义或任务分解，属于 FR-022(a) 所称「修复既有缺陷所必需」。
+
+## Plan Repair Record（2026-10-20，第 6 轮：post-review repair，P0/P1 + 效率案例）
+
+**触发**：review.md 的 P0/F1（test-budget 完整性分母静默缩小）、P1/F2（driver closure 前误报 pass）、P1/F3+F7（`next_stage_dispatched` 同义反复、`evidence_ptr` 指向已删除临时目录）、P1/F6（watcher grace 自检抖动）与 `notes/efficiency-case-study-2026-10-20.md` 的案例输入要求。修复保持判据只增不减：缺失/空证据计入分母并报 `unknown`（exit 1）；基线增加成功派发正控；watcher 增加零窗口回归钉。
+
+**PLAN-EDIT 声明**：
+
+- `PLAN-EDIT: plan.md — 新增第 6 轮记录与 scope 决策；分类=minor（记录修复范围与判据变化），理由=review F1/F2/F3/F6/F7 与效率案例输入。`
+- `PLAN-EDIT: data-model.md — § Stall Behavior Baseline 录制对象增加成功完成正控，SB-2 明确双向观测，SB-3 明确按场景相对路径比较，新增 SB-6 证据持久化；分类=minor（证据程序澄清，不改变 E1–E8 实体、字段或 SC 判据），理由=review F3/F7。`
+- `PLAN-EDIT: contracts/delivery-and-invariants.md — DI-03 明确成功正控与 durability 要求；分类=minor（证据程序澄清，不降低任何 MUST），理由=review F3/F7。`
+- `audit-test-budget.py` 与 `tests/unit/test_audit_test_budget.py`：P0 修复，属实现面而非 plan-owned 制品；分母改为全部适用阶段，缺失/空证据计 `unknown` 并判失败。
+- `tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py`、`tests/contract/test_sdd_loop_driver_efficiency.py`、`skills/external/sdd-loop-driver/scripts/watch-target.sh` 与 `references/efficiency-model.md`：实现/技能面修复，不是 plan-owned 制品。
+
+**Scope 决策（templates/commands/implement.md）**：本轮**不**修改 `templates/commands/implement.md`。driver-closure `pending` 规则作为 dated closing rule 落在本特性的 `review.md` 与 `verification.md`，并明确「closure E2 行 + `comm -13` 证据落地前不得报 pass」。理由：修改框架命令提示词会改变所有下游项目的 implement 行为，属于跨项目能力变更，应在独立特性中按完整 SDD 链设计并测试；本次 post-review repair 只关闭 063 的 P0/P1，不扩大范围。
+
+**不重审理由**：本轮只修复已批准判据的正确实现（分母、双向观测、持久证据、确定性自检）并记录案例输入；不改变 FR/SC 语义、四项优化范围、架构或任务分解。判据只增强不削弱：P0 使审计可失败，SC-010 基线由三场景扩为三场景+正控，watcher 自检新增回归钉。

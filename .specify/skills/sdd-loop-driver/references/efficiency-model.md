@@ -115,7 +115,8 @@ implement 内 MUST NOT 再运行第二次全量套件；其内部回归比较义
 每次定向运行记录：命令、选择依据、所选路径 `selected_paths[]`、充分性 `sufficiency`、rc、passed/failed、新增失败 `new_failures[]`、比较基线。每个**适用阶段**（`clarify` / `plan` / `tasks` / `checklist` / `analyze` / `review`）恰有一条 `row_type=stage-status` 行；整阶段缺行计入完整性分母，MUST NOT 静默缩小分母。
 
 - `not-run-docs-only` 按**六项缩减字段集**判完整：`stage`、`row_type=stage-status`、`status`、`selection_basis`、`changed_paths[]`、`evidence_ptr`；运行字段不适用，MUST NOT 报 `unknown`。
-- 快车道按 §1 授权跳过 `checklist` 时，该阶段记 `not-applicable-skipped-stage`（[[STR-008]]），以 E1 准入记录 + [[STR-003]] 为联结证据；MUST NOT 记为 `unknown`，MUST NOT 计入完整性分母。
+- 快车道按 §1 授权跳过 `checklist` 时，该阶段记 `not-applicable-skipped-stage`（[[STR-008]]），以 E1 准入记录 + [[STR-003]] 为联结证据；MUST NOT 记为 `unknown`，MUST NOT 计入完整性分母。缺失联结证据的 skip 视为未授权：阶段计入分母并报 `unknown`。
+- 证据文件整体缺失、文件为空、或没有唯一 `stage-status` 行时，该阶段仍计入分母并报 `unknown` + 违规（审计 exit 1）；MUST NOT 静默跳过或缩小分母。
 - `unknown` 只用于证据缺失；收口审计输出 `stages=N complete=N`（N = 适用阶段总数，含文档型阶段）。
 
 ### 2.5 审计、例外与修复

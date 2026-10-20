@@ -1,8 +1,8 @@
 {
   "differences": [],
   "replay": {
-    "base_commit": "8d6413a326ad7b23a13a436e50cedce019f619c8",
-    "recorded_at": 1792499962,
+    "base_commit": "a108ff116e503bcb78375e7347bb0a28baee68f2",
+    "recorded_at": 1792501912,
     "initial_retries": 0,
     "scenarios": [
       {
@@ -17,7 +17,7 @@
         "escalation_package_complete": "true",
         "next_stage_dispatched": "no",
         "spine_write_before_action": "yes",
-        "evidence_ptr": "spine.md"
+        "evidence_ptr": "stall-evidence-replay/timeout/spine.md"
       },
       {
         "scenario": "retry-limit",
@@ -31,7 +31,7 @@
         "escalation_package_complete": "true",
         "next_stage_dispatched": "no",
         "spine_write_before_action": "yes",
-        "evidence_ptr": "spine.md"
+        "evidence_ptr": "stall-evidence-replay/retry-limit/spine.md"
       },
       {
         "scenario": "fake-done",
@@ -45,7 +45,21 @@
         "escalation_package_complete": "not-applicable",
         "next_stage_dispatched": "no",
         "spine_write_before_action": "yes",
-        "evidence_ptr": "spine.md"
+        "evidence_ptr": "stall-evidence-replay/fake-done/spine.md"
+      },
+      {
+        "scenario": "success",
+        "watcher_verdict": "DONE",
+        "exit_code": {
+          "watcher": 0,
+          "runner": 0
+        },
+        "spine_stall_state": "",
+        "retries_consumed": 0,
+        "escalation_package_complete": "not-applicable",
+        "next_stage_dispatched": "yes",
+        "spine_write_before_action": "yes",
+        "evidence_ptr": "stall-evidence-replay/success/spine.md"
       }
     ]
   }

@@ -9,8 +9,9 @@ Checks: exactly two full-suite slots per line (baseline + closure), no third
 slot, in-slot reruns only after closure, explicit out-of-slot exceptions,
 environment failures that consume no slot, name-level closure comparison,
 missing evidence reported as ``unknown`` (never zero), optional stage-log scan
-for unaccounted full runs, and per-stage ``stage-status`` completeness with the
-fast-lane skip linkage.
+for unaccounted full runs, and per-stage ``stage-status`` completeness over the
+full applicable-stage denominator (a missing or empty evidence file stays in the
+denominator and reports ``unknown``).
 
 Exit codes: 0 pass, 1 audit failure, 2 input or parse error.
 
@@ -336,31 +337,36 @@ def stage_status_complete(row):
 def check_stages(evidence, spine_text, violations, unknown):
     admission = parse_admission(spine_text)
     problem = admission_problem(admission, spine_text)
-    skip_claimed = any(
-        row.get("status") == SKIP_STATUS
-        for rows in evidence.values() for row in rows)
-    if skip_claimed and problem:
-        unknown[0] += 1
-        violations.append("fast-lane skip untrusted: %s" % problem)
     stages = 0
     complete = 0
     for stage in E3_STAGES:
         rows = evidence.get(stage)
         if rows is None:
+            stages += 1
+            unknown[0] += 1
+            violations.append(
+                "%s: stage evidence file missing; counted in the completeness "
+                "denominator (unknown)" % stage)
             continue
         status_rows = [row for row in rows if row.get("row_type") == "stage-status"]
         if any(row.get("status") == SKIP_STATUS for row in status_rows):
             if stage != "checklist":
+                stages += 1
                 unknown[0] += 1
                 violations.append("%s: skipped-stage status outside checklist" % stage)
                 continue
             if problem:
+                stages += 1
+                unknown[0] += 1
+                violations.append("fast-lane skip untrusted for %s: %s"
+                                  % (stage, problem))
                 continue
             continue
         stages += 1
         if len(status_rows) != 1:
-            violations.append("%s: expected exactly one stage-status row, found %d"
-                              % (stage, len(status_rows)))
+            unknown[0] += 1
+            violations.append("%s: expected exactly one stage-status row, found %d "
+                              "(unknown)" % (stage, len(status_rows)))
             continue
         if stage_status_complete(status_rows[0]):
             complete += 1

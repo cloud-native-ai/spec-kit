@@ -1,6 +1,6 @@
 {
   "base_commit": "a1aac7e5f8a6174d8cf26b0c1665c539dad3383d",
-  "recorded_at": 1792494509,
+  "recorded_at": 1792501870,
   "initial_retries": 0,
   "scenarios": [
     {
@@ -15,7 +15,7 @@
       "escalation_package_complete": "true",
       "next_stage_dispatched": "no",
       "spine_write_before_action": "yes",
-      "evidence_ptr": "/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/stall-fixture-pnmw7bbp/timeout-run/timeout/spine.md"
+      "evidence_ptr": "stall-evidence/timeout/spine.md"
     },
     {
       "scenario": "retry-limit",
@@ -29,7 +29,7 @@
       "escalation_package_complete": "true",
       "next_stage_dispatched": "no",
       "spine_write_before_action": "yes",
-      "evidence_ptr": "/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/stall-fixture-pnmw7bbp/retry-limit-run/retry-limit/spine.md"
+      "evidence_ptr": "stall-evidence/retry-limit/spine.md"
     },
     {
       "scenario": "fake-done",
@@ -43,7 +43,21 @@
       "escalation_package_complete": "not-applicable",
       "next_stage_dispatched": "no",
       "spine_write_before_action": "yes",
-      "evidence_ptr": "/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/stall-fixture-pnmw7bbp/fake-done-run/fake-done/spine.md"
+      "evidence_ptr": "stall-evidence/fake-done/spine.md"
+    },
+    {
+      "scenario": "success",
+      "watcher_verdict": "DONE",
+      "exit_code": {
+        "watcher": 0,
+        "runner": 0
+      },
+      "spine_stall_state": "",
+      "retries_consumed": 0,
+      "escalation_package_complete": "not-applicable",
+      "next_stage_dispatched": "yes",
+      "spine_write_before_action": "yes",
+      "evidence_ptr": "stall-evidence/success/spine.md"
     }
   ]
 }

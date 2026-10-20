@@ -621,6 +621,11 @@ run_single() {
   local window_end=$((START_EPOCH + WINDOW)) grace_end=0 grace_used=0 now remaining sleep_for
   if [ "$ONCE" -eq 0 ] && [ "$DEADLINE_EPOCH" -gt 0 ] && [ "$DEADLINE_GRACE" -gt 0 ]; then
     grace_end=$((DEADLINE_EPOCH + DEADLINE_GRACE))
+    # A deadline call must sample through the deadline (and its grace) even
+    # when the polling window is shorter: the first evaluation can cross the
+    # window boundary under load and return RUNNING before the deadline is
+    # ever observed.
+    [ "$window_end" -lt "$grace_end" ] && window_end=$grace_end
   fi
   while :; do
     maybe_renew_lease
@@ -630,7 +635,6 @@ run_single() {
       # Deadline reached but the process may still complete: keep sampling
       # through the grace window instead of returning TIMEOUT immediately.
       grace_used=1
-      [ "$window_end" -lt "$grace_end" ] && window_end=$grace_end
     elif [ "$V_CODE" -ne "$EXIT_RUNNING" ]; then
       [ "$grace_used" -eq 1 ] && [ "$V_CODE" -eq "$EXIT_TIMEOUT" ] && V_REASON="deadline-grace-expired"
       emit_single
@@ -858,6 +862,13 @@ self_test() {
   check grace-timeout 14 TIMEOUT "${r%%$'\n'*}" "${r#*$'\n'}"
   printf '%s\n' "${r#*$'\n'}" | grep -q 'reason=deadline-grace-expired' \
     || bad "grace-timeout-reason" "grace expiry reason missing: ${r#*$'\n'}"
+
+  # 7d. a polling window shorter than the deadline+grace must not return
+  # RUNNING before the deadline is observed (load-independent regression pin)
+  r=$(watch --label zero-window --pid-file "$base/pid6" --status-file "$base/none6" \
+    --log "$base/none6" --sentinel PLAN-DONE --timeout 1 --deadline-grace 2 \
+    --window 0 --interval 1 --start-grace 0)
+  check zero-window 14 TIMEOUT "${r%%$'\n'*}" "${r#*$'\n'}"
 
   # 8. no signals at all => NO_SIGNAL (zero-match path must not fake completion)
   r=$(watch --label nosignal --pid-file "$base/none8" --status-file "$base/none8" \

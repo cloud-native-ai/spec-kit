@@ -24,10 +24,18 @@ Single execution body for the SC-010 behavior baseline. It creates a stub
 runner (controlled pid/status/heartbeat/runner-log and rc), calls the real
 `watch-target.sh` of the supplied worktree for the U3 verdict, runs the
 documented U4/U5 driver program, and reads the seven observed fields back from
-the state spine, status file, runner log and dispatch log. It never contains an
+the state spine, status file, runner log and dispatch log. The four scenarios
+are timeout, retry-limit, fake-done (INCOMPLETE, no next-stage dispatch) and
+success (DONE, writes `next_stage=<stage>` to `dispatch.log`), so
+`next_stage_dispatched` is observed in both directions. It never contains an
 expected tuple and never backfills from a baseline file (SB-5). `--record`,
 `--replay` and `--self-test` are the only modes; `--initial-retries` accepts
 only `0`.
+
+Per-scenario artifacts are copied to `--evidence-dir` (default: a
+`stall-evidence` / `stall-evidence-replay` sibling of `--out`) before the
+temporary run root is deleted, and `evidence_ptr` is rewritten to that durable
+relative path.
 
 ## Self-check (2026-10-20)
 

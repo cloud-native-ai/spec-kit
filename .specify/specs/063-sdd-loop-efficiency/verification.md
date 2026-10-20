@@ -104,12 +104,19 @@ recording), **driver closure** (owned by the driver after review).
 
 - Quickstart S3: exit `0`, `slots=baseline:1 closure:1 reruns=0 exceptions=0
   unknown=0`, `stages=0 complete=0`, `status=ok` (details in
-  `notes/quickstart-run.md`).
-- Live 063 spine (`/tmp/sdd-loop-efficiency/state.md`):
-  `audit-test-budget.py --spine ... --spec-dir .specify/specs/063-sdd-loop-efficiency
-  --stage-check implement` → exit `0`, `slots=baseline:1 closure:0 ...`,
-  `stages=0 complete=0`. `baseline_slot=consumed`; closure remains driver-owned
-  after review. Implement ran no second full suite.
+  `notes/quickstart-run.md`). The S3 fixture has no E3 stage rows; the corrected
+  audit (post-review repair) evaluates it against the full denominator, so this
+  historical S3 output is superseded by the T022 repair record below.
+- Live 063 spine (`/tmp/sdd-loop-efficiency/state.md`), **post-review repair
+  (2026-10-20)**: `audit-test-budget.py --spine ... --spec-dir
+  .specify/specs/063-sdd-loop-efficiency --stage-check implement` → exit `1`,
+  `slots=baseline:1 closure:0 reruns=0 exceptions=0 unknown=6
+  environment_failures=0`, `stages=6 complete=0`, `status=fail` with one
+  `stage evidence file missing` reason per E3 stage. The old `stages=0
+  complete=0 status=ok` output was the P0/F1 defect; the corrected audit makes
+  the missing E3 evidence visible (F4 remains open for closure).
+  `baseline_slot=consumed`; closure remains driver-owned after review.
+  Implement ran no second full suite.
 - E2 fence is the only ledger; `test-evidence/implement.jsonl` carries one E3
   reference row and is never audited as a ledger (I-05).
 
@@ -202,8 +209,9 @@ recording), **driver closure** (owned by the driver after review).
   `sentinel=0`).
 - `watch-target.sh`: `--raw-stream` visibility (`stream=na|absent|growing|idle`,
   `raw=`/`bytes=` on EVIDENCE, never a verdict input); four stream self-tests
-  plus a `stream-progress-not-done` sub-check. Self-test: `33 passed, 0 failed`
-  (28 historical + 4 stream cases + the progress sub-check; no case deleted).
+  plus a `stream-progress-not-done` sub-check. Self-test: `34 passed, 0 failed`
+  (28 historical + 4 stream cases + the progress sub-check + the post-review
+  zero-window deadline pin; no case deleted).
 
 ### T039/T040 — owner document, recipes, prompts, mirror (automated)
 
@@ -239,7 +247,8 @@ recording), **driver closure** (owned by the driver after review).
 
 ### T043 — post-mutation re-run (automated)
 
-- `57 passed in 13.48s`, exit 0; watcher self-test `33 passed, 0 failed`;
+- `57 passed in 13.48s`, exit 0; watcher self-test `34 passed, 0 failed`
+  (post-review: six consecutive runs, all `34/0`);
   quickstart S4/S5 re-run identical. No self-test case was removed by the
   repairs. US4 checkpoint closed.
 
@@ -308,15 +317,27 @@ recording), **driver closure** (owned by the driver after review).
 - Trace: `notes/s7-dry-run-trace.md` (recorded, non-CI). Fast lane: admission
   exit 0, `decision=fast-lane`, 12/25, seven pass, checklist skipped. Control:
   exit 1, `decision=full-chain`, `checklist=executed`.
-- Replay: `driver-stall-fixture.py --replay ... --initial-retries 0` →
-  `PASS: replay matches baseline`, `differences: []`; scenarios:
-  `timeout TIMEOUT {14,124} stalled-timeout`,
-  `retry-limit FAILED {12,1} stalled-retry-limit retries=2`,
-  `fake-done INCOMPLETE {15,0} incomplete-fake-done, dispatch=no`.
+- **Post-review repair (2026-10-20)**: the baseline was re-recorded on a
+  detached worktree at `a1aac7e5` with the updated fixture (three stall
+  scenarios + a `success` positive control) and durable evidence under
+  `notes/stall-evidence/<scenario>/`. `next_stage_dispatched` is `yes` for
+  `success` (dispatch.log contains `next_stage=review`) and `no` for the three
+  stall scenarios, so the field is no longer tautological.
+- Replay: `driver-stall-fixture.py --replay ... --initial-retries 0
+  --evidence-dir notes/stall-evidence-replay` → `PASS: replay matches
+  baseline`, `differences: []`; scenarios:
+  `timeout TIMEOUT {14,124} stalled-timeout dispatch=no`,
+  `retry-limit FAILED {12,1} stalled-retry-limit retries=2 dispatch=no`,
+  `fake-done INCOMPLETE {15,0} incomplete-fake-done dispatch=no`,
+  `success DONE {0,0} next_stage=review dispatch=yes`.
 - Mutations on fixture copies (original untouched): non-zero initial retries →
   `rc=1` `DIFF: initial_retries`; transcribed field → `rc=1`
   `DIFF: spine_stall_state`; write-before-action flip → `rc=1`
-  `DIFF: spine_write_before_action`. SB-5 proven.
+  `DIFF: spine_write_before_action`; post-review dispatch flip → `rc=1`
+  `DIFF: success:next_stage_dispatched`. The fixture self-test also flips the
+  dispatch decision internally and requires the comparison to fail. SB-5
+  proven. The post-review dispatch application is a repair regression check;
+  the implementation-time mutation total remains 7 groups / 24 applications.
 
 ### T052 — final verification
 
@@ -325,7 +346,7 @@ recording), **driver closure** (owned by the driver after review).
 | Gate | Result |
 |------|--------|
 | GATE-1 targeted set | `144 passed in 118.48s`, exit 0 |
-| GATE-2 watcher self-test | `33 passed, 0 failed` (28 historical + 4 stream cases + progress sub-check) |
+| GATE-2 watcher self-test | `34 passed, 0 failed` (28 historical + 4 stream cases + progress sub-check + zero-window deadline pin); post-review: six consecutive runs all `34/0` |
 | GATE-3 mirror pair | `diff -rq` exit 0; `--check` `ok (21 files)` |
 | GATE-4 compile face | `74 units, zero drift` |
 | GATE-5 validators | tasks `0 error / 0 warning`; requirements `0 error / 0 warning` |
@@ -341,20 +362,31 @@ row appended demonstrates the closure view: `slots=baseline:1 closure:1`,
 
 **Success criteria** (evidence class: automated / recorded trace / driver closure)
 
+**Closing rules (post-review repair, 2026-10-20)**:
+
+1. An SC whose evidence class includes **driver closure** MUST be `pending
+   (driver closure)` until the closure E2 row and the name-level `comm -13`
+   artifact exist; it MUST NOT be reported as `pass` before then.
+2. An SC whose evidence is a live run of this feature's own lifecycle (SC-005's
+   stage-evidence completeness) MUST remain `pending` until the E3
+   `stage-status` rows exist. Automated tests prove the mechanism, not the run.
+3. These rules are mirrored in `review.md` § 9; no pending criterion may be
+   turned green by closing a code finding alone.
+
 | SC | Status | Evidence |
 |----|--------|----------|
 | SC-001 | pass (automated) | admission unit + FL tests: every fast-lane run carries the E1 record; no recordless skip |
 | SC-002 | pass (automated + recorded trace) | S1/S2 + S7 trace: medium skips checklist (0 dispatches), analyze/review kept; large refused |
-| SC-003 | pass (automated + driver closure) | ledger audit two slots, exceptions visible; closure slot is driver-owned |
+| SC-003 | **pending (driver closure)** | ledger audit unit tests green (`25 passed`, including two-slot/exception/rerun cases); real spine audit is `slots=baseline:1 closure:0` — no closure E2 row exists yet. Closure slot is driver-owned and MUST land before merge. |
 | SC-004 | pass (automated) | injected regression found by name diff; count-only closure rejected |
-| SC-005 | pass (automated) | audit tests: `stages=N complete=N`, docs-only reduced fields, skipped stage excluded, unknown reported |
+| SC-005 | **pending (self-application evidence, F4)** | audit behavior is green (`25 passed`, full denominator incl. missing/empty evidence; real spec-dir audit reports `stages=6 complete=0`, exit 1). The feature's own E3 `stage-status` rows do not exist yet, so the 100% completeness outcome is not met. |
 | SC-006 | pass (automated) | plan audit tests + PC clauses: every touch classified; undeclared/substantive gate-fail; no silent re-review |
 | SC-007 | pass (automated) | derive latency trace test + zero-fabrication count + no agent sleep |
 | SC-008 | pass (automated) | local nohup survival + `--once` no-redispatch integration tests |
 | SC-009 | pass (automated) | non-terminal sentinel → INCOMPLETE; terminal result → DONE; derive failure never fake DONE |
-| SC-010 | pass (recorded replay, executable fixture) | `stall-behavior-baseline-final.json`, `differences: []`, `initial_retries=0`, `exit_code={watcher,runner}`; 3 mutations fail the comparison |
+| SC-010 | pass (recorded replay, executable fixture) | `stall-behavior-baseline.json` re-recorded at `a1aac7e5` with 3 stall scenarios + success positive control; `stall-behavior-baseline-final.json`, `differences: []`, `initial_retries=0`, `exit_code={watcher,runner}`; `next_stage_dispatched` observed as both `yes` and `no`; evidence pointers durable under `notes/stall-evidence*/`; 3 manual mutations + the self-test dispatch mutation fail the comparison |
 | SC-011 | pass (automated) | auto probe degradation marker; no fake DONE; no stage failure caused by degradation |
-| SC-012 | pass (automated) | 74 contract tests green (C-3/C-4 intentional); mirror pair 0 drift + zero NEW drift; name-level new failures empty |
+| SC-012 | **pending (driver closure)** | 74 contract tests green (C-3/C-4 intentional); mirror pair 0 drift + zero NEW drift. The name-level new-failure result requires the closure full suite and `comm -13`; neither exists yet. |
 | SC-013 | pass (recorded trace) | 063 ran the full chain; checklist/analyze artifacts present; zero fast-lane records |
 
 **G-01 edge cases**
@@ -383,3 +415,116 @@ row appended demonstrates the closure view: `slots=baseline:1 closure:1`,
   archive or Probe Object.
 - The E2 ledger lives only in the spine fence; `test-evidence/implement.jsonl`
   is an E3 reference copy, never audited as a ledger.
+
+## Post-Review Repair (2026-10-20, P0/P1 + efficiency case input)
+
+This section records the repair of review findings F1 (P0), F2, F3, F6, F7
+(P1/P1/P2/P2) and the committed efficiency case study. F4 is disclosed as open.
+
+### P0 — F1 completeness denominator
+
+- **Red (pre-fix)**: with only `analyze.jsonl` present, the audit printed
+  `stages=1 complete=1`, `status=ok`, exit 0; `test_stages_complete_summary`
+  asserted the shrunken `(2, 2)`.
+- **Fix**: `check_stages` iterates every `E3_STAGES` entry. A missing file, an
+  empty file, or a non-unique `stage-status` row keeps the stage in the
+  denominator, increments `unknown`, and produces a violation (exit 1). An
+  unauthorized fast-lane skip is treated the same way; only an E1-linked
+  `checklist` skip is excluded.
+- **Green**: `bash scripts/bash/run-tests.sh tests/unit/test_audit_test_budget.py -q`
+  → `25 passed in 2.59s`. New reverse tests:
+  `test_missing_stage_evidence_fails`, `test_empty_stage_evidence_fails`,
+  `test_missing_evidence_directory_fails`; `test_stages_complete_summary` now
+  expects the full applicable denominator (5/5 with the authorized checklist
+  skip).
+- **Real 063 output**:
+  `slots=baseline:1 closure:0 reruns=0 exceptions=0 unknown=6
+  environment_failures=0`, `stages=6 complete=0`, `status=fail`, exit 1, one
+  `stage evidence file missing` reason per E3 stage. This matches SC-005's
+  required semantics and exposes F4 instead of hiding it.
+- Owner document updated: `references/efficiency-model.md` §2.4 (missing/empty
+  evidence and unauthorized skip semantics).
+
+### P1 — F2 closing rules
+
+- `review.md` §9 and this file's SC table now state: any SC whose evidence class
+  includes **driver closure** stays `pending (driver closure)` until the closure
+  E2 row and `comm -13` artifact exist; SC-005's self-application stays
+  `pending` until the E3 rows exist.
+- SC-003, SC-005, SC-012 are now `pending`; no code finding closes them.
+- **Scope decision**: `templates/commands/implement.md` was not modified. The
+  framework-level rule is recorded as a plan-repair scope decision
+  (plan.md § Plan Repair Record 第 6 轮) because changing every downstream
+  implement run is a cross-project capability change that needs its own
+  feature.
+
+### P1 — F3/F7 dispatch observability and durable evidence
+
+- Fixture: four scenarios (`timeout`, `retry-limit`, `fake-done`, `success`).
+  `success` writes `next_stage=review` to `dispatch.log` and the spine;
+  `fake-done` keeps no dispatch. `next_stage_dispatched` is therefore observed
+  as both `yes` and `no`.
+- Evidence: per-scenario artifacts are copied to `notes/stall-evidence/`
+  (baseline) and `notes/stall-evidence-replay/` (replay) before the temp root
+  is removed; `evidence_ptr` is a durable relative path.
+- Baseline re-recorded on a detached `a1aac7e5` worktree (base_commit
+  preserved). Replay on the current tree:
+  `PASS: replay matches baseline`, `differences: []`.
+- Mutation drill: `initial_retries`, `spine_stall_state`,
+  `spine_write_before_action`, and the new `success:next_stage_dispatched`
+  all fail the comparison (`rc=1`); the self-test additionally flips the
+  dispatch decision internally. Original fixture untouched.
+- Contract DI-03 now pins four scenarios and both dispatch values, and rejects
+  temp-directory evidence pointers.
+
+### P1 — F6 watcher grace determinism
+
+- **Root cause**: the polling window was `START_EPOCH + WINDOW` and was only
+  extended after a TIMEOUT verdict was already observed. When the first
+  evaluation crossed the window boundary under load, `run_single` could exit
+  `RUNNING` (`exit 10`) before the deadline was ever seen.
+- **Fix**: when a deadline and `--deadline-grace` are configured, the window end
+  starts at `max(START_EPOCH + WINDOW, DEADLINE_EPOCH + DEADLINE_GRACE)`.
+  Deadline supersedes window expiry.
+- **Regression pin**: new self-test case `7d zero-window` uses `--window 0
+  --timeout 1 --deadline-grace 2` and must return `TIMEOUT` (exit 14); the old
+  code deterministically returned `RUNNING` (exit 10).
+- **Reproducibility**: six consecutive
+  `bash skills/external/sdd-loop-driver/scripts/watch-target.sh --self-test`
+  runs all reported `34 passed, 0 failed`. No case was deleted; the count grew
+  from 33 to 34 by the new pin. GATE-2 above is updated.
+
+### Efficiency case study input
+
+- `notes/efficiency-case-study-2026-10-20.md` is committed with this feature and
+  is referenced by `review.md` §10 and this repair section. It records the
+  measured 063/064 development cost, root causes (feature size, over-specified
+  cross-layer specs, late overlap, long uncommitted subagent runs, incomplete
+  two-slot dogfood, hook/monitoring noise), and seven recommendations.
+- Routed recommendations: large-feature decomposition gate, cross-feature
+  overlap pre-check, per-task-group commits, `TIMEOUT` as budget verdict (not a
+  kill signal), non-blocking hook timeouts, earlier deterministic checks,
+  two-slot dogfood with missing-evidence pins.
+- Feedback store: one local entry recorded via `feedback-utils.py --action
+  record --unit-id "/speckit.implement" --unit-type command` with markers
+  `sdd-loop-efficiency` and `token-efficiency`; the runtime feedback file is
+  intentionally not committed.
+
+### Test evidence (post-repair)
+
+| Check | Result |
+|-------|--------|
+| `tests/unit/test_audit_test_budget.py` | `25 passed in 2.59s` |
+| 063 targeted set (admission, budget, plan-changes, derive, runner, regression, efficiency contract, skill contract) | `147 passed in 116.43s` (was 144; +3 new audit reverse tests) |
+| Watcher self-test | six consecutive runs, `34 passed, 0 failed` |
+| Fixture self-test | `PASS: driver-stall-fixture self-test` |
+| Fixture replay | `PASS: replay matches baseline`, `differences: []` |
+| Mirror pair | `diff -rq` exit 0; `sync-mirrors.py --check --only skills/external/sdd-loop-driver` → `ok (21 files)` |
+| Compile embeds | `74 units, zero drift` |
+| Validators | requirements `0 error / 0 warning`; tasks `0 error / 0 warning` |
+| Full suite | Not run in this repair (closure is driver-owned); T002 baseline remains `68 failed, 4115 passed, 1 skipped` |
+
+**F4 remains open**: no E3 `stage-status` rows exist for the feature's own
+clarify/plan/tasks/checklist/analyze/review stages. The corrected audit reports
+this as `stages=6 complete=0` and exit 1; closure must write those rows from the
+actual stage runs or record the failure.
