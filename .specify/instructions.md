@@ -70,6 +70,17 @@ Every fact — a concept's meaning, a normative rule, a threshold, an enumerated
 
 Owner-selection order, the duplicate conditions, the counts/enumerations rules, and the disagreement procedure: `.specify/shared/guidelines/one-source-of-truth.md`.
 
+## Concurrent Development Safety (并发开发安全)
+
+Parallel branches and agent flows share one git history, so any machine-managed file that several flows rewrite is a merge-conflict hotspot. Storage design MUST assume concurrent writers:
+
+- **Records are per-entry files (记录类数据一文一件)**: append-only observations — run records, scores, evidence runs, feedback entries, memory entries, logs — MUST land as one file per entry, with a timestamp or stable entry id in the filename; they MUST NOT share one `.jsonl` stream or one mutable aggregate. Two branches running the same command must add different paths (or no path), so git merges them without conflict.
+- **Derived indexes are rebuilt, never shared state (派生索引即读即建)**: an index reconstructible from the entries MUST be rebuilt on read or kept per entry; never commit a mutable aggregate that every flow rewrites. A legacy monolithic store stays readable as a read-only fallback and is never rewritten.
+- **Single-owner state is the exception (单一所有者的状态除外)**: canonical registries (`features.md`, `register.md`, `glossary.md`), the constitution/instructions, and authored knowledge aggregates stay single files by design — conflicts there are semantic merges, not layout defects. A mutable processing state (e.g. a progress manifest) stays single-file only while no two flows are expected to write it concurrently; otherwise split it per key.
+- **Verify before shipping (先验证再落地)**: every new or changed store ships a test that simulates two writers and asserts they produce distinct paths.
+
+Before creating or changing a machine-managed store, ask: **what happens if two branches run this at the same time?** If the answer is "they write the same path", the layout is wrong.
+
 ## Task Complexity Rubric
 
 Right-size your thinking to the task: under-thinking complex or high-stakes tasks causes defects and rework (a **quality** cost); over-thinking trivial tasks wastes time and adds noise (an **efficiency** cost). Classify each task by scope/size, uncertainty/novelty, blast radius/reversibility, cross-cutting impact, and requirements clarity, then adopt the matching depth — **Trivial → Minimal**, **Standard → Moderate**, **Complex → Deep**, **High-stakes/Ambiguous → Exhaustive**. Tie-break to the **higher tier** (blast radius and requirements clarity dominate); treat unclassifiable tasks as **Standard** (the default), and treat unclear/under-specified requirements as themselves a High-stakes signal — clarify before proceeding.

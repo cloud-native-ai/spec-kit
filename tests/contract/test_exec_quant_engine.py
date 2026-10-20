@@ -150,17 +150,69 @@ def run_via_host_wrapper(args, env_home: Path, host_name: str = "qodercli",
     return subprocess.run(cmd, capture_output=True, text=True, timeout=240, env=env)
 
 
+def store_dir(ws: Path) -> Path:
+    return ws / ".specify" / "memory" / "exec-quant"
+
+
+def records_dir(ws: Path) -> Path:
+    return store_dir(ws) / "records"
+
+
+def scores_dir(ws: Path) -> Path:
+    return store_dir(ws) / "scores"
+
+
 def records_path(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "exec-quant" / "records.jsonl"
+    """Legacy single-file store, readable but never written since the split."""
+    return store_dir(ws) / "records.jsonl"
 
 
 def scores_path(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "exec-quant" / "scores.jsonl"
+    return store_dir(ws) / "scores.jsonl"
 
 
 def read_jsonl(path: Path) -> list:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
             if line.strip()]
+
+
+def read_records(ws: Path) -> list:
+    entries = read_jsonl(records_path(ws)) if records_path(ws).is_file() else []
+    if records_dir(ws).is_dir():
+        entries += [json.loads(path.read_text(encoding="utf-8"))
+                    for path in sorted(records_dir(ws).glob("*.json"))]
+    return entries
+
+
+def read_scores(ws: Path) -> list:
+    entries = read_jsonl(scores_path(ws)) if scores_path(ws).is_file() else []
+    if scores_dir(ws).is_dir():
+        entries += [json.loads(path.read_text(encoding="utf-8"))
+                    for path in sorted(scores_dir(ws).glob("*.json"))]
+    return entries
+
+
+def record_files(ws: Path) -> list:
+    return sorted(records_dir(ws).glob("*.json")) if records_dir(ws).is_dir() else []
+
+
+def store_snapshot(ws: Path) -> dict:
+    root = store_dir(ws)
+    if not root.is_dir():
+        return {}
+    return {p.relative_to(root).as_posix(): p.read_bytes()
+            for p in root.rglob("*")
+            if p.is_file() and p.name != ".write.lock"}
+
+
+def records_snapshot(ws: Path) -> dict:
+    return {name: payload for name, payload in store_snapshot(ws).items()
+            if name == "records.jsonl" or name.startswith("records/")}
+
+
+def scores_snapshot(ws: Path) -> dict:
+    return {name: payload for name, payload in store_snapshot(ws).items()
+            if name == "scores.jsonl" or name.startswith("scores/")}
 
 
 def collect_args(ws: Path, unit_id="/speckit.plan", **over):
@@ -229,7 +281,7 @@ def assert_field_binary_law(record):
 
 
 def load_single_record(ws: Path) -> dict:
-    records = read_jsonl(records_path(ws))
+    records = read_records(ws)
     assert len(records) == 1, f"expected 1 record, found {len(records)}"
     return records[0]
 
@@ -263,8 +315,12 @@ class TestCollectContract:
     def test_collect_writes_storage_and_record(self, ws, fake_home):
         result = run_engine(collect_args(ws), env_home=fake_home)
         assert result.returncode == 0, result.stderr
-        assert records_path(ws).is_file()
-        assert scores_path(ws).is_file()
+        assert records_dir(ws).is_dir()
+        assert scores_dir(ws).is_dir()
+        entry_files = record_files(ws)
+        assert len(entry_files) == 1, f"expected one entry file, found {entry_files}"
+        assert re.fullmatch(r"\d{8}T\d{12}Z-[0-9a-f]{8}\.json", entry_files[0].name), (
+            f"entry filename must be timestamp-based: {entry_files[0].name}")
         record = load_single_record(ws)
         # V3: kind literal + schema_version (061 v2)
         assert record["kind"] == KIND
@@ -282,7 +338,7 @@ class TestCollectContract:
         assert isinstance(record["run_id"], str) and record["run_id"]
         # collect text output names run_id and the landing path
         assert record["run_id"] in result.stdout
-        assert str(records_path(ws)) in result.stdout
+        assert str(records_dir(ws)) in result.stdout
 
     def test_collect_explicit_run_id(self, ws, fake_home):
         result = run_engine(collect_args(ws, run_id="run-x1"), env_home=fake_home)
@@ -370,11 +426,12 @@ class TestCollectContract:
         second = run_engine(collect_args(ws, run_id="dup-1"), env_home=fake_home)
         assert second.returncode == 0, second.stderr
         assert "duplicate" in (second.stdout + second.stderr).lower()
-        assert len(read_jsonl(records_path(ws))) == 1
+        assert len(read_records(ws)) == 1
+        assert len(record_files(ws)) == 1
 
     def test_collect_write_failure_exits_1_with_visible_stderr(self, ws, fake_home):
-        records_path(ws).parent.mkdir(parents=True, exist_ok=True)
-        records_path(ws).mkdir()  # a directory where the append-only file must be
+        records_dir(ws).parent.mkdir(parents=True, exist_ok=True)
+        records_dir(ws).write_text("occupied", encoding="utf-8")  # a file where a dir must be
         result = run_engine(collect_args(ws), env_home=fake_home)
         assert result.returncode == 1
         assert result.stderr.strip(), "failure must be visible on stderr"
@@ -605,7 +662,7 @@ class TestListRecords:
 
     def test_filter_by_run_id(self, ws, fake_home):
         _collect_two_units(ws, fake_home)
-        records = read_jsonl(records_path(ws))
+        records = read_records(ws)
         run_id = records[0]["run_id"]
         result = run_engine(["--action", "list-records", "--workspace-root", str(ws),
                              "--run-id", run_id, "--format", "json"],
@@ -635,7 +692,7 @@ class TestListRecords:
 
     def test_scores_joined_latest_scored_at_wins(self, ws, fake_home):
         _collect_two_units(ws, fake_home)
-        record = read_jsonl(records_path(ws))[0]
+        record = read_records(ws)[0]
         run_engine(["--action", "score", "--workspace-root", str(ws),
                     "--unit-id", record["unit_id"], "--run-id", record["run_id"],
                     "--score", "3"], env_home=fake_home)
@@ -653,19 +710,20 @@ class TestListRecords:
 
 
 class TestScoreAction:
-    """动作三 score: append-only scores.jsonl, precondition, bounds."""
+    """动作三 score: append-only score entries, precondition, bounds."""
 
     def test_score_appends_only_to_scores(self, ws, fake_home):
         run_engine(collect_args(ws), env_home=fake_home)
-        before = records_path(ws).read_bytes()
+        before = records_snapshot(ws)
         result = run_engine(["--action", "score", "--workspace-root", str(ws),
                              "--unit-id", "/speckit.plan", "--run-id",
-                             read_jsonl(records_path(ws))[0]["run_id"],
+                             read_records(ws)[0]["run_id"],
                              "--score", "4", "--note", "手测通过"],
                             env_home=fake_home)
         assert result.returncode == 0, result.stderr
-        assert records_path(ws).read_bytes() == before, "records.jsonl untouched"
-        scores = read_jsonl(scores_path(ws))
+        assert records_snapshot(ws) == before, "record entries must stay untouched"
+        assert not scores_path(ws).exists(), "new scores land in scores/, not the legacy file"
+        scores = read_scores(ws)
         assert len(scores) == 1
         entry = scores[0]
         assert entry["entry_type"] == "score"
@@ -684,7 +742,7 @@ class TestScoreAction:
 
     def test_score_bounds(self, ws, fake_home):
         run_engine(collect_args(ws), env_home=fake_home)
-        run_id = read_jsonl(records_path(ws))[0]["run_id"]
+        run_id = read_records(ws)[0]["run_id"]
         for bad in ("0", "6"):
             result = run_engine(["--action", "score", "--workspace-root", str(ws),
                                  "--unit-id", "/speckit.plan", "--run-id", run_id,
@@ -733,25 +791,27 @@ class TestScoreAction:
 # ===========================================================================
 
 class TestAppendOnly:
-    """V4: no action rewrites or reorders existing store lines."""
+    """V4: no action rewrites or reorders existing store entries."""
 
-    def test_actions_never_rewrite_existing_lines(self, ws, fake_home):
+    def test_actions_never_rewrite_existing_entries(self, ws, fake_home):
         run_engine(collect_args(ws, run_id="v4-a"), env_home=fake_home)
         run_engine(collect_args(ws, unit_id="skill:study-project", run_id="v4-b"),
                    env_home=fake_home)
-        records_before = records_path(ws).read_bytes()
-        scores_before = scores_path(ws).read_bytes()
+        records_before = records_snapshot(ws)
+        scores_before = scores_snapshot(ws)
         run_engine(["--action", "list-records", "--workspace-root", str(ws)],
                    env_home=fake_home)
         run_engine(["--action", "score", "--workspace-root", str(ws),
                     "--unit-id", "/speckit.plan", "--run-id", "v4-a", "--score", "3"],
                    env_home=fake_home)
         run_engine(collect_args(ws, run_id="v4-a"), env_home=fake_home)  # duplicate
-        assert records_path(ws).read_bytes() == records_before, \
-            "list/score/duplicate-collect must leave records.jsonl byte-identical"
-        scores_after = scores_path(ws).read_bytes()
-        assert scores_after.startswith(scores_before), "scores.jsonl must stay append-only"
-        assert len(scores_after.splitlines()) == len(scores_before.splitlines()) + 1
+        assert records_snapshot(ws) == records_before, \
+            "list/score/duplicate-collect must leave every record entry byte-identical"
+        scores_after = scores_snapshot(ws)
+        new_scores = set(scores_after) - set(scores_before)
+        assert len(new_scores) == 1, "exactly one score entry file is added"
+        for name, payload in scores_before.items():
+            assert scores_after[name] == payload, "existing score entries stay byte-identical"
 
 
 class TestSizeCap:
@@ -765,7 +825,9 @@ class TestSizeCap:
         result = run_via_host_wrapper(collect_args(ws), env_home=fake_home,
                                       wrapper_args=("x" * 70000,))
         assert result.returncode == 0, result.stderr
-        line = records_path(ws).read_text(encoding="utf-8").splitlines()[0]
+        entry_files = record_files(ws)
+        assert len(entry_files) == 1, f"expected one entry file, found {entry_files}"
+        line = entry_files[0].read_text(encoding="utf-8").splitlines()[0]
         assert len(line.encode("utf-8")) <= 64 * 1024 + 1, "record must fit the cap"
         record = json.loads(line)
         assert record["truncated"], "truncation must be annotated in the record"
@@ -804,9 +866,11 @@ class TestCredentialDefense:
 
     def test_zero_credential_shapes_across_the_store(self, ws, fake_home):
         run_engine(collect_args(ws), env_home=fake_home)
-        for line in records_path(ws).read_text(encoding="utf-8").splitlines():
-            for pattern in self.INDEPENDENT_SHAPES:
-                assert not pattern.search(line), f"credential shape in store: {pattern.pattern}"
+        for path in record_files(ws):
+            for line in path.read_text(encoding="utf-8").splitlines():
+                for pattern in self.INDEPENDENT_SHAPES:
+                    assert not pattern.search(line), (
+                        f"credential shape in store: {pattern.pattern}")
 
 
 class TestCarriedConsistency:
@@ -862,8 +926,8 @@ class TestNonBlocking:
             f"exceptions must not propagate: {result.stderr!r}"
 
     def test_write_failure_exits_1_cleanly(self, ws, fake_home):
-        records_path(ws).parent.mkdir(parents=True, exist_ok=True)
-        records_path(ws).mkdir()
+        records_dir(ws).parent.mkdir(parents=True, exist_ok=True)
+        records_dir(ws).write_text("occupied", encoding="utf-8")
         result = run_engine(collect_args(ws), env_home=fake_home)
         assert result.returncode == 1
         assert result.stderr.strip()

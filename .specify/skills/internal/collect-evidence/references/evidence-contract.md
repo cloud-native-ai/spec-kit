@@ -6,13 +6,14 @@
 
 ```text
 .specify/memory/evidence/
-├── index.json                       # 存储索引(store/updated/entries[])
 └── ev-<YYYYMMDD>-<HHMMSS>-<slug>/   # 一次证据运行(不可变)
     ├── findings.json                # 证据合同(下述)
     ├── manifest.json                # 运行元数据(泳道状态+reason、引擎信息、digest)
     ├── lanes/<lane>.json            # 各执行泳道的原始 envelope(已脱敏)
     └── intervention.json            # (可选)消费层写入的干预台账
 ```
+
+索引不落盘:`list` / `latest` / `compare` 每次从 `ev-*` 运行目录**即读即建**。并发流程各写独立运行目录,因此不存在共享可写索引文件,也不会产生合并冲突。(旧版 `index.json` 为只读残留,新引擎不再读取或写入。)
 
 ## findings.json 顶层字段(白名单,不多不少)
 
