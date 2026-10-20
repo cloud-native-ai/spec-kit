@@ -1,0 +1,52 @@
+{
+  "differences": [],
+  "replay": {
+    "base_commit": "8d6413a326ad7b23a13a436e50cedce019f619c8",
+    "recorded_at": 1792499962,
+    "initial_retries": 0,
+    "scenarios": [
+      {
+        "scenario": "timeout",
+        "watcher_verdict": "TIMEOUT",
+        "exit_code": {
+          "watcher": 14,
+          "runner": 124
+        },
+        "spine_stall_state": "stalled-timeout",
+        "retries_consumed": 0,
+        "escalation_package_complete": "true",
+        "next_stage_dispatched": "no",
+        "spine_write_before_action": "yes",
+        "evidence_ptr": "spine.md"
+      },
+      {
+        "scenario": "retry-limit",
+        "watcher_verdict": "FAILED",
+        "exit_code": {
+          "watcher": 12,
+          "runner": 1
+        },
+        "spine_stall_state": "stalled-retry-limit",
+        "retries_consumed": 2,
+        "escalation_package_complete": "true",
+        "next_stage_dispatched": "no",
+        "spine_write_before_action": "yes",
+        "evidence_ptr": "spine.md"
+      },
+      {
+        "scenario": "fake-done",
+        "watcher_verdict": "INCOMPLETE",
+        "exit_code": {
+          "watcher": 15,
+          "runner": 0
+        },
+        "spine_stall_state": "incomplete-fake-done",
+        "retries_consumed": 0,
+        "escalation_package_complete": "not-applicable",
+        "next_stage_dispatched": "no",
+        "spine_write_before_action": "yes",
+        "evidence_ptr": "spine.md"
+      }
+    ]
+  }
+}

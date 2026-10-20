@@ -10,6 +10,7 @@ red-first. The T046 coverage meta-test asserts that every clause id in
 ``contracts/*.md`` has its named function.
 """
 
+import json
 import re
 import subprocess
 import sys
@@ -563,3 +564,153 @@ def test_pd_10_runner_interface():
     allowed = {"argparse", "json", "os", "re", "sys", "time", "pathlib"}
     assert set(imports) <= allowed, "unexpected import: %s" % (set(imports) - allowed)
     assert "jq" not in derive
+
+
+# ------------------------------------------------------------------ DI-01
+
+
+def test_di_01_confirmation_gates_unchanged():
+    skill = _text(SKILL_MD)
+    assert "push" in skill
+    assert "确认门" in skill or "确认" in skill
+    docs = _text(DOCS_PAGE)
+    assert "确认门" in docs or "确认" in docs
+
+
+# ------------------------------------------------------------------ DI-02
+
+
+def test_di_02_independent_verification_unchanged():
+    prompts = _text(PROMPTS)
+    assert "独立校验" in prompts
+    assert "校验者不是该阶段的执行子代理" in prompts
+    skill = _text(SKILL_MD)
+    assert "独立校验" in skill
+
+
+# ------------------------------------------------------------------ DI-03
+
+
+def test_di_03_stall_handling_unchanged():
+    fixture = _text(REPO_ROOT / "tests" / "fixtures" / "sdd_loop_efficiency"
+                    / "driver-stall-fixture.py")
+    assert "initial_retries" in fixture
+    assert "exit_code" in fixture
+    assert "watch-target.sh" in fixture
+    baseline = json.loads((SPEC_DIR / "notes" / "stall-behavior-baseline.json")
+                          .read_text(encoding="utf-8"))
+    assert baseline["initial_retries"] == 0
+    assert len(baseline["scenarios"]) == 3
+    for scenario in baseline["scenarios"]:
+        assert set(scenario["exit_code"]) == {"watcher", "runner"}
+    prompts = _text(PROMPTS)
+    assert "四要素" in prompts and "状态脊" in prompts
+
+
+# ------------------------------------------------------------------ DI-04
+
+
+def test_di_04_quality_gates_not_weakened():
+    skill = _text(SKILL_MD)
+    assert "analyze" in skill and "review" in skill
+    assert "不可省略" in skill
+    efficiency = _text(EFFICIENCY)
+    assert "不削弱" in efficiency or "MUST NOT 改变" in efficiency
+    assert "测试预算" in efficiency
+
+
+# ------------------------------------------------------------------ DI-05
+
+
+def test_di_05_delivery_and_mirror():
+    docs = _text(DOCS_PAGE)
+    assert "运行效率优化" in docs
+    check = _run([REPO_ROOT / "scripts" / "python" / "sync-mirrors.py",
+                  "--check", "--only", "skills/external/sdd-loop-driver"])
+    assert check.returncode == 0, check.stdout + check.stderr
+    for path in ("SKILL.md", "references/efficiency-model.md",
+                 "scripts/admission-check.py", "scripts/audit-test-budget.py",
+                 "scripts/audit-plan-changes.py", "scripts/derive-live-log.py",
+                 "scripts/stage-runner.sh", "scripts/watch-target.sh"):
+        assert (SKILL_DIR / path).exists(), "deliverable missing: %s" % path
+
+
+# ------------------------------------------------------------------ DI-06
+
+
+def test_di_06_contract_and_fixtures():
+    fixtures = REPO_ROOT / "tests" / "fixtures" / "sdd_loop_efficiency"
+    for path in ("medium", "large", "plan-repo", "state-spine-valid.md",
+                 "stream/non_terminal_sentinel.jsonl",
+                 "stream/result_sentinel.jsonl", "stream/malformed.jsonl",
+                 "stub-cli.sh", "driver-stall-fixture.py"):
+        assert (fixtures / path).exists(), "fixture missing: %s" % path
+    for path in ("tests/unit/test_admission_check.py",
+                 "tests/unit/test_audit_test_budget.py",
+                 "tests/unit/test_audit_plan_changes.py",
+                 "tests/unit/test_derive_live_log.py",
+                 "tests/integration/test_sdd_loop_efficiency_runner.py",
+                 "tests/integration/test_sdd_loop_efficiency_regression.py"):
+        assert (REPO_ROOT / path).exists(), "test missing: %s" % path
+
+
+# ------------------------------------------------------------------ DI-07
+
+
+def test_di_07_self_application():
+    requirements = _text(REQUIREMENTS)
+    assert "**FR-010**" in requirements
+    assert "完整阶段链" in requirements
+    assert (SPEC_DIR / "checklists" / "requirements.md").exists()
+    assert (SPEC_DIR / "checklists" / "efficiency.md").exists()
+    feature_ref = _text(SPEC_DIR / "feature-ref.md")
+    assert "自应用" in feature_ref
+    efficiency = _text(EFFICIENCY)
+    assert "063" in efficiency and "MUST NOT" in efficiency
+
+
+# ------------------------------------------------------------------ DI-08
+
+
+def test_di_08_backward_compatible():
+    docs = _text(DOCS_PAGE)
+    assert "progress=degraded" in docs
+    assert "完成判定不变" in docs
+    efficiency = _text(EFFICIENCY)
+    assert "完整链是缺省行为" in efficiency
+    prompts = _text(PROMPTS)
+    assert "sentinel" in prompts.lower() or "哨兵" in prompts
+    watch_help = _script_help("watch-target.sh")
+    assert "0 DONE" in watch_help and "15 INCOMPLETE" in watch_help
+
+
+# ------------------------------------------------------------------ DI-09
+
+
+def test_di_09_orchestration_layer_only():
+    efficiency = _text(EFFICIENCY)
+    assert "编排层" in efficiency
+    assert "框架命令内部" in efficiency
+    assert "显式排除" in efficiency
+    contract = _text(CONTRACTS / "delivery-and-invariants.md")
+    assert "DI-09" in contract and "编排层" in contract
+
+
+# ------------------------------------------------------- coverage meta-test
+
+
+def test_all_contract_clauses_have_named_tests():
+    source = Path(__file__).read_text(encoding="utf-8")
+    clauses = []
+    for contract in sorted(CONTRACTS.glob("*.md")):
+        text = contract.read_text(encoding="utf-8")
+        for match in re.finditer(r"^- \*\*(FL|TB|PC|PD|DI)-(\d{2})", text,
+                                 re.MULTILINE):
+            clauses.append((match.group(1), match.group(2)))
+    assert len(clauses) == 50, "expected 50 clauses, found %d" % len(clauses)
+    missing = []
+    for prefix, number in clauses:
+        name = "test_%s_%s_" % (prefix.lower(), number)
+        if ("def %s" % name) not in source:
+            missing.append("%s-%s" % (prefix, number))
+    assert not missing, "clauses without a named test: %s" % missing

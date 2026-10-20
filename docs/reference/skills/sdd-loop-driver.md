@@ -1,6 +1,6 @@
 # sdd-loop-driver（无人值守 SDD 循环驱动）
 
-**机制一句话**：以一条一遍性提示词驱动宿主 agent 完成「登录环境 → 以 qodercli 为子代理 → 按阶段推进 SDD 全流程 → 合并 main」的循环闭环，全程自推进、零用户提醒。真源：`skills/external/sdd-loop-driver/SKILL.md`（+ references/ 三份手册 + `scripts/watch-target.sh`）。
+**机制一句话**：以一条一遍性提示词驱动宿主 agent 完成「登录环境 → 以 qodercli 为子代理 → 按阶段推进 SDD 全流程 → 合并 main」的循环闭环，全程自推进、零用户提醒。真源：`skills/external/sdd-loop-driver/SKILL.md`（+ references/ 四份手册（含效率 owner `efficiency-model.md`）+ `scripts/`）。
 
 ## 加载与投递
 
@@ -44,6 +44,17 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 - **Deadline grace / TIMEOUT 不是可杀信号**：watcher 在 deadline 后继续采样 `--deadline-grace`（缺省 120s），晚完成重判 `DONE`/`FAILED`；收到 `TIMEOUT` 先 `--once` 最终快照，`pid=alive` + `heartbeat=fresh` 时优先延长/继续，停线须用户显式决定并保留 worktree/status/log。
 - **多线批量**：manifest 模式一次连接检查多条线，任一线终止即返回全部快照。
 - **pgrep 陷阱**：`pgrep -c` 零匹配会先打印 0 再以退出码 1 结束，`|| echo 0` 会追加第二个 0；存活判据一律用 PID 文件 + `kill -0`，watcher 自测覆盖零匹配、僵尸、PID 复用等反向用例。
+
+## 运行效率优化（Feature 063）
+
+四项编排层优化，规则与字段面 owner 是 skill 参考手册 `references/efficiency-model.md`：
+
+- **中型特性快车道**：仅入口携带 `fast-lane=opt-in` 时，在 tasks 后按七项机械判据裁决；录取则跳过 checklist、保留 analyze/review，判据失效即 fail-closed 回退完整链（默认仍是完整链）。
+- **两槽位测试预算**：每线只有 implement 起点 baseline 与 review 后 closure 两次全量；中间阶段与 review 用 `targeted-set-v1` 定向集并记录证据；槽外全量必须是有原因与证据的显式例外，缺失证据报 `unknown`。
+- **plan 只小修约束**：plan 完成后下游只允许小修并须 `PLAN-EDIT:` 声明；实质改动必须显式异常回传并由驱动按两分支处置；requirements 门内变更按最新锚点 re-baseline。
+- **进度可见与脱离**：阶段 runner 默认 stream-json，原始事件流与派生 live log 同时保留；本地与远端都用 `nohup` 脱离；`--once` 重入只核验、不重派。
+
+**日志形态变化（已披露）**：stream 模式新增 `raw-<line>-<stage>.jsonl` 与派生 `log-<line>-<stage>.log`；CLI 不支持该输出模式或派生失败时降级为既有缓冲模式，并在 status 记录 `progress=degraded` 与原因。完成判定不变：哨兵仍只认 live log 最后非空行，watcher 判定与退出码、确认门、独立校验与卡死处置均未改变。
 
 ## 并发归属与生命周期
 

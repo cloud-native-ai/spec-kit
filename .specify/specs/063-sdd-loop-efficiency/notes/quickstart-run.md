@@ -86,4 +86,20 @@ status=ok
 - Re-run after the mutation drill: same result (`1`, `undeclared=true`).
 - Cleanup: fixture tree and `/tmp/063-plan-edits.txt` removed.
 
-## S7 — pending (US5, recorded dry-run decision trace; non-CI)
+## S7 — recorded dry-run decision trace (non-CI)
+
+- Trace: `notes/s7-dry-run-trace.md` (no nested driver launch).
+- Fast lane: entry literal present → `admission-check.py` exit `0`,
+  `decision=fast-lane`, 12 FR / 25 tasks, seven pass, `checklist=skipped(fast-lane)`;
+  sequence skips checklist, keeps analyze/review, implement baseline, closure, merge.
+- Control: literal absent → exit `1`, `decision=full-chain`,
+  `checklist=executed`; full chain runs checklist.
+- Deterministic components referenced: S1–S6 evidence plus the SC-010 replay
+  (`differences: []`, `initial_retries=0`, `exit_code={watcher,runner}`).
+- **Non-CI**: the LLM-orchestrated stage sequence is a recorded trace, not a CI
+  test; CI covers the scripts/contracts only.
+- Driver-stall mutation drill (fixture copies, original restored): non-zero
+  initial retries → `rc=1` with `DIFF: initial_retries`; transcribed expected
+  field → `DIFF: spine_stall_state`; flipped write-before-action order →
+  `DIFF: spine_write_before_action`. All three must fail, proving SB-5.
+- Cleanup: temporary fixtures removed.

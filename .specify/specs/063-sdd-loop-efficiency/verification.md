@@ -242,3 +242,144 @@ recording), **driver closure** (owned by the driver after review).
 - `57 passed in 13.48s`, exit 0; watcher self-test `33 passed, 0 failed`;
   quickstart S4/S5 re-run identical. No self-test case was removed by the
   repairs. US4 checkpoint closed.
+
+## US5 — distribution, coverage and closure (T044–T052)
+
+### T044 — SKILL.md H2 + C-3 intentional update (automated)
+
+- `SKILL.md` gains the `Efficiency Optimizations（运行效率优化）` H2 (four-item
+  summary + `references/efficiency-model.md` owner pointer + script list) between
+  `Discipline Defaults` and `References`. The 064-owned
+  `CLI Capability Profiles` section is untouched.
+- `PINNED_H2_SECTIONS` updated with an in-file C-3 reason and date (2026-10-20).
+
+### T045 — C-4 intentional update (automated)
+
+- The `sed` derivation assertion is replaced by `stage-runner.sh`; the nohup,
+  heartbeat, stage-chain and closure assertions are retained. The in-file C-4
+  reason (single testable point, no per-stage copy drift) and date are recorded.
+
+### T046 — DI-01…DI-09 + coverage meta-test (automated)
+
+- Nine named DI tests pin confirmation gates, independent verification, stall
+  handling (fixture + `initial_retries=0` + `exit_code={watcher,runner}`),
+  quality gates, delivery/mirror, fixtures, self-application, backward
+  compatibility and orchestration-layer scope.
+- The coverage meta-test reads all five contract files and asserts every
+  `FL/TB/PC/PD/DI` clause id has its named test: **50/50**, total 50.
+
+### T047 — docs page (automated structure)
+
+- `docs/reference/skills/sdd-loop-driver.md` gains the four-optimization section,
+  discloses the new raw/live log files and `progress=degraded` fallback, and
+  states that completion verdicts are unchanged; existing topology/portability
+  content is retained.
+
+### T048 — mirror, compile face, 064 ownership guard
+
+- `sync-mirrors.py --write --only skills/external/sdd-loop-driver` → `ok (21 files)`;
+  `diff -rq` exit 0; `--check --only ...` exit 0 (owned pair 0 drift).
+- Wide `--check --only skills/external`: exit 2 with **62 DIFF**, path-for-path
+  identical to the frozen list `notes/baseline-mirror-diff-paths.txt` (`comm-23`
+  empty) → zero NEW drift. The recorded list spans **10** directories; the
+  plan prose's "12 directories" is a dated count inaccuracy — the recorded
+  artifact is authoritative and no path changed. Global zero drift is NOT claimed.
+- `probe-utils.py --action compile-embeds --check` → `74 units, zero drift`.
+- `tests/contract/test_sdd_loop_driver_cli_profiles.py -q` → `18 passed`,
+  including the 064-only `test_clp_17_no_063_duplicate_owner`; 063 keeps no
+  CLI-profile task/contract/test.
+
+### T049 — both contract files green (automated)
+
+- `tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_loop_driver_efficiency.py -q`
+  → `74 passed` (23 existing skill tests + 51 efficiency tests: 50 clause tests
+  + 1 coverage meta-test).
+
+### T050 — feature registry (governance)
+
+- `.specify/memory/features/058.md` Latest Review appends the 063 implementation
+  record and the previously missing **063 checklist-stage record**
+  (`checklists/efficiency.md`, 39 items = 31 pass / 8 recorded) — F-01 closed.
+- `.specify/memory/features.md` 058 row Last Updated notes the 063 implementation.
+  `Total Features` stays 62; no Feature created; status stays `Implemented`.
+
+### T051 — S7 trace, SC-010 replay, driver-stall mutations
+
+- Trace: `notes/s7-dry-run-trace.md` (recorded, non-CI). Fast lane: admission
+  exit 0, `decision=fast-lane`, 12/25, seven pass, checklist skipped. Control:
+  exit 1, `decision=full-chain`, `checklist=executed`.
+- Replay: `driver-stall-fixture.py --replay ... --initial-retries 0` →
+  `PASS: replay matches baseline`, `differences: []`; scenarios:
+  `timeout TIMEOUT {14,124} stalled-timeout`,
+  `retry-limit FAILED {12,1} stalled-retry-limit retries=2`,
+  `fake-done INCOMPLETE {15,0} incomplete-fake-done, dispatch=no`.
+- Mutations on fixture copies (original untouched): non-zero initial retries →
+  `rc=1` `DIFF: initial_retries`; transcribed field → `rc=1`
+  `DIFF: spine_stall_state`; write-before-action flip → `rc=1`
+  `DIFF: spine_write_before_action`. SB-5 proven.
+
+### T052 — final verification
+
+**Gates**
+
+| Gate | Result |
+|------|--------|
+| GATE-1 targeted set | `144 passed in 118.48s`, exit 0 |
+| GATE-2 watcher self-test | `33 passed, 0 failed` (28 historical + 4 stream cases + progress sub-check) |
+| GATE-3 mirror pair | `diff -rq` exit 0; `--check` `ok (21 files)` |
+| GATE-4 compile face | `74 units, zero drift` |
+| GATE-5 validators | tasks `0 error / 0 warning`; requirements `0 error / 0 warning` |
+| GATE-6 open rows | `0` after this closure |
+| GATE-7 deliverables | `24/24` present |
+| GATE-8 budget slots | real spine `--stage-check implement` → `slots=baseline:1 closure:0`, `status=ok`; closure remains driver-owned |
+
+**GATE-8 closure visibility**: the real spine's closure check fails until the
+driver appends the closure row (`closure check requires exactly 1 closure slot,
+found 0`) — this is the intended guard. A copy of the spine with a valid closure
+row appended demonstrates the closure view: `slots=baseline:1 closure:1`,
+`status=ok`. No closure full suite ran inside implement and the copy was deleted.
+
+**Success criteria** (evidence class: automated / recorded trace / driver closure)
+
+| SC | Status | Evidence |
+|----|--------|----------|
+| SC-001 | pass (automated) | admission unit + FL tests: every fast-lane run carries the E1 record; no recordless skip |
+| SC-002 | pass (automated + recorded trace) | S1/S2 + S7 trace: medium skips checklist (0 dispatches), analyze/review kept; large refused |
+| SC-003 | pass (automated + driver closure) | ledger audit two slots, exceptions visible; closure slot is driver-owned |
+| SC-004 | pass (automated) | injected regression found by name diff; count-only closure rejected |
+| SC-005 | pass (automated) | audit tests: `stages=N complete=N`, docs-only reduced fields, skipped stage excluded, unknown reported |
+| SC-006 | pass (automated) | plan audit tests + PC clauses: every touch classified; undeclared/substantive gate-fail; no silent re-review |
+| SC-007 | pass (automated) | derive latency trace test + zero-fabrication count + no agent sleep |
+| SC-008 | pass (automated) | local nohup survival + `--once` no-redispatch integration tests |
+| SC-009 | pass (automated) | non-terminal sentinel → INCOMPLETE; terminal result → DONE; derive failure never fake DONE |
+| SC-010 | pass (recorded replay, executable fixture) | `stall-behavior-baseline-final.json`, `differences: []`, `initial_retries=0`, `exit_code={watcher,runner}`; 3 mutations fail the comparison |
+| SC-011 | pass (automated) | auto probe degradation marker; no fake DONE; no stage failure caused by degradation |
+| SC-012 | pass (automated) | 74 contract tests green (C-3/C-4 intentional); mirror pair 0 drift + zero NEW drift; name-level new failures empty |
+| SC-013 | pass (recorded trace) | 063 ran the full chain; checklist/analyze artifacts present; zero fast-lane records |
+
+**G-01 edge cases**
+
+| Edge case | Evidence |
+|-----------|----------|
+| Multi-line ledger isolation | `test_multiline_ledger_isolation` (T016) |
+| `detached=no` unprotected | `test_detached_no_marks_unprotected` (T034/T037) |
+| Missing admission record at wrap-up | `test_missing_or_incomplete_admission_record_fails_closed` (T016/T019) |
+| Empty targeted-set escalation | `test_empty_selection_escalated_status` (T016/T019) |
+| Accumulated minor edits via final diff | `test_accumulated_minor_edits_use_final_diff` (T025/T027) |
+| Re-entry restores plan `active` | `test_pc_01_activation_point` / `test_pc_11_reanchoring` (T026/T028) |
+
+**Other closure checks**
+
+- Mutation totals: 7 target groups / 24 applications (T014 5 + T023 5 + T031 3 +
+  T042 8 + T051 3), each red and restored with checksums.
+- E4: `approved_baseline_commit=ed96d5c8`; four `rebaseline_events[]`; the latest
+  anchor is used. No `requirements.md` change occurred after T000, so no further
+  re-anchor was needed.
+- 063 has no fast-lane record; `checklists/requirements.md`,
+  `checklists/efficiency.md` and the analyze report
+  (`/tmp/sdd-loop-efficiency/log-sdd-loop-efficiency-analyze-rerun-3.log`) are in place.
+  Review is executed by the driver after implement.
+- 064 ownership: guard green; 063 contains no CLI-profile task, contract, test,
+  archive or Probe Object.
+- The E2 ledger lives only in the spine fence; `test-evidence/implement.jsonl`
+  is an E3 reference copy, never audited as a ledger.
