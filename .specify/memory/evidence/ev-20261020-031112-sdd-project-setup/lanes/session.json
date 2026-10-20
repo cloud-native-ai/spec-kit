@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 3,
+  "kind": "session-core-facts",
+  "scope": {
+    "platform": "qoder",
+    "workspace": "spec-kit",
+    "until": "2026-10-20T03:11:12.414Z",
+    "selection": "all-eligible",
+    "eligibleSessions": 32,
+    "selectedSessions": 32,
+    "sampled": false
+  },
+  "candidateSelection": {
+    "strategy": "agent-work-loop-portfolio-v1",
+    "availableClasses": {
+      "boundary-change": 4,
+      "lifecycle-demand": 1,
+      "operation-control": 9
+    },
+    "emittedClasses": {
+      "boundary-change": 4,
+      "lifecycle-demand": 1,
+      "operation-control": 5
+    }
+  },
+  "admission": {
+    "taskEpisodes": 53,
+    "candidateEpisodes": 15,
+    "distinctRequests": 9,
+    "emittedCandidates": 5
+  },
+  "populationCoverage": {
+    "withChanges": 0,
+    "withChecks": 0,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 1,
+    "withFrictionConsequence": 0
+  },
+  "observationCoverage": {
+    "withChanges": 0,
+    "withChecks": 0,
+    "withReviewedRelevantCheck": 0,
+    "withResultSignal": 0,
+    "withAssistantHandoff": 0,
+    "withStructuredCompletion": 0,
+    "withUserCorrection": 0,
+    "withExecutionFriction": 1,
+    "withFrictionConsequence": 0
+  },
+  "admissionSupport": {
+    "semanticGuardrails": [
+      "occurrences-not-distinct-episodes",
+      "coverage-not-suggestion",
+      "omitted-details-not-signal-evidence",
+      "project-capability-inventory-unobserved"
+    ],
+    "sharedFrictionConsequences": []
+  },
+  "candidates": [
+    {
+      "ref": "E1",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "需要接过 qoder中对 sdd-project-setup技能的创建和针对sdd-loop-driver技能的优化流程,读取qoder和这两个技能相关的session,获取详细信息",
+        "key": "req:295e553609d9",
+        "occurrences": 1,
+        "followUp": "先pull然后合并远端的修改,解决完所有冲突之后push",
+        "observedTurns": 2,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "boundary-change",
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "friction": {
+        "executionFailures": 1,
+        "permissionDenials": 0
+      },
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "skill:git-utils"
+      ]
+    },
+    {
+      "ref": "E2",
+      "contextGroup": "G1",
+      "request": {
+        "summary": "全部按照建议进行apply",
+        "key": "req:b081c88c3831",
+        "occurrences": 1,
+        "followUp": "<path>,它会频繁的进行sdd流程调用,因此它能收集大量的针对speckit框架的反馈信息,需要确保skills/external/sdd-loop-driver技能的执行流程中用来进行feedback和probe的点都设置妥当.",
+        "observedTurns": 2,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "boundary-change",
+        "lifecycle-demand",
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "skill:implement-feature"
+      ],
+      "lifecycle": [
+        {
+          "intent": "testing-verification",
+          "family": "debug-test-verification",
+          "dimensionId": "change-validation",
+          "checkId": "relevant-check",
+          "confidence": "High"
+        },
+        {
+          "intent": "setup-isolation",
+          "family": "setup-isolation",
+          "dimensionId": "controlled-execution",
+          "checkId": "instruction-led-start",
+          "confidence": "High"
+        }
+      ]
+    },
+    {
+      "ref": "E3",
+      "contextGroup": "G2",
+      "request": {
+        "summary": "需要在@<path> 中做一些修改, 使用skill而不是am",
+        "key": "req:369aad33bfc8",
+        "occurrences": 1,
+        "intermediate": "需要在@<path> 中做一些修改, 使用skill而不是team, 需要确保这套无人值守机制在脱离的.specify框架和目录结构的情况下也可以执行, 通常情况下用来执行loop的agent是不需要按照speckit框架的,被驱动的子代理…",
+        "followUp": "需要在@<path> 中做一些修改, 使用skill而不是team",
+        "observedTurns": 4,
+        "omittedTurns": 1
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "boundary-change",
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "skill:clarify-artifact"
+      ]
+    },
+    {
+      "ref": "E4",
+      "contextGroup": "G2",
+      "request": {
+        "summary": "pull上游最新代码更新到master分支,然后将057-sdd-loop-driver分支基于最新代码进行rebase",
+        "key": "req:3aca570f7a30",
+        "occurrences": 1,
+        "followUp": "读取@<path> 的内容,然后将这个文档拆解成不同的文档,分散到shared目录中的对应文档中. 这个文档的核心议题是\"如何以无人值守的方式进行SDD开发\", 也是我们当前分支(058-sdd-loop-driver)准备完成的功能. 在其中拆解的内容,至少要包含两个部分:1)如果驱动子代理(如ssh+su+qode…",
+        "observedTurns": 2,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "boundary-change",
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "skill:manage-instructions",
+        "skill:memory-recall",
+        "skill:memory-record"
+      ]
+    },
+    {
+      "ref": "E5",
+      "contextGroup": "G3",
+      "request": {
+        "summary": "<path>: 当前还缺少一个关键配置就是子代理中的命令行工具的配置管理. <path>,不同的子代理配置都需要不同的结果量化方法和配置管理. 默认情况下使用如下配置: model=DeepSeek-Flash, effort=max, context size=1M",
+        "key": "req:65afe85be366",
+        "occurrences": 1,
+        "observedTurns": 1,
+        "omittedTurns": 0
+      },
+      "changes": {
+        "edits": 0,
+        "files": 0
+      },
+      "evidenceClasses": [
+        "operation-control"
+      ],
+      "acceptanceSignals": [],
+      "acceptanceEvidenceCeiling": "unobserved",
+      "frictionConsequenceSignals": [],
+      "checks": [],
+      "closure": "no-change-observed",
+      "mechanisms": [
+        "skill:sdd-loop-driver"
+      ]
+    }
+  ],
+  "omitted": {
+    "noRequest": 20,
+    "selfAnalysis": 0,
+    "lowSignal": 18,
+    "duplicateRequests": 6,
+    "candidateBudget": 4,
+    "checkBudget": 0,
+    "activeSessions": 1,
+    "homeSessionOnly": 0
+  },
+  "warningCodes": [
+    "missing-optional-root",
+    "disabled-source-root"
+  ],
+  "excludes": [
+    "assistantText",
+    "rawPrompts",
+    "commands",
+    "toolOutput",
+    "paths",
+    "rawIds",
+    "secrets"
+  ],
+  "diagnosticFlags": [
+    "portfolio-truncated",
+    "no-change-evidence",
+    "no-reviewed-relevant-check-evidence",
+    "no-result-evidence"
+  ],
+  "cost": {
+    "serializedBytes": 5843,
+    "estimatedTokens": 1562
+  }
+}

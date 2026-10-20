@@ -4,7 +4,7 @@
 
 ## 机制矩阵维度定义（S1）
 
-`.specify/scripts/mechanism-inventory.py` 对 `<project-dir>/.specify/` 输出以下维度（每个 ok/missing）：
+`scripts/mechanism-inventory.py` 对 `<project-dir>/.specify/` 输出以下维度（每个 ok/missing）：
 
 | 维度 | 判定 | 对应机制 |
 |------|------|----------|
@@ -100,10 +100,25 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --ai <tool> 
 | 1 | `/speckit.constitution` | const 缺 | 宪法 bootstrap（模板→项目语境→占位填充→版本裁决） |
 | 2 | `/speckit.sanitize` | 框架资料存在陈旧残留（过期索引/死链/镜像漂移；complete 状态也可能有） | 框架资料卫生治理，陈旧残留按两级判据清理 |
 | 3 | `/speckit.feature` | feat 缺 | 特性注册表种子（对既有代码 reconcile，非空仓常翻出大量 Implemented） |
-| 4 | `/speckit.instructions` | compat 断、instructions 过期、partial/degraded 刷新 | 项目指令文件 + 各工具兼容符号链接重建 |
+| 4 | `/speckit.instructions` | compat 断、instructions 过期、partial/degraded 刷新、**instructions 体积超预算（generator `BUDGET ... over`）** | 项目指令文件 + 各工具兼容符号链接重建；超预算时执行 § S3.4 收敛 |
 | 5 | `/speckit.docs` | 文档空间与实况漂移（docs 树与代码/特性不一致） | 文档空间治理（委托 create-docs 收敛核对） |
 
 每项执行后登记（执行/已存在/跳过+理由）；全部处理或声明后接强化序列。**不做整建**：五项之外的机制（glossary/feedback 目录/知识库目录等）仅在 S1 判缺且项目语境需要时逐个补建，否则进「未处理清单」。
+
+### S3.4 Instruction size-budget convergence（R3 fallback）
+
+`/speckit.instructions` 的生成器报告（`BUDGET: <size> <budget> over`）是**收敛触发**，不是转述给用户的装饰性告警。处理顺序：
+
+1. **先走 owner 的 R1/R2**：`/speckit.instructions` 已内置 `manage-instructions` Action 5 的 R1（模板拥有章节压缩）与 R2（project-owned 章节 >4 KB 外迁）；若报告回到 `within`，本步结束，登记 `converged(R1/R2)`。不要在 setup 侧重实现 R1/R2。
+2. **R3 回退（project-filled 大章节外迁）**：仅当 R1/R2 无合法候选、报告仍 `over` 时执行。读取生成器的 section table，按 `live B` 降序选择 `placeholder=yes` 且 `delta > 0` 的 project-filled 章节（排除纯指针/纯汇总章节，如 `## Documentation Map` 本身）：
+   - 先找该章节已声明的 owner 文档；没有则在 `docs/` 下新建 owner 文档（复用 `create-docs` 的目录约定），把章节正文**机械迁移**过去；
+   - 断言每条 bullet/段落都已落到 owner 文档且仅出现一次；断言通过后才把 instructions 中的章节替换为“一段摘要 + owner 文档指针”；
+   - 在 `## Documentation Map` 增加该 owner 文档行；保留原有内容，不得手工转写或丢弃；
+   - 每次只迁移一个章节，迁移后重跑 `/speckit.instructions`（或生成器）复测，直到 `within` 或没有可迁移章节。
+3. **仍超预算 = pending**：列出剩余最大章节与原因，向用户给出三项选择——上调预算（`INSTRUCTIONS_BUDGET_BYTES` 的 owner 决策）/ 拆分章节 / 接受超预算；不得静默宣布完成，也不得删除项目内容换取绿色。
+4. **幂等**：`within` 稳定态重复执行零写动作；R3 只处理 `over` 的 project-filled 候选。
+
+**Guardrails**：R3 是 setup 初始化场景的回退路由；R1/R2 的 owner 仍是 `manage-instructions`，本步骤不改变其判据。不得修改预算常量、不得 push、不得把 owner 文档迁移变成手工摘要。
 
 ## S3+ STRENGTHEN（强化序列——机制就绪后的增值建设，按需逐项）
 
@@ -149,7 +164,7 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --ai <tool> 
 
 ## S4 VERIFY（五族前置检查 + 矩阵 + 链接）
 
-**五族前置检查**（2026-10-16 上收——权威落点 `.specify/skills/internal/run-agent/references/dispatch-preflight.md`，本节引用不复写；结论每项 ≤3 行摘要写入凭证。本技能处置后仍缺 = ⑤ fail 语义）。
+**五族前置检查**（2026-10-16 上收——权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`，本节引用不复写；结论每项 ≤3 行摘要写入凭证。本技能处置后仍缺 = ⑤ fail 语义）。
 
 加上：机制矩阵复扫达 complete（或 partial 且缺口已声明）、compat 链接核验 `find <project-dir> -maxdepth 2 -type l ! -exec test -e {} \; -print` 为空。三者齐备才进 S5。
 
@@ -182,7 +197,7 @@ suggestion: >-
 
 ## 软协同契约（与 sdd-loop-driver）
 
-- **非强绑定**：两技能各自可独立运行。本技能不要求 sdd-loop-driver 存在，sdd-loop-driver 也不依赖本技能先行——其 preflight 已上收 run-agent 公用承载（`.specify/skills/internal/run-agent/references/dispatch-preflight.md`，analyze C-30），⑤ fail 时经该处置链 handoff 给本技能。
+- **非强绑定**：两技能各自可独立运行。本技能不要求 sdd-loop-driver 存在，sdd-loop-driver 也不依赖本技能先行——其 preflight 已上收 run-agent 公用承载（`skills/internal/run-agent/references/dispatch-preflight.md`，analyze C-30），⑤ fail 时经该处置链 handoff 给本技能。
 - **本技能 → sdd-loop-driver**：S5 候选工作清单是建议入口之一；sdd-loop-driver 的输入源除清单外还包括用户明确指定的特性/切片。
 - **sdd-loop-driver → 本技能**：其 preflight 发现 `.specify/` 缺失/宪法不在位/机制退化时，把处置 handoff 给本技能（模式由探测定：缺失=install，退化=refresh），处置完成后回到循环。
 - 职责切分线：**框架调协（install/reconcile/strengthen/verify/候选清单）** = 本技能；**SDD 完整阶段循环/状态脊/收尾纪律** = sdd-loop-driver。互不越界，互不强依赖。

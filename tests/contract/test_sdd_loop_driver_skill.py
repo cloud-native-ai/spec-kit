@@ -31,7 +31,17 @@ PINNED_H2_SECTIONS = [
     "Boundary",
     "Subagent Create & Dispatch Delegation（子代理创建与派发委派）",  # 060 C-29: delegation section
     "Feedback & Probe Points（反馈与探针采集点）",  # 060: in-loop framework-feedback capture points
+    "CLI Capability Profiles",  # 064: CLI behaviour knowledge entry
     "Wrap-up",  # compiled section (probe registry; AUTO-GENERATED)
+]
+
+CLI_PROFILE_RELS = [
+    "references/cli/index.md",
+    "references/cli/qodercli.md",
+    "references/cli/claude.md",
+    "references/cli/codex.md",
+    "references/cli/opencode.md",
+    "references/cli/hermes.md",
 ]
 
 
@@ -335,7 +345,10 @@ def test_c18_mirror_pair_no_drift():
     src = SKILL_DIR
     dst = REPO_ROOT / ".specify" / "skills" / "sdd-loop-driver"
     assert dst.exists(), "runtime mirror missing — sync-mirrors --write not run"
-    for rel in ["SKILL.md", "references/dispatch-recipes.md", "references/stage-prompts.md"]:
+    for rel in [
+        "SKILL.md", "references/dispatch-recipes.md", "references/stage-prompts.md",
+        *CLI_PROFILE_RELS,
+    ]:
         assert filecmp.cmp(src / rel, dst / rel, shallow=False), (
             f"mirror drift on {rel}"
         )
@@ -372,7 +385,10 @@ def test_c11_self_containment_no_runtime_framework_reads():
 def test_c12_mirror_byte_identical():
     dst = REPO_ROOT / ".specify" / "skills" / "sdd-loop-driver"
     assert dst.exists(), "runtime mirror missing"
-    for rel in ["SKILL.md", "references/dispatch-recipes.md", "references/stage-prompts.md"]:
+    for rel in [
+        "SKILL.md", "references/dispatch-recipes.md", "references/stage-prompts.md",
+        *CLI_PROFILE_RELS,
+    ]:
         assert (dst / rel).read_text(encoding="utf-8") == (SKILL_DIR / rel).read_text(
             encoding="utf-8"
         ), f"mirror not byte-identical: {rel}"

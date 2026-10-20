@@ -31,6 +31,8 @@ S4 VERIFY    五族前置检查 + 机制矩阵复扫 + 兼容符号链接核验�
 S5 SUGGEST   候选工作清单（未完成 feature / 大改进 feedback / TODO 事项）
 ```
 
+- **指令体积预算**：S3 的 `/speckit.instructions` 后读取生成器 `BUDGET` 报告；超预算先走 `manage-instructions` 的 R1/R2，仍超时按 `setup-recipes.md` § S3.4 的 R3 回退外迁 project-filled 大章节；无法收敛时列为 pending（预算上调/拆分章节），不静默转述告警。
+
 ## 执行侧可移植性
 
 - 宿主环境无需 `.specify/`——盘点脚本只读扫描目标项目，无副作用。
@@ -49,6 +51,7 @@ S5 SUGGEST   候选工作清单（未完成 feature / 大改进 feedback / TODO 
 - **前置检查（五族）与失败处置链**：权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`（本技能 S4 引用，不复写）。
 - **通用远端命令形态**：`shared/workflow/external-dispatch-recipes.md`（本技能保留 setup 特有命令：specify init、机制盘点脚本）。
 - **治理命令的子代理派发**：经 run-agent（可选形态——独立运行时编排者亦可亲自执行）。
+- **指令体积预算**：预算常量 owner 是 `scripts/bash/generate-instructions.sh` 的 `INSTRUCTIONS_BUDGET_BYTES`；R1/R2 owner 是 `manage-instructions`；setup 负责触发、验证与 R3 初始化回退。
 
 ## 边界
 

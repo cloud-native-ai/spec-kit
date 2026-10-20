@@ -74,7 +74,7 @@ U5 STALL     超时/重试上限/预算触顶 → 停线、状态脊落盘、出
 U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归档清扫，缺省本地合并）+ 一份收尾汇总
 ```
 
-多条线并行 = 多个独立循环实例：一线一连接、一线一状态脊。
+多条线并行 = 多个独立循环实例：一线一连接、一线一状态脊。**U0.5 线路登记**：首次派发前把该线登记进环境级 Line Registry（`scripts/line-registry.py --action register`），此后每个事件携带 `(line_id, run_id)` 归属信封；U6 收尾后注销（`deregister`）。无标识消息一律经 `resolve-message` 判定，禁止用进程扫描推断线路。
 
 U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计划；未产出前不得进入 U2，更不得直接编辑目标仓库——目标项目为本仓库时同样适用。
 
@@ -94,16 +94,18 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 
 ## References
 
-- `references/dispatch-recipes.md` — 五大执行机制的命令形态：断点探测、阶段化 prompt 文件、runner 与派生、后台执行 + 统一监听（长轮询窗口/批量多线）、收尾纪律；阶段链与哨兵字面量；派发可见性操作规则。
-- `references/watch-model.md` — 统一监听模型：信号源、判定状态机、事件优先机制阶梯、窗口与阶段期限的区分、`pgrep -c` 零匹配陷阱、多线 manifest、宿主适配与自测要求。
-- `references/stage-prompts.md` — 阶段提示词三段骨架全文、独立校验程序、已验证变体（本地简报先行 / 构建固化分线）、多线并发隔离与窄读法授权、卡死处置与状态脊程序。
-- `scripts/watch-target.sh` — 无框架依赖的长轮询 watcher 参考实现（单目标/多目标、快照与自测模式）。
+- `references/dispatch-recipes.md` — 五大执行机制的命令形态：断点探测、阶段化 prompt 文件、runner 与派生、后台执行 + 统一监听（长轮询窗口/批量多线）、收尾纪律；阶段链与哨兵字面量；派发可见性操作规则；线路登记/归属信封/消息入口（Recipe 6）。
+- `references/watch-model.md` — 统一监听模型：信号源、判定状态机、事件优先机制阶梯、窗口与阶段期限的区分、`pgrep -c` 零匹配陷阱、多线 manifest、宿主适配与自测要求；归属层消费规则与重接线快照（§11）。
+- `references/stage-prompts.md` — 阶段提示词三段骨架全文、独立校验程序、Line Registration/Envelope/Ingress 程序、重接线/重复启动/orphan/stale/U6 程序、已验证变体（本地简报先行 / 构建固化分线）、多线并发隔离与窄读法授权、卡死处置与状态脊程序。
+- `scripts/watch-target.sh` — 无框架依赖的长轮询 watcher 参考实现（单目标/多目标、快照与自测模式、`--line-id/--run-id/--meta` 归属过滤、窗口内 lease 续租钩子）。
+- `scripts/line-registry.py` — Python 3 stdlib-only 引擎：环境级 Registry、原子写/同线锁、信封分类、消息入口、所有权/集成队列、lease/reservation/身份校验。
 
 ## Boundary
 
 - 收尾动作的合并/push 维持确认门控破坏性分类：缺省本地合并；push 须经入口显式授权。
 - 本手册编排阶段为不透明单元：不改 requirements/clarify/plan/tasks/checklist/analyze/implement/review 各命令的内部流程。
 - 不绑定特定项目族或工作区命名规则：别名、用户、路径、CLI、断点阶段全部入口参数化。
+- 同仓多写线：worktree-per-write-line + Ownership Manifest + 确定性集成队列（单一协调者、每批一次镜像）；规则见 `references/dispatch-recipes.md` Recipe 7 与 `references/stage-prompts.md` Concurrency Isolation。worktree 只在合并成功后移除，未合并/未提交时保留并上送。
 - 目标项目未安装 spec-kit（无 `.specify/`）时：**委托 sdd-project-setup** 处置（本技能不执行初始化），处置完成并取得就绪凭证后重入循环。
 
 ## Subagent Create & Dispatch Delegation（子代理创建与派发委派）
@@ -121,6 +123,15 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 1. **每线观察点（U4/U6）**：独立校验与收尾时，把观察到的 **speckit 框架级摩擦**记入该线状态脊的「框架观察」段——结构化三要素：现象 / 框架位置（哪个阶段命令、模板、命令面）/ 对驱动的影响。范围限框架本身（阶段命令行为、模板缺口、哨兵与校验误报）；目标项目的业务问题不属此类。
 2. **收尾落库点（U6）**：收尾汇总携带「框架反馈候选」清单（自各线「框架观察」段聚合）。落库形态分两种：宿主工作区具备规格库结构（specify init 产物在位）时，候选逐条经 `feedback-utils.py --action record --unit-id "skill:sdd-loop-driver" --unit-type skill` 落宿主反馈库（runtime-mode 门控沿用编译 Wrap-up 节的 gate）；standalone（无该结构）时，候选清单随收尾汇总交付用户，由用户决定投递去向——**不自动上送**（feedback 红线：manual 投递，绝不自动传输）。
 3. **skill 收尾点（run 结束）**：编译 `## Wrap-up` 节既有的五步引擎链（run determination → exec quant → feedback record → threshold notice → token reflection；probe-registry `@point:wrap-up scope=all` 绑定，73 units 全覆盖）——run 结束照单执行，本节不重复其步骤。
+
+## CLI Capability Profiles
+
+`references/cli/` 是 CLI 行为知识的**唯一落点**；`references/cli/index.md` 是 schema 与观测程序的 owner。
+
+- **派发前（U2）只读查档**：按目标 CLI 档案选择超时/脱离形态，派发记录写 `profile_id` / `profile_version` / `observed_cli_version`；匹配且无新事实不产生反馈。
+- **U4/U5 观测后更新**：实际行为与 `known` 不符、`unknown` 获得已验证值、或新版本/平台行为首次出现时，先写状态脊 `cli_observations`，再更新档案 provenance，再记录恰好一条 `cli-profile:<cli>` 反馈；无新事实零反馈。
+- **派发资格**：仍由 061 的 `CAPABILITY_MATRIX`（`scripts/python/execution-config.py`）**唯一**拥有；档案只记录观测，冲突时资格以矩阵为准。
+- 档案更新不得改变哨兵、watcher 判定/退出码、确认门、阶段 deadline 或测试预算；当前阶段使用 U2 记录的形态。
 
 ## Wrap-up
 

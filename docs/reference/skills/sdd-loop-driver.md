@@ -41,8 +41,19 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 - **信号**：退出记录、完成哨兵、PID（含 start ticks/PID 复用校验）、心跳、日志尾行；完成必须有正证据——进程消失、日志静默、`pgrep` 零匹配都不是完成。
 - **机制阶梯**：长轮询窗口（一次调用内等待，事件发生即返回）→ 宿主原生通知（仅作补充，不得结束驱动者会话）→ 间隔轮询回退；禁止独立 `sleep` 回合空等。
 - **窗口 ≠ 超时**：单窗口到期只返回 `RUNNING` 并立即重入；只有阶段 deadline 产生 `TIMEOUT`。
+- **Deadline grace / TIMEOUT 不是可杀信号**：watcher 在 deadline 后继续采样 `--deadline-grace`（缺省 120s），晚完成重判 `DONE`/`FAILED`；收到 `TIMEOUT` 先 `--once` 最终快照，`pid=alive` + `heartbeat=fresh` 时优先延长/继续，停线须用户显式决定并保留 worktree/status/log。
 - **多线批量**：manifest 模式一次连接检查多条线，任一线终止即返回全部快照。
 - **pgrep 陷阱**：`pgrep -c` 零匹配会先打印 0 再以退出码 1 结束，`|| echo 0` 会追加第二个 0；存活判据一律用 PID 文件 + `kill -0`，watcher 自测覆盖零匹配、僵尸、PID 复用等反向用例。
+
+## 并发归属与生命周期
+
+- **Line Registry**：环境级线路登记（`scripts/line-registry.py`，stdlib-only）；每个事件携带 `(line_id, run_id)` 归属信封，`foreign`/`stale-run`/`unattributed` 不改变当前线路状态；无标识消息经确定性入口判定（恰好一次澄清，禁止进程扫描推断）。规则真源：`skills/external/sdd-loop-driver/references/stage-prompts.md` 的 Line Registration/Envelope/Ingress 节。
+- **工作区隔离与集成队列**：worktree-per-write-line、Ownership Manifest 归一化重叠、FIFO 串行化、确定性拓扑队列、运行时归档一次与每批一次镜像。操作序列见 `references/dispatch-recipes.md` Recipe 7。
+- **生命周期解耦**：脱离式 runner（`setsid`/`nohup`/`disown`）、driver lease、`(line_id, stage)` 原子 reservation、重接线三分支（running/done/dead）与远端不可达分类。程序见 `references/stage-prompts.md` 的 Reattach & Lifecycle 节；监听归属层见 `references/watch-model.md` §11。
+
+## CLI 能力档案
+
+每个作为 subagent 调用的 CLI 在 `skills/external/sdd-loop-driver/references/cli/` 拥有独立档案（八维度、known/unknown 与 provenance）。`references/cli/index.md` 是 schema 与观测程序的 owner；派发前（U2）查阅、U4/U5 观测后更新，并记录 `cli-profile:<cli>` 反馈。派发资格仍由 Feature 061 的 `CAPABILITY_MATRIX` 唯一拥有。本页只提供入口，不复述档案内容。
 
 ## 触发与路由
 

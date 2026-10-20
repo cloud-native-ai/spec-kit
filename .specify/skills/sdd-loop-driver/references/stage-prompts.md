@@ -47,6 +47,7 @@
 - **非法等待**：独立 `sleep N` 回合；挂起监视器后结束驱动者会话「等待通知/恢复」——在会话式宿主（subagent 结束即停摆）中这意味着循环静默死亡，直接违反 Hard Requirement 1 与 5。唯一例外：宿主已被探针证明通知会自动恢复**同一运行**（`watch-model.md` §6）；此时原生通知只能作唤醒补充，每次唤醒仍做一次快照判定。
 - **终止判定去向**：`DONE` / `INCOMPLETE` → U4；`ANOMALY` / `FAILED` / `DEAD` / `TIMEOUT` / `NO_SIGNAL` → U5；`RUNNING` → 重入。
 - **窗口到期 ≠ 阶段超时**：只有状态脊中的 `stage_deadline_epoch` 触发 `TIMEOUT`；单窗口到期只产生 `RUNNING`。watcher 不杀进程，处置属 U5。
+- **TIMEOUT 不等于可杀**：收到 `TIMEOUT` 后先跑一次 `--once` 最终快照；若 status/sentinel 已出现，按 U4/U5 重新路由；若 `pid=alive` + `heartbeat=fresh` 仍无终态，优先延长/继续观察，不得仅凭 TIMEOUT 停线或杀进程。停线/TERM 必须经用户显式决定，停止前再快照并保留 worktree/status/log。watcher 的 `--deadline-grace` 缺省 120s；宿主工具超时设为 `window + deadline-grace + 30s`。
 - **完成需正证据**：进程消失、日志静默、`pgrep` 零匹配都**不是**完成；哨兵/退出记录是必要正证据，U4 仍须独立校验。
 - 驱动者必须存活到全线收束（U6）或显式停线（U5）。
 - 驱动者确须提前结束（预算耗尽、会话上限）时，唯一合法路径：状态脊写为 `stalled` / `reentry-required`（当前阶段、已试次数、证据指针齐备）+ 向用户显式上报——**静默等待与静默退出都是不被接受的输出**。
@@ -75,7 +76,7 @@
 1. 终止判定 → 处置：
    - `ANOMALY` / `FAILED` / `DEAD` / `NO_SIGNAL` → 重试（重试前修复可归因原因：环境、提示词、断点判定、启动路径），计一次已试次数；
    - `INCOMPLETE` → 按**伪完成**重试（核对哨兵/产物/日志），计一次已试次数；
-   - `TIMEOUT` → 阶段超时，按重试上限处置；
+   - `TIMEOUT` → 先 `--once` 最终快照；若 status/sentinel 已出现则按 U4/U5 重新路由；活进程优先延长/继续观察；只有最终无终态且用户显式决定时才按重试/停线处置；
    - `RUNNING`（窗口到期）→ 不是失败，不计重试，立即重入下一监听窗口。
 2. 达重试上限或预算触顶 → **停环**：该线停止推进。
 3. 状态脊落盘：当前阶段、已试次数、断点判定、**watcher 最近判定快照（verdict / pid / heartbeat / rc / reason）**、证据指针（日志路径/提交号/status 路径）、卡死状态 = stalled。
@@ -93,6 +94,57 @@
 - **程序**：U0 入口声明时、U2 派发前、U3 收到终止判定时、U4 校验后、U5 停线时**先写状态、后做动作**——续环与重入只读状态脊，零上下文可接手；循环 MUST NOT 依赖会话记忆。
 - **重入**：任何新会话接手该线时，从状态脊读取断点判定与已试次数，先跑一次 `watch-target.sh --once` 快照；终止判定在即按 U4/U5 续环，否则从对应阶段续跑或恢复监听窗口。
 
+## Line Registration, Envelope & Message Ingress（线路登记、归属与消息入口，064）
+
+### U0.5 线路登记（首次派发前）
+
+状态脊头字段先写 `line_id` / `run_id`，再向环境级 Registry 注册：
+
+```bash
+python3 <skill-dir>/scripts/line-registry.py --action register --line-id <line> --run-id <run> \
+  --project-dir <project> --repo-root <repo> --state active [--write-line ...] --format json
+```
+
+- 注册失败 = 该线启动失败：显式上送（路径 + 原因），不得静默继续或改用项目内路径。
+- 单线运行同样注册并携带信封；不得因归属机制改变 U0–U6、阶段链、哨兵校验与卡死处置。
+- 收尾（U6）后 `--action deregister --line-id <line> --reason <reason>`；`state=closed`、`closed_at` 必填。
+
+### 归属信封（每个事件）
+
+- status / pid / heartbeat 行尾携带 `line=<id> run=<id> stage=<stage> event=<type>`；
+- 日志旁路 `log-<line>-<stage>.log.meta.jsonl`（append-only，单写者）承载 `log-start` / `log-terminal`，终止条含 `sentinel_seen` 与 `exit`；
+- 提示词旁路 `prompt-<line>-<stage>.md.meta.json` 在派发前写入；
+- **日志正文零改动**：哨兵字面量与「最后非空行」判定不变；不得在哨兵后追加信封。
+
+### 消息入口程序（驱动侧）
+
+每次收到用户消息，先调用确定性入口，再决定路由：
+
+```bash
+python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message "<message>" [--clarified]
+```
+
+判定与动作（封闭集：`route | clarify | ambiguous-stop | no-active | no-match`）：
+
+| 结果 | 驱动动作 |
+|------|----------|
+| `route` | 将消息交给 `target_line_id`；不改动其他线路 |
+| `clarify` | 原样向用户提出 `question`（恰好一个），附候选清单；等待期间其他线路继续推进 |
+| `ambiguous-stop` | 列出候选并停止路由；**不得再问第二个问题**，不得猜 |
+| `no-active` | 明确报告无活动线路并请求目标 |
+| `no-match` | 报告标识与候选不匹配；不回落到猜测 |
+
+- 可识别标识：显式 `line_id` token，或唯一匹配的 project/repo 路径或分支名。
+- **禁止**使用 `ps`/`pgrep`/进程名/cwd/环境态推断；入口澄清只阻塞该条消息，不暂停/改变其他 line 的子代理与监听。
+
+### 事件归属消费规则
+
+- `own`：`(line_id, run_id)` 与当前监听目标一致——唯一可参与判定、进度与 Registry 状态的事件类别。
+- `foreign`：`line_id` 不同——不得转发、不得计入、不得改变当前线路状态。
+- `stale-run`：同线旧 `run_id`——不得作为当前尝试的证据。
+- `unattributed`：信封缺失或不可解析——显式报告归属缺口，不得当作完成/失败证据。
+- `legacy`：watcher 未提供归属参数时的 058 兼容行为（无过滤）；新派发 MUST 提供归属参数。`legacy` 仅允许用于单活动线 / 058 兼容调用；多活动线 MUST NOT 以 legacy 调用绕过归属过滤（先由 `resolve-message` 定线，再带参数监听）。
+
 ## Concurrency Isolation（并发隔离，多线并行）
 
 多线并行时每条线是独立循环实例：**一线一连接（检查时独立发起）、一线一状态脊**；任一线的失败不阻塞其他线。
@@ -106,6 +158,23 @@
 - 审后提交边界：本线只做阶段产物提交，审后由主会话统一提交本线收尾件。
 ```
 
+### 写线工作区声明（064）
+
+写线派发前，提示词与状态脊 MUST 携带以下声明（缺一项不得派发）：
+
+```text
+- worktree：<worktree_path>（本线唯一写工作区）
+- branch：line/<line_id>（base_sha：<base_sha>）
+- owned_paths：<...>；read_only_paths：<...>；forbidden_paths：<...>
+- resources：ports=<start-end>；cache_dir=<...>；tmp_dir=<...>
+```
+
+- 一个 worktree 同时只有一个写 line；阶段子代理**不得切换分支**、创建/删除 worktree，或改写其他 line 的 worktree。
+- 不得写入另一活动 line 的 `read_only_paths` / `forbidden_paths`；不得写共享可写运行时路径（feedback / session / knowledge / exec-quant 各写本线 worktree）。
+- 阶段提交只允许阶段产物路径；运行时记录不提交，由集成者一次归档。
+- U6 时未合并/未提交的 worktree MUST 保留并上送（`worktree_retained=true`）；移除只由集成序列在合并成功后执行。
+- 端口/缓存/临时目录按 Registry 分配使用；不得启动全局服务。
+
 ### 窄读法授权（Narrow-Read Authorization）
 
 被隔离项确需追加操作时，**只有显式授权才能放行**：
@@ -116,6 +185,68 @@
 
 - 授权是**显式、逐项、有界**的——不存在隐式放行；「顺便看一下」不是授权。
 - 每次授权记录进该线状态脊（何时、何项、何界），供收尾汇总审计。
+
+## CLI Capability Profiles（U2/U4/U5，064）
+
+CLI 行为知识的唯一落点是 `references/cli/`（schema owner：`references/cli/index.md`）；本节只规定驱动侧的查阅/观测程序，不复述档案内容。
+
+### U2 派发前（只读查阅）
+
+- 只读查阅目标 CLI 档案，据此选择超时形态与 detach 形态；**不改档**。
+- 派发记录写入状态脊：`profile_id`、`profile_version`、`observed_cli_version`。
+- 输出模式的吞吐默认（stream-json）由 063 拥有；档案只记录缓冲/事件事实，**不改写**该默认。
+- 匹配且无新事实 → **零反馈**。
+
+### U4 独立校验（比对）
+
+比对以下事实与档案：输出模式/事件形状、哨兵来源、status/exit 字段、runner rc 与 watcher 判定、日志/session 位置、**缓冲**/可见性。
+
+### U5 停线处置（比对）
+
+比对以下事实与档案：已知**缺陷**、**超时**上限、**detach**/退出/孤儿行为。
+
+### 观测事件与写序
+
+观测事件 = (a) 与 `known` 不符；(b) `unknown` 获得已验证值；(c) 新版本/平台行为首次出现。
+
+处置顺序 MUST 为：
+
+1. 状态脊追加 `cli_observations` 段（观测事实 / 对照的档案条目 / 影响）；
+2. 更新档案 `## Provenance`；
+3. 经既有 feedback 引擎记录 **恰好一条** `cli-profile:<cli>` 反馈。
+
+- 一次观测事件恰好一条反馈；**每个事件各一条**（同一次派发内的多个独立事件不得合并或遗漏）；
+- 无新事实 → **零反馈**；
+- `feedback_id` 可在反馈落库后回填 provenance；
+- 档案更新不回溯改变 U2 记录的形态；若冲突使当前阶段无法安全完成，走既有 U5 停线/重试程序，不得以改档代替行为修复。
+- `known` 条目带观测日期、CLI 版本与证据指针；`unknown` 不填猜测值；版本/平台不一致视为新观测。
+
+## Reattach & Lifecycle（重接线与生命周期，064）
+
+### 重接线程序（主会话恢复后）
+
+**唯一恢复源 = Registry + 状态脊 + 四件套证据**；不得依赖会话记忆、对话历史或宽泛进程扫描。
+
+1. `lease-acquire`：取得该 line 的 driver lease；活持有者 exit 3 → 不夺取；过期 lease 先验证证据再 `lease-break`；`suspected-alive` 需显式 `--override`。
+2. `verify-identity`：校验 runner/cli start token；cwd 在平台暴露时校验（Linux `/proc/<pid>/cwd`，macOS 记 `unsupported`）；branch 由 worktree `git rev-parse --abbrev-ref HEAD` 复核。
+3. **先做一次 `watch-target.sh --once` 快照**，再决定去向：
+   - `identity=ok` + `RUNNING` → 恢复监听，**零重复派发**；
+   - `identity=ok` + `DONE` → 进既有 U4 独立校验 → U5/U6；
+   - `identity=dead/mismatch` → 既有 U5 卡死/重试程序，保留 worktree 与证据；
+   - `identity=remote-unreachable` → `stalled`（reason=`remote-unreachable`）+ 重试连通性，不判 dead、不重派。
+4. 每 ≤ `ttl/3` 续租 lease；U2/U3/U4/U5 各续租一次。
+
+### 重复启动与 orphan/stale
+
+- 派发前 `reserve`（`(line_id, stage)` 原子 `O_CREAT|O_EXCL`）：已有活动 reservation 时，同 `run_id` 且 PID 身份有效 → attach；否则拒绝，绝不启动第二个同阶段进程。
+- orphan：进程存活但无有效驱动/Registry/状态脊，或 Registry 缺失 → 显式标记并上送；只用线自有证据与已登记 PID，禁止宽泛进程扫描；处置留痕，不静默认领或终止。
+- stale：PID 死亡/复用、cwd/branch 不符、证据超期 → 显式标记；清理是显式动作；远端 ssh 不可达记 `stalled`，不记 stale/dead。
+
+### U6 收尾（生命周期）
+
+- U6 在 `integration_result`（merged|failed）记录之后执行；只读线阶段完成直接 U6；写线集成前显式放弃以 `last_event=abandoned` 关闭。
+- U6 注销 Registry（`closed` + `closed_at`）、释放 reservation 与 lease、按保留策略归档证据；不得留下 `active` 残留。
+- worktree 的移除只由集成序列在合并成功后执行；未合并（failed/放弃）时保留并置 `worktree_retained=true`。
 
 ## Variants（已验证变体）
 

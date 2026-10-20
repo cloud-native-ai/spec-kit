@@ -35,9 +35,12 @@ watch-target.sh — bounded long-poll watcher (read-only)
 Single target:
   watch-target.sh --label L --pid-file P --status-file S --log G \
                   [--sentinel STAGE-DONE] [--heartbeat H] \
+                  [--line-id ID --run-id RUN] [--stage STAGE] [--meta FILE] \
+                  [--registry DIR] \
+                  [--lease-ttl N --lease-renew-cmd CMD --lease-renew-interval N] \
                   [--deadline-epoch E | --timeout T] \
                   [--window N] [--interval N] [--start-grace N] \
-                  [--heartbeat-max-age N] [--once] [--verbose]
+                  [--deadline-grace N] [--heartbeat-max-age N] [--once] [--verbose]
 
 Manifest (one target per line: label|pid|status|log|sentinel|heartbeat|deadline):
   watch-target.sh --manifest FILE [--window N] [--interval N] [--start-grace N]
@@ -57,13 +60,26 @@ Verdicts / exit codes:
   16 NO_SIGNAL     no pid/status within start grace
   2 USAGE          bad arguments
 
-Defaults: window=300s, interval=3s, start-grace=30s, heartbeat-max-age=120s.
-Set the host tool timeout to window + 30s so the watcher can return first.
+Defaults: window=200s, interval=3s, start-grace=30s, deadline-grace=120s,
+heartbeat-max-age=120s. --deadline-grace N keeps sampling for N seconds after
+the stage deadline; a late status/sentinel reclassifies to DONE/FAILED before
+TIMEOUT. TIMEOUT is a budget verdict, not a death certificate: a live
+pid/heartbeat must be rechecked with --once before any stop decision.
+The default window is <= ttl/3 for the default 600s driver lease. Pass
+--lease-ttl N to enforce the window <= N/3 rule (it fails when the window is
+larger and no --lease-renew-cmd is given); --lease-renew-cmd refreshes the
+lease heartbeat inside the window (--lease-renew-interval defaults to 60s).
+With --registry DIR (or SPECIFY_LINE_REGISTRY_DIR), the watcher consumes only
+the PID registered for --line-id and verifies its start token (Linux start
+ticks, macOS `ps -p <pid> -o lstart=`) plus branch when registered.
+Set the host tool timeout to window + deadline-grace + 30s so the watcher can
+return first; with the defaults that is 200 + 120 + 30 = 350s.
 --timeout T is relative to THIS invocation; for multi-window stages pass
 --deadline-epoch (absolute stage deadline) instead, or each window resets it.
 The watcher must run as the same identity as the runner (kill -0 permission).
 --self-test runs zero-match / dead / zombie / pid-reuse / fake-done /
-anomaly / exit-code / timeout / manifest regression cases.
+anomaly / exit-code / timeout / manifest / registry-identity / lease-window
+regression cases.
 EOF
 }
 
@@ -98,15 +114,25 @@ SENTINEL=""
 HEARTBEAT=""
 DEADLINE_EPOCH=0
 TIMEOUT=""
-WINDOW=300
+WINDOW=200
 INTERVAL=3
 START_GRACE=30
+DEADLINE_GRACE=120
 HEARTBEAT_MAX_AGE=120
 ONCE=0
 MANIFEST=""
 VERBOSE=0
 SELF_TEST=0
 START_EPOCH=0
+LINE_ID=""
+RUN_ID=""
+STAGE=""
+META=""
+REGISTRY_DIR="${SPECIFY_LINE_REGISTRY_DIR:-}"
+LEASE_TTL=""
+LEASE_RENEW_CMD=""
+LEASE_RENEW_INTERVAL=60
+LAST_LEASE_RENEW=0
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -121,8 +147,17 @@ while [ "$#" -gt 0 ]; do
     --window) [ "$#" -ge 2 ] || die_usage "--window needs a value"; WINDOW="$2"; shift 2 ;;
     --interval) [ "$#" -ge 2 ] || die_usage "--interval needs a value"; INTERVAL="$2"; shift 2 ;;
     --start-grace) [ "$#" -ge 2 ] || die_usage "--start-grace needs a value"; START_GRACE="$2"; shift 2 ;;
+    --deadline-grace) [ "$#" -ge 2 ] || die_usage "--deadline-grace needs a value"; DEADLINE_GRACE="$2"; shift 2 ;;
     --heartbeat-max-age) [ "$#" -ge 2 ] || die_usage "--heartbeat-max-age needs a value"; HEARTBEAT_MAX_AGE="$2"; shift 2 ;;
     --manifest) [ "$#" -ge 2 ] || die_usage "--manifest needs a value"; MANIFEST="$2"; shift 2 ;;
+    --line-id) [ "$#" -ge 2 ] || die_usage "--line-id needs a value"; LINE_ID="$2"; shift 2 ;;
+    --run-id) [ "$#" -ge 2 ] || die_usage "--run-id needs a value"; RUN_ID="$2"; shift 2 ;;
+    --stage) [ "$#" -ge 2 ] || die_usage "--stage needs a value"; STAGE="$2"; shift 2 ;;
+    --meta) [ "$#" -ge 2 ] || die_usage "--meta needs a value"; META="$2"; shift 2 ;;
+    --registry) [ "$#" -ge 2 ] || die_usage "--registry needs a value"; REGISTRY_DIR="$2"; shift 2 ;;
+    --lease-ttl) [ "$#" -ge 2 ] || die_usage "--lease-ttl needs a value"; LEASE_TTL="$2"; shift 2 ;;
+    --lease-renew-cmd) [ "$#" -ge 2 ] || die_usage "--lease-renew-cmd needs a value"; LEASE_RENEW_CMD="$2"; shift 2 ;;
+    --lease-renew-interval) [ "$#" -ge 2 ] || die_usage "--lease-renew-interval needs a value"; LEASE_RENEW_INTERVAL="$2"; shift 2 ;;
     --once) ONCE=1; shift ;;
     --verbose) VERBOSE=1; shift ;;
     --self-test) SELF_TEST=1; shift ;;
@@ -131,11 +166,25 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-for name in WINDOW INTERVAL START_GRACE HEARTBEAT_MAX_AGE; do
+for name in WINDOW INTERVAL START_GRACE DEADLINE_GRACE HEARTBEAT_MAX_AGE LEASE_RENEW_INTERVAL; do
   value="${!name}"
   is_uint "$value" || die_usage "$name must be a non-negative integer, got '$value'"
 done
+if [ -n "$LINE_ID" ] || [ -n "$RUN_ID" ]; then
+  [ -n "$LINE_ID" ] && [ -n "$RUN_ID" ] || die_usage "--line-id and --run-id must be provided together"
+fi
+if [ -n "$REGISTRY_DIR" ] && [ -z "$LINE_ID" ]; then
+  die_usage "--registry requires --line-id (registry identity is line-scoped)"
+fi
 [ "$INTERVAL" -gt 0 ] || die_usage "--interval must be > 0"
+if [ -n "$LEASE_TTL" ]; then
+  is_uint "$LEASE_TTL" && [ "$LEASE_TTL" -gt 0 ] || die_usage "--lease-ttl must be a positive integer"
+  lease_max=$((LEASE_TTL / 3))
+  [ "$lease_max" -gt 0 ] || lease_max=1
+  if [ -z "$LEASE_RENEW_CMD" ] && [ "$WINDOW" -gt "$lease_max" ]; then
+    die_usage "window ${WINDOW}s exceeds lease ttl/3 (${lease_max}s); pass --window <= ${lease_max} or --lease-renew-cmd"
+  fi
+fi
 if [ -n "$TIMEOUT" ]; then
   is_uint "$TIMEOUT" || die_usage "--timeout must be a non-negative integer"
   [ "$DEADLINE_EPOCH" -eq 0 ] || die_usage "use either --timeout or --deadline-epoch, not both"
@@ -144,11 +193,125 @@ is_uint "$DEADLINE_EPOCH" || die_usage "--deadline-epoch must be a non-negative 
 
 P_PID=""
 P_START=""
+P_CLASS=""
+P_PRESENT=0
+S_CLASS=""
+M_CLASS=""
+M_EXISTS=0
+M_SENT=""
+H_CLASS=""
+HB_EXISTS=0
+CC=""
+
+classify_pair() {
+  local carrier_line="$1" carrier_run="$2"
+  if [ -z "$LINE_ID" ] && [ -z "$RUN_ID" ]; then
+    CC="legacy"; return 0
+  fi
+  if [ -z "$carrier_line" ] || [ -z "$carrier_run" ]; then
+    CC="unattributed"; return 0
+  fi
+  if [ "$carrier_line" != "$LINE_ID" ]; then
+    CC="foreign"; return 0
+  fi
+  if [ "$carrier_run" != "$RUN_ID" ]; then
+    CC="stale-run"; return 0
+  fi
+  CC="own"
+}
+
+line_field_of() {
+  printf '%s' "$1" | sed -n 's/.*[[:space:]]line=\([^[:space:]]*\).*/\1/p' | head -n 1
+}
+
+run_field_of() {
+  printf '%s' "$1" | sed -n 's/.*[[:space:]]run=\([^[:space:]]*\).*/\1/p' | head -n 1
+}
+
+json_field() {
+  printf '%s' "$1" | sed -n "s/.*\"$2\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" | head -n 1
+}
+
+read_meta_file() {
+  local f="$1" ml=""
+  M_CLASS=""; M_EXISTS=0; M_SENT=""
+  [ -n "$f" ] && [ -f "$f" ] || return 0
+  M_EXISTS=1
+  ml=$(tail -n 20 "$f" 2>/dev/null | awk 'NF { last=$0 } END { print last }')
+  [ -n "$ml" ] || return 0
+  classify_pair "$(json_field "$ml" line_id)" "$(json_field "$ml" run_id)"
+  M_CLASS="$CC"
+  M_SENT=$(printf '%s' "$ml" | sed -n 's/.*"sentinel_seen"[[:space:]]*:[[:space:]]*\([01]\).*/\1/p')
+}
+
+read_heartbeat_envelope() {
+  local f="$1" hl=""
+  H_CLASS=""; HB_EXISTS=0
+  [ -n "$f" ] && [ -f "$f" ] || return 0
+  HB_EXISTS=1
+  hl=$(tail -n 5 "$f" 2>/dev/null | awk 'NF { last=$0 } END { print last }')
+  classify_pair "$(line_field_of "$hl")" "$(run_field_of "$hl")"
+  H_CLASS="$CC"
+}
+
+REG_STATE="off"
+REG_RUNNER_PID=""
+REG_RUNNER_START=""
+REG_CLI_PID=""
+REG_CLI_START=""
+REG_WORKTREE=""
+REG_BRANCH=""
+
+read_registry_entry() {
+  REG_STATE="off"; REG_RUNNER_PID=""; REG_RUNNER_START=""
+  REG_CLI_PID=""; REG_CLI_START=""
+  REG_WORKTREE=""; REG_BRANCH=""
+  [ -n "$LINE_ID" ] && [ -n "$REGISTRY_DIR" ] || return 0
+  local entry="$REGISTRY_DIR/$LINE_ID.json" text
+  if [ ! -f "$entry" ]; then
+    REG_STATE="missing"
+    return 0
+  fi
+  if ! text=$(cat "$entry" 2>/dev/null); then
+    REG_STATE="missing"
+    return 0
+  fi
+  REG_STATE="present"
+  REG_RUNNER_PID=$(printf '%s\n' "$text" | sed -n 's/.*"runner_pid"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' | head -n 1)
+  REG_RUNNER_START=$(json_field "$text" runner_start_token)
+  REG_CLI_PID=$(printf '%s\n' "$text" | sed -n 's/.*"cli_pid"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' | head -n 1)
+  REG_CLI_START=$(json_field "$text" cli_start_token)
+  REG_WORKTREE=$(json_field "$text" worktree_path)
+  REG_BRANCH=$(json_field "$text" branch)
+  return 0
+}
+
+process_start_token() {
+  local pid="$1" token=""
+  if [ -r "/proc/$pid/stat" ]; then
+    token=$(awk '{print $22}' "/proc/$pid/stat" 2>/dev/null)
+  else
+    token=$(ps -p "$pid" -o lstart= 2>/dev/null | tr '\n' ' ' \
+      | tr -s '[:space:]' ' ' | sed 's/^ //; s/ $//')
+  fi
+  printf '%s' "$token"
+}
+
+process_stat_state() {
+  local pid="$1" stat=""
+  if [ -r "/proc/$pid/stat" ]; then
+    stat=$(awk '{print $3}' "/proc/$pid/stat" 2>/dev/null)
+  else
+    stat=$(ps -p "$pid" -o stat= 2>/dev/null | awk 'NR==1{print $1}')
+  fi
+  printf '%s' "$stat"
+}
 
 read_pid_file() {
-  local f="$1" pid="" start=""
-  P_PID=""; P_START=""
+  local f="$1" pid="" start="" pl=""
+  P_PID=""; P_START=""; P_CLASS=""; P_PRESENT=0
   [ -n "$f" ] && [ -f "$f" ] || return 0
+  P_PRESENT=1
   pid=$(sed -n 's/^pid=\([0-9][0-9]*\).*/\1/p' "$f" | head -n 1)
   start=$(sed -n 's/.*start=\([0-9][0-9]*\).*/\1/p' "$f" | head -n 1)
   if [ -z "$pid" ]; then
@@ -157,6 +320,10 @@ read_pid_file() {
   fi
   P_PID="$pid"
   P_START="$start"
+  pl=$(grep -m 1 '^pid=' "$f" 2>/dev/null || true)
+  [ -n "$pl" ] || pl=$(head -n 1 "$f" 2>/dev/null || true)
+  classify_pair "$(line_field_of "$pl")" "$(run_field_of "$pl")"
+  P_CLASS="$CC"
 }
 
 PID_STATE="missing"
@@ -169,18 +336,15 @@ is_alive() {
     PID_STATE="dead"
     return 1
   fi
-  if [ -r "/proc/$pid/stat" ]; then
-    state=$(awk '{print $3}' "/proc/$pid/stat" 2>/dev/null)
-    if [ "$state" = "Z" ]; then
-      PID_STATE="zombie"
+  state=$(process_stat_state "$pid")
+  case "$state" in
+    Z*) PID_STATE="zombie"; return 1 ;;
+  esac
+  if [ -n "$expected" ]; then
+    actual=$(process_start_token "$pid")
+    if [ -n "$actual" ] && [ "$actual" != "$expected" ]; then
+      PID_STATE="reused"
       return 1
-    fi
-    if [ -n "$expected" ]; then
-      actual=$(awk '{print $22}' "/proc/$pid/stat" 2>/dev/null)
-      if [ -n "$actual" ] && [ "$actual" != "$expected" ]; then
-        PID_STATE="reused"
-        return 1
-      fi
     fi
   fi
   PID_STATE="alive"
@@ -190,10 +354,11 @@ is_alive() {
 S_EXISTS=0
 S_RC=""
 S_SENT=""
+S_CLASS=""
 
 read_status_file() {
   local f="$1" line=""
-  S_EXISTS=0; S_RC=""; S_SENT=""
+  S_EXISTS=0; S_RC=""; S_SENT=""; S_CLASS=""
   [ -n "$f" ] && [ -f "$f" ] || return 0
   line=$(grep -m 1 '^exit=' "$f" 2>/dev/null || true)
   [ -n "$line" ] || return 0
@@ -201,6 +366,8 @@ read_status_file() {
   S_RC=$(printf '%s\n' "$line" | sed -n 's/^exit=\([0-9][0-9]*\).*/\1/p')
   S_SENT=$(printf '%s\n' "$line" | sed -n 's/.*sentinel=\([01]\).*/\1/p')
   is_uint "$S_RC" || S_RC=0
+  classify_pair "$(line_field_of "$line")" "$(run_field_of "$line")"
+  S_CLASS="$CC"
 }
 
 last_nonempty_line() {
@@ -211,30 +378,96 @@ last_nonempty_line() {
 }
 
 V_LABEL=""; V_VERDICT=""; V_CODE=0; V_REASON=""
-V_PID=""; V_HB=""; V_SENT=""; V_RC=""; V_LAST=""; V_STATUS_RAW=""; V_ELAPSED=0; V_ANOMALY="no"
+V_PID=""; V_HB=""; V_SENT=""; V_RC=""; V_LAST=""; V_STATUS_RAW=""; V_ELAPSED=0; V_ANOMALY="no"; V_ATTR="legacy"; V_AT=""
 
 evaluate() {
   local label="$1" pidf="$2" statf="$3" logf="$4" sent="$5" hbf="$6" dl="$7"
   local now pid start pid_alive=0 pid_state="missing" hb_state="na" sent_state="na"
   local last="" anomaly=0 s_exists=0 s_rc="" s_sent=""
   local verdict="RUNNING" code="$EXIT_RUNNING" reason="" age=0 mt=0
+  local pid_class="" status_class="" log_class="" sent_own=0
 
   now=$(now_epoch)
-  read_pid_file "$pidf"; pid="$P_PID"; start="$P_START"
+  read_pid_file "$pidf"; pid="$P_PID"; start="$P_START"; pid_class="$P_CLASS"
+  if [ -n "$LINE_ID" ] && [ "$pid_class" != "own" ]; then
+    pid=""; start=""
+  fi
+  read_registry_entry
+  registry_identity=""
+  if [ "$REG_STATE" = "present" ]; then
+    if [ -n "$REG_RUNNER_PID" ] || [ -n "$REG_CLI_PID" ]; then
+      if [ -n "$pid" ] && [ "$pid" = "$REG_RUNNER_PID" ]; then
+        # The registry token is authoritative even when the pid file lacks one.
+        [ -n "$REG_RUNNER_START" ] && start="$REG_RUNNER_START"
+      elif [ -n "$pid" ] && [ "$pid" = "$REG_CLI_PID" ]; then
+        [ -n "$REG_CLI_START" ] && start="$REG_CLI_START"
+      elif [ -n "$pid" ]; then
+        pid=""; start=""; registry_identity="unregistered"
+      fi
+    elif [ -n "$pid" ]; then
+      # A registered line with no registered PID has no identity evidence;
+      # an ambient pid file must never be trusted (pre-dispatch entry).
+      pid=""; start=""; registry_identity="unregistered"
+    fi
+  elif [ "$REG_STATE" = "missing" ] && [ -n "$pid" ]; then
+    pid=""; start=""; registry_identity="unregistered"
+  fi
   if [ -n "$pid" ]; then
     if is_alive "$pid" "$start"; then pid_alive=1; fi
     pid_state="$PID_STATE"
+  elif [ -n "$registry_identity" ]; then
+    pid_state="$registry_identity"
+  fi
+  if [ "$pid_alive" -eq 1 ] && [ "$REG_STATE" = "present" ] && [ -n "$REG_BRANCH" ]; then
+    if [ -z "$REG_WORKTREE" ] || [ ! -d "$REG_WORKTREE" ]; then
+      # A registered branch that cannot be verified is not a trusted identity.
+      pid_alive=0
+      pid_state="branch-mismatch"
+    elif command -v git >/dev/null 2>&1; then
+      actual_branch=$(git -C "$REG_WORKTREE" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+      if [ -n "$actual_branch" ] && [ "$actual_branch" != "$REG_BRANCH" ]; then
+        pid_alive=0
+        pid_state="branch-mismatch"
+      fi
+    fi
   fi
 
-  read_status_file "$statf"; s_exists="$S_EXISTS"; s_rc="$S_RC"; s_sent="$S_SENT"
+  read_status_file "$statf"; s_exists="$S_EXISTS"; s_rc="$S_RC"; s_sent="$S_SENT"; status_class="$S_CLASS"
+  if [ -n "$LINE_ID" ] && [ "$status_class" != "own" ]; then
+    s_exists=0; s_rc=""; s_sent=""
+  fi
+  read_meta_file "$META"
+  read_heartbeat_envelope "$hbf"
   last=$(last_nonempty_line "$logf")
-  case "$last" in ANOMALY:*) anomaly=1 ;; esac
+  if [ "$M_EXISTS" -eq 1 ]; then
+    log_class="$M_CLASS"
+  elif [ "$S_EXISTS" -eq 1 ]; then
+    log_class="$status_class"
+  else
+    log_class="unattributed"
+  fi
+  case "$last" in
+    ANOMALY:*)
+      if [ -z "$LINE_ID" ] || [ "$log_class" = "own" ]; then anomaly=1; fi
+      ;;
+  esac
 
   if [ -n "$sent" ]; then
-    if [ "$last" = "$sent" ] || [ "$s_sent" = "1" ]; then
-      sent_state="yes"
+    if [ -z "$LINE_ID" ]; then
+      if [ "$last" = "$sent" ] || [ "$s_sent" = "1" ]; then
+        sent_state="yes"
+      else
+        sent_state="no"
+      fi
     else
-      sent_state="no"
+      if [ "$s_exists" -eq 1 ] && [ "$s_sent" = "1" ]; then
+        sent_own=1
+      elif [ "$M_EXISTS" -eq 1 ] && [ "$M_CLASS" = "own" ] && [ "$M_SENT" = "1" ] && [ "$last" = "$sent" ]; then
+        sent_own=1
+      elif [ "$s_exists" -eq 1 ] && [ "$M_EXISTS" -eq 0 ] && [ "$last" = "$sent" ]; then
+        sent_own=1
+      fi
+      [ "$sent_own" -eq 1 ] && sent_state="yes" || sent_state="no"
     fi
   fi
 
@@ -243,7 +476,9 @@ evaluate() {
       mt=$(file_mtime "$hbf")
       if is_uint "$mt" && [ "$mt" -gt 0 ]; then
         age=$((now - mt))
-        if [ "$age" -gt "$HEARTBEAT_MAX_AGE" ]; then hb_state="stale"; else hb_state="fresh"; fi
+        if [ -n "$LINE_ID" ] && [ "$H_CLASS" != "own" ]; then
+          hb_state="na"
+        elif [ "$age" -gt "$HEARTBEAT_MAX_AGE" ]; then hb_state="stale"; else hb_state="fresh"; fi
       else
         hb_state="missing"
       fi
@@ -277,7 +512,8 @@ evaluate() {
       verdict="DONE"; code="$EXIT_DONE"; reason="sentinel"
     elif [ "$anomaly" -eq 1 ] && [ "$pid_alive" -eq 0 ]; then
       verdict="ANOMALY"; code="$EXIT_ANOMALY"; reason="anomaly-line"
-    elif [ "$pid_state" = "dead" ] || [ "$pid_state" = "zombie" ] || [ "$pid_state" = "reused" ]; then
+    elif [ "$pid_state" = "dead" ] || [ "$pid_state" = "zombie" ] || [ "$pid_state" = "reused" ] \
+         || [ "$pid_state" = "unregistered" ] || [ "$pid_state" = "branch-mismatch" ]; then
       verdict="DEAD"; code="$EXIT_DEAD"; reason="pid-$pid_state"
     elif [ "$pid_state" = "alive" ]; then
       verdict="RUNNING"; code="$EXIT_RUNNING"; reason="alive"
@@ -300,18 +536,34 @@ evaluate() {
   V_RC="${s_rc:-na}"; V_LAST="$last"; V_STATUS_RAW=""
   [ "$anomaly" -eq 1 ] && V_ANOMALY="observed" || V_ANOMALY="no"
   [ "$s_exists" -eq 1 ] && V_STATUS_RAW="exit=$s_rc sentinel=${s_sent:-na}"
+  if [ -z "$LINE_ID" ]; then
+    V_ATTR="legacy"
+  elif [ "$S_EXISTS" -eq 1 ]; then
+    V_ATTR="$status_class"
+  elif [ "$M_EXISTS" -eq 1 ]; then
+    V_ATTR="$M_CLASS"
+  elif [ "$HB_EXISTS" -eq 1 ]; then
+    V_ATTR="$H_CLASS"
+  elif [ "$P_PRESENT" -eq 1 ]; then
+    V_ATTR="$pid_class"
+  else
+    V_ATTR="unattributed"
+  fi
   V_ELAPSED=$((now - START_EPOCH))
+  V_AT="$now"
 }
 
 format_verdict() {
-  printf 'WATCH label=%s verdict=%s pid=%s heartbeat=%s anomaly=%s sentinel=%s rc=%s elapsed=%s reason=%s' \
-    "$V_LABEL" "$V_VERDICT" "$V_PID" "$V_HB" "$V_ANOMALY" "$V_SENT" "$V_RC" "$V_ELAPSED" "$V_REASON"
+  printf 'WATCH label=%s verdict=%s pid=%s heartbeat=%s anomaly=%s sentinel=%s rc=%s elapsed=%s reason=%s line=%s run=%s stage=%s event=watcher-verdict at=%s attribution=%s' \
+    "$V_LABEL" "$V_VERDICT" "$V_PID" "$V_HB" "$V_ANOMALY" "$V_SENT" "$V_RC" "$V_ELAPSED" "$V_REASON" \
+    "$LINE_ID" "$RUN_ID" "$STAGE" "$V_AT" "$V_ATTR"
 }
 
 format_evidence() {
   local last
   last=$(one_line "$V_LAST" | tr '"' "'")
-  printf 'EVIDENCE label=%s last="%s" status="%s"' "$V_LABEL" "$last" "$V_STATUS_RAW"
+  printf 'EVIDENCE label=%s last="%s" status="%s" line=%s run=%s stage=%s event=watcher-verdict at=%s attribution=%s' \
+    "$V_LABEL" "$last" "$V_STATUS_RAW" "$LINE_ID" "$RUN_ID" "$STAGE" "$V_AT" "$V_ATTR"
 }
 
 emit_single() {
@@ -325,14 +577,35 @@ normalize_field() {
   if [ "$1" = "-" ]; then printf ''; else printf '%s' "$1"; fi
 }
 
+maybe_renew_lease() {
+  [ -n "$LEASE_RENEW_CMD" ] || return 0
+  local now
+  now=$(now_epoch)
+  if [ "$LAST_LEASE_RENEW" -eq 0 ] || [ "$((now - LAST_LEASE_RENEW))" -ge "$LEASE_RENEW_INTERVAL" ]; then
+    bash -c "$LEASE_RENEW_CMD" >/dev/null 2>&1 || true
+    LAST_LEASE_RENEW=$now
+  fi
+}
+
 run_single() {
   START_EPOCH=$(now_epoch)
   if [ -n "$TIMEOUT" ]; then DEADLINE_EPOCH=$((START_EPOCH + TIMEOUT)); fi
   [ "$ONCE" -eq 1 ] && WINDOW=0
-  local window_end=$((START_EPOCH + WINDOW)) now remaining sleep_for
+  local window_end=$((START_EPOCH + WINDOW)) grace_end=0 grace_used=0 now remaining sleep_for
+  if [ "$ONCE" -eq 0 ] && [ "$DEADLINE_EPOCH" -gt 0 ] && [ "$DEADLINE_GRACE" -gt 0 ]; then
+    grace_end=$((DEADLINE_EPOCH + DEADLINE_GRACE))
+  fi
   while :; do
+    maybe_renew_lease
     evaluate "$LABEL" "$PID_FILE" "$STATUS_FILE" "$LOG_FILE" "$SENTINEL" "$HEARTBEAT" "$DEADLINE_EPOCH"
-    if [ "$V_CODE" -ne "$EXIT_RUNNING" ]; then
+    now=$(now_epoch)
+    if [ "$V_CODE" -eq "$EXIT_TIMEOUT" ] && [ "$grace_end" -gt 0 ] && [ "$now" -lt "$grace_end" ]; then
+      # Deadline reached but the process may still complete: keep sampling
+      # through the grace window instead of returning TIMEOUT immediately.
+      grace_used=1
+      [ "$window_end" -lt "$grace_end" ] && window_end=$grace_end
+    elif [ "$V_CODE" -ne "$EXIT_RUNNING" ]; then
+      [ "$grace_used" -eq 1 ] && [ "$V_CODE" -eq "$EXIT_TIMEOUT" ] && V_REASON="deadline-grace-expired"
       emit_single
       exit "$V_CODE"
     fi
@@ -384,6 +657,7 @@ run_manifest() {
   local -a result_lines evidence_lines
   local any_terminal worst worst_sev sev
   while :; do
+    maybe_renew_lease
     result_lines=(); evidence_lines=(); any_terminal=0; worst="$EXIT_RUNNING"; worst_sev=1
     for i in "${!M_LABEL[@]}"; do
       local dl="${M_DL[$i]}"
@@ -453,6 +727,20 @@ self_test() {
     fi
   }
 
+  check_attr() {
+    local name="$1" want_rc="$2" want_verdict="$3" want_attr="$4" r="$5"
+    local rc="${r%%$'\n'*}" out="${r#*$'\n'}"
+    if [ "$rc" -ne "$want_rc" ]; then
+      bad "$name" "exit $rc != $want_rc; output: $out"
+    elif ! printf '%s\n' "$out" | grep -q "verdict=$want_verdict"; then
+      bad "$name" "missing verdict=$want_verdict; output: $out"
+    elif ! printf '%s\n' "$out" | grep -q "attribution=$want_attr"; then
+      bad "$name" "missing attribution=$want_attr; output: $out"
+    else
+      ok "$name"
+    fi
+  }
+
   watch() {
     local out rc
     out=$("$SELF" "$@" 2>&1); rc=$?
@@ -499,18 +787,14 @@ self_test() {
     --log "$base/log4b" --sentinel PLAN-DONE --window 1 --start-grace 0)
   check anomaly-precedence 11 ANOMALY "${r%%$'\n'*}" "${r#*$'\n'}"
 
-  # 5. dead pid, no exit record
-  sleep 0.2 & local deadpid=$!
-  disown "$deadpid" 2>/dev/null || true
-  ST_SPAWNED+=("$deadpid")
-  wait "$deadpid" 2>/dev/null || true
-  printf 'pid=%s start=\n' "$deadpid" > "$base/pid5"
+  # 5. dead pid, no exit record (fixed unused pid: no reuse race)
+  printf 'pid=999999 start=\n' > "$base/pid5"
   r=$(watch --label dead --pid-file "$base/pid5" --status-file "$base/none5" \
     --log "$base/none5" --sentinel PLAN-DONE --window 1 --start-grace 0)
   check dead 13 DEAD "${r%%$'\n'*}" "${r#*$'\n'}"
 
-  # 6. running process, no terminal signal
-  sleep 3 & local live=$!
+  # 6. running process, no terminal signal (long-lived so later cases keep a live pid)
+  sleep 30 & local live=$!
   disown "$live" 2>/dev/null || true
   ST_SPAWNED+=("$live")
   local ticks=""
@@ -522,8 +806,29 @@ self_test() {
 
   # 7. stage deadline => TIMEOUT, not window expiry
   r=$(watch --label timeout --pid-file "$base/pid6" --status-file "$base/none6" \
-    --log "$base/none6" --sentinel PLAN-DONE --timeout 1 --window 3 --interval 1 --start-grace 0)
+    --log "$base/none6" --sentinel PLAN-DONE --timeout 1 --deadline-grace 0 \
+    --window 3 --interval 1 --start-grace 0)
   check timeout 14 TIMEOUT "${r%%$'\n'*}" "${r#*$'\n'}"
+
+  # 7b. late completion inside the deadline grace => DONE, not TIMEOUT
+  : > "$base/late.log"
+  ( sleep 2; printf 'exit=0 at=%s sentinel=1\n' "$(date +%s)" > "$base/late.status"; \
+    printf 'PLAN-DONE\n' > "$base/late.log" ) &
+  local late_writer=$!
+  ST_SPAWNED+=("$late_writer")
+  r=$(watch --label late --pid-file "$base/pid6" --status-file "$base/late.status" \
+    --log "$base/late.log" --sentinel PLAN-DONE --timeout 1 --deadline-grace 4 \
+    --window 1 --interval 1 --start-grace 0)
+  wait "$late_writer" 2>/dev/null || true
+  check late-completion 0 DONE "${r%%$'\n'*}" "${r#*$'\n'}"
+
+  # 7c. grace expires without a status => TIMEOUT with an explicit reason
+  r=$(watch --label grace-timeout --pid-file "$base/pid6" --status-file "$base/none6" \
+    --log "$base/none6" --sentinel PLAN-DONE --timeout 1 --deadline-grace 2 \
+    --window 1 --interval 1 --start-grace 0)
+  check grace-timeout 14 TIMEOUT "${r%%$'\n'*}" "${r#*$'\n'}"
+  printf '%s\n' "${r#*$'\n'}" | grep -q 'reason=deadline-grace-expired' \
+    || bad "grace-timeout-reason" "grace expiry reason missing: ${r#*$'\n'}"
 
   # 8. no signals at all => NO_SIGNAL (zero-match path must not fake completion)
   r=$(watch --label nosignal --pid-file "$base/none8" --status-file "$base/none8" \
@@ -540,13 +845,13 @@ self_test() {
   check stale-heartbeat 10 RUNNING "${r%%$'\n'*}" "${r#*$'\n'}"
   printf '%s\n' "${r#*$'\n'}" | grep -q 'heartbeat=stale' || bad "stale-heartbeat-flag" "heartbeat not stale: $r"
 
-  # 10. pid reuse guard
+  # 10. pid reuse guard: live PID whose recorded start token is wrong
   printf 'pid=%s start=1\n' "$$" > "$base/pid10"
   r=$(watch --label reused --pid-file "$base/pid10" --status-file "$base/none10" \
     --log "$base/none10" --sentinel PLAN-DONE --window 1 --start-grace 0)
   check pid-reuse 13 DEAD "${r%%$'\n'*}" "${r#*$'\n'}"
 
-  # 10b. zombie process (requires a non-reaping parent; /proc state check)
+  # 10b. zombie process (requires a non-reaping parent; /proc or ps stat check)
   if command -v python3 >/dev/null 2>&1; then
     python3 - "$base/zpid" <<'PY' &
 import os, sys, time
@@ -585,11 +890,17 @@ PY
     --log "$base/log12" --window 0 --start-grace 0)
   check async-exit-ok 0 DONE "${r%%$'\n'*}" "${r#*$'\n'}"
 
-  # 13. manifest: one DONE + one RUNNING, both reported
+  # 13. manifest: one DONE + one RUNNING, both reported (fresh live PID)
+  sleep 30 & local manifest_live=$!
+  disown "$manifest_live" 2>/dev/null || true
+  ST_SPAWNED+=("$manifest_live")
+  local manifest_ticks
+  manifest_ticks=$(process_start_token "$manifest_live")
+  printf 'pid=%s start=%s\n' "$manifest_live" "$manifest_ticks" > "$base/pidm2"
   printf 'PLAN-DONE\n' > "$base/logm1"
   printf 'exit=0 at=1 sentinel=1\n' > "$base/statusm1"
   printf 'm1|%s|%s|%s|PLAN-DONE|-|0\nm2|%s|-|-|PLAN-DONE|-|0\n' \
-    "$base/pid1" "$base/statusm1" "$base/logm1" "$base/pid6" > "$base/manifest"
+    "$base/pid1" "$base/statusm1" "$base/logm1" "$base/pidm2" > "$base/manifest"
   r=$(watch --manifest "$base/manifest" --window 1 --interval 1 --start-grace 0)
   local mrc="${r%%$'\n'*}" mout="${r#*$'\n'}"
   if [ "$mrc" -ne 0 ] || ! printf '%s\n' "$mout" | grep -q 'label=m1 verdict=DONE' \
@@ -599,15 +910,102 @@ PY
     ok "manifest"
   fi
 
+  # 13b. attribution: own / foreign / stale-run / unattributed / legacy
+  sleep 8 & local attr_live=$!
+  disown "$attr_live" 2>/dev/null || true
+  ST_SPAWNED+=("$attr_live")
+  local attr_ticks=""
+  [ -r "/proc/$attr_live/stat" ] && attr_ticks=$(awk '{print $22}' "/proc/$attr_live/stat")
+  printf 'PLAN-DONE\n' > "$base/logattr"
+  printf 'exit=0 at=1 sentinel=1 line=L1 run=R1 stage=plan event=status\n' > "$base/statusattr"
+  printf 'pid=%s start=%s at=1 line=L1 run=R1 stage=plan event=pid\n' "$attr_live" "$attr_ticks" > "$base/pidattr"
+  printf 'at=1 line=L1 run=R1 stage=plan event=heartbeat\n' > "$base/hbattr"
+  printf '{"line_id":"L1","run_id":"R1","stage":"plan","event":"log-terminal","at":1,"sentinel_seen":1,"exit":0}\n' > "$base/metaattr"
+  r=$(watch --label attr-own --line-id L1 --run-id R1 \
+    --pid-file "$base/pidattr" --status-file "$base/statusattr" --log "$base/logattr" \
+    --sentinel PLAN-DONE --heartbeat "$base/hbattr" --meta "$base/metaattr" --window 0 --start-grace 0)
+  check_attr "attribution-own" 0 DONE own "$r"
+
+  printf 'exit=0 at=1 sentinel=1 line=L2 run=R2 stage=plan event=status\n' > "$base/statusforeign"
+  printf '{"line_id":"L2","run_id":"R2","stage":"plan","event":"log-terminal","at":1,"sentinel_seen":1,"exit":0}\n' > "$base/metaforeign"
+  r=$(watch --label attr-foreign --line-id L1 --run-id R1 \
+    --pid-file "$base/pidattr" --status-file "$base/statusforeign" --log "$base/logattr" \
+    --sentinel PLAN-DONE --heartbeat "$base/hbattr" --meta "$base/metaforeign" --window 0 --start-grace 0)
+  check_attr "attribution-foreign-not-consumed" 10 RUNNING foreign "$r"
+
+  printf 'exit=0 at=1 sentinel=1 line=L1 run=R0 stage=plan event=status\n' > "$base/statusstale"
+  printf '{"line_id":"L1","run_id":"R0","stage":"plan","event":"log-terminal","at":1,"sentinel_seen":1,"exit":0}\n' > "$base/metastale"
+  r=$(watch --label attr-stale --line-id L1 --run-id R1 \
+    --pid-file "$base/pidattr" --status-file "$base/statusstale" --log "$base/logattr" \
+    --sentinel PLAN-DONE --heartbeat "$base/hbattr" --meta "$base/metastale" --window 0 --start-grace 0)
+  check_attr "attribution-stale-run" 10 RUNNING stale-run "$r"
+
+  printf 'exit=0 at=1 sentinel=1\n' > "$base/statusunattr"
+  r=$(watch --label attr-unattr --line-id L1 --run-id R1 \
+    --pid-file "$base/pidattr" --status-file "$base/statusunattr" --log "$base/logattr" \
+    --sentinel PLAN-DONE --heartbeat "$base/hbattr" --window 0 --start-grace 0)
+  check_attr "attribution-unattributed" 10 RUNNING unattributed "$r"
+
+  r=$(watch --label attr-legacy --pid-file "$base/pidattr" --status-file "$base/statusattr" \
+    --log "$base/logattr" --sentinel PLAN-DONE --heartbeat "$base/hbattr" --window 0 --start-grace 0)
+  check_attr "attribution-legacy" 0 DONE legacy "$r"
+
+  # 13c. lease renewal hook fires inside a watch window
+  : > "$base/renewed"
+  r=$(watch --label lease-renew --line-id L1 --run-id R1 \
+    --pid-file "$base/pidattr" --status-file "$base/none13" --log "$base/none13" \
+    --sentinel PLAN-DONE --window 2 --interval 1 --start-grace 0 \
+    --lease-renew-cmd "printf x >> '$base/renewed'" --lease-renew-interval 1)
+  local renew_rc="${r%%$'\n'*}"
+  if [ "$renew_rc" -eq 10 ] && [ -s "$base/renewed" ]; then
+    ok "lease-renew-hook"
+  else
+    bad "lease-renew-hook" "rc=$renew_rc renewed=$(wc -c < "$base/renewed" 2>/dev/null || echo 0)"
+  fi
+
+  # 13d. registry identity: registered PID + token is consumed, a different
+  # PID is refused, and a missing registry entry is never trusted.
+  local reg="$ST_TMP/registry"
+  mkdir -p "$reg"
+  local reg_token
+  reg_token=$(process_start_token "$$")
+  printf '{"line_id":"L1","run_id":"R1","runner_pid":%s,"runner_start_token":"%s"}\n' \
+    "$$" "$reg_token" > "$reg/L1.json"
+  printf 'pid=%s start=%s at=1 line=L1 run=R1 stage=plan event=pid\n' "$$" "$reg_token" > "$base/pidreg"
+  r=$(watch --label reg-ok --line-id L1 --run-id R1 --registry "$reg" \
+    --pid-file "$base/pidreg" --status-file "$base/nonereg" --log "$base/nonereg" \
+    --sentinel PLAN-DONE --window 0 --start-grace 0)
+  check reg-identity 10 RUNNING "${r%%$'\n'*}" "${r#*$'\n'}"
+  printf 'pid=1 start=%s at=1 line=L1 run=R1 stage=plan event=pid\n' "$reg_token" > "$base/pidregbad"
+  r=$(watch --label reg-foreign --line-id L1 --run-id R1 --registry "$reg" \
+    --pid-file "$base/pidregbad" --status-file "$base/nonereg" --log "$base/nonereg" \
+    --sentinel PLAN-DONE --window 1 --start-grace 0)
+  check reg-unregistered 13 DEAD "${r%%$'\n'*}" "${r#*$'\n'}"
+  rm -f "$reg/L1.json"
+  r=$(watch --label reg-missing --line-id L1 --run-id R1 --registry "$reg" \
+    --pid-file "$base/pidreg" --status-file "$base/nonereg" --log "$base/nonereg" \
+    --sentinel PLAN-DONE --window 1 --start-grace 0)
+  check reg-missing 13 DEAD "${r%%$'\n'*}" "${r#*$'\n'}"
+
+  # 13e. lease window gate: window > ttl/3 without a renewal hook fails fast
+  r=$(watch --label lease-window --lease-ttl 600 --window 201 \
+    --pid-file "$base/pid6" --status-file "$base/none13e" --log "$base/none13e" \
+    --sentinel PLAN-DONE --start-grace 0)
+  if [ "${r%%$'\n'*}" -eq 2 ] && printf '%s\n' "${r#*$'\n'}" | grep -q 'ttl/3'; then
+    ok "lease-window-over-ttl"
+  else
+    bad "lease-window-over-ttl" "rc=${r%%$'\n'*} out=${r#*$'\n'}"
+  fi
+
   # 14. demonstrate the pgrep -c zero-match trap (regression knowledge; the
   # watcher itself never uses pgrep for liveness)
   if command -v pgrep >/dev/null 2>&1; then
     local zero
     zero=$(pgrep -c '__watch_target_no_such_process__' 2>/dev/null || echo 0)
-    if [ "$zero" = "$(printf '0\n0')" ]; then
+    if [ "$zero" = "0" ] || [ "$zero" = "$(printf '0\n0')" ]; then
       ok "pgrep-zero-match-trap-reproduced"
     else
-      bad "pgrep-zero-match-trap-reproduced" "expected two 0 lines, got: $zero"
+      bad "pgrep-zero-match-trap-reproduced" "expected zero-match output, got: $zero"
     fi
   fi
 

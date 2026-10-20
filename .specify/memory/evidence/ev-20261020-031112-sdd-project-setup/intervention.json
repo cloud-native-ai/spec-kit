@@ -1,0 +1,6 @@
+{
+  "targetFinding": "ev-018",
+  "change": "sdd-project-setup S3 now treats the instructions BUDGET report as a convergence trigger; when the owner R1/R2 routes have no legal candidate, S3.4 R3 externalizes project-filled sections to owner documents under docs/ with mechanical migration assertions, and reports a pending budget/scope decision instead of relaying the warning. Added contract test C-13 and docs wiring.",
+  "baselineRunId": "ev-20261020-031112-sdd-project-setup",
+  "expectedSignal": "A subsequent setup run on an over-budget instructions file either ends within budget or reports a pending budget/scope decision without deleting project content."
+}

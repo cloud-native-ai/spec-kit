@@ -1,0 +1,116 @@
+# test runner: /Users/liuqiming.lqm/project/profiles/.venv/bin/python3 -m pytest tests/contract/test_workspace_isolation_contract.py -q -k p0_
+F..FF....F..................                                             [100%]
+=================================== FAILURES ===================================
+______________ test_p0_stale_cleanup_is_not_an_ownership_release _______________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_stale_cleanup_is_not_a0')
+
+    def test_p0_stale_cleanup_is_not_an_ownership_release(tmp_path):
+        """Regression for review P0-01: a stale-cleaned holder must keep blocking."""
+        _repo, reg, holder, waiter, _mw = _prepare_overlap(tmp_path)
+        stale = engine_json("deregister", "--line-id", holder, "--reason", "stale-cleanup", reg=reg)
+        assert stale["state"] == "stale"
+        assert stale["stale_from_state"] == "active"
+        assert "closed_at" not in stale
+        manifest = json.loads((reg / "manifests" / f"{holder}.json").read_text())
+        assert "released_at" not in manifest
+    
+        refused = run_engine("promote-waiting", "--line-id", waiter, reg=reg)
+>       assert refused.returncode == 3, refused.stdout
+E       AssertionError: {"base_sha": "6ea710c866391d01ffd0c6cfff5e7ead0ff74eeb", "branch": "line/wait-20261020T084324Z-4671", "claimed_ns": 1792485805295828000, "cli": "qodercli", "created_at": "2026-10-20T08:43:25Z", "driver_session": "pid:85405", "last_event": "promoted", "line_id": "wait-20261020T084324Z-4671", "owned_paths": ["/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_stale_cleanup_is_not_a0/repo/src/file"], "ownership_manifest_path": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_stale_cleanup_is_not_a0/mw.json", "project_dir": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_stale_cleanup_is_not_a0/repo", "repo_root": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_stale_cleanup_is_not_a0/repo", "run_history": [], "run_id": "r20261020T084325Z-3e66", "schema_version": 1, "state": "active", "updated_at": "2026-10-20T08:43:25Z", "worktree_path": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_stale_cleanup_is_not_a0/w", "write_line": true}
+E         
+E       assert 0 == 3
+E        +  where 0 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python3', '/tmp/mutation-line-registry-p0.py',...jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_stale_cleanup_is_not_a0/w", "write_line": true}\n', stderr='').returncode
+
+tests/contract/test_workspace_isolation_contract.py:208: AssertionError
+----------------------------- Captured stderr call -----------------------------
+time="2026-10-20 16:43:23" level=info msg="Running git hook" hook=pre-commit
+time="2026-10-20 16:43:24" level=info msg="Running git hook" hook=prepare-commit-msg
+time="2026-10-20 16:43:24" level=info msg="Running git hook" hook=commit-msg
+time="2026-10-20 16:43:24" level=info msg="Running git hook" hook=post-commit
+______________ test_p0_update_state_active_cannot_bypass_the_gate ______________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_update_state_active_ca0')
+
+    def test_p0_update_state_active_cannot_bypass_the_gate(tmp_path):
+        _repo, reg, holder, waiter, _mw = _prepare_overlap(tmp_path)
+        engine_json("deregister", "--line-id", holder, "--reason", "stale-cleanup", reg=reg)
+        bypass = run_engine("update", "--line-id", waiter, "--state", "active", reg=reg)
+>       assert bypass.returncode == 3, bypass.stdout
+E       AssertionError: {"base_sha": "fa4869bf548c88be6b8c8bbbc06db4e3484751cc", "branch": "line/wait-20261020T084336Z-03cc", "claimed_ns": 1792485817101749000, "cli": "qodercli", "created_at": "2026-10-20T08:43:37Z", "driver_session": "pid:85405", "last_event": "waiting-ownership-overlap", "line_id": "wait-20261020T084336Z-03cc", "owned_paths": ["/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_update_state_active_ca0/repo/src/file"], "ownership_manifest_path": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_update_state_active_ca0/mw.json", "project_dir": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_update_state_active_ca0/repo", "repo_root": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_update_state_active_ca0/repo", "run_history": [], "run_id": "r20261020T084336Z-a064", "schema_version": 1, "state": "active", "updated_at": "2026-10-20T08:43:37Z", "worktree_path": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_update_state_active_ca0/w", "write_line": true}
+E         
+E       assert 0 == 3
+E        +  where 0 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python3', '/tmp/mutation-line-registry-p0.py',...jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_update_state_active_ca0/w", "write_line": true}\n', stderr='').returncode
+
+tests/contract/test_workspace_isolation_contract.py:255: AssertionError
+----------------------------- Captured stderr call -----------------------------
+time="2026-10-20 16:43:35" level=info msg="Running git hook" hook=pre-commit
+time="2026-10-20 16:43:36" level=info msg="Running git hook" hook=prepare-commit-msg
+time="2026-10-20 16:43:36" level=info msg="Running git hook" hook=commit-msg
+time="2026-10-20 16:43:36" level=info msg="Running git hook" hook=post-commit
+__________________ test_p0_reacquired_ownership_blocks_again ___________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_reacquired_ownership_b0')
+
+    def test_p0_reacquired_ownership_blocks_again(tmp_path):
+        repo, reg, holder, waiter, _mw = _prepare_overlap(tmp_path)
+        engine_json(
+            "release-ownership", "--line-id", holder, "--reason", "handoff",
+            "--evidence-ref", "notes/handoff.md", reg=reg,
+        )
+        reacquired = engine_json(
+            "ownership-check", "--line-id", holder,
+            "--manifest", str(tmp_path / "mh.json"), reg=reg,
+        )
+        # The waiter already queued an earlier current claim, so the re-acquired
+        # holder goes behind it; the old release history must not be treated as a
+        # permanent unlock.
+        assert reacquired["decision"] == "waiting"
+        assert reacquired["holder_line_id"] == waiter
+        manifest = json.loads((reg / "manifests" / f"{holder}.json").read_text())
+        assert "released_at" not in manifest
+        assert manifest["claimed_at"] and manifest["claimed_ns"]
+    
+        third = make_line_id("thrd")
+        proc = run_engine(
+            "register", "--line-id", third, "--run-id", make_run_id(),
+            "--project-dir", str(repo), "--repo-root", str(repo),
+            "--state", "active", "--manifest",
+            str(_manifest(tmp_path / "m3.json", third, owned=["src/other"])), reg=reg,
+        )
+>       assert proc.returncode == 3, proc.stdout
+E       AssertionError: {"claimed_ns": 1792485821079646000, "cli": "qodercli", "created_at": "2026-10-20T08:43:41Z", "driver_session": "pid:85405", "last_event": "registered", "line_id": "thrd-20261020T084340Z-7737", "owned_paths": ["/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_reacquired_ownership_b0/repo/src/other"], "ownership_manifest_path": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_reacquired_ownership_b0/m3.json", "project_dir": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_reacquired_ownership_b0/repo", "repo_root": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_reacquired_ownership_b0/repo", "run_history": [], "run_id": "r20261020T084340Z-7b3e", "schema_version": 1, "state": "active", "updated_at": "2026-10-20T08:43:41Z", "write_line": true}
+E         
+E       assert 0 == 3
+E        +  where 0 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python3', '/tmp/mutation-line-registry-p0.py',...7b3e", "schema_version": 1, "state": "active", "updated_at": "2026-10-20T08:43:41Z", "write_line": true}\n', stderr='').returncode
+
+tests/contract/test_workspace_isolation_contract.py:286: AssertionError
+----------------------------- Captured stderr call -----------------------------
+time="2026-10-20 16:43:38" level=info msg="Running git hook" hook=pre-commit
+time="2026-10-20 16:43:38" level=info msg="Running git hook" hook=prepare-commit-msg
+time="2026-10-20 16:43:39" level=info msg="Running git hook" hook=commit-msg
+time="2026-10-20 16:43:40" level=info msg="Running git hook" hook=post-commit
+_________________ test_p0_close_without_evidence_still_blocks __________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_close_without_evidence0')
+
+    def test_p0_close_without_evidence_still_blocks(tmp_path):
+        _repo, reg, holder, waiter, _mw = _prepare_overlap(tmp_path)
+        engine_json("deregister", "--line-id", holder, "--reason", "abandoned", reg=reg)
+        refused = run_engine("promote-waiting", "--line-id", waiter, reg=reg)
+>       assert refused.returncode == 3
+E       assert 0 == 3
+E        +  where 0 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python3', '/tmp/mutation-line-registry-p0.py',...jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-308/test_p0_close_without_evidence0/w", "write_line": true}\n', stderr='').returncode
+
+tests/contract/test_workspace_isolation_contract.py:389: AssertionError
+----------------------------- Captured stderr call -----------------------------
+time="2026-10-20 16:43:49" level=info msg="Running git hook" hook=pre-commit
+time="2026-10-20 16:43:50" level=info msg="Running git hook" hook=prepare-commit-msg
+time="2026-10-20 16:43:50" level=info msg="Running git hook" hook=commit-msg
+time="2026-10-20 16:43:50" level=info msg="Running git hook" hook=post-commit
+=========================== short test summary info ============================
+FAILED tests/contract/test_workspace_isolation_contract.py::test_p0_stale_cleanup_is_not_an_ownership_release
+FAILED tests/contract/test_workspace_isolation_contract.py::test_p0_update_state_active_cannot_bypass_the_gate
+FAILED tests/contract/test_workspace_isolation_contract.py::test_p0_reacquired_ownership_blocks_again
+FAILED tests/contract/test_workspace_isolation_contract.py::test_p0_close_without_evidence_still_blocks
+4 failed, 24 passed, 18 deselected in 68.96s (0:01:08)

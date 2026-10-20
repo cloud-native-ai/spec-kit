@@ -160,3 +160,11 @@
 | 配置快照 | config snapshot | 配置解析引擎在派发前落盘的 effective config 及其身份（config_id、source_chain、resolved_at）；派发量化记录经 config_id 引用快照作为「本次用了什么配置」的凭据（需求 061） | auto | proposed |
 | 默认层 | defaults layer | 子代理 CLI 配置的最低优先级层 .specify/agents/execution/configs/_defaults.yaml，由 specify init 从模板播种且永不覆盖；其 cli 只是默认值，代理或内联选择其它 CLI 时整层跳过（需求 061） | auto | proposed |
 | CLI 能力矩阵 | CLI capability matrix | 每个受支持子代理 CLI 的可派发形态、可接受旗标与可用量化方法的单一代码侧 owner 表；文档只引用不复制，未验证组合以 exit 2 拒收并列出字段与支持集（需求 061） | auto | proposed |
+| Line Registry | 线路登记册, line registry | 环境级线路登记集合:每线一个 <line_id>.json + 同线锁,是线路发现、归属校验与重接线的恢复入口之一;真源 .specify/specs/064-subagent-concurrency/data-model.md § E1 | auto | proposed |
+| Line Envelope | 线路信封, line envelope | 附着于阶段 prompt/status/log/heartbeat/哨兵记录/watcher/monitor 事件的机器可读归属记录 (line_id, run_id, stage, event);以 JSON 旁路承载,不改日志正文与哨兵最后一行;真源 data-model.md § E2 | auto | proposed |
+| Ownership Manifest | 归属清单, ownership manifest | 每条 line 的路径集声明 (owned_paths/read_only_paths/forbidden_paths);Manifest 是路径集 owner,Registry 的 owned_paths 是可再生产投影;真源 data-model.md § E3 | auto | proposed |
+| Integration Queue | 集成队列, integration queue | ready_for_merge 线路的确定性合并序列:拓扑依赖优先,同层按 (ready_for_merge_at, line_id) 升序,重放一致;真源 data-model.md § E7 | auto | proposed |
+| CLI Capability Profile | CLI 能力档案, capability profile | 每个 CLI 一份的观测行为知识文档 (references/cli/<cli>.md),覆盖八维度 known/unknown 与 provenance;不是派发资格 owner(061 的 CAPABILITY_MATRIX 拥有资格);真源 data-model.md § E9 | auto | proposed |
+| Driver Lease | 驱动租约, driver lease | 表示哪个驱动会话在接管一条 line 的租约文件 <line_id>.driver.lock;活持有者不得夺取,过期须带证据破除并留历史;真源 data-model.md § E4 | auto | proposed |
+| Stage Reservation | 阶段预占, stage reservation | (line_id, stage) 的 O_CREAT 加 O_EXCL 预占,防止同一阶段重复启动;第二启动者只能附着或拒绝;真源 data-model.md § E5 | auto | proposed |
+| Detached Stage Execution | 脱离式阶段执行, detached execution | 子代理在独立进程组/会话 + 四件套 + Registry + reservation + lease 下的执行形态,生命周期独立于主会话并可重新接线;真源 data-model.md § E6/references | auto | proposed |
