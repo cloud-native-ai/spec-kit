@@ -326,7 +326,7 @@ All 68 FR and all 10 SC appear in at least one item; the mapping is collective, 
 
 - **Checklist result**: 40 items — 16 PASS / 24 FAIL. FAILs are requirement-quality findings, not run anomalies.
 - **Traceability**: 40/40 items carry a requirement/SC reference or a `[Gap]/[Ambiguity]/[Conflict]/[Assumption]` marker (100%, above the 80% floor).
-- **Upstream validators (post-write run)**: see the run record appended at the end of this phase; `validate-requirements.py` and `validate-tasks.py` must both remain exit 0.
-- **Upstream files untouched**: requirements.md, plan.md, tasks.md, contracts/, data-model.md, feature-ref.md, quickstart.md were read only. This file is new; `checklists/requirements.md` is unchanged.
+- **Upstream validators (post-write run)**: `validate-requirements.py` exit 0 — `status: ok`, 0 error(s), 0 warning(s), scanned 351 lines / 78 definition rows / 4 shared strings; `validate-tasks.py` exit 0 — `PASS`, 0 error(s), 0 warning(s).
+- **Upstream files untouched**: requirements.md, plan.md, tasks.md, contracts/, data-model.md, feature-ref.md, quickstart.md were read only. This file is new; `checklists/requirements.md` is unchanged (`git diff --quiet` exit 0).
 - **No implementation testing**: no product behavior was run; all verdicts are textual/traceability judgments against file:line evidence.
 - **Same-author gate**: detection delegated to three fresh-context read-only subagents with disjoint scopes; validation re-opened every cited line; 3 detector candidates were reclassified/merged before landing (see the note above).
