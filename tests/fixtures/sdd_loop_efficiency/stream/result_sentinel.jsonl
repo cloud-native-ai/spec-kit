@@ -1,0 +1,3 @@
+{"type":"system","subtype":"init","session_id":"fixture-result"}
+{"type":"assistant","message":{"content":[{"type":"text","text":"the body mentions PLAN-DONE as a word"}]}}
+{"type":"result","subtype":"success","is_error":false,"result":"the stage finished its work\nthe final line is exact\nPLAN-DONE"}

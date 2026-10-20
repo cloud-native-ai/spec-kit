@@ -1,0 +1,27 @@
+# Fixture Tasks — 012-medium
+
+- [ ] T001 fixture task 1
+- [ ] T002 fixture task 2
+- [ ] T003 fixture task 3
+- [ ] T004 fixture task 4
+- [ ] T005 fixture task 5
+- [ ] T006 fixture task 6
+- [ ] T007 fixture task 7
+- [ ] T008 fixture task 8
+- [ ] T009 fixture task 9
+- [ ] T010 fixture task 10
+- [ ] T011 fixture task 11
+- [ ] T012 fixture task 12
+- [ ] T013 fixture task 13
+- [ ] T014 fixture task 14
+- [ ] T015 fixture task 15
+- [ ] T016 fixture task 16
+- [ ] T017 fixture task 17
+- [ ] T018 fixture task 18
+- [ ] T019 fixture task 19
+- [ ] T020 fixture task 20
+- [ ] T021 fixture task 21
+- [ ] T022 fixture task 22
+- [ ] T023 fixture task 23
+- [ ] T024 fixture task 24
+- [ ] T025 fixture task 25

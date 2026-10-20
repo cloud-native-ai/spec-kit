@@ -1,0 +1,1 @@
+{"stage":"plan","row_type":"stage-status","status":"not-run-docs-only","selection_basis":"targeted-set-v1: changed paths are documentation-only","selected_paths":[],"sufficiency":"docs-only stage; no executable surface changed","changed_paths":["docs/notes/fixture.md"],"evidence_ptr":"logs/plan.log"}
