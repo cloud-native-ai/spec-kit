@@ -157,6 +157,23 @@ python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message 
 - 审后提交边界：本线只做阶段产物提交，审后由主会话统一提交本线收尾件。
 ```
 
+### 写线工作区声明（Feature 064）
+
+写线派发前，提示词与状态脊 MUST 携带以下声明（缺一项不得派发）：
+
+```text
+- worktree：<worktree_path>（本线唯一写工作区）
+- branch：line/<line_id>（base_sha：<base_sha>）
+- owned_paths：<...>；read_only_paths：<...>；forbidden_paths：<...>
+- resources：ports=<start-end>；cache_dir=<...>；tmp_dir=<...>
+```
+
+- 一个 worktree 同时只有一个写 line；阶段子代理**不得切换分支**、创建/删除 worktree，或改写其他 line 的 worktree。
+- 不得写入另一活动 line 的 `read_only_paths` / `forbidden_paths`；不得写共享可写运行时路径（feedback / session / knowledge / exec-quant 各写本线 worktree）。
+- 阶段提交只允许阶段产物路径；运行时记录不提交，由集成者一次归档。
+- U6 时未合并/未提交的 worktree MUST 保留并上送（`worktree_retained=true`）；移除只由集成序列在合并成功后执行。
+- 端口/缓存/临时目录按 Registry 分配使用；不得启动全局服务。
+
 ### 窄读法授权（Narrow-Read Authorization）
 
 被隔离项确需追加操作时，**只有显式授权才能放行**：

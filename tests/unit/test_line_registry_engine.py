@@ -218,3 +218,44 @@ def test_event_word_list_and_attribution_values():
         "watcher-verdict", "monitor", "registry-update", "integration",
     }
     assert engine.ATTRIBUTION_VALUES == {"own", "foreign", "stale-run", "unattributed", "legacy"}
+
+
+# ---------------------------------------------------------------- US2: paths / queue / resources
+
+
+def test_path_normalization_and_overlap(tmp_path):
+    engine = _load_engine()
+    repo = tmp_path / "repo"
+    (repo / "src" / "lib").mkdir(parents=True)
+    (repo / "link").symlink_to(repo / "src", target_is_directory=True)
+    a = engine.normalize_path("src/lib", repo)
+    b = engine.normalize_path(str(repo / "link" / "lib"), repo)
+    assert a == b
+    assert engine.paths_overlap(a, str(repo / "src"))
+    assert not engine.paths_overlap(a, str(repo / "other"))
+
+
+def test_topological_layers_and_cycle_refusal():
+    engine = _load_engine()
+    layers = engine.topological_layers(
+        ["a", "b", "c"], {"a": set(), "b": set(), "c": {"a"}}
+    )
+    assert layers == [["a", "b"], ["c"]]
+    with pytest.raises(engine.EngineError):
+        engine.topological_layers(["a", "b"], {"a": {"b"}, "b": {"a"}})
+
+
+def test_conflict_name_is_deterministic():
+    engine = _load_engine()
+    name, conflict = engine.conflict_name({"same.md"}, "same.md", "line-x")
+    assert conflict is True and name == "same.md.line-x.1"
+    name2, conflict2 = engine.conflict_name({"same.md", name}, "same.md", "line-x")
+    assert conflict2 is True and name2 == "same.md.line-x.2"
+    assert engine.conflict_name(set(), "same.md", "line-x") == ("same.md", False)
+
+
+def test_port_block_allocation_skips_used_ranges():
+    engine = _load_engine()
+    block = engine.allocate_port_block([(39000, 39019), (39040, 39059)], 39000, 20)
+    assert block == (39020, 39039)
+    assert engine.allocate_port_block([], 39000, 20) == (39000, 39019)

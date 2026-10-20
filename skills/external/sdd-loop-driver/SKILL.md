@@ -105,6 +105,7 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 - 收尾动作的合并/push 维持确认门控破坏性分类：缺省本地合并；push 须经入口显式授权。
 - 本手册编排阶段为不透明单元：不改 requirements/clarify/plan/tasks/checklist/analyze/implement/review 各命令的内部流程。
 - 不绑定特定项目族或工作区命名规则：别名、用户、路径、CLI、断点阶段全部入口参数化。
+- 同仓多写线：worktree-per-write-line + Ownership Manifest + 确定性集成队列（单一协调者、每批一次镜像）；规则见 `references/dispatch-recipes.md` Recipe 7 与 `references/stage-prompts.md` Concurrency Isolation。worktree 只在合并成功后移除，未合并/未提交时保留并上送。
 - 目标项目未安装 spec-kit（无 `.specify/`）时：**委托 sdd-project-setup** 处置（本技能不执行初始化），处置完成并取得就绪凭证后重入循环。
 
 ## Subagent Create & Dispatch Delegation（子代理创建与派发委派）

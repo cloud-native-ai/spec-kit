@@ -568,7 +568,6 @@ def action_register(ctx: Context) -> int:
         require(bool(entry.get("worktree_path")), "--write-line requires --worktree-path")
         require(bool(entry.get("branch")), "--write-line requires --branch")
         require(bool(entry.get("base_sha")), "--write-line requires --base-sha")
-        require(bool(args.manifest), "--write-line requires --manifest")
     if state == "waiting":
         entry["waiting_reason"] = args.waiting_reason or "ownership-overlap"
         entry["queued_at"] = args.queued_at or at
@@ -590,6 +589,8 @@ def action_register(ctx: Context) -> int:
     if args.spine:
         entry["spine_path"] = str(Path(args.spine).expanduser().resolve())
     validate_entry(entry)
+    if entry.get("worktree_path"):
+        _ensure_unique_worktree(ctx.reg, entry["worktree_path"], line_id)
     exclusive_write_json(entry_path(ctx.reg, line_id), entry)
     return emit(entry)
 
@@ -696,6 +697,8 @@ def action_update(ctx: Context) -> int:
 
     def mutate(data):
         _apply_update(data, args)
+        if data.get("worktree_path"):
+            _ensure_unique_worktree(ctx.reg, data["worktree_path"], line_id)
         if args.spine:
             check_spine_consistency(data, args.spine)
         elif data.get("spine_path"):
@@ -1100,6 +1103,444 @@ def action_verify_identity(ctx: Context) -> int:
     return emit(payload)
 
 
+# ---------------------------------------------------------------- ownership / queue / resources
+
+
+def topological_layers(nodes: list[str], edges: dict[str, set[str]]) -> list[list[str]]:
+    remaining = set(nodes)
+    layers: list[list[str]] = []
+    while remaining:
+        layer = sorted(node for node in remaining if not (edges.get(node, set()) & remaining))
+        if not layer:
+            raise EngineError(EXIT_IO, "dependency cycle detected: " + ", ".join(sorted(remaining)))
+        layers.append(layer)
+        remaining -= set(layer)
+    return layers
+
+
+def conflict_name(existing: set[str], basename: str, line_id: str) -> tuple[str, bool]:
+    if basename not in existing:
+        return basename, False
+    index = 1
+    while True:
+        candidate = f"{basename}.{line_id}.{index}"
+        if candidate not in existing:
+            return candidate, True
+        index += 1
+
+
+def allocate_port_block(used: list[tuple[int, int]], start: int, size: int) -> tuple[int, int]:
+    candidate = start
+    for range_start, range_end in sorted(used):
+        if candidate + size - 1 < range_start:
+            break
+        if candidate > range_end:
+            continue
+        candidate = range_end + 1
+    return candidate, candidate + size - 1
+
+
+def _manifest_for_entry(reg: Path, entry: dict) -> dict | None:
+    candidates = [manifest_path(reg, entry["line_id"])]
+    if entry.get("ownership_manifest_path"):
+        candidates.append(Path(entry["ownership_manifest_path"]))
+    for path in candidates:
+        data = read_json_optional(path)
+        if data is not None:
+            return data
+    return None
+
+
+def _manifest_conflicts(self_manifest: dict, other_manifest: dict, other_line: str) -> list[dict]:
+    conflicts = []
+    self_owned = self_manifest.get("owned_paths", [])
+    self_readonly = self_manifest.get("read_only_paths", []) + self_manifest.get("forbidden_paths", [])
+    other_owned = other_manifest.get("owned_paths", [])
+    other_readonly = other_manifest.get("read_only_paths", []) + other_manifest.get("forbidden_paths", [])
+
+    def record(path, other_path, kind):
+        conflicts.append({
+            "line_id": other_line, "path": path, "other_path": other_path, "kind": kind,
+        })
+
+    for a in self_owned:
+        for b in other_owned:
+            if paths_overlap(a, b):
+                record(a, b, "write-write")
+        for b in other_readonly:
+            if paths_overlap(a, b):
+                record(a, b, "write-readonly")
+    for a in self_readonly:
+        for b in other_owned:
+            if paths_overlap(a, b):
+                record(a, b, "readonly-write")
+    return conflicts
+
+
+def _ownership_conflicts(ctx: Context, self_entry: dict, self_manifest: dict) -> tuple[list[dict], list[dict]]:
+    conflicts: list[dict] = []
+    competitors: list[dict] = []
+    for path in sorted(ctx.reg.glob("*.json")):
+        entry = read_json(path)
+        if entry.get("line_id") == self_entry.get("line_id"):
+            continue
+        if entry.get("state") in {"closed", "stale", "orphaned"}:
+            continue
+        other_manifest = _manifest_for_entry(ctx.reg, entry)
+        if not other_manifest or other_manifest.get("released_at"):
+            continue
+        found = _manifest_conflicts(self_manifest, other_manifest, entry["line_id"])
+        if found:
+            conflicts.extend(found)
+            competitors.append(entry)
+    return conflicts, competitors
+
+
+def _ensure_unique_worktree(reg: Path, worktree: str, line_id: str) -> None:
+    target = str(Path(worktree).expanduser().resolve())
+    for path in reg.glob("*.json"):
+        entry = read_json(path)
+        if entry.get("line_id") == line_id:
+            continue
+        if entry.get("state") in {"closed", "stale", "orphaned"}:
+            continue
+        existing = entry.get("worktree_path")
+        if existing and str(Path(existing).resolve()) == target:
+            raise EngineError(
+                EXIT_USAGE,
+                f"worktree target already owned by line {entry.get('line_id')}: {target}",
+                path=target,
+            )
+
+
+def action_ownership_check(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(bool(args.manifest), "ownership-check requires --manifest")
+    entry = ctx.load(line_id)
+    manifest = load_manifest(Path(args.manifest), line_id, Path(entry["repo_root"]))
+    ensure_registry_dir(ctx.reg)
+    atomic_write_json(manifest_path(ctx.reg, line_id), manifest)
+    conflicts, competitors = _ownership_conflicts(ctx, entry, manifest)
+    decision = "proceed"
+    holder = None
+    if conflicts:
+        earliest = min(
+            competitors + [entry],
+            key=lambda item: (item.get("created_at") or "", item["line_id"]),
+        )
+        if earliest["line_id"] != line_id:
+            decision = "waiting"
+            holder = earliest["line_id"]
+
+    def mutate(data):
+        data["owned_paths"] = list(manifest["owned_paths"])
+        data["ownership_manifest_path"] = str(Path(args.manifest).resolve())
+        data["last_event"] = "ownership-checked"
+        if decision == "waiting":
+            data["state"] = "waiting"
+            data["waiting_reason"] = "ownership-overlap"
+            data["holder_line_id"] = holder
+            data["queued_at"] = now_iso()
+            data["last_event"] = "waiting-ownership-overlap"
+        elif data.get("state") == "waiting" and data.get("waiting_reason") == "ownership-overlap":
+            data["state"] = "active"
+            for key in ("waiting_reason", "holder_line_id", "queued_at"):
+                data.pop(key, None)
+            data["last_event"] = "ownership-cleared"
+
+    updated = ctx.mutate(line_id, mutate)
+    payload = {
+        "line_id": line_id,
+        "overlaps": conflicts,
+        "decision": decision,
+        "state": updated["state"],
+    }
+    if holder:
+        payload["holder_line_id"] = holder
+    return emit(payload)
+
+
+def action_release_ownership(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(bool(args.reason), "release-ownership requires --reason")
+    require(bool(args.evidence_ref), "release-ownership requires --evidence-ref")
+    entry = ctx.load(line_id)
+    manifest = _manifest_for_entry(ctx.reg, entry)
+    if manifest is not None:
+        manifest["released_at"] = now_iso()
+        manifest["release_reason"] = args.reason
+        manifest["evidence_ref"] = args.evidence_ref
+        atomic_write_json(manifest_path(ctx.reg, line_id), manifest)
+    append_jsonl(ctx.reg / f"{line_id}.ownership-history.jsonl", {
+        "event": "released", "reason": args.reason,
+        "evidence_ref": args.evidence_ref, "at": now_iso(),
+    })
+
+    def mutate(data):
+        data["last_event"] = "ownership-released"
+
+    updated = ctx.mutate(line_id, mutate)
+    return emit({
+        "line_id": line_id, "released": True,
+        "reason": args.reason, "state": updated["state"],
+    })
+
+
+def action_promote_waiting(ctx: Context) -> int:
+    line_id = validate_line_id(ctx.args.line_id or "")
+    entry = ctx.load(line_id)
+    require(entry.get("state") == "waiting", f"line {line_id} is not waiting (state={entry.get('state')})")
+    manifest = _manifest_for_entry(ctx.reg, entry)
+    if manifest is not None:
+        conflicts, competitors = _ownership_conflicts(ctx, entry, manifest)
+        if conflicts:
+            holder = min(competitors, key=lambda item: (item.get("created_at") or "", item["line_id"]))
+            return emit({
+                "line_id": line_id, "promoted": False, "reason": "ownership-overlap",
+                "holder_line_id": holder["line_id"],
+            }, code=EXIT_HELD)
+    cap = int(os.environ.get("SPECIFY_LINE_CONCURRENCY_CAP", DEFAULT_CONCURRENCY_CAP))
+    active = [
+        read_json(path) for path in ctx.reg.glob("*.json")
+        if read_json(path).get("line_id") != line_id
+        and read_json(path).get("state") == "active"
+        and read_json(path).get("stage")
+    ]
+    if len(active) >= cap:
+        return emit({"line_id": line_id, "promoted": False, "reason": "concurrency-cap"}, code=EXIT_HELD)
+
+    def mutate(data):
+        data["state"] = "active"
+        for key in ("waiting_reason", "holder_line_id", "queued_at"):
+            data.pop(key, None)
+        data["last_event"] = "promoted"
+
+    return emit(ctx.mutate(line_id, mutate))
+
+
+def action_integration_enqueue(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    entry = ctx.load(line_id)
+    require(entry.get("state") == "completed", "integration-enqueue requires state=completed")
+
+    def mutate(data):
+        data["merge_ready"] = True
+        data["ready_for_merge_at"] = args.at or now_iso()
+        data["last_event"] = "integration-enqueued"
+
+    return emit(ctx.mutate(line_id, mutate))
+
+
+def action_integration_plan(ctx: Context) -> int:
+    ensure_registry_dir(ctx.reg)
+    entries = {}
+    for path in sorted(ctx.reg.glob("*.json")):
+        entry = read_json(path)
+        entries[entry["line_id"]] = entry
+    queued = {
+        line_id: entry for line_id, entry in entries.items()
+        if entry.get("state") == "completed" and entry.get("merge_ready")
+    }
+    dependencies: dict[str, set[str]] = {}
+    blocked_by: dict[str, set[str]] = {}
+    for line_id, entry in queued.items():
+        manifest = _manifest_for_entry(ctx.reg, entry) or {}
+        deps = manifest.get("integration_depends_on", []) or []
+        dependencies[line_id] = set()
+        blocked_by[line_id] = set()
+        for dep in deps:
+            require(dep in entries, f"integration_depends_on references unknown line: {dep}")
+            dep_entry = entries[dep]
+            merged = (dep_entry.get("integration_result") or {}).get("status") == "merged"
+            if merged:
+                continue
+            if dep in queued:
+                dependencies[line_id].add(dep)
+            else:
+                blocked_by[line_id].add(dep)
+    changed = True
+    while changed:
+        changed = False
+        for line_id in list(queued):
+            if blocked_by[line_id]:
+                continue
+            for dep in dependencies[line_id]:
+                if dep in blocked_by and blocked_by[dep]:
+                    blocked_by[line_id].add(dep)
+                    changed = True
+                    break
+    runnable = [line_id for line_id in queued if not blocked_by[line_id]]
+    layers = topological_layers(
+        runnable, {line_id: dependencies[line_id] & set(runnable) for line_id in runnable}
+    )
+    output = []
+    order = 0
+    for layer_index, layer in enumerate(layers):
+        for line_id in sorted(
+            layer, key=lambda item: (queued[item].get("ready_for_merge_at") or "", item)
+        ):
+            order += 1
+            output.append({
+                "order": order,
+                "line_id": line_id,
+                "ready_for_merge_at": queued[line_id].get("ready_for_merge_at"),
+                "layer": layer_index,
+                "depends_on": sorted(dependencies[line_id]),
+                "blocked_by": [],
+            })
+    for line_id in sorted(line_id for line_id in queued if blocked_by[line_id]):
+        output.append({
+            "order": None,
+            "line_id": line_id,
+            "ready_for_merge_at": queued[line_id].get("ready_for_merge_at"),
+            "layer": None,
+            "depends_on": sorted(dependencies[line_id]),
+            "blocked_by": sorted(blocked_by[line_id]),
+        })
+    return emit(output)
+
+
+def action_integration_record(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(args.result in INTEGRATION_RESULTS,
+            f"--result must be one of {sorted(INTEGRATION_RESULTS)}")
+    if args.result == "merged":
+        require(bool(args.commit), "merged result requires --commit")
+    else:
+        require(bool(args.reason), "failed result requires --reason")
+    entry = ctx.load(line_id)
+    require(entry.get("state") == "completed", "integration-record requires state=completed")
+
+    def mutate(data):
+        data["integration_result"] = {
+            "status": args.result,
+            "at": now_iso(),
+            "commit": args.commit,
+            "reason": args.reason,
+        }
+        data["merge_ready"] = False
+        data.pop("ready_for_merge_at", None)
+        data["last_event"] = f"integration-{args.result}"
+
+    return emit(ctx.mutate(line_id, mutate))
+
+
+def action_allocate_resources(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    entry = ctx.load(line_id)
+    cap = int(args.cap or os.environ.get("SPECIFY_LINE_CONCURRENCY_CAP", DEFAULT_CONCURRENCY_CAP))
+    start = int(args.port_range_start or DEFAULT_PORT_START)
+    block = int(args.block_size or DEFAULT_BLOCK_SIZE)
+    require(cap > 0, "--cap must be positive")
+    require(block > 0, "--block-size must be positive")
+    others = []
+    for path in sorted(ctx.reg.glob("*.json")):
+        other = read_json(path)
+        if other.get("line_id") == line_id:
+            continue
+        if other.get("state") == "active" and other.get("stage"):
+            others.append(other)
+    if len(others) >= cap:
+        def mark_waiting(data):
+            data["state"] = "waiting"
+            data["waiting_reason"] = "concurrency-cap"
+            data["queued_at"] = now_iso()
+            data["last_event"] = "waiting-concurrency-cap"
+
+        updated = ctx.mutate(line_id, mark_waiting)
+        return emit({
+            "line_id": line_id, "waiting": True, "reason": "concurrency-cap",
+            "active_count": len(others), "cap": cap, "state": updated["state"],
+        }, code=EXIT_HELD)
+    used = []
+    for other in others:
+        ports = (other.get("resources") or {}).get("ports")
+        if isinstance(ports, list) and len(ports) == 2:
+            used.append((int(ports[0]), int(ports[1])))
+    port_start, port_end = allocate_port_block(used, start, block)
+    repo = Path(entry["repo_root"])
+    repo_parent = repo.parent
+    cache_dir = repo_parent / ".spec-kit" / "cache" / repo.name / line_id
+    tmp_dir = repo_parent / ".spec-kit" / "tmp" / repo.name / line_id
+    resources = {
+        "ports": [port_start, port_end],
+        "cache_dir": str(cache_dir),
+        "tmp_dir": str(tmp_dir),
+        "active_count": len(others) + 1,
+        "cap": cap,
+    }
+
+    def mutate(data):
+        data["resources"] = resources
+        data["last_event"] = "resources-allocated"
+
+    ctx.mutate(line_id, mutate)
+    return emit({"line_id": line_id, "waiting": False, "resources": resources})
+
+
+def _iter_runtime_files(worktree: Path):
+    for relative in RUNTIME_RECORD_DIRS:
+        root = worktree / relative
+        if not root.exists():
+            continue
+        for path in sorted(root.rglob("*")):
+            if path.is_file():
+                yield path
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(65536), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def action_archive_runtime(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(bool(args.worktree), "archive-runtime requires --worktree")
+    require(bool(args.dest), "archive-runtime requires --dest")
+    worktree = Path(args.worktree).expanduser().resolve()
+    dest = Path(args.dest).expanduser().resolve()
+    require(worktree.exists(), f"worktree not found: {worktree}")
+    require(dest != worktree and worktree not in dest.parents,
+            "archive destination must be outside the worktree")
+    dest.mkdir(parents=True, exist_ok=True)
+    existing = {path.name for path in dest.iterdir() if path.is_file()}
+    records = []
+    for source in _iter_runtime_files(worktree):
+        archived_name, conflict = conflict_name(existing, source.name, line_id)
+        existing.add(archived_name)
+        target = dest / archived_name
+        shutil.copy2(source, target)
+        source_hash = _sha256(source)
+        target_hash = _sha256(target)
+        if source_hash != target_hash:
+            raise RegistryIOError(target, "archived file hash mismatch")
+        records.append({
+            "original": str(source.relative_to(worktree)),
+            "archived_name": archived_name,
+            "sha256": source_hash,
+            "conflict": conflict,
+        })
+    manifest = {
+        "line_id": line_id,
+        "run_id": args.run_id,
+        "source_worktree": str(worktree),
+        "dest_dir": str(dest),
+        "files": records,
+        "created_at": now_iso(),
+    }
+    atomic_write_json(dest / f"runtime-archive-{line_id}.json", manifest)
+    return emit(manifest)
+
+
 # ---------------------------------------------------------------- manifests
 
 
@@ -1157,9 +1598,7 @@ UNIMPLEMENTED = {
     "classify-remote", "reattach-brief",
     "lease-acquire", "lease-renew", "lease-release", "lease-break",
     "reserve", "reservation-status", "reservation-break",
-    "orphan-check", "ownership-check", "release-ownership", "promote-waiting",
-    "integration-enqueue", "integration-plan", "integration-record",
-    "allocate-resources", "archive-runtime",
+    "orphan-check",
 }
 
 DISPATCH = {
@@ -1169,6 +1608,14 @@ DISPATCH = {
     "list": action_list,
     "resolve-message": action_resolve_message,
     "verify-identity": action_verify_identity,
+    "ownership-check": action_ownership_check,
+    "release-ownership": action_release_ownership,
+    "promote-waiting": action_promote_waiting,
+    "integration-enqueue": action_integration_enqueue,
+    "integration-plan": action_integration_plan,
+    "integration-record": action_integration_record,
+    "allocate-resources": action_allocate_resources,
+    "archive-runtime": action_archive_runtime,
 }
 
 

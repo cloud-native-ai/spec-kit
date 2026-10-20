@@ -46,3 +46,28 @@ stub_calls=0
 Exit status: foreign injection returns `10 RUNNING` (never DONE) with `attribution=foreign`; `ps`/`pgrep`/`pidof` PATH stubs recorded zero invocations.
 
 Teardown: both scenarios use `mktemp -d` and `rm -rf` the temp root; no registry entry, worktree, or process remains.
+
+### S3. 同仓双写线：worktree、所有权与集成队列
+
+Command: `bash /tmp/run-s3.sh` (temp git repo + two worktrees; no push).
+
+```text
+== S3.1 worktrees ==
+== S3.2 ownership ==
+L1 proceed overlaps 0
+L2 waiting holder wt-20261020T130000Z-a1b2
+== S3.3 commits + fsck ==
+fsck=ok
+commits=3
+== S3.4 enqueue + plan replay ==
+replay=identical
+order [(1, 'wt-20261020T130000Z-a1b2'), (2, 'wt-20261020T130001Z-c3d4')]
+== S3.5 runtime archive once ==
+files ['.specify/memory/feedback/entry.md']
+== S3.6 failure retention ==
+worktree_retained=yes
+```
+
+Exit status: all engine calls `0` (except the intentional waiting decision, which is a JSON result, not an error); `git fsck --no-dangling` exit 0. The evidence directory is excluded from the runtime archive; a failed integration record keeps the worktree.
+
+Teardown: temp repo/worktrees/registry removed (`rm -rf` of the mktemp root).

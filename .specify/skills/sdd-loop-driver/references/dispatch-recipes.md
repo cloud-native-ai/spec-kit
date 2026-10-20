@@ -175,6 +175,52 @@ python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message 
 - 可识别标识 = 显式 `line_id` token，或唯一匹配的 project/repo 路径或分支名。
 - **禁止**用 `ps`/`pgrep`/进程名/cwd/环境态推断归属；一次澄清不阻断其他线路。
 
+## Recipe 7 — 工作区隔离与确定性集成（Feature 064）
+
+### Worktree-per-write-line
+
+```bash
+git -C <repo> worktree add -b line/<line> <worktree_path> <base_sha>
+# 等价形态（在仓库内执行）：git worktree add -b line/<line> <worktree_path> <base_sha>
+```
+
+- 每条写线一个独立 worktree + 专用分支 `line/<line>`；`worktree_path` / `branch` / `base_sha` 登记进 Registry。
+- 缺省 `worktree_path=<repo_parent>/.spec-kit/worktrees/<repo-basename>/<line_id>`；目标已存在或跨文件系统 → 显式失败，不得复用/删除其他 line 的 worktree。
+- 一个 worktree 同时只有一个写 line；阶段子代理只在该 worktree 内提交，**不得切换分支、创建/删除 worktree、改写其他 line 的 worktree**。
+- 运行时记录（feedback / session / knowledge / exec-quant）写在各自 worktree 内；**阶段提交不提交运行时记录**（路径集合以 `data-model.md` § E8 为唯一枚举；`evidence/`、`history/`、`trigger/` 明确排除）。
+
+### Ownership Manifest 与串行化
+
+```bash
+python3 <skill-dir>/scripts/line-registry.py --action ownership-check \
+  --line-id <line> --manifest <registry>/manifests/<line>.json --format json
+```
+
+- Manifest 是 `owned_paths` / `read_only_paths` / `forbidden_paths` / `integration_depends_on` 的 owner；Registry 的 `owned_paths` 是投影。
+- 路径先归一化（相对路径按 `repo_root` 展开、`realpath`、去尾分隔符）再比较；写-写重叠（相等或互相包含）在注册/派发前拒绝或串行化。
+- 重叠按 `created_at` FIFO（同一时间戳 `line_id` 字典序 tie-break）串行：后到线 `state=waiting`，持 `waiting_reason=ownership-overlap`、`holder_line_id`、`queued_at`。
+- 持线者死亡**不自动释放**：先保留并上送其 worktree/证据，再经 `release-ownership --reason --evidence-ref` 显式处置；`promote-waiting` 只在无冲突且未超并发上限时晋级。
+- 任何 line 不得写入另一活动 line 的 `read_only_paths` / `forbidden_paths`。
+
+### Integration Protocol（单一协调者）
+
+1. `integration-plan`：输入 `state=completed` 且 `merge_ready=true` 的条目 + 各线 `integration_depends_on`；拓扑分层，同层按 `(ready_for_merge_at, line_id)`，重放逐字相同；环 → 显式拒绝。
+2. 逐线序列：`git -C <worktree> fetch/rebase` 到最新 trunk → 运行**完整质量门** → **合并**（缺省本地合并） → `integration-record`（`state` 保持 `completed`、`merge_ready=false`） → `archive-runtime`（移除 worktree 之前，冲突保留双方） → `git worktree remove <worktree>`（仅 merged，**无 `--force`**）。
+3. 任一步失败：`integration-record --result failed --reason …`，**保留 worktree 与证据**，继续下一条；该 line 的 U6 不自动执行。
+4. **每批一次**：全部条目处置后统一执行 `sync-mirrors.py` 与命令副本再生成；镜像/命令副本不在逐线序列中，**不得每 line 执行**。
+5. 不 force push、不绕过确认门；push 仍是显式授权动作。MUST NOT force push。
+
+### 构建/测试隔离
+
+- 每线独立端口块（缺省 39000 + 20/线）、缓存目录与临时目录；或只读共享缓存。不得写共享路径、不得启动全局服务。
+- 并发上限可配置（缺省 4，`SPECIFY_LINE_CONCURRENCY_CAP` 覆盖），派发前检查；超限线 `state=waiting`（`waiting_reason=concurrency-cap`）。
+- 每条线报告端口、缓存/临时路径与上限使用情况。
+
+### 崩溃与重入
+
+- 恢复证据 = worktree + 状态脊 + Registry；stale lock **先验证持有者**再处置，不盲目删除。
+- 重入先做一次 `--once` 快照，再决定派发/校验/恢复窗口。
+
 ## Boundary
 
 - 远端不可达 / 凭证失效 / 子代理 CLI 不在执行身份路径：前置检查（run-agent dispatch-preflight.md）拦截并给修复动作，不裸报错弃线。
