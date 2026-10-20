@@ -175,6 +175,11 @@ python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message 
 - 可识别标识 = 显式 `line_id` token，或唯一匹配的 project/repo 路径或分支名。
 - **禁止**用 `ps`/`pgrep`/进程名/cwd/环境态推断归属；一次澄清不阻断其他线路。
 
+### U2 派发前查档（CLI Capability Profiles）
+
+- 只读查阅 `references/cli/index.md` 与目标 `<cli>.md`；据此选择超时/脱离形态，**不复制档案内容**。
+- 派发记录携带 `profile_id` / `profile_version` / `observed_cli_version`；匹配且无新事实不产生反馈。
+
 ## Recipe 7 — 工作区隔离与确定性集成（Feature 064）
 
 ### Worktree-per-write-line

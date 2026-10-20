@@ -96,3 +96,28 @@ remote-unreachable
 ```
 
 Exit status: lease refusal `3` (expired holder, explicit break required); snapshot `10 RUNNING` → `0 DONE` without a second dispatch; reservation attach on the second start; remote probe classified `remote-unreachable`. Teardown killed the fake runner/driver and removed the temp root.
+
+### S5. CLI 档案观测 → 恰好一条反馈
+
+Command: `bash /tmp/run-s5.sh` (temp feedback workspace; profile copy for the simulated mismatch; no runtime feedback committed).
+
+```text
+== S5.1 qodercli dimensions ==
+invocation => known
+output_mode => known
+timeouts => known
+sentinel => known
+buffering => known
+session_logs => known
+detach_signals => known
+defects_versions => known
+== S5.2 no new fact -> zero feedback ==
+count 0
+== S5.3 mismatch -> spine -> provenance -> exactly one feedback ==
+count 1
+== S5.4 probe registry ==
+Probe registry valid: 10 classes, 114 internal + 0 external objects
+contains_object=1
+```
+
+Exit status: all commands `0`; zero new feedback when no fact changed; exactly one retrievable `cli-profile:qodercli` entry after the simulated `-p` mismatch; the probe object is registered and the registry validates.

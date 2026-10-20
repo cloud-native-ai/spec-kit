@@ -44,6 +44,16 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 - **多线批量**：manifest 模式一次连接检查多条线，任一线终止即返回全部快照。
 - **pgrep 陷阱**：`pgrep -c` 零匹配会先打印 0 再以退出码 1 结束，`|| echo 0` 会追加第二个 0；存活判据一律用 PID 文件 + `kill -0`，watcher 自测覆盖零匹配、僵尸、PID 复用等反向用例。
 
+## 并发归属与生命周期
+
+- **Line Registry**：环境级线路登记（`scripts/line-registry.py`，stdlib-only）；每个事件携带 `(line_id, run_id)` 归属信封，`foreign`/`stale-run`/`unattributed` 不改变当前线路状态；无标识消息经确定性入口判定（恰好一次澄清，禁止进程扫描推断）。规则真源：`skills/external/sdd-loop-driver/references/stage-prompts.md` 的 Line Registration/Envelope/Ingress 节。
+- **工作区隔离与集成队列**：worktree-per-write-line、Ownership Manifest 归一化重叠、FIFO 串行化、确定性拓扑队列、运行时归档一次与每批一次镜像。操作序列见 `references/dispatch-recipes.md` Recipe 7。
+- **生命周期解耦**：脱离式 runner（`setsid`/`nohup`/`disown`）、driver lease、`(line_id, stage)` 原子 reservation、重接线三分支（running/done/dead）与远端不可达分类。程序见 `references/stage-prompts.md` 的 Reattach & Lifecycle 节；监听归属层见 `references/watch-model.md` §11。
+
+## CLI 能力档案
+
+每个作为 subagent 调用的 CLI 在 `skills/external/sdd-loop-driver/references/cli/` 拥有独立档案（八维度、known/unknown 与 provenance）。`references/cli/index.md` 是 schema 与观测程序的 owner；派发前（U2）查阅、U4/U5 观测后更新，并记录 `cli-profile:<cli>` 反馈。派发资格仍由 Feature 061 的 `CAPABILITY_MATRIX` 唯一拥有。本页只提供入口，不复述档案内容。
+
 ## 触发与路由
 
 - 以 `/sdd-loop-driver` 给出功能/改进描述 = SDD 目标；目标项目可为当前仓库，**包括 sdd-loop-driver 自身**。

@@ -36,3 +36,11 @@ Each entry records the real red run captured before the implementation it exerci
 - Output (tail): `21 failed, 20 passed in 6.08s`
 - Failing: lease/reservation/classify-remote/orphan/reattach actions not dispatched; pure lease/identity helpers absent; detach/reattach documentation absent; kill/reattach integration cases red on the same actions.
 - Passing baseline: registry core, US1 attribution, US2 isolation.
+
+## R5 — US4 CLI profile tests (T049–T051)
+
+- Time: 2026-10-20 (implement run)
+- Command: `SPECKIT_PYTHON=/Users/liuqiming.lqm/project/profiles/.venv/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_cli_profiles.py tests/contract/test_sdd_loop_driver_skill.py -q`
+- Exit status: 1
+- Output (tail): `19 failed, 21 passed in 0.24s`
+- Failing: profile set/dimensions/provenance/qodercli facts/skeletons/marker/probe object/SKILL H2/docs/mirrors; the updated pinned H2 set and mirror coverage fail because `CLI Capability Profiles` and `references/cli/` do not exist yet.

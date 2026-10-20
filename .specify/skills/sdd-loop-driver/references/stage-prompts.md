@@ -185,6 +185,41 @@ python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message 
 - 授权是**显式、逐项、有界**的——不存在隐式放行；「顺便看一下」不是授权。
 - 每次授权记录进该线状态脊（何时、何项、何界），供收尾汇总审计。
 
+## CLI Capability Profiles（U2/U4/U5，Feature 064）
+
+CLI 行为知识的唯一落点是 `references/cli/`（schema owner：`references/cli/index.md`）；本节只规定驱动侧的查阅/观测程序，不复述档案内容。
+
+### U2 派发前（只读查阅）
+
+- 只读查阅目标 CLI 档案，据此选择超时形态与 detach 形态；**不改档**。
+- 派发记录写入状态脊：`profile_id`、`profile_version`、`observed_cli_version`。
+- 输出模式的吞吐默认（stream-json）由 Feature 063 拥有；档案只记录缓冲/事件事实，**不改写**该默认。
+- 匹配且无新事实 → **零反馈**。
+
+### U4 独立校验（比对）
+
+比对以下事实与档案：输出模式/事件形状、哨兵来源、status/exit 字段、runner rc 与 watcher 判定、日志/session 位置、**缓冲**/可见性。
+
+### U5 停线处置（比对）
+
+比对以下事实与档案：已知**缺陷**、**超时**上限、**detach**/退出/孤儿行为。
+
+### 观测事件与写序
+
+观测事件 = (a) 与 `known` 不符；(b) `unknown` 获得已验证值；(c) 新版本/平台行为首次出现。
+
+处置顺序 MUST 为：
+
+1. 状态脊追加 `cli_observations` 段（观测事实 / 对照的档案条目 / 影响）；
+2. 更新档案 `## Provenance`；
+3. 经既有 feedback 引擎记录 **恰好一条** `cli-profile:<cli>` 反馈。
+
+- 一次观测事件恰好一条反馈；**每个事件各一条**（同一次派发内的多个独立事件不得合并或遗漏）；
+- 无新事实 → **零反馈**；
+- `feedback_id` 可在反馈落库后回填 provenance；
+- 档案更新不回溯改变 U2 记录的形态；若冲突使当前阶段无法安全完成，走既有 U5 停线/重试程序，不得以改档代替行为修复。
+- `known` 条目带观测日期、CLI 版本与证据指针；`unknown` 不填猜测值；版本/平台不一致视为新观测。
+
 ## Reattach & Lifecycle（重接线与生命周期，Feature 064）
 
 ### 重接线程序（主会话恢复后）

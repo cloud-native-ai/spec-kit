@@ -42,3 +42,15 @@
 4. `shared/definitions/probe-definitions.md` 中 `unit=skill:sdd-loop-driver` 的 Object 恰好 1 行，id 为 `skill-sdd-loop-driver-cli-profile`。
 5. `tests/unit/test_cli_profile_record.py` 不存在或已迁移至 064 的测试文件；不存在两组档案断言。
 6. `python3 .specify/scripts/python/probe-utils.py --action probes --validate` exit 0。
+
+## 4. Branch verification record (implement, 2026-10-20)
+
+Read-only inspection of `bcf27c77` (main worktree) and repository-wide residual scan on `064-subagent-concurrency`:
+
+- `git show bcf27c77:.specify/specs/063-sdd-loop-efficiency/contracts/cli-profiles.md` exists on 063 only; this tree contains exactly one CLI-profile contract at `.specify/specs/064-subagent-concurrency/contracts/cli-profiles.md`.
+- No `references/cli/README.md` exists in this tree; the schema owner is `references/cli/index.md`.
+- No `tests/unit/test_cli_profile_record.py` exists in this tree.
+- `shared/definitions/probe-definitions.md` contains exactly one object for `unit=skill:sdd-loop-driver`: `skill-sdd-loop-driver-cli-profile` (no `skill-sdd-loop-driver-wrapup`).
+- Guard installed: `test_clp_17_no_063_duplicate_owner` performs the same repository-wide scan and is green.
+- **Merge-time obligations (unchanged, recorded in §1–§3):** delete 063's provisional `contracts/cli-profiles.md` (or replace with a ≤5-line pointer), delete its CP tests / `test_cli_profile_record.py`, do not restore `references/cli/README.md`, do not register a second Probe Object for `skill:sdd-loop-driver`, and replace its `STR-009` literal with a pointer to 064 `STR-001`.
+- The 063 worktree/branch was not modified.
