@@ -95,7 +95,7 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
   --status-file /home/<run-user>/status-<line>-<stage> \
   --log /home/<run-user>/log-<line>-<stage>.log \
   --sentinel <STAGE>-DONE --heartbeat /home/<run-user>/heartbeat-<line>-<stage>.log \
-  --deadline-epoch <stage_deadline_epoch> --window 300 --interval 3'"
+  --deadline-epoch <stage_deadline_epoch> --window 200 --interval 3'"
 ```
 
 要点：
@@ -153,15 +153,18 @@ python3 <skill-dir>/scripts/line-registry.py --action register \
 
 **U6 注销（收尾后）**：`--action deregister --line-id <line> --reason <reason>`；closed 条目保留历史字段，`list --active` 不再返回。
 
-**Watcher 归属参数**：每个监听窗口追加 `--line-id <line> --run-id <run> --meta <log-…meta.jsonl>`；输出行追加 `line= run= attribution=own|foreign|stale-run|unattributed|legacy`。只有 `own` 事件参与判定；`foreign`/`stale-run`/`unattributed` 只出现在摘要，不改变 verdict、进度或 Registry 状态。未提供归属参数时保持 058 兼容（`attribution=legacy`，无过滤）。
+**Watcher 归属参数**：每个监听窗口追加 `--line-id <line> --run-id <run> --registry <registry> --meta <log-…meta.jsonl>`；watcher 只消费 Registry 中登记且 start token 校验通过的 `runner_pid`/`cli_pid`（PID 文件中的未登记 PID 一律 `DEAD pid=unregistered`；登记了 `branch` 时校验 worktree 分支），输出行追加 `line= run= attribution=own|foreign|stale-run|unattributed|legacy`。只有 `own` 事件参与判定；`foreign`/`stale-run`/`unattributed` 只出现在摘要，不改变 verdict、进度或 Registry 状态。未提供归属参数时保持 058 兼容（`attribution=legacy`，无过滤）。
 
-**持 lease 的监听窗口（I-19）**：持有 driver lease 时，`--window` MUST ≤ `ttl_seconds/3`（缺省 ≤200s），或给 watcher 传窗口内续租钩子：
+**持 lease 的监听窗口（I-19）**：持有 driver lease 时，`--window` MUST ≤ `ttl_seconds/3`（缺省 ≤200s），或给 watcher 传窗口内续租钩子。watcher 缺省窗口即 200s；显式声明的 lease 用 `--lease-ttl` 钉住上限（超限且无续租钩子 → 立即 usage 失败）：
 
 ```bash
-... watch-target.sh ... --line-id <line> --run-id <run> --meta <meta> \
+... watch-target.sh ... --line-id <line> --run-id <run> --registry <registry> --meta <meta> \
+  --lease-ttl 600 --window 200 \
   --lease-renew-cmd "python3 <skill-dir>/scripts/line-registry.py --action lease-renew --line-id <line> --session <session>" \
   --lease-renew-interval 60
 ```
+
+`lease-renew` 在间隔 > ttl/3 时仍续租（不让活会话自伤），但会写入 `lease-cadence-violation` 历史事件并把 Registry 的 `last_event` 置为该违规。
 
 **消息入口（无标识消息）**：归属判定下沉为确定性动作，驱动只呈现结果：
 
@@ -203,16 +206,30 @@ python3 <skill-dir>/scripts/line-registry.py --action ownership-check \
 
 - Manifest 是 `owned_paths` / `read_only_paths` / `forbidden_paths` / `integration_depends_on` 的 owner；Registry 的 `owned_paths` 是投影。
 - 路径先归一化（相对路径按 `repo_root` 展开、`realpath`、去尾分隔符）再比较；写-写重叠（相等或互相包含）在注册/派发前拒绝或串行化。
-- 重叠按 `created_at` FIFO（同一时间戳 `line_id` 字典序 tie-break）串行：后到线 `state=waiting`，持 `waiting_reason=ownership-overlap`、`holder_line_id`、`queued_at`。
-- 持线者死亡**不自动释放**：先保留并上送其 worktree/证据，再经 `release-ownership --reason --evidence-ref` 显式处置；`promote-waiting` 只在无冲突且未超并发上限时晋级。
+- 重叠按当前认领时间 FIFO（Manifest/条目 `claimed_ns`，无则 `created_at` 的 epoch ns；同一时间戳 `line_id` 字典序 tie-break）串行：后到线 `state=waiting`，持 `waiting_reason=ownership-overlap`、`holder_line_id`、`queued_at`。`ownership-check` 重新认领会刷新 `claimed_ns`，因此重认领的线排在既有等待者之后，不能凭旧 `created_at` 抢占。
+- `ownership-check` **不再隐式晋升**：冲突消失后 waiting 线保持 waiting 并返回 `promotion_required=true`，只有显式 `promote-waiting` 才能晋级。
+- 持线者死亡**不自动释放**：`deregister --reason stale-cleanup` 只把线标记为 `state=stale`（`stale_at`），不关闭、不释放 ownership、不释放 reservation；随后必须经 `release-ownership --reason --evidence-ref` 显式处置（stale → closed）。`promote-waiting` 仅当持线者满足以下之一时才放行：① 当前 Manifest 已由 `release-ownership` 释放（`released_at` + 带 `evidence_ref` 的历史）；② `integration_result.status=merged`（真实存在且可从 trunk HEAD 到达的提交）且已完成 U6 `closed`。仅 `deregister --reason abandoned`（无 release 证据）的 closed 线仍然阻止晋升。
+- **任何进入 active 的路径同闸**：`register --state active` 携带重叠 manifest 会被拒绝（exit 3）；`update --state active` 在从 waiting/stalled 等非 active 状态迁移时执行同一冲突扫描，已释放（Manifest `released_at`）的写线必须先 `ownership-check` 重新认领。`ownership-check` 会写入 `claimed_at`/`claimed_ns` 并清除旧的 `released_at`，因此旧的释放历史不能解锁新的占用，重新认领按当前时间排队；`closed/stale/orphaned` 条目不得重新认领。
+- **状态一致性**：`closed` 是终态，任何 `update` 不得复活；`update` 进入 active 只允许来自 waiting/stalled。`release-ownership` 对 `active`/`waiting` 线会把它置为 `stalled`（停止写入，等待显式 U5/U6），对 `stale`/`orphaned` 则关闭。`allocate-resources` 只接受 active 线。ownership 影响动作在环境级 `.ownership.lock` 内串行，避免并发注册双赢。
+- **路径纪律**：`owned_paths` 在 register/update 写入前归一化（相对路径按 repo_root、realpath、去尾分隔符），活动线新增 owned_paths 走冲突闸门（与 active 线冲突时无条件拒绝）；`update` 不能清空 owned_paths（释放走 `release-ownership`），也不能用投影遮蔽 manifest（路径集变更走 `ownership-check`）。`worktree_path`/`branch`/`base_sha` 设置后不可改写，worktree 必须在 repo_root/project_dir 之外且不是 repo root；`integration-record` 校验 worktree 分支与登记一致。closed/stale/orphaned 线不接受 lease/reserve。
+- `integration_result` 只能经 `integration-record` 写入（`update` 不提供该字段）；`merged` 需要真实存在、可从 HEAD 到达且包含该线 worktree HEAD 的提交，写线还必须保留可验证的 worktree（非 git `repo_root` 拒绝 merged）。
 - 任何 line 不得写入另一活动 line 的 `read_only_paths` / `forbidden_paths`。
 
 ### Integration Protocol（单一协调者）
 
 1. `integration-plan`：输入 `state=completed` 且 `merge_ready=true` 的条目 + 各线 `integration_depends_on`；拓扑分层，同层按 `(ready_for_merge_at, line_id)`，重放逐字相同；环 → 显式拒绝。
-2. 逐线序列：`git -C <worktree> fetch/rebase` 到最新 trunk → 运行**完整质量门** → **合并**（缺省本地合并） → `integration-record`（`state` 保持 `completed`、`merge_ready=false`） → `archive-runtime`（移除 worktree 之前，冲突保留双方） → `git worktree remove <worktree>`（仅 merged，**无 `--force`**）。
+2. 逐线序列由可执行执行器完成（`scripts/integrate-lines.py`；stdout 输出 JSON 摘要，含每线状态与 `archive_calls`/`mirror_calls` 计数）：
+
+   ```bash
+   python3 <skill-dir>/scripts/integrate-lines.py \
+     --repo <repo> --trunk <trunk> --registry <registry> --archive <archive-dir> \
+     [--gate-cmd "<完整质量门命令>"] [--mirror-cmd "python3 scripts/python/sync-mirrors.py --write ..."] \
+     [--lines <line>[,<line>...]]
+   ```
+
+   执行器按顺序执行：`git -C <worktree> rebase <trunk>` → 质量门 → `git -C <repo> merge --ff-only <rebased-sha>` → `integration-record --result merged --commit` → `archive-runtime`（移除 worktree 之前，冲突保留双方） → `git worktree remove <worktree>`（仅 merged，**无 `--force`**）。仓库必须已检出 trunk；执行器**不切换分支**，不满足时显式失败。
 3. 任一步失败：`integration-record --result failed --reason …`，**保留 worktree 与证据**，继续下一条；该 line 的 U6 不自动执行。
-4. **每批一次**：全部条目处置后统一执行 `sync-mirrors.py` 与命令副本再生成；镜像/命令副本不在逐线序列中，**不得每 line 执行**。
+4. **每批一次**：全部条目处置后执行器调用一次 `--mirror-cmd`（`sync-mirrors.py` 与命令副本再生成）；镜像/命令副本不在逐线序列中，**不得每 line 执行**。
 5. 不 force push、不绕过确认门；push 仍是显式授权动作。MUST NOT force push。
 
 ### 构建/测试隔离
@@ -237,20 +254,32 @@ python3 <skill-dir>/scripts/line-registry.py --action reserve --line-id <line> -
 # 已有 reservation：同 run_id 且 PID 身份有效 → attach；否则拒绝，绝不启动第二个同阶段进程
 # reservation 的 pid = launch 方（launcher/runner 外壳）的启动身份；runner 启动后只更新 Registry 的 runner_pid，不重写 reservation
 
-# 2) 脱离启动：独立进程组/会话 + stdio 与主会话脱离
+# 2) 脱离启动：交付的 runner 脚本 + 独立进程组/会话 + stdio 与主会话脱离
+#    run-stage.sh 负责写四件套（PID + start token、原子 status、log、heartbeat）、
+#    以 nohup 启动 CLI 子进程、wait 并按哨兵写终态；registry 更新失败时写 ANOMALY 并终止。
 if command -v setsid >/dev/null 2>&1; then
-  setsid nohup bash <runner> > <runner-log> 2>&1 < /dev/null &
+  setsid nohup bash <skill-dir>/scripts/run-stage.sh \
+    --line-id <line> --run-id <run> --stage <stage> --registry <registry> \
+    --worktree <worktree> --prompt <prompt> \
+    --pid-file <pidf> --status-file <status> --log <log> --heartbeat <heartbeat> \
+    --sentinel <STAGE>-DONE --engine <skill-dir>/scripts/line-registry.py \
+    --command "<cli> ..." \
+    > <runner-log> 2>&1 < /dev/null &
 else
-  nohup bash <runner> > <runner-log> 2>&1 < /dev/null &
+  nohup bash <skill-dir>/scripts/run-stage.sh \
+    --line-id <line> --run-id <run> --stage <stage> --registry <registry> \
+    --worktree <worktree> --prompt <prompt> \
+    --pid-file <pidf> --status-file <status> --log <log> --heartbeat <heartbeat> \
+    --sentinel <STAGE>-DONE --engine <skill-dir>/scripts/line-registry.py \
+    --command "<cli> ..." \
+    > <runner-log> 2>&1 < /dev/null &
   disown
 fi
 
-# 3) runner 内：CLI 作为记录 PID 的子进程后台启动 + wait，不能只记录 runner 外壳
-"<cli>" ... > "$log" 2>&1 &
-cli_pid=$!
-printf 'pid=%s start=%s at=%s line=%s run=%s stage=%s event=pid\n' \
-  "$cli_pid" "<cli-start-token>" "$(date +%s)" "<line>" "<run>" "<stage>" >> "$cli_pidf"
-wait "$cli_pid"; rc=$?
+# 3) runner 行为（由 run-stage.sh 实现，勿在调用方重复）：
+#    nohup bash -c "<cli> ..." >> <log> 2>&1 &  →  pid 文件记录 cli_pid + start token
+#    Registry update --runner-pid/--runner-start-token/--cli-pid/--cli-start-token
+#    wait cli_pid；按 log 最后非空行与 --sentinel 写原子 status（exit/sentinel）
 ```
 
 - 主会话进程/会话终止信号 MUST NOT 传播到子代理；stdio 一律重定向到日志或 `/dev/null`。

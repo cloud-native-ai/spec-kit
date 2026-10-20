@@ -97,6 +97,8 @@ remote-unreachable
 
 Exit status: lease refusal `3` (expired holder, explicit break required); snapshot `10 RUNNING` → `0 DONE` without a second dispatch; reservation attach on the second start; remote probe classified `remote-unreachable`. Teardown killed the fake runner/driver and removed the temp root.
 
+> **Post-review (2026-10-20)**: the abbreviated `life-…` output above is a dated record. The authoritative S4 evidence is now the behavior test `test_delivered_runner_recipe_survives_driver_kill_and_reattaches`, which uses the delivered `run-stage.sh`, real line/run IDs, a real driver-group SIGHUP, and prints full watcher lines.
+
 ### S5. CLI 档案观测 → 恰好一条反馈
 
 Command: `bash /tmp/run-s5.sh` (temp feedback workspace; profile copy for the simulated mismatch; no runtime feedback committed).
@@ -121,6 +123,8 @@ contains_object=1
 ```
 
 Exit status: all commands `0`; zero new feedback when no fact changed; exactly one retrievable `cli-profile:qodercli` entry after the simulated `-p` mismatch; the probe object is registered and the registry validates.
+
+> **Post-review (2026-10-20)**: `/tmp/run-s5.sh` was ephemeral, so the output above is retained only as a dated record. The reproducible counterpart is committed at `tests/fixtures/cli_observation.py` and executed by `test_clp_10_observation_fixture_cardinality`, which asserts the same cardinality from `HEAD`: no new fact → one spine event, zero feedback, profile bytes unchanged; mismatch → one spine event, one provenance row, exactly one retrievable `cli-profile:qodercli` entry.
 
 ### S6. 非回归收口（全特性矩阵 + 名称级基线对比）
 

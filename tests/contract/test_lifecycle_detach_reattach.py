@@ -77,7 +77,7 @@ def _docs() -> str:
     )
 
 
-def test_lc_01_02_detached_process_group_documented(tmp_path):
+def test_doc_lc_01_02_detached_process_group(tmp_path):
     text = _docs()
     for needle in ["setsid", "nohup", "disown", "stdio", "/dev/null"]:
         assert needle in text, f"detach literal missing: {needle}"
@@ -330,6 +330,57 @@ def test_lc_13_orphan_check_uses_line_evidence(tmp_path):
     assert "pgrep" not in body and "ps -" not in body
 
 
+def test_lc_13_orphan_mark_writes_state(tmp_path):
+    project = make_project(tmp_path)
+    reg = tmp_path / "reg"
+    entry = _register(reg, project)
+    engine_json(
+        "update", "--line-id", entry["line_id"], "--stage", "plan",
+        "--runner-pid", "999999", "--runner-start-token", "0",
+        "--cli-pid", "999999", "--cli-start-token", "0",
+        "--status-path", str(tmp_path / "status-gone"),
+        "--log-path", str(tmp_path / "log-gone"),
+        "--heartbeat-path", str(tmp_path / "hb-gone"),
+        "--prompt-path", str(tmp_path / "prompt-gone"), reg=reg,
+    )
+    checked = engine_json("orphan-check", "--line-id", entry["line_id"], "--mark", reg=reg)
+    assert checked["orphaned"] is True
+    assert checked["marked"] is True
+    assert checked["state"] == "orphaned"
+    stored = json.loads((reg / f"{entry['line_id']}.json").read_text())
+    assert stored["state"] == "orphaned"
+    assert stored["orphaned_at"]
+    assert stored["orphan_evidence"]
+    disposed = engine_json(
+        "release-ownership", "--line-id", entry["line_id"], "--reason", "orphan-disposed",
+        "--evidence-ref", "notes/orphan.md", reg=reg,
+    )
+    assert disposed["state"] == "closed"
+
+
+def test_lc_05_cadence_violation_is_recorded(tmp_path):
+    project = make_project(tmp_path)
+    reg = tmp_path / "reg"
+    entry = _register(reg, project)
+    engine_json(
+        "lease-acquire", "--line-id", entry["line_id"], "--session", "s1",
+        "--pid", str(os.getpid()), "--ttl", "600", reg=reg,
+    )
+    lease_file = reg / f"{entry['line_id']}.driver.lock"
+    lease = json.loads(lease_file.read_text())
+    lease["heartbeat_at"] = _old_iso(300)
+    lease_file.write_text(json.dumps(lease), encoding="utf-8")
+    renew = engine_json(
+        "lease-renew", "--line-id", entry["line_id"], "--session", "s1", reg=reg
+    )
+    assert renew["cadence_ok"] is False
+    assert renew["interval_seconds"] > renew["max_interval_seconds"]
+    history = (reg / f"{entry['line_id']}.lease-history.jsonl").read_text()
+    assert '"event": "lease-cadence-violation"' in history
+    stored = json.loads((reg / f"{entry['line_id']}.json").read_text())
+    assert stored["last_event"] == "lease-cadence-violation"
+
+
 def test_lc_14_stale_explicit(tmp_path):
     project = make_project(tmp_path)
     reg = tmp_path / "reg"
@@ -338,8 +389,14 @@ def test_lc_14_stale_explicit(tmp_path):
                 "--runner-start-token", "0", reg=reg)
     identity = engine_json("verify-identity", "--line-id", entry["line_id"], reg=reg)
     assert identity["identity"] == "dead"
-    closed = engine_json("deregister", "--line-id", entry["line_id"], "--reason", "stale-cleanup", reg=reg)
-    assert closed["state"] == "closed"
+    stale = engine_json("deregister", "--line-id", entry["line_id"], "--reason", "stale-cleanup", reg=reg)
+    assert stale["state"] == "stale"
+    assert stale["stale_at"]
+    disposed = engine_json(
+        "release-ownership", "--line-id", entry["line_id"], "--reason", "stale-cleanup",
+        "--evidence-ref", "notes/stale-evidence.md", reg=reg,
+    )
+    assert disposed["state"] == "closed"
 
 
 def test_lc_15_second_start_attach_or_refuse(tmp_path):
@@ -410,10 +467,3 @@ def test_lc_17_remote_fields_isomorphic(tmp_path):
     assert reserve["reservation"]["host"] == os.uname().nodename
 
 
-def test_lc_18_kill_reattach_delegate():
-    integration = (
-        Path(__file__).resolve().parents[1] / "integration" / "test_session_kill_reattach.py"
-    )
-    text = integration.read_text(encoding="utf-8")
-    for needle in ["SIGHUP", "survive", "reattach", "reservation", "remote-unreachable"]:
-        assert needle in text

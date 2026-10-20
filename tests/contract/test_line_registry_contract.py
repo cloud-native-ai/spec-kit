@@ -196,11 +196,18 @@ def test_lr_10_stale_detection_explicit_cleanup(tmp_path):
     )
     identity = engine_json("verify-identity", "--line-id", entry["line_id"], reg=reg)
     assert identity["identity"] == "dead"
-    closed = engine_json(
+    stale = engine_json(
         "deregister", "--line-id", entry["line_id"], "--reason", "stale-cleanup", reg=reg
     )
+    assert stale["state"] == "stale"
+    assert stale["last_event"] == "stale-marked"
+    assert "closed_at" not in stale
+    # Explicit disposition is required to close a stale line.
+    closed = engine_json(
+        "release-ownership", "--line-id", entry["line_id"], "--reason", "stale-cleanup",
+        "--evidence-ref", "notes/stale-evidence.md", reg=reg,
+    )
     assert closed["state"] == "closed"
-    assert closed["last_event"] == "stale-cleanup"
     survivor = json.loads((reg / f"{other['line_id']}.json").read_text())
     assert survivor["state"] == "active"
     assert survivor["line_id"] == other["line_id"]

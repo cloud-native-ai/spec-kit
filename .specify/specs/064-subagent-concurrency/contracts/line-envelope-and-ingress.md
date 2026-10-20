@@ -7,7 +7,7 @@
 
 ## A. Envelope
 
-- **EN-01（信封字段）**: 每个阶段 prompt、status、log、heartbeat、哨兵承载记录、watcher 输出与 monitor 事件 MUST 携带 `line_id`、`run_id`、`stage`、`event`、`at`；终止事件另带 `sentinel_seen`/`exit`（FR-008, V-EN）。
+- **EN-01（信封字段）**: 每个阶段 prompt、status、log、heartbeat、哨兵承载记录、watcher 输出与 monitor 事件 MUST 携带 `line_id`、`run_id`、`stage`、`event`、`at`（`at` 为 epoch seconds；Registry 中其他时间字段仍为 ISO-8601 UTC）；终止事件另带 `sentinel_seen`/`exit`（FR-008, V-EN）。
 - **EN-02（载体与命名）**: 信封 MUST 采用 JSON 旁路：status/pid/heartbeat 在既有 key=value 行尾追加字段；日志旁路 `log-<line>-<stage>.log.meta.jsonl`（append-only，单写者）；提示词旁路 `prompt-<line>-<stage>.md.meta.json`；watcher 输出追加 `line=`/`run=`/`attribution=`。MUST NOT 写入日志正文（FR-008）。
 - **EN-03（哨兵保全）**: 通用哨兵字面量（大写阶段名 + `-DONE`）与「日志最后非空行」判定 MUST 保持不变；归属 MUST NOT 通过改写哨兵、位移最后一行或在其后追加信封实现（FR-009）。
 - **EN-04（分类）**: 归属键 `(line_id, run_id)`；`line_id` 不同 → `foreign`；`line_id` 相同 `run_id` 不同 → `stale-run`；缺失/不可解析 → `unattributed`；watcher 未提供归属参数 → `legacy`（058 兼容）（FR-014, FR-015, V-EN-2）。

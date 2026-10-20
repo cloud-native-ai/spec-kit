@@ -94,6 +94,9 @@ def test_clp_04_qodercli_initial_facts():
     assert rows["timeouts"]["status"] in {"known", "unknown"}
     # 0/negative semantics are not measured: the row must say unknown or name it.
     assert "0/负值" in text or "0 / 负值" in text or "0/negative" in text
+    # Known rows carry the CLI's own observable version, not a placeholder.
+    assert "qodercli 1.1.73" in text
+    assert "version string not exposed" not in text
 
 
 def test_clp_05_skeleton_discipline():
@@ -147,7 +150,7 @@ def test_clp_09_u4_u5_comparisons():
         assert needle in prompts, f"U4/U5 comparison missing: {needle}"
 
 
-def test_clp_10_write_order_and_feedback_cardinality():
+def test_doc_clp_10_stage_prompt_write_order():
     prompts = (SKILL_DIR / "references" / "stage-prompts.md").read_text(encoding="utf-8")
     section = prompts.split("## CLI Capability Profiles", 1)[1].split("\n## ", 1)[0].lower()
     order = ["cli_observations", "provenance", "feedback"]
@@ -157,6 +160,71 @@ def test_clp_10_write_order_and_feedback_cardinality():
     assert "恰好一条" in prompts
     assert "无新事实" in prompts and "零反馈" in prompts
     assert "每个事件各一条" in prompts or "每个观测事件" in prompts
+
+
+def _profile_value(text: str, dimension: str) -> str:
+    for line in text.splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if cells and cells[0] == dimension:
+            return cells[2]
+    raise AssertionError(f"dimension missing: {dimension}")
+
+
+def test_clp_10_observation_fixture_cardinality(tmp_path):
+    """SC-006 behavior: the executable observation fixture proves
+    no-fact -> zero feedback and mismatch -> exactly one feedback."""
+    fixture = Path(__file__).resolve().parents[1] / "fixtures" / "cli_observation.py"
+    workspace = tmp_path / "ws"
+    (workspace / ".specify" / "memory" / "feedback").mkdir(parents=True)
+    profile = tmp_path / "qodercli.md"
+    profile.write_bytes((CLI_DIR / "qodercli.md").read_bytes())
+    original = profile.read_text(encoding="utf-8")
+    current = _profile_value(original, "buffering")
+    spine = workspace / ".specify" / "memory" / "exec-quant" / "cli-observations.jsonl"
+
+    def observe(event: dict):
+        proc = subprocess.run(
+            [sys.executable, str(fixture), "--workspace", str(workspace),
+             "--profile", str(profile), "--event", json.dumps(event)],
+            capture_output=True, text=True,
+        )
+        assert proc.returncode == 0, proc.stdout + proc.stderr
+        return json.loads(proc.stdout)
+
+    no_fact = observe({
+        "dimension": "buffering", "observed_value": current,
+        "observation": "no new fact", "trigger": "U2",
+        "cli_version": "qodercli 1.1.73", "evidence": "fixture-no-change",
+    })
+    assert no_fact == {**no_fact, "changed": False, "feedback_count": 0}
+    assert profile.read_text(encoding="utf-8") == original, "no-fact must not touch the profile"
+    assert len(spine.read_text(encoding="utf-8").splitlines()) == 1
+
+    mismatch = observe({
+        "dimension": "buffering", "observed_value": "live output while -p is still running",
+        "observation": "simulated -p buffering mismatch", "trigger": "U5",
+        "cli_version": "qodercli 1.1.73", "evidence": "fixture-simulated-mismatch",
+    })
+    assert mismatch["changed"] is True
+    assert mismatch["feedback_count"] == 1
+    assert mismatch["provenance_appended"] is True
+    updated = profile.read_text(encoding="utf-8")
+    assert "simulated -p buffering mismatch" in updated
+    assert mismatch["feedback_id"] and mismatch["feedback_id"] in updated
+    assert len(spine.read_text(encoding="utf-8").splitlines()) == 2
+
+    engine = REPO_ROOT / ".specify" / "scripts" / "python" / "feedback-utils.py"
+    listed = subprocess.run(
+        [sys.executable, str(engine), "--action", "list", "--workspace-root", str(workspace),
+         "--contains", "cli-profile:qodercli", "--format", "json"],
+        capture_output=True, text=True,
+    )
+    assert listed.returncode == 0, listed.stderr
+    payload = json.loads(listed.stdout)
+    entries = payload.get("matches", payload.get("entries", payload if isinstance(payload, list) else []))
+    assert len(entries) == 1
 
 
 def test_clp_11_marker_retrievable(tmp_path):
@@ -258,3 +326,26 @@ def test_clp_17_no_063_duplicate_owner():
     assert len(unit_rows) == 1
     assert "skill-sdd-loop-driver-cli-profile" in unit_rows[0]
     assert "skill-sdd-loop-driver-wrapup" not in probe
+
+    # Branch-aware guard: the 063 branch tree is inspected, not just this worktree.
+    guard = SKILL_DIR / "scripts" / "check-063-overlap.py"
+    proc = subprocess.run(
+        [sys.executable, str(guard), "--repo", str(REPO_ROOT)],
+        capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    payload = json.loads(proc.stdout)
+    assert payload["status"] in {"branch-absent", "pending-merge-obligation", "clean"}
+    if payload["status"] == "pending-merge-obligation":
+        assert any(
+            path.endswith("063-sdd-loop-efficiency/contracts/cli-profiles.md")
+            for path in payload["paths"]
+        ), payload
+    strict = subprocess.run(
+        [sys.executable, str(guard), "--repo", str(REPO_ROOT), "--strict-premerge"],
+        capture_output=True, text=True,
+    )
+    if payload["status"] == "pending-merge-obligation":
+        assert strict.returncode == 3, strict.stdout
+    else:
+        assert strict.returncode == 0, strict.stdout

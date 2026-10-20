@@ -120,6 +120,20 @@ def write_status(
     return path
 
 
+def process_token(pid: int) -> str:
+    """Platform start token: Linux start ticks, otherwise `ps -p <pid> -o lstart=`."""
+    stat = Path(f"/proc/{pid}/stat")
+    if stat.exists():
+        try:
+            return stat.read_text(encoding="utf-8").split()[21]
+        except (OSError, IndexError):
+            pass
+    proc = subprocess.run(
+        ["ps", "-p", str(pid), "-o", "lstart="], capture_output=True, text=True
+    )
+    return " ".join(proc.stdout.split())
+
+
 def write_pid(
     path: Path,
     pid: int,
@@ -202,7 +216,8 @@ def four_piece(
         "prompt_meta": root / f"prompt-{line}-{stage}.md.meta.json",
     }
     pid_value = pid if pid is not None else os.getpid()
-    write_pid(paths["pid"], pid_value, start="1", line=line, run=run, stage=stage, envelope=envelope)
+    start = process_token(pid_value) if pid_alive(pid_value) else "1"
+    write_pid(paths["pid"], pid_value, start=start, line=line, run=run, stage=stage, envelope=envelope)
     write_log(paths["log"], "working", f"{stage.upper()}-DONE" if sentinel else "working")
     write_heartbeat(paths["heartbeat"], line=line, run=run, stage=stage, envelope=envelope)
     if sentinel:
@@ -253,7 +268,7 @@ def install_process_stubs(tmp_path: Path, names=("ps", "pgrep", "pidof")) -> dic
         stub = bin_dir / name
         stub.write_text(
             "#!/bin/sh\n"
-            f'printf "%s\\n" "{name}" >> "{log}"\n'
+            f'printf "%s %s\\n" "{name}" "$*" >> "{log}"\n'
             "exit 1\n",
             encoding="utf-8",
         )
@@ -305,7 +320,9 @@ printf 'exit=0 at=%s sentinel=1 line={line} run={run} stage={stage} event=status
         f'pidf="{paths["pid"]}"\n'
         f'hb="{paths["heartbeat"]}"\n'
         f'meta="{paths["meta"]}"\n'
-        f'printf "pid=%s start=1 at=%s line={line} run={run} stage={stage} event=pid\\n" "$$" "$(date +%s)" > "$pidf"\n'
+        'if [ -r "/proc/$$/stat" ]; then start=$(awk \'{print $22}\' "/proc/$$/stat"); '
+        'else start=$(ps -p $$ -o lstart= | tr -s "[:space:]" " " | sed "s/^ //; s/ $//"); fi\n'
+        f'printf "pid=%s start=%s at=%s line={line} run={run} stage={stage} event=pid\\n" "$$" "$start" "$(date +%s)" > "$pidf"\n'
         f'printf "{{}} " > /dev/null\n'
         f'( while kill -0 $$ 2>/dev/null; do printf "at=%s line={line} run={run} stage={stage} event=heartbeat\\n" "$(date +%s)" > "$hb"; sleep 0.5; done ) &\n'
         f'hbpid=$!\n'

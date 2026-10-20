@@ -4,7 +4,7 @@
 **Date**: 2026-10-20
 **Scope**: 本文件拥有 064 引入的实体字段、状态词表与校验规则。既有实体（状态脊、watcher 判定、`CAPABILITY_MATRIX`、feedback/exec-quant 记录）由各自 owner 拥有，本文件只声明 064 追加的字段与其约束。
 
-约定：`MUST` 规则编号 `V-<实体>-<n>` 被 `contracts/` 引用；时间为 ISO-8601 UTC（`YYYY-MM-DDTHH:MM:SSZ`）；路径在写入 Registry 前归一化为绝对路径。
+约定：`MUST` 规则编号 `V-<实体>-<n>` 被 `contracts/` 引用；时间为 ISO-8601 UTC（`YYYY-MM-DDTHH:MM:SSZ`），唯一例外是 E2 事件信封的 `at` 字段，固定为 epoch seconds（与 watcher 输出及既有 status 行一致）；路径在写入 Registry 前归一化为绝对路径。
 
 ---
 
@@ -43,6 +43,11 @@
 | `remote` | object\|null | remote only | `{alias, run_user, remote_root}`；Registry 仍在驱动侧 |
 | `last_event` | string | always | 最近一次状态事件（如 `u2-dispatch`） |
 | `created_at` / `updated_at` / `closed_at` | ISO | always/always/U6 | `closed_at` 仅 closed |
+| `stale_at` / `stale_from_state` | ISO/string | stale | `deregister --reason stale-cleanup` 进入 stale 时写入；不写 `closed_at` |
+| `orphaned_at` / `orphan_evidence` | ISO/string[] | orphaned | `orphan-check --mark` 进入 orphaned 时写入 |
+| `claimed_ns` | int | always | 登记时的当前认领序号（`time.time_ns()`）；Manifest 的同名字段在 `ownership-check` 重新认领时刷新。FIFO 排序键 = Manifest/条目的 `claimed_ns`（无则 `created_at` 的 epoch ns）+ `line_id` tie-break |
+| `ownership_released_at` | ISO | after explicit release | `release-ownership`（含 `evidence_ref`）写入；与 ownership history 的 `released` 记录互为证据 |
+| `last_cadence_violation` | object | lease | `lease-renew` 间隔 > ttl/3 时写入 `{event, session, at, interval_seconds, max_interval_seconds}`，并把 `last_event` 置为 `lease-cadence-violation` |
 | `lease` | object\|null | always (nullable) | `{holder_session, holder_pid, holder_start_token, acquired_at, heartbeat_at, ttl_seconds}` 的只读投影（真源为 lease 文件）；无 lease 时为 `null` |
 
 **Validation rules**
@@ -59,19 +64,21 @@
 - **V-LR-10**: `closed` 条目保留全部历史字段，`closed_at` 必填；`list --active` 只返回 `active/waiting`（不返回 `stalled/completed/closed/stale/orphaned`）。
 - **V-LR-11**: 未知扩展字段必须原样保留（向前兼容）；引擎不得因未知字段拒绝读取。
 - **V-LR-12**: 并发读取方永不观察到不可解析 JSON、重复 `line_id` 或丢失其他条目（由 per-file 原子替换 + 目录独立保证）。
+- **V-LR-14（终态与释放一致性）**: `closed` 是终态，任何 `update` 不得把 closed 条目改回 active 等其他状态（新尝试必须新建 line）；`update` 进入 active 只允许来自 `waiting`/`stalled`（或已是 active），`completed/stale/orphaned/closed` 不可复活。`allocate-resources` MUST 要求 `state=active`，不得把任何非 active 条目改写为 waiting。`owned_paths` 在 `register` 与 `update` 写入前 MUST 归一化；活动线新增/变更 `owned_paths` MUST 通过冲突闸门，且冲突对象中存在 active 线时 MUST 拒绝（不让更早时间戳的线抢占已活动线）。`update` MUST NOT 清空 `owned_paths`（释放只能经 `release-ownership`），MUST NOT 用投影遮蔽已存在的 Manifest（Manifest 路径集只能经 `ownership-check` 变更）。`worktree_path`/`branch`/`base_sha` 一经设置 MUST 不可改写；`worktree_path` MUST 位于 `repo_root` 与 `project_dir` 之外（register/update/validate 均检查），`integration-record` 对写线还要求 worktree 不是 repo root、分支与登记一致、worktree HEAD 包含于被断言的合并提交。`lease-acquire`/`reserve` MUST 拒绝 `closed/stale/orphaned` 条目。无 Manifest 的条目释放后，释放历史同样阻止其重新进入 active（重新认领需 `ownership-check` 建立新 Manifest）。`release-ownership` 对 `active`/`waiting` 条目 MUST 将其置为 `stalled`（保留证据，等待显式 U5/U6 处置），MUST NOT 让已释放的线继续处于 active；对 `stale`/`orphaned` 条目则置 `closed`。`register` 是新的认领：调用方 Manifest 中的 `released_at`/`release_reason`/`evidence_ref` MUST 被清除并写入新的 `claimed_at`/`claimed_ns`。`ownership-check` MUST 拒绝 `closed/stale/orphaned` 条目。所有 ownership 影响动作（register/deregister/ownership-check/release-ownership/promote-waiting/integration-record，以及带 `--state active`/`--owned-paths`/`--worktree-path` 的 update）MUST 在环境级 `.ownership.lock` 内完成冲突判定与写入，防止并发双赢。
+- **V-LR-13（晋升闸门）**: 任何进入 `active` 的路径（`register --state active`、`update --state active`、`promote-waiting`）都必须通过同一 ownership 闸门；`ownership-check` 不得隐式改写为 active，waiting 只可经显式 `promote-waiting` 晋级。放行条件：当前 Manifest 未释放（`released_at` 缺席）即继续阻止，除非满足其一——① `release-ownership` 写入 `released_at` + 带 `evidence_ref` 的 ownership history；② `integration_result.status=merged` 且条目已 U6 `closed`。`ownership-check` 是重新取得声明：写入 `claimed_at`/`claimed_ns` 并清除旧的 `released_at`/`release_reason`/`evidence_ref`，因此旧的释放历史不得再解除新占用，且重新认领按当前时间排在既有等待者之后。任一已释放的写线（Manifest `released_at` 存在）不得经 `update --state active` 直接激活，必须先 `ownership-check` 重新认领。`stale`/`orphaned` 与无上述证据的 `closed` 条目继续阻止晋升；`deregister --reason stale-cleanup` 只写 `stale`，不写 `closed`、不释放 ownership/reservation。`integration_result` 只能由 `integration-record` 写入；`merged` 的 `--commit` 必须是 repo 中真实存在、可从当前 HEAD 到达、且包含该线 worktree HEAD 的提交；有 ownership 的写线在非 git `repo_root` 上不得记录 merged。
 
 **State transitions**
 
 ```text
 register(U0.5) ──> active（无重叠/未超 cap）| waiting(ownership-overlap|concurrency-cap)
-waiting ──promote──> active           (holder 集成合并并 U6 closed / explicit release / disjoint)
+waiting ──explicit promote──> active  (holder merged+U6 closed / explicit release with evidence / disjoint)
 active ──u5──> stalled ──retry(new run_id)──> active | ──explicit abandon(u6)──> closed
 active ──explicit abandon(u6)──> closed
 active ──u4 all stages done──> completed (写线: merge_ready=true, ready_for_merge_at; 只读线: merge_ready=false, 直接 u6)
 completed ──integration-record(merged|failed)──> completed (状态不变；merge_ready=false；integration_result 记录)
 completed ──u6(merged 或 explicit abandon)──> closed
-active ──identity fail / evidence expired──> stale ──explicit cleanup──> closed
-active/waiting ──line-owned evidence missing──> orphaned ──explicit disposition──> closed
+active ──identity fail / evidence expired──> stale (stale-cleanup) ──release-ownership+evidence──> closed
+active/waiting ──line-owned evidence missing──> orphaned (orphan-check --mark) ──release-ownership+evidence──> closed
 ```
 
 `completed` 是唯一的 pre-merge 状态：全部阶段完成即进入，集成结果不引入新状态。U6 MUST 在 `integration_result` 记录之后执行；worktree 只在 merged 时由集成序列移除，failed/abandoned 时保留。`stalled` 与 `waiting` 不自动迁移；任何破除/释放都是显式动作并写入 `last_event`/历史。

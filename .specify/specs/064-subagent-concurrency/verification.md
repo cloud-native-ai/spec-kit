@@ -2,6 +2,8 @@
 
 **Branch**: `064-subagent-concurrency` · **Tests Mode**: ON · **Test runner**: `scripts/bash/run-tests.sh` with `SPECKIT_PYTHON=/Users/liuqiming.lqm/project/profiles/.venv/bin/python3` (pytest 9.1.1).
 
+> **Post-review repair (2026-10-20)**: Review finding P0-01 plus the key P1 findings F2–F5 (and F6–F12 dispositions) changed the engine, watcher, tests and several earlier "Closed" claims. Section 12 and `notes/postreview-repair.md` are the current disposition; where §3–§7 conflict with §12, §12 wins.
+
 ## 1. Test environment (disclosed correction)
 
 The tasks/plan premise "pytest unavailable" was falsified at implement time: the system `python3` has no pytest, but a pytest-capable interpreter exists at `/Users/liuqiming.lqm/project/profiles/.venv/bin/python3`. Every test run uses the canonical `run-tests.sh` with `SPECKIT_PYTHON` set, so green is **observed**, not fabricated. The system interpreter remains pytest-free, so the runner's loud-fail contract is unchanged.
@@ -30,6 +32,10 @@ Each red run was captured before its implementation; every story ended with a gr
 | Watcher self-test | `watch-target.sh --self-test` | **18 passed, 4 failed** — exactly the recorded baseline (`pid-reuse`, `zombie`, `manifest`, `pgrep-zero-match-trap-reproduced`); new attribution and lease-renew-hook cases pass |
 | Confirmation gates | `run-tests.sh tests/contract/test_confirmation_gates_sweep.py -q` | **45 passed, 1 failed** — the failure is in the recorded baseline (unchanged) |
 | Single-line compatibility | LR-13 / EN-16 / NG-07 named cases | **3 passed** |
+| Post-review feature matrix (11 files) | same file set as above, after the P0/P1 repair | **160 passed, 0 failed** (126.07 s) — full log `notes/postreview-logs/feature-matrix.log` |
+| Post-review matrix, final tree (12 files) | 11 feature files + `test_shipped_surface_client_neutrality.py`, after the independent-audit bypass fixes | **168 passed, 0 failed** (93.95 s) — full log `notes/postreview-logs/feature-matrix-final.log` |
+| Post-review full suite | `run-tests.sh tests -q --names-out current-failed.txt` | see §12 (full log `notes/postreview-logs/full-suite.log`) |
+| Post-review watcher self-test | `watch-target.sh --self-test` | **26 passed, 0 failed** (all four prior baseline failures fixed: real pid-reuse, zombie, manifest freshness, pgrep trap assertion) |
 
 ## 4. Success Criteria
 
@@ -38,9 +44,9 @@ Each red run was captured before its implementation; every story ended with a gr
 | SC-001 | **Pass** | `test_two_lines_same_sentinel_no_cross_attribution`: two lines, identical `PLAN-DONE`, identical CLI; both `DONE`, `attribution=own`; zero cross-attribution |
 | SC-002 | **Pass** | `test_unlabelled_message_exactly_one_clarification_and_no_process_scan`: 2 active lines → `clarify`, exactly one `？`, 2 candidates; PATH-stub `ps`/`pgrep`/`pidof` calls = 0; `ambiguous-stop` counted as a correct terminal outcome |
 | SC-003 | **Pass** | `test_foreign_status_pid_and_meta_never_change_state`: `RUNNING` (never DONE), state/updated_at unchanged, `attribution=foreign`; `test_en_04_classification` covers `foreign`/`stale-run`/`unattributed`/`legacy` |
-| SC-004 | **Pass** | `test_worktree_integration_queue.py`: `git fsck --no-dangling` exit 0; both commit SHAs in `git rev-list --all`; overlap → `waiting` with holder; `integration-plan` replay byte-identical; runtime archived once; failed integration retains worktree |
-| SC-005 | **Pass** | `test_session_kill_reattach.py`: detached runner survives driver SIGHUP; new session lease → identity ok → `--once RUNNING` → DONE; reservation attach (zero redispatch); dead branch retains registry; remote probe → `remote-unreachable` (`branch_hint=stalled`) |
-| SC-006 | **Pass** | qodercli profile has 8 `known` dimensions with provenance; S5: no new fact → 0 feedback; simulated `-p` mismatch → exactly 1 retrievable `cli-profile:qodercli` entry; probe object registered (`probes --validate` exit 0) |
+| SC-004 | **Pass (behavior, post-review)** | `test_integration_executor_merges_queue_and_replay_is_identical`: the delivered `integrate-lines.py` merges two real worktrees; merged **tree SHA identical across two replays**, `archive_calls=2`, `mirror_calls=1`, worktrees removed, `git fsck` exit 0; failure case retains the worktree and continues. Earlier plan-only evidence is superseded. |
+| SC-005 | **Pass (behavior, post-review)** | `test_delivered_runner_recipe_survives_driver_kill_and_reattaches`: the documented `nohup … & disown` recipe launches the delivered `run-stage.sh`; driver-group SIGHUP leaves runner **and** CLI alive, heartbeat advances, new session `lease → verify-identity ok → --once RUNNING → DONE`, reservation attach, PIDs unchanged (zero redispatch). Fixture-only survival evidence is superseded. |
+| SC-006 | **Pass (behavior, post-review)** | `test_clp_10_observation_fixture_cardinality` executes `tests/fixtures/cli_observation.py`: no new fact → 1 spine event, 0 feedback, profile unchanged; mismatch → spine + provenance + exactly 1 retrievable `cli-profile:qodercli` entry. qodercli known rows carry `qodercli --version` → `1.1.73`. |
 | SC-007 | **Pass** | confirmation gate suite unchanged (1 pre-existing baseline failure); push-stub scenario records zero `push`; watcher exit-code constants/help pinned in `test_ng_04` |
 | SC-008 | **Pass** | 11 planned/additive test files present; three mutation drills each turned ≥1 test red (§ 5) |
 | SC-009 | **Pass** | `test_lr_12_concurrent_registration`: N=12 writers + interleaved reader; 100% parseable, 0 lost, 0 duplicates, no half-write observed |
@@ -53,6 +59,7 @@ Each red run was captured before its implementation; every story ended with a gr
 | 1. Attribution filter removed (watcher copy) | `2 failed, 4 passed` in `test_two_line_isolation.py` (foreign and stale-run cases consumed) | copy deleted → `6 passed` |
 | 2. Detach removed (`SDD_RUNNER_MODE=foreground`) | `4 failed` in `test_session_kill_reattach.py` (runner dies with the driver group) | default detached → `4 passed` |
 | 3. Reservation exclusivity removed (engine copy: check-then-create + race window) | `1 failed, 15 passed` (`test_lc_04_reservation_concurrent_single_winner`) | copy deleted → `16 passed` |
+| 4. Ownership closure gate removed (post-review, engine copy: closed/stale/orphaned skipped again) | `2 failed, 3 passed` in the five P0 tests — `test_p0_stale_cleanup_is_not_an_ownership_release` and `test_p0_close_without_evidence_still_blocks` (full log `notes/postreview-logs/mutation-p0-red.log`) | real engine → `5 passed` (`notes/postreview-logs/mutation-p0-green.log`) |
 
 ## 6. Completion Gates
 
@@ -71,7 +78,7 @@ Each red run was captured before its implementation; every story ended with a gr
 
 ## 7. Carried-over analyze findings — disposition
 
-All 22 carried-over/new findings from the analyze rerun were closed during implement; none deferred.
+Original implement claim: all 22 carried-over/new findings were closed. **Review F10 re-read this ledger**: several dispositions (I-04, I-15, G-01, G-06 and others) were backed by doc/string or plan-only evidence. The post-review status is in §12 and `notes/postreview-repair.md`; the rows below remain as the implement-time record with the §12 overrides.
 
 | ID | Severity | Disposition |
 |----|----------|-------------|
@@ -122,3 +129,26 @@ None — all T001–T082 are `[X]`.
 ## 11. Commit chain (implement)
 
 `9e69f3de` US1 → `ba785b0a` US2 → `a100d560` US3 → `c37d7614` US4 → `30439f53` US5/Polish (verification, S6, task closure, analyze carry-over closure) → docs closure commit (DoD status).
+
+## 12. Post-review repair (2026-10-20)
+
+Authoritative detail and waivers: `notes/postreview-repair.md`. Review findings were re-read against the repaired tree; evidence kinds are explicit.
+
+| Finding | Status after repair | evidence_kind | Named evidence |
+|---------|--------------------|---------------|----------------|
+| P0-01 promotion fail-open | **CLOSED (incl. five independent-audit rounds)** | behavior + mutation + independent audit | twenty-eight `test_p0_*` tests (update/register/re-acquire/forged-merge/released-reactivation/non-git/terminal-state/concurrency/ownership-mutation bypasses included); mutation red `4 failed, 24 passed` → green `28 passed` |
+| P1-F2 watcher identity/macOS token | **CLOSED** | behavior | `test_en_07_watcher_consumes_registered_identity`, `test_en_07_watcher_rejects_branch_mismatch`; self-test 26/0 |
+| P1-F3 executable integration queue | **CLOSED** | behavior | `test_integration_executor_merges_queue_and_replay_is_identical`, `test_integration_executor_failure_retains_worktree_and_continues` |
+| P1-F4 detach/reattach product evidence | **CLOSED (local)** / Partial (remote) | behavior | `test_delivered_runner_recipe_survives_driver_kill_and_reattaches`, `test_run_stage_fails_loud_when_registry_update_fails` |
+| P1-F5 behavior/doc separation | **CLOSED** | behavior + doc/static | delegate meta tests removed; `test_en_13` live-writer; `test_doc_*` renames |
+| P1-F6 stale/orphaned states | **CLOSED** | behavior | `test_lc_13_orphan_mark_writes_state`, `test_lc_14_stale_explicit` |
+| P1-F7 lease cadence | **CLOSED** | behavior | `test_lc_05_cadence_violation_is_recorded`, self-test `lease-window-over-ttl` |
+| P1-F8 CLI observation fixture | **CLOSED** | behavior | `test_clp_10_observation_fixture_cardinality` |
+| P1-F9 063 guard | **CLOSED (pre-merge guard)** | behavior | `check-063-overlap.py` + `test_clp_17_no_063_duplicate_owner` |
+| P1-F10 closure ledger | **CLOSED** | doc/static | this §12 + repair record evidence kinds |
+| P2-F11 evidence capture | **CLOSED for new runs** / historical Partial waiver | doc/static | `notes/postreview-logs/*.log` |
+| P2-F12 `at` type | **CLOSED** | doc/static | data-model exception + EN-01 |
+
+**Analyze carry-over re-read (F10)**: I-04 (integration), I-15 (lease), G-01 (EN-13), G-06 (SC-004) were Partial in the original ledger and are now backed by the behavior tests above; CHK012 (P0) and CHK031 (stale/orphaned) are now closed. The remaining original Partial items (CHK004 legacy multi-line, CHK022 feedback backfill prose, CHK026 063 branch, CHK038 macOS PID reuse, CHK040 NG-03 text) have either been upgraded (CHK026/CHK038) or remain doc/protocol-level with the waiver recorded in `notes/postreview-repair.md` §4.
+
+**Repair test results**: final feature matrix **188 passed / 0 failed**; watcher self-test **26 passed / 0 failed**; P0 mutation red `4 failed, 24 passed` → green `28 passed`; full suite **69 failed / 4113 passed / 1 skipped** with **0 NEW / 0 fixed** against the review-HEAD `c9a0d132` rerun (69 = 69); mirrors 15 files byte-identical; probe 114 objects valid; compile-embeds 74 units zero drift. Logs: `notes/postreview-logs/`.

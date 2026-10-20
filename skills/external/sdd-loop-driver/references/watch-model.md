@@ -109,7 +109,7 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
   --status-file /home/<run-user>/status-<line>-<stage> \
   --log /home/<run-user>/log-<line>-<stage>.log \
   --sentinel <STAGE>-DONE --heartbeat /home/<run-user>/heartbeat-<line>-<stage>.log \
-  --deadline-epoch <epoch> --window 300 --interval 3'"
+  --deadline-epoch <epoch> --window 200 --interval 3'"
 ```
 
 ## 7. 存活判据的正确性（pgrep 陷阱）

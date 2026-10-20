@@ -8,7 +8,7 @@
 ## Clauses
 
 - **LR-01（位置与覆盖）**: 同一 OS 用户一份环境级 Registry。默认目录 `${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines`；`SPECIFY_LINE_REGISTRY_DIR` 覆盖。目录 MUST 位于任一 line 的 worktree 之外，且无需扫描项目目录即可发现。跨机器/多用户共享默认不支持；远端 line 只在驱动侧 Registry 增加最小远端字段（FR-001, FR-065）。
-- **LR-02（注册与注销时点）**: 每条 line 在 U0.5（首次派发前）注册；U6 收尾后注销（`state=closed`）。注册/注销失败 MUST 显式上送并停止该 line 的启动/收尾断言，MUST NOT 静默继续（FR-002, FR-057）。
+- **LR-02（注册与注销时点）**: 每条 line 在 U0.5（首次派发前）注册；U6 收尾后注销（`state=closed`）。`deregister --reason stale-cleanup` 不是 U6：它只把条目标记为 `state=stale`（保留 Manifest/reservation/worktree），显式 `release-ownership --reason --evidence-ref` 才进入 closed（FR-002, FR-055, FR-057）。注册/注销失败 MUST 显式上送并停止该 line 的启动/收尾断言，MUST NOT 静默继续。
 - **LR-03（每线文件与原子写）**: 每线一个 `<line_id>.json`。写入 MUST 为同目录临时文件 + `fsync(file)` + `os.replace` + `fsync(dir)`；读取方不得观察到截断/半写（FR-002, FR-003）。
 - **LR-04（同线锁）**: 同线读-改-写 MUST 经 `<line_id>.lock` 的排他锁串行化（`fcntl.flock`，超时即失败上报）。跨线写入 MUST NOT 共享锁或互相覆盖（FR-003）。
 - **LR-05（读取保证）**: 并发读取方 MUST 始终得到可解析 JSON、唯一 `line_id`、且不丢失其他 line 条目；`list --active` 只返回 `active/waiting`，并输出可机读摘要（`line_id/run_id/project/branch/stage/state/updated_at`）（FR-003, FR-010, SC-009）。
@@ -29,10 +29,11 @@
 
 | action | 关键输入 | 输出（JSON） | 退出码 |
 |--------|----------|--------------|--------|
-| `register` | `--line-id` `--run-id` `--project-dir` `--repo-root` `--state` `[--manifest]` | 条目快照 | 0 / 2 / 6 |
-| `update` | `--line-id` + 字段 flags | 条目快照 | 0 / 2 / 3 / 6 |
-| `deregister` | `--line-id` `--reason` | 终态摘要 | 0 / 2 / 6 |
+| `register` | `--line-id` `--run-id` `--project-dir` `--repo-root` `--state` `[--manifest]` | 条目快照（active + 重叠 manifest → exit 3） | 0 / 2 / 3 / 6 |
+| `update` | `--line-id` + 字段 flags | 条目快照（仅 waiting/stalled → active；`--state active`/`--owned-paths` 通过 ownership 闸门；路径归一化；owned_paths 不可清空/遮蔽 manifest；worktree/branch/base_sha 不可改写） | 0 / 2 / 3 / 6 |
+| `deregister` | `--line-id` `--reason` | 状态摘要（closed；`stale-cleanup` → stale） | 0 / 2 / 6 |
 | `list` | `--active` / `--all` | 条目摘要数组 | 0 / 2 / 6 |
+| `lease-acquire` / `reserve` | 见 LC-04/LC-05 | 租约/保留记录（closed/stale/orphaned → exit 2） | 0 / 2 / 3 / 4 / 6 |
 | `resolve-message` | `--message` `[--clarified]` | `route/clarify/ambiguous-stop/no-active/no-match` | 0 / 2 / 6 |
 | `verify-identity` | `--line-id` `[--probe-json]` | `data-model.md` § E6 JSON | 0 / 2 / 4 / 6 |
 | `classify-remote` | `--probe-json` | `{identity, reason}` | 0 / 2 / 6 |
@@ -44,10 +45,10 @@
 | `reserve` | `--line-id` `--stage` `--run-id` `--pid` `--start-token` | reservation 快照 | 0 / 2 / 3 / 6 |
 | `reservation-status` | `--line-id` `--stage` | reservation 摘要 | 0 / 2 / 6 |
 | `reservation-break` | `--line-id` `--stage` `--reason` `--evidence-ref` | 破除记录 | 0 / 2 / 3 / 6 |
-| `orphan-check` | `--line-id` | `{orphaned, evidence[]}` | 0 / 2 / 6 |
-| `ownership-check` | `--line-id` `--manifest` | `{overlaps[], decision: proceed\|waiting, holder_line_id?, waiting_reason?}` | 0 / 2 / 6 |
-| `release-ownership` | `--line-id` `--reason` `--evidence-ref` | 释放记录 | 0 / 2 / 3 / 6 |
-| `promote-waiting` | `--line-id` | 新状态 | 0 / 2 / 3 / 6 |
+| `orphan-check` | `--line-id` `[--mark]` | `{orphaned, evidence[], marked?, state?}` | 0 / 2 / 6 |
+| `ownership-check` | `--line-id` `--manifest` | `{overlaps[], decision: proceed\|waiting, holder_line_id?, promotion_required?}`；重新取得时清 released_at | 0 / 2 / 3 / 6 |
+| `release-ownership` | `--line-id` `--reason` `--evidence-ref` | 释放记录（stale/orphaned → closed；active/waiting → stalled） | 0 / 2 / 3 / 6 |
+| `promote-waiting` | `--line-id` | 新状态（未满足闸门 → exit 3） | 0 / 2 / 3 / 6 |
 | `integration-enqueue` | `--line-id` `--at` | 条目 | 0 / 2 / 6 |
 | `integration-plan` | — | 有序条目数组 | 0 / 2 / 6（环/依赖非法=6） |
 | `integration-record` | `--line-id` `--result` `--commit` | 条目 | 0 / 2 / 6 |

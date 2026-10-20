@@ -15,8 +15,8 @@
 
 - **WI-04（Manifest 与投影）**: 每条 line MUST 声明 Ownership Manifest（`owned_paths`/`read_only_paths`/`forbidden_paths`/`integration_depends_on`）。Manifest 是路径集 owner；Registry 的 `owned_paths` 是可由 Manifest 再生的投影（FR-020, V-OM）。
 - **WI-05（归一化与重叠）**: 路径 MUST 归一化（相对/绝对统一、符号链接解析、去尾分隔符）后比较；写-写重叠（相等或互相包含）MUST 在注册/派发前被拒绝或串行化。不同字符串写法的同一路径、嵌套前缀重叠均须命中（FR-020, FR-021, Edge Case）。
-- **WI-06（串行化）**: 重叠 line MUST 按 `created_at` FIFO（同一时间戳以 `line_id` 字典序 tie-break）串行化；后到 line `state=waiting`，持有等待票据（`waiting_reason`、`holder_line_id`、`queued_at`），直到持线者完成集成合并并完成 U6 收尾（`closed`）或显式放弃（FR-021, FR-057）。
-- **WI-07（持线者死亡）**: 持线者死亡 MUST NOT 自动释放归属；`waiting` 保持，先保留并上送持线者 worktree/证据，再由显式 `release-ownership --reason --evidence-ref` 处置并留痕（FR-021, Edge Case）。
+- **WI-06（串行化）**: 重叠 line MUST 按当前认领时间 FIFO（Manifest/条目的 `claimed_ns`，无则 `created_at` 的 epoch ns；同一时间戳以 `line_id` 字典序 tie-break）串行化；重新认领（`ownership-check`）刷新认领时间并排在既有等待者之后；后到 line `state=waiting`，持有等待票据（`waiting_reason`、`holder_line_id`、`queued_at`），直到持线者完成集成合并并完成 U6 收尾（`closed`）或经 `release-ownership --reason --evidence-ref` 显式释放。`ownership-check` MUST NOT 隐式晋升；`promote-waiting` MUST 校验持线者满足「带 evidence_ref 的 released 历史」或「`integration_result.status=merged` 且已 U6 `closed`」，否则 exit 3 且 waiting 保持不变（FR-021, FR-057, V-LR-13）。
+- **WI-07（持线者死亡）**: 持线者死亡 MUST NOT 自动释放归属；`waiting` 保持，先保留并上送持线者 worktree/证据，再由显式 `release-ownership --reason --evidence-ref` 处置并留痕。`deregister --reason stale-cleanup` 只把条目标记为 `stale`（写 `stale_at`、保留 Manifest/reservation/worktree），MUST NOT 直接写 `closed`，MUST NOT 构成释放路径（FR-021, FR-055, Edge Case）。
 - **WI-08（只读/禁止路径）**: 任何 line MUST NOT 写入另一活动 line 的 `read_only_paths` 或 `forbidden_paths`；命中按重叠处理（FR-021, V-OM-4）。
 
 ## C. Runtime, Mirrors, Integration

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 from fixtures.line_fixtures import (
@@ -162,6 +163,136 @@ def test_runtime_archive_once_before_removal(tmp_path):
     archived = json.loads(manifest_file.read_text())
     assert archived["line_id"] == line
     assert archived["files"][0]["sha256"]
+    assert worktree.exists()
+
+
+EXECUTOR = (
+    Path(__file__).resolve().parents[2]
+    / "skills" / "external" / "sdd-loop-driver" / "scripts" / "integrate-lines.py"
+)
+
+
+def _execute(repo: Path, reg: Path, archive: Path, *extra: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, str(EXECUTOR), "--repo", str(repo), "--trunk", "main",
+         "--registry", str(reg), "--archive", str(archive), *extra],
+        capture_output=True, text=True,
+    )
+
+
+def _build_two_line_queue(root: Path):
+    repo = make_git_repo(root)
+    reg = root / "reg"
+    # Fixed IDs keep the two replay scenarios comparable.
+    lines = ["ex1-20261020T120000Z-aaaa", "ex2-20261020T120000Z-bbbb"]
+    worktrees = []
+    for index, line in enumerate(lines):
+        worktree = root / f"wt-{index}"
+        worktrees.append(worktree)
+        _register(reg, repo, line, worktree)
+        _add_worktree(repo, worktree, line)
+        _commit(worktree, f"src/file{index}.txt", f"line {index}\n", f"line {index}")
+        engine_json("update", "--line-id", line, "--state", "completed", reg=reg)
+        engine_json("integration-enqueue", "--line-id", line,
+                    "--at", f"2026-10-20T12:00:0{index}Z", reg=reg)
+    return repo, reg, lines, worktrees
+
+
+def test_integration_executor_merges_queue_and_replay_is_identical(tmp_path):
+    def scenario(root: Path) -> tuple[str, list[str], dict]:
+        root.mkdir(parents=True, exist_ok=True)
+        repo, reg, lines, worktrees = _build_two_line_queue(root)
+        counter = root / "mirror-count"
+        proc = _execute(
+            repo, reg, root / "archive",
+            "--gate-cmd", "test -f README.md",
+            "--mirror-cmd", f"printf x >> '{counter}'",
+        )
+        assert proc.returncode == 0, proc.stdout + proc.stderr
+        summary = json.loads(proc.stdout)
+        assert [row["line_id"] for row in summary["results"]] == lines
+        assert all(row["status"] == "merged" for row in summary["results"])
+        assert summary["archive_calls"] == 2
+        assert summary["mirror_calls"] == 1
+        assert all(row["worktree_removed"] for row in summary["results"])
+        assert counter.read_text() == "x", "mirrors must run once per batch, never per line"
+        for worktree in worktrees:
+            assert not worktree.exists()
+        assert (repo / "src" / "file0.txt").exists() and (repo / "src" / "file1.txt").exists()
+        fsck = subprocess.run(
+            ["git", "-C", str(repo), "fsck", "--no-dangling"], capture_output=True, text=True
+        )
+        assert fsck.returncode == 0, fsck.stderr
+        tree = git(repo, "rev-parse", "HEAD^{tree}").stdout.strip()
+        return tree, lines, summary
+
+    first_tree, first_lines, _ = scenario(tmp_path / "run1")
+    second_tree, second_lines, _ = scenario(tmp_path / "run2")
+    assert first_lines == second_lines
+    assert first_tree == second_tree, "merge result must replay to an identical tree"
+
+
+def test_integration_executor_failure_retains_worktree_and_continues(tmp_path):
+    repo = make_git_repo(tmp_path)
+    reg = tmp_path / "reg"
+    failing, passing = make_line_id("exf"), make_line_id("exp")
+    wt_fail, wt_pass = tmp_path / "wt-fail", tmp_path / "wt-pass"
+    _register(reg, repo, failing, wt_fail)
+    _register(reg, repo, passing, wt_pass)
+    _add_worktree(repo, wt_fail, failing)
+    _add_worktree(repo, wt_pass, passing)
+    _commit(wt_fail, "FAIL_GATE", "fail\n", "failing line")
+    _commit(wt_pass, "src/pass.txt", "pass\n", "passing line")
+    engine_json("update", "--line-id", failing, "--state", "completed", reg=reg)
+    engine_json("update", "--line-id", passing, "--state", "completed", reg=reg)
+    engine_json("integration-enqueue", "--line-id", failing,
+                "--at", "2026-10-20T12:00:00Z", reg=reg)
+    engine_json("integration-enqueue", "--line-id", passing,
+                "--at", "2026-10-20T12:00:01Z", reg=reg)
+
+    proc = _execute(
+        repo, reg, tmp_path / "archive",
+        "--gate-cmd", "test ! -f FAIL_GATE",
+    )
+    assert proc.returncode == 3, proc.stdout
+    summary = json.loads(proc.stdout)
+    by_line = {row["line_id"]: row for row in summary["results"]}
+    assert by_line[failing]["status"] == "failed"
+    assert by_line[failing]["reason"] == "quality-gate"
+    assert by_line[passing]["status"] == "merged"
+    assert summary["archive_calls"] == 1
+    assert wt_fail.exists(), "failed integration must retain its worktree"
+    assert not wt_pass.exists()
+    stored_fail = json.loads((reg / f"{failing}.json").read_text())
+    assert stored_fail["integration_result"]["status"] == "failed"
+    stored_pass = json.loads((reg / f"{passing}.json").read_text())
+    assert stored_pass["integration_result"]["status"] == "merged"
+
+
+def test_integration_executor_refuses_preexisting_rebase(tmp_path):
+    repo = make_git_repo(tmp_path)
+    reg = tmp_path / "reg"
+    line = make_line_id("prewh")
+    worktree = tmp_path / "wt-pre"
+    _register(reg, repo, line, worktree)
+    _add_worktree(repo, worktree, line)
+    _commit(worktree, "src/pre.txt", "pre\n", "pre")
+    engine_json("update", "--line-id", line, "--state", "completed", reg=reg)
+    engine_json("integration-enqueue", "--line-id", line, reg=reg)
+    marker = Path(git(worktree, "rev-parse", "--git-path", "rebase-merge").stdout.strip())
+    if not marker.is_absolute():
+        marker = worktree / marker
+    marker.mkdir(parents=True, exist_ok=True)
+    env_marker = marker / "dummy"
+    env_marker.write_text("preexisting\n", encoding="utf-8")
+
+    proc = _execute(repo, reg, tmp_path / "archive")
+    assert proc.returncode == 3, proc.stdout
+    summary = json.loads(proc.stdout)
+    assert summary["results"][0]["reason"] == "rebase-in-progress"
+    assert marker.exists(), "a pre-existing rebase must never be aborted"
+    stored = json.loads((reg / f"{line}.json").read_text())
+    assert stored["integration_result"]["status"] == "failed"
     assert worktree.exists()
 
 

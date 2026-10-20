@@ -447,6 +447,13 @@ def validate_entry(entry: dict) -> dict:
         require(isinstance(result, dict), "integration_result must be an object")
         require(result.get("status") in INTEGRATION_RESULTS,
                 f"integration_result.status must be one of {sorted(INTEGRATION_RESULTS)}")
+    worktree = entry.get("worktree_path")
+    if worktree:
+        resolved = Path(worktree).resolve()
+        for key in ("repo_root", "project_dir"):
+            root = Path(entry[key]).resolve()
+            require(resolved != root and root not in resolved.parents,
+                    f"worktree_path must be outside {key}: {worktree}")
     for pid_field, token_field in (
         ("runner_pid", "runner_start_token"),
         ("cli_pid", "cli_start_token"),
@@ -558,6 +565,7 @@ def action_register(ctx: Context) -> int:
         "state": state,
         "last_event": "registered",
         "created_at": at,
+        "claimed_ns": time.time_ns(),
         "updated_at": at,
         "run_history": [],
     }
@@ -571,20 +579,35 @@ def action_register(ctx: Context) -> int:
         require(bool(entry.get("worktree_path")), "--write-line requires --worktree-path")
         require(bool(entry.get("branch")), "--write-line requires --branch")
         require(bool(entry.get("base_sha")), "--write-line requires --base-sha")
+    entry["write_line"] = bool(args.write_line or args.manifest or args.owned_paths)
     if state == "waiting":
         entry["waiting_reason"] = args.waiting_reason or "ownership-overlap"
         entry["queued_at"] = args.queued_at or at
         if entry["waiting_reason"] == "ownership-overlap":
             require(bool(args.holder_line_id), "--holder-line-id required for ownership-overlap")
             entry["holder_line_id"] = args.holder_line_id
+    manifest_view = None
     if args.manifest:
         manifest = load_manifest(Path(args.manifest), line_id, repo_root)
         entry["owned_paths"] = list(manifest["owned_paths"])
         entry["ownership_manifest_path"] = str(Path(args.manifest).resolve())
-        if not manifest_path(ctx.reg, line_id).exists():
-            atomic_write_json(manifest_path(ctx.reg, line_id), manifest)
+        # Registration is a fresh claim: a caller-supplied released_at must
+        # not turn the new line into a non-blocking owner.
+        for key in ("released_at", "release_reason", "evidence_ref"):
+            manifest.pop(key, None)
+        manifest["claimed_at"] = entry["created_at"]
+        manifest["claimed_ns"] = entry["claimed_ns"]
+        manifest_view = manifest
     elif args.owned_paths:
-        entry["owned_paths"] = json.loads(args.owned_paths)
+        raw_paths = json.loads(args.owned_paths)
+        require(isinstance(raw_paths, list), "owned_paths must be a JSON array")
+        entry["owned_paths"] = [normalize_path(p, repo_root) for p in raw_paths]
+        manifest_view = {
+            "line_id": line_id,
+            "owned_paths": list(entry["owned_paths"]),
+            "read_only_paths": [],
+            "forbidden_paths": [],
+        }
     if args.remote:
         entry["remote"] = json.loads(args.remote)
     if args.resources:
@@ -592,9 +615,14 @@ def action_register(ctx: Context) -> int:
     if args.spine:
         entry["spine_path"] = str(Path(args.spine).expanduser().resolve())
     validate_entry(entry)
+    if entry["state"] == "active" and manifest_view is not None:
+        _raise_if_ownership_conflict(ctx, entry, manifest_view)
     if entry.get("worktree_path"):
         _ensure_unique_worktree(ctx.reg, entry["worktree_path"], line_id)
     exclusive_write_json(entry_path(ctx.reg, line_id), entry)
+    if args.manifest and manifest_view is not None \
+            and not manifest_path(ctx.reg, line_id).exists():
+        atomic_write_json(manifest_path(ctx.reg, line_id), manifest_view)
     return emit(entry)
 
 
@@ -617,7 +645,6 @@ def _apply_update(entry: dict, args: argparse.Namespace) -> None:
         "status_path": "status_path",
         "log_path": "log_path",
         "heartbeat_path": "heartbeat_path",
-        "ownership_manifest_path": "ownership_manifest_path",
         "spine_path": "spine_path",
     }
     for flag, key in scalar.items():
@@ -665,7 +692,6 @@ def _apply_update(entry: dict, args: argparse.Namespace) -> None:
             entry[key] = _parse_bool(raw)
     json_fields = {
         "meta_paths": args.meta_json,
-        "integration_result": args.integration_result,
         "resources": args.resources,
         "remote": args.remote,
         "owned_paths": args.owned_paths,
@@ -699,7 +725,59 @@ def action_update(ctx: Context) -> int:
     entry = ctx.load(line_id)
 
     def mutate(data):
+        previous_state = data.get("state")
+        data_previous = dict(data)
         _apply_update(data, args)
+        require(previous_state != "closed" or data.get("state") == "closed",
+                "closed is terminal; a new attempt requires a new line")
+        if args.owned_paths is not None:
+            raw_paths = json.loads(args.owned_paths)
+            require(isinstance(raw_paths, list), "owned_paths must be a JSON array")
+            require(bool(raw_paths), "owned_paths cannot be emptied; use release-ownership")
+            require(_manifest_for_entry(ctx.reg, data) is None,
+                    "owned_paths are owned by the manifest; use ownership-check to change them")
+            data["owned_paths"] = [
+                normalize_path(p, Path(data["repo_root"])) for p in raw_paths
+            ]
+            if data.get("state") == "active":
+                view = {
+                    "line_id": line_id,
+                    "owned_paths": list(data["owned_paths"]),
+                    "read_only_paths": [],
+                    "forbidden_paths": [],
+                }
+                _raise_if_ownership_conflict(ctx, data, view)
+        if args.worktree_path is not None:
+            new_worktree = (
+                str(Path(args.worktree_path).expanduser().resolve())
+                if args.worktree_path else ""
+            )
+            previous_worktree = data_previous.get("worktree_path")
+            require(not previous_worktree or new_worktree == previous_worktree,
+                    "worktree_path is immutable once set; register a new line instead")
+            data["worktree_path"] = new_worktree
+        for key in ("branch", "base_sha"):
+            if getattr(args, key) is not None and data_previous.get(key) is not None:
+                require(getattr(args, key) == data_previous.get(key),
+                        f"{key} is immutable once set")
+        if data.get("state") == "active" and previous_state != "active":
+            require(previous_state in {"waiting", "stalled"},
+                    f"cannot transition from {previous_state!r} to active; "
+                    "closed/stale/orphaned/completed are not revivable")
+            # Every path into active must pass the ownership gate, not just
+            # ownership-check / promote-waiting (P0-01 bypass found in review).
+            if _entry_released(ctx, data):
+                # A released write line must re-acquire via ownership-check
+                # (which clears released_at / records a new claim) before it
+                # can become active again.
+                raise EngineError(
+                    EXIT_HELD,
+                    "ownership was released; re-acquire with ownership-check before becoming active",
+                    line_id=line_id,
+                )
+            manifest = _entry_manifest_view(ctx, data)
+            if manifest is not None:
+                _raise_if_ownership_conflict(ctx, data, manifest)
         if data.get("worktree_path"):
             _ensure_unique_worktree(ctx.reg, data["worktree_path"], line_id)
         if args.spine:
@@ -716,7 +794,19 @@ def action_deregister(ctx: Context) -> int:
     require(bool(args.reason), "deregister requires --reason")
 
     def mutate(entry):
-        if (entry.get("worktree_path") and entry.get("state") == "completed"
+        previous = entry.get("state")
+        if args.reason == "stale-cleanup":
+            # Stale cleanup marks the line stale; it never closes it and never
+            # releases ownership. Only an explicit release-ownership (with
+            # evidence) or a merged integration + U6 close unblocks waiters.
+            if previous == "closed":
+                return
+            entry["state"] = "stale"
+            entry.setdefault("stale_at", now_iso())
+            entry["stale_from_state"] = previous
+            entry["last_event"] = "stale-marked"
+            return
+        if (entry.get("worktree_path") and previous == "completed"
                 and not entry.get("integration_result") and args.reason != "abandoned"):
             raise EngineError(
                 EXIT_USAGE,
@@ -743,7 +833,8 @@ def action_deregister(ctx: Context) -> int:
         })
 
     entry = ctx.mutate(line_id, mutate)
-    _release_resources_for_line(ctx.reg, line_id, reason=args.reason)
+    if entry.get("state") == "closed":
+        _release_resources_for_line(ctx.reg, line_id, reason=args.reason)
     return emit(entry)
 
 
@@ -1200,6 +1291,60 @@ def _manifest_conflicts(self_manifest: dict, other_manifest: dict, other_line: s
     return conflicts
 
 
+def _ownership_release_record(reg: Path, line_id: str) -> dict | None:
+    """Last explicit release (with evidence) from the ownership history."""
+    history = reg / f"{line_id}.ownership-history.jsonl"
+    if not history.exists():
+        return None
+    try:
+        lines = history.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return None
+    for line in reversed(lines):
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if record.get("event") == "released" and record.get("evidence_ref"):
+            return record
+    return None
+
+
+def _entry_manifest_view(ctx: Context, entry: dict) -> dict | None:
+    """Manifest file, or the entry's owned_paths projection when the file is absent.
+
+    Falling back to the projection closes the "delete the manifest to stop
+    blocking" hole: ownership declared at registration still blocks.
+    """
+    manifest = _manifest_for_entry(ctx.reg, entry)
+    if manifest is not None:
+        return manifest
+    owned = entry.get("owned_paths")
+    if owned:
+        root = Path(entry.get("repo_root") or ".")
+        return {
+            "line_id": entry["line_id"],
+            "owned_paths": [normalize_path(p, root) for p in owned],
+            "read_only_paths": [],
+            "forbidden_paths": [],
+        }
+    return None
+
+
+def _entry_released(ctx: Context, entry: dict) -> bool:
+    """Released = the stored manifest is released, or (no manifest file) a
+    release record exists. The owned_paths projection must not mask a release."""
+    manifest_file = _manifest_for_entry(ctx.reg, entry)
+    if manifest_file is not None:
+        return bool(manifest_file.get("released_at"))
+    return _ownership_release_record(ctx.reg, entry["line_id"]) is not None
+
+
+def _closure_is_evidenced(entry: dict) -> bool:
+    """A closed line releases overlap only after a merged integration."""
+    return (entry.get("integration_result") or {}).get("status") == "merged"
+
+
 def _ownership_conflicts(ctx: Context, self_entry: dict, self_manifest: dict) -> tuple[list[dict], list[dict]]:
     conflicts: list[dict] = []
     competitors: list[dict] = []
@@ -1207,16 +1352,74 @@ def _ownership_conflicts(ctx: Context, self_entry: dict, self_manifest: dict) ->
         entry = read_json(path)
         if entry.get("line_id") == self_entry.get("line_id"):
             continue
-        if entry.get("state") in {"closed", "stale", "orphaned"}:
+        manifest_file = _manifest_for_entry(ctx.reg, entry)
+        other_manifest = _entry_manifest_view(ctx, entry)
+        if other_manifest is None:
             continue
-        other_manifest = _manifest_for_entry(ctx.reg, entry)
-        if not other_manifest or other_manifest.get("released_at"):
+        if manifest_file is not None:
+            # A re-acquisition (ownership-check) clears released_at, so the
+            # stored manifest is the current claim; old release history must
+            # not unblock a holder that is active again. An *active* line with
+            # a released manifest is inconsistent and keeps blocking (fail-safe).
+            if manifest_file.get("released_at") and entry.get("state") != "active":
+                continue
+        elif _ownership_release_record(ctx.reg, entry["line_id"]):
             continue
+        if entry.get("state") == "closed" and _closure_is_evidenced(entry):
+            continue
+        # stale/orphaned and any closed line without explicit release or merged
+        # evidence keep blocking: stale-cleanup is not an implicit release (FR-021).
         found = _manifest_conflicts(self_manifest, other_manifest, entry["line_id"])
         if found:
             conflicts.extend(found)
             competitors.append(entry)
     return conflicts, competitors
+
+
+def _claim_key(ctx: Context, entry: dict) -> tuple[int, str]:
+    """FIFO key of the current claim: a re-acquired manifest restarts its slot.
+
+    Nanosecond resolution (claimed_ns) keeps ordering deterministic when
+    several claims happen inside one ISO-second.
+    """
+    manifest = _manifest_for_entry(ctx.reg, entry) or {}
+    claimed_ns = manifest.get("claimed_ns")
+    if not isinstance(claimed_ns, int):
+        claimed_ns = entry.get("claimed_ns")
+    if isinstance(claimed_ns, int):
+        return (claimed_ns, entry["line_id"])
+    epoch = _iso_epoch(entry.get("created_at")) or 0
+    return (int(epoch * 1_000_000_000), entry["line_id"])
+
+
+def _raise_if_ownership_conflict(ctx: Context, entry: dict, manifest: dict) -> None:
+    """Every path that makes a line active passes this gate.
+
+    The current claim holder may (re)enter active even while later claimants
+    wait; a later claimant is refused. This mirrors ownership-check's FIFO.
+    """
+    conflicts, competitors = _ownership_conflicts(ctx, entry, manifest)
+    if not conflicts:
+        return
+    # An already-active owner is never preempted by a later ownership claim,
+    # even if the claimant has an older creation/claim timestamp.
+    active_competitors = [item for item in competitors if item.get("state") == "active"]
+    if active_competitors:
+        raise EngineError(
+            EXIT_HELD,
+            f"ownership overlap with active line {active_competitors[0]['line_id']}",
+            holder_line_id=active_competitors[0]["line_id"],
+            conflicts=conflicts[:10],
+        )
+    earliest = min(competitors + [entry], key=lambda item: _claim_key(ctx, item))
+    if earliest["line_id"] == entry["line_id"]:
+        return
+    raise EngineError(
+        EXIT_HELD,
+        f"ownership overlap with line {earliest['line_id']}",
+        holder_line_id=earliest["line_id"],
+        conflicts=conflicts[:10],
+    )
 
 
 def _ensure_unique_worktree(reg: Path, worktree: str, line_id: str) -> None:
@@ -1225,7 +1428,7 @@ def _ensure_unique_worktree(reg: Path, worktree: str, line_id: str) -> None:
         entry = read_json(path)
         if entry.get("line_id") == line_id:
             continue
-        if entry.get("state") in {"closed", "stale", "orphaned"}:
+        if entry.get("state") == "closed" and not entry.get("worktree_retained"):
             continue
         existing = entry.get("worktree_path")
         if existing and str(Path(existing).resolve()) == target:
@@ -1241,16 +1444,27 @@ def action_ownership_check(ctx: Context) -> int:
     line_id = validate_line_id(args.line_id or "")
     require(bool(args.manifest), "ownership-check requires --manifest")
     entry = ctx.load(line_id)
+    require(entry.get("state") not in {"closed", "stale", "orphaned"},
+            f"cannot re-acquire ownership from state {entry.get('state')!r}; dispose or register a new line")
     manifest = load_manifest(Path(args.manifest), line_id, Path(entry["repo_root"]))
+    # ownership-check is a claim: it re-acquires a previously released
+    # manifest, so the stale released_at/evidence must not keep it unlocked.
+    manifest["claimed_at"] = now_iso()
+    manifest["claimed_ns"] = time.time_ns()
+    for key in ("released_at", "release_reason", "evidence_ref"):
+        manifest.pop(key, None)
     ensure_registry_dir(ctx.reg)
     atomic_write_json(manifest_path(ctx.reg, line_id), manifest)
+    append_jsonl(ctx.reg / f"{line_id}.ownership-history.jsonl", {
+        "event": "acquired", "at": manifest["claimed_at"],
+    })
     conflicts, competitors = _ownership_conflicts(ctx, entry, manifest)
     decision = "proceed"
     holder = None
     if conflicts:
         earliest = min(
             competitors + [entry],
-            key=lambda item: (item.get("created_at") or "", item["line_id"]),
+            key=lambda item: _claim_key(ctx, item),
         )
         if earliest["line_id"] != line_id:
             decision = "waiting"
@@ -1267,10 +1481,9 @@ def action_ownership_check(ctx: Context) -> int:
             data["queued_at"] = now_iso()
             data["last_event"] = "waiting-ownership-overlap"
         elif data.get("state") == "waiting" and data.get("waiting_reason") == "ownership-overlap":
-            data["state"] = "active"
-            for key in ("waiting_reason", "holder_line_id", "queued_at"):
-                data.pop(key, None)
-            data["last_event"] = "ownership-cleared"
+            # No implicit promotion: a waiting line only becomes active through
+            # the explicit promote-waiting action after the gate below passes.
+            data["last_event"] = "ownership-clear-awaiting-promotion"
 
     updated = ctx.mutate(line_id, mutate)
     payload = {
@@ -1279,6 +1492,8 @@ def action_ownership_check(ctx: Context) -> int:
         "decision": decision,
         "state": updated["state"],
     }
+    if updated["state"] == "waiting":
+        payload["promotion_required"] = True
     if holder:
         payload["holder_line_id"] = holder
     return emit(payload)
@@ -1303,8 +1518,27 @@ def action_release_ownership(ctx: Context) -> int:
 
     def mutate(data):
         data["last_event"] = "ownership-released"
+        data["ownership_released_at"] = now_iso()
+        if data.get("state") in {"stale", "orphaned"}:
+            # Explicit disposition closes a stale/orphaned line; the manifest
+            # release above is what unblocks overlapping waiters.
+            data["state"] = "closed"
+            data["closed_at"] = now_iso()
+            worktree = data.get("worktree_path")
+            if worktree:
+                merged = (data.get("integration_result") or {}).get("status") == "merged"
+                data["worktree_retained"] = bool(Path(worktree).exists()) and not merged
+        elif data.get("state") in {"active", "waiting"}:
+            # A line that gave up its paths must stop being a writer; explicit
+            # U5/U6 disposition follows. This prevents an active line from
+            # coexisting with the next owner of the same paths.
+            data["state"] = "stalled"
+            for key in ("waiting_reason", "holder_line_id", "queued_at"):
+                data.pop(key, None)
 
     updated = ctx.mutate(line_id, mutate)
+    if updated.get("state") == "closed":
+        _release_resources_for_line(ctx.reg, line_id, reason=args.reason)
     return emit({
         "line_id": line_id, "released": True,
         "reason": args.reason, "state": updated["state"],
@@ -1315,15 +1549,24 @@ def action_promote_waiting(ctx: Context) -> int:
     line_id = validate_line_id(ctx.args.line_id or "")
     entry = ctx.load(line_id)
     require(entry.get("state") == "waiting", f"line {line_id} is not waiting (state={entry.get('state')})")
-    manifest = _manifest_for_entry(ctx.reg, entry)
+    manifest = _entry_manifest_view(ctx, entry)
+    if _entry_released(ctx, entry):
+        return emit({
+            "line_id": line_id, "promoted": False, "reason": "ownership-released",
+        }, code=EXIT_HELD)
+    if manifest is None and entry.get("waiting_reason") == "ownership-overlap":
+        return emit({
+            "line_id": line_id, "promoted": False, "reason": "manifest-missing",
+        }, code=EXIT_HELD)
     if manifest is not None:
         conflicts, competitors = _ownership_conflicts(ctx, entry, manifest)
         if conflicts:
-            holder = min(competitors, key=lambda item: (item.get("created_at") or "", item["line_id"]))
-            return emit({
-                "line_id": line_id, "promoted": False, "reason": "ownership-overlap",
-                "holder_line_id": holder["line_id"],
-            }, code=EXIT_HELD)
+            earliest = min(competitors + [entry], key=lambda item: _claim_key(ctx, item))
+            if earliest["line_id"] != line_id:
+                return emit({
+                    "line_id": line_id, "promoted": False, "reason": "ownership-overlap",
+                    "holder_line_id": earliest["line_id"],
+                }, code=EXIT_HELD)
     cap = int(os.environ.get("SPECIFY_LINE_CONCURRENCY_CAP", DEFAULT_CONCURRENCY_CAP))
     active = [
         read_json(path) for path in ctx.reg.glob("*.json")
@@ -1437,6 +1680,59 @@ def action_integration_record(ctx: Context) -> int:
         require(bool(args.reason), "failed result requires --reason")
     entry = ctx.load(line_id)
     require(entry.get("state") == "completed", "integration-record requires state=completed")
+    if args.result == "merged":
+        repo = Path(entry["repo_root"])
+        probe = subprocess.run(
+            ["git", "-C", str(repo), "rev-parse", "--git-dir"],
+            capture_output=True, text=True, timeout=5,
+        )
+        ownership_line = bool(
+            entry.get("write_line") or entry.get("owned_paths") or entry.get("worktree_path")
+        )
+        if probe.returncode != 0 and ownership_line:
+            require(False,
+                    f"merged integration for a write line requires a git repo_root: {repo}")
+        if probe.returncode == 0:
+            exists = subprocess.run(
+                ["git", "-C", str(repo), "cat-file", "-e", f"{args.commit}^{{commit}}"],
+                capture_output=True, text=True, timeout=5,
+            )
+            require(exists.returncode == 0,
+                    f"merged commit does not exist in repo: {args.commit}")
+            reachable = subprocess.run(
+                ["git", "-C", str(repo), "merge-base", "--is-ancestor",
+                 args.commit, "HEAD"],
+                capture_output=True, text=True, timeout=5,
+            )
+            require(reachable.returncode == 0,
+                    f"merged commit is not reachable from HEAD: {args.commit}")
+            if ownership_line:
+                worktree = entry.get("worktree_path")
+                require(bool(worktree) and Path(worktree).exists(),
+                        "merged write line requires its retained worktree for containment verification")
+                require(Path(worktree).resolve() != repo.resolve(),
+                        "merged write line worktree must not be the repo root itself")
+                if entry.get("branch"):
+                    actual_branch = subprocess.run(
+                        ["git", "-C", worktree, "rev-parse", "--abbrev-ref", "HEAD"],
+                        capture_output=True, text=True, timeout=5,
+                    )
+                    require(actual_branch.returncode == 0
+                            and actual_branch.stdout.strip() == entry["branch"],
+                            "merged write line worktree branch does not match the registered branch")
+                line_head = subprocess.run(
+                    ["git", "-C", worktree, "rev-parse", "HEAD"],
+                    capture_output=True, text=True, timeout=5,
+                )
+                require(line_head.returncode == 0 and bool(line_head.stdout.strip()),
+                        "cannot verify the line worktree HEAD")
+                contains = subprocess.run(
+                    ["git", "-C", str(repo), "merge-base", "--is-ancestor",
+                     line_head.stdout.strip(), args.commit],
+                    capture_output=True, text=True, timeout=5,
+                )
+                require(contains.returncode == 0,
+                        "merged commit does not contain the line worktree HEAD")
 
     def mutate(data):
         data["integration_result"] = {
@@ -1456,6 +1752,8 @@ def action_allocate_resources(ctx: Context) -> int:
     args = ctx.args
     line_id = validate_line_id(args.line_id or "")
     entry = ctx.load(line_id)
+    require(entry.get("state") == "active",
+            f"allocate-resources requires state=active (state={entry.get('state')})")
     cap = int(args.cap or os.environ.get("SPECIFY_LINE_CONCURRENCY_CAP", DEFAULT_CONCURRENCY_CAP))
     start = int(args.port_range_start or DEFAULT_PORT_START)
     block = int(args.block_size or DEFAULT_BLOCK_SIZE)
@@ -1647,7 +1945,9 @@ def action_lease_acquire(ctx: Context) -> int:
     require(bool(args.session), "lease-acquire requires --session")
     require(bool(args.pid), "lease-acquire requires --pid")
     require(args.ttl is None or int(args.ttl) > 0, "--ttl must be positive")
-    ctx.load(line_id)
+    entry = ctx.load(line_id)
+    require(entry.get("state") not in {"closed", "stale", "orphaned"},
+            f"cannot lease a {entry.get('state')} line")
     ensure_registry_dir(ctx.reg)
     ttl = int(args.ttl or DEFAULT_TTL)
     pid = int(args.pid)
@@ -1726,7 +2026,17 @@ def action_lease_renew(ctx: Context) -> int:
         "event": "renewed", "session": args.session, "at": lease["heartbeat_at"],
         "interval_seconds": interval, "cadence_ok": cadence_ok,
     })
-    _project_lease(ctx, line_id, lease, "lease-renewed")
+    if not cadence_ok:
+        violation = {
+            "event": "lease-cadence-violation", "session": args.session,
+            "at": lease["heartbeat_at"], "interval_seconds": interval,
+            "max_interval_seconds": max_interval,
+        }
+        append_jsonl(lease_history_path(ctx.reg, line_id), violation)
+        lease["last_cadence_violation"] = violation
+        _project_lease(ctx, line_id, lease, "lease-cadence-violation")
+    else:
+        _project_lease(ctx, line_id, lease, "lease-renewed")
     payload = dict(lease)
     payload.update({
         "renewed": True,
@@ -1825,7 +2135,9 @@ def action_reserve(ctx: Context) -> int:
     require(bool(args.run_id), "reserve requires --run-id")
     require(bool(args.pid), "reserve requires --pid")
     validate_run_id(args.run_id)
-    ctx.load(line_id)
+    entry = ctx.load(line_id)
+    require(entry.get("state") not in {"closed", "stale", "orphaned"},
+            f"cannot reserve a stage for a {entry.get('state')} line")
     ensure_registry_dir(ctx.reg)
     pid = int(args.pid)
     token = args.start_token or process_start_token(pid)
@@ -1949,7 +2261,20 @@ def action_orphan_check(ctx: Context) -> int:
             evidence.append("reservation-run-mismatch")
     if present:
         evidence.extend(f"present:{name}" for name in present)
-    return emit({"line_id": line_id, "orphaned": orphaned, "evidence": evidence})
+    payload = {"line_id": line_id, "orphaned": orphaned, "evidence": evidence}
+    if orphaned and args.mark:
+        require(state not in {"closed", "stale", "orphaned"},
+                f"cannot mark orphaned from state {state!r}")
+
+        def mutate(data):
+            data["state"] = "orphaned"
+            data["orphaned_at"] = now_iso()
+            data["orphan_evidence"] = evidence
+            data["last_event"] = "orphan-marked"
+
+        payload["state"] = ctx.mutate(line_id, mutate)["state"]
+        payload["marked"] = True
+    return emit(payload)
 
 
 def action_reattach_brief(ctx: Context) -> int:
@@ -2122,12 +2447,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--queued-at")
     parser.add_argument("--merge-ready")
     parser.add_argument("--ready-for-merge-at")
-    parser.add_argument("--integration-result")
     parser.add_argument("--worktree-retained")
     parser.add_argument("--resources")
     parser.add_argument("--remote")
     parser.add_argument("--owned-paths")
-    parser.add_argument("--ownership-manifest-path")
     parser.add_argument("--reason")
     parser.add_argument("--evidence-ref")
     parser.add_argument("--message")
@@ -2148,6 +2471,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--label")
     parser.add_argument("--active", action="store_true", default=False)
     parser.add_argument("--all", action="store_true", default=False)
+    parser.add_argument("--mark", action="store_true", default=False)
     return parser
 
 
@@ -2161,8 +2485,27 @@ def main(argv: list[str] | None = None) -> int:
         return fail_from(EngineError(
             EXIT_USAGE, f"action not implemented yet: {args.action}",
         ))
+    ctx = Context(args)
+    ownership_actions = {
+        "register", "deregister", "ownership-check", "release-ownership",
+        "promote-waiting", "integration-record", "allocate-resources",
+        "orphan-check",
+    }
+    needs_ownership_lock = args.action in ownership_actions or (
+        args.action == "update" and (
+            args.state == "active"
+            or args.owned_paths is not None
+            or args.worktree_path is not None
+        )
+    )
     try:
-        return handler(Context(args))
+        if needs_ownership_lock:
+            # Cross-line gate + write must be atomic: otherwise two concurrent
+            # registrations can both observe "no conflict" (P0 audit TOCTOU).
+            ensure_registry_dir(ctx.reg)
+            with line_lock(ctx.reg / ".ownership.lock"):
+                return handler(ctx)
+        return handler(ctx)
     except EngineError as exc:
         return fail_from(exc)
     except json.JSONDecodeError as exc:

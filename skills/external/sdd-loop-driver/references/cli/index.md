@@ -57,6 +57,8 @@ Each profile carries `## Provenance`:
 
 Write order is fixed: state-spine `cli_observations` → profile provenance → feedback. A single dispatch may produce multiple independent observation events; each produces its own feedback entry (never merged, never dropped). No new fact = zero feedback.
 
+The executable counterpart of this chain is the framework test fixture `tests/fixtures/cli_observation.py` (driven by `test_clp_10_observation_fixture_cardinality`): one event → one spine record; on a changed value it also appends one provenance row and records exactly one `cli-profile:<cli>` feedback entry. `known` rows record the CLI's own observable version (`qodercli --version` → `1.1.73`, 2026-10-20) plus a reproducible evidence pointer, never a placeholder.
+
 ## Feedback Marker
 
 Record through the existing engine (do not duplicate or replace it; never auto-transmit):

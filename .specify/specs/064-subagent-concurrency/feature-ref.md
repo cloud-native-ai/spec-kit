@@ -18,7 +18,11 @@
 | Path | Change | Purpose |
 |------|--------|---------|
 | `skills/external/sdd-loop-driver/scripts/line-registry.py` | **new** (Python stdlib-only) | Registry/lease/reservation/identity/queue/ownership/resources/archive engine |
-| `skills/external/sdd-loop-driver/scripts/watch-target.sh` | extended | Attribution flags (`--line-id/--run-id/--meta`), foreign/stale-run/unattributed filtering, self-test cases; verdicts/exit codes unchanged |
+| `skills/external/sdd-loop-driver/scripts/watch-target.sh` | extended | Attribution flags (`--line-id/--run-id/--meta`), `--registry` identity (runner/cli PID + start token + branch), foreign/stale-run/unattributed filtering, self-test cases; verdicts/exit codes unchanged |
+| `skills/external/sdd-loop-driver/scripts/run-stage.sh` | **new** | Executable detached runner: four-piece evidence, CLI child under nohup, registry projection, atomic status |
+| `skills/external/sdd-loop-driver/scripts/integrate-lines.py` | **new** | Executable WI-14 integration coordinator (rebase → gate → merge → record → archive → remove; mirror once per batch) |
+| `skills/external/sdd-loop-driver/scripts/check-063-overlap.py` | **new** | Branch-aware 063 dual-owner guard (pending-merge vs merged) |
+| `tests/fixtures/cli_observation.py` | **new** | Executable S5 observation fixture (spine → provenance → exactly one feedback) |
 | `skills/external/sdd-loop-driver/SKILL.md` | extended | New H2 `CLI Capability Profiles`; concurrency/lifecycle pointers; envelope/Registry entry points |
 | `skills/external/sdd-loop-driver/references/cli/index.md` + `qodercli.md` + `claude.md` + `codex.md` + `opencode.md` + `hermes.md` | **new** | CLI behaviour knowledge (8 dimensions, known/unknown, provenance) |
 | `references/dispatch-recipes.md` | extended | Envelope-carrying runner, CLI child PID, reservation-before-dispatch, detach (setsid/nohup), integration protocol pointer |
@@ -57,9 +61,9 @@ No new command, skill, daemon, external service, runtime dependency, or model AP
 | SC-001 | `test_two_line_isolation` — event attribution diff list is empty; both lines' completion verdicts correct (2/2 = 100%) |
 | SC-002 | Ingress fixture — exactly one question per unidentified message; PATH-stub `ps`/`pgrep` invocation count 0; post-answer routing correctness 100% (ambiguous-stop counts as a correct terminal outcome, not an error; correctness = correct outcomes / answered messages) |
 | SC-003 | Foreign monitor/PID fixture — state transition count 0; 100% tagged `foreign`; `stale-run`/`unattributed` rows in `test_en_04_classification` and the two-line integration file prove the other non-own classes are also not consumed |
-| SC-004 | `test_worktree_integration_queue` — `git fsck --no-dangling` exit 0; commit SHAs present in `git rev-list --all`; overlap rejection 100%; replay comparison = byte-identical `integration-plan` JSON plus identical ordered line_id list |
-| SC-005 | `test_session_kill_reattach` — survival 100%, reattach 100%, redispatch 0, branch outcome matches evidence; `orphaned`, `stalled(remote-unreachable)` and `dead` outcomes covered by `test_lc_13_orphan_check_uses_line_evidence`, `test_lc_09_remote_unreachable_not_dead`, and the integration dead branch |
-| SC-006 | Profile content check + `feedback-utils.py --action list --contains "cli-profile:qodercli"`; simulated mismatch → exactly 1; no new fact → zero new feedback |
+| SC-004 | `test_worktree_integration_queue` — `test_integration_executor_merges_queue_and_replay_is_identical` runs the delivered `integrate-lines.py` on two real worktrees twice: merged tree SHA identical across replays, `archive_calls=2`, `mirror_calls=1`, worktrees removed, `git fsck` exit 0; overlap rejection 100%; plan JSON still byte-identical |
+| SC-005 | `test_session_kill_reattach` — `test_delivered_runner_recipe_survives_driver_kill_and_reattaches` launches the delivered `run-stage.sh` with the documented nohup+disown recipe, SIGHUPs the driver group, proves runner+CLI survival, heartbeat continuation, registry `verify-identity=ok`, `--once RUNNING → DONE`, reservation attach (redispatch 0), and unchanged runner/cli PIDs; `orphaned`, `stalled(remote-unreachable)` and `dead` outcomes covered by `test_lc_13_orphan_mark_writes_state`, `test_lc_09_remote_unreachable_not_dead`, and the integration dead branch |
+| SC-006 | `test_clp_10_observation_fixture_cardinality` executes `tests/fixtures/cli_observation.py`: no new fact → spine 1 event + zero feedback + profile unchanged; mismatch → spine + one provenance row + exactly one retrievable `cli-profile:qodercli` entry; qodercli rows carry `qodercli --version` → 1.1.73 |
 | SC-007 | Existing contract suites + push-stub count 0 + watcher exit-code pin |
 | SC-008 | Test matrix + three mutation drills each turning ≥1 test red |
 | SC-009 | `test_lr_12_concurrent_registration` — N=12 writers plus an interleaved reader; parse rate 100%, lost 0, duplicate 0, no half-written JSON observed during writes |

@@ -16,10 +16,13 @@ from fixtures.line_fixtures import (
     engine_json,
     engine_path,
     four_piece,
+    git,
     install_process_stubs,
+    make_git_repo,
     make_line_id,
     make_project,
     make_run_id,
+    process_token,
     run_engine,
     run_watcher,
     stub_calls,
@@ -193,14 +196,21 @@ def test_en_07_targeted_pid_only(tmp_path):
     stubs = install_process_stubs(tmp_path)
     proc = run_watcher(paths, line, run, "PLAN-DONE", env=stubs["env"])
     assert proc.returncode == 10
-    assert stub_calls(stubs) == [], "watcher invoked a broad process scan"
-    source = watcher_path().read_text(encoding="utf-8")
-    runtime = source[: source.find("# ---------------------------------------------------------------- self-test")]
-    runtime = "\n".join(
-        line for line in runtime.splitlines() if not line.lstrip().startswith("#")
-    )
-    assert not re.search(r"\b(pgrep|pidof)\b", runtime)
-    assert not re.search(r"\bps\b", runtime)
+    calls = stub_calls(stubs)
+    for call in calls:
+        # Only a targeted single-PID probe is permitted (EN-07).
+        assert call.startswith("ps -p "), f"broad process scan: {call!r}"
+
+
+def test_en_07_registered_line_without_pids_rejects_ambient_pid(tmp_path):
+    project = make_project(tmp_path)
+    reg = tmp_path / "reg"
+    line, run = make_line_id("nopid"), make_run_id()
+    _register(reg, project, line, run)
+    paths = four_piece(tmp_path / "rt", line, run, stage="plan", sentinel=False)
+    proc = run_watcher(paths, line, run, "PLAN-DONE", "--registry", str(reg))
+    assert proc.returncode == 13, proc.stdout
+    assert "pid=unregistered" in proc.stdout
 
 
 def test_en_08_active_definition(tmp_path):
@@ -271,6 +281,9 @@ def test_en_12_single_zero_active(tmp_path):
 
 
 def test_en_13_clarification_non_blocking(tmp_path):
+    """Clarification is a non-blocking terminal answer: when it is issued, the
+    other line's evidence keeps advancing under a live writer and no registry
+    entry is mutated by resolve-message."""
     project = make_project(tmp_path)
     reg = tmp_path / "reg"
     l1, r1 = make_line_id("alpha"), make_run_id()
@@ -279,15 +292,31 @@ def test_en_13_clarification_non_blocking(tmp_path):
     entry2 = _register(reg, project, l2, r2)
     heartbeat = tmp_path / "heartbeat-l2.log"
     write_heartbeat(heartbeat, line=l2, run=r2, stage="plan")
-    before_mtime = heartbeat.stat().st_mtime_ns
-    decision = engine_json("resolve-message", "--message", "继续推进", reg=reg)
-    assert decision["decision"] == "clarify"
-    time.sleep(0.02)
-    write_heartbeat(heartbeat, line=l2, run=r2, stage="plan")
-    updated = engine_json("update", "--line-id", l2, "--last-event", "still-advancing", reg=reg)
-    assert heartbeat.stat().st_mtime_ns >= before_mtime
-    assert updated["updated_at"] >= entry2["updated_at"]
-    assert updated["state"] == "active"
+    writer = subprocess.Popen(
+        ["bash", "-c",
+         f'while :; do printf "at=%s line={l2} run={r2} stage=plan event=heartbeat\\n" '
+         f'"$(date +%s%N)" > "{heartbeat}"; sleep 0.05; done'],
+        start_new_session=True,
+        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+    try:
+        time.sleep(0.2)
+        before_mtime = heartbeat.stat().st_mtime_ns
+        started = time.time()
+        decision = engine_json("resolve-message", "--message", "继续推进", reg=reg)
+        elapsed = time.time() - started
+        assert decision["decision"] == "clarify"
+        assert elapsed < 5, "clarification must return immediately"
+        time.sleep(0.3)
+        assert heartbeat.stat().st_mtime_ns > before_mtime, (
+            "the other line's heartbeat writer must keep advancing during clarification"
+        )
+    finally:
+        writer.terminate()
+        writer.wait(timeout=5)
+    after = json.loads((reg / f"{l2}.json").read_text())
+    assert after["updated_at"] == entry2["updated_at"]
+    assert after["state"] == "active"
     l1_entry = json.loads((reg / f"{l1}.json").read_text())
     assert l1_entry["state"] == "active"
 
@@ -312,13 +341,69 @@ def test_en_14_no_process_scan(tmp_path):
     assert "cwd" not in body.lower()
 
 
-def test_en_15_integration_delegate():
-    integration = (
-        Path(__file__).resolve().parents[1] / "integration" / "test_two_line_isolation.py"
+def test_en_07_watcher_consumes_registered_identity(tmp_path):
+    """EN-07 behavior: registry PID/token is authoritative; a live but wrong
+    identity (PID reuse) can never produce a RUNNING/DONE verdict."""
+    project = make_project(tmp_path)
+    reg = tmp_path / "reg"
+    line, run = make_line_id("regid"), make_run_id()
+    _register(reg, project, line, run)
+    paths = four_piece(tmp_path / "rt", line, run, stage="plan", sentinel=False)
+    token = process_token(os.getpid())
+    engine_json(
+        "update", "--line-id", line, "--stage", "plan",
+        "--runner-pid", str(os.getpid()), "--runner-start-token", token,
+        "--cli-pid", str(os.getpid()), "--cli-start-token", token,
+        "--status-path", str(paths["status"]), "--log-path", str(paths["log"]),
+        "--heartbeat-path", str(paths["heartbeat"]), reg=reg,
     )
-    text = integration.read_text(encoding="utf-8")
-    for needle in ["PLAN-DONE", "foreign", "clarify", "attribution"]:
-        assert needle in text
+    own = run_watcher(paths, line, run, "PLAN-DONE", "--registry", str(reg))
+    assert own.returncode == 10 and "verdict=RUNNING" in own.stdout, own.stdout
+
+    # A different live PID in the pid file is not the registered runner.
+    write_pid(paths["pid"], 1, start=token, line=line, run=run, stage="plan")
+    foreign = run_watcher(paths, line, run, "PLAN-DONE", "--registry", str(reg))
+    assert foreign.returncode == 13, foreign.stdout
+    assert "pid=unregistered" in foreign.stdout
+
+    # Registry start token wins over the pid file; a stale token is PID reuse.
+    engine_json(
+        "update", "--line-id", line, "--runner-start-token", "wrong-token", reg=reg
+    )
+    write_pid(paths["pid"], os.getpid(), start="wrong-token", line=line, run=run, stage="plan")
+    reused = run_watcher(paths, line, run, "PLAN-DONE", "--registry", str(reg))
+    assert reused.returncode == 13, reused.stdout
+    assert "pid=reused" in reused.stdout
+
+    # A missing registry entry means no identity evidence at all.
+    (reg / f"{line}.json").unlink()
+    missing = run_watcher(paths, line, run, "PLAN-DONE", "--registry", str(reg))
+    assert missing.returncode == 13, missing.stdout
+    assert "pid=unregistered" in missing.stdout
+
+
+def test_en_07_watcher_rejects_branch_mismatch(tmp_path):
+    repo = make_git_repo(tmp_path)
+    worktree = tmp_path / "wt"
+    git(repo, "worktree", "add", "-q", "-b", "line/actual", str(worktree), "main")
+    reg = tmp_path / "reg"
+    line, run = make_line_id("br"), make_run_id()
+    engine_json(
+        "register", "--line-id", line, "--run-id", run,
+        "--project-dir", str(repo), "--repo-root", str(repo),
+        "--state", "active", "--write-line",
+        "--worktree-path", str(worktree), "--branch", "line/other",
+        "--base-sha", git(repo, "rev-parse", "HEAD").stdout.strip(), reg=reg,
+    )
+    paths = four_piece(worktree / "rt", line, run, stage="plan", sentinel=False)
+    token = process_token(os.getpid())
+    engine_json(
+        "update", "--line-id", line, "--runner-pid", str(os.getpid()),
+        "--runner-start-token", token, reg=reg,
+    )
+    proc = run_watcher(paths, line, run, "PLAN-DONE", "--registry", str(reg))
+    assert proc.returncode == 13, proc.stdout
+    assert "pid=branch-mismatch" in proc.stdout
 
 
 def test_en_16_single_line_envelope_compat(tmp_path):

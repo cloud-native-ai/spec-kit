@@ -36,7 +36,8 @@ Single target:
   watch-target.sh --label L --pid-file P --status-file S --log G \
                   [--sentinel STAGE-DONE] [--heartbeat H] \
                   [--line-id ID --run-id RUN] [--stage STAGE] [--meta FILE] \
-                  [--lease-renew-cmd CMD --lease-renew-interval N] \
+                  [--registry DIR] \
+                  [--lease-ttl N --lease-renew-cmd CMD --lease-renew-interval N] \
                   [--deadline-epoch E | --timeout T] \
                   [--window N] [--interval N] [--start-grace N] \
                   [--heartbeat-max-age N] [--once] [--verbose]
@@ -59,16 +60,21 @@ Verdicts / exit codes:
   16 NO_SIGNAL     no pid/status within start grace
   2 USAGE          bad arguments
 
-Defaults: window=300s, interval=3s, start-grace=30s, heartbeat-max-age=120s.
-When holding a driver lease, either set --window to at most ttl/3 (default
-<=200s) or pass --lease-renew-cmd so the lease heartbeat is refreshed inside
-the window (--lease-renew-interval defaults to 60s).
+Defaults: window=200s, interval=3s, start-grace=30s, heartbeat-max-age=120s.
+The default window is <= ttl/3 for the default 600s driver lease. Pass
+--lease-ttl N to enforce the window <= N/3 rule (it fails when the window is
+larger and no --lease-renew-cmd is given); --lease-renew-cmd refreshes the
+lease heartbeat inside the window (--lease-renew-interval defaults to 60s).
+With --registry DIR (or SPECIFY_LINE_REGISTRY_DIR), the watcher consumes only
+the PID registered for --line-id and verifies its start token (Linux start
+ticks, macOS `ps -p <pid> -o lstart=`) plus branch when registered.
 Set the host tool timeout to window + 30s so the watcher can return first.
 --timeout T is relative to THIS invocation; for multi-window stages pass
 --deadline-epoch (absolute stage deadline) instead, or each window resets it.
 The watcher must run as the same identity as the runner (kill -0 permission).
 --self-test runs zero-match / dead / zombie / pid-reuse / fake-done /
-anomaly / exit-code / timeout / manifest regression cases.
+anomaly / exit-code / timeout / manifest / registry-identity / lease-window
+regression cases.
 EOF
 }
 
@@ -103,7 +109,7 @@ SENTINEL=""
 HEARTBEAT=""
 DEADLINE_EPOCH=0
 TIMEOUT=""
-WINDOW=300
+WINDOW=200
 INTERVAL=3
 START_GRACE=30
 HEARTBEAT_MAX_AGE=120
@@ -116,6 +122,8 @@ LINE_ID=""
 RUN_ID=""
 STAGE=""
 META=""
+REGISTRY_DIR="${SPECIFY_LINE_REGISTRY_DIR:-}"
+LEASE_TTL=""
 LEASE_RENEW_CMD=""
 LEASE_RENEW_INTERVAL=60
 LAST_LEASE_RENEW=0
@@ -139,6 +147,8 @@ while [ "$#" -gt 0 ]; do
     --run-id) [ "$#" -ge 2 ] || die_usage "--run-id needs a value"; RUN_ID="$2"; shift 2 ;;
     --stage) [ "$#" -ge 2 ] || die_usage "--stage needs a value"; STAGE="$2"; shift 2 ;;
     --meta) [ "$#" -ge 2 ] || die_usage "--meta needs a value"; META="$2"; shift 2 ;;
+    --registry) [ "$#" -ge 2 ] || die_usage "--registry needs a value"; REGISTRY_DIR="$2"; shift 2 ;;
+    --lease-ttl) [ "$#" -ge 2 ] || die_usage "--lease-ttl needs a value"; LEASE_TTL="$2"; shift 2 ;;
     --lease-renew-cmd) [ "$#" -ge 2 ] || die_usage "--lease-renew-cmd needs a value"; LEASE_RENEW_CMD="$2"; shift 2 ;;
     --lease-renew-interval) [ "$#" -ge 2 ] || die_usage "--lease-renew-interval needs a value"; LEASE_RENEW_INTERVAL="$2"; shift 2 ;;
     --once) ONCE=1; shift ;;
@@ -156,7 +166,18 @@ done
 if [ -n "$LINE_ID" ] || [ -n "$RUN_ID" ]; then
   [ -n "$LINE_ID" ] && [ -n "$RUN_ID" ] || die_usage "--line-id and --run-id must be provided together"
 fi
+if [ -n "$REGISTRY_DIR" ] && [ -z "$LINE_ID" ]; then
+  die_usage "--registry requires --line-id (registry identity is line-scoped)"
+fi
 [ "$INTERVAL" -gt 0 ] || die_usage "--interval must be > 0"
+if [ -n "$LEASE_TTL" ]; then
+  is_uint "$LEASE_TTL" && [ "$LEASE_TTL" -gt 0 ] || die_usage "--lease-ttl must be a positive integer"
+  lease_max=$((LEASE_TTL / 3))
+  [ "$lease_max" -gt 0 ] || lease_max=1
+  if [ -z "$LEASE_RENEW_CMD" ] && [ "$WINDOW" -gt "$lease_max" ]; then
+    die_usage "window ${WINDOW}s exceeds lease ttl/3 (${lease_max}s); pass --window <= ${lease_max} or --lease-renew-cmd"
+  fi
+fi
 if [ -n "$TIMEOUT" ]; then
   is_uint "$TIMEOUT" || die_usage "--timeout must be a non-negative integer"
   [ "$DEADLINE_EPOCH" -eq 0 ] || die_usage "use either --timeout or --deadline-epoch, not both"
@@ -226,6 +247,59 @@ read_heartbeat_envelope() {
   H_CLASS="$CC"
 }
 
+REG_STATE="off"
+REG_RUNNER_PID=""
+REG_RUNNER_START=""
+REG_CLI_PID=""
+REG_CLI_START=""
+REG_WORKTREE=""
+REG_BRANCH=""
+
+read_registry_entry() {
+  REG_STATE="off"; REG_RUNNER_PID=""; REG_RUNNER_START=""
+  REG_CLI_PID=""; REG_CLI_START=""
+  REG_WORKTREE=""; REG_BRANCH=""
+  [ -n "$LINE_ID" ] && [ -n "$REGISTRY_DIR" ] || return 0
+  local entry="$REGISTRY_DIR/$LINE_ID.json" text
+  if [ ! -f "$entry" ]; then
+    REG_STATE="missing"
+    return 0
+  fi
+  if ! text=$(cat "$entry" 2>/dev/null); then
+    REG_STATE="missing"
+    return 0
+  fi
+  REG_STATE="present"
+  REG_RUNNER_PID=$(printf '%s\n' "$text" | sed -n 's/.*"runner_pid"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' | head -n 1)
+  REG_RUNNER_START=$(json_field "$text" runner_start_token)
+  REG_CLI_PID=$(printf '%s\n' "$text" | sed -n 's/.*"cli_pid"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' | head -n 1)
+  REG_CLI_START=$(json_field "$text" cli_start_token)
+  REG_WORKTREE=$(json_field "$text" worktree_path)
+  REG_BRANCH=$(json_field "$text" branch)
+  return 0
+}
+
+process_start_token() {
+  local pid="$1" token=""
+  if [ -r "/proc/$pid/stat" ]; then
+    token=$(awk '{print $22}' "/proc/$pid/stat" 2>/dev/null)
+  else
+    token=$(ps -p "$pid" -o lstart= 2>/dev/null | tr '\n' ' ' \
+      | tr -s '[:space:]' ' ' | sed 's/^ //; s/ $//')
+  fi
+  printf '%s' "$token"
+}
+
+process_stat_state() {
+  local pid="$1" stat=""
+  if [ -r "/proc/$pid/stat" ]; then
+    stat=$(awk '{print $3}' "/proc/$pid/stat" 2>/dev/null)
+  else
+    stat=$(ps -p "$pid" -o stat= 2>/dev/null | awk 'NR==1{print $1}')
+  fi
+  printf '%s' "$stat"
+}
+
 read_pid_file() {
   local f="$1" pid="" start="" pl=""
   P_PID=""; P_START=""; P_CLASS=""; P_PRESENT=0
@@ -255,18 +329,15 @@ is_alive() {
     PID_STATE="dead"
     return 1
   fi
-  if [ -r "/proc/$pid/stat" ]; then
-    state=$(awk '{print $3}' "/proc/$pid/stat" 2>/dev/null)
-    if [ "$state" = "Z" ]; then
-      PID_STATE="zombie"
+  state=$(process_stat_state "$pid")
+  case "$state" in
+    Z*) PID_STATE="zombie"; return 1 ;;
+  esac
+  if [ -n "$expected" ]; then
+    actual=$(process_start_token "$pid")
+    if [ -n "$actual" ] && [ "$actual" != "$expected" ]; then
+      PID_STATE="reused"
       return 1
-    fi
-    if [ -n "$expected" ]; then
-      actual=$(awk '{print $22}' "/proc/$pid/stat" 2>/dev/null)
-      if [ -n "$actual" ] && [ "$actual" != "$expected" ]; then
-        PID_STATE="reused"
-        return 1
-      fi
     fi
   fi
   PID_STATE="alive"
@@ -314,9 +385,44 @@ evaluate() {
   if [ -n "$LINE_ID" ] && [ "$pid_class" != "own" ]; then
     pid=""; start=""
   fi
+  read_registry_entry
+  registry_identity=""
+  if [ "$REG_STATE" = "present" ]; then
+    if [ -n "$REG_RUNNER_PID" ] || [ -n "$REG_CLI_PID" ]; then
+      if [ -n "$pid" ] && [ "$pid" = "$REG_RUNNER_PID" ]; then
+        # The registry token is authoritative even when the pid file lacks one.
+        [ -n "$REG_RUNNER_START" ] && start="$REG_RUNNER_START"
+      elif [ -n "$pid" ] && [ "$pid" = "$REG_CLI_PID" ]; then
+        [ -n "$REG_CLI_START" ] && start="$REG_CLI_START"
+      elif [ -n "$pid" ]; then
+        pid=""; start=""; registry_identity="unregistered"
+      fi
+    elif [ -n "$pid" ]; then
+      # A registered line with no registered PID has no identity evidence;
+      # an ambient pid file must never be trusted (pre-dispatch entry).
+      pid=""; start=""; registry_identity="unregistered"
+    fi
+  elif [ "$REG_STATE" = "missing" ] && [ -n "$pid" ]; then
+    pid=""; start=""; registry_identity="unregistered"
+  fi
   if [ -n "$pid" ]; then
     if is_alive "$pid" "$start"; then pid_alive=1; fi
     pid_state="$PID_STATE"
+  elif [ -n "$registry_identity" ]; then
+    pid_state="$registry_identity"
+  fi
+  if [ "$pid_alive" -eq 1 ] && [ "$REG_STATE" = "present" ] && [ -n "$REG_BRANCH" ]; then
+    if [ -z "$REG_WORKTREE" ] || [ ! -d "$REG_WORKTREE" ]; then
+      # A registered branch that cannot be verified is not a trusted identity.
+      pid_alive=0
+      pid_state="branch-mismatch"
+    elif command -v git >/dev/null 2>&1; then
+      actual_branch=$(git -C "$REG_WORKTREE" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+      if [ -n "$actual_branch" ] && [ "$actual_branch" != "$REG_BRANCH" ]; then
+        pid_alive=0
+        pid_state="branch-mismatch"
+      fi
+    fi
   fi
 
   read_status_file "$statf"; s_exists="$S_EXISTS"; s_rc="$S_RC"; s_sent="$S_SENT"; status_class="$S_CLASS"
@@ -399,7 +505,8 @@ evaluate() {
       verdict="DONE"; code="$EXIT_DONE"; reason="sentinel"
     elif [ "$anomaly" -eq 1 ] && [ "$pid_alive" -eq 0 ]; then
       verdict="ANOMALY"; code="$EXIT_ANOMALY"; reason="anomaly-line"
-    elif [ "$pid_state" = "dead" ] || [ "$pid_state" = "zombie" ] || [ "$pid_state" = "reused" ]; then
+    elif [ "$pid_state" = "dead" ] || [ "$pid_state" = "zombie" ] || [ "$pid_state" = "reused" ] \
+         || [ "$pid_state" = "unregistered" ] || [ "$pid_state" = "branch-mismatch" ]; then
       verdict="DEAD"; code="$EXIT_DEAD"; reason="pid-$pid_state"
     elif [ "$pid_state" = "alive" ]; then
       verdict="RUNNING"; code="$EXIT_RUNNING"; reason="alive"
@@ -700,13 +807,13 @@ self_test() {
   check stale-heartbeat 10 RUNNING "${r%%$'\n'*}" "${r#*$'\n'}"
   printf '%s\n' "${r#*$'\n'}" | grep -q 'heartbeat=stale' || bad "stale-heartbeat-flag" "heartbeat not stale: $r"
 
-  # 10. pid reuse guard
+  # 10. pid reuse guard: live PID whose recorded start token is wrong
   printf 'pid=%s start=1\n' "$$" > "$base/pid10"
   r=$(watch --label reused --pid-file "$base/pid10" --status-file "$base/none10" \
     --log "$base/none10" --sentinel PLAN-DONE --window 1 --start-grace 0)
   check pid-reuse 13 DEAD "${r%%$'\n'*}" "${r#*$'\n'}"
 
-  # 10b. zombie process (requires a non-reaping parent; /proc state check)
+  # 10b. zombie process (requires a non-reaping parent; /proc or ps stat check)
   if command -v python3 >/dev/null 2>&1; then
     python3 - "$base/zpid" <<'PY' &
 import os, sys, time
@@ -745,11 +852,17 @@ PY
     --log "$base/log12" --window 0 --start-grace 0)
   check async-exit-ok 0 DONE "${r%%$'\n'*}" "${r#*$'\n'}"
 
-  # 13. manifest: one DONE + one RUNNING, both reported
+  # 13. manifest: one DONE + one RUNNING, both reported (fresh live PID)
+  sleep 30 & local manifest_live=$!
+  disown "$manifest_live" 2>/dev/null || true
+  ST_SPAWNED+=("$manifest_live")
+  local manifest_ticks
+  manifest_ticks=$(process_start_token "$manifest_live")
+  printf 'pid=%s start=%s\n' "$manifest_live" "$manifest_ticks" > "$base/pidm2"
   printf 'PLAN-DONE\n' > "$base/logm1"
   printf 'exit=0 at=1 sentinel=1\n' > "$base/statusm1"
   printf 'm1|%s|%s|%s|PLAN-DONE|-|0\nm2|%s|-|-|PLAN-DONE|-|0\n' \
-    "$base/pid1" "$base/statusm1" "$base/logm1" "$base/pid6" > "$base/manifest"
+    "$base/pid1" "$base/statusm1" "$base/logm1" "$base/pidm2" > "$base/manifest"
   r=$(watch --manifest "$base/manifest" --window 1 --interval 1 --start-grace 0)
   local mrc="${r%%$'\n'*}" mout="${r#*$'\n'}"
   if [ "$mrc" -ne 0 ] || ! printf '%s\n' "$mout" | grep -q 'label=m1 verdict=DONE' \
@@ -812,15 +925,49 @@ PY
     bad "lease-renew-hook" "rc=$renew_rc renewed=$(wc -c < "$base/renewed" 2>/dev/null || echo 0)"
   fi
 
+  # 13d. registry identity: registered PID + token is consumed, a different
+  # PID is refused, and a missing registry entry is never trusted.
+  local reg="$ST_TMP/registry"
+  mkdir -p "$reg"
+  local reg_token
+  reg_token=$(process_start_token "$$")
+  printf '{"line_id":"L1","run_id":"R1","runner_pid":%s,"runner_start_token":"%s"}\n' \
+    "$$" "$reg_token" > "$reg/L1.json"
+  printf 'pid=%s start=%s at=1 line=L1 run=R1 stage=plan event=pid\n' "$$" "$reg_token" > "$base/pidreg"
+  r=$(watch --label reg-ok --line-id L1 --run-id R1 --registry "$reg" \
+    --pid-file "$base/pidreg" --status-file "$base/nonereg" --log "$base/nonereg" \
+    --sentinel PLAN-DONE --window 0 --start-grace 0)
+  check reg-identity 10 RUNNING "${r%%$'\n'*}" "${r#*$'\n'}"
+  printf 'pid=1 start=%s at=1 line=L1 run=R1 stage=plan event=pid\n' "$reg_token" > "$base/pidregbad"
+  r=$(watch --label reg-foreign --line-id L1 --run-id R1 --registry "$reg" \
+    --pid-file "$base/pidregbad" --status-file "$base/nonereg" --log "$base/nonereg" \
+    --sentinel PLAN-DONE --window 1 --start-grace 0)
+  check reg-unregistered 13 DEAD "${r%%$'\n'*}" "${r#*$'\n'}"
+  rm -f "$reg/L1.json"
+  r=$(watch --label reg-missing --line-id L1 --run-id R1 --registry "$reg" \
+    --pid-file "$base/pidreg" --status-file "$base/nonereg" --log "$base/nonereg" \
+    --sentinel PLAN-DONE --window 1 --start-grace 0)
+  check reg-missing 13 DEAD "${r%%$'\n'*}" "${r#*$'\n'}"
+
+  # 13e. lease window gate: window > ttl/3 without a renewal hook fails fast
+  r=$(watch --label lease-window --lease-ttl 600 --window 201 \
+    --pid-file "$base/pid6" --status-file "$base/none13e" --log "$base/none13e" \
+    --sentinel PLAN-DONE --start-grace 0)
+  if [ "${r%%$'\n'*}" -eq 2 ] && printf '%s\n' "${r#*$'\n'}" | grep -q 'ttl/3'; then
+    ok "lease-window-over-ttl"
+  else
+    bad "lease-window-over-ttl" "rc=${r%%$'\n'*} out=${r#*$'\n'}"
+  fi
+
   # 14. demonstrate the pgrep -c zero-match trap (regression knowledge; the
   # watcher itself never uses pgrep for liveness)
   if command -v pgrep >/dev/null 2>&1; then
     local zero
     zero=$(pgrep -c '__watch_target_no_such_process__' 2>/dev/null || echo 0)
-    if [ "$zero" = "$(printf '0\n0')" ]; then
+    if [ "$zero" = "0" ] || [ "$zero" = "$(printf '0\n0')" ]; then
       ok "pgrep-zero-match-trap-reproduced"
     else
-      bad "pgrep-zero-match-trap-reproduced" "expected two 0 lines, got: $zero"
+      bad "pgrep-zero-match-trap-reproduced" "expected zero-match output, got: $zero"
     fi
   fi
 

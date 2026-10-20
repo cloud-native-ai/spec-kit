@@ -1,13 +1,16 @@
-"""Integration S4: detached stage survives a driver kill and reattaches.
+"""Integration S4: the delivered detached runner survives a driver kill and reattaches.
 
-`SDD_RUNNER_MODE=foreground` forces the non-detached shape, which makes the
-survival assertion red (mutation drill 2).
+The survival case launches `scripts/run-stage.sh` with the documented
+`nohup ... & disown` recipe and SIGHUPs the driver's process group; the
+fixture-only shape remains for the done/dead/remote classification cases.
 """
 from __future__ import annotations
 
 import json
 import os
+import signal
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -18,12 +21,16 @@ from fixtures.line_fixtures import (
     make_project,
     make_run_id,
     pid_alive,
+    process_token,
     run_engine,
     snapshot,
     start_fake_stage,
     teardown_stage,
     wait_until,
 )
+
+SKILL_DIR = Path(__file__).resolve().parents[2] / "skills" / "external" / "sdd-loop-driver"
+RUNNER = SKILL_DIR / "scripts" / "run-stage.sh"
 
 
 def _token(pid: int) -> str:
@@ -68,6 +75,7 @@ def _watch(ctx, *extra):
         ["bash", str(Path(__file__).resolve().parents[2] / "skills" / "external" /
                    "sdd-loop-driver" / "scripts" / "watch-target.sh"), "--once",
          "--line-id", ctx["line"], "--run-id", ctx["run"], "--label", ctx["line"],
+         "--registry", str(ctx["reg"]),
          "--pid-file", str(ctx["stage"]["paths"]["pid"]),
          "--status-file", str(ctx["stage"]["paths"]["status"]),
          "--log", str(ctx["stage"]["paths"]["log"]),
@@ -80,62 +88,165 @@ def _watch(ctx, *extra):
     return proc
 
 
-def test_detached_stage_survives_driver_kill_and_reattaches(tmp_path):
-    ctx = _prepare(tmp_path, duration=6)
-    stage = ctx["stage"]
+def test_delivered_runner_recipe_survives_driver_kill_and_reattaches(tmp_path):
+    """FR-046/047/048: the documented detach recipe + delivered runner are the
+    evidence, not a pytest-made process session."""
+    project = make_project(tmp_path)
+    reg = tmp_path / "reg"
+    line, run = make_line_id("recipe"), make_run_id()
+    engine_json(
+        "register", "--line-id", line, "--run-id", run,
+        "--project-dir", str(project), "--repo-root", str(project),
+        "--state", "active", reg=reg,
+    )
+    stage_root = tmp_path / "stage"
+    stage_root.mkdir()
+    paths = {
+        "pid": stage_root / f"pid-{line}-plan",
+        "status": stage_root / f"status-{line}-plan",
+        "log": stage_root / f"log-{line}-plan.log",
+        "heartbeat": stage_root / f"heartbeat-{line}-plan.log",
+        "meta": stage_root / f"log-{line}-plan.meta.jsonl",
+        "prompt": stage_root / f"prompt-{line}-plan.md",
+    }
+    paths["prompt"].write_text("plan stage\n", encoding="utf-8")
+    cli = stage_root / "cli.sh"
+    cli.write_text("#!/usr/bin/env bash\nsleep 8\nprintf 'PLAN-DONE\\n'\nexit 0\n", encoding="utf-8")
+    cli.chmod(0o755)
+    runner_log = stage_root / "runner.log"
+
+    # The exact recipe from dispatch-recipes.md (macOS has no setsid).
+    recipe = (
+        f"nohup bash '{RUNNER}' --line-id '{line}' --run-id '{run}' --stage plan "
+        f"--registry '{reg}' --worktree '{project}' --prompt '{paths['prompt']}' "
+        f"--pid-file '{paths['pid']}' --status-file '{paths['status']}' "
+        f"--log '{paths['log']}' --heartbeat '{paths['heartbeat']}' "
+        f"--sentinel PLAN-DONE --engine '{SKILL_DIR / 'scripts' / 'line-registry.py'}' "
+        f"--engine-python '{os.sys.executable}' "
+        f"--command \"bash '{cli}'\" > '{runner_log}' 2>&1 < /dev/null & disown; "
+        "sleep 60"
+    )
+    driver = subprocess.Popen(
+        ["bash", "-c", recipe], cwd=str(project),
+        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+
+    def entry() -> dict:
+        path = reg / f"{line}.json"
+        return json.loads(path.read_text()) if path.exists() else {}
+
     try:
-        lease = engine_json(
-            "lease-acquire", "--line-id", ctx["line"], "--session", "old",
-            "--pid", str(stage["driver"].pid), reg=ctx["reg"],
-        )
-        assert lease["holder_session"] == "old"
+        assert wait_until(
+            lambda: entry().get("runner_pid") and entry().get("cli_pid"), timeout=10
+        ), entry()
+        launched = entry()
+        runner_pid, cli_pid = launched["runner_pid"], launched["cli_pid"]
+        assert pid_alive(runner_pid) and pid_alive(cli_pid)
+        assert paths["pid"].read_text().split()[0] == f"pid={cli_pid}"
+
         engine_json(
-            "reserve", "--line-id", ctx["line"], "--stage", "plan",
-            "--run-id", ctx["run"], "--pid", str(stage["runner"].pid),
-            "--start-token", ctx["token"], reg=ctx["reg"],
+            "reserve", "--line-id", line, "--stage", "plan",
+            "--run-id", run, "--pid", str(runner_pid),
+            "--start-token", process_token(runner_pid), reg=reg,
         )
-        kill_driver_group(stage)  # SIGHUP to the driver process group
-        stage["driver"].wait(timeout=3)
+
+        os.killpg(os.getpgid(driver.pid), signal.SIGHUP)
+        driver.wait(timeout=5)
         time.sleep(0.4)
-        assert pid_alive(stage["runner"].pid), "detached runner must survive the driver kill"
-        heartbeat = ctx["stage"]["paths"]["heartbeat"]
-        before = heartbeat.stat().st_mtime_ns
-        assert wait_until(lambda: heartbeat.stat().st_mtime_ns > before, timeout=3), "heartbeat stopped"
-
-        # New session: stale lease must be broken with evidence, then acquired.
-        refused = run_engine(
-            "lease-acquire", "--line-id", ctx["line"], "--session", "new",
-            "--pid", str(os.getpid()), reg=ctx["reg"],
-        )
-        assert refused.returncode == 3
-        engine_json(
-            "lease-break", "--line-id", ctx["line"], "--reason", "driver-killed",
-            "--evidence-ref", "notes/kill.md", reg=ctx["reg"],
-        )
-        engine_json(
-            "lease-acquire", "--line-id", ctx["line"], "--session", "new",
-            "--pid", str(os.getpid()), reg=ctx["reg"],
+        assert pid_alive(runner_pid), "detached runner must survive the driver group SIGHUP"
+        assert pid_alive(cli_pid), "CLI child must survive the driver group SIGHUP"
+        before = paths["heartbeat"].stat().st_mtime_ns
+        assert wait_until(lambda: paths["heartbeat"].stat().st_mtime_ns > before, timeout=3), (
+            "heartbeat stopped after the driver kill"
         )
 
-        identity = engine_json("verify-identity", "--line-id", ctx["line"], reg=ctx["reg"])
-        assert identity["identity"] == "ok"
+        # New session reattaches through the registry + state spine only.
+        engine_json(
+            "lease-acquire", "--line-id", line, "--session", "new",
+            "--pid", str(os.getpid()), reg=reg,
+        )
+        identity = engine_json("verify-identity", "--line-id", line, reg=reg)
+        assert identity["identity"] == "ok", identity
         assert identity["branch_hint"] == "running"
+        ctx = {"line": line, "run": run, "reg": reg, "stage": {"paths": paths}}
         running = _watch(ctx)
-        assert running.returncode == 10 and "verdict=RUNNING" in running.stdout
+        assert running.returncode == 10 and "verdict=RUNNING" in running.stdout, running.stdout
 
         attach = engine_json(
-            "reserve", "--line-id", ctx["line"], "--stage", "plan",
-            "--run-id", ctx["run"], "--pid", str(stage["runner"].pid),
-            "--start-token", ctx["token"], reg=ctx["reg"],
+            "reserve", "--line-id", line, "--stage", "plan",
+            "--run-id", run, "--pid", str(runner_pid),
+            "--start-token", process_token(runner_pid), reg=reg,
         )
         assert attach["action"] == "attach", "reattach must not launch a second stage"
+        assert not paths["status"].exists() or "exit=" not in paths["status"].read_text()
 
-        assert wait_until(lambda: "exit=" in snapshot(ctx["stage"]["paths"]["status"]), timeout=10)
+        assert wait_until(lambda: "exit=" in snapshot(paths["status"]), timeout=20)
         done = _watch(ctx)
-        assert done.returncode == 0 and "verdict=DONE" in done.stdout
-        assert identity["identity"] == "ok"
+        assert done.returncode == 0 and "verdict=DONE" in done.stdout, done.stdout
+        after = entry()
+        assert after["runner_pid"] == runner_pid and after["cli_pid"] == cli_pid, (
+            "reattachment must not re-dispatch the stage"
+        )
+        assert paths["log"].read_text().splitlines()[-1] == "PLAN-DONE"
     finally:
-        teardown_stage(stage)
+        for pid in (locals().get("cli_pid"), locals().get("runner_pid")):
+            if pid:
+                try:
+                    os.kill(pid, signal.SIGTERM)
+                except OSError:
+                    pass
+        driver.kill()
+        driver.wait(timeout=3)
+
+
+def test_run_stage_requires_the_engine(tmp_path):
+    """Without --engine the runner could start an untracked stage; refuse."""
+    project = make_project(tmp_path)
+    proc = subprocess.run(
+        ["bash", str(RUNNER), "--line-id", make_line_id("noengine"), "--run-id", make_run_id(),
+         "--stage", "plan", "--registry", str(tmp_path / "reg"), "--worktree", str(project),
+         "--pid-file", str(tmp_path / "pid"), "--status-file", str(tmp_path / "status"),
+         "--log", str(tmp_path / "log"), "--heartbeat", str(tmp_path / "hb"),
+         "--command", "true"],
+        capture_output=True, text=True, timeout=10,
+    )
+    assert proc.returncode == 2
+    assert "--engine" in proc.stderr
+
+
+def test_run_stage_fails_loud_when_registry_update_fails(tmp_path):
+    """An untracked stage is never left running: registry projection failure
+    writes ANOMALY + exit=4 and terminates the CLI child."""
+    project = make_project(tmp_path)
+    stage_root = tmp_path / "stage-fail"
+    stage_root.mkdir()
+    paths = {
+        "pid": stage_root / "pid",
+        "status": stage_root / "status",
+        "log": stage_root / "log",
+        "heartbeat": stage_root / "hb",
+    }
+    broken_engine = stage_root / "broken-engine.py"
+    broken_engine.write_text("import sys; sys.exit(1)\n", encoding="utf-8")
+    cli = stage_root / "cli.sh"
+    cli.write_text("#!/usr/bin/env bash\nsleep 30\n", encoding="utf-8")
+    cli.chmod(0o755)
+    proc = subprocess.run(
+        ["bash", str(RUNNER), "--line-id", make_line_id("failing"), "--run-id", make_run_id(),
+         "--stage", "plan", "--registry", str(tmp_path / "reg"), "--worktree", str(project),
+         "--pid-file", str(paths["pid"]), "--status-file", str(paths["status"]),
+         "--log", str(paths["log"]), "--heartbeat", str(paths["heartbeat"]),
+         "--engine", str(broken_engine), "--engine-python", sys.executable,
+         "--command", f"bash '{cli}'"],
+        capture_output=True, text=True, timeout=30,
+    )
+    assert proc.returncode == 4, proc.stderr
+    status = paths["status"].read_text()
+    assert "exit=4" in status and "sentinel=0" in status
+    assert "ANOMALY: registry-update-failed" in paths["log"].read_text()
+    cli_pid = int(paths["pid"].read_text().split()[0].split("=")[1])
+    assert wait_until(lambda: not pid_alive(cli_pid), timeout=3), "CLI must not outlive a failed projection"
 
 
 def test_done_branch_skips_redispatch(tmp_path):

@@ -1,0 +1,1707 @@
+# test runner: /Users/liuqiming.lqm/project/profiles/.venv/bin/python3 -m pytest tests -q
+.................F...................................................... [  1%]
+.........................................................F.............F [  3%]
+....................................................................F... [  5%]
+......................................F................................. [  6%]
+............F.........F............................................F.... [  8%]
+...............................FFF.F.................................... [ 10%]
+F.......................................F..............F................ [ 12%]
+........................................................................ [ 13%]
+.......F.....F............FFF........................................... [ 15%]
+......................................F.FFFF................FF.......... [ 17%]
+........................................................................ [ 19%]
+........................................F.........................F..... [ 20%]
+...................F.....F.F............F.....................F.......F. [ 22%]
+........................................................................ [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+......F......F.......................................................... [ 34%]
+.........................................F...................F.......... [ 36%]
+........................................................................ [ 38%]
+.................F...................................................... [ 39%]
+........................................................................ [ 41%]
+......................FF....F...........................F............... [ 43%]
+........................................................................ [ 45%]
+........F............F..F..................F.................F.......... [ 46%]
+........................................................................ [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+.........................................F.............................. [ 57%]
+................F.....................................................F. [ 59%]
+.....................................F.....F............................ [ 60%]
+........................................................................ [ 62%]
+...FF................................................................... [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+...F.......F.........F......................FFFF........................ [ 69%]
+..........................................................FF............ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+..........F.................F.....F..................................... [ 76%]
+......................F................................................. [ 78%]
+........................................................................ [ 79%]
+...............................................................s........ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+...........................................                              [100%]
+=================================== FAILURES ===================================
+_____________________ test_c14_mirror_pair_byte_identical ______________________
+
+    def test_c14_mirror_pair_byte_identical():
+        """agents/ ↔ .specify/agents/templates/ 镜像对字节一致。"""
+        assert EXECUTOR_MIRROR.exists(), "runtime mirror missing — sync-mirrors not run"
+>       assert EXECUTOR.read_bytes() == EXECUTOR_MIRROR.read_bytes(), (
+            "agents/sdd-executor.agent.md mirror drift"
+        )
+E       AssertionError: agents/sdd-executor.agent.md mirror drift
+E       assert b'---\nname: ...use:end -->\n' == b'---\nname: ...use:end -->\n'
+E         
+E         At index 4362 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_agent_dispatch_mechanism.py:234: AssertionError
+__________________ test_doc_exists_with_byte_identical_mirror __________________
+
+    def test_doc_exists_with_byte_identical_mirror():
+        assert DOC.is_file(), f"missing philosophy owner doc: {DOC}"
+        assert DOC_MIRROR.is_file(), f"missing mirror: {DOC_MIRROR}"
+>       assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), "philosophy doc mirror drift"
+E       AssertionError: philosophy doc mirror drift
+E       assert b'# Ask, Reco...xe3\x80\x82\n' == b'# Ask, Reco...xe3\x80\x82\n'
+E         
+E         At index 1255 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_ask_record_repeat.py:119: AssertionError
+__________________ test_two_hats_owner_doc_has_mirror_parity ___________________
+
+    def test_two_hats_owner_doc_has_mirror_parity():
+>       assert HATS_DOC.read_bytes() == HATS_DOC_MIRROR.read_bytes(), (
+            "dogfooding-definitions mirrors diverged"
+        )
+E       AssertionError: dogfooding-definitions mirrors diverged
+E       assert b'# Dogfoodin...xe3\x80\x82\n' == b'# Dogfoodin...xe3\x80\x82\n'
+E         
+E         At index 325 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_ask_record_repeat.py:267: AssertionError
+____________ test_c5_gate_budget_is_unchanged_by_the_owner_document ____________
+
+    def test_c5_gate_budget_is_unchanged_by_the_owner_document():
+        r = subprocess.run(
+            [sys.executable, str(SCRIPTS / "scan-confirmation-gates.py"), "--summary"],
+            capture_output=True, text=True, cwd=str(ROOT),
+        )
+        assert r.returncode == 0, r.stdout + r.stderr
+        m = re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout)
+        v = re.search(r"violations[^:]*:\s*(\d+)", r.stdout)
+        assert m and v, r.stdout
+>       assert int(m.group(1)) == GATE_TOTAL, (
+            f"the owner document sits in shared/, i.e. inside the scanned surface, and the "
+            f"integer headroom is 0: total moved to {m.group(1)}"
+        )
+E       AssertionError: the owner document sits in shared/, i.e. inside the scanned surface, and the integer headroom is 0: total moved to 27
+E       assert 27 == 23
+E        +  where 27 = int('27')
+E        +    where '27' = <built-in method group of re.Match object at 0x1167f2c20>(1)
+E        +      where <built-in method group of re.Match object at 0x1167f2c20> = <re.Match object; span=(0, 31), match='blocking confirmation gates: 27'>.group
+
+tests/contract/test_clause_coverage.py:290: AssertionError
+______________ test_the_four_md_forms_never_co_occur_in_one_file _______________
+
+    def test_the_four_md_forms_never_co_occur_in_one_file():
+        md = [p for p in _corpus() if p.suffix == ".md"]
+        assert md, "corpus empty — wrong cwd?"
+        co_occurring = [p for p in md if len(ce.md_forms_hit(p)) > 1]
+>       assert co_occurring == []
+E       AssertionError: assert [PosixPath('/...ncements.md')] == []
+E         
+E         Left contains 2 more items, first extra item: PosixPath('/private/tmp/sdd-064-baseline/.specify/specs/060-decompose-subagent-dispatch/contracts/delegation-parity.md')
+E         Use -v to get more diff
+
+tests/contract/test_clause_forms.py:87: AssertionError
+______________ test_propagation_chain_is_green_in_canonical_order ______________
+
+    def test_propagation_chain_is_green_in_canonical_order():
+        # Step 1 — compile: the compiled faces match the registry (nothing to migrate).
+        rc = probe_utils.main(["--action", "compile-embeds", "--check", "--format", "json"])
+        assert rc == 0, (
+            "step 1 (compile --check) red: the compiled faces drifted from the registry — "
+            "run probe-utils.py --action compile-embeds BEFORE regen/sync"
+        )
+        # Step 2 — regen: per-tool copies match the (compiled) source templates.
+        proc = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "python" / "regen-command-copies.py"),
+             "--check"], capture_output=True, text=True, check=False)
+        assert proc.returncode == 0, (
+            "step 2 (regen --check) red: per-tool copies drifted from the compiled "
+            "templates — run regen-command-copies.py after every compile-embeds"
+        )
+        # Step 3 — sync: the .specify mirrors match the sources.
+        proc = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "python" / "sync-mirrors.py"),
+             "--check"], capture_output=True, text=True, check=False)
+>       assert proc.returncode == 0, (
+            "step 3 (sync --check) red: .specify mirrors drifted from the sources — run "
+            "sync-mirrors.py after regen"
+        )
+E       AssertionError: step 3 (sync --check) red: .specify mirrors drifted from the sources — run sync-mirrors.py after regen
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python3', '/private/tmp/sdd-064-baseline/scrip...ed/workflow/user-input-protocol.md\nDRIFT detected — run: python3 scripts/python/sync-mirrors.py --write\n', stderr='').returncode
+
+tests/contract/test_compile_propagation_order.py:83: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{
+  "ok": true,
+  "check": true,
+  "units": 74,
+  "structural": [],
+  "drift": []
+}
+___________________ test_residual_total_within_sc002_target ____________________
+
+    def test_residual_total_within_sc002_target() -> None:
+        if not BASELINE.is_file():
+            pytest.skip("baseline.json not present (pre-implementation checkout)")
+        baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+        payload = run_scanner()
+        cap = baseline["total"] * 0.25
+>       assert payload["total"] <= cap, (
+            f"SC-002 target missed: residual {payload['total']} > 25% of baseline {baseline['total']}"
+        )
+E       AssertionError: SC-002 target missed: residual 27 > 25% of baseline 93
+E       assert 27 <= 23.25
+
+tests/contract/test_confirmation_gates_sweep.py:167: AssertionError
+_________________ test_c1_template_carries_both_new_principles _________________
+
+    def test_c1_template_carries_both_new_principles():
+        text = _text(TEMPLATE)
+        titles = _template_titles(text)
+        missing = [t for t in NEW_TEMPLATE_TITLES if t not in titles]
+        assert not missing, f"template is missing principle titles: {missing}"
+        numerals = _template_numerals(text)
+>       assert len(numerals) == TEMPLATE_COUNT, (
+            f"template has {len(numerals)} principles, expected {TEMPLATE_COUNT}"
+        )
+E       AssertionError: template has 15 principles, expected 14
+E       assert 15 == 14
+E        +  where 15 = len(['I', 'II', 'III', 'IV', 'V', 'VI', ...])
+
+tests/contract/test_constitution_double_landing.py:228: AssertionError
+________ test_c18_the_engine_suite_that_reads_the_owner_doc_stays_green ________
+
+    def test_c18_the_engine_suite_that_reads_the_owner_doc_stays_green():
+        r = subprocess.run(
+            [sys.executable, "-m", "pytest", "-q", "tests/contract/test_goal_targets_engine.py"],
+            capture_output=True, text=True, cwd=str(ROOT))
+>       assert r.returncode == 0, f"the AUTHORITY pin broke:\n{r.stdout[-1200:]}"
+E       AssertionError: the AUTHORITY pin broke:
+E         ..............................F..........                                [100%]
+E         =================================== FAILURES ===================================
+E         ______________________ test_engine_exists_with_its_mirror ______________________
+E         
+E             def test_engine_exists_with_its_mirror():
+E                 assert ENGINE.is_file()
+E                 assert ENGINE_MIRROR.is_file(), "run sync-mirrors.py --write"
+E         >       assert ENGINE.read_bytes() == ENGINE_MIRROR.read_bytes()
+E         E       AssertionError: assert b'#!/usr/bin/...xit(main())\n' == b'#!/usr/bin/...xit(main())\n'
+E         E         
+E         E         At index 644 diff: b's' != b'.'
+E         E         Use -v to get more diff
+E         
+E         tests/contract/test_goal_targets_engine.py:339: AssertionError
+E         =========================== short test summary info ============================
+E         FAILED tests/contract/test_goal_targets_engine.py::test_engine_exists_with_its_mirror
+E         1 failed, 40 passed in 1.74s
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python3', '-m', 'pytest', '-q', 'tests/contrac...s/contract/test_goal_targets_engine.py::test_engine_exists_with_its_mirror\n1 failed, 40 passed in 1.74s\n', stderr='').returncode
+
+tests/contract/test_criterion_subject.py:543: AssertionError
+______________ test_c19_the_gate_budget_survives_the_new_section _______________
+
+    def test_c19_the_gate_budget_survives_the_new_section():
+        r = subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "python" / "scan-confirmation-gates.py"),
+             "--summary"], capture_output=True, text=True, cwd=str(ROOT))
+        assert r.returncode == 0, r.stdout + r.stderr
+        total = int(re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout).group(1))
+        violations = int(re.search(r"violations[^:]*:\s*(\d+)", r.stdout).group(1))
+>       assert total == 23, (
+            f"the owner doc sits in shared/, inside the scanned surface, and the integer "
+            f"headroom is 0: total moved to {total}"
+        )
+E       AssertionError: the owner doc sits in shared/, inside the scanned surface, and the integer headroom is 0: total moved to 27
+E       assert 27 == 23
+
+tests/contract/test_criterion_subject.py:553: AssertionError
+_____ test_the_mirror_of_the_owner_doc_matches_and_the_clause_count_holds ______
+
+    def test_the_mirror_of_the_owner_doc_matches_and_the_clause_count_holds():
+        assert OWNER_DOC_MIRROR.is_file(), f"the runtime mirror is missing: {OWNER_DOC_MIRROR}"
+>       assert OWNER_DOC.read_text(encoding="utf-8") == OWNER_DOC_MIRROR.read_text(
+            encoding="utf-8"), "the owner doc and its .specify mirror diverged"
+E       AssertionError: the owner doc and its .specify mirror diverged
+E       assert '# Goal Defin...biguation |\n' == '# Goal Defin...biguation |\n'
+E         
+E         Skipping 9073 identical leading characters in diff, use -v to show
+E           个解析器的处置
+E           
+E         - `.specify/skills/internal/create-team/scripts/build-summary-input.py` 有自己的**本地** goal 判据读取器,其 `load_goal_definition` 的注释明写:该脚本与 `.specify/scripts/python/goal-utils.py` 分属两棵镜像树(`skills/` 与 `.specify/scripts/`)且相对深度不同,跨树 import 在安装到消费项目后即断,故刻意本地解析。**处置:让它同样理解指代形**——就地做同一导出,并把指代形渲染成成员名再交给总结,使读者不会看到一个自己无从解析的裸标记;MUST NOT 靠加一个 import 来解决。**代价明示**:于是仓内并存两处导出实现,二者的一致性由 `tests/contract/test_criterion_subject.py` 对同一输入断言两侧成员一致来钉住,而不是靠人记得同步——把同步交给记忆,正是本节要消灭的失效模式。
+E         ?  ---------                             ...
+E         
+E         ...Full output truncated (74 lines hidden), use '-vv' to show
+
+tests/contract/test_criterion_subject.py:562: AssertionError
+____________________ test_specify_mirror_is_byte_identical _____________________
+
+    def test_specify_mirror_is_byte_identical():
+        assert MIRROR.is_file(), f"mirror missing: {MIRROR} (run sync-mirrors.py --write)"
+>       assert ANCHOR.read_bytes() == MIRROR.read_bytes(), "anchor and its .specify mirror diverged"
+E       AssertionError: anchor and its .specify mirror diverged
+E       assert b'# Derivatio...ning docs |\n' == b'# Derivatio...ning docs |\n'
+E         
+E         At index 14182 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_derivation_definitions.py:97: AssertionError
+____________ test_engine_and_its_specify_mirror_are_byte_identical _____________
+
+    def test_engine_and_its_specify_mirror_are_byte_identical():
+        assert ENGINE.is_file()
+        assert ENGINE_MIRROR.is_file(), "run sync-mirrors.py --write"
+>       assert ENGINE.read_bytes() == ENGINE_MIRROR.read_bytes()
+E       AssertionError: assert b'#!/usr/bin/...xit(main())\n' == b'#!/usr/bin/...xit(main())\n'
+E         
+E         At index 815 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_derive_command_surface.py:107: AssertionError
+____________ test_engine_and_its_specify_mirror_are_byte_identical _____________
+
+    def test_engine_and_its_specify_mirror_are_byte_identical():
+        """C-35: the scripts mirror pair is strict/byte-identical."""
+        assert ENGINE_MIRROR.is_file(), "run sync-mirrors.py --write"
+>       assert ENGINE.read_bytes() == ENGINE_MIRROR.read_bytes()
+E       AssertionError: assert b'#!/usr/bin/...xit(main())\n' == b'#!/usr/bin/...xit(main())\n'
+E         
+E         At index 815 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_derive_engine_contract.py:402: AssertionError
+__________________ test_c12_skill_source_mirror_byte_identity __________________
+
+    @pytest.mark.contract
+    def test_c12_skill_source_mirror_byte_identity():
+        """Source → ``.specify/skills/`` projection for both halves of the pair.
+    
+        Frontmatter, ``## Feedback`` and the feedback unit-id are pinned per member by
+        ``test_c18_pair_member_shape``, so this asserts only byte-identity and the two
+        cannot drift apart about who owns what.
+        """
+        for name in PAIR:
+            src, mirror = pair_skill_path(name), pair_mirror_path(name)
+            assert src.is_file(), f"skills/{name}/SKILL.md missing"
+            assert mirror.is_file(), f".specify/skills/{name}/SKILL.md mirror missing"
+>           assert src.read_bytes() == mirror.read_bytes(), f"{name}: skill mirror drift"
+E           AssertionError: improve-docs: skill mirror drift
+E           assert b'---\nname: ...ints here)"\n' == b'---\nname: ...ints here)"\n'
+E             
+E             At index 9861 diff: b's' != b'.'
+E             Use -v to get more diff
+
+tests/contract/test_docs_command_template.py:247: AssertionError
+________________ TestCollectEvidenceSkill.test_mirror_identical ________________
+
+self = <contract.test_evidence_step_conformance.TestCollectEvidenceSkill object at 0x115479bf0>
+
+    def test_mirror_identical(self):
+        assert COLLECT_SKILL_MIRROR.is_file(), "mirror missing"
+>       assert COLLECT_SKILL.read_bytes() == COLLECT_SKILL_MIRROR.read_bytes()
+E       assert b'---\nname: ...ints here)"\n' == b'---\nname: ...ints here)"\n'
+E         
+E         At index 1230 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_evidence_step_conformance.py:66: AssertionError
+___________ TestEvidenceStepConvention.test_mirrored_to_source_side ____________
+
+self = <contract.test_evidence_step_conformance.TestEvidenceStepConvention object at 0x1158a9450>
+
+    def test_mirrored_to_source_side(self):
+        assert EVIDENCE_STEP_SRC.is_file(), "shared/workflow mirror missing"
+>       assert EVIDENCE_STEP.read_bytes() == EVIDENCE_STEP_SRC.read_bytes()
+E       AssertionError: assert b'# Canonical...xe3\x80\x82\n' == b'# Canonical...xe3\x80\x82\n'
+E         
+E         At index 1041 diff: b'.' != b's'
+E         Use -v to get more diff
+
+tests/contract/test_evidence_step_conformance.py:95: AssertionError
+______ TestImproveSkillIntegration.test_mirror_identical[improve-skills] _______
+
+self = <contract.test_evidence_step_conformance.TestImproveSkillIntegration object at 0x1158308c0>
+skill = ('improve-skills', PosixPath('/private/tmp/sdd-064-baseline/skills/external/improve-skills/SKILL.md'), '---\nname: imp...n Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"\n')
+
+    def test_mirror_identical(self, skill):
+        name, path, text = skill
+        flat = REPO_ROOT / ".specify" / "skills" / name / "SKILL.md"
+        nested = REPO_ROOT / ".specify" / "skills" / "internal" / name / "SKILL.md"
+        mirror = flat if flat.is_file() else nested
+        assert mirror.is_file(), f"{name} mirror missing"
+>       assert path.read_bytes() == mirror.read_bytes()
+E       assert b'---\nname: ...ints here)"\n' == b'---\nname: ...ints here)"\n'
+E         
+E         At index 4380 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_evidence_step_conformance.py:138: AssertionError
+_______ TestImproveSkillIntegration.test_mirror_identical[improve-agent] _______
+
+self = <contract.test_evidence_step_conformance.TestImproveSkillIntegration object at 0x1158309b0>
+skill = ('improve-agent', PosixPath('/private/tmp/sdd-064-baseline/skills/internal/improve-agent/SKILL.md'), '---\nname: impro...n Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"\n')
+
+    def test_mirror_identical(self, skill):
+        name, path, text = skill
+        flat = REPO_ROOT / ".specify" / "skills" / name / "SKILL.md"
+        nested = REPO_ROOT / ".specify" / "skills" / "internal" / name / "SKILL.md"
+        mirror = flat if flat.is_file() else nested
+        assert mirror.is_file(), f"{name} mirror missing"
+>       assert path.read_bytes() == mirror.read_bytes()
+E       assert b'---\nname: ...ints here)"\n' == b'---\nname: ...ints here)"\n'
+E         
+E         At index 2051 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_evidence_step_conformance.py:138: AssertionError
+_______ TestImproveSkillIntegration.test_mirror_identical[improve-team] ________
+
+self = <contract.test_evidence_step_conformance.TestImproveSkillIntegration object at 0x115855ef0>
+skill = ('improve-team', PosixPath('/private/tmp/sdd-064-baseline/skills/internal/improve-team/SKILL.md'), '---\nname: improve...n Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"\n')
+
+    def test_mirror_identical(self, skill):
+        name, path, text = skill
+        flat = REPO_ROOT / ".specify" / "skills" / name / "SKILL.md"
+        nested = REPO_ROOT / ".specify" / "skills" / "internal" / name / "SKILL.md"
+        mirror = flat if flat.is_file() else nested
+        assert mirror.is_file(), f"{name} mirror missing"
+>       assert path.read_bytes() == mirror.read_bytes()
+E       assert b'---\nname: ...ints here)"\n' == b'---\nname: ...ints here)"\n'
+E         
+E         At index 6327 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_evidence_step_conformance.py:138: AssertionError
+____________ TestLLMCollection.test_endpoint_candidates_origin_only ____________
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x1158e0a50>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_endpoint_candidates_origi0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_endpoint_candidates_origi0/home')
+
+    def test_endpoint_candidates_origin_only(self, ws, fake_home):
+        # the whitelist is read from the HOST process environ, so the values
+        # must be planted on the impersonated host (the wrapper), not the
+        # engine's own env
+        result = run_via_host_wrapper(
+            collect_args(ws),
+            env_home=fake_home,
+            extra_env={"ANTHROPIC_BASE_URL": "https://user:pw@api.example.com/v1/path?k=1",
+                       "DASHSCOPE_API_URL": "https://dashscope.example.com/compatible/v1"},
+        )
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+        endpoints = record["llm"]["endpoint_candidates"]
+>       assert isinstance(endpoints, dict), f"expected candidate mapping: {endpoints!r}"
+E       AssertionError: expected candidate mapping: 'not_evaluated'
+E       assert False
+E        +  where False = isinstance('not_evaluated', dict)
+
+tests/contract/test_exec_quant_engine.py:453: AssertionError
+____________ TestLLMCollection.test_qoder_adapter_reads_config_face ____________
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x1158f5220>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_qoder_adapter_reads_confi0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_qoder_adapter_reads_confi0/home')
+
+    def test_qoder_adapter_reads_config_face(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "gfmodel",
+                      "preferences": {"gfmodel": {"contextWindow": 1000000}}}}),
+            encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+>       assert record["agent"]["resolution"] == "resolved"
+E       AssertionError: assert 'unresolved' == 'resolved'
+E         
+E         - resolved
+E         + unresolved
+E         ? ++
+
+tests/contract/test_exec_quant_engine.py:479: AssertionError
+_____ TestLLMCollection.test_qoder_adapter_reads_per_model_effort_when_set _____
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x1158f5350>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_qoder_adapter_reads_per_m0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_qoder_adapter_reads_per_m0/home')
+
+    def test_qoder_adapter_reads_per_model_effort_when_set(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "qmodel_38max",
+                      "preferences": {"qmodel_38max": {
+                          "contextWindow": 1000000,
+                          "reasoning": {"enabled": True, "effort": "xhigh"}}}}}),
+            encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        llm = load_single_record(ws)["llm"]
+>       assert llm["reasoning_effort"] == {"value": "xhigh", "provenance": "measured"}
+E       AssertionError: assert 'not_evaluated' == {'value': 'xhigh', 'provenance': 'measured'}
+
+tests/contract/test_exec_quant_engine.py:500: AssertionError
+________ TestLLMCollection.test_missing_config_face_degrades_to_marker _________
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x1158fd010>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_missing_config_face_degra0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_missing_config_face_degra0/home')
+
+    def test_missing_config_face_degrades_to_marker(self, ws, fake_home):
+        # fake HOME has no .qoder/ at all — the adapter finds nothing
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+>       assert record["agent"]["resolution"] == "resolved"
+E       AssertionError: assert 'unresolved' == 'resolved'
+E         
+E         - resolved
+E         + unresolved
+E         ? ++
+
+tests/contract/test_exec_quant_engine.py:507: AssertionError
+_______ TestAgentCollection.test_resolved_agent_fields_from_wrapper_host _______
+
+self = <contract.test_exec_quant_engine.TestAgentCollection object at 0x1158e1590>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_resolved_agent_fields_fro0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_resolved_agent_fields_fro0/home')
+
+    def test_resolved_agent_fields_from_wrapper_host(self, ws, fake_home):
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+        agent = record["agent"]
+>       assert agent["resolution"] == "resolved"
+E       AssertionError: assert 'unresolved' == 'resolved'
+E         
+E         - resolved
+E         + unresolved
+E         ? ++
+
+tests/contract/test_exec_quant_engine.py:520: AssertionError
+_______ TestSizeCap.test_oversized_record_is_field_truncated_and_capped ________
+
+self = <contract.test_exec_quant_engine.TestSizeCap object at 0x1158e1f90>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_oversized_record_is_field0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_oversized_record_is_field0/home')
+
+    def test_oversized_record_is_field_truncated_and_capped(self, ws, fake_home):
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home,
+                                      wrapper_args=("x" * 70000,))
+        assert result.returncode == 0, result.stderr
+        line = records_path(ws).read_text(encoding="utf-8").splitlines()[0]
+        assert len(line.encode("utf-8")) <= 64 * 1024 + 1, "record must fit the cap"
+        record = json.loads(line)
+>       assert record["truncated"], "truncation must be annotated in the record"
+E       AssertionError: truncation must be annotated in the record
+E       assert []
+
+tests/contract/test_exec_quant_engine.py:766: AssertionError
+___ TestCredentialDefense.test_engine_masks_credential_shaped_config_values ____
+
+self = <contract.test_exec_quant_engine.TestCredentialDefense object at 0x1158e20d0>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_engine_masks_credential_s0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-247/test_engine_masks_credential_s0/home')
+
+    def test_engine_masks_credential_shaped_config_values(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "sk-0123456789abcdef0123",
+                      "preferences": {"sk-0123456789abcdef0123": {
+                          "contextWindow": 1000000}}}}), encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+        serialized = json.dumps(record)
+        assert "sk-0123456789abcdef0123" not in serialized, \
+            "credential-shaped value must be masked before write"
+>       assert "[masked-credential:" in serialized, "mask must be annotated in place"
+E       AssertionError: mask must be annotated in place
+E       assert '[masked-credential:' in '{"kind": "speckit.exec-quant", "schema_version": 2, "unit_id": "/speckit.plan", "unit_type": "command", "run_id": "sp...d", "satisfaction": "not_evaluated", "exit_code": "not_evaluated"}, "qualification": "not_evaluated", "truncated": []}'
+
+tests/contract/test_exec_quant_engine.py:796: AssertionError
+________________________ test_c2_mirror_byte_identical _________________________
+
+    def test_c2_mirror_byte_identical():
+        """C-2: the runtime mirror is byte-identical to the source."""
+        assert DOC.is_file(), f"missing source: {DOC.relative_to(ROOT)}"
+        assert DOC_MIRROR.is_file(), f"missing mirror: {DOC_MIRROR.relative_to(ROOT)}"
+>       assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), (
+            f"{DOC.relative_to(ROOT)} and {DOC_MIRROR.relative_to(ROOT)} differ; "
+            "run: python3 scripts/python/sync-mirrors.py --write --only shared"
+        )
+E       AssertionError: shared/guidelines/fast-fail.md and .specify/shared/guidelines/fast-fail.md differ; run: python3 scripts/python/sync-mirrors.py --write --only shared
+E       assert b'# \xe5\xbf\...xe3\x80\x82\n' == b'# \xe5\xbf\...xe3\x80\x82\n'
+E         
+E         At index 265 diff: b't' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_fast_fail_discipline.py:220: AssertionError
+_________________ test_a7_section_counts_20_to_21_and_21_to_22 _________________
+
+    def test_a7_section_counts_20_to_21_and_21_to_22():
+        """C-7: top-level counts -- template 21, live 22 (20/21 before; +2 = ID Register + Run Determination, 2026-10-08)."""
+        tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
+        live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
+>       assert tpl == 21, f"C-7: template has {tpl} top-level sections; expected 21 (20 before + 1)"
+E       AssertionError: C-7: template has 23 top-level sections; expected 21 (20 before + 1)
+E       assert 23 == 21
+
+tests/contract/test_fast_fail_discipline.py:723: AssertionError
+___________________ test_x13_double_landing_three_count_pins ___________________
+
+    def test_x13_double_landing_three_count_pins():
+        """C-13: the three count pins were raised in the same batch."""
+        src = _text(DOUBLE_LANDING_TEST)
+        for name, want in (("TEMPLATE_COUNT", 14), ("LIVE_COUNT", 16), ("COMMAND_COUNT", 8)):
+            m = re.search(rf"^{name} = (\d+)", src, re.M)
+            assert m, f"C-13: {name} not found in the guard"
+            assert int(m.group(1)) == want, f"C-13: {name} is {m.group(1)}; expected {want}"
+        # and the counts are true of the artifacts, not just of the pins
+>       assert len(PRINCIPLE_RE.findall(_text(CONST_TPL))) == 14, "C-13: the template does not actually hold 14"
+E       AssertionError: C-13: the template does not actually hold 14
+E       assert 15 == 14
+E        +  where 15 = len([('I', 'Library-First Design'), ('II', 'CLI & Text I/O Interface'), ('III', 'Documentation-First'), ('IV', 'Test-First Development'), ('V', 'Integration & Contract Testing'), ('VI', 'Observability, Versioning & Simplicity'), ...])
+E        +    where [('I', 'Library-First Design'), ('II', 'CLI & Text I/O Interface'), ('III', 'Documentation-First'), ('IV', 'Test-First Development'), ('V', 'Integration & Contract Testing'), ('VI', 'Observability, Versioning & Simplicity'), ...] = <built-in method findall of re.Pattern object at 0x1156f4040>('# [PROJECT_NAME] Constitution\n<!--\nThis is a PRESET template containing a set of generic project principles\nand wo...t Amended**: [LAST_AMENDED_DATE]\n<!-- Example: Version: 1.0.0 | Ratified: 2025-01-01 | Last Amended: 2025-01-01 -->\n')
+E        +      where <built-in method findall of re.Pattern object at 0x1156f4040> = re.compile('^### ([IVXLC0-9]+)\\. (.+)$', re.MULTILINE).findall
+E        +      and   '# [PROJECT_NAME] Constitution\n<!--\nThis is a PRESET template containing a set of generic project principles\nand wo...t Amended**: [LAST_AMENDED_DATE]\n<!-- Example: Version: 1.0.0 | Ratified: 2025-01-01 | Last Amended: 2025-01-01 -->\n' = _text(PosixPath('/private/tmp/sdd-064-baseline/templates/constitution-template.md'))
+
+tests/contract/test_fast_fail_discipline.py:1107: AssertionError
+________________ test_x19_ufc_class_eleven_gains_fast_fail_path ________________
+
+    def test_x19_ufc_class_eleven_gains_fast_fail_path():
+        """C-19 DELEGATION GUARD: the real assertion lives in the UFC doc test.
+    
+        constitution-export.md C-19..C-22 are carried by the pre-existing
+        tests/contract/test_user_facing_comprehension_doc.py (T048), because that file
+        already owns the interface-class table -- adding a second assertion here would
+        create a second definition point. This function guards the DELEGATION itself: if
+        the delegate assertion is ever removed, the delegation silently breaks while this
+        file stays green.
+        """
+        src = _text(UFC_DOC_TEST)
+        assert "shared/guidelines/fast-fail.md" in src, (
+            "C-19 delegation broken: the UFC doc test no longer mentions this discipline"
+        )
+        assert re.search(r"C-19: class ⑪ does not list the fast-fail discipline", src), (
+            "C-19 delegation broken: the class-⑪ assertion is no longer in the UFC doc test"
+        )
+        # and the delegate really does pass -- run it, do not assume it
+        import subprocess
+        r = subprocess.run(
+            ["python3", "-m", "pytest", str(UFC_DOC_TEST.relative_to(ROOT)), "-q", "-k", "c14 or c18a"],
+            capture_output=True, text=True, cwd=str(ROOT),
+        )
+>       assert r.returncode == 0, f"C-19 delegate is red:\n{r.stdout[-700:]}"
+E       AssertionError: C-19 delegate is red:
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-m', 'pytest', 'tests/contract/test_user_facing_comprehension_doc.py', '-q', '-k', ...18a'], returncode=1, stdout='', stderr='/Library/Developer/CommandLineTools/usr/bin/python3: No module named pytest\n').returncode
+
+tests/contract/test_fast_fail_discipline.py:1212: AssertionError
+____________________ test_x21_ufc_override_column_unchanged ____________________
+
+    def test_x21_ufc_override_column_unchanged():
+        """C-21 DELEGATION GUARD: the override cap stays 2 and class ⑪'s column stays '—'."""
+        src = _text(UFC_DOC_TEST)
+        assert re.search(r"<= 2", src), "C-21 delegation broken: the override cap of 2 is gone"
+        assert re.search(r"C-21: class ⑪ gained a reader_baseline_override", src), (
+            "C-21 delegation broken: the per-row override assertion is no longer in the UFC doc test"
+        )
+        import subprocess
+        r = subprocess.run(
+            ["python3", "-m", "pytest", str(UFC_DOC_TEST.relative_to(ROOT)), "-q", "-k", "c18a"],
+            capture_output=True, text=True, cwd=str(ROOT),
+        )
+>       assert r.returncode == 0, f"C-21 delegate (test_c18a) is red:\n{r.stdout[-700:]}"
+E       AssertionError: C-21 delegate (test_c18a) is red:
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-m', 'pytest', 'tests/contract/test_user_facing_comprehension_doc.py', '-q', '-k', 'c18a'], returncode=1, stdout='', stderr='/Library/Developer/CommandLineTools/usr/bin/python3: No module named pytest\n').returncode
+
+tests/contract/test_fast_fail_discipline.py:1246: AssertionError
+_______________ test_i11_channel_two_mirrors_and_per_tool_copies _______________
+
+    def test_i11_channel_two_mirrors_and_per_tool_copies():
+        """C-11: the mirror and all four per-tool trees carry the identical clause."""
+        owner = _clause_interval(_text(DOC))
+        for preset in FACTORY_PRESETS:
+            mirror = ROOT / ".specify" / "agents" / "templates" / preset.name
+            assert mirror.is_file(), f"C-11: missing mirror {mirror.relative_to(ROOT)}"
+>           assert mirror.read_bytes() == preset.read_bytes(), (
+                f"C-11: {mirror.relative_to(ROOT)} differs from its source"
+            )
+E           AssertionError: C-11: .specify/agents/templates/skill-verifier.agent.md differs from its source
+E           assert b'---\nname: ...use:end -->\n' == b'---\nname: ...use:end -->\n'
+E             
+E             At index 3784 diff: b'.' != b's'
+E             Use -v to get more diff
+
+tests/contract/test_fast_fail_discipline.py:1435: AssertionError
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_fast_fail_discipline.py:1831: AssertionError
+__________________ test_g17_mirrors_produced_by_engines_only ___________________
+
+    def test_g17_mirrors_produced_by_engines_only():
+        """G-17: the mirror pairs are unchanged, and mirrors are byte-identical to sources."""
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "_ff_sync_mirrors", ROOT / "scripts" / "python" / "sync-mirrors.py"
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        pairs = [(s, d) for s, d, _strict, _ex in mod.MIRROR_PAIRS]
+        assert ("shared", ".specify/shared") in pairs, "G-17: the shared mirror pair is gone"
+        assert ("agents", ".specify/agents/templates") in pairs, "G-17: the agents mirror pair is gone"
+        assert ("templates", ".specify/templates") in pairs, "G-17: the templates mirror pair is gone"
+        assert len(mod.MIRROR_PAIRS) == 6, f"G-17: MIRROR_PAIRS has {len(mod.MIRROR_PAIRS)} entries, expected 6 (skills split into external+internal)"
+        # every artifact this feature mirrored is byte-identical to its source
+        for src, mirror in (
+            (DOC, DOC_MIRROR),
+            (ROOT / "shared" / "definitions" / "subagent-definitions.md",
+             ROOT / ".specify" / "shared" / "definitions" / "subagent-definitions.md"),
+            (ROOT / "shared" / "guidelines" / "user-facing-comprehension.md",
+             ROOT / ".specify" / "shared" / "guidelines" / "user-facing-comprehension.md"),
+            (ROOT / "templates" / "instructions-template.md",
+             ROOT / ".specify" / "templates" / "instructions-template.md"),
+            (ROOT / "templates" / "constitution-template.md",
+             ROOT / ".specify" / "templates" / "constitution-template.md"),
+        ):
+            assert mirror.is_file(), f"G-17: mirror missing for {src.relative_to(ROOT)}"
+>           assert src.read_bytes() == mirror.read_bytes(), (
+                f"G-17: {mirror.relative_to(ROOT)} was hand-edited or is stale vs {src.relative_to(ROOT)}"
+            )
+E           AssertionError: G-17: .specify/shared/guidelines/fast-fail.md was hand-edited or is stale vs shared/guidelines/fast-fail.md
+E           assert b'# \xe5\xbf\...xe3\x80\x82\n' == b'# \xe5\xbf\...xe3\x80\x82\n'
+E             
+E             At index 265 diff: b't' != b'.'
+E             Use -v to get more diff
+
+tests/contract/test_fast_fail_discipline.py:1967: AssertionError
+_____________________ test_skill_mirror_is_byte_identical ______________________
+
+    @pytest.mark.contract
+    def test_skill_mirror_is_byte_identical():
+        drift = []
+        for source in sorted(SKILL_DIR.rglob("*")):
+            if not source.is_file():
+                continue
+            mirror = MIRROR_DIR / source.relative_to(SKILL_DIR)
+            if not mirror.is_file() or mirror.read_bytes() != source.read_bytes():
+                drift.append(source.relative_to(SKILL_DIR).as_posix())
+>       assert not drift, f"git-workflow mirror drift: {drift}"
+E       AssertionError: git-workflow mirror drift: ['SKILL.md', 'assets/ledger-template.md', 'references/merge-provenance.md', 'references/submodule-command-recipes.md']
+E       assert not ['SKILL.md', 'assets/ledger-template.md', 'references/merge-provenance.md', 'references/submodule-command-recipes.md']
+
+tests/contract/test_git_workflow_instructions_block.py:135: AssertionError
+__________________ test_shared_protocol_present_and_mirrored ___________________
+
+    def test_shared_protocol_present_and_mirrored():
+        src = ROOT / "shared" / "workflow" / "glossary.md"
+        mirror = ROOT / ".specify" / "shared" / "workflow" / "glossary.md"
+        assert src.exists() and mirror.exists()
+>       assert read(src) == read(mirror), "shared/workflow/glossary.md mirror not byte-identical"
+E       AssertionError: shared/workflow/glossary.md mirror not byte-identical
+E       assert '# Glossary P...d commands.\n' == '# Glossary P...d commands.\n'
+E         
+E         Skipping 461 identical leading characters in diff, use -v to show
+E           doc; the
+E         - `.specify/scripts/python/glossary-utils.py` engine performs only deterministic file operations and
+E         ?  ---------
+E         + `scripts/python/glossary-utils.py` engine performs only deterministic file operations and
+E           structural conflict detection....
+E         
+E         ...Full output truncated (83 lines hidden), use '-vv' to show
+
+tests/contract/test_glossary_mechanism.py:91: AssertionError
+______________________ test_engine_exists_with_its_mirror ______________________
+
+    def test_engine_exists_with_its_mirror():
+        assert ENGINE.is_file()
+        assert ENGINE_MIRROR.is_file(), "run sync-mirrors.py --write"
+>       assert ENGINE.read_bytes() == ENGINE_MIRROR.read_bytes()
+E       AssertionError: assert b'#!/usr/bin/...xit(main())\n' == b'#!/usr/bin/...xit(main())\n'
+E         
+E         At index 644 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_goal_targets_engine.py:339: AssertionError
+__________ TestInvariantGroups.test_mapping_mirror_is_byte_identical ___________
+
+self = <contract.test_goal_writeset.TestInvariantGroups object at 0x1166f8380>
+
+    def test_mapping_mirror_is_byte_identical(self):
+>       assert _read(CANONICAL_MAPPING) == _read(MIRROR_MAPPING), (
+            "summary-mapping.md and its .specify mirror diverged — "
+            "run scripts/python/sync-mirrors.py --write"
+        )
+E       AssertionError: summary-mapping.md and its .specify mirror diverged — run scripts/python/sync-mirrors.py --write
+E       assert '# 团队 → 项目管理概...-blocking).\n' == '# 团队 → 项目管理概...-blocking).\n'
+E         
+E         Skipping 124 identical leading characters in diff, use -v to show
+E         - 1)。表单生成器 `.specify/scripts/build-summary-input.py` 按本文件实现;报告与契约引用本文件而不各自重述。
+E         ?           ---------
+E         + 1)。表单生成器 `scripts/build-summary-input.py` 按本文件实现;报告与契约引用本文件而不各自重述。
+E           >
+E           > **边界**:`summarize-project` 保持不变(只读呈现工具、输入面仍是表单),适配责任全在团队侧(FR-024)。字段定义与约束的权威是该技能的 `schema/project.sql`(DDL),本文件不复写 schema。...
+E         
+E         ...Full output truncated (212 lines hidden), use '-vv' to show
+
+tests/contract/test_goal_writeset.py:96: AssertionError
+____________________ test_mirror_parity_for_the_whole_skill ____________________
+
+    @pytest.mark.contract
+    def test_mirror_parity_for_the_whole_skill():
+        assert MIRROR_DIR.is_dir(), ".specify/skills/create-pages mirror missing"
+        drift = []
+        for source in sorted(SKILL_DIR.rglob("*")):
+            if not source.is_file():
+                continue
+            mirror = MIRROR_DIR / source.relative_to(SKILL_DIR)
+            if not mirror.is_file() or mirror.read_bytes() != source.read_bytes():
+                drift.append(source.relative_to(SKILL_DIR).as_posix())
+>       assert not drift, f"skill mirror drift: {drift}"
+E       AssertionError: skill mirror drift: ['SKILL.md', 'references/hugo-site.md', 'scripts/scaffold-ci.sh']
+E       assert not ['SKILL.md', 'references/hugo-site.md', 'scripts/scaffold-ci.sh']
+
+tests/contract/test_hugo_scaffold_contract.py:315: AssertionError
+_________ test_c4_budget_total_and_violations_after_the_feature_landed _________
+
+    def test_c4_budget_total_and_violations_after_the_feature_landed():
+        total, violations, out = _summary()
+>       assert total == GATE_TOTAL, (
+            f"the feature changed the blocking-gate total from {GATE_TOTAL} to {total}; the "
+            f"integer headroom is zero so this is a violation, not a rounding: {out}"
+        )
+E       AssertionError: the feature changed the blocking-gate total from 23 to 27; the integer headroom is zero so this is a violation, not a rounding: blocking confirmation gates: 27
+E           destructive: 20
+E           governance_kept: 7
+E         violations (reversible gates still blocking): 0
+E         
+E       assert 27 == 23
+
+tests/contract/test_neutrality_budget.py:162: AssertionError
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+
+    def test_c5_the_cap_leaves_zero_integer_headroom():
+        baseline = json.loads(
+            (ROOT / ".specify" / "specs" / "044-reduce-confirmation-flows" / "baseline.json")
+            .read_text(encoding="utf-8"))
+        assert baseline["total"] == CAP_BASELINE_TOTAL, (
+            f"the cap's frozen baseline moved; the derived cap and every pin keyed on it must be "
+            f"re-derived together, not adjusted to fit: {baseline['total']}"
+        )
+        cap = baseline["total"] * CAP_FACTOR
+        assert cap == 23.25, cap
+        total, _violations, _out = _summary()
+>       assert total <= cap, f"over cap: {total} > {cap}"
+E       AssertionError: over cap: 27 > 23.25
+E       assert 27 <= 23.25
+
+tests/contract/test_neutrality_budget.py:180: AssertionError
+_______ test_c10_the_scanner_and_its_mirror_are_untouched_in_the_window ________
+
+    def test_c10_the_scanner_and_its_mirror_are_untouched_in_the_window():
+        assert _window_diff("scripts/python/scan-confirmation-gates.py") == ""
+>       assert _window_diff(".specify/scripts/python/scan-confirmation-gates.py") == ""
+E       AssertionError: assert 'diff --git a...ATTERNS = (\n' == ''
+E         
+E         + diff --git a/.specify/scripts/python/scan-confirmation-gates.py b/.specify/scripts/python/scan-confirmation-gates.py
+E         + index b78d2979..aa578e64 100644
+E         + --- a/.specify/scripts/python/scan-confirmation-gates.py
+E         + +++ b/.specify/scripts/python/scan-confirmation-gates.py
+E         + @@ -3,14 +3,14 @@
+E         +  ...
+E         
+E         ...Full output truncated (36 lines hidden), use '-vv' to show
+
+tests/contract/test_neutrality_budget.py:289: AssertionError
+______________ test_owner_doc_exists_and_mirror_is_byte_identical ______________
+
+    @pytest.mark.contract
+    def test_owner_doc_exists_and_mirror_is_byte_identical():
+>       assert SOURCE.read_bytes() == MIRROR.read_bytes(), (
+            "objective-analysis-gate mirror drift -- run "
+            "`python3 scripts/python/sync-mirrors.py --write shared`"
+        )
+E       AssertionError: objective-analysis-gate mirror drift -- run `python3 scripts/python/sync-mirrors.py --write shared`
+E       assert b'# Objective...invocation.\n' == b'# Objective...invocation.\n'
+E         
+E         At index 436 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_objective_analysis_gate.py:172: AssertionError
+_______________________ test_create_skills_mirror_parity _______________________
+
+    @pytest.mark.contract
+    def test_create_skills_mirror_parity():
+        if not CREATE_SKILLS_MIRROR.exists():
+            pytest.skip("Mirror file does not exist")
+>       assert _text(CREATE_SKILLS_FILE) == _text(CREATE_SKILLS_MIRROR), (
+            "create-skills SKILL.md mirror differs from source"
+        )
+E       AssertionError: create-skills SKILL.md mirror differs from source
+E       assert '---\nname: c...ints here)"\n' == '---\nname: c...ints here)"\n'
+E         
+E         Skipping 9163 identical leading characters in diff, use -v to show
+E            body
+E         - ├── .specify/scripts/            # Executable scripts (optional)
+E         ?     ---------
+E         + ├── scripts/            # Executable scripts (optional)
+E           ├── references/         # Reference materials loaded on demand (optional)...
+E         
+E         ...Full output truncated (146 lines hidden), use '-vv' to show
+
+tests/contract/test_portable_skill_creation.py:124: AssertionError
+______________________ test_c11_gate_scan_total_unchanged ______________________
+
+    def test_c11_gate_scan_total_unchanged():
+        assert BASELINE_GATES.is_file(), (
+            f"missing frozen baseline: {BASELINE_GATES} (T002 must run first)"
+        )
+        frozen = json.loads(read(BASELINE_GATES))["confirmationGates"]
+        proc = subprocess.run(
+            [
+                "python3", str(SCANNER), "--root", str(ROOT), "--json",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == frozen["total"], (
+            f"gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_proactive_trigger_section.py:352: AssertionError
+________________ test_doc_c1_exists_with_byte_identical_mirror _________________
+
+    def test_doc_c1_exists_with_byte_identical_mirror():
+        assert DISCIPLINE_DOC.is_file(), f"missing discipline doc: {DISCIPLINE_DOC}"
+        assert DISCIPLINE_DOC_MIRROR.is_file(), (
+            f"missing discipline doc mirror: {DISCIPLINE_DOC_MIRROR}"
+        )
+>       assert DISCIPLINE_DOC.read_bytes() == DISCIPLINE_DOC_MIRROR.read_bytes(), (
+            "discipline doc mirror drift"
+        )
+E       AssertionError: discipline doc mirror drift
+E       assert b'# Proactive...xe3\x80\x82\n' == b'# Proactive...xe3\x80\x82\n'
+E         
+E         At index 100 diff: b't' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_proactive_trigger_section.py:452: AssertionError
+_____________ test_catalog_does_not_participate_in_registry_counts _____________
+
+    def test_catalog_does_not_participate_in_registry_counts() -> None:
+        registry = probe_utils.load_probe_registry(ROOT)
+        internal = len(registry["objects"])
+        external = len(registry["external"])
+        assert registry["errors"] == [], f"registry structural errors: {registry['errors']}"
+        assert external == 0, "external probes must stay out of the framework registry"
+        # 72 既有 + 14 散布探测点入册 + 20 reconcile 缺口补登 + 057 新增 2 个 skill-wrapup Object + 059 新增 4 个 exec-quant Object（同任务更新计数契约）
+>       assert internal == 112, (
+            f"catalog leaked into the engine population or Objects drifted: internal={internal}"
+        )
+E       AssertionError: catalog leaked into the engine population or Objects drifted: internal=114
+E       assert 114 == 112
+
+tests/contract/test_probe_nonentity_catalog.py:94: AssertionError
+__________________ test_doc_exists_with_byte_identical_mirror __________________
+
+    def test_doc_exists_with_byte_identical_mirror():
+        assert DOC.is_file(), f"missing owner doc: {DOC}"
+        assert DOC_MIRROR.is_file(), f"missing owner doc mirror: {DOC_MIRROR}"
+>       assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), "owner doc mirror drift"
+E       AssertionError: owner doc mirror drift
+E       assert b'# \xe8\xbf\...xe3\x80\x82\n' == b'# \xe8\xbf\...xe3\x80\x82\n'
+E         
+E         At index 444 diff: b't' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_progress_reporting.py:85: AssertionError
+______________ test_runtime_mode_doc_exists_in_source_and_mirror _______________
+
+    @pytest.mark.contract
+    def test_runtime_mode_doc_exists_in_source_and_mirror():
+        source = REPO_ROOT / "shared" / "workflow" / "runtime-mode.md"
+        mirror = REPO_ROOT / ".specify" / "shared" / "workflow" / "runtime-mode.md"
+        assert source.exists(), "shared/workflow/runtime-mode.md is missing"
+        text = source.read_text(encoding="utf-8")
+        assert "standalone" in text and ".specify" in text
+        if mirror.exists():
+>           assert text == mirror.read_text(encoding="utf-8"), (
+                "runtime-mode.md mirror differs from source"
+            )
+E           AssertionError: runtime-mode.md mirror differs from source
+E           assert '# Runtime Mo...conformant.\n' == '# Runtime Mo...conformant.\n'
+E             
+E             Skipping 2698 identical leading characters in diff, use -v to show
+E             - LL_HOME}` .specify/scripts/references/assets) run identically in both modes.
+E             ?           ---------
+E             + LL_HOME}` scripts/references/assets) run identically in both modes.
+E               
+E               ## Canonical gate line for `## Feedback` sections...
+E             
+E             ...Full output truncated (19 lines hidden), use '-vv' to show
+
+tests/contract/test_runtime_mode_gate.py:46: AssertionError
+___ TestScriptsDistributionParity.test_repo_has_no_orphan_or_drifted_scripts ___
+
+self = <contract.test_scripts_distribution_parity.TestScriptsDistributionParity object at 0x116de8c30>
+
+    def test_repo_has_no_orphan_or_drifted_scripts(self):
+        """The live gate: every .specify/scripts file has a canonical source."""
+        result = subprocess.run(
+            [sys.executable, str(ENGINE), "--check"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+>       assert result.returncode == 0, (
+            "sync-mirrors.py --check failed.\n"
+            "An ORPHAN line means a mirror-only file that `specify init` can never "
+            "distribute: either add the canonical source (e.g. scripts/bash/<name>.sh) "
+            "or delete the mirror copy.\n"
+            "A DIFF/MISS line means the mirror drifted: run "
+            "`python3 scripts/python/sync-mirrors.py --write`.\n\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+E       AssertionError: sync-mirrors.py --check failed.
+E         An ORPHAN line means a mirror-only file that `specify init` can never distribute: either add the canonical source (e.g. scripts/bash/<name>.sh) or delete the mirror copy.
+E         A DIFF/MISS line means the mirror drifted: run `python3 scripts/python/sync-mirrors.py --write`.
+E         
+E         stdout:
+E         OK: all per-tool command copies match the source templates.
+E         ok    templates/ == .specify/templates/ (22 files)
+E         DIFF  .specify/skills/create-pages/SKILL.md
+E         DIFF  .specify/skills/create-pages/references/hugo-site.md
+E         DIFF  .specify/skills/create-pages/scripts/scaffold-ci.sh
+E         DIFF  .specify/skills/create-skills/SKILL.md
+E         DIFF  .specify/skills/create-skills/references/skill-creation-quality-checklist.md
+E         DIFF  .specify/skills/database-utils/SKILL.md
+E         DIFF  .specify/skills/database-utils/references/setup-and-usage.md
+E         DIFF  .specify/skills/document-utils/SKILL.md
+E         DIFF  .specify/skills/draw-diagram/SKILL.md
+E         DIFF  .specify/skills/draw-diagram/assets/delivery.css
+E         DIFF  .specify/skills/draw-diagram/references/merge-provenance/drawio.baseline.txt
+E         DIFF  .specify/skills/draw-diagram/references/merge-provenance/echarts.baseline.txt
+E         DIFF  .specify/skills/draw-diagram/references/merge-provenance/excalidraw.baseline.txt
+E         DIFF  .specify/skills/draw-diagram/references/merge-provenance/mermaid.baseline.txt
+E         DIFF  .specify/skills/draw-diagram/references/merge-provenance/plantuml.baseline.txt
+E         DIFF  .specify/skills/draw-diagram/references/merge-provenance.md
+E         DIFF  .specify/skills/draw-diagram/references/types/d3js/assets/template.html
+E         DIFF  .specify/skills/draw-diagram/references/types/drawio/drawio.md
+E         DIFF  .specify/skills/draw-diagram/references/types/drawio/references/mxgraph-format.md
+E         DIFF  .specify/skills/draw-diagram/references/types/drawio/references/render-and-export.md
+E         DIFF  .specify/skills/draw-diagram/references/types/echarts/assets/template.html
+E         DIFF  .specify/skills/draw-diagram/references/types/echarts/best-practices/best-practices.md
+E         DIFF  .specify/skills/draw-diagram/references/types/echarts/best-practices/pitfalls.md
+E         DIFF  .specify/skills/draw-diagram/references/types/echarts/echarts.md
+E         DIFF  .specify/skills/draw-diagram/references/types/echarts/references/echarts-guide.md
+E         DIFF  .specify/skills/draw-diagram/references/types/echarts/references/sds-realization.md
+E         DIFF  .specify/skills/draw-diagram/references/types/echarts/scripts/check-layout.mjs
+E         DIFF  .specify/skills/draw-diagram/references/types/echarts/scripts/sync-config.mjs
+E         DIFF  .specify/skills/draw-diagram/references/types/echarts/scripts/vendor-echarts.sh
+E         DIFF  .specify/skills/draw-diagram/references/types/echarts/scripts/verify-deliverable.mjs
+E         DIFF  .specify/skills/draw-diagram/references/types/excalidraw/excalidraw.md
+E         DIFF  .specify/skills/draw-diagram/references/types/excalidraw/references/guide/server-deployment.md
+E         DIFF  .specify/skills/draw-diagram/references/types/excalidraw/scripts/render-excalidraw.sh
+E         DIFF  .specify/skills/draw-diagram/references/types/mermaid/mermaid.md
+E         DIFF  .specify/skills/draw-diagram/references/types/mermaid/references/document/00-mermaid-overview.md
+E         DIFF  .specify/skills/draw-diagram/references/types/mermaid/references/howto/12-rendering-and-output.md
+E         DIFF  .specify/skills/draw-diagram/references/types/mermaid/references/howto/13-wbs-diagram.md
+E         DIFF  .specify/skills/draw-diagram/references/types/mermaid/references/howto/14-gantt-diagram.md
+E         DIFF  .specify/skills/draw-diagram/references/types/mermaid/server/README.md
+E         DIFF  .specify/skills/draw-diagram/references/types/plantuml/plantuml.md
+E         DIFF  .specify/skills/draw-diagram/references/types/plantuml/references/howto/10-layout-planning.md
+E         DIFF  .specify/skills/draw-diagram/references/types/plantuml/references/howto/12-rendering-and-output.md
+E         DIFF  .specify/skills/draw-diagram/references/types/plantuml/references/howto/15-mindmap-diagram.md
+E         DIFF  .specify/skills/draw-diagram/references/types/plantuml/references/howto/17-yaml-diagram.md
+E         DIFF  .specify/skills/git-utils/SKILL.md
+E         DIFF  .specify/skills/git-utils/assets/ledger-template.md
+E         DIFF  .specify/skills/git-utils/references/merge-provenance.md
+E         DIFF  .specify/skills/git-utils/references/submodule-command-recipes.md
+E         DIFF  .specify/skills/improve-docs/SKILL.md
+E         DIFF  .specify/skills/improve-skills/SKILL.md
+E         DIFF  .specify/skills/improve-skills/references/claude-code-guide.md
+E         DIFF  .specify/skills/improve-skills/references/constraint-placement.md
+E         DIFF  .specify/skills/improve-skills/references/copilot-guide.md
+E         DIFF  .specify/skills/improve-skills/references/loop-playbook.md
+E         DIFF  .specify/skills/improve-skills/references/skill-quality-checklist.md
+E         DIFF  .specify/skills/improve-skills/references/skill-slimming-principles.md
+E         DIFF  .specify/skills/improve-skills/scripts/redline-check.py
+E         DIFF  .specify/skills/merge-skills/SKILL.md
+E         DIFF  .specify/skills/merge-skills/references/content-extraction.md
+E         DIFF  .specify/skills/merge-skills/references/decommission-and-wiring.md
+E         DIFF  .specify/skills/merge-skills/references/restructure-mapping.md
+E         DIFF  .specify/skills/sdd-project-setup/SKILL.md
+E         DIFF  .specify/skills/sdd-project-setup/references/setup-recipes.md
+E         DIFF  .specify/skills/sdd-project-setup/scripts/mechanism-inventory.py
+E         DIFF  .specify/skills/think-skills/SKILL.md
+E         DIFF  .specify/skills/internal/analyze-artifacts/references/detection-and-severity.md
+E         DIFF  .specify/skills/internal/analyze-artifacts/references/validation-and-report.md
+E         DIFF  .specify/skills/internal/archive-session/SKILL.md
+E         DIFF  .specify/skills/internal/clarify-artifact/SKILL.md
+E         DIFF  .specify/skills/internal/collect-evidence/SKILL.md
+E         DIFF  .specify/skills/internal/collect-evidence/references/evidence-discipline.md
+E         DIFF  .specify/skills/internal/create-agent/SKILL.md
+E         DIFF  .specify/skills/internal/create-agent/references/execution-config.md
+E         DIFF  .specify/skills/internal/create-agent/templates/agent-capacity-knowledge-manager-template.md
+E         DIFF  .specify/skills/internal/create-agent/templates/agent-capacity-module-designer-template.md
+E         DIFF  .specify/skills/internal/create-agent/templates/agent-capacity-qa-engineer-template.md
+E         DIFF  .specify/skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md
+E         DIFF  .specify/skills/internal/create-agent/templates/agent-capacity-system-designer-template.md
+E         DIFF  .specify/skills/internal/create-agent/templates/agent-capacity-test-engineer-template.md
+E         DIFF  .specify/skills/internal/create-agent/templates/agent-capacity-ux-analyst-template.md
+E         DIFF  .specify/skills/internal/create-checklist/SKILL.md
+E         DIFF  .specify/skills/internal/create-plan/SKILL.md
+E         DIFF  .specify/skills/internal/create-requirements/SKILL.md
+E         DIFF  .specify/skills/internal/create-tasks/SKILL.md
+E         DIFF  .specify/skills/internal/create-tasks/references/phase-shapes.md
+E         DIFF  .specify/skills/internal/create-team/SKILL.md
+E         DIFF  .specify/skills/internal/create-team/references/capacity-vs-responsibility.md
+E         DIFF  .specify/skills/internal/create-team/references/conceptual-model.md
+E         DIFF  .specify/skills/internal/create-team/references/create-mode.md
+E         DIFF  .specify/skills/internal/create-team/references/execution-guide.md
+E         DIFF  .specify/skills/internal/create-team/references/goal.md
+E         DIFF  .specify/skills/internal/create-team/references/patterns.md
+E         DIFF  .specify/skills/internal/create-team/references/summary-mapping.md
+E         DIFF  .specify/skills/internal/create-team/references/team-presets.md
+E         DIFF  .specify/skills/internal/create-team/scripts/build-summary-input.py
+E         DIFF  .specify/skills/internal/create-team/scripts/dispatch.sh
+E         DIFF  .specify/skills/internal/create-team/scripts/stream-filter.py
+E         DIFF  .specify/skills/internal/create-team/templates/agents/agent-team-supervisor-template.md
+E         DIFF  .specify/skills/internal/create-tools/templates/tool-project-script-template.md
+E         DIFF  .specify/skills/internal/derive-architecture/SKILL.md
+E         DIFF  .specify/skills/internal/implement-feature/SKILL.md
+E         DIFF  .specify/skills/internal/improve-agent/SKILL.md
+E         DIFF  .specify/skills/internal/improve-agent/references/claude-code-guide.md
+E         DIFF  .specify/skills/internal/improve-agent/references/copilot-guide.md
+E         DIFF  .specify/skills/internal/improve-team/SKILL.md
+E         DIFF  .specify/skills/internal/manage-agents/SKILL.md
+E         DIFF  .specify/skills/internal/manage-constitution/SKILL.md
+E         DIFF  .specify/skills/internal/manage-features/SKILL.md
+E         DIFF  .specify/skills/internal/manage-feedback/references/path-a-digest.md
+E         DIFF  .specify/skills/internal/manage-feedback/references/path-b-and-probe.md
+E         DIFF  .specify/skills/internal/manage-goal/SKILL.md
+E         DIFF  .specify/skills/internal/manage-history/SKILL.md
+E         DIFF  .specify/skills/internal/manage-instructions/SKILL.md
+E         DIFF  .specify/skills/internal/manage-todo/SKILL.md
+E         DIFF  .specify/skills/internal/research-feature/SKILL.md
+E         DIFF  .specify/skills/internal/run-agent/SKILL.md
+E         DIFF  .specify/skills/internal/run-interview/SKILL.md
+E         DIFF  .specify/skills/internal/sanitize-materials/SKILL.md
+E         DIFF  .specify/skills/internal/self-improvement/SKILL.md
+E         DIFF  .specify/skills/internal/study-project/references/uml-visualization-guide.md
+E         DIFF  .specify/skills/internal/summarize-project/SKILL.md
+E         DIFF  .specify/skills/internal/summarize-project/references/consistency-rules.md
+E         DIFF  .specify/skills/internal/summarize-project/references/data-model.md
+E         DIFF  .specify/skills/internal/summarize-project/references/degradation.md
+E         DIFF  .specify/skills/internal/summarize-project/references/milestones.md
+E         DIFF  .specify/skills/internal/summarize-project/references/people-encoding.md
+E         DIFF  .specify/skills/internal/summarize-project/references/portability.md
+E         DIFF  .specify/skills/internal/summarize-project/references/reporting-playbook.md
+E         DIFF  .specify/skills/internal/summarize-project/references/required-info.md
+E         DIFF  .specify/skills/internal/summarize-project/references/source-tiers.md
+E         DIFF  .specify/skills/internal/summarize-project/references/task-progress.md
+E         DIFF  .specify/skills/internal/summarize-project/schema/project.sql
+E         DIFF  .specify/skills/internal/summarize-project/scripts/progress-engine.py
+E         DIFF  .specify/skills/internal/summarize-project/scripts/validate-project-input.py
+E         DIFF  .specify/skills/internal/summarize-project/scripts/verify-chart-data.py
+E         DIFF  .specify/agents/templates/sdd-executor.agent.md
+E         DIFF  .specify/agents/templates/skill-verifier.agent.md
+E         DIFF  .specify/agents/templates/structure-adjuster.agent.md
+E         DIFF  .specify/scripts/bash/create-new-tools.sh
+E         DIFF  .specify/scripts/bash/generate-instructions.sh
+E         DIFF  .specify/scripts/bash/refresh-tools.sh
+E         DIFF  .specify/scripts/js/better-harness/coding-agent-practices/inventory.mjs
+E         DIFF  .specify/scripts/js/better-harness/session-analysis/analyzer.mjs
+E         DIFF  .specify/scripts/js/better-harness/session-analysis/index.mjs
+E         DIFF  .specify/scripts/js/better-harness/session-analysis/selection-profile.mjs
+E         DIFF  .specify/scripts/js/better-harness/session-analysis.mjs
+E         DIFF  .specify/scripts/python/account-clause-coverage.py
+E         DIFF  .specify/scripts/python/clause_extract.py
+E         DIFF  .specify/scripts/python/derive-utils.py
+E         DIFF  .specify/scripts/python/execution-config.py
+E         DIFF  .specify/scripts/python/gate-check.py
+E         DIFF  .specify/scripts/python/goal-utils.py
+E         DIFF  .specify/scripts/python/interview-utils.py
+E         DIFF  .specify/scripts/python/regen-command-copies.py
+E         DIFF  .specify/scripts/python/run-determination.py
+E         DIFF  .specify/scripts/python/sanitize-utils.py
+E         DIFF  .specify/scripts/python/scan-confirmation-gates.py
+E         DIFF  .specify/scripts/python/sync-mirrors.py
+E         DIFF  .specify/scripts/python/tools-utils.py
+E         DIFF  .specify/scripts/python/trigger-utils.py
+E         DIFF  .specify/scripts/python/validate-requirements.py
+E         DIFF  .specify/scripts/python/validate-tasks.py
+E         DIFF  .specify/shared/constants/clarify-taxonomy.md
+E         DIFF  .specify/shared/definitions/agent-definitions.md
+E         DIFF  .specify/shared/definitions/contract-clause-definitions.md
+E         DIFF  .specify/shared/definitions/derivation-definitions.md
+E         DIFF  .specify/shared/definitions/dogfooding-definitions.md
+E         DIFF  .specify/shared/definitions/framework-map.md
+E         DIFF  .specify/shared/definitions/goal-definitions.md
+E         DIFF  .specify/shared/definitions/self-improvement-definitions.md
+E         DIFF  .specify/shared/definitions/subagent-definitions.md
+E         DIFF  .specify/shared/definitions/tool-definitions.md
+E         DIFF  .specify/shared/guidelines/ask-record-repeat.md
+E         DIFF  .specify/shared/guidelines/confirmation-gates.md
+E         DIFF  .specify/shared/guidelines/critique-and-self-critique.md
+E         DIFF  .specify/shared/guidelines/fast-fail.md
+E         DIFF  .specify/shared/guidelines/proactive-trigger.md
+E         DIFF  .specify/shared/guidelines/progress-reporting.md
+E         DIFF  .specify/shared/guidelines/requirements-guidelines.md
+E         DIFF  .specify/shared/guidelines/self-improvement.md
+E         DIFF  .specify/shared/guidelines/single-run-evidence.md
+E         DIFF  .specify/shared/guidelines/todo-in-context.md
+E         DIFF  .specify/shared/guidelines/token-efficiency.md
+E         DIFF  .specify/shared/guidelines/user-facing-comprehension.md
+E         DIFF  .specify/shared/patterns/explicit-implicit-pattern.md
+E         DIFF  .specify/shared/patterns/interview-pattern.md
+E         DIFF  .specify/shared/patterns/reconcile-pattern.md
+E         DIFF  .specify/shared/patterns/self-improvement-pattern.md
+E         DIFF  .specify/shared/workflow/evidence-step.md
+E         DIFF  .specify/shared/workflow/external-dispatch-recipes.md
+E         DIFF  .specify/shared/workflow/feature-integration.md
+E         DIFF  .specify/shared/workflow/glossary.md
+E         DIFF  .specify/shared/workflow/interview-walkthrough.md
+E         DIFF  .specify/shared/workflow/objective-analysis-gate.md
+E         DIFF  .specify/shared/workflow/runtime-mode.md
+E         DIFF  .specify/shared/workflow/self-improvement-workflow.md
+E         DIFF  .specify/shared/workflow/symlink-model.md
+E         DIFF  .specify/shared/workflow/user-input-protocol.md
+E         DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+E         
+E         stderr:
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python3', '/private/tmp/sdd-064-baseline/scrip...ed/workflow/user-input-protocol.md\nDRIFT detected — run: python3 scripts/python/sync-mirrors.py --write\n', stderr='').returncode
+
+tests/contract/test_scripts_distribution_parity.py:80: AssertionError
+________________________ test_c10_mirror_byte_identical ________________________
+
+    def test_c10_mirror_byte_identical():
+        import filecmp
+    
+        dst = REPO_ROOT / ".specify" / "skills" / "sdd-project-setup"
+        assert dst.exists(), "runtime mirror missing — sync-mirrors not run"
+        for rel in ["SKILL.md", "references/setup-recipes.md", "scripts/mechanism-inventory.py"]:
+            assert (dst / rel).exists(), f"mirror missing file: {rel}"
+>           assert filecmp.cmp(SKILL_DIR / rel, dst / rel, shallow=False), (
+                f"mirror drift on {rel}"
+            )
+E           AssertionError: mirror drift on SKILL.md
+E           assert False
+E            +  where False = <function cmp at 0x1162a80f0>((PosixPath('/private/tmp/sdd-064-baseline/skills/external/sdd-project-setup') / 'SKILL.md'), (PosixPath('/private/tmp/sdd-064-baseline/.specify/skills/sdd-project-setup') / 'SKILL.md'), shallow=False)
+E            +    where <function cmp at 0x1162a80f0> = <module 'filecmp' from '/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/filecmp.py'>.cmp
+
+tests/contract/test_sdd_project_setup_skill.py:271: AssertionError
+_________ test_c4_canonical_shared_files_are_mirrored_byte_identically _________
+
+    def test_c4_canonical_shared_files_are_mirrored_byte_identically():
+        for source in (DEFINITION, GUIDELINE, PATTERN, WORKFLOW):
+            rel = source.relative_to(ROOT / "shared")
+            mirror = ROOT / ".specify/shared" / rel
+            assert mirror.is_file(), f"missing shared mirror: {mirror}"
+>           assert source.read_bytes() == mirror.read_bytes(), f"shared mirror drift: {rel}"
+E           AssertionError: shared mirror drift: definitions/self-improvement-definitions.md
+E           assert b'# Self-Impr...-improving.\n' == b'# Self-Impr...-improving.\n'
+E             
+E             At index 242 diff: b's' != b'.'
+E             Use -v to get more diff
+
+tests/contract/test_self_improvement_conformance.py:98: AssertionError
+__________________ test_c10_runtime_skill_mirrors_are_current __________________
+
+    def test_c10_runtime_skill_mirrors_are_current():
+        for source in sorted((ROOT / "skills").glob("*/*/SKILL.md")):
+            name, layer = source.parent.name, source.parent.parent.name
+            rel = f"{layer}/{name}" if layer == "internal" else name
+            mirror = ROOT / ".specify/skills" / rel / "SKILL.md"
+            assert mirror.is_file(), f"missing Skill mirror: {rel}"
+>           assert source.read_bytes() == mirror.read_bytes(), f"Skill mirror drift: {rel}"
+E           AssertionError: Skill mirror drift: create-pages
+E           assert b'---\nname: ...ints here)"\n' == b'---\nname: ...ints here)"\n'
+E             
+E             At index 2930 diff: b's' != b'.'
+E             Use -v to get more diff
+
+tests/contract/test_self_improvement_conformance.py:167: AssertionError
+______________ test_mirror_is_byte_equivalent[summarize-project] _______________
+
+canonical = PosixPath('/private/tmp/sdd-064-baseline/skills/internal/summarize-project')
+mirror = PosixPath('/private/tmp/sdd-064-baseline/.specify/skills/internal/summarize-project')
+
+    @pytest.mark.parametrize(
+        "canonical,mirror",
+        [(SKILL_DIR, MIRROR_DIR), (STUDY_SKILL_DIR, STUDY_MIRROR_DIR)],
+        ids=["summarize-project", "study-project"],
+    )
+    def test_mirror_is_byte_equivalent(canonical, mirror):
+>       assert_dirs_byte_equivalent(canonical, mirror)
+
+tests/contract/test_summarize_project_prompt_assets.py:170: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+canonical = PosixPath('/private/tmp/sdd-064-baseline/skills/internal/summarize-project')
+mirror = PosixPath('/private/tmp/sdd-064-baseline/.specify/skills/internal/summarize-project')
+
+    def assert_dirs_byte_equivalent(canonical: Path, mirror: Path) -> None:
+        """Assert two directory trees contain identical files with identical text."""
+        assert canonical.is_dir(), f"Missing canonical dir {canonical}"
+        assert mirror.is_dir(), f"Missing mirror dir {mirror}"
+        left, right = dir_file_map(canonical), dir_file_map(mirror)
+        assert set(left) == set(right), (
+            f"Tree mismatch: only-canonical={sorted(set(left) - set(right))} "
+            f"only-mirror={sorted(set(right) - set(left))}"
+        )
+        diffs = [rel for rel in left if left[rel] != right[rel]]
+>       assert not diffs, f"Byte differences in mirrored files: {diffs}"
+               ^^^^^^^^^
+E       AssertionError: Byte differences in mirrored files: ['SKILL.md', 'references/consistency-rules.md', 'references/data-model.md', 'references/degradation.md', 'references/milestones.md', 'references/people-encoding.md', 'references/portability.md', 'references/reporting-playbook.md', 'references/required-info.md', 'references/source-tiers.md', 'references/task-progress.md', 'schema/project.sql', 'scripts/progress-engine.py', 'scripts/validate-project-input.py', 'scripts/verify-chart-data.py']
+
+tests/contract/helpers_prompt_assets.py:94: AssertionError
+________________ test_mirror_is_byte_equivalent[study-project] _________________
+
+canonical = PosixPath('/private/tmp/sdd-064-baseline/skills/internal/study-project')
+mirror = PosixPath('/private/tmp/sdd-064-baseline/.specify/skills/internal/study-project')
+
+    @pytest.mark.parametrize(
+        "canonical,mirror",
+        [(SKILL_DIR, MIRROR_DIR), (STUDY_SKILL_DIR, STUDY_MIRROR_DIR)],
+        ids=["summarize-project", "study-project"],
+    )
+    def test_mirror_is_byte_equivalent(canonical, mirror):
+>       assert_dirs_byte_equivalent(canonical, mirror)
+
+tests/contract/test_summarize_project_prompt_assets.py:170: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+canonical = PosixPath('/private/tmp/sdd-064-baseline/skills/internal/study-project')
+mirror = PosixPath('/private/tmp/sdd-064-baseline/.specify/skills/internal/study-project')
+
+    def assert_dirs_byte_equivalent(canonical: Path, mirror: Path) -> None:
+        """Assert two directory trees contain identical files with identical text."""
+        assert canonical.is_dir(), f"Missing canonical dir {canonical}"
+        assert mirror.is_dir(), f"Missing mirror dir {mirror}"
+        left, right = dir_file_map(canonical), dir_file_map(mirror)
+        assert set(left) == set(right), (
+            f"Tree mismatch: only-canonical={sorted(set(left) - set(right))} "
+            f"only-mirror={sorted(set(right) - set(left))}"
+        )
+        diffs = [rel for rel in left if left[rel] != right[rel]]
+>       assert not diffs, f"Byte differences in mirrored files: {diffs}"
+               ^^^^^^^^^
+E       AssertionError: Byte differences in mirrored files: ['references/uml-visualization-guide.md']
+
+tests/contract/helpers_prompt_assets.py:94: AssertionError
+________ TestTodoInContextWiring.test_guideline_is_mirrored_byte_exact _________
+
+self = <contract.test_todo_in_context_wiring.TestTodoInContextWiring object at 0x116cddd10>
+
+    def test_guideline_is_mirrored_byte_exact(self):
+        assert GUIDELINE_MIRROR.is_file(), "guideline mirror missing under .specify/shared/guidelines/"
+        src = GUIDELINE_SRC.read_bytes()
+        mirror = GUIDELINE_MIRROR.read_bytes()
+>       assert src == mirror, "guideline source and .specify mirror have drifted"
+E       AssertionError: guideline source and .specify mirror have drifted
+E       assert b'# TODO-in-C...xe3\x80\x82\n' == b'# TODO-in-C...xe3\x80\x82\n'
+E         
+E         At index 713 diff: b't' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_todo_in_context_wiring.py:39: AssertionError
+________________________ test_cd1_mirror_byte_identical ________________________
+
+    def test_cd1_mirror_byte_identical():
+        assert DOC_MIRROR.is_file(), f"missing mirror: {DOC_MIRROR}"
+>       assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), "discipline doc mirror drift"
+E       AssertionError: discipline doc mirror drift
+E       assert b'# Token \xe...xe3\x80\x82\n' == b'# Token \xe...xe3\x80\x82\n'
+E         
+E         At index 308 diff: b't' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_token_efficiency_discipline.py:37: AssertionError
+___________________ test_cd5_headings_only_in_discipline_doc ___________________
+
+    def test_cd5_headings_only_in_discipline_doc():
+        offenders = []
+        for base in (ROOT / "shared", ROOT / "templates"):
+            for md in base.rglob("*.md"):
+                if md == DOC:
+                    continue
+                text = md.read_text(encoding="utf-8", errors="replace")
+                for heading in SECTION_HEADINGS:
+                    if heading in text:
+                        offenders.append(f"{md}:{heading}")
+>       assert not offenders, f"discipline sections copied outside single source: {offenders}"
+E       AssertionError: discipline sections copied outside single source: ['/private/tmp/sdd-064-baseline/shared/guidelines/progress-reporting.md:## 判定边界', '/private/tmp/sdd-064-baseline/shared/guidelines/single-run-evidence.md:## 判定边界']
+E       assert not ['/private/tmp/sdd-064-baseline/shared/guidelines/progress-reporting.md:## 判定边界', '/private/tmp/sdd-064-baseline/shared/guidelines/single-run-evidence.md:## 判定边界']
+
+tests/contract/test_token_efficiency_discipline.py:104: AssertionError
+_ test_ca3_skill_mirror_identical[skills/external/create-skills/references/skill-creation-quality-checklist.md] _
+
+rel = 'skills/external/create-skills/references/skill-creation-quality-checklist.md'
+
+    @pytest.mark.parametrize("rel", GATE_FILES)
+    def test_ca3_skill_mirror_identical(rel):
+        src = ROOT / rel
+        # Runtime mirror shape: external flattens to .specify/skills/<name>/..., internal
+        # stays nested under .specify/skills/internal/<name>/...
+        mirror_rel = rel.replace("skills/external/", "skills/", 1)
+        mirror = ROOT / ".specify" / mirror_rel
+        assert mirror.is_file(), f"missing mirror: {mirror}"
+>       assert src.read_bytes() == mirror.read_bytes(), f"mirror drift: {rel}"
+E       AssertionError: mirror drift: skills/external/create-skills/references/skill-creation-quality-checklist.md
+E       assert b"# Skill Cre...fresh context" == b"# Skill Cre...fresh context"
+E         
+E         At index 1651 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_token_efficiency_gates.py:49: AssertionError
+_ test_ca3_skill_mirror_identical[skills/external/improve-skills/references/skill-quality-checklist.md] _
+
+rel = 'skills/external/improve-skills/references/skill-quality-checklist.md'
+
+    @pytest.mark.parametrize("rel", GATE_FILES)
+    def test_ca3_skill_mirror_identical(rel):
+        src = ROOT / rel
+        # Runtime mirror shape: external flattens to .specify/skills/<name>/..., internal
+        # stays nested under .specify/skills/internal/<name>/...
+        mirror_rel = rel.replace("skills/external/", "skills/", 1)
+        mirror = ROOT / ".specify" / mirror_rel
+        assert mirror.is_file(), f"missing mirror: {mirror}"
+>       assert src.read_bytes() == mirror.read_bytes(), f"mirror drift: {rel}"
+E       AssertionError: mirror drift: skills/external/improve-skills/references/skill-quality-checklist.md
+E       assert b'# Skill Qua...dividually.\n' == b'# Skill Qua...dividually.\n'
+E         
+E         At index 7218 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_token_efficiency_gates.py:49: AssertionError
+____ test_ca3_skill_mirror_identical[skills/internal/create-agent/SKILL.md] ____
+
+rel = 'skills/internal/create-agent/SKILL.md'
+
+    @pytest.mark.parametrize("rel", GATE_FILES)
+    def test_ca3_skill_mirror_identical(rel):
+        src = ROOT / rel
+        # Runtime mirror shape: external flattens to .specify/skills/<name>/..., internal
+        # stays nested under .specify/skills/internal/<name>/...
+        mirror_rel = rel.replace("skills/external/", "skills/", 1)
+        mirror = ROOT / ".specify" / mirror_rel
+        assert mirror.is_file(), f"missing mirror: {mirror}"
+>       assert src.read_bytes() == mirror.read_bytes(), f"mirror drift: {rel}"
+E       AssertionError: mirror drift: skills/internal/create-agent/SKILL.md
+E       assert b'---\nname: ...ints here)"\n' == b'---\nname: ...ints here)"\n'
+E         
+E         At index 1396 diff: b't' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_token_efficiency_gates.py:49: AssertionError
+____ test_ca3_skill_mirror_identical[skills/internal/create-team/SKILL.md] _____
+
+rel = 'skills/internal/create-team/SKILL.md'
+
+    @pytest.mark.parametrize("rel", GATE_FILES)
+    def test_ca3_skill_mirror_identical(rel):
+        src = ROOT / rel
+        # Runtime mirror shape: external flattens to .specify/skills/<name>/..., internal
+        # stays nested under .specify/skills/internal/<name>/...
+        mirror_rel = rel.replace("skills/external/", "skills/", 1)
+        mirror = ROOT / ".specify" / mirror_rel
+        assert mirror.is_file(), f"missing mirror: {mirror}"
+>       assert src.read_bytes() == mirror.read_bytes(), f"mirror drift: {rel}"
+E       AssertionError: mirror drift: skills/internal/create-team/SKILL.md
+E       assert b'---\nname: ...ints here)"\n' == b'---\nname: ...ints here)"\n'
+E         
+E         At index 2607 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_token_efficiency_gates.py:49: AssertionError
+________________________ test_c2_mirror_byte_identical _________________________
+
+    def test_c2_mirror_byte_identical():
+        assert ENGINE.is_file(), f"missing engine: {ENGINE}"
+        assert ENGINE_MIRROR.is_file(), (
+            f"missing STRICT mirror: {ENGINE_MIRROR} — a mirror-only file reports ORPHAN and exit 2"
+        )
+>       assert ENGINE.read_bytes() == ENGINE_MIRROR.read_bytes(), "engine mirror drift"
+E       AssertionError: engine mirror drift
+E       assert b'#!/usr/bin/...xit(main())\n' == b'#!/usr/bin/...xit(main())\n'
+E         
+E         At index 552 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_trigger_engine.py:217: AssertionError
+_______________________ test_c2_sync_mirrors_check_clean _______________________
+
+    def test_c2_sync_mirrors_check_clean():
+        proc = subprocess.run(
+            [sys.executable, str(SYNC_MIRRORS), "--check"], cwd=ROOT,
+            capture_output=True, text=True,
+        )
+>       assert proc.returncode == 0, f"sync-mirrors --check exit {proc.returncode}:\n{proc.stdout[-1500:]}"
+E       AssertionError: sync-mirrors --check exit 2:
+E         l-definitions.md
+E         DIFF  .specify/shared/guidelines/ask-record-repeat.md
+E         DIFF  .specify/shared/guidelines/confirmation-gates.md
+E         DIFF  .specify/shared/guidelines/critique-and-self-critique.md
+E         DIFF  .specify/shared/guidelines/fast-fail.md
+E         DIFF  .specify/shared/guidelines/proactive-trigger.md
+E         DIFF  .specify/shared/guidelines/progress-reporting.md
+E         DIFF  .specify/shared/guidelines/requirements-guidelines.md
+E         DIFF  .specify/shared/guidelines/self-improvement.md
+E         DIFF  .specify/shared/guidelines/single-run-evidence.md
+E         DIFF  .specify/shared/guidelines/todo-in-context.md
+E         DIFF  .specify/shared/guidelines/token-efficiency.md
+E         DIFF  .specify/shared/guidelines/user-facing-comprehension.md
+E         DIFF  .specify/shared/patterns/explicit-implicit-pattern.md
+E         DIFF  .specify/shared/patterns/interview-pattern.md
+E         DIFF  .specify/shared/patterns/reconcile-pattern.md
+E         DIFF  .specify/shared/patterns/self-improvement-pattern.md
+E         DIFF  .specify/shared/workflow/evidence-step.md
+E         DIFF  .specify/shared/workflow/external-dispatch-recipes.md
+E         DIFF  .specify/shared/workflow/feature-integration.md
+E         DIFF  .specify/shared/workflow/glossary.md
+E         DIFF  .specify/shared/workflow/interview-walkthrough.md
+E         DIFF  .specify/shared/workflow/objective-analysis-gate.md
+E         DIFF  .specify/shared/workflow/runtime-mode.md
+E         DIFF  .specify/shared/workflow/self-improvement-workflow.md
+E         DIFF  .specify/shared/workflow/symlink-model.md
+E         DIFF  .specify/shared/workflow/user-input-protocol.md
+E         DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python3', '/private/tmp/sdd-064-baseline/scrip...ed/workflow/user-input-protocol.md\nDRIFT detected — run: python3 scripts/python/sync-mirrors.py --write\n', stderr='').returncode
+
+tests/contract/test_trigger_engine.py:225: AssertionError
+_______________________ test_c2_mirror_is_byte_identical _______________________
+
+    @pytest.mark.contract
+    def test_c2_mirror_is_byte_identical():
+        assert DOC_MIRROR.is_file(), (
+            f"mirror missing: {DOC_MIRROR.relative_to(ROOT)} — run "
+            "`python3 scripts/python/sync-mirrors.py --write --only shared`"
+        )
+>       assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), "truth-doc mirror drift"
+E       AssertionError: truth-doc mirror drift
+E       assert b'# \xe9\x9d\...xe3\x80\x82\n' == b'# \xe9\x9d\...xe3\x80\x82\n'
+E         
+E         At index 362 diff: b't' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_user_facing_comprehension_doc.py:193: AssertionError
+_____________________ test_gn_c2_gate_scan_total_unchanged _____________________
+
+    @pytest.mark.contract
+    def test_gn_c2_gate_scan_total_unchanged():
+        """Run the real scanner and assert equality — not <=, per the clause."""
+        proc = subprocess.run(
+            ["python3", str(SCANNER), "--root", str(ROOT), "--json"],
+            capture_output=True, text=True,
+        )
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == 23, (
+            f"gate total moved to {payload['total']}; the frozen budget is 23 and the integer "
+            "headroom is 0, so any new BLOCKING_RE hit in scan scope lands here"
+        )
+E       AssertionError: gate total moved to 27; the frozen budget is 23 and the integer headroom is 0, so any new BLOCKING_RE hit in scan scope lands here
+E       assert 27 == 23
+
+tests/contract/test_user_facing_comprehension_doc.py:576: AssertionError
+______________________ test_c3_mirrors_are_byte_identical ______________________
+
+    def test_c3_mirrors_are_byte_identical():
+        # `templates/commands/` has NO `.specify/` mirror — sync-mirrors.py's templates pair
+        # excludes `commands` (retired), and C-14 forbids recreating it. So C-3 covers all
+        # eight sources under the `shared` and `skills` pairs; clarify.md's rule source moved
+        # to the `clarify-artifact` skill in the S3 command thinning (per-tool command copies
+        # remain C-14's subject).
+        drifted = []
+        for rel, _ in RULE_SOURCES:
+            if not rel.startswith(("shared/", "skills/")):
+                continue
+            src, mirror = ROOT / rel, ROOT / ".specify" / rel
+            if not mirror.is_file():
+                drifted.append(f"{rel}: mirror missing")
+            elif src.read_bytes() != mirror.read_bytes():
+                drifted.append(f"{rel}: source and mirror differ")
+>       assert not drifted, f"mirror drift (run sync-mirrors.py --write): {drifted}"
+E       AssertionError: mirror drift (run sync-mirrors.py --write): ['shared/guidelines/confirmation-gates.md: source and mirror differ', 'shared/patterns/interview-pattern.md: source and mirror differ', 'skills/internal/clarify-artifact/SKILL.md: source and mirror differ', 'shared/guidelines/requirements-guidelines.md: source and mirror differ', 'shared/guidelines/proactive-trigger.md: source and mirror differ', 'skills/internal/summarize-project/references/reporting-playbook.md: source and mirror differ', 'shared/workflow/glossary.md: source and mirror differ']
+E       assert not ['shared/guidelines/confirmation-gates.md: source and mirror differ', 'shared/patterns/interview-pattern.md: source an...nd mirror differ', 'skills/internal/summarize-project/references/reporting-playbook.md: source and mirror differ', ...]
+
+tests/contract/test_user_facing_comprehension_pointers.py:277: AssertionError
+___________________ test_confirmation_gate_budget_unchanged ____________________
+
+    @pytest.mark.contract
+    def test_confirmation_gate_budget_unchanged():
+        proc = subprocess.run(
+            [sys.executable, str(SCAN)], capture_output=True, text=True, check=False)
+        out = proc.stdout
+        m_total = re.search(r"blocking confirmation gates: (\d+)", out)
+        m_viol = re.search(r"violations \(reversible gates still blocking\): (\d+)", out)
+        assert m_total and m_viol, f"scan-confirmation-gates output unparsable:\n{out}{proc.stderr}"
+>       assert int(m_total.group(1)) == 23, (
+            f"gate budget moved: {m_total.group(1)} != 23 — the compiled sections changed "
+            f"the confirmation-gate surface; the budget owner must re-adjudicate first"
+        )
+E       AssertionError: gate budget moved: 27 != 23 — the compiled sections changed the confirmation-gate surface; the budget owner must re-adjudicate first
+E       assert 27 == 23
+E        +  where 27 = int('27')
+E        +    where '27' = <built-in method group of re.Match object at 0x1176def80>(1)
+E        +      where <built-in method group of re.Match object at 0x1176def80> = <re.Match object; span=(0, 31), match='blocking confirmation gates: 27'>.group
+
+tests/contract/test_wrap_up_wording_gate_safe.py:74: AssertionError
+=============================== warnings summary ===============================
+tests/unit/test_derive_moves.py:44
+  /private/tmp/sdd-064-baseline/tests/unit/test_derive_moves.py:44: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_derive_validate.py:79
+  /private/tmp/sdd-064-baseline/tests/unit/test_derive_validate.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_sync_mirrors_resilience.py:20
+  /private/tmp/sdd-064-baseline/tests/unit/test_sync_mirrors_resilience.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/contract/test_evidence_utils_cli.py::TestCE3Doctor::test_node_block
+  /Users/liuqiming.lqm/project/profiles/.venv/lib/python3.14/site-packages/_pytest/fixtures.py:1313: PytestRemovedIn10Warning: Class-scoped fixture defined as instance method is deprecated.
+  Instance attributes set in this fixture will NOT be visible to test methods,
+  as each test gets a new instance while the fixture runs only once per class.
+  Use @classmethod decorator and set attributes on cls instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#class-scoped-fixture-as-instance-method
+    fixturefunc = resolve_fixture_function(fixturedef, request)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_agent_dispatch_mechanism.py::test_c14_mirror_pair_byte_identical
+FAILED tests/contract/test_ask_record_repeat.py::test_doc_exists_with_byte_identical_mirror
+FAILED tests/contract/test_ask_record_repeat.py::test_two_hats_owner_doc_has_mirror_parity
+FAILED tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+FAILED tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+FAILED tests/contract/test_compile_propagation_order.py::test_propagation_chain_is_green_in_canonical_order
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+FAILED tests/contract/test_constitution_double_landing.py::test_c1_template_carries_both_new_principles
+FAILED tests/contract/test_criterion_subject.py::test_c18_the_engine_suite_that_reads_the_owner_doc_stays_green
+FAILED tests/contract/test_criterion_subject.py::test_c19_the_gate_budget_survives_the_new_section
+FAILED tests/contract/test_criterion_subject.py::test_the_mirror_of_the_owner_doc_matches_and_the_clause_count_holds
+FAILED tests/contract/test_derivation_definitions.py::test_specify_mirror_is_byte_identical
+FAILED tests/contract/test_derive_command_surface.py::test_engine_and_its_specify_mirror_are_byte_identical
+FAILED tests/contract/test_derive_engine_contract.py::test_engine_and_its_specify_mirror_are_byte_identical
+FAILED tests/contract/test_docs_command_template.py::test_c12_skill_source_mirror_byte_identity
+FAILED tests/contract/test_evidence_step_conformance.py::TestCollectEvidenceSkill::test_mirror_identical
+FAILED tests/contract/test_evidence_step_conformance.py::TestEvidenceStepConvention::test_mirrored_to_source_side
+FAILED tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-skills]
+FAILED tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-agent]
+FAILED tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-team]
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_endpoint_candidates_origin_only
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_config_face
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_per_model_effort_when_set
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_missing_config_face_degrades_to_marker
+FAILED tests/contract/test_exec_quant_engine.py::TestAgentCollection::test_resolved_agent_fields_from_wrapper_host
+FAILED tests/contract/test_exec_quant_engine.py::TestSizeCap::test_oversized_record_is_field_truncated_and_capped
+FAILED tests/contract/test_exec_quant_engine.py::TestCredentialDefense::test_engine_masks_credential_shaped_config_values
+FAILED tests/contract/test_fast_fail_discipline.py::test_c2_mirror_byte_identical
+FAILED tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22
+FAILED tests/contract/test_fast_fail_discipline.py::test_x13_double_landing_three_count_pins
+FAILED tests/contract/test_fast_fail_discipline.py::test_x19_ufc_class_eleven_gains_fast_fail_path
+FAILED tests/contract/test_fast_fail_discipline.py::test_x21_ufc_override_column_unchanged
+FAILED tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_fast_fail_discipline.py::test_g17_mirrors_produced_by_engines_only
+FAILED tests/contract/test_git_workflow_instructions_block.py::test_skill_mirror_is_byte_identical
+FAILED tests/contract/test_glossary_mechanism.py::test_shared_protocol_present_and_mirrored
+FAILED tests/contract/test_goal_targets_engine.py::test_engine_exists_with_its_mirror
+FAILED tests/contract/test_goal_writeset.py::TestInvariantGroups::test_mapping_mirror_is_byte_identical
+FAILED tests/contract/test_hugo_scaffold_contract.py::test_mirror_parity_for_the_whole_skill
+FAILED tests/contract/test_neutrality_budget.py::test_c4_budget_total_and_violations_after_the_feature_landed
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+FAILED tests/contract/test_neutrality_budget.py::test_c10_the_scanner_and_its_mirror_are_untouched_in_the_window
+FAILED tests/contract/test_objective_analysis_gate.py::test_owner_doc_exists_and_mirror_is_byte_identical
+FAILED tests/contract/test_portable_skill_creation.py::test_create_skills_mirror_parity
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+FAILED tests/contract/test_proactive_trigger_section.py::test_doc_c1_exists_with_byte_identical_mirror
+FAILED tests/contract/test_probe_nonentity_catalog.py::test_catalog_does_not_participate_in_registry_counts
+FAILED tests/contract/test_progress_reporting.py::test_doc_exists_with_byte_identical_mirror
+FAILED tests/contract/test_runtime_mode_gate.py::test_runtime_mode_doc_exists_in_source_and_mirror
+FAILED tests/contract/test_scripts_distribution_parity.py::TestScriptsDistributionParity::test_repo_has_no_orphan_or_drifted_scripts
+FAILED tests/contract/test_sdd_project_setup_skill.py::test_c10_mirror_byte_identical
+FAILED tests/contract/test_self_improvement_conformance.py::test_c4_canonical_shared_files_are_mirrored_byte_identically
+FAILED tests/contract/test_self_improvement_conformance.py::test_c10_runtime_skill_mirrors_are_current
+FAILED tests/contract/test_summarize_project_prompt_assets.py::test_mirror_is_byte_equivalent[summarize-project]
+FAILED tests/contract/test_summarize_project_prompt_assets.py::test_mirror_is_byte_equivalent[study-project]
+FAILED tests/contract/test_todo_in_context_wiring.py::TestTodoInContextWiring::test_guideline_is_mirrored_byte_exact
+FAILED tests/contract/test_token_efficiency_discipline.py::test_cd1_mirror_byte_identical
+FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+FAILED tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/external/create-skills/references/skill-creation-quality-checklist.md]
+FAILED tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/external/improve-skills/references/skill-quality-checklist.md]
+FAILED tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/internal/create-agent/SKILL.md]
+FAILED tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/internal/create-team/SKILL.md]
+FAILED tests/contract/test_trigger_engine.py::test_c2_mirror_byte_identical
+FAILED tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+FAILED tests/contract/test_user_facing_comprehension_doc.py::test_c2_mirror_is_byte_identical
+FAILED tests/contract/test_user_facing_comprehension_doc.py::test_gn_c2_gate_scan_total_unchanged
+FAILED tests/contract/test_user_facing_comprehension_pointers.py::test_c3_mirrors_are_byte_identical
+FAILED tests/contract/test_wrap_up_wording_gate_safe.py::test_confirmation_gate_budget_unchanged
+69 failed, 4077 passed, 1 skipped, 4 warnings in 300.36s (0:05:00)
+# failed-name list written: /tmp/sdd-064/baseline-failed-review-head.txt (      69 entries)
+BASELINE_RC=1

@@ -54,3 +54,18 @@ Read-only inspection of `bcf27c77` (main worktree) and repository-wide residual 
 - Guard installed: `test_clp_17_no_063_duplicate_owner` performs the same repository-wide scan and is green.
 - **Merge-time obligations (unchanged, recorded in §1–§3):** delete 063's provisional `contracts/cli-profiles.md` (or replace with a ≤5-line pointer), delete its CP tests / `test_cli_profile_record.py`, do not restore `references/cli/README.md`, do not register a second Probe Object for `skill:sdd-loop-driver`, and replace its `STR-009` literal with a pointer to 064 `STR-001`.
 - The 063 worktree/branch was not modified.
+
+## 5. Branch-aware guard (postreview repair, 2026-10-20)
+
+The worktree-only guard could not see the unmerged 063 branch. `skills/external/sdd-loop-driver/scripts/check-063-overlap.py` now inspects the branch tree directly:
+
+```bash
+python3 skills/external/sdd-loop-driver/scripts/check-063-overlap.py --repo <repo>
+# 063 absent -> branch-absent; present but unmerged -> pending-merge-obligation (paths);
+# merged into HEAD with residual assets -> exit 3 dual-owner
+
+python3 skills/external/sdd-loop-driver/scripts/check-063-overlap.py --repo <repo> --strict-premerge
+# exit 3 while the provisional 063 assets still exist (use in the 063 merge checklist/CI)
+```
+
+`test_clp_17_no_063_duplicate_owner` executes the guard: the default invocation must exit 0 and disclose `pending-merge-obligation` with the 063 contract path; `--strict-premerge` must exit 3 in that state. This turns the merge-time obligation into an executable pre-merge check instead of a post-merge red test.
