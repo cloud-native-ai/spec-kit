@@ -74,7 +74,7 @@ U5 STALL     超时/重试上限/预算触顶 → 停线、状态脊落盘、出
 U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归档清扫，缺省本地合并）+ 一份收尾汇总
 ```
 
-多条线并行 = 多个独立循环实例：一线一连接、一线一状态脊。
+多条线并行 = 多个独立循环实例：一线一连接、一线一状态脊。**U0.5 线路登记**：首次派发前把该线登记进环境级 Line Registry（`scripts/line-registry.py --action register`），此后每个事件携带 `(line_id, run_id)` 归属信封；U6 收尾后注销（`deregister`）。无标识消息一律经 `resolve-message` 判定，禁止用进程扫描推断线路。
 
 U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计划；未产出前不得进入 U2，更不得直接编辑目标仓库——目标项目为本仓库时同样适用。
 
@@ -94,10 +94,11 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 
 ## References
 
-- `references/dispatch-recipes.md` — 五大执行机制的命令形态：断点探测、阶段化 prompt 文件、runner 与派生、后台执行 + 统一监听（长轮询窗口/批量多线）、收尾纪律；阶段链与哨兵字面量；派发可见性操作规则。
+- `references/dispatch-recipes.md` — 五大执行机制的命令形态：断点探测、阶段化 prompt 文件、runner 与派生、后台执行 + 统一监听（长轮询窗口/批量多线）、收尾纪律；阶段链与哨兵字面量；派发可见性操作规则；线路登记/归属信封/消息入口（Recipe 6）。
 - `references/watch-model.md` — 统一监听模型：信号源、判定状态机、事件优先机制阶梯、窗口与阶段期限的区分、`pgrep -c` 零匹配陷阱、多线 manifest、宿主适配与自测要求。
-- `references/stage-prompts.md` — 阶段提示词三段骨架全文、独立校验程序、已验证变体（本地简报先行 / 构建固化分线）、多线并发隔离与窄读法授权、卡死处置与状态脊程序。
-- `scripts/watch-target.sh` — 无框架依赖的长轮询 watcher 参考实现（单目标/多目标、快照与自测模式）。
+- `references/stage-prompts.md` — 阶段提示词三段骨架全文、独立校验程序、Line Registration/Envelope/Ingress 程序、已验证变体（本地简报先行 / 构建固化分线）、多线并发隔离与窄读法授权、卡死处置与状态脊程序。
+- `scripts/watch-target.sh` — 无框架依赖的长轮询 watcher 参考实现（单目标/多目标、快照与自测模式、`--line-id/--run-id/--meta` 归属过滤、窗口内 lease 续租钩子）。
+- `scripts/line-registry.py` — Python 3 stdlib-only 引擎：环境级 Registry、原子写/同线锁、信封分类、消息入口、所有权/集成队列、lease/reservation/身份校验。
 
 ## Boundary
 

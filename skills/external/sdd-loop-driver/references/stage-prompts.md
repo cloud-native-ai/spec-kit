@@ -93,6 +93,57 @@
 - **程序**：U0 入口声明时、U2 派发前、U3 收到终止判定时、U4 校验后、U5 停线时**先写状态、后做动作**——续环与重入只读状态脊，零上下文可接手；循环 MUST NOT 依赖会话记忆。
 - **重入**：任何新会话接手该线时，从状态脊读取断点判定与已试次数，先跑一次 `watch-target.sh --once` 快照；终止判定在即按 U4/U5 续环，否则从对应阶段续跑或恢复监听窗口。
 
+## Line Registration, Envelope & Message Ingress（线路登记、归属与消息入口，Feature 064）
+
+### U0.5 线路登记（首次派发前）
+
+状态脊头字段先写 `line_id` / `run_id`，再向环境级 Registry 注册：
+
+```bash
+python3 <skill-dir>/scripts/line-registry.py --action register --line-id <line> --run-id <run> \
+  --project-dir <project> --repo-root <repo> --state active [--write-line ...] --format json
+```
+
+- 注册失败 = 该线启动失败：显式上送（路径 + 原因），不得静默继续或改用项目内路径。
+- 单线运行同样注册并携带信封；不得因归属机制改变 U0–U6、阶段链、哨兵校验与卡死处置。
+- 收尾（U6）后 `--action deregister --line-id <line> --reason <reason>`；`state=closed`、`closed_at` 必填。
+
+### 归属信封（每个事件）
+
+- status / pid / heartbeat 行尾携带 `line=<id> run=<id> stage=<stage> event=<type>`；
+- 日志旁路 `log-<line>-<stage>.log.meta.jsonl`（append-only，单写者）承载 `log-start` / `log-terminal`，终止条含 `sentinel_seen` 与 `exit`；
+- 提示词旁路 `prompt-<line>-<stage>.md.meta.json` 在派发前写入；
+- **日志正文零改动**：哨兵字面量与「最后非空行」判定不变；不得在哨兵后追加信封。
+
+### 消息入口程序（驱动侧）
+
+每次收到用户消息，先调用确定性入口，再决定路由：
+
+```bash
+python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message "<message>" [--clarified]
+```
+
+判定与动作（封闭集：`route | clarify | ambiguous-stop | no-active | no-match`）：
+
+| 结果 | 驱动动作 |
+|------|----------|
+| `route` | 将消息交给 `target_line_id`；不改动其他线路 |
+| `clarify` | 原样向用户提出 `question`（恰好一个），附候选清单；等待期间其他线路继续推进 |
+| `ambiguous-stop` | 列出候选并停止路由；**不得再问第二个问题**，不得猜 |
+| `no-active` | 明确报告无活动线路并请求目标 |
+| `no-match` | 报告标识与候选不匹配；不回落到猜测 |
+
+- 可识别标识：显式 `line_id` token，或唯一匹配的 project/repo 路径或分支名。
+- **禁止**使用 `ps`/`pgrep`/进程名/cwd/环境态推断；入口澄清只阻塞该条消息，不暂停/改变其他 line 的子代理与监听。
+
+### 事件归属消费规则
+
+- `own`：`(line_id, run_id)` 与当前监听目标一致——唯一可参与判定、进度与 Registry 状态的事件类别。
+- `foreign`：`line_id` 不同——不得转发、不得计入、不得改变当前线路状态。
+- `stale-run`：同线旧 `run_id`——不得作为当前尝试的证据。
+- `unattributed`：信封缺失或不可解析——显式报告归属缺口，不得当作完成/失败证据。
+- `legacy`：watcher 未提供归属参数时的 058 兼容行为（无过滤）；新派发 MUST 提供归属参数。
+
 ## Concurrency Isolation（并发隔离，多线并行）
 
 多线并行时每条线是独立循环实例：**一线一连接（检查时独立发起）、一线一状态脊**；任一线的失败不阻塞其他线。

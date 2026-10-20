@@ -35,6 +35,8 @@ watch-target.sh — bounded long-poll watcher (read-only)
 Single target:
   watch-target.sh --label L --pid-file P --status-file S --log G \
                   [--sentinel STAGE-DONE] [--heartbeat H] \
+                  [--line-id ID --run-id RUN] [--meta FILE] \
+                  [--lease-renew-cmd CMD --lease-renew-interval N] \
                   [--deadline-epoch E | --timeout T] \
                   [--window N] [--interval N] [--start-grace N] \
                   [--heartbeat-max-age N] [--once] [--verbose]
@@ -58,6 +60,9 @@ Verdicts / exit codes:
   2 USAGE          bad arguments
 
 Defaults: window=300s, interval=3s, start-grace=30s, heartbeat-max-age=120s.
+When holding a driver lease, either set --window to at most ttl/3 (default
+<=200s) or pass --lease-renew-cmd so the lease heartbeat is refreshed inside
+the window (--lease-renew-interval defaults to 60s).
 Set the host tool timeout to window + 30s so the watcher can return first.
 --timeout T is relative to THIS invocation; for multi-window stages pass
 --deadline-epoch (absolute stage deadline) instead, or each window resets it.
@@ -107,6 +112,12 @@ MANIFEST=""
 VERBOSE=0
 SELF_TEST=0
 START_EPOCH=0
+LINE_ID=""
+RUN_ID=""
+META=""
+LEASE_RENEW_CMD=""
+LEASE_RENEW_INTERVAL=60
+LAST_LEASE_RENEW=0
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -123,6 +134,11 @@ while [ "$#" -gt 0 ]; do
     --start-grace) [ "$#" -ge 2 ] || die_usage "--start-grace needs a value"; START_GRACE="$2"; shift 2 ;;
     --heartbeat-max-age) [ "$#" -ge 2 ] || die_usage "--heartbeat-max-age needs a value"; HEARTBEAT_MAX_AGE="$2"; shift 2 ;;
     --manifest) [ "$#" -ge 2 ] || die_usage "--manifest needs a value"; MANIFEST="$2"; shift 2 ;;
+    --line-id) [ "$#" -ge 2 ] || die_usage "--line-id needs a value"; LINE_ID="$2"; shift 2 ;;
+    --run-id) [ "$#" -ge 2 ] || die_usage "--run-id needs a value"; RUN_ID="$2"; shift 2 ;;
+    --meta) [ "$#" -ge 2 ] || die_usage "--meta needs a value"; META="$2"; shift 2 ;;
+    --lease-renew-cmd) [ "$#" -ge 2 ] || die_usage "--lease-renew-cmd needs a value"; LEASE_RENEW_CMD="$2"; shift 2 ;;
+    --lease-renew-interval) [ "$#" -ge 2 ] || die_usage "--lease-renew-interval needs a value"; LEASE_RENEW_INTERVAL="$2"; shift 2 ;;
     --once) ONCE=1; shift ;;
     --verbose) VERBOSE=1; shift ;;
     --self-test) SELF_TEST=1; shift ;;
@@ -131,10 +147,13 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-for name in WINDOW INTERVAL START_GRACE HEARTBEAT_MAX_AGE; do
+for name in WINDOW INTERVAL START_GRACE HEARTBEAT_MAX_AGE LEASE_RENEW_INTERVAL; do
   value="${!name}"
   is_uint "$value" || die_usage "$name must be a non-negative integer, got '$value'"
 done
+if [ -n "$LINE_ID" ] || [ -n "$RUN_ID" ]; then
+  [ -n "$LINE_ID" ] && [ -n "$RUN_ID" ] || die_usage "--line-id and --run-id must be provided together"
+fi
 [ "$INTERVAL" -gt 0 ] || die_usage "--interval must be > 0"
 if [ -n "$TIMEOUT" ]; then
   is_uint "$TIMEOUT" || die_usage "--timeout must be a non-negative integer"
@@ -144,11 +163,72 @@ is_uint "$DEADLINE_EPOCH" || die_usage "--deadline-epoch must be a non-negative 
 
 P_PID=""
 P_START=""
+P_CLASS=""
+P_PRESENT=0
+S_CLASS=""
+M_CLASS=""
+M_EXISTS=0
+M_SENT=""
+H_CLASS=""
+HB_EXISTS=0
+CC=""
+
+classify_pair() {
+  local carrier_line="$1" carrier_run="$2"
+  if [ -z "$LINE_ID" ] && [ -z "$RUN_ID" ]; then
+    CC="legacy"; return 0
+  fi
+  if [ -z "$carrier_line" ] || [ -z "$carrier_run" ]; then
+    CC="unattributed"; return 0
+  fi
+  if [ "$carrier_line" != "$LINE_ID" ]; then
+    CC="foreign"; return 0
+  fi
+  if [ "$carrier_run" != "$RUN_ID" ]; then
+    CC="stale-run"; return 0
+  fi
+  CC="own"
+}
+
+line_field_of() {
+  printf '%s' "$1" | sed -n 's/.*[[:space:]]line=\([^[:space:]]*\).*/\1/p' | head -n 1
+}
+
+run_field_of() {
+  printf '%s' "$1" | sed -n 's/.*[[:space:]]run=\([^[:space:]]*\).*/\1/p' | head -n 1
+}
+
+json_field() {
+  printf '%s' "$1" | sed -n "s/.*\"$2\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" | head -n 1
+}
+
+read_meta_file() {
+  local f="$1" ml=""
+  M_CLASS=""; M_EXISTS=0; M_SENT=""
+  [ -n "$f" ] && [ -f "$f" ] || return 0
+  M_EXISTS=1
+  ml=$(tail -n 20 "$f" 2>/dev/null | awk 'NF { last=$0 } END { print last }')
+  [ -n "$ml" ] || return 0
+  classify_pair "$(json_field "$ml" line_id)" "$(json_field "$ml" run_id)"
+  M_CLASS="$CC"
+  M_SENT=$(printf '%s' "$ml" | sed -n 's/.*"sentinel_seen"[[:space:]]*:[[:space:]]*\([01]\).*/\1/p')
+}
+
+read_heartbeat_envelope() {
+  local f="$1" hl=""
+  H_CLASS=""; HB_EXISTS=0
+  [ -n "$f" ] && [ -f "$f" ] || return 0
+  HB_EXISTS=1
+  hl=$(tail -n 5 "$f" 2>/dev/null | awk 'NF { last=$0 } END { print last }')
+  classify_pair "$(line_field_of "$hl")" "$(run_field_of "$hl")"
+  H_CLASS="$CC"
+}
 
 read_pid_file() {
-  local f="$1" pid="" start=""
-  P_PID=""; P_START=""
+  local f="$1" pid="" start="" pl=""
+  P_PID=""; P_START=""; P_CLASS=""; P_PRESENT=0
   [ -n "$f" ] && [ -f "$f" ] || return 0
+  P_PRESENT=1
   pid=$(sed -n 's/^pid=\([0-9][0-9]*\).*/\1/p' "$f" | head -n 1)
   start=$(sed -n 's/.*start=\([0-9][0-9]*\).*/\1/p' "$f" | head -n 1)
   if [ -z "$pid" ]; then
@@ -157,6 +237,10 @@ read_pid_file() {
   fi
   P_PID="$pid"
   P_START="$start"
+  pl=$(grep -m 1 '^pid=' "$f" 2>/dev/null || true)
+  [ -n "$pl" ] || pl=$(head -n 1 "$f" 2>/dev/null || true)
+  classify_pair "$(line_field_of "$pl")" "$(run_field_of "$pl")"
+  P_CLASS="$CC"
 }
 
 PID_STATE="missing"
@@ -190,10 +274,11 @@ is_alive() {
 S_EXISTS=0
 S_RC=""
 S_SENT=""
+S_CLASS=""
 
 read_status_file() {
   local f="$1" line=""
-  S_EXISTS=0; S_RC=""; S_SENT=""
+  S_EXISTS=0; S_RC=""; S_SENT=""; S_CLASS=""
   [ -n "$f" ] && [ -f "$f" ] || return 0
   line=$(grep -m 1 '^exit=' "$f" 2>/dev/null || true)
   [ -n "$line" ] || return 0
@@ -201,6 +286,8 @@ read_status_file() {
   S_RC=$(printf '%s\n' "$line" | sed -n 's/^exit=\([0-9][0-9]*\).*/\1/p')
   S_SENT=$(printf '%s\n' "$line" | sed -n 's/.*sentinel=\([01]\).*/\1/p')
   is_uint "$S_RC" || S_RC=0
+  classify_pair "$(line_field_of "$line")" "$(run_field_of "$line")"
+  S_CLASS="$CC"
 }
 
 last_nonempty_line() {
@@ -211,30 +298,61 @@ last_nonempty_line() {
 }
 
 V_LABEL=""; V_VERDICT=""; V_CODE=0; V_REASON=""
-V_PID=""; V_HB=""; V_SENT=""; V_RC=""; V_LAST=""; V_STATUS_RAW=""; V_ELAPSED=0; V_ANOMALY="no"
+V_PID=""; V_HB=""; V_SENT=""; V_RC=""; V_LAST=""; V_STATUS_RAW=""; V_ELAPSED=0; V_ANOMALY="no"; V_ATTR="legacy"
 
 evaluate() {
   local label="$1" pidf="$2" statf="$3" logf="$4" sent="$5" hbf="$6" dl="$7"
   local now pid start pid_alive=0 pid_state="missing" hb_state="na" sent_state="na"
   local last="" anomaly=0 s_exists=0 s_rc="" s_sent=""
   local verdict="RUNNING" code="$EXIT_RUNNING" reason="" age=0 mt=0
+  local pid_class="" status_class="" log_class="" sent_own=0
 
   now=$(now_epoch)
-  read_pid_file "$pidf"; pid="$P_PID"; start="$P_START"
+  read_pid_file "$pidf"; pid="$P_PID"; start="$P_START"; pid_class="$P_CLASS"
+  if [ -n "$LINE_ID" ] && [ "$pid_class" != "own" ]; then
+    pid=""; start=""
+  fi
   if [ -n "$pid" ]; then
     if is_alive "$pid" "$start"; then pid_alive=1; fi
     pid_state="$PID_STATE"
   fi
 
-  read_status_file "$statf"; s_exists="$S_EXISTS"; s_rc="$S_RC"; s_sent="$S_SENT"
+  read_status_file "$statf"; s_exists="$S_EXISTS"; s_rc="$S_RC"; s_sent="$S_SENT"; status_class="$S_CLASS"
+  if [ -n "$LINE_ID" ] && [ "$status_class" != "own" ]; then
+    s_exists=0; s_rc=""; s_sent=""
+  fi
+  read_meta_file "$META"
+  read_heartbeat_envelope "$hbf"
   last=$(last_nonempty_line "$logf")
-  case "$last" in ANOMALY:*) anomaly=1 ;; esac
+  if [ "$M_EXISTS" -eq 1 ]; then
+    log_class="$M_CLASS"
+  elif [ "$S_EXISTS" -eq 1 ]; then
+    log_class="$status_class"
+  else
+    log_class="unattributed"
+  fi
+  case "$last" in
+    ANOMALY:*)
+      if [ -z "$LINE_ID" ] || [ "$log_class" = "own" ]; then anomaly=1; fi
+      ;;
+  esac
 
   if [ -n "$sent" ]; then
-    if [ "$last" = "$sent" ] || [ "$s_sent" = "1" ]; then
-      sent_state="yes"
+    if [ -z "$LINE_ID" ]; then
+      if [ "$last" = "$sent" ] || [ "$s_sent" = "1" ]; then
+        sent_state="yes"
+      else
+        sent_state="no"
+      fi
     else
-      sent_state="no"
+      if [ "$s_exists" -eq 1 ] && [ "$s_sent" = "1" ]; then
+        sent_own=1
+      elif [ "$M_EXISTS" -eq 1 ] && [ "$M_CLASS" = "own" ] && [ "$M_SENT" = "1" ] && [ "$last" = "$sent" ]; then
+        sent_own=1
+      elif [ "$s_exists" -eq 1 ] && [ "$M_EXISTS" -eq 0 ] && [ "$last" = "$sent" ]; then
+        sent_own=1
+      fi
+      [ "$sent_own" -eq 1 ] && sent_state="yes" || sent_state="no"
     fi
   fi
 
@@ -243,7 +361,9 @@ evaluate() {
       mt=$(file_mtime "$hbf")
       if is_uint "$mt" && [ "$mt" -gt 0 ]; then
         age=$((now - mt))
-        if [ "$age" -gt "$HEARTBEAT_MAX_AGE" ]; then hb_state="stale"; else hb_state="fresh"; fi
+        if [ -n "$LINE_ID" ] && [ "$H_CLASS" != "own" ]; then
+          hb_state="na"
+        elif [ "$age" -gt "$HEARTBEAT_MAX_AGE" ]; then hb_state="stale"; else hb_state="fresh"; fi
       else
         hb_state="missing"
       fi
@@ -300,18 +420,33 @@ evaluate() {
   V_RC="${s_rc:-na}"; V_LAST="$last"; V_STATUS_RAW=""
   [ "$anomaly" -eq 1 ] && V_ANOMALY="observed" || V_ANOMALY="no"
   [ "$s_exists" -eq 1 ] && V_STATUS_RAW="exit=$s_rc sentinel=${s_sent:-na}"
+  if [ -z "$LINE_ID" ]; then
+    V_ATTR="legacy"
+  elif [ "$S_EXISTS" -eq 1 ]; then
+    V_ATTR="$status_class"
+  elif [ "$M_EXISTS" -eq 1 ]; then
+    V_ATTR="$M_CLASS"
+  elif [ "$HB_EXISTS" -eq 1 ]; then
+    V_ATTR="$H_CLASS"
+  elif [ "$P_PRESENT" -eq 1 ]; then
+    V_ATTR="$pid_class"
+  else
+    V_ATTR="unattributed"
+  fi
   V_ELAPSED=$((now - START_EPOCH))
 }
 
 format_verdict() {
-  printf 'WATCH label=%s verdict=%s pid=%s heartbeat=%s anomaly=%s sentinel=%s rc=%s elapsed=%s reason=%s' \
-    "$V_LABEL" "$V_VERDICT" "$V_PID" "$V_HB" "$V_ANOMALY" "$V_SENT" "$V_RC" "$V_ELAPSED" "$V_REASON"
+  printf 'WATCH label=%s verdict=%s pid=%s heartbeat=%s anomaly=%s sentinel=%s rc=%s elapsed=%s reason=%s line=%s run=%s attribution=%s' \
+    "$V_LABEL" "$V_VERDICT" "$V_PID" "$V_HB" "$V_ANOMALY" "$V_SENT" "$V_RC" "$V_ELAPSED" "$V_REASON" \
+    "$LINE_ID" "$RUN_ID" "$V_ATTR"
 }
 
 format_evidence() {
   local last
   last=$(one_line "$V_LAST" | tr '"' "'")
-  printf 'EVIDENCE label=%s last="%s" status="%s"' "$V_LABEL" "$last" "$V_STATUS_RAW"
+  printf 'EVIDENCE label=%s last="%s" status="%s" line=%s run=%s attribution=%s' \
+    "$V_LABEL" "$last" "$V_STATUS_RAW" "$LINE_ID" "$RUN_ID" "$V_ATTR"
 }
 
 emit_single() {
@@ -325,12 +460,23 @@ normalize_field() {
   if [ "$1" = "-" ]; then printf ''; else printf '%s' "$1"; fi
 }
 
+maybe_renew_lease() {
+  [ -n "$LEASE_RENEW_CMD" ] || return 0
+  local now
+  now=$(now_epoch)
+  if [ "$LAST_LEASE_RENEW" -eq 0 ] || [ "$((now - LAST_LEASE_RENEW))" -ge "$LEASE_RENEW_INTERVAL" ]; then
+    bash -c "$LEASE_RENEW_CMD" >/dev/null 2>&1 || true
+    LAST_LEASE_RENEW=$now
+  fi
+}
+
 run_single() {
   START_EPOCH=$(now_epoch)
   if [ -n "$TIMEOUT" ]; then DEADLINE_EPOCH=$((START_EPOCH + TIMEOUT)); fi
   [ "$ONCE" -eq 1 ] && WINDOW=0
   local window_end=$((START_EPOCH + WINDOW)) now remaining sleep_for
   while :; do
+    maybe_renew_lease
     evaluate "$LABEL" "$PID_FILE" "$STATUS_FILE" "$LOG_FILE" "$SENTINEL" "$HEARTBEAT" "$DEADLINE_EPOCH"
     if [ "$V_CODE" -ne "$EXIT_RUNNING" ]; then
       emit_single
@@ -384,6 +530,7 @@ run_manifest() {
   local -a result_lines evidence_lines
   local any_terminal worst worst_sev sev
   while :; do
+    maybe_renew_lease
     result_lines=(); evidence_lines=(); any_terminal=0; worst="$EXIT_RUNNING"; worst_sev=1
     for i in "${!M_LABEL[@]}"; do
       local dl="${M_DL[$i]}"
@@ -448,6 +595,20 @@ self_test() {
       bad "$name" "exit $rc != $want_rc; output: $out"
     elif ! printf '%s\n' "$out" | grep -q "verdict=$want_verdict"; then
       bad "$name" "missing verdict=$want_verdict; output: $out"
+    else
+      ok "$name"
+    fi
+  }
+
+  check_attr() {
+    local name="$1" want_rc="$2" want_verdict="$3" want_attr="$4" r="$5"
+    local rc="${r%%$'\n'*}" out="${r#*$'\n'}"
+    if [ "$rc" -ne "$want_rc" ]; then
+      bad "$name" "exit $rc != $want_rc; output: $out"
+    elif ! printf '%s\n' "$out" | grep -q "verdict=$want_verdict"; then
+      bad "$name" "missing verdict=$want_verdict; output: $out"
+    elif ! printf '%s\n' "$out" | grep -q "attribution=$want_attr"; then
+      bad "$name" "missing attribution=$want_attr; output: $out"
     else
       ok "$name"
     fi
@@ -597,6 +758,59 @@ PY
     bad "manifest" "rc=$mrc out=$mout"
   else
     ok "manifest"
+  fi
+
+  # 13b. attribution: own / foreign / stale-run / unattributed / legacy
+  sleep 8 & local attr_live=$!
+  disown "$attr_live" 2>/dev/null || true
+  ST_SPAWNED+=("$attr_live")
+  local attr_ticks=""
+  [ -r "/proc/$attr_live/stat" ] && attr_ticks=$(awk '{print $22}' "/proc/$attr_live/stat")
+  printf 'PLAN-DONE\n' > "$base/logattr"
+  printf 'exit=0 at=1 sentinel=1 line=L1 run=R1 stage=plan event=status\n' > "$base/statusattr"
+  printf 'pid=%s start=%s at=1 line=L1 run=R1 stage=plan event=pid\n' "$attr_live" "$attr_ticks" > "$base/pidattr"
+  printf 'at=1 line=L1 run=R1 stage=plan event=heartbeat\n' > "$base/hbattr"
+  printf '{"line_id":"L1","run_id":"R1","stage":"plan","event":"log-terminal","at":1,"sentinel_seen":1,"exit":0}\n' > "$base/metaattr"
+  r=$(watch --label attr-own --line-id L1 --run-id R1 \
+    --pid-file "$base/pidattr" --status-file "$base/statusattr" --log "$base/logattr" \
+    --sentinel PLAN-DONE --heartbeat "$base/hbattr" --meta "$base/metaattr" --window 0 --start-grace 0)
+  check_attr "attribution-own" 0 DONE own "$r"
+
+  printf 'exit=0 at=1 sentinel=1 line=L2 run=R2 stage=plan event=status\n' > "$base/statusforeign"
+  printf '{"line_id":"L2","run_id":"R2","stage":"plan","event":"log-terminal","at":1,"sentinel_seen":1,"exit":0}\n' > "$base/metaforeign"
+  r=$(watch --label attr-foreign --line-id L1 --run-id R1 \
+    --pid-file "$base/pidattr" --status-file "$base/statusforeign" --log "$base/logattr" \
+    --sentinel PLAN-DONE --heartbeat "$base/hbattr" --meta "$base/metaforeign" --window 0 --start-grace 0)
+  check_attr "attribution-foreign-not-consumed" 10 RUNNING foreign "$r"
+
+  printf 'exit=0 at=1 sentinel=1 line=L1 run=R0 stage=plan event=status\n' > "$base/statusstale"
+  printf '{"line_id":"L1","run_id":"R0","stage":"plan","event":"log-terminal","at":1,"sentinel_seen":1,"exit":0}\n' > "$base/metastale"
+  r=$(watch --label attr-stale --line-id L1 --run-id R1 \
+    --pid-file "$base/pidattr" --status-file "$base/statusstale" --log "$base/logattr" \
+    --sentinel PLAN-DONE --heartbeat "$base/hbattr" --meta "$base/metastale" --window 0 --start-grace 0)
+  check_attr "attribution-stale-run" 10 RUNNING stale-run "$r"
+
+  printf 'exit=0 at=1 sentinel=1\n' > "$base/statusunattr"
+  r=$(watch --label attr-unattr --line-id L1 --run-id R1 \
+    --pid-file "$base/pidattr" --status-file "$base/statusunattr" --log "$base/logattr" \
+    --sentinel PLAN-DONE --heartbeat "$base/hbattr" --window 0 --start-grace 0)
+  check_attr "attribution-unattributed" 10 RUNNING unattributed "$r"
+
+  r=$(watch --label attr-legacy --pid-file "$base/pidattr" --status-file "$base/statusattr" \
+    --log "$base/logattr" --sentinel PLAN-DONE --heartbeat "$base/hbattr" --window 0 --start-grace 0)
+  check_attr "attribution-legacy" 0 DONE legacy "$r"
+
+  # 13c. lease renewal hook fires inside a watch window
+  : > "$base/renewed"
+  r=$(watch --label lease-renew --line-id L1 --run-id R1 \
+    --pid-file "$base/pidattr" --status-file "$base/none13" --log "$base/none13" \
+    --sentinel PLAN-DONE --window 2 --interval 1 --start-grace 0 \
+    --lease-renew-cmd "printf x >> '$base/renewed'" --lease-renew-interval 1)
+  local renew_rc="${r%%$'\n'*}"
+  if [ "$renew_rc" -eq 10 ] && [ -s "$base/renewed" ]; then
+    ok "lease-renew-hook"
+  else
+    bad "lease-renew-hook" "rc=$renew_rc renewed=$(wc -c < "$base/renewed" 2>/dev/null || echo 0)"
   fi
 
   # 14. demonstrate the pgrep -c zero-match trap (regression knowledge; the

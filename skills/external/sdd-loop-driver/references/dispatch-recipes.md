@@ -28,18 +28,21 @@
 # /home/<run-user>/run-<line>-<stage>.sh
 #!/usr/bin/env bash
 set -u
-line=<line>; stage=<stage>; sentinel="<STAGE>-DONE"
+line=<line>; run=<run>; stage=<stage>; sentinel="<STAGE>-DONE"
 dir=/home/<run-user>
 pidf="$dir/pid-$line-$stage"; status="$dir/status-$line-$stage"
 log="$dir/log-$line-$stage.log"; hb="$dir/heartbeat-$line-$stage.log"
+meta="$dir/log-$line-$stage.log.meta.jsonl"; prompt_meta="$dir/prompt-$line-$stage.md.meta.json"
 runner_pid=$$
 write_atomic() { local tmp="$1.tmp.$$"; printf '%s\n' "$2" > "$tmp" && mv "$tmp" "$1"; }
 start_ticks=$(awk '{print $22}' "/proc/$$/stat" 2>/dev/null || true)
-write_atomic "$pidf" "pid=$runner_pid start=$start_ticks at=$(date +%s)"
+write_atomic "$pidf" "pid=$runner_pid start=$start_ticks at=$(date +%s) line=$line run=$run stage=$stage event=pid"
+printf '{"line_id":"%s","run_id":"%s","stage":"%s","event":"log-start","at":%s}\n' \
+  "$line" "$run" "$stage" "$(date +%s)" >> "$meta"
 
 # 心跳随 runner 死亡而退出，避免孤儿心跳伪造存活
 ( while kill -0 "$runner_pid" 2>/dev/null; do
-    write_atomic "$hb" "$(date +%s)"
+    write_atomic "$hb" "at=$(date +%s) line=$line run=$run stage=$stage event=heartbeat"
     sleep 30
   done ) &
 hb_pid=$!
@@ -51,7 +54,9 @@ finish() {
   kill "$hb_pid" 2>/dev/null || true
   last=$(tail -n 50 "$log" 2>/dev/null | awk 'NF{line=$0} END{print line}' | tr -d '\r' | sed 's/[[:space:]]*$//')
   sent=0; [ "$last" = "$sentinel" ] && sent=1
-  write_atomic "$status" "exit=$rc at=$(date +%s) sentinel=$sent"
+  write_atomic "$status" "exit=$rc at=$(date +%s) sentinel=$sent line=$line run=$run stage=$stage event=status"
+  printf '{"line_id":"%s","run_id":"%s","stage":"%s","event":"log-terminal","at":%s,"sentinel_seen":%s,"exit":%s}\n' \
+    "$line" "$run" "$stage" "$(date +%s)" "$sent" "$rc" >> "$meta"
   exit "$rc"
 }
 trap 'finish $?' EXIT
@@ -62,9 +67,10 @@ cd "<project-dir>" || exit 127
 
 要点：
 
-- **退出记录是完成的主事件**：`status-…` 原子写入 `exit=<rc> at=<epoch> sentinel=<0|1>`；驱动者优先读退出记录，而不是猜测进程状态。
-- **PID 文件是存活的唯一权威**：`pid + start ticks` 供 `kill -0`、僵尸检测与 PID 复用校验；禁止用 `pgrep -c` 计数推断存活或完成（零匹配陷阱见 `watch-model.md` §7）。
-- **心跳只证明 runner 外壳活着**：心跳循环以 `kill -0 "$runner_pid"` 为条件，外壳死亡即停跳；子代理是否卡死仍由阶段 deadline 判定。
+- **退出记录是完成的主事件**：`status-…` 原子写入 `exit=<rc> at=<epoch> sentinel=<0|1>`，并在行尾追加归属信封 `line= run= stage= event=status`；驱动者优先读退出记录，而不是猜测进程状态。
+- **PID 文件是存活的唯一权威**：`pid + start ticks` 供 `kill -0`、僵尸检测与 PID 复用校验；PID 行同样携带信封。禁止用 `pgrep -c` 计数推断存活或完成（零匹配陷阱见 `watch-model.md` §7）。
+- **归属信封只走旁路**：日志正文零改动；`log-<line>-<stage>.log.meta.jsonl` 在启动与终止各追加一条 JSON（终止条含 `sentinel_seen`/`exit`），`prompt-<line>-<stage>.md.meta.json` 是派发前写入的静态信封。哨兵仍是日志最后一个非空行。
+- **心跳只证明 runner 外壳活着**：心跳循环以 `kill -0 "$runner_pid"` 为条件，外壳死亡即停跳；每跳行尾带 `line= run= stage= event=heartbeat`。子代理是否卡死仍由阶段 deadline 判定。
 - **日志最后非空行**是哨兵判据；`-p` 缓冲模式下日志在退出前静默属预期，由退出记录提供提前事件。
 - 下一阶段 runner 用 `sed` 替换上一阶段 runner 的提示词/哨兵字面量派生——runner 形态跨阶段恒同，避免重复维护整套脚本。
 
@@ -129,6 +135,45 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
 
 - **本地拓扑**：项目在本机时省略 ssh/su，直接以本地项目为工作目录执行 runner；需求上下文先写简报文件（`/tmp/<topic>-sdd-brief.md`），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」——命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5（本配方坍缩为引用）。监听同样走 `watch-target.sh`，只是去掉 ssh/su 层（`watch-model.md` §6）。
 - **构建固化变体**：同一主机按角色分线（不同系统用户在各自目录固化不同层），仅经入口参数（执行身份、路径）区分，机制零新增分支——形态见同文件 § Recipe 6。
+
+## Recipe 6 — 线路登记、归属信封与消息入口（Feature 064）
+
+**环境级 Line Registry**：同一 OS 用户一份，缺省 `${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines`，`SPECIFY_LINE_REGISTRY_DIR` 可覆盖；每线一个 `<line_id>.json`，同线更新以 `<line_id>.lock` 排他锁串行化，写入为临时文件 + `fsync` + `os.replace` 原子替换。引擎无框架依赖：`scripts/line-registry.py`（Python 3 stdlib-only）。
+
+**U0.5 注册（首次派发前）**：
+
+```bash
+python3 <skill-dir>/scripts/line-registry.py --action register \
+  --line-id <line> --run-id <run> --project-dir <project-dir> --repo-root <repo-root> \
+  --state active [--write-line --manifest <manifest> --worktree-path <wt> \
+  --branch line/<line> --base-sha <sha>] --format json
+```
+
+注册失败（目录不可写、JSON 损坏）→ 显式上送并停止该线启动；不得回退到项目内共享路径。
+
+**U6 注销（收尾后）**：`--action deregister --line-id <line> --reason <reason>`；closed 条目保留历史字段，`list --active` 不再返回。
+
+**Watcher 归属参数**：每个监听窗口追加 `--line-id <line> --run-id <run> --meta <log-…meta.jsonl>`；输出行追加 `line= run= attribution=own|foreign|stale-run|unattributed|legacy`。只有 `own` 事件参与判定；`foreign`/`stale-run`/`unattributed` 只出现在摘要，不改变 verdict、进度或 Registry 状态。未提供归属参数时保持 058 兼容（`attribution=legacy`，无过滤）。
+
+**持 lease 的监听窗口（I-19）**：持有 driver lease 时，`--window` MUST ≤ `ttl_seconds/3`（缺省 ≤200s），或给 watcher 传窗口内续租钩子：
+
+```bash
+... watch-target.sh ... --line-id <line> --run-id <run> --meta <meta> \
+  --lease-renew-cmd "python3 <skill-dir>/scripts/line-registry.py --action lease-renew --line-id <line> --session <session>" \
+  --lease-renew-interval 60
+```
+
+**消息入口（无标识消息）**：归属判定下沉为确定性动作，驱动只呈现结果：
+
+```bash
+python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message "<user message>" [--clarified]
+```
+
+- 活动线 = `active|waiting`；0 条 → `no-active`；恰好 1 条且无标识 → `route`；
+- ≥2 条且无可识别标识 → `clarify`：**恰好一个问题**并列候选（line_id / project / branch / stage / state）；
+- 用户回答仍不唯一（`--clarified`）→ `ambiguous-stop`：列候选并停止，不再问第二个问题；
+- 可识别标识 = 显式 `line_id` token，或唯一匹配的 project/repo 路径或分支名。
+- **禁止**用 `ps`/`pgrep`/进程名/cwd/环境态推断归属；一次澄清不阻断其他线路。
 
 ## Boundary
 

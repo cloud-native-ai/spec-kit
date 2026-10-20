@@ -1,0 +1,1260 @@
+#!/usr/bin/env python3
+"""line-registry.py — environment Line Registry / envelope / lifecycle engine.
+
+Feature 064.  Python 3.8+ stdlib only.  One file owns the file-based state:
+
+  * per-line registry entry   $REGISTRY/<line_id>.json   (atomic replace)
+  * same-line lock            $REGISTRY/<line_id>.lock   (fcntl.flock)
+  * ownership manifest        $REGISTRY/manifests/<line_id>.json
+  * driver lease              $REGISTRY/<line_id>.driver.lock
+  * stage reservation         $REGISTRY/reservations/<line_id>.<stage>.json
+
+Exit codes: 0 ok, 2 usage/validation, 3 held by an active resource,
+4 identity cannot be computed, 6 registry I/O or corruption.
+"""
+from __future__ import annotations
+
+import argparse
+import contextlib
+import errno
+import fcntl
+import hashlib
+import json
+import os
+import re
+import secrets
+import shutil
+import socket
+import stat
+import subprocess
+import sys
+import tempfile
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+SCHEMA_VERSION = 1
+EXIT_OK = 0
+EXIT_USAGE = 2
+EXIT_HELD = 3
+EXIT_NO_IDENTITY = 4
+EXIT_IO = 6
+
+LINE_ID_RE = re.compile(r"^[a-z0-9][A-Za-z0-9-]{7,63}$")
+RUN_ID_RE = re.compile(r"^r[0-9]{8}T[0-9]{6}Z-[0-9a-f]{4}$")
+SLUG_RE = re.compile(r"[^a-z0-9]+")
+
+STATE_VALUES = {"active", "waiting", "stalled", "completed", "orphaned", "stale", "closed"}
+ACTIVE_STATES = {"active", "waiting"}
+HOLDING_STATES = {"active", "completed"}
+EVENT_VALUES = {
+    "prompt", "pid", "heartbeat", "status", "log-start", "log-terminal",
+    "watcher-verdict", "monitor", "registry-update", "integration",
+}
+ATTRIBUTION_VALUES = {"own", "foreign", "stale-run", "unattributed", "legacy"}
+WAITING_REASONS = {"ownership-overlap", "concurrency-cap"}
+INTEGRATION_RESULTS = {"merged", "failed"}
+DEFAULT_TTL = 600
+DEFAULT_LOCK_TIMEOUT = 10.0
+DEFAULT_PORT_START = 39000
+DEFAULT_BLOCK_SIZE = 20
+DEFAULT_CONCURRENCY_CAP = 4
+RUNTIME_RECORD_DIRS = (
+    Path(".specify") / "memory" / "feedback",
+    Path(".specify") / "memory" / "session",
+    Path(".specify") / "memory" / "knowledge",
+    Path(".specify") / "memory" / "exec-quant",
+)
+
+ACTIONS = {
+    "register", "update", "deregister", "list", "resolve-message",
+    "verify-identity", "classify-remote", "reattach-brief",
+    "lease-acquire", "lease-renew", "lease-release", "lease-break",
+    "reserve", "reservation-status", "reservation-break",
+    "orphan-check", "ownership-check", "release-ownership", "promote-waiting",
+    "integration-enqueue", "integration-plan", "integration-record",
+    "allocate-resources", "archive-runtime",
+}
+
+
+class EngineError(Exception):
+    def __init__(self, code: int, message: str, **extra):
+        super().__init__(message)
+        self.code = code
+        self.message = message
+        self.extra = extra
+
+
+class LockTimeout(EngineError):
+    def __init__(self, path: Path, timeout: float):
+        super().__init__(
+            EXIT_HELD,
+            f"timed out after {timeout}s waiting for lock {path}",
+            path=str(path),
+        )
+
+
+class RegistryIOError(EngineError):
+    def __init__(self, path: Path, message: str):
+        super().__init__(EXIT_IO, message, path=str(path))
+
+
+# ---------------------------------------------------------------- primitives
+
+
+def now_epoch() -> int:
+    return int(time.time())
+
+
+def now_iso(at: int | None = None) -> str:
+    return datetime.fromtimestamp(at if at is not None else time.time(), timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
+
+
+def utc_stamp(at: float | None = None) -> str:
+    return time.strftime("%Y%m%dT%H%M%SZ", time.gmtime(at if at is not None else time.time()))
+
+
+def slugify(value: str, limit: int = 20) -> str:
+    slug = SLUG_RE.sub("-", str(value).lower()).strip("-")
+    slug = slug[:limit].strip("-")
+    return slug or "line"
+
+
+def generate_line_id(project_dir: Path, now: float | None = None) -> str:
+    return f"{slugify(Path(project_dir).name)}-{utc_stamp(now)}-{secrets.token_hex(2)}"
+
+
+def generate_run_id(now: float | None = None) -> str:
+    return f"r{utc_stamp(now)}-{secrets.token_hex(2)}"
+
+
+def resolve_registry_dir() -> Path:
+    override = os.environ.get("SPECIFY_LINE_REGISTRY_DIR")
+    if override:
+        return Path(override).expanduser().resolve()
+    xdg = os.environ.get("XDG_STATE_HOME")
+    if xdg:
+        return Path(xdg).expanduser().resolve() / "spec-kit" / "lines"
+    home = Path(os.environ.get("HOME", "~")).expanduser().resolve()
+    return home / ".local" / "state" / "spec-kit" / "lines"
+
+
+def resolve_runtime_dir() -> Path:
+    override = os.environ.get("SPECIFY_LINE_RUNTIME_DIR")
+    if override:
+        return Path(override).expanduser().resolve()
+    return Path(os.environ.get("HOME", "~")).expanduser().resolve()
+
+
+def ensure_registry_dir(path: Path) -> None:
+    try:
+        path.mkdir(mode=0o700, parents=True, exist_ok=True)
+    except OSError as exc:
+        raise RegistryIOError(path, f"cannot create registry dir: {exc}")
+    if not os.access(path, os.W_OK | os.X_OK):
+        raise RegistryIOError(path, "registry dir is not writable")
+
+
+def _fsync_dir(path: Path) -> None:
+    try:
+        fd = os.open(str(path), os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(fd)
+    except OSError:
+        pass
+    finally:
+        os.close(fd)
+
+
+def atomic_write_json(path: Path, data: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(data, sort_keys=True, ensure_ascii=False, indent=2) + "\n"
+    fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent))
+    tmp = Path(tmp_name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(payload)
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, path)
+        _fsync_dir(path.parent)
+    except OSError as exc:
+        with contextlib.suppress(OSError):
+            tmp.unlink()
+        raise RegistryIOError(path, f"cannot write registry entry: {exc}")
+
+
+def exclusive_write_json(path: Path, data: dict) -> None:
+    """Atomic create that refuses to overwrite (V-LR-2)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(data, sort_keys=True, ensure_ascii=False, indent=2) + "\n"
+    fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent))
+    tmp = Path(tmp_name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(payload)
+            fh.flush()
+            os.fsync(fh.fileno())
+        try:
+            os.link(tmp, path)
+        except FileExistsError:
+            raise EngineError(EXIT_USAGE, f"line already exists: {path}", path=str(path))
+        _fsync_dir(path.parent)
+    except OSError as exc:
+        raise RegistryIOError(path, f"cannot create registry entry: {exc}")
+    finally:
+        with contextlib.suppress(OSError):
+            tmp.unlink()
+
+
+def read_json(path: Path) -> dict:
+    try:
+        with path.open("r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except FileNotFoundError:
+        raise
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RegistryIOError(path, f"unreadable registry JSON: {exc}")
+    if not isinstance(data, dict):
+        raise RegistryIOError(path, "registry entry is not a JSON object")
+    return data
+
+
+def read_json_optional(path: Path) -> dict | None:
+    try:
+        return read_json(path)
+    except FileNotFoundError:
+        return None
+
+
+def append_jsonl(path: Path, record: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    line = json.dumps(record, sort_keys=True, ensure_ascii=False) + "\n"
+    try:
+        with path.open("a", encoding="utf-8") as fh:
+            fh.write(line)
+            fh.flush()
+            os.fsync(fh.fileno())
+    except OSError as exc:
+        raise RegistryIOError(path, f"cannot append history: {exc}")
+
+
+@contextlib.contextmanager
+def line_lock(lock_path: Path, timeout: float = DEFAULT_LOCK_TIMEOUT):
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    fh = open(lock_path, "a+")
+    deadline = time.time() + timeout
+    try:
+        while True:
+            try:
+                fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except OSError as exc:
+                if exc.errno not in (errno.EACCES, errno.EAGAIN):
+                    raise
+                if time.time() >= deadline:
+                    raise LockTimeout(lock_path, timeout)
+                time.sleep(0.05)
+        yield
+    finally:
+        with contextlib.suppress(OSError):
+            fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
+        fh.close()
+
+
+def entry_path(reg: Path, line_id: str) -> Path:
+    return reg / f"{line_id}.json"
+
+
+def lock_path(reg: Path, line_id: str) -> Path:
+    return reg / f"{line_id}.lock"
+
+
+def manifest_path(reg: Path, line_id: str) -> Path:
+    return reg / "manifests" / f"{line_id}.json"
+
+
+def lease_path(reg: Path, line_id: str) -> Path:
+    return reg / f"{line_id}.driver.lock"
+
+
+def lease_history_path(reg: Path, line_id: str) -> Path:
+    return reg / f"{line_id}.lease-history.jsonl"
+
+
+def reservation_path(reg: Path, line_id: str, stage: str) -> Path:
+    return reg / "reservations" / f"{line_id}.{stage}.json"
+
+
+def reservation_history_path(reg: Path, line_id: str, stage: str) -> Path:
+    return reg / "reservations" / f"{line_id}.{stage}.reservation-history.jsonl"
+
+
+# ---------------------------------------------------------------- process identity
+
+
+def process_start_token(pid: int) -> str | None:
+    if pid <= 0:
+        return None
+    stat_path = Path(f"/proc/{pid}/stat")
+    if stat_path.exists():
+        try:
+            fields = stat_path.read_text(encoding="utf-8", errors="replace").split()
+            if len(fields) > 21:
+                return fields[21]
+        except OSError:
+            pass
+    try:
+        proc = subprocess.run(
+            ["ps", "-p", str(pid), "-o", "lstart="],
+            capture_output=True, text=True, timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    token = " ".join(proc.stdout.split())
+    return token or None
+
+
+def process_alive(pid: int | None, token: str | None = None) -> bool:
+    if not pid or pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    if token:
+        actual = process_start_token(pid)
+        if actual is not None and actual != token:
+            return False
+    return True
+
+
+def process_cwd(pid: int) -> Path | None:
+    link = Path(f"/proc/{pid}/cwd")
+    try:
+        return link.resolve()
+    except (OSError, RuntimeError):
+        return None
+
+
+def branch_of(repo: Path) -> str | None:
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(repo), "rev-parse", "--abbrev-ref", "HEAD"],
+            capture_output=True, text=True, timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if proc.returncode != 0:
+        return None
+    value = proc.stdout.strip()
+    return value or None
+
+
+# ---------------------------------------------------------------- validation
+
+
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise EngineError(EXIT_USAGE, message)
+
+
+def validate_line_id(line_id: str) -> str:
+    require(bool(line_id) and bool(LINE_ID_RE.match(line_id)), f"invalid line_id: {line_id!r}")
+    return line_id
+
+
+def validate_run_id(run_id: str) -> str:
+    require(bool(run_id) and bool(RUN_ID_RE.match(run_id)), f"invalid run_id: {run_id!r}")
+    return run_id
+
+
+def validate_state(state: str) -> str:
+    require(state in STATE_VALUES, f"invalid state: {state!r} (expected one of {sorted(STATE_VALUES)})")
+    return state
+
+
+def _check_abs(path_value: str, field: str) -> None:
+    require(bool(path_value), f"{field} is required")
+    require(os.path.isabs(path_value), f"{field} must be an absolute path: {path_value!r}")
+
+
+def _validate_remote(remote: dict) -> None:
+    require(isinstance(remote, dict), "remote must be a JSON object")
+    for key in ("alias", "run_user", "remote_root"):
+        require(bool(remote.get(key)), f"remote.{key} is required")
+
+
+def _validate_runtime_paths(entry: dict) -> None:
+    stage = entry.get("stage")
+    if not stage:
+        return
+    for key in ("prompt_path", "status_path", "log_path", "heartbeat_path"):
+        value = entry.get(key)
+        _check_abs(value or "", key)
+
+
+def _default_runtime_paths(entry: dict) -> None:
+    stage = entry.get("stage")
+    if not stage:
+        return
+    runtime = resolve_runtime_dir()
+    line_id = entry["line_id"]
+    defaults = {
+        "prompt_path": runtime / f"prompt-{line_id}-{stage}.md",
+        "status_path": runtime / f"status-{line_id}-{stage}",
+        "log_path": runtime / f"log-{line_id}-{stage}.log",
+        "heartbeat_path": runtime / f"heartbeat-{line_id}-{stage}.log",
+    }
+    for key, value in defaults.items():
+        entry.setdefault(key, str(value))
+    meta = entry.get("meta_paths")
+    if not isinstance(meta, dict):
+        meta = {}
+    meta.setdefault("prompt", str(runtime / f"prompt-{line_id}-{stage}.md.meta.json"))
+    meta.setdefault("log", str(runtime / f"log-{line_id}-{stage}.log.meta.jsonl"))
+    entry["meta_paths"] = meta
+
+
+def validate_entry(entry: dict) -> dict:
+    for field in ("line_id", "run_id", "project_dir", "repo_root", "driver_session", "cli", "state"):
+        require(bool(entry.get(field)), f"required field missing: {field}")
+    validate_line_id(entry["line_id"])
+    validate_run_id(entry["run_id"])
+    validate_state(entry["state"])
+    _check_abs(entry["project_dir"], "project_dir")
+    _check_abs(entry["repo_root"], "repo_root")
+    state = entry["state"]
+    if state == "waiting":
+        reason = entry.get("waiting_reason")
+        require(reason in WAITING_REASONS, f"waiting requires waiting_reason in {sorted(WAITING_REASONS)}")
+        require(bool(entry.get("queued_at")), "waiting requires queued_at")
+        if reason == "ownership-overlap":
+            require(bool(entry.get("holder_line_id")), "ownership-overlap waiting requires holder_line_id")
+    if state == "closed":
+        require(bool(entry.get("closed_at")), "closed requires closed_at")
+    if entry.get("remote") is not None:
+        _validate_remote(entry["remote"])
+    if entry.get("integration_result") is not None:
+        result = entry["integration_result"]
+        require(isinstance(result, dict), "integration_result must be an object")
+        require(result.get("status") in INTEGRATION_RESULTS,
+                f"integration_result.status must be one of {sorted(INTEGRATION_RESULTS)}")
+    for pid_field, token_field in (
+        ("runner_pid", "runner_start_token"),
+        ("cli_pid", "cli_start_token"),
+    ):
+        if entry.get(pid_field) is not None:
+            require(entry.get(token_field) is not None,
+                    f"{pid_field} requires {token_field}")
+    if entry["state"] == "active" and entry.get("stage"):
+        _validate_runtime_paths(entry)
+        require(entry.get("runner_pid") is not None, "dispatched active entry requires runner_pid")
+        require(entry.get("cli_pid") is not None, "dispatched active entry requires cli_pid")
+    return entry
+
+
+def check_spine_consistency(entry: dict, spine_path: str | None) -> None:
+    if not spine_path:
+        return
+    path = Path(spine_path)
+    if not path.exists():
+        return
+    text = path.read_text(encoding="utf-8", errors="replace")
+    match = re.search(r"^\s*state\s*[:=]\s*([A-Za-z_-]+)", text, re.MULTILINE)
+    if not match:
+        return
+    spine_state = match.group(1)
+    mapping = {
+        "active": {"running", "retrying"},
+        "stalled": {"stalled"},
+        "completed": {"done"},
+    }
+    if entry["state"] in mapping and spine_state not in mapping[entry["state"]]:
+        raise EngineError(
+            EXIT_USAGE,
+            f"registry state {entry['state']!r} contradicts spine state {spine_state!r}",
+            spine=str(path),
+        )
+
+
+# ---------------------------------------------------------------- command context
+
+
+class Context:
+    def __init__(self, args: argparse.Namespace):
+        self.args = args
+        self.reg = resolve_registry_dir()
+
+    def load(self, line_id: str, *, optional: bool = False) -> dict | None:
+        path = entry_path(self.reg, line_id)
+        try:
+            return read_json(path)
+        except FileNotFoundError:
+            if optional:
+                return None
+            raise EngineError(EXIT_NO_IDENTITY, f"registry entry not found: {path}", path=str(path))
+
+    def mutate(self, line_id: str, mutate):
+        ensure_registry_dir(self.reg)
+        with line_lock(lock_path(self.reg, line_id)):
+            entry = self.load(line_id)
+            mutate(entry)
+            entry["updated_at"] = now_iso()
+            validate_entry(entry)
+            atomic_write_json(entry_path(self.reg, line_id), entry)
+            return entry
+
+
+def emit(payload, code: int = EXIT_OK) -> int:
+    print(json.dumps(payload, sort_keys=True, ensure_ascii=False))
+    return code
+
+
+def fail_from(exc: EngineError) -> int:
+    payload = {"ok": False, "error": {"message": exc.message, "code": exc.code, **exc.extra}}
+    if exc.code == EXIT_USAGE:
+        print(json.dumps(payload, sort_keys=True, ensure_ascii=False), file=sys.stderr)
+    else:
+        print(json.dumps(payload, sort_keys=True, ensure_ascii=False))
+    return exc.code
+
+
+# ---------------------------------------------------------------- actions: lifecycle
+
+
+def action_register(ctx: Context) -> int:
+    args = ctx.args
+    ensure_registry_dir(ctx.reg)
+    require(bool(args.project_dir), "register requires --project-dir")
+    require(bool(args.repo_root), "register requires --repo-root")
+    project_dir = Path(args.project_dir).expanduser().resolve()
+    repo_root = Path(args.repo_root).expanduser().resolve()
+    require(project_dir.is_absolute(), "project_dir must be absolute")
+    require(repo_root.is_absolute(), "repo_root must be absolute")
+    line_id = validate_line_id(args.line_id or generate_line_id(project_dir))
+    run_id = validate_run_id(args.run_id or generate_run_id())
+    state = args.state or "active"
+    validate_state(state)
+    require(state in {"active", "waiting"}, "register state must be active or waiting")
+    driver_session = args.driver_session or os.environ.get("SPECIFY_DRIVER_SESSION") or f"pid:{os.getppid()}"
+    cli = args.cli or os.environ.get("DISPATCH_CLI") or "qodercli"
+    at = now_iso()
+    entry = {
+        "schema_version": SCHEMA_VERSION,
+        "line_id": line_id,
+        "run_id": run_id,
+        "project_dir": str(project_dir),
+        "repo_root": str(repo_root),
+        "driver_session": driver_session,
+        "cli": cli,
+        "state": state,
+        "last_event": "registered",
+        "created_at": at,
+        "updated_at": at,
+        "run_history": [],
+    }
+    if args.worktree_path:
+        entry["worktree_path"] = str(Path(args.worktree_path).expanduser().resolve())
+    if args.branch:
+        entry["branch"] = args.branch
+    if args.base_sha:
+        entry["base_sha"] = args.base_sha
+    if args.write_line:
+        require(bool(entry.get("worktree_path")), "--write-line requires --worktree-path")
+        require(bool(entry.get("branch")), "--write-line requires --branch")
+        require(bool(entry.get("base_sha")), "--write-line requires --base-sha")
+        require(bool(args.manifest), "--write-line requires --manifest")
+    if state == "waiting":
+        entry["waiting_reason"] = args.waiting_reason or "ownership-overlap"
+        entry["queued_at"] = args.queued_at or at
+        if entry["waiting_reason"] == "ownership-overlap":
+            require(bool(args.holder_line_id), "--holder-line-id required for ownership-overlap")
+            entry["holder_line_id"] = args.holder_line_id
+    if args.manifest:
+        manifest = load_manifest(Path(args.manifest), line_id, repo_root)
+        entry["owned_paths"] = list(manifest["owned_paths"])
+        entry["ownership_manifest_path"] = str(Path(args.manifest).resolve())
+        if not manifest_path(ctx.reg, line_id).exists():
+            atomic_write_json(manifest_path(ctx.reg, line_id), manifest)
+    elif args.owned_paths:
+        entry["owned_paths"] = json.loads(args.owned_paths)
+    if args.remote:
+        entry["remote"] = json.loads(args.remote)
+    if args.resources:
+        entry["resources"] = json.loads(args.resources)
+    if args.spine:
+        entry["spine_path"] = str(Path(args.spine).expanduser().resolve())
+    validate_entry(entry)
+    exclusive_write_json(entry_path(ctx.reg, line_id), entry)
+    return emit(entry)
+
+
+def _apply_update(entry: dict, args: argparse.Namespace) -> None:
+    previous_run = entry.get("run_id")
+    scalar = {
+        "stage": "stage",
+        "state": "state",
+        "last_event": "last_event",
+        "driver_session": "driver_session",
+        "cli": "cli",
+        "worktree_path": "worktree_path",
+        "branch": "branch",
+        "base_sha": "base_sha",
+        "waiting_reason": "waiting_reason",
+        "holder_line_id": "holder_line_id",
+        "queued_at": "queued_at",
+        "ready_for_merge_at": "ready_for_merge_at",
+        "prompt_path": "prompt_path",
+        "status_path": "status_path",
+        "log_path": "log_path",
+        "heartbeat_path": "heartbeat_path",
+        "ownership_manifest_path": "ownership_manifest_path",
+        "spine_path": "spine_path",
+    }
+    for flag, key in scalar.items():
+        value = getattr(args, flag, None)
+        if value is not None:
+            entry[key] = value
+    if args.run_id:
+        validate_run_id(args.run_id)
+        if previous_run and args.run_id != previous_run:
+            history = entry.setdefault("run_history", [])
+            history.append({
+                "run_id": previous_run,
+                "started_at": entry.get("created_at") or entry.get("updated_at") or now_iso(),
+                "ended_at": now_iso(),
+                "outcome": "superseded",
+            })
+        entry["run_id"] = args.run_id
+    if args.state is not None:
+        validate_state(args.state)
+        require(args.state != "closed", "use deregister to close a line")
+        if args.state == "active":
+            for key in ("waiting_reason", "holder_line_id", "queued_at"):
+                entry.pop(key, None)
+    for pid_field, token_field in (
+        ("runner_pid", "runner_start_token"),
+        ("cli_pid", "cli_start_token"),
+    ):
+        pid = getattr(args, pid_field)
+        token = getattr(args, token_field)
+        if pid is not None:
+            pid = int(pid)
+            entry[pid_field] = pid
+            if token is None:
+                token = process_start_token(pid)
+                require(token is not None, f"cannot derive start token for {pid_field}={pid}; pass {token_field}")
+            entry[token_field] = token
+        elif token is not None:
+            entry[token_field] = token
+    bools = {
+        "merge_ready": args.merge_ready,
+        "worktree_retained": args.worktree_retained,
+    }
+    for key, raw in bools.items():
+        if raw is not None:
+            entry[key] = _parse_bool(raw)
+    json_fields = {
+        "meta_paths": args.meta_json,
+        "integration_result": args.integration_result,
+        "resources": args.resources,
+        "remote": args.remote,
+        "owned_paths": args.owned_paths,
+    }
+    for key, raw in json_fields.items():
+        if raw is not None:
+            entry[key] = json.loads(raw)
+    if args.stage:
+        _default_runtime_paths(entry)
+    if args.merge_ready is not None:
+        merge_ready = _parse_bool(args.merge_ready)
+        if merge_ready:
+            require(entry.get("state") == "completed", "merge_ready requires state=completed")
+            entry.setdefault("ready_for_merge_at", now_iso())
+        else:
+            entry.pop("ready_for_merge_at", None)
+
+
+def _parse_bool(raw) -> bool:
+    if isinstance(raw, bool):
+        return raw
+    value = str(raw).strip().lower()
+    require(value in {"true", "false", "1", "0", "yes", "no"},
+            f"invalid boolean: {raw!r}")
+    return value in {"true", "1", "yes"}
+
+
+def action_update(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    entry = ctx.load(line_id)
+
+    def mutate(data):
+        _apply_update(data, args)
+        if args.spine:
+            check_spine_consistency(data, args.spine)
+        elif data.get("spine_path"):
+            check_spine_consistency(data, data["spine_path"])
+
+    return emit(ctx.mutate(line_id, mutate))
+
+
+def action_deregister(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(bool(args.reason), "deregister requires --reason")
+
+    def mutate(entry):
+        entry["state"] = "closed"
+        entry["closed_at"] = now_iso()
+        entry["last_event"] = args.reason
+        entry.pop("waiting_reason", None)
+        entry.pop("holder_line_id", None)
+        worktree = entry.get("worktree_path")
+        merged = ((entry.get("integration_result") or {}).get("status") == "merged")
+        if args.worktree_retained is not None:
+            entry["worktree_retained"] = _parse_bool(args.worktree_retained)
+        elif worktree:
+            entry["worktree_retained"] = bool(Path(worktree).exists()) and not merged
+        entry.setdefault("run_history", []).append({
+            "run_id": entry["run_id"],
+            "started_at": entry.get("created_at") or now_iso(),
+            "ended_at": now_iso(),
+            "outcome": args.reason,
+        })
+
+    entry = ctx.mutate(line_id, mutate)
+    _release_resources_for_line(ctx.reg, line_id, reason=args.reason)
+    return emit(entry)
+
+
+def _release_resources_for_line(reg: Path, line_id: str, reason: str) -> None:
+    lease = lease_path(reg, line_id)
+    if lease.exists():
+        record = read_json_optional(lease)
+        append_jsonl(lease_history_path(reg, line_id), {
+            "event": "released", "reason": reason, "at": now_iso(), "holder": record,
+        })
+        with contextlib.suppress(OSError):
+            lease.unlink()
+    reservations = reg / "reservations"
+    if reservations.exists():
+        for path in sorted(reservations.glob(f"{line_id}.*.json")):
+            if ".reservation-history" in path.name:
+                continue
+            stage = path.name[len(line_id) + 1:-len(".json")]
+            try:
+                append_jsonl(
+                    reservation_history_path(reg, line_id, stage),
+                    {"event": "released", "reason": reason, "at": now_iso()},
+                )
+            except RegistryIOError:
+                pass
+            with contextlib.suppress(OSError):
+                path.unlink()
+
+
+def action_list(ctx: Context) -> int:
+    args = ctx.args
+    ensure_registry_dir(ctx.reg)
+    summaries = []
+    for path in sorted(ctx.reg.glob("*.json")):
+        entry = read_json(path)
+        if args.active and entry.get("state") not in ACTIVE_STATES:
+            continue
+        summaries.append({
+            "line_id": entry.get("line_id"),
+            "run_id": entry.get("run_id"),
+            "project_dir": entry.get("project_dir"),
+            "branch": entry.get("branch"),
+            "stage": entry.get("stage"),
+            "state": entry.get("state"),
+            "updated_at": entry.get("updated_at"),
+        })
+    return emit(summaries)
+
+
+# ---------------------------------------------------------------- envelope / ingress
+
+
+LINE_TOKEN_RE = re.compile(r"(?<![A-Za-z0-9_-])([a-z0-9][A-Za-z0-9-]{7,63})(?![A-Za-z0-9_-])")
+GENERATED_LINE_SHAPE = re.compile(r"^[a-z0-9][A-Za-z0-9-]*-[0-9]{8}T[0-9]{6}Z-[0-9a-f]{4}$")
+
+
+def classify_envelope(
+    carrier_line: str | None,
+    carrier_run: str | None,
+    target_line: str | None,
+    target_run: str | None,
+) -> str:
+    if not target_line and not target_run:
+        return "legacy"
+    if not carrier_line or not carrier_run:
+        return "unattributed"
+    if carrier_line != target_line:
+        return "foreign"
+    if carrier_run != target_run:
+        return "stale-run"
+    return "own"
+
+
+def decide_ingress(active_count: int, match_count: int, identified: bool, clarified: bool) -> str:
+    if active_count == 0:
+        return "no-active"
+    if match_count == 1:
+        return "route"
+    if identified and match_count == 0 and active_count == 1:
+        return "no-match"
+    if active_count == 1:
+        return "route"
+    return "ambiguous-stop" if clarified else "clarify"
+
+
+def _active_entries(ctx: Context) -> list[dict]:
+    ensure_registry_dir(ctx.reg)
+    entries = []
+    for path in sorted(ctx.reg.glob("*.json")):
+        entry = read_json(path)
+        if entry.get("state") in ACTIVE_STATES:
+            entries.append(entry)
+    return sorted(entries, key=lambda e: e["line_id"])
+
+
+def _contains_path(message: str, value: str | None) -> bool:
+    if not value:
+        return False
+    candidates = {value, str(Path(value))}
+    for candidate in candidates:
+        if not candidate:
+            continue
+        idx = message.find(candidate)
+        while idx != -1:
+            end = idx + len(candidate)
+            if end >= len(message) or not (message[end].isalnum() or message[end] == "_"):
+                return True
+            idx = message.find(candidate, idx + 1)
+    return False
+
+
+def _contains_branch(message: str, branch: str | None) -> bool:
+    if not branch:
+        return False
+    return re.search(rf"(?<![A-Za-z0-9_/-]){re.escape(branch)}(?![A-Za-z0-9_/-])", message) is not None
+
+
+def _candidate(entry: dict) -> dict:
+    return {
+        "line_id": entry.get("line_id"),
+        "project_dir": entry.get("project_dir"),
+        "branch": entry.get("branch") or "-",
+        "stage": entry.get("stage") or "-",
+        "state": entry.get("state"),
+    }
+
+
+def _clarification_question(candidates: list[dict]) -> str:
+    parts = []
+    for index, candidate in enumerate(candidates, 1):
+        parts.append(
+            f"{index}) line_id={candidate['line_id']} project={candidate['project_dir']} "
+            f"branch={candidate['branch']} stage={candidate['stage']} state={candidate['state']}"
+        )
+    return "请确认这条消息属于哪条线路：" + "；".join(parts) + "？"
+
+
+def action_resolve_message(ctx: Context) -> int:
+    args = ctx.args
+    message = args.message or ""
+    require(bool(message.strip()), "resolve-message requires --message")
+    active = _active_entries(ctx)
+    active_ids = {entry["line_id"] for entry in active}
+    tokens = LINE_TOKEN_RE.findall(message)
+    token_hits = {token for token in tokens if token in active_ids}
+    shape_tokens = [token for token in tokens if GENERATED_LINE_SHAPE.match(token)]
+    matched = set(token_hits)
+    if not shape_tokens:
+        for entry in active:
+            if _contains_path(message, entry.get("project_dir")) or _contains_path(
+                message, entry.get("repo_root")
+            ) or _contains_branch(message, entry.get("branch")):
+                matched.add(entry["line_id"])
+    identified = bool(shape_tokens) or bool(matched)
+    decision = decide_ingress(len(active), len(matched), identified, args.clarified)
+    candidates = [_candidate(entry) for entry in active]
+    payload = {
+        "decision": decision,
+        "message": message,
+        "active_count": len(active),
+        "candidates": candidates,
+    }
+    if decision == "route":
+        if matched:
+            payload["target_line_id"] = sorted(matched)[0]
+        else:
+            require(len(active) == 1, "route without a unique match")
+            payload["target_line_id"] = active[0]["line_id"]
+    elif decision == "clarify":
+        payload["question"] = _clarification_question(candidates)
+    elif decision == "ambiguous-stop":
+        payload["candidates"] = candidates
+    elif decision == "no-match":
+        payload["requested"] = sorted(shape_tokens)
+    return emit(payload)
+
+
+# ---------------------------------------------------------------- identity
+
+
+def _identity_process(pid, token) -> dict:
+    if pid is None:
+        return {"pid": None, "alive": False, "start_token_match": None}
+    pid = int(pid)
+    alive = process_alive(pid)
+    actual = process_start_token(pid) if alive else None
+    match = None
+    if token is not None and actual is not None:
+        match = str(actual) == str(token)
+    return {"pid": pid, "alive": alive, "start_token_match": match}
+
+
+def _status_summary(path_value: str | None) -> dict:
+    summary = {"path": path_value, "exists": False, "exit": None, "sentinel": None}
+    if not path_value:
+        return summary
+    path = Path(path_value)
+    if not path.exists():
+        return summary
+    summary["exists"] = True
+    text = path.read_text(encoding="utf-8", errors="replace")
+    match = re.search(r"^exit=([0-9]+)", text, re.MULTILINE)
+    if match:
+        summary["exit"] = int(match.group(1))
+    match = re.search(r"sentinel=([01])", text)
+    if match:
+        summary["sentinel"] = int(match.group(1))
+    return summary
+
+
+def _last_line(path_value: str | None) -> str | None:
+    if not path_value:
+        return None
+    path = Path(path_value)
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8", errors="replace")
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    return lines[-1] if lines else None
+
+
+def _cursor(path_value: str | None) -> str | None:
+    if not path_value:
+        return None
+    path = Path(path_value)
+    if not path.exists():
+        return None
+    return path.read_text(encoding="utf-8", errors="replace").strip() or None
+
+
+def _heartbeat_age(path_value: str | None):
+    if not path_value:
+        return None
+    path = Path(path_value)
+    if not path.exists():
+        return None
+    return max(0, now_epoch() - int(path.stat().st_mtime))
+
+
+def _pid_path(entry: dict) -> str | None:
+    status = entry.get("status_path")
+    if not status:
+        return None
+    path = Path(status)
+    if path.name.startswith("status-"):
+        return str(path.with_name("pid-" + path.name[len("status-"):]))
+    return None
+
+
+def _local_identity(entry: dict) -> dict:
+    runner = _identity_process(entry.get("runner_pid"), entry.get("runner_start_token"))
+    cli = _identity_process(entry.get("cli_pid"), entry.get("cli_start_token"))
+    cwd_check = "unsupported"
+    if runner.get("pid") and runner.get("alive"):
+        actual_cwd = process_cwd(runner["pid"])
+        if actual_cwd is not None:
+            expected = [
+                Path(value).resolve()
+                for value in (entry.get("worktree_path"), entry.get("project_dir"), entry.get("repo_root"))
+                if value
+            ]
+            cwd_check = "ok" if any(
+                actual_cwd == expected_path or expected_path in actual_cwd.parents
+                for expected_path in expected
+            ) else "mismatch"
+    branch_check = "skipped"
+    if entry.get("branch"):
+        repo = entry.get("worktree_path") or entry.get("repo_root")
+        actual_branch = branch_of(Path(repo)) if repo else None
+        if actual_branch is not None:
+            branch_check = "ok" if actual_branch == entry["branch"] else "mismatch"
+    identity = "ok"
+    if not runner.get("pid") and not cli.get("pid"):
+        identity = "unknown"
+    elif runner.get("pid") and not runner.get("alive"):
+        identity = "dead"
+    elif runner.get("start_token_match") is False:
+        identity = "mismatch"
+    elif cli.get("pid") and not cli.get("alive"):
+        identity = "mismatch"
+    elif cli.get("start_token_match") is False:
+        identity = "mismatch"
+    elif cwd_check == "mismatch" or branch_check == "mismatch":
+        identity = "mismatch"
+    status = _status_summary(entry.get("status_path"))
+    return {
+        "identity": identity,
+        "runner": runner,
+        "cli": cli,
+        "cwd_check": cwd_check,
+        "branch_check": branch_check,
+        "status": status,
+    }
+
+
+def _branch_hint(identity: str, status: dict, reservation: dict | None) -> str:
+    if identity == "remote-unreachable":
+        return "stalled"
+    if status.get("exists") and status.get("exit") == 0 and status.get("sentinel") == 1:
+        return "done"
+    if identity == "dead":
+        return "dead"
+    if identity in {"ok", "unknown"} and reservation:
+        return "running"
+    if identity == "ok":
+        return "running"
+    return "stalled"
+
+
+def action_verify_identity(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    probe = None
+    if args.probe_json:
+        raw = args.probe_json
+        probe_path = Path(raw)
+        if probe_path.exists():
+            probe = read_json(probe_path)
+        else:
+            try:
+                probe = json.loads(raw)
+            except json.JSONDecodeError:
+                raise EngineError(EXIT_NO_IDENTITY, f"probe JSON unavailable: {raw}")
+    if isinstance(probe, dict):
+        if probe.get("unreachable") or probe.get("ssh_error") or probe.get("identity") == "remote-unreachable":
+            return emit({
+                "line_id": line_id,
+                "identity": "remote-unreachable",
+                "reason": probe.get("reason") or "ssh-unreachable",
+            })
+        if "identity" in probe:
+            payload = dict(probe)
+            payload.setdefault("line_id", line_id)
+            return emit(payload)
+    entry = ctx.load(line_id)
+    local = _local_identity(entry)
+    reservation = read_json_optional(reservation_path(ctx.reg, line_id, entry.get("stage") or ""))
+    lease = read_json_optional(lease_path(ctx.reg, line_id))
+    payload = {
+        "line_id": line_id,
+        "run_id": entry.get("run_id"),
+        "identity": local["identity"],
+        "runner": local["runner"],
+        "cli": local["cli"],
+        "cwd_check": local["cwd_check"],
+        "branch_check": local["branch_check"],
+        "reservation": reservation,
+        "lease": lease,
+        "evidence": {
+            "status": local["status"],
+            "log": {
+                "path": entry.get("log_path"),
+                "exists": bool(entry.get("log_path") and Path(entry["log_path"]).exists()),
+                "last_line": _last_line(entry.get("log_path")),
+            },
+            "heartbeat": {
+                "path": entry.get("heartbeat_path"),
+                "exists": bool(entry.get("heartbeat_path") and Path(entry["heartbeat_path"]).exists()),
+                "age_seconds": _heartbeat_age(entry.get("heartbeat_path")),
+            },
+            "pid": {
+                "path": _pid_path(entry),
+                "exists": bool(_pid_path(entry) and Path(_pid_path(entry)).exists()),
+            },
+        },
+        "branch_hint": _branch_hint(local["identity"], local["status"], reservation),
+    }
+    return emit(payload)
+
+
+# ---------------------------------------------------------------- manifests
+
+
+def normalize_path(raw: str, repo_root: Path) -> str:
+    path = Path(raw).expanduser()
+    if not path.is_absolute():
+        path = repo_root / path
+    try:
+        resolved = path.resolve(strict=False)
+    except OSError:
+        resolved = path.absolute()
+    text = str(resolved)
+    if len(text) > 1:
+        text = text.rstrip(os.sep)
+    return text
+
+
+def paths_overlap(a: str, b: str) -> bool:
+    if a == b:
+        return True
+    a_prefix = a + os.sep
+    b_prefix = b + os.sep
+    return a.startswith(b_prefix) or b.startswith(a_prefix)
+
+
+def load_manifest(path: Path, line_id: str, repo_root: Path) -> dict:
+    data = read_json(path)
+    require(data.get("line_id") == line_id, f"manifest line_id {data.get('line_id')!r} != {line_id!r}")
+    for key in ("owned_paths", "read_only_paths", "forbidden_paths"):
+        require(isinstance(data.get(key, []), list), f"manifest {key} must be a list")
+    owned = [normalize_path(p, repo_root) for p in data.get("owned_paths", [])]
+    read_only = [normalize_path(p, repo_root) for p in data.get("read_only_paths", [])]
+    forbidden = [normalize_path(p, repo_root) for p in data.get("forbidden_paths", [])]
+    for path in owned:
+        require(not any(paths_overlap(path, f) for f in forbidden),
+                f"owned path overlaps forbidden path: {path}")
+    depends = data.get("integration_depends_on", [])
+    require(isinstance(depends, list), "integration_depends_on must be a list")
+    data.update({
+        "schema_version": data.get("schema_version", SCHEMA_VERSION),
+        "line_id": line_id,
+        "owned_paths": owned,
+        "read_only_paths": read_only,
+        "forbidden_paths": forbidden,
+        "integration_depends_on": depends,
+        "declared_at": data.get("declared_at") or now_iso(),
+    })
+    return data
+
+
+# ---------------------------------------------------------------- dispatch
+
+
+UNIMPLEMENTED = {
+    "classify-remote", "reattach-brief",
+    "lease-acquire", "lease-renew", "lease-release", "lease-break",
+    "reserve", "reservation-status", "reservation-break",
+    "orphan-check", "ownership-check", "release-ownership", "promote-waiting",
+    "integration-enqueue", "integration-plan", "integration-record",
+    "allocate-resources", "archive-runtime",
+}
+
+DISPATCH = {
+    "register": action_register,
+    "update": action_update,
+    "deregister": action_deregister,
+    "list": action_list,
+    "resolve-message": action_resolve_message,
+    "verify-identity": action_verify_identity,
+}
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="line-registry.py", add_help=True)
+    parser.add_argument("--action", required=True)
+    parser.add_argument("--format", default="json", choices=["json"])
+    parser.add_argument("--line-id")
+    parser.add_argument("--run-id")
+    parser.add_argument("--project-dir")
+    parser.add_argument("--repo-root")
+    parser.add_argument("--state")
+    parser.add_argument("--manifest")
+    parser.add_argument("--write-line", action="store_true", default=False)
+    parser.add_argument("--stage")
+    parser.add_argument("--last-event")
+    parser.add_argument("--driver-session")
+    parser.add_argument("--cli")
+    parser.add_argument("--worktree-path")
+    parser.add_argument("--branch")
+    parser.add_argument("--base-sha")
+    parser.add_argument("--spine")
+    parser.add_argument("--pid")
+    parser.add_argument("--start-token")
+    parser.add_argument("--runner-pid")
+    parser.add_argument("--runner-start-token")
+    parser.add_argument("--cli-pid")
+    parser.add_argument("--cli-start-token")
+    parser.add_argument("--prompt-path")
+    parser.add_argument("--status-path")
+    parser.add_argument("--log-path")
+    parser.add_argument("--heartbeat-path")
+    parser.add_argument("--meta-json")
+    parser.add_argument("--waiting-reason")
+    parser.add_argument("--holder-line-id")
+    parser.add_argument("--queued-at")
+    parser.add_argument("--merge-ready")
+    parser.add_argument("--ready-for-merge-at")
+    parser.add_argument("--integration-result")
+    parser.add_argument("--worktree-retained")
+    parser.add_argument("--resources")
+    parser.add_argument("--remote")
+    parser.add_argument("--owned-paths")
+    parser.add_argument("--ownership-manifest-path")
+    parser.add_argument("--reason")
+    parser.add_argument("--evidence-ref")
+    parser.add_argument("--message")
+    parser.add_argument("--clarified", action="store_true", default=False)
+    parser.add_argument("--probe-json")
+    parser.add_argument("--session")
+    parser.add_argument("--ttl")
+    parser.add_argument("--override", action="store_true", default=False)
+    parser.add_argument("--host")
+    parser.add_argument("--worktree")
+    parser.add_argument("--dest")
+    parser.add_argument("--port-range-start")
+    parser.add_argument("--block-size")
+    parser.add_argument("--cap")
+    parser.add_argument("--result")
+    parser.add_argument("--commit")
+    parser.add_argument("--at")
+    parser.add_argument("--label")
+    parser.add_argument("--active", action="store_true", default=False)
+    parser.add_argument("--all", action="store_true", default=False)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    if args.action not in ACTIONS:
+        return fail_from(EngineError(EXIT_USAGE, f"unknown action: {args.action}"))
+    handler = DISPATCH.get(args.action)
+    if handler is None:
+        return fail_from(EngineError(
+            EXIT_USAGE, f"action not implemented yet: {args.action}",
+        ))
+    try:
+        return handler(Context(args))
+    except EngineError as exc:
+        return fail_from(exc)
+    except json.JSONDecodeError as exc:
+        return fail_from(EngineError(EXIT_USAGE, f"invalid JSON argument: {exc}"))
+    except (OSError, ValueError) as exc:
+        return fail_from(RegistryIOError(resolve_registry_dir(), str(exc)))
+
+
+if __name__ == "__main__":
+    sys.exit(main())
