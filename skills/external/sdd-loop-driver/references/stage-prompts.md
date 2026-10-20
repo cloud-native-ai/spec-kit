@@ -63,6 +63,40 @@
 
 **伪完成判未完成**：尾标在而产物缺 = 未完成，循环不派发下一阶段。**U3 返回 `DONE` 只是候选**，三条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。
 
+## Fast Lane Conditional Blocks（快车道条件块）
+
+> Owner of the fast-lane rules is `references/efficiency-model.md` §1. These
+> blocks are copied verbatim into the dispatched prompt only when the line's E1
+> admission record says `decision=fast-lane`. A full-chain run receives none of
+> them; a missing checklist artifact is then a missing required gate.
+
+### implement block（快车道录取时）
+
+```text
+FAST LANE: this line was admitted before checklist (E1 record in the state
+spine; entry literal fast-lane=opt-in). The checklist stage is intentionally
+skipped: checklist=skipped(fast-lane). Do not treat the absent checklist
+artifact as a missing required gate. analyze and review remain mandatory and
+unchanged. Any reversion trigger (new engine/skill/dependency/security surface,
+task-count drift) must be reported with the explicit anomaly line; the driver
+then reverts to the full chain, re-dispatches checklist, and re-runs analyze if
+it had already passed.
+```
+
+### review block（快车道录取时）
+
+```text
+FAST LANE: checklist=skipped(fast-lane) (E1 admission record in the state
+spine). Review behavior, evidence obligations and finding severities are
+unchanged. Do not waive a missing required validation because checklist was
+skipped; only the checklist quality-list step is absent.
+```
+
+### 发布纪律
+
+- 驱动在派发 `implement` / `review` 提示词时，从状态脊读取 E1 记录并附上对应块与准入证据指针；无 E1 记录或 `decision=full-chain` 时 MUST NOT 附块。
+- 收尾汇总必须携带 `checklist=skipped(fast-lane)` 或等价可见标记；回退过的线同时携带 `reversion` 触发与证据。
+
 ## Stall Handling & State Spine（卡死处置与状态脊，U5）
 
 ### 缺省值（入口参数可覆盖）

@@ -1,3 +1,5 @@
+**Related Feature**: 058
+
 # Fixture Requirements — 012-medium
 
 - **FR-001**: fixture requirement 1
@@ -14,3 +16,9 @@
 - **FR-012**: fixture requirement 12
 
 - **SC-001**: fixture success criterion
+
+## Clarifications
+
+### Session 2026-10-20
+
+- Q: fixture? → A: fixture answer.

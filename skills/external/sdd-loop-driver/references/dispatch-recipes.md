@@ -115,6 +115,11 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
 
 - 阶段链固定顺序：`requirements → clarify → plan → tasks → checklist → analyze → implement → review`（2026-10-17 修订：纳入 checklist/analyze 质量门——无人值守循环执行完整版流程，日常手动开发常省略的非必须命令一律必经）；每阶段完成哨兵 = 大写阶段名 + `-DONE`（如 `PLAN-DONE`、`CHECKLIST-DONE`、`ANALYZE-DONE`）。尾标是完成的必要条件，充分条件由独立校验补齐。
 - **U3→U4 接线**：U3 的终止判定决定去向——`DONE` / `INCOMPLETE` 进 U4 独立校验（`INCOMPLETE` 按伪完成处理）；`ANOMALY` / `FAILED` / `DEAD` / `TIMEOUT` / `NO_SIGNAL` 直接进 U5。U4 通过后才派发下一阶段。
+- **快车道裁决点（tasks U4 之后、checklist 派发之前）**：入口携带字面量 `fast-lane=opt-in` 时，驱动在该点调用 `scripts/admission-check.py`（七判据与接口 owner：`references/efficiency-model.md` §1.2），把 E1 准入记录写入状态脊后再决定下一派发：
+  - `decision=fast-lane` → 跳过 `checklist`，在状态脊与收尾标记 `checklist=skipped(fast-lane)`，随后派发 `analyze`（快车道保留 analyze 与 review，见 efficiency-model §1.6）；下游 implement/review 提示词携带 `references/stage-prompts.md` 的快车道条件块。
+  - `decision=full-chain`（含任一判据 fail 或无法证明）→ 照常派发 `checklist`，完整链不变。
+  - **回退序列**：录取后判据失效或后续阶段发现新事实时，写状态脊 `reversion{trigger,evidence,at}` → 回退完整链 → 在适用位置补派 `checklist` → 若 `analyze` 已通过，补派后重过 `analyze` 一次 → 继续完整链；回退不得静默（efficiency-model §1.5）。
+  - 缺少 E1 准入记录时 MUST NOT 声称快车道；063 自身走完整链（efficiency-model §1.7）。
 - **质量门编排（checklist / analyze 两门位于 tasks 与 implement 之间）**：
   - **checklist 门**：产物 = `REQUIREMENTS_DIR/checklists/` 新增清单文件；清单项的满足判定不在本门裁决——由 implement 阶段的 checklist 豁免门接管（子代理按 G5 默认纪律自行裁决，waiver 记录进 waivers.md）。
   - **analyze 门**：产物 = findings 报告正文（只读命令，不产新提交）；门判据 = 报告中 CRITICAL/HIGH 发现为零或已处置。
