@@ -488,7 +488,10 @@ This section records the repair of review findings F1 (P0), F2, F3, F6, F7
   Deadline supersedes window expiry.
 - **Regression pin**: new self-test case `7d zero-window` uses `--window 0
   --timeout 1 --deadline-grace 2` and must return `TIMEOUT` (exit 14); the old
-  code deterministically returned `RUNNING` (exit 10).
+  code deterministically returned `RUNNING` (exit 10). Real red/green with a
+  live pid:
+  - old (`HEAD^` script): `verdict=RUNNING ... elapsed=0`, exit 10;
+  - new: `verdict=TIMEOUT ... elapsed=3 reason=deadline-grace-expired`, exit 14.
 - **Reproducibility**: six consecutive
   `bash skills/external/sdd-loop-driver/scripts/watch-target.sh --self-test`
   runs all reported `34 passed, 0 failed`. No case was deleted; the count grew
