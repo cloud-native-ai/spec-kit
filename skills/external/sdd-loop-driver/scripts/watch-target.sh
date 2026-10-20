@@ -40,7 +40,7 @@ Single target:
                   [--lease-ttl N --lease-renew-cmd CMD --lease-renew-interval N] \
                   [--deadline-epoch E | --timeout T] \
                   [--window N] [--interval N] [--start-grace N] \
-                  [--heartbeat-max-age N] [--once] [--verbose]
+                  [--deadline-grace N] [--heartbeat-max-age N] [--once] [--verbose]
 
 Manifest (one target per line: label|pid|status|log|sentinel|heartbeat|deadline):
   watch-target.sh --manifest FILE [--window N] [--interval N] [--start-grace N]
@@ -60,7 +60,11 @@ Verdicts / exit codes:
   16 NO_SIGNAL     no pid/status within start grace
   2 USAGE          bad arguments
 
-Defaults: window=200s, interval=3s, start-grace=30s, heartbeat-max-age=120s.
+Defaults: window=200s, interval=3s, start-grace=30s, deadline-grace=120s,
+heartbeat-max-age=120s. --deadline-grace N keeps sampling for N seconds after
+the stage deadline; a late status/sentinel reclassifies to DONE/FAILED before
+TIMEOUT. TIMEOUT is a budget verdict, not a death certificate: a live
+pid/heartbeat must be rechecked with --once before any stop decision.
 The default window is <= ttl/3 for the default 600s driver lease. Pass
 --lease-ttl N to enforce the window <= N/3 rule (it fails when the window is
 larger and no --lease-renew-cmd is given); --lease-renew-cmd refreshes the
@@ -68,7 +72,8 @@ lease heartbeat inside the window (--lease-renew-interval defaults to 60s).
 With --registry DIR (or SPECIFY_LINE_REGISTRY_DIR), the watcher consumes only
 the PID registered for --line-id and verifies its start token (Linux start
 ticks, macOS `ps -p <pid> -o lstart=`) plus branch when registered.
-Set the host tool timeout to window + 30s so the watcher can return first.
+Set the host tool timeout to window + deadline-grace + 30s so the watcher can
+return first; with the defaults that is 200 + 120 + 30 = 350s.
 --timeout T is relative to THIS invocation; for multi-window stages pass
 --deadline-epoch (absolute stage deadline) instead, or each window resets it.
 The watcher must run as the same identity as the runner (kill -0 permission).
@@ -112,6 +117,7 @@ TIMEOUT=""
 WINDOW=200
 INTERVAL=3
 START_GRACE=30
+DEADLINE_GRACE=120
 HEARTBEAT_MAX_AGE=120
 ONCE=0
 MANIFEST=""
@@ -141,6 +147,7 @@ while [ "$#" -gt 0 ]; do
     --window) [ "$#" -ge 2 ] || die_usage "--window needs a value"; WINDOW="$2"; shift 2 ;;
     --interval) [ "$#" -ge 2 ] || die_usage "--interval needs a value"; INTERVAL="$2"; shift 2 ;;
     --start-grace) [ "$#" -ge 2 ] || die_usage "--start-grace needs a value"; START_GRACE="$2"; shift 2 ;;
+    --deadline-grace) [ "$#" -ge 2 ] || die_usage "--deadline-grace needs a value"; DEADLINE_GRACE="$2"; shift 2 ;;
     --heartbeat-max-age) [ "$#" -ge 2 ] || die_usage "--heartbeat-max-age needs a value"; HEARTBEAT_MAX_AGE="$2"; shift 2 ;;
     --manifest) [ "$#" -ge 2 ] || die_usage "--manifest needs a value"; MANIFEST="$2"; shift 2 ;;
     --line-id) [ "$#" -ge 2 ] || die_usage "--line-id needs a value"; LINE_ID="$2"; shift 2 ;;
@@ -159,7 +166,7 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-for name in WINDOW INTERVAL START_GRACE HEARTBEAT_MAX_AGE LEASE_RENEW_INTERVAL; do
+for name in WINDOW INTERVAL START_GRACE DEADLINE_GRACE HEARTBEAT_MAX_AGE LEASE_RENEW_INTERVAL; do
   value="${!name}"
   is_uint "$value" || die_usage "$name must be a non-negative integer, got '$value'"
 done
@@ -584,11 +591,21 @@ run_single() {
   START_EPOCH=$(now_epoch)
   if [ -n "$TIMEOUT" ]; then DEADLINE_EPOCH=$((START_EPOCH + TIMEOUT)); fi
   [ "$ONCE" -eq 1 ] && WINDOW=0
-  local window_end=$((START_EPOCH + WINDOW)) now remaining sleep_for
+  local window_end=$((START_EPOCH + WINDOW)) grace_end=0 grace_used=0 now remaining sleep_for
+  if [ "$ONCE" -eq 0 ] && [ "$DEADLINE_EPOCH" -gt 0 ] && [ "$DEADLINE_GRACE" -gt 0 ]; then
+    grace_end=$((DEADLINE_EPOCH + DEADLINE_GRACE))
+  fi
   while :; do
     maybe_renew_lease
     evaluate "$LABEL" "$PID_FILE" "$STATUS_FILE" "$LOG_FILE" "$SENTINEL" "$HEARTBEAT" "$DEADLINE_EPOCH"
-    if [ "$V_CODE" -ne "$EXIT_RUNNING" ]; then
+    now=$(now_epoch)
+    if [ "$V_CODE" -eq "$EXIT_TIMEOUT" ] && [ "$grace_end" -gt 0 ] && [ "$now" -lt "$grace_end" ]; then
+      # Deadline reached but the process may still complete: keep sampling
+      # through the grace window instead of returning TIMEOUT immediately.
+      grace_used=1
+      [ "$window_end" -lt "$grace_end" ] && window_end=$grace_end
+    elif [ "$V_CODE" -ne "$EXIT_RUNNING" ]; then
+      [ "$grace_used" -eq 1 ] && [ "$V_CODE" -eq "$EXIT_TIMEOUT" ] && V_REASON="deadline-grace-expired"
       emit_single
       exit "$V_CODE"
     fi
@@ -776,8 +793,8 @@ self_test() {
     --log "$base/none5" --sentinel PLAN-DONE --window 1 --start-grace 0)
   check dead 13 DEAD "${r%%$'\n'*}" "${r#*$'\n'}"
 
-  # 6. running process, no terminal signal
-  sleep 3 & local live=$!
+  # 6. running process, no terminal signal (long-lived so later cases keep a live pid)
+  sleep 30 & local live=$!
   disown "$live" 2>/dev/null || true
   ST_SPAWNED+=("$live")
   local ticks=""
@@ -789,8 +806,29 @@ self_test() {
 
   # 7. stage deadline => TIMEOUT, not window expiry
   r=$(watch --label timeout --pid-file "$base/pid6" --status-file "$base/none6" \
-    --log "$base/none6" --sentinel PLAN-DONE --timeout 1 --window 3 --interval 1 --start-grace 0)
+    --log "$base/none6" --sentinel PLAN-DONE --timeout 1 --deadline-grace 0 \
+    --window 3 --interval 1 --start-grace 0)
   check timeout 14 TIMEOUT "${r%%$'\n'*}" "${r#*$'\n'}"
+
+  # 7b. late completion inside the deadline grace => DONE, not TIMEOUT
+  : > "$base/late.log"
+  ( sleep 2; printf 'exit=0 at=%s sentinel=1\n' "$(date +%s)" > "$base/late.status"; \
+    printf 'PLAN-DONE\n' > "$base/late.log" ) &
+  local late_writer=$!
+  ST_SPAWNED+=("$late_writer")
+  r=$(watch --label late --pid-file "$base/pid6" --status-file "$base/late.status" \
+    --log "$base/late.log" --sentinel PLAN-DONE --timeout 1 --deadline-grace 4 \
+    --window 1 --interval 1 --start-grace 0)
+  wait "$late_writer" 2>/dev/null || true
+  check late-completion 0 DONE "${r%%$'\n'*}" "${r#*$'\n'}"
+
+  # 7c. grace expires without a status => TIMEOUT with an explicit reason
+  r=$(watch --label grace-timeout --pid-file "$base/pid6" --status-file "$base/none6" \
+    --log "$base/none6" --sentinel PLAN-DONE --timeout 1 --deadline-grace 2 \
+    --window 1 --interval 1 --start-grace 0)
+  check grace-timeout 14 TIMEOUT "${r%%$'\n'*}" "${r#*$'\n'}"
+  printf '%s\n' "${r#*$'\n'}" | grep -q 'reason=deadline-grace-expired' \
+    || bad "grace-timeout-reason" "grace expiry reason missing: ${r#*$'\n'}"
 
   # 8. no signals at all => NO_SIGNAL (zero-match path must not fake completion)
   r=$(watch --label nosignal --pid-file "$base/none8" --status-file "$base/none8" \

@@ -23,6 +23,7 @@
 | **Observe（观察）** | 读取日志/心跳/退出记录，不做判定 | watcher 内部动作，或 U3 的证据采集 |
 | **Watch window（监听窗口）** | 一次阻塞调用的最长持续时间 | `--window`；到期返回 `RUNNING`，驱动者立即重入下一窗口 |
 | **Stage deadline（阶段期限）** | 阶段开始时间 + 阶段超时（缺省 90 分钟） | 唯一产生 `TIMEOUT` 的判据；入口可覆盖 |
+| **Deadline grace（期限宽限）** | 阶段期限之后继续采样、等待晚完成证据的窗口 | `--deadline-grace`（缺省 120s）；晚到的 status/sentinel 重判为 DONE/FAILED；宽限到期仍无终态才返回 `TIMEOUT` |
 
 ## 2. Watch Target 与信号源
 
@@ -48,7 +49,7 @@
 | `FAILED` | 12 | 是 | 退出记录 `exit≠0`，无异常行 | U5：先修可归因原因再重试 |
 | `INCOMPLETE` | 15 | 是 | **配置了哨兵时**，退出记录 `exit=0` 但哨兵缺失 | **伪完成候选**：U4 判未完成，不派发下一阶段 |
 | `DEAD` | 13 | 是 | 有 PID 记录且进程已死/僵尸/PID 复用，且无退出记录 | U5：外壳死亡，查日志尾部后重试/上送 |
-| `TIMEOUT` | 14 | 是 | 无更高优先级信号，且 `now ≥ stage deadline` | U5：停线或按入口策略处置；watcher 不杀进程 |
+| `TIMEOUT` | 14 | 是 | 无更高优先级信号，且 `now ≥ stage deadline`（宽限期已耗尽） | U5：**先做 `--once` 最终快照**；`pid=alive` + `heartbeat=fresh` 时不得仅凭 TIMEOUT 停线或杀进程，优先延长/继续观察；停线须用户显式决定；watcher 不杀进程 |
 | `NO_SIGNAL` | 16 | 是 | PID 与退出记录都缺失，且超出启动宽限期 | U5：启动失败/路径错误，先查前置检查与 runner |
 | `DONE` | 0 | 是 | 哨兵命中（退出记录 `rc=0` + 哨兵，或日志最后非空行 = 哨兵；进程状态不改变该判定）；未配置哨兵时退出记录 `rc=0` 即 DONE | **U4 独立校验**；哨兵不是充分条件 |
 | `RUNNING` | 10 | 否 | 进程存活或仍在启动宽限期内，无终止信号 | 立即重入下一 watch window，不做 agent 侧 sleep |
@@ -59,6 +60,14 @@
 - **异常行**只在其已是最后一行且（退出记录存在或进程已死）时判 `ANOMALY`；进程仍活时异常行可能是中间输出，返回 `RUNNING` 并带 `anomaly=observed`。
 - **心跳 stale + PID alive** 返回 `RUNNING` + `heartbeat=stale`（外壳看门狗退化），不直接判 `STALLED`；阶段期限仍是唯一超时判据。日志增长或 stream 输出可覆盖该警告。
 - **窗口到期**永远返回 `RUNNING`，绝不返回 `TIMEOUT`。
+
+### 3.1 Deadline grace 与 late completion（2026-10-20 热修）
+
+- **TIMEOUT 是预算判定，不是死亡证明**。子代理可能在 deadline 之后才写出 `exit=0/1` 与哨兵；把 TIMEOUT 当成“可杀/已卡死”会把晚完成误判为故障（实测：postreview-repair 在 deadline 后约 11 分钟自行完成，status 显示 `exit=0 sentinel=1`）。
+- watcher 在 deadline 后继续采样 `--deadline-grace` 秒（缺省 120）；期间任何 status / sentinel / 异常行按 §3 重新判定，`DONE`/`FAILED`/`ANOMALY` 优先于 `TIMEOUT`；宽限耗尽仍无终态才返回 `TIMEOUT`，reason 为 `deadline-grace-expired`。
+- 宿主工具超时 MUST 设为 `window + deadline-grace + 30s`；否则宿主会先杀掉 watcher，宽限来不及生效。
+- 驱动者收到 `TIMEOUT` 后 MUST 先跑 `--once` 最终快照：若 status/sentinel 已出现，按 U4/U5 重新路由，**不得判 stall**；若 `pid=alive` + `heartbeat=fresh` 仍无终态，优先延长/继续窗口。停线或 TERM 必须经用户显式决定，并在停止前再跑一次 `--once`，保留 worktree/status/log 证据。
+- **无提交 ≠ 卡死**：长审计/长测试期间可能数十分钟没有 commit；判断依据是 pid/heartbeat/status/session 活动，而不是 commit 间隔。
 
 ## 4. 机制阶梯（事件优先）
 
@@ -103,13 +112,14 @@
 ssh <alias> "cat > /home/<run-user>/watch-target.sh" < <skill-dir>/scripts/watch-target.sh
 ssh <alias> "chmod +x /home/<run-user>/watch-target.sh"
 
-# 每个窗口：一次 ssh（与 runner 同一执行身份），命中即返回；工具超时设为 window+30s
+# 每个窗口：一次 ssh（与 runner 同一执行身份），命中即返回；工具超时设为 window+deadline-grace+30s
 ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
   --label <line> --pid-file /home/<run-user>/pid-<line>-<stage> \
   --status-file /home/<run-user>/status-<line>-<stage> \
   --log /home/<run-user>/log-<line>-<stage>.log \
   --sentinel <STAGE>-DONE --heartbeat /home/<run-user>/heartbeat-<line>-<stage>.log \
-  --deadline-epoch <epoch> --window 200 --interval 3'"
+  --deadline-epoch <epoch> --window 200 --interval 3 \
+  --deadline-grace 120'"
 ```
 
 ## 7. 存活判据的正确性（pgrep 陷阱）
@@ -150,7 +160,7 @@ label|pid_file|status_file|log|sentinel|heartbeat|deadline_epoch
 - **U2**：状态脊写入 `stage_started_at`、`stage_deadline_epoch`、四件套路径（pid/status/log/heartbeat）与哨兵字面量。
 - **U3**：按 §4 选机制；终止判定 → 写状态脊 `last_verdict` + 证据一行 → 进 U4（`DONE`/`INCOMPLETE`）或 U5（其余）。`RUNNING` → 立即重入。
 - **U4**：哨兵（必要）+ 产物核验 + 纪律抽查（充分）；`DONE` 只是候选，不是结论。
-- **U5**：四要素上送件携带 watcher 的 `verdict` / `pid` / `heartbeat` / `rc` / `reason` 快照；绝不静默等待。
+- **U5**：四要素上送件携带 watcher 的 `verdict` / `pid` / `heartbeat` / `rc` / `reason` / `last_status` 快照，并注明 `grace_expired` 是否发生；收到 `TIMEOUT` 先 `--once` 最终快照，活进程不得仅凭 TIMEOUT 停线/杀进程；绝不静默等待。
 - **重入**：先 `--once` 快照，按判定进 U4/U5 或恢复窗口。
 - **调用失败不是判定**：一次监听调用没有返回任何 `WATCH` 行（ssh 255、宿主工具超时、网络中断）时，不改变阶段状态——先做 `--once` 快照或连通性检查，再重入新窗口；连续失败按 U5 的环境根因处置。**绝不把连接故障当作阶段失败，也绝不因此杀进程。**
 - **重入时的 NO_SIGNAL**：若运行时文件已被清理但日志哨兵/阶段产物仍在，先按 U4 产物路径核对；核对通过即视为已完成，不按启动失败处置。

@@ -47,6 +47,7 @@
 - **非法等待**：独立 `sleep N` 回合；挂起监视器后结束驱动者会话「等待通知/恢复」——在会话式宿主（subagent 结束即停摆）中这意味着循环静默死亡，直接违反 Hard Requirement 1 与 5。唯一例外：宿主已被探针证明通知会自动恢复**同一运行**（`watch-model.md` §6）；此时原生通知只能作唤醒补充，每次唤醒仍做一次快照判定。
 - **终止判定去向**：`DONE` / `INCOMPLETE` → U4；`ANOMALY` / `FAILED` / `DEAD` / `TIMEOUT` / `NO_SIGNAL` → U5；`RUNNING` → 重入。
 - **窗口到期 ≠ 阶段超时**：只有状态脊中的 `stage_deadline_epoch` 触发 `TIMEOUT`；单窗口到期只产生 `RUNNING`。watcher 不杀进程，处置属 U5。
+- **TIMEOUT 不等于可杀**：收到 `TIMEOUT` 后先跑一次 `--once` 最终快照；若 status/sentinel 已出现，按 U4/U5 重新路由；若 `pid=alive` + `heartbeat=fresh` 仍无终态，优先延长/继续观察，不得仅凭 TIMEOUT 停线或杀进程。停线/TERM 必须经用户显式决定，停止前再快照并保留 worktree/status/log。watcher 的 `--deadline-grace` 缺省 120s；宿主工具超时设为 `window + deadline-grace + 30s`。
 - **完成需正证据**：进程消失、日志静默、`pgrep` 零匹配都**不是**完成；哨兵/退出记录是必要正证据，U4 仍须独立校验。
 - 驱动者必须存活到全线收束（U6）或显式停线（U5）。
 - 驱动者确须提前结束（预算耗尽、会话上限）时，唯一合法路径：状态脊写为 `stalled` / `reentry-required`（当前阶段、已试次数、证据指针齐备）+ 向用户显式上报——**静默等待与静默退出都是不被接受的输出**。
@@ -75,7 +76,7 @@
 1. 终止判定 → 处置：
    - `ANOMALY` / `FAILED` / `DEAD` / `NO_SIGNAL` → 重试（重试前修复可归因原因：环境、提示词、断点判定、启动路径），计一次已试次数；
    - `INCOMPLETE` → 按**伪完成**重试（核对哨兵/产物/日志），计一次已试次数；
-   - `TIMEOUT` → 阶段超时，按重试上限处置；
+   - `TIMEOUT` → 先 `--once` 最终快照；若 status/sentinel 已出现则按 U4/U5 重新路由；活进程优先延长/继续观察；只有最终无终态且用户显式决定时才按重试/停线处置；
    - `RUNNING`（窗口到期）→ 不是失败，不计重试，立即重入下一监听窗口。
 2. 达重试上限或预算触顶 → **停环**：该线停止推进。
 3. 状态脊落盘：当前阶段、已试次数、断点判定、**watcher 最近判定快照（verdict / pid / heartbeat / rc / reason）**、证据指针（日志路径/提交号/status 路径）、卡死状态 = stalled。

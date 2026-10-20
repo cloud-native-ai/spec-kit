@@ -89,13 +89,14 @@ ssh <alias> "chmod +x /home/<run-user>/watch-target.sh"
 ssh <alias> "nohup su - <run-user> -c 'bash /home/<run-user>/run-<line>-<stage>.sh > /home/<run-user>/runner-log-<line>-<stage>.log 2>&1' < /dev/null > /dev/null 2>&1 &"
 
 # 2) 每个监听窗口：一次 ssh（与 runner 同一执行身份），命中终止判定或窗口到期即返回
-#    （工具超时设为 window+30s）
+#    （工具超时设为 window+deadline-grace+30s）
 ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
   --label <line> --pid-file /home/<run-user>/pid-<line>-<stage> \
   --status-file /home/<run-user>/status-<line>-<stage> \
   --log /home/<run-user>/log-<line>-<stage>.log \
   --sentinel <STAGE>-DONE --heartbeat /home/<run-user>/heartbeat-<line>-<stage>.log \
-  --deadline-epoch <stage_deadline_epoch> --window 200 --interval 3'"
+  --deadline-epoch <stage_deadline_epoch> --window 200 --interval 3 \
+  --deadline-grace 120'"
 ```
 
 要点：
@@ -104,6 +105,7 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
 - **外层三重重定向必须**：`nohup` 任务本体之外再带 `< /dev/null` 并把 ssh 通道的 stdout/stderr 重定向（`> /dev/null 2>&1`）——缺省时后台任务继承 ssh 通道的 stdio，本地 ssh 挂起直到超时（实测 2026-10-16：每次派发白烧一次 2 分钟本地超时，进程虽照常启动但驱动者节拍被打断）。runner 自身的 stdout/stderr 在 `su -c` 内层落 `runner-log`，保证归属 run-user 可读。
 - **监听机制阶梯（`watch-model.md` §4）**：长轮询窗口缺省 → 宿主原生通知仅作补充（且不得结束驱动者会话）→ 间隔轮询回退；**禁止**独立 `sleep N` 回合空等。
 - **窗口到期 ≠ 阶段超时**：watcher 返回 `RUNNING`（退出码 10）时立即发起下一窗口，不做 agent 侧等待；只有 `TIMEOUT`（阶段 deadline）进入 U5。这条把「监视器零匹配/窗口到期误判超时」与真正的阶段超时分开（2026-10 实测缺陷：`pgrep -c` 零匹配先输出 0 再被 `|| echo 0` 追加第二个 0，导致 clarify 已完成仍被误判超时）。
+- **TIMEOUT 不是终止命令**：watcher 在 deadline 后继续采样 `--deadline-grace` 秒（缺省 120s），晚完成会重判 `DONE`/`FAILED`。收到 `TIMEOUT` 后驱动者 MUST 先做 `--once` 最终快照；`pid=alive` + `heartbeat=fresh` 时不得仅凭 TIMEOUT 停线/杀进程；停线须用户显式决定并保留 worktree/status/log。
 - **正证据优先**：每轮一次读取退出记录 → PID 存活 → 日志尾行 → 心跳 mtime；进程消失、日志静默、`pgrep` 零匹配都**不是**完成。心跳只证明 runner 外壳活着，与 PID 一起看。
 - **多线批查**：一个窗口一次 ssh 检查多条线（`--manifest` 模式），任一线终止即返回全部线快照，**判定仍逐线独立做**；输出只保留判定行与必要证据，哨兵未现且进程存活时无需更多输出。
 - **观察面纪律（底稿注解：External Dispatch Visibility Contract，`subagent-definitions.md`）**：禁止**缓冲至退出**式派发——`qodercli -p "<prompt>" > agent.log 2>&1 &` 这种「输出缓冲到进程退出才落盘」的形态让运行期零可见性，是明令禁止的反模式。本机制的观察面是**阶段粒度**（哨兵出现在输出末尾）：`-p` 缓冲意味着阶段结束前日志静默——退出记录与窗口监听等的就是终止事件；若需阶段内进度/卡死检测，把 runner 换成流式输出（`--output-format stream-json`）形态。
