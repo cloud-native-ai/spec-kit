@@ -12,9 +12,10 @@
 | B-2 | `python3 scripts/python/sync-mirrors.py --check --only skills/external` | 退出码 2，**68 个 DIFF，跨 12 个技能目录**；其中 sdd-loop-driver 3 文件（SKILL.md、references/dispatch-recipes.md、references/watch-model.md），其余为 draw-diagram 36、improve-skills 8、merge-skills 4、git-utils 4、sdd-project-setup 3、create-pages 3、database-utils 2、create-skills 2、think-skills 1、improve-docs 1、document-utils 1。sdd-loop-driver 镜像侧含 `.specify/` 前缀路径，且编译 fingerprint 与源侧不同（不判断哪侧“更新”，fingerprint 不表达新旧） | 既有契约 `test_c12_mirror_byte_identical` / `test_c18_mirror_pair_no_drift` 在基线即红（21 passed / 2 failed；测试函数共 23）。本特性只拥有 sdd-loop-driver 对：实现期用源→镜像同步修复该对，其余 11 个目录的既有漂移不在本特性面，采用「零 NEW drift」相对判据并完整披露 |
 | B-3 | `python -m pytest tests/contract/test_sdd_loop_driver_skill.py -q` | **21 passed / 2 failed**（即 B-2 的 C-12/C-18；文件共 23 个测试函数） | 既有 H2 节集合（C-3）与 C-4 的 `sed` 断言当前为绿；本特性若新增 H2 或替换 runner 派生形态，必须有意更新并在 plan/tasks 记录理由（FR-041） |
 | B-4 | `bash scripts/bash/run-tests.sh --names-out /tmp/063-names-probe.txt tests/unit/test_ensure_symlink.py -q` | 7 passed；names 文件 0 行；脚本自行输出解释器与条目数 | `--names-out` 接口可直接用于两个全量槽位的名称级差集（`comm -13`），无需新增测试引擎 |
-| B-5 | `python3 scripts/python/validate-requirements.py .specify/specs/063-sdd-loop-efficiency/requirements.md` | `status: ok`；301 lines / 56 definition rows / 6 shared strings；0 error / 0 warning（requirements-repair 后实测 313 lines / 8 shared strings，见 `feature-ref.md` 基线记录） | 规格可作为 plan 的权威输入；准入脚本的 FR 计数口径应与该校验器的定义行口径一致 |
+| B-5 | `python3 scripts/python/validate-requirements.py .specify/specs/063-sdd-loop-efficiency/requirements.md` | `status: ok`；301 lines / 56 definition rows / 6 shared strings；0 error / 0 warning（requirements-repair 后 313 / 56 / 8；plan-repair-2 的 CLI profiles delta 后 382 / 65 / 10，见 `feature-ref.md` 基线记录） | 规格可作为 plan 的权威输入；准入脚本的 FR 计数口径应与该校验器的定义行口径一致 |
 | B-6 | `python3 --version` / `python --version` | 3.9.6 / 3.14.6 | 新脚本按 `pyproject.toml` 的 `>=3.8` 编写（不用 3.9+ 专属语法）；pytest 由 `run-tests.sh` 自行解析 |
 | B-7 | 检索 `--output-format stream-json` | 既有先例：`skills/internal/create-team/scripts/dispatch.sh` + `stream-filter.py`；形状权威：`.specify/shared/definitions/subagent-definitions.md` § External Dispatch Visibility Contract（事件 `assistant` / `system(init)` / `result`） | 派生规则可复用**事件形状知识**，但 loop-driver 分类为 external、运行时零框架依赖，不能复用内部技能脚本；必须自包含实现并在文中声明「设计期参考、运行时无依赖」 |
+| B-8 | `which qodercli claude codex opencode hermes` + `qodercli --help` / `--version`；`probe-utils.py --action probes --reconcile` | `qodercli` 1.1.73 可用（`-p/--print`、`-o/--output-format`、session 子命令）；`codex`、`opencode` 可用；`claude`、`hermes` 不在 PATH；`references/cli/` 不存在；reconcile 报 `skill:sdd-loop-driver` 与 `skill:sdd-project-setup` 两个 embed-without-object 缺口；`compile-embeds --check` 74 units zero drift | CLI 档案以 qodercli 为已知项、其余为 skeleton；观测点必须补最小 Probe Object 才能走 feedback 引擎；compile-embeds 不应因 Object 行变化 |
 
 ## 2. 设计决定
 
@@ -81,6 +82,17 @@
 - **决定**：063 自身走完整链，不产生快车道记录；本 plan 由完整 research/design 流程产出。确定性组件（准入、台账、派生、脱离、名称级回归）由 CI 测试证明；LLM 驱动的阶段序列行为由实现期录制的编排演练（dry-run trace）证明，并在 verification.md 如实标注哪些 SC 是自动证据、哪些是录制证据。
 - **理由**：driver 本体是提示词手册，不是可单测的调度器；把不可自动化的部分伪装成自动测试才是伪证据（better-harness 证据纪律）。录制 trace + 契约钉住决策表是可复核的诚实上限。
 
+### R-11 CLI 能力档案：单一 owner + 最小 Probe Object
+
+- **决定**：在 `references/cli/` 下为每个 subagent CLI 建独立档案（qodercli 已知、其余四份 skeleton），以 `README.md` 为 schema/观测程序 owner；SKILL.md 新增 [[STR-010]] 节做入口与规则摘要。观测触发点 U2/U4/U5；每次事件先写状态脊 CLI 观测段，再更新档案 provenance，再经既有 `feedback-utils.py --action record` 写一条含 [[STR-009]]`<cli>` 的反馈。注册面只新增一个最小 Object `skill-sdd-loop-driver-wrapup`（`skill-wrapup` / `skill:sdd-loop-driver` / `wrap-up`），不新增 Class/Handler/Binding；compile-embeds fingerprint 不变。
+- **理由**：CLI 行为知识散落在配方与会话记忆中，错误假设会造成静默降级/伪完成/超时误判；档案把知识收敛到单一 owner，并用既有 feedback 引擎形成「使用→观测→沉淀」闭环。最小 Object 同时关闭该技能「有编译 Wrap-up 但无 probe object」的既有缺口，避免另造未注册机制。
+- **替代方案否决**：让每个阶段子代理各自记录 CLI 行为——知识碎片化且无法审计；新增 Probe Class/phase-boundary Handler——扩大机制面且不使反馈更可执行；把档案写成运行时配置——违反「档案不改变当前阶段行为」的约束。
+
+### R-12 U-01R / N 项的 plan 传播
+
+- **决定**：U-01R 用驱动侧可执行夹具（stub runner + 真实 watcher + 文档化 U4/U5 程序）观测七个字段，`initial_retries=0`、`exit_code={watcher,runner}`，禁止判定表转录/硬编码期望值；N-01 把 `state_spine_path` 放入 U0/E6/阶段提示词骨架，远端走 transport→driver merge（`merge_source`），统一 T002/D-T3 的传输载体措辞；N-02 在 E4/E5/PC-11 定义 re-anchoring；N-03 在 E3/TB-06/07 定义 docs-only 缩减字段集与 `stages=N complete=N`；N-05 在 FL-03(a) 钉住窄/宽任务计数边界。tasks 侧传播留给 tasks-repair-2。
+- **理由**：这些是 analyze-rerun 的 plan-owned 发现；把驱动侧字段从「判定表转录」改为「夹具观测」才能让 SC-010 的比较具有回归发现能力；其余四项是把 requirements 已冻结口径落到字段/契约/审计输出，避免下游 tasks 再次漂移。
+
 ## 3. 明确排除（本特性不做）
 
 - 不修改 `templates/commands/*`、`skills/internal/{implement-feature,review-sdd-process,analyze-artifacts,create-plan}` 等框架命令内部流程；plan 约束与测试预算只在编排层执行。
@@ -91,4 +103,4 @@
 
 ## 4. 未决项
 
-无。FR-003 的中型区间、预算作用域、plan 改动分流、入口字面量均已在 clarify Session 2026-10-20 冻结；本 plan 不重裁。
+无设计性未决项。FR-003 的中型区间、预算作用域、plan 改动分流、入口字面量均已在 clarify Session 2026-10-20 冻结；CLI 档案的范围与落点已在 requirements Clarifications（plan-repair-2）记录。剩余为执行侧同步：`tasks.md` 尚未承接 US6/U-01R/N 项，按本轮约定留给 tasks-repair-2；`skill:sdd-project-setup` 的 probe reconcile 缺口为既有例外，已披露且不在本特性范围。

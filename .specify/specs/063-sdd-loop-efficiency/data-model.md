@@ -2,7 +2,7 @@
 
 **Feature**: 063-sdd-loop-efficiency → Feature 058（演化特性）
 **Spec**: [requirements.md](requirements.md)
-**说明**: 本特性不新增数据库或常驻存储。实体全部落在文件上：每线**状态脊**（Markdown，承载记录与台账）、特性目录下的**测试证据文件**（JSONL）、阶段运行产物（raw stream / live log / pid / status / heartbeat / runner-log）。本文件登记字段面与校验规则，是契约测试与审计脚本的判定对象；字段值域以本节为 plan 期权威，实现后由脚本常量与契约测试共同钉住。
+**说明**: 本特性不新增数据库或常驻存储。实体全部落在文件上：每线**状态脊**（Markdown，承载记录与台账）、特性目录下的**测试证据文件**（JSONL）、阶段运行产物（raw stream / live log / pid / status / heartbeat / runner-log）。本文件登记字段面与校验规则，是契约测试与审计脚本的判定对象；字段值域以本节为 plan 期权威，实现后由脚本常量与契约测试共同钉住。除 E1–E8 实体外，本文件还登记两个**非实体证据制品**：Stall Behavior Baseline（SC-010）与 CLI Capability Profile（FR-044…FR-049）；它们不改变实体计数。
 
 ## 实体一览
 
@@ -73,6 +73,8 @@
 | `exception_reason` | 字符串 | `out-of-slot-exception` 必填，含证据指针 |
 | `environment_evidence` | 字符串 | `environment-failure` 必填（解释器/依赖缺失、收集前失败证据） |
 | `evidence_ptr` | 路径 | 阶段日志或证据文件指针 |
+| `merge_source` | 路径 + 内容哈希或 `na` | 行由执行侧（远端拓扑/E3 传输副本）合并进状态脊时必填；记录来源路径、哈希与合并时间；`na` 表示本行由状态脊一侧直接写入 |
+| `merged_at` | epoch 或 ISO-8601 或 `na` | 合并时间；`merge_source=na` 时为 `na` |
 
 **槽位语义**：
 - `baseline`：implement 起点，每线至多 1 条；记录名称级失败基线。
@@ -88,6 +90,7 @@
 - V-E2-4：`environment-failure` 必须给出收集前失败证据；实际执行了测试的调用（含 0 tests collected 的选择失败）不得记为该槽位。
 - V-E2-5：`closure` 的 `baseline_compare` 必须是名称级差集；仅计数比较 → 审计失败（SC-004）。
 - V-E2-6：收口审计 MUST 可选扫描阶段日志（`--logs-dir`）中的全量 runner 命令；日志中出现但台账未入账的全量命中 → 审计失败；日志缺失 → `unknown`，MUST NOT 当零。
+- V-E2-7：`merge_source` 非 `na` 时，驱动 MUST 把执行侧传输行合并进状态脊并记录来源路径/哈希/时间；合并后的槽位语义 MUST 与直接写入一致；`test-evidence/implement.jsonl` 只是传输载体，合并前 MUST NOT 作为台账或审计来源；closure 审计在状态脊看不到 baseline 时 MUST 失败（FR-017/TB-03）。
 
 ## E3 — Targeted Test Evidence
 
@@ -96,6 +99,7 @@
 | 字段 | 取值/形态 | 约束 |
 |------|-----------|------|
 | `stage` | 阶段名 | 一条记录只属一个阶段 |
+| `row_type` | `stage-status` \| `run` | 每个适用阶段恰有一条 `stage-status`（阶段状态行）；`run` 为可选的补充运行行 |
 | `status` | `ran` \| `not-run-docs-only` \| `empty-selection-escalated` \| `not-applicable-skipped-stage` \| `unknown` | 不允许静默空证据；`not-applicable-skipped-stage` 即 [[STR-008]] |
 | `command` | 命令行 | `ran` 必填 |
 | `selection_basis` | 规则编号 + 命令输出摘要 | 算法 owner = `contracts/test-budget.md` TB-05 `targeted-set-v1`；取 (a) 改动路径覆盖、(b) 交付物契约测试、(c) 夹具改动测试的并集 |
@@ -104,13 +108,16 @@
 | `rc` / `passed` / `failed` | 整数 | `ran` 必填；缺失 → `unknown` |
 | `new_failures[]` | 测试 ID 列表 | 相对所选基线 |
 | `baseline` | 路径/命令或 `na` | 比较基线 |
+| `changed_paths[]` | 仓库相对路径列表 | `not-run-docs-only` 必填；证明改动集不含可执行/测试面 |
 | `evidence_ptr` | 路径 | 阶段日志/证据文件 |
 
 **校验规则**：
 - V-E3-1：`selected_paths` 为空且本阶段改动了可执行面 → `status=empty-selection-escalated`，必须扩大同族或按显式例外升级为全量（FR-013 边界）。
-- V-E3-2：`not-run-docs-only` 仅当改动集不含可执行/测试面时合法；必须附改动路径证据。
-- V-E3-3：缺命令、选择依据、rc、计数、新增失败、基线任一字段 → 收口审计报告 `unknown`（SC-005）。
+- V-E3-2：`not-run-docs-only` 仅当改动集不含可执行/测试面时合法；必须附 `changed_paths[]` 证据。
+- V-E3-3：`ran` 行缺命令、选择依据、rc、计数、新增失败、基线任一字段 → 收口审计报告 `unknown`（SC-005）。
 - V-E3-4：`status=not-applicable-skipped-stage`（[[STR-008]]）仅当 `stage=checklist`、E1 准入记录 `decision=fast-lane` 且状态脊含 [[STR-003]] 跳过标记时合法；该记录 MUST NOT 记为 `unknown`，MUST NOT 计入 SC-005 完整性分母；缺少上述联结证据的跳过 → `unknown` 并由收口审计报告。
+- V-E3-5：`status=not-run-docs-only` 按缩减字段集判定完整——`stage`、`row_type=stage-status`、`status`、`selection_basis`、`changed_paths[]`、`evidence_ptr` 六项齐全；运行字段（`command`、`rc`、`passed`、`failed`、`new_failures`、`baseline`）不适用，MUST NOT 报 `unknown`。缺任一缩减字段 → 判未完整。
+- V-E3-6：每个适用阶段 MUST 恰有一条 `row_type=stage-status` 行；整阶段缺失该行 → 计入完整性分母并判未完整（MUST NOT 静默缩小分母）；授权跳过阶段（[[STR-008]]）不计入分母；收口审计 MUST 输出 `stages=N complete=N`（N = 适用阶段总数）。
 
 ## E4 — Plan Constraint State
 
@@ -120,7 +127,9 @@
 |------|-----------|------|
 | `plan_constraint` | `absent` \| `active` | plan U4 通过时置 `active` |
 | `activated_at` | epoch/ISO-8601 | 生效点 = plan 完成时 |
-| `plan_commit` | 提交号 | 约束基线；同时是「已批准需求基线」锚点（FR-022） |
+| `plan_commit` | 提交号 | 约束基线；同时是「已批准需求基线」的**初始**锚点（FR-022） |
+| `approved_baseline_commit` | 提交号 | 初始 MUST 等于 `plan_commit`；任何 re-baseline 后更新为最新基线提交；E5 分类 MUST 以它为准 |
+| `rebaseline_events[]` | 每次 `{trigger, at, previous_baseline_commit, new_baseline_commit, requirements_diff_summary}` | requirements.md 在 plan U4 后被合法修改时记录的重新锚定事件；不构成 plan 重审，不移动约束生效点 |
 | `plan_owned_paths[]` | 路径列表 | `plan.md`、`data-model.md`、`contracts/`、`quickstart.md`、`research.md`、`feature-ref.md` |
 | `re_reviews[]` | 每次 `{trigger, at, plan_commit}` | 每次完整 plan 重审都必须记录；不设人工次数上限，重复回环由既有 stall/retry 纪律（90 分钟 / 2 次）兜底 |
 
@@ -128,6 +137,8 @@
 - V-E4-1：`active` 后下游提示词必须携带只小修块与 `PLAN-EDIT:` 声明要求（FR-020/FR-021）。
 - V-E4-2：驱动重入后必须从状态脊恢复 `active` 与 `activated_at`（edge case）。
 - V-E4-3：收尾汇总必须报告是否发生 plan 制品改动及其分类（FR-024）。
+- V-E4-4（re-anchoring）：plan 约束激活后，任何在门内完成的 `requirements.md` 变更（含 analyze 路由修复、clarify 写回与显式范围修订）MUST 在下一个依赖该基线的 U4 分类之前触发 re-baseline——状态脊记录 `rebaseline_events[]` 一条（触发、时间、前一基线提交、新基线提交 = 包含该变更的提交、FR/SC 定义集合与语义差异摘要），并把 `approved_baseline_commit` 更新为新基线提交。变更未提交或无法定位其提交时 MUST NOT re-anchor，受影响 plan 改动一律按 FR-022(b) 上送。re-anchoring 本身不构成 plan 重审，也不移动约束生效点；此后的 (a)/(b) 判定 MUST 以最新锚定基线为比较对象。
+- V-E4-5：`approved_baseline_commit` MUST 指向一个包含当前 `requirements.md` FR/SC 定义集合与语义的提交；驱动 MUST 用 `git show <commit>:requirements.md` 复核该文件存在且定义集合与记录一致；缺失或不一致 → 分类不可信、门失败。
 
 ## E5 — Plan Change Classification
 
@@ -136,7 +147,7 @@
 | 字段 | 取值/形态 | 约束 |
 |------|-----------|------|
 | `stage` / `base` / `head` | 阶段名 + 提交区间 | `base..head` 覆盖本阶段提交 |
-| `approved_baseline_commit` | 提交号 | MUST 等于 E4 `plan_commit`；分支 (a)/(b) 判定以该提交的 `requirements.md` FR/SC 定义集合与语义为比较对象；缺失或不一致 → 分类不可信、门失败 |
+| `approved_baseline_commit` | 提交号 | MUST 等于 E4 最新的 `approved_baseline_commit`（初始为 `plan_commit`，re-baseline 后为最新基线提交）；分支 (a)/(b) 判定以该提交的 `requirements.md` FR/SC 定义集合与语义为比较对象；缺失或不一致 → 分类不可信、门失败 |
 | `touched_paths[]` | plan 拥有路径 | 由 `git diff --name-only <base>..HEAD` **加** `git status --porcelain -- <plan paths>`（未提交改动）机械派生 |
 | `declaration_lines[]` | 阶段回传中的 `PLAN-EDIT:` 行 | 缺失即未声明 |
 | `classification` | `none` \| `minor` \| `substantive` \| `undeclared` | 按**最终 diff** 判定，不按单次编辑措辞 |
@@ -148,7 +159,8 @@
 - V-E5-2：`substantive` 定义：改变范围、架构方向、数据模型语义、契约语义、FR/SC 内容或任务分解范围，或引入新能力/安全面。
 - V-E5-3：`minor` 仅限错别字/措辞、断链/引用修复、格式、行级一致性；多处小修合并后改变语义 → 按最终 diff 判 `substantive`。
 - V-E5-4：分流 `(a)` 仅在「修复既有缺陷且不变更上述任一项」时合法；无法判定或引入新面 → `(b)` 四要素上送（FR-022）。
-- V-E5-5：分类记录 MUST 含 `approved_baseline_commit`，其值 MUST 等于 E4 `plan_commit`；分支 (a) 的「不改变已批准需求」判定 MUST 以该提交的 `requirements.md` 为比较对象，MUST NOT 以工作树当前文本或其它提交替代（FR-022/SC-006）。
+- V-E5-5：分类记录 MUST 含 `approved_baseline_commit`，其值 MUST 等于 E4 最新的 `approved_baseline_commit`（初始 = `plan_commit`，re-baseline 后 = 最新基线）；分支 (a) 的「不改变已批准需求」判定 MUST 以该提交的 `requirements.md` 为比较对象，MUST NOT 以工作树当前文本或其它提交替代（FR-022/SC-006）。
+- V-E5-6：若 `requirements.md` 在 plan U4 后发生变更但尚未提交、或无法定位其提交，则 MUST NOT re-anchor；受影响 plan 改动一律按 FR-022(b) 上送。若已 re-anchor，分类 MUST 使用最新 `approved_baseline_commit`，且为本特性新口径所需的 plan 改动 MUST 按两分支正常分类，不得因旧基线缺少该需求而误判越界。
 
 ## E6 — Stage Dispatch Record
 
@@ -157,6 +169,8 @@
 | 字段 | 取值/形态 | 约束 |
 |------|-----------|------|
 | `stage` / `line` | 阶段与线标签 | 一线一状态脊 |
+| `state_spine_path` | 绝对或仓库相对路径 | MUST 等于 E8 U0 入口声明记录的路径；阶段提示词骨架中的 `STATE_SPINE_PATH` 与它同源；缺失 → 派发前快速失败（`ANOMALY:`），MUST NOT 另建第二份状态脊 |
+| `spine_write_mode` | `direct` \| `transport` | `direct` = 执行侧可直接写状态脊（本地）；`transport` = 远端拓扑，执行侧写 `<spec-dir>/test-evidence/<stage>.jsonl` 传输行，由驱动合并进状态脊并记 `merge_source` |
 | `prompt_path` / `sentinel` | 路径 + 字面量 | 哨兵不变（大写阶段名 + [[STR-002]]） |
 | `detached` | `yes` \| `no` | 本地/远端都编码 nohup 形态；`no` 必须标记「未脱离」风险 |
 | `dispatch_form` | 命令行形态摘要 | 必含 `nohup` 与 stdin `/dev/null` 与 stdout/stderr 重定向（FR-031） |
@@ -166,11 +180,16 @@
 | `stage_started_at` / `stage_deadline_epoch` | epoch | TIMEOUT 唯一判据 |
 | `fast_lane_marker` | `none` \| [[STR-003]] | 与准入记录一致 |
 | `plan_constraint_marker` | `none` \| `active` | 与 E4 一致 |
+| `profile_id` / `profile_version` | 字符串 | U2 查档命中的 CLI 档案 id 与版本；无档案先建骨架时记 `skeleton` |
+| `observed_cli_version` | 字符串 | 派发前实测的 CLI 版本；与档案 version applicability 不一致时触发观测事件 |
 
 **校验规则**：
 - V-E6-1：`detached=no` 的运行不得计入受保护运行，状态脊记录风险（edge case）。
 - V-E6-2：`mode=buffered-degraded` 必须附 [[STR-004]] 与原因（SC-011）。
 - V-E6-3：哨兵、判定状态机、退出码、四件套路径语义不得因本实体扩格而变化（FR-029/FR-032）。
+- V-E6-4：`state_spine_path` MUST 非空并与 E8 U0 入口声明一致；缺失或与 U0 不一致 → 派发前以 `ANOMALY:` 快速失败，MUST NOT 猜测路径或另建台账。
+- V-E6-5：派发前 MUST 记录 `profile_id` / `profile_version` / `observed_cli_version`；档案缺失时先按 CP-01 建骨架并把缺口写入状态脊；缺少查档记录的派发 → 门失败。
+- V-E6-6：`spine_write_mode=transport` 时，阶段 MUST 只写 E3 传输行与名称名单；驱动 MUST 在 U4 后把对应 E2 行合并进状态脊并记 `merge_source`；执行侧 MUST NOT 创建第二份台账，closure 审计在状态脊看不到 baseline 时 MUST 失败。
 
 ## E7 — Raw/Live Evidence Pair
 
@@ -195,21 +214,24 @@
 
 | 区块 | 内容 | 写入时机 |
 |------|------|----------|
-| U0 entry | 目标/拓扑/权威/切片/断点 + [[STR-006]]（如有） | U0 |
+| U0 entry | 目标/拓扑/权威/切片/断点 + `state_spine_path` + `spine_write_mode`（`direct`/`transport`） + [[STR-006]]（如有） | U0 |
 | preflight | 五族结论摘要 | U0/U1 之间 |
-| dispatch | E6 字段 | U2 派发前 |
+| dispatch | E6 字段（含 `state_spine_path`、`spine_write_mode`、CLI 档案查档字段） | U2 派发前 |
 | watch | `last_verdict` / 证据快照 | U3 终止判定时 |
 | admission | E1 | checklist 派发前 |
 | test budget | E2 围栏 | 每次测试证据入账时 |
-| plan constraint | E4 | plan U4 后 |
-| stall baseline | [[STR-007]] 路径 + `base_commit` + 录制时间 | 实现首个行为面提交前 |
+| plan constraint | E4（含 `approved_baseline_commit`、`rebaseline_events[]`） | plan U4 后 |
+| stall baseline | [[STR-007]] 路径 + `base_commit` + `initial_retries=0` + 录制时间 | 实现首个行为面提交前 |
 | plan changes | E5 | 每个下游阶段 U4 后 |
+| CLI observations | `{cli, trigger, expected, observed, outcome, profile_update, feedback_entry_id, evidence_ptr}` | 每次 U2/U4/U5 观测事件，先于档案更新与反馈记录 |
 | verify/stall | U4 结论 / U5 上送四要素 | U4/U5 |
 
 **校验规则**：
 - V-E8-1：所有状态转移先写状态脊后执行动作；续环不依赖会话记忆。
 - V-E8-2：多线并行时每线独立 E1/E2/E4/E6/E7，路径与槽位不得共享或互相覆盖（FR-011）。
 - V-E8-3：新会话接手先 `--once` 快照；已完成阶段只核验不重派（FR-032）。
+- V-E8-4：U0 入口 MUST 记录 `state_spine_path` 与 `spine_write_mode`；所有阶段的 E6 与阶段提示词骨架 MUST 引用同一路径。远端拓扑（`transport`）下，执行侧只写 spec-dir 证据与传输行，驱动在 U4 后合并进状态脊并记录 `merge_source`；本地拓扑（`direct`）可直接追加，但状态脊 MUST 仍是唯一台账来源（FR-017/TB-03）。
+- V-E8-5：每次 CLI 观测事件 MUST 先在 `CLI observations` 段写入记录，再更新档案 provenance，再写反馈；三者的时间顺序 MUST 可由记录/文件时间或顺序号复核（先写后动）。观测记录缺失但档案/反馈已变更 → 审计判不可信。
 
 ## Stall Behavior Baseline（卡死行为基线证据制品，非 E1–E8 实体）
 
@@ -223,13 +245,49 @@
 | 重试上限（stalled） | 状态脊卡死状态 + 四要素上送件齐备 |
 | 伪完成（退出 rc=0 且哨兵缺失） | 判 INCOMPLETE，不派发下一阶段 |
 
-**每个元组字段**：`watcher_verdict`、`exit_code`、`spine_stall_state`、`retries_consumed`、`escalation_package_complete`（或 `not-applicable`）、`next_stage_dispatched`（`yes|no`）、`spine_write_before_action`（`yes|no`）、`evidence_ptr`。文件根字段：`base_commit`、`recorded_at`、`scenarios[]`。
+**每个元组字段**：`watcher_verdict`、`exit_code`（对象：`{"watcher": <int>, "runner": <int>}`，分别记录 watcher 判定退出码与 runner/CLI rc；MUST NOT 合并为一个值）、`spine_stall_state`、`retries_consumed`、`escalation_package_complete`（或 `not-applicable`）、`next_stage_dispatched`（`yes|no`）、`spine_write_before_action`（`yes|no`）、`evidence_ptr`。文件根字段：`base_commit`、`recorded_at`、`initial_retries`（固定为 `0`）、`scenarios[]`。
 
 **录制与比较约束**：
-- SB-1：基线 MUST 在实现首个行为面提交之前录制；录制时点与 `base_commit` MUST 写入状态脊（E8 stall baseline 行）。
-- SB-2：超时与伪完成场景用 watcher 自动夹具录制；重试上限的驾驶过程用录制 trace，两类证据在验证记录中如实标注，MUST NOT 把 trace 冒充自动测试。
-- SB-3：收口 MUST 用同一组夹具在当前树上重放并生成 final 记录；比较前归一化剔除时间戳、PID、绝对路径与耗时。
+- SB-1：基线 MUST 在实现首个行为面提交之前录制；录制时点、`base_commit` 与 `initial_retries=0` MUST 写入状态脊（E8 stall baseline 行）。
+- SB-2：三类场景（超时 / 重试上限 / 伪完成）MUST 统一由**驱动侧可执行夹具**（`tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py`）驱动并观测：stub runner 产生受控 pid/status/heartbeat/runner-log 与 rc，真实 `watch-target.sh` 提供 U3 判定，夹具执行文档化的 U4/U5 驱动侧程序（状态脊先写后动、重试消耗、四要素上送件、下一阶段派发决策）并从状态脊/status/退出记录读取七个字段。watcher 自动夹具只提供 U3 判定，不得被当作驱动侧字段来源；录制 trace 仅可作为端到端补充证据，MUST NOT 替代夹具观测。
+- SB-3：收口 MUST 用同一可执行夹具与同一 `initial_retries=0` 在当前树上重放并生成 final 记录；比较前归一化剔除时间戳、PID、绝对路径与耗时。
 - SB-4：逐字段比较；任何字段差异 MUST 判回归并修复，MUST NOT 以归因豁免。名称级测试失败基线只服务 SC-012，MUST NOT 用于 SC-010。
+- SB-5（反转录）：夹具 MUST NOT 从判定表/场景→期望值映射填充字段，MUST NOT 从基线文件回填；字段值 MUST 由受控场景中的实际观测产生。夹具 MAY 断言内部一致性（如 `runner` 子字段等于 status 文件的 `exit`、`watcher` 子字段等于 watcher 进程退出码），但 MUST NOT 断言或写入硬编码的期望元组。`retries_consumed` MUST 从 `initial_retries=0` 起按实际重试逐步累加；`spine_write_before_action` MUST 由状态脊写入与动作执行的可复核顺序产生。
+
+## CLI Capability Profile（CLI 能力档案证据制品，非 E1–E8 实体）
+
+**定位**：每个作为 subagent 调用的 CLI 一份活文档，路径 `skills/external/sdd-loop-driver/references/cli/<cli>.md`；schema 与观测程序的单一 owner 是 `references/cli/README.md`。它不是状态脊实体，不改变 E1–E8 计数，也不消耗测试预算；它承载 CLI 行为知识，档案更新通过 E8 `CLI observations` 段与既有 feedback 引擎留痕。
+
+**档案集合**：至少 `qodercli.md`、`claude.md`、`codex.md`、`opencode.md`、`hermes.md`；`qodercli.md` MUST 含已验证 `known` 条目，其余四份 MAY 为骨架但每个维度 MUST 显式 `known`/`unknown`。
+
+**档案字段**：
+
+| 字段 | 取值/形态 | 约束 |
+|------|-----------|------|
+| `cli` | 字符串 | 与文件名一致；稳定标记 [[STR-009]]`<cli>` 使用同一名称 |
+| `profile_version` | 正整数 | 每次档案内容变更递增 |
+| `last_updated` | ISO-8601 | 最近一次更新日期 |
+| `known_unknown_summary` | `known=<n> unknown=<n>` | 与条目实际状态一致，不得手写不一致 |
+| `invocation` | 结构化条目 | 非交互旗标、cwd、提示词输入、模型/权限参数 |
+| `output_modes` | 结构化条目 | `-p` 缓冲形态与 [[STR-001]] 形态；事件形状与终止结果位置 |
+| `timeout_caps` | 结构化条目 | `BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 语义与观测值；与阶段 deadline 的区分 |
+| `sentinel_reliability` | 结构化条目 | 是否保证终止 `result` 文本；已知非终止事件哨兵字样情形；降级路径 |
+| `session_logs` | 结构化条目 | session 存储/恢复命令、运行日志目录 |
+| `known_defects[]` | 条目列表 | `{id, symptom, affected_versions, workaround, fixed_in, status}` |
+| `version_applicability` | 结构化条目 | 观测到的 CLI 版本、平台、适用区间 |
+| `provenance[]` | 条目列表 | `{at, trigger, observation, profile_change, feedback_entry_id\|standalone, evidence_ptr}` |
+
+**条目字段**（每个维度下的原子条目）：`status: known|unknown`、`value`、`observed_at`、`cli_version`、`evidence_ptr`。`unknown` 条目 MUST NOT 带猜测值。
+
+**观测记录字段**（状态脊 E8 `CLI observations` 段，一行一次事件）：`cli`、`trigger`（`u2-pre-dispatch` / `u4-verify` / `u5-stall`）、`expected`（档案当前值或 `unknown`）、`observed`、`outcome`（`mismatch` / `unknown-fill` / `new-version` / `match`）、`profile_update`（`profile_version` 或 `none`）、`feedback_marker`（[[STR-009]]`<cli>` 或 `standalone`）、`feedback_entry_id`、`at`、`evidence_ptr`。`outcome=match` 的记录 MUST NOT 产生反馈条目。
+
+**校验规则**：
+- V-CP-1：五份档案存在；每份含七个必填维度与 `provenance[]`；缺失任一维度 → 契约失败。
+- V-CP-2：每个条目有 `status`；`known` 条目四元数据（`observed_at`、`cli_version`、`evidence_ptr`、`value`）齐全；`unknown` 条目不携带猜测值。
+- V-CP-3：`known_unknown_summary` 与条目实际状态一致；`last_updated` 与最新 provenance 一致。
+- V-CP-4：`version_applicability` 覆盖观测到的版本；版本不一致产生 `outcome=new-version` 观测事件，不得静默沿用旧值。
+- V-CP-5：观测记录先于档案更新与反馈写入（E8 V-E8-5）；`outcome≠match` 的记录 MUST 有对应 `profile_update` 与反馈 id（standalone 记 `standalone`）。
+- V-CP-6：档案更新 MUST NOT 改变 E6 已记录的当前阶段派发形态；当前阶段命令与判定以 E6 为准（CP-08）。
 
 ## 实体关系
 
@@ -240,6 +298,8 @@ E8 State Spine (per line)
  ├─ E2 Test Budget Ledger (2 slots + reruns/exceptions)
  │    └─ evidence_ptr ──▶ E3 Targeted Evidence ×N (per stage)
  ├─ E4 Plan Constraint State (activated at plan completion)
+ │    └─ approved_baseline_commit / rebaseline_events[]
  ├─ E5 Plan Change Classification ×N (per downstream stage U4)
+ ├─ CLI observations ×N ──▶ CLI Capability Profile (per CLI) ──▶ [[STR-009]] feedback marker
  └─ Stall Behavior Baseline ──▶ [[STR-007]] (recorded before first behavior commit)
 ```
