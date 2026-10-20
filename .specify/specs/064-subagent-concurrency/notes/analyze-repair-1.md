@@ -56,7 +56,7 @@
 | U-03 | MEDIUM | reservation PID 语义（launcher/runner/cli）；留待 US3 实现时明确 |
 | U-05 | MEDIUM | `resources.active_count/cap` 字段与报告时点；未列入本轮清单 |
 | G-01 | MEDIUM | FR-012 的 SC 度量缺口；本轮仅在 T008 补了 EN-13 具名断言，SC 级度量留待后续 |
-| G-04 | MEDIUM | SC-002/003/005 的测量分母与非 own 事件覆盖；留待后续 |
+| G-04 | MEDIUM | 部分：SC-002 的 ambiguous-stop 分母已记录（见 requirements Clarifications）；SC-003/SC-005 的 stale-run/unattributed 与 orphan/stalled/remote 测量面留待后续 |
 | G-05 | MEDIUM | SC-009 的 N 值与写-读交错断言；留待后续 |
 | G-06 | MEDIUM | SC-004 的比较层级（队列日志/树哈希/提交 SHA）；留待后续 |
 | A-01 | MEDIUM | 「安全缺省派发」定义与 061 矩阵合成；留待后续 |
@@ -72,7 +72,7 @@ checklists/concurrency.md 的 24 项 FAIL 保持原样（dated record）；本�
 
 ## 5. Validator / 结构证据
 
-- `python3 .specify/scripts/python/validate-requirements.py .specify/specs/064-subagent-concurrency/requirements.md` → exit 0，`scanned: 362 lines, 78 definition rows, 4 shared strings`，0 error / 0 warning。
+- `python3 .specify/scripts/python/validate-requirements.py .specify/specs/064-subagent-concurrency/requirements.md` → exit 0，`scanned: 363 lines, 78 definition rows, 4 shared strings`，0 error / 0 warning。
 - `python3 .specify/scripts/python/validate-tasks.py .specify/specs/064-subagent-concurrency/tasks.md` → PASS，0 error / 0 warning。
 - `python3 .specify/scripts/python/glossary-utils.py --action validate --root .` → `valid: true`。
 - 结构计数：FR 68、SC 10、V-* 59、契约条款 98（LR 13 + EN 16 + WI 21 + LC 18 + CLP 17 + NG 13）、任务 T001–T082 连续且 82 行。

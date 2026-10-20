@@ -55,7 +55,7 @@ No new command, skill, daemon, external service, runtime dependency, or model AP
 | SC | Evidence plan |
 |----|---------------|
 | SC-001 | `test_two_line_isolation` — event attribution diff list is empty; both lines' completion verdicts correct (2/2 = 100%) |
-| SC-002 | Ingress fixture — exactly one question per unidentified message; PATH-stub `ps`/`pgrep` invocation count 0; post-answer routing correctness 100% (ambiguous-stop counts as a correct terminal outcome and is excluded from the routing denominator) |
+| SC-002 | Ingress fixture — exactly one question per unidentified message; PATH-stub `ps`/`pgrep` invocation count 0; post-answer routing correctness 100% (ambiguous-stop counts as a correct terminal outcome, not an error; correctness = correct outcomes / answered messages) |
 | SC-003 | Foreign monitor/PID fixture — state transition count 0; 100% tagged `foreign` |
 | SC-004 | `test_worktree_integration_queue` — `git fsck`, commit graph, overlap rejection 100%, replay diff 0 |
 | SC-005 | `test_session_kill_reattach` — survival 100%, reattach 100%, redispatch 0, branch outcome matches evidence |

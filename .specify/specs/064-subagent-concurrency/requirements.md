@@ -359,3 +359,4 @@
 - Q: driver lease 的续租节奏与「PID 活但心跳过期」如何处置？ → A: 持有者 MUST 以 ≤ `ttl_seconds/3`（缺省 TTL 600s → ≤200s）续租，并在阶段推进点各续租一次；存活判据为心跳未过期且 PID/token 匹配；心跳过期但 PID 仍存活且 token 匹配视为 `suspected-alive`，不得自动夺取或破除，只允许显式 `--override` 破除并留痕。
 - Q: Probe Object 的 fallback 形态？ → A: 主落点 `skill-wrapup` + `unit=skill:sdd-loop-driver` 经实测可通过 `probes --validate`；`custom:` 形态不匹配注册表 unit 正则、external 形态要求 `ext-` 前缀，故 MUST NOT 保留不可执行的 fallback。
 - Q: 运行时记录集合如何闭合？ → A: 以 `data-model.md` § E8 的四路径为唯一枚举；`evidence/`、`history/`、`trigger/` 明确排除（理由见 FR-022）。
+- Q: SC-002 的路由正确率如何处理 `ambiguous-stop`？ → A: `ambiguous-stop` 是 FR-010 规定的正确终止结局，计为正确而非错误；正确率 = 正确结局数 / 已回答消息数。SC-003/SC-005 的其余测量面（stale-run/unattributed、orphan/stalled/remote-unreachable）留待 G-04 后续收口。
