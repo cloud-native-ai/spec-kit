@@ -314,11 +314,15 @@ Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓）；契约文件 5（原
 - `PLAN-EDIT: plan.md — 删除 §⑤ CLI Capability Profiles 设计、CLI 交付/镜像/Probe/测试条目与相关计数，新增“CLI 行为知识边界（064 owner）”指针与第 3 轮记录；分类=substantive（删除已迁出的能力面），理由=执行 064 的收编条款（CLP-17）与 `notes/063-overlap-adjudication.md` 的逐条裁决，不改变四项吞吐优化的范围。`
 - `PLAN-EDIT: data-model.md — 删除 CLI Capability Profile 证据制品、CLI schema 规则组、E6 CLI 查档字段与其校验规则、E8 CLI observations 与其校验规则，改为指向 064 E9/E10；分类=substantive（字段面收窄），理由=同一裁决；E1–E8 基础实体与其余 41 条校验规则不变。`
 - `PLAN-EDIT: contracts/cli-profiles.md — 删除该 provisional 契约文件；分类=substantive（删除重复 owner），理由=064 是唯一 owner，仓库级守卫 `test_clp_17_no_063_duplicate_owner` 要求 063 不得保留第二份契约。`
+- `PLAN-EDIT: contracts/progress-decoupling.md — PD-01/PD-04 的 CLI 行为事实与工具超时改为指向 064 的 `references/cli/` 与 CLP-02/CLP-08；分类=minor（指针与引用修复），理由=CLI-profile 契约已迁出 064，063 只保留 stream-json/nohup 行为规则。`
+- `PLAN-EDIT: contracts/delivery-and-invariants.md — DI-01/DI-04/DI-05/DI-06/DI-09 删除 CLI 档案、CP 条款与 Probe Object 交付项及 FR-049/SC-014/SC-016 引用，DI-05 更新镜像基线表述，追溯表与覆盖核对重新映射；分类=substantive（交付面与引用面收窄），理由=同一裁决，消除悬空引用。`
 - `PLAN-EDIT: quickstart.md — 删除 S8 CLI 档案查档/观测场景与相关清理/术语/钉住项，S6 锚点链更新；分类=minor（删除已迁出场景），理由=同一裁决，场景编号收口为 S1…S7。`
 - `PLAN-EDIT: feature-ref.md — 删除 CLI 档案 FR/SC 映射、交付项与基线记录，更新为 43 FR / 13 SC / 24 项交付；分类=substantive（映射与交付面收窄），理由=同一裁决。`
 - `PLAN-EDIT: research.md — 将 B-8/R-11 改为指向 064 的归属记录，更新 B-5 计数与未决项；分类=minor（dated 证据与指针），理由=同一裁决。`
 - `PLAN-EDIT: tasks.md — 仅由 tasks 阶段更新：不新增 US6；T044 只新增 `Efficiency Optimizations` H2；T048 增加 064 归属守卫；计数与实测前提按 43 FR / 13 SC / 50 条款 / 24 交付 / 7 场景重算；分类=minor（任务侧收口），理由=同一裁决。`
 
 **编号与计数**：FR 收口到 FR-043（43 条），SC 收口到 SC-013（13 条），Shared Strings 收口到 STR-008（8 条），契约 5 文件 / 50 条款（含 PC-11），数据模型 8 实体 / 41 条 E 规则，quickstart 7 场景，交付 24 项。所有引用由 `validate-requirements.py` 与 `validate-tasks.py` 复算，MUST exit 0。
+
+**纠正类发现（就地修复并披露）**：PC-11 已在 plan-repair-2 引入，但 tasks.md 的 DoD-3、T026、T046、T049、Clause partition 与 plan 的若干计数仍写 49 条款且遗漏 PC-11。本轮统一为 50 条款，并把 `test_pc_11_reanchoring` 纳入 T026 与 T046 的覆盖要求；同时把合并 064 后的实测值（镜像 62 DIFF / 本对 0；既有契约 23 passed；watcher 自测 28 passed / 0 failed）写回 tasks/feature-ref/research 的实测前提。以上均为可复算事实的纠正，不改变需求范围或设计。
 
 **不重审理由**：本轮是 plan 约束激活后的下游规格修复，但 CLI-profile 增量的迁出是 064 已记录的跨特性裁决，不是对已批准需求范围的改写；四项吞吐优化的 FR/SC 语义、架构、数据模型与任务分解均未改变。该情形属于 FR-022(a) 所称“修复既有缺陷所必需”，且 064 的 owner 地位是唯一一致读法；若驱动认为存在其它读法，按 FR-022(b) 四要素上送。
