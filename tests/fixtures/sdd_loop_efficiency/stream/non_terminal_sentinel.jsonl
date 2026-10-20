@@ -1,0 +1,3 @@
+{"type":"system","subtype":"init","session_id":"fixture-non-terminal"}
+{"type":"assistant","message":{"content":[{"type":"text","text":"working on the stage; the text mentions PLAN-DONE but this is not a terminal result"}]}}
+{"type":"assistant","message":{"content":[{"type":"text","text":"still working after the sentinel-shaped line"}]}}

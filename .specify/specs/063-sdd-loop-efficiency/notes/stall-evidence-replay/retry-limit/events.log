@@ -1,0 +1,11 @@
+WRITE step=1 dispatch stage
+ACTION step=1 launch-runner
+WRITE step=2 retry_consumed
+WRITE step=3 dispatch stage
+ACTION step=3 redispatch-runner
+WRITE step=4 retry_consumed
+WRITE step=5 dispatch stage
+ACTION step=5 redispatch-runner
+WRITE step=6 stall_state
+ACTION step=6 emit-escalation
+WRITE step=7 retries_consumed

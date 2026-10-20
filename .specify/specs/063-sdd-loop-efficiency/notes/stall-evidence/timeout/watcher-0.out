@@ -1,0 +1,2 @@
+WATCH label=fixture verdict=TIMEOUT pid=alive heartbeat=fresh anomaly=no sentinel=no rc=na elapsed=1 reason=deadline
+EVIDENCE label=fixture last="" status=""

@@ -1,0 +1,2 @@
+WATCH label=fixture verdict=FAILED pid=dead heartbeat=fresh anomaly=no sentinel=no rc=1 elapsed=0 reason=exit-record-rc
+EVIDENCE label=fixture last="" status="exit=1 sentinel=0"

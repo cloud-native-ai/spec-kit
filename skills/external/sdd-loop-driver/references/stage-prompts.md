@@ -16,6 +16,9 @@
 - 项目宪法：<project>/.specify/memory/constitution.md（合规底线）
 - 上一阶段完成提交：<prev-stage-commit-hash>（续作基线）
 - 当前断点判定：<breakpoint-verdict>（从状态脊恢复时必填）
+- 状态脊：STATE_SPINE_PATH=<state_spine_path>（U0 入口声明；缺失即快速失败）
+- 证据目录：EVIDENCE_DIR=<spec-dir>/test-evidence
+- 状态脊写入模式：SPINE_WRITE_MODE=direct|transport
 ```
 
 ### 第②段：执行要求（默认纪律，每次派发原样携带）
@@ -62,6 +65,147 @@
 3. **纪律合规抽查（充分条件之二）**：第②段的执行要求未被违反——脏文件未被提交/还原、无未授权 push、假设已记录。
 
 **伪完成判未完成**：尾标在而产物缺 = 未完成，循环不派发下一阶段。**U3 返回 `DONE` 只是候选**，三条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。
+
+## Fast Lane Conditional Blocks（快车道条件块）
+
+> Owner of the fast-lane rules is `references/efficiency-model.md` §1. These
+> blocks are copied verbatim into the dispatched prompt only when the line's E1
+> admission record says `decision=fast-lane`. A full-chain run receives none of
+> them; a missing checklist artifact is then a missing required gate.
+
+### implement block（快车道录取时）
+
+```text
+FAST LANE: this line was admitted before checklist (E1 record in the state
+spine; entry literal fast-lane=opt-in). The checklist stage is intentionally
+skipped: checklist=skipped(fast-lane). Do not treat the absent checklist
+artifact as a missing required gate. analyze and review remain mandatory and
+unchanged. Any reversion trigger (new engine/skill/dependency/security surface,
+task-count drift) must be reported with the explicit anomaly line; the driver
+then reverts to the full chain, re-dispatches checklist, and re-runs analyze if
+it had already passed.
+```
+
+### review block（快车道录取时）
+
+```text
+FAST LANE: checklist=skipped(fast-lane) (E1 admission record in the state
+spine). Review behavior, evidence obligations and finding severities are
+unchanged. Do not waive a missing required validation because checklist was
+skipped; only the checklist quality-list step is absent.
+```
+
+### 发布纪律
+
+- 驱动在派发 `implement` / `review` 提示词时，从状态脊读取 E1 记录并附上对应块与准入证据指针；无 E1 记录或 `decision=full-chain` 时 MUST NOT 附块。
+- 收尾汇总必须携带 `checklist=skipped(fast-lane)` 或等价可见标记；回退过的线同时携带 `reversion` 触发与证据。
+
+## Test Budget Blocks（测试预算块，全部阶段）
+
+> Owner of the two-slot rules is `references/efficiency-model.md` §2. These
+> blocks are copied into the dispatched prompt according to the stage; the
+> session state is always `STATE_SPINE_PATH` (never a second ledger file).
+
+### implement block（implement 起点）
+
+```text
+TEST BUDGET: before the first task, run exactly one full suite:
+  bash scripts/bash/run-tests.sh --names-out <spec-dir>/baseline-failed.txt
+Write the E2 baseline row into the state-spine fence at STATE_SPINE_PATH
+(seq=1, slot=baseline, stage=implement, selection_basis=full-suite, command,
+rc, passed/failed, failed_names_path, evidence_ptr; merge_source/merged_at=na
+when written directly). 禁止第二次全量（Do not run a second full suite in
+implement); any additional full run is forbidden unless it is recorded as
+out-of-slot-exception with a reason and evidence. Intermediate verification uses the targeted set
+targeted-set-v1 (efficiency-model §2.3) and leaves an E3 stage-status row in
+EVIDENCE_DIR.
+```
+
+### 中间阶段与 review block（clarify / plan / tasks / checklist / analyze / review）
+
+```text
+TEST BUDGET: run only the targeted set selected by targeted-set-v1 with
+stage_base=<stage-base>; record command, selection_basis, selected_paths[],
+sufficiency, rc, passed/failed, new_failures[] and baseline in an E3
+stage-status row (EVIDENCE_DIR). Docs-only stages record status=not-run-docs-only
+with the six reduced fields. An empty set with executable changes is recorded
+as empty-selection-escalated (expand or escalate explicitly). A checklist stage
+skipped by the fast lane records not-applicable-skipped-stage and is excluded
+from the completeness denominator.
+```
+
+### closure block（驱动侧，review 后、合并前）
+
+```text
+TEST BUDGET CLOSURE: after review passes and before merge, run the closure full
+suite:
+  bash scripts/bash/run-tests.sh --names-out <spec-dir>/final-failed.txt
+Compare by name: comm -13 baseline-failed.txt final-failed.txt. Append the E2
+closure row to the SAME state spine (baseline_compare must be the name-level
+diff; never a count comparison), then audit:
+  python3 <skill-dir>/scripts/audit-test-budget.py --spine "$STATE_SPINE" \
+    --spec-dir <spec-dir> --stage-check closure
+The summary must report baseline:1 closure:1 plus stages=N complete=N; any new
+failure is fixed or explicitly attributed. A fix rerun of the same suite is an
+in-slot-rerun (trigger + evidence), not a third slot.
+```
+
+### closure-repair 重入 block
+
+```text
+TEST BUDGET: this re-entry repairs closure findings and carries
+baseline_slot=skip(closure-repair). Do not consume the baseline slot again and
+do not run any other full suite; use targeted-set-v1 for intermediate tests.
+```
+
+## Plan Constraint Block（plan 完成后的只小修块）
+
+> Owner of the plan constraint rules is `references/efficiency-model.md` §3.
+> The block is copied into the `tasks` / `analyze` / `implement` / `review`
+> prompts whenever the state spine says `plan_constraint=active`. On re-entry
+> the driver restores `active` and `activated_at` from the spine before
+> dispatching; a missing value is a fast-fail at dispatch, never a silent
+> "constraint absent".
+
+```text
+PLAN CONSTRAINT: plan_constraint=active since <activated_at>
+(plan_commit=<plan_commit>; approved_baseline_commit=<latest anchor>). Any
+change to a plan-owned artifact (plan.md, data-model.md, contracts/,
+quickstart.md, research.md, feature-ref.md) must be a minor fix only —
+typo/wording, broken link/reference repair, formatting, line-level consistency.
+Declare every touch before the done sentinel in the return:
+  PLAN-EDIT: <path> — <reason>；分类=minor|substantive
+For a substantive change (scope, architecture, data-model/contract semantics,
+FR/SC content, task breakdown, new capability/security surface), stop and
+return exactly one explicit anomaly line:
+  ANOMALY: <one-line fact>
+together with the proposed change and its substantive reason. Never rewrite the
+plan silently and never re-run the plan stage yourself.
+```
+
+## Progress & Detach Blocks（进度与脱离）
+
+> Owner of the stream/detach rules is `references/efficiency-model.md` §4.
+
+### 派发块（每个阶段）
+
+```text
+PROGRESS & DETACH: this stage runs under stage-runner.sh with
+--output-format stream-json by default. The raw stream (raw-<line>-<stage>.jsonl)
+and the derived live log (log-<line>-<stage>.log) are evidence; only a terminal
+result may leave the sentinel as the last non-empty line. The dispatch record
+carries detached=yes|no; detached=no is recorded as an unprotected run with a
+risk reason. Progress growth and raw bytes never decide completion.
+```
+
+### 重入块（新会话接管时）
+
+```text
+REENTRY: before dispatching or resuming, run watch-target.sh --once against the
+recorded pid/status/log/heartbeat. A completed stage is verified, never
+redispatched. Wait only inside the long-poll window; do not add an independent
+sleep turn and do not start any resident service.
+```
 
 ## Stall Handling & State Spine（卡死处置与状态脊，U5）
 

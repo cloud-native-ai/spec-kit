@@ -138,7 +138,7 @@ def test_clp_08_u2_consult_record():
         assert field in prompts, f"dispatch record field missing: {field}"
     assert "U2" in prompts and "只读查阅" in prompts
     index = (CLI_DIR / "index.md").read_text(encoding="utf-8")
-    assert "063" in index and "stream-json" in index
+    assert "efficiency-model.md" in index and "stream-json" in index
     assert "不改写" in index or "不得改写" in index
 
 

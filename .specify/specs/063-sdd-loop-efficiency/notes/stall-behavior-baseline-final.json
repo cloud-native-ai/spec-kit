@@ -1,0 +1,66 @@
+{
+  "differences": [],
+  "replay": {
+    "base_commit": "a108ff116e503bcb78375e7347bb0a28baee68f2",
+    "recorded_at": 1792501912,
+    "initial_retries": 0,
+    "scenarios": [
+      {
+        "scenario": "timeout",
+        "watcher_verdict": "TIMEOUT",
+        "exit_code": {
+          "watcher": 14,
+          "runner": 124
+        },
+        "spine_stall_state": "stalled-timeout",
+        "retries_consumed": 0,
+        "escalation_package_complete": "true",
+        "next_stage_dispatched": "no",
+        "spine_write_before_action": "yes",
+        "evidence_ptr": "stall-evidence-replay/timeout/spine.md"
+      },
+      {
+        "scenario": "retry-limit",
+        "watcher_verdict": "FAILED",
+        "exit_code": {
+          "watcher": 12,
+          "runner": 1
+        },
+        "spine_stall_state": "stalled-retry-limit",
+        "retries_consumed": 2,
+        "escalation_package_complete": "true",
+        "next_stage_dispatched": "no",
+        "spine_write_before_action": "yes",
+        "evidence_ptr": "stall-evidence-replay/retry-limit/spine.md"
+      },
+      {
+        "scenario": "fake-done",
+        "watcher_verdict": "INCOMPLETE",
+        "exit_code": {
+          "watcher": 15,
+          "runner": 0
+        },
+        "spine_stall_state": "incomplete-fake-done",
+        "retries_consumed": 0,
+        "escalation_package_complete": "not-applicable",
+        "next_stage_dispatched": "no",
+        "spine_write_before_action": "yes",
+        "evidence_ptr": "stall-evidence-replay/fake-done/spine.md"
+      },
+      {
+        "scenario": "success",
+        "watcher_verdict": "DONE",
+        "exit_code": {
+          "watcher": 0,
+          "runner": 0
+        },
+        "spine_stall_state": "",
+        "retries_consumed": 0,
+        "escalation_package_complete": "not-applicable",
+        "next_stage_dispatched": "yes",
+        "spine_write_before_action": "yes",
+        "evidence_ptr": "stall-evidence-replay/success/spine.md"
+      }
+    ]
+  }
+}

@@ -35,7 +35,7 @@
 | **退出记录** | `status-<line>-<stage>`：`exit=<rc> at=<epoch> sentinel=<0|1>`，用临时文件 + `mv` 原子写入 | 退出码 + 哨兵布尔值；完成/失败的强信号 | `rc=na`，降级看哨兵与进程状态 |
 | **存活** | `pid-<line>-<stage>`：`pid=<pid> start=<start_ticks> at=<epoch>` | `kill -0` + `/proc/<pid>/stat` 僵尸/复用校验 | `pid=missing`，按启动宽限期处理 |
 | **心跳** | `heartbeat-<line>-<stage>.log`：每 30s 原子覆盖为 epoch | 证明 **runner 外壳**仍活着；不证明子代理有进展 | `heartbeat=missing`；不作为单独完成/超时判据 |
-| **进度** | 日志增长 / `--output-format stream-json` 的 live log | 排障与卡死辅助 | `-p` 缓冲模式下日志在退出前静默，属预期 |
+| **进度** | 派生 live log（`log-<line>-<stage>.log`，最后非空行是哨兵来源）+ raw stream（`raw-<line>-<stage>.jsonl`，经 `--raw-stream` 只报告 `stream=na\|absent\|growing\|idle` 与字节数） | 排障与卡死辅助；raw 增长只是可见性 | `-p` / buffered 模式下日志在退出前静默，属预期；stream 缺失时 `stream=na\|absent` |
 | **异常行** | 日志最后一个非空行以 `ANOMALY:` 开头 | 显式失败回传（fast-fail） | 无 |
 | **阶段期限** | 状态脊中的 `stage_started_at + stage_timeout` | 唯一的 `TIMEOUT` 判据 | 入口必须提供，否则不得判超时 |
 
@@ -60,6 +60,8 @@
 - **异常行**只在其已是最后一行且（退出记录存在或进程已死）时判 `ANOMALY`；进程仍活时异常行可能是中间输出，返回 `RUNNING` 并带 `anomaly=observed`。
 - **心跳 stale + PID alive** 返回 `RUNNING` + `heartbeat=stale`（外壳看门狗退化），不直接判 `STALLED`；阶段期限仍是唯一超时判据。日志增长或 stream 输出可覆盖该警告。
 - **窗口到期**永远返回 `RUNNING`，绝不返回 `TIMEOUT`。
+- **进度与 raw 增长不参与判定**：live log 行数/增长、raw stream 字节增长都不得单独产生 `DONE` 或 `TIMEOUT`；哨兵仍只认 live log 最后非空行，raw 只作证据面。非终止事件中的哨兵字样不构成完成。
+- **降级**：CLI 不支持 stream-json（`progress=degraded reason=cli-lacks-stream`）或派生失败（先 `--finish` 恢复，再 buffered fallback）时，runner 在 status 记录降级与原因；watcher 判定表与退出码零改动，`sentinel=0` 仍按 `INCOMPLETE` 处理。
 
 ### 3.1 Deadline grace 与 late completion（2026-10-20 热修）
 
@@ -83,6 +85,8 @@
    - 用 `pgrep` 零匹配、进程消失或日志静默推断完成。
 
 **窗口尺寸**：`--window` ≤ 宿主工具超时上限 − 30s 余量（例如宿主上限 600s → 窗口 300–540s）。窗口到期返回 `RUNNING` 后**立即**发起下一窗口，不在 agent 侧等待。若宿主没有可调工具超时，使用短窗口（60–120s）重复。
+
+**进度面（stream / buffered / degraded）**：stream 模式下 runner 以 `--output-format stream-json` 运行，raw 落盘、派生 live log 增量增长；CLI 不支持时转 buffered 并记 `progress=degraded` + 原因；派生失败先 `--finish` 恢复、再 buffered fallback，皆无则 `sentinel=0`（INCOMPLETE，绝不伪完成）。进度面选择不改变 §3 判定、退出码或窗口语义；`--raw-stream` 的 `stream=` 字段只是可见性证据。
 
 ## 5. 主动策略（Proactive Rules）
 
@@ -170,7 +174,7 @@ label|pid_file|status_file|log|sentinel|heartbeat|deadline_epoch
 `scripts/watch-target.sh` — 无框架依赖的 bash 长轮询 watcher。
 
 - 单目标与 `--manifest` 多目标；`--once` 快照；`--self-test` 回归用例。
-- 输出为单行 `WATCH label=… verdict=… pid=… heartbeat=… anomaly=… sentinel=… rc=… elapsed=… reason=…`；终止判定附带一行 `EVIDENCE …`。
+- 输出为单行 `WATCH label=… verdict=… pid=… heartbeat=… anomaly=… sentinel=… rc=… elapsed=… reason=… stream=na|absent|growing|idle …`；终止判定附带一行 `EVIDENCE …`（提供 `--raw-stream` 时附 `raw=<path> bytes=<n>`）。`stream=` 只作可见性，不参与任何 verdict。
 - 只读信号，不 kill、不写项目状态。
 - 退出码与判定表由 `--help` / `--self-test` 钉住；本文件的 §3 是语义映射，代码是精确值所有者。
 - watcher 必须与 runner 以**同一执行身份**运行（`kill -0` 的权限前提）；远端拓扑两者都在 `<run-user>` 下。

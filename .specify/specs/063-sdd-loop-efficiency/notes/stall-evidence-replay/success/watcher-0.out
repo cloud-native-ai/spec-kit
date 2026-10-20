@@ -1,0 +1,2 @@
+WATCH label=fixture verdict=DONE pid=dead heartbeat=fresh anomaly=no sentinel=yes rc=0 elapsed=0 reason=exit-record-sentinel stream=na line= run= stage= event=watcher-verdict at=1792501911 attribution=legacy
+EVIDENCE label=fixture last="FIXTURE-DONE" status="exit=0 sentinel=1" line= run= stage= event=watcher-verdict at=1792501911 attribution=legacy

@@ -1,0 +1,4 @@
+# test runner: python -m pytest tests/contract/test_sdd_loop_driver_skill.py -q
+.......................                                                  [100%]
+23 passed in 0.03s
+contract_rc=0

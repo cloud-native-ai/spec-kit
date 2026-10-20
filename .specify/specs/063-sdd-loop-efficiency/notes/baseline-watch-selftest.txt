@@ -1,0 +1,30 @@
+ok done
+ok fake-done
+ok anomaly
+ok failed
+ok anomaly-precedence
+ok dead
+ok running
+ok timeout
+ok late-completion
+ok grace-timeout
+ok no-signal
+ok stale-heartbeat
+ok pid-reuse
+ok zombie
+ok sentinel-only
+ok async-exit-ok
+ok manifest
+ok attribution-own
+ok attribution-foreign-not-consumed
+ok attribution-stale-run
+ok attribution-unattributed
+ok attribution-legacy
+ok lease-renew-hook
+ok reg-identity
+ok reg-unregistered
+ok reg-missing
+ok lease-window-over-ttl
+ok pgrep-zero-match-trap-reproduced
+SELF-TEST: 28 passed, 0 failed
+selftest_rc=0

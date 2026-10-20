@@ -27,6 +27,10 @@ PINNED_H2_SECTIONS = [
     "The Loop (U0–U6)",
     "Hard Requirements",
     "Discipline Defaults",
+    # 063 C-3 intentional update (2026-10-20): add the four efficiency
+    # optimizations summary + owner pointer. The 064-owned
+    # "CLI Capability Profiles" section below is unchanged and not copied.
+    "Efficiency Optimizations（运行效率优化）",
     "References",
     "Boundary",
     "Subagent Create & Dispatch Delegation（子代理创建与派发委派）",  # 060 C-29: delegation section
@@ -157,7 +161,11 @@ def test_c4_dispatch_recipes_inline_five_mechanisms():
     assert "heartbeat" in text or "心跳" in text, "heartbeat delta must be retained"
     assert "nohup" in text, "nohup detached dispatch is the authority here (H-04 ruling)"
     assert "间隔" in text or "interval" in text
-    assert "sed" in text, "runner derivation delta must be retained"
+    # 063 C-4 intentional update (2026-10-20): the per-stage sed derivation
+    # form is superseded by the parameterized stage-runner.sh (single testable
+    # point, no per-stage copy drift). The old form is retained as a historical
+    # note only; silently deleting the assertion is forbidden.
+    assert "stage-runner.sh" in text, "runner derivation delta must be retained"
     # closure discipline (orchestration body, retained)
     assert "main" in text
     assert "收尾汇总" in text or "终态" in text

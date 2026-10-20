@@ -1,0 +1,2 @@
+WATCH label=fixture verdict=INCOMPLETE pid=dead heartbeat=fresh anomaly=no sentinel=no rc=0 elapsed=0 reason=exit-record-no-sentinel
+EVIDENCE label=fixture last="" status="exit=0 sentinel=0"

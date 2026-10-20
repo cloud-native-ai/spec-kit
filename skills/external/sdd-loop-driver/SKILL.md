@@ -92,6 +92,17 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 
 阶段提示词骨架的第二段把以下默认纪律写进每一次派发（全文见 references/stage-prompts.md）：直接执行不要确认、访谈式问题自行裁决并记录假设、只提交本特性产物、既有脏文件不提交不还原、不要 push（除非明确授权）。
 
+## Efficiency Optimizations（运行效率优化）
+
+四项编排层优化（唯一 owner = `references/efficiency-model.md`，本节只作摘要与指针）：
+
+1. **中型特性快车道**：仅入口携带 `fast-lane=opt-in` 时，在 tasks 后按七项机械判据裁决；录取则跳过 checklist、保留 analyze/review，判据失效即 fail-closed 回退完整链。
+2. **两槽位测试预算**：每线仅 implement 起点 baseline 与 review 后 closure 两次全量；中间阶段与 review 用 `targeted-set-v1` 定向集并留证据；槽外全量必须显式例外。
+3. **Plan 只小修约束**：plan 完成后下游只允许小修并须 `PLAN-EDIT:` 声明；实质改动按两分支处置；requirements 门内变更按最新锚点 re-baseline。
+4. **进度可见与脱离**：阶段 runner 默认 stream-json，raw + 派生 live log；本地与远端都用 nohup 脱离，`--once` 重入只核验不重派。
+
+新增脚本：`scripts/admission-check.py`、`scripts/audit-test-budget.py`、`scripts/audit-plan-changes.py`、`scripts/derive-live-log.py`、`scripts/stage-runner.sh`（`watch-target.sh` 扩展 `--raw-stream`）。细则与字段面见 owner 文档与 `references/stage-prompts.md`、`references/dispatch-recipes.md`、`references/watch-model.md`。
+
 ## References
 
 - `references/dispatch-recipes.md` — 五大执行机制的命令形态：断点探测、阶段化 prompt 文件、runner 与派生、后台执行 + 统一监听（长轮询窗口/批量多线）、收尾纪律；阶段链与哨兵字面量；派发可见性操作规则；线路登记/归属信封/消息入口（Recipe 6）。

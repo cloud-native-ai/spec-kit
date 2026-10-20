@@ -1,0 +1,7 @@
+WRITE step=1 dispatch stage
+ACTION step=1 launch-runner
+WRITE step=2 once_snapshot verdict
+ACTION step=2 once-snapshot
+WRITE step=3 stall_state
+ACTION step=3 emit-escalation
+WRITE step=4 retries_consumed
