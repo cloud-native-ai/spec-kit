@@ -71,3 +71,28 @@ worktree_retained=yes
 Exit status: all engine calls `0` (except the intentional waiting decision, which is a JSON result, not an error); `git fsck --no-dangling` exit 0. The evidence directory is excluded from the runtime archive; a failed integration record keeps the worktree.
 
 Teardown: temp repo/worktrees/registry removed (`rm -rf` of the mktemp root).
+
+### S4. 主会话 kill / 重接线
+
+Command: `python3 /tmp/run-s4.py` (temp project/registry; detached fake stage; driver killed with SIGHUP).
+
+```text
+== S4.1 dispatch ==
+lease holder old ttl 600
+second reserve: attach
+== S4.2 kill driver ==
+runner_alive_after_driver_kill: True
+heartbeat_advancing: True
+== S4.3 new session lease ==
+lease_acquire_exit: 3 holder_state: expired
+identity: ok cwd: unsupported hint: running
+== S4.4 snapshot ==
+WATCH label=life-… verdict=RUNNING pid=alive heartbeat=fresh anomaly=no sentinel=no rc=na elapsed=0 reason=alive line=life-… run=r… attribution=own
+watch_exit: 10
+WATCH label=life-… verdict=DONE pid=alive heartbeat=fresh anomaly=no sentinel=yes rc=0 elapsed=0 reason=exit-record-sentinel line=life-… run=r… attribution=own
+watch_exit: 0
+== S4.5 remote unreachable ==
+remote-unreachable
+```
+
+Exit status: lease refusal `3` (expired holder, explicit break required); snapshot `10 RUNNING` → `0 DONE` without a second dispatch; reservation attach on the second start; remote probe classified `remote-unreachable`. Teardown killed the fake runner/driver and removed the temp root.

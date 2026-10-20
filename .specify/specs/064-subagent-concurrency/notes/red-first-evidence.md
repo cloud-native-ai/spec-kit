@@ -27,3 +27,12 @@ Each entry records the real red run captured before the implementation it exerci
 - Output (tail): `26 failed, 16 passed in 17.04s`
 - Failing: ownership-check/release/promote, integration-enqueue/plan/record, allocate-resources, archive-runtime, path/queue pure helpers, worktree-path uniqueness, and the documentation clauses for the integration protocol (not yet written).
 - Passing baseline: registry core and US1 attribution coverage.
+
+## R4 — US3 lifecycle tests (T034–T037)
+
+- Time: 2026-10-20 (implement run)
+- Command: `SPECKIT_PYTHON=/Users/liuqiming.lqm/project/profiles/.venv/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_line_registry_engine.py tests/contract/test_lifecycle_detach_reattach.py tests/integration/test_session_kill_reattach.py -q`
+- Exit status: 1
+- Output (tail): `21 failed, 20 passed in 6.08s`
+- Failing: lease/reservation/classify-remote/orphan/reattach actions not dispatched; pure lease/identity helpers absent; detach/reattach documentation absent; kill/reattach integration cases red on the same actions.
+- Passing baseline: registry core, US1 attribution, US2 isolation.

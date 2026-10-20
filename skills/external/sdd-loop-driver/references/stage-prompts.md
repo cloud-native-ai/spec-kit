@@ -185,6 +185,33 @@ python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message 
 - 授权是**显式、逐项、有界**的——不存在隐式放行；「顺便看一下」不是授权。
 - 每次授权记录进该线状态脊（何时、何项、何界），供收尾汇总审计。
 
+## Reattach & Lifecycle（重接线与生命周期，Feature 064）
+
+### 重接线程序（主会话恢复后）
+
+**唯一恢复源 = Registry + 状态脊 + 四件套证据**；不得依赖会话记忆、对话历史或宽泛进程扫描。
+
+1. `lease-acquire`：取得该 line 的 driver lease；活持有者 exit 3 → 不夺取；过期 lease 先验证证据再 `lease-break`；`suspected-alive` 需显式 `--override`。
+2. `verify-identity`：校验 runner/cli start token；cwd 在平台暴露时校验（Linux `/proc/<pid>/cwd`，macOS 记 `unsupported`）；branch 由 worktree `git rev-parse --abbrev-ref HEAD` 复核。
+3. **先做一次 `watch-target.sh --once` 快照**，再决定去向：
+   - `identity=ok` + `RUNNING` → 恢复监听，**零重复派发**；
+   - `identity=ok` + `DONE` → 进既有 U4 独立校验 → U5/U6；
+   - `identity=dead/mismatch` → 既有 U5 卡死/重试程序，保留 worktree 与证据；
+   - `identity=remote-unreachable` → `stalled`（reason=`remote-unreachable`）+ 重试连通性，不判 dead、不重派。
+4. 每 ≤ `ttl/3` 续租 lease；U2/U3/U4/U5 各续租一次。
+
+### 重复启动与 orphan/stale
+
+- 派发前 `reserve`（`(line_id, stage)` 原子 `O_CREAT|O_EXCL`）：已有活动 reservation 时，同 `run_id` 且 PID 身份有效 → attach；否则拒绝，绝不启动第二个同阶段进程。
+- orphan：进程存活但无有效驱动/Registry/状态脊，或 Registry 缺失 → 显式标记并上送；只用线自有证据与已登记 PID，禁止宽泛进程扫描；处置留痕，不静默认领或终止。
+- stale：PID 死亡/复用、cwd/branch 不符、证据超期 → 显式标记；清理是显式动作；远端 ssh 不可达记 `stalled`，不记 stale/dead。
+
+### U6 收尾（生命周期）
+
+- U6 在 `integration_result`（merged|failed）记录之后执行；只读线阶段完成直接 U6；写线集成前显式放弃以 `last_event=abandoned` 关闭。
+- U6 注销 Registry（`closed` + `closed_at`）、释放 reservation 与 lease、按保留策略归档证据；不得留下 `active` 残留。
+- worktree 的移除只由集成序列在合并成功后执行；未合并（failed/放弃）时保留并置 `worktree_retained=true`。
+
 ## Variants（已验证变体）
 
 ### 本地拓扑（本地简报先行）

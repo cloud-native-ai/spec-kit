@@ -259,3 +259,57 @@ def test_port_block_allocation_skips_used_ranges():
     block = engine.allocate_port_block([(39000, 39019), (39040, 39059)], 39000, 20)
     assert block == (39020, 39039)
     assert engine.allocate_port_block([], 39000, 20) == (39000, 39019)
+
+
+# ---------------------------------------------------------------- US3: lease / reservation / identity
+
+
+def test_lease_holder_classification():
+    engine = _load_engine()
+    assert engine.classify_lease_status(100, 600, True, True, True) == "live"
+    assert engine.classify_lease_status(100, 600, None, None, False) == "live"  # remote/unverifiable
+    assert engine.classify_lease_status(100, 600, False, False, True) == "expired"
+    assert engine.classify_lease_status(700, 600, True, True, True) == "suspected-alive"
+    assert engine.classify_lease_status(700, 600, False, False, True) == "expired"
+    assert engine.classify_lease_status(700, 600, None, None, False) == "expired"
+
+
+def test_lease_max_interval_is_ttl_third():
+    engine = _load_engine()
+    assert engine.lease_max_interval(600) == 200
+    assert engine.lease_max_interval(300) == 100
+
+
+def test_reservation_attach_decision():
+    engine = _load_engine()
+    reservation = {"run_id": "r20261020T120000Z-a1b2"}
+    assert engine.reservation_attach_decision(reservation, "r20261020T120000Z-a1b2", True, True) == "attach"
+    assert engine.reservation_attach_decision(reservation, "r20261020T120000Z-a1b2", False, False) == "refuse"
+    assert engine.reservation_attach_decision(reservation, "r20261020T120000Z-dead", True, True) == "refuse"
+
+
+def test_identity_classification():
+    engine = _load_engine()
+    assert engine.classify_identity({"pid": 1, "alive": True, "start_token_match": True},
+                                    {"pid": 2, "alive": True, "start_token_match": True},
+                                    "unsupported", "skipped") == "ok"
+    assert engine.classify_identity({"pid": 1, "alive": False, "start_token_match": None},
+                                    {"pid": 2, "alive": False, "start_token_match": None},
+                                    "unsupported", "skipped") == "dead"
+    assert engine.classify_identity({"pid": 1, "alive": True, "start_token_match": False},
+                                    {"pid": 2, "alive": True, "start_token_match": True},
+                                    "unsupported", "skipped") == "mismatch"
+    assert engine.classify_identity({"pid": None, "alive": False, "start_token_match": None},
+                                    {"pid": None, "alive": False, "start_token_match": None},
+                                    "unsupported", "skipped") == "unknown"
+    assert engine.classify_identity({"pid": 1, "alive": True, "start_token_match": True},
+                                    {"pid": 2, "alive": True, "start_token_match": True},
+                                    "mismatch", "skipped") == "mismatch"
+
+
+def test_remote_probe_classification():
+    engine = _load_engine()
+    assert engine.classify_remote_probe({"unreachable": True}) == "remote-unreachable"
+    assert engine.classify_remote_probe({"ssh_error": "255"}) == "remote-unreachable"
+    assert engine.classify_remote_probe({"identity": "ok"}) == "ok"
+    assert engine.classify_remote_probe({"identity": "dead"}) == "dead"

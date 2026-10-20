@@ -304,9 +304,11 @@ printf 'exit=0 at=%s sentinel=1 line={line} run={run} stage={stage} event=status
         f'hb="{paths["heartbeat"]}"\n'
         f'meta="{paths["meta"]}"\n'
         f'printf "pid=%s start=1 at=%s line={line} run={run} stage={stage} event=pid\\n" "$$" "$(date +%s)" > "$pidf"\n'
-        f'printf "{{\\"line_id\\": \\"{line}\\", \\"run_id\\": \\"{run}\\", \\"stage\\": \\"{stage}\\", \\"event\\": \\"prompt\\", \\"at\\": 1}}\\n" > /dev/null\n'
-        f'printf "at=%s line={line} run={run} stage={stage} event=heartbeat\\n" "$(date +%s)" > "$hb"\n'
+        f'printf "{{}} " > /dev/null\n'
+        f'( while kill -0 $$ 2>/dev/null; do printf "at=%s line={line} run={run} stage={stage} event=heartbeat\\n" "$(date +%s)" > "$hb"; sleep 0.5; done ) &\n'
+        f'hbpid=$!\n'
         f'sleep {duration}\n'
+        f'kill "$hbpid" 2>/dev/null || true\n'
         f'{body}'
         f'exit 0\n',
         encoding="utf-8",

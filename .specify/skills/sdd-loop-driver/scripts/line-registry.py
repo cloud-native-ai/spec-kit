@@ -334,11 +334,15 @@ def process_alive(pid: int | None, token: str | None = None) -> bool:
 
 
 def process_cwd(pid: int) -> Path | None:
-    link = Path(f"/proc/{pid}/cwd")
+    link = f"/proc/{pid}/cwd"
     try:
-        return link.resolve()
-    except (OSError, RuntimeError):
+        target = os.readlink(link)
+    except OSError:
         return None
+    try:
+        return Path(target).resolve()
+    except (OSError, RuntimeError):
+        return Path(os.path.abspath(target))
 
 
 def branch_of(repo: Path) -> str | None:
@@ -713,11 +717,19 @@ def action_deregister(ctx: Context) -> int:
     require(bool(args.reason), "deregister requires --reason")
 
     def mutate(entry):
+        if (entry.get("worktree_path") and entry.get("state") == "completed"
+                and not entry.get("integration_result") and args.reason != "abandoned"):
+            raise EngineError(
+                EXIT_USAGE,
+                "U6 requires an integration_result before closing a write line "
+                "(or --reason abandoned)",
+            )
         entry["state"] = "closed"
         entry["closed_at"] = now_iso()
         entry["last_event"] = args.reason
         entry.pop("waiting_reason", None)
         entry.pop("holder_line_id", None)
+        entry["lease"] = None
         worktree = entry.get("worktree_path")
         merged = ((entry.get("integration_result") or {}).get("status") == "merged")
         if args.worktree_retained is not None:
@@ -1004,19 +1016,7 @@ def _local_identity(entry: dict) -> dict:
         actual_branch = branch_of(Path(repo)) if repo else None
         if actual_branch is not None:
             branch_check = "ok" if actual_branch == entry["branch"] else "mismatch"
-    identity = "ok"
-    if not runner.get("pid") and not cli.get("pid"):
-        identity = "unknown"
-    elif runner.get("pid") and not runner.get("alive"):
-        identity = "dead"
-    elif runner.get("start_token_match") is False:
-        identity = "mismatch"
-    elif cli.get("pid") and not cli.get("alive"):
-        identity = "mismatch"
-    elif cli.get("start_token_match") is False:
-        identity = "mismatch"
-    elif cwd_check == "mismatch" or branch_check == "mismatch":
-        identity = "mismatch"
+    identity = classify_identity(runner, cli, cwd_check, branch_check)
     status = _status_summary(entry.get("status_path"))
     return {
         "identity": identity,
@@ -1026,6 +1026,28 @@ def _local_identity(entry: dict) -> dict:
         "branch_check": branch_check,
         "status": status,
     }
+
+
+def classify_identity(runner: dict, cli: dict, cwd_check: str, branch_check: str) -> str:
+    if not runner.get("pid") and not cli.get("pid"):
+        return "unknown"
+    if runner.get("pid") and not runner.get("alive"):
+        return "dead"
+    if runner.get("start_token_match") is False:
+        return "mismatch"
+    if cli.get("pid") and not cli.get("alive"):
+        return "mismatch"
+    if cli.get("start_token_match") is False:
+        return "mismatch"
+    if cwd_check == "mismatch" or branch_check == "mismatch":
+        return "mismatch"
+    return "ok"
+
+
+def classify_remote_probe(probe: dict) -> str:
+    if probe.get("unreachable") or probe.get("ssh_error"):
+        return "remote-unreachable"
+    return probe.get("identity") or "unknown"
 
 
 def _branch_hint(identity: str, status: dict, reservation: dict | None) -> str:
@@ -1062,10 +1084,12 @@ def action_verify_identity(ctx: Context) -> int:
                 "line_id": line_id,
                 "identity": "remote-unreachable",
                 "reason": probe.get("reason") or "ssh-unreachable",
+                "branch_hint": "stalled",
             })
         if "identity" in probe:
             payload = dict(probe)
             payload.setdefault("line_id", line_id)
+            payload.setdefault("branch_hint", "stalled" if classify_remote_probe(probe) == "remote-unreachable" else None)
             return emit(payload)
     entry = ctx.load(line_id)
     local = _local_identity(entry)
@@ -1541,6 +1565,446 @@ def action_archive_runtime(ctx: Context) -> int:
     return emit(manifest)
 
 
+# ---------------------------------------------------------------- lease / reservation / reattach
+
+
+def _iso_epoch(value: str | None) -> float | None:
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(
+            tzinfo=timezone.utc
+        ).timestamp()
+    except ValueError:
+        return None
+
+
+def lease_max_interval(ttl_seconds: int) -> int:
+    return max(1, int(ttl_seconds) // 3)
+
+
+def classify_lease_status(
+    heartbeat_age: int,
+    ttl_seconds: int,
+    pid_alive: bool | None,
+    token_match: bool | None,
+    local: bool,
+) -> str:
+    if heartbeat_age < ttl_seconds:
+        if not local:
+            return "live"
+        if pid_alive and token_match is not False:
+            return "live"
+        return "expired"
+    if local and pid_alive and token_match:
+        return "suspected-alive"
+    return "expired"
+
+
+def reservation_attach_decision(
+    reservation: dict, run_id: str, pid_alive: bool, token_match: bool | None
+) -> str:
+    if reservation.get("run_id") == run_id and pid_alive and token_match is not False:
+        return "attach"
+    return "refuse"
+
+
+def _lease_status(lease: dict) -> dict:
+    heartbeat = _iso_epoch(lease.get("heartbeat_at"))
+    ttl = int(lease.get("ttl_seconds") or DEFAULT_TTL)
+    age = int(now_epoch() - heartbeat) if heartbeat is not None else ttl + 1
+    local = lease.get("host") == socket.gethostname()
+    pid = lease.get("holder_pid")
+    token = lease.get("holder_start_token")
+    pid_alive = process_alive(int(pid)) if local and pid else None
+    token_match = None
+    if local and pid and pid_alive and token:
+        actual = process_start_token(int(pid))
+        token_match = (actual == token) if actual is not None else None
+    state = classify_lease_status(age, ttl, pid_alive, token_match, local)
+    return {
+        "holder_state": state,
+        "heartbeat_age_seconds": age,
+        "pid_alive": pid_alive,
+        "token_match": token_match,
+        "local": local,
+    }
+
+
+def _project_lease(ctx: Context, line_id: str, lease: dict | None, event: str) -> None:
+    def mutate(data):
+        data["lease"] = lease
+        data["last_event"] = event
+
+    try:
+        ctx.mutate(line_id, mutate)
+    except EngineError:
+        raise
+
+
+def action_lease_acquire(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(bool(args.session), "lease-acquire requires --session")
+    require(bool(args.pid), "lease-acquire requires --pid")
+    require(args.ttl is None or int(args.ttl) > 0, "--ttl must be positive")
+    ctx.load(line_id)
+    ensure_registry_dir(ctx.reg)
+    ttl = int(args.ttl or DEFAULT_TTL)
+    pid = int(args.pid)
+    token = args.start_token or process_start_token(pid)
+    require(token is not None, "cannot derive holder start token; pass --start-token")
+    host = args.host or socket.gethostname()
+    at = now_iso()
+    lease = {
+        "line_id": line_id,
+        "holder_session": args.session,
+        "holder_pid": pid,
+        "holder_start_token": token,
+        "host": host,
+        "acquired_at": at,
+        "heartbeat_at": at,
+        "ttl_seconds": ttl,
+    }
+    path = lease_path(ctx.reg, line_id)
+    payload = json.dumps(lease, sort_keys=True, ensure_ascii=False) + "\n"
+    try:
+        fd = os.open(str(path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    except FileExistsError:
+        existing = read_json(path)
+        status = _lease_status(existing)
+        append_jsonl(lease_history_path(ctx.reg, line_id), {
+            "event": "refused", "session": args.session, "at": now_iso(), **status,
+        })
+        return emit({
+            "acquired": False,
+            "line_id": line_id,
+            "holder": existing,
+            **status,
+            "requires_break": True,
+        }, code=EXIT_HELD)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(payload)
+            fh.flush()
+            os.fsync(fh.fileno())
+        _fsync_dir(path.parent)
+    except OSError as exc:
+        with contextlib.suppress(OSError):
+            path.unlink()
+        raise RegistryIOError(path, f"cannot create lease: {exc}")
+    append_jsonl(lease_history_path(ctx.reg, line_id), {
+        "event": "acquired", "session": args.session, "at": at, "ttl_seconds": ttl,
+    })
+    try:
+        _project_lease(ctx, line_id, lease, "lease-acquired")
+    except EngineError:
+        with contextlib.suppress(OSError):
+            path.unlink()
+        raise
+    return emit(lease)
+
+
+def action_lease_renew(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(bool(args.session), "lease-renew requires --session")
+    path = lease_path(ctx.reg, line_id)
+    lease = read_json_optional(path)
+    if lease is None:
+        return emit({"renewed": False, "error": "no active lease"}, code=EXIT_HELD)
+    if lease.get("holder_session") != args.session:
+        return emit({"renewed": False, "error": "session is not the lease holder"}, code=EXIT_HELD)
+    previous = _iso_epoch(lease.get("heartbeat_at"))
+    now = now_epoch()
+    interval = int(now - previous) if previous is not None else None
+    ttl = int(lease.get("ttl_seconds") or DEFAULT_TTL)
+    max_interval = lease_max_interval(ttl)
+    lease["heartbeat_at"] = now_iso(now)
+    atomic_write_json(path, lease)
+    cadence_ok = interval is not None and interval <= max_interval
+    append_jsonl(lease_history_path(ctx.reg, line_id), {
+        "event": "renewed", "session": args.session, "at": lease["heartbeat_at"],
+        "interval_seconds": interval, "cadence_ok": cadence_ok,
+    })
+    _project_lease(ctx, line_id, lease, "lease-renewed")
+    payload = dict(lease)
+    payload.update({
+        "renewed": True,
+        "interval_seconds": interval,
+        "max_interval_seconds": max_interval,
+        "cadence_ok": cadence_ok,
+    })
+    return emit(payload)
+
+
+def action_lease_release(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(bool(args.session), "lease-release requires --session")
+    path = lease_path(ctx.reg, line_id)
+    lease = read_json_optional(path)
+    if lease is None:
+        return emit({"released": False, "error": "no active lease"}, code=EXIT_HELD)
+    if lease.get("holder_session") != args.session:
+        return emit({"released": False, "error": "session is not the lease holder"}, code=EXIT_HELD)
+    append_jsonl(lease_history_path(ctx.reg, line_id), {
+        "event": "released", "session": args.session, "at": now_iso(),
+    })
+    with contextlib.suppress(OSError):
+        path.unlink()
+    _project_lease(ctx, line_id, None, "lease-released")
+    return emit({"released": True, "line_id": line_id})
+
+
+def action_lease_break(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(bool(args.reason), "lease-break requires --reason")
+    require(bool(args.evidence_ref), "lease-break requires --evidence-ref")
+    path = lease_path(ctx.reg, line_id)
+    lease = read_json_optional(path)
+    if lease is None:
+        return emit({"broken": False, "reason": "no active lease"})
+    status = _lease_status(lease)
+    state = status["holder_state"]
+    if state == "live":
+        return emit({
+            "broken": False, "error": "lease holder is live", **status,
+        }, code=EXIT_HELD)
+    if state == "suspected-alive" and not args.override:
+        return emit({
+            "broken": False,
+            "error": "suspected-alive requires --override",
+            **status,
+        }, code=EXIT_HELD)
+    append_jsonl(lease_history_path(ctx.reg, line_id), {
+        "event": "broken",
+        "reason": args.reason,
+        "evidence_ref": args.evidence_ref,
+        "override": bool(args.override),
+        "at": now_iso(),
+        "holder": lease,
+        **status,
+    })
+    with contextlib.suppress(OSError):
+        path.unlink()
+    _project_lease(ctx, line_id, None, "lease-broken")
+    payload = {
+        "broken": True,
+        "line_id": line_id,
+        "reason": args.reason,
+        "evidence_ref": args.evidence_ref,
+        "override": bool(args.override),
+        **status,
+    }
+    return emit(payload)
+
+
+def action_classify_remote(ctx: Context) -> int:
+    args = ctx.args
+    require(bool(args.probe_json), "classify-remote requires --probe-json")
+    probe_path = Path(args.probe_json)
+    if probe_path.exists():
+        probe = read_json(probe_path)
+    else:
+        try:
+            probe = json.loads(args.probe_json)
+        except json.JSONDecodeError:
+            raise EngineError(EXIT_USAGE, f"invalid probe JSON: {args.probe_json}")
+    identity = classify_remote_probe(probe)
+    return emit({
+        "identity": identity,
+        "reason": probe.get("reason") or ("ssh-unreachable" if identity == "remote-unreachable" else None),
+    })
+
+
+def action_reserve(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(bool(args.stage), "reserve requires --stage")
+    require(bool(args.run_id), "reserve requires --run-id")
+    require(bool(args.pid), "reserve requires --pid")
+    validate_run_id(args.run_id)
+    ctx.load(line_id)
+    ensure_registry_dir(ctx.reg)
+    pid = int(args.pid)
+    token = args.start_token or process_start_token(pid)
+    require(token is not None, "cannot derive reservation start token; pass --start-token")
+    reservation = {
+        "line_id": line_id,
+        "stage": args.stage,
+        "run_id": args.run_id,
+        "pid": pid,
+        "start_token": token,
+        "host": args.host or socket.gethostname(),
+        "started_at": now_iso(),
+    }
+    path = reservation_path(ctx.reg, line_id, args.stage)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(reservation, sort_keys=True, ensure_ascii=False) + "\n"
+    try:
+        fd = os.open(str(path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    except FileExistsError:
+        existing = read_json(path)
+        pid_alive = process_alive(int(existing.get("pid") or 0))
+        token_match = None
+        if pid_alive and existing.get("start_token"):
+            token_match = process_start_token(int(existing["pid"])) == existing["start_token"]
+        decision = reservation_attach_decision(existing, args.run_id, pid_alive, token_match)
+        if decision == "attach":
+            return emit({"action": "attach", "reservation": existing})
+        return emit({"action": "refuse", "reservation": existing}, code=EXIT_HELD)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(payload)
+            fh.flush()
+            os.fsync(fh.fileno())
+        _fsync_dir(path.parent)
+    except OSError as exc:
+        with contextlib.suppress(OSError):
+            path.unlink()
+        raise RegistryIOError(path, f"cannot create reservation: {exc}")
+    return emit({"action": "created", "reservation": reservation})
+
+
+def action_reservation_status(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(bool(args.stage), "reservation-status requires --stage")
+    path = reservation_path(ctx.reg, line_id, args.stage)
+    reservation = read_json_optional(path)
+    if reservation is None:
+        return emit({"found": False, "line_id": line_id, "stage": args.stage})
+    return emit({"found": True, "reservation": reservation})
+
+
+def action_reservation_break(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    require(bool(args.stage), "reservation-break requires --stage")
+    require(bool(args.reason), "reservation-break requires --reason")
+    require(bool(args.evidence_ref), "reservation-break requires --evidence-ref")
+    path = reservation_path(ctx.reg, line_id, args.stage)
+    reservation = read_json_optional(path)
+    if reservation is None:
+        return emit({"broken": False, "reason": "no reservation"})
+    pid = int(reservation.get("pid") or 0)
+    pid_alive = process_alive(pid)
+    token_match = None
+    if pid_alive and reservation.get("start_token"):
+        token_match = process_start_token(pid) == reservation["start_token"]
+    if pid_alive and token_match is not False:
+        return emit({
+            "broken": False, "error": "reservation holder is live",
+            "reservation": reservation,
+        }, code=EXIT_HELD)
+    append_jsonl(reservation_history_path(ctx.reg, line_id, args.stage), {
+        "event": "broken",
+        "reason": args.reason,
+        "evidence_ref": args.evidence_ref,
+        "at": now_iso(),
+        "reservation": reservation,
+    })
+    with contextlib.suppress(OSError):
+        path.unlink()
+    return emit({
+        "broken": True, "line_id": line_id, "stage": args.stage,
+        "reason": args.reason, "evidence_ref": args.evidence_ref,
+    })
+
+
+def action_orphan_check(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    entry = ctx.load(line_id, optional=True)
+    evidence: list[str] = []
+    orphaned = False
+    if entry is None:
+        orphaned = True
+        evidence.append("registry-missing")
+        reservation_dir = ctx.reg / "reservations"
+        if reservation_dir.exists() and list(reservation_dir.glob(f"{line_id}.*.json")):
+            evidence.append("reservation-without-registry")
+        return emit({"line_id": line_id, "orphaned": orphaned, "evidence": evidence})
+    state = entry.get("state")
+    files = {
+        "status": entry.get("status_path"),
+        "log": entry.get("log_path"),
+        "heartbeat": entry.get("heartbeat_path"),
+        "pid": _pid_path(entry),
+    }
+    present = [name for name, value in files.items() if value and Path(value).exists()]
+    if state in {"closed", "stale", "orphaned"}:
+        if entry.get("runner_pid") and process_alive(int(entry["runner_pid"]),
+                                                     entry.get("runner_start_token")):
+            orphaned = True
+            evidence.append("process-alive-while-closed")
+    elif state == "active" and entry.get("stage"):
+        reservation = read_json_optional(reservation_path(ctx.reg, line_id, entry["stage"]))
+        if reservation is None and not present:
+            orphaned = True
+            evidence.append("line-evidence-missing")
+        elif reservation is not None and reservation.get("run_id") != entry.get("run_id"):
+            orphaned = True
+            evidence.append("reservation-run-mismatch")
+    if present:
+        evidence.extend(f"present:{name}" for name in present)
+    return emit({"line_id": line_id, "orphaned": orphaned, "evidence": evidence})
+
+
+def action_reattach_brief(ctx: Context) -> int:
+    args = ctx.args
+    line_id = validate_line_id(args.line_id or "")
+    entry = ctx.load(line_id)
+    local = _local_identity(entry)
+    reservation = read_json_optional(reservation_path(ctx.reg, line_id, entry.get("stage") or ""))
+    lease = read_json_optional(lease_path(ctx.reg, line_id))
+    spine_path = entry.get("spine_path")
+    spine = {"path": spine_path, "exists": bool(spine_path and Path(spine_path).exists())}
+    if spine["exists"]:
+        text = Path(spine_path).read_text(encoding="utf-8", errors="replace")
+        match = re.search(r"^\s*state\s*[:=]\s*([A-Za-z_-]+)", text, re.MULTILINE)
+        spine["state"] = match.group(1) if match else None
+        lines = [line.strip() for line in text.splitlines() if line.strip()]
+        spine["last_line"] = lines[-1] if lines else None
+    return emit({
+        "line_id": line_id,
+        "run_id": entry.get("run_id"),
+        "registry": {
+            "state": entry.get("state"),
+            "stage": entry.get("stage"),
+            "worktree_path": entry.get("worktree_path"),
+            "branch": entry.get("branch"),
+            "runner_pid": entry.get("runner_pid"),
+            "cli_pid": entry.get("cli_pid"),
+        },
+        "spine": spine,
+        "evidence": {
+            "status": local["status"],
+            "log": {
+                "path": entry.get("log_path"),
+                "exists": bool(entry.get("log_path") and Path(entry["log_path"]).exists()),
+                "last_line": _last_line(entry.get("log_path")),
+            },
+            "heartbeat": {
+                "path": entry.get("heartbeat_path"),
+                "exists": bool(entry.get("heartbeat_path") and Path(entry["heartbeat_path"]).exists()),
+                "age_seconds": _heartbeat_age(entry.get("heartbeat_path")),
+            },
+            "pid": {
+                "path": _pid_path(entry),
+                "exists": bool(_pid_path(entry) and Path(_pid_path(entry)).exists()),
+            },
+        },
+        "reservation": reservation,
+        "lease": lease,
+        "identity": local["identity"],
+        "branch_hint": _branch_hint(local["identity"], local["status"], reservation),
+        "snapshot_required": True,
+    })
+
+
 # ---------------------------------------------------------------- manifests
 
 
@@ -1594,12 +2058,7 @@ def load_manifest(path: Path, line_id: str, repo_root: Path) -> dict:
 # ---------------------------------------------------------------- dispatch
 
 
-UNIMPLEMENTED = {
-    "classify-remote", "reattach-brief",
-    "lease-acquire", "lease-renew", "lease-release", "lease-break",
-    "reserve", "reservation-status", "reservation-break",
-    "orphan-check",
-}
+UNIMPLEMENTED = set()
 
 DISPATCH = {
     "register": action_register,
@@ -1608,6 +2067,16 @@ DISPATCH = {
     "list": action_list,
     "resolve-message": action_resolve_message,
     "verify-identity": action_verify_identity,
+    "classify-remote": action_classify_remote,
+    "reattach-brief": action_reattach_brief,
+    "lease-acquire": action_lease_acquire,
+    "lease-renew": action_lease_renew,
+    "lease-release": action_lease_release,
+    "lease-break": action_lease_break,
+    "reserve": action_reserve,
+    "reservation-status": action_reservation_status,
+    "reservation-break": action_reservation_break,
+    "orphan-check": action_orphan_check,
     "ownership-check": action_ownership_check,
     "release-ownership": action_release_ownership,
     "promote-waiting": action_promote_waiting,

@@ -221,6 +221,38 @@ python3 <skill-dir>/scripts/line-registry.py --action ownership-check \
 - 恢复证据 = worktree + 状态脊 + Registry；stale lock **先验证持有者**再处置，不盲目删除。
 - 重入先做一次 `--once` 快照，再决定派发/校验/恢复窗口。
 
+### 脱离式 runner、reservation 与 lease（Feature 064）
+
+**本地脱离**（`setsid` 可用时优先；本机 macOS 无 `setsid` 时用 `nohup + disown`）：
+
+```bash
+# 1) 派发前：原子 reservation 防重复启动；内容含 run_id、启动 PID、start token
+python3 <skill-dir>/scripts/line-registry.py --action reserve --line-id <line> --stage <stage> \
+  --run-id <run> --pid <launcher-pid> --start-token <launcher-token> --format json
+# 已有 reservation：同 run_id 且 PID 身份有效 → attach；否则拒绝，绝不启动第二个同阶段进程
+
+# 2) 脱离启动：独立进程组/会话 + stdio 与主会话脱离
+if command -v setsid >/dev/null 2>&1; then
+  setsid nohup bash <runner> > <runner-log> 2>&1 < /dev/null &
+else
+  nohup bash <runner> > <runner-log> 2>&1 < /dev/null &
+  disown
+fi
+
+# 3) runner 内：CLI 作为记录 PID 的子进程后台启动 + wait，不能只记录 runner 外壳
+"<cli>" ... > "$log" 2>&1 &
+cli_pid=$!
+printf 'pid=%s start=%s at=%s line=%s run=%s stage=%s event=pid\n' \
+  "$cli_pid" "<cli-start-token>" "$(date +%s)" "<line>" "<run>" "<stage>" >> "$cli_pidf"
+wait "$cli_pid"; rc=$?
+```
+
+- 主会话进程/会话终止信号 MUST NOT 传播到子代理；stdio 一律重定向到日志或 `/dev/null`。
+- runner 启动时写四件套（PID + start token、原子 status、log、heartbeat）并在 Registry 登记 `runner_pid` / `cli_pid` 与各自 start token。
+- 远端拓扑同构：`ssh <alias> "nohup su - <run-user> -c 'bash <runner> …' < /dev/null > /dev/null 2>&1 &"`；Registry 仍在驱动侧，字段与本地相同，仅增加 `remote.alias` / `remote.run_user` / `remote.remote_root`。
+- **driver lease**：会话接管一条 line 前 `lease-acquire`（`O_CREAT|O_EXCL`）；活持有者 → exit 3；过期 lease 先验证证据再 `lease-break --reason --evidence-ref`；PID 活 + token 匹配 + 心跳过期 = `suspected-alive`，只允许 `--override` 破除。持有者以 ≤ `ttl_seconds/3`（缺省 ≤200s）续租，并在 U2/U3/U4/U5 各续租一次；watch window 遵守 Recipe 6 的窗口上限或续租钩子。
+- **重接线**：`lease-acquire` → `verify-identity`（runner/cli start token、cwd、branch）→ `watch-target.sh --once` → 三分支；不依赖会话记忆或宽泛进程扫描。
+
 ## Boundary
 
 - 远端不可达 / 凭证失效 / 子代理 CLI 不在执行身份路径：前置检查（run-agent dispatch-preflight.md）拦截并给修复动作，不裸报错弃线。
