@@ -34,7 +34,7 @@
 - **「线路」（line）**：一条独立推进的 SDD 循环实例（一个项目切片、一个分支/工作树、一份状态脊）。本特性把「线」升级为可登记、可归属的一等实体，但不替换既有状态脊；状态脊仍是阶段状态的 owner。
 - **`line_id` / `run_id` 语义**：`line_id` 标识环境内的一条线路，在其证据存续期内不复用；`run_id` 标识该线路的一次执行尝试。重新接线复用同一 `run_id`；重试/重新派发可产生新 `run_id`，旧记录保留。两者与 feedback / exec-quant 的 `(unit_id, run_id)` 记录去重键**不是同一命名空间**，事件信封不得被当作反馈记录消费。
 - **Registry 范围与存储**：同一环境（同一 OS 用户）一份；默认位置 `${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines/`，可由 `SPECIFY_LINE_REGISTRY_DIR` 覆盖（供测试与远端驱动使用），位于任一 line 的 worktree 之外，便于跨项目发现。每线一个 `<line_id>.json`，写入采用「临时文件 + fsync + `os.replace`」原子替换；同线更新用 `<line_id>.lock` 排他锁串行化，跨线写入互不覆盖。跨机器/多用户共享默认排除；远端 line 只在 Registry 中增加最小远端字段（host/alias、run_user、远端路径），由本地驱动经 ssh 读取/校验。
-- **Registry 状态词表**：`active / waiting / stalled / completed / orphaned / stale / closed` 为本特性新引入的封闭集；`waiting` 表示已注册但尚未派发、因归属重叠或队列而等待，此时不存在阶段执行，故不与状态脊冲突。它与状态脊的 `running / retrying / stalled / done` 不互相替代，Registry 状态 MUST NOT 与状态脊矛盾。
+- **Registry 状态词表**：`active / waiting / stalled / completed / orphaned / stale / closed` 为本特性新引入的封闭集；`waiting` 表示已注册但尚未派发、因归属重叠或队列而等待，此时不存在阶段执行，故不与状态脊冲突。`completed` 是唯一的 pre-merge 状态：全部阶段完成即进入 `completed`（写线同时置 `merge_ready=true`，只读线不置），集成结果记录在 `integration_result` 上且不改变状态，U6 收尾才进入 `closed`。它与状态脊的 `running / retrying / stalled / done` 不互相替代，Registry 状态 MUST NOT 与状态脊矛盾。
 - **信封编码**：语义字段固定为 `line_id`、`run_id`（以及 stage/事件类型）；编码采用 JSON 旁路记录——status/heartbeat 的字段加日志旁路 `.meta.jsonl`，不写入日志正文，不改变哨兵的「最后非空行」语义。旁路文件的具体命名由 plan 固定并记录。
 - **哨兵归属**：通用哨兵字面量与「日志最后非空行」判定不变；归属由承载它的 line-scoped 记录（status/log 旁路/heartbeat 信封）完成，不以改写哨兵、位移最后一行或在哨兵之后追加信封实现。
 - **消息入口**：活动线定义为 `state` 为 `active` 或 `waiting` 的 line；>1 条活动线且消息无标识 → 每条消息恰好一次澄清并列出候选；恰好 1 条 → 直接路由；0 条 → 明确报告无活动线路。可识别标识为显式 `line_id`，或唯一匹配的 `project_dir`/`repo_root`/分支名；回答仍无法唯一匹配时显式报告候选并停止路由，不追加第二个问题。任何情况下都不得用 `ps`/`pgrep`/进程名/cwd/环境态推断。
@@ -89,7 +89,7 @@
 1. **Given** 同一仓库有两条写线路，**When** 分配工作区，**Then** 每条写线路获得独立 worktree 与专用分支，`worktree_path`/`branch`/`base_sha` 被记录；阶段子代理不切换分支。
 2. **Given** 两条线路声明了重叠的 `owned_paths`，**When** 协调者做派发前检查，**Then** 第二条被拒绝或串行化，两者不会同时写入同一路径。
 3. **Given** 两条线路的 `owned_paths` 不相交，**When** 并发运行，**Then** 两者可以同时推进，端口、缓存与临时数据库不冲突。
-4. **Given** 两条线路都已 `ready_for_merge`，**When** 集成协调者执行队列，**Then** 按确定性顺序 rebase、跑完整质量门、合并、更新 Registry/镜像、归档运行时记录并移除 worktree；同一输入的重复执行得到相同顺序与结果。
+4. **Given** 两条线路都已进入 `completed`（`merge_ready=true`，即 `ready_for_merge`），**When** 集成协调者执行队列，**Then** 按确定性顺序逐线 rebase、跑完整质量门、合并、更新该线 Registry 条目（`integration_result`）、归档运行时记录并移除 worktree，整批结束后统一执行一次镜像同步与命令副本再生成；同一输入的重复执行得到相同顺序与结果。
 5. **Given** 一条线路的 worktree 仍有未提交工作或合并失败，**When** 收尾，**Then** 该 worktree 被保留并上送，不删除、不静默丢弃。
 6. **Given** 集成中途崩溃，**When** 重新进入，**Then** 以 worktree + 状态脊 + Registry 为证据；stale lock 先验证持有者再处置，不盲目删除。
 
@@ -126,7 +126,7 @@
 
 1. **Given** qodercli 档案存在，**When** 维护者查阅，**Then** 八个维度均有 `known` 或 `unknown` 标注，且已知事实带观测日期、版本与证据指针。
 2. **Given** claude/codex/opencode/hermes 尚未完整观测，**When** 查阅其骨架档案，**Then** 每个维度显式标注 `unknown`，没有猜测值冒充实测。
-3. **Given** 一次派发准备使用某 CLI，**When** 执行 U2 前置检查，**Then** 读取该 CLI 档案并按档案记载选择输出/超时/脱离形态；派发记录带 profile id/version。
+3. **Given** 一次派发准备使用某 CLI，**When** 执行 U2 前置检查，**Then** 读取该 CLI 档案并按档案记载选择超时/脱离形态（输出模式的吞吐默认沿用 063 的 stream-json，档案不改写默认）；派发记录带 profile id/version。
 4. **Given** U4/U5 观察到档案与实际不符，**When** 处置观测事件，**Then** 先写状态脊观测段，再更新档案 provenance，再记录恰好一条包含 `cli-profile:<cli>` 的反馈；没有新事实时不产生反馈。
 5. **Given** 档案更新与一次进行中的阶段，**When** 观察值变化，**Then** 当前阶段继续使用 U2 记录的形态，更新不回溯改变哨兵、判定、退出码、确认门或 deadline。
 6. **Given** 档案观测与 061 的能力矩阵冲突，**When** 判断派发资格，**Then** 以矩阵为准；档案记录观测与证据并产生反馈，不暗改矩阵。
@@ -170,7 +170,7 @@
 - 超时环境变量为 0 或负值且未实测：档案记为 `unknown`，不得猜测其含义，也不据此改变阶段 deadline。
 - CLI 观测与档案一致：不产生反馈；只有 mismatch / unknown 获值 / 新版本行为才产生事件。
 - 063 与 064 同时存在 CLI 档案制品：不得出现两个 owner；analyze/plan 记录保留/迁移决定。
-- U6 收尾时线路尚未合并：注销/清理只做安全的证据归档，worktree 保留。
+- 集成失败或显式放弃后经 U6 收尾且尚未合并：注销只做安全的证据归档，worktree 保留并上送；合并成功时 worktree 已由集成序列移除。
 - 单线运行：仍注册并携带信封；不得因归属机制引入行为回归。
 - 用户回答仍无法唯一匹配候选活动线：显式报告候选并停止路由；不得再问第二个问题，也不得按进程/cwd 猜测。
 - 同一 line 的旧 `run_id` 事件到达：标记 `stale-run`，不改变当前尝试状态；不得因 `run_id` 不同而把事件计为 `foreign` 或当前进度。
@@ -192,7 +192,7 @@
 - **FR-003**: Registry 的并发更新 MUST 串行化或使用原子替换；每线一条独立记录 + 同线排他锁，跨线写入 MUST NOT 互相覆盖；任何读取方 MUST NOT 观察到截断、半写、重复 `line_id` 或丢失其他 line 条目的状态。
 - **FR-004**: 每个 Registry 条目 MUST 含环境内唯一且不复用的 `line_id` 与标识一次执行尝试的 `run_id`；重新接线 MUST 复用原 `run_id`，重试/重新派发 MAY 产生新 `run_id`，历史记录 MUST 保留。
 - **FR-005**: Registry 条目 MUST 覆盖：`line_id`（[[STR-003]]）、`run_id`（[[STR-004]]）、`project_dir`、`repo_root`、`worktree_path`、`branch`、`base_sha`、`driver_session`、`cli`、`runner_pid` 与 `qodercli_pid`（各带 start ticks）、prompt/status/log/heartbeat 路径、`owned_paths`（写归属投影）、Ownership Manifest 引用、`stage`、`state`、`created_at`、`updated_at`；远端 line MUST 另含最小远端字段（host/alias、run_user、远端路径）。
-- **FR-006**: Registry 的 `state` MUST 使用封闭集 `active / waiting / stalled / completed / orphaned / stale / closed`；`waiting` 表示已注册但尚未派发、因归属重叠或队列而等待，此时不得存在阶段执行，故不与状态脊冲突；状态 MUST 在 U0.5、U2 派发、U3 终止、U4 校验、U5 停线、U6 收尾同步更新；Registry 状态 MUST NOT 与状态脊的阶段判定相矛盾。
+- **FR-006**: Registry 的 `state` MUST 使用封闭集 `active / waiting / stalled / completed / orphaned / stale / closed`，并在六个同步点各写入唯一值：**U0.5 注册** → `active`（无归属重叠且未超并发上限）或 `waiting`（`waiting_reason=ownership-overlap|concurrency-cap`）；**U2 派发** → 保持 `active`（`waiting` 不得派发）；**U3 终止判定到达** → 保持 `active`（仅更新 `last_event`，等待 U4 判定）；**U4 校验** → 通过且尚有阶段为 `active`，全部阶段完成为 `completed`（写线同时置 `merge_ready=true` 并写 `ready_for_merge_at`；只读线不置 `merge_ready`，U6 直接关闭）；**U5 停线** → `stalled`（重试可产生新 `run_id` 后回到 `active`，显式放弃进入 U6）；**U6 收尾** → `closed`（`closed_at` 必填）。`waiting` 表示已注册但尚未派发、因归属重叠或队列而等待，此时不得存在阶段执行，故不与状态脊冲突。集成结果不引入新状态：merged/failed 记录为 `completed` 条目上的 `integration_result`，U6 在集成结果记录之后执行。Registry 状态 MUST NOT 与状态脊的阶段判定相矛盾（映射见 `data-model.md` V-LR-9）。
 - **FR-007**: 系统 MUST 识别 stale（PID 死亡、PID 复用、start ticks/cwd/branch 与登记不符、或证据超期）；证据超期以既有 watcher 的心跳/阶段期限语义为准，不另设阈值；stale 条目的清理 MUST 是显式、留痕的动作，MUST NOT 盲目删除、覆盖或静默改写其他 line 的登记。
 - **FR-008**: 每个阶段 prompt、status、log、heartbeat、哨兵承载记录、watcher 输出与 monitor 事件 MUST 携带机器可读的归属信封，至少包含 `line_id`（[[STR-003]]）与 `run_id`（[[STR-004]]），并含 stage/事件类型；信封 MUST 采用 JSON 旁路记录（status/heartbeat 字段 + 日志旁路 `.meta.jsonl`），MUST NOT 写入日志正文或改变哨兵的「最后非空行」语义。
 - **FR-009**: 既有通用阶段哨兵（大写阶段名 + `-DONE`）的字面量与「日志最后非空行」判定 MUST 保持不变；每个哨兵 MUST 可经其所在 line-scoped 记录的信封归属到唯一 line，MUST NOT 通过改写哨兵字面量、位移最后一行或在哨兵之后追加信封来换取归属。
@@ -210,12 +210,12 @@
 - **FR-018**: 每条写 line MUST 使用独立的 `git worktree` 与专用分支，从 trunk（或当前集成分支）的 `base_sha` 创建；worktree 默认路径为 `<repo_parent>/.spec-kit/worktrees/<repo-basename>/<line_id>`（可配置），MUST 位于任一 line 的 worktree 之外；`worktree_path`、`branch`、`base_sha` MUST 记录在 Registry。
 - **FR-019**: 每个 worktree MUST 只有一个写 line；阶段子代理 MUST NOT 切换分支、创建/删除 worktree，或改写其他 line 的 worktree。
 - **FR-020**: 每条 line MUST 声明 Ownership Manifest：`owned_paths`（写）、`read_only_paths`（只读）、`forbidden_paths`（禁止访问）；路径 MUST 归一化（相对/绝对统一、符号链接解析）后比较；Manifest 是路径集的 owner，Registry 中的 `owned_paths` 是可由 Manifest 再生的投影。
-- **FR-021**: 协调者 MUST 在注册/派发前拒绝写-写重叠；重叠 line MUST 按 `created_at` FIFO（同一时间戳以 `line_id` 字典序 tie-break）串行化，后到 line 进入 `waiting` 并持有等待票据，直到持线者完成 U6 合并或显式放弃；持线者死亡 MUST NOT 自动释放归属，须先保留其 worktree/证据并显式处置；路径集拆分后才可改为并发；不相交的写 line MAY 并发；任何 line MUST NOT 写入另一活动 line 的 `read_only_paths` 或 `forbidden_paths`。
-- **FR-022**: line 本地运行时记录（feedback/session/exec-quant 等）MUST 写在各自 worktree/line 范围内，且该 line 的提交 MUST NOT 包含这些运行时记录；MUST NOT 存在跨 line 共享的可写运行时路径。
+- **FR-021**: 协调者 MUST 在注册/派发前拒绝写-写重叠；重叠 line MUST 按 `created_at` FIFO（同一时间戳以 `line_id` 字典序 tie-break）串行化，后到 line 进入 `waiting` 并持有等待票据，直到持线者完成集成合并并完成 U6 收尾，或显式放弃；持线者死亡 MUST NOT 自动释放归属，须先保留其 worktree/证据并显式处置；路径集拆分后才可改为并发；不相交的写 line MAY 并发；任何 line MUST NOT 写入另一活动 line 的 `read_only_paths` 或 `forbidden_paths`。
+- **FR-022**: line 本地运行时记录 MUST 写在各自 worktree/line 范围内，且该 line 的阶段提交 MUST NOT 包含这些运行时记录；MUST NOT 存在跨 line 共享的可写运行时路径。运行时记录路径集合是封闭集；其唯一枚举、排除项及排除理由由 `data-model.md` § E8 **Runtime-record path set** 与 **Excluded stores** 表拥有，本条款只声明集合封闭且排除项 MUST NOT 被当作可合并的运行时记录。
 - **FR-023**: 集成者 MUST 在一次集成过程中统一提交/归档各 line 的运行时记录（在移除 worktree 之前读取并归档）；MUST NOT 由各 line 分别提交共享运行时记录。
 - **FR-024**: 镜像同步与命令副本再生成（`sync-mirrors.py`、`regen-command-copies.py`）MUST 只在集成过程执行一次；MUST NOT 每 line 执行。
-- **FR-025**: 合并 MUST 由单一集成协调者执行；队列顺序 MUST 确定：按 `ready_for_merge` 时间 FIFO，同一时间戳以 `line_id` 字典序 tie-break；若 line 间存在显式声明的拓扑依赖，依赖先于被依赖者，同层仍按 FIFO/tie-break；重放同一输入 MUST 得到相同顺序与结果。
-- **FR-026**: 集成流程 MUST 对每条 `ready_for_merge` line 依次执行：rebase 到最新 trunk、运行完整质量门、合并、更新 Registry/镜像、归档运行时记录、移除 worktree；任一步失败 MUST 保留该 line 的 worktree 与证据并上送。
+- **FR-025**: 合并 MUST 由单一集成协调者执行；队列输入 = Registry 中 `state=completed` 且 `merge_ready=true` 的条目；队列顺序 MUST 确定：按 `ready_for_merge_at` 时间 FIFO，同一时间戳以 `line_id` 字典序 tie-break；若 line 间存在显式声明的拓扑依赖，依赖先于被依赖者，同层仍按 FIFO/tie-break；重放同一输入 MUST 得到相同顺序与结果。
+- **FR-026**: 集成流程 MUST 对每条 `ready_for_merge` line 依次执行：rebase 到最新 trunk、运行完整质量门、合并、更新该 line 的 Registry 条目（`integration_result`，状态保持 `completed`）、归档运行时记录、移除 worktree（仅合并成功时）；镜像同步与命令副本再生成 MUST NOT 出现在逐线序列中，MUST 由集成者在整批集成结束时统一执行一次（FR-024）；任一步失败 MUST 保留该 line 的 worktree 与证据并上送，继续下一条。
 - **FR-027**: 集成 MUST NOT force push，MUST NOT 绕过既有确认门；push 仍是显式授权动作。
 - **FR-028**: 构建/测试隔离 MUST 为每条 line 提供独立的缓存、端口与临时数据库，或只读共享缓存；MUST NOT 启动全局服务；并发上限 MUST 可配置并在派发前检查。
 - **FR-029**: 每条 line MUST 报告其分配的端口、缓存/临时路径与并发上限使用情况，供协调者与收尾汇总消费。
@@ -229,10 +229,10 @@
 - **FR-034**: 每份档案 MUST 覆盖八个维度：调用方式、关键参数、提示词/权限模式；输出模式（`-p` 缓冲 vs `--output-format stream-json`）与事件形状；后台/超时上限（`BASH_DEFAULT_TIMEOUT_MS`/`BASH_MAX_TIMEOUT_MS`、默认最大 600,000 ms、正值覆盖、0/负值语义）；哨兵可靠性与非终止回显；缓冲/可见性行为；session/run 日志位置；detach 行为（`nohup`/`setsid`/`disown`）、信号/退出与孤儿检测；已知缺陷、版本适用性与证据。
 - **FR-035**: 每个条目 MUST 标注 `known` 或 `unknown`；`known` MUST 带观测日期、CLI 版本与证据指针；`unknown` MUST NOT 被猜测值填充；版本/平台不一致 MUST 视为新的观测事件，不得直接沿用旧结论。
 - **FR-036**: `qodercli` 初始档案 MUST 至少记录：`-p` 缓冲至退出；`BASH_DEFAULT_TIMEOUT_MS`/`BASH_MAX_TIMEOUT_MS` 与默认最大 600,000 ms、正值覆盖语义；`--output-format stream-json` 支持；session/run 日志位置（含 `~/.qoder/logs/` 的实测路径）；主会话故障需脱离 runner 才能存活；0/负值超时语义 MUST 记录为 `known` 或 `unknown`，不得猜测。
-- **FR-037**: 派发前（U2）MUST 查阅目标 CLI 档案，并据此选择输出模式、超时形态与 detach 形态；派发记录 MUST 带 profile id/version 与观测到的 CLI 版本。
+- **FR-037**: 派发前（U2）MUST 查阅目标 CLI 档案，并据此选择超时形态与 detach 形态；输出模式的吞吐默认（stream-json）由 Feature 063 拥有，档案只记录缓冲/事件事实，不得改写该默认；派发记录 MUST 带 profile id/version 与观测到的 CLI 版本。
 - **FR-038**: 观测触发点 MUST 至少覆盖 U2 派发前（只读查阅档案、记录 profile id/version 与观测到的 CLI 版本，不改档）、U4 独立校验（比对缓冲/哨兵/退出/日志行为）与 U5 停线（比对超时/detach/孤儿行为）；发现实际行为与 `known` 不符、`unknown` 获得已验证值、或新版本/平台行为首次出现时，MUST 更新档案并记录反馈；匹配且无新事实时 MUST NOT 产生反馈。
 - **FR-039**: 观测更新 MUST 先写状态脊的 CLI 观测段，再更新档案 provenance，再记录反馈（先写后动）；一次观测事件 MUST 恰好产生一条 feedback；同一次派发内出现多个独立观测事件时，每个事件各产生一条，不得合并或遗漏；匹配且无新事实时 MUST NOT 产生反馈。
-- **FR-040**: 观测反馈 MUST 使用稳定标记 [[STR-001]] + `<cli>`（例如 `cli-profile:qodercli`），经既有 feedback 机制记录并可检索（机制 owner：`.specify/shared/workflow/feedback-step.md` 与 `.specify/scripts/python/feedback-utils.py`）；该观测点 MUST 经既有 probe 注册表登记为最小 Probe Object `skill-sdd-loop-driver-cli-profile`（优先归入 `skill-wrapup` class、unit `skill:sdd-loop-driver`、lifecycle point `wrap-up`；若 external skill 须走 `external-custom` class，则以 `custom:` unit 登记），并以 stage dispatch 的 U4/U5 收尾作为反馈记录时点；两种落点都必须通过注册表自身的 `--action probes --validate`；MUST NOT 新增 lifecycle point、引入未注册的观测机制或复制/替代 feedback 引擎，MUST NOT 自动外传。
+- **FR-040**: 观测反馈 MUST 使用稳定标记 [[STR-001]] + `<cli>`（例如 `cli-profile:qodercli`），经既有 feedback 机制记录并可检索（机制 owner：`.specify/shared/workflow/feedback-step.md` 与 `.specify/scripts/python/feedback-utils.py`）；该观测点 MUST 经既有 probe 注册表登记为最小 Probe Object `skill-sdd-loop-driver-cli-profile`（`class_id=skill-wrapup`、`unit=skill:sdd-loop-driver`、`lifecycle_point=wrap-up`），以 `probe-utils.py --action probes --validate` exit 0 作为唯一登记判据；MUST NOT 使用无法通过注册表校验的 fallback 形态（`custom:` unit 不满足注册表 unit 正则，external 形态要求 `ext-` 前缀，二者均不得登记）；若主落点未来被注册表拒绝，MUST 先修订注册表契约并记录裁决，不得静默改用非法形态；并以 stage dispatch 的 U4/U5 收尾作为反馈记录时点；MUST NOT 新增 lifecycle point、引入未注册的观测机制或复制/替代 feedback 引擎，MUST NOT 自动外传。
 - **FR-041**: 档案更新 MUST NOT 改变哨兵语义、watcher 判定状态机/退出码、确认门、阶段 deadline 或测试预算；当前阶段 MUST 使用 U2 记录的形态，更新 MUST NOT 回溯改变它。
 - **FR-042**: `references/cli/` MUST 是 CLI 行为知识的唯一落点；其他 references、阶段提示词与 docs MUST 只引用，不得复制档案内容；档案 MUST 经既有镜像机制同步，并提供 docs 入口。
 - **FR-043**: CLI 档案 MUST NOT 成为派发资格的第二 owner；可接受形态、旗标与支持集仍由 Feature 061 的代码侧 `CAPABILITY_MATRIX` 唯一拥有。二者冲突时，派发资格以矩阵为准；档案记录观测并产生反馈；矩阵变更 MUST 经其 owner 流程，不得由档案更新暗改。
@@ -244,7 +244,7 @@
 - **FR-046**: 阶段子代理 MUST 在独立进程组/会话中运行（`setsid`/`nohup`/`disown` 的适用组合），stdio MUST 与主会话脱离（重定向到日志或 `/dev/null`）；主会话的终止信号 MUST NOT 传播到子代理。
 - **FR-047**: 主会话故障（进程或会话终止）MUST NOT 终止已启动的子代理；子代理生命周期 MUST 独立于驱动的模型循环。
 - **FR-048**: runner MUST 在启动前/启动时写入四件套（PID + start ticks、原子 status、log、heartbeat）并在 Registry 登记；派发前 MUST 建立原子 reservation 以防重复启动。
-- **FR-049**: 重新接线 MUST 只使用 Registry + 状态脊（以及四件套证据）；MUST NOT 依赖会话记忆、对话历史或宽泛进程扫描；接管前 MUST 取得该 line 的 driver lease（`<line_id>.driver.lock`），lease 由活会话持有时 MUST NOT 夺取；过期 lease MUST 先验证持有者证据（心跳/PID/状态脊）再显式破除并留痕。
+- **FR-049**: 重新接线 MUST 只使用 Registry + 状态脊（以及四件套证据）；MUST NOT 依赖会话记忆、对话历史或宽泛进程扫描；接管前 MUST 取得该 line 的 driver lease（`<line_id>.driver.lock`），lease 由活会话持有时 MUST NOT 夺取。持有者 MUST 以不超过 `ttl_seconds/3` 的周期续租（缺省 TTL 600s → 续租周期 ≤ 200s），并在 U2 派发、U3 终止、U4 校验、U5 处置等阶段推进点各续租一次；lease 存活判据 = 心跳未过期（`now < heartbeat_at + ttl`）且（本地）PID/start token 匹配。过期 lease MUST 先验证持有者证据（心跳/PID/状态脊）再显式破除并留痕；若 PID 仍存活且 start token 匹配但心跳已过期，视为 `suspected-alive`，MUST NOT 自动夺取或自动破除，只允许显式 `--override` 破除并在历史中记录该证据。
 - **FR-050**: 取得 lease 后，重新接线 MUST 校验登记的 PID start ticks、cwd 与 branch；校验通过后 MUST 先做一次 `--once` 快照，再决定去向；远端 line 的校验经 ssh 执行，ssh 不可达 MUST NOT 判为死亡或身份不符。
 - **FR-051**: 快照判定 running 时 MUST 恢复监听，MUST NOT 重新派发该阶段。
 - **FR-052**: 快照判定已完成（哨兵 + 证据）时 MUST 进入既有 U4/U5 校验/收尾路径，MUST NOT 重新派发。
@@ -252,7 +252,7 @@
 - **FR-054**: Orphan（进程存活但无有效驱动/Registry/状态脊，或 Registry 缺失）MUST 被显式识别、标记并上送；识别只允许使用线自有证据（Registry、worktree、状态脊、reservation、heartbeat/status 文件）与已登记 PID，MUST NOT 用宽泛 `ps`/`pgrep` 发现 orphan；处置 MUST 留痕，MUST NOT 静默认领或静默终止。
 - **FR-055**: Stale（Registry 指向的进程已死、PID 复用、cwd/branch 不符或证据超期）MUST 被显式识别、标记并上送；清理 MUST 是显式动作，MUST NOT 覆盖其他 line 的登记；远端 ssh 不可达 MUST 记为 `stalled`（reason=`remote-unreachable`）并重试连通性，MUST NOT 记为 stale/dead。
 - **FR-056**: 重复启动防护 MUST 以 `(line_id, stage)` 的原子 reservation 实现（`O_CREAT|O_EXCL` 创建 reservation 文件，内容含 `run_id`、PID、时间戳）；已有活动 reservation 时，第二次启动 MUST 附着监听或拒绝，MUST NOT 启动第二个同阶段进程；stale reservation MUST 先验证 PID/心跳/状态脊再显式破除。
-- **FR-057**: U6 收尾 MUST 注销该 line 的 Registry 条目、释放 reservation、按保留策略归档证据，并仅在合并成功后移除 worktree；MUST NOT 留下 active 残留。
+- **FR-057**: U6 收尾 MUST 在集成结果（`integration_result` = merged|failed）记录之后执行；只读线无集成步骤，阶段完成后直接 U6；写线在集成前显式放弃时以放弃记录（`last_event=abandoned`）关闭。U6 MUST 注销该 line 的 Registry 条目（`closed`）、释放 reservation 与 lease、按保留策略归档证据；worktree 的移除只由集成序列在合并成功后执行（FR-026），未合并（集成失败或显式放弃）时 MUST 保留并置 `worktree_retained=true`（用户显式动作除外，见 FR-032）；MUST NOT 留下 `active` 残留。
 - **FR-058**: 本地与远端拓扑 MUST 同构：远端使用 ssh + su + nohup，Registry 字段与身份校验规则相同，仅增加最小远端字段（host/alias、run_user、远端路径）；Registry 始终位于驱动侧 OS 用户，远端 line 经 ssh 读取/校验；远端连接断开 MUST NOT 杀死已脱离的子代理，也 MUST NOT 被记为阶段失败或 DEAD。
 - **FR-059**: 主会话 kill / 重新接线模拟测试 MUST 证明：子代理存活、新会话经 Registry + 状态脊重新接线、零重复派发、阶段结局正确（running / done / dead 三分支）。
 
@@ -345,6 +345,17 @@
 
 - Q: Feature 064 应绑定既有 Feature 还是新建？063 在途的 provisional CLI-profile 范围如何归属？ → A: 新建 Feature 064（058/061/063 均不拥有并发归属、同仓工作区隔离与生命周期解耦的完整范围）；064 是 CLI 能力档案的权威归属，063 的 `FR-044`…`FR-049`、`CP-01`…`CP-10` 由 analyze/plan 逐条裁决保留/迁入/去重并记录，禁止双 owner 或静默复制；063 未在本分支登记，合并时自登记。
 - Q: Line Registry 的存储位置与原子性、无标识消息入口、foreign/unattributed 事件、哨兵归属的最终规则？ → A: Registry 默认为 `${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines/`（`SPECIFY_LINE_REGISTRY_DIR` 可覆盖），每线一个 `<line_id>.json`，临时文件 + fsync + `os.replace` 原子替换，同线 `<line_id>.lock` 排他锁串行化；活动线 = `active` 或 `waiting`，>1 条时每条无标识消息恰好一次澄清并列出候选，1 条直接路由，0 条显式报告，禁止进程扫描推断；归属键 `(line_id, run_id)`，`line_id` 不同→`foreign`，缺失/不可解析→`unattributed`，同线旧 `run_id`→`stale-run`，三者均不得改变当前状态；哨兵仍为日志最后非空行原文，信封写入旁路 JSON，不追加/不改写哨兵行。
-- Q: worktree 路径与清理、ownership 重叠串行化、集成队列顺序、运行时/镜像提交归属？ → A: worktree 默认 `<repo_parent>/.spec-kit/worktrees/<repo-basename>/<line_id>`；清理仅在合并成功或用户显式动作后以 `git worktree remove` 执行（无 `--force`），未提交/未合并保留上送。写-写重叠按 `created_at` FIFO、`line_id` 字典序 tie-break 串行化，后到线 `state=waiting`；持线者死亡不自动释放归属。集成队列按 `ready_for_merge` 时间 FIFO、`line_id` tie-break，显式拓扑依赖优先；每线依次 rebase→完整门→合并→更新 Registry/镜像→归档运行时→移除 worktree，失败保留并继续下一条。运行时记录由各 line 写在自身 worktree 且不提交，集成者一次归档/提交；镜像同步与命令副本再生成只在集成过程执行一次。
+- Q: worktree 路径与清理、ownership 重叠串行化、集成队列顺序、运行时/镜像提交归属？ → A: worktree 默认 `<repo_parent>/.spec-kit/worktrees/<repo-basename>/<line_id>`；清理仅在合并成功或用户显式动作后以 `git worktree remove` 执行（无 `--force`），未提交/未合并保留上送。写-写重叠按 `created_at` FIFO、`line_id` 字典序 tie-break 串行化，后到线 `state=waiting`；持线者死亡不自动释放归属。集成队列按 `ready_for_merge_at` 时间 FIFO、`line_id` tie-break，显式拓扑依赖优先；每线依次 rebase→完整门→合并→更新该线 Registry 条目→归档运行时→移除 worktree（仅合并成功），整批结束后统一执行一次镜像同步与命令副本再生成，失败保留并继续下一条。运行时记录由各 line 写在自身 worktree 且不提交，集成者一次归档/提交；镜像同步与命令副本再生成只在集成过程执行一次（FR-026 为逐线/批次基数唯一 owner）。
 - Q: 主会话 kill/restart 的 reattach 协议、orphan/stale/重复启动、跨机器边界？ → A: 新会话以 Registry+状态脊为唯一恢复源，先取 `<line_id>.driver.lock` lease（活会话持有不得夺取，过期 lease 先验证再破除），校验 PID start ticks/cwd/branch，再跑 `--once`；running→恢复监听零重派，done→U4/U5，dead/身份不符→既有 U5 卡死/重试并保留 worktree/证据。`(line_id, stage)` 以 `O_CREAT|O_EXCL` reservation 防重复启动，第二启动者只能附着或拒绝。orphan 仅由线自有证据与已登记 PID 识别，禁止宽泛进程扫描；stale 由 PID 死亡/复用/cwd/branch 不符/证据超期识别，清理留痕。Registry 位于驱动侧 OS 用户；远端 line 只加 host/alias、run_user、远端路径，ssh 不可达记 `stalled`（reason=`remote-unreachable`）而非 dead。
-- Q: CLI 能力档案的 probe+feedback 触发点与既有边界？ → A: U2 派发前只读查阅并记录 profile/CLI 版本；U4 独立校验与 U5 停线各做一次行为比对；仅在 `known` 不符、`unknown` 获得已验证值、或新版本/平台首次出现时，先写状态脊观测段→更新档案 provenance→经 `feedback-utils.py` 记录恰好一条 `cli-profile:<cli>` 反馈；无新事实不产生反馈。probe 以最小 Probe Object `skill-sdd-loop-driver-cli-profile` 入既有注册表（优先 `skill-wrapup`，external 情形走 `external-custom`），不新增 lifecycle point、不复制 feedback 引擎、不自动外传。既有哨兵字面量、watcher 判定状态机/退出码、确认门、阶段 deadline 与测试预算不变。
+- Q: CLI 能力档案的 probe+feedback 触发点与既有边界？ → A: U2 派发前只读查阅并记录 profile/CLI 版本；U4 独立校验与 U5 停线各做一次行为比对；仅在 `known` 不符、`unknown` 获得已验证值、或新版本/平台首次出现时，先写状态脊观测段→更新档案 provenance→经 `feedback-utils.py` 记录恰好一条 `cli-profile:<cli>` 反馈；无新事实不产生反馈。probe 以最小 Probe Object `skill-sdd-loop-driver-cli-profile` 入既有注册表（`skill-wrapup` + `skill:sdd-loop-driver` + `wrap-up`；不使用无法通过 `probes --validate` 的 `custom:` fallback），不新增 lifecycle point、不复制 feedback 引擎、不自动外传。既有哨兵字面量、watcher 判定状态机/退出码、确认门、阶段 deadline 与测试预算不变。
+
+### Session 2026-10-20 — analyze repair-1（无人值守）
+
+> 本阶段为 analyze 门回环第 1 轮，未向用户发起访谈；以下裁决按入口指令、终态权威 brief 与既有 owner 边界作出，已同步落入相应 FR/契约/数据模型，`/speckit.clarify` 可推翻。
+
+- Q: 「全部阶段完成但尚未合并」的 Registry 状态是 `completed` 还是 `active + merge_ready`？ → A: **`completed` 是唯一 pre-merge 状态**：U4 全部阶段完成即置 `completed`，写线同时置 `merge_ready=true`（只读线不置，直接 U6）；集成只更新 `integration_result` 并把 `merge_ready` 置 false，状态保持 `completed`；U6 在集成结果记录之后执行并置 `closed`。`active` 仅表示已派发且脊为 `running/retrying`，或尚未派发的 `stage=null` 空窗。
+- Q: U6 与集成的先后？ → A: **集成先行、U6 收尾**：合并成功由集成序列移除 worktree；集成失败或显式放弃时 line 保持 `completed` 等待显式处置；经 U6 关闭且未合并时保留 worktree（`worktree_retained=true`）。等待线只在持线者完成集成合并并 U6 `closed`，或显式放弃后晋级；stale 清理产生的 `closed` 不构成自动释放。
+- Q: 镜像与 Registry 的更新基数？ → A: 每条合并线只更新自己的 Registry 条目（`integration-record`）；镜像同步与命令副本再生成由集成者在整批结束时统一执行一次（FR-024 为唯一基数，FR-026 的逐线步骤不含镜像）。
+- Q: driver lease 的续租节奏与「PID 活但心跳过期」如何处置？ → A: 持有者 MUST 以 ≤ `ttl_seconds/3`（缺省 TTL 600s → ≤200s）续租，并在阶段推进点各续租一次；存活判据为心跳未过期且 PID/token 匹配；心跳过期但 PID 仍存活且 token 匹配视为 `suspected-alive`，不得自动夺取或破除，只允许显式 `--override` 破除并留痕。
+- Q: Probe Object 的 fallback 形态？ → A: 主落点 `skill-wrapup` + `unit=skill:sdd-loop-driver` 经实测可通过 `probes --validate`；`custom:` 形态不匹配注册表 unit 正则、external 形态要求 `ext-` 前缀，故 MUST NOT 保留不可执行的 fallback。
+- Q: 运行时记录集合如何闭合？ → A: 以 `data-model.md` § E8 的四路径为唯一枚举；`evidence/`、`history/`、`trigger/` 明确排除（理由见 FR-022）。

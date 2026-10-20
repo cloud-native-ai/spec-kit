@@ -17,19 +17,19 @@
 
 ## B. Dispatch & Observation
 
-- **CLP-08（U2 查阅）**: U2 派发前 MUST 只读查阅目标 CLI 档案，并据此选择输出模式、超时形态与 detach 形态；派发记录 MUST 带 `profile_id`、`profile_version`、`observed_cli_version`。匹配且无新事实时 MUST NOT 产生反馈（FR-037, V-CLP-3）。
+- **CLP-08（U2 查阅）**: U2 派发前 MUST 只读查阅目标 CLI 档案，并据此选择超时形态与 detach 形态；**输出模式的吞吐默认（stream-json）由 Feature 063 拥有，档案只记录该模式的缓冲/事件事实，并在已知不兼容时提供回退观测，不得改写 063 默认**（边界见 `notes/063-overlap-adjudication.md` §2.7）；派发记录 MUST 带 `profile_id`、`profile_version`、`observed_cli_version`。匹配且无新事实时 MUST NOT 产生反馈（FR-037, V-CLP-3）。
 - **CLP-09（U4/U5 比对）**: U4 独立校验 MUST 比对输出模式/事件形状、哨兵来源、status/exit 字段、runner rc 与 watcher 判定、日志/session 位置；U5 停线 MUST 比对已知缺陷、超时上限、detach/孤儿行为（FR-038）。
 - **CLP-10（观测事件与写序）**: 观测事件 = (a) 与 `known` 不符；(b) `unknown` 获得已验证值；(c) 新版本/平台行为首次出现。处置顺序 MUST 为：先写状态脊 `cli_observations` → 更新档案 provenance → 记录恰好一条反馈。一次观测事件恰好一条反馈；无新事实零反馈（FR-039, V-CLP-3）。
-- **CLP-11（稳定标记）**: 反馈 MUST 经既有 `feedback-utils.py --action record --unit-id "skill:sdd-loop-driver" --unit-type skill` 记录，`--review`/`--points` 含稳定标记 `cli-profile:<cli>`；可由 `--action list --contains "cli-profile:<cli>"` 检索。MUST NOT 复制/替代 feedback 引擎，MUST NOT 自动外传（FR-040, STR-001）。宿主无 `.specify/`（standalone）时，按编译 `## Wrap-up` 的 runtime-mode gate 跳过引擎调用，但档案更新与收尾汇总中的观测报告仍是必需项（063 CP-07 的 standalone 分支）。
-- **CLP-12（Probe Object）**: 观测点 MUST 经既有 probe 注册表登记为最小 Probe Object `skill-sdd-loop-driver-cli-profile`：优先 `class_id=skill-wrapup`、`unit=skill:sdd-loop-driver`、`lifecycle_point=wrap-up`；若 `probes --validate` 拒绝，则退到 `external-custom` + `custom:` unit。MUST NOT 新增 lifecycle point、Probe Class、Handler 或 HandlerBinding；MUST 通过 `probe-utils.py --action probes --validate`（FR-040）。
-- **CLP-13（行为不变）**: 档案更新 MUST NOT 改变哨兵语义、watcher 判定状态机/退出码、确认门、阶段 deadline 或测试预算；当前阶段 MUST 使用 U2 记录的形态，更新 MUST NOT 回溯改变。若观测冲突使当前阶段无法安全完成，MUST 走既有 U5 停线/重试程序，MUST NOT 以更新档案代替行为修复（FR-041, 063 CP-08, V-CLP-4）。
+- **CLP-11（稳定标记）**: 反馈 MUST 经既有 `feedback-utils.py --action record --unit-id "skill:sdd-loop-driver" --unit-type skill` 记录，`--review`/`--points` 含稳定标记 `cli-profile:<cli>`；可由 `--action list --contains "cli-profile:<cli>"` 检索。MUST NOT 复制/替代 feedback 引擎，MUST NOT 自动外传（FR-040, STR-001）。宿主无 `.specify/`（standalone）时，按编译 `## Wrap-up` 的 runtime-mode gate 跳过引擎调用，但档案更新与收尾汇总中的观测报告仍是必需项。
+- **CLP-12（Probe Object）**: 观测点 MUST 经既有 probe 注册表登记为最小 Probe Object `skill-sdd-loop-driver-cli-profile`：`class_id=skill-wrapup`、`unit=skill:sdd-loop-driver`、`lifecycle_point=wrap-up`，以 `probe-utils.py --action probes --validate` exit 0 为唯一登记判据。该主落点已实测通过（2026-10-20）；`custom:` unit 不匹配注册表 unit 正则、external 形态要求 `ext-` 前缀，二者 MUST NOT 作为 fallback 登记。MUST NOT 新增 lifecycle point、Probe Class、Handler 或 HandlerBinding；若主落点未来被拒绝，MUST 先修订注册表契约并记录裁决（FR-040）。
+- **CLP-13（行为不变）**: 档案更新 MUST NOT 改变哨兵语义、watcher 判定状态机/退出码、确认门、阶段 deadline 或测试预算；当前阶段 MUST 使用 U2 记录的形态，更新 MUST NOT 回溯改变。若观测冲突使当前阶段无法安全完成，MUST 走既有 U5 停线/重试程序，MUST NOT 以更新档案代替行为修复（FR-041, V-CLP-4）。
 - **CLP-14（版本与缺陷生命周期）**: `known` 条目 MUST 声明适用版本；缺陷保留历史，修复记 `fixed_in`，不得在未复测时把旧缺陷当当前事实；冲突观测同存并附证据，不得静默择一（FR-035, V-CLP-6）。
 
 ## C. Boundary & Delivery
 
 - **CLP-15（与 061 矩阵边界）**: 派发资格（可接受形态/旗标/支持集）MUST 以 `scripts/python/execution-config.py` 的 `CAPABILITY_MATRIX` 为唯一 owner；档案只记录观测行为。冲突时派发资格以矩阵为准，档案记录观测并产生反馈；矩阵变更 MUST 经其 owner 流程，不得由档案更新暗改（FR-043, V-CLP-5）。
 - **CLP-16（交付与镜像）**: 档案与 `index.md` MUST 位于 `references/cli/`，经 `scripts/python/sync-mirrors.py --only skills/external/sdd-loop-driver` 同步到 `.specify/skills/sdd-loop-driver/`；契约测试 MUST 钉住档案集合、八维度、known/unknown 纪律、`cli-profile:<cli>` 标记、Probe Object 注册、SKILL.md H2 与 docs 入口；MUST NOT 新增技能、命令、常驻服务、外部依赖或模型 API（FR-045）。
-- **CLP-17（063 收编）**: 063 的 provisional `FR-044…FR-049` 与 `CP-01…CP-10` MUST 按 `notes/063-overlap-adjudication.md` 的逐条裁决迁移至本契约；063 合并时 MUST 删除其 provisional 档案契约并改为指向 064，MUST NOT 双 owner 或静默复制（FR-044）。
+- **CLP-17（063 收编与仓库级唯一 owner）**: 063 的 provisional `FR-044…FR-049` 与 `CP-01…CP-10` MUST 按 `notes/063-overlap-adjudication.md` 的逐条裁决迁移至本契约；063 合并时 MUST 删除其 provisional 档案契约并改为指向 064，MUST NOT 双 owner 或静默复制。仓库级唯一 owner 由 `test_clp_17_no_063_duplicate_owner` 守卫：扫描整个仓库（不限 064 规格目录），第二份 CLI-profile 契约、`references/cli/README.md`、`test_cli_profile_record.py` 或同 unit 的第二 Probe Object 均判失败；合并完成后守卫 MUST 转绿（FR-044）。
 
 ## 063 → 064 条款映射（摘要；逐条理由见 notes）
 

@@ -193,17 +193,20 @@ All `NEEDS CLARIFICATION` items in Technical Context are resolved; residual unkn
 - **D-01**: 单一 stdlib 引擎 `line-registry.py` 承载 Registry/lease/reservation/identity/queue/ownership/resources/archive 动作；不拆多个脚本（共享底层原子读写）。
 - **D-02**: FR-005 的 `qodercli_pid` 泛化为 `cli_pid`/`cli_start_token`（`cli=qodercli` 时即同一值），以支持多 CLI 档案；字段语义与 FR-005 一致。
 - **D-03**: 信封载体与命名按 EN-02；watcher 未给 `--line-id/--run-id` 时保持 058 兼容（`attribution=legacy`，无过滤）。
-- **D-04**: `ready_for_merge` 建模为 `merge_ready` 标记 + `ready_for_merge_at`，不加入 Registry `state` 封闭集。
+- **D-04**: `ready_for_merge` 建模为 `merge_ready` 标记 + `ready_for_merge_at`，不加入 Registry `state` 封闭集；仅当 `state=completed` 时为 true，`integration-record` 后置 false。
 - **D-05**: `line_id = <project-slug>-<YYYYMMDDTHHMMSSZ>-<4hex>`；`run_id = r<YYYYMMDDTHHMMSSZ>-<4hex>`；重接线复用 `run_id`。
 - **D-06**: worktree 默认 `<repo_parent>/.spec-kit/worktrees/<repo-basename>/<line_id>`，分支 `line/<line_id>`；Manifest 在 `$REGISTRY/manifests/`；lease/reservation 在 `$REGISTRY/` 与 `$REGISTRY/reservations/`。
 - **D-07**: 集成队列 = 拓扑分层 + 同层 `(ready_for_merge_at, line_id)`；环显式拒绝。
 - **D-08**: 资源缺省端口 39000 + 20/线、并发上限 4（`SPECIFY_LINE_CONCURRENCY_CAP` 覆盖），只登记不绑定，禁止全局服务。
 - **D-09**: 远端身份校验 = 远端跑同一引擎产出 probe JSON，本地 `classify-remote` 分类；ssh 失败 = `stalled(remote-unreachable)`，不判 dead。
-- **D-10**: CLI schema owner 为 `references/cli/index.md`（按宪法 X 的路径语义命名；063 的嵌套 `README.md` 不保留）；Probe Object id `skill-sdd-loop-driver-cli-profile`（优先 `skill-wrapup`，fallback `external-custom`）。
+- **D-10**: CLI schema owner 为 `references/cli/index.md`（按宪法 X 的路径语义命名；063 的嵌套 `README.md` 不保留）；Probe Object id `skill-sdd-loop-driver-cli-profile`（`skill-wrapup` + `skill:sdd-loop-driver` + `wrap-up`；主落点经实测通过，不保留不可执行的 `custom:` fallback）。
 - **D-11**: 063 provisional 范围按 `notes/063-overlap-adjudication.md` 迁入/合并/保留；063 合并时删除其契约与档案测试，禁止双 owner。
 - **D-12**: 状态脊只追加 `line_id/run_id`、`cli_observations`、派发三字段、lease/resume 快照字段；既有阶段状态词与写入顺序不变。
 - **D-13**: 镜像策略 = 只对本特性触碰的文件负责，判据「no NEW drift」；基线 3（技能）/ 9（shared/definitions）文件漂移已记录。
 - **D-14**: 既有 `test_sdd_loop_driver_skill.py` 的 H2 固定集合新增 `CLI Capability Profiles`，属结构契约同步，不改变行为断言。
+- **D-15**（analyze repair-1）: `completed` 是唯一 pre-merge Registry 状态；全部阶段完成即 `completed`，写线同时 `merge_ready=true`（只读线直接 U6）；集成结果记录为 `integration_result` 且状态保持 `completed`；U6 在集成结果之后关闭（`closed`）；worktree 仅由 merged 的集成序列移除，failed/放弃时 `worktree_retained=true`。
+- **D-16**（analyze repair-1）: driver lease 续租周期 ≤ `ttl_seconds/3`（缺省 ≤200s），阶段推进点（U2/U3/U4/U5）各续租一次；`suspected-alive`（PID 活 + token 匹配 + 心跳过期）不得自动夺取/破除，只允许显式 `--override` 并留痕。
+- **D-17**（analyze repair-1）: Runtime-record path set 以 `data-model.md` § E8 的四条路径为唯一枚举；`evidence/`、`history/`、`trigger/` 明确排除且不得并入归档。
 
 **Assumptions**（无人值守运行下的自行裁决，可由后续 clarify 推翻）：
 
@@ -214,7 +217,22 @@ All `NEEDS CLARIFICATION` items in Technical Context are resolved; residual unkn
 - qodercli 的 0/负值超时语义、hermes 的矩阵条目缺失，均按 `unknown`/缺口记录，不在本阶段实验。
 - 本环境无 pytest：不伪造测试通过；implement 阶段补测。
 
-**PLAN-EDIT**: 本 plan 为首版，未修改既已批准的 064 需求/范围/架构；无 PLAN-EDIT 记录。跨特性的契约替换（063 provisional → 064）已在 D-11 与 `notes/063-overlap-adjudication.md` 逐条留痕。
+**PLAN-EDIT (2026-10-20, analyze repair-1)**: 本轮修改的 plan-owned 产物如下（裁决与理由同时记录在 `requirements.md` § Clarifications「analyze repair-1」；requirements/tasks 不属 plan-owned，其同步改动见 tasks 的修复记录，未混入本表）：
+
+| 文件 | 分类 | 理由 |
+|------|------|------|
+| `data-model.md` | decision + correction | I-02（`completed` 唯一 pre-merge 状态、六同步点映射、V-LR-9、集成序列/U6 顺序）；I-15（V-DL-2/3/4 续租与 `suspected-alive`）；I-04（V-IQ-4 每线 Registry/批次镜像）；U-04（E8 排除清单） |
+| `contracts/workspace-isolation.md` | correction | I-04（WI-14/Integration Protocol 基数）；I-02（WI-06 晋级条件、协议 U6 顺序）；I-16（WI-21 第五项）；U-04（WI-09 排除指针） |
+| `contracts/lifecycle-detach-reattach.md` | decision + correction | I-15（LC-05/LC-06）；I-02（LC-16 U6 顺序）；重接线程序续租与 U6 步骤 |
+| `contracts/line-registry.md` | correction | I-02（LR-09 指向 FR-006 六点表）；I-15（`lease-break --override`） |
+| `contracts/cli-profiles.md` | correction | I-08（CLP-08 输出模式边界、CLP-11/13 去 CP 活引用、CLP-17 仓库级守卫）；I-14（CLP-12 单一落点） |
+| `contracts/non-regression-and-tests.md` | correction | G-02/G-03（NG 逐条追溯、NG-03 具名测试、FR-065 承载行） |
+| `contracts/line-envelope-and-ingress.md` | correction | G-03（EN-13 具名测试） |
+| `research.md` | correction | I-14（R10 Probe 落点实测结论，删除不可执行 fallback） |
+| `feature-ref.md` | correction | G-07（SC-001/002/006 度量分量）；G-03（FR-065 承载说明） |
+| `notes/063-overlap-adjudication.md` | correction | I-08（输出模式 owner 边界）；I-14（Probe 落点结论） |
+
+无条款判据被降低；无失败项被删除。跨特性的契约替换（063 provisional → 064）仍由 D-11 与 `notes/063-overlap-adjudication.md` 留痕。本轮 HIGH/MEDIUM 修复与延后项清单见 `notes/analyze-repair-1.md`。
 
 ## Cross-Feature Overlap Adjudication (063)
 

@@ -58,7 +58,18 @@
 
 | Clause | FR/SC | Planned tests |
 |--------|-------|---------------|
-| NG-01…NG-09 | FR-060…FR-066, FR-068, SC-007 | 既有确认门/契约测试 + `test_ng_04_watcher_exit_codes_unchanged` + `test_ng_08_mirror_no_new_drift` |
+| NG-01 | FR-060, SC-007 | `test_ng_01_no_push` |
+| NG-02 | FR-061, FR-032 | `test_ng_02_no_uncommitted_deletion` |
+| NG-03 | FR-062, CLP-17 | `test_ng_03_migration_content_preserved`（063 裁决表逐行存在；迁移条款在 064 有等价承载；无静默删除） |
+| NG-04 | FR-063, EN-03/EN-06 | `test_ng_04_watcher_exit_codes_unchanged` |
+| NG-05 | FR-064, 宪法 IX | `test_ng_05_stdlib_only` |
+| NG-06 | FR-066, FR-041 | 既有确认门/独立校验契约测试 |
+| NG-07 | FR-068, LR-13 | `test_ng_07_single_line_compat` |
+| NG-08 | FR-045, 宪法 XI | `test_ng_08_mirror_no_new_drift` |
+| NG-09 | FR-042 | `test_ng_09_docs_entry` |
+| NG-10…NG-12 | SC-007/SC-008 | implement 阶段 `verification.md` + `run-tests.sh --names-out` 基线 |
+| NG-13 | FR-067, SC-008 | 测试矩阵 + 三项变异演练 |
+| FR-065 承载行（非 NG） | FR-065 | `test_lr_08_remote_minimal_fields`、`test_lc_17_remote_fields_isomorphic`（LR-08/LC-17 是 FR-065 的条款承载；NG 表不再声称承载 FR-065） |
 | NG-10…NG-12 | SC-007/SC-008 | implement 阶段 `verification.md` + `run-tests.sh --names-out` 基线 |
 | NG-13 | FR-067, SC-008 | 测试矩阵 + 三项变异演练 |
 | 测试矩阵 | FR-067, SC-008 | 上表所列 10 个文件 |

@@ -14,8 +14,8 @@
 
 ## B. Lease & Identity
 
-- **LC-05（驱动租约获取）**: 会话接管一条 line MUST 先取得 `<line_id>.driver.lock` lease（`O_CREAT|O_EXCL`）；lease 由活会话持有时 MUST NOT 夺取（exit 3）。`lease-renew` 周期刷新心跳（FR-049, V-DL-1/2/4）。
-- **LC-06（过期 lease 破除）**: 过期 lease MUST 先验证持有者证据（心跳/PID/token/状态脊），再经 `lease-break --reason --evidence-ref` 显式破除并写历史；MUST NOT 盲删（FR-049, V-DL-3）。
+- **LC-05（驱动租约获取与续租）**: 会话接管一条 line MUST 先取得 `<line_id>.driver.lock` lease（`O_CREAT|O_EXCL`）；lease 由活会话持有时 MUST NOT 夺取（exit 3）。持有者 MUST 以 ≤ `ttl_seconds/3` 的周期调用 `lease-renew` 刷新心跳（缺省 TTL 600s → ≤200s），并在 U2 派发、U3 终止、U4 校验、U5 处置各续租一次；`lease-renew` 只允许持有者本人（FR-049, V-DL-1/2/4）。
+- **LC-06（过期 lease 破除）**: 过期 lease MUST 先验证持有者证据（心跳/PID/token/状态脊），再经 `lease-break --reason --evidence-ref` 显式破除并写历史；若 PID 仍存活且 start token 匹配但心跳已过期（`suspected-alive`），MUST NOT 自动破除，只能追加 `--override` 并在历史中记录「PID 活 + 心跳过期」证据；MUST NOT 盲删（FR-049, V-DL-3）。
 - **LC-07（身份校验）**: 取得 lease 后 MUST 校验登记 PID 的 start token；cwd MUST 在平台暴露进程 cwd 时校验（Linux `/proc/<pid>/cwd`），平台不暴露时（macOS）记录 `cwd_check=unsupported` 作为唯一允许的豁免；branch MUST 始终由 worktree `git rev-parse --abbrev-ref HEAD` 复核。校验结果按 `data-model.md` § E6/V-ID-1/2 分类（FR-050, V-ID-1）。
 - **LC-08（快照先行）**: 身份校验通过后 MUST 先执行一次 `watch-target.sh --once` 快照，再决定去向；重接线 MUST NOT 依赖会话记忆、对话历史或宽泛进程扫描（FR-049, FR-050, V-ID-4）。
 - **LC-09（远端校验）**: 远端 line 的身份校验经 ssh 在远端执行同一引擎；ssh 不可达 MUST NOT 判为死亡或身份不符（`identity=remote-unreachable` → `stalled`，reason=`remote-unreachable`），也不得触发重派（FR-050, FR-055, FR-058）。
@@ -31,7 +31,7 @@
 ## D. Duplicate Launch & Closure
 
 - **LC-15（重复启动）**: 已有活动 reservation 时，第二次启动 MUST 附着监听（同 `run_id` 且身份有效）或拒绝；MUST NOT 启动第二个同阶段进程。stale reservation MUST 先验证 PID/心跳/状态脊再显式破除（FR-056, V-SR-1/2/3）。
-- **LC-16（U6 收尾）**: U6 收尾 MUST 注销 Registry 条目（`state=closed`）、释放 reservation、按保留策略归档证据，并仅在合并成功后移除 worktree；MUST NOT 留下 `active` 残留（FR-057, SC-010）。
+- **LC-16（U6 收尾）**: U6 MUST 在 `integration_result`（merged|failed）记录之后执行；只读线无集成步骤，阶段完成后直接 U6；写线在集成前显式放弃时以 `last_event=abandoned` 关闭。U6 MUST 注销 Registry 条目（`state=closed`、`closed_at`）、释放 reservation 与 lease、按保留策略归档证据；worktree 的移除只由集成序列在合并成功后执行（WI-14/FR-026），未合并（failed/显式放弃）时保留并置 `worktree_retained=true`（用户显式动作除外，FR-032）；MUST NOT 留下 `active` 残留（FR-057, SC-010）。
 - **LC-17（本地/远端同构）**: 本地与远端使用同一 Registry 字段与身份校验规则；远端仅增加 `data-model.md` § E1/V-LR-8 定义的最小远端字段（字段枚举不在本条复述）；Registry 始终在驱动侧（FR-058, FR-065）。
 - **LC-18（kill/reattach 验收）**: 主会话 kill 后子代理存活率 100%；新会话经 Registry + 状态脊重接线成功率 100%、重复派发 0；running/done/dead 三分支与证据一致率 100%（FR-059, SC-005/SC-010）。
 
@@ -48,6 +48,8 @@
    identity=dead/mismatch              → U5 卡死/重试程序（保留 worktree）
    identity=remote-unreachable         → stalled(remote-unreachable) + 连通性重试（零重派）
    reservation/orphan evidence         → orphan-check 调查，不盲派
+5. 每 ≤ ttl/3 续租 lease；阶段推进点（U2/U3/U4/U5）各续租一次
+6. U6 在 integration_result 之后关闭（state=closed）；merged 的 worktree 已由集成序列移除，failed/放弃保留
 ```
 
 ## Traceability

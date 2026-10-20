@@ -28,11 +28,11 @@
 
 1. **CP-01 的落点文件**: 063 指定 `references/cli/README.md` 为 schema owner。宪法 X 的保留名阻断严格范围只覆盖项目根与 `docs/`，但按其路径语义原则（目录索引用 `index.md`，不以嵌套 `README.md` 承担索引语义），064 统一为 `references/cli/index.md`，其余不受影响。063 合并时 MUST NOT 恢复 `README.md`。
 2. **维度数**: 063 为七维（无独立 detach/信号/孤儿维度）；064 为八维（新增 detach 行为、信号/退出与孤儿检测）。064 的八维定义是唯一 roster；063 的七维文本删除，不保留副本。
-3. **Probe Object**: 063 设计注册 `skill-sdd-loop-driver-wrapup`（`skill-wrapup`，unit `skill:sdd-loop-driver`，`wrap-up`）。064 注册 `skill-sdd-loop-driver-cli-profile`（同 class/unit/point）。同一 unit 只保留 064 的 Object；063 合并时不得再添加其 Object 行。若注册表校验要求 external skill 走 `external-custom`，064 按 requirements FR-040 的 fallback 以 `custom:` unit 登记，仍只保留一个 Object。
+3. **Probe Object**: 063 设计注册 `skill-sdd-loop-driver-wrapup`（`skill-wrapup`，unit `skill:sdd-loop-driver`，`wrap-up`）。064 注册 `skill-sdd-loop-driver-cli-profile`（同 class/unit/point）。同一 unit 只保留 064 的 Object；063 合并时不得再添加其 Object 行。主落点经 2026-10-20 实测通过 `probes --validate`；`custom:` unit 不匹配注册表 unit 正则、external 形态要求 `ext-` 前缀，二者不得作为 fallback 登记（analyze repair-1 裁定）。
 4. **反馈标记**: 063 的 `STR-009` 与 064 的 `STR-001` 字面量相同（`cli-profile:`）；064 的共享字符串是唯一声明，063 合并时删除其 `STR-009` 行并在正文使用 064 的 `[[STR-001]]` 等价指针（跨规格引用以路径+字符串 ID 表示）。
 5. **测试文件**: 063 规划 `tests/contract/test_sdd_loop_driver_efficiency.py` 内的 CP 测试与 `tests/unit/test_cli_profile_record.py`。064 规划 `tests/contract/test_sdd_loop_driver_cli_profiles.py`；063 合并时 MUST 移除其 CP 测试段落，不得保留第二套档案断言。063 的 `test_cli_profile_record.py` 若已实现，迁移为 064 的单元测试或删除；MUST NOT 双份。
 6. **内容保全（NG-03）**: 063 的档案条款文本在本文件 §1 与 064 CLP 条款中均有等价承载；063 合并时以「删除 + 指针」方式收编，历史保留在 063 的提交历史与 064 的 `notes/` 记录中，不属于静默丢失。
-7. **依赖方向**: 064 引用 063 的 stream-json 默认与 nohup 实施作为已知依赖，但不依赖 063 分支代码存在；若 063 先合并，064 的 runner 修改需与之协调（同文件 `dispatch-recipes.md`），冲突处理以 064 的归属/生命周期字段为准、以 063 的 stream-json 派生为准。
+7. **依赖方向与输出模式边界**: 064 引用 063 的 stream-json 默认与 nohup 实施作为已知依赖，但不依赖 063 分支代码存在；若 063 先合并，064 的 runner 修改需与之协调（同文件 `dispatch-recipes.md`），冲突处理以 064 的归属/生命周期字段为准、以 063 的 stream-json 派生为准。**输出模式的吞吐默认（stream-json）由 063 决定；064 档案只记录缓冲/事件等观测事实并在 U2 只读引用，档案更新不得改写该默认**（CLP-08）。
 
 ## 3. 验证清单（063 合并时执行）
 

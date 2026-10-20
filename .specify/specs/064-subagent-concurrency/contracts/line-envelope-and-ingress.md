@@ -46,6 +46,6 @@ WATCH label=L1 verdict=RUNNING pid=alive heartbeat=ok anomaly=no sentinel=no rc=
 |--------|-------|---------------|
 | EN-01…EN-04 | FR-008, FR-009, FR-014 | `test_line_envelope_contract.py::test_en_01_fields`, `test_en_02_carriers`, `test_en_03_sentinel_untouched`, `test_en_04_classification` |
 | EN-05/EN-06/EN-07 | FR-013…FR-015, FR-063, SC-003 | `test_en_05_foreign_not_consumed`, `test_en_06_watcher_flags_and_exit_codes`, `test_en_07_targeted_pid_only` |
-| EN-08…EN-14 | FR-010…FR-012, SC-002 | `test_en_10_exactly_one_clarification`, `test_en_11_ambiguous_stop`, `test_en_12_single_zero_active`, `test_en_14_no_process_scan` |
+| EN-08…EN-14 | FR-010…FR-012, SC-002 | `test_en_10_exactly_one_clarification`, `test_en_11_ambiguous_stop`, `test_en_12_single_zero_active`, `test_en_13_clarification_non_blocking`, `test_en_14_no_process_scan` |
 | EN-15 | FR-016, SC-001/SC-003/SC-008 | `tests/integration/test_two_line_isolation.py` |
 | EN-16 | FR-017, FR-068 | `test_en_16_single_line_envelope_compat` |

@@ -48,18 +48,18 @@ No new command, skill, daemon, external service, runtime dependency, or model AP
 | FR-018…FR-032 | WI-01…WI-21 |
 | FR-033…FR-045 | CLP-01…CLP-17 (FR-044 → CLP-17 + `notes/063-overlap-adjudication.md`) |
 | FR-046…FR-059 | LC-01…LC-18 (FR-058 → LC-17/LR-08; FR-059 → LC-18) |
-| FR-060…FR-068 | NG-01…NG-13 (FR-067 → NG-13) |
+| FR-060…FR-068 | NG-01…NG-13（FR-065 → LR-08/LC-17；FR-067 → NG-13；FR-065 不由 NG 条款承载） |
 
 ## 4. Success Criteria Coverage
 
 | SC | Evidence plan |
 |----|---------------|
-| SC-001 | `test_two_line_isolation` — event attribution diff list is empty |
-| SC-002 | Ingress fixture — one question per unidentified message; PATH-stub `ps`/`pgrep` invocation count 0 |
+| SC-001 | `test_two_line_isolation` — event attribution diff list is empty; both lines' completion verdicts correct (2/2 = 100%) |
+| SC-002 | Ingress fixture — exactly one question per unidentified message; PATH-stub `ps`/`pgrep` invocation count 0; post-answer routing correctness 100% (ambiguous-stop counts as a correct terminal outcome and is excluded from the routing denominator) |
 | SC-003 | Foreign monitor/PID fixture — state transition count 0; 100% tagged `foreign` |
 | SC-004 | `test_worktree_integration_queue` — `git fsck`, commit graph, overlap rejection 100%, replay diff 0 |
 | SC-005 | `test_session_kill_reattach` — survival 100%, reattach 100%, redispatch 0, branch outcome matches evidence |
-| SC-006 | Profile content check + `feedback-utils.py --action list --contains "cli-profile:qodercli"`; simulated mismatch → exactly 1 |
+| SC-006 | Profile content check + `feedback-utils.py --action list --contains "cli-profile:qodercli"`; simulated mismatch → exactly 1; no new fact → zero new feedback |
 | SC-007 | Existing contract suites + push-stub count 0 + watcher exit-code pin |
 | SC-008 | Test matrix + three mutation drills each turning ≥1 test red |
 | SC-009 | `test_lr_12_concurrent_registration` — N writers, parse rate 100%, lost 0, duplicate 0 |

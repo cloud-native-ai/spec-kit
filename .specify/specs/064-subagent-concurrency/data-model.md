@@ -35,8 +35,8 @@
 | `stage` | string\|null | active | 当前阶段（`requirements`…`review`）；`waiting` 可为 null |
 | `state` | enum | always | 见 V-LR-4 |
 | `waiting_reason` / `holder_line_id` / `queued_at` | string/null | waiting | 串行化票据 |
-| `merge_ready` / `ready_for_merge_at` | bool/ISO | integration | 集成队列输入，不进入 `state` 封闭集 |
-| `integration_result` | object\|null | after integration | `{status: merged\|failed\|skipped, at, commit, reason}` |
+| `merge_ready` / `ready_for_merge_at` | bool/ISO | integration | 集成队列输入；仅当 `state=completed` 时为 true，`integration-record` 后置 false；不进入 `state` 封闭集 |
+| `integration_result` | object\|null | after integration | `{status: merged\|failed\|skipped, at, commit, reason}`；记录时 `state` 保持 `completed`，直到 U6 关闭 |
 | `worktree_retained` | bool | U6 | 未合并/未提交时 `true` |
 | `resources` | object\|null | active | `{ports:[start,end], cache_dir, tmp_dir}` |
 | `remote` | object\|null | remote only | `{alias, run_user, remote_root}`；Registry 仍在驱动侧 |
@@ -54,27 +54,26 @@
 - **V-LR-6**: `active` 且已派发时，四件套路径、`stage`、`runner_pid`、`cli_pid` 必须齐备；未派发时允许 `stage=null` 且无 PID。
 - **V-LR-7**: `start_token` 是平台身份令牌：Linux 为 `/proc/<pid>/stat` 字段 22；macOS 为 `ps -p <pid> -o lstart=` 的规范化字符串。PID 不得单独存在而无 token。
 - **V-LR-8**: `remote` 条目必须含 `alias`、`run_user`、`remote_root`；Registry 路径必须仍在驱动侧（不得写入远端共享目录）。
-- **V-LR-9**: Registry `state` 与状态脊不得矛盾：已派发时 `active` ↔ 脊 `running/retrying`；`stalled` ↔ 脊 `stalled`；`completed/closed` ↔ 脊 `done`。尚未派发的 `active`（`stage=null`、无 PID/四件套）没有阶段执行，不构成矛盾；`waiting` 同理。
-- **V-LR-10**: `closed` 条目保留全部历史字段，`closed_at` 必填；`list --active` 不返回 `closed/stale/orphaned`。
+- **V-LR-9**: Registry `state` 与状态脊不得矛盾：已派发的 `active` ↔ 脊 `running/retrying`；`stalled` ↔ 脊 `stalled`；`completed` ↔ 脊 `done`（全部阶段完成，等待或已完成集成）。尚未派发的 `active`（`stage=null`、无 PID/四件套）与 `waiting` 没有阶段执行，不构成矛盾。`closed/stale/orphaned` 为终态/待处置态：以 `closed_at`、`last_event` 与保留的状态脊证据记录原因（如 `abandoned`、`stale-cleanup`），不再要求与脊当前值相等。
+- **V-LR-10**: `closed` 条目保留全部历史字段，`closed_at` 必填；`list --active` 只返回 `active/waiting`（不返回 `stalled/completed/closed/stale/orphaned`）。
 - **V-LR-11**: 未知扩展字段必须原样保留（向前兼容）；引擎不得因未知字段拒绝读取。
 - **V-LR-12**: 并发读取方永不观察到不可解析 JSON、重复 `line_id` 或丢失其他条目（由 per-file 原子替换 + 目录独立保证）。
 
 **State transitions**
 
 ```text
-register(U0.5) ──> active | waiting(ownership/cap)
-waiting ──promote──> active           (holder closed / explicit release / disjoint)
-active ──u5──> stalled ──retry──> active (new run_id) | closed
-active ──all stages done (pre-merge)──> completed
-completed ──u6──> closed
-active ──u6(merged/abandoned)──> closed
+register(U0.5) ──> active（无重叠/未超 cap）| waiting(ownership-overlap|concurrency-cap)
+waiting ──promote──> active           (holder 集成合并并 U6 closed / explicit release / disjoint)
+active ──u5──> stalled ──retry(new run_id)──> active | ──explicit abandon(u6)──> closed
+active ──explicit abandon(u6)──> closed
+active ──u4 all stages done──> completed (写线: merge_ready=true, ready_for_merge_at; 只读线: merge_ready=false, 直接 u6)
+completed ──integration-record(merged|failed)──> completed (状态不变；merge_ready=false；integration_result 记录)
+completed ──u6(merged 或 explicit abandon)──> closed
 active ──identity fail / evidence expired──> stale ──explicit cleanup──> closed
 active/waiting ──line-owned evidence missing──> orphaned ──explicit disposition──> closed
-active ──u4 all stages done & merge ready──> active + merge_ready=true
-merge_ready line ──integration merged──> closed
 ```
 
-`stalled` 与 `waiting` 不自动迁移；任何破除/释放都是显式动作并写入 `last_event`/历史。
+`completed` 是唯一的 pre-merge 状态：全部阶段完成即进入，集成结果不引入新状态。U6 MUST 在 `integration_result` 记录之后执行；worktree 只在 merged 时由集成序列移除，failed/abandoned 时保留。`stalled` 与 `waiting` 不自动迁移；任何破除/释放都是显式动作并写入 `last_event`/历史。
 
 ---
 
@@ -159,15 +158,15 @@ merge_ready line ──integration merged──> closed
 | `holder_session` | string | always |
 | `holder_pid` / `holder_start_token` | int/string | always |
 | `host` | string | always |
-| `acquired_at` / `heartbeat_at` | ISO | always |
-| `ttl_seconds` | int | always；缺省 600 |
+| `acquired_at` / `heartbeat_at` | ISO | always；`heartbeat_at` 由每次续租刷新 |
+| `ttl_seconds` | int | always；缺省 600；续租周期 MUST ≤ `ttl_seconds/3`（缺省 ≤200s） |
 
 **Validation rules**
 
 - **V-DL-1**: 获取以 `O_CREAT|O_EXCL` 创建；已存在时读取持有者。
-- **V-DL-2**: 持有者存活 = `now < heartbeat_at + ttl` 且（本地）PID 与 token 匹配；存活 → 夺取拒绝（引擎 exit 3）。
-- **V-DL-3**: 过期 lease 只能经 `lease-break --reason <…> --evidence-ref <…>` 破除；破除前必须验证持有者死亡/心跳过期证据；每次破除追加历史行。
-- **V-DL-4**: `lease-renew` 只允许持有者本人；`lease-release` 只允许持有者本人；两者都刷新/删除 lease 文件。
+- **V-DL-2**: 持有者存活 = `now < heartbeat_at + ttl` 且（本地）PID 与 start token 匹配；存活 → 夺取拒绝（引擎 exit 3）。心跳过期但（本地）PID 仍存活且 token 匹配 → `suspected-alive`：不得自动夺取，也不得按普通过期 lease 自动破除。`host` 与当前主机不同时，PID 证据经远端探针获取；拿不到 PID 证据不构成 `suspected-alive`，按心跳过期与状态脊证据处置。
+- **V-DL-3**: 过期 lease 只能经 `lease-break --reason <…> --evidence-ref <…>` 破除；破除前必须验证持有者死亡/心跳过期证据；`suspected-alive` 只能追加 `--override` 显式破除，并在历史行记录「PID 活 + 心跳过期」证据；每次破除追加历史行。
+- **V-DL-4**: `lease-renew` 只允许持有者本人；持有者 MUST 在 U2 派发、U3 终止、U4 校验、U5 处置各续租一次，且任意两次续租间隔 MUST ≤ `ttl_seconds/3`（缺省 ≤200s）；`lease-release` 只允许持有者本人；两者都刷新/删除 lease 文件。
 - **V-DL-5**: 一个 line 同时最多一个有效 lease；lease 指向的 session 与 Registry `driver_session` 不一致时，以 lease 为准并记录 `last_event=lease-owner-changed`。
 
 ---
@@ -221,7 +220,7 @@ merge_ready line ──integration merged──> closed
 
 ## E7. Integration Queue
 
-**Inputs**: Registry `merge_ready=true` 条目 + 各线 Manifest `integration_depends_on`。
+**Inputs**: Registry 中 `state=completed` 且 `merge_ready=true` 的条目 + 各线 Manifest `integration_depends_on`。
 
 **Computed entry**: `{order, line_id, ready_for_merge_at, layer, depends_on}`。
 
@@ -229,8 +228,8 @@ merge_ready line ──integration merged──> closed
 
 - **V-IQ-1**: 排序 = 拓扑分层（Kahn）→ 同层 `(ready_for_merge_at, line_id)` 升序；同输入重放逐字相同。
 - **V-IQ-2**: 环 → 拒绝构建并上送，不合并任何环上线。
-- **V-IQ-3**: 依赖 line 存在但未 `merge_ready`（或已 closed 且未合并）→ 该依赖视为未满足，条目留在队列并显式报告，不静默跳过；依赖 line_id 不存在或 Manifest 引用非法 → 按 V-OM-5 显式失败，不构建队列。
-- **V-IQ-4**: 每线执行序列固定：rebase → 完整质量门 → 合并 → 更新 Registry/镜像 → 归档运行时 → 移除 worktree；任一步失败保留 worktree 与证据，继续下一条。
+- **V-IQ-3**: 依赖满足 = 依赖 line 的 `integration_result.status=merged`（包括已 `closed` 的 merged 历史）。依赖 line 存在但尚未 merged（仍 `merge_ready=true` 未执行、`integration_result.status=failed`、或已 closed 且未合并）→ 该依赖视为未满足，条目留在队列并显式报告，不静默跳过；依赖 line_id 不存在或 Manifest 引用非法 → 按 V-OM-5 显式失败，不构建队列。
+- **V-IQ-4**: 每线执行序列固定：rebase → 完整质量门 → 合并 → `integration-record`（更新该线 Registry 条目；`state` 保持 `completed`，`merge_ready=false`）→ 归档运行时 → 移除 worktree（仅 merged）；镜像同步与命令副本再生成不在逐线序列内，MUST 在整批条目处置后统一执行一次。任一步失败保留 worktree 与证据，继续下一条。
 - **V-IQ-5**: 集成不得 force push、不得绕过确认门；push 仍需显式授权。
 
 ---
@@ -255,6 +254,14 @@ merge_ready line ──integration merged──> closed
 <worktree>/.specify/memory/knowledge/
 <worktree>/.specify/memory/exec-quant/
 ```
+
+**Excluded stores**（明确不在本集合内，任何文档不得把它们并入运行时归档）：
+
+| Store | 排除理由 |
+|-------|----------|
+| `<worktree>/.specify/memory/evidence/` | 线级证据，随 worktree 保留/上送，不由集成合并 |
+| `<worktree>/.specify/history/` | 主线派生的项目知识库，不允许按线分叉合并 |
+| `<worktree>/.specify/memory/trigger/` | 宿主运行状态；line MUST NOT 写入 |
 
 **Validation rules**
 

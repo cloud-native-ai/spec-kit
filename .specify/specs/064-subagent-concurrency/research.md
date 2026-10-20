@@ -97,7 +97,7 @@
 
 ## 6. R6 — 集成队列的确定性
 
-**Decision**: 就绪标记 = Registry 的 `merge_ready=true` + `ready_for_merge_at`（不是 `state` 值，保持状态封闭集不变）。队列 = 以 Manifest `integration_depends_on` 建有向图 → Kahn 分层 → 同层按 `(ready_for_merge_at, line_id)` 升序；检测到环 → 显式拒绝并上送，不合并任何环上线。重放同一 Registry+Manifest 输入得到逐字相同顺序。
+**Decision**: 就绪标记 = Registry 的 `merge_ready=true` + `ready_for_merge_at`（不是 `state` 值，保持状态封闭集不变；仅当 `state=completed` 时为 true，`integration-record` 后置 false）。队列 = 以 Manifest `integration_depends_on` 建有向图 → Kahn 分层 → 同层按 `(ready_for_merge_at, line_id)` 升序；检测到环 → 显式拒绝并上送，不合并任何环上线。重放同一 Registry+Manifest 输入得到逐字相同顺序。
 
 **Rationale**: 拓扑依赖优先于同层 FIFO，符合 FR-025；把 `ready_for_merge` 建模为标记而非状态，避免与状态脊/Registry 状态封闭集冲突。
 
@@ -115,7 +115,7 @@
 
 **Decision**:
 - **脱离**：本地 `setsid`（可用时）+ `nohup` + stdio 重定向；远端 `ssh + su + nohup`（既有配方）。runner 把 CLI 作为子进程后台启动、记录 `cli_pid` + start token、`wait` 后写 status。
-- **Lease**：`<line_id>.driver.lock` 以 `O_CREAT|O_EXCL` 创建，内容 JSON（session/pid/start token/host/acquired_at/heartbeat_at/ttl=600s）；`lease-renew` 刷新 `heartbeat_at`；活持有者（心跳未过期且本地 PID 身份匹配）拒绝夺取；过期 lease 只能经 `lease-break --reason --evidence-ref` 破除，并追加 `<line_id>.lease-history.jsonl`。
+- **Lease**：`<line_id>.driver.lock` 以 `O_CREAT|O_EXCL` 创建，内容 JSON（session/pid/start token/host/acquired_at/heartbeat_at/ttl=600s）；持有者以 ≤ `ttl/3`（缺省 ≤200s）周期并在 U2/U3/U4/U5 续租，`lease-renew` 刷新 `heartbeat_at`；活持有者（心跳未过期且本地 PID 身份匹配）拒绝夺取；过期 lease 只能经 `lease-break --reason --evidence-ref` 破除，并追加 `<line_id>.lease-history.jsonl`；PID 活 + token 匹配 + 心跳过期 = `suspected-alive`，需显式 `--override` 破除并留痕。
 - **Reservation**：`$REGISTRY/reservations/<line_id>.<stage>.json` 以 `O_CREAT|O_EXCL` 创建；已有活动 reservation 时第二启动者只能 `attach`（同 run_id 且 PID 身份有效）或拒绝；stale reservation 先验证 PID/心跳/状态脊再显式破除。
 - **重接线**：`lease-acquire` → `verify-identity`（runner/cli PID start token；Linux 追加 `/proc/<pid>/cwd`；branch 由 worktree `git rev-parse --abbrev-ref HEAD` 复核）→ `watch-target.sh --once` → 三分支（running 恢复监听 / done 进 U4/U5 / dead 进 U5），零重复派发。
 
@@ -137,7 +137,7 @@
 - 落点 `skills/external/sdd-loop-driver/references/cli/<cli>.md`，schema/观测程序 owner 为 `references/cli/index.md`（索引型文件按宪法 X 的路径语义选择 `index.md`；宪法 X 的保留名阻断严格范围只覆盖项目根与 `docs/`，因此这是命名一致性选择，不是对治理范围的扩权）。
 - 八维度：调用与参数/权限模式；输出模式；后台/超时上限；哨兵可靠性与非终止回显；缓冲/可见性；session/run 日志；detach/信号/孤儿；已知缺陷/版本/证据。
 - 观测触发：U2 只读查阅并记录 `profile_id/profile_version/observed_cli_version`；U4/U5 各比对一次。更新顺序：状态脊 `cli_observations` → 档案 provenance → `feedback-utils.py` 恰好一条 `cli-profile:<cli>`；无新事实零反馈。
-- Probe Object：`skill-sdd-loop-driver-cli-profile`，优先 `skill-wrapup` class + `unit=skill:sdd-loop-driver` + `lifecycle_point=wrap-up`；若 `probes --validate` 拒绝该组合，则退到 `external-custom` + `custom:skill:sdd-loop-driver`（requirements FR-040 授权），仍不新增 class/handler/lifecycle point。
+- Probe Object：`skill-sdd-loop-driver-cli-profile`，`skill-wrapup` class + `unit=skill:sdd-loop-driver` + `lifecycle_point=wrap-up`；2026-10-20 以临时注册表副本实测该组合通过 `probes --validate`。`custom:skill:sdd-loop-driver` 不匹配注册表 unit 正则（`^custom:[a-z0-9._/-]+$`），external 形态要求 `ext-` 前缀，故不保留不可执行的 fallback；仍不新增 class/handler/lifecycle point。
 - 063 逐条裁决见 `notes/063-overlap-adjudication.md`；063 的 stream-json/nohup 作为依赖引用，不复制。
 
 **Rationale**: 档案是行为知识而非派发资格，引用 `CAPABILITY_MATRIX`；`index.md` 同时满足宪法 X 与单一 owner；Probe Object 以最小登记面接入既有反馈链。

@@ -15,7 +15,7 @@
 - **LR-06（身份格式与生命周期）**: `line_id` 环境内唯一且证据存续期内不复用；`run_id` 标识一次执行尝试。重接线 MUST 复用原 `run_id`；重试/重派 MAY 产生新 `run_id` 并保留 `run_history`。二者与 feedback/exec-quant 的 `(unit_id, run_id)` 不是同一命名空间（FR-004, `data-model.md` V-LR-2/V-LR-3）。
 - **LR-07（字段完整性）**: Registry 条目 MUST 覆盖 `data-model.md` § E1 表中 `always/active/after dispatch/write lines/U6` 规定时点的字段；缺字段的写入被拒绝（FR-005, V-LR-1）。FR-005 的 `qodercli_pid` 映射为 `cli_pid`（`cli=qodercli` 时同一值，Decision D-02）。
 - **LR-08（远端最小字段）**: 远端条目 MUST 另含 `remote.alias`、`remote.run_user`、`remote.remote_root`；Registry 始终位于驱动侧 OS 用户，远端经 ssh 读取/校验（FR-058, FR-065, V-LR-8）。
-- **LR-09（状态封闭集与同步点）**: `state` MUST ∈ `active/waiting/stalled/completed/orphaned/stale/closed`，并在 U0.5、U2 派发、U3 终止、U4 校验、U5 停线、U6 收尾同步更新；MUST NOT 与状态脊矛盾（FR-006, V-LR-4/V-LR-9）。
+- **LR-09（状态封闭集与同步点）**: `state` MUST ∈ `active/waiting/stalled/completed/orphaned/stale/closed`；六个同步点（U0.5/U2/U3/U4/U5/U6）各自写入的状态值由 FR-006 的映射表唯一规定，`completed` 是唯一 pre-merge 状态；MUST NOT 与状态脊矛盾（映射见 `data-model.md` V-LR-9）（FR-006, V-LR-4/V-LR-9）。
 - **LR-10（stale 识别与显式清理）**: stale = PID 死亡、PID 复用（start token 不符）、cwd/branch 不符、或证据超期（沿用既有 watcher 心跳/阶段期限语义，不另设阈值）。清理 MUST 是显式、留痕动作；MUST NOT 盲目删除/覆盖其他 line 登记（FR-007, V-LR-10）。
 - **LR-11（注册失败语义）**: Registry 目录不可写或已有 JSON 损坏 → 注册/更新以非零退出并给出路径与原因；line MUST NOT 回退到项目内共享路径启动（Edge Case, FR-002）。
 - **LR-12（并发完整性验收）**: N 条 line 并发注册/更新后，Registry 可解析率 100%、丢失条目数 0、重复 `line_id` 数 0；同线锁下无半写（FR-003, SC-009）。
@@ -40,7 +40,7 @@
 | `lease-acquire` | `--line-id` `--session` `--pid` `[--ttl]` | lease 快照 | 0 / 2 / 3 / 6 |
 | `lease-renew` | `--line-id` `--session` | lease 快照 | 0 / 2 / 3 / 6 |
 | `lease-release` | `--line-id` `--session` | 释放摘要 | 0 / 2 / 3 / 6 |
-| `lease-break` | `--line-id` `--reason` `--evidence-ref` | 破除记录 | 0 / 2 / 3 / 6 |
+| `lease-break` | `--line-id` `--reason` `--evidence-ref` `[--override]` | 破除记录 | 0 / 2 / 3 / 6 |
 | `reserve` | `--line-id` `--stage` `--run-id` `--pid` `--start-token` | reservation 快照 | 0 / 2 / 3 / 6 |
 | `reservation-status` | `--line-id` `--stage` | reservation 摘要 | 0 / 2 / 6 |
 | `reservation-break` | `--line-id` `--stage` `--reason` `--evidence-ref` | 破除记录 | 0 / 2 / 3 / 6 |
