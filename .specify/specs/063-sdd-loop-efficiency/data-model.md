@@ -2,7 +2,7 @@
 
 **Feature**: 063-sdd-loop-efficiency → Feature 058（演化特性）
 **Spec**: [requirements.md](requirements.md)
-**说明**: 本特性不新增数据库或常驻存储。实体全部落在文件上：每线**状态脊**（Markdown，承载记录与台账）、特性目录下的**测试证据文件**（JSONL）、阶段运行产物（raw stream / live log / pid / status / heartbeat / runner-log）。本文件登记字段面与校验规则，是契约测试与审计脚本的判定对象；字段值域以本节为 plan 期权威，实现后由脚本常量与契约测试共同钉住。除 E1–E8 实体外，本文件还登记两个**非实体证据制品**：Stall Behavior Baseline（SC-010）与 CLI Capability Profile（FR-044…FR-049）；它们不改变实体计数。
+**说明**: 本特性不新增数据库或常驻存储。实体全部落在文件上：每线**状态脊**（Markdown，承载记录与台账）、特性目录下的**测试证据文件**（JSONL）、阶段运行产物（raw stream / live log / pid / status / heartbeat / runner-log）。本文件登记字段面与校验规则，是契约测试与审计脚本的判定对象；字段值域以本节为 plan 期权威，实现后由脚本常量与契约测试共同钉住。除 E1–E8 实体外，本文件还登记一个**非实体证据制品**：Stall Behavior Baseline（SC-010）。CLI Capability Profile 与 CLI 观测字段由 Feature 064 的 `data-model.md` E9/E10 拥有，不在本文件定义。
 
 ## 实体一览
 
@@ -180,15 +180,14 @@
 | `stage_started_at` / `stage_deadline_epoch` | epoch | TIMEOUT 唯一判据 |
 | `fast_lane_marker` | `none` \| [[STR-003]] | 与准入记录一致 |
 | `plan_constraint_marker` | `none` \| `active` | 与 E4 一致 |
-| `profile_id` / `profile_version` | 字符串 | U2 查档命中的 CLI 档案 id 与版本；无档案先建骨架时记 `skeleton` |
-| `observed_cli_version` | 字符串 | 派发前实测的 CLI 版本；与档案 version applicability 不一致时触发观测事件 |
+
+CLI 查档字段（`profile_id` / `profile_version` / `observed_cli_version`）由 Feature 064 的 `data-model.md` E10 追加到派发记录；本文件不重复定义，MUST NOT 在 063 另立字段。
 
 **校验规则**：
 - V-E6-1：`detached=no` 的运行不得计入受保护运行，状态脊记录风险（edge case）。
 - V-E6-2：`mode=buffered-degraded` 必须附 [[STR-004]] 与原因（SC-011）。
 - V-E6-3：哨兵、判定状态机、退出码、四件套路径语义不得因本实体扩格而变化（FR-029/FR-032）。
 - V-E6-4：`state_spine_path` MUST 非空并与 E8 U0 入口声明一致；缺失或与 U0 不一致 → 派发前以 `ANOMALY:` 快速失败，MUST NOT 猜测路径或另建台账。
-- V-E6-5：派发前 MUST 记录 `profile_id` / `profile_version` / `observed_cli_version`；档案缺失时先按 CP-01 建骨架并把缺口写入状态脊；缺少查档记录的派发 → 门失败。
 - V-E6-6：`spine_write_mode=transport` 时，阶段 MUST 只写 E3 传输行与名称名单；驱动 MUST 在 U4 后把对应 E2 行合并进状态脊并记 `merge_source`；执行侧 MUST NOT 创建第二份台账，closure 审计在状态脊看不到 baseline 时 MUST 失败。
 
 ## E7 — Raw/Live Evidence Pair
@@ -216,22 +215,22 @@
 |------|------|----------|
 | U0 entry | 目标/拓扑/权威/切片/断点 + `state_spine_path` + `spine_write_mode`（`direct`/`transport`） + [[STR-006]]（如有） | U0 |
 | preflight | 五族结论摘要 | U0/U1 之间 |
-| dispatch | E6 字段（含 `state_spine_path`、`spine_write_mode`、CLI 档案查档字段） | U2 派发前 |
+| dispatch | E6 字段（含 `state_spine_path`、`spine_write_mode`；CLI 查档字段由 064 E10 追加） | U2 派发前 |
 | watch | `last_verdict` / 证据快照 | U3 终止判定时 |
 | admission | E1 | checklist 派发前 |
 | test budget | E2 围栏 | 每次测试证据入账时 |
 | plan constraint | E4（含 `approved_baseline_commit`、`rebaseline_events[]`） | plan U4 后 |
 | stall baseline | [[STR-007]] 路径 + `base_commit` + `initial_retries=0` + 录制时间 | 实现首个行为面提交前 |
 | plan changes | E5 | 每个下游阶段 U4 后 |
-| CLI observations | `{cli, trigger, expected, observed, outcome, profile_update, feedback_entry_id, evidence_ptr}` | 每次 U2/U4/U5 观测事件，先于档案更新与反馈记录 |
 | verify/stall | U4 结论 / U5 上送四要素 | U4/U5 |
+
+CLI 观测段（`cli_observations`）由 Feature 064 的 `data-model.md` E10 定义并追加到状态脊；本文件不重复该段及其写序规则。
 
 **校验规则**：
 - V-E8-1：所有状态转移先写状态脊后执行动作；续环不依赖会话记忆。
 - V-E8-2：多线并行时每线独立 E1/E2/E4/E6/E7，路径与槽位不得共享或互相覆盖（FR-011）。
 - V-E8-3：新会话接手先 `--once` 快照；已完成阶段只核验不重派（FR-032）。
 - V-E8-4：U0 入口 MUST 记录 `state_spine_path` 与 `spine_write_mode`；所有阶段的 E6 与阶段提示词骨架 MUST 引用同一路径。远端拓扑（`transport`）下，执行侧只写 spec-dir 证据与传输行，驱动在 U4 后合并进状态脊并记录 `merge_source`；本地拓扑（`direct`）可直接追加，但状态脊 MUST 仍是唯一台账来源（FR-017/TB-03）。
-- V-E8-5：每次 CLI 观测事件 MUST 先在 `CLI observations` 段写入记录，再更新档案 provenance，再写反馈；三者的时间顺序 MUST 可由记录/文件时间或顺序号复核（先写后动）。观测记录缺失但档案/反馈已变更 → 审计判不可信。
 
 ## Stall Behavior Baseline（卡死行为基线证据制品，非 E1–E8 实体）
 
@@ -254,40 +253,9 @@
 - SB-4：逐字段比较；任何字段差异 MUST 判回归并修复，MUST NOT 以归因豁免。名称级测试失败基线只服务 SC-012，MUST NOT 用于 SC-010。
 - SB-5（反转录）：夹具 MUST NOT 从判定表/场景→期望值映射填充字段，MUST NOT 从基线文件回填；字段值 MUST 由受控场景中的实际观测产生。夹具 MAY 断言内部一致性（如 `runner` 子字段等于 status 文件的 `exit`、`watcher` 子字段等于 watcher 进程退出码），但 MUST NOT 断言或写入硬编码的期望元组。`retries_consumed` MUST 从 `initial_retries=0` 起按实际重试逐步累加；`spine_write_before_action` MUST 由状态脊写入与动作执行的可复核顺序产生。
 
-## CLI Capability Profile（CLI 能力档案证据制品，非 E1–E8 实体）
+## CLI Capability Profile / CLI Observation（归属 064，仅指针）
 
-**定位**：每个作为 subagent 调用的 CLI 一份活文档，路径 `skills/external/sdd-loop-driver/references/cli/<cli>.md`；schema 与观测程序的单一 owner 是 `references/cli/README.md`。它不是状态脊实体，不改变 E1–E8 计数，也不消耗测试预算；它承载 CLI 行为知识，档案更新通过 E8 `CLI observations` 段与既有 feedback 引擎留痕。
-
-**档案集合**：至少 `qodercli.md`、`claude.md`、`codex.md`、`opencode.md`、`hermes.md`；`qodercli.md` MUST 含已验证 `known` 条目，其余四份 MAY 为骨架但每个维度 MUST 显式 `known`/`unknown`。
-
-**档案字段**：
-
-| 字段 | 取值/形态 | 约束 |
-|------|-----------|------|
-| `cli` | 字符串 | 与文件名一致；稳定标记 [[STR-009]]`<cli>` 使用同一名称 |
-| `profile_version` | 正整数 | 每次档案内容变更递增 |
-| `last_updated` | ISO-8601 | 最近一次更新日期 |
-| `known_unknown_summary` | `known=<n> unknown=<n>` | 与条目实际状态一致，不得手写不一致 |
-| `invocation` | 结构化条目 | 非交互旗标、cwd、提示词输入、模型/权限参数 |
-| `output_modes` | 结构化条目 | `-p` 缓冲形态与 [[STR-001]] 形态；事件形状与终止结果位置 |
-| `timeout_caps` | 结构化条目 | `BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 语义与观测值；与阶段 deadline 的区分 |
-| `sentinel_reliability` | 结构化条目 | 是否保证终止 `result` 文本；已知非终止事件哨兵字样情形；降级路径 |
-| `session_logs` | 结构化条目 | session 存储/恢复命令、运行日志目录 |
-| `known_defects[]` | 条目列表 | `{id, symptom, affected_versions, workaround, fixed_in, status}` |
-| `version_applicability` | 结构化条目 | 观测到的 CLI 版本、平台、适用区间 |
-| `provenance[]` | 条目列表 | `{at, trigger, observation, profile_change, feedback_entry_id\|standalone, evidence_ptr}` |
-
-**条目字段**（每个维度下的原子条目）：`status: known|unknown`、`value`、`observed_at`、`cli_version`、`evidence_ptr`。`unknown` 条目 MUST NOT 带猜测值。
-
-**观测记录字段**（状态脊 E8 `CLI observations` 段，一行一次事件）：`cli`、`trigger`（`u2-pre-dispatch` / `u4-verify` / `u5-stall`）、`expected`（档案当前值或 `unknown`）、`observed`、`outcome`（`mismatch` / `unknown-fill` / `new-version` / `match`）、`profile_update`（`profile_version` 或 `none`）、`feedback_marker`（[[STR-009]]`<cli>` 或 `standalone`）、`feedback_entry_id`、`at`、`evidence_ptr`。`outcome=match` 的记录 MUST NOT 产生反馈条目。
-
-**校验规则**：
-- V-CP-1：五份档案存在；每份含七个必填维度与 `provenance[]`；缺失任一维度 → 契约失败。
-- V-CP-2：每个条目有 `status`；`known` 条目四元数据（`observed_at`、`cli_version`、`evidence_ptr`、`value`）齐全；`unknown` 条目不携带猜测值。
-- V-CP-3：`known_unknown_summary` 与条目实际状态一致；`last_updated` 与最新 provenance 一致。
-- V-CP-4：`version_applicability` 覆盖观测到的版本；版本不一致产生 `outcome=new-version` 观测事件，不得静默沿用旧值。
-- V-CP-5：观测记录先于档案更新与反馈写入（E8 V-E8-5）；`outcome≠match` 的记录 MUST 有对应 `profile_update` 与反馈 id（standalone 记 `standalone`）。
-- V-CP-6：档案更新 MUST NOT 改变 E6 已记录的当前阶段派发形态；当前阶段命令与判定以 E6 为准（CP-08）。
+这两个证据制品不在本特性数据模型内。唯一 owner = `.specify/specs/064-subagent-concurrency/data-model.md` E9（CLI Capability Profile）与 E10（State Spine Extension：`cli_observations` 与派发记录 `profile_id` / `profile_version` / `observed_cli_version`），契约 = 064 `contracts/cli-profiles.md` CLP-01…CLP-17。063 的 E6/E8 只保留基础派发/状态脊字段；CLI 追加字段由 064 E10 定义，MUST NOT 在 063 复制字段表、观测记录或校验规则。
 
 ## 实体关系
 
@@ -300,6 +268,7 @@ E8 State Spine (per line)
  ├─ E4 Plan Constraint State (activated at plan completion)
  │    └─ approved_baseline_commit / rebaseline_events[]
  ├─ E5 Plan Change Classification ×N (per downstream stage U4)
- ├─ CLI observations ×N ──▶ CLI Capability Profile (per CLI) ──▶ [[STR-009]] feedback marker
  └─ Stall Behavior Baseline ──▶ [[STR-007]] (recorded before first behavior commit)
 ```
+
+CLI 观测段与 CLI 档案（064 E9/E10）不在此关系图内；它们引用 E6/E8 的基础字段，由 064 定义。

@@ -10,21 +10,21 @@
 
 SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-007]]）为行为基线，收口用同一驱动侧可执行夹具归一化重放比较；名称级测试失败基线只服务 SC-012。镜像验收 = 本对零 drift + 全部镜像对相对 B-2 冻结清单零 NEW drift。
 
-**2026-10-20 用户授权增量（CLI Capability Profiles）**：在四项优化之外新增第五个能力面——每个作为 subagent 的 CLI 一份独立档案（`references/cli/<cli>.md`：qodercli + claude/codex/opencode/hermes 骨架），覆盖调用参数、输出模式、超时上限（`BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 语义）、哨兵可靠性、session/run 日志位置、已知缺陷、版本适用性；每项显式 `known`/`unknown`。SKILL.md 新增 [[STR-010]] 节；观测触发点 U2/U4/U5，稳定标记 [[STR-009]]`<cli>`，通过既有 feedback 引擎记录。档案不改变哨兵/判定/确认门/阶段 deadline；更新只作用于后续派发。
+**CLI 能力档案归属（2026-10-20 裁决）**：CLI 能力档案（集合、八维、`known`/`unknown`、U2/U4/U5 观测、probe/feedback、契约与测试）唯一归属于 Feature 064（`contracts/cli-profiles.md` CLP-01…CLP-17、`notes/063-overlap-adjudication.md`）。063 只保留 stream-json 输出默认（FR-026）与 nohup 脱离（FR-031），并只读引用 064 的 `references/cli/index.md`；不新增/修改 `references/cli/`、不注册 Probe Object、不定义 CP 契约或档案测试。
 
-交付面 = 1 个技能（3 份既有 references 更新 + 1 份效率 owner 文档 + `references/cli/README.md` + 5 份 CLI 档案 + 5 个新脚本 + 1 个扩展脚本）+ docs 参考页 + 契约/单元/集成测试与夹具（含驱动侧卡死夹具与 CLI 档案 schema 单测）+ Feature 058 扩展记录 + 1 个最小 Probe Object。零新技能、零新命令、零常驻服务、零外部依赖、零模型 API。完成哨兵、watcher 判定状态机、退出码、确认门、独立校验与卡死处置保持不变。063 自身走完整阶段链，快车道只作用于未来运行。
+交付面 = 1 个技能（3 份既有 references 更新 + 1 份效率 owner 文档 + 5 个新脚本 + 1 个扩展脚本）+ docs 参考页 + 契约/单元/集成测试与夹具（含驱动侧卡死夹具）+ Feature 058 扩展记录。零新技能、零新命令、零常驻服务、零外部依赖、零模型 API。完成哨兵、watcher 判定状态机、退出码、确认门、独立校验与卡死处置保持不变。063 自身走完整阶段链，快车道只作用于未来运行。CLI 能力档案不属于本交付面（064 owner）。
 
 ## Technical Context
 
 **Language/Version**: Markdown 技能面；Bash（runner/watcher，兼容 bash 3.2+ 的常见用法）；Python ≥3.8 仅标准库（准入/派生/台账审计/plan 改动判定）；测试为 pytest（仓库既有 contract/unit/integration 分层）
 **Primary Dependencies**: 既有 `git`、`bash`、`python3`；既有 `scripts/bash/run-tests.sh`（名称级基线）；既有 `scripts/python/sync-mirrors.py`（镜像）；既有 `skills/external/sdd-loop-driver/scripts/watch-target.sh`。**不新增任何依赖**，不引入 `jq`/网络/模型 API
-**Storage**: 文件即存储——状态脊 Markdown（准入记录、JSONL 台账围栏、plan 约束、CLI 观测段）、`<spec-dir>/test-evidence/<stage>.jsonl`、`baseline-failed.txt`/`final-failed.txt`、`notes/stall-behavior-baseline.json`（SC-010 行为基线）、`references/cli/*.md`（CLI 能力档案）、阶段产物 raw/live/pid/status/heartbeat/runner-log。无数据库、无新服务
-**Testing**: Tests Mode **ON**。契约测试钉文档面与条款（含新增 CP-01…CP-10）；单元测试钉四个 Python 脚本、CLI 档案 schema/观测记录、驱动侧卡死夹具；集成测试钉 runner 脱离/降级与名称级回归；`watch-target.sh --self-test` 扩流式用例。既有契约测试 21/23 绿，2 红为既有镜像漂移（Phase 0 B-2），本特性修复为绿
+**Storage**: 文件即存储——状态脊 Markdown（准入记录、JSONL 台账围栏、plan 约束）、`<spec-dir>/test-evidence/<stage>.jsonl`、`baseline-failed.txt`/`final-failed.txt`、`notes/stall-behavior-baseline.json`（SC-010 行为基线）、阶段产物 raw/live/pid/status/heartbeat/runner-log。无数据库、无新服务。CLI 观测段与派发记录中的 CLI 查档字段由 064 的 `data-model.md` E10 扩展，本特性不定义。
+**Testing**: Tests Mode **ON**。契约测试钉文档面与条款（5 份契约 / 50 条款）；单元测试钉四个 Python 脚本与驱动侧卡死夹具；集成测试钉 runner 脱离/降级与名称级回归；`watch-target.sh --self-test` 扩流式用例。既有契约测试 23/23 绿（plan 期为 21/23，镜像漂移已由合并 064 关闭），本特性保持绿色
 **Target Platform**: Linux 与 macOS 驱动/执行宿主；远端拓扑 = `ssh + su + nohup` + Linux 执行侧；macOS 无 `/proc` 的 watcher 分支按平台跳过或退化
-**Project Type**: 框架源（两顶帽子：改动落 `skills/external/`、`docs/`、`tests/`，镜像经 sync-mirrors 同步；`.specify/memory` 仅记录 Feature 扩展与最小 Probe Object）
-**Performance Goals**: 每线全量套件恰 2 槽位（需求方报告的一次运行 6 次为 dated baseline，本 plan 未复测、不据此宣称提速百分比）；事件→派生行延迟 ≤120s（无事件区间不适用；伪造进度行数为 0）；驱动零独立 `sleep` 回合；checklist 在中型夹具中派发 0 次；CLI 查档是派发前的一次文件读取，不引入额外后台进程
-**Constraints**: 哨兵/判定状态机/退出码/确认门/独立校验/卡死处置不变；快车道默认关且仅显式启用；预算不得静默超支；plan 约束不改框架内部；CLI 档案不改变当前阶段行为；无新服务/依赖/API；063 自身完整链
-**Scale/Scope**: 1 个技能；references = 3 份既有更新 + `efficiency-model.md` + `cli/README.md` + 5 份 CLI 档案；6 个 scripts（5 新 + 1 扩）；1 个 docs 页；6 个契约文件 / 60 条款（含 CP ×10 与 PC-11）；2 个契约测试文件（1 新 + 1 有意更新）；5 个单元测试；2 个集成测试；1 个夹具目录（含驱动侧卡死夹具）；1 个最小 Probe Object；Feature 058 两个登记面
+**Project Type**: 框架源（两顶帽子：改动落 `skills/external/`、`docs/`、`tests/`，镜像经 sync-mirrors 同步；`.specify/memory` 仅记录 Feature 扩展）
+**Performance Goals**: 每线全量套件恰 2 槽位（需求方报告的一次运行 6 次为 dated baseline，本 plan 未复测、不据此宣称提速百分比）；事件→派生行延迟 ≤120s（无事件区间不适用；伪造进度行数为 0）；驱动零独立 `sleep` 回合；checklist 在中型夹具中派发 0 次
+**Constraints**: 哨兵/判定状态机/退出码/确认门/独立校验/卡死处置不变；快车道默认关且仅显式启用；预算不得静默超支；plan 约束不改框架内部；CLI 能力档案不属本特性（064 owner），本特性不复制其档案、契约或测试；无新服务/依赖/API；063 自身完整链
+**Scale/Scope**: 1 个技能；references = 3 份既有更新 + `efficiency-model.md`；6 个 scripts（5 新 + 1 扩）；1 个 docs 页；5 个契约文件 / 50 条款；2 个契约测试文件（1 新 + 1 有意更新）；4 个单元测试；2 个集成测试；1 个夹具目录（含驱动侧卡死夹具）；Feature 058 两个登记面。CLI 档案/契约/测试/Probe Object = 064 拥有，不计入本特性交付。
 
 ## Constitution Check
 
@@ -34,9 +34,9 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
-| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `feature-ref.md` FR-001…049 逐行映射到设计落点；每个设计决定在 `research.md` R-1…R-12 有理由与替代方案 |
+| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `feature-ref.md` FR-001…043 逐行映射到设计落点；每个设计决定在 `research.md` R-1…R-12 有理由与替代方案 |
 | II | Feature-Centric Development | ✅ Pass | 绑定 Feature 058（演化特性）；扩展切片规则：状态保持 `Implemented`，只更新 Feature detail 与索引 Last Updated；未新建 Feature |
-| III | Intent-Driven Development | ✅ Pass | 先定义「快车道何时可信、预算如何不丢回归、plan 约束边界、脱离后如何接管、CLI 行为知识如何沉淀」，再给命令形态；四项优化与 CLI 档案的取舍和显式排除在 research/contracts |
+| III | Intent-Driven Development | ✅ Pass | 先定义「快车道何时可信、预算如何不丢回归、plan 约束边界、脱离后如何接管」，再给命令形态；四项优化的取舍和显式排除在 research/contracts。CLI 行为知识由 064 拥有，本特性只引用 |
 | IV | Test-First & Contract-Driven Implementation | ⚠ Partial — see Complexity Tracking | Tests Mode ON；5 个新脚本按 red-first 编写并配单元测试；49 个契约条款、决策表策略测试、FR-042(a)–(e) 夹具、名称级回归集成测试。SC-010 卡死处置以 `ba2a18db` 冻结提交上的行为基线（[[STR-007]]）录制与归一化重放证明；名称级基线只服务 SC-012。LLM 驱动的端到端阶段序列无法在 CI 自动化，由实现期录制 trace 证明（见 Complexity Tracking） |
 | V | AI Agent Integration Standards | ✅ Pass | 不新增/变更 agent provider；沿用 qodercli/claude 的 stream-json 事件形状；`AGENT_CONFIG` 与 `_ASSISTANT_TIERS` 零改动 |
 | VI | Continuous Quality & Observability | ✅ Pass | raw/live 双证据、四件套、状态脊、准入记录、预算台账、plan 分类、收尾汇总；失败与降级均显式留痕 |
@@ -47,9 +47,9 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 | XI | Dogfooding (Self-Application) | ✅ Pass | 机制修复落框架源侧 `skills/external/`，镜像经 sync-mirrors 同步；063 自身完整链；基线缺陷（watcher 自测、镜像漂移）披露并按机制侧修复 |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | 复用 `sync-mirrors.py`（有 Tool 记录）、`run-tests.sh`、`watch-target.sh`；查 `.specify/memory/tools/` 无 stream 派生/准入/台账同能力记录，按预期编写新脚本 |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 强化 Controlled Execution（脱离/可见）、Change Validation（两槽位/定向证据）、Learning Capture（台账/收尾）；证据区分自动测试与录制 trace，不把 configured 当 used |
-| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 四项机制由 `references/efficiency-model.md` 单一 owner；CLI 行为知识由 `references/cli/` 单一 owner（SKILL/docs/配方只引用）；SKILL/docs 只摘要+指针；字段面由 `data-model.md` 拥有；阈值/退出码由脚本与契约测试钉住，不在多处复述 |
-| XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | docs 页与 quickstart 面向未参与运行的维护者/操作者；每个术语首次出现给上下文；quickstart 每条示例带前提与钉住者；CLI 档案每维给 known/unknown 与证据指针 |
-| XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 准入 fail-closed、plan 实质改动显式异常行、派生降级不伪完成、档案观测 mismatch 必须落档并留反馈、基线异常披露；无静默超预算/静默跳过/静默重审/静默沿用旧 CLI 结论 |
+| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 四项机制由 `references/efficiency-model.md` 单一 owner；CLI 行为知识由 064 的 `references/cli/` 单一 owner（本特性只读引用，不复制）；SKILL/docs 只摘要+指针；字段面由 `data-model.md` 拥有；阈值/退出码由脚本与契约测试钉住，不在多处复述 |
+| XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | docs 页与 quickstart 面向未参与运行的维护者/操作者；每个术语首次出现给上下文；quickstart 每条示例带前提与钉住者；CLI 档案的 known/unknown 与证据指针由 064 文档承载 |
+| XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 准入 fail-closed、plan 实质改动显式异常行、派生降级不伪完成、基线异常披露；无静默超预算/静默跳过/静默重审；CLI 观测异常按 064 的既有 U5/重试程序处置 |
 
 **Gates Status**: ⚠ 一项 Partial（IV，已在 Complexity Tracking 辩护）；无 Fail。
 
@@ -66,7 +66,7 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 
 - **启用**：U0 入口声明出现 [[STR-006]] 并原文入状态脊；无人值守唯一入口；交互式允许一次非阻塞提议。
 - **裁决点**：`tasks` U4 通过后、`checklist` 派发前；`scripts/admission-check.py` 输出七判据 JSON（全部机械判定，无自证项），任何解析失败 fail-closed。
-- **计数口径**：准入只使用 FR-003(a) 的窄模式（FR 定义行 `^- **FR-[0-9]{3}**:`；任务行 `^- \[[ xX]\] T[0-9]{3}`）；宽模式 `^- \[[ xX>~]\] T[0-9]{3}` 仅用于仓库任务记账（现有 tasks.md 当前 52 行），MUST NOT 用于准入，两者不得混用；当前 requirements 为 49 条 FR 定义行，task 行数待 tasks-repair-2 新增后复算；准入夹具始终以窄模式为准。
+- **计数口径**：准入只使用 FR-003(a) 的窄模式（FR 定义行 `^- **FR-[0-9]{3}**:`；任务行 `^- \[[ xX]\] T[0-9]{3}`）；宽模式 `^- \[[ xX>~]\] T[0-9]{3}` 仅用于仓库任务记账（tasks.md 当前 52 行），MUST NOT 用于准入，两者不得混用；当前 requirements 为 43 条 FR 定义行（tasks-repair-2 收口 CLI-profile 条款后复算），准入夹具始终以窄模式为准。
 - **录取**：状态脊写入 E1 记录 + [[STR-003]]；派发 `analyze`，跳过 `checklist`；`implement`/`review` 提示词携带跳过标记与准入证据指针。
 - **回退**：`analyze` 等阶段发现新引擎/安全面/任务越界 → 回退完整链，补派 `checklist`；若 `analyze` 已过则补派后重过 analyze 一次。
 - **不变量**：`analyze`/`review` 门判据、回环上限、独立校验完全不变。
@@ -85,7 +85,7 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 - **声明**：任何 plan 制品改动须在哨兵前回传 `PLAN-EDIT:` 声明行；完整格式由 `references/efficiency-model.md` §3.2 单一 owner 定义（本 plan 不复写）。
 - **校验**：`audit-plan-changes.py` 机械输出 touched/declared；驱动按最终 diff 分类 minor/substantive/undeclared；未声明或实质 → 阶段门失败。
 - **分流**：修复既有缺陷且不变更批准面 → 一次完整 plan 重审 + U4 复验；改变批准面/新能力/无法判定 → 四要素上送。判定比较对象 = E4 最新 `approved_baseline_commit` 中 `requirements.md` 的 FR/SC 定义集合与语义；分类记录写该值，不得用工作树文本或其它提交替代。每次实质改动都按其分支处置并留痕；重复回环由既有 stall/retry 纪律兜底，不设人工次数上限。
-- **Re-anchoring**：plan 约束激活后，`requirements.md` 的任何门内变更（analyze 路由修复、clarify 写回、显式范围修订）必须在下一个依赖该基线的 U4 分类前触发 re-baseline：E4 记录事件（触发/时间/前基线/新基线/差异摘要）并更新 `approved_baseline_commit`；未提交或无法定位提交时不得 re-anchor，受影响 plan 改动按 (b) 上送。re-anchoring 不构成 plan 重审，不移动约束生效点；新基线所含需求对应的 plan 改动按两分支正常分类，不得因旧基线缺该需求而误判越界。本特性自身即实例：plan U4 在 `5ab8a5e7`，requirements-repair 第 1 轮在 `0c719b80`、第 2 轮在 `864940de`；plan-repair-2 的 CLI profiles delta 提交是下一个锚点候选，实现前必须按同一规则锚定到包含它的提交。
+- **Re-anchoring**：plan 约束激活后，`requirements.md` 的任何门内变更（analyze 路由修复、clarify 写回、显式范围修订）必须在下一个依赖该基线的 U4 分类前触发 re-baseline：E4 记录事件（触发/时间/前基线/新基线/差异摘要）并更新 `approved_baseline_commit`；未提交或无法定位提交时不得 re-anchor，受影响 plan 改动按 (b) 上送。re-anchoring 不构成 plan 重审，不移动约束生效点；新基线所含需求对应的 plan 改动按两分支正常分类，不得因旧基线缺该需求而误判越界。本特性自身即实例：plan U4 在 `5ab8a5e7`，requirements-repair 第 1 轮在 `0c719b80`、第 2 轮在 `864940de`；plan-repair-2 的 requirements delta 在 `bcf27c77`，tasks-repair-2 的 CLI-profile 收口 requirements 变更提交是下一个锚点候选。CLI 能力档案本身由 064 拥有，其 profile 内容不进入本特性的已批准需求基线。
 - **显式排除**：框架命令内部硬执行不做；手工调用不受约束；若编排层不安全，另立特性。
 
 ### ④ 进度可见与脱离
@@ -95,18 +95,15 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 - **watcher**：判定表与退出码不变；可选 `--raw-stream` 只输出成长/字节证据；自测覆盖非终止哨兵、终止哨兵、派生失败、脱离存活。
 - **脱离**：远端保留 `ssh+su+nohup`；本地 `nohup ... </dev/null >runner-log 2>&1 &`（可用时 `setsid`）；派发记录 `detached`；重入 `--once` 只核验不重派。
 
-### ⑤ CLI Capability Profiles（2026-10-20 用户授权增量）
+### ⑤ CLI 行为知识边界（064 owner；本特性只读引用）
 
-- **档案集**：`references/cli/README.md`（schema 与观测程序单一 owner）+ `qodercli.md`（已知项）+ `claude.md` / `codex.md` / `opencode.md` / `hermes.md`（骨架，逐项 `known`/`unknown`）。每档案覆盖七维：调用与关键参数、输出模式（`-p` vs [[STR-001]]）、后台/超时上限（`BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 语义与阶段 deadline 的区分）、哨兵可靠性、session/run 日志位置、已知缺陷、版本适用性。
-- **SKILL.md 入口**：新增 H2 [[STR-010]]，只写三条规则 + 指针：派发前查档；U4/U5 观测后更新；`references/cli/` 是唯一 CLI 行为知识落点，其他文件只引用。
-- **观测点**：U2 派发前（查档、把 `profile_id`/`profile_version`/`observed_cli_version` 写入 E6；无档案先建骨架）、U4 独立校验（比对输出模式/事件形状/哨兵来源/status/exit/日志位置）、U5 停线（命中已知缺陷或新增缺陷）。每次观测事件先写 E8 `CLI observations`，再更新档案 `## Provenance`，再经 `feedback-utils.py --action record` 写一条含 [[STR-009]]`<cli>` 的反馈；匹配且无事件不记录。
-- **Probe 注册**：在 `probe-definitions.md` `## Objects` 新增最小行 `skill-sdd-loop-driver-wrapup | skill-wrapup | skill:sdd-loop-driver | wrap-up`；不新增 Class/Handler/HandlerBinding。该行关闭既有 `embed without probe object: skill:sdd-loop-driver` 缺口并使 feedback record 可执行；`skill:sdd-project-setup` 的同类缺口按基线披露。compile-embeds fingerprint 不变（Handler/HandlerBinding 未改）。
-- **不变量**：档案不改变哨兵/判定/退出码/确认门/阶段 deadline；当前阶段使用 U2 记录的命令形态，更新只作用于后续派发；冲突无法安全完成时走既有 U5/重试/`ANOMALY:`。
-- **standalone**：无 `.specify/` 时跳过 feedback 引擎调用，但档案更新与收尾汇总观测报告仍是必需项，且不自动外传。
+- **归属**：CLI 能力档案的集合、八维、`known`/`unknown`、provenance、U2/U4/U5 观测、probe/feedback、契约与测试由 Feature 064 唯一拥有（`contracts/cli-profiles.md` CLP-01…CLP-17；`notes/063-overlap-adjudication.md`）。063 MUST NOT 新增/修改 `references/cli/`、复制档案内容、注册 Probe Object 或建立第二套 CP 契约/测试。
+- **本特性保留**：stream-json 输出默认（FR-026）与 nohup 脱离（FR-031）是 064 档案（CLP-02/04/08、CLP-13）记录的既有事实；064 只读引用，不改写本特性的输出模式默认。
+- **派发边界**：063 的 E6/E8 只保留基础派发与状态脊字段；CLI 查档字段与 `cli_observations` 由 064 `data-model.md` E10 定义。063 实现 stream-json/nohup 时可按 064 `references/cli/index.md` 只读查档，但不得把档案更新当作行为修复或改变当前阶段判定。
 
 ### Verification & Mutation Plan (red-first)
 
-- **Red-first**：5 个新脚本（`admission-check.py`、`derive-live-log.py`、`audit-test-budget.py`、`audit-plan-changes.py`、`stage-runner.sh`）、watch-target 扩展、CLI 档案 schema/观测记录（`test_cli_profile_record.py`）与驱动侧卡死夹具均先写失败测试，再实现；每个 red 运行的时间、命令与失败断言记入 `verification.md`，不事后补记。
+- **Red-first**：5 个新脚本（`admission-check.py`、`derive-live-log.py`、`audit-test-budget.py`、`audit-plan-changes.py`、`stage-runner.sh`）、watch-target 扩展与驱动侧卡死夹具均先写失败测试，再实现；每个 red 运行的时间、命令与失败断言记入 `verification.md`，不事后补记。CLI 档案 schema/观测测试属于 064，不在本特性 red-first 范围。
 - **卡死行为基线（SC-010）**：实现首个行为面提交之前，在冻结提交 `ba2a18db` 的只读 worktree 上，用**驱动侧可执行夹具** `tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py` 录制三类处置元组到 [[STR-007]]：stub runner 产生受控 pid/status/heartbeat/runner-log 与 rc，真实 `watch-target.sh` 提供 U3 判定，夹具执行文档化的 U4/U5 驱动侧程序（状态脊先写后动、重试消耗、四要素上送件、下一阶段派发决策）并观测七个字段；watcher 自动夹具只提供 U3，录制 trace 只作补充证据。夹具 MUST NOT 从判定表转录或硬编码期望值，`initial_retries=0`，`exit_code` 分为 `{watcher, runner}`。录制不是全量测试运行，不消耗 FR-011 槽位。收口用同一夹具与同一初始重试数在当前树重放，归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较，零差异为通过；名称级基线只服务 SC-012。
 - **变异演练**（实现期逐项执行、立即还原、记录证据；任一项未变红即视为该测试不设防）：
 
@@ -119,10 +116,9 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 | stage-runner | stream 能力可用时强选 buffered；跳过 status 写入；去掉 detached 记录 | runner 集成测试（stream/degraded/detached） |
 | watch-target | 让进度增长产生 DONE；从 raw 直接读哨兵 | `watch-target.sh --self-test` 与 stream 用例 |
 | driver-stall-fixture | 把 `initial_retries` 改为非 0；从场景→期望值表转录字段；翻转下一阶段派发/先写后动顺序 | 基线 vs 收口逐字段比较必须失败（SB-5 反转录） |
-| CLI profiles | 删除 [[STR-010]] 节；省略一个必填维度；去掉 [[STR-009]] 标记/最小 Probe Object 注册 | `test_cp_01…test_cp_10` 与 `test_cli_profile_record.py` |
 
-- **既有断言的有意更新**：C-3 的 H2 集合新增 `Efficiency Optimizations` 与 [[STR-010]] 两节；C-4 的 `sed` 派生断言改为 `stage-runner.sh`。三项在 tasks 中以独立任务记录理由，禁止静默删除。
-- **镜像与基线**：每个脚本落盘后跑 `sync-mirrors.py --write --only skills/external/sdd-loop-driver`，以 `--check --only skills/external/sdd-loop-driver` 本对零 drift 为验收；另跑 `--check --only skills/external` 并与 `research.md` B-2 冻结清单（68 DIFF / 12 目录）比较，本特性面以外的既有 DIFF 不得新增（零 NEW drift）。全量测试的 name-level 基线在 implement 起点冻结，变异演练后复跑并确认零新增失败（只服务 SC-012）。
+- **既有断言的有意更新**：C-3 的 H2 集合新增 `Efficiency Optimizations` 一节（`CLI Capability Profiles` 节由 064 拥有且已在该集合中，本特性 MUST NOT 删除或改写）；C-4 的 `sed` 派生断言改为 `stage-runner.sh`。两项在 tasks 中以独立任务记录理由，禁止静默删除。
+- **镜像与基线**：每个脚本落盘后跑 `sync-mirrors.py --write --only skills/external/sdd-loop-driver`，以 `--check --only skills/external/sdd-loop-driver` 本对零 drift 为验收；另跑 `--check --only skills/external` 并与 `research.md` B-2 冻结清单（预合并 68 DIFF / 12 目录）比较，本特性面以外的既有 DIFF 不得新增（零 NEW drift）。2026-10-20 合并 064 后实测为 62 DIFF / 12 目录、本对 0 DIFF，作为实现起点的当前读数。全量测试的 name-level 基线在 implement 起点冻结，变异演练后复跑并确认零新增失败（只服务 SC-012）。
 
 ## Project Structure
 
@@ -132,15 +128,14 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 .specify/specs/063-sdd-loop-efficiency/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output — R-1…R-12 + B-1…B-8 基线实测
-├── data-model.md        # Phase 1 output — E1…E8 + 43 条 E 校验规则 + 6 条 CP schema 规则 + 卡死行为基线（SB-1…SB-5）+ CLI 档案制品
+├── data-model.md        # Phase 1 output — E1…E8 + 41 条 E 校验规则 + 卡死行为基线（SB-1…SB-5）
 ├── quickstart.md        # Phase 1 output — S1…S7（逐例前提与钉住者）
-├── contracts/           # Phase 1 output — 6 文件 60 条款
+├── contracts/           # Phase 1 output — 5 文件 50 条款
 │   ├── fast-lane.md
 │   ├── test-budget.md
 │   ├── plan-constraint.md
 │   ├── progress-decoupling.md
-│   ├── delivery-and-invariants.md
-│   └── cli-profiles.md  # CP-01…CP-10 + Probe Object 注册设计
+│   └── delivery-and-invariants.md
 ├── feature-ref.md       # Phase 1 output — FR/SC 映射 + 交付清单 + 基线
 ├── requirements.md      # /speckit.requirements 产物（已澄清）
 ├── checklists/requirements.md  # 需求质量清单（16/16）
@@ -154,30 +149,28 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 ```text
 skills/external/sdd-loop-driver/                 # 技能唯一承载面（源）
 skills/external/sdd-loop-driver/references/      # efficiency-model（新 owner）+ 三份既有手册更新
-skills/external/sdd-loop-driver/references/cli/  # README + qodercli/claude/codex/opencode/hermes 五份档案
+skills/external/sdd-loop-driver/references/cli/  # 064 拥有（index + 五份档案）；本特性只读引用，不修改
 skills/external/sdd-loop-driver/scripts/         # 5 个新脚本 + watch-target.sh 扩展
 docs/reference/skills/                           # sdd-loop-driver 用户文档页更新
-tests/contract/                                  # 新增效率/CLI 档案条款契约 + 有意更新既有 loop-driver 契约
-tests/unit/                                      # 4 个脚本单测 + CLI 档案 schema/观测单测
+tests/contract/                                  # 新增效率条款契约 + 有意更新既有 loop-driver 契约
+tests/unit/                                      # 4 个脚本单测 + 驱动侧卡死夹具单测
 tests/integration/                               # runner 脱离/降级 + 名称级回归集成
 tests/fixtures/sdd_loop_efficiency/              # 中型/大型 spec、stream 事件、stub CLI、临时 repo、driver-stall-fixture
 .specify/memory/features/                        # 058 扩展规划记录
 .specify/memory/features.md                      # 索引 Last Updated 注记
-.specify/shared/definitions/probe-definitions.md # 最小 Probe Object（skill-sdd-loop-driver-wrapup）
 ```
 
-**Structure Decision**: 本特性落在既有框架源布局内，无新顶层目录：四项优化与 CLI 档案全部进入 `skills/external/sdd-loop-driver/` 的 references（含新增 `references/cli/`）与 scripts 面；docs 页在同目录惯例路径更新；测试进入既有 `tests/{contract,unit,integration,fixtures}` 分层；最小 Probe Object 写入既有 `shared/definitions/probe-definitions.md` 与其 `.specify/` 镜像。不新增技能目录、不新增 command/template、不触碰 `.specify/templates/commands/`。`references/cli/` 是该技能内的子目录，不是新顶层目录或新技能。
+**Structure Decision**: 本特性落在既有框架源布局内，无新顶层目录：四项优化进入 `skills/external/sdd-loop-driver/` 的 references 与 scripts 面；docs 页在同目录惯例路径更新；测试进入既有 `tests/{contract,unit,integration,fixtures}` 分层。`references/cli/` 与 Probe Object `skill-sdd-loop-driver-cli-profile` 由 064 拥有，本特性不新增、不修改、不注册。不新增技能目录、不新增 command/template、不触碰 `.specify/templates/commands/`。
 
 ### Mirror Obligations *(mandatory)*
 
-同步引擎：`scripts/python/sync-mirrors.py`（`skills/external` ↔ `.specify/skills` 对）。**基线漂移（2026-10-20 实测）**：`--check --only skills/external` 退出码 2，68 个 DIFF 跨 12 个技能目录；其中本特性拥有的 sdd-loop-driver 3 文件（SKILL.md、references/dispatch-recipes.md、references/watch-model.md）已 DIFF（镜像含 `.specify/` 前缀路径与不同 fingerprint），既有契约 C-12/C-18 因此红。完整清单见 `research.md` B-2。本特性 MUST 在实现期用 `sync-mirrors.py --write --only skills/external/sdd-loop-driver` 把 sdd-loop-driver 修复为源→镜像一致（契约测试为权威），并以「本对零 drift」为验收；另以 `--check --only skills/external` 对照 B-2 冻结清单（2026-10-20，68 DIFF / 12 目录），其余 11 个目录的既有漂移不属本特性面，采用「零 NEW drift」相对判据并完整披露。
+同步引擎：`scripts/python/sync-mirrors.py`（`skills/external` ↔ `.specify/skills` 对）。**基线漂移**：plan 期（合并 064 前）实测 `--check --only skills/external` 退出码 2，68 个 DIFF 跨 12 个技能目录，其中 sdd-loop-driver 3 文件；2026-10-20 合并 064 后复测为 62 DIFF / 12 目录、sdd-loop-driver 对 0 DIFF（完整清单与先后读数见 `research.md` B-2）。本特性 MUST 在实现期用 `sync-mirrors.py --write --only skills/external/sdd-loop-driver` 维持本对源→镜像一致，并以「本对零 drift」为验收；另以 `--check --only skills/external` 对照冻结清单，其余目录的既有漂移不属本特性面，采用「零 NEW drift」相对判据并完整披露。
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `skills/external/sdd-loop-driver/SKILL.md`、`references/*.md`（含 `references/cli/*.md`）、`scripts/*` | `.specify/skills/sdd-loop-driver/` 同名文件 | `python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver` 后 `--check --only skills/external/sdd-loop-driver` exit 0（本对零 drift，含 5 份 CLI 档案与 README）；`--check --only skills/external` 相对 B-2 冻结清单零 NEW drift；新增脚本保持可执行位 |
-| `skills/external/sdd-loop-driver/SKILL.md` 的编译 `## Wrap-up` 面 | 同文件镜像 | 不编辑该面；`probe-utils.py --action compile-embeds --check` 零漂移（Object 行不参与 fingerprint） |
-| `shared/definitions/probe-definitions.md`（新增 `skill-sdd-loop-driver-wrapup` 行） | `.specify/shared/definitions/probe-definitions.md` | `sync-mirrors.py --write --only shared/definitions/probe-definitions.md`；两侧 `probes --validate` exit 0；`--reconcile` 关闭 sdd-loop-driver 缺口 |
-| `docs/reference/skills/sdd-loop-driver.md` | 无镜像 | docs 漂移检查/文档结构测试 |
+| `skills/external/sdd-loop-driver/SKILL.md`、`references/*.md`（不含 `references/cli/`，该目录由 064 拥有）、`scripts/*` | `.specify/skills/sdd-loop-driver/` 同名文件 | `python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver` 后 `--check --only skills/external/sdd-loop-driver` exit 0（本对零 drift；`references/cli/` 只验证字节一致，不得修改内容）；`--check --only skills/external` 相对冻结清单零 NEW drift；新增脚本保持可执行位 |
+| `skills/external/sdd-loop-driver/SKILL.md` 的编译 `## Wrap-up` 面 | 同文件镜像 | 不编辑该面；`probe-utils.py --action compile-embeds --check` 零漂移 |
+| `docs/reference/skills/sdd-loop-driver.md` | 无镜像 | docs 漂移检查/文档结构测试；不复制 064 的 CLI 档案内容 |
 | `tests/contract/*`、`tests/unit/*`、`tests/integration/*`、`tests/fixtures/*` | 无镜像（tests 不在 MIRROR_PAIRS） | pytest 直跑 |
 | `.specify/memory/features/058.md`、`.specify/memory/features.md` | 无镜像（运行时记忆） | 索引一致性检查；状态不回退 |
 
@@ -185,7 +178,7 @@ tests/fixtures/sdd_loop_efficiency/              # 中型/大型 spec、stream �
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| IV Test-First 判 ⚠ Partial | 确定性组件（准入/派生/台账/plan 分类/脱离/名称级回归/驱动侧卡死夹具/CLI 档案 schema）全部有单元或集成测试；SC-010 卡死处置以 `ba2a18db` 上的行为基线（[[STR-007]]）与 `driver-stall-fixture.py` 的观测/归一化重放作为确定性证据（禁止判定表转录/硬编码期望值）；但端到端阶段序列由 LLM 按提示词执行，CI 无法真实重放 driver。实现期以录制编排 trace 作为该层证据，并在 verification.md 如实标注。 | 把 driver 改写成可自动调度的运行时以换取端到端 CI——违反宪法 IX（框架是提示词而非运行时平台），且会替换本特性要优化的对象；058 先例同样以录制演练 + 结构契约承载不可自动化的部分。CLI 档案也不引入新运行时：它是文档 + 既有 feedback 引擎的一次调用。 |
+| IV Test-First 判 ⚠ Partial | 确定性组件（准入/派生/台账/plan 分类/脱离/名称级回归/驱动侧卡死夹具）全部有单元或集成测试；SC-010 卡死处置以 `ba2a18db` 上的行为基线（[[STR-007]]）与 `driver-stall-fixture.py` 的观测/归一化重放作为确定性证据（禁止判定表转录/硬编码期望值）；但端到端阶段序列由 LLM 按提示词执行，CI 无法真实重放 driver。实现期以录制编排 trace 作为该层证据，并在 verification.md 如实标注。 | 把 driver 改写成可自动调度的运行时以换取端到端 CI——违反宪法 IX（框架是提示词而非运行时平台），且会替换本特性要优化的对象；058 先例同样以录制演练 + 结构契约承载不可自动化的部分。 |
 
 ## Phase 0: Research Review
 
@@ -197,24 +190,24 @@ tests/fixtures/sdd_loop_efficiency/              # 中型/大型 spec、stream �
 - **R-4**：预算台账 = 状态脊 JSONL 围栏 + 阶段证据文件 + 审计脚本；名称级 `comm -13`。
 - **R-5**：plan 约束只在编排层；`audit-plan-changes.py` 机械判定 touched/undeclared，驱动做语义分类与两分支路由；每次实质改动按其分支处置并留痕，重复回环由既有 stall/retry 纪律兜底。
 - **R-6/R-7**：本地补 nohup；watcher 只加 `--raw-stream` 证据面，判定表/退出码零改动；既有 4 个平台/时序自测缺陷一并修正。
-- **R-8**：SKILL.md 新增两个 H2（`Efficiency Optimizations`、[[STR-010]]）+ 有意更新既有 C-3/C-4 断言，理由记录。
+- **R-8**：SKILL.md 新增一个 H2（`Efficiency Optimizations`）+ 有意更新既有 C-3/C-4 断言，理由记录。`CLI Capability Profiles` 节由 064 拥有且已在该 H2 集合中，本特性不修改。
 - **R-9/R-10**：全部证据落文件；确定性组件自动化，LLM 序列用录制 trace，证据形态如实区分。
-- **R-11**：CLI 档案以 `references/cli/README.md` 为 schema/观测程序 owner，五份档案为实例；观测点复用既有 probe 注册表，新增最小 Object `skill-sdd-loop-driver-wrapup`（不新增 Class/Handler/Binding），关闭既有 `embed without probe object` 缺口并使 feedback record 可执行；档案不改变阶段行为。
+- **R-11**：CLI 能力档案的唯一 owner 是 Feature 064（`references/cli/index.md`、`contracts/cli-profiles.md`、Probe Object `skill-sdd-loop-driver-cli-profile`）；063 只保留 stream-json 默认与 nohup 事实并由 064 引用，不复制档案、不注册 Object、不新增 CP 契约/测试。
 - **R-12**：U-01R 的驱动侧字段由 `driver-stall-fixture.py` 观测产生（stub runner + 真实 watcher + 文档化 U4/U5 程序），禁止判定表转录/硬编码期望值；N-01 的 `state_spine_path` 进入 E6/E8 与阶段提示词骨架，远端走 transport→driver merge；N-02 的 re-anchoring 落 E4/E5 与 PC-11；N-03 的 docs-only 缩减字段集与 `stages=N complete=N` 落 E3/TB-06/07。
 
-基线异常（已取证、非本特性引入、按机制侧修复）：watcher 自测 12/4（macOS 平台 + 时序）、镜像三文件漂移导致既有契约 2 红、`probe-utils.py --action probes --reconcile` 报 `skill:sdd-loop-driver` 与 `skill:sdd-project-setup` 两个 embed-without-object 缺口。前三项写入 `feature-ref.md` 基线记录与实现任务；probe 缺口由本特性的最小 Object 修复 sdd-loop-driver 一侧，sdd-project-setup 一侧保留为既有例外并完整披露。均不静默修平。
+基线异常（已取证、非本特性引入、按机制侧修复）：watcher 自测 12/4（macOS 平台 + 时序）、镜像漂移导致既有契约 2 红。2026-10-20 合并 064 后，sdd-loop-driver 的 probe `embed without probe object` 缺口已由 064 的 `skill-sdd-loop-driver-cli-profile` 关闭；`skill:sdd-project-setup` 的同类缺口保留为既有例外并完整披露。以上均写入 `feature-ref.md` 基线记录与实现任务，不静默修平。
 
 ## Phase 1: Design Artifacts Summary
 
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
-| Data model | [`data-model.md`](data-model.md) | 8 实体（E1 准入记录 / E2 预算台账 / E3 定向证据 / E4 plan 约束 / E5 plan 改动分类 / E6 派发记录 / E7 raw-live 对 / E8 状态脊）+ 43 条 E 校验规则（原 32 + V-E2-7、V-E3-5/6、V-E4-4/5、V-E5-6、V-E6-4/5/6、V-E8-4/5）+ 6 条 CLI Profile schema 规则（V-CP-1…V-CP-6）+ 两个非实体证据制品（卡死行为基线 SB-1…SB-5、CLI Capability Profile） |
-| Contracts | [`contracts/`](contracts/) | 6 文件 60 条款：fast-lane.md（FL-01…FL-10）、test-budget.md（TB-01…TB-10）、plan-constraint.md（PC-01…PC-11）、progress-decoupling.md（PD-01…PD-10）、delivery-and-invariants.md（DI-01…DI-09）、cli-profiles.md（CP-01…CP-10）；每文件带 FR/测试追溯表 |
-| Quickstart | [`quickstart.md`](quickstart.md) | 8 场景（S1 录取 / S2 拒绝 / S3 台账审计 / S4 派生哨兵 / S5 本地脱离 / S6 plan 分类与 re-anchor / S7 端到端录制演练 / S8 CLI 档案查档与观测）；每条带前提与钉住者 |
-| Feature ref | [`feature-ref.md`](feature-ref.md) | FR 49/49 + SC 16/16 映射；31 项交付清单；基线记录；显式排除；自应用声明 |
-| Research | [`research.md`](research.md) | R-1…R-12 + B-1…B-8 基线实测 |
+| Data model | [`data-model.md`](data-model.md) | 8 实体（E1 准入记录 / E2 预算台账 / E3 定向证据 / E4 plan 约束 / E5 plan 改动分类 / E6 派发记录 / E7 raw-live 对 / E8 状态脊）+ 41 条 E 校验规则（原 32 + V-E2-7、V-E3-5/6、V-E4-4/5、V-E5-6、V-E6-4/6、V-E8-4）+ 一个非实体证据制品（卡死行为基线 SB-1…SB-5）；CLI 档案/观测字段指向 064 E9/E10 |
+| Contracts | [`contracts/`](contracts/) | 5 文件 50 条款：fast-lane.md（FL-01…FL-10）、test-budget.md（TB-01…TB-10）、plan-constraint.md（PC-01…PC-11）、progress-decoupling.md（PD-01…PD-10）、delivery-and-invariants.md（DI-01…DI-09）；每文件带 FR/测试追溯表 |
+| Quickstart | [`quickstart.md`](quickstart.md) | 7 场景（S1 录取 / S2 拒绝 / S3 台账审计 / S4 派生哨兵 / S5 本地脱离 / S6 plan 分类与 re-anchor / S7 端到端录制演练）；每条带前提与钉住者 |
+| Feature ref | [`feature-ref.md`](feature-ref.md) | FR 43/43 + SC 13/13 映射；24 项交付清单；基线记录；显式排除；自应用声明 |
+| Research | [`research.md`](research.md) | R-1…R-12 + B-1…B-8 基线实测（R-11/B-8 为 064 归属指针） |
 
-Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓；新增 CI 档案为非实体证据制品）；契约文件 6（原预估 4–5，CLI 档案增量使其变为 6 ✓）；条款 60（原预估 40–50，含 CP 与 PC-11）；quickstart 场景 8（原预估 6–7，S8 为增量）；初次产出无漂移需修正项（2026-10-20 analyze 门回环的 plan-owned 修复见 Plan Repair Record 第 1 轮；plan-repair-2 的本轮传播见第 2 轮）。
+Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓）；契约文件 5（原预估 4–5 ✓；CLI 档案增量已裁决给 064，不计入本特性）；条款 50（原预估 40–50，含 PC-11）；quickstart 场景 7（原预估 6–7 ✓；S8 已裁决给 064）；初次产出无漂移需修正项（2026-10-20 analyze 门回环的 plan-owned 修复见 Plan Repair Record 第 1 轮；plan-repair-2 的本轮传播见第 2 轮；tasks-repair-2 的 CLI-profile 收口见第 3 轮）。
 
 ## Plan Repair Record（2026-10-20，analyze 门回环第 1 轮）
 
@@ -244,21 +237,20 @@ Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓；新增 CI 档案为非�
 
 ## Plan Repair Record（2026-10-20，plan-repair-2）
 
-**触发**：① analyze-rerun 报告（0 CRITICAL / 1 HIGH / 4 MEDIUM / 2 LOW）的 plan-owned 项：U-01R（驱动侧字段同义反复）、N-01（`state_spine_path` / 远端证据合并 / T002 与 D-T3 兜底措辞）、N-02（requirements 变更后的 re-anchoring）、N-03（`not-run-docs-only` 缩减字段集与 `stages=N complete=N`）、N-05（窄/宽任务计数边界）；② 用户 2026-10-20 显式授权的 CLI Capability Profiles 增量。本轮同时执行两部分：requirements delta 按用户授权写入 `requirements.md` 并在 Clarifications 记录裁决；plan 传播只修改 plan-owned 产物。`tasks.md` 与 `checklists/efficiency.md` 不动，任务侧传播留给 tasks-repair-2。
+**触发**：① analyze-rerun 报告（0 CRITICAL / 1 HIGH / 4 MEDIUM / 2 LOW）的 plan-owned 项：U-01R（驱动侧字段同义反复）、N-01（`state_spine_path` / 远端证据合并 / T002 与 D-T3 兜底措辞）、N-02（requirements 变更后的 re-anchoring）、N-03（`not-run-docs-only` 缩减字段集与 `stages=N complete=N`）、N-05（窄/宽任务计数边界）；② plan-repair-2 曾在用户授权下临时加入 CLI Capability Profiles 增量。该增量已在 tasks-repair-2 按 064 的 `notes/063-overlap-adjudication.md` 裁决迁入 064，并从本规格删除（见 Plan Repair Record 第 3 轮）。本轮保留的 plan 传播只覆盖 U-01R/N-01/N-02/N-03/N-05。
 
 **PLAN-EDIT 声明**：
 
-- `PLAN-EDIT: plan.md — 新增 ⑤ CLI Capability Profiles、驱动侧卡死夹具、re-anchoring、state_spine_path/远端合并、docs-only 完整性、窄/宽计数边界与第 2 轮记录；分类=substantive（新增能力面与证据程序），理由=实施 requirements 已冻结的 FR-044…FR-049 与 FR-022/FR-038/FR-012 口径，不改变四项核心优化的范围或既有任务分解。`
-- `PLAN-EDIT: data-model.md — E2 增加 merge_source/merged_at（V-E2-7）、E3 增加 row_type/changed_paths 与 V-E3-5/6、E4 增加 approved_baseline_commit/rebaseline_events（V-E4-4/5）、E5 更新基线引用与 V-E5-6、E6 增加 state_spine_path/spine_write_mode/CLI 查档字段（V-E6-4/5/6）、E8 增加 state_spine_path/CLI observations（V-E8-4/5）、SB 元组拆分 exit_code 并新增 SB-5 反转录、新增 CLI Capability Profile 非实体制品（V-CP-1…V-CP-6）；分类=substantive（字段面与证据制品扩展），理由=同上。`
-- `PLAN-EDIT: contracts/cli-profiles.md — 新增 CP-01…CP-10 与最小 Probe Object 注册设计；分类=substantive（新契约文件），理由=FR-044…FR-049 的已批准口径。`
+- `PLAN-EDIT: plan.md — 驱动侧卡死夹具、re-anchoring、state_spine_path/远端合并、docs-only 完整性、窄/宽计数边界与第 2 轮记录；分类=substantive（新增证据程序与字段引用），理由=实施 FR-022/FR-038/FR-012 口径，不改变四项核心优化的范围或既有任务分解。CLI-profile 增量已由第 3 轮删除。`
+- `PLAN-EDIT: data-model.md — E2 增加 merge_source/merged_at（V-E2-7）、E3 增加 row_type/changed_paths 与 V-E3-5/6、E4 增加 approved_baseline_commit/rebaseline_events（V-E4-4/5）、E5 更新基线引用与 V-E5-6、E6 增加 state_spine_path/spine_write_mode（V-E6-4/6）、E8 增加 state_spine_path（V-E8-4）、SB 元组拆分 exit_code 并新增 SB-5 反转录；分类=substantive（字段面与证据制品扩展），理由=FR-022/FR-017/FR-038 已批准口径。CLI 字段/观测由 064 E10 拥有，已由第 3 轮移出。`
 - `PLAN-EDIT: contracts/plan-constraint.md — PC-01/PC-06 绑定最新 approved_baseline_commit，新增 PC-11 re-anchoring；分类=substantive（分类输入与路由规则），理由=FR-022 已批准口径（N-02）。`
 - `PLAN-EDIT: contracts/test-budget.md — TB-03 增加 state_spine_path/远端 transport→merge；TB-06 增加 docs-only 缩减字段集；TB-07 增加 stage-status 唯一性、stages=N complete=N、merge 校验；分类=substantive（证据字段与审计规则），理由=FR-012/FR-017 已批准口径（N-01/N-03）。`
 - `PLAN-EDIT: contracts/fast-lane.md — FL-03(a) 增加窄/宽任务计数边界；分类=minor（引用澄清，不改判据语义；N-05）。`
-- `PLAN-EDIT: contracts/progress-decoupling.md — PD-01 引用 CLI 档案为行为事实 owner；PD-04 明确 BASH_* 超时上限不是阶段 deadline；分类=minor（引用与边界澄清）。`
-- `PLAN-EDIT: contracts/delivery-and-invariants.md — DI-03 改为驱动侧可执行夹具、exit_code 双字段、initial_retries=0、反转录；DI-05 增加 references/cli 与五份档案；DI-06 增加 CP 条款与 H2 集合新增两节；分类=substantive（证据形态与交付面），理由=FR-038/FR-040/FR-049 已批准口径（U-01R）。`
-- `PLAN-EDIT: quickstart.md — S3 增加 stages=N complete=N 与远端 merge 前提；S6 增加 re-anchor；S7 改为驱动侧可执行夹具；新增 S8 CLI 档案查档/观测；分类=substantive（新增场景与证据形态），理由=同上。`
-- `PLAN-EDIT: feature-ref.md — FR-044…FR-049 与 SC-014…SC-016 映射、交付清单 23→31、SC-005/010 证据更新、基线记录更新；分类=substantive（映射与交付面扩展）。`
-- `PLAN-EDIT: research.md — 新增 B-8（qodercli/CLI 可用性与 probe 缺口实测）、R-11（CLI 档案与最小 Probe Object）、R-12（U-01R/N 传播）；更新 B-5 的当前计数；分类=minor（dated 证据与设计理由，不改既有决定）。`
+- `PLAN-EDIT: contracts/progress-decoupling.md — PD-04 明确 BASH_* 超时上限不是阶段 deadline；分类=minor（边界澄清）。CLI 档案引用已由第 3 轮删除。`
+- `PLAN-EDIT: contracts/delivery-and-invariants.md — DI-03 改为驱动侧可执行夹具、exit_code 双字段、initial_retries=0、反转录；DI-06 更新证据形态；分类=substantive（证据形态），理由=FR-038 已批准口径（U-01R）。references/cli/CP 交付项已由第 3 轮移出。`
+- `PLAN-EDIT: quickstart.md — S3 增加 stages=N complete=N 与远端 merge 前提；S6 增加 re-anchor；S7 改为驱动侧可执行夹具；分类=substantive（证据形态），理由=同上。S8 CLI 档案场景已由第 3 轮删除。`
+- `PLAN-EDIT: feature-ref.md — SC-005/010 证据更新、基线记录更新、交付清单重算；分类=substantive（映射与证据）。CLI 映射与交付项已由第 3 轮删除。`
+- `PLAN-EDIT: research.md — 新增 R-12（U-01R/N 传播）；更新 B-5 的当前计数；B-8/R-11 改为指向 064 的归属记录；分类=minor（dated 证据与设计理由，不改既有决定）。`
 
 **U-01R 传播（HIGH）**：
 
@@ -290,25 +282,43 @@ Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓；新增 CI 档案为非�
 - **FL-03(a)/plan §①**：准入只用窄模式；宽模式只作仓库记账；两者不混用；重入文件出现 `[>]`/`[~]` 时宽模式会多计，准入仍按窄模式。
 - **tasks-repair-2 义务**：T001/T010/T013/T052 的计数说明必须区分窄/宽；当前 52/52 相同是巧合，不得写成"两者一致"。
 
-**CLI Capability Profiles 增量（requirements delta）**：
+**CLI Capability Profiles（已迁出）**：plan-repair-2 的临时 CLI-profile 增量已由 tasks-repair-2 按 064 `notes/063-overlap-adjudication.md` 迁入 064（`contracts/cli-profiles.md` CLP-01…CLP-17）。本规格不再保留档案、契约、观测、Probe Object 或测试条款；064 是唯一 owner。
 
-- **档案**：`references/cli/README.md` + qodercli/claude/codex/opencode/hermes 五份；七维必填；`known`/`unknown`；`## Provenance` 更新表。
-- **SKILL.md**：新增 H2 [[STR-010]]（摘要 + 指针）；`references/cli/` 是唯一 CLI 行为知识落点。
-- **观测点**：U2/U4/U5；每次事件先写 E8 `CLI observations`，再更新档案，再经既有 feedback 引擎记录一条含 [[STR-009]]`<cli>` 的反馈；匹配无事件不记录；standalone 跳过引擎但必须更新档案并写入收尾汇总。
-- **最小 Probe Object**：`skill-sdd-loop-driver-wrapup | skill-wrapup | skill:sdd-loop-driver | wrap-up`；不新增 Class/Handler/Binding；compile-embeds fingerprint 不变；关闭 sdd-loop-driver 的既有 reconcile 缺口；sdd-project-setup 缺口保留为既有例外。
-- **不变量**：档案不改变哨兵/判定/退出码/确认门/阶段 deadline；更新只作用于后续派发。
+**tasks-repair-2 承接的未同步项**（本轮只修改 `tasks.md`）：
 
-**tasks-repair-2 需要承接的未同步项**（本轮不修改 `tasks.md`）：
-
-1. 新增 US6 任务：档案 README + 五份档案、SKILL.md H2、U2/U4/U5 观测程序、最小 Probe Object 注册与零漂移验证、CLI 档案 schema 单测、CP-01…CP-10 契约测试、docs 页入口、镜像同步。
+1. 不新增 US6 任务：CLI 档案/契约/测试/Probe Object 由 064 拥有；`tasks.md` 只记录指向 064 的边界说明，不出现 CLI-profile 实施任务。
 2. 更新 T001/T051：驱动侧可执行夹具、`initial_retries=0`、`exit_code` 双字段、禁止判定表转录；更新 T002/D-T3：`state_spine_path` 与 transport→merge 统一措辞。
 3. 更新 T025/T026/T027/T028/T052：PC-11 re-anchoring 与 E4 `rebaseline_events[]`；更新 T016/T019/T022/T052：`stages=N complete=N` 与 docs-only 缩减字段集；更新 T010/T013/T052：窄/宽计数边界。
-4. 更新 T044/T045/T046：SKILL.md 两个 H2 的 C-3 有意更新；CP 条款纳入覆盖 meta-test；DoD-3 的 49 条款改为 60 条款；任务行数从 52 起新增，需由 tasks 阶段复算并同步 DoD/GATE/分支计数。
-5. 更新 tasks 的 `Measured premises`：requirements 由 43 FR/13 SC/8 STR 变为 49 FR/16 SC/10 STR；契约由 49 条变为 60 条；交付清单由 23 项变为 31 项；数据模型规则由 32 条变为 43 条 E 规则 + 6 条 CP schema 规则；quickstart 由 7 场景变为 8 场景。
+4. 更新 T044/T045/T046：C-3 只新增 `Efficiency Optimizations` 一节；`CLI Capability Profiles` 节由 064 拥有且已在该集合中，不得删除、复制或改写；DoD-3 保持 50 条款（含 PC-11，不含 CP）；任务行数保持 52，不新增 CLI 任务。
+5. 更新 tasks 的 `Measured premises`：requirements 为 43 FR / 13 SC / 8 STR；契约 5 文件 / 49 条；交付清单 24 项；数据模型 41 条 E 规则；quickstart 7 场景。
 
 **本轮假设**：
 
-- CLI 档案中 qodercli 的已知项在实现期由 `qodercli --help` / 版本探测 / 现有派发配方证据填充；本 plan 不把未验证的 CLI 行为写成 `known`。本机实测 `qodercli 1.1.73`、`codex` 与 `opencode` 可用，claude/hermes 未在 PATH 中；档案骨架对未验证项一律 `unknown`。
-- `BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 的具体值按宿主/工具实测记录；实现若发现它们与阶段 deadline 冲突，按 CP-09/PD-04 记录并设置兼容值，不改阶段判定。
-- 最小 Probe Object 只解决 `skill:sdd-loop-driver` 的注册缺口；不顺手补 `skill:sdd-project-setup`，避免扩大交付面；该既有缺口在基线中披露。
-- 本轮 requirements delta 与 plan 传播提交后，若后续再有 requirements 变更，按 PC-11 在执行 U4 前 re-anchor；本轮的 requirements 提交本身就是一次锚点候选。
+- CLI 档案/观测/probe 由 064 拥有；063 需要 qodercli 行为事实时只读引用 064 `references/cli/qodercli.md` 与 `index.md`，不复制其内容。
+- `BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 的具体值由 064 档案记录；063 的 PD-04 只声明它们不是阶段 deadline，阶段 TIMEOUT 仍只由阶段 deadline 产生。
+- `skill:sdd-project-setup` 的 probe reconcile 缺口保留为既有例外并披露；063 不注册任何 Probe Object，不修改 `shared/definitions/probe-definitions.md`。
+- 本轮 requirements 收口提交后，若后续再有 requirements 变更，按 PC-11 在执行 U4 前 re-anchor；本轮的 requirements 提交本身是一次锚点候选。
+
+## Plan Repair Record（2026-10-20，tasks-repair-2：CLI-profile 重叠收口）
+
+**触发**：Feature 064 的 `notes/063-overlap-adjudication.md` 与已实现资产（`references/cli/`、`contracts/cli-profiles.md`、Probe Object `skill-sdd-loop-driver-cli-profile`、`test_sdd_loop_driver_cli_profiles.py`）确认 064 是 CLI 能力档案的唯一 owner；063 的临时 CLI-profile 增量必须删除或改为指针，避免双 owner 与静默复制。本轮只做规格/规划收口，不实现代码。
+
+**裁决结果**：
+
+- 删除：063 的 provisional CLI-profile 契约（条款组与 Probe Object 注册设计，编号见 064）、US6、CLI-profile FR 条款组、SC 条款组、CLI 实体、CLI 边界用例、CLI 共享字符串、档案测试引用、CLI 档案与 README 交付项、最小 Probe Object 注册设计。
+- 保留：快车道（checklist 跳过准入/回退）、两槽位测试预算、plan 只小修约束、stream-json 输出默认与 nohup 脱离；064 对后两项只读引用（CLP-08/CLP-13）。
+- 指针：064 `requirements.md`（CLI 档案条款）、`contracts/cli-profiles.md` CLP-01…CLP-17、`notes/063-overlap-adjudication.md`、`data-model.md` E9/E10、`references/cli/index.md`。
+
+**PLAN-EDIT 声明**：
+
+- `PLAN-EDIT: plan.md — 删除 §⑤ CLI Capability Profiles 设计、CLI 交付/镜像/Probe/测试条目与相关计数，新增“CLI 行为知识边界（064 owner）”指针与第 3 轮记录；分类=substantive（删除已迁出的能力面），理由=执行 064 的收编条款（CLP-17）与 `notes/063-overlap-adjudication.md` 的逐条裁决，不改变四项吞吐优化的范围。`
+- `PLAN-EDIT: data-model.md — 删除 CLI Capability Profile 证据制品、CLI schema 规则组、E6 CLI 查档字段与其校验规则、E8 CLI observations 与其校验规则，改为指向 064 E9/E10；分类=substantive（字段面收窄），理由=同一裁决；E1–E8 基础实体与其余 41 条校验规则不变。`
+- `PLAN-EDIT: contracts/cli-profiles.md — 删除该 provisional 契约文件；分类=substantive（删除重复 owner），理由=064 是唯一 owner，仓库级守卫 `test_clp_17_no_063_duplicate_owner` 要求 063 不得保留第二份契约。`
+- `PLAN-EDIT: quickstart.md — 删除 S8 CLI 档案查档/观测场景与相关清理/术语/钉住项，S6 锚点链更新；分类=minor（删除已迁出场景），理由=同一裁决，场景编号收口为 S1…S7。`
+- `PLAN-EDIT: feature-ref.md — 删除 CLI 档案 FR/SC 映射、交付项与基线记录，更新为 43 FR / 13 SC / 24 项交付；分类=substantive（映射与交付面收窄），理由=同一裁决。`
+- `PLAN-EDIT: research.md — 将 B-8/R-11 改为指向 064 的归属记录，更新 B-5 计数与未决项；分类=minor（dated 证据与指针），理由=同一裁决。`
+- `PLAN-EDIT: tasks.md — 仅由 tasks 阶段更新：不新增 US6；T044 只新增 `Efficiency Optimizations` H2；T048 增加 064 归属守卫；计数与实测前提按 43 FR / 13 SC / 50 条款 / 24 交付 / 7 场景重算；分类=minor（任务侧收口），理由=同一裁决。`
+
+**编号与计数**：FR 收口到 FR-043（43 条），SC 收口到 SC-013（13 条），Shared Strings 收口到 STR-008（8 条），契约 5 文件 / 50 条款（含 PC-11），数据模型 8 实体 / 41 条 E 规则，quickstart 7 场景，交付 24 项。所有引用由 `validate-requirements.py` 与 `validate-tasks.py` 复算，MUST exit 0。
+
+**不重审理由**：本轮是 plan 约束激活后的下游规格修复，但 CLI-profile 增量的迁出是 064 已记录的跨特性裁决，不是对已批准需求范围的改写；四项吞吐优化的 FR/SC 语义、架构、数据模型与任务分解均未改变。该情形属于 FR-022(a) 所称“修复既有缺陷所必需”，且 064 的 owner 地位是唯一一致读法；若驱动认为存在其它读法，按 FR-022(b) 四要素上送。

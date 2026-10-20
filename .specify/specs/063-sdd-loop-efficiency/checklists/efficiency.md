@@ -12,7 +12,7 @@
 
 ## 判定口径与证据方法
 
-- **计数由命令派生，不手抄**：FR 定义行 43、SC 定义行 13、任务行 52、Shared Strings 6、验收场景 28、Edge Cases 24、Assumptions 11；既有 `checklists/requirements.md` 为 16/16 全勾选。
+- **计数由命令派生，不手抄**：FR 定义行 43、SC 定义行 13、任务行 52、Shared Strings 8、验收场景 28、Edge Cases 25、Assumptions 12；既有 `checklists/requirements.md` 为 16/16 全勾选。2026-10-20 tasks-repair-2 收口 CLI-profile 条款后复算；本清单生成时的 6 strings 为 dated 读数。
 - **可判定性口径**：每项判定给出文件与行号、字段名、字面量或命令输出；无法从规范文本唯一判定的项判 **FAIL**，不以“看起来合理”代替证据。
 - **同作者门**：本清单阶段由具备新鲜上下文的阶段子代理执行；`requirements.md`、`plan.md`、`tasks.md` 由前序阶段生成，本阶段未参与其写作——未触发 `.specify/shared/workflow/objective-analysis-gate.md` 的同作者委派条件。
 - **不通过项**：保留为 `[ ]`，逐项记录缺口与建议处置；不为全绿而降低判据。汇总见 § 不通过项汇总。
@@ -155,3 +155,4 @@
 - `plan.md` / `tasks.md` / `contracts/` 只作为缺口发现上下文；本清单不评价其实现质量。
 - 本阶段测试证据：`status=not-run-docs-only`，改动集仅 `checklists/efficiency.md`，无可执行/测试面改动。
 - 同作者门未触发：本清单由新鲜上下文的 checklist 阶段子代理生成，前序 requirements/plan/tasks 由其他阶段生成。
+- 2026-10-20 tasks-repair-2：063 的临时 CLI-profile 范围已按 Feature 064 的 `notes/063-overlap-adjudication.md` 迁出；本清单的 39 项判定对象仍为四项效率优化，不受影响，未新增或删除检查项。当前计数为 43 FR / 13 SC / 8 Shared Strings。

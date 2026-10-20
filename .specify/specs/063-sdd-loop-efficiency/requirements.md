@@ -3,7 +3,7 @@
 **Requirement Branch**: `063-sdd-loop-efficiency`  
 **Created**: 2026-10-20  
 **Status**: Draft  
-**Input**: User description: "优化 sdd-loop-driver 无人值守 SDD 运行吞吐：为中型特性提供显式、可审计的快车道（跳过 checklist，保留 analyze/review）；全量测试每特性运行仅两次（implement 起点与最终收口），中间阶段与 review 使用定向测试并记录证据；plan 阶段预置「下游只小修、不重审」约束（框架命令内部硬约束不可安全实现时显式排除）；阶段派发采用 stream-json 进度可见与 nohup 完全解耦，保持完成哨兵、独立校验、确认门与卡死处置不变。本特性自身仍走完整阶段链（checklist/analyze/review 必需），快车道仅作用于未来运行。" 需求语义权威（brief）已归档为 dated record：[notes/source-requirement.md](notes/source-requirement.md)（2026-10-20 逐字快照）；原 `/tmp/sdd-loop-efficiency-brief.md` 仅保留为 provenance 注记，不再作为权威引用。**2026-10-20 用户授权增量**：为每个作为 subagent 调用的 CLI 建立独立能力档案（`skills/external/sdd-loop-driver/references/cli/<cli>.md`），至少 qodercli，claude / codex / opencode / hermes 以可增量填充的 known/unknown 骨架建立；档案在使用中持续更新，并补充可执行的 probe + feedback 观测点（稳定标记 `cli-profile:<cli>`）。档案不改变阶段哨兵、判定、确认门或预算，仅沉淀 CLI 行为知识。
+**Input**: User description: "优化 sdd-loop-driver 无人值守 SDD 运行吞吐：为中型特性提供显式、可审计的快车道（跳过 checklist，保留 analyze/review）；全量测试每特性运行仅两次（implement 起点与最终收口），中间阶段与 review 使用定向测试并记录证据；plan 阶段预置「下游只小修、不重审」约束（框架命令内部硬约束不可安全实现时显式排除）；阶段派发采用 stream-json 进度可见与 nohup 完全解耦，保持完成哨兵、独立校验、确认门与卡死处置不变。本特性自身仍走完整阶段链（checklist/analyze/review 必需），快车道仅作用于未来运行。" 需求语义权威（brief）已归档为 dated record：[notes/source-requirement.md](notes/source-requirement.md)（2026-10-20 逐字快照）；原 `/tmp/sdd-loop-efficiency-brief.md` 仅保留为 provenance 注记，不再作为权威引用。**CLI 能力档案归属（2026-10-20 裁决）**：CLI 能力档案（集合、必填维度、known/unknown、U2/U4/U5 观测、probe/feedback、契约与测试）唯一归属于 Feature 064（`.specify/specs/064-subagent-concurrency/`；逐条裁决见 `notes/063-overlap-adjudication.md`）。本规格只保留四项吞吐优化与 stream-json / nohup 能力，不再定义、复制或测试 CLI 档案；需要 CLI 行为知识时指向 064 的 `contracts/cli-profiles.md` 与 `skills/external/sdd-loop-driver/references/cli/index.md`。
 
 ## Related Feature *(mandatory)*
 
@@ -19,9 +19,8 @@
 - implement 技能偏好规范 runner 并以名称级基线做回归比较（`skills/internal/implement-feature/SKILL.md`），但不存在运行级全量测试预算；中间阶段与 review 是否跑全量没有统一约束。
 - 全仓检索（2026-10-20）未发现快车道、plan 冻结/只小修约束的既有实现或术语占用：`skills/external/sdd-loop-driver/` 与 `docs/reference/skills/sdd-loop-driver.md` 中相关检索为零命中。
 - 契约测试 `tests/contract/test_sdd_loop_driver_skill.py` 钉住 SKILL.md 的 H2 节集合与逐条款行为；技能本体位于 `skills/external/sdd-loop-driver/`，运行时镜像位于 `.specify/skills/sdd-loop-driver/`；逐技能参考页为 `docs/reference/skills/sdd-loop-driver.md`。
-- `skills/external/sdd-loop-driver/references/` 目前没有 `cli/` 目录，也没有任何按 CLI 归档的能力/缺陷文件；CLI 行为知识散落在派发配方、watch-model 与会话记忆中。
-- `probe-definitions.md` 的 Objects 表没有 `skill:sdd-loop-driver` 行，但该技能 SKILL.md 已带编译 `## Wrap-up` 面；2026-10-20 实测 `probe-utils.py --action probes --reconcile` 报 `embed without probe object: skill:sdd-loop-driver`（同一输出中还有 `skill:sdd-project-setup`）。CLI 档案观测点若要走既有 feedback 引擎，必须先补一个最小 Probe Object。
-- 当前最大规格编号为 `062`；本规格为 `063`。
+- `skills/external/sdd-loop-driver/references/cli/`（`index.md` + 五份档案）与 Probe Object `skill-sdd-loop-driver-cli-profile` 已由 Feature 064 于 2026-10-20 落地；唯一 owner 为 064，063 MUST NOT 新增、修改或复制。063 的 stream-json 默认与 nohup 脱离作为 064 档案记录的既有事实被 064 引用（064 CLP-08/CLP-13）。
+- 本规格编写时最大规格编号为 `062`；此后 `063` 与 `064` 已登记，064 为 CLI 能力档案的权威归属。
 
 ## Assumptions（对输入中开放点的缺省裁决，clarify 阶段可推翻）
 
@@ -36,10 +35,7 @@
 - **本特性自身走完整链**：checklist/analyze/review 均必经；快车道只作用于未来运行。
 - **不改阶段命令内部流程**：四项优化优先在编排层实现；确需下沉时必须在 plan 记录显式设计裁定（变更面、风险、回归证据与替代方案）。
 - **向后兼容**：未启用快车道的现有用户看到的行为与改动前一致；哨兵字面量、判定状态机与退出码不变。
-- **CLI 档案是活文档（2026-10-20 授权增量）**：每个 CLI 一份独立档案；已知项标 `known` 并带观测日期、CLI 版本与证据指针，未验证项标 `unknown` 且不得猜测填充。档案由驱动在派发/校验/停线时维护，不新增运行时、服务或依赖。
-- **观测点复用既有机制**：CLI 档案反馈走既有 `feedback-utils.py` 记录路径，并以一个最小 Probe Object（object_id `skill-sdd-loop-driver-wrapup`，unit `skill:sdd-loop-driver`，`skill-wrapup` 类，`wrap-up` 生命周期点）完成注册；不新增 Probe Class、Handler 或 HandlerBinding。该对象同时修复「技能已有编译 Wrap-up 但无 probe object」的既有缺口；`skill:sdd-project-setup` 的同类缺口不在本特性范围，按既有基线披露。
-- **档案更新不改变当前阶段行为**：档案不改变哨兵字面量、watcher 判定、退出码、确认门、阶段 deadline 或测试预算；U2 记录的派发形态对当前阶段保持有效，更新只作用于后续派发。若档案与观测冲突导致当前阶段无法安全完成，按既有 U5 停线/重试/`ANOMALY:` 处置，不得以「更新档案」代替行为修复。
-- **standalone 降级**：宿主工作区没有 `.specify/` 时，技能按编译 Wrap-up 的 runtime-mode gate 跳过 feedback 引擎调用；档案更新与收尾汇总中的观测报告仍然是必需项，且不自动外传。
+- **CLI 能力档案归属 064（2026-10-20 裁决）**：本特性只拥有 stream-json 输出默认与 nohup 脱离；CLI 档案集合、八维、观测、probe/feedback、契约与测试由 Feature 064 唯一拥有（064 的 CLI 档案条款与 `contracts/cli-profiles.md` CLP-01…CLP-17）。063 不新增 `references/cli/`、Probe Object、CP 契约或档案测试；派发记录/状态脊的 CLI 追加字段由 064 `data-model.md` E10 定义，本规格不重复。
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -136,23 +132,7 @@
 
 ---
 
-### User Story 6 - CLI 能力档案：派发前查档、观测后更新 (Priority: P2)
-
-运行操作者以多种 subagent CLI（至少 qodercli，以及 claude / codex / opencode / hermes）驱动阶段。每种 CLI 的行为差异——非交互调用与关键参数、缓冲/流式输出、超时上限、哨兵可靠性、会话与运行日志位置、版本缺陷——不应散落在派发配方、阶段提示词与会话记忆里。驱动在派发前查阅该 CLI 的独立能力档案，按档案选择调用形态；在 U4 独立校验与 U5 停线处置中观测实际行为，发现与档案不符或档案仍为 `unknown` 的项时，更新档案并留下带稳定标记的反馈记录。档案更新是运行期知识沉淀，不改变当前阶段的哨兵、判定或确认门。
-
-**Why this priority**: 错误的 CLI 假设会以「静默降级、伪完成、超时误判」的形式污染整条运行线；把 CLI 行为知识收敛到单一档案并在使用中持续校正，才能让派发配方与 runner 的可移植性主张可验证。
-
-**Independent Test**: 准备一组 CLI 档案夹具（qodercli 已知项 + 四个骨架 unknown 项）与一个行为与档案冲突的 stub CLI；检查派发前查档记录、U4/U5 观测记录、档案更新与反馈标记。
-
-**Acceptance Scenarios**:
-
-1. **Given** 一次 qodercli 派发，**When** 驱动准备 U2，**Then** 它读取 `references/cli/qodercli.md`，核对调用方式、输出模式、超时上限与哨兵可靠性，并把档案 id/版本与实测 CLI 版本写入 E6 派发记录。
-2. **Given** 档案声明某 CLI 不支持 stream-json，**When** 驱动派发，**Then** 它选择档案记载的缓冲/降级形态并记录原因，不得盲目传入不支持的旗标。
-3. **Given** U4 观察到哨兵来自非终止事件，而档案把哨兵可靠性记为「仅终止 result」，**When** 独立校验执行，**Then** 驱动更新档案并留下带 [[STR-009]]`<cli>` 标记的一条反馈；当前阶段的哨兵与判定规则保持不变。
-4. **Given** U5 停线由档案中已记录的缺陷触发，**When** 生成四要素上送件，**Then** 上送件引用该已知缺陷条目并留下带标记的反馈；若缺陷是新发现，先更新档案再完成上送件。
-5. **Given** 一个骨架档案仍有 `unknown` 字段，**When** 该 CLI 首次被使用，**Then** 驱动在 U4/U5 后只填写已验证字段，其余保持 `unknown`，并记录本次观测事件。
-6. **Given** 阶段运行期间发生档案更新，**When** 该阶段结束，**Then** 它的派发命令行与判定规则保持 U2 记录的原样；更新只作用于下一次派发。
-7. **Given** 宿主工作区没有 `.specify/`（standalone），**When** 发生观测事件，**Then** 档案仍然更新且观测进入收尾汇总；按编译 Wrap-up 的 runtime-mode gate 跳过 feedback 引擎调用，且不自动外传。
+> **Delegated scope（CLI 能力档案，归属 064）**：CLI 能力档案不在本特性范围。其用户故事、观测触发（U2/U4/U5）、probe/feedback 与验收由 Feature 064 拥有（`.specify/specs/064-subagent-concurrency/requirements.md` 的 CLI 档案条款；`contracts/cli-profiles.md` CLP-01…CLP-17；裁决 `notes/063-overlap-adjudication.md`）。本规格不重复其故事、场景、实体或验收。063 的 stream-json 默认（FR-026）与 nohup 脱离（FR-031）是 064 档案记录的既有事实，由 064 只读引用。
 
 ---
 
@@ -182,13 +162,7 @@
 - U4 无法判定一处 plan 改动是否改变需求范围、架构/数据模型/契约语义或任务分解范围 → 按 FR-022(b) 作为决策上送，不得自行派发完整 plan 重审。
 - 驱动在 plan 完成前退出并在之后重入 → 只小修约束的 active 登记点仍为 plan 完成时；重入后必须从状态脊恢复该状态。
 - 快车道运行在收尾时发现准入记录缺失或字段不全 → 收口审计判不可信，按完整链补跑缺失门或上送，不得追认。
-- CLI 版本与档案的 version applicability 不一致 → 视为观测事件；先重新核对关键字段（输出模式、哨兵、超时上限），不得直接沿用旧版本的 `known` 结论。
-- 准备派发的 CLI 没有档案 → 先按最小骨架创建（全部 `unknown`）并记录该缺口，再使用安全缺省（能力探测 + 降级、nohup、仅终止 result 哨兵）；不得无档案直接派发。
-- 同一 CLI 在不同版本/宿主上给出冲突观测 → 两条观测都带版本与证据记录；档案保留最新已验证值并附冲突注记，不得删除历史观测。
-- `BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 的工具调用上限低于阶段 deadline → 档案记录该上限；派发必须设置兼容的工具超时，阶段 TIMEOUT 仍只由阶段 deadline 产生（FR-029），不得把工具超时误报为阶段超时。
-- 已知缺陷在新版本被修复 → 档案更新 version applicability 与 `fixed_in`，保留历史缺陷条目；不得把旧缺陷当成当前版本事实。
-- 阶段运行中更新档案 → 当前阶段不回溯改变命令与判定；若冲突使当前阶段无法安全完成，按既有 U5 停线/重试/`ANOMALY:` 处置。
-- 同一观测事件被重复记录 → 以「CLI + 触发点 + 证据指针」去重；同一事件只产生一条带标记的反馈，不得批量合并不同 CLI 的观测。
+- CLI 能力档案相关的边界（版本不一致、无档案、冲突观测、档案运行中更新等）由 Feature 064 的 requirements Edge Cases 拥有；本特性不重复。
 
 ## Requirements *(mandatory)*
 
@@ -255,14 +229,9 @@
 - **FR-042**: 行为夹具 MUST 证明：(a) 中型夹具走快车道、跳过 checklist 且 analyze/review 均执行；(b) 槽外全量超预算且无例外被检出；(c) 下游阶段实质性 plan 改动被 U4 抓获；(d) 驱动中途退出不中断脱离阶段且重入可核验；(e) implement 起点之后注入的回归被最终全量运行发现。
 - **FR-043**: 四项优化 MUST 优先在编排层实现；若某优化无法在编排层安全达成，MUST 在 plan 阶段记录显式设计裁定（变更面、风险、回归证据与替代方案），不得静默修改框架命令内部或静默放弃。
 
-#### CLI Capability Profiles（CLI 能力档案）
+#### CLI Capability Profiles（归属 064，仅指针）
 
-- **FR-044**: 每个作为 subagent 调用的 CLI MUST 拥有独立能力档案 `skills/external/sdd-loop-driver/references/cli/<cli>.md`；至少包含 qodercli；claude / codex / opencode / hermes MUST 以可增量填充的骨架档案存在，并对每一项显式标注 `known` 或 `unknown`。没有档案的 CLI MUST NOT 被派发；派发前 MUST 先建立最小骨架并记录该缺口。
-- **FR-045**: 每份档案 MUST 覆盖以下维度：调用方式与关键参数；输出模式（`-p` 缓冲 vs stream-json）；后台/超时上限（含 `BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 语义，以及它们与阶段 deadline 的区分）；哨兵可靠性（终止 result 文本 vs 非终止事件）；session/run 日志位置；已知缺陷；版本适用性。每个条目 MUST 标注 `known` / `unknown`；每个 `known` 条目 MUST 带观测日期、CLI 版本与证据指针；`unknown` MUST NOT 被猜测值填充。
-- **FR-046**: `SKILL.md` MUST 增加 H2 [[STR-010]] 节，声明：派发前 MUST 查阅对应 CLI 档案；U4/U5 观测后 MUST 更新档案；`references/cli/` 下的档案是 CLI 行为知识的唯一落点，其他 references / 阶段提示词 / docs 只可引用，MUST NOT 复制其内容。档案 schema 与观测程序的单一 owner MAY 为 `references/cli/README.md`；SKILL.md 只摘要并指向该 owner。
-- **FR-047**: 系统 MUST 提供一个可执行的 CLI 观测点，稳定标记为 [[STR-009]]`<cli>`；每次观测事件（观测值与 `known` 不符、`unknown` 获得已验证值、或新 CLI/版本行为首次出现）MUST 更新对应档案并附 provenance，MUST 通过既有 feedback 机制记录恰好一条包含该标记的反馈。观测触发点 MUST 至少覆盖 U2 派发前、U4 独立校验、U5 停线。该观测点 MUST 经既有 probe 注册表注册（允许新增一个最小 Probe Object），MUST NOT 使用未注册的机制；档案匹配且无事件的派发 MUST NOT 产生反馈条目。
-- **FR-048**: CLI 档案 MUST NOT 改变阶段哨兵、watcher 判定、退出码、确认门或阶段 deadline；档案更新属于运行期知识沉淀。当前阶段 MUST 使用 U2 记录的派发形态；更新 MUST NOT 回溯改变它。若观测冲突使当前阶段无法安全完成，MUST 走既有 U5 停线/重试/[[STR-005]] 程序，不得以更新档案代替行为修复。
-- **FR-049**: CLI 档案与 README MUST 落在技能 references 面并经既有镜像机制同步；契约测试 MUST 钉住 [[STR-010]] 节、档案集合、必填维度、`known`/`unknown` 纪律、[[STR-009]] 标记与最小 Probe Object 注册；docs 页 MUST 提供入口；MUST NOT 新增技能、命令、常驻服务、外部依赖或模型 API；反馈仍为 manual 投递，MUST NOT 自动外传。
+CLI 能力档案的集合、必填维度、`known` / `unknown`、provenance、U2/U4/U5 观测、probe/feedback、交付与契约测试由 Feature 064 唯一拥有：`.specify/specs/064-subagent-concurrency/requirements.md`（CLI 档案条款）、`contracts/cli-profiles.md`（CLP-01…CLP-17）、`notes/063-overlap-adjudication.md`。本特性 MUST NOT 定义、复制、测试或注册第二套 CLI 档案；本特性的 stream-json 默认（FR-026）与 nohup 脱离（FR-031）是 064 档案记录的既有事实，由 064 引用。
 
 ### 显式排除项（Out of Scope）
 
@@ -275,8 +244,7 @@
 - 自动把反馈或运行数据外传。
 - 在预算之外自动追加全量运行；槽外全量必须为显式例外。
 - 重新设计阶段命令的内部测试策略；本特性只约束编排层的运行预算与证据。
-- 以 CLI 档案自动改写阶段命令、哨兵字面量、watcher 判定、退出码、确认门或阶段 deadline；档案只沉淀行为知识。
-- 把 CLI 档案做成运行时依赖、常驻服务、网络查询或自动外传通道；档案是技能内文档，反馈仍为 manual 投递。
+- CLI 能力档案的集合、必填维度、`known`/`unknown` 纪律、观测 probe、反馈标记、契约与测试——由 Feature 064 唯一拥有；本特性只保留 stream-json 输出默认与 nohup 脱离，且 MUST NOT 复制档案内容或建立第二套档案/契约/测试。
 
 ### Key Entities *(include if requirement involves data)*
 
@@ -289,8 +257,7 @@
 - **Targeted Test Set（定向测试集）**: 按确定性规则选出的测试路径集合，附选择依据与充分性说明。
 - **Stage Dispatch Record（派发记录）**: 阶段名、提示词路径、派发形态（是否脱离）、哨兵字面量、deadline、四件套路径与快车道/plan 约束标记。
 - **Stall Behavior Baseline（卡死行为基线）**: 冻结提交上由脚本化驱动夹具或可重放驱动 trace 观测的三类卡死场景处置元组（watcher 判定、退出码（watcher 判定退出码与 runner rc）、状态脊卡死状态、重试次数（初始固定为 0，记录消耗值）、四要素齐备性、下一阶段是否派发、状态脊是否先写后动），以及同一可执行夹具的收口重放与归一化比较结果；驱动侧字段 MUST 为观测值，不得从判定表转录。
-- **CLI Capability Profile（CLI 能力档案）**: 每个 subagent CLI 一份的活文档，承载调用方式/参数、输出模式、超时上限、哨兵可靠性、session/run 日志位置、已知缺陷与版本适用性；每项标注 `known` / `unknown` 并附 provenance。它是 CLI 行为知识的唯一落点。
-- **CLI Observation Record（CLI 观测记录）**: 一次 CLI 观测事件的记录——CLI、触发点（U2/U4/U5）、预期档案值、实际观测、结果分类（mismatch / unknown-fill / new-version）、档案更新指针、[[STR-009]] 标记与反馈条目 id、证据指针；与状态脊的框架观察段和收尾汇总联结。
+- **CLI Capability Profile / CLI Observation Record（归属 064，不在本特性实体清单）**: 其唯一 owner 为 Feature 064 的 `data-model.md` E9/E10 与 `contracts/cli-profiles.md`；063 不重复定义字段、观测记录或验收。
 
 ## Success Criteria *(mandatory)*
 
@@ -309,9 +276,8 @@
 - **SC-011**: 不支持 stream-json 的 CLI 运行 100% 记录降级标记，伪 DONE 次数为 0，因降级导致的阶段失败次数为 0。
 - **SC-012**: 既有 loop-driver 契约测试 100% 保持绿色，或因本特性被有意更新且有记录；相对冻结基线零新增失败（名称级差集为空）；镜像判据 = 本特性触碰的 `sdd-loop-driver` 镜像对零 drift，且全部镜像对相对冻结基线零 NEW drift；其余镜像对的既有漂移作为已记录基线例外保留、不得扩大；未启用快车道的默认行为与改动前一致。
 - **SC-013**: 本特性自身运行包含 `checklist`、`analyze`、`review` 的产物与证据；本特性自身运行中的快车道记录数为 0。
-- **SC-014**: 100% 的 subagent CLI 派发都有对应档案与 U2 查档记录（档案 id/版本 + 实测 CLI 版本）；qodercli 与 claude / codex / opencode / hermes 五份档案在位，且每项显式标注 `known` / `unknown`；无档案派发次数为 0。
-- **SC-015**: 100% 的 CLI 观测事件都产生（a）带观测日期、CLI 版本与证据指针的档案更新，以及（b）恰好一条包含 [[STR-009]]`<cli>` 标记的反馈条目，可由 `feedback-utils.py --action list --contains` 检索；standalone 宿主（无 `.specify/`）仍更新档案并把观测写入收尾汇总，feedback 引擎调用按 runtime-mode gate 跳过；无证据的 `known` 条目数为 0。
-- **SC-016**: 由档案更新导致的哨兵/判定/退出码/确认门/阶段 deadline 变化数为 0；当前阶段派发形态不因更新而回溯改变；契约测试钉住 [[STR-010]] 节、五份档案、必填维度、[[STR-009]] 标记与最小 Probe Object；`probe-utils.py --action compile-embeds --check` 零漂移，本特性触碰的镜像对零 drift。
+
+> **CLI 能力档案验收（归属 064）**：档案集合、八维、`known`/`unknown`、观测反馈、probe 注册、交付与镜像由 Feature 064 的 SC-006 与 `contracts/cli-profiles.md` 拥有；本特性不重复其成功标准。
 
 ### Measurement Sources & Collection Methods
 
@@ -325,9 +291,7 @@
 - **SC-011 Source**: 降级夹具：不支持 stream-json 的 CLI 桩、状态脊降级标记、判定与退出码记录。
 - **SC-012 Source**: 改动前用 `scripts/bash/run-tests.sh --names-out <file>` 冻结失败名单，改动后用同一命令输出并以 `comm -13` 断言为空；`scripts/python/sync-mirrors.py --check` 的输出按镜像对归属统计——本特性拥有的 `skills/external/sdd-loop-driver` ↔ `.specify/skills/sdd-loop-driver` 对零 DIFF，全部镜像对相对冻结基线零 NEW DIFF，其余镜像对的既有 DIFF 逐条保留在冻结基线清单中并记录为已披露例外。
 - **SC-013 Source**: 本规格目录的 `checklists/`、analyze/review 产物与收尾汇总；检索本特性运行记录中的快车道标记（应为 0）。
-- **SC-014 Source**: 每线 E6 派发记录中的 `profile_id` / `profile_version` / `observed_cli_version` 字段 + `references/cli/` 文件存在性；契约测试钉住档案集合与必填维度；夹具覆盖「无档案 → 先建骨架」与「已归档 → 直接查档」两条路径。
-- **SC-015 Source**: 档案 `## Provenance` 表 + 状态脊「CLI 观测」段 + `feedback-utils.py --action list --contains "cli-profile:<cli>"` 输出；standalone 场景以收尾汇总与档案更新为证据，并明确标注 feedback 引擎未调用；观测夹具注入 mismatch / unknown-fill / new-version 三类事件。
-- **SC-016 Source**: 契约测试（CP 条款与安全不变量）；`probe-utils.py --action probes --validate`、`--action compile-embeds --check`、`--action probes --reconcile`（sdd-loop-driver 缺口关闭，`sdd-project-setup` 既有缺口按基线披露）；`sync-mirrors.py --check --only skills/external/sdd-loop-driver`；同一阶段更新前后的 E6 派发记录快照。
+- **CLI 能力档案 Source（归属 064）**: 由 Feature 064 的 SC-006 与 `contracts/cli-profiles.md` 拥有；063 不重复测量。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
 
@@ -341,8 +305,6 @@
 | `STR-006` | "fast-lane=opt-in" | FR-002, FR-004 |
 | `STR-007` | "notes/stall-behavior-baseline.json" | FR-038, SC-010 |
 | `STR-008` | "not-applicable-skipped-stage" | FR-012, SC-005 |
-| `STR-009` | "cli-profile:" | FR-047, SC-015, SC-016 |
-| `STR-010` | "CLI Capability Profiles" | FR-046, SC-016 |
 
 **Citation convention**: When an FR, contract, task, or test references one of these strings, write `[[STR-NNN]]` instead of copy-pasting the literal. CI / `/speckit.analyze` can then verify that every `[[STR-NNN]]` reference resolves to a row in this section.
 
@@ -371,11 +333,10 @@
 - Q: `requirements.md` 在 plan U4 后被合法修改时，批准基线如何重新锚定？ → A: 在下一个依赖该基线的 U4 分类前记录 re-baseline 事件（触发、时间、前一基线、新基线 = 包含该变更的提交、FR/SC 差异摘要），`approved_baseline_commit` 更新为新基线；变更未提交或无法定位提交时不得 re-anchor，受影响 plan 改动按 FR-022(b) 上送；re-anchoring 不构成 plan 重审、不移动约束生效点，后续分支判定以最新基线为准。
 - Q: SC-005 的完整性分母与 `not-run-docs-only` 如何计？ → A: 分母 = 全部适用阶段（含文档型阶段）；文档型阶段按缩减字段集（阶段状态、选择依据、改动路径证据、证据指针）判完整，运行字段不适用且不报 `unknown`；授权跳过（[[STR-008]]）不计入分母；整阶段缺失证据记录计入分母并判未完整；收口审计 MUST 输出 `stages=N complete=N`。
 
-### Session 2026-10-20（plan-repair-2，用户授权 CLI Capability Profiles 增量）
+### Session 2026-10-20（tasks-repair-2，CLI-profile 重叠收口）
 
-- Q: 新增 CLI 档案的范围与落点是什么？ → A: 用户 2026-10-20 显式授权：每个作为 subagent 的 CLI 一份独立文件，落在 `skills/external/sdd-loop-driver/references/cli/<cli>.md`；至少 qodercli，claude / codex / opencode / hermes 以可增量填充的骨架建立。档案覆盖调用方式与参数、输出模式（`-p` 缓冲 vs stream-json）、后台/超时上限（含 `BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 语义）、哨兵可靠性、session/run 日志位置、已知缺陷、版本适用性；每项显式 `known` / `unknown`，`unknown` 不得猜测填充。
-- Q: 如何在「不伪造未注册机制」的前提下补 probe + feedback 点？ → A: 复用既有 probe 注册表与 feedback 引擎，新增一个最小 Probe Object：`skill-sdd-loop-driver-wrapup`（class `skill-wrapup`，unit `skill:sdd-loop-driver`，lifecycle_point `wrap-up`）。理由：该技能已有编译 `## Wrap-up` 面，但注册表无对应 Object，2026-10-20 `probe-utils.py --action probes --reconcile` 报 `embed without probe object: skill:sdd-loop-driver`；该行同时使既有 feedback record 路径可执行，并成为 CLI 观测反馈的注册落点。不新增 Probe Class、Handler 或 HandlerBinding；现有 `@point:wrap-up scope=all` 绑定已覆盖该单元的编译面。`skill:sdd-project-setup` 的同类既有缺口不在本特性范围，按基线披露。
-- Q: CLI 观测的触发点与反馈标记如何定义？ → A: 触发点至少 U2 派发前（查档；无档案先建骨架）、U4 独立校验（对照实际输出/哨兵/日志/退出码）、U5 停线（引用已知缺陷或新增缺陷）。稳定标记为 [[STR-009]]`<cli>`；每次观测事件（mismatch / unknown-fill / new-version）更新档案 provenance，并通过 `feedback-utils.py --action record` 记录恰好一条包含该标记的反馈；无事件的匹配派发不记录。standalone 宿主按 runtime-mode gate 跳过引擎调用，但档案更新与收尾汇总报告仍是必需项。
-- Q: 档案更新是否改变当前阶段行为？ → A: 不改变。档案不改变哨兵字面量、watcher 判定、退出码、确认门、阶段 deadline 或测试预算；当前阶段使用 U2 记录的派发形态，更新只作用于后续派发。若冲突使当前阶段无法安全完成，走既有 U5/重试/`ANOMALY:` 程序，不得以更新档案代替行为修复。
-- Q: 档案的优先级与交付面？ → A: US6 定为 P2（支撑性能力，避免与四项核心优化的 P1 交付顺序冲突）。交付面为 `references/cli/README.md` + 五份档案 + 契约测试 + 镜像 + docs 入口；不新增技能、命令、服务、依赖或模型 API；反馈仍为 manual 投递。
-- Q: 本特性自身运行是否立即受档案约束？ → A: 063 自身仍走完整链；本次运行对 qodercli 的观测可作为 `qodercli.md` 的 dated 种子证据，但 MUST NOT 以档案更新改变本运行任何阶段的命令或判定。档案机制从实现完成后的后续派发生效。
+- Q: 063 在 plan-repair-2 临时加入的 CLI 能力档案条款如何处置？ → A: 按 Feature 064 的 `notes/063-overlap-adjudication.md` 逐条裁决迁入 064（064 的 CLI 档案条款与 `contracts/cli-profiles.md` CLP-01…CLP-17）。063 删除 US6、CLI-profile 临时条款（FR 编号段 044–049、SC 编号段 014–016）、CLI 实体、CLI 边界用例、两个 CLI 共享字符串、provisional 契约与档案测试；只保留指向 064 的指针，禁止双 owner 或静默复制。
+- Q: 063 最终保留哪些能力？ → A: 四项吞吐优化（快车道、两槽位测试预算、plan 只小修、stream-json 进度与 nohup 脱离）。stream-json 输出默认（FR-026）与 nohup 脱离（FR-031）作为 064 档案记录的既有事实由 064 引用；063 不复制档案内容。
+- Q: probe/feedback 注册如何处置？ → A: 由 064 的最小 Probe Object `skill-sdd-loop-driver-cli-profile` 承担；063 不注册、不修改 `shared/definitions/probe-definitions.md`，不新增任何 CLI-profile 专用 Object 或测试。
+- Q: 编号与计数如何收口？ → A: FR 收口到 FR-043，SC 收口到 SC-013，Shared Strings 收口到 STR-008；所有 FR/SC/条款/任务/交付计数与引用 MUST 重算，`validate-requirements.py` 与 `validate-tasks.py` exit 0，且无悬空引用或重复定义。
+- Q: 本特性与 064 的依赖方向是什么？ → A: 输出模式的吞吐默认（stream-json）由 063 拥有，064 CLP-08 只记录事实、不得改写；063 实现 stream-json/nohup 时可只读引用 064 的 `references/cli/index.md` 与档案，但 MUST NOT 新增/修改该目录、复制其内容或另立契约。
