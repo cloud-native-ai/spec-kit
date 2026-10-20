@@ -161,6 +161,8 @@ Red-first：每个新脚本/扩展先写失败测试并记录 red 运行（`veri
 
 **Decision**: 更新 `docs/reference/skills/sdd-loop-driver.md` 增加「并发归属与生命周期」「CLI 能力档案」入口（指向 skill 引用，不复述内容）。镜像义务：`skills/external/sdd-loop-driver/**` → `.specify/skills/sdd-loop-driver/**`；`shared/definitions/probe-definitions.md` → `.specify/shared/definitions/probe-definitions.md`；docs 无镜像。验收 = 「本特性触碰的镜像对无 NEW drift」并按 §0 记录基线。
 
+**两顶帽子声明（宪法 XI）**: 本特性编辑的是**框架源**（`skills/external/**`、`shared/definitions/**`、`docs/**`、`tests/**`）；`.specify/skills/**` 与 `.specify/shared/**` 是这个仓库作为客户项目时的**运行时投影**，由 `sync-mirrors.py` 生成，不手工编辑。任何面向所有下游项目的规则都落在源侧并随发布/init 流动，运行时副本只做镜像同步。
+
 **Rationale**: 宪法 XIV（引用不复述）与 plan 模板的镜像义务；`sync-mirrors.py --only` 可把范围限制到本特性触碰的文件。
 
 ## 13. 未决事项（不在本阶段猜测）
