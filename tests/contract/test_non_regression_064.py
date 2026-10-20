@@ -112,9 +112,12 @@ def test_ng_05_stdlib_only_engine():
         elif isinstance(node, ast.ImportFrom):
             if node.level == 0 and node.module:
                 imports.add(node.module.split(".")[0])
-    stdlib = set(sys.stdlib_module_names)
-    stdlib.update({"__future__"})
-    external = imports - stdlib
+    allowed = {
+        "argparse", "contextlib", "errno", "fcntl", "hashlib", "json", "os", "re",
+        "secrets", "shutil", "socket", "subprocess", "sys", "tempfile", "time",
+        "datetime", "pathlib", "__future__",
+    }
+    external = imports - allowed
     assert external == set(), f"non-stdlib imports: {sorted(external)}"
     assert WATCHER.read_text(encoding="utf-8").startswith("#!/usr/bin/env bash")
 

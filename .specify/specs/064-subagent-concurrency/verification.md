@@ -25,7 +25,7 @@ Each red run was captured before its implementation; every story ended with a gr
 | Run | Command | Result |
 |-----|---------|--------|
 | Feature matrix (11 files) | `run-tests.sh <unit + 5 contracts + skill + non-regression + 3 integration> -q` | **151 passed, 0 failed** (56.45 s) |
-| Full suite | `run-tests.sh tests -q --names-out current-failed.txt` | **4077 passed, 69 failed, 1 skipped** (295.19 s); baseline 71 failed |
+| Full suite | `run-tests.sh tests -q --names-out current-failed.txt` | **4077 passed, 69 failed, 1 skipped** (307.71 s); baseline 71 failed; a second full run after the non-behavioral engine-import cleanup and the 3.8-compatible stdlib guard reproduced the identical failure set |
 | Baseline diff | `comm -13 baseline-failed.txt current-failed.txt` | **0 NEW failures**; 2 baseline failures fixed (`test_c12_mirror_byte_identical`, `test_c18_mirror_pair_no_drift`) |
 | Watcher self-test | `watch-target.sh --self-test` | **18 passed, 4 failed** — exactly the recorded baseline (`pid-reuse`, `zombie`, `manifest`, `pgrep-zero-match-trap-reproduced`); new attribution and lease-renew-hook cases pass |
 | Confirmation gates | `run-tests.sh tests/contract/test_confirmation_gates_sweep.py -q` | **45 passed, 1 failed** — the failure is in the recorded baseline (unchanged) |
