@@ -121,4 +121,4 @@ None — all T001–T082 are `[X]`.
 
 ## 11. Commit chain (implement)
 
-`9e69f3de` US1 → `ba785b0a` US2 → `a100d560` US3 → `c37d7614` US4 → final US5/Polish commit (verification, S6, task closure, analyze carry-over closure).
+`9e69f3de` US1 → `ba785b0a` US2 → `a100d560` US3 → `c37d7614` US4 → `30439f53` US5/Polish (verification, S6, task closure, analyze carry-over closure) → docs closure commit (DoD status).

@@ -20,7 +20,7 @@
 - DoD-6: Quickstart S1–S6 have real command/output/exit evidence in `notes/quickstart-run.md`; teardown left no temp registry, worktree, or process.
 - DoD-7: 063 overlap is closed: no duplicate CLI-profile owner, test, or Probe Object exists; merge-time deletion/pointer steps are recorded in `notes/063-overlap-adjudication.md`.
 - DoD-8: No automatic push, no deletion of uncommitted work, no new daemon/external service/runtime dependency/model API, and no change to 058 sentinel/verdict/exit-code semantics or confirmation gates.
-- DoD Status: pending
+- DoD Status: done
 
 ## Completion Gate
 
