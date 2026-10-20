@@ -35,6 +35,22 @@ These four facts govern every part of the mechanism and outrank any embedded wor
 4. **Local workaround value.** Until a Spec Kit version update lands, past entries are a
    reference for working around recurring issues — see *Workaround lookup* below.
 
+### Mechanism boundary — SDD-flow mechanisms vs framework feedback
+
+`/speckit.analyze` and `/speckit.review` **belong to the SDD flow** and take the current
+feature as their input: analyze is the read-only pre-implementation artifact-consistency
+gate, and review is the post-implementation critique of the SDD process that produced
+that feature. Review's report is **feature-scoped** — its "global" reach is the whole SDD
+process of that one feature, never a whole-framework assessment.
+
+**Feedback is not an SDD stage.** It targets the Spec Kit framework itself (red line 1),
+attaches to the wrap-up of any qualifying unit — SDD command or not — and accumulates
+across runs and units. Each entry stays `scope: local` (one unit + one run); a
+framework-wide view exists only as the **aggregation** the introspection step builds from
+recorded entries, never as an independent, zero-input audit. In short: analyze/review ask
+"how is this feature's SDD run going?"; feedback asks "what does this unit's real use say
+about the framework?".
+
 **Goal anchor (Constitution Principle XIII — Better-Harness Orientation).** Feedback is one
 of the framework's Better-Harness instruments: it strengthens the **Learning Capture**
 dimension of the goal model defined once in `.specify/shared/guidelines/better-harness.md`.
@@ -76,12 +92,14 @@ content from the user.
    exactly one line:
    `No significant optimization points identified this run.`
    **Token 效率自评**(纪律定义见 `.specify/shared/guidelines/token-efficiency.md`)——同步自查三问:本次运行是否发生 (1) **原文转储**(机器管理数据文件整体注入上下文)、(2) LLM **代做确定性工作**(固定规则判断未交程序)、(3) **重复读取**同一内容?有发现 → 对应优化点条目行 MUST 内嵌字面量 `token-efficiency`(稳定标记,供 `--action list --contains token-efficiency` 检索聚合);干净运行 MUST NOT 追加空洞的 Token 观察条目。量化口径:定性描述或行/字节代理指标,精确 Token 计数不可得时 MUST **不编造**具体数值。
-3. **Scope guard.** Keep strictly to *this* unit's operation. Do NOT produce a
-   global/whole-project assessment — that is `/speckit.review`'s job. Every wrap-up entry
-   is `scope: local`. A global review recommendation is not left without an intake: its
-   legal entry is the existing `/speckit.feedback` manage-feedback Path A digest
-   § A3 自省(Introspection) step. No new intake store, tracking engine, or scoring system
-   is introduced.
+3. **Scope guard.** Keep strictly to *this* unit's operation. Every entry is
+   `scope: local` (one unit + one run); a framework-wide view exists only as the
+   aggregation the introspection step builds from recorded entries — never as an
+   entry-level assessment, and never by restating another unit's findings. The
+   mechanism boundary is owned by § *Mechanism boundary* above. A review recommendation
+   that targets the framework is not left without an intake: its legal entry is the
+   existing `/speckit.feedback` manage-feedback Path A digest § A3 自省(Introspection)
+   step. No new intake store, tracking engine, or scoring system is introduced.
 4. **Dedup guard.** Choose a stable `run_id` for this run (e.g. the feature key + a run
    timestamp). If a parent flow already recorded feedback for this same `(unit_id, run_id)`,
    the engine will no-op — do not force a duplicate.

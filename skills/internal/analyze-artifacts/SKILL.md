@@ -170,6 +170,10 @@ observations, metrics, and the rerun delta when a prior report exists:
   different, consumer-neutral capability and does not interpret its own output.
 - **Code review is not this skill.** Reviewing a diff or a PR is a different capability;
   this one reviews the spec chain.
+- **Feedback is not this skill.** `/speckit.feedback` targets the Spec Kit framework
+  itself across accumulated unit-run entries; this skill analyzes the current feature's
+  spec chain. The boundary is owned by
+  `.specify/shared/workflow/feedback-step.md` § *Mechanism boundary*.
 
 ## Wrap-up
 
