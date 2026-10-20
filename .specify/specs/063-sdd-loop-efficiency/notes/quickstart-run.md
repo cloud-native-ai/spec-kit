@@ -37,9 +37,30 @@ status=ok
 - Re-run after the mutation drill: same output, exit `0`.
 - Cleanup: fixture tree and `/tmp/063-line-state.md` removed.
 
-## S4 — pending (US4)
+## S4 — derived live log and sentinel verdict
 
-## S5 — pending (US4)
+- 4a: derive `stream/non_terminal_sentinel.jsonl` → `/tmp/063-live-a.log`
+  (last line is a prefixed progress line); status `exit=0 ... sentinel=0`;
+  watcher exit `15` → `verdict=INCOMPLETE` (`reason=exit-record-no-sentinel`).
+- 4b: derive `stream/result_sentinel.jsonl` → `/tmp/063-live-b.log`
+  (last non-empty line `PLAN-DONE`); watcher with no status exits `0` →
+  `verdict=DONE` (`reason=sentinel`).
+- WATCH lines carry `stream=na`; with `--raw-stream` they report
+  `stream=na|absent|growing|idle` and EVIDENCE adds `raw=`/`bytes=`, never
+  changing the verdict.
+- Re-run after the mutation drill: same results.
+
+## S5 — local nohup survival and `--once` re-entry
+
+- Command: the quickstart §S5 form (`export TMP063`; parent `bash -c` launches
+  `nohup … </dev/null >runner-log 2>&1 &` and exits).
+- `status-demo-plan`: `exit=0 at=… sentinel=1 … progress=stream detached=yes`.
+- `log-demo-plan.log` last non-empty line: `PLAN-DONE`.
+- Raw evidence: `raw-demo-plan.jsonl` 4 lines, receive-timestamp sidecar 4 lines.
+- Re-entry snapshot: `watch-target.sh --once` → exit `0`,
+  `verdict=DONE pid=dead sentinel=yes rc=0`; the completed stage is verified,
+  not redispatched (status/raw unchanged in the integration test).
+- Cleanup: temp state dir removed after the status file existed.
 
 ## S6 — plan change classification (undeclared → gate failure)
 

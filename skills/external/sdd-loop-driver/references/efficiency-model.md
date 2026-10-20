@@ -217,3 +217,49 @@ plan 约束激活后，任何门内完成的 `requirements.md` 变更（含 anal
 ### 3.10 契约钉住
 
 PC-01…PC-11 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_pc_01…test_pc_11` 钉住；机械判定由 `tests/unit/test_audit_plan_changes.py` 覆盖。
+
+## 4. 进度可见与驱动解耦（Progress & Detach）
+
+### 4.1 stream-json 主路径
+
+`scripts/stage-runner.sh` 默认以 `stream-json` 调用阶段 CLI（`[[STR-001]]`），并把原始事件流完整落盘为 `raw-<line>-<stage>.jsonl`；CLI 的 stderr 单独落 `runner-log-<line>-<stage>.log`，不混入 raw。CLI 行为事实（是否支持该输出模式、事件形状、哨兵可靠性、工具超时上限）由 Feature 064 的 `references/cli/<cli>.md` 与 `contracts/cli-profiles.md` 拥有，本文件只读引用、不复制档案内容。派发资格由 Feature 061 的 `CAPABILITY_MATRIX` 决定；档案存在不等于可派发。
+
+### 4.2 增量派生与可追溯性
+
+`scripts/derive-live-log.py` 是确定性派生步骤：逐行读取 raw NDJSON，每个有意义的非终止事件立即输出一行可读进度（不缓冲到进程退出），实时日志可追加读取与尾部跟踪。每条派生行携带其 raw 事件序号与接收时间戳（`[evt=<seq> at=<epoch>] ...`），且在 runner 侧有对应的 raw 接收时间戳 sidecar（`raw-<line>-<stage>.ts.jsonl`）：
+
+- **事件→派生行延迟 ≤120 秒**；无事件的静默区间不适用该阈值（也不产生任何派生行）。
+- **每条派生行 MUST 可追溯到一条 raw 事件**；无对应事件时伪造进度行数 MUST 为 0（SC-007）。
+- 不可解析行容错跳过，不得伪造进度或完成。
+
+### 4.3 哨兵契约
+
+阶段正常结束时，live log 的最后一个非空行 MUST 恰好是 `<STAGE>-DONE`。派生 MUST 取 CLI 终止 `result` 事件的文本并在 EOF 时作为最后内容逐字追加；MUST NOT 让 JSON 信封、事件元数据或**非终止事件**中的哨兵字样满足判定。`--finish` 从 raw 一次性恢复终止 result 文本。
+
+### 4.4 watcher 可见性与判定不变
+
+watcher 把流式进度只当作可见性信号：进度行数/增长与 raw 字节增长 MUST NOT 单独产生 `DONE` 或 `TIMEOUT`；完成仍须哨兵 + U4 独立校验，超时仍只由阶段 deadline 产生。`--raw-stream PATH` 在 WATCH 行附 `stream=na|absent|growing|idle`、在 EVIDENCE 行附 raw 路径与字节数，**不参与任何 verdict**。既有判定顺序、退出码与窗口/deadline 语义零改动（精确值 owner 是 `scripts/watch-target.sh --help/--self-test`）。`BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 是宿主工具上限，不是阶段 deadline；工具上限导致的提前终止 MUST NOT 记作阶段超时。
+
+### 4.5 降级
+
+CLI 不支持 stream-json（能力探测失败）或派生运行时缺失/派生失败时，runner MUST 回退既有缓冲模式，在 status 记录 `progress=degraded` 与原因，并继续以退出记录 + 哨兵 + deadline 判定：
+
+- 探测失败 → `progress=degraded reason=cli-lacks-stream`。
+- 派生失败 → 先跑一次性 `--finish` 从 raw 恢复终止 `result` 文本；成功即写入 live log 并记 `degradation=derivation-recovered`。
+- raw 无终止 result、但 raw 最后非空行恰为哨兵（CLI 未按 stream 输出）→ `buffered-fallback`。
+- 两者皆无 → `sentinel=0`，按 `INCOMPLETE` 处理——这是缺失完成证据，不是降级导致的阶段失败。降级 MUST NOT 产生伪完成或阶段失败。
+
+### 4.6 nohup 双拓扑与未脱离风险
+
+阶段派发 MUST 在本地与远端两种拓扑下都完全脱离驱动会话：以 `nohup` 启动 runner，stdin 接 `/dev/null`，stdout/stderr 重定向到文件。远端保留 `ssh + su + nohup` 形态；本地补齐等价形态。脱离是默认形态：
+
+- 派发记录写 `detached=yes|no`；遗漏 nohup 或 `</dev/null` → 记 `detached=no`，status 另写 `unprotected=true` 与风险原因。
+- 四件套（pid / status / log / heartbeat）保持；新会话用 `--once` 快照接管，已完成阶段只核验、不重新派发；脱离 MUST NOT 削弱 U3/U4。
+
+### 4.7 等待与证据纪律
+
+驱动等待仍是既有长轮询窗口；实时日志只在窗口内读取用于可见性。MUST NOT 新增独立 `sleep` 回合或固定 cadence 空转，MUST NOT 引入新的常驻服务、守护进程或外部依赖。raw stream 与派生 live log MUST 作为 U4/U5 与事后审计证据保留。
+
+### 4.8 契约钉住
+
+PD-01…PD-10 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_pd_01…test_pd_10` 钉住；派生由 `tests/unit/test_derive_live_log.py` 覆盖；runner 行为由 `tests/integration/test_sdd_loop_efficiency_runner.py` 与 `watch-target.sh --self-test` 的四个 stream 用例覆盖。

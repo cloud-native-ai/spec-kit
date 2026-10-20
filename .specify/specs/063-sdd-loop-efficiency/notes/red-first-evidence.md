@@ -151,3 +151,53 @@ FAILED tests/contract/test_sdd_loop_driver_efficiency.py::test_pc_11_reanchoring
 
 - Meaning: efficiency-model §3, the plan-change prompt block and the audit
   script do not exist yet. Must go green after T027/T028.
+
+## T033 — tests/unit/test_derive_live_log.py
+
+- Date: 2026-10-20
+- Command: `bash scripts/bash/run-tests.sh tests/unit/test_derive_live_log.py -q`
+- Exit status: `1`
+- Output tail:
+
+```text
+FAILED tests/unit/test_derive_live_log.py::test_non_terminal_sentinel_not_bare_last_line
+...
+FAILED tests/unit/test_derive_live_log.py::test_derived_lines_all_have_raw_origin
+8 failed in 1.58s
+```
+
+- Meaning: `derive-live-log.py` does not exist. Must go green after T036.
+
+## T034 — tests/integration/test_sdd_loop_efficiency_runner.py
+
+- Date: 2026-10-20
+- Command: `bash scripts/bash/run-tests.sh tests/integration/test_sdd_loop_efficiency_runner.py -q`
+- Exit status: `1`
+- Output tail:
+
+```text
+E  ... stage-runner.sh: No such file or directory
+E  +  where 127 = CompletedProcess(...)
+FAILED ...::test_stream_mode_writes_raw_and_live
+...
+7 failed in 30.46s
+```
+
+- Meaning: `stage-runner.sh` does not exist. Must go green after T037.
+
+## T035 — PD-01…PD-10 contract functions
+
+- Date: 2026-10-20
+- Command: `bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_efficiency.py -q`
+- Exit status: `1`
+- Output tail:
+
+```text
+FAILED ...::test_pd_01_stream_default_and_raw
+...
+FAILED ...::test_pd_10_runner_interface
+10 failed, 31 passed in 0.50s
+```
+
+- Meaning: efficiency-model §4, the runner, the derivation and the watcher
+  extension do not exist yet. Must go green after T036/T037/T038/T039.

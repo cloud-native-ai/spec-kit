@@ -43,7 +43,10 @@ def _run(args):
 
 
 def _script_help(name):
-    completed = _run([SKILL_DIR / "scripts" / name, "--help"])
+    script = SKILL_DIR / "scripts" / name
+    prefix = ["bash"] if name.endswith(".sh") else [sys.executable]
+    completed = subprocess.run(
+        prefix + [str(script), "--help"], capture_output=True, text=True)
     assert completed.returncode == 0, completed.stderr
     return completed.stdout + completed.stderr
 
@@ -426,3 +429,137 @@ def test_pc_11_reanchoring():
     assert "activated_at" in recipes or "重入" in recipes
     contract = _text(CONTRACTS / "plan-constraint.md")
     assert "PC-11" in contract
+
+
+# ------------------------------------------------------------------ PD-01
+
+
+def test_pd_01_stream_default_and_raw():
+    efficiency = _text(EFFICIENCY)
+    assert "stream-json" in efficiency
+    assert "raw-<line>-<stage>.jsonl" in efficiency
+    assert "064" in efficiency
+    runner = _text(SKILL_DIR / "scripts" / "stage-runner.sh")
+    assert "stream-json" in runner
+    help_text = _script_help("stage-runner.sh")
+    assert "--mode" in help_text and "--cli-args" in help_text
+
+
+# ------------------------------------------------------------------ PD-02
+
+
+def test_pd_02_incremental_live_log():
+    efficiency = _text(EFFICIENCY)
+    assert "增量" in efficiency
+    assert "120" in efficiency
+    derive = _text(SKILL_DIR / "scripts" / "derive-live-log.py")
+    assert "evt=" in derive and "at=" in derive
+    assert "flush" in derive
+    help_text = _script_help("derive-live-log.py")
+    for flag in ("--events", "--out", "--finish"):
+        assert flag in help_text, "derive flag missing: %s" % flag
+
+
+# ------------------------------------------------------------------ PD-03
+
+
+def test_pd_03_sentinel_from_result_only():
+    efficiency = _text(EFFICIENCY)
+    assert "终止" in efficiency and "result" in efficiency
+    assert "非终止" in efficiency
+    derive = _text(SKILL_DIR / "scripts" / "derive-live-log.py")
+    assert "result" in derive
+    runner = _text(SKILL_DIR / "scripts" / "stage-runner.sh")
+    assert "sentinel" in runner
+
+
+# ------------------------------------------------------------------ PD-04
+
+
+def test_pd_04_watcher_unchanged():
+    watch_text = _text(WATCH)
+    assert "raw" in watch_text and "stream" in watch_text
+    help_text = _script_help("watch-target.sh")
+    assert "--raw-stream" in help_text
+    assert "0 DONE" in help_text and "14 TIMEOUT" in help_text
+    efficiency = _text(EFFICIENCY)
+    assert "判定" in efficiency and "不变" in efficiency
+
+
+# ------------------------------------------------------------------ PD-05
+
+
+def test_pd_05_degradation_marker():
+    runner = _text(SKILL_DIR / "scripts" / "stage-runner.sh")
+    for token in ("degraded", "derivation-recovered", "buffered-fallback",
+                  "sentinel=0"):
+        assert token in runner, "degradation token missing: %s" % token
+    efficiency = _text(EFFICIENCY)
+    assert "降级" in efficiency and "伪完成" in efficiency
+
+
+# ------------------------------------------------------------------ PD-06
+
+
+def test_pd_06_nohup_both_topologies():
+    recipes = _text(RECIPES)
+    assert "nohup" in recipes
+    assert "</dev/null" in recipes
+    assert "ssh" in recipes
+    efficiency = _text(EFFICIENCY)
+    assert "nohup" in efficiency and "本地" in efficiency and "远端" in efficiency
+
+
+# ------------------------------------------------------------------ PD-07
+
+
+def test_pd_07_reentry_once():
+    prompts = _text(PROMPTS)
+    assert "--once" in prompts
+    recipes = _text(RECIPES)
+    assert "--once" in recipes
+    efficiency = _text(EFFICIENCY)
+    assert "--once" in efficiency
+
+
+# ------------------------------------------------------------------ PD-08
+
+
+def test_pd_08_watcher_raw_and_selftests():
+    help_text = _script_help("watch-target.sh")
+    assert "--raw-stream" in help_text
+    watch_source = _text(SKILL_DIR / "scripts" / "watch-target.sh")
+    for case in ("stream-nonterminal-sentinel", "stream-result-sentinel",
+                 "stream-derive-failure", "stream-detached-survives"):
+        assert case in watch_source, "self-test case missing: %s" % case
+
+
+# ------------------------------------------------------------------ PD-09
+
+
+def test_pd_09_no_new_wait_or_service():
+    efficiency = _text(EFFICIENCY)
+    assert "sleep" in efficiency
+    assert "常驻服务" in efficiency
+    assert "MUST NOT" in efficiency
+    runner = _text(SKILL_DIR / "scripts" / "stage-runner.sh")
+    assert "sleep" in runner
+
+
+# ------------------------------------------------------------------ PD-10
+
+
+def test_pd_10_runner_interface():
+    help_text = _script_help("stage-runner.sh")
+    for flag in ("--cli", "--cli-args", "--project-dir", "--prompt-file",
+                 "--sentinel", "--line", "--stage", "--state-dir", "--mode",
+                 "--detached"):
+        assert flag in help_text, "runner flag missing: %s" % flag
+    runner = _text(SKILL_DIR / "scripts" / "stage-runner.sh")
+    for token in ("exit", "status", "heartbeat", "detached"):
+        assert token in runner
+    derive = _text(SKILL_DIR / "scripts" / "derive-live-log.py")
+    imports = re.findall(r"^import\s+([A-Za-z_][A-Za-z0-9_]*)", derive, re.MULTILINE)
+    allowed = {"argparse", "json", "os", "re", "sys", "time", "pathlib"}
+    assert set(imports) <= allowed, "unexpected import: %s" % (set(imports) - allowed)
+    assert "jq" not in derive

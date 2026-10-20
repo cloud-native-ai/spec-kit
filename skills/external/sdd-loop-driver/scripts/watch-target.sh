@@ -34,13 +34,17 @@ watch-target.sh — bounded long-poll watcher (read-only)
 
 Single target:
   watch-target.sh --label L --pid-file P --status-file S --log G \
-                  [--sentinel STAGE-DONE] [--heartbeat H] \
+                  [--sentinel STAGE-DONE] [--heartbeat H] [--raw-stream PATH] \
                   [--line-id ID --run-id RUN] [--stage STAGE] [--meta FILE] \
                   [--registry DIR] \
                   [--lease-ttl N --lease-renew-cmd CMD --lease-renew-interval N] \
                   [--deadline-epoch E | --timeout T] \
                   [--window N] [--interval N] [--start-grace N] \
                   [--deadline-grace N] [--heartbeat-max-age N] [--once] [--verbose]
+
+--raw-stream PATH reports stream=na|absent|growing|idle on the WATCH line and
+raw=<path> bytes=<n> on EVIDENCE; raw growth is visibility only and never
+participates in any verdict. The sentinel is still read from --log only.
 
 Manifest (one target per line: label|pid|status|log|sentinel|heartbeat|deadline):
   watch-target.sh --manifest FILE [--window N] [--interval N] [--start-grace N]
@@ -133,6 +137,8 @@ LEASE_TTL=""
 LEASE_RENEW_CMD=""
 LEASE_RENEW_INTERVAL=60
 LAST_LEASE_RENEW=0
+RAW_STREAM=""
+RAW_PREV_SIZE=""
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -142,6 +148,7 @@ while [ "$#" -gt 0 ]; do
     --log) [ "$#" -ge 2 ] || die_usage "--log needs a value"; LOG_FILE="$2"; shift 2 ;;
     --sentinel) [ "$#" -ge 2 ] || die_usage "--sentinel needs a value"; SENTINEL="$2"; shift 2 ;;
     --heartbeat) [ "$#" -ge 2 ] || die_usage "--heartbeat needs a value"; HEARTBEAT="$2"; shift 2 ;;
+    --raw-stream) [ "$#" -ge 2 ] || die_usage "--raw-stream needs a value"; RAW_STREAM="$2"; shift 2 ;;
     --deadline-epoch) [ "$#" -ge 2 ] || die_usage "--deadline-epoch needs a value"; DEADLINE_EPOCH="$2"; shift 2 ;;
     --timeout) [ "$#" -ge 2 ] || die_usage "--timeout needs a value"; TIMEOUT="$2"; shift 2 ;;
     --window) [ "$#" -ge 2 ] || die_usage "--window needs a value"; WINDOW="$2"; shift 2 ;;
@@ -379,12 +386,13 @@ last_nonempty_line() {
 
 V_LABEL=""; V_VERDICT=""; V_CODE=0; V_REASON=""
 V_PID=""; V_HB=""; V_SENT=""; V_RC=""; V_LAST=""; V_STATUS_RAW=""; V_ELAPSED=0; V_ANOMALY="no"; V_ATTR="legacy"; V_AT=""
+V_STREAM="na"; V_RAW_BYTES=0
 
 evaluate() {
   local label="$1" pidf="$2" statf="$3" logf="$4" sent="$5" hbf="$6" dl="$7"
   local now pid start pid_alive=0 pid_state="missing" hb_state="na" sent_state="na"
   local last="" anomaly=0 s_exists=0 s_rc="" s_sent=""
-  local verdict="RUNNING" code="$EXIT_RUNNING" reason="" age=0 mt=0
+  local verdict="RUNNING" code="$EXIT_RUNNING" reason="" age=0 mt=0 size=""
   local pid_class="" status_class="" log_class="" sent_own=0
 
   now=$(now_epoch)
@@ -549,21 +557,40 @@ evaluate() {
   else
     V_ATTR="unattributed"
   fi
+  V_STREAM="na"; V_RAW_BYTES=0
+  if [ -n "$RAW_STREAM" ]; then
+    if [ ! -f "$RAW_STREAM" ]; then
+      V_STREAM="absent"
+    else
+      size=$(wc -c < "$RAW_STREAM" 2>/dev/null | tr -d ' ')
+      case "$size" in ''|*[!0-9]*) size=0 ;; esac
+      V_RAW_BYTES="$size"
+      if [ -n "$RAW_PREV_SIZE" ] && [ "$size" -gt "$RAW_PREV_SIZE" ]; then
+        V_STREAM="growing"
+      else
+        V_STREAM="idle"
+      fi
+      RAW_PREV_SIZE="$size"
+    fi
+  fi
   V_ELAPSED=$((now - START_EPOCH))
   V_AT="$now"
 }
 
 format_verdict() {
-  printf 'WATCH label=%s verdict=%s pid=%s heartbeat=%s anomaly=%s sentinel=%s rc=%s elapsed=%s reason=%s line=%s run=%s stage=%s event=watcher-verdict at=%s attribution=%s' \
-    "$V_LABEL" "$V_VERDICT" "$V_PID" "$V_HB" "$V_ANOMALY" "$V_SENT" "$V_RC" "$V_ELAPSED" "$V_REASON" \
+  printf 'WATCH label=%s verdict=%s pid=%s heartbeat=%s anomaly=%s sentinel=%s rc=%s elapsed=%s reason=%s stream=%s line=%s run=%s stage=%s event=watcher-verdict at=%s attribution=%s' \
+    "$V_LABEL" "$V_VERDICT" "$V_PID" "$V_HB" "$V_ANOMALY" "$V_SENT" "$V_RC" "$V_ELAPSED" "$V_REASON" "$V_STREAM" \
     "$LINE_ID" "$RUN_ID" "$STAGE" "$V_AT" "$V_ATTR"
 }
 
 format_evidence() {
-  local last
+  local last raw_extra=""
   last=$(one_line "$V_LAST" | tr '"' "'")
-  printf 'EVIDENCE label=%s last="%s" status="%s" line=%s run=%s stage=%s event=watcher-verdict at=%s attribution=%s' \
-    "$V_LABEL" "$last" "$V_STATUS_RAW" "$LINE_ID" "$RUN_ID" "$STAGE" "$V_AT" "$V_ATTR"
+  if [ -n "$RAW_STREAM" ]; then
+    raw_extra=" raw=$RAW_STREAM bytes=$V_RAW_BYTES"
+  fi
+  printf 'EVIDENCE label=%s last="%s" status="%s" line=%s run=%s stage=%s event=watcher-verdict at=%s attribution=%s%s' \
+    "$V_LABEL" "$last" "$V_STATUS_RAW" "$LINE_ID" "$RUN_ID" "$STAGE" "$V_AT" "$V_ATTR" "$raw_extra"
 }
 
 emit_single() {
@@ -749,6 +776,8 @@ self_test() {
   }
 
   local base="$ST_TMP/base"
+  local self_dir
+  self_dir=$(cd "$(dirname "$SELF")" && pwd)
   mkdir -p "$base"
 
   # 1. DONE via exit record + sentinel
@@ -1008,6 +1037,78 @@ PY
       bad "pgrep-zero-match-trap-reproduced" "expected zero-match output, got: $zero"
     fi
   fi
+
+  # 15. stream: non-terminal sentinel wording never yields DONE
+  if command -v python3 >/dev/null 2>&1; then
+    printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"text","text":"mentions PLAN-DONE but is not terminal"}]}}' \
+      > "$base/raw-nonterminal.jsonl"
+    python3 "$self_dir/derive-live-log.py" --events "$base/raw-nonterminal.jsonl" \
+      --out "$base/live-nonterminal.log"
+    printf 'exit=0 at=1 sentinel=0\n' > "$base/status-nonterminal"
+    r=$(watch --label stream-nonterminal --pid-file "$base/pid1" \
+      --status-file "$base/status-nonterminal" --log "$base/live-nonterminal.log" \
+      --sentinel PLAN-DONE --raw-stream "$base/raw-nonterminal.jsonl" \
+      --window 0 --start-grace 0)
+    check stream-nonterminal-sentinel 15 INCOMPLETE "${r%%$'\n'*}" "${r#*$'\n'}"
+    printf '%s\n' "${r#*$'\n'}" | grep -q 'stream=' \
+      || bad "stream-visibility" "stream field missing: $r"
+    r=$(watch --label stream-progress --pid-file "$base/none15p" \
+      --status-file "$base/none15p" --log "$base/live-nonterminal.log" \
+      --sentinel PLAN-DONE --raw-stream "$base/raw-nonterminal.jsonl" \
+      --window 0 --start-grace 0)
+    if [ "${r%%$'\n'*}" -ne 16 ] \
+       || printf '%s\n' "${r#*$'\n'}" | grep -q 'verdict=DONE'; then
+      bad "stream-progress-not-done" "progress/raw produced a terminal verdict: $r"
+    else
+      ok "stream-progress-not-done"
+    fi
+
+    # 16. stream: terminal result sentinel yields DONE from the live log only
+    printf '%s\n' '{"type":"result","subtype":"success","is_error":false,"result":"finished\nPLAN-DONE"}' \
+      > "$base/raw-result.jsonl"
+    python3 "$self_dir/derive-live-log.py" --events "$base/raw-result.jsonl" \
+      --out "$base/live-result.log"
+    r=$(watch --label stream-result --pid-file "$base/none15" \
+      --status-file "$base/none15" --log "$base/live-result.log" \
+      --sentinel PLAN-DONE --raw-stream "$base/raw-result.jsonl" \
+      --window 0 --start-grace 0)
+    check stream-result-sentinel 0 DONE "${r%%$'\n'*}" "${r#*$'\n'}"
+
+    # 17. stream: derivation failure without a terminal result never fakes DONE
+    printf '%s\n' 'not json at all' \
+      '{"type":"assistant","message":{"content":[{"type":"text","text":"still no result"}]}}' \
+      > "$base/raw-malformed.jsonl"
+    python3 "$self_dir/derive-live-log.py" --events "$base/raw-malformed.jsonl" \
+      --out "$base/live-malformed.log"
+    if python3 "$self_dir/derive-live-log.py" --events "$base/raw-malformed.jsonl" \
+         --finish >/dev/null 2>&1; then
+      bad "stream-derive-failure" "finish unexpectedly recovered a result"
+    fi
+    printf 'exit=0 at=1 sentinel=0\n' > "$base/status-malformed"
+    r=$(watch --label stream-malformed --pid-file "$base/pid1" \
+      --status-file "$base/status-malformed" --log "$base/live-malformed.log" \
+      --sentinel PLAN-DONE --window 0 --start-grace 0)
+    check stream-derive-failure 15 INCOMPLETE "${r%%$'\n'*}" "${r#*$'\n'}"
+  else
+    printf 'skip stream-nonterminal-sentinel (python3 not found)\n'
+    printf 'skip stream-result-sentinel (python3 not found)\n'
+    printf 'skip stream-derive-failure (python3 not found)\n'
+  fi
+
+  # 18. detached runner survives the launching shell exit
+  cat > "$base/detached-writer.sh" <<'EOS'
+#!/usr/bin/env bash
+sleep 1
+printf 'exit=0 at=1 sentinel=1\n' > "$1/status-stream-detached"
+printf 'PLAN-DONE\n' > "$1/log-stream-detached.log"
+EOS
+  chmod +x "$base/detached-writer.sh"
+  bash -c 'nohup bash "$1" "$2" </dev/null >/dev/null 2>&1 &' _ \
+    "$base/detached-writer.sh" "$base"
+  r=$(watch --label stream-detached --pid-file "$base/none18" \
+    --status-file "$base/status-stream-detached" --log "$base/log-stream-detached.log" \
+    --sentinel PLAN-DONE --window 8 --interval 1 --start-grace 4)
+  check stream-detached-survives 0 DONE "${r%%$'\n'*}" "${r#*$'\n'}"
 
   if [ "$fail" -eq 0 ]; then
     printf 'SELF-TEST: %s passed, 0 failed\n' "$pass"

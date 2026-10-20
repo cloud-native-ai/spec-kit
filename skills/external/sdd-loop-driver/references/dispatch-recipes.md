@@ -22,57 +22,26 @@
 
 ## Recipe 2 — Runner 脚本与派生（Runner & Derivation）——**正证据四件套差异面**
 
-基础 runner 形态（`cd` + `<cli> -w` + `-p "$(cat …)"` + sed 派生）见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。本技能差异面——**pid / status / log / heartbeat 正证据四件套**（无人值守长跑的完成判定与存活判定都依赖它们；模型见 `watch-model.md` §2）：
+基础 runner 形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。**2026-10-20 起，逐阶段 `sed` 派生旧形态被 `scripts/stage-runner.sh` 取代**（单点可测试、消除每阶段副本漂移；Feature 063）：runner 是参数化单阶段进程，不自行 detach，由 Recipe 3 的 `nohup` 形态启动。旧 `sed` 形态仅作历史注记，MUST NOT 再用于新派发。本技能差异面——**pid / status / log / heartbeat 正证据四件套**（无人值守长跑的完成判定与存活判定都依赖它们；模型见 `watch-model.md` §2）以及 stream 证据对：
 
 ```bash
-# /home/<run-user>/run-<line>-<stage>.sh
-#!/usr/bin/env bash
-set -u
-line=<line>; run=<run>; stage=<stage>; sentinel="<STAGE>-DONE"
-dir=/home/<run-user>
-pidf="$dir/pid-$line-$stage"; status="$dir/status-$line-$stage"
-log="$dir/log-$line-$stage.log"; hb="$dir/heartbeat-$line-$stage.log"
-meta="$dir/log-$line-$stage.log.meta.jsonl"; prompt_meta="$dir/prompt-$line-$stage.md.meta.json"
-runner_pid=$$
-write_atomic() { local tmp="$1.tmp.$$"; printf '%s\n' "$2" > "$tmp" && mv "$tmp" "$1"; }
-start_ticks=$(awk '{print $22}' "/proc/$$/stat" 2>/dev/null || true)
-write_atomic "$pidf" "pid=$runner_pid start=$start_ticks at=$(date +%s) line=$line run=$run stage=$stage event=pid"
-printf '{"line_id":"%s","run_id":"%s","stage":"%s","event":"log-start","at":%s}\n' \
-  "$line" "$run" "$stage" "$(date +%s)" >> "$meta"
-
-# 心跳随 runner 死亡而退出，避免孤儿心跳伪造存活
-( while kill -0 "$runner_pid" 2>/dev/null; do
-    write_atomic "$hb" "at=$(date +%s) line=$line run=$run stage=$stage event=heartbeat"
-    sleep 30
-  done ) &
-hb_pid=$!
-disown "$hb_pid" 2>/dev/null || true
-
-finish() {
-  rc=$1
-  trap - EXIT
-  kill "$hb_pid" 2>/dev/null || true
-  last=$(tail -n 50 "$log" 2>/dev/null | awk 'NF{line=$0} END{print line}' | tr -d '\r' | sed 's/[[:space:]]*$//')
-  sent=0; [ "$last" = "$sentinel" ] && sent=1
-  write_atomic "$status" "exit=$rc at=$(date +%s) sentinel=$sent line=$line run=$run stage=$stage event=status"
-  printf '{"line_id":"%s","run_id":"%s","stage":"%s","event":"log-terminal","at":%s,"sentinel_seen":%s,"exit":%s}\n' \
-    "$line" "$run" "$stage" "$(date +%s)" "$sent" "$rc" >> "$meta"
-  exit "$rc"
-}
-trap 'finish $?' EXIT
-
-cd "<project-dir>" || exit 127
-"<cli>" -w "<project-dir>" --permission-mode auto -p "$(cat "$dir/prompt-$line-$stage.md")" > "$log" 2>&1
+bash <skill-dir>/scripts/stage-runner.sh \
+  --cli "<cli>" --cli-args "<cli args>" \
+  --project-dir "<project-dir>" --prompt-file "<prompt-file>" \
+  --sentinel "<STAGE>-DONE" --line "<line>" --stage "<stage>" \
+  --state-dir "<state-dir>" --mode auto --detached yes
 ```
 
 要点：
 
-- **退出记录是完成的主事件**：`status-…` 原子写入 `exit=<rc> at=<epoch> sentinel=<0|1>`，并在行尾追加归属信封 `line= run= stage= event=status`；驱动者优先读退出记录，而不是猜测进程状态。
-- **PID 文件是存活的唯一权威**：`pid + start ticks` 供 `kill -0`、僵尸检测与 PID 复用校验；PID 行同样携带信封。禁止用 `pgrep -c` 计数推断存活或完成（零匹配陷阱见 `watch-model.md` §7）。
-- **归属信封只走旁路**：日志正文零改动；`log-<line>-<stage>.log.meta.jsonl` 在启动与终止各追加一条 JSON（终止条含 `sentinel_seen`/`exit`），`prompt-<line>-<stage>.md.meta.json` 是派发前写入的静态信封。哨兵仍是日志最后一个非空行。
-- **心跳只证明 runner 外壳活着**：心跳循环以 `kill -0 "$runner_pid"` 为条件，外壳死亡即停跳；每跳行尾带 `line= run= stage= event=heartbeat`。子代理是否卡死仍由阶段 deadline 判定。
-- **日志最后非空行**是哨兵判据；`-p` 缓冲模式下日志在退出前静默属预期，由退出记录提供提前事件。
-- 下一阶段 runner 用 `sed` 替换上一阶段 runner 的提示词/哨兵字面量派生——runner 形态跨阶段恒同，避免重复维护整套脚本。
+- **stream 模式（默认）**：runner 以 `--output-format stream-json` 调用 CLI，逐行写 `raw-<line>-<stage>.jsonl` 与接收时间戳 sidecar `raw-<line>-<stage>.ts.jsonl`，经 `derive-live-log.py` 增量派生 `log-<line>-<stage>.log`；CLI stderr 单独落 `runner-log-<line>-<stage>.log`，不混入 raw。原始流与派生日志都保留为 U4/U5 证据。
+- **退出记录是完成的主事件**：`status-<line>-<stage>` 原子写入 `exit=<rc> at=<epoch> sentinel=<0|1> ... progress=stream|buffered|degraded detached=yes|no`；驱动者优先读退出记录，而不是猜测进程状态。
+- **PID 文件是存活的唯一权威**：`pid + start token` 供 `kill -0`、僵尸检测与 PID 复用校验。禁止用 `pgrep -c` 计数推断存活或完成（零匹配陷阱见 `watch-model.md` §7）。
+- **归属信封只走旁路**（064）：日志正文零改动；`log-<line>-<stage>.log.meta.jsonl` 在启动与终止各追加一条 JSON（终止条含 `sentinel_seen`/`exit`）；`prompt-<line>-<stage>.md.meta.json` 是派发前写入的静态信封。哨兵仍是日志最后一个非空行。
+- **心跳只证明 runner 外壳活着**：心跳循环以 `kill -0 "$runner_pid"` 为条件，外壳死亡即停跳。子代理是否卡死仍由阶段 deadline 判定。
+- **日志最后非空行**是哨兵判据；buffered 模式下日志在退出前静默属预期，由退出记录提供提前事件。
+- **降级**：CLI 不支持 stream-json 时 `progress=degraded reason=cli-lacks-stream`；派生失败先 `--finish` 恢复、再 buffered fallback；皆无则 `sentinel=0`（INCOMPLETE，绝不伪完成）。
+- **未脱离**：`--detached no` 时 status 另写 `unprotected=true` 与风险原因，不计为受保护运行。
 
 ## Recipe 3 — 脱离模式派发 + 统一监听（Detached Dispatch & Unified Watch，缺省形态）——**nohup 权威落点**
 
@@ -101,14 +70,14 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
 
 要点：
 
-- **脱离（detached）优先于前台**：`nohup … &` 让远端进程独立于 ssh 连接存活；派发命令立即返回，驱动者随后发起独立的监听窗口。简化变体（本地 ssh 后台 `ssh … "su - …" > 本地日志 2>&1 &`）仅适用于短阶段且连接稳定时——连接断开会杀掉子代理，故**缺省用脱离形态**。
+- **脱离（detached）优先于前台**：`nohup … &` 让远端进程独立于 ssh 连接存活；派发命令立即返回，驱动者随后发起独立的监听窗口。简化变体（本地 ssh 后台 `ssh … "su - …" > 本地日志 2>&1 &`）仅适用于短阶段且连接稳定时——连接断开会杀掉子代理，故**缺省用脱离形态**。派发记录 MUST 写 `detached=yes|no`；遗漏 `nohup` 或 `< /dev/null` 时记 `detached=no`，status 另写 `unprotected=true` 与风险原因，不计为受保护运行。
 - **外层三重重定向必须**：`nohup` 任务本体之外再带 `< /dev/null` 并把 ssh 通道的 stdout/stderr 重定向（`> /dev/null 2>&1`）——缺省时后台任务继承 ssh 通道的 stdio，本地 ssh 挂起直到超时（实测 2026-10-16：每次派发白烧一次 2 分钟本地超时，进程虽照常启动但驱动者节拍被打断）。runner 自身的 stdout/stderr 在 `su -c` 内层落 `runner-log`，保证归属 run-user 可读。
 - **监听机制阶梯（`watch-model.md` §4）**：长轮询窗口缺省 → 宿主原生通知仅作补充（且不得结束驱动者会话）→ 间隔轮询回退；**禁止**独立 `sleep N` 回合空等。
 - **窗口到期 ≠ 阶段超时**：watcher 返回 `RUNNING`（退出码 10）时立即发起下一窗口，不做 agent 侧等待；只有 `TIMEOUT`（阶段 deadline）进入 U5。这条把「监视器零匹配/窗口到期误判超时」与真正的阶段超时分开（2026-10 实测缺陷：`pgrep -c` 零匹配先输出 0 再被 `|| echo 0` 追加第二个 0，导致 clarify 已完成仍被误判超时）。
 - **TIMEOUT 不是终止命令**：watcher 在 deadline 后继续采样 `--deadline-grace` 秒（缺省 120s），晚完成会重判 `DONE`/`FAILED`。收到 `TIMEOUT` 后驱动者 MUST 先做 `--once` 最终快照；`pid=alive` + `heartbeat=fresh` 时不得仅凭 TIMEOUT 停线/杀进程；停线须用户显式决定并保留 worktree/status/log。
 - **正证据优先**：每轮一次读取退出记录 → PID 存活 → 日志尾行 → 心跳 mtime；进程消失、日志静默、`pgrep` 零匹配都**不是**完成。心跳只证明 runner 外壳活着，与 PID 一起看。
 - **多线批查**：一个窗口一次 ssh 检查多条线（`--manifest` 模式），任一线终止即返回全部线快照，**判定仍逐线独立做**；输出只保留判定行与必要证据，哨兵未现且进程存活时无需更多输出。
-- **观察面纪律（底稿注解：External Dispatch Visibility Contract，`subagent-definitions.md`）**：禁止**缓冲至退出**式派发——`qodercli -p "<prompt>" > agent.log 2>&1 &` 这种「输出缓冲到进程退出才落盘」的形态让运行期零可见性，是明令禁止的反模式。本机制的观察面是**阶段粒度**（哨兵出现在输出末尾）：`-p` 缓冲意味着阶段结束前日志静默——退出记录与窗口监听等的就是终止事件；若需阶段内进度/卡死检测，把 runner 换成流式输出（`--output-format stream-json`）形态。
+- **观察面纪律（底稿注解：External Dispatch Visibility Contract，`subagent-definitions.md`）**：禁止**缓冲至退出**式派发——`qodercli -p "<prompt>" > agent.log 2>&1 &` 这种「输出缓冲到进程退出才落盘」的形态让运行期零可见性，是明令禁止的反模式。`stage-runner.sh` 缺省用 `--output-format stream-json`：raw 落盘、live log 增量增长，退出记录与窗口监听仍以哨兵/退出记录为准；CLI 不支持时降级 buffered 并记 `progress=degraded`（efficiency-model §4）。
 - 终止判定 `DONE` / `INCOMPLETE` → 独立校验（见 stage-prompts.md）；其余终止判定 → U5；通过则派发下一阶段（回到 Recipe 1/2/3）。
 
 ## Recipe 4 — 阶段链与收尾（Stage Chain & Closure）——编排本体
@@ -145,6 +114,26 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
 ## Recipe 5 — 本地拓扑与变体
 
 - **本地拓扑**：项目在本机时省略 ssh/su，直接以本地项目为工作目录执行 runner；需求上下文先写简报文件（`/tmp/<topic>-sdd-brief.md`），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」——命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5（本配方坍缩为引用）。监听同样走 `watch-target.sh`，只是去掉 ssh/su 层（`watch-model.md` §6）。
+- **本地脱离（缺省形态，与远端同构）**：`setsid` 可用时优先，本机 macOS 无 `setsid` 时用 `nohup + disown`；stdin 接 `/dev/null`，stdout/stderr 重定向到 runner-log：
+
+  ```bash
+  if command -v setsid >/dev/null 2>&1; then
+    setsid nohup bash <skill-dir>/scripts/stage-runner.sh \
+      --cli "<cli>" --cli-args "<cli args>" --project-dir "<project-dir>" \
+      --prompt-file "<prompt-file>" --sentinel "<STAGE>-DONE" --line "<line>" \
+      --stage "<stage>" --state-dir "<state-dir>" --mode auto --detached yes \
+      </dev/null >"<state-dir>/runner-log-<line>-<stage>.log" 2>&1 &
+  else
+    nohup bash <skill-dir>/scripts/stage-runner.sh \
+      --cli "<cli>" --cli-args "<cli args>" --project-dir "<project-dir>" \
+      --prompt-file "<prompt-file>" --sentinel "<STAGE>-DONE" --line "<line>" \
+      --stage "<stage>" --state-dir "<state-dir>" --mode auto --detached yes \
+      </dev/null >"<state-dir>/runner-log-<line>-<stage>.log" 2>&1 &
+    disown
+  fi
+  ```
+
+  远端等价形态：`ssh <alias> "nohup su - <run-user> -c 'bash <skill-dir>/scripts/stage-runner.sh …' < /dev/null > /dev/null 2>&1 &"`。两种拓扑的派发记录都写 `detached=yes`；无法脱离时写 `no` 并按未受保护运行记录风险。重入先 `watch-target.sh --once` 快照，已完成的阶段只核验、不重派。
 - **构建固化变体**：同一主机按角色分线（不同系统用户在各自目录固化不同层），仅经入口参数（执行身份、路径）区分，机制零新增分支——形态见同文件 § Recipe 6。
 
 ## Recipe 6 — 线路登记、归属信封与消息入口（064）

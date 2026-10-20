@@ -183,6 +183,30 @@ together with the proposed change and its substantive reason. Never rewrite the
 plan silently and never re-run the plan stage yourself.
 ```
 
+## Progress & Detach Blocks（进度与脱离）
+
+> Owner of the stream/detach rules is `references/efficiency-model.md` §4.
+
+### 派发块（每个阶段）
+
+```text
+PROGRESS & DETACH: this stage runs under stage-runner.sh with
+--output-format stream-json by default. The raw stream (raw-<line>-<stage>.jsonl)
+and the derived live log (log-<line>-<stage>.log) are evidence; only a terminal
+result may leave the sentinel as the last non-empty line. The dispatch record
+carries detached=yes|no; detached=no is recorded as an unprotected run with a
+risk reason. Progress growth and raw bytes never decide completion.
+```
+
+### 重入块（新会话接管时）
+
+```text
+REENTRY: before dispatching or resuming, run watch-target.sh --once against the
+recorded pid/status/log/heartbeat. A completed stage is verified, never
+redispatched. Wait only inside the long-poll window; do not add an independent
+sleep turn and do not start any resident service.
+```
+
 ## Stall Handling & State Spine（卡死处置与状态脊，U5）
 
 ### 缺省值（入口参数可覆盖）

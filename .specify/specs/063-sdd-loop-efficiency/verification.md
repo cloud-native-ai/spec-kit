@@ -178,3 +178,67 @@ recording), **driver closure** (owned by the driver after review).
 - `PLAN-EDIT:` format owner, two-branch routing and the framework-internal
   explicit exclusion are visible in the owner document and prompts.
 - US3 checkpoint closed.
+
+## US4 — stream progress and detached runner (T033–T043)
+
+### T033/T034/T035 — red-first (automated)
+
+- Red: `notes/red-first-evidence.md` § T033 (8 failed), § T034 (7 failed,
+  runner absent), § T035 (10 PD failures).
+- Green (T041): `tests/unit/test_derive_live_log.py
+  tests/integration/test_sdd_loop_efficiency_runner.py
+  tests/contract/test_sdd_loop_driver_efficiency.py -q` → `57 passed in 13.48s`.
+
+### T036/T037/T038 — derivation, runner, watcher (automated)
+
+- `derive-live-log.py`: incremental prefixed progress lines with `evt=`/`at=`,
+  terminal `result` text appended verbatim at EOF, `--finish` recovery,
+  malformed input tolerated without fabricated completion.
+- `stage-runner.sh`: auto probe and `--output-format stream-json` pipeline,
+  raw + receive-timestamp sidecar, derived live log, four-piece set + runner
+  log, `exit/sentinel/progress/detached` status (with `unprotected=true` and
+  risk reason for `--detached no`), exit code = CLI rc, degradation chain
+  (`cli-lacks-stream` → `derivation-recovered` → `buffered-fallback` →
+  `sentinel=0`).
+- `watch-target.sh`: `--raw-stream` visibility (`stream=na|absent|growing|idle`,
+  `raw=`/`bytes=` on EVIDENCE, never a verdict input); four stream self-tests
+  plus a `stream-progress-not-done` sub-check. Self-test: `33 passed, 0 failed`
+  (28 historical + 4 stream cases + the progress sub-check; no case deleted).
+
+### T039/T040 — owner document, recipes, prompts, mirror (automated)
+
+- `references/efficiency-model.md` §4; `watch-model.md` §2/§3/§4/§10 progress,
+  degradation and raw evidence (verdict table unchanged); Recipe 2 switched to
+  `stage-runner.sh` (old `sed` form explicitly superseded); Recipe 3/5 nohup
+  forms and `detached` recording; stage-prompts progress/detach/re-entry blocks.
+- Mirror: 7 changed (2 new scripts); `diff -rq` exit 0; `--check --only ...` →
+  `ok (21 files)`; new scripts keep the executable bit in the mirror.
+
+### T041 — live runs and quickstart S4/S5 (automated + recorded)
+
+- S4a: INCOMPLETE (15), last line is a prefixed progress line; S4b: DONE (0)
+  from the terminal result. S5: `status` has `exit=0 sentinel=1 progress=stream
+  detached=yes`, live log ends `PLAN-DONE`, raw/sidecar 4/4 lines; `--once`
+  re-entry returns DONE without redispatch. Details in `notes/quickstart-run.md`.
+- SC-008/009/011 automated evidence: runner integration + derive unit +
+  watcher self-tests; `--once` re-entry in
+  `test_once_snapshot_does_not_redispatch`.
+
+### T042 — mutation drill (8 applications, all restored)
+
+| Mutation | Red test | Restore |
+|----------|----------|---------|
+| non-terminal events emit a bare sentinel | `test_non_terminal_sentinel_not_bare_last_line` | checksum equal |
+| result text written before progress lines | `test_terminal_result_appended_verbatim` (+ incremental pipe) | checksum equal |
+| delete result extraction | `test_terminal_result_appended_verbatim` | checksum equal |
+| force buffered even when stream is available | `test_auto_selects_stream_when_cli_advertises_capability` | checksum equal |
+| skip status write | `test_stream_mode_writes_raw_and_live` | checksum equal |
+| drop the detached record | `test_status_fields_and_exit_code_propagation` | checksum equal |
+| progress growth produces DONE | `stream-progress-not-done` (self-test) | checksum equal |
+| read the sentinel from raw | `stream-progress-not-done` + `stream-nonterminal-sentinel` | checksum equal |
+
+### T043 — post-mutation re-run (automated)
+
+- `57 passed in 13.48s`, exit 0; watcher self-test `33 passed, 0 failed`;
+  quickstart S4/S5 re-run identical. No self-test case was removed by the
+  repairs. US4 checkpoint closed.
