@@ -13,7 +13,7 @@ Distill the **current AI tool's** past conversations **for the current project**
 
 This skill owns the executable core of `/speckit.history`: Steps 1–6 (tool identification, clean extraction, five-dimension distillation, theme aggregation, manifest handling) and the Safety Rules, all inline. The per-tool heavy lifting is externalized to the engines — `.specify/scripts/bash/collect-history.sh` (locate / extract / manifest-update) and `.specify/scripts/python/history-utils.py` (pluggable `STORE_RESOLVERS` per tool) — and this skill drives them as invocation instructions. The command template keeps entry, user-input handling, and lifecycle only.
 
-Canonical extraction source: `templates/commands/history.md` § Steps 1–6 and § Safety Rules. Content moved here verbatim in substance. Long-form reference (owner of the conceptual model): `docs/reference/commands/history.md`.
+Canonical extraction source: `.specify/templates/commands/history.md` § Steps 1–6 and § Safety Rules. Content moved here verbatim in substance. Long-form reference (owner of the conceptual model): `docs/reference/commands/history.md`.
 
 ## Input Contract
 

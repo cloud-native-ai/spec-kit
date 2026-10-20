@@ -26,7 +26,7 @@
 
 ## 采集子集边界(防侵蚀)
 
-采集子集(`scripts/js/better-harness/`)**只进事实,不进观点**:上游的评分、严重度、建议目录、渲染层永久排除在子集之外(清单见其 `UPSTREAM.md` 与 contracts/engine-subset-boundary.md)。向子集新增文件必须同步更新 UPSTREAM.md 清单,且不得来自排除清单。
+采集子集(`.specify/scripts/js/better-harness/`)**只进事实,不进观点**:上游的评分、严重度、建议目录、渲染层永久排除在子集之外(清单见其 `UPSTREAM.md` 与 contracts/engine-subset-boundary.md)。向子集新增文件必须同步更新 UPSTREAM.md 清单,且不得来自排除清单。
 
 ## 消费方响应约定(参考)
 

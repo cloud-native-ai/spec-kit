@@ -2,7 +2,7 @@
 
 本文件覆盖三件事：交付产物**怎么跑出图**、**几何为什么必须由调用方给出**、以及**布局/走线 pass 到底能做什么**。XML 语法侧见 `./mxgraph-format.md`。
 
-> **轴②「渲染位置」不在本文件内声明。** 渲染方式（本地 / 远端 / 共享渲染服务）正在另一条流程中重新裁定。本文件只登记 draw.io 的**引擎能力事实**——它能经哪些路径渲染与导出——不声明本套件采用哪条路径，也**不对各路径排优劣**；选路判据 owner 是 `skills/external/draw-diagram/references/routing-matrix.md` §0（该节目前明确**不登记轴②取值**）。下文对「远端路径」的记录是能力清单的一部分，**不是**选型结论。
+> **轴②「渲染位置」不在本文件内声明。** 渲染方式（本地 / 远端 / 共享渲染服务）正在另一条流程中重新裁定。本文件只登记 draw.io 的**引擎能力事实**——它能经哪些路径渲染与导出——不声明本套件采用哪条路径，也**不对各路径排优劣**；选路判据 owner 是 `.specify/skills/draw-diagram/references/routing-matrix.md` §0（该节目前明确**不登记轴②取值**）。下文对「远端路径」的记录是能力清单的一部分，**不是**选型结论。
 
 > **验证状态**：本机无 draw.io Desktop / CLI，故本文件的全部渲染与导出结论**均来自官方文档，未经一次真实执行**。已实测的部分只有 XML 结构层（见 `./mxgraph-format.md` §9 第 1 项）。
 
@@ -84,7 +84,7 @@ S1f 草稿曾断言「**引擎不含自动布局**，调用方必须自算全部
 
 **引擎侧的硬事实**：`postLayout` **会移动 vertex**。因此凡「调用方给定的位置本身必须保留」，就不能开 `postLayout`——`libavoid` 明确「Vertices stay exactly where you placed them」，是这种场景的选项。
 
-> **边界声明（防层级越界）**：官方文档在描述各 pass 时会举例说明它们**各自擅长哪类图**（如 libavoid 之于连接密集的架构/拓扑，elk 之于有向层级流程）。本文件**只登记「pass 会不会动 vertex」这一引擎侧事实**，不据此推荐图类、也不判断某张图的空间排布是否「承载含义」——**「该画成什么图类」「版面本身是否承载语义」是语义判断，owner 是前门**（`skills/external/draw-diagram/SKILL.md`）。前门若已给出几何与版面意图，本文件的一切 pass 建议**一律让位**。
+> **边界声明（防层级越界）**：官方文档在描述各 pass 时会举例说明它们**各自擅长哪类图**（如 libavoid 之于连接密集的架构/拓扑，elk 之于有向层级流程）。本文件**只登记「pass 会不会动 vertex」这一引擎侧事实**，不据此推荐图类、也不判断某张图的空间排布是否「承载含义」——**「该画成什么图类」「版面本身是否承载语义」是语义判断，owner 是前门**（`.specify/skills/draw-diagram/SKILL.md`）。前门若已给出几何与版面意图，本文件的一切 pass 建议**一律让位**。
 
 ### 3.5 因此「布局」在本技能里的含义
 
@@ -106,7 +106,7 @@ S1f 草稿曾断言「**引擎不含自动布局**，调用方必须自算全部
 
 ## 5. 语义层与引擎选择指针（本文件不承载）
 
-- 语义模型 → `skills/external/draw-diagram/references/semantic-model.md`（**现存**）
-- **引擎选择**、`drawio` ↔ `excalidraw` 优先序、能力轴层与反路由红线 → `skills/external/draw-diagram/references/routing-matrix.md`（**现存**）
-- 版面规划与自由度判据、图类选择、样式配色、内容措辞、类专属约定 → 前门 `skills/external/draw-diagram/SKILL.md`（**现存**）；其专章参考文件（`references/howto/*`、`references/guide/*`、`references/document/*`）由 stage S1d 规划、**尚未落盘**，故不预建具体路径
+- 语义模型 → `.specify/skills/draw-diagram/references/semantic-model.md`（**现存**）
+- **引擎选择**、`drawio` ↔ `excalidraw` 优先序、能力轴层与反路由红线 → `.specify/skills/draw-diagram/references/routing-matrix.md`（**现存**）
+- 版面规划与自由度判据、图类选择、样式配色、内容措辞、类专属约定 → 前门 `.specify/skills/draw-diagram/SKILL.md`（**现存**）；其专章参考文件（`references/howto/*`、`references/guide/*`、`references/document/*`）由 stage S1d 规划、**尚未落盘**，故不预建具体路径
 - XML 语法、容器构造与生成硬性规则 → `./mxgraph-format.md`（同技能内）

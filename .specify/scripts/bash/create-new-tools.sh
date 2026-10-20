@@ -128,7 +128,7 @@ fi
 if git rev-parse --show-toplevel >/dev/null 2>&1; then
     ROOT_DIR=$(git rev-parse --show-toplevel)
 else
-    # Fallback: assume script is in scripts/bash (depth 2)
+    # Fallback: assume script is in .specify/scripts/bash (depth 2)
     ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 fi
 
@@ -407,7 +407,7 @@ get_template_file() {
         return
     fi
 
-    # Templates are owned by the create-tools skill; the templates/ paths are a
+    # Templates are owned by the create-tools skill; the .specify/templates/ paths are a
     # fallback for installs predating the move.
     local candidate
     for candidate in \

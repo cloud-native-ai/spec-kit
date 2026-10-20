@@ -13,7 +13,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-skills/SKILL.md>"
 
 ## Input Contract
 
-- **输入**:技能标识——名称(如 `my-draft`)或规范路径(如 `skills/internal/my-draft/SKILL.md`),来自调用方参数或会话上下文;名称可省略扩展名。
+- **输入**:技能标识——名称(如 `my-draft`)或规范路径(如 `.specify/skills/internal/my-draft/SKILL.md`),来自调用方参数或会话上下文;名称可省略扩展名。
 - **消歧**:输入若命中 `/speckit.*` 命令名(命令面,非技能),报告该名字属命令面并指向对应 `/speckit.*` 入口,不强行执行。
 - **递归**:目标是 run-skills 自身时照常执行并披露这一点;无特殊分支。
 
@@ -39,7 +39,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-skills/SKILL.md>"
 
 ### 3. 执行(加载并遵照,不内联)
 
-- 读取命中路径的 `SKILL.md` 正文,**将其作为本次运行的最高执行指引**,输入按调用方接线;技能自带 `${SKILL_HOME}`(技能自有资源)/`${SKILL_WORKDIR}`(运行时产物)路径约定按其正文与 `skills/external/create-skills/SKILL.md` 的路径约定解释。
+- 读取命中路径的 `SKILL.md` 正文,**将其作为本次运行的最高执行指引**,输入按调用方接线;技能自带 `${SKILL_HOME}`(技能自有资源)/`${SKILL_WORKDIR}`(运行时产物)路径约定按其正文与 `.specify/skills/create-skills/SKILL.md` 的路径约定解释。
 - 把目标技能的产出/报告**转述**给调用方;MUST NOT 将目标技能的逻辑复制进本技能。
 - 运行中发现的异常按目标技能自身的治理处理;run-skills 自身对「无法解析/无效制品/越界路径」三类异常停在本层并上送可行动错误。
 

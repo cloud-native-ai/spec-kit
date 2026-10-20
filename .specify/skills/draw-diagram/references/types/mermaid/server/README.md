@@ -18,7 +18,7 @@
 ## 2. 构建镜像
 
 ```bash
-cd skills/external/draw-diagram/references/types/mermaid/server
+cd .specify/skills/draw-diagram/references/types/mermaid/server
 docker build -t reg.docker.alibaba-inc.com/cws-images/images-mermaid-server:1.0.0 .
 # 内网镜像仓库（如 alibaba-inc registry）：
 docker push reg.docker.alibaba-inc.com/cws-images/images-mermaid-server:1.0.0
@@ -31,7 +31,7 @@ docker push reg.docker.alibaba-inc.com/cws-images/images-mermaid-server:1.0.0
 
 ```bash
 # 简单方式（等价于 plantuml-server 的 docker-run.sh 简化版）
-bash skills/external/draw-diagram/references/types/mermaid/server/docker-run.sh            # 默认 9696
+bash .specify/skills/draw-diagram/references/types/mermaid/server/docker-run.sh            # 默认 9696
 # 或手动：
 docker run -d --name mermaid-server --restart unless-stopped \
   -p 9696:9696 reg.docker.alibaba-inc.com/cws-images/images-mermaid-server:1.0.0
@@ -41,7 +41,7 @@ docker run -d --name mermaid-server --restart unless-stopped \
 
 ```bash
 export MERMAID_SERVER=http://<内网主机>:9696
-bash skills/external/draw-diagram/references/types/mermaid/scripts/render-mermaid.sh figure.mmd figures/ figure
+bash .specify/skills/draw-diagram/references/types/mermaid/scripts/render-mermaid.sh figure.mmd figures/ figure
 # → 走内网服务器渲染（默认后端即 server，远端优先）
 ```
 

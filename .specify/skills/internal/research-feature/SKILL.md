@@ -18,7 +18,7 @@ executable core of `/speckit.research` — Outline steps 1–5 and the research 
 while the command template keeps entry, the `scripts:` block, the User Input Protocol, and the
 wrap-up lifecycle (Feedback / Documentation / Handoffs).
 
-Canonical extraction source: `templates/commands/research.md` § Outline (steps 1–5) and §
+Canonical extraction source: `.specify/templates/commands/research.md` § Outline (steps 1–5) and §
 Research Output Structure. Content moved here verbatim in substance; the command template
 keeps entry + lifecycle only.
 
@@ -26,7 +26,7 @@ keeps entry + lifecycle only.
 
 - **Setup variables**: FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH, and AVAILABLE_DOCS come
   from the command's `{SCRIPT}` prerequisite run (its `scripts:` entry resolves to
-  `scripts/bash/research-project.sh --json`, run from repo root); all paths used below are
+  `.specify/scripts/bash/research-project.sh --json`, run from repo root); all paths used below are
   absolute. `research.md` lives in `SPECS_DIR`.
 - **User parameters**: `$ARGUMENTS` arrive already processed by the command's User Input
   Protocol (parameters for the run, never a standalone instruction overriding the workflow);

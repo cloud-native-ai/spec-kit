@@ -53,7 +53,7 @@ So the practical rule when building a roster: decide **what the member writes to
 
 ### 消解条款:「每席皆 Worker」vs canonical 写权(本节为该消解的唯一真源)
 
-一个 pattern 的**每个执行席位都是 Worker**(serial 链的常态,见 `templates/agents/agent-serial-orchestration-template.md`)与上面的写权门并不冲突,因为二者约束的是**不同的写目标**。消解规则:
+一个 pattern 的**每个执行席位都是 Worker**(serial 链的常态,见 `.specify/templates/agents/agent-serial-orchestration-template.md`)与上面的写权门并不冲突,因为二者约束的是**不同的写目标**。消解规则:
 
 - **Worker 只产补丁到工作区** —— 交付物落在业务路径或运行工作区(`.specify/teams/.work/<slug>/`);这是 Worker 的合法写面,不需要 Meta 身份。
 - **交付物本身就是 agent / skill / team 定义时**,花名册 MUST 含**唯一 Meta supervisor**(Team Supervisor),由它把 Worker 产出的补丁落到 canonical 路径;Worker MUST NOT 直接写 canonical 定义文件。
@@ -91,4 +91,4 @@ The team domain has **four** collaboration patterns. Each encodes a different **
 
 ## Template home
 
-The multi-agent authoring templates (team-supervisor, the three EEI stages, and the parallel/serial/triad orchestration templates + workflow schema) live in `skills/internal/create-team/templates/agents/` (installed mirror: `.specify/skills/internal/create-team/templates/agents/`). The single-agent **capacity** templates (`agent-capacity-<X>-template.md`) and the custom/project-custom scaffolds remain in `skills/internal/create-agent/templates/`. The `continuous` operating discipline is documented in [`operating-loops.md`](operating-loops.md).
+The multi-agent authoring templates (team-supervisor, the three EEI stages, and the parallel/serial/triad orchestration templates + workflow schema) live in `.specify/skills/internal/create-team/templates/agents/` (installed mirror: `.specify/skills/internal/create-team/templates/agents/`). The single-agent **capacity** templates (`agent-capacity-<X>-template.md`) and the custom/project-custom scaffolds remain in `.specify/skills/internal/create-agent/templates/`. The `continuous` operating discipline is documented in [`operating-loops.md`](operating-loops.md).

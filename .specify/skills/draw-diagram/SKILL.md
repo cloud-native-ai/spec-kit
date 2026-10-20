@@ -65,7 +65,7 @@ classification: external
 | `plantuml` | [./references/types/plantuml/plantuml.md](./references/types/plantuml/plantuml.md) | 严格 UML 语义、WBS/甘特/Salt/JSON/YAML/ER |
 
 选型判据（独占登记、图类矩阵、tie-break）见 [./references/routing-matrix.md](./references/routing-matrix.md)；
-每个引擎层内部自带 `references/`（L5）、`scripts/`、`assets/`，其相对路径与自定位脚本按引擎层根目录解释。
+每个引擎层内部自带 `references/`（L5）、`.specify/scripts/`、`assets/`，其相对路径与自定位脚本按引擎层根目录解释。
 
 ## Workflow
 
@@ -105,7 +105,7 @@ classification: external
 ### Step 3: 分派到引擎层
 
 - 读选定引擎的入口文档 `references/types/<engine>/<engine>.md`，按其自身流程渲染；传入 **SDS 文件路径**（SDS = Semantic Drawing Spec，即 LDM + Geometry 的落盘形态，schema 见 [./references/semantic-model.md](./references/semantic-model.md)）+ 目标/输出要求 + **交付契约**（[./references/delivery-contract.md](./references/delivery-contract.md)：HTML 包装、源文件与图片保留、面向用户的文字规则、交互式网页交付 § D7（interactivity_intent ≠ none 时适用））；尽量 file-path-only handoff。**`weight_plan` 随 SDS 一并传递**，由引擎层按其「强弱实现」小节落地（各引擎线宽/边框语法归引擎层自有）；**`interactivity_intent` 同随 SDS 传递**，由引擎层按其「交互实现」小节落地（当前 d3js / echarts 设有该节；`level: none` 时无交互义务）
-- 引擎层的 `scripts/` 按其文档给定的调用形式执行：`${SKILL_HOME}` 指本技能根目录，故引擎脚本路径形如 `${SKILL_HOME}/references/types/<engine>/scripts/<script>`
+- 引擎层的 `.specify/scripts/` 按其文档给定的调用形式执行：`${SKILL_HOME}` 指本技能根目录，故引擎脚本路径形如 `${SKILL_HOME}/references/types/<engine>/scripts/<script>`
 - 前门层不渲染、不手改引擎产物、不改引擎脚本（score = f(target) 纪律在引擎层各自生效）
 - **只加载选定引擎那一层**：不得为了「参考」而把其它引擎层的文档读进上下文
 
@@ -126,8 +126,8 @@ classification: external
 
 | 层 | 承载面 | 这一层做什么 |
 |----|--------|-------------|
-| **L1** | `skills/external/draw-diagram/SKILL.md`（本文件） | 分析语义逻辑，构建 LDM 与几何层，产出**整体逻辑图表设计**（Step 1） |
-| **L2** | `skills/external/draw-diagram/references/*.md` | 选型与判据分析：路由矩阵 / 独占登记 / tie-break / 能力轴（Step 2）、LDM/SDS schema 与覆盖检查、**交付契约**（交付形态 + 面向用户的文字规则） |
+| **L1** | `.specify/skills/draw-diagram/SKILL.md`（本文件） | 分析语义逻辑，构建 LDM 与几何层，产出**整体逻辑图表设计**（Step 1） |
+| **L2** | `.specify/skills/draw-diagram/references/*.md` | 选型与判据分析：路由矩阵 / 独占登记 / tie-break / 能力轴（Step 2）、LDM/SDS schema 与覆盖检查、**交付契约**（交付形态 + 面向用户的文字规则） |
 | **L3** | 分派决策本身 | 选定后读入对应引擎层入口文档，传 SDS 路径 + `weight_plan` + 交付契约（Step 3） |
 | **L4** | `references/types/<engine>/<engine>.md` | 针对**自身图表类型**做引擎侧逻辑设计：「SDS 实现与强弱落地」小节把语义档位落实为本引擎的绝对线宽/字号，并声明几何兑现义务 |
 | **L5** | `references/types/<engine>/references/*.md` | 各层面完善并输出最终图表：语法/格式、渲染与导出、引擎指南与坑位 |
@@ -135,7 +135,7 @@ classification: external
 **当前落地状态（如实记录，不粉饰）**：
 
 - L1–L5 五层均已在盘：六个引擎层于 2026-10-12 由原 `draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml}`
-  六个独立技能整体内置而来，内容无损、形式按本技能惯例重表达，各引擎层的 `references/`、`scripts/`、
+  六个独立技能整体内置而来，内容无损、形式按本技能惯例重表达，各引擎层的 `references/`、`.specify/scripts/`、
   `assets/`、`best-practices/` 子树原样保留（其内部相对链接与自定位脚本随子树整体迁移，未打断）。
 - 跨引擎**同名的 47 个 `.md` 文件经哈希比对无一内容相同**，全部已分化——实测口径（勿凭文件名判定重复）：
   `12-gantt-diagram.md` 在 mermaid 是 73 行、在 plantuml 是 1708 行；`layout.md` 是 69 行 vs 471 行；
@@ -171,7 +171,7 @@ classification: external
 
 ## Self-Improvement Contract
 
-- Canonical owner: `skills/external/draw-diagram/`（镜像 `.specify/skills/draw-diagram/` 由 sync-mirrors 生成，不手改）
+- Canonical owner: `.specify/skills/draw-diagram/`（镜像 `.specify/skills/draw-diagram/` 由 sync-mirrors 生成，不手改）
 - Own-run observation: 每次分派的路由命中（独占/矩阵/tie-break/问用户）、验收覆盖结果、重渲染次数
 - Mutation route: `improve-skills`（路由错配、矩阵缺口、LDM 字段不足、引擎层语法/坑位均走此路由修订本技能）
 - Validation route: 路由判定用 arena 账本历史案例回放；纪律类修订按 create-skills 压力测试法 RED-GREEN；

@@ -19,7 +19,7 @@ classification: external
 
 - **加载本手册的宿主 agent 就是驱动者**：U0–U6（探测/派发/轮询/校验/续环/收尾）由加载者在自己的会话亲自执行，不得委托任何 subagent；**自检**：若处于 subagent 上下文且被赋予「代为驱动循环」的任务，按显式异常行上报并停在前置阶段——嵌套驱动永不是合法形态。
 - **流程不可替换**：不得用 improve-skills/create-skills 等维护路径替代 U0–U6（Hard Requirement 7）。
-- **派发治理义务上收**：子代理提示词不引用/加载驱动技能、不含循环逻辑；义务全文与派发前拦截见 `skills/internal/run-agent/SKILL.md` 派发治理节与 subagent-definitions § Dispatch-Time Governance Obligation。
+- **派发治理义务上收**：子代理提示词不引用/加载驱动技能、不含循环逻辑；义务全文与派发前拦截见 `.specify/skills/internal/run-agent/SKILL.md` 派发治理节与 subagent-definitions § Dispatch-Time Governance Obligation。
 - **两侧环境模型**：spec-kit 只要求存在于执行侧（目标项目）；编排侧宿主无需安装，缺之不构成缺口（真源：`.specify/shared/workflow/execution-topology.md`）。
 
 ## When to Load
@@ -65,7 +65,7 @@ U5 STALL     超时/重试上限/预算触顶 → 停线、状态脊落盘、出
 U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归档清扫，缺省本地合并）+ 一份收尾汇总
 ```
 
-多条线并行 = 多个独立循环实例：一线一连接、一线一状态脊。首次派发前登记环境级 Line Registry（`scripts/line-registry.py --action register`），事件携带 `(line_id, run_id)` 信封，U6 后 `deregister`；无标识消息经 `resolve-message` 判定，禁止进程扫描推断。
+多条线并行 = 多个独立循环实例：一线一连接、一线一状态脊。首次派发前登记环境级 Line Registry（`.specify/scripts/line-registry.py --action register`），事件携带 `(line_id, run_id)` 信封，U6 后 `deregister`；无标识消息经 `resolve-message` 判定，禁止进程扫描推断。
 
 U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计划；未产出前不得进入 U2，更不得直接编辑目标仓库。
 
@@ -106,10 +106,10 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - `references/dispatch-recipes.md` — 五大执行机制：断点探测、阶段化 prompt、runner 与派生、统一监听、收尾；阶段链与哨兵；hook/SSH 窗口；线路登记与消息入口。
 - `references/watch-model.md` — 统一监听模型：信号源、判定状态机、窗口与阶段期限、`pgrep -c` 零匹配陷阱、多线 manifest、宿主适配与自测；归属层与重接线快照（§11）；hook 事件补充、SSH 远程读法与故障矩阵（§12–§13）。
 - `references/stage-prompts.md` — 三段骨架、独立校验、Line/Envelope/Ingress、重接线/orphan/U6、变体、并发隔离与窄读法授权、卡死处置与状态脊。
-- `scripts/watch-target.sh` — 长轮询 watcher 参考实现（单目标/多目标、快照与自测、归属过滤、hook、`--raw-stream`、lease 续租）。
-- `scripts/hook-stop.sh` / `watch-hook.sh` — Stop hook 模板（原子写 done JSON + FIFO）与远端同身份长读（`HOOK_TIMEOUT`）。
-- `scripts/line-registry.py` — Python 3 stdlib-only 引擎：环境级 Registry、原子写/同线锁、信封分类、消息入口、所有权/集成队列、lease/reservation/身份校验。
-- `scripts/decomposition-check.py` / `pre-analyze-check.py` / `overlap-check.py` — 三个确定性门：大特性拆分、跨产物预检、跨特性重叠（规则 owner：efficiency-model §5–§7）。
+- `.specify/scripts/watch-target.sh` — 长轮询 watcher 参考实现（单目标/多目标、快照与自测、归属过滤、hook、`--raw-stream`、lease 续租）。
+- `.specify/scripts/hook-stop.sh` / `watch-hook.sh` — Stop hook 模板（原子写 done JSON + FIFO）与远端同身份长读（`HOOK_TIMEOUT`）。
+- `.specify/scripts/line-registry.py` — Python 3 stdlib-only 引擎：环境级 Registry、原子写/同线锁、信封分类、消息入口、所有权/集成队列、lease/reservation/身份校验。
+- `.specify/scripts/decomposition-check.py` / `pre-analyze-check.py` / `overlap-check.py` — 三个确定性门：大特性拆分、跨产物预检、跨特性重叠（规则 owner：efficiency-model §5–§7）。
 
 ## Boundary
 
@@ -123,8 +123,8 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 
 本手册是**编排者**：它不自带派发机制，而是委派两个承接技能完成驱动子代理的任务（2026-10-16 委派化裁定）：
 
-- **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 按职责实例化阶段执行实例（一实例一职责）；产出=`.specify/agents/instances/<slug>.agent.md`。
-- **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：以 Execution 拓扑声明（本地/远端）+ 实例引用发起执行；产出=执行结果或可见性三元组；前置检查与失败处置见其 `references/dispatch-preflight.md`。
+- **实例创建 → create-agent**（`.specify/skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 按职责实例化阶段执行实例（一实例一职责）；产出=`.specify/agents/instances/<slug>.agent.md`。
+- **阶段派发 → run-agent**（`.specify/skills/internal/run-agent/SKILL.md`）：以 Execution 拓扑声明（本地/远端）+ 实例引用发起执行；产出=执行结果或可见性三元组；前置检查与失败处置见其 `references/dispatch-preflight.md`。
 - **编排本体在本手册**：阶段序列（U0–U6）、状态脊、哨兵与独立校验、卡死处置、收尾合并不由承接技能承担（职责切分见 agent-definitions § Driving Subagents via the Three Layers）。
 
 ## Feedback & Probe Points（反馈与探针采集点）
@@ -141,7 +141,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 
 - **派发前（U2）只读查档**：按目标 CLI 档案选择超时/脱离形态，派发记录写 `profile_id` / `profile_version` / `observed_cli_version`；匹配且无新事实不产生反馈。
 - **U4/U5 观测后更新**：实际行为与 `known` 不符、`unknown` 获得已验证值、或新版本/平台行为首次出现时，先写状态脊 `cli_observations`，再更新档案 provenance，再记录恰好一条 `cli-profile:<cli>` 反馈；无新事实零反馈。
-- **派发资格**：仍由 `CAPABILITY_MATRIX`（`scripts/python/execution-config.py`）**唯一**拥有；档案只记录观测，冲突时资格以矩阵为准。
+- **派发资格**：仍由 `CAPABILITY_MATRIX`（`.specify/scripts/python/execution-config.py`）**唯一**拥有；档案只记录观测，冲突时资格以矩阵为准。
 - 档案更新不得改变哨兵、watcher 判定/退出码、确认门、阶段 deadline 或测试预算；当前阶段使用 U2 记录的形态。
 
 ## Wrap-up

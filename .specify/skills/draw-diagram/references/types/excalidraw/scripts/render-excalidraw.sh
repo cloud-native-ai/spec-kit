@@ -4,7 +4,7 @@
 #
 # Same remote-first policy as plantuml's render-plantuml.sh:
 #   • server — POST the scene to an excalidraw render service (EXCALIDRAW_SERVER).
-#              THE DEFAULT. The service is the `scripts/server/` bundled with the
+#              THE DEFAULT. The service is the `.specify/scripts/server/` bundled with the
 #              excalidraw engine layer (Node + headless Chromium driving the real
 #              @excalidraw/excalidraw export pipeline).
 #   • local  — start the bundled render service on this machine for this run,

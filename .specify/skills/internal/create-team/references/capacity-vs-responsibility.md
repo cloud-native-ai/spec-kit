@@ -4,14 +4,14 @@
 
 Two skills author agent-shaped Markdown, and the recurring confusion is "which one do I edit?". The answer is a single axis:
 
-| | `skills/internal/create-agent/templates/` | `skills/internal/create-team/templates/agents/` |
+| | `.specify/skills/internal/create-agent/templates/` | `.specify/skills/internal/create-team/templates/agents/` |
 |---|---|---|
 | **Center of gravity** | the **agent** | the **team** |
 | **What it defines** | **capacity** — what this agent *can do* | **responsibility** — what this agent *is accountable for inside one team* |
 | **Question answered** | "who is this professional?" | "what is this seat in the formation?" |
 | **Scope of validity** | team-agnostic; valid in any team or standalone | valid only inside the team/run that instantiated it |
 | **Typical lifecycle** | `persistent` — stored at `.specify/agents/templates/<slug>.agent.md` | mostly `temporary` — lives in the orchestrator's context for one run |
-| **Files** | `agent-capacity-<X>-template.md`, `agent-project-custom-template.md`, `agent-supervision-delegation.md`, `agent-skill-enablement.md` | `agent-team-supervisor-template.md`, `agent-stage-{executor,evaluator,optimizer}-template.md`, the `agent-*-orchestration-template.md` set, `agent-workflow-schema.md`; `teams/` stays in `templates/` |
+| **Files** | `agent-capacity-<X>-template.md`, `agent-project-custom-template.md`, `agent-supervision-delegation.md`, `agent-skill-enablement.md` | `agent-team-supervisor-template.md`, `agent-stage-{executor,evaluator,optimizer}-template.md`, the `agent-*-orchestration-template.md` set, `agent-workflow-schema.md`; `teams/` stays in `.specify/templates/` |
 
 ## What belongs to capacity (create-agent)
 

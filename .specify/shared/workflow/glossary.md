@@ -6,7 +6,7 @@ embed a lightweight `## Glossary` step that points here (modeled on the `## Feed
 
 The glossary is a **documentation/prompt-framework** artifact (Constitution Principle IX):
 correction and conflict *judgment* are AI-agent behaviors interpreted from this doc; the
-`scripts/python/glossary-utils.py` engine performs only deterministic file operations and
+`.specify/scripts/python/glossary-utils.py` engine performs only deterministic file operations and
 structural conflict detection.
 
 The glossary is loaded as **ambient context** for every command via the Documentation Map
@@ -67,7 +67,7 @@ and **same-term/different-meaning** clashes.
 
 Non-conflicting writes MUST proceed directly (non-blocking) and be merged into the flow's
 wrap-up report — only conflicts and overwrites of user-authored entries stop for user
-resolution (see below; criteria: `shared/guidelines/confirmation-gates.md`).
+resolution (see below; criteria: `.specify/shared/guidelines/confirmation-gates.md`).
 
 - On any detected or plausible conflict, **present it** (candidate, colliding entries, kind)
   and obtain an **explicit user resolution** (`keep-existing` / `replace` / `merge-variant` /

@@ -13,8 +13,8 @@ classification: internal
 
 ## Path Conventions
 
-- 引擎:`.specify/scripts/python/evidence-utils.py`(镜像 `scripts/python/`)
-- 采集子集:`scripts/js/better-harness/`(镜像 `.specify/scripts/js/better-harness/`,溯源见其 `UPSTREAM.md`)
+- 引擎:`.specify/scripts/python/evidence-utils.py`(镜像 `.specify/scripts/python/`)
+- 采集子集:`.specify/scripts/js/better-harness/`(镜像 `.specify/scripts/js/better-harness/`,溯源见其 `UPSTREAM.md`)
 - 证据存储:`.specify/memory/evidence/<run-id>/{findings.json,manifest.json,lanes/}`;索引不落盘,由运行目录**即读即建**(并发流程各写各的 `ev-*` 目录,不共享可写索引)
 - 消费约定(供 improve-* 等引用,本技能不执行):`.specify/shared/workflow/evidence-step.md`
 

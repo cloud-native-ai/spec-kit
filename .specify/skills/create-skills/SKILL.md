@@ -102,7 +102,7 @@ Optional frontmatter (on demand):
 ```
 ${SKILL_HOME}/
 ├── SKILL.md            # Required, Skill main body
-├── scripts/            # Executable scripts (optional)
+├── .specify/scripts/            # Executable scripts (optional)
 ├── references/         # Reference materials loaded on demand (optional)
 └── assets/             # Static assets for outputs (optional)
 ```
@@ -113,7 +113,7 @@ The project creation script may create standard empty resource directories durin
 
 1. Discovery: Read `name` + `description`
 2. After match: Read `SKILL.md` body
-3. When needed: Read `scripts/`, `references/`, `assets/`
+3. When needed: Read `.specify/scripts/`, `references/`, `assets/`
 
 Constraints:
 - `SKILL.md` recommended < 500 lines

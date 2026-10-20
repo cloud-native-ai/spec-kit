@@ -62,7 +62,7 @@ COUNT_SKIP_LINE = re.compile(
 BACKTICK = re.compile(r"`([^`\n]+)`")
 PATH_TOKEN = re.compile(r"^[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)+/?$")
 PATH_ROOTS = (
-    ".specify/", "skills/", "shared/", "templates/",
+    ".specify/", "skills/", ".specify/shared/", ".specify/templates/",
     "src/", "agents/", "tests/", "docs/", "feedback/",
 )
 

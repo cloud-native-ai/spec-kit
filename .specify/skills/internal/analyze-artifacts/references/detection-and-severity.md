@@ -1,7 +1,7 @@
 # Detection passes, severity, and the noise floor
 
 Owns §4 (detection), §5 (severity) and the do-not-flag list of the analysis skill. Extracted
-from `templates/commands/analyze.md`; content preserved, form re-expressed.
+from `.specify/templates/commands/analyze.md`; content preserved, form re-expressed.
 
 ## Same-author detection delegation (applies before any pass)
 

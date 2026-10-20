@@ -129,7 +129,7 @@ skipped; only the checklist quality-list step is absent.
 
 ```text
 TEST BUDGET: before the first task, run exactly one full suite:
-  bash scripts/bash/run-tests.sh --names-out <spec-dir>/baseline-failed.txt
+  bash .specify/scripts/bash/run-tests.sh --names-out <spec-dir>/baseline-failed.txt
 Write the E2 baseline row into the state-spine fence at STATE_SPINE_PATH
 (seq=1, slot=baseline, stage=implement, selection_basis=full-suite, command,
 rc, passed/failed, failed_names_path, evidence_ptr; merge_source/merged_at=na
@@ -158,7 +158,7 @@ from the completeness denominator.
 ```text
 TEST BUDGET CLOSURE: after review passes and before merge, run the closure full
 suite:
-  bash scripts/bash/run-tests.sh --names-out <spec-dir>/final-failed.txt
+  bash .specify/scripts/bash/run-tests.sh --names-out <spec-dir>/final-failed.txt
 Compare by name: comm -13 baseline-failed.txt final-failed.txt. Append the E2
 closure row to the SAME state spine (baseline_compare must be the name-level
 diff; never a count comparison), then audit:

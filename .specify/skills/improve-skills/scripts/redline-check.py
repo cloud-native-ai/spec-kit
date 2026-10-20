@@ -34,7 +34,7 @@ Usage
     redline-check.py <path/to/SKILL.md> [--scan-all] [--file-only] [--json] [--quiet]
 
     <SKILL.md>   target Skill. Default scope is the Skill's own behavior contract:
-                 SKILL.md + scripts/ (+ root-level *.sh/*.py). Encyclopedic L2
+                 SKILL.md + .specify/scripts/ (+ root-level *.sh/*.py). Encyclopedic L2
                  references (API listings, "rejected mechanism" tables) are excluded
                  from the gate because they *document* capabilities rather than
                  *perform* them, and grepping them produces noise.

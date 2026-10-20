@@ -14,7 +14,7 @@
 
 ### 1.2 裁决点与七项判据
 
-裁决点在 `tasks.md` 已产出、`checklist` 派发之前，由 `scripts/admission-check.py` 以制品实测值判定。七项判据（全部机械判定；任一项无法证明即 fail-closed 判 `full-chain`）：
+裁决点在 `tasks.md` 已产出、`checklist` 派发之前，由 `.specify/scripts/admission-check.py` 以制品实测值判定。七项判据（全部机械判定；任一项无法证明即 fail-closed 判 `full-chain`）：
 
 | id | 判据 | 机械证据 |
 |----|------|----------|
@@ -28,7 +28,7 @@
 
 **窄/宽模式边界**：准入只使用窄任务模式 `^- \[[ xX]\] T[0-9]{3}`。仓库记账使用宽模式 `^- \[[ xX>~]\] T[0-9]{3}`，它会把 `[>]`/`[~]` 行计入，**MUST NOT 用于准入**；两者不得混用。FR/任务区间数值的运行时 owner 是 `admission-check.py` 的 `FR_MIN/FR_MAX/TASK_MIN/TASK_MAX` 常量，契约测试钉住它们；语义 owner 是 `requirements.md` FR-003。
 
-**脚本接口**（`scripts/admission-check.py`，标准库且 Python ≥3.8）：
+**脚本接口**（`.specify/scripts/admission-check.py`，标准库且 Python ≥3.8）：
 
 ```text
 admission-check.py --project P --base-ref R --requirements F --tasks F \
@@ -84,7 +84,7 @@ FL-01…FL-10 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_
 
 ### 2.1 全量定义与作用域
 
-**全量测试运行** = 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件（本仓 = `bash scripts/bash/run-tests.sh`）。预算以**运行线**为作用域：每线独立台账与独立槽位，多线并行互不共享或消耗。每条运行线恰好两个全量槽位：
+**全量测试运行** = 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件（本仓 = `bash .specify/scripts/bash/run-tests.sh`）。预算以**运行线**为作用域：每线独立台账与独立槽位，多线并行互不共享或消耗。每条运行线恰好两个全量槽位：
 
 | 槽位 | 时点 | 程序 |
 |------|------|------|
@@ -123,7 +123,7 @@ implement 内 MUST NOT 再运行第二次全量套件；其内部回归比较义
 
 ### 2.5 审计、例外与修复
 
-`scripts/audit-test-budget.py --spine "$STATE_SPINE" --spec-dir <spec-dir> [--logs-dir <dir>] [--stage-check implement|closure]`：
+`.specify/scripts/audit-test-budget.py --spine "$STATE_SPINE" --spec-dir <spec-dir> [--logs-dir <dir>] [--stage-check implement|closure]`：
 
 - 校验两槽位、第三槽位拒绝、`in-slot-rerun` 只能出现在 `closure` 之后、`out-of-slot-exception` 必带原因与证据、`environment-failure` 不消耗槽位、closure 必须是名称级差集。
 - `--logs-dir` 扫描阶段日志中的全量 runner 命令：日志中出现但台账未入账 → 违规；日志缺失 → `unknown`，MUST NOT 当零。
@@ -225,11 +225,11 @@ PC-01…PC-11 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_
 
 ### 4.1 stream-json 主路径
 
-`scripts/stage-runner.sh` 默认以 `stream-json` 调用阶段 CLI（`[[STR-001]]`），并把原始事件流完整落盘为 `raw-<line>-<stage>.jsonl`；CLI 的 stderr 单独落 `runner-log-<line>-<stage>.log`，不混入 raw。CLI 行为事实（是否支持该输出模式、事件形状、哨兵可靠性、工具超时上限）由 `references/cli/<cli>.md` 与 `contracts/cli-profiles.md` 拥有，本文件只读引用、不复制档案内容。派发资格由 `CAPABILITY_MATRIX` 决定；档案存在不等于可派发。
+`.specify/scripts/stage-runner.sh` 默认以 `stream-json` 调用阶段 CLI（`[[STR-001]]`），并把原始事件流完整落盘为 `raw-<line>-<stage>.jsonl`；CLI 的 stderr 单独落 `runner-log-<line>-<stage>.log`，不混入 raw。CLI 行为事实（是否支持该输出模式、事件形状、哨兵可靠性、工具超时上限）由 `references/cli/<cli>.md` 与 `contracts/cli-profiles.md` 拥有，本文件只读引用、不复制档案内容。派发资格由 `CAPABILITY_MATRIX` 决定；档案存在不等于可派发。
 
 ### 4.2 增量派生与可追溯性
 
-`scripts/derive-live-log.py` 是确定性派生步骤：逐行读取 raw NDJSON，每个有意义的非终止事件立即输出一行可读进度（不缓冲到进程退出），实时日志可追加读取与尾部跟踪。每条派生行携带其 raw 事件序号与接收时间戳（`[evt=<seq> at=<epoch>] ...`），且在 runner 侧有对应的 raw 接收时间戳 sidecar（`raw-<line>-<stage>.ts.jsonl`）：
+`.specify/scripts/derive-live-log.py` 是确定性派生步骤：逐行读取 raw NDJSON，每个有意义的非终止事件立即输出一行可读进度（不缓冲到进程退出），实时日志可追加读取与尾部跟踪。每条派生行携带其 raw 事件序号与接收时间戳（`[evt=<seq> at=<epoch>] ...`），且在 runner 侧有对应的 raw 接收时间戳 sidecar（`raw-<line>-<stage>.ts.jsonl`）：
 
 - **事件→派生行延迟 ≤120 秒**；无事件的静默区间不适用该阈值（也不产生任何派生行）。
 - **每条派生行 MUST 可追溯到一条 raw 事件**；无对应事件时伪造进度行数 MUST 为 0（SC-007）。
@@ -241,7 +241,7 @@ PC-01…PC-11 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_
 
 ### 4.4 watcher 可见性与判定不变
 
-watcher 把流式进度只当作可见性信号：进度行数/增长与 raw 字节增长 MUST NOT 单独产生 `DONE` 或 `TIMEOUT`；完成仍须哨兵 + U4 独立校验，超时仍只由阶段 deadline 产生。`--raw-stream PATH` 在 WATCH 行附 `stream=na|absent|growing|idle`、在 EVIDENCE 行附 raw 路径与字节数，**不参与任何 verdict**。既有判定顺序、退出码与窗口/deadline 语义零改动（精确值 owner 是 `scripts/watch-target.sh --help/--self-test`）。`BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 是宿主工具上限，不是阶段 deadline；工具上限导致的提前终止 MUST NOT 记作阶段超时。
+watcher 把流式进度只当作可见性信号：进度行数/增长与 raw 字节增长 MUST NOT 单独产生 `DONE` 或 `TIMEOUT`；完成仍须哨兵 + U4 独立校验，超时仍只由阶段 deadline 产生。`--raw-stream PATH` 在 WATCH 行附 `stream=na|absent|growing|idle`、在 EVIDENCE 行附 raw 路径与字节数，**不参与任何 verdict**。既有判定顺序、退出码与窗口/deadline 语义零改动（精确值 owner 是 `.specify/scripts/watch-target.sh --help/--self-test`）。`BASH_DEFAULT_TIMEOUT_MS` / `BASH_MAX_TIMEOUT_MS` 是宿主工具上限，不是阶段 deadline；工具上限导致的提前终止 MUST NOT 记作阶段超时。
 
 ### 4.5 降级
 
@@ -278,7 +278,7 @@ PD-01…PD-10 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_
 | plan 入口（requirements U4 后、plan 派发前） | `requirements.md` | FR 定义行数 > 30 |
 | tasks U4（tasks 产物后、analyze 派发前） | `requirements.md` + `tasks.md` | FR 定义行数 > 30，或任务行数 > 40 |
 
-FR 定义行 = `^- \*\*FR-[0-9]{3}\*\*:`；任务行 = `^- \[[ xX>~]\] T[0-9]{3}`（宽模式，含 `[>]`/`[~]`）。上限与快车道中型区间端点一致（`FR_MAX`/`TASK_MAX`），数值 owner 是 `scripts/decomposition-check.py` 的 `FR_CEILING`/`TASK_CEILING` 常量；契约测试钉住二者相等。
+FR 定义行 = `^- \*\*FR-[0-9]{3}\*\*:`；任务行 = `^- \[[ xX>~]\] T[0-9]{3}`（宽模式，含 `[>]`/`[~]`）。上限与快车道中型区间端点一致（`FR_MAX`/`TASK_MAX`），数值 owner 是 `.specify/scripts/decomposition-check.py` 的 `FR_CEILING`/`TASK_CEILING` 常量；契约测试钉住二者相等。
 
 ### 5.2 脚本接口
 
@@ -309,7 +309,7 @@ decomposition-check.py --mode plan|tasks --requirements F [--tasks F] [--json-ou
 
 ### 6.1 目的与运行点
 
-analyze 是跨产物一致性的最后防线，不是第一次检查。requirements / plan / tasks 三个阶段的 U4 MUST 在派发下一阶段（plan / tasks / analyze）之前运行 `scripts/pre-analyze-check.py`，把可机械判定的漂移挡在 analyze 之前。预检通过是 analyze 派发的前置条件；预检失败 MUST NOT 派发 analyze。
+analyze 是跨产物一致性的最后防线，不是第一次检查。requirements / plan / tasks 三个阶段的 U4 MUST 在派发下一阶段（plan / tasks / analyze）之前运行 `.specify/scripts/pre-analyze-check.py`，把可机械判定的漂移挡在 analyze 之前。预检通过是 analyze 派发的前置条件；预检失败 MUST NOT 派发 analyze。
 
 ### 6.2 检查项
 
@@ -347,13 +347,13 @@ pre-analyze-check.py --spec-dir D --stage requirements|plan|tasks --repo R \
 
 ### 7.1 目的与运行点
 
-同一仓库内多条特性线可能交付同一路径（同一技能、同一 CLI 档案、同一 probe 对象），重叠在 implement 才暴露会产生成串返工。`clarify` U4 MUST 在派发 plan 之前运行 `scripts/overlap-check.py`，对当前特性与 specs 根下所有同级特性做交付面比较。
+同一仓库内多条特性线可能交付同一路径（同一技能、同一 CLI 档案、同一 probe 对象），重叠在 implement 才暴露会产生成串返工。`clarify` U4 MUST 在派发 plan 之前运行 `.specify/scripts/overlap-check.py`，对当前特性与 specs 根下所有同级特性做交付面比较。
 
 ### 7.2 判据
 
 - **当前特性的交付面**：`feature-ref.md` 中声明的共享交付根路径（反引号或行首路径；无声明时回退 `tasks.md` / `plan.md`）。特性自身 spec 目录内的路径不计。
 - **其他特性的交付面**：优先取**实际交付面**——提交信息点名该 spec 的提交所改动的共享根文件（次选：触碰该 spec 目录的提交）；无 git 历史时回退其声明。这样"被引用的输入路径"不会被误判为交付物。
-- **共享交付根**：`skills/`、`shared/`、`scripts/`、`templates/`、`src/`、`agents/`、`docs/`。无扩展名且不以 `/` 结尾的裸目录 token 忽略（它指整个区域，不是交付物）；显式目录声明以 `/` 结尾保留。
+- **共享交付根**：`skills/`、`.specify/shared/`、`.specify/scripts/`、`.specify/templates/`、`src/`、`agents/`、`docs/`。无扩展名且不以 `/` 结尾的裸目录 token 忽略（它指整个区域，不是交付物）；显式目录声明以 `/` 结尾保留。
 - **重叠关系**：`same-path`（完全相同）或 `nested-path`（一方是另一方的目录前缀）。
 - 当前特性未声明任何共享交付路径 → `clear`（附 `note`），不是错误。
 - 同级 specs 目录按 `^[0-9]{3}-` 识别；当前特性不在 specs 根下时也纳入比较集合。

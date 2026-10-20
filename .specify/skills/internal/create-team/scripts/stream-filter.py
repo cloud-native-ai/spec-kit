@@ -11,7 +11,7 @@ Reads NDJSON on stdin, writes one short line per meaningful event on stdout (lin
 Line width can be tuned via STREAM_FILTER_WIDTH (default: 140).
 
 Part of the External Dispatch Visibility Contract reference implementation;
-see shared/definitions/subagent-definitions.md. Normally driven by dispatch.sh.
+see .specify/shared/definitions/subagent-definitions.md. Normally driven by dispatch.sh.
 """
 import json
 import os

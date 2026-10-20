@@ -3,7 +3,7 @@
 #
 # Run under the same identity as the runner (run-user), locally or via ssh:
 #   ssh <alias> "su - <run-user> -c \
-#     'bash --noprofile --norc -c \"bash scripts/watch-hook.sh <stage> <window> <deadline> <fifo> <done-json>\"'"
+#     'bash --noprofile --norc -c \"bash .specify/scripts/watch-hook.sh <stage> <window> <deadline> <fifo> <done-json>\"'"
 #
 # Output: the event JSON (done file preferred over a FIFO line) or HOOK_TIMEOUT.
 # The caller then runs watch-target.sh --once for the authoritative verdict.

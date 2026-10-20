@@ -10,8 +10,8 @@ deliverables. Two features that claim the same path, or nested paths, will
 collide during implementation. The check reports each overlap with its relation
 (``same-path`` or ``nested-path``).
 
-Only shared, repo-visible delivery roots are compared (skills/, shared/,
-scripts/, templates/, src/, agents/, docs/); feature-internal artifacts under
+Only shared, repo-visible delivery roots are compared (skills/, .specify/shared/,
+.specify/scripts/, .specify/templates/, src/, agents/, docs/); feature-internal artifacts under
 the spec directory never count as overlaps. A missing specs root or a
 spec directory with no declared paths is not an error.
 
@@ -39,7 +39,7 @@ BACKTICK = re.compile(r"`([^`\n]+)`")
 PATH_TOKEN = re.compile(r"^[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)+/?$")
 LINE_PATH = re.compile(r"^\s*([A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)+)")
 PATH_ROOTS = (
-    "skills/", "shared/", "scripts/", "templates/",
+    "skills/", ".specify/shared/", ".specify/scripts/", ".specify/templates/",
     "src/", "agents/", "docs/",
 )
 

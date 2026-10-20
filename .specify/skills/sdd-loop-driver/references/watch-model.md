@@ -18,7 +18,7 @@
 | 词 | 含义 | 本模型中的形态 |
 |----|------|----------------|
 | **Wait（等待）** | 驱动者暂停推进，直到终止事件或窗口到期 | 只允许发生在一次工具调用内部（长轮询）；或经 §6 探针证明可自动恢复的宿主通知 |
-| **Monitor（监视）** | 持续采样一个或多个目标的信号并给出判定 | `scripts/watch-target.sh`（无状态、可重入、只读） |
+| **Monitor（监视）** | 持续采样一个或多个目标的信号并给出判定 | `.specify/scripts/watch-target.sh`（无状态、可重入、只读） |
 | **Poll（轮询）** | 周期性重复采样 | **回退形态**：无法阻塞等待时使用；不是缺省 |
 | **Observe（观察）** | 读取日志/心跳/退出记录，不做判定 | watcher 内部动作，或 U3 的证据采集 |
 | **Watch window（监听窗口）** | 一次阻塞调用的最长持续时间 | `--window`；到期返回 `RUNNING`，驱动者立即重入下一窗口 |
@@ -42,7 +42,7 @@
 
 ## 3. 判定状态机（Verdict State Machine）
 
-判定按下列顺序短路；先命中者胜。`scripts/watch-target.sh` 是退出码的代码侧所有者（`--help` 与 `--self-test` 钉住）。
+判定按下列顺序短路；先命中者胜。`.specify/scripts/watch-target.sh` 是退出码的代码侧所有者（`--help` 与 `--self-test` 钉住）。
 
 | 判定 | 退出码 | 终止? | 触发条件（按优先级） | 驱动者动作 |
 |------|--------|-------|----------------------|------------|
@@ -173,7 +173,7 @@ label|pid_file|status_file|log|sentinel|heartbeat|deadline_epoch
 
 ## 10. 参考实现
 
-`scripts/watch-target.sh` — 无框架依赖的 bash 长轮询 watcher（可选 hook 事件补充）。
+`.specify/scripts/watch-target.sh` — 无框架依赖的 bash 长轮询 watcher（可选 hook 事件补充）。
 
 - 单目标与 `--manifest` 多目标；`--once` 快照；`--self-test` 回归用例。
 - hook 参数：`--hook-done F`（持久完成记录，先查）与 `--hook-fifo F`（窗口内阻塞读，事件到达即缩短等待）；仅单目标可用。
@@ -194,7 +194,7 @@ label|pid_file|status_file|log|sentinel|heartbeat|deadline_epoch
 - **远端不可达**：一次 watcher 调用没有返回任何 `WATCH` 行（ssh 255/超时）时，不改变阶段状态，不判 DEAD；先做连通性检查并按 `stalled(remote-unreachable)` 处置。
 - **lease 续租钩子**：持有 driver lease 时，窗口 ≤ `ttl/3`（缺省 ≤200s）或传 `--lease-renew-cmd`（`--lease-renew-interval` 缺省 60s）在窗口内续租；钩子失败不改变判定。
 
-- 配套脚本：`scripts/hook-stop.sh`（Stop hook 模板，写 done JSON + 尽力写 FIFO）与 `scripts/watch-hook.sh`（远端同身份长读，先查 done、再读 FIFO，输出事件或 `HOOK_TIMEOUT`）。
+- 配套脚本：`.specify/scripts/hook-stop.sh`（Stop hook 模板，写 done JSON + 尽力写 FIFO）与 `.specify/scripts/watch-hook.sh`（远端同身份长读，先查 done、再读 FIFO，输出事件或 `HOOK_TIMEOUT`）。
 
 ## 12. Hook 事件补充（Qoder CLI Stop / SubagentStop）
 
@@ -228,7 +228,7 @@ HOOK_EVENT_DIR="$dir" HOOK_STAGE="$stage" HOOK_FIFO="$dir/hook-done-$line-$stage
 ### 12.3 watcher 侧
 
 ```bash
-scripts/watch-target.sh --label "$line" \
+.specify/scripts/watch-target.sh --label "$line" \
   --pid-file … --status-file … --log … --sentinel "$STAGE-DONE" --heartbeat … \
   --hook-done "$dir/hook-event-$stage.json" \
   --hook-fifo "$dir/hook-done-$stage.fifo" \

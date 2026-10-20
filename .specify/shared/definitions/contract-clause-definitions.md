@@ -70,7 +70,7 @@
 
 | 消费方 | 消费什么 |
 |---|---|
-| `scripts/python/clause_extract.py` | § 2 形态集、§ 4 边界与引用组、§ 5 处置形态 |
-| `scripts/python/account-clause-coverage.py` | 经 `clause_extract.py` 间接消费全部三节 |
-| `scripts/python/validate-tasks.py`(归属声明解析) | § 2 的 id 形态,用于判定一个被声明的条款 id 是否可解析 |
+| `.specify/scripts/python/clause_extract.py` | § 2 形态集、§ 4 边界与引用组、§ 5 处置形态 |
+| `.specify/scripts/python/account-clause-coverage.py` | 经 `clause_extract.py` 间接消费全部三节 |
+| `.specify/scripts/python/validate-tasks.py`(归属声明解析) | § 2 的 id 形态,用于判定一个被声明的条款 id 是否可解析 |
 | 各 spec 的 `feature-ref.md` 映射表 | § 4 的引用组规则(该表是本规则的发布视图,不是第二个独立结论) |

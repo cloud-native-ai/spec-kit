@@ -98,7 +98,7 @@ Success-shaped statements exist in both worlds; their authority is disjoint (dec
 
 ### 第二个解析器的处置
 
-`skills/internal/create-team/scripts/build-summary-input.py` 有自己的**本地** goal 判据读取器,其 `load_goal_definition` 的注释明写:该脚本与 `scripts/python/goal-utils.py` 分属两棵镜像树(`skills/` 与 `scripts/`)且相对深度不同,跨树 import 在安装到消费项目后即断,故刻意本地解析。**处置:让它同样理解指代形**——就地做同一导出,并把指代形渲染成成员名再交给总结,使读者不会看到一个自己无从解析的裸标记;MUST NOT 靠加一个 import 来解决。**代价明示**:于是仓内并存两处导出实现,二者的一致性由 `tests/contract/test_criterion_subject.py` 对同一输入断言两侧成员一致来钉住,而不是靠人记得同步——把同步交给记忆,正是本节要消灭的失效模式。
+`.specify/skills/internal/create-team/scripts/build-summary-input.py` 有自己的**本地** goal 判据读取器,其 `load_goal_definition` 的注释明写:该脚本与 `.specify/scripts/python/goal-utils.py` 分属两棵镜像树(`skills/` 与 `.specify/scripts/`)且相对深度不同,跨树 import 在安装到消费项目后即断,故刻意本地解析。**处置:让它同样理解指代形**——就地做同一导出,并把指代形渲染成成员名再交给总结,使读者不会看到一个自己无从解析的裸标记;MUST NOT 靠加一个 import 来解决。**代价明示**:于是仓内并存两处导出实现,二者的一致性由 `tests/contract/test_criterion_subject.py` 对同一输入断言两侧成员一致来钉住,而不是靠人记得同步——把同步交给记忆,正是本节要消灭的失效模式。
 
 ### 退出码约定在本仓并不统一
 
