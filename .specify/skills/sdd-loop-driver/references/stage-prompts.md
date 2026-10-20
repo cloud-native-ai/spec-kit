@@ -158,6 +158,31 @@ baseline_slot=skip(closure-repair). Do not consume the baseline slot again and
 do not run any other full suite; use targeted-set-v1 for intermediate tests.
 ```
 
+## Plan Constraint Block（plan 完成后的只小修块）
+
+> Owner of the plan constraint rules is `references/efficiency-model.md` §3.
+> The block is copied into the `tasks` / `analyze` / `implement` / `review`
+> prompts whenever the state spine says `plan_constraint=active`. On re-entry
+> the driver restores `active` and `activated_at` from the spine before
+> dispatching; a missing value is a fast-fail at dispatch, never a silent
+> "constraint absent".
+
+```text
+PLAN CONSTRAINT: plan_constraint=active since <activated_at>
+(plan_commit=<plan_commit>; approved_baseline_commit=<latest anchor>). Any
+change to a plan-owned artifact (plan.md, data-model.md, contracts/,
+quickstart.md, research.md, feature-ref.md) must be a minor fix only —
+typo/wording, broken link/reference repair, formatting, line-level consistency.
+Declare every touch before the done sentinel in the return:
+  PLAN-EDIT: <path> — <reason>；分类=minor|substantive
+For a substantive change (scope, architecture, data-model/contract semantics,
+FR/SC content, task breakdown, new capability/security surface), stop and
+return exactly one explicit anomaly line:
+  ANOMALY: <one-line fact>
+together with the proposed change and its substantive reason. Never rewrite the
+plan silently and never re-run the plan stage yourself.
+```
+
 ## Stall Handling & State Spine（卡死处置与状态脊，U5）
 
 ### 缺省值（入口参数可覆盖）

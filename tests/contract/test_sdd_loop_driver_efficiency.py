@@ -303,3 +303,126 @@ def test_tb_10_orchestration_layer_only():
     assert "框架命令内部" in efficiency
     contract = _text(CONTRACTS / "test-budget.md")
     assert "TB-10" in contract and "编排层" in contract
+
+
+# ------------------------------------------------------------------ PC-01
+
+
+def test_pc_01_activation_point():
+    efficiency = _text(EFFICIENCY)
+    for token in ("plan_constraint=active", "activated_at", "plan_commit",
+                  "approved_baseline_commit"):
+        assert token in efficiency, "PC-01 token missing: %s" % token
+    recipes = _text(RECIPES)
+    assert "plan_constraint" in recipes or "只小修" in recipes
+
+
+# ------------------------------------------------------------------ PC-02
+
+
+def test_pc_02_minor_definition():
+    efficiency = _text(EFFICIENCY)
+    for token in ("错别字", "断链", "格式", "行级一致性"):
+        assert token in efficiency, "minor definition token missing: %s" % token
+
+
+# ------------------------------------------------------------------ PC-03
+
+
+def test_pc_03_substantive_final_diff():
+    efficiency = _text(EFFICIENCY)
+    assert "实质改动" in efficiency
+    assert "最终 diff" in efficiency or "最终差异" in efficiency
+    assert "范围" in efficiency and "架构" in efficiency
+
+
+# ------------------------------------------------------------------ PC-04
+
+
+def test_pc_04_prompt_block_and_plan_edit():
+    prompts = _text(PROMPTS)
+    assert "PLAN-EDIT:" in prompts
+    assert "ANOMALY:" in prompts
+    assert "只小修" in prompts
+    assert "tasks" in prompts and "implement" in prompts and "review" in prompts
+
+
+# ------------------------------------------------------------------ PC-05
+
+
+def test_pc_05_u4_diff_check():
+    efficiency = _text(EFFICIENCY)
+    assert "git diff --name-only" in efficiency
+    assert "git status --porcelain" in efficiency
+    assert "U4" in efficiency
+
+
+# ------------------------------------------------------------------ PC-06
+
+
+def test_pc_06_routing_branches():
+    efficiency = _text(EFFICIENCY)
+    assert "approved_baseline_commit" in efficiency
+    assert "四要素" in efficiency
+    assert "(a)" in efficiency and "(b)" in efficiency
+    assert "requirements.md" in efficiency
+
+
+# ------------------------------------------------------------------ PC-07
+
+
+def test_pc_07_analyze_repair_unchanged():
+    efficiency = _text(EFFICIENCY)
+    assert "analyze" in efficiency
+    assert "不取消" in efficiency or "不削弱" in efficiency
+    assert "重过该门" in efficiency or "重过" in efficiency
+
+
+# ------------------------------------------------------------------ PC-08
+
+
+def test_pc_08_wrapup_reporting():
+    efficiency = _text(EFFICIENCY)
+    assert "收尾汇总" in efficiency
+    assert "分类" in efficiency and "处置" in efficiency
+
+
+# ------------------------------------------------------------------ PC-09
+
+
+def test_pc_09_explicit_exclusion():
+    efficiency = _text(EFFICIENCY)
+    assert "显式排除" in efficiency
+    assert "手工调用" in efficiency
+    assert "框架命令内部" in efficiency
+
+
+# ------------------------------------------------------------------ PC-10
+
+
+def test_pc_10_audit_script_interface():
+    help_text = _script_help("audit-plan-changes.py")
+    for flag in ("--repo", "--base", "--head", "--plan-owned", "--declarations"):
+        assert flag in help_text, "audit-plan-changes flag missing: %s" % flag
+    source = _text(SKILL_DIR / "scripts" / "audit-plan-changes.py")
+    for token in ("touched_paths", "declaration_lines", "undeclared", "diff_stats"):
+        assert token in source, "output field missing: %s" % token
+    imports = re.findall(r"^import\s+([A-Za-z_][A-Za-z0-9_]*)", source, re.MULTILINE)
+    allowed = {"argparse", "json", "os", "re", "subprocess", "sys", "pathlib"}
+    assert set(imports) <= allowed, "unexpected import: %s" % (set(imports) - allowed)
+    assert ".specify/scripts" not in source
+
+
+# ------------------------------------------------------------------ PC-11
+
+
+def test_pc_11_reanchoring():
+    efficiency = _text(EFFICIENCY)
+    for token in ("rebaseline_events", "approved_baseline_commit",
+                  "未提交", "不可定位", "plan 重审"):
+        assert token in efficiency, "PC-11 token missing: %s" % token
+    assert "此后一律使用**最新**锚点" in efficiency
+    recipes = _text(RECIPES)
+    assert "activated_at" in recipes or "重入" in recipes
+    contract = _text(CONTRACTS / "plan-constraint.md")
+    assert "PC-11" in contract

@@ -129,3 +129,52 @@ recording), **driver closure** (owned by the driver after review).
 - Ledger still reports exactly two slots, 0 exceptions, 0 unknown; no second
   full suite ran inside implement.
 - US2 checkpoint closed.
+
+## US3 — plan minor-fix constraint (T025–T032)
+
+### T025/T026 — red-first (automated)
+
+- Red: `notes/red-first-evidence.md` § T025 (8 failed, script absent) and § T026
+  (9 PC failures).
+- Green (T030 combined run): `tests/unit/test_audit_plan_changes.py
+  tests/contract/test_sdd_loop_driver_efficiency.py -q` → `39 passed`.
+- Script: `skills/external/sdd-loop-driver/scripts/audit-plan-changes.py`;
+  bare artifact names (`plan.md`, `contracts`) resolve to any matching
+  repo-relative path; final `diff_stats` uses `git diff --numstat <base>` so
+  accumulated edits are judged on the cumulative diff; the script is read-only.
+
+### T028/T029 — owner document, prompts, recipes, mirror (automated)
+
+- `references/efficiency-model.md` §3 (activation state, minor/substantive
+  definitions, `PLAN-EDIT:` format owner, U4 diff check, two branches with the
+  latest `approved_baseline_commit`, re-anchoring, re-entry restore, exclusion).
+- `references/stage-prompts.md` plan-constraint block (tasks/analyze/implement/
+  review; `PLAN-EDIT:` + `ANOMALY:`); `references/dispatch-recipes.md` Recipe 4
+  registration, U4 classification/routing and re-entry restore.
+- Mirror: 1 new + 3 updated; `diff -rq` exit 0; `--check --only ...` →
+  `ok (19 files)`.
+
+### T030 — quickstart S6 (automated + recorded)
+
+- Exit `1`, `touched_paths=[".specify/specs/012-medium/plan.md"]` (the sole
+  artifact is `plan.md`), `undeclared=true`, `classification=undeclared`,
+  `diff_stats` added 2. The driver fails the gate before PC-06 routing.
+  Details in `notes/quickstart-run.md`.
+
+### T031 — mutation drill (3 applications, all restored)
+
+| Mutation | Red test | Restore |
+|----------|----------|---------|
+| ignore uncommitted changes | `test_uncommitted_plan_change_included` | checksum equal |
+| empty declarations still declared | `test_undeclared_plan_change_flagged` | checksum equal |
+| ignore the new anchor after re-baseline | `test_pc_11_reanchoring` | checksum equal |
+
+- The PC-11 pin was strengthened to the exact latest-anchor sentence
+  (`此后一律使用**最新**锚点`) after the first attempt did not turn red.
+
+### T032 — post-mutation re-run (automated)
+
+- `39 passed in 20.46s`, exit 0; quickstart S6 re-run identical.
+- `PLAN-EDIT:` format owner, two-branch routing and the framework-internal
+  explicit exclusion are visible in the owner document and prompts.
+- US3 checkpoint closed.

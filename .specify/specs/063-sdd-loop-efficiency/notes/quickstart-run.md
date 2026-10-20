@@ -41,6 +41,28 @@ status=ok
 
 ## S5 — pending (US4)
 
-## S6 — pending (US3)
+## S6 — plan change classification (undeclared → gate failure)
+
+- Preparation: plan-repo fixture initialized and committed; one commit appends a
+  marker to `.specify/specs/012-medium/plan.md`; the declarations file is empty.
+- Command: `python3 skills/external/sdd-loop-driver/scripts/audit-plan-changes.py --repo "$FIXTURE_REPO" --base "$PLAN_BASE" --head "$PLAN_HEAD" --plan-owned plan.md --plan-owned data-model.md --plan-owned contracts --plan-owned quickstart.md --plan-owned research.md --plan-owned feature-ref.md --declarations /tmp/063-plan-edits.txt`
+- Exit: `1`
+- Output (relevant fields):
+
+```json
+{
+  "touched_paths": [".specify/specs/012-medium/plan.md"],
+  "declaration_lines": [],
+  "undeclared": true,
+  "classification": "undeclared",
+  "diff_stats": [{"path": ".specify/specs/012-medium/plan.md", "added": 2, "deleted": 0}]
+}
+```
+
+- The only touched artifact is `plan.md`; `touched_paths[]` carries the
+  repo-relative path from `git diff --name-only` (T027). The driver classifies
+  the final diff and fails the stage gate before PC-06 routing.
+- Re-run after the mutation drill: same result (`1`, `undeclared=true`).
+- Cleanup: fixture tree and `/tmp/063-plan-edits.txt` removed.
 
 ## S7 — pending (US5, recorded dry-run decision trace; non-CI)

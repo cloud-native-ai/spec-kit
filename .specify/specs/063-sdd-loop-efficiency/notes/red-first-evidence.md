@@ -117,3 +117,37 @@ FAILED tests/contract/test_sdd_loop_driver_efficiency.py::test_tb_10_orchestrati
 
 - Meaning: efficiency-model §2, the audit script and the prompt/recipe wiring do
   not exist yet. Must go green after T019/T020.
+
+## T025 — tests/unit/test_audit_plan_changes.py
+
+- Date: 2026-10-20
+- Command: `bash scripts/bash/run-tests.sh tests/unit/test_audit_plan_changes.py -q`
+- Exit status: `1`
+- Output tail:
+
+```text
+FAILED tests/unit/test_audit_plan_changes.py::test_undeclared_plan_change_flagged
+...
+FAILED tests/unit/test_audit_plan_changes.py::test_multi_commit_touch_set - a...
+8 failed in 35.27s
+```
+
+- Meaning: `audit-plan-changes.py` does not exist (every invocation exits 2).
+  Must go green after T027.
+
+## T026 — PC-01…PC-11 contract functions
+
+- Date: 2026-10-20
+- Command: `bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_efficiency.py -q`
+- Exit status: `1`
+- Output tail:
+
+```text
+FAILED tests/contract/test_sdd_loop_driver_efficiency.py::test_pc_01_activation_point
+...
+FAILED tests/contract/test_sdd_loop_driver_efficiency.py::test_pc_11_reanchoring
+9 failed, 22 passed in 0.41s
+```
+
+- Meaning: efficiency-model §3, the plan-change prompt block and the audit
+  script do not exist yet. Must go green after T027/T028.

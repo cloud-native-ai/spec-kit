@@ -138,3 +138,82 @@ implement 内 MUST NOT 再运行第二次全量套件；其内部回归比较义
 ### 2.7 契约钉住
 
 TB-01…TB-10 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_tb_01…test_tb_10` 钉住；审计行为由 `tests/unit/test_audit_test_budget.py` 覆盖；名称级回归由 `tests/integration/test_sdd_loop_efficiency_regression.py` 覆盖。
+
+## 3. Plan 只小修约束（Plan Constraint）
+
+### 3.1 生效点与状态
+
+`plan` 阶段 U4 通过时，驱动 MUST 在状态脊登记：
+
+```text
+plan_constraint=active
+activated_at=<epoch/ISO-8601>
+plan_commit=<plan U4 commit>
+approved_baseline_commit=<initial = plan_commit>
+plan_owned_paths=plan.md,data-model.md,contracts/,quickstart.md,research.md,feature-ref.md
+```
+
+此后 `tasks` / `analyze` / `implement` / `review` 的提示词携带只小修块。驱动重入 MUST 从状态脊恢复 `plan_constraint=active` 与 `activated_at`，不得依赖会话记忆；二者缺失时不得假装约束不存在，按断点探测恢复。
+
+### 3.2 小修与实质改动
+
+- **小修**：错别字/措辞、断链/引用修复、格式、行级一致性；不改变范围、架构方向、数据模型语义、契约语义、FR/SC 内容或任务分解范围。
+- **实质改动**：改变上述任一项、引入新能力/安全面，或多处小修累积后按**最终 diff** 改变语义。分类 MUST 按最终累计差异判定，MUST NOT 按单次编辑的措辞规避。
+
+### 3.3 `PLAN-EDIT:` 声明格式（唯一 owner）
+
+任何下游阶段对 plan 制品的改动 MUST 在完成哨兵前的回传中包含声明行。本小节是该格式的唯一 owner：
+
+```text
+PLAN-EDIT: <repo-relative path or artifact> — <one-line reason>；分类=minor|substantive
+```
+
+- 一条声明覆盖其点名的路径（或该路径的 basename）；未被任何声明覆盖的触碰判 `undeclared`。
+- 需要实质改动但无法在约束下继续时，阶段 MUST 以 `ANOMALY: <一句话事实>` 回传建议改动与实质性理由，MUST NOT 静默改写 plan 或自行重跑 plan 阶段。
+
+### 3.4 U4 校验与分类
+
+驱动在每个下游阶段 U4 运行：
+
+```bash
+python3 <skill-dir>/scripts/audit-plan-changes.py --repo <repo> \
+  --base <stage-base> --head HEAD --plan-owned plan.md --plan-owned data-model.md \
+  --plan-owned contracts --plan-owned quickstart.md --plan-owned research.md \
+  --plan-owned feature-ref.md --declarations <stage-declarations.txt>
+```
+
+脚本机械给出 `touched_paths[]`（`git diff --name-only <base>..HEAD` 加 `git status --porcelain` 未提交改动）、`declaration_lines[]`、`undeclared` 与按 `base` 的最终累计 `diff_stats`。驱动据最终 diff 把每个触碰分类为 `minor` / `substantive` / `undeclared`，并写入状态脊（E5）。`undeclared` 或 `substantive` MUST 先判该阶段门失败，再进入 3.5 分流。
+
+### 3.5 两分支分流
+
+「已批准需求基线」= E4 最新 `approved_baseline_commit` 中 `requirements.md` 的 FR/SC 定义集合与语义（`git show <commit>:requirements.md` 复核）。分类记录 MUST 写入该值；MUST NOT 以工作树文本或其它提交替代。
+
+- **(a) 修复既有缺陷所必需**，且不改变已批准的需求范围/FR/SC 语义、架构方向、数据模型语义、契约语义或任务分解范围 → 驱动派发一次完整 plan 重审并记录触发与证据；重审通过后对门失败阶段做一次 U4 复验。
+- **(b) 改变上述任一项、引入新能力/安全面，或驱动无法确定** → 作为决策以四要素上送（发现了什么 / 为何吃重 / 中间产物逐项可定位 / 可选处置），MUST NOT 自行重审。
+
+每一次 `substantive`/`undeclared` 改动都按其分支处置并留痕，MUST NOT 因次数跳过分流；重复回环由既有 stall/retry 纪律兜底，不设人工次数上限。
+
+### 3.6 Re-anchoring（requirements 门内变更）
+
+plan 约束激活后，任何门内完成的 `requirements.md` 变更（含 analyze 路由修复、clarify 写回与显式范围修订）MUST 在下一个依赖该基线的 U4 分类之前触发 re-baseline：
+
+1. 在 E4 追加一条 `rebaseline_events[]`：触发、时间、前一基线提交、新基线提交（= 包含该变更的提交）、FR/SC 定义集合与语义差异摘要；
+2. 把 `approved_baseline_commit` 更新为新基线（此后一律使用**最新**锚点）；
+3. 变更未提交或不可定位其提交时 MUST NOT re-anchor，受影响 plan 改动一律按 3.5(b) 上送；
+4. re-anchoring 本身不构成 plan 重审，也不移动约束生效点；为落实新基线所含需求而做的 plan 改动按两分支正常分类，不得因旧基线缺少该需求而误判越界。
+
+### 3.7 analyze 修复路由不变
+
+本约束 MUST NOT 取消或削弱 analyze 门的上游修复路由：analyze 发现仍须回到所属制品修复并重过该门；约束只限制修复规模与重审开销。
+
+### 3.8 收尾报告
+
+收尾汇总 MUST 报告：约束是否 active、是否发生过 plan 制品改动、每项分类与处置去向（pass / gate-fail-rereview / gate-fail-escalate）。
+
+### 3.9 显式排除与设计代价
+
+框架命令内部的硬执行是**显式排除**项：约束是编排层纪律，驱动是执行点。已接受的设计代价：非驱动手工调用阶段命令不受约束；若后续证明编排层实现不安全，MUST 另立特性修订，不得静默扩大范围。
+
+### 3.10 契约钉住
+
+PC-01…PC-11 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_pc_01…test_pc_11` 钉住；机械判定由 `tests/unit/test_audit_plan_changes.py` 覆盖。
