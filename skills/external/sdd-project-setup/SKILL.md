@@ -48,6 +48,8 @@ S5 SUGGEST   产出候选工作清单（三个内部来源：未完成 feature /
              sdd-loop-driver 推进开发
 ```
 
+**Instruction-chain budget gate**: `/speckit.instructions` 的 `BUDGET` 报告是 S3 的收敛条件之一；超预算处理见 `references/setup-recipes.md` § S3.4（先走 owner 的 R1/R2，仍超则执行 R3 project-filled 章节外迁；无法收敛列 pending）。
+
 ## Hard Requirements
 
 1. **盘点先于处置**：S2/S3 的任何动作之前必须先跑 S1 脚本盘点——禁止凭印象判定项目状态（archive-not-delete；本仓 fleet 实测中 4/41 为退化安装、2/41 缺特性注册表，肉眼不可判）。
@@ -57,6 +59,7 @@ S5 SUGGEST   产出候选工作清单（三个内部来源：未完成 feature /
 5. **建议而非强制**：S5 的候选工作清单是提示（有哪些可做的事），不携带任何「必须调用 sdd-loop-driver」的语义；调用与否由用户或上游流程决定。
 6. **幂等收敛**：S2/S3/S3+ 的每一动作 MUST 幂等——同一稳定态上重复执行不产生新的写动作；每项动作执行前 MUST 以本次 S1 盘点结果为缺口凭据，禁止凭上次执行的记忆跳过或重做（幂等与重入语义见 setup-recipes.md）。
 7. **运行时与 CLI 就绪先于 init**：S2 执行 specify init 前 MUST 完成 S2 的 CLI 层——python 解析阶梯三级全缺 → **报错退出，绝不自动安装 Python**；CLI 安装链三源全败 → 报告缺口并停止；两者都不得静默跳过 init 或手工伪造 `.specify/`。
+8. **指令体积预算收敛**：S3 的 `/speckit.instructions` 之后 MUST 读取生成器的 `BUDGET` 报告；`over` 时 MUST 先走 owner 的 R1/R2，仍超且存在可迁移 project-filled 章节时 MUST 按 `references/setup-recipes.md` § S3.4 执行 R3 回退；未回到预算内且无可迁移章节时 MUST 作为 pending 上报（上调预算/拆分章节），不得静默转述告警或删除项目内容。
 
 ## Discipline Defaults
 

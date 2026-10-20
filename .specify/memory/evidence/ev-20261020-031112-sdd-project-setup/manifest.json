@@ -1,0 +1,30 @@
+{
+  "runId": "ev-20261020-031112-sdd-project-setup",
+  "target": "skill:sdd-project-setup",
+  "created": "2026-10-20T03:11:12Z",
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 12
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 76
+    }
+  },
+  "engine": {
+    "engineSubsetPath": "scripts/js/better-harness",
+    "upstreamCommit": "b2e621d",
+    "nodeVersion": "26.3.1"
+  },
+  "findingsDigest": "sha256:725ebafce0d30e3c4d4c1e748510990300a0ef541c02ec6f4e8b74d2796bcaab"
+}

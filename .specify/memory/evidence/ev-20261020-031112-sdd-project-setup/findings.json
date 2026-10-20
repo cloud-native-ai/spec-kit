@@ -1,0 +1,366 @@
+{
+  "schemaVersion": 1,
+  "kind": "speckit.evidence-findings",
+  "target": "skill:sdd-project-setup",
+  "runId": "ev-20261020-031112-sdd-project-setup",
+  "window": {
+    "since": null,
+    "until": null
+  },
+  "platforms": [
+    "qoder"
+  ],
+  "lanes": {
+    "session": {
+      "status": "available"
+    },
+    "project": {
+      "status": "available"
+    },
+    "assets": {
+      "status": "available"
+    },
+    "runs": {
+      "status": "partial",
+      "teamsScanned": 12
+    },
+    "feedback": {
+      "status": "available",
+      "entries": 76
+    }
+  },
+  "evidence": [
+    {
+      "id": "ev-001",
+      "lane": "session",
+      "evidenceState": "Exercised",
+      "summary": "53 task episode(s) observed on qoder; 5 candidate(s) admitted, 0 with user corrections.",
+      "evidenceRefs": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5"
+      ],
+      "signals": {
+        "taskEpisodes": 53,
+        "candidates": 5,
+        "userCorrections": 0
+      },
+      "privacyNote": "redacted-semantic-facet"
+    },
+    {
+      "id": "ev-002",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Project profile captured: primary languages python, javascript, typescript; git history signals collected.",
+      "evidenceRefs": [
+        "core-change-watch/project-profile",
+        "core-change-watch/git-history-profile"
+      ],
+      "signals": {
+        "primaryLanguages": 3,
+        "sourceFiles": 309,
+        "testFiles": 293
+      }
+    },
+    {
+      "id": "ev-003",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "Dependency governance: 2 ecosystem(s), risk level medium.",
+      "evidenceRefs": [
+        "dependency-governance/cli"
+      ],
+      "signals": {
+        "ecosystems": 2,
+        "staleDependencyFiles": 0
+      }
+    },
+    {
+      "id": "ev-004",
+      "lane": "assets",
+      "evidenceState": "Present",
+      "summary": "Asset baseline (qoder): status complete, 16 lint finding(s), inventory available.",
+      "evidenceRefs": [
+        "coding-agent-practices/asset-baseline"
+      ],
+      "signals": {
+        "lintFindings": 16
+      }
+    },
+    {
+      "id": "ev-005",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team command-logic-as-classified-skills: 4 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/command-logic-as-classified-skills/runs/20261009T032057Z-report.md",
+        ".specify/teams/command-logic-as-classified-skills/runs/20261009T033542Z-report.md",
+        ".specify/teams/command-logic-as-classified-skills/runs/20261012T081704Z-report.md",
+        ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md"
+      ],
+      "signals": {
+        "runReports": 4,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-006",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team cws-workspace-cluster: 2 run report(s), 2 logged cycle(s), 0 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/cws-workspace-cluster/runs/20260730T082021Z-report.md",
+        ".specify/teams/cws-workspace-cluster/runs/20260730T094500Z-report.md"
+      ],
+      "signals": {
+        "runReports": 2,
+        "loggedCycles": 2,
+        "escalations": 13,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-007",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team demo-seat-dispatch: 1 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/demo-seat-dispatch/runs/20261008T214100Z-report.md"
+      ],
+      "signals": {
+        "runReports": 1,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-008",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team draw-diagram-interactive: 1 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/draw-diagram-interactive/runs/20261014T1710Z-report.md"
+      ],
+      "signals": {
+        "runReports": 1,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-009",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team draw-plantuml-optimizer: 5 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/draw-plantuml-optimizer/runs/20260715T130546Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T071030Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T074420Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T094834Z-report.md",
+        ".specify/teams/draw-plantuml-optimizer/runs/20260716T104232Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-010",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team draw-two-layer-structure: 7 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/draw-two-layer-structure/runs/2026-09-16T060815Z-report.md",
+        ".specify/teams/draw-two-layer-structure/runs/2026-09-16T102026Z-report.md",
+        ".specify/teams/draw-two-layer-structure/runs/2026-09-16T122228Z-report.md",
+        ".specify/teams/draw-two-layer-structure/runs/2026-09-17T025417Z-report.md",
+        ".specify/teams/draw-two-layer-structure/runs/2026-09-17T072239Z-report.md"
+      ],
+      "signals": {
+        "runReports": 7,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-011",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team post-refactor-mechanism-integrity: 1 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/post-refactor-mechanism-integrity/runs/20261011T144202Z-report.md"
+      ],
+      "signals": {
+        "runReports": 1,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-012",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team requirement-implement-monitor: 5 run report(s), 5 logged cycle(s), 1 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/requirement-implement-monitor/runs/20260729T063425Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T072002Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T074013Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260729T093345Z-report.md",
+        ".specify/teams/requirement-implement-monitor/runs/20260730T022200Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 5,
+        "escalations": 4,
+        "critiqueNotes": 1
+      }
+    },
+    {
+      "id": "ev-013",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team session-driven-self-improvement: 5 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/session-driven-self-improvement/runs/20261005T172252Z-report.md",
+        ".specify/teams/session-driven-self-improvement/runs/20261007T170045Z-report.md",
+        ".specify/teams/session-driven-self-improvement/runs/20261008T025904Z-report.md",
+        ".specify/teams/session-driven-self-improvement/runs/20261008T073900Z-report.md",
+        ".specify/teams/session-driven-self-improvement/runs/20261008T090000Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-014",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team skill-layer-install-separation: 3 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/skill-layer-install-separation/runs/20261009T080933Z-report.md",
+        ".specify/teams/skill-layer-install-separation/runs/20261009T181458Z-report.md",
+        ".specify/teams/skill-layer-install-separation/runs/20261011T021003Z-report.md"
+      ],
+      "signals": {
+        "runReports": 3,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-015",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team summarize-project-optimizer: 2 run report(s), 0 logged cycle(s), 0 critique note(s); artifacts incomplete (no STATE.md/run-log).",
+      "evidenceRefs": [
+        ".specify/teams/summarize-project-optimizer/runs/20260730T122438Z-report.md",
+        ".specify/teams/summarize-project-optimizer/runs/20260730T180020Z-report.md"
+      ],
+      "signals": {
+        "runReports": 2,
+        "loggedCycles": 0,
+        "escalations": 0,
+        "critiqueNotes": 0
+      }
+    },
+    {
+      "id": "ev-016",
+      "lane": "runs",
+      "evidenceState": "Exercised",
+      "summary": "Team viz-skill-arena: 5 run report(s), 5 logged cycle(s), 4 critique note(s).",
+      "evidenceRefs": [
+        ".specify/teams/viz-skill-arena/runs/2026-08-07T15-00-00Z-report.md",
+        ".specify/teams/viz-skill-arena/runs/2026-08-07T16-30-00Z-report.md",
+        ".specify/teams/viz-skill-arena/runs/2026-08-07T18-30-00Z-report.md",
+        ".specify/teams/viz-skill-arena/runs/2026-09-15T023000Z-report.md",
+        ".specify/teams/viz-skill-arena/runs/2026-09-15T090000Z-report.md"
+      ],
+      "signals": {
+        "runReports": 5,
+        "loggedCycles": 5,
+        "escalations": 0,
+        "critiqueNotes": 4
+      }
+    },
+    {
+      "id": "ev-017",
+      "lane": "feedback",
+      "evidenceState": "Exercised",
+      "summary": "Recurring optimization theme across 14 feedback entries: wrap up 引擎调用链需多轮参数发现 run id complexity",
+      "evidenceRefs": [
+        ".specify/memory/feedback/20261014T160808Z-skill-manage-instructions.md",
+        ".specify/memory/feedback/20261014T160808Z-skill-memory-recall.md",
+        ".specify/memory/feedback/20261014T160808Z-skill-memory-record.md",
+        ".specify/memory/feedback/20261014T160808Z-speckit-instructions.md",
+        ".specify/memory/feedback/20261015T020937Z-speckit-clarify.md",
+        ".specify/memory/feedback/20261015T020938Z-skill-clarify-artifact.md"
+      ],
+      "signals": {
+        "recurrence": 14
+      }
+    },
+    {
+      "id": "ev-018",
+      "lane": "feedback",
+      "evidenceState": "Exercised",
+      "summary": "Recurring optimization theme across 14 feedback entries: instructions 尺寸 预算 均无合法候选 delta 行全部",
+      "evidenceRefs": [
+        ".specify/memory/feedback/20261014T160808Z-skill-manage-instructions.md",
+        ".specify/memory/feedback/20261014T160808Z-skill-memory-recall.md",
+        ".specify/memory/feedback/20261014T160808Z-skill-memory-record.md",
+        ".specify/memory/feedback/20261014T160808Z-speckit-instructions.md",
+        ".specify/memory/feedback/20261015T020937Z-speckit-clarify.md",
+        ".specify/memory/feedback/20261015T020938Z-skill-clarify-artifact.md"
+      ],
+      "signals": {
+        "recurrence": 14
+      }
+    },
+    {
+      "id": "ev-019",
+      "lane": "feedback",
+      "evidenceState": "Exercised",
+      "summary": "Recurring optimization theme across 7 feedback entries: no significant optimization points identified this",
+      "evidenceRefs": [
+        ".specify/memory/feedback/20261016T061518Z-skill-review-sdd-process.md",
+        ".specify/memory/feedback/20261016T080252Z-skill-git-utils.md",
+        ".specify/memory/feedback/20261018T002912Z-speckit-clarify.md",
+        ".specify/memory/feedback/20261018T002921Z-skill-clarify-artifact.md",
+        ".specify/memory/feedback/20261019T071229Z-speckit-requirements.md",
+        ".specify/memory/feedback/20261019T072038Z-speckit-clarify.md"
+      ],
+      "signals": {
+        "recurrence": 7
+      }
+    },
+    {
+      "id": "ev-020",
+      "lane": "feedback",
+      "evidenceState": "Present",
+      "summary": "Feedback store scanned: 76 entr(y/ies), 3 recurring optimization theme(s).",
+      "evidenceRefs": [
+        ".specify/memory/feedback/20261019T170645Z-speckit-plan.md",
+        ".specify/memory/feedback/20261019T172529Z-speckit-checklist.md"
+      ],
+      "signals": {
+        "entries": 76,
+        "recurringThemes": 3
+      }
+    }
+  ],
+  "findingsDigest": "sha256:725ebafce0d30e3c4d4c1e748510990300a0ef541c02ec6f4e8b74d2796bcaab"
+}
