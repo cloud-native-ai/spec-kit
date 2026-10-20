@@ -8,7 +8,7 @@
 
 在编排层为 `sdd-loop-driver` 增加四项吞吐优化，不修改任何框架阶段命令内部：① 中型特性快车道（入口 [[STR-006]] 显式启用，`tasks` 后以制品实测七判据裁决，跳过 `checklist` 但保留 `analyze`/`review`，fail-closed 回退；被跳过的 checklist 记 [[STR-008]]、不计入完整性分母）；② 每线两个全量测试槽位（implement 起点 baseline、review 后收口 closure），中间阶段与 review 只用固定程序 `targeted-set-v1` 选择的定向集并留证据；③ plan 完成后「只小修、不重审」约束（编排层执行，U4 按最终 diff 分类，实质改动走两分支；已批准需求基线锚定 `plan_commit` 中的 `requirements.md`，分类记录写 `approved_baseline_commit`，框架内部硬执行显式排除）；④ 阶段 runner 默认 `--output-format stream-json`，原始事件流落盘，自包含派生紧凑实时日志（事件→派生行延迟 ≤120s），哨兵只认终止 `result` 文本；本地与远端都用 `nohup` 完全脱离驱动会话。
 
-SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-007]]）为行为基线，收口用同一驱动侧可执行夹具归一化重放比较；名称级测试失败基线只服务 SC-012。镜像验收 = 本对零 drift + 全部镜像对相对 B-2 冻结清单零 NEW drift。
+SC-010 以冻结提交上录制的三类卡死处置元组（[[STR-007]]）为行为基线，收口用同一驱动侧可执行夹具归一化重放比较；名称级测试失败基线只服务 SC-012。实现前复核（N-08）：冻结读数 `ba2a18db` 不适用，首个行为面提交为 `9e69f3de`，实际行为基线取父提交 `a1aac7e5`（见 § Plan Repair Record 第 5 轮）。镜像验收 = 本对零 drift + 全部镜像对相对 B-2 冻结清单零 NEW drift。
 
 **CLI 能力档案归属（2026-10-20 裁决）**：CLI 能力档案（集合、八维、`known`/`unknown`、U2/U4/U5 观测、probe/feedback、契约与测试）唯一归属于 Feature 064（`contracts/cli-profiles.md` CLP-01…CLP-17、`.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md`）。063 只保留 stream-json 输出默认（FR-026）与 nohup 脱离（FR-031），并只读引用 064 的 `references/cli/index.md`；不新增/修改 `references/cli/`、不注册 Probe Object、不定义 CP 契约或档案测试。
 
@@ -38,7 +38,7 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `feature-ref.md` FR-001…043 逐行映射到设计落点；每个设计决定在 `research.md` R-1…R-12 有理由与替代方案 |
 | II | Feature-Centric Development | ✅ Pass | 绑定 Feature 058（演化特性）；扩展切片规则：状态保持 `Implemented`，只更新 Feature detail 与索引 Last Updated；未新建 Feature |
 | III | Intent-Driven Development | ✅ Pass | 先定义「快车道何时可信、预算如何不丢回归、plan 约束边界、脱离后如何接管」，再给命令形态；四项优化的取舍和显式排除在 research/contracts。CLI 行为知识由 064 拥有，本特性只引用 |
-| IV | Test-First & Contract-Driven Implementation | ⚠ Partial — see Complexity Tracking | Tests Mode ON；5 个新脚本按 red-first 编写并配单元测试；50 个契约条款、决策表策略测试、FR-042(a)–(e) 夹具、名称级回归集成测试。SC-010 卡死处置以 `ba2a18db` 冻结提交上的行为基线（[[STR-007]]）录制与归一化重放证明；名称级基线只服务 SC-012。LLM 驱动的端到端阶段序列无法在 CI 自动化，由实现期录制 trace 证明（见 Complexity Tracking） |
+| IV | Test-First & Contract-Driven Implementation | ⚠ Partial — see Complexity Tracking | Tests Mode ON；5 个新脚本按 red-first 编写并配单元测试；50 个契约条款、决策表策略测试、FR-042(a)–(e) 夹具、名称级回归集成测试。SC-010 卡死处置以 `a1aac7e5` 行为基线（[[STR-007]]）录制与归一化重放证明（冻结读数 `ba2a18db` 因 064 行为面提交 `9e69f3de` 而不适用，见第 5 轮记录）；名称级基线只服务 SC-012。LLM 驱动的端到端阶段序列无法在 CI 自动化，由实现期录制 trace 证明（见 Complexity Tracking） |
 | V | AI Agent Integration Standards | ✅ Pass | 不新增/变更 agent provider；沿用 qodercli/claude 的 stream-json 事件形状；`AGENT_CONFIG` 与 `_ASSISTANT_TIERS` 零改动 |
 | VI | Continuous Quality & Observability | ✅ Pass | raw/live 双证据、四件套、状态脊、准入记录、预算台账、plan 分类、收尾汇总；失败与降级均显式留痕 |
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass | Feature 058 已在册；本 plan 产出四件套 + research；不越权推进 `Implemented`；Pre-Status-Flip Gate 留给 implement |
@@ -105,7 +105,7 @@ SC-010 以冻结提交 `ba2a18db` 上录制的三类卡死处置元组（[[STR-0
 ### Verification & Mutation Plan (red-first)
 
 - **Red-first**：5 个新脚本（`admission-check.py`、`derive-live-log.py`、`audit-test-budget.py`、`audit-plan-changes.py`、`stage-runner.sh`）、watch-target 扩展与驱动侧卡死夹具均先写失败测试，再实现；每个 red 运行的时间、命令与失败断言记入 `verification.md`，不事后补记。CLI 档案 schema/观测测试属于 064，不在本特性 red-first 范围。
-- **卡死行为基线（SC-010）**：实现首个行为面提交之前，在冻结提交 `ba2a18db` 的只读 worktree 上，用**驱动侧可执行夹具** `tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py` 录制三类处置元组到 [[STR-007]]：stub runner 产生受控 pid/status/heartbeat/runner-log 与 rc，真实 `watch-target.sh` 提供 U3 判定，夹具执行文档化的 U4/U5 驱动侧程序（状态脊先写后动、重试消耗、四要素上送件、下一阶段派发决策）并观测七个字段；watcher 自动夹具只提供 U3，录制 trace 只作补充证据。夹具 MUST NOT 从判定表转录或硬编码期望值，`initial_retries=0`，`exit_code` 分为 `{watcher, runner}`。录制不是全量测试运行，不消耗 FR-011 槽位。收口用同一夹具与同一初始重试数在当前树重放，归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较，零差异为通过；名称级基线只服务 SC-012。
+- **卡死行为基线（SC-010）**：实现首个行为面提交之前，在实际行为基线提交 `a1aac7e5` 的只读 worktree 上（冻结读数 `ba2a18db` 不适用：首个行为面提交为 `9e69f3de`，见第 5 轮记录），用**驱动侧可执行夹具** `tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py` 录制三类处置元组到 [[STR-007]]：stub runner 产生受控 pid/status/heartbeat/runner-log 与 rc，真实 `watch-target.sh` 提供 U3 判定，夹具执行文档化的 U4/U5 驱动侧程序（状态脊先写后动、重试消耗、四要素上送件、下一阶段派发决策）并观测七个字段；watcher 自动夹具只提供 U3，录制 trace 只作补充证据。夹具 MUST NOT 从判定表转录或硬编码期望值，`initial_retries=0`，`exit_code` 分为 `{watcher, runner}`。录制不是全量测试运行，不消耗 FR-011 槽位。收口用同一夹具与同一初始重试数在当前树重放，归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较，零差异为通过；名称级基线只服务 SC-012。
 - **变异演练**（实现期逐项执行、立即还原、记录证据；任一项未变红即视为该测试不设防）：
 
 | 目标 | 变异 | 必须变红的测试 |
@@ -154,7 +154,7 @@ skills/external/sdd-loop-driver/references/cli/  # 064 拥有（index + 五份�
 skills/external/sdd-loop-driver/scripts/         # 5 个新脚本 + watch-target.sh 扩展
 docs/reference/skills/                           # sdd-loop-driver 用户文档页更新
 tests/contract/                                  # 新增效率条款契约 + 有意更新既有 loop-driver 契约
-tests/unit/                                      # 4 个脚本单测 + 驱动侧卡死夹具单测
+tests/unit/                                      # 4 个脚本单测 + 驱动侧卡死夹具 `--self-test`
 tests/integration/                               # runner 脱离/降级 + 名称级回归集成
 tests/fixtures/sdd_loop_efficiency/              # 中型/大型 spec、stream 事件、stub CLI、临时 repo、driver-stall-fixture
 .specify/memory/features/                        # 058 扩展规划记录
@@ -179,7 +179,7 @@ tests/fixtures/sdd_loop_efficiency/              # 中型/大型 spec、stream �
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| IV Test-First 判 ⚠ Partial | 确定性组件（准入/派生/台账/plan 分类/脱离/名称级回归/驱动侧卡死夹具）全部有单元或集成测试；SC-010 卡死处置以 `ba2a18db` 上的行为基线（[[STR-007]]）与 `driver-stall-fixture.py` 的观测/归一化重放作为确定性证据（禁止判定表转录/硬编码期望值）；但端到端阶段序列由 LLM 按提示词执行，CI 无法真实重放 driver。实现期以录制编排 trace 作为该层证据，并在 verification.md 如实标注。 | 把 driver 改写成可自动调度的运行时以换取端到端 CI——违反宪法 IX（框架是提示词而非运行时平台），且会替换本特性要优化的对象；058 先例同样以录制演练 + 结构契约承载不可自动化的部分。 |
+| IV Test-First 判 ⚠ Partial | 确定性组件（准入/派生/台账/plan 分类/脱离/名称级回归/驱动侧卡死夹具）全部有单元或集成测试；SC-010 卡死处置以 `a1aac7e5` 上的行为基线（[[STR-007]]）与 `driver-stall-fixture.py` 的观测/归一化重放作为确定性证据（禁止判定表转录/硬编码期望值）；但端到端阶段序列由 LLM 按提示词执行，CI 无法真实重放 driver。实现期以录制编排 trace 作为该层证据，并在 verification.md 如实标注。 | 把 driver 改写成可自动调度的运行时以换取端到端 CI——违反宪法 IX（框架是提示词而非运行时平台），且会替换本特性要优化的对象；058 先例同样以录制演练 + 结构契约承载不可自动化的部分。 |
 
 ## Phase 0: Research Review
 
@@ -231,7 +231,7 @@ Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓）；契约文件 5（原
 
 **假设**：
 
-- `ba2a18db` 之后至实现首个行为面提交之间只含规格/计划/清单文档（requirements-repair 的自述），故 SC-010 行为基线冻结提交取 `ba2a18db`；实现期若发现行为面改动，按 FR-038 改取首个行为面改动前的提交并在状态脊记录差异。
+- `ba2a18db` 之后至实现首个行为面提交之间只含规格/计划/清单文档（requirements-repair 的自述），故 SC-010 行为基线冻结提交初取 `ba2a18db`；**实现前复核（第 5 轮）**发现 `ba2a18db` 之后的首个行为面提交为 `9e69f3de`，按 FR-038 改取首个行为面改动前的父提交 `a1aac7e5` 并在状态脊记录差异。
 - `lines.manifest` 行语法 owner 选择 `data-model.md` E1（而非契约），因为 E1 已拥有 `lines_manifest_ptr` 字段且准入脚本输入以 E1 为准；FL-03(e) 只引用。
 - `targeted-set-v1` 以现有 shell 工具实现，不新增脚本交付面；算法 owner 放 `contracts/test-budget.md` TB-05，`efficiency-model.md` §2.3 为实现载体并由契约测试钉住。
 - SC-010 行为重放不是全量测试运行，不消耗 FR-011 的两个槽位；重试上限驾驶使用录制 trace，并在 `verification.md` 如实标注。
@@ -345,3 +345,19 @@ Phase 0 预期 vs 实际：实体 8（预估 7–8 ✓）；契约文件 5（原
 - L-02：plan 与 `contracts/progress-decoupling.md` 的点名统一使用 `.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md`。`requirements.md` 的同类指针不在本轮允许的修改面（tasks.md + plan-owned 小修），保留给 requirements-owned 阶段；这是范围披露，不是判据降低。
 
 **不重审理由**：本轮只纠正指针、计数与路径，并把 tasks 层证据程序对齐已冻结的 requirements/plan/data-model/contracts 口径；不改变已批准需求范围、FR/SC 语义、架构、数据模型、契约语义或任务分解，属于 FR-022(a) 所称“修复既有缺陷所必需”。
+
+## Plan Repair Record（2026-10-20，implement 起点：analyze-rerun-3 记录项落地）
+
+**触发**：analyze-rerun-3 门 READY（0 CRITICAL / 0 HIGH）的记录项在 implement 前落实：N-08（SC-010 冻结提交不适用）、L-02（064 裁决完整路径）、L-03（夹具「单测」措辞）、L-04（收窄「或 trace」为夹具唯一、trace 补充）。N-03R 与 F-01 由 tasks-owned 行（T022/T050）承接。
+
+**PLAN-EDIT 声明**：
+
+- `PLAN-EDIT: plan.md — Summary / Constitution Check / Verification & Mutation Plan / Complexity Tracking 的 SC-010 基线提交表述由 ba2a18db 修正为「冻结读数不适用，实际基线 a1aac7e5（首个行为面提交 9e69f3de 的父提交）」；Phase 1 结构的夹具单测注释改写为 --self-test；新增第 5 轮记录；分类=minor（日期化基线纠正与措辞收窄，不改设计、范围或判定语义），理由=N-08/L-03/L-04。`
+- `PLAN-EDIT: data-model.md — § Stall Behavior Baseline 的录制对象改为实际基线 a1aac7e5 并保留冻结读数差异说明；分类=minor（证据基线纠正），理由=N-08。`
+- `PLAN-EDIT: contracts/delivery-and-invariants.md — DI-03 的 base_commit 改为实际基线 a1aac7e5，保留冻结读数与父提交规则；分类=minor（证据基线纠正），理由=N-08。`
+- `PLAN-EDIT: quickstart.md — SC-010 准备步骤的 worktree 提交改为 a1aac7e5 并说明 N-08 复核结论；分类=minor（操作步骤纠正），理由=N-08。`
+- `PLAN-EDIT: feature-ref.md — FR-038/SC-010 映射与基线记录的冻结提交改为实际基线 a1aac7e5；分类=minor（证据基线纠正），理由=N-08。`
+- `requirements.md` 的 FR-038 / SC-010 / 术语 / SC-010 Source / 两条澄清记录由 requirements-owned 修正在 implement 起点落地（完整路径 L-02、trace 收窄 L-04、基线提交 N-08），并按 PC-11 在状态脊记录 re-baseline 事件；不属于本 PLAN-EDIT 面。
+- `tasks.md` 的 T001 兜底检测显式化为「先跑 git log 复核、确认 9e69f3de、取 a1aac7e5」，T022 增补「每适用阶段恰一条 stage-status」；tasks.md 不是 plan-owned 制品。
+
+**不重审理由**：本轮只纠正已披露基线的提交取值与措辞收窄，按 FR-038/SC-010 的既有兜底条款执行，不改变四项优化的范围、FR/SC 语义、架构、数据模型语义或任务分解，属于 FR-022(a) 所称「修复既有缺陷所必需」。

@@ -45,7 +45,7 @@
 | FR-035 证据保留、无新服务 | 产物命名与边界 | PD-09 |
 | FR-036 确认门不变 | SKILL.md Boundary / DISPATCH | DI-01 |
 | FR-037 独立校验不变 | stage-prompts U4 程序 | DI-02 |
-| FR-038 卡死处置不变 | stage-prompts U5 程序；[[STR-007]] 三类场景行为基线（`ba2a18db` 冻结）；driver-stall-fixture 观测（exit_code 双字段、initial_retries=0） | DI-03 |
+| FR-038 卡死处置不变 | stage-prompts U5 程序；[[STR-007]] 三类场景行为基线（实际基线 `a1aac7e5`；冻结读数 `ba2a18db` 不适用）；driver-stall-fixture 观测（exit_code 双字段、initial_retries=0） | DI-03 |
 | FR-039 质量门不降低 | 契约与默认值（快车道默认关） | DI-04/08 |
 | FR-040 交付面与镜像 | 交付清单；`sync-mirrors --only skills/external/sdd-loop-driver`（本对零 drift + 零 NEW drift） | DI-05 |
 | FR-041 契约测试 | 既有测试有意更新 + 新契约文件（不含 CP；CLI 档案契约归 064） | DI-06 |
@@ -65,7 +65,7 @@
 | SC-007 | 事件→派生行延迟 ≤120s（无事件区间不适用）；无伪造行；无独立 sleep 回合 | `test_derive_live_log.py` + 契约 PD-02/PD-09 |
 | SC-008 | 脱离存活 + `--once` 接管不重派：存活/降级由集成测试自动证明；新会话接管由 trace 证明 | `test_sdd_loop_efficiency_runner.py` + trace |
 | SC-009 | 非终止/终止/派生失败三类哨兵用例 | 单测 + self-test |
-| SC-010 | 确认门/独立校验条款测试；卡死处置以 [[STR-007]] 行为基线（`ba2a18db`）录制并由驱动侧可执行夹具（initial_retries=0、exit_code 双字段、反转录）在收口归一化重放比较，零差异为通过；名称级基线不得冒充行为基线 | 契约测试 + driver-stall-fixture + verification.md（自动夹具/录制 trace 如实标注） |
+| SC-010 | 确认门/独立校验条款测试；卡死处置以 [[STR-007]] 行为基线（实际基线 `a1aac7e5`）录制并由驱动侧可执行夹具（initial_retries=0、exit_code 双字段、反转录）在收口归一化重放比较，零差异为通过；名称级基线不得冒充行为基线 | 契约测试 + driver-stall-fixture + verification.md（自动夹具/录制 trace 如实标注） |
 | SC-011 | 不支持 stream-json 的 stub CLI → 降级标记、无伪 DONE | runner 集成测试 |
 | SC-012 | 全量名称级基线（implement 起点冻结）与改动后名称级差集为空；本对镜像零 drift，全部镜像对相对冻结基线零 NEW drift（既有 DIFF 作为已披露例外）；既有契约绿或有意更新 | `run-tests.sh --names-out` + `sync-mirrors.py --check` |
 | SC-013 | 本特性运行 trace 检索 checklist/analyze/review 产物；快车道记录数 0 | verification.md + `test_fl_10` |
@@ -121,7 +121,7 @@ tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py        # 新增（驱
 
 - **既有契约**：plan 期 `tests/contract/test_sdd_loop_driver_skill.py` = 21 passed / 2 failed（C-12/C-18 镜像漂移）；2026-10-20 合并 064 后实测 23 passed / 0 failed，本特性只需保持绿色并有意更新 C-3/C-4。
 - **镜像**：plan 期 `sync-mirrors.py --check --only skills/external` 退出码 2，68 个 DIFF 跨 12 个技能目录，sdd-loop-driver 占 3 个（SKILL.md、references/dispatch-recipes.md、references/watch-model.md）；2026-10-20 合并 064 后实测 62 DIFF / 12 目录、本对 0 DIFF。零 NEW drift 以 `research.md` B-2 冻结清单为比较对象。
-- **卡死行为基线（SC-010）**：冻结提交 `ba2a18db`；实现首个行为面提交之前录制 `notes/stall-behavior-baseline.json`（[[STR-007]]），覆盖超时 / 重试上限 / 伪完成三类处置元组；本 plan 期该基线尚不存在，由实现期录制，收口以同一组夹具归一化重放比较。名称级测试失败基线只服务 SC-012。
+- **卡死行为基线（SC-010）**：实际行为基线提交 `a1aac7e5`（规格冻结读数 `ba2a18db` 不适用：首个行为面提交为 `9e69f3de`，取父提交）；实现首个行为面提交之前录制 `notes/stall-behavior-baseline.json`（[[STR-007]]），覆盖超时 / 重试上限 / 伪完成三类处置元组；本 plan 期该基线尚不存在，由实现期录制，收口以同一组夹具归一化重放比较。名称级测试失败基线只服务 SC-012。
 - **watcher 自测**：plan 期 12 passed / 4 failed（macOS：无 `/proc` 的 pid-reuse、zombie；`sleep 3` 时序的 manifest；`pgrep -c` 平台差异）；2026-10-20 合并 064 与 monitor hotfix 后实测 28 passed / 0 failed。本特性扩展自测时保持跨平台或显式跳过。
 - **规格校验**：`validate-requirements.py` = exit 0；tasks-repair-2 收口 CLI-profile 条款后实测 343 lines / 56 definition rows / 8 shared strings（plan-repair-2 临时增量为 382 / 65 / 10，已迁出 064；requirements-repair 第 2 轮为 313 / 56 / 8，plan 初测为 301 / 56 / 6，作历史对照）。
 - **测试运行器**：`run-tests.sh --names-out` 探针 = 7 passed、名单 0 行；全量名称级基线在 implement 起点按本特性预算规则捕获。

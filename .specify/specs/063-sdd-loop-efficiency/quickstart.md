@@ -157,7 +157,7 @@ python3 skills/external/sdd-loop-driver/scripts/audit-plan-changes.py \
 按 `references/efficiency-model.md` 的 U0–U6 流程，用一个中型夹具跑一次「入口携带 `fast-lane=opt-in` → tasks 后准入 → 跳过 checklist → analyze → implement（起点全量）→ review → 收口全量 → 合并」；同时跑一个未携带字面量的对照，确认完整链。记录派发序列、状态脊、台账与收尾汇总。
 
 - **证据形态**：实现期在 `verification.md` 粘贴两份录制 trace（快车道/完整链）的路径与要点；CI 只自动验证确定性组件与契约条款，不冒充端到端证明（better-harness 证据纪律）。SC-002/SC-003/SC-006/SC-008 的非自动部分以该 trace 为证据并如实标注。
-- **卡死行为基线（SC-010）**：在实现首个行为面提交之前，于冻结提交 `ba2a18db` 的只读 worktree 上，用驱动侧可执行夹具 `tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py` 录制 [[STR-007]] 的三类处置元组（超时 / 重试上限 / 伪完成）：stub runner 产生受控 status/rc，真实 `watch-target.sh` 提供 U3 判定，夹具执行文档化 U4/U5 程序并观测七个字段；`initial_retries=0`，`exit_code` 分 `{watcher, runner}`；夹具不得从判定表转录或硬编码期望值。收口用同一夹具重放，归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较，零差异为通过。该录制不是全量测试运行，不消耗两个全量槽位；名称级基线只服务 SC-012。
+- **卡死行为基线（SC-010）**：在实现首个行为面提交之前，于实际行为基线提交 `a1aac7e5` 的只读 worktree 上（规格冻结读数 `ba2a18db` 不适用：首个行为面提交为 `9e69f3de`，取父提交），用驱动侧可执行夹具 `tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py` 录制 [[STR-007]] 的三类处置元组（超时 / 重试上限 / 伪完成）：stub runner 产生受控 status/rc，真实 `watch-target.sh` 提供 U3 判定，夹具执行文档化 U4/U5 程序并观测七个字段；`initial_retries=0`，`exit_code` 分 `{watcher, runner}`；夹具不得从判定表转录或硬编码期望值。收口用同一夹具重放，归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较，零差异为通过。该录制不是全量测试运行，不消耗两个全量槽位；名称级基线只服务 SC-012。
 - **钉住**：`tests/contract/test_sdd_loop_driver_efficiency.py::test_fl_10_self_application_exclusion` 只钉住「本特性自身不走快车道」；trace 本身不是 CI 测试。
 
 > **CLI 能力档案场景（归属 064）**：派发前查档、U2/U4/U5 观测、known/unknown 与 feedback 标记的执行示例由 Feature 064 的 quickstart 与 `contracts/cli-profiles.md` 拥有；本文不复制、不重测。

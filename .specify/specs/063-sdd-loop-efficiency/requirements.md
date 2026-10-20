@@ -3,7 +3,7 @@
 **Requirement Branch**: `063-sdd-loop-efficiency`  
 **Created**: 2026-10-20  
 **Status**: Draft  
-**Input**: User description: "优化 sdd-loop-driver 无人值守 SDD 运行吞吐：为中型特性提供显式、可审计的快车道（跳过 checklist，保留 analyze/review）；全量测试每特性运行仅两次（implement 起点与最终收口），中间阶段与 review 使用定向测试并记录证据；plan 阶段预置「下游只小修、不重审」约束（框架命令内部硬约束不可安全实现时显式排除）；阶段派发采用 stream-json 进度可见与 nohup 完全解耦，保持完成哨兵、独立校验、确认门与卡死处置不变。本特性自身仍走完整阶段链（checklist/analyze/review 必需），快车道仅作用于未来运行。" 需求语义权威（brief）已归档为 dated record：[notes/source-requirement.md](notes/source-requirement.md)（2026-10-20 逐字快照）；原 `/tmp/sdd-loop-efficiency-brief.md` 仅保留为 provenance 注记，不再作为权威引用。**CLI 能力档案归属（2026-10-20 裁决）**：CLI 能力档案（集合、必填维度、known/unknown、U2/U4/U5 观测、probe/feedback、契约与测试）唯一归属于 Feature 064（`.specify/specs/064-subagent-concurrency/`；逐条裁决见 `notes/063-overlap-adjudication.md`）。本规格只保留四项吞吐优化与 stream-json / nohup 能力，不再定义、复制或测试 CLI 档案；需要 CLI 行为知识时指向 064 的 `contracts/cli-profiles.md` 与 `skills/external/sdd-loop-driver/references/cli/index.md`。
+**Input**: User description: "优化 sdd-loop-driver 无人值守 SDD 运行吞吐：为中型特性提供显式、可审计的快车道（跳过 checklist，保留 analyze/review）；全量测试每特性运行仅两次（implement 起点与最终收口），中间阶段与 review 使用定向测试并记录证据；plan 阶段预置「下游只小修、不重审」约束（框架命令内部硬约束不可安全实现时显式排除）；阶段派发采用 stream-json 进度可见与 nohup 完全解耦，保持完成哨兵、独立校验、确认门与卡死处置不变。本特性自身仍走完整阶段链（checklist/analyze/review 必需），快车道仅作用于未来运行。" 需求语义权威（brief）已归档为 dated record：[notes/source-requirement.md](notes/source-requirement.md)（2026-10-20 逐字快照）；原 `/tmp/sdd-loop-efficiency-brief.md` 仅保留为 provenance 注记，不再作为权威引用。**CLI 能力档案归属（2026-10-20 裁决）**：CLI 能力档案（集合、必填维度、known/unknown、U2/U4/U5 观测、probe/feedback、契约与测试）唯一归属于 Feature 064（`.specify/specs/064-subagent-concurrency/`；逐条裁决见 `.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md`）。本规格只保留四项吞吐优化与 stream-json / nohup 能力，不再定义、复制或测试 CLI 档案；需要 CLI 行为知识时指向 064 的 `contracts/cli-profiles.md` 与 `skills/external/sdd-loop-driver/references/cli/index.md`。
 
 ## Related Feature *(mandatory)*
 
@@ -132,7 +132,7 @@
 
 ---
 
-> **Delegated scope（CLI 能力档案，归属 064）**：CLI 能力档案不在本特性范围。其用户故事、观测触发（U2/U4/U5）、probe/feedback 与验收由 Feature 064 拥有（`.specify/specs/064-subagent-concurrency/requirements.md` 的 CLI 档案条款；`contracts/cli-profiles.md` CLP-01…CLP-17；裁决 `notes/063-overlap-adjudication.md`）。本规格不重复其故事、场景、实体或验收。063 的 stream-json 默认（FR-026）与 nohup 脱离（FR-031）是 064 档案记录的既有事实，由 064 只读引用。
+> **Delegated scope（CLI 能力档案，归属 064）**：CLI 能力档案不在本特性范围。其用户故事、观测触发（U2/U4/U5）、probe/feedback 与验收由 Feature 064 拥有（`.specify/specs/064-subagent-concurrency/requirements.md` 的 CLI 档案条款；`contracts/cli-profiles.md` CLP-01…CLP-17；裁决 `.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md`）。本规格不重复其故事、场景、实体或验收。063 的 stream-json 默认（FR-026）与 nohup 脱离（FR-031）是 064 档案记录的既有事实，由 064 只读引用。
 
 ---
 
@@ -219,7 +219,7 @@
 
 - **FR-036**: 四项优化 MUST NOT 改变确认门：push 仍是破坏性动作、须显式授权；MUST NOT 新增自动批准或绕过路径。
 - **FR-037**: 独立校验 MUST 不变：执行者自报的完成仍只是候选；哨兵、产物核验与纪律抽查 MUST 同时成立，校验者 MUST NOT 是该阶段执行子代理。
-- **FR-038**: 卡死处置 MUST 不变：阶段 deadline、重试上限、四要素上送件（发现了什么 / 为何吃重 / 中间产物逐项可定位 / 可选处置）与状态脊先写后动 MUST 保持；脱离运行中途失去驱动 MUST 可恢复，MUST NOT 被静默遗弃。该「不变」MUST 以可复算的行为基线判定，MUST NOT 以名称级测试失败基线替代：在冻结提交（本规格为 `ba2a18db`；若实现起点前另有行为面改动，以首个行为面改动前的提交为准并在状态脊记录差异）上，以三类场景夹具录制处置结果元组——超时（TIMEOUT）、重试上限（stalled + 四要素上送件）、伪完成（退出 rc=0 且哨兵缺失 → INCOMPLETE，不派发下一阶段）；每个元组 MUST 至少记录 watcher 判定、退出码（MUST 区分 watcher 判定退出码与 runner rc）、状态脊卡死状态、消耗的重试次数、四要素上送件齐备性（或不适用）、是否派发下一阶段、状态脊是否先写后动。驱动侧字段（状态脊卡死状态、重试消耗、四要素齐备性、下一阶段派发、先写后动、runner rc）MUST 由脚本化驱动夹具或可重放的驱动 trace 观测产生，MUST NOT 从 U3/U4/U5 判定表转录、MUST NOT 在夹具内硬编码期望值或从基线文件回填；录制 MUST 固定并记录初始已试次数（本规格为 0）。基线制品 MUST 为 [[STR-007]]（含 `base_commit`、场景、逐字段元组与录制证据指针），MUST 在实现首个行为面提交之前录制；收口 MUST 由同一可执行夹具在当前树上重放驱动侧步骤，归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较，MUST NOT 仅重读基线文件；任何字段差异 MUST 判回归并修复，MUST NOT 以归因豁免。
+- **FR-038**: 卡死处置 MUST 不变：阶段 deadline、重试上限、四要素上送件（发现了什么 / 为何吃重 / 中间产物逐项可定位 / 可选处置）与状态脊先写后动 MUST 保持；脱离运行中途失去驱动 MUST 可恢复，MUST NOT 被静默遗弃。该「不变」MUST 以可复算的行为基线判定，MUST NOT 以名称级测试失败基线替代：在冻结提交（本规格为 `ba2a18db`；若实现起点前另有行为面改动，以首个行为面改动前的提交为准并在状态脊记录差异）上，以三类场景夹具录制处置结果元组——超时（TIMEOUT）、重试上限（stalled + 四要素上送件）、伪完成（退出 rc=0 且哨兵缺失 → INCOMPLETE，不派发下一阶段）；每个元组 MUST 至少记录 watcher 判定、退出码（MUST 区分 watcher 判定退出码与 runner rc）、状态脊卡死状态、消耗的重试次数、四要素上送件齐备性（或不适用）、是否派发下一阶段、状态脊是否先写后动。驱动侧字段（状态脊卡死状态、重试消耗、四要素齐备性、下一阶段派发、先写后动、runner rc）MUST 由唯一执行体的脚本化驱动夹具（`tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py`）观测产生；录制 trace 只能作补充证据，MUST NOT 替代夹具观测，MUST NOT 作为驱动侧字段来源；夹具 MUST NOT 从 U3/U4/U5 判定表转录、MUST NOT 在夹具内硬编码期望值或从基线文件回填；录制 MUST 固定并记录初始已试次数（本规格为 0）。实现前复核（2026-10-20，N-08）：`ba2a18db` 之后的首个行为面提交为 `9e69f3de`（Feature 064 的 line registry），故本规格冻结读数 `ba2a18db` 不适用，实际行为基线取首个行为面改动前的父提交 `a1aac7e5`，差异记录于状态脊与 `notes/pre-change-measurements.md`。基线制品 MUST 为 [[STR-007]]（含 `base_commit`、场景、逐字段元组与录制证据指针），MUST 在实现首个行为面提交之前录制；收口 MUST 由同一可执行夹具在当前树上重放驱动侧步骤，归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较，MUST NOT 仅重读基线文件；任何字段差异 MUST 判回归并修复，MUST NOT 以归因豁免。
 - **FR-039**: 四项优化 MUST NOT 降低质量门：analyze/review 必经、必需校验不得静默跳过、测试预算不得静默超支、快车道不得静默启用。
 
 #### 自应用、分发与测试
@@ -231,7 +231,7 @@
 
 #### CLI Capability Profiles（归属 064，仅指针）
 
-CLI 能力档案的集合、必填维度、`known` / `unknown`、provenance、U2/U4/U5 观测、probe/feedback、交付与契约测试由 Feature 064 唯一拥有：`.specify/specs/064-subagent-concurrency/requirements.md`（CLI 档案条款）、`contracts/cli-profiles.md`（CLP-01…CLP-17）、`notes/063-overlap-adjudication.md`。本特性 MUST NOT 定义、复制、测试或注册第二套 CLI 档案；本特性的 stream-json 默认（FR-026）与 nohup 脱离（FR-031）是 064 档案记录的既有事实，由 064 引用。
+CLI 能力档案的集合、必填维度、`known` / `unknown`、provenance、U2/U4/U5 观测、probe/feedback、交付与契约测试由 Feature 064 唯一拥有：`.specify/specs/064-subagent-concurrency/requirements.md`（CLI 档案条款）、`contracts/cli-profiles.md`（CLP-01…CLP-17）、`.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md`。本特性 MUST NOT 定义、复制、测试或注册第二套 CLI 档案；本特性的 stream-json 默认（FR-026）与 nohup 脱离（FR-031）是 064 档案记录的既有事实，由 064 引用。
 
 ### 显式排除项（Out of Scope）
 
@@ -256,7 +256,7 @@ CLI 能力档案的集合、必填维度、`known` / `unknown`、provenance、U2
 - **Plan Change Classification（plan 改动分类）**: 下游阶段对 plan 制品改动的分类结果（小修 / 实质改动 / 未声明），含判定依据与处置去向。
 - **Targeted Test Set（定向测试集）**: 按确定性规则选出的测试路径集合，附选择依据与充分性说明。
 - **Stage Dispatch Record（派发记录）**: 阶段名、提示词路径、派发形态（是否脱离）、哨兵字面量、deadline、四件套路径与快车道/plan 约束标记。
-- **Stall Behavior Baseline（卡死行为基线）**: 冻结提交上由脚本化驱动夹具或可重放驱动 trace 观测的三类卡死场景处置元组（watcher 判定、退出码（watcher 判定退出码与 runner rc）、状态脊卡死状态、重试次数（初始固定为 0，记录消耗值）、四要素齐备性、下一阶段是否派发、状态脊是否先写后动），以及同一可执行夹具的收口重放与归一化比较结果；驱动侧字段 MUST 为观测值，不得从判定表转录。
+- **Stall Behavior Baseline（卡死行为基线）**: 冻结提交上由唯一执行体的脚本化驱动夹具（`driver-stall-fixture.py`）观测的三类卡死场景处置元组（watcher 判定、退出码（watcher 判定退出码与 runner rc）、状态脊卡死状态、重试次数（初始固定为 0，记录消耗值）、四要素齐备性、下一阶段是否派发、状态脊是否先写后动），以及同一可执行夹具的收口重放与归一化比较结果；录制 trace 只作补充证据，驱动侧字段 MUST 为夹具观测值，不得从判定表转录或由 trace 替代。
 - **CLI Capability Profile / CLI Observation Record（归属 064，不在本特性实体清单）**: 其唯一 owner 为 Feature 064 的 `data-model.md` E9/E10 与 `contracts/cli-profiles.md`；063 不重复定义字段、观测记录或验收。
 
 ## Success Criteria *(mandatory)*
@@ -272,7 +272,7 @@ CLI 能力档案的集合、必填维度、`known` / `unknown`、provenance、U2
 - **SC-007**: 在一个有事件输出的阶段中，每个有效进度事件自被 runner 接收（写入 raw stream 的时刻）到对应派生行写入紧凑实时日志的延迟不超过 120 秒（事件→派生行延迟）；无事件的静默区间不适用该阈值；阶段无事件时伪造进度行数为 0（每条派生行 MUST 可追溯到一条 raw 事件）；驱动独立 `sleep` 回合与固定 cadence 空转次数为 0。
 - **SC-008**: 驱动进程中途退出后，脱离阶段继续并完成的比例为 100%；新会话凭状态脊与 `--once` 快照接管、且未重新派发已完成阶段的比例为 100%。
 - **SC-009**: 非终止事件中的哨兵字样被判 DONE 的次数为 0；终止结果事件中的哨兵被正确识别的比例为 100%；派生失败时伪 DONE 次数为 0。
-- **SC-010**: 未授权 push 次数为 0；确认门绕过次数为 0；独立校验绕过次数为 0；卡死场景（超时 / 重试上限 / 伪完成）的处置结果与 [[STR-007]] 行为基线逐字段一致率为 100%（归一化后零差异；基线在实现首个行为面提交之前的冻结提交上录制，七字段包含驱动侧观测值，由脚本化驱动夹具或可重放驱动 trace 产生并经同一可执行夹具重放比较）；把名称级测试失败基线冒充行为基线的次数为 0；从判定表转录驱动侧字段的次数为 0。
+- **SC-010**: 未授权 push 次数为 0；确认门绕过次数为 0；独立校验绕过次数为 0；卡死场景（超时 / 重试上限 / 伪完成）的处置结果与 [[STR-007]] 行为基线逐字段一致率为 100%（归一化后零差异；基线在实现首个行为面提交之前的冻结提交上录制，七字段包含驱动侧观测值，由唯一执行体的脚本化驱动夹具产生并经同一可执行夹具重放比较，录制 trace 只作补充证据）；把名称级测试失败基线冒充行为基线的次数为 0；从判定表转录驱动侧字段的次数为 0；以录制 trace 替代夹具观测驱动侧字段的次数为 0。
 - **SC-011**: 不支持 stream-json 的 CLI 运行 100% 记录降级标记，伪 DONE 次数为 0，因降级导致的阶段失败次数为 0。
 - **SC-012**: 既有 loop-driver 契约测试 100% 保持绿色，或因本特性被有意更新且有记录；相对冻结基线零新增失败（名称级差集为空）；镜像判据 = 本特性触碰的 `sdd-loop-driver` 镜像对零 drift，且全部镜像对相对冻结基线零 NEW drift；其余镜像对的既有漂移作为已记录基线例外保留、不得扩大；未启用快车道的默认行为与改动前一致。
 - **SC-013**: 本特性自身运行包含 `checklist`、`analyze`、`review` 的产物与证据；本特性自身运行中的快车道记录数为 0。
@@ -287,7 +287,7 @@ CLI 能力档案的集合、必填维度、`known` / `unknown`、provenance、U2
 - **SC-007 Source**: raw stream 逐行接收时间戳（runner 从 CLI 读取并写入时打点）与派生实时日志逐行时间戳的逐事件配对；对每条有对应事件的行计算事件→派生行延迟并与 120 秒比较，无事件区间不计入；伪造行审计 = 无对应 raw 事件的派生行计数（须为 0）；驱动调用序列用于独立 `sleep` / 固定 cadence 审计。
 - **SC-008 Source**: 脱离存活夹具：中途终止驱动进程，检查 runner 的退出记录与阶段产物；重入演练记录 `--once` 快照与派发决策。
 - **SC-009 Source**: 派生与 watcher 夹具：非终止事件注入、终止结果事件、派生失败三类用例的判定记录。
-- **SC-010 Source**: 冻结提交上的三类卡死场景录制 [[STR-007]]（超时 / 重试上限 / 伪完成）。watcher 提供 U3 判定；驱动侧字段由脚本化驱动夹具（或可重放的驱动 trace）执行 U4/U5 程序、以 stub runner 驱动重试消耗，并从状态脊快照、派发记录与退出记录观测产生，MUST NOT 从判定表转录、硬编码期望值或从基线文件回填。录制与收口重放 MUST 使用同一可执行夹具与同一初始已试次数（0），归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较；退出码 MUST 区分 watcher 判定退出码与 runner rc；证据类别（自动夹具 / 录制驱动 trace）在验证记录中如实标注；确认门与独立校验由契约条款测试覆盖。
+- **SC-010 Source**: 冻结提交上的三类卡死场景录制 [[STR-007]]（超时 / 重试上限 / 伪完成）。watcher 提供 U3 判定；驱动侧字段由唯一执行体的脚本化驱动夹具（`tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py`）执行 U4/U5 程序、以 stub runner 驱动重试消耗，并从状态脊快照、派发记录与退出记录观测产生；录制 trace 只作补充证据，MUST NOT 替代夹具观测。夹具 MUST NOT 从判定表转录、硬编码期望值或从基线文件回填。录制与收口重放 MUST 使用同一可执行夹具与同一初始已试次数（0），归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较；退出码 MUST 区分 watcher 判定退出码与 runner rc；证据类别（自动夹具 / 录制驱动 trace）在验证记录中如实标注；确认门与独立校验由契约条款测试覆盖。
 - **SC-011 Source**: 降级夹具：不支持 stream-json 的 CLI 桩、状态脊降级标记、判定与退出码记录。
 - **SC-012 Source**: 改动前用 `scripts/bash/run-tests.sh --names-out <file>` 冻结失败名单，改动后用同一命令输出并以 `comm -13` 断言为空；`scripts/python/sync-mirrors.py --check` 的输出按镜像对归属统计——本特性拥有的 `skills/external/sdd-loop-driver` ↔ `.specify/skills/sdd-loop-driver` 对零 DIFF，全部镜像对相对冻结基线零 NEW DIFF，其余镜像对的既有 DIFF 逐条保留在冻结基线清单中并记录为已披露例外。
 - **SC-013 Source**: 本规格目录的 `checklists/`、analyze/review 产物与收尾汇总；检索本特性运行记录中的快车道标记（应为 0）。
@@ -320,7 +320,7 @@ CLI 能力档案的集合、必填维度、`known` / `unknown`、provenance、U2
 
 ### Session 2026-10-20（requirements-repair 第 1 轮，analyze 门回环）
 
-- Q: SC-010 的「改动前基线」采用什么证据形态？ → A: 采用行为基线，不收窄为契约测试、也不用名称级测试失败基线替代。冻结提交为 `ba2a18db`（此后至实现开始的提交只含规格/计划/清单文档，不改变驱动行为面）；在实现首个行为面提交之前，用超时 / 重试上限 / 伪完成三类场景夹具录制处置元组到 [[STR-007]]；收口以同一组夹具重放，归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较，零差异为通过。名称级测试基线只服务于 SC-012。
+- Q: SC-010 的「改动前基线」采用什么证据形态？ → A: 采用行为基线，不收窄为契约测试、也不用名称级测试失败基线替代。规格冻结读数为 `ba2a18db`；实现前复核（N-08）发现其后的首个行为面提交为 `9e69f3de`，实际基线改取首个行为面改动前的父提交 `a1aac7e5` 并在状态脊记录差异；在实现首个行为面提交之前，用超时 / 重试上限 / 伪完成三类场景夹具录制处置元组到 [[STR-007]]；收口以同一组夹具重放，归一化剔除时间戳、PID、绝对路径与耗时后逐字段比较，零差异为通过。名称级测试基线只服务于 SC-012。
 - Q: FR-022 的「已批准需求基线」绑定到什么制品与提交？ → A: 绑定 plan U4 通过时记录的 `plan_commit` 中 `requirements.md` 的 FR/SC 定义集合与语义；U4 分类记录写入 `approved_baseline_commit`，分支 (a)/(b) 只与该提交比较，不得使用工作树当前文本或其它提交替代。
 - Q: SC-007 的 120 秒阈值计时对象是什么？ → A: 事件→派生行延迟——每条有效事件从 runner 接收（写入 raw stream）到对应派生行写入 live log 不超过 120 秒；无事件区间不适用该阈值，且不得为填补空白伪造进度行；每条派生行必须可追溯到一条 raw 事件。
 - Q: 快车道授权跳过的 checklist 在 SC-005 的 100% 证据完整率中如何计？ → A: 记为 [[STR-008]]，不计入分母，且不得记为 `unknown`；联结依据是 E1 准入记录与 [[STR-003]]。
@@ -329,7 +329,7 @@ CLI 能力档案的集合、必填维度、`known` / `unknown`、provenance、U2
 
 ### Session 2026-10-20（requirements-repair 第 2 轮，analyze 门回环）
 
-- Q: SC-010 的驱动侧字段如何成为可复算证据？ → A: 保留 100% 实测一致率，不降级。三类场景的驱动侧字段 MUST 由脚本化驱动夹具或可重放的驱动 trace 观测产生，watcher 只提供 U3 判定；录制固定并记录初始已试次数（0），退出码 MUST 区分 watcher 判定退出码与 runner rc；收口由同一可执行夹具重放驱动侧步骤，MUST NOT 从判定表转录或仅重读基线文件。名称级测试失败基线只服务 SC-012。
+- Q: SC-010 的驱动侧字段如何成为可复算证据？ → A: 保留 100% 实测一致率，不降级。三类场景的驱动侧字段 MUST 由唯一执行体的脚本化驱动夹具（`driver-stall-fixture.py`）观测产生；录制 trace 只作补充证据，MUST NOT 替代夹具观测。watcher 只提供 U3 判定；录制固定并记录初始已试次数（0），退出码 MUST 区分 watcher 判定退出码与 runner rc；收口由同一可执行夹具重放驱动侧步骤，MUST NOT 从判定表转录或仅重读基线文件。名称级测试失败基线只服务 SC-012。
 - Q: `requirements.md` 在 plan U4 后被合法修改时，批准基线如何重新锚定？ → A: 在下一个依赖该基线的 U4 分类前记录 re-baseline 事件（触发、时间、前一基线、新基线 = 包含该变更的提交、FR/SC 差异摘要），`approved_baseline_commit` 更新为新基线；变更未提交或无法定位提交时不得 re-anchor，受影响 plan 改动按 FR-022(b) 上送；re-anchoring 不构成 plan 重审、不移动约束生效点，后续分支判定以最新基线为准。
 - Q: SC-005 的完整性分母与 `not-run-docs-only` 如何计？ → A: 分母 = 全部适用阶段（含文档型阶段）；文档型阶段按缩减字段集（阶段状态、选择依据、改动路径证据、证据指针）判完整，运行字段不适用且不报 `unknown`；授权跳过（[[STR-008]]）不计入分母；整阶段缺失证据记录计入分母并判未完整；收口审计 MUST 输出 `stages=N complete=N`。
 
@@ -340,3 +340,8 @@ CLI 能力档案的集合、必填维度、`known` / `unknown`、provenance、U2
 - Q: probe/feedback 注册如何处置？ → A: 由 064 的最小 Probe Object `skill-sdd-loop-driver-cli-profile` 承担；063 不注册、不修改 `shared/definitions/probe-definitions.md`，不新增任何 CLI-profile 专用 Object 或测试。
 - Q: 编号与计数如何收口？ → A: FR 收口到 FR-043，SC 收口到 SC-013，Shared Strings 收口到 STR-008；所有 FR/SC/条款/任务/交付计数与引用 MUST 重算，`validate-requirements.py` 与 `validate-tasks.py` exit 0，且无悬空引用或重复定义。
 - Q: 本特性与 064 的依赖方向是什么？ → A: 输出模式的吞吐默认（stream-json）由 063 拥有，064 CLP-08 只记录事实、不得改写；063 实现 stream-json/nohup 时可只读引用 064 的 `references/cli/index.md` 与档案，但 MUST NOT 新增/修改该目录、复制其内容或另立契约。
+
+### Session 2026-10-20（implement 起点，analyze-rerun-3 记录项落地）
+
+- Q: SC-010 的行为基线提交取哪个？ → A: 规格冻结读数 `ba2a18db` 不适用。实现前复核 `git log --oneline ba2a18db..HEAD -- skills/external/sdd-loop-driver/SKILL.md references scripts` 显示首个行为面提交为 `9e69f3de`（Feature 064 的 line registry），故按 FR-038 的兜底条款改取首个行为面改动前的父提交 `a1aac7e5` 作为实际行为基线；差异写入状态脊 stall baseline 行、`notes/pre-change-measurements.md` 与 plan.md § Plan Repair Record 第 5 轮。
+- Q: 驱动侧字段的证据形态是否允许 trace 替代夹具？ → A: 不允许。`tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py` 是唯一执行体与唯一驱动侧字段来源；录制 trace 只能作补充证据，不得替代夹具观测（L-04 收窄）。
