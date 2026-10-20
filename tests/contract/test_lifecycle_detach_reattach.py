@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,6 +12,7 @@ from pathlib import Path
 import pytest
 
 from fixtures.line_fixtures import (
+    engine_path,
     four_piece,
     make_line_id,
     make_project,
@@ -126,6 +128,33 @@ def test_lc_04_reservation_exclusive(tmp_path):
         "--start-token", _token(os.getpid()), reg=reg,
     )
     assert refused.returncode == 3
+
+
+def test_lc_04_reservation_concurrent_single_winner(tmp_path):
+    project = make_project(tmp_path)
+    reg = tmp_path / "reg"
+    entry = _register(reg, project)
+    token = _token(os.getpid())
+    env = dict(os.environ, SPECIFY_LINE_REGISTRY_DIR=str(reg))
+    procs = []
+    for index in range(6):
+        procs.append(subprocess.Popen(
+            [sys.executable, str(engine_path()), "--action", "reserve",
+             "--line-id", entry["line_id"], "--stage", "plan",
+             "--run-id", make_run_id(f"{index:04x}"),
+             "--pid", str(os.getpid()), "--start-token", token],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env,
+        ))
+    results = []
+    for proc in procs:
+        out, err = proc.communicate(timeout=20)
+        results.append((proc.returncode, out, err))
+    winners = [row for row in results if row[0] == 0]
+    refused = [row for row in results if row[0] == 3]
+    assert len(winners) == 1, results
+    assert len(refused) == 5, results
+    stored = json.loads((reg / "reservations" / f"{entry['line_id']}.plan.json").read_text())
+    assert stored["line_id"] == entry["line_id"]
 
 
 def test_lc_05_live_lease_refused_and_cadence(tmp_path):

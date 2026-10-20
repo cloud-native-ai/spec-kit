@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """line-registry.py — environment Line Registry / envelope / lifecycle engine.
 
-Feature 064.  Python 3.8+ stdlib only.  One file owns the file-based state:
+064.  Python 3.8+ stdlib only.  One file owns the file-based state:
 
   * per-line registry entry   $REGISTRY/<line_id>.json   (atomic replace)
   * same-line lock            $REGISTRY/<line_id>.lock   (fcntl.flock)

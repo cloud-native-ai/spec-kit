@@ -130,7 +130,7 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 
 - **派发前（U2）只读查档**：按目标 CLI 档案选择超时/脱离形态，派发记录写 `profile_id` / `profile_version` / `observed_cli_version`；匹配且无新事实不产生反馈。
 - **U4/U5 观测后更新**：实际行为与 `known` 不符、`unknown` 获得已验证值、或新版本/平台行为首次出现时，先写状态脊 `cli_observations`，再更新档案 provenance，再记录恰好一条 `cli-profile:<cli>` 反馈；无新事实零反馈。
-- **派发资格**：仍由 Feature 061 的 `CAPABILITY_MATRIX`（`scripts/python/execution-config.py`）**唯一**拥有；档案只记录观测，冲突时资格以矩阵为准。
+- **派发资格**：仍由 061 的 `CAPABILITY_MATRIX`（`scripts/python/execution-config.py`）**唯一**拥有；档案只记录观测，冲突时资格以矩阵为准。
 - 档案更新不得改变哨兵、watcher 判定/退出码、确认门、阶段 deadline 或测试预算；当前阶段使用 U2 记录的形态。
 
 ## Wrap-up

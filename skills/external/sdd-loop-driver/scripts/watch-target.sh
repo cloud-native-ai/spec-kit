@@ -35,7 +35,7 @@ watch-target.sh — bounded long-poll watcher (read-only)
 Single target:
   watch-target.sh --label L --pid-file P --status-file S --log G \
                   [--sentinel STAGE-DONE] [--heartbeat H] \
-                  [--line-id ID --run-id RUN] [--meta FILE] \
+                  [--line-id ID --run-id RUN] [--stage STAGE] [--meta FILE] \
                   [--lease-renew-cmd CMD --lease-renew-interval N] \
                   [--deadline-epoch E | --timeout T] \
                   [--window N] [--interval N] [--start-grace N] \
@@ -114,6 +114,7 @@ SELF_TEST=0
 START_EPOCH=0
 LINE_ID=""
 RUN_ID=""
+STAGE=""
 META=""
 LEASE_RENEW_CMD=""
 LEASE_RENEW_INTERVAL=60
@@ -136,6 +137,7 @@ while [ "$#" -gt 0 ]; do
     --manifest) [ "$#" -ge 2 ] || die_usage "--manifest needs a value"; MANIFEST="$2"; shift 2 ;;
     --line-id) [ "$#" -ge 2 ] || die_usage "--line-id needs a value"; LINE_ID="$2"; shift 2 ;;
     --run-id) [ "$#" -ge 2 ] || die_usage "--run-id needs a value"; RUN_ID="$2"; shift 2 ;;
+    --stage) [ "$#" -ge 2 ] || die_usage "--stage needs a value"; STAGE="$2"; shift 2 ;;
     --meta) [ "$#" -ge 2 ] || die_usage "--meta needs a value"; META="$2"; shift 2 ;;
     --lease-renew-cmd) [ "$#" -ge 2 ] || die_usage "--lease-renew-cmd needs a value"; LEASE_RENEW_CMD="$2"; shift 2 ;;
     --lease-renew-interval) [ "$#" -ge 2 ] || die_usage "--lease-renew-interval needs a value"; LEASE_RENEW_INTERVAL="$2"; shift 2 ;;
@@ -298,7 +300,7 @@ last_nonempty_line() {
 }
 
 V_LABEL=""; V_VERDICT=""; V_CODE=0; V_REASON=""
-V_PID=""; V_HB=""; V_SENT=""; V_RC=""; V_LAST=""; V_STATUS_RAW=""; V_ELAPSED=0; V_ANOMALY="no"; V_ATTR="legacy"
+V_PID=""; V_HB=""; V_SENT=""; V_RC=""; V_LAST=""; V_STATUS_RAW=""; V_ELAPSED=0; V_ANOMALY="no"; V_ATTR="legacy"; V_AT=""
 
 evaluate() {
   local label="$1" pidf="$2" statf="$3" logf="$4" sent="$5" hbf="$6" dl="$7"
@@ -434,19 +436,20 @@ evaluate() {
     V_ATTR="unattributed"
   fi
   V_ELAPSED=$((now - START_EPOCH))
+  V_AT="$now"
 }
 
 format_verdict() {
-  printf 'WATCH label=%s verdict=%s pid=%s heartbeat=%s anomaly=%s sentinel=%s rc=%s elapsed=%s reason=%s line=%s run=%s attribution=%s' \
+  printf 'WATCH label=%s verdict=%s pid=%s heartbeat=%s anomaly=%s sentinel=%s rc=%s elapsed=%s reason=%s line=%s run=%s stage=%s event=watcher-verdict at=%s attribution=%s' \
     "$V_LABEL" "$V_VERDICT" "$V_PID" "$V_HB" "$V_ANOMALY" "$V_SENT" "$V_RC" "$V_ELAPSED" "$V_REASON" \
-    "$LINE_ID" "$RUN_ID" "$V_ATTR"
+    "$LINE_ID" "$RUN_ID" "$STAGE" "$V_AT" "$V_ATTR"
 }
 
 format_evidence() {
   local last
   last=$(one_line "$V_LAST" | tr '"' "'")
-  printf 'EVIDENCE label=%s last="%s" status="%s" line=%s run=%s attribution=%s' \
-    "$V_LABEL" "$last" "$V_STATUS_RAW" "$LINE_ID" "$RUN_ID" "$V_ATTR"
+  printf 'EVIDENCE label=%s last="%s" status="%s" line=%s run=%s stage=%s event=watcher-verdict at=%s attribution=%s' \
+    "$V_LABEL" "$last" "$V_STATUS_RAW" "$LINE_ID" "$RUN_ID" "$STAGE" "$V_AT" "$V_ATTR"
 }
 
 emit_single() {
@@ -660,12 +663,8 @@ self_test() {
     --log "$base/log4b" --sentinel PLAN-DONE --window 1 --start-grace 0)
   check anomaly-precedence 11 ANOMALY "${r%%$'\n'*}" "${r#*$'\n'}"
 
-  # 5. dead pid, no exit record
-  sleep 0.2 & local deadpid=$!
-  disown "$deadpid" 2>/dev/null || true
-  ST_SPAWNED+=("$deadpid")
-  wait "$deadpid" 2>/dev/null || true
-  printf 'pid=%s start=\n' "$deadpid" > "$base/pid5"
+  # 5. dead pid, no exit record (fixed unused pid: no reuse race)
+  printf 'pid=999999 start=\n' > "$base/pid5"
   r=$(watch --label dead --pid-file "$base/pid5" --status-file "$base/none5" \
     --log "$base/none5" --sentinel PLAN-DONE --window 1 --start-grace 0)
   check dead 13 DEAD "${r%%$'\n'*}" "${r#*$'\n'}"

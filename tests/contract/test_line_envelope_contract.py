@@ -79,6 +79,10 @@ def test_en_02_carriers(tmp_path):
     assert f"line={line}" in paths["heartbeat"].read_text()
     assert "line_id" in paths["meta"].read_text()
     assert paths["log"].read_text() == log_before
+    watch = run_watcher(paths, line, run, "PLAN-DONE")
+    assert "stage=plan" in watch.stdout
+    assert "event=watcher-verdict" in watch.stdout
+    assert " at=" in watch.stdout
 
 
 def test_en_03_sentinel_untouched(tmp_path):

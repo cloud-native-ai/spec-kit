@@ -10,7 +10,7 @@
 - **LC-01（独立进程组/会话）**: 阶段子代理 MUST 在独立进程组/会话中运行；本地使用 `setsid`（可用时）+ `nohup`，远端使用 `ssh + su + nohup`；stdio MUST 与主会话脱离（重定向到日志或 `/dev/null`）；主会话终止信号 MUST NOT 传播到子代理（FR-046, FR-047）。
 - **LC-02（主会话故障隔离）**: 主会话进程/会话终止 MUST NOT 终止已启动子代理；子代理生命周期独立于驱动的模型循环（FR-047）。
 - **LC-03（四件套与登记）**: runner MUST 启动时写入 PID + start token、原子 status、log、heartbeat，并在 Registry 登记 `runner_pid`/`cli_pid` 及 token；CLI MUST 作为记录 PID 的子进程运行（后台启动 + `wait`），不得只记录 runner 外壳（FR-048）。
-- **LC-04（派发前预占）**: 派发前 MUST 以 `(line_id, stage)` 的 `O_CREAT|O_EXCL` reservation 防重复启动；reservation 内容含 `run_id`、PID、时间戳（FR-048, FR-056）。
+- **LC-04（派发前预占）**: 派发前 MUST 以 `(line_id, stage)` 的 `O_CREAT|O_EXCL` reservation 防重复启动；reservation 内容含 `run_id`、PID、时间戳（FR-048, FR-056）。reservation 的 `pid` 是 launch 方（launcher/runner 外壳）的启动身份；Registry 的 `runner_pid` 是执行侧 runner。launcher 先占位，runner 启动后更新 Registry，不重写 reservation。
 
 ## B. Lease & Identity
 
@@ -24,7 +24,7 @@
 
 - **LC-10（running）**: 快照判定 running 时 MUST 恢复监听，MUST NOT 重新派发该阶段；重复派发次数 0（FR-051, SC-005）。
 - **LC-11（done）**: 快照判定已完成（哨兵 + 证据齐备）时 MUST 进入既有 U4/U5 校验/收尾路径，MUST NOT 重新派发（FR-052）。
-- **LC-12（dead / mismatch）**: 快照判定死亡或身份不符时 MUST 按既有 U5 卡死/重试程序处置，保留 worktree 与证据；MUST NOT 盲目杀进程或删除工作树（FR-053, FR-061）。
+- **LC-12（dead / mismatch）**: 快照判定死亡或身份不符时 MUST 按既有 U5 卡死/重试程序处置，保留 worktree 与证据；MUST NOT 盲目杀进程或删除工作树（FR-053, FR-061）。Registry 状态由 U5 显式置 `stalled`（不自动置 `stale`；`stale` 只经显式清理）；`identity=unknown` MUST NOT 映射为 dead，按 stalled/重新校验处置。
 - **LC-13（orphan）**: 进程存活但无有效驱动/Registry/状态脊，或 Registry 缺失 → 显式识别、标记 `orphaned` 并上送。识别 MUST 只用线自有证据与已登记 PID；MUST NOT 用宽泛 `ps`/`pgrep` 发现 orphan；处置 MUST 留痕，MUST NOT 静默认领或静默终止该进程（FR-054, V-SR-5）。
 - **LC-14（stale）**: Registry 指向的进程已死、PID 复用、cwd/branch 不符或证据超期 → 标记 `stale` 并上送；清理为显式动作；远端不可达记 `stalled` 而非 stale/dead（FR-055, V-LR-10）。
 

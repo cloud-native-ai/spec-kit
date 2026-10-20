@@ -46,7 +46,9 @@
 - **CLI 观测触发**：U2 派发前只读查阅并记录 profile/CLI 版本；U4 独立校验与 U5 停线处置各做一次行为比对；反馈经既有 feedback 引擎按 `cli-profile:<cli>` 标记记录，probe 以最小 Probe Object 入既有注册表，不新增 lifecycle point 或平行观测机制。
 - **CLI 事实纪律**：超时环境变量的 0/负值语义若未经实测，MUST 记为 `unknown`，不得按训练知识猜测；`known` 事实必须带观测日期、版本与证据指针。
 - **脱附形态**：具体使用 `nohup`、`setsid`、`disown` 的哪种组合由对应 CLI 档案与拓扑决定；共同约束是独立进程组/会话、stdio 脱离、主会话终止信号不得传播。
-- **单线兼容**：单线运行同样注册并携带信封，保证机制统一；其 U0–U6、阶段链、哨兵与卡死处置行为保持兼容。
+- **单线兼容**：单线运行同样注册并携带信封，保证机制统一；其 U0–U6、阶段链、哨兵与卡死处置行为保持兼容。注册/注销失败时按 LR-02/LR-11 显式上送并停止该线，属受控例外。
+- **平台豁免（cwd/branch）**：cwd 校验仅在平台暴露进程 cwd 时执行（Linux `/proc/<pid>/cwd`）；macOS 记录 `cwd_check=unsupported`，这是唯一允许的豁免。branch 校验在有登记且 git 元数据可用时执行，否则记 `skipped`。
+- **standalone 反馈例外**：宿主无 `.specify/`（standalone）时，CLI 档案观测的 feedback 记录按编译 `## Wrap-up` 的 runtime-mode gate 跳过反馈引擎调用；档案更新与收尾汇总中的观测报告仍是必需项。
 - **Feature 绑定**：已按 `/speckit.clarify` 绑定新建 Feature 064；注册表行与详情文件已落册，Related Feature 不再保留待裁决标记。
 
 ## 跨特性重叠与边界（record for analyze/plan；不构成第二 owner）
@@ -199,7 +201,7 @@
 - **FR-010**: 当 >1 条 line 处于 `active` 或 `waiting`（本组条款统称「活动线」），而用户消息未携带 line/project 标识时，驱动 MUST 对每条此类消息只提出恰好一个澄清问题并列出候选活动线；可识别的标识形态为显式 `line_id`，或唯一匹配的 `project_dir`/`repo_root`/分支名；MUST NOT 基于 `ps`、`pgrep`、进程名、cwd 或环境态推断归属。用户回答仍无法唯一匹配时，MUST 显式报告候选并停止路由，MUST NOT 再问第二个问题或猜测。
 - **FR-011**: 当恰好 1 条活动线时，未标注消息 MUST 路由到该 line；当 0 条活动线时，MUST 明确报告无活动线路并请求目标，MUST NOT 推断。
 - **FR-012**: 一次入口澄清 MUST NOT 停止、暂停或改变其他 line 的子代理与监听；未回答期间，其他 line MUST 继续按状态脊推进；等待回答只阻塞该条消息的路由，不阻塞任何 line 的执行。
-- **FR-013**: watcher/monitor MUST 只消费 Registry 中登记且身份校验通过的 PID（start ticks，以及可用的 cwd/branch 证据）；归属判定 MUST NOT 使用宽泛 `ps`/`pgrep`、进程名匹配或当前 shell 状态。
+- **FR-013**: watcher/monitor MUST 只消费 Registry 中登记且身份校验通过的 PID（start ticks；cwd 在平台暴露时校验，branch 在有登记时校验）；归属判定 MUST NOT 使用宽泛 `ps`/`pgrep`、进程名匹配或当前 shell 状态。
 - **FR-014**: 事件归属键为 `(line_id, run_id)`；任何 `line_id` 与当前 line 不同的事件 MUST 被标记为 `foreign`（[[STR-002]]），MUST NOT 被当前 line 消费、转发、计入进度或改变其状态；同一 line 但 `run_id` 非当前执行尝试的事件 MUST 被标记为 `stale-run`，同样不得作为当前尝试的证据。
 - **FR-015**: 缺失或不可解析信封的事件 MUST 视为 `unattributed`，MUST NOT 作为当前 line 的完成/失败证据；系统 MUST 显式报告该归属缺口；`foreign`/`stale-run`/`unattributed` 事件 MAY 出现在监听摘要或线日志中，但 MUST NOT 被计入当前 line 的进度、判定或 Registry 状态。
 - **FR-016**: 同环境双 line 模拟测试 MUST 证明：相同通用哨兵、相同 CLI 命令名下事件零串台；无标识消息只澄清一次；foreign monitor 事件不改变当前 line 状态；PID 复用/死亡不产生假完成。
@@ -219,7 +221,7 @@
 - **FR-027**: 集成 MUST NOT force push，MUST NOT 绕过既有确认门；push 仍是显式授权动作。
 - **FR-028**: 构建/测试隔离 MUST 为每条 line 提供独立的缓存、端口与临时数据库，或只读共享缓存；MUST NOT 启动全局服务；并发上限 MUST 可配置并在派发前检查。
 - **FR-029**: 每条 line MUST 报告其分配的端口、缓存/临时路径与并发上限使用情况，供协调者与收尾汇总消费。
-- **FR-030**: 崩溃/重入 MUST 以 worktree + 状态脊 + Registry 为恢复证据；遇到 stale lock MUST 先验证持有者身份，MUST NOT 盲目删除；重入 MUST 先做一次 `--once` 快照。
+- **FR-030**: 崩溃/重入 MUST 以 worktree + 状态脊 + Registry 为恢复证据；遇到 stale lock MUST 先验证持有者身份，MUST NOT 盲目删除；重入 MUST 在任何重派或去向决定之前先做一次 `--once` 快照（快照程序见 LC-08 / V-ID-4）。
 - **FR-031**: 同仓库双写线模拟测试 MUST 覆盖重叠与不相交路径集：无 Git index 损坏、无丢失已提交工作、重叠被拒/串行、确定性队列、运行时/镜像只集成一次。
 - **FR-032**: worktree 清理 MUST 只在合并成功或用户显式动作后执行；存在未提交工作时 MUST 保留并上送，MUST NOT 删除。
 

@@ -220,9 +220,11 @@ def four_piece(
 
 
 def watcher_args(paths: dict, line: str, run: str, sentinel: str, *extra: str) -> list[str]:
+    match = __import__("re").search(r"log-" + __import__("re").escape(line) + r"-(.+)\.log$", paths["log"].name)
+    stage = match.group(1) if match else ""
     return [
         "bash", str(watcher_path()), "--once",
-        "--line-id", line, "--run-id", run,
+        "--line-id", line, "--run-id", run, "--stage", stage,
         "--label", line,
         "--pid-file", str(paths["pid"]),
         "--status-file", str(paths["status"]),

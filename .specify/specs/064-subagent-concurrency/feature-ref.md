@@ -56,13 +56,13 @@ No new command, skill, daemon, external service, runtime dependency, or model AP
 |----|---------------|
 | SC-001 | `test_two_line_isolation` — event attribution diff list is empty; both lines' completion verdicts correct (2/2 = 100%) |
 | SC-002 | Ingress fixture — exactly one question per unidentified message; PATH-stub `ps`/`pgrep` invocation count 0; post-answer routing correctness 100% (ambiguous-stop counts as a correct terminal outcome, not an error; correctness = correct outcomes / answered messages) |
-| SC-003 | Foreign monitor/PID fixture — state transition count 0; 100% tagged `foreign` |
-| SC-004 | `test_worktree_integration_queue` — `git fsck`, commit graph, overlap rejection 100%, replay diff 0 |
-| SC-005 | `test_session_kill_reattach` — survival 100%, reattach 100%, redispatch 0, branch outcome matches evidence |
+| SC-003 | Foreign monitor/PID fixture — state transition count 0; 100% tagged `foreign`; `stale-run`/`unattributed` rows in `test_en_04_classification` and the two-line integration file prove the other non-own classes are also not consumed |
+| SC-004 | `test_worktree_integration_queue` — `git fsck --no-dangling` exit 0; commit SHAs present in `git rev-list --all`; overlap rejection 100%; replay comparison = byte-identical `integration-plan` JSON plus identical ordered line_id list |
+| SC-005 | `test_session_kill_reattach` — survival 100%, reattach 100%, redispatch 0, branch outcome matches evidence; `orphaned`, `stalled(remote-unreachable)` and `dead` outcomes covered by `test_lc_13_orphan_check_uses_line_evidence`, `test_lc_09_remote_unreachable_not_dead`, and the integration dead branch |
 | SC-006 | Profile content check + `feedback-utils.py --action list --contains "cli-profile:qodercli"`; simulated mismatch → exactly 1; no new fact → zero new feedback |
 | SC-007 | Existing contract suites + push-stub count 0 + watcher exit-code pin |
 | SC-008 | Test matrix + three mutation drills each turning ≥1 test red |
-| SC-009 | `test_lr_12_concurrent_registration` — N writers, parse rate 100%, lost 0, duplicate 0 |
+| SC-009 | `test_lr_12_concurrent_registration` — N=12 writers plus an interleaved reader; parse rate 100%, lost 0, duplicate 0, no half-written JSON observed during writes |
 | SC-010 | U6 fixture — active residue 0; worktree retained when unmerged; `--once` executed; duplicate start 0 |
 
 ## 5. 063 Overlap

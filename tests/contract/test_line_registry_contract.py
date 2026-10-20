@@ -220,10 +220,27 @@ def test_lr_11_unwritable_fails_start(tmp_path):
 
 
 def test_lr_12_concurrent_registration(tmp_path):
+    """N=12 writers with an interleaved reader (SC-009: no half-write/missing entry)."""
     project = make_project(tmp_path)
     reg = tmp_path / "reg"
     env = base_env(reg)
     count = 12
+    read_errors = []
+    stop = threading.Event()
+
+    def reader():
+        while not stop.is_set():
+            proc = run_engine("list", "--all", reg=reg)
+            if proc.returncode != 0:
+                read_errors.append(proc.stderr)
+                continue
+            try:
+                json.loads(proc.stdout)
+            except json.JSONDecodeError:
+                read_errors.append(proc.stdout)
+
+    reader_thread = threading.Thread(target=reader, daemon=True)
+    reader_thread.start()
     procs = []
     for i in range(count):
         line = make_line_id("conc", f"{i:04x}")
@@ -237,6 +254,9 @@ def test_lr_12_concurrent_registration(tmp_path):
     for proc in procs:
         proc.wait(timeout=30)
         assert proc.returncode == 0, proc.stderr.read()
+    stop.set()
+    reader_thread.join(timeout=10)
+    assert read_errors == [], read_errors
     rows = engine_json("list", "--all", reg=reg)
     ids = [row["line_id"] for row in rows]
     assert len(ids) == count

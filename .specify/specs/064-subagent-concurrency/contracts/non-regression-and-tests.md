@@ -12,7 +12,7 @@
 - **NG-04（哨兵/判定/退出码不变）**: 除归属信封增量外，阶段哨兵字面量、watcher 判定状态机与退出码 MUST 保持不变；退出码仍由 `scripts/watch-target.sh` 代码侧 owner 决定（FR-063, EN-03/EN-06）。
 - **NG-05（无新增运行时依赖）**: MUST NOT 引入常驻服务/daemon、外部服务、模型 API 或新运行时依赖；新脚本 MUST 为 Python 3 stdlib-only 或 bash，复用既有 feedback/probe/mirror 引擎（FR-064, 宪法 IX）。
 - **NG-06（确认门与独立校验）**: 既有确认门、独立校验、阶段 deadline、测试预算与阶段命令内部流程 MUST 保持不变（FR-066, FR-041）。
-- **NG-07（单线兼容）**: 单线运行 MUST 保持 U0–U6、阶段链、哨兵校验与卡死处置行为；新增 Registry/信封为统一增量（FR-068, LR-13）。
+- **NG-07（单线兼容）**: 单线运行 MUST 保持 U0–U6、阶段链、哨兵校验与卡死处置行为；新增 Registry/信封为统一增量（FR-068, LR-13）。受控例外：注册/注销失败时显式上送并停止该线（LR-02/LR-11），不视为行为回归。
 - **NG-08（镜像义务）**: 所有新增/修改的技能文件 MUST 经 `sync-mirrors.py` 同步；`shared/definitions/probe-definitions.md` 的镜像 MUST 同改；验收判据为「本特性触碰的镜像对 no NEW drift」，基线见 `research.md` § 0（FR-045, 宪法 XI）。
 - **NG-09（docs 入口）**: `docs/reference/skills/sdd-loop-driver.md` MUST 增加并发归属/生命周期与 CLI 档案入口；只引用不复述（FR-042）。
 
@@ -70,6 +70,4 @@
 | NG-10…NG-12 | SC-007/SC-008 | implement 阶段 `verification.md` + `run-tests.sh --names-out` 基线 |
 | NG-13 | FR-067, SC-008 | 测试矩阵 + 三项变异演练 |
 | FR-065 承载行（非 NG） | FR-065 | `test_lr_08_remote_minimal_fields`、`test_lc_17_remote_fields_isomorphic`（LR-08/LC-17 是 FR-065 的条款承载；NG 表不再声称承载 FR-065） |
-| NG-10…NG-12 | SC-007/SC-008 | implement 阶段 `verification.md` + `run-tests.sh --names-out` 基线 |
-| NG-13 | FR-067, SC-008 | 测试矩阵 + 三项变异演练 |
 | 测试矩阵 | FR-067, SC-008 | 上表所列 10 个文件 |

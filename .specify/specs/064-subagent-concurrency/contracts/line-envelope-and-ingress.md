@@ -12,7 +12,7 @@
 - **EN-03（哨兵保全）**: 通用哨兵字面量（大写阶段名 + `-DONE`）与「日志最后非空行」判定 MUST 保持不变；归属 MUST NOT 通过改写哨兵、位移最后一行或在其后追加信封实现（FR-009）。
 - **EN-04（分类）**: 归属键 `(line_id, run_id)`；`line_id` 不同 → `foreign`；`line_id` 相同 `run_id` 不同 → `stale-run`；缺失/不可解析 → `unattributed`；watcher 未提供归属参数 → `legacy`（058 兼容）（FR-014, FR-015, V-EN-2）。
 - **EN-05（消费规则）**: 只有 `own` 事件可参与判定、进度与 Registry 状态。`foreign`/`stale-run`/`unattributed` MAY 出现在 watcher 摘要或线日志，MUST NOT 被消费、转发、计入进度或改变状态（FR-014, FR-015, SC-003）。
-- **EN-06（Watcher 接口）**: `watch-target.sh` 新增可选 `--line-id`、`--run-id`、`--meta`。提供两者时执行归属过滤；输出行追加 `line=`/`run=`/`attribution=`；判定状态机、退出码、窗口/deadline 语义 MUST 零改动（FR-013, FR-063）。
+- **EN-06（Watcher 接口）**: `watch-target.sh` 新增可选 `--line-id`、`--run-id`、`--meta`。提供两者时执行归属过滤；输出行追加 `line=`/`run=`/`stage=`/`event=watcher-verdict`/`at=`/`attribution=`；判定状态机、退出码、窗口/deadline 语义 MUST 零改动（FR-013, FR-063）。
 - **EN-07（PID 身份）**: watcher/monitor MUST 只消费 Registry 中登记且身份校验通过的 PID（start token；cwd/branch 在可用时）。归属判定 MUST NOT 使用宽泛 `ps`/`pgrep`、进程名匹配或当前 shell 状态；对单个登记 PID 的定向探询（`ps -p <registered-pid>`）不属宽泛扫描（FR-013, V-LR-7）。
 
 ## B. Message Ingress
@@ -25,7 +25,7 @@
 - **EN-13（不阻塞他线）**: 一次入口澄清 MUST NOT 停止/暂停/改变其他 line 的子代理与监听；等待回答只阻塞该条消息的路由（FR-012）。
 - **EN-14（零进程扫描）**: `resolve-message` 及其调用链 MUST NOT 执行 `ps`/`pgrep`/`pidof`/进程名枚举；契约测试以 PATH 桩计数与源码扫描双重验证（FR-010, SC-002）。
 - **EN-15（双线验收）**: 同环境双线、相同通用哨兵、相同 CLI 命令名下：跨线归属错误 0；每条无标识消息澄清数 1；foreign monitor 事件改变当前状态 0 次；PID 复用/死亡不产生假完成（FR-016, SC-001/SC-003, SC-008）。
-- **EN-16（单线信封与兼容）**: 单线运行 MUST 同样注册并携带信封；watcher 提供归属参数时即使只有一条线也执行归属过滤（`legacy` 仅用于未提供参数的兼容调用）。单线的 U0–U6、阶段链、哨兵校验、watcher 判定与退出码 MUST 与 058 基线一致（FR-017, FR-068）。
+- **EN-16（单线信封与兼容）**: 单线运行 MUST 同样注册并携带信封；watcher 提供归属参数时即使只有一条线也执行归属过滤。`legacy` 仅用于单活动线 / 058 兼容调用（未提供归属参数）；多活动线 MUST NOT 以 legacy 调用绕过归属过滤。单线的 U0–U6、阶段链、哨兵校验、watcher 判定与退出码 MUST 与 058 基线一致（FR-017, FR-068）。
 
 ## Watcher 输出示例（own / foreign）
 

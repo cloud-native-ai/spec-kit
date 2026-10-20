@@ -19,6 +19,7 @@
 | `schema_version` | int | always | 当前 `1` |
 | `line_id` | string | always | 环境内唯一、不复用；格式 `^[a-z0-9][A-Za-z0-9-]{7,63}$`，生成规则 `<project-slug>-<YYYYMMDDTHHMMSSZ>-<4hex>` |
 | `run_id` | string | always | 一次执行尝试；格式 `^r[0-9]{8}T[0-9]{6}Z-[0-9a-f]{4}$`；reattach 复用，重试换新 |
+| `run_history` | array | always（可为空） | 追加数组：`{run_id, started_at, ended_at, outcome}`；重试/重派追加旧尝试，重接线复用当前 `run_id` |
 | `project_dir` | abs path | always | 目标项目根（含 `.specify/`） |
 | `repo_root` | abs path | always | git 仓库根 |
 | `worktree_path` | abs path | write lines | 独立 worktree；只读线可为 `null` 或独立只读视图 |
@@ -32,13 +33,13 @@
 | `meta_paths` | object | after dispatch | `{prompt, log}` → 旁路信封文件路径 |
 | `owned_paths` | string[] | write lines | Ownership Manifest 的投影（可再生） |
 | `ownership_manifest_path` | abs path | write lines | Manifest owner 指针 |
-| `stage` | string\|null | active | 当前阶段（`requirements`…`review`）；`waiting` 可为 null |
+| `stage` | string\|null | active | 当前阶段（`requirements`…`review`）；未派发的 `active` 可为 null（V-LR-6），`waiting` 可为 null |
 | `state` | enum | always | 见 V-LR-4 |
 | `waiting_reason` / `holder_line_id` / `queued_at` | string/null | waiting | 串行化票据 |
 | `merge_ready` / `ready_for_merge_at` | bool/ISO | integration | 集成队列输入；仅当 `state=completed` 时为 true，`integration-record` 后置 false；不进入 `state` 封闭集 |
-| `integration_result` | object\|null | after integration | `{status: merged\|failed\|skipped, at, commit, reason}`；记录时 `state` 保持 `completed`，直到 U6 关闭 |
+| `integration_result` | object\|null | after integration | `{status: merged\|failed, at, commit, reason}`；记录时 `state` 保持 `completed`，直到 U6 关闭 |
 | `worktree_retained` | bool | U6 | 未合并/未提交时 `true` |
-| `resources` | object\|null | active | `{ports:[start,end], cache_dir, tmp_dir}` |
+| `resources` | object\|null | active | `{ports:[start,end], cache_dir, tmp_dir, active_count, cap}`；`active_count`/`cap` 是分配时点的并发上限使用情况 |
 | `remote` | object\|null | remote only | `{alias, run_user, remote_root}`；Registry 仍在驱动侧 |
 | `last_event` | string | always | 最近一次状态事件（如 `u2-dispatch`） |
 | `created_at` / `updated_at` / `closed_at` | ISO | always/always/U6 | `closed_at` 仅 closed |
@@ -287,6 +288,7 @@ active/waiting ──line-owned evidence missing──> orphaned ──explicit 
 | `observed_at` | date | known |
 | `cli_version` | string | known |
 | `evidence_ptr` | string | known（命令/日志/提交指针） |
+| `profile_version` | string | always | 档案观测批次/内容版本（派发记录与 provenance 共用） |
 
 **Provenance table**（每份档案）：`date | trigger (U2\|U4\|U5) | observation | change | feedback_id`。
 
@@ -325,6 +327,7 @@ active/waiting ──line-owned evidence missing──> orphaned ──explicit 
 | `cache_dir` | abs path | `<repo_parent>/.spec-kit/cache/<repo-basename>/<line_id>` |
 | `tmp_dir` | abs path | `<repo_parent>/.spec-kit/tmp/<repo-basename>/<line_id>` |
 | `concurrency_cap` | int | 缺省 4；`SPECIFY_LINE_CONCURRENCY_CAP` 可覆盖 |
+| `active_count` | int | 分配时点的活动已派发线数（含本线）；与 `cap` 一起写入 `resources` 供报告 |
 
 **Validation rules**
 

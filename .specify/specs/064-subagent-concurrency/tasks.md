@@ -252,18 +252,18 @@ Requirement-group mapping: FR-001…FR-017 → Phase 3 (US1); FR-018…FR-032 �
 
 ### Tests for User Story 5 (MANDATORY) ⚠️
 
-- [ ] T068 [US5] [blockedBy: T066] Author `tests/contract/test_non_regression_064.py` with NG-01, NG-02, NG-03, NG-04, NG-05, NG-08, NG-09, and NG-13 guards: watcher exit-code constants unchanged, no `git push` in engine/watcher surfaces, no `--force` worktree removal, stdlib-only imports, no daemon/model API, docs entry present, mirror baseline comparison, the 10 planned test files present, and the NG-03 guard (the full 063 adjudication table is intact and every migrated 063 clause has a 064 carrier — no silent deletion)
+- [X] T068 [US5] [blockedBy: T066] Author `tests/contract/test_non_regression_064.py` with NG-01, NG-02, NG-03, NG-04, NG-05, NG-08, NG-09, and NG-13 guards: watcher exit-code constants unchanged, no `git push` in engine/watcher surfaces, no `--force` worktree removal, stdlib-only imports, no daemon/model API, docs entry present, mirror baseline comparison, the 10 planned test files present, and the NG-03 guard (the full 063 adjudication table is intact and every migrated 063 clause has a 064 carrier — no silent deletion)
 
 ### Verification for User Story 5
 
-- [ ] T069 [US5] [blockedBy: T068] Run the existing full suite with `.specify/scripts/bash/run-tests.sh tests -q --names-out .specify/specs/064-subagent-concurrency/current-failed.txt`, compare to `baseline-failed.txt` with `comm -13`, and record the result in `verification.md`; if pytest is unavailable, record `green: Unobserved` verbatim (NG-10)
-- [ ] T070 [US5] [blockedBy: T068] Run `bash skills/external/sdd-loop-driver/scripts/watch-target.sh --self-test`, assert the 12-passed/4-failed baseline is not worsened and new attribution cases pass, and record the output in `verification.md`
-- [ ] T071 [US5] [blockedBy: T068] Run `tests/contract/test_confirmation_gates_sweep.py` and the push-stub integration scenario; assert zero push actions and unchanged confirmation gates; record in `verification.md`
-- [ ] T072 [US5] [blockedBy: T069] Mutation drill 1: copy the watcher to `notes/mutation-watch-target.sh`, remove the attribution filter, run `SDD_WATCHER=<copy> run-tests.sh tests/integration/test_two_line_isolation.py -q`, record the red result in `verification.md`, delete the copy, and re-run green
-- [ ] T073 [US5] [blockedBy: T069] Mutation drill 2: run `SDD_RUNNER_MODE=foreground run-tests.sh tests/integration/test_session_kill_reattach.py -q` to simulate removed detach, record the red result in `verification.md`, then re-run the default detached mode green
-- [ ] T074 [US5] [blockedBy: T069] Mutation drill 3: copy the engine to `notes/mutation-line-registry.py`, replace the O_CREAT|O_EXCL reservation with check-then-create, run `SDD_ENGINE=<copy> run-tests.sh tests/contract/test_lifecycle_detach_reattach.py -q`, record red in `verification.md`, delete the copy, and re-run green
-- [ ] T075 [US5] [blockedBy: T069] Run the single-line compatibility regression (quickstart S1 + LR-13/EN-16 cases) and assert 058 U0–U6/sentinel/verdict/exit behavior is unchanged; record in `verification.md`
-- [ ] T076 [US5] [blockedBy: T072,T073,T074,T075] Execute quickstart S6 (full feature test matrix + name-level baseline comparison) and append the real output under a `### S6.` heading to `.specify/specs/064-subagent-concurrency/notes/quickstart-run.md`
+- [X] T069 [US5] [blockedBy: T068] Run the existing full suite with `.specify/scripts/bash/run-tests.sh tests -q --names-out .specify/specs/064-subagent-concurrency/current-failed.txt`, compare to `baseline-failed.txt` with `comm -13`, and record the result in `verification.md`; if pytest is unavailable, record `green: Unobserved` verbatim (NG-10)
+- [X] T070 [US5] [blockedBy: T068] Run `bash skills/external/sdd-loop-driver/scripts/watch-target.sh --self-test`, assert the 12-passed/4-failed baseline is not worsened and new attribution cases pass, and record the output in `verification.md`
+- [X] T071 [US5] [blockedBy: T068] Run `tests/contract/test_confirmation_gates_sweep.py` and the push-stub integration scenario; assert zero push actions and unchanged confirmation gates; record in `verification.md`
+- [X] T072 [US5] [blockedBy: T069] Mutation drill 1: copy the watcher to `notes/mutation-watch-target.sh`, remove the attribution filter, run `SDD_WATCHER=<copy> run-tests.sh tests/integration/test_two_line_isolation.py -q`, record the red result in `verification.md`, delete the copy, and re-run green
+- [X] T073 [US5] [blockedBy: T069] Mutation drill 2: run `SDD_RUNNER_MODE=foreground run-tests.sh tests/integration/test_session_kill_reattach.py -q` to simulate removed detach, record the red result in `verification.md`, then re-run the default detached mode green
+- [X] T074 [US5] [blockedBy: T069] Mutation drill 3: copy the engine to `notes/mutation-line-registry.py`, replace the O_CREAT|O_EXCL reservation with check-then-create, run `SDD_ENGINE=<copy> run-tests.sh tests/contract/test_lifecycle_detach_reattach.py -q`, record red in `verification.md`, delete the copy, and re-run green
+- [X] T075 [US5] [blockedBy: T069] Run the single-line compatibility regression (quickstart S1 + LR-13/EN-16 cases) and assert 058 U0–U6/sentinel/verdict/exit behavior is unchanged; record in `verification.md`
+- [X] T076 [US5] [blockedBy: T072,T073,T074,T075] Execute quickstart S6 (full feature test matrix + name-level baseline comparison) and append the real output under a `### S6.` heading to `.specify/specs/064-subagent-concurrency/notes/quickstart-run.md`
 
 **Checkpoint**: US5 is green or honestly Unobserved; the three mutation drills each turn at least one test red, and no boundary is relaxed.
 
@@ -273,12 +273,12 @@ Requirement-group mapping: FR-001…FR-017 → Phase 3 (US1); FR-018…FR-032 �
 
 **Purpose**: Final mirror, probe, test, quickstart, verification, and boundary audit across all stories.
 
-- [ ] T077 [blockedBy: T076] Final mirror audit: run `sync-mirrors.py --check --only skills/external/sdd-loop-driver` and `--only shared/definitions/probe-definitions.md`; require zero diff for both, and confirm the 9 pre-existing `shared/definitions` diffs are unchanged (no NEW drift)
-- [ ] T078 [blockedBy: T077] Final registry/drift check: `probe-utils.py --action probes --validate` exit 0, `probe-utils.py --action compile-embeds --check` zero drift, and `test_clp_12_probe_object_registered` green
-- [ ] T079 [blockedBy: T077] Final full test run with `run-tests.sh tests -q --names-out .specify/specs/064-subagent-concurrency/current-failed.txt` and `comm -13 baseline-failed.txt current-failed.txt`; record zero NEW failures or the exact `Unobserved` reason in `verification.md`
-- [ ] T080 [blockedBy: T077] Final quickstart rerun S1–S6 end to end; confirm each scenario's real output is present and current under `### S1.`–`### S6.` headings in `.specify/specs/064-subagent-concurrency/notes/quickstart-run.md`; confirm teardown left no temp registry/worktree/process
-- [ ] T081 [blockedBy: T079,T080] Write `verification.md` with SC-001…SC-010 statuses, red-first/mutation evidence pointers, deferred_tasks, and the Completion Gate results; run GATE-1…GATE-10 checks against the current tree
-- [ ] T082 [blockedBy: T081] Final boundary review: no automatic push, no deletion of uncommitted work, no new daemon/external service/runtime dependency/model API, no duplicate 063 CLI-profile owner, and docs/mirrors consistent; record in `verification.md`
+- [X] T077 [blockedBy: T076] Final mirror audit: run `sync-mirrors.py --check --only skills/external/sdd-loop-driver` and `--only shared/definitions/probe-definitions.md`; require zero diff for both, and confirm the 9 pre-existing `shared/definitions` diffs are unchanged (no NEW drift)
+- [X] T078 [blockedBy: T077] Final registry/drift check: `probe-utils.py --action probes --validate` exit 0, `probe-utils.py --action compile-embeds --check` zero drift, and `test_clp_12_probe_object_registered` green
+- [X] T079 [blockedBy: T077] Final full test run with `run-tests.sh tests -q --names-out .specify/specs/064-subagent-concurrency/current-failed.txt` and `comm -13 baseline-failed.txt current-failed.txt`; record zero NEW failures or the exact `Unobserved` reason in `verification.md`
+- [X] T080 [blockedBy: T077] Final quickstart rerun S1–S6 end to end; confirm each scenario's real output is present and current under `### S1.`–`### S6.` headings in `.specify/specs/064-subagent-concurrency/notes/quickstart-run.md`; confirm teardown left no temp registry/worktree/process
+- [X] T081 [blockedBy: T079,T080] Write `verification.md` with SC-001…SC-010 statuses, red-first/mutation evidence pointers, deferred_tasks, and the Completion Gate results; run GATE-1…GATE-10 checks against the current tree
+- [X] T082 [blockedBy: T081] Final boundary review: no automatic push, no deletion of uncommitted work, no new daemon/external service/runtime dependency/model API, no duplicate 063 CLI-profile owner, and docs/mirrors consistent; record in `verification.md`
 
 **Checkpoint**: All stories are complete, the mirror/probe/test/quickstart evidence is current, and the feature is ready for `/speckit.implement` closure and `/speckit.review`.
 

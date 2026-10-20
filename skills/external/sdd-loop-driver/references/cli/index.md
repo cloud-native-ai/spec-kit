@@ -12,7 +12,7 @@
 | opencode | `opencode.md` | skeleton (all dimensions unknown) |
 | hermes | `hermes.md` | skeleton (all dimensions unknown; `CAPABILITY_MATRIX` gap) |
 
-A CLI without a profile MUST NOT be dispatched: first create the skeleton, record the gap, then dispatch under the safe default defined by the matrix. A profile never grants dispatch eligibility.
+A CLI without a profile MUST NOT be dispatched: first create the skeleton, record the gap, then dispatch under the safe default defined by the matrix. A profile never grants dispatch eligibility. Concretely, the safe default after a skeleton exists is: dispatch only if `CAPABILITY_MATRIX` accepts the CLI; if the matrix has no entry (e.g. `hermes`), do **not** dispatch — record the gap and leave the eligibility decision to the matrix owner.
 
 ## Eight Dimensions
 
@@ -74,7 +74,7 @@ Stable marker: `cli-profile:<cli>`. Probe Object: `skill-sdd-loop-driver-cli-pro
 
 - A profile update MUST NOT change sentinel semantics, the watcher 判定 state machine or 退出码 (exit codes), 确认门 (confirmation gates), stage deadlines, or the test budget（测试预算）。
 - The current stage uses the shape recorded at U2; an update never retroactively changes it（不回溯、不改变当前阶段的形态）。 If the observed conflict makes the stage unsafe, use the existing U5 stall/retry path — never substitute a profile edit for a behaviour fix.
-- Throughput default of the output mode (stream-json) is owned by Feature 063; profiles record buffering/event facts only and MUST NOT rewrite that default (不改写 063 默认).
+- Throughput default of the output mode (stream-json) is owned by 063; profiles record buffering/event facts only and MUST NOT rewrite that default (不改写 063 默认).
 
 ## Matrix Authority
 

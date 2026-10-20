@@ -93,7 +93,7 @@
 - **程序**：U0 入口声明时、U2 派发前、U3 收到终止判定时、U4 校验后、U5 停线时**先写状态、后做动作**——续环与重入只读状态脊，零上下文可接手；循环 MUST NOT 依赖会话记忆。
 - **重入**：任何新会话接手该线时，从状态脊读取断点判定与已试次数，先跑一次 `watch-target.sh --once` 快照；终止判定在即按 U4/U5 续环，否则从对应阶段续跑或恢复监听窗口。
 
-## Line Registration, Envelope & Message Ingress（线路登记、归属与消息入口，Feature 064）
+## Line Registration, Envelope & Message Ingress（线路登记、归属与消息入口，064）
 
 ### U0.5 线路登记（首次派发前）
 
@@ -142,7 +142,7 @@ python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message 
 - `foreign`：`line_id` 不同——不得转发、不得计入、不得改变当前线路状态。
 - `stale-run`：同线旧 `run_id`——不得作为当前尝试的证据。
 - `unattributed`：信封缺失或不可解析——显式报告归属缺口，不得当作完成/失败证据。
-- `legacy`：watcher 未提供归属参数时的 058 兼容行为（无过滤）；新派发 MUST 提供归属参数。
+- `legacy`：watcher 未提供归属参数时的 058 兼容行为（无过滤）；新派发 MUST 提供归属参数。`legacy` 仅允许用于单活动线 / 058 兼容调用；多活动线 MUST NOT 以 legacy 调用绕过归属过滤（先由 `resolve-message` 定线，再带参数监听）。
 
 ## Concurrency Isolation（并发隔离，多线并行）
 
@@ -157,7 +157,7 @@ python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message 
 - 审后提交边界：本线只做阶段产物提交，审后由主会话统一提交本线收尾件。
 ```
 
-### 写线工作区声明（Feature 064）
+### 写线工作区声明（064）
 
 写线派发前，提示词与状态脊 MUST 携带以下声明（缺一项不得派发）：
 
@@ -185,7 +185,7 @@ python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message 
 - 授权是**显式、逐项、有界**的——不存在隐式放行；「顺便看一下」不是授权。
 - 每次授权记录进该线状态脊（何时、何项、何界），供收尾汇总审计。
 
-## CLI Capability Profiles（U2/U4/U5，Feature 064）
+## CLI Capability Profiles（U2/U4/U5，064）
 
 CLI 行为知识的唯一落点是 `references/cli/`（schema owner：`references/cli/index.md`）；本节只规定驱动侧的查阅/观测程序，不复述档案内容。
 
@@ -193,7 +193,7 @@ CLI 行为知识的唯一落点是 `references/cli/`（schema owner：`reference
 
 - 只读查阅目标 CLI 档案，据此选择超时形态与 detach 形态；**不改档**。
 - 派发记录写入状态脊：`profile_id`、`profile_version`、`observed_cli_version`。
-- 输出模式的吞吐默认（stream-json）由 Feature 063 拥有；档案只记录缓冲/事件事实，**不改写**该默认。
+- 输出模式的吞吐默认（stream-json）由 063 拥有；档案只记录缓冲/事件事实，**不改写**该默认。
 - 匹配且无新事实 → **零反馈**。
 
 ### U4 独立校验（比对）
@@ -220,7 +220,7 @@ CLI 行为知识的唯一落点是 `references/cli/`（schema owner：`reference
 - 档案更新不回溯改变 U2 记录的形态；若冲突使当前阶段无法安全完成，走既有 U5 停线/重试程序，不得以改档代替行为修复。
 - `known` 条目带观测日期、CLI 版本与证据指针；`unknown` 不填猜测值；版本/平台不一致视为新观测。
 
-## Reattach & Lifecycle（重接线与生命周期，Feature 064）
+## Reattach & Lifecycle（重接线与生命周期，064）
 
 ### 重接线程序（主会话恢复后）
 

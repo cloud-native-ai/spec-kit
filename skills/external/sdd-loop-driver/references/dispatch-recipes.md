@@ -136,7 +136,7 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
 - **本地拓扑**：项目在本机时省略 ssh/su，直接以本地项目为工作目录执行 runner；需求上下文先写简报文件（`/tmp/<topic>-sdd-brief.md`），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」——命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5（本配方坍缩为引用）。监听同样走 `watch-target.sh`，只是去掉 ssh/su 层（`watch-model.md` §6）。
 - **构建固化变体**：同一主机按角色分线（不同系统用户在各自目录固化不同层），仅经入口参数（执行身份、路径）区分，机制零新增分支——形态见同文件 § Recipe 6。
 
-## Recipe 6 — 线路登记、归属信封与消息入口（Feature 064）
+## Recipe 6 — 线路登记、归属信封与消息入口（064）
 
 **环境级 Line Registry**：同一 OS 用户一份，缺省 `${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines`，`SPECIFY_LINE_REGISTRY_DIR` 可覆盖；每线一个 `<line_id>.json`，同线更新以 `<line_id>.lock` 排他锁串行化，写入为临时文件 + `fsync` + `os.replace` 原子替换。引擎无框架依赖：`scripts/line-registry.py`（Python 3 stdlib-only）。
 
@@ -180,7 +180,7 @@ python3 <skill-dir>/scripts/line-registry.py --action resolve-message --message 
 - 只读查阅 `references/cli/index.md` 与目标 `<cli>.md`；据此选择超时/脱离形态，**不复制档案内容**。
 - 派发记录携带 `profile_id` / `profile_version` / `observed_cli_version`；匹配且无新事实不产生反馈。
 
-## Recipe 7 — 工作区隔离与确定性集成（Feature 064）
+## Recipe 7 — 工作区隔离与确定性集成（064）
 
 ### Worktree-per-write-line
 
@@ -226,7 +226,7 @@ python3 <skill-dir>/scripts/line-registry.py --action ownership-check \
 - 恢复证据 = worktree + 状态脊 + Registry；stale lock **先验证持有者**再处置，不盲目删除。
 - 重入先做一次 `--once` 快照，再决定派发/校验/恢复窗口。
 
-### 脱离式 runner、reservation 与 lease（Feature 064）
+### 脱离式 runner、reservation 与 lease（064）
 
 **本地脱离**（`setsid` 可用时优先；本机 macOS 无 `setsid` 时用 `nohup + disown`）：
 
@@ -235,6 +235,7 @@ python3 <skill-dir>/scripts/line-registry.py --action ownership-check \
 python3 <skill-dir>/scripts/line-registry.py --action reserve --line-id <line> --stage <stage> \
   --run-id <run> --pid <launcher-pid> --start-token <launcher-token> --format json
 # 已有 reservation：同 run_id 且 PID 身份有效 → attach；否则拒绝，绝不启动第二个同阶段进程
+# reservation 的 pid = launch 方（launcher/runner 外壳）的启动身份；runner 启动后只更新 Registry 的 runner_pid，不重写 reservation
 
 # 2) 脱离启动：独立进程组/会话 + stdio 与主会话脱离
 if command -v setsid >/dev/null 2>&1; then

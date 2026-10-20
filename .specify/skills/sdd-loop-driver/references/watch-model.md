@@ -165,13 +165,13 @@ label|pid_file|status_file|log|sentinel|heartbeat|deadline_epoch
 - 退出码与判定表由 `--help` / `--self-test` 钉住；本文件的 §3 是语义映射，代码是精确值所有者。
 - watcher 必须与 runner 以**同一执行身份**运行（`kill -0` 的权限前提）；远端拓扑两者都在 `<run-user>` 下。
 
-## 11. 归属层与重接线快照（Feature 064）
+## 11. 归属层与重接线快照（064）
 
 > 本节只增加消费规则与快照入口；§3 的判定状态机与退出码保持不变。
 
 - **归属参数**：watcher 可选 `--line-id` / `--run-id` / `--meta`；提供 `--line-id` 与 `--run-id` 时执行归属过滤，输出行追加 `line=` / `run=` / `attribution=`（`own|foreign|stale-run|unattributed|legacy`）。
 - **消费规则**：只有 `own` 事件参与判定、进度与 Registry 状态；`foreign`/`stale-run`/`unattributed` 只出现在摘要，不改变 verdict、不改变状态、不转发为当前线路进度。
-- **兼容规则**：未提供归属参数 → `attribution=legacy`，行为与 058 完全一致；单线新派发 MUST 提供归属参数。
+- **兼容规则**：未提供归属参数 → `attribution=legacy`，行为与 058 完全一致；单线新派发 MUST 提供归属参数。`legacy` 仅限单活动线 / 058 兼容调用；多活动线 MUST NOT 以 legacy 调用绕过归属过滤。
 - **重接线快照**：新会话先 `--once` 判定（running → 恢复监听；done → U4/U5；dead → U5；远端不可达 → `stalled(remote-unreachable)`），再决定去向；快照不写状态、不杀进程。
 - **远端不可达**：一次 watcher 调用没有返回任何 `WATCH` 行（ssh 255/超时）时，不改变阶段状态，不判 DEAD；先做连通性检查并按 `stalled(remote-unreachable)` 处置。
 - **lease 续租钩子**：持有 driver lease 时，窗口 ≤ `ttl/3`（缺省 ≤200s）或传 `--lease-renew-cmd`（`--lease-renew-interval` 缺省 60s）在窗口内续租；钩子失败不改变判定。

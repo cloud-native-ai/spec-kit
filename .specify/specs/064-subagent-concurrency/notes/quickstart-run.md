@@ -121,3 +121,50 @@ contains_object=1
 ```
 
 Exit status: all commands `0`; zero new feedback when no fact changed; exactly one retrievable `cli-profile:qodercli` entry after the simulated `-p` mismatch; the probe object is registered and the registry validates.
+
+### S6. 非回归收口（全特性矩阵 + 名称级基线对比）
+
+Feature matrix command (all 11 planned test files, including the additive non-regression file):
+
+```bash
+SPECKIT_PYTHON=/Users/liuqiming.lqm/project/profiles/.venv/bin/python3 \
+  bash scripts/bash/run-tests.sh tests/unit/test_line_registry_engine.py \
+  tests/contract/test_line_registry_contract.py tests/contract/test_line_envelope_contract.py \
+  tests/contract/test_workspace_isolation_contract.py tests/contract/test_lifecycle_detach_reattach.py \
+  tests/contract/test_sdd_loop_driver_cli_profiles.py tests/contract/test_sdd_loop_driver_skill.py \
+  tests/contract/test_non_regression_064.py tests/integration/test_two_line_isolation.py \
+  tests/integration/test_worktree_integration_queue.py tests/integration/test_session_kill_reattach.py \
+  -q --names-out /tmp/064-feature-failed.txt
+```
+
+```text
+151 passed in 56.45s
+# failed-name list written: /tmp/064-feature-failed.txt (       0 entries)
+```
+
+Full suite with name-level baseline comparison:
+
+```bash
+SPECKIT_PYTHON=/Users/liuqiming.lqm/project/profiles/.venv/bin/python3 \
+  bash scripts/bash/run-tests.sh tests -q --names-out .specify/specs/064-subagent-concurrency/current-failed.txt
+comm -13 .specify/specs/064-subagent-concurrency/baseline-failed.txt \
+         .specify/specs/064-subagent-concurrency/current-failed.txt
+```
+
+```text
+69 failed, 4077 passed, 1 skipped, 4 warnings in 295.19s
+# failed-name list written: .specify/specs/064-subagent-concurrency/current-failed.txt (69 entries)
+comm -13 output: <empty>        # zero NEW failures
+comm -23 (fixed): tests/contract/test_sdd_loop_driver_skill.py::test_c12_mirror_byte_identical,
+                  tests/contract/test_sdd_loop_driver_skill.py::test_c18_mirror_pair_no_drift
+baseline=71 current=69
+```
+
+Watcher self-test: `18 passed, 4 failed`; the four failures are the recorded macOS baseline (`pid-reuse`, `zombie`, `manifest`, `pgrep-zero-match-trap-reproduced`); all new attribution and lease-renew-hook cases pass.
+
+Mutation drills (each re-run green after deleting the copied mutation):
+- Drill 1 (attribution filter removed): `2 failed, 4 passed` in `test_two_line_isolation.py`; after deletion `6 passed`.
+- Drill 2 (`SDD_RUNNER_MODE=foreground`): `4 failed` in `test_session_kill_reattach.py`; default mode `4 passed`.
+- Drill 3 (reservation exclusivity removed): `1 failed, 15 passed` (`test_lc_04_reservation_concurrent_single_winner`); after deletion `16 passed`.
+
+Teardown: all scenarios use `mktemp` roots and remove them; no temp registry, worktree, or fake process remains (verified by each scenario's `finally` cleanup).
