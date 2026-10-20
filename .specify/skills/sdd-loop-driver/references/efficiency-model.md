@@ -1,6 +1,6 @@
 # Efficiency Model — sdd-loop-driver 运行效率优化
 
-> 本文件是四项运行效率优化（快车道 / 测试预算 / plan 小修约束 / 进度可见与脱离）的**唯一 owner**：快车道（§1）、两槽位测试预算（§2）、plan 只小修约束（§3）、进度可见与驱动解耦（§4）。SKILL.md 与 docs 页只保留摘要与指针；`references/dispatch-recipes.md` 与 `references/stage-prompts.md` 只引用本文件定义的字段、判据与程序，不复写规则。契约钉住落点为 `tests/contract/test_sdd_loop_driver_efficiency.py`。
+> 本文件是七项运行效率优化（快车道 / 测试预算 / plan 小修约束 / 进度可见与脱离 / 大特性拆分门 / 确定性预检 / 跨特性重叠预检）的**唯一 owner**：快车道（§1）、两槽位测试预算（§2）、plan 只小修约束（§3）、进度可见与驱动解耦（§4）、大特性拆分门（§5）、确定性预检（§6）、跨特性重叠预检（§7）。SKILL.md 与 docs 页只保留摘要与指针；`references/dispatch-recipes.md` 与 `references/stage-prompts.md` 只引用本文件定义的字段、判据与程序，不复写规则。契约钉住落点为 `tests/contract/test_sdd_loop_driver_efficiency.py` 与 `tests/contract/test_sdd_loop_driver_gates.py`。
 
 本文件自带运行时事实：条目只描述驱动在编排层执行的动作与判定；CLI 行为事实由 `references/cli/` 档案拥有，本文件只读引用，不复制档案内容。
 
@@ -77,6 +77,8 @@ admission-check.py --project P --base-ref R --requirements F --tasks F \
 ### 1.8 契约钉住
 
 FL-01…FL-10 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_fl_01…test_fl_10` 钉住；准入行为由 `tests/unit/test_admission_check.py` 覆盖。任何运行 MUST NOT 在缺少 E1 准入记录时声称自己走了快车道。
+
+> 快车道区间只适用于**单个**特性；超出区间的特性由 §5 的大特性拆分门接管——快车道拒绝不是终点，拆分后每个切片重新进入区间判定。
 
 ## 2. 两槽位测试预算（Test Budget）
 
@@ -264,3 +266,113 @@ CLI 不支持 stream-json（能力探测失败）或派生运行时缺失/派生
 ### 4.8 契约钉住
 
 PD-01…PD-10 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_pd_01…test_pd_10` 钉住；派生由 `tests/unit/test_derive_live_log.py` 覆盖；runner 行为由 `tests/integration/test_sdd_loop_efficiency_runner.py` 与 `watch-target.sh --self-test` 的四个 stream 用例覆盖。
+
+## 5. 大特性拆分门（Decomposition Gate）
+
+### 5.1 判据与决策点
+
+单条运行线一次只推进**一个**特性。规模超上限时禁止把完整链一次性压在大特性上，MUST 先拆分为多个切片。两个决策点（均为机械判定）：
+
+| 决策点 | 输入 | 触发 `split-required` 的条件 |
+|--------|------|------------------------------|
+| plan 入口（requirements U4 后、plan 派发前） | `requirements.md` | FR 定义行数 > 30 |
+| tasks U4（tasks 产物后、analyze 派发前） | `requirements.md` + `tasks.md` | FR 定义行数 > 30，或任务行数 > 40 |
+
+FR 定义行 = `^- \*\*FR-[0-9]{3}\*\*:`；任务行 = `^- \[[ xX>~]\] T[0-9]{3}`（宽模式，含 `[>]`/`[~]`）。上限与快车道中型区间端点一致（`FR_MAX`/`TASK_MAX`），数值 owner 是 `scripts/decomposition-check.py` 的 `FR_CEILING`/`TASK_CEILING` 常量；契约测试钉住二者相等。
+
+### 5.2 脚本接口
+
+```text
+decomposition-check.py --mode plan|tasks --requirements F [--tasks F] [--json-out F]
+```
+
+退出码：`0` = `proceed`；`1` = `split-required`；`2` = 输入或解析错误（缺文件、零 FR/任务定义）。标准库且 Python ≥3.8。
+
+### 5.3 `split-required` 处置
+
+1. 驱动 MUST NOT 派发后续阶段（plan 或 analyze）；在状态脊写入拆分记录：`measured`（FR/任务实测数）、`reasons[]`、`ceilings`、`proposed_slices[]`（每个切片给出名称、FR 范围或主题、预估规模）与 `base_commit`。
+2. 拆分粒度为**特性切片**：每个切片 MUST 自身落入 8–30 FR / 10–40 任务的区间，并各自拥有独立的 spec 目录与注册表绑定（`Related Feature` 仍指向同一特性）。
+3. 拆分记录经用户或上游流程确认后，驱动按切片顺序逐条走完整链；MUST NOT 在同一线并行推进多个切片。
+4. 拆分是**范围决策**：驱动 MUST NOT 自行删除、合并或重排需求来规避上限；无法在保留原意的前提下拆分时按四要素上送。
+
+### 5.4 边界
+
+- 上限只约束单特性规模，不评价内容质量；小于 8 FR 的特性不因此被拒绝，只按完整链执行（其成本本就低）。
+- 拆分后切片仍受测试预算（§2）、plan 约束（§3）与全部质量门约束，MUST NOT 因拆分降低任何门。
+- 本门是编排层纪律：非驱动手工调用阶段命令不受约束（与 §3.9 同一排除语义）。
+
+### 5.5 钉住
+
+常量与退出码由 `tests/unit/test_decomposition_check.py` 覆盖；上限与快车道端点的一致性由 `tests/contract/test_sdd_loop_driver_gates.py` 钉住。
+
+## 6. 确定性预检（Pre-Analyze Deterministic Gate）
+
+### 6.1 目的与运行点
+
+analyze 是跨产物一致性的最后防线，不是第一次检查。requirements / plan / tasks 三个阶段的 U4 MUST 在派发下一阶段（plan / tasks / analyze）之前运行 `scripts/pre-analyze-check.py`，把可机械判定的漂移挡在 analyze 之前。预检通过是 analyze 派发的前置条件；预检失败 MUST NOT 派发 analyze。
+
+### 6.2 检查项
+
+| 检查 | 判据 | 严重度 |
+|------|------|--------|
+| `duplicate-id` | FR/SC 在 requirements.md 内、契约条款在 `contracts/` 内、任务在 tasks.md 内重复定义 | error |
+| `dangling-id` | 引用不存在的 FR/SC；引用本规格契约命名空间内不存在的条款；跨特性命名空间（本规格未定义的 prefix） | error / advisory |
+| `blocked-by` | `[blockedBy: ...]` 指向不存在的任务；非具体占位符（如 `Txxx`） | error / advisory |
+| `count-claim` | 形式化制品中的 `N FR`、`N SC`、`N tasks/任务` 声明与实际定义数不符（区间、示例、历史/修复记录行跳过） | error |
+| `missing-path` | 反引号声明的工作区路径在 `<repo>` 下不存在 | advisory（`--strict` 时 error） |
+
+只扫描形式化制品（requirements/plan/tasks/data-model/quickstart/research/feature-ref/contracts/checklists）；`notes/`、`review.md`、`verification.md` 是带日期的记录，不参与实时一致性判定。
+
+### 6.3 脚本接口
+
+```text
+pre-analyze-check.py --spec-dir D --stage requirements|plan|tasks --repo R \
+  [--strict] [--waive CHECK:REL_PATH:LINE ...] [--json-out F]
+```
+
+退出码：`0` = pass；`1` = fail（存在未豁免的阻挡项）；`2` = 输入或解析错误。输出 JSON 携带 `findings[]{check,severity,path,line,message}` 与 `summary{errors,advisories,waived,fr,sc,tasks,clauses,files}`。
+
+### 6.4 修复与豁免
+
+1. error 级 finding MUST 在所属制品修复后重跑预检；连续两轮仍失败按 stall 纪律处理。
+2. advisory 默认不阻挡；`--strict` 把它们升级为阻挡，用于收口前加固。
+3. 豁免 MUST 使用 `--waive check:path:line` 精确到行，并在状态脊记录理由；MUST NOT 用宽泛豁免掩盖整类漂移。
+4. 预检 MUST NOT 替代 analyze：预检只处理机械可判定项，语义/覆盖/宪法冲突仍由 analyze 判定，analyze 的 CRITICAL/HIGH 归零判据不削弱。
+
+### 6.5 钉住
+
+行为由 `tests/unit/test_pre_analyze_check.py` 覆盖；脚本接口与 owner 文档由 `tests/contract/test_sdd_loop_driver_gates.py` 钉住。
+
+## 7. 跨特性重叠预检（Cross-Feature Overlap Pre-check）
+
+### 7.1 目的与运行点
+
+同一仓库内多条特性线可能交付同一路径（同一技能、同一 CLI 档案、同一 probe 对象），重叠在 implement 才暴露会产生成串返工。`clarify` U4 MUST 在派发 plan 之前运行 `scripts/overlap-check.py`，对当前特性与 specs 根下所有同级特性做交付面比较。
+
+### 7.2 判据
+
+- **当前特性的交付面**：`feature-ref.md` 中声明的共享交付根路径（反引号或行首路径；无声明时回退 `tasks.md` / `plan.md`）。特性自身 spec 目录内的路径不计。
+- **其他特性的交付面**：优先取**实际交付面**——提交信息点名该 spec 的提交所改动的共享根文件（次选：触碰该 spec 目录的提交）；无 git 历史时回退其声明。这样"被引用的输入路径"不会被误判为交付物。
+- **共享交付根**：`skills/`、`shared/`、`scripts/`、`templates/`、`src/`、`agents/`、`docs/`。无扩展名且不以 `/` 结尾的裸目录 token 忽略（它指整个区域，不是交付物）；显式目录声明以 `/` 结尾保留。
+- **重叠关系**：`same-path`（完全相同）或 `nested-path`（一方是另一方的目录前缀）。
+- 当前特性未声明任何共享交付路径 → `clear`（附 `note`），不是错误。
+- 同级 specs 目录按 `^[0-9]{3}-` 识别；当前特性不在 specs 根下时也纳入比较集合。
+
+### 7.3 脚本接口
+
+```text
+overlap-check.py --spec-dir D [--specs-root S] [--repo R] [--json-out F]
+```
+
+退出码：`0` = clear；`1` = overlap；`2` = 输入或解析错误。输出携带 `overlaps[]{other_spec,relation,current_path,other_path}` 与 `checked_specs[]`。
+
+### 7.4 处置
+
+1. 出现 overlap MUST NOT 直接派发 plan；驱动先做**归属裁决**：为每个重叠路径指定唯一 owner（通常为先声明或既有特性），另一方从范围中移除或改为只读引用。
+2. 裁决结果 MUST 同时写入两条线的状态脊（`overlap_adjudication`：路径、owner、另一方的处置、时间）与相关 spec 的 Clarifications/feature-ref 注记。
+3. 裁决后重跑 `overlap-check.py` 直至 `clear`；无法裁决时按四要素上送，MUST NOT 让两条线并行写同一路径。
+4. 重叠预检是 clarify 的完成条件之一，MUST NOT 因"稍后可能不冲突"而跳过。
+
+### 7.5 钉住
+
+行为由 `tests/unit/test_overlap_check.py` 覆盖；脚本接口、owner 文档与阶段提示词接线由 `tests/contract/test_sdd_loop_driver_gates.py` 钉住。

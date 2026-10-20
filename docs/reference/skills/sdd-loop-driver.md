@@ -54,6 +54,12 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 - **plan 只小修约束**：plan 完成后下游只允许小修并须 `PLAN-EDIT:` 声明；实质改动必须显式异常回传并由驱动按两分支处置；requirements 门内变更按最新锚点 re-baseline。
 - **进度可见与脱离**：阶段 runner 默认 stream-json，原始事件流与派生 live log 同时保留；本地与远端都用 `nohup` 脱离；`--once` 重入只核验、不重派。
 
+**上游效率门（2026-10-21 增补）**：
+
+- **大特性拆分门**：plan 入口 FR >30 或 tasks U4 任务 >40 时判 `split-required`，驱动必须先拆成各自落入区间（8–30 FR / 10–40 任务）的切片，再逐条走完整链（`scripts/decomposition-check.py`）。
+- **确定性预检**：requirements/plan/tasks 的 U4 在派发下一阶段前运行 `scripts/pre-analyze-check.py`，机械拦截重复/悬空 ID、`blockedBy` 断链、计数声明漂移与死路径；机械项不再留到 analyze。
+- **跨特性重叠预检**：clarify U4 运行 `scripts/overlap-check.py` 比较同级特性的共享交付路径（`same-path`/`nested-path`），重叠必须先完成归属裁决并写入两条线状态脊，才能派发 plan。
+
 **日志形态变化（已披露）**：stream 模式新增 `raw-<line>-<stage>.jsonl` 与派生 `log-<line>-<stage>.log`；CLI 不支持该输出模式或派生失败时降级为既有缓冲模式，并在 status 记录 `progress=degraded` 与原因。完成判定不变：哨兵仍只认 live log 最后非空行，watcher 判定与退出码、确认门、独立校验与卡死处置均未改变。
 
 ## 并发归属与生命周期

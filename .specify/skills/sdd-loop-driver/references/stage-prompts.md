@@ -66,6 +66,24 @@
 
 **伪完成判未完成**：尾标在而产物缺 = 未完成，循环不派发下一阶段。**U3 返回 `DONE` 只是候选**，三条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。
 
+## Deterministic Gates（确定性门，U4 / 派发前）
+
+> Owner of the gate rules is `references/efficiency-model.md` §5–§7. These
+> commands run inside U4; a failing gate blocks the next dispatch and its
+> result is recorded in the state spine.
+
+| 时点 | 命令 | 失败处置 |
+|------|------|----------|
+| clarify U4（plan 派发前） | `python3 <skill-dir>/scripts/overlap-check.py --spec-dir <spec-dir> --repo <repo>` | `overlap` → 先做归属裁决并写入两条线状态脊，重跑至 `clear`；不得派发 plan |
+| requirements U4（plan 派发前） | `python3 <skill-dir>/scripts/decomposition-check.py --mode plan --requirements <spec-dir>/requirements.md` | `split-required` → 写拆分记录（§5.3），按切片重新走 requirements；不得派发 plan |
+| requirements U4 | `python3 <skill-dir>/scripts/pre-analyze-check.py --spec-dir <spec-dir> --stage requirements --repo <repo>` | `fail` → 修复制品后重跑；连续两轮失败按 stall 处置 |
+| plan U4（tasks 派发前） | `python3 <skill-dir>/scripts/pre-analyze-check.py --spec-dir <spec-dir> --stage plan --repo <repo>` | 同上 |
+| tasks U4（analyze 派发前） | `python3 <skill-dir>/scripts/decomposition-check.py --mode tasks --requirements <spec-dir>/requirements.md --tasks <spec-dir>/tasks.md`，随后 `python3 <skill-dir>/scripts/pre-analyze-check.py --spec-dir <spec-dir> --stage tasks --repo <repo>` | `split-required` 或 `fail` → 不得派发 analyze |
+
+- 预检失败是**阶段门失败**，不是 analyze 的替代：修复后仍必须派发 analyze 并满足其 CRITICAL/HIGH 判据。
+- `--strict` 把 `missing-path` advisory 升级为阻挡；`--waive CHECK:path:line` 只做逐行豁免，理由写入状态脊。
+- 上表的命令、退出码与摘要写入该阶段 E3 `stage-status` 的 `sufficiency`/`evidence_ptr`，并在状态脊记录 `gates` 摘要。
+
 ## Fast Lane Conditional Blocks（快车道条件块）
 
 > Owner of the fast-lane rules is `references/efficiency-model.md` §1. These

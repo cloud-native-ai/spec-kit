@@ -5,35 +5,28 @@ skill_id: "<SKILL:.specify/skills/sdd-loop-driver/SKILL.md>"
 classification: external
 ---
 
-> **分类注解**：本 skill 依**依赖轴**判定为 external——自身零 spec-kit 依赖、任何宿主 agent 可直接加载（手动放置即可用）；其内容编排 spec-kit 的 SDD 流程（语义耦合在此显式声明），该耦合只体现在它指挥子代理在目标项目中执行 `/speckit.*` 阶段命令，不构成本 skill 的运行时依赖。
+> **分类注解**：本 skill 依**依赖轴**判定为 external——自身零 spec-kit 依赖、任何宿主 agent 可直接加载；内容编排 spec-kit 的 SDD 流程（语义耦合显式声明：指挥子代理执行 `/speckit.*`），不构成运行时依赖。
 
 ## What This Skill Does
 
-把 2026-10-14 起在多个项目被反复手工验证有效的「无人值守 SDD 驱动」模式固化为可执行手册：宿主 agent（不需要安装 spec-kit）加载本手册后，对每条项目线执行「断点探测 → 阶段派发 → 统一监听 → 独立校验 → 续环」的循环，直到 review 完成并合并收尾。三条硬需求——自迭代、独立校验、卡死处置——的运行规则全部内置于本手册（见下文与 references/）。监听语义（等待/监控/轮询/wait/monitor）的唯一权威落点是 `references/watch-model.md`：子代理进程、异步脚本、日志、心跳、退出记录与多线批量共用同一套信号与判定模型。
+把经多项目验证的「无人值守 SDD 驱动」固化为可执行手册：宿主 agent（无需安装 spec-kit）对每条项目线执行「断点探测 → 阶段派发 → 统一监听 → 独立校验 → 续环」，直到 review 完成并合并收尾。自迭代、独立校验、卡死处置三条硬需求内置于本手册；监听语义（等待/监控/轮询）的唯一权威落点是 `references/watch-model.md`。
 
-**触发语义与路由（2026-10-19 修订）**：以本技能名加载并给出功能/改进描述 = SDD 目标；目标项目可以是任意仓库，**包括本技能自身所在的仓库**。改进对象即使是 sdd-loop-driver 本身，也必须走 U0/U1 → 阶段链。只有入口显式声明「只做技能维护、不走 SDD」时，才允许 improve-skills/create-skills 等维护路径；不得因为缺少目标/权威文档等参数而改走别的流程（缺省解析见 When to Load）。
+**触发语义与路由**：以本技能名加载并给出功能/改进描述 = SDD 目标，目标项目可为任意仓库（含本技能自身仓库）；改进本技能也必须走 U0/U1 → 阶段链。仅入口显式声明「只做技能维护、不走 SDD」时，才允许 improve-skills/create-skills 维护路径。**主导流程唯一**：**加载后的第一个动作**是写出 U0 入口声明与阶段计划，在此之前不加载其他技能、不编辑文件、不派发 subagent。
 
-**主导流程唯一**：本技能加载后，本轮主导流程是 SDD 循环；其他技能只能作为被调用工具，不能成为主导流程。**加载后的第一个动作**是写出 U0 入口声明与阶段计划；在此之前不得加载其他技能、不得直接编辑文件、不得派发 subagent。
-
-**完整流程纪律（2026-10-17 修订）**：本手册编排的是**完整版** SDD 流程——`speckit.checklist`、`speckit.analyze`、`speckit.review` 等日常手动开发常被省略的非必须质量门，在无人值守循环中一律必经、不可省略、不可跳阶段（编排与门判据见 dispatch-recipes.md Recipe 4）。
-
-**软协同关系**：本技能与 sdd-project-setup **非强绑定、各自可独立运行**。本技能保留自有的必要 preflight（五族前置检查，见 dispatch-recipes.md）；检查不通过且属框架安装/调协问题时，handoff 给 sdd-project-setup 处置，处置完成后回到循环。sdd-project-setup 调协完成后产出的候选工作清单（未完成 feature / 大改进 feedback / TODO 事项）是本技能建议的输入来源之一，但未经用户或上游流程确认不自动启动循环。
-
-**职责切分线**：框架调协（install/reconcile/verify/候选清单）= sdd-project-setup；SDD 完整阶段循环（含 checklist/analyze 质量门）= 本技能。
+**质量门完整**：checklist/analyze/review 在无人值守循环中一律必经、不可省略（编排见 dispatch-recipes.md Recipe 4）。与 sdd-project-setup 软协同、各自可独立运行：框架调协归它，阶段循环归本技能；其候选清单是建议输入，未经确认不自动启动本循环。
 
 ## Driver Topology（驱动拓扑——义务真源：run-agent 派发治理）
 
-- **加载本手册的宿主 agent 就是驱动者**：U0–U6（探测/派发/轮询/校验/续环/收尾）全部由加载者在自己的会话里亲自执行，不得委托给任何 subagent。
-- **流程不可替换**：加载者不得用 improve-skills/create-skills 等技能维护路径替代 U0–U6；详见 Hard Requirement 7。
-- **派发治理义务已上收（analyze C-26）**：子代理提示词不引用驱动/循环技能、不指示加载技能、不含循环逻辑；嵌套驱动禁止、循环层级恒为 1——义务全文与派发前拦截见 `skills/internal/run-agent/SKILL.md` 派发治理节与 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation（本节改为引用，义务本体单一落点）。
-- **自检**：若加载本手册时发现自己处于 subagent 上下文且被赋予的任务是「代为驱动循环」，按显式异常行上报并停在前置阶段——嵌套驱动永不是合法形态。
-- **两侧环境模型**：本手册（编排侧）与阶段子代理（执行侧）通常运行在不同环境——speckit 框架（specify CLI / `.specify/`）只要求存在于执行侧（目标项目所在环境），编排侧宿主不需要安装 spec-kit、缺之不构成缺口；两侧角色划分、安装归属与误读纠正的真源见 `.specify/shared/workflow/execution-topology.md`（执行拓扑模型）。
+- **加载本手册的宿主 agent 就是驱动者**：U0–U6（探测/派发/轮询/校验/续环/收尾）由加载者在自己的会话亲自执行，不得委托任何 subagent；**自检**：若处于 subagent 上下文且被赋予「代为驱动循环」的任务，按显式异常行上报并停在前置阶段——嵌套驱动永不是合法形态。
+- **流程不可替换**：不得用 improve-skills/create-skills 等维护路径替代 U0–U6（Hard Requirement 7）。
+- **派发治理义务上收**：子代理提示词不引用驱动/循环技能、不指示加载技能、不含循环逻辑；义务全文与派发前拦截见 `skills/internal/run-agent/SKILL.md` 派发治理节与 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。
+- **两侧环境模型**：speckit 框架（specify CLI / `.specify/`）只要求存在于执行侧（目标项目）；编排侧宿主不需要安装 spec-kit，缺之不构成缺口（真源：`.specify/shared/workflow/execution-topology.md`）。
 
 ## When to Load
 
-- 入口话术只声明**目标与起点**：目标项目（含登录别名/用户/路径）、断点位置（可不声明——机制自动探测）、终态权威文档路径、特性切片（由入口声明或按终态权威文档推导——本技能不自动选题）。
-- 宿主环境**无** `.specify/` 也可运行本手册（SC 可移植场景）；仅当子代理要在目标项目执行 `/speckit.*` 阶段命令时，目标项目才需要具备 `.specify/` 结构。
-- 本手册**不**适用于：需要用户逐轮拍板的探索式会话（那是访谈模式）；单命令进程内长跑（那是 implement 长跑模式）。
+- 入口只声明**目标与起点**：目标项目（含登录别名/用户/路径）、断点（可不声明，机制自动探测）、终态权威文档、特性切片（入口声明或按权威文档推导——本技能不自动选题）。
+- 宿主无 `.specify/` 也可运行；仅当子代理要在目标项目执行 `/speckit.*` 时，目标项目才需具备 `.specify/`。
+- 不适用于：需用户逐轮拍板的探索式会话；单命令进程内长跑（implement 长跑模式）。
 
 ### U0 入口解析（缺省 + 强制自检）
 
@@ -42,25 +35,23 @@ classification: external
 | 入口缺省 | 解析规则 |
 |----------|----------|
 | 目标项目 | 当前工作目录含 `.specify/` → 当前仓库；否则问一个澄清问题，不猜 |
-| 执行拓扑 | 未给 ssh 别名/run-user/远端路径 → 本地直驱；给全 → 远端 |
-| 终态权威文档 | 入口功能描述 + 现有 `docs/` + 项目宪法；选择写入 U0 状态脊 |
+| 执行拓扑 | 未给 ssh 别名/run-user/远端路径 → 本地；给全 → 远端 |
+| 终态权威文档 | 入口描述 + 现有 `docs/` + 宪法；写入 U0 状态脊 |
 | 断点 | U1 自动探测，禁止猜测 |
-| 特性切片 | 入口功能描述；未给则按终态权威文档推导，本技能不自动选题 |
+| 特性切片 | 入口描述；未给则按权威文档推导，不自动选题 |
 
 **U0.5 自检（进入 U2 前必须通过）**：
 
-1. 目标、拓扑、权威、切片、断点是否已写入状态脊？
-2. 我是否正准备直接编辑目标仓库？是 → **停下**：这不是 U2 派发，是流程绕过。
-3. 我是否正准备加载 improve-skills/create-skills 等维护技能？是 → 除非入口显式声明「只做技能维护」，否则**停下**并回到 U1。
-4. 阶段计划（下一阶段 + 派发形态）是否已写出？否 → 先写，再派发。
+1. 目标、拓扑、权威、切片、断点已写入状态脊？
+2. 正准备直接编辑目标仓库？→ **停**：这是流程绕过，不是 U2 派发。
+3. 正准备加载 improve-skills/create-skills？→ 除非入口声明「只做技能维护」，否则**停**并回 U1。
+4. 阶段计划（下一阶段 + 派发形态）已写出？否 → 先写再派发。
 
 ### 常见误路由（入口 → 正确路由）
 
-| 入口形态 | 正确路由 | 禁止 |
-|----------|----------|------|
-| 以本技能名 + 功能/改进描述 | SDD 阶段链；目标可为本仓库 | 直接改代码；改走 improve-skills |
-| 以本技能名 + 明确「只改技能文档/不走 SDD」 | 技能维护路径 | 强制派发阶段 |
-| 纯提问/咨询 | 回答并停 | 自动启动循环 |
+- 本技能名 + 功能/改进描述 → SDD 阶段链（目标可为本仓库）；禁止直接改代码或改走 improve-skills。
+- 本技能名 + 明确「只改技能文档/不走 SDD」→ 技能维护路径；不得强制派发阶段。
+- 纯提问/咨询 → 回答并停；不自动启动循环。
 
 ## The Loop (U0–U6)
 
@@ -74,7 +65,7 @@ U5 STALL     超时/重试上限/预算触顶 → 停线、状态脊落盘、出
 U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归档清扫，缺省本地合并）+ 一份收尾汇总
 ```
 
-多条线并行 = 多个独立循环实例：一线一连接、一线一状态脊。**U0.5 线路登记**：首次派发前把该线登记进环境级 Line Registry（`scripts/line-registry.py --action register`），此后每个事件携带 `(line_id, run_id)` 归属信封；U6 收尾后注销（`deregister`）。无标识消息一律经 `resolve-message` 判定，禁止用进程扫描推断线路。
+多条线并行 = 多个独立循环实例：一线一连接、一线一状态脊。首次派发前登记环境级 Line Registry（`scripts/line-registry.py --action register`），事件携带 `(line_id, run_id)` 信封，U6 后 `deregister`；无标识消息经 `resolve-message` 判定，禁止进程扫描推断。
 
 U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计划；未产出前不得进入 U2，更不得直接编辑目标仓库——目标项目为本仓库时同样适用。
 
@@ -84,8 +75,8 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 2. **独立校验**：阶段完成判定不由执行者自报——校验者不是该阶段执行子代理；哨兵在而产物缺 = 伪完成，判未完成。
 3. **卡死处置**：达重试上限（缺省 2 次）或阶段超时（缺省 90 分钟）→ 停环、落状态脊、出上送件四要素（发现了什么 / 为何吃重 / 已产生的中间产物逐项可定位 / 可选处置）。
 4. **状态脊**：每线状态文件在 U2 派发前、U3 终止判定时、U4 校验后、U5 停线时先写后动；续环与重入只认状态脊，不依赖会话记忆。
-5. **驱动者生命周期**：U3 是驱动者当前运行内的有界等待（缺省长轮询窗口，见 `references/watch-model.md`），驱动者必须存活到全线收束或显式停线上送；独立 `sleep` 回合与「挂监视器后等待通知/恢复」都不是合法形态——除非宿主已被探针证明能在通知后自动恢复同一运行（watch-model §6）。会话式宿主中驱动者确须结束时，唯一合法路径是把状态脊写为 stalled/reentry-required 并显式上报（重入是常态路径，程序见 stage-prompts.md）。
-6. **驱动拓扑**：加载者即驱动者，亲自执行 U0–U6；阶段执行子代理只收三段骨架提示词；反嵌套义务（不引用驱动/循环技能、不指示加载技能、不含循环逻辑）的真源在 run-agent 派发治理——本手册于 U2 派发前按其自检，全文见「Driver Topology」节。
+5. **驱动者生命周期**：U3 是当前运行内的有界等待（窗口见 `references/watch-model.md`），驱动者必须存活到全线收束或显式停线上送；独立 `sleep` 回合与「挂监视器后等通知/恢复」均不合法——除非宿主已被探针证明能在通知后自动恢复同一运行（watch-model §6）。确须结束时，唯一合法路径是把状态脊写为 stalled/reentry-required 并显式上报（重入是常态路径）。
+6. **驱动拓扑**：加载者即驱动者，亲自执行 U0–U6；阶段子代理只收三段骨架提示词；反嵌套义务真源在 run-agent 派发治理，本手册于 U2 派发前自检。
 7. **流程不可替换（no workflow substitution）**：完成 U0/U1 并写出阶段计划前，禁止直接编辑目标仓库；禁止用 improve-skills/create-skills 等技能维护路径替代 SDD 阶段链。目标项目为本技能所在仓库时同样适用。唯一例外：入口显式声明「只做技能维护、不走 SDD」。
 
 ## Discipline Defaults
@@ -94,45 +85,49 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 
 ## Efficiency Optimizations（运行效率优化）
 
-四项编排层优化（唯一 owner = `references/efficiency-model.md`，本节只作摘要与指针）：
+七项编排层优化（owner = `references/efficiency-model.md`，本节只作摘要）：
 
-1. **中型特性快车道**：仅入口携带 `fast-lane=opt-in` 时，在 tasks 后按七项机械判据裁决；录取则跳过 checklist、保留 analyze/review，判据失效即 fail-closed 回退完整链。
-2. **两槽位测试预算**：每线仅 implement 起点 baseline 与 review 后 closure 两次全量；中间阶段与 review 用 `targeted-set-v1` 定向集并留证据；槽外全量必须显式例外。
-3. **Plan 只小修约束**：plan 完成后下游只允许小修并须 `PLAN-EDIT:` 声明；实质改动按两分支处置；requirements 门内变更按最新锚点 re-baseline。
-4. **进度可见与脱离**：阶段 runner 默认 stream-json，raw + 派生 live log；本地与远端都用 nohup 脱离，`--once` 重入只核验不重派。
+1. **快车道**：仅入口 `fast-lane=opt-in` 时在 tasks 后按七项机械判据裁决；录取跳过 checklist、保留 analyze/review，判据失效即回退完整链。
+2. **两槽位测试预算**：每线仅 implement 起点 baseline 与 review 后 closure 两次全量；中间阶段与 review 用定向集留证据；槽外全量必须显式例外。
+3. **Plan 只小修**：plan 后下游只允许小修并须 `PLAN-EDIT:` 声明；实质改动按两分支处置；requirements 门内变更按最新锚点 re-baseline。
+4. **进度可见与脱离**：runner 默认 stream-json，raw + 派生 live log；本地与远端均用 nohup 脱离，`--once` 重入只核验不重派。
+5. **大特性拆分门**：plan 入口 >30 FR 或 tasks U4 >40 任务判 `split-required`，拆分后逐切片推进。
+6. **确定性预检**：requirements/plan/tasks 的 U4 先跑 `pre-analyze-check.py`（重复/悬空 ID、blockedBy、计数漂移、死路径），在 analyze 前修复。
+7. **跨特性重叠预检**：clarify U4 运行 `overlap-check.py`，共享交付路径重叠先做归属裁决再派发 plan。
 
-新增脚本：`scripts/admission-check.py`、`scripts/audit-test-budget.py`、`scripts/audit-plan-changes.py`、`scripts/derive-live-log.py`、`scripts/stage-runner.sh`（`watch-target.sh` 扩展 `--raw-stream`）。细则与字段面见 owner 文档与 `references/stage-prompts.md`、`references/dispatch-recipes.md`、`references/watch-model.md`。
+新增脚本与领域细则见 `references/efficiency-model.md` §5–§7 与 References。
 
 ## References
 
-- `references/dispatch-recipes.md` — 五大执行机制的命令形态：断点探测、阶段化 prompt 文件、runner 与派生、后台执行 + 统一监听（长轮询窗口/批量多线）、收尾纪律；阶段链与哨兵字面量；派发可见性操作规则；线路登记/归属信封/消息入口（Recipe 6）。
-- `references/watch-model.md` — 统一监听模型：信号源、判定状态机、事件优先机制阶梯、窗口与阶段期限的区分、`pgrep -c` 零匹配陷阱、多线 manifest、宿主适配与自测要求；归属层消费规则与重接线快照（§11）。
-- `references/stage-prompts.md` — 阶段提示词三段骨架全文、独立校验程序、Line Registration/Envelope/Ingress 程序、重接线/重复启动/orphan/stale/U6 程序、已验证变体（本地简报先行 / 构建固化分线）、多线并发隔离与窄读法授权、卡死处置与状态脊程序。
+- `references/dispatch-recipes.md` — 五大执行机制的命令形态：断点探测、阶段化 prompt、runner 与派生、后台执行 + 统一监听、收尾纪律；阶段链与哨兵字面量；线路登记/归属信封/消息入口。
+- `references/watch-model.md` — 统一监听模型：信号源、判定状态机、窗口与阶段期限、`pgrep -c` 零匹配陷阱、多线 manifest、宿主适配与自测；归属层与重接线快照（§11）。
+- `references/stage-prompts.md` — 三段骨架全文、独立校验、Line/Envelope/Ingress、重接线/orphan/U6、已验证变体、并发隔离与窄读法授权、卡死处置与状态脊。
 - `scripts/watch-target.sh` — 无框架依赖的长轮询 watcher 参考实现（单目标/多目标、快照与自测模式、`--line-id/--run-id/--meta` 归属过滤、窗口内 lease 续租钩子）。
 - `scripts/line-registry.py` — Python 3 stdlib-only 引擎：环境级 Registry、原子写/同线锁、信封分类、消息入口、所有权/集成队列、lease/reservation/身份校验。
+- `scripts/decomposition-check.py` / `pre-analyze-check.py` / `overlap-check.py` — 三个确定性门：大特性拆分、跨产物预检、跨特性重叠（规则 owner：efficiency-model §5–§7）。
 
 ## Boundary
 
 - 收尾动作的合并/push 维持确认门控破坏性分类：缺省本地合并；push 须经入口显式授权。
 - 本手册编排阶段为不透明单元：不改 requirements/clarify/plan/tasks/checklist/analyze/implement/review 各命令的内部流程。
 - 不绑定特定项目族或工作区命名规则：别名、用户、路径、CLI、断点阶段全部入口参数化。
-- 同仓多写线：worktree-per-write-line + Ownership Manifest + 确定性集成队列（单一协调者、每批一次镜像）；规则见 `references/dispatch-recipes.md` Recipe 7 与 `references/stage-prompts.md` Concurrency Isolation。worktree 只在合并成功后移除，未合并/未提交时保留并上送。
+- 同仓多写线：worktree-per-write-line + Ownership Manifest + 确定性集成队列；规则见 `references/dispatch-recipes.md` Recipe 7 与 `references/stage-prompts.md` Concurrency Isolation。worktree 只在合并成功后移除，未合并时保留并上送。
 - 目标项目未安装 spec-kit（无 `.specify/`）时：**委托 sdd-project-setup** 处置（本技能不执行初始化），处置完成并取得就绪凭证后重入循环。
 
 ## Subagent Create & Dispatch Delegation（子代理创建与派发委派）
 
 本手册是**编排者**：它不自带派发机制，而是委派两个承接技能完成驱动子代理的任务（2026-10-16 委派化裁定）：
 
-- **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 能力模板按职责实例化阶段执行实例（一实例一职责，`capacity-scope` 引用绑定）；输入=职责声明，产出=`.specify/agents/instances/<slug>.agent.md`。
-- **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：以 Execution 拓扑声明（本地/远端，见 subagent-definitions § Execution Topology Declaration）+ 实例引用发起执行；输入=实例+拓扑+阶段提示词，产出=执行结果或可见性三元组。前置检查（五族）与失败处置链见其 `references/dispatch-preflight.md`。
-- **编排本体在本手册**：阶段序列（U0–U6）、状态脊、哨兵与独立校验、卡死处置、收尾合并——三技能不承接这些（职责切分线见 agent-definitions § Driving Subagents via the Three Layers）。
+- **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 按职责实例化阶段执行实例（一实例一职责）；输入=职责声明，产出=`.specify/agents/instances/<slug>.agent.md`。
+- **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：以 Execution 拓扑声明（本地/远端）+ 实例引用发起执行；输入=实例+拓扑+阶段提示词，产出=执行结果或可见性三元组；前置检查与失败处置链见其 `references/dispatch-preflight.md`。
+- **编排本体在本手册**：阶段序列（U0–U6）、状态脊、哨兵与独立校验、卡死处置、收尾合并不由承接技能承担（职责切分见 agent-definitions § Driving Subagents via the Three Layers）。
 
 ## Feedback & Probe Points（反馈与探针采集点）
 
 本技能频繁驱动完整 SDD 流程，是 speckit 框架摩擦的最佳观察者——框架级观察 MUST 有落点，MUST NOT 随收尾汇总蒸发。三个采集点（本技能不加新采集机器——状态脊、收尾汇总与既有引擎就是载体，IX）：
 
 1. **每线观察点（U4/U6）**：独立校验与收尾时，把观察到的 **speckit 框架级摩擦**记入该线状态脊的「框架观察」段——结构化三要素：现象 / 框架位置（哪个阶段命令、模板、命令面）/ 对驱动的影响。范围限框架本身（阶段命令行为、模板缺口、哨兵与校验误报）；目标项目的业务问题不属此类。
-2. **收尾落库点（U6）**：收尾汇总携带「框架反馈候选」清单（自各线「框架观察」段聚合）。落库形态分两种：宿主工作区具备规格库结构（specify init 产物在位）时，候选逐条经 `feedback-utils.py --action record --unit-id "skill:sdd-loop-driver" --unit-type skill` 落宿主反馈库（runtime-mode 门控沿用编译 Wrap-up 节的 gate）；standalone（无该结构）时，候选清单随收尾汇总交付用户，由用户决定投递去向——**不自动上送**（feedback 红线：manual 投递，绝不自动传输）。
+2. **收尾落库点（U6）**：收尾汇总携带「框架反馈候选」清单（自各线「框架观察」段聚合）。宿主具备规格库结构时，候选逐条经 `feedback-utils.py --action record --unit-id "skill:sdd-loop-driver" --unit-type skill` 落宿主反馈库（runtime-mode 门控沿用 Wrap-up 节）；standalone 时随收尾汇总交付用户——**不自动上送**（manual 投递红线）。
 3. **skill 收尾点（run 结束）**：编译 `## Wrap-up` 节既有的五步引擎链（run determination → exec quant → feedback record → threshold notice → token reflection；probe-registry `@point:wrap-up scope=all` 绑定，73 units 全覆盖）——run 结束照单执行，本节不重复其步骤。
 
 ## CLI Capability Profiles
