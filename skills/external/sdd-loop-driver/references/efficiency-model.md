@@ -77,3 +77,64 @@ admission-check.py --project P --base-ref R --requirements F --tasks F \
 ### 1.8 契约钉住
 
 FL-01…FL-10 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_fl_01…test_fl_10` 钉住；准入行为由 `tests/unit/test_admission_check.py` 覆盖。任何运行 MUST NOT 在缺少 E1 准入记录时声称自己走了快车道。
+
+## 2. 两槽位测试预算（Test Budget）
+
+### 2.1 全量定义与作用域
+
+**全量测试运行** = 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件（本仓 = `bash scripts/bash/run-tests.sh`）。预算以**运行线**为作用域：每线独立台账与独立槽位，多线并行互不共享或消耗。每条运行线恰好两个全量槽位：
+
+| 槽位 | 时点 | 程序 |
+|------|------|------|
+| `baseline` | implement 起点（首个任务前） | `run-tests.sh --names-out <spec-dir>/baseline-failed.txt`，按名称捕获失败名单 |
+| `closure` | `review` 通过之后、合并之前，由驱动或独立校验单元执行 | `run-tests.sh --names-out <spec-dir>/final-failed.txt`，`comm -13` 名称级比较 |
+
+implement 内 MUST NOT 再运行第二次全量套件；其内部回归比较义务由收口槽位承担。槽内重跑记 `in-slot-rerun`，不另开槽。
+
+### 2.2 台账与证据分工
+
+- **E2 台账唯一来源** = 线状态脊的 `<!-- test-budget:begin -->` … `<!-- test-budget:end -->` JSONL 围栏；`<spec-dir>/test-evidence/implement.jsonl` 仅是 E3 传输/证据副本，MUST NOT 作为台账或审计来源。
+- 本地拓扑 `spine_write_mode=direct` 由阶段直接追加；远端 `transport` 由执行侧写传输行，驱动在 U4 后合并进状态脊并记 `merge_source`/`merged_at`，合并前不得审计。
+- E2 行字段以 `data-model.md` E2 为准（seq / slot / stage / purpose / trigger / at / command / selection_basis / rc / passed / failed / failed_names_path / baseline_compare / evidence_ptr，例外行另带 `exception_reason`，环境失败行带 `environment_evidence`）。
+- 缺失 `passed`/`failed` → 审计报 `unknown`，MUST NOT 记为零或补造。
+
+### 2.3 固定选择程序 `targeted-set-v1`
+
+`clarify` / `plan` / `tasks` / `checklist` / `analyze` 与 `review` 只运行定向测试集；选择 MUST 由固定程序 `targeted-set-v1` 执行。算法 owner 是 `contracts/test-budget.md` TB-05；本节是实现载体，二者不一致时以 TB-05 为准。
+
+- **输入**：`stage_base`（阶段起点提交）、`spec_dir`、`changed_paths`（`git diff --name-only --diff-filter=ACMR <stage_base>..HEAD` 与 `git status --porcelain` 的路径并集）、`test_roots` = `tests/unit`、`tests/contract`、`tests/integration`、`tests/scenarios`。
+- **(a) 改动路径覆盖**：候选 = `find <test_roots> -type f -name 'test_*.py' | LC_ALL=C sort`；对每个不在 `test_roots` 下的 `changed_path`，选中内容包含该仓库相对路径或其模块 stem（basename 去扩展名）的候选文件（`grep -lF` 固定字符串）。
+- **(b) 交付物契约测试**：本特性短名从 `spec_dir` 目录名去掉编号前缀派生；选中内容包含该短名或交付面路径（`skills/external/sdd-loop-driver`、`docs/reference/skills/sdd-loop-driver.md`）的契约/集成测试。
+- **(c) 夹具变更**：`changed_path` 在 `test_roots` 下时选中该文件自身；在 `tests/fixtures/` 下时选中内容引用该夹具路径的测试文件。
+- **排序与输出**：去重后 `LC_ALL=C sort -u`，每行一个仓库相对测试路径（stdout），供 E3 `selected_paths[]` 原样记录。
+- **复现性**：同一 `stage_base` + 同一工作树状态 MUST 产生同一集合；阶段 MUST 记录完整命令、`stage_base`、输出（或摘要 + 哈希）与充分性说明；不同阶段 MUST NOT 使用不同选择命令。
+- **空集**：改动了可执行面却得到空集 → `empty-selection-escalated`（扩大同族或按显式例外升级为全量，并记录原因）；仅文档改动 → `not-run-docs-only`。
+
+### 2.4 E3 证据字段与完整性
+
+每次定向运行记录：命令、选择依据、所选路径 `selected_paths[]`、充分性 `sufficiency`、rc、passed/failed、新增失败 `new_failures[]`、比较基线。每个**适用阶段**（`clarify` / `plan` / `tasks` / `checklist` / `analyze` / `review`）恰有一条 `row_type=stage-status` 行；整阶段缺行计入完整性分母，MUST NOT 静默缩小分母。
+
+- `not-run-docs-only` 按**六项缩减字段集**判完整：`stage`、`row_type=stage-status`、`status`、`selection_basis`、`changed_paths[]`、`evidence_ptr`；运行字段不适用，MUST NOT 报 `unknown`。
+- 快车道按 §1 授权跳过 `checklist` 时，该阶段记 `not-applicable-skipped-stage`（[[STR-008]]），以 E1 准入记录 + [[STR-003]] 为联结证据；MUST NOT 记为 `unknown`，MUST NOT 计入完整性分母。
+- `unknown` 只用于证据缺失；收口审计输出 `stages=N complete=N`（N = 适用阶段总数，含文档型阶段）。
+
+### 2.5 审计、例外与修复
+
+`scripts/audit-test-budget.py --spine "$STATE_SPINE" --spec-dir <spec-dir> [--logs-dir <dir>] [--stage-check implement|closure]`：
+
+- 校验两槽位、第三槽位拒绝、`in-slot-rerun` 只能出现在 `closure` 之后、`out-of-slot-exception` 必带原因与证据、`environment-failure` 不消耗槽位、closure 必须是名称级差集。
+- `--logs-dir` 扫描阶段日志中的全量 runner 命令：日志中出现但台账未入账 → 违规；日志缺失 → `unknown`，MUST NOT 当零。
+- `--stage-check implement` 只要求 baseline 恰 1 且允许 closure 未写入；`--stage-check closure` 要求 baseline 与 closure 各 1。
+- 摘要 MUST 输出 `slots=baseline:N closure:N reruns=N exceptions=N unknown:N environment_failures=N` 与 `stages=N complete=N`。
+
+**槽外例外与槽内重跑**：任何槽外全量 MUST 以 `out-of-slot-exception` 形式出现，带原因与证据，收尾汇总列出次数与原因。收口因修复新失败而重跑同一套件记 `in-slot-rerun`（含触发与证据），不另开槽；MUST NOT 静默超预算。**环境失败**：收集/执行任何测试前即失败（解释器或依赖缺失、收集前错误）记 `environment-failure`，不消耗槽位并附证据；实际执行了测试的调用（含 0 tests collected 的选择失败）消耗槽位。
+
+**收口归属**：implement 只消耗 `baseline` 槽位；`closure` 由驱动在 `review` 通过之后、合并之前写入同一状态脊。closure 修复重入携带 `baseline_slot=skip(closure-repair)`，不再消耗 baseline。
+
+### 2.6 编排层实现
+
+本预算 MUST 在编排层实现（阶段提示词 + 状态脊台账 + 收口审计），MUST NOT 依赖修改框架命令内部流程。`STATE_SPINE_PATH`、`EVIDENCE_DIR`、`SPINE_WRITE_MODE=direct|transport` 由阶段提示词骨架统一携带；缺失 `STATE_SPINE_PATH` → 派发前快速失败（`ANOMALY:`），MUST NOT 另建第二份台账。
+
+### 2.7 契约钉住
+
+TB-01…TB-10 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_tb_01…test_tb_10` 钉住；审计行为由 `tests/unit/test_audit_test_budget.py` 覆盖；名称级回归由 `tests/integration/test_sdd_loop_efficiency_regression.py` 覆盖。

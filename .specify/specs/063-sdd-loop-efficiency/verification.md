@@ -75,3 +75,57 @@ recording), **driver closure** (owned by the driver after review).
 - Mirror re-sync + `diff -rq` exit 0 + `--check` exit 0.
 - `33 passed in 121.09s`, exit 0; quickstart S1/S2 re-run with the same expectations.
 - `git diff` contains only the feature's expected paths (implementation + mirrors + tests + spec notes).
+
+## US2 — two-slot budget and targeted evidence (T016–T024)
+
+### T016/T017/T018 — red-first (automated)
+
+- Red: `notes/red-first-evidence.md` § T016/T017/T018 (script absent; 22 unit
+  failures, 1 integration failure, 10 TB contract failures).
+- Green (T022 combined run): `tests/unit/test_audit_test_budget.py
+  tests/integration/test_sdd_loop_efficiency_regression.py
+  tests/contract/test_sdd_loop_driver_efficiency.py -q` → `43 passed in 4.50s`.
+- Script: `skills/external/sdd-loop-driver/scripts/audit-test-budget.py`;
+  ledger authority = the `<!-- test-budget:begin/end -->` fence in the state
+  spine; `test-evidence/` is E3 only (`test_ledger_reads_state_spine_fence`).
+
+### T020/T021 — owner document, prompts, recipes, mirror (automated)
+
+- `references/efficiency-model.md` §2 (two slots, targeted-set-v1, E3 fields,
+  audit/exceptions, completeness `stages=N complete=N`, orchestration layer).
+- `references/stage-prompts.md` budget blocks (implement baseline, intermediate
+  and review targeted runs, driver closure, `baseline_slot=skip(closure-repair)`,
+  `STATE_SPINE_PATH`/`EVIDENCE_DIR`/`SPINE_WRITE_MODE` placeholders).
+- `references/dispatch-recipes.md` Recipe 4 closure timing + audit command.
+- Mirror: `sync-mirrors.py --write --only skills/external/sdd-loop-driver` →
+  1 new + 3 updated; `diff -rq` exit 0; `--check --only ...` → `ok (18 files)`.
+
+### T022 — live ledger and quickstart S3 (automated + recorded)
+
+- Quickstart S3: exit `0`, `slots=baseline:1 closure:1 reruns=0 exceptions=0
+  unknown=0`, `stages=0 complete=0`, `status=ok` (details in
+  `notes/quickstart-run.md`).
+- Live 063 spine (`/tmp/sdd-loop-efficiency/state.md`):
+  `audit-test-budget.py --spine ... --spec-dir .specify/specs/063-sdd-loop-efficiency
+  --stage-check implement` → exit `0`, `slots=baseline:1 closure:0 ...`,
+  `stages=0 complete=0`. `baseline_slot=consumed`; closure remains driver-owned
+  after review. Implement ran no second full suite.
+- E2 fence is the only ledger; `test-evidence/implement.jsonl` carries one E3
+  reference row and is never audited as a ledger (I-05).
+
+### T023 — mutation drill (5 applications, all restored)
+
+| Mutation | Red test | Restore |
+|----------|----------|---------|
+| allow a third slot | `test_third_slot_rejected` | checksum equal |
+| missing `exception_reason` passes | `test_out_of_slot_without_exception_fails` | checksum equal |
+| count comparison replaces name-level diff | `test_closure_requires_name_level_diff` | checksum equal |
+| ignore `--logs-dir` scan hits | `test_unaccounted_log_full_run_rejected` (+ `test_missing_logs_reports_unknown`) | checksum equal |
+| drop docs-only reduced-field / completeness checks | `test_docs_only_reduced_field_set` | checksum equal |
+
+### T024 — post-mutation re-run (automated)
+
+- `43 passed in 4.50s`, exit 0; quickstart S3 re-run identical.
+- Ledger still reports exactly two slots, 0 exceptions, 0 unknown; no second
+  full suite ran inside implement.
+- US2 checkpoint closed.

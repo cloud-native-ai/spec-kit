@@ -64,3 +64,56 @@ FAILED tests/contract/test_sdd_loop_driver_efficiency.py::test_fl_10_self_applic
 
 - Meaning: the owner document, the script and the downstream blocks do not exist
   yet. FL tests must go green after T011/T012.
+
+## T016 — tests/unit/test_audit_test_budget.py
+
+- Date: 2026-10-20
+- Command: `bash scripts/bash/run-tests.sh tests/unit/test_audit_test_budget.py -q`
+- Exit status: `1`
+- Output tail:
+
+```text
+FAILED tests/unit/test_audit_test_budget.py::test_valid_two_slot_ledger - Ass...
+FAILED tests/unit/test_audit_test_budget.py::test_summary_shape - assert 2 == 0
+FAILED tests/unit/test_audit_test_budget.py::test_out_of_slot_without_exception_fails
+...
+FAILED tests/unit/test_audit_test_budget.py::test_stages_complete_summary - A...
+22 failed in 2.41s
+```
+
+- Meaning: `audit-test-budget.py` does not exist (every invocation exits 2 from
+  the interpreter). The suite must go green after T019.
+
+## T017 — tests/integration/test_sdd_loop_efficiency_regression.py
+
+- Date: 2026-10-20
+- Command: `bash scripts/bash/run-tests.sh tests/integration/test_sdd_loop_efficiency_regression.py -q`
+- Exit status: `1`
+- Output tail:
+
+```text
+E       AssertionError: ... can't open file '.../scripts/audit-test-budget.py':
+        [Errno 2] No such file or directory
+E         assert 2 == 1
+FAILED tests/integration/test_sdd_loop_efficiency_regression.py::test_injected_regression_found_by_name_diff
+1 failed in 1.62s
+```
+
+- Meaning: the name-level `--names-out` comparison works, but the closure audit
+  does not exist yet. Must go green after T019.
+
+## T018 — TB-01…TB-10 contract functions
+
+- Date: 2026-10-20
+- Command: `bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_efficiency.py -q`
+- Exit status: `1`
+- Output tail (before T019/T020):
+
+```text
+FAILED tests/contract/test_sdd_loop_driver_efficiency.py::test_tb_01_full_run_definition
+...
+FAILED tests/contract/test_sdd_loop_driver_efficiency.py::test_tb_10_orchestration_layer_only
+```
+
+- Meaning: efficiency-model §2, the audit script and the prompt/recipe wiring do
+  not exist yet. Must go green after T019/T020.

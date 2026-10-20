@@ -16,6 +16,9 @@
 - 项目宪法：<project>/.specify/memory/constitution.md（合规底线）
 - 上一阶段完成提交：<prev-stage-commit-hash>（续作基线）
 - 当前断点判定：<breakpoint-verdict>（从状态脊恢复时必填）
+- 状态脊：STATE_SPINE_PATH=<state_spine_path>（U0 入口声明；缺失即快速失败）
+- 证据目录：EVIDENCE_DIR=<spec-dir>/test-evidence
+- 状态脊写入模式：SPINE_WRITE_MODE=direct|transport
 ```
 
 ### 第②段：执行要求（默认纪律，每次派发原样携带）
@@ -96,6 +99,64 @@ skipped; only the checklist quality-list step is absent.
 
 - 驱动在派发 `implement` / `review` 提示词时，从状态脊读取 E1 记录并附上对应块与准入证据指针；无 E1 记录或 `decision=full-chain` 时 MUST NOT 附块。
 - 收尾汇总必须携带 `checklist=skipped(fast-lane)` 或等价可见标记；回退过的线同时携带 `reversion` 触发与证据。
+
+## Test Budget Blocks（测试预算块，全部阶段）
+
+> Owner of the two-slot rules is `references/efficiency-model.md` §2. These
+> blocks are copied into the dispatched prompt according to the stage; the
+> session state is always `STATE_SPINE_PATH` (never a second ledger file).
+
+### implement block（implement 起点）
+
+```text
+TEST BUDGET: before the first task, run exactly one full suite:
+  bash scripts/bash/run-tests.sh --names-out <spec-dir>/baseline-failed.txt
+Write the E2 baseline row into the state-spine fence at STATE_SPINE_PATH
+(seq=1, slot=baseline, stage=implement, selection_basis=full-suite, command,
+rc, passed/failed, failed_names_path, evidence_ptr; merge_source/merged_at=na
+when written directly). 禁止第二次全量（Do not run a second full suite in
+implement); any additional full run is forbidden unless it is recorded as
+out-of-slot-exception with a reason and evidence. Intermediate verification uses the targeted set
+targeted-set-v1 (efficiency-model §2.3) and leaves an E3 stage-status row in
+EVIDENCE_DIR.
+```
+
+### 中间阶段与 review block（clarify / plan / tasks / checklist / analyze / review）
+
+```text
+TEST BUDGET: run only the targeted set selected by targeted-set-v1 with
+stage_base=<stage-base>; record command, selection_basis, selected_paths[],
+sufficiency, rc, passed/failed, new_failures[] and baseline in an E3
+stage-status row (EVIDENCE_DIR). Docs-only stages record status=not-run-docs-only
+with the six reduced fields. An empty set with executable changes is recorded
+as empty-selection-escalated (expand or escalate explicitly). A checklist stage
+skipped by the fast lane records not-applicable-skipped-stage and is excluded
+from the completeness denominator.
+```
+
+### closure block（驱动侧，review 后、合并前）
+
+```text
+TEST BUDGET CLOSURE: after review passes and before merge, run the closure full
+suite:
+  bash scripts/bash/run-tests.sh --names-out <spec-dir>/final-failed.txt
+Compare by name: comm -13 baseline-failed.txt final-failed.txt. Append the E2
+closure row to the SAME state spine (baseline_compare must be the name-level
+diff; never a count comparison), then audit:
+  python3 <skill-dir>/scripts/audit-test-budget.py --spine "$STATE_SPINE" \
+    --spec-dir <spec-dir> --stage-check closure
+The summary must report baseline:1 closure:1 plus stages=N complete=N; any new
+failure is fixed or explicitly attributed. A fix rerun of the same suite is an
+in-slot-rerun (trigger + evidence), not a third slot.
+```
+
+### closure-repair 重入 block
+
+```text
+TEST BUDGET: this re-entry repairs closure findings and carries
+baseline_slot=skip(closure-repair). Do not consume the baseline slot again and
+do not run any other full suite; use targeted-set-v1 for intermediate tests.
+```
 
 ## Stall Handling & State Spine（卡死处置与状态脊，U5）
 

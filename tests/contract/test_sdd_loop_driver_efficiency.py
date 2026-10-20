@@ -180,3 +180,126 @@ def test_fl_10_self_application_exclusion():
     assert "MUST NOT" in efficiency
     feature_ref = _text(SPEC_DIR / "feature-ref.md")
     assert "自应用" in feature_ref
+
+
+# ------------------------------------------------------------------ TB-01
+
+
+def test_tb_01_full_run_definition():
+    efficiency = _text(EFFICIENCY)
+    assert "全量测试运行" in efficiency
+    assert "运行线" in efficiency
+    assert "不带路径" in efficiency or "无路径" in efficiency
+    contract = _text(CONTRACTS / "test-budget.md")
+    assert "TB-01" in contract and "运行线" in contract
+
+
+# ------------------------------------------------------------------ TB-02
+
+
+def test_tb_02_two_slots_only():
+    efficiency = _text(EFFICIENCY)
+    assert "恰好两个槽位" in efficiency or "两个全量槽位" in efficiency
+    assert "baseline" in efficiency and "closure" in efficiency
+    assert "review" in efficiency and "合并之前" in efficiency
+
+
+# ------------------------------------------------------------------ TB-03
+
+
+def test_tb_03_baseline_prompt():
+    prompts = _text(PROMPTS)
+    assert "--names-out" in prompts
+    assert "STATE_SPINE_PATH" in prompts
+    assert "第二次全量" in prompts or "禁止第二次全量" in prompts
+    assert "baseline_slot=skip(closure-repair)" in prompts
+    efficiency = _text(EFFICIENCY)
+    assert "implement 起点" in efficiency
+    assert "E2" in efficiency and "状态脊" in efficiency
+
+
+# ------------------------------------------------------------------ TB-04
+
+
+def test_tb_04_name_level_diff():
+    source = _text(SKILL_DIR / "scripts" / "audit-test-budget.py")
+    assert "comm -13" in source or "comm" in source
+    assert "baseline_compare" in source
+    efficiency = _text(EFFICIENCY)
+    assert "comm -13" in efficiency
+    assert "名称级" in efficiency
+
+
+# ------------------------------------------------------------------ TB-05
+
+
+def test_tb_05_targeted_selection_rule():
+    efficiency = _text(EFFICIENCY)
+    assert "targeted-set-v1" in efficiency
+    for token in ("stage_base", "changed_paths", "test_roots",
+                  "LC_ALL=C sort -u", "(a)", "(b)", "(c)"):
+        assert token in efficiency, "targeted-set-v1 input missing: %s" % token
+    contract = _text(CONTRACTS / "test-budget.md")
+    assert "targeted-set-v1" in contract and "TB-05" in contract
+
+
+# ------------------------------------------------------------------ TB-06
+
+
+def test_tb_06_evidence_fields():
+    efficiency = _text(EFFICIENCY)
+    for token in ("selected_paths", "selection_basis", "sufficiency",
+                  "new_failures", "not-run-docs-only",
+                  "not-applicable-skipped-stage", "empty-selection-escalated"):
+        assert token in efficiency, "E3 evidence token missing: %s" % token
+    assert "六项" in efficiency or "缩减字段集" in efficiency
+
+
+# ------------------------------------------------------------------ TB-07
+
+
+def test_tb_07_ledger_audit_unknown():
+    help_text = _script_help("audit-test-budget.py")
+    for flag in ("--spine", "--spec-dir", "--logs-dir", "--stage-check"):
+        assert flag in help_text, "audit flag missing: %s" % flag
+    source = _text(SKILL_DIR / "scripts" / "audit-test-budget.py")
+    assert "unknown" in source
+    assert "stage-status" in source
+    assert "stages=" in source and "complete=" in source
+    assert "test-budget:begin" in source and "test-budget:end" in source
+
+
+# ------------------------------------------------------------------ TB-08
+
+
+def test_tb_08_exception_and_rerun():
+    efficiency = _text(EFFICIENCY)
+    assert "out-of-slot-exception" in efficiency
+    assert "in-slot-rerun" in efficiency
+    assert "槽外" in efficiency and "槽内" in efficiency
+    source = _text(SKILL_DIR / "scripts" / "audit-test-budget.py")
+    assert "out-of-slot-exception" in source
+    assert "in-slot-rerun" in source
+
+
+# ------------------------------------------------------------------ TB-09
+
+
+def test_tb_09_environment_failure_no_slot():
+    efficiency = _text(EFFICIENCY)
+    assert "environment-failure" in efficiency
+    assert "不消耗槽位" in efficiency
+    source = _text(SKILL_DIR / "scripts" / "audit-test-budget.py")
+    assert "environment-failure" in source
+    assert "environment_evidence" in source
+
+
+# ------------------------------------------------------------------ TB-10
+
+
+def test_tb_10_orchestration_layer_only():
+    efficiency = _text(EFFICIENCY)
+    assert "编排层" in efficiency
+    assert "框架命令内部" in efficiency
+    contract = _text(CONTRACTS / "test-budget.md")
+    assert "TB-10" in contract and "编排层" in contract

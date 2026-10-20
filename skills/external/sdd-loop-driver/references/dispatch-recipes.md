@@ -120,6 +120,9 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
   - `decision=full-chain`（含任一判据 fail 或无法证明）→ 照常派发 `checklist`，完整链不变。
   - **回退序列**：录取后判据失效或后续阶段发现新事实时，写状态脊 `reversion{trigger,evidence,at}` → 回退完整链 → 在适用位置补派 `checklist` → 若 `analyze` 已通过，补派后重过 `analyze` 一次 → 继续完整链；回退不得静默（efficiency-model §1.5）。
   - 缺少 E1 准入记录时 MUST NOT 声称快车道；063 自身走完整链（efficiency-model §1.7）。
+- **两槽位测试预算时序（owner: efficiency-model §2）**：implement 派发前先把 `baseline` E2 行写入 `$STATE_SPINE`（`run-tests.sh --names-out` 全量、名称级失败名单），implement 内不再运行第二次全量。中间阶段与 review 只跑 `targeted-set-v1` 定向集并把 E3 `stage-status` 行写入 `EVIDENCE_DIR`。`review` 通过之后、合并之前由驱动执行 `closure`：全量 `--names-out` + `comm -13` 名称级比较，追加到**同一状态脊**并审计：
+  `python3 <skill-dir>/scripts/audit-test-budget.py --spine "$STATE_SPINE" --spec-dir <spec-dir> --stage-check closure`；
+  收口摘要必须含 `baseline:1 closure:1`、`stages=N complete=N`。槽外全量只能以 `out-of-slot-exception` 记录原因与证据；收口修复重跑记 `in-slot-rerun`（不另开槽）；收口修复重入携带 `baseline_slot=skip(closure-repair)`。远端 `spine_write_mode=transport` 时，执行侧只写 `<spec-dir>/test-evidence/implement.jsonl` 传输行，驱动在 closure 前按 TB-03 合并进状态脊并记 `merge_source`/`merged_at`。
 - **质量门编排（checklist / analyze 两门位于 tasks 与 implement 之间）**：
   - **checklist 门**：产物 = `REQUIREMENTS_DIR/checklists/` 新增清单文件；清单项的满足判定不在本门裁决——由 implement 阶段的 checklist 豁免门接管（子代理按 G5 默认纪律自行裁决，waiver 记录进 waivers.md）。
   - **analyze 门**：产物 = findings 报告正文（只读命令，不产新提交）；门判据 = 报告中 CRITICAL/HIGH 发现为零或已处置。
