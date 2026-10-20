@@ -4,7 +4,11 @@
 Recording Only: every completed execution of a covered unit (the same unit
 semantics as run-determination) lands ONE quant record — agent program fields,
 LLM detail fields, quality fields — into the engine-owned durable store
-``.specify/memory/exec-quant/`` (records.jsonl + scores.jsonl, append-only).
+``.specify/memory/exec-quant/``. Each entry is its own timestamp-named file
+under ``records/`` or ``scores/``: concurrent branches then append different
+files instead of colliding on one shared tracked file. Legacy
+``records.jsonl`` / ``scores.jsonl`` stores stay readable (read-only
+fallback); new writes never touch them.
 
 v2 (Feature 061): schema_version=2, ``unit_type=agent`` via ``agent:<slug>``,
 the ``collect-dispatch`` action (one record per external dispatch label), an
@@ -32,6 +36,7 @@ import re
 import shutil
 import subprocess
 import sys
+import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -84,8 +89,11 @@ RECENT_WINDOW_MINUTES = 90
 RECORD_SIZE_CAP_BYTES = 64 * 1024
 
 STORAGE_REL = Path(".specify") / "memory" / "exec-quant"
-RECORDS_NAME = "records.jsonl"
-SCORES_NAME = "scores.jsonl"
+RECORDS_DIR_NAME = "records"
+SCORES_DIR_NAME = "scores"
+LEGACY_RECORDS_NAME = "records.jsonl"
+LEGACY_SCORES_NAME = "scores.jsonl"
+LOCK_NAME = ".write.lock"
 DEFAULT_DISPATCH_LOG_DIR = Path(".specify") / "agents" / "execution" / "logs"
 
 _UNIT_ID_RE = re.compile(
@@ -185,18 +193,60 @@ def storage_dir(workspace_root: Path) -> Path:
     return workspace_root / STORAGE_REL
 
 
+def records_dir(workspace_root: Path) -> Path:
+    return storage_dir(workspace_root) / RECORDS_DIR_NAME
+
+
+def scores_dir(workspace_root: Path) -> Path:
+    return storage_dir(workspace_root) / SCORES_DIR_NAME
+
+
 def bootstrap_storage(workspace_root: Path) -> Tuple[Path, Path]:
-    directory = storage_dir(workspace_root)
     try:
-        directory.mkdir(parents=True, exist_ok=True)
-        records = directory / RECORDS_NAME
-        scores = directory / SCORES_NAME
-        for path in (records, scores):
-            if not path.exists():
-                path.touch()
+        records = records_dir(workspace_root)
+        scores = scores_dir(workspace_root)
+        records.mkdir(parents=True, exist_ok=True)
+        scores.mkdir(parents=True, exist_ok=True)
         return records, scores
     except OSError as exc:
         raise ExecQuantError(f"cannot bootstrap the exec-quant store: {exc}") from exc
+
+
+def entry_filename(stamp: Optional[datetime] = None) -> str:
+    stamp = stamp or datetime.now(timezone.utc)
+    return f"{stamp.strftime('%Y%m%dT%H%M%S%fZ')}-{uuid.uuid4().hex[:8]}.json"
+
+
+def write_entry(directory: Path, entry: Dict[str, Any]) -> Path:
+    """One entry per timestamp-named file; tmp+rename keeps readers whole."""
+    target = directory / entry_filename()
+    temporary = directory / (".tmp-" + uuid.uuid4().hex + ".part")
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+        with temporary.open("w", encoding="utf-8") as handle:
+            handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        os.replace(temporary, target)
+    except OSError as exc:
+        try:
+            temporary.unlink()
+        except OSError:
+            pass
+        raise ExecQuantError(f"cannot write {target}: {exc}") from exc
+    return target
+
+
+def read_entry_files(directory: Path) -> List[Dict[str, Any]]:
+    if not directory.is_dir():
+        return []
+    entries = []
+    for path in sorted(directory.glob("*.json")):
+        try:
+            node = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(node, dict):
+            entries.append(node)
+    return entries
 
 
 # ---------------------------------------------------------------------------
@@ -626,22 +676,9 @@ def enforce_size_cap(record: Dict[str, Any]) -> List[str]:
             truncated.append(path)
 
 
-def existing_record(records_path: Path, unit_id: str, run_id: str) -> bool:
-    try:
-        with records_path.open("r", encoding="utf-8") as handle:
-            for line in handle:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    record = json.loads(line)
-                except ValueError:
-                    continue
-                if (record.get("unit_id") == unit_id and record.get("run_id") == run_id):
-                    return True
-    except OSError:
-        return False
-    return False
+def existing_record(workspace_root: Path, unit_id: str, run_id: str) -> bool:
+    return any(record.get("unit_id") == unit_id and record.get("run_id") == run_id
+               for record in load_records(workspace_root))
 
 
 # ---------------------------------------------------------------------------
@@ -855,14 +892,16 @@ def assemble_dispatch_record(unit_id: str, run_id: str, snapshot: Dict[str, Any]
     }
 
 
-def append_record_locked(records_path: Path, record: Dict[str, Any],
-                         unit_id: str, run_id: str) -> bool:
-    """Check-then-append under one POSIX flock (C-EQ-07).
+def append_record_locked(workspace_root: Path, record: Dict[str, Any],
+                         unit_id: str, run_id: str) -> Optional[Path]:
+    """Check-then-write under one POSIX flock (C-EQ-07).
 
-    On platforms without ``fcntl`` the operation degrades to the same
-    check-then-append sequence without claiming atomicity.
+    Entries are separate files, so the lock now serializes only the duplicate
+    check instead of sheltering a shared append target. On platforms without
+    ``fcntl`` the operation degrades to the same sequence without claiming
+    atomicity.
     """
-    lock_path = records_path.with_name(records_path.name + ".lock")
+    lock_path = storage_dir(workspace_root) / LOCK_NAME
     lock_handle = None
     locked = False
     try:
@@ -873,11 +912,9 @@ def append_record_locked(records_path: Path, record: Dict[str, Any],
             locked = True
         except ImportError:  # documented non-POSIX degradation
             locked = False
-        if existing_record(records_path, unit_id, run_id):
-            return False
-        with records_path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(record, ensure_ascii=False) + "\n")
-        return True
+        if existing_record(workspace_root, unit_id, run_id):
+            return None
+        return write_entry(records_dir(workspace_root), record)
     finally:
         if lock_handle is not None:
             if locked:
@@ -921,25 +958,20 @@ def action_collect(args: argparse.Namespace) -> int:
         raise InputError(
             f"--unit-type {args.unit_type!r} contradicts the unit-id form "
             f"{unit_id!r} (expected {resolved_type!r})")
-    records_path, _scores_path = bootstrap_storage(workspace_root)
+    records_store, _scores_store = bootstrap_storage(workspace_root)
     run_id, resolution, determination = resolve_run_identity(
         workspace_root, unit_id, args.run_id)
-    if existing_record(records_path, unit_id, run_id):
-        print(f"exec-quant: duplicate record for ({unit_id}, {run_id}); "
-              f"no second row written -> {records_path}")
-        return 0
     record = assemble_record(unit_id, resolved_type, run_id, resolution, determination)
     record = mask_credentials(record)
     truncated = enforce_size_cap(record)
     record["truncated"] = truncated
-    line = json.dumps(record, ensure_ascii=False)
-    try:
-        with records_path.open("a", encoding="utf-8") as handle:
-            handle.write(line + "\n")
-    except OSError as exc:
-        raise ExecQuantError(f"cannot append to {records_path}: {exc}") from exc
+    target = append_record_locked(workspace_root, record, unit_id, run_id)
+    if target is None:
+        print(f"exec-quant: duplicate record for ({unit_id}, {run_id}); "
+              f"no second row written -> {records_store}")
+        return 0
     print(f"exec-quant: recorded {unit_id} run={record['run_id']} "
-          f"resolution={resolution} -> {records_path}")
+          f"resolution={resolution} -> {target}")
     return 0
 
 
@@ -970,18 +1002,19 @@ def action_collect_dispatch(args: argparse.Namespace) -> int:
             workspace_root.resolve()).as_posix()
     except ValueError:
         snapshot_rel = snapshot_path.as_posix()
-    records_path, _scores_path = bootstrap_storage(workspace_root)
+    records_store, _scores_store = bootstrap_storage(workspace_root)
     record = assemble_dispatch_record(unit_id, args.run_id, snapshot, snapshot_rel,
                                       log_dir)
     record = mask_credentials(record)
     truncated = enforce_size_cap(record)
     record["truncated"] = truncated
-    if not append_record_locked(records_path, record, unit_id, args.run_id):
+    target = append_record_locked(workspace_root, record, unit_id, args.run_id)
+    if target is None:
         print(f"exec-quant: duplicate record for ({unit_id}, {args.run_id}); "
-              f"no second row written -> {records_path}")
+              f"no second row written -> {records_store}")
         return 0
     print(f"exec-quant: recorded {unit_id} run={args.run_id} "
-          f"config_id={record['config']['config_id']} -> {records_path}")
+          f"config_id={record['config']['config_id']} -> {target}")
     return 0
 
 
@@ -1009,12 +1042,20 @@ def _field_text(node: Any) -> str:
     return str(node)
 
 
+def load_records(workspace_root: Path) -> List[Dict[str, Any]]:
+    base = storage_dir(workspace_root)
+    return (read_jsonl_safe(base / LEGACY_RECORDS_NAME)
+            + read_entry_files(base / RECORDS_DIR_NAME))
+
+
+def load_scores(workspace_root: Path) -> List[Dict[str, Any]]:
+    base = storage_dir(workspace_root)
+    return (read_jsonl_safe(base / LEGACY_SCORES_NAME)
+            + read_entry_files(base / SCORES_DIR_NAME))
+
+
 def load_store(workspace_root: Path):
-    records_file = storage_dir(workspace_root) / RECORDS_NAME
-    scores_file = storage_dir(workspace_root) / SCORES_NAME
-    records = read_jsonl_safe(records_file)
-    scores = read_jsonl_safe(scores_file)
-    return records, scores
+    return load_records(workspace_root), load_scores(workspace_root)
 
 
 def read_jsonl_safe(path: Path) -> List[Dict[str, Any]]:
@@ -1110,14 +1151,12 @@ def action_score(args: argparse.Namespace) -> int:
         raise InputError("score requires --score (1-5)")
     if not (1 <= args.score <= 5):
         raise InputError(f"--score must be within 1-5, got {args.score}")
-    records_file = storage_dir(workspace_root) / RECORDS_NAME
-    target = next((r for r in read_jsonl_safe(records_file)
+    target = next((r for r in load_records(workspace_root)
                    if r.get("unit_id") == unit_id and r.get("run_id") == args.run_id), None)
     if target is None:
         raise InputError(
             f"no record for ({unit_id}, {args.run_id}) — score appends to an "
             f"existing record, run collect first")
-    scores_file = storage_dir(workspace_root) / SCORES_NAME
     entry = {
         "kind": KIND,
         "entry_type": "score",
@@ -1130,14 +1169,9 @@ def action_score(args: argparse.Namespace) -> int:
     }
     if args.note:
         entry["note"] = args.note
-    try:
-        scores_file.parent.mkdir(parents=True, exist_ok=True)
-        with scores_file.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
-    except OSError as exc:
-        raise ExecQuantError(f"cannot append to {scores_file}: {exc}") from exc
+    target_file = write_entry(scores_dir(workspace_root), entry)
     print(f"exec-quant: scored {unit_id} run={args.run_id} "
-          f"score={args.score} provenance=user-given -> {scores_file}")
+          f"score={args.score} provenance=user-given -> {target_file}")
     return 0
 
 

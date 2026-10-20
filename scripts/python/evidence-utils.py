@@ -72,10 +72,6 @@ def evidence_dir(root: Path) -> Path:
     return root / EVIDENCE_SUBDIR
 
 
-def index_path(root: Path) -> Path:
-    return evidence_dir(root) / "index.json"
-
-
 def utc_now() -> datetime:
     return datetime.now(timezone.utc)
 
@@ -115,14 +111,12 @@ def make_run_id(target: str, now: datetime, store: Path = None) -> str:
 
 
 def load_index(root: Path) -> dict:
-    path = index_path(root)
-    if path.is_file():
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-            if isinstance(data, dict) and isinstance(data.get("entries"), list):
-                return data
-        except (json.JSONDecodeError, OSError):
-            pass
+    """Derive the index from the immutable run directories on every read.
+
+    No aggregate is persisted: concurrent flows add separate ``ev-*``
+    directories, so a shared index file would be the one write target they
+    all collide on (and a git merge-conflict hotspot).
+    """
     return rebuild_index(root)
 
 
@@ -153,13 +147,6 @@ def rebuild_index(root: Path) -> dict:
                 "file": str(Path(run_dir.name) / "findings.json"),
             })
     return {"store": "evidence", "updated": iso(utc_now()), "entries": entries}
-
-
-def save_index(root: Path, index: dict) -> None:
-    index["updated"] = iso(utc_now())
-    evidence_dir(root).mkdir(parents=True, exist_ok=True)
-    index_path(root).write_text(
-        json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 # --- redaction ----------------------------------------------------------------
@@ -636,16 +623,6 @@ def action_collect(args) -> dict:
         lanes_dir.mkdir(parents=True, exist_ok=True)
         write_text_atomic(lanes_dir / f"{lane}.json",
             json.dumps(redact_deep(envelope, root), ensure_ascii=False, indent=2) + "\n")
-
-    index = load_index(root)
-    index["entries"].append({
-        "runId": run_id,
-        "target": args.target,
-        "created": iso(now),
-        "lanesSummary": {k: v.get("status", "") for k, v in lane_status.items()},
-        "file": str(Path(run_id) / "findings.json"),
-    })
-    save_index(root, index)
 
     return {
         "runId": run_id,

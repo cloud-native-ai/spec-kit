@@ -1497,11 +1497,9 @@ class TestLaneProjections:
                     "target": "/speckit.plan", "runId": run_id,
                     "lanes": {}, "evidence": [], "findingsDigest": digest}
         (run_dir / "findings.json").write_text(json.dumps(findings), encoding="utf-8")
-        index = {"entries": [{"runId": run_id, "target": "/speckit.plan",
-                              "created": created, "lanesSummary": {},
-                              "file": f"{run_id}/findings.json"}]}
-        (ws / ".specify" / "memory" / "evidence" / "index.json").write_text(
-            json.dumps(index), encoding="utf-8")
+        manifest = {"runId": run_id, "target": "/speckit.plan", "created": created,
+                    "lanes": {}, "findingsDigest": digest}
+        (run_dir / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
         return run_id, digest
 
     def test_fresh_evidence_run_is_consumed_and_its_digest_recorded(self, eng, ws, capsys):
