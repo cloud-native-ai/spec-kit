@@ -76,7 +76,7 @@ Stable marker: `cli-profile:<cli>`. Probe Object: `skill-sdd-loop-driver-cli-pro
 
 - A profile update MUST NOT change sentinel semantics, the watcher 判定 state machine or 退出码 (exit codes), 确认门 (confirmation gates), stage deadlines, or the test budget（测试预算）。
 - The current stage uses the shape recorded at U2; an update never retroactively changes it（不回溯、不改变当前阶段的形态）。 If the observed conflict makes the stage unsafe, use the existing U5 stall/retry path — never substitute a profile edit for a behaviour fix.
-- Throughput default of the output mode (stream-json) is owned by 063; profiles record buffering/event facts only and MUST NOT rewrite that default (不改写 063 默认).
+- Throughput default of the output mode (stream-json) is owned by `efficiency-model.md`; profiles record buffering/event facts only and MUST NOT rewrite that default (不改写该默认).
 
 ## Matrix Authority
 

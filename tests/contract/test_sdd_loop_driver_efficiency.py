@@ -180,7 +180,7 @@ def test_fl_10_self_application_exclusion():
     assert "**FR-010**" in requirements
     assert "完整阶段链" in requirements
     efficiency = _text(EFFICIENCY)
-    assert "063" in efficiency and "完整阶段链" in efficiency
+    assert "自应用" in efficiency and "完整阶段链" in efficiency
     assert "MUST NOT" in efficiency
     feature_ref = _text(SPEC_DIR / "feature-ref.md")
     assert "自应用" in feature_ref
@@ -439,7 +439,7 @@ def test_pd_01_stream_default_and_raw():
     efficiency = _text(EFFICIENCY)
     assert "stream-json" in efficiency
     assert "raw-<line>-<stage>.jsonl" in efficiency
-    assert "064" in efficiency
+    assert "references/cli/" in efficiency
     runner = _text(SKILL_DIR / "scripts" / "stage-runner.sh")
     assert "stream-json" in runner
     help_text = _script_help("stage-runner.sh")
@@ -669,7 +669,7 @@ def test_di_07_self_application():
     feature_ref = _text(SPEC_DIR / "feature-ref.md")
     assert "自应用" in feature_ref
     efficiency = _text(EFFICIENCY)
-    assert "063" in efficiency and "MUST NOT" in efficiency
+    assert "自应用" in efficiency and "MUST NOT" in efficiency
 
 
 # ------------------------------------------------------------------ DI-08

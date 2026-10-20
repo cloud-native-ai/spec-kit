@@ -1,8 +1,8 @@
 # Efficiency Model — sdd-loop-driver 运行效率优化
 
-> 本文件是 Feature 063 四项运行效率优化的**唯一 owner**：快车道（§1）、两槽位测试预算（§2）、plan 只小修约束（§3）、进度可见与驱动解耦（§4）。SKILL.md 与 docs 页只保留摘要与指针；`references/dispatch-recipes.md` 与 `references/stage-prompts.md` 只引用本文件定义的字段、判据与程序，不复写规则。契约钉住落点为 `tests/contract/test_sdd_loop_driver_efficiency.py`。
+> 本文件是四项运行效率优化（快车道 / 测试预算 / plan 小修约束 / 进度可见与脱离）的**唯一 owner**：快车道（§1）、两槽位测试预算（§2）、plan 只小修约束（§3）、进度可见与驱动解耦（§4）。SKILL.md 与 docs 页只保留摘要与指针；`references/dispatch-recipes.md` 与 `references/stage-prompts.md` 只引用本文件定义的字段、判据与程序，不复写规则。契约钉住落点为 `tests/contract/test_sdd_loop_driver_efficiency.py`。
 
-本文件自带运行时事实：条目只描述驱动在编排层执行的动作与判定；CLI 行为事实由 Feature 064 的 `references/cli/` 档案拥有，本文件只读引用，不复制档案内容。
+本文件自带运行时事实：条目只描述驱动在编排层执行的动作与判定；CLI 行为事实由 `references/cli/` 档案拥有，本文件只读引用，不复制档案内容。
 
 ## 1. 快车道（Fast Lane）
 
@@ -72,7 +72,7 @@ admission-check.py --project P --base-ref R --requirements F --tasks F \
 
 ### 1.7 自应用排除
 
-063 自身的运行 MUST 使用完整阶段链（`checklist`、`analyze`、`review` 均必经），MUST NOT 产生本特性自身的快车道记录。该例外在 requirements FR-010、plan 与收尾证据中可见；它是规格约束，不是对快车道判据的豁免。
+自应用例外：开发本技能的项目自身 MUST 使用完整阶段链（`checklist`、`analyze`、`review` 均必经），MUST NOT 产生本特性自身的快车道记录。该例外在 requirements FR-010、plan 与收尾证据中可见；它是规格约束，不是对快车道判据的豁免。
 
 ### 1.8 契约钉住
 
@@ -223,7 +223,7 @@ PC-01…PC-11 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_
 
 ### 4.1 stream-json 主路径
 
-`scripts/stage-runner.sh` 默认以 `stream-json` 调用阶段 CLI（`[[STR-001]]`），并把原始事件流完整落盘为 `raw-<line>-<stage>.jsonl`；CLI 的 stderr 单独落 `runner-log-<line>-<stage>.log`，不混入 raw。CLI 行为事实（是否支持该输出模式、事件形状、哨兵可靠性、工具超时上限）由 Feature 064 的 `references/cli/<cli>.md` 与 `contracts/cli-profiles.md` 拥有，本文件只读引用、不复制档案内容。派发资格由 Feature 061 的 `CAPABILITY_MATRIX` 决定；档案存在不等于可派发。
+`scripts/stage-runner.sh` 默认以 `stream-json` 调用阶段 CLI（`[[STR-001]]`），并把原始事件流完整落盘为 `raw-<line>-<stage>.jsonl`；CLI 的 stderr 单独落 `runner-log-<line>-<stage>.log`，不混入 raw。CLI 行为事实（是否支持该输出模式、事件形状、哨兵可靠性、工具超时上限）由 `references/cli/<cli>.md` 与 `contracts/cli-profiles.md` 拥有，本文件只读引用、不复制档案内容。派发资格由 `CAPABILITY_MATRIX` 决定；档案存在不等于可派发。
 
 ### 4.2 增量派生与可追溯性
 

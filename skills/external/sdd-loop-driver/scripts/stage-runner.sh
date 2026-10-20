@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# stage-runner.sh — parameterized stage runner for sdd-loop-driver (Feature 063).
+# stage-runner.sh — parameterized stage runner for sdd-loop-driver.
 #
 # Runs one stage CLI under the stream-json pipeline by default: the raw event
 # stream is preserved, a compact live log is derived incrementally, and the

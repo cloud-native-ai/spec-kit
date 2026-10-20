@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit the per-line full-suite test budget ledger (Feature 063).
+"""Audit the per-line full-suite test budget ledger.
 
 The ledger is the ``<!-- test-budget:begin -->`` … ``<!-- test-budget:end -->``
 JSONL fence inside the line state spine. ``<spec-dir>/test-evidence/*.jsonl``
@@ -379,7 +379,7 @@ def check_stages(evidence, spine_text, violations, unknown):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
-        description="Audit the Feature 063 test-budget ledger in the line state spine.")
+        description="Audit the test-budget ledger in the line state spine.")
     parser.add_argument("--spine", required=True,
                         help="line state spine carrying the test-budget JSONL fence")
     parser.add_argument("--spec-dir", required=True,

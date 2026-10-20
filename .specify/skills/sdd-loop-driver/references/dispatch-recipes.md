@@ -22,7 +22,7 @@
 
 ## Recipe 2 — Runner 脚本与派生（Runner & Derivation）——**正证据四件套差异面**
 
-基础 runner 形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。**2026-10-20 起，逐阶段 `sed` 派生旧形态被 `scripts/stage-runner.sh` 取代**（单点可测试、消除每阶段副本漂移；Feature 063）：runner 是参数化单阶段进程，不自行 detach，由 Recipe 3 的 `nohup` 形态启动。旧 `sed` 形态仅作历史注记，MUST NOT 再用于新派发。本技能差异面——**pid / status / log / heartbeat 正证据四件套**（无人值守长跑的完成判定与存活判定都依赖它们；模型见 `watch-model.md` §2）以及 stream 证据对：
+基础 runner 形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。**2026-10-20 起，逐阶段 `sed` 派生旧形态被 `scripts/stage-runner.sh` 取代**（单点可测试、消除每阶段副本漂移）：runner 是参数化单阶段进程，不自行 detach，由 Recipe 3 的 `nohup` 形态启动。旧 `sed` 形态仅作历史注记，MUST NOT 再用于新派发。本技能差异面——**pid / status / log / heartbeat 正证据四件套**（无人值守长跑的完成判定与存活判定都依赖它们；模型见 `watch-model.md` §2）以及 stream 证据对：
 
 ```bash
 bash <skill-dir>/scripts/stage-runner.sh \
@@ -153,7 +153,7 @@ python3 <skill-dir>/scripts/line-registry.py --action register \
 
 **U6 注销（收尾后）**：`--action deregister --line-id <line> --reason <reason>`；closed 条目保留历史字段，`list --active` 不再返回。
 
-**Watcher 归属参数**：每个监听窗口追加 `--line-id <line> --run-id <run> --registry <registry> --meta <log-…meta.jsonl>`；watcher 只消费 Registry 中登记且 start token 校验通过的 `runner_pid`/`cli_pid`（PID 文件中的未登记 PID 一律 `DEAD pid=unregistered`；登记了 `branch` 时校验 worktree 分支），输出行追加 `line= run= attribution=own|foreign|stale-run|unattributed|legacy`。只有 `own` 事件参与判定；`foreign`/`stale-run`/`unattributed` 只出现在摘要，不改变 verdict、进度或 Registry 状态。未提供归属参数时保持 058 兼容（`attribution=legacy`，无过滤）。
+**Watcher 归属参数**：每个监听窗口追加 `--line-id <line> --run-id <run> --registry <registry> --meta <log-…meta.jsonl>`；watcher 只消费 Registry 中登记且 start token 校验通过的 `runner_pid`/`cli_pid`（PID 文件中的未登记 PID 一律 `DEAD pid=unregistered`；登记了 `branch` 时校验 worktree 分支），输出行追加 `line= run= stage= event= attribution=own|foreign|stale-run|unattributed|legacy`。只有 `own` 事件参与判定；`foreign`/`stale-run`/`unattributed` 只出现在摘要，不改变 verdict、进度或 Registry 状态。未提供归属参数时保持 058 兼容（`attribution=legacy`，无过滤）。
 
 **持 lease 的监听窗口（I-19）**：持有 driver lease 时，`--window` MUST ≤ `ttl_seconds/3`（缺省 ≤200s），或给 watcher 传窗口内续租钩子。watcher 缺省窗口即 200s；显式声明的 lease 用 `--lease-ttl` 钉住上限（超限且无续租钩子 → 立即 usage 失败）：
 

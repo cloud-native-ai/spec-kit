@@ -94,7 +94,7 @@ U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计�
 
 ## Efficiency Optimizations（运行效率优化）
 
-四项编排层优化（Feature 063；唯一 owner = `references/efficiency-model.md`，本节只作摘要与指针）：
+四项编排层优化（唯一 owner = `references/efficiency-model.md`，本节只作摘要与指针）：
 
 1. **中型特性快车道**：仅入口携带 `fast-lane=opt-in` 时，在 tasks 后按七项机械判据裁决；录取则跳过 checklist、保留 analyze/review，判据失效即 fail-closed 回退完整链。
 2. **两槽位测试预算**：每线仅 implement 起点 baseline 与 review 后 closure 两次全量；中间阶段与 review 用 `targeted-set-v1` 定向集并留证据；槽外全量必须显式例外。

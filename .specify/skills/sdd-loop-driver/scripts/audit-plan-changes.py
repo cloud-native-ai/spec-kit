@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mechanically audit plan-owned changes after the plan stage (Feature 063).
+"""Mechanically audit plan-owned changes after the plan stage.
 
 Reports the touched plan-owned paths (committed range + uncommitted changes),
 the ``PLAN-EDIT:`` declaration lines, the undeclared verdict and the final

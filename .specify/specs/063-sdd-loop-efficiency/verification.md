@@ -117,6 +117,19 @@ recording), **driver closure** (owned by the driver after review).
   the missing E3 evidence visible (F4 remains open for closure).
   `baseline_slot=consumed`; closure remains driver-owned after review.
   Implement ran no second full suite.
+- **Driver closure (2026-10-20)**: E2 `closure` row appended to the same spine
+  (`seq=2`, `4239 passed / 68 failed`, 897.80 s, log
+  `/tmp/063-closure-full-suite-2.log`). Name-level compare `comm -13` against
+  `notes/baseline-failed-tests.txt` → **0 new failures** (the 68 baseline
+  failures are identical by name; +124 net passes are new tests). The first
+  closure attempt found two new failures introduced by the feature's own shipped
+  surface — `test_en_02_carriers` (the `stage=`/`event=` carrier literals lost
+  from `dispatch-recipes.md`) and
+  `test_shipped_surface_has_no_framework_runtime_references` (new skill files
+  attributed `Feature 0NN`); both were repaired client-neutrally and the closure
+  slot was re-run. E3 `stage-status` rows now exist for all six applicable
+  stages; final audit: `slots=baseline:1 closure:1 reruns=0 exceptions=0
+  unknown=0 environment_failures=0`, `stages=6 complete=6`, `status=ok`.
 - E2 fence is the only ledger; `test-evidence/implement.jsonl` carries one E3
   reference row and is never audited as a ledger (I-05).
 
@@ -352,13 +365,15 @@ recording), **driver closure** (owned by the driver after review).
 | GATE-5 validators | tasks `0 error / 0 warning`; requirements `0 error / 0 warning` |
 | GATE-6 open rows | `0` after this closure |
 | GATE-7 deliverables | `24/24` present |
-| GATE-8 budget slots | real spine `--stage-check implement` → `slots=baseline:1 closure:0`, `status=ok`; closure remains driver-owned |
+| GATE-8 budget slots | implement close: `--stage-check implement` → `slots=baseline:1 closure:0`, `status=ok`; driver closure: `--stage-check closure` → `slots=baseline:1 closure:1`, `stages=6 complete=6`, `status=ok` |
 
-**GATE-8 closure visibility**: the real spine's closure check fails until the
-driver appends the closure row (`closure check requires exactly 1 closure slot,
-found 0`) — this is the intended guard. A copy of the spine with a valid closure
-row appended demonstrates the closure view: `slots=baseline:1 closure:1`,
-`status=ok`. No closure full suite ran inside implement and the copy was deleted.
+**GATE-8 closure record**: after review, the driver appended the `closure` E2
+row (seq=2) to the real spine and wrote the six E3 `stage-status` rows. The
+closure audit reports `slots=baseline:1 closure:1 reruns=0 exceptions=0
+unknown=0 environment_failures=0`, `stages=6 complete=6`, `status=ok`. The
+closure full suite ran exactly once after the repair of the two new failures
+(the pre-repair run is the same slot, not a third slot). No closure full suite
+ran inside implement.
 
 **Success criteria** (evidence class: automated / recorded trace / driver closure)
 
@@ -377,16 +392,16 @@ row appended demonstrates the closure view: `slots=baseline:1 closure:1`,
 |----|--------|----------|
 | SC-001 | pass (automated) | admission unit + FL tests: every fast-lane run carries the E1 record; no recordless skip |
 | SC-002 | pass (automated + recorded trace) | S1/S2 + S7 trace: medium skips checklist (0 dispatches), analyze/review kept; large refused |
-| SC-003 | **pending (driver closure)** | ledger audit unit tests green (`25 passed`, including two-slot/exception/rerun cases); real spine audit is `slots=baseline:1 closure:0` — no closure E2 row exists yet. Closure slot is driver-owned and MUST land before merge. |
+| SC-003 | pass (driver closure) | ledger audit unit tests green (`25 passed`); real spine now reports `slots=baseline:1 closure:1` with the closure E2 row and its `comm -13` compare; `status=ok`. |
 | SC-004 | pass (automated) | injected regression found by name diff; count-only closure rejected |
-| SC-005 | **pending (self-application evidence, F4)** | audit behavior is green (`25 passed`, full denominator incl. missing/empty evidence; real spec-dir audit reports `stages=6 complete=0`, exit 1). The feature's own E3 `stage-status` rows do not exist yet, so the 100% completeness outcome is not met. |
+| SC-005 | pass (driver closure) | mechanism green (`25 passed`, full denominator incl. missing/empty evidence); the feature's own six E3 `stage-status` rows exist and the closure audit reports `stages=6 complete=6`, `status=ok`. |
 | SC-006 | pass (automated) | plan audit tests + PC clauses: every touch classified; undeclared/substantive gate-fail; no silent re-review |
 | SC-007 | pass (automated) | derive latency trace test + zero-fabrication count + no agent sleep |
 | SC-008 | pass (automated) | local nohup survival + `--once` no-redispatch integration tests |
 | SC-009 | pass (automated) | non-terminal sentinel → INCOMPLETE; terminal result → DONE; derive failure never fake DONE |
 | SC-010 | pass (recorded replay, executable fixture) | `stall-behavior-baseline.json` re-recorded at `a1aac7e5` with 3 stall scenarios + success positive control; `stall-behavior-baseline-final.json`, `differences: []`, `initial_retries=0`, `exit_code={watcher,runner}`; `next_stage_dispatched` observed as both `yes` and `no`; evidence pointers durable under `notes/stall-evidence*/`; post-repair mutations (retries, transcribed field, write-before-action, dispatch flip) all fail the comparison, and the self-test flips dispatch internally |
 | SC-011 | pass (automated) | auto probe degradation marker; no fake DONE; no stage failure caused by degradation |
-| SC-012 | **pending (driver closure)** | 74 contract tests green (C-3/C-4 intentional); mirror pair 0 drift + zero NEW drift. The name-level new-failure result requires the closure full suite and `comm -13`; neither exists yet. |
+| SC-012 | pass (driver closure) | 74 contract tests green (C-3/C-4 intentional); mirror pair 0 drift + zero NEW drift. Closure full suite vs baseline by name: `comm -13` → 0 new failures (68 identical baseline failures; 4239 passed). |
 | SC-013 | pass (recorded trace) | 063 ran the full chain; checklist/analyze artifacts present; zero fast-lane records |
 
 **G-01 edge cases**

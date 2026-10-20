@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""admission-check.py — deterministic fast-lane admission gate (Feature 063).
+"""admission-check.py — deterministic fast-lane admission gate.
 
 Seven mechanically measured criteria (a)-(g) decide whether a medium feature
 may skip ``checklist`` while keeping ``analyze`` and ``review``. Every value is
