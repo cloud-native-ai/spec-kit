@@ -96,7 +96,10 @@ content from the user.
    `scope: local` (one unit + one run); a framework-wide view exists only as the
    aggregation the introspection step builds from recorded entries — never as an
    entry-level assessment, and never by restating another unit's findings. The
-   mechanism boundary is owned by § *Mechanism boundary* above.
+   mechanism boundary is owned by § *Mechanism boundary* above. A review recommendation
+   that targets the framework is not left without an intake: its legal entry is the
+   existing `/speckit.feedback` manage-feedback Path A digest § A3 自省(Introspection)
+   step. No new intake store, tracking engine, or scoring system is introduced.
 4. **Dedup guard.** Choose a stable `run_id` for this run (e.g. the feature key + a run
    timestamp). If a parent flow already recorded feedback for this same `(unit_id, run_id)`,
    the engine will no-op — do not force a duplicate.

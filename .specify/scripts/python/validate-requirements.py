@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """validate-requirements.py — deterministic checker for a `requirements.md` artifact.
 
-Program-First discipline (.specify/shared/guidelines/token-efficiency.md): the propositions checked
+Program-First discipline (shared/guidelines/token-efficiency.md): the propositions checked
 here are fixed, textual and decidable, so a program judges them and prints a verdict; an
 agent MUST NOT re-derive them by reading the artifact and declaring a result.
 

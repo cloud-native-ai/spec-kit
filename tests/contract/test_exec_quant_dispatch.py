@@ -144,16 +144,58 @@ def dispatch_args(ws: Path, snapshot: Path, cid: str, label: str = "demo-label",
     return args
 
 
+def store_dir(ws: Path) -> Path:
+    return ws / ".specify" / "memory" / "exec-quant"
+
+
+def records_dir(ws: Path) -> Path:
+    return store_dir(ws) / "records"
+
+
+def scores_dir(ws: Path) -> Path:
+    return store_dir(ws) / "scores"
+
+
 def records_path(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "exec-quant" / "records.jsonl"
+    """Legacy single-file store, readable but never written since the split."""
+    return store_dir(ws) / "records.jsonl"
 
 
-def read_records(ws: Path) -> list:
-    path = records_path(ws)
+def record_files(ws: Path) -> list:
+    return sorted(records_dir(ws).glob("*.json")) if records_dir(ws).is_dir() else []
+
+
+def read_jsonl(path: Path) -> list:
     if not path.is_file():
         return []
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
             if line.strip()]
+
+
+def read_records(ws: Path) -> list:
+    entries = read_jsonl(records_path(ws))
+    if records_dir(ws).is_dir():
+        entries += [json.loads(path.read_text(encoding="utf-8"))
+                    for path in sorted(records_dir(ws).glob("*.json"))]
+    return entries
+
+
+def read_scores(ws: Path) -> list:
+    entries = read_jsonl(store_dir(ws) / "scores.jsonl")
+    if scores_dir(ws).is_dir():
+        entries += [json.loads(path.read_text(encoding="utf-8"))
+                    for path in sorted(scores_dir(ws).glob("*.json"))]
+    return entries
+
+
+def records_snapshot(ws: Path) -> dict:
+    root = store_dir(ws)
+    if not root.is_dir():
+        return {}
+    return {p.relative_to(root).as_posix(): p.read_bytes()
+            for p in root.rglob("*")
+            if p.is_file() and (p.relative_to(root).as_posix() == "records.jsonl"
+                                or p.relative_to(root).as_posix().startswith("records/"))}
 
 
 def assert_no_blanks(node, path="$"):
@@ -203,7 +245,7 @@ class TestSchemaV2:
         snapshot, cid = write_snapshot(ws, qoder_effective())
         result = run_engine(dispatch_args(ws, snapshot, cid, unit_id="/speckit.plan"))
         assert result.returncode == 2
-        assert not records_path(ws).exists() or not read_records(ws)
+        assert not read_records(ws)
 
 
 # ===========================================================================
@@ -303,11 +345,11 @@ class TestIdempotency:
         write_status(ws, "demo-label", "demo-label exit=0")
         first = run_engine(dispatch_args(ws, snapshot, cid))
         assert first.returncode == 0, first.stderr
-        before = records_path(ws).read_bytes()
+        before = records_snapshot(ws)
         second = run_engine(dispatch_args(ws, snapshot, cid))
         assert second.returncode == 0, second.stderr
         assert "duplicate" in (second.stdout + second.stderr).lower()
-        assert records_path(ws).read_bytes() == before
+        assert records_snapshot(ws) == before
         assert len(read_records(ws)) == 1
 
 
@@ -570,9 +612,8 @@ class TestListAndScore:
                              "--unit-id", "agent:sample-agent", "--run-id",
                              "demo-label", "--score", "5", "--note", "ok"])
         assert result.returncode == 0, result.stderr
-        scores = [json.loads(line) for line in
-                  (ws / ".specify" / "memory" / "exec-quant" / "scores.jsonl")
-                  .read_text(encoding="utf-8").splitlines() if line.strip()]
+        scores = read_scores(ws)
+        assert len(scores) == 1
         assert scores[0]["provenance"] == "user-given"
         assert scores[0]["unit_type"] == "agent"
 
@@ -596,14 +637,16 @@ class TestDefenses:
         snapshot, cid = write_snapshot(ws, qoder_effective())
         write_status(ws, "demo-label", "demo-label exit=0")
         run_engine(dispatch_args(ws, snapshot, cid))
-        before = records_path(ws).read_bytes()
+        before = records_snapshot(ws)
         other = qoder_effective()
         other["mode"] = "external"
         other["model"] = "other-model"
         snapshot2, cid2 = write_snapshot(ws, other)
-        run_engine(dispatch_args(ws, snapshot2, cid2))
-        after = records_path(ws).read_bytes()
-        assert after.startswith(before)
+        run_engine(dispatch_args(ws, snapshot2, cid2, label="demo-label-2"))
+        after = records_snapshot(ws)
+        for name, payload in before.items():
+            assert after.get(name) == payload, "existing record entries stay byte-identical"
+        assert len(after) == len(before) + 1, "the second dispatch adds exactly one entry"
 
     def test_credential_values_are_masked(self, tmp_path):
         ws = make_ws(tmp_path)
@@ -612,7 +655,8 @@ class TestDefenses:
         snapshot, cid = write_snapshot(ws, effective)
         result = run_engine(dispatch_args(ws, snapshot, cid))
         assert result.returncode == 0, result.stderr
-        serialized = records_path(ws).read_text(encoding="utf-8")
+        serialized = "\n".join(path.read_text(encoding="utf-8")
+                               for path in record_files(ws))
         assert "sk-0123456789abcdef0123" not in serialized
         assert "[masked-credential:" in serialized
 
@@ -623,7 +667,9 @@ class TestDefenses:
         snapshot, cid = write_snapshot(ws, effective)
         result = run_engine(dispatch_args(ws, snapshot, cid))
         assert result.returncode == 0, result.stderr
-        line = records_path(ws).read_text(encoding="utf-8").splitlines()[0]
+        entry_files = record_files(ws)
+        assert len(entry_files) == 1, f"expected one entry file, found {entry_files}"
+        line = entry_files[0].read_text(encoding="utf-8").splitlines()[0]
         assert len(line.encode("utf-8")) <= 64 * 1024 + 1
         record = json.loads(line)
         assert record["truncated"]

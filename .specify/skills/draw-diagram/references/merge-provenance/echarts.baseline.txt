@@ -375,10 +375,10 @@ myChart
 nameGap
 nameLocation
 newData
-node .specify/scripts/check-layout.mjs <config>
-node .specify/scripts/sync-config.mjs <file>.config.json
-node .specify/scripts/verify-deliverable.mjs <file>.html
-node .specify/scripts/verify-deliverable.mjs <html>
+node scripts/check-layout.mjs <config>
+node scripts/sync-config.mjs <file>.config.json
+node scripts/verify-deliverable.mjs <file>.html
+node scripts/verify-deliverable.mjs <html>
 onerror
 option
 parallel
@@ -399,12 +399,12 @@ run_id
 sankey
 saveAsImage
 scatter
-.specify/scripts/
-.specify/scripts/check-layout.mjs
-.specify/scripts/sync-config.mjs
-.specify/scripts/vendor-echarts.sh
-.specify/scripts/vendor-echarts.sh <dir>
-.specify/scripts/verify-deliverable.mjs
+scripts/
+scripts/check-layout.mjs
+scripts/sync-config.mjs
+scripts/vendor-echarts.sh
+scripts/vendor-echarts.sh <dir>
+scripts/verify-deliverable.mjs
 series.data
 series.encode
 series.seriesLayoutBy

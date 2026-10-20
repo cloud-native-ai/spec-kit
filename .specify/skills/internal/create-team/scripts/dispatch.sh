@@ -2,7 +2,7 @@
 # dispatch.sh — visible external-subagent dispatch (Spec Kit reference implementation).
 #
 # Implements the External Dispatch Visibility Contract defined in
-# .specify/shared/definitions/subagent-definitions.md. It replaces the silent anti-pattern:
+# shared/definitions/subagent-definitions.md. It replaces the silent anti-pattern:
 #
 #   qodercli -p "<prompt>" > agent.log 2>&1 &   # buffered until exit -> zero progress signal
 #
@@ -43,7 +43,7 @@ shift 3
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLI="${DISPATCH_CLI:-qodercli}"
 # Default to the tracked-repo runtime-log location documented in
-# .specify/shared/definitions/agent-definitions.md (git-ignored via .specify/.gitignore), so the
+# shared/definitions/agent-definitions.md (git-ignored via .specify/.gitignore), so the
 # visibility triplet lands where every consumer expects it. Outside a Spec Kit tree the
 # temp-dir fallback keeps the script usable.
 if [[ -n "${DISPATCH_LOG_DIR:-}" ]]; then

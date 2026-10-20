@@ -1,7 +1,7 @@
 # Path B — 打包上送 & Probe Injection
 
 Owns § Path B (steps 1–6) and § Probe Injection of the feedback skill. Extracted from
-`.specify/templates/commands/feedback.md`; content preserved, form re-expressed. The routing
+`templates/commands/feedback.md`; content preserved, form re-expressed. The routing
 judgment that selects Path B (or defers probe injection to an explicit request) lives
 in the skill's SKILL.md (Routing flow).
 

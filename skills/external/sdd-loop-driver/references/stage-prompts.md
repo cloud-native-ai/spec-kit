@@ -55,6 +55,7 @@
 - 驱动者必须存活到全线收束（U6）或显式停线（U5）。
 - 驱动者确须提前结束（预算耗尽、会话上限）时，唯一合法路径：状态脊写为 `stalled` / `reentry-required`（当前阶段、已试次数、证据指针齐备）+ 向用户显式上报——**静默等待与静默退出都是不被接受的输出**。
 - **重入是常态路径**：任何新会话从状态脊读取断点判定与已试次数，先跑一次 `watch-target.sh --once` 快照核对（远端阶段可能已自行完成——终止判定在即按 U4/U5 续环），再决定派发、校验或恢复窗口。
+- **Hook 事件是补充，不是判定**：Qoder CLI 的 `Stop` hook 写 done JSON/FIFO 只缩短等待（`--hook-done`/`--hook-fifo`）；DONE 仍要求退出记录 + 哨兵，U4 仍校验产物与纪律。API 崩溃时 Stop 不触发，status/exit 记录必须独立兜底；模型与 SSH 形态见 `watch-model.md` §11–§12。
 
 ## Independent Verification（独立校验程序，U4）
 

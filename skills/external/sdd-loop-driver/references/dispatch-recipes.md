@@ -43,6 +43,25 @@ bash <skill-dir>/scripts/stage-runner.sh \
 - **降级**：CLI 不支持 stream-json 时 `progress=degraded reason=cli-lacks-stream`；派生失败先 `--finish` 恢复、再 buffered fallback；皆无则 `sentinel=0`（INCOMPLETE，绝不伪完成）。
 - **未脱离**：`--detached no` 时 status 另写 `unprotected=true` 与风险原因，不计为受保护运行。
 
+### Hook 事件补充（Qoder CLI Stop hook，推荐）
+
+在正证据四件套之外增加一个**提前完成信号**（不改变权威判定）。runner 创建每阶段 FIFO 与 settings，qodercli 用 `--settings` 注入 Stop hook；hook 先原子写 `hook-event-<stage>.json`，再尽力写 FIFO：
+
+```bash
+mkfifo "$dir/hook-done-$line-$stage.fifo"
+cat > "$dir/hook-settings-$line-$stage.json" <<'JSON'
+{"hooks":{"Stop":[{"hooks":[{"type":"command",
+  "command":"/abs/path/hook-stop.sh","timeout":5}]}]}}
+JSON
+HOOK_EVENT_DIR="$dir" HOOK_STAGE="$stage" HOOK_FIFO="$dir/hook-done-$line-$stage.fifo" \
+  "<cli>" -w "<project-dir>" --permission-mode auto \
+  --settings "$dir/hook-settings-$line-$stage.json" \
+  -p "$(cat "$dir/prompt-$line-$stage.md")" > "$log" 2>&1
+```
+
+- hook 事件只产生 `hook=observed`；退出记录/哨兵仍是权威。正常完成时 hook 缩短等待，API 崩溃时 Stop 不触发、由 status/exit 记录判 FAILED。
+- 模板：`scripts/hook-stop.sh`；本地/远端模型与故障矩阵见 `watch-model.md` §11–§12。
+
 ## Recipe 3 — 脱离模式派发 + 统一监听（Detached Dispatch & Unified Watch，缺省形态）——**nohup 权威落点**
 
 **让子代理在后台自己跑，驱动者用长轮询窗口监听**——派发连接断开不中断子代理，等待期间不消耗模型回合。本形态是 loop-driver 实测独有差异面（analyze H-04 裁定：权威落点在本文件，不迁配方真源）；监听规则本体见 `watch-model.md`，本节只给命令形态：
@@ -79,6 +98,24 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
 - **多线批查**：一个窗口一次 ssh 检查多条线（`--manifest` 模式），任一线终止即返回全部线快照，**判定仍逐线独立做**；输出只保留判定行与必要证据，哨兵未现且进程存活时无需更多输出。
 - **观察面纪律（底稿注解：External Dispatch Visibility Contract，`subagent-definitions.md`）**：禁止**缓冲至退出**式派发——`qodercli -p "<prompt>" > agent.log 2>&1 &` 这种「输出缓冲到进程退出才落盘」的形态让运行期零可见性，是明令禁止的反模式。`stage-runner.sh` 缺省用 `--output-format stream-json`：raw 落盘、live log 增量增长，退出记录与窗口监听仍以哨兵/退出记录为准；CLI 不支持时降级 buffered 并记 `progress=degraded`（efficiency-model §4）。
 - 终止判定 `DONE` / `INCOMPLETE` → 独立校验（见 stage-prompts.md）；其余终止判定 → U5；通过则派发下一阶段（回到 Recipe 1/2/3）。
+
+### Hook + SSH 远程窗口（推荐补充）
+
+- **本地 watcher**：在原命令上加 `--hook-done "$dir/hook-event-$stage.json" --hook-fifo "$dir/hook-done-$line-$stage.fifo"`；hook 到达即缩短当前窗口，判定仍回到本条的正证据链。
+- **远端 watcher**：每个窗口一次 ssh，在 run-user 侧长读 FIFO/done（工具超时 = window + 30s）：
+
+```bash
+ssh -o BatchMode=yes <alias> \
+  "su - <run-user> -c 'bash --noprofile --norc -c \
+    \"bash /home/<run-user>/watch-hook.sh <stage> <window> <deadline> \
+      /home/<run-user>/hook-done-<stage>.fifo \
+      /home/<run-user>/hook-event-<stage>.json\"'"
+# 事件或 HOOK_TIMEOUT 返回后，再跑一次远端 watch-target.sh --once 取权威判定
+```
+
+- SSH 断开不杀远端进程；下一窗口先查 `done.json`（check-before-wait）再读 FIFO，断开不丢事件。远端命令统一 `bash --noprofile --norc` 并重定向 stderr；只解析最后一行/数字，空输出 = UNKNOWN，绝不当作 0/完成。
+- 多线：线数少每线一个 SSH 长读；线数多把所有 hook 追加到单一 `hook-events.log`，本地用一条 `ssh … "tail -F -n 0 …"` 流式读取并按 `line/stage` 路由；manifest 模式不消费 hook 参数。
+- 观测侧故障矩阵（pgrep 零匹配、作用域、登录噪声、共享目录误删、hook 未触发、进程消失≠完成）见 `watch-model.md` §12。
 
 ## Recipe 4 — 阶段链与收尾（Stage Chain & Closure）——编排本体
 

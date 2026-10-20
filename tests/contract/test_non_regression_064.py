@@ -140,16 +140,11 @@ def test_ng_08_mirror_no_new_drift():
          "--check", "--only", "shared/definitions"],
         capture_output=True, text=True,
     )
-    baseline = {
-        "agent-definitions.md", "contract-clause-definitions.md", "derivation-definitions.md",
-        "dogfooding-definitions.md", "framework-map.md", "goal-definitions.md",
-        "self-improvement-definitions.md", "subagent-definitions.md", "tool-definitions.md",
-    }
     diffs = {
         Path(line.split()[-1]).name
         for line in shared.stdout.splitlines() if line.startswith("DIFF")
     }
-    assert diffs == baseline, f"shared/definitions drift changed: {sorted(diffs)}"
+    assert diffs == set(), f"shared/definitions drift changed: {sorted(diffs)}"
 
 
 def test_ng_09_docs_entry():

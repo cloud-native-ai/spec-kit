@@ -109,12 +109,14 @@
 | skill-memory-record-wrapup | skill-wrapup | skill:memory-record | wrap-up |
 | skill-merge-skills-wrapup | skill-wrapup | skill:merge-skills | wrap-up |
 | skill-self-improvement-wrapup | skill-wrapup | skill:self-improvement | wrap-up |
+| skill-sdd-project-setup-wrapup | skill-wrapup | skill:sdd-project-setup | wrap-up |
 | skill-study-project-wrapup | skill-wrapup | skill:study-project | wrap-up |
 | skill-summarize-project-wrapup | skill-wrapup | skill:summarize-project | wrap-up |
 | skill-think-skills-wrapup | skill-wrapup | skill:think-skills | wrap-up |
 | speckit-feedback-wrapup | command-wrapup | /speckit.feedback | wrap-up |
 | gate-feature-status-regression | command-gate | /speckit.feature | gate-feature-status-regression |
 | gate-implement-checklist-waiver | command-gate | /speckit.implement | gate-implement-checklist-waiver |
+| gate-implement-evidence-binding | command-gate | /speckit.implement | gate-implement-evidence-binding |
 | gate-sanitize-destructive-cleanup | command-gate | /speckit.sanitize | gate-sanitize-destructive-cleanup |
 | gate-session-export-overwrite | command-gate | /speckit.session | gate-session-export-overwrite |
 | gate-tools-invoke-entry | command-gate | /speckit.tools | gate-tools-invoke-entry |
@@ -185,6 +187,14 @@
 > confirmation-gates.md 治理条目名。behavior_owner 仅路径指针——本表 MUST NOT
 > 复述行为规则(One Source Of Truth)。order 冲突判定:同一 lifecycle point 内
 > 不同 Handler 不得同序。
+> 编译面占位约定(063 C-20,kind=engine 行):渲染集 = 该 action 引擎 manifest
+> (`--action args-manifest`,per contracts/engine-action-sets.md 对账义务 4)的
+> required 全集 + source 全集(--unit-id/--unit-type 已由调用行携带实值,不重复
+> 占位渲染);占位语法 = 参数名去 `--` 前缀、连字符转下划线、全大写(如
+> `--run-id` ⇒ `<RUN_ID>`);代入规则 = 尖括号为本轮运行时值——代入后照抄执行。
+> 约定行文本由本注声明、渲染器逐字采用:当 section 内任一引擎行含占位时,在该行
+> 之后渲染一行约定行;无占位则不渲染。
+> Compiled-face convention line: 尖括号为本轮运行时值——代入后照抄执行(占位 = 参数名去 --、转下划线、全大写;渲染集 = 引擎 manifest required + source,身份对已带实值)
 
 | handler_id | kind | action | mode | order | behavior_owner |
 |------------|------|--------|------|-------|----------------|
@@ -220,6 +230,7 @@
 | h-gate-evidence | @point:confirm-gate | gate-git-workflow-tiered-mode | 044 门控必要性证据(逐 gate Object) |
 | h-gate-evidence | @point:confirm-gate | gate-glossary-user-entry-overwrite | 044 门控必要性证据(逐 gate Object) |
 | h-gate-evidence | @point:confirm-gate | gate-implement-checklist-waiver | 044 门控必要性证据(逐 gate Object) |
+| h-gate-evidence | @point:confirm-gate | gate-implement-evidence-binding | 063 证据绑定门:pass 声明绑定归档证据([[STR-001]]) |
 | h-gate-evidence | @point:confirm-gate | gate-improve-tools-no-test-invoke | 044 门控必要性证据(逐 gate Object) |
 | h-gate-evidence | @point:confirm-gate | gate-rubric-high-stakes | 044 门控必要性证据(逐 gate Object) |
 | h-gate-evidence | @point:confirm-gate | gate-sanitize-destructive-cleanup | 044 门控必要性证据(逐 gate Object) |

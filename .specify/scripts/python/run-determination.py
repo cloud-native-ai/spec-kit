@@ -7,7 +7,7 @@ one ``run_determination`` record. The record *is* the 改点 (owner:
 ``.specify/memory/glossary.md`` → `改点`): an observation sensor inside the
 improve flow, never a feedback entry and never an intervention ledger.
 
-Program-First (``.specify/shared/guidelines/token-efficiency.md`` § 程序优先) is the whole
+Program-First (``shared/guidelines/token-efficiency.md`` § 程序优先) is the whole
 reason this file exists: every fixed-rule judgment below — source-hierarchy
 resolution, name-level set difference, literal-substring evidence search, the
 satisfaction decision table, the trigger conjunction — is computed here, and the
@@ -16,7 +16,7 @@ model supplies only the coarse classifications it is the sole competent judge of
 ``--unresolved-red``). Summary-First (§ 摘要优先) binds the read side: this
 engine reads originals freely and emits projections only.
 
-Ownership (``.specify/shared/guidelines/one-source-of-truth.md``, tier 1 = code). This
+Ownership (``shared/guidelines/one-source-of-truth.md``, tier 1 = code). This
 module is the code-side owner of the ``run_determination`` record schema and of
 every value domain the program branches on. The design-time owner of the four
 quantities' 判定口径, the three lanes' read surfaces, the two consumption points
@@ -28,27 +28,27 @@ block and MUST NOT be cited as current reality afterwards.
 Deliberately reached by reference, never restated here:
 
 * Exit codes — the house table, owned by the ``EXIT_*`` constants shared across
-  ``.specify/scripts/python/`` engines and by STR-007 in
+  ``scripts/python/`` engines and by STR-007 in
   ``.specify/specs/053-machine-decidable-artifacts/requirements.md`` § Shared
   Strings. One code never carries two meanings across actions of this binary.
 * ``not_evaluated`` and the comparison words — owned by STR-004 (same file) and
-  ``.specify/shared/workflow/self-improvement-workflow.md`` SI-8.
+  ``shared/workflow/self-improvement-workflow.md`` SI-8.
 * The four feedback red lines and the never-solicit line — owned by
-  ``.specify/shared/workflow/feedback-step.md`` § Positioning & Red Lines.
+  ``shared/workflow/feedback-step.md`` § Positioning & Red Lines.
 * The name-level baseline form, red-first evidence, mutation drill and the
   anti-vacuity sentinel — owned by ``.specify/memory/glossary.md``.
 * Which agent CLIs have a resolvable session store, and which do not — owned by
   ``STORE_RESOLVERS`` / ``UNSUPPORTED_TOOL_HINTS`` in
-  ``.specify/scripts/python/history-utils.py``.
+  ``scripts/python/history-utils.py``.
 * The memory store's layout, entry format and index — owned by
-  ``.specify/scripts/python/memory-utils.py``, which is the only writer this engine uses.
+  ``scripts/python/memory-utils.py``, which is the only writer this engine uses.
 * The evidence store's run layout and freshness gate — owned by
-  ``.specify/scripts/python/evidence-utils.py``.
-* ``should_prompt`` and its threshold — owned by ``.specify/scripts/python/feedback-utils.py``.
+  ``scripts/python/evidence-utils.py``.
+* ``should_prompt`` and its threshold — owned by ``scripts/python/feedback-utils.py``.
   This engine composes with it and never re-implements it.
 
 Hard separation from 情境评估 (Situational Assessment, owner
-``.specify/shared/guidelines/proactive-trigger.md``): the two are structural siblings with
+``shared/guidelines/proactive-trigger.md``): the two are structural siblings with
 disjoint jobs. This engine writes no per-turn row, adds no situation or signal
 vocabulary, and never calls that engine.
 
@@ -60,7 +60,7 @@ Actions:
   history     read-only projection of past records (never record bodies)
 
 No aggregate score exists in this engine and none may be added: a scalar roll-up
-is rejected by ``.specify/shared/guidelines/fast-fail.md`` § 范围限制 and by the B2
+is rejected by ``shared/guidelines/fast-fail.md`` § 范围限制 and by the B2
 adjudication in ``.specify/teams/session-driven-self-improvement/team.md``.
 The only roll-up is the boolean ``passive_trigger.trigger_feedback``.
 
@@ -79,7 +79,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 # Exit codes: the house table. Owner is code (the EXIT_* constants shared across
-# .specify/scripts/python/ engines) plus STR-007; see the module docstring.
+# scripts/python/ engines) plus STR-007; see the module docstring.
 EXIT_OK = 0
 EXIT_INPUT_ERROR = 2
 EXIT_NOT_FOUND = 3
@@ -87,9 +87,51 @@ EXIT_INVALID = 4
 
 RECORD_KIND = "speckit.run-determination"
 SCHEMA_VERSION = 1
-ENGINE_REL_PATH = ".specify/scripts/python/run-determination.py"
+ENGINE_REL_PATH = "scripts/python/run-determination.py"
 
-ACTIONS = ("determine", "settle", "history")
+ACTIONS = ("determine", "settle", "history", "args-manifest")
+
+# --- argument manifest (063 C-22) ---------------------------------------------
+# Per-action required/source classification. "required" = flags this engine
+# itself validates as required for the action (the SAME lists the one-shot
+# missing-argument check consumes — C-23); "source" = run-evidence inputs the
+# caller may carry. `--action args-manifest` verifies every listed flag against
+# build_parser()'s LIVE option strings before emitting, so a renamed/removed
+# parser flag can never leave a stale manifest behind (parser = single source
+# of truth). The compile-embeds renderer consumes this manifest; it holds no
+# argument table of its own (063 C-21).
+ARG_MANIFEST = {
+    "determine": {
+        "required": ["--unit-id", "--run-id", "--complexity"],
+        "source": [
+            "--session-file", "--session-rows", "--tool", "--proxy-paths",
+            "--token-note", "--elapsed-ms", "--elapsed-note",
+            "--names-current", "--names-baseline", "--declared-check",
+            "--green-check", "--red-first-refs", "--collected",
+            "--prev-user-turn-class", "--unresolved-red", "--red-source",
+        ],
+    },
+    "settle": {
+        "required": ["--unit-id", "--user-turn-class"],
+        "source": ["--run-id"],
+    },
+    "history": {
+        "required": ["--target"],
+        "source": ["--run-id", "--limit", "--unsettled"],
+    },
+    "args-manifest": {"required": [], "source": []},
+}
+
+# One-shot missing-argument error tails (C-23): the load-bearing guidance the
+# old sequential errors carried, kept per flag inside the SINGLE message.
+_REQUIRED_GUIDANCE = {
+    "--unit-id": "expected /speckit.<command>, skill:<name> or "
+                 "custom:<owner>/<name>",
+    "--run-id": "the key is (unit_id, run_id)",
+    "--complexity": "it is a caller declaration, never an engine derivation",
+    "--user-turn-class": "this is the turn that settles the previous run",
+    "--target": "the unit whose determination history is requested",
+}
 
 # --- value domains (code-owned; see the module docstring) --------------------
 
@@ -702,7 +744,7 @@ def read_red_state(args: argparse.Namespace) -> Tuple[str, str]:
 
 def _signal(axis: str) -> Dict[str, str]:
     """The ``{key, direction}`` shape of ``expectedSignal`` in
-    ``.specify/shared/workflow/evidence-step.md`` § Step E, so a finding can become a
+    ``shared/workflow/evidence-step.md`` § Step E, so a finding can become a
     ledger entry without a translation layer."""
     direction = SIGNAL_DIRECTIONS[axis]
     if direction not in DIRECTIONS:
@@ -809,7 +851,7 @@ def apply_qualification_gate(record: Dict[str, Any]) -> None:
 
 def observation_for(axis: str, body: Dict[str, Any]) -> str:
     """One bounded line: what was measured, never what to fix. Counts route; they
-    do not conclude (``.specify/shared/workflow/evidence-step.md`` red line 3)."""
+    do not conclude (``shared/workflow/evidence-step.md`` red line 3)."""
     verdict = body.get("verdict")
     reason = body.get("reason")
     if axis in ("token_consumption", "elapsed"):
@@ -1368,6 +1410,38 @@ def require_unit(args: argparse.Namespace) -> Tuple[str, str]:
     return unit_id, unit_type
 
 
+def _missing_required(args: argparse.Namespace, action: str) -> List[str]:
+    """C-23 (063): collect EVERY missing required flag of `action` in one pass.
+    The required list is ARG_MANIFEST's — the same classification the
+    args-manifest action emits, so validation and manifest cannot drift apart."""
+    parser = build_parser()
+    missing: List[str] = []
+    for flag in ARG_MANIFEST[action]["required"]:
+        act = parser._option_string_actions.get(flag)
+        if act is None:
+            raise InvalidError(
+                f"argument manifest drifted from the parser: {flag} is not an "
+                "option of this engine")
+        value = getattr(args, act.dest, None)
+        if value is None or (isinstance(value, str) and not value.strip()):
+            missing.append(flag)
+    return missing
+
+
+def _raise_missing(action: str, missing: List[str]) -> None:
+    """C-23 (063): ONE InputError naming ALL missing required arguments —
+    replaces the sequential one-at-a-time checks (a call missing ≥2 required
+    args yields exactly one error listing every one of them)."""
+    if not missing:
+        return
+    parts: List[str] = []
+    for flag in missing:
+        note = _REQUIRED_GUIDANCE.get(flag)
+        parts.append(f"{flag} ({note})" if note else flag)
+    raise InputError(
+        f"{action} is missing required arguments: " + "; ".join(parts))
+
+
 def settle_one(workspace_root: Path, target: Dict[str, Any], turn_class: str) -> Dict[str, Any]:
     record = target["record"]
     red = (record["axes"]["satisfaction"].get("unresolved_red") or {})
@@ -1386,15 +1460,11 @@ def settle_one(workspace_root: Path, target: Dict[str, Any], turn_class: str) ->
 
 def action_determine(args: argparse.Namespace) -> Tuple[Dict[str, Any], int]:
     workspace_root = resolve_workspace_root(args.workspace_root)
+    # C-23 (063): ALL missing required arguments in ONE error — replaces the
+    # sequential --run-id / --complexity checks; a call missing ≥2 required
+    # args names them all in a single InputError (exit 2 stays).
+    _raise_missing("determine", _missing_required(args, "determine"))
     unit_id, unit_type = require_unit(args)
-    if not args.run_id:
-        raise InputError("--run-id is required: the key is (unit_id, run_id)")
-    if not args.complexity:
-        # § 3: complexity is a caller-declared input, and the scope gate depends
-        # on it. Absent it, there is nothing to gate on — that is a malformed
-        # call, not an uninterpretable artifact.
-        raise InputError("--complexity is required: it is a caller declaration, "
-                         "never an engine derivation")
     if args.user_turn_class is not None:
         raise InputError(
             "--user-turn-class is not an input to `determine`: this run's "
@@ -1448,6 +1518,8 @@ def action_determine(args: argparse.Namespace) -> Tuple[Dict[str, Any], int]:
 
 def action_settle(args: argparse.Namespace) -> Tuple[Dict[str, Any], int]:
     workspace_root = resolve_workspace_root(args.workspace_root)
+    # C-23 (063): the same one-shot missing-argument contract as determine.
+    _raise_missing("settle", _missing_required(args, "settle"))
     unit_id, _ = require_unit(args)
     if not args.user_turn_class:
         raise InputError("--user-turn-class is required for settle")
@@ -1484,6 +1556,8 @@ def action_settle(args: argparse.Namespace) -> Tuple[Dict[str, Any], int]:
 
 def action_history(args: argparse.Namespace) -> Tuple[Dict[str, Any], int]:
     workspace_root = resolve_workspace_root(args.workspace_root)
+    # C-23 (063): the same one-shot missing-argument contract as determine.
+    _raise_missing("history", _missing_required(args, "history"))
     if not args.target:
         raise InputError("--target is required for history")
     unit_id = args.target.strip()
@@ -1516,10 +1590,36 @@ def action_history(args: argparse.Namespace) -> Tuple[Dict[str, Any], int]:
     return {"target": unit_id, "counts": counts, "records": rows[:limit]}, EXIT_OK
 
 
+def action_args_manifest(args: argparse.Namespace) -> Tuple[Dict[str, Any], int]:
+    """C-22 (063): machine-readable per-action argument manifest, BUILT FROM
+    this engine's own parser — every classified flag is verified against the
+    live parser's option strings before emitting, so a renamed/removed parser
+    flag can never leave a stale manifest entry behind. Pure query face: no
+    workspace access, no write."""
+    parser = build_parser()
+    live = {opt for act in parser._actions for opt in act.option_strings}
+    manifest: Dict[str, Any] = {}
+    for action in ACTIONS:
+        spec = ARG_MANIFEST.get(action)
+        if spec is None:
+            raise InvalidError(
+                f"args-manifest: action {action!r} has no manifest spec")
+        for key in ("required", "source"):
+            unknown = [f for f in spec[key] if f not in live]
+            if unknown:
+                raise InvalidError(
+                    f"args-manifest: {action} {key} flags are not options of "
+                    f"this engine's parser: {unknown}")
+        manifest[action] = {"required": list(spec["required"]),
+                            "source": list(spec["source"])}
+    return manifest, EXIT_OK
+
+
 _ACTIONS = {
     "determine": action_determine,
     "settle": action_settle,
     "history": action_history,
+    "args-manifest": action_args_manifest,
 }
 
 
@@ -1614,6 +1714,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def render_text(action: str, payload: Dict[str, Any]) -> str:
+    if action == "args-manifest":
+        # C-22 (063): the manifest is a machine face — pure JSON regardless of
+        # --json, so the compile-embeds renderer consumes one invocation form.
+        return json.dumps(payload, ensure_ascii=False, indent=2)
     lines: List[str] = []
     if "skipped" in payload:
         return f"skipped: {payload['skipped']}"

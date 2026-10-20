@@ -1,7 +1,7 @@
 # Path A — 就地消化 (Digest In This Project)
 
 Owns § Path A (A1–A6 + behavior rules) of the feedback skill. Extracted from
-`.specify/templates/commands/feedback.md`; content preserved, form re-expressed. The routing
+`templates/commands/feedback.md`; content preserved, form re-expressed. The routing
 judgment that selects this path lives in the skill's SKILL.md (Routing flow).
 
 Everything the feedback points at this project. In the **framework project** that is

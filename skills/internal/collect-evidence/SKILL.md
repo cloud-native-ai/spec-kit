@@ -15,7 +15,7 @@ classification: internal
 
 - 引擎:`.specify/scripts/python/evidence-utils.py`(镜像 `scripts/python/`)
 - 采集子集:`scripts/js/better-harness/`(镜像 `.specify/scripts/js/better-harness/`,溯源见其 `UPSTREAM.md`)
-- 证据存储:`.specify/memory/evidence/<run-id>/{findings.json,manifest.json,lanes/}`+ `index.json`
+- 证据存储:`.specify/memory/evidence/<run-id>/{findings.json,manifest.json,lanes/}`;索引不落盘,由运行目录**即读即建**(并发流程各写各的 `ev-*` 目录,不共享可写索引)
 - 消费约定(供 improve-* 等引用,本技能不执行):`.specify/shared/workflow/evidence-step.md`
 
 ## Workflow
@@ -75,8 +75,9 @@ python3 .specify/scripts/python/evidence-utils.py --action collect \
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
-1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:collect-evidence" --unit-type skill`
-2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:collect-evidence" --unit-type skill`
-3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:collect-evidence" --unit-type skill`
+1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:collect-evidence" --unit-type skill --run-id <RUN_ID> --complexity <COMPLEXITY>`；source args when available: `--session-file <SESSION_FILE> --session-rows <SESSION_ROWS> --tool <TOOL> --proxy-paths <PROXY_PATHS> --token-note <TOKEN_NOTE> --elapsed-ms <ELAPSED_MS> --elapsed-note <ELAPSED_NOTE> --names-current <NAMES_CURRENT> --names-baseline <NAMES_BASELINE> --declared-check <DECLARED_CHECK> --green-check <GREEN_CHECK> --red-first-refs <RED_FIRST_REFS> --collected <COLLECTED> --prev-user-turn-class <PREV_USER_TURN_CLASS> --unresolved-red <UNRESOLVED_RED> --red-source <RED_SOURCE>`
+   尖括号为本轮运行时值——代入后照抄执行(占位 = 参数名去 --、转下划线、全大写;渲染集 = 引擎 manifest required + source,身份对已带实值)
+2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:collect-evidence" --unit-type skill`；source args when available: `--run-id <RUN_ID>`
+3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:collect-evidence" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"

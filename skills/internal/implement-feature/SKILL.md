@@ -36,6 +36,21 @@ Optional: Git Commit. Content moved here verbatim in substance.
 
 ## Workflow (steps 1–9)
 
+### Step 0 — Baseline pre-flight (re-capture frozen values)
+
+Before any other workflow step, re-capture every frozen baseline this feature
+carries. The set is derived from the spec directory by glob —
+`<spec-dir>/baseline-*` and `<spec-dir>/notes/baseline-*` — plus the coverage
+baseline file (`<spec-dir>/coverage-baseline.txt`, [[STR-002]]); it is
+directory-derived, never a hand-written count. For each captured value that
+differs from the frozen file, the new value MUST be written into the row that
+cites it, and every difference MUST be classified — BEFORE any drift verdict is
+issued — using `git log` provenance into exactly one of: `upstream repair`,
+`inherited`, `attributable to this feature`, or `undecidable`. `undecidable`
+MUST be reported explicitly; you MUST NOT guess between the three attributed
+classes. A missing baseline file is handled as a first capture with its
+provenance recorded — never as zero drift.
+
 ### Step 1 — Prerequisites and paths
 
 Run `{SCRIPT}` from repo root; parse `REQUIREMENTS_DIR` and `AVAILABLE_DOCS`. All paths
@@ -46,12 +61,19 @@ must be absolute.
 If `REQUIREMENTS_DIR/checklists/` exists, check checklist status first:
 
 - Count total/completed/incomplete items per checklist.
-- If incomplete: STOP, show table, ask **"Proceed anyway? (yes/no)"**.
+- **Third branch — recheck answered**: an item whose subject a later stage resolved and
+  recorded in `checklists/recheck-<date>-<topic>.md` (the append-only C-8 shape) counts
+  as answered — not incomplete, no waiver needed. Subtract it before counting; the gate
+  fires only for genuinely unresolved items.
+- If genuinely unresolved items remain: STOP, show table, ask **"Proceed anyway? (yes/no)"**.
   > Gate probe: gate-implement-checklist-waiver — after the user decision, record firing
   > evidence per `.specify/shared/guidelines/confirmation-gates.md` §门控观察协议
   > (non-blocking).
-- If user proceeds: require waiver comment, record in `REQUIREMENTS_DIR/waivers.md`.
-- If all complete: proceed automatically.
+- If user proceeds: require a waiver recorded in `REQUIREMENTS_DIR/waivers.md` carrying
+  all four parts — `Scope`, `Basis`, `Disposition`, `Closed`. `Closed` MUST state what
+  solved the item (which upstream artifact edit closed it). A waiver missing any part is
+  non-compliant and MUST NOT be treated as closed evidence.
+- If all complete (or answered): proceed automatically.
 
 ### Step 3 — Load context (summary-first)
 
@@ -294,6 +316,17 @@ Pre-Status-Flip Gate. Populate `REQUIREMENTS_DIR/verification.md` from
 narrow it to a subset (a gate or DoD row reading `pass|deferred` silently forbids an
 honest `partial`).
 
+> Gate probe: gate-implement-evidence-binding — after populating the evidence
+> records, run the binding check per the template's declared rules: every sample
+> recorded `pass` MUST have a complete evidence row whose archived artifact
+> exists, is non-empty, and whose computed SHA-256 equals the recorded hash;
+> missing/empty/mismatch is RED naming the sample id and the reason — the failure
+> MUST NOT be downgraded to "self-disclosed and continue". A `pass` without a
+> complete evidence row is `unverified` and MUST NOT be cited as passing evidence
+> anywhere downstream. Record firing evidence per
+> `.specify/shared/guidelines/confirmation-gates.md` § 门控观察协议 (non-blocking;
+> via the feedback engine `--lifecycle-point`).
+
 ### Mid-Run User Directives (scope changes DURING implement)
 
 When the user changes scope or adds a design constraint while the implementation run is
@@ -372,8 +405,9 @@ gate's approval routing in step 8). After implementation, generate commit comman
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
-1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:implement-feature" --unit-type skill`
-2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:implement-feature" --unit-type skill`
-3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:implement-feature" --unit-type skill`
+1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:implement-feature" --unit-type skill --run-id <RUN_ID> --complexity <COMPLEXITY>`；source args when available: `--session-file <SESSION_FILE> --session-rows <SESSION_ROWS> --tool <TOOL> --proxy-paths <PROXY_PATHS> --token-note <TOKEN_NOTE> --elapsed-ms <ELAPSED_MS> --elapsed-note <ELAPSED_NOTE> --names-current <NAMES_CURRENT> --names-baseline <NAMES_BASELINE> --declared-check <DECLARED_CHECK> --green-check <GREEN_CHECK> --red-first-refs <RED_FIRST_REFS> --collected <COLLECTED> --prev-user-turn-class <PREV_USER_TURN_CLASS> --unresolved-red <UNRESOLVED_RED> --red-source <RED_SOURCE>`
+   尖括号为本轮运行时值——代入后照抄执行(占位 = 参数名去 --、转下划线、全大写;渲染集 = 引擎 manifest required + source,身份对已带实值)
+2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:implement-feature" --unit-type skill`；source args when available: `--run-id <RUN_ID>`
+3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:implement-feature" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"

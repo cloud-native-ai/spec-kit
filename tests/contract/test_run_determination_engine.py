@@ -263,7 +263,12 @@ class TestEngineSurface:
                 eng.EXIT_NOT_FOUND, eng.EXIT_INVALID) == (0, 2, 3, 4)
 
     def test_action_set_is_closed(self, eng):
-        assert tuple(eng.ACTIONS) == ("determine", "settle", "history")
+        # Amended by Feature 063 (C-22, 2026-10-20): the wrap-up engine gains
+        # `args-manifest` (the machine-readable argument manifest the
+        # compile-embeds renderer consumes). Exact pin updated same-batch;
+        # bidirectional ownership: tests/contract/test_probe_engine_action_sets.py.
+        assert tuple(eng.ACTIONS) == ("determine", "settle", "history",
+                                      "args-manifest")
 
     def test_unknown_action_exits_2(self, eng, ws):
         with pytest.raises(SystemExit) as exc:
@@ -1492,11 +1497,9 @@ class TestLaneProjections:
                     "target": "/speckit.plan", "runId": run_id,
                     "lanes": {}, "evidence": [], "findingsDigest": digest}
         (run_dir / "findings.json").write_text(json.dumps(findings), encoding="utf-8")
-        index = {"entries": [{"runId": run_id, "target": "/speckit.plan",
-                              "created": created, "lanesSummary": {},
-                              "file": f"{run_id}/findings.json"}]}
-        (ws / ".specify" / "memory" / "evidence" / "index.json").write_text(
-            json.dumps(index), encoding="utf-8")
+        manifest = {"runId": run_id, "target": "/speckit.plan", "created": created,
+                    "lanes": {}, "findingsDigest": digest}
+        (run_dir / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
         return run_id, digest
 
     def test_fresh_evidence_run_is_consumed_and_its_digest_recorded(self, eng, ws, capsys):

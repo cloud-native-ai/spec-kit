@@ -2,7 +2,7 @@
 
 **Schema authority** for subagent dispatch configuration. This file owns the field-level
 schema; the *runtime* behavior is owned by the deterministic engine
-`.specify/scripts/python/execution-config.py` (actions `resolve` / `validate` / `list-configs`). The
+`scripts/python/execution-config.py` (actions `resolve` / `validate` / `list-configs`). The
 CLI capability values are owned **only** by `CAPABILITY_MATRIX` in that engine — this
 document references it and never copies its table.
 
@@ -10,7 +10,7 @@ document references it and never copies its table.
 
 | Layer | Location | Tracked |
 |-------|----------|---------|
-| `defaults` | `.specify/agents/execution/configs/_defaults.yaml` (seeded by `specify init` from `.specify/templates/execution-config-defaults.yaml`) | yes |
+| `defaults` | `.specify/agents/execution/configs/_defaults.yaml` (seeded by `specify init` from `templates/execution-config-defaults.yaml`) | yes |
 | `agent-config` | `.specify/agents/execution/configs/<slug>.yaml` | yes |
 | `inline` | `--mode / --cli / --model / --reasoning-effort / --context-window / --extra-flags / --log-dir / --quantification-method` at dispatch time | n/a |
 
@@ -73,13 +73,13 @@ method only — `auto` is never rejected merely for not appearing in a per-CLI m
 ## CLI capability
 
 Supported CLI names, per-CLI external support, accepted flags, and available quantification
-methods are declared **only** in `CAPABILITY_MATRIX` inside `.specify/scripts/python/execution-config.py`.
+methods are declared **only** in `CAPABILITY_MATRIX` inside `scripts/python/execution-config.py`.
 Read the code (or run `resolve` on a candidate config) for the current values; do not
 reproduce the table in a document or an agent definition.
 
 ## Defaults layer and init seeding
 
-- Content owner: `.specify/templates/execution-config-defaults.yaml` (packaged with the CLI).
+- Content owner: `templates/execution-config-defaults.yaml` (packaged with the CLI).
 - `specify init` seeds `.specify/agents/execution/configs/_defaults.yaml` **only when the
   file is absent**; an existing file (including a user-edited one) is never overwritten.
 - A missing defaults layer makes `resolve` exit 2 with the path and the `specify init` repair.

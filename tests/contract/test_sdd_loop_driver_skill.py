@@ -11,6 +11,7 @@ red-first (notes/red-first-evidence.md records the red runs).
 
 import filecmp
 import re
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -349,14 +350,22 @@ def test_c17_roster_baseline_updated():
 # ---------------------------------------------------------------- C-18
 
 
+MIRROR_FILES = [
+    "SKILL.md",
+    "references/dispatch-recipes.md",
+    "references/stage-prompts.md",
+    "references/watch-model.md",
+    "scripts/watch-target.sh",
+    "scripts/hook-stop.sh",
+    "scripts/watch-hook.sh",
+]
+
+
 def test_c18_mirror_pair_no_drift():
     src = SKILL_DIR
     dst = REPO_ROOT / ".specify" / "skills" / "sdd-loop-driver"
     assert dst.exists(), "runtime mirror missing — sync-mirrors --write not run"
-    for rel in [
-        "SKILL.md", "references/dispatch-recipes.md", "references/stage-prompts.md",
-        *CLI_PROFILE_RELS,
-    ]:
+    for rel in MIRROR_FILES + CLI_PROFILE_RELS:
         assert filecmp.cmp(src / rel, dst / rel, shallow=False), (
             f"mirror drift on {rel}"
         )
@@ -393,10 +402,7 @@ def test_c11_self_containment_no_runtime_framework_reads():
 def test_c12_mirror_byte_identical():
     dst = REPO_ROOT / ".specify" / "skills" / "sdd-loop-driver"
     assert dst.exists(), "runtime mirror missing"
-    for rel in [
-        "SKILL.md", "references/dispatch-recipes.md", "references/stage-prompts.md",
-        *CLI_PROFILE_RELS,
-    ]:
+    for rel in MIRROR_FILES + CLI_PROFILE_RELS:
         assert (dst / rel).read_text(encoding="utf-8") == (SKILL_DIR / rel).read_text(
             encoding="utf-8"
         ), f"mirror not byte-identical: {rel}"
@@ -485,3 +491,40 @@ def test_trigger_routing_guard_pinned():
         assert needle in text, f"trigger-routing guard missing: {needle}"
     docs = DOCS_PAGE.read_text(encoding="utf-8")
     assert "触发与路由" in docs
+
+
+# ---------------------------------------------------------------- C-21 / C-22
+# Hook-based completion backstop and the SSH observability failure matrix
+# (2026-10-19 monitoring reliability follow-up).
+
+
+def test_c21_hook_backstop_documented():
+    watch = (SKILL_DIR / "references" / "watch-model.md").read_text(encoding="utf-8")
+    recipes = (SKILL_DIR / "references" / "dispatch-recipes.md").read_text(encoding="utf-8")
+    for needle in [
+        "Stop",
+        "SubagentStop",
+        "hook-event",
+        "--hook-done",
+        "--hook-fifo",
+        "bash --noprofile --norc",
+        "done.json",
+    ]:
+        assert needle in watch, f"watch-model hook contract missing: {needle}"
+    assert "--settings" in recipes, "dispatch recipes must show per-dispatch hook settings"
+    assert (SKILL_DIR / "scripts" / "hook-stop.sh").exists(), "hook-stop.sh missing"
+    assert (SKILL_DIR / "scripts" / "watch-hook.sh").exists(), "watch-hook.sh missing"
+
+
+def test_c22_watch_target_hook_selftest():
+    script = SKILL_DIR / "scripts" / "watch-target.sh"
+    result = subprocess.run(
+        ["bash", str(script), "--self-test"],
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    combined = result.stdout + result.stderr
+    assert result.returncode == 0, f"self-test failed:\n{combined[-1200:]}"
+    assert "hook-done" in combined, "self-test missing hook-done case"
+    assert "hook-fifo" in combined, "self-test missing hook-fifo case"

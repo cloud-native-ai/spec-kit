@@ -73,7 +73,12 @@ def collect_fixture(tmp_path: Path, lanes: str = "runs,feedback") -> dict:
     run_dir = (workspace / out["path"]) if not Path(out["path"]).is_absolute() else Path(out["path"])
     findings = json.loads((run_dir / "findings.json").read_text(encoding="utf-8"))
     manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
-    index = json.loads((workspace / ".specify" / "memory" / "evidence" / "index.json").read_text(encoding="utf-8"))
+    listed = subprocess.run(
+        [sys.executable, str(SCRIPT), "--action", "list", "--target", "project"],
+        capture_output=True, text=True, cwd=str(workspace), timeout=120,
+    )
+    assert listed.returncode == 0, listed.stderr
+    index = json.loads(listed.stdout)
     return {"findings": findings, "manifest": manifest, "index": index,
             "run_dir": run_dir, "workspace": workspace}
 
@@ -187,13 +192,15 @@ class TestCF10CF11Manifest:
 
 
 class TestCF12Index:
-    def test_index_structure(self, artifacts):
+    def test_index_is_derived_from_run_directories(self, artifacts):
         index = artifacts["index"]
-        assert index["store"] == "evidence"
-        assert index["entries"], "collect must append an index entry"
+        assert index["entries"], "collect must be discoverable through the derived index"
         entry = index["entries"][-1]
         for field in ("runId", "target", "created", "lanesSummary", "file"):
             assert field in entry, field
+        assert not (artifacts["workspace"] / ".specify" / "memory" / "evidence"
+                    / "index.json").exists(), (
+            "the index must be derived on read, never persisted as a shared file")
 
 
 class TestCF13FeedbackPackageExclusion:

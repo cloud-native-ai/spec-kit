@@ -201,9 +201,13 @@ network-pullable images, a live cluster, special hardware):
    re-probe on every generation and every rerun.
 2. **Single landing point**: record every probe conclusion exactly ONCE, in the generated
    tasks.md's `## Environment Prerequisites` section (see
-   `.specify/templates/tasks-template.md`). Per-phase prerequisites and `[~]` task notes
-   MUST reference that section instead of restating verdicts — two hand-synced copies of
-   the same conclusion drift apart.
+   `.specify/templates/tasks-template.md`). The "reference instead of restating" duty is
+   OPEN over carriers: per-phase prerequisites, `[~]` task notes, assumption rows,
+   decision rows, and ANY free-prose row that states or implies an environment verdict —
+   all MUST reference that section instead of restating verdicts. No carrier is exempt
+   by being unlisted; the list cannot be closed, so a verdict sitting in an unlisted
+   carrier is still a restatement. Two hand-synced copies of the same conclusion drift
+   apart.
 3. **Pre-validate named targets**: any concrete build/smoke target named in a task MUST
    have a locally satisfiable dependency chain (base images pullable, toolchain present).
    If unsatisfiable, either substitute a satisfiable target up front or pre-flag the task
@@ -362,20 +366,34 @@ each implement round has to guess where the previous phase put the file:
   path here; a Setup/Foundational row that captures or consumes that baseline points at
   that owner.
 - `<spec-dir>/notes/red-first-evidence.md` — for every test that MUST go red before its
-  subject exists: the command, its real output, and its exit status.
+  subject exists: the command, its real output, and its exit status. When the note binds
+  a claim to a gate, it MUST quote the gate row verbatim — id + name + check command;
+  a bare gate id alone MUST NOT be used, so a later renumbering produces a visible
+  mismatch rather than a silently dangling reference. Forward-applicable only:
+  pre-existing note instances (e.g. 062's) are out of scope and MUST NOT be
+  retro-edited.
 - `<spec-dir>/notes/quickstart-run.md` — the real output of actually running this
   feature's `quickstart.md` scenario, its teardown steps included.
 - `<spec-dir>/notes/pre-change-measurements.md` — the pre-change side of every "diff
   against pre-change output" premise: the measured value, the command that produced it,
   and the capture date.
+- `<spec-dir>/coverage-baseline.txt` — for a feature with a contract set, freeze it with
+  `python3 scripts/python/account-clause-coverage.py <spec-dir> --freeze > <spec-dir>/coverage-baseline.txt`
+  (the accountant's own default path is `coverage-baseline.txt`); the timing is the same
+  re-freeze timing stated below (first full-tree accounting per feature, not first
+  all-green). A feature without a contract set MUST skip with an explicit stated reason —
+  MUST NOT fabricate an empty baseline.
 
 Create `notes/` in Phase 1 (Setup) so that Phase 2 (Foundational) rows already have
 somewhere to write. **Re-freeze timing**: these files are frozen measurements, so they
 inherit the never-cache rule the Environment Prerequisites probes above already state —
-re-capture on every generation and every rerun of this command, and re-capture at the
-start of `/speckit.implement` whenever the tree has advanced since generation. A row whose
-re-capture yields a different value carries the new value; MUST NOT keep citing the stale
-frozen one.
+re-capture on every generation and every rerun of this command (the producer-side
+obligation, retained). The implement-side re-capture is not this command's duty to
+describe: it is owned by `/speckit.implement`'s baseline pre-flight (its Step 0 in
+`skills/internal/implement-feature/SKILL.md` — the implement-side consumer step),
+which re-captures every frozen baseline before any workflow step and classifies every
+difference. A row whose re-capture yields a different value carries the new value; MUST
+NOT keep citing the stale frozen one.
 
 **Special phase shapes**: two cases override the default "Models → Services → Endpoints"
 within-story order — **asset-migration** (porting/vendoring an external code subset: split
@@ -421,8 +439,9 @@ breakdown may expose new Features or invalidate old ones. Update
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
-1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:create-tasks" --unit-type skill`
-2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:create-tasks" --unit-type skill`
-3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:create-tasks" --unit-type skill`
+1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:create-tasks" --unit-type skill --run-id <RUN_ID> --complexity <COMPLEXITY>`；source args when available: `--session-file <SESSION_FILE> --session-rows <SESSION_ROWS> --tool <TOOL> --proxy-paths <PROXY_PATHS> --token-note <TOKEN_NOTE> --elapsed-ms <ELAPSED_MS> --elapsed-note <ELAPSED_NOTE> --names-current <NAMES_CURRENT> --names-baseline <NAMES_BASELINE> --declared-check <DECLARED_CHECK> --green-check <GREEN_CHECK> --red-first-refs <RED_FIRST_REFS> --collected <COLLECTED> --prev-user-turn-class <PREV_USER_TURN_CLASS> --unresolved-red <UNRESOLVED_RED> --red-source <RED_SOURCE>`
+   尖括号为本轮运行时值——代入后照抄执行(占位 = 参数名去 --、转下划线、全大写;渲染集 = 引擎 manifest required + source,身份对已带实值)
+2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:create-tasks" --unit-type skill`；source args when available: `--run-id <RUN_ID>`
+3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:create-tasks" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"

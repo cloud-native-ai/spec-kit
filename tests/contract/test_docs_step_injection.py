@@ -147,7 +147,11 @@ def test_c3_c4_documentation_section_position_and_reference(cmd: str):
     body = wrapup_section(text)
     assert DOCS_LINE_MARKER in body, f"{cmd}.md Wrap-up missing the Docs Sync Eval call line"
     assert "docs-step.md" in body, f"{cmd}.md docs-sync line must cite docs-step.md"
-    assert len(body) < 1500, f"{cmd}.md Wrap-up must reference, not copy, the rules"
+    # 063 C-20/C-21 amendment (2026-10-20): engine lines render the full
+    # args-manifest inline; the compiled command face grew to ~1777 B. Budget
+    # raised 1500 -> 2500; the reference-not-copy intent stays (docs-step.md
+    # cite + marker assertions above unchanged).
+    assert len(body) < 2500, f"{cmd}.md Wrap-up must reference, not copy, the rules"
 
 
 @pytest.mark.contract

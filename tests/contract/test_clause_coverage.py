@@ -1027,3 +1027,91 @@ def test_the_contract_still_has_the_clause_count_this_suite_pins():
     ids = re.findall(r"(?m)^\*\*C-(\d+)\*\*", body)
     assert len(ids) == 27, f"clause count moved: {len(ids)}"
     assert [int(i) for i in ids] == list(range(1, 28)), "clause ids are not contiguous"
+
+
+# =========================================================================== #
+# 063 C-5/C-6/C-7 — coverage lane wiring on the consume and freeze sides
+#
+# C-5: analyze runs the accountant as a fixed read-only step (no --freeze) and
+#      surfaces baseline-missing with its remedy.
+# C-6: create-tasks freezes coverage-baseline.txt at the re-freeze timing, and an
+#      explicit skip (never a fabricated empty baseline) when there is no contract set.
+# C-7: both sides name the SAME path form, the accountant's --baseline default.
+# =========================================================================== #
+
+ANALYZE_SKILL = ROOT / "skills" / "internal" / "analyze-artifacts" / "SKILL.md"
+ANALYZE_CMD = ROOT / "templates" / "commands" / "analyze.md"
+CREATE_TASKS_SKILL = ROOT / "skills" / "internal" / "create-tasks" / "SKILL.md"
+
+
+def _section(text: str, start_pattern: str, end_pattern: str) -> str:
+    m = re.search(rf"(?ms)^{start_pattern}.*?(?=^{end_pattern})", text)
+    assert m, f"section {start_pattern!r} not found"
+    return m.group(0)
+
+
+def test_c5_analyze_skill_runs_the_accountant_as_a_fixed_read_only_step():
+    assert ANALYZE_SKILL.is_file()
+    body = ANALYZE_SKILL.read_text(encoding="utf-8")
+    command_lines = [l for l in body.splitlines() if "account-clause-coverage.py" in l]
+    assert command_lines, "analyze MUST name the coverage accountant (C-5)"
+    for line in command_lines:
+        assert "--spec" in line, f"the fixed step MUST pass --spec: {line}"
+        assert "--freeze" not in line, f"the analyze side MUST NOT freeze: {line}"
+    # a fixed step is a numbered workflow step, not an aside
+    assert re.search(r"(?m)^### \d+\..*(?:[Cc]overage|覆盖)", body), (
+        "the accountant MUST be a numbered workflow step"
+    )
+
+
+def test_c5_baseline_missing_is_phase_visible_with_its_remedy():
+    body = ANALYZE_SKILL.read_text(encoding="utf-8")
+    assert "baseline-missing" in body
+    assert re.search(r"/speckit\.tasks", body), (
+        "the remedy for a missing baseline MUST be named"
+    )
+
+
+def test_c3_c5_analyze_command_face_names_checklists_and_the_coverage_step():
+    body = ANALYZE_CMD.read_text(encoding="utf-8")
+    delegation = _section(body, r"## Delegation", r"## ")
+    assert "checklists/" in delegation, (
+        "Delegation Inputs MUST name the checklist surface (C-3)"
+    )
+    assert "account-clause-coverage.py" in delegation, (
+        "Delegation Inputs MUST carry the coverage step (C-5)"
+    )
+
+
+def test_c6_create_tasks_freezes_the_coverage_baseline():
+    body = CREATE_TASKS_SKILL.read_text(encoding="utf-8")
+    m = re.search(r"(?ms)^\*\*Runtime-evidence landing points.*?(?=^## )", body)
+    assert m, "Runtime-evidence landing points section not found"
+    section = m.group(0)
+    assert "coverage-baseline.txt" in section, (
+        "the freeze duty MUST land in Runtime-evidence landing points (C-6)"
+    )
+    assert "--freeze" in section
+    assert "account-clause-coverage.py" in section
+    assert re.search(r"re-freeze|refreeze|重冻", section, re.I), (
+        "the timing MUST be tied to the existing re-freeze timing"
+    )
+    assert re.search(r"skip|跳过", section, re.I), (
+        "a feature without a contract set MUST skip explicitly"
+    )
+    assert re.search(r"空基线|empty baseline", section, re.I), (
+        "the skip MUST NOT fabricate an empty baseline"
+    )
+
+
+def test_c7_both_sides_name_the_accountants_same_default_path(tmp_path):
+    mod = _load()
+    assert mod.BASELINE_NAME == "coverage-baseline.txt"
+    assert mod.BASELINE_NAME in ANALYZE_SKILL.read_text(encoding="utf-8")
+    assert mod.BASELINE_NAME in CREATE_TASKS_SKILL.read_text(encoding="utf-8")
+    # behavioral: a spec without the baseline at the default path is baseline-missing
+    corpus = _corpus(tmp_path)
+    spec = corpus / "001-alpha"
+    payload = _payload([str(spec), "--corpus-root", str(corpus)], expect=2)
+    assert payload["status"] == "baseline-missing"
+    assert not (spec / mod.BASELINE_NAME).exists()

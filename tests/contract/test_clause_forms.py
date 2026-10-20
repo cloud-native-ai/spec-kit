@@ -297,3 +297,82 @@ def test_the_extractor_runs_as_a_script_and_exits_zero(tmp_path):
     )
     assert r.returncode == 0, r.stderr
     assert "C-1" in r.stdout
+
+
+# --------------------------------------------------------------------------- #
+# dual-width reference groups (063 C-1/C-2)
+#
+# The owner document is the normative record (C-1: the extractor MUST NOT be the
+# only place the delimiter set is written down). These tests are the deterministic
+# self-test samples C-2 requires.
+# --------------------------------------------------------------------------- #
+
+OWNER_DEFINITIONS = ROOT / "shared" / "definitions" / "contract-clause-definitions.md"
+
+
+def _rule_2_body() -> str:
+    text = OWNER_DEFINITIONS.read_text(encoding="utf-8")
+    m = re.search(r"(?ms)^2\. \*\*引用组.*?(?=^3\. )", text)
+    assert m, "owner document § 4 rule 2 (citation group) not found"
+    return m.group(0)
+
+
+def test_owner_body_names_both_delimiter_widths_and_same_width_nesting():
+    """C-1: the declaration lives in the owner body, not only in the extractor."""
+    rule = _rule_2_body()
+    for ch in ("(", ")", "（", "）"):
+        assert ch in rule, f"owner § 4 rule 2 MUST name the delimiter {ch!r}"
+    assert re.search(r"同宽|same width|same-width", rule), (
+        "owner § 4 rule 2 MUST state the same-width nesting rule"
+    )
+    assert "嵌套" in rule, "owner § 4 rule 2 MUST keep the one-level nesting rule"
+    assert "畸形组" in rule, "owner § 4 rule 2 MUST name the malformed-group outcome"
+    assert re.search(r"不得静默|MUST NOT silently", rule), (
+        "owner § 4 rule 2 MUST forbid silently counting a malformed group"
+    )
+
+
+def test_a_full_width_group_is_a_reference_group(tmp_path):
+    """C-2 sample 1: one full-width group."""
+    assert ce.parentheticals("（FR-001）") == ["FR-001"]
+    p = tmp_path / "fullwidth.md"
+    p.write_text("**C-1** 规则（FR-001）\n", encoding="utf-8")
+    assert ce.clause_citations(p)["C-1"] == {"FR-001"}
+
+
+def test_same_width_nested_group_is_one_group(tmp_path):
+    """C-2 sample 2: one same-width one-level nested group, both widths."""
+    assert ce.parentheticals("（外层（FR-018）尾部）") == ["外层（FR-018）尾部"]
+    assert ce.parentheticals("(outer (FR-018) tail)") == ["outer (FR-018) tail"]
+    p = tmp_path / "nested-width.md"
+    p.write_text("**C-1** 规则（外层（FR-018）尾部）\n", encoding="utf-8")
+    assert ce.clause_citations(p)["C-1"] == {"FR-018"}
+
+
+def test_cross_width_pairing_is_malformed_never_a_citation(tmp_path):
+    """C-2 sample 3: a cross-width pair is reported as its own outcome and is neither
+    a citation (below) nor a mention (it never reaches the citation-group selector)."""
+    assert ce.parentheticals("(FR-001）") == []
+    malformed = ce.malformed_parentheticals("(FR-001）")
+    assert len(malformed) == 1, malformed
+    assert "FR-001" in malformed[0]
+
+    p = tmp_path / "cross.md"
+    p.write_text("**C-1** 规则 (FR-001）\n", encoding="utf-8")
+    assert ce.clause_citations(p)["C-1"] == set()
+
+
+def test_an_unpaired_delimiter_is_malformed_never_a_citation(tmp_path):
+    """C-2: an unpaired delimiter is malformed in either width."""
+    assert ce.parentheticals("（FR-001") == []
+    assert len(ce.malformed_parentheticals("（FR-001")) == 1
+    p = tmp_path / "unpaired.md"
+    p.write_text("**C-1** 规则 （FR-001\n", encoding="utf-8")
+    assert ce.clause_citations(p)["C-1"] == set()
+
+
+def test_ascii_only_corpus_totals_are_unchanged_by_width_support():
+    """C-2 sample 4: adding width support MUST NOT change an ASCII-only corpus's total."""
+    ascii_text = "a (b) c (d (e) f) g (h)"
+    assert ce.parentheticals(ascii_text) == ["b", "d (e) f", "h"]
+    assert ce.malformed_parentheticals(ascii_text) == []
