@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-feedback-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-21T13:54:29Z"
 summary: "Feedback consume run digested 70 open entries after correcting a default-limit truncation from 5 to 70 via a superseding introspection report. 27 members processed, 43 excluded/ignored, 15 findings ro"
+disposition_reason: "introspection-20261021T160835Z: excluded (governance decision recorded / already backlogged M-01)"
 ---
 
 ## Review

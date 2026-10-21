@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-git-utils-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-21T15:54:58Z"
 summary: "Committed 177 changed files in 4 logical commits and pushed branch 065-loop-interruption-recovery to gitlab (new remote branch, upstream set); working tree clean; pre-push hook passed."
+introspection_ref: "introspection-20261021T160835Z#F-02"
+disposition_reason: "introspection:introspection-20261021T160835Z#F-02"
 ---
 
 ## Review
