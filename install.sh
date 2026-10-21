@@ -10,9 +10,11 @@
 # Ground layer (assumed present, NEVER auto-installed): bash + python3 (with
 # pip) + git + network. Intranet-first: the internal GitLab source is tried
 # first and the only pip index contacted is the one pip is actually
-# configured with; public mirrors (gitee/github) are probed only when the
-# internal source is unreachable, and `uv` is an opt-in accelerator for
-# machines that already have it — never installed here.
+# configured with. Source probing stops at the first reachable source, so a
+# working GitLab costs exactly one probe; public mirrors (gitee/github) are
+# probed only when the internal source is unreachable AND again only if the
+# chosen source fails to install. `uv` is an opt-in accelerator for machines
+# that already have it — never installed here.
 #
 # Exit codes: 0 ok | 2 environment prerequisite missing (python/pip/git/uv)
 # | 3 no viable source x index combination | 5 post-install verification
@@ -101,8 +103,10 @@ specify is already on PATH, the ladder prefers that installation's python
 (upgrade-in-place) to avoid installing a duplicate into an unrelated env.
 
 Ground layer (never auto-installed): bash, python3 with pip, git, network.
-Intranet-first: internal GitLab is tried before public mirrors; the only pip
-index contacted is the one pip is configured with (explicit override wins).
+Intranet-first: internal GitLab is tried before public mirrors, and probing
+stops at the first reachable source (remaining mirrors are probed only if
+the chosen one fails to install); the only pip index contacted is the one
+pip is configured with (explicit override wins).
 EOF
 }
 
@@ -434,10 +438,61 @@ if [ "${INDEX_OK}" != true ]; then
 fi
 
 # ------------------------------------------------------- source selection --
+# Probing is lazy and short-circuited: sources are probed in intranet-first
+# order and probing STOPS at the first reachable one — a healthy GitLab costs
+# exactly one probe. Sources after it stay "skipped" and are probed only on
+# demand if the chosen source fails to install.
 CHOSEN_SOURCE=""
 CHOSEN_LABEL=""
 CHOSEN_INDEX=0
 SOURCE_STATUSES=()
+
+source_host() { # source_host <git+ spec>
+  local host="${1#*://}"
+  printf '%s\n' "${host%%/*}"
+}
+
+choose_source() { # choose_source <start_index (1-based)>
+  # Selects the first usable source at or after <start_index>, probing pending
+  # ones in order and stopping at the first that answers. Returns 1 when no
+  # source is usable. Must NOT run in a subshell: it mutates CHOSEN_*.
+  local start="$1" idx spec status j
+  for ((idx = start; idx <= ${#SOURCE_SPECS[@]}; idx++)); do
+    spec="${SOURCE_SPECS[$((idx - 1))]}"
+    status="${SOURCE_STATUSES[$((idx - 1))]}"
+    if [ "${status}" = "ok" ]; then
+      CHOSEN_SOURCE="${spec}"
+      CHOSEN_LABEL="${SOURCE_SCOPES[$((idx - 1))]}"
+      CHOSEN_INDEX="${idx}"
+      return 0
+    fi
+    if [ "${status}" = "unreachable" ]; then
+      continue
+    fi
+    if [ "${OPT_NO_PROBE}" != true ]; then
+      log_info "Probing source ${idx}/${#SOURCE_SPECS[@]}: $(source_host "${spec}") [${SOURCE_SCOPES[$((idx - 1))]}]"
+      if probe_git_source "${spec}"; then
+        status="ok"
+      else
+        status="unreachable"
+      fi
+    fi
+    SOURCE_STATUSES[$((idx - 1))]="${status}"
+    if [ "${status}" != "unreachable" ]; then
+      CHOSEN_SOURCE="${spec}"
+      CHOSEN_LABEL="${SOURCE_SCOPES[$((idx - 1))]}"
+      CHOSEN_INDEX="${idx}"
+      if [ "${OPT_NO_PROBE}" != true ]; then
+        for ((j = idx + 1; j <= ${#SOURCE_SPECS[@]}; j++)); do
+          [ "${SOURCE_STATUSES[$((j - 1))]}" = "unprobed" ] &&
+            SOURCE_STATUSES[$((j - 1))]="skipped"
+        done
+      fi
+      return 0
+    fi
+  done
+  return 1
+}
 
 case "${SOURCE_MODE}" in
   local-editable)
@@ -449,29 +504,10 @@ case "${SOURCE_MODE}" in
     CHOSEN_LABEL="local directory"
     ;;
   *)
-    i=0
     for spec in "${SOURCE_SPECS[@]}"; do
-      i=$((i + 1))
-      status="ok"
-      if [ "${OPT_NO_PROBE}" != true ]; then
-        host="${spec#*://}"
-        host="${host%%/*}"
-        log_info "Probing source ${i}/${#SOURCE_SPECS[@]}: ${host} [${SOURCE_SCOPES[$((i - 1))]}]"
-        if probe_git_source "${spec}"; then
-          status="ok"
-        else
-          status="unreachable"
-        fi
-      else
-        status="unprobed"
-      fi
-      SOURCE_STATUSES+=("${status}")
-      if [ -z "${CHOSEN_SOURCE}" ] && [ "${status}" != "unreachable" ]; then
-        CHOSEN_SOURCE="${spec}"
-        CHOSEN_LABEL="${SOURCE_SCOPES[$((i - 1))]}"
-        CHOSEN_INDEX="${i}"
-      fi
+      SOURCE_STATUSES+=("unprobed")
     done
+    choose_source 1 || true
     ;;
 esac
 
@@ -536,7 +572,9 @@ print_plan() {
       i=0
       for spec in "${SOURCE_SPECS[@]}"; do
         i=$((i + 1))
-        printf '  %d. %s  [%s]  probe: %s\n' "${i}" "${spec}" "${SOURCE_SCOPES[$((i - 1))]}" "${SOURCE_STATUSES[$((i - 1))]}"
+        status="${SOURCE_STATUSES[$((i - 1))]}"
+        [ "${status}" = "skipped" ] && status="skipped (earlier source reachable)"
+        printf '  %d. %s  [%s]  probe: %s\n' "${i}" "${spec}" "${SOURCE_SCOPES[$((i - 1))]}" "${status}"
       done
       ;;
     single-git)
@@ -589,36 +627,31 @@ else
   log_info "Clean reinstall: removing any previous specify-cli"
   "${PIP_UNINSTALL_CMD[@]}" >/dev/null 2>&1 || true
   log_info "Running: ${PIP_INSTALL_CMD[*]}"
-  if ! "${PIP_INSTALL_CMD[@]}"; then
+  INSTALLED=false
+  if "${PIP_INSTALL_CMD[@]}"; then
+    INSTALLED=true
+  else
     log_warn "pip install failed from: ${CHOSEN_SOURCE}"
     # fall through only when the failed source was from the fallback list
     if [ "${SOURCE_MODE}" != "fallback" ]; then
       die 3 "install failed from the single requested source: ${CHOSEN_SOURCE}"
     fi
-    next=""
-    idx=$((CHOSEN_INDEX))
-    while [ "${idx}" -lt "${#SOURCE_SPECS[@]}" ]; do
-      idx=$((idx + 1))
-      spec="${SOURCE_SPECS[$((idx - 1))]}"
-      if [ "${SOURCE_STATUSES[$((idx - 1))]}" = "unreachable" ]; then
-        continue
-      fi
-      next="${spec}"
-      CHOSEN_INDEX="${idx}"
-      break
-    done
-    if [ -z "${next}" ]; then
-      source_remediation
-      exit 3
-    fi
-    log_warn "Retrying with next reachable source: ${next}"
-    CHOSEN_SOURCE="${next}"
+  fi
+  # Fall back lazily: each remaining source is probed only now, in order,
+  # until one installs or all are exhausted.
+  while [ "${INSTALLED}" = false ] && choose_source $((CHOSEN_INDEX + 1)); do
+    log_warn "Retrying with next reachable source: ${CHOSEN_SOURCE}"
     PIP_INSTALL_CMD=("${PY_BIN}" -m pip install "${INSTALL_ARGS[@]}" "${CHOSEN_SOURCE}")
     log_info "Running: ${PIP_INSTALL_CMD[*]}"
-    if ! "${PIP_INSTALL_CMD[@]}"; then
-      source_remediation
-      exit 3
+    if "${PIP_INSTALL_CMD[@]}"; then
+      INSTALLED=true
+    else
+      log_warn "pip install failed from: ${CHOSEN_SOURCE}"
     fi
+  done
+  if [ "${INSTALLED}" != true ]; then
+    source_remediation
+    exit 3
   fi
   SPECIFY_BIN="${BIN_DIR}/specify"
 fi
