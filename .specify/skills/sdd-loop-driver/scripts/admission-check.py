@@ -37,9 +37,9 @@ SKIP_VALUE = "skipped(fast-lane)"
 SKIP_MARKER = "checklist=" + SKIP_VALUE
 
 ENGINE_PREFIXES = (
-    ".specify/templates/",
+    "templates/",
     "src/",
-    ".specify/scripts/",
+    "scripts/",
     ".specify/templates/commands/",
     "skills/internal/",
 )

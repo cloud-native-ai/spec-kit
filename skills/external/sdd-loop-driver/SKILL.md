@@ -1,6 +1,6 @@
 ---
 name: sdd-loop-driver
-description: 无人值守 SDD 循环驱动手册——以一条一遍性提示词驱动主代理完成「登录环境 → 以 qodercli 为子代理 → 按阶段推进 SDD 完整流程（requirements → clarify → plan → tasks → checklist → analyze → implement → review）→ 合并 main」的完整闭环，全程循环自推进、零用户提醒。当用户说「使用SDD开发模式推动 <项目>」「无人值守推进」「sdd-loop-driver」「需要使用一个循环来完成这项工作，而不是每次由我提醒你重试或继续」时加载本手册。执行细节（断点探测 / 阶段化 prompt 文件 / runner 与派生 / 后台执行+统一监听 / 收尾纪律）全部由本手册承接，入口只声明目标与起点。当以本技能名给出功能/改进描述时，视为 SDD 目标（目标项目可为本技能自身所在仓库），先做 U0/U1 并走阶段链，不得就地改代码或切换为技能维护路径。
+description: 无人值守 SDD 循环驱动手册——以一条一遍性提示词驱动主代理完成「登录环境 → 本地用宿主原生子代理 / 远端用 qodercli 为子代理 → 按阶段推进 SDD 完整流程（requirements → clarify → plan → tasks → checklist → analyze → implement → review）→ 合并 main」的完整闭环，全程循环自推进、零用户提醒。当用户说「使用SDD开发模式推动 <项目>」「无人值守推进」「sdd-loop-driver」「需要使用一个循环来完成这项工作，而不是每次由我提醒你重试或继续」时加载本手册。执行细节（断点探测 / 阶段化 prompt 文件 / runner 与派生 / 后台执行+统一监听 / 收尾纪律）全部由本手册承接，入口只声明目标与起点。当以本技能名给出功能/改进描述时，视为 SDD 目标（目标项目可为本技能自身所在仓库），先做 U0/U1 并走阶段链，不得就地改代码或切换为技能维护路径。
 skill_id: "<SKILL:.specify/skills/sdd-loop-driver/SKILL.md>"
 classification: external
 ---
@@ -34,8 +34,8 @@ classification: external
 
 | 入口缺省 | 解析规则 |
 |----------|----------|
-| 目标项目 | 当前工作目录含 `.specify/` → 当前仓库；否则问一个澄清问题，不猜 |
-| 执行拓扑 | 未给 ssh 别名/run-user/远端路径 → 本地；给全 → 远端 |
+| 目标项目 | 未给路径且未给 host/ssh 别名 → **当前项目**（在 git 仓库内取仓库根；非 git 取会话工作目录；当前工作目录含 `.specify/` 时以其为准）；给了本地路径 → 该路径；远端三元组给全 → 远端 |
+| 执行拓扑 | 未给 ssh 别名/run-user/远端路径 → **本地**（宿主原生子代理；MUST NOT 启动 qodercli）；给全 → 远端（外部 CLI）；只给 host 或三元组不完整 → 问一个澄清问题，不猜 |
 | 终态权威文档 | 入口描述 + 现有 `docs/` + 宪法；写入 U0 状态脊 |
 | 断点 | U1 自动探测，禁止猜测 |
 | 特性切片 | 入口描述；未给则按权威文档推导，不自动选题 |
@@ -58,8 +58,8 @@ classification: external
 ```text
 U0 ENTRY     一遍性入口：目标、线、断点（或"探测"）、终态权威文档
 U1 PROBE     每线：断点探测（git 分支 + 近期提交 + specs 目录 + 终态文档）判定续跑阶段
-U2 DISPATCH  写阶段提示词文件 + runner，后台派发（配方见 references/dispatch-recipes.md）
-U3 WATCH     统一监听：单次调用内长轮询信号（退出记录/哨兵/PID/心跳）至终止判定或窗口到期；窗口到期只返回 RUNNING 并立即重入，只有阶段 deadline 产生 TIMEOUT（见 references/watch-model.md）
+U2 DISPATCH  本地：原生子代理逐阶段派发（同步返回）；远端：写 prompt + runner 后台派发（配方见 references/dispatch-recipes.md）
+U3 WATCH     远端统一监听：单次调用内长轮询信号（退出记录/哨兵/PID/心跳）至终止判定或窗口到期；窗口到期只返回 RUNNING 并立即重入，只有阶段 deadline 产生 TIMEOUT（本地原生调用即等待，不轮询；见 references/watch-model.md）
 U4 VERIFY    独立校验：哨兵（必要）+ 产物核验 + 纪律抽查（充分）→ 通过才续环
 U5 STALL     超时/重试上限/预算触顶 → 停线、状态脊落盘、出上送件（绝不静默等待）
 U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归档清扫，缺省本地合并）+ 一份收尾汇总
@@ -79,8 +79,8 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 2. **独立校验**：阶段完成判定不由执行者自报——校验者不是该阶段执行子代理；哨兵在而产物缺 = 伪完成，判未完成。
 3. **卡死处置**：达重试上限（缺省 2 次）或阶段超时（缺省 90 分钟）→ 停环、落状态脊、出上送件四要素（发现了什么 / 为何吃重 / 已产生的中间产物逐项可定位 / 可选处置）。
 4. **状态脊**：每线状态文件在 U2 派发前、U3 终止判定时、U4 校验后、U5 停线时先写后动；续环与重入只认状态脊，不依赖会话记忆。
-5. **驱动者生命周期**：U3 是当前运行内的有界等待（窗口见 `references/watch-model.md`），驱动者必须存活到全线收束或显式停线上送；独立 `sleep` 回合与「挂监视器后等通知/恢复」均不合法——除非宿主已被探针证明能自动恢复同一运行。确须结束时，唯一合法路径是把状态脊写为 stalled/reentry-required 并显式上报。
-6. **驱动拓扑**：加载者即驱动者，亲自执行 U0–U6；阶段子代理只收三段骨架提示词；反嵌套义务真源在 run-agent 派发治理，本手册于 U2 派发前自检。
+5. **驱动者生命周期**：U3 是当前运行内的有界等待（外部 CLI 用窗口；本地原生以一次同步调用为界，见 `references/watch-model.md`），驱动者必须存活到全线收束或显式停线上送；独立 `sleep` 回合与「挂监视器后等通知/恢复」均不合法——除非宿主已被探针证明能自动恢复同一运行。确须结束时，唯一合法路径是把状态脊写为 stalled/reentry-required 并显式上报。
+6. **驱动拓扑**：加载者即驱动者，亲自执行 U0–U6；阶段子代理只收三段骨架提示词；本地拓扑用宿主原生子代理（MUST NOT 启动 qodercli），远端才用外部 CLI；反嵌套义务真源在 run-agent 派发治理，本手册于 U2 派发前自检。
 7. **流程不可替换**：U0/U1 与阶段计划写出前禁止直接编辑目标仓库；禁止用 improve-skills/create-skills 等维护路径替代 SDD 阶段链（目标为本仓库时同样适用）。唯一例外：入口显式声明「只做技能维护、不走 SDD」。
 
 ## Discipline Defaults
@@ -91,25 +91,25 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 
 七项优化（owner：`references/efficiency-model.md`）：
 
-1. **快车道**：仅入口 `fast-lane=opt-in` 时在 tasks 后按七项机械判据裁决；录取跳过 checklist、保留 analyze/review，判据失效即回退完整链。
-2. **两槽位测试预算**：每线仅 implement 起点 baseline 与 review 后 closure 两次全量；中间与 review 用定向集留证据；槽外全量必须显式例外。
-3. **Plan 只小修**：plan 后下游只允许小修并须 `PLAN-EDIT:` 声明；实质改动按两分支处置；requirements 门内变更按最新锚点 re-baseline。
-4. **进度与脱离**：runner 默认 stream-json，raw + 派生 live log；本地与远端均 nohup 脱离，`--once` 重入只核验不重派。
-5. **大特性拆分门**：plan 入口 >30 FR 或 tasks U4 >40 任务判 `split-required`，拆分后逐切片推进。
-6. **确定性预检**：requirements/plan/tasks 的 U4 先跑 `pre-analyze-check.py`（重复/悬空 ID、blockedBy、计数漂移、死路径），在 analyze 前修复。
-7. **跨特性重叠预检**：clarify U4 运行 `overlap-check.py`，共享交付路径重叠先做归属裁决再派发 plan。
+1. **快车道**：仅入口 `fast-lane=opt-in` 时在 tasks 后按七项机械判据裁决；失效即回退完整链。
+2. **两槽位测试预算**：每线仅 implement 起点与 review 后两次全量，其余用定向集留证。
+3. **Plan 只小修**：`PLAN-EDIT:` 声明；实质改动按两分支处置。
+4. **进度与脱离**：runner 默认 stream-json + live log；本地与远端均脱离，`--once` 只核验不重派。
+5. **大特性拆分门**：plan 入口 >30 FR 或 tasks U4 >40 任务判 `split-required`。
+6. **确定性预检**：requirements/plan/tasks 的 U4 先跑 `pre-analyze-check.py`。
+7. **跨特性重叠预检**：clarify U4 跑 `overlap-check.py`，先裁决归属再派发 plan。
 
 新增脚本与领域细则见 `references/efficiency-model.md` §5–§7 与 References。
 
 ## References
 
-- `references/dispatch-recipes.md` — 五大执行机制：断点探测、阶段化 prompt、runner 与派生、统一监听、收尾；阶段链与哨兵；hook/SSH 窗口；线路登记与消息入口。
-- `references/watch-model.md` — 统一监听模型：信号源、判定状态机、窗口与阶段期限、`pgrep -c` 零匹配陷阱、多线 manifest、宿主适配与自测；归属层与重接线快照（§11）；hook 事件补充、SSH 远程读法与故障矩阵（§12–§13）。
-- `references/stage-prompts.md` — 三段骨架、独立校验、Line/Envelope/Ingress、重接线/orphan/U6、变体、并发隔离与窄读法授权、卡死处置与状态脊。
-- `scripts/watch-target.sh` — 长轮询 watcher 参考实现（单目标/多目标、快照与自测、归属过滤、hook、`--raw-stream`、lease 续租）。
-- `scripts/hook-stop.sh` / `watch-hook.sh` — Stop hook 模板（原子写 done JSON + FIFO）与远端同身份长读（`HOOK_TIMEOUT`）。
-- `scripts/line-registry.py` — Python 3 stdlib-only 引擎：环境级 Registry、原子写/同线锁、信封分类、消息入口、所有权/集成队列、lease/reservation/身份校验。
-- `scripts/decomposition-check.py` / `pre-analyze-check.py` / `overlap-check.py` — 三个确定性门：大特性拆分、跨产物预检、跨特性重叠（规则 owner：efficiency-model §5–§7）。
+- `references/dispatch-recipes.md` — 五大执行机制、阶段链与哨兵、hook/SSH 窗口、线路登记。
+- `references/watch-model.md` — 统一监听模型：信号源、判定状态机、窗口/期限、多线 manifest、hook/SSH 与故障矩阵。
+- `references/stage-prompts.md` — 三段骨架、独立校验、Line/Envelope/Ingress、重接线、变体、并发隔离、卡死处置。
+- `scripts/watch-target.sh` — 长轮询 watcher 参考实现（快照、归属过滤、hook、lease）。
+- `scripts/hook-stop.sh` / `watch-hook.sh` — Stop hook 模板与远端同身份长读。
+- `scripts/line-registry.py` — 环境级 Registry、原子写/同线锁、信封分类、消息入口、集成队列。
+- `scripts/decomposition-check.py` / `pre-analyze-check.py` / `overlap-check.py` — 三个确定性门（owner：efficiency-model §5–§7）。
 
 ## Boundary
 
@@ -124,7 +124,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 本手册是**编排者**：它不自带派发机制，而是委派两个承接技能完成驱动子代理的任务（2026-10-16 委派化裁定）：
 
 - **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 按职责实例化阶段执行实例（一实例一职责）；产出=`.specify/agents/instances/<slug>.agent.md`。
-- **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：以 Execution 拓扑声明（本地/远端）+ 实例引用发起执行；产出=执行结果或可见性三元组；前置检查与失败处置见其 `references/dispatch-preflight.md`。
+- **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：本地拓扑用宿主原生子代理（MUST NOT 启动 qodercli），远端拓扑用外部 CLI；以拓扑声明 + 实例引用发起执行；前置检查与失败处置见其 `references/dispatch-preflight.md`。
 - **编排本体在本手册**：阶段序列（U0–U6）、状态脊、哨兵与独立校验、卡死处置、收尾合并不由承接技能承担（职责切分见 agent-definitions § Driving Subagents via the Three Layers）。
 
 ## Feedback & Probe Points（反馈与探针采集点）

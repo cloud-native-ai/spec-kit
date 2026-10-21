@@ -1,12 +1,12 @@
 # Dispatch Recipes — 五大执行机制命令形态（sdd-loop-driver）
 
-> 本文件是宿主 agent 驱动外部子代理的**操作手册**：全部命令形态自包含可用，不依赖任何框架文档（对撰写底稿的引用仅为溯源注解）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。
+> 本文件是宿主 agent 驱动阶段子代理的**操作手册**：本地拓扑用宿主原生子代理，远端拓扑用外部 agent CLI；全部命令形态自包含可用，不依赖任何框架文档（对撰写底稿的引用仅为溯源注解）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。
 >
 > **委派化声明（2026-10-16 裁定）**：与配方真源 `.specify/shared/workflow/external-dispatch-recipes.md` 同型的机制段已坍缩为引用；本文件保留 **loop-driver 特有差异面**（心跳机制、脱离形态权威落点、阶段链与收尾编排）与对真源的引用——单一事实落点，重复即漂移。
 
 ## Preflight — 前置检查（引用 run-agent 公用承载；U0 与 U1 之间）
 
-> 五族前置检查表与失败处置链已上收至 `.specify/skills/internal/run-agent/references/dispatch-preflight.md`（2026-10-16 上收，本表唯一权威落点在彼处）——检查先于 U1 派发；结论（逐项 ok / fail / uncertain）以**每项 ≤3 行摘要**写入该线状态脊的前置检查段。⑤ fail（`.specify/` 缺失/退化）handoff sdd-project-setup（缺失=install、退化=refresh）的软协同语义随表迁移；①②③ fail 停线上送、④ uncertain 列待补清单的处置链同见该文件。
+> 五族前置检查表与失败处置链已上收至 `skills/internal/run-agent/references/dispatch-preflight.md`（2026-10-16 上收，本表唯一权威落点在彼处）——检查先于 U1 派发；结论（逐项 ok / fail / uncertain）以**每项 ≤3 行摘要**写入该线状态脊的前置检查段。⑤ fail（`.specify/` 缺失/退化）handoff sdd-project-setup（缺失=install、退化=refresh）的软协同语义随表迁移；①②③ fail 停线上送、④ uncertain 列待补清单的处置链同见该文件。
 
 ## Recipe 0 — 断点探测（Breakpoint Probe）
 
@@ -14,15 +14,25 @@
 
 两条本技能纪律保留：三信号与终态权威文档路径一起判定续跑阶段，判定结果写入该线状态脊；必须覆盖收尾场景——review 已完成、只剩合并时直接进入收尾配方（Recipe 4）。
 
+## 本地原生拓扑（默认：入口未给 host+path）
+
+本地拓扑不使用 SSH/`su`，也不启动外部 agent CLI。目标项目按 SKILL.md § U0 缺省解析取**当前项目**；阶段派发直接使用当前宿主 agent 的原生子代理（如 Claude Code `Agent`/`Task`、Qoder CLI 原生 subagent）：
+
+- **派发**：把 `stage-prompts.md` 的三段骨架直接作为原生子代理提示词（上下文较大时可先落一份 brief 文件并让子代理读取）；一阶段一次调用，不写 runner、不建 FIFO/hook。
+- **等待**：原生调用是同步阻塞调用，返回即阶段结束——这次调用本身就是 U3 的等待；不适用 `watch-model.md` 的窗口/心跳/退出记录判定，也不得为它启动 `watch-target.sh`。
+- **状态与校验**：U2 派发前写状态脊；返回后按 U4 独立校验（校验者仍不是执行子代理）。失败/超时按 U5 的重试与上送规则处置——没有后台进程可杀。
+- **多线**：宿主支持并行原生调用时可按线并行；否则串行，一线一状态脊。
+- **边界**：MUST NOT 在本地以 `qodercli` / `claude -p` 等外部 CLI 启动子代理；本文件 Recipe 2–3 的 runner/脱离/统一监听仅用于远端拓扑。宿主没有原生子代理能力时，由驱动者在本会话直接执行阶段命令（单代理形态），仍不得降级到外部 CLI。
+
 ## Recipe 1 — 阶段提示词文件（Stage Prompt File）
 
 每阶段把完整指令经 heredoc 写为远端文件（不内联进命令行）。落盘命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 2——本配方坍缩为引用。
 
-两条本技能纪律保留：提示词三段骨架（背景与权威文档 / 执行要求 / 完成尾标与回传契约）见 `stage-prompts.md`——骨架内容是本技能的编排本体；反嵌套红线义务真源在 run-agent 派发治理（`.specify/skills/internal/run-agent/SKILL.md`），派发前自检涵盖本配方。
+两条本技能纪律保留：提示词三段骨架（背景与权威文档 / 执行要求 / 完成尾标与回传契约）见 `stage-prompts.md`——骨架内容是本技能的编排本体；反嵌套红线义务真源在 run-agent 派发治理（`skills/internal/run-agent/SKILL.md`），派发前自检涵盖本配方。
 
 ## Recipe 2 — Runner 脚本与派生（Runner & Derivation）——**正证据四件套差异面**
 
-基础 runner 形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。**2026-10-20 起，逐阶段 `sed` 派生旧形态被 `.specify/scripts/stage-runner.sh` 取代**（单点可测试、消除每阶段副本漂移）：runner 是参数化单阶段进程，不自行 detach，由 Recipe 3 的 `nohup` 形态启动。旧 `sed` 形态仅作历史注记，MUST NOT 再用于新派发。本技能差异面——**pid / status / log / heartbeat 正证据四件套**（无人值守长跑的完成判定与存活判定都依赖它们；模型见 `watch-model.md` §2）以及 stream 证据对：
+基础 runner 形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。**2026-10-20 起，逐阶段 `sed` 派生旧形态被 `scripts/stage-runner.sh` 取代**（单点可测试、消除每阶段副本漂移）：runner 是参数化单阶段进程，不自行 detach，由 Recipe 3 的 `nohup` 形态启动。旧 `sed` 形态仅作历史注记，MUST NOT 再用于新派发。本技能差异面——**pid / status / log / heartbeat 正证据四件套**（无人值守长跑的完成判定与存活判定都依赖它们；模型见 `watch-model.md` §2）以及 stream 证据对：
 
 ```bash
 bash <skill-dir>/scripts/stage-runner.sh \
@@ -60,9 +70,9 @@ HOOK_EVENT_DIR="$dir" HOOK_STAGE="$stage" HOOK_FIFO="$dir/hook-done-$line-$stage
 ```
 
 - hook 事件只产生 `hook=observed`；退出记录/哨兵仍是权威。正常完成时 hook 缩短等待，API 崩溃时 Stop 不触发、由 status/exit 记录判 FAILED。
-- 模板：`.specify/scripts/hook-stop.sh`；本地/远端模型与故障矩阵见 `watch-model.md` §11–§12。
+- 模板：`scripts/hook-stop.sh`；本地/远端模型与故障矩阵见 `watch-model.md` §11–§12。
 
-## Recipe 3 — 脱离模式派发 + 统一监听（Detached Dispatch & Unified Watch，缺省形态）——**nohup 权威落点**
+## Recipe 3 — 脱离模式派发 + 统一监听（Detached Dispatch & Unified Watch，远端缺省形态）——**nohup 权威落点**
 
 **让子代理在后台自己跑，驱动者用长轮询窗口监听**——派发连接断开不中断子代理，等待期间不消耗模型回合。本形态是 loop-driver 实测独有差异面（analyze H-04 裁定：权威落点在本文件，不迁配方真源）；监听规则本体见 `watch-model.md`，本节只给命令形态：
 
@@ -121,7 +131,7 @@ ssh -o BatchMode=yes <alias> \
 
 - 阶段链固定顺序：`requirements → clarify → plan → tasks → checklist → analyze → implement → review`（2026-10-17 修订：纳入 checklist/analyze 质量门——无人值守循环执行完整版流程，日常手动开发常省略的非必须命令一律必经）；每阶段完成哨兵 = 大写阶段名 + `-DONE`（如 `PLAN-DONE`、`CHECKLIST-DONE`、`ANALYZE-DONE`）。尾标是完成的必要条件，充分条件由独立校验补齐。
 - **U3→U4 接线**：U3 的终止判定决定去向——`DONE` / `INCOMPLETE` 进 U4 独立校验（`INCOMPLETE` 按伪完成处理）；`ANOMALY` / `FAILED` / `DEAD` / `TIMEOUT` / `NO_SIGNAL` 直接进 U5。U4 通过后才派发下一阶段。
-- **快车道裁决点（tasks U4 之后、checklist 派发之前）**：入口携带字面量 `fast-lane=opt-in` 时，驱动在该点调用 `.specify/scripts/admission-check.py`（七判据与接口 owner：`references/efficiency-model.md` §1.2），把 E1 准入记录写入状态脊后再决定下一派发：
+- **快车道裁决点（tasks U4 之后、checklist 派发之前）**：入口携带字面量 `fast-lane=opt-in` 时，驱动在该点调用 `scripts/admission-check.py`（七判据与接口 owner：`references/efficiency-model.md` §1.2），把 E1 准入记录写入状态脊后再决定下一派发：
   - `decision=fast-lane` → 跳过 `checklist`，在状态脊与收尾标记 `checklist=skipped(fast-lane)`，随后派发 `analyze`（快车道保留 analyze 与 review，见 efficiency-model §1.6）；下游 implement/review 提示词携带 `references/stage-prompts.md` 的快车道条件块。
   - `decision=full-chain`（含任一判据 fail 或无法证明）→ 照常派发 `checklist`，完整链不变。
   - **回退序列**：录取后判据失效或后续阶段发现新事实时，写状态脊 `reversion{trigger,evidence,at}` → 回退完整链 → 在适用位置补派 `checklist` → 若 `analyze` 已通过，补派后重过 `analyze` 一次 → 继续完整链；回退不得静默（efficiency-model §1.5）。
@@ -175,7 +185,7 @@ ssh -o BatchMode=yes <alias> \
 
 ## Recipe 6 — 线路登记、归属信封与消息入口（064）
 
-**环境级 Line Registry**：同一 OS 用户一份，缺省 `${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines`，`SPECIFY_LINE_REGISTRY_DIR` 可覆盖；每线一个 `<line_id>.json`，同线更新以 `<line_id>.lock` 排他锁串行化，写入为临时文件 + `fsync` + `os.replace` 原子替换。引擎无框架依赖：`.specify/scripts/line-registry.py`（Python 3 stdlib-only）。
+**环境级 Line Registry**：同一 OS 用户一份，缺省 `${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines`，`SPECIFY_LINE_REGISTRY_DIR` 可覆盖；每线一个 `<line_id>.json`，同线更新以 `<line_id>.lock` 排他锁串行化，写入为临时文件 + `fsync` + `os.replace` 原子替换。引擎无框架依赖：`scripts/line-registry.py`（Python 3 stdlib-only）。
 
 **U0.5 注册（首次派发前）**：
 
@@ -255,12 +265,12 @@ python3 <skill-dir>/scripts/line-registry.py --action ownership-check \
 ### Integration Protocol（单一协调者）
 
 1. `integration-plan`：输入 `state=completed` 且 `merge_ready=true` 的条目 + 各线 `integration_depends_on`；拓扑分层，同层按 `(ready_for_merge_at, line_id)`，重放逐字相同；环 → 显式拒绝。
-2. 逐线序列由可执行执行器完成（`.specify/scripts/integrate-lines.py`；stdout 输出 JSON 摘要，含每线状态与 `archive_calls`/`mirror_calls` 计数）：
+2. 逐线序列由可执行执行器完成（`scripts/integrate-lines.py`；stdout 输出 JSON 摘要，含每线状态与 `archive_calls`/`mirror_calls` 计数）：
 
    ```bash
    python3 <skill-dir>/scripts/integrate-lines.py \
      --repo <repo> --trunk <trunk> --registry <registry> --archive <archive-dir> \
-     [--gate-cmd "<完整质量门命令>"] [--mirror-cmd "python3 .specify/scripts/python/sync-mirrors.py --write ..."] \
+     [--gate-cmd "<完整质量门命令>"] [--mirror-cmd "python3 scripts/python/sync-mirrors.py --write ..."] \
      [--lines <line>[,<line>...]]
    ```
 

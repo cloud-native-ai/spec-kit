@@ -13,6 +13,7 @@ and pin the structural facts the skill's own documents declare:
   C-6 reconcile sequence literal          C-12 docs page content blocks
   C-13 instruction budget convergence path
   C-14 host hook health check wiring
+  C-15 local default + native-subagent carrier rule
 """
 
 import re
@@ -357,3 +358,28 @@ def test_c14_recipes_and_docs_wire_hook_health():
     )
     docs = DOCS_PAGE.read_text(encoding="utf-8")
     assert "hook-health" in docs, "docs page must mention the hook health check"
+
+
+# ---------------------------------------------------------------- C-15
+
+
+def test_c15_local_default_and_native_subagent():
+    text = _skill_text()
+    assert "S0 入口缺省解析" in text, "S0 default-resolution table must exist"
+    assert "当前项目" in text, (
+        "entry without host+path must default to the current project"
+    )
+    assert "原生子代理" in text, (
+        "local topology must name the host's native subagent"
+    )
+    assert "MUST NOT 启动 `qodercli`" in text, (
+        "local topology must forbid launching qodercli as a subagent"
+    )
+    recipes = _recipes_text()
+    assert "本地拓扑" in recipes and "n/a" in recipes, (
+        "S4 recipes must record local-topology inapplicability of preflight ①–③"
+    )
+    docs = DOCS_PAGE.read_text(encoding="utf-8")
+    assert "当前项目" in docs and "原生子代理" in docs, (
+        "docs page must carry the local default and native-subagent rule"
+    )

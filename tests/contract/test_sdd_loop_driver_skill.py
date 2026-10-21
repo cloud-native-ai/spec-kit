@@ -528,3 +528,38 @@ def test_c22_watch_target_hook_selftest():
     assert result.returncode == 0, f"self-test failed:\n{combined[-1200:]}"
     assert "hook-done" in combined, "self-test missing hook-done case"
     assert "hook-fifo" in combined, "self-test missing hook-fifo case"
+
+
+# ---------------------------------------------------------------- C-23
+# 2026-10-21: an entry with no host+path must default to the current
+# project and dispatch to the host's native subagent; qodercli is reserved
+# for the remote topology.
+
+
+def test_c23_local_native_subagent_default():
+    text = _skill_text()
+    fields, _ = _parse_frontmatter(text)
+    assert "当前项目" in text, "no host+path must default to the current project"
+    assert "原生子代理" in text, "local topology must name the native subagent"
+    assert "MUST NOT 启动 qodercli" in text, (
+        "local topology must forbid launching qodercli"
+    )
+    assert "原生子代理" in fields["description"], (
+        "description must describe both carrier forms, not qodercli only"
+    )
+    recipes = _recipes_text()
+    assert "本地原生拓扑" in recipes and "watch-target.sh" in recipes, (
+        "local native dispatch must be documented apart from the external watcher"
+    )
+    prompts = _prompts_text()
+    assert "本地原生" in prompts and "同步阻塞调用" in prompts, (
+        "stage-prompt skeleton must cover native dispatch"
+    )
+    watch = (SKILL_DIR / "references" / "watch-model.md").read_text(encoding="utf-8")
+    assert "本地原生子代理" in watch and "适用边界" in watch, (
+        "watch model must scope itself to external CLI dispatch"
+    )
+    docs = DOCS_PAGE.read_text(encoding="utf-8")
+    assert "当前项目" in docs and "原生子代理" in docs, (
+        "docs page must carry the local default and native-subagent rule"
+    )

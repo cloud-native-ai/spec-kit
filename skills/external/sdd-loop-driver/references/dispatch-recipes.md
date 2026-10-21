@@ -1,6 +1,6 @@
 # Dispatch Recipes — 五大执行机制命令形态（sdd-loop-driver）
 
-> 本文件是宿主 agent 驱动外部子代理的**操作手册**：全部命令形态自包含可用，不依赖任何框架文档（对撰写底稿的引用仅为溯源注解）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。
+> 本文件是宿主 agent 驱动阶段子代理的**操作手册**：本地拓扑用宿主原生子代理，远端拓扑用外部 agent CLI；全部命令形态自包含可用，不依赖任何框架文档（对撰写底稿的引用仅为溯源注解）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。
 >
 > **委派化声明（2026-10-16 裁定）**：与配方真源 `.specify/shared/workflow/external-dispatch-recipes.md` 同型的机制段已坍缩为引用；本文件保留 **loop-driver 特有差异面**（心跳机制、脱离形态权威落点、阶段链与收尾编排）与对真源的引用——单一事实落点，重复即漂移。
 
@@ -13,6 +13,16 @@
 派发前探测目标项目当前所处 SDD 阶段，未声明阶段时**必须探测、禁止猜测**。命令形态（三信号：分支名 / 近期提交 / specs 目录）见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 1——本配方坍缩为引用。
 
 两条本技能纪律保留：三信号与终态权威文档路径一起判定续跑阶段，判定结果写入该线状态脊；必须覆盖收尾场景——review 已完成、只剩合并时直接进入收尾配方（Recipe 4）。
+
+## 本地原生拓扑（默认：入口未给 host+path）
+
+本地拓扑不使用 SSH/`su`，也不启动外部 agent CLI。目标项目按 SKILL.md § U0 缺省解析取**当前项目**；阶段派发直接使用当前宿主 agent 的原生子代理（如 Claude Code `Agent`/`Task`、Qoder CLI 原生 subagent）：
+
+- **派发**：把 `stage-prompts.md` 的三段骨架直接作为原生子代理提示词（上下文较大时可先落一份 brief 文件并让子代理读取）；一阶段一次调用，不写 runner、不建 FIFO/hook。
+- **等待**：原生调用是同步阻塞调用，返回即阶段结束——这次调用本身就是 U3 的等待；不适用 `watch-model.md` 的窗口/心跳/退出记录判定，也不得为它启动 `watch-target.sh`。
+- **状态与校验**：U2 派发前写状态脊；返回后按 U4 独立校验（校验者仍不是执行子代理）。失败/超时按 U5 的重试与上送规则处置——没有后台进程可杀。
+- **多线**：宿主支持并行原生调用时可按线并行；否则串行，一线一状态脊。
+- **边界**：MUST NOT 在本地以 `qodercli` / `claude -p` 等外部 CLI 启动子代理；本文件 Recipe 2–3 的 runner/脱离/统一监听仅用于远端拓扑。宿主没有原生子代理能力时，由驱动者在本会话直接执行阶段命令（单代理形态），仍不得降级到外部 CLI。
 
 ## Recipe 1 — 阶段提示词文件（Stage Prompt File）
 
@@ -62,7 +72,7 @@ HOOK_EVENT_DIR="$dir" HOOK_STAGE="$stage" HOOK_FIFO="$dir/hook-done-$line-$stage
 - hook 事件只产生 `hook=observed`；退出记录/哨兵仍是权威。正常完成时 hook 缩短等待，API 崩溃时 Stop 不触发、由 status/exit 记录判 FAILED。
 - 模板：`scripts/hook-stop.sh`；本地/远端模型与故障矩阵见 `watch-model.md` §11–§12。
 
-## Recipe 3 — 脱离模式派发 + 统一监听（Detached Dispatch & Unified Watch，缺省形态）——**nohup 权威落点**
+## Recipe 3 — 脱离模式派发 + 统一监听（Detached Dispatch & Unified Watch，远端缺省形态）——**nohup 权威落点**
 
 **让子代理在后台自己跑，驱动者用长轮询窗口监听**——派发连接断开不中断子代理，等待期间不消耗模型回合。本形态是 loop-driver 实测独有差异面（analyze H-04 裁定：权威落点在本文件，不迁配方真源）；监听规则本体见 `watch-model.md`，本节只给命令形态：
 

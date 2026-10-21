@@ -10,9 +10,10 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），任�
 
 | 参数 | 取值 | 说明 |
 |------|------|------|
-| 目标项目 | 本地路径，或 `ssh <alias>` + 运行用户 + 项目目录 | 远端形态参数与 sdd-loop-driver 一致 |
-| 模式 | `install`（全新安装）/ `refresh`（刷新既有）/ `verify`（只读核查） | 由 sdd-loop-driver 委派时：缺失=install、退化=refresh |
-| 目标 AI 工具 | qoder / claude / codex / opencode / hermes / copilot | `specify init --ai <tool>` 的取值 |
+| 目标项目 | 本地路径，或 `ssh <alias>` + 运行用户 + 项目目录；**路径与 host 都未给 → 当前项目**（git 根，非 git 仓库取工作目录） | 远端形态参数与 sdd-loop-driver 一致 |
+| 执行拓扑 / 子代理承载 | 无 host → 本地：编排者直执或宿主**原生子代理**（不启动 `qodercli`）；远端三元组给全 → run-agent 派发外部 agent CLI | 只给 host 或三元组不完整 → 问一个澄清问题，不猜 |
+| 模式 | `install`（全新安装）/ `refresh`（刷新既有）/ `verify`（只读核查） | 未给时按 S1 分级：absent=install、degraded/partial=refresh、complete=verify；委派时缺失=install、退化=refresh |
+| 目标 AI 工具 | qoder / claude / codex / opencode / hermes / copilot | 未给时 `all`；`specify init --ai <tool>` 的取值 |
 
 ## 五步循环（S0–S5）
 
@@ -34,6 +35,7 @@ S5 SUGGEST   候选工作清单（未完成 feature / 大改进 feedback / TODO 
 
 - **指令体积预算**：S3 的 `/speckit.instructions` 后读取生成器 `BUDGET` 报告；超预算先走 `manage-instructions` 的 R1/R2，仍超时按 `setup-recipes.md` § S3.4 的 R3 回退外迁 project-filled 大章节；无法收敛时列为 pending（预算上调/拆分章节），不静默转述告警。
 - **宿主 hook 体检**：S4 运行 `scripts/hook-health.py`，检出会在每次工具调用同步阻塞的 hook（工具事件 + `async` 未开 + timeout ≤5s）。普通同步 hook 由 `--fix` 置 `async: true`（写前备份）；带 `_*_managed` 标记或落在自愈遥测路径（AITrace/r2c、yunke、loongsuite、a1）的 vendor hook 会被其 agent 秒级回写，脚本只报告并给出处置选项。退出码 `0` 干净/已修复、`10` 有未解决风险（登记未处理清单）、`2` 参数错误；verify 模式只读。
+- **本地拓扑前置检查**：① SSH、② 运行用户、③ 子代理 CLI 不适用（无 `ssh`/`su`/外部 CLI），逐项记 `n/a`；只核对 ④ LLM 配置与 ⑤ spec-kit 可用性。远端拓扑五族全查。
 
 ## 执行侧可移植性
 
@@ -52,7 +54,7 @@ S5 SUGGEST   候选工作清单（未完成 feature / 大改进 feedback / TODO 
 
 - **前置检查（五族）与失败处置链**：权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`（本技能 S4 引用，不复写）。
 - **通用远端命令形态**：`shared/workflow/external-dispatch-recipes.md`（本技能保留 setup 特有命令：specify init、机制盘点脚本）。
-- **治理命令的子代理派发**：经 run-agent（可选形态——独立运行时编排者亦可亲自执行）。
+- **治理命令的子代理派发**：本地缺省由编排者直执或宿主**原生子代理**承载（不启动 `qodercli`）；远端经 run-agent 派发外部 agent CLI（可选形态——独立运行时编排者亦可亲自执行）。
 - **指令体积预算**：预算常量 owner 是 `scripts/bash/generate-instructions.sh` 的 `INSTRUCTIONS_BUDGET_BYTES`；R1/R2 owner 是 `manage-instructions`；setup 负责触发、验证与 R3 初始化回退。
 
 ## 边界
