@@ -29,7 +29,7 @@
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | 每个设计决定回指 `requirements.md` 的 FR / clarify 裁决；FR-010 的驱动者写入侧按切片映射归 065b，本切片交付读取契约与消费（§Slice Landing Notes）。 |
-| II | Feature-Centric Development | ✅ Pass | 复用 Feature 065、不新建 ID；Draft→Planned 由 `/speckit.plan` 与本阶段指令要求执行，与切片 requirements 的“不得改写注册状态”一句的差异已披露（§Disclosed Deviations）。 |
+| II | Feature-Centric Development | ✅ Pass | 复用 Feature 065、不新建 ID 或注册行；Draft→Planned 由 `/speckit.plan` 按 Feature Integration 拥有，切片 requirements 已同步授权该推进（§Disclosed Deviations）。 |
 | III | Intent-Driven Development | ✅ Pass | `Summary` 先述价值与边界；`research.md` 每条裁决含被否方案与否决理由。 |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | `contracts/` 的 60 条条款先于实现；Testing Strategy 为每个新检查配红先测试、逆样本、AM-01 映射一致性、拒绝信封与归属三态测试（SC-006）。 |
 | V | AI Agent Integration Standards | ✅ Pass | 不触碰 `AGENT_CONFIG` / `_ASSISTANT_TIERS`；无新增 agent CLI、配置键或 provider 面。 |
