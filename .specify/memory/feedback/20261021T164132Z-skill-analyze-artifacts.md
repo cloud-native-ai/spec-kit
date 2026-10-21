@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-21T16:41:32Z"
 summary: "066 analyze gate failed: 2 CRITICAL + 8 HIGH open. The 066 slice is a parallel duplicate of tracked 065a per Feature Index/Detail; derived/completion/action tables lack one owner and are restated acro"
+disposition_reason: "066 archived as historical; active basis 065a; 066 analyze gate not applicable"
 ---
 
 ## Review
