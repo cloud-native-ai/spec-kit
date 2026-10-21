@@ -42,37 +42,25 @@ S2 分两层，**CLI 层先于项目层**：S2-0 python 运行时解析 → S2-1
 
 ### S2-0 Python 运行时解析（CLI 层前置）
 
-specify CLI 依赖环境提供的 Python 运行时，按以下**解析阶梯**确定本次所有 pip/specify 操作绑定的 python，逐级回退：
+> **所有权声明**：python 解析阶梯的**实现本体**已收归 spec-kit 仓根 `install.sh`（单一事实源）；本节只保留技能侧的适用要点，阶梯明细（含 `--python` / `SPECIFY_PYTHON` 优先级）不再在此复述——以 `bash install.sh --help` 与 install.sh 源码为准。
 
-| 级 | 来源 | 判定形式 |
-|----|------|----------|
-| 1 | 项目虚拟环境 | `<project-dir>/.venv/bin/python` 存在且可执行 |
-| 2 | PATH 首个 | `command -v python3` 解析到的第一个（失败再试 `command -v python`） |
-| 3 | 系统已装最新 | 枚举标准 bin 目录（`/usr/bin` `/usr/local/bin` `/opt/homebrew/bin` 等）下已安装的 `python3*`，取版本最高者 |
+要点：
 
-**失败即停**：三级全缺 → **报错退出，绝不自动安装 Python**——缺运行时是环境缺口，自动安装会掩盖环境问题且不可控（fast-fail）。解析成功后以 `<python> -m pip --version` 验证 pip 可用；pip 缺失同样报错退出（不代装）。前置还包括 `git` 可用（安装源均为 git+https）。
-
-选定环境后，可执行文件落在该环境的 bin 目录（venv 情形为 `<project-dir>/.venv/bin/`）——后续 `specify` 调用以该 bin 目录优先（`PATH=<bin>:$PATH` 或全路径调用），不得假设裸 `specify` 一定指向刚安装的环境。
+- 阶梯为 `--python` / `SPECIFY_PYTHON` → `<project-dir>/.venv/bin/python` → **既有安装的 python（upgrade-in-place）** → PATH `python3`（`python`）→ 系统 bin 目录最高版 `python3*`；install.sh 在其**运行目录**（`$PWD`）探测 `.venv`，故远端/本地均应 cd 到目标项目目录后再执行。升级与安装同路（clean reinstall）：无钉死/无 cwd venv 时优先升级既有安装所在环境，避免在无关 python 里装出第二份。
+- **失败即停**：全缺 → 报错退出（exit 2），**绝不自动安装 Python**；pip 缺失同样报错退出（不代装）——缺运行时是环境缺口，自动安装会掩盖环境问题且不可控（fast-fail）。
+- 选定环境后，可执行文件落在该环境的 bin 目录（venv 情形为 `<project-dir>/.venv/bin/`）——后续 `specify` 调用以该 bin 目录优先（`PATH=<bin>:$PATH` 或全路径调用），不得假设裸 `specify` 一定指向刚安装的环境。
 
 ### S2-1 specify CLI 安装（ensure / install 语义）
 
-> 固化来源：cws-lib-bash/scripts/313_specify.sh（2026-10-17 版）。
+> **所有权声明（2026-10-21 起）**：specify CLI 冷启动安装逻辑的**单一事实源**是 spec-kit 仓根 `install.sh`（python 阶梯、内网优先三源回退、pip index 成对预检、uv opt-in、`specify check` 终验、退出码阶梯 0/2/3/5 全部在那里）。本技能与 cws-lib-bash 的 `specify_install` 均为**定位并委托** install.sh 的消费方，不持有任何安装逻辑副本；安装源清单、index 处理的变更只改 install.sh 一处。
 
-- **ensure（幂等门）**：`command -v specify` 在位 → 跳过安装（clean reinstall 仅限入口显式要求升级 CLI 时）。
-- **install（clean reinstall + 三源回退）**：
-  1. 先跑 S2-0 解析 python；
-  2. 清理旧装：`<python> -m pip uninstall -y specify-cli`（包名 `specify-cli`，命令名 `specify`；未安装视为成功，非致命）；
-  3. 按序尝试三个安装源，**网络预检先行、首成功即止**：
-
-| 优先级 | 安装源 | 预检主机 |
-|--------|--------|----------|
-| 1 | `git+https://gitlab.alibaba-inc.com/cloud-native-ai/spec-kit.git@master` | gitlab.alibaba-inc.com |
-| 2 | `git+https://gitee.com/cloud-native-ai/spec-kit.git@master` | gitee.com |
-| 3 | `git+https://github.com/cloud-native-ai/spec-kit.git@master` | github.com |
-
-     每源先做连通性预检（如 `curl -sI --max-time 10 https://<主机>`，不可达跳过该源），可达则 `<python> -m pip install --timeout 20 <源>`；失败/不可达 → 下一源。**三源全败 → 缺口报告并停止**。
-- **验证**：`specify check`（框架自带依赖检查）——失败视为安装未完成：回 S2-1 重装一次，仍败则停止。
-- **远端形态**：以上判定与安装命令整体经 `ssh <alias> "su - <run-user> -c '...'"` 在执行侧运行（占位约定同 S4）；python 解析阶梯同样在执行侧判定。
+- **ensure（幂等门）**：`command -v specify` 在位 → 跳过安装（升级 = 重新执行 install.sh，clean reinstall 语义，阶梯内 upgrade-in-place 级优先既有安装的 python）。
+- **install（委托 install.sh）**：
+  1. 获取 install.sh——本地 spec-kit checkout 直接用（`<spec-kit-checkout>/install.sh`）；无 checkout 时 `git clone --depth 1 <三源之首> /tmp/spec-kit` 后用其根目录 install.sh；
+  2. `cd <project-dir>` 后执行 `bash <install.sh> [args]`——参数直接透传（`--python` 钉阶梯、`--intranet-only` 纯内网、`--index-url` 显式指定、`--dry-run` 只看计划）；
+  3. 退出码契约：`0` 成功 · `2` 缺前置（python/pip/git/uv）· `3` 无可用「源 × index」组合或全源安装失败 · `5` `specify check` 终验失败——非 0 一律视为安装未完成，按码处置不重试盲跑。
+- **验证**：install.sh 内置 `specify check` 终验；独立补验时在选定 bin 目录优先的前提下执行。
+- **远端形态**：以上判定与安装命令整体经 `ssh <alias> "su - <run-user> -c '...'"` 在执行侧运行（占位约定同 S4）；install.sh 与 python 阶梯均在该侧判定与执行。
 
 ### S2-2 项目 init / 刷新
 

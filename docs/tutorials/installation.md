@@ -61,6 +61,37 @@ If you prefer to get the templates without checking for the right tools:
 uvx --from git+https://github.com/github/spec-kit.git specify init <project_name> --ai copilot --ignore-agent-tools
 ```
 
+## Cold-Start Bootstrap: install.sh (intranet-first)
+
+`uvx --from git+https://github.com/...` above assumes public GitHub and a public PyPI are reachable. In intranet environments (internal GitLab, internal PyPI mirror) that path is unavailable — the repo-root `install.sh` is the single owner of cold-start install logic:
+
+```bash
+# Intranet cold start (bash + python3/pip + git assumed present, never auto-installed):
+git clone --depth 1 https://gitlab.alibaba-inc.com/cloud-native-ai/spec-kit.git /tmp/spec-kit
+bash /tmp/spec-kit/install.sh
+
+# Already inside a spec-kit checkout (self-hosting / dev):
+./install.sh --local
+
+# Constrained machine: internal GitLab only, zero public network contact:
+./install.sh --intranet-only
+
+# Preview the full plan (python resolution, index pairing, per-source preflight):
+./install.sh --dry-run
+```
+
+Design contract:
+
+- **Python ladder**: `--python` / `SPECIFY_PYTHON` → `$PWD/.venv/bin/python` → PATH `python3` (`python`) → newest system `python3*`. All levels missing → hard exit (Python is never auto-installed).
+- **Upgrade semantics**: install is a clean reinstall, and the ladder's upgrade-in-place level — between the cwd `.venv` level and PATH — prefers the python of an existing `specify` on PATH, so re-running `install.sh` from any directory upgrades the existing installation instead of installing a duplicate into an unrelated environment. Caller-controlled destination still wins: pin `--python` or run from the project venv's directory (the fleet upgrade workflow).
+- **Source × index pairing**: the pip index actually configured (explicit flag > `PIP_INDEX_URL` > pip config > pypi.org) is probed together with each git source, because dependency resolution always needs the index even when the git source hosts the specify-cli tree itself. The install command pins `--index-url` (and `--trusted-host` for plain-HTTP mirrors) explicitly.
+- **Intranet-first fallback**: internal GitLab → gitee → github; `--intranet-only` drops the public mirrors entirely. Reachability probes are bounded (never hang on a black-holed host); `--no-probe` skips probing.
+- **uv is an opt-in accelerator, never a bootstrap dependency**: `--uv` / `SPECIFY_INSTALLER=uv` requires an existing uv on PATH (exit 2 otherwise, uv is never installed here) and injects the resolved index (`UV_DEFAULT_INDEX` / `UV_INDEX_URL`, plus `UV_INSECURE_HOST` for plain-HTTP mirrors).
+- **Post-install verification**: `specify check` runs before the script reports success; failure is exit 5, not a silent pass.
+- Exit codes: `0` ok · `2` missing prerequisite (python/pip/git/uv) · `3` no viable source × index · `5` verification failed.
+
+Wrapper note: downstream wrappers (e.g. cws-lib-bash `specify_install`) must only **locate or fetch this script and delegate** — resolution ladders, source lists, and index handling live here, single-sourced.
+
 ## Source Stamp (来源标识)
 
 Every `specify init` writes `.specify/source.json` into the target project — the record of **which framework source commit** produced this scaffolding. The commit id is the **sole version identifier** (formal version numbers are deliberately not used):
