@@ -1,0 +1,5 @@
+usage: pre-analyze-check.py [-h] --spec-dir SPEC_DIR
+                            [--stage {requirements,plan,tasks}] [--repo REPO]
+                            [--strict] [--waive CHECK:REL_PATH:LINE]
+                            [--json-out JSON_OUT]
+pre-analyze-check.py: error: argument --stage: invalid choice: 'checklist' (choose from 'requirements', 'plan', 'tasks')

@@ -1,0 +1,17 @@
+file: .specify/specs/065a-state-awareness/checklists/snapshot-contract.md
+items: 37
+sequential: True
+duplicate_ids: False
+under_soft_cap_40: True
+traceable_items: 37 / 37 (100.0%)
+untraceable_ids: []
+prohibited_implementation_prefixes: []
+question_form_items: 37 / 37
+sections: ['## 1. Read-Only Boundary and the `--out` Exception', '## 2. Evidence and Verdict Semantics', '## 3. Interruption Forms and Slice Ownership', '## 4. `--probe` and `not-dispatched`', '## 5. Cross-Artifact Traceability and Slice Boundaries', '## Notes']
+has_purpose: True
+has_created: True
+has_requirements_link: True
+existing_requirements_checklist_unchanged: True
+checklists_git_status_after_commit: ''
+last_commit_for_file: a272a348 docs(065a-state-awareness): add snapshot contract quality checklist
+STRUCTURE_CHECK: PASS

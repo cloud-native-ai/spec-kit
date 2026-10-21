@@ -1,0 +1,1 @@
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=19 waived=0

@@ -34,3 +34,9 @@ All slices allocate the D boundary FRs (FR-038…FR-048) and E boundary FRs (FR-
 ## Re-run
 
 After a split decision, re-run the gate per slice. Do not delete, merge or reorder FRs to evade the ceiling (§5.3.4).
+
+## Dispatch attempt halted (2026-10-21)
+
+A `/speckit.plan` dispatch for the umbrella Feature 065 arrived while this gate was still blocking. The line state spine (`state-spine.md`) records `state: stalled`, `current_stage: plan (not dispatched)` and "Do not dispatch plan for the umbrella"; the gate re-measured `split-required` (`fr_count=52`, ceiling 30, exit 1). The plan stage therefore halted instead of treating its own dispatch as the §5.3.3 confirmation: that would be self-confirmation, not a user/upstream decision.
+
+Draft plan artifacts were produced for review but are **not committed** and MUST NOT be treated as a completed plan. To advance, the user/upstream flow must either (a) confirm the three-slice split (`065a`/`065b`/`065c`) and update the state spine, or (b) record an explicit decision that overrides the decomposition gate in the state spine. Independent review findings against the draft are recorded in `notes/plan-blocked-review.md`; they must be fixed before any plan is landed.

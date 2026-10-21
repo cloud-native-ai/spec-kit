@@ -1,0 +1,36 @@
+file: .specify/specs/065a-state-awareness/requirements.md
+status: error
+  [id-contiguous] fail (27)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+scanned: 328 lines, 31 definition rows, 4 shared strings
+136: id-contiguous: the FR sequence skips FR-013 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-014 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-015 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-016 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-017 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-018 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-019 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-020 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-021 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-022 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-023 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-024 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-025 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-026 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-027 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-028 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-029 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-030 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-031 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-032 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-033 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-034 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-035 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-036 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-037 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-045 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+136: id-contiguous: the FR sequence skips FR-048 — either that row was deleted or it was never written; restore it or renumber the tail so the sequence is gapless
+27 error(s), 0 warning(s)
