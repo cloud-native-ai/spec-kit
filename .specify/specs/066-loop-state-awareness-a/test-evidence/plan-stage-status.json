@@ -1,0 +1,55 @@
+{
+  "stage": "plan",
+  "feature": "066-loop-state-awareness-a",
+  "binding_feature": "065",
+  "checked_at": "2026-10-21T13:00:00Z",
+  "selection_basis": "docs-only plan stage plus the targeted compatibility set",
+  "commands": [
+    {
+      "name": "watch-target-self-test",
+      "command": "bash skills/external/sdd-loop-driver/scripts/watch-target.sh --self-test",
+      "rc": 0,
+      "observed": "SELF-TEST: 38 passed, 0 failed"
+    },
+    {
+      "name": "mirror-pair-check",
+      "command": "python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver",
+      "rc": 0,
+      "observed": "ok skills/external/ == .specify/skills/ (26 files); 0 drift"
+    },
+    {
+      "name": "plan-pre-analyze-check",
+      "command": "python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/066-loop-state-awareness-a --stage plan --repo .",
+      "rc": 0,
+      "observed": "decision=pass errors=0 advisories=37 (expected missing implementation paths plus pre-existing external-clause notes)"
+    },
+    {
+      "name": "targeted-pytest",
+      "command": "/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest -q tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_loop_driver_efficiency.py tests/unit/test_line_registry_engine.py tests/unit/test_decomposition_check.py",
+      "rc": 0,
+      "observed": "108 passed in 27.08s"
+    },
+    {
+      "name": "feature-registry-tests",
+      "command": "/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest -q tests/contract/test_spec_feature_binding_integrity.py tests/contract/test_registry_completeness.py",
+      "rc": 0,
+      "observed": "5 passed in 0.04s"
+    }
+  ],
+  "artifact_counts": {
+    "entities": 12,
+    "validation_rules": 61,
+    "contract_files": 4,
+    "contract_clauses": 92,
+    "quickstart_scenarios": 8,
+    "research_decisions": 20
+  },
+  "not_run": [
+    "Engine snapshot examples: the engine is not implemented in the plan stage; every engine example carries a per-example plan-time disclaimer and premises in quickstart.md.",
+    "Mutation drills: mandatory implementation gate CMP-08; not claimed as executed by this plan."
+  ],
+  "notes": [
+    "The tracked 065a-state-awareness plan/tasks already exist and Feature 065 is already Planned; 066 is the upstream-designated active slice for this run and does not delete or modify 065a.",
+    "No source, mirror, test or docs/ file was changed in this plan stage; the commit covers only the 066 design artifacts plus the Feature registry update."
+  ]
+}

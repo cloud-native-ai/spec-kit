@@ -38,7 +38,7 @@ Slice A does not implement `recover` or `check-spine` execution, does not write 
 | G1 Technical Context | Every field answered from measured code/docs; no unresolved clarification marker | Technical Context above; `research.md` § 0–2 (measured watcher, Registry, carrier and test baselines) | ✅ |
 | G2 Constitution Check | One row per constitution principle, dynamically derived; Fail/Partial justified | 16-row table below, re-checked after Phase 1 | ✅ |
 | G3 Structure & Mirrors | Real directories, every mirror/generated copy listed, verify criterion measured against baseline | Project Structure + Mirror Obligations; baseline 26-file pair, 0 drift | ✅ |
-| G4 Phase 1 Artifacts | data-model, contracts, quickstart and feature-ref landed; counts backfilled from disk | Phase 1 Design Artifacts Summary | ✅ |
+| G4 Phase 1 Artifacts | data-model, contracts, quickstart and feature-ref landed; counts backfilled from disk | Phase 1 Design Artifacts Summary; `test-evidence/plan-stage-status.json` | ✅ |
 
 ## Constitution Check
 
@@ -207,6 +207,7 @@ Counts below were verified against the files on disk after the Phase 1 artifacts
 | Quickstart | [`quickstart.md`](quickstart.md) | 8 scenarios (S1–S8) plus one executed plan-time baseline section; every engine example carries a per-example plan-time disclaimer and premises |
 | Feature reference | [`feature-ref.md`](feature-ref.md) | Feature binding, FR 25/25 and SC 8/8 coverage, deliverable list, cross-feature boundaries |
 | Research | [`research.md`](research.md) | 20 decisions, measured baseline, rejected alternatives, test strategy |
+| Plan-stage evidence | [`test-evidence/plan-stage-status.json`](test-evidence/plan-stage-status.json) | Pre-check, watcher self-test, mirror pair, targeted pytest and feature-registry results; engine examples marked not run at plan time |
 
 **Drift from the Phase 0 expectation**: none. Phase 0 expected 12 entities, four contracts and eight quickstart scenarios; the final counts match. The plan-time baseline was executed with the existing watcher/mirror/pytest commands; engine examples remain non-executable until the implementation lands, as disclosed per example.
 
