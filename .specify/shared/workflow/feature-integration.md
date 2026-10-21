@@ -30,7 +30,7 @@ Each command owns exactly one transition:
 
 | Command | Transition | Notes |
 |---------|-----------|-------|
-| `/speckit.requirements` | (none) → `Draft` or keep existing | Feature binding only |
+| `/speckit.requirements` | (none) → `Draft` or keep existing | Initializes Feature Linkage; binding deferred to `/speckit.clarify` Mode A |
 | `/speckit.plan` | `Draft → Planned` | MUST NOT land `Implemented` |
 | `/speckit.tasks` | Maintain `Planned` | Status unchanged |
 | `/speckit.implement` | `Planned → Implemented` | Requires Pre-Status-Flip Gate |
@@ -49,15 +49,15 @@ Before advancing to `Implemented`:
 6. Void DoD rows and Completion Gate items: a DoD row OR a `## Completion Gate` item whose premise is measurably
    false is **void**, not unmet. It does not block the flip, but it MUST carry cited measurement, an inline annotation
    on the `DoD Status` line (or on the gate item), and prominent surfacing in the wrap-up report. Record the correction
-   where the false premise lives (see `.specify/templates/tasks-template.md` DoD Status). Never report the Definition of Done as
+   where the false premise lives (see `templates/tasks-template.md` DoD Status). Never report the Definition of Done as
    plainly "met" while a void row is folded silently into it
 
-## Feature Binding Rules (requirements phase)
+## Feature Binding Rules (clarify checkpoint)
 
-When `/speckit.requirements` creates a new spec:
+`/speckit.requirements` initializes `Related Feature` with `Need clarification`; `/speckit.clarify` Mode A applies these rules to scan, bind, or create:
 
 1. **Scan for existing Feature**:
-   - Search by context: Scan `.specify/memory/features/*.md` and `.specify/memory/features.md`
+   - Search by context: Scan `memory/features/*.md` and `memory/features.md`
    - Search by ID: Check `SPECIFY_FEATURE` env, git branch name, numeric prefix in BRANCH_NAME
    - **Binding-precedent heuristic**: for each candidate Feature, check its sibling specs (prior spec directories already bound to it, e.g. via its detail file's Related Files/history). A Feature whose siblings repeatedly absorbed similar work is strong evidence for **bind**; a candidate with no topical siblings is evidence for **create**. Surface the precedent when recommending bind-vs-create.
 
@@ -67,7 +67,7 @@ When `/speckit.requirements` creates a new spec:
 
 3. **Integration responsibilities**:
    - Ensure corresponding Feature entry exists
-   - Update `.specify/memory/features.md`: set Status to the transition this command owns (§ Status State Machine — the requirements phase lands `Draft`, never `Planned`), update Spec Path, refresh date
+   - Update `memory/features.md`: set Status to the transition owned by `/speckit.requirements` (§ Status State Machine — the requirements phase lands `Draft`, never `Planned`), update Spec Path, refresh date
    - The index is **hand-maintained**: no script regenerates it, so the `Total Features` header and the rows MUST be edited together in the same pass — a header edited alone, or rows edited without it, leaves the file self-inconsistent while still looking well-formed
    - Never create duplicate Feature IDs
 
