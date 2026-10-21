@@ -50,7 +50,7 @@ ProbeInput ──(a|b)────> EvidenceBundle
 | `recovery_action` | enum | 是 | `none` / `watch` / `verify` / `resume` / `retry` / `stop` |
 | `recovery_reason` | string | 是 | 动作依据（§7.2） |
 | `recovery_decision` | RecoveryDecision | 是 | §7.1；`action`/`reason` 与顶层字段相等 |
-| `false_completion` | bool | 是 | 哨兵存在且任一必需产物缺失/为空；为真时动作为 `retry`（除非 `IA-04` 证据缺口或 `IA-15` 尝试上限改为 `stop`） |
+| `false_completion` | bool | 是 | 哨兵存在且任一必需产物缺失/为空；为真时动作按 `IA-14`（C-46）求值：`STALLED`/`REENTRY_REQUIRED` 为 `stop`，其余为 `retry`（除非 `IA-04` 证据缺口或 `IA-15` 尝试上限改为 `stop`） |
 | `spine` | SpineRecord | 是 | §3.2 |
 | `registry` | RegistryView | 是 | §3.1 |
 | `paths` | object | 是 | `{state_dir, spec_dir, repo, spine, probe}`，未知为 `null` |
@@ -254,7 +254,7 @@ ProbeInput ──(a|b)────> EvidenceBundle
 3. `loop_state` 只能取 `§2.2` 的封闭集；watcher 在时逐字一致。
 4. 任何缺失值只以 `null` 出现；`status`/`value_state` 只取各自封闭集。
 5. 除 `evaluated_at` 外不得输出随当前时间变化的派生数值。
-6. 完成哨兵 = 日志最后非空行 `== <STAGE>-DONE`（owner：FR-004）。`false_completion=true` ⇔ 末行哨兵 ∧ 至少一项必需产物缺失/为空；此时 `recovery_action=retry`，除非 `IA-04` 的证据缺口短路或 `IA-15` 的尝试上限将其改为 `stop`。`false_completion` 与 `artifacts-without-completion` 互斥。
+6. 完成哨兵 = 日志最后非空行 `== <STAGE>-DONE`（owner：FR-004）。`false_completion=true` ⇔ 末行哨兵 ∧ 至少一项必需产物缺失/为空；动作按 `IA-14`（C-46）求值：`STALLED`/`REENTRY_REQUIRED` 为 `stop`，其余为 `retry`，除非 `IA-04` 证据缺口短路或 `IA-15` 尝试上限改为 `stop`。`false_completion` 与 `artifacts-without-completion` 互斥。
 7. `recovery_action=resume` ⇒ 产物齐备 ∧ 日志末行非 `ANOMALY:` ∧（末行哨兵 ∨ salvage 完整记录）∧ `attempt` 已知且未达上限；`loop_state=DONE` 且提交齐备时 MUST 为 `verify`。
 8. `--probe` 模式下所有证据 `evidence_source=probe`，且不得读取本地文件或调用本地 watcher；与本地路径参数同时提供时 exit 2。
 9. 被列入 `stale_signals` 的信号不参与任何求值；065a 不因单纯 stale 改变动作，`stale-unisolated → stop` 由 065c 承接（SA-1）。

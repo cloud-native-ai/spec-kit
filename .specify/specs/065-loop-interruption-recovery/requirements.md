@@ -30,7 +30,7 @@
 
 - **A-1 入口形态**: 新建单一引擎 `loop-state.py`（Python 3 标准库）承载 `snapshot`（只读）、`recover`（默认 dry-run、`--apply` 才变更）与 `check-spine`（只读校验）三个动作，外加 `--self-test`，而不是继续扩充 `line-registry.py`。理由：line-registry 的领域是登记/归属/lease，已近 100 KB；状态感知需要读 spec 产物与 git，且必须保持只读，独立入口更容易被测试与约束。两者共享 Registry/状态脊证据，但不互相替代。
 - **A-2 判定所有权**: watch 域判定仍由 `watch-target.sh` 唯一拥有。`loop-state.py` 只调用 `--once` 或消费调用方提供的 WATCH 快照，绝不重新实现信号优先级与退出码；`loop_state` 在存在活动 target 时逐字等于 watcher 判定。
-- **A-3 两套词表分离**: `loop_state`（快照输出的聚合判定，大写）与 `spine_state`（状态脊文件状态，小写连字符）是两个词表，各自有 owner，不互相替代；快照显式报告二者及 `spine_consistent`。
+- **A-3 两套词表分离**: `loop_state`（快照输出的聚合判定，大写）与 `spine_state`（状态脊文件状态，小写连字符）是两个词表，各自有 owner，不互相替代；快照显式报告二者及嵌套 `spine.consistent`。
 - **A-4 第五信号 watchbeat**: 为检测「已派发但无 watcher」，新增由驱动者写入的 watchbeat 标记（`watchbeat-<line>-<stage>`），每窗口开始/返回各一次原子覆盖。它是驱动者存在证据，不是完成/存活信号，不参与任何 watch 判定；状态脊仍遵守「RUNNING 窗口不写」的既有规则。
 - **A-5 动作集合**: 恢复动作取封闭集 `none / watch / verify / resume / retry / stop`。在输入建议的 `resume / retry / stop` 之外增加 `watch`（继续监听，不重派）、`verify`（进入 U4 独立校验）、`none`（未派发或不适用），以避免把「活着但没人监听」「已完成待校验」误映射到 mutating 动作。
 - **A-6 salvage 有界例外**: 产物齐备但无正向终止证据（无哨兵、非 `exit=0`）时，`resume` 必须由驱动者显式记录 `salvage` 判定（依据 = 产物清单 + 无 `ANOMALY:` 行 + U4 产物/纪律核验）才允许提交；未记录时一律 `retry`。该例外必须出现在 U4 结论与收尾汇总中，不得静默放行。
@@ -43,7 +43,7 @@
 - **A-13 远端拓扑**: 聚合器在证据所在主机以同一执行身份运行，或消费调用方经 ssh 采集的 probe 快照；ssh 不可达记 `stalled(remote-unreachable)`，绝不记 `DEAD`。
 - **A-14 未派发语义**: 尚未派发的线不在本特性判定范围内；快照以 `UNKNOWN` + `reason=not-dispatched` 表达，恢复动作为 `none`。
 - **A-15 Feature 绑定**: 入口已声明特性 ID 065；2026-10-21 `/speckit.clarify` 已新建并绑定 Feature 065（Draft），注册行与 `.specify/memory/features/065.md` 同批落盘；不另开新 ID。
-- **A-16 derived 映射**: 无活动 watcher 时，`loop_state` 由独立、固定优先级的聚合映射表导出，始终标注 `verdict_source=derived`；它不是 watcher 判定状态机的复制，不得声称具有 watcher 判定的语义或退出码。映射与状态脊 `last_verdict` 冲突时只报 `spine_consistent=false`，不静默择一。
+- **A-16 derived 映射**: 无活动 watcher 时，`loop_state` 由独立、固定优先级的聚合映射表导出，始终标注 `verdict_source=derived`；它不是 watcher 判定状态机的复制，不得声称具有 watcher 判定的语义或退出码。映射与状态脊 `last_verdict` 冲突时只报 `spine.consistent=false`，不静默择一。
 - **A-17 引擎 CLI 契约**: 三个动作共享同一 JSON 信封（含 `schema_version`）与退出码阶梯 `0/1/2`；`recover` 仅在 `resume/retry/stop` 且 `--apply` 时写状态脊恢复记录，`watch` 只刷新 watchbeat，`verify/none` 不写任何状态；远端 probe 快照经 `--probe <file>` 输入。
 - **A-18 状态脊机读段**: 使用独立 fence `<!-- loop-state:begin -->` … `<!-- loop-state:end -->` 与 `spine_schema: v1`；状态键使用 `spine_state:` 前缀，MUST NOT 使用裸 `state:` 键，以避免改变 `line-registry.py` 对首个 `state[:=]` 行的既有读取；状态枚举扩展为 `running / retrying / stalled / reentry-required / done`。
 - **A-19 并发恢复锁**: `recover --apply` 对同一线持有独立原子锁；第二个写者等待有界时间后返回 `result=locked`（exit 1），不自动清理疑似 stale lock；显式 `--break-lock` 才把旧锁移动至 `attempts/` 隔离并继续，绝不删除。
@@ -329,7 +329,7 @@
 
 - Q: Feature 065 是新建还是绑定既有 Feature（058）？ → A: 新建 Feature 065 并绑定为 Draft；058/063/064 为被引用 owner，绑定先例（063 绑定 058、064 在 058 之上新建）支持新建；注册行与 `features/065.md` 同批落盘，058 的 Related Specifications 增加反向交叉引用。
 - Q: `loop-state.py` 的动作集合以 A-1 的“两个动作”为准还是包含 FR-021 的 `check-spine`？ → A: 三个动作 `snapshot` / `recover` / `check-spine`，外加 `--self-test`；A-1 与 requirements 会话中的“两个动作”表述被本裁决修正（旧行保留为历史记录）。
-- Q: 无活动 watcher 时 `loop_state` 如何确定性推导，且不与 FR-005 的“不重实现 watcher 状态机”冲突？ → A: derived 映射按 FR-004 的固定优先级（spine stalled/reentry-required → 同名状态；ANOMALY/FAILED/DONE/INCOMPLETE/DEAD/TIMEOUT/NO_SIGNAL/RUNNING/UNKNOWN 按文件证据）求值，始终标注 `verdict_source=derived`，不得声称是 watcher 判定；与 `last_verdict` 冲突时报 `spine_consistent=false`。watchbeat 新鲜度用标记自身 `window=` + `--deadline-grace`，心跳最大年龄用 `--heartbeat-max-age`，两者 owner 均为 `scripts/watch-target.sh`，本规格不复述数值。
+- Q: 无活动 watcher 时 `loop_state` 如何确定性推导，且不与 FR-005 的“不重实现 watcher 状态机”冲突？ → A: derived 映射按 FR-004 的固定优先级（spine stalled/reentry-required → 同名状态；ANOMALY/FAILED/DONE/INCOMPLETE/DEAD/TIMEOUT/NO_SIGNAL/RUNNING/UNKNOWN 按文件证据）求值，始终标注 `verdict_source=derived`，不得声称是 watcher 判定；与 `last_verdict` 冲突时报 `spine.consistent=false`。watchbeat 新鲜度用标记自身 `window=` + `--deadline-grace`，心跳最大年龄用 `--heartbeat-max-age`，两者 owner 均为 `scripts/watch-target.sh`，本规格不复述数值。
 - Q: salvage 判定如何被恢复程序识别？ → A: `recover --action resume --salvage --evidence <ref>` 显式提供；`--salvage` 必须带至少一个可定位证据引用，`--apply` 先写状态脊 `salvage: accepted` / `salvage_evidence` / `salvage_at` 再提交；未提供时动作保持 `retry`，且 `check-spine` 对声称 salvage 但缺证据的记录判失败。
 - Q: 三个动作的 JSON/退出码/并发契约如何统一？ → A: 所有 JSON 输出带 `schema_version`；退出码统一为 0（求值/应用成功，含 `action=stop` 与 `already-applied`）/1（`check-spine` 失败、apply 被拒或失败、并发锁 `locked`）/2（参数或输入错误）；`recover --apply` 只对 `resume/retry/stop` 先写状态脊恢复记录，`watch` 只刷新 watchbeat，`verify/none` 不写状态；同线并发由独立原子锁串行化，后者返回 `locked`，只有显式 `--break-lock` 才把旧锁移入 [[STR-005]] 隔离。
 

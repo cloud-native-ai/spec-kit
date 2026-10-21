@@ -66,7 +66,7 @@
 ## 7. 判定与动作
 
 - **C-30**: `loop_state` MUST 取自封闭集 `RUNNING / DONE / INCOMPLETE / ANOMALY / FAILED / DEAD / TIMEOUT / NO_SIGNAL / STALLED / REENTRY_REQUIRED / UNKNOWN`；`recovery_action` MUST 取自 `none / watch / verify / resume / retry / stop`。优先级与门见 `interruption-and-action.md`；`recovery_decision` 与顶层动作字段 MUST 一致。 (FR-004, FR-009)
-- **C-31**: `false_completion=true` 当且仅当哨兵存在（按 `requirements.md` FR-004，哨兵 = 日志最后非空行 `== <STAGE>-DONE`）且任一必需产物缺失或为空；此时 `recovery_action` MUST 为 `retry`，除非 `IA-04` 的证据缺口短路判为 `stop`，或 `IA-15` 的尝试上限把它升级为 `stop`；MUST NOT 建议 `resume`。`false_completion` 与 `artifacts-without-completion` 是互斥的两侧（见 `IA-10`），MUST NOT 同时为真。 (FR-007, FR-051)
+- **C-31**: `false_completion=true` 当且仅当哨兵存在（按 `requirements.md` FR-004，哨兵 = 日志最后非空行 `== <STAGE>-DONE`）且任一必需产物缺失或为空；此时 `recovery_action` 按 `IA-14`（C-46）求值：`STALLED`/`REENTRY_REQUIRED` 为 `stop`（行 11），其余为 `retry`，除非 `IA-04` 证据缺口短路或 `IA-15` 尝试上限改为 `stop`；MUST NOT 建议 `resume`。`false_completion` 与 `artifacts-without-completion` 是互斥的两侧（见 `IA-10`），MUST NOT 同时为真。 (FR-007, FR-051)
 - **C-32**: 相同输入两次运行，除 `evaluated_at` 外所有字段 MUST 逐字相等。输出 MUST NOT 包含 `age_seconds`、剩余时间或其他随调用时刻变化的派生数值；只输出原始 `at`/`mtime_ns` 与布尔判定。`evaluated_at` MUST 为 ISO-8601 UTC。 (FR-001, SC-002)
 
 ## 8. 规范示例

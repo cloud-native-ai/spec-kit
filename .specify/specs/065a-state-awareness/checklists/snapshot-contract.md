@@ -42,6 +42,7 @@
 - [ ] CHK019 - Is `check-spine` assigned to exactly one downstream slice? feature-ref §2 and plan.md assign 065b, the current execution directive groups it with 065c, and LS-02's `owner=065b|065c` leaves the per-action pairing implicit. [Conflict, LS-02, feature-ref §2, plan.md]
 - [ ] CHK020 - Is the salvage-gate mutation drill correctly scoped? 065a evaluates the salvage gate (IA-16), but FR-046's drill deferral sends the salvage drill to 065c. [Consistency, FR-046, IA-16, T026]
 - [ ] CHK021 - Is the parent C-area action rule for `stale-signal` (stale and cannot isolate → stop) represented, deferred, or explicitly excluded in 065a's read-only action matrix? [Gap, IA-14, SA-1, FR-009]
+  - CHK021 disposition: covered-by requirements.md SA-1 (stale-signal isolation/stop execution deferred to 065c; 065a only emits stale_signals/interruptions)
 - [ ] CHK022 - Is `unwatched` defined as "no fresh watchbeat" even when a watcher verdict is present, and is that distinct from watcher-unavailable? [Ambiguity, FR-010, FR-011, IA-08]
 
 ## 4. `--probe` and `not-dispatched`
@@ -53,13 +54,17 @@
 - [ ] CHK027 - Does an explicit `--stage` count as dispatch evidence for `not-dispatched`, or is it intent only? IA-03 lists a Registry `stage` but not `--stage`. [Ambiguity, IA-03, LS-07]
 - [ ] CHK028 - Is the `missing` vs `na` status mapping specified for a never-dispatched line (four-piece, watchbeat, artifacts, commits) versus a dispatched line with absent files? [Ambiguity, FR-003, IA-03, SN-03]
 - [ ] CHK029 - Is the stage-resolution source order complete? Registry is the only stage source after `--stage`, so the "Registry missing but spine/four-piece readable" edge case cannot locate stage-scoped evidence without guessing. [Gap, FR-002, Edge Cases, LS-07]
+  - CHK029 disposition: covered-by contracts/loop-state-cli.md C-7 and contracts/interruption-and-action.md C-35/C-36 (--stage → Registry; both absent → stage=null/unknown; Registry missing continues evaluation; dispatched-with-missing-spine → stop)
 
 ## 5. Cross-Artifact Traceability and Slice Boundaries
 
 - [ ] CHK030 - Is there an explicit traceability chain from every contract clause (LS/SN/IA/AM) and every sliced FR/SC to tasks/tests, beyond DoD-3's assertion that each clause has a landing? [Traceability, Gap, FR-012, FR-046, AM-01, DoD-3, tasks.md §Requirement Coverage Map]
+  - CHK030 disposition: covered-by tasks.md §Requirement Coverage Map + coverage-baseline.txt (accountant: claimed clauses 60, FR 25/25, baseline 495)
 - [ ] CHK031 - Is the plan-stage artifact set (AM-02/AM-03) traceable to both the U4 owner list and the plan-owned set, including the conditional `research.md`? [Traceability, FR-006, AM-03, efficiency-model §3.1]
 - [ ] CHK032 - Does the checklist-stage mapping encode U4's "newly added checklist file" requirement, or can a pre-existing `checklists/` directory satisfy completeness? [Gap, FR-006, AM-02, AM-05]
+  - CHK032 disposition: covered-by contracts/stage-artifact-map.md C-54 (checklist requires a file added/modified since stage_base_commit; pre-existing files do not count)
 - [ ] CHK033 - Is "提交齐备" in IA-14 row 5 defined for `commit_required=false` and an unknown commit baseline, so a DONE analyze stage maps to `verify` rather than falling through? [Gap, IA-14, AM-04, AM-08, AM-10]
+  - CHK033 disposition: covered-by contracts/interruption-and-action.md C-46 rows 5/6 and contracts/stage-artifact-map.md C-57 (commit_required=false → verify; unknown baseline → verify only for DONE)
 - [ ] CHK034 - Is FR-010's driver write-side deferral to 065b stated in the requirements themselves, not only in plan §Slice Landing Notes, so the slice is not judged incomplete for an unimplemented write obligation? [Traceability, FR-010, plan.md]
 - [ ] CHK035 - Is the `recover`/`check-spine` refusal envelope's `owner` field unambiguous (one owner per action) and consistent with the slice allocation? [Consistency, LS-02, feature-ref §2]
 - [ ] CHK036 - Is the Feature 065 registry-status rule consistent? requirements §Related Feature forbids rewriting the registered status, while plan §Disclosed Deviations and feature-ref §1 record a Draft→Planned transition. [Conflict, requirements §Related Feature, plan.md, feature-ref §1]

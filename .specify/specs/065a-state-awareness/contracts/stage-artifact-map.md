@@ -45,7 +45,7 @@
 ## 3. 完整性
 
 - **C-54**: 产物完整性 MUST 只由“文件存在且非空”判定；目录类产物（`contracts/`、`checklists/`）MUST 要求目录存在且至少含一个非空文件。`checklist` 阶段另 MUST 要求存在自 `stage_base_commit` 起新增或修改的 checklist 文件；仅有预先存在的 checklist 文件 MUST NOT 判完整。`stage_base_commit` 未知时 MUST 记 `artifacts.complete=null`、`artifacts.value_state=unknown`（按 `C-57`，不猜完整），并 MUST NOT 计入 `false_completion`——不可判不等于不完整。MUST NOT 从日志文本、时间或提交推断内容完整性。 (FR-006, FR-007, FR-008)
-- **C-55**: 缺少必需产物或产物为空时 MUST 进入 `missing_artifacts[]`，且 `artifacts.complete=false`。末行哨兵存在而此项非空时 MUST 置 `false_completion=true`（`C-42`）。 (FR-007, FR-051)
+- **C-55**: 缺少必需产物或产物为空时 MUST 进入 `missing_artifacts[]`，且 `artifacts.complete=false`。末行哨兵存在而此项非空时 MUST 置 `false_completion=true`（`C-42`）。`stage_base_commit` 未知时本条不适用：按 `C-54` 记 `complete=null`/`value_state=unknown`，不得据缺件改判 `false_completion`。 (FR-007, FR-051)
 - **C-56**: `stage` 未知时产物映射不可建立：spec 路径可读 → `artifacts.status=present`、`value_state=unknown`；spec 路径不可读 → `status=missing`、`value_state=na`；两种情形均 `complete=null`。MUST NOT 用其它阶段的产物顶替。 (FR-003, FR-006)
 
 ## 4. 提交证据

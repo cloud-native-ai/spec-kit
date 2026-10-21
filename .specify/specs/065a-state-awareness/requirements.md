@@ -185,7 +185,7 @@
 | FR-040 | [#FR-040](../065-loop-interruption-recovery/requirements.md) | 逐字沿用 |
 | FR-041 | [#FR-041](../065-loop-interruption-recovery/requirements.md) | 逐字沿用 |
 | FR-042 | [#FR-042](../065-loop-interruption-recovery/requirements.md) | 逐字沿用 |
-| FR-043 | [#FR-043](../065-loop-interruption-recovery/requirements.md) | 逐字沿用 |
+| FR-043 | [#FR-043](../065-loop-interruption-recovery/requirements.md) | 065a 仅引用 owner reference 的镜像；2026-10-21 analyze 修复：derived 表 owner 归 FR-004，FR-043 不拥有该表（见 FR-004 行） |
 | FR-044 | [#FR-044](../065-loop-interruption-recovery/requirements.md) | 065a 落地状态感知/入口文档；恢复动作与 watchbeat 章节由 065b/065c 在同一 FR 下补齐 |
 | FR-046 | [#FR-046](../065-loop-interruption-recovery/requirements.md) | 065a 对「无 watcher 检测」执行变异演练，并覆盖本切片全部新增检查的逆样本；「旧信号隔离」「salvage 门」的变异演练由 065c 承接 |
 | FR-047 | [#FR-047](../065-loop-interruption-recovery/requirements.md) | 逐字沿用 |
