@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "061-subagent-cli-config"
 feature_id: "061"
+disposition: "ignored"
 partial: false
 created: "2026-10-18T00:29:21Z"
 summary: "Clarify-artifact execution for Feature 061 (Mode A): taxonomy scan identified the Feature Linkage placeholder and five deferred-by-assumption decisions; the closed-question loop was run unattended wit"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

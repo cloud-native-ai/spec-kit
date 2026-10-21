@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-instructions-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-19T16:45:39Z"
 summary: "063 C-12 live leg via /speckit.instructions (user adjudication): live .specify/instructions.md ID Register converged with REC- (single-line, +28 B, section now byte-identical to rendered template); pr"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

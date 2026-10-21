@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "062-humanize-command"
 feature_id: "062"
+disposition: "processed"
 partial: false
 created: "2026-10-19T10:38:09Z"
 summary: "implement 062（attempt 2，续跑 T031–T033）：33/33 任务全 [X]、0 deferred；quickstart S1–S8 全部实跑并留痕 notes/quickstart-run.md（S5b clause_blocks tuple 解包修复后 covered 29 / missing NONE）；SC-001..SC-011 全部 pass；validate"
+introspection_ref: "introspection-20261021T133447Z#F-16"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-16"
 ---
 
 ## Review

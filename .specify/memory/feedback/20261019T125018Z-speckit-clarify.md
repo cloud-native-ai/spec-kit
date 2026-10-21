@@ -8,9 +8,11 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "063-review-p1-governance"
+disposition: "ignored"
 partial: false
 created: "2026-10-19T12:50:18Z"
 summary: "063-review-p1-governance clarify: Mode A scan 12 类(4 Partial/Missing→3 问自裁决);Feature 063 新建并登记(索引行+详情+062 反向交叉引用);FR-006/FR-008 机制 owner 落点回写;畸形组裁定维持;validator exit 0。一处就地纠正:Assumptions 标题「花括号」→「括号」笔误"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

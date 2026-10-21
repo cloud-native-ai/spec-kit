@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-16T06:14:43Z"
 summary: "pass — SDD process review completed for 059; friction: AVAILABLE_DOCS omitted implement-time evidence (notes/, baseline-failed.txt), workaround = manual directory walk; improvement targets recorded as"
+introspection_ref: "introspection-20261021T133447Z#F-09"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-09"
 ---
 
 ## Review

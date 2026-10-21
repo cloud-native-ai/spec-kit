@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-19T14:00:16Z"
 summary: "063 analyze completed read-only: CRITICAL=0/HIGH=0, 5 MEDIUM + 3 LOW findings (top: tasks.md [P] count 25 vs actual 24 with T002 listed parallel but marked non-parallel; SC-001 comparison-object ambig"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

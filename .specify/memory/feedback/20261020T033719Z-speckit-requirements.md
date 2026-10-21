@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "064-subagent-concurrency"
+disposition: "processed"
 partial: false
 created: "2026-10-20T03:37:19Z"
 summary: "为 Feature 064 创建 requirements.md 与质量检查单：读取 brief、宪法、sdd-loop-driver/run-agent 机制文档与 063 在途契约，写出 5 个用户故事、68 条 FR、10 条 SC、4 条 Shared Strings；validator 首轮 1 处 Shared Strings 反向引用失败（SC-003 未以 [[STR-002]] "
+introspection_ref: "introspection-20261021T133447Z#F-12"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-12"
 ---
 
 ## Review

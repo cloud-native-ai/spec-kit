@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-19T19:06:39Z"
 summary: "REVIEW stage complete: report landed 708b1ab5; P0=1 (Step-2 gate silent skip, CONFIRM by independent validator) / P1=3 / P2=5; REC-063-01..10 registered same-commit"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

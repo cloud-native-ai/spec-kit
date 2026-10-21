@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-10-16T06:15:18Z"
 summary: "pass — internal skill executed inline under /speckit.review; no standalone friction"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

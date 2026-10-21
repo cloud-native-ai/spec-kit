@@ -8,9 +8,11 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "062-humanize-command"
+disposition: "ignored"
 partial: false
 created: "2026-10-19T07:20:38Z"
 summary: "Clarify stage for 062-humanize-command completed: Related Feature bound to new Feature 062 (registry row Draft + detail file landed, Total Features 60→61), skill classification ratified external per g"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-manage-feedback-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-15T09:08:16Z"
 summary: "Path A batch 5:5 包 77 条 + 本地 33,4 并行只读核验 159 点,自省 11 问题 confirmed,33 条 processed,34 backlog 行,收料清空,孤儿保留副本。披露 3 处就地修复:①A5 的 rm 别名交互化静默拒删(教训 § 五 rm 变体的活体第二次观察,该类缺陷本轮已路由 improve-docs 行 20);②introspect-re"
+introspection_ref: "introspection-20261021T133447Z#F-10"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-10"
 ---
 
 ## Review

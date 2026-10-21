@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "062-humanize-command"
 feature_id: "062"
+disposition: "ignored"
 partial: false
 created: "2026-10-19T08:35:18Z"
 summary: "CLARIFY repair round 1（analyze 门 HIGH=2 回环）落位：H-01→FR-029/SC-011（提示注入防线），H-02→FR-013/SC-003 主语言判定规则；B-01 调用语法落 FR-015/FR-018（新增 STR-004）；U-01..U-07、F-01/F-02、L-01..L-03 裁定并入 FR-008/FR-011/FR-019/FR-02"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

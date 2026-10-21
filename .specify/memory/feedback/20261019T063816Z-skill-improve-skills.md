@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-improve-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-10-19T06:38:16Z"
 summary: "统一监听模型落地（目标 skill: sdd-loop-driver）：长轮询窗口替代固定 cadence 空等；完成判定改为正证据（退出记录/哨兵/PID/心跳）；修复 pgrep -c 零匹配加 || echo 0 造成 clarify 已完成却误判超时的缺陷；新增 watch-target.sh（16 项自测 + 端到端 mock 验证）。"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

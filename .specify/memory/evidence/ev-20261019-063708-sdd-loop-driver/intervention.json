@@ -1,0 +1,9 @@
+{
+  "targetFinding": "user-directive:no-host-path-defaults-local-native",
+  "change": "sdd-loop-driver U0 now defaults an entry with no host+path to the current project; local topology dispatches to the host's native subagent (or orchestrator-direct) and MUST NOT launch qodercli; U2/U3 split native synchronous wait vs remote external runner/watcher; HR6, delegation, dispatch-recipes, watch-model, stage-prompts, docs, and contract test C-23 wired.",
+  "baselineRunId": "ev-20261019-063708-sdd-loop-driver",
+  "expectedSignal": {
+    "signalKey": "local_native_subagent_carrier",
+    "direction": "improve"
+  }
+}

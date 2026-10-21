@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-16T12:29:11Z"
 summary: "analyze 060: 三检测器(scope a/b/c 互不相交)+双验证者(与检测者不相交)完成;11+8+5 原始发现去重为 17 行,验证波 7 发=5 confirm+2 downgrade(MEDIUM: C-35 簿记级/义务枚举嵌套超集)+0 reject,降级率 29%;两 CRITICAL 均为治理面:XIV 被本特性自身违反(计数手写 7 处+修复方向错)+Total Fe"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

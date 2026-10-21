@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "063-review-p1-governance"
 feature_id: "063"
+disposition: "processed"
 partial: false
 created: "2026-10-19T13:40:09Z"
 summary: "Created checklists/requirements-quality.md with 40 decidable requirement-quality items (CHK001-CHK040, 8 groups, 100% traceable). Surfaced 12 substantive requirements-quality issues: FR-022 baseline s"
+introspection_ref: "introspection-20261021T133447Z#F-07"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-07"
 ---
 
 ## Review

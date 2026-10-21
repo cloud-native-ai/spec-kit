@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "061-subagent-cli-config"
 feature_id: "061"
+disposition: "ignored"
 partial: false
 created: "2026-10-18T00:29:12Z"
 summary: "Clarify run for Feature 061 (Mode A): resolved the Related Feature placeholder and five deferred-by-assumption decisions (new Feature 061 binding, engine-name lock, explicit-override field set, whole-"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-20T13:04:50Z"
 summary: "# Specification-Driven Development (SDD) Process Review Report: 063-sdd-loop-efficiency"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

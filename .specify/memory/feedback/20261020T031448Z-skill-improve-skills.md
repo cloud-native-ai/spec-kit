@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-improve-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-20T03:14:48Z"
 summary: "improve-skills sdd-project-setup: instruction budget overrun addressed via S3 trigger + S3.4 R3 fallback; evidence ev-018; docs/tests/mirrors green; cross-skill R3 ownership noted."
+introspection_ref: "introspection-20261021T133447Z#F-14"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-14"
 ---
 
 ## Review

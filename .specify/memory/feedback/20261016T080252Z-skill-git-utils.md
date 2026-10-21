@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-git-utils-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-10-16T08:02:52Z"
 summary: "定向收敛(操作E): fetch gitlab + merge 059系12提交(零冲突) + push gitlab master(1d085be9..5e8a66f7) + 用户裁决只推gitlab。异常披露: 合并后注册表更新致sdd-project-setup编译块旧指纹漂移(已重编译+镜像同步+专提5e8a66f7); 工作树出现他session在途的宪法XV模板改动(未纳入提交未推送)"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

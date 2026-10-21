@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "061-subagent-cli-config"
 feature_id: "061"
+disposition: "processed"
 partial: false
 created: "2026-10-18T03:40:58Z"
 summary: "061 SDD process review completed: 20 findings (P0=0, P1=10, P2=10); three P0 candidates independently validated and all downgraded to P1. Report: .specify/specs/061-subagent-cli-config/review.md. Dete"
+introspection_ref: "introspection-20261021T133447Z#F-05"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-05"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "063-sdd-loop-efficiency"
 feature_id: "058"
+disposition: "processed"
 partial: false
 created: "2026-10-19T16:40:49Z"
 summary: "Mode A clarify on 063: bound the spec to Feature 058 as an evolution (no status regression), froze the medium-band thresholds, defined the fast-lane opt-in literal, scoped the test budget per run line"
+introspection_ref: "introspection-20261021T133447Z#F-15"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-15"
 ---
 
 ## Review

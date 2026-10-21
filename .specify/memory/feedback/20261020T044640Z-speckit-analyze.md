@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "064-subagent-concurrency"
 feature_id: "064"
+disposition: "ignored"
 partial: false
 created: "2026-10-20T04:46:40Z"
 summary: "064 analyze completed read-only: 30 findings (0 CRITICAL / 3 HIGH / 25 MEDIUM / 2 LOW); 24 checklist FAILs adjudicated; validation wave 3 confirm / 5 downgrade / 0 reject; no artifact commit, no push."
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

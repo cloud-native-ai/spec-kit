@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-improve-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-10-19T06:38:37Z"
 summary: "旁路发现（不影响本次统一监听改进）：sdd-loop-driver 的 SKILL.md 内嵌 Wrap-up 调用 feedback-utils --unit-id skill:sdd-loop-driver，但 probe-definitions 中没有该 unit 的 probe object，执行即报 no probe object for unit。需注册该 unit 或在不可注册时不生"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

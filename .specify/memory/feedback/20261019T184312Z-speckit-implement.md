@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-19T18:43:12Z"
 summary: "attempt-2 续跑完成 063 implement：51/51 [X]，SC 14/14，GATE 7 PASS + GATE-5 void 附实测；全量 21 failed/4089 passed 0 NEW。"
+introspection_ref: "introspection-20261021T133447Z#F-03"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-03"
 ---
 
 ## Review

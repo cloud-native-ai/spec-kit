@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "064-subagent-concurrency"
 feature_id: "064"
+disposition: "ignored"
 partial: false
 created: "2026-10-20T04:36:44Z"
 summary: "064 checklist run created checklists/concurrency.md (40 items: 16 pass / 24 fail); validate-requirements and validate-tasks both exit 0; 24 requirement-quality findings are recorded and handed to anal"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

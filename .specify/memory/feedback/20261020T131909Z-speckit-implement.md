@@ -8,9 +8,11 @@ probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "063-sdd-loop-efficiency"
+disposition: "ignored"
 partial: false
 created: "2026-10-20T13:19:09Z"
 summary: "Post-review repair of 063-sdd-loop-efficiency. Fixed P0 F1 (audit denominator), P1 F2 (closure pending rules), P1 F3/F7 (dispatch observability + durable evidence) and P1 F6 (watcher determinism). The"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

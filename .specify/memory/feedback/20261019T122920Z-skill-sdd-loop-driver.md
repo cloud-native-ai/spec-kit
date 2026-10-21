@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-sdd-loop-driver-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-10-19T12:29:20Z"
 summary: "062 humanize SDD loop complete; monitoring hook/SSH improvements landed; probe object registered to close the feedback landing gap."
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

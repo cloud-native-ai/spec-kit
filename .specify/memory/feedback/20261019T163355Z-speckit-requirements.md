@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "063-sdd-loop-efficiency"
+disposition: "processed"
 partial: false
 created: "2026-10-19T16:33:55Z"
 summary: "Requirements stage for 063-sdd-loop-efficiency completed: branch and spec scaffolded, the optimization brief archived as a dated record, requirements.md filled with 43 FRs / 13 SCs / 5 shared strings,"
+introspection_ref: "introspection-20261021T133447Z#F-12"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-12"
 ---
 
 ## Review

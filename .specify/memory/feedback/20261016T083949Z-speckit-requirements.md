@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-16T08:39:49Z"
 summary: "需求规格 060-decompose-subagent-dispatch 一次成稿:四故事(创建面/派发面/委派化/证据回流)+15 FR+6 SC+6 STR;校验器首轮7处[[STR-NNN]]反向引用失败(Consumed-by声明与FR实际引用不符)——属撰写疏漏非判据缺陷,两轮修复后exit 0;checklist一次全绿(in-session先行裁决合规路径)。概念真源(agent-d"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-improve-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-10-19T06:50:41Z"
 summary: "修复 sdd-loop-driver 的路由缺陷：以技能名加功能描述加载时曾被误路由到 improve-skills 并直接改代码，跳过 U0–U6。新增触发语义、主导流程唯一、U0 缺省解析、U0.5 自检、HR7 流程不可替换与常见误路由表；fresh-context 只读子代理复测确认第一步为 U0 声明且禁止 improve-skills 直接编辑。"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

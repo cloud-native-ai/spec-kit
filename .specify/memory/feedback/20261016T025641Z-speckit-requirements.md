@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "059-exec-quant-recording"
+disposition: "processed"
 partial: false
 created: "2026-10-16T02:56:41Z"
 summary: "Requirements phase for 059-exec-quant-recording completed: brief ingested, four open points adjudicated into Assumptions (A1-A6), spec written (15 FRs / 3 stories / 4 SCs / 2 shared strings), determin"
+introspection_ref: "introspection-20261021T133447Z#F-10"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-10"
 ---
 
 ## Review

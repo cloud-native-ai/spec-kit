@@ -1,6 +1,9 @@
 {
-  "targetFinding": "ev-018",
-  "change": "sdd-project-setup S3 now treats the instructions BUDGET report as a convergence trigger; when the owner R1/R2 routes have no legal candidate, S3.4 R3 externalizes project-filled sections to owner documents under docs/ with mechanical migration assertions, and reports a pending budget/scope decision instead of relaying the warning. Added contract test C-13 and docs wiring.",
+  "targetFinding": "user-directive:no-host-path-defaults-local-native",
+  "change": "sdd-project-setup S0 now resolves an entry with no host/path to the current project (git root or session cwd); local topology runs governance commands via orchestrator-direct or the host's native subagent and MUST NOT launch qodercli/claude -p; remote topology keeps external CLI via run-agent; S4 marks preflight 1-3 n/a locally; docs and contract test C-15 wired.",
   "baselineRunId": "ev-20261020-031112-sdd-project-setup",
-  "expectedSignal": "A subsequent setup run on an over-budget instructions file either ends within budget or reports a pending budget/scope decision without deleting project content."
+  "expectedSignal": {
+    "signalKey": "local_native_subagent_carrier",
+    "direction": "improve"
+  }
 }

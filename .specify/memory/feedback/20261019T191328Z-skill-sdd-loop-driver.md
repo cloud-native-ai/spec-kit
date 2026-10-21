@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-19T19:13:28Z"
 summary: "063 Review P1 Governance implemented, reviewed and merged; P0=1 (checklist gate skipped), P1=3, P2=5; 51/51 tasks; full tests 21/4089 zero NEW; C-12 ruled to /speckit.instructions; Stop-hook backstop "
+introspection_ref: "introspection-20261021T133447Z#F-13"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-13"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "062-humanize-command"
 feature_id: "062"
+disposition: "processed"
 partial: false
 created: "2026-10-19T11:44:46Z"
 summary: "本单元 wrap-up 摩擦（scope: local，仅记 /speckit.review 自身执行面，全局评估见 review.md）：(1) 编译嵌入的 Wrap-up 面 step 1/step 3 仅带 --unit-id/--unit-type：run-determination.py 以 exit 2 报 '--run-id is required'，补 --run-id 后再报 '"
+introspection_ref: "introspection-20261021T133447Z#F-11"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-11"
 ---
 
 ## Review

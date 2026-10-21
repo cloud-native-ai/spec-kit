@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-improve-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-10-16T18:09:12Z"
 summary: "improve-skills sdd-project-setup: 用户两要求全落地——①幂等/调协:SKILL.md 幂等契约+HR-6 收敛条目,setup-recipes 新增'幂等与重入语义'节(收敛契约 N 次=1 次+9 命令逐条重入语义表+--force 破坏性守卫+稳定态快路径);研究发现其 S3+ 强化序列已有每命令触发条件(缺什么才跑),真正缺的是整体收敛契约成文与 --for"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

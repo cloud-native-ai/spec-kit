@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-git-utils-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-10-20T02:39:20Z"
 summary: "Pulled gitlab/master (feedback boundary + mirror restore), merged into master with one Scope-guard conflict resolved keeping both boundary and 063 intake; full suite 21/4093 zero NEW; compile/regen cl"
+disposition_reason: "introspection-20261021T133447Z: excluded (no actionable framework finding)"
 ---
 
 ## Review

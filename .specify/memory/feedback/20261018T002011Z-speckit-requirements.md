@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "061-subagent-cli-config"
+disposition: "processed"
 partial: false
 created: "2026-10-18T00:20:11Z"
 summary: "执行 /speckit.requirements 为 Feature 061 生成 requirements.md 与质量检查单：先读终态简报、宪法与 059/060 先例，实测核对 exec-quant v1、空 configs 目录、dispatch.sh 额外参数透传等现状事实；用脚手架创建 061 分支；写出 4 个用户故事、33 条 FR/SC 与 15 条 Shared Strings"
+introspection_ref: "introspection-20261021T133447Z#F-10"
+disposition_reason: "introspection:introspection-20261021T133447Z#F-10"
 ---
 
 ## Review
