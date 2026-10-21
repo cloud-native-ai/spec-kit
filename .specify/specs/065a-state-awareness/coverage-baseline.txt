@@ -1,5 +1,5 @@
 # coverage-baseline: frozen UNCOVERED clause names, codepoint-sorted, one per line; compare with `LC_ALL=C comm -13 <this file> <live uncovered>` — the LC_ALL=C is load-bearing: glibc collation ignores # / and . at the first level, so under a UTF-8 locale these header lines sort AFTER the names, comm reports 'file 1 is not in sorted order' and then echoes all of file 2 as the delta
-# frozen-from: .specify/specs/*/contracts/* excluding 065a-state-awareness | owner-forms: md-bold-closed,md-bold-paren,md-heading,yaml-openapi,yaml-assertions,md-none (md-none named, never silently covered) | clause-rules: .specify/shared/definitions/contract-clause-definitions.md | per-form counts: notes/clause-form-census.md | base-sha: 095c291ae2ab | files: 164 (parsed 81 + named 83)
+# frozen-from: .specify/specs/*/contracts/* excluding 065a-state-awareness | owner-forms: md-bold-closed,md-bold-paren,md-heading,yaml-openapi,yaml-assertions,md-none (md-none named, never silently covered) | clause-rules: .specify/shared/definitions/contract-clause-definitions.md | per-form counts: notes/clause-form-census.md | base-sha: d1149063e3ed | files: 164 (parsed 81 + named 83)
 003-speckit-agents-command/contracts/agents-command.openapi.yaml#post
 003-speckit-agents-command/contracts/agents-command.openapi.yaml#put
 006-add-qoder-support/contracts/qoder-support.openapi.yaml#get
