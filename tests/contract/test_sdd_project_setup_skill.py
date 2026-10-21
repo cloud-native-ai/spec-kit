@@ -12,6 +12,7 @@ and pin the structural facts the skill's own documents declare:
   C-5 mechanism matrix + grading          C-11 roster baselines updated
   C-6 reconcile sequence literal          C-12 docs page content blocks
   C-13 instruction budget convergence path
+  C-14 host hook health check wiring
 """
 
 import re
@@ -267,7 +268,8 @@ def test_c10_mirror_byte_identical():
 
     dst = REPO_ROOT / ".specify" / "skills" / "sdd-project-setup"
     assert dst.exists(), "runtime mirror missing — sync-mirrors not run"
-    for rel in ["SKILL.md", "references/setup-recipes.md", "scripts/mechanism-inventory.py"]:
+    for rel in ["SKILL.md", "references/setup-recipes.md",
+                "scripts/mechanism-inventory.py", "scripts/hook-health.py"]:
         assert (dst / rel).exists(), f"mirror missing file: {rel}"
         assert filecmp.cmp(SKILL_DIR / rel, dst / rel, shallow=False), (
             f"mirror drift on {rel}"
@@ -327,3 +329,31 @@ def test_c13_instruction_budget_convergence_is_wired():
     assert "预算" in docs and "R3" in docs, (
         "docs page must explain the instruction budget convergence path"
     )
+
+
+# ---------------------------------------------------------------- C-14
+
+HOOK_HEALTH = SKILL_DIR / "scripts" / "hook-health.py"
+
+
+def test_c14_hook_health_script_contract():
+    text = HOOK_HEALTH.read_text(encoding="utf-8")
+    for flag in ("--project", "--settings", "--max-sync-timeout", "--fix", "--json"):
+        assert flag in text, f"hook-health must expose {flag}"
+    assert "vendor-managed" in text and "fixable" in text, (
+        "the two finding classes must be visible in the script"
+    )
+    assert "return 10" in text, "unresolved risks must exit 10"
+    assert "hook-health.bak-" in text, "fix mode must back up settings first"
+
+
+def test_c14_recipes_and_docs_wire_hook_health():
+    recipes = _recipes_text()
+    assert "hook-health.py" in recipes and "S4-H" in recipes, (
+        "S4 must run the host hook health check"
+    )
+    assert "vendor-managed" in recipes, (
+        "the vendor self-healing constraint must be documented"
+    )
+    docs = DOCS_PAGE.read_text(encoding="utf-8")
+    assert "hook-health" in docs, "docs page must mention the hook health check"

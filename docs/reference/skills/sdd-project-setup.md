@@ -27,11 +27,13 @@ S3 RECONCILE 按缺口按需逐项：constitution → sanitize → feature →
 S3+ STRENGTHEN 强化序列（机制就绪后的增值建设，按需逐项）：
              history → docs 深化 → research → feature 特性生成 →
              goal（定义 3–5 个项目目标）
-S4 VERIFY    五族前置检查 + 机制矩阵复扫 + 兼容符号链接核验，全绿才算完成
+S4 VERIFY    五族前置检查 + 宿主 hook 体检 + 机制矩阵复扫 + 兼容符号链接核验，
+             全绿才算完成
 S5 SUGGEST   候选工作清单（未完成 feature / 大改进 feedback / TODO 事项）
 ```
 
 - **指令体积预算**：S3 的 `/speckit.instructions` 后读取生成器 `BUDGET` 报告；超预算先走 `manage-instructions` 的 R1/R2，仍超时按 `setup-recipes.md` § S3.4 的 R3 回退外迁 project-filled 大章节；无法收敛时列为 pending（预算上调/拆分章节），不静默转述告警。
+- **宿主 hook 体检**：S4 运行 `scripts/hook-health.py`，检出会在每次工具调用同步阻塞的 hook（工具事件 + `async` 未开 + timeout ≤5s）。普通同步 hook 由 `--fix` 置 `async: true`（写前备份）；带 `_*_managed` 标记或落在自愈遥测路径（AITrace/r2c、yunke、loongsuite、a1）的 vendor hook 会被其 agent 秒级回写，脚本只报告并给出处置选项。退出码 `0` 干净/已修复、`10` 有未解决风险（登记未处理清单）、`2` 参数错误；verify 模式只读。
 
 ## 执行侧可移植性
 
