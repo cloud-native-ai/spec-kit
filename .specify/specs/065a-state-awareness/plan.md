@@ -96,7 +96,7 @@ skills/external/sdd-loop-driver/
 ├── scripts/
 │   └── loop-state.py        # 新增：只读聚合引擎（标准库）
 ├── references/
-│   └── state-awareness.md   # 新增：状态感知/形态/动作/产物映射的 owner reference
+│   └── state-awareness.md   # 新增：状态感知规则 owner reference（derived 映射仅为 FR-004 的镜像）
 └── SKILL.md                 # 更新：References 行 + 只读入口 Hard Requirement
 
 .specify/skills/sdd-loop-driver/
@@ -133,7 +133,7 @@ tests/
 - **红先**：每个检测器、每个动作分支先写失败断言，再实现；`tests/unit/test_loop_state_engine.py` 覆盖六类形态、派生映射、stale 排除、产物/提交、probe 两形状、legacy 脊、`not-dispatched`、尝试上限与 salvage 门。
 - **逆样本**：正常窗口不报 `unwatched`；活进程不出 `stop`；哨兵在而产物缺不得 `resume`；缺失信号不得变 `ok`；本地证据在 probe 模式下不得混入；同输入两次运行除 `evaluated_at` 外 diff 为 0。
 - **输入分档**：必需 CLI 参数/`--probe` 不可读 → exit 2；证据源不可读 → `status=missing` + exit 0；`--probe` 与本地路径参数并用 → exit 2 且不读本地证据。
-- **特例动作**：analyze DONE（无文件产物 → vacuous `artifacts.complete=true`）→ `verify`；`commit_required=false` DONE → `verify`；未知提交基线 → `verify`（`reason=commit-baseline-unknown`）；clarify 合法无变更 → `verify`；implement 仅文档提交 → 不完整；checklist 仅预存文件 → 不完整。
+- **特例动作**：analyze DONE（无文件产物 → vacuous `artifacts.complete=true`）→ `verify`；`commit_required=false` DONE → `verify`；DONE + 未知提交基线 → `verify`（`reason=commit-baseline-unknown`）；clarify 合法无变更 → `verify`；implement 仅文档提交 → 不完整；checklist 仅预存文件 → 不完整；`STALLED`/`ANOMALY`/`DEAD` + 产物齐备 + 未知基线 → 分别 `stop`/`retry`/`retry`（行 11/12），不得 `verify`。
 - **哨兵边界**：末行哨兵 + 活进程 + 其后 `ANOMALY:` 行 → 不判 `DONE`、不判 `false_completion`；`false_completion` 与 `artifacts-without-completion` 互斥。
 - **`--out` 边界**：目标与父目录先规范化再比较；symlink、相对路径与指向 state dir 的符号链接均 exit 2 且不留文件。
 - **归属矩阵**：无 `run=` 的现行信封在无 stale 时走兼容形态并正常消费终止证据；有 stale 时不调用 watcher 且 `detail=stale-evidence`；有 meta 或匹配 `run=` 时走归属形态并附 `--line-id/--run-id/--registry/--meta`。三态各至少一条正样本与一条逆样本。

@@ -50,7 +50,7 @@
 
   - `commit_required=false` 或 `commits.status=na` → `true`；
   - `no_change_allowed=true` 且阶段产物相对 `stage_base_commit` 无变更 → `true`（合法的无变更阶段，无可提交内容）；
-  - `commits.value_state=unknown` → `false`，且 MUST NOT 进入 `resume`/`stop` 的提交分支，而是进入 `verify`（`reason=commit-baseline-unknown`）；
+  - `commits.value_state=unknown` → `false`，且 MUST NOT 进入 `resume`/`stop` 的提交分支；仅当 `loop_state=DONE` 时动作进入 `verify`（`reason=commit-baseline-unknown`），其他状态按下方行 11/12 求值；
   - 否则 → 基线之后存在触及该阶段产物路径的提交（implement：仅代码/测试路径，见 `stage-artifact-map.md` C-58/C-60）。
 
   `analyze` 无必需文件产物 → `artifacts.complete=true`（vacuous truth）；`implement` 以代码/测试路径的提交证据为完整判据。候选动作 MUST 按下列顺序取首个命中项：
@@ -62,7 +62,7 @@
   | 3 | `loop_state=UNKNOWN`（非未派发） | `stop` |
   | 4 | `unwatched` ∨ `deadline-overrun-live` ∨ `loop_state=RUNNING` ∨（`loop_state=TIMEOUT` ∧ `pid.alive=true`） | `watch` |
   | 5 | `loop_state=DONE` ∧ `commit_required=false`（含 `commits.status=na`） | `verify` |
-  | 6 | （`loop_state=DONE` ∨ 产物齐备）∧ `commits.value_state=unknown` | `verify`（`reason=commit-baseline-unknown`） |
+  | 6 | `loop_state=DONE` ∧ `commits.value_state=unknown` | `verify`（`reason=commit-baseline-unknown`） |
   | 7 | `loop_state=DONE` ∧ 产物齐备 ∧ 提交齐备 | `verify` |
   | 8 | 产物齐备 ∧ 末行非 `ANOMALY:` ∧（末行哨兵 ∨ salvage 完整记录） | `resume` |
   | 9 | 产物齐备 ∧ 无末行哨兵 ∧ 无 salvage | `retry` |
@@ -70,6 +70,8 @@
   | 11 | `STALLED` ∨ `REENTRY_REQUIRED` | `stop` |
   | 12 | 其余终态（`INCOMPLETE/ANOMALY/FAILED/DEAD/TIMEOUT/NO_SIGNAL`） | `retry` |
   | 13 | 兜底 | `stop` |
+
+  行 8–10 MUST NOT 应用于 `STALLED`/`REENTRY_REQUIRED`；这两个状态只由行 11 裁决，即使产物齐备也不得改判为 `resume`/`retry`。
 
   (FR-007, FR-008, SC-001, SC-003)
 - **C-47**: 在候选动作得到后 MUST 应用重试上限：`attempt` 已知且 `attempt ≥ retry_limit` 时，候选为 `resume`/`retry`/`stop` 的 MUST 改为 `stop`（`reason=attempts-exhausted`）；`watch`/`none`/`verify` 不受此限。`attempt` 未知时 MUST NOT 给 `resume`（降级 `retry`，`blocked_by` 记 `attempt-unknown`）。 (FR-051, SC-001)

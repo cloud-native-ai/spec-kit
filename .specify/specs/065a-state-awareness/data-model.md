@@ -262,5 +262,5 @@ ProbeInput ──(a|b)────> EvidenceBundle
 11. `recovery_decision.action`/`reason` 与顶层 `recovery_action`/`recovery_reason` 相等；`blocked_by` 非空时必须解释为何未采用更高优先级动作。
 12. `status=missing` ⇒ `value_state=na`；`value_state=unknown` 只与 `status=present` 配对。watcher 不可用是 `present=false` + `status=missing` + `value_state=na` + `reason=unavailable`，不是值级 `unknown`。
 13. 一致性字段为嵌套 `spine.consistent`（bool \| null）；不输出顶层 `spine_consistent` 别名。
-14. `commit_required=false` 或 `commits.status=na` ⇒ 提交齐备；`commits.value_state=unknown` ⇒ 提交齐备=false 且动作走 `verify`（`reason=commit-baseline-unknown`）；`analyze` 无必需文件产物 ⇒ `artifacts.complete=true`（vacuous truth）。
+14. （summary only；owner 为 `contracts/interruption-and-action.md` C-46）`commit_required=false` 或 `commits.status=na` ⇒ 提交齐备；`commits.value_state=unknown` ⇒ 提交齐备=false，且仅当 `loop_state=DONE` 时动作走 `verify`（`reason=commit-baseline-unknown`），其他终态按 C-46 行 11/12；`analyze` 无必需文件产物 ⇒ `artifacts.complete=true`（vacuous truth）。
 15. `not-dispatched` ⇒ 四件套、watchbeat、artifacts、commits 均为 `status=na`、`value_state=na`；`--stage` 只是意图，不是派发证据。

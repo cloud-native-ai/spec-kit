@@ -143,7 +143,7 @@
 3. `loop_state=UNKNOWN`（证据缺口）→ `stop`。
 4. `unwatched` / `deadline-overrun-live` / `loop_state=RUNNING` /（`TIMEOUT` 且 pid 存活）→ `watch`。
 5. `DONE` + `commit_required=false`（含 `commits.status=na`）→ `verify`。
-6. （`DONE` 或产物齐备）+ `commits.value_state=unknown` → `verify`（`reason=commit-baseline-unknown`，不得进入 `resume`/`stop` 提交分支）。
+6. `loop_state=DONE` + `commits.value_state=unknown` → `verify`（`reason=commit-baseline-unknown`，不得进入 `resume`/`stop` 提交分支）；产物齐备不单独触发本行，其他终态按第 11/12 条求值。
 7. `DONE` + 产物齐备 + 提交齐备 → `verify`。
 8. 产物齐备 + 日志末行非 `ANOMALY:` +（末行哨兵或脊 salvage **完整记录**：`accepted` + `salvage_evidence` + `salvage_at`）→ `resume`；`attempt` 未知时不得给 `resume`（降级 `retry`）。
 9. 产物齐备 + 无末行哨兵 + salvage 未完整记录 → `retry`（salvage 门）。
@@ -152,7 +152,9 @@
 12. 其余终态（`INCOMPLETE/ANOMALY/FAILED/DEAD/NO_SIGNAL`；`TIMEOUT` 仅在 pid 不存活时）→ `retry`。
 13. 兜底 → `stop`（不猜）。
 
-`提交齐备` 的判据：`commit_required=false` 或 `commits.status=na` → true；`no_change_allowed=true` 且相对 `stage_base_commit` 无变更 → true（clarify 合法无变更）；`value_state=unknown` → false 且走 `verify`；否则以基线后触及阶段产物路径的提交为准（implement 仅代码/测试路径）。analyze 无必需文件产物 → `artifacts.complete=true`（vacuous truth）。`stale-signal` 在 065a 只列入并排除求值，不单独改变候选动作；`stale-unisolated → stop` 由 065c 承接（SA-1 显式推迟）。
+第 8–10 条 MUST NOT 应用于 `STALLED`/`REENTRY_REQUIRED`；这两个状态只由第 11 条裁决，即使产物齐备也不得改判为 `resume`/`retry`。
+
+`提交齐备` 的判据：`commit_required=false` 或 `commits.status=na` → true；`no_change_allowed=true` 且相对 `stage_base_commit` 无变更 → true（clarify 合法无变更）；`value_state=unknown` → false，且仅当 `loop_state=DONE` 时动作走 `verify`（`reason=commit-baseline-unknown`），其他终态按第 11/12 条；否则以基线后触及阶段产物路径的提交为准（implement 仅代码/测试路径）。analyze 无必需文件产物 → `artifacts.complete=true`（vacuous truth）。`stale-signal` 在 065a 只列入并排除求值，不单独改变候选动作；`stale-unisolated → stop` 由 065c 承接（SA-1 显式推迟）。
 
 在得出候选后应用重试上限：`attempt >= retry_limit` 且候选 ∈ {resume, retry, stop} → `stop`；`watch/none/verify` 不受限。`retry_limit` 取 `--retry-limit` → 引擎常量；常量由契约测试与 `references/stage-prompts.md` § Stall Handling 的缺省值钉住（漂移转红），不在本规格复述。
 
@@ -185,7 +187,7 @@
 **裁决**：
 
 - 源改动只落 `skills/external/sdd-loop-driver/`；`.specify/skills/sdd-loop-driver/` 通过 `scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver` 再生成。
-- 新增 owner reference `references/state-awareness.md`，拥有：快照入口、六类检测表（+ 八类封闭词表与 065b 归属）、derived 映射、产物映射章节、probe 契约、动作建议表。`watch-model.md` 不改。
+- 新增 owner reference `references/state-awareness.md`，拥有：快照入口、六类检测表（+ 八类封闭词表与 065b 归属）、产物映射章节、probe 契约、动作建议表；镜像 derived 映射（owner 为 FR-004，只做镜像与指针，不声称拥有该表）。`watch-model.md` 不改。
 - `SKILL.md` 增加 Reference 行与一条只读 Hard Requirement；`docs/reference/skills/sdd-loop-driver.md` 增加入口、调用形态、与 watcher/Registry 的关系。
 - 测试：`tests/unit/test_loop_state_engine.py`（求值逻辑与夹具，含归属三态与无 `run=` 信封）+ `tests/contract/test_loop_state_contract.py`（信封、退出码、probe、自测、确定性、变异演练、AM-01 映射一致性、文档/镜像表）；`tests/contract/test_sdd_loop_driver_skill.py` 的 `MIRROR_FILES` 增补新文件。
 

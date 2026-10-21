@@ -123,7 +123,7 @@
 - Registry 条目缺失但状态脊与四件套可读：继续求值并记 `registry=missing`；不得因此判 `UNKNOWN`。
 - Registry 条目存在但状态脊缺失：`UNKNOWN` + `stop` 建议，上送证据缺口；不得凭 Registry 单独猜阶段。
 - 远端 ssh 不可达：`stalled(remote-unreachable)`，重试连通性；不得判 `DEAD`，不得重派。
-- 同一次派发内出现多个中断形态（如 `unwatched` + `stale-signal`）：全部列出，动作按父 C 区优先级裁决，不以一条掩盖另一条。
+- 同一次派发内出现多个中断形态（如 `unwatched` + `stale-signal`）：全部列出，不以一条掩盖另一条；非 stale 形态的动作按父 C 区优先级裁决，stale 形态按 SA-1/C-43 只列入 `stale_signals[]`/`interruptions[]` 并从求值中排除，065a 不因单纯 stale 改变候选动作，`stale-unisolated → stop` 由 065c 承接。
 - 快照运行期间 watcher 恰好结束：以 `--once` 的当次输出为准；不得混用两次调用的证据。
 - 状态脊与快照同时写入：快照只读，不竞争；恢复写脊遵循单写者与原子替换（写侧由 065c 承接）。
 
@@ -153,7 +153,7 @@
 - **FR-040**: 各 `/speckit.*` 命令内部流程、阶段提示词三段骨架、哨兵字面量、确认门与 fast-fail 纪律 MUST 保持不变；本特性只改驱动技能及其测试与文档。
 - **FR-041**: 本特性 MUST NOT 引入常驻服务/daemon、外部服务或新的运行时依赖；实现 MUST 复用既有 shell/Python 标准库、watcher、Registry 与 feedback/probe 机制。
 - **FR-042**: 两顶帽子：改动 MUST 落在框架源 `skills/external/sdd-loop-driver/`；`.specify/skills/sdd-loop-driver/` 为生成镜像，MUST NOT 手改；镜像 MUST 经 `sync-mirrors.py` 再生成并通过镜像一致性检查；打包随既有 hatch 构建流程，无手工步骤。
-- **FR-043**: 状态感知/中断/恢复规则 MUST 在技能内有一个唯一 owner 文档（references 下的专门文件或章节），SKILL.md 与各 references MUST 引用而非复述判定表；`references/watch-model.md` 仍是 watch 判定的唯一 owner，本特性 MUST NOT 在其中复制状态恢复规则或改变其语义。
+- **FR-043**: 状态感知/中断/恢复规则 MUST 在技能内有一个唯一 owner 文档（references 下的专门文件或章节），SKILL.md 与各 references MUST 引用而非复述判定表；`references/watch-model.md` 仍是 watch 判定的唯一 owner，本特性 MUST NOT 在其中复制状态恢复规则或改变其语义。派生映射表（FR-004）不在本条 owner 文档的拥有范围内；owner reference 对 derived 映射只做镜像与指针，MUST NOT 声称拥有该表。本条 owner 文档拥有的是快照入口、六类检测表、产物映射章节、probe 契约与动作建议表等其余规则。
 - **FR-044**: 文档 MUST 更新：SKILL.md（Hard Requirements 与 References）、owner reference（状态感知、判定表、恢复动作、watchbeat）、`docs/reference/skills/sdd-loop-driver.md`（入口、调用形态、与 watcher/Registry 的关系）；文档取值 MUST 与代码一致。
 - **FR-046**: 测试 MUST 含变异演练：移除「无 watcher 检测」「旧信号隔离」「salvage 门」任一行为时，至少一条测试 MUST 转红；全部新检查 MUST 有逆样本，MUST NOT 出现只在通过路径上运行的绿。
 - **FR-047**: 单线与多线 MUST 同构：快照按线独立求值，不引入跨线推断；多线调用 MAY 由调用方逐线循环，本特性 MUST NOT 新增 manifest 或批量判定语义。

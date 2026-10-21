@@ -41,7 +41,7 @@
 
 ## 4. 状态脊与 Registry
 
-- **C-23**: `spine` MUST 含 `path`、`status`、`schema ∈ {v1, legacy, missing}`、`state`、`state_value_state`、`consistent`、`fields`、`missing_fields`。legacy 脊 MUST 被识别为 `schema=legacy` 并降级求值；缺字段记 `unknown`，MUST NOT 猜测或用默认值补齐（A-11/A-18 的读取侧）。`consistent` 的判据只在 `requirements.md` FR-004 与 `IA-07` 定义。 (FR-003, FR-004)
+- **C-23**: `spine` MUST 含 `path`、`status`、`schema ∈ {v1, legacy, missing}`、`state`、`state_value_state`、`consistent`、`fields`、`missing_fields`。legacy 脊 MUST 被识别为 `schema=legacy` 并降级求值；缺字段记 `unknown`，MUST NOT 猜测或用默认值补齐（A-11/A-18 的读取侧）。`consistent` 的判据见 `interruption-and-action.md` C-39（summary only；owner 为 C-39，其上游规则在 `requirements.md` FR-004）。 (FR-003, FR-004)
 - **C-24**: `registry` MUST 含 `status`、`path`、`state`、`stage`、`run_id`、`spine_path`。Registry 缺失时 `status=missing` 且求值继续（`C-5`）；Registry 字段语义与 ownership 归 Feature 064，本切片只读消费。 (FR-003, FR-039, FR-052)
 
 ## 5. 监听判定

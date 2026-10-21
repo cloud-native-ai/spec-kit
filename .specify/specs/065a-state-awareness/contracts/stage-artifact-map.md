@@ -44,13 +44,13 @@
 
 ## 3. 完整性
 
-- **C-54**: 产物完整性 MUST 只由“文件存在且非空”判定；目录类产物（`contracts/`、`checklists/`）MUST 要求目录存在且至少含一个非空文件。`checklist` 阶段另 MUST 要求存在自 `stage_base_commit` 起新增或修改的 checklist 文件；仅有预先存在的 checklist 文件 MUST NOT 判完整。`stage_base_commit` 未知时按 `C-57` 记 `value_state=unknown`，不猜完整。MUST NOT 从日志文本、时间或提交推断内容完整性。 (FR-006, FR-007, FR-008)
+- **C-54**: 产物完整性 MUST 只由“文件存在且非空”判定；目录类产物（`contracts/`、`checklists/`）MUST 要求目录存在且至少含一个非空文件。`checklist` 阶段另 MUST 要求存在自 `stage_base_commit` 起新增或修改的 checklist 文件；仅有预先存在的 checklist 文件 MUST NOT 判完整。`stage_base_commit` 未知时 MUST 记 `artifacts.complete=null`、`artifacts.value_state=unknown`（按 `C-57`，不猜完整），并 MUST NOT 计入 `false_completion`——不可判不等于不完整。MUST NOT 从日志文本、时间或提交推断内容完整性。 (FR-006, FR-007, FR-008)
 - **C-55**: 缺少必需产物或产物为空时 MUST 进入 `missing_artifacts[]`，且 `artifacts.complete=false`。末行哨兵存在而此项非空时 MUST 置 `false_completion=true`（`C-42`）。 (FR-007, FR-051)
 - **C-56**: `stage` 未知时产物映射不可建立：spec 路径可读 → `artifacts.status=present`、`value_state=unknown`；spec 路径不可读 → `status=missing`、`value_state=na`；两种情形均 `complete=null`。MUST NOT 用其它阶段的产物顶替。 (FR-003, FR-006)
 
 ## 4. 提交证据
 
-- **C-57**: 提交证据 MUST 以状态脊 `stage_base_commit` 为基线，执行 `git log <base>..HEAD -- <pathspec>`。基线缺失或不可读时 MUST 记 `commits.value_state=unknown`，MUST NOT 回退为“最近一次提交”或 HEAD 猜测；此时 `提交齐备=false`，动作路由按 `C-46` 的 `commit-baseline-unknown` 分支进入 `verify`（不得进入 `resume`/`stop` 提交分支）。`commit_required=false` 时 `commits.status=na`，按 `C-46` 视为提交齐备。 (FR-008, SC-002)
+- **C-57**: 提交证据 MUST 以状态脊 `stage_base_commit` 为基线，执行 `git log <base>..HEAD -- <pathspec>`。基线缺失或不可读时 MUST 记 `commits.value_state=unknown`，MUST NOT 回退为“最近一次提交”或 HEAD 猜测；此时 `提交齐备=false`；仅当 `loop_state=DONE` 时按 `C-46` 第 6 行进入 `verify`（`reason=commit-baseline-unknown`），其他终态 MUST 按 `C-46` 行 11/12 求值，不得因产物齐备改判 `verify`。`commit_required=false` 时 `commits.status=na`，按 `C-46` 视为提交齐备。 (FR-008, SC-002)
 - **C-58**: `pathspec` MUST 为阶段产物的仓库相对路径：requirements/clarify → `requirements.md`；plan → 五个必需产物 + `research.md`（存在时）；tasks → `tasks.md`；checklist → `checklists/`；review → `review.md`；implement → 代码/测试路径枚举 `src/`、`skills/`、`scripts/`、`tests/`、`templates/`、`agents/`（仅触及 `docs/`、`.specify/` 或其它非代码路径的提交 MUST NOT 计为 implement 完成证据）。路径 MUST 以解析后的 `spec_dir`（implement 除外）为前缀。 (FR-006, FR-008)
 - **C-59**: `uncommitted_artifacts[]` MUST 仅在基线已知时计算：必需产物存在但基线之后没有任何提交触及它 → 列入。基线未知时 MUST 输出空数组，并以 `commits.value_state=unknown` 表达不可判；MUST NOT 把空数组表述为“已全部提交”。 (FR-008, SC-002)
 - **C-60**: `implement` 的“产物完整”MUST 以基线后的代码/测试提交证据表达，`artifacts.complete` 与 `提交齐备` 同源：`pathspec` 至少命中一个上述代码/测试路径且存在提交 → `true`；仅文档提交或零提交 → `false`。`artifacts` 记 `status=na`；`commit_required=true`。代码/测试的具体目录结构归各阶段命令，本映射只冻结上述 pathspec 枚举。 (FR-008, SC-001)
