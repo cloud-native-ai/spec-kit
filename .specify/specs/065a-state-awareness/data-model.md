@@ -68,7 +68,8 @@ ProbeInput ──(a|b)────> EvidenceBundle
 
 - 存在 watcher 判定时，取值**逐字等于** `watch_verdict.verdict`，`verdict_source=watcher`；聚合器不改写。
 - 无 watcher 判定时按 `requirements.md` FR-004 的固定优先级导出，`verdict_source=derived`；三个前置分支：`not-dispatched`（`IA-03`）、远端不可达（`IA-06`/`IA-12`）、有派发证据但缺脊（`IA-04`）。
-- 状态优先级表的**唯一 owner** 是 `requirements.md` FR-004；本文件与代码只引用，不复述阈值或完整规则文本。
+- 状态优先级表与 watcher 优先不变量的**唯一 owner** 是 `requirements.md` FR-004（parent #FR-004）；本文件与代码只作为该表的镜像，不复述阈值或完整规则文本，也不得声称拥有该表。
+- 一致性字段统一为嵌套 `spine.consistent`（bool \| null）；MUST NOT 输出顶层 `spine_consistent` 别名。
 
 ### 2.3 `loop_state_reason` 取值
 
@@ -119,8 +120,9 @@ ProbeInput ──(a|b)────> EvidenceBundle
 **边界（Q2 裁决）**：
 
 - `missing`：路径不存在或不可读 → 值用 `null`，`value_state=na`（没有可判定的值）。
-- `na`：该信号对本阶段/本次尝试不适用（如 `commit_required=false`、未配置 hook），`value_state=na`。
-- `unknown`：源存在、值不可判（legacy 缺字段、信封不可解析、watcher 不可用、阶段未知无产物映射）→ `present` + `unknown`。
+- `na`：该信号对本阶段/本次尝试不适用（如 `commit_required=false`、未配置 hook、`not-dispatched` 的四件套/watchbeat/artifacts/commits），`value_state=na`。
+- `unknown`：源存在、值不可判（legacy 缺字段、信封不可解析、阶段未知无产物映射）→ `present` + `unknown`。watcher 不可用不是值级 `unknown`，而是三态映射（§4.3）：`present=false` + `status=missing` + `value_state=na` + `reason=unavailable`。
+- `--stage` 只是调用方意图，不是派发证据；never-dispatched 时四件套、watchbeat、artifacts 与 commits 一律 `status=na`、`value_state=na`。
 - 禁止用 `0`、`""`、`"ok"` 代替缺失值。
 
 **stale 排除**：被列入 `stale_signals` 的信号保留 `status=present`，但**不进入** `loop_state`/产物/动作求值。
@@ -131,9 +133,9 @@ ProbeInput ──(a|b)────> EvidenceBundle
 |------|----------|------|
 | `pid` | `pid`、`start`、`at`、`alive`、`identity`、`attribution` | `identity ∈ ok\|mismatch\|unknown`；只用记录的 PID 做 `kill -0` 与 start token 比对，不做进程发现扫描 |
 | `status` | `exit_code`、`at`、`sentinel`、`run_id`、`stage`、`event`、`legacy`、`attribution` | 空格信封；`run_id` 取 `run=`，现行 `stage-runner.sh` 不写该字段时为 `null`；`legacy=true` 表示无 `line=`/`run=` 归属 |
-| `log` | `last_line`、`sentinel_present`、`sentinel`、`anomaly` | 最后非空行；哨兵字面量为 `<STAGE>-DONE` |
+| `log` | `last_line`、`sentinel_present`、`sentinel`、`anomaly` | `sentinel_present` = 最后非空行恰好等于 `<STAGE>-DONE`（owner：`requirements.md` FR-004）；更早出现的哨兵字样不置真 |
 | `heartbeat` | `at`、`mtime_ns`、`fresh`、`attribution` | 新鲜度按 mtime 与阈值 |
-| `watchbeat` | `run_id`、`stage`、`window`、`at`、`event`、`fresh` | `event ∈ watch-window\|watch-return`；新鲜度 = 年龄 ≤ `window` + deadline-grace |
+| `watchbeat` | `run_id`、`stage`、`window`、`at`、`event`、`fresh` | `event ∈ watch-window\|watch-return`；新鲜度 = 年龄 ≤ `window` + deadline-grace；写入义务归 065b，本切片只读 |
 | `hook` | `path`、`observed_at` | 可选；未配置 → `status=na` |
 | `artifacts` | `stage`、`complete`、`commit_required`、`no_change_allowed`、`items[]` | `items[] = {path, required, status, size}` |
 | `commits` | `base`、`pathspec[]`、`commits[]`、`touching` | `commits[] = {sha, subject}` |
@@ -155,7 +157,13 @@ ProbeInput ──(a|b)────> EvidenceBundle
 | `attribution` | string \| null | 取得判定时取 watcher 输出的归属字面量（`own`/`legacy`/`unattributed`/`stale-run`/`foreign`）；其余 `null` |
 | `detail` | string \| null | 不可用的具体原因（`script-missing`/`invocation-failed`/`timeout`/`unparseable`/`usage`/`stale-evidence`/`probe-unreachable`） |
 
-**三态**：有判定（`present=true` + verdict）；不可用（`present=false` + `reason=unavailable` + `detail`）；无活动 target（`present=false` + `reason=null`，对应证据 `status=na`）。
+**三态**：
+
+| 状态 | `present` | `status` | `value_state` | `verdict` | `reason` |
+|------|-----------|----------|---------------|-----------|----------|
+| 取得判定 | `true` | `present` | `known` | watcher 字面量 | watcher 的 reason 或 `null` |
+| watcher 不可用 | `false` | `missing` | `na` | `null` | `unavailable` |
+| 无活动 target | `false` | `na` | `na` | `null` | `null` |
 
 ### 4.4 StaleSignal
 
@@ -172,7 +180,7 @@ ProbeInput ──(a|b)────> EvidenceBundle
 
 ### 5.1 PathContext
 
-`state_dir`、`spec_dir`、`repo`、`spine`、`probe` 五个路径；按 `research.md` R-02 的顺序解析。未解析项为 `null`，对应证据记 `missing`。
+`state_dir`、`spec_dir`、`repo`、`spine`、`probe` 五个路径；按 `research.md` R-02 的顺序解析。未解析项为 `null`，对应证据记 `missing`。两类输入 MUST 区分：必需输入 = 必需 CLI 参数（`--line-id`，显式提供时的 `--probe` 文件），不可读/不可解析 → exit 2；证据源 = 上述路径指向的脊/四件套/产物等证据文件，不可读 → `status=missing` + exit 0。
 
 ### 5.2 ThresholdSet
 
@@ -237,19 +245,22 @@ ProbeInput ──(a|b)────> EvidenceBundle
 
 ### 7.2 `recovery_reason` 取值
 
-`not-dispatched`、`remote-unreachable`、`evidence-gap`、`attempts-exhausted`、`unwatched`、`deadline-overrun-live`、`running`、`done-complete`、`artifacts-uncommitted`、`salvage-accepted`、`salvage-not-recorded`、`false-completion`、`terminal-retry`、`stalled-handoff`。
+`not-dispatched`、`remote-unreachable`、`evidence-gap`、`attempts-exhausted`、`unwatched`、`deadline-overrun-live`、`running`、`done-complete`、`commit-baseline-unknown`、`artifacts-uncommitted`、`salvage-accepted`、`salvage-not-recorded`、`false-completion`、`terminal-retry`、`stalled-handoff`。
 
 ## 8. 不变量与校验
 
 1. `schema_version=1`；未知字段由旧读取方忽略。
-2. `verdict_source=watcher` ⇔ `watch_verdict.present=true`。
-3. `loop_state` 只能取封闭集；watcher 在时逐字一致。
+2. `verdict_source` 与 `watch_verdict.present` 的对应关系、以及 watcher 来源下 `loop_state` 的逐字相等约束，按 `requirements.md` FR-004 执行（owner）；本文件不复述该不变量。
+3. `loop_state` 只能取 `§2.2` 的封闭集；watcher 在时逐字一致。
 4. 任何缺失值只以 `null` 出现；`status`/`value_state` 只取各自封闭集。
 5. 除 `evaluated_at` 外不得输出随当前时间变化的派生数值。
-6. `false_completion=true` ⇒ `recovery_action=retry`，除非 `IA-04` 的证据缺口短路或 `IA-15` 的尝试上限将其改为 `stop`。
-7. `recovery_action=resume` ⇒ 产物齐备 ∧ 日志末行非 `ANOMALY:` ∧（哨兵 ∨ salvage 完整记录）∧ `attempt` 已知且未达上限。
-8. `--probe` 模式下所有证据 `evidence_source=probe`，且不得读取本地文件或调用本地 watcher。
-9. 被列入 `stale_signals` 的信号不参与任何求值。
-10. 快照不写状态脊、四件套、Registry 或工作树；`--out` 为唯一写路径，且不得落在 state dir 或 repo 内。
+6. 完成哨兵 = 日志最后非空行 `== <STAGE>-DONE`（owner：FR-004）。`false_completion=true` ⇔ 末行哨兵 ∧ 至少一项必需产物缺失/为空；此时 `recovery_action=retry`，除非 `IA-04` 的证据缺口短路或 `IA-15` 的尝试上限将其改为 `stop`。`false_completion` 与 `artifacts-without-completion` 互斥。
+7. `recovery_action=resume` ⇒ 产物齐备 ∧ 日志末行非 `ANOMALY:` ∧（末行哨兵 ∨ salvage 完整记录）∧ `attempt` 已知且未达上限；`loop_state=DONE` 且提交齐备时 MUST 为 `verify`。
+8. `--probe` 模式下所有证据 `evidence_source=probe`，且不得读取本地文件或调用本地 watcher；与本地路径参数同时提供时 exit 2。
+9. 被列入 `stale_signals` 的信号不参与任何求值；065a 不因单纯 stale 改变动作，`stale-unisolated → stop` 由 065c 承接（SA-1）。
+10. 快照不写状态脊、四件套、Registry 或工作树；`--out` 为唯一写路径，目标与父目录先 `realpath`/`Path.resolve` 再与解析后的 state dir / repo 比较，比较先于创建临时文件，拒绝时 exit 2 且不留文件。
 11. `recovery_decision.action`/`reason` 与顶层 `recovery_action`/`recovery_reason` 相等；`blocked_by` 非空时必须解释为何未采用更高优先级动作。
-12. `status=missing` ⇒ `value_state=na`；`value_state=unknown` 只与 `status=present` 配对。
+12. `status=missing` ⇒ `value_state=na`；`value_state=unknown` 只与 `status=present` 配对。watcher 不可用是 `present=false` + `status=missing` + `value_state=na` + `reason=unavailable`，不是值级 `unknown`。
+13. 一致性字段为嵌套 `spine.consistent`（bool \| null）；不输出顶层 `spine_consistent` 别名。
+14. `commit_required=false` 或 `commits.status=na` ⇒ 提交齐备；`commits.value_state=unknown` ⇒ 提交齐备=false 且动作走 `verify`（`reason=commit-baseline-unknown`）；`analyze` 无必需文件产物 ⇒ `artifacts.complete=true`（vacuous truth）。
+15. `not-dispatched` ⇒ 四件套、watchbeat、artifacts、commits 均为 `status=na`、`value_state=na`；`--stage` 只是意图，不是派发证据。

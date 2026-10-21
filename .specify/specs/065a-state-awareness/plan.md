@@ -6,7 +6,7 @@
 
 ## Summary
 
-为 SDD 循环驱动技能增加一个确定性、只读的状态聚合入口 `loop-state.py`：一次 `snapshot` 调用聚合状态脊、Line Registry 条目、pid/status/log/heartbeat 四件套、watchbeat、阶段产物、git 提交与可用的 watcher 判定，输出统一 JSON 信封，识别六类中断形态，并给出唯一恢复动作建议（`none/watch/verify/resume/retry/stop`）。本切片只求值、不执行：不写脊、不提交、不隔离、不杀进程。退出码统一为 `0/1/2`，绝不复用 watcher 的 `10–16`。`recover` 与 `check-spine` 在本切片保留结构化拒绝分支，分别由 065c 与 065b 实现。
+为 SDD 循环驱动技能增加一个确定性、只读的状态聚合入口 `loop-state.py`：一次 `snapshot` 调用聚合状态脊、Line Registry 条目、pid/status/log/heartbeat 四件套、watchbeat、阶段产物、git 提交与可用的 watcher 判定，输出统一 JSON 信封，识别六类中断形态，并给出唯一恢复动作建议（`none/watch/verify/resume/retry/stop`）。本切片只求值、不执行：不写脊、不提交、不隔离、不杀进程。退出码统一为 `0/1/2`，绝不复用 watcher 的 `10–16`。`recover` 与 `check-spine` 在本切片保留结构化拒绝分支：`recover` 由 `065c` 实现，`check-spine` 由 `065b` 实现（与 `notes/decomposition-gate.md` 一致）。
 
 ## Technical Context
 
@@ -41,7 +41,7 @@
 | XI | Dogfooding (Self-Application) | ✅ Pass | 改动落框架源 `skills/external/sdd-loop-driver/`；镜像由 `sync-mirrors.py` 生成，不手改 `.specify/` 副本（§Mirror Obligations）。 |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | 仓库无覆盖状态聚合的既有 Tool；实现复用 watcher 与 Registry，而非重写判定（`research.md` §1、R-06）。 |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 强化 Controlled Execution 与 Change Validation 维度；不新增评分/记录引擎；基线证据见 `research.md` §1/§4。 |
-| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 新 owner reference 收敛规则；阈值 owner 为 `watch-target.sh`；产物映射 owner 对为“脚本数据 + `references/state-awareness.md` 章节”，契约文件在实施后为 dated 记录（`AM-01`）。 |
+| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | derived `loop_state` 映射表与 watcher 优先不变量只在 `requirements.md` FR-004 定义一次，reference 与代码是镜像并由契约测试比对；阈值 owner 为 `watch-target.sh`；产物映射 owner 对为“脚本数据 + `references/state-awareness.md` 章节”，契约文件在实施后为 dated 记录（`AM-01`）。 |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | `quickstart.md` 每条 planned 示例附前提；拒绝信封含用户可读 `message`（`LS-02`）；内部字段以路径指针引用。 |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 不可解析 probe / 非法组合直接 exit 2；缺失与未知显式化；无静默默认值；独立评审发现的过载结论已在本轮修正并披露（§Disclosed Deviations）。 |
 
@@ -80,10 +80,10 @@ argv / probe ──> resolve paths ──> read evidence ──> exclude stale �
 ├── research.md              # Phase 0：13 条技术裁决
 ├── data-model.md            # Phase 1：13 个实体与不变量
 ├── contracts/
-│   ├── loop-state-cli.md    # LS-01…LS-18
-│   ├── snapshot-envelope.md # SN-01…SN-14
-│   ├── interruption-and-action.md # IA-01…IA-17
-│   └── stage-artifact-map.md      # AM-01…AM-11
+│   ├── loop-state-cli.md    # C-1…C-18（别名 LS-01…LS-18）
+│   ├── snapshot-envelope.md # C-19…C-32（别名 SN-01…SN-14）
+│   ├── interruption-and-action.md # C-33…C-49（别名 IA-01…IA-17）
+│   └── stage-artifact-map.md      # C-50…C-60（别名 AM-01…AM-11）
 ├── quickstart.md            # 3 项可执行基线 + 7 个 planned 场景
 ├── feature-ref.md           # Feature 065 绑定与切片边界
 └── tasks.md                 # Phase 2 输出（/speckit.tasks 创建，本阶段不产出）
@@ -132,9 +132,13 @@ tests/
 
 - **红先**：每个检测器、每个动作分支先写失败断言，再实现；`tests/unit/test_loop_state_engine.py` 覆盖六类形态、派生映射、stale 排除、产物/提交、probe 两形状、legacy 脊、`not-dispatched`、尝试上限与 salvage 门。
 - **逆样本**：正常窗口不报 `unwatched`；活进程不出 `stop`；哨兵在而产物缺不得 `resume`；缺失信号不得变 `ok`；本地证据在 probe 模式下不得混入；同输入两次运行除 `evaluated_at` 外 diff 为 0。
+- **输入分档**：必需 CLI 参数/`--probe` 不可读 → exit 2；证据源不可读 → `status=missing` + exit 0；`--probe` 与本地路径参数并用 → exit 2 且不读本地证据。
+- **特例动作**：analyze DONE（无文件产物 → vacuous `artifacts.complete=true`）→ `verify`；`commit_required=false` DONE → `verify`；未知提交基线 → `verify`（`reason=commit-baseline-unknown`）；clarify 合法无变更 → `verify`；implement 仅文档提交 → 不完整；checklist 仅预存文件 → 不完整。
+- **哨兵边界**：末行哨兵 + 活进程 + 其后 `ANOMALY:` 行 → 不判 `DONE`、不判 `false_completion`；`false_completion` 与 `artifacts-without-completion` 互斥。
+- **`--out` 边界**：目标与父目录先规范化再比较；symlink、相对路径与指向 state dir 的符号链接均 exit 2 且不留文件。
 - **归属矩阵**：无 `run=` 的现行信封在无 stale 时走兼容形态并正常消费终止证据；有 stale 时不调用 watcher 且 `detail=stale-evidence`；有 meta 或匹配 `run=` 时走归属形态并附 `--line-id/--run-id/--registry/--meta`。三态各至少一条正样本与一条逆样本。
 - **契约一致性**：`contracts/stage-artifact-map.md` 的五个维度与 `references/state-awareness.md` §Stage Artifact Map 及脚本 `STAGE_ARTIFACTS` 逐项一致（`AM-01`）；信封字段域、`recovery_action` 与 `recovery_decision.action` 相等、拒绝信封 exit 1 + 用户可读 `message` 均由契约测试钉住。
-- **变异演练（SC-006）**：移除 `unwatched` 检测后至少一条测试转红；演练命令、移除位置与转红用例写入实现阶段的验收记录（`verification.md` 或阶段日志），不得只保留通过路径的绿。
+- **变异演练（SC-006）**：移除 `unwatched` 检测后至少一条测试转红；另对 salvage 门做一次 mutation drill（移除 `IA-16` 的完整记录门，至少一条测试转红）；演练命令、移除位置与转红用例写入实现阶段的验收记录（`verification.md` 或阶段日志），不得只保留通过路径的绿。
 - **兼容**：`watch-target.sh --self-test`（plan 阶段实测 38/38）、Registry 引擎测试与镜像一致性检查保持绿色。
 
 ## Complexity Tracking
@@ -164,13 +168,13 @@ N/A — Constitution Check 无 Fail / Partial，无需要辩护的复杂度。
 
 ### Disclosed Deviations
 
-1. **Feature 状态推进**：切片 `requirements.md` §Related Feature 写有“MUST NOT 改写注册状态或索引行”；本阶段指令与 `/speckit.plan` 的 Feature Integration 要求把 Feature 065 从 `Draft` 推进到 `Planned`。本 plan 执行后者，不新建 Feature ID 或注册行，并在此显式披露该差异。
+1. **Feature 状态推进**：切片 `requirements.md` §Related Feature 已按 2026-10-21 analyze 修复改写为「不新建 Feature ID、不新增注册行；Draft→Planned 的状态推进由 plan 阶段按 Feature Integration 拥有」。本 plan 据此把 Feature 065 从 `Draft` 推进到 `Planned`，不新建 Feature ID 或注册行；requirements 与该推进现已一致，不再存在被违反的 MUST NOT。
 2. **Setup 脚本**：`create-new-plan.sh` 按分支前缀会解析到并发隔离的 umbrella 目录，故未运行；模板结构直接落到切片目录（§Phase 0 上文）。
 3. **镜像基线**：`sync-mirrors.py --check` 在 plan 阶段被隔离策略拒绝执行；基线改由 implement 首次编辑前测量，判据为“无新增漂移”。
 
 ## Phase 1: Design Artifacts Summary
 
-*Backfilled after the artifacts landed on disk; counts measured with `grep -cE` against the exact clause form `^- \*\*[A-Z]{2,4}-[0-9]{2}\b`, so prose mentions do not inflate them.*
+*Backfilled after the artifacts landed on disk; counts measured with `grep -cE '^- \*\*C-[0-9]+\*\*'` against the canonical clause form, so alias tables and prose mentions do not inflate them.*
 
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|

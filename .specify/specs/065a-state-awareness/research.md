@@ -34,7 +34,7 @@
 
 ### R-01 入口形态：单文件、标准库、三动作面 + self-test
 
-**裁决**：新增 `skills/external/sdd-loop-driver/scripts/loop-state.py`，Python 3 标准库、零外部依赖，单文件实现。CLI 采用 `--action snapshot|recover|check-spine` 与 `--self-test`。065a 实现 `snapshot`；`recover` 与 `check-spine` 接受但返回结构化拒绝信封（`result=failed`、`reason=not-implemented-in-065a`、`owner=065c|065b`）与退出码 1，确保 CLI 面在切片间不重构。
+**裁决**：新增 `skills/external/sdd-loop-driver/scripts/loop-state.py`，Python 3 标准库、零外部依赖，单文件实现。CLI 采用 `--action snapshot|recover|check-spine` 与 `--self-test`。065a 实现 `snapshot`；`recover` 与 `check-spine` 接受但返回结构化拒绝信封（`result=failed`、`reason=not-implemented-in-065a`、退出码 1）。`owner` 字段逐动作钉死：`check-spine` → `owner=065b`，`recover` → `owner=065c`（与 `notes/decomposition-gate.md` 一致），确保 CLI 面在切片间不重构。
 
 **理由**：FR-001 要求确定性只读入口；A-17 要求三动作共享信封与退出码阶梯在本切片冻结。冻结的是**契约面**，不是未实现动作的行为。
 
@@ -54,6 +54,8 @@
 | `repo` | `--repo` → `git -C <spec_dir|cwd> rev-parse --show-toplevel` → `missing` |
 | watchbeat / 四件套 | 由 `state_dir` + `line_id` + `stage` 按既有命名约定拼出 |
 
+「必需输入」= 必需 CLI 参数（`--line-id`，以及显式提供时的 `--probe` 文件）：不可读/不可解析 → exit 2。「证据源」= 状态脊、Registry、四件套等证据文件：不可读 → `status=missing` + exit 0。`--stage` 只是调用方意图，不是派发证据。
+
 **理由**：FR-002 的覆盖顺序；`state_dir` 的推导与 `line-registry.py` 的 `resolve_runtime_dir` 及 `stage-runner.sh` 的落盘约定一致。spine 与 spec-dir 没有可靠默认值，猜测会制造伪证据。
 
 **否决**：把 `<spec-dir>/state-spine.md` 当默认（本仓库的实际脊可能位于 `/tmp` 驱动目录）；把 cwd 当 spec-dir（调用方可能在仓库任意目录）。
@@ -68,7 +70,7 @@
 
 ### R-04 状态与值的两层模型
 
-**裁决**：每个信号输出 `status ∈ present|missing|na`（源在不在）与 `value_state ∈ known|unknown|na`（读出的值可不可判）；值本身缺失用 `null`。`legacy`、不可解析信封、watcher 不可用、阶段未知导致无产物映射 → `value_state=unknown`。悬挂的 stale 信号保留 `status=present`，但**不参与** `loop_state` 求值。
+**裁决**：每个信号输出 `status ∈ present|missing|na`（源在不在）与 `value_state ∈ known|unknown|na`（读出的值可不可判）；值本身缺失用 `null`。`legacy`、不可解析信封、阶段未知导致无产物映射 → `value_state=unknown`。watcher 不可用不是值级 `unknown`，而是三态映射：`present=false` + `status=missing` + `value_state=na` + `reason=unavailable`。悬挂的 stale 信号保留 `status=present`，但**不参与** `loop_state` 求值。
 
 **理由**：Q2 裁决；SC-002 需要分别断言“源缺失”与“值未知”。stale 信号若参与求值会复现实测的旧 status 误判。
 
@@ -90,7 +92,7 @@
 2. **兼容形态**：归属不可证（现行 `stage-runner.sh` 的 status/pid 不带 `run=`，且无 meta），且 `stale_signals` 为空 → 不附归属参数，watcher 输出 `attribution=legacy`，正常消费当前证据。
 3. **不调用**：归属不可证且存在 stale 信号 → 不调用 watcher，`present=false`、`reason=unavailable`、`detail=stale-evidence`，走 derived（stale 已排除）。
 
-解析 stdout 的 `WATCH ... verdict=... rc=... reason=... attribution=...` 行；`watch_verdict.exit_code` 保存 watcher 的判定码（0 或非零，owner：`watch-target.sh --help`）；usage 与调用失败记 `exit_code=null`。watcher 不可用（脚本缺失、调用失败、超时、输出不可解析、usage）→ `present=false, verdict=null, reason=unavailable` + `detail=<具体原因>`，改走 derived 映射，绝不伪造 verdict、绝不判 `DEAD`。watch target 是否存在由文件证据判定：pid/status 记录存在、哨兵存在或 `stage_started_at` 可读；否则无目标 → `present=false`、证据 `status=na`。
+解析 stdout 的 `WATCH ... verdict=... rc=... reason=... attribution=...` 行；`watch_verdict.exit_code` 保存 watcher 的判定码（0 或非零，owner：`watch-target.sh --help`）；usage 与调用失败记 `exit_code=null`。watcher 不可用（脚本缺失、调用失败、超时、输出不可解析、usage）→ `present=false`、`status=missing`、`value_state=na`、`verdict=null`、`reason=unavailable` + `detail=<具体原因>`，改走 derived 映射，绝不伪造 verdict、绝不判 `DEAD`。watch target 是否存在由文件证据判定：pid/status 记录存在、哨兵存在或 `stage_started_at` 可读；否则无目标 → `present=false`、`status=na`、`value_state=na`、`reason=null`。
 
 **理由**：FR-005 与 Q5；A-2 的判定所有权。归属分态避免把一个“无 run= 的现行信封”在 `--line-id` 下误判 `unattributed` 而丢弃终止证据；兼容形态只在快照已排除 stale 后使用，安全性由本地 stale 过滤兜底。`loop-state.py` 的退出码始终由自身阶梯决定，watcher 的退出码只作数据。
 
@@ -111,7 +113,7 @@
 
 ### R-08 产物映射与提交证据
 
-**裁决**：脚本内 `STAGE_ARTIFACTS` 数据表为机器权威，`references/state-awareness.md` 的同名章节为其人类可读投影，契约测试断言两者一致。表覆盖 8 个阶段，每项含 `artifacts[]`（必需）、`owned_paths[]`（受约束但可选，plan 的 `research.md` 落此）、`commit_required`、`no_change_allowed`。完整性只看“文件存在且非空”（目录类产物要求至少一个非空文件）；提交证据以脊 `stage_base_commit` 为基线，`git log <base>..HEAD -- <pathspec>`；基线缺失 → `commits.value_state=unknown`，不回退“最近一次提交”；`commit_required=false` → `status=na`。implement 的产物完整性以基线后的代码/测试提交表达（无固定 spec 路径）。
+**裁决**：脚本内 `STAGE_ARTIFACTS` 数据表为机器权威，`references/state-awareness.md` 的同名章节为其人类可读投影，契约测试断言两者一致。表覆盖 8 个阶段，每项含 `artifacts[]`（必需）、`owned_paths[]`（受约束但可选，plan 的 `research.md` 落此）、`commit_required`、`no_change_allowed`。完整性只看“文件存在且非空”（目录类产物要求至少一个非空文件）；`checklist` 阶段另要求自 `stage_base_commit` 起新增或修改的 checklist 文件，仅有预存文件不判完整。提交证据以脊 `stage_base_commit` 为基线，`git log <base>..HEAD -- <pathspec>`；基线缺失 → `commits.value_state=unknown`，不回退“最近一次提交”；`commit_required=false` → `status=na`。implement 的产物完整性以基线后的代码/测试提交表达，`pathspec` 枚举为 `src/`、`skills/`、`scripts/`、`tests/`、`templates/`、`agents/`；仅文档提交不计。`提交齐备` 谓词与特例动作（analyze vacuous complete、clarify 合法无变更、unknown baseline → verify）由 `IA-14` 唯一定义。
 
 **理由**：FR-006/007/008；A-12 的 owner 形式；plan-owned 集合来自 `efficiency-model.md` §3.1，U4 清单来自 `stage-prompts.md`。`research.md` 在 plan 模板中是条件产物，故列为 owned-but-optional，而 `feature-ref.md` 等为本流程必需产物。
 
@@ -140,13 +142,17 @@
 2. `remote-unreachable` → `stop`。
 3. `loop_state=UNKNOWN`（证据缺口）→ `stop`。
 4. `unwatched` / `deadline-overrun-live` / `loop_state=RUNNING` /（`TIMEOUT` 且 pid 存活）→ `watch`。
-5. `DONE` + 产物齐备 + 提交齐备 → `verify`。
-6. 产物齐备 + 日志末行非 `ANOMALY:` +（哨兵存在或脊 salvage **完整记录**：`accepted` + `salvage_evidence` + `salvage_at`）→ `resume`；`attempt` 未知时不得给 `resume`（降级 `retry`）。
-7. 产物齐备 + 无哨兵 + salvage 未完整记录 → `retry`（salvage 门）。
-8. 伪完成（哨兵在而产物缺）→ `retry`，除非证据缺口（`IA-04`）或尝试上限（`IA-15`）改为 `stop`。
-9. `STALLED` / `REENTRY_REQUIRED` → `stop`（交回驱动者，不重派）。
-10. 其余终态（`INCOMPLETE/ANOMALY/FAILED/DEAD/NO_SIGNAL`；`TIMEOUT` 仅在 pid 不存活时）→ `retry`。
-11. 兜底 → `stop`（不猜）。
+5. `DONE` + `commit_required=false`（含 `commits.status=na`）→ `verify`。
+6. （`DONE` 或产物齐备）+ `commits.value_state=unknown` → `verify`（`reason=commit-baseline-unknown`，不得进入 `resume`/`stop` 提交分支）。
+7. `DONE` + 产物齐备 + 提交齐备 → `verify`。
+8. 产物齐备 + 日志末行非 `ANOMALY:` +（末行哨兵或脊 salvage **完整记录**：`accepted` + `salvage_evidence` + `salvage_at`）→ `resume`；`attempt` 未知时不得给 `resume`（降级 `retry`）。
+9. 产物齐备 + 无末行哨兵 + salvage 未完整记录 → `retry`（salvage 门）。
+10. 伪完成（末行哨兵而产物缺）→ `retry`，除非证据缺口（`IA-04`）或尝试上限（`IA-15`）改为 `stop`。
+11. `STALLED` / `REENTRY_REQUIRED` → `stop`（交回驱动者，不重派）。
+12. 其余终态（`INCOMPLETE/ANOMALY/FAILED/DEAD/NO_SIGNAL`；`TIMEOUT` 仅在 pid 不存活时）→ `retry`。
+13. 兜底 → `stop`（不猜）。
+
+`提交齐备` 的判据：`commit_required=false` 或 `commits.status=na` → true；`no_change_allowed=true` 且相对 `stage_base_commit` 无变更 → true（clarify 合法无变更）；`value_state=unknown` → false 且走 `verify`；否则以基线后触及阶段产物路径的提交为准（implement 仅代码/测试路径）。analyze 无必需文件产物 → `artifacts.complete=true`（vacuous truth）。`stale-signal` 在 065a 只列入并排除求值，不单独改变候选动作；`stale-unisolated → stop` 由 065c 承接（SA-1 显式推迟）。
 
 在得出候选后应用重试上限：`attempt >= retry_limit` 且候选 ∈ {resume, retry, stop} → `stop`；`watch/none/verify` 不受限。`retry_limit` 取 `--retry-limit` → 引擎常量；常量由契约测试与 `references/stage-prompts.md` § Stall Handling 的缺省值钉住（漂移转红），不在本规格复述。
 
@@ -168,7 +174,7 @@
 
 - 六类已实现形态（`unwatched` 缺失/过期两分支、`dead-no-exit-record`、`deadline-overrun-live`、`artifacts-without-completion`、`stale-signal`、`remote-unreachable`）；
 - 旧信号污染、产物齐备无哨兵、进程死无退出记录、哨兵在产物缺、TIMEOUT 活进程、legacy 脊、不可达证据；
-- `not-dispatched`、Registry 缺失但可继续求值、probe 两形状、probe 拒绝路径、确定性、退出码阶梯与 `--help` 钉住。
+- `not-dispatched`（含 `--stage` 仅为意图与脊存在排除条件）、Registry 缺失但可继续求值、必需输入与证据源分档（exit 2 vs `missing` + exit 0）、末行哨兵边界（末行哨兵 + 活进程 + 其后 `ANOMALY:` 行）、提交齐备特例（analyze vacuous complete、`commit_required=false`、unknown baseline、clarify 合法无变更、implement 仅文档提交、checklist 仅预存文件）、probe 两形状、probe 拒绝路径、确定性、退出码阶梯与 `--help` 钉住。
 
 并发锁与 `recover/check-spine` 拒绝路径不在本切片自测范围（065c/065b 追加）。
 

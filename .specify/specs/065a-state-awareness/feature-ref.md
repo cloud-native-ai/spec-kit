@@ -9,7 +9,7 @@
 
 - 本切片 MUST 复用 Feature 065，MUST NOT 新建 Feature ID 或注册行（`requirements.md` A-15）。
 - Feature 065 的权威需求仍是父规格 `.specify/specs/065-loop-interruption-recovery/requirements.md`；本切片是其在分解门下的第一个执行单元，保留父 FR 编号空间（SA-2）。
-- 本 plan 只把 Feature 065 的注册状态从 `Draft` 推进到 `Planned`，并更新详情文件的 Latest Review / Related Specifications；MUST NOT 推进到 `Implemented`。
+- 本 plan 按 `requirements.md` §Related Feature 的授权（Draft→Planned 由 plan 阶段按 Feature Integration 拥有）把 Feature 065 的注册状态从 `Draft` 推进到 `Planned`，并更新详情文件的 Latest Review / Related Specifications；MUST NOT 推进到 `Implemented`。
 
 ## 2. 本切片在 Feature 065 中的位置
 
@@ -61,4 +61,4 @@
 - `.specify/memory/features/065.md`：`Status: Planned`；`Last Updated`；Latest Review 追加 065a plan 摘要；Related Specifications 增加切片规格与 plan 指针。
 - `Total Features` 不变（本次不新增 Feature 行）。
 
-**披露**：切片 `requirements.md` §Related Feature 写有“MUST NOT 改写注册状态或索引行”；本阶段指令与 `/speckit.plan` 的 Feature Integration 要求把绑定特性推进到 `Planned`。本阶段执行后者并在此显式记录差异；不新建 Feature ID、不新增注册行（另见 `plan.md` §Disclosed Deviations）。
+**状态推进说明**：切片 `requirements.md` §Related Feature 已按 2026-10-21 analyze 修复改写为「不新建 Feature ID、不新增注册行；Draft→Planned 的状态推进由 plan 阶段按 Feature Integration 拥有」。本阶段据此执行 Draft→Planned，不新建 Feature ID、不新增注册行；requirements 与该推进现已一致（另见 `plan.md` §Disclosed Deviations）。

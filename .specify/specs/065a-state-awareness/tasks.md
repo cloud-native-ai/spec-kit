@@ -17,7 +17,7 @@
 
 - DoD-1: 所有任务行为 `[X]`；如有 `[~]`，理由记录在 `.specify/specs/065a-state-awareness/verification.md` 的 `deferred_tasks=`。
 - DoD-2: `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现 `snapshot`、`--probe`、`--self-test`，对 `recover`/`check-spine` 返回结构化拒绝；全部执行路径只读（显式 `--out` 除外）。
-- DoD-3: 4 份契约的 60 条条款逐条有测试或文档落点；`LS`/`SN`/`IA`/`AM` 条款由单元/契约测试与 owner reference 覆盖，跨切片条款在 reference 中显式标注归属。
+- DoD-3: 4 份契约的 60 条规范条款（`C-1`…`C-60`；`LS`/`SN`/`IA`/`AM` 为别名）逐条由任务行 `[green:]` 认领并有测试或文档落点；另有一条契约测试断言 `loop-state.py` 的 `STAGE_ARTIFACTS`、`references/state-awareness.md` §Stage Artifact Map 与 `requirements.md` FR-004 的 derived 映射表三方逐项一致（代码表 == reference 表 == FR-004 表）。
 - DoD-4: `tests/unit/test_loop_state_engine.py`、`tests/contract/test_loop_state_contract.py`、`tests/contract/test_sdd_loop_driver_skill.py` 全绿，且全量回归相对 T001 基线零 NEW 失败。
 - DoD-5: 源与运行时镜像字节一致（`scripts/loop-state.py`、`references/state-awareness.md`、`SKILL.md` 三对）；`sync-mirrors.py --check` 相对 T001 基线无新增漂移。
 - DoD-6: `.specify/specs/065a-state-awareness/verification.md` 以 `- **SC-001**:` 至 `- **SC-006**:` 列出六条成功标准的状态、命令、输出与证据，并以 `- **US5-A1**:` 至 `- **US5-A4**:` 列出四条兼容性验收。
@@ -49,7 +49,7 @@
 - **[P]**: 可与同一阶段内其它 `[P]` 行并行（写目标不同、无未完成依赖）。
 - **[Story]**: 用户故事标签（`[US1]` / `[US2]`），仅用户故事阶段的任务携带。
 - **[blockedBy: T001,T002]**: 显式依赖标签；被列出的任务全部 `[X]` 前不得开始本行。存在具体依赖时用它替代散文式“depends on”。
-- **契约绿点**: 本切片契约使用 `LS`/`SN`/`IA`/`AM` 条款编号，`.specify/scripts/python/clause_extract.py` 只识别 `C-<n>` 形式，声明 `[green: contracts/<file>#LS-01]` 会被 `validate-tasks.py` 判 `green-dangling`；因此绿点归属由 § Requirement Coverage Map 与对应测试行承担，不使用 `[green:]` 标签。
+- **契约绿点**: 本切片契约使用项目规范条款形态 `C-1`…`C-60`（语法 owner：`.specify/shared/definitions/contract-clause-definitions.md` §3），`LS`/`SN`/`IA`/`AM` 仅作为别名保留在各契约开头的映射表。`clause_extract.py` 只识别 `C-<n>` 形式，故绿点用 `[green: contracts/<file>#C-<n>]` 声明；60 条条款必须被任务行完整认领（T003 C-1…C-6、T004 C-7…C-32、T007 C-33…C-49、T011 C-50…C-60），并由 `account-clause-coverage.py` 核对。
 - 每行必须单行完成（含文件路径），不得换行续写。
 
 ### Task State Sigil (REQUIRED)
@@ -68,7 +68,8 @@
 
 | Premise | Re-derivation command | Real output |
 |---------|-----------------------|-------------|
-| 契约条款数 | `grep -cE '^- \*\*[A-Z]{2,4}-[0-9]{2}\b' .specify/specs/065a-state-awareness/contracts/*.md` | `loop-state-cli.md` 18、`snapshot-envelope.md` 14、`interruption-and-action.md` 17、`stage-artifact-map.md` 11；合计 60 |
+| 契约条款数 | `grep -cE '^- \*\*C-[0-9]+\*\*' .specify/specs/065a-state-awareness/contracts/*.md` | `loop-state-cli.md` 18、`snapshot-envelope.md` 14、`interruption-and-action.md` 17、`stage-artifact-map.md` 11；合计 60（`LS`/`SN`/`IA`/`AM` 为别名，不计入） |
+| 契约条款数（历史形态，勿用） | `grep -cE '^- \*\*[A-Z]{2,4}-[0-9]{2}\b' .specify/specs/065a-state-awareness/contracts/*.md` | 0 —— 条款已改为规范 `C-N` 形态；该命令只作迁移前对照 |
 | 契约条款数（naive 变体，勿用） | `grep -ohE '[A-Z]{2,4}-[0-9]{2}' .specify/specs/065a-state-awareness/contracts/*.md \| wc -l` | 80 —— 把散文引用计入，与条款定义数不一致 |
 | 任务行数 | `grep -cE '^- \[ \] T[0-9]{3}' .specify/specs/065a-state-awareness/tasks.md` | 30（红线 ≤40） |
 | 任务行数（naive 变体，勿用） | `grep -ohE 'T[0-9]{3}' .specify/specs/065a-state-awareness/tasks.md \| wc -l` | 182 —— 把 `blockedBy` 引用与正文提及计入，与任务行定义数不一致 |
@@ -99,7 +100,7 @@
 | FR-039 | T010、T024 |
 | FR-040 | T029 |
 | FR-041 | T029 |
-| FR-042 | T023 |
+| FR-042 | T020、T023 |
 | FR-043 | T018、T022 |
 | FR-044 | T021、T022 |
 | FR-046 | T005–T008、T026 |
@@ -112,10 +113,10 @@
 | SC-002 | T005、T006、T008、T019 |
 | SC-003 | T007、T019、T026 |
 | SC-004 | T024 |
-| SC-005 | T023、T029 |
+| SC-005 | T020、T023、T029 |
 | SC-006 | T005–T008、T026 |
 
-父编号 045 / 048 为显式 out-of-slice（分别由 065c 汇总/承接），不在本表冒充切片需求。
+父编号 045 / 048 为显式 out-of-slice（分别由 065c 汇总/承接），不在本表冒充切片需求。T001（改前基线）、T002（覆盖基线冻结）、T030（Completion Gate 复验）是流程任务，按设计不映射 FR/SC。
 
 **Task Distribution**: Setup 2 · Foundational 2 · US1 15 · US2 6 · Polish 5 · 任务行合计 30。
 
@@ -138,8 +139,8 @@
 
 **⚠️ CRITICAL**: 本阶段完成前，用户故事阶段不得开始。
 
-- [ ] T003 红先编写 CLI/信封契约测试到 `tests/contract/test_loop_state_contract.py`：`--help` 的 `0/1/2` 阶梯与“watcher 判定码只作数据”、`recover`/`check-spine` 结构化拒绝（`schema_version=1`、`applied=false`、`result=failed`、`reason=not-implemented-in-065a`、exit 1）、快照顶层必填字段与 `recovery_decision.action/reason` 一致性、`--out` 原子写与落在 `state_dir`/`repo` 内时 exit 2、快照只读 mtime 审计；运行并把失败输出（命令、真实输出、退出码）写入 `.specify/specs/065a-state-awareness/notes/red-first-evidence.md`。
-- [ ] T004 实现 `skills/external/sdd-loop-driver/scripts/loop-state.py` 的 CLI 骨架与共享进程契约：`--action snapshot|recover|check-spine`、`--self-test` 与 `--line-id/--stage/--state-dir/--spec-dir/--repo/--spine/--probe/--watch-script/--out/--start-grace/--deadline-grace/--heartbeat-max-age/--retry-limit` 参数面；`--help` 列出三动作、全部参数、退出码阶梯与“watcher 判定码是数据”；`0/1/2` 退出阶梯；两个未实现动作的结构化拒绝；顶层信封组装；`--out` 同目录临时文件加原子替换并在目标落入 `state_dir` 或 `repo` 时 exit 2；仅标准库、Python 3.8 语法。 [blockedBy: T003]
+- [ ] T003 红先编写 CLI/信封契约测试到 `tests/contract/test_loop_state_contract.py`：`--help` 的 `0/1/2` 阶梯与“watcher 判定码只作数据”、`recover`/`check-spine` 结构化拒绝（`schema_version=1`、`applied=false`、`result=failed`、`reason=not-implemented-in-065a`、逐动作 `owner`：`check-spine`→`065b`、`recover`→`065c`、exit 1）、快照顶层必填字段与 `recovery_decision.action/reason` 一致性、嵌套 `spine.consistent` 且无顶层别名、`--out` 原子写与目标/父目录先 `realpath` 后比较（含 symlink、相对路径、指向 `state_dir` 的符号链接）落在 `state_dir`/`repo` 内时 exit 2 且不留文件、快照只读 mtime 审计；运行并把失败输出（命令、真实输出、退出码）写入 `.specify/specs/065a-state-awareness/notes/red-first-evidence.md`。 [green: contracts/loop-state-cli.md#C-1] [green: contracts/loop-state-cli.md#C-2] [green: contracts/loop-state-cli.md#C-3] [green: contracts/loop-state-cli.md#C-4] [green: contracts/loop-state-cli.md#C-5] [green: contracts/loop-state-cli.md#C-6]
+- [ ] T004 实现 `skills/external/sdd-loop-driver/scripts/loop-state.py` 的 CLI 骨架与共享进程契约：`--action snapshot|recover|check-spine`、`--self-test` 与 `--line-id/--stage/--state-dir/--spec-dir/--repo/--spine/--probe/--watch-script/--out/--start-grace/--deadline-grace/--heartbeat-max-age/--retry-limit` 参数面；`--help` 列出三动作、全部参数、退出码阶梯与“watcher 判定码是数据”；`0/1/2` 退出阶梯；两个未实现动作的结构化拒绝（`owner` 按动作：`check-spine`→`065b`、`recover`→`065c`）；顶层信封组装（含嵌套 `spine.consistent`）；`--out` 目标与父目录先 `realpath` 再比较、同目录临时文件加原子替换，目标落入 `state_dir` 或 `repo` 时 exit 2 且不留文件；仅标准库、Python 3.8 语法。 [blockedBy: T003] [green: contracts/loop-state-cli.md#C-7] [green: contracts/loop-state-cli.md#C-8] [green: contracts/loop-state-cli.md#C-9] [green: contracts/loop-state-cli.md#C-10] [green: contracts/loop-state-cli.md#C-11] [green: contracts/loop-state-cli.md#C-12] [green: contracts/loop-state-cli.md#C-13] [green: contracts/loop-state-cli.md#C-14] [green: contracts/loop-state-cli.md#C-15] [green: contracts/loop-state-cli.md#C-16] [green: contracts/loop-state-cli.md#C-17] [green: contracts/loop-state-cli.md#C-18] [green: contracts/snapshot-envelope.md#C-19] [green: contracts/snapshot-envelope.md#C-20] [green: contracts/snapshot-envelope.md#C-21] [green: contracts/snapshot-envelope.md#C-22] [green: contracts/snapshot-envelope.md#C-23] [green: contracts/snapshot-envelope.md#C-24] [green: contracts/snapshot-envelope.md#C-25] [green: contracts/snapshot-envelope.md#C-26] [green: contracts/snapshot-envelope.md#C-27] [green: contracts/snapshot-envelope.md#C-28] [green: contracts/snapshot-envelope.md#C-29] [green: contracts/snapshot-envelope.md#C-30] [green: contracts/snapshot-envelope.md#C-31] [green: contracts/snapshot-envelope.md#C-32]
 
 **Checkpoint**: `--help`、退出码阶梯、拒绝信封与 `--out` 边界可由契约测试验证；US1 可以开始。
 
@@ -155,23 +156,23 @@
 
 > **NOTE: 先写这些测试并确认其失败，再进入实现。**
 
-- [ ] T005 [US1] 红先编写单元测试到 `tests/unit/test_loop_state_engine.py`：路径解析优先级（显式 `--spine/--state-dir/--spec-dir/--repo` → Registry → `missing`）、Registry 缺失继续求值、v1 机读段与 legacy 脊降级（`missing_fields`、`value_state=unknown`）、“有派发证据但脊缺失 → `UNKNOWN`+`stop`”与 `not-dispatched` 的判据互斥、单线求值不跨线推断、两次同输入除 `evaluated_at` 外逐字相等；把红跑输出写入 `.specify/specs/065a-state-awareness/notes/red-first-evidence.md`。 [blockedBy: T004]
-- [ ] T006 [US1] 红先扩展 `tests/unit/test_loop_state_engine.py`：四件套空格信封读取（含无 `run=` 的现行 status/pid）、watchbeat 的 `run/stage/window/at/event` 与新鲜度、日志末行哨兵与 `ANOMALY:`、stale 三类判据（run 不符、mtime 早于 `stage_started_at`、无归属 `legacy-stale`）与求值排除、产物“存在且非空”（目录至少一个非空文件）、`stage_base_commit` 基线的提交证据、`false_completion`；记录红跑。 [blockedBy: T005]
-- [ ] T007 [US1] 红先扩展 `tests/unit/test_loop_state_engine.py`：FR-004 的 derived 八条优先级与两个前置短路、六类检测器的正/逆样本（正常窗口不报 `unwatched`、活进程不出 `stop`、哨兵在而产物缺不 `resume`）、watcher 归属三态（own / legacy / 有 stale 不调用）、`IA-14` 动作优先级、salvage 门与尝试上限、probe 两形状与本地证据隔离、事故回放夹具（SC-001）；记录红跑。 [blockedBy: T006]
-- [ ] T008 [US1] 红先扩展 `tests/contract/test_loop_state_contract.py`：`--probe` 两形状与拒绝路径（不可解析、`schema_version≠1`、`reachable=true`、与本地路径参数互斥）、`--self-test` 输出契约（`ok <case>` / `FAIL <case> — <detail>` / `SELF-TEST: N passed, M failed` / exit 0|1）、确定性（除 `evaluated_at` 外 diff 为 0）、`AM-01` 的脚本 `STAGE_ARTIFACTS` 与 `references/state-awareness.md` §Stage Artifact Map 五维逐项一致；记录红跑。 [blockedBy: T003,T004]
+- [ ] T005 [US1] 红先编写单元测试到 `tests/unit/test_loop_state_engine.py`：路径解析优先级（显式 `--spine/--state-dir/--spec-dir/--repo` → Registry → `missing`）、Registry 缺失继续求值、v1 机读段与 legacy 脊降级（`missing_fields`、`value_state=unknown`）、“有派发证据但脊缺失 → `UNKNOWN`+`stop`”与 `not-dispatched` 的判据互斥、`--stage` 仅为意图、脊存在且 `spine_state` 非空时排除 `not-dispatched`、never-dispatched 时四件套/watchbeat/artifacts/commits 记 `status=na`/`value_state=na`、单线求值不跨线推断、两次同输入除 `evaluated_at` 外逐字相等；把红跑输出写入 `.specify/specs/065a-state-awareness/notes/red-first-evidence.md`。 [blockedBy: T004]
+- [ ] T006 [US1] 红先扩展 `tests/unit/test_loop_state_engine.py`：四件套空格信封读取（含无 `run=` 的现行 status/pid）、watchbeat 的 `run/stage/window/at/event` 与新鲜度、日志末行哨兵与 `ANOMALY:`（哨兵 MUST 为最后非空行；末行 `ANOMALY:` 时更早的哨兵字样不置真）、stale 三类判据（run 不符、mtime 早于 `stage_started_at`、无归属 `legacy-stale`）与求值排除、产物“存在且非空”（目录至少一个非空文件）、`checklist` 阶段要求自 `stage_base_commit` 起新增/修改的 checklist 文件（仅有预存文件的负例 → 不完整）、`stage_base_commit` 基线的提交证据、analyze 无必需文件 → `artifacts.complete=true`（vacuous truth）、implement 仅文档提交的负例 → 不完整、`false_completion` 与 `artifacts-without-completion` 互斥；记录红跑。 [blockedBy: T005]
+- [ ] T007 [US1] 红先扩展 `tests/unit/test_loop_state_engine.py`：FR-004 的 derived 八条优先级与两个前置短路、六类检测器的正/逆样本（正常窗口不报 `unwatched`、活进程不出 `stop`、哨兵在而产物缺不 `resume`）、watcher 判定三态（取得 `present=true`/`status=present`/`known`/字面量；不可用 `present=false`/`status=missing`/`value_state=na`/`reason=unavailable`；无 target `present=false`/`status=na`/`value_state=na`）、watcher 归属三态（own / legacy / 有 stale 不调用）、`IA-14` 动作优先级与特例（analyze DONE → `verify`；`commit_required=false` 的 DONE → `verify`；`commits.value_state=unknown` → `verify` + `reason=commit-baseline-unknown`；clarify 合法无变更 → `verify`）、末行哨兵 + 活进程 + 其后 `ANOMALY:` 行 → 不判 `DONE`（RUNNING + `watch`，`false_completion=false`）、stale 存在时仅列入并排除求值、不因单纯 stale 改变动作（`stale-unisolated` 归 065c）、salvage 门与尝试上限、probe 两形状与本地证据隔离、事故回放夹具（SC-001）；记录红跑。 [blockedBy: T006] [green: contracts/interruption-and-action.md#C-33] [green: contracts/interruption-and-action.md#C-34] [green: contracts/interruption-and-action.md#C-35] [green: contracts/interruption-and-action.md#C-36] [green: contracts/interruption-and-action.md#C-37] [green: contracts/interruption-and-action.md#C-38] [green: contracts/interruption-and-action.md#C-39] [green: contracts/interruption-and-action.md#C-40] [green: contracts/interruption-and-action.md#C-41] [green: contracts/interruption-and-action.md#C-42] [green: contracts/interruption-and-action.md#C-43] [green: contracts/interruption-and-action.md#C-44] [green: contracts/interruption-and-action.md#C-45] [green: contracts/interruption-and-action.md#C-46] [green: contracts/interruption-and-action.md#C-47] [green: contracts/interruption-and-action.md#C-48] [green: contracts/interruption-and-action.md#C-49]
+- [ ] T008 [US1] 红先扩展 `tests/contract/test_loop_state_contract.py`：`--probe` 两形状与拒绝路径（不可解析、`schema_version≠1`、`reachable=true`、与 `--spine/--state-dir/--spec-dir/--repo/--watch-script` 互斥且 exit 2、不读本地证据）、必需输入与证据源矩阵（`--line-id` 缺失 → exit 2；`--probe` 不可读/不可解析 → exit 2；`--spine`/`--state-dir`/`--spec-dir`/`--repo` 不可读 → `status=missing` + exit 0）、`--self-test` 输出契约（`ok <case>` / `FAIL <case> — <detail>` / `SELF-TEST: N passed, M failed` / exit 0|1）、确定性（除 `evaluated_at` 外 diff 为 0）、`C-50`（`AM-01`）的脚本 `STAGE_ARTIFACTS` 与 `references/state-awareness.md` §Stage Artifact Map 五维逐项一致、以及脚本 derived 映射表 == reference §Derived Mapping 表 == `requirements.md` FR-004 表的三方逐项一致；记录红跑。 [blockedBy: T003,T004]
 
 ### Implementation for User Story 1
 
 - [ ] T009 [US1] 在 `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现输入解析与只读投影：按 `LS-04` 解析 `line_id/stage/state_dir/spine/spec_dir/repo`、读取 Registry 条目（缺失记 `status=missing` 且不致命）、解析脊 v1 fence 与 legacy `state[:=]`、输出 `paths`/`spine`/`registry`；缺失值用 `null`，不猜路径、不填默认值。 [blockedBy: T005]
 - [ ] T010 [US1] 在 `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现证据读取器：pid/status/log/heartbeat 空格信封、watchbeat 标记、可选 hook、产物与提交证据的输入面；按信封 `run=`、mtime 与 legacy 判据产出 `stale_signals[]` 并从 `loop_state`/产物/动作求值中排除；只输出原始 `at`/`mtime_ns`，不输出年龄。 [blockedBy: T006]
-- [ ] T011 [US1] 在 `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现 `STAGE_ARTIFACTS` 数据表（requirements/clarify/plan/tasks/checklist/analyze/implement/review 八阶段，含 `artifacts[]`/`owned_paths[]`/`commit_required`/`no_change_allowed`）、产物完整性（存在且非空；目录至少一个非空文件）、`missing_artifacts[]`、以 `stage_base_commit` 为基线的 `git log <base>..HEAD -- <pathspec>` 提交证据、`uncommitted_artifacts[]` 与 `false_completion`；基线缺失记 `commits.value_state=unknown` 且不回退 HEAD。 [blockedBy: T006]
-- [ ] T012 [US1] 在 `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现 watcher 委托：仅在有活动 target、非 `not-dispatched`、非 `--probe` 时调用 `watch-target.sh --once`；按 `LS-14` 三态选择归属参数（可证归属 / 兼容形态 / 有 stale 不调用），解析 `WATCH key=value` 的 `verdict/rc/reason/attribution`；不可用统一输出 `present=false`、`verdict=null`、`reason=unavailable` 与 `detail` 值域，绝不伪造 verdict 或判 `DEAD`。 [blockedBy: T007]
+- [ ] T011 [US1] 在 `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现 `STAGE_ARTIFACTS` 数据表（requirements/clarify/plan/tasks/checklist/analyze/implement/review 八阶段，含 `artifacts[]`/`owned_paths[]`/`commit_required`/`no_change_allowed`）、产物完整性（存在且非空；目录至少一个非空文件；`checklist` 要求自 `stage_base_commit` 起新增/修改的 checklist 文件）、`missing_artifacts[]`、以 `stage_base_commit` 为基线的 `git log <base>..HEAD -- <pathspec>` 提交证据（implement 的 pathspec 枚举为 `src/`、`skills/`、`scripts/`、`tests/`、`templates/`、`agents/`，仅文档提交不计）、`uncommitted_artifacts[]`、`false_completion` 与 analyze 的 vacuous `artifacts.complete=true`；基线缺失记 `commits.value_state=unknown` 且不回退 HEAD；提交齐备谓词按 `C-46`（`IA-14`）投影。 [blockedBy: T006] [green: contracts/stage-artifact-map.md#C-50] [green: contracts/stage-artifact-map.md#C-51] [green: contracts/stage-artifact-map.md#C-52] [green: contracts/stage-artifact-map.md#C-53] [green: contracts/stage-artifact-map.md#C-54] [green: contracts/stage-artifact-map.md#C-55] [green: contracts/stage-artifact-map.md#C-56] [green: contracts/stage-artifact-map.md#C-57] [green: contracts/stage-artifact-map.md#C-58] [green: contracts/stage-artifact-map.md#C-59] [green: contracts/stage-artifact-map.md#C-60]
+- [ ] T012 [US1] 在 `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现 watcher 委托：仅在有活动 target、非 `not-dispatched`、非 `--probe` 时调用 `watch-target.sh --once`；按 `C-14`（`LS-14`）三态选择归属参数（可证归属 / 兼容形态 / 有 stale 不调用），解析 `WATCH key=value` 的 `verdict/rc/reason/attribution`；判定三态 MUST 与 T007 的断言一致——取得 `present=true`/`status=present`/`value_state=known`/字面量；不可用 `present=false`/`status=missing`/`value_state=na`/`verdict=null`/`reason=unavailable` + `detail` 值域；无 target `present=false`/`status=na`/`value_state=na`/`reason=null`；绝不伪造 verdict 或判 `DEAD`。 [blockedBy: T007]
 - [ ] T013 [US1] 在 `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现 `loop_state` 求值：watcher 判定存在时逐字采用；否则按 FR-004 固定优先级导出，并先执行 `not-dispatched`、远端不可达、有派发证据但缺脊三个前置分支；标注 `verdict_source` 与 `loop_state_reason`；与 `spine.last_verdict` 冲突只报 `spine.consistent=false`，不静默择一。 [blockedBy: T007]
 - [ ] T014 [US1] 在 `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现六类只读检测器：`unwatched`（缺失/过期两分支，哨兵存在时不触发）、`dead-no-exit-record`、`deadline-overrun-live`、`artifacts-without-completion`、`stale-signal`、`remote-unreachable`；每条含 `form/detail/evidence[]/detector`，不同根因各自成条；`heartbeat-stalled` 与 `lifecycle-spine-violation` 只保留词表与 `missing`/`unknown` 语义、不检测。 [blockedBy: T007]
 - [ ] T015 [US1] 在 `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现动作建议与信封收口：按 `IA-14` 顺序取唯一 `recovery_action`，应用 `IA-15` 尝试上限与 `attempt` 未知时不得 `resume`、`IA-16` salvage 完整记录门、`IA-17` 活进程 `TIMEOUT` 优先 `watch`；组装 `recovery_decision` 的 `action/reason/preconditions/blocked_by` 并保证与顶层字段相等。 [blockedBy: T007]
 - [ ] T016 [US1] 在 `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现 `--probe`：形状 (a) 逐字消费探针的 `spine`/`registry`/`watch_verdict`/`evidence` 并本地重算派生字段、`evidence_source=probe`；形状 (b) 输出 `STALLED`+`remote-unreachable`+`stop`；不可解析、`schema_version≠1`、`reachable=true`、`line_id` 冲突或与本地路径参数并用一律 exit 2；probe 模式不读本地证据、不调用本地 watcher。 [blockedBy: T008]
 - [ ] T017 [US1] 在 `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现 `--self-test`：自建临时夹具，逐例输出 `ok <case>` / `FAIL <case> — <detail>`，末行 `SELF-TEST: N passed, M failed`，退出 0/1；覆盖 `LS-18` 列出的六类形态（含 `unwatched` 两分支）、旧信号污染、产物齐备无哨兵、进程死无退出记录、哨兵在产物缺、TIMEOUT 活进程、legacy 脊、不可达证据、`not-dispatched`、Registry 缺失继续求值、probe 两形状与拒绝、未实现动作拒绝、确定性与 `--help` 阶梯钉住。 [blockedBy: T009,T010,T011,T012,T013,T014,T015,T016]
-- [ ] T018 [P] [US1] 编写 owner reference `skills/external/sdd-loop-driver/references/state-awareness.md`：快照入口与调用形态、八类形态表（标注 065a 六类检测 / 065b 两类）、FR-004 derived 映射的引用指针、§Stage Artifact Map（与脚本 `STAGE_ARTIFACTS` 五维逐项一致）、probe 契约、动作建议表、watchbeat 读取契约；SKILL.md 与其它 references 只引用本章节、不复述整表。 [blockedBy: T011]
+- [ ] T018 [P] [US1] 编写 owner reference `skills/external/sdd-loop-driver/references/state-awareness.md`：快照入口与调用形态、八类形态表（标注 065a 六类检测 / 065b 两类）、§Derived Mapping（必须包含一张逐项镜像 `requirements.md` FR-004 的映射表，首行声明 FR-004 为唯一 owner；不得声称拥有该表）、§Stage Artifact Map（与脚本 `STAGE_ARTIFACTS` 五维逐项一致）、probe 契约、动作建议表、watchbeat 读取契约；SKILL.md 与其它 references 只引用本章节、不复述整表。 [blockedBy: T011]
 
 ### Verification for User Story 1
 
@@ -210,7 +211,7 @@
 
 **Purpose**: 变异演练、全量回归、SC 证据矩阵、范围审计与 Completion Gate 复验。
 
-- [ ] T026 执行 SC-006 变异演练：先把 `skills/external/sdd-loop-driver/scripts/loop-state.py` 按字节备份到临时路径，再就地移除 `unwatched` 检测分支，运行 `tests/unit/test_loop_state_engine.py` 的对应用例并确认至少一条转红；随后从备份按字节恢复并校验 sha256 一致；把移除位置、命令与转红用例写入 `.specify/specs/065a-state-awareness/verification.md`。 [blockedBy: T019]
+- [ ] T026 执行 SC-006 变异演练：先把 `skills/external/sdd-loop-driver/scripts/loop-state.py` 按字节备份到临时路径，再就地移除 `unwatched` 检测分支，运行 `tests/unit/test_loop_state_engine.py` 的对应用例并确认至少一条转红；然后恢复备份，再移除 `IA-16`（`C-48`）的 salvage 完整记录门（把未完整记录当作完整），确认至少一条 salvage 用例转红；每次从备份按字节恢复并校验 sha256 一致；把两处移除位置、命令与转红用例写入 `.specify/specs/065a-state-awareness/verification.md`。 [blockedBy: T019]
 - [ ] T027 全量名字级回归：用 `SPECKIT_PYTHON=<§ Environment Prerequisites（2026-10-21）的 pytest 解释器> bash scripts/bash/run-tests.sh --names-out /tmp/065a-current-failed.txt -q` 运行全量套件，并与 T001 按其 owner 形态捕获的失败名基线做 `comm -13`（比较形态 owner：`.specify/skills/internal/implement-feature/SKILL.md` § Test runs）；要求零 NEW 失败；命令、计数与差集写入 `.specify/specs/065a-state-awareness/verification.md`。 [blockedBy: T025]
 - [ ] T028 写 SC 证据矩阵：在 `.specify/specs/065a-state-awareness/verification.md` 以 `- **SC-001**:` 至 `- **SC-006**:` 逐条给出状态、度量命令、真实输出摘要与证据路径（事故回放、确定性 diff、误报计数、watcher/Registry 回归、镜像/文档/依赖、逆样本与变异）；无法测量的量显式记 `not-evaluated`，不得手填。 [blockedBy: T026,T027]
 - [ ] T029 只读与范围审计：用 `git status --short` 与 `git diff --stat` 证明 `.specify/skills/sdd-loop-driver/` 的改动仅来自 `sync-mirrors.py` 再生成且与源字节一致，未改动 066/067/068 目录、`.specify/specs/065-loop-interruption-recovery/`、`watch-target.sh`、`line-registry.py`、命令模板与 `pyproject.toml`；确认无 daemon/外部依赖、无 push/merge/kill/删除，且 `--out` 之外无写入（mtime 审计）；结论写入 `.specify/specs/065a-state-awareness/verification.md`。 [blockedBy: T025]
@@ -287,7 +288,7 @@ Task: "T018 编写 references/state-awareness.md"
 
 - `[P]` 仅表示可并行，不表示可跳过依赖；带 `blockedBy` 的行必须在被列任务全部 `[X]` 后开始。
 - 本切片只实现 `snapshot`、`--probe`、`--self-test`；`recover` 与 `check-spine` 只返回结构化拒绝，执行路径、并发锁、`heartbeat-stalled`、`lifecycle-spine-violation` 不进入本切片。
-- 契约条款编号为 `LS`/`SN`/`IA`/`AM`，不使用 `[green:]` 绿点标签（原因见 § Format）；条款覆盖由 § Requirement Coverage Map 与测试行承担。
+- 契约条款使用规范 `C-1`…`C-60`；`LS`/`SN`/`IA`/`AM` 为别名。60 条条款由 `[green:]` 在 T003/T004/T007/T011 完整认领（原因见 § Format），并由 `account-clause-coverage.py` 核对 claimed=60、FR 25/25。
 - 工作树中的驱动技能文件已含外部同步产生的未提交改动；实现只做增量编辑，不得回退、重排或整文件重写。
 - `test-evidence/` 是驱动侧证据通道，本切片任务不写、不提交；`notes/`、`verification.md`、`coverage-baseline.txt` 是本切片的证据落点。
 - 快照只读：不得写状态脊、四件套、Registry 或工作树；`--out` 是唯一写路径且不得落在 `state_dir` 或 `repo` 内。

@@ -81,7 +81,7 @@ python3 skills/external/sdd-loop-driver/scripts/loop-state.py \
 
 ## 5. Planned example：远端不可达 probe
 
-**Premises**：probe 文件为合法 JSON `{"schema_version": 1, "reachable": false, "reason": "ssh-255"}`；调用时不得同时提供 `--spine/--state-dir/--spec-dir/--repo/--watch-script`；probe 模式不读取 Registry，因此 §4 的“Registry 有 stage”分支不适用于本场景。
+**Premises**：probe 文件为合法 JSON `{"schema_version": 1, "reachable": false, "reason": "ssh-255"}`；调用时不得同时提供 `--spine/--state-dir/--spec-dir/--repo/--watch-script`（同时提供 MUST exit 2 且不读取任何本地证据）；probe 模式不读取 Registry，因此 §4 的“Registry 有 stage”分支不适用于本场景。
 
 ```bash
 python3 skills/external/sdd-loop-driver/scripts/loop-state.py \
@@ -99,7 +99,7 @@ python3 skills/external/sdd-loop-driver/scripts/loop-state.py \
   --action snapshot --line-id <line> --probe <snapshot.json>
 ```
 
-**Expected**: `evidence.evidence_source=probe`；所有取值来自 probe；本地冲突文件 MUST NOT 改变 `loop_state`/`interruptions`/`recovery_action`。probe 不可解析或 `schema_version≠1` 时退出码 `2`。
+**Expected**: `evidence.evidence_source=probe`；所有取值来自 probe；本地冲突文件 MUST NOT 改变 `loop_state`/`interruptions`/`recovery_action`。probe 不可解析或 `schema_version≠1` 时退出码 `2`；与本地路径参数同时提供时同样退出码 `2`，且 MUST NOT 读取本地证据。
 
 ## 7. Planned example：自测
 
@@ -122,7 +122,7 @@ python3 skills/external/sdd-loop-driver/scripts/loop-state.py \
   --out /tmp/loop-state-<line>.json
 ```
 
-**Expected**: 文件内容与 stdout 信封逐字相同（原子写入）；目标若落在 state dir 或 repo 内，退出码 `2` 且不写任何文件。除 `--out` 外，快照 MUST NOT 改变任何 mtime 或工作树状态。
+**Expected**: 文件内容与 stdout 信封逐字相同（原子写入）；目标与其父目录 MUST 先 `realpath`/`Path.resolve` 规范化，再与解析后的 state dir / repo 比较；目标（含相对路径或经 symlink 指向 state dir / repo）若落在两者内，退出码 `2` 且不写任何文件。除 `--out` 外，快照 MUST NOT 改变任何 mtime 或工作树状态。
 
 ## 9. 验收映射
 
