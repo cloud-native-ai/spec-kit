@@ -1,5 +1,7 @@
 # Implementation Plan: 066-loop-state-awareness-a
 
+> **Historical (archived 2026-10-22)**: 066 is an early parallel split attempt; the active execution basis is `065a-state-awareness`. Do not implement or analyze this slice as active. See `notes/historical.md`.
+
 **Branch**: `065-loop-interruption-recovery` | **Date**: 2026-10-21 | **Spec**: [requirements.md](requirements.md)
 **Requirement → Feature**: `066-loop-state-awareness-a` → Feature 065 SDD 循环中断感知与状态恢复（Loop Interruption Awareness & Recovery）
 **Input**: Specification from `.specify/specs/066-loop-state-awareness-a/requirements.md`

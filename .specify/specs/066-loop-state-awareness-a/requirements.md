@@ -1,5 +1,7 @@
 # Requirements Specification: 状态感知（State Awareness）— Feature 065 / Slice 066
 
+> **Historical (archived 2026-10-22)**: 066 is an early parallel split attempt; the active execution basis is `065a-state-awareness`. Do not implement or analyze this slice as active. See `notes/historical.md`.
+
 **Requirement Branch**: `065-loop-interruption-recovery`（父特性线；切片规格目录 `066-loop-state-awareness-a`）  
 **Created**: 2026-10-21  
 **Status**: Draft  

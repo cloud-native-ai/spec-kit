@@ -1,5 +1,7 @@
 # Feature Reference — 066-loop-state-awareness-a
 
+> **Historical (archived 2026-10-22)**: not the active slice; see `notes/historical.md`. Active work continues in `065a-state-awareness`.
+
 **Date**: 2026-10-21 | **Requirement key**: `066-loop-state-awareness-a` | **Bound Feature**: 065 — SDD 循环中断感知与状态恢复（Loop Interruption Awareness & Recovery）
 
 ## Binding
