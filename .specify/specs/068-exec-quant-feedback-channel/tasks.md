@@ -129,9 +129,9 @@ T001（镜像/改前基线）、T002（覆盖基线冻结）、T014/T021/T027（
 
 **Purpose**: 冻结改前基线（镜像漂移 / 条款覆盖 / E2 全量失败名单），让后续每个「相对基线零 NEW」判据都有日期化依据；`notes/` 目录就位供红先取证。
 
-- [ ] T001 捕获改前基线到 `.specify/specs/068-exec-quant-feedback-channel/notes/pre-change-measurements.md`：`python3 scripts/python/sync-mirrors.py --check` 的逐对既有 drift 名单（判据 = 相对该基线零 NEW drift，既有 DIFF 一律不归因本特性；基线概览单一落点见 § Environment Prerequisites，本行落盘逐对完整名单与捕获日期）、`git status --short` 与 `git rev-parse HEAD` 快照（覆盖 § Path Conventions 的编辑面与禁改面），并创建 `notes/` 目录供后续红先取证行写入。
-- [ ] T002 [P] 冻结契约覆盖基线：在仓库根运行 `python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/068-exec-quant-feedback-channel --freeze > .specify/specs/068-exec-quant-feedback-channel/coverage-baseline.txt`（脚本只打印、不写文件），核对输出首行含 `frozen-from:` 且明示 excluding 068 自身、记录 `base-sha`；该文件留作后续覆盖核对的冻结侧。
-- [ ] T003 [P] 执行 E2 全量基线（implement 起点，恰好一次，§ Test Budget）：`bash scripts/bash/run-tests.sh --names-out .specify/specs/068-exec-quant-feedback-channel/baseline-failed.txt`（无其他过滤参数 = 全量；owner = `.specify/skills/internal/implement-feature/SKILL.md` § Test runs，失败名单比较形式以 owner 为准，本行只落命令与路径），在状态脊 test-budget 账本记 `slot=baseline` 行（命令、耗时、失败名单行数、日期）；MUST 先于任何实现编辑；`No module named pytest` 判 probe failure 不消耗槽位、不记空基线（§ Environment Prerequisites）。
+- [X] T001 捕获改前基线到 `.specify/specs/068-exec-quant-feedback-channel/notes/pre-change-measurements.md`：`python3 scripts/python/sync-mirrors.py --check` 的逐对既有 drift 名单（判据 = 相对该基线零 NEW drift，既有 DIFF 一律不归因本特性；基线概览单一落点见 § Environment Prerequisites，本行落盘逐对完整名单与捕获日期）、`git status --short` 与 `git rev-parse HEAD` 快照（覆盖 § Path Conventions 的编辑面与禁改面），并创建 `notes/` 目录供后续红先取证行写入。
+- [X] T002 [P] 冻结契约覆盖基线：在仓库根运行 `python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/068-exec-quant-feedback-channel --freeze > .specify/specs/068-exec-quant-feedback-channel/coverage-baseline.txt`（脚本只打印、不写文件），核对输出首行含 `frozen-from:` 且明示 excluding 068 自身、记录 `base-sha`；该文件留作后续覆盖核对的冻结侧。
+- [X] T003 [P] 执行 E2 全量基线（implement 起点，恰好一次，§ Test Budget）：`bash scripts/bash/run-tests.sh --names-out .specify/specs/068-exec-quant-feedback-channel/baseline-failed.txt`（无其他过滤参数 = 全量；owner = `.specify/skills/internal/implement-feature/SKILL.md` § Test runs，失败名单比较形式以 owner 为准，本行只落命令与路径），在状态脊 test-budget 账本记 `slot=baseline` 行（命令、耗时、失败名单行数、日期）；MUST 先于任何实现编辑；`No module named pytest` 判 probe failure 不消耗槽位、不记空基线（§ Environment Prerequisites）。
 
 **Checkpoint**: 三份基线落盘（镜像漂移 / 覆盖 / E2 失败名单）；全部「零 NEW」判据有冻结对照物。
 
