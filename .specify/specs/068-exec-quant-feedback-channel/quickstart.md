@@ -107,8 +107,9 @@ python3 -m pytest tests/contract/test_feedback_utils_cli.py \
   tests/integration/test_feedback_selective_triggering.py \
   tests/integration/test_feedback_skill_record.py \
   tests/integration/test_feedback_threshold.py -q
-# 实现前基线（本阶段 2026-10-22 实跑）: 全部通过, 0 failed —— 见
-# test-evidence/log-baseline-pre-impl.txt（排序 nodeid 失败名单 = 空名单）
+# 实现前基线（本阶段 2026-10-22 实跑）: 3 failed, 544 passed —— 见
+# test-evidence/log-baseline-pre-impl.txt（排序 nodeid 失败名单 = 3 个既有镜像一致性 nodeid；
+# 判据 = 实现后零 NEW failing nodeid，名字级比对）
 ```
 
 **核验形态**（SC-006 / C-CS-03）: 实现后重跑同一命令集，排序失败 nodeid 名单与
