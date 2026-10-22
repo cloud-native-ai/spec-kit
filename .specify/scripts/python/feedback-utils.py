@@ -31,7 +31,7 @@ Each entry is local-scoped (``scope: local``: one unit + one run); a
 framework-wide view exists only as the aggregation built over recorded entries.
 ``/speckit.review`` is a separate SDD-flow mechanism that reviews one feature's
 process — not a whole-framework report (boundary owner:
-``.specify/shared/workflow/feedback-step.md`` § Mechanism boundary).
+``shared/workflow/feedback-step.md`` § Mechanism boundary).
 
 Positioning: feedback targets the Spec Kit framework itself (templates,
 commands, skills, scripts, docs) — never the LLM, agent CLI, harness, or the

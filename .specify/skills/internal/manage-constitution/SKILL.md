@@ -15,7 +15,7 @@ a TEMPLATE containing placeholder tokens in square brackets (e.g. `[PROJECT_NAME
 template precisely, and (c) propagate any amendments across dependent artifacts.
 
 Owning command: `/speckit.constitution`. Canonical extraction source:
-`.specify/templates/commands/constitution.md` § Pre-flight and execution flow steps 1–8 — including
+`templates/commands/constitution.md` § Pre-flight and execution flow steps 1–8 — including
 the `x.y.z.ddd` version-increment rules, the consistency-propagation checklist, and the Sync
 Impact Report format. Content moved here in substance; the command template keeps entry,
 user-input handling, and handoffs only.
@@ -271,7 +271,7 @@ Write the completed constitution to `/.specify/memory/constitution.md` (overwrit
   re-checking plans after a "Constitution Check" change (`/speckit.plan`) — is routed by the
   owning command's Handoffs, not re-invoked here.
 - User-input processing and handoff wiring stay with the command template
-  (`.specify/templates/commands/constitution.md`); this skill starts from the processed intent.
+  (`templates/commands/constitution.md`); this skill starts from the processed intent.
 
 ## Wrap-up
 

@@ -131,7 +131,7 @@ This Skill follows the canonical path conventions:
 | Directory | Contents |
 |-----------|----------|
 | `${SKILL_HOME}/scripts/office/` | Shared Office tools: `soffice.py`, `pack.py`, `unpack.py`, `validate.py`, `helpers/`, `validators/`, `schemas/` |
-| `${SKILL_HOME}/scripts/docx/` | DOCX-specific: `accept_changes.py`, `comment.py`, `.specify/templates/` |
+| `${SKILL_HOME}/scripts/docx/` | DOCX-specific: `accept_changes.py`, `comment.py`, `templates/` |
 | `${SKILL_HOME}/scripts/pdf/` | PDF-specific: `check_bounding_boxes.py`, `check_fillable_fields.py`, `convert_pdf_to_images.py`, `create_validation_image.py`, `extract_form_field_info.py`, `extract_form_structure.py`, `fill_fillable_fields.py`, `fill_pdf_form_with_annotations.py` |
 | `${SKILL_HOME}/scripts/pptx/` | PPTX-specific: `add_slide.py`, `clean.py`, `thumbnail.py` |
 | `${SKILL_HOME}/scripts/xlsx/` | XLSX-specific: `recalc.py` |

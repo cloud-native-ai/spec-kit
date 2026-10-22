@@ -16,7 +16,7 @@ ordering, engine invocation). The goal *concept* — composition, lifecycle, bou
 against Requirement, criteria authority, singularity, and the team binding — is defined
 once in `.specify/shared/definitions/goal-definitions.md`. **Link to that document; never
 restate it.** Deterministic rules (identity grammar, three-part structure, lifecycle
-table, change history, archive enumeration) live in `.specify/scripts/python/goal-utils.py`. Call
+table, change history, archive enumeration) live in `scripts/python/goal-utils.py`. Call
 the engine; do not re-derive its judgments in prose.
 
 **Non-negotiable boundary** (carried verbatim from the command's positioning): no skill,
@@ -24,7 +24,7 @@ script, or other command may write into the goal archive **directly** — the go
 (`goal-utils.py`) is its sole writing path, whether driven by `/speckit.goal` or carried
 as delegated logic behind it.
 
-Canonical extraction source: `.specify/templates/commands/goal.md` § Modes, § Outline 1–7, and
+Canonical extraction source: `templates/commands/goal.md` § Modes, § Outline 1–7, and
 § Boundaries. Content moved here verbatim in substance; the command template keeps entry,
 user-input handling, glossary pre-step, and lifecycle only.
 
@@ -72,25 +72,25 @@ gate**；事后修改经 `/speckit.goal` modify). `view` stays read-only.
 ### 4. Execute via the engine — never hand-write a definition file
 
 The block below fixes only the **read/write grouping**; every action's full flag set and
-defaults are owned by `python3 .specify/scripts/python/goal-utils.py --help` and are not restated
+defaults are owned by `python3 scripts/python/goal-utils.py --help` and are not restated
 here.
 
 ```bash
 # 读组 — zero writes
-python3 .specify/scripts/python/goal-utils.py list    # archive listing (no `view` action)
-python3 .specify/scripts/python/goal-utils.py validate <goal-slug>
-python3 .specify/scripts/python/goal-utils.py check-statement "<sub-outcome statement>"
-python3 .specify/scripts/python/goal-utils.py targets <goal-slug> --list
-python3 .specify/scripts/python/goal-utils.py targets <goal-slug> --check "<sub-outcome statement>"
+python3 scripts/python/goal-utils.py list    # archive listing (no `view` action)
+python3 scripts/python/goal-utils.py validate <goal-slug>
+python3 scripts/python/goal-utils.py check-statement "<sub-outcome statement>"
+python3 scripts/python/goal-utils.py targets <goal-slug> --list
+python3 scripts/python/goal-utils.py targets <goal-slug> --check "<sub-outcome statement>"
 
 # 写组 — mutates the one definition file
-python3 .specify/scripts/python/goal-utils.py create <goal-slug> --objective "<desired end outcome>"
-python3 .specify/scripts/python/goal-utils.py objective <goal-slug> --set "<revised outcome>"
-python3 .specify/scripts/python/goal-utils.py criteria <goal-slug> --criterion "<new>"
-python3 .specify/scripts/python/goal-utils.py status <goal-slug> --set achieved
-python3 .specify/scripts/python/goal-utils.py targets <goal-slug> --add "<sub-outcome statement>"
-python3 .specify/scripts/python/goal-utils.py targets <goal-slug> --set done --id T-001
-python3 .specify/scripts/python/goal-utils.py migrate <team-slug>
+python3 scripts/python/goal-utils.py create <goal-slug> --objective "<desired end outcome>"
+python3 scripts/python/goal-utils.py objective <goal-slug> --set "<revised outcome>"
+python3 scripts/python/goal-utils.py criteria <goal-slug> --criterion "<new>"
+python3 scripts/python/goal-utils.py status <goal-slug> --set achieved
+python3 scripts/python/goal-utils.py targets <goal-slug> --add "<sub-outcome statement>"
+python3 scripts/python/goal-utils.py targets <goal-slug> --set done --id T-001
+python3 scripts/python/goal-utils.py migrate <team-slug>
 ```
 
 Exit codes: `0` ok · `2` input error (rejection) · `3` not found · `4` validation failed.

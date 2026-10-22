@@ -315,7 +315,7 @@ fi
 
 # Create the skills/tools explanation docs at .specify top level (create-only,
 # never overwrite — same non-destructive policy as the glossary). These carry
-# the no-registry discovery model; canonical sources live in .specify/templates/.
+# the no-registry discovery model; canonical sources live in templates/.
 for doc_name in skills tools; do
   DOC_TEMPLATE=".specify/templates/${doc_name}.md"
   DOC_TARGET="$TARGET_DIR/${doc_name}.md"

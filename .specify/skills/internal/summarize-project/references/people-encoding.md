@@ -4,7 +4,7 @@
 
 **边界（两条）**：
 1. **通用绘图规则不在此**：字形与冗余编码、图例契约、版面/刻度/zoom 量测、渲染踩坑——权威出处在 draw-diagram：`<draw-diagram>/references/guide/style.md`、`<draw-diagram>/references/howto/13-wbs-diagram.md`、`<draw-diagram>/references/howto/14-gantt-diagram.md`、`<draw-diagram>/references/howto/15-mindmap-diagram.md`。
-2. **日期与进度的计算不在此**：状态判定、延期判定、天数差、进度百分比、父项聚合、today 偏移，全部由 `.specify/scripts/progress-engine.py` 完成；本文档只写**引擎输出字段如何呈现**（哪张图承载什么、什么状态配什么颜色/符号/文案），**不含任何日期比较、算式或判定步骤**。
+2. **日期与进度的计算不在此**：状态判定、延期判定、天数差、进度百分比、父项聚合、today 偏移，全部由 `scripts/progress-engine.py` 完成；本文档只写**引擎输出字段如何呈现**（哪张图承载什么、什么状态配什么颜色/符号/文案），**不含任何日期比较、算式或判定步骤**。
 
 **本文档存在的原因**：采集阶段登记了「负责人」，但如果五个呈现层面都没有人员的落点，这份数据就被静默丢弃——报告读者看不到"谁在负责"，采集也就白做。因此本文档规定：**人员是与状态、日期同级的一等呈现维度，每张图与报告正文都有强制承载位；缺失也必须显式说明，不得静默省略。**
 
@@ -164,7 +164,7 @@ PlantUML 甘特原生有资源语法 `[任务] on {张三}`。**本技能默认�
 
 ### 4.2 三态与逾期：状态**取自引擎输出**，本节只管怎么呈现
 
-**判定不在本文档**：里程碑的状态、锚定日、逾期天数一律由 `.specify/scripts/progress-engine.py` 计算（一次运行、全报告共用）：
+**判定不在本文档**：里程碑的状态、锚定日、逾期天数一律由 `scripts/progress-engine.py` 计算（一次运行、全报告共用）：
 
 ```bash
 python3 ${SKILL_HOME}/scripts/progress-engine.py \
@@ -592,7 +592,7 @@ end legend
 - [ ] 人员名称四处逐字一致：结构 D 规范名 = WBS `【…】` = 甘特 ` ▪ 姓名` = 里程碑 ` ▪姓名`（推断后缀 `（推断）` 只出现在表格与元信息）
 - [ ] 甘特未使用 `on {}`（除用户明确要求负载视图，且已按第 3 节例外条件处理）
 - [ ] 每个里程碑菱形标签自带 `yyyy-mm-dd` + 三态符号（`✓`/`◇`/`⚠`），日期照抄引擎 `anchor_date`；字形合规按 `<draw-diagram>/references/guide/style.md`「状态编码：颜色 + 符号冗余」检查
-- [ ] 已跑过 `.specify/scripts/progress-engine.py`（同一 `--baseline` 与全报告基准日一致）；图内颜色/符号与跟踪表状态列逐条等于引擎 `status`，依据列文本取自引擎 `delay_days` / `evidence`（逾期写 `逾期 N 天`），**报告内无任何手工日期比较或天数差计算**
+- [ ] 已跑过 `scripts/progress-engine.py`（同一 `--baseline` 与全报告基准日一致）；图内颜色/符号与跟踪表状态列逐条等于引擎 `status`，依据列文本取自引擎 `delay_days` / `evidence`（逾期写 `逾期 N 天`），**报告内无任何手工日期比较或天数差计算**
 - [ ] 引擎 `status=unknown-schedule` 的里程碑：标签写 `未排期`、颜色为琥珀（**未上红**），依据列与图说写「无计划日期，无法判定延期」，并已记入 `## 元信息 · 材料缺口`
 - [ ] today 蓝线左侧无 `◇ pending`、右侧无 `✓ achieved`（否则回查锚定日或达成依据）
 - [ ] WBS / 脑图 / 里程碑视图均已按统一**四态**色板着色（不是灰白单色）；脑图分组节点用中性 `.group` 色

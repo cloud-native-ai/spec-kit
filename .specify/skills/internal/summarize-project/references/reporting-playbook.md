@@ -2,7 +2,7 @@
 
 `summarize-project` 技能的**跨层公共约定**：跨层图表呈现公约（四态色板 / yyyy-mm-dd 日期 / 图题图说 / 渲染契约）、**进度呈现公约（进度贯穿五章节）**、报告结构、刷新规则、图集拆分、三图一致性清单、范围与粒度控制、落盘检查单、外部文档取材。各呈现层面的细则已分解到独立层参考文档（见下方索引）；工作流主框架见 [../SKILL.md](../SKILL.md)。
 
-**边界（两条）**：① **日期与进度的计算**（状态判定、延期、天数差、百分比、聚合、today 偏移、出图判据）由 `.specify/scripts/progress-engine.py` 独家承担，本手册与各层文档只写"取哪个字段、怎么呈现"（见 [consistency-rules.md](consistency-rules.md) §0.1）。② 本手册只写**本报告的信息语义约定**（哪张图承载什么、报告结构与门禁）；通用绘图规则——PlantUML 语法、字形与冗余编码、图例契约、版面/刻度/zoom 量测、渲染踩坑——权威出处在 draw-diagram：`<draw-diagram>/references/guide/style.md`、`<draw-diagram>/references/guide/large-diagram-playbook.md`、`<draw-diagram>/references/howto/13-wbs-diagram.md`、`<draw-diagram>/references/howto/14-gantt-diagram.md`、`<draw-diagram>/references/howto/15-mindmap-diagram.md`、`<draw-diagram>/references/howto/12-rendering-and-output.md`。同一条规则只有一个权威出处，本手册不重述通用规则。
+**边界（两条）**：① **日期与进度的计算**（状态判定、延期、天数差、百分比、聚合、today 偏移、出图判据）由 `scripts/progress-engine.py` 独家承担，本手册与各层文档只写"取哪个字段、怎么呈现"（见 [consistency-rules.md](consistency-rules.md) §0.1）。② 本手册只写**本报告的信息语义约定**（哪张图承载什么、报告结构与门禁）；通用绘图规则——PlantUML 语法、字形与冗余编码、图例契约、版面/刻度/zoom 量测、渲染踩坑——权威出处在 draw-diagram：`<draw-diagram>/references/guide/style.md`、`<draw-diagram>/references/guide/large-diagram-playbook.md`、`<draw-diagram>/references/howto/13-wbs-diagram.md`、`<draw-diagram>/references/howto/14-gantt-diagram.md`、`<draw-diagram>/references/howto/15-mindmap-diagram.md`、`<draw-diagram>/references/howto/12-rendering-and-output.md`。同一条规则只有一个权威出处，本手册不重述通用规则。
 
 ## 0. 层参考文档索引（一层一文档）
 
@@ -26,14 +26,14 @@
 | [required-info.md](required-info.md) | **业务语义层（必要信息表）**：七个实体的规范字段名（snake_case，字段名即列名也即关联键）、三档必填性 R/I/O、每字段的呈现用途与缺失后果、表单落位与只读纪律、数据库生命周期（默认重建 / `--update` 基于历史库更新）、opt-in repo 与多 repo 归集、校验报告输出字段。**约束规则本身不在这里重述，指向 DDL** |
 | [data-model.md](data-model.md) | 记录层四结构 → 呈现物的派生映射与完整性检查（字段定义引用 DDL，不再另写一份 schema）、日期呈现与推断标注 |
 | [people-encoding.md](people-encoding.md) | 人员承载位（记录层 / 图内 / 报告正文三层）与缺失显式声明、统一图元字面量、甘特人员编码（负责人进条形显示名，不用 `on {}`）、里程碑日期与三态/逾期字段映射、本报告的四态色板映射与引擎字段消费契约、里程碑视图独立成图判定、里程碑/目标进度看板（形态 A 表 + 形态 B 图）、实测通过的 PlantUML 示例 |
-| [progress-presentation.md](progress-presentation.md) | **进度贯穿五章节的呈现骨架**：五章节各自的进度呈现位/形态/引用字段总表、逐章节呈现模板（整体进度摘要 / 特性进度列 / 工作项与阶段聚合进度 / 里程碑进度汇总表 / 进度叙述）、进度叙述规范（百分比写法、枚举→读者用语映射、禁用写法）、跨章节进度口径一致门禁、进度数据缺失时的降级、`## 元信息 · 进度数据来源`。**一切进度与日期计算在引擎（`.specify/scripts/progress-engine.py`），呈现层只引用字段** |
+| [progress-presentation.md](progress-presentation.md) | **进度贯穿五章节的呈现骨架**：五章节各自的进度呈现位/形态/引用字段总表、逐章节呈现模板（整体进度摘要 / 特性进度列 / 工作项与阶段聚合进度 / 里程碑进度汇总表 / 进度叙述）、进度叙述规范（百分比写法、枚举→读者用语映射、禁用写法）、跨章节进度口径一致门禁、进度数据缺失时的降级、`## 元信息 · 进度数据来源`。**一切进度与日期计算在引擎（`scripts/progress-engine.py`），呈现层只引用字段** |
 | [degradation.md](degradation.md) | 表单字段缺失时的诚实降级：R/I/O 三档分流（R→阻断出表单、I→推断标注、O→显式降级）与三个声明位、五类禁造物（进度%/里程碑日期/工期/负责人/任务状态）的合法终态、无里程碑材料时 `## 项目里程碑` 合法形态、无排期材料时甘特出图判据（git-only 极弱材料判据）、`### 材料缺口` 清单结构、稀疏项目最小可交付报告形态、声明句模板库 |
 | [portability.md](portability.md) | **可移植性纪律**：规则必须项目无关、具体值一律标注为示例、判定必须有确定性依据（DB 约束 / SQL / 脚本输出 / 材料明写）、新项目上不匹配就记材料缺口而非硬套规则、呈现决策必须可复现；技能作者自检 + 落盘「可移植性自检」门禁 |
 | [source-tiers.md](source-tiers.md) | **opt-in repo 补充源的定向查询规程（非主路径）**：启用门（`project.repos[]` + `derive_fields`）、字段级授权与佐证顺序、禁止全仓扫描、按语言取材点、"提交≠里程碑"红线、构建/CI 证据强度分级、多 repo 冲突处置 |
 | [consistency-rules.md](consistency-rules.md) | 判定规则单一权威：状态映射全集、阶段聚合真值表（四分支）、节点计数口径、spec→工作项聚合、「已交付但记录未闭合」诚实处理、逾期/at-risk 判定、统计口径契约、ID 命名空间、§11 分解树覆盖完整性门禁、§8 落盘门禁清单 |
-| `.specify/scripts/project-db.py`（**关系模型读写与校验**） | `--init` 建库建表、`--load` 装载表单（**约束即校验**，违规报可读原因）、`--update` 基于历史库 UPSERT 更新并给变更摘要、`--check` 完整性体检、`--query`/`--sql` 只读查询、`--export-json` 导出引擎输入。退出码 0 成功 / 3 约束违规 / 2 输入错误 |
-| `.specify/scripts/validate-project-input.py`（**R 档齐备性 + 待填表单**） | 检查跨表的业务必填组合（`project_name`、`baseline_date`、`work_items`/`milestones` 至少一组非空）、登记 I/O 档缺口；`--form-skeleton` 输出只含缺失必填项与数据库拒绝行的待填表单。机械约束已下沉到数据库。退出码 0 齐备 / 3 阻断 / 2 输入错误 |
-| `.specify/scripts/progress-engine.py`（**计算权威**） | 日期归一化与排序、状态映射、延期判定（含 `unknown-schedule` 诚实态）、进度% 与算式串、父项/项目聚合、里程碑达成与逾期天数、时间轴排序、甘特 today 偏移与出图判据、覆盖闭合等式、人员覆盖率、推断字段汇总。**输入是交付目录 `data/` 下的关系模型 `project.db`**（`--db`；取数与聚合走 SQL，字段名 = DDL 列名；派生产物，默认每次重建，不写入目标项目管理工件） |
+| `scripts/project-db.py`（**关系模型读写与校验**） | `--init` 建库建表、`--load` 装载表单（**约束即校验**，违规报可读原因）、`--update` 基于历史库 UPSERT 更新并给变更摘要、`--check` 完整性体检、`--query`/`--sql` 只读查询、`--export-json` 导出引擎输入。退出码 0 成功 / 3 约束违规 / 2 输入错误 |
+| `scripts/validate-project-input.py`（**R 档齐备性 + 待填表单**） | 检查跨表的业务必填组合（`project_name`、`baseline_date`、`work_items`/`milestones` 至少一组非空）、登记 I/O 档缺口；`--form-skeleton` 输出只含缺失必填项与数据库拒绝行的待填表单。机械约束已下沉到数据库。退出码 0 齐备 / 3 阻断 / 2 输入错误 |
+| `scripts/progress-engine.py`（**计算权威**） | 日期归一化与排序、状态映射、延期判定（含 `unknown-schedule` 诚实态）、进度% 与算式串、父项/项目聚合、里程碑达成与逾期天数、时间轴排序、甘特 today 偏移与出图判据、覆盖闭合等式、人员覆盖率、推断字段汇总。**输入是交付目录 `data/` 下的关系模型 `project.db`**（`--db`；取数与聚合走 SQL，字段名 = DDL 列名；派生产物，默认每次重建，不写入目标项目管理工件） |
 | 本手册 | 跨层图表呈现公约、**进度呈现公约（§1.8）**、报告骨架、刷新规则、图集拆分、一致性清单、范围/粒度控制、落盘检查单 |
 
 ## 1. 跨层图表呈现公约（所有图表统一遵守）
@@ -87,8 +87,8 @@
 - **失败修正 ≤2 轮**：按报错行修正源码后重渲。常见语法诱因（前向引用、`<style>` 的 `arrow { }` 内写 `LineStyle`、`happens at` 引用未声明的任务、`<style>` 多属性挤在一行、`legend` 未闭合、日期格式非法等）见 `<draw-diagram>/references/howto/14-gantt-diagram.md`、`<draw-diagram>/references/howto/13-wbs-diagram.md` 与 `<draw-diagram>/references/guide/style.md`，本手册不重述。修正若触及门禁冻结内容，回对应门禁重新确认。
 - **失败不可静默**：2 轮修正仍失败时，**不得**删图、不得以旧渲染结果冒充——`.puml` 源文件保留在 `assets/` 内，在报告该图位置写图题 + 显式告示行 `> ⚠ 本图渲染失败：<一句原因>`（并注明图源文件名，读者可自行渲染），并计入元信息渲染状态清单。
 - **渲染状态清单**：`## 元信息` 逐图记录「图名 | ok / failed（原因） 」；存在 failed 时报告仍可落盘，但自包含检查按"带失败告示"通过，不算静默缺图。
-- **渲染后量测自检**：成功产物还须按 `<draw-diagram>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」执行（有效字号 / 长宽比 / 标签不越界），可用其 `.specify/scripts/measure-svg-layout.py` 量测；另目检本报告特有项——图例完整可见、today 线可辨、WBS 左右阶段顺序正确、无文字截断重叠。**版面不合格按"调参重渲"处理**（刻度/zoom、MaximumWidth、Margin/Padding、legend 位置），不占用 2 轮语法修正额度、也不出失败告示。
-- **两支量测各司其职（渲染后，判据不重叠）**：**通用版面几何**（长宽比 / 有效字号 / 标签溢出 / A–B 排期比对）以 `<draw-diagram>/scripts/measure-svg-layout.py` 为权威引擎；**数据侧几何**（甘特条形起止 ⇄ 记录层日期、里程碑菱形 ⇄ 锚定日、进行中条结束边界 ⇄ 基准日——需项目日期做真值）由本技能 `.specify/scripts/verify-chart-data.py --svg <图.svg> --kind gantt --expect <记录层.json>` 承担——其 `--expect` 真值**直接由引擎输出转出**（`bars` 取各条目的 `planned_start`/`planned_end`/`progress_pct`，`milestones` 取 `anchor_date`，`project_start`/`today` 取 `gantt.project_start` 与 `baseline`），因此"图画在哪一天"与"报告写哪一天"共用同一份计算结果。两支输入不同、量测对象不同，不重复实现同一量测（通用几何不在本技能重造）。
+- **渲染后量测自检**：成功产物还须按 `<draw-diagram>/references/howto/14-gantt-diagram.md`「量测自检：三条几何判据」执行（有效字号 / 长宽比 / 标签不越界），可用其 `scripts/measure-svg-layout.py` 量测；另目检本报告特有项——图例完整可见、today 线可辨、WBS 左右阶段顺序正确、无文字截断重叠。**版面不合格按"调参重渲"处理**（刻度/zoom、MaximumWidth、Margin/Padding、legend 位置），不占用 2 轮语法修正额度、也不出失败告示。
+- **两支量测各司其职（渲染后，判据不重叠）**：**通用版面几何**（长宽比 / 有效字号 / 标签溢出 / A–B 排期比对）以 `<draw-diagram>/scripts/measure-svg-layout.py` 为权威引擎；**数据侧几何**（甘特条形起止 ⇄ 记录层日期、里程碑菱形 ⇄ 锚定日、进行中条结束边界 ⇄ 基准日——需项目日期做真值）由本技能 `scripts/verify-chart-data.py --svg <图.svg> --kind gantt --expect <记录层.json>` 承担——其 `--expect` 真值**直接由引擎输出转出**（`bars` 取各条目的 `planned_start`/`planned_end`/`progress_pct`，`milestones` 取 `anchor_date`，`project_start`/`today` 取 `gantt.project_start` 与 `baseline`），因此"图画在哪一天"与"报告写哪一天"共用同一份计算结果。两支输入不同、量测对象不同，不重复实现同一量测（通用几何不在本技能重造）。
 
 ### 1.5 人员承载公约（人员是一等呈现维度）
 

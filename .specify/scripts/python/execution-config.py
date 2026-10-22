@@ -290,7 +290,7 @@ def load_layer(path: Path, layer: str, agent: str, workspace_root: Path,
         if required:
             raise InputError(
                 f"defaults layer missing: {path} — run 'specify init' to seed it from "
-                f".specify/templates/execution-config-defaults.yaml, or restore the file")
+                f"templates/execution-config-defaults.yaml, or restore the file")
         return None
     values = parse_yaml_subset(path)
     errors = validate_layer(values, layer, agent, workspace_root)
@@ -702,7 +702,7 @@ def action_list_configs(args: argparse.Namespace) -> int:
     if not defaults_path.is_file():
         raise InputError(
             f"defaults layer missing: {defaults_path} — run 'specify init' to seed it from "
-            f".specify/templates/execution-config-defaults.yaml, or restore the file")
+            f"templates/execution-config-defaults.yaml, or restore the file")
     entries: List[Dict[str, Any]] = []
     try:
         files = sorted(configs_dir.glob("*.yaml"))

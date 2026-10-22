@@ -16,7 +16,7 @@ to a step. This skill is the executable core of `/speckit.derive`.
 
 方法的核心区别：读来源不是为了知道它**主张什么**，而是为了知道它**怎么从前提走到结论**。产物是一条可被独立读者重放核查的推导链，以及每个元素都回指链上某一步的架构。
 
-Canonical extraction source: `.specify/templates/commands/derive.md` § Stage 1–9 (Preflight /
+Canonical extraction source: `templates/commands/derive.md` § Stage 1–9 (Preflight /
 online grounding / operator extraction / chain construction / two-pass self-review /
 report) plus its Behavior Rules and the `/speckit.derive` vs `/speckit.research`
 boundary. Content moved here verbatim in substance; the command template keeps entry,

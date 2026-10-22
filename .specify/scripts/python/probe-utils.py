@@ -13,7 +13,7 @@ registry layer from here (its migrate-legacy action re-registers entries with
 probe attribution).
 
 stdlib-only; same deployment shape as feedback-utils.py (framework source
-``.specify/scripts/python/`` + ``.specify/scripts/python/`` mirror). The registry file
+``scripts/python/`` + ``.specify/scripts/python/`` mirror). The registry file
 is read from ``<workspace_root>/.specify/shared/definitions/probe-definitions.md``.
 """
 from __future__ import annotations
@@ -135,7 +135,7 @@ _PROBE_KINDS = ("internal", "external")
 _CLASS_FIELDS = ("class_id", "kind", "collection", "target_slice",
                  "processing", "insertion_type")
 _OBJECT_FIELDS = ("object_id", "class_id", "unit", "lifecycle_point")
-_SCRIPT_UNIT_RE = re.compile(r"^.specify/scripts/(?:bash|python)/[a-z0-9][a-z0-9._-]*\.(?:py|sh)$")
+_SCRIPT_UNIT_RE = re.compile(r"^scripts/(?:bash|python)/[a-z0-9][a-z0-9._-]*\.(?:py|sh)$")
 _CATALOG_HEADING = "非实体 probe 目录"
 _CATALOG_ENTRY_RE = re.compile(r"^- `([^`]+)` — .+$")
 
@@ -259,7 +259,7 @@ def load_probe_registry(workspace_root: Path) -> Dict[str, Any]:
                 if not _SCRIPT_UNIT_RE.match(o.get("unit", "")):
                     errors.append(
                         f"object '{oid}': unit '{o.get('unit', '')}' must be an engine "
-                        "script path (.specify/scripts/python/*.py or .specify/scripts/bash/*.sh) for "
+                        "script path (scripts/python/*.py or scripts/bash/*.sh) for "
                         "scripts-slice classes")
             elif not validate_unit_id(o.get("unit", "")):
                 errors.append(
@@ -438,7 +438,7 @@ def compose_probe_map(registry: Dict[str, Any]) -> str:
         "# Feedback Probe Map(反馈插点结构图)",
         "",
         "> **派生物** — 由 `--action map` 自 probe 真源整体重建,禁止手工编辑;",
-        "> 真源:`.specify/shared/definitions/probe-definitions.md` + 项目外部 probe。",
+        "> 真源:`shared/definitions/probe-definitions.md` + 项目外部 probe。",
         "",
     ]
     for kind, kind_label in (("internal", "internal(内部 — 目标为 Spec Kit 框架)"),
@@ -851,11 +851,11 @@ def scan_compile_units(workspace_root: Path) -> Dict[str, Path]:
 
 
 def _runtime_path(owner: str) -> str:
-    """Registry owner paths are framework-source-face (.specify/scripts/, .specify/shared/);
+    """Registry owner paths are framework-source-face (scripts/, shared/);
     compiled sections must reference the runtime face that resolves in every
     consumer — the framework repo AND downstream projects (only .specify/
-    exists there): .specify/scripts/python/x.py → .specify/scripts/python/x.py."""
-    if owner.startswith((".specify/scripts/", ".specify/shared/", ".specify/templates/")):
+    exists there): scripts/python/x.py → .specify/scripts/python/x.py."""
+    if owner.startswith(("scripts/", "shared/", "templates/")):
         return ".specify/" + owner
     return owner
 

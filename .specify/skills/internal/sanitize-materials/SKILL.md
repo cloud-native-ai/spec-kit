@@ -20,7 +20,7 @@ Owning command: `/speckit.sanitize`. The command template keeps entry, parameter
 and the command-lifecycle wrap-up surfaces; this skill carries the entire executable
 seven-stage flow.
 
-Canonical extraction source: `.specify/templates/commands/sanitize.md` § Outline, § Stage 1–7
+Canonical extraction source: `templates/commands/sanitize.md` § Outline, § Stage 1–7
 (Preflight / Collect / Judge / Present / Confirm / Apply / Wrap-up), and § Behavior Rules.
 Content moved here verbatim in substance; the command keeps entry + lifecycle only.
 

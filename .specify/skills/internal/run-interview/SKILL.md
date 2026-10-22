@@ -21,7 +21,7 @@ once in `.specify/shared/patterns/interview-pattern.md`. **Read that document an
 follow it; never restate or re-derive its rules here.** This skill owns only the
 *invocation*.
 
-Canonical extraction source: `.specify/templates/commands/interview.md` § Run Modes, § Mode
+Canonical extraction source: `templates/commands/interview.md` § Run Modes, § Mode
 resolution, § Interview Mode, § Outline, § Report, and § Behavior Rules (plus §
 Glossary). Content moved here verbatim in substance; the command template keeps entry,
 wiring, and lifecycle delegation only.
@@ -34,7 +34,7 @@ wiring, and lifecycle delegation only.
   a `resume` request continues an existing ledger — its header conventions and recorded
   mode then win (see Mode resolution, level 2).
 - **Context script**: run the command's declared prerequisite script — the `{SCRIPT}`
-  slot, `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` — from repo root once;
+  slot, `scripts/bash/check-prerequisites.sh --json --paths-only` — from repo root once;
   parse JSON for `REPO_ROOT`, `BRANCH`, `REQUIREMENT_ID`, `REQUIREMENTS_DIR`,
   `FEATURE_SPEC`, `IMPL_PLAN`, `TASKS`. A non-feature branch is not an error — it
   selects the non-feature ledger location.
@@ -178,7 +178,7 @@ write behaviour):
    section for the full judgment.
 
    **Drive the graph through the engine, never by reasoning about it in prose** —
-   `.specify/scripts/python/interview-utils.py` owns frontier computation, ordering, cycle
+   `scripts/python/interview-utils.py` owns frontier computation, ordering, cycle
    rejection, descendant walks, and retraction propagation (see the pattern's Engine
    section for the full contract and the strict division of labour):
 

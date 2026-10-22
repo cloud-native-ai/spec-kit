@@ -142,13 +142,13 @@ Mermaid 为**自动布局引擎**（dagre，无绝对坐标 API）→ SDS Geomet
 
 > 专项图表的渲染同样走 Step 8 的渲染脚本（`render-mermaid.sh`），服务器后端（mermaid.ink）与本地后端（mermaid-cli）对全部类型一视同仁，无需 Graphviz。
 >
-> **WBS / 甘特图交付前必做量测自检**：这两类图的"清晰度、版面、日期定位"都不能靠肉眼判断，用 [measure-svg-layout.py](.specify/scripts/measure-svg-layout.py) 量三条判据——**正文有效字号 ≥12px**（`= font-size × 显示宽度 ÷ viewBox 宽`；放大 zoom 无效）、**长宽比 1.2~1.8:1**、**标签不越过时间轴右边界**；判断某个写法（依赖箭头、资源分配、标题字号）有没有改写排期，用 `--compare` 做 A/B 并看 `scheduleChanged`。详见 [13-wbs-diagram.md](references/howto/13-wbs-diagram.md)、[14-gantt-diagram.md](references/howto/14-gantt-diagram.md)。
+> **WBS / 甘特图交付前必做量测自检**：这两类图的"清晰度、版面、日期定位"都不能靠肉眼判断，用 [measure-svg-layout.py](scripts/measure-svg-layout.py) 量三条判据——**正文有效字号 ≥12px**（`= font-size × 显示宽度 ÷ viewBox 宽`；放大 zoom 无效）、**长宽比 1.2~1.8:1**、**标签不越过时间轴右边界**；判断某个写法（依赖箭头、资源分配、标题字号）有没有改写排期，用 `--compare` 做 A/B 并看 `scheduleChanged`。详见 [13-wbs-diagram.md](references/howto/13-wbs-diagram.md)、[14-gantt-diagram.md](references/howto/14-gantt-diagram.md)。
 
 ## 输出要求
 
 - **交付契约（必读；规则 owner 在前门）**：[../draw-diagram/references/delivery-contract.md](../../delivery-contract.md) —— D1/D2 交付形态、D3–D5 面向用户的文字规则（**图内标签与 HTML 正文同规**）、D6 交付前自检。**条文与示例只存在于契约，本节不复写。**以下各条是本引擎的**机械落地**，与契约冲突时以契约为准。
 - 输出为单个 HTML 文档，包含渲染的图表；**每图附「可复现信息」折叠块**（内嵌 `.mmd` 源码 + 渲染命令，`<details>` 块，见 [12-rendering-and-output.md §4.4](references/howto/12-rendering-and-output.md)），不依赖外部渲染服务在线即可复现
-- 图表通过 [render-mermaid.sh](.specify/scripts/render-mermaid.sh) 渲染，同时产出 PNG 与 SVG（**默认远端渲染**：脚本默认 `MERMAID_BACKEND=server`；本地渲染必须先在用户确认后以 `MERMAID_BACKEND=local` 显式启用）
+- 图表通过 [render-mermaid.sh](scripts/render-mermaid.sh) 渲染，同时产出 PNG 与 SVG（**默认远端渲染**：脚本默认 `MERMAID_BACKEND=server`；本地渲染必须先在用户确认后以 `MERMAID_BACKEND=local` 显式启用）
 - **默认优先选用 PNG 格式**引用/嵌入图片（最美观，且在 Preview / Markdown 预览中可直接查看）；仅当图表过宽/过大或需任意无损缩放时改用 SVG
 - **密集图（组件/部署/时序）交付前量有效字号**：`measure-svg-layout.py <x.svg> --display-width <目标显示宽>`，正文 <12px 时上调 `fontSize`（时序图用 sequence 的 `actorFontSize`/`messageFontSize`/`noteFontSize`）重渲，或 HTML 改引 SVG 宽幅显示——**放大 zoom 无效**（画布同比放大）
 - **嵌入 Markdown 文档时（最佳实践）**：默认看 PNG、细节不够可开 SVG 无损放大，**SVG/PNG 必须同时产出**。⚠️ Markdown 图片 `![]()` 与内联 HTML `<a>` 走**不同的路径解析管线**（有的渲染器会代理/改写 Markdown 图片 URL 却透传 HTML `href`），混用会导致两条路径不一致——故 **PNG 与 SVG 引用须用同一机制**：首选**全内联 HTML**（`<a href=x.svg target=_blank rel=noopener><img src=x.png></a>`，点图即开 SVG 新标签），渲染器会剥 HTML 时回退**全纯 Markdown**（同标签打开）。→ 见 [12-rendering-and-output.md §4.3](references/howto/12-rendering-and-output.md)

@@ -20,8 +20,8 @@ The input is a description of the agent to improve and what went wrong or could 
 - **Layer (mandatory, explicit)**: which agent layer the improvement targets — `template` / `instance` / `execution` (taxonomy: `.specify/shared/definitions/agent-definitions.md`). Never infer the layer silently; if the request does not state it and the target identifier does not imply it unambiguously, ask the user before editing anything.
 - **Target identifier**: Resolve to exactly one artifact of a supported kind (see § Target Classification):
   - `.specify/agents/templates/*.agent.md` (an installed role Template)
-  - `.specify/skills/internal/create-agent/templates/agent-capacity-*-template.md` (an abstract capacity Class)
-  - `.specify/skills/internal/create-agent/templates/agent-supervision-delegation.md` (shared supervision snippet — edits here propagate to ALL supervisors)
+  - `skills/internal/create-agent/templates/agent-capacity-*-template.md` (an abstract capacity Class)
+  - `skills/internal/create-agent/templates/agent-supervision-delegation.md` (shared supervision snippet — edits here propagate to ALL supervisors)
   - `.specify/agents/instances/*.agent.md` (a generated custom / project-custom agent)
   - `.specify/agents/execution/configs/*.yaml` or `execution/scripts/*` (dispatch config / wrapper)
 - **Improvement direction**: What specifically needs to change — extracted from user feedback, observed failures, or behavioral drift.
@@ -46,7 +46,7 @@ If the identifier matches multiple kinds or none, ask one clarifying question. A
 ### 1. Identify the target template
 
 - Parse the user's input for a role name, slug, or artifact path, plus the declared **layer**
-- Resolve within the declared layer: `template` → `.specify/agents/templates/<slug>.agent.md` or `.specify/skills/internal/create-agent/templates/agent-capacity-<slug>-template.md`; `instance` → `.specify/agents/instances/<slug>.agent.md`; `execution` → `.specify/agents/execution/configs/<slug>.yaml`
+- Resolve within the declared layer: `template` → `.specify/agents/templates/<slug>.agent.md` or `skills/internal/create-agent/templates/agent-capacity-<slug>-template.md`; `instance` → `.specify/agents/instances/<slug>.agent.md`; `execution` → `.specify/agents/execution/configs/<slug>.yaml`
 - If multiple artifacts match or none match, ask one clarifying question
 - Read the current artifact content before making changes
 

@@ -16,15 +16,15 @@ compatibility symlinks (`CLAUDE.md`, `QODER.md`, `AGENTS.md`, `.github/copilot-i
 converge non-destructively.
 
 Owning command: `/speckit.instructions`. Canonical extraction source:
-`.specify/templates/commands/instructions.md` § Overview content guidelines, § Update Strategy,
+`templates/commands/instructions.md` § Overview content guidelines, § Update Strategy,
 § Glossary Initialization, § Error Handling, and § Actions 1–8. Content moved here in
 substance; the command template keeps entry, user-input handling, the frontmatter `scripts:`
 wiring, and the wrap-up lifecycle steps only.
 
 **Existing delegations (not absorbed)**: the memory face is already delegated and stays at
 command level — prior-memory recall (touched by Action 4) lives in the native `memory-recall`
-skill (`.specify/skills/internal/memory-recall/SKILL.md`), and run-outcome recording (Action 8) lives
-in the native `memory-record` skill (`.specify/skills/internal/memory-record/SKILL.md`). This skill
+skill (`skills/internal/memory-recall/SKILL.md`), and run-outcome recording (Action 8) lives
+in the native `memory-record` skill (`skills/internal/memory-record/SKILL.md`). This skill
 references them where its workflow touches them; it does not restate their rules.
 
 ## Input Contract
@@ -46,7 +46,7 @@ Content guidelines for `.specify/instructions.md` — what the convergence pass 
 - **Map, not manual (地图而非手册)**: the file's job is to answer *what exists* and *where it
   lives*, then point to the owning document — never to teach *how*. Operational detail
   (workflows, step sequences, invocation rules) belongs in the documents the map points to
-  (constitution, `docs/`, `.specify/shared/` definitions, skill/command files); when tempted to explain
+  (constitution, `docs/`, `shared/` definitions, skill/command files); when tempted to explain
   a procedure here, replace it with a pointer to the canonical doc that owns it.
 - If `.specify/instructions.md` already exists, merge intelligently: preserve valuable content
   and update only what is outdated.
@@ -149,7 +149,7 @@ Fallback behavior:
 
 ### Action 1 — Setup
 
-Run `{SCRIPT}` (`.specify/scripts/bash/generate-instructions.sh`, mirrored at
+Run `{SCRIPT}` (`scripts/bash/generate-instructions.sh`, mirrored at
 `.specify/scripts/bash/generate-instructions.sh`) to ensure the basic directory structure,
 `.copilotignore`, and template `.specify/instructions.md` exist.
 
@@ -238,7 +238,7 @@ projects damaged before the non-destructive fix.)
 - Check `.specify/memory/constitution.md` (if exists) to identify any mandated project rules.
 - Check `.specify/memory/features.md` (if exists) for feature status reference.
 - **Recall face — existing delegation**: prior project memory is retrieved by the native
-  `memory-recall` skill (`.specify/skills/internal/memory-recall/SKILL.md`), which stays at command
+  `memory-recall` skill (`skills/internal/memory-recall/SKILL.md`), which stays at command
   level and is not restated here. Its recalled conventions, user preferences, durable
   decisions, and prior-run outcomes are treated in this workflow as hand-authored /
   non-derivable inputs to Action 5 — must-keep knowledge on par with content recovered from
@@ -397,7 +397,7 @@ empty-of-user-content, so its sections are simply filled in.
 
 **Record face — existing delegation** (stays at command level; the memory skill's rules are
 not restated here): the native `memory-record` skill
-(`.specify/skills/internal/memory-record/SKILL.md`) persists this run's outcome — skipped for trivial
+(`skills/internal/memory-record/SKILL.md`) persists this run's outcome — skipped for trivial
 no-op runs where all sections were within tolerance and the arguments were empty. What this
 workflow hands it:
 
@@ -412,7 +412,7 @@ workflow hands it:
 
 - User-input processing, the frontmatter `scripts:` wiring, and the wrap-up lifecycle steps
   (Artifact Commit, Feedback, Documentation) stay with the command template
-  `.specify/templates/commands/instructions.md`; this skill starts from the processed intent and ends
+  `templates/commands/instructions.md`; this skill starts from the processed intent and ends
   before the wrap-up wiring.
 - The memory face stays with the existing `memory-recall` / `memory-record` skills (Action 4 /
   Action 8) — this skill neither duplicates nor replaces them.

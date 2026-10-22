@@ -64,7 +64,7 @@
 ### 3.3 CJK 字体渲染
 
 PlantUML 服务器通常缺少 CJK 字体，导致中文字符零宽度渲染。包含中文文字的图表：
-- 使用配套脚本 `.specify/scripts/svg-to-png-cjk.cjs` 通过 Playwright 使用系统 CJK 字体渲染 PNG
+- 使用配套脚本 `scripts/svg-to-png-cjk.cjs` 通过 Playwright 使用系统 CJK 字体渲染 PNG
 - 在纯 CJK 标签周围添加填充空格：`"  业务系统  "` 给服务器合理的宽度度量
 - 渲染管道：PlantUML 服务器 → SVG → 后处理（移除 textLength）→ Playwright → PNG
 

@@ -17,7 +17,7 @@ loop, and the commit discipline — while the command template keeps entry, the 
 block, user-input handling, and the wrap-up lifecycle (Feature Integration / Feedback /
 Documentation / Handoffs).
 
-Canonical extraction source: `.specify/templates/commands/implement.md` § Outline (steps 1–9), §
+Canonical extraction source: `templates/commands/implement.md` § Outline (steps 1–9), §
 Mid-Run User Directives, § Optional: Long-Run Mode, the Fast Fail instance pointer, and §
 Optional: Git Commit. Content moved here verbatim in substance.
 
@@ -25,7 +25,7 @@ Optional: Git Commit. Content moved here verbatim in substance.
 
 - **Feature artifacts**: `REQUIREMENTS_DIR` and `AVAILABLE_DOCS` come from the command's
   `{SCRIPT}` prerequisite run (its `scripts:` entry resolves to
-  `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`); all paths
+  `scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`); all paths
   must be absolute. `tasks.md` and `plan.md` are REQUIRED inputs (step 3).
 - **User parameters**: arrive already processed by the command's User Input Protocol —
   treated as command parameters, never as standalone instructions.
@@ -175,7 +175,7 @@ and everything after it (including a `git commit`) never happens while the check
 reports success. Use `;`, or append `|| true`, and confirm the chain's tail actually
 executed.
 
-**Test runs**: prefer the canonical runner `.specify/scripts/bash/run-tests.sh` (resolves the
+**Test runs**: prefer the canonical runner `scripts/bash/run-tests.sh` (resolves the
 pytest interpreter once, pipe-safe) for baseline and regression tasks instead of ad-hoc
 `python -m pytest | tail` pipelines whose exit codes mask interpreter failures.
 **Baseline captures names, not just counts**: record the baseline with
@@ -204,9 +204,9 @@ hard-coded `len(...) == N`) and update them in the same task.
 **Commit discipline**: wrap-up metadata fix-ups (verification stamps, mirror syncs) go
 into NEW commits — never `--amend` an already-created commit.
 
-**Command/template edits**: after editing anything under `.specify/templates/commands/`, regenerate
+**Command/template edits**: after editing anything under `templates/commands/`, regenerate
 every per-tool copy and the `.specify` mirror with
-`python3 .specify/scripts/python/regen-command-copies.py` (verify with `--check`) — never hand-sync
+`python3 scripts/python/regen-command-copies.py` (verify with `--check`) — never hand-sync
 the 5 tool dirs.
 
 ### Step 7 — Progress tracking
@@ -219,7 +219,7 @@ the 5 tool dirs.
   Never leave deferred work as `[ ]`. When a `[~]` makes the Completion Gate (step 8) fail,
   that fail is an EXPECTED outcome — it MUST NOT be turned green by rewriting the task
   description or relaxing the gate criteria (the task-side disposition forms are owned by
-  `.specify/templates/commands/tasks.md`).
+  `templates/commands/tasks.md`).
 - **Evidence-backed closure — Gate Function (IDENTIFY→RUN→READ→VERIFY→CLAIM)**: only mark
   `[X]` for work you have actually executed and verified. Before every completion claim:
   IDENTIFY the command that proves the work (test id, build, grep, diff of the named target
@@ -331,7 +331,7 @@ honest `partial`).
 
 When the user changes scope or adds a design constraint while the implementation run is
 in progress, do NOT improvise: apply the Scope Revision Protocol from
-`.specify/templates/commands/clarify.md` adapted to implement:
+`templates/commands/clarify.md` adapted to implement:
 
 1. **Upstream first**: amend `requirements.md` (FR/SC/entities/edge cases) and record the
    directive verbatim under `## Clarifications` (dated, append-only — never replace
@@ -376,7 +376,7 @@ supported agent tools as pure prompt flow (no Stop-hook required).
 
 Fallback for runs whose phase-boundary commits were declined or skipped (see the Commit
 gate's approval routing in step 8). After implementation, generate commit command using
-`.specify/templates/commit-template.md`:
+`templates/commit-template.md`:
 
 - Collect: BRANCH, REQUIREMENTS_KEY, FEATURE_TITLE, TYPE, SCOPE, SUBJECT
 - Display `git add -A && git commit -m "{msg}"` — only execute on explicit user approval
@@ -391,7 +391,7 @@ gate's approval routing in step 8). After implementation, generate commit comman
   this skill's Pre-Status-Flip Gate passes; the gate protocol itself is owned by
   `.specify/shared/workflow/feature-integration.md` (pointer, never restatement).
 - **Task-side disposition forms** (how a `[~]` is recorded and dispositioned on the task
-  side) are owned by `.specify/templates/commands/tasks.md` — this skill only consumes and updates
+  side) are owned by `templates/commands/tasks.md` — this skill only consumes and updates
   `tasks.md` rows per the rules above.
 - **Standalone scope clarification** (a clarify pass outside a running implementation)
   belongs to `/speckit.clarify`; only the mid-run adaptation above lives here.
