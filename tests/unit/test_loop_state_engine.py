@@ -58,10 +58,14 @@ def _load_engine():
     return module
 
 
-def _run(args, env=None, cwd=None, timeout=120):
+def _run(args, env=None, cwd=None, timeout=120, unset=None):
     merged = dict(os.environ)
     if env:
         merged.update(env)
+    # `unset` removes inherited names (e.g. SPECIFY_LINE_RUNTIME_DIR) so the
+    # R-02 fallback tail can be exercised instead of the host's own value.
+    for name in unset or ():
+        merged.pop(name, None)
     return subprocess.run(
         [sys.executable, str(SCRIPT), *args],
         capture_output=True, text=True, env=merged, cwd=cwd, timeout=timeout,
@@ -286,7 +290,7 @@ class Workspace:
 
 
 def _snapshot(ws, *extra, stage="tasks", spine=True, state_dir=True,
-              spec_dir=True, repo=True, watch=None, thresholds=None):
+              spec_dir=True, repo=True, watch=None, thresholds=None, unset=None):
     th = dict(DEFAULT_THRESHOLDS)
     if thresholds:
         th.update(thresholds)
@@ -308,7 +312,7 @@ def _snapshot(ws, *extra, stage="tasks", spine=True, state_dir=True,
     if stage is not None:
         args += ["--stage", stage]
     args += [str(x) for x in extra]
-    return _run(args, env=ws.env)
+    return _run(args, env=ws.env, unset=unset)
 
 
 def _snap_json(ws, *extra, **kwargs):
@@ -384,6 +388,47 @@ def test_registry_fallback_resolves_paths_and_stage(tmp_path):
     assert env["stage"] == "tasks"
     assert env["paths"]["spine"] == str(ws.spine)
     assert env["paths"]["state_dir"] == str(ws.state_dir)
+
+
+def test_state_dir_falls_back_to_runtime_dir_env(tmp_path):
+    """R-02 level 3: with no --state-dir and no Registry `status_path`, the
+    `SPECIFY_LINE_RUNTIME_DIR` convention the runner writes to is used, so the
+    four-piece evidence is still found instead of leaving `state_dir` null."""
+    ws = Workspace(tmp_path)  # no registry entry -> level 2 cannot fire
+    ws.write_spine(state="running")
+    pid = ws.write_pid(pid=os.getpid())
+    ws.write_heartbeat()
+
+    env = _snap_json(ws, state_dir=False)  # --spine stays explicit
+
+    assert env["registry"]["status"] == "missing"
+    assert env["paths"]["state_dir"] == str(ws.state_dir)
+    assert env["evidence"]["pid"]["status"] == "present"
+    assert env["evidence"]["pid"]["path"] == str(pid)
+    assert env["loop_state"] == "RUNNING"
+
+
+def test_state_dir_falls_back_to_home_when_runtime_env_is_absent(tmp_path):
+    """R-02 level 4: with no --state-dir, no Registry and no
+    `SPECIFY_LINE_RUNTIME_DIR`, `$HOME` is the last resort. The fixture points
+    HOME at a temp dir, so the real home is neither read nor written."""
+    ws = Workspace(tmp_path)  # no registry entry
+    ws.write_spine(state="running")
+    home_pid = ws.home / ("pid-%s-%s" % (ws.line, ws.stage))
+    home_pid.write_text(
+        "pid=%d start=424242 at=%d line=%s stage=%s event=pid\n"
+        % (os.getpid(), NOW, ws.line, ws.stage), encoding="utf-8")
+    (ws.home / ("heartbeat-%s-%s.log" % (ws.line, ws.stage))).write_text(
+        "at=%d line=%s stage=%s event=heartbeat\n" % (NOW, ws.line, ws.stage),
+        encoding="utf-8")
+
+    env = _snap_json(ws, state_dir=False, unset=["SPECIFY_LINE_RUNTIME_DIR"])
+
+    assert env["paths"]["state_dir"] == str(ws.home)
+    assert env["paths"]["state_dir"] != str(Path.home()), "real home must stay out"
+    assert env["evidence"]["pid"]["status"] == "present"
+    assert env["evidence"]["pid"]["path"] == str(home_pid)
+    assert env["loop_state"] == "RUNNING"
 
 
 def test_missing_registry_continues_evaluation(tmp_path):
@@ -656,17 +701,36 @@ def test_current_envelope_without_run_is_legacy_not_stale(tmp_path):
 
 
 def test_unresolved_paths_stay_null_and_are_not_invented(tmp_path):
-    """C-4: explicit -> Registry -> failure; the failure branch invents nothing."""
+    """C-4 + R-02: only the R-02 chain may produce a path; every item the chain
+    cannot produce stays null. `state_dir` is the single item with an env/HOME
+    tail, so the fixture's env (level 3) decides it; spine/spec_dir/repo have no
+    fallback at all and MUST stay null."""
     ws = Workspace(tmp_path)  # no registry entry, no explicit paths
 
     env = _snap_json(ws, spine=False, state_dir=False, spec_dir=False, repo=False)
 
     assert set(env["paths"]) == {"state_dir", "spec_dir", "repo", "spine", "probe"}
-    for key in ("state_dir", "spec_dir", "repo", "spine", "probe"):
+    assert env["paths"]["state_dir"] == str(ws.state_dir)
+    for key in ("spec_dir", "repo", "spine", "probe"):
         assert env["paths"][key] is None, key
     assert env["registry"]["status"] == "missing"
     assert env["spine"]["status"] == "missing"
     assert env["spine"]["schema"] == "missing"
+
+
+def test_state_dir_stays_null_when_every_r02_source_is_absent(tmp_path):
+    """R-02 invents no default: with --state-dir, the Registry,
+    `SPECIFY_LINE_RUNTIME_DIR` AND `$HOME` all absent, `state_dir` is null and
+    the four-piece names cannot be built, so no evidence is claimed present."""
+    ws = Workspace(tmp_path)  # no registry entry
+    ws.write_spine(state="running")
+
+    env = _snap_json(ws, state_dir=False,
+                     unset=["SPECIFY_LINE_RUNTIME_DIR", "HOME"])
+
+    assert env["paths"]["state_dir"] is None
+    for key in ("pid", "status", "log", "heartbeat", "watchbeat"):
+        assert env["evidence"][key]["status"] != "present", key
 
 
 def test_unreadable_evidence_sources_report_missing_and_exit_zero(tmp_path):

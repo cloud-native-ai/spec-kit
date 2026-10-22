@@ -181,7 +181,9 @@ stale run-mismatch -> forms ['stale-signal'] (1 signal, excluded from evaluation
 
 ### Interpretive decisions taken contract-first (disclosure)
 
-- **R-02 env fallback not implemented.** C-4 fixes resolution as explicit → Registry
+- **R-02 env fallback not implemented.** (Superseded — see §T009 residual below;
+  the fallback is now implemented and this reading is withdrawn.) C-4 fixes
+  resolution as explicit → Registry
   → failure ⇒ `null`. `SPECIFY_LINE_RUNTIME_DIR` is therefore *not* consulted for
   `state_dir`; doing so would invent a path the caller did not state. Deviation from
   `research.md` R-02 recorded here; `test_unresolved_paths_stay_null_and_are_not_invented`
@@ -217,4 +219,47 @@ stale run-mismatch -> forms ['stale-signal'] (1 signal, excluded from evaluation
   §Stage Artifact Map table, and `test_derived_mapping_is_three_way_identical` does
   the same for §Derived Mapping. Path lists belong in backticks, prose must stay out
   of backticks, and booleans must read `true`/`false`.
+
+## T009 residual — R-02 `state_dir` chain completed (2026-10-22)
+
+U4 verification found a real gap: `resolve_paths` implemented only
+`--state-dir` → Registry `status_path` parent, while `research.md` R-02 — the owner
+that both `contracts/loop-state-cli.md` C-4 and `data-model.md` §5.1 delegate the
+per-item order to — also names `SPECIFY_LINE_RUNTIME_DIR` → `$HOME` as levels 3–4
+of the `state_dir` chain. Scope of this part: that chain plus its coverage only
+(no T015+ work, no docs/reference or mirror edits).
+
+```
+$ SPECKIT_PYTHON=/Users/liuqiming.lqm/project/profiles/.venv/bin/python \
+  bash scripts/bash/run-tests.sh -q \
+  tests/unit/test_loop_state_engine.py tests/contract/test_loop_state_contract.py
+26 failed, 57 passed in 48.56s
+RUN_EXIT=1
+```
+
+Per file: unit `37 passed / 21 failed` (was 34/21), contract `20 passed / 5 failed`
+(unchanged). The failing node-id set is byte-identical to the pre-patch run (a
+`diff` of the two sorted `FAILED` lists is empty), so the 26 residual reds keep
+their owners: T015 18 unit, T016 3 unit + 2 contract, T018 3 contract.
+
+New coverage (3 tests, green):
+
+| test | level exercised |
+|------|-----------------|
+| `test_state_dir_falls_back_to_runtime_dir_env` | level 3 — Registry missing, `SPECIFY_LINE_RUNTIME_DIR` supplies `state_dir` and the four-piece evidence is found there (`RUNNING`) |
+| `test_state_dir_falls_back_to_home_when_runtime_env_is_absent` | level 4 — `SPECIFY_LINE_RUNTIME_DIR` unset, `$HOME` (a `tmp_path` dir) supplies `state_dir`; the real home is neither read nor written |
+| `test_state_dir_stays_null_when_every_r02_source_is_absent` | tail strictness — all four sources absent ⇒ `state_dir=null` and no evidence is claimed present |
+
+`test_unresolved_paths_stay_null_and_are_not_invented` was corrected, not weakened:
+it now asserts the R-02 chain produces `state_dir` (level 3) while `spine` /
+`spec_dir` / `repo` / `probe` — the items with no chain tail — still stay null. Its
+previous blanket `state_dir is None` pin encoded the withdrawn deviation.
+
+Supersedes disclosure bullet 1 (§Interpretive decisions): C-4 delegates the
+per-item order to R-02 rather than fixing "explicit → Registry → failure" for every
+path, so the env/HOME tail is contract-conformant. `resolve_runtime_dir()` in the
+engine mirrors `line-registry.py`; an unset `$HOME` leaves `state_dir` null (R-02's
+“不猜默认”, no pwd-derived guess). The `unset=` channel added to the unit-test
+`_run`/`_snapshot` helpers exists only so a test can drop an inherited
+`SPECIFY_LINE_RUNTIME_DIR`; no fixture ever points at a real home.
 

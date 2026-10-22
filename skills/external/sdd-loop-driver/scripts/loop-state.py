@@ -416,9 +416,29 @@ def read_registry(path):
     return view, raw
 
 
+def resolve_runtime_dir():
+    """R-02 `state_dir` fallbacks 3-4: `$SPECIFY_LINE_RUNTIME_DIR` -> `$HOME`.
+
+    Mirrors `line-registry.py` `resolve_runtime_dir` (the on-disk convention
+    owner R-02 cites), so the engine looks where the runner writes. Nothing is
+    invented: when neither variable is set the item stays `None` (null
+    semantics) — `$HOME` unset is not replaced by a pwd-derived guess."""
+    override = os.environ.get("SPECIFY_LINE_RUNTIME_DIR")
+    if override:
+        return Path(override).expanduser()
+    home = os.environ.get("HOME")
+    if home:
+        return Path(home).expanduser()
+    return None
+
+
 def resolve_paths(args):
-    """Explicit CLI args win, then the Registry entry, then the item stays null
-    (C-4: explicit -> Registry -> failure; missing values are never invented)."""
+    """R-02 per-item priority (C-4 delegates the item order to R-02).
+
+    `state_dir`: explicit --state-dir -> Registry `status_path` parent ->
+    `$SPECIFY_LINE_RUNTIME_DIR` -> `$HOME`. `spine`: explicit -> Registry
+    `spine_path` -> null. `spec_dir` / `repo`: explicit only -> null. A value
+    that the chain cannot produce stays null; nothing is guessed."""
     registry_dir = resolve_registry_dir()
     registry_path = registry_dir / ("%s.json" % args.line_id)
     registry, raw = read_registry(registry_path)
@@ -428,6 +448,8 @@ def resolve_paths(args):
         status_path = raw.get("status_path")
         if isinstance(status_path, str) and status_path:
             state_dir = Path(status_path).expanduser().parent
+    if state_dir is None:
+        state_dir = resolve_runtime_dir()
 
     spine = Path(args.spine).expanduser() if args.spine else None
     if spine is None and isinstance(raw, dict):
