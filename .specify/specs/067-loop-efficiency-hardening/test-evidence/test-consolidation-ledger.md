@@ -116,3 +116,28 @@ engine subprocess invocations pinning the 9-key envelope shape, graded exit code
 LED-08 note (reportive, no rows): two same-shape sibling rows ADDED to
 `test_task_count_boundary_edges` at f14c4f49 — `[30-10-True]` (fr upper × task lower, inside
 window) and `[7-9-False]` (both below lower bounds). New coverage, post-only ids.
+
+## Correction rows — T035 closure audit (2026-10-22, LED-03)
+
+<!-- appended by P16-closure-audits T035; append-only correction per LED-03; nothing above is rewritten -->
+
+The strict full-node-id join at T035 found 8 baseline ids whose only ledger coverage was the
+**base-id form** of two parametrized loops (rows 54 and 76): those rows recorded
+`original_id` without the `[param]` suffix, deviating from the E2 schema rule
+("original_id = full node id (case-level)"), so the literal LED-05 join reported
+8 false unmatched. Coverage itself was intact: both rows' `retained_equivalent_id` fields
+enumerate exactly the covering suite params, and all 8 params are present and green in the
+closure post list (T035 audit). Rows 82–89 record the 8 full node ids per the E2 schema;
+disposition and equivalence mirror the parent rows. Commit `373f4b32` = HEAD at append
+time; the rows land in the P16 closure commit.
+
+| # | original_id | disposition | retained_equivalent_id | equivalence_rationale | date | commit |
+|---|---|---|---|---|---|---|
+| 82 | tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-agent] | case-merge | tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/improve-agent/SKILL.md->.specify/skills/internal/improve-agent/SKILL.md] | LED-03 correction of row 54 base-id form: full node id of one member of the 3-param IMPROVE_SKILLS loop; assertion set (exists + byte identity, flat/nested engine pair) preserved per row 54; param green in closure post list | 2026-10-22 | 373f4b32 |
+| 83 | tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-skills] | case-merge | tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/improve-skills/SKILL.md->.specify/skills/improve-skills/SKILL.md] | LED-03 correction of row 54 base-id form (external-flat member); as row 82 | 2026-10-22 | 373f4b32 |
+| 84 | tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-team] | case-merge | tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/improve-team/SKILL.md->.specify/skills/internal/improve-team/SKILL.md] | LED-03 correction of row 54 base-id form (internal-nested member); as row 82 | 2026-10-22 | 373f4b32 |
+| 85 | tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/external/create-skills/references/skill-creation-quality-checklist.md] | case-merge | tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/create-skills/references/skill-creation-quality-checklist.md->.specify/skills/create-skills/references/skill-creation-quality-checklist.md] | LED-03 correction of row 76 base-id form: full node id of one member of the 5-param GATE_FILES loop; assertion set (mirror-exists + byte identity) preserved per row 76; param green in closure post list | 2026-10-22 | 373f4b32 |
+| 86 | tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/external/improve-skills/references/skill-quality-checklist.md] | case-merge | tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/improve-skills/references/skill-quality-checklist.md->.specify/skills/improve-skills/references/skill-quality-checklist.md] | LED-03 correction of row 76 base-id form; as row 85 | 2026-10-22 | 373f4b32 |
+| 87 | tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/internal/create-agent/SKILL.md] | case-merge | tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/create-agent/SKILL.md->.specify/skills/internal/create-agent/SKILL.md] | LED-03 correction of row 76 base-id form; as row 85 | 2026-10-22 | 373f4b32 |
+| 88 | tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/internal/create-team/SKILL.md] | case-merge | tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/create-team/SKILL.md->.specify/skills/internal/create-team/SKILL.md] | LED-03 correction of row 76 base-id form; as row 85 | 2026-10-22 | 373f4b32 |
+| 89 | tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/internal/create-tools/SKILL.md] | case-merge | tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/create-tools/SKILL.md->.specify/skills/internal/create-tools/SKILL.md] | LED-03 correction of row 76 base-id form; as row 85 | 2026-10-22 | 373f4b32 |
