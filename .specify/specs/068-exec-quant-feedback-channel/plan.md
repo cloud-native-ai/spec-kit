@@ -95,8 +95,8 @@ tests/integration/                    # 新增端到端测试（package→ingest
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `scripts/python/feedback-utils.py` | `.specify/scripts/python/feedback-utils.py`（scripts 对，strict extras） | 编辑前跑 `sync-mirrors.py --check --only scripts` 记录既有 drift；落地后 `--write` 同步，复查该对零 NEW drift（实测现状该对无 DIFF） |
-| `scripts/python/exec-quant.py` | `.specify/scripts/python/exec-quant.py`（scripts 对） | 同上（实测现状该对无 DIFF） |
+| `scripts/python/feedback-utils.py` | `.specify/scripts/python/feedback-utils.py`（scripts 对，strict extras） | 编辑前跑 `sync-mirrors.py --check --only scripts` 记录既有 drift；落地后 `--write` 同步，复查该对零 NEW drift（2026-10-22 tasks 阶段复测更正：该对存在 **1 行既有 DIFF**——镜像侧 f265cfbd 已把 docstring 内 `shared/workflow/feedback-step.md` 路径引用改为 `.specify/` 前缀形态、源侧未同步；本行原文「实测现状该对无 DIFF」系 plan 阶段误测。判据仍为「相对该既有基线零 NEW drift」；`--write` 落地后该既有 DIFF 随字节同步消失属预期，不算回归） |
+| `scripts/python/exec-quant.py` | `.specify/scripts/python/exec-quant.py`（scripts 对） | 同上判据（2026-10-22 tasks 阶段复测：该对现状零 DIFF） |
 | `skills/internal/manage-feedback/SKILL.md` | `.specify/skills/internal/manage-feedback/SKILL.md`（skills/internal 对） | 同法；零 NEW drift + 副本含改动 |
 | `skills/internal/manage-feedback/references/path-a-digest.md` | `.specify/skills/internal/manage-feedback/references/path-a-digest.md` | 同上 |
 | `skills/internal/manage-feedback/references/path-b-and-probe.md` | `.specify/skills/internal/manage-feedback/references/path-b-and-probe.md` | 同上 |
