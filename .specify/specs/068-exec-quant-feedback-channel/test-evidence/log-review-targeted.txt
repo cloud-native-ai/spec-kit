@@ -1,0 +1,4 @@
+# test runner: python3 -m pytest tests/contract/test_feedback_exec_quant_payload.py tests/contract/test_feedback_intake_exec_quant.py tests/contract/test_exec_quant_aggregate.py tests/contract/test_exec_quant_channel_boundary.py tests/contract/test_exec_quant_channel_compat.py tests/integration/test_feedback_exec_quant_channel.py -q
+........................................................................ [ 84%]
+.............                                                            [100%]
+85 passed in 2.23s

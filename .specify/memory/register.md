@@ -48,3 +48,14 @@
 | REC-063-08 | 阶段残留持久载体：未解决残留随阶段收尾**同提交**落 register OI- 行或 feedback backlog 行，带无载体残留的 DONE 不合规；32768 B 预算值做一次显式裁定 | `.specify/specs/063-review-p1-governance/review.md` § 5.4（F7/F9） | open |
 | REC-063-09 | 被引 REC- 补登记：为 061 全部被引用 `REC-` id 补 pointer 行；review Handoff 增补「同趟登记前辈被引未登记 id」义务 | `.specify/specs/063-review-p1-governance/review.md` § 5.4（F8） | open |
 | REC-063-10 | 跨特性状态钉封闭窗口规则：特性域状态钉（窗口钉/封闭集/字节预算）**创作时**必须声明封闭规则；修订他特性之钉须按 REC-063-08 载体登记日期行 | `.specify/specs/063-review-p1-governance/review.md` § 5.3（F9） | open |
+| REC-068-01 | plan 门增契约条款形态检查：pre-analyze-check 在 stage≥plan 时对 contracts/* 跑 clause_extract.form_of()，md-none 或零条款即 error（或 plan U4 逐契约跑 clause_extract） | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.3 REC-068-01（F1） | open |
+| REC-068-02 | audit-test-budget 分母按 stage-check 收敛：`--stage-check <stage>` 只要求 ≤stage 的 stage-status 完备（或显式 --allow-future-stages），implement 期审计可按构造 exit 0 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.3 REC-068-02（F2） | open |
+| REC-068-03 | TDD 重段预算按测试写作/实现边界拆分（或按任务行×实测回合数定段预算），替代再次上调阶段级常数 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.4 REC-068-03（F3） | open |
+| REC-068-04 | 镜像同步任务行开最小 `--only` 文件/对前缀处方（能力已在 sync-mirrors.py）；伴生 REC-068-04a = --write 打印前缀外附带重写计数 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.4 REC-068-04（F4） | open |
+| REC-068-05 | analyze 修复同步清单须枚举耐久注册表面（features/<ID>.md、features.md）并以 grep 复核修正事实零漏改 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.4 REC-068-05（F5） | open |
+| REC-068-06 | 实现段跨特性钉修订归属规则：欠账钉修订须在产生段内同段补齐、提交点名钉+裁决需求行、按 REC-063-10 登记日期行 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.4 REC-068-06（F6） | open |
+| REC-068-07 | pre-analyze-check 的 SKIP_HEADING 历史跳过改为日期/记录标记门控，替代裸「修订」子串 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.3 REC-068-07（F7） | open |
+| REC-068-08 | coverage-baseline 单一所有者与单一执行点：tasks 阶段 U4 冻结（撤销 implement 期 T002）或 GATE-7 断言显式延期并指向 implement 任务 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.4 REC-068-08（F8） | open |
+| REC-068-09 | verification Run 头 branch 字段机械捕获（`git branch --show-current`），禁止继承 trunk 声明 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.4 REC-068-09（F9） | open |
+| REC-068-10 | requirements 模板 Status 字段退役或指针化（所有者 = features.md），消除保证过期的第二份状态副本 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.1 REC-068-10（F10） | open |
+| REC-068-11 | 无人值守线 wrap-up 引擎步骤归属一次裁定（executor 或 orchestrator）并注记命令模板，取代逐阶段偏离披露 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.4 REC-068-11（F11） | open |
