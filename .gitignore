@@ -43,8 +43,10 @@ output/
 # Spec Kit-specific files
 .genreleases/
 *.zip
-.specify/tools/
 .migration-backups/
+
+# .specify-scoped runtime ignore rules live in .specify/.gitignore
+# (framework-owned template, installed by `specify init`).
 
 # Node / Playwright skill runtime artifacts
 node_modules/
@@ -52,9 +54,6 @@ node_modules/
 
 input/
 .qoder/sessions/
-.specify/tools/*.json
-.specify/instructions.md-*
-.specify/teams/.work/
 
 # /speckit.implement long-run mode state (per-spec, transient)
 *.local.md
@@ -63,15 +62,5 @@ input/
 .session-export/
 # 043: build-embedded source commit (build artifact)
 src/specify_cli/_source_commit.json
-
-# sanitize findings ledger (Feature 047): machine-regenerable runtime cache
-# (deterministic checkers re-derive findings on every collect); dogfood
-# evidence is recorded in the spec's verification.md instead.
-.specify/memory/sanitize/
-
-# (FR-003); never committed in the framework repo, excluded from wheel and
-# mirror sync (see contracts/framework-exclusions.md).
-.specify/# proactive flow trigger: per-turn telemetry churns, learning state must not
-.specify/memory/trigger/telemetry.jsonl
 
 **/*.egg-info/

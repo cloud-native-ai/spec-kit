@@ -21,8 +21,23 @@ def test_template_exists():
 @pytest.mark.contract
 def test_template_uses_specify_relative_patterns():
     body = TEMPLATE.read_text(encoding="utf-8")
-    assert "history/.work/" in body
-    assert "teams/.work/" in body
+    for pattern in (
+        "history/.work/",
+        "teams/.work/",
+        "agents/execution/logs/",
+        "tools/",
+        "instructions.md-*",
+        "memory/sanitize/",
+        "memory/trigger/telemetry.jsonl",
+    ):
+        assert pattern in body, f"missing .specify-relative rule: {pattern}"
     # Patterns are relative to .specify/, never repo-root-anchored.
-    assert ".specify/history/.work/" not in body
-    assert ".specify/teams/.work/" not in body
+    for anchored in (
+        ".specify/history/.work/",
+        ".specify/teams/.work/",
+        ".specify/tools/",
+        ".specify/instructions.md-*",
+        ".specify/memory/sanitize/",
+        ".specify/memory/trigger/telemetry.jsonl",
+    ):
+        assert anchored not in body, f"repo-root-anchored rule leaked: {anchored}"

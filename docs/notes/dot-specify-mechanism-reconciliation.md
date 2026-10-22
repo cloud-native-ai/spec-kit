@@ -24,13 +24,13 @@ tags: [criterion-reconcile, mechanism-audit, dot-specify]
 | # | 目录/文件面 | 支撑机制(流程/命令/技能/引擎) | 证据(路径或调用点) | 判定 |
 |---|---|---|---|---|
 | 1 | `.specify/instructions.md` | `/speckit.instructions` 命令,经生成脚本产出 | `scripts/bash/generate-instructions.sh:29`(TARGET_FILE);命令模板 `templates/commands/instructions.md` | 有主 |
-| 2 | `.specify/instructions.md-<时间戳>` 备份族(26 份) | 同一命令的带时间戳备份历史;根 `.gitignore` 持其排除 pattern | `scripts/bash/generate-instructions.sh:190,201,292` | 有主 |
+| 2 | `.specify/instructions.md-<时间戳>` 备份族(26 份) | 同一命令的带时间戳备份历史;`.specify/.gitignore`（init 模板）持其排除 pattern | `scripts/bash/generate-instructions.sh:190,201,292` + `templates/gitignore-specify-template` | 有主 |
 | 3 | `.specify/skills.md` | `/speckit.instructions` create-if-absent(源 `.specify/templates/skills.md`,既有副本永不覆盖) | `templates/commands/instructions.md:112` | 有主 |
 | 4 | `.specify/tools.md` | 同上(源 `.specify/templates/tools.md`) | `templates/commands/instructions.md:112` | 有主 |
-| 5 | `.specify/tools/`(`system.json` / `shell.json` / `project.json`) | 工具发现清单(discovery inventories):`refresh-tools.sh` 引擎产出、canonical caller `generate-instructions.sh` 重定向写入,机器生成、禁手改;根 `.gitignore` 持排除 pattern(运行时生成物,不随 git) | `scripts/bash/refresh-tools.sh:60` + 根 `.gitignore:46` + `shared/definitions/tool-definitions.md:36` + `tests/contract/test_tools_inventory_ownership.py:38` | 有主 |
+| 5 | `.specify/tools/`(`system.json` / `shell.json` / `project.json`) | 工具发现清单(discovery inventories):`refresh-tools.sh` 引擎产出、canonical caller `generate-instructions.sh` 重定向写入,机器生成、禁手改;`.specify/.gitignore`（init 模板）持排除 pattern(运行时生成物,不随 git) | `scripts/bash/refresh-tools.sh:60` + `templates/gitignore-specify-template` + `shared/definitions/tool-definitions.md:36` + `tests/contract/test_tools_inventory_ownership.py:38` | 有主 |
 | 6 | `.specify/source.json` | CLI init 提交戳(feature 043:framework/commit/stamped_at) | `src/specify_cli/__init__.py:588-602` | 有主 |
 | 7 | `.specify/gate.yaml` | 确认门机械写门:`gate-check.py` 引擎读取,`/speckit.implement` 消费;模板 `templates/gate-template.yaml` | `scripts/python/gate-check.py:45`(GATE_FILE)+ `templates/commands/implement.md:51` | 有主 |
-| 8 | `.specify/.gitignore` | CLI 安装自 `templates/gitignore-specify-template` | `src/specify_cli/__init__.py:2357-2361` | 有主 |
+| 8 | `.specify/.gitignore` | CLI 安装自 `templates/gitignore-specify-template` | `src/specify_cli/__init__.py:2389-2402`（`copy_local_templates` 的 `.gitignore` 安装块） | 有主 |
 | 9 | `.specify/memory/constitution.md` | `/speckit.constitution` | `templates/commands/constitution.md` + `templates/constitution-template.md` | 有主 |
 | 10 | `.specify/memory/features.md` + `features/<NNN>.md`(54 份) | 特性集成工作流(索引手工维护,记录义务归该流程) | `.specify/shared/workflow/feature-integration.md` + `templates/feature-index-template.md` + `templates/feature-details-template.md` | 有主 |
 | 11 | `.specify/memory/glossary.md` | 词汇协议流程 + glossary-utils 引擎 | `.specify/shared/workflow/glossary.md` + `scripts/python/glossary-utils.py` | 有主 |
@@ -80,7 +80,8 @@ tags: [criterion-reconcile, mechanism-audit, dot-specify]
 
 S3 交接验证门 REJECT 后的定点返工(独立验证者判定表仅两项 D1/N1,其余全绿;goal 判据本体经验证者自行重推导已通过,本轮仅修此两项、修完即停):
 
-- **D1(缺行)**:顶层 `.specify/tools/`(实含 `system.json` / `shell.json` / `project.json`,`ls -A` 复核)原表缺行。已补为第 5 行,紧邻 `.specify/tools.md`(沿用表内伴随面相邻模式,同行 2 之于行 1)。四条证据均先实读、后引用:`scripts/bash/refresh-tools.sh:60`(canonical caller `generate-instructions.sh` 将引擎 stdout 重定向写入 `.specify/tools/{system,shell,project}.json`)、根 `.gitignore:46`(`.specify/tools/` 排除 pattern)、`shared/definitions/tool-definitions.md:36`(discovery inventories 机器生成、禁手改)、`tests/contract/test_tools_inventory_ownership.py:38`(`INVENTORIES` 常量)。判定「有主」。
+- **D1(缺行)**:顶层 `.specify/tools/`(实含 `system.json` / `shell.json` / `project.json`,`ls -A` 复核)原表缺行。已补为第 5 行,紧邻 `.specify/tools.md`(沿用表内伴随面相邻模式,同行 2 之于行 1)。四条证据均先实读、后引用:`scripts/bash/refresh-tools.sh:60`(canonical caller `generate-instructions.sh` 将引擎 stdout 重定向写入 `.specify/tools/{system,shell,project}.json`)、`.specify/.gitignore`（init 模板 `templates/gitignore-specify-template`；2026-10-22 Phase 0 前该 pattern 位于根 `.gitignore:46`）、`shared/definitions/tool-definitions.md:36`(discovery inventories 机器生成、禁手改)、`tests/contract/test_tools_inventory_ownership.py:38`(`INVENTORIES` 常量)。判定「有主」。
+- **Phase 0 更新（2026-10-22）**:`.specify` 专属运行时 ignore 规则已从根 `.gitignore` 迁入 init 管理的 `.specify/.gitignore` 模板；涉及 `tools/`、`instructions.md-*`、`memory/sanitize/`、`memory/trigger/telemetry.jsonl`（以及既有 `history/.work/`、`teams/.work/`、`agents/execution/logs/`）。根规则仅保留通用 pattern；上文 D1 的根路径引用为 2026-10-11 时点记录。
 - **N1(计数)**:`.specify/templates/` 行「22 文件」与实跑 `ls .specify/templates | wc -l` = **21** 不符(`ls -A` 同为 21,无隐藏件),已改 21;该行随补行移位为第 31 行。
 - 计数整体重述:全表 **33 行 = 32 有主 + 1 排除(`skills/`)**;缺口仍为零。原第 5–32 行顺次移位为第 6–33 行;表内行号引用(§2 行 25→26、行 31→32;§3 17/32→18/33)已同步。
 - 本轮 `docs/` 写面仍仅本 note;`consumer-upgrade-migration-plan.md` 本轮未触碰(其 §3/§9 为 S3 原轮已验证面),另写 `S3/manifest.md`(fix note + 异常行,原内容保留)。

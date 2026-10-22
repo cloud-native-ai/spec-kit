@@ -397,12 +397,16 @@ def test_every_assess_writes_exactly_one_row(ws):
 
 
 def test_telemetry_is_git_ignored_but_index_is_not(ws):
-    gi = ws / ".gitignore"
-    assert gi.is_file(), "init must maintain the project ignore file"
+    gi = ws / ".specify" / ".gitignore"
+    assert gi.is_file(), "init must maintain the .specify-scoped ignore file"
     text = gi.read_text(encoding="utf-8")
-    assert ".specify/memory/trigger/telemetry.jsonl" in text, (
+    assert "memory/trigger/telemetry.jsonl" in text, (
         "V6.9: per-turn telemetry churns and must be ignored"
     )
+    root_gi = ws / ".gitignore"
+    assert not root_gi.is_file() or "memory/trigger/telemetry.jsonl" not in root_gi.read_text(
+        encoding="utf-8"
+    ), "telemetry ignore rule must stay .specify-scoped, not in the project root"
     proc = subprocess.run(
         ["git", "check-ignore", "-q", ".specify/memory/trigger/index.json"],
         cwd=ws, capture_output=True, text=True,

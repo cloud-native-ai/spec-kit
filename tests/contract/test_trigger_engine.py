@@ -1018,15 +1018,19 @@ def test_init_writes_the_e6_shape(ws):
 
 def test_init_maintains_the_telemetry_ignore_entry(ws):
     do_init(ws)
-    gi = ws / ".gitignore"
-    assert gi.is_file(), "init must create/extend the project ignore file"
+    gi = ws / ".specify" / ".gitignore"
+    assert gi.is_file(), "init must create/extend .specify/.gitignore"
     text = gi.read_text(encoding="utf-8")
-    assert ".specify/memory/trigger/telemetry.jsonl" in text, (
+    assert "memory/trigger/telemetry.jsonl" in text, (
         "V6.9: telemetry must be ignored (it churns every turn)"
     )
-    assert not re.search(r"(?m)^\.specify/memory/trigger/index\.json$", text), (
+    assert not re.search(r"(?m)^memory/trigger/index\.json$", text), (
         "V6.9: index.json must NOT be ignored — it carries user tuning across clones"
     )
+    root_gi = ws / ".gitignore"
+    assert not root_gi.is_file() or "memory/trigger/telemetry.jsonl" not in root_gi.read_text(
+        encoding="utf-8"
+    ), "telemetry ignore rule must stay .specify-scoped, not in the project root"
 
 
 def test_init_does_not_revert_local_tuning(ws):

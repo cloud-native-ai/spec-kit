@@ -17,6 +17,21 @@ TEMPLATE_BODY = (
     "\n"
     "# /speckit.team run intermediate workspace (transient); team defs + runs/ reports stay tracked\n"
     "teams/.work/\n"
+    "\n"
+    "# Agent Execution runtime logs\n"
+    "agents/execution/logs/\n"
+    "\n"
+    "# Tool discovery inventories\n"
+    "tools/\n"
+    "\n"
+    "# Instructions backups\n"
+    "instructions.md-*\n"
+    "\n"
+    "# Sanitize findings ledger\n"
+    "memory/sanitize/\n"
+    "\n"
+    "# Proactive-flow telemetry\n"
+    "memory/trigger/telemetry.jsonl\n"
 )
 
 
@@ -47,6 +62,7 @@ def test_fresh_init_ships_specify_gitignore(monkeypatch, tmp_path: Path):
     body = installed.read_text(encoding="utf-8")
     assert "history/.work/" in body
     assert "teams/.work/" in body
+    assert "memory/trigger/telemetry.jsonl" in body
 
 
 def test_reinit_refreshes_specify_gitignore(monkeypatch, tmp_path: Path):
