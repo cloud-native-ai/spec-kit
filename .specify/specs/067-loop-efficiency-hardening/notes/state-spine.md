@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792658279
-stage_deadline_epoch: 1792663679
-stage_base_commit: 58dd4f79
+stage_started_at: 1792659431
+stage_deadline_epoch: 1792664831
+stage_base_commit: 550d3b09
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,19 +37,17 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (implement F · T025–T029)
+## Current Part Brief (Phase 8 · T030–T032)
 
-- **part_id**: P12-implement-F-triage-drills
-- **allowed files**: triage-relevant contract/unit test files (gate-total pins, exec-quant, loop_state), `test-evidence/` triage/debt/evidence, `tasks.md` T025–T029 checkboxes only
-- **must not modify**: source `shared/`, `skills/`, `scripts/`, `templates/`, `src/`, `pyproject.toml`, mirrors, registry, requirements.md, plan.md, tests unrelated to triage; never delete a test to hide a failure
-- **T025**: gate-total pins — for each remaining Class 2 gate-total failure, identify the owner fact; update the expected literal with a recorded rationale (stale-pin) or register a dated debt; do not weaken pin strength.
-- **T026**: exec-quant failures — triage each name; environment-specific/pre-existing → debt with evidence; do not fake a pass.
-- **T027**: loop_state 3 failures — triage; two pass in isolation and fail in full context (order/state dependence); register debt or fix test-local isolation without weakening assertions.
-- **T028**: injection + localization drill — inject one failing assertion into a merged suite parameter, run with `--names-out`, confirm the name-level diff contains exactly the injected name, re-run by node id to reproduce, then restore; evidence `injection-drill-<date>.md`.
-- **T029**: triage closure — verify all 83 baseline names have exactly one row (50 mirror + 33 Class 2), debt rows point to dated records, pinned-roster intersection resolved, no test deleted to hide a failure.
+- **part_id**: P13-implement-wrapup
+- **allowed files**: `.specify/specs/067-loop-efficiency-hardening/verification.md`, `test-evidence/` evidence, `tasks.md` T030–T032 checkboxes only
+- **must not modify**: tests, source, scripts, mirrors, registry, requirements.md, plan.md, Phase 9 tasks
+- **T030 mirror obligations**: run `python3 scripts/python/sync-mirrors.py --check`; record 0 DIFF or the pair-scope; note that 202 mirrors were engine-written at `1d40ebeb`. No hand edits.
+- **T031 review precheck**: T001–T029 closed; T033–T038 pending closure by design; validate-tasks 0; evidence files exist (E1, w2 timings, w3 recheck/sync, drill, triage 83 rows, ledger, pinned roster); write the precheck section in verification.md.
+- **T032 verification.md**: record what ran (commands/counts/pointers), what did not run (closure tasks), waiver none; SC-001…SC-005 evidence via the dispatch log (not_evaluated where unavailable); SC-006…SC-010 `pending-closure`.
 - **no full suite**; no test claimed pass unless actually run.
 - **run-turn-budget**: 120
-- **acceptance**: T025–T029 `[X]`; triage table 83 rows; drills recorded with restoration; residual debt explicit; no new failures introduced
+- **acceptance**: T030–T032 `[X]`; verification.md complete for the implement phase; review dispatchable
 
 ## Dispatch Log
 
@@ -66,7 +64,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P9-implement-CD-telemetry-clone | implement | T013–T018 | not_evaluated | targeted only | e30ea169, 5b2521c9 | DONE — telemetry 23.36→1.14 s (CLI smoke kept); proactive+instructions 32.70→31.0 s, still over band, attributed to generator subprocesses in the forbidden `scripts/` surface; clone fixture wired and verified |
 | P10-implement-E1-mirror-suite-fold | implement | T019–T021 | not_evaluated | suite 202F/521P (drift, expected); 23 functions folded | 54cf98e4, 0c674638, 00b654a1 | DONE — suite covers 723 params; ledger 23 case-merge rows; no sync yet |
 | P11-implement-E2-fold3-sync-recheck | implement | T022–T024 | not_evaluated | targeted: fold recheck 206F/822P (0 new); suite 202F/521P → 0F/723P; combined rerun 9F/1214P (all in-register) | 3059f4f0, 1d40ebeb, a6098885, 58dd4f79 | DONE — batch 3: 12 functions folded (9 pure + 3 byte-only, ledger 70–81); sync: 5 pairs, 202 engine-written mirrors, --check 0 DIFF; triage 50 rows (49 synced / 1 debt: test_i11 stale-pin, FB-06 debt-i11-per-tool-clause-render-2026-10-22.md) |
-| P12-implement-F-triage-drills | implement | T025–T029 | — | targeted only | — | dispatched |
+| P12-implement-F-triage-drills | implement | T025–T029 | 120 (budget-exhausted) | Class 2 rerun 19P/14F (debt-known) | bc5c443a, 550d3b09 | DONE (salvaged) — 9 test files triaged, 6 debt records, 33/33 Class 2 rows, 83/83 triage coverage; injection drill hit/localize/reproduce/restore; no injection residue; 14 debt reds remain baseline-known |
+| P13-implement-wrapup | implement | T030–T032 | — | none | — | dispatched |
 
 ## Gates
 
@@ -100,7 +99,9 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 ## Checkpoint
 
 - requirements DONE (`982a0503`); clarify DONE (`f086e36d`); baseline measured (`137abc67`); plan DONE (`bca3bc99`); tasks DONE (`78954beb`); checklist DONE (`3db048e4`, CHK012 fixed by `b9d23cc2`); analyze GREEN (`ae215d74`, 0 CRITICAL/HIGH, M-1…M-3 remediated).
-- implement: part A DONE (T001–T006 + T007 implement-start slot). T007 result: 534 s wall (≤600 s process check), 83 failed / 4469 passed / 1 skipped, name diff 0 NEW / 0 FIXED; E1 record `full-run-2026-10-22-implement-start.md`; budget fence baseline:1/closure:0. Next: part B (T008–T012), then C/D/E/F, Phase 8 wrap-up, review, Phase 9 closure, U6 local merge (push requires explicit authorization).
+- implement: parts A–F DONE (T001–T029). T007 result: 534 s wall (≤600 s process check), 83 failed / 4469 passed / 1 skipped, name diff 0 NEW / 0 FIXED. E1 record `full-run-2026-10-22-implement-start.md`; budget fence baseline:1/closure:0.
+- Implement outcomes: RC-07 hook neutralization + admission in-process (121→23 s call sum); telemetry 23.36→1.14 s; mirror suite 723 params green after engine sync of 202 mirrors; 35 test functions folded with ledger; 83/83 baseline names triaged (50 mirror-class, 33 Class 2; 14 known debt reds remain in-baseline).
+- Part F budget-exhausted at 120 turns; salvaged in-session (`550d3b09`), no second full dispatch. Next: Phase 8 wrap-up (T030–T032), review, Phase 9 closure (T033–T038), U6 local merge (push requires explicit authorization).
 - E3 stage evidence for clarify/plan/tasks/checklist/analyze added; review row pending the review stage.
 
 ## Framework Observations
