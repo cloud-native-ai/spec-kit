@@ -22,7 +22,7 @@
 | 事实 | 值 | 来源 |
 |---|---|---|
 | 完整运行基线 | 750 s 墙钟（pytest 748.56 s），exit 1 | test-evidence/baseline-full-2026-10-22.md |
-| 计数 | 83 failed / 4467 passed / 1 skipped；collect 4553（contract 3428 / unit 734 / integration 391） | 同上 |
+| 计数 | 83 failed / 4467 passed / 1 skipped；collect 4551（contract 3426 / unit 734 / integration 391；E4 头注权威；4553 为缓存 union 旧锚点，已废弃——review P2-1） | 同上 |
 | 最慢 50 条 | 298.2 s（≈40% 墙钟）：admission_check 18、worktree queue 6、proactive trigger 4、trigger telemetry 3、workspace isolation 3、单条 self-test 28.21 s | test-evidence/baseline-durations-2026-10-22.txt |
 | 失败集结构 | 83 条：50 条含 mirror/parity/sync/drift/distribution 标记；33 条为 gate-total 钉住、exec-quant、3 条 loop-state | test-evidence/baseline-failures-2026-10-22.txt |
 | 宿主单位成本 | 空 spawn ≈10 ms；git CLI ≈29 ms；解释器 ≈55 ms；**fixture 提交 ≈0.9 s（全局 core.hooksPath 安全扫描钩子）**；admission_check 探针 call 相 2.93–9.62 s 而 CPU 仅 ≈2.6 s/全程 | test-evidence/plan-probes-2026-10-22.md（P-2…P-4） |
@@ -96,7 +96,7 @@
 | test_workspace_isolation_contract.py 3 条 ≈13.5 s | git fixture 提交钩子税（同第一行机制） | 同上复测法 | RC-07 即覆盖；必要时模块级仓 | 13.5 → 5–6 s | 低 |
 | watch-target self-test 1 条 28.21 s | 脚本内实时 sleep/宽限窗口（自测用例 6 的 sleep 30 keeper 等，P-5）；脚本不在 FR-021 交付面 | 已静态取证（P-5） | 本 spec 不修（交付面外）；28 s 作为固定成本计入预算算术；脚本侧加速旋钮记为未来 spec 候选（R-10） | 0（固定成本） | 预算挤占已计入算术 |
 | 全套件宽尾部（30+ 文件 52 处直接 commit 调用点 + 引擎脚本提交） | 每处提交付 ≈0.9 s 钩子税（P-4 全局 core.hooksPath 实测） | RC-07 落地后 implement 起点槽位全量运行对比基线 | RC-07 单点 autouse fixture（GIT_CONFIG_GLOBAL/SYSTEM 指向空临时文件，仅测试进程树） | 全局回收约 40–70 s | 个别用例依赖全局 git config → 收窄；baseline 槽位运行即验证点 |
-| 收集/用例开销（298 文件导入 + 4553 用例） | 收集期导入所有测试模块；纯 byte-identity 折叠减少函数数但不减文件数，收益有限 | 收集期 `--collect-only` 计时（实施期一次性） | 仅作为 W3 的次要收益记录，不作独立杠杆 | ≈5–15 s | 低 |
+| 收集/用例开销（298 文件导入 + 4551 用例） | 收集期导入所有测试模块；纯 byte-identity 折叠减少函数数但不减文件数，收益有限 | 收集期 `--collect-only` 计时（实施期一次性） | 仅作为 W3 的次要收益记录，不作独立杠杆 | ≈5–15 s | 低 |
 
 **不做的事**（显式排除）：不改测试执行顺序/随机化；不引入常驻预览服务；不把整层移出完整运行；不为速度弱化断言（断言对象与隔离语义不变，FR-016）。
 

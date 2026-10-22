@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792659743
-stage_deadline_epoch: 1792665143
-stage_base_commit: 8d71082c
+stage_started_at: 1792660465
+stage_deadline_epoch: 1792665865
+stage_base_commit: d32cdd70
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,16 +37,19 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (review)
+## Current Part Brief (closure · T033–T038)
 
-- **part_id**: P14-review
-- **allowed files**: new `.specify/specs/067-loop-efficiency-hardening/review.md` only (plus a commit of that file if convenient)
-- **must not modify**: requirements, plan, tasks, tests, source, scripts, mirrors, registry, verification.md
-- **may run targeted checks**: mirror `--check`; the 723-param suite; admission/telemetry families; the 33 Class 2 node ids; no full suite (T034 owns the closure slot)
-- **review focus**: (1) requirements ↔ plan ↔ tasks ↔ implementation consistency; (2) test-slimming correctness and no coverage loss (ledger 81 rows, 0 deleted); (3) drift protection and the 83-name triage (14 known debt reds; 0 NEW expected); (4) evidence honesty (E1 534 s, injection drill, baseline counts); (5) delivery boundary (tests + generated mirrors only; no src/runtime deps; runner unchanged); (6) constitution compliance; (7) closure readiness (T033–T038 pending).
-- **output**: `review.md` with P0/P1/P2 findings and a final verdict `PASS` / `PASS WITH WAIVER` / `FAIL`; each finding with file:line and remediation.
-- **run-turn-budget**: 120
-- **acceptance**: independent review; no unexecuted test claimed pass; no code/test edits
+- **part_id**: P15-closure
+- **sequence**: driver executes T033 (post id list) and T034 (closure full run, MP-02 cold cache + `--names-out`, E1 + spine fence) first; then a closure subagent executes T035–T038 audits/verification.
+- **allowed files**: `verification.md`, `test-evidence/` evidence, `tasks.md` T033–T038 checkboxes; no tests/source/scripts/mirrors/registry/requirements/plan edits.
+- **W-1 ruling**: pinned roster check is a ledger join (roster id in post list, or case-merge row → green suite param); see `pinned-roster-addendum-2026-10-22.md`.
+- **count authority**: E4 header 4551 (contract 3426 / unit 734 / integration 391); 4553/3428 are discarded cache-union anchors.
+- **expected closure failure set**: 15 known reds (14 pre-existing-debt + i11), same on both sides of the name diff; 0 NEW. Do not fix debt names during closure.
+- **T035**: baseline vs post id join; missing set = folded ids; ledger unmatched = 0; layer counts vs E4 base; post-only reported.
+- **T036**: name-level diff vs T007 in-stage baseline; 0 NEW; 15 known reds; W-1 roster join; triage closure.
+- **T037**: pyproject runtime dependency diff empty; no new dev deps; no new network calls in tests.
+- **T038**: verification finalize SC-006…SC-010 and DoD-7; GATE-1…GATE-7 pass or explicit waiver; no third full run.
+- **run-turn-budget**: 120 (T035–T038); no full suite beyond T034.
 
 ## Dispatch Log
 
@@ -65,7 +68,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P11-implement-E2-fold3-sync-recheck | implement | T022–T024 | not_evaluated | targeted: fold recheck 206F/822P (0 new); suite 202F/521P → 0F/723P; combined rerun 9F/1214P (all in-register) | 3059f4f0, 1d40ebeb, a6098885, 58dd4f79 | DONE — batch 3: 12 functions folded (9 pure + 3 byte-only, ledger 70–81); sync: 5 pairs, 202 engine-written mirrors, --check 0 DIFF; triage 50 rows (49 synced / 1 debt: test_i11 stale-pin, FB-06 debt-i11-per-tool-clause-render-2026-10-22.md) |
 | P12-implement-F-triage-drills | implement | T025–T029 | 120 (budget-exhausted) | Class 2 rerun 19P/14F (debt-known) | bc5c443a, 550d3b09 | DONE (salvaged) — 9 test files triaged, 6 debt records, 33/33 Class 2 rows, 83/83 triage coverage; injection drill hit/localize/reproduce/restore; no injection residue; 14 debt reds remain baseline-known |
 | P13-implement-wrapup | implement | T030–T032 | not_evaluated | none run | 8d71082c | DONE — mirror --check 0 DIFF; 29/29 implement tasks closed; triage 83/83; ledger 81 rows (35 case-merge + 46 retained, 0 deleted); verification.md 9 sections |
-| P14-review | review | — | — | targeted checks only | — | dispatched |
+| P14-review | review | — | not_evaluated | targeted: mirror 0 DIFF; suite 723P; admission 25P; telemetry 13P; Class 2 19P/14F | d32cdd70 | DONE — **PASS WITH WAIVER**; P0=0 / P1=1 (W-1 roster literal check) / P2=3; W-1 ruled via addendum; no full suite |
+| P15-closure | closure | T033–T038 | — | T034 full run | — | dispatched (driver T033/T034, then audits) |
 
 ## Gates
 
@@ -102,7 +106,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 - implement: parts A–F DONE (T001–T029). T007 result: 534 s wall (≤600 s process check), 83 failed / 4469 passed / 1 skipped, name diff 0 NEW / 0 FIXED. E1 record `full-run-2026-10-22-implement-start.md`; budget fence baseline:1/closure:0.
 - Implement outcomes: RC-07 hook neutralization + admission in-process (121→23 s call sum); telemetry 23.36→1.14 s; mirror suite 723 params green after engine sync of 202 mirrors; 35 test functions folded with ledger; 83/83 baseline names triaged (50 mirror-class, 33 Class 2; 14 known debt reds remain in-baseline).
 - Part F budget-exhausted at 120 turns; salvaged in-session (`550d3b09`), no second full dispatch. Phase 8 DONE (`8d71082c`): mirror `--check` 0 DIFF, 29/29 implement tasks closed, triage 83/83, ledger 81 rows (0 deleted), verification.md built.
-- Next: independent review → Phase 9 closure (T033–T038: full run + coverage/name-level/dependency audits + verification finalize) → U6 local merge (push requires explicit authorization).
+- Review DONE (`d32cdd70`): PASS WITH WAIVER; P0=0/P1=1(W-1)/P2=3. W-1 ruled (ledger-join roster check; addendum); count anchors corrected to 4551/3426; closure expects 15 known reds and 0 NEW.
+- Next: closure (T033–T038: post ids → closure full run → coverage/name/dependency audits → verification finalize) → U6 local merge (push requires explicit authorization).
 - E3 stage evidence for clarify/plan/tasks/checklist/analyze added; review row pending the review stage.
 
 ## Framework Observations
