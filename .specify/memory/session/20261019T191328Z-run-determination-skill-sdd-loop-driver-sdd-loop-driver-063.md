@@ -6,10 +6,10 @@ feature: "063-review-p1-governance"
 tags: ["run-determination", "sdd-loop-driver-063-p1-governance-20261020"]
 title: "run-determination skill:sdd-loop-driver sdd-loop-driver-063-p1-governance-20261020"
 created: "2026-10-19T19:13:28Z"
-summary: "skill:sdd-loop-driver run=sdd-loop-driver-063-p1-governance-20261020 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "skill:sdd-loop-driver run=sdd-loop-driver-063-p1-governance-20261020 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
 ---
 
-skill:sdd-loop-driver run=sdd-loop-driver-063-p1-governance-20261020 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+skill:sdd-loop-driver run=sdd-loop-driver-063-p1-governance-20261020 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -21,7 +21,7 @@ skill:sdd-loop-driver run=sdd-loop-driver-063-p1-governance-20261020 token=not_e
   "feature": "063-review-p1-governance",
   "feature_id": "063",
   "determined_at": "2026-10-19T19:13:28Z",
-  "settled_at": null,
+  "settled_at": "2026-10-22T10:04:59Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -83,9 +83,9 @@ skill:sdd-loop-driver run=sdd-loop-driver-063-p1-governance-20261020 token=not_e
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
@@ -159,18 +159,6 @@ skill:sdd-loop-driver run=sdd-loop-driver-063-p1-governance-20261020 token=not_e
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -190,11 +178,6 @@ skill:sdd-loop-driver run=sdd-loop-driver-063-p1-governance-20261020 token=not_e
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=None collected=None reason=no_declared_checks",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }
