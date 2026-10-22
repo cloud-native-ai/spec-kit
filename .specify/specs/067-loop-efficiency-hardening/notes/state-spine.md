@@ -67,7 +67,7 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P13-implement-wrapup | implement | T030–T032 | not_evaluated | none run | 8d71082c | DONE — mirror --check 0 DIFF; 29/29 implement tasks closed; triage 83/83; ledger 81 rows (35 case-merge + 46 retained, 0 deleted); verification.md 9 sections |
 | P14-review | review | — | not_evaluated | targeted: mirror 0 DIFF; suite 723P; admission 25P; telemetry 13P; Class 2 19P/14F | d32cdd70 | DONE — **PASS WITH WAIVER**; P0=0 / P1=1 (W-1 roster literal check) / P2=3; W-1 ruled via addendum; no full suite |
 | P15-closure | closure | T033–T034 (driver) | not_evaluated | full run 14F/5224P/1S | e6c3e655 | DONE — post ids 5239; closure **553 s** (≤600); 0 NEW / 69 fixed / 14 known debt; budget audit baseline:1 closure:1, stages 6/6 |
-| P16-closure-audits | closure | T035–T038 | — | audits only | — | dispatched |
+| P16-closure-audits | closure | T035–T038 | not_evaluated | audits only — zero pytest runs | dd05f4a3 | DONE — T035 unmatched=0 (LED-03 corr rows 82–89, disclosed); missing 38 = folded set; layers 3426/734/391 × 4111/736/392 ✓; T036 0 NEW / 69 fixed / W-1 302=264+38+0 gap; triage 83/83; T037 pyproject diff 0B, network tokens 0; T038 verification §10, GATE-1…7 all PASS, RC-04 not triggered; T035–T038 `[X]` |
 
 ## Gates
 
@@ -105,10 +105,10 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 - implement: parts A–F DONE (T001–T029). T007 result: 534 s wall (≤600 s process check), 83 failed / 4469 passed / 1 skipped, name diff 0 NEW / 0 FIXED. E1 record `full-run-2026-10-22-implement-start.md`; budget fence baseline:1/closure:0.
 - Implement outcomes: RC-07 hook neutralization + admission in-process (121→23 s call sum); telemetry 23.36→1.14 s; mirror suite 723 params green after engine sync of 202 mirrors; 35 test functions folded with ledger; 83/83 baseline names triaged (50 mirror-class, 33 Class 2; 14 known debt reds remain in-baseline).
 - Part F budget-exhausted at 120 turns; salvaged in-session (`550d3b09`), no second full dispatch. Phase 8 DONE (`8d71082c`): mirror `--check` 0 DIFF, 29/29 implement tasks closed, triage 83/83, ledger 81 rows (0 deleted), verification.md built.
-- Review DONE (`d32cdd70`): PASS WITH WAIVER; P0=0/P1=1(W-1)/P2=3. W-1 ruled (ledger-join roster check; addendum); count anchors corrected to 4551/3426; closure expects 15 known reds and 0 NEW.
+- Review DONE (`d32cdd70`): PASS WITH WAIVER; P0=0/P1=1(W-1)/P2=3. W-1 ruled (ledger-join roster check; addendum); count anchors corrected to 4551/3426.
 - Closure T033/T034 DONE (`e6c3e655`): post ids 5239; wall **553 s** (≤600); 14F/5224P/1S; **0 NEW** / 69 fixed / 14 known debt; E1 closure record; fence baseline:1/closure:1; audit `stages=6 complete=6` exit 0.
-- Next: T035–T038 audits + verification finalize → U6 local merge to master (push requires explicit authorization).
-- E3 stage evidence for clarify/plan/tasks/checklist/analyze added; review row pending the review stage.
+- T035–T038 DONE (`dd05f4a3`): coverage join unmatched 0; W-1 roster 302 = 264 direct + 38 mapped, 0 gap; dependency boundary 0; SC-006…SC-010 and GATE-1…GATE-7 pass; DoD green; 38/38 tasks closed.
+- Next: U6 local merge to master. Push is not authorized in this entry; no push performed.
 
 ## Framework Observations
 

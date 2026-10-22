@@ -34,7 +34,7 @@
 - DoD-6: SC-010 三项检索全过（运行时依赖 diff 为空 / 测试侧新增依赖仅在开发组 / 新增网络调用为 0）。
 - DoD-7: `verification.md` 记录哪些测试跑了、哪些未跑、waiver 原文（如有）；SC-001…SC-010 逐项有状态与证据指针；不可得指标记 `not_evaluated`。
 
-**DoD Status**: pending（tasks 阶段产物；implement 闭合后按 GATE-1…GATE-7 复核翻转）
+**DoD Status**: **green**（2026-10-22 closure — GATE-1…GATE-7 全过；closure E1 wall **553 s** ≤600；名称级 0 NEW / 69 fixed / 14 known debt；triage 83/83；覆盖 join unmatched 0；依赖边界三项 0；预算审计 `baseline:1 closure:1`、`stages=6 complete=6`）。
 
 ## Completion Gate
 
