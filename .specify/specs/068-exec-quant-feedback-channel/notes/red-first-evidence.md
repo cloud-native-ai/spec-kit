@@ -366,3 +366,117 @@ FAILED tests/contract/test_feedback_intake_exec_quant.py::test_ingest_does_not_t
   feedback 条目处理零变化）→ 第 4 例。全部自构夹具，真实入站包
   `feedback/feedback-20261022T062525Z.zip` 与客户存储写面零触碰（场景 5 premise 原文）。
 
+
+---
+
+# Implement Part 4a — US3 汇总腿红先测试（T016 / T019，2026-10-22）
+
+- 测试针对框架源 `scripts/python/exec-quant.py`（T016 经 `tests/script_api.py` 的
+  `_load_module` 装载注册面 + subprocess 走引擎真实命令行，与
+  `test_exec_quant_engine.py` 同形；T019 经同一装载器取 `exec_quant` 与
+  `feedback_utils` 双引擎进程内跑链）。夹具全部自构（tmp_path 聚合层/客户存储），
+  真实入站包、运行时记录、`.specify/` 镜像零触碰（红跑后 `git status` 核对：改动面
+  恰为两支新测试文件）。
+- 4b 实现注意（本段钉住的接口形态与读法裁决，逐条可溯源）：动作注册 = `ACTIONS`
+  元组 + `ARG_MANIFEST["aggregate"]`（required=[]，C-18 零新增必需参数）；缺省
+  `--format` 行为 = json；`skipped_unreadable` 以视图顶层 int 计数呈现（C-19 要求
+  可观察；E7 字段表按「必需下限非封闭集」读法，同 C-16 平面计数先例）；视图顶层
+  键集 = E7 六字段 ∪ {skipped_unreadable}，每源键集 = E7 七字段封闭（C-21
+  不评估不打分的结构面）；coverage = 该源 quality 分布逐字段合计（D8「coverage
+  汇总」，零字段词表可重放）；形态归一按形状规则统一执行——未知新字段携带合法
+  `{value, provenance}` 形 → evaluated、裸 `[[STR-002]]`/缺键/未知形态 →
+  not_evaluated（唯一同时满足记录法则两形态律、FR-013 零失真与 C-20 零硬编码的
+  读法；「未知字段名一律 not_evaluated」的严格读法需要硬编码词表，弃）；CHK027
+  空层 0/0 占比形态**未钉**（契约未定义，留给 4b 裁决），但零臆造数值守卫仍禁止
+  空分母下的任何编造百分比。
+
+## § T016 — `tests/contract/test_exec_quant_aggregate.py`（red-first）
+
+- 命令：`bash scripts/bash/run-tests.sh tests/contract/test_exec_quant_aggregate.py -q`
+- 退出码：`1`；`--collect-only` = 25
+- 真实输出尾部（节选）：
+
+```text
+E       AssertionError: assert 'aggregate' in ('collect', 'list-records', 'score', 'collect-dispatch', 'args-manifest')
+...（CLI 面 21 例统一终止于 argparse 层）
+E       AssertionError: no stdout JSON (rc=2): usage: exec-quant.py [--action ...]
+__main__.py: error: argument --action: invalid choice: 'aggregate' (choose from 'collect', 'list-records', 'score', 'collect-dispatch', 'args-manifest')
+FAILED tests/contract/test_exec_quant_aggregate.py::test_action_registered_in_actions_and_arg_manifest
+FAILED tests/contract/test_exec_quant_aggregate.py::test_args_manifest_covers_aggregate_flags
+FAILED tests/contract/test_exec_quant_aggregate.py::test_aggregate_accepts_workspace_root_and_format_flags
+FAILED tests/contract/test_exec_quant_aggregate.py::test_format_defaults_to_json
+FAILED tests/contract/test_exec_quant_aggregate.py::test_format_text_face_runs
+FAILED tests/contract/test_exec_quant_aggregate.py::test_consumes_aggregated_envelopes_grouped_by_source_project
+FAILED tests/contract/test_exec_quant_aggregate.py::test_same_source_project_across_slug_dirs_merges
+FAILED tests/contract/test_exec_quant_aggregate.py::test_local_records_and_scores_never_enter_view
+FAILED tests/contract/test_exec_quant_aggregate.py::test_unreadable_envelopes_counted_non_blocking
+FAILED tests/contract/test_exec_quant_aggregate.py::test_own_repo_source_has_same_rights
+FAILED tests/contract/test_exec_quant_aggregate.py::test_view_projection_field_set_e7
+FAILED tests/contract/test_exec_quant_aggregate.py::test_quality_shape_normalization
+FAILED tests/contract/test_exec_quant_aggregate.py::test_unknown_field_with_measured_shape_is_shape_evaluated
+FAILED tests/contract/test_exec_quant_aggregate.py::test_coverage_is_quality_distribution_total
+FAILED tests/contract/test_exec_quant_aggregate.py::test_totals_and_store_digest_replayable
+FAILED tests/contract/test_exec_quant_aggregate.py::test_every_number_replayable_from_record_files
+FAILED tests/contract/test_exec_quant_aggregate.py::test_view_keys_are_closed_counter_projection
+FAILED tests/contract/test_exec_quant_aggregate.py::test_no_fabricated_values_in_view
+FAILED tests/contract/test_exec_quant_aggregate.py::test_product_lands_in_summaries_entry_form
+FAILED tests/contract/test_exec_quant_aggregate.py::test_stdout_and_product_are_isomorphic
+FAILED tests/contract/test_exec_quant_aggregate.py::test_rerun_appends_new_file_with_identical_numbers
+FAILED tests/contract/test_exec_quant_aggregate.py::test_empty_aggregated_layer_zero_sources
+FAILED tests/contract/test_exec_quant_aggregate.py::test_aggregate_writes_only_under_aggregated
+23 failed, 2 passed in 1.21s
+```
+
+- 用例清单：上列 23 红 + 2 预绿守卫（`test_subject_is_framework_source_engine`：
+  装载源自 `scripts/python/` 而非镜像——既有能力，红先期通过属预期；
+  `test_engine_has_no_coupling_to_the_intake_path`：引擎源零 feedback 耦合的结构钉
+  ——现状即真，其价值在 aggregate 落地后钉住「零接收触发路径」不被实现引入；
+  行为面负例由 T011 `test_ingest_does_not_trigger_aggregate` 与 T019 链内断言覆盖）。
+- 条款映射：C-18 → 注册/manifest/旗标/缺省 json/text 面（5 例）；C-19 → 消费面
+  分组、跨 slug 同源合并、本地 records//scores/ 负例、信封不可读非阻塞、本仓同权
+  （5 例）；C-20 → E7 字段集、形态归一、未知字段形状读法、coverage=quality 合计、
+  totals+store_digest 重放、逐数字名单重放（6 例）；C-21 → 封闭键集 + 零臆造
+  （2 例）；C-22 → 产物落盘/同构/重跑一致/空层（4 例）；C-23 → 零耦合结构钉 +
+  产物仅落 aggregated/（2 例）。
+- 失败归因：**subject 缺失**——23 例全部终止于 `aggregate` 未注册（argparse
+  `invalid choice` → rc=2，或注册面断言 `assert 'aggregate' in ACTIONS`），无一例
+  触及夹具数据或断言逻辑缺陷；断言面零修正。
+
+## § T019 — `tests/integration/test_feedback_exec_quant_channel.py`（red-first，汇总链）
+
+- 命令：`bash scripts/bash/run-tests.sh tests/integration/test_feedback_exec_quant_channel.py -q`
+- 退出码：`1`（三轮同：首轮 6 failed、夹具修正两处后终跑仍 6 failed 但红因已归一）
+- 真实输出尾部（节选）：
+
+```text
+E       assert (2 == 0)
+E        +  where 2 = <_pytest.capture.CaptureFixture>.rb  # rc of EQ.main via _aggregate
+assert rc == 0 and view is not None
+FAILED tests/integration/test_feedback_exec_quant_channel.py::test_full_chain_two_sources_view_and_product
+FAILED tests/integration/test_feedback_exec_quant_channel.py::test_same_package_double_ingest_zero_delta_and_rerun_consistent
+FAILED tests/integration/test_feedback_exec_quant_channel.py::test_ingest_does_not_auto_aggregate_in_chain
+FAILED tests/integration/test_feedback_exec_quant_channel.py::test_credential_scan_zero_hits_over_products_and_aggregate_layer
+FAILED tests/integration/test_feedback_exec_quant_channel.py::test_chain_runs_with_sockets_blocked
+FAILED tests/integration/test_feedback_exec_quant_channel.py::test_no_payload_isomorphic_package_full_chain_zero_diff
+6 failed in 0.21s
+```
+
+- 用例清单（6 例，全部先走通 package/ingest 链再钉 aggregate）：全链双源视图与
+  产物（≥2 源、unknown-project 字面组零猜测、双形态 3 条全携带、逐数字名单重放、
+  stdout 与落盘同构、store_digest 4/4）；同包双收幂等（`ingested:0` /
+  `duplicates_skipped` 全量、聚合层字节零增量、重跑新文件旧件零改写、数字一致）；
+  链内接收零自动汇总（C-17/C-23 行为负例：两次 ingest 后 summaries 为空）；凭据
+  零出现（对聚合层 + summaries 产物 + 包成员跑凭据型变量名/字面值扫描，命中 0）；
+  全链零网络（socket.socket/create_connection/getaddrinfo 全部改为 raise 后整链
+  跑通）；无载荷等构包全链零差异（feedback 条目 + 零载荷包 → 聚合层字节零增量、
+  汇总数字零变化、零新组）。
+- 失败归因：
+  1. 首轮 6 例中 2 例先折在**夹具缺陷**（SKILL § TDD 归因后修正并披露）：(a) package
+     报告的 `zip` 是相对客户工作区的路径，`_package` 未按客户根解析 →
+     `FileNotFoundError`；(b) 投递步撞名——两个客户包在同一秒内生成同名
+     `feedback-<ts>.zip`，投递复制相互覆盖（alpha 指向的收件路径被 beta 内容覆盖
+     → `ingested==1`）——投递命名加客户名前缀修正（真实收件箱语义：同名投递件
+     从不静默互覆）。
+  2. 修正后终态 6 例全部归因 **subject 缺失**：package/ingest 链节全部走通（包
+     报告、双形态计数、归因、幂等断言通过），统一红在 `--action aggregate` 未注册
+     （rc=2 invalid choice，view=None）。断言面除上述 2 处夹具修正外零缺陷。
