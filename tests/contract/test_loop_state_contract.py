@@ -10,13 +10,17 @@ Red-first per tasks.md T003/T008: each batch lands before the code it
 asserts; `notes/red-first-evidence.md` records the red runs.
 """
 
+import importlib.util
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
+
+pytestmark = pytest.mark.contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "loop-state.py"
@@ -104,18 +108,28 @@ def test_help_lists_actions_params_exit_ladder_and_watcher_data_note():
         assert param in text, f"--help missing parameter {param}"
     assert "Exit codes:" in text, "--help missing exit-code ladder"
     ladder = text.split("Exit codes:", 1)[1]
-    for code, keyword in (("0", "success"), ("1", "rejected"), ("2", "argument")):
-        assert re_ladder(ladder, code, keyword), (
-            f"--help ladder line for {code} ({keyword}) missing"
+    # C-3 pins the *semantics* of each rung, not one spelling of the keyword:
+    # rung 0 = evaluation succeeded (either "success" or "succeeded" is valid),
+    # rung 1 = rejected/validation failed, rung 2 = argument error.
+    for code, keywords in (
+        ("0", ("success", "succeeded")),
+        ("1", ("rejected", "refused")),
+        ("2", ("argument", "usage")),
+    ):
+        assert re_ladder(ladder, code, keywords), (
+            f"--help ladder line for {code} ({keywords}) missing"
         )
     assert "DATA" in text and "10-16" in text, (
         "--help must state watcher verdict codes are data (never reused)"
     )
 
 
-def re_ladder(ladder_text, code, keyword):
+def re_ladder(ladder_text, code, keywords):
+    if isinstance(keywords, str):
+        keywords = (keywords,)
     for line in ladder_text.splitlines():
-        if line.strip().startswith(code) and keyword in line:
+        stripped = line.strip()
+        if stripped.startswith(code) and any(k in line for k in keywords):
             return True
     return False
 
@@ -288,3 +302,352 @@ def test_derived_mapping_owner_is_fr004_everywhere():
     assert SCRIPT.exists(), "loop-state.py missing (T004)"
     engine_text = SCRIPT.read_text(encoding="utf-8")
     assert "FR-004" in engine_text, "engine must cite FR-004 as the mapping owner"
+
+
+# ---------------------------------------------------------------------------
+# T008 / C-11..C-13: --probe acceptance, refusals and local-evidence isolation
+# ---------------------------------------------------------------------------
+
+def _probe_minimal_a():
+    """Shape (a): a snapshot envelope with watch_verdict + evidence."""
+    return {
+        "schema_version": 1,
+        "line_id": "demo-line",
+        "watch_verdict": {
+            "present": False, "status": "na", "value_state": "na",
+            "verdict": None, "reason": None, "exit_code": None,
+            "attribution": None, "detail": None,
+        },
+        "evidence": {
+            "evidence_source": "probe",
+            "pid": {"status": "missing", "value_state": "na", "path": None},
+            "status": {"status": "missing", "value_state": "na", "path": None},
+            "log": {"status": "missing", "value_state": "na", "path": None},
+            "heartbeat": {"status": "missing", "value_state": "na", "path": None},
+            "watchbeat": {"status": "missing", "value_state": "na", "path": None},
+            "hook": {"status": "na", "value_state": "na", "path": None,
+                     "observed_at": None},
+            "artifacts": {"status": "missing", "value_state": "na",
+                          "stage": None, "complete": None,
+                          "commit_required": None, "no_change_allowed": None,
+                          "items": []},
+            "commits": {"status": "missing", "value_state": "na", "base": None,
+                        "pathspec": [], "commits": [], "touching": None},
+        },
+    }
+
+
+def _probe_snapshot_run(tmp_path, payload, name="probe.json"):
+    probe = tmp_path / name
+    probe.write_text(json.dumps(payload), encoding="utf-8")
+    return probe, _run(["--action", "snapshot", "--line-id", "demo-line",
+                        "--probe", str(probe)])
+
+
+def test_probe_shapes_a_and_b_are_accepted(tmp_path):
+    probe, proc = _probe_snapshot_run(tmp_path, _probe_minimal_a())
+    assert proc.returncode == 0, proc.stderr
+    envelope = json.loads(proc.stdout)
+    assert envelope["evidence"]["evidence_source"] == "probe"
+    assert envelope["paths"]["probe"] == str(probe)
+
+    _, proc = _probe_snapshot_run(
+        tmp_path, {"schema_version": 1, "reachable": False, "reason": "ssh-255"},
+        name="probe-b.json")
+    assert proc.returncode == 0, proc.stderr
+    envelope = json.loads(proc.stdout)
+    assert envelope["loop_state"] == "STALLED"
+    assert envelope["loop_state_reason"] == "remote-unreachable"
+    assert envelope["recovery_action"] == "stop"
+
+
+@pytest.mark.parametrize("payload,label", [
+    ("{not json", "unparseable"),
+    ({"schema_version": 2, "watch_verdict": {}, "evidence": {}}, "wrong-schema"),
+    ({"schema_version": 1, "reachable": True, "reason": "x"}, "reachable-true"),
+    ({"schema_version": 1, "watch_verdict": {}, "evidence": {}, "line_id": "other"},
+     "line-mismatch"),
+])
+def test_probe_rejections_exit_2(tmp_path, payload, label):
+    probe = tmp_path / ("probe-%s.json" % label)
+    probe.write_text(payload if isinstance(payload, str) else json.dumps(payload),
+                     encoding="utf-8")
+    proc = _run(["--action", "snapshot", "--line-id", "demo-line",
+                 "--probe", str(probe)])
+    assert proc.returncode == 2, f"{label}: expected exit 2, got {proc.returncode}"
+
+    missing = _run(["--action", "snapshot", "--line-id", "demo-line",
+                    "--probe", str(tmp_path / "nope.json")])
+    assert missing.returncode == 2, "an unreadable --probe file is exit 2"
+
+
+@pytest.mark.parametrize("flag", [
+    "--spine", "--state-dir", "--spec-dir", "--repo", "--watch-script",
+])
+def test_probe_is_mutually_exclusive_with_local_paths(tmp_path, flag):
+    state_dir, spec_dir, spine = _make_fixture(tmp_path)
+    probe = tmp_path / "probe.json"
+    probe.write_text(json.dumps(_probe_minimal_a()), encoding="utf-8")
+    targets = {
+        "--spine": str(spine), "--state-dir": str(state_dir),
+        "--spec-dir": str(spec_dir), "--repo": str(spec_dir),
+        "--watch-script": str(REPO_ROOT / "no-such-watch.sh"),
+    }
+    proc = _run(["--action", "snapshot", "--line-id", "demo-line",
+                 "--probe", str(probe), flag, targets[flag]])
+    assert proc.returncode == 2, (
+        f"{flag} together with --probe must exit 2 (mutual exclusion)"
+    )
+
+
+def test_probe_does_not_read_local_evidence(tmp_path):
+    state_dir, spec_dir, spine = _make_fixture(tmp_path)
+    state_dir.joinpath("log-demo-line-plan.log").write_text(
+        "TASKS-DONE\n", encoding="utf-8")  # local completion evidence
+    probe = tmp_path / "probe.json"
+    probe.write_text(json.dumps({"schema_version": 1, "reachable": False,
+                                 "reason": "ssh-255"}), encoding="utf-8")
+    proc = _run(["--action", "snapshot", "--line-id", "demo-line",
+                 "--probe", str(probe)])
+    assert proc.returncode == 0, proc.stderr
+    envelope = json.loads(proc.stdout)
+    assert envelope["loop_state"] == "STALLED", (
+        "local completion evidence must never be mixed into probe evaluation"
+    )
+    assert envelope["evidence"]["log"]["status"] == "missing"
+
+
+# ---------------------------------------------------------------------------
+# T008 / C-4/C-6: required-input vs evidence-source matrix
+# ---------------------------------------------------------------------------
+
+def test_missing_line_id_exits_2():
+    proc = _run(["--action", "snapshot"])
+    assert proc.returncode == 2, "--line-id is a required input (exit 2)"
+
+
+def test_unreadable_evidence_sources_missing_but_exit_0(tmp_path):
+    state_dir = tmp_path / "state" / "demo-line"
+    state_dir.mkdir(parents=True)
+    state_dir.joinpath("log-demo-line-plan.log").write_text(
+        "TASKS-DONE\n", encoding="utf-8")  # dispatch evidence, spine absent
+    proc = _run([
+        "--action", "snapshot", "--line-id", "demo-line", "--stage", "plan",
+        "--spine", str(tmp_path),            # a directory: unreadable as a file
+        "--state-dir", str(state_dir),
+        "--spec-dir", str(tmp_path / "no-spec"),
+        "--repo", str(tmp_path / "no-repo"),
+    ])
+    assert proc.returncode == 0, proc.stderr
+    envelope = json.loads(proc.stdout)
+    assert envelope["spine"]["status"] == "missing"
+    assert envelope["registry"]["status"] == "missing"
+    assert envelope["loop_state"] == "UNKNOWN"
+    assert envelope["recovery_action"] == "stop"
+
+
+# ---------------------------------------------------------------------------
+# T008 / C-17: --self-test output contract
+# ---------------------------------------------------------------------------
+
+def test_self_test_output_contract():
+    proc = _run(["--self-test"])
+    assert proc.returncode in (0, 1), proc.stderr
+    lines = [line for line in proc.stdout.splitlines() if line.strip()]
+    assert lines, "--self-test produced no output"
+    summary = re.match(r"^SELF-TEST: (\d+) passed, (\d+) failed$", lines[-1])
+    assert summary, f"last line must be the summary, got: {lines[-1]!r}"
+    passed, failed = int(summary.group(1)), int(summary.group(2))
+    assert passed + failed > 0
+    for line in lines[:-1]:
+        assert line.startswith("ok ") or re.match(r"^FAIL .+ — .+$", line), (
+            f"per-case line must be 'ok <case>' or 'FAIL <case> — <detail>': {line!r}"
+        )
+    assert proc.returncode == (0 if failed == 0 else 1), (
+        "exit 0 when all cases pass, 1 when any fails"
+    )
+
+
+# ---------------------------------------------------------------------------
+# T008 / C-32: determinism (only evaluated_at may diff)
+# ---------------------------------------------------------------------------
+
+def test_two_runs_differ_only_in_evaluated_at(tmp_path):
+    state_dir, spec_dir, spine = _make_fixture(tmp_path)
+    args = _snapshot_args(state_dir, spec_dir, spine)
+    first = _run(args)
+    second = _run(args)
+    assert first.returncode == 0, first.stderr
+    assert second.returncode == 0, second.stderr
+    left = json.loads(first.stdout)
+    right = json.loads(second.stdout)
+    assert left["evaluated_at"].endswith("Z")
+    assert {k: v for k, v in left.items() if k != "evaluated_at"} == {
+        k: v for k, v in right.items() if k != "evaluated_at"}
+    assert "age_seconds" not in first.stdout, (
+        "age-like derived numbers are forbidden (only raw at/mtime_ns)"
+    )
+
+
+# ---------------------------------------------------------------------------
+# T008 / C-50 (AM-01): STAGE_ARTIFACTS vs reference §Stage Artifact Map
+# ---------------------------------------------------------------------------
+
+STAGES = ["requirements", "clarify", "plan", "tasks", "checklist", "analyze",
+          "implement", "review"]
+STATES = ("RUNNING|DONE|INCOMPLETE|ANOMALY|FAILED|DEAD|TIMEOUT|NO_SIGNAL|"
+          "STALLED|REENTRY_REQUIRED|UNKNOWN")
+
+
+def _load_engine_module():
+    assert SCRIPT.exists(), "loop-state.py missing (T004)"
+    spec = importlib.util.spec_from_file_location("loop_state_contract", SCRIPT)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["loop_state_contract"] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def _section(text, heading):
+    lines = text.splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if line.startswith("#") and heading in line:
+            start = index + 1
+            break
+    assert start is not None, f"section {heading!r} missing"
+    body = []
+    for line in lines[start:]:
+        if line.startswith("## "):
+            break
+        body.append(line)
+    return body
+
+
+def _table_rows(body):
+    rows = []
+    for line in body:
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if not cells:
+            continue
+        if all(set(cell) <= set("-: ") for cell in cells):
+            continue
+        rows.append(cells)
+    return rows
+
+
+def _backticked(cell):
+    return re.findall(r"`([^`]+)`", cell)
+
+
+def _as_bool(cell):
+    value = cell.strip().strip("`").lower()
+    if value in ("true", "yes", "是"):
+        return True
+    if value in ("false", "no", "否"):
+        return False
+    raise AssertionError(f"not a boolean cell: {cell!r}")
+
+
+def test_stage_artifacts_match_reference_five_dimensions():
+    module = _load_engine_module()
+    table = getattr(module, "STAGE_ARTIFACTS", None)
+    assert isinstance(table, dict), (
+        "STAGE_ARTIFACTS is the runtime owner of the stage artifact map (T011)"
+    )
+    assert sorted(table) == sorted(STAGES), (
+        f"STAGE_ARTIFACTS must cover the eight stages, got {sorted(table)}"
+    )
+
+    assert REF.exists(), "references/state-awareness.md missing (T018)"
+    rows = _table_rows(_section(REF.read_text(encoding="utf-8"),
+                                "Stage Artifact Map"))
+    assert rows, "§Stage Artifact Map must contain the mirror table"
+    reference = {}
+    for cells in rows[1:]:
+        name = (_backticked(cells[0]) or [cells[0].strip()])[0]
+        if name not in STAGES:
+            continue
+        reference[name] = {
+            "artifacts": sorted(_backticked(cells[1])),
+            "owned_paths": sorted(_backticked(cells[2])),
+            "commit_required": _as_bool(cells[3]),
+            "no_change_allowed": _as_bool(cells[4]),
+        }
+    assert sorted(reference) == sorted(STAGES), (
+        f"reference table must cover the eight stages, got {sorted(reference)}"
+    )
+
+    for stage in STAGES:
+        entry = table[stage]
+        assert sorted(entry["artifacts"]) == reference[stage]["artifacts"], stage
+        assert sorted(entry["owned_paths"]) == reference[stage]["owned_paths"], stage
+        assert entry["commit_required"] is reference[stage]["commit_required"], stage
+        assert entry["no_change_allowed"] is reference[stage]["no_change_allowed"], stage
+
+
+# ---------------------------------------------------------------------------
+# T008: script derived table == reference §Derived Mapping == FR-004 table
+# ---------------------------------------------------------------------------
+
+def _clause_states():
+    """FR-004 is the owner: derive the expected (order -> states) from it."""
+    text = SLICE_REQ.read_text(encoding="utf-8")
+    line = next(l for l in text.splitlines() if l.startswith("- **FR-004**"))
+    marks = [(m.start(), int(m.group(1)))
+             for m in re.finditer(r"\((\d+)\)", line)]
+    assert [num for _pos, num in marks] == list(range(1, 9)), (
+        "FR-004 must carry its eight numbered priority clauses"
+    )
+    clauses = {}
+    for index, (pos, number) in enumerate(marks):
+        end = marks[index + 1][0] if index + 1 < len(marks) else len(line)
+        clause = line[pos:end].split("。", 1)[0]
+        found = re.findall(r"\b(%s)\b" % STATES, clause)
+        clauses[number] = [s for i, s in enumerate(found)
+                           if i == 0 or found[i - 1] != s]
+    return clauses
+
+
+def _group(rows):
+    grouped = {}
+    for order, state in rows:
+        grouped.setdefault(order, []).append(state)
+    return grouped
+
+
+def test_derived_mapping_is_three_way_identical():
+    expected = _clause_states()
+
+    module = _load_engine_module()
+    script_rows = getattr(module, "DERIVED_MAPPING", None)
+    assert isinstance(script_rows, list) and script_rows, (
+        "loop-state.py must expose DERIVED_MAPPING (order, state) rows mirroring "
+        "FR-004 (T013)"
+    )
+    script_grouped = _group(
+        (row["order"], row.get("state") or row["loop_state"]) for row in script_rows)
+    assert script_grouped == expected, (
+        "script derived table must mirror FR-004 clause by clause"
+    )
+
+    assert REF.exists(), "references/state-awareness.md missing (T018)"
+    rows = _table_rows(_section(REF.read_text(encoding="utf-8"), "Derived Mapping"))
+    assert rows, "§Derived Mapping must contain the mirror table"
+    reference_grouped = {}
+    for cells in rows[1:]:
+        match = re.match(r"^(\d+)$", (_backticked(cells[0]) or [cells[0].strip()])[0])
+        if not match:
+            continue
+        order = int(match.group(1))
+        found = re.findall(r"\b(%s)\b" % STATES, " | ".join(cells[1:]))
+        deduped = [s for i, s in enumerate(found) if i == 0 or found[i - 1] != s]
+        reference_grouped[order] = deduped
+    assert reference_grouped == expected, (
+        "reference §Derived Mapping must mirror FR-004 clause by clause"
+    )
+
