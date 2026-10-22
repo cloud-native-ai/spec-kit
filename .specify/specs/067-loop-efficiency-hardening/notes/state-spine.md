@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792660465
-stage_deadline_epoch: 1792665865
-stage_base_commit: d32cdd70
+stage_started_at: 1792661127
+stage_deadline_epoch: 1792666527
+stage_base_commit: e6c3e655
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,19 +37,16 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (closure · T033–T038)
+## Current Part Brief (closure audits · T035–T038)
 
-- **part_id**: P15-closure
-- **sequence**: driver executes T033 (post id list) and T034 (closure full run, MP-02 cold cache + `--names-out`, E1 + spine fence) first; then a closure subagent executes T035–T038 audits/verification.
-- **allowed files**: `verification.md`, `test-evidence/` evidence, `tasks.md` T033–T038 checkboxes; no tests/source/scripts/mirrors/registry/requirements/plan edits.
-- **W-1 ruling**: pinned roster check is a ledger join (roster id in post list, or case-merge row → green suite param); see `pinned-roster-addendum-2026-10-22.md`.
-- **count authority**: E4 header 4551 (contract 3426 / unit 734 / integration 391); 4553/3428 are discarded cache-union anchors.
-- **expected closure failure set**: 15 known reds (14 pre-existing-debt + i11), same on both sides of the name diff; 0 NEW. Do not fix debt names during closure.
-- **T035**: baseline vs post id join; missing set = folded ids; ledger unmatched = 0; layer counts vs E4 base; post-only reported.
-- **T036**: name-level diff vs T007 in-stage baseline; 0 NEW; 15 known reds; W-1 roster join; triage closure.
-- **T037**: pyproject runtime dependency diff empty; no new dev deps; no new network calls in tests.
-- **T038**: verification finalize SC-006…SC-010 and DoD-7; GATE-1…GATE-7 pass or explicit waiver; no third full run.
-- **run-turn-budget**: 120 (T035–T038); no full suite beyond T034.
+- **part_id**: P16-closure-audits
+- **T033/T034 DONE** (driver): post id list 5239; closure wall **553 s**, 14 failed / 5224 passed / 1 skipped; name diff **0 NEW**, 69 fixed, 14 known debt; budget audit `baseline:1 closure:1`, `stages=6 complete=6`, exit 0.
+- **allowed files**: `verification.md`, `test-evidence/` evidence, `tasks.md` T035–T038 checkboxes; no tests/source/scripts/mirrors/registry/requirements/plan edits.
+- **T035**: coverage audit — baseline 4551 vs post 5239; missing 38 (folded ids) all ledger-mapped (0 unmatched prechecked); layer counts vs E4 (3426/734/391 base); post-only 726 (723 suite + 3 new) reported; write `coverage-audit-2026-10-22.md`.
+- **T036**: name diff vs T007 baseline — 0 NEW, 69 fixed, 14 known debt (i11 fixed); W-1 roster ledger join; triage closure; write `name-diff-2026-10-22.txt` + audit section.
+- **T037**: dependency boundary — `git diff 7f9033ec..HEAD -- pyproject.toml` empty; no new dev deps; no new network calls in tests; write `dependency-boundary-2026-10-22.md`.
+- **T038**: verification finalize SC-006…SC-010 (SC-006 pass 553 s; SC-007 pass coverage; SC-008 pass 0 NEW/W-1; SC-009 pass drill; SC-010 pass) and DoD-7; GATE-1…GATE-7; mark T035–T038 `[X]`; no third full run.
+- **run-turn-budget**: 120; no full suite.
 
 ## Dispatch Log
 
@@ -69,7 +66,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P12-implement-F-triage-drills | implement | T025–T029 | 120 (budget-exhausted) | Class 2 rerun 19P/14F (debt-known) | bc5c443a, 550d3b09 | DONE (salvaged) — 9 test files triaged, 6 debt records, 33/33 Class 2 rows, 83/83 triage coverage; injection drill hit/localize/reproduce/restore; no injection residue; 14 debt reds remain baseline-known |
 | P13-implement-wrapup | implement | T030–T032 | not_evaluated | none run | 8d71082c | DONE — mirror --check 0 DIFF; 29/29 implement tasks closed; triage 83/83; ledger 81 rows (35 case-merge + 46 retained, 0 deleted); verification.md 9 sections |
 | P14-review | review | — | not_evaluated | targeted: mirror 0 DIFF; suite 723P; admission 25P; telemetry 13P; Class 2 19P/14F | d32cdd70 | DONE — **PASS WITH WAIVER**; P0=0 / P1=1 (W-1 roster literal check) / P2=3; W-1 ruled via addendum; no full suite |
-| P15-closure | closure | T033–T038 | — | T034 full run | — | dispatched (driver T033/T034, then audits) |
+| P15-closure | closure | T033–T034 (driver) | not_evaluated | full run 14F/5224P/1S | e6c3e655 | DONE — post ids 5239; closure **553 s** (≤600); 0 NEW / 69 fixed / 14 known debt; budget audit baseline:1 closure:1, stages 6/6 |
+| P16-closure-audits | closure | T035–T038 | — | audits only | — | dispatched |
 
 ## Gates
 
@@ -108,7 +106,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 - Implement outcomes: RC-07 hook neutralization + admission in-process (121→23 s call sum); telemetry 23.36→1.14 s; mirror suite 723 params green after engine sync of 202 mirrors; 35 test functions folded with ledger; 83/83 baseline names triaged (50 mirror-class, 33 Class 2; 14 known debt reds remain in-baseline).
 - Part F budget-exhausted at 120 turns; salvaged in-session (`550d3b09`), no second full dispatch. Phase 8 DONE (`8d71082c`): mirror `--check` 0 DIFF, 29/29 implement tasks closed, triage 83/83, ledger 81 rows (0 deleted), verification.md built.
 - Review DONE (`d32cdd70`): PASS WITH WAIVER; P0=0/P1=1(W-1)/P2=3. W-1 ruled (ledger-join roster check; addendum); count anchors corrected to 4551/3426; closure expects 15 known reds and 0 NEW.
-- Next: closure (T033–T038: post ids → closure full run → coverage/name/dependency audits → verification finalize) → U6 local merge (push requires explicit authorization).
+- Closure T033/T034 DONE (`e6c3e655`): post ids 5239; wall **553 s** (≤600); 14F/5224P/1S; **0 NEW** / 69 fixed / 14 known debt; E1 closure record; fence baseline:1/closure:1; audit `stages=6 complete=6` exit 0.
+- Next: T035–T038 audits + verification finalize → U6 local merge to master (push requires explicit authorization).
 - E3 stage evidence for clarify/plan/tasks/checklist/analyze added; review row pending the review stage.
 
 ## Framework Observations
