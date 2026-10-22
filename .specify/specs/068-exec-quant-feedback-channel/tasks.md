@@ -35,7 +35,7 @@
 - GATE-6: 无未完成任务 — check: `grep -cE '^- \[[ >]\]' .specify/specs/068-exec-quant-feedback-channel/tasks.md` 返回 0。
 - GATE-7: 条款覆盖完整 — check: `python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/068-exec-quant-feedback-channel` exit 0，输出 claimed clauses 31 / FR uncovered 0 / uncovered beyond baseline 0。
 - GATE-8: SC 证据齐备 — check: `grep -cE '^- \*\*SC-00[1-6]\*\*' .specify/specs/068-exec-quant-feedback-channel/verification.md` 返回 6。
-- GATE-9: 测试预算账本合规 — check: `python3 skills/external/sdd-loop-driver/scripts/audit-test-budget.py --spine $SPINE --spec-dir .specify/specs/068-exec-quant-feedback-channel --stage-check implement` exit 0（E2 baseline 槽已记、closure 槽未消耗；closure 校验在 review 后以 `--stage-check closure` 执行）。
+- GATE-9: 测试预算账本合规 — check: `python3 skills/external/sdd-loop-driver/scripts/audit-test-budget.py --spine $SPINE --spec-dir .specify/specs/068-exec-quant-feedback-channel --stage-check implement`；implement 期判据 = 输出 `slots=baseline:1 closure:0` 且唯一 error 为 `review: stage evidence file missing`（review 证据由 review 阶段落盘，属预期未来阶段）；最终 closure 审计在 review 后以 `--stage-check closure` 要求 exit 0。
 
 ## Environment Prerequisites
 
@@ -238,7 +238,7 @@ T001（镜像/改前基线）、T002（覆盖基线冻结）、T014/T021/T027（
 - [ ] T027 镜像与逐工具副本收口（§ Mirror Obligations；本行只写镜像面，T025 已编辑的源只读 `shared/workflow/feedback-step.md` 与源只读 `templates/commands/feedback.md` 不在本行改写）：`python3 scripts/python/sync-mirrors.py --write --only skills/internal` 与 `--only shared` 后 `--check` 复查两对相对 T001 基线零 NEW drift；`python3 scripts/python/regen-command-copies.py` 再生成逐工具副本并 diff 逐副本含改动（`.specify/templates/commands/` 已退役、无该镜像）；镜像对 `.specify/shared/workflow/feedback-step.md` 同步后既有失败测试 `test_feedback_step_reference_form.py::test_owner_mirror_is_byte_identical` 预期转绿（基线失败消失不算回归）；全程零手改镜像与副本。 [blockedBy: T025] [green: contracts/compatibility-security.md#C-31]
 - [ ] T028 快速启动实跑取证：执行 `quickstart.md` 可执行场景并留痕 `notes/quickstart-run.md`（真实命令、输出、退出码、teardown）：场景 0（route a 存储形态探测，含样例客户项目只读 `ls`）；场景 1–3/5 以测试已钉断言为核验形态（route b——在自构夹具上复跑 `package` / `ingest-exec-quant` / `aggregate` 命令行本身，记录 `--format json` 输出与 `aggregated/` 落盘清单；不触碰真实入站包与客户存储写面）；场景 4 由 T023 的定向重跑代表（引用其证据行，不重复执行）。 [blockedBy: T020,T027]
 - [ ] T029 写 SC 证据矩阵到 `verification.md`：`- **SC-001**:` 至 `- **SC-006**:` 逐条列状态、命令、输出摘要与证据指针（SC-001/002 ← T005–T007+T028；SC-003 ← T011/T013/T019；SC-004 ← T016–T020；SC-005 ← T022；SC-006 ← T003 基线 + T023 比对 + closure 槽）；未测量量显式记 not-evaluated，零手填。 [blockedBy: T023,T028]
-- [ ] T030 范围审计与 Completion Gate 复验（结果写 `verification.md` §T030）：`git status --short` 核对禁改面零命中（真实入站包、`.specify/memory/exec-quant/records/` 与 `.specify/memory/feedback/` 运行时记录、059 制品、镜像手改）；逐项复验 GATE-1…GATE-8（GATE-9 以 `--stage-check implement` 执行，closure 槽留待 review）；`account-clause-coverage.py` 核对 claimed=31 且 FR 19/19、SC 6/6 有任务行映射；Feature 068 保持 `Planned`（生命周期推进属 implement 阶段，本阶段不写注册表）。 [blockedBy: T029]
+- [ ] T030 范围审计与 Completion Gate 复验（结果写 `verification.md` §T030）：`git status --short` 核对禁改面零命中（真实入站包、`.specify/memory/exec-quant/records/` 与 `.specify/memory/feedback/` 运行时记录、059 制品、镜像手改）；逐项复验 GATE-1…GATE-8（GATE-9 以 `--stage-check implement` 执行：baseline:1/closure:0 且唯一 error 为 review 证据缺失属预期；closure 审计在 review 后以 `--stage-check closure` 要求 exit 0）；`account-clause-coverage.py` 核对 claimed=31 且 FR 19/19、SC 6/6 有任务行映射；Feature 068 保持 `Planned`（生命周期推进属 implement 阶段，本阶段不写注册表）。 [blockedBy: T029]
 
 **Checkpoint**: 文档/镜像/证据/审计全部收口；除 closure 槽外所有 GATE 可就地复验通过。
 
