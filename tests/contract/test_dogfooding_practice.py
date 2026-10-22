@@ -111,7 +111,9 @@ SECTION_HEADING = "## Dogfooding Practice"
 # Amended by requirement 063-review-p1-governance (C-22, 2026-10-20): the
 # wrap-up engine gains `args-manifest` (the machine-readable argument manifest
 # the compile-embeds renderer consumes). Closed-set pin updated same-batch.
-FEEDBACK_ENGINE_ACTIONS = {"record", "status", "list", "dispose", "mark-submitted", "reindex", "package", "upstream", "cleanup", "migrate-legacy", "introspect-register", "args-manifest"}
+# 068 C-10 (2026-10-22, same-batch amendment): the receive leg adds the explicit
+# `ingest-exec-quant` engine action; the closed-set pin follows the action set.
+FEEDBACK_ENGINE_ACTIONS = {"record", "status", "list", "dispose", "mark-submitted", "reindex", "package", "upstream", "cleanup", "migrate-legacy", "introspect-register", "args-manifest", "ingest-exec-quant"}
 PROBE_ENGINE_ACTIONS = {"probes", "map", "probe-inject", "handlers", "compile-embeds"}
 ENGINE_ACTIONS = FEEDBACK_ENGINE_ACTIONS | PROBE_ENGINE_ACTIONS
 # Project identifiers that MUST NOT leak into a project-neutral shared section.

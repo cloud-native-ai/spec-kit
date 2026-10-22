@@ -321,7 +321,7 @@ its class-③ instance):
    ingest plus degradation counters; aggregation only as a suggested explicit
    follow-up) is owned by `/speckit.feedback` Path A —
    `skills/internal/manage-feedback/references/path-a-digest.md` § A2. This step adds
-   no command, no confirmation gate, and no transmission path (red line 3 unchanged:
+   no command, no blocking user gate, and no transmission path (red line 3 unchanged:
    the payload only rides inside the same manually-delivered zip).
 2. **Skip this time** — do nothing; the prompt will naturally reappear only after more
    entries accumulate.
