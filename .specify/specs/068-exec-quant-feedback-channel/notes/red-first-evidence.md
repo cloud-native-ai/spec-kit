@@ -312,3 +312,57 @@ FAILED tests/contract/test_feedback_intake_exec_quant.py::test_ingest_does_not_t
   `exec_quant_dir(` 只读定位器访问」——接收腿对 `aggregated/` 的写面若触发该钉，
   按 SKILL § TDD 断言/裁决归因处置（059 修订关系记录于 068 侧），属 3b 实现面。
 
+---
+
+# Implement Part 3c — US2 镜像同步与取证（T014 / T015，2026-10-22）
+
+前置：T012/T013 已于 db0371a0 落地（US2 实现全绿 109 测试）；本段零引擎源编辑
+（`scripts/python/feedback-utils.py` 源侧字节不变），仅镜像同步收口 + 取证。
+
+## § T014 — scripts 对镜像同步（feedback-utils.py 编辑收口点）
+
+- 命令 1（pre-write drift 记录）：`python3 scripts/python/sync-mirrors.py --check --only scripts`
+  → 退出码 `2`；scripts 对 = 26 个 DIFF 文件，文件集与 T001 基线逐项一致
+  （`notes/pre-change-measurements.md` §1 附录 A scripts 段）→ **零 NEW drift**。
+- 命令 2（写入）：`python3 scripts/python/sync-mirrors.py --write --only scripts`
+  → 退出码 `0`；`sync scripts/ -> .specify/scripts/ (26 files)`。
+- 命令 3（复查）：`python3 scripts/python/sync-mirrors.py --check --only scripts`
+  → 退出码 `0`；`ok scripts/ == .specify/scripts/ (109 files)`（scripts 对整体转净）。
+- 命令 4（字节核对）：`cmp scripts/python/feedback-utils.py .specify/scripts/python/feedback-utils.py`
+  → rc=0 字节一致；`cmp scripts/python/exec-quant.py .specify/scripts/python/exec-quant.py`
+  → rc=0 字节一致（该对零 DIFF 与前提一致）。
+- **drift 判定（相对 T001 基线）**：零 NEW drift。feedback-utils 对原有的 1 行继承
+  DIFF（镜像侧 f265cfbd docstring 路径前缀）随字节同步消失，plan.md § Mirror
+  Obligations 明示属预期、不算回归；基线内其余 25 个 scripts 对继承性路径前缀 DIFF
+  亦随同对字节同步消失（同机制、同判据，不算回归）。零手改镜像（唯一写面 =
+  sync-mirrors.py --write；`git status` 核对改动面恰为该 26 个镜像文件，零源侧文件
+  入改动）。
+- 同步后定向确认（canonical runner）：`bash scripts/bash/run-tests.sh
+  tests/unit/test_feedback_intake_exec_quant.py tests/contract/test_feedback_intake_exec_quant.py
+  tests/contract/test_exec_quant_engine.py -q` → 退出码 `0`；`87 passed in 20.56s`
+  （镜像/源一致后 US2 两支 + 引擎契约仍全绿）。
+
+## § T015 — 接收腿定向转绿与取证（US2 两支 + 邻接定向集）
+
+- 命令：`bash scripts/bash/run-tests.sh tests/unit/test_feedback_intake_exec_quant.py
+  tests/contract/test_feedback_intake_exec_quant.py tests/contract/test_exec_quant_engine.py
+  tests/unit/test_feedback_package.py tests/unit/test_feedback_utils.py
+  tests/contract/test_feedback_utils_cli.py -q`
+- 退出码：`0`；输出尾部：`120 passed in 20.60s`（US2 两支 37 + 引擎契约 50 +
+  邻接面 33，零跳过零失败——接收腿对 feedback 既有动作面零回归）。
+- 本段零实现期失败归因（源侧零编辑；T012/T013 的失败归因已在 part 3b 完成）。
+
+## § 独立可用性核验（快速启动场景 2/5 对应断言 — 已提交测试等价物）
+
+- 命令：`bash scripts/bash/run-tests.sh
+  tests/contract/test_feedback_intake_exec_quant.py::test_identified_identity_slug_group_and_envelope_attribution
+  tests/contract/test_feedback_intake_exec_quant.py::test_duplicate_ingest_idempotent
+  tests/contract/test_feedback_intake_exec_quant.py::test_feedback_store_untouched_no_contamination
+  tests/contract/test_feedback_intake_exec_quant.py::test_no_payload_package_zero_difference -q`
+- 退出码：`0`；`4 passed in 0.11s`。
+- 断言映射：场景 2（接收归因 + 二次接收幂等 `ingested:0`/`duplicates_skipped` 全量 +
+  `aggregated/<source-slug>/records/` 分组 + feedback store 零混入）→ 前三例；
+  场景 5（无载荷等构包 `record_count:0`/`ingested:0` exit 0、聚合层目录零创建、
+  feedback 条目处理零变化）→ 第 4 例。全部自构夹具，真实入站包
+  `feedback/feedback-20261022T062525Z.zip` 与客户存储写面零触碰（场景 5 premise 原文）。
+
