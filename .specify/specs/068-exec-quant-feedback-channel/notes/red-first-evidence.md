@@ -480,3 +480,100 @@ FAILED tests/integration/test_feedback_exec_quant_channel.py::test_no_payload_is
   2. 修正后终态 6 例全部归因 **subject 缺失**：package/ingest 链节全部走通（包
      报告、双形态计数、归因、幂等断言通过），统一红在 `--action aggregate` 未注册
      （rc=2 invalid choice，view=None）。断言面除上述 2 处夹具修正外零缺陷。
+
+---
+
+# Implement Part 4b — US3 汇总腿实现（T017 / T018，2026-10-22）
+
+## § 实现落点（scripts/python/exec-quant.py）
+
+- 注册面：`ACTIONS` 元组追加 `aggregate`；`ARG_MANIFEST["aggregate"] =
+  {required: [], source: ["--workspace-root", "--format"]}`（C-18 零新增必需
+  参数；argparse parser 仍是旗标唯一事实源，`--action args-manifest` 自动覆盖
+  ——实测 emit 含 aggregate 条目且旗标全部 live）。
+- `--format` 缺省改为 per-action 解析：parser 的 `--format` 改为 `default=None`
+  （parser 不再携带缺省面），`list-records` 缺省仍解析为 text（既有钉
+  `test_text_is_the_default_form` 零变化），`aggregate` 缺省解析为 json
+  （C-18 / 4a 钉）。旗标集合与 USAGE_LINE 零变化。
+- 消费面（C-19）：`load_aggregated_envelopes` 只读
+  `aggregated/**/records/*.json`（glob 复用 `RECORDS_DIR_NAME` 常量），本地
+  `records/`/`scores/` 零进入；不可读信封（解析失败/非 dict/缺可用 `record`
+  对象）计 `skipped_unreadable` 顶层 int，非阻塞。
+- 视图投影（C-20/E7）：按信封 `source_project` 分组（本仓同权零特判；缺/空
+  归因落字面 `unknown-project` 组，同 E6 惯例）；`identity_status` 取该组文件
+  名序首信封的投影；`units`/`quality`/`coverage`/`record_files[]` 全部可由
+  名单重放；形态归一按形状规则统一（`{"value",…}` 对象 → evaluated；裸
+  `[[STR-002]]`/缺键/未知形态 → not_evaluated；字段宇宙 = 观测键并集，零硬
+  编码词表）。
+- 4b 裁决（4a 留白项）：
+  1. **空层 0/0 占比形态**（CHK027 未钉）：`totals.not_evaluated_ratio` 在
+     分母为 0 时落 `null`（显式未评估），不落 0/不落任何编造百分比
+     （FR-013「无数不编」与模块记录法则同构）；分母 > 0 时落未舍入浮点
+     `not_evaluated_total/slots`（与重放守卫的 allowed 集合逐位相等）。
+  2. **store_digest.record_files_total 口径**：聚合层探得的信封文件总数
+     （可读 + skipped_unreadable；「信封文件总数」的字面读法）；
+     `identity_keys_total` = 可读信封 distinct identity_key 数。
+  3. **缺 `aggregation_envelope` 的可读信封**：按 C-19 封闭 unreadable 定义
+     （非 dict、缺 record 键）不算不可读，归因落字面 `unknown-project` 组。
+- 产物（C-22/C-23）：stdout 与落盘同一 dict 双出（同构）；`write_entry`
+  （tmp+rename、`entry_filename()` 形态）落 `aggregated/summaries/`，一次
+  运行一个新文件、旧文件零改写、append-only；text 面为同一视图的人工计数
+  行（无新增数值面）；零网络零外发、写面仅 `aggregated/`（字节级快照测试
+  核对）；引擎源与接收腿零耦合（结构钉维持）。
+
+## § 绿证据（T017+T018 定向转绿）
+
+- 命令：`bash scripts/bash/run-tests.sh tests/contract/test_exec_quant_aggregate.py -q`
+- 退出码：`0`；`25 passed in 1.10s`（T016 的 23 红 + 2 预绿全部转绿）。
+- 命令：`bash scripts/bash/run-tests.sh tests/integration/test_feedback_exec_quant_channel.py -q`
+- 退出码：`0`；`6 passed in 0.16s`（T019 全链 6 例全部转绿）。
+- 合并复跑（收尾单趟，含邻接）：`bash scripts/bash/run-tests.sh
+  tests/contract/test_exec_quant_engine.py tests/contract/test_exec_quant_dispatch.py
+  tests/contract/test_probe_engine_action_sets.py tests/contract/test_exec_quant_aggregate.py
+  tests/integration/test_feedback_exec_quant_channel.py -q`
+- 退出码：`0`；`125 passed in 34.09s`。
+- 邻接套件（回归查询）：`tests/unit/test_feedback_intake_exec_quant.py` +
+  `tests/contract/test_feedback_exec_quant_payload.py` +
+  `tests/contract/test_engine_face_contract.py` → `58 passed`；三套件与上面
+  合并趟零失败。`tests/contract/test_exec_quant_dispatch.py` 一并随合并趟绿。
+- 全量套件未运行（按分段纪律，T023 名字级回归留后段）。
+
+## § 断言/夹具修正披露（SKILL § TDD 归因；四处，零弱化）
+
+1. **T016 `test_aggregate_writes_only_under_aggregated` 路径前缀断言缺陷**
+   （红先期被 argparse 层红掩盖、4b 首绿跑暴露）：断言用 `startswith("aggregated")`
+   比对相对工作区的快照路径，而本测试文件自身的 `_agg` helper 与 C-19/C-22、
+   T019 的 `_aggregated` 都把聚合层钉在
+   `.specify/memory/exec-quant/aggregated`——原前缀形态不可能满足（产物唯一
+   合法落点即被判失败）。修正 = 前缀改为 store 内聚合层全相对路径；守卫意图
+   （全部字节级变化落聚合层内 + 恰一产物）零变化，精确等值断言保留。
+2. **T016 `test_quality_shape_normalization` 两处直读字面量与同测试自带重放
+   oracle 矛盾**（红先期被注册面红掩盖）：`brand_new_axis`/`odd_future_form`
+   直读期望 `not_evaluated: 1`（只有携带记录参与该字段分布的读法），而同测试
+   `_replay_source` oracle、T019 同形 oracle、契约 C-20（「裸 `[[STR-002]]`
+   或缺失键 → not_evaluated」逐记录语义）与 E7（「缺字段 = 显式 not_evaluated
+   计数呈现」）均钉逐记录读法（缺键的兄弟记录计入 not_evaluated）；同断言块
+   的 `tokens` 字面量（=2，含 r3 整键缺失）本身已采用逐记录读法——两处字面量
+   连同文件自身 oracle 三方互斥，属期望形态笔误。修正 = 两处改为
+   `not_evaluated: 3`（精确等值保留），未测槽位由此显式进入未测占比（FR-013
+   零失真方向），非弱化。
+3. **T019 两处夹具缺陷**（红先期被 aggregate 未注册的先行断言掩盖）：
+   (a) `intake, rc = _ingest(...)` 对单 dict 返回的 helper 做元组解包
+   （ValueError；同文件其余调用点均为单值赋值）→ 改单值赋值，后续断言键
+   （`ingested`/`duplicates_skipped`/`record_count`）与接收腿报告实键核对一致；
+   (b) gamma 的 feedback `record` 调用缺 `--unit-type` → 引擎按 063 C-23
+   （一次性收集全部缺失必需旗标）rc=2 → 补 `--unit-type command`（兄弟集成
+   测试同形约定），夹具从此走到它本来要验证的零载荷链。
+4. **邻接守卫同批次修订（063 C-22 先例，C-18/C-10 契约授权）**：
+   `tests/contract/test_exec_quant_engine.py` 的 `ACTIONS_CLOSED_SET` 与
+   `tests/contract/test_probe_engine_action_sets.py` 的 exec-quant 期望集
+   += `aggregate`（双向精确钉零放松）；同文件 `FEEDBACK_ALLOWED` +=
+   `ingest-exec-quant`——该项为 **US2 段（db0371a0）欠下的同批修订**，4b 邻接
+   巡检时发现其红（非本段引擎改动引入，HEAD 即红），按同一先例就地补齐并披露。
+
+## § 遗留与边界
+
+- `.specify/scripts/python/exec-quant.py` 镜像暂存预期 drift（本段按纪律零手改
+  镜像；T021 `sync-mirrors.py --write --only scripts` 收口）。
+- T020（定向绿证据追加 + stage-status 行）与 T021（镜像同步 + cmp）留给 4c 段；
+  本段绿证据已按上列命令行/退出码/计数完整在案。

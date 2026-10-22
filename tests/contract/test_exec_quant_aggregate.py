@@ -482,10 +482,18 @@ def test_quality_shape_normalization(tmp_path):
     quality = alpha["quality"]
     assert quality["elapsed_ms"] == {"evaluated": 2, "not_evaluated": 1}
     assert quality["tokens"] == {"evaluated": 1, "not_evaluated": 2}
-    # a field missing from two sibling records still counts not_evaluated
-    assert quality["brand_new_axis"] == {"evaluated": 0, "not_evaluated": 1}
+    # a field missing from two sibling records still counts not_evaluated —
+    # per record (the ``tokens`` literal above already pins that reading: r3
+    # misses the key entirely and counts). Assertion-form fix, disclosed in
+    # notes/red-first-evidence.md § 4b: the two literals below originally
+    # expected not_evaluated=1 (only the carrying record participating),
+    # contradicting this file's own replay oracle, the integration oracle,
+    # and C-20/E7 ("缺失键 → not_evaluated"; "缺字段 = 显式 not_evaluated
+    # 计数呈现"). Exact equality kept, expected form corrected to the
+    # per-record count.
+    assert quality["brand_new_axis"] == {"evaluated": 0, "not_evaluated": 3}
     # an unforeseen value form is never evaluated
-    assert quality["odd_future_form"] == {"evaluated": 0, "not_evaluated": 1}
+    assert quality["odd_future_form"] == {"evaluated": 0, "not_evaluated": 3}
 
 
 def test_unknown_field_with_measured_shape_is_shape_evaluated(tmp_path):
@@ -716,6 +724,13 @@ def test_engine_has_no_coupling_to_the_intake_path():
 def test_aggregate_writes_only_under_aggregated(tmp_path):
     # C-23: zero network, zero egress; products land only in this repo's
     # aggregated/ — every byte-level change of a run is inside aggregated/.
+    # (Assertion-form fix, disclosed in notes/red-first-evidence.md § 4b: the
+    # original prefixes compared against the bare dir name "aggregated", which
+    # is unsatisfiable for paths under the engine store — the file's own
+    # ``_agg`` helper and C-19/C-22 pin the layer at
+    # ``.specify/memory/exec-quant/aggregated``. The guard's intent — every
+    # change inside the aggregated layer, exactly one product — is unchanged.)
+    store_rel = ".specify/memory/exec-quant/aggregated"
     ws = tmp_path
     _seed_store(ws)
     before = _snapshot(ws)
@@ -727,6 +742,7 @@ def test_aggregate_writes_only_under_aggregated(tmp_path):
     changed = {p for p in set(before) | set(after)
                if before.get(p) != after.get(p)}
     assert changed, "aggregate produced nothing at all"
-    assert all(p.startswith("aggregated") for p in changed), sorted(changed)
-    landed = [p for p in changed if p.startswith("aggregated/summaries/")]
+    assert all(p.startswith(store_rel) for p in changed), sorted(changed)
+    landed = [p for p in changed
+              if p.startswith(store_rel + "/summaries/")]
     assert len(landed) == 1 and landed[0] in after  # the product itself

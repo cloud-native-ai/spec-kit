@@ -4,6 +4,9 @@ Pins BOTH migration sides exactly (bidirectional: extra or missing action fails)
 - ``probe-utils.py`` allowed set: probes, map, probe-inject, handlers, compile-embeds
 - ``feedback-utils.py`` retained set: record, status, list, dispose, mark-submitted,
   reindex, package, cleanup, upstream, migrate-legacy, introspect-register
+  (amended same-batch for 068: + ingest-exec-quant, intake-contract C-10 —
+  the amendment was owed by the US2 leg and landed during 4b adjacency
+  diligence; see notes/red-first-evidence.md § 4b)
 - ``run-determination.py`` ACTIONS closure: determine, settle, history
 
 Amended by Feature 063 (C-22, 2026-10-20): each wrap-up engine (run-determination,
@@ -34,6 +37,9 @@ FEEDBACK_ALLOWED = {
     "record", "status", "list", "dispose", "mark-submitted", "reindex",
     "package", "cleanup", "upstream", "migrate-legacy", "introspect-register",
     "args-manifest",
+    # 068 intake-contract C-10 (same-batch amendment, landed in 4b): the
+    # receive leg's explicit engine action joins the closed set.
+    "ingest-exec-quant",
 }
 PROBE_ALLOWED = {"probes", "map", "probe-inject", "handlers", "compile-embeds"}
 # 063 C-22: the wrap-up engine's ACTIONS closure, exact-pinned both ways.
@@ -104,12 +110,13 @@ def test_engine_action_sets_disjoint() -> None:
 
 
 def test_exec_quant_action_set_exact() -> None:
-    """059 exact-pin + 063 C-22: the engine's action closure, read BOTH ways
-    (ACTIONS constant + argparse choices), is exactly the closed set."""
+    """059 exact-pin + 063 C-22 + 068 C-18: the engine's action closure, read
+    BOTH ways (ACTIONS constant + argparse choices), is exactly the closed
+    set (068: the explicit `aggregate` action joined same-batch)."""
     assert EXECQUANT_SCRIPT.is_file(), "exec-quant.py missing — engine not implemented"
     got = _execquant_actions()
     expected = {"collect", "list-records", "score", "collect-dispatch",
-                "args-manifest"}
+                "args-manifest", "aggregate"}
     assert got == expected, (
         f"exec-quant.py action set drifted: extra={sorted(got - expected)} "
         f"missing={sorted(expected - got)}"

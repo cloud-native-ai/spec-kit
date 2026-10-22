@@ -55,7 +55,10 @@ FRAMEWORK_STORE = REPO_ROOT / ".specify" / "memory" / "exec-quant"
 # (same-batch amendment; the docstring below had already drifted at 059 —
 # collect-dispatch landed without a write-back, per the 056 owner contract's
 # historical note).
-ACTIONS_CLOSED_SET = {"collect", "list-records", "score", "collect-dispatch", "args-manifest"}
+# 068 C-18 (2026-10-22, same-batch amendment): the explicit `aggregate` action
+# joins the closed set (US3 summary leg; registered in ACTIONS + parser).
+ACTIONS_CLOSED_SET = {"collect", "list-records", "score", "collect-dispatch", "args-manifest",
+                      "aggregate"}
 KIND = "speckit.exec-quant"  # [[STR-001]]
 NOT_EVALUATED = "not_evaluated"  # [[STR-002]]
 PROVENANCE_DOMAIN = {"measured", "carried", "user-given", "configured"}

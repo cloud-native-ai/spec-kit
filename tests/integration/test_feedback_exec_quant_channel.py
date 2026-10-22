@@ -380,8 +380,13 @@ def test_same_package_double_ingest_zero_delta_and_rerun_consistent(
     first_products = _summaries(hub)
     first_bytes = first_products[0].read_bytes()
 
-    intake, rc = _ingest(hub, alpha_bundle, capsys)  # same package again
-    assert rc == 0
+    # Fixture-form fixes (both masked at red phase — the test died at the
+    # unregistered-aggregate assert before reaching these lines), disclosed in
+    # notes/red-first-evidence.md § 4b: `_ingest` returns one report dict
+    # (every sibling call site assigns it singly), and the engine's record
+    # action requires --unit-type for a /speckit. unit (063 C-23 collects all
+    # missing required flags, exit 2 — sibling tests pass "command").
+    intake = _ingest(hub, alpha_bundle, capsys)  # same package again
     assert intake["ingested"] == 0
     assert intake["duplicates_skipped"] == intake["record_count"] == 3
     assert {p.name: p.read_bytes() for p in _envelope_files(hub)} == before
@@ -453,7 +458,8 @@ def test_no_payload_isomorphic_package_full_chain_zero_diff(tmp_path, capsys):
     gamma.mkdir()
     _declare_project(gamma, "customer-gamma")
     _, rc_record = _fu(["--action", "record", "--workspace-root", str(gamma),
-                        "--unit-id", "/speckit.plan", "--run-id", "r-gamma",
+                        "--unit-id", "/speckit.plan", "--unit-type", "command",
+                        "--run-id", "r-gamma",
                         "--review", "framework friction noted", "--points",
                         "one friction point", "--format", "json"], capsys)
     assert rc_record == 0
