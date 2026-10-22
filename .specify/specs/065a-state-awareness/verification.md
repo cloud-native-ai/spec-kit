@@ -9,7 +9,7 @@
 
 **原文**：「用户已显式授权**忽略测试**：不要运行/修复完整 pytest 套件，不追求红转绿；只做 docs/镜像/verification/gates 与 smoke。」
 
-- **范围**：本切片 26 个红测试保持 `waived/not-run`（T015×18、T016×5、T018×3），另含 T019 / T020 / T021 / T024 / T026 / T027 与 GATE-3 的 pytest 部分。
+- **范围**：本切片 26 个测试记 `waived/not-run`（T015×18、T016×5、T018×3），另含 T019 / T020 / T021 / T024 / T026 / T027 与 GATE-3 的 pytest 部分。**实测口径**：last observed 26 failed before T015–T018 implementation (commit 35aa0192); not re-run after T015–T018; current red/green is not evaluated。
 - **纪律**：未运行的测试一律记 `waived/not-run`，**不得**写 `pass` / `green`；`--self-test`、watcher 自测、镜像检查、smoke 夹具的证据按 `smoke-evidence` 记录，与测试面区分。
 - **不受豁免的部分**：确定性门（`validate-tasks.py`、`pre-analyze-check.py`、`account-clause-coverage.py`、`sync-mirrors.py --check`）、`watch-target.sh --self-test`、`loop-state.py --self-test` 与手工 smoke 全部实跑。
 
@@ -40,7 +40,7 @@
 
 ## T027 — 全量名字级回归
 
-`waived/not-run`。命令 `SPECKIT_PYTHON=… bash scripts/bash/run-tests.sh --names-out /tmp/065a-current-failed.txt -q` 未执行；`comm -13` 差集无可比较对象；**NEW 失败计数为 not-evaluated，不是 0**。本轮唯一可得的失败面证据是 `tasks.md` § Environment Prerequisites 记录的 26 个红用例，它们在用户豁免下保持 `waived/not-run`。
+`waived/not-run`。命令 `SPECKIT_PYTHON=… bash scripts/bash/run-tests.sh --names-out /tmp/065a-current-failed.txt -q` 未执行；`comm -13` 差集无可比较对象；**NEW 失败计数为 not-evaluated，不是 0**。本轮唯一可得的失败面证据是 `tasks.md` § Environment Prerequisites 记录的 26 个用例，它们在用户豁免下记 `waived/not-run`（实测口径：last observed 26 failed before T015–T018 implementation (commit 35aa0192); not re-run after T015–T018; current red/green is not evaluated）。
 
 ## T028 — SC 证据矩阵
 
@@ -101,7 +101,7 @@
 ## 收口统计
 
 - 任务：30/30 `[X]`（T001–T018 前段完成，T019–T030 本段完成）；`[~]` = 0；`deferred_tasks=` 为空。
-- 测试面：26 个红用例保持 `waived/not-run`（T015×18、T016×5、T018×3）；T019 / T020 / T021 / T024 / T026 / T027 的 pytest 部分同样 `waived/not-run`；GATE-3 `waived/void`。
+- 测试面：26 个用例记 `waived/not-run`（T015×18、T016×5、T018×3）；T019 / T020 / T021 / T024 / T026 / T027 的 pytest 部分同样 `waived/not-run`；GATE-3 `waived/void`。实测口径：last observed 26 failed before T015–T018 implementation (commit 35aa0192); not re-run after T015–T018; current red/green is not evaluated。
 
 ## 就地修复披露（fast-fail 顺手修复：RP-1 近似错）
 
@@ -113,7 +113,7 @@
 
 ## 未测量与剩余风险
 
-1. **26 个红用例 + 本轮三份测试文件的运行**全部未执行：字段级断言、probe 隔离、salvage 门、动作阶梯的 pytest 级验收仍是账面外的验收面；`--self-test` 与 smoke 只覆盖其中一部分。
+1. **26 个用例（`35aa0192` 时 last observed 红；T015–T018 实施后未复测，current red/green not evaluated）+ 本轮三份测试文件的运行**全部未执行：字段级断言、probe 隔离、salvage 门、动作阶梯的 pytest 级验收仍是账面外的验收面；`--self-test` 与 smoke 只覆盖其中一部分。
 2. **SC-006 变异演练未做** → 新增检查的逆样本有效性未经变异证明。
 3. **T027 全量回归未做** → 相对 T001 基线的 NEW 失败数不可知（不是 0）。
 4. **就地修复未经 pytest 验证**：若未来发现某绿用例依赖旧的目录类产物行为，需按 RP-1 的判据复核而非回退本修复。
