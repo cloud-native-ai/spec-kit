@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792651372
-stage_deadline_epoch: 1792656772
-stage_base_commit: bca3bc99
+stage_started_at: 1792652141
+stage_deadline_epoch: 1792657541
+stage_base_commit: 78954beb
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,16 +37,16 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (tasks)
+## Current Part Brief (checklist)
 
-- **part_id**: P4-tasks-test-slimming
-- **allowed files**: new/updated `.specify/specs/067-loop-efficiency-hardening/tasks.md` and new `notes/tasks-*` if needed; requirements/plan/design artifacts read-only
-- **must not modify**: tests, runner, `pyproject.toml`, source, mirrors, registry, requirements.md, plan.md
-- **target validation**: `python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/067-loop-efficiency-hardening --stage tasks --repo .` and `python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/067-loop-efficiency-hardening/requirements.md --tasks .specify/specs/067-loop-efficiency-hardening/tasks.md`; tasks validator closure
-- **design input**: plan.md §Implementation Slicing (7 parts / ≈37 tasks projected, each ≤8); W1–W5; contracts MP/LED/RC/FB; TDD tests mode ON (test changes are the deliverable; every consolidation needs ledger + injection drill)
-- **expected red→green**: no tasks.md (red) → dependency-ordered tasks with per-part ≤8 tasks, test commands/node ids, expected red→green, ledger/drill/measurement evidence duties (green)
+- **part_id**: P5-checklist-test-slimming
+- **allowed files**: new `.specify/specs/067-loop-efficiency-hardening/checklists/*.md` and new `notes/checklist-*`
+- **must not modify**: requirements.md, plan.md, tasks.md, tests, runner, source, mirrors, registry
+- **target validation**: checklist structure validator (0 error); every item answerable with decisive evidence from requirements/plan/tasks; no `[Gap]` left unaddressed without a remediation note
+- **focus**: requirements-quality for US5/FR-011…FR-021/SC-006…SC-010 (completeness, clarity, consistency, measurable criteria, edge cases, dependency boundary, acceptance) plus cross-checks that the 067 test-slimming scope does not weaken coverage or drift protection
+- **expected red→green**: no checklist artifact (red) → dated checklist with item-by-item judgments/evidence pointers and explicit gaps (green)
 - **run-turn-budget**: 120
-- **acceptance**: no placeholders; every FR/SC has at least one task; tasks follow the strict checklist format; no test run claimed
+- **acceptance**: no test run claimed; no implementation edits; checklist is requirements-quality, not a duplicate of tests.md
 
 ## Dispatch Log
 
@@ -55,7 +55,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P1-requirements-test-scope | requirements | — | not_evaluated | none run | 982a0503 | DONE — US5 + FR-011…FR-021 + SC-006…SC-010 land; no test claimed |
 | P2-clarify-test-economics | clarify | — | not_evaluated | none run (baseline in flight; only lastfailed cache read) | f086e36d | DONE — 7 open items ratified; Assumptions de-opened; FR-012/FR-018/SC-007src/SC-008 minimal revisions; pre-analyze 0/0 fr=21 sc=10; validate-requirements 0e/0w |
 | P3-plan-test-slimming | plan | — | not_evaluated | none run (2-node timing probe only, per plan-probes dated record) | bca3bc99 | DONE — plan.md + research/data-model/contracts×4/quickstart + plan-probes evidence; pre-analyze --stage plan pass 0e/0a (clauses=35); decomposition-check --mode plan proceed (FR 21/30); no full-suite run; no test claimed as passing |
-| P4-tasks-test-slimming | tasks | — | — | none run | — | dispatched |
+| P4-tasks-test-slimming | tasks | T001–T038 | not_evaluated | none run | 78954beb | DONE — 38 tasks / 9 phases (≤8 per part); validate-tasks 0e/0w; pre-analyze tasks pass 0e/1a (expected missing new test path); decomposition proceed 38/40; no test run |
+| P5-checklist-test-slimming | checklist | — | — | none run | — | dispatched |
 
 ## Gates
 
