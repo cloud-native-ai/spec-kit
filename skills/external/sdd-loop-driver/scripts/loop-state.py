@@ -1783,12 +1783,12 @@ def suggest_action(loop_state, view, artifacts, commits, commit_ctx, spine,
         loop_state, view, artifacts, commits, commit_ctx, spine,
         not_dispatched_flag, remote_unreachable, false_completion, forms)
 
-    # C-47: only a candidate that would spend another attempt is rewritten.
-    # An already-`stop` candidate is left with its own reason, which states
-    # the real cause instead of mislabelling it as attempt exhaustion.
+    # C-47: with a known attempt at the limit, every candidate the owner lists
+    # (`resume` / `retry` / `stop`) resolves to `stop` + `attempts-exhausted`;
+    # `watch` / `none` / `verify` are unaffected.
     attempt = spine_field(spine, "attempt")
     retry_limit = thresholds.get("retry_limit")
-    if action in ("resume", "retry") and attempt is not None \
+    if action in ("resume", "retry", "stop") and attempt is not None \
             and retry_limit is not None and attempt >= retry_limit:
         return ("stop", "attempts-exhausted",
                 preconditions + ["attempt >= retry_limit"], blocked_by)
@@ -2719,6 +2719,19 @@ def do_self_test(args):
               and env["recovery_action"] == "stop"
               and env["recovery_reason"] == "attempts-exhausted",
               "attempt >= retry_limit rewrites retry to stop (C-47)")
+
+        fx.write_spine(state="stalled", started_at=fx.now - 100,
+                       base_commit=base, attempt=2, retry_limit=2)
+        fx.write_status(exit_code=0, sentinel=1)
+        fx.write_log(["TASKS-DONE"])
+        code, env = fx.snapshot_json()
+        check("attempt-limit-relabels-stop",
+              base is not None and code == EXIT_OK and env
+              and env["loop_state"] == "STALLED"
+              and env["recovery_action"] == "stop"
+              and env["recovery_reason"] == "attempts-exhausted",
+              "C-47 lists stop among the rewritten candidates, so row 11's "
+              "stalled-handoff is relabelled at the limit")
 
         fx.write_spine(state="stalled", started_at=fx.now - 100,
                        base_commit=base)

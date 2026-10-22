@@ -285,7 +285,7 @@ is unchanged from the T009 residual run and none of these node ids is claimed gr
 ```
 $ python3 skills/external/sdd-loop-driver/scripts/loop-state.py --self-test
 ...
-SELF-TEST: 35 passed, 0 failed        # exit 0
+SELF-TEST: 36 passed, 0 failed        # exit 0
 
 $ python3 /tmp/loop_state_smoke.py    # hand-written fixture, not pytest
 SMOKE: 0 failed (11 checks)           # exit 0
@@ -313,11 +313,13 @@ log staying unread, probe shape (b) fully `missing`, four rejection paths, the
 
 **Interpretive decisions disclosed (implementation read of the owner contracts)**
 
-1. **C-47 scope**: the attempt cap rewrites `resume` / `retry` candidates to
-   `stop` (`reason=attempts-exhausted`). A candidate that is already `stop` keeps its
-   own reason — the action already satisfies "no further attempt", and relabelling it
-   `attempts-exhausted` would state a false cause (e.g. `remote-unreachable`). This
-   reading is recorded in `references/state-awareness.md` §恢复动作建议.
+1. **C-47 scope**: the attempt cap applies to the exact candidate list the owner
+   writes — `resume` / `retry` / `stop` — so a candidate that is already `stop` is also
+   relabelled to `stop` (`reason=attempts-exhausted`) when `attempt` is known and at the
+   limit; `watch` / `none` / `verify` are untouched. An earlier draft preserved the
+   original reason of `stop` candidates; that was my own reading rather than recorded
+   intent, so it was reverted to the literal owner text. Recorded in
+   `references/state-awareness.md` §恢复动作建议.
 2. **Row 11 hoisting**: `STALLED` / `REENTRY_REQUIRED` are evaluated before C-46
    rows 8–10, as the owner text explicitly requires ("行 8–10 MUST NOT 应用于 …").
 3. **Row 9 / row 13 reasons**: `salvage-not-recorded` (row 9) and `evidence-gap`

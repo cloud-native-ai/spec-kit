@@ -126,7 +126,7 @@ probe 模式下不执行本地 git 证据计算，因此 `uncommitted_artifacts=
 
 ## 恢复动作建议
 
-`recovery_action` 是封闭集 `none / watch / verify / resume / retry / stop` 中的恰好一个，对相同输入可复现。**候选行号与先后次序的 owner 是 `contracts/interruption-and-action.md` C-46**；本表只记录引擎的落地读法（含 C-46 明文要求的“行 8–10 不重判 STALLED / REENTRY_REQUIRED”，以及 C-47 的上限只改写真会消耗重试的候选）。
+`recovery_action` 是封闭集 `none / watch / verify / resume / retry / stop` 中的恰好一个，对相同输入可复现。**候选行号与先后次序的 owner 是 `contracts/interruption-and-action.md` C-46**；本表只记录引擎的落地读法（含 C-46 明文要求的“行 8–10 不重判 STALLED / REENTRY_REQUIRED”，以及 C-47 对 `resume` / `retry` / `stop` 三类候选的上限改写）。
 
 | C-46 行 | 触发面 | 动作 | `reason` |
 |---------|--------|------|----------|
@@ -146,7 +146,7 @@ probe 模式下不执行本地 git 证据计算，因此 `uncommitted_artifacts=
 
 门与上限：
 
-- **C-47 尝试上限**：`attempt` 已知且 `attempt ≥ retry_limit` 时，`resume` / `retry` 候选改写为 `stop`（`reason=attempts-exhausted`）。已是 `stop` 的候选保持自身 `reason`——它已经满足“不再消耗尝试”，改标 `attempts-exhausted` 会掩盖真实根因。`attempt` 未知时 MUST NOT 给 `resume`：降级 `retry`，`recovery_decision.blocked_by` 记 `attempt-unknown`。
+- **C-47 尝试上限**：`attempt` 已知且 `attempt ≥ retry_limit` 时，候选为 `resume` / `retry` / `stop` 的一律改写为 `stop`（`reason=attempts-exhausted`）——按 C-47 字面清单执行，已是 `stop` 的候选同样改标，其原 `reason` 让位于上限事实。`watch` / `none` / `verify` 不受此限。`attempt` 未知时 MUST NOT 给 `resume`：降级 `retry`，`recovery_decision.blocked_by` 记 `attempt-unknown`。
 - **C-48 salvage 门**：仅当状态脊同时具备 `salvage=accepted`、非空 `salvage_evidence`、非空 `salvage_at` 才算“完整记录”；否则按未记录处理，候选不得为 `resume`。本切片不写 salvage 记录（065c 承接）。
 - **C-49 只建议**：`stop` 在 065a 只是建议——不杀进程、不删证据、不移除 worktree；活进程的 `TIMEOUT` 优先落 `watch`，停线只能在最终快照与用户显式决定之后发生。
 - `recovery_decision` 始终内嵌 `action` / `reason` / `preconditions[]` / `blocked_by[]`，且 `action` / `reason` 与顶层 `recovery_action` / `recovery_reason` 相等。`blocked_by` 非空时必须能解释“为什么没采用更高优先级动作”。
