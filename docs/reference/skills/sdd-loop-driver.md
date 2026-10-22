@@ -1,6 +1,6 @@
 # sdd-loop-driver（无人值守 SDD 循环驱动）
 
-**机制一句话**：以一条一遍性提示词驱动宿主 agent 完成「登录环境 → 本地用宿主原生子代理 / 远端用 qodercli 为子代理 → 按阶段推进 SDD 全流程 → 合并 main」的循环闭环，全程自推进、零用户提醒。真源：`skills/external/sdd-loop-driver/SKILL.md`（+ references/ 四份手册（含效率 owner `efficiency-model.md`）+ `scripts/`）。
+**机制一句话**：以一条一遍性提示词驱动宿主 agent 完成「登录环境 → 本地用宿主原生子代理 / 远端用 qodercli 为子代理 → 按阶段推进 SDD 全流程 → 合并 main」的循环闭环，全程自推进、零用户提醒。真源：`skills/external/sdd-loop-driver/SKILL.md`（+ references/ 五份手册（含效率 owner `efficiency-model.md`、状态感知 owner `state-awareness.md`）+ `scripts/`）。
 
 ## 加载与投递
 
@@ -46,6 +46,22 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 - **Deadline grace / TIMEOUT 不是可杀信号**：watcher 在 deadline 后继续采样 `--deadline-grace`（缺省 120s），晚完成重判 `DONE`/`FAILED`；收到 `TIMEOUT` 先 `--once` 最终快照，`pid=alive` + `heartbeat=fresh` 时优先延长/继续，停线须用户显式决定并保留 worktree/status/log。
 - **多线批量**：manifest 模式一次连接检查多条线，任一线终止即返回全部快照。
 - **pgrep 陷阱**：`pgrep -c` 零匹配会先打印 0 再以退出码 1 结束，`|| echo 0` 会追加第二个 0；存活判据一律用 PID 文件 + `kill -0`，watcher 自测覆盖零匹配、僵尸、PID 复用等反向用例。
+
+## 状态感知快照（065a-state-awareness）
+
+**机制一句话**：一次调用把一条线的脊、Registry、四件套、watchbeat、产物与提交证据、watcher 判定聚合成一个 JSON 信封，给出唯一恢复动作建议。**只读**——不写脊、不杀进程、不删证据；字段面 owner 是本技能参考手册 `references/state-awareness.md`，本页只给入口与关系。
+
+- **入口**：`scripts/loop-state.py`（Python ≥ 3.8，仅标准库，无常驻进程、无网络轮询）。
+- **调用形态**：
+  - `--action snapshot --line-id <line> [--stage …] [--state-dir …] [--spec-dir …] [--repo …] [--spine …] [--watch-script …] [--out …]` — 读本地证据给出聚合快照；`--out` 是唯一写路径（落在 state dir / repo 内一律拒绝）。
+  - `--probe <file>` — 只消费调用方采集的 probe JSON（形状 (a) 快照信封 / 形状 (b) 最小可达性），不读本地证据、不调本地 watcher，与本地路径参数互斥。
+  - `--self-test` — 自建临时夹具跑内建用例，末行 `SELF-TEST: N passed, M failed`。
+  - `--action recover` / `--action check-spine` — 本切片只返回结构化拒绝信封（owner 分别为 065c / 065b）。
+- **信封**：`schema_version=1`；`loop_state` 取十一值封闭集，`recovery_action` 取 `none/watch/verify/resume/retry/stop` 中恰好一个；缺失值一律 `null`。
+- **退出码**：`0` 求值成功（任何 `loop_state` 都是数据）、`1` 拒绝或校验失败、`2` 参数错误或必需输入不可读/不可解析；watcher 的 `10–16` 是**数据**，只写入 `watch_verdict.exit_code`。
+- **与 watcher 的关系**：有活动 watch target 时 `loop_state` 与 `watch-target.sh` 的判定逐字一致（`verdict_source=watcher`）；无 target 时按 `requirements.md` FR-004 的优先级在本地派生（`verdict_source=derived`）。判定状态机与退出码语义的 owner 是 `references/watch-model.md`，本入口不复述、不改写。
+- **与 Registry 的关系**：`scripts/line-registry.py` 的条目提供路径与 `stage` 回退（显式参数 > Registry 条目 > 环境约定 > `null`）；条目缺失记 `status=missing` 且不致命，绝不猜路径、不扫进程。
+- **只读边界**：快照不改任何 mtime、不写四件套与工作树；`stop` 只是建议，停线须在最终快照与用户显式决定之后。
 
 ## 运行效率优化（063-sdd-loop-efficiency 切片；058 演化）
 

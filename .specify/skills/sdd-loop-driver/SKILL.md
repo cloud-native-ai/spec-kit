@@ -82,6 +82,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 5. **驱动者生命周期**：U3 是当前运行内的有界等待（外部 CLI 用窗口；本地原生以一次同步调用为界，见 `references/watch-model.md`），驱动者必须存活到全线收束或显式停线上送；独立 `sleep` 回合与「挂监视器后等通知/恢复」均不合法——除非宿主已被探针证明能自动恢复同一运行。确须结束时，唯一合法路径是把状态脊写为 stalled/reentry-required 并显式上报。
 6. **驱动拓扑**：加载者即驱动者，亲自执行 U0–U6；阶段子代理只收三段骨架提示词；本地拓扑用宿主原生子代理（MUST NOT 启动 qodercli），远端才用外部 CLI；反嵌套义务真源在 run-agent 派发治理，本手册于 U2 派发前自检。
 7. **流程不可替换**：U0/U1 与阶段计划写出前禁止直接编辑目标仓库；禁止用 improve-skills/create-skills 等维护路径替代 SDD 阶段链（目标为本仓库时同样适用）。唯一例外：入口显式声明「只做技能维护、不走 SDD」。
+8. **快照只读**：`scripts/loop-state.py` 的 snapshot 只读——MUST NOT 写状态脊、四件套、Registry 或工作树（唯一写路径是显式 `--out`，且落在 state dir / repo 内一律拒绝），MUST NOT 杀进程、删证据或移除 worktree；`stop` 在 065a 只是建议。字段面与检测读法 owner 是 `references/state-awareness.md`。
 
 ## Discipline Defaults
 
@@ -105,7 +106,9 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 
 - `references/dispatch-recipes.md` — 五大执行机制、阶段链与哨兵、hook/SSH 窗口、线路登记。
 - `references/watch-model.md` — 统一监听模型：信号源、判定状态机、窗口/期限、多线 manifest、hook/SSH 与故障矩阵。
+- `references/state-awareness.md` — 状态感知快照 owner：入口与调用形态、六类检测与两类保留形态、§Derived Mapping（镜像 FR-004）、§Stage Artifact Map、probe 契约、动作建议与 watchbeat 读法；本手册与其它 references 只引用其章节，不复述整表。
 - `references/stage-prompts.md` — 三段骨架、独立校验、Line/Envelope/Ingress、重接线、变体、并发隔离、卡死处置。
+- `scripts/loop-state.py` — 只读快照引擎（`snapshot` / `--probe` / `--self-test`；`recover`、`check-spine` 返回结构化拒绝），字段面与退出码契约见 `references/state-awareness.md`。
 - `scripts/watch-target.sh` — 长轮询 watcher 参考实现（快照、归属过滤、hook、lease）。
 - `scripts/hook-stop.sh` / `watch-hook.sh` — Stop hook 模板与远端同身份长读。
 - `scripts/line-registry.py` — 环境级 Registry、原子写/同线锁、信封分类、消息入口、集成队列。

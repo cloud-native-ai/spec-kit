@@ -651,3 +651,101 @@ def test_derived_mapping_is_three_way_identical():
         "reference §Derived Mapping must mirror FR-004 clause by clause"
     )
 
+
+# ---------------------------------------------------------------------------
+# T021 / C-33 (LS-13) + C-43/C-44: distribution surface — SKILL.md and the
+# docs page must carry the entry, the call forms and the watcher/Registry
+# relationship, with values that agree with `--help` and the engine data.
+# ---------------------------------------------------------------------------
+
+SKILL_MD = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "SKILL.md"
+DOCS_MD = REPO_ROOT / "docs" / "reference" / "skills" / "sdd-loop-driver.md"
+
+
+def _numbered_items(body):
+    items = {}
+    current = None
+    for line in body:
+        match = re.match(r"^(\d+)\.\s+(.*)$", line)
+        if match:
+            current = int(match.group(1))
+            items[current] = [match.group(2)]
+        elif current is not None and line.strip():
+            items[current].append(line.strip())
+    return {number: " ".join(parts) for number, parts in items.items()}
+
+
+def test_skill_references_state_awareness_reference():
+    assert SKILL_MD.exists(), "skills/external/sdd-loop-driver/SKILL.md missing"
+    body = _section(SKILL_MD.read_text(encoding="utf-8"), "References")
+    hits = [line for line in body if "references/state-awareness.md" in line]
+    assert hits, (
+        "SKILL.md §References must carry a `references/state-awareness.md` line "
+        "(T022); other references point at its sections instead of copying tables"
+    )
+
+
+def test_skill_hard_requirement_snapshot_is_read_only():
+    body = _section(SKILL_MD.read_text(encoding="utf-8"), "Hard Requirements")
+    items = _numbered_items(body)
+    hits = [number for number, text in items.items() if "loop-state.py" in text]
+    assert hits, (
+        "a Hard Requirement must name `scripts/loop-state.py` so the read-only "
+        "boundary is not only a reference note (T022)"
+    )
+    item = items[hits[0]]
+    for literal in ("只读", "写状态脊", "杀进程"):
+        assert literal in item, (
+            "the loop-state Hard Requirement must state %r; snapshot is read-only "
+            "and never writes the spine or kills processes" % literal
+        )
+    assert "MUST NOT" in item, "the hard requirement must be normative (MUST NOT)"
+
+
+def test_docs_page_documents_entry_call_forms_and_relationships():
+    assert DOCS_MD.exists(), "docs/reference/skills/sdd-loop-driver.md missing"
+    text = DOCS_MD.read_text(encoding="utf-8")
+    assert "scripts/loop-state.py" in text, "the docs page must name the entry"
+    for form in ("--action snapshot", "--probe", "--self-test"):
+        assert form in text, "the docs page must document the %r call form" % form
+    assert "references/state-awareness.md" in text, (
+        "the docs page must point at the owner reference instead of restating it"
+    )
+    assert "watch-target.sh" in text and "references/watch-model.md" in text, (
+        "the docs page must state the relationship to the watcher and its owner"
+    )
+    assert "line-registry.py" in text, (
+        "the docs page must state the relationship to the Line Registry"
+    )
+
+
+def test_docs_values_agree_with_help_and_engine_data():
+    proc = _run(["--help"])
+    assert proc.returncode == 0, proc.stderr
+    choices = re.search(r"--action \{([^}]+)\}", proc.stdout)
+    assert choices, "`--help` must publish the --action choice list"
+    actions = [item.strip() for item in choices.group(1).split(",")]
+    assert actions == ["snapshot", "recover", "check-spine"], actions
+
+    docs = DOCS_MD.read_text(encoding="utf-8")
+    for action in actions:
+        assert action in docs, "docs must document the %r action from --help" % action
+
+    ladder = re.findall(r"(?m)^\s{2}([12])\s\s", proc.stdout)
+    assert "0" in proc.stdout.split("Exit codes:", 1)[1], "help must keep the exit ladder"
+    assert "1" in ladder and "2" in ladder, ladder
+    exit_line = next((line for line in docs.splitlines()
+                      if line.startswith("- **退出码**")), None)
+    assert exit_line, "the docs page must state the exit-code boundary"
+    for code in ("0", "1", "2"):
+        assert code in exit_line, "the docs exit ladder must carry %r" % code
+
+    module = _load_engine_module()
+    assert getattr(module, "SCHEMA_VERSION", None) == 1
+    assert "schema_version" in docs and "1" in docs, (
+        "the docs page must state the schema_version=1 envelope"
+    )
+    assert "schema_version=1" in docs or "`schema_version`" in docs, (
+        "the docs page must name the envelope schema field"
+    )
+

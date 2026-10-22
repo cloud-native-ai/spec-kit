@@ -24,7 +24,7 @@
 - DoD-7: 文档取值与代码一致：`references/state-awareness.md`、`SKILL.md`、`docs/reference/skills/sdd-loop-driver.md` 均含入口、调用形态与 watcher/Registry 关系，且与 `--help` 一致。
 - DoD-8: 范围审计通过：未改动 066/067/068 目录、`.specify/specs/065-loop-interruption-recovery/`、watcher/Registry 语义、命令模板与依赖清单；无 daemon、无 push/merge/kill/删除。
 
-**DoD Status**: pending
+**DoD Status**: partial — DoD-1/2/3/5/6/7/8 由 smoke 与确定性门取证；**DoD-4 waived/not-run**（用户测试豁免，26 个红用例未修复、GATE-3 未执行，不声称全绿）；DoD-5 的“相对 T001 基线无新增漂移”以 28 files / exit 0 取证。证据：`.specify/specs/065a-state-awareness/verification.md`。
 
 ## Completion Gate
 
@@ -176,7 +176,7 @@
 
 ### Verification for User Story 1
 
-- [ ] T019 [US1] 跑绿并实证 US1：`SPECKIT_PYTHON=<§ Environment Prerequisites（2026-10-21）的 pytest 解释器> bash scripts/bash/run-tests.sh tests/unit/test_loop_state_engine.py tests/contract/test_loop_state_contract.py -q` 全绿；按 `quickstart.md` §2–§8 用真实夹具执行事故回放、正常窗口、未派发、两种 probe、`--self-test` 与 `--out` 场景，把命令、输出与退出码写入 `.specify/specs/065a-state-awareness/notes/quickstart-run.md`；发现漂移在本行内修正并重跑。 [blockedBy: T017,T018]
+- [X] T019 [US1] smoke 实证 US1（pytest 部分 waived/not-run；用户豁免不运行测试，红用例未修复）：quickstart §2 事故回放（`loop_state=FAILED`、`verdict_source=derived`、`interruptions=[artifacts-without-completion]`、`recovery_action=retry`/`salvage-not-recorded`、`uncommitted_artifacts=5`）、§5 probe 不可达（`STALLED`/`remote-unreachable`/`stop`）、§6 probe 形状 (a) 逐字消费且本地证据未混入 + 与本地路径参数互斥 exit 2、§7 `--self-test` 36/36 exit 0、§8 `--out` 与 stdout 逐键相等且落在 state dir 内 exit 2 且不落文件；§3/§4 手工场景记 waived/not-run；命令、输出与退出码见 `notes/quickstart-run.md`；本行内发现的目录类产物 `uncommitted_artifacts` 漂移按 fast-fail RP-1 就地修复并复跑（4→5，自测仍 36/36）。 [blockedBy: T017,T018]
 
 **Checkpoint**: US1 可独立验收：单次快照给出完整聚合、六类形态、唯一动作建议，且 `--self-test` 与 probe 行为符合契约。
 
@@ -190,18 +190,18 @@
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T020 [US2] 红先更新 `tests/contract/test_sdd_loop_driver_skill.py` 的 `MIRROR_FILES`，加入 `scripts/loop-state.py` 与 `references/state-awareness.md`（保留工作树中已有的外部同步未提交改动，只做增量、不回退/重排），运行镜像断言并把失败输出写入 `.specify/specs/065a-state-awareness/notes/red-first-evidence.md`。 [blockedBy: T019]
-- [ ] T021 [US2] 红先扩展 `tests/contract/test_loop_state_contract.py` 的分发/文档断言：`skills/external/sdd-loop-driver/SKILL.md` 含 `references/state-awareness.md` 的 References 行与只读 Hard Requirement；`docs/reference/skills/sdd-loop-driver.md` 含入口路径、调用形态、与 watcher/Registry 的关系；断言取值与脚本 `--help`/数据一致；记录红跑。 [blockedBy: T019]
+- [X] T020 [US2] 增量更新 `tests/contract/test_sdd_loop_driver_skill.py` 的 `MIRROR_FILES`，加入 `scripts/loop-state.py` 与 `references/state-awareness.md`（保留工作树未提交改动，只做增量、不回退/重排）；smoke 证据（tests waived by user）：`MIRROR_FILES` 现为 9 项，`sync-mirrors --check` 28 files exit 0 且三对 `cmp` IDENTICAL，故断言的数据面成立；pytest 红跑未执行，失败输出未写入 `notes/red-first-evidence.md`（记 waived/not-run，不伪造红跑输出）。 [blockedBy: T019]
+- [X] T021 [US2] 扩展 `tests/contract/test_loop_state_contract.py` 的分发/文档断言（新增 4 个用例）：`skills/external/sdd-loop-driver/SKILL.md` 的 §References 含 `references/state-awareness.md` 行、§Hard Requirements 含 `scripts/loop-state.py` 只读条（`只读`/`写状态脊`/`杀进程`/`MUST NOT`）；`docs/reference/skills/sdd-loop-driver.md` 含入口 `scripts/loop-state.py`、`--action snapshot`/`--probe`/`--self-test` 调用形态与 watcher/Registry 关系；断言取值与脚本 `--help` 的 `--action` 选择表、退出码阶梯与 `SCHEMA_VERSION=1` 一致；smoke 证据（tests waived by user）：pytest 未运行，改以 pytest-stub 注入执行这 4 个用例体（非 pytest 运行）→ 4/4 通过，文档改动前对应 grep 计数为 0（红信号）。 [blockedBy: T019]
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] 更新分发文档：在 `skills/external/sdd-loop-driver/SKILL.md` 增加 `references/state-awareness.md` 的 References 行与“快照只读、不得写脊/杀进程”的 Hard Requirement；在 `docs/reference/skills/sdd-loop-driver.md` 增加 `loop-state.py` 入口、`snapshot`/`--probe`/`--self-test` 调用形态及与 watcher/Registry 的关系；只增量编辑并保留既有未提交改动。 [blockedBy: T021]
-- [ ] T023 [US2] 再生成运行时镜像并验证：运行 `python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver`，随后 `python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver` 相对 T001 基线无新增漂移，并对 `scripts/loop-state.py`、`references/state-awareness.md`、`SKILL.md` 三对源/镜像做 `cmp`/`diff -q` 字节比较；禁止手改 `.specify/skills/sdd-loop-driver/`。 [blockedBy: T017,T018,T022]
+- [X] T022 [US2] 更新分发文档：`skills/external/sdd-loop-driver/SKILL.md` 增 Hard Requirement 8（快照只读：MUST NOT 写脊/四件套/Registry/工作树、MUST NOT 杀进程/删证据/移除 worktree，`--out` 是唯一写路径）与 References 行（`references/state-awareness.md`、`scripts/loop-state.py`）；`docs/reference/skills/sdd-loop-driver.md` 增 §状态感知快照（入口、`--action snapshot`/`--probe`/`--self-test` 与两条拒绝动作、`schema_version=1`、退出码 `0/1/2`、与 `watch-target.sh`+`references/watch-model.md` 及 `line-registry.py` 的关系、只读边界），并把 references 计数由四份更新为五份；只增量编辑，未回退既有未提交改动。 [blockedBy: T021]
+- [X] T023 [US2] 再生成运行时镜像并验证：`python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver` → `MISS references/state-awareness.md`、`DIFF SKILL.md`、`DIFF scripts/loop-state.py`、`sync … (3 files)` exit 0；随后 `--check` → `ok skills/external/ == .specify/skills/ (28 files)` exit 0（相对 T001 基线的 26 files 无新增漂移）；三对源/镜像 `cmp -s` 全 IDENTICAL、sha256 逐对相等（`loop-state.py b472e52d…`、`state-awareness.md 910e4fe2…`、`SKILL.md 5216a08f…`）；未手改 `.specify/skills/sdd-loop-driver/`。 [blockedBy: T017,T018,T022]
 
 ### Verification for User Story 2 (US5 Compatibility)
 
-- [ ] T024 [US2] 运行兼容性回归（US5 A1–A3）：`bash skills/external/sdd-loop-driver/scripts/watch-target.sh --self-test`（`0 failed`、判定与退出码零差异）、`SPECKIT_PYTHON=<§ Environment Prerequisites（2026-10-21）的 pytest 解释器> bash scripts/bash/run-tests.sh tests/unit/test_line_registry_engine.py tests/contract/test_sdd_loop_driver_skill.py -q`、以及 `python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver`；与 T001 基线做名字级比较（比较形态 owner：`.specify/skills/internal/implement-feature/SKILL.md` § Test runs），把命令、输出与差异写入 `.specify/specs/065a-state-awareness/verification.md`。 [blockedBy: T023]
-- [ ] T025 [US2] 完成 US5 四条兼容性验收：在 `.specify/specs/065a-state-awareness/verification.md` 以 `- **US5-A1**:` 至 `- **US5-A4**:` 逐条记录 A1 watcher 自测与退出码零差异、A2 四件套与 Registry 旧条目可读（含无 `run=` 信封）、A3 源/镜像字节一致与漂移为零、A4 既有 `/speckit.*` 命令三段骨架/哨兵字面量/确认门/no-push 策略无改动（以 `git diff` 为证）；每条给命令、输出与证据指针。 [blockedBy: T024]
+- [X] T024 [US2] 兼容性回归（US5 A1–A3）：`bash skills/external/sdd-loop-driver/scripts/watch-target.sh --self-test` → `SELF-TEST: 38 passed, 0 failed` exit 0（与 plan 期基线逐字相同、判定与退出码零差异）；`python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver` → `ok … (28 files)` exit 0；`bash scripts/bash/run-tests.sh tests/unit/test_line_registry_engine.py tests/contract/test_sdd_loop_driver_skill.py -q` 记 waived/not-run（用户豁免），名字级比较因此无可比较对象；命令、输出与差异见 `verification.md` §T024。 [blockedBy: T023]
+- [X] T025 [US2] 完成 US5 四条兼容性验收（`verification.md` §T025）：`- **US5-A1**:` watcher 自测 38/0 零差异且脚本本体零改动（smoke-evidence）、`- **US5-A2**:` legacy Registry 条目（无 `run_id`）与无 `run=` 四件套可读（`registry.status=present`、`stage` 由 Registry 解析、`attribution=legacy`、`stale_signals=0`）、`- **US5-A3**:` 三对源/镜像字节一致 + `--check` 28 files 零漂移、`- **US5-A4**:` 命令模板/哨兵字面量/watcher 判定码/确认门/no-push 零改动（`git status`/`git diff` 为证）；每条含命令、输出与证据指针。 [blockedBy: T024]
 
 **Checkpoint**: US2 可独立验收：既有测试全绿、镜像字节一致、文档与代码取值一致、US5 四场景均有证据。
 
@@ -211,11 +211,11 @@
 
 **Purpose**: 变异演练、全量回归、SC 证据矩阵、范围审计与 Completion Gate 复验。
 
-- [ ] T026 执行 SC-006 变异演练：先把 `skills/external/sdd-loop-driver/scripts/loop-state.py` 按字节备份到临时路径，再就地移除 `unwatched` 检测分支，运行 `tests/unit/test_loop_state_engine.py` 的对应用例并确认至少一条转红；然后恢复备份，再移除 `IA-16`（`C-48`）的 salvage 完整记录门（把未完整记录当作完整），确认至少一条 salvage 用例转红；每次从备份按字节恢复并校验 sha256 一致；把两处移除位置、命令与转红用例写入 `.specify/specs/065a-state-awareness/verification.md`。 [blockedBy: T019]
-- [ ] T027 全量名字级回归：用 `SPECKIT_PYTHON=<§ Environment Prerequisites（2026-10-21）的 pytest 解释器> bash scripts/bash/run-tests.sh --names-out /tmp/065a-current-failed.txt -q` 运行全量套件，并与 T001 按其 owner 形态捕获的失败名基线做 `comm -13`（比较形态 owner：`.specify/skills/internal/implement-feature/SKILL.md` § Test runs）；要求零 NEW 失败；命令、计数与差集写入 `.specify/specs/065a-state-awareness/verification.md`。 [blockedBy: T025]
-- [ ] T028 写 SC 证据矩阵：在 `.specify/specs/065a-state-awareness/verification.md` 以 `- **SC-001**:` 至 `- **SC-006**:` 逐条给出状态、度量命令、真实输出摘要与证据路径（事故回放、确定性 diff、误报计数、watcher/Registry 回归、镜像/文档/依赖、逆样本与变异）；无法测量的量显式记 `not-evaluated`，不得手填。 [blockedBy: T026,T027]
-- [ ] T029 只读与范围审计：用 `git status --short` 与 `git diff --stat` 证明 `.specify/skills/sdd-loop-driver/` 的改动仅来自 `sync-mirrors.py` 再生成且与源字节一致，未改动 066/067/068 目录、`.specify/specs/065-loop-interruption-recovery/`、`watch-target.sh`、`line-registry.py`、命令模板与 `pyproject.toml`；确认无 daemon/外部依赖、无 push/merge/kill/删除，且 `--out` 之外无写入（mtime 审计）；结论写入 `.specify/specs/065a-state-awareness/verification.md`。 [blockedBy: T025]
-- [ ] T030 收口复验全部 Completion Gate：逐条运行 GATE-1 至 GATE-7 的 check 命令，把命令、退出码与关键输出追加到 `.specify/specs/065a-state-awareness/verification.md`；任一失败不得声称完成，按失败项修复后重跑。 [blockedBy: T028,T029]
+- [X] T026 执行 SC-006 变异演练：waived/not-run —— 用户豁免不运行 pytest，而变异唯一读数是「对应用例是否转红」，无 pytest 即不可测。未移除 `skills/external/sdd-loop-driver/scripts/loop-state.py` 的 `unwatched` 检测分支、未移除 `IA-16`（`C-48`）salvage 完整记录门；备份/恢复与 sha256 校验未发生（无变异实施）；两处移除位置、命令与转红用例均记「未执行」，未伪造计数；SC-006 记 not-evaluated。 [blockedBy: T019]
+- [X] T027 全量名字级回归：waived/not-run —— 用户豁免，`bash scripts/bash/run-tests.sh --names-out /tmp/065a-current-failed.txt -q` 未执行，`comm -13` 无可比较对象，NEW 失败数记 not-evaluated（不是 0）；26 个红用例保持 waived/not-run；命令与不可测量原因写入 `verification.md` §T027。 [blockedBy: T025]
+- [X] T028 写 SC 证据矩阵（`verification.md` §T028）：`- **SC-001**:` smoke-verified 子集（事故回放 `rc=0`/`FAILED`/`retry`）、`- **SC-002**:` smoke-verified（两次快照剔除 `evaluated_at` 后全等；`missing=7`、`unknown=1`、`na=1`、零值/`ok` 猜测=0）、`- **SC-003**:` 部分 smoke（`unwatched` 正逆 + 活进程 `TIMEOUT`→`watch`；计数型断言 waived/not-run）、`- **SC-004**:` watcher 面 smoke-verified / 测试面 waived/not-run、`- **SC-005**:` smoke-verified（3/3 对字节一致、28 files、文档已更新、daemon/外部依赖=0）、`- **SC-006**:` not-evaluated；未测量量显式记 not-evaluated，未手填。 [blockedBy: T026,T027]
+- [X] T029 只读与范围审计（`verification.md` §T029）：`git status --short` 11 项、`git diff --stat` 7 files/133+/7-；`.specify/skills/sdd-loop-driver/` 的 3 个改动全部来自 `sync-mirrors.py --write` 再生成且与源字节一致；禁改面 9 条路径（066/067/068 目录、`.specify/specs/065-loop-interruption-recovery`、`watch-target.sh`、`line-registry.py`、`templates/commands`、`.specify/templates`、`pyproject.toml`）`git status` 均 0 命中；无 daemon/外部依赖、无 push/merge/kill/删除；mtime 审计既有 30 文件变化数 0、`state/` 无新增文件，新增文件仅在一次性夹具 `.git/` 与重定向 HOME 的 `.pyc` 缓存。 [blockedBy: T025]
+- [X] T030 收口复验 Completion Gate（`verification.md` §T030）：GATE-1 `validate-tasks.py` → `PASS … 0 error(s), 0 warning(s)` exit 0；GATE-2 `pre-analyze-check.py --stage tasks` → `decision=pass errors=0 advisories=0 waived=0`（fr=25 sc=6 tasks=30）exit 0；GATE-3 pytest **waived/void**（用户豁免原文在册，不计 pass）；GATE-4 watcher 自测 `38 passed, 0 failed` exit 0；GATE-5 `sync-mirrors --check` 28 files exit 0 且三对 `cmp` IDENTICAL；GATE-6 未完成行计数 0；GATE-7 SC=6 / US5=4；附 `account-clause-coverage.py` claimed=60、FR 25/25、beyond-baseline=0、status ok。Feature 065 保持 `Planned`（065b/065c 排队），仅记 `065a slice implementation-complete with test waiver`。 [blockedBy: T028,T029]
 
 **Checkpoint**: 变异演练可复现、全量回归零 NEW 失败、六条 SC 与四条 US5 均有测量证据、全部 GATE 通过。
 

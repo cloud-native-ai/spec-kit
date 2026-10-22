@@ -355,9 +355,11 @@ MIRROR_FILES = [
     "references/dispatch-recipes.md",
     "references/stage-prompts.md",
     "references/watch-model.md",
+    "references/state-awareness.md",
     "scripts/watch-target.sh",
     "scripts/hook-stop.sh",
     "scripts/watch-hook.sh",
+    "scripts/loop-state.py",
 ]
 
 

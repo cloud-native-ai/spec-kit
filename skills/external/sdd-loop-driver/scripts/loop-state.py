@@ -1315,10 +1315,14 @@ def uncommitted_artifacts_of(artifacts, commit_ctx):
         if item["status"] != "present":
             continue
         rel = item["path"]
+        # C-59 symmetry: a directory artifact (`contracts/`) resolves against
+        # its git pathspec entry, which carries no trailing slash.
+        rel_key = rel.rstrip("/")
         relative = None
         pathspec = commit_ctx.get("pathspec") or []
         for candidate in pathspec:
-            if candidate.endswith(rel) or ("/" + rel) in candidate:
+            key = candidate.rstrip("/")
+            if key == rel_key or key.endswith("/" + rel_key):
                 relative = candidate
                 break
         if relative is None:
