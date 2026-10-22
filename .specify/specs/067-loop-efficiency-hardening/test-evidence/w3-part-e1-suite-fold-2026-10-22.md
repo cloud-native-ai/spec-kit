@@ -140,5 +140,6 @@ batch-3 folds (T022).
 
 ## Commits
 
-- Part E1 artifact commit: pending (backfilled below after commit).
-- Ledger commit-hash backfill commit: pending.
+- Part E1 artifact commit: `54cf98e4` (suite, folds, ledger rows 46–69 with
+  commit columns `pending`, evidence file, tasks.md T019–T021 → `[X]`).
+- Ledger commit-hash backfill commit: pending (this edit).
