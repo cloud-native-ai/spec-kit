@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792650678
-stage_deadline_epoch: 1792656078
-stage_base_commit: 137abc67
+stage_started_at: 1792651372
+stage_deadline_epoch: 1792656772
+stage_base_commit: bca3bc99
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,16 +37,16 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (plan)
+## Current Part Brief (tasks)
 
-- **part_id**: P3-plan-test-slimming
-- **allowed files**: new/updated `.specify/specs/067-loop-efficiency-hardening/{plan.md,research.md,data-model.md,quickstart.md,contracts/*,test-evidence/plan-*,notes/plan-*}`; requirements.md only for a minimal contradiction fix that MUST be reported
-- **must not modify**: tests, runner, `pyproject.toml`, source, mirrors, registry
-- **target validation**: `python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/067-loop-efficiency-hardening --stage plan --repo .`; plan validator closure
-- **baseline facts to design against**: 750 s wall / 748.56 s pytest; 83 failed / 4467 passed / 1 skipped; 50 of 83 failures are mirror/parity/sync-like; slowest 50 = 298.2 s, admission_check 18, worktree queue 6, trigger telemetry 3, proactive trigger 4; serial default, dev-only xdist optional; SC-008 relative to baseline failure set
-- **expected red→green**: no plan.md/design artifacts (red) → plan + Phase 1 design artifacts with measurable gates, consolidation ledger, fixture/table-driven strategy, runner/measurement contract, baseline-debt triage (green)
+- **part_id**: P4-tasks-test-slimming
+- **allowed files**: new/updated `.specify/specs/067-loop-efficiency-hardening/tasks.md` and new `notes/tasks-*` if needed; requirements/plan/design artifacts read-only
+- **must not modify**: tests, runner, `pyproject.toml`, source, mirrors, registry, requirements.md, plan.md
+- **target validation**: `python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/067-loop-efficiency-hardening --stage tasks --repo .` and `python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/067-loop-efficiency-hardening/requirements.md --tasks .specify/specs/067-loop-efficiency-hardening/tasks.md`; tasks validator closure
+- **design input**: plan.md §Implementation Slicing (7 parts / ≈37 tasks projected, each ≤8); W1–W5; contracts MP/LED/RC/FB; TDD tests mode ON (test changes are the deliverable; every consolidation needs ledger + injection drill)
+- **expected red→green**: no tasks.md (red) → dependency-ordered tasks with per-part ≤8 tasks, test commands/node ids, expected red→green, ledger/drill/measurement evidence duties (green)
 - **run-turn-budget**: 120
-- **acceptance**: plan contains no placeholders; every requirement (FR-001…FR-021, SC-001…SC-010) has a design owner or explicit rationale; no full-suite run; no test claimed as run
+- **acceptance**: no placeholders; every FR/SC has at least one task; tasks follow the strict checklist format; no test run claimed
 
 ## Dispatch Log
 
@@ -54,7 +54,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 |------|-------|----------|-------|-------------|--------|---------|
 | P1-requirements-test-scope | requirements | — | not_evaluated | none run | 982a0503 | DONE — US5 + FR-011…FR-021 + SC-006…SC-010 land; no test claimed |
 | P2-clarify-test-economics | clarify | — | not_evaluated | none run (baseline in flight; only lastfailed cache read) | f086e36d | DONE — 7 open items ratified; Assumptions de-opened; FR-012/FR-018/SC-007src/SC-008 minimal revisions; pre-analyze 0/0 fr=21 sc=10; validate-requirements 0e/0w |
-| P3-plan-test-slimming | plan | — | — | none run | — | dispatched |
+| P3-plan-test-slimming | plan | — | not_evaluated | none run (2-node timing probe only, per plan-probes dated record) | bca3bc99 | DONE — plan.md + research/data-model/contracts×4/quickstart + plan-probes evidence; pre-analyze --stage plan pass 0e/0a (clauses=35); decomposition-check --mode plan proceed (FR 21/30); no full-suite run; no test claimed as passing |
+| P4-tasks-test-slimming | tasks | — | — | none run | — | dispatched |
 
 ## Gates
 
@@ -75,7 +76,7 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 
 ## Checkpoint
 
-- requirements: DONE (`982a0503`); clarify: DONE (`f086e36d`); baseline: measured and committed (`137abc67`); next stage = plan (design + Phase 1 artifacts; fixed measurement command pinned per `test-evidence/measurement-protocol-2026-10-22.md`).
+- requirements: DONE (`982a0503`); clarify: DONE (`f086e36d`); baseline: measured and committed (`137abc67`); plan: DONE (`bca3bc99`) — test-slimming design + Phase 1 artifacts; key rulings: fixture git-hook tax ≈0.9 s/commit is the top root cause (RC-07 neutralization), xdist admitted but NOT adopted (serial-first + RC-04 escalation path), fixed measurement command pinned verbatim (contracts/measurement.md MP-02); next stage = tasks (slicing recommendation in plan §Implementation Slicing, ≈7 parts / ≈37 tasks projected; baseline id list E4 = implement-start duty).
 
 ## Framework Observations
 
