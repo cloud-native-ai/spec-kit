@@ -586,7 +586,13 @@ def test_watchbeat_marker_projection_and_freshness(tmp_path):
     ws.write_spine(run_id="run-1")
     ws.write_pid(pid=os.getpid())
     ws.write_heartbeat()
-    ws.write_watchbeat(at=NOW, window=300, run="run-1")
+    # Test-local isolation fix (T027 triage, 2026-10-22): anchor the watchbeat to
+    # call time, not module-import time. NOW binds at collection; in a full suite
+    # the unit tier runs >300 s later, so an at=NOW marker sits outside its own
+    # 300 s window and `fresh` degrades. The equality assertion is unchanged — it
+    # compares against the exact value this test wrote.
+    now = int(time.time())
+    ws.write_watchbeat(at=now, window=300, run="run-1")
 
     env = _snap_json(ws)
     wb = env["evidence"]["watchbeat"]
@@ -596,7 +602,7 @@ def test_watchbeat_marker_projection_and_freshness(tmp_path):
     assert wb["run_id"] == "run-1"
     assert wb["stage"] == "tasks"
     assert wb["window"] == 300
-    assert wb["at"] == NOW
+    assert wb["at"] == now
     assert wb["event"] == "watch-window"
     assert wb["fresh"] is True
 
@@ -1093,8 +1099,14 @@ def test_derived_deadline_overrun_with_live_process_is_timeout_watch(tmp_path):
 
 def test_unwatched_detector_positive_expired_and_negative(tmp_path):
     """C-40: watchbeat missing/expired reports unwatched; fresh or sentinel does not."""
+    # Test-local isolation fix (T027 triage, 2026-10-22): the fresh/expired boundary
+    # cases anchor to call time instead of module-import NOW. NOW binds at
+    # collection; in a full suite the unit tier runs >300 s later, so an at=NOW
+    # marker already sits past its own 300 s window and the "fresh" branch becomes
+    # unreachable. Assertions and branch coverage are unchanged.
+    now = int(time.time())
     ws = Workspace(tmp_path)
-    ws.write_spine(started_at=NOW - 100)
+    ws.write_spine(started_at=now - 100)
     ws.write_pid(pid=os.getpid())
     ws.write_heartbeat()
 
@@ -1103,11 +1115,11 @@ def test_unwatched_detector_positive_expired_and_negative(tmp_path):
     assert _find(env, "unwatched"), "a running stage without a watchbeat is unwatched"
     assert env["recovery_action"] == "watch"
 
-    ws.write_watchbeat(at=NOW, window=300)  # inside its own window
+    ws.write_watchbeat(at=now, window=300)  # inside its own window
     env = _snap_json(ws)
     assert _find(env, "unwatched") == [], "fresh window must not be reported unwatched"
 
-    ws.write_watchbeat(at=NOW - 1000, window=300)  # past window + grace(0)
+    ws.write_watchbeat(at=now - 1000, window=300)  # past window + grace(0)
     env = _snap_json(ws)
     assert _find(env, "unwatched"), "an expired watchbeat is the expired branch"
 
@@ -1194,6 +1206,14 @@ def test_terminal_states_with_unknown_commit_baseline_never_verify(tmp_path):
     assert env["loop_state"] == "STALLED"
     assert env["recovery_action"] == "stop"
 
+    # Fixture fix (T027 triage, 2026-10-22): the ANOMALY sub-case must not inherit
+    # the stalled spine from the previous sub-case. FR-004's derived mapping (owner:
+    # 065a requirements #FR-004) ranks `spine_state=stalled` -> STALLED ABOVE the
+    # anomaly-line rule, so with the stalled spine still in place the engine legally
+    # returns STALLED and the ANOMALY branch is unreachable. Resetting the spine to
+    # a running state lets the sub-case construct what its assertions name. All
+    # assertions (ANOMALY, retry, never the row-6 verify branch) are unchanged.
+    ws.write_spine(state="running", base_commit=None, started_at=NOW - 100)
     ws.write_pid(pid=os.getpid())
     ws.write_heartbeat()
     ws.write_status(exit_code=1, sentinel=0)

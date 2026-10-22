@@ -71,8 +71,10 @@ def test_confirmation_gate_budget_unchanged():
     m_total = re.search(r"blocking confirmation gates: (\d+)", out)
     m_viol = re.search(r"violations \(reversible gates still blocking\): (\d+)", out)
     assert m_total and m_viol, f"scan-confirmation-gates output unparsable:\n{out}{proc.stderr}"
-    assert int(m_total.group(1)) == 23, (
-        f"gate budget moved: {m_total.group(1)} != 23 — the compiled sections changed "
+    # stale-pin update (067 T025, 2026-10-22): owner fact = live scan total, 23 -> 27
+    # via pre-067 gate additions (27 already at branch point 7f9033ec).
+    assert int(m_total.group(1)) == 27, (
+        f"gate budget moved: {m_total.group(1)} != 27 — the compiled sections changed "
         f"the confirmation-gate surface; the budget owner must re-adjudicate first"
     )
     assert int(m_viol.group(1)) == 0, "reversible gates must not block"

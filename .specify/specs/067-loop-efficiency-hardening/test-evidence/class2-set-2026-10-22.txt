@@ -1,0 +1,52 @@
+# Class 2 Set — T025–T027 processing objects (2026-10-22)
+
+Authority: tasks.md T025–T027; set = T007 in-stage baseline 83 names minus the 50 triage-registered
+mirror-class original ids (49 mirror-sync synced + 1 stale-pin debt-registered @ a6098885).
+
+## Source commands
+
+```bash
+# 1) authoritative baseline (T007 in-stage full-run --names-out, slot=baseline):
+wc -l < test-evidence/baseline-failures-2026-10-22-implement-start.txt   # -> 83
+# 2) registered rows extracted from failure-triage-2026-10-22.md
+grep -cE '^\| tests/[^|]+ \| (mirror-sync|stale-pin) \|' failure-triage-2026-10-22.md  # -> 50
+# 3) set difference (python: baseline - registered)
+```
+
+counts: baseline=83, registered-mirror-class=50, class2=33 (gate-total=23, exec-quant=7, loop_state=3)
+
+## Full list (33)
+
+ 1. [T025-gate-total] tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+ 2. [T025-gate-total] tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+ 3. [T025-gate-total] tests/contract/test_compile_propagation_order.py::test_compiled_fingerprints_match_the_runtime_registry
+ 4. [T025-gate-total] tests/contract/test_compile_propagation_order.py::test_propagation_chain_is_green_in_canonical_order
+ 5. [T025-gate-total] tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+ 6. [T025-gate-total] tests/contract/test_constitution_double_landing.py::test_c1_template_carries_both_new_principles
+ 7. [T025-gate-total] tests/contract/test_criterion_subject.py::test_c18_the_engine_suite_that_reads_the_owner_doc_stays_green
+ 8. [T025-gate-total] tests/contract/test_criterion_subject.py::test_c19_the_gate_budget_survives_the_new_section
+ 9. [T026-exec-quant] tests/contract/test_exec_quant_engine.py::TestAgentCollection::test_resolved_agent_fields_from_wrapper_host
+10. [T026-exec-quant] tests/contract/test_exec_quant_engine.py::TestCredentialDefense::test_engine_masks_credential_shaped_config_values
+11. [T026-exec-quant] tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_endpoint_candidates_origin_only
+12. [T026-exec-quant] tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_missing_config_face_degrades_to_marker
+13. [T026-exec-quant] tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_config_face
+14. [T026-exec-quant] tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_per_model_effort_when_set
+15. [T026-exec-quant] tests/contract/test_exec_quant_engine.py::TestSizeCap::test_oversized_record_is_field_truncated_and_capped
+16. [T025-gate-total] tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22
+17. [T025-gate-total] tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+18. [T025-gate-total] tests/contract/test_fast_fail_discipline.py::test_x13_double_landing_three_count_pins
+19. [T025-gate-total] tests/contract/test_fast_fail_discipline.py::test_x19_ufc_class_eleven_gains_fast_fail_path
+20. [T025-gate-total] tests/contract/test_fast_fail_discipline.py::test_x21_ufc_override_column_unchanged
+21. [T025-gate-total] tests/contract/test_neutrality_budget.py::test_c4_budget_total_and_violations_after_the_feature_landed
+22. [T025-gate-total] tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+23. [T025-gate-total] tests/contract/test_phase2_bindings.py::test_wrap_up_compile_unaffected_by_phase2_rows
+24. [T025-gate-total] tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+25. [T025-gate-total] tests/contract/test_probe_nonentity_catalog.py::test_catalog_does_not_participate_in_registry_counts
+26. [T025-gate-total] tests/contract/test_probe_registry_umbrella.py::test_feedback_utils_probe_validate_still_green
+27. [T025-gate-total] tests/contract/test_shipped_surface_client_neutrality.py::test_shipped_surface_has_no_framework_runtime_references
+28. [T025-gate-total] tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+29. [T025-gate-total] tests/contract/test_user_facing_comprehension_doc.py::test_gn_c2_gate_scan_total_unchanged
+30. [T025-gate-total] tests/contract/test_wrap_up_wording_gate_safe.py::test_confirmation_gate_budget_unchanged
+31. [T027-loop-state] tests/unit/test_loop_state_engine.py::test_terminal_states_with_unknown_commit_baseline_never_verify
+32. [T027-loop-state] tests/unit/test_loop_state_engine.py::test_unwatched_detector_positive_expired_and_negative
+33. [T027-loop-state] tests/unit/test_loop_state_engine.py::test_watchbeat_marker_projection_and_freshness

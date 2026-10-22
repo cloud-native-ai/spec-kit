@@ -82,7 +82,9 @@ PAREN_FORM_FILE = (
     / "rubric-section.md"
 )
 PAREN_FORM_CLAUSES = 10
-GATE_TOTAL = 23
+GATE_TOTAL = 27  # stale-pin update (067 T025, 2026-10-22): owner fact = scan-confirmation-gates.py
+# live total, 23 -> 27 via pre-067 gate additions (latest 7e738423, 2026-10-20; 27 already at
+# branch point 7f9033ec). Equality pin strength unchanged.
 
 
 def _load():

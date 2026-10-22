@@ -20,3 +20,13 @@
   green (FB-06). The test is NOT deleted (FB-07).
 - **risk if unresolved at closure**: one in-register baseline name stays red;
   SC-008 closure diff must carry it as a known name, not a NEW one.
+
+## Resolution (2026-10-22, T025-class triage, part F)
+
+Resolved as `pin-updated+rationale` — the anticipated T025-class ruling. The per-tool arm now
+compares each rendered copy's clause interval against the **engine-rendered owner literal**
+(`specify_cli.rewrite_paths(owner)`, the recorded owner of the `shared/` → `.specify/shared/`
+render rewrite), preserving exact byte-identity strength; the mirror arm keeps raw byte
+identity. Fix lands in the part F triage commit; the triage row for the name is updated in
+place (one row per name, V-E5-1). This record remains as the dated history of the registered
+interval; it no longer represents an open debt.

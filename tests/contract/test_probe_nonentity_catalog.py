@@ -91,6 +91,9 @@ def test_catalog_does_not_participate_in_registry_counts() -> None:
     assert registry["errors"] == [], f"registry structural errors: {registry['errors']}"
     assert external == 0, "external probes must stay out of the framework registry"
     # 72 既有 + 14 散布探测点入册 + 20 reconcile 缺口补登 + 057 新增 2 个 skill-wrapup Object + 059 新增 4 个 exec-quant Object（同任务更新计数契约）
-    assert internal == 112, (
+    # stale-pin update (067 T025, 2026-10-22): 112 -> 116; +4 Objects registered by
+    # pre-067 features (063 evidence/gate objects etc.; the engine-loaded registry
+    # already holds 116 at branch point 7f9033ec, errors-free at HEAD).
+    assert internal == 116, (
         f"catalog leaked into the engine population or Objects drifted: internal={internal}"
     )

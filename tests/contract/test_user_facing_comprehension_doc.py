@@ -567,8 +567,8 @@ def test_gn_c2_gate_scan_total_unchanged():
     )
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
-    assert payload["total"] == 23, (
-        f"gate total moved to {payload['total']}; the frozen budget is 23 and the integer "
+    assert payload["total"] == 27, (
+        f"gate total moved to {payload['total']}; the recorded budget is 27 and the integer "
         "headroom is 0, so any new BLOCKING_RE hit in scan scope lands here"
     )
     assert payload["violations"] == [], f"violations: {payload['violations']}"
