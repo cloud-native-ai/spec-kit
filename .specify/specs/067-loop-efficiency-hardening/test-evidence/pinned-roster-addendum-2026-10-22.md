@@ -24,7 +24,7 @@ The check is executed as a deterministic ledger join (roster id â†’ ledger row â
 
 ## Closure expectations
 
-- The T007 in-stage baseline has 83 names; after triage, **15 known reds** remain (14 `pre-existing-debt` + `test_i11` stale-pin). The closure name-level diff must show the same 15 on both sides and **0 NEW**; debt names must not be "fixed" during closure.
+- The T007 in-stage baseline has 83 names. At review time 15 known reds were expected (14 `pre-existing-debt` + `test_i11` stale-pin); `test_i11` was fixed in `bc5c443a`, so the closure run showed **14** (all `pre-existing-debt`) and **0 NEW**. The known-red set is a subset of the T007 baseline; debt names must not be "fixed" during closure.
 - Any roster id that is neither in the post list nor ledger-mapped to a green suite param is a real gap and blocks GATE-1.
 
 ## References

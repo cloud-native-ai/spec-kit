@@ -98,6 +98,7 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 
 <!-- test-budget:begin -->
 {"seq":1,"slot":"baseline","stage":"implement","purpose":"implement-start-baseline","trigger":"scheduled","at":"2026-10-22T07:39:30Z","command":"bash scripts/bash/run-tests.sh -q --durations=50 --names-out .specify/specs/067-loop-efficiency-hardening/test-evidence/baseline-failures-2026-10-22-implement-start.txt","selection_basis":"full-suite","rc":1,"passed":4469,"failed":83,"failed_names_path":".specify/specs/067-loop-efficiency-hardening/test-evidence/baseline-failures-2026-10-22-implement-start.txt","baseline_compare":"na","wall_seconds":534,"evidence_ptr":".specify/specs/067-loop-efficiency-hardening/test-evidence/full-run-2026-10-22-implement-start.md"}
+{"seq":2,"slot":"closure","stage":"closure","purpose":"closure-final","trigger":"scheduled","at":"2026-10-22T09:15:05Z","command":"bash scripts/bash/run-tests.sh -q --durations=50 --names-out .specify/specs/067-loop-efficiency-hardening/test-evidence/closure-failures-2026-10-22.txt","selection_basis":"full-suite","rc":1,"passed":5224,"failed":14,"failed_names_path":".specify/specs/067-loop-efficiency-hardening/test-evidence/closure-failures-2026-10-22.txt","baseline_compare":"comm -13: 0 new; 14 known debt reds (all in T007 baseline); 69 fixed","wall_seconds":553,"evidence_ptr":".specify/specs/067-loop-efficiency-hardening/test-evidence/full-run-2026-10-22-closure.md"}
 <!-- test-budget:end -->
 
 ## Checkpoint
