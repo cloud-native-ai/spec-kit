@@ -1,0 +1,654 @@
+# Pinned Test Roster (FR-018 / FB-03) — 067-loop-efficiency-hardening
+# Inventory date: 2026-10-22 · tree: 067-loop-efficiency-hardening @ a8a097b6 (T002)
+# Scope: tests/contract/ only (FB-03 pinned-class contract tests), expanded to full node ids
+# (parametrized rows included) against the T001 universe (baseline-test-ids.txt, 4551 ids);
+# every line below is a member of that universe (validity by construction).
+#
+# 口径 (detection criteria, mechanical and reproducible):
+#   R1 mirror byte-identity      — test name contains byte_identical | byte_equivalent |
+#                                  mirror | no_drift  (name-based)
+#   R2 section-set pins          — test name contains one of: section_set, all_template_sections,
+#                                  all_sections, sections_present, section_present, required_sections,
+#                                  mandatory_sections, sections_are, sections_carry, sections_verbatim,
+#                                  sections_present_verbatim, sections_frozen, closed_and_ordered,
+#                                  once_per  (substring-based; snake_case-safe)
+#   R3 constitution double-landing — whole file test_constitution_double_landing.py + any test
+#                                  name containing "constitution"
+#   R4 confirmation-gate SHA pins — whole file test_confirmation_gates_sweep.py (criteria doc is
+#                                  hash-frozen section-by-section there) + the C-4 hash-freeze test
+#                                  test_user_facing_comprehension_pointers.py::test_c4_criteria_sections_are_verbatim_frozen
+#   R5 fast-fail contract        — whole file test_fast_fail_discipline.py (contract class)
+# Categories may overlap at file granularity by design (R4 file-scoped guards are not re-listed
+# under R2); the UNION (302 ids) is what FB-03 retention and T036 roster ⊆ post check.
+# Narrow/wide note: the mirror-parity-candidates file (36 entries) is the byte-identity FOLD
+# candidate list (narrow, pure byte-compare functions); this roster's R1 (98 ids incl.
+# parametrized rows and drift pins) is the PIN inventory — wider by design, different purpose.
+
+
+## R1-mirror-byte-identity (98 ids)
+
+tests/contract/test_agent_dispatch_mechanism.py::test_c14_mirror_pair_byte_identical
+tests/contract/test_ask_record_repeat.py::test_doc_exists_with_byte_identical_mirror
+tests/contract/test_ask_record_repeat.py::test_mirrored_engine_still_resolves_its_own_project
+tests/contract/test_ask_record_repeat.py::test_template_mirror_parity
+tests/contract/test_ask_record_repeat.py::test_two_hats_owner_doc_has_mirror_parity
+tests/contract/test_checker_form.py::test_c31_mirror_pair_covers_scripts_with_strict_extras
+tests/contract/test_checker_form.py::test_c32_proxy_every_written_pair_has_a_row_in_the_mirror_table
+tests/contract/test_criterion_subject.py::test_the_mirror_of_the_owner_doc_matches_and_the_clause_count_holds
+tests/contract/test_derivation_definitions.py::test_specify_mirror_is_byte_identical
+tests/contract/test_derive_command_surface.py::test_engine_and_its_specify_mirror_are_byte_identical
+tests/contract/test_derive_engine_contract.py::test_engine_and_its_specify_mirror_are_byte_identical
+tests/contract/test_derive_engine_contract.py::test_specify_mirror_guard_is_present_in_source
+tests/contract/test_derive_engine_contract.py::test_workspace_root_specify_mirror_resolves_to_the_parent
+tests/contract/test_docs_command_template.py::test_c12_skill_source_mirror_byte_identity
+tests/contract/test_docs_command_template.py::test_c1_source_and_mirror
+tests/contract/test_docs_step_injection.py::test_c1_single_source_and_mirror
+tests/contract/test_docs_utils_cli.py::test_c1_mirror_is_byte_identical
+tests/contract/test_dogfooding_practice.py::test_c2_doc_exists_with_mirror
+tests/contract/test_dogfooding_practice.py::test_c3_mirror_byte_identical
+tests/contract/test_dogfooding_practice.py::test_c4_engine_mirror_untouched
+tests/contract/test_dogfooding_practice.py::test_c5_section_appears_once_per_mirror
+tests/contract/test_evidence_step_conformance.py::TestCollectEvidenceSkill::test_mirror_identical
+tests/contract/test_evidence_step_conformance.py::TestEvidenceStepConvention::test_mirrored_to_source_side
+tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-agent]
+tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-skills]
+tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-team]
+tests/contract/test_evidence_utils_cli.py::TestMirror::test_mirror_identical
+tests/contract/test_fast_fail_discipline.py::test_a14_no_refresh_instructions_restores_mirror
+tests/contract/test_fast_fail_discipline.py::test_c2_mirror_byte_identical
+tests/contract/test_fast_fail_discipline.py::test_g17_mirrors_produced_by_engines_only
+tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+tests/contract/test_feedback_probe_cli.py::TestMapAction::test_map_is_deterministic_byte_identical
+tests/contract/test_feedback_probe_entry_schema.py::TestRecordProbeResolution::test_index_mirror_carries_probe_keys
+tests/contract/test_feedback_skill_conformance.py::test_every_runtime_mirror_skill_carries_feedback_section
+tests/contract/test_feedback_step_reference_form.py::test_owner_mirror_is_byte_identical
+tests/contract/test_git_workflow_instructions_block.py::test_skill_mirror_is_byte_identical
+tests/contract/test_glossary_mechanism.py::test_glossary_template_present_and_mirrored
+tests/contract/test_glossary_mechanism.py::test_instructions_template_mirror_identical
+tests/contract/test_glossary_mechanism.py::test_shared_protocol_present_and_mirrored
+tests/contract/test_goal_targets_engine.py::test_engine_exists_with_its_mirror
+tests/contract/test_goal_writeset.py::TestInvariantGroups::test_mapping_mirror_is_byte_identical
+tests/contract/test_hugo_scaffold_contract.py::test_mirror_parity_for_the_whole_skill
+tests/contract/test_install_script.py::test_dry_run_intranet_only_drops_public_mirrors
+tests/contract/test_mirror_root_guard.py::test_canonical_and_mirror_check_agree
+tests/contract/test_mirror_root_guard.py::test_mirror_placed_sync_mirrors_never_nests
+tests/contract/test_neutrality_budget.py::test_c10_the_scanner_and_its_mirror_are_untouched_in_the_window
+tests/contract/test_no_organize_agents_refs.py::TestNoOrganizeAgentsRefs::test_skills_mirror_parity
+tests/contract/test_non_regression_064.py::test_ng_08_mirror_no_new_drift
+tests/contract/test_objective_analysis_gate.py::test_owner_doc_exists_and_mirror_is_byte_identical
+tests/contract/test_one_source_of_truth.py::test_c1_doc_exists_with_mirror
+tests/contract/test_one_source_of_truth.py::test_c9_mirror_parity
+tests/contract/test_portable_skill_creation.py::test_create_skills_mirror_parity
+tests/contract/test_proactive_trigger_section.py::test_c2_mirror_parity
+tests/contract/test_proactive_trigger_section.py::test_doc_c1_exists_with_byte_identical_mirror
+tests/contract/test_progress_reporting.py::test_doc_exists_with_byte_identical_mirror
+tests/contract/test_progress_reporting.py::test_template_mirrors_are_byte_identical
+tests/contract/test_run_determination_engine.py::TestOwnerSurfaces::test_engine_home_is_the_framework_root_not_the_mirror
+tests/contract/test_run_determination_engine.py::TestSeparationFromSituationalAssessment::test_engine_does_not_write_the_mirror_by_hand
+tests/contract/test_run_skills_wiring.py::test_c1_run_skills_canonical_and_mirror_identical
+tests/contract/test_run_skills_wiring.py::test_c7_run_team_canonical_and_mirror_identical
+tests/contract/test_runtime_mode_gate.py::test_every_runtime_mirror_skill_feedback_carries_mode_gate
+tests/contract/test_runtime_mode_gate.py::test_runtime_mode_doc_exists_in_source_and_mirror
+tests/contract/test_sanitize_template.py::test_engine_invocations_use_workspace_mirror_path
+tests/contract/test_scan_confirmation_gates.py::test_mirror_roots_excluded
+tests/contract/test_scripts_distribution_parity.py::TestScriptsDistributionParity::test_compare_pair_reports_mirror_only_file_as_extra
+tests/contract/test_sdd_loop_driver_cli_profiles.py::test_clp_16_delivery_mirror_docs
+tests/contract/test_sdd_loop_driver_efficiency.py::test_di_05_delivery_and_mirror
+tests/contract/test_sdd_loop_driver_skill.py::test_c12_mirror_byte_identical
+tests/contract/test_sdd_loop_driver_skill.py::test_c18_mirror_pair_no_drift
+tests/contract/test_sdd_project_setup_skill.py::test_c10_mirror_byte_identical
+tests/contract/test_sdd_workflow_removed.py::test_sdd_workflow_skill_dir_absent_in_installed_mirror
+tests/contract/test_self_improvement_conformance.py::test_c10_runtime_skill_mirrors_are_current
+tests/contract/test_self_improvement_conformance.py::test_c4_canonical_shared_files_are_mirrored_byte_identically
+tests/contract/test_summarize_project_prompt_assets.py::test_mirror_is_byte_equivalent[study-project]
+tests/contract/test_summarize_project_prompt_assets.py::test_mirror_is_byte_equivalent[summarize-project]
+tests/contract/test_task_complexity_rubric.py::test_c10_mirror_parity
+tests/contract/test_task_complexity_rubric.py::test_c1_doc_exists_with_mirror
+tests/contract/test_todo_in_context_wiring.py::TestTodoInContextWiring::test_guideline_is_mirrored_byte_exact
+tests/contract/test_token_efficiency_discipline.py::test_cd1_mirror_byte_identical
+tests/contract/test_token_efficiency_discipline.py::test_cd4_instructions_template_mirror_identical
+tests/contract/test_token_efficiency_feedback.py::test_cm1_mirror_identical
+tests/contract/test_token_efficiency_feedback.py::test_cm2_engine_mirror_identical
+tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/external/create-skills/references/skill-creation-quality-checklist.md]
+tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/external/improve-skills/references/skill-quality-checklist.md]
+tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/internal/create-agent/SKILL.md]
+tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/internal/create-team/SKILL.md]
+tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/internal/create-tools/SKILL.md]
+tests/contract/test_tools_command_routing.py::TestToolSkillPairPresence::test_skill_mirror_in_sync[skill_path0-create-tools]
+tests/contract/test_tools_command_routing.py::TestToolSkillPairPresence::test_skill_mirror_in_sync[skill_path1-improve-tools]
+tests/contract/test_trigger_engine.py::test_c2_mirror_byte_identical
+tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+tests/contract/test_trigger_engine.py::test_c7_mirror_invocation_resolves_the_repo_not_specify
+tests/contract/test_trigger_seed_derivation.py::test_c1_seed_exists_and_mirror_is_byte_identical
+tests/contract/test_user_facing_comprehension_doc.py::test_c2_mirror_is_byte_identical
+tests/contract/test_user_facing_comprehension_pointers.py::test_c14_per_tool_copies_regenerated_and_retired_mirror_absent
+tests/contract/test_user_facing_comprehension_pointers.py::test_c3_mirrors_are_byte_identical
+tests/contract/test_user_facing_comprehension_section.py::test_c2_mirror_carries_the_section_and_is_byte_identical
+tests/contract/test_workspace_isolation_contract.py::test_doc_wi_11_mirrors_once
+
+## R2-section-set-pins (35 ids)
+
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[claude-code-guide.md-create-agent]
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[claude-code-guide.md-improve-agent]
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[claude-code-guide.md-improve-skills]
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[copilot-guide.md-create-agent]
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[copilot-guide.md-improve-agent]
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[copilot-guide.md-improve-skills]
+tests/contract/test_ask_record_repeat.py::test_sections_are_pointer_shaped_not_content_copies
+tests/contract/test_derivation_definitions.py::test_anchor_carries_the_required_sections[Contradiction Handling]
+tests/contract/test_derivation_definitions.py::test_anchor_carries_the_required_sections[Script / Prompt Boundary]
+tests/contract/test_derivation_definitions.py::test_anchor_carries_the_required_sections[Terminology Boundaries]
+tests/contract/test_dogfooding_practice.py::test_c2_section_present_in_template
+tests/contract/test_dogfooding_practice.py::test_c5_section_appears_once_per_mirror
+tests/contract/test_evidence_step_conformance.py::TestCollectEvidenceSkill::test_feedback_section_present
+tests/contract/test_feedback_two_path_routing.py::TestIntrospectionPresenceAndPosition::test_introspection_section_present_inside_path_a
+tests/contract/test_goal_definition.py::test_required_sections_present[## History]
+tests/contract/test_goal_definition.py::test_required_sections_present[## Objective]
+tests/contract/test_goal_definition.py::test_required_sections_present[## Success Criteria]
+tests/contract/test_instructions_section_propagation.py::test_c1_live_instructions_carry_all_template_sections
+tests/contract/test_one_source_of_truth.py::test_c2_doc_has_all_sections
+tests/contract/test_proactive_trigger_section.py::test_doc_c2_section_set_closed_and_ordered
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[knowledge-manager]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[module-designer]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[qa-engineer]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[requirements-analyst]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[system-designer]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[test-engineer]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[ux-analyst]
+tests/contract/test_sanitize_template.py::test_handoffs_section_present
+tests/contract/test_sdd_loop_driver_skill.py::test_c10_stage_prompts_all_sections_present
+tests/contract/test_sdd_loop_driver_skill.py::test_c3_skill_md_section_set
+tests/contract/test_sdd_project_setup_skill.py::test_c3_skill_md_section_set
+tests/contract/test_summary_writeset.py::test_reader_sections_carry_no_internal_identifiers
+tests/contract/test_token_efficiency_discipline.py::test_cd2_required_sections_present
+tests/contract/test_user_facing_comprehension_doc.py::test_c6_seven_sections_present_verbatim
+tests/contract/test_user_facing_comprehension_pointers.py::test_c4_criteria_sections_are_verbatim_frozen
+
+## R3-constitution-double-landing (24 ids)
+
+tests/contract/test_constitution_double_landing.py::test_c10_removing_a_watchlist_principle_breaks_c7[command]
+tests/contract/test_constitution_double_landing.py::test_c10_removing_a_watchlist_principle_breaks_c7[template]
+tests/contract/test_constitution_double_landing.py::test_c11_live_constitution_carries_the_comprehension_principle
+tests/contract/test_constitution_double_landing.py::test_c12_live_constitution_version_and_sync_impact_report
+tests/contract/test_constitution_double_landing.py::test_c13_new_principle_blocks_have_zero_blocking_hits[One Source of Truth (Authority & Reference Discipline)]
+tests/contract/test_constitution_double_landing.py::test_c13_new_principle_blocks_have_zero_blocking_hits[User-Facing Comprehension (No Jargon, With Context)]
+tests/contract/test_constitution_double_landing.py::test_c1_template_carries_both_new_principles
+tests/contract/test_constitution_double_landing.py::test_c2_new_principle_structure_is_compliant[One Source of Truth (Authority & Reference Discipline)]
+tests/contract/test_constitution_double_landing.py::test_c2_new_principle_structure_is_compliant[User-Facing Comprehension (No Jargon, With Context)]
+tests/contract/test_constitution_double_landing.py::test_c3_new_principle_anchors_its_truth_document[One Source of Truth (Authority & Reference Discipline)]
+tests/contract/test_constitution_double_landing.py::test_c3_new_principle_anchors_its_truth_document[User-Facing Comprehension (No Jargon, With Context)]
+tests/contract/test_constitution_double_landing.py::test_c4_new_principle_declares_no_new_machinery[One Source of Truth (Authority & Reference Discipline)]
+tests/contract/test_constitution_double_landing.py::test_c4_new_principle_declares_no_new_machinery[User-Facing Comprehension (No Jargon, With Context)]
+tests/contract/test_constitution_double_landing.py::test_c5_command_must_include_list_has_both_entries
+tests/contract/test_constitution_double_landing.py::test_c6_command_entry_has_anchor_and_scope_sub_bullets[One Source of Truth (Authority & Reference Discipline)]
+tests/contract/test_constitution_double_landing.py::test_c6_command_entry_has_anchor_and_scope_sub_bullets[User-Facing Comprehension (No Jargon, With Context)]
+tests/contract/test_constitution_double_landing.py::test_c7_watchlist_principles_land_on_both_sides
+tests/contract/test_constitution_double_landing.py::test_c8_matcher_is_numeral_agnostic
+tests/contract/test_constitution_double_landing.py::test_c9_code_ssot_and_str006_are_not_merged
+tests/contract/test_dogfooding_practice.py::test_c6_terminology_constitution
+tests/contract/test_fast_fail_discipline.py::test_x4_live_constitution_principle_xvi
+tests/contract/test_one_source_of_truth.py::test_c8_constitution_principle_present
+tests/contract/test_one_source_of_truth.py::test_c8_constitution_version_bumped
+tests/contract/test_tools_command_routing.py::TestToolConceptDefinition::test_constitution_codifies_tool_reuse
+
+## R4-confirmation-gate-sha-pins (46 ids)
+
+tests/contract/test_confirmation_gates_sweep.py::test_all_required_sections_present
+tests/contract/test_confirmation_gates_sweep.py::test_anti_backflow_rule
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[SKILL.md0]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[SKILL.md1]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[SKILL.md2]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[SKILL.md3]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[SKILL.md4]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[goal.md]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[team.md]
+tests/contract/test_confirmation_gates_sweep.py::test_concept_basis_reference
+tests/contract/test_confirmation_gates_sweep.py::test_continuous_tiered_gates_untouched
+tests/contract/test_confirmation_gates_sweep.py::test_destructive_list_floor
+tests/contract/test_confirmation_gates_sweep.py::test_doubtful_strict_rule
+tests/contract/test_confirmation_gates_sweep.py::test_execution_report_granularity_and_failure_rules
+tests/contract/test_confirmation_gates_sweep.py::test_goal_empty_overwrite_is_registered_as_destructive
+tests/contract/test_confirmation_gates_sweep.py::test_goal_surface_adds_nothing_to_the_gate_count[goal-definitions.md]
+tests/contract/test_confirmation_gates_sweep.py::test_goal_surface_adds_nothing_to_the_gate_count[goal.md]
+tests/contract/test_confirmation_gates_sweep.py::test_governance_kept_list_floor
+tests/contract/test_confirmation_gates_sweep.py::test_no_reversible_gates_remain_blocking
+tests/contract/test_confirmation_gates_sweep.py::test_nonblocking_submission_notice_rule
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[shared/definitions/tool-definitions.md-Execution never happens before user confirmation via preview gate]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[shared/workflow/glossary.md---confirmed-resolution]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/external/git-utils/SKILL.md-force-with-lease]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/analyze-artifacts/SKILL.md-the user must approve, and any follow-up editing command is invoked]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/create-team/references/operating-loops.md-\u5206\u7ea7\u786e\u8ba4]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/implement-feature/SKILL.md-CONFIRM]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/implement-feature/SKILL.md-only execute on explicit user approval]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/manage-feedback/references/path-a-digest.md-The user confirms the **routing decisions** in the digest report]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/manage-todo/SKILL.md-only execute on explicit user approval]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/sanitize-materials/SKILL.md-for user confirmation before any execution]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/docs.md-stop-and-confirm]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/feature.md-status]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/interview.md-confirm]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/session.md-same-name]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/tools.md-confirm]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/constitution-template.md-irreversible]
+tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+tests/contract/test_confirmation_gates_sweep.py::test_run_determination_surface_adds_nothing_to_the_gate_count[feedback-step.md]
+tests/contract/test_confirmation_gates_sweep.py::test_run_determination_surface_adds_nothing_to_the_gate_count[instructions-template.md]
+tests/contract/test_confirmation_gates_sweep.py::test_team_command_direct_persist_and_report
+tests/contract/test_confirmation_gates_sweep.py::test_team_surface_carries_no_blocking_wording[SKILL.md]
+tests/contract/test_confirmation_gates_sweep.py::test_team_surface_carries_no_blocking_wording[create-mode.md]
+tests/contract/test_confirmation_gates_sweep.py::test_team_surface_carries_no_blocking_wording[execution-guide.md]
+tests/contract/test_confirmation_gates_sweep.py::test_team_surface_carries_no_blocking_wording[team.md]
+tests/contract/test_confirmation_gates_sweep.py::test_two_level_taxonomy_normative
+tests/contract/test_confirmation_gates_sweep.py::test_wrapup_submission_prompt_nonblocking
+
+## R5-fast-fail-contract (105 ids)
+
+tests/contract/test_fast_fail_discipline.py::test_a10_no_engine_invocation_form
+tests/contract/test_fast_fail_discipline.py::test_a11_project_neutral
+tests/contract/test_fast_fail_discipline.py::test_a12_no_speckit_command_form
+tests/contract/test_fast_fail_discipline.py::test_a13_recovery_path_names_real_cli_asset
+tests/contract/test_fast_fail_discipline.py::test_a14_no_refresh_instructions_restores_mirror
+tests/contract/test_fast_fail_discipline.py::test_a15_forbidden_sentence_mutation_drill
+tests/contract/test_fast_fail_discipline.py::test_a16_instance_points_one_pointer_each
+tests/contract/test_fast_fail_discipline.py::test_a17_instance_points_sentinel
+tests/contract/test_fast_fail_discipline.py::test_a18_convergence_scope_bounded
+tests/contract/test_fast_fail_discipline.py::test_a19_channel_one_unobservable_self_statement
+tests/contract/test_fast_fail_discipline.py::test_a1_template_heading_present
+tests/contract/test_fast_fail_discipline.py::test_a2_live_instructions_heading_present
+tests/contract/test_fast_fail_discipline.py::test_a3_exactly_one_pointer_line_each
+tests/contract/test_fast_fail_discipline.py::test_a4_pointer_count_sentinel
+tests/contract/test_fast_fail_discipline.py::test_a5_four_discipline_sections_strict_order
+tests/contract/test_fast_fail_discipline.py::test_a6_not_inside_three_section_window
+tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22
+tests/contract/test_fast_fail_discipline.py::test_a8_no_inlined_section_names
+tests/contract/test_fast_fail_discipline.py::test_a9_house_lead_sentence_form
+tests/contract/test_fast_fail_discipline.py::test_c10_triage_criteria_seven_items
+tests/contract/test_fast_fail_discipline.py::test_c11_blast_radius_decidable
+tests/contract/test_fast_fail_discipline.py::test_c12_blind_check_sentinel_reference
+tests/contract/test_fast_fail_discipline.py::test_c13_list_entry_syntax_closed
+tests/contract/test_fast_fail_discipline.py::test_c14_seven_named_failures_locatable
+tests/contract/test_fast_fail_discipline.py::test_c15_named_failure_sentinel
+tests/contract/test_fast_fail_discipline.py::test_c16_gate_discipline_delegated_by_path
+tests/contract/test_fast_fail_discipline.py::test_c17_surface_report_and_disclosure
+tests/contract/test_fast_fail_discipline.py::test_c18_growth_loop_marker_and_bidirectional
+tests/contract/test_fast_fail_discipline.py::test_c19_growth_loop_three_numbers
+tests/contract/test_fast_fail_discipline.py::test_c1_truth_source_doc_exists
+tests/contract/test_fast_fail_discipline.py::test_c20_marker_literals_are_mutually_disjoint
+tests/contract/test_fast_fail_discipline.py::test_c21_project_neutral
+tests/contract/test_fast_fail_discipline.py::test_c22_scope_limits_and_accepted_cost
+tests/contract/test_fast_fail_discipline.py::test_c2_mirror_byte_identical
+tests/contract/test_fast_fail_discipline.py::test_c3_filename_rename_guard
+tests/contract/test_fast_fail_discipline.py::test_c4_ownership_first_8_lines
+tests/contract/test_fast_fail_discipline.py::test_c5_failure_statement_first_20_lines
+tests/contract/test_fast_fail_discipline.py::test_c6_canonical_ufc_pointer_line
+tests/contract/test_fast_fail_discipline.py::test_c7_nine_section_closed_tuple
+tests/contract/test_fast_fail_discipline.py::test_c8_rfc2119_keywords
+tests/contract/test_fast_fail_discipline.py::test_c9_bilingual_h1
+tests/contract/test_fast_fail_discipline.py::test_g10_three_pins_independently_locatable
+tests/contract/test_fast_fail_discipline.py::test_g11_pins_and_baselines_not_modified
+tests/contract/test_fast_fail_discipline.py::test_g12_avoidance_is_wording_only
+tests/contract/test_fast_fail_discipline.py::test_g13_rewording_triggers_consistency_rerun
+tests/contract/test_fast_fail_discipline.py::test_g14_accepted_cost_in_scope_limits
+tests/contract/test_fast_fail_discipline.py::test_g15_cost_not_only_in_spec_mutation_drill
+tests/contract/test_fast_fail_discipline.py::test_g16_six_engines_zero_change
+tests/contract/test_fast_fail_discipline.py::test_g17_mirrors_produced_by_engines_only
+tests/contract/test_fast_fail_discipline.py::test_g1_prechange_baseline_frozen_relative
+tests/contract/test_fast_fail_discipline.py::test_g2_scanner_zero_change
+tests/contract/test_fast_fail_discipline.py::test_g3_counting_unit_is_matching_lines
+tests/contract/test_fast_fail_discipline.py::test_g4_scan_surface_covers_new_text
+tests/contract/test_fast_fail_discipline.py::test_g5_specify_dir_skipped
+tests/contract/test_fast_fail_discipline.py::test_g6_adjacent_discipline_name_avoided
+tests/contract/test_fast_fail_discipline.py::test_g7_stop_semantics_zero_hit
+tests/contract/test_fast_fail_discipline.py::test_g8_stop_semantics_anti_vacuity_sentinels
+tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+tests/contract/test_fast_fail_discipline.py::test_i10_channel_two_factory_presets_byte_equal
+tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+tests/contract/test_fast_fail_discipline.py::test_i12_channel_two_bounded_set
+tests/contract/test_fast_fail_discipline.py::test_i13_channel_three_payload_sixth_field_row
+tests/contract/test_fast_fail_discipline.py::test_i14_context_isolation_rules_unchanged
+tests/contract/test_fast_fail_discipline.py::test_i15_channel_one_inline_prompt_landing
+tests/contract/test_fast_fail_discipline.py::test_i16_three_channels_not_mutually_exclusive
+tests/contract/test_fast_fail_discipline.py::test_i17_subagent_definitions_dispatch_section
+tests/contract/test_fast_fail_discipline.py::test_i18_visibility_vs_governance_split
+tests/contract/test_fast_fail_discipline.py::test_i19_pre_dispatch_probe_obligation
+tests/contract/test_fast_fail_discipline.py::test_i1_exactly_one_delimiter_pair
+tests/contract/test_fast_fail_discipline.py::test_i20_anomaly_return_line_obligation
+tests/contract/test_fast_fail_discipline.py::test_i21_anomaly_halt_excluded_from_failure_rules
+tests/contract/test_fast_fail_discipline.py::test_i22_three_modes_equally_bound
+tests/contract/test_fast_fail_discipline.py::test_i23_per_hop_reinjection_and_precedence
+tests/contract/test_fast_fail_discipline.py::test_i26_channel_one_enforced_by_review
+tests/contract/test_fast_fail_discipline.py::test_i2_clause_identifier_present
+tests/contract/test_fast_fail_discipline.py::test_i3_three_mandatory_contents
+tests/contract/test_fast_fail_discipline.py::test_i4_path_may_not_substitute
+tests/contract/test_fast_fail_discipline.py::test_i5_clause_within_10_lines_1200_bytes
+tests/contract/test_fast_fail_discipline.py::test_i6_clause_lines_zero_blocking_hits
+tests/contract/test_fast_fail_discipline.py::test_i7_clause_size_and_hits_anti_vacuity_sentinels
+tests/contract/test_fast_fail_discipline.py::test_i8_channel_two_command_authoring_requirement
+tests/contract/test_fast_fail_discipline.py::test_i9_channel_two_skill_authoring_requirement
+tests/contract/test_fast_fail_discipline.py::test_x10_principle_block_lines_under_100
+tests/contract/test_fast_fail_discipline.py::test_x11_principle_block_no_restated_content
+tests/contract/test_fast_fail_discipline.py::test_x12_principle_block_project_neutral
+tests/contract/test_fast_fail_discipline.py::test_x13_double_landing_three_count_pins
+tests/contract/test_fast_fail_discipline.py::test_x14_min_version_floor_semantics
+tests/contract/test_fast_fail_discipline.py::test_x15_watchlist_gains_principle_title
+tests/contract/test_fast_fail_discipline.py::test_x16_plan_template_zero_change
+tests/contract/test_fast_fail_discipline.py::test_x17_plan_template_enumeration_sentinel
+tests/contract/test_fast_fail_discipline.py::test_x18_downstream_gate_rows_15_to_16
+tests/contract/test_fast_fail_discipline.py::test_x19_ufc_class_eleven_gains_fast_fail_path
+tests/contract/test_fast_fail_discipline.py::test_x1_template_principle_xiv
+tests/contract/test_fast_fail_discipline.py::test_x20_ufc_dedup_pin_raised_to_nine
+tests/contract/test_fast_fail_discipline.py::test_x21_ufc_override_column_unchanged
+tests/contract/test_fast_fail_discipline.py::test_x22_cross_discipline_change_recorded
+tests/contract/test_fast_fail_discipline.py::test_x23_surface_report_ownership_split
+tests/contract/test_fast_fail_discipline.py::test_x2_command_must_include_entry
+tests/contract/test_fast_fail_discipline.py::test_x3_double_landing_neither_side_missing
+tests/contract/test_fast_fail_discipline.py::test_x4_live_constitution_principle_xvi
+tests/contract/test_fast_fail_discipline.py::test_x5_live_version_minor_bump
+tests/contract/test_fast_fail_discipline.py::test_x6_sync_impact_report_prepended
+tests/contract/test_fast_fail_discipline.py::test_x7_version_three_segment_form
+tests/contract/test_fast_fail_discipline.py::test_x8_principle_block_structure
+tests/contract/test_fast_fail_discipline.py::test_x9_principle_block_pointer_and_no_new_mechanism
+
+## UNION (302 ids — FB-03 retention set)
+
+tests/contract/test_agent_dispatch_mechanism.py::test_c14_mirror_pair_byte_identical
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[claude-code-guide.md-create-agent]
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[claude-code-guide.md-improve-agent]
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[claude-code-guide.md-improve-skills]
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[copilot-guide.md-create-agent]
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[copilot-guide.md-improve-agent]
+tests/contract/test_agent_specific_config_skills.py::TestC004ReferenceDocumentStructure::test_guide_has_required_sections[copilot-guide.md-improve-skills]
+tests/contract/test_ask_record_repeat.py::test_doc_exists_with_byte_identical_mirror
+tests/contract/test_ask_record_repeat.py::test_mirrored_engine_still_resolves_its_own_project
+tests/contract/test_ask_record_repeat.py::test_sections_are_pointer_shaped_not_content_copies
+tests/contract/test_ask_record_repeat.py::test_template_mirror_parity
+tests/contract/test_ask_record_repeat.py::test_two_hats_owner_doc_has_mirror_parity
+tests/contract/test_checker_form.py::test_c31_mirror_pair_covers_scripts_with_strict_extras
+tests/contract/test_checker_form.py::test_c32_proxy_every_written_pair_has_a_row_in_the_mirror_table
+tests/contract/test_confirmation_gates_sweep.py::test_all_required_sections_present
+tests/contract/test_confirmation_gates_sweep.py::test_anti_backflow_rule
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[SKILL.md0]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[SKILL.md1]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[SKILL.md2]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[SKILL.md3]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[SKILL.md4]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[goal.md]
+tests/contract/test_confirmation_gates_sweep.py::test_auto_exec_surface_carries_report_instructions[team.md]
+tests/contract/test_confirmation_gates_sweep.py::test_concept_basis_reference
+tests/contract/test_confirmation_gates_sweep.py::test_continuous_tiered_gates_untouched
+tests/contract/test_confirmation_gates_sweep.py::test_destructive_list_floor
+tests/contract/test_confirmation_gates_sweep.py::test_doubtful_strict_rule
+tests/contract/test_confirmation_gates_sweep.py::test_execution_report_granularity_and_failure_rules
+tests/contract/test_confirmation_gates_sweep.py::test_goal_empty_overwrite_is_registered_as_destructive
+tests/contract/test_confirmation_gates_sweep.py::test_goal_surface_adds_nothing_to_the_gate_count[goal-definitions.md]
+tests/contract/test_confirmation_gates_sweep.py::test_goal_surface_adds_nothing_to_the_gate_count[goal.md]
+tests/contract/test_confirmation_gates_sweep.py::test_governance_kept_list_floor
+tests/contract/test_confirmation_gates_sweep.py::test_no_reversible_gates_remain_blocking
+tests/contract/test_confirmation_gates_sweep.py::test_nonblocking_submission_notice_rule
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[shared/definitions/tool-definitions.md-Execution never happens before user confirmation via preview gate]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[shared/workflow/glossary.md---confirmed-resolution]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/external/git-utils/SKILL.md-force-with-lease]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/analyze-artifacts/SKILL.md-the user must approve, and any follow-up editing command is invoked]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/create-team/references/operating-loops.md-\u5206\u7ea7\u786e\u8ba4]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/implement-feature/SKILL.md-CONFIRM]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/implement-feature/SKILL.md-only execute on explicit user approval]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/manage-feedback/references/path-a-digest.md-The user confirms the **routing decisions** in the digest report]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/manage-todo/SKILL.md-only execute on explicit user approval]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[skills/internal/sanitize-materials/SKILL.md-for user confirmation before any execution]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/docs.md-stop-and-confirm]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/feature.md-status]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/interview.md-confirm]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/session.md-same-name]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/tools.md-confirm]
+tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/constitution-template.md-irreversible]
+tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+tests/contract/test_confirmation_gates_sweep.py::test_run_determination_surface_adds_nothing_to_the_gate_count[feedback-step.md]
+tests/contract/test_confirmation_gates_sweep.py::test_run_determination_surface_adds_nothing_to_the_gate_count[instructions-template.md]
+tests/contract/test_confirmation_gates_sweep.py::test_team_command_direct_persist_and_report
+tests/contract/test_confirmation_gates_sweep.py::test_team_surface_carries_no_blocking_wording[SKILL.md]
+tests/contract/test_confirmation_gates_sweep.py::test_team_surface_carries_no_blocking_wording[create-mode.md]
+tests/contract/test_confirmation_gates_sweep.py::test_team_surface_carries_no_blocking_wording[execution-guide.md]
+tests/contract/test_confirmation_gates_sweep.py::test_team_surface_carries_no_blocking_wording[team.md]
+tests/contract/test_confirmation_gates_sweep.py::test_two_level_taxonomy_normative
+tests/contract/test_confirmation_gates_sweep.py::test_wrapup_submission_prompt_nonblocking
+tests/contract/test_constitution_double_landing.py::test_c10_removing_a_watchlist_principle_breaks_c7[command]
+tests/contract/test_constitution_double_landing.py::test_c10_removing_a_watchlist_principle_breaks_c7[template]
+tests/contract/test_constitution_double_landing.py::test_c11_live_constitution_carries_the_comprehension_principle
+tests/contract/test_constitution_double_landing.py::test_c12_live_constitution_version_and_sync_impact_report
+tests/contract/test_constitution_double_landing.py::test_c13_new_principle_blocks_have_zero_blocking_hits[One Source of Truth (Authority & Reference Discipline)]
+tests/contract/test_constitution_double_landing.py::test_c13_new_principle_blocks_have_zero_blocking_hits[User-Facing Comprehension (No Jargon, With Context)]
+tests/contract/test_constitution_double_landing.py::test_c1_template_carries_both_new_principles
+tests/contract/test_constitution_double_landing.py::test_c2_new_principle_structure_is_compliant[One Source of Truth (Authority & Reference Discipline)]
+tests/contract/test_constitution_double_landing.py::test_c2_new_principle_structure_is_compliant[User-Facing Comprehension (No Jargon, With Context)]
+tests/contract/test_constitution_double_landing.py::test_c3_new_principle_anchors_its_truth_document[One Source of Truth (Authority & Reference Discipline)]
+tests/contract/test_constitution_double_landing.py::test_c3_new_principle_anchors_its_truth_document[User-Facing Comprehension (No Jargon, With Context)]
+tests/contract/test_constitution_double_landing.py::test_c4_new_principle_declares_no_new_machinery[One Source of Truth (Authority & Reference Discipline)]
+tests/contract/test_constitution_double_landing.py::test_c4_new_principle_declares_no_new_machinery[User-Facing Comprehension (No Jargon, With Context)]
+tests/contract/test_constitution_double_landing.py::test_c5_command_must_include_list_has_both_entries
+tests/contract/test_constitution_double_landing.py::test_c6_command_entry_has_anchor_and_scope_sub_bullets[One Source of Truth (Authority & Reference Discipline)]
+tests/contract/test_constitution_double_landing.py::test_c6_command_entry_has_anchor_and_scope_sub_bullets[User-Facing Comprehension (No Jargon, With Context)]
+tests/contract/test_constitution_double_landing.py::test_c7_watchlist_principles_land_on_both_sides
+tests/contract/test_constitution_double_landing.py::test_c8_matcher_is_numeral_agnostic
+tests/contract/test_constitution_double_landing.py::test_c9_code_ssot_and_str006_are_not_merged
+tests/contract/test_criterion_subject.py::test_the_mirror_of_the_owner_doc_matches_and_the_clause_count_holds
+tests/contract/test_derivation_definitions.py::test_anchor_carries_the_required_sections[Contradiction Handling]
+tests/contract/test_derivation_definitions.py::test_anchor_carries_the_required_sections[Script / Prompt Boundary]
+tests/contract/test_derivation_definitions.py::test_anchor_carries_the_required_sections[Terminology Boundaries]
+tests/contract/test_derivation_definitions.py::test_specify_mirror_is_byte_identical
+tests/contract/test_derive_command_surface.py::test_engine_and_its_specify_mirror_are_byte_identical
+tests/contract/test_derive_engine_contract.py::test_engine_and_its_specify_mirror_are_byte_identical
+tests/contract/test_derive_engine_contract.py::test_specify_mirror_guard_is_present_in_source
+tests/contract/test_derive_engine_contract.py::test_workspace_root_specify_mirror_resolves_to_the_parent
+tests/contract/test_docs_command_template.py::test_c12_skill_source_mirror_byte_identity
+tests/contract/test_docs_command_template.py::test_c1_source_and_mirror
+tests/contract/test_docs_step_injection.py::test_c1_single_source_and_mirror
+tests/contract/test_docs_utils_cli.py::test_c1_mirror_is_byte_identical
+tests/contract/test_dogfooding_practice.py::test_c2_doc_exists_with_mirror
+tests/contract/test_dogfooding_practice.py::test_c2_section_present_in_template
+tests/contract/test_dogfooding_practice.py::test_c3_mirror_byte_identical
+tests/contract/test_dogfooding_practice.py::test_c4_engine_mirror_untouched
+tests/contract/test_dogfooding_practice.py::test_c5_section_appears_once_per_mirror
+tests/contract/test_dogfooding_practice.py::test_c6_terminology_constitution
+tests/contract/test_evidence_step_conformance.py::TestCollectEvidenceSkill::test_feedback_section_present
+tests/contract/test_evidence_step_conformance.py::TestCollectEvidenceSkill::test_mirror_identical
+tests/contract/test_evidence_step_conformance.py::TestEvidenceStepConvention::test_mirrored_to_source_side
+tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-agent]
+tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-skills]
+tests/contract/test_evidence_step_conformance.py::TestImproveSkillIntegration::test_mirror_identical[improve-team]
+tests/contract/test_evidence_utils_cli.py::TestMirror::test_mirror_identical
+tests/contract/test_fast_fail_discipline.py::test_a10_no_engine_invocation_form
+tests/contract/test_fast_fail_discipline.py::test_a11_project_neutral
+tests/contract/test_fast_fail_discipline.py::test_a12_no_speckit_command_form
+tests/contract/test_fast_fail_discipline.py::test_a13_recovery_path_names_real_cli_asset
+tests/contract/test_fast_fail_discipline.py::test_a14_no_refresh_instructions_restores_mirror
+tests/contract/test_fast_fail_discipline.py::test_a15_forbidden_sentence_mutation_drill
+tests/contract/test_fast_fail_discipline.py::test_a16_instance_points_one_pointer_each
+tests/contract/test_fast_fail_discipline.py::test_a17_instance_points_sentinel
+tests/contract/test_fast_fail_discipline.py::test_a18_convergence_scope_bounded
+tests/contract/test_fast_fail_discipline.py::test_a19_channel_one_unobservable_self_statement
+tests/contract/test_fast_fail_discipline.py::test_a1_template_heading_present
+tests/contract/test_fast_fail_discipline.py::test_a2_live_instructions_heading_present
+tests/contract/test_fast_fail_discipline.py::test_a3_exactly_one_pointer_line_each
+tests/contract/test_fast_fail_discipline.py::test_a4_pointer_count_sentinel
+tests/contract/test_fast_fail_discipline.py::test_a5_four_discipline_sections_strict_order
+tests/contract/test_fast_fail_discipline.py::test_a6_not_inside_three_section_window
+tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22
+tests/contract/test_fast_fail_discipline.py::test_a8_no_inlined_section_names
+tests/contract/test_fast_fail_discipline.py::test_a9_house_lead_sentence_form
+tests/contract/test_fast_fail_discipline.py::test_c10_triage_criteria_seven_items
+tests/contract/test_fast_fail_discipline.py::test_c11_blast_radius_decidable
+tests/contract/test_fast_fail_discipline.py::test_c12_blind_check_sentinel_reference
+tests/contract/test_fast_fail_discipline.py::test_c13_list_entry_syntax_closed
+tests/contract/test_fast_fail_discipline.py::test_c14_seven_named_failures_locatable
+tests/contract/test_fast_fail_discipline.py::test_c15_named_failure_sentinel
+tests/contract/test_fast_fail_discipline.py::test_c16_gate_discipline_delegated_by_path
+tests/contract/test_fast_fail_discipline.py::test_c17_surface_report_and_disclosure
+tests/contract/test_fast_fail_discipline.py::test_c18_growth_loop_marker_and_bidirectional
+tests/contract/test_fast_fail_discipline.py::test_c19_growth_loop_three_numbers
+tests/contract/test_fast_fail_discipline.py::test_c1_truth_source_doc_exists
+tests/contract/test_fast_fail_discipline.py::test_c20_marker_literals_are_mutually_disjoint
+tests/contract/test_fast_fail_discipline.py::test_c21_project_neutral
+tests/contract/test_fast_fail_discipline.py::test_c22_scope_limits_and_accepted_cost
+tests/contract/test_fast_fail_discipline.py::test_c2_mirror_byte_identical
+tests/contract/test_fast_fail_discipline.py::test_c3_filename_rename_guard
+tests/contract/test_fast_fail_discipline.py::test_c4_ownership_first_8_lines
+tests/contract/test_fast_fail_discipline.py::test_c5_failure_statement_first_20_lines
+tests/contract/test_fast_fail_discipline.py::test_c6_canonical_ufc_pointer_line
+tests/contract/test_fast_fail_discipline.py::test_c7_nine_section_closed_tuple
+tests/contract/test_fast_fail_discipline.py::test_c8_rfc2119_keywords
+tests/contract/test_fast_fail_discipline.py::test_c9_bilingual_h1
+tests/contract/test_fast_fail_discipline.py::test_g10_three_pins_independently_locatable
+tests/contract/test_fast_fail_discipline.py::test_g11_pins_and_baselines_not_modified
+tests/contract/test_fast_fail_discipline.py::test_g12_avoidance_is_wording_only
+tests/contract/test_fast_fail_discipline.py::test_g13_rewording_triggers_consistency_rerun
+tests/contract/test_fast_fail_discipline.py::test_g14_accepted_cost_in_scope_limits
+tests/contract/test_fast_fail_discipline.py::test_g15_cost_not_only_in_spec_mutation_drill
+tests/contract/test_fast_fail_discipline.py::test_g16_six_engines_zero_change
+tests/contract/test_fast_fail_discipline.py::test_g17_mirrors_produced_by_engines_only
+tests/contract/test_fast_fail_discipline.py::test_g1_prechange_baseline_frozen_relative
+tests/contract/test_fast_fail_discipline.py::test_g2_scanner_zero_change
+tests/contract/test_fast_fail_discipline.py::test_g3_counting_unit_is_matching_lines
+tests/contract/test_fast_fail_discipline.py::test_g4_scan_surface_covers_new_text
+tests/contract/test_fast_fail_discipline.py::test_g5_specify_dir_skipped
+tests/contract/test_fast_fail_discipline.py::test_g6_adjacent_discipline_name_avoided
+tests/contract/test_fast_fail_discipline.py::test_g7_stop_semantics_zero_hit
+tests/contract/test_fast_fail_discipline.py::test_g8_stop_semantics_anti_vacuity_sentinels
+tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+tests/contract/test_fast_fail_discipline.py::test_i10_channel_two_factory_presets_byte_equal
+tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+tests/contract/test_fast_fail_discipline.py::test_i12_channel_two_bounded_set
+tests/contract/test_fast_fail_discipline.py::test_i13_channel_three_payload_sixth_field_row
+tests/contract/test_fast_fail_discipline.py::test_i14_context_isolation_rules_unchanged
+tests/contract/test_fast_fail_discipline.py::test_i15_channel_one_inline_prompt_landing
+tests/contract/test_fast_fail_discipline.py::test_i16_three_channels_not_mutually_exclusive
+tests/contract/test_fast_fail_discipline.py::test_i17_subagent_definitions_dispatch_section
+tests/contract/test_fast_fail_discipline.py::test_i18_visibility_vs_governance_split
+tests/contract/test_fast_fail_discipline.py::test_i19_pre_dispatch_probe_obligation
+tests/contract/test_fast_fail_discipline.py::test_i1_exactly_one_delimiter_pair
+tests/contract/test_fast_fail_discipline.py::test_i20_anomaly_return_line_obligation
+tests/contract/test_fast_fail_discipline.py::test_i21_anomaly_halt_excluded_from_failure_rules
+tests/contract/test_fast_fail_discipline.py::test_i22_three_modes_equally_bound
+tests/contract/test_fast_fail_discipline.py::test_i23_per_hop_reinjection_and_precedence
+tests/contract/test_fast_fail_discipline.py::test_i26_channel_one_enforced_by_review
+tests/contract/test_fast_fail_discipline.py::test_i2_clause_identifier_present
+tests/contract/test_fast_fail_discipline.py::test_i3_three_mandatory_contents
+tests/contract/test_fast_fail_discipline.py::test_i4_path_may_not_substitute
+tests/contract/test_fast_fail_discipline.py::test_i5_clause_within_10_lines_1200_bytes
+tests/contract/test_fast_fail_discipline.py::test_i6_clause_lines_zero_blocking_hits
+tests/contract/test_fast_fail_discipline.py::test_i7_clause_size_and_hits_anti_vacuity_sentinels
+tests/contract/test_fast_fail_discipline.py::test_i8_channel_two_command_authoring_requirement
+tests/contract/test_fast_fail_discipline.py::test_i9_channel_two_skill_authoring_requirement
+tests/contract/test_fast_fail_discipline.py::test_x10_principle_block_lines_under_100
+tests/contract/test_fast_fail_discipline.py::test_x11_principle_block_no_restated_content
+tests/contract/test_fast_fail_discipline.py::test_x12_principle_block_project_neutral
+tests/contract/test_fast_fail_discipline.py::test_x13_double_landing_three_count_pins
+tests/contract/test_fast_fail_discipline.py::test_x14_min_version_floor_semantics
+tests/contract/test_fast_fail_discipline.py::test_x15_watchlist_gains_principle_title
+tests/contract/test_fast_fail_discipline.py::test_x16_plan_template_zero_change
+tests/contract/test_fast_fail_discipline.py::test_x17_plan_template_enumeration_sentinel
+tests/contract/test_fast_fail_discipline.py::test_x18_downstream_gate_rows_15_to_16
+tests/contract/test_fast_fail_discipline.py::test_x19_ufc_class_eleven_gains_fast_fail_path
+tests/contract/test_fast_fail_discipline.py::test_x1_template_principle_xiv
+tests/contract/test_fast_fail_discipline.py::test_x20_ufc_dedup_pin_raised_to_nine
+tests/contract/test_fast_fail_discipline.py::test_x21_ufc_override_column_unchanged
+tests/contract/test_fast_fail_discipline.py::test_x22_cross_discipline_change_recorded
+tests/contract/test_fast_fail_discipline.py::test_x23_surface_report_ownership_split
+tests/contract/test_fast_fail_discipline.py::test_x2_command_must_include_entry
+tests/contract/test_fast_fail_discipline.py::test_x3_double_landing_neither_side_missing
+tests/contract/test_fast_fail_discipline.py::test_x4_live_constitution_principle_xvi
+tests/contract/test_fast_fail_discipline.py::test_x5_live_version_minor_bump
+tests/contract/test_fast_fail_discipline.py::test_x6_sync_impact_report_prepended
+tests/contract/test_fast_fail_discipline.py::test_x7_version_three_segment_form
+tests/contract/test_fast_fail_discipline.py::test_x8_principle_block_structure
+tests/contract/test_fast_fail_discipline.py::test_x9_principle_block_pointer_and_no_new_mechanism
+tests/contract/test_feedback_probe_cli.py::TestMapAction::test_map_is_deterministic_byte_identical
+tests/contract/test_feedback_probe_entry_schema.py::TestRecordProbeResolution::test_index_mirror_carries_probe_keys
+tests/contract/test_feedback_skill_conformance.py::test_every_runtime_mirror_skill_carries_feedback_section
+tests/contract/test_feedback_step_reference_form.py::test_owner_mirror_is_byte_identical
+tests/contract/test_feedback_two_path_routing.py::TestIntrospectionPresenceAndPosition::test_introspection_section_present_inside_path_a
+tests/contract/test_git_workflow_instructions_block.py::test_skill_mirror_is_byte_identical
+tests/contract/test_glossary_mechanism.py::test_glossary_template_present_and_mirrored
+tests/contract/test_glossary_mechanism.py::test_instructions_template_mirror_identical
+tests/contract/test_glossary_mechanism.py::test_shared_protocol_present_and_mirrored
+tests/contract/test_goal_definition.py::test_required_sections_present[## History]
+tests/contract/test_goal_definition.py::test_required_sections_present[## Objective]
+tests/contract/test_goal_definition.py::test_required_sections_present[## Success Criteria]
+tests/contract/test_goal_targets_engine.py::test_engine_exists_with_its_mirror
+tests/contract/test_goal_writeset.py::TestInvariantGroups::test_mapping_mirror_is_byte_identical
+tests/contract/test_hugo_scaffold_contract.py::test_mirror_parity_for_the_whole_skill
+tests/contract/test_install_script.py::test_dry_run_intranet_only_drops_public_mirrors
+tests/contract/test_instructions_section_propagation.py::test_c1_live_instructions_carry_all_template_sections
+tests/contract/test_mirror_root_guard.py::test_canonical_and_mirror_check_agree
+tests/contract/test_mirror_root_guard.py::test_mirror_placed_sync_mirrors_never_nests
+tests/contract/test_neutrality_budget.py::test_c10_the_scanner_and_its_mirror_are_untouched_in_the_window
+tests/contract/test_no_organize_agents_refs.py::TestNoOrganizeAgentsRefs::test_skills_mirror_parity
+tests/contract/test_non_regression_064.py::test_ng_08_mirror_no_new_drift
+tests/contract/test_objective_analysis_gate.py::test_owner_doc_exists_and_mirror_is_byte_identical
+tests/contract/test_one_source_of_truth.py::test_c1_doc_exists_with_mirror
+tests/contract/test_one_source_of_truth.py::test_c2_doc_has_all_sections
+tests/contract/test_one_source_of_truth.py::test_c8_constitution_principle_present
+tests/contract/test_one_source_of_truth.py::test_c8_constitution_version_bumped
+tests/contract/test_one_source_of_truth.py::test_c9_mirror_parity
+tests/contract/test_portable_skill_creation.py::test_create_skills_mirror_parity
+tests/contract/test_proactive_trigger_section.py::test_c2_mirror_parity
+tests/contract/test_proactive_trigger_section.py::test_doc_c1_exists_with_byte_identical_mirror
+tests/contract/test_proactive_trigger_section.py::test_doc_c2_section_set_closed_and_ordered
+tests/contract/test_progress_reporting.py::test_doc_exists_with_byte_identical_mirror
+tests/contract/test_progress_reporting.py::test_template_mirrors_are_byte_identical
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[knowledge-manager]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[module-designer]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[qa-engineer]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[requirements-analyst]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[system-designer]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[test-engineer]
+tests/contract/test_role_templates.py::TestRoleTemplateSections::test_mandatory_sections_present[ux-analyst]
+tests/contract/test_run_determination_engine.py::TestOwnerSurfaces::test_engine_home_is_the_framework_root_not_the_mirror
+tests/contract/test_run_determination_engine.py::TestSeparationFromSituationalAssessment::test_engine_does_not_write_the_mirror_by_hand
+tests/contract/test_run_skills_wiring.py::test_c1_run_skills_canonical_and_mirror_identical
+tests/contract/test_run_skills_wiring.py::test_c7_run_team_canonical_and_mirror_identical
+tests/contract/test_runtime_mode_gate.py::test_every_runtime_mirror_skill_feedback_carries_mode_gate
+tests/contract/test_runtime_mode_gate.py::test_runtime_mode_doc_exists_in_source_and_mirror
+tests/contract/test_sanitize_template.py::test_engine_invocations_use_workspace_mirror_path
+tests/contract/test_sanitize_template.py::test_handoffs_section_present
+tests/contract/test_scan_confirmation_gates.py::test_mirror_roots_excluded
+tests/contract/test_scripts_distribution_parity.py::TestScriptsDistributionParity::test_compare_pair_reports_mirror_only_file_as_extra
+tests/contract/test_sdd_loop_driver_cli_profiles.py::test_clp_16_delivery_mirror_docs
+tests/contract/test_sdd_loop_driver_efficiency.py::test_di_05_delivery_and_mirror
+tests/contract/test_sdd_loop_driver_skill.py::test_c10_stage_prompts_all_sections_present
+tests/contract/test_sdd_loop_driver_skill.py::test_c12_mirror_byte_identical
+tests/contract/test_sdd_loop_driver_skill.py::test_c18_mirror_pair_no_drift
+tests/contract/test_sdd_loop_driver_skill.py::test_c3_skill_md_section_set
+tests/contract/test_sdd_project_setup_skill.py::test_c10_mirror_byte_identical
+tests/contract/test_sdd_project_setup_skill.py::test_c3_skill_md_section_set
+tests/contract/test_sdd_workflow_removed.py::test_sdd_workflow_skill_dir_absent_in_installed_mirror
+tests/contract/test_self_improvement_conformance.py::test_c10_runtime_skill_mirrors_are_current
+tests/contract/test_self_improvement_conformance.py::test_c4_canonical_shared_files_are_mirrored_byte_identically
+tests/contract/test_summarize_project_prompt_assets.py::test_mirror_is_byte_equivalent[study-project]
+tests/contract/test_summarize_project_prompt_assets.py::test_mirror_is_byte_equivalent[summarize-project]
+tests/contract/test_summary_writeset.py::test_reader_sections_carry_no_internal_identifiers
+tests/contract/test_task_complexity_rubric.py::test_c10_mirror_parity
+tests/contract/test_task_complexity_rubric.py::test_c1_doc_exists_with_mirror
+tests/contract/test_todo_in_context_wiring.py::TestTodoInContextWiring::test_guideline_is_mirrored_byte_exact
+tests/contract/test_token_efficiency_discipline.py::test_cd1_mirror_byte_identical
+tests/contract/test_token_efficiency_discipline.py::test_cd2_required_sections_present
+tests/contract/test_token_efficiency_discipline.py::test_cd4_instructions_template_mirror_identical
+tests/contract/test_token_efficiency_feedback.py::test_cm1_mirror_identical
+tests/contract/test_token_efficiency_feedback.py::test_cm2_engine_mirror_identical
+tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/external/create-skills/references/skill-creation-quality-checklist.md]
+tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/external/improve-skills/references/skill-quality-checklist.md]
+tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/internal/create-agent/SKILL.md]
+tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/internal/create-team/SKILL.md]
+tests/contract/test_token_efficiency_gates.py::test_ca3_skill_mirror_identical[skills/internal/create-tools/SKILL.md]
+tests/contract/test_tools_command_routing.py::TestToolConceptDefinition::test_constitution_codifies_tool_reuse
+tests/contract/test_tools_command_routing.py::TestToolSkillPairPresence::test_skill_mirror_in_sync[skill_path0-create-tools]
+tests/contract/test_tools_command_routing.py::TestToolSkillPairPresence::test_skill_mirror_in_sync[skill_path1-improve-tools]
+tests/contract/test_trigger_engine.py::test_c2_mirror_byte_identical
+tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+tests/contract/test_trigger_engine.py::test_c7_mirror_invocation_resolves_the_repo_not_specify
+tests/contract/test_trigger_seed_derivation.py::test_c1_seed_exists_and_mirror_is_byte_identical
+tests/contract/test_user_facing_comprehension_doc.py::test_c2_mirror_is_byte_identical
+tests/contract/test_user_facing_comprehension_doc.py::test_c6_seven_sections_present_verbatim
+tests/contract/test_user_facing_comprehension_pointers.py::test_c14_per_tool_copies_regenerated_and_retired_mirror_absent
+tests/contract/test_user_facing_comprehension_pointers.py::test_c3_mirrors_are_byte_identical
+tests/contract/test_user_facing_comprehension_pointers.py::test_c4_criteria_sections_are_verbatim_frozen
+tests/contract/test_user_facing_comprehension_section.py::test_c2_mirror_carries_the_section_and_is_byte_identical
+tests/contract/test_workspace_isolation_contract.py::test_doc_wi_11_mirrors_once

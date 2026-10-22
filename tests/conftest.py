@@ -11,6 +11,24 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 
+@pytest.fixture(autouse=True)
+def _neutralize_host_git_config(tmp_path_factory, monkeypatch):
+    """RC-07 (067): point GIT_CONFIG_GLOBAL / GIT_CONFIG_SYSTEM at empty temp files.
+
+    Scope: the test process tree only (git subprocesses inherit the env). The host
+    git configuration — including any global ``core.hooksPath`` hook tax — is never
+    read by tests; asserts nothing changes semantically. Reversible: deleting this
+    fixture restores prior behavior. Per-test temp files keep cases isolated.
+    """
+    cfg_dir = tmp_path_factory.mktemp("rc07-git-config")
+    global_cfg = cfg_dir / "gitconfig-global"
+    system_cfg = cfg_dir / "gitconfig-system"
+    global_cfg.write_text("", encoding="utf-8")
+    system_cfg.write_text("", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(global_cfg))
+    monkeypatch.setenv("GIT_CONFIG_SYSTEM", str(system_cfg))
+
+
 @pytest.fixture
 def workspace_root(tmp_path: Path) -> Path:
     return tmp_path
