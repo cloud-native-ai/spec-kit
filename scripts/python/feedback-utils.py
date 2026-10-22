@@ -1095,12 +1095,280 @@ def action_upstream(args: argparse.Namespace) -> Dict[str, Any]:
     return detect_upstream({"upstream_repo": set_url or state["upstream_repo"]})
 
 
+# --------------------------------------------------------------------------- #
+# Exec-Quant payload (068 package leg; contracts/package-layout.md C-1..C-9)
+# --------------------------------------------------------------------------- #
+EXEC_QUANT_STORAGE_REL = Path(".specify") / "memory" / "exec-quant"
+PAYLOAD_DIRNAME = "exec-quant"
+PAYLOAD_RECORDS_DIRNAME = "records"
+PAYLOAD_MANIFEST_NAME = "payload-manifest.json"
+PAYLOAD_KIND = "speckit.exec-quant-payload"  # data-model § E4
+PAYLOAD_SCHEMA_VERSION = 1
+# [[STR-001]] (requirements § Shared Strings; same anchor as the quant
+# engine's KIND constant)
+RECORD_KIND = "speckit.exec-quant"
+# C-2 is the single normative source of the cap values; these constants are
+# the implementation's only definition of them (no second table anywhere).
+MAX_PAYLOAD_RECORDS = 1000
+MAX_PAYLOAD_BYTES = 16 * 1024 * 1024  # 16 MiB
+
+_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+_PROJECT_NAME_RE = re.compile(
+    r"^\s*(?:-\s*)?\*\*Project Name\*\*:\s*(.+?)\s*$", re.M)
+
+
+def exec_quant_dir(workspace_root: Path) -> Path:
+    return Path(workspace_root).resolve() / EXEC_QUANT_STORAGE_REL
+
+
+def _resolve_source_commit(workspace_root: Path) -> Optional[str]:
+    """Workspace HEAD commit (C-5 / research D3), or ``None``.
+
+    ``git rev-parse HEAD`` is implemented by its semantic — resolving the
+    workspace repo's current HEAD commit — via pure local file reads:
+    ``.git`` directory or gitdir-pointer file → ``HEAD`` → loose ref file →
+    ``packed-refs``. Rationale (recorded in notes/red-first-evidence.md,
+    ruling B): this engine carries a red-line guard
+    (``tests/unit/test_feedback_package.py::test_engine_source_has_no_network_
+    or_push``) that forbids a process-spawn surface, and the package leg is
+    zero-network (C-9). Any failure → ``None`` (no retry, no blocking). Only
+    40-hex values are accepted (data-model § E2); anything else degrades to
+    ``None``.
+    """
+    git = Path(workspace_root) / ".git"
+    try:
+        if git.is_file():  # worktree/submodule: "gitdir: <path>" pointer
+            pointer = git.read_text(encoding="utf-8").strip()
+            if not pointer.startswith("gitdir:"):
+                return None
+            git = (Path(workspace_root)
+                   / pointer[len("gitdir:"):].strip()).resolve()
+        if not git.is_dir():
+            return None
+        head = (git / "HEAD").read_text(encoding="utf-8").strip()
+        if _SHA_RE.match(head):  # detached HEAD
+            return head
+        if not head.startswith("ref:"):
+            return None
+        ref = head[len("ref:"):].strip()
+        loose = git / ref
+        if loose.is_file():
+            sha = loose.read_text(encoding="utf-8").strip()
+            return sha if _SHA_RE.match(sha) else None
+        packed = git / "packed-refs"
+        if packed.is_file():
+            for line in packed.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                sha, _, ref_name = line.partition(" ")
+                if ref_name == ref and _SHA_RE.match(sha):
+                    return sha
+        return None
+    except (OSError, ValueError):
+        return None
+
+
+def _resolve_package_identity(workspace_root: Path) -> Dict[str, Any]:
+    """Package-level source project identity (C-5 / research D3).
+
+    ``project_name``: ``**Project Name**:`` line of the workspace's
+    ``.specify/instructions.md`` → workspace directory basename → empty +
+    ``identity_status: "unknown-project"``. Never a filesystem absolute path
+    and no new credential surface (FR-003).
+    """
+    project_name = ""
+    instructions = (Path(workspace_root) / ".specify" / "instructions.md")
+    try:
+        match = _PROJECT_NAME_RE.search(instructions.read_text(encoding="utf-8"))
+        if match:
+            project_name = match.group(1)
+    except (OSError, ValueError):
+        pass
+    if not project_name:
+        project_name = Path(workspace_root).resolve().name or ""
+    return {
+        "project_name": project_name,
+        "source_commit": _resolve_source_commit(workspace_root),
+        "identity_status": "identified" if project_name else "unknown-project",
+    }
+
+
+def _read_payload_object(raw: bytes) -> Optional[Dict[str, Any]]:
+    """One swept item → record object, or None (C-1: object + kind gate)."""
+    try:
+        obj = json.loads(raw.decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        return None
+    if not isinstance(obj, dict) or obj.get("kind") != RECORD_KIND:
+        return None
+    return obj
+
+
+def _collect_exec_quant_payload(workspace_root: Path) -> Dict[str, Any]:
+    """Read-only sweep of the workspace exec-quant store (C-1 / C-2).
+
+    Dual form: per-entry ``records/*.json`` files plus the legacy single-file
+    ``records.jsonl`` stream, both fully included when they coexist (FR-001,
+    no watermark). Items that fail to parse as a record-kind object are
+    skipped and counted in ``skipped_unreadable``. Legacy entries are named
+    ``legacy-records-L%04d.json`` from physical line number 1; blank lines
+    are not records (ruling A, notes/red-first-evidence.md). Scan window =
+    snapshot taken when the sweep starts (A3 semantics). Sort key
+    ``(collected_at ascending, payload record name ascending)``; a missing
+    ``collected_at`` sorts as the empty string (ruling U-02). Caps are
+    applied to the sorted prefix as whole records (ruling U-01): the first
+    entry that would exceed a cap — and every entry after it — counts into
+    ``truncated_count``, so a single oversize record is itself truncated and
+    no partial bytes ever leave the store. Every probed item lands in
+    exactly one of the three buckets (ruling U-03), so
+    ``skipped_unreadable + truncated_count + record_count`` equals the
+    probed total.
+
+    Never raises: every degradation lands in a counter (C-9, non-blocking).
+    """
+    store = exec_quant_dir(workspace_root)
+    records_dir = store / "records"
+    legacy_path = store / "records.jsonl"
+    counts = {"records-dir": 0, "legacy-jsonl": 0}
+    skipped = 0
+    # candidates: (name, source_form, collected_at, raw bytes), usable only
+    candidates: List[Tuple[str, str, str, bytes]] = []
+
+    # Snapshot window (C-1): materialize the name list once at sweep start —
+    # writes landing mid-sweep are not included.
+    if records_dir.is_dir():
+        for path in sorted(records_dir.glob("*.json")):
+            try:
+                raw = path.read_bytes()
+            except OSError:
+                skipped += 1
+                continue
+            if _read_payload_object(raw) is None:
+                skipped += 1
+                continue
+            record = json.loads(raw.decode("utf-8"))
+            collected_at = str(record.get("collected_at", "") or "")
+            candidates.append((path.name, "records-dir", collected_at, raw))
+            counts["records-dir"] += 1
+    if legacy_path.is_file():
+        try:
+            lines = legacy_path.read_text(encoding="utf-8").splitlines()
+        except (OSError, ValueError):
+            lines = []
+        for lineno, line in enumerate(lines, start=1):
+            if not line.strip():
+                continue  # ruling A: blank line is not a record
+            raw = line.encode("utf-8")
+            if _read_payload_object(raw) is None:
+                skipped += 1
+                continue
+            record = json.loads(raw.decode("utf-8"))
+            collected_at = str(record.get("collected_at", "") or "")
+            candidates.append((f"legacy-records-L{lineno:04d}.json",
+                               "legacy-jsonl", collected_at, raw))
+            counts["legacy-jsonl"] += 1
+
+    # C-2: deterministic, cross-machine reproducible (ruling U-02).
+    candidates.sort(key=lambda c: (c[2], c[0]))
+
+    included: List[Dict[str, Any]] = []
+    total_bytes = 0
+    for name, source_form, collected_at, raw in candidates:
+        if (len(included) >= MAX_PAYLOAD_RECORDS
+                or total_bytes + len(raw) > MAX_PAYLOAD_BYTES):
+            break  # U-01: first violator and every entry after it truncate
+        included.append({"name": name, "source_form": source_form,
+                         "collected_at": collected_at, "data": raw})
+        total_bytes += len(raw)
+
+    return {
+        "identity": _resolve_package_identity(workspace_root),  # C-5 / D3
+        "records": included,
+        "record_count": len(included),
+        "source_form_counts": counts,
+        "skipped_unreadable": skipped,
+        "truncated_count": len(candidates) - len(included),
+        "cap_records": MAX_PAYLOAD_RECORDS,
+        "cap_bytes": MAX_PAYLOAD_BYTES,
+        "collected_at_range": ([included[0]["collected_at"],
+                                included[-1]["collected_at"]]
+                               if included else None),
+    }
+
+
+def _payload_report(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """C-7 JSON-report projection: counts + identity, never record bytes."""
+    identity = payload["identity"]
+    return {
+        "record_count": payload["record_count"],
+        "source_form_counts": dict(payload["source_form_counts"]),
+        "skipped_unreadable": payload["skipped_unreadable"],
+        "truncated_count": payload["truncated_count"],
+        "cap_records": payload["cap_records"],
+        "cap_bytes": payload["cap_bytes"],
+        "collected_at_range": payload["collected_at_range"],
+        "identity_status": identity["identity_status"],
+        "project_name": identity["project_name"] or None,
+        "source_commit": identity["source_commit"],
+    }
+
+
+def _render_payload_sections(
+        payload: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str]]:
+    """C-4 / C-6 / data-model E5: ONE renderer, two faces.
+
+    The machine manifest (``exec-quant/payload-manifest.json``, field set =
+    data-model § E4) and the human ``MANIFEST.md`` § Exec-Quant Payload lines
+    are derived here from the same payload values, so the two faces cannot
+    drift apart (One Source Of Truth). The empty-payload section is always
+    rendered and declares 「无量化数据」 (FR-005 explicit degradation).
+    """
+    identity = payload["identity"]
+    manifest = {
+        "schema_version": PAYLOAD_SCHEMA_VERSION,
+        "kind": PAYLOAD_KIND,
+        "identity": dict(identity),
+        "record_count": payload["record_count"],
+        "source_form_counts": dict(payload["source_form_counts"]),
+        "skipped_unreadable": payload["skipped_unreadable"],
+        "truncated_count": payload["truncated_count"],
+        "cap_records": payload["cap_records"],
+        "cap_bytes": payload["cap_bytes"],
+        "collected_at_range": payload["collected_at_range"],
+    }
+    forms = manifest["source_form_counts"]
+    project = identity["project_name"] or "unknown-project"
+    lines = ["## Exec-Quant Payload", ""]
+    if manifest["record_count"] == 0:
+        lines += ["Exec-Quant Payload: none (无量化数据).",
+                  "The source store had no readable exec-quant records at "
+                  "package time."]
+    else:
+        lines += [f"- **Records**: {manifest['record_count']}",
+                  f"- **Source forms**: records-dir {forms['records-dir']}, "
+                  f"legacy-jsonl {forms['legacy-jsonl']}"]
+    lines += [f"- **Skipped unreadable**: {manifest['skipped_unreadable']}",
+              f"- **Truncated**: {manifest['truncated_count']}",
+              f"- **Cap**: {manifest['cap_records']} records / "
+              f"{manifest['cap_bytes']} bytes "
+              f"(triggered: {'yes' if manifest['truncated_count'] else 'no'})",
+              f"- **Source project**: {project}"]
+    if manifest["collected_at_range"]:
+        lines.append(f"- **Collected range**: "
+                     f"{manifest['collected_at_range'][0]} → "
+                     f"{manifest['collected_at_range'][1]}")
+    lines.append("")
+    return manifest, lines
+
+
 def write_package(
     workspace_root: Path,
     index: Dict[str, Any],
     selected: List[Dict[str, Any]],
     notes: Optional[str] = None,
     include_introspection: bool = False,
+    payload: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Zip ``selected`` entries into ``packages/``; source files are never touched.
 
@@ -1109,11 +1377,25 @@ def write_package(
     When ``include_introspection`` is set, introspection reports referenced by
     the selected entries ride along under ``introspection/`` and are listed in
     a MANIFEST section (engine-cli C-9..C-12).
+
+    068 package leg: when ``payload`` (from ``_collect_exec_quant_payload``)
+    is given, its records ride along under ``exec-quant/`` as a first-class
+    payload (C-3) declared by ``exec-quant/payload-manifest.json`` (C-4) and
+    a MANIFEST § Exec-Quant Payload section rendered by the same function
+    (C-6). FR-019: the early return fires only when BOTH the feedback
+    entries and the payload records are empty — payload-only packages are
+    produced with an explicit ``Entries: 0``.
     """
     upstream = detect_upstream(index)
-    if not selected:
-        return {"packaged": 0, "zip": None, "missing": [], "upstream": upstream,
-                "note": "No feedback entries to package."}
+    payload_records = list(payload["records"]) if payload else []
+    if not selected and not payload_records:
+        result = {"packaged": 0, "zip": None, "missing": [],
+                  "upstream": upstream,
+                  "note": "No feedback entries or exec-quant payload records "
+                          "to package."}
+        if payload is not None:
+            result["exec_quant_payload"] = _payload_report(payload)
+        return result
 
     store_dir = feedback_dir(workspace_root)
     packages_dir = store_dir / PACKAGES_DIRNAME
@@ -1125,6 +1407,10 @@ def write_package(
         zip_path = packages_dir / f"feedback-{timestamp_id()}-{counter}.zip"
         counter += 1
 
+    # FR-019: selected may be empty while a payload-only package is produced.
+    time_range = (f"{selected[0].get('created', '-')} → "
+                  f"{selected[-1].get('created', '-')}"
+                  if selected else "-")
     manifest_lines = [
         "# Feedback Package Manifest",
         "",
@@ -1134,8 +1420,7 @@ def write_package(
         "",
         f"- **Generated**: {now_iso()}",
         f"- **Entries**: {len(selected)}",
-        f"- **Time range**: {selected[0].get('created', '-')} → "
-        f"{selected[-1].get('created', '-')}",
+        f"- **Time range**: {time_range}",
         f"- **spec-kit version**: {_speckit_version()}",
         f"- **Install source**: {upstream.get('url') or 'unknown'}"
         + (f" @ {upstream['commit']}" if upstream.get("commit") else ""),
@@ -1185,6 +1470,19 @@ def write_package(
                         status = f"{report_status.get(rid, '?')} (missing)"
                     manifest_lines.append(
                         f"| {rid} | {linked_n} | {status} |")
+        if payload is not None:
+            # 068 C-3/C-4: payload members only under exec-quant/; record
+            # members are byte-verbatim copies of the source bytes (zero
+            # re-sort, re-encode, or field filtering); the machine manifest
+            # and the human section below come from ONE renderer (C-6).
+            payload_manifest, payload_lines = _render_payload_sections(payload)
+            for record in payload_records:
+                zf.writestr(f"{PAYLOAD_DIRNAME}/{PAYLOAD_RECORDS_DIRNAME}/"
+                            f"{record['name']}", record["data"])
+            zf.writestr(f"{PAYLOAD_DIRNAME}/{PAYLOAD_MANIFEST_NAME}",
+                        json.dumps(payload_manifest, ensure_ascii=False,
+                                   indent=2) + "\n")
+            manifest_lines += payload_lines
         zf.writestr("MANIFEST.md", "\n".join(manifest_lines) + "\n")
         if notes and notes.strip():
             zf.writestr(
@@ -1194,8 +1492,11 @@ def write_package(
             )
 
     rel_zip = zip_path.relative_to(workspace_root).as_posix()
-    return {"packaged": len(packaged), "zip": rel_zip, "missing": missing,
-            "upstream": upstream}
+    result = {"packaged": len(packaged), "zip": rel_zip, "missing": missing,
+              "upstream": upstream}
+    if payload is not None:
+        result["exec_quant_payload"] = _payload_report(payload)
+    return result
 
 
 def action_package(args: argparse.Namespace) -> Dict[str, Any]:
@@ -1204,6 +1505,12 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
     External entries (``kind: external``) are host-project-local by contract
     (engine-cli C-4): they are excluded from the upstream package and only
     surfaced as an ``excluded_external`` count.
+
+    068 package leg: the workspace exec-quant store is swept read-only
+    (C-1/C-2) and its records ride along as the exec-quant payload (FR-001
+    full inclusion — the sweep is independent of the entry time filter, so
+    no watermark exists). Every payload degradation is non-blocking (C-9):
+    it surfaces as counters in the report faces, never as a failure.
     """
     workspace_root = resolve_workspace_root(args.workspace_root)
     state = load_store_state(workspace_root)
@@ -1217,12 +1524,14 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
     excluded_external = sum(1 for e in selected if e.get("kind") == "external")
     selected = [e for e in selected if e.get("kind") != "external"]
 
+    payload = _collect_exec_quant_payload(workspace_root)  # C-9: never raises
     result = write_package(workspace_root, {
         "upstream_repo": state["upstream_repo"],
         "introspections": state["introspections"],
     }, selected,
                            include_introspection=bool(
-                               getattr(args, "include_introspection", False)))
+                               getattr(args, "include_introspection", False)),
+                           payload=payload)
     result["excluded_external"] = excluded_external
     if not result.get("zip"):
         result["upstream"] = detect_upstream(
@@ -1503,6 +1812,17 @@ def render_text(action: str, payload: Dict[str, Any]) -> str:
         ]
         if payload.get("missing"):
             lines.append(f"  missing entry files skipped: {payload['missing']}")
+        rep = payload.get("exec_quant_payload")
+        if rep:  # 068 C-7: payload inclusion visible on the text face too
+            if rep.get("record_count"):
+                lines.append(
+                    f"  exec-quant payload: {rep['record_count']} record(s) "
+                    f"(skipped unreadable: {rep['skipped_unreadable']}, "
+                    f"truncated: {rep['truncated_count']})")
+            else:
+                lines.append(
+                    "  exec-quant payload: none (no readable exec-quant "
+                    "records — 无量化数据)")
         lines.extend(f"  {step}" for step in payload.get("next_steps", []))
         return "\n".join(lines)
     if action == "upstream":

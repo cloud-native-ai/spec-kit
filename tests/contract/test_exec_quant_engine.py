@@ -933,12 +933,24 @@ class TestNonBlocking:
         assert result.stderr.strip()
         assert "Traceback" not in result.stderr
 
-    def test_packaging_is_structurally_excluded(self):
-        """quickstart ⑪ premise: feedback package reads only the feedback store.
-        Structural pin here (zero references to the quant store in the feedback
-        engine source); behavioral assurance rides the existing
-        tests/integration/test_feedback_*.py suite (see T014 run)."""
+    def test_packaging_quant_coupling_is_read_only(self):
+        """068 revision of the former 059 structural exclusion (requirements
+        § 对 059 的变更关系 + FR-019; clarify A5 keeps the zero-auto-transmit
+        clause intact): the feedback package now READS the quant store for a
+        first-class payload, so the old "zero exec-quant references" pin is
+        superseded by its revised boundary — the feedback engine stays
+        engine-decoupled (no import or spawn of the quant engine) and
+        reaches the quant store only through its single read-only locator;
+        behavioral read-only assurance rides
+        tests/contract/test_feedback_exec_quant_payload.py::
+        test_source_stores_read_only_after_package (068 T005)."""
         feedback_src = (REPO_ROOT / "scripts" / "python" / "feedback-utils.py").read_text(
             encoding="utf-8")
-        assert "exec-quant" not in feedback_src, \
-            "feedback engine must not reference the quant store (structural exclusion)"
+        assert "exec-quant.py" not in feedback_src, \
+            "feedback engine must not import or spawn the quant engine"
+        locator_uses = [line.strip() for line in feedback_src.splitlines()
+                        if "exec_quant_dir(" in line]
+        assert locator_uses, "payload sweep locator must exist (068 C-1)"
+        assert all("def exec_quant_dir" in use or "store = exec_quant_dir("
+                   in use for use in locator_uses), \
+            f"quant store must be reached only via the read-only locator: {locator_uses}"
