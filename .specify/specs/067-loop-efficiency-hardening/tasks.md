@@ -169,11 +169,11 @@
 
 **Purpose**: 对 33 条非镜像基线失败逐名三选一处置（陈旧钉住更新 / 机制修复 / 负债登记），并以注入 + 定位演练证明合并后套件的防护与可定位性。
 
-- [ ] T025 [US5] [blockedBy: T024] gate-total 钉住类失败逐名 triage：对基线失败清单（FB-01 权威 83 名）中 gate-total 钉住条目逐名对照 owner 事实三选一 — 陈旧钉住（owner 值已合法移动）→ 按当前 owner 值更新钉住并记录理由（FR-018 允许、理由入行）；真回归 → 修机制；收口前无法归因/修复 → FB-06 负债登记。禁止删测试（FB-07）；每名一行入 triage 表（debt 行受 V-E5-2 约束）。证据落点：triage 表行 + 行内 evidence 指针（diff / owner 事实 / 负债记录路径）。
-- [ ] T026 [US5] [blockedBy: T024] exec-quant 类失败逐名 triage：对基线失败清单中 exec-quant 条目逐名执行同 T025 三选一纪律。证据落点：triage 表行。
-- [ ] T027 [US5] [blockedBy: T011,T024] loop-state 3 条逐名 triage：对 `tests/unit/test_loop_state_engine.py` 的 3 条基线失败（`test_terminal_states_with_unknown_commit_baseline_never_verify`、`test_unwatched_detector_positive_expired_and_negative`、`test_watchbeat_marker_projection_and_freshness`）执行同三选一纪律；与 T011 夹具改动衔接核对（夹具复用不得是该 3 条失败的原因，若夹具改动影响判定先归因再处置）。证据落点：triage 表行。
-- [ ] T028 [US5] [blockedBy: T022,T025,T026,T027] FB-08 注入演练 + FB-09 定位演练（SC-008 / SC-009）：选一个 T019–T022 产生的合并后参数化用例，临时注入单行断言失败 → 运行该用例并提取名称级清单（FB-04：`--names-out` 或等价提取）→ `comm -13` 差集 100% 命中且仅命中注入名；失败输出唯一 node id（含参数行标识）→ 按该 node id 定向重跑复现失败（FB-09）；随即还原注入并复跑确认还原。演练记录（命令、差集输出、重跑命令与结果、还原确认、日期）落 `test-evidence/injection-drill-〈date〉.md`。验收：命中、定位、复现三项全中；任一不中即停并按 Fast Fail 上报。
-- [ ] T029 [US5] [blockedBy: T024,T028] triage 表闭环核对：V-E5-1（83 名每名恰一行）、V-E5-2（debt-registered 行指向 dated 负债记录且注明非本范围引入）、V-E5-3（mirror-sync 行含 sync 命令与 pair 范围）；核对无任何基线失败以删测试方式处置（FB-07）；核对钉住名册（T002）与 triage 表的钉住交集全部有处置。证据落点：`test-evidence/failure-triage-2026-10-22.md` 的核对节（勾稽结果与残留负债清单）。
+- [X] T025 [US5] [blockedBy: T024] gate-total 钉住类失败逐名 triage：对基线失败清单（FB-01 权威 83 名）中 gate-total 钉住条目逐名对照 owner 事实三选一 — 陈旧钉住（owner 值已合法移动）→ 按当前 owner 值更新钉住并记录理由（FR-018 允许、理由入行）；真回归 → 修机制；收口前无法归因/修复 → FB-06 负债登记。禁止删测试（FB-07）；每名一行入 triage 表（debt 行受 V-E5-2 约束）。证据落点：triage 表行 + 行内 evidence 指针（diff / owner 事实 / 负债记录路径）。
+- [X] T026 [US5] [blockedBy: T024] exec-quant 类失败逐名 triage：对基线失败清单中 exec-quant 条目逐名执行同 T025 三选一纪律。证据落点：triage 表行。
+- [X] T027 [US5] [blockedBy: T011,T024] loop-state 3 条逐名 triage：对 `tests/unit/test_loop_state_engine.py` 的 3 条基线失败（`test_terminal_states_with_unknown_commit_baseline_never_verify`、`test_unwatched_detector_positive_expired_and_negative`、`test_watchbeat_marker_projection_and_freshness`）执行同三选一纪律；与 T011 夹具改动衔接核对（夹具复用不得是该 3 条失败的原因，若夹具改动影响判定先归因再处置）。证据落点：triage 表行。
+- [X] T028 [US5] [blockedBy: T022,T025,T026,T027] FB-08 注入演练 + FB-09 定位演练（SC-008 / SC-009）：选一个 T019–T022 产生的合并后参数化用例，临时注入单行断言失败 → 运行该用例并提取名称级清单（FB-04：`--names-out` 或等价提取）→ `comm -13` 差集 100% 命中且仅命中注入名；失败输出唯一 node id（含参数行标识）→ 按该 node id 定向重跑复现失败（FB-09）；随即还原注入并复跑确认还原。演练记录（命令、差集输出、重跑命令与结果、还原确认、日期）落 `test-evidence/injection-drill-〈date〉.md`。验收：命中、定位、复现三项全中；任一不中即停并按 Fast Fail 上报。
+- [X] T029 [US5] [blockedBy: T024,T028] triage 表闭环核对：V-E5-1（83 名每名恰一行）、V-E5-2（debt-registered 行指向 dated 负债记录且注明非本范围引入）、V-E5-3（mirror-sync 行含 sync 命令与 pair 范围）；核对无任何基线失败以删测试方式处置（FB-07）；核对钉住名册（T002）与 triage 表的钉住交集全部有处置。证据落点：`test-evidence/failure-triage-2026-10-22.md` 的核对节（勾稽结果与残留负债清单）。
 
 **Checkpoint**: 83 名全部有处置且留痕；演练三中；无删测试；残留负债显式登记。
 
