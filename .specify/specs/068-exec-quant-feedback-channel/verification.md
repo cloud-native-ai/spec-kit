@@ -102,10 +102,13 @@ SC-004 ← T016–T020；SC-005 ← T022；SC-006 ← T003 基线 + T023 比对 
   包接收零差异 = T024 守卫（真实包只读参照 + 自构等构包）+ quickstart 场景 5
   实跑（`record_count: 0`、exit 0、聚合层零增长）。两引擎既有动作面零语义
   变化（feedback 12 动作 + 仅增 ingest-exec-quant；exec-quant 5 动作 + 仅增
-  aggregate）。**显式未测项**：E2 全量槽（T003 `baseline-failed.txt` 84 名单）
-  与当前全量的 closure 槽名字级比对按 § Test Budget 属 review/closure 阶段，
-  implement 期 `not-evaluated`（零手填，不得读作已测）。核验命令 =
-  canonical runner 24 文件集（quickstart 场景 4 命令集）。证据 =
+  aggregate）。**Closure 槽（review 后）**：E2 全量 closure 首跑 82 failed /
+  4591 passed，名字级对比发现 3 个新增失败（feedback-step 门措辞 ×2、dogfooding
+  动作集钉 ×1）；修复后 in-slot 全量复跑 **79 failed / 4594 passed**，
+  `comm -13 baseline-failed.txt final-failed.txt` = **空**（零新增），5 个基线
+  失败消失（既有镜像/同步修复，不计回归）；`audit-test-budget --stage-check closure`
+  = pass（baseline:1 closure:1 reruns:1）。implement 期该槽曾记 `not-evaluated`，
+  现为实测。核验命令 = canonical runner 24 文件集（quickstart 场景 4 命令集）。证据 =
   `test-evidence/log-baseline-pre-impl.txt`、`log-regression-post-impl.txt`、
   `log-current-post-impl-names.txt`、`log-final-post-sync-names.txt`、
   `notes/red-first-evidence.md` § T023/§ T027、`notes/quickstart-run.md`
@@ -130,8 +133,8 @@ SC-005_status=pass
 SC-005_value=credential scans 0 hits (zip members / aggregated/ / summaries/); network ops 0 (AST audit + runtime observation)
 SC-005_note=T022 boundary guards 11 passed
 SC-006_status=pass
-SC-006_value=comm-13 empty vs frozen 24-file baseline (3F/544P → 0F/547P); no-payload intake zero-diff; closure-slot full-suite comparison not-evaluated at implement
-SC-006_note=T023 + T027 final run; E2 closure slot deferred to review per Test Budget
+SC-006_value=24-file baseline 3F/544P -> 0F/547P; no-payload intake zero-diff; E2 closure full-suite 84F baseline -> 79F/4594P with comm -13 empty (0 new; 5 baseline failures resolved)
+SC-006_note=T023 + T027 final run; E2 closure slot executed post-review: first run 3 new failures fixed, in-slot rerun 79F/4594P, audit pass
 deferred_tasks=none
 ```
 
@@ -222,7 +225,7 @@ verdict=pass
 | GATE-6 | 无未完成任务 | `grep -cE '^- \[[ >]\]' tasks.md` → `0`（收口标记后复跑；T001–T030 全 `[X]`） | PASS |
 | GATE-7 | 条款覆盖 claimed=31 / FR 0 uncovered / beyond baseline 0 | `claimed clauses (this feature): 31`；`FR uncovered: 0`；`uncovered beyond baseline: 0`（冻结基线 495 名单），rc=0 | PASS |
 | GATE-8 | SC 证据六行齐备 | `grep -cE '^- \*\*SC-00[1-6]\*\*' verification.md` → `6` | PASS |
-| GATE-9 | `audit-test-budget.py --stage-check implement`：`slots=baseline:1 closure:0` 且唯一 error = review 证据缺失 | `slots=baseline:1 closure:0 reruns=0 exceptions=0 unknown=1 environment_failures=0`；`status=fail`，reason = `review: stage evidence file missing`——唯一 error 恰为预期未来阶段项，判据内判定 **PASS（implement 期）**；review 证据零伪造，closure 审计留待 review 后 `--stage-check closure` 要求 exit 0 | PASS（implement 期判据） |
+| GATE-9 | `audit-test-budget.py --stage-check implement`：`slots=baseline:1 closure:0` 且唯一 error = review 证据缺失 | `slots=baseline:1 closure:0 reruns=0 exceptions=0 unknown=1 environment_failures=0`；`status=fail`，reason = `review: stage evidence file missing`——唯一 error 恰为预期未来阶段项，判据内判定 **PASS（implement 期）**；review 证据零伪造。review 后 closure 审计实测：`slots=baseline:1 closure:1 reruns=1`，`stages=6 complete=6`，`status=ok`（state spine Test Budget） | PASS（implement 期判据；closure 后 PASS） |
 
 GATE-5 取证披露：`--check` 收尾把 regen 委托的 `OK:` 行无换行并入最后一条
 DIFF 行（`run-interview/SKILL.mdOK: …`），属输出流拼接伪影；归一化拆分后
