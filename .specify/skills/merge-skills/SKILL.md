@@ -48,7 +48,7 @@ Convert the source's content into a neutral, readable intermediate (scratch, **n
 
 - Markdown source → usually already neutral; read directly.
 - HTML / rich formats → convert to Markdown with a deterministic tool (program-first — do not hand-transcribe). Example converter and the extraction recipes: [`./references/content-extraction.md`](./references/content-extraction.md).
-- Scripts / assets → inventory their behavior; scripts usually move into the target's `.specify/scripts/` largely intact (form is already code, not doc prose).
+- Scripts / assets → inventory their behavior; scripts usually move into the target's `scripts/` largely intact (form is already code, not doc prose).
 
 Land the intermediate under a scratch dir (e.g. `${SKILL_WORKDIR}/tmp/merge-<source>/`); it is working material, cleaned up in Phase 8.
 

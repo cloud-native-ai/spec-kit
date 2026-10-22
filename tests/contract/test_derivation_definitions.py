@@ -90,11 +90,8 @@ def _str001_literals() -> list[str]:
 
 def test_anchor_exists():
     assert ANCHOR.is_file(), f"concept anchor missing: {ANCHOR}"
-
-
-def test_specify_mirror_is_byte_identical():
-    assert MIRROR.is_file(), f"mirror missing: {MIRROR} (run sync-mirrors.py --write)"
-    assert ANCHOR.read_bytes() == MIRROR.read_bytes(), "anchor and its .specify mirror diverged"
+    # mirror byte-identity folded into tests/contract/test_mirror_parity_suite.py
+    # (spec 067 T020; ledger row in test-evidence/test-consolidation-ledger.md)
 
 
 def test_anchor_declares_ownership_in_its_opening_lines():

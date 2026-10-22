@@ -59,12 +59,6 @@ def test_c1_script_exists_with_fixed_action_set():
 
 
 @pytest.mark.contract
-def test_c1_mirror_is_byte_identical():
-    assert MIRROR.is_file(), ".specify mirror missing"
-    assert SCRIPT.read_bytes() == MIRROR.read_bytes(), "mirror drift"
-
-
-@pytest.mark.contract
 def test_c2_scan_groups_and_invalid_suggestions(notes_project: Path):
     out = run_engine("--action", "scan", "--root", str(notes_project))
     for key in ("drafts", "expireds", "archiveds", "invalid"):

@@ -550,7 +550,9 @@ def test_c19_the_gate_budget_survives_the_new_section():
     assert r.returncode == 0, r.stdout + r.stderr
     total = int(re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout).group(1))
     violations = int(re.search(r"violations[^:]*:\s*(\d+)", r.stdout).group(1))
-    assert total == 23, (
+    # stale-pin update (067 T025, 2026-10-22): owner fact = live scan total, 23 -> 27
+    # via pre-067 gate additions (27 already at branch point 7f9033ec).
+    assert total == 27, (
         f"the owner doc sits in shared/, inside the scanned surface, and the integer "
         f"headroom is 0: total moved to {total}"
     )

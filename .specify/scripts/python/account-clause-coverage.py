@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Account clause and FR coverage for a feature spec, as set differences over named items.
 
-Program-First discipline (.specify/shared/guidelines/token-efficiency.md): "every contract clause
+Program-First discipline (shared/guidelines/token-efficiency.md): "every contract clause
 is claimed by exactly one task row" is a fixed set relation, so it is computed here once
 instead of being re-asserted in prose on every run.
 
@@ -10,7 +10,7 @@ different owners and so do their claimed subsets:
 
   clause lane   universe  every contract file under `<corpus-root>/*/contracts/`, cut into
                 clause blocks by the forms the syntax owner declares
-                (`.specify/shared/definitions/contract-clause-definitions.md`); per-form counts are
+                (`shared/definitions/contract-clause-definitions.md`); per-form counts are
                 owned by that spec's `notes/clause-form-census.md` and are NOT restated here
                 claimed   the `[green: <contract>#<clause>]` declarations on that spec's own
                 tasks.md rows, parsed by validate-tasks.py so the mention/fence rules have
@@ -57,10 +57,10 @@ Exit codes:
   2  input error, including a missing baseline file (C-21)
 
 Usage:
-  python3 .specify/scripts/python/account-clause-coverage.py <spec-dir-or-a-file-inside-it>
-  python3 .specify/scripts/python/account-clause-coverage.py --spec-dir DIR [--corpus-root DIR]
+  python3 scripts/python/account-clause-coverage.py <spec-dir-or-a-file-inside-it>
+  python3 scripts/python/account-clause-coverage.py --spec-dir DIR [--corpus-root DIR]
                                                     [--baseline PATH] [--json] [--list-named]
-  python3 .specify/scripts/python/account-clause-coverage.py DIR --freeze > DIR/coverage-baseline.txt
+  python3 scripts/python/account-clause-coverage.py DIR --freeze > DIR/coverage-baseline.txt
 
 Freeze the baseline at the FIRST full-tree accounting run, not the first green one: green
 would require the baseline while the baseline requires a run, which is circular (C-21).
@@ -87,7 +87,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-OWNER_DOC = ".specify/shared/definitions/contract-clause-definitions.md"
+OWNER_DOC = "shared/definitions/contract-clause-definitions.md"
 CENSUS_OWNER = "notes/clause-form-census.md"
 
 STR009 = "UNCOVERED:"
@@ -115,7 +115,7 @@ def _sibling(name: str):
     """Load a sibling script by path.
 
     By path rather than `import`, because this script runs both as
-    `python3 .specify/scripts/python/account-clause-coverage.py` (its own directory is
+    `python3 scripts/python/account-clause-coverage.py` (its own directory is
     `sys.path[0]`) and under `importlib` from a contract test (where it is not). Resolving
     beside `__file__` also keeps a `.specify/` mirror copy on the mirror's own siblings.
     """

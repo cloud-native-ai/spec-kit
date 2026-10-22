@@ -9,7 +9,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-team/SKILL.md>"
 
 ## Goal
 
-执行一个已建团队的完整运行流程,承接 `/speckit.team` run 语义的全部程序性义务——五查预检经引擎唯一判定、目标重述、双结构渲染、present & execute、按 pattern 编排派发、运行报告(每次运行强制);每条义务以同等强度落于本技能对应节。概念语义:团队 = goal + Static Structure(Role × Stage × Type)+ Dynamic Structure(四种协作模式),真源 `.specify/skills/internal/create-team/references/conceptual-model.md`;Goal–Team 绑定与 Target 语义真源 `.specify/shared/definitions/goal-definitions.md`。单代理操作归 `/speckit.agents`;create/modify 语义归 create-team / improve-team。
+执行一个已建团队的完整运行流程,承接 `/speckit.team` run 语义的全部程序性义务——五查预检经引擎唯一判定、目标重述、双结构渲染、present & execute、按 pattern 编排派发、运行报告(每次运行强制);每条义务以同等强度落于本技能对应节。概念语义:团队 = goal + Static Structure(Role × Stage × Type)+ Dynamic Structure(四种协作模式),真源 `skills/internal/create-team/references/conceptual-model.md`;Goal–Team 绑定与 Target 语义真源 `.specify/shared/definitions/goal-definitions.md`。单代理操作归 `/speckit.agents`;create/modify 语义归 create-team / improve-team。
 
 ## Input Contract
 
@@ -50,11 +50,11 @@ python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <
 - `本次 Target: 无(对 goal 整体运行)`
 - 解析来源为 `team-default` 时:`本次 Target: T-<nnn> — <statement>(open)(团队默认)`
 
-(表单真源:`.specify/skills/internal/create-team/SKILL.md` → Summary Refresh)
+(表单真源:`skills/internal/create-team/SKILL.md` → Summary Refresh)
 
 ### 6. Orchestrate(按团队 pattern 编排)
 
-- 并行(parallel):派发前做 territory 校验(团队范围声明,真源 `.specify/skills/internal/create-team/references/` 与词汇表 Team Territory)。
+- 并行(parallel):派发前做 territory 校验(团队范围声明,真源 `skills/internal/create-team/references/` 与词汇表 Team Territory)。
 - 串行链(serial):DAG 无环校验 + 逐交接(harness)验证。
 - 迭代(iteration):强制最大迭代上限。
 - 持续(continuous):每轮 run 一个 cycle,按声明成熟度运行,独立校验者(独立 verifier)在 L2+ 常驻。
@@ -68,8 +68,8 @@ python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <
 ## Constraints(不变量)
 
 - **`--target` 不变量**:Goal–Team 绑定、身份解析、summary 送达目录不因 `--target` 改变——它只是本次运行的聚焦切片,不是重绑或写域声明。
-- **输出纪律**:run 中间产物留在 git-ignored `.specify/teams/.work/<slug>/`;交付物只到声明的目标路径(完整纪律:`.specify/skills/internal/create-team/SKILL.md` → Run Workspace, Reports & Output Discipline)。
-- **continuous 例外门控**:`.specify/skills/internal/create-team/references/operating-loops.md` 与 `.specify/templates/teams/project-cluster.md` 的分级门保持,不因提取而放开。
+- **输出纪律**:run 中间产物留在 git-ignored `.specify/teams/.work/<slug>/`;交付物只到声明的目标路径(完整纪律:`skills/internal/create-team/SKILL.md` → Run Workspace, Reports & Output Discipline)。
+- **continuous 例外门控**:`skills/internal/create-team/references/operating-loops.md` 与 `templates/teams/project-cluster.md` 的分级门保持,不因提取而放开。
 
 ## Boundaries
 

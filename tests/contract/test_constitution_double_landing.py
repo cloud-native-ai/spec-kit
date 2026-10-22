@@ -66,7 +66,8 @@ LIVE_TITLE_RE = TEMPLATE_TITLE_RE
 # C-9: the pre-existing command-side entry that shares a substring with STR-006.
 CODE_SSOT_NAME = "Code as the Single Source of Truth"
 
-TEMPLATE_COUNT = 14     # 11 pre-existing + 2 (Feature 051) + 1 landed here (Feature 052)
+TEMPLATE_COUNT = 15     # stale-pin update (067 T025, 2026-10-22): 14 -> 15 (XV Single-Run
+                        # Evidence joined the preset template, f1f6e96a 2026-10-16, pre-067)
 LIVE_COUNT = 16         # 14 pre-existing + 1 (XIV already carries STR-006) + 1 (XVI landed here)
 COMMAND_COUNT = 8       # 5 pre-existing + 2 (Feature 051) + 1 landed here (Feature 052)
 MIN_VERSION = (1, 13)   # floor semantics, never an equality pin

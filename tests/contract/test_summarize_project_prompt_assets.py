@@ -47,8 +47,8 @@ from specify_cli import _OBSOLETE_SKILLS
 
 from tests.contract.helpers_prompt_assets import (
     ROOT,
-    assert_dirs_byte_equivalent,
     assert_ordered,
+    dir_file_map,
     read_frontmatter,
     text_of,
 )
@@ -167,7 +167,17 @@ def test_manage_project_in_obsolete_cleanup_manifest():
     ids=["summarize-project", "study-project"],
 )
 def test_mirror_is_byte_equivalent(canonical, mirror):
-    assert_dirs_byte_equivalent(canonical, mirror)
+    # Tree file-set equality is the assertion beyond per-file byte identity (the
+    # lenient skills pairs keep mirror-only ORPHANs note-only in the engine), so it
+    # stays pinned here; per-file byte identity is carried by the shared
+    # tests/contract/test_mirror_parity_suite.py skills/internal params (067 T022).
+    assert canonical.is_dir(), f"Missing canonical dir {canonical}"
+    assert mirror.is_dir(), f"Missing mirror dir {mirror}"
+    left, right = dir_file_map(canonical), dir_file_map(mirror)
+    assert set(left) == set(right), (
+        f"Tree mismatch: only-canonical={sorted(set(left) - set(right))} "
+        f"only-mirror={sorted(set(right) - set(left))}"
+    )
 
 
 # ---------------------------------------------------------------------------

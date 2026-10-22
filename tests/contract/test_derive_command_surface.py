@@ -98,13 +98,9 @@ def test_qoder_copy_description_equals_the_template_short_description():
 
 
 # --------------------------------------------------------------------------
-# engine + mirror
+# engine mirror byte-identity folded into tests/contract/test_mirror_parity_suite.py
+# (spec 067 T020; ledger row in test-evidence/test-consolidation-ledger.md)
 # --------------------------------------------------------------------------
-
-def test_engine_and_its_specify_mirror_are_byte_identical():
-    assert ENGINE.is_file()
-    assert ENGINE_MIRROR.is_file(), "run sync-mirrors.py --write"
-    assert ENGINE.read_bytes() == ENGINE_MIRROR.read_bytes()
 
 
 # --------------------------------------------------------------------------

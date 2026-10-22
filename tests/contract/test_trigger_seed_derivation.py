@@ -21,7 +21,6 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 SEED = ROOT / "templates" / "proactive-trigger-seed.json"
-SEED_MIRROR = ROOT / ".specify" / "templates" / "proactive-trigger-seed.json"
 DATA_MODEL = (
     ROOT / ".specify" / "specs" / "050-proactive-flow-trigger" / "data-model.md"
 )
@@ -103,13 +102,13 @@ def section_body(text: str, heading: str) -> str | None:
 
 
 # --- C-1: dual surface, byte-identical ---
+# Seed mirror byte identity is carried by tests/contract/test_mirror_parity_suite.py
+# templates param (067 T022); the seed's own validity stays pinned here.
 
 
 def test_c1_seed_exists_and_mirror_is_byte_identical():
     assert SEED.is_file(), f"missing seed: {SEED}"
     json.loads(SEED.read_text(encoding="utf-8"))  # valid JSON
-    assert SEED_MIRROR.is_file(), f"missing seed mirror: {SEED_MIRROR}"
-    assert SEED.read_bytes() == SEED_MIRROR.read_bytes(), "seed mirror drift"
 
 
 # --- C-2: closed top-level schema ---

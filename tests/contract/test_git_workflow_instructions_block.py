@@ -123,13 +123,8 @@ def test_legacy_stores_are_only_referenced_as_migration_sources():
         "the inline instructions block must be listed as a legacy source"
 
 
-@pytest.mark.contract
-def test_skill_mirror_is_byte_identical():
-    drift = []
-    for source in sorted(SKILL_DIR.rglob("*")):
-        if not source.is_file():
-            continue
-        mirror = MIRROR_DIR / source.relative_to(SKILL_DIR)
-        if not mirror.is_file() or mirror.read_bytes() != source.read_bytes():
-            drift.append(source.relative_to(SKILL_DIR).as_posix())
-    assert not drift, f"git-workflow mirror drift: {drift}"
+# test_skill_mirror_is_byte_identical removed (folded) into
+# tests/contract/test_mirror_parity_suite.py, spec 067 T021: it asserted
+# mirror-exists + byte-identity for every file under skills/external/git-utils —
+# exactly the engine-driven suite params for that subtree. Ledger row in
+# test-evidence/test-consolidation-ledger.md.

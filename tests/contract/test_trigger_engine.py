@@ -207,14 +207,9 @@ def test_c1_stdlib_only():
 
 
 # --- C-2: byte-identical STRICT mirror ---
-
-
-def test_c2_mirror_byte_identical():
-    assert ENGINE.is_file(), f"missing engine: {ENGINE}"
-    assert ENGINE_MIRROR.is_file(), (
-        f"missing STRICT mirror: {ENGINE_MIRROR} — a mirror-only file reports ORPHAN and exit 2"
-    )
-    assert ENGINE.read_bytes() == ENGINE_MIRROR.read_bytes(), "engine mirror drift"
+# Byte identity for scripts/python/trigger-utils.py -> .specify/ mirror is carried
+# by tests/contract/test_mirror_parity_suite.py strict scripts param (067 T022);
+# the STRICT-pair ORPHAN face stays pinned by test_c2_sync_mirrors_check_clean.
 
 
 def test_c2_sync_mirrors_check_clean():

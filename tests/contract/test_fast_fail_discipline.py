@@ -28,6 +28,7 @@ from __future__ import annotations
 import importlib.util
 import pathlib
 import re
+import sys
 from pathlib import Path
 
 import pytest
@@ -213,14 +214,9 @@ def test_c1_truth_source_doc_exists():
     assert DOC.is_file(), f"missing truth-source doc: {DOC.relative_to(ROOT)}"
 
 
-def test_c2_mirror_byte_identical():
-    """C-2: the runtime mirror is byte-identical to the source."""
-    assert DOC.is_file(), f"missing source: {DOC.relative_to(ROOT)}"
-    assert DOC_MIRROR.is_file(), f"missing mirror: {DOC_MIRROR.relative_to(ROOT)}"
-    assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), (
-        f"{DOC.relative_to(ROOT)} and {DOC_MIRROR.relative_to(ROOT)} differ; "
-        "run: python3 scripts/python/sync-mirrors.py --write --only shared"
-    )
+# C-2 (runtime mirror byte-identity) folded into
+# tests/contract/test_mirror_parity_suite.py (spec 067 T020; ledger row in
+# test-evidence/test-consolidation-ledger.md).
 
 
 def test_c3_filename_rename_guard():
@@ -717,11 +713,14 @@ def test_a6_not_inside_three_section_window():
 
 
 def test_a7_section_counts_20_to_21_and_21_to_22():
-    """C-7: top-level counts -- template 21, live 22 (20/21 before; +2 = ID Register + Run Determination, 2026-10-08)."""
+    """C-7: top-level counts -- template 24, live 25. Stale-pin update (067 T025,
+    2026-10-22): owner facts moved 21/22 -> 24/25 via pre-067 instructions-section
+    additions (Single-Run Evidence + progress reporting ambient sections,
+    f1f6e96a/410c68c4, plus 063 storage guidance aadcaf6b). Equality pins unchanged."""
     tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
     live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
-    assert tpl == 21, f"C-7: template has {tpl} top-level sections; expected 21 (20 before + 1)"
-    assert live == 22, f"C-7: live file has {live} top-level sections; expected 22 (21 before + 1)"
+    assert tpl == 24, f"C-7: template has {tpl} top-level sections; expected 24 (21 pinned before)"
+    assert live == 25, f"C-7: live file has {live} top-level sections; expected 25 (22 pinned before)"
     tpl_set = {l for l in _lines(INSTR) if l.startswith("## ")}
     live_set = {l for l in _lines(INSTR_LIVE) if l.startswith("## ")}
     assert tpl_set <= live_set, f"C-7: template sections missing from live: {sorted(tpl_set - live_set)}"
@@ -1097,14 +1096,17 @@ def test_x12_principle_block_project_neutral():
 
 
 def test_x13_double_landing_three_count_pins():
-    """C-13: the three count pins were raised in the same batch."""
+    """C-13: the three count pins were raised in the same batch. Stale-pin update
+    (067 T025, 2026-10-22): the template's principle roster moved 14 -> 15 (XV
+    Single-Run Evidence, f1f6e96a 2026-10-16, pre-067); live (16) and command (8)
+    facts still hold."""
     src = _text(DOUBLE_LANDING_TEST)
-    for name, want in (("TEMPLATE_COUNT", 14), ("LIVE_COUNT", 16), ("COMMAND_COUNT", 8)):
+    for name, want in (("TEMPLATE_COUNT", 15), ("LIVE_COUNT", 16), ("COMMAND_COUNT", 8)):
         m = re.search(rf"^{name} = (\d+)", src, re.M)
         assert m, f"C-13: {name} not found in the guard"
         assert int(m.group(1)) == want, f"C-13: {name} is {m.group(1)}; expected {want}"
     # and the counts are true of the artifacts, not just of the pins
-    assert len(PRINCIPLE_RE.findall(_text(CONST_TPL))) == 14, "C-13: the template does not actually hold 14"
+    assert len(PRINCIPLE_RE.findall(_text(CONST_TPL))) == 15, "C-13: the template does not actually hold 15"
     assert len(PRINCIPLE_RE.findall(_text(CONST_LIVE))) == 16, "C-13: the live constitution does not hold 16"
     # S3 re-point: the command list became the generator skill's MUST-include
     # sub-entry block (same block extraction the double-landing guard uses).
@@ -1203,10 +1205,14 @@ def test_x19_ufc_class_eleven_gains_fast_fail_path():
     assert re.search(r"C-19: class ⑪ does not list the fast-fail discipline", src), (
         "C-19 delegation broken: the class-⑪ assertion is no longer in the UFC doc test"
     )
-    # and the delegate really does pass -- run it, do not assume it
+    # and the delegate really does pass -- run it, do not assume it.
+    # Test-local isolation fix (067 T025, 2026-10-22): resolve the delegate through
+    # sys.executable (the interpreter running this suite) instead of a bare
+    # "python3", which may lack pytest on hosts where the suite runs under a venv.
+    # Assertion strength unchanged: the delegate must still exit 0.
     import subprocess
     r = subprocess.run(
-        ["python3", "-m", "pytest", str(UFC_DOC_TEST.relative_to(ROOT)), "-q", "-k", "c14 or c18a"],
+        [sys.executable, "-m", "pytest", str(UFC_DOC_TEST.relative_to(ROOT)), "-q", "-k", "c14 or c18a"],
         capture_output=True, text=True, cwd=str(ROOT),
     )
     assert r.returncode == 0, f"C-19 delegate is red:\n{r.stdout[-700:]}"
@@ -1240,7 +1246,8 @@ def test_x21_ufc_override_column_unchanged():
     )
     import subprocess
     r = subprocess.run(
-        ["python3", "-m", "pytest", str(UFC_DOC_TEST.relative_to(ROOT)), "-q", "-k", "c18a"],
+        # same isolation fix as C-19 above: sys.executable, not bare "python3"
+        [sys.executable, "-m", "pytest", str(UFC_DOC_TEST.relative_to(ROOT)), "-q", "-k", "c18a"],
         capture_output=True, text=True, cwd=str(ROOT),
     )
     assert r.returncode == 0, f"C-21 delegate (test_c18a) is red:\n{r.stdout[-700:]}"
@@ -1428,6 +1435,13 @@ def test_i10_channel_two_factory_presets_byte_equal():
 
 def test_i11_channel_two_mirrors_and_per_tool_copies():
     """C-11: the mirror and all four per-tool trees carry the identical clause."""
+    # Stale-pin update (067 T025, 2026-10-22): per-tool trees are RENDERED copies —
+    # the render engine (specify_cli.rewrite_paths, the recorded owner of the rule)
+    # rewrites root-relative `shared/` to the runtime `.specify/shared/` prefix. The
+    # raw owner literal is the wrong expected value for that channel; the pin now
+    # compares each per-tool interval against the engine-rendered owner literal.
+    # Byte-identity strength unchanged (still exact interval equality).
+    from specify_cli import rewrite_paths
     owner = _clause_interval(_text(DOC))
     for preset in FACTORY_PRESETS:
         mirror = ROOT / ".specify" / "agents" / "templates" / preset.name
@@ -1441,8 +1455,9 @@ def test_i11_channel_two_mirrors_and_per_tool_copies():
         for slug in PRESET_SLUGS:
             copy = d / naming.format(slug=slug)
             assert copy.is_file(), f"C-11: {copy.relative_to(ROOT)} was not rendered"
-            assert _clause_interval(_text(copy)) == owner, (
-                f"C-11: {copy.relative_to(ROOT)}'s clause interval is not byte-identical to the owner"
+            assert _clause_interval(_text(copy)) == rewrite_paths(owner), (
+                f"C-11: {copy.relative_to(ROOT)}'s clause interval is not byte-identical "
+                f"to the engine-rendered owner literal (rewrite_paths)"
             )
 
 
@@ -1838,7 +1853,7 @@ def test_g9_total_equals_frozen_baseline():
 def test_g10_three_pins_independently_locatable():
     """C-10 + C-10(a): each of the three pins resolves to a real assertion of its own form."""
     ufc = _text(UFC_DOC_TEST)
-    assert re.search(r'payload\["total"\] == 23', ufc), "C-10 row one: the hard-coded == 23 literal is gone"
+    assert re.search(r'payload\["total"\] == 27', ufc), "C-10 row one: the hard-coded == 27 literal is gone"
     proactive = _text(PROACTIVE_TEST)
     assert re.search(r'payload\["total"\] == frozen\["total"\]', proactive), (
         "C-10 row two: the equality-against-frozen-baseline assertion is gone"

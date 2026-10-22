@@ -2,7 +2,7 @@
 
 对应报告 `## 任务进展` 节。面向外部读者回答两个问题：**每个任务当前的状态是什么？项目的整体进度安排是怎样的？** 工作流主框架见 [../SKILL.md](../SKILL.md)；跨层公共约定见 [reporting-playbook.md](reporting-playbook.md)（四态色板、日期格式、图说三要素等见其「跨层图表呈现公约」节）。
 
-**边界**：本文档只写**呈现什么、怎么呈现**。**一切日期与进度计算**（状态判定、进度%、工期、延期天数、today 偏移、甘特出图判据）由 `.specify/scripts/progress-engine.py` 独家完成，本文档只写"取引擎哪个字段、怎么落在图上"——见 [consistency-rules.md](consistency-rules.md) §0.1「计算下沉」。
+**边界**：本文档只写**呈现什么、怎么呈现**。**一切日期与进度计算**（状态判定、进度%、工期、延期天数、today 偏移、甘特出图判据）由 `scripts/progress-engine.py` 独家完成，本文档只写"取引擎哪个字段、怎么落在图上"——见 [consistency-rules.md](consistency-rules.md) §0.1「计算下沉」。
 
 ## 呈现要素
 
@@ -103,7 +103,7 @@ end legend
 
 ## 进度与状态：**取引擎输出，不在本文档推断**
 
-条目状态、进度百分比、工期、延期天数一律由 `.specify/scripts/progress-engine.py` 一次算出（判定语义见 [consistency-rules.md](consistency-rules.md) §1/§2/§6，调用方式见其 §0.1）。下表描述的是"材料信号 → 状态"的判定语义（判定与百分比计算在引擎内实现）；**呈现层只引用引擎输出的状态枚举与进度百分比字段**，不在本文档或报告中做任何换算：
+条目状态、进度百分比、工期、延期天数一律由 `scripts/progress-engine.py` 一次算出（判定语义见 [consistency-rules.md](consistency-rules.md) §1/§2/§6，调用方式见其 §0.1）。下表描述的是"材料信号 → 状态"的判定语义（判定与百分比计算在引擎内实现）；**呈现层只引用引擎输出的状态枚举与进度百分比字段**，不在本文档或报告中做任何换算：
 
 | 材料信号 | 引擎给出的状态 | 呈现层取值 |
 |----------|----------------|------------|
@@ -171,7 +171,7 @@ python3 ${SKILL_HOME}/scripts/progress-engine.py \
 - [ ] 四态着色使用统一色板（同 WBS）；`is N% complete` 的 N 与图说算式**逐字取自引擎** `progress_pct` / `progress_formula`，in-progress / delayed 条目均有 `is N% complete` 及依据；引擎给 `null` 的条目不写 complete 子句、进度列写 `-（无可计数依据）`（未用 0% 顶替且已声明）；not-started 条未写 complete 子句；图例色块与任务条同字面量
 - [ ] `status = delayed` 的条形为 `#EF9A9A/#C62828` 且显示名带 `⚠`；延期天数已落在任务记录表/图说（取引擎 `delay_days`）
 - [ ] 延期条的起止仍由记录层计划日期决定（未为"显得延期"改动条形位置）
-- [ ] 已跑过 `.specify/scripts/progress-engine.py`（`--baseline` = 全报告基准日），本节所有日期、天数、百分比均可在引擎输出中逐字找到；**报告内无任何手工日期比较或算式**
+- [ ] 已跑过 `scripts/progress-engine.py`（`--baseline` = 全报告基准日），本节所有日期、天数、百分比均可在引擎输出中逐字找到；**报告内无任何手工日期比较或算式**
 - [ ] 引擎 `schedule_status = unknown-schedule` 的条目：未计入逾期数、未上逾期色，且已声明「无计划日期，无法判定延期」
 - [ ] 负责人以条形显示名后缀 ` ▪ 姓名` 承载，与 WBS `【…】` 逐字一致；缺失写 ` ▪ 未记录`（不省略）；未使用 `on {}`（除按例外条件启用的负载视图）
 - [ ] 所有绝对日期（Project starts、起止、title 基准日、叙述）均为 yyyy-mm-dd

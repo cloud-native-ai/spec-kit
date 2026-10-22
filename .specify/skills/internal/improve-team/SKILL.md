@@ -38,7 +38,7 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 | Symptom | Likely cause | Team edit |
 |---------|--------------|-----------|
 | Iteration never converges | Threshold too high or conflicting dimensions | Lower threshold / rebalance `quality_dimensions` weights |
-| Score oscillates | Ambiguous evaluator criteria | Tighten the evaluator rubric (via the moved stage templates in `.specify/skills/internal/create-team/templates/`) |
+| Score oscillates | Ambiguous evaluator criteria | Tighten the evaluator rubric (via the moved stage templates in `skills/internal/create-team/templates/`) |
 | Parallel file conflicts | Overlapping territories | Repartition `territories`; move shared files to forbidden-write |
 | Serial stage stalls | Broken/missing handoff dependency | Fix `blockedBy` edges / handoff file path |
 | Serial stage 反复撞派发轮次上限,产物只覆盖目标的一小部分 | **交付粒度超预算** — stage 的 `outputs` 规模超过单次派发可承载量 | 按目录规模拆 stage,或降为目录级 + 例外清单;粒度纪律见 `../create-team/references/patterns.md` § Serial Chain |

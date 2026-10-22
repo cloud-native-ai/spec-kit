@@ -78,7 +78,7 @@ SCHEMA_DOC = """\
 ================================================================================
 **字段类型、取值域、实体关联的可执行权威 = `schema/project.sql`（DDL，由数据库约束强制）**；
 业务含义与三档必填性 R/I/O 见 `references/required-info.md`。下面描述的是同一个关系模型
-的 YAML/JSON 形态（人工可写的输入面），由 `.specify/scripts/project-db.py --load` 装载进数据库，
+的 YAML/JSON 形态（人工可写的输入面），由 `scripts/project-db.py --load` 装载进数据库，
 **装载即校验**；本引擎从数据库读取（`--db`），也接受该 JSON 形态（`--input`，向后兼容）。
 档位：R 必填-阻断 ｜ I 可推断（须带 inferred/inferred_from）｜ O 可选（缺失显式降级）。
 
@@ -1837,7 +1837,7 @@ def main() -> int:
                      "用 SQL 完成查询与聚合，输出可被报告直接引用的结构化 JSON"
                      "（状态 / 进度% / 延期天数 / 聚合 / 甘特参数）。"),
         epilog=("字段定义与约束的权威 = schema/project.sql（DDL）；业务含义与必填档位见 "
-                "references/required-info.md；表单→数据库的装载与校验由 .specify/scripts/project-db.py "
+                "references/required-info.md；表单→数据库的装载与校验由 scripts/project-db.py "
                 "承担；判定语义见 references/consistency-rules.md。Markdown 只引用本引擎输出，"
                 "不重述算法。\n"
                 "示例：\n"

@@ -15,7 +15,7 @@ phase artifact and leaves it self-consistent, or — when the user has re-scoped
 feature — executes the Scope Revision Protocol instead of a clarification run.
 
 Owning command: `/speckit.clarify`. Canonical extraction source:
-`.specify/templates/commands/clarify.md` § Phase 0 (Phase Detection & Context Setup), § Taxonomy
+`templates/commands/clarify.md` § Phase 0 (Phase Detection & Context Setup), § Taxonomy
 & Coverage Scan, § Question Generation & Interactive Loop, § Report, § Behavior Rules,
 and § Scope Revision Protocol. Content moved here verbatim in substance; the command
 template keeps entry, wiring, and lifecycle delegation only.
@@ -28,7 +28,7 @@ template keeps entry, wiring, and lifecycle delegation only.
   to integrate, or an explicit target artifact naming a mode override (below). They are
   never standalone instructions.
 - **Script**: run the command's declared prerequisite script — the `{SCRIPT}` slot,
-  `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` — from repo root once; parse
+  `scripts/bash/check-prerequisites.sh --json --paths-only` — from repo root once; parse
   JSON for `REPO_ROOT`, `BRANCH`, `REQUIREMENT_ID`, `REQUIREMENTS_DIR`, `FEATURE_SPEC`,
   `IMPL_PLAN`, `TASKS`.
 

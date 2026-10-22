@@ -64,9 +64,9 @@ def test_heading_and_pointer_present_in_both_template_copies():
         assert DOC_LINK in body, f"pointer link {DOC_LINK!r} missing in {rel}"
 
 
-def test_template_mirrors_are_byte_identical():
-    assert SRC.read_bytes() == MIRROR.read_bytes(
-    ), "instructions-template mirrors diverged"
+# test_template_mirrors_are_byte_identical folded into
+# tests/contract/test_mirror_parity_suite.py (spec 067 T021; ledger row in
+# test-evidence/test-consolidation-ledger.md).
 
 
 def test_ambient_section_carries_the_five_keywords():
@@ -77,12 +77,9 @@ def test_ambient_section_carries_the_five_keywords():
 
 
 # --- owner doc: full discipline, and its mirror ---
-
-
-def test_doc_exists_with_byte_identical_mirror():
-    assert DOC.is_file(), f"missing owner doc: {DOC}"
-    assert DOC_MIRROR.is_file(), f"missing owner doc mirror: {DOC_MIRROR}"
-    assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), "owner doc mirror drift"
+# (test_doc_exists_with_byte_identical_mirror folded into
+#  tests/contract/test_mirror_parity_suite.py, spec 067 T021; ledger row in
+#  test-evidence/test-consolidation-ledger.md)
 
 
 def test_doc_defines_the_load_bearing_clauses():

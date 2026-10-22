@@ -38,15 +38,9 @@ def test_ca3_gate_file_references_discipline_doc_not_copies(rel):
     assert "## 程序优先(Program-First)" not in text, f"discipline section copied into {rel}"
 
 
-@pytest.mark.parametrize("rel", GATE_FILES)
-def test_ca3_skill_mirror_identical(rel):
-    src = ROOT / rel
-    # Runtime mirror shape: external flattens to .specify/skills/<name>/..., internal
-    # stays nested under .specify/skills/internal/<name>/...
-    mirror_rel = rel.replace("skills/external/", "skills/", 1)
-    mirror = ROOT / ".specify" / mirror_rel
-    assert mirror.is_file(), f"missing mirror: {mirror}"
-    assert src.read_bytes() == mirror.read_bytes(), f"mirror drift: {rel}"
+# Mirror parity for the five gate files is carried by the shared
+# tests/contract/test_mirror_parity_suite.py skills params (external flat /
+# internal nested per the engine pairs) — 067 T022.
 
 
 def test_ca3_skills_template_not_bloated():

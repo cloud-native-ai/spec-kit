@@ -1,6 +1,7 @@
 """Contract tests for Feature 040 token-efficiency discipline doc (spec 035).
 
-Pins contracts/discipline-doc.md: C-D1 (existence + mirror parity), C-D2
+Pins contracts/discipline-doc.md: C-D1 (existence; mirror parity carried by
+tests/contract/test_mirror_parity_suite.py shared params since 067 T022), C-D2
 (six required sections), C-D3 (normative content), C-D4 (ambient reference),
 C-D5 (reference-not-copy).
 """
@@ -14,9 +15,7 @@ pytestmark = pytest.mark.contract
 ROOT = Path(__file__).resolve().parents[2]
 
 DOC = ROOT / "shared" / "guidelines" / "token-efficiency.md"
-DOC_MIRROR = ROOT / ".specify" / "shared" / "guidelines" / "token-efficiency.md"
 INSTR = ROOT / "templates" / "instructions-template.md"
-INSTR_MIRROR = ROOT / ".specify" / "templates" / "instructions-template.md"
 
 SECTION_HEADINGS = [
     "## 程序优先(Program-First)",
@@ -30,11 +29,6 @@ SECTION_HEADINGS = [
 
 def test_cd1_doc_exists():
     assert DOC.is_file(), f"missing discipline doc: {DOC}"
-
-
-def test_cd1_mirror_byte_identical():
-    assert DOC_MIRROR.is_file(), f"missing mirror: {DOC_MIRROR}"
-    assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), "discipline doc mirror drift"
 
 
 def test_cd2_required_sections_present():
@@ -79,10 +73,6 @@ def test_cd4_ambient_reference_in_instructions_template():
     text = INSTR.read_text(encoding="utf-8")
     assert "token-efficiency" in text, "ambient token-efficiency reference missing"
     assert "shared/guidelines/token-efficiency.md" in text, "ambient reference path missing"
-
-
-def test_cd4_instructions_template_mirror_identical():
-    assert INSTR.read_bytes() == INSTR_MIRROR.read_bytes(), "instructions-template mirror drift"
 
 
 def test_cd4_ambient_reference_does_not_inline_copy():

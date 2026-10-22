@@ -138,13 +138,26 @@ def _load_scanner():
     return module
 
 
+_SRC_BYTES = SRC.read_bytes()
+
+
 @pytest.fixture
-def installed_project(tmp_path: Path) -> Path:
-    """A minimal installed-project layout the generator can run against."""
-    (tmp_path / ".specify" / "templates").mkdir(parents=True)
-    (tmp_path / ".specify" / "templates" / "instructions-template.md").write_bytes(
-        SRC.read_bytes()
-    )
+def installed_project(tmp_path: Path, tmp_path_factory) -> Path:
+    """A minimal installed-project layout the generator can run against.
+
+    067 T016: the template tree is installed as a per-case clone of the
+    session-level read-only snapshot (``tests/conftest.py``
+    ``install_template_clone``; APFS clonefile first, plain copy fallback)
+    instead of a per-case read+write. Semantics unchanged (FR-016): each case
+    still receives its own independent copy of the template and the live file
+    is still written fresh per case, so c9's bare-start pin (``must start
+    without the section``) holds exactly as before.
+    """
+    from conftest import install_template_clone
+
+    templates = tmp_path / ".specify" / "templates"
+    install_template_clone({"instructions-template.md": _SRC_BYTES}, templates,
+                           tmp_path_factory)
     # A live file that predates the new section and carries project-local content.
     (tmp_path / ".specify" / "instructions.md").write_text(
         "# Instructions\n\n"
@@ -442,16 +455,9 @@ def _doc_section(text: str, title: str) -> str:
 
 
 # --- doc C-1: dual surface + byte-identical mirror ---
-
-
-def test_doc_c1_exists_with_byte_identical_mirror():
-    assert DISCIPLINE_DOC.is_file(), f"missing discipline doc: {DISCIPLINE_DOC}"
-    assert DISCIPLINE_DOC_MIRROR.is_file(), (
-        f"missing discipline doc mirror: {DISCIPLINE_DOC_MIRROR}"
-    )
-    assert DISCIPLINE_DOC.read_bytes() == DISCIPLINE_DOC_MIRROR.read_bytes(), (
-        "discipline doc mirror drift"
-    )
+# (test_doc_c1_exists_with_byte_identical_mirror folded into
+#  tests/contract/test_mirror_parity_suite.py, spec 067 T021; ledger row in
+#  test-evidence/test-consolidation-ledger.md)
 
 
 # --- doc C-2: closed section set, exact order ---

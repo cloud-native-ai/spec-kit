@@ -111,12 +111,8 @@ def _load_scanner():
 
 
 # --- owner doc: exists, mirrored, declares ownership ---
-
-
-def test_doc_exists_with_byte_identical_mirror():
-    assert DOC.is_file(), f"missing philosophy owner doc: {DOC}"
-    assert DOC_MIRROR.is_file(), f"missing mirror: {DOC_MIRROR}"
-    assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), "philosophy doc mirror drift"
+# (mirror byte-identity folded into tests/contract/test_mirror_parity_suite.py,
+#  spec 067 T020 — ledger row in test-evidence/test-consolidation-ledger.md)
 
 
 def test_doc_declares_itself_the_owner():

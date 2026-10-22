@@ -49,7 +49,8 @@ BASE_SHA = "ad190d46de960efd70e61a4719a16561a89b7e9d"
 # is empty, i.e. 053's own window left the state machine untouched).
 C12_WINDOW_END = "cb0a190a"  # 053's last implement-window commit (wrap-up chore)
 
-GATE_TOTAL = 23
+GATE_TOTAL = 27  # stale-pin update (067 T025, 2026-10-22): owner fact = live scan total,
+# 23 -> 27 via pre-067 gate additions (27 already at branch point 7f9033ec).
 GATE_VIOLATIONS = 0
 CAP_BASELINE_TOTAL = 93
 CAP_FACTOR = 0.25
@@ -203,7 +204,7 @@ def test_c6_the_cap_is_pinned_in_three_forms_with_meta_pins_over_them():
         encoding="utf-8")
     sweep = (ROOT / "tests" / "contract" / "test_confirmation_gates_sweep.py").read_text(
         encoding="utf-8")
-    assert 'payload["total"] == 23' in ufc, "form ① the hardcoded literal pin is gone"
+    assert 'payload["total"] == 27' in ufc, "form ① the hardcoded literal pin is gone"
     assert 'payload["total"] == frozen["total"]' in trigger, (
         "form ② the equality-with-frozen-baseline pin is gone"
     )
@@ -214,7 +215,8 @@ def test_c6_the_cap_is_pinned_in_three_forms_with_meta_pins_over_them():
     fast_fail = (ROOT / "tests" / "contract" / "test_fast_fail_discipline.py").read_text(
         encoding="utf-8")
     meta_needles = (
-        r"""re.search(r'payload\["total"\] == 23'""",
+        # needle updated in step with the 067 T025 stale-pin update of the UFC literal
+        r"""re.search(r'payload\["total"\] == 27'""",
         r"""re.search(r'payload\["total"\] == frozen\["total"\]'""",
         r"""re.search(r'payload\["total"\] <= cap'""",
         r"""re.search(r'baseline\["total"\] \* 0\.25'""",
@@ -248,7 +250,7 @@ def test_c7_the_only_legal_route_is_wording_not_relaxation():
         encoding="utf-8")
     sweep = (ROOT / "tests" / "contract" / "test_confirmation_gates_sweep.py").read_text(
         encoding="utf-8")
-    assert 'payload["total"] == 23' in ufc, "cap pin ① was relaxed"
+    assert 'payload["total"] == 27' in ufc, "cap pin ① was relaxed"
     assert 'payload["total"] == frozen["total"]' in trigger, "cap pin ② was relaxed"
     assert 'baseline["total"] * 0.25' in sweep, "cap pin ③ was relaxed"
 

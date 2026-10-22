@@ -257,24 +257,8 @@ def test_c2_confirmation_gates_pointer_is_in_the_header_ownership_area():
 
 
 # --- C-3: mirror parity for the seven sources that have a .specify/ twin ---
-
-
-def test_c3_mirrors_are_byte_identical():
-    # `templates/commands/` has NO `.specify/` mirror — sync-mirrors.py's templates pair
-    # excludes `commands` (retired), and C-14 forbids recreating it. So C-3 covers all
-    # eight sources under the `shared` and `skills` pairs; clarify.md's rule source moved
-    # to the `clarify-artifact` skill in the S3 command thinning (per-tool command copies
-    # remain C-14's subject).
-    drifted = []
-    for rel, _ in RULE_SOURCES:
-        if not rel.startswith(("shared/", "skills/")):
-            continue
-        src, mirror = ROOT / rel, ROOT / ".specify" / rel
-        if not mirror.is_file():
-            drifted.append(f"{rel}: mirror missing")
-        elif src.read_bytes() != mirror.read_bytes():
-            drifted.append(f"{rel}: source and mirror differ")
-    assert not drifted, f"mirror drift (run sync-mirrors.py --write): {drifted}"
+# Byte parity for the eight RULE_SOURCES under the shared/skills pairs is carried
+# by tests/contract/test_mirror_parity_suite.py params (067 T022).
 
 
 # --- C-4: the five criteria sections are frozen verbatim (US2 / T021) ---
