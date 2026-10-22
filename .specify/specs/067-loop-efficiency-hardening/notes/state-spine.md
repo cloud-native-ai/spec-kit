@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792652141
-stage_deadline_epoch: 1792657541
-stage_base_commit: 78954beb
+stage_started_at: 1792652770
+stage_deadline_epoch: 1792658170
+stage_base_commit: b9d23cc2
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,16 +37,16 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (checklist)
+## Current Part Brief (analyze)
 
-- **part_id**: P5-checklist-test-slimming
-- **allowed files**: new `.specify/specs/067-loop-efficiency-hardening/checklists/*.md` and new `notes/checklist-*`
-- **must not modify**: requirements.md, plan.md, tasks.md, tests, runner, source, mirrors, registry
-- **target validation**: checklist structure validator (0 error); every item answerable with decisive evidence from requirements/plan/tasks; no `[Gap]` left unaddressed without a remediation note
-- **focus**: requirements-quality for US5/FR-011…FR-021/SC-006…SC-010 (completeness, clarity, consistency, measurable criteria, edge cases, dependency boundary, acceptance) plus cross-checks that the 067 test-slimming scope does not weaken coverage or drift protection
-- **expected red→green**: no checklist artifact (red) → dated checklist with item-by-item judgments/evidence pointers and explicit gaps (green)
+- **part_id**: P6-analyze-test-slimming
+- **allowed files**: new `test-evidence/analyze-findings-2026-10-22.md` (report only); all other artifacts read-only
+- **must not modify**: requirements, plan, tasks, checklist, tests, runner, source, mirrors, registry
+- **target**: independent cross-artifact consistency/quality analysis (requirements ↔ plan ↔ tasks ↔ checklist ↔ feature registry ↔ constitution), severity-tagged findings, explicit CRITICAL/HIGH closure or blocking list; zero test runs; no false claims
+- **known inputs**: checklist 41 items (40 PASS / CHK012 FAIL already remediated by `b9d23cc2`); pre-analyze tasks pass with 10 advisories (9 external TB-03/04 clause references + 1 expected missing new suite path); baseline 750 s / 83 failed is the reference set
+- **expected red→green**: no analyze report (red) → GREEN or a complete findings report with remediation pointers (green)
 - **run-turn-budget**: 120
-- **acceptance**: no test run claimed; no implementation edits; checklist is requirements-quality, not a duplicate of tests.md
+- **acceptance**: every FR/SC traceable; no unresolved CRITICAL/HIGH; no edits outside the report; no test run claimed
 
 ## Dispatch Log
 
@@ -56,7 +56,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P2-clarify-test-economics | clarify | — | not_evaluated | none run (baseline in flight; only lastfailed cache read) | f086e36d | DONE — 7 open items ratified; Assumptions de-opened; FR-012/FR-018/SC-007src/SC-008 minimal revisions; pre-analyze 0/0 fr=21 sc=10; validate-requirements 0e/0w |
 | P3-plan-test-slimming | plan | — | not_evaluated | none run (2-node timing probe only, per plan-probes dated record) | bca3bc99 | DONE — plan.md + research/data-model/contracts×4/quickstart + plan-probes evidence; pre-analyze --stage plan pass 0e/0a (clauses=35); decomposition-check --mode plan proceed (FR 21/30); no full-suite run; no test claimed as passing |
 | P4-tasks-test-slimming | tasks | T001–T038 | not_evaluated | none run | 78954beb | DONE — 38 tasks / 9 phases (≤8 per part); validate-tasks 0e/0w; pre-analyze tasks pass 0e/1a (expected missing new test path); decomposition proceed 38/40; no test run |
-| P5-checklist-test-slimming | checklist | — | — | none run | — | dispatched |
+| P5-checklist-test-slimming | checklist | CHK001–CHK041 | not_evaluated | none run | 3db048e4 | DONE — 41 items, 40 PASS / 1 FAIL (CHK012 E2 symbol ambiguity); FAIL remediated by `b9d23cc2` (tasks.md disambiguation; validate-tasks 0/0); no test run |
+| P6-analyze-test-slimming | analyze | — | — | none run | — | dispatched |
 
 ## Gates
 
