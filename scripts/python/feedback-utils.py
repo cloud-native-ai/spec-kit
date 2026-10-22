@@ -51,10 +51,13 @@ with both.
 from __future__ import annotations
 
 import argparse
+import fcntl
+import hashlib
 import json
 import os
 import re
 import sys
+import uuid
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -1112,6 +1115,15 @@ RECORD_KIND = "speckit.exec-quant"
 MAX_PAYLOAD_RECORDS = 1000
 MAX_PAYLOAD_BYTES = 16 * 1024 * 1024  # 16 MiB
 
+# 068 intake leg (intake-contract C-10..C-17; data-model § E6 / research D5/D6)
+AGGREGATED_DIRNAME = "aggregated"
+AGGREGATED_RECORDS_DIRNAME = "records"
+AGGREGATE_LOCK_NAME = ".write.lock"  # C-13 shared critical section
+ENVELOPE_SCHEMA_VERSION = 1  # data-model § E6
+ENVELOPE_KIND = "speckit.exec-quant-aggregated"  # data-model § E6
+IDENTITY_KEY_SEP = "\x1f"  # C-13 / D6 five-tuple separator
+UNKNOWN_PROJECT = "unknown-project"  # C-12 literal group (E2 enum value)
+
 _SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 _PROJECT_NAME_RE = re.compile(
     r"^\s*(?:-\s*)?\*\*Project Name\*\*:\s*(.+?)\s*$", re.M)
@@ -1360,6 +1372,277 @@ def _render_payload_sections(
                      f"{manifest['collected_at_range'][1]}")
     lines.append("")
     return manifest, lines
+
+
+# --------------------------------------------------------------------------- #
+# Exec-Quant intake (068 US2 receive leg; contracts/intake-contract.md C-10..C-17)
+# --------------------------------------------------------------------------- #
+def _identity_key(record: Dict[str, Any], source_project: str) -> str:
+    """C-13 / D6: sha256 of the five-tuple ``source_project ␟ unit_id ␟
+    unit_type ␟ run_id ␟ collected_at`` joined with ``\\x1f``. The tuple is
+    content-free (the F-01 remediation): ``content_hash`` is computed
+    separately and MUST NOT enter this key. A missing field participates as
+    the empty string (same convention as the U-02 sort rule)."""
+    parts = [str(source_project or ""),
+             str(record.get("unit_id", "") or ""),
+             str(record.get("unit_type", "") or ""),
+             str(record.get("run_id", "") or ""),
+             str(record.get("collected_at", "") or "")]
+    return hashlib.sha256(
+        IDENTITY_KEY_SEP.join(parts).encode("utf-8")).hexdigest()
+
+
+def _canonical_json(record: Dict[str, Any]) -> str:
+    """C-13 / D6 canonical form: sort_keys + ensure_ascii=False + compact."""
+    return json.dumps(record, sort_keys=True, ensure_ascii=False,
+                      separators=(",", ":"))
+
+
+def _content_hash(record: Dict[str, Any]) -> str:
+    """C-13: independent canonical-JSON sha256 — comparison field only,
+    never mixed into ``identity_key`` (D6 / analyze F-01)."""
+    return hashlib.sha256(
+        _canonical_json(record).encode("utf-8")).hexdigest()
+
+
+def _source_slug(project_name: str, identity_key: str) -> str:
+    """D5 / E6: slugged project name (lowercase, ``[a-z0-9-]``) + 8-char
+    identity short hash; an empty identity string collapses to the literal
+    ``unknown-project`` group (deterministic, no hash suffix, C-12)."""
+    name = re.sub(r"[^a-z0-9]+", "-",
+                  str(project_name or "").strip().lower()).strip("-")
+    if not name:
+        return UNKNOWN_PROJECT
+    return f"{name}-{identity_key[:8]}"
+
+
+def _build_envelope(record: Dict[str, Any], identity: Any,
+                    package_file: str) -> Dict[str, Any]:
+    """Data-model § E6 envelope: attribution face + the source record sealed
+    verbatim under ``record`` (C-14/C-15 — no rewrite, completion or drop of
+    any source field; unknown fields ride along untouched)."""
+    ident = dict(identity) if isinstance(identity, dict) else {}
+    project = str(ident.get("project_name") or "").strip()
+    status = str(ident.get("identity_status")
+                 or (UNKNOWN_PROJECT if not project else "identified"))
+    source_project = project or UNKNOWN_PROJECT  # E6: missing → literal
+    return {
+        "aggregation_envelope": {
+            "schema_version": ENVELOPE_SCHEMA_VERSION,
+            "kind": ENVELOPE_KIND,
+            "source_project": source_project,
+            "source_commit": ident.get("source_commit"),
+            "identity_status": status or UNKNOWN_PROJECT,
+            "identity_key": _identity_key(record, source_project),
+            "content_hash": _content_hash(record),
+            "package_file": str(package_file or ""),
+            "ingested_at": now_iso(),
+        },
+        "record": record,
+    }
+
+
+def _intake_entry_filename() -> str:
+    """C-14: envelope filename rides the quant engine's ``entry_filename()``
+    form (timestamp with microseconds + 8-hex uuid), decoupled from the
+    source member names (which are not guaranteed unique across packages).
+    The engine stay decoupled, so the format is re-derived here; the
+    normative owner is intake-contract C-14."""
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    return f"{stamp}-{uuid.uuid4().hex[:8]}.json"
+
+
+def _write_envelope_atomic(group_dir: Path,
+                           envelope: Dict[str, Any]) -> Path:
+    """tmp+rename atomic write (write_entry form); leaves zero residue."""
+    group_dir.mkdir(parents=True, exist_ok=True)
+    target = group_dir / _intake_entry_filename()
+    tmp = group_dir / (".tmp-" + uuid.uuid4().hex + ".part")
+    tmp.write_text(
+        json.dumps(envelope, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8")
+    os.replace(tmp, target)
+    return target
+
+
+def _scan_identity_window(aggregated: Path) -> Dict[str, str]:
+    """C-13 dedup window: ``identity_key → content_hash`` over every existing
+    aggregated envelope (all groups). Unreadable envelopes stay outside the
+    window (they cannot veto a write they cannot be compared against)."""
+    window: Dict[str, str] = {}
+    if not aggregated.is_dir():
+        return window
+    for group in sorted(aggregated.iterdir()):
+        records_dir = group / AGGREGATED_RECORDS_DIRNAME
+        if not records_dir.is_dir():
+            continue
+        for path in sorted(records_dir.glob("*.json")):
+            try:
+                envelope = json.loads(path.read_text(encoding="utf-8"))
+                env = envelope["aggregation_envelope"]
+                key = env["identity_key"]
+                content_hash = env["content_hash"]
+            except (OSError, ValueError, KeyError, TypeError):
+                continue
+            if isinstance(key, str) and isinstance(content_hash, str):
+                window[key] = content_hash
+    return window
+
+
+def _intake_result(record_count: int, ingested: int, duplicates: int,
+                   skipped: int, conflicts: int, groups: int,
+                   manifest_unreadable: bool) -> Dict[str, Any]:
+    """C-16 output face: the fixed seven-key report."""
+    return {
+        "record_count": record_count,
+        "ingested": ingested,
+        "duplicates_skipped": duplicates,
+        "skipped_unreadable": skipped,
+        "identity_conflicts": conflicts,
+        "groups_touched": groups,
+        "manifest_unreadable": manifest_unreadable,
+    }
+
+
+def action_ingest_exec_quant(args: argparse.Namespace) -> Dict[str, Any]:
+    """Unpack the ``exec-quant/`` payload of an inbound feedback bundle into
+    the local aggregated layer (068 US2; intake-contract C-10..C-17).
+
+    Payload recognition = zip member path prefix ``exec-quant/`` (C-11): a
+    package without it is a zero-count no-op with zero storage writes (the
+    068-pre package stays zero-difference, FR-009). Attribution reads the
+    payload manifest identity only — a missing/corrupt manifest or an
+    ``unknown-project`` identity lands the literal ``unknown-project`` group
+    and is never guessed from paths or content (C-12, FR-006). Per-member
+    parse/kind failures are non-blocking ``skipped_unreadable`` (C-11,
+    FR-010). Dedup check + write share ONE flock critical section on
+    ``aggregated/.write.lock`` (C-13): same identity_key + same content_hash
+    → ``duplicates_skipped``; same key + different content → keep-first +
+    ``identity_conflicts``. Envelopes are per-entry tmp+rename atomic writes
+    (C-14) and the feedback store is never read or written (C-14/FR-006;
+    the intake never triggers aggregate, C-17). Exit ladder: degradations
+    complete with exit 0; ``--package`` missing/not a zip/an unwritable
+    aggregated store is exit 2 (C-16/D10).
+    """
+    if not getattr(args, "package", None):
+        raise FeedbackError(
+            "ingest-exec-quant: --package <zip> is required (the inbound "
+            "feedback bundle carrying the exec-quant payload)")
+    package_path = Path(args.package)
+    if not package_path.is_file():
+        raise FeedbackError(
+            f"ingest-exec-quant: --package file not found: {package_path}")
+    try:
+        archive = zipfile.ZipFile(package_path)
+    except (OSError, ValueError, zipfile.BadZipFile) as exc:
+        raise FeedbackError(
+            f"ingest-exec-quant: --package is not a readable zip: "
+            f"{package_path} ({exc})")
+    workspace_root = resolve_workspace_root(args.workspace_root)
+    store = exec_quant_dir(workspace_root)  # single quant-store locator (068 boundary)
+    aggregated = store / AGGREGATED_DIRNAME
+
+    prefix = PAYLOAD_DIRNAME + "/"
+    manifest_name = f"{prefix}{PAYLOAD_MANIFEST_NAME}"
+    with archive:
+        names = archive.namelist()
+        payload_members = sorted(
+            name for name in names
+            if name.startswith(prefix) and name != manifest_name)
+        if not payload_members:
+            # C-11: no exec-quant/ payload → zero difference vs 068-pre.
+            return _intake_result(0, 0, 0, 0, 0, 0, False)
+
+        manifest: Optional[Dict[str, Any]] = None
+        manifest_unreadable = manifest_name not in names
+        if not manifest_unreadable:
+            try:
+                manifest = json.loads(archive.read(manifest_name)
+                                      .decode("utf-8"))
+                if not isinstance(manifest, dict):
+                    manifest, manifest_unreadable = None, True
+            except (OSError, ValueError, UnicodeDecodeError,
+                    zipfile.BadZipFile):
+                manifest, manifest_unreadable = None, True
+
+        # C-12: attribution from the manifest identity ONLY. A missing or
+        # unknown-project identity normalizes to the literal group; no
+        # guessing from the zip path or the record content.
+        raw_identity = manifest.get("identity") if manifest else None
+        identity = dict(raw_identity) if isinstance(raw_identity, dict) else {}
+        project_name = str(identity.get("project_name") or "").strip()
+        if (str(identity.get("identity_status") or "") == UNKNOWN_PROJECT
+                or not project_name):
+            identity = {"project_name": "",
+                        "source_commit": identity.get("source_commit"),
+                        "identity_status": UNKNOWN_PROJECT}
+
+        record_count = 0
+        skipped = 0
+        parsed: List[Dict[str, Any]] = []
+        for member in payload_members:
+            record_count += 1
+            try:
+                obj = json.loads(archive.read(member).decode("utf-8"))
+            except (OSError, ValueError, UnicodeDecodeError,
+                    zipfile.BadZipFile):
+                skipped += 1
+                continue
+            if not isinstance(obj, dict) or obj.get("kind") != RECORD_KIND:
+                skipped += 1
+                continue
+            parsed.append(obj)
+
+    if not parsed:
+        # Nothing writable: zero storage touch even when members were skipped.
+        return _intake_result(record_count, 0, 0, skipped, 0, 0,
+                              manifest_unreadable)
+
+    resolved_project = project_name or UNKNOWN_PROJECT
+    # D5: the source-slug group is anchored on the first parsed record's
+    # identity short hash (the red-first contract pins this form).
+    group_slug = _source_slug(
+        project_name, _identity_key(parsed[0], resolved_project))
+
+    try:
+        aggregated.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise FeedbackError(
+            f"ingest-exec-quant: aggregated store is not writable: "
+            f"{aggregated} ({exc})")
+
+    ingested = 0
+    duplicates = 0
+    conflicts = 0
+    groups_touched: set = set()
+    lock_path = aggregated / AGGREGATE_LOCK_NAME
+    with lock_path.open("a+") as lock_handle:
+        fcntl.flock(lock_handle, fcntl.LOCK_EX)
+        try:
+            # C-13: the dedup check and every write share this one critical
+            # section, so two concurrent intakes can never double-write.
+            window = _scan_identity_window(aggregated)
+            for record in parsed:
+                key = _identity_key(record, resolved_project)
+                content_hash = _content_hash(record)
+                prior = window.get(key)
+                if prior is not None:
+                    if prior == content_hash:
+                        duplicates += 1
+                    else:  # keep-first: same identity, different content
+                        conflicts += 1
+                    continue
+                _write_envelope_atomic(
+                    aggregated / group_slug / AGGREGATED_RECORDS_DIRNAME,
+                    _build_envelope(record, identity, package_path.name))
+                window[key] = content_hash
+                ingested += 1
+                groups_touched.add(group_slug)
+        finally:
+            fcntl.flock(lock_handle, fcntl.LOCK_UN)
+
+    return _intake_result(record_count, ingested, duplicates, skipped,
+                          conflicts, len(groups_touched), manifest_unreadable)
 
 
 def write_package(
@@ -1832,6 +2115,26 @@ def render_text(action: str, payload: Dict[str, Any]) -> str:
                     "--action upstream --set <repo-url>")
         commit = f" @ {payload['commit']}" if payload.get("commit") else ""
         return f"Upstream repo ({payload.get('source')}): {url}{commit}"
+    if action == "ingest-exec-quant":
+        if not payload.get("record_count"):
+            return ("Exec-quant payload: none (无量化数据) — nothing to "
+                    "ingest; the feedback face was not touched.")
+        lines = [
+            f"Ingested exec-quant payload: {payload['record_count']} record(s) "
+            f"({payload['ingested']} new, "
+            f"{payload['duplicates_skipped']} duplicate(s) skipped, "
+            f"{payload['skipped_unreadable']} skipped unreadable, "
+            f"{payload['identity_conflicts']} identity conflict(s); "
+            f"groups touched: {payload['groups_touched']})",
+            "  next: aggregate is a separate explicit action (--action "
+            "aggregate on the quant engine) — ingest never triggers it",
+        ]
+        if payload.get("manifest_unreadable"):
+            lines.append(
+                "  note: payload-manifest.json was missing/unreadable — "
+                "members were attempted one by one; identity fell back to "
+                "unknown-project")
+        return "\n".join(lines)
     if action == "list":
         matches = payload.get("matches", [])
         if not matches:
@@ -1859,11 +2162,13 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         choices=["record", "status", "list", "dispose", "mark-submitted", "reindex",
                  "package", "cleanup", "upstream", "migrate-legacy",
-                 "introspect-register", "args-manifest"],
+                 "introspect-register", "args-manifest", "ingest-exec-quant"],
     )
     parser.add_argument("--package", default=None,
                         help="cleanup: path to the package zip (workspace-"
-                             "relative or absolute), or 'latest'")
+                             "relative or absolute), or 'latest'; "
+                             "ingest-exec-quant: the inbound feedback bundle "
+                             "to unpack (required)")
     parser.add_argument("--report-file", default=None,
                         help="introspect-register: path to the introspection "
                              "report file")
@@ -1975,6 +2280,7 @@ _ACTIONS = {
     "migrate-legacy": action_migrate_legacy,
     "introspect-register": action_introspect_register,
     "args-manifest": action_args_manifest,
+    "ingest-exec-quant": action_ingest_exec_quant,
 }
 
 
