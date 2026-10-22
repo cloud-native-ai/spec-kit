@@ -48,3 +48,12 @@ per-test temp files. Host git config untouched; reversible by deleting the fixtu
 - Post-RC-07 run: 23 passed in 31.71 s; full stdout captured in the run record
   (`/tmp/t003-post.txt` at run time; summary lines transcribed above).
 - No test is claimed green beyond these two actually-run targeted invocations.
+
+## T006 addendum (post-T004/T005 final state, same command)
+
+- Final targeted run at `f14c4f49`: `25 passed in 27.69s` (call sum 23.03 s). Full
+  before/after table, band comparison on both bases, and overhead attribution:
+  `test-evidence/w2-admission-timing-2026-10-22.md`.
+- RC-07 remains in effect for the whole suite (autouse); its share of the family
+  reduction (121.33 → 31.71 s before T004/T005) is the single largest contributor
+  to the final 121.33 → 27.69 s result.
