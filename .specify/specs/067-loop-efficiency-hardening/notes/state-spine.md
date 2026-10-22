@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792655936
-stage_deadline_epoch: 1792661336
-stage_base_commit: 3cf366b6
+stage_started_at: 1792656640
+stage_deadline_epoch: 1792662040
+stage_base_commit: 5b2521c9
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,18 +37,17 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (implement C+D · T013–T018)
+## Current Part Brief (implement E1 · T019–T021)
 
-- **part_id**: P9-implement-CD-telemetry-clone
-- **allowed files**: `tests/integration/test_trigger_telemetry.py`, `tests/conftest.py`, `tests/contract/test_proactive_trigger_section.py`, `tests/contract/test_instructions_size_budget.py`, `test-evidence/` evidence, `tasks.md` T013–T018 checkboxes only
+- **part_id**: P10-implement-E1-mirror-suite-fold
+- **allowed files**: new `tests/contract/test_mirror_parity_suite.py`, the contract test files named in the T020/T021 fold batches, `test-evidence/` evidence + `test-evidence/test-consolidation-ledger.md`, `tasks.md` T019–T021 checkboxes only
 - **must not modify**: `src/`, `scripts/`, `pyproject.toml`, mirrors, registry, requirements.md, plan.md, other tests
-- **C (T013–T014)**: telemetry family is ~18 s post-RC-07 (still above the 4–6 s band); importlib-load `scripts/python/trigger-utils.py`, call actions in-process, reset module state explicitly between actions, keep ≥1 real CLI smoke test pinning payload/exit semantics; retest and record before/after.
-- **D (T015–T018)**: measure proactive+instructions family first (~14 s post-RC-07 vs 10–12 s band); add a session-level read-only template snapshot + per-case clone helper in `tests/conftest.py` (APFS clonefile with copy fallback), wire proactive/instructions only if still above band; no-op with evidence if already in band. Generator stays a subprocess.
-- **isolation**: assertions and isolation semantics unchanged; snapshot clone must preserve the c9 bare-start semantics; no cross-case pollution.
-- **target commands**: `bash scripts/bash/run-tests.sh <family files> -q --durations=0`
-- **expected**: telemetry ≤6 s family (or over-band attributed); proactive+instructions ≤12 s family (or no-op evidence); CLI pins preserved; no full-suite run
+- **T019**: create the shared parametrized mirror suite; table source = importlib-loaded `scripts/python/sync-mirrors.py` `MIRROR_PAIRS`/compare semantics; assert byte identity per pair; parametrize ids carry source→mirror; cover all engine pairs; do not fix drift here (drift = expected red until T023 sync).
+- **T020/T021**: fold pure byte-identity functions in batches 1 and 2 (dictionary-order first two thirds of the candidate set). Only fold functions whose assertions are purely the mirror byte comparison; keep extra assertions (section sets, counts, wiring, normalization) in their own tests. Every removed function gets a ledger row (case-merge, retained_equivalent_id = suite param id, equivalence rationale, date, commit). Pin strength must not decrease (LED-07).
+- **targeted verification**: run `bash scripts/bash/run-tests.sh tests/contract/test_mirror_parity_suite.py <touched files> -q --durations=0`; expected failures are only known mirror drift (baseline names) and must be name-traceable; no new failure names.
+- **no full suite**; no test claimed pass unless actually run; no drift sync (T023 owns it).
 - **run-turn-budget**: 120
-- **acceptance**: T013–T018 `[X]`; evidence `w2-telemetry-timing-*` and `w2-partd-timing-*`; ledger rows for merged/rewritten tests; no unexecuted test claimed pass
+- **acceptance**: T019–T021 `[X]`; ledger rows count == removed function count; suite node ids unique/path-locatable; evidence `w3-fold-batch12-<date>.md`; no unexecuted test claimed pass
 
 ## Dispatch Log
 
@@ -62,7 +61,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P6-analyze-test-slimming | analyze | — | not_evaluated | none run | ae215d74 (report + remediation) | DONE — VERDICT GREEN; 0 CRITICAL / 0 HIGH / 3 MEDIUM / 8 LOW; M-1 slot ruling, M-2 count reconciliation, M-3 feature registry sync applied; no test run |
 | P7-implement-A-baseline-rc07-admission | implement | T001–T006 (T007 driver) | not_evaluated | targeted: admission 23→25 passed; full slot 83F/4469P/1S | 47a52cc9, f14c4f49, fe5f1e62, e95a5920 | DONE — RC-07 fixture + admission in-process/clone; call sum 121.06→23.03 s; T007 wall **534 s**, name diff 0 NEW / 0 FIXED |
 | P8-implement-B-slow-families | implement | T008–T012 | not_evaluated | targeted only; 9 runs | 3cf366b6 | DONE — all four families already in band after RC-07; zero code changes; no ledger changes |
-| P9-implement-CD-telemetry-clone | implement | T013–T018 | — | targeted only | — | dispatched (C mandatory; D measure-first) |
+| P9-implement-CD-telemetry-clone | implement | T013–T018 | not_evaluated | targeted only | e30ea169, 5b2521c9 | DONE — telemetry 23.36→1.14 s (CLI smoke kept); proactive+instructions 32.70→31.0 s, still over band, attributed to generator subprocesses in the forbidden `scripts/` surface; clone fixture wired and verified |
+| P10-implement-E1-mirror-suite-fold | implement | T019–T021 | — | targeted only | — | dispatched |
 
 ## Gates
 
