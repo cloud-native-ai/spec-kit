@@ -577,3 +577,68 @@ FAILED tests/integration/test_feedback_exec_quant_channel.py::test_no_payload_is
   镜像；T021 `sync-mirrors.py --write --only scripts` 收口）。
 - T020（定向绿证据追加 + stage-status 行）与 T021（镜像同步 + cmp）留给 4c 段；
   本段绿证据已按上列命令行/退出码/计数完整在案。
+
+---
+
+# part 4c — T020（US3 取证）与 T021（exec-quant scripts 镜像同步）
+
+## § T020 — 汇总腿定向转绿与取证
+
+- 命令（US3 两支，canonical runner）：`bash scripts/bash/run-tests.sh
+  tests/contract/test_exec_quant_aggregate.py
+  tests/integration/test_feedback_exec_quant_channel.py -q`
+- 退出码：`0`；`31 passed in 1.13s`（aggregate 契约 25 + 集成链 6，全部绿）。
+- 命令（邻接 5 支）：`bash scripts/bash/run-tests.sh
+  tests/contract/test_exec_quant_engine.py tests/contract/test_exec_quant_dispatch.py
+  tests/contract/test_probe_engine_action_sets.py
+  tests/unit/test_feedback_intake_exec_quant.py
+  tests/contract/test_feedback_exec_quant_payload.py -q`
+- 退出码：`0`；`128 passed in 33.16s`（exec-quant 引擎 50 + dispatch + probe 动作集
+  + US2 接收单元 17 + US1 载荷契约；邻接零回归）。
+- 全量套件未运行（E2 baseline 槽已消耗，closure 名字级比对留 T023/后段）。
+
+## § 独立可用性核验（快速启动场景 3 对应断言 — 已提交测试等价物）
+
+quickstart.md 场景 3 明示钉住测试 = `tests/contract/test_exec_quant_aggregate.py`；
+对应断言逐项转绿（31 例内的具名等价物）：
+
+- ① 动作名 `aggregate` + `--format` 旗标（C-18）：`test_action_registered_in_actions_and_arg_manifest`、
+  `test_args_manifest_covers_aggregate_flags`、`test_aggregate_accepts_workspace_root_and_format_flags`、
+  `test_format_defaults_to_json`。
+- ② 视图字段集合（C-20）：`test_view_projection_field_set_e7`、
+  `test_quality_shape_normalization`、`test_coverage_is_quality_distribution_total`、
+  `test_totals_and_store_digest_replayable`；`sources[]` 按源项目分组 =
+  `test_consumes_aggregated_envelopes_grouped_by_source_project`。
+- ③ 产物路径与形态（C-22，`aggregated/summaries/<id>.json`）：`test_product_lands_in_summaries_entry_form`、
+  `test_stdout_and_product_are_isomorphic`、`test_rerun_appends_new_file_with_identical_numbers`。
+- `record_files[]` 可对账（FR-011）：`test_every_number_replayable_from_record_files`。
+- ≥2 源项目全链（含 `unknown-project` 组）= 集成测试
+  `tests/integration/test_feedback_exec_quant_channel.py`（同趟 6 passed）。
+- 显式动作边界（接收不自动汇总，C-23 负例）= `test_engine_has_no_coupling_to_the_intake_path`。
+
+## § T021 — scripts 对镜像同步（exec-quant.py 编辑收口点）
+
+- Pre-write 核验（判据基准 = T001 基线 `notes/pre-change-measurements.md` §1）：
+  `python3 -u scripts/python/sync-mirrors.py --check --only scripts` → **26 DIFF**，
+  文件集 = T001 基线 26 项中 `feedback-utils.py`（3c 已同步消失）由
+  `exec-quant.py`（4b 源编辑的预期暂存 drift，即本段同步义务对象）替换，
+  其余 25 项逐名与基线一致 = **相对基线零 NEW drift**。
+- 写入：`python3 -u scripts/python/sync-mirrors.py --write --only scripts` →
+  `sync  scripts/ -> .specify/scripts/ (26 files)`，退出码 `0`；零手改镜像。
+- Post-write 复查：`--check --only scripts` → `ok scripts/ == .specify/scripts/
+  (109 files)`，退出码 `0`（scripts 对内零 DIFF）。
+- 字节核对：`cmp scripts/python/exec-quant.py
+  .specify/scripts/python/exec-quant.py` → rc=0（一致）；`cmp
+  scripts/python/feedback-utils.py .specify/scripts/python/feedback-utils.py` →
+  rc=0（3c 同步状态保持）。
+- 附带改动：`--only scripts` 写入同时重写了 25 个继承漂移镜像（T001 基线内
+  既有 DIFF 的字节收敛）；按派发纪律仅提交 `.specify/scripts/python/exec-quant.py`，
+  其余 25 个留工作树由驱动统一还原（与 3c 段同模式），镜像本体零手改。
+- 同步后重跑 US3 定向集（合并 7 支单趟收尾）：`bash scripts/bash/run-tests.sh
+  tests/contract/test_exec_quant_aggregate.py
+  tests/integration/test_feedback_exec_quant_channel.py
+  tests/contract/test_exec_quant_engine.py tests/contract/test_exec_quant_dispatch.py
+  tests/contract/test_probe_engine_action_sets.py
+  tests/unit/test_feedback_intake_exec_quant.py
+  tests/contract/test_feedback_exec_quant_payload.py -q`
+- 退出码：`0`；`159 passed in 34.20s`（= US3 31 + 邻接 128，镜像/源一致后仍全绿）。
