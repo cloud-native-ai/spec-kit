@@ -168,3 +168,5 @@
 | Driver Lease | 驱动租约, driver lease | 表示哪个驱动会话在接管一条 line 的租约文件 <line_id>.driver.lock;活持有者不得夺取,过期须带证据破除并留历史;真源 data-model.md § E4 | auto | proposed |
 | Stage Reservation | 阶段预占, stage reservation | (line_id, stage) 的 O_CREAT 加 O_EXCL 预占,防止同一阶段重复启动;第二启动者只能附着或拒绝;真源 data-model.md § E5 | auto | proposed |
 | Detached Stage Execution | 脱离式阶段执行, detached execution | 子代理在独立进程组/会话 + 四件套 + Registry + reservation + lease 下的执行形态,生命周期独立于主会话并可重新接线;真源 data-model.md § E6/references | auto | proposed |
+| 反馈通道 (Feedback Channel) | - | /speckit.feedback 经 068 升级后的通用框架反馈机制:客户项目经打包把反馈内容(feedback 条目 + exec-quant 载荷等一等载荷)随包收回 spec-kit 上游,人工投递、零自动传输;通道即『打包→手动送达→接收分流→本地消化/汇总』的整条路径。与三捕获机制中的 Feedback Entry(单条改进反思)对象不同。真源 .specify/specs/068-exec-quant-feedback-channel/requirements.md | auto | proposed |
+| 执行量化载荷 (Exec-Quant Payload) | - | 反馈包内 exec-quant 记录副本的统称(068):源项目身份 + 逐条执行量化记录(含遗留形态)+ 载荷级降级计数,在 MANIFEST 显式声明为一等包组成;由打包流程一次写入后不可变,接收侧解出到 spec-kit 聚合层。真源 .specify/specs/068-exec-quant-feedback-channel/requirements.md | auto | proposed |
