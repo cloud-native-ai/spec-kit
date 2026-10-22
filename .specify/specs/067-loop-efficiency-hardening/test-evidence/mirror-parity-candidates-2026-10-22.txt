@@ -1,0 +1,36 @@
+tests/contract/test_agent_dispatch_mechanism.py:231::test_c14_mirror_pair_byte_identical():
+tests/contract/test_ask_record_repeat.py:116::test_doc_exists_with_byte_identical_mirror():
+tests/contract/test_derivation_definitions.py:95::test_specify_mirror_is_byte_identical():
+tests/contract/test_derive_command_surface.py:104::test_engine_and_its_specify_mirror_are_byte_identical():
+tests/contract/test_derive_engine_contract.py:399::test_engine_and_its_specify_mirror_are_byte_identical():
+tests/contract/test_docs_utils_cli.py:62::test_c1_mirror_is_byte_identical():
+tests/contract/test_dogfooding_practice.py:188::test_c3_mirror_byte_identical():
+tests/contract/test_evidence_step_conformance.py:64:    def test_mirror_identical(self):
+tests/contract/test_evidence_step_conformance.py:132:    def test_mirror_identical(self, skill):
+tests/contract/test_evidence_utils_cli.py:195:    def test_mirror_identical(self):
+tests/contract/test_fast_fail_discipline.py:216::test_c2_mirror_byte_identical():
+tests/contract/test_feedback_probe_cli.py:58:    def test_map_is_deterministic_byte_identical(
+tests/contract/test_feedback_step_reference_form.py:265::test_owner_mirror_is_byte_identical():
+tests/contract/test_git_workflow_instructions_block.py:127::test_skill_mirror_is_byte_identical():
+tests/contract/test_glossary_mechanism.py:56::test_instructions_template_mirror_identical():
+tests/contract/test_goal_writeset.py:95:    def test_mapping_mirror_is_byte_identical(self):
+tests/contract/test_objective_analysis_gate.py:171::test_owner_doc_exists_and_mirror_is_byte_identical():
+tests/contract/test_proactive_trigger_section.py:447::test_doc_c1_exists_with_byte_identical_mirror():
+tests/contract/test_progress_reporting.py:67::test_template_mirrors_are_byte_identical():
+tests/contract/test_progress_reporting.py:82::test_doc_exists_with_byte_identical_mirror():
+tests/contract/test_run_skills_wiring.py:70::test_c1_run_skills_canonical_and_mirror_identical():
+tests/contract/test_run_skills_wiring.py:137::test_c7_run_team_canonical_and_mirror_identical():
+tests/contract/test_sdd_loop_driver_skill.py:404::test_c12_mirror_byte_identical():
+tests/contract/test_sdd_project_setup_skill.py:267::test_c10_mirror_byte_identical():
+tests/contract/test_self_improvement_conformance.py:93::test_c4_canonical_shared_files_are_mirrored_byte_identically():
+tests/contract/test_summarize_project_prompt_assets.py:169::test_mirror_is_byte_equivalent(canonical, mirror):
+tests/contract/test_token_efficiency_discipline.py:35::test_cd1_mirror_byte_identical():
+tests/contract/test_token_efficiency_discipline.py:84::test_cd4_instructions_template_mirror_identical():
+tests/contract/test_token_efficiency_feedback.py:44::test_cm1_mirror_identical():
+tests/contract/test_token_efficiency_feedback.py:49::test_cm2_engine_mirror_identical():
+tests/contract/test_token_efficiency_gates.py:42::test_ca3_skill_mirror_identical(rel):
+tests/contract/test_trigger_engine.py:212::test_c2_mirror_byte_identical():
+tests/contract/test_trigger_seed_derivation.py:108::test_c1_seed_exists_and_mirror_is_byte_identical():
+tests/contract/test_user_facing_comprehension_doc.py:188::test_c2_mirror_is_byte_identical():
+tests/contract/test_user_facing_comprehension_pointers.py:262::test_c3_mirrors_are_byte_identical():
+tests/contract/test_user_facing_comprehension_section.py:129::test_c2_mirror_carries_the_section_and_is_byte_identical():
