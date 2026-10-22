@@ -1,0 +1,17 @@
+=========================== short test summary info ============================
+FAILED tests/contract/test_feedback_step_reference_form.py::test_owner_mirror_is_byte_identical
+FAILED tests/contract/test_token_efficiency_feedback.py::test_cm1_mirror_identical
+FAILED tests/contract/test_token_efficiency_feedback.py::test_cm2_engine_mirror_identical
+3 failed, 544 passed in 35.62s
+RC=0
+
+--- capture metadata ---
+command: python3 -m pytest <24 feedback/exec-quant contract+unit+integration files, see quickstart.md scenario 4> -q (tail -5 captured)
+date: 2026-10-22 (plan stage, pre-implementation freeze)
+result: 3 failed, 544 passed; sorted failed nodeids (the name-level baseline):
+  FAILED tests/contract/test_feedback_step_reference_form.py::test_owner_mirror_is_byte_identical
+  FAILED tests/contract/test_token_efficiency_feedback.py::test_cm1_mirror_identical
+  FAILED tests/contract/test_token_efficiency_feedback.py::test_cm2_engine_mirror_identical
+note: all 3 failures are pre-existing mirror-identity drifts (consistent with
+  scripts/python/sync-mirrors.py --check pre-edit baseline recorded in plan.md);
+  criterion for FR-018/SC-006 = zero NEW failing nodeids vs this list (name-level).
