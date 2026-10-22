@@ -60,7 +60,7 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P4-tasks-test-slimming | tasks | T001–T038 | not_evaluated | none run | 78954beb | DONE — 38 tasks / 9 phases (≤8 per part); validate-tasks 0e/0w; pre-analyze tasks pass 0e/1a (expected missing new test path); decomposition proceed 38/40; no test run |
 | P5-checklist-test-slimming | checklist | CHK001–CHK041 | not_evaluated | none run | 3db048e4 | DONE — 41 items, 40 PASS / 1 FAIL (CHK012 E2 symbol ambiguity); FAIL remediated by `b9d23cc2` (tasks.md disambiguation; validate-tasks 0/0); no test run |
 | P6-analyze-test-slimming | analyze | — | not_evaluated | none run | ae215d74 (report + remediation) | DONE — VERDICT GREEN; 0 CRITICAL / 0 HIGH / 3 MEDIUM / 8 LOW; M-1 slot ruling, M-2 count reconciliation, M-3 feature registry sync applied; no test run |
-| P7-implement-A-baseline-rc07-admission | implement | T001–T006 (T007 driver) | — | targeted only | — | dispatched |
+| P7-implement-A-baseline-rc07-admission | implement | T001–T006 (T007 driver) | not_evaluated | targeted: admission 23→25 passed; full slot 83F/4469P/1S | 47a52cc9, f14c4f49, fe5f1e62 + T007 evidence | DONE — RC-07 fixture + admission in-process/clone; call sum 121.06→23.03 s; T007 wall **534 s**, name diff 0 NEW / 0 FIXED |
 
 ## Gates
 
@@ -87,10 +87,15 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 - In-stage full runs = exactly two; any third run requires an explicit out-of-slot exception record.
 - Closure name-level diff authority = the T007 in-stage baseline list; the pre-stage 83-name list is the scope baseline.
 
+<!-- test-budget:begin -->
+{"seq":1,"slot":"baseline","stage":"implement","purpose":"implement-start-baseline","trigger":"scheduled","at":"2026-10-22T07:39:30Z","command":"bash scripts/bash/run-tests.sh -q --durations=50 --names-out .specify/specs/067-loop-efficiency-hardening/test-evidence/baseline-failures-2026-10-22-implement-start.txt","selection_basis":"full-suite","rc":1,"passed":4469,"failed":83,"failed_names_path":".specify/specs/067-loop-efficiency-hardening/test-evidence/baseline-failures-2026-10-22-implement-start.txt","baseline_compare":"na","wall_seconds":534,"evidence_ptr":".specify/specs/067-loop-efficiency-hardening/test-evidence/full-run-2026-10-22-implement-start.md"}
+<!-- test-budget:end -->
+
 ## Checkpoint
 
 - requirements DONE (`982a0503`); clarify DONE (`f086e36d`); baseline measured (`137abc67`); plan DONE (`bca3bc99`); tasks DONE (`78954beb`); checklist DONE (`3db048e4`, CHK012 fixed by `b9d23cc2`); analyze GREEN (`ae215d74`, 0 CRITICAL/HIGH, M-1…M-3 remediated).
-- implement: part A dispatched (T001–T006); T007 driver-run next; then parts B–F, Phase 8 wrap-up, review, Phase 9 closure, U6 local merge (push requires explicit authorization).
+- implement: part A DONE (T001–T006 + T007 implement-start slot). T007 result: 534 s wall (≤600 s process check), 83 failed / 4469 passed / 1 skipped, name diff 0 NEW / 0 FIXED; E1 record `full-run-2026-10-22-implement-start.md`; budget fence baseline:1/closure:0. Next: part B (T008–T012), then C/D/E/F, Phase 8 wrap-up, review, Phase 9 closure, U6 local merge (push requires explicit authorization).
+- E3 stage evidence for clarify/plan/tasks/checklist/analyze added; review row pending the review stage.
 
 ## Framework Observations
 
