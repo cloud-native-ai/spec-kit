@@ -88,14 +88,15 @@ Payload *归因到* 恰一个 Source Project Identity；Payload *声明于* MANI
 | `aggregation_envelope.source_project` | string | E2.project_name；缺失 = `"unknown-project"` 字面量 |
 | `aggregation_envelope.source_commit` | string \| null | E2 佐证 |
 | `aggregation_envelope.identity_status` | enum | E2 |
-| `aggregation_envelope.identity_key` | string | 64-hex（D6 定义） |
-| `aggregation_envelope.content_hash` | string | 64-hex canonical sha256 |
+| `aggregation_envelope.identity_key` | string | 64-hex；D6 五元组哈希（不含 content_hash） |
+| `aggregation_envelope.content_hash` | string | 64-hex canonical sha256；独立比较字段，不进入 identity_key |
 | `aggregation_envelope.package_file` | string | 来源 zip 文件名（不含路径） |
 | `aggregation_envelope.ingested_at` | string | ISO-8601 Z |
 | `record` | object | 源记录 verbatim（未知字段零丢弃） |
 
 **Validation**: 信封不可变（落盘后不更新）；`identity_key` 唯一性由接收动作在
-flock 去重检查下保证；`source-slug` = `slug(project_name) + "-" + hash8(identity串)`
+flock 去重检查下保证；同 key 异 content_hash 不入库（keep-first，`identity_conflicts`
+计数）；`source-slug` = `slug(project_name) + "-" + hash8(identity串)`
 或字面 `unknown-project`。
 
 ## E7 — Aggregate View（新增，汇总产物）

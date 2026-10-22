@@ -176,7 +176,7 @@ spec-kit 维护者可对本仓聚合层执行汇总:得到跨项目、跨单元�
 
 - **FR-006**: spec-kit 侧入站包接收流程 MUST 识别 exec-quant 载荷(record kind [[STR-001]])并把载荷记录解出到本仓聚合层、按包级源项目身份归因;**接收由既有 `/speckit.feedback` 入站包处理路径承接,不新增命令**;识别/解出/归因/聚合的行为归属接收流程(引擎动作名留 plan),feedback 条目处理语义不变;exec-quant 记录 MUST NOT 进入 feedback store(059 FR-009 存储分界保留);身份缺失时归入显式 unknown-project 分组,MUST NOT 猜测
 - **FR-007**: 接收与聚合层 MUST 容忍既有版本/布局/字段形态差异:逐条 `records/` 目录与遗留 jsonl 流并存、schema v1 与 v2 并存、已测字段 `{value, provenance}` 对象与未测字段裸 [[STR-002]] 字符串并存;读取侧归一为派生视图,缺失字段以显式未测标记呈现,**源记录中的未知字段 MUST 原样保留进聚合层(零丢弃)**,MUST NOT 推断或填补;不可解析项跳过并计数;源数据零改写
-- **FR-008**: 接收 MUST 按源记录身份(源项目 + unit_id + run_id + 采集时间戳)幂等:同一包重复接收零重复聚合条目
+- **FR-008**: 接收 MUST 按源记录身份(源项目 + unit_id + unit_type + run_id + 采集时间戳)幂等——unit_type 为显式细化;content_hash 仅用于同身份内容比较、MUST NOT 进入 identity_key:同一包重复接收零重复聚合条目
 - **FR-009**: 不含 exec-quant 载荷的既有形态入站包 MUST 与 068 之前行为零差异——feedback 条目处理语义、MANIFEST 语义、清理与对账动作全部不变,流程不因缺载荷报错
 - **FR-010**: 接收过程的损坏与不可读(zip 成员、单条记录)MUST 显式计数上报且非阻塞——feedback 条目处理 MUST NOT 因量化载荷问题受阻或劣化
 
@@ -273,4 +273,5 @@ Format: - Q: <question> → A: <answer>
 - Q: A4 兼容策略的读取侧归一细则? → A: schema v1/v2、`records/` 目录 vs 遗留 jsonl、`{value, provenance}` vs 裸 [[STR-002]] 三类差异全部在**读取与派生视图**侧归一;**源记录中的未知字段原样保留进聚合层(零丢弃)**;不可解析项跳过并计数,零臆造值;源数据零改写(遗留单体流只读回退)。已固化进 FR-007(FR-005/FR-010 承接计数)。
 - Q: A5 边界复核——修订 059 FR-011 会不会被读成放宽零自动传输? → A: **不会**:修订按子句拆开处置——「结构性排除于反馈打包」修订为仅限手动触发打包;「排除于一切上送路径(零自动传输)」原样保留,任何流程仍 MUST NOT 外送;059 的采集遮蔽与封顶不变;本特性不新增确认门。已固化进 FR-016(子句拆分表述)+ FR-015。
 - Q: Feature 注册的既有计数状态? → A: `features.md` 表头 `Total Features`=64 与实际行数 64 一致,本次新增 068 行后同步更新为 65,零漂移;披露一个**既有**缺口(非本特性引入,不在本阶段修复):specs 066/067 存在但注册表无对应行(066/067 的注册义务属其自身特性线),本阶段不代为补录。
+- Q: analyze F-01——identity_key 是否包含 content_hash? → A: **不包含**。identity_key = 五元组(source_project + unit_id + unit_type + run_id + collected_at);content_hash 作为独立字段,仅用于同 identity_key 的内容比较(同 key 同 hash → `duplicates_skipped`;同 key 异 hash → keep-first + `identity_conflicts`)。依据:FR-008 的源记录身份不含内容;C-13 的冲突分支必须可构造;五元组中的 unit_type 是对 FR-008 的显式细化。已同步 C-13 / D6 / data-model E6 / T010 / T013。
 

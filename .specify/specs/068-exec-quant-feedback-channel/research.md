@@ -98,19 +98,19 @@ excerpt reads) per create-plan § Phase 0 subagent-unavailable fallback; marked
   summaries 按次落盘、可重建（重跑产生新文件不覆盖旧文件）。
 - **Rejected**: 单一聚合 JSON → 违反 FR-012 禁令；归因字段并进记录顶层 → 命名空间冲突风险。
 
-## D6 — 幂等身份键：`source_project + unit_id + unit_type + run_id + collected_at` + 记录内容 canonical sha256
+## D6 — 幂等身份键：五元组 `source_project + unit_id + unit_type + run_id + collected_at`（不含内容）+ 独立 content_hash 比较
 
 - **Serves**: FR-008、US2 场景 2/4。
 - **Decision**: `identity_key = sha256(join([source_project, unit_id, unit_type,
-  run_id, collected_at], "\x1f") + "\x1e" + sha256(canonical_json(record)))`。
+  run_id, collected_at], "\x1f"))`；`content_hash = sha256(canonical_json(record))`
+  作为独立字段落信封，不拼入 identity_key。
   canonical_json = `json.dumps(sort_keys=True, ensure_ascii=False, separators=(",",":"))`。
   同 identity_key 且同 content_hash → 重复，跳过计数；同 identity_key 不同
-  content_hash（引擎法则下不应发生）→ keep-first + `identity_conflict` 显式计数，
-  不覆盖不并行写入。
-- **Rationale**: 五元组覆盖 spec 指定身份（FR-008）；内容哈希兜底同身份异内容；
-  059 采集侧已按 (unit_id, run_id) 去重（`append_record_locked` →
-  `existing_record`，`exec-quant.py:895-917`），故全量包含产生的重复必然是
-  同内容重复，keep-first 语义零信息损失。
+  content_hash → keep-first + `identity_conflicts` 显式计数，不覆盖不并行写入。
+- **Rationale**: 五元组覆盖 spec 指定身份（FR-008，unit_type 为显式细化）；内容哈希
+  独立比较同身份异内容，使冲突分支可构造并保留 keep-first 语义；059 采集侧已按
+  (unit_id, run_id) 去重（`append_record_locked` → `existing_record`，
+  `exec-quant.py:895-917`），全量包含产生的重复通常是同内容重复，但不可假定永远如此。
 
 ## D7 — 载荷封顶：MAX_PAYLOAD_RECORDS = 1000、MAX_PAYLOAD_BYTES = 16 MiB，按 (collected_at, 文件名) 升序纳入，截断显式计数
 

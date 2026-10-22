@@ -32,10 +32,11 @@
 - **C-13** 幂等身份键与去重
 
 - `identity_key = sha256(source_project ␟ unit_id ␟ unit_type ␟ run_id ␟
-  collected_at ␞ content_hash)`（␟ = `\x1f` 分隔，␞ = `\x1e`；canonical JSON
-  sha256 为 content_hash；D6）。
-- 去重窗口 = 全聚合层既有信封的 `identity_key` 集合；重复（同 key 同
-  content_hash）→ 跳过 + `duplicates_skipped` 计数，零重复条目（FR-008）。
+  collected_at)`（␟ = `\x1f` 分隔；五元组不含内容；D6）。
+- `content_hash = sha256(canonical_json(record))` 作为**独立字段**落信封，仅用于同
+  `identity_key` 的内容比较，MUST NOT 拼入 `identity_key`。
+- 去重窗口 = 全聚合层既有信封的 `identity_key` 集合；同 key 同
+  content_hash → 跳过 + `duplicates_skipped` 计数，零重复条目（FR-008）。
 - 同 key 异 content_hash → keep-first + `identity_conflicts` 计数（D6）。
 - 去重检查 + 写入 MUST 在一个 flock 临界区内（沿用 `append_record_locked` 形态，
   锁文件 `aggregated/.write.lock`），两流程并写零冲突（并发开发安全纪律）。
