@@ -163,6 +163,8 @@ turn / token 计数在本周期 dispatch log 全部记 `not_evaluated`（驱动�
 | 失败名单 | 14 名（排序一行一条） | `closure-failures-2026-10-22.txt` |
 | 预算 fence | seq 2 slot=closure；`baseline:1 closure:1` | 状态脊 `<!-- test-budget -->` 围栏（驱动者写入） |
 
+**Post-measurement tree delta**: `git diff --name-only 00287a38..2de9a49b` = 14 files, all under `.specify/specs/067-loop-efficiency-hardening/` plus `.specify/memory/features/058.md`; **zero** changes under `tests/`, `shared/`, `skills/`, `scripts/`, `templates/`. The E1 record's `git_commit=00287a38` remains valid for the measured test tree (MP-08); the later commits are documentation/evidence only.
+
 ### 10.2 T035 — SC-007 覆盖审计（GATE-2）
 
 `coverage-audit-2026-10-22.md`：4551 → 5239；缺失 38（全 contract 层）全部台账映射，**unmatched = 0**；缺失集恰为折叠 id 集；三层计数交叉核对一致；post-only 726 报告性列出（LED-08）。

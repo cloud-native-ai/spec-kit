@@ -1,14 +1,14 @@
 # Loop State Spine — 067-loop-efficiency-hardening
 
 <!-- loop-state:begin -->
-spine_state: running
+spine_state: completed
 stage_started_at: 1792661127
 stage_deadline_epoch: 1792666527
 stage_base_commit: e6c3e655
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
-last_verdict: none
+last_verdict: pass-with-waiver
 salvage: none
 <!-- loop-state:end -->
 
@@ -108,7 +108,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 - Review DONE (`d32cdd70`): PASS WITH WAIVER; P0=0/P1=1(W-1)/P2=3. W-1 ruled (ledger-join roster check; addendum); count anchors corrected to 4551/3426.
 - Closure T033/T034 DONE (`e6c3e655`): post ids 5239; wall **553 s** (≤600); 14F/5224P/1S; **0 NEW** / 69 fixed / 14 known debt; E1 closure record; fence baseline:1/closure:1; audit `stages=6 complete=6` exit 0.
 - T035–T038 DONE (`dd05f4a3`): coverage join unmatched 0; W-1 roster 302 = 264 direct + 38 mapped, 0 gap; dependency boundary 0; SC-006…SC-010 and GATE-1…GATE-7 pass; DoD green; 38/38 tasks closed.
-- Next: U6 local merge to master. Push is not authorized in this entry; no push performed.
+- U6 DONE: `067-loop-efficiency-hardening` fast-forward merged into `master` at `2de9a49b`; working tree clean; no push (not authorized). Post-measurement delta `00287a38..2de9a49b` is 14 documentation/evidence files only; `tests/`, `shared/`, `skills/`, `scripts/`, `templates/` unchanged (E1 validity preserved).
+- Final metrics: closure wall **553 s** (≤600), 14F/5224P/1S; 0 NEW / 69 fixed / 14 known debt; 723-param suite green; 35 functions folded (0 deleted); 202 mirrors engine-synced; triage 83/83; GATE-1…7 pass; DoD green; review PASS WITH WAIVER.
 
 ## Framework Observations
 
