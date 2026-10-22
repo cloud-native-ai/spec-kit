@@ -213,14 +213,9 @@ def test_c1_truth_source_doc_exists():
     assert DOC.is_file(), f"missing truth-source doc: {DOC.relative_to(ROOT)}"
 
 
-def test_c2_mirror_byte_identical():
-    """C-2: the runtime mirror is byte-identical to the source."""
-    assert DOC.is_file(), f"missing source: {DOC.relative_to(ROOT)}"
-    assert DOC_MIRROR.is_file(), f"missing mirror: {DOC_MIRROR.relative_to(ROOT)}"
-    assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), (
-        f"{DOC.relative_to(ROOT)} and {DOC_MIRROR.relative_to(ROOT)} differ; "
-        "run: python3 scripts/python/sync-mirrors.py --write --only shared"
-    )
+# C-2 (runtime mirror byte-identity) folded into
+# tests/contract/test_mirror_parity_suite.py (spec 067 T020; ledger row in
+# test-evidence/test-consolidation-ledger.md).
 
 
 def test_c3_filename_rename_guard():

@@ -329,7 +329,20 @@ def test_c15_docs_page_form_compliant():
 
 def test_c16_contract_test_file_complete():
     source = Path(__file__).read_text(encoding="utf-8")
+    suite = (REPO_ROOT / "tests" / "contract" / "test_mirror_parity_suite.py").read_text(
+        encoding="utf-8"
+    )
     for i in range(1, 20):
+        if i == 12:
+            # C-12's byte-identity face was consolidated (spec 067 T021, ledger
+            # rows 67+69) into the shared mirror-parity suite; the clause stays
+            # pinned by requiring the suite to carry the sdd-loop-driver parity
+            # params. The original literal is kept as the first arm.
+            assert "def test_c12_" in source or "skills/external/sdd-loop-driver/" in suite, (
+                "clause C-12 has no test face: neither test_c12_* in this file nor "
+                "sdd-loop-driver parity params in test_mirror_parity_suite.py"
+            )
+            continue
         assert f"def test_c{i}_" in source, (
             f"clause C-{i} has no test function (contract: one test per clause)"
         )
@@ -401,13 +414,11 @@ def test_c11_self_containment_no_runtime_framework_reads():
                 )
 
 
-def test_c12_mirror_byte_identical():
-    dst = REPO_ROOT / ".specify" / "skills" / "sdd-loop-driver"
-    assert dst.exists(), "runtime mirror missing"
-    for rel in MIRROR_FILES + CLI_PROFILE_RELS:
-        assert (dst / rel).read_text(encoding="utf-8") == (SKILL_DIR / rel).read_text(
-            encoding="utf-8"
-        ), f"mirror not byte-identical: {rel}"
+# test_c12_mirror_byte_identical folded into
+# tests/contract/test_mirror_parity_suite.py (spec 067 T021; ledger row in
+# test-evidence/test-consolidation-ledger.md; MIRROR_FILES + CLI_PROFILE_RELS
+# byte compares carried by the engine-driven suite params for that subtree).
+# test_c18_mirror_pair_no_drift below keeps the same loop as an in-file guard.
 
 
 def test_c13_external_roster_and_directory():

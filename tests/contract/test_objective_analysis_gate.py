@@ -165,14 +165,9 @@ def _blocking_hits(text: str) -> list[str]:
 
 
 # --- owner doc: exists, mirrored, declares ownership ---
-
-
-@pytest.mark.contract
-def test_owner_doc_exists_and_mirror_is_byte_identical():
-    assert SOURCE.read_bytes() == MIRROR.read_bytes(), (
-        "objective-analysis-gate mirror drift -- run "
-        "`python3 scripts/python/sync-mirrors.py --write shared`"
-    )
+# (test_owner_doc_exists_and_mirror_is_byte_identical folded into
+#  tests/contract/test_mirror_parity_suite.py, spec 067 T021; ledger row in
+#  test-evidence/test-consolidation-ledger.md)
 
 
 @pytest.mark.contract

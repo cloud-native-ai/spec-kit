@@ -92,11 +92,9 @@ class TestInvariantGroups:
             f"matched lines:\n{window}"
         )
 
-    def test_mapping_mirror_is_byte_identical(self):
-        assert _read(CANONICAL_MAPPING) == _read(MIRROR_MAPPING), (
-            "summary-mapping.md and its .specify mirror diverged — "
-            "run scripts/python/sync-mirrors.py --write"
-        )
+    # test_mapping_mirror_is_byte_identical folded into
+    # tests/contract/test_mirror_parity_suite.py (spec 067 T021; ledger row in
+    # test-evidence/test-consolidation-ledger.md).
 
 
 class TestAtomicityAndSerialization:

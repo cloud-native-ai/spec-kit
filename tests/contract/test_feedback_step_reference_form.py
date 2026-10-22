@@ -262,8 +262,6 @@ def test_owner_keeps_the_procedure_substance():
         assert literal in text, f"owner lost substance: {literal!r}"
 
 
-def test_owner_mirror_is_byte_identical():
-    assert OWNER_MIRROR.is_file(), "missing .specify mirror of feedback-step.md"
-    assert OWNER.read_bytes() == OWNER_MIRROR.read_bytes(), (
-        "feedback-step.md mirror drift — run sync-mirrors.py --write shared"
-    )
+# test_owner_mirror_is_byte_identical folded into
+# tests/contract/test_mirror_parity_suite.py (spec 067 T021; ledger row in
+# test-evidence/test-consolidation-ledger.md).

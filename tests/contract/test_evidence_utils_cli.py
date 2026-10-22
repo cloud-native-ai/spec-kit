@@ -189,12 +189,8 @@ class TestAssetsLintCount:
             "otherwise assets-lane carries 4 permanent false-positive broken refs")
 
 
-# --- C-E11 / mirror -----------------------------------------------------------
-
-class TestMirror:
-    def test_mirror_identical(self):
-        assert MIRROR.is_file(), "scripts/python mirror missing"
-        assert MIRROR.read_bytes() == SCRIPT.read_bytes()
+# --- C-E11 / mirror: folded into tests/contract/test_mirror_parity_suite.py
+# (spec 067 T020; ledger row in test-evidence/test-consolidation-ledger.md)
 
 
 def make_min_workspace(tmp_path: Path) -> Path:

@@ -396,7 +396,6 @@ def test_both_formats_render_one_result(tmp_path):
     assert "A11, A14" in tout, "the semantic-pending line is rendered in text too"
 
 
-def test_engine_and_its_specify_mirror_are_byte_identical():
-    """C-35: the scripts mirror pair is strict/byte-identical."""
-    assert ENGINE_MIRROR.is_file(), "run sync-mirrors.py --write"
-    assert ENGINE.read_bytes() == ENGINE_MIRROR.read_bytes()
+# C-35: the scripts mirror pair is strict/byte-identical — folded into
+# tests/contract/test_mirror_parity_suite.py (spec 067 T020; ledger row in
+# test-evidence/test-consolidation-ledger.md).

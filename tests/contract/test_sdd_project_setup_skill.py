@@ -264,17 +264,9 @@ def test_c9_grading_matches_recipes():
 # ---------------------------------------------------------------- C-10
 
 
-def test_c10_mirror_byte_identical():
-    import filecmp
-
-    dst = REPO_ROOT / ".specify" / "skills" / "sdd-project-setup"
-    assert dst.exists(), "runtime mirror missing — sync-mirrors not run"
-    for rel in ["SKILL.md", "references/setup-recipes.md",
-                "scripts/mechanism-inventory.py", "scripts/hook-health.py"]:
-        assert (dst / rel).exists(), f"mirror missing file: {rel}"
-        assert filecmp.cmp(SKILL_DIR / rel, dst / rel, shallow=False), (
-            f"mirror drift on {rel}"
-        )
+# test_c10_mirror_byte_identical folded into
+# tests/contract/test_mirror_parity_suite.py (spec 067 T021; ledger row in
+# test-evidence/test-consolidation-ledger.md).
 
 
 # ---------------------------------------------------------------- C-11

@@ -65,12 +65,9 @@ def _section(text: str, heading: str) -> str:
     return "\n".join(body)
 
 
-# --- C-1: run-skills canonical exists, mirror byte-identical ---
-
-def test_c1_run_skills_canonical_and_mirror_identical():
-    assert RUN_SKILLS.is_file(), f"missing canonical {RUN_SKILLS}"
-    assert RUN_SKILLS_MIRROR.is_file(), f"missing mirror {RUN_SKILLS_MIRROR}"
-    assert RUN_SKILLS.read_bytes() == RUN_SKILLS_MIRROR.read_bytes()
+# --- C-1: run-skills canonical exists, mirror byte-identical — folded into
+# tests/contract/test_mirror_parity_suite.py (spec 067 T021; ledger row in
+# test-evidence/test-consolidation-ledger.md)
 
 
 # --- C-2: run-skills frontmatter ---
@@ -132,12 +129,9 @@ def test_c6_team_md_run_mode_procedural_zero():
         assert forbidden not in body, f"run procedure detail remains: {forbidden}"
 
 
-# --- C-7: run-team canonical exists, mirror byte-identical ---
-
-def test_c7_run_team_canonical_and_mirror_identical():
-    assert RUN_TEAM.is_file(), f"missing canonical {RUN_TEAM}"
-    assert RUN_TEAM_MIRROR.is_file(), f"missing mirror {RUN_TEAM_MIRROR}"
-    assert RUN_TEAM.read_bytes() == RUN_TEAM_MIRROR.read_bytes()
+# --- C-7: run-team canonical exists, mirror byte-identical — folded into
+# tests/contract/test_mirror_parity_suite.py (spec 067 T021; ledger row in
+# test-evidence/test-consolidation-ledger.md)
 
 
 # --- C-8: run-team frontmatter ---

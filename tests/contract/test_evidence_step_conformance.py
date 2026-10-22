@@ -61,9 +61,8 @@ class TestCollectEvidenceSkill:
         for pattern in VERDICT_PATTERNS:
             assert not re.search(pattern, text, re.I), pattern
 
-    def test_mirror_identical(self):
-        assert COLLECT_SKILL_MIRROR.is_file(), "mirror missing"
-        assert COLLECT_SKILL.read_bytes() == COLLECT_SKILL_MIRROR.read_bytes()
+    # test_mirror_identical folded into tests/contract/test_mirror_parity_suite.py
+    # (spec 067 T020; ledger row in test-evidence/test-consolidation-ledger.md)
 
     def test_references_exist(self):
         assert CONTRACT_REF.is_file()
@@ -129,13 +128,10 @@ class TestImproveSkillIntegration:
         name, path, text = skill
         assert len(text.splitlines()) <= 500, name
 
-    def test_mirror_identical(self, skill):
-        name, path, text = skill
-        flat = REPO_ROOT / ".specify" / "skills" / name / "SKILL.md"
-        nested = REPO_ROOT / ".specify" / "skills" / "internal" / name / "SKILL.md"
-        mirror = flat if flat.is_file() else nested
-        assert mirror.is_file(), f"{name} mirror missing"
-        assert path.read_bytes() == mirror.read_bytes()
+    # test_mirror_identical (flat-if-exists-else-nested per skill) folded into
+    # tests/contract/test_mirror_parity_suite.py (spec 067 T020; ledger row in
+    # test-evidence/test-consolidation-ledger.md; retained params: one per
+    # IMPROVE_SKILLS entry, flat/nested per engine pairs)
 
     def test_improve_team_consumes_runs_lane_not_raw_artifacts(self):
         text = IMPROVE_SKILLS["improve-team"].read_text(encoding="utf-8")

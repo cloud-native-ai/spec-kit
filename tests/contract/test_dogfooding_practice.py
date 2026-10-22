@@ -183,12 +183,8 @@ def test_c2_project_neutral():
             assert bad not in text, f"misspelled variant {bad!r} in {name}"
 
 
-# --- C-3: byte-identical mirrors ---
-
-def test_c3_mirror_byte_identical():
-    assert SRC.read_bytes() == MIRROR.read_bytes(), \
-        "templates/instructions-template.md and .specify/templates/instructions-template.md differ"
-
+# --- C-3: byte-identical mirrors — folded into tests/contract/test_mirror_parity_suite.py
+# (spec 067 T020; ledger row in test-evidence/test-consolidation-ledger.md)
 
 # --- C-5: single delivery point, no duplication ---
 

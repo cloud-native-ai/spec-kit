@@ -225,17 +225,6 @@ def test_c13_retire_lifecycle_in_create_agent():
     assert re.search(r"retire", text, re.IGNORECASE)
 
 
-# ---------------------------------------------------------------- C-14
-
-
-def test_c14_mirror_pair_byte_identical():
-    """agents/ ↔ .specify/agents/templates/ 镜像对字节一致。"""
-    assert EXECUTOR_MIRROR.exists(), "runtime mirror missing — sync-mirrors not run"
-    assert EXECUTOR.read_bytes() == EXECUTOR_MIRROR.read_bytes(), (
-        "agents/sdd-executor.agent.md mirror drift"
-    )
-
-
 # ================================================================ US2 (C-15..C-21)
 
 RUN_AGENT_SKILL = REPO_ROOT / "skills" / "internal" / "run-agent" / "SKILL.md"

@@ -455,16 +455,9 @@ def _doc_section(text: str, title: str) -> str:
 
 
 # --- doc C-1: dual surface + byte-identical mirror ---
-
-
-def test_doc_c1_exists_with_byte_identical_mirror():
-    assert DISCIPLINE_DOC.is_file(), f"missing discipline doc: {DISCIPLINE_DOC}"
-    assert DISCIPLINE_DOC_MIRROR.is_file(), (
-        f"missing discipline doc mirror: {DISCIPLINE_DOC_MIRROR}"
-    )
-    assert DISCIPLINE_DOC.read_bytes() == DISCIPLINE_DOC_MIRROR.read_bytes(), (
-        "discipline doc mirror drift"
-    )
+# (test_doc_c1_exists_with_byte_identical_mirror folded into
+#  tests/contract/test_mirror_parity_suite.py, spec 067 T021; ledger row in
+#  test-evidence/test-consolidation-ledger.md)
 
 
 # --- doc C-2: closed section set, exact order ---

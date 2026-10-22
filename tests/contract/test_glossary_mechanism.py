@@ -53,9 +53,9 @@ def test_documentation_map_has_glossary_row():
         assert "| **Glossary** |" in text, f"Glossary Documentation Map row missing in {rel}"
 
 
-def test_instructions_template_mirror_identical():
-    assert read(ROOT / "templates/instructions-template.md") == \
-        read(ROOT / ".specify/templates/instructions-template.md")
+# test_instructions_template_mirror_identical folded into
+# tests/contract/test_mirror_parity_suite.py (spec 067 T021; ledger row in
+# test-evidence/test-consolidation-ledger.md).
 
 
 # --- Init hook (instruction-init.md C-1) ---
