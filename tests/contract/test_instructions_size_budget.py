@@ -102,12 +102,22 @@ def _make_project(
     Mirrors test_instructions_section_propagation.py's fixture, including the
     ``tools-utils.py`` symlink that ``refresh-tools.sh`` resolves from the
     project root.
+
+    067 T017: the template tree is installed as a per-case clone of the
+    session-level read-only snapshot (``tests/conftest.py``
+    ``install_template_clone``; APFS clonefile first, plain copy fallback)
+    instead of a per-case write. Semantics unchanged (FR-016): every case
+    receives its own independent template copy — ``test_report_is_idempotent``'s
+    idempotence assertions still run against a fresh project each time.
     """
-    (tmp_path / ".specify" / "templates").mkdir(parents=True)
-    (tmp_path / ".specify" / "templates" / "instructions-template.md").write_text(
-        template_body
-        or "# Instructions\n\n## Alpha\n\nalpha body\n\n## Beta\n\nbeta body\n",
-        encoding="utf-8",
+    from conftest import install_template_clone
+
+    install_template_clone(
+        {"instructions-template.md": (
+            template_body
+            or "# Instructions\n\n## Alpha\n\nalpha body\n\n## Beta\n\nbeta body\n"
+        ).encode("utf-8")},
+        tmp_path / ".specify" / "templates",
     )
     specify_py = tmp_path / ".specify" / "scripts" / "python"
     specify_py.mkdir(parents=True, exist_ok=True)

@@ -138,13 +138,26 @@ def _load_scanner():
     return module
 
 
+_SRC_BYTES = SRC.read_bytes()
+
+
 @pytest.fixture
-def installed_project(tmp_path: Path) -> Path:
-    """A minimal installed-project layout the generator can run against."""
-    (tmp_path / ".specify" / "templates").mkdir(parents=True)
-    (tmp_path / ".specify" / "templates" / "instructions-template.md").write_bytes(
-        SRC.read_bytes()
-    )
+def installed_project(tmp_path: Path, tmp_path_factory) -> Path:
+    """A minimal installed-project layout the generator can run against.
+
+    067 T016: the template tree is installed as a per-case clone of the
+    session-level read-only snapshot (``tests/conftest.py``
+    ``install_template_clone``; APFS clonefile first, plain copy fallback)
+    instead of a per-case read+write. Semantics unchanged (FR-016): each case
+    still receives its own independent copy of the template and the live file
+    is still written fresh per case, so c9's bare-start pin (``must start
+    without the section``) holds exactly as before.
+    """
+    from conftest import install_template_clone
+
+    templates = tmp_path / ".specify" / "templates"
+    install_template_clone({"instructions-template.md": _SRC_BYTES}, templates,
+                           tmp_path_factory)
     # A live file that predates the new section and carries project-local content.
     (tmp_path / ".specify" / "instructions.md").write_text(
         "# Instructions\n\n"

@@ -1,3 +1,6 @@
+import hashlib
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -154,3 +157,104 @@ def ai_tools_resource_path(tmp_path: Path) -> Path:
     from fixtures.ai_tools_support import make_resource_with_skills
 
     return make_resource_with_skills(tmp_path / "resource")
+
+
+# --------------------------------------------------------------------------
+# 067 T015: session-level read-only template snapshots + per-case clones
+#
+# plan §W2 行 4 / FR-016: a template tree used by many cases is snapshotted
+# once per pytest session (read-only) and every case receives its own
+# write-time clone — macOS APFS `clonefile` first (via `cp -c`), plain copy
+# fallback everywhere else (and whenever clonefile refuses). The fallback is
+# behavior-neutral: both methods must yield a byte-identical tree, which the
+# helper asserts on EVERY clone, so a broken clone fails loudly instead of
+# silently polluting a case. Cross-case isolation is structural: snapshots are
+# never written to after creation, and each clone lands in that case's own
+# tmp_path (c9's bare-start semantics are untouched by construction).
+# --------------------------------------------------------------------------
+
+_TEMPLATE_SNAPSHOT_BASE: Path | None = None
+
+
+def _w2_snapshot_base(tmp_path_factory=None) -> Path:
+    global _TEMPLATE_SNAPSHOT_BASE
+    if _TEMPLATE_SNAPSHOT_BASE is None:
+        if tmp_path_factory is not None:
+            _TEMPLATE_SNAPSHOT_BASE = tmp_path_factory.mktemp("w2-template-snapshots")
+        else:
+            # Plain-helper callers (no fixture arg available) share a
+            # tempfile-backed store; snapshots are read-only once built.
+            import tempfile
+
+            _TEMPLATE_SNAPSHOT_BASE = Path(
+                tempfile.mkdtemp(prefix="w2-template-snapshots-")
+            )
+    return _TEMPLATE_SNAPSHOT_BASE
+
+
+def _w2_tree_digest(root: Path) -> str:
+    """Order-stable content digest of a file tree (relpath + bytes per entry)."""
+    h = hashlib.sha256()
+    for p in sorted(root.rglob("*")):
+        h.update(p.relative_to(root).as_posix().encode("utf-8"))
+        h.update(b"\0")
+        if p.is_symlink():
+            h.update(b"symlink:" + str(p.readlink()).encode("utf-8"))
+        elif p.is_file():
+            h.update(p.read_bytes())
+        h.update(b"\0")
+    return h.hexdigest()
+
+
+def _w2_clone_dir(src: Path, dst: Path, force_copy: bool = False) -> str:
+    """Clone the tree at `src` to the (not-yet-existing) `dst`.
+
+    Returns the method actually used: ``'clonefile'`` (macOS APFS clonefile,
+    `cp -cR`) or ``'copy'`` (shutil.copytree fallback — used on non-darwin
+    platforms, when `force_copy` is set, and whenever `cp -c` refuses, e.g. a
+    non-APFS volume). Callers verify byte-identity, keeping the fallback
+    behavior-neutral.
+    """
+    if dst.exists():
+        shutil.rmtree(dst)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    if not force_copy and sys.platform == "darwin":
+        proc = subprocess.run(
+            ["cp", "-cR", str(src), str(dst)], capture_output=True, text=True
+        )
+        if proc.returncode == 0:
+            return "clonefile"
+    shutil.copytree(src, dst, symlinks=True)
+    return "copy"
+
+
+def install_template_clone(
+    files: dict[str, bytes], dst: Path, tmp_path_factory=None, force_copy: bool = False
+) -> str:
+    """Install a template tree at `dst` as a clone of the session snapshot.
+
+    `files` maps tree-relative paths to content. The read-only snapshot for
+    this exact tree is built once per session (keyed by a content digest), so
+    every case after the first pays only a clone. Self-verifying (T015
+    acceptance): the clone is byte-compared against the snapshot on every
+    call, and two consecutive clones are independent by construction — each
+    is a separate copy in its own tmp directory; the snapshot is never
+    mutated. Returns the clone method actually used ('clonefile' | 'copy').
+    """
+    digest = hashlib.sha256(
+        b"\0".join(
+            b"".join((rel.encode("utf-8"), b"\x00", content))
+            for rel, content in sorted(files.items())
+        )
+    ).hexdigest()[:16]
+    snap = _w2_snapshot_base(tmp_path_factory) / digest
+    if not snap.exists():
+        for rel, content in files.items():
+            target = snap / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(content)
+    method = _w2_clone_dir(snap, dst, force_copy=force_copy)
+    assert _w2_tree_digest(snap) == _w2_tree_digest(dst), (
+        f"template clone ({method}) diverged from the session snapshot {digest}"
+    )
+    return method

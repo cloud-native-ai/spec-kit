@@ -7,10 +7,25 @@ SC-011's silence and escalation-rate readings.
 
 Written RED before the rotate/config actions exist (tasks.md T030 is
 parallel-eligible with the US2 implementation).
+
+Mechanism (067 T013, FR-016/FR-020): engine actions are called **in-process** —
+``scripts/python/trigger-utils.py`` is importlib-loaded once and its
+``main(argv)`` entry point invoked directly — so the sixty-turn loops no longer
+pay 60+ interpreter cold starts. Two contract faces are kept intact:
+
+* **workspace equivalence**: every in-process call passes ``--workspace``
+  explicitly (an in-process call has no subprocess CWD to resolve from, and the
+  pytest CWD must never leak into root resolution);
+* **the CLI face stays real**: ``test_cli_subprocess_smoke_pins_payload_and_
+  exit_semantics`` runs true subprocess invocations and pins envelope shape /
+  exit codes, asserting subprocess ↔ in-process agreement on identical argv.
 """
 
 from __future__ import annotations
 
+import contextlib
+import importlib.util
+import io
 import json
 import subprocess
 import sys
@@ -25,6 +40,59 @@ SEED = ROOT / "templates" / "proactive-trigger-seed.json"
 EXIT_OK = 0
 CLARIFY_ARGS = ["--stage", "requirements-unclear", "--signal", "needs-clarification"]
 
+# --- in-process engine (067 T013) -------------------------------------------
+#
+# The engine keeps ALL mutable state in workspace files (`.specify/memory/
+# trigger/`); its module level declares immutable constants only, and the
+# parser is rebuilt on every `main()` call. A fresh re-exec of the module under
+# a new namespace is therefore a complete state reset — `reset_engine_state`
+# runs it whenever the runner switches workspace (i.e. at every test case
+# boundary), so no module-level state can carry across cases (FR-016).
+
+_RESET_SEQ = iter(range(1 << 30))
+_ACTIVE_WS: list[Path | None] = [None]
+
+
+def _load_engine():
+    spec = importlib.util.spec_from_file_location(
+        f"_trigger_utils_telemetry_{next(_RESET_SEQ)}", ENGINE
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+ENGINE_MOD = _load_engine()
+
+
+def reset_engine_state() -> None:
+    """Explicit module-state reset between workspaces/actions (FR-016, T013).
+
+    Re-executes the engine module in a fresh namespace so any state a future
+    engine revision adds at module level starts pristine for the next case.
+    """
+    global ENGINE_MOD
+    ENGINE_MOD = _load_engine()
+    _ACTIVE_WS[0] = None
+
+
+def run(args, cwd) -> subprocess.CompletedProcess:
+    """Call one engine action in-process with CLI argv semantics.
+
+    ``cwd`` is the workspace; it is forwarded as ``--workspace`` because the
+    in-process call has no subprocess CWD (and the pytest CWD must not be
+    consulted). Switching workspace triggers an explicit engine-state reset.
+    """
+    if _ACTIVE_WS[0] != cwd:
+        reset_engine_state()
+        _ACTIVE_WS[0] = cwd
+    argv = ["--workspace", str(cwd), *args]
+    out, err = io.StringIO(), io.StringIO()
+    with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+        code = ENGINE_MOD.main(argv)
+    return subprocess.CompletedProcess(argv, code, out.getvalue(), err.getvalue())
+
 
 @pytest.fixture
 def ws(tmp_path: Path) -> Path:
@@ -36,11 +104,6 @@ def ws(tmp_path: Path) -> Path:
     subprocess.run(["git", "init", "-q", "."], cwd=tmp_path, check=True)
     run(["--action", "init"], tmp_path)
     return tmp_path
-
-
-def run(args, cwd) -> subprocess.CompletedProcess:
-    return subprocess.run([sys.executable, str(ENGINE), *args], cwd=cwd,
-                          capture_output=True, text=True)
 
 
 def env_of(proc) -> dict:
@@ -76,6 +139,80 @@ def assess(ws, session, turn, stage_args, compliance=True, probe=False):
     proc = run(args, ws)
     assert proc.returncode == EXIT_OK, proc.stderr
     return env_of(proc)
+
+
+def cli_run(args, cwd: Path) -> subprocess.CompletedProcess:
+    """The real CLI face: a true engine subprocess (067 T013 smoke)."""
+    return subprocess.run([sys.executable, str(ENGINE), *args], cwd=cwd,
+                          capture_output=True, text=True)
+
+
+def normalized_envelope(raw: str) -> dict:
+    """Envelope minus the two fields that legitimately differ between twin
+    workspaces (run timestamp) or between root spellings (absolute path)."""
+    env = json.loads(raw)
+    env.pop("generatedAt")
+    env["workspaceRoot"] = "<ws>"
+    return env
+
+
+# --- 067 T013 (FR-020): the CLI subprocess face, pinned ---------------------
+
+
+def test_cli_subprocess_smoke_pins_payload_and_exit_semantics(tmp_path: Path):
+    """≥1 true CLI subprocess run stays in this file (FR-020).
+
+    Pins the engine's CLI contract on a real interpreter subprocess — fixed
+    9-key envelope, ok/errors shape, graded exit codes — and asserts the
+    in-process runner used by every other test in this file produces the
+    *same* payload and exit code for identical argv on a twin workspace. If a
+    future engine change makes the two faces diverge, this pin fires.
+    """
+    ws_cli = tmp_path / "cli"
+    ws_ipc = tmp_path / "ipc"
+    for d in (ws_cli, ws_ipc):
+        (d / ".specify" / "templates").mkdir(parents=True)
+        (d / ".specify" / "templates" / "proactive-trigger-seed.json").write_bytes(
+            SEED.read_bytes()
+        )
+        (d / ".specify" / "memory").mkdir(parents=True, exist_ok=True)
+        subprocess.run(["git", "init", "-q", "."], cwd=d, check=True)
+
+    # init: envelope shape + ok flag, pinned on the subprocess face.
+    proc_cli = cli_run(["--action", "init"], ws_cli)
+    assert proc_cli.returncode == EXIT_OK, proc_cli.stderr
+    init_env = json.loads(proc_cli.stdout)
+    assert init_env["ok"] is True
+    assert init_env["action"] == "init"
+    assert init_env["errors"] == [] and init_env["warnings"] == []
+    assert set(init_env) == {
+        "ok", "action", "workspaceRoot", "generatedAt", "errors",
+        "warnings", "semanticJudgmentPending", "notes", "payload",
+    }, "the fixed 9-key envelope shape drifted"
+
+    # Same argv through the in-process entry point: identical envelope.
+    proc_ipc = run(["--action", "init"], ws_ipc)
+    assert proc_ipc.returncode == proc_cli.returncode
+    assert normalized_envelope(proc_ipc.stdout) == normalized_envelope(proc_cli.stdout)
+
+    # assess: silent unrelated turn — payload and exit agree across the faces.
+    assess_args = ["--action", "assess", "--session", "ssmoke",
+                   "--turn-id", "ssmoke-01", "--stage", "non-feature",
+                   "--compliance-done"]
+    smoke_cli = cli_run(assess_args, ws_cli)
+    assert smoke_cli.returncode == EXIT_OK, smoke_cli.stderr
+    assert json.loads(smoke_cli.stdout)["payload"].get("suggestion") is None
+    smoke_ipc = run(assess_args, ws_ipc)
+    assert smoke_ipc.returncode == smoke_cli.returncode
+    assert normalized_envelope(smoke_ipc.stdout) == normalized_envelope(smoke_cli.stdout)
+
+    # Usage-error path: graded exit code 1 with ok=false on both faces.
+    bad_cli = cli_run(["--action", "bogus"], ws_cli)
+    assert bad_cli.returncode == 1
+    assert json.loads(bad_cli.stdout)["ok"] is False
+    bad_ipc = run(["--action", "bogus"], ws_ipc)
+    assert bad_ipc.returncode == bad_cli.returncode
+    assert normalized_envelope(bad_ipc.stdout) == normalized_envelope(bad_cli.stdout)
 
 
 # --- V4.3: append-then-truncate is an always-true invariant ---
