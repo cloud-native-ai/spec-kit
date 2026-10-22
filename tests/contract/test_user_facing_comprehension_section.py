@@ -127,15 +127,14 @@ def test_c1_template_carries_the_section_exactly_once_with_its_pointer():
 
 
 def test_c2_mirror_carries_the_section_and_is_byte_identical():
+    # Byte identity templates/instructions-template.md <-> .specify/ mirror is carried
+    # by tests/contract/test_mirror_parity_suite.py templates param (067 T022); the
+    # section-face assertions on the mirrored copy stay pinned here.
     mirror = _text(MIRROR)
     count = len(re.findall(rf"(?m)^{re.escape(HEADING)}\s*$", mirror))
     assert count == 1, f"{HEADING!r} must appear exactly once in the mirror, got {count}"
     assert POINTER in _section(mirror), (
         f"the mirrored section body must carry the STR-001 pointer {POINTER!r}"
-    )
-    assert TEMPLATE.read_bytes() == MIRROR.read_bytes(), (
-        "templates/instructions-template.md and its .specify/ mirror diverged "
-        "(run scripts/python/sync-mirrors.py --write templates)"
     )
 
 

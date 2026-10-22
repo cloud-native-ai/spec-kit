@@ -17,7 +17,6 @@ pytestmark = pytest.mark.contract
 ROOT = Path(__file__).resolve().parents[2]
 FEEDBACK_STEP = ROOT / "shared" / "workflow" / "feedback-step.md"
 ENGINE = ROOT / "scripts" / "python" / "feedback-utils.py"
-ENGINE_MIRROR = ROOT / ".specify" / "scripts" / "python" / "feedback-utils.py"
 
 
 # --------------------------------------------------------------------------- #
@@ -41,13 +40,8 @@ def test_cm1_clean_run_sentence_and_no_fabrication():
     assert "不编造" in text or "MUST NOT fabricate" in text, "no-fabrication rule missing"
 
 
-def test_cm1_mirror_identical():
-    mirror = ROOT / ".specify" / "shared" / "workflow" / "feedback-step.md"
-    assert FEEDBACK_STEP.read_bytes() == mirror.read_bytes(), "feedback-step mirror drift"
-
-
-def test_cm2_engine_mirror_identical():
-    assert ENGINE.read_bytes() == ENGINE_MIRROR.read_bytes(), "feedback-utils mirror drift"
+# Mirror parity for feedback-step.md and feedback-utils.py is carried by the shared
+# tests/contract/test_mirror_parity_suite.py shared/scripts params (067 T022).
 
 
 # --------------------------------------------------------------------------- #

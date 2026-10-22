@@ -90,14 +90,6 @@ def test_c3_core_mechanisms_reference_the_model_without_redefining_evidence():
     assert "不得重定义 evidenceState" in evidence
 
 
-def test_c4_canonical_shared_files_are_mirrored_byte_identically():
-    for source in (DEFINITION, GUIDELINE, PATTERN, WORKFLOW):
-        rel = source.relative_to(ROOT / "shared")
-        mirror = ROOT / ".specify/shared" / rel
-        assert mirror.is_file(), f"missing shared mirror: {mirror}"
-        assert source.read_bytes() == mirror.read_bytes(), f"shared mirror drift: {rel}"
-
-
 def test_c5_all_create_and_improve_skills_reference_canonical_workflow():
     discovered_create = {
         p.parent.name

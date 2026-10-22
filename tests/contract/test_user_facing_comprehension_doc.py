@@ -34,7 +34,6 @@ DOC_NAME = "user-facing-comprehension.md"   # STR-002 basename; its stem is STR-
 ROOT = Path(__file__).resolve().parents[2]
 GUIDELINES = ROOT / "shared" / "guidelines"
 DOC = GUIDELINES / DOC_NAME
-DOC_MIRROR = ROOT / ".specify" / "shared" / "guidelines" / DOC_NAME
 SCANNER = ROOT / "scripts" / "python" / "scan-confirmation-gates.py"
 SPEC_DIR = ROOT / ".specify" / "specs" / "051-user-facing-comprehension"
 NOTES = SPEC_DIR / "notes" / "pre-change-measurements.md"
@@ -184,13 +183,8 @@ def test_c1_doc_exists():
     assert DOC.is_file(), f"truth document missing: {DOC.relative_to(ROOT)}"
 
 
-@pytest.mark.contract
-def test_c2_mirror_is_byte_identical():
-    assert DOC_MIRROR.is_file(), (
-        f"mirror missing: {DOC_MIRROR.relative_to(ROOT)} — run "
-        "`python3 scripts/python/sync-mirrors.py --write --only shared`"
-    )
-    assert DOC.read_bytes() == DOC_MIRROR.read_bytes(), "truth-doc mirror drift"
+# Mirror parity for shared/guidelines/user-facing-comprehension.md is carried by
+# tests/contract/test_mirror_parity_suite.py shared param (067 T022).
 
 
 @pytest.mark.contract
