@@ -183,9 +183,9 @@
 
 **Purpose**: implement 期收尾：镜像义务核销、review 前置核对、verification 建档；review 派发由驱动者执行，closure 槽位（Phase 9）在 review 后、合并前执行。
 
-- [ ] T030 [blockedBy: T029] mirror 同步（如涉及）：对本特性触碰过的镜像对 — `scripts/bash/run-tests.sh`（预期零改动）与 `skills/external/sdd-loop-driver/`（仅引用性更新，FR-021 / RC-06）— 执行 `python3 scripts/python/sync-mirrors.py --write --only <pair>` 后 `--check --only <pair>` 本对零 drift，且全仓 `--check` 相对实施前读数零 NEW drift（plan § Mirror Obligations 判据）；未触碰任何镜像面则在 `verification.md` 显式记录「未触碰」。证据落点：核对输出贴入 `verification.md` 对应节。
-- [ ] T031 [blockedBy: T030] review 前置核对：任务行全闭合（GATE-3 grep 为 0）；两槽位核对（implement 内全量仅 T007 已跑，closure 槽位待 review 后）；`python3 .specify/scripts/python/validate-tasks.py .specify/specs/067-loop-efficiency-hardening/tasks.md` 0 error；证据齐备清单（E1 记录、w2 timing ×4、w1 sync 记录、w3 复测记录、drill 记录、triage 表、台账、钉住名册）逐项 `test -e`；把清单与核对输出写入 `verification.md` 的 review 前置节。
-- [ ] T032 [blockedBy: T031] verification.md 建档：记录 implement 期间哪些测试跑了（命令 + 计数 + 证据指针）、哪些未跑、waiver 原文（无则记 none）；SC-001…SC-005 自应用证据 = 本特性 dispatch log 如实转录（turn / token 不可得记 `not_evaluated`，FR-007，不编造数字）；SC-006…SC-010 标 `pending-closure`（待 T033–T038 closure 槽位回填）。验收：文件存在、SC 逐项有状态。
+- [X] T030 [blockedBy: T029] mirror 同步（如涉及）：对本特性触碰过的镜像对 — `scripts/bash/run-tests.sh`（预期零改动）与 `skills/external/sdd-loop-driver/`（仅引用性更新，FR-021 / RC-06）— 执行 `python3 scripts/python/sync-mirrors.py --write --only <pair>` 后 `--check --only <pair>` 本对零 drift，且全仓 `--check` 相对实施前读数零 NEW drift（plan § Mirror Obligations 判据）；未触碰任何镜像面则在 `verification.md` 显式记录「未触碰」。证据落点：核对输出贴入 `verification.md` 对应节。
+- [X] T031 [blockedBy: T030] review 前置核对：任务行全闭合（GATE-3 grep 为 0）；两槽位核对（implement 内全量仅 T007 已跑，closure 槽位待 review 后）；`python3 .specify/scripts/python/validate-tasks.py .specify/specs/067-loop-efficiency-hardening/tasks.md` 0 error；证据齐备清单（E1 记录、w2 timing ×4、w1 sync 记录、w3 复测记录、drill 记录、triage 表、台账、钉住名册）逐项 `test -e`；把清单与核对输出写入 `verification.md` 的 review 前置节。
+- [X] T032 [blockedBy: T031] verification.md 建档：记录 implement 期间哪些测试跑了（命令 + 计数 + 证据指针）、哪些未跑、waiver 原文（无则记 none）；SC-001…SC-005 自应用证据 = 本特性 dispatch log 如实转录（turn / token 不可得记 `not_evaluated`，FR-007，不编造数字）；SC-006…SC-010 标 `pending-closure`（待 T033–T038 closure 槽位回填）。验收：文件存在、SC 逐项有状态。
 
 **Checkpoint**: implement 期收尾完成、review 可派发；closure 槽位任务待 review 后、合并前执行。
 
