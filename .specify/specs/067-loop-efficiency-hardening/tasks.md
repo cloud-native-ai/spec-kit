@@ -130,8 +130,8 @@
 
 **Purpose**: 把 60+ 次引擎子进程冷启动的 telemetry 循环改为进程内直调，同时钉住 CLI 契约面，保证子进程与进程内语义一致。
 
-- [ ] T013 [US5] [blockedBy: T007] trigger telemetry 进程内动作化 + CLI 冒烟钉住（research R-2）：改 `tests/integration/test_trigger_telemetry.py`（基线 3 条 ≈19.9 s；sixty-turns 用例循环 60+ 次引擎子进程，每次解释器冷启动 ≈55 ms 起，plan-probes P-3）— importlib 载入 `scripts/python/trigger-utils.py` 直调 action（套件既有模式），动作间显式状态重置（模块级全局态以重置 helper 隔离，FR-016）；保留 ≥1 条 CLI 子进程冒烟用例钉住 payload / 退出码语义（子进程↔进程内一致性由此钉住，FR-020）。目标 node id：`test_sixty_turns_then_rotate_keeps_at_most_the_window`（基线 6.31 s）、`test_row_count_never_exceeds_the_window`（6.22 s）、`test_rotation_loses_no_rule_state`（7.39 s）。预期 red→green：red = ≈19.9 s；green = 4–6 s 带。禁改面：trigger-utils.py 引擎。证据随 T014。
-- [ ] T014 [US5] [blockedBy: T013] Part C 定向复测与台账回填：`bash scripts/bash/run-tests.sh tests/integration/test_trigger_telemetry.py -q --durations=0` 记录逐条时长；CLI 冒烟钉住核对（子进程用例仍真实起进程）；台账行核对；落 `test-evidence/w2-telemetry-timing-〈date〉.md`。超带处置同 T006。
+- [x] T013 [US5] [blockedBy: T007] trigger telemetry 进程内动作化 + CLI 冒烟钉住（research R-2）：改 `tests/integration/test_trigger_telemetry.py`（基线 3 条 ≈19.9 s；sixty-turns 用例循环 60+ 次引擎子进程，每次解释器冷启动 ≈55 ms 起，plan-probes P-3）— importlib 载入 `scripts/python/trigger-utils.py` 直调 action（套件既有模式），动作间显式状态重置（模块级全局态以重置 helper 隔离，FR-016）；保留 ≥1 条 CLI 子进程冒烟用例钉住 payload / 退出码语义（子进程↔进程内一致性由此钉住，FR-020）。目标 node id：`test_sixty_turns_then_rotate_keeps_at_most_the_window`（基线 6.31 s）、`test_row_count_never_exceeds_the_window`（6.22 s）、`test_rotation_loses_no_rule_state`（7.39 s）。预期 red→green：red = ≈19.9 s；green = 4–6 s 带。禁改面：trigger-utils.py 引擎。证据随 T014。
+- [x] T014 [US5] [blockedBy: T013] Part C 定向复测与台账回填：`bash scripts/bash/run-tests.sh tests/integration/test_trigger_telemetry.py -q --durations=0` 记录逐条时长；CLI 冒烟钉住核对（子进程用例仍真实起进程）；台账行核对；落 `test-evidence/w2-telemetry-timing-〈date〉.md`。超带处置同 T006。
 
 **Checkpoint**: telemetry 家族落带；CLI 契约面钉住保留；进程内全局态无跨用例泄漏证据。
 
@@ -141,10 +141,10 @@
 
 **Purpose**: 用 session 级只读模板快照 + 每用例写时克隆替代逐用例 copytree；平台回退必须实现且行为中性；生成器契约面保持子进程。
 
-- [ ] T015 [US5] [blockedBy: T007] session 级模板只读快照 + 每用例写时克隆 fixture：在 `tests/conftest.py`（与 RC-07 同一处，plan § Scale/Scope「conftest 一处」）增 session 级只读模板快照 fixture 与每用例克隆 helper — macOS APFS `clonefile` 优先、普通 copy 回退（平台相关回退必须实现且行为中性，plan §W2 行 4）；每用例独立克隆保持 c9 幂等断言的裸起点语义（FR-016，跨用例零污染）。目标面：`tests/contract/test_proactive_trigger_section.py` 与 `tests/contract/test_instructions_size_budget.py` 的逐用例模板树安装。验收：fixture 自证（克隆树与快照 byte 一致、两次连续克隆互不影响）。证据随 T018。
-- [ ] T016 [P] [US5] [blockedBy: T015] proactive trigger 家族接入快照克隆：改 `tests/contract/test_proactive_trigger_section.py`（基线 4 条 ≈17.6 s）接入 T015 夹具（模板树安装从逐用例 copytree 改为克隆）；生成器保持子进程执行（契约面不进程内化，plan §W2 行 4）。目标 node id：`test_c9_section_propagates_and_is_idempotent`（基线 7.30 s，幂等断言跑两次生成）等 4 条。预期 red→green：red = ≈17.6 s；green = 与 T017 合计 10–12 s 带。台账行随 T018。
-- [ ] T017 [P] [US5] [blockedBy: T015] instructions size budget 幂等用例接入：改 `tests/contract/test_instructions_size_budget.py` 的 `test_report_is_idempotent`（基线单条 6.98 s）接入 T015 夹具；两次生成器运行的幂等断言保持。预期 red→green：与 T016 合并评估（合计带 10–12 s）。台账行随 T018。
-- [ ] T018 [US5] [blockedBy: T016,T017] Part D 定向复测与台账回填：`bash scripts/bash/run-tests.sh tests/contract/test_proactive_trigger_section.py tests/contract/test_instructions_size_budget.py -q --durations=0`；对照基线合计 ≈24.6 s 与 10–12 s 带；核对跨用例无污染（c9 裸起点语义）；台账行核对；落 `test-evidence/w2-partd-timing-〈date〉.md`（含平台回退路径的实测记录）。
+- [x] T015 [US5] [blockedBy: T007] session 级模板只读快照 + 每用例写时克隆 fixture：在 `tests/conftest.py`（与 RC-07 同一处，plan § Scale/Scope「conftest 一处」）增 session 级只读模板快照 fixture 与每用例克隆 helper — macOS APFS `clonefile` 优先、普通 copy 回退（平台相关回退必须实现且行为中性，plan §W2 行 4）；每用例独立克隆保持 c9 幂等断言的裸起点语义（FR-016，跨用例零污染）。目标面：`tests/contract/test_proactive_trigger_section.py` 与 `tests/contract/test_instructions_size_budget.py` 的逐用例模板树安装。验收：fixture 自证（克隆树与快照 byte 一致、两次连续克隆互不影响）。证据随 T018。
+- [x] T016 [P] [US5] [blockedBy: T015] proactive trigger 家族接入快照克隆：改 `tests/contract/test_proactive_trigger_section.py`（基线 4 条 ≈17.6 s）接入 T015 夹具（模板树安装从逐用例 copytree 改为克隆）；生成器保持子进程执行（契约面不进程内化，plan §W2 行 4）。目标 node id：`test_c9_section_propagates_and_is_idempotent`（基线 7.30 s，幂等断言跑两次生成）等 4 条。预期 red→green：red = ≈17.6 s；green = 与 T017 合计 10–12 s 带。台账行随 T018。
+- [x] T017 [P] [US5] [blockedBy: T015] instructions size budget 幂等用例接入：改 `tests/contract/test_instructions_size_budget.py` 的 `test_report_is_idempotent`（基线单条 6.98 s）接入 T015 夹具；两次生成器运行的幂等断言保持。预期 red→green：与 T016 合并评估（合计带 10–12 s）。台账行随 T018。
+- [x] T018 [US5] [blockedBy: T016,T017] Part D 定向复测与台账回填：`bash scripts/bash/run-tests.sh tests/contract/test_proactive_trigger_section.py tests/contract/test_instructions_size_budget.py -q --durations=0`；对照基线合计 ≈24.6 s 与 10–12 s 带；核对跨用例无污染（c9 裸起点语义）；台账行核对；落 `test-evidence/w2-partd-timing-〈date〉.md`（含平台回退路径的实测记录）。
 
 **Checkpoint**: 快照克隆夹具落地；proactive / instructions 家族落带；平台回退路径有证据。
 
