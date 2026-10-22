@@ -5,6 +5,7 @@
 **Slice status**: implement 6/6 全段落地（part 1–5：47cd37e8…d2fd6270；part 6a：
 ea2883bf + 1088d4ca；part 6b：T028–T030 收口）。T001–T030 全 `[X]`，
 `deferred_tasks=` none。
+**Post-merge (067 test framework)**: merged upstream at `790d3c1c`; see `notes/post-merge-067.md` — full suite 19F/5342P in 276.48s, zero new vs the 068 pre-merge 79; 067's 600s budget holds.
 **状态词汇**：`SC-NNN_status=` 取值沿用 owner
 `.specify/templates/verification-log-template.md` 的封闭集
 （pass | fail | partial | deferred | unknown）。
