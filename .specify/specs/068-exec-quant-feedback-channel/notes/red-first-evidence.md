@@ -642,3 +642,106 @@ quickstart.md 场景 3 明示钉住测试 = `tests/contract/test_exec_quant_aggr
   tests/unit/test_feedback_intake_exec_quant.py
   tests/contract/test_feedback_exec_quant_payload.py -q`
 - 退出码：`0`；`159 passed in 34.20s`（= US3 31 + 邻接 128，镜像/源一致后仍全绿）。
+
+# Implement Part 5 — US4 边界守卫（T022 / T023 / T024，2026-10-22）
+
+> 本阶段是回归网（tasks.md Phase 5 头注）：T022/T024 守护三腿已实现行为，
+> **非红先**，绿即通过；红则先归因（subject 回归 vs 断言缺陷）再处置，不得静默。
+> T023 为既有套件名字级回归（FR-018/SC-006），判据基线 = 冻结的
+> `test-evidence/log-baseline-pre-impl.txt`（3 failed / 544 passed）。
+
+## § T022 — `tests/contract/test_exec_quant_channel_boundary.py`（回归网，绿）
+
+- 命令（canonical runner）：`bash scripts/bash/run-tests.sh
+  tests/contract/test_exec_quant_channel_boundary.py -q`
+- 退出码：`0`；`11 passed in 0.55s`（-v 逐一核对：4 静态审计 + 2 运行面 +
+  4 凭据链 + 1 常量钉，零 skip）。
+- 守卫面（C-24 / C-25）：
+  - 零网络断言 = 引擎源 AST 审查（`socket`/`urllib.request`/`requests`/`httpx`/
+    `asyncio` 等 18 模块黑名单 + `subprocess.*` 常量命令面，`urllib.parse`
+    白名单例外）+ 运行面观察（三腿全程 monkeypatch 屏蔽 `socket.socket`/
+    `create_connection`/`getaddrinfo`/`threading.Timer`/`builtins.input`，
+    线程集合前后相等，写路径全部落在两声明的 store 内）。
+  - 「绿灯也是断言」自证：`test_network_audit_would_flag_a_violation` 用注入
+    `import socket` / `subprocess.run(["curl",…])` 的对照样本证明审查器可转红。
+  - 凭据零出现（SC-005）：模块级夹具用真 059 collector（host-CLI 伪装 wrapper，
+    `ANTHROPIC_BASE_URL=https://user:pw@api.example.com/v1` 凭据形环境）产出
+    记录，过 package → ingest-exec-quant → aggregate 全链；用引擎自带
+    `CREDENTIAL_PATTERNS` 分别扫描打包 zip（逐成员）、`aggregated/` 层
+    （除 summaries/）、`summaries/` 汇总产物 → 命中计数均 = 0；
+    `user:pw` 哨兵全链零出现；端点值全程 origin-only（`https://api.example.com`）。
+  - 059 遮蔽/封顶不削弱：`RECORD_SIZE_CAP_BYTES == 65536`、
+    `MAX_PAYLOAD_RECORDS == 1000`、`MAX_PAYLOAD_BYTES == 16777216`、
+    `CREDENTIAL_PATTERNS` 8 形态名、`ENDPOINT_ENV_NAMES` 9 名逐字钉。
+  - 子句拆分保留：mark-submitted 归档 zip（068 前唯一外发产物）零
+    `exec-quant/` 成员——手动打包腿是唯一可携带载荷的产物。
+- 本段零 subject 失败；两次断言面缺陷就地修正并披露（SKILL § TDD）：
+  ①zip 实际落点为 feedback store 内 `packages/`（非 workspace 根
+  `packages/`），零外发断言的允许前缀按真实写面收紧；②`--action record`
+  输出为 JSON+提示块混合文本，夹具改为不解析该输出（rc 断言即可）。两者均为
+  新测试自身的断言缺陷，非三腿行为问题。
+
+## § T024 — `tests/contract/test_exec_quant_channel_compat.py`（回归网，绿）
+
+- 命令：`bash scripts/bash/run-tests.sh
+  tests/contract/test_exec_quant_channel_compat.py -q`
+- 退出码：`0`；`6 passed in 0.14s`（-v 核对零 skip；真实入站包参照测试实跑）。
+- 守卫面（C-27/C-28/C-29/C-30）：
+  - 无载荷等构包零差异：自构 068 前形态包（MANIFEST/条目/SUBMISSION-NOTES/
+    introspection）→ `ingest-exec-quant` 全零计数 exit 0 零存储写入；真实包
+    `feedback/feedback-20261022T062525Z.zip` 只读取参照（成员名派生等构包 +
+    前后字节比对确认未触碰；文件缺失时 skip 兜底）。
+  - 双空 → package 不产包且显式说明（note 同时点名 feedback 与 exec-quant）。
+  - 三类并存全链：records/ 目录（schema v1+v2、`{value,provenance}` 与裸
+    `not_evaluated`、未知顶层/quality 字段）+ 遗留 `records.jsonl`（含坏行）
+    同仓打包 → 接收 → 汇总；`source_form_counts` 双计数、`skipped_unreadable=1`、
+    遗留成员名 `legacy-records-L0001.json`；信封 record 逐字段等于原件
+    （未知字段零丢弃）；D8 形态规则汇总（未知形态按未测计，coverage
+    2/10 可重放）；源 store 快照前后字节相等（遗留单体流只读永不重写）。
+  - 零新增阻断式确认门：`_DESTRUCTIVE_ACTIONS` 恰为 068 前六动作（零增长）、
+    两引擎 parser 无 `--yes/--force/…` 同意旗标、`ARG_MANIFEST["aggregate"]
+    ["required"] == []`、运行面屏蔽 `builtins.input` 三腿照常完成。
+  - 存储分界：`aggregated/` 全仓唯一且恰在 `exec-quant/aggregated/`；feedback
+    store 快照零变化且零 `[[STR-001]]`/量化单元 id/信封字样；两清点口径互不
+    引用（feedback `list` count=1 不含量化记录；exec-quant `list-records`
+    恰 1 条且相邻 `aggregated/` 信封不入清点、零 feedback 条目字样）。
+- 本段零失败（首跑 `set()` 对 dict 不可哈希为断言面缺陷，改 JSON 正则形比对，
+  就地修正并披露）。
+
+## § T023 — 既有套件名字级回归（FR-018/SC-006）
+
+- 命令（canonical runner，quickstart 场景 4 的 24 文件 feedback/exec-quant
+  定向集）：`bash scripts/bash/run-tests.sh <24 文件集> -q --names-out
+  test-evidence/log-current-post-impl-names.txt`（全量输出留存
+  `test-evidence/log-regression-post-impl.txt`）。
+- 退出码：`1`（pytest 原生结果）；**2 failed / 545 passed in 35.95s**
+  （收集数 547 与基线 544+3=547 完全一致，零收集面变化）。
+- 名字级比对（基线 = 冻结 `test-evidence/log-baseline-pre-impl.txt` 的
+  3 个失败 nodeid 排序名单）：
+  - `comm -13 baseline current` → **空**（零新增失败 nodeid，FR-018/SC-006
+    判据满足）。
+  - `comm -23 baseline current` → 1 条消失：
+    `tests/contract/test_token_efficiency_feedback.py::test_cm2_engine_mirror_identical`
+    —— 归因：该测试钉 `scripts/python/feedback-utils.py` 与其
+    `.specify/scripts/python/` 镜像字节一致，part 3c 的 T014 scripts 对镜像
+    同步已使该对收敛（预期转绿）。**既有镜像一致性失败的消失不算回归**
+    （任务行明示判据）；余 2 个失败
+    （`test_feedback_step_reference_form.py::test_owner_mirror_is_byte_identical`、
+    `test_token_efficiency_feedback.py::test_cm1_mirror_identical`）与基线
+    逐名相同，均为 feedback-step.md 镜像面既有漂移，T027 镜像同步的预期转绿对象。
+- 两引擎既有动作面零语义变化核对（C-26）：
+  - feedback `_ACTIONS` = 既有 12 动作（record/status/list/dispose/
+    mark-submitted/reindex/package/upstream/cleanup/migrate-legacy/
+    introspect-register/args-manifest）逐一在位 + 新增恰 1 个
+    `ingest-exec-quant`；`_DESTRUCTIVE_ACTIONS` = 068 前六动作零增长；
+    `args-manifest` 输出保持 12 动作面（其既有语义零变化，C-26 明示该动作
+    输出零变化，故 ingest 不入该清单属契约一致而非缺漏；ingest 的
+    `--package` 必填签名由 C-10 测试面钉住）。
+  - exec-quant `ACTIONS` = 既有 5 动作（collect/list-records/score/
+    collect-dispatch/args-manifest）逐一在位 + 按契约仅追加 `aggregate`
+    （`ARG_MANIFEST["aggregate"]["required"] == []`）。
+  - 既有动作语义零变化由本趟套件背书：545 passed 含
+    test_feedback_utils_cli / test_feedback_package / test_feedback_utils /
+    test_exec_quant_engine 等语义钉，零新增失败。
+- 结论：**零新增失败 nodeid；唯一名单变化是既有镜像一致性失败的预期消失；
+  真实回归：无。**

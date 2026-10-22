@@ -1,0 +1,41 @@
+# test runner: python3 -m pytest tests/contract/test_feedback_utils_cli.py tests/contract/test_feedback_entry_schema.py tests/contract/test_feedback_mechanism_boundary.py tests/contract/test_feedback_skill_conformance.py tests/contract/test_feedback_two_path_routing.py tests/contract/test_feedback_command_template.py tests/contract/test_feedback_command_classification.py tests/contract/test_feedback_introspection_engine.py tests/contract/test_feedback_introspection_report.py tests/contract/test_feedback_probe_cli.py tests/contract/test_feedback_probe_entry_schema.py tests/contract/test_feedback_probe_registry.py tests/contract/test_feedback_step_reference_form.py tests/contract/test_token_efficiency_feedback.py tests/contract/test_exec_quant_engine.py tests/contract/test_exec_quant_dispatch.py tests/unit/test_feedback_package.py tests/unit/test_feedback_utils.py tests/integration/test_feedback_command_record.py tests/integration/test_feedback_dedup.py tests/integration/test_feedback_partial.py tests/integration/test_feedback_selective_triggering.py tests/integration/test_feedback_skill_record.py tests/integration/test_feedback_threshold.py -q
+........................................................................ [ 13%]
+........................................................................ [ 26%]
+........................................................................ [ 39%]
+........................................................................ [ 52%]
+........................................................................ [ 65%]
+................................................F...F................... [ 78%]
+........................................................................ [ 92%]
+...........................................                              [100%]
+=================================== FAILURES ===================================
+_____________________ test_owner_mirror_is_byte_identical ______________________
+
+    def test_owner_mirror_is_byte_identical():
+        assert OWNER_MIRROR.is_file(), "missing .specify mirror of feedback-step.md"
+>       assert OWNER.read_bytes() == OWNER_MIRROR.read_bytes(), (
+            "feedback-step.md mirror drift — run sync-mirrors.py --write shared"
+        )
+E       AssertionError: feedback-step.md mirror drift — run sync-mirrors.py --write shared
+E       assert b'# Canonical...HRESHOLD`).\n' == b'# Canonical...HRESHOLD`).\n'
+E         
+E         At index 479 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_feedback_step_reference_form.py:267: AssertionError
+__________________________ test_cm1_mirror_identical ___________________________
+
+    def test_cm1_mirror_identical():
+        mirror = ROOT / ".specify" / "shared" / "workflow" / "feedback-step.md"
+>       assert FEEDBACK_STEP.read_bytes() == mirror.read_bytes(), "feedback-step mirror drift"
+E       AssertionError: feedback-step mirror drift
+E       assert b'# Canonical...HRESHOLD`).\n' == b'# Canonical...HRESHOLD`).\n'
+E         
+E         At index 479 diff: b's' != b'.'
+E         Use -v to get more diff
+
+tests/contract/test_token_efficiency_feedback.py:46: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_feedback_step_reference_form.py::test_owner_mirror_is_byte_identical
+FAILED tests/contract/test_token_efficiency_feedback.py::test_cm1_mirror_identical
+2 failed, 545 passed in 35.95s
+# failed-name list written: .specify/specs/068-exec-quant-feedback-channel/test-evidence/log-current-post-impl-names.txt (2 entries)
