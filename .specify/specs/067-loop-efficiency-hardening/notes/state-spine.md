@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792655452
-stage_deadline_epoch: 1792660852
-stage_base_commit: e95a5920
+stage_started_at: 1792655936
+stage_deadline_epoch: 1792661336
+stage_base_commit: 3cf366b6
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,18 +37,18 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (implement B · T008–T012)
+## Current Part Brief (implement C+D · T013–T018)
 
-- **part_id**: P8-implement-B-slow-families
-- **allowed files**: `tests/integration/test_worktree_integration_queue.py`, `tests/contract/test_workspace_isolation_contract.py`, `tests/contract/test_store_state_protocol.py`, `tests/unit/test_audit_plan_changes.py`, `tests/unit/test_loop_state_engine.py`, `test-evidence/` evidence, `tasks.md` T008–T012 checkboxes only
+- **part_id**: P9-implement-CD-telemetry-clone
+- **allowed files**: `tests/integration/test_trigger_telemetry.py`, `tests/conftest.py`, `tests/contract/test_proactive_trigger_section.py`, `tests/contract/test_instructions_size_budget.py`, `test-evidence/` evidence, `tasks.md` T013–T018 checkboxes only
 - **must not modify**: `src/`, `scripts/`, `pyproject.toml`, mirrors, registry, requirements.md, plan.md, other tests
-- **measure-first rule**: run each family targeted BEFORE editing. RC-07 already cut the global hook tax; if a family is already within the plan §W2 band, record the measurement as a no-op ("already in band after RC-07") and do NOT edit that file. Only edit families still above band.
-- **families**: worktree queue (T008), workspace isolation (T009), store-state two-branch merge (T010), audit_plan_changes + loop_state fixtures (T011), then T012 consolidated targeted retest + ledger rows
-- **loop_state constraint**: T011 may only touch fixtures; the 3 baseline-failing loop_state tests must not be fixed or weakened here (triage owns them), and fixture changes must not become their failure cause
+- **C (T013–T014)**: telemetry family is ~18 s post-RC-07 (still above the 4–6 s band); importlib-load `scripts/python/trigger-utils.py`, call actions in-process, reset module state explicitly between actions, keep ≥1 real CLI smoke test pinning payload/exit semantics; retest and record before/after.
+- **D (T015–T018)**: measure proactive+instructions family first (~14 s post-RC-07 vs 10–12 s band); add a session-level read-only template snapshot + per-case clone helper in `tests/conftest.py` (APFS clonefile with copy fallback), wire proactive/instructions only if still above band; no-op with evidence if already in band. Generator stays a subprocess.
+- **isolation**: assertions and isolation semantics unchanged; snapshot clone must preserve the c9 bare-start semantics; no cross-case pollution.
 - **target commands**: `bash scripts/bash/run-tests.sh <family files> -q --durations=0`
-- **expected red→green**: each family measured post-RC-07; above-band families reduced into plan band; all assertions and isolation semantics preserved; no full-suite run
+- **expected**: telemetry ≤6 s family (or over-band attributed); proactive+instructions ≤12 s family (or no-op evidence); CLI pins preserved; no full-suite run
 - **run-turn-budget**: 120
-- **acceptance**: T008–T012 `[X]` (no-op with measurement evidence allowed); ledger rows for any merged/rewritten tests; before/after table in `test-evidence/w2-partb-timing-<date>.md`; no test claimed pass unless actually run
+- **acceptance**: T013–T018 `[X]`; evidence `w2-telemetry-timing-*` and `w2-partd-timing-*`; ledger rows for merged/rewritten tests; no unexecuted test claimed pass
 
 ## Dispatch Log
 
@@ -61,7 +61,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P5-checklist-test-slimming | checklist | CHK001–CHK041 | not_evaluated | none run | 3db048e4 | DONE — 41 items, 40 PASS / 1 FAIL (CHK012 E2 symbol ambiguity); FAIL remediated by `b9d23cc2` (tasks.md disambiguation; validate-tasks 0/0); no test run |
 | P6-analyze-test-slimming | analyze | — | not_evaluated | none run | ae215d74 (report + remediation) | DONE — VERDICT GREEN; 0 CRITICAL / 0 HIGH / 3 MEDIUM / 8 LOW; M-1 slot ruling, M-2 count reconciliation, M-3 feature registry sync applied; no test run |
 | P7-implement-A-baseline-rc07-admission | implement | T001–T006 (T007 driver) | not_evaluated | targeted: admission 23→25 passed; full slot 83F/4469P/1S | 47a52cc9, f14c4f49, fe5f1e62, e95a5920 | DONE — RC-07 fixture + admission in-process/clone; call sum 121.06→23.03 s; T007 wall **534 s**, name diff 0 NEW / 0 FIXED |
-| P8-implement-B-slow-families | implement | T008–T012 | — | targeted only | — | dispatched (measure-first; no-op if already in band) |
+| P8-implement-B-slow-families | implement | T008–T012 | not_evaluated | targeted only; 9 runs | 3cf366b6 | DONE — all four families already in band after RC-07; zero code changes; no ledger changes |
+| P9-implement-CD-telemetry-clone | implement | T013–T018 | — | targeted only | — | dispatched (C mandatory; D measure-first) |
 
 ## Gates
 
