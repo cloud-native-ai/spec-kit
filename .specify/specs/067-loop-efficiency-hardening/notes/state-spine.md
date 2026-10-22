@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792652770
-stage_deadline_epoch: 1792658170
-stage_base_commit: b9d23cc2
+stage_started_at: 1792653477
+stage_deadline_epoch: 1792658877
+stage_base_commit: ae215d74
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,16 +37,18 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (analyze)
+## Current Part Brief (implement A · T001–T006)
 
-- **part_id**: P6-analyze-test-slimming
-- **allowed files**: new `test-evidence/analyze-findings-2026-10-22.md` (report only); all other artifacts read-only
-- **must not modify**: requirements, plan, tasks, checklist, tests, runner, source, mirrors, registry
-- **target**: independent cross-artifact consistency/quality analysis (requirements ↔ plan ↔ tasks ↔ checklist ↔ feature registry ↔ constitution), severity-tagged findings, explicit CRITICAL/HIGH closure or blocking list; zero test runs; no false claims
-- **known inputs**: checklist 41 items (40 PASS / CHK012 FAIL already remediated by `b9d23cc2`); pre-analyze tasks pass with 10 advisories (9 external TB-03/04 clause references + 1 expected missing new suite path); baseline 750 s / 83 failed is the reference set
-- **expected red→green**: no analyze report (red) → GREEN or a complete findings report with remediation pointers (green)
+- **part_id**: P7-implement-A-baseline-rc07-admission
+- **allowed files**: `tests/conftest.py`, `tests/unit/test_admission_check.py`, `test-evidence/` new/updated evidence files, `tasks.md` task-state checkboxes only
+- **must not modify**: `src/`, `scripts/`, `pyproject.toml`, mirrors, registry, requirements.md, plan.md, other tests
+- **tasks**: T001 baseline id list (three-number reconciliation), T002 evidence skeletons (ledger/triage/pinned roster), T003 RC-07 autouse git-config neutralization fixture, T004 admission in-process direct call with CLI pin, T005 admission fixture reuse + table-driven expansion, T006 targeted retest + timing evidence
+- **excluded**: T007 (implement-start full run) is **driver-executed after this part** with `--names-out` and the MP-02 cold-cache protocol; the executor MUST NOT run the full suite
+- **target commands**: `bash scripts/bash/run-tests.sh --collect-only -q` (T001); `bash scripts/bash/run-tests.sh tests/unit/test_admission_check.py -q --durations=0` (T003/T006)
+- **expected red→green**: admission family baseline 87.45 s (red) → family ≤25 s design band, or over-band recorded with attribution (green); all 18 admission behaviors and the CLI exit-code pin preserved
 - **run-turn-budget**: 120
-- **acceptance**: every FR/SC traceable; no unresolved CRITICAL/HIGH; no edits outside the report; no test run claimed
+- **acceptance**: T001–T006 `[X]`; RC-07 scoped and reversible; ledger rows for merged/rewritten cases; no full-suite run; no test claimed pass unless actually run; report residual risks
+- **test-budget ruling**: pre-stage 750 s run is diagnostic and consumes no slot; T007 is the implement-start slot; T034 is the closure slot; exactly two in-stage full runs
 
 ## Dispatch Log
 
@@ -57,7 +59,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P3-plan-test-slimming | plan | — | not_evaluated | none run (2-node timing probe only, per plan-probes dated record) | bca3bc99 | DONE — plan.md + research/data-model/contracts×4/quickstart + plan-probes evidence; pre-analyze --stage plan pass 0e/0a (clauses=35); decomposition-check --mode plan proceed (FR 21/30); no full-suite run; no test claimed as passing |
 | P4-tasks-test-slimming | tasks | T001–T038 | not_evaluated | none run | 78954beb | DONE — 38 tasks / 9 phases (≤8 per part); validate-tasks 0e/0w; pre-analyze tasks pass 0e/1a (expected missing new test path); decomposition proceed 38/40; no test run |
 | P5-checklist-test-slimming | checklist | CHK001–CHK041 | not_evaluated | none run | 3db048e4 | DONE — 41 items, 40 PASS / 1 FAIL (CHK012 E2 symbol ambiguity); FAIL remediated by `b9d23cc2` (tasks.md disambiguation; validate-tasks 0/0); no test run |
-| P6-analyze-test-slimming | analyze | — | — | none run | — | dispatched |
+| P6-analyze-test-slimming | analyze | — | not_evaluated | none run | ae215d74 (report + remediation) | DONE — VERDICT GREEN; 0 CRITICAL / 0 HIGH / 3 MEDIUM / 8 LOW; M-1 slot ruling, M-2 count reconciliation, M-3 feature registry sync applied; no test run |
+| P7-implement-A-baseline-rc07-admission | implement | T001–T006 (T007 driver) | — | targeted only | — | dispatched |
 
 ## Gates
 
@@ -76,9 +79,18 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 - Full stdout: machine-local `notes/baseline-full-2026-10-22.log` (`*.log` gitignored); dated record committed at `137abc67`.
 - This is the pre-change baseline for SC-006/SC-008, not a passing run.
 
+## Test-Budget Ruling (M-1)
+
+- Pre-stage full run `2026-10-22` (750 s, 83 failed) = diagnostic baseline outside implement; consumes no 063 slot.
+- Implement-start slot = T007: full run with `--names-out` (`test-evidence/baseline-failures-<date>-implement-start.txt`) and MP-02 cold-cache protocol; booked in this spine's `<!-- test-budget -->` fence by T007.
+- Closure slot = T034: full run after review, before merge; booked as `slot=closure`.
+- In-stage full runs = exactly two; any third run requires an explicit out-of-slot exception record.
+- Closure name-level diff authority = the T007 in-stage baseline list; the pre-stage 83-name list is the scope baseline.
+
 ## Checkpoint
 
-- requirements: DONE (`982a0503`); clarify: DONE (`f086e36d`); baseline: measured and committed (`137abc67`); plan: DONE (`bca3bc99`) — test-slimming design + Phase 1 artifacts; key rulings: fixture git-hook tax ≈0.9 s/commit is the top root cause (RC-07 neutralization), xdist admitted but NOT adopted (serial-first + RC-04 escalation path), fixed measurement command pinned verbatim (contracts/measurement.md MP-02); next stage = tasks (slicing recommendation in plan §Implementation Slicing, ≈7 parts / ≈37 tasks projected; baseline id list E4 = implement-start duty).
+- requirements DONE (`982a0503`); clarify DONE (`f086e36d`); baseline measured (`137abc67`); plan DONE (`bca3bc99`); tasks DONE (`78954beb`); checklist DONE (`3db048e4`, CHK012 fixed by `b9d23cc2`); analyze GREEN (`ae215d74`, 0 CRITICAL/HIGH, M-1…M-3 remediated).
+- implement: part A dispatched (T001–T006); T007 driver-run next; then parts B–F, Phase 8 wrap-up, review, Phase 9 closure, U6 local merge (push requires explicit authorization).
 
 ## Framework Observations
 
