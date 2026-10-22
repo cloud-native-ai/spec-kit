@@ -5,10 +5,10 @@ source: "/speckit.feedback"
 tags: ["run-determination", "feedback-consume-20261021t161900z"]
 title: "run-determination /speckit.feedback feedback-consume-20261021T161900Z"
 created: "2026-10-21T16:30:11Z"
-summary: "/speckit.feedback run=feedback-consume-20261021T161900Z token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=not_evaluated"
+summary: "/speckit.feedback run=feedback-consume-20261021T161900Z token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=accepted"
 ---
 
-/speckit.feedback run=feedback-consume-20261021T161900Z token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=not_evaluated
+/speckit.feedback run=feedback-consume-20261021T161900Z token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=accepted
 
 ```json
 {
@@ -20,7 +20,7 @@ summary: "/speckit.feedback run=feedback-consume-20261021T161900Z token=not_eval
   "feature": null,
   "feature_id": null,
   "determined_at": "2026-10-21T16:30:11Z",
-  "settled_at": null,
+  "settled_at": "2026-10-22T11:43:19Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -86,9 +86,9 @@ summary: "/speckit.feedback run=feedback-consume-20261021T161900Z token=not_eval
       ]
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "false",
         "source": "none"
@@ -160,18 +160,6 @@ summary: "/speckit.feedback run=feedback-consume-20261021T161900Z token=not_eval
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -186,11 +174,6 @@ summary: "/speckit.feedback run=feedback-consume-20261021T161900Z token=not_eval
       },
       {
         "observation": "elapsed not_evaluated via source=unavailable: current=None baseline=None reason=source_unavailable",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }

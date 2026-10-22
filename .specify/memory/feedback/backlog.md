@@ -139,3 +139,21 @@
 | 2026-10-21 | introspection-20261021T160835Z#F-01 | slice spec 目录解析依赖分支前缀且无 --spec-dir 覆盖；cws-lib-bash 硬依赖；plan 期未强制 canonical C-N 条款形态（复发 F-05/F-08） | improve-skills | `scripts/bash/common.sh`、`scripts/bash/check-prerequisites.sh`、`shared/definitions/contract-clause-definitions.md`、`scripts/python/clause_extract.py` | open | — |
 | 2026-10-21 | introspection-20261021T160835Z#F-02 | git-utils 混合工作树提交分组仍靠人工路径前缀分类；建议增加确定性 changed-path 分组助手/配方（低优先级） | improve-skills | `skills/external/git-utils/SKILL.md`、`docs/git-workflow.md` | open | — |
 | 2026-10-21 | introspection-20261021T161900Z#F-01 | /speckit.feedback wrap-up 自记录使 open 永不归零；A3 要求至少一个 finding | improve-skills | `templates/commands/feedback.md`、`skills/internal/manage-feedback/references/path-a-digest.md`、`scripts/python/feedback-utils.py` | open | — |
+| 2026-10-22 | bundle feedback-20261022T062525Z.zip #speckit-feedback | status 的 legacy_remaining 计数无解释 | improve-docs | `docs/reference/skills/feedback.md`、`skills/internal/manage-feedback/references/path-b-and-probe.md` | open | — |
+| 2026-10-22 | bundle #speckit-clarify | Mode A 派生清单仅按 FR/SC 计数变动回访，不刷新流程注记/Feature detail | improve-skills | `skills/internal/clarify-artifact/SKILL.md`、`shared/constants/clarify-taxonomy.md` | open | — |
+| 2026-10-22 | bundle #speckit-implement | 契约按文档假定 SDK 签名，缺签名探针前置 | improve-skills | `skills/internal/create-plan/SKILL.md` | open | — |
+| 2026-10-22 | bundle #speckit-analyze | GATE-1 需运行时强制文件存在性 | improve-skills | `templates/tasks-template.md`、`skills/internal/create-tasks/SKILL.md` | open | — |
+| 2026-10-22 | bundle #speckit-review | 完成门需一等 [~]/门级 deferral | improve-skills | `skills/internal/implement-feature/SKILL.md`、`templates/tasks-template.md` | open | — |
+| 2026-10-22 | bundle #speckit-review | 证据记录绑定被评审 HEAD SHA | improve-skills | `templates/verification-log-template.md` | open | — |
+| 2026-10-22 | bundle #speckit-review | analyze 对宪法 MUST 级不一致需处置 | improve-skills | `skills/internal/analyze-artifacts/SKILL.md` | open | — |
+| 2026-10-22 | bundle #speckit-review | 门语义 lint：analyze 前捕获 fail-open/缺失证据路径 | speckit-requirements | （新检查器；owner 待定） | open | — |
+| 2026-10-22 | bundle #speckit-review | register.md + 仓内 analyze 报告使持久 ID 可解析 | speckit-requirements | `templates/commands/analyze.md`、`skills/internal/analyze-artifacts/SKILL.md` | open | — |
+| 2026-10-22 | bundle #skill-improve-skills | 承诺 6 个 per-agent guide，实际仅 2 个 | improve-skills | `skills/external/improve-skills/SKILL.md:112`、`references/` | open | — |
+| 2026-10-22 | bundle #skill-improve-skills | loop-playbook 缺「文档先行、代码跟进」续接模式 | improve-skills | `skills/external/improve-skills/references/loop-playbook.md` | open | — |
+| 2026-10-22 | bundle #skill-sdd-loop-driver | --deadline-epoch 越过 --window 上限 | improve-skills | `skills/external/sdd-loop-driver/scripts/watch-target.sh`、`references/watch-model.md` | open | — |
+| 2026-10-22 | bundle #skill-sdd-loop-driver | stage-runner.sh 四件套无 run= 封套 | improve-skills | `skills/external/sdd-loop-driver/scripts/stage-runner.sh` | open | — |
+| 2026-10-22 | bundle #skill-sdd-loop-driver | SPINE_WRITE_MODE=direct 允许子代理改写状态脊 | improve-skills | `skills/external/sdd-loop-driver/references/efficiency-model.md`、`references/stage-prompts.md` | open | — |
+| 2026-10-22 | bundle #skill-sdd-loop-driver | audit-test-budget 需字面 JSON 围栏，台账手写 | improve-tools | `scripts/python/audit-test-budget.py`、`skills/external/sdd-loop-driver/references/stage-prompts.md` | open | — |
+| 2026-10-22 | bundle #skill-sdd-loop-driver | create-new-requirements/plan.sh 切分支与派发纪律冲突 | improve-skills | `scripts/bash/create-new-requirements.sh`、`scripts/bash/create-new-plan.sh` | open | — |
+| 2026-10-22 | introspection-20261022T105731Z#F-01 | sdd-loop-driver 预算/台账/镜像 --only/coverage 基线过程摩擦 | improve-skills | `skills/external/sdd-loop-driver/`、`scripts/python/sync-mirrors.py`、`skills/internal/create-tasks/SKILL.md` | open | — |
+| 2026-10-22 | local 20261022T093747Z-skill-sdd-loop-driver | 067 运行：Part F 预算/ledger、git index.lock 延迟、proactive 家族超带、full-suite 余量薄 | improve-skills / speckit-requirements | `skills/external/sdd-loop-driver/`、`scripts/python/audit-test-budget.py` | open | — |

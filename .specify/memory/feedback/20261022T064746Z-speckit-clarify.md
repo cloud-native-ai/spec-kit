@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-22T06:47:46Z"
 summary: "pass"
+disposition_reason: "introspection:clean-run-no-points"
 ---
 
 ## Review

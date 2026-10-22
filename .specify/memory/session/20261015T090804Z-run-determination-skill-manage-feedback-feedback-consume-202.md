@@ -5,10 +5,10 @@ source: "skill:manage-feedback"
 tags: ["run-determination", "feedback-consume:20261015t081832z"]
 title: "run-determination skill:manage-feedback feedback-consume:20261015T081832Z"
 created: "2026-10-15T09:08:04Z"
-summary: "skill:manage-feedback run=feedback-consume:20261015T081832Z token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "skill:manage-feedback run=feedback-consume:20261015T081832Z token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
 ---
 
-skill:manage-feedback run=feedback-consume:20261015T081832Z token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+skill:manage-feedback run=feedback-consume:20261015T081832Z token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -20,7 +20,7 @@ skill:manage-feedback run=feedback-consume:20261015T081832Z token=not_evaluated 
   "feature": null,
   "feature_id": null,
   "determined_at": "2026-10-15T09:08:04Z",
-  "settled_at": null,
+  "settled_at": "2026-10-22T11:43:34Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -82,9 +82,9 @@ skill:manage-feedback run=feedback-consume:20261015T081832Z token=not_evaluated 
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
@@ -155,18 +155,6 @@ skill:manage-feedback run=feedback-consume:20261015T081832Z token=not_evaluated 
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -186,11 +174,6 @@ skill:manage-feedback run=feedback-consume:20261015T081832Z token=not_evaluated 
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=None collected=None reason=no_declared_checks",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }

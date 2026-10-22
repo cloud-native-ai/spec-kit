@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "068-exec-quant-feedback-channel"
 feature_id: "068"
+disposition: "processed"
 partial: false
 created: "2026-10-22T10:05:15Z"
 summary: "Feature 068 delivered end-to-end: /speckit.feedback package now carries exec-quant payloads; intake idempotently ingests to aggregated/; explicit aggregate summary is local-only. Review PASS merge-rea"
+introspection_ref: "introspection-20261022T105731Z#F-01"
+disposition_reason: "introspection:introspection-20261022T105731Z#F-01"
 ---
 
 ## Review
