@@ -12,14 +12,15 @@
 - **stage_deadline_epoch**: 1792608836
 - **attempts**: 0 (resumed under the raised budget; prior 2 budget-exhausted sub-dispatches are recorded below)
 - **retry_limit**: 2
-- **sub_dispatch**: 3
+- **sub_dispatch**: 5
 - **status**: ready (budget raised + bounded split continuation)
 - **turn_budget**: 120 (owner: `agents/sdd-executor.agent.md`; commit `696d5f4b`)
-- **part_scope**: T003–T008 (next)
+- **part_scope**: T015–T018 (next)
+- **last_part**: T009–T014 DONE (engine core: input projection, evidence/stale readers, `STAGE_ARTIFACTS` + commit evidence, watcher delegation, `loop_state` derivation, six detectors; unit 34 passed / 21 failed, contract 20 passed / 5 failed; 26 residual reds = T015×18 + T016×5 + T018×3; tasks 14 done / 16 open)
 - **split_plan**: T003–T008 (contract/unit tests + red evidence) → T009–T014 (engine core) → T015–T018 (actions/probe/self-test/reference) → T019–T025 (quickstart/docs/mirror/compat) → T026–T030 (mutation/regression/verification/gates)
 - **stall_reason (resolved)**: 30-task TDD implement exceeded the old 40-turn/output budgets; resolved by raising the executor budget to 120 and splitting into ≤8-task parts (commit `696d5f4b`)
-- **checkpoint**: T001–T002 [X]; T003/T004 artifacts exist but unchecked; `loop-state.py` 29 KB CLI skeleton with `--self-test` 4/4; `tests/contract/test_loop_state_contract.py` 6 passed / 2 failed (help wording; T018 reference missing); unit test, reference, docs, integration test, verification.md all missing; 28 tasks open
-- **intermediate_artifacts**: `skills/external/sdd-loop-driver/scripts/loop-state.py`, `tests/contract/test_loop_state_contract.py`, `.specify/specs/065a-state-awareness/notes/red-first-evidence.md`, phase-1 commit `0989d804`, WIP checkpoint `33500623`, budget commit `696d5f4b`
+- **checkpoint**: T001–T014 [X]; `loop-state.py` implements T009–T014 (snapshot exit 0, `--self-test` still 4/4, pyflakes clean, no unused defs); remaining engine gaps are deliberate: `suggest_action` only the three pre-branches (T015), `--probe` still exits 2 (T016), self-test cases (T017), `references/state-awareness.md` (T018)
+- **intermediate_artifacts**: `skills/external/sdd-loop-driver/scripts/loop-state.py`, `tests/unit/test_loop_state_engine.py`, `tests/contract/test_loop_state_contract.py`, `.specify/specs/065a-state-awareness/notes/red-first-evidence.md`, phase-1 commit `0989d804`, WIP checkpoint `33500623`, budget commit `696d5f4b`
 - **pre_existing_dirty**: `.specify/agents/.render-manifest.json`, `.specify/source.json` — external `specify init/refresh` metadata; the stage MUST NOT touch, revert, or commit them
 - **dirty_baseline_note**: runtime mirrors were restored from source (shared/workflow/feature-integration.md, sdd-loop-driver, sdd-project-setup) before dispatch; source is authoritative
 - **evidence**: analyze GREEN (`test-evidence/analyze-findings-r3.md`); coverage 60 clauses / FR 25/25; validate-tasks 0/0; pre-analyze pass with 42 expected missing-path advisories

@@ -109,3 +109,112 @@ SELF-TEST: 4 passed, 0 failed
 EXIT=0
 ```
 
+## T009–T014 — engine core lands, residual reds attributed (2026-10-22)
+
+Part-scope: T009 (input parsing / read-only projection), T010 (evidence readers +
+stale isolation), T011 (stage artifact map + commit evidence), T012 (watcher
+delegation), T013 (`loop_state` derivation), T014 (six read-only detectors).
+T015 (action closure), T016 (`--probe`), T017 (`--self-test` extension) and T018
+(owner reference) stay out of scope by dispatch.
+
+```
+$ SPECKIT_PYTHON=/Users/liuqiming.lqm/project/profiles/.venv/bin/python \
+  bash scripts/bash/run-tests.sh -q \
+  tests/unit/test_loop_state_engine.py tests/contract/test_loop_state_contract.py
+26 failed, 54 passed in 39.94s
+RUN_EXIT=1
+```
+
+Baseline before this part: `56 failed, 24 passed` (80 tests). After: 30 tests turned
+green — unit `34 passed / 21 failed`, contract `20 passed / 5 failed`. No test was
+made green by weakening an assertion.
+
+### Residual reds (26) and their owners
+
+| count | location | failing assertion | owner |
+|-------|----------|-------------------|-------|
+| 18 | unit | `recovery_action` / `recovery_reason` (e.g. `assert 'stop' == 'verify'`, `assert 'unknown' == 'attempts-exhausted'`) | T015 C-46..C-49 ladder, attempt limit, salvage gate, live-TIMEOUT watch |
+| 3 | unit | `--probe` exit 2 (`--probe consumption is not implemented in this build`) | T016 |
+| 2 | contract | `test_probe_shapes_a_and_b_are_accepted`, `test_probe_does_not_read_local_evidence` | T016 |
+| 3 | contract | `references/state-awareness.md missing (T018)` | T018 |
+
+Every unit red stops on its first action assertion, so the assertions *after* it were
+verified out of band with a throw-away harness (`/tmp/verify_t13_t14.py`, not
+committed). Confirmed derived/al detector behavior that the red lines hide:
+
+```
+no-signal: NO_SIGNAL no-signal            running: RUNNING running ['unwatched']
+timeout: TIMEOUT deadline-overrun ['unwatched','deadline-overrun-live']
+ahead:   RUNNING ['unwatched']            (deadline not passed -> no finding)
+unwatched-missing: ['unwatched']  fresh: []  expired: ['unwatched']  sentinel: []
+stale run-mismatch -> forms ['stale-signal'] (1 signal, excluded from evaluation)
+```
+
+### Three defects the red run exposed and fixed in the engine
+
+1. `collect_signals` unpacked `missing_signal(...)` (a dict) as a 2-tuple: every
+   snapshot with a missing evidence file crashed with `ValueError: too many values
+   to unpack`. Readers now return `(signal, meta)` uniformly.
+2. Two dead helpers (`watcher_attribution_form`, `envelopes_agree_placeholder`) were
+   written but never called — `delegate_watcher` implements the C-14 attribution
+   inline. Removed (pyflakes clean, no unused defs/consts).
+3. `resolve_thresholds` probed `watch-target.sh --help` even when all three
+   thresholds were explicit. That extra invocation ran the recording watcher script
+   in `test_watcher_attribution_forms`, which then saw an argv file and failed
+   `stale evidence must prevent the watcher call`. The help probe now runs only when
+   a value is missing (C-16 order preserved: explicit → `--help` → `unknown`).
+
+### Test edits (no assertion weakened — rationale per item)
+
+1. `test_v1_spine_fields_are_parsed_without_guessing` asserted
+   `spine.consistent in (True, None)`. That fixture has no four-piece evidence and
+   the start grace has elapsed, so FR-004 rule (6) derives `NO_SIGNAL` while the
+   spine says `last_verdict=RUNNING`; C-39 then *mandates* `false`. Replaced with
+   the stricter pair `loop_state == "NO_SIGNAL"` + `consistent is False`.
+2. `test_analyze_artifacts_are_vacuously_complete`,
+   `test_implement_document_only_commit_is_not_complete` and
+   `test_clarify_legitimate_no_change_is_verify` wrote their four-piece files under
+   the fixture default stage (`tasks`) while calling `--stage analyze|implement|
+   clarify`, so the engine could never see that stage's sentinel/exit record. They
+   now set `ws.stage` (the pattern `test_directory_artifact_*` and
+   `test_checklist_stage_*` already use). Assertions untouched.
+
+### Interpretive decisions taken contract-first (disclosure)
+
+- **R-02 env fallback not implemented.** C-4 fixes resolution as explicit → Registry
+  → failure ⇒ `null`. `SPECIFY_LINE_RUNTIME_DIR` is therefore *not* consulted for
+  `state_dir`; doing so would invent a path the caller did not state. Deviation from
+  `research.md` R-02 recorded here; `test_unresolved_paths_stay_null_and_are_not_invented`
+  pins the contract reading.
+- **Staleness with an unknown current attempt.** With no spine/Registry `run_id`, a
+  lone `run=` claim is not enough to attribute evidence: fewer than two agreeing
+  four-piece envelopes ⇒ `run-mismatch` (doubtful-strict, C-43). The watchbeat
+  marker is exempt from that rule (C-40 owns its freshness via `window=`) and is
+  only compared against a known attempt.
+- **Liveness identity.** `compare_start_identity` returns `ok`/`mismatch` only for
+  comparable tokens (equal, or both numeric); otherwise `unknown`. No invented
+  "start ticks missing ⇒ pid reuse" verdict.
+- **`missing_fields`** lists the six `REQUIRED_SPINE_FIELDS`, not all fourteen
+  readable ones (a v1 spine may legitimately omit `salvage*`/`*_path`/`last_verdict`).
+- **Baseline split (C1a residual risk).** `stage_base_commit` *absent* ⇒
+  `artifacts.complete=null` + `commits.value_state=unknown` + empty
+  `uncommitted_artifacts` (C-54/C-57/C-59). `stage_base_commit` *present but
+  unresolvable* ⇒ file-level completeness is still computed, `commits.value_state=
+  unknown`, `uncommitted_artifacts=[]`. C-54's “未知” is read as “no baseline
+  recorded”; C-57's unreadable baseline is expressed through `commits`. If a later
+  reviewer reads C-54 as also covering unresolvable bases, `artifacts.complete` /
+  `false_completion` for that case must be revisited — this is the C1a item carried
+  into T015.
+- **`spine.consistent`** compares `last_verdict` with the final `loop_state`
+  (including a verbatim watcher verdict) and is `null` when either side is unknown.
+- **Reason literals emitted by T013/T014**: `spine-stalled`, `spine-reentry-required`,
+  `anomaly-line`, `exit-nonzero`, `sentinel-and-artifacts`, `exit-zero-incomplete`,
+  `sentinel-no-exit`, `dead-no-exit-record`, `deadline-overrun`, `no-signal`,
+  `running`, `unknown`, `not-dispatched`, `evidence-gap`, `remote-unreachable`,
+  `watcher-verdict`. T015 owns the `recovery_reason` literals.
+- **T018 authoring warning**: `test_stage_artifacts_match_reference_five_dimensions`
+  harvests backticked tokens from cells 0–2 and booleans from cells 3–4 of the
+  §Stage Artifact Map table, and `test_derived_mapping_is_three_way_identical` does
+  the same for §Derived Mapping. Path lists belong in backticks, prose must stay out
+  of backticks, and booleans must read `true`/`false`.
+

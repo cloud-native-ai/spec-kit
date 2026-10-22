@@ -364,7 +364,11 @@ def test_v1_spine_fields_are_parsed_without_guessing(tmp_path):
     assert fields["attempt"] == 3
     assert fields["retry_limit"] == 5
     assert env["spine"]["missing_fields"] == []
-    assert env["spine"]["consistent"] in (True, None)
+    # No four-piece evidence in this fixture and the start grace has elapsed, so
+    # FR-004 rule (6) derives NO_SIGNAL != last_verdict RUNNING; C-39 then
+    # requires consistent=false (report, never silently pick a side).
+    assert env["loop_state"] == "NO_SIGNAL"
+    assert env["spine"]["consistent"] is False
 
 
 def test_registry_fallback_resolves_paths_and_stage(tmp_path):
@@ -820,6 +824,7 @@ def test_unknown_base_commit_marks_value_unknown_not_head_guess(tmp_path):
 def test_analyze_artifacts_are_vacuously_complete(tmp_path):
     """C-53: analyze has no required file artifacts -> complete=true."""
     ws = Workspace(tmp_path)
+    ws.stage = "analyze"  # four-piece names follow the stage under test
     base = ws.git_base()
     ws.write_spine(base_commit=base)
     ws.write_status(exit_code=0, sentinel=1)
@@ -838,6 +843,7 @@ def test_analyze_artifacts_are_vacuously_complete(tmp_path):
 def test_implement_document_only_commit_is_not_complete(tmp_path):
     """C-60: implement completeness is code/test commit evidence only."""
     ws = Workspace(tmp_path)
+    ws.stage = "implement"  # four-piece names follow the stage under test
     base = ws.git_base()
     ws.write_spine(base_commit=base)
     ws.write_status(exit_code=0, sentinel=1)
@@ -1090,6 +1096,7 @@ def test_artifacts_without_completion_never_suggests_resume(tmp_path):
 def test_clarify_legitimate_no_change_is_verify(tmp_path):
     """C-46: no_change_allowed + no artifact change since base is commit-ready."""
     ws = Workspace(tmp_path)
+    ws.stage = "clarify"  # four-piece names follow the stage under test
     ws.write_artifact("requirements.md")   # the clarify artifact, unchanged
     base = ws.git_base()                   # committed at / before the baseline
     ws.write_spine(base_commit=base)
