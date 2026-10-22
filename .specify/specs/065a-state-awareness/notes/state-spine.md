@@ -12,12 +12,13 @@
 - **stage_deadline_epoch**: 1792608836
 - **attempts**: 0 (resumed under the raised budget; prior 2 budget-exhausted sub-dispatches are recorded below)
 - **retry_limit**: 2
-- **sub_dispatch**: 6
-- **status**: ready (budget raised + bounded split continuation)
+- **sub_dispatch**: 7
+- **status**: implementing-fast (explicit test waiver) — T015–T018 DONE, next part T019–T030
+- **test_waiver**: user instruction 2026-10-22 — "以忽略测试的方法尽快完成当前的sdd周期"; remaining tests are `waived/not-run`, never claimed pass
 - **turn_budget**: 120 (owner: `agents/sdd-executor.agent.md`; commit `696d5f4b`)
-- **part_scope**: T015–T018 (next)
-- **last_part**: T009 residual DONE (R-02 `state_dir` chain completed: `--state-dir` → Registry `status_path` parent → `SPECIFY_LINE_RUNTIME_DIR` → `$HOME`, unset `$HOME` stays null; +3 unit tests, unit 37 passed / 21 failed, contract 20 passed / 5 failed; red node-id set byte-identical to baseline, 26 residual reds unchanged = T015×18 + T016×5 + T018×3; tasks 14 done / 16 open). Prior part T009–T014 engine core DONE (input projection, evidence/stale readers, `STAGE_ARTIFACTS` + commit evidence, watcher delegation, `loop_state` derivation, six detectors; unit 34 passed / 21 failed, contract 20 passed / 5 failed)
-- **split_plan**: T003–T008 (contract/unit tests + red evidence) → T009–T014 (engine core) → T015–T018 (actions/probe/self-test/reference) → T019–T025 (quickstart/docs/mirror/compat) → T026–T030 (mutation/regression/verification/gates)
+- **part_scope**: T015–T018 (fast; actions/probe/self-test/reference; smoke only) — DONE
+- **last_part**: T015–T018 DONE under the test waiver: full C-46 action ladder (`suggest_action` + `action_ladder`, C-47 attempt cap, C-48 salvage gate, row 11 hoisted above rows 8–10), `--probe` shapes (a)/(b) + five rejection paths + local-path mutex (`do_probe_snapshot`, no local readers/watcher/git), `--self-test` expanded to 35 cases (`SELF-TEST: 35 passed, 0 failed`, exit 0), and `references/state-awareness.md` (FR-004 mirror, five-dimension stage map, probe/action/watchbeat contracts). 26 residual red tests remain `waived/not-run` (T015×18 + T016×5 + T018×3), never claimed pass; hand smoke 11/11; tasks 18 done / 12 open. Prior part T009 residual DONE (R-02 `state_dir` chain completed; unit 37 passed / 21 failed, contract 20 passed / 5 failed)
+- **split_plan**: T003–T008 (contract/unit tests + red evidence) → T009–T014 (engine core) → **fast completion under test waiver**: T015–T018 (actions/probe/self-test/reference, smoke only) → T019–T030 (docs/mirror/verification/gates, tests waived) → review → local merge (push requires the prior explicit authorization / final confirmation)
 - **stall_reason (resolved)**: 30-task TDD implement exceeded the old 40-turn/output budgets; resolved by raising the executor budget to 120 and splitting into ≤8-task parts (commit `696d5f4b`)
 - **checkpoint**: T001–T014 [X]; `loop-state.py` implements T009–T014 with the full R-02 `state_dir` chain (snapshot exit 0, `--self-test` still 4/4, pyflakes clean, no unused defs); remaining engine gaps are deliberate: `suggest_action` only the three pre-branches (T015), `--probe` still exits 2 (T016), self-test cases (T017), `references/state-awareness.md` (T018)
 - **intermediate_artifacts**: `skills/external/sdd-loop-driver/scripts/loop-state.py`, `tests/unit/test_loop_state_engine.py`, `tests/contract/test_loop_state_contract.py`, `.specify/specs/065a-state-awareness/notes/red-first-evidence.md`, phase-1 commit `0989d804`, WIP checkpoint `33500623`, budget commit `696d5f4b`, engine-core commit `0ac387eb`

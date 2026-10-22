@@ -263,3 +263,79 @@ engine mirrors `line-registry.py`; an unset `$HOME` leaves `state_dir` null (R-0
 `_run`/`_snapshot` helpers exists only so a test can drop an inherited
 `SPECIFY_LINE_RUNTIME_DIR`; no fixture ever points at a real home.
 
+## T015–T018 — fast completion under explicit test waiver (2026-10-22)
+
+**User instruction (waiver)**: "以忽略测试的方法尽快完成当前的sdd周期" — implement only;
+do **not** run or repair the full pytest suite, do **not** chase red-to-green. This
+part implemented T015–T018 and verified them with `--self-test`, `--help` and a
+small hand-written snapshot smoke. **No pytest command was run and no test file was
+edited in this part.**
+
+**Status of the 26 residual red tests: `waived/not-run` — NOT pass.** The inventory
+is unchanged from the T009 residual run and none of these node ids is claimed green:
+
+| owner | count | level | status |
+|-------|-------|-------|--------|
+| T015 | 18 | unit (`test_*` action/salvage/attempt/TIMEOUT rows) | `waived/not-run` |
+| T016 | 5 | unit 3 + contract 2 (`test_probe_*`) | `waived/not-run` |
+| T018 | 3 | contract (`test_derived_mapping_owner_is_fr004_everywhere`, `test_stage_artifacts_match_reference_five_dimensions`, `test_derived_mapping_is_three_way_identical`) | `waived/not-run` |
+
+**Smoke evidence actually executed**
+
+```
+$ python3 skills/external/sdd-loop-driver/scripts/loop-state.py --self-test
+...
+SELF-TEST: 35 passed, 0 failed        # exit 0
+
+$ python3 /tmp/loop_state_smoke.py    # hand-written fixture, not pytest
+SMOKE: 0 failed (11 checks)           # exit 0
+
+$ python3 -m py_compile skills/external/sdd-loop-driver/scripts/loop-state.py
+COMPILE-OK
+```
+
+`--self-test` cases now span the `C-18` list: six 065a forms (both `unwatched`
+branches), stale pollution, artifacts-complete-without-sentinel, sentinel-without-
+artifacts (`false_completion`), dead process without an exit record, live `TIMEOUT`,
+legacy spine, `not-dispatched` (including "`--stage` is intent only" and "a
+non-empty spine state excludes it"), missing Registry, required-input vs evidence-
+source tiering (exit 2 vs `missing` + exit 0), both probe shapes, five probe
+rejections + the local-path mutex, per-action refusal envelopes, determinism and the
+`--help` ladder.
+
+The manual smoke covered what `--self-test` does not: `clarify` no-change → `verify`
+(C-46 row 2), `resume` with an unknown `attempt` downgraded to `retry` with
+`blocked_by=["attempt-unknown"]`, stale evidence not changing the action, probe
+shape (a) DONE evidence → `DONE` + `verify` with a contradictory local `ANOMALY:`
+log staying unread, probe shape (b) fully `missing`, four rejection paths, the
+`--probe`/`--spine` mutex, `--out` byte-equal to stdout, and two-run determinism
+(only `evaluated_at` differs).
+
+**Interpretive decisions disclosed (implementation read of the owner contracts)**
+
+1. **C-47 scope**: the attempt cap rewrites `resume` / `retry` candidates to
+   `stop` (`reason=attempts-exhausted`). A candidate that is already `stop` keeps its
+   own reason — the action already satisfies "no further attempt", and relabelling it
+   `attempts-exhausted` would state a false cause (e.g. `remote-unreachable`). This
+   reading is recorded in `references/state-awareness.md` §恢复动作建议.
+2. **Row 11 hoisting**: `STALLED` / `REENTRY_REQUIRED` are evaluated before C-46
+   rows 8–10, as the owner text explicitly requires ("行 8–10 MUST NOT 应用于 …").
+3. **Row 9 / row 13 reasons**: `salvage-not-recorded` (row 9) and `evidence-gap`
+   (row 13) are chosen from the closed `recovery_reason` set in `data-model.md`
+   §7.2; no new reason literal was invented.
+4. **Probe `uncommitted_artifacts`**: probe mode computes no local git evidence, so
+   the field is `[]` meaning "not computed here", not "everything is committed";
+   `paths.*` except `probe` are `null`.
+5. **`--self-test` uses a throwaway git repo** for the commit-evidence rows. If
+   `git init/commit` fails, `git-fixture` (and the commit-dependent cases) report
+   `FAIL` rather than silently skipping — the engine's commit evidence itself
+   requires git.
+
+**Residual risk if the waiver is lifted**: the 26 red tests are the acceptance
+surface. The highest-risk unverified claims are (a) exact envelope field shape under
+every fixture (`test_snapshot_envelope_required_fields_and_decision_consistency`),
+(b) the three reference/script/FR-004 three-way comparisons as *executed pytest*
+(the same logic passed when replicated standalone), and (c) probe-local isolation
+asserted by the contract test's own fixtures rather than the smoke's. None of these
+is claimed green here.
+

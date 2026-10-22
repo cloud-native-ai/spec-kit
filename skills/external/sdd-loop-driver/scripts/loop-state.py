@@ -1646,21 +1646,160 @@ def detect_interruptions(view, artifacts, stale, signals, dispatched,
 
 
 # ---------------------------------------------------------------------------
-# Recovery suggestion (T015 owns C-46..C-49). Only the three pre-branches are
-# implemented here; the candidate ladder lands with T015.
+# Recovery suggestion (T015 / C-45..C-49)
+#
+# The candidate ladder order is OWNED by contracts/interruption-and-action.md
+# C-46 (`提交齐备` predicate); this function is its implementation, not a second
+# definition. Two structural notes that follow from that owner:
+#   - rows 8-10 MUST NOT re-judge STALLED / REENTRY_REQUIRED, so row 11 is
+#     evaluated before them (the owner states this explicitly);
+#   - with an unknown `attempt`, `resume` is never emitted (C-47).
+# 065a only ever suggests: it never commits, isolates, re-dispatches, kills a
+# process, writes a spine or stops a line (C-45/C-49).
 # ---------------------------------------------------------------------------
 
-def suggest_action(loop_state, loop_state_reason, view, artifacts,
-                   not_dispatched_flag, evidence_gap, remote_unreachable):
+def salvage_record_complete(spine):
+    """C-48: `salvage=accepted` alone is not a record; evidence and at are."""
+    accepted = str(spine_field(spine, "salvage") or "").strip().lower()
+    if accepted != "accepted":
+        return False
+    return bool(spine_field(spine, "salvage_evidence")) and bool(
+        spine_field(spine, "salvage_at"))
+
+
+def commit_ready_of(artifacts, commits, commit_ctx):
+    """C-46 `提交齐备` predicate (owner: interruption-and-action.md C-46)."""
+    if artifacts.get("commit_required") is False:
+        return True
+    if commits.get("status") == "na":
+        return True
+    if commits.get("value_state") == "unknown":
+        # No provable baseline: never a HEAD guess, never commit-ready.
+        return False
+    if artifacts.get("no_change_allowed") is True:
+        changed_any = (commit_ctx or {}).get("changed_any")
+        if changed_any is not None and not changed_any:
+            return True  # a legitimate no-change stage has nothing to commit
+    return commits.get("touching") is True
+
+
+def action_ladder(loop_state, view, artifacts, commits, commit_ctx, spine,
+                  not_dispatched_flag, remote_unreachable, false_completion,
+                  forms):
+    """C-46 rows 1-13 in owner order (row 11 hoisted above rows 8-10)."""
+    attempt = spine_field(spine, "attempt")
+    artifacts_complete = artifacts.get("complete") is True
+    salvage_ok = salvage_record_complete(spine)
+    sentinel = bool(view.get("sentinel_present"))
+    anomaly_last = bool(view.get("anomaly_last"))
+
+    # Rows 1-3: short circuits that outrank every evidence-based candidate.
     if not_dispatched_flag:
         return "none", "not-dispatched", [], []
     if remote_unreachable:
-        return "stop", "remote-unreachable", [], []
-    if evidence_gap:
-        return "stop", "evidence-gap", [], []
-    # TODO(T015): C-46 candidate ladder (rows 3-13), C-47 attempt limit,
-    # C-48 salvage gate, C-49 live-TIMEOUT watch priority.
-    return "stop", "unknown", [], []
+        return ("stop", "remote-unreachable",
+                ["the probe proves the remote evidence host unreachable"], [])
+    if loop_state == "UNKNOWN":
+        return ("stop", "evidence-gap",
+                ["no evaluable evidence set (or spine missing after dispatch)"],
+                [])
+
+    # Row 4: keep watching — a live TIMEOUT is watched, never killed (C-49).
+    timeout_live = loop_state == "TIMEOUT" and view.get("pid_alive") is True
+    if ("unwatched" in forms or "deadline-overrun-live" in forms
+            or loop_state == "RUNNING" or timeout_live):
+        if "deadline-overrun-live" in forms:
+            reason = "deadline-overrun-live"
+        elif "unwatched" in forms:
+            reason = "unwatched"
+        else:
+            reason = "running"
+        return ("watch", reason,
+                ["live or recently active stage", "no terminal evidence"], [])
+
+    # Rows 5-7: DONE only. DONE is the single state allowed to reach `verify`
+    # on an unknown commit baseline (row 6).
+    if loop_state == "DONE":
+        if artifacts.get("commit_required") is False \
+                or commits.get("status") == "na":
+            return ("verify", "done-complete",
+                    ["loop_state=DONE", "commit_required=false"], [])
+        if commits.get("value_state") == "unknown":
+            return ("verify", "commit-baseline-unknown",
+                    ["loop_state=DONE",
+                     "stage_base_commit missing or unresolvable"], [])
+        if artifacts_complete and commit_ready_of(artifacts, commits,
+                                                  commit_ctx):
+            return ("verify", "done-complete",
+                    ["loop_state=DONE", "required artifacts complete",
+                     "commit-ready"], [])
+
+    # Row 11: STALLED / REENTRY_REQUIRED are judged here and only here.
+    if loop_state in ("STALLED", "REENTRY_REQUIRED"):
+        return ("stop", "stalled-handoff",
+                ["spine_state=%s" % (view.get("spine_state") or "stalled")], [])
+
+    # Row 8: resume needs complete artifacts, a non-ANOMALY final line and
+    # either the final-line sentinel or a complete salvage record (C-48).
+    if artifacts_complete and not anomaly_last and (sentinel or salvage_ok):
+        reason = ("salvage-accepted" if (salvage_ok and not sentinel)
+                  else "artifacts-uncommitted")
+        preconditions = ["required artifacts complete",
+                         "final log line is not ANOMALY:"]
+        preconditions.append("final-line sentinel present" if sentinel
+                             else "complete salvage record")
+        if attempt is None:
+            return "retry", reason, preconditions, ["attempt-unknown"]
+        return "resume", reason, preconditions, []
+
+    # Row 9: artifacts complete, no sentinel, no complete salvage record.
+    if artifacts_complete:
+        return ("retry", "salvage-not-recorded",
+                ["required artifacts complete",
+                 "no final-line sentinel and no complete salvage record"], [])
+
+    # Row 10: a sentinel over missing artifacts (C-31/C-42) is a retry.
+    if false_completion:
+        return ("retry", "false-completion",
+                ["final-line sentinel present", "required artifacts missing "
+                 "or empty"], [])
+
+    # Row 12: every remaining terminal state.
+    if loop_state in ("INCOMPLETE", "ANOMALY", "FAILED", "DEAD", "TIMEOUT",
+                      "NO_SIGNAL"):
+        return ("retry", "terminal-retry",
+                ["terminal evidence is not completion evidence"], [])
+
+    # Row 13: fallback (e.g. a watcher DONE whose artifacts contradict it).
+    return ("stop", "evidence-gap",
+            ["completion evidence is contradicted by the artifact side"], [])
+
+
+def suggest_action(loop_state, view, artifacts, commits, commit_ctx, spine,
+                   thresholds, not_dispatched_flag, remote_unreachable,
+                   false_completion, forms):
+    """C-46 ladder + C-47 attempt cap (C-48 is folded into row 8)."""
+    action, reason, preconditions, blocked_by = action_ladder(
+        loop_state, view, artifacts, commits, commit_ctx, spine,
+        not_dispatched_flag, remote_unreachable, false_completion, forms)
+
+    # C-47: only a candidate that would spend another attempt is rewritten.
+    # An already-`stop` candidate is left with its own reason, which states
+    # the real cause instead of mislabelling it as attempt exhaustion.
+    attempt = spine_field(spine, "attempt")
+    retry_limit = thresholds.get("retry_limit")
+    if action in ("resume", "retry") and attempt is not None \
+            and retry_limit is not None and attempt >= retry_limit:
+        return ("stop", "attempts-exhausted",
+                preconditions + ["attempt >= retry_limit"], blocked_by)
+
+    # Defensive: `resume` is never emitted with an unknown attempt (C-47).
+    if action == "resume" and attempt is None:
+        if "attempt-unknown" not in blocked_by:
+            blocked_by = blocked_by + ["attempt-unknown"]
+        return "retry", reason, preconditions, blocked_by
+
+    return action, reason, preconditions, blocked_by
 
 
 # ---------------------------------------------------------------------------
@@ -1775,6 +1914,221 @@ def refusal_envelope(action):
     }
 
 
+# ---------------------------------------------------------------------------
+# --probe (T016 / C-11..C-13)
+#
+# Two shapes are accepted: (a) a snapshot envelope whose spine / registry /
+# watch_verdict / evidence blocks are consumed verbatim and only the derived
+# fields are recomputed locally, and (b) a minimal reachability proof
+# (`reachable=false`) that maps to STALLED + remote-unreachable + stop.
+# Probe mode never resolves local paths, never reads local evidence and never
+# invokes the local watcher (C-13).
+# ---------------------------------------------------------------------------
+
+PROBE_WATCH_KEYS = ("present", "status", "value_state", "verdict", "reason",
+                    "exit_code", "attribution", "detail")
+
+
+def missing_spine_view():
+    return {
+        "path": None, "status": "missing", "schema": "missing", "state": None,
+        "state_value_state": "na", "consistent": None,
+        "fields": empty_spine_fields(),
+        "missing_fields": list(REQUIRED_SPINE_FIELDS),
+    }
+
+
+def missing_registry_view():
+    return {"status": "missing", "path": None, "state": None, "stage": None,
+            "run_id": None, "spine_path": None}
+
+
+def missing_artifacts_block():
+    return {"status": "missing", "value_state": "na", "stage": None,
+            "complete": None, "commit_required": None,
+            "no_change_allowed": None, "items": []}
+
+
+def missing_commits_block():
+    return {"status": "missing", "value_state": "na", "base": None,
+            "pathspec": [], "commits": [], "touching": None}
+
+
+def normalize_probe_watch(raw):
+    watch = {"present": False, "status": "missing", "value_state": "na",
+             "verdict": None, "reason": None, "exit_code": None,
+             "attribution": None, "detail": None}
+    if isinstance(raw, dict):
+        for key in PROBE_WATCH_KEYS:
+            if key in raw:
+                watch[key] = raw[key]
+    watch["present"] = watch["present"] is True
+    return watch
+
+
+def unreachable_watch():
+    watch = normalize_probe_watch(None)
+    watch["reason"] = "unavailable"
+    watch["detail"] = "probe-unreachable"
+    return watch
+
+
+def probe_missing_signals():
+    return {
+        "pid": missing_signal(PID_FIELDS),
+        "status": missing_signal(STATUS_FIELDS),
+        "log": missing_signal(LOG_FIELDS),
+        "heartbeat": missing_signal(HEARTBEAT_FIELDS),
+        "watchbeat": missing_signal(WATCHBEAT_FIELDS),
+        "hook": hook_signal(),
+    }
+
+
+def load_probe(path_raw, line_id):
+    """C-11/C-12: a required input. Anything unusable is exit 2, never `missing`."""
+    path = Path(path_raw).expanduser()
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        fail_usage("--probe %s is unreadable (exit 2: required input)"
+                   % path_raw)
+    try:
+        payload = json.loads(text)
+    except ValueError:
+        fail_usage("--probe %s is not parseable JSON (exit 2: required input)"
+                   % path_raw)
+    if not isinstance(payload, dict):
+        fail_usage("--probe %s must contain a JSON object (exit 2)" % path_raw)
+
+    schema = payload.get("schema_version")
+    if isinstance(schema, bool) or schema != SCHEMA_VERSION:
+        fail_usage("--probe schema_version must be %d (exit 2)"
+                   % SCHEMA_VERSION)
+
+    probe_line = payload.get("line_id")
+    if probe_line is not None and str(probe_line) != str(line_id):
+        fail_usage("--probe line_id %r does not match --line-id %r (exit 2)"
+                   % (probe_line, line_id))
+
+    if "reachable" in payload:
+        # Shape (b): reachability only. `reachable=true` carries no evaluable
+        # evidence and is therefore a required-input error, not a snapshot.
+        if payload.get("reachable") is not False:
+            fail_usage("--probe shape (b) requires reachable=false; "
+                       "reachable=true has no evaluable evidence (exit 2)")
+        return "unreachable", payload, path
+
+    if "watch_verdict" not in payload or "evidence" not in payload:
+        fail_usage("--probe matches neither shape (a) [watch_verdict + "
+                   "evidence] nor shape (b) [reachable=false] (exit 2)")
+    return "envelope", payload, path
+
+
+def do_probe_snapshot(args):
+    now = now_epoch()
+    shape, payload, probe_path = load_probe(args.probe, args.line_id)
+    paths = {"state_dir": None, "spec_dir": None, "repo": None, "spine": None,
+             "probe": str(probe_path), "registry_dir": None,
+             "registry_path": None}
+    threshold_set = resolve_thresholds(args, None)
+    remote_unreachable = shape == "unreachable"
+
+    if remote_unreachable:
+        spine = missing_spine_view()
+        registry = missing_registry_view()
+        watch = unreachable_watch()
+        signals = probe_missing_signals()
+        artifacts = missing_artifacts_block()
+        commits = missing_commits_block()
+        stage = args.stage
+    else:
+        spine = payload.get("spine")
+        if not isinstance(spine, dict):
+            spine = missing_spine_view()
+        registry = payload.get("registry")
+        if not isinstance(registry, dict):
+            registry = missing_registry_view()
+        watch = normalize_probe_watch(payload.get("watch_verdict"))
+        raw_evidence = payload.get("evidence")
+        raw_evidence = raw_evidence if isinstance(raw_evidence, dict) else {}
+        signals = {}
+        for name, defaults in (("pid", PID_FIELDS), ("status", STATUS_FIELDS),
+                               ("log", LOG_FIELDS),
+                               ("heartbeat", HEARTBEAT_FIELDS),
+                               ("watchbeat", WATCHBEAT_FIELDS)):
+            block = raw_evidence.get(name)
+            signals[name] = (block if isinstance(block, dict)
+                             else missing_signal(defaults))
+        signals["hook"] = (raw_evidence["hook"]
+                           if isinstance(raw_evidence.get("hook"), dict)
+                           else hook_signal())
+        artifacts = raw_evidence.get("artifacts")
+        if not isinstance(artifacts, dict):
+            artifacts = missing_artifacts_block()
+        commits = raw_evidence.get("commits")
+        if not isinstance(commits, dict):
+            commits = missing_commits_block()
+        stage = (args.stage or registry.get("stage")
+                 or artifacts.get("stage"))
+
+    # Probe evidence carries its own freshness: no local reader runs, so the
+    # view is built from the probe signals alone (C-13).
+    view = build_view(signals, set(), spine, threshold_set, now)
+    view["sentinel_present"] = bool(
+        ev_value(signals, set(), "log", "sentinel_present"))
+
+    false_completion = false_completion_of(view["sentinel_present"], artifacts)
+    loop_state, loop_state_reason, verdict_source = derive_loop_state(
+        view, watch, artifacts, False, False, remote_unreachable)
+    interruptions = detect_interruptions(
+        view, artifacts, [], signals, not remote_unreachable,
+        remote_unreachable, str(probe_path))
+    action, action_reason, preconditions, blocked_by = suggest_action(
+        loop_state, view, artifacts, commits, {}, spine, threshold_set, False,
+        remote_unreachable, false_completion,
+        {item["form"] for item in interruptions})
+
+    spine["consistent"] = spine_consistent(spine, loop_state)
+
+    evidence = {"evidence_source": "probe"}
+    for name in ("pid", "status", "log", "heartbeat", "watchbeat", "hook"):
+        evidence[name] = signals[name]
+    evidence["artifacts"] = artifacts
+    evidence["commits"] = commits
+
+    parts = {
+        "spine": spine,
+        "registry": registry,
+        "run_id": (registry.get("run_id")
+                   if registry.get("run_id") is not None
+                   else spine_field(spine, "run_id")),
+        "stage": stage,
+        "loop_state": loop_state,
+        "verdict_source": verdict_source,
+        "loop_state_reason": loop_state_reason,
+        "watch": watch,
+        "action": action,
+        "action_reason": action_reason,
+        "preconditions": preconditions,
+        "blocked_by": blocked_by,
+        "false_completion": false_completion,
+        "thresholds": threshold_set,
+        "evidence": evidence,
+        "interruptions": interruptions,
+        "missing_artifacts": missing_artifacts_of(artifacts),
+        # Probe mode reads no local git evidence; unknown stays unsaid rather
+        # than invented (null semantics, C-6).
+        "uncommitted_artifacts": [],
+        "stale": [],
+    }
+    envelope = build_envelope(args, paths, parts)
+    content = json.dumps(envelope, ensure_ascii=False, indent=2) + "\n"
+    if args.out:
+        atomic_write(Path(args.out).expanduser(), content)
+    sys.stdout.write(content)
+    sys.exit(EXIT_OK)
+
+
 def do_snapshot(args, parser):
     now = now_epoch()
     paths, registry, raw_registry = resolve_paths(args)
@@ -1843,7 +2197,9 @@ def do_snapshot(args, parser):
         view, artifacts, stale, signals, dispatched, False, None)
 
     action, action_reason, preconditions, blocked_by = suggest_action(
-        loop_state, loop_state_reason, view, artifacts, nd, evidence_gap, False)
+        loop_state, view, artifacts, commits, commit_ctx, spine,
+        threshold_set, nd, False, false_completion,
+        {item["form"] for item in interruptions})
 
     spine["consistent"] = spine_consistent(spine, loop_state)
 
@@ -1894,9 +2250,215 @@ def do_snapshot(args, parser):
     sys.exit(EXIT_OK)
 
 
+class _SelfTestFixture:
+    """Throwaway on-disk fixture for --self-test (C-17).
+
+    Everything lives under one temp dir: the spec dir sits inside a fresh git
+    repo (never the caller's), the Registry dir starts empty, and HOME/XDG are
+    redirected. No network, no candidate real process, no caller repository
+    state is read.
+    """
+
+    def __init__(self, root):
+        self.root = Path(root)
+        self.line = "self-test"
+        self.stage = "tasks"
+        self.state = self.root / "state"
+        self.repo = self.root / "repo"
+        self.spec = self.repo / ".specify" / "specs" / "self-test"
+        self.registry = self.root / "registry"
+        self.home = self.root / "home"
+        for directory in (self.state, self.spec, self.registry, self.home,
+                          self.root / "xdg"):
+            directory.mkdir(parents=True, exist_ok=True)
+        self.spine_path = self.state / "spine.md"
+        self.env = dict(os.environ)
+        self.env.update({
+            "SPECIFY_LINE_REGISTRY_DIR": str(self.registry),
+            "SPECIFY_LINE_RUNTIME_DIR": str(self.state),
+            "HOME": str(self.home),
+            "XDG_STATE_HOME": str(self.root / "xdg"),
+        })
+        self.now = now_epoch()
+
+    # -- layout -----------------------------------------------------------
+    def signal_path(self, kind):
+        names = {
+            "pid": "pid-%s-%s" % (self.line, self.stage),
+            "status": "status-%s-%s" % (self.line, self.stage),
+            "log": "log-%s-%s.log" % (self.line, self.stage),
+            "heartbeat": "heartbeat-%s-%s.log" % (self.line, self.stage),
+            "watchbeat": "watchbeat-%s-%s" % (self.line, self.stage),
+        }
+        return self.state / names[kind]
+
+    def clear(self):
+        for directory in (self.state, self.registry):
+            for entry in directory.iterdir():
+                if entry.is_file():
+                    entry.unlink()
+        for base, _dirs, files in os.walk(str(self.spec)):
+            for name in files:
+                (Path(base) / name).unlink()
+
+    def write(self, path, text):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    # -- evidence ---------------------------------------------------------
+    def write_spine(self, state="running", started_at=None, deadline=None,
+                    base_commit="abc1234", attempt=1, retry_limit=2,
+                    run_id=None, salvage=None, salvage_evidence=None,
+                    salvage_at=None):
+        lines = ["# Loop State Spine — %s" % self.line, "",
+                 "<!-- loop-state:begin -->", "spine_schema: v1",
+                 "spine_state: %s" % state]
+        if started_at is not None:
+            lines.append("stage_started_at: %d" % started_at)
+        if deadline is not None:
+            lines.append("stage_deadline_epoch: %d" % deadline)
+        if base_commit is not None:
+            lines.append("stage_base_commit: %s" % base_commit)
+        if attempt is not None:
+            lines.append("attempt: %d" % attempt)
+        if retry_limit is not None:
+            lines.append("retry_limit: %d" % retry_limit)
+        if run_id is not None:
+            lines.append("run_id: %s" % run_id)
+        if salvage is not None:
+            lines.append("salvage: %s" % salvage)
+        if salvage_evidence is not None:
+            lines.append("salvage_evidence: %s" % salvage_evidence)
+        if salvage_at is not None:
+            lines.append("salvage_at: %s" % salvage_at)
+        lines += ["<!-- loop-state:end -->", ""]
+        self.write(self.spine_path, "\n".join(lines))
+
+    def write_legacy_spine(self, state="running"):
+        self.write(self.spine_path,
+                   "# Loop State Spine — %s\n\nstate: %s\n"
+                   % (self.line, state))
+
+    def write_pid(self, pid=None, start="424242", run=None):
+        tokens = ["pid=%d" % (os.getpid() if pid is None else pid),
+                  "start=%s" % start, "at=%d" % self.now,
+                  "line=%s" % self.line]
+        if run is not None:
+            tokens.append("run=%s" % run)
+        tokens += ["stage=%s" % self.stage, "event=pid"]
+        self.write(self.signal_path("pid"), " ".join(tokens) + "\n")
+
+    def write_status(self, exit_code=0, sentinel=1, run=None):
+        tokens = ["exit=%s" % exit_code, "at=%d" % self.now,
+                  "sentinel=%s" % sentinel, "line=%s" % self.line]
+        if run is not None:
+            tokens.append("run=%s" % run)
+        tokens += ["stage=%s" % self.stage, "event=status"]
+        self.write(self.signal_path("status"), " ".join(tokens) + "\n")
+
+    def write_log(self, lines):
+        body = lines if isinstance(lines, str) else "\n".join(lines)
+        self.write(self.signal_path("log"), body + "\n")
+
+    def write_heartbeat(self, run=None):
+        tokens = ["at=%d" % self.now, "line=%s" % self.line]
+        if run is not None:
+            tokens.append("run=%s" % run)
+        tokens += ["stage=%s" % self.stage, "event=heartbeat"]
+        self.write(self.signal_path("heartbeat"), " ".join(tokens) + "\n")
+
+    def write_watchbeat(self, at=None, window=300, run=None):
+        tokens = []
+        if run is not None:
+            tokens.append("run=%s" % run)
+        tokens += ["stage=%s" % self.stage, "window=%d" % window,
+                   "at=%d" % (self.now if at is None else at),
+                   "event=watch-window"]
+        self.write(self.signal_path("watchbeat"), " ".join(tokens) + "\n")
+
+    def write_artifact(self, name="tasks.md", text="content\n"):
+        self.write(self.spec / name, text)
+
+    def write_registry(self, stage="tasks", run_id=None):
+        entry = {"schema_version": 1, "line_id": self.line,
+                 "run_id": run_id or "run-1", "state": "active",
+                 "updated_at": "2026-10-21T10:00:00Z",
+                 "spine_path": str(self.spine_path),
+                 "status_path": str(self.signal_path("status"))}
+        if stage:
+            entry["stage"] = stage
+        self.write(self.registry / ("%s.json" % self.line),
+                   json.dumps(entry))
+
+    # -- git --------------------------------------------------------------
+    def git(self, *args):
+        return subprocess.run(["git"] + list(args), cwd=str(self.repo),
+                              capture_output=True, text=True)
+
+    def git_commit(self, message):
+        if self.git("add", "-A").returncode != 0:
+            return None
+        done = self.git("commit", "-q", "--allow-empty", "-m", message)
+        if done.returncode != 0:
+            return None
+        sha = self.git("rev-parse", "HEAD")
+        return sha.stdout.strip() if sha.returncode == 0 else None
+
+    def git_base(self):
+        if not (self.repo / ".git").exists():
+            for args in (("init", "-q"),
+                         ("config", "user.email", "self-test@example.com"),
+                         ("config", "user.name", "Self Test"),
+                         ("config", "commit.gpgsign", "false")):
+                if self.git(*args).returncode != 0:
+                    return None
+        return self.git_commit("base")
+
+    # -- invocation -------------------------------------------------------
+    def run(self, argv):
+        return subprocess.run([sys.executable, __file__] + list(argv),
+                              capture_output=True, text=True, env=self.env)
+
+    def snapshot(self, *extra, stage="tasks", env=None):
+        argv = ["--action", "snapshot", "--line-id", self.line,
+                "--state-dir", str(self.state), "--spec-dir", str(self.spec),
+                "--repo", str(self.repo), "--spine", str(self.spine_path),
+                "--watch-script", str(self.root / "no-such-watch.sh"),
+                "--start-grace", "0", "--deadline-grace", "0",
+                "--heartbeat-max-age", "3600"]
+        if stage is not None:
+            argv += ["--stage", stage]
+        return self.run(argv + [str(item) for item in extra])
+
+    def snapshot_json(self, *extra, **kwargs):
+        proc = self.snapshot(*extra, **kwargs)
+        try:
+            return proc.returncode, json.loads(proc.stdout)
+        except ValueError:
+            return proc.returncode, None
+
+    def probe(self, probe_path, line_id=None):
+        # Probe mode carries no local path flags at all (C-13).
+        return self.run(["--action", "snapshot", "--line-id",
+                         line_id or self.line, "--probe", str(probe_path)])
+
+    def probe_json(self, probe_path, line_id=None):
+        proc = self.probe(probe_path, line_id)
+        try:
+            return proc.returncode, json.loads(proc.stdout)
+        except ValueError:
+            return proc.returncode, None
+
+
+def _selftest_forms(envelope):
+    return [item.get("form") for item in envelope.get("interruptions") or []]
+
+
 def do_self_test(args):
-    """Structural cases now (help ladder + refusal envelopes); the six-form
-    and evidence cases land with T017 (C-18)."""
+    """Built-in fixture suite (C-17/C-18): six 065a forms, stale pollution,
+    artifact/commit gates, the C-46 ladder, not-dispatched, degraded sources,
+    probe shapes and rejections, refusal envelopes, determinism and the help
+    ladder. No real process, network or caller-repository state is touched."""
     passed, failed = 0, 0
 
     def check(name, cond, detail=""):
@@ -1908,6 +2470,7 @@ def do_self_test(args):
             failed += 1
             print("FAIL %s — %s" % (name, detail or "assertion failed"))
 
+    # -- process-level contract -------------------------------------------
     help_proc = subprocess.run(
         [sys.executable, __file__, "--help"],
         capture_output=True, text=True,
@@ -1921,18 +2484,365 @@ def do_self_test(args):
           "watcher codes as data note missing")
     for action, owner in sorted(REFUSAL_OWNER.items()):
         proc = subprocess.run(
-            [sys.executable, __file__, "--action", action, "--line-id", "self-test"],
+            [sys.executable, __file__, "--action", action, "--line-id",
+             "self-test"],
             capture_output=True, text=True,
         )
         try:
             env = json.loads(proc.stdout)
-            ok = (proc.returncode == EXIT_REFUSED and env.get("result") == "failed"
+            ok = (proc.returncode == EXIT_REFUSED
+                  and env.get("result") == "failed"
                   and env.get("owner") == owner
                   and env.get("reason") == "not-implemented-in-065a")
         except ValueError:
             ok = False
         check("refusal-%s" % action, ok,
               "expected refusal envelope with owner=%s, exit 1" % owner)
+
+    with tempfile.TemporaryDirectory(prefix="loop-state-selftest-") as tmp:
+        fx = _SelfTestFixture(tmp)
+
+        check("required-input-missing-line-id",
+              fx.run(["--action", "snapshot"]).returncode == EXIT_USAGE,
+              "a missing --line-id must exit 2")
+
+        # -- dispatch evidence and degraded sources -----------------------
+        fx.clear()
+        fx.write_registry(stage=fx.stage)
+        proc = fx.run(["--action", "snapshot", "--line-id", fx.line,
+                       "--stage", fx.stage, "--spine", str(fx.state),
+                       "--state-dir", str(fx.state), "--spec-dir",
+                       str(fx.spec), "--repo", str(fx.repo),
+                       "--start-grace", "0", "--deadline-grace", "0",
+                       "--heartbeat-max-age", "3600"])
+        try:
+            env = json.loads(proc.stdout)
+        except ValueError:
+            env = {}
+        check("evidence-source-unreadable-exits-0",
+              proc.returncode == EXIT_OK
+              and env.get("spine", {}).get("status") == "missing"
+              and env.get("recovery_action") == "stop"
+              and env.get("recovery_reason") == "evidence-gap",
+              "an unreadable spine is `missing` with exit 0, never exit 2")
+
+        fx.clear()
+        code, env = fx.snapshot_json()
+        check("not-dispatched",
+              code == EXIT_OK and env and env["loop_state"] == "UNKNOWN"
+              and env["loop_state_reason"] == "not-dispatched"
+              and env["recovery_action"] == "none"
+              and env["evidence"]["artifacts"]["status"] == "na",
+              "--stage alone is intent, not dispatch evidence")
+
+        fx.clear()
+        fx.write_spine(state="running", started_at=fx.now - 100)
+        code, env = fx.snapshot_json()
+        check("not-dispatched-excluded-by-spine",
+              code == EXIT_OK and env
+              and env["loop_state_reason"] != "not-dispatched"
+              and env["loop_state"] == "NO_SIGNAL"
+              and env["recovery_action"] != "none",
+              "a non-empty spine_state excludes not-dispatched")
+
+        fx.clear()
+        fx.write_spine(state="running", started_at=fx.now - 100)
+        fx.write_pid()
+        fx.write_heartbeat()
+        code, env = fx.snapshot_json()
+        check("registry-missing-continues",
+              code == EXIT_OK and env
+              and env["registry"]["status"] == "missing"
+              and env["loop_state"] == "RUNNING"
+              and env["verdict_source"] == "derived",
+              "a missing Registry must not stop evaluation (C-5)")
+
+        # -- the six 065a interruption forms ------------------------------
+        fx.clear()
+        fx.write_spine(state="running", started_at=fx.now - 100)
+        fx.write_pid()
+        fx.write_heartbeat()
+        code, env = fx.snapshot_json()
+        check("unwatched-missing-marker",
+              code == EXIT_OK and env and "unwatched" in _selftest_forms(env)
+              and env["recovery_action"] == "watch"
+              and env["recovery_reason"] == "unwatched",
+              "a running stage without a watchbeat is unwatched")
+
+        fx.write_watchbeat(at=fx.now - 1000, window=300, run="run-1")
+        code, env = fx.snapshot_json()
+        check("unwatched-expired-marker",
+              code == EXIT_OK and env and "unwatched" in _selftest_forms(env)
+              and env["recovery_action"] == "watch",
+              "a watchbeat past window + grace is the expired branch")
+
+        fx.write_watchbeat(at=fx.now, window=300, run="run-1")
+        code, env = fx.snapshot_json()
+        check("unwatched-fresh-marker-negative",
+              code == EXIT_OK and env and "unwatched" not in _selftest_forms(env)
+              and env["recovery_action"] == "watch"
+              and env["recovery_reason"] == "running",
+              "a fresh watchbeat must not report unwatched")
+
+        fx.clear()
+        fx.write_spine(state="running", started_at=fx.now - 100)
+        fx.write_pid(pid=2147483646)  # no real process can own this pid
+        code, env = fx.snapshot_json()
+        check("dead-no-exit-record",
+              code == EXIT_OK and env and env["loop_state"] == "DEAD"
+              and "dead-no-exit-record" in _selftest_forms(env)
+              and env["recovery_action"] == "retry",
+              "a dead pid without an exit record is DEAD, never DONE")
+
+        fx.clear()
+        fx.write_spine(state="running", started_at=fx.now - 900,
+                       deadline=fx.now - 100)
+        fx.write_pid()
+        fx.write_heartbeat()
+        fx.write_watchbeat(at=fx.now, window=300, run="run-1")
+        code, env = fx.snapshot_json()
+        check("timeout-live-process-watch",
+              code == EXIT_OK and env and env["loop_state"] == "TIMEOUT"
+              and "deadline-overrun-live" in _selftest_forms(env)
+              and env["recovery_action"] == "watch",
+              "a live TIMEOUT must be watched, never stopped (C-49)")
+
+        fx.clear()
+        fx.write_spine(state="running", started_at=fx.now - 100,
+                       run_id="run-1")
+        fx.write_pid(run="run-1")
+        fx.write_heartbeat(run="run-other")
+        fx.write_watchbeat(at=fx.now, window=300, run="run-1")
+        code, env = fx.snapshot_json()
+        stale = {entry["signal"]: entry["reason"]
+                 for entry in (env or {}).get("stale_signals") or []}
+        check("stale-signal-excluded-without-action-change",
+              code == EXIT_OK and env and stale.get("heartbeat") == "run-mismatch"
+              and env["loop_state"] == "RUNNING"
+              and env["recovery_action"] == "watch",
+              "a foreign-run heartbeat is listed as stale, never a new action")
+
+        fx.clear()
+        fx.write_legacy_spine(state="running")
+        fx.write_pid()
+        fx.write_heartbeat()
+        code, env = fx.snapshot_json()
+        spine = (env or {}).get("spine") or {}
+        check("legacy-spine-degrades",
+              code == EXIT_OK and env and spine.get("schema") == "legacy"
+              and spine.get("fields", {}).get("attempt") is None
+              and "attempt" in spine.get("missing_fields", [])
+              and env["loop_state"] == "RUNNING",
+              "a legacy spine reports missing fields instead of guessing")
+
+        # -- artifact / commit gates + C-46 rows --------------------------
+        fx.clear()
+        base = fx.git_base()
+        check("git-fixture", base is not None,
+              "git init/commit failed; commit-evidence cases cannot run")
+        fx.write_artifact("tasks.md")
+        fx.write_status(exit_code=0, sentinel=0)
+        fx.write_log(["working"])
+        fx.write_spine(state="running", started_at=fx.now - 100,
+                       base_commit=base)
+        code, env = fx.snapshot_json()
+        check("artifacts-without-sentinel-retry",
+              base is not None and code == EXIT_OK and env
+              and env["loop_state"] == "INCOMPLETE"
+              and "artifacts-without-completion" in _selftest_forms(env)
+              and env["false_completion"] is False
+              and env["recovery_action"] == "retry",
+              "complete artifacts without a sentinel are never a resume")
+
+        fx.write_status(exit_code=0, sentinel=1)
+        fx.write_log(["TASKS-DONE"])
+        fx.write_spine(state="running", started_at=fx.now - 100,
+                       base_commit=base)
+        (fx.spec / "tasks.md").unlink()  # sentinel present, artifact gone
+        code, env = fx.snapshot_json()
+        check("false-completion-retry",
+              base is not None and code == EXIT_OK and env
+              and env["false_completion"] is True
+              and env["recovery_action"] == "retry"
+              and env["recovery_reason"] == "false-completion"
+              and "artifacts-without-completion" not in _selftest_forms(env),
+              "sentinel over missing artifacts is a false completion")
+
+        fx.write_artifact("tasks.md")
+        fx.write_log(["TASKS-DONE"])
+        code, env = fx.snapshot_json()
+        check("done-uncommitted-resume",
+              base is not None and code == EXIT_OK and env
+              and env["loop_state"] == "DONE"
+              and env["uncommitted_artifacts"] == ["tasks.md"]
+              and env["recovery_action"] == "resume",
+              "DONE with an uncommitted artifact is resumed, not verified")
+        fx.git_commit("tasks: complete")
+        code, env = fx.snapshot_json()
+        check("done-committed-verify",
+              base is not None and code == EXIT_OK and env
+              and env["loop_state"] == "DONE"
+              and env["evidence"]["commits"]["touching"] is True
+              and env["uncommitted_artifacts"] == []
+              and env["recovery_action"] == "verify"
+              and env["recovery_reason"] == "done-complete",
+              "DONE + commit-ready must verify")
+
+        fx.write_spine(state="running", started_at=fx.now - 100,
+                       base_commit=base, salvage="accepted")
+        fx.write_log(["working"])
+        code, env = fx.snapshot_json()
+        check("salvage-incomplete-no-resume",
+              base is not None and code == EXIT_OK and env
+              and env["recovery_action"] == "retry"
+              and env["recovery_reason"] == "salvage-not-recorded",
+              "an incomplete salvage record never resumes")
+
+        fx.write_spine(state="running", started_at=fx.now - 100,
+                       base_commit=base, attempt=1, retry_limit=2,
+                       salvage="accepted",
+                       salvage_evidence="notes/salvage.md",
+                       salvage_at="2026-10-21T10:00:00Z")
+        code, env = fx.snapshot_json()
+        check("salvage-complete-resume",
+              base is not None and code == EXIT_OK and env
+              and env["recovery_action"] == "resume",
+              "a complete salvage record allows a resume")
+
+        fx.write_spine(state="running", started_at=fx.now - 100,
+                       base_commit=base, attempt=2, retry_limit=2)
+        fx.write_status(exit_code=1, sentinel=0)
+        fx.write_log(["working"])
+        code, env = fx.snapshot_json()
+        check("attempt-limit-forces-stop",
+              base is not None and code == EXIT_OK and env
+              and env["recovery_action"] == "stop"
+              and env["recovery_reason"] == "attempts-exhausted",
+              "attempt >= retry_limit rewrites retry to stop (C-47)")
+
+        fx.write_spine(state="stalled", started_at=fx.now - 100,
+                       base_commit=base)
+        fx.write_status(exit_code=0, sentinel=1)
+        fx.write_log(["TASKS-DONE"])
+        code, env = fx.snapshot_json()
+        check("stalled-with-complete-artifacts-stop",
+              base is not None and code == EXIT_OK and env
+              and env["loop_state"] == "STALLED"
+              and env["recovery_action"] == "stop"
+              and env["recovery_reason"] == "stalled-handoff",
+              "rows 8-10 must not re-judge STALLED (C-46 row 11)")
+
+        fx.write_spine(state="running", started_at=fx.now - 100,
+                       base_commit=None)
+        fx.write_status(exit_code=0, sentinel=1)
+        fx.write_log(["TASKS-DONE"])
+        code, env = fx.snapshot_json()
+        check("done-unknown-baseline-verify",
+              code == EXIT_OK and env
+              and env["evidence"]["commits"]["value_state"] == "unknown"
+              and env["loop_state"] == "DONE"
+              and env["recovery_action"] == "verify"
+              and env["recovery_reason"] == "commit-baseline-unknown",
+              "only a DONE state may verify on an unknown baseline")
+
+        # -- determinism ---------------------------------------------------
+        fx.write_spine(state="running", started_at=fx.now - 100,
+                       base_commit=base)
+        first_code, first = fx.snapshot_json()
+        second_code, second = fx.snapshot_json()
+        check("deterministic-except-evaluated-at",
+              first_code == second_code == EXIT_OK and first and second
+              and {k: v for k, v in first.items() if k != "evaluated_at"}
+              == {k: v for k, v in second.items() if k != "evaluated_at"},
+              "two runs of the same input may differ only in evaluated_at")
+
+        # -- probe shapes and rejections ----------------------------------
+        probe_a = {
+            "schema_version": 1,
+            "line_id": fx.line,
+            "watch_verdict": {
+                "present": True, "status": "present", "value_state": "known",
+                "verdict": "STALLED", "reason": "stalled", "exit_code": 13,
+                "attribution": "own", "detail": None,
+            },
+            "evidence": {
+                "evidence_source": "probe",
+                "pid": {"status": "missing", "value_state": "na", "path": None},
+                "status": {"status": "missing", "value_state": "na",
+                           "path": None},
+                "log": {"status": "missing", "value_state": "na", "path": None},
+                "heartbeat": {"status": "missing", "value_state": "na",
+                              "path": None},
+                "watchbeat": {"status": "missing", "value_state": "na",
+                              "path": None},
+                "hook": {"status": "na", "value_state": "na", "path": None},
+                "artifacts": {"status": "missing", "value_state": "na",
+                              "stage": None, "complete": None,
+                              "commit_required": None,
+                              "no_change_allowed": None, "items": []},
+                "commits": {"status": "missing", "value_state": "na",
+                            "base": None, "pathspec": [], "commits": [],
+                            "touching": None},
+            },
+        }
+        probe_a_path = fx.root / "probe-a.json"
+        fx.write(probe_a_path, json.dumps(probe_a))
+        code, env = fx.probe_json(probe_a_path)
+        check("probe-shape-a-verdict-verbatim",
+              code == EXIT_OK and env
+              and env["evidence"]["evidence_source"] == "probe"
+              and env["paths"]["probe"] == str(probe_a_path)
+              and env["verdict_source"] == "watcher"
+              and env["loop_state"] == "STALLED"
+              and env["recovery_action"] == "stop",
+              "probe shape (a) consumes the watcher verdict verbatim")
+
+        probe_b_path = fx.root / "probe-b.json"
+        fx.write(probe_b_path, json.dumps({"schema_version": 1,
+                                           "reachable": False,
+                                           "reason": "ssh-255"}))
+        code, env = fx.probe_json(probe_b_path)
+        missing_everywhere = env is not None and all(
+            env["evidence"][key]["status"] == "missing"
+            for key in ("pid", "status", "log", "heartbeat", "watchbeat",
+                        "artifacts", "commits"))
+        check("probe-shape-b-unreachable",
+              code == EXIT_OK and env and env["loop_state"] == "STALLED"
+              and env["loop_state_reason"] == "remote-unreachable"
+              and env["recovery_action"] == "stop"
+              and "remote-unreachable" in _selftest_forms(env)
+              and missing_everywhere,
+              "probe shape (b) is STALLED + remote-unreachable + stop")
+
+        fx.write(fx.root / "probe-bad.json", "{not json")
+        bad_schema = fx.root / "probe-schema.json"
+        fx.write(bad_schema, json.dumps({"schema_version": 2,
+                                         "watch_verdict": {},
+                                         "evidence": {}}))
+        reachable = fx.root / "probe-reachable.json"
+        fx.write(reachable, json.dumps({"schema_version": 1,
+                                        "reachable": True, "reason": "x"}))
+        mismatch = fx.root / "probe-line.json"
+        fx.write(mismatch, json.dumps({"schema_version": 1, "line_id": "other",
+                                       "watch_verdict": {},
+                                       "evidence": {}}))
+        rejections = {
+            "unparseable": fx.root / "probe-bad.json",
+            "wrong-schema": bad_schema,
+            "reachable-true": reachable,
+            "line-mismatch": mismatch,
+            "unreadable": fx.root / "probe-absent.json",
+        }
+        for label, probe_path in sorted(rejections.items()):
+            proc = fx.run(["--action", "snapshot", "--line-id", fx.line,
+                           "--probe", str(probe_path)])
+            check("probe-reject-%s" % label, proc.returncode == EXIT_USAGE,
+                  "expected exit 2, got %d" % proc.returncode)
+        proc = fx.run(["--action", "snapshot", "--line-id", fx.line,
+                       "--probe", str(probe_a_path),
+                       "--spine", str(fx.spine_path)])
+        check("probe-local-path-mutex", proc.returncode == EXIT_USAGE,
+              "--probe together with --spine must exit 2 (C-13)")
 
     print("SELF-TEST: %d passed, %d failed" % (passed, failed))
     sys.exit(EXIT_OK if failed == 0 else EXIT_REFUSED)
@@ -1991,8 +2901,7 @@ def main(argv=None):
         if any(v is not None for v in local_flags):
             fail_usage("--probe is mutually exclusive with --spine/--state-dir/"
                        "--spec-dir/--repo/--watch-script (exit 2)")
-        # TODO(T016): probe shapes (a)/(b) consumption. Skeleton rejects.
-        fail_usage("--probe consumption is not implemented in this build")
+        do_probe_snapshot(args)
 
     if args.action == "snapshot":
         do_snapshot(args, parser)
