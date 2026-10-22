@@ -69,6 +69,7 @@ MANIFEST.md § Exec-Quant Payload 人读段由同一渲染函数产出（内容�
 - 双空 → 不产包，输出显式说明（既有非零包为成功语义不变）。
 - external 排除（`kind: external`）、时间过滤、`--all`、`--include-introspection`
   语义零变化。
+- 引用组：(FR-019)
 
 - **C-9** 非阻塞与零网络
 

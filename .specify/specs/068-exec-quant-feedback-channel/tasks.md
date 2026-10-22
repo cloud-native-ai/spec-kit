@@ -33,7 +33,7 @@
 - GATE-4: FR-018/SC-006 定向零回归 — check: `bash scripts/bash/run-tests.sh` 按快速启动场景 4 的 24 文件集重跑，失败 nodeid 排序后与 `test-evidence/log-baseline-pre-impl.txt` 的名单 `comm -13` 逐名比对零新增（名字级，非计数级）。
 - GATE-5: 镜像零 NEW drift — check: `python3 scripts/python/sync-mirrors.py --check` 相对 T001 记录的既有基线零 NEW DIFF，且 plan.md § Mirror Obligations 各对 `cmp` 逐对一致。
 - GATE-6: 无未完成任务 — check: `grep -cE '^- \[[ >]\]' .specify/specs/068-exec-quant-feedback-channel/tasks.md` 返回 0。
-- GATE-7: 条款覆盖完整 — check: `python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/068-exec-quant-feedback-channel` 报告 claimed=31、零 dangling。
+- GATE-7: 条款覆盖完整 — check: `python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/068-exec-quant-feedback-channel` exit 0，输出 claimed clauses 31 / FR uncovered 0 / uncovered beyond baseline 0。
 - GATE-8: SC 证据齐备 — check: `grep -cE '^- \*\*SC-00[1-6]\*\*' .specify/specs/068-exec-quant-feedback-channel/verification.md` 返回 6。
 - GATE-9: 测试预算账本合规 — check: `python3 skills/external/sdd-loop-driver/scripts/audit-test-budget.py --spine $SPINE --spec-dir .specify/specs/068-exec-quant-feedback-channel --stage-check implement` exit 0（E2 baseline 槽已记、closure 槽未消耗；closure 校验在 review 后以 `--stage-check closure` 执行）。
 
