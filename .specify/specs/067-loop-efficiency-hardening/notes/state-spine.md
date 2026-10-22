@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792659431
-stage_deadline_epoch: 1792664831
-stage_base_commit: 550d3b09
+stage_started_at: 1792659743
+stage_deadline_epoch: 1792665143
+stage_base_commit: 8d71082c
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,17 +37,16 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (Phase 8 · T030–T032)
+## Current Part Brief (review)
 
-- **part_id**: P13-implement-wrapup
-- **allowed files**: `.specify/specs/067-loop-efficiency-hardening/verification.md`, `test-evidence/` evidence, `tasks.md` T030–T032 checkboxes only
-- **must not modify**: tests, source, scripts, mirrors, registry, requirements.md, plan.md, Phase 9 tasks
-- **T030 mirror obligations**: run `python3 scripts/python/sync-mirrors.py --check`; record 0 DIFF or the pair-scope; note that 202 mirrors were engine-written at `1d40ebeb`. No hand edits.
-- **T031 review precheck**: T001–T029 closed; T033–T038 pending closure by design; validate-tasks 0; evidence files exist (E1, w2 timings, w3 recheck/sync, drill, triage 83 rows, ledger, pinned roster); write the precheck section in verification.md.
-- **T032 verification.md**: record what ran (commands/counts/pointers), what did not run (closure tasks), waiver none; SC-001…SC-005 evidence via the dispatch log (not_evaluated where unavailable); SC-006…SC-010 `pending-closure`.
-- **no full suite**; no test claimed pass unless actually run.
+- **part_id**: P14-review
+- **allowed files**: new `.specify/specs/067-loop-efficiency-hardening/review.md` only (plus a commit of that file if convenient)
+- **must not modify**: requirements, plan, tasks, tests, source, scripts, mirrors, registry, verification.md
+- **may run targeted checks**: mirror `--check`; the 723-param suite; admission/telemetry families; the 33 Class 2 node ids; no full suite (T034 owns the closure slot)
+- **review focus**: (1) requirements ↔ plan ↔ tasks ↔ implementation consistency; (2) test-slimming correctness and no coverage loss (ledger 81 rows, 0 deleted); (3) drift protection and the 83-name triage (14 known debt reds; 0 NEW expected); (4) evidence honesty (E1 534 s, injection drill, baseline counts); (5) delivery boundary (tests + generated mirrors only; no src/runtime deps; runner unchanged); (6) constitution compliance; (7) closure readiness (T033–T038 pending).
+- **output**: `review.md` with P0/P1/P2 findings and a final verdict `PASS` / `PASS WITH WAIVER` / `FAIL`; each finding with file:line and remediation.
 - **run-turn-budget**: 120
-- **acceptance**: T030–T032 `[X]`; verification.md complete for the implement phase; review dispatchable
+- **acceptance**: independent review; no unexecuted test claimed pass; no code/test edits
 
 ## Dispatch Log
 
@@ -65,7 +64,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P10-implement-E1-mirror-suite-fold | implement | T019–T021 | not_evaluated | suite 202F/521P (drift, expected); 23 functions folded | 54cf98e4, 0c674638, 00b654a1 | DONE — suite covers 723 params; ledger 23 case-merge rows; no sync yet |
 | P11-implement-E2-fold3-sync-recheck | implement | T022–T024 | not_evaluated | targeted: fold recheck 206F/822P (0 new); suite 202F/521P → 0F/723P; combined rerun 9F/1214P (all in-register) | 3059f4f0, 1d40ebeb, a6098885, 58dd4f79 | DONE — batch 3: 12 functions folded (9 pure + 3 byte-only, ledger 70–81); sync: 5 pairs, 202 engine-written mirrors, --check 0 DIFF; triage 50 rows (49 synced / 1 debt: test_i11 stale-pin, FB-06 debt-i11-per-tool-clause-render-2026-10-22.md) |
 | P12-implement-F-triage-drills | implement | T025–T029 | 120 (budget-exhausted) | Class 2 rerun 19P/14F (debt-known) | bc5c443a, 550d3b09 | DONE (salvaged) — 9 test files triaged, 6 debt records, 33/33 Class 2 rows, 83/83 triage coverage; injection drill hit/localize/reproduce/restore; no injection residue; 14 debt reds remain baseline-known |
-| P13-implement-wrapup | implement | T030–T032 | — | none | — | dispatched |
+| P13-implement-wrapup | implement | T030–T032 | not_evaluated | none run | 8d71082c | DONE — mirror --check 0 DIFF; 29/29 implement tasks closed; triage 83/83; ledger 81 rows (35 case-merge + 46 retained, 0 deleted); verification.md 9 sections |
+| P14-review | review | — | — | targeted checks only | — | dispatched |
 
 ## Gates
 
@@ -101,7 +101,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 - requirements DONE (`982a0503`); clarify DONE (`f086e36d`); baseline measured (`137abc67`); plan DONE (`bca3bc99`); tasks DONE (`78954beb`); checklist DONE (`3db048e4`, CHK012 fixed by `b9d23cc2`); analyze GREEN (`ae215d74`, 0 CRITICAL/HIGH, M-1…M-3 remediated).
 - implement: parts A–F DONE (T001–T029). T007 result: 534 s wall (≤600 s process check), 83 failed / 4469 passed / 1 skipped, name diff 0 NEW / 0 FIXED. E1 record `full-run-2026-10-22-implement-start.md`; budget fence baseline:1/closure:0.
 - Implement outcomes: RC-07 hook neutralization + admission in-process (121→23 s call sum); telemetry 23.36→1.14 s; mirror suite 723 params green after engine sync of 202 mirrors; 35 test functions folded with ledger; 83/83 baseline names triaged (50 mirror-class, 33 Class 2; 14 known debt reds remain in-baseline).
-- Part F budget-exhausted at 120 turns; salvaged in-session (`550d3b09`), no second full dispatch. Next: Phase 8 wrap-up (T030–T032), review, Phase 9 closure (T033–T038), U6 local merge (push requires explicit authorization).
+- Part F budget-exhausted at 120 turns; salvaged in-session (`550d3b09`), no second full dispatch. Phase 8 DONE (`8d71082c`): mirror `--check` 0 DIFF, 29/29 implement tasks closed, triage 83/83, ledger 81 rows (0 deleted), verification.md built.
+- Next: independent review → Phase 9 closure (T033–T038: full run + coverage/name-level/dependency audits + verification finalize) → U6 local merge (push requires explicit authorization).
 - E3 stage evidence for clarify/plan/tasks/checklist/analyze added; review row pending the review stage.
 
 ## Framework Observations
