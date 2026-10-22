@@ -1,8 +1,9 @@
-# Red-First Evidence — 068 Exec-Quant Feedback Channel (implement part 2, US1)
+# Red-First Evidence — 068 Exec-Quant Feedback Channel (implement, US1/US2)
 
 红先取证纪律（tasks.md § Tests / owner `.specify/skills/internal/implement-feature/SKILL.md`
 § TDD / § Test runs）：每支新测试先以未实现状态运行并记录命令、真实输出、退出码与
-用例清单。本文件按节追加（T004 → T005 → 绿证据），append-only。
+用例清单。本文件按节追加（US1: T004 → T005 → 绿证据；US2 part 3a: T010 → T011），
+append-only。
 
 - 日期：2026-10-22
 - canonical runner：`bash scripts/bash/run-tests.sh <targets> -q`
@@ -189,4 +190,125 @@ FAILED tests/contract/test_feedback_exec_quant_payload.py::test_identity_degrada
   单元 `test_sweep_is_read_only_on_source_store`；场景 3（输出报告知情）→
   `test_json_report_face_visible_counts` / `test_text_report_face_visible_counts`；
   场景 4（FR-019）→ 上两支 FR-019 用例。场景 4（quickstart 回归比对）见上节。
+
+---
+
+# Implement Part 3a — US2 接收腿红先测试（T010 / T011，2026-10-22）
+
+- 测试针对框架源 `scripts/python/feedback-utils.py`（`tests/script_api.py` 装载路径，
+  非 `.specify/` 镜像）；夹具全部自构，真实入站包与运行时记录零触碰。
+- 单元侧接口锚（part 3b T012/T013 实现须落这些名字，形态同 US1 的
+  `_collect_exec_quant_payload` 先例）：`_identity_key(record, source_project)`、
+  `_canonical_json(record)`、`_content_hash(record)`、
+  `_source_slug(project_name, identity_key)`、
+  `_build_envelope(record, identity, package_file)`。
+
+## § T010 — `tests/unit/test_feedback_intake_exec_quant.py`（red-first）
+
+- 命令：`bash scripts/bash/run-tests.sh tests/unit/test_feedback_intake_exec_quant.py -q`
+- 退出码：`1`
+- 真实输出尾部（节选）：
+
+```text
+E       AttributeError: module 'feedback_utils' has no attribute '_build_envelope'
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_identity_key_is_sha256_of_unit_separator_tuple
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_identity_key_deterministic_and_64hex
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_identity_key_excludes_content_f01
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_identity_key_missing_fields_join_as_empty
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_identity_key_varies_with_every_tuple_component
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_canonical_json_sort_keys_compact_raw_unicode
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_canonical_json_insertion_order_insensitive
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_content_hash_is_sha256_of_canonical_form
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_source_slug_is_name_plus_identity_hash8
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_source_slug_lowercases_and_substitutes_separators
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_source_slug_stays_in_restricted_charset
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_source_slug_empty_identity_is_literal_unknown_project
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_envelope_field_set_matches_e6
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_envelope_record_is_verbatim_zero_drop
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_envelope_identity_and_hash_fields
+FAILED tests/unit/test_feedback_intake_exec_quant.py::test_envelope_unknown_project_literal_source
+16 failed, 1 passed in 0.14s
+```
+
+- 用例清单：上列 16 红 + 1 预绿守卫（`test_subject_is_framework_source_engine`：
+  断言 `feedback_utils` 装载自框架源 `scripts/python/feedback-utils.py` 而非
+  `.specify/` 镜像——装载路径属既有能力，红先期通过属预期；该守卫的价值在 3b
+  实现加入后持续防镜像漂移）。收集核对：`--collect-only` = 17。
+- 覆盖面：identity_key 五元组 `\x1f` 连接 sha256（逐分量可变、确定性、64-hex、
+  缺字段按空串）、content_hash 独立且不拼入 identity_key（F-01 修复口径，冲突分支
+  可构造）、canonical JSON（sort_keys + ensure_ascii=False + 紧凑分隔符 + 插入序
+  无关）、source-slug（slug 化 `[a-z0-9-]` + 身份串短哈希 8 位后缀；空身份 → 字面
+  `unknown-project` 确定性）、信封 E6 字段集（`aggregation_envelope.*` 九字段 +
+  `record` verbatim、未知字段零丢弃、unknown-project 字面落组）。
+- 失败归因：**subject 缺失**——16 例全部 `AttributeError: module 'feedback_utils'
+  has no attribute '_identity_key'/'_canonical_json'/'_content_hash'/'_source_slug'/
+  '_build_envelope'`，断言面本身无缺陷。
+
+## § T011 — `tests/contract/test_feedback_intake_exec_quant.py`（red-first）
+
+- 命令：`bash scripts/bash/run-tests.sh tests/contract/test_feedback_intake_exec_quant.py -q`
+- 退出码：`1`（两轮同）
+- 首轮 19 failed / 1 passed：该 1 例通过属**假绿**——
+  `test_missing_package_flag_is_usage_error_exit_2` 被 argparse 的
+  `invalid choice: 'ingest-exec-quant'` 用法文本满足（usage 行含既有全局
+  `--package` 旗标字样，`"--package" in stderr` 与 `code == 2` 双双凑巧成立），
+  即该检查在其 subject 缺失时不会变红，不构成证据（快速失败纪律：机器给出的绿
+  同样受判据约束）。归因 = 断言面缺陷（非 subject），按 SKILL § TDD 先修正再披露：
+  修正后断言 = 退出码 2（argparse SystemExit 或 `FeedbackError` 两态皆收）+ 错误文本
+  指名 `--package` + **不得**是 invalid choice（动作必须已注册），更名为
+  `test_missing_package_flag_exit_2`。
+- 修正后终跑真实输出尾部（节选）：
+
+```text
+__main__.py: error: argument --action: invalid choice: 'ingest-exec-quant' (choose from 'record', 'status', 'list', 'dispose', 'mark-submitted', 'reindex', 'package', 'cleanup', 'upstream', 'migrate-legacy', 'introspect-register', 'args-manifest')
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_action_is_registered
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_missing_package_flag_exit_2
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_no_payload_package_zero_difference
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_manifest_missing_records_still_ingested
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_manifest_corrupt_json_still_ingests
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_unreadable_and_wrong_kind_members_skipped
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_manifest_identity_missing_lands_unknown_project
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_unknown_project_status_lands_literal_group_no_guessing
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_identified_identity_slug_group_and_envelope_attribution
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_duplicate_ingest_idempotent
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_cross_package_overlap_dedup
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_same_identity_different_content_keep_first
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_dedup_and_write_share_one_flock_critical_section
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_envelope_files_entry_filename_form_and_no_residue
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_output_json_required_keys_and_types
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_nonexistent_package_file_exit_2
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_non_zip_file_exit_2
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_storage_unwritable_exit_2
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_feedback_store_untouched_no_contamination
+FAILED tests/contract/test_feedback_intake_exec_quant.py::test_ingest_does_not_trigger_aggregate
+20 failed in 2.19s
+```
+
+- 用例清单：上列 20 例（收集核对 `--collect-only` = 20），条款映射：C-10 →
+  注册 + `--package` 必选（2 例）；C-11 → 无载荷零差异 + manifest 缺失/损坏降级 +
+  单条不可解析/kind 不符（4 例）；C-12 → 身份缺失/unknown-project 字面分组零猜测 +
+  identified slug 分组与信封归因（3 例）；C-13 → 同包幂等、跨包重叠去重、同 key
+  异 content keep-first + `identity_conflicts`（F-01 后该分支可构造）、flock 单临界区
+  （持锁线程阻塞断言）（4 例）；C-14 → 信封 `entry_filename()` 形态 + tmp 零残留、
+  feedback store 零混入零触碰（3 例）；C-16 → 输出键集与退出码阶梯（缺包/非 zip/
+  存储不可写 exit 2，降级 exit 0）（5 例，含交叉）；C-17 → 接收不触发 aggregate
+  （1 例）；C-15 由信封 verbatim 断言覆盖。
+- 失败归因：**subject 缺失**——20 例全部终止于 argparse 解析层
+  `invalid choice: 'ingest-exec-quant'`（动作未注册），无一例触及存储写入；断言面
+  除上述已披露修正的 1 例外无缺陷。红跑零副作用：全部夹具写入各自 `tmp_path`，
+  仓库工作树仅新增两支测试文件（`git status` 核对，禁改面零命中）。
+
+### part 3b 实现注意（本段红先测试钉住的接口形态）
+
+- 动作注册：`_ACTIONS["ingest-exec-quant"]`；`--package` 必选（缺失 → exit 2，
+  argparse required 或 `FeedbackError` 均可，测试两态兼容，但错误文本须指名
+  `--package`）。
+- 退出码阶梯：降级（manifest 缺失/损坏、单条跳过、identity_conflicts）exit 0；
+  `--package` 文件缺失 / 非 zip / 聚合层不可写 exit 2。
+- 分组目录：`aggregated/<source-slug>/records/`，slug = D5 形态；identity 缺失/
+  `unknown-project` → 字面 `unknown-project` 组；锁文件 `aggregated/.write.lock`。
+- 已知邻接守卫：`tests/contract/test_exec_quant_engine.py::
+  test_packaging_quant_coupling_is_read_only` 钉「量化存储仅经
+  `exec_quant_dir(` 只读定位器访问」——接收腿对 `aggregated/` 的写面若触发该钉，
+  按 SKILL § TDD 断言/裁决归因处置（059 修订关系记录于 068 侧），属 3b 实现面。
 
