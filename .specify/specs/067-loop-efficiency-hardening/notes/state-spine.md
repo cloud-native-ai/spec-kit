@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792656640
-stage_deadline_epoch: 1792662040
-stage_base_commit: 5b2521c9
+stage_started_at: 1792657561
+stage_deadline_epoch: 1792662961
+stage_base_commit: 00b654a1
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,17 +37,17 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (implement E1 · T019–T021)
+## Current Part Brief (implement E2 · T022–T024)
 
-- **part_id**: P10-implement-E1-mirror-suite-fold
-- **allowed files**: new `tests/contract/test_mirror_parity_suite.py`, the contract test files named in the T020/T021 fold batches, `test-evidence/` evidence + `test-evidence/test-consolidation-ledger.md`, `tasks.md` T019–T021 checkboxes only
-- **must not modify**: `src/`, `scripts/`, `pyproject.toml`, mirrors, registry, requirements.md, plan.md, other tests
-- **T019**: create the shared parametrized mirror suite; table source = importlib-loaded `scripts/python/sync-mirrors.py` `MIRROR_PAIRS`/compare semantics; assert byte identity per pair; parametrize ids carry source→mirror; cover all engine pairs; do not fix drift here (drift = expected red until T023 sync).
-- **T020/T021**: fold pure byte-identity functions in batches 1 and 2 (dictionary-order first two thirds of the candidate set). Only fold functions whose assertions are purely the mirror byte comparison; keep extra assertions (section sets, counts, wiring, normalization) in their own tests. Every removed function gets a ledger row (case-merge, retained_equivalent_id = suite param id, equivalence rationale, date, commit). Pin strength must not decrease (LED-07).
-- **targeted verification**: run `bash scripts/bash/run-tests.sh tests/contract/test_mirror_parity_suite.py <touched files> -q --durations=0`; expected failures are only known mirror drift (baseline names) and must be name-traceable; no new failure names.
-- **no full suite**; no test claimed pass unless actually run; no drift sync (T023 owns it).
+- **part_id**: P11-implement-E2-fold3-sync-recheck
+- **allowed files**: remaining contract test files for fold batch 3, mirror files written by `scripts/python/sync-mirrors.py`, `test-evidence/` evidence + ledger + triage, `tasks.md` T022–T024 checkboxes only
+- **must not modify by hand**: source `shared/`, `skills/`, `scripts/`, `templates/`, `src/`, `pyproject.toml`, registry, requirements.md, plan.md; mirrors MUST be written by the sync engine, never hand-edited
+- **T022**: fold the remaining batch-3 candidates (including 3 with extra assertions — preserve those assertions); ledger rows; targeted recheck.
+- **T023**: run `python3 scripts/python/sync-mirrors.py --check`; for every fixable drift pair run `--write --only <pair>`; record the pair range and results; triage the 50 mirror-class baseline failures into `failure-triage-2026-10-22.md` (class=mirror-sync, disposition=synced, evidence pointer). Do not hide failures by deleting tests. If a pair cannot be synced, record a dated debt row and report it as an anomaly if it would remain a closure-new failure.
+- **T024**: re-run `tests/contract/test_mirror_parity_suite.py` and the affected baseline mirror tests; expect the suite's 202 drift failures to turn green; record red→green counts and any residual debt rows. The goal is a green suite before closure so SC-008 sees no new names.
+- **no full suite** (T034 owns closure); no test claimed pass unless actually run.
 - **run-turn-budget**: 120
-- **acceptance**: T019–T021 `[X]`; ledger rows count == removed function count; suite node ids unique/path-locatable; evidence `w3-fold-batch12-<date>.md`; no unexecuted test claimed pass
+- **acceptance**: T022–T024 `[X]`; suite green or residual failures explicitly debt-registered with a closure plan; sync committed via engine; triage rows for the 50 mirror failures; evidence `w3-sync-<date>.md`
 
 ## Dispatch Log
 
@@ -62,7 +62,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P7-implement-A-baseline-rc07-admission | implement | T001–T006 (T007 driver) | not_evaluated | targeted: admission 23→25 passed; full slot 83F/4469P/1S | 47a52cc9, f14c4f49, fe5f1e62, e95a5920 | DONE — RC-07 fixture + admission in-process/clone; call sum 121.06→23.03 s; T007 wall **534 s**, name diff 0 NEW / 0 FIXED |
 | P8-implement-B-slow-families | implement | T008–T012 | not_evaluated | targeted only; 9 runs | 3cf366b6 | DONE — all four families already in band after RC-07; zero code changes; no ledger changes |
 | P9-implement-CD-telemetry-clone | implement | T013–T018 | not_evaluated | targeted only | e30ea169, 5b2521c9 | DONE — telemetry 23.36→1.14 s (CLI smoke kept); proactive+instructions 32.70→31.0 s, still over band, attributed to generator subprocesses in the forbidden `scripts/` surface; clone fixture wired and verified |
-| P10-implement-E1-mirror-suite-fold | implement | T019–T021 | — | targeted only | — | dispatched |
+| P10-implement-E1-mirror-suite-fold | implement | T019–T021 | not_evaluated | suite 202F/521P (drift, expected); 23 functions folded | 54cf98e4, 0c674638, 00b654a1 | DONE — suite covers 723 params; ledger 23 case-merge rows; no sync yet |
+| P11-implement-E2-fold3-sync-recheck | implement | T022–T024 | — | targeted only | — | dispatched (sync owns drift) |
 
 ## Gates
 
