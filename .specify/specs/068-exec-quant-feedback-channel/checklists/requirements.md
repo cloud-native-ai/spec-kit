@@ -31,7 +31,8 @@
 
 ## Notes
 
-- Validation evidence: deterministic checker run after the final spec write-back — `python3 .specify/scripts/python/validate-requirements.py .specify/specs/068-exec-quant-feedback-channel/requirements.md` → status ok, 0 error(s), 0 warning(s)（id-contiguous / doc-order / ref-resolvable / marker-count / dup-id 全 pass;252 lines, 24 definition rows, 2 shared strings）。清单 stamp 以该次运行为准,非手打。
-- 实现细节判定说明: 文件/引擎路径仅出现在「现状锚点」(dated feasibility record)与 Key Entities 的定名引用中,与 059/067 既有规格同构;全部规范性 FR/SC 行为层表述,未引入技术选型。
-- Pending(非失败项): `Related Feature` 保持 `Need clarification` 默认值,按 create-requirements 技能 § Feature Integration,绑定/落册由 `/speckit.clarify` checkpoint 处理。
-- 无 [NEEDS CLARIFICATION] 标记(0/3);开放裁决以 Assumptions A1–A5 记录,clarify 阶段可推翻。
+- Validation evidence: deterministic checker run after the clarify write-back — `python3 .specify/scripts/python/validate-requirements.py .specify/specs/068-exec-quant-feedback-channel/requirements.md` → status ok, 0 error(s), 0 warning(s)（id-contiguous / doc-order / ref-resolvable / marker-count / dup-id 全 pass;277 lines, 25 definition rows, 2 shared strings）。清单 stamp 以该次运行为准,非手打。requirements 阶段的同名运行(写回前计数)已被本次取代,旧值以 git 历史为准。
+- 实现细节判定说明: 文件/引擎路径仅出现在「现状锚点」(dated feasibility record)、Key Entities 定名引用与 clarify 裁决的子目录定名(`aggregated/`)中,与 059/067 既有规格同构;全部规范性 FR/SC 行为层表述,未引入技术选型。
+- ~~Pending(非失败项): `Related Feature` 保持 `Need clarification` 默认值~~ → **已于 2026-10-22 `/speckit.clarify` 裁决解决**:新建 Feature 068 并完成注册(features.md 068 行 + features/068.md,状态 Draft)。
+- 无 [NEEDS CLARIFICATION] 标记;Assumptions A1–A5 已由 clarify Session 2026-10-22 逐条裁决固化(全部成立,部分细化),开放裁决清零。
+- Clarify 增量: 新增 FR-019(空 feedback 条目时载荷独立成包)、US1/US2 各 1 条验收场景、1 条 Edge Case;FR-001/003/006/007/011/012/016 按 10 项裁定细化;FR/SC 计数 24 → 25。

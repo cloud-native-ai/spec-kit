@@ -7,13 +7,12 @@
 
 ## Related Feature *(mandatory)*
 
-<!--
-  ACTION REQUIRED: Keep the default values as "Need clarification" in the initial draft.
-  /speckit.clarify must resolve this section to the final Feature binding before planning.
--->
+**Feature ID**: 068（2026-10-22 由 `/speckit.clarify` 新建并绑定；注册状态 Draft）
+**Feature Name**: 执行量化数据反馈回传与汇总（Exec-Quant Feedback Channel）
 
-**Feature ID**: Need clarification  
-**Feature Name**: Need clarification
+**Related features**:
+
+- **059 — 执行量化记录（Exec-Quant Recording）**: 本特性的**前序与被修订对象,不是吸收者**。059 定义记录采集、专属存储、遮蔽与封顶;068 在其上增加回传与聚合层,并显式修订其 FR-011 的仅打包一条腿（修订关系见上文对照表,零静默矛盾）。059 的规格与登记条目零改写。
 
 ## Overview
 
@@ -42,9 +41,11 @@
 | FR-012 非阻塞 | 采集失败不劣化运行 | **保留并延伸**:打包/接收/汇总各环节失败同样非阻塞、可见 |
 | SC-004 打包产物含零条量化记录 | 验收判据 | **由 059 验收期语义废止**:068 落地后以本特性 SC-003/SC-005 替代该判据(059 的验收属其自身生命周期,不被追溯重写) |
 
-### Assumptions（无人值守裁决记录,clarify 阶段可推翻）
+### Assumptions（无人值守裁决记录,已由 clarify 裁决固化）
 
-- **A1 载荷包含策略 = 有记录即包含,不新增开关与确认门。** 依据:入口明确要求 package 流程「将 exec-quant 数据一并收回」,语义是默认随包;打包本身已是用户手动动作,再叠一道确认门与确认门治理(可逆动作自动执行 + 执行报告)相悖。载荷是否提供退出开关属 plan 层细节,不影响本裁决。存储为空时按 FR-006 显式降级,不报错。
+> 2026-10-22 `/speckit.clarify` 对 A1–A5 逐条裁决:**全部成立**,其中 A1（退出开关边界）、A2（子目录定名 `aggregated/`）、A3（字段形态）、A4（未知字段保留/跳过计数）有细化——权威表述以 `## Clarifications` Session 2026-10-22 与相应 FR 行为准,本节保留为裁决前的推理记录。
+
+- **A1 载荷包含策略 = 有记录即包含,不新增开关与确认门。** 依据:入口明确要求 package 流程「将 exec-quant 数据一并收回」,语义是默认随包;打包本身已是用户手动动作,再叠一道确认门与确认门治理(可逆动作自动执行 + 执行报告)相悖。载荷是否提供退出开关属 plan 层细节,不影响本裁决。存储为空时按 FR-005 显式降级,不报错。（2026-10-22 clarify 更正:原文误引 FR-006,打包侧空存储降级的规范条目是 FR-005。）
 - **A2 聚合层落点 = exec-quant 存储内、记录路径之外的引擎自有派生子目录(本仓即 `.specify/memory/exec-quant/` 下与 `records/`、`scores/` 平行的新子目录)。** 依据:一个域一个所有者(量化引擎已自有该存储);子目录隔离使入站/派生数据不与本地记录路径混淆;按并发开发安全纪律,派生产物按条落盘、可重建,绝不做成多流程并发重写的可变聚合单文件。
 - **A3 跨项目身份 = 包级显式携带,记录级 `agent.cwd` 仅作佐证。** 依据:现包格式不含源项目标识,而记录的 `agent.cwd` 只在部分字段组存在且属采集面数据;归因是被依赖的一等事实,不得靠推断链。包级身份字段缺失时按显式 unknown 分组,不猜(见 Edge Cases)。
 - **A4 兼容策略 = 聚合侧容忍,不改写源。** 布局(`records/` vs 遗留 jsonl)、schema(v1/v2)、字段形态(`{value, provenance}` vs 裸 `not_evaluated`)差异全部在**读取与派生视图**侧归一;遗留流保持只读可解析,永不重写(并发开发安全:遗留单体存储只读回退)。不可解析项跳过并计数,零臆造值。
@@ -89,6 +90,7 @@
 1. **Given** 客户项目 exec-quant 存储含 ≥1 条可读记录, **When** 用户执行打包流程, **Then** 产物 zip 含 exec-quant 载荷(记录条数与存储可读记录数一致),MANIFEST 显式声明载荷及其条数
 2. **Given** 打包流程执行完成, **When** 核对客户项目两侧存储(feedback store 与 exec-quant store), **Then** 全部源文件零改动(只读打包),条目不因打包而移动或删除
 3. **Given** 用户查看打包流程的输出报告, **When** 载荷被包含, **Then** 报告可见载荷条数——用户在手动投递前对包内数据范围知情
+4. **Given** feedback 条目为空而 exec-quant 存储含 ≥1 条可读记录, **When** 用户执行打包流程, **Then** 仍产出包:包内零 feedback 条目(MANIFEST 显式计数 0)而 exec-quant 载荷照常纳入——载荷独立成包,不依附 feedback 条目(见 FR-019)
 
 ---
 
@@ -105,6 +107,7 @@ spec-kit 侧按既有入站包流程收到一个手工送达的 zip 后,处理�
 1. **Given** 一个含 exec-quant 载荷与 feedback 条目的入站包, **When** spec-kit 侧接收流程执行, **Then** 载荷记录进入聚合层并带源项目归因,feedback 条目进入既有消化路径,exec-quant 记录零条混入 feedback store
 2. **Given** 同一个包被接收两次, **When** 第二次接收完成, **Then** 聚合层零重复条目(幂等)
 3. **Given** 一个不含 exec-quant 载荷的既有形态入站包(基线包同构), **When** 接收流程执行, **Then** feedback 条目处理行为与 068 之前零差异,流程不因缺载荷而报错
+4. **Given** 两个不同包因全量包含策略携带重叠记录(同一源项目同一记录), **When** 先后接收完成, **Then** 聚合层零重复条目——重叠记录按源记录身份(源项目 + unit_id + run_id + 采集时间戳)幂等合并,全量包含的重复代价由接收侧幂等吸收
 
 ---
 
@@ -143,6 +146,7 @@ spec-kit 维护者可对本仓聚合层执行汇总:得到跨项目、跨单元�
 ### Edge Cases
 
 - **客户存储为空或目录缺失**:包不含 exec-quant 载荷,MANIFEST/输出显式注明「无量化数据」,打包流程照常成功(非阻塞,零报错)。
+- **feedback 条目为空而量化记录存在**:包仍产出,只含 exec-quant 载荷,feedback 条目计数显式为 0;两者都空才不产出(见 FR-019)。
 - **部分记录损坏或不可解析**:可读记录照常入包,不可解析项在 MANIFEST 中显式计数跳过;零部分写入、零臆造。
 - **仅存遗留布局**(只有 schema v1 的 `records.jsonl`、无 `records/` 目录):遗留流按只读方式纳入载荷并标注来源形态,源文件永不重写;接收侧按兼容策略归一(A4)。
 - **载荷超过合理包体**:按显式封顶截断,MANIFEST 记录纳入数/截断数与截断标注,不静默丢弃也不无界膨胀。
@@ -162,33 +166,37 @@ spec-kit 维护者可对本仓聚合层执行汇总:得到跨项目、跨单元�
 
 #### 打包腿——量化数据随包收回（US1）
 
-- **FR-001**: 客户项目的 `/speckit.feedback package` 打包流程在 exec-quant 存储含 ≥1 条可读记录时 MUST 将记录纳入包内 exec-quant 载荷(record kind [[STR-001]]),载荷作为包的一等组成在 MANIFEST 中显式声明(条数、来源形态、降级计数),MUST NOT 以临时附加文件等未声明形态混入
+- **FR-001**: 客户项目的 `/speckit.feedback package` 打包流程在 exec-quant 存储含 ≥1 条可读记录时 MUST 将存储中**全部可读记录**纳入包内 exec-quant 载荷(record kind [[STR-001]])——**全量包含,不引入增量水位**(clarify 裁决,代价与理由见 Clarifications);载荷作为包的一等组成在 MANIFEST 中显式声明(条数、来源形态、降级计数),MUST NOT 以临时附加文件等未声明形态混入
 - **FR-002**: 打包 MUST 对 exec-quant 存储与 feedback store 严格只读——源记录文件零改动、零移动、零删除;记录的读取按来源形态(逐条 `records/` 目录、遗留 jsonl 流)分别容忍,遗留流保持只读不重写
-- **FR-003**: 包 MUST 携带包级源项目身份字段,使接收侧可把载荷记录归因到源项目;记录级环境字段(如 `agent.cwd`)仅作佐证,MUST NOT 作为唯一归因依据
+- **FR-003**: 包 MUST 携带包级源项目身份字段,使接收侧可把载荷记录归因到源项目;身份字段形态为**源项目的项目名或稳定标识(必选)+ 框架 source commit(可选佐证)**,MUST NOT 以文件系统绝对路径作为身份载体,MUST NOT 新增凭据面;记录级环境字段(如 `agent.cwd`)仅作佐证,MUST NOT 作为唯一归因依据
 - **FR-004**: 打包输出报告 MUST 向用户可见地报告载荷纳入情况(条数、降级计数),使用户在手动投递前对包内量化数据范围知情
 - **FR-005**: 存储为空/目录缺失时包 MUST 显式降级为无载荷(注明「无量化数据」)并照常成功;部分记录不可解析时 MUST 纳入可读项并在 MANIFEST 显式计数跳过项;载荷体量 MUST 有显式封顶,截断时在 MANIFEST 记录纳入数/截断数;以上一切降级 MUST NOT 使打包流程失败(非阻塞)
 
 #### 接收腿——解出与归因（US2）
 
-- **FR-006**: spec-kit 侧入站包接收流程 MUST 识别 exec-quant 载荷(record kind [[STR-001]])并把载荷记录解出到本仓聚合层、按包级源项目身份归因;exec-quant 记录 MUST NOT 进入 feedback store(059 FR-009 存储分界保留);身份缺失时归入显式 unknown-project 分组,MUST NOT 猜测
-- **FR-007**: 接收与聚合层 MUST 容忍既有版本/布局/字段形态差异:逐条 `records/` 目录与遗留 jsonl 流并存、schema v1 与 v2 并存、已测字段 `{value, provenance}` 对象与未测字段裸 [[STR-002]] 字符串并存;读取侧归一为派生视图,缺失字段以显式未测标记呈现,MUST NOT 推断或填补;源数据零改写
+- **FR-006**: spec-kit 侧入站包接收流程 MUST 识别 exec-quant 载荷(record kind [[STR-001]])并把载荷记录解出到本仓聚合层、按包级源项目身份归因;**接收由既有 `/speckit.feedback` 入站包处理路径承接,不新增命令**;识别/解出/归因/聚合的行为归属接收流程(引擎动作名留 plan),feedback 条目处理语义不变;exec-quant 记录 MUST NOT 进入 feedback store(059 FR-009 存储分界保留);身份缺失时归入显式 unknown-project 分组,MUST NOT 猜测
+- **FR-007**: 接收与聚合层 MUST 容忍既有版本/布局/字段形态差异:逐条 `records/` 目录与遗留 jsonl 流并存、schema v1 与 v2 并存、已测字段 `{value, provenance}` 对象与未测字段裸 [[STR-002]] 字符串并存;读取侧归一为派生视图,缺失字段以显式未测标记呈现,**源记录中的未知字段 MUST 原样保留进聚合层(零丢弃)**,MUST NOT 推断或填补;不可解析项跳过并计数;源数据零改写
 - **FR-008**: 接收 MUST 按源记录身份(源项目 + unit_id + run_id + 采集时间戳)幂等:同一包重复接收零重复聚合条目
 - **FR-009**: 不含 exec-quant 载荷的既有形态入站包 MUST 与 068 之前行为零差异——feedback 条目处理语义、MANIFEST 语义、清理与对账动作全部不变,流程不因缺载荷报错
 - **FR-010**: 接收过程的损坏与不可读(zip 成员、单条记录)MUST 显式计数上报且非阻塞——feedback 条目处理 MUST NOT 因量化载荷问题受阻或劣化
 
 #### 汇总腿——本地聚合分析（US3）
 
-- **FR-011**: spec-kit MUST 能对聚合层执行跨项目汇总,产出按源项目与单元维度的聚合视图(记录计数、质量量分布、未测覆盖率——以 [[STR-002]] 标记计数),提供机器可读输出形态,每个聚合数字可对账到具体记录
-- **FR-012**: 聚合层与汇总产物 MUST 落 exec-quant 存储内、本地记录路径之外的引擎自有派生子目录(A2),按条落盘、可重建,形成多流程可并写形态;MUST NOT 造出多流程并发重写的可变聚合单文件(并发开发安全纪律)
+- **FR-011**: spec-kit MUST 能对聚合层执行跨项目汇总,产出按源项目与单元维度的聚合视图(记录计数、质量量分布、未测覆盖率——以 [[STR-002]] 标记计数),提供机器可读输出形态,每个聚合数字可对账到具体记录;**汇总为显式动作**(可重复、可审计),由 `/speckit.feedback` 或量化引擎动作触发,MUST NOT 随接收自动执行(clarify 裁决)
+- **FR-012**: 聚合层与汇总产物 MUST 落 exec-quant 存储内、本地记录路径之外的引擎自有派生子目录 **`aggregated/`**(即本仓 `.specify/memory/exec-quant/aggregated/`,与 `records/`、`scores/` 平行;接收记录与汇总产物均落其下,内部细分留 plan)(A2),按条落盘、可重建,形成多流程可并写形态;MUST NOT 造出多流程并发重写的可变聚合单文件(并发开发安全纪律)
 - **FR-013**: 汇总 MUST 零臆造:未测/缺失字段以 [[STR-002]] 显式标记计数呈现,禁止任何填补、外推或基线杜撰(「测量而非印象」延伸)
 - **FR-014**: 聚合层与汇总产物 MUST 仅存 spec-kit 本地,零自动传输、零网络操作;对外共享只能由用户显式发起且不属于本特性范围
 
 #### 边界腿——修订后的安全边界与非回归（US4）
 
 - **FR-015**: 凭据零出现贯穿全链路:打包产物、聚合层、汇总产物中凭据型值(API 密钥、token、鉴权头)MUST 零出现;打包与接收 MUST NOT 新增采集面、MUST NOT 削弱 059 采集侧的遮蔽与封顶(载荷只携带采集时已遮蔽/封顶的数据)
-- **FR-016**: 零自动传输红线原样保留:打包、接收、汇总全部由用户手动发起、纯本地执行;本特性修订 059 FR-011 的**仅打包一条腿**,「一切自动上送路径排除」条款 MUST NOT 被解释为放宽
+- **FR-016**: 零自动传输红线原样保留:打包、接收、汇总全部由用户手动发起、纯本地执行。059 FR-011 的修订**按子句拆开处置,零整条放宽**:其「结构性排除于反馈打包」子句修订为「量化记录可进入**手动触发**的打包产物」;其「排除于一切上送路径(零自动传输)」子句原样保留——任何流程仍 MUST NOT 将记录传送到任何外部目的地,本特性 MUST NOT 被解释为对该子句的放宽
 - **FR-017**: 既有 feedback 引擎行为(record/list/status/dispose/mark-submitted/reindex/cleanup、external 条目排除、SUBMISSION-NOTES)与既有 exec-quant 引擎行为(collect/list-records/score)MUST 不受本特性影响
 - **FR-018**: 既有 feedback / exec-quant 契约与集成测试套件 MUST 全部通过,失败名单与实现前基线逐名比对零新增(name-level)
+
+#### 打包腿补充裁定——空反馈条目时载荷独立成包（US1，clarify 新增）
+
+- **FR-019**: feedback 条目为空而 exec-quant 存储含 ≥1 条可读记录时,打包流程 MUST **仍产出包**:包内 feedback 条目计数为 0(MANIFEST 显式声明)而 exec-quant 载荷照常纳入;**仅当 feedback 条目与 exec-quant 可读记录都为空时**,包才不产出(显式降级说明)。既有引擎在 feedback 条目为空时的提前返回行为 MUST 依此修订——载荷可独立成包,不依附于 feedback 条目存在(本条按 doc-order 追加于 FR 列表末尾,语义属打包腿)
 
 ### 显式排除项（Out of Scope）
 
@@ -205,8 +213,8 @@ spec-kit 维护者可对本仓聚合层执行汇总:得到跨项目、跨单元�
 - **反馈包 (Feedback Package)**: 手工投递的 zip 产物;068 起布局为:feedback 条目(根部,不变)+ 可选 `introspection/`(不变)+ **exec-quant 载荷段(新增)** + MANIFEST.md(新增载荷声明段)+ 可选 SUBMISSION-NOTES.md(不变)
 - **执行量化载荷 (Exec-Quant Payload)**: 包内 exec-quant 记录副本的统称:源项目身份 + 逐条记录(读自客户存储,含遗留形态)+ 载荷级降级计数;由打包流程一次写入、此后不可变
 - **源项目身份 (Source Project Identity)**: 包级归因字段,把载荷记录绑定到来源客户项目;缺失时落显式 unknown-project 分组
-- **聚合层 (Aggregation Store)**: spec-kit 本仓 exec-quant 存储内、本地记录路径之外的引擎自有派生子目录:接收解出的记录(带归因)按条落盘、幂等去重、可重建
-- **聚合视图 (Aggregate View)**: 汇总动作的机器可读产物:按源项目/单元维度的计数、质量量分布、未测覆盖率;每次汇总按条落盘于派生层,零臆造
+- **聚合层 (Aggregation Store)**: spec-kit 本仓 exec-quant 存储内的引擎自有派生子目录 `aggregated/`(与本地 `records/`、`scores/` 平行):接收解出的记录(带归因)按条落盘、幂等去重、可重建
+- **聚合视图 (Aggregate View)**: 汇总动作的机器可读产物:按源项目/单元维度的计数、质量量分布、未测覆盖率;每次汇总按条落盘于 `aggregated/` 之下,零臆造
 - **量化引擎 (Exec-Quant Engine)**: `exec-quant.py`(059 已定名),本特性只扩展其回传/聚合相关动作面,采集/列出/打分语义不变;打包/接收侧改动落 feedback 引擎与接收流程
 
 ## Success Criteria *(mandatory)*
@@ -249,3 +257,20 @@ spec-kit 维护者可对本仓聚合层执行汇总:得到跨项目、跨单元�
 This section will be populated by /speckit.clarify command with questions and answers.
 Format: - Q: <question> → A: <answer>
 -->
+
+### Session 2026-10-22 — clarify（无人值守,Mode A）
+
+> 本阶段为无人值守运行,未向用户发起访谈;以下裁决按入口指令、059 既有边界与仓库现状自行作出并标注推荐依据,已同步落入相应 FR/SC/Edge Cases。裁决对象 = requirements 阶段留下的 Assumptions A1–A5 与派发方明确列出的追加裁定项。
+
+- Q: Related Feature 绑定既有 Feature 还是新建? → A: **新建 Feature 068(本规格自身)**,不绑定 059;059 是前序与被修订对象,不是吸收者。依据:本特性引入新能力面(回传+聚合,横跨 feedback 与 exec-quant 两个既有引擎),而 059 的采集语义与边界原文零改写。注册义务已履行:`.specify/memory/features.md` 新增 068 行(Draft)+ `features/068.md` 详情;按 feature-integration § Binding Rules 本应向邻接 Feature 写逆向交叉引用,但派发约束明确「不要改写 059 制品」,故承接关系只记录于 068.md 的 Related Specifications(偏离已披露)。
+- Q: A1 载荷包含策略——默认包含还是显式开关/确认门? → A: **默认「有记录即随包包含」,不新增阻断式确认门**;如实现层提供退出开关,只能是非阻断的可选参数,且不构成确认门(可逆动作自动执行+执行报告,与确认门治理边界一致)。依据:打包本身已是用户手动动作,入口语义是「一并收回」;FR-004 的知情报告承担可观测性。已固化进 FR-001。
+- Q: feedback 条目为空而 exec-quant 记录存在时,打包行为? → A: **仍产出包,只含 exec-quant 载荷**(MANIFEST 显式声明 feedback 条目计数 0);两者都空才不产出。依据:现状引擎在 feedback 为空时提前返回「No feedback entries」,该行为会使量化数据在纯量化场景下无法收回,与「载荷是一等组成」矛盾。已固化为新 FR-019 + US1 验收场景 4 + Edge Case 条目。
+- Q: 每次打包携带全部可读记录,还是只携带自上次打包以来的新记录(水位)? → A: **全量包含,不引入水位**。依据:接收侧幂等去重(FR-008,按源记录身份)使重复载荷无害;水位是新增可变状态,须定义存储、更新时机与并发安全形态(违反并发开发安全纪律的成本高于重复传输),而全量包含零新增状态、零丢数风险(漏标水位即丢数据)。代价 = 相邻多次打包重复携带同一批记录,由接收幂等吸收;体量由 FR-005 封顶约束。已固化进 FR-001 + US2 验收场景 4。
+- Q: A3 包级源项目身份字段的形态? → A: **项目名/稳定标识(必选)+ 框架 source commit(可选佐证)**;MUST NOT 以绝对路径作身份载体(跨机不稳定、属环境细节),MUST NOT 新增凭据面;缺失时落显式 unknown-project 分组,不猜。已固化进 FR-003。
+- Q: A2 聚合层落点的具体子目录名? → A: **`aggregated/`**(本仓即 `.specify/memory/exec-quant/aggregated/`,与 `records/`、`scores/` 平行),接收记录与汇总产物均落其下,按条落盘、可重建、幂等去重;内部细分布局留 plan。依据:一个域一个所有者(量化引擎自有该存储);子目录隔离派生数据与本地记录路径。已固化进 FR-012 + Key Entities。
+- Q: 接收走新命令还是既有路径? → A: **既有 `/speckit.feedback` 入站包处理路径(Path A intake)承接,不新增命令**;feedback 条目处理语义不变;识别/解出/归因/聚合的行为归属接收流程(引擎动作名留 plan,行为边界以 FR-006~FR-010 为准)。已固化进 FR-006。
+- Q: 汇总是接收后自动执行还是显式动作? → A: **显式动作**(可重复、可审计),由 `/speckit.feedback` 或量化引擎动作触发;接收只负责解出归因,MUST NOT 自动汇总。依据:自动触发会把派生写混入接收路径(两流程并发写同一面,违反并发隔离);显式动作让每次汇总产出独立可对账条目。产物机器可读、按条落盘于 `aggregated/`、仅本地零外发。已固化进 FR-011/FR-012/FR-014。
+- Q: A4 兼容策略的读取侧归一细则? → A: schema v1/v2、`records/` 目录 vs 遗留 jsonl、`{value, provenance}` vs 裸 [[STR-002]] 三类差异全部在**读取与派生视图**侧归一;**源记录中的未知字段原样保留进聚合层(零丢弃)**;不可解析项跳过并计数,零臆造值;源数据零改写(遗留单体流只读回退)。已固化进 FR-007(FR-005/FR-010 承接计数)。
+- Q: A5 边界复核——修订 059 FR-011 会不会被读成放宽零自动传输? → A: **不会**:修订按子句拆开处置——「结构性排除于反馈打包」修订为仅限手动触发打包;「排除于一切上送路径(零自动传输)」原样保留,任何流程仍 MUST NOT 外送;059 的采集遮蔽与封顶不变;本特性不新增确认门。已固化进 FR-016(子句拆分表述)+ FR-015。
+- Q: Feature 注册的既有计数状态? → A: `features.md` 表头 `Total Features`=64 与实际行数 64 一致,本次新增 068 行后同步更新为 65,零漂移;披露一个**既有**缺口(非本特性引入,不在本阶段修复):specs 066/067 存在但注册表无对应行(066/067 的注册义务属其自身特性线),本阶段不代为补录。
+
