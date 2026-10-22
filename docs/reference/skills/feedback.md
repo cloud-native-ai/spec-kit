@@ -98,6 +98,7 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 | `reindex` | Explicit reconciliation and migration entry point (req 055): derives entries from the entry files, materializes store scalars into `state/`, retires a legacy `index.json`, and reports `migrated`. Idempotent. |
 | `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. `--include-introspection` additionally packs the introspection reports covering the selected entries (plus a `## Introspection Reports` MANIFEST section). |
 | `cleanup` | After packaging, remove the entries contained in a given zip from the active store (`--package <zip|latest>`, `--dry-run` preview first); every removal is logged to `cleanup-log.md`. |
+| `ingest-exec-quant` | Receiving side of the exec-quant channel (068): unpack an inbound bundle's `exec-quant/` payload into the aggregated layer (`.specify/memory/exec-quant/aggregated/<source-slug>/records/`) with package-level identity attribution; `--package <zip>` required. Idempotent via identity-key dedup (`duplicates_skipped`); never touches the feedback store; degradations (unreadable manifest/records, `unknown-project` identity, conflicts) exit 0 with counters, while a call that cannot run (missing/non-zip package, unwritable store) exits 2. |
 | `probes` / `map` / `probe-inject` | Migrated to the shared probe engine (056): run them on `probe-utils.py` — see [probe.md](probe.md) for the probe-family CLI, the Handler/HandlerBinding model, and the read-only host boundary. |
 | `migrate-legacy` | One-shot convergence of legacy entries per an approved plan file (`--plan-file`, one `<entry-id> -> delete|re-register` per line); every outcome lands in the migration log. |
 | `upstream` | Show (or `--set`) the upstream repo URL used for manual delivery guidance. |
@@ -242,6 +243,16 @@ before changing anything is what surfaces those conflicts, and it forces a singl
 mechanism that fits every reporting environment rather than a fix shaped by whichever
 bundle happened to be opened first. The same rule is recorded for agents in the project
 instructions (`.specify/instructions.md` → Key Directories).
+
+**Exec-quant payload step (068, Path A § A2)**: for every pending bundle, Path A also
+runs `--action ingest-exec-quant --package <zip>` once, unpacking the bundle's
+quantified-data payload into the receiving repo's aggregated layer with per-counter
+degradation reporting (`ingested` / `duplicates_skipped` / `skipped_unreadable` /
+`identity_conflicts` / `manifest_unreadable`); this is what lets the mandatory post-digest
+bundle cleanup stay safe for quantified data — the payload has already landed locally.
+Bundles packaged before the channel carry no payload and stay zero-difference. Receiving
+never triggers aggregation: the cross-project summary view is a separate explicit
+`exec-quant.py --action aggregate` run, offered as a suggested follow-up step.
 
 ## Workaround lookup
 

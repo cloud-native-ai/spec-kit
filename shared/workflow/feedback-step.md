@@ -312,6 +312,17 @@ its class-③ instance):
    archives the pending batch into `packages/` (with the optional disposition
    record as `SUBMISSION-NOTES.md` inside the zip) and then resets the local
    counter — every reset therefore leaves an auditable package artifact behind.
+
+   **Exec-quant payload awareness (068)**: when the project has an exec-quant store,
+   the package above also carries that store's records as an `exec-quant/` payload,
+   and the same report faces (text and `--format json`) state the payload counts and
+   degradation counters — surface them in the wrap-up notification, since they are
+   part of what the batch is declared to contain. The receive-side flow (per-bundle
+   ingest plus degradation counters; aggregation only as a suggested explicit
+   follow-up) is owned by `/speckit.feedback` Path A —
+   `skills/internal/manage-feedback/references/path-a-digest.md` § A2. This step adds
+   no command, no confirmation gate, and no transmission path (red line 3 unchanged:
+   the payload only rides inside the same manually-delivered zip).
 2. **Skip this time** — do nothing; the prompt will naturally reappear only after more
    entries accumulate.
 3. **Stop prompting** — the agent raises the threshold (`--threshold <N>` or

@@ -18,7 +18,7 @@ explicitly-requested § Probe Injection capability. The owning command is
 its own wrap-up Feedback / Documentation / Handoffs steps) and delegates everything
 below to this skill.
 
-Canonical extraction source: `.specify/templates/commands/feedback.md` § Routing flow
+Canonical extraction source: `templates/commands/feedback.md` § Routing flow
 (steps 1–10), § Path A (A1–A6 + behavior rules), § Path B (steps 1–6),
 § Probe Injection, and § Behavior Rules. The routing judgment lives in this SKILL.md;
 the two execution paths and the probe capability live in `references/`. The engine
@@ -161,9 +161,11 @@ prompt MUST NOT recommend it.
 - **Path A — 就地消化 (Digest In This Project)**: execute per
   [`./references/path-a-digest.md`](./references/path-a-digest.md) — A1 pending-bundle
   intake (re-delivery / interrupted-run / orphan recognition), A2 extraction and
-  large-batch read discipline, A3 Introspection(自省), A4 reconcile and route, A5
-  atomic cleanup with the consume-log row, A6 dispose local entries, and the Path A
-  behavior rules.
+  large-batch read discipline plus the exec-quant payload ingest (`ingest-exec-quant
+  --package <zip>`, once per bundle, degradation counters reported; aggregation is at
+  most a suggested explicit follow-up, never part of the receive flow), A3
+  Introspection(自省), A4 reconcile and route, A5 atomic cleanup with the consume-log
+  row, A6 dispose local entries, and the Path A behavior rules.
 - **Path B — 打包上送 (Package For The Framework Upstream)**: execute per
   [`./references/path-b-and-probe.md`](./references/path-b-and-probe.md) — status,
   filtered summary, disposition, packaging, hat-aware post-package cleanup,

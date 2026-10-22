@@ -745,3 +745,88 @@ quickstart.md 场景 3 明示钉住测试 = `tests/contract/test_exec_quant_aggr
     test_exec_quant_engine 等语义钉，零新增失败。
 - 结论：**零新增失败 nodeid；唯一名单变化是既有镜像一致性失败的预期消失；
   真实回归：无。**
+
+---
+
+# Implement Part 6a — Polish 文档面/镜像收口（T025 / T026 / T027，2026-10-22）
+
+> 本段为文档面与镜像收口（无新测试）；取证对象 = 引擎动作面对齐 + 镜像零 NEW
+> drift + 24 文件集最终名字级比对。
+
+## § T025 — 流程面文档（源侧 5 文件）
+
+- `skills/internal/manage-feedback/SKILL.md`：Path execution 的 Path A 行补 A2
+  exec-quant 载荷接收调用点（`ingest-exec-quant --package <zip>`，每包恰一次，
+  降级计数知情；汇总至多是建议的显式后续步骤）。
+- `references/path-a-digest.md`：A2 末新增「Exec-quant payload ingest」块——
+  调用点、聚合层落点 `aggregated/<source-slug>/records/`、七键降级计数
+  （record_count / ingested / duplicates_skipped / skipped_unreadable /
+  identity_conflicts / groups_touched / manifest_unreadable）须入 digest 报告、
+  降级 exit 0 / 调用不可执行 exit 2、无载荷零差异、幂等重收、**接收永不触发
+  汇总**（`exec-quant.py --action aggregate` 仅建议为显式后续步骤）。
+- `references/path-b-and-probe.md`：第 4 步 Package 补载荷面——全量包含（与条目
+  时间过滤无关、零水位线）、引擎封顶（1000 条 / 16 MiB）触顶截断计数、降级
+  非阻塞双报告面（text 与 `--format json`）与 MANIFEST § Exec-Quant Payload
+  人读段（空载荷段照写声明无量化数据）、feedback 空 + 载荷非空仍产包
+  （`Entries: 0` 显式）。
+- `shared/workflow/feedback-step.md`：Threshold prompt § 1 package 段后补
+  「Exec-quant payload awareness (068)」——载荷随包后的 wrap-up 观察面，指针形态
+  （接收侧流程归 `/speckit.feedback` Path A § A2），零新增命令、零新增确认门、
+  红线 3 不变（载荷只随同一个人手送 zip）。
+- `templates/commands/feedback.md`：技能引用行同步（path-a-digest 行 + 
+  path-b-and-probe 行），零新增命令、零新增确认门。
+- 取值对齐核验：动作名/退出码/计数键逐项对照引擎实文——
+  `feedback-utils.py --help` 动作面（13 动作，含 `ingest-exec-quant`；`--package`
+  help 文本明示 ingest 必填）、`render_text` 的 ingest 文本面（无载荷措辞、
+  "next: aggregate is a separate explicit action"）、`_intake_result` 七键、
+  `exec-quant.py ACTIONS`（6 动作，含 `aggregate`）。零新增命令/确认门；
+  059 制品零触碰。
+
+## § T026 — 参考文档（docs/ 2 文件，无镜像义务）
+
+- `docs/reference/commands/feedback.md`：A2 段新增载荷接收步骤（调用点、七键
+  降级计数、退出码语义、零差异与幂等、接收不聚合 + `exec-quant.py --action
+  aggregate` 动作名）；Path B 段新增载荷面（全量包含/封顶/降级计数/空载荷段/
+  FR-019 双向）；Exit Codes 表 exit 2 行补 ingest 调用级失败三因 + 表后补
+  「降级非 exit 2」说明段。
+- `docs/reference/skills/feedback.md`：引擎动作表新增 `ingest-exec-quant` 行；
+  Intake side 段新增「Exec-quant payload step (068, Path A § A2)」（每包恰一次
+  调用点、降级计数、对 A5 清理安全性的意义、前置通道包零差异、汇总仅显式
+  后续步骤）。
+- 引擎动作名以代码为准核验：`_ACTIONS`（feedback-utils.py）与 `ACTIONS`
+  （exec-quant.py）实值对照，文档与 `--help` 输出一致。
+
+## § T027 — 镜像与逐工具副本收口
+
+- `python3 -u scripts/python/sync-mirrors.py --write --only skills/internal`
+  → `sync skills/internal/ -> .specify/skills/internal/ (75 files)`，rc=0；
+  复查 `--check --only skills/internal` →
+  `ok skills/internal/ == .specify/skills/internal/ (136 files)`，rc=0。
+- `python3 -u scripts/python/sync-mirrors.py --write --only shared` →
+  `sync shared/ -> .specify/shared/ (37 files)`，rc=0；复查
+  `--check --only shared` → `ok shared/ == .specify/shared/ (51 files)`，rc=0。
+- 判定：相对 T001 基线（skills/internal 75 DIFF / shared 37 DIFF，均为镜像侧
+  路径前缀改写类既有漂移）**零 NEW drift**；既有 DIFF 随字节同步消失属预期
+  （plan § Mirror Obligations 明示不算回归）。四个特性镜像文件逐对 `cmp`
+  rc=0 字节一致：`.specify/skills/internal/manage-feedback/{SKILL.md,
+  references/path-a-digest.md,references/path-b-and-probe.md}` 与
+  `.specify/shared/workflow/feedback-step.md`。零手改镜像。
+- `python3 -u scripts/python/regen-command-copies.py` → 恰好修复 4 个逐工具
+  feedback 副本（.claude/commands/、.github/prompts/、.opencode/command/、
+  .qoder/commands/ 各 1）；`--check` → `OK: all per-tool command copies match
+  the source templates.`，rc=0。Codex 无独立命令目录（`.codex/commands` 不存在
+  于本仓，regen 以现存目录为准），逐工具清单以脚本实跑输出为准。零手改副本。
+- 预期转绿核验：
+  `tests/contract/test_feedback_step_reference_form.py::test_owner_mirror_is_byte_identical`
+  与 `tests/contract/test_token_efficiency_feedback.py::test_cm1_mirror_identical`
+  → `2 passed`（与 T023 预测一致）。
+- 24 文件集最终重跑（canonical runner，quickstart 场景 4 命令集）：
+  **547 passed / 0 failed in 35.90s**，runner rc=0；失败名单
+  `test-evidence/log-final-post-sync-names.txt` **0 条**。相对冻结基线
+  （log-baseline-pre-impl.txt：3 failed / 544 passed）**零 NEW failing
+  nodeid**（当前失败集为空）；T023 时余留的 2 个既有镜像一致性失败
+  （owner_mirror_is_byte_identical / test_cm1_mirror_identical）如预测转绿，
+  基线失败消失不算回归。收集数 547 与基线 544+3 一致，零收集面变化。
+- 提交范围纪律：本段只提交特性相关镜像/副本（上列 4 镜像 + 4 逐工具副本）；
+  `--write`/regen 附带改动的其余继承漂移镜像（108 个 `.specify/` 文件，
+  `git status` 实数）留在工作树由驱动统一还原，不入本特性提交。

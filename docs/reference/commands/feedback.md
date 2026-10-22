@@ -41,6 +41,14 @@ python3 .specify/scripts/python/feedback-utils.py --action list --disposition op
 
 **A2 Read**: small batches inline via `unzip -p`; larger batches extract to a temp dir and dispatch balanced parallel read-only verifiers returning a compact verdict table. Bundle identity comes from the MANIFEST (`Install source`, `Generated`, entry-file set), which catches a re-delivery the filename check cannot.
 
+**A2 Exec-quant payload ingest** (068, one call per bundle alongside the read):
+
+```bash
+python3 .specify/scripts/python/feedback-utils.py --action ingest-exec-quant --package <zip>
+```
+
+Unpacks the bundle's `exec-quant/` payload into the aggregated layer `.specify/memory/exec-quant/aggregated/<source-slug>/records/`, attributed by the package-level identity — and never touches the feedback store. The report is the degradation surface — `record_count` / `ingested` / `duplicates_skipped` / `skipped_unreadable` / `identity_conflicts` / `groups_touched` / `manifest_unreadable` — and those counters land in the digest report. Degradation semantics: unreadable payload manifest, unreadable member records, `unknown-project` identity, same-key-different-content conflicts (kept first, counted), and re-delivered duplicates are all **non-blocking and exit 0**; exit 2 is reserved for a call that cannot run at all (missing `--package`, not a readable zip, unwritable aggregated store). A bundle without an `exec-quant/` payload is a zero-count no-op with zero writes, so pre-068 bundles stay zero-difference; re-ingesting the same bundle is idempotent (`ingested: 0`, `duplicates_skipped` full). **Receiving never aggregates** — the cross-project summary view is a separate explicit action, `exec-quant.py --action aggregate` (append-only summaries under `aggregated/summaries/`), offered as a suggested follow-up, not run inside the receive flow.
+
 **A3 Introspection(自省)** — scenario-grounded deep processing, five steps: (1) 范围快照 via `list --disposition open --format json` (summary-first; narrow with `--slice/--kind/--since`); (2) 场景化分析 — agent-side verification of each entry against the live scenario (unit source, referenced files) with a verdict per entry, clustering same-root-cause entries into findings of five elements (statement / root cause / evidence anchors / routing decision / optimization proposal); (3) 报告产出 — draft persisted to `.specify/memory/feedback/introspection/<report-id>.md`, validated and linked via `introspect-register`; (4) 用户确认 — per-finding routing overrides are recorded, then `introspect-register --confirm` applies the report's `建议处置` rows as batch dispositions; (5) 路由建议 — advisory only, nothing auto-applied or auto-transmitted.
 
 ```bash
@@ -82,6 +90,8 @@ Filters: `--slice`, `--kind <internal|external>`, `--disposition <processed|igno
 
 Running Path A's introspection before packaging is advised, not required: skipping it affects nothing downstream.
 
+**Exec-quant payload face (068)**: the same `--action package` call also sweeps the workspace's exec-quant store read-only and carries its records under `exec-quant/` as a first-class payload — full inclusion independent of the entry time filter (no watermark), under engine-enforced caps (1,000 records / 16 MiB) that truncate and report the remainder. Every payload degradation (unreadable record, truncation, missing project identity) is non-blocking and surfaces as counters in both report faces (text and `--format json`) and in the zip's `MANIFEST.md` § Exec-Quant Payload section, which is rendered even for an empty payload and then declares no quant data. Feedback-empty + payload-non-empty still produces a package, with `Entries: 0` explicit. The receiving side unpacks this payload per bundle — see the A2 ingest step above.
+
 ## Probe Injection (explicit request only)
 
 For client-project custom Skills/Agents/Commands (framework probes never cover them). Outside the automatic router because the target unit id cannot be inferred:
@@ -98,8 +108,10 @@ Writes `.specify/memory/feedback/probes/ext-<slug>.md` (`ext-` prefix enforces t
 | Code | Meaning |
 |------|---------|
 | 0 | success |
-| 2 | validation verdict (unknown unit/probe, schema violation, reconcile gap, bad disposition, missing package) |
+| 2 | validation verdict (unknown unit/probe, schema violation, reconcile gap, bad disposition, missing package; `ingest-exec-quant`: missing `--package`, not a readable zip, unwritable aggregated store) |
 | 3 | IO/storage error |
+
+Payload/intake degradations are deliberately **not** exit 2: for `ingest-exec-quant` (and for the `package` payload sweep), an unreadable manifest or record, an `unknown-project` identity, an identity conflict, duplicates, or truncation completes with exit 0 and is reported as a counter — only a call that cannot run at all is a verdict.
 
 ## See Also
 
