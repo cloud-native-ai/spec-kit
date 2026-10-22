@@ -2,9 +2,9 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-stage_started_at: 1792653477
-stage_deadline_epoch: 1792658877
-stage_base_commit: ae215d74
+stage_started_at: 1792655452
+stage_deadline_epoch: 1792660852
+stage_base_commit: e95a5920
 attempt: 0
 retry_limit: 2
 run_id: r20261022T061700Z-067a
@@ -37,18 +37,18 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 6. Implement in bounded parts; full-suite budget only at implement start and post-review slots.
 7. Review → local merge.
 
-## Current Part Brief (implement A · T001–T006)
+## Current Part Brief (implement B · T008–T012)
 
-- **part_id**: P7-implement-A-baseline-rc07-admission
-- **allowed files**: `tests/conftest.py`, `tests/unit/test_admission_check.py`, `test-evidence/` new/updated evidence files, `tasks.md` task-state checkboxes only
+- **part_id**: P8-implement-B-slow-families
+- **allowed files**: `tests/integration/test_worktree_integration_queue.py`, `tests/contract/test_workspace_isolation_contract.py`, `tests/contract/test_store_state_protocol.py`, `tests/unit/test_audit_plan_changes.py`, `tests/unit/test_loop_state_engine.py`, `test-evidence/` evidence, `tasks.md` T008–T012 checkboxes only
 - **must not modify**: `src/`, `scripts/`, `pyproject.toml`, mirrors, registry, requirements.md, plan.md, other tests
-- **tasks**: T001 baseline id list (three-number reconciliation), T002 evidence skeletons (ledger/triage/pinned roster), T003 RC-07 autouse git-config neutralization fixture, T004 admission in-process direct call with CLI pin, T005 admission fixture reuse + table-driven expansion, T006 targeted retest + timing evidence
-- **excluded**: T007 (implement-start full run) is **driver-executed after this part** with `--names-out` and the MP-02 cold-cache protocol; the executor MUST NOT run the full suite
-- **target commands**: `bash scripts/bash/run-tests.sh --collect-only -q` (T001); `bash scripts/bash/run-tests.sh tests/unit/test_admission_check.py -q --durations=0` (T003/T006)
-- **expected red→green**: admission family baseline 87.45 s (red) → family ≤25 s design band, or over-band recorded with attribution (green); all 18 admission behaviors and the CLI exit-code pin preserved
+- **measure-first rule**: run each family targeted BEFORE editing. RC-07 already cut the global hook tax; if a family is already within the plan §W2 band, record the measurement as a no-op ("already in band after RC-07") and do NOT edit that file. Only edit families still above band.
+- **families**: worktree queue (T008), workspace isolation (T009), store-state two-branch merge (T010), audit_plan_changes + loop_state fixtures (T011), then T012 consolidated targeted retest + ledger rows
+- **loop_state constraint**: T011 may only touch fixtures; the 3 baseline-failing loop_state tests must not be fixed or weakened here (triage owns them), and fixture changes must not become their failure cause
+- **target commands**: `bash scripts/bash/run-tests.sh <family files> -q --durations=0`
+- **expected red→green**: each family measured post-RC-07; above-band families reduced into plan band; all assertions and isolation semantics preserved; no full-suite run
 - **run-turn-budget**: 120
-- **acceptance**: T001–T006 `[X]`; RC-07 scoped and reversible; ledger rows for merged/rewritten cases; no full-suite run; no test claimed pass unless actually run; report residual risks
-- **test-budget ruling**: pre-stage 750 s run is diagnostic and consumes no slot; T007 is the implement-start slot; T034 is the closure slot; exactly two in-stage full runs
+- **acceptance**: T008–T012 `[X]` (no-op with measurement evidence allowed); ledger rows for any merged/rewritten tests; before/after table in `test-evidence/w2-partb-timing-<date>.md`; no test claimed pass unless actually run
 
 ## Dispatch Log
 
@@ -60,7 +60,8 @@ requirements (update scope with test-suite optimization) → U4 verify + determi
 | P4-tasks-test-slimming | tasks | T001–T038 | not_evaluated | none run | 78954beb | DONE — 38 tasks / 9 phases (≤8 per part); validate-tasks 0e/0w; pre-analyze tasks pass 0e/1a (expected missing new test path); decomposition proceed 38/40; no test run |
 | P5-checklist-test-slimming | checklist | CHK001–CHK041 | not_evaluated | none run | 3db048e4 | DONE — 41 items, 40 PASS / 1 FAIL (CHK012 E2 symbol ambiguity); FAIL remediated by `b9d23cc2` (tasks.md disambiguation; validate-tasks 0/0); no test run |
 | P6-analyze-test-slimming | analyze | — | not_evaluated | none run | ae215d74 (report + remediation) | DONE — VERDICT GREEN; 0 CRITICAL / 0 HIGH / 3 MEDIUM / 8 LOW; M-1 slot ruling, M-2 count reconciliation, M-3 feature registry sync applied; no test run |
-| P7-implement-A-baseline-rc07-admission | implement | T001–T006 (T007 driver) | not_evaluated | targeted: admission 23→25 passed; full slot 83F/4469P/1S | 47a52cc9, f14c4f49, fe5f1e62 + T007 evidence | DONE — RC-07 fixture + admission in-process/clone; call sum 121.06→23.03 s; T007 wall **534 s**, name diff 0 NEW / 0 FIXED |
+| P7-implement-A-baseline-rc07-admission | implement | T001–T006 (T007 driver) | not_evaluated | targeted: admission 23→25 passed; full slot 83F/4469P/1S | 47a52cc9, f14c4f49, fe5f1e62, e95a5920 | DONE — RC-07 fixture + admission in-process/clone; call sum 121.06→23.03 s; T007 wall **534 s**, name diff 0 NEW / 0 FIXED |
+| P8-implement-B-slow-families | implement | T008–T012 | — | targeted only | — | dispatched (measure-first; no-op if already in band) |
 
 ## Gates
 
