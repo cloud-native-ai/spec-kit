@@ -3,7 +3,7 @@
 **Feature**: 068 Exec-Quant Feedback Channel | **File scope**: `scripts/python/feedback-utils.py`
 (+ mirror) | **FR served**: FR-001 ~ FR-005, FR-019 | **引擎动作**: `--action package`（扩展）
 
-## C-PL-01 载荷采集（read-only sweep）
+- **C-1** 载荷采集（read-only sweep）
 
 打包流程 MUST 扫描 `<workspace>/.specify/memory/exec-quant/`：
 
@@ -16,14 +16,14 @@
 - 源存储零改动、零移动、零删除（FR-002）；扫描窗口 = 动作发起时刻快照，扫描期间
   新写入不纳入（与 A3 自省既有快照语义一致）。
 
-## C-PL-02 排序与封顶
+- **C-2** 排序与封顶
 
 - 排序键 `(collected_at 升序, 源文件名升序)`，确定性、跨机可复现。
 - 上限：`MAX_PAYLOAD_RECORDS = 1000` 条、`MAX_PAYLOAD_BYTES = 16 MiB`（模块常量）。
 - 触顶即截断：余下条目计入 `truncated_count`，不静默丢弃、不无界膨胀（FR-005）。
 - 上限值 MUST 写入 `payload-manifest.json` 的 `cap_records` / `cap_bytes`（取证）。
 
-## C-PL-03 包内布局
+- **C-3** 包内布局
 
 ```text
 <zip root>/exec-quant/payload-manifest.json
@@ -37,12 +37,12 @@
 - feedback 条目、`introspection/`、`SUBMISSION-NOTES.md`、`MANIFEST.md` 既有布局
   与命名零变化。
 
-## C-PL-04 payload-manifest.json
+- **C-4** payload-manifest.json
 
 `exec-quant/payload-manifest.json` 字段与校验见 data-model.md § E4；MUST 与
 MANIFEST.md § Exec-Quant Payload 人读段由同一渲染函数产出（内容同源）。
 
-## C-PL-05 包级源项目身份
+- **C-5** 包级源项目身份
 
 - `project_name`：读 `.specify/instructions.md` 的 `**Project Name**:` 行；失败回退
   workspace 目录基名；再失败置空 + `identity_status: "unknown-project"`（D3）。
@@ -50,18 +50,18 @@ MANIFEST.md § Exec-Quant Payload 人读段由同一渲染函数产出（内容�
 - MUST NOT 以文件系统绝对路径作身份载体；MUST NOT 新增凭据面（FR-003）。
 - 身份写入 E2 / E4，接收侧以此归因；记录级 `agent.cwd` 仅佐证（FR-003）。
 
-## C-PL-06 MANIFEST.md § Exec-Quant Payload 段
+- **C-6** MANIFEST.md § Exec-Quant Payload 段
 
 - 空载荷时该段 MUST 存在并声明「无量化数据」（显式降级，FR-005）。
 - 非空时 MUST 声明：条数、`source_form_counts`、`skipped_unreadable`、
   `truncated_count`、`project_name`（或 unknown-project）、封顶触发与否。
 
-## C-PL-07 打包输出报告
+- **C-7** 打包输出报告
 
 `--action package` 的输出（text 与 `--format json` 双面）MUST 可见载荷纳入情况：
 条数、降级计数（FR-004）——用户手动投递前对包内数据范围知情。
 
-## C-PL-08 FR-019 行为修订
+- **C-8** FR-019 行为修订
 
 - `write_package` 早退条件由「feedback 条目为空」修订为「feedback 条目与载荷记录
   双空」（D9）。
@@ -70,7 +70,7 @@ MANIFEST.md § Exec-Quant Payload 人读段由同一渲染函数产出（内容�
 - external 排除（`kind: external`）、时间过滤、`--all`、`--include-introspection`
   语义零变化。
 
-## C-PL-09 非阻塞与零网络
+- **C-9** 非阻塞与零网络
 
 - 载荷采集任何降级（空存储/目录缺失、部分不可解析、截断、身份缺失）MUST NOT 使
   打包流程失败（FR-005）。

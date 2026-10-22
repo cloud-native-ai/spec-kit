@@ -44,10 +44,10 @@ unzip -l .specify/memory/feedback/packages/feedback-<ts>.zip | grep exec-quant
 ```
 
 **Premises（逐例，实现前均为待重测假设）**: ① 输出键名 `exec_quant_payload`
-与子键集合为设计态（C-PL-07）；② `exec-quant/` 成员路径前缀（C-PL-03）；
-③ 该项目 instructions.md 含 Project Name 行 → 身份 identified（C-PL-05）；
+与子键集合为设计态（C-7）；② `exec-quant/` 成员路径前缀（C-3）；
+③ 该项目 instructions.md 含 Project Name 行 → 身份 identified（C-5）；
 ④ FR-019：若该项目 feedback 条目为空而记录 ≥1，同命令仍产出包
-（`Entries: 0` + 载荷，C-PL-08）。测试钉住 ①②④ 的断言形态；③ 由
+（`Entries: 0` + 载荷，C-8）。测试钉住 ①②④ 的断言形态；③ 由
 test_feedback_exec_quant_payload 的身份用例钉住。
 
 ## 场景 2 — spec-kit 接收（实现后；route b：由
@@ -58,28 +58,28 @@ test_feedback_exec_quant_payload 的身份用例钉住。
 python3 .specify/scripts/python/feedback-utils.py --action ingest-exec-quant \
   --package feedback/feedback-<ts>.zip --format json
 # 期望输出: {"record_count": 7, "ingested": 7, "duplicates_skipped": 0, ...}
-# 二次执行同一包 → {"ingested": 0, "duplicates_skipped": 7}（幂等, C-IN-04）
+# 二次执行同一包 → {"ingested": 0, "duplicates_skipped": 7}（幂等, C-13）
 ls .specify/memory/exec-quant/aggregated/cws-lib-python-*/records/ | wc -l   # → 7
 ls .specify/memory/feedback/*.md | grep -c exec-quant || true               # → 0（零混入）
 ```
 
-**Premises**: ① 动作名 `ingest-exec-quant` 与 `--package` 旗标（C-IN-01）；
+**Premises**: ① 动作名 `ingest-exec-quant` 与 `--package` 旗标（C-10）；
 ② 分组目录 `aggregated/<source-slug>/records/` 与 slug 形态（data-model § E6）；
-③ 幂等输出键（C-IN-07）。全部由测试断言钉住；`feedback/` 清单核对（零混入，
-C-CS-07）由测试的 store 隔离断言钉住。
+③ 幂等输出键（C-16）。全部由测试断言钉住；`feedback/` 清单核对（零混入，
+C-30）由测试的 store 隔离断言钉住。
 
 ## 场景 3 — 跨项目汇总（实现后；route b：由
 `tests/contract/test_exec_quant_aggregate.py` 钉住）
 
 ```bash
-# 聚合层含 ≥2 源项目后，维护者显式执行（接收不自动汇总, C-AG-06）：
+# 聚合层含 ≥2 源项目后，维护者显式执行（接收不自动汇总, C-23）：
 python3 .specify/scripts/python/exec-quant.py --action aggregate --format json
 # 期望: stdout JSON（sources[] 按 project 分组, units/quality/coverage/record_files,
 #       totals）+ 落盘 .specify/memory/exec-quant/aggregated/summaries/<id>.json
 ```
 
-**Premises**: ① 动作名 `aggregate` 与 `--format` 旗标（C-AG-01）；② 视图字段
-集合（C-AG-03）；③ 产物路径与文件形态（C-AG-05）。测试钉住断言形态；
+**Premises**: ① 动作名 `aggregate` 与 `--format` 旗标（C-18）；② 视图字段
+集合（C-20）；③ 产物路径与文件形态（C-22）。测试钉住断言形态；
 `record_files[]` 可对账（FR-011）由测试的名单重放断言钉住。
 
 ## 场景 4 — 回归基线比对（实现前后各一次，route a：实现前基线已于本阶段冻结）
@@ -112,7 +112,7 @@ python3 -m pytest tests/contract/test_feedback_utils_cli.py \
 # 判据 = 实现后零 NEW failing nodeid，名字级比对）
 ```
 
-**核验形态**（SC-006 / C-CS-03）: 实现后重跑同一命令集，排序失败 nodeid 名单与
+**核验形态**（SC-006 / C-26）: 实现后重跑同一命令集，排序失败 nodeid 名单与
 冻结基线逐名比对零新增；**名字级**而非计数级（新增通过的用例不算回归，新增
 失败必须逐名解释）。
 
@@ -126,7 +126,7 @@ python3 .specify/scripts/python/feedback-utils.py --action ingest-exec-quant \
 # 期望: {"record_count": 0, "ingested": 0, ...} exit=0；feedback 条目处理行为零变化
 ```
 
-**Premises**: 无载荷 → 零计数零写入零报错（C-IN-02 / C-CS-04）；聚合层目录
+**Premises**: 无载荷 → 零计数零写入零报错（C-11 / C-27）；聚合层目录
 零创建（无写入即无 mkdir 副作用）。该真实基线包本身为只读参考
 （`feedback/feedback-20261022T062525Z.zip` 禁改禁删——本线派发约束），测试用
 自构等构包，不触碰真实包。

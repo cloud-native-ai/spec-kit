@@ -16,7 +16,7 @@ Feature 068 把 `/speckit.feedback` 从「只回传框架摩擦条目」升级�
 **Testing**: pytest（markers: contract / integration）；red-first 取证 + 名字级基线比对（基线已冻结，见 Test Strategy）
 **Target Platform**: Linux / macOS（POSIX flock；无 fcntl 平台沿用引擎既有的文档化降级）
 **Project Type**: 框架源（scripts / skills / templates / shared / docs）+ 运行时镜像（`.specify/`，sync-mirrors 投影）
-**Performance Goals**: 非阻塞优先于吞吐；载荷封顶 1000 条 / 16 MiB（contracts C-PL-02）
+**Performance Goals**: 非阻塞优先于吞吐；载荷封顶 1000 条 / 16 MiB（contracts C-2）
 **Constraints**: 三腿零网络（FR-016）；源存储严格只读（FR-002）；降级显式计数非阻塞（FR-005/FR-010）；零新增命令、零新增确认门（clarify 裁决）
 **Scale/Scope**: 单客户项目记录量级 ≤ 数千条（实测 15 + 7 + 59 条）；改动面 = 2 引擎 + 2 技能引用文件 + 1 命令模板 + 1 shared step + 2 docs + 测试 3 层
 
@@ -33,7 +33,7 @@ Feature 068 把 `/speckit.feedback` 从「只回传框架摩擦条目」升级�
 | III | Intent-Driven Development | ✅ Pass | requirements 的 what/why（四 US + 边界）驱动设计；11 项 clarify 裁决逐一落位（research.md 引 Clarifications） |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | 本特性含可执行运行时代码 → 全量 Test-First（不适用 template-only Partial）：D11 三层测试 + red-first 取证 + 验收场景即测试 |
 | V | AI Agent Integration Standards | ✅ Pass | 零 agent roster / AGENT_CONFIG 触碰；通道升级发生在既有命令-技能-引擎三层内 |
-| VI | Continuous Quality & Observability | ✅ Pass | 降级显式计数（C-PL-07/C-IN-07）；新行为落 specs/plan/docs（D12）；零投机特性 |
+| VI | Continuous Quality & Observability | ✅ Pass | 降级显式计数（C-7/C-16）；新行为落 specs/plan/docs（D12）；零投机特性 |
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass | Feature reuse-first：新建 Feature 068 已由 clarify 裁决（059 显式排除回传聚合，无既有 Feature 可绑定）；状态只进不退 Draft → Planned |
 | VIII | Code as the Single Source of Truth | ✅ Pass | 现状锚点全部标 dated record 并以 file:line 实测（research.md 各 Decision Evidence；requirements 现状锚点节同惯例） |
 | IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | 零新命令/零守护进程/零扫描器/零新机制；聚合层沿用既有按条文件 + flock 纪律；封顶/身份复用既有指令文件与 git HEAD |
@@ -41,9 +41,9 @@ Feature 068 把 `/speckit.feedback` 从「只回传框架摩擦条目」升级�
 | XI | Dogfooding (Self-Application) | ✅ Pass | 本特性即 Loop A 通道升级（既有链路上增强，非重建）；两顶帽子：Mirror Obligations 表强制源先镜像后；059 逆向交叉引用豁免已披露于 features/068.md（派发约束，非静默偏离） |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | 规划复用 create-new-plan.sh / sync-mirrors MIRROR_PAIRS / args-manifest 契约；实现复用 write_entry / flock / read_entry_files 既有件（research D8）；零新 Tool 需求 |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 强化 Learning Capture（量化数据可回传汇总）+ Reliable Delivery（非阻塞、知情报告）；零新评分/记录系统；锚定 better-harness 机制映射 |
-| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | MANIFEST 人读段与 payload-manifest.json 同函数渲染（C-PL-04）；封顶值唯一规范落点 = contracts C-PL-02（实现落模块常量）；[[STR-NNN]] 引用惯例沿用 |
-| XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | FR-004 知情报告 = 人可读计数 + 降级说明（C-PL-07）；机器可读面（JSON 键）面向维护者基线读者，docs 同步给出语境（D12） |
-| XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 降级/冲突/跳过一律显式计数不静默修补（D10；C-IN-04 identity_conflicts keep-first）；本计划自身的探索降级与基线失败均已显式披露 |
+| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | MANIFEST 人读段与 payload-manifest.json 同函数渲染（C-4）；封顶值唯一规范落点 = contracts C-2（实现落模块常量）；[[STR-NNN]] 引用惯例沿用 |
+| XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | FR-004 知情报告 = 人可读计数 + 降级说明（C-7）；机器可读面（JSON 键）面向维护者基线读者，docs 同步给出语境（D12） |
+| XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 降级/冲突/跳过一律显式计数不静默修补（D10；C-13 identity_conflicts keep-first）；本计划自身的探索降级与基线失败均已显式披露 |
 
 **Gates Status**: ✅ 全部 16 原则 Pass，零 Fail / 零 Partial——无 Complexity Tracking 违例项。披露两件过程性事实（非违例）：① 同作者评分门降级为直接复核（行上标注，D13）；② 实现前基线含 3 个**既有**镜像一致性失败（非本特性引入，名字已冻结于 test-evidence/log-baseline-pre-impl.txt，判据 = 零新增）。
 
@@ -124,7 +124,7 @@ tests/integration/                    # 新增端到端测试（package→ingest
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
 | Data model | [data-model.md](data-model.md) | 8 实体（E1 既有记录零 schema 变更；E2–E7 新增；E8 既有对账面零变化） |
-| Contracts | [contracts/](contracts/) | 4 文件 31 条款：package-layout(9: C-PL-01–09)、intake-contract(8: C-IN-01–08)、aggregate-contract(6: C-AG-01–06)、compatibility-security(8: C-CS-01–08)；条款 id 各文件内连续可解析 |
+| Contracts | [contracts/](contracts/) | 4 文件 31 条款：package-layout(9: C-1–C-9)、intake-contract(8: C-10–C-17)、aggregate-contract(6: C-18–C-23)、compatibility-security(8: C-24–C-31)；条款 id 各文件内连续可解析 |
 | Quickstart | [quickstart.md](quickstart.md) | 6 场景（场景 0/4 = route a 已实跑；1/2/3/5 = route b 契约钉住 + 逐例 premises） |
 | Feature ref | [feature-ref.md](feature-ref.md) | FR 19/19 + SC 6/6 全覆盖映射；Feature list 复核完成 |
 
