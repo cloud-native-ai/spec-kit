@@ -126,6 +126,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 按职责实例化阶段执行实例（一实例一职责）；产出=`.specify/agents/instances/<slug>.agent.md`。
 - **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：本地拓扑用宿主原生子代理（MUST NOT 启动 qodercli），远端拓扑用外部 CLI；以拓扑声明 + 实例引用发起执行；前置检查与失败处置见其 `references/dispatch-preflight.md`。
 - **编排本体在本手册**：阶段序列（U0–U6）、状态脊、哨兵与独立校验、卡死处置、收尾合并不由承接技能承担（职责切分见 agent-definitions § Driving Subagents via the Three Layers）。
+- **阶段子代理预算**：默认 `run-turn-budget` 120；大 implement 阶段按 ≤8 任务/段拆分，细则见 `references/dispatch-recipes.md` § 阶段子代理预算与分段。
 
 ## Feedback & Probe Points（反馈与探针采集点）
 
