@@ -1,7 +1,7 @@
 # Verification — 068-exec-quant-feedback-channel（Feature 068）
 
 **Run**: 2026-10-22 · Python 3.11.11 / pytest 8.4.2 · canonical runner
-`scripts/bash/run-tests.sh` · branch `master`
+`scripts/bash/run-tests.sh` · branch `068-exec-quant-feedback-channel`
 **Slice status**: implement 6/6 全段落地（part 1–5：47cd37e8…d2fd6270；part 6a：
 ea2883bf + 1088d4ca；part 6b：T028–T030 收口）。T001–T030 全 `[X]`，
 `deferred_tasks=` none。
