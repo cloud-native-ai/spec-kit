@@ -152,7 +152,7 @@ ssh -o BatchMode=yes <alias> \
   - **analyze 门**：产物 = findings 报告正文（只读命令，不产新提交）；门判据 = 报告中 CRITICAL/HIGH 发现为零或已处置。
   - **回环规则（两门同构，一轮有界）**：门发现的问题回上游阶段修复（checklist 项失败 → 重派 plan 或 tasks；analyze CRITICAL/HIGH → 重派 requirements/plan/tasks 对应修复）后重过该门，同一门最多回环一轮；第二轮 checklist 仍未过 → 豁免放行并记录进状态脊；第二轮 analyze 仍有 CRITICAL/HIGH → 停线上送（跨产物矛盾带病进 implement 会放大，不可豁免）。
 - **合并收尾（git 状态判定，不设哨兵）**：review 后合并回 main——判定条件为特性分支的提交已包含于集成分支、且工作树无该分支的未合并/冲突残留；两项齐备即该线合并完成。push 与远程分支操作缺省不执行（确认门控破坏性动作；仅入口显式授权时先推后合）。
-- **脏树合并变体（实测配方）**：工作树存在与集成分支冲突的既有脏文件、`git checkout main` 被终止时，不动工作树——`git push . HEAD:main` 快进本地 main 引用，再 `git push origin HEAD:main` 推远端；工作树留在特性分支无害，重入只认状态脊。
+- **脏树合并变体（实测配方）**：工作树存在与集成分支冲突的既有脏文件、`git checkout main` 被终止时，不动工作树——`git push . HEAD:main` 快进本地 main 引用，再 `git push origin HEAD:main` 推远端；工作树留在特性分支无害，重入只认状态脊。**仓含 submodule 时**必须加 `--no-recurse-submodules`（默认 `push.recurseSubmodules` 会尝试推送子模块，在 detached/no-remote 子模块上以「远端意外挂断」失败，main 引用不变）：`git push --no-recurse-submodules . HEAD:main`。
 - **分支清理（branch hygiene，合并后的收尾步）**：合并并推送后，删除本特性的特性分支——本地用 `git branch -d`（安全删除，未合并自动拒删），远端先 `git merge-base --is-ancestor origin/<branch> main` 验证祖先关系再 `git push origin --delete`；判定 NOT-MERGED 的分支保留并登记进收尾汇总，不强删。该线历史上的遗留分支同规则一并巡检（实测定级示例见 2026-10-15 xuanji-doc：6 条规格/验证分支 + 1 条已并入的 kb-v41-phase-t 时代分支，全部验证祖先后删除，终态仅存 main）。
 - **P0 前置门**：同线上一特性 review 的 P0 发现未修复或未显式豁免前，禁止派发该线下一特性规格的 requirements（P0 语义 = fix before next spec；豁免记录进状态脊）。
 - **工作树归档清扫（archive-or-ignore，合并的前置门）**：合并前驱动者必须把该线工作树残留逐文件（或逐聚类）归类处置，确保「代码全部归档合并到主干并推送上游」可判定：
@@ -188,6 +188,20 @@ ssh -o BatchMode=yes <alias> \
   ```
 
   远端等价形态：`ssh <alias> "nohup su - <run-user> -c 'bash <skill-dir>/scripts/stage-runner.sh …' < /dev/null > /dev/null 2>&1 &"`。两种拓扑的派发记录都写 `detached=yes`；无法脱离时写 `no` 并按未受保护运行记录风险。重入先 `watch-target.sh --once` 快照，已完成的阶段只核验、不重派。
+- **Qoder 桌面宿主变体（在 Qoder Desktop app 内驱动 headless）**：桌面版会向所有子进程注入四个 SDK 运行时变量，直接启动 `qodercli -p` 会在参数解析阶段报
+  `sdk_invalid_args: Agent SDK entrypoint env is set but required flags are missing`（无哨兵、无日志产物）。本拓扑 MUST 用桌面适配器包裹 runner，使清除后的环境沿 `stage-runner → qodercli` 传递（变量清单、探针与 1.1.76 实测见 `references/cli/qodercli.md` § "Qoder Desktop Host Adapter"）：
+
+  ```bash
+  env -u QODER_AGENT_SDK_ENTRYPOINT -u QODER_AGENT_SDK_VERSION \
+      -u QODER_SDK_AUTH_PAYLOAD_FILE -u QODER_SDK_CUSTOM_BASE_URL_BYOK \
+    nohup bash <skill-dir>/scripts/stage-runner.sh \
+      --cli "<cli>" --cli-args "<cli args>" --project-dir "<project-dir>" \
+      --prompt-file "<prompt-file>" --sentinel "<STAGE>-DONE" --line "<line>" \
+      --stage "<stage>" --state-dir "<state-dir>" --mode auto --detached yes \
+      </dev/null >"<state-dir>/runner-log-<line>-<stage>.log" 2>&1 &
+  ```
+
+  桌面/CLI 的 `--permission-mode auto` 仍然必需（`accept_edits` 会拒绝 git 等白名单外 Bash）。桌面加载项目技能走 `<repo>/.qoder/skills → .specify/skills`；框架技能按项目副本分发，不建全局链接（R0）。
 - **构建固化变体**：同一主机按角色分线（不同系统用户在各自目录固化不同层），仅经入口参数（执行身份、路径）区分，机制零新增分支——形态见同文件 § Recipe 6。
 
 ## Recipe 6 — 线路登记、归属信封与消息入口（064）

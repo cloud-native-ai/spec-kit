@@ -69,6 +69,14 @@ U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归
 
 U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计划；未产出前不得进入 U2，更不得直接编辑目标仓库。
 
+**Qoder Desktop host adapter**: when the driver itself runs inside the Qoder
+Desktop app, every headless `qodercli` child must be launched through the
+desktop adapter that unsets the four `QODER_AGENT_SDK_*` / `QODER_SDK_*`
+variables, otherwise `-p` exits immediately with `sdk_invalid_args`. Wrapper,
+variable list and observed 1.1.76 facts: `references/cli/qodercli.md`
+§ "Qoder Desktop Host Adapter"; dispatch form: `references/dispatch-recipes.md`
+§ Recipe 5 "Qoder 桌面宿主变体".
+
 ### Hook completion backstop（Qoder CLI）
 
 Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=observed`），完成仍由退出记录 + 哨兵判定；SSH 长读与故障矩阵见 `references/watch-model.md` §12–§13。
