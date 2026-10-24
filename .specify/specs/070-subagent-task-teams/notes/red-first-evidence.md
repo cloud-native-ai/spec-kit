@@ -411,3 +411,12 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
 - **Deleted-timestamp variant** (copied spine, `plan-wp02` settle `ended_at` removed): rc 0; `wall_clock_seconds=200` (int) while `critical_path_seconds`, `parallelism_efficiency`, and `max_concurrent` are the literal `"not_evaluated"` — not zero.
 - **Missing-session variant** (same spine, no `--sessions`): rc 0; `manual_interventions=0` is still reported while `sessions` and `manual_interventions_per_session` are `"not_evaluated"`.
 - **E3 stage-status row**: appended to `test-evidence/implement-stage-status.jsonl` (`substage=impl-s5-us5-report`).
+
+## Segment impl-s5 targeted audit
+
+- **Date**: 2026-10-25T00:55Z
+- **Command**: `python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_preset.py tests/integration/test_wp_coordination_dry_runs.py tests/unit/test_wp_report.py tests/contract/test_sdd_loop_driver_wp_model.py tests/contract/test_sdd_loop_driver_wp_coordination.py tests/unit/test_wp_gate.py tests/contract/test_sdd_loop_driver_wp_gate.py`
+- **Real output**: `264 passed in 5.91s`; exit code `0`. Selection basis: every Feature 070 test file whose subject the segment changed or whose fixtures the segment extended; no unrelated suite was run.
+- **Structural check**: `python3 scripts/python/validate-tasks.py .specify/specs/070-subagent-task-teams/tasks.md` → `PASS — 0 error(s), 0 warning(s)`, rc 0.
+- **Existing driver non-regression**: `python3 -m pytest -q tests/unit/test_decomposition_check.py tests/unit/test_pre_analyze_check.py tests/unit/test_overlap_check.py tests/contract/test_sdd_loop_driver_gates.py tests/contract/test_sdd_loop_driver_skill.py` → `65 passed in 17.01s`, rc 0, identical to the T001 pre-change baseline.
+- **Budget note**: no full suite was run; the E2 slot remains consumed by T002 and the closure slot remains T039.
