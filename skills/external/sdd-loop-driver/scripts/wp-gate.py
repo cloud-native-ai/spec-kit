@@ -47,6 +47,8 @@ BOUNDED_UNITS = ("tasks", "clauses", "artifacts", "acceptance")
 CHECK_NAMES = ("plan", "preflight", "retry")
 TIE_BREAK = "wp_id-lexicographic"
 HASH_EXCLUDED_KEYS = ("plan_hash", "slot_cap_requested", "slot_cap_ceiling")
+# WG-13 advisories do not block dispatch; every other finding is blocking.
+ADVISORY_CODES = ("not-beneficial",)
 
 PLAN_BEGIN = re.compile(r"<!--\s*wp-plan:begin\s+(.*?)-->")
 PLAN_END = re.compile(r"<!--\s*wp-plan:end\s*-->")
@@ -329,7 +331,8 @@ def _schema_check_package(package, plan_stage, index):
                 _finding("schema-missing", wp_id, "%s.bounded_by.unit" % label)
             )
         count = bounded.get("count")
-        if not (_is_int(count) and count > 0):
+        # WG-09 owns the non-positive value; WG-06 only rejects a wrong type.
+        if not _is_int(count):
             findings.append(
                 _finding("schema-missing", wp_id, "%s.bounded_by.count" % label)
             )
@@ -422,7 +425,9 @@ def validate_plan_schema(plan, stage, stage_attempt=None):
         ),
         ("required_outputs", lambda value: _is_string_list(value)),
         ("integrator_outputs", lambda value: isinstance(value, list) and _is_string_list(value)),
-        ("pattern", lambda value: value in PATTERNS),
+        # WG-11 owns the closed pattern set and reports pattern-mismatch,
+        # including the excluded `continuous` value.
+        ("pattern", _is_text),
         ("tie_break", lambda value: value == TIE_BREAK),
         ("slot_cap", lambda value: _is_int(value) and value >= 1),
         ("packages", lambda value: isinstance(value, list) and bool(value)),
@@ -452,28 +457,9 @@ def validate_plan_schema(plan, stage, stage_attempt=None):
 
     pattern = plan.get("pattern")
     repair_loop = plan.get("repair_loop")
-    if pattern == "iteration":
-        if not isinstance(repair_loop, dict):
-            findings.append(
-                _finding("schema-missing", None, "plan.repair_loop is required")
-            )
-        else:
-            if not (_is_int(repair_loop.get("max_iterations")) and repair_loop["max_iterations"] > 0):
-                findings.append(
-                    _finding(
-                        "schema-missing",
-                        None,
-                        "plan.repair_loop.max_iterations",
-                    )
-                )
-            for key in ("stop_condition", "findings_source"):
-                if not _is_text(repair_loop.get(key)):
-                    findings.append(
-                        _finding(
-                            "schema-missing", None, "plan.repair_loop.%s" % key
-                        )
-                    )
-    elif repair_loop is not None:
+    # WG-11 owns the complete-repair_loop requirement for pattern=iteration;
+    # the conditional field remains a schema violation in every other pattern.
+    if pattern != "iteration" and repair_loop is not None:
         findings.append(
             _finding(
                 "schema-missing",
@@ -481,6 +467,25 @@ def validate_plan_schema(plan, stage, stage_attempt=None):
                 "plan.repair_loop is only valid with pattern=iteration",
             )
         )
+
+    required_outputs = plan.get("required_outputs")
+    integrator_outputs = plan.get("integrator_outputs")
+    if (
+        isinstance(required_outputs, list)
+        and _is_string_list(required_outputs)
+        and isinstance(integrator_outputs, list)
+        and _is_string_list(integrator_outputs)
+    ):
+        for output in integrator_outputs:
+            if output not in required_outputs:
+                findings.append(
+                    _finding(
+                        "schema-missing",
+                        None,
+                        "integrator_outputs entry is not in required_outputs: %s"
+                        % output,
+                    )
+                )
 
     decision = plan.get("decision")
     packages = plan.get("packages")
@@ -564,6 +569,385 @@ def validate_plan_schema(plan, stage, stage_attempt=None):
     return findings
 
 
+def _known_dependency_graph(packages):
+    ids = {package["wp_id"] for package in packages}
+    return {
+        package["wp_id"]: sorted(
+            {dep for dep in package["depends_on"] if dep in ids}
+        )
+        for package in packages
+    }
+
+
+def _has_path(graph, start, target):
+    pending = list(graph.get(start, []))
+    seen = set()
+    while pending:
+        node = pending.pop()
+        if node == target:
+            return True
+        if node in seen:
+            continue
+        seen.add(node)
+        pending.extend(graph.get(node, []))
+    return False
+
+
+def _independent(graph, left, right):
+    return not _has_path(graph, left, right) and not _has_path(
+        graph, right, left
+    )
+
+
+def _independent_read_only_pair(packages, graph):
+    read_only = [
+        package["wp_id"]
+        for package in packages
+        if package["kind"] == "read-only"
+    ]
+    for offset, left in enumerate(read_only):
+        for right in read_only[offset + 1:]:
+            if _independent(graph, left, right):
+                return True
+    return False
+
+
+def _graph_findings(packages):
+    """WG-07 graph checks plus the WP-04 deterministic layers."""
+    findings = []
+    counts = {}
+    for package in packages:
+        counts[package["wp_id"]] = counts.get(package["wp_id"], 0) + 1
+    duplicates = sorted(
+        wp_id for wp_id, count in counts.items() if count > 1
+    )
+    for wp_id in duplicates:
+        findings.append(_finding("dup-wp-id", wp_id, "duplicate wp_id"))
+
+    known_ids = set(counts)
+    dangling = []
+    for package in packages:
+        for dep in package["depends_on"]:
+            if dep not in known_ids:
+                dangling.append(dep)
+                findings.append(
+                    _finding(
+                        "dangling-dep",
+                        package["wp_id"],
+                        "unknown dependency %s" % dep,
+                    )
+                )
+
+    if duplicates:
+        return findings, []
+
+    graph = _known_dependency_graph(packages)
+    indegree = {
+        node: len(dependencies) for node, dependencies in graph.items()
+    }
+    ready = sorted(node for node, count in indegree.items() if count == 0)
+    order = []
+    while ready:
+        node = ready.pop(0)
+        order.append(node)
+        for other, dependencies in graph.items():
+            if node in dependencies:
+                indegree[other] -= 1
+                if indegree[other] == 0:
+                    ready.append(other)
+        ready.sort()
+    if len(order) < len(graph):
+        remaining = sorted(set(graph) - set(order))
+        findings.append(
+            _finding(
+                "cycle",
+                None,
+                "dependency cycle among: %s" % ", ".join(remaining),
+            )
+        )
+        return findings, []
+    if dangling:
+        return findings, []
+
+    depth = {}
+    for node in order:
+        dependencies = [dep for dep in graph[node] if dep in depth]
+        depth[node] = (
+            0
+            if not dependencies
+            else 1 + max(depth[dep] for dep in dependencies)
+        )
+    layers = []
+    if depth:
+        for level in range(max(depth.values()) + 1):
+            layers.append(
+                sorted(node for node, value in depth.items() if value == level)
+            )
+    return findings, layers
+
+
+def _consumed_by_dependent(packages, producer, output):
+    reverse = {}
+    for package in packages:
+        for dep in package["depends_on"]:
+            reverse.setdefault(dep, []).append(package["wp_id"])
+    inputs = {package["wp_id"]: package["inputs"] for package in packages}
+    pending = list(reverse.get(producer, []))
+    seen = set()
+    while pending:
+        node = pending.pop()
+        if node in seen:
+            continue
+        seen.add(node)
+        if output in inputs.get(node, []):
+            return True
+        pending.extend(reverse.get(node, []))
+    return False
+
+
+def _output_findings(plan, packages):
+    """WG-08 output coverage; integrator_outputs are excluded, not package-owned."""
+    findings = []
+    required = plan["required_outputs"]
+    integrator = plan["integrator_outputs"]
+    if not required:
+        # E2 leaves required_outputs empty for non-decomposed decisions.
+        return findings
+    integrator_set = set(integrator)
+    owners = {}
+    for package in packages:
+        for output in package["outputs"]:
+            owners.setdefault(output, []).append(package["wp_id"])
+    for output in required:
+        if output in integrator_set:
+            continue
+        claimants = sorted(owners.get(output, []))
+        if not claimants:
+            findings.append(
+                _finding(
+                    "orphan-output",
+                    None,
+                    "required output owned by no package: %s" % output,
+                )
+            )
+        else:
+            for claimant in claimants[1:]:
+                findings.append(
+                    _finding(
+                        "duplicate-output",
+                        claimant,
+                        "required output claimed by multiple packages: %s"
+                        % output,
+                    )
+                )
+    for package in packages:
+        intermediates = package.get("intermediate_outputs") or []
+        for output in package["outputs"]:
+            if output in integrator_set:
+                findings.append(
+                    _finding(
+                        "duplicate-output",
+                        package["wp_id"],
+                        "package claims integrator output: %s" % output,
+                    )
+                )
+            elif output not in required and output not in intermediates:
+                findings.append(
+                    _finding(
+                        "orphan-output",
+                        package["wp_id"],
+                        "output is neither required nor intermediate: %s"
+                        % output,
+                    )
+                )
+        for output in intermediates:
+            if not _consumed_by_dependent(
+                packages, package["wp_id"], output
+            ):
+                findings.append(
+                    _finding(
+                        "orphan-output",
+                        package["wp_id"],
+                        "intermediate output is not consumed by a dependent: %s"
+                        % output,
+                    )
+                )
+    return findings
+
+
+def _kind_findings(packages):
+    findings = []
+    for package in packages:
+        wp_id = package["wp_id"]
+        kind = package["kind"]
+        if kind == "read-only" and package["owned_paths"]:
+            findings.append(
+                _finding("kind-mismatch", wp_id, "read-only package owns paths")
+            )
+        elif kind == "write" and not package["owned_paths"]:
+            findings.append(
+                _finding("kind-mismatch", wp_id, "write package owns no paths")
+            )
+        if kind == "write" and package["parallel_safe"]:
+            findings.append(
+                _finding(
+                    "kind-mismatch", wp_id, "write package is parallel_safe"
+                )
+            )
+    return findings
+
+
+def _bounded_findings(packages):
+    findings = []
+    for package in packages:
+        bounded = package["bounded_by"]
+        unit = bounded["unit"]
+        count = bounded["count"]
+        if not (_is_int(count) and count > 0):
+            findings.append(
+                _finding(
+                    "unbounded",
+                    package["wp_id"],
+                    "bounded_by.count must be a positive integer",
+                )
+            )
+        elif unit == "tasks" and count > 8:
+            findings.append(
+                _finding(
+                    "unbounded",
+                    package["wp_id"],
+                    "tasks bound %d exceeds 8" % count,
+                )
+            )
+        elif unit == "clauses" and count > 40:
+            findings.append(
+                _finding(
+                    "unbounded",
+                    package["wp_id"],
+                    "clauses bound %d exceeds 40" % count,
+                )
+            )
+    return findings
+
+
+def _complete_repair_loop(plan):
+    repair = plan.get("repair_loop")
+    return (
+        isinstance(repair, dict)
+        and _is_int(repair.get("max_iterations"))
+        and repair.get("max_iterations") > 0
+        and _is_text(repair.get("stop_condition"))
+        and _is_text(repair.get("findings_source"))
+    )
+
+
+def _pattern_findings(plan, packages, graph):
+    """WG-11 pattern/graph compatibility."""
+    findings = []
+    pattern = plan.get("pattern")
+    if pattern not in PATTERNS:
+        findings.append(
+            _finding(
+                "pattern-mismatch",
+                None,
+                "pattern %r is not in the closed set %s"
+                % (pattern, "/".join(PATTERNS)),
+            )
+        )
+        return findings
+    if pattern == "iteration":
+        if not _complete_repair_loop(plan):
+            findings.append(
+                _finding(
+                    "pattern-mismatch",
+                    None,
+                    "iteration requires a complete repair_loop",
+                )
+            )
+        return findings
+    if pattern == "parallel":
+        if len(packages) < 2:
+            findings.append(
+                _finding(
+                    "pattern-mismatch",
+                    None,
+                    "parallel requires at least two packages",
+                )
+            )
+        for package in packages:
+            if package["kind"] == "write":
+                findings.append(
+                    _finding(
+                        "pattern-mismatch",
+                        package["wp_id"],
+                        "parallel cannot include a write package",
+                    )
+                )
+            if not package["parallel_safe"]:
+                findings.append(
+                    _finding(
+                        "pattern-mismatch",
+                        package["wp_id"],
+                        "parallel requires parallel_safe packages",
+                    )
+                )
+        if len(packages) >= 2:
+            ids = sorted(graph)
+            for offset, left in enumerate(ids):
+                for right in ids[offset + 1:]:
+                    if not _independent(graph, left, right):
+                        findings.append(
+                            _finding(
+                                "pattern-mismatch",
+                                right,
+                                "parallel requires independent packages "
+                                "(dependency with %s)" % left,
+                            )
+                        )
+    if pattern == "serial":
+        if all(
+            package["kind"] == "read-only" for package in packages
+        ) and _independent_read_only_pair(packages, graph):
+            findings.append(
+                _finding(
+                    "pattern-mismatch",
+                    None,
+                    "independent read-only packages require pattern=parallel",
+                )
+            )
+    return findings
+
+
+def _beneficial(plan, packages, graph, layers):
+    """WG-13 benefit test; budgets are the declared max_turns weights."""
+    if len(packages) < 2:
+        return False
+    if plan.get("slot_cap", 1) >= 2 and _independent_read_only_pair(
+        packages, graph
+    ):
+        return True
+    weights = {
+        package["wp_id"]: package["max_turns"] for package in packages
+    }
+    if layers:
+        critical = {}
+        for layer in layers:
+            for node in layer:
+                dependencies = [
+                    dep for dep in graph.get(node, []) if dep in critical
+                ]
+                critical[node] = weights[node] + (
+                    max(critical[dep] for dep in dependencies)
+                    if dependencies
+                    else 0
+                )
+        if max(critical.values()) < sum(weights.values()):
+            return True
+    if plan.get("pattern") == "iteration" and _complete_repair_loop(plan):
+        return True
+    return False
+
+
 def _select_plan(document, stage, stage_attempt):
     matches = [
         fence
@@ -600,9 +984,9 @@ def _amendments_for(document, stage, stage_attempt):
     return sorted(selected, key=lambda body: body["seq"])
 
 
-def _amendment_hash_findings(plan, amendments):
+def _amendment_hash_findings(base_plan_hash, amendments):
     findings = []
-    current = plan.get("plan_hash")
+    current = base_plan_hash
     for amendment in sorted(amendments, key=lambda body: body["seq"]):
         recorded_supersedes = amendment.get("supersedes_plan_hash")
         if recorded_supersedes != current:
@@ -629,15 +1013,17 @@ def _load_plan(args, document):
             attempt = highest_stage_attempt(document)
         else:
             attempt = plan.get("stage_attempt")
-        return plan, [], attempt
+        return plan, [], attempt, plan.get("plan_hash")
     attempt = args.stage_attempt
     if attempt is None:
         attempt = highest_stage_attempt(document)
         if attempt <= 0:
             raise InputError("spine contains no plan fence or stage attempt")
     plan = _select_plan(document, stage, attempt)
+    base_plan_hash = plan.get("plan_hash")
     amendments = _amendments_for(document, stage, attempt)
-    return effective_plan(plan, amendments), amendments, attempt
+    effective = effective_plan(plan, amendments)
+    return effective, amendments, attempt, base_plan_hash
 
 
 def _emit(record, json_out):
@@ -656,7 +1042,7 @@ def run(args):
         raise InputError("one of --spine or --plan-json is required")
     document = read_spine(args.spine) if args.spine else None
 
-    plan, amendments, attempt = _load_plan(args, document)
+    plan, amendments, attempt, base_plan_hash = _load_plan(args, document)
 
     if args.check == "preflight":
         packages = plan.get("packages") if isinstance(plan, dict) else None
@@ -678,10 +1064,20 @@ def run(args):
         raise CheckUnavailable("check 'retry' is not available in this build")
 
     findings = validate_plan_schema(plan, args.stage, attempt)
-    recorded_hash = plan.get("plan_hash") if isinstance(plan, dict) else None
     recomputed = canonical_plan_hash(plan)
-    if not findings:
-        findings.extend(_amendment_hash_findings(plan, amendments))
+    packages = plan.get("packages")
+    layers = []
+    graph = {}
+    if not findings and isinstance(packages, list):
+        graph_findings, layers = _graph_findings(packages)
+        findings.extend(graph_findings)
+        findings.extend(_output_findings(plan, packages))
+        findings.extend(_kind_findings(packages))
+        findings.extend(_bounded_findings(packages))
+        graph = _known_dependency_graph(packages)
+        findings.extend(_pattern_findings(plan, packages, graph))
+        findings.extend(_amendment_hash_findings(base_plan_hash, amendments))
+        recorded_hash = plan.get("plan_hash")
         if recorded_hash != recomputed:
             findings.append(
                 _finding(
@@ -690,11 +1086,37 @@ def run(args):
                     "recorded %r, recomputed %r" % (recorded_hash, recomputed),
                 )
             )
-    findings = _sort_findings(findings)
 
-    if findings:
+    blocking = [
+        finding
+        for finding in findings
+        if finding["code"] not in ADVISORY_CODES
+    ]
+    advisory = []
+    if (
+        not blocking
+        and plan.get("decision") == "decomposed"
+        and isinstance(packages, list)
+        and len(packages) >= 2
+        and not _beneficial(plan, packages, graph, layers)
+    ):
+        advisory.append(
+            _finding(
+                "not-beneficial",
+                None,
+                "not-beneficial: no independent read-only pair with "
+                "slot_cap>=2, the budget-weighted critical path is not "
+                "shorter than the budget sum, and no bounded repair loop "
+                "applies",
+            )
+        )
+    findings = _sort_findings(findings + advisory)
+
+    if blocking:
         verdict = "reject"
-    elif plan.get("decision") == "single-package":
+    elif plan.get("decision") in ("single-package", "disabled", "fallback"):
+        verdict = "single-package"
+    elif advisory:
         verdict = "single-package"
     else:
         verdict = "admit"
@@ -708,6 +1130,10 @@ def run(args):
         "plan_hash": recomputed,
         "checked_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "evidence_ptr": args.json_out or None,
+        "dispatch_layers": layers,
+        "integration_order": [
+            wp_id for layer in layers for wp_id in layer
+        ],
     }
     _emit(record, args.json_out)
     return 0 if verdict in ("admit", "single-package") else 1
