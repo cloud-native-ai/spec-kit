@@ -43,7 +43,7 @@
 | VI | Continuous Quality & Observability | ✅ Pass | 两引擎输出结构化 JSON + 非零退出码；降级（未声明 / not-run / 缺 git）一律显式字段，不静默；新行为写入 features 详情与 § Test Strategy |
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass | Feature reuse-first 命中 069；状态只进不退（Draft → Planned）；成功判据逐条有测量源（feature-ref.md § SC → Measurement） |
 | VIII | Code as the Single Source of Truth | ✅ Pass | 规模与基线全部为本次实跑：命令 27 / 技能 51 / 镜像全绿 / 结构违规 3 / 契约套件 4154 通过 31 失败；推断项均标注 |
-| IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | 零新命令、零守护进程、零数据库、零侧车数据文件；台账复用 owner 内 Markdown 表先例（027）；计数比对委派而非重写；两引擎合计两个动作面 |
+| IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | 零新命令、零守护进程、零数据库、零侧车数据文件；台账复用 owner 内 Markdown 表先例（027）；计数比对委派而非重写；两引擎合计三个动作（`check` / `lookup` / `verify`） |
 | X | Documentation Naming & Location Conventions | ✅ Pass | 新文件全部小写 kebab（`flow-class-definitions.md`、`expression-gates.md`、`flow-class-check.py`、`doc-consistency-check.py`）；零新增保留名；`<域>-definitions.md` 沿用同目录惯例 |
 | XI | Dogfooding (Self-Application) | ✅ Pass | 两顶帽子已点名：改动落框架源 `shared/` + `scripts/`，`.specify/` 只作镜像；本切片的分类判据对自身适用（069a 自判 `execution`，见 research.md R12） |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | 复用既有件：`sync-mirrors.py`（镜像）、`pre-analyze-check.py`（计数比对，委派）、`exec-quant`/`run-determination`/`feedback-utils`（基线三量）、`validate-requirements.py`（需求面）；仅两个新引擎无既有覆盖 |
