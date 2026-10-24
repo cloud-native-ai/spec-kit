@@ -287,8 +287,8 @@ $ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode 
  "fr_ceiling": 30, "task_ceiling": 40}, "reasons": []}
 ```
 
-9 条 advisory 全部是 `missing-path`：8 条指向本切片**尚未创建**的测试文件（`tests/**` 在 plan 阶段不存在），
-1 条指向 research.md 里被否决的备选路径 `shared/definitions/isomorphism-map.md`；`errors = 0`。`decomposition-check` 的 `proceed` 与 requirements 阶段的 `fr_count = 14` 一致。
+10 条 advisory 全部是 `missing-path`：8 条指向本切片**尚未创建**的测试文件（`tests/**` 在 plan 阶段不存在），
+另 2 条是本文件与 research.md 里提到的**被否决备选路径** `shared/definitions/isomorphism-map.md`；`errors = 0`。`decomposition-check` 的 `proceed` 与 requirements 阶段的 `fr_count = 14` 一致。
 契约引用组覆盖（`account-clause-coverage.py` 的 FR lane）：`FR universe: 14 / FR claimed: 14 / FR uncovered: 0`。
 
 ## Phase 1: Design Artifacts Summary
