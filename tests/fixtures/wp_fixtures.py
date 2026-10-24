@@ -104,6 +104,20 @@ def make_two_package_plan(stage: str = STAGE, **overrides) -> dict:
     return plan
 
 
+def make_single_package_plan(stage: str = STAGE, **overrides) -> dict:
+    """WP-13 single-package representation: one write package, stage sentinel."""
+    package = make_package(
+        "%s-wp01" % stage,
+        stage,
+        kind="write",
+        parallel_safe=False,
+        owned_paths=["%s.md" % stage],
+        bounded_by={"unit": "acceptance", "count": 1},
+        sentinel="%s-DONE" % stage.upper(),
+    )
+    return make_plan(packages=[package], stage=stage, **overrides)
+
+
 def make_write_package(wp_id: str = "plan-wp03", stage: str = STAGE, **overrides) -> dict:
     package = make_package(
         wp_id,
@@ -285,6 +299,90 @@ def verdict_event(**overrides) -> dict:
         "evidence_ptr": "wp/line-plan-plan-wp01-a1w1.verdict.json",
         "at": 1790000250,
     }
+    event.update(overrides)
+    return event
+
+
+def retry_event(**overrides) -> dict:
+    event = {
+        "event": "retry",
+        "wp_id": "plan-wp01",
+        "wp_attempt": 2,
+        "retry_delta": {
+            "changed": ["budget"],
+            "reason": "budget exhausted at the declared turn count",
+            "budget": {
+                "from_max_turns": 120,
+                "to_max_turns": 160,
+                "evidence_ref": "wp/line-plan-plan-wp01-a1w1.result.json",
+            },
+        },
+        "gate_evidence": "wp/line-plan-a1-gate-retry.json",
+        "at": 1790000300,
+    }
+    event.update(overrides)
+    return event
+
+
+def integrate_event(**overrides) -> dict:
+    event = {
+        "event": "integrate",
+        "stage_attempt": 1,
+        "order": ["plan-wp01", "plan-wp02"],
+        "at": 1790000400,
+        "conflict": False,
+        "commit": "0123456789abcdef0123456789abcdef01234567",
+    }
+    event.update(overrides)
+    return event
+
+
+def stage_close_event(**overrides) -> dict:
+    event = {
+        "event": "stage-close",
+        "stage_attempt": 1,
+        "stage_u4_at": 1790000500,
+        "wall_clock_seconds": 400,
+        "critical_path_seconds": 120,
+        "parallelism_efficiency": 0.6,
+        "retries_package": 0,
+        "retries_stage": 0,
+        "stage_attempts": 1,
+        "canonical_stages": 8,
+        "stage_executions_per_canonical": 0.125,
+        "manual_interventions": 0,
+        "sessions": 1,
+        "token_cost": "not_evaluated",
+        "report_ptr": "reports/line-plan-a1-coordination.json",
+    }
+    event.update(overrides)
+    return event
+
+
+def wp_failed_event(**overrides) -> dict:
+    event = {
+        "event": "wp_failed",
+        "wp_id": "plan-wp01",
+        "attempts": 2,
+        "verdict_evidence": "wp/line-plan-plan-wp01-a1w2.verdict.json",
+        "at": 1790000450,
+    }
+    event.update(overrides)
+    return event
+
+
+def implement_dispatch_event(**overrides) -> dict:
+    """WP-12: the 067 part brief projected onto the dispatch event."""
+    event = dispatch_event(
+        part_id="plan-wp01",
+        task_ids=["T009", "T010"],
+        turns=17,
+        test_delta={"passed": 23, "failed": 0, "new_failures": []},
+        commit="0123456789abcdef0123456789abcdef01234567",
+        outcome="done",
+        duration_seconds=180,
+        token_cost="not_evaluated",
+    )
     event.update(overrides)
     return event
 
