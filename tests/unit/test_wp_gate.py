@@ -823,6 +823,7 @@ def test_preflight_includes_plan_checks(tmp_path):
     assert "cycle" in codes
     assert "orphan-output" in codes
     assert "write-write-unordered" in codes
+    assert "path-overlap" in codes
 
 
 def test_preflight_exit_two_for_unreadable_manifest(tmp_path):

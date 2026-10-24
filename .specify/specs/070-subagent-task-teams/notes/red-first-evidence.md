@@ -157,3 +157,25 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
 - **Failing groups (real)**: 12 preflight cases (coverage/forbidden/normalization, write-write and read-write overlap, ordered allow, slot cap, isolation, plan-check inclusion) and 27 retry cases (attempt-1 admission, unchanged, budget/scope/topology deltas, malformed delta, exhaustion, split inheritance and split-depth-one).
 - **Disclosed accidental greens (not evidence)**: `test_preflight_exit_two_for_unreadable_manifest`, `test_preflight_exit_two_for_malformed_manifest`, and `test_retry_attempt_must_be_positive` pass only because the current build exits 2 unconditionally for `--check preflight|retry`; after T017 they still discriminate through the explicit input guards. No green here is cited for preflight or retry behaviour.
 
+## T017 — preflight and retry gate checks (green)
+
+- **Date**: 2026-10-25T01:55Z
+- **Host**: Linux x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed paths (implementation)**:
+  - `skills/external/sdd-loop-driver/scripts/wp-gate.py` (WG-14…WG-17 preflight/retry checks, shared plan-check/verdict path, WG-16 owns the `slot_cap` lower bound)
+  - `skills/external/sdd-loop-driver/references/decomposition-model.md` (§12 preflight/retry pointers)
+  - `tests/unit/test_wp_gate.py` (Scenario B assertion adds `path-overlap`)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/unit/test_wp_gate.py
+  ```
+- **Real output**: `83 passed in 2.93s`; exit code `0`.
+- **Adjacent green**:
+  - `python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_gate.py tests/contract/test_sdd_loop_driver_wp_model.py` → `68 passed in 1.97s`.
+  - Existing driver targeted suite (`test_decomposition_check.py`, `test_pre_analyze_check.py`, `test_overlap_check.py`, `test_sdd_loop_driver_gates.py`, `test_sdd_loop_driver_skill.py`) → `65 passed in 17.02s`, identical to the pre-change baseline.
+- **Transition**: `39 failed, 44 passed` (T016 red) → `83 passed`.
+- **Quickstart Scenario B (manual, real command shape)**: a fixture with a cycle, an unowned required output, and two unordered writes on `src/generated/` → `verdict=reject`, rc `1`, codes `cycle`, `orphan-output`, `path-overlap`, `write-write-unordered`; `--json-out` is byte-equivalent to stdout JSON. The `path-overlap` finding deferred at T013 is now exercised.
+- **Quickstart Scenario D (manual, retry portion)**: with one dispatch in the ledger, attempt 2 without a delta → `retry-unchanged`, rc `1`; attempt 3 → `retry-exhausted`, rc `1`.
+- **Disclosed in-scope contract mapping**: WG-06's `slot_cap` schema predicate now checks the type only; WG-16 owns the `1..ceiling` bound, matching the clause split. No plan-owned or contract artifact changed.
+
+

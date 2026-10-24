@@ -64,10 +64,6 @@ class InputError(Exception):
     """Unreadable, unparseable, or incomplete input (exit 2)."""
 
 
-class CheckUnavailable(Exception):
-    """The requested check has no implementation in this build (exit 2)."""
-
-
 def _read_text(path):
     try:
         with open(path, "r", encoding="utf-8") as handle:
@@ -429,7 +425,8 @@ def validate_plan_schema(plan, stage, stage_attempt=None):
         # including the excluded `continuous` value.
         ("pattern", _is_text),
         ("tie_break", lambda value: value == TIE_BREAK),
-        ("slot_cap", lambda value: _is_int(value) and value >= 1),
+        # WG-16 (preflight) owns the 1..ceiling bound; WG-06 checks the type only.
+        ("slot_cap", lambda value: _is_int(value)),
         ("packages", lambda value: isinstance(value, list) and bool(value)),
         ("plan_hash", lambda value: _is_text(value) and bool(HEX_HASH.match(value))),
     )
@@ -1002,6 +999,657 @@ def _amendment_hash_findings(base_plan_hash, amendments):
     return findings
 
 
+def _normalize_repo_path(value, repo_root):
+    """064 Ownership Manifest normalization: repo-relative, realpath, no trailing sep."""
+    expanded = os.path.expanduser(value)
+    if not os.path.isabs(expanded):
+        expanded = os.path.join(repo_root, expanded)
+    normalized = os.path.realpath(expanded)
+    if normalized != os.sep:
+        normalized = normalized.rstrip(os.sep)
+    return normalized
+
+
+def _path_covers(parent, child):
+    if parent == child:
+        return True
+    prefix = parent if parent.endswith(os.sep) else parent + os.sep
+    return child.startswith(prefix)
+
+
+def _paths_overlap(left, right):
+    return _path_covers(left, right) or _path_covers(right, left)
+
+
+def _path_set(values, repo_root):
+    return sorted(
+        {
+            _normalize_repo_path(value, repo_root)
+            for value in values or []
+            if _is_text(value)
+        }
+    )
+
+
+def _load_manifest(path, repo_root):
+    manifest = _read_json_object(path, "--manifest")
+    for key in ("owned_paths", "read_only_paths", "forbidden_paths"):
+        value = manifest.get(key, [])
+        if not (isinstance(value, list) and _is_string_list(value)):
+            raise InputError("manifest.%s must be a string array" % key)
+    return {
+        "owned": _path_set(manifest.get("owned_paths", []), repo_root),
+        "read_only": _path_set(manifest.get("read_only_paths", []), repo_root),
+        "forbidden": _path_set(manifest.get("forbidden_paths", []), repo_root),
+    }
+
+
+def _write_territory(package, repo_root):
+    return _path_set(package.get("owned_paths"), repo_root)
+
+
+def _read_territory(package, repo_root):
+    return _path_set(package.get("read_only_paths"), repo_root)
+
+
+def _concurrent_candidates(packages, graph, slot_cap):
+    """Read-only packages that can overlap an independent peer under the slot cap."""
+    if not (_is_int(slot_cap) and slot_cap >= 2):
+        return set()
+    candidates = set()
+    for package in packages:
+        if package.get("kind") != "read-only":
+            continue
+        wp_id = package["wp_id"]
+        for other in packages:
+            if other["wp_id"] == wp_id:
+                continue
+            if _independent(graph, wp_id, other["wp_id"]):
+                candidates.add(wp_id)
+                break
+    return candidates
+
+
+def _resources_isolated(package):
+    resources = package.get("resources") or {}
+    for key in ("ports", "tmp_dir", "cache_dir"):
+        value = resources.get(key)
+        if _is_text(value) and value != "none":
+            return True
+    shared = resources.get("shared_readonly")
+    return isinstance(shared, list) and bool(shared)
+
+
+def _append_unique(findings, finding):
+    if finding not in findings:
+        findings.append(finding)
+
+
+def _preflight_findings(plan, packages, graph, manifest, slot_ceiling, repo_root):
+    """WG-14 manifest coverage/forbidden, WG-15 territories, WG-16 slot cap/isolation."""
+    findings = []
+    for package in packages:
+        wp_id = package["wp_id"]
+        owned = _write_territory(package, repo_root)
+        for raw in package.get("owned_paths") or []:
+            path = _normalize_repo_path(raw, repo_root)
+            if not any(
+                _path_covers(entry, path) for entry in manifest["owned"]
+            ):
+                findings.append(
+                    _finding(
+                        "manifest-uncovered",
+                        wp_id,
+                        "owned path is not covered by the manifest: %s" % raw,
+                    )
+                )
+        for raw in list(package.get("owned_paths") or []) + list(
+            package.get("read_only_paths") or []
+        ):
+            path = _normalize_repo_path(raw, repo_root)
+            if any(
+                _paths_overlap(entry, path)
+                for entry in manifest["forbidden"]
+            ):
+                findings.append(
+                    _finding(
+                        "manifest-forbidden",
+                        wp_id,
+                        "path hits a forbidden manifest entry: %s" % raw,
+                    )
+                )
+
+    for offset, left in enumerate(packages):
+        for right in packages[offset + 1:]:
+            left_id = left["wp_id"]
+            right_id = right["wp_id"]
+            if not _independent(graph, left_id, right_id):
+                continue
+            owner_id = min(left_id, right_id)
+            left_write = _write_territory(left, repo_root)
+            right_write = _write_territory(right, repo_root)
+            left_read = _read_territory(left, repo_root)
+            right_read = _read_territory(right, repo_root)
+
+            if any(
+                _paths_overlap(a, b)
+                for a in left_write
+                for b in right_write
+            ):
+                _append_unique(
+                    findings,
+                    _finding(
+                        "write-write-unordered",
+                        owner_id,
+                        "unordered write territories overlap: %s / %s"
+                        % (left_id, right_id),
+                    ),
+                )
+                _append_unique(
+                    findings,
+                    _finding(
+                        "path-overlap",
+                        owner_id,
+                        "unordered write territories overlap: %s / %s"
+                        % (left_id, right_id),
+                    ),
+                )
+            if any(
+                _paths_overlap(a, b)
+                for a in left_write
+                for b in right_read
+            ):
+                _append_unique(
+                    findings,
+                    _finding(
+                        "read-write-unordered",
+                        left_id,
+                        "%s reads %s's write territory"
+                        % (right_id, left_id),
+                    ),
+                )
+                _append_unique(
+                    findings,
+                    _finding(
+                        "path-overlap",
+                        owner_id,
+                        "%s reads %s's write territory"
+                        % (right_id, left_id),
+                    ),
+                )
+            if any(
+                _paths_overlap(b, a)
+                for b in right_write
+                for a in left_read
+            ):
+                _append_unique(
+                    findings,
+                    _finding(
+                        "read-write-unordered",
+                        right_id,
+                        "%s reads %s's write territory"
+                        % (left_id, right_id),
+                    ),
+                )
+                _append_unique(
+                    findings,
+                    _finding(
+                        "path-overlap",
+                        owner_id,
+                        "%s reads %s's write territory"
+                        % (left_id, right_id),
+                    ),
+                )
+
+    slot_cap = plan.get("slot_cap")
+    if not (
+        _is_int(slot_cap) and 1 <= slot_cap <= slot_ceiling
+    ):
+        findings.append(
+            _finding(
+                "slot-cap-exceeded",
+                None,
+                "slot_cap %r is outside 1..%d" % (slot_cap, slot_ceiling),
+            )
+        )
+    candidates = _concurrent_candidates(packages, graph, slot_cap)
+    for package in packages:
+        if package["wp_id"] in candidates and not _resources_isolated(package):
+            findings.append(
+                _finding(
+                    "isolation-missing",
+                    package["wp_id"],
+                    "concurrently dispatchable package declares no isolated "
+                    "port, temporary directory, cache directory, or shared "
+                    "read-only resource",
+                )
+            )
+    return findings
+
+
+CHILD_ID = re.compile(r"^(?P<parent>.+)-[a-z]$")
+RETRY_TOPOLOGIES = (
+    "parallel-native",
+    "serial-native",
+    "detached-runner",
+    "split-serial-children",
+)
+RETRY_CHANGES = ("scope", "budget", "topology")
+DISPATCH_EVIDENCE_TEXT = re.compile(
+    r"\b(turns?|turn_count|budget[-_ ]exhausted|output[-_ ]tokens?)\b",
+    re.IGNORECASE,
+)
+DISPATCH_EVIDENCE_KEYS = (
+    "turns",
+    "turn_count",
+    "budget_exhausted",
+    "output_tokens",
+    "output_token_evidence",
+)
+
+
+def _dispatch_count(events, attempt, wp_id):
+    return sum(
+        1
+        for event in events
+        if event.get("event") == "dispatch"
+        and _attempt_value(event) == attempt
+        and event.get("wp_id") == wp_id
+    )
+
+
+def _retry_delta_for(amendments, events, wp_id, wp_attempt):
+    candidates = [
+        amendment
+        for amendment in amendments
+        if amendment.get("wp_id") == wp_id
+        and amendment.get("wp_attempt") == wp_attempt
+        and isinstance(amendment.get("retry_delta"), dict)
+    ]
+    if candidates:
+        chosen = max(candidates, key=lambda body: body.get("seq", 0))
+        return chosen["retry_delta"], chosen
+    retries = [
+        event
+        for event in events
+        if event.get("event") == "retry"
+        and event.get("wp_id") == wp_id
+        and event.get("wp_attempt") == wp_attempt
+        and isinstance(event.get("retry_delta"), dict)
+    ]
+    if retries:
+        return retries[-1]["retry_delta"], None
+    return None, None
+
+
+def _split_children(delta):
+    scope = delta.get("scope") if isinstance(delta, dict) else None
+    if not isinstance(scope, dict) or "split_into" not in scope:
+        return None
+    children = scope.get("split_into")
+    if not (
+        isinstance(children, list)
+        and len(children) >= 2
+        and _is_string_list(children)
+    ):
+        return []
+    return children
+
+
+def _evidence_is_dispatch_level(reference, spine_path, repo_root):
+    candidates = []
+    if os.path.isabs(reference):
+        candidates.append(reference)
+    else:
+        if spine_path:
+            candidates.append(
+                os.path.join(
+                    os.path.dirname(os.path.abspath(spine_path)), reference
+                )
+            )
+        if repo_root:
+            candidates.append(os.path.join(repo_root, reference))
+        candidates.append(os.path.join(os.getcwd(), reference))
+    for candidate in candidates:
+        if not os.path.isfile(candidate):
+            continue
+        try:
+            text = _read_text(candidate)
+        except InputError:
+            return False
+        if DISPATCH_EVIDENCE_TEXT.search(text):
+            return True
+        try:
+            body = json.loads(text)
+        except ValueError:
+            body = None
+        if isinstance(body, dict):
+            return any(key in body for key in DISPATCH_EVIDENCE_KEYS)
+        return False
+    return False
+
+
+def _retry_invalid(detail):
+    return _finding("retry-delta-invalid", None, detail)
+
+
+def _retry_unchanged(detail):
+    return _finding("retry-unchanged", None, detail)
+
+
+def _retry_exhausted(detail):
+    return _finding("retry-exhausted", None, detail)
+
+
+def _validate_scope(delta, wp_id, amendments, current_amendment):
+    scope = delta.get("scope")
+    if not isinstance(scope, dict):
+        return [_retry_invalid("scope change lacks a scope object")]
+    children = _split_children(delta)
+    if children is not None:
+        if not children:
+            return [
+                _retry_invalid("split_into must list at least two child ids")
+            ]
+        if len(set(children)) != len(children):
+            return [_retry_invalid("split child ids must be distinct")]
+        for child in children:
+            if not child.startswith(wp_id + "-"):
+                return [
+                    _retry_invalid(
+                        "split child id %s does not extend %s" % (child, wp_id)
+                    )
+                ]
+        records = {}
+        for amendment in amendments:
+            for record in amendment.get("packages", []):
+                if (
+                    isinstance(record, dict)
+                    and record.get("wp_id") in children
+                ):
+                    records[record["wp_id"]] = record
+        output_sets = []
+        for child in children:
+            record = records.get(child)
+            if record is None:
+                return [
+                    _retry_invalid(
+                        "split child %s has no package record" % child
+                    )
+                ]
+            outputs = record.get("outputs")
+            if not (
+                isinstance(outputs, list)
+                and outputs
+                and _is_string_list(outputs)
+            ):
+                return [
+                    _retry_invalid(
+                        "split child %s has no outputs" % child
+                    )
+                ]
+            output_sets.append(set(outputs))
+        for offset, left in enumerate(output_sets):
+            for right in output_sets[offset + 1:]:
+                if left & right:
+                    return [
+                        _retry_invalid(
+                            "split children must have distinct outputs"
+                        )
+                    ]
+        for amendment in amendments:
+            if amendment is current_amendment:
+                continue
+            if amendment.get("wp_id") == wp_id:
+                prior = _split_children(
+                    amendment.get("retry_delta") or {}
+                )
+                if prior is not None:
+                    return [
+                        _retry_exhausted(
+                            "a lineage may be split only once"
+                        )
+                    ]
+        return []
+
+    from_count = scope.get("from_count")
+    to_count = scope.get("to_count")
+    if not (
+        _is_int(from_count)
+        and from_count > 0
+        and _is_int(to_count)
+        and to_count > 0
+    ):
+        return [
+            _retry_invalid(
+                "scope change lacks positive integer from_count/to_count"
+            )
+        ]
+    if (
+        scope.get("from_unit") not in BOUNDED_UNITS
+        or scope.get("to_unit") not in BOUNDED_UNITS
+    ):
+        return [_retry_invalid("scope change uses an unknown bounded unit")]
+    if to_count >= from_count:
+        return [
+            _retry_invalid(
+                "scope change must strictly decrease bounded_by.count "
+                "or split into children"
+            )
+        ]
+    return []
+
+
+def _validate_budget(delta, spine_path, repo_root):
+    budget = delta.get("budget")
+    if not isinstance(budget, dict):
+        return [_retry_invalid("budget change lacks a budget object")]
+    from_turns = budget.get("from_max_turns")
+    to_turns = budget.get("to_max_turns")
+    if not (
+        _is_int(from_turns)
+        and from_turns > 0
+        and _is_int(to_turns)
+        and to_turns > 0
+    ):
+        return [
+            _retry_invalid(
+                "budget change lacks positive integer max_turns values"
+            )
+        ]
+    if to_turns == from_turns:
+        return [
+            _retry_unchanged(
+                "an identical same-budget rerun is not a material delta"
+            )
+        ]
+    if to_turns < from_turns:
+        return [
+            _retry_invalid("budget change must strictly increase max_turns")
+        ]
+    reference = budget.get("evidence_ref")
+    if not _is_text(reference):
+        return [_retry_invalid("budget change lacks evidence_ref")]
+    if not _evidence_is_dispatch_level(reference, spine_path, repo_root):
+        return [
+            _retry_invalid(
+                "budget evidence_ref does not resolve to dispatch-level "
+                "evidence"
+            )
+        ]
+    return []
+
+
+def _validate_topology(delta):
+    topology = delta.get("topology")
+    if not isinstance(topology, dict):
+        return [_retry_invalid("topology change lacks a topology object")]
+    source = topology.get("from")
+    target = topology.get("to")
+    if source not in RETRY_TOPOLOGIES or target not in RETRY_TOPOLOGIES:
+        return [
+            _retry_invalid(
+                "topology values must be in the closed set %s"
+                % "/".join(RETRY_TOPOLOGIES)
+            )
+        ]
+    if source == target:
+        return [_retry_invalid("topology change must change the dispatch form")]
+    return []
+
+
+def _validate_retry_delta(
+    delta, wp_id, amendments, current_amendment, spine_path, repo_root
+):
+    findings = []
+    reason = delta.get("reason")
+    changed = delta.get("changed")
+    if not _is_text(reason):
+        findings.append(_retry_invalid("retry delta lacks a reason"))
+    if not (
+        isinstance(changed, list)
+        and changed
+        and all(item in RETRY_CHANGES for item in changed)
+    ):
+        findings.append(
+            _retry_invalid(
+                "changed must be a non-empty subset of scope|budget|topology"
+            )
+        )
+        return findings
+    changed_set = set(changed)
+    if "scope" in changed_set:
+        findings.extend(
+            _validate_scope(
+                delta, wp_id, amendments, current_amendment
+            )
+        )
+    if "budget" in changed_set:
+        findings.extend(_validate_budget(delta, spine_path, repo_root))
+    if "topology" in changed_set:
+        findings.extend(_validate_topology(delta))
+    return findings
+
+
+def _retry_findings(
+    args, plan, amendments, document, attempt, spine_path, repo_root
+):
+    events = document.get("ledger", []) if document else []
+    wp_id = args.wp_id
+    requested = args.wp_attempt
+    if not (_is_int(requested) and requested >= 1):
+        raise InputError("--wp-attempt must be a positive integer")
+    packages = {
+        package["wp_id"]: package
+        for package in plan.get("packages", [])
+        if isinstance(package, dict) and _is_text(package.get("wp_id"))
+    }
+    child = CHILD_ID.match(wp_id)
+    if child:
+        parent_id = child.group("parent")
+        if wp_id not in packages:
+            return [
+                _retry_invalid(
+                    "split child is not present in the effective plan"
+                )
+            ], 0
+        parent_record = packages.get(parent_id)
+        if parent_record is None:
+            return [
+                _retry_invalid(
+                    "lineage parent is not present in the effective plan"
+                )
+            ], 0
+        superseded = parent_record.get("superseded_by") or []
+        if superseded and wp_id not in superseded:
+            return [
+                _retry_invalid(
+                    "child is not listed by the parent's superseded_by"
+                )
+            ], 0
+        parent_count = _dispatch_count(events, attempt, parent_id)
+        own_count = _dispatch_count(events, attempt, wp_id)
+        if own_count >= 1:
+            return [
+                _retry_exhausted(
+                    "a split child receives no automatic retry"
+                )
+            ], own_count
+        if parent_count >= 2:
+            return [
+                _retry_exhausted(
+                    "the lineage is already at two attempts"
+                )
+            ], own_count
+        if requested >= 3:
+            return [_retry_exhausted("attempt 3 is rejected")], own_count
+        expected = parent_count + 1
+        if requested != expected:
+            return [
+                _retry_invalid(
+                    "a split child's sole dispatch must carry the parent's "
+                    "retry attempt (%d)" % expected
+                )
+            ], own_count
+        delta, _current = _retry_delta_for(
+            amendments, events, wp_id, requested
+        )
+        if delta is not None:
+            return [
+                _retry_exhausted(
+                    "a split child is never split again or retried"
+                )
+            ], own_count
+        return [], own_count
+
+    if wp_id not in packages:
+        return [
+            _finding(
+                "schema-missing",
+                wp_id,
+                "wp_id is not present in the effective plan",
+            )
+        ], 0
+    own_count = _dispatch_count(events, attempt, wp_id)
+    if own_count >= 2:
+        return [
+            _retry_exhausted("the package is already at two attempts")
+        ], own_count
+    if requested >= 3:
+        return [_retry_exhausted("attempt 3 is rejected")], own_count
+    if own_count == 0 and requested == 1:
+        return [], own_count
+    if requested <= own_count:
+        return [
+            _retry_unchanged("the attempt was already dispatched")
+        ], own_count
+    if requested != own_count + 1:
+        return [
+            _retry_invalid(
+                "attempts must be consecutive; expected attempt %d"
+                % (own_count + 1)
+            )
+        ], own_count
+    delta, current_amendment = _retry_delta_for(
+        amendments, events, wp_id, requested
+    )
+    if delta is None:
+        return [
+            _retry_unchanged("a second attempt without a material delta")
+        ], own_count
+    return (
+        _validate_retry_delta(
+            delta,
+            wp_id,
+            amendments,
+            current_amendment,
+            spine_path,
+            repo_root,
+        ),
+        own_count,
+    )
+
+
 def _load_plan(args, document):
     stage = args.stage
     if args.plan_json:
@@ -1037,35 +1685,12 @@ def _emit(record, json_out):
     print(text)
 
 
-def run(args):
-    if not args.spine and not args.plan_json:
-        raise InputError("one of --spine or --plan-json is required")
-    document = read_spine(args.spine) if args.spine else None
-
-    plan, amendments, attempt, base_plan_hash = _load_plan(args, document)
-
-    if args.check == "preflight":
-        packages = plan.get("packages") if isinstance(plan, dict) else None
-        if isinstance(packages, list) and any(
-            isinstance(package, dict) and package.get("owned_paths")
-            for package in packages
-        ):
-            if not args.manifest:
-                raise InputError(
-                    "--manifest is required by --check preflight when a package owns paths"
-                )
-        raise CheckUnavailable("check 'preflight' is not available in this build")
-
-    if args.check == "retry":
-        if not args.wp_id:
-            raise InputError("--check retry requires --wp-id")
-        if args.wp_attempt is None:
-            raise InputError("--check retry requires --wp-attempt")
-        raise CheckUnavailable("check 'retry' is not available in this build")
-
+def _plan_findings(plan, args, attempt, base_plan_hash, amendments):
     findings = validate_plan_schema(plan, args.stage, attempt)
-    recomputed = canonical_plan_hash(plan)
-    packages = plan.get("packages")
+    schema_failed = any(
+        finding["code"] == "schema-missing" for finding in findings
+    )
+    packages = plan.get("packages") if isinstance(plan, dict) else None
     layers = []
     graph = {}
     if not findings and isinstance(packages, list):
@@ -1077,6 +1702,7 @@ def run(args):
         graph = _known_dependency_graph(packages)
         findings.extend(_pattern_findings(plan, packages, graph))
         findings.extend(_amendment_hash_findings(base_plan_hash, amendments))
+        recomputed = canonical_plan_hash(plan)
         recorded_hash = plan.get("plan_hash")
         if recorded_hash != recomputed:
             findings.append(
@@ -1086,13 +1712,19 @@ def run(args):
                     "recorded %r, recomputed %r" % (recorded_hash, recomputed),
                 )
             )
+    else:
+        recomputed = canonical_plan_hash(plan) if isinstance(plan, dict) else ""
+    return findings, layers, graph, schema_failed, recomputed
 
+
+def _finalize_plan_verdict(plan, findings, graph, layers):
     blocking = [
         finding
         for finding in findings
         if finding["code"] not in ADVISORY_CODES
     ]
     advisory = []
+    packages = plan.get("packages") if isinstance(plan, dict) else None
     if (
         not blocking
         and plan.get("decision") == "decomposed"
@@ -1111,7 +1743,6 @@ def run(args):
             )
         )
     findings = _sort_findings(findings + advisory)
-
     if blocking:
         verdict = "reject"
     elif plan.get("decision") in ("single-package", "disabled", "fallback"):
@@ -1120,6 +1751,83 @@ def run(args):
         verdict = "single-package"
     else:
         verdict = "admit"
+    return findings, verdict
+
+
+def run(args):
+    if not args.spine and not args.plan_json:
+        raise InputError("one of --spine or --plan-json is required")
+    document = read_spine(args.spine) if args.spine else None
+
+    plan, amendments, attempt, base_plan_hash = _load_plan(args, document)
+    repo_root = os.path.realpath(args.repo or os.getcwd())
+
+    if args.check == "retry":
+        if not args.wp_id:
+            raise InputError("--check retry requires --wp-id")
+        if args.wp_attempt is None:
+            raise InputError("--check retry requires --wp-attempt")
+        findings, dispatch_count = _retry_findings(
+            args, plan, amendments, document, attempt, args.spine, repo_root
+        )
+        findings = _sort_findings(findings)
+        verdict = "reject" if findings else "admit"
+        record = {
+            "schema_version": SCHEMA_VERSION,
+            "check": args.check,
+            "stage": args.stage,
+            "verdict": verdict,
+            "findings": findings,
+            "plan_hash": canonical_plan_hash(plan),
+            "checked_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "evidence_ptr": args.json_out or None,
+            "dispatch_layers": [],
+            "integration_order": [],
+            "dispatch_count": dispatch_count,
+            "wp_id": args.wp_id,
+            "wp_attempt": args.wp_attempt,
+        }
+        _emit(record, args.json_out)
+        return 0 if verdict == "admit" else 1
+
+    packages = plan.get("packages") if isinstance(plan, dict) else None
+    manifest = None
+    if args.check == "preflight":
+        if (
+            isinstance(packages, list)
+            and any(
+                isinstance(package, dict) and package.get("owned_paths")
+                for package in packages
+            )
+            and not args.manifest
+        ):
+            raise InputError(
+                "--manifest is required by --check preflight when a package "
+                "owns paths"
+            )
+        manifest = (
+            _load_manifest(args.manifest, repo_root)
+            if args.manifest
+            else {"owned": [], "read_only": [], "forbidden": []}
+        )
+
+    findings, layers, graph, schema_failed, recomputed = _plan_findings(
+        plan, args, attempt, base_plan_hash, amendments
+    )
+    if args.check == "preflight" and not schema_failed:
+        findings.extend(
+            _preflight_findings(
+                plan,
+                packages,
+                graph,
+                manifest,
+                args.slot_cap_ceiling,
+                repo_root,
+            )
+        )
+    findings, verdict = _finalize_plan_verdict(
+        plan, findings, graph, layers
+    )
 
     record = {
         "schema_version": SCHEMA_VERSION,
@@ -1163,9 +1871,6 @@ def main(argv=None):
         return run(args)
     except InputError as exc:
         print("wp-gate: input error: %s" % exc, file=sys.stderr)
-        return 2
-    except CheckUnavailable as exc:
-        print("wp-gate: %s" % exc, file=sys.stderr)
         return 2
 
 

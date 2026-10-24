@@ -150,6 +150,8 @@ The gate is `skills/external/sdd-loop-driver/scripts/wp-gate.py`: deterministic,
 - JSON envelope, including `dispatch_layers` and `integration_order`: WG-04 plus WP-04.
 - Exit taxonomy (`0` admit/single-package, `1` reject, `2` input/parse/I/O or unavailable layer): WG-05.
 - Plan checks: WG-06 (schema), WG-07 (graph), WG-08 (output coverage), WG-09 (boundedness), WG-10 (kind), WG-11 (pattern), WG-12 (hash), WG-13 (benefit).
+- Preflight checks: WG-14 (manifest coverage and forbidden paths), WG-15 (unordered write/read and write/write territories), WG-16 (slot cap and resource isolation). Preflight re-runs the plan checks first, so one invocation can report a cycle, an orphan output, and a path overlap together; a schema failure suppresses the checks that need an incomplete record (WG-06 ordering).
+- Retry checks: WG-17 (ledger-derived dispatch counts, attempt-1 admission, a material delta for attempt 2, strictly-greater budget with dispatch-level evidence, split-child attempt inheritance, split depth one, `retry-unchanged`/`retry-delta-invalid`/`retry-exhausted`). The counter source is OR-14; there is no counter file.
 - One repair is allowed (split, serialize, or reduce to one package), recorded as an amendment. A second reject falls back to `single-package` with `decision=fallback`, `reason=gate-reject`, and the finding list as evidence. Exit 2 falls back with `reason=decomposition-unavailable`. The fallback verdict mapping is owned by FN-08 and WG-18.
 - The gate's verdict is appended to the ledger's `plan` event before the first dispatch. The plan fence itself is never edited by the gate and remains the canonical decision record.
 
