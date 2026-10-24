@@ -129,7 +129,7 @@ S3 六面 owner 集；要求 `findings = 0`。`shared/workflow/expression-gates.
 **理由（实测 + 披露）**: 069a review 的 REC-069a-11 已记录一处**既有**缺陷：`expression-gates.md § 事实一致性`
 复述了 `one-source-of-truth.md` 的判据。若把 expression-gates 当主体，SC-005 会继承该既有红；修复它属于重写 069a 规则，
 本切片无权做。把它排除在主体集之外不是放宽判据——SC-005 的对象是「本切片不得把判据正文搬出 owner」，
-而 `expression-gates.md` 恰好是六个 owner 之一，按「排除集 = 六个 owner 路径本身」它本就在排除侧。
+而 `expression-gates.md` 恰好是 S3 比较集 9 条 owner 路径之一，按「排除集 = S3 比较集」它本就在排除侧。
 
 **被否方案**: 全仓 grep 六个 owner 的每一行——不可判定（owner 的普通措辞会与任何文档碰巧相同），且必然命中既有红。
 
@@ -172,7 +172,8 @@ S3 六面 owner 集；要求 `findings = 0`。`shared/workflow/expression-gates.
 | 3 | xuanji-function | `/Users/liuqiming.lqm/project/kangaroo-xuanji/xuanji-function` | `a2fad18` | `main` | 28 | 无（未刷新） | `.venv/bin/python -m pytest -q`（`pytest.ini` 存在） |
 
 **决策**: 快照 = `git archive <HEAD> | tar -x -C <tmp>` 的**临时副本**；原始项目与工作树脏改动都不参与，
-也不被修改（`git archive` 只读）。刷新在副本上进行，跑测前后各采一次 `--names-out` 名字集，`comm -13` 断言为空。
+也不被修改（`git archive` 只读）。刷新在副本上进行，跑测前后各采一次按套件原生失败输出提取的 nodeid 名集（pytest `FAILED <nodeid>` / Go `go test -json` 的 fail 事件），`comm -13` 断言为空。
+刷新包 MUST 由本切片源码构建 wheel——机器上预装的 `specify` 包内无 069a 载荷（实测 `shared/definitions/` 无 `flow-class-definitions.md`、`shared/workflow/` 无 `expression-gates.md`），不可作刷新入口。
 三个项目本机均有 `.venv/bin/python` 与 `go1.27.2`（实测），具备跑测前提。
 
 **披露**: 工作树脏改动被排除是**设计选择**（要可复现的快照），不是遗漏；若某套件依赖未跟踪文件（`.env` 等）而无法启动，
@@ -192,7 +193,7 @@ S3 六面 owner 集；要求 `findings = 0`。`shared/workflow/expression-gates.
 | P1 | `shared/definitions/flow-class-definitions.md:8` | 四个共享字面量的登记处被指向 **069a** 的 § Shared Strings；语义 owner 是父规格 | 改为「父规格 § Shared Strings 是语义 owner；069a / 069b 的表是同源投影」 | 切片 requirements § Shared Strings Owner 声明 |
 | P2 | 同文件 `:19` | 「由 069b 承接；本版只保留这一行指针」 | 由实体章节取代该行（R1） | FR-001 / FR-003 |
 | P3 | 同文件 `:88` | 「声明机制不在 069a（迁移与兼容由 069b 承接），本版不提供项目侧声明面」 | 收敛为已裁定语义：客户 MAY 在自己的知识空间记录，**框架不读取**；不提供项目侧声明面与存储/读取点 | FR-008、Clarifications 最后一条 |
-| P4 | 同文件台账说明中的两处「069b 承接规范」 | 指向一个当时尚不存在的规范 | 改为指向已落盘的契约条款（`contracts/isomorphism-map.md` C-7 / `contracts/ledger-reconciler.md` C-7） | FR-011 |
+| P4 | 同文件判据 `:35`、台账说明 `:95` 与台账 `notes` 8 处的「069b 承接」 | 指向一个当时尚不存在的规范 | 改为指向已落盘的 `contracts/ledger-reconciler.md` C-7（mixed-oracle 的规范条款）；映射交接行由实体章节取代（R1），不改写成条款指针 | FR-011 |
 
 这四处只改指针与措辞，不改 069a 的判据正文；P1–P4 都要随 `shared → .specify/shared` 镜像同步（见 plan § Mirror Obligations）。
 

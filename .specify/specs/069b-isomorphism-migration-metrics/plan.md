@@ -149,7 +149,7 @@ tests/unit/test_reconciler_extensions.py       # 新增：red_kind 优先级/cov
 - **判据副本**：复用 duplicate 面，主体集封闭（不含六个 owner），要求 findings = 0（R10）。
 - **作用域**：新动作 + `check` 只在框架源仓运行；载荷根给 `framework-source-required`（R11）。
 - **基线**：`gate_calls = 0` / `confirmations = 0 + 0` / `wall_clock = null` → 三项 `not-evaluated`（R12）。
-- **快照**：三个未刷新客户项目 + archive 临时副本 + `--names-out` 名字集（R13）。
+- **快照**：三个未刷新客户项目 + archive 临时副本 + 原生失败 nodeid 名集（R13）。
 - **既有措辞偏差**：P1–P4 登记为四行指针收敛，实现期随镜像同步（R15）。
 
 **No standalone requirement leftovers**: `requirements.md` 无 `[NEEDS CLARIFICATION]`；`pre-analyze-check.py --stage requirements`
@@ -193,7 +193,7 @@ tests/unit/test_reconciler_extensions.py       # 新增：red_kind 优先级/cov
 - **分发**：四类载荷同一个发行包——`pyproject.toml` 第 34 行 `scripts`、第 37 行 `shared` 的 force-include，
   `src/specify_cli/__init__.py` 第 2462 行起的 shared 复制段；不新增机制（契约 C-5）。
 - **零回归**：三个未刷新客户快照（`notes/migration-samples.md`）用 `git archive <HEAD>` 建临时副本，
-  刷新前后各跑一次套件并采 `--names-out`，`comm -13` MUST 为空；MUST NOT 用条数比对；框架仓基线不替代客户快照（契约 C-6/C-7/C-9）。
+  刷新前后各跑一次套件并按该套件的原生失败输出采集 nodeid 名集（pytest `FAILED <nodeid>` / Go `go test -json` 的 fail 事件；框架仓的 `--names-out` 不是客户套件通道），`comm -13` MUST 为空；刷新包 MUST 由本切片源码构建 wheel（预装 `specify` 的包内无 069a 载荷，实测不可作刷新入口）；MUST NOT 用条数比对；框架仓基线不替代客户快照（契约 C-6/C-7/C-9）。
 - **零项目侧存储/读取点**：无新路径、无缓存、无注册表；项目自建流程按默认类运行，其自身知识空间里的类别记录框架不读（契约 C-4）。
 
 ### 3) 度量仪器（回答「三项基线用什么取数、数据长什么样、没有样本怎么记」）
@@ -228,6 +228,7 @@ FR-009–013 → 契约二；FR-014 → 契约四）；5 条 SC 也都在引用�
 | 既有断言 | 为什么本切片的扩展不会破它 |
 |----------|---------------------------|
 | `tests/unit/test_flow_class_check.py` 的「8 个 kind」集合与 `set(kinds) == {"row-malformed"}` | 行级夹具在注入坏行时仍保留 78 条可解析行，`ledger-truncated` 不触发 |
+| 同文件 `_render_owner` 夹具无 `**台账版本**` 声明 | 新增 `ledger-version-missing` 会让 `kinds <= set(EIGHT_KINDS)` 与 `set(kinds) == {"row-malformed"}` 变红；T019 只给夹具构建器补一行版本声明（tasks A-1），不改其断言与判据语义 |
 | 同文件 `test_inventory_truncated_below_*` | 这些夹具的 `templates/commands/` **存在但数量不足**，仍走 `inventory-truncated`；`framework-source-required` 只在两棵源树都缺席时触发 |
 | `tests/contract/test_flow_class_ledger.py` 的「78 units / 零 findings / 载体唯一」 | 新增章节不产生第二份台账行；表头与列集合不变 |
 | `tests/unit/test_flow_class_check.py` 的退出码阶梯（0/1/2） | 新字段是增量；`owner-unavailable` 仍是唯一「无 findings 的退出 2」分支，新增的 `framework-source-required` 只在载荷根触发 |

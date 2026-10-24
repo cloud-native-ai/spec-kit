@@ -13,7 +13,7 @@
 
 - **C-2** 刷新后原子到位
 
-刷新（`specify init` / 包复制）MUST 一次带来四类载荷：分类所有者（含映射与边界章节）、门禁 owner（069a 已交付，本切片不改）、
+刷新（`specify init` 的覆盖式合并复制；框架无独立 refresh 子命令）MUST 一次带来四类载荷：分类所有者（含映射与边界章节）、门禁 owner（069a 已交付，本切片不改）、
 引擎（`scripts/python/flow-class-check.py` 新动作）、命令副本（内容不变，因为本切片不改模板）。
 四类载荷 MUST 出自**同一个发行包**；「有新引擎但没有新 owner」与「有新 owner 但没有新引擎」
 都不是受支持的状态，出现时按 `owner-unavailable` 降级（`lookup`）或 `framework-source-required`（框架源动作）显式报出。
@@ -49,6 +49,9 @@
 | 技能（本切片不改） | `skills/external`、`skills/internal` | `.specify/skills/` | `src/hatch_build.py` 的 `_stage_skills` 阶段拷贝 |
 | 命令副本（本切片不改） | `templates/commands/` | 每工具副本 | `generate_commands()` 由模板生成；本切片零模板改动 |
 
+刷新与验证使用的发行包 MUST 由本切片源码构建（wheel）；机器上预装的旧 `specify` 不作为刷新入口——2026-10-25 实测其包内
+`specify_cli/shared/definitions/` 不含 `flow-class-definitions.md`、`specify_cli/shared/workflow/` 不含 `expression-gates.md`。
+构建后 MUST 先断言包内四类载荷在场，再用于刷新。
 MUST NOT 通过手写 `.specify/` 副本分发；`.specify/` 侧 MUST 与源同字节（`sync-mirrors.py` 投影）。
 
 （FR-008）
@@ -64,8 +67,9 @@ SC-002 的样本 MUST 在跑测前落盘到 `notes/migration-samples.md`，逐�
 
 - **C-7** 名字级基线比对
 
-新增失败 MUST 以**失败 nodeid 集合**比对：刷新前与刷新后各跑一次套件并采集 `--names-out` 名字清单，
-`comm -13 <before> <after>` MUST 为空。MUST NOT 用失败条数比对（条数相同可以掩盖「修好一个、弄坏一个」）。
+新增失败 MUST 以**失败 nodeid 集合**比对：刷新前与刷新后各跑一次套件，并按该套件的原生失败输出采集 nodeid 名集
+（pytest 取 `FAILED <nodeid>`；Go 取 `go test -json` 的 fail 事件 `<package>::<Test>`；框架仓自身的 `run-tests.sh --names-out`
+只是框架仓基线通道，不是客户套件的通道），`comm -13 <before> <after>` MUST 为空。MUST NOT 用失败条数比对（条数相同可以掩盖「修好一个、弄坏一个」）。
 套件命令 MUST 原样取自 `notes/migration-samples.md`；比对 MUST 使用同一台机器、同一个解释器、同一组环境变量。
 
 （FR-007；SC-002）
@@ -73,9 +77,10 @@ SC-002 的样本 MUST 在跑测前落盘到 `notes/migration-samples.md`，逐�
 - **C-8** 快照刷新程序与降级
 
 快照 MUST 用 `git archive <HEAD> | tar -x -C <tmp>` 建立**临时副本**；原始项目与工作树 MUST NOT 被修改。
-刷新 MUST 在临时副本内执行（`specify init` 或同一发行包的载荷复制），并在刷新前后各跑一次套件。
+刷新 MUST 在临时副本内由发行包安装入口执行（`specify init . --here --force --ai <tool> --no-git --ignore-agent-tools`，
+或等价的安装器入口），并在刷新前后各跑一次套件。该发行包 MUST 由本切片源码构建（C-5），MUST NOT 使用预装的旧 CLI。
 若套件因缺少未跟踪文件（`.env`、本地缓存等）而无法启动，MUST 记 `not-evaluated` + reason，
-MUST NOT 记 0 新增失败；若 `specify init` 在本机不可执行，MUST 同样记 `not-evaluated`，MUST NOT 以手工拷贝冒充刷新。
+MUST NOT 记 0 新增失败；若 `specify init` 在本机不可执行，MUST 同样记 `not-evaluated`，MUST NOT 以人工 `cp` / 逐文件复制冒充刷新。
 临时副本 MUST 在记录证据后清理（可复建）。
 
 （FR-006、FR-007；SC-002）

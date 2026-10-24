@@ -19,7 +19,7 @@
 |----|------|--------------------|
 | `gate_calls` | exec-quant 运行记录（068 通道） | `python3 scripts/python/exec-quant.py --action list-records --since 2026-10-24 --format json` |
 | `confirmations`（门控观察） | feedback 条目 frontmatter | `python3 scripts/python/feedback-utils.py --action list --since 2026-10-24 --format json`，逐条查其文件是否带 `lifecycle_point: gate-*` |
-| `confirmations`（clarify 轮次） | 本切片 `requirements.md` § Clarifications | `grep -c '^- Q:' <requirements.md>` |
+| `confirmations`（clarify 轮次） | 本切片 `requirements.md` § Clarifications | 仅当存在本切片的 `/speckit.clarify` 运行记录时：`grep -c '^- Q:' <requirements.md>`；无记录或自裁决 Q/A 记 0（C-4） |
 | `wall_clock`（终点） | 运行判定记录 | `python3 scripts/python/run-determination.py --action history --target /speckit.analyze --json` |
 | `wall_clock`（起点） | git 提交 author date | `git log -1 --format=%as -- <requirements.md>` |
 

@@ -115,7 +115,7 @@ python3 scripts/python/doc-consistency-check.py --action verify \
 ```
 
 期望：`faces = 6`、每条指针可解析（含 `§` 锚）、`findings = []`；duplicate 面 `findings = []`（主体集封闭，
-不含六个 owner 路径，尤其不含 `expression-gates.md` 本身）。钉住契约：C-11 / C-12 / C-13；SC-005。
+不含 S3 比较集的 9 条 owner 路径，尤其不含 `expression-gates.md` 本身）。钉住契约：C-11 / C-12 / C-13；SC-005。
 
 ## 场景 6 — 未刷新项目行为不变，刷新后原子到位（route a 探针 + route b 比对）
 

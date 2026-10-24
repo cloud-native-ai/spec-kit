@@ -16,7 +16,7 @@
 | FR-004 | 禁止整套移植；跨类只复用不变量 | 算子表代码型算子闭集扫描 + 评审面判定 | `isomorphism-map.md` C-11 | `test_isomorphism_map.py`（闭集命中） |
 | FR-005 | 同构主张必须落地 | 格语法 + 许可句闭集 + 评审面 | `isomorphism-map.md` C-7 / C-10 / C-12 | `test_isomorphism_map.py`（口号行 + 介质判据短语） |
 | FR-006 | 未刷新行为不变；刷新自动获得 | 零新调用点；单包原子性 | `migration-distribution.md` C-1 / C-2 / C-3 / C-8 | `test_migration_distribution.py`（调用点零新增/载荷清单） |
-| FR-007 | 名字级基线零新增失败 | 三快照 + `--names-out` + `comm -13` | `migration-distribution.md` C-6 / C-7 / C-9 | `test_migration_distribution.py`（样本记录与判据形态） |
+| FR-007 | 名字级基线零新增失败 | 三快照 + 原生失败 nodeid 名集 + `comm -13` | `migration-distribution.md` C-6 / C-7 / C-9 | `test_migration_distribution.py`（样本记录与判据形态） |
 | FR-008 | 分发走既有路径；零项目侧存储/读取点 | `pyproject.toml` force-include + `init` shared 拷贝 + `hatch_build` | `migration-distribution.md` C-4 / C-5 / C-10 / C-11 | `test_migration_distribution.py`（零新路径/零模板改动） |
 | FR-009 | 所有者唯一、键 `flow_class`、映射归该所有者 | owner 开篇 owns 列表 + 表头 | `isomorphism-map.md` C-1 + `ledger-reconciler.md` C-5 / C-6 | `test_isomorphism_map.py`（owns 列表）+ `test_ledger_reconciliation.py`（表头/版本声明） |
 | FR-010 | 声明式行集；反空真下限 + 覆盖率断言 | `check` 扩展：`ledger-truncated` / `coverage` / `red_kind` | `ledger-reconciler.md` C-1 / C-2 / C-3 / C-4 / C-14 | `test_ledger_reconciliation.py`（双注入 + 覆盖率算术） |
@@ -32,8 +32,8 @@
 
 | SC | 判据 | 测量源 | 契约 |
 |----|------|--------|------|
-| SC-001 | 未标注行 = 0；四类边界齐全且每条可指认门禁处理 | `--action isomorphism` findings=0 + 两表逐行核对记录 | C-2…C-9 |
-| SC-002 | 3 个客户快照上名字级新增失败 = 0 | `notes/migration-samples.md` 冻结样本 + 前后 `--names-out` + `comm -13` | C-6 / C-7 / C-8 |
+| SC-001 | 未标注行 = 0 且标注失真行 = 0；四类边界齐全且每条可指认门禁处理 | `--action isomorphism` findings=0 + 两表逐行核对记录 | C-2…C-9 |
+| SC-002 | 3 个客户快照上名字级新增失败 = 0 | `notes/migration-samples.md` 冻结样本 + 前后原生失败 nodeid 名集 + `comm -13` | C-6 / C-7 / C-8 |
 | SC-003 | 双注入各自转红且两红可区分；静默绿 = 0 | `--action check` 两次注入的 `red_kind` + 退出码 | C-1 / C-2 / C-3 |
 | SC-004 | 混合 oracle 样本一致率 100%、全落 `execution`；择优 = 0 | 两份互不可见判定记录 + 台账 `basis/flow_class` 一致性 | C-7 |
 | SC-005 | 六面 owner 指针 6/6；判据正文在 owner 之外出现 0 次 | `--action faces` + duplicate 面（封闭主体集） | C-11 / C-12 / C-13 |
@@ -49,7 +49,7 @@ SC-004 的两名判定者是**人工并列证据**：未执行时记 `not-evalua
 | `shared/definitions/flow-class-definitions.md` 的判据 / 两取值 / 台账 / 类中立清单 | 只读与增量：本切片在该文档新增两个章节、一处版本声明、四行指针收敛（P1–P4） |
 | `shared/workflow/expression-gates.md` 的六面表 / 阶段算子表 / 调用点表 | 只读：映射的强制声明与 faces 检查都以它为 owner；**本切片不改该文件** |
 | `scripts/python/flow-class-check.py` 的 `check` / `lookup` | 扩展 `check`（增量字段与新 kind），`lookup` 零改动 |
-| 069a 的 4 份契约与 8 个测试文件 | 不修改；本切片新增 4 份契约与 8 个测试，并保持既有测试绿 |
+| 069a 的 4 份契约与 8 个测试文件 | 不修改其判据与断言；唯一触碰是 `tests/unit/test_flow_class_check.py` 的 `_render_owner` 夹具补一行 `**台账版本**` 声明（新 kind 的输入前提，见 tasks A-1）；本切片新增 4 份契约与 8 个测试，并保持既有测试绿 |
 | 069a 的 `notes/expression-baseline.md` | 只作同口径先例，**不当本片前值** |
 
 ## 4. 测试映射（新增 8 个文件）

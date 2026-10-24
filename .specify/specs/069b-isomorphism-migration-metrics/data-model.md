@@ -142,7 +142,7 @@
 | `dirty_files` | int | 工作树脏文件数（快照排除，仅记录） | C-6 |
 | `payload_state` | enum | `unrefreshed` \| `refreshed` | FR-006 |
 | `suite_command` | text | 原样可执行 | C-7 |
-| `names_before` / `names_after` | path | `--names-out` 产物 | C-7 |
+| `names_before` / `names_after` | path | 失败名集产物（按套件原生失败输出提取；C-7） | C-7 |
 | `delta` | set | `comm -13` 结果，MUST 为空或 `not-evaluated` | SC-002 |
 
 **冻结值**：见 `notes/migration-samples.md`（三个未刷新项目 + HEAD + 套件命令）。

@@ -53,7 +53,7 @@ SC-003 的两次注入 MUST 分别落到 `gap` 与 `parse-failure`（或 `owner-
 
 所有者文档 MUST 在 § 逐流程台账 内声明**一次** `**台账版本**: <整数>（<YYYY-MM-DD>）`，
 并写明生效版本由该文档版本与既有 `## 变更记录` 共同承载、行级不设版本列。
-声明缺失或出现多于一次 → `ledger-version-missing`（一次都没有）或 `ledger-version-duplicated`（多于一次，按 `row-malformed` 同类处理）。
+声明缺失 → `ledger-version-missing`；出现多于一次 → 复用 `row-malformed`（不新增 kind，计入 `parse_errors`）。
 版本不兼容的判据 MUST 继续是「表头 / 列集合与解析器期望不符」（069a C-4 / C-5），本契约 MUST NOT 引入
 `version` 字段、行级版本列或第三个版本信号。
 
@@ -81,7 +81,7 @@ SC-003 的两次注入 MUST 分别落到 `gap` 与 `parse-failure`（或 `owner-
 `--action delegation` MUST 从命令模板文本解析委托边，语法为
 `(?:\.specify/)?skills/(?:external/|internal/)?<name>/SKILL.md` → `skill:<name>`；同一模板内重复出现的同名技能 MUST 去重。
 每条边 MUST 产出 `{command, skill, command_class, skill_class, verdict, source_line}`，`verdict` ∈
-`same-class` / `neutral-exempt` / `mismatch` / `unknown-skill`。
+`same-class` / `neutral-exempt` / `mismatch` / `unknown-skill`。JSON 顶层 MUST 含 `commands_scanned`（被扫描模板数）。
 `mismatch` → finding `delegation-mismatch`；台账中不存在的技能 → `delegation-unknown-skill`。
 模板未声明任何技能路径时不构成委托边，MUST NOT 产出 finding。
 
@@ -91,6 +91,7 @@ SC-003 的两次注入 MUST 分别落到 `gap` 与 `parse-failure`（或 `owner-
 
 委托关系 MUST 只由图中的命令模板与技能目录解析，MUST NOT 读取任何手工维护的「命令 → 技能」映射表；
 仓库内出现此类清单（≥3 行命令 id 与技能 id 的对应表，且不属于命令模板自身）→ `delegation-hand-list`。
+扫描范围 MUST 封闭为 `shared/`、`templates/commands/`、`skills/` 与本 spec 的 formal artifacts。
 类中立豁免 MUST 取自所有者 § 类中立清单（069a C-8 的封闭清单），MUST NOT 在本契约或引擎里复制一份清单副本。
 
 （FR-012）
@@ -108,14 +109,15 @@ SC-003 的两次注入 MUST 分别落到 `gap` 与 `parse-failure`（或 `owner-
 每行**一个** `owner_pointer` 格。一个格内 MAY 用 `+` 连接多个路径，仍计为**一个绑定**（主机制 + 执行件）。
 每个路径 MUST 在仓库内可解析（源码根或 `.specify/` 镜像）；格内带 `§ <anchor>` 时，该文件 MUST 存在标题文本包含该锚的
 `#` 标题行。违规分别记 `faces-count`（行数 ≠ 6）、`faces-duplicate`（face id 重复）、
-`faces-pointer-missing`（空格）、`faces-unresolvable`（路径或锚不可解析）。
+`faces-pointer-missing`（空格）、`faces-unresolvable`（路径或锚不可解析）。JSON 顶层 MUST 含 `faces`（解析出的面数）。
 
 （FR-013；SC-005）
 
 - **C-12** 第二绑定表禁止
 
 六面之外的文件 MUST NOT 出现把 ≥3 个 face id 与 owner 路径成对列出的表（Markdown 表格或 YAML 形态）。
-命中 → `faces-second-table`。六个 owner 路径本身与门禁 owner 不在扫描范围内；命令模板与技能 MUST NOT 复制面表。
+扫描范围 MUST 封闭为 `shared/`（S3 比较集除外）、`templates/commands/`、`skills/` 与本 spec 的 formal artifacts。
+命中 → `faces-second-table`。S3 比较集的 9 条 owner 路径不在扫描范围内；命令模板与技能 MUST NOT 复制面表。
 
 （FR-013；SC-005）
 
@@ -125,7 +127,7 @@ SC-005 的「判据正文在 owner 之外出现 0 次」MUST 由既有
 `scripts/python/doc-consistency-check.py --faces duplicate` 测量，比较侧沿用该引擎已声明的 S3 六面 owner 集；
 主体集 MUST 封闭为 `shared/definitions/flow-class-definitions.md` 与本 spec 的 formal artifacts。
 要求 `findings = 0`。`shared/workflow/expression-gates.md` 是 S3 owner（`evidence-asof` 面），MUST NOT 进入主体集——
-它是「六个 owner 路径之一」，按 SC-005 的排除集本就在比较侧。该口径 MUST NOT 被读成全仓 grep 等价物。
+它是 S3 比较集（9 条 owner 路径；6 个绑定格，其中三面各含主机制 + 执行件两条路径）之一，按 SC-005 的排除集本就在比较侧。该口径 MUST NOT 被读成全仓 grep 等价物。
 
 （FR-013；SC-005）
 
@@ -135,6 +137,7 @@ SC-005 的「判据正文在 owner 之外出现 0 次」MUST 由既有
 或存在可解析的 `skills/{external,internal}/*/SKILL.md`。
 两者皆不满足（客户 payload 根，包括 `--repo <project>` 与 `--repo <project>/.specify` 两种传法）时，
 MUST 以退出码 2 + `error.label = framework-source-required` 结束，MUST NOT 产出 findings、MUST NOT 退出 0、MUST NOT 报 `inventory-truncated`。
+若 owner 同时缺失，按 C-3 的优先级报 `owner-unavailable`（两者都是具名的非绿状态，MUST NOT 退出 0）。
 `--action lookup` MUST 继续支持双帽子解析（源码根与载荷根），其行为不受本条影响。
 
 （FR-010、FR-013）
