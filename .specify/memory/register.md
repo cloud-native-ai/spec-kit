@@ -59,3 +59,17 @@
 | REC-068-09 | verification Run 头 branch 字段机械捕获（`git branch --show-current`），禁止继承 trunk 声明 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.4 REC-068-09（F9） | open |
 | REC-068-10 | requirements 模板 Status 字段退役或指针化（所有者 = features.md），消除保证过期的第二份状态副本 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.1 REC-068-10（F10） | open |
 | REC-068-11 | 无人值守线 wrap-up 引擎步骤归属一次裁定（executor 或 orchestrator）并注记命令模板，取代逐阶段偏离披露 | `.specify/specs/068-exec-quant-feedback-channel/review.md` § 5.4 REC-068-11（F11） | open |
+| REC-069a-01 | verification 模板：分母为运行时事件的 SC，`pass` 必须有至少一条运行期观测；否则只能 `partial`/`deferred` + reason | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.1 REC-069a-01（F4/F9） | open |
+| REC-069a-02 | checklist 模板：out-of-slice 项保持 `[ ]` + disposition；闭合汇总由标记派生（`n([x]) + n([ ]) = total`） | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.1 REC-069a-02（F5） | open |
+| REC-069a-03 | 接线命令必须带完整范围与 strict：`--path <doc>… [--spec-dir …] --strict`，命令模板与 create-docs R6 同改 | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.2 REC-069a-03（F1/F7） | open |
+| REC-069a-04 | 两顶帽子下的根解析：脚本位于 `.specify/` 时优先 payload 根，OWNER/DELEGATE 双根候选；新增「执行模板所写命令原文」的契约测试 | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.3 REC-069a-04（F1/F2） | open |
+| REC-069a-05 | `lookup` 不得回传域外取值：值非法/重复行/行冲突时降级默认类 + 可见标签 + 退出 2 | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.3 REC-069a-05（F3） | open |
+| REC-069a-06 | 客户端形态的 `check` 要么有真实扫描面与通过态，要么不随包下发（与 069b 交接） | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.3 REC-069a-06（F14） | open |
+| REC-069a-07 | 切片投影：「逐字沿用」仅在两文本逐字相等时允许；切片补强须用 `slice-strengthened` + 切片锚，或同步父规格 | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.4 REC-069a-07（F6） | open |
+| REC-069a-08 | 基线仪器前置：冻结时同时冻结枚举单元集与预期检查次数；不可分离则开工前记 `not-evaluated` | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.4 REC-069a-08（F8） | open |
+| REC-069a-09 | Feature 状态不得由单个切片推进：切片感知状态（`Implemented k/n` 或 Partially Implemented） | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.4 REC-069a-09（F10） | open |
+| REC-069a-10 | 作者自裁 checklist 需一次独立复核：同一 agent 同时写需求并裁定 ≥N 条清单项时，实现前派一次 fresh-context 只读复核 | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.4 REC-069a-10（时间线 6 / F5 / F6） | open |
+| REC-069a-11 | 事实一致性门禁补 owner↔owner 面（或在 C-2 写明排除理由）；`expression-gates.md` § 事实一致性 收敛为指针 | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.4 REC-069a-11（F12） | open |
+| REC-069a-12 | reader 面覆盖 FR-019 所称对象类（S1 形式产物），或收窄 FR-019 的对象清单 | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.4 REC-069a-12（F13） | open |
+| REC-069a-13 | 冻结基线的数字只留指针：plan/tasks/C-7 不重述失败计数，计数归 `notes/test-baseline-contract.txt` | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.5 REC-069a-13（F11） | open |
+| REC-069a-14 | 调用点表区分「命令执行的面」与「流程执行的面」：六面归表达类流程，W1 行只登记命令可执行的四面 + 评审指针 | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.4 REC-069a-14（F15） | open |

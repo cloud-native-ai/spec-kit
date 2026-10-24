@@ -1,0 +1,950 @@
+# Red-first evidence — 069a US1 测试先行段（T004 / T005 / T006）
+
+**Feature**: 069a-flow-classification-docs-gates（父 069） | **Scope**: US1 的三支新增测试
+**Discipline**: Constitution IV / `tasks.md` § Tests Mode ON — 测试先落盘，实现（T007–T011）尚不存在；
+红必须是「实现缺失 / 行为不符」，不是测试自身的 import、语法或采集错误。
+**Captured**: 2026-10-24T13:37:04Z（+0800 21:37）；测试内容最终版复跑同结果（3 次，36 failed / 3 passed，0.72–0.73s，node id 完全一致）
+**Branch**: `069-execution-expression-sdd` | **HEAD**: `f0b8eaedb39c93a0b9360c9d8193bbb592d20b4a`
+**Interpreter**: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（pytest 9.1.1；本仓 `.venv` 无 pytest，实测 `No module named pytest`）
+
+## 1. 命令、输出摘要与退出码
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_flow_class_ledger.py \
+  tests/contract/test_flow_class_correctness.py \
+  tests/unit/test_flow_class_check.py \
+  -q --tb=short -p no:cacheprovider
+# exit code: 1
+# 36 failed, 3 passed in 0.72s（复跑 0.72–0.73s，失败 node id 完全一致）
+```
+
+采集面自检（同一解释器、同一树）：
+
+```text
+pytest <三文件> --collect-only -q  →  39 tests collected in 0.10s (exit 0)
+python -m py_compile <三文件>       →  COMPILE-OK (exit 0)
+```
+
+结论：三支测试可被正常采集与编译；36 条失败全部是断言级失败（见 §2），不存在 collection error、
+import error 或测试自身语法错误。
+
+## 2. 红的原因（两族，均为「目标产物缺失」）
+
+| 断言族 | 触发点 | 失败次数 | 交付行 |
+|--------|--------|----------|--------|
+| owner missing | `_read_owner()` → `shared/definitions/flow-class-definitions.md` 不存在 | 6 | T007 / T008 |
+| engine missing | `_run()` → `scripts/python/flow-class-check.py` 不存在 | 30 | T009 / T010 |
+| **合计** | | **36** | 与 `36 failed` 一致，无第三种失败原因 |
+
+真实输出（首条 owner 族，逐字）：
+
+```text
+E   AssertionError: flow-class owner missing: shared/definitions/flow-class-definitions.md — expected at T007/T008 (069a). Red is the intended pre-implementation state for T004.
+E   assert False
+E    +  where False = is_file()
+```
+
+真实输出（engine 族，逐字）：
+
+```text
+E   AssertionError: flow-class engine missing: scripts/python/flow-class-check.py — expected at T009/T010 (069a). Red is the intended pre-implementation state for T006.
+E   assert False
+```
+
+两族都由 `_read_owner()` / `_run()` 的显式存在性前置断言产生：引擎与 owner 缺席时测试以可读断言停下，
+不会退化成 `FileNotFoundError` 或 collection crash。
+
+## 3. 逐文件失败 node id（36 条，逐行一个）
+
+### `tests/contract/test_flow_class_ledger.py` — 9 failed / 2 passed
+
+```text
+tests/contract/test_flow_class_ledger.py::test_owner_exists_and_declares_required_sections
+tests/contract/test_flow_class_ledger.py::test_ledger_has_78_rows_covering_inventory_bidirectionally
+tests/contract/test_flow_class_ledger.py::test_ledger_values_are_binary_and_basis_is_closed
+tests/contract/test_flow_class_ledger.py::test_first_batch_members_are_registered_as_expression
+tests/contract/test_flow_class_ledger.py::test_check_reports_78_units_and_zero_gaps
+tests/contract/test_flow_class_ledger.py::test_lookup_unregistered_unit_returns_default_with_marker
+tests/contract/test_flow_class_ledger.py::test_lookup_registered_unit_returns_ledger_source_without_marker
+tests/contract/test_flow_class_ledger.py::test_neutral_list_is_closed_against_ledger
+tests/contract/test_flow_class_ledger.py::test_change_log_row_form
+```
+
+### `tests/contract/test_flow_class_correctness.py` — 3 failed / 1 passed
+
+```text
+tests/contract/test_flow_class_correctness.py::test_lookup_matches_independent_oracle
+tests/contract/test_flow_class_correctness.py::test_mutating_one_class_turns_the_same_comparison_red
+tests/contract/test_flow_class_correctness.py::test_source_and_marker_invariants_hold_for_every_unit
+```
+
+### `tests/unit/test_flow_class_check.py` — 24 failed / 0 passed
+
+```text
+tests/unit/test_flow_class_check.py::test_clean_full_fixture_exits_0_with_no_findings
+tests/unit/test_flow_class_check.py::test_missing_ledger_row_reports_missing
+tests/unit/test_flow_class_check.py::test_ledger_row_absent_from_inventory_reports_unknown
+tests/unit/test_flow_class_check.py::test_repeated_row_reports_duplicate
+tests/unit/test_flow_class_check.py::test_opposite_values_report_dual_class
+tests/unit/test_flow_class_check.py::test_out_of_domain_value_reports_invalid_class
+tests/unit/test_flow_class_check.py::test_row_with_wrong_cell_count_reports_row_malformed
+tests/unit/test_flow_class_check.py::test_row_with_empty_required_value_reports_row_malformed
+tests/unit/test_flow_class_check.py::test_non_canonical_unit_ids_report_row_malformed
+tests/unit/test_flow_class_check.py::test_neutral_flag_outside_closed_list_reports_neutral_unlisted
+tests/unit/test_flow_class_check.py::test_inventory_truncated_below_command_floor
+tests/unit/test_flow_class_check.py::test_inventory_truncated_below_skill_floor
+tests/unit/test_flow_class_check.py::test_repo_without_skills_directory_is_not_silently_green
+tests/unit/test_flow_class_check.py::test_repo_with_empty_skills_directory_is_not_silently_green
+tests/unit/test_flow_class_check.py::test_exit_code_ladder
+tests/unit/test_flow_class_check.py::test_check_exit_2_when_owner_missing
+tests/unit/test_flow_class_check.py::test_check_exit_2_when_ledger_header_missing
+tests/unit/test_flow_class_check.py::test_parser_reads_columns_by_header_and_does_not_guess
+tests/unit/test_flow_class_check.py::test_unit_ids_are_normalised_to_the_two_canonical_forms
+tests/unit/test_flow_class_check.py::test_lookup_unregistered_keeps_the_marker_non_empty
+tests/unit/test_flow_class_check.py::test_lookup_owner_missing_keeps_default_semantics
+tests/unit/test_flow_class_check.py::test_lookup_owner_without_ledger_table_keeps_default_semantics
+tests/unit/test_flow_class_check.py::test_default_marker_and_owner_degradation_label_are_mutually_exclusive
+tests/unit/test_flow_class_check.py::test_check_and_lookup_are_read_only
+```
+
+## 4. 实现前即通过的 3 支（负向守卫，不是「已实现」）
+
+| 测试 | 现在为何通过 | 实现后仍须保持 |
+|------|--------------|----------------|
+| `test_flow_class_ledger.py::test_no_second_classification_data_file` | 当前仓库确实不存在第二份 `unit → class` 数据（Markdown 台账行 / YAML·JSON 数据 / 代码常量三形态均为零命中） | T007/T008 落地后仍只允许 owner 一处；任何侧车数据文件出现即转红 |
+| `test_flow_class_ledger.py::test_templates_and_skills_never_assign_class_key` | 78 个模板/技能当前零 `flow_class` 键赋值、零台账样式行 | W1–W4 接线只能写 lookup 与 owner 指针，不能内联类别 |
+| `test_flow_class_correctness.py::test_fixture_matrix_is_not_vacuous` | 只检查测试内 oracle 矩阵（≥10 单元 / 两类各 ≥3 / 未注册 ≥1 / 类中立 ≥1 / mixed ≥1）与夹具自洽，不触达引擎 | 作为「这条测试本身不空真」的自检长期保留 |
+
+## 5. 三支测试钉住的断言面（与任务原文逐项对应）
+
+| 任务断言面 | 落点（node id 摘要） |
+|-----------|----------------------|
+| 台账 78 行、逐行两值之一、列头逐字 `flow_class` | `test_ledger_has_78_rows_covering_inventory_bidirectionally`、`test_ledger_values_are_binary_and_basis_is_closed` |
+| 台账 ↔ 清单双向相等（27 命令 + 51 技能）、零重复 | `test_ledger_has_78_rows_covering_inventory_bidirectionally` |
+| `/speckit.docs` 与 `/speckit.humanize` 为表达类首批成员 | `test_first_batch_members_are_registered_as_expression` |
+| 未登记单元 → 默认类 + `[[STR-004]]` 标记 + `source=default`（不得呈现为已判定） | `test_lookup_unregistered_unit_returns_default_with_marker`、`test_lookup_registered_unit_returns_ledger_source_without_marker`、`test_lookup_unregistered_keeps_the_marker_non_empty` |
+| 仓库内零第二份分类数据（表格 / YAML / JSON / 代码常量） | `test_no_second_classification_data_file` |
+| 类中立清单封闭（枚举 + rationale + 与 `neutral: yes` 互为子集） | `test_neutral_list_is_closed_against_ledger` |
+| § 变更记录 行形态 `date \| unit_id \| before → after \| basis \| 依据` | `test_change_log_row_form` |
+| `templates/commands/**` 与 `skills/**/SKILL.md` 零类别键赋值 | `test_templates_and_skills_never_assign_class_key` |
+| 正确性 fixture ≥10 单元（两类各 ≥3 / 未声明 / 类中立 / 混合 oracle） | `test_fixture_matrix_is_not_vacuous`、`test_lookup_matches_independent_oracle` |
+| 变异断言（改错一类 → 比对转红；改回 → 回绿） | `test_mutating_one_class_turns_the_same_comparison_red` |
+| 解析器八类 finding 各自独立 | `test_missing…` / `test_ledger_row_absent…unknown` / `test_repeated_row…duplicate` / `test_opposite_values…dual_class` / `test_out_of_domain…invalid_class` / `test_row_with_wrong_cell_count…` + `test_row_with_empty_required_value…` + `test_non_canonical_unit_ids…row_malformed` / `test_neutral_flag_outside…neutral_unlisted` / `test_inventory_truncated_…` ×2 |
+| 单元 id 归一化（`/speckit.<stem>` / `skill:<dir>`） | `test_unit_ids_are_normalised_to_the_two_canonical_forms` + 干净夹具的 `units=78` |
+| 反空真下限（命令 27 / 技能 51）与客户树形态 | `test_inventory_truncated_below_command_floor`、`…below_skill_floor`、`test_repo_without_skills_directory_is_not_silently_green`、`test_repo_with_empty_skills_directory_is_not_silently_green` |
+| 退出码阶梯（check 0/1/2、lookup 0/2） | `test_exit_code_ladder`、`test_check_exit_2_when_owner_missing`、`test_check_exit_2_when_ledger_header_missing` |
+| `lookup` 降级分支与两标签互斥（FR-016） | `test_lookup_owner_missing_keeps_default_semantics`、`test_lookup_owner_without_ledger_table_keeps_default_semantics`、`test_default_marker_and_owner_degradation_label_are_mutually_exclusive` |
+| 只读（不写任何文件） | `test_check_and_lookup_are_read_only` |
+
+## 6. 实现期必须知道的三处边界裁定（测试即规格）
+
+1. **降级标签的两个名字**：契约 C-7 写 `owner-unparsable`，data-model E9 写 `owner-unavailable`。
+   两支降级测试接受**任一**标签（`any(label in stderr for label in (...))`）；承重断言是
+   `exit 2` + 默认类语义 + `marker=null`，以及它与「未登记 → `marker=[[STR-004]]`」互斥。
+   这是本阶段发现的产物间措辞分歧，未改任何规格文件（越界），留给 T010 落地时统一。
+2. **「表头缺失」与「缺必选列」的分界**：整张表/表头不存在 → `check` exit 2（C-13 的解析错误）；
+   行级缺陷（列数不符 / 必选值为空 / 单元 id 形态非法）→ `row-malformed` finding + exit 1（T006 原文）。
+3. **解析按表头绑定，不按位置猜列**：`test_parser_reads_columns_by_header_and_does_not_guess`
+   用同一批数据 + 置换列序的台账要求仍 exit 0（T006「解析器不猜列」）。规范台账仍是
+   `| unit_id | flow_class | basis | neutral | notes |`，置换只用于验证解析器不猜列。
+
+另外两条实现接口约定：`--action check --format json` 的干净运行须带 `units == 78`（T012 期望）
+与 ISO-8601 Z 的 `checked_at`；真实仓库的 `check` 测试**不带** `--repo`，以覆盖 C-5 的默认自定位。
+
+## 7. 转绿义务（green obligations，下一段执行）
+
+| 交付行 | 使哪些 node id 转绿 |
+|--------|---------------------|
+| T007 owner 判据 / 边界例 / 命名空间骨架 + 变更记录空表 | `test_owner_exists_and_declares_required_sections`、`test_change_log_row_form` |
+| T008 台账 78 行 + `basis` / `neutral` 列 | `test_ledger_has_78_rows…`、`test_ledger_values…`、`test_first_batch_members…` |
+| T009 `--action check`（八类 finding、下限、退出码、JSON、只读） | 单元套件 24 支中的 20 支 + `test_check_reports_78_units_and_zero_gaps` |
+| T010 `--action lookup`（默认/已登记/降级） | `test_lookup_unregistered_…`、`test_lookup_registered_…`、`test_lookup_owner_*`、`test_default_marker_and_owner_degradation_label_are_mutually_exclusive`、`test_unit_ids_are_normalised_…` |
+| T011 类中立封闭清单 | `test_neutral_list_is_closed_against_ledger`、`test_neutral_flag_outside_closed_list_reports_neutral_unlisted` |
+| T005 正确性 oracle | `test_lookup_matches_independent_oracle`、`test_mutating_one_class…`、`test_source_and_marker_invariants…` |
+| T012 US1 定向转绿 | 上述三文件 39/39 全绿；绿证据追加到本文件 |
+
+**判据声明**：本文件只冻结「实现前红」的事实与逐条 node id；转绿后必须在同一文件追加绿跑（命令、
+输出摘要、退出码），不得覆盖本节。
+
+---
+
+# Green run — 069a US1 定向转绿与取证（T012）
+
+**Captured**: 2026-10-24T13:55:52Z | **Branch**: `069-execution-expression-sdd` | **HEAD**: `e39cb05ba3a068f46690e94d0afad3a7fc0c6c5f`（实现提交见本条段末 `git log -1`）
+**Interpreter**: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（pytest 9.1.1）；真实运行 `python3` = 3.9.6（系统解释器，引擎按 ≥3.8 stdlib-only 编写）
+
+## 8. 三支 US1 测试转绿
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_flow_class_ledger.py \
+  tests/contract/test_flow_class_correctness.py \
+  tests/unit/test_flow_class_check.py \
+  -q -p no:cacheprovider
+# exit code: 0
+# 39 passed in 7.55s
+```
+
+实现前基线为 `30 failed, 9 passed`（owner 已在 T007/T008 落盘，故 owner 族 6 支已绿；其余 30 支全因引擎缺失）
+→ 实现后 `39 passed`。正确性测试的变异断言（`test_mutating_one_class_turns_the_same_comparison_red`）
+随同一批转绿：改错一类转红、改回回绿。
+
+## 9. 引擎实跑（真实仓库，无 `--repo`，验证 C-5 自定位）
+
+```bash
+$ python3 scripts/python/flow-class-check.py --action check --format json
+{
+  "action": "check",
+  "checked_at": "2026-10-24T13:55:34Z",
+  "repo": "/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit",
+  "units": 78,
+  "inventory": {"commands": 27, "skills": 51, "floors": {"commands": 27, "skills": 51}},
+  "findings": [],
+  "error": null
+}
+# exit code: 0
+
+$ python3 scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.docs" --format json
+{
+  "action": "lookup", "checked_at": "2026-10-24T13:55:34Z", "unit_id": "/speckit.docs",
+  "flow_class": "expression", "source": "ledger", "marker": null,
+  "basis": "reader-oracle", "neutral": false, "error": null
+}
+# exit code: 0
+
+$ python3 scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.never-registered" --format json
+{
+  "action": "lookup", "checked_at": "2026-10-24T13:55:35Z", "unit_id": "/speckit.never-registered",
+  "flow_class": "execution", "source": "default", "marker": "未声明·按默认",
+  "basis": null, "neutral": false, "error": null
+}
+# exit code: 0
+```
+
+降级分支实测（临时空树，无 owner）：
+
+```bash
+$ python3 scripts/python/flow-class-check.py --action lookup --repo "$TMPD" --unit-id "/speckit.docs" --format json
+owner-unavailable: owner document unreadable: <TMPD>/shared/definitions/flow-class-definitions.md (...)
+{ "flow_class": "execution", "source": "default", "marker": null, "basis": null,
+  "error": {"label": "owner-unavailable", ...} }
+# exit code: 2  —— 默认类语义保留、marker 为 null、与「未登记」的 未声明·按默认 标记互斥
+```
+
+## 10. T010 定案的两处边界（实现即裁定）
+
+1. **降级标签统一为 `owner-unavailable`**（§6.1 遗留项）：owner 不可解析/缺席 → stderr `owner-unavailable`
+   + 默认类语义 + `marker=null`；「未登记」→ `source=default` + `marker=未声明·按默认`。
+   测试、契约 C-7、data-model E9、tasks T006/T010/T027、feature-ref FR-016 已同步为单一标签，语义不变。
+2. **表头缺失 vs 行级缺陷**：整张表/必选列缺失 → `check` exit 2（C-13 解析错误）；
+   列数不符 / 必选值为空 / 单元 id 非规范 / `basis` 越界 → `row-malformed`（exit 1），且该行不进单元集
+   （不再被二次判为 missing/unknown/invalid-class）。
+
+## 11. 未关闭项（本段不修，按任务归属登记）
+
+| 项 | 现状 | 归属 |
+|----|------|------|
+| 镜像漂移 `test_mirror_parity_suite` | `scripts/python/flow-class-check.py` 与 `shared/definitions/flow-class-definitions.md` 两对镜像缺失 → 2 failed / 726 passed（实跑） | T033（镜像义务段） |
+| US2（文档型门禁与接线） | 未进入；T013+ 保持未勾选 | T013 起 |
+| `validate-tasks.py` / 条款覆盖核对 | 本段未重跑；T004–T008 勾选状态由前段负责 | T034 / 收尾 |
+
+## 12. 本段提交
+
+commit: 见 `git log -1 --format=%H` 于 `069-execution-expression-sdd`（本文件与引擎、三支测试、
+契约 C-7、data-model E9、feature-ref FR-016、tasks T006/T009–T012 同一提交）。
+
+---
+
+# Red-first evidence — 069a US2 前半（T013 / T014 / T015）与门禁 owner 转绿（T016–T019）
+
+**Feature**: 069a-flow-classification-docs-gates（父 069） | **Scope**: US2 的三支红先测试 + `shared/workflow/expression-gates.md`
+**Branch**: `069-execution-expression-sdd` | **HEAD（本段开始）**: `6c519ae173548e7dffd0004695eb41c15b5e2111`
+**Interpreter**: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（pytest 9.1.1）
+**Captured**: 2026-10-24T14:05:44Z
+
+## 13. 红跑：三支 US2 测试（owner 落盘前）
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_gates_doc.py \
+  tests/contract/test_doc_consistency_checker.py \
+  tests/unit/test_doc_consistency_rules.py \
+  tests/contract/test_expression_gate_wiring.py \
+  -q --tb=line -p no:cacheprovider
+# exit code: 1
+# 64 failed, 6 passed in 0.73s   （捕获时 70 支；T014 随后补入 1 支 S3 对照侧测试，
+#                                  同属 engine-missing 族，故当前为 71 支 / 65 failed）
+```
+
+采集面自检（同一解释器、同一树）：
+
+```text
+pytest <四文件> --collect-only -q  →  70 tests collected (exit 0)
+python -m py_compile <四文件>       →  COMPILE-OK (exit 0)
+```
+
+红的原因（三族，均为「目标产物缺失」，无 collection / import / 语法错误）：
+
+| 断言族 | 触发点 | 失败数 | 交付行 |
+|--------|--------|--------|--------|
+| owner missing | `_read_owner()` → `shared/workflow/expression-gates.md` 不存在 | 18 | T016 / T017 / T018 / T019 |
+| engine missing | `_run()` → `scripts/python/doc-consistency-check.py` 不存在 | 38（契约 24 + 单元 14；补入 1 支后为 39） | T020 / T021 |
+| wiring missing | `_outline_wiring_section()` / 技能 token 段 / 命令副本 | 8 | T022 / T023 / T024 / T025 |
+| **合计** | | **64** | 与 `64 failed` 一致 |
+
+逐字输出（三族各取首条）：
+
+```text
+E   AssertionError: expression-gate owner missing: shared/workflow/expression-gates.md — expected at
+    T016/T017/T018/T019 (069a). Red is the intended pre-implementation state for T013.
+E   AssertionError: doc-consistency checker missing: scripts/python/doc-consistency-check.py — expected
+    at T020/T021 (069a). Red is the intended pre-implementation state for T014.
+E   AssertionError: wiring subsection missing in docs.md — expected a `###` block under `## Outline`
+    naming shared/workflow/expression-gates.md or the engines (T022/T025, 069a). Red is the pre-wiring state.
+```
+
+### 13.1 实现前即通过的 6 支（负向守卫，不是「已实现」）
+
+| 测试 | 现在为何通过 | 实现后仍须保持 |
+|------|--------------|----------------|
+| `test_expression_gate_wiring.py::test_a1_docs_template_keeps_its_top_level_sections` | docs 模板顶级章节未动 | 接线只新增 `###` 小节，不改 `## ` 序列 |
+| `…::test_a2_humanize_template_stays_simple` | 现模板 1 处 `SKILL.md`、无 `## Wrap-up`、非表格行 ≤ 120 | W2 只加 owner 指针，保持 Simple |
+| `…::test_a5_no_class_key_assignment_or_ledger_row` | 四个接线文件零类别键赋值、零台账样式行 | 接线只写 lookup 与指针 |
+| `…::test_a6_wiring_set_is_closed` | 其余 25 模板 / 49 技能零引擎与 owner 引用 | 接线封闭集只有 W1–W4 |
+| `…::test_a6_wiring_inventory_matches_the_frozen_denominator` | 实测 27 模板 + 51 技能 | 分母不变 |
+| `…::test_pre_completion_specs_stay_byte_identical` | 062 / 067 / 068 `requirements.md` sha256 与冻结值一致 | SC-008 |
+
+## 14. 绿跑：T016–T019 门禁 owner
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_gates_doc.py -q -p no:cacheprovider
+# exit code: 0
+# 18 passed in 0.33s
+```
+
+owner 落地后同一批四文件的逐文件状态（红仍是「实现缺失」，不是测试缺陷）：
+
+```text
+tests/contract/test_expression_gates_doc.py      18 passed                      （T013 转绿）
+tests/contract/test_doc_consistency_checker.py   25 failed                      （T020/T021 交付前保持红；含事后补入的
+                                                                                  `test_c05_s3_owner_set_is_the_reference_side_only`，
+                                                                                  同属 engine-missing 族）
+tests/unit/test_doc_consistency_rules.py         14 failed                      （T020/T021 交付前保持红）
+tests/contract/test_expression_gate_wiring.py     6 passed / 8 failed           （8 支全部等 T022–T025 接线）
+```
+
+8 支红全部依赖接线本体：A1/A2 取 `## Outline` 内的接线小节，A3/A4 取技能内的 owner/引擎 token 段，
+A5 依赖 `_wiring_texts()`（接线出现前无从取样），A7 依赖重生成后的 8 个命令副本。故它们与接线同批转绿
+（归属 T022–T025），不属 T016–T019 的绿义务。
+
+## 15. 本段落地物与判据
+
+| 交付行 | 落点 | 该行绿义务 |
+|--------|------|-----------|
+| T013 | `tests/contract/test_expression_gates_doc.py`（18 支） | 自身为红先测试；T016–T019 落地后 18/18 转绿 |
+| T014 | `tests/contract/test_doc_consistency_checker.py`（24 支）+ `tests/unit/test_doc_consistency_rules.py`（14 支） | 交付 T020/T021 后转绿 |
+| T015 | `tests/contract/test_expression_gate_wiring.py`（14 支，A1–A7 + 两条守卫 + SC-008） | 交付 T022–T025 后 8 支转绿 + 6 支守卫保持绿 |
+| T016 | `shared/workflow/expression-gates.md` § 六面（封闭集） | C-1 |
+| T017 | 同上 § 阶段算子表 / § 阻断级别 | C-2 / C-3 |
+| T018 | 同上 § 读者声明 / § 证据分级与 as-of / § 结构… / § 事实一致性 / § 评审 / § 三项基线 / § 算子去重 | C-4…C-10 |
+| T019 | 同上 § 阶段不变量 / § 与复杂度轴正交 / § 调用点表 / § 调用时机与降级 / § 与首批成员的关系 | C-11…C-15 |
+
+## 16. 本段自行裁决的三处实现接口（测试即规格，记录以便 T020+ 复用）
+
+1. **证据标注的行语法**：一行只有出现标记 `证据：` 才被视为带标注的断言行；等级取标记后第一个 token，
+   `as-of <YYYY-MM-DD>`，`source: <文本>` 必填。理由：若以裸 `实测 / 推断 / 引用` 判定，规格产物里
+   大量「实测」叙述会被误判为标注行。语法已写入门禁 owner § 证据分级与 as-of（判据 owner 是本文件，
+   故语法不属第二来源）。
+2. **「接线小节」的定位方式**：命令模板按内容锚定——`## Outline` 内第一个提到 owner 路径或引擎的
+   `###` 小节；技能按 token 所在 `###` 块提取。这样 W1/W2 的小节标题由实现者自选，位置与内容仍被钉住。
+3. **`--faces` 缺省 = 四面**、`--path` 缺省时 `reader` 面为 `not-applicable`、无 `--spec-dir` 时 `count`
+   为 `not-run`（带 reason）：三项均取自契约 C-1 / C-4 / C-6 的既有措辞，未新增语义。
+
+## 17. 未关闭项（本段不修，按任务归属登记）
+
+| 项 | 现状 | 归属 |
+|----|------|------|
+| `doc-consistency-check.py` | 不存在；38 支测试保持红属预期 | T020 / T021 |
+| W1–W4 接线与 8 个命令副本 | 未动；8 支接线测试保持红属预期 | T022–T025 |
+| 镜像漂移 | `shared/workflow/expression-gates.md` 尚无 `.specify/shared/` 镜像（与既有两对同类） | T033 |
+| `shared/workflow/feedback-step.md` 一行指针 | 未加：本段只声明正交契约（C-13）；指针行本体与 `shared/` 镜像同批落地，避免制造第二处未镜像漂移 | T033 |
+
+## 18. 全量契约套件对照（相对 `notes/test-baseline-contract.txt`）
+
+命令（排除本段三支新契约测试，避免把「红先」计成回归）：
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest tests/contract -q --tb=no -p no:cacheprovider \
+  --ignore=tests/contract/test_expression_gates_doc.py \
+  --ignore=tests/contract/test_doc_consistency_checker.py \
+  --ignore=tests/contract/test_expression_gate_wiring.py
+# 39 failed, 4189 passed, 5 skipped, 1 warning in 225.69s
+```
+
+冻结基线是 33 条 node id。差值 6 条，**全部由缺少 `.specify/` 镜像引起**（归属 T033，本段按任务边界不写镜像）：
+
+| 新增失败 node id | 直接原因 | provenance |
+|------------------|----------|-----------|
+| `test_mirror_parity_suite…[scripts/python/flow-class-check.py->…]` | 引擎无镜像 | US1（本段之前已红） |
+| `test_mirror_parity_suite…[shared/definitions/flow-class-definitions.md->…]` | 分类 owner 无镜像 | US1（本段之前已红） |
+| `test_mirror_parity_suite…[shared/workflow/expression-gates.md->…]` | 门禁 owner 无镜像 | 本段新增文件 |
+| `test_trigger_engine.py::test_c2_sync_mirrors_check_clean` | `sync-mirrors --check` exit 2 | 同上（三处 MISS） |
+| `test_scripts_distribution_parity.py::…test_repo_has_no_orphan_or_drifted_scripts` | 同上 | 同上 |
+| `test_compile_propagation_order.py::test_propagation_chain_is_green_in_canonical_order` | 同上（第 3 步 sync --check） | 同上 |
+
+一处**本段引入并已当场修复**的回归（属 Fast Fail 的 in-passing 修复，披露于此）：
+
+- `test_one_source_of_truth.py::test_c6_single_source_sweep` 曾因门禁 owner 的 `owner_pointer` 写成
+  「`one-source-of-truth.md` § Declare the owner」而转红——该测试把 `Declare the owner` 视为只允许
+  出现在纪律文档里的章节名。修复：事实一致性面的指针改为「整文件即判据，无单章节锚」（该 owner 的
+  T016 原文本来也只给路径），修复后 `test_one_source_of_truth.py` 33 passed。
+
+结论：除上述 6 条镜像类（T033 义务）外，**零新增失败**；既有 33 红按纪律不修、不掩盖。
+
+---
+
+# Green run — 069a US2 检查器（T020 / T021）
+
+**Feature**: 069a-flow-classification-docs-gates（父 069） | **Scope**: `scripts/python/doc-consistency-check.py`（四面）+ 契约 C-6/C-7 两处补全
+**Branch**: `069-execution-expression-sdd` | **HEAD（本段开始）**: `854caf1a`
+**Interpreter**: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（pytest 9.1.1；Python 3.14）
+**Captured**: 2026-10-24T14:30:00Z
+
+## 19. 绿跑：T014 的两支测试 39 支全绿
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_doc_consistency_checker.py \
+  tests/unit/test_doc_consistency_rules.py \
+  -q --tb=short -p no:cacheprovider
+# exit code: 0
+# 39 passed in 3.85s
+```
+
+逐文件：
+
+```text
+tests/contract/test_doc_consistency_checker.py   25 passed in 2.84s   （T020 C-1…C-4 + T021 C-5…C-8 的契约面）
+tests/unit/test_doc_consistency_rules.py         14 passed in 1.23s   （归一化/阈值/排除项/委派降级/--faces/--json-out）
+pytest --collect-only -q <两文件>                → 39 tests collected (exit 0)
+python3 -m py_compile scripts/python/doc-consistency-check.py → COMPILE-OK
+```
+
+解释器覆盖面：测试解释器为 Python 3.14；另有系统 `python3`（3.9.6）实跑四支 CLI 冒烟（reader/evidence/
+count/strict），行为一致——引擎只用 `argparse/json/re/subprocess/time/collections/difflib/pathlib`，符合
+plan § Language/Version 的 Python ≥ 3.8 下限。
+
+## 20. 本段自行裁决的实现接口（测试即规格，记录以便 T022+ 复用）
+
+1. **测试侧缺一件辅助函数（Fast Fail 的 in-passing 修复，披露于此）**：首次绿跑为 `1 failed, 38 passed`，
+   失败不是引擎行为而是 `test_c05_s3_owner_set_is_the_reference_side_only` 调用的 `_duplicates()` 在
+   `tests/contract/` 内未定义（`NameError`；单元测试文件有同名实现）。按最小修正补入同名 helper
+   （`[f for f in _findings(doc) if f.get("rule") == "duplicate-fact"]`），语义由该测试名与其文档串唯一确定，
+   未改断言、未放宽阈值。修正后 39/39。
+2. **委派不带 `--json-out`**：C-1 的「除 `--json-out` 外零写入」与 C-6 的调用形式在「回收 delegate 报告」上冲突；
+   该引擎的 stdout 就是同一份 JSON 记录，故按只读优先执行，并把这一条写回 C-6（契约补全，不改语义）。
+3. **`not-evaluated` 的理由载体**：C-3/C-8 要求降级「附 `reason`」，而 C-7 的报文字段里没有位置。实现输出
+   顶层 `degradations[]`（`face/status/path/line/reason`），`faces` 的取值仍是三态字符串；契约 C-7 同步补一行。
+4. **`evidence` 面的对象边界**：`shared/workflow/evidence-step.md` 与 `shared/guidelines/single-run-evidence.md`
+   是另两套证据取值域的 owner（data-model E6 的 object boundary），显式排除在 evidence 面之外。
+5. **S3 只作对照侧**：`duplicate` 面比较 `S1∪S2 ↔ S1∪S2` 与 `S1∪S2 ↔ S3`，从不做 S3 自比对——owner 之间
+   合法的机器重生成块（如编译后的 Wrap-up 步骤表）因此不会被误报为手写副本。
+6. **`path` 口径**：仓库内文件用仓库相对路径（E7 的 `path` 定义），仓库外（测试夹具在 `tmp_path`）用绝对路径；
+   字典序取首处/第二处因此确定且可复现。
+7. **`count` 的阶段选择**：有 `plan.md` 走 `--stage plan`，仅有 `tasks.md` 走 `--stage tasks`（由 delegate 自己
+   以 exit 2 报缺 `plan.md`，其 stderr 落进 `count_check.reason`）；**不**回退 `--stage requirements`——那会让
+   「只有 requirements.md」的夹具静默变绿，正是 C-6 要挡的假通过。
+8. **`reader` 窗口**：前 40 个**非空行**（围栏代码行计入行数、但不在其中解析声明），两行任一缺失或值为空即
+   `reader-declaration-missing`。
+
+## 21. 真实仓库实跑（只读，自证不误报）
+
+```bash
+python3 scripts/python/doc-consistency-check.py --action verify \
+  --spec-dir .specify/specs/069a-flow-classification-docs-gates --format json
+# exit code: 0    （12 files；findings: 0）
+# faces: reader=not-applicable evidence=pass duplicate=pass count=pass
+# count_check: {"status": "delegated", "reason": null, "stage": "plan",
+#               "delegate": "skills/external/sdd-loop-driver/scripts/pre-analyze-check.py"}
+```
+
+即本特性自己的 12 份形式产物同时通过四个面（含对 9 个 owner 对照侧的跨文件手写副本比对），
+检查器不是「只会红」的夹具级实现。
+
+## 22. 全量契约套件对照（相对 `notes/test-baseline-contract.txt`）
+
+本段只新增/修改两个文件，可影响的结构面测试仅「脚本集 × 镜像」三类。用「移走新脚本再跑」的方式做
+归因测量（同一棵树、同一解释器）：
+
+```text
+不带 scripts/python/doc-consistency-check.py：
+  test_scripts_distribution_parity.py           1 failed   （US1 三处镜像缺失，本段之前已红）
+  test_trigger_engine.py::test_c2_..._clean     1 failed   （同上）
+  test_mirror_parity_suite.py                   3 failed   （flow-class-check.py / flow-class-definitions.md / expression-gates.md）
+带该脚本：
+  同上 5 条 + test_mirror_parity_suite.py::test_mirror_file_byte_identical[
+      scripts/python/doc-consistency-check.py->.specify/scripts/python/doc-consistency-check.py]
+```
+
+结论：本段相对「本段开始时的树」只新增 **1 条**失败 node id，且它是 `.specify/scripts/python/` 镜像尚未
+生成所致——与 US1、US2-前半留下的三处镜像漂移同源，归属 T033（镜像同步先于 T034 全量核验）。按任务边界
+（不做接线、不写镜像）本段不生成该镜像。
+
+## 23. 未关闭项（本段不修，按任务归属登记）
+
+| 项 | 现状 | 归属 |
+|----|------|------|
+| `doc-consistency-check.py` 的 `.specify/scripts/` 镜像 | 不存在；parity 套件因此多 1 条红 | T033 |
+| W1–W4 接线与 8 个命令副本 | 未动；`test_expression_gate_wiring.py` 的 8 支保持红属预期 | T022–T027 |
+| `--strict` 对 `reader=not-applicable` | 不升级为失败：C-4 明写 `not-applicable` 是「没有 `--path`」的显式态，不是 `not-evaluated` | 已有裁定，无需后续动作 |
+
+## 24. 本段提交
+
+本段唯一提交含：检查器（新）、契约测试的一件 helper 修正、契约 C-6/C-7 两处补全、`tasks.md` 的
+T020/T021 勾选与本文件。commit 见 `git log -1 --format=%H`（分支 `069-execution-expression-sdd`）。
+
+---
+
+# Red-first evidence — 069a US2 接线段（T022–T027）
+
+**Scope**: W1–W4 最小接线、8 个命令副本重生成、US2 定向转绿与两条降级面实测。**不进入 US3（T028+）**。
+**Branch**: `069-execution-expression-sdd` | **起点 HEAD**: `550539d9`
+**Interpreter**: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（pytest 9.1.1）
+**Captured**: 2026-10-24（+0800）
+
+## 25. 接线落地（T022–T025）
+
+| # | 文件 | 位置 | 行 | 增补内容 | 负向约束（实测） |
+|---|------|------|----|----------|------------------|
+| W1 | `templates/commands/docs.md` | `## Outline` 内、`### 技能输入` 之前（第 32 行起，`### 技能输入` 现在第 38 行） | L32–L37 | ① `flow-class-check.py --action lookup --unit-id "/speckit.docs"`；② 两个 owner 指针 + 按 `/speckit.docs` 调用点行执行文档型算子（含 `doc-consistency-check.py --action verify`，三面；计数面委派；结构/链接/构建沿用 `docs-utils.py --action validate`；评审沿用 `/speckit.review`）；③ 降级可见（`source: default` 原样显示 `marker`；退出码 2 显示 `owner-unavailable` 且 `marker` 为 null，两标签互斥；不中断、不静默切换门禁集） | `## ` 顶级序列仍为 User Input / Glossary / Outline / Wrap-up / Handoffs（`test_a1_docs_template_keeps_its_top_level_sections` 绿）；无类别字面量、无归属断言、无判据/算子表副本 |
+| W3 | `skills/external/create-docs/SKILL.md` | `### Reconcile Loop` R6 verify（L85）与 `### Authoring Flow` R6 验证（L114），两处同一句 | L85 / L114 | 门禁 owner 指针 + 「当调用方已解析为文档型算子集时，对受触文档执行 `doc-consistency-check.py --action verify`（复用调用方同一次执行的输出）；owner 或引擎缺席时显式跳过」+ 分类 owner 指针（类别由调用方读取，本技能不新增读取） | `### Desired-State Baseline` 零改动；checker 非无条件硬依赖（前置条件 + 缺席显式跳过）；无类别归属断言 |
+| W2 | `templates/commands/humanize.md` | `## Outline` 内、委派段之前（`### 门禁归口` L24–L28；`### 委派（强制）` L30 承载原 Delegation 段） | L24–L28 | **仅**两个 owner 指针 + 「类别读取与最小算子集执行由委派技能在其 Stage 6 承担」 | 接线小节路径集合**恰等于**两个 owner 路径（`test_a2_...pointers_only` 绿）；零脚本调用、零 `flow-class-check.py` / `--action lookup` / `--unit-id` / `doc-consistency-check.py` / `feedback-utils.py` / `probe-utils.py`；全文 `SKILL.md` 仍 1 次、无 `## Wrap-up`；非表格行 40 → **48**（≤ 120） |
+| W4 | `skills/external/humanize/SKILL.md` | `### Stage 6 — 保真自检（交付前）` 段首（L81） | L81 | ① 该流程唯一一次 lookup（`--unit-id "/speckit.humanize"`）；② 一句 owner 指针（humanize 调用点行 = 最小集，不按六面登记；执行细则仍归本文件 Non-negotiables 与 Stage 6）；③ 缺席时 `owner-unavailable` 且 `marker` 为 null，未登记单元显示其 `marker`（两标签互斥），均不中断改写 | Stage 6 标题与 `diff_protected.py` 引用保留；lookup 落在 Stage 6 与 Stage 7 之间（`test_a4_...keeps_stage6_and_fidelity` 绿）；不回指命令模板路径；062 默认输出/报告契约零改动（`test_humanize_command_surface.py` 10 passed） |
+
+**一处实现裁定（记录以便复核）**：W2 要求「委派段之前」，而 A2 把「接线小节」的边界取到下一个 `###` 标题；两者叠加时委派段（含 `.specify/skills/humanize/SKILL.md`）会被并入接线小节，路径集合断言必然失败。裁定：给委派段补一个 `### 委派（强制）` 标题使其自成小节，接线小节位置与「只含两个 owner 路径」两条均成立；委派段文字逐字未改。
+
+## 26. 副本重生成（T026）
+
+```bash
+python3 scripts/python/regen-command-copies.py
+# Regenerated command copies for 4 tools.
+# Fixed drift: .github/prompts/speckit.{docs,humanize}.prompt.md
+#              .claude/commands/speckit.{docs,humanize}.md
+#              .opencode/command/speckit.{docs,humanize}.md
+#              .qoder/commands/speckit.{docs,humanize}.md   （8 个）
+python3 scripts/python/regen-command-copies.py --check
+# OK: all per-tool command copies match the source templates.   （exit 0）
+```
+
+逐副本实测（`grep -c`）：
+
+| 副本 | `flow-class-check.py` | `--action lookup` | `expression-gates.md` | `doc-consistency-check.py` | `flow-class-definitions.md` |
+|------|----------------------|-------------------|----------------------|---------------------------|----------------------------|
+| `.claude/commands/speckit.docs.md` | 1 | 1 | 1 | 1 | — |
+| `.github/prompts/speckit.docs.prompt.md` | 1 | 1 | 1 | 1 | — |
+| `.opencode/command/speckit.docs.md` | 1 | 1 | 1 | 1 | — |
+| `.qoder/commands/speckit.docs.md` | 1 | 1 | 1 | 1 | — |
+| `.claude/commands/speckit.humanize.md` | **0** | 0 | 1 | 0 | 1 |
+| `.github/prompts/speckit.humanize.prompt.md` | **0** | 0 | 1 | 0 | 1 |
+| `.opencode/command/speckit.humanize.md` | **0** | 0 | 1 | 0 | 1 |
+| `.qoder/commands/speckit.humanize.md` | **0** | 0 | 1 | 0 | 1 |
+
+副本全部由生成器写出（MUST NOT 手写），无一被手工编辑。
+
+## 27. US2 定向转绿（T027）
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_gate_wiring.py \
+  tests/contract/test_expression_gates_doc.py \
+  tests/contract/test_doc_consistency_checker.py \
+  tests/unit/test_doc_consistency_rules.py -q
+# 71 passed in 4.46s   （exit 0）
+```
+
+| 文件 | 收集 | 结果 |
+|------|------|------|
+| `tests/contract/test_expression_gate_wiring.py` | 14 | 全绿（接线前 8 红 → 0） |
+| `tests/contract/test_expression_gates_doc.py` | 18 | 全绿（保持） |
+| `tests/contract/test_doc_consistency_checker.py` | 25 | 全绿（保持） |
+| `tests/unit/test_doc_consistency_rules.py` | 14 | 全绿（保持） |
+
+相邻回归（接线改变的是既有表面，扩大一次核对面）：
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  <上列 4 支> tests/unit/test_flow_class_check.py tests/contract/test_flow_class_ledger.py \
+  tests/contract/test_docs_command_template.py tests/contract/test_humanize_command_surface.py -q
+# 138 passed in 11.54s   （exit 0）
+```
+
+## 28. 两条降级面实测（T027，真实输出）
+
+**A. 空树（无 `skills/`、无 owner）跑 `--action check`** —— 报缺口、非零退出：
+
+```text
+$ python3 scripts/python/flow-class-check.py --action check --repo ~/tmp/069a-t027-empty
+owner-unavailable: owner document unreadable: .../069a-t027-empty/shared/definitions/flow-class-definitions.md
+  ([Errno 2] No such file or directory: ...)
+# exit code: 2
+```
+
+**B. owner 在位但树内无 `templates/` + `skills/`** —— 缺口逐条报出、退出码 1：
+
+```text
+$ python3 scripts/python/flow-class-check.py --action check --repo ~/tmp/069a-t027-noskills
+flow-class check: 0 unit(s) scanned, 80 finding(s)
+  [unknown] /speckit.agents — ledger unit is absent from the inventory
+  [unknown] /speckit.analyze — ledger unit is absent from the inventory
+  ...（逐单元，共 80 条）
+# exit code: 1
+```
+
+**C. owner 在位但无台账段 → `--action lookup`** —— 默认类语义 + `marker` 为 null + `owner-unavailable`：
+
+```text
+$ python3 scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.docs" --repo ~/tmp/069a-t027-noledger
+owner-unavailable: owner document has no '逐流程台账' section
+unit_id: /speckit.docs
+flow_class: execution
+source: default
+marker: null
+basis: null
+neutral: false
+# exit code: 2
+```
+
+**对照（另一降级标签）** —— 所有者可解析、单元未登记：
+
+```text
+$ python3 scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.undeclared-probe"
+unit_id: /speckit.undeclared-probe
+flow_class: execution
+source: default
+marker: 未声明·按默认
+basis: null
+neutral: false
+# exit code: 0
+```
+
+两标签互斥得到实测：`marker = 未声明·按默认`（exit 0）与 `marker = null` + `owner-unavailable`（exit 2）
+从不同时出现；两条路径都保留默认类语义、都不中断流程。
+
+## 29. 全量契约套件对照（相对 `notes/test-baseline-contract.txt`）
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest tests/contract -q
+# 40 failed, 4246 passed, 5 skipped, 1 warning in 213.79s
+# 基线（HEAD 01d1feaa）：33 failed, 4177 passed, 5 skipped
+```
+
+新增失败 **7 条**，全部同源 = US1/US2-前半新增的 4 个文件尚未生成 `.specify/` 镜像（`.specify/scripts/python/`、
+`.specify/shared/`），与接线无关：
+
+```text
+test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/doc-consistency-check.py -> .specify/...]
+test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/flow-class-check.py -> .specify/...]
+test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/definitions/flow-class-definitions.md -> .specify/...]
+test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/workflow/expression-gates.md -> .specify/...]
+test_scripts_distribution_parity.py::test_repo_has_no_orphan_or_drifted_scripts
+test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+test_compile_propagation_order.py::test_propagation_chain_is_green_in_canonical_order
+（末条同因：`sync-mirrors.py --check` 在传播链第 3 步因同一批缺失镜像返回 2）
+```
+
+`tests/unit` 全量：**811 passed**（76.68s），零新增失败。
+
+## 30. 未关闭项（本段不修，按任务归属登记）
+
+| 项 | 现状 | 归属 |
+|----|------|------|
+| `.specify/scripts/python/{flow-class-check,doc-consistency-check}.py` 与 `.specify/shared/{definitions/flow-class-definitions,workflow/expression-gates}.md` 镜像缺失 | 缺 4 个镜像；由此派生 7 条契约红（见 §29） | T033（镜像同步先于 T034 全量核验） |
+| 其余 6 条历史红 | 与基线一致的既有失败，本段零触碰 | 非本切片 |
+| W2 的「委派段之前」与 A2 段落边界的张力 | 已按「给委派段补 `###` 标题」裁定，见 §25 的实现裁定 | 若评审另有裁定，回退只需删除该标题并与 A2 同步 |
+
+## 31. 本段提交
+
+本段唯一提交含：W1–W4 四个接线文件（2 个命令模板 + 2 个技能源）、两个技能源对应的 `.specify/skills/` 镜像、
+8 个重生成的命令副本、`tasks.md` 的 T022–T027 勾选与本文件。commit 见 `git log -1 --format=%H`
+（分支 `069-execution-expression-sdd`）。
+
+---
+
+# US3 测试先行段（T028 / T029 / T030 / T031）
+
+**Scope**: US3 = 防滥用与兼容（`contracts/compatibility-distribution.md` C-1…C-10 + FR-014 / FR-026 / SC-008）。
+**Captured**: 2026-10-24T14:4x Z（+0800 22:4x，同日；逐项时刻见各节）
+**Branch**: `069-execution-expression-sdd` | **HEAD at start**: `d0b3f7dc5f81e9781815aef068c7f6b3767a7ca8`
+**Interpreter**: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（pytest 9.1.1）
+
+## 32. 红跑：T028 兼容面契约测试（owner/接线落盘后、US3 实现前）
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_compatibility.py -q --tb=short -p no:cacheprovider
+# exit code: 1
+# 2 failed, 12 passed in 0.35s（复跑 0.85s，失败 node id 相同）
+```
+
+采集面自检（同一解释器、同一树）：
+
+```text
+pytest tests/contract/test_expression_compatibility.py --collect-only -q  →  14 tests collected (exit 0)
+python3 -m py_compile tests/contract/test_expression_compatibility.py      →  COMPILE-OK (exit 0)
+```
+
+两条失败（逐字）：
+
+```text
+E   AssertionError: shared/workflow/feedback-step.md carries no pointer to shared/definitions/flow-class-definitions.md — the complexity axis and the class axis must be declared orthogonal (FR-004 / C-6). Red is the pre-T029 state.
+E   assert []
+
+E   AssertionError: C-6: exactly one pointer line may be added to feedback-step.md, found 0: []
+E   assert 0 == 1
+```
+
+红的原因单一：US3 的实现行 T029 尚未落盘（`shared/workflow/feedback-step.md` 里没有指向分类 owner 的正交指针）。
+
+**12 条先行转绿不是「已实现」，而是负向守卫**（钉住 US1/US2 已交付的既有面，本段只证明它们未被本切片改动）：
+
+| 绿点 | 钉住的既有面 |
+|------|--------------|
+| `test_c1_zero_new_commands` / `test_c1_skill_inventory_is_frozen` | 27 个命令模板 + 51 个技能单元的冻结名字集合与层级 |
+| `test_c5_non_wiring_files_keep_their_frozen_hashes` | `notes/pre-change-file-hashes.txt` 的 74 行（25 模板 + 49 技能）逐文件 sha256 |
+| `test_c5_untouchable_framework_paths_are_unchanged` | `src/specify_cli/`、`AGENTS.md`、`.specify/instructions.md` 相对改前 HEAD 零改动 |
+| `test_c2_no_project_side_classification_store` | `.specify/memory/` 下无分类数据文件 / 台账样式行 / `flow_class` 赋值 |
+| `test_c5_wiring_surface_is_closed` | W1–W4 之外零引擎/owner 引用 |
+| `test_c4_unrefreshed_form_has_no_call_sites` | 改前 HEAD 的四个接线文件零调用点（见 §34 实测） |
+| `test_c3_payloads_ship_in_one_package` | 四类载荷同包（force-include 三项 + hatch 阶段拷 skills） |
+| `test_c7_mirrors_are_byte_identical` | 7 个源文件的镜像同字节；4 个新载荷允许缺镜像（T033） |
+| `test_c9_pre_completion_specs_stay_byte_identical` | 062/067/068 `requirements.md` sha256 |
+| `test_stage_integrity_section_reads_no_class` | 门禁 owner § 阶段不变量 不读类别键、不调 lookup |
+| `test_stage_skip_claims_only_appear_as_rejection` | 跳过/缩短/改判三连唯一命中 = 拒绝规则，且逐行无「许可式」表述 |
+
+## 33. T029 正交指针：唯一新增行
+
+**落点**：`shared/workflow/feedback-step.md` 开篇复杂度判据段（以 `... or consumes another flow's artifact.` 结尾）之后、`**Embedding units reference this file; they do not copy it.**` 之前；单条独立段落，物理一行（该文件既有最长行 641 字符，长行有先例）。
+
+**新增内容（逐字）**：
+
+```text
+**Orthogonal axis — no derivation either way.** The complexity criterion above decides only whether a wrap-up face exists; the execution / expression class axis decides only the set of gate operators. The two axes are orthogonal and MUST NOT be derived from each other; their criteria, two values and per-unit ledger are owned by `shared/definitions/flow-class-definitions.md`.
+```
+
+**既有判据与红线段落零改动（机器证据，`-U0` 全量差异）**：
+
+```text
+$ git diff -U0 01d1feaa -- shared/workflow/feedback-step.md
+@@ -10,0 +11,2 @@ consumes, or consumes another flow's artifact.
++**Orthogonal axis — no derivation either way.** … `shared/definitions/flow-class-definitions.md`.
++
+```
+
+差异只有 `+` 两行（指针行 + 其后空行），`-` 行为 0 —— 复杂度判据段与 § Positioning & Red Lines 逐字未动。
+该文件在本切片内**只**获得这一处指针：不复制判据、不列举取值、不出现台账行（`C-6`）。
+
+## 34. T030 兼容面转绿与两条实测
+
+### 34.1 转绿
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_compatibility.py -q --tb=short -p no:cacheprovider
+# 14 passed in 0.24s   （exit 0）
+```
+
+**镜像腿的红→绿闭环（同一支测试内的真实红，非构造）**：加入指针行后、同步镜像前，`test_c7_mirrors_are_byte_identical` 转红并点名唯一差异：
+
+```text
+E   AssertionError: C-7: mirrors are projections of the framework source, never hand-edited (absence is tolerated only for the four new payloads until T033):
+      - .specify/shared/workflow/feedback-step.md — mirror differs from shared/workflow/feedback-step.md
+```
+
+修复走投影工具、不手改镜像：
+
+```bash
+python3 scripts/python/sync-mirrors.py --write --only shared/workflow/feedback-step.md
+# scope --only: shared/workflow/feedback-step.md
+# DIFF  .specify/shared/workflow/feedback-step.md
+# sync  shared/ -> .specify/shared/ (1 files)
+# exit 0
+cmp -s shared/workflow/feedback-step.md .specify/shared/workflow/feedback-step.md  →  BYTE-IDENTICAL
+```
+
+### 34.2 未刷新项目形态（`git show`，改前 HEAD 取 `notes/pre-change-measurements.md` 记录值 `01d1feaa`）
+
+```text
+$ for f in templates/commands/docs.md templates/commands/humanize.md \
+           skills/external/create-docs/SKILL.md skills/external/humanize/SKILL.md; do
+    git show 01d1feaa08d4541be2b59af30aa8c2e87128e55a:$f | grep -cE 'flow-class-check\.py|flow-class-definitions\.md|expression-gates\.md|doc-consistency-check\.py|--action lookup'
+  done
+templates/commands/docs.md                       -> 0
+templates/commands/humanize.md                   -> 0
+skills/external/create-docs/SKILL.md             -> 0
+skills/external/humanize/SKILL.md                -> 0
+```
+
+阳性对照（同一批 token 在当前树上的真实计数，证明上面测的是本切片新增的差异，不是常量）：
+
+```text
+templates/commands/docs.md             -> 1 --action lookup, 1 doc-consistency-check.py, 1 expression-gates.md, 1 flow-class-check.py, 1 flow-class-definitions.md
+templates/commands/humanize.md         -> 1 expression-gates.md, 1 flow-class-definitions.md（零脚本调用）
+skills/external/create-docs/SKILL.md   -> 2 doc-consistency-check.py, 2 expression-gates.md, 2 flow-class-definitions.md
+skills/external/humanize/SKILL.md      -> 1 --action lookup, 1 expression-gates.md, 1 flow-class-check.py, 1 flow-class-definitions.md
+```
+
+结论：未刷新项目拿到的是旧命令副本与旧技能，**零调用点**；`.specify/shared/` 与 `.specify/scripts/` 侧的两份 owner 与两个引擎同包到达，不存在「有调用点却无 owner/引擎」的稳定态（C-4）。
+
+### 34.3 四类载荷同包原子性
+
+```text
+$ grep -nE '^"(memory|scripts|templates|agents|shared)"' pyproject.toml
+33:"memory" = "specify_cli/memory"
+34:"scripts" = "specify_cli/scripts"
+35:"templates" = "specify_cli/templates"
+36:"agents" = "specify_cli/agents"
+37:"shared" = "specify_cli/shared"
+38:# "skills" is intentionally absent here: src/hatch_build.py stage-copies it
+
+$ grep -nE '_stage_skills|specify_cli/skills|_SKILLS_SRC' src/hatch_build.py
+38:_SKILLS_SRC = _REPO_ROOT / "skills"
+42:def _stage_skills(build_data):
+59:    build_data.setdefault("force_include", {})[str(staged)] = "specify_cli/skills"
+78:    _stage_skills(build_data)
+```
+
+四类载荷（`shared/`、`scripts/`、`templates/`、`skills/`）由同一个 wheel 提供：前三项静态 `force-include`，`skills/` 由同一构建钩子的阶段拷贝注册进 `force_include`（045/046 既有机制，本切片零改动）。
+
+## 35. T031 防滥用审计（只读，命令与真实输出）
+
+### ① 「跳过 / 缩短 / 改判 / skip / exempt」表述：三连唯一命中 = 拒绝规则
+
+```text
+$ grep -nE '跳过|缩短|改判|skip|exempt|豁免' shared/definitions/flow-class-definitions.md shared/workflow/expression-gates.md
+shared/definitions/flow-class-definitions.md:61:  … 构建绿只证明发布面可用（必要条件），不把文档内容改判为 `execution`。
+shared/definitions/flow-class-definitions.md:71: 类别 MUST NOT 被用作跳过或缩短阶段的开关：…（本文件不复述）。
+shared/definitions/flow-class-definitions.md:183: 类中立是**封闭清单**：… 用来豁免「命令与其委托技能 MUST 同类」这一条约束。
+shared/definitions/flow-class-definitions.md:184: 类中立**不改变**该单元自身的类别键（仍是一个二值），也**不豁免任何门禁**——…
+shared/workflow/expression-gates.md:120: - 任何以「本流程属表达类」为由跳过、缩短或改判阶段的请求 MUST 被拒绝——该规则无例外。
+```
+
+判读（四条）：
+
+- **三连（跳过 ∧ 缩短 ∧ 改判）唯一命中** `expression-gates.md:120`，且该行带「MUST 被拒绝」与「该规则**无例外**」——唯一命中就是拒绝规则本身，无许可式例外。
+- 61 行是「**不把**文档内容改判为某类」的判据禁令（不是阶段改判），含否定词。
+- 71 行是「类别 **MUST NOT** 被用作跳过或缩短阶段的开关」的指针，含否定词。
+- 183/184 行的「豁免」是**类中立豁免「命令↔委托技能同类」这一条约束**，与阶段/门禁无关；184 行紧接明文「也**不豁免任何门禁**」。审计判据（全部命中行都必须带否定/禁止词）在测试 `test_stage_skip_claims_only_appear_as_rejection` 内机器执行，本行给出人工复核。
+
+### ② 阶段完整性段落零类别键读取
+
+```text
+$ python3 - <<'PY'  # 取 § 阶段不变量 整段后逐 token 计数
+section_lines=6
+  flow_class                   -> 0
+  flow-class-check.py          -> 0
+  --action lookup              -> 0
+  --unit-id                    -> 0
+  flow-class-definitions.md    -> 0
+
+## 阶段不变量
+
+- 阶段完整性由既有阶段记录判定，类别 MUST NOT 参与该判定。
+- `analyze` 与 `review` 的调用率 MUST 为 100%。
+- 任何以「本流程属表达类」为由跳过、缩短或改判阶段的请求 MUST 被拒绝——该规则无例外。
+```
+
+判读：判定依据只取「既有阶段记录」，类别以**禁止参与**的形式出现（不是读取），段内无类别键、无引擎调用、无 lookup。
+
+### ③ analyze / review 调用率 100% 明文在场
+
+```text
+$ grep -nE '100%' shared/workflow/expression-gates.md
+41:| analyze | `/speckit.analyze`（调用率 100%） | fact-consistency | blocking |
+45:| review | `/speckit.review`（调用率 100%，按读者基准判定） | review | blocking |
+119:- `analyze` 与 `review` 的调用率 MUST 为 100%。
+```
+
+### ④ 两个命令模板的类别赋值字面量 = 0
+
+```text
+$ for f in templates/commands/docs.md templates/commands/humanize.md; do
+    echo "$f -> flow_class[:=] count=$(grep -cE 'flow_class[[:space:]]*[:=]' "$f")"
+  done
+templates/commands/docs.md -> flow_class[:=] count=0
+templates/commands/humanize.md -> flow_class[:=] count=0
+```
+
+### ⑤ 接线面封闭（W1–W4 之外零调用点）
+
+```text
+checked=74 (25 templates + 49 skills) offenders=0
+```
+
+判据：对 74 个非接线文件逐个检索 `flow-class-check.py` / `expression-gates.md` / `doc-consistency-check.py` / `flow-class-definitions.md`，命中数 0。
+
+**审计结论**：四条面均无漏洞——类别不可作为跳过开关（拒绝规则唯一且无例外）、阶段完整性不读类别、analyze/review 100% 明文在场、接线面封闭、接线文本零类别赋值。
+
+## 36. 定向回归与镜像面（本段已执行）
+
+```bash
+# 069a 全家 + 接线邻居 + 前序表面
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_gates_doc.py tests/contract/test_expression_gate_wiring.py \
+  tests/contract/test_docs_command_template.py tests/contract/test_humanize_command_surface.py \
+  tests/contract/test_flow_class_ledger.py tests/contract/test_flow_class_correctness.py \
+  tests/contract/test_doc_consistency_checker.py \
+  tests/unit/test_flow_class_check.py tests/unit/test_doc_consistency_rules.py -q
+# 142 passed in 11.84s   （exit 0）
+
+# 读取 feedback-step.md 的既有套件 + 本支兼容测试
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_compatibility.py \
+  tests/contract/test_feedback_mechanism_boundary.py tests/contract/test_feedback_command_classification.py \
+  tests/contract/test_run_determination_passive_wiring.py tests/contract/test_token_efficiency_discipline.py \
+  tests/contract/test_shared_reference_directory.py tests/contract/test_self_improvement_conformance.py \
+  tests/contract/test_compile_embeds.py -q
+# 1 failed, 125 passed in 2.17s
+# 唯一失败 = test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+#   → 已在 notes/test-baseline-contract.txt 第 37 行（既有红，本段零触碰）
+```
+
+镜像面与副本面（相对改前基线，**零新增差异**）：
+
+```text
+$ python3 scripts/python/sync-mirrors.py --check
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (396 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+MISS  .specify/scripts/python/doc-consistency-check.py
+MISS  .specify/scripts/python/flow-class-check.py
+MISS  .specify/shared/definitions/flow-class-definitions.md
+MISS  .specify/shared/workflow/expression-gates.md
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+# exit 2 —— 与改前基线同一组 4 个缺失（本段未新增任何漂移；feedback-step 的镜像已由投影补齐）
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.   # exit 0
+```
+
+## 37. 未关闭项（本段不修，按任务归属登记）
+
+| 项 | 现状 | 归属 |
+|----|------|------|
+| `.specify/scripts/python/{flow-class-check,doc-consistency-check}.py` 与 `.specify/shared/{definitions/flow-class-definitions,workflow/expression-gates}.md` 镜像缺失 | 仍缺 4 个（与改前基线同组，本段零新增）；兼容测试对这 4 个源文件允许「镜像缺席」，其余镜像一律要求逐字节相同 | T033 |
+| 全量契约套件零新增失败核验 | 本段只做定向回归；全量 `pytest tests/contract` 与基线名单比对 | T034 |
+| `test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc` | 冻结基线内既有红，本段零触碰 | 非本切片 |
+| **T004–T008 的状态脊仍为 `[ ]`**（US1 测试与 owner 段落早已提交、且在本段 142-pass 定向回归内全绿；历史提交 `82744713` / `e39cb05b` 只落产物、从未勾选） | 既有记账漂移，本段只做 US3，不代 US1 勾选；`validate-tasks.py` 仍 0 error（GATE-8 在 Polish 阶段会看到这 5 行） | US1 / Polish 收口（T034 前） |
+
+## 38. 本段提交
+
+本段提交含：`tests/contract/test_expression_compatibility.py`（14 条断言）、
+`shared/workflow/feedback-step.md` 的**一行**正交指针与其 `.specify/shared/workflow/feedback-step.md` 投影、
+`tasks.md` 的 T028–T031 勾选与本文件。commit 见 `git log -1 --format=%H`（分支 `069-execution-expression-sdd`）。

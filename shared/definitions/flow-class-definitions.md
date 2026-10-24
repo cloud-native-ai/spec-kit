@@ -1,0 +1,208 @@
+# Flow Class Definitions — 执行 / 表达流程分类
+
+**Owner（唯一所有者）**: 本文件 `shared/definitions/flow-class-definitions.md` 是「执行 / 表达」分类轴的唯一所有者。
+它拥有：**判据、两个取值、判定依据（`basis`）、边界例、命名空间、逐流程台账、类中立封闭清单、变更记录**。
+其他任何位置（命令模板、技能、契约、测试、门户文档）MUST 以「路径 + 章节锚」引用本文件，MUST NOT 复制判据句或取值定义，MUST NOT 以表格 / YAML / JSON / 代码常量的形式再声明一份「流程单元 → 类别」的映射；仓库中 MUST NOT 出现第二份分类数据文件。
+
+**机器键**: `flow_class`（[[STR-003]]）。取值只有两个：`execution`（[[STR-001]]）与 `expression`（[[STR-002]]）。
+四个共享字面量（`[[STR-001]]` / `[[STR-002]]` / `[[STR-003]]` / `[[STR-004]]`）的登记处是本切片需求规格的 § Shared Strings；本文引用其语义，不另立第二张字面量表。
+
+**覆盖范围**: 框架内全部流程单元——命令模板（`templates/commands/*.md` → `/speckit.<stem>`）与技能（`skills/{external,internal}/*/SKILL.md` → `skill:<dir-name>`）。
+清单规模（实测 2026-10-24：`ls templates/commands/*.md | wc -l` → 27；`ls skills/{external,internal}/*/SKILL.md | wc -l` → 51）：命令 27 + 技能 51 = **78 行台账**。
+
+**不在本文件**（只给指针，不复述）：
+
+| 主题 | 所有者 |
+|------|--------|
+| 门禁算子集、文档型六面、阶段算子表、调用点表 | `shared/workflow/expression-gates.md` |
+| 复杂度轴（复杂 / 简单命令，决定有无 wrap-up 面） | `shared/workflow/feedback-step.md` |
+| 同构映射（8 阶段 × 3 面）与不可同构边界 | 由 069b 承接；本版只保留这一行指针，不展开映射行 |
+| 读取类别的唯一引擎 | `scripts/python/flow-class-check.py` |
+
+## 判据
+
+### 唯一问题
+
+分类只回答一个问题：**该流程的主交付物，其验收由什么判定？**
+判定 MUST NOT 引入第二个问题——失败是否不可逆、交付物有几件、由谁编写，都不构成第二判别量（主交付物并列时，失败不可逆性只作 tie-break）。
+
+### 判定步骤（两步，必须都写得出答案）
+
+1. **指认主交付物**：该流程验收完成时必须交出去、并被消费者用来做最终判定的那一件产物（多件时取被最终判定实际使用的那件）。
+2. **指认判定面**：这件产物的缺陷，最先在哪一面暴露？
+   - 机器面——脚本退出码、生成物不可用、下游流程或运行时消费失败、执行行为不符 → `execution`，`basis = behavior-oracle`。
+   - 读者面——只有当人读错、或与外部事实不符时才暴露；结构 / 链接 / 构建检查通过不构成充分条件 → `expression`，`basis = reader-oracle`。
+   - 两面都必须签字才算完成 → `mixed-oracle`，类别一律取 `execution`（父 069 §Edge Cases 首条；规范条款由 069b 承接，本文件只留指针），并在台账该行 `notes` 保留父指针。
+
+### 两个取值
+
+- `execution`：主交付物在验收时被机器执行、解析或消费，其缺陷以可观测的行为差异显现（退出码、生成物不可用、下游流程失败、运行时行为不符）。
+- `expression`：主交付物交给人阅读，其缺陷只有在读者读错或与外部事实不符时显现；机器结构检查通过只是必要条件。
+
+### 判定依据 `basis`
+
+| 取值 | 含义 |
+|------|------|
+| `behavior-oracle` | 判定由机器可观测的事实给出：运行行为、生成物可用性、脚本退出码、可对回制品的核验结论 |
+| `reader-oracle` | 判定只能由读者给出：读懂与否、是否与外部事实相符 |
+| `mixed-oracle` | 两种 oracle 都是最终判定所必需；类别取 `execution`，规范条款归 069b |
+
+`basis` 是台账每行的必选列，也是 `lookup` 输出的一部分；它不是第三个类别，不改写任何取值。
+
+### 不参与判定的因素（介质无关）
+
+以下因素 MUST NOT 参与判定：文件扩展名、自然语言种类、是否含代码块、是否由脚本生成、交付物数量比例、构建 / 结构 / 链接检查是否通过、作者身份。
+判定的全部输入是「主交付物 + 判定面」；凡是靠介质或制品形态推出的结论，一律按判据缺陷处理。
+
+### 边界例
+
+- **Markdown 架构文档 → `expression`**：交付物给人读，判据是读者能否理解并与外部事实相符；「它是 Markdown」不参与判定——同内容的纯文本或表格也一样。
+- **须生成并编译 SDK 的 OpenAPI 契约 → `execution`**：验收落在「生成物能否编译、SDK 能否按契约调用」这一可观测行为上；它同时可被人阅读，不改变判定。
+- **站点构建通过不改变判定**：`/speckit.docs`（文档内容，`expression`）与 `skill:create-pages`（站点构建与发布，`execution`）作用在同一棵文档树上——前者按读者面判定，后者按构建与页面可用性判定；构建绿只证明发布面可用（必要条件），不把文档内容改判为 `execution`。
+- **未登记单元 → 默认 `execution` 并在消费点标注**：默认不等于已判定；判定缺席不得被读作表达类（FR-009，消费点标注形态归门禁侧调用点表）。
+
+### 判据缺陷
+
+指认不出唯一主交付物或唯一判定面 → 判为**判据缺陷**：先修判据、再对全部样本重判（FR-006），MUST NOT 就地逐案裁定。
+台账与判据冲突时以判据为准，并把冲突本身记为缺陷（FR-005）。
+
+### 不变量指针
+
+类别 MUST NOT 被用作跳过或缩短阶段的开关：阶段集合、门禁数量与 analyze / review 的调用率不因类别改变（规范条款归 `shared/workflow/expression-gates.md` § 阶段不变量与 requirements FR-012 / FR-013 / FR-014，本文件不复述）。
+
+## 命名空间
+
+- `flow_class` 是本分类的机器键：台账列头、JSON 键、CLI 参数统一用它；裸 `execution` MUST NOT 充当键名。
+- `execution` 与既有 **Agent Execution**（Agent 三层分类法第三层，概念见 `shared/definitions/agent-definitions.md`，词汇表见 `.specify/memory/glossary.md` 的 `Agent Execution` 行）**同词异义**：前者描述「流程主交付物的验收 oracle」，后者描述「Agent 模板 / 实例 / 执行」三层的第三层。
+- 读法约束：`execution` 只有在 `flow_class` 语境下（本文件判据、台账列、`lookup` 输出）才读作本分类；出现在 `.specify/agents/execution/`、`execution-config.py` 等既有名称中时 MUST NOT 读作本分类。
+- 词汇表侧的同词消歧行（`流程分类 (Flow Class)` / `执行类流程` / `表达类流程`）以本文件为 owner 指针；本文件不复述词汇表的同音 / 易混词列。
+
+## 与复杂度轴正交
+
+复杂度轴（复杂命令 / 简单命令）的 owner 是 `shared/workflow/feedback-step.md`：它决定**有没有 wrap-up 面**。本分类轴决定**门禁算子集**（owner：`shared/workflow/expression-gates.md`）。
+两轴 MUST NOT 互相推导：由复杂度推类别、或由类别推 wrap-up 面，都是缺陷。可核对的对照：`/speckit.docs` 是复杂命令、`/speckit.humanize` 是简单命令，二者在本台账同为 `expression`。
+
+## 所有权：归框架，客户项目只为自己新增的流程声明
+
+- 分类所有权归框架；客户项目 MUST NOT 覆盖框架流程的类别。
+- 客户项目 MAY 按同一判据为自己新增的流程声明类别；声明机制不在 069a（迁移与兼容由 069b 承接），本版不提供项目侧声明面。
+- 框架源与客户运行时副本并存时以本文件为准：副本 MUST 由生成 / 刷新产生并带漂移检查，副本不是第二真源。
+
+## 逐流程台账
+
+一行一个流程单元，首格是单元 id（命令 `/speckit.<stem>`，技能 `skill:<dir-name>`）；列按**表头名**解析，解析器 MUST NOT 猜列。
+列头逐字取机器键 `flow_class`；`basis` 取本节上文的三值；`neutral` 只允许留空或 `yes`（`yes` 仅用于 § 类中立清单 中的技能）；`notes` 是该行的判定要点，不复述判据正文。
+`mixed-oracle` 行一律取 `execution`（父 069 §Edge Cases 首条，069b 承接规范），行内 `notes` 保留父指针。
+
+| unit_id | flow_class | basis | neutral | notes |
+| --- | --- | --- | --- | --- |
+| /speckit.agents | execution | behavior-oracle |  | 交付代理定义与调度结果；以派发后的行为与 agent 校验判定 |
+| /speckit.analyze | execution | behavior-oracle |  | 交付一致性分析结论；可重跑复算并作为门禁裁决 |
+| /speckit.checklist | execution | behavior-oracle |  | 交付需求质量清单；条目被后续门禁机器消费 |
+| /speckit.clarify | execution | behavior-oracle |  | 交付写回规格的裁定；由 validator 与下游流程读取判定 |
+| /speckit.constitution | execution | mixed-oracle |  | 治理文本由读者判、版本推进由引擎判；父 069 §Edge Cases 首条（069b 承接规范） |
+| /speckit.derive | expression | reader-oracle |  | 交付可重放的推导链；是否可溯源只能由读者判定 |
+| /speckit.docs | expression | reader-oracle |  | 首批成员；文档内容由读者与外部事实判定（FR-025） |
+| /speckit.feature | execution | behavior-oracle |  | 交付特性注册行与详情；由命令读取与状态机脚本判定 |
+| /speckit.feedback | execution | behavior-oracle |  | 交付反馈条目与分流结果；路由与打包结果可判定 |
+| /speckit.goal | execution | behavior-oracle |  | 交付目标定义与共用关系；由 goal 引擎校验判定 |
+| /speckit.history | execution | behavior-oracle |  | 交付 manifest 与主题知识；增量与去重可机器判定 |
+| /speckit.humanize | expression | reader-oracle |  | 首批成员；保真与自然度由读者判定（FR-025） |
+| /speckit.implement | execution | mixed-oracle |  | 代码须运行、规格回填须读者核；父 069 §Edge Cases 首条（069b 承接规范） |
+| /speckit.improve | execution | behavior-oracle |  | 交付改进后的技能 / 代理 / 团队 / 工具；以再运行与校验判定 |
+| /speckit.instructions | execution | mixed-oracle |  | 指令文本由读者判、符号链接由脚本判；父 069 §Edge Cases 首条（069b 承接规范） |
+| /speckit.interview | execution | mixed-oracle |  | 目标产物因对象而异、ledger 由引擎传播且收敛须用户确认；父 069 §Edge Cases 首条（069b 承接规范） |
+| /speckit.plan | execution | behavior-oracle |  | 交付设计产物；由 pre-analyze 检查与下游 tasks 消费判定 |
+| /speckit.requirements | execution | behavior-oracle |  | 交付需求规格；由 validator 与下游流程消费判定 |
+| /speckit.research | execution | behavior-oracle |  | 交付研究结论；由 plan 与 pre-analyze 检查消费判定 |
+| /speckit.review | execution | behavior-oracle |  | 交付评审结论；findings 逐条对回阶段记录与制品 |
+| /speckit.sanitize | execution | behavior-oracle |  | 交付清理结果与残留清单；由脚本复算判定 |
+| /speckit.session | execution | behavior-oracle |  | 交付会话导出目录；文件集与清单可校验 |
+| /speckit.skills | execution | behavior-oracle |  | 交付技能实体；以再运行与校验判定 |
+| /speckit.tasks | execution | behavior-oracle |  | 交付任务清单；由 validate-tasks 与覆盖核对判定 |
+| /speckit.team | execution | behavior-oracle |  | 交付团队定义与运行报告；由预检与运行结果判定 |
+| /speckit.todo | execution | behavior-oracle |  | 交付 TODO 块与搁置条目；由扫描器判定 |
+| /speckit.tools | execution | behavior-oracle |  | 交付 Tool 记录；由校验与调用行为判定 |
+| skill:create-docs | expression | reader-oracle |  | 首批成员委派技能；文档内容由读者与外部事实判定 |
+| skill:create-pages | execution | behavior-oracle |  | 边界例：站点构建通过只证发布面可用、不改文档内容类别 |
+| skill:create-skills | execution | behavior-oracle |  | 交付技能实体；以再运行与校验判定 |
+| skill:database-utils | execution | behavior-oracle |  | 交付查询结果；以 SQL 执行行为判定 |
+| skill:document-utils | execution | behavior-oracle |  | 交付读写后的文档文件；以产物可打开与可渲染判定 |
+| skill:draw-diagram | execution | behavior-oracle |  | 交付图源与渲染产物；以渲染结果与结构判定 |
+| skill:git-utils | execution | behavior-oracle |  | 交付平台对象与分支状态；以平台行为判定 |
+| skill:humanize | expression | reader-oracle |  | 首批成员执行体；保真与自然度由读者判定（W4 承载唯一读取） |
+| skill:improve-docs | expression | reader-oracle |  | 改进后的文档；读者面判定，与 /speckit.docs 同类 |
+| skill:improve-skills | execution | behavior-oracle |  | 交付改进后的技能；以再运行判定 |
+| skill:merge-skills | execution | behavior-oracle |  | 交付合并后的技能实体；覆盖与再运行可核验 |
+| skill:sdd-loop-driver | execution | behavior-oracle |  | 交付阶段推进与证据；由阶段记录与检查器判定 |
+| skill:sdd-project-setup | execution | behavior-oracle |  | 交付项目调谐结果；由机制分级脚本判定 |
+| skill:think-skills | execution | behavior-oracle |  | 交付执行行为的模拟判定；以与真实运行一致为准 |
+| skill:analyze-artifacts | execution | behavior-oracle |  | 交付一致性分析结论；可重跑复算并作为门禁裁决 |
+| skill:archive-session | execution | behavior-oracle | yes | 类中立（session）：导出会话产物，无自身交付物 |
+| skill:clarify-artifact | execution | behavior-oracle |  | 交付写回制品的裁定；由下游读取与校验判定 |
+| skill:code-review | execution | behavior-oracle |  | 交付代码评审结论；判定对象是代码差异的可验证缺陷 |
+| skill:collect-evidence | execution | behavior-oracle | yes | 类中立（evidence）：为目标单元采集证据，findings 归属被采集单元 |
+| skill:create-agent | execution | behavior-oracle |  | 交付代理定义；以派发后的行为判定 |
+| skill:create-checklist | execution | behavior-oracle |  | 交付质量清单；条目被后续门禁消费 |
+| skill:create-plan | execution | behavior-oracle |  | 交付设计产物；由 pre-analyze 检查与下游消费判定 |
+| skill:create-requirements | execution | behavior-oracle |  | 交付需求规格；由 validator 与下游消费判定 |
+| skill:create-tasks | execution | behavior-oracle |  | 交付任务清单；由 validate-tasks 与覆盖核对判定 |
+| skill:create-team | execution | behavior-oracle |  | 交付团队定义；由预检与运行结果判定 |
+| skill:create-tools | execution | behavior-oracle |  | 交付 Tool 记录；由校验与调用行为判定 |
+| skill:derive-architecture | expression | reader-oracle |  | 交付可重放的推导链；是否可溯源只能由读者判定 |
+| skill:implement-feature | execution | mixed-oracle |  | 代码须运行、规格回填须读者核；父 069 §Edge Cases 首条（069b 承接规范） |
+| skill:improve-agent | execution | behavior-oracle |  | 交付改进后的代理；以再运行判定 |
+| skill:improve-team | execution | behavior-oracle |  | 交付改进后的团队；以运行与阈值判定 |
+| skill:improve-tools | execution | behavior-oracle |  | 交付改进后的 Tool 记录；以校验与调用判定 |
+| skill:manage-agents | execution | behavior-oracle |  | 交付多 Agent 接线状态；由接线脚本核验判定 |
+| skill:manage-constitution | execution | mixed-oracle |  | 治理文本由读者判、版本与校验由引擎判；父 069 §Edge Cases 首条（069b 承接规范） |
+| skill:manage-features | execution | behavior-oracle |  | 交付特性注册与详情；由状态机脚本判定 |
+| skill:manage-feedback | execution | behavior-oracle | yes | 类中立（feedback）：分流调用方的反馈条目，无自身交付物 |
+| skill:manage-goal | execution | behavior-oracle |  | 交付目标定义；由 goal 引擎校验判定 |
+| skill:manage-history | execution | behavior-oracle |  | 交付知识库与 manifest；增量与去重可机器判定 |
+| skill:manage-instructions | execution | mixed-oracle |  | 指令文本由读者判、符号链接由脚本判；父 069 §Edge Cases 首条（069b 承接规范） |
+| skill:manage-todo | execution | behavior-oracle |  | 交付 TODO 块与搁置条目；由扫描器判定 |
+| skill:memory-recall | execution | behavior-oracle | yes | 类中立（memory）：检索并注入记忆，不产出自己的制品 |
+| skill:memory-record | execution | behavior-oracle | yes | 类中立（memory）：记录调用方流程的决策与状态 |
+| skill:research-feature | execution | behavior-oracle |  | 交付研究结论；由 plan 与 pre-analyze 检查消费判定 |
+| skill:review-sdd-process | execution | behavior-oracle |  | 交付评审结论；findings 逐条对回阶段记录与制品 |
+| skill:run-agent | execution | behavior-oracle |  | 交付一次代理运行结果；以运行行为判定 |
+| skill:run-interview | execution | mixed-oracle |  | 收敛须用户确认、ledger 由引擎传播；父 069 §Edge Cases 首条（069b 承接规范） |
+| skill:run-skills | execution | behavior-oracle |  | 交付技能运行结果；以实际执行判定 |
+| skill:run-team | execution | behavior-oracle |  | 交付团队运行报告；以运行结果判定 |
+| skill:sanitize-materials | execution | behavior-oracle |  | 交付清理结果与残留清单；由脚本复算判定 |
+| skill:self-improvement | execution | behavior-oracle |  | 交付改进点与运行记录；由引擎记录判定 |
+| skill:study-project | expression | reader-oracle |  | 交付架构分析报告；报告是否读懂由读者判定 |
+| skill:summarize-project | expression | reader-oracle |  | 交付项目总结报告；呈现是否可用由读者判定 |
+
+台账完备性以**仓库清单**为准：清单有而台账无 → 缺口，台账有而清单无 → 未登记项，两侧 MUST 双向覆盖、零缺口（对账由 `scripts/python/flow-class-check.py --action check` 执行）。
+同一单元在台账中 MUST 恰好一行；两行同值 → 重复，两行反值 → 双类冲突。
+
+## 类中立清单
+
+类中立是**封闭清单**：登记「承载调用方产物、没有自己的交付物」的共享技能，用来豁免「命令与其委托技能 MUST 同类」这一条约束。
+类中立**不改变**该单元自身的类别键（仍是一个二值），也**不豁免任何门禁**——门禁是否执行只由门禁 owner 的调用点表决定。
+清单外出现 `neutral: yes` 即缺陷；清单内条目 MUST 存在于技能清单且台账该行为 `neutral: yes`。
+
+| unit_id | category | rationale |
+| --- | --- | --- |
+| skill:memory-record | memory | 记录调用方流程的决策与状态，条目归属调用方，无独立交付物 |
+| skill:memory-recall | memory | 检索并向调用方注入已有记忆，不产出自己的制品 |
+| skill:manage-feedback | feedback | 汇总并分流调用方产生的反馈条目，条目归属上报单元 |
+| skill:collect-evidence | evidence | 为目标单元采集证据，findings 与边界声明归属被采集单元 |
+| skill:archive-session | session | 导出当前会话产物，内容归属被导出的会话 |
+
+## 变更记录
+
+台账每次类别变更 MUST 在此留一行：`date | unit_id | before → after | basis | 依据`。
+变更记录是审计痕迹，MUST NOT 被当作当前取值的来源——当前取值只从 § 逐流程台账 读。
+空表表示自本版起尚无类别变更。
+
+| date | unit_id | before → after | basis | 依据 |
+| --- | --- | --- | --- | --- |
+
+## 消费方指针
+
+- 读取类别：`scripts/python/flow-class-check.py --action lookup --unit-id <id>`（唯一读取路径；命令模板与技能 MUST NOT 内嵌类别副本）。
+- 对账：同引擎 `--action check`（八类 finding 与反空真下限归契约 `contracts/flow-class-ledger.md`）。
+- 门禁算子与调用点：`shared/workflow/expression-gates.md`（本文件不列举面名、算子与调用点）。

@@ -767,7 +767,8 @@ cleanup_selftest() {
 
 self_test() {
   local pass=0 fail=0
-  ST_TMP=$(mktemp -d "${TMPDIR:-/tmp}/watch-target-selftest.XXXXXX") || {
+  mkdir -p "$HOME/tmp"
+  ST_TMP=$(mktemp -d "$HOME/tmp/watch-target-selftest.XXXXXX") || {
     echo "SELF-TEST: cannot create temp dir" >&2
     return 1
   }

@@ -58,7 +58,7 @@ S2 分两层，**CLI 层先于项目层**：S2-0 python 运行时解析 → S2-1
 
 - **ensure（幂等门）**：`command -v specify` 在位 → 跳过安装（升级 = 重新执行 install.sh，clean reinstall 语义，阶梯内 upgrade-in-place 级优先既有安装的 python）。
 - **install（委托 install.sh）**：
-  1. 获取 install.sh——本地 spec-kit checkout 直接用（`<spec-kit-checkout>/install.sh`）；无 checkout 时 `git clone --depth 1 <三源之首> /tmp/spec-kit` 后用其根目录 install.sh；
+  1. 获取 install.sh——本地 spec-kit checkout 直接用（`<spec-kit-checkout>/install.sh`）；无 checkout 时 `git clone --depth 1 <三源之首> ~/tmp/spec-kit` 后用其根目录 install.sh；
   2. `cd <project-dir>` 后执行 `bash <install.sh> [args]`——参数直接透传（`--python` 钉阶梯、`--intranet-only` 纯内网、`--index-url` 显式指定、`--dry-run` 只看计划）；
   3. 退出码契约：`0` 成功 · `2` 缺前置（python/pip/git/uv）· `3` 无可用「源 × index」组合或全源安装失败 · `5` `specify check` 终验失败——非 0 一律视为安装未完成，按码处置不重试盲跑。
 - **验证**：install.sh 内置 `specify check` 终验；独立补验时在选定 bin 目录优先的前提下执行。

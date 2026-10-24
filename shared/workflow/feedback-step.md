@@ -8,6 +8,8 @@ wrap-up / Git-commit-prompt stage. Simple commands carry no wrap-up face at all 
 command is complex iff it invokes scripts/CLI tools, produces an artifact another flow
 consumes, or consumes another flow's artifact.
 
+**Orthogonal axis — no derivation either way.** The complexity criterion above decides only whether a wrap-up face exists; the execution / expression class axis decides only the set of gate operators. The two axes are orthogonal and MUST NOT be derived from each other; their criteria, two values and per-unit ledger are owned by `shared/definitions/flow-class-definitions.md`.
+
 **Embedding units reference this file; they do not copy it.** Each embedded
 `## Feedback` section is one of the two short pointer forms in § *Embedded reference
 forms* below — copy the form that matches the surface, substitute only the unit id,

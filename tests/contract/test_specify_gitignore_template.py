@@ -29,6 +29,7 @@ def test_template_uses_specify_relative_patterns():
         "instructions.md-*",
         "memory/sanitize/",
         "memory/trigger/telemetry.jsonl",
+        ".tmp/",
     ):
         assert pattern in body, f"missing .specify-relative rule: {pattern}"
     # Patterns are relative to .specify/, never repo-root-anchored.
@@ -39,5 +40,6 @@ def test_template_uses_specify_relative_patterns():
         ".specify/instructions.md-*",
         ".specify/memory/sanitize/",
         ".specify/memory/trigger/telemetry.jsonl",
+        ".specify/.tmp/",
     ):
         assert anchored not in body, f"repo-root-anchored rule leaked: {anchored}"
