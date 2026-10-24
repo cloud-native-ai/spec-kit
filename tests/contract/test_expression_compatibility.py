@@ -1,0 +1,657 @@
+"""Contract tests for 069a US3 — compatibility & distribution (T028).
+
+Owns the compatibility face of
+``.specify/specs/069a-flow-classification-docs-gates/contracts/compatibility-distribution.md``
+that ``tasks.md`` T028 names, plus the three US3 invariants the slice must keep
+mechanically checkable (stage integrity does not read the class; a class may
+never be read as a permission to skip / shorten / reclassify a stage; the
+unrefreshed form has no call sites at all):
+
+* **C-1 zero new commands** — ``templates/commands/`` holds exactly the frozen
+  27 command templates (count *and* name set), and no command file exists below
+  a subdirectory; ``skills/{external,internal}/*/SKILL.md`` holds exactly the
+  frozen 51 skill units.
+* **C-2 zero project-side storage** — nothing under ``.specify/memory/`` is a
+  second classification store (no classification-named file, no ledger-style
+  row, no ``flow_class`` assignment).
+* **C-3 one-package atomicity** — the four payload classes (``shared/``,
+  ``scripts/``, ``templates/``, ``skills/``) ship from the same wheel: the
+  first three through ``pyproject.toml`` ``force-include``, ``skills/``
+  through ``src/hatch_build.py`` staging.
+* **C-4 unrefreshed form** — at the pre-change HEAD the two command templates
+  and the two skills carry **no** call site; the wiring exists only in the
+  current tree, so an unrefreshed project behaves exactly as before.
+* **C-5 wiring surface is closed** — the 25 non-wiring templates and 49
+  non-wiring skills reference neither engine nor either owner document; the 74
+  non-wiring sources keep the sha256 recorded in
+  ``notes/pre-change-file-hashes.txt``; ``src/specify_cli/``, ``AGENTS.md`` and
+  ``.specify/instructions.md`` are untouched relative to the baseline.
+* **C-6 additive one-line pointer** — ``shared/workflow/feedback-step.md``
+  gains exactly one added line (the orthogonal-axis pointer) and loses
+  nothing: the pre-existing complexity criterion and red-line paragraphs are
+  byte-identical.
+* **C-7 mirrors** — every one of the seven owned sources that has a mirror is
+  byte-identical to it. The four new payloads may still be mirror-absent at
+  US3 (their mirrors land in T033); a mirror that exists MUST never drift, so
+  no mirror can be hand-edited and none can silently disappear.
+* **C-9 earlier specs** — 062 / 067 / 068 ``requirements.md`` stay
+  byte-identical (SC-008).
+* **Stage integrity** — the stage-integrity section of the gate owner reads no
+  class key and no lookup; the skip/shorten/reclassify triad appears exactly
+  once in the two owner documents and that one occurrence is the rejection
+  rule, stated without exception.
+
+Red-first (Constitution IV): the two ``C-6`` legs fail until T029 adds the
+pointer line — everything else pins invariants US1/US2 already established, so
+its job is to catch a regression of the compatibility surface, not to be red
+for its own sake. Failure messages name the frozen value and the contract
+clause, never a bare assertion.
+"""
+from __future__ import annotations
+
+import hashlib
+import re
+import subprocess
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "069a-flow-classification-docs-gates"
+HASH_MANIFEST = SPEC_DIR / "notes" / "pre-change-file-hashes.txt"
+
+# The slice's pre-change baseline (notes/pre-change-measurements.md § header).
+PRE_CHANGE_HEAD = "01d1feaa08d4541be2b59af30aa8c2e87128e55a"
+
+COMMANDS_DIR = REPO_ROOT / "templates" / "commands"
+SKILLS_DIR = REPO_ROOT / "skills"
+MEMORY_DIR = REPO_ROOT / ".specify" / "memory"
+
+CLASS_OWNER = "shared/definitions/flow-class-definitions.md"
+GATE_OWNER = "shared/workflow/expression-gates.md"
+FEEDBACK_STEP = REPO_ROOT / "shared" / "workflow" / "feedback-step.md"
+
+# The wiring surface (C-5): the only four files allowed to name an engine/owner.
+WIRING_TEMPLATES = ("docs.md", "humanize.md")
+WIRING_SKILLS = (
+    "skills/external/create-docs/SKILL.md",
+    "skills/external/humanize/SKILL.md",
+)
+
+# C-1 frozen denominator: 27 command templates (stem == `/speckit.<stem>`).
+FROZEN_COMMANDS = (
+    "agents",
+    "analyze",
+    "checklist",
+    "clarify",
+    "constitution",
+    "derive",
+    "docs",
+    "feature",
+    "feedback",
+    "goal",
+    "history",
+    "humanize",
+    "implement",
+    "improve",
+    "instructions",
+    "interview",
+    "plan",
+    "requirements",
+    "research",
+    "review",
+    "sanitize",
+    "session",
+    "skills",
+    "tasks",
+    "team",
+    "todo",
+    "tools",
+)
+
+# C-1 frozen denominator: 51 skill units, layer-qualified so a layer move or a
+# rename is a failure rather than a silent re-count.
+FROZEN_SKILLS = (
+    "external/create-docs",
+    "external/create-pages",
+    "external/create-skills",
+    "external/database-utils",
+    "external/document-utils",
+    "external/draw-diagram",
+    "external/git-utils",
+    "external/humanize",
+    "external/improve-docs",
+    "external/improve-skills",
+    "external/merge-skills",
+    "external/sdd-loop-driver",
+    "external/sdd-project-setup",
+    "external/think-skills",
+    "internal/analyze-artifacts",
+    "internal/archive-session",
+    "internal/clarify-artifact",
+    "internal/code-review",
+    "internal/collect-evidence",
+    "internal/create-agent",
+    "internal/create-checklist",
+    "internal/create-plan",
+    "internal/create-requirements",
+    "internal/create-tasks",
+    "internal/create-team",
+    "internal/create-tools",
+    "internal/derive-architecture",
+    "internal/implement-feature",
+    "internal/improve-agent",
+    "internal/improve-team",
+    "internal/improve-tools",
+    "internal/manage-agents",
+    "internal/manage-constitution",
+    "internal/manage-features",
+    "internal/manage-feedback",
+    "internal/manage-goal",
+    "internal/manage-history",
+    "internal/manage-instructions",
+    "internal/manage-todo",
+    "internal/memory-recall",
+    "internal/memory-record",
+    "internal/research-feature",
+    "internal/review-sdd-process",
+    "internal/run-agent",
+    "internal/run-interview",
+    "internal/run-skills",
+    "internal/run-team",
+    "internal/sanitize-materials",
+    "internal/self-improvement",
+    "internal/study-project",
+    "internal/summarize-project",
+)
+
+# C-5: no engine, no owner document may be named outside the wiring surface.
+ENGINE_OR_OWNER_TOKENS = (
+    "flow-class-check.py",
+    "expression-gates.md",
+    "doc-consistency-check.py",
+    "flow-class-definitions.md",
+)
+
+# SC-008 frozen hashes (notes/pre-change-measurements.md § 5).
+FROZEN_SPEC_HASHES = {
+    ".specify/specs/062-humanize-command/requirements.md":
+        "987b24ea1f98abb2a01d14779814eab28416f4ad1cbd81a36d51efb72d5f9da0",
+    ".specify/specs/067-loop-efficiency-hardening/requirements.md":
+        "29e26b701ebef9d80782b9a215ef97759290a384d898cb3320cfedde161fa0cd",
+    ".specify/specs/068-exec-quant-feedback-channel/requirements.md":
+        "ec20d5e28bd0eb5e2afdbd851cb753ef6e1c37a1c24e66b196f9305f18b45af7",
+}
+
+# C-7: the seven owned sources and their mirror targets (mirror paths follow
+# sync-mirrors.py MIRROR_PAIRS: shared -> .specify/shared, scripts ->
+# .specify/scripts, skills/external -> .specify/skills flat).
+MIRROR_PAIRS = {
+    "shared/definitions/flow-class-definitions.md":
+        ".specify/shared/definitions/flow-class-definitions.md",
+    "shared/workflow/expression-gates.md":
+        ".specify/shared/workflow/expression-gates.md",
+    "shared/workflow/feedback-step.md":
+        ".specify/shared/workflow/feedback-step.md",
+    "scripts/python/flow-class-check.py":
+        ".specify/scripts/python/flow-class-check.py",
+    "scripts/python/doc-consistency-check.py":
+        ".specify/scripts/python/doc-consistency-check.py",
+    "skills/external/create-docs/SKILL.md":
+        ".specify/skills/create-docs/SKILL.md",
+    "skills/external/humanize/SKILL.md":
+        ".specify/skills/humanize/SKILL.md",
+}
+
+# The four new payloads whose mirrors land in T033 (Polish). Absence is allowed
+# for exactly these; any other absent mirror is a regression.
+NEW_PAYLOAD_SOURCES = frozenset({
+    "shared/definitions/flow-class-definitions.md",
+    "shared/workflow/expression-gates.md",
+    "scripts/python/flow-class-check.py",
+    "scripts/python/doc-consistency-check.py",
+})
+
+LEDGER_ROW_RE = re.compile(
+    r"^\s*\|\s*`?(?:/speckit\.[a-z0-9-]+|skill:[a-z0-9-]+)`?\s*\|\s*"
+    r"(?:execution|expression)\s*\|"
+)
+CLASS_ASSIGN_RE = re.compile(
+    r"""flow_class["']?\s*[:=]\s*["']?(?:execution|expression)\b"""
+)
+CLASS_FILE_NAME_RE = re.compile(r"(flow[-_]?class|classification)", re.IGNORECASE)
+
+# Stage-skip vocabulary and the only acceptable polarity for a mention.
+SKIP_TRIAD = ("跳过", "缩短", "改判")
+SKIP_TOKENS = ("跳过", "缩短", "改判")
+SKIP_LATIN_TOKENS = ("skip", "exempt")
+# A mention is acceptable only when it forbids the move (or states that no
+# exception exists). A permission-shaped sentence carries none of these.
+NEGATION_MARKERS = (
+    "拒绝",
+    "MUST NOT",
+    "不得",
+    "无例外",
+    "不豁免",
+    "不把",
+    "不因",
+    "不被",
+    "不构成",
+    "不改变",
+)
+
+
+# --------------------------------------------------------------------------- #
+# helpers
+# --------------------------------------------------------------------------- #
+def _read(path: Path) -> str:
+    assert path.is_file(), "expected file missing: %s" % path.relative_to(REPO_ROOT)
+    return path.read_text(encoding="utf-8")
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _git(*args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        ["git", *args], cwd=str(REPO_ROOT), capture_output=True, text=True
+    )
+
+
+def _git_show(rev_path: str) -> str:
+    """Content of ``<rev>:<path>``; a missing object is a hard failure.
+
+    A silent skip here would turn "the unrefreshed form has no call site" into a
+    claim nobody checked, so the object is required.
+    """
+    proc = _git("show", rev_path)
+    assert proc.returncode == 0, (
+        "git object unavailable: %s — the compatibility face is anchored on the "
+        "pre-change HEAD recorded in notes/pre-change-measurements.md (stderr: %r)"
+        % (rev_path, proc.stderr)
+    )
+    return proc.stdout
+
+
+def _section(text: str, heading: str) -> str:
+    """Body of the ``## <heading>`` section, up to the next level-2 heading."""
+    lines = text.splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if line.strip() == heading:
+            start = index
+            continue
+        if start is not None and line.startswith("## "):
+            return "\n".join(lines[start:index])
+    assert start is not None, "section %r missing" % heading
+    return "\n".join(lines[start:])
+
+
+def _hash_manifest() -> dict[str, str]:
+    text = _read(HASH_MANIFEST)
+    entries: dict[str, str] = {}
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        match = re.match(r"^([0-9a-f]{64})  (.+)$", line)
+        assert match, "malformed manifest line: %r" % line
+        entries[match.group(2)] = match.group(1)
+    return entries
+
+
+# --------------------------------------------------------------------------- #
+# C-1 — zero new commands / frozen inventories
+# --------------------------------------------------------------------------- #
+def test_c1_zero_new_commands():
+    template_files = sorted(COMMANDS_DIR.glob("*.md"))
+    stems = sorted(path.stem for path in template_files)
+    assert stems == sorted(FROZEN_COMMANDS), (
+        "command template name set drifted (C-1: zero new / renamed / deleted "
+        "commands). expected %d, found %d; symmetric difference: %r"
+        % (
+            len(FROZEN_COMMANDS),
+            len(stems),
+            sorted(set(stems) ^ set(FROZEN_COMMANDS)),
+        )
+    )
+    nested = sorted(
+        path.relative_to(COMMANDS_DIR).as_posix()
+        for path in COMMANDS_DIR.rglob("*")
+        if path.is_file() and path.parent != COMMANDS_DIR
+    )
+    assert not nested, (
+        "command files must be flat under templates/commands/ (C-1); found: %r" % nested
+    )
+
+
+def test_c1_skill_inventory_is_frozen():
+    found = sorted(
+        "%s/%s" % (layer, directory.name)
+        for layer in ("external", "internal")
+        for directory in (SKILLS_DIR / layer).iterdir()
+        if directory.is_dir() and (directory / "SKILL.md").is_file()
+    )
+    assert found == sorted(FROZEN_SKILLS), (
+        "skill inventory drifted (C-1: zero new / renamed / deleted skills). "
+        "expected %d, found %d; symmetric difference: %r"
+        % (
+            len(FROZEN_SKILLS),
+            len(found),
+            sorted(set(found) ^ set(FROZEN_SKILLS)),
+        )
+    )
+    orphans = sorted(
+        directory.relative_to(SKILLS_DIR).as_posix()
+        for layer in ("external", "internal")
+        for directory in (SKILLS_DIR / layer).iterdir()
+        if directory.is_dir() and not (directory / "SKILL.md").is_file()
+    )
+    assert not orphans, (
+        "skill directories without SKILL.md would escape the inventory (C-1): %r"
+        % orphans
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-5 — non-wiring sources keep their frozen bytes; framework paths untouched
+# --------------------------------------------------------------------------- #
+def test_c5_non_wiring_files_keep_their_frozen_hashes():
+    manifest = _hash_manifest()
+    templates = [rel for rel in manifest if rel.startswith("templates/commands/")]
+    skills = [rel for rel in manifest if rel.startswith("skills/")]
+    assert len(manifest) == 74, "hash manifest must cover 74 sources, found %d" % len(manifest)
+    assert len(templates) == 25, "hash manifest must cover 25 templates, found %d" % len(templates)
+    assert len(skills) == 49, "hash manifest must cover 49 skills, found %d" % len(skills)
+    assert not any(rel.endswith(tuple(WIRING_TEMPLATES)) for rel in templates), (
+        "the manifest is the NON-wiring complement; it still lists a wiring template"
+    )
+    assert not any(rel in WIRING_SKILLS for rel in skills), (
+        "the manifest is the NON-wiring complement; it still lists a wiring skill"
+    )
+
+    drifted: list[str] = []
+    missing: list[str] = []
+    for rel, expected in sorted(manifest.items()):
+        path = REPO_ROOT / rel
+        if not path.is_file():
+            missing.append(rel)
+            continue
+        if _sha256(path) != expected:
+            drifted.append(rel)
+    assert not missing, (
+        "non-wiring source disappeared (C-5, zero new commands/skills): %r" % missing
+    )
+    assert not drifted, (
+        "non-wiring source changed (C-5: the slice may only touch W1-W4 and the "
+        "feedback-step pointer). drifted: %r" % drifted
+    )
+
+
+def test_c5_untouchable_framework_paths_are_unchanged():
+    # Slice-scoped completion guard: it answers "did 069a touch these?" — a later
+    # feature that legitimately edits them refreshes its own baseline record.
+    proc = _git(
+        "diff",
+        "--name-only",
+        PRE_CHANGE_HEAD,
+        "--",
+        "src/specify_cli",
+        "AGENTS.md",
+        ".specify/instructions.md",
+    )
+    assert proc.returncode == 0, "git diff failed: %r" % proc.stderr
+    changed = [line for line in proc.stdout.splitlines() if line.strip()]
+    assert not changed, (
+        "paths the slice must not touch changed relative to %s: %r"
+        % (PRE_CHANGE_HEAD[:8], changed)
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-2 — zero project-side classification storage
+# --------------------------------------------------------------------------- #
+def test_c2_no_project_side_classification_store():
+    offenders: list[str] = []
+    for path in sorted(MEMORY_DIR.rglob("*")):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(REPO_ROOT).as_posix()
+        if CLASS_FILE_NAME_RE.search(path.name):
+            offenders.append("%s — classification-named file" % rel)
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        for number, line in enumerate(text.splitlines(), 1):
+            if LEDGER_ROW_RE.match(line):
+                offenders.append("%s:%d — ledger-style unit/class row" % (rel, number))
+            elif CLASS_ASSIGN_RE.search(line):
+                offenders.append("%s:%d — flow_class assignment" % (rel, number))
+    assert not offenders, (
+        "C-2: no classification data may be stored project-side (the ledger is "
+        "the owner document, delivered with shared/). found:\n- "
+        + "\n- ".join(offenders)
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-5 — the wiring surface is closed
+# --------------------------------------------------------------------------- #
+def test_c5_wiring_surface_is_closed():
+    offenders: list[str] = []
+    for path in sorted(COMMANDS_DIR.glob("*.md")):
+        if path.name in WIRING_TEMPLATES:
+            continue
+        text = path.read_text(encoding="utf-8")
+        offenders.extend(
+            "%s -> %s" % (path.relative_to(REPO_ROOT).as_posix(), token)
+            for token in ENGINE_OR_OWNER_TOKENS
+            if token in text
+        )
+    for skill_file in sorted(SKILLS_DIR.glob("external/*/SKILL.md")) + sorted(
+        SKILLS_DIR.glob("internal/*/SKILL.md")
+    ):
+        if skill_file.relative_to(REPO_ROOT).as_posix() in WIRING_SKILLS:
+            continue
+        text = skill_file.read_text(encoding="utf-8")
+        offenders.extend(
+            "%s -> %s" % (skill_file.relative_to(REPO_ROOT).as_posix(), token)
+            for token in ENGINE_OR_OWNER_TOKENS
+            if token in text
+        )
+    assert not offenders, (
+        "C-5: wiring is closed to W1-W4; extra references found:\n- "
+        + "\n- ".join(offenders)
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-4 — the unrefreshed form carries no call site
+# --------------------------------------------------------------------------- #
+def test_c4_unrefreshed_form_has_no_call_sites():
+    targets = (
+        "templates/commands/docs.md",
+        "templates/commands/humanize.md",
+    ) + WIRING_SKILLS
+    tokens = ENGINE_OR_OWNER_TOKENS + ("--action lookup",)
+    for rel in targets:
+        old = _git_show("%s:%s" % (PRE_CHANGE_HEAD, rel))
+        hits = [token for token in tokens if token in old]
+        assert not hits, (
+            "%s already carried %r at the pre-change HEAD — an unrefreshed "
+            "project would then have a call site without the owner/engine (C-4)"
+            % (rel, hits)
+        )
+    # Positive control: the same files DO carry the wiring now, so the check
+    # above is measuring the slice's own addition rather than a constant.
+    assert "flow-class-check.py" in _read(COMMANDS_DIR / "docs.md")
+    assert "flow-class-check.py" in _read(SKILLS_DIR / "external" / "humanize" / "SKILL.md")
+
+
+# --------------------------------------------------------------------------- #
+# C-3 — one package carries all four payload classes
+# --------------------------------------------------------------------------- #
+def test_c3_payloads_ship_in_one_package():
+    pyproject = _read(REPO_ROOT / "pyproject.toml")
+    for payload in ("shared", "scripts", "templates"):
+        pattern = r'^"%s"\s*=\s*"specify_cli/%s"' % (payload, payload)
+        assert re.search(pattern, pyproject, re.MULTILINE), (
+            "C-3: payload %r is not force-included in the wheel" % payload
+        )
+    hatch = _read(REPO_ROOT / "src" / "hatch_build.py")
+    assert "_stage_skills" in hatch and '"specify_cli/skills"' in hatch, (
+        "C-3: skills/ must ride the same wheel through the hatch_build staging copy"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-7 — mirrors never drift (the four new payloads may land in T033)
+# --------------------------------------------------------------------------- #
+def test_c7_mirrors_are_byte_identical():
+    problems: list[str] = []
+    for source_rel, mirror_rel in sorted(MIRROR_PAIRS.items()):
+        source = REPO_ROOT / source_rel
+        mirror = REPO_ROOT / mirror_rel
+        assert source.is_file(), "owned source missing: %s" % source_rel
+        if not mirror.is_file():
+            if source_rel not in NEW_PAYLOAD_SOURCES:
+                problems.append("%s — mirror disappeared" % mirror_rel)
+            continue
+        if source.read_bytes() != mirror.read_bytes():
+            problems.append("%s — mirror differs from %s" % (mirror_rel, source_rel))
+    assert not problems, (
+        "C-7: mirrors are projections of the framework source, never hand-edited "
+        "(absence is tolerated only for the four new payloads until T033):\n- "
+        + "\n- ".join(problems)
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-9 — earlier specs stay byte-identical (SC-008)
+# --------------------------------------------------------------------------- #
+def test_c9_pre_completion_specs_stay_byte_identical():
+    for rel, expected in FROZEN_SPEC_HASHES.items():
+        path = REPO_ROOT / rel
+        assert path.is_file(), "frozen spec missing: %s" % rel
+        assert _sha256(path) == expected, (
+            "SC-008: %s changed — 062 / 067 / 068 are referenced, never rewritten" % rel
+        )
+
+
+# --------------------------------------------------------------------------- #
+# Stage integrity — no class read, skip/shorten/reclassify only as rejection
+# --------------------------------------------------------------------------- #
+def test_stage_integrity_section_reads_no_class():
+    gates = _read(REPO_ROOT / GATE_OWNER)
+    body = _section(gates, "## 阶段不变量")
+    assert body.strip(), "the gate owner must carry a stage-integrity section"
+    for token in ("flow_class", "flow-class-check.py", "--action lookup", "--unit-id"):
+        assert token not in body, (
+            "stage integrity MUST be judged from existing stage records, never "
+            "from the class — found %r in the section" % token
+        )
+    assert "既有阶段记录" in body, (
+        "the section must name the stage record as the judge"
+    )
+    assert re.search(r"analyze", body) and re.search(r"review", body), (
+        "analyze and review must both be named as 100%% call-rate stages"
+    )
+    assert "100%" in body, "the 100%% call rate for analyze and review must be stated"
+
+
+def test_stage_skip_claims_only_appear_as_rejection():
+    owners = (REPO_ROOT / CLASS_OWNER, REPO_ROOT / GATE_OWNER)
+    triad_hits: list[tuple[str, int, str]] = []
+    permission_shaped: list[str] = []
+    for owner in owners:
+        rel = owner.relative_to(REPO_ROOT).as_posix()
+        for number, line in enumerate(_read(owner).splitlines(), 1):
+            lowered = line.lower()
+            hits = [token for token in SKIP_TOKENS if token in line]
+            hits += [token for token in SKIP_LATIN_TOKENS if token in lowered]
+            # 豁免 counts only when it touches a stage or a gate (the class-neutral
+            # exemption is a different subject and is owned by the ledger section).
+            if "豁免" in line and re.search(r"阶段|门禁|gate|stage", line):
+                hits.append("豁免")
+            if not hits:
+                continue
+            if all(token in line for token in SKIP_TRIAD):
+                triad_hits.append((rel, number, line.strip()))
+            if not any(marker in line for marker in NEGATION_MARKERS):
+                permission_shaped.append(
+                    "%s:%d — %r (%r)" % (rel, number, line.strip(), hits)
+                )
+    assert not permission_shaped, (
+        "a skip / shorten / reclassify mention must be forbidden, never permitted "
+        "(FR-014):\n- " + "\n- ".join(permission_shaped)
+    )
+    assert len(triad_hits) == 1, (
+        "the skip+shorten+reclassify triad must appear exactly once (the rejection "
+        "rule); found %d: %r" % (len(triad_hits), triad_hits)
+    )
+    rel, number, line = triad_hits[0]
+    assert "拒绝" in line and "无例外" in line, (
+        "the single skip/shorten/reclassify occurrence must be the rejection rule "
+        "stated without exception, found %s:%d — %r" % (rel, number, line)
+    )
+    assert rel == GATE_OWNER, (
+        "the rejection rule belongs to the gate owner's stage invariants, found in %s" % rel
+    )
+    stages = _read(REPO_ROOT / GATE_OWNER)
+    assert line in _section(stages, "## 阶段不变量"), (
+        "the rejection rule must live in the gate owner's stage-integrity section"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-6 — the feedback-step orthogonal pointer (T029; red until it lands)
+# --------------------------------------------------------------------------- #
+def test_c6_feedback_step_declares_orthogonal_axes():
+    text = _read(FEEDBACK_STEP)
+    pointer_lines = [
+        line for line in text.splitlines() if CLASS_OWNER in line
+    ]
+    assert pointer_lines, (
+        "shared/workflow/feedback-step.md carries no pointer to %s — the "
+        "complexity axis and the class axis must be declared orthogonal (FR-004 / "
+        "C-6). Red is the pre-T029 state." % CLASS_OWNER
+    )
+    assert len(pointer_lines) == 1, (
+        "the orthogonal pointer must be a single line, found %d: %r"
+        % (len(pointer_lines), pointer_lines)
+    )
+    line = pointer_lines[0]
+    lowered = line.lower()
+    for token in ("orthogonal", "complexity", "gate operator"):
+        assert token in lowered, (
+            "the pointer line must state the orthogonal split (missing %r): %r"
+            % (token, line)
+        )
+    assert "derived from each other" in lowered, (
+        "the pointer line must forbid deriving one axis from the other: %r" % line
+    )
+
+
+def test_c6_feedback_step_edit_is_additive_single_line():
+    proc = _git("diff", "-U0", PRE_CHANGE_HEAD, "--", "shared/workflow/feedback-step.md")
+    assert proc.returncode == 0, "git diff failed: %r" % proc.stderr
+    removed: list[str] = []
+    added: list[str] = []
+    for line in proc.stdout.splitlines():
+        if line.startswith("---") or line.startswith("+++"):
+            continue
+        if line.startswith("-"):
+            removed.append(line)
+        elif line.startswith("+") and line[1:].strip():
+            added.append(line[1:])
+    assert not removed, (
+        "C-6: the existing complexity criterion and red-line paragraphs must stay "
+        "byte-identical — removed lines: %r" % removed
+    )
+    assert len(added) == 1, (
+        "C-6: exactly one pointer line may be added to feedback-step.md, found %d: %r"
+        % (len(added), added)
+    )
+    assert CLASS_OWNER in added[0], (
+        "the added line must point at %s: %r" % (CLASS_OWNER, added[0])
+    )

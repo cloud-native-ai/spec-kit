@@ -217,13 +217,13 @@ T001 / T002 / T003（改前基线）、T004 / T005 / T006（分类侧红先测�
 
 > **NOTE: 先写这些测试并确认其失败，再进入实现。**
 
-- [ ] T028 [US3] 红先编写契约测试到 `tests/contract/test_expression_compatibility.py`：`templates/commands/` 文件集 = 27 个名字集合不变、`skills/{external,internal}/*/SKILL.md` = 51 个名字集合不变；`notes/pre-change-file-hashes.txt` 里 25 个非接线模板 + 49 个非接线技能 sha256 全部不变；062 / 067 / 068 的 `requirements.md` sha256 与冻结值一致；`src/specify_cli/`、`AGENTS.md`、`.specify/instructions.md` 相对基线哈希零改动；零新增命令；仓库内零新增项目侧存储路径（`.specify/memory/` 下无分类数据文件）；接线封闭集之外零引擎/owner 引用；`.specify/` 镜像与源同字节；运行红跑并写入 `notes/red-first-evidence.md`。 [blockedBy: T001]
+- [X] T028 [US3] 红先编写契约测试到 `tests/contract/test_expression_compatibility.py`：`templates/commands/` 文件集 = 27 个名字集合不变、`skills/{external,internal}/*/SKILL.md` = 51 个名字集合不变；`notes/pre-change-file-hashes.txt` 里 25 个非接线模板 + 49 个非接线技能 sha256 全部不变；062 / 067 / 068 的 `requirements.md` sha256 与冻结值一致；`src/specify_cli/`、`AGENTS.md`、`.specify/instructions.md` 相对基线哈希零改动；零新增命令；仓库内零新增项目侧存储路径（`.specify/memory/` 下无分类数据文件）；接线封闭集之外零引擎/owner 引用；`.specify/` 镜像与源同字节；运行红跑并写入 `notes/red-first-evidence.md`。 [blockedBy: T001]
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] 在 `shared/workflow/feedback-step.md` 增补一行正交指针（既有复杂度判据与红线段落零改动）：声明复杂度轴决定 wrap-up 面有无、类别轴决定门禁算子集、两轴不互相推导，判据与台账归 `shared/definitions/flow-class-definitions.md`；该文件不得复制判据或台账。 [blockedBy: T007]
-- [ ] T030 [US3] 兼容面转绿并取证：运行 `tests/contract/test_expression_compatibility.py` 至全绿（只读执行），绿证据追加 `notes/red-first-evidence.md`；另实测「未刷新项目」形态——`git show <改前 HEAD>:templates/commands/docs.md` 与同法 humanize 模板不含 `flow-class-check.py`（零调用点、行为与接线前逐字一致），并核对 `pyproject.toml` 的 `force-include` 与 `src/hatch_build.py` 覆盖四类载荷（`shared/`、`scripts/`、`templates/`、`skills/`）以证同包原子性；`<改前 HEAD>` 取 `notes/pre-change-measurements.md` 记录值。 [blockedBy: T028] [green: contracts/compatibility-distribution.md#C-1] [green: contracts/compatibility-distribution.md#C-2] [green: contracts/compatibility-distribution.md#C-3]
-- [ ] T031 [US3] 防滥用审计（只读核对并留证）：① 在 `shared/definitions/flow-class-definitions.md` 与 `shared/workflow/expression-gates.md` 检索「跳过 / 缩短 / skip / exempt」类表述，确认唯一命中是拒绝规则本身且不带例外；② 确认阶段完整性判定段落不出现类别键（[[STR-003]]）读取（命中即判缺陷）；③ 确认 analyze 与 review 调用率 100% 的明文在场；④ 用 `grep -c` 记录两个命令模板的类别赋值字面量为 0；把四条命令与真实输出写入 `notes/red-first-evidence.md` 的防滥用小节。 [blockedBy: T030]
+- [X] T029 [US3] 在 `shared/workflow/feedback-step.md` 增补一行正交指针（既有复杂度判据与红线段落零改动）：声明复杂度轴决定 wrap-up 面有无、类别轴决定门禁算子集、两轴不互相推导，判据与台账归 `shared/definitions/flow-class-definitions.md`；该文件不得复制判据或台账。 [blockedBy: T007]
+- [X] T030 [US3] 兼容面转绿并取证：运行 `tests/contract/test_expression_compatibility.py` 至全绿（只读执行），绿证据追加 `notes/red-first-evidence.md`；另实测「未刷新项目」形态——`git show <改前 HEAD>:templates/commands/docs.md` 与同法 humanize 模板不含 `flow-class-check.py`（零调用点、行为与接线前逐字一致），并核对 `pyproject.toml` 的 `force-include` 与 `src/hatch_build.py` 覆盖四类载荷（`shared/`、`scripts/`、`templates/`、`skills/`）以证同包原子性；`<改前 HEAD>` 取 `notes/pre-change-measurements.md` 记录值。 [blockedBy: T028] [green: contracts/compatibility-distribution.md#C-1] [green: contracts/compatibility-distribution.md#C-2] [green: contracts/compatibility-distribution.md#C-3]
+- [X] T031 [US3] 防滥用审计（只读核对并留证）：① 在 `shared/definitions/flow-class-definitions.md` 与 `shared/workflow/expression-gates.md` 检索「跳过 / 缩短 / skip / exempt」类表述，确认唯一命中是拒绝规则本身且不带例外；② 确认阶段完整性判定段落不出现类别键（[[STR-003]]）读取（命中即判缺陷）；③ 确认 analyze 与 review 调用率 100% 的明文在场；④ 用 `grep -c` 记录两个命令模板的类别赋值字面量为 0；把四条命令与真实输出写入 `notes/red-first-evidence.md` 的防滥用小节。 [blockedBy: T030]
 
 **Checkpoint**: US3 独立可验收——正交声明与阶段不变量在读面上无漏洞、前序三规格字节不变、零新命令与零项目侧存储成立、接线面封闭可机械核对。
 

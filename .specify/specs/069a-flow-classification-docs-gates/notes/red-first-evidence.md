@@ -673,3 +673,278 @@ test_compile_propagation_order.py::test_propagation_chain_is_green_in_canonical_
 本段唯一提交含：W1–W4 四个接线文件（2 个命令模板 + 2 个技能源）、两个技能源对应的 `.specify/skills/` 镜像、
 8 个重生成的命令副本、`tasks.md` 的 T022–T027 勾选与本文件。commit 见 `git log -1 --format=%H`
 （分支 `069-execution-expression-sdd`）。
+
+---
+
+# US3 测试先行段（T028 / T029 / T030 / T031）
+
+**Scope**: US3 = 防滥用与兼容（`contracts/compatibility-distribution.md` C-1…C-10 + FR-014 / FR-026 / SC-008）。
+**Captured**: 2026-10-24T14:4x Z（+0800 22:4x，同日；逐项时刻见各节）
+**Branch**: `069-execution-expression-sdd` | **HEAD at start**: `d0b3f7dc5f81e9781815aef068c7f6b3767a7ca8`
+**Interpreter**: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（pytest 9.1.1）
+
+## 32. 红跑：T028 兼容面契约测试（owner/接线落盘后、US3 实现前）
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_compatibility.py -q --tb=short -p no:cacheprovider
+# exit code: 1
+# 2 failed, 12 passed in 0.35s（复跑 0.85s，失败 node id 相同）
+```
+
+采集面自检（同一解释器、同一树）：
+
+```text
+pytest tests/contract/test_expression_compatibility.py --collect-only -q  →  14 tests collected (exit 0)
+python3 -m py_compile tests/contract/test_expression_compatibility.py      →  COMPILE-OK (exit 0)
+```
+
+两条失败（逐字）：
+
+```text
+E   AssertionError: shared/workflow/feedback-step.md carries no pointer to shared/definitions/flow-class-definitions.md — the complexity axis and the class axis must be declared orthogonal (FR-004 / C-6). Red is the pre-T029 state.
+E   assert []
+
+E   AssertionError: C-6: exactly one pointer line may be added to feedback-step.md, found 0: []
+E   assert 0 == 1
+```
+
+红的原因单一：US3 的实现行 T029 尚未落盘（`shared/workflow/feedback-step.md` 里没有指向分类 owner 的正交指针）。
+
+**12 条先行转绿不是「已实现」，而是负向守卫**（钉住 US1/US2 已交付的既有面，本段只证明它们未被本切片改动）：
+
+| 绿点 | 钉住的既有面 |
+|------|--------------|
+| `test_c1_zero_new_commands` / `test_c1_skill_inventory_is_frozen` | 27 个命令模板 + 51 个技能单元的冻结名字集合与层级 |
+| `test_c5_non_wiring_files_keep_their_frozen_hashes` | `notes/pre-change-file-hashes.txt` 的 74 行（25 模板 + 49 技能）逐文件 sha256 |
+| `test_c5_untouchable_framework_paths_are_unchanged` | `src/specify_cli/`、`AGENTS.md`、`.specify/instructions.md` 相对改前 HEAD 零改动 |
+| `test_c2_no_project_side_classification_store` | `.specify/memory/` 下无分类数据文件 / 台账样式行 / `flow_class` 赋值 |
+| `test_c5_wiring_surface_is_closed` | W1–W4 之外零引擎/owner 引用 |
+| `test_c4_unrefreshed_form_has_no_call_sites` | 改前 HEAD 的四个接线文件零调用点（见 §34 实测） |
+| `test_c3_payloads_ship_in_one_package` | 四类载荷同包（force-include 三项 + hatch 阶段拷 skills） |
+| `test_c7_mirrors_are_byte_identical` | 7 个源文件的镜像同字节；4 个新载荷允许缺镜像（T033） |
+| `test_c9_pre_completion_specs_stay_byte_identical` | 062/067/068 `requirements.md` sha256 |
+| `test_stage_integrity_section_reads_no_class` | 门禁 owner § 阶段不变量 不读类别键、不调 lookup |
+| `test_stage_skip_claims_only_appear_as_rejection` | 跳过/缩短/改判三连唯一命中 = 拒绝规则，且逐行无「许可式」表述 |
+
+## 33. T029 正交指针：唯一新增行
+
+**落点**：`shared/workflow/feedback-step.md` 开篇复杂度判据段（以 `... or consumes another flow's artifact.` 结尾）之后、`**Embedding units reference this file; they do not copy it.**` 之前；单条独立段落，物理一行（该文件既有最长行 641 字符，长行有先例）。
+
+**新增内容（逐字）**：
+
+```text
+**Orthogonal axis — no derivation either way.** The complexity criterion above decides only whether a wrap-up face exists; the execution / expression class axis decides only the set of gate operators. The two axes are orthogonal and MUST NOT be derived from each other; their criteria, two values and per-unit ledger are owned by `shared/definitions/flow-class-definitions.md`.
+```
+
+**既有判据与红线段落零改动（机器证据，`-U0` 全量差异）**：
+
+```text
+$ git diff -U0 01d1feaa -- shared/workflow/feedback-step.md
+@@ -10,0 +11,2 @@ consumes, or consumes another flow's artifact.
++**Orthogonal axis — no derivation either way.** … `shared/definitions/flow-class-definitions.md`.
++
+```
+
+差异只有 `+` 两行（指针行 + 其后空行），`-` 行为 0 —— 复杂度判据段与 § Positioning & Red Lines 逐字未动。
+该文件在本切片内**只**获得这一处指针：不复制判据、不列举取值、不出现台账行（`C-6`）。
+
+## 34. T030 兼容面转绿与两条实测
+
+### 34.1 转绿
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_compatibility.py -q --tb=short -p no:cacheprovider
+# 14 passed in 0.24s   （exit 0）
+```
+
+**镜像腿的红→绿闭环（同一支测试内的真实红，非构造）**：加入指针行后、同步镜像前，`test_c7_mirrors_are_byte_identical` 转红并点名唯一差异：
+
+```text
+E   AssertionError: C-7: mirrors are projections of the framework source, never hand-edited (absence is tolerated only for the four new payloads until T033):
+      - .specify/shared/workflow/feedback-step.md — mirror differs from shared/workflow/feedback-step.md
+```
+
+修复走投影工具、不手改镜像：
+
+```bash
+python3 scripts/python/sync-mirrors.py --write --only shared/workflow/feedback-step.md
+# scope --only: shared/workflow/feedback-step.md
+# DIFF  .specify/shared/workflow/feedback-step.md
+# sync  shared/ -> .specify/shared/ (1 files)
+# exit 0
+cmp -s shared/workflow/feedback-step.md .specify/shared/workflow/feedback-step.md  →  BYTE-IDENTICAL
+```
+
+### 34.2 未刷新项目形态（`git show`，改前 HEAD 取 `notes/pre-change-measurements.md` 记录值 `01d1feaa`）
+
+```text
+$ for f in templates/commands/docs.md templates/commands/humanize.md \
+           skills/external/create-docs/SKILL.md skills/external/humanize/SKILL.md; do
+    git show 01d1feaa08d4541be2b59af30aa8c2e87128e55a:$f | grep -cE 'flow-class-check\.py|flow-class-definitions\.md|expression-gates\.md|doc-consistency-check\.py|--action lookup'
+  done
+templates/commands/docs.md                       -> 0
+templates/commands/humanize.md                   -> 0
+skills/external/create-docs/SKILL.md             -> 0
+skills/external/humanize/SKILL.md                -> 0
+```
+
+阳性对照（同一批 token 在当前树上的真实计数，证明上面测的是本切片新增的差异，不是常量）：
+
+```text
+templates/commands/docs.md             -> 1 --action lookup, 1 doc-consistency-check.py, 1 expression-gates.md, 1 flow-class-check.py, 1 flow-class-definitions.md
+templates/commands/humanize.md         -> 1 expression-gates.md, 1 flow-class-definitions.md（零脚本调用）
+skills/external/create-docs/SKILL.md   -> 2 doc-consistency-check.py, 2 expression-gates.md, 2 flow-class-definitions.md
+skills/external/humanize/SKILL.md      -> 1 --action lookup, 1 expression-gates.md, 1 flow-class-check.py, 1 flow-class-definitions.md
+```
+
+结论：未刷新项目拿到的是旧命令副本与旧技能，**零调用点**；`.specify/shared/` 与 `.specify/scripts/` 侧的两份 owner 与两个引擎同包到达，不存在「有调用点却无 owner/引擎」的稳定态（C-4）。
+
+### 34.3 四类载荷同包原子性
+
+```text
+$ grep -nE '^"(memory|scripts|templates|agents|shared)"' pyproject.toml
+33:"memory" = "specify_cli/memory"
+34:"scripts" = "specify_cli/scripts"
+35:"templates" = "specify_cli/templates"
+36:"agents" = "specify_cli/agents"
+37:"shared" = "specify_cli/shared"
+38:# "skills" is intentionally absent here: src/hatch_build.py stage-copies it
+
+$ grep -nE '_stage_skills|specify_cli/skills|_SKILLS_SRC' src/hatch_build.py
+38:_SKILLS_SRC = _REPO_ROOT / "skills"
+42:def _stage_skills(build_data):
+59:    build_data.setdefault("force_include", {})[str(staged)] = "specify_cli/skills"
+78:    _stage_skills(build_data)
+```
+
+四类载荷（`shared/`、`scripts/`、`templates/`、`skills/`）由同一个 wheel 提供：前三项静态 `force-include`，`skills/` 由同一构建钩子的阶段拷贝注册进 `force_include`（045/046 既有机制，本切片零改动）。
+
+## 35. T031 防滥用审计（只读，命令与真实输出）
+
+### ① 「跳过 / 缩短 / 改判 / skip / exempt」表述：三连唯一命中 = 拒绝规则
+
+```text
+$ grep -nE '跳过|缩短|改判|skip|exempt|豁免' shared/definitions/flow-class-definitions.md shared/workflow/expression-gates.md
+shared/definitions/flow-class-definitions.md:61:  … 构建绿只证明发布面可用（必要条件），不把文档内容改判为 `execution`。
+shared/definitions/flow-class-definitions.md:71: 类别 MUST NOT 被用作跳过或缩短阶段的开关：…（本文件不复述）。
+shared/definitions/flow-class-definitions.md:183: 类中立是**封闭清单**：… 用来豁免「命令与其委托技能 MUST 同类」这一条约束。
+shared/definitions/flow-class-definitions.md:184: 类中立**不改变**该单元自身的类别键（仍是一个二值），也**不豁免任何门禁**——…
+shared/workflow/expression-gates.md:120: - 任何以「本流程属表达类」为由跳过、缩短或改判阶段的请求 MUST 被拒绝——该规则无例外。
+```
+
+判读（四条）：
+
+- **三连（跳过 ∧ 缩短 ∧ 改判）唯一命中** `expression-gates.md:120`，且该行带「MUST 被拒绝」与「该规则**无例外**」——唯一命中就是拒绝规则本身，无许可式例外。
+- 61 行是「**不把**文档内容改判为某类」的判据禁令（不是阶段改判），含否定词。
+- 71 行是「类别 **MUST NOT** 被用作跳过或缩短阶段的开关」的指针，含否定词。
+- 183/184 行的「豁免」是**类中立豁免「命令↔委托技能同类」这一条约束**，与阶段/门禁无关；184 行紧接明文「也**不豁免任何门禁**」。审计判据（全部命中行都必须带否定/禁止词）在测试 `test_stage_skip_claims_only_appear_as_rejection` 内机器执行，本行给出人工复核。
+
+### ② 阶段完整性段落零类别键读取
+
+```text
+$ python3 - <<'PY'  # 取 § 阶段不变量 整段后逐 token 计数
+section_lines=6
+  flow_class                   -> 0
+  flow-class-check.py          -> 0
+  --action lookup              -> 0
+  --unit-id                    -> 0
+  flow-class-definitions.md    -> 0
+
+## 阶段不变量
+
+- 阶段完整性由既有阶段记录判定，类别 MUST NOT 参与该判定。
+- `analyze` 与 `review` 的调用率 MUST 为 100%。
+- 任何以「本流程属表达类」为由跳过、缩短或改判阶段的请求 MUST 被拒绝——该规则无例外。
+```
+
+判读：判定依据只取「既有阶段记录」，类别以**禁止参与**的形式出现（不是读取），段内无类别键、无引擎调用、无 lookup。
+
+### ③ analyze / review 调用率 100% 明文在场
+
+```text
+$ grep -nE '100%' shared/workflow/expression-gates.md
+41:| analyze | `/speckit.analyze`（调用率 100%） | fact-consistency | blocking |
+45:| review | `/speckit.review`（调用率 100%，按读者基准判定） | review | blocking |
+119:- `analyze` 与 `review` 的调用率 MUST 为 100%。
+```
+
+### ④ 两个命令模板的类别赋值字面量 = 0
+
+```text
+$ for f in templates/commands/docs.md templates/commands/humanize.md; do
+    echo "$f -> flow_class[:=] count=$(grep -cE 'flow_class[[:space:]]*[:=]' "$f")"
+  done
+templates/commands/docs.md -> flow_class[:=] count=0
+templates/commands/humanize.md -> flow_class[:=] count=0
+```
+
+### ⑤ 接线面封闭（W1–W4 之外零调用点）
+
+```text
+checked=74 (25 templates + 49 skills) offenders=0
+```
+
+判据：对 74 个非接线文件逐个检索 `flow-class-check.py` / `expression-gates.md` / `doc-consistency-check.py` / `flow-class-definitions.md`，命中数 0。
+
+**审计结论**：四条面均无漏洞——类别不可作为跳过开关（拒绝规则唯一且无例外）、阶段完整性不读类别、analyze/review 100% 明文在场、接线面封闭、接线文本零类别赋值。
+
+## 36. 定向回归与镜像面（本段已执行）
+
+```bash
+# 069a 全家 + 接线邻居 + 前序表面
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_gates_doc.py tests/contract/test_expression_gate_wiring.py \
+  tests/contract/test_docs_command_template.py tests/contract/test_humanize_command_surface.py \
+  tests/contract/test_flow_class_ledger.py tests/contract/test_flow_class_correctness.py \
+  tests/contract/test_doc_consistency_checker.py \
+  tests/unit/test_flow_class_check.py tests/unit/test_doc_consistency_rules.py -q
+# 142 passed in 11.84s   （exit 0）
+
+# 读取 feedback-step.md 的既有套件 + 本支兼容测试
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_compatibility.py \
+  tests/contract/test_feedback_mechanism_boundary.py tests/contract/test_feedback_command_classification.py \
+  tests/contract/test_run_determination_passive_wiring.py tests/contract/test_token_efficiency_discipline.py \
+  tests/contract/test_shared_reference_directory.py tests/contract/test_self_improvement_conformance.py \
+  tests/contract/test_compile_embeds.py -q
+# 1 failed, 125 passed in 2.17s
+# 唯一失败 = test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+#   → 已在 notes/test-baseline-contract.txt 第 37 行（既有红，本段零触碰）
+```
+
+镜像面与副本面（相对改前基线，**零新增差异**）：
+
+```text
+$ python3 scripts/python/sync-mirrors.py --check
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (396 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+MISS  .specify/scripts/python/doc-consistency-check.py
+MISS  .specify/scripts/python/flow-class-check.py
+MISS  .specify/shared/definitions/flow-class-definitions.md
+MISS  .specify/shared/workflow/expression-gates.md
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+# exit 2 —— 与改前基线同一组 4 个缺失（本段未新增任何漂移；feedback-step 的镜像已由投影补齐）
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.   # exit 0
+```
+
+## 37. 未关闭项（本段不修，按任务归属登记）
+
+| 项 | 现状 | 归属 |
+|----|------|------|
+| `.specify/scripts/python/{flow-class-check,doc-consistency-check}.py` 与 `.specify/shared/{definitions/flow-class-definitions,workflow/expression-gates}.md` 镜像缺失 | 仍缺 4 个（与改前基线同组，本段零新增）；兼容测试对这 4 个源文件允许「镜像缺席」，其余镜像一律要求逐字节相同 | T033 |
+| 全量契约套件零新增失败核验 | 本段只做定向回归；全量 `pytest tests/contract` 与基线名单比对 | T034 |
+| `test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc` | 冻结基线内既有红，本段零触碰 | 非本切片 |
+| **T004–T008 的状态脊仍为 `[ ]`**（US1 测试与 owner 段落早已提交、且在本段 142-pass 定向回归内全绿；历史提交 `82744713` / `e39cb05b` 只落产物、从未勾选） | 既有记账漂移，本段只做 US3，不代 US1 勾选；`validate-tasks.py` 仍 0 error（GATE-8 在 Polish 阶段会看到这 5 行） | US1 / Polish 收口（T034 前） |
+
+## 38. 本段提交
+
+本段提交含：`tests/contract/test_expression_compatibility.py`（14 条断言）、
+`shared/workflow/feedback-step.md` 的**一行**正交指针与其 `.specify/shared/workflow/feedback-step.md` 投影、
+`tasks.md` 的 T028–T031 勾选与本文件。commit 见 `git log -1 --format=%H`（分支 `069-execution-expression-sdd`）。
