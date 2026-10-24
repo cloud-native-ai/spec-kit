@@ -1,7 +1,7 @@
 # Quickstart Run — 069b
 
 **Owner**: T009（场景 1 / 场景 2）；场景 3–6 与 docs-sync 由各自任务行（T013 / T023 / T025）按同一形态追加。
-**Run date**: 2026-10-25 · **Tree**: 场景 1 / 2 的工作树基于 `c38b44cc`，场景 6 基于 `efe63551` 加 US2 改动（`069b-isomorphism-migration-metrics`），各节输出均在提交前实跑取得。
+**Run date**: 2026-10-25 · **Tree**: 场景 1 / 2 的工作树基于 `c38b44cc`，场景 3 / 4 / 5 基于 `ed713ede` 加 US3 改动，场景 6 基于 `efe63551` 加 US2 改动（`069b-isomorphism-migration-metrics`），各节输出均在提交前实跑取得。
 **Interpreter**: pytest 仅 `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest` 可用；引擎用系统 `python3`。
 
 ---
@@ -70,6 +70,126 @@ EXIT=0
 | 阶段算子表追加一行 `pytest -q tests/` | `code-operator-in-expression-gates` | `test_injected_code_operator_turns_red` | passed |
 
 判读：每种注入各自转红、退出码 1；真实树同一命令退出码 0（场景 1），因此红不是环境噪声。
+
+---
+
+## 场景 3 — 台账的双注入必须给出两种可区分的红（route b，T023 实跑）
+
+**Owner**: T019（`coverage` / `red_kind` / 三个新 kind）、T023（本场景取证）
+**Run**: 2026-10-25 · `~/tmp/069b-t023/` 下两个由真实 `templates/` + `skills/` + owner 复制的夹具根，各注入一处缺陷；
+仓库本身零改动（`--repo` 指向副本）。
+
+```bash
+python3 scripts/python/flow-class-check.py --action check --repo . --format json         # 真实树
+python3 scripts/python/flow-class-check.py --action check --repo ~/tmp/069b-t023/check-gap --format json
+python3 scripts/python/flow-class-check.py --action check --repo ~/tmp/069b-t023/check-parse --format json
+```
+
+真实树（C-2 的六个伴生量 + `clean`）：
+
+```json
+{
+  "action": "check", "units": 78,
+  "coverage": {"ledger_rows": 78, "inventory_units": 78, "matched": 78,
+               "gaps": 0, "parse_errors": 0, "floor": 39},
+  "red_kind": "clean", "findings": [], "error": null
+}
+EXIT=0
+```
+
+文本面（空集旁同时打印两个反空真伴生量，MUST NOT 只打印「0 findings」）：
+
+```text
+flow-class check: 78 unit(s) scanned, 0 finding(s) [matched=78 inventory_units=78, clean]
+coverage: ledger_rows=78 matched=78 inventory_units=78 gaps=0 parse_errors=0 floor=39
+EXIT=0
+```
+
+| 注入 | `red_kind` | 退出码 | `coverage` | 代表 finding |
+|------|-----------|--------|------------|--------------|
+| A 删一行台账（`/speckit.agents`） | `gap` | 1 | `ledger_rows=77 matched=77 gaps=1 parse_errors=0 floor=39` | `missing` ×1 |
+| B 表头保留、数据行全删（解析出 0 行而清单非空） | `parse-failure` | 1 | `ledger_rows=0 matched=0 gaps=78 parse_errors=1 floor=39` | `ledger-truncated` ×1 + `missing` ×78 |
+
+**判据**：两次运行的 `red_kind` 不同（`gap` ≠ `parse-failure`）；「静默绿」（退出码 0）样本数 = 0；
+A 的 77 行仍在解析侧下限 39 之上，因此 MUST NOT 报 `ledger-truncated`（C-1 / C-4）；
+`gaps = missing + unknown` 与 `parse_errors = row-malformed + ledger-truncated` 在两个副本上都成立（C-2）。
+钉住契约：C-1 / C-2 / C-3；SC-003。
+
+---
+
+## 场景 4 — 委托关系由模板解析，不由人工清单（route b，T023 实跑）
+
+**Owner**: T020（`--action delegation`）、T023（本场景取证）
+**Run**: 2026-10-25 · 真实树 + `~/tmp/069b-t023/deleg`（把 `skill:analyze-artifacts` 改成 `expression`）。
+
+```bash
+python3 scripts/python/flow-class-check.py --action delegation --repo . --format json
+python3 scripts/python/flow-class-check.py --action delegation --repo ~/tmp/069b-t023/deleg --format json
+```
+
+真实树：
+
+```text
+commands_scanned=27  edges=41  findings=0
+verdicts={'same-class': 35, 'neutral-exempt': 6}
+crossing neutral edge = ('/speckit.docs', 'skill:memory-record', 'expression', 'execution')
+EXIT=0
+```
+
+证伪副本（反类技能必须转红）：
+
+```text
+findings=[('delegation-mismatch', '/speckit.analyze')]
+edge={'command': '/speckit.analyze', 'skill': 'skill:analyze-artifacts',
+      'command_class': 'execution', 'skill_class': 'expression',
+      'verdict': 'mismatch', 'source_line': 41}
+EXIT=1
+```
+
+**判读**：41 条边全部由命令模板文本解析（同一模板内同名去重），35 条同类、6 条类中立豁免；
+6 条豁免中只有 `docs → memory-record` 两侧类别不同，因此「豁免先于同类判断」这一裁决顺序被真实样本覆盖（C-8）；
+类中立清单取自 owner § 类中立清单，引擎内无清单副本（C-10）；真实树零人工 command→skill 表（C-9）。
+钉住契约：C-8 / C-9 / C-10；FR-012。
+
+---
+
+## 场景 5 — 六面 owner 指针 6/6 且判据不搬家（route b，T023 实跑）
+
+**Owner**: T021（`--action faces`）、T023（本场景取证）
+**Run**: 2026-10-25 · 真实树 + 只读复核 `doc-consistency-check.py` 的 duplicate 面。
+
+```bash
+python3 scripts/python/flow-class-check.py --action faces --repo . --format json
+python3 scripts/python/doc-consistency-check.py --action verify --faces duplicate \
+  --path shared/definitions/flow-class-definitions.md \
+  --spec-dir .specify/specs/069b-isomorphism-migration-metrics --format json
+```
+
+```json
+{
+  "action": "faces",
+  "checked_at": "2026-10-24T17:52:28Z",
+  "repo": "/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit",
+  "faces": 6,
+  "findings": [],
+  "error": null
+}
+EXIT=0
+```
+
+duplicate 面（主体集 = 分类 owner + 本 spec 的 formal artifacts；S3 比较集是 9 条 owner 路径，含
+`shared/workflow/expression-gates.md` 本身）：
+
+```text
+{"action": "verify", "scope": {"paths": ["…/shared/definitions/flow-class-definitions.md"], "files_scanned": 13},
+ "faces": {"duplicate": "pass"}, "findings": [], "count_check": {"status": "not-run", …}, "degradations": []}
+EXIT=0
+```
+
+**判读**：§ 六面 恰好 6 行、face id 唯一、每行一个 `owner_pointer` 格（`+` 连接仍算一个绑定）；
+9 条真实指针路径在源码根或 `.specify/` 镜像可解析，`§` 锚在目标文件有匹配标题；
+六面之外零第二绑定表（C-12），判据正文副本计数为 0（C-13）。
+钉住契约：C-11 / C-12 / C-13；SC-005。
 
 ---
 

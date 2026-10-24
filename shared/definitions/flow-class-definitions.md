@@ -121,6 +121,11 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 
 ## 逐流程台账
 
+**台账版本**: 1（2026-10-25）
+生效版本由本文件的文档版本与既有 § 变更记录 共同承载；台账**行级不设版本列**，
+本声明在 § 逐流程台账 内只出现一次（缺失 → `ledger-version-missing`，重复 → `row-malformed`；规范条款归
+`.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-5）。
+
 一行一个流程单元，首格是单元 id（命令 `/speckit.<stem>`，技能 `skill:<dir-name>`）；列按**表头名**解析，解析器 MUST NOT 猜列。
 列头逐字取机器键 `flow_class`；`basis` 取本节上文的三值；`neutral` 只允许留空或 `yes`（`yes` 仅用于 § 类中立清单 中的技能）；`notes` 是该行的判定要点，不复述判据正文。
 `mixed-oracle` 行一律取 `execution`（父 069 §Edge Cases 首条；规范条款见 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-7），行内 `notes` 保留父指针。

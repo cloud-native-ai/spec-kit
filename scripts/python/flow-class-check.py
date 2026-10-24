@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Flow-class ledger engine (069a): reconcile the ledger and resolve a unit's class.
+"""Flow-class ledger engine (069a / 069b): reconcile, resolve and verify bindings.
 
 The single owner of the execution/expression classification is
 ``shared/definitions/flow-class-definitions.md``; this engine never restates the
@@ -7,9 +7,14 @@ criteria or the values' meaning. It only:
 
 * ``--action check`` — scan the repository inventory (``templates/commands/*.md``
   and ``skills/{external,internal}/*/SKILL.md``), parse the owner's per-unit
-  ledger, and report every defect as one of the eight contracted finding kinds
-  (``missing`` / ``unknown`` / ``duplicate`` / ``dual-class`` / ``invalid-class`` /
-  ``row-malformed`` / ``neutral-unlisted`` / ``inventory-truncated``);
+  ledger, and report every defect as one of the contracted finding kinds. The
+  069a eight (``missing`` / ``unknown`` / ``duplicate`` / ``dual-class`` /
+  ``invalid-class`` / ``row-malformed`` / ``neutral-unlisted`` /
+  ``inventory-truncated``) keep their semantics; 069b adds ``ledger-truncated``,
+  ``ledger-version-missing`` and ``mixed-oracle-class`` (contract
+  ``contracts/ledger-reconciler.md`` C-1 / C-5 / C-7). The JSON also carries the
+  ``coverage`` block, the ``red_kind`` bucket and the text face's anti-vacuous
+  companion numbers (C-2 / C-3);
 * ``--action lookup --unit-id <id>`` — return the registered class for a unit, or
   the default class plus the fixed "undeclared, running on the default" marker for
   a well-formed but unregistered unit.
@@ -19,29 +24,41 @@ criteria or the values' meaning. It only:
   ``(stage, face, blocking)`` rows, the boundary-to-face bindings, the closed
   medium-axis phrases and the code-type operator floor (069b contract
   ``contracts/isomorphism-map.md``).
+* ``--action delegation`` — parse the command → skill delegation edges out of the
+  command templates (069b contract C-8…C-10) and judge each edge against the
+  owner ledger; a hand-maintained command→skill table is itself a finding.
+* ``--action faces`` — parse the gate owner's six-face table (069b contract
+  C-11 / C-12) and judge the count, id uniqueness, the single ``owner_pointer``
+  binding per row, path/anchor resolvability and the absence of a second binding
+  table.
 
 All actions are read-only: no file is written or modified.
 
-Exit codes (contracts ``flow-class-ledger.md`` C-13 and ``isomorphism-map.md``
-C-13):
+Exit codes (contracts ``flow-class-ledger.md`` C-13, ``isomorphism-map.md`` C-13
+and ``ledger-reconciler.md`` C-3 / C-14):
 
-* ``check``:  0 = zero findings, 1 = at least one finding, 2 = input/parse error
-  (owner document missing, ledger section or header unparsable);
+* ``check``:  0 = zero findings, 1 = at least one finding, 2 = a named non-green
+  state (``owner-unavailable`` when the owner document is missing or unparsable,
+  ``framework-source-required`` when the repository is a client payload root).
+  ``red_kind`` names that state with the fixed priority
+  ``owner-unavailable`` > ``framework-source-required`` > ``parse-failure`` >
+  ``gap`` > ``clean``;
 * ``lookup``: 0 = resolved (including the default degradation), 2 = malformed unit
   id or unparsable owner. An unparsable owner keeps the default class semantics,
   reports ``owner-unavailable`` on stderr and leaves ``marker`` null — the two
   degradation labels are mutually exclusive (requirements FR-009 / FR-016);
-* ``isomorphism``: 0 = zero findings, 1 = at least one finding, 2 = input error
-  (owner/map missing, roster unparsable ``roster-unavailable``, gate owner
-  unparsable ``gate-owner-unavailable``, or a payload root
-  ``framework-source-required``). A payload root emits zero findings and never a
-  green verdict.
+* ``isomorphism`` / ``delegation`` / ``faces``: 0 = zero findings, 1 = at least
+  one finding, 2 = input error (missing/unparsable owner or gate owner) or a
+  payload root (``framework-source-required``). A payload root emits zero
+  findings and never a green verdict.
 
 Usage::
 
     python3 scripts/python/flow-class-check.py --action check [--repo <root>] [--format text|json]
     python3 scripts/python/flow-class-check.py --action lookup --unit-id <id> [--repo <root>] [--format text|json]
     python3 scripts/python/flow-class-check.py --action isomorphism [--repo <root>] [--format text|json]
+    python3 scripts/python/flow-class-check.py --action delegation [--repo <root>] [--format text|json]
+    python3 scripts/python/flow-class-check.py --action faces [--repo <root>] [--format text|json]
 
 The ledger is parsed by header name, never by column position; a row whose cell
 count or required values do not fit the declared grammar is reported as
@@ -69,11 +86,19 @@ DEFAULT_MARKER = "未声明·按默认"    # [[STR-004]]
 
 CLASS_VALUES = (EXECUTION, EXPRESSION)
 BASIS_VALUES = ("behavior-oracle", "reader-oracle", "mixed-oracle")
+MIXED_ORACLE = "mixed-oracle"
 NEUTRAL_CATEGORIES = ("memory", "feedback", "evidence", "session")
 
 # Anti-vacuous floors: measured constants (2026-10-24), never derived at runtime.
 FLOOR_COMMANDS = 27
 FLOOR_SKILLS = 51
+# 069b contract C-1: the parse-side anti-vacuous floor is derived from the
+# inventory-side constants — floor((27 + 51) / 2) = 39 — never from the ledger
+# under inspection and never from a third hand-written unit count. It is a
+# materiality threshold, not a completeness judgement (completeness is
+# ``matched == inventory_units and gaps == 0``); 77 parsed rows must stay above it
+# so that deleting one row is a ``gap``, not a parse failure.
+LEDGER_FLOOR = (FLOOR_COMMANDS + FLOOR_SKILLS) // 2
 
 OWNER_REL = Path("shared") / "definitions" / "flow-class-definitions.md"
 MIRROR_DIR_NAME = ".specify"
@@ -90,7 +115,14 @@ UNIT_ID_RE = re.compile(r"^(?:/speckit\.[a-z0-9][a-z0-9-]*|skill:[a-z0-9][a-z0-9
 HEADING_RE = re.compile(r"^(#{1,6})\s")
 SEPARATOR_CELL_RE = re.compile(r":?-{2,}:?")
 
+# 069b contract C-5: the ledger version is declared once, in a fixed grammar.
+LEDGER_VERSION_KEY = "台账版本"
+LEDGER_VERSION_RE = re.compile(
+    r"^\*\*%s\*\*\s*:\s*\d+\s*（\d{4}-\d{2}-\d{2}）\s*$" % LEDGER_VERSION_KEY
+)
+
 FINDING_KINDS = (
+    # 069a's eight, semantics untouched (contract C-4).
     "missing",
     "unknown",
     "duplicate",
@@ -99,9 +131,35 @@ FINDING_KINDS = (
     "row-malformed",
     "neutral-unlisted",
     "inventory-truncated",
+    # 069b's additions to ``check`` (contract C-4: exactly three).
+    "ledger-truncated",
+    "ledger-version-missing",
+    "mixed-oracle-class",
 )
 
-DEGRADATION_LABEL = "owner-unavailable"
+# 069b contract C-3: the two buckets are an exhaustive partition of ``check``'s
+# kinds. Anything outside CHECK_GAP_KINDS is a parse failure, so
+# ``red_kind == clean`` <=> ``findings == []`` holds by construction.
+CHECK_GAP_KINDS = frozenset(
+    {
+        "missing",
+        "unknown",
+        "duplicate",
+        "dual-class",
+        "invalid-class",
+        "neutral-unlisted",
+        "mixed-oracle-class",
+        "ledger-version-missing",
+    }
+)
+
+RED_OWNER_UNAVAILABLE = "owner-unavailable"
+RED_FRAMEWORK_SOURCE_REQUIRED = "framework-source-required"
+RED_PARSE_FAILURE = "parse-failure"
+RED_GAP = "gap"
+RED_CLEAN = "clean"
+
+DEGRADATION_LABEL = RED_OWNER_UNAVAILABLE
 
 
 # --------------------------------------------------------------------------- #
@@ -159,11 +217,13 @@ def is_separator(row: list[str]) -> bool:
     return bool(row) and all(SEPARATOR_CELL_RE.fullmatch(cell) for cell in row)
 
 
-def section_body(lines: list[str], keyword: str):
-    """Return the body lines of the first heading containing ``keyword``.
+def section_with_offset(lines: list[str], keyword: str):
+    """Return ``(heading_index, body_lines)`` for the first matching heading.
 
     The body stops at the next heading of the same or a higher level, so a later
-    section's table can never be mistaken for this section's table.
+    section's table can never be mistaken for this section's table. The heading
+    index is returned so callers can report absolute 1-based line numbers
+    (``heading_index + 2`` is the first body line).
     """
     for index, line in enumerate(lines):
         match = HEADING_RE.match(line)
@@ -176,8 +236,14 @@ def section_body(lines: list[str], keyword: str):
             if follow_match and len(follow_match.group(1)) <= level:
                 break
             body.append(follow)
-        return body
-    return None
+        return index, body
+    return None, None
+
+
+def section_body(lines: list[str], keyword: str):
+    """Return the body lines of the first heading containing ``keyword``."""
+    _index, body = section_with_offset(lines, keyword)
+    return body
 
 
 def first_table(lines: list[str]):
@@ -206,10 +272,11 @@ class OwnerError(Exception):
 
 
 class OwnerLedger:
-    def __init__(self, rows, malformed, neutral_units):
+    def __init__(self, rows, malformed, neutral_units, version_declarations):
         self.rows = rows                  # list[dict] with a "_line" key
         self.malformed = malformed        # list[dict] {line, unit_id, message}
         self.neutral_units = neutral_units  # set[str]
+        self.version_declarations = version_declarations  # list[dict] {line, text}
 
 
 # --------------------------------------------------------------------------- #
@@ -263,7 +330,7 @@ def parse_owner(repo: Path) -> OwnerLedger:
         raise OwnerError("owner document unreadable: %s (%s)" % (owner_path, exc))
 
     lines = text.splitlines()
-    body = section_body(lines, LEDGER_SECTION_KEYWORD)
+    section_start, body = section_with_offset(lines, LEDGER_SECTION_KEYWORD)
     if body is None:
         raise OwnerError(
             "owner document has no %r section" % LEDGER_SECTION_KEYWORD
@@ -310,7 +377,17 @@ def parse_owner(repo: Path) -> OwnerLedger:
         record["_line"] = line_no
         rows.append(record)
 
-    return OwnerLedger(rows, malformed, parse_neutral_list(lines))
+    # 069b contract C-5: the version declaration lives once inside § 逐流程台账.
+    # Counting it here (not as a ledger column) keeps the version signal single:
+    # missing -> ``ledger-version-missing``; duplicated or malformed -> the
+    # existing ``row-malformed`` (no new kind, counted as a parse error).
+    version_declarations = [
+        {"line": section_start + 2 + offset, "text": line.strip()}
+        for offset, line in enumerate(body)
+        if line.strip().startswith("**%s**" % LEDGER_VERSION_KEY)
+    ]
+
+    return OwnerLedger(rows, malformed, parse_neutral_list(lines), version_declarations)
 
 
 def _canonical_or_none(unit_id: str):
@@ -388,6 +465,45 @@ def finding(kind: str, unit_id=None, message: str = "", line=None) -> dict:
 def reconcile(repo: Path, inventory: Inventory, ledger: OwnerLedger) -> list[dict]:
     findings: list[dict] = []
 
+    # C-5: exactly one version declaration inside § 逐流程台账.
+    if not ledger.version_declarations:
+        findings.append(
+            finding(
+                "ledger-version-missing",
+                None,
+                message="§ %s declares no `**%s**: <int>（<YYYY-MM-DD>）`"
+                % (LEDGER_SECTION_KEYWORD, LEDGER_VERSION_KEY),
+            )
+        )
+    else:
+        first = ledger.version_declarations[0]
+        if len(ledger.version_declarations) > 1:
+            findings.append(
+                finding(
+                    "row-malformed",
+                    None,
+                    message="the `**%s**` declaration appears %d times (lines %r); "
+                    "it MUST appear exactly once"
+                    % (
+                        LEDGER_VERSION_KEY,
+                        len(ledger.version_declarations),
+                        [item["line"] for item in ledger.version_declarations],
+                    ),
+                    line=first["line"],
+                )
+            )
+        elif not LEDGER_VERSION_RE.match(first["text"]):
+            findings.append(
+                finding(
+                    "row-malformed",
+                    None,
+                    message="the `**%s**` declaration does not match "
+                    "`**%s**: <int>（<YYYY-MM-DD>）`: %r"
+                    % (LEDGER_VERSION_KEY, LEDGER_VERSION_KEY, first["text"]),
+                    line=first["line"],
+                )
+            )
+
     for item in ledger.malformed:
         findings.append(
             finding(
@@ -409,6 +525,21 @@ def reconcile(repo: Path, inventory: Inventory, ledger: OwnerLedger) -> list[dic
                     unit_id,
                     message="%s value %r is outside the closed set %r"
                     % (CLASS_KEY, row[CLASS_KEY], CLASS_VALUES),
+                    line=row["_line"],
+                )
+            )
+        # C-7: a mixed-oracle row is always execution (both oracles sign off);
+        # the class is a ledger defect, never a per-case call for expression.
+        if (
+            row.get("basis", "").strip() == MIXED_ORACLE
+            and row[CLASS_KEY] != EXECUTION
+        ):
+            findings.append(
+                finding(
+                    "mixed-oracle-class",
+                    unit_id,
+                    message="basis %r with %s %r — a mixed-oracle row MUST be %r"
+                    % (MIXED_ORACLE, CLASS_KEY, row[CLASS_KEY], EXECUTION),
                     line=row["_line"],
                 )
             )
@@ -484,6 +615,19 @@ def reconcile(repo: Path, inventory: Inventory, ledger: OwnerLedger) -> list[dic
                 % (len(inventory.skills), FLOOR_SKILLS),
             )
         )
+    # C-1: the parse-side anti-vacuous floor. A ledger parsed into fewer rows
+    # than the inventory-derived floor (including zero) is a parse failure, never
+    # a green verdict; it must not be confused with a single deletion (77 rows).
+    if len(ledger.rows) < LEDGER_FLOOR:
+        findings.append(
+            finding(
+                "ledger-truncated",
+                None,
+                message="ledger parsed %d row(s), below the floor of %d "
+                "derived from the inventory-side floors"
+                % (len(ledger.rows), LEDGER_FLOOR),
+            )
+        )
 
     kinds_order = {kind: position for position, kind in enumerate(FINDING_KINDS)}
     findings.sort(
@@ -496,14 +640,69 @@ def reconcile(repo: Path, inventory: Inventory, ledger: OwnerLedger) -> list[dic
     return findings
 
 
+def coverage_block(inventory: Inventory, ledger: OwnerLedger, findings: list[dict]) -> dict:
+    """Return the six contracted coverage integers (contract C-2).
+
+    ``matched`` is ``|ledger units ∩ inventory units|`` — the anti-vacuous
+    companion of ``findings == []``. ``gaps`` is exactly ``missing + unknown`` and
+    ``parse_errors`` counts the ledger-side parse defects only
+    (``row-malformed + ledger-truncated``); ``inventory-truncated`` belongs to the
+    inventory side and is deliberately excluded from that sum (it still lands in
+    the ``parse-failure`` bucket per C-3).
+    """
+    kinds = [item["kind"] for item in findings]
+    ledger_units = {row["unit_id"] for row in ledger.rows}
+    inventory_units = inventory.units
+    return {
+        "ledger_rows": len(ledger.rows),
+        "inventory_units": len(inventory_units),
+        "matched": len(ledger_units & inventory_units),
+        "gaps": kinds.count("missing") + kinds.count("unknown"),
+        "parse_errors": kinds.count("row-malformed") + kinds.count("ledger-truncated"),
+        "floor": LEDGER_FLOOR,
+    }
+
+
+def red_kind_for(findings: list[dict]) -> str:
+    """Return the bucket name for a measured ``check`` run (contract C-3).
+
+    The two buckets are an exhaustive partition of ``check``'s finding kinds, so
+    ``clean`` is returned exactly when there are no findings; a finding outside
+    ``CHECK_GAP_KINDS`` can only mean a parse failure.
+    """
+    if not findings:
+        return RED_CLEAN
+    if all(item["kind"] in CHECK_GAP_KINDS for item in findings):
+        return RED_GAP
+    return RED_PARSE_FAILURE
+
+
 # --------------------------------------------------------------------------- #
 # actions
 # --------------------------------------------------------------------------- #
 def render_check_text(record: dict) -> str:
+    coverage = record["coverage"] or {}
+    companion = "matched=%s inventory_units=%s" % (
+        coverage.get("matched", "n/a"),
+        coverage.get("inventory_units", "n/a"),
+    )
     lines = [
-        "flow-class check: %d unit(s) scanned, %d finding(s)"
-        % (record["units"], len(record["findings"]))
+        "flow-class check: %d unit(s) scanned, %d finding(s) [%s, %s]"
+        % (record["units"], len(record["findings"]), companion, record["red_kind"])
     ]
+    if record["coverage"] is not None:
+        lines.append(
+            "coverage: ledger_rows=%d matched=%d inventory_units=%d gaps=%d "
+            "parse_errors=%d floor=%d"
+            % (
+                coverage["ledger_rows"],
+                coverage["matched"],
+                coverage["inventory_units"],
+                coverage["gaps"],
+                coverage["parse_errors"],
+                coverage["floor"],
+            )
+        )
     for item in record["findings"]:
         location = item.get("unit_id") or "-"
         if item.get("line"):
@@ -512,32 +711,72 @@ def render_check_text(record: dict) -> str:
     return "\n".join(lines)
 
 
-def action_check(repo: Path, output_format: str) -> int:
-    stamp = checked_at()
-    inventory = scan_inventory(repo)
-    record = {
+def check_record(stamp: str, repo: Path) -> dict:
+    return {
         "action": "check",
         "checked_at": stamp,
         "repo": str(repo),
-        "units": len(inventory.units),
+        "units": 0,
         "inventory": {
-            "commands": len(inventory.commands),
-            "skills": len(inventory.skills),
+            "commands": 0,
+            "skills": 0,
             "floors": {"commands": FLOOR_COMMANDS, "skills": FLOOR_SKILLS},
         },
+        "coverage": None,
+        "red_kind": None,
         "findings": [],
         "error": None,
     }
+
+
+def check_input_error(
+    record: dict, label: str, detail: str, output_format: str, code: int = 2
+) -> int:
+    """Emit a named non-green state: no findings, no green verdict (C-3 / C-14)."""
+    record["error"] = {"label": label, "detail": detail}
+    record["red_kind"] = label
+    print("%s: %s" % (label, detail), file=sys.stderr)
+    if output_format == "json":
+        print(json.dumps(record, ensure_ascii=False, indent=2))
+    else:
+        print(render_check_text(record))
+    return code
+
+
+def action_check(repo: Path, output_format: str) -> int:
+    stamp = checked_at()
+    record = check_record(stamp, repo)
+
+    # C-3 gives ``owner-unavailable`` the highest priority, so the owner is parsed
+    # before the payload-root branch: a client project with no owner reports the
+    # more specific label rather than ``framework-source-required``.
     try:
         ledger = parse_owner(repo)
     except OwnerError as exc:
-        record["error"] = {"label": DEGRADATION_LABEL, "detail": str(exc)}
-        print("%s: %s" % (DEGRADATION_LABEL, exc), file=sys.stderr)
-        if output_format == "json":
-            print(json.dumps(record, ensure_ascii=False, indent=2))
-        return 2
+        return check_input_error(record, RED_OWNER_UNAVAILABLE, str(exc), output_format)
 
+    # C-14: ``check`` only runs in a framework source tree. A payload root (client
+    # ``.specify/`` shape, or the payload directory itself) is a named state: zero
+    # findings, exit 2, never a green verdict and never ``inventory-truncated``.
+    if not is_framework_source(repo):
+        return check_input_error(
+            record,
+            RED_FRAMEWORK_SOURCE_REQUIRED,
+            "neither templates/commands/ nor a parseable skills/{external,internal}/ "
+            "is present in %s" % repo,
+            output_format,
+        )
+
+    inventory = scan_inventory(repo)
+    record["units"] = len(inventory.units)
+    record["inventory"] = {
+        "commands": len(inventory.commands),
+        "skills": len(inventory.skills),
+        "floors": {"commands": FLOOR_COMMANDS, "skills": FLOOR_SKILLS},
+    }
     record["findings"] = reconcile(repo, inventory, ledger)
+    record["coverage"] = coverage_block(inventory, ledger, record["findings"])
+    record["red_kind"] = red_kind_for(record["findings"])
     if output_format == "json":
         print(json.dumps(record, ensure_ascii=False, indent=2))
     else:
@@ -1240,6 +1479,600 @@ def is_framework_source(repo: Path) -> bool:
     return False
 
 
+def payload_root_label(repo: Path) -> str:
+    """Name a non-framework root: owner-unavailable outranks the payload label.
+
+    Contract C-14 / C-3: both are named non-green states. When the owner is also
+    missing, the more specific ``owner-unavailable`` wins; otherwise the root is a
+    client payload and ``framework-source-required`` is the state.
+    """
+    if any(path.is_file() for path in owner_candidates(repo)):
+        return RED_FRAMEWORK_SOURCE_REQUIRED
+    return RED_OWNER_UNAVAILABLE
+
+
+def resolve_any(repo: Path, rel: str):
+    """Resolve a repository-relative path in the source root, then the mirror."""
+    for root in (repo, repo / MIRROR_DIR_NAME):
+        candidate = root / rel
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def markdown_tables(lines: list[str]):
+    """Yield ``(header_cells, [(line_no, cells), ...])`` for every Markdown table."""
+    index = 0
+    while index < len(lines):
+        if not lines[index].lstrip().startswith("|"):
+            index += 1
+            continue
+        if index + 1 >= len(lines) or not lines[index + 1].lstrip().startswith("|"):
+            index += 1
+            continue
+        header = cells(lines[index])
+        if not is_separator(cells(lines[index + 1])):
+            index += 1
+            continue
+        rows: list[tuple[int, list[str]]] = []
+        cursor = index + 2
+        while cursor < len(lines) and lines[cursor].lstrip().startswith("|"):
+            row = cells(lines[cursor])
+            if not is_separator(row):
+                rows.append((cursor + 1, row))
+            cursor += 1
+        yield header, rows
+        index = cursor
+
+
+# --------------------------------------------------------------------------- #
+# 069b: delegation edges (contract contracts/ledger-reconciler.md C-8…C-10)
+# --------------------------------------------------------------------------- #
+# C-8: the declared grammar. The name class is the ledger's unit-id class, so a
+# placeholder such as ``skills/<name>/SKILL.md`` can never become an edge.
+DELEGATION_EDGE_RE = re.compile(
+    r"(?:\.specify/)?skills/(?:external/|internal/)?([a-z0-9][a-z0-9-]*)/SKILL\.md"
+)
+DELEGATION_MIN_HAND_LIST_ROWS = 3
+HAND_LIST_COMMAND_RE = re.compile(r"(?<![A-Za-z0-9_-])/speckit\.[a-z0-9][a-z0-9-]*")
+HAND_LIST_SKILL_RE = re.compile(r"(?<![A-Za-z0-9_-])skill:[a-z0-9][a-z0-9-]*")
+BACKTICK_TOKEN_RE = re.compile(r"`([^`]+)`")
+PATH_LIKE_RE = re.compile(r"^[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+$")
+
+SPEC_DIR_REL = Path(".specify") / "specs" / "069b-isomorphism-migration-metrics"
+S3_OWNER_PATHS_ASSIGN_RE = re.compile(r"^OWNER_PATHS\s*=\s*\((.*?)\)", re.S | re.M)
+
+
+def formal_spec_artifacts(repo: Path) -> list[Path]:
+    """This slice's formal artifacts — ``notes/`` records are not formal.
+
+    Contract C-12 / C-9 close the scan scope at "this spec's formal artifacts";
+    dated run records under ``notes/`` are evidence, not specification, and the
+    fixtures never contain a spec directory at all.
+    """
+    spec = repo / SPEC_DIR_REL
+    if not spec.is_dir():
+        return []
+    return [
+        path
+        for path in sorted(spec.rglob("*.md"))
+        if path.is_file() and "notes" not in path.relative_to(spec).parts
+    ]
+
+
+def scope_markdown_files(repo: Path) -> list[Path]:
+    """The closed scan scope: shared/, the command templates, skills/, the spec."""
+    files: list[Path] = []
+    for root_rel in (Path("shared"), COMMANDS_REL, SKILLS_REL):
+        root = repo / root_rel
+        if root.is_dir():
+            files.extend(sorted(path for path in root.rglob("*.md") if path.is_file()))
+    files.extend(formal_spec_artifacts(repo))
+    unique: list[Path] = []
+    seen: set[Path] = set()
+    for path in files:
+        key = path.resolve()
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(path)
+    return unique
+
+
+def s3_owner_paths() -> frozenset[str]:
+    """Read the S3 comparison set from its owner engine's ``OWNER_PATHS`` literal.
+
+    Contract C-12 excludes that set from the second-table scan. It is read from
+    ``doc-consistency-check.py`` (the declared owner) instead of keeping a second
+    copy here; an unreadable assignment degrades to an empty set, which only makes
+    the scan *stricter* (more files checked), never more permissive.
+    """
+    engine = Path(__file__).resolve().parent / "doc-consistency-check.py"
+    try:
+        text = engine.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return frozenset()
+    match = S3_OWNER_PATHS_ASSIGN_RE.search(text)
+    if not match:
+        return frozenset()
+    return frozenset(re.findall(r"[\"']([^\"']+)[\"']", match.group(1)))
+
+
+def ledger_class_map(ledger: OwnerLedger) -> dict[str, str]:
+    classes: dict[str, str] = {}
+    for row in ledger.rows:
+        if row[CLASS_KEY] in CLASS_VALUES:
+            classes[row["unit_id"]] = row[CLASS_KEY]
+    return classes
+
+
+def parse_delegation_edges(repo: Path):
+    """Return ``(edges, commands_scanned)``; per-template de-duplication (C-8)."""
+    commands_dir = repo / COMMANDS_REL
+    if not commands_dir.is_dir():
+        return [], 0
+    paths = sorted(path for path in commands_dir.glob("*.md") if path.is_file())
+    edges: list[dict] = []
+    for path in paths:
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except (OSError, UnicodeDecodeError):
+            continue
+        command = "/speckit.%s" % path.stem
+        seen: set[str] = set()
+        for number, line in enumerate(lines, 1):
+            for match in DELEGATION_EDGE_RE.finditer(line):
+                name = match.group(1)
+                if name in seen:
+                    continue
+                seen.add(name)
+                edges.append(
+                    {
+                        "command": command,
+                        "skill": "skill:%s" % name,
+                        "source_line": number,
+                    }
+                )
+    return edges, len(paths)
+
+
+def judge_delegation(edges, classes, neutral_units):
+    """Return ``(edge_records, findings)`` with the fixed verdict order (C-8)."""
+    records: list[dict] = []
+    findings: list[dict] = []
+    for edge in edges:
+        skill = edge["skill"]
+        command_class = classes.get(edge["command"])
+        skill_class = classes.get(skill)
+        if skill not in classes:
+            verdict = "unknown-skill"
+        elif skill in neutral_units:
+            # C-8 / C-10: a closed-list member is exempt whatever the two classes
+            # are — the exemption is taken from the owner, never copied here.
+            verdict = "neutral-exempt"
+        elif command_class == skill_class:
+            verdict = "same-class"
+        else:
+            verdict = "mismatch"
+        records.append(
+            dict(edge, command_class=command_class, skill_class=skill_class, verdict=verdict)
+        )
+        if verdict == "mismatch":
+            findings.append(
+                finding(
+                    "delegation-mismatch",
+                    edge["command"],
+                    message="%s (%r) delegates to %s (%r) — a command and its delegated "
+                    "skill MUST share one class"
+                    % (edge["command"], command_class, skill, skill_class),
+                    line=edge["source_line"],
+                )
+            )
+        elif verdict == "unknown-skill":
+            findings.append(
+                finding(
+                    "delegation-unknown-skill",
+                    skill,
+                    message="%s delegates to %s, which has no ledger row"
+                    % (edge["command"], skill),
+                    line=edge["source_line"],
+                )
+            )
+    return records, findings
+
+
+def scan_hand_lists(repo: Path) -> list[dict]:
+    """C-9: a hand-maintained command→skill table outside the templates.
+
+    A row counts as a pair when it carries a command id and a skill id; three such
+    rows in one table are the contracted minimum. The command templates are the
+    only legitimate place for delegation facts, so ``templates/commands/`` is
+    skipped as a source and used as the parse side instead.
+    """
+    findings: list[dict] = []
+    templates = (repo / COMMANDS_REL).resolve()
+    for path in scope_markdown_files(repo):
+        if path.resolve().parent == templates:
+            continue
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except (OSError, UnicodeDecodeError):
+            continue
+        for header, rows in markdown_tables(lines):
+            pairs = [
+                line_no
+                for line_no, row in rows
+                if HAND_LIST_COMMAND_RE.search(" | ".join(row))
+                and HAND_LIST_SKILL_RE.search(" | ".join(row))
+            ]
+            if len(pairs) < DELEGATION_MIN_HAND_LIST_ROWS:
+                continue
+            findings.append(
+                finding(
+                    "delegation-hand-list",
+                    None,
+                    message="%s carries a %d-row command→skill table; delegation MUST be "
+                    "parsed from the templates, never maintained by hand"
+                    % (path.relative_to(repo).as_posix(), len(pairs)),
+                    line=pairs[0],
+                )
+            )
+            break
+    return findings
+
+
+def render_delegation_text(record: dict) -> str:
+    verdicts: dict[str, int] = {}
+    for edge in record["edges"]:
+        verdicts[edge["verdict"]] = verdicts.get(edge["verdict"], 0) + 1
+    lines = [
+        "flow-class delegation: %d template(s) scanned, %d edge(s), %d finding(s)"
+        % (record["commands_scanned"], len(record["edges"]), len(record["findings"]))
+    ]
+    if verdicts:
+        lines.append(
+            "verdicts: "
+            + ", ".join("%s=%d" % (key, verdicts[key]) for key in sorted(verdicts))
+        )
+    for item in record["findings"]:
+        location = item.get("unit_id") or "-"
+        if item.get("line"):
+            location = "%s (line %d)" % (location, item["line"])
+        lines.append("  [%s] %s — %s" % (item["kind"], location, item["message"]))
+    return "\n".join(lines)
+
+
+def emit_delegation(record: dict, output_format: str, code: int) -> int:
+    if output_format == "json":
+        print(json.dumps(record, ensure_ascii=False, indent=2))
+    else:
+        if record["error"]:
+            print("%s: %s" % (record["error"]["label"], record["error"]["detail"]))
+        else:
+            print(render_delegation_text(record))
+    return code
+
+
+def action_delegation(repo: Path, output_format: str) -> int:
+    record = {
+        "action": "delegation",
+        "checked_at": checked_at(),
+        "repo": str(repo),
+        "commands_scanned": 0,
+        "edges": [],
+        "findings": [],
+        "error": None,
+    }
+
+    try:
+        ledger = parse_owner(repo)
+    except OwnerError as exc:
+        record["error"] = {"label": RED_OWNER_UNAVAILABLE, "detail": str(exc)}
+        print("%s: %s" % (RED_OWNER_UNAVAILABLE, exc), file=sys.stderr)
+        return emit_delegation(record, output_format, 2)
+
+    if not is_framework_source(repo):
+        label = payload_root_label(repo)
+        detail = (
+            "neither templates/commands/ nor a parseable skills/{external,internal}/ "
+            "is present in %s" % repo
+        )
+        record["error"] = {"label": label, "detail": detail}
+        print("%s: %s" % (label, detail), file=sys.stderr)
+        return emit_delegation(record, output_format, 2)
+
+    edges, scanned = parse_delegation_edges(repo)
+    records, findings = judge_delegation(
+        edges, ledger_class_map(ledger), ledger.neutral_units
+    )
+    record["commands_scanned"] = scanned
+    record["edges"] = records
+    record["findings"] = scan_hand_lists(repo) + findings
+    return emit_delegation(record, output_format, 1 if record["findings"] else 0)
+
+
+# --------------------------------------------------------------------------- #
+# 069b: six-face bindings (contract contracts/ledger-reconciler.md C-11 / C-12)
+# --------------------------------------------------------------------------- #
+FACES_SECTION_KEYWORD = "六面"
+FACES_EXPECTED = 6
+FACE_ID_COLUMN = "face id"
+FACE_POINTER_COLUMN = "owner_pointer"
+
+
+def pointer_bindings(cell: str) -> list[tuple[str, str | None]]:
+    """Split one ``owner_pointer`` cell into ``(path, anchor)`` pairs (C-11).
+
+    A cell joining several paths with ``+`` is still **one** binding; each segment
+    carries its own optional ``§ <anchor>``.
+    """
+    bindings: list[tuple[str, str | None]] = []
+    for segment in cell.split("+"):
+        match = BACKTICK_TOKEN_RE.search(segment)
+        if not match:
+            continue
+        path = match.group(1).strip()
+        anchor = None
+        if "§" in segment:
+            tail = segment.split("§", 1)[1]
+            anchor = BACKTICK_TOKEN_RE.sub("", tail)
+            anchor = re.sub(r"[（(].*?[）)]", "", anchor).strip("` ").strip()
+        bindings.append((path, anchor or None))
+    return bindings
+
+
+def anchor_matches(path: Path, anchor: str) -> bool:
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        return False
+    for line in lines:
+        match = re.match(r"^(#{1,6})\s+(.*)$", line)
+        if match and anchor in match.group(2):
+            return True
+    return False
+
+
+def scan_second_face_tables(repo: Path, faces: list[str]) -> list[dict]:
+    """C-12: no second table pairs ≥3 face ids with owner paths.
+
+    The six-face table itself lives in the gate owner, which C-12 excludes by
+    wording; the S3 comparison set is excluded per the contract and read from its
+    owner instead of being copied.
+    """
+    findings: list[dict] = []
+    gate_owner = resolve_shared(repo, GATES_OWNER_REL)
+    gate_owner_resolved = gate_owner.resolve() if gate_owner is not None else None
+    s3 = s3_owner_paths()
+    for path in scope_markdown_files(repo):
+        resolved = path.resolve()
+        if resolved == gate_owner_resolved:
+            continue
+        if path.relative_to(repo).as_posix() in s3:
+            continue
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except (OSError, UnicodeDecodeError):
+            continue
+        for header, rows in markdown_tables(lines):
+            hits = []
+            for line_no, row in rows:
+                text = " | ".join(row)
+                named = face_ids_in(text, faces)
+                paths = [
+                    token
+                    for token in BACKTICK_TOKEN_RE.findall(text)
+                    if PATH_LIKE_RE.match(token.strip())
+                ]
+                if named and paths:
+                    hits.append(line_no)
+            if len(hits) < 3:
+                continue
+            findings.append(
+                finding(
+                    "faces-second-table",
+                    None,
+                    message="%s pairs %d face id(s) with owner paths outside § %s; the "
+                    "face table is owned once by %s"
+                    % (
+                        path.relative_to(repo).as_posix(),
+                        len(hits),
+                        FACES_SECTION_KEYWORD,
+                        GATES_OWNER_REL.as_posix(),
+                    ),
+                    line=hits[0],
+                )
+            )
+            break
+    return findings
+
+
+def check_faces(repo: Path, header, rows) -> tuple[list[str], list[dict]]:
+    """Return ``(face ids, findings)`` for the parsed six-face table (C-11)."""
+    findings: list[dict] = []
+    if FACE_ID_COLUMN not in header or FACE_POINTER_COLUMN not in header:
+        raise GateOwnerError(
+            "six-face table lacks the %r / %r column(s): header=%r"
+            % (FACE_ID_COLUMN, FACE_POINTER_COLUMN, header)
+        )
+    face_index = header.index(FACE_ID_COLUMN)
+    pointer_index = header.index(FACE_POINTER_COLUMN)
+
+    if len(rows) != FACES_EXPECTED:
+        findings.append(
+            finding(
+                "faces-count",
+                None,
+                message="§ %s carries %d data row(s); the closed set is exactly %d"
+                % (FACES_SECTION_KEYWORD, len(rows), FACES_EXPECTED),
+            )
+        )
+
+    face_ids: list[str] = []
+    seen: dict[str, int] = {}
+    for line_no, row in rows:
+        if len(row) != len(header):
+            findings.append(
+                finding(
+                    "faces-count",
+                    None,
+                    message="face row on line %d has %d cell(s); the header declares %d"
+                    % (line_no, len(row), len(header)),
+                    line=line_no,
+                )
+            )
+            continue
+        face_id = row[face_index].strip("` ")
+        face_ids.append(face_id)
+        if face_id in seen:
+            findings.append(
+                finding(
+                    "faces-duplicate",
+                    face_id,
+                    message="face id %r appears on lines %d and %d"
+                    % (face_id, seen[face_id], line_no),
+                    line=line_no,
+                )
+            )
+        else:
+            seen[face_id] = line_no
+
+        cell = row[pointer_index]
+        if not cell.strip():
+            findings.append(
+                finding(
+                    "faces-pointer-missing",
+                    face_id,
+                    message="face %r has an empty %s cell"
+                    % (face_id, FACE_POINTER_COLUMN),
+                    line=line_no,
+                )
+            )
+            continue
+        bindings = pointer_bindings(cell)
+        if not bindings:
+            findings.append(
+                finding(
+                    "faces-pointer-missing",
+                    face_id,
+                    message="face %r names no backticked path in its %s cell"
+                    % (face_id, FACE_POINTER_COLUMN),
+                    line=line_no,
+                )
+            )
+            continue
+        for rel, anchor in bindings:
+            resolved = resolve_any(repo, rel)
+            if resolved is None:
+                findings.append(
+                    finding(
+                        "faces-unresolvable",
+                        face_id,
+                        message="face %r points at %r, which resolves in neither the "
+                        "source root nor the %s mirror"
+                        % (face_id, rel, MIRROR_DIR_NAME),
+                        line=line_no,
+                    )
+                )
+                continue
+            if anchor and not anchor_matches(resolved, anchor):
+                findings.append(
+                    finding(
+                        "faces-unresolvable",
+                        face_id,
+                        message="face %r anchor %r has no matching heading in %s"
+                        % (face_id, anchor, rel),
+                        line=line_no,
+                    )
+                )
+    return face_ids, findings
+
+
+def render_faces_text(record: dict) -> str:
+    lines = [
+        "flow-class faces: %d face(s) parsed, %d finding(s)"
+        % (record["faces"], len(record["findings"]))
+    ]
+    for item in record["findings"]:
+        location = item.get("unit_id") or "-"
+        if item.get("line"):
+            location = "%s (line %d)" % (location, item["line"])
+        lines.append("  [%s] %s — %s" % (item["kind"], location, item["message"]))
+    return "\n".join(lines)
+
+
+def emit_faces(record: dict, output_format: str, code: int) -> int:
+    if output_format == "json":
+        print(json.dumps(record, ensure_ascii=False, indent=2))
+    else:
+        if record["error"]:
+            print("%s: %s" % (record["error"]["label"], record["error"]["detail"]))
+        else:
+            print(render_faces_text(record))
+    return code
+
+
+def action_faces(repo: Path, output_format: str) -> int:
+    record = {
+        "action": "faces",
+        "checked_at": checked_at(),
+        "repo": str(repo),
+        "faces": 0,
+        "findings": [],
+        "error": None,
+    }
+
+    if not is_framework_source(repo):
+        label = payload_root_label(repo)
+        detail = (
+            "neither templates/commands/ nor a parseable skills/{external,internal}/ "
+            "is present in %s" % repo
+        )
+        record["error"] = {"label": label, "detail": detail}
+        print("%s: %s" % (label, detail), file=sys.stderr)
+        return emit_faces(record, output_format, 2)
+
+    path = resolve_shared(repo, GATES_OWNER_REL)
+    if path is None:
+        detail = "gate owner missing: %s" % (repo / GATES_OWNER_REL)
+        record["error"] = {"label": "gate-owner-unavailable", "detail": detail}
+        print("gate-owner-unavailable: %s" % detail, file=sys.stderr)
+        return emit_faces(record, output_format, 2)
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError) as exc:
+        detail = "gate owner unreadable: %s (%s)" % (path, exc)
+        record["error"] = {"label": "gate-owner-unavailable", "detail": detail}
+        print("gate-owner-unavailable: %s" % detail, file=sys.stderr)
+        return emit_faces(record, output_format, 2)
+
+    body = section_body(lines, FACES_SECTION_KEYWORD)
+    if body is None:
+        detail = "gate owner has no § %s section" % FACES_SECTION_KEYWORD
+        record["error"] = {"label": "gate-owner-unavailable", "detail": detail}
+        print("gate-owner-unavailable: %s" % detail, file=sys.stderr)
+        return emit_faces(record, output_format, 2)
+    table = first_table(body)
+    if table is None:
+        detail = "gate owner § %s has no parseable table" % FACES_SECTION_KEYWORD
+        record["error"] = {"label": "gate-owner-unavailable", "detail": detail}
+        print("gate-owner-unavailable: %s" % detail, file=sys.stderr)
+        return emit_faces(record, output_format, 2)
+
+    header, rows = table
+    try:
+        face_ids, findings = check_faces(repo, header, rows)
+    except GateOwnerError as exc:
+        record["error"] = {"label": "gate-owner-unavailable", "detail": str(exc)}
+        print("gate-owner-unavailable: %s" % exc, file=sys.stderr)
+        return emit_faces(record, output_format, 2)
+
+    record["faces"] = len(rows)
+    findings.extend(scan_second_face_tables(repo, face_ids))
+    record["findings"] = findings
+    return emit_faces(record, output_format, 1 if findings else 0)
+
+
 # --------------------------------------------------------------------------- #
 # entry point
 # --------------------------------------------------------------------------- #
@@ -1252,7 +2085,9 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
-        "--action", required=True, choices=("check", "lookup", "isomorphism")
+        "--action",
+        required=True,
+        choices=("check", "lookup", "isomorphism", "delegation", "faces"),
     )
     parser.add_argument(
         "--repo",
@@ -1278,6 +2113,10 @@ def main(argv=None) -> int:
         return action_lookup(repo, args.unit_id, args.format)
     if args.action == "isomorphism":
         return action_isomorphism(repo, args.format)
+    if args.action == "delegation":
+        return action_delegation(repo, args.format)
+    if args.action == "faces":
+        return action_faces(repo, args.format)
     return action_check(repo, args.format)
 
 

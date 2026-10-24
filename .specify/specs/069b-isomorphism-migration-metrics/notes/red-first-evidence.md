@@ -354,3 +354,104 @@ EXIT=1
 零 collection error（17 条全部被收集并执行）。本文件不复述 T014–T016 的整仓断言，
 只钉边界（38 / 39 / 40、100 行台账不动 floor、四条件与 `clean` 的必要非充分关系、
 语法与去重、`+` 绑定与 `§` 锚）——这些边界同样必须在 T019–T021 落地后转绿。
+
+---
+
+## G6 — T023 转绿：US3 定向套件（R5–R9 的 78 条红全部转绿）
+
+**HEAD at green run**: `ed713ede` + US3 改动（工作树，未提交）。
+
+```
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+    tests/contract/test_ledger_reconciliation.py tests/contract/test_delegation_classes.py \
+    tests/contract/test_expression_faces.py tests/contract/test_measurement_instruments.py \
+    tests/unit/test_reconciler_extensions.py -q -p no:cacheprovider
+
+........................................................................ [ 92%]
+......                                                                   [100%]
+78 passed in 6.59s
+EXIT=0
+```
+
+判读：R5（21 红）→ 0 红；R6（10 红）→ 0 红；R7（9 红）→ 0 红；R8（1 红）→ 0 红；
+R9（17 红）→ 0 红；红跑阶段已绿的 22 条保持绿。零 skip、零 xfail。
+
+**069a 回归（本切片 MUST NOT 改写其判据）**：
+
+```
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+    tests/unit/test_flow_class_check.py tests/contract/test_flow_class_ledger.py \
+    tests/contract/test_flow_class_correctness.py tests/contract/test_expression_gates_doc.py \
+    tests/contract/test_expression_compatibility.py tests/contract/test_expression_gate_wiring.py \
+    -q -p no:cacheprovider
+
+94 passed, 1 failed
+FAILED tests/contract/test_expression_compatibility.py::test_c7_mirrors_are_byte_identical
+EXIT=1
+```
+
+判读：唯一红是「源已改、镜像未投影」的已知中间态（G4 已披露，镜像同步是 T024/Polish 的写目标），
+不是 US3 引入的判据缺陷；069a 的 8 个 finding kind 语义、`lookup` 字段与退出码零改动。
+`tests/contract/test_mirror_parity_suite.py` 同样只剩 `flow-class-check.py` 与
+`flow-class-definitions.md` 两对（728 passed / 2 failed），与 G4 的名单一致，零新增对。
+
+**四项实测（T023 原文要求，全部在真实树或 `~/tmp` 副本上只读执行）**：
+
+```
+$ python3 scripts/python/flow-class-check.py --action check --repo . --format json
+{"action": "check", "units": 78, "coverage": {"ledger_rows": 78, "inventory_units": 78,
+ "matched": 78, "gaps": 0, "parse_errors": 0, "floor": 39}, "red_kind": "clean",
+ "findings": [], "error": null}
+EXIT=0
+
+$ python3 scripts/python/flow-class-check.py --action check --format text
+flow-class check: 78 unit(s) scanned, 0 finding(s) [matched=78 inventory_units=78, clean]
+coverage: ledger_rows=78 matched=78 inventory_units=78 gaps=0 parse_errors=0 floor=39
+EXIT=0
+```
+
+双注入副本（`~/tmp/069b-t023/`，由真实 `templates/` + `skills/` + owner 复制后各注入一处）：
+
+```
+$ ... --action check --repo ~/tmp/069b-t023/check-gap --format json      # 删一行台账
+coverage={'ledger_rows': 77, 'inventory_units': 78, 'matched': 77, 'gaps': 1,
+          'parse_errors': 0, 'floor': 39}  red_kind=gap  kinds={'missing': 1}
+EXIT=1
+
+$ ... --action check --repo ~/tmp/069b-t023/check-parse --format json    # 表头保留、数据行全删
+coverage={'ledger_rows': 0, 'inventory_units': 78, 'matched': 0, 'gaps': 78,
+          'parse_errors': 1, 'floor': 39}  red_kind=parse-failure  kinds={'missing': 78, 'ledger-truncated': 1}
+EXIT=1
+```
+
+判读：两次注入的 `red_kind` 不同（`gap` / `parse-failure`），「静默绿」样本数 = 0；
+删一行仍在 floor 39 之上，未被误判为截断。
+
+```
+$ ... --action delegation --repo . --format json
+commands_scanned=27  edges=41  findings=0  verdicts={'same-class': 35, 'neutral-exempt': 6}
+crossing neutral edge = ('/speckit.docs', 'skill:memory-record', 'expression', 'execution')
+EXIT=0
+
+$ ... --action delegation --repo ~/tmp/069b-t023/deleg --format json     # 把 skill:analyze-artifacts 改成 expression
+findings=[('delegation-mismatch', '/speckit.analyze')]
+edge={'command': '/speckit.analyze', 'skill': 'skill:analyze-artifacts', 'command_class': 'execution',
+      'skill_class': 'expression', 'verdict': 'mismatch', 'source_line': 41}
+EXIT=1
+
+$ ... --action faces --repo . --format json
+{"action": "faces", "faces": 6, "findings": [], "error": null}
+EXIT=0
+```
+
+三个新动作在只含 `.specify/` 载荷的临时根（`~/tmp/069b-t023/payload`）上：
+
+```
+check       EXIT=2  label=framework-source-required  findings=[]  red_kind=framework-source-required
+delegation  EXIT=2  label=framework-source-required  findings=[]
+faces       EXIT=2  label=framework-source-required  findings=[]
+```
+
+判读：载荷根不产 findings、不退出 0、不报 `inventory-truncated`（C-14）；`check` 的具名状态
+进 `red_kind`，另两个动作以 `error.label` 表达（C-14 只要求具名非绿状态，未要求三动作同形）。
+完整输出与场景对照见 `notes/quickstart-run.md` § 场景 3 / 4 / 5。
