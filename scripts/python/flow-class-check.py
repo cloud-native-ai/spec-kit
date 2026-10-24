@@ -13,22 +13,35 @@ criteria or the values' meaning. It only:
 * ``--action lookup --unit-id <id>`` — return the registered class for a unit, or
   the default class plus the fixed "undeclared, running on the default" marker for
   a well-formed but unregistered unit.
+* ``--action isomorphism`` — parse the owner's isomorphism map (8 stages x 3
+  faces) and its four non-isomorphism boundaries, then judge the 24 cells, the
+  truthfulness of every enforcement annotation against the gate owner's
+  ``(stage, face, blocking)`` rows, the boundary-to-face bindings, the closed
+  medium-axis phrases and the code-type operator floor (069b contract
+  ``contracts/isomorphism-map.md``).
 
-Both actions are read-only: no file is written or modified.
+All actions are read-only: no file is written or modified.
 
-Exit codes (contract ``contracts/flow-class-ledger.md`` C-13):
+Exit codes (contracts ``flow-class-ledger.md`` C-13 and ``isomorphism-map.md``
+C-13):
 
 * ``check``:  0 = zero findings, 1 = at least one finding, 2 = input/parse error
   (owner document missing, ledger section or header unparsable);
 * ``lookup``: 0 = resolved (including the default degradation), 2 = malformed unit
   id or unparsable owner. An unparsable owner keeps the default class semantics,
   reports ``owner-unavailable`` on stderr and leaves ``marker`` null — the two
-  degradation labels are mutually exclusive (requirements FR-009 / FR-016).
+  degradation labels are mutually exclusive (requirements FR-009 / FR-016);
+* ``isomorphism``: 0 = zero findings, 1 = at least one finding, 2 = input error
+  (owner/map missing, roster unparsable ``roster-unavailable``, gate owner
+  unparsable ``gate-owner-unavailable``, or a payload root
+  ``framework-source-required``). A payload root emits zero findings and never a
+  green verdict.
 
 Usage::
 
     python3 scripts/python/flow-class-check.py --action check [--repo <root>] [--format text|json]
     python3 scripts/python/flow-class-check.py --action lookup --unit-id <id> [--repo <root>] [--format text|json]
+    python3 scripts/python/flow-class-check.py --action isomorphism [--repo <root>] [--format text|json]
 
 The ledger is parsed by header name, never by column position; a row whose cell
 count or required values do not fit the declared grammar is reported as
@@ -652,6 +665,582 @@ def action_lookup(repo: Path, unit_id: str, output_format: str) -> int:
 
 
 # --------------------------------------------------------------------------- #
+# 069b: isomorphism map action (contract contracts/isomorphism-map.md)
+# --------------------------------------------------------------------------- #
+GATES_OWNER_REL = Path("shared") / "workflow" / "expression-gates.md"
+ROSTER_REL = Path("skills") / "external" / "sdd-loop-driver" / "scripts" / "loop-state.py"
+MAP_SECTION_KEYWORD = "同构映射"
+BOUNDARY_SECTION_KEYWORD = "不可同构边界"
+FACE_SECTION_KEYWORD = "六面（封闭集）"
+OPERATOR_SECTION_KEYWORD = "阶段算子表"
+
+# Contract C-2 / C-8: the table headers, verbatim.
+MAP_HEADER = (
+    "阶段",
+    "结构（实体 / 关系 / 边界）",
+    "流程（阶段与门禁角色）",
+    "逻辑（证据 / 契约 / 验收 / 版本 / 所有权）",
+    "强制门禁",
+    "强制状态",
+)
+BOUNDARY_HEADER = ("边界", "不可互换的判定面", "为什么不能互换", "门禁处理")
+
+# Contract C-4: the status column is a closed two-value set.
+ENFORCED = "已强制"
+DECLARED_UNENFORCED = "已声明未强制"
+STATUS_VALUES = (ENFORCED, DECLARED_UNENFORCED)
+
+# Contract C-11 / C-12: the closed phrase sets (case-insensitive).
+CODE_OPERATORS = ("pytest", "--cov", "coverage", "go test", "mvn test", "npm test", "jest")
+MEDIUM_PHRASES = ("按扩展名", "by extension", ".md 即", ".yaml 即")
+
+ROSTER_START_RE = re.compile(r"^STAGE_ARTIFACTS\s*=\s*\{")
+ROSTER_KEY_RE = re.compile(r'^ {4}"([a-z][a-z0-9_-]*)"\s*:\s*\{')
+GATE_SPLIT_RE = re.compile(r"[、,，/+\s]+")
+GATE_RESIDUAL_RE = re.compile(r"[\s`、,，。；;：:/+\-—（）()\[\]]+")
+
+
+class RosterError(Exception):
+    """The stage roster owner cannot be parsed (a C-13 exit-2 condition)."""
+
+
+class GateOwnerError(Exception):
+    """The gate owner cannot be parsed (a C-13 exit-2 condition)."""
+
+
+def resolve_shared(repo: Path, rel: Path):
+    """Resolve a ``shared/``-relative path in the framework source, then its mirror."""
+    for root in (repo, repo / MIRROR_DIR_NAME):
+        path = root / rel
+        if path.is_file():
+            return path
+    return None
+
+
+def parse_roster(repo: Path) -> list[str]:
+    """Return the ``STAGE_ARTIFACTS`` top-level keys, statically parsed.
+
+    The roster is the *owner* of the stage set: this action MUST NOT fall back to
+    a built-in eight-stage list, so an empty or missing assignment is an input
+    error rather than a silent default.
+    """
+    path = repo / ROSTER_REL
+    if not path.is_file():
+        raise RosterError("stage roster owner missing: %s" % (repo / ROSTER_REL))
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError) as exc:
+        raise RosterError("stage roster owner unreadable: %s (%s)" % (path, exc))
+
+    start = next((i for i, line in enumerate(lines) if ROSTER_START_RE.match(line)), None)
+    if start is None:
+        raise RosterError("STAGE_ARTIFACTS assignment not found in %s" % path)
+    stages: list[str] = []
+    for follow in lines[start + 1:]:
+        if follow and not follow.startswith(" "):
+            break
+        match = ROSTER_KEY_RE.match(follow)
+        if match:
+            stages.append(match.group(1))
+    if not stages:
+        raise RosterError("STAGE_ARTIFACTS has no top-level stage keys in %s" % path)
+    return stages
+
+
+class GateOwner:
+    def __init__(self, faces, operators):
+        self.faces = faces          # list[str] in table order
+        self.operators = operators  # list[dict] with stage / face / blocking / operator
+
+    @property
+    def blocking_pairs(self):
+        return {
+            (row["stage"], row["face"]) for row in self.operators if row["blocking"]
+        }
+
+    @property
+    def blocking_stages(self):
+        return {row["stage"] for row in self.operators if row["blocking"]}
+
+
+def parse_gate_owner(repo: Path) -> GateOwner:
+    path = resolve_shared(repo, GATES_OWNER_REL)
+    if path is None:
+        raise GateOwnerError("gate owner missing: %s" % (repo / GATES_OWNER_REL))
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError) as exc:
+        raise GateOwnerError("gate owner unreadable: %s (%s)" % (path, exc))
+
+    face_body = section_body(lines, FACE_SECTION_KEYWORD)
+    if face_body is None:
+        raise GateOwnerError("gate owner has no %r section" % FACE_SECTION_KEYWORD)
+    face_table = first_table(face_body)
+    if face_table is None:
+        raise GateOwnerError("gate owner § 六面 has no parseable table")
+    face_header, face_rows = face_table
+    if "face id" not in face_header:
+        raise GateOwnerError("six-face table has no 'face id' column: %r" % (face_header,))
+    face_index = face_header.index("face id")
+    faces = [
+        row[face_index].strip("` ")
+        for _line, row in face_rows
+        if len(row) == len(face_header) and row[face_index].strip("` ")
+    ]
+    if not faces:
+        raise GateOwnerError("six-face table yielded no face ids")
+
+    operator_body = section_body(lines, OPERATOR_SECTION_KEYWORD)
+    if operator_body is None:
+        raise GateOwnerError("gate owner has no %r section" % OPERATOR_SECTION_KEYWORD)
+    operator_table = first_table(operator_body)
+    if operator_table is None:
+        raise GateOwnerError("gate owner § 阶段算子表 has no parseable table")
+    op_header, op_rows = operator_table
+    required = ("阶段", "执行算子", "对应面", "阻断级别")
+    missing = [column for column in required if column not in op_header]
+    if missing:
+        raise GateOwnerError(
+            "operator table lacks required column(s): %s (header=%r)"
+            % (", ".join(missing), op_header)
+        )
+    operators = []
+    for _line, row in op_rows:
+        if len(row) != len(op_header):
+            continue
+        record = {column: row[op_header.index(column)] for column in required}
+        operators.append(
+            {
+                "stage": record["阶段"].strip("` "),
+                "face": record["对应面"].strip("` "),
+                "blocking": record["阻断级别"].strip("` ").lower() == "blocking",
+                "operator": record["执行算子"],
+            }
+        )
+    return GateOwner(faces, operators)
+
+
+def parse_isomorphism_map(repo: Path):
+    """Return ``(map_rows, boundary_rows_or_None)``; raise ``OwnerError`` on shape loss.
+
+    A missing/unparsable map *table* is an input error (the checker has no
+    subject). A missing boundary table is a finding rather than an input error:
+    C-8 names the defect (``boundary-missing``) and the checker can still report
+    the map half.
+    """
+    owner_path = next((path for path in owner_candidates(repo) if path.is_file()), None)
+    if owner_path is None:
+        raise OwnerError(
+            "owner document unreadable: none of %s exists"
+            % ", ".join(str(path) for path in owner_candidates(repo))
+        )
+    try:
+        lines = owner_path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError) as exc:
+        raise OwnerError("owner document unreadable: %s (%s)" % (owner_path, exc))
+
+    map_body = section_body(lines, MAP_SECTION_KEYWORD)
+    if map_body is None:
+        raise OwnerError("owner document has no %r section" % MAP_SECTION_KEYWORD)
+    map_table = first_table(map_body)
+    if map_table is None:
+        raise OwnerError("owner § 同构映射 has no parseable Markdown table")
+    map_header, map_rows = map_table
+    if tuple(map_header) != MAP_HEADER:
+        raise OwnerError(
+            "map header does not match contract C-2 verbatim: got %r" % (map_header,)
+        )
+
+    boundary_table = None
+    boundary_body = section_body(lines, BOUNDARY_SECTION_KEYWORD)
+    if boundary_body is not None:
+        boundary_table = first_table(boundary_body)
+    return map_rows, boundary_table
+
+
+def iso_finding(kind: str, stage, message: str) -> dict:
+    return {"kind": kind, "stage": stage, "message": message}
+
+
+def gate_tokens(cell: str) -> list[str]:
+    """Split a 强制门禁 cell into candidate tokens (backticks stripped)."""
+    cleaned = cell.replace("`", " ")
+    return [token for token in GATE_SPLIT_RE.split(cleaned) if token and token not in ("—", "-")]
+
+
+def face_ids_in(text: str, faces) -> list[str]:
+    found = []
+    for face in sorted(faces, key=len, reverse=True):
+        if re.search(r"(?<![a-z0-9-])%s(?![a-z0-9-])" % re.escape(face), text):
+            found.append(face)
+    return found
+
+
+def cell_grammar_problem(cell: str):
+    if cell.count("↔") != 1:
+        return "expected exactly one '↔', found %d" % cell.count("↔")
+    left, right = [part.strip() for part in cell.split("↔")]
+    if not left.startswith("代码型："):
+        return "left side does not start with '代码型：'"
+    if not right.startswith("文档型："):
+        return "right side does not start with '文档型：'"
+    if len(left) < 8 or len(right) < 8:
+        return "a side is shorter than 8 characters (left=%d, right=%d)" % (
+            len(left),
+            len(right),
+        )
+    return None
+
+
+def medium_hits(cell: str) -> list[str]:
+    normalized = re.sub(r"\s+", "", cell).lower()
+    return [
+        phrase
+        for phrase in MEDIUM_PHRASES
+        if re.sub(r"\s+", "", phrase).lower() in normalized
+    ]
+
+
+def check_map(rows, roster: list[str], gates: GateOwner) -> list[dict]:
+    findings: list[dict] = []
+    face_columns = MAP_HEADER[1:4]
+    blocking_pairs = gates.blocking_pairs
+    blocking_stages = gates.blocking_stages
+
+    stages: list[str] = []
+    for line_no, row in rows:
+        if len(row) != len(MAP_HEADER):
+            findings.append(
+                iso_finding(
+                    "cell-malformed",
+                    row[0].strip("` ") if row else None,
+                    "map row on line %d has %d cell(s), expected %d"
+                    % (line_no, len(row), len(MAP_HEADER)),
+                )
+            )
+            continue
+        stage = row[0].strip("` ")
+        stages.append(stage)
+
+        for column in face_columns:
+            cell = row[MAP_HEADER.index(column)]
+            problem = cell_grammar_problem(cell)
+            if problem:
+                findings.append(
+                    iso_finding(
+                        "cell-malformed",
+                        stage,
+                        "%s cell on line %d: %s" % (column, line_no, problem),
+                    )
+                )
+
+        status = row[MAP_HEADER.index("强制状态")].strip("` ")
+        gate_cell = row[MAP_HEADER.index("强制门禁")]
+        named = face_ids_in(gate_cell, gates.faces)
+        candidates = gate_tokens(gate_cell)
+        unknown = [token for token in candidates if token not in gates.faces]
+
+        if status == ENFORCED:
+            if not named:
+                findings.append(
+                    iso_finding(
+                        "slogan-row",
+                        stage,
+                        "row claims enforcement but names no closed face id",
+                    )
+                )
+            for face in unknown:
+                findings.append(
+                    iso_finding(
+                        "gate-unknown",
+                        stage,
+                        "face id %r is outside the closed six-face set" % face,
+                    )
+                )
+            for face in named:
+                if (stage, face) not in blocking_pairs:
+                    findings.append(
+                        iso_finding(
+                            "annotation-false-enforced",
+                            stage,
+                            "%r is claimed enforced but has no blocking operator at %r"
+                            % (face, stage),
+                        )
+                    )
+        elif status == DECLARED_UNENFORCED:
+            if candidates:
+                findings.append(
+                    iso_finding(
+                        "status-invalid",
+                        stage,
+                        "已声明未强制 must leave 强制门禁 empty, found %r" % (candidates,),
+                    )
+                )
+            if stage in blocking_stages:
+                findings.append(
+                    iso_finding(
+                        "annotation-false-unenforced",
+                        stage,
+                        "stage %r has blocking operator(s) but is declared unenforced" % stage,
+                    )
+                )
+        elif status:
+            findings.append(
+                iso_finding(
+                    "status-invalid",
+                    stage,
+                    "强制状态 %r is outside the closed set %r" % (status, STATUS_VALUES),
+                )
+            )
+        else:
+            findings.append(
+                iso_finding(
+                    "slogan-row",
+                    stage,
+                    "row carries neither a closed face id nor the 已声明未强制 annotation",
+                )
+            )
+
+    if len(rows) != len(roster):
+        findings.append(
+            iso_finding(
+                "stage-set-mismatch",
+                None,
+                "map has %d data row(s), the roster has %d stage(s)" % (len(rows), len(roster)),
+            )
+        )
+    if len(stages) != len(set(stages)) or set(stages) != set(roster):
+        findings.append(
+            iso_finding(
+                "stage-set-mismatch",
+                None,
+                "map stage set %r does not equal the roster keys %r"
+                % (sorted(set(stages)), sorted(roster)),
+            )
+        )
+
+    for _line_no, row in rows:
+        if len(row) != len(MAP_HEADER):
+            continue
+        for column in face_columns:
+            hits = medium_hits(row[MAP_HEADER.index(column)])
+            if hits:
+                findings.append(
+                    iso_finding(
+                        "medium-axis-in-map",
+                        row[0].strip("` "),
+                        "%s cell uses a medium-axis phrase as the classification reason: %r"
+                        % (column, hits),
+                    )
+                )
+    return findings
+
+
+def check_boundaries(boundary_table, gates: GateOwner) -> list[dict]:
+    findings: list[dict] = []
+    if boundary_table is None:
+        return [
+            iso_finding(
+                "boundary-missing",
+                None,
+                "owner has no § %s table; all four boundaries are absent"
+                % BOUNDARY_SECTION_KEYWORD,
+            )
+        ]
+    header, rows = boundary_table
+    if tuple(header) != BOUNDARY_HEADER:
+        findings.append(
+            iso_finding(
+                "boundary-malformed",
+                None,
+                "boundary header does not match contract C-8 verbatim: got %r" % (header,),
+            )
+        )
+
+    def column(name: str) -> int:
+        return header.index(name) if name in header else BOUNDARY_HEADER.index(name)
+
+    seen: list[str] = []
+    for line_no, row in rows:
+        if len(row) != len(BOUNDARY_HEADER):
+            findings.append(
+                iso_finding(
+                    "boundary-malformed",
+                    None,
+                    "boundary row on line %d has %d cell(s), expected %d"
+                    % (line_no, len(row), len(BOUNDARY_HEADER)),
+                )
+            )
+            continue
+        boundary = row[0].strip("` ")
+        if boundary not in ("a", "b", "c", "d"):
+            findings.append(
+                iso_finding(
+                    "boundary-missing",
+                    None,
+                    "unknown boundary id %r on line %d" % (boundary, line_no),
+                )
+            )
+            continue
+        seen.append(boundary)
+
+        reason = row[column("为什么不能互换")].strip()
+        if not reason:
+            findings.append(
+                iso_finding(
+                    "boundary-malformed",
+                    None,
+                    "boundary %r has an empty 为什么不能互换 cell" % boundary,
+                )
+            )
+
+        handling = row[column("门禁处理")].strip()
+        named = face_ids_in(handling, gates.faces)
+        if not named:
+            findings.append(
+                iso_finding(
+                    "boundary-unbound",
+                    None,
+                    "boundary %r names no closed face id in 门禁处理" % boundary,
+                )
+            )
+        else:
+            residual = handling
+            for face in named:
+                residual = residual.replace(face, "")
+            if len(GATE_RESIDUAL_RE.sub("", residual)) < 4:
+                findings.append(
+                    iso_finding(
+                        "boundary-malformed",
+                        None,
+                        "boundary %r lists face id(s) but no handling explanation" % boundary,
+                    )
+                )
+
+    for boundary in ("a", "b", "c", "d"):
+        count = seen.count(boundary)
+        if count == 0:
+            findings.append(
+                iso_finding("boundary-missing", None, "boundary %r is missing" % boundary)
+            )
+        elif count > 1:
+            findings.append(
+                iso_finding(
+                    "boundary-missing",
+                    None,
+                    "boundary %r appears %d times" % (boundary, count),
+                )
+            )
+    return findings
+
+
+def check_code_operators(gates: GateOwner) -> list[dict]:
+    findings: list[dict] = []
+    for row in gates.operators:
+        lowered = row["operator"].lower()
+        for token in CODE_OPERATORS:
+            if token in lowered:
+                findings.append(
+                    iso_finding(
+                        "code-operator-in-expression-gates",
+                        row["stage"],
+                        "执行算子 carries the code-type operator %r: %r"
+                        % (token, row["operator"]),
+                    )
+                )
+                break
+    return findings
+
+
+def render_isomorphism_text(record: dict) -> str:
+    lines = [
+        "flow-class isomorphism: %d stage row(s), %d gate face(s), %d finding(s)"
+        % (record["stages"], record["gates"], len(record["findings"]))
+    ]
+    for item in record["findings"]:
+        location = item.get("stage") or "-"
+        lines.append("  [%s] %s — %s" % (item["kind"], location, item["message"]))
+    return "\n".join(lines)
+
+
+def emit_isomorphism(record: dict, output_format: str, code: int) -> int:
+    if output_format == "json":
+        print(json.dumps(record, ensure_ascii=False, indent=2))
+    else:
+        if record["error"]:
+            print("%s: %s" % (record["error"]["label"], record["error"]["detail"]))
+        else:
+            print(render_isomorphism_text(record))
+    return code
+
+
+def isomorphism_input_error(record: dict, label: str, detail: str, output_format: str) -> int:
+    record["error"] = {"label": label, "detail": detail}
+    print("%s: %s" % (label, detail), file=sys.stderr)
+    return emit_isomorphism(record, output_format, 2)
+
+
+def action_isomorphism(repo: Path, output_format: str) -> int:
+    record = {
+        "action": "isomorphism",
+        "checked_at": checked_at(),
+        "repo": str(repo),
+        "stages": 0,
+        "gates": 0,
+        "findings": [],
+        "error": None,
+    }
+
+    # C-13: this action only runs in a framework source tree. A payload root
+    # (client `.specify/` shape) is an input error, never a green verdict.
+    if not is_framework_source(repo):
+        return isomorphism_input_error(
+            record,
+            "framework-source-required",
+            "neither templates/commands/ nor a parseable skills/{external,internal}/ is present in %s"
+            % repo,
+            output_format,
+        )
+
+    try:
+        roster = parse_roster(repo)
+    except RosterError as exc:
+        return isomorphism_input_error(record, "roster-unavailable", str(exc), output_format)
+
+    try:
+        gates = parse_gate_owner(repo)
+    except GateOwnerError as exc:
+        return isomorphism_input_error(
+            record, "gate-owner-unavailable", str(exc), output_format
+        )
+
+    try:
+        map_rows, boundary_table = parse_isomorphism_map(repo)
+    except OwnerError as exc:
+        return isomorphism_input_error(record, DEGRADATION_LABEL, str(exc), output_format)
+
+    record["stages"] = len(map_rows)
+    record["gates"] = len(gates.faces)
+
+    findings: list[dict] = []
+    findings.extend(check_map(map_rows, roster, gates))
+    findings.extend(check_boundaries(boundary_table, gates))
+    findings.extend(check_code_operators(gates))
+    record["findings"] = findings
+    return emit_isomorphism(record, output_format, 1 if findings else 0)
+
+
+def is_framework_source(repo: Path) -> bool:
+    if (repo / COMMANDS_REL).is_dir():
+        return True
+    for layer in SKILL_LAYERS:
+        layer_dir = repo / SKILLS_REL / layer
+        if layer_dir.is_dir() and any(layer_dir.glob("*/SKILL.md")):
+            return True
+    return False
+
+
+# --------------------------------------------------------------------------- #
 # entry point
 # --------------------------------------------------------------------------- #
 def build_parser() -> argparse.ArgumentParser:
@@ -662,7 +1251,9 @@ def build_parser() -> argparse.ArgumentParser:
             "(owner: shared/definitions/flow-class-definitions.md)."
         ),
     )
-    parser.add_argument("--action", required=True, choices=("check", "lookup"))
+    parser.add_argument(
+        "--action", required=True, choices=("check", "lookup", "isomorphism")
+    )
     parser.add_argument(
         "--repo",
         default=None,
@@ -685,6 +1276,8 @@ def main(argv=None) -> int:
             print("--action lookup requires --unit-id <id>", file=sys.stderr)
             return 2
         return action_lookup(repo, args.unit_id, args.format)
+    if args.action == "isomorphism":
+        return action_isomorphism(repo, args.format)
     return action_check(repo, args.format)
 
 
