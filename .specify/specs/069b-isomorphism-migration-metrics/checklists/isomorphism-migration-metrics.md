@@ -119,7 +119,7 @@
 - [x] CHK022 「未刷新行为不变」是否建立在可核验的「零新增调用点」论证上（模板与技能零改动 + 调用点表零改动），而不是一句声明？[Completeness, Req §FR-006; C-1 / C-3] → 已核: 实测 `templates/commands/` 27、技能 51；本切片零模板 / 零技能改动；`expression-gates.md` 调用点表 W1–W4 零改动；四个新动作未登记为任何调用点；`regen-command-copies.py --check` OK。
 - [x] CHK023 刷新是否被要求从**同一个发行包**一次带来四类载荷，部分刷新是否被具名降级，且刷新入口是否被点名（不存在独立 refresh 子命令；且该发行包必须由本切片源码构建，不能是预装旧 CLI）？[Consistency, Req §FR-006 / §FR-008; C-2 / C-5] → 已核: C-2 / C-5 四类载荷同包；C-5 要求刷新包由本切片源码构建 wheel（实测预装 CLI 的包内无 069a 载荷）；C-2 的「有新引擎无新 owner」不是受支持态（`lookup` → `owner-unavailable`；框架源动作 → `framework-source-required`）；C-14 补「owner 同时缺失时按 C-3 报 `owner-unavailable`」；FR-006 增 `specify init` 覆盖式合并入口；实测 CLI 只有 init / check / render-agents。
 - [x] CHK024 分发是否限定为既有路径（force-include + shared 复制 + hatch skills 阶段），且「零项目侧存储 / 读取点」是否完整覆盖路径、缓存、索引、注册表？[Dependency / Completeness, Req §FR-008; C-4 / C-5] → 已核: 实测 `pyproject.toml:34 scripts`、`:37 shared`、`src/specify_cli/__init__.py:2462` shared 复制段、`src/hatch_build.py:42 _stage_skills`；C-4 禁止项目侧新增路径 / 数据文件 / 缓存 / 索引 / 注册表；`--action lookup` 是唯一面向客户运行时的读取入口。
-- [ ] CHK025 客户项目那份分类副本的「漂移检查」是否被指定了 owner 与仪器，还是只有框架源 ↔ 镜像的检查？[Gap, Req §FR-008] → disposition: verify-in-implementation: 本切片范围内的漂移检查只有框架源 `sync-mirrors.py --check`（六对 ok 实测）；客户副本由 `specify init` 整文件覆盖，C-4 禁止新增客户侧检查器。若要求客户侧主动检查，会与 FR-008 的「不新增分发机制」冲突，须由后续特性修订 FR-008——本清单记录该假设，不据此放宽任何判据。
+- [ ] CHK025 客户项目那份分类副本的「漂移检查」是否被指定了 owner 与仪器，还是只有框架源 ↔ 镜像的检查？[Gap, Req §FR-008] → disposition: **out-of-slice**（2026-10-25 review-fix F9 由 `verify-in-implementation` 改判）: 本切片范围内的漂移检查只有框架源 `sync-mirrors.py --check`（六对 ok 实测）；客户副本由 `specify init` 整文件覆盖，C-4 禁止新增客户侧检查器。实现期未、也无法在本切片内关闭该项——它是**需求缺口**（FR-008 没有指定客户副本的检查 owner），不是实现缺口。转交记录：owner = 后续修订 FR-008 的特性（尚未立项）；登记编号 `OI-069b-01`（`.specify/memory/register.md`）。解除条件 = 该特性为 FR-008 指定 owner 与仪器，或明确豁免。本项保持 `[ ]`，**不冒充完成**。
 
 ## J. 客户快照与名字级判据
 
@@ -139,13 +139,17 @@
 
 - [x] CHK034 14 FR / 5 SC 是否都映射到至少一个任务，51 条款是否每条恰好被认领一次且每契约内单调，29 个任务行是否每个要么被映射、要么被声明为流程行？[Traceability, Req §FR-001–§FR-014 / §SC-001–§SC-005] → 已处置: FR-010 覆盖补 T018；实测 51 条 `[green:]` 唯一、每契约单调递增、无重复；14 / 5 全部有映射；T018 原为唯一既未映射也未声明为流程行的任务。
 - [x] CHK035 8 支新测试是否被要求先红、红形态是「动作 / 章节缺失」而非 import / collection error，Tests Mode ON 是否由可执行引擎扩展正当化而非 template-only 门？[Measurability, Constitution IV; tasks §Tests Mode] → 已核: 8 个测试文件（6 契约 + 2 单元）；tasks §Tests Mode ON 并写明理由；T004 / T005 / T010 / T014–T018 逐支红跑并写 `notes/red-first-evidence.md`；红形态明文禁止 import / collection error。
-- [x] CHK036 Feature 069 是否保持 `Planned`（069a Implemented / 069b 进行中）、069a 是否除 A-1 的一行 fixture 外零改动、被否决的 `shared/definitions/isomorphism-map.md` 是否仍不存在，且文内计数（78 / 51 / 29 / 14 / 5 / 3 / 6 / 16 / 26-27 / 6 / 9）是否与实测一致、plan 的 `advisories=9` 与正文 10 是否已披露？[Consistency, Req §SA-5 / §SA-6; tasks §Path Conventions] → 已核: `features.md` 069 = `Planned`；069a 规格 / 测试 `git status` 干净；A-1 仅允许 `_render_owner` 补一行版本声明（feature-ref §3、plan §4 已同步）；`shared/definitions/isomorphism-map.md` ABSENT；实测计数与文内一致；T011 的「12 处」更正为三类处置（P2 删除 / P3 重写 / P4 的 10 处指向 C-7）；plan 的 `advisories=9` vs 正文 10 已由 tasks §Generation-time premise corrections 披露，且当前重跑三阶段均为 27（tasks.md 与本清单已存在，属分母变化，非载荷错误）。
+- [x] CHK036 Feature 069 是否保持 `Planned`（069a Implemented / 069b 进行中）、069a 是否除 A-1 的一行 fixture 外零改动、被否决的 `shared/definitions/isomorphism-map.md` 是否仍不存在，且文内计数（78 / 51 / 29 / 14 / 5 / 3 / 6 / 16 / 26-27 / 6 / 9）是否与实测一致、plan 的 `advisories=9` 与正文 10 是否已披露？[Consistency, Req §SA-5 / §SA-6; tasks §Path Conventions] → 已核: 清单阶段实测 `features.md` 069 = `Planned`；069a 规格 / 测试 `git status` 干净；A-1 仅允许 `_render_owner` 补一行版本声明（feature-ref §3、plan §4 已同步）；`shared/definitions/isomorphism-map.md` ABSENT；实测计数与文内一致；T011 的「12 处」更正为三类处置（P2 删除 / P3 重写 / P4 的 10 处指向 C-7）；plan 的 `advisories=9` vs 正文 10 已由 tasks §Generation-time premise corrections 披露，且当前重跑三阶段均为 27（tasks.md 与本清单已存在，属分母变化，非载荷错误）。**状态更新（2026-10-25 review-fix F2/F3）**：本项的两个前提已随时间失效——(a) 索引状态按 Pre-Status-Flip 门推进为 `Implemented`（069a/069b 均 Implemented，见 `features/069.md` § Slice-aware status）；(b) 069a 的测试被触碰第二处——`tests/contract/test_expression_gates_doc.py` 的仪器断言（授权与证据见 `tasks.md` § 跨切片一致性修正登记）。
 
 ---
 
 ## Notes
 
-- `[x]` 项的行尾 `→ 已核:` / `→ 已处置:` 是可复算证据或本轮已落的规格修正；`[ ]` 项只有一条（CHK025），disposition 为 `verify-in-implementation`。
+- `[x]` 项的行尾 `→ 已核:` / `→ 已处置:` 是可复算证据或本轮已落的规格修正；`[ ]` 项只有一条（CHK025），
+  disposition 为 **`out-of-slice`**，已转交 `OI-069b-01`（`register.md`），不冒充完成。切片收口时对账见
+  `verification.md` § Checklist 收口对账。
 - 本清单不评判实现好坏：`--action isomorphism` / `delegation` / `faces` 的实际绿跑、三快照的 `comm -13`、双注入的 `red_kind` 属实现期取证（tasks T009 / T012 / T023 / T026 / T027），本清单只核对它们的判据、样本与非替代关系是否已经写死。
-- 069a 的规格与判据正文零改动；唯一触碰是 `tests/unit/test_flow_class_check.py` 的 `_render_owner` 补一行 `**台账版本**`（tasks A-1 的披露边界）。
-- 本清单运行未修改任何实现、模板、技能或 `.specify/` 镜像；规格修正只落在本切片的 requirements / plan / research / data-model / contracts / tasks / quickstart / feature-ref / notes。
+- 069a 的**规格与判据正文**零改动；069a 的测试文件触碰两处——`tests/unit/test_flow_class_check.py` 的 `_render_owner`
+  补一行 `**台账版本**`（tasks A-1 的披露边界），与 `tests/contract/test_expression_gates_doc.py` 的仪器断言重编码
+  （2026-10-25 review-fix F2 更正：原「唯一触碰是 A-1」不成立；授权见 `tasks.md` § 跨切片一致性修正登记）。
+- 本清单运行未修改任何实现、模板、技能或 `.specify/` 镜像；规格修正只落在本切片的 requirements / plan / research / data-model / contracts / tasks / quickstart / feature-ref / notes。清单项本身在 2026-10-25 review-fix 轮按 F9 / F2 / F3 就地更正 disposition 与两处过期前提，未改任何判据。

@@ -38,6 +38,17 @@
 **Scale/Scope**: 修改既有文件 2 个（owner 文档、引擎）；新增文件 = 4 份契约 + 8 个测试 + 3 份 notes；契约条款 4 份；
 quickstart 7 个场景；无新增命令、无新增门禁面
 
+**Constraint correction（2026-10-25 · review-fix F2）**: 上面的「修改既有文件 2 个」与「不改 069a 的任何规格与判据正文」
+在实际交付后需要两处限定，均已登记在 `tasks.md` § 跨切片一致性修正登记，此处只记设计与授权理由（判据与证据不在此复述）：
+
+- 069a 的**规格正文**（`.specify/specs/069a-flow-classification-docs-gates/` 下全部文档、父规格）零改动；被触碰的是
+  069a 的**契约测试** `tests/contract/test_expression_gates_doc.py` 的仪器断言——仪器口径（`wall_clock` 起点）按 069a C-9
+  的委派由本切片 C-1 拥有，故这是**同一判据的仪器重编码**，不是判据改写。
+- 修正对象是 069a 交付的门禁 owner `shared/workflow/expression-gates.md` 的 § 三项基线（起点仪器）与其 § 阶段算子表（新增
+  `算子 id` 列，供引用级强制判据解析）。两者都不在 § Source Code 的编辑面清单内，故本切片的「既有文件 2 个」按授权例外
+  更正为「3 个 + 其镜像」；编辑面清单未预先声明该文件，是 F2 指出的流程缺口，修复归 review REC-069b-05（framework 侧）。
+
+
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
@@ -128,6 +139,11 @@ tests/unit/test_reconciler_extensions.py       # 新增：red_kind 优先级/cov
 
 **不产生镜像义务**：`tests/**`（不入镜像）、`.specify/specs/**`（规格产物本身）。
 **命令副本零改动**：`templates/commands/` 未被触碰，故 `regen-command-copies.py --check` 应继续 `OK`；若它变化，说明有人改了模板。
+
+**Mirror addendum（2026-10-25 · review-fix F2 / F1 / F4）**: 上表是 plan 阶段的两对义务，不是最终集合。实际交付触碰五对，
+owner 是 `contracts/migration-distribution.md` C-10（不在此复述），新增三对为 `shared/workflow/expression-gates.md`
+（跨切片仪器口径 + `算子 id` 列）、`scripts/python/doc-consistency-check.py`（duplicate 面作用域）与各自的 `.specify/` 镜像。
+判据仍是「零新增差异」，复核输出见 `verification.md` § T024。
 
 ## Complexity Tracking
 
@@ -241,6 +257,10 @@ FR-009–013 → 契约二；FR-014 → 契约四）；5 条 SC 也都在引用�
 - `plan.md` / `research.md` / `data-model.md` / `contracts/`（4 份）/ `quickstart.md` / `feature-ref.md` / `notes/`（3 份 dated 记录）落盘。
 - **Feature 069 保持 `Planned`**：`069a = Implemented`、`069b = plan 已落盘`；本阶段 MUST NOT 写 `Implemented`。
   登记更新只落 `features/069.md` 的 Related Specifications / Status Tracking 与索引行 Last Updated，不改状态列。
+  **（review-fix F3 补记）** 这是 **plan 阶段**的约束，不是永久禁令：切片实现收口后，`shared/workflow/feature-integration.md`
+  的 Pre-Status-Flip 门（tasks 零 `[ ]`、`verification.md` 每个 SC 有状态行、无未处置 deferred）全部满足，故由
+  `/speckit.implement` 把索引状态推进 `Planned → Implemented`（069a / 069b 均 Implemented）；现状见
+  `features/069.md` § Slice-aware status。`Ready for Review` 与 `Completed` 均未主张（review 的 P0/P1 处置尚未闭合）。
 - 不创建 `tasks.md` / `verification.md`（分别归 `/speckit.tasks` 与 `/speckit.implement`）。
 
 ## Test Strategy
@@ -304,7 +324,7 @@ $ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode 
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
 | Data model | [data-model.md](data-model.md) | 10 实体（E1–E10） |
-| Contracts | [contracts/](contracts/) | 4 份：`isomorphism-map.md` / `ledger-reconciler.md` / `migration-distribution.md` / `measurement-instruments.md`；条款 51 条（14 + 16 + 11 + 10） |
+| Contracts | [contracts/](contracts/) | 4 份：`isomorphism-map.md` / `ledger-reconciler.md` / `migration-distribution.md` / `measurement-instruments.md`；条款 52 条（14 + 16 + 12 + 10；C-12「刷新载荷冒烟」由 2026-10-25 review-fix F5 追加，plan 期是 51 条） |
 | Quickstart | [quickstart.md](quickstart.md) | 7 场景（逐例标注 route a / route b） |
 | Feature reference | [feature-ref.md](feature-ref.md) | 14 条 FR → 落点 → 契约 → 测试；5 条 SC → 测量源；Feature list 复核 |
 | Research | [research.md](research.md) | 15 项决策（R1–R15） |

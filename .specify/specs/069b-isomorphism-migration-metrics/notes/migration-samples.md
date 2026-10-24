@@ -5,11 +5,18 @@
 **刷新前状态**: 三个样本均**未刷新**——`.specify/shared/definitions/flow-class-definitions.md` 与
 `.specify/scripts/python/flow-class-check.py` 都不存在（实测 `test -f`），即 069a 的载荷尚未到达。
 
-| # | 项目 | 路径 | HEAD | 分支 | 工作树脏文件 | 069a 载荷 | 套件命令 | 跑测前提 |
+| # | 项目 | 路径 | HEAD | 分支 | 工作树脏文件 | 069a 载荷 | 套件命令 | 跑测前提（冻结原文，未经冒烟；实际可执行前提见 § 跑测机制更正） |
 |---|------|------|------|------|--------------|-----------|----------|----------|
 | 1 | xuanji-agent | `/Users/liuqiming.lqm/project/kangaroo-xuanji/xuanji-agent` | `3f68b62` | `master` | 195 | 无 | `.venv/bin/python -m pytest tests/ -q` | `.venv/bin/python` 存在（实测）；套件不依赖未跟踪文件 |
 | 2 | xuanji-cli | `/Users/liuqiming.lqm/project/kangaroo-xuanji/xuanji-cli` | `a0c476d` | `xuanji/develop` | 548 | 无 | `go test ./...` | `go1.27.2` 在 PATH（实测）；模块缓存可用 |
 | 3 | xuanji-function | `/Users/liuqiming.lqm/project/kangaroo-xuanji/xuanji-function` | `a2fad18` | `main` | 28 | 无 | `.venv/bin/python -m pytest -q` | `.venv/bin/python` 与 `pytest.ini` 存在（实测） |
+
+**《跑测前提》更正（review-fix F8，2026-10-25）**：上表最后一列的原文**未经冒烟就被冻结**，实测只有第 2 行可用。
+第 1、3 行按原样执行**启动不了**套件（`.venv` 不在 `git archive` 内；`xuanji-agent` 的 editable 安装把导入指回原工作树；
+`xuanji-function` 缺 cws-lib 环境与三处 `PYTHONPATH`）。冻结的是**样本**（项目 / HEAD / 分支 / 脏文件数 / 载荷状态 / 套件命令），
+这些值全部成立且未改；**运行环境契约不属样本**，它被三处更正改写，逐条见下两节。
+「样本已冻结」因此**不得被读成**「跑测程序也已冻结」——这是 F8 指出的缺口，修复归 review REC-069b-10（冻结时同时冻结
+解释器 / `PYTHONPATH` / 环境变量 / node 集提取并先做一次冒烟）。
 
 ## 快照与刷新程序（不修改原始项目）
 
@@ -123,3 +130,21 @@ python3 .specify/scripts/python/flow-class-check.py --action isomorphism --repo 
 3. 原始项目零修改：刷新前后 `xuanji-agent 195` / `xuanji-cli 548` / `xuanji-function 28` 个脏文件，HEAD 未变。
 4. 与产品套件是两条独立证据：产品套件证明「加文件不破坏既有行为」；本节证明「新增载荷真的能跑」。
    任一缺失时 SC-002 不得记 pass（契约 C-12）。
+
+## 样本代表性（review-fix F12，2026-10-25）
+
+SC-002 的措辞是「既有客户项目」，而这三个样本是**便利样本**（从本机工作树取，同组同作者）。代表性边界必须写明，
+否则「零新增失败」会被读成对整个客户面的保证：
+
+| 维度 | 本样本覆盖 | **未覆盖** |
+|------|------------|------------|
+| 组织 | 1 个代码组 `kangaroo-xuanji` 下的 3 个库 | 其他代码组 / 其他团队维护的库 |
+| 维护者 | 同一作者、同一 git 身份、同一台机器 | 他人维护的项目、含人工本地改动的项目 |
+| 语言 / 工具链 | Python（pytest）2 个、Go（`go test`）1 个 | Java / Maven、Node / pnpm、Rust / Cargo 等 |
+| `.specify` 历史 | 三者都有 `.specify/` 且**都缺 069a 载荷**（新装形态） | 老版本 `.specify`（旧命令副本 / 旧技能树）、无 `.specify/` 的项目 |
+| 操作系统 / 路径 | macOS，本机绝对路径 | Windows（路径分隔符、`go test` 行为）、Linux CI 容器 |
+| 刷新入口 | 同一 wheel + `specify init` | 其他安装形态（pipx / 镜像预装 / 既有 CLI 原地升级） |
+
+**读法**：SC-002 的「零新增失败」只在上述**已覆盖**维度上成立；它不证明 Java 客户端或 Windows 检出同样零回归。
+选样依据是**可得性**（本机工作树），不是代表性——这正是 F12 指出的缺口。修复归 review REC-069b-09：任一迁移 / 兼容 SC
+至少含一个作者所属组之外的样本，且样本从框架已安装项目清单派生，而不是从作者工作集挑。

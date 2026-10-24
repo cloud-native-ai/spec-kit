@@ -3,6 +3,7 @@
 **Run**: 2026-10-25 · branch `069b-isomorphism-migration-metrics` · run-start HEAD `5d5331b9`
 **Scope of this run**: Polish 阶段 T024–T029（镜像与命令副本、文档同步评估、全量回归、SC 证据、特性登记、终局门禁）＋ T014–T018 复选框回填（产物已存在且 78 支全绿，只补状态位）＋ 一处跨切片一致性修正（墙钟起点仪器，见 §跨切片一致性修正）
 **Review-fix (2026-10-25, F1/F4/F5)**: 映射强制声明改为引用级可证伪（`gate:<算子 id>`）、SC-005 测量面从 13 文件恢复到「四棵树 + 本轮 owner」、「刷新载荷冒烟」补入 SC-002。逐项证据见 §Review-fix F1/F4/F5。
+**Review-fix (2026-10-25, F2/F3/F6 + P2 F7–F12)**: 跨切片改动显式登记（tasks/plan 同步更正「零改动」表述）、父状态按 Pre-Status-Flip 门推进 `Planned → Implemented`、三项基线按「仪器-对象缺口」如实降级（不记 0）、P2 六项逐条处置。逐项证据见 §Review-fix F2/F3/F6/P2。
 **Owner of the record shape**: `.specify/templates/verification-log-template.md`（`SC-NNN_status=` 词表：pass \| fail \| partial \| deferred \| unknown）
 **Owner of the failing-test names and count**: `notes/test-baseline-contract.txt`（本文件只记 `comm -13` 的结果，不复述数字为「当前实测」）
 
@@ -13,7 +14,8 @@ baseline_commit=4710676297dcdbcaabb72f6dc7882abfae906006
 baseline_date=2026-10-25
 baseline_branch=069b-isomorphism-migration-metrics
 implementation_date=2026-10-25
-post_change_commit=<本文件的引入提交：git log -1 --format=%H -- .specify/specs/069b-isomorphism-migration-metrics/verification.md>
+post_change_commit=<pin: 本文件落地提交的 SHA，由紧随的仅改本行的 pin 提交回填>
+post_change_commit_pin=single-line follow-up commit; this run's log is landed by the commit named in post_change_commit
 deferred_tasks=
 ```
 
@@ -89,9 +91,11 @@ $ /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest tests/contract/test_exp
 EXIT=0
 ```
 
-**未动的面**（可用 `git diff` 证）：六面表、8 阶段算子表、调用点表、阻断级别与证据语法逐字未变——diff 只落在「三项基线」的表行与紧随其后的冻结点条目。069a 的其他判据（C-1…C-8、C-10…C-15）与断言均未改写。
+**未动的面**（可用 `git diff` 证）：六面表、调用点表、阻断级别与证据语法逐字未变；§ 阶段算子表的**算子文本 / 对应面 / 阻断级别**逐字未变。diff 只落在「三项基线」的表行与其后的冻结点条目（`33c47fd5`），以及 § 阶段算子表新增的 `算子 id` 列（`d8fc2bf9`，review-fix F1 为把 `已强制` 做成引用级可证伪而加）。069a 的其他判据（C-1…C-8、C-10…C-15）与断言**语义**均未改写。
 
-**证据指针**：本节 `git diff --stat` 与 18 passed 实跑；`notes/expression-baseline.md` 表内 `wall_clock` 行已按同一仪器记录。
+**落地提交与登记（review-fix F2）**：本修正实际横跨两个提交——`33c47fd5`（`wall_clock` 起点仪器 + `tests/contract/test_expression_gates_doc.py` 的断言仪器重编码）、`d8fc2bf9`（同一 owner 的 `算子 id` 列 + 该列驱动的引用级断言）。旧记录把跨切片改动只写在 `verification.md` 与提交消息里，于是 `tasks.md` / `plan.md` 的「禁改面 / 本切片零改动 / 唯一 A-1」与树不一致；现已在两处登记（`tasks.md` § 跨切片一致性修正登记；`plan.md` § Constraint correction 与 § Mirror addendum），069a 的**规格目录**仍零改动。派发前提只给了一个提交号 `d8fc2bf9`，实测补全为上述两个：墙钟起点修正落在 `33c47fd5`，`d8fc2bf9` 是 `算子 id` 列与其断言。
+
+**证据指针**：本节 `git diff --stat` 与 18 passed 实跑；`notes/expression-baseline.md` 表内 `wall_clock` 行已按同一仪器记录；`tasks.md` § 跨切片一致性修正登记（逐项授权与提交）。
 
 ---
 
@@ -191,6 +195,7 @@ $ wc -l < ~/tmp/069b-baseline-names.txt
 - **SC-003** — 状态 **pass**。对台账做两种注入（临时副本，不改仓库）：A 删一行（`/speckit.agents`）→ `red_kind = gap`、exit 1、`ledger_rows=77 gaps=1 parse_errors=0`；B 破坏表形（表头保留、数据行全删）→ `red_kind = parse-failure`、exit 1、`ledger_rows=0 parse_errors=1` + `ledger-truncated`。两红**可区分**（`gap` ≠ `parse-failure`），静默绿样本数 = 0（真实树 `red_kind = clean`、exit 0 是唯一绿样本）。另在复制根上验证 `LEDGER_FLOOR = 39` 的反空真：77 行仍判 `gap`、MUST NOT 触发 `ledger-truncated`。逐项记录见 `notes/quickstart-run.md` § 场景 3。
 - **SC-004** — 状态 **unknown**。**机器侧已测**：台账 `basis = mixed-oracle` 行 **8 行全部 `flow_class = execution`**（命令侧 `/speckit.constitution`、`/speckit.implement`、`/speckit.instructions`、`/speckit.interview`；技能侧 `skill:implement-feature`、`skill:manage-constitution`、`skill:manage-instructions`、`skill:run-interview`），`mixed-oracle-class` 反例注入（`basis = mixed-oracle` 且 `flow_class = expression`）转红（`tests/contract/test_ledger_reconciliation.py::test_mixed_oracle_expression_row_is_rejected`），择优样本数 = 0。**未测**：两名判定者（不同的人 / 不同的会话 / 判定时互不可见、结论分别落盘后比对）的独立归类演练**本次未执行**——本 run 是单代理 headless 收口，无第二名独立判定者，一致率无可测量的分母，故不记 100%、不记达成。
   - 样本清单与两类覆盖：**「既被人读又被脚本解析」**类取 `/speckit.instructions`（指令文本由读者判、符号链接由脚本判）与 `skill:manage-instructions`（同源技能）；**「须生成并编译」**类取 `/speckit.implement` 与 `skill:implement-feature`（台账 notes 原文为「代码须运行、规格回填须读者核」——执行侧 oracle 落在运行生成的产物上；owner 文档里字面的「须生成并编译 SDK 的 OpenAPI 契约」是边界例，不是台账单元）。机器侧落类分布 = 8/8 `execution`，0 条 `expression`。
+  - **执行载体缺口（review-fix F10）**：本条的人工半在 `plan.md` / `tasks.md` 里**没有执行载体**——没有一行任务派发第二名互相隔离的判定者，也没有带 owner 的 `deferred` 条目。因此单代理收口下它只能落 `unknown`：不是「测了但没测准」，而是**从未安排测量**。解除条件与 owner 见 §Residual MEDIUM-1；机制修复归 review REC-069b-04（plan 期必须为需要多判定者的 SC 指定载体，否则不得进入 implement）。
 - **SC-005** — 状态 **pass**（测量面已按 review-fix F4 恢复）。`--action faces --repo . --format json` 返回 `faces = 6`、`findings = []`、exit 0——六面表恰好 6 行、face id 唯一、每行一个 `owner_pointer` 格（`+` 连接仍算一个绑定）、9 条真实指针路径在源码根或 `.specify/` 镜像可解析、`§` 锚均有匹配标题（`notes/quickstart-run.md` § 场景 5）。判据正文不搬家：`doc-consistency-check.py --action verify --faces duplicate --owner-path shared/definitions/flow-class-definitions.md --path shared --path templates/commands --path skills --path docs --spec-dir .specify/specs/069b-isomorphism-migration-metrics` 在**声明主体面（533 个文件）**上 `faces.duplicate = pass`、`findings = []`；比较侧是分类 owner 单文件（`scope.owners` 自证）。命令模板 / 技能 / 文档树里的副本注入各一条均转红（`tests/contract/test_expression_faces.py`）。旧口径「owner + spec artifacts 13 文件」已废弃——它看不见模板、技能与文档里的副本。
 
 ```text
@@ -227,7 +232,7 @@ SC-005_note=criterion text stays in its owner; the old 13-file scope (owner + sp
 | 6 | 迁移与分发（未刷新零调用点 / 刷新同包原子 / 三快照零新增） | 完成 | § 场景 6（含 6.1–6.4） |
 | 7 | 三项基线只用既有仪器 | 完成 | § 场景 7（指针段）→ 实跑记录归 `notes/expression-baseline.md` § 复核 |
 
-场景 7 的**值与仪器归 `notes/expression-baseline.md`**（本文件与 `quickstart-run.md` 只留指针，不复述数值）：四条来源命令全部 exit 0 可重跑，`gate_calls` / `confirmations`（两个分项）/ `wall_clock` 均按契约 C-6 记 `not-evaluated` + reason，不记 0、不记达成。docs-sync 评估另见 § T025 与 `quickstart-run.md` § docs-sync。
+场景 7 的**值与仪器归 `notes/expression-baseline.md`**（本文件与 `quickstart-run.md` 只留指针，不复述数值）：四条来源命令全部 exit 0 可重跑；三项量的 verdict 均为 `not-evaluated`，但**原因不同且都不记 0**——`confirmations` 两个分项是实测 0（降幅不可定义）、`gate_calls` 是仪器看不见对象（通道数 `unit_id` 记录，门禁是脚本）、`wall_clock` 是终点记录在本切片从未生成（review-fix F6 已把该运行缺口登记在 `notes/expression-baseline.md` § 仪器-对象缺口）。docs-sync 评估另见 § T025 与 `quickstart-run.md` § docs-sync。
 
 **证据指针**：本节各 SC 行的命令与 `notes/quickstart-run.md` 小节；机器侧 `flow-class-check.py` 三种动作的 JSON 输出；`tests/contract/test_ledger_reconciliation.py` 的 `mixed-oracle` 两用例。
 
@@ -241,9 +246,14 @@ SC-005_note=criterion text stays in its owner; the old 13-file scope (owner + sp
 2. `features/069.md` § Status Tracking **已有**「切片 069b tasks（2026-10-25）」行（tasks 阶段回填，29 与 Tests Mode ON 均在），本轮**追加**「切片 069b implement（2026-10-25）」行记录收口证据（29/29 `[X]`、SC 分布、零 NEW、镜像、覆盖、结构面）。
 3. § Slice-aware status 原文「069b = plan 已落盘……tasks / implement 未开始」已过期 → 改为「069b = Implemented」并保留父级索引状态列的处置说明（A-P1）。
 
-**索引行（`features.md`）**：只改 069 行的 **Last Updated** 单元格（追加本次收口），**Status 列保持 `Planned`** —— `tasks.md` T028 明文「状态列 MUST 保持 `Planned`……`Implemented` 转移属 `/speckit.implement`／评审 owner」，本 run 按派发不进入 review，故按可逆优先停放（A-P1）。未写 `Completed`、未新增 Feature 行、未回填他特性登记。
+**索引行（`features.md`）—— 收口时的处置与 review-fix F3 的更正**
 
-**判读**：切片级事实（069b Implemented）在详情文件可查；索引级状态停在更保守的值上，属**欠报**而非虚报。
+- 收口时只改 069 行的 **Last Updated** 单元格，**Status 列保持 `Planned`**，理由写的是「`tasks.md` T028 明文『状态列 MUST 保持 `Planned`……`Implemented` 转移属 `/speckit.implement`／评审 owner』，本 run 按派发不进入 review」。
+- **该理由不成立，已更正（review-fix F3）**：T028 那句话自相矛盾——本 run **就是**落实 implement 收口的那一趟；`shared/workflow/feature-integration.md` 的 Pre-Status-Flip 四项逐条全过（`tasks.md` 零 `[ ]` = 29/29 `[X]`、`deferred_tasks=` 空、5 条 SC 状态行齐备、无未处置 `[~]`），owner 协议要求推进。故索引行 069 的 Status 改为 `Implemented`（069a / 069b 均 Implemented），`features/069.md` 的 Status 同步改为 `Implemented`，其 § Slice-aware status 首条改写为「索引状态列 = `Implemented`」。
+- **未主张的两级**：`Ready for Review`（状态机定义 = 全部 deferred 解决或豁免**且** review 证据产出）未写——review 报告已产出，但其 P0/P1 处置尚未闭合；`Completed`（人工验收）同样未写。
+- **索引单元格按 F11 收敛**：069 行 Last Updated 原为逐次追加的长叙事（切分后单元格实测 2 959 字符），现改写为一行 `2026-10-25 (slice: 069b Implemented; 069a Implemented) — 详情见 .specify/memory/features/069.md`，叙事留在 `features/069.md` § Status Tracking；索引文件头 `Last Updated` 同步为 2026-10-25。未新增 Feature 行、未回填他特性登记。
+
+**判读**：至此索引与详情文件不再互相矛盾，也没有虚报完成度——停在 `Implemented`，不写 `Ready for Review` / `Completed`。
 
 **证据指针**：`.specify/memory/features/069.md`（§ Related Specifications 的 069b Tasks 行、§ Status Tracking 的 implement 行、§ Slice-aware status）；`.specify/memory/features.md` 069 行 Last Updated 单元格。
 
@@ -321,7 +331,91 @@ $ grep -rn -- '--action isomorphism\|--action delegation\|--action faces' \
 
 **证据指针**：本节四段门禁输出 + 结构面三段命令；`notes/pre-change-measurements.md` § 2（结构面基线 3 条）。
 
+### review-fix 后门禁复跑（2026-10-25，工作树 = review-fix F2/F3/F6 + P2 的全部落盘后、提交前）
+
+上四段是**收口时**的真实输出；review-fix 之后条款数与命令口径有变（F5 追加 C-12、F2 改了 tasks 的禁改面表述），
+故在同一台机器上复跑一遍。判据不变，数字以本小节为准：
+
+```text
+$ python3 .specify/scripts/python/validate-requirements.py .specify/specs/069b-isomorphism-migration-metrics/requirements.md
+file: .specify/specs/069b-isomorphism-migration-metrics/requirements.md
+status: ok
+  [id-contiguous] pass (0)   [doc-order] pass (0)   [ref-resolvable] pass (0)
+  [marker-count] pass (0)    [dup-id] pass (0)
+scanned: 284 lines, 19 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+
+$ python3 .specify/scripts/python/validate-requirements.py .specify/specs/069-execution-expression-sdd/requirements.md
+status: ok
+scanned: 356 lines, 54 definition rows, 4 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/069b-isomorphism-migration-metrics/tasks.md
+PASS: .specify/specs/069b-isomorphism-migration-metrics/tasks.md — 0 error(s), 0 warning(s)
+EXIT=0
+
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
+    --spec-dir .specify/specs/069b-isomorphism-migration-metrics --stage tasks --repo .
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=9 waived=0
+{"summary": {"errors": 0, "advisories": 9, "waived": 0, "fr": 14, "sc": 5, "tasks": 29, "clauses": 0, "files": 12}}
+EXIT=0
+
+$ python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/069b-isomorphism-migration-metrics
+uncovered beyond baseline: 0
+FR universe: 14 / FR claimed: 14 / FR uncovered: 0
+companion: claimed clauses 52, scanned files 184, clause universe 1035, FR universe 14
+  [clause-uncovered] pass (495) — 495 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 14 of 14 FRs cited from citation groups
+  [clause-unparsable] warn (87) — 常驻基线（解析疑问，不读作零且已覆盖）
+  [coverage-baseline-delta] pass (0) — baseline holds 495 names
+0 error(s), 0 warning(s)
+status: ok
+EXIT=0
+```
+
+**判读**：`tasks` 仍 29 行（review-fix 未新增任务行，见 `tasks.md` § 跨切片一致性修正登记）；**advisory 仍 9 条**，即
+原先逐条裁定的 8 条被否决备选路径 + 1 条客户快照相对路径，没有新增；条款覆盖从 51 → 52（F5 的 C-12 认领到 T029），
+**0 beyond baseline**——A 组追加 C-12 时未同步认领分区，曾使该门禁报 `1 beyond baseline`（status `uncovered`），
+本组的登记修正把它拉回 `ok`；这不是放宽判据。需求侧的两个 `validate-requirements.py`（父 / 069b）均为 `ok`。
+
 ---
+
+## §Review-fix F2/F3/F6 + P2（2026-10-25）
+
+**口径**：本节只记**规格 / 登记 / 记录面**的修正；代码面归 review-fix A（见 §Review-fix F1/F4/F5）。每条给「处置形态 → 证据指针」。
+
+| Finding | 严重级 | 处置 | 证据 |
+|---------|-------:|------|------|
+| F2 跨切片改动未登记，「唯一 A-1 / 零改动」与树不符 | P0 | **fixed** | `tasks.md` § 跨切片一致性修正登记（4 行 + 范围边界 + 为何不补任务行）；`tasks.md` § Path Conventions 的 `禁改面` 与 § Notes 两处旧表述就地更正（保留原文 + `~~删除线~~` + 更正句）；`plan.md` § Constraint correction 与 § Mirror addendum；本节 §跨切片一致性修正 补两个落地提交。**069a 判据正文零改动**（`git diff 33c47fd5^ -- .specify/specs/069a-flow-classification-docs-gates` 为空） |
+| F3 Feature 069 停在 `Planned` 而 Pre-Status-Flip 四项全过 | P1 | **fixed** | `features.md` 069 行 Status = `Implemented`；`features/069.md` Status = `Implemented`、§ Slice-aware status 首条 = 索引状态列 `Implemented`、Status Tracking 新增「Implemented（切片 2/2）」；四项证据 = 本节 § DoD 的 DoD-1 / DoD-7 + `deferred_tasks=` 空 + `tasks.md` 零 `[~]`。**未写** `Ready for Review` / `Completed` |
+| F6 `gate_calls` / `wall_clock` 结构性不可测，且归因写成「记录属别的切片」 | P1 | **fixed（记录面）** | `notes/expression-baseline.md`：`gate_calls` 的 `frozen_value` 由 `0` 改为 `not-evaluated` + 原因（契约 C-3 明禁「当作 0」）；新增 § 仪器-对象缺口（三条，各带处置）；`wall_clock` 的「5 条全属其他特性」归因删除，改写为「本切片 analyze 未产出运行判定记录」；`verification.md` §T027 指针段同口径。**不伪造 0**：`confirmations` 的 0 是实测值照记；`gate_calls` 通道里观察到的 0/1 只作「命令单元计数」写进实测明细，不作本量之值 |
+| F7 `post_change_commit` 的值位是散文（shell 命令） | P2 | **fixed** | 头部 `post_change_commit=` 填本文件的落地提交 SHA；该值由紧随的一次「仅改这一行」的 pin 提交回填，`post_change_commit_pin` 记其性质 |
+| F8 快照「跑测前提」三条为假，且更正只追加在表后 | P2 | **recorded** | `notes/migration-samples.md`：前提列改名「冻结原文，未经冒烟；实际可执行前提见 § 跑测机制更正」，表下新增《跑测前提》更正段（哪几行按原样启动不了、冻结的是样本不是运行环境契约），并声明该缺口归 REC-069b-10 |
+| F9 CHK025 在切片收口时仍 `[ ]` 且无收口证据 | P2 | **recorded（转交）** | 清单 CHK025 disposition 由 `verify-in-implementation` 改判 **`out-of-slice`**，保持 `[ ]`，转交 `OI-069b-01`（`register.md`）；本节 §Checklist 收口对账 |
+| F10 SC-004 需两名隔离判定者，plan 从未安排 | P2 | **recorded** | §T027 SC-004 新增「执行载体缺口」子条（说明 `unknown` 是「从未安排测量」而非测不准）；§Residual MEDIUM-1 保留解除条件；机制修复归 REC-069b-04 |
+| F11 索引 Last Updated 单元格写成 2 959 字符的追加式叙事 | P2 | **fixed** | 见 §T028「索引单元格按 F11 收敛」：改为一行 `日期 (slice: 069b Implemented; 069a Implemented) — 详情见 .specify/memory/features/069.md` |
+| F12 三个样本同组同作者，代表性未记录 | P2 | **recorded** | `notes/migration-samples.md` § 样本代表性：六维「已覆盖 / 未覆盖」表 + 读法（SC-002 只在该六个维度上成立）；样本本身未更换（换了就不是同一份冻结记录） |
+
+**未处置残留（明确承认）**：F2 的机制修复（提交门按 `禁改面` 做 diff 校验）与 F6 的仪器插桩（门禁脚本在调用点写 exec-quant 形状记录）都是 **framework 改动**，按本次派发不在本组范围；已由 review REC-069b-05 / REC-069b-08 承载。本组只保证**记录与树一致、不虚报**。
+
+## §Checklist 收口对账（review-fix F9）
+
+实现收口时清单是 35 `[x]` / 1 `[ ]`，而唯一未闭合项的 disposition 写着 `verify-in-implementation`——实现期却从未核对它。对账结果与处置：
+
+```text
+$ grep -c '^- \[x\]' .specify/specs/069b-isomorphism-migration-metrics/checklists/isomorphism-migration-metrics.md
+35
+$ grep -c '^- \[ \]' .specify/specs/069b-isomorphism-migration-metrics/checklists/isomorphism-migration-metrics.md
+1
+```
+
+- **CHK025（唯一 `[ ]`）→ 转交，不关闭**：它问「客户副本的漂移检查有没有 owner 与仪器」。框架源 ↔ 镜像有 `sync-mirrors.py --check`；客户副本由 `specify init` 整文件覆盖，且 C-4 禁止新增客户侧检查器——这是 **FR-008 的需求缺口**，实现期没有任何动作能关闭它，也没有证据可引用。故 disposition 改判 `out-of-slice`，登记 `OI-069b-01`，owner = 后续修订 FR-008 的特性（未立项），解除条件 = 指定 owner 与仪器或明确豁免。**保持 `[ ]`**。
+- **CHK036 的两处前提已过期**：原文「Feature 保持 `Planned`」「069a 除 A-1 外零改动」在 F2 / F3 的修正后不成立，已在原行追加「状态更新」子句，不重写历史行。
+- **汇总由标记派生**：35 + 1 = 36 = 清单项总数；`[x]` 数未变、`[ ]` 仍为 1——**没有把「转交」写成「关闭」**。
+
+**证据指针**：清单 CHK025 / CHK036 行与 § Notes；`register.md` 的 `OI-069b-01` 行。
 
 ## §DoD 状态
 
@@ -329,7 +423,7 @@ $ grep -rn -- '--action isomorphism\|--action delegation\|--action faces' \
 |--------|------|------|
 | DoD-1 全部任务 `[X]` 且无 `[~]` | pass | `tasks.md` 29 行全 `[X]`；`deferred_tasks=` 空 |
 | DoD-2 两个编辑面按契约交付 | pass | owner 8×3 + 四边界 + 台账版本（`test_isomorphism_map` 24 用例 / `test_ledger_reconciliation` 21 用例全绿）；引擎三动作 + `check` 扩展；`lookup` 与 069a 八 kind 零改动（G3 回归证据） |
-| DoD-3 51 条款各认领一次 | pass | `account-clause-coverage.py`：claimed = 51、uncovered beyond baseline = 0（§ T029） |
+| DoD-3 52 条款各认领一次 | pass | `account-clause-coverage.py`：claimed = 52、uncovered beyond baseline = 0（§ T029 的 review-fix 复跑）。plan 期的 51 条在 review-fix F5 追加 C-12 后升为 52 条，绿点归 T029（见 `tasks.md` § 跨切片一致性修正登记） |
 | DoD-4 8 支新测试全绿且零新增失败 | pass | US1 34 + US2 16 + US3 78 全绿；`comm -13` 空（§ T026） |
 | DoD-5 镜像与副本零漂移 | pass | 六对 `ok`、两个编辑面 `cmp` 同字节、命令副本 `OK`（§ T024） |
 | DoD-6 零新命令 / 零新门禁面 / 零项目侧存储 / 零新采集器 | pass | `templates/commands/` 27 个文件；三个新动作在 `templates/` `skills/` 及全部命令副本中零命中；`expression-gates.md` 六面表与调用点表 `git diff` 零改动；`.specify/memory/` 零类别存储（`test_migration_distribution` 断言） |
@@ -340,7 +434,7 @@ $ grep -rn -- '--action isomorphism\|--action delegation\|--action faces' \
 
 ## §Assumptions（本轮自行裁决）
 
-- **A-P1 父 Feature 状态列保持 `Planned`**：`tasks.md` T028 明文「状态列 MUST 保持 `Planned`……`Implemented` 转移属 `/speckit.implement`」。本 run 虽属 069b 实现收口，但派发明确「不进入 review」，且父行状态的推进判定属实现/评审 owner；按可逆优先，本轮只把切片级事实写进 `features/069.md`（069b = Implemented + verification 指针）与 `features.md` 的 Last Updated 单元格，**不改状态列**。该取舍不构成对完成度的虚报：状态列停在一个更保守的值上，切片级证据在详情文件可查。
+- **A-P1（已废止 / superseded，2026-10-25 review-fix F3）父 Feature 状态列保持 `Planned`**：原理由「`tasks.md` T028 明文『状态列 MUST 保持 `Planned`……`Implemented` 转移属 `/speckit.implement`／评审 owner』，本 run 按派发不进入 review」**自相矛盾**——本 run 就是落实 implement 收口的那一趟，且 Pre-Status-Flip 四项全过，owner 协议要求推进。现已把索引行推进为 `Implemented`（见 §T028 与 `features/069.md` § Slice-aware status）。保留此条只为留痕：**当时停在 `Planned` 是欠报**，不是「更保守的正确值」。
 - **A-P2 跨切片修正落在 owner + 其契约测试**：`tests/contract/test_expression_gates_doc.py` 的字面断言属 069b 的编辑面（`tests/contract/`），改的是同一判据的仪器编码，不是判据语义；069a 的 contracts 文档（`.specify/specs/069a-.../`，禁改面）保持原样，其 C-9 已把仪器口径委派给 069b。
 - **A-P3 SC-004 的「须生成并编译」样本**：台账里没有字面写「编译」的单元，取 `/speckit.implement` 与 `skill:implement-feature`（notes 原文「代码须运行」= 执行侧 oracle 落在运行生成的产物上）。这是**样本措辞的近似**，已在 SC-004 行明写；该条状态本就是 `unknown`，不因此影响任何「达成」结论。
 
@@ -348,6 +442,8 @@ $ grep -rn -- '--action isomorphism\|--action delegation\|--action faces' \
 
 ## §Residual（遗留问题，按严重度）
 
-- **MEDIUM-1**：SC-004 的人工半（两名互相隔离判定者的独立归类）未执行——单代理收口无第二判定者。解除条件：由第二名判定者在隔离结论后逐条比对 8 个混合 oracle 单元与判据，统计一致率并落盘。
+- **MEDIUM-1**：SC-004 的人工半（两名互相隔离判定者的独立归类）未执行——单代理收口无第二判定者，且 plan / tasks 从未为它安排执行载体（review-fix F10）。解除条件：由第二名判定者在隔离结论后逐条比对 8 个混合 oracle 单元与判据，统计一致率并落盘。机制修复归 review REC-069b-04。
+- **MEDIUM-2（review-fix F6 登记）**：本切片 2026-10-25 的 analyze 轮未产出 `/speckit.analyze` 运行判定记录，故 `wall_clock` 只有起点、没有终点。这不是数据窗口的性质，而是运行缺口（那轮 analyze 是自跑，未走记录入口）。解除条件：该轮以 `/speckit.analyze` 入口重跑并落记录，或把 analyze 的收尾接上运行判定（框架改动，归 REC-069b-08）。
 - **LOW-1**：`docs/` 没有脚本参考面（`flow-class-check.py` 的四个动作在项目文档中零记载，069a 的 `lookup`/`check` 亦然）。本轮按 docs-step 判「无需记录」——新增参考面属 `/speckit.docs` 的结构决策，不在实现收口内。
-- **LOW-2**：`features.md` 的 069 行状态列停在 `Planned`（A-P1）。解除条件：实现/评审 owner 在 DoD 满足后按状态机推进 `Planned → Implemented`。
+- **LOW-2（已解除，2026-10-25 review-fix F3）**：`features.md` 的 069 行状态列曾停在 `Planned`（A-P1）。现已按 Pre-Status-Flip 门推进为 `Implemented`，本条关闭。
+- **LOW-3（transferred，2026-10-25 review-fix F9）**：客户侧分类副本的漂移检查缺 owner 与仪器（CHK025）。本切片判 `out-of-slice`，转交 `OI-069b-01`（`register.md`），owner = 后续修订 FR-008 的特性（未立项）。**未关闭**。

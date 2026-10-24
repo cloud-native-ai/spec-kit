@@ -414,3 +414,26 @@ Reconstructed from `git log` scoped to `.specify/specs/069b-isomorphism-migratio
 ## 8. Feedback
 
 Please share the contents of this document with the spec-kit framework developers.
+
+## 9. Disposition（review-fix 收口，2026-10-25）
+
+**范围与不改动项**：本报告评审的快照是 `41453812`。**review-fix A**（代码面）处置 F1 / F4 / F5，其结论与 §3、§6 的判读保持不变，本节不重新裁定。**review-fix B**（规格 / 登记 / 记录面）处置 F2 / F3 / F6 与 P2 的 F7–F12。下表是本轮结束时每条 finding 的状态与证据指针；证据本体在切片 `verification.md` 与 `notes/`，本节只做指针。
+
+| Finding | 严重级 | 处置 | 证据指针 |
+|---------|-------:|------|----------|
+| F1 映射「强制」是阶段级代理 | P0 | **fixed（review-fix A）** | 映射行改带 `gate:<算子 id>` 引用；引擎新增 5 种引用级 finding（缺失 / 未知 / 畸形 / 非阻断 / 不匹配）；`tasks.md` 的算子表新增 `算子 id` 列。证据：`verification.md` § SC-001 与 §Review-fix F1/F4/F5；`tests/unit/test_isomorphism_checker.py` |
+| F2 跨切片改动未登记，记录仍称「唯一 A-1」 | P0 | **fixed（B）** | `tasks.md` § 跨切片一致性修正登记（4 行 + 范围边界 + 为何不补任务行）；`tasks.md` § Path Conventions / § Notes 的三处旧表述就地更正；`plan.md` § Constraint correction 与 § Mirror addendum；`verification.md` §跨切片一致性修正 补两个提交号（`33c47fd5` 墙钟起点 + 断言、`d8fc2bf9` 算子 id 列）。069a 规格目录零改动 |
+| F3 Feature 069 停在 `Planned` | P1 | **fixed（B）** | `features.md` 069 Status = `Implemented`；`features/069.md` Status = `Implemented`、§ Slice-aware status 首条 = 索引状态列 `Implemented`、Status Tracking 新增「Implemented（切片 2/2）」；依据 = Pre-Status-Flip 四项全过（`verification.md` § DoD-1 / DoD-7、`deferred_tasks=` 空）。未写 `Ready for Review` / `Completed` |
+| F4 SC-005 测量面窄化为 13 文件 | P1 | **fixed（review-fix A）** | 主体面恢复为 `shared/` + `templates/commands/` + `skills/` + `docs/` + 本轮 owner（533 文件）；模板 / 技能 / 文档三处副本注入各转红。证据：`verification.md` § SC-005、`tests/contract/test_expression_faces.py` |
+| F5 三快照只证明「加文件不破坏产品套件」 | P1 | **fixed（A）+ 代表性 limited（F12）** | 三个快照补「刷新载荷冒烟」：安装后的 `--action lookup` exit 0 且 `source=ledger`、`check` / `isomorphism` exit 2 `framework-source-required`；契约新增 C-12 强制该形态。**仍不证明**载荷与业务行为的耦合——代表性边界见 F12 |
+| F6 两项基线结构性不可测，归因写成「记录属别的切片」 | P1 | **partial（B：记录面 fixed；插桩 out of scope）** | `gate_calls` 的 `frozen_value` 由 `0` 改 `not-evaluated` + 原因（契约 C-3 禁「当作 0」）；`notes/expression-baseline.md` 新增 § 仪器-对象缺口；`wall_clock` 的错误归因删除并改写为「本切片 analyze 未产出运行判定记录」，同缺口登记为 `verification.md` §Residual MEDIUM-2。**未做**：门禁脚本调用点插桩与 analyze 收尾接运行判定——属框架改动，由 REC-069b-08 承载 |
+| F7 `post_change_commit` 值位是散文 | P2 | **fixed（B）** | 头部填本文件落地提交的 SHA；该值由紧随的一次「仅改这一行」的 pin 提交回填（`post_change_commit_pin` 记其性质） |
+| F8 冻结表的「跑测前提」三条为假 | P2 | **recorded（B）** | 前提列改名「冻结原文，未经冒烟」，表下新增《跑测前提》更正段：两行按原样启动不了（`.venv` 不在 archive / editable 指回原树 / 缺 cws-lib 环境），并声明「冻结的是样本，不是运行环境契约」；修复归 REC-069b-10 |
+| F9 CHK025 收口无处置 | P2 | **recorded / transferred（B）** | disposition 由 `verify-in-implementation` 改判 `out-of-slice`，保持 `[ ]`，转交 `OI-069b-01`（`register.md`）；`verification.md` §Checklist 收口对账 给出 35+1=36 的派生汇总，未把转交写成关闭 |
+| F10 SC-004 无执行载体 | P2 | **recorded（B）** | `verification.md` §T027 SC-004 新增「执行载体缺口」子条（`unknown` = 从未安排测量）；§Residual MEDIUM-1 保留解除条件；修复归 REC-069b-04 |
+| F11 索引单元格 2 959 字符叙事 | P2 | **fixed（B）** | `features.md` 069 行 Last Updated 改为一行 `2026-10-25 (slice: 069b Implemented; 069a Implemented) — 详情见 .specify/memory/features/069.md`；叙事留在 `features/069.md`；索引头 `Last Updated` 同步 |
+| F12 样本同组同作者 | P2 | **recorded（B）** | `notes/migration-samples.md` § 样本代表性：组织 / 维护者 / 语言 / `.specify` 历史 / 操作系统 / 刷新入口六维「已覆盖 vs 未覆盖」表 + 读法；样本未更换（换了就不是同一份冻结记录） |
+
+**收口门禁（本轮实跑，输出见 `verification.md` § T029 的 review-fix 复跑小节）**：`validate-requirements.py`（父 / 069b）均 `ok`；`validate-tasks.py` 0 error / 0 warning；`pre-analyze-check.py --stage tasks` `decision=pass` errors=0 advisories=9（与收口时同集合，无新增）；`account-clause-coverage.py` **claimed 52 / 0 beyond baseline**（A 组追加 C-12 时未同步认领分区，曾使该门禁报 `uncovered`，B 组把它拉回 `ok`，未放宽判据）；069b 的 8 支测试文件 `128 passed`。
+
+**新增的可移植教训（由本组处置直接暴露，供 REC 池引用）**：① 「记录面修完即算 fixed」不成立——F6 标 `partial` 而不是 `fixed`，因为仪器插桩没做；② 追加契约条款时必须同趟更新认领分区，否则覆盖门禁从绿转红（本次 C-12 即实例）；③ 「状态翻转归别的 owner」这类任务行措辞会把 implement 锁死在 `Planned`，应由 owner 文档而非任务散文决定状态推进。

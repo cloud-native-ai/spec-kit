@@ -17,7 +17,7 @@
 
 - DoD-1: 全部任务行行为 `[X]`；若出现 `[~]`，其理由逐条记录在 `.specify/specs/069b-isomorphism-migration-metrics/verification.md` 的 `deferred_tasks=`。
 - DoD-2: 两个编辑面按契约交付——`shared/definitions/flow-class-definitions.md`（同构映射 8 行 × 3 面 = 24 格、每行强制门禁与强制状态、四类不可同构边界、台账版本声明、P1–P4 指针收敛）与 `scripts/python/flow-class-check.py`（新增 `isomorphism` / `delegation` / `faces` 三动作，扩展 `check` 的 `ledger-truncated` / `coverage` / `red_kind`）；`--action lookup` 输出字段、降级标签与退出码，以及 069a 的八个 finding kind 全部不变。
-- DoD-3: 4 份契约共 51 条款（14 + 16 + 11 + 10）每条恰被一个任务行 `[green:]` 认领一次，`account-clause-coverage.py` 报告 claimed = 51；条款认领顺序在每个契约内单调递增。
+- DoD-3: 4 份契约共 52 条款（14 + 16 + 12 + 10；`migration-distribution.md` 的 C-12「刷新载荷冒烟」由 2026-10-25 review-fix F5 新增，绿点归 T029，登记见 § 跨切片一致性修正登记）每条恰被一个任务行 `[green:]` 认领一次，`account-clause-coverage.py` 报告 claimed = 52；条款认领顺序在每个契约内单调递增。
 - DoD-4: 8 支新测试（`test_isomorphism_map` / `test_ledger_reconciliation` / `test_delegation_classes` / `test_expression_faces` / `test_migration_distribution` / `test_measurement_instruments` / `test_isomorphism_checker` / `test_reconciler_extensions`）全绿；相对 `notes/test-baseline-contract.txt` 零**新增**失败 nodeid（既有红不修、不掩盖；计数与名单的唯一所有者是该文件，本文件不重述数字）。
 - DoD-5: plan.md § Mirror Obligations 逐行落地——`shared/definitions/flow-class-definitions.md` 与 `scripts/python/flow-class-check.py` 各自的 `.specify/` 镜像同字节，`sync-mirrors.py --check` 相对改前基线零新增差异，`regen-command-copies.py --check` 继续 `OK`（证明 `templates/commands/` 零改动）；零手改镜像、零手写副本。
 - DoD-6: 零新增 `/speckit.*` 命令、零新增门禁面、零项目侧类别存储或读取点、零新采集器；三个新动作与 `check` 未被登记为任何命令模板或技能的调用点（`shared/workflow/expression-gates.md` § 调用点表零改动）。
@@ -54,7 +54,7 @@
 - **[P]**: 可与同阶段其它 `[P]` 行并行（写目标不同、无未完成依赖）。本切片只有 Setup 与 Polish 各两条满足该条件；用户故事内的红先行共用 `notes/red-first-evidence.md` 这一追加落点（共享 sink 即同写目标），故不标 `[P]`。
 - **[Story]**: 用户故事标签（`[US1]`…`[US3]`），只在用户故事阶段的任务行出现；Setup 与 Polish 阶段零 `[US` 标记。
 - **[blockedBy: T001,T002]**: 显式依赖标签；被列任务全部 `[X]` 前不得开始本行。仅阶段顺序关系时不写。
-- **[green: <contract>#<clause>]**：绿点认领——本行是使该条款转绿的那一行；契约路径相对本文件目录解析。51 条款分区：`isomorphism-map.md` C-1…C-7→T006、C-8…C-12→T007、C-13…C-14→T008；`ledger-reconciler.md` C-1…C-7→T019、C-8…C-10→T020、C-11…C-13→T021、C-14…C-16→T023；`migration-distribution.md` C-1…C-5→T011、C-6…C-9→T012、C-10→T024、C-11→T029；`measurement-instruments.md` C-1…C-7→T022、C-8…C-10→T023。每条恰一行认领，`validate-tasks.py` 四项 green 检查 + `account-clause-coverage.py` 核对。
+- **[green: <contract>#<clause>]**：绿点认领——本行是使该条款转绿的那一行；契约路径相对本文件目录解析。52 条款分区：`isomorphism-map.md` C-1…C-7→T006、C-8…C-12→T007、C-13…C-14→T008；`ledger-reconciler.md` C-1…C-7→T019、C-8…C-10→T020、C-11…C-13→T021、C-14…C-16→T023；`migration-distribution.md` C-1…C-5→T011、C-6…C-9→T012、C-10→T024、C-11…C-12→T029；`measurement-instruments.md` C-1…C-7→T022、C-8…C-10→T023。每条恰一行认领，`validate-tasks.py` 四项 green 检查 + `account-clause-coverage.py` 核对。
 - 每行必须单行完成（含文件路径），不得换行续写。
 
 ### Task State Sigil (REQUIRED)
@@ -66,8 +66,35 @@
 - **框架源（编辑面）**: `shared/definitions/flow-class-definitions.md`、`scripts/python/flow-class-check.py`、`tests/contract/`、`tests/unit/`。
 - **生成面（禁止手改）**: `.specify/shared/` 与 `.specify/scripts/` 镜像（`sync-mirrors.py` 投影）、每工具命令副本（`regen-command-copies.py` 生成）。
 - **证据落点（本特性）**: `.specify/specs/069b-isomorphism-migration-metrics/` 下的 `notes/pre-change-measurements.md`、`notes/red-first-evidence.md`、`notes/quickstart-run.md`、`coverage-baseline.txt`、`verification.md`，以及既有的 `notes/test-baseline-contract.txt`、`notes/expression-baseline.md`、`notes/migration-samples.md`。
-- **禁改面**: `templates/commands/`、`skills/`、`shared/workflow/expression-gates.md`（六面与算子表 owner，069a 已交付）、`.specify/specs/069a-flow-classification-docs-gates/`、`.specify/specs/069-execution-expression-sdd/`（父规格）、`.specify/specs/062-humanize-command/`、`067-loop-efficiency-hardening/`、`068-exec-quant-feedback-channel/`、`src/specify_cli/`。
+- **禁改面**: `templates/commands/`、`skills/`、`.specify/specs/069a-flow-classification-docs-gates/`、`.specify/specs/069-execution-expression-sdd/`（父规格）、`.specify/specs/062-humanize-command/`、`067-loop-efficiency-hardening/`、`068-exec-quant-feedback-channel/`、`src/specify_cli/`。`shared/workflow/expression-gates.md`（六面与算子表 owner，069a 已交付）的**判据正文面**——六面表、阶段算子表的算子文本与阻断级别、调用点表——同属禁改面；**唯一授权例外**是本切片契约 C-1 拥有的 `wall_clock` 起点仪器口径、以及为使该 owner 可被引用而新增的 `算子 id` 列，逐项登记见下节 § 跨切片一致性修正登记。例外之外对该文件的任何改动都属越界。
 - **被否决备选（MUST NOT 创建）**: `shared/definitions/isomorphism-map.md` 是 research R1 明确否决的方案（会产生第二个分类 owner）；映射与边界的唯一载体是 `shared/definitions/flow-class-definitions.md`。`contracts/isomorphism-map.md` 是本切片的**契约文档**（形态与判据），不是映射副本，两者不可混淆。`pre-analyze-check.py` 对该路径的 2 条 `missing-path` advisory 是这条被否决备选的正常残留，**不靠创建文件消除**。
+
+## 跨切片一致性修正登记（2026-10-25 · review-fix F2）
+
+本文件在 `f0df3d0b` 冻结时把 `shared/workflow/expression-gates.md` **整体**列入 `禁改面`，并在 § Notes 写下「本切片零改动」与
+「069a 唯一触碰是 A-1」。**这两句在实现期已不成立**；此处按事实登记，不重写冻结原文，也不改写 069a 的判据正文。
+
+| # | 路径 | 改动 | 授权依据 | 落地提交 |
+|---|------|------|----------|----------|
+| 1 | `shared/workflow/expression-gates.md` | § 三项基线 的 `wall_clock` 起点由 `git log -1 --format=%cs` 改为 `git log --diff-filter=A --format='%h %as'`（首次提交的 author date），冻结点条目补「MUST NOT 用 `git log -1`」 | 069a 的表达式门禁契约 C-9 已把「仪器口径与 `not-evaluated` 降级的规范条款」委派给 069b；本切片 `contracts/measurement-instruments.md` C-1 是该口径的唯一 owner，两条表述冲突时以 C-1 为准 | `33c47fd5` |
+| 2 | `tests/contract/test_expression_gates_doc.py` | C-9 的机械断言由字面 `git log -1 --format=%cs` 改为 `--diff-filter=A`（判据语义「首次提交」不变，只重编码仪器；断言消息注明 069b C-1 为仪器 owner） | 同上：改的是同一判据的仪器编码，不是判据语义；该文件属本切片编辑面 `tests/contract/` | `33c47fd5` |
+| 3 | `shared/workflow/expression-gates.md` | § 阶段算子表 新增 `算子 id` 列（`G-…`，全表唯一），供分类 owner 的映射表以 `gate:<算子 id>` 引用；16 行算子文本、对应面、阻断级别逐字不变 | review-fix F1：把「已强制」做成可证伪的引用级判据（契约 `isomorphism-map.md` C-5）；属同一文件的**授权扩展**，不触碰 069a 判据语义 | `d8fc2bf9` |
+| 4 | `.specify/shared/workflow/expression-gates.md` | 上述第 1、3 项的镜像投影（`sync-mirrors.py --write --only shared`），`cmp` 同字节 | 生成面，不手改 | `33c47fd5`、`d8fc2bf9` |
+
+**范围边界（可用 `git diff` 复核）**：改动只落在 § 三项基线 的一行 + 紧随的冻结点条目、§ 阶段算子表 的**新增列**；
+069a 判据正文（C-1…C-8、C-10…C-15 的文本）、六面表、调用点表、阻断级别定义逐字未变，069a 的规格目录零改动。
+**「唯一 A-1」不成立**：069a 的测试文件被触碰两次——A-1 的夹具一行输入（`tests/unit/test_flow_class_check.py`）、
+以及上表第 2 行的断言仪器重编码；两次都未改断言判据。
+
+**为何本次补登记而不补任务行**：修正发生在 T024–T029 的收口范围内（镜像、验证、登记），其证据由 T024（镜像逐对核验）
+与 T027（SC 证据）承载，本表即那次范围扩张的登记行。事后补任务行会把冻结的 29 行清单改成 30 行，令 `verification.md`
+与 `features/069.md` 中逐字引用的「29 行」全部失真；后续同类修正按 review REC-069b-05 在**发生当趟**补任务行。
+
+**契约条款追加（review-fix F5，同切片、非跨切片）**：`contracts/migration-distribution.md` 新增 **C-12「刷新载荷冒烟」**
+（每个快照须在刷新后的副本内执行安装后的载荷入口，而不是只证明文件在场）。该条款在 tasks 冻结后才出现，故认领分区随之上调为
+**52 条**：C-12 的绿点归 **T029**（收口复核行；条款本体由其测试断言与冒烟记录支撑），保持契约内认领顺序单调；
+DoD-3 的条款数与 `claimed` 值同步更正为 52。该追加只新增条款，不改任何既有条款的语义，也不动 069a 的判据。
+
 
 ## Measured Premises (re-measured at generation time 2026-10-25, HEAD `02abd56c`)
 
@@ -225,8 +252,8 @@ T001 / T002 / T003（改前基线与覆盖基线）、T008（`--action isomorphi
 - [X] T025 [P] 文档同步评估与结构面复核：按 `.specify/shared/workflow/docs-step.md` § Evaluation procedure 判断 `docs/reference/` 与 `docs/concepts/` 中涉及流程分类 / 门禁的页面是否因新增映射与边界而失真（失真时只补一行指向 owner 文档的指针，不复制映射表或判据），随后跑 `python3 skills/external/create-docs/scripts/docs-utils.py --action validate --root .` 核对 `violations` 计数与 kind 集合相对 T001 基线零新增，把结论与两段输出写入 `notes/quickstart-run.md` 的 docs-sync 小节。
 - [X] T026 全量回归与红先证据完整性：跑 `SPECKIT_PYTHON=/Users/liuqiming.lqm/project/profiles/.venv/bin/python bash scripts/bash/run-tests.sh --names-out ~/tmp/069b-names-after.txt tests/contract tests/unit -q --tb=no -p no:cacheprovider`，把失败 nodeid 排序后与 `notes/test-baseline-contract.txt` 的冻结名单做 `comm -13`（MUST 为空，判据是名字级不是条数级）；同时核对 `notes/red-first-evidence.md` 覆盖 8 支测试的红跑与转绿证据各一条，缺项补齐。 [blockedBy: T024]
 - [X] T027 逐 SC 落 `.specify/specs/069b-isomorphism-migration-metrics/verification.md`：`- **SC-001**` … `- **SC-005**` 各带状态（取 `verification-log-template.md` 五值词表）、命令、输出摘要与证据指针；SC-001 记 `--action isomorphism` 的零 finding 与逐行核对记录，SC-002 记三快照的 `comm -13` 结果（未取得样本时状态取词表内的 `unknown`、证据行写 `not-evaluated` + reason——`not-evaluated` MUST NOT 出现在状态位），SC-003 记双注入的 `red_kind` 与退出码，SC-004 记混合 oracle 样本清单与机器侧落类分布（两名独立判定者未执行时状态取 `unknown`、证据行写 `not-evaluated` + reason，不记达成），SC-005 记 6/6 owner 指针与 duplicate 面 `findings = 0`；另把 `notes/quickstart-run.md` 七个场景的完成情况与小节指针列入本文件。 [blockedBy: T026]
-- [X] T028 特性登记核对与补齐：确认 `.specify/memory/features/069.md` § Related Specifications 已有本切片 `tasks.md` 指针与任务规模、§ Status Tracking 已有「069b tasks」行（tasks 阶段已回填，缺则补），只需更新 `.specify/memory/features.md` 的 069 行 Last Updated 单元格——状态列 MUST 保持 `Planned`（`069a = Implemented` / `069b = 进行中`），`Implemented` 转移属 `/speckit.implement`。 [blockedBy: T027]
-- [X] T029 终局门禁复跑：依次跑 `python3 .specify/scripts/python/validate-tasks.py .specify/specs/069b-isomorphism-migration-metrics/tasks.md`（0 error / 0 warning）、`python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/069b-isomorphism-migration-metrics --stage tasks --repo .`（errors=0，advisory 逐条裁定）、`python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/069b-isomorphism-migration-metrics/requirements.md --tasks .specify/specs/069b-isomorphism-migration-metrics/tasks.md`（`proceed`）、`python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/069b-isomorphism-migration-metrics`（claimed = 51、uncovered beyond baseline = 0），并复核零新增 `/speckit.*` 命令与零新增门禁面（`templates/commands/` 27 个文件、`shared/workflow/expression-gates.md` 六面表零改动、调用点表零新增），把四段真实输出贴入 `verification.md` 的 gates 小节。 [green: contracts/migration-distribution.md#C-11] [blockedBy: T028]
+- [X] T028 特性登记核对与补齐：确认 `.specify/memory/features/069.md` § Related Specifications 已有本切片 `tasks.md` 指针与任务规模、§ Status Tracking 已有「069b tasks」行（tasks 阶段已回填，缺则补），只需更新 `.specify/memory/features.md` 的 069 行 Last Updated 单元格——状态列 MUST 保持 `Planned`（`069a = Implemented` / `069b = 进行中`），`Implemented` 转移属 `/speckit.implement`。 **（2026-10-25 review-fix F3 更正）** 「状态列 MUST 保持 `Planned`」只在本趟**不是** implement 收口时成立；本趟就是收口，Pre-Status-Flip 四项全过后按 owner 协议推进为 `Implemented`——正确的判据在 `shared/workflow/feature-integration.md`，不在任务行散文里。 [blockedBy: T027]
+- [X] T029 终局门禁复跑：依次跑 `python3 .specify/scripts/python/validate-tasks.py .specify/specs/069b-isomorphism-migration-metrics/tasks.md`（0 error / 0 warning）、`python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/069b-isomorphism-migration-metrics --stage tasks --repo .`（errors=0，advisory 逐条裁定）、`python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/069b-isomorphism-migration-metrics/requirements.md --tasks .specify/specs/069b-isomorphism-migration-metrics/tasks.md`（`proceed`）、`python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/069b-isomorphism-migration-metrics`（claimed = 52、uncovered beyond baseline = 0），并复核零新增 `/speckit.*` 命令与零新增门禁面（`templates/commands/` 27 个文件、`shared/workflow/expression-gates.md` 六面表零改动、调用点表零新增），把四段真实输出贴入 `verification.md` 的 gates 小节。 [green: contracts/migration-distribution.md#C-11] [green: contracts/migration-distribution.md#C-12] [blockedBy: T028]
 
 ---
 
@@ -292,7 +319,7 @@ MVP = **US1**：三个故事在 requirements 中同为 P2，而 US1 是切片头
 - 「相对基线零新增」判据的分母都在 § Measured Premises 与 T001 落盘的 `notes/pre-change-measurements.md`；任务行只引用，不复述基线数值。
 - 契约套件判据是「零**新增**失败 nodeid」（基线红名单 = `notes/test-baseline-contract.txt`，计数以该文件为准）；`pytest` 只存在于 `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`，不得假设 `python3 -m pytest` 可用。
 - 结构面判据是「零**新增**违规」（基线已有 `broken-link` 2 + `note-frontmatter` 1）；写成「全绿」会与既有债冲突，本切片不修也不掩盖他特性的登记债。
-- 判据正文只在两个 owner 内（`shared/definitions/flow-class-definitions.md` 与 `shared/workflow/expression-gates.md`）：本切片的契约、测试与任务行一律引用，不复制判据句、算子表或面表；`shared/workflow/expression-gates.md` 本切片零改动。
+- 判据正文只在两个 owner 内（`shared/definitions/flow-class-definitions.md` 与 `shared/workflow/expression-gates.md`）：本切片的契约、测试与任务行一律引用，不复制判据句、算子表或面表。~~`shared/workflow/expression-gates.md` 本切片零改动。~~ **已更正（review-fix F2）**：对该文件的改动仅限 § 跨切片一致性修正登记 的四项（`wall_clock` 起点仪器口径、引用级 `算子 id` 列、其镜像投影），判据正文与该 owner 的其余表格仍逐字未变。
 - 被否决备选 `shared/definitions/isomorphism-map.md` MUST NOT 创建；`pre-analyze-check.py` 对它报 `missing-path` advisory 属预期残留（§ Path Conventions、T005）。
-- 062 / 067 / 068 只被引用不被改写；069a 的规格与判据正文零改动（唯一触碰是 A-1 允许的 069a 单元测试夹具补一行输入）。
+- 062 / 067 / 068 只被引用不被改写；069a 的**规格正文**零改动。~~唯一触碰是 A-1 允许的 069a 单元测试夹具补一行输入。~~ **已更正（review-fix F2）**：069a 的测试文件被触碰两次——A-1 的夹具一行输入（`tests/unit/test_flow_class_check.py`），与 `tests/contract/test_expression_gates_doc.py` 的仪器断言重编码（两次都不改断言判据；授权与证据见 § 跨切片一致性修正登记）。
 - 提交纪律：只提交本特性产物（显式路径），不夹带运行期记录（`.specify/memory/session/`、`exec-quant/records/`、`feedback/`）与他命令的未提交工件；本 tasks 阶段不 push。

@@ -84,3 +84,4 @@
 | REC-069b-09 | 迁移快照须至少一个刷新后执行 `.specify` 载荷的冒烟，并记录样本代表性 | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.4 REC-069b-09（F5/F12） | open |
 | REC-069b-10 | 冻结样本时同时冻结运行环境契约（解释器/PYTHONPATH/变量/node 集），冻结时先冒烟 | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.4 REC-069b-10（F8） | open |
 | REC-069b-11 | implement 收口须对账 checklist 的 `verify-in-implementation` 开放项（关闭或转交） | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.4 REC-069b-11（F9） | open |
+| OI-069b-01 | 客户侧分类副本的「漂移检查」没有 owner 与仪器（FR-008 只覆盖框架源 ↔ 镜像）；069b 的 CHK025 因此判 `out-of-slice` 并保持 `[ ]`，不冒充完成 | `.specify/specs/069b-isomorphism-migration-metrics/checklists/isomorphism-migration-metrics.md` CHK025 + 同切片 `verification.md` § Checklist 收口对账 | open（owner = 后续修订 FR-008 的特性，尚未立项；解除条件 = 为该检查指定 owner 与仪器，或明确豁免） |
