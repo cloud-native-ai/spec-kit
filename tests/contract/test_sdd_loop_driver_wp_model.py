@@ -34,9 +34,6 @@ DRIVER_ROOT = REPO_ROOT / "skills" / "external" / "sdd-loop-driver"
 GATE = DRIVER_ROOT / "scripts" / "wp-gate.py"
 MODEL_DOC = DRIVER_ROOT / "references" / "decomposition-model.md"
 CONTRACTS = REPO_ROOT / ".specify" / "specs" / "070-subagent-task-teams" / "contracts"
-DATA_MODEL = (
-    REPO_ROOT / ".specify" / "specs" / "070-subagent-task-teams" / "data-model.md"
-)
 
 ISO_8601 = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
