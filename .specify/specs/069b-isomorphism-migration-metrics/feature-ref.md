@@ -18,7 +18,7 @@
 | FR-006 | 未刷新行为不变；刷新自动获得 | 零新调用点；单包原子性 | `migration-distribution.md` C-1 / C-2 / C-3 / C-8 | `test_migration_distribution.py`（调用点零新增/载荷清单） |
 | FR-007 | 名字级基线零新增失败 | 三快照 + `--names-out` + `comm -13` | `migration-distribution.md` C-6 / C-7 / C-9 | `test_migration_distribution.py`（样本记录与判据形态） |
 | FR-008 | 分发走既有路径；零项目侧存储/读取点 | `pyproject.toml` force-include + `init` shared 拷贝 + `hatch_build` | `migration-distribution.md` C-4 / C-5 / C-10 / C-11 | `test_migration_distribution.py`（零新路径/零模板改动） |
-| FR-009 | 所有者唯一、键 `flow_class`、映射归该所有者 | owner 开篇 owns 列表 + 表头 | `ledger-reconciler.md` C-5 / C-6 | `test_ledger_reconciliation.py`（表头/版本声明） |
+| FR-009 | 所有者唯一、键 `flow_class`、映射归该所有者 | owner 开篇 owns 列表 + 表头 | `isomorphism-map.md` C-1 + `ledger-reconciler.md` C-5 / C-6 | `test_isomorphism_map.py`（owns 列表）+ `test_ledger_reconciliation.py`（表头/版本声明） |
 | FR-010 | 声明式行集；反空真下限 + 覆盖率断言 | `check` 扩展：`ledger-truncated` / `coverage` / `red_kind` | `ledger-reconciler.md` C-1 / C-2 / C-3 / C-4 / C-14 | `test_ledger_reconciliation.py`（双注入 + 覆盖率算术） |
 | FR-011 | 混合 oracle 一律 `execution` 并叠加 | 台账一致性检查 `mixed-oracle-class` | `ledger-reconciler.md` C-7 | `test_ledger_reconciliation.py`（反例注入） |
 | FR-012 | 委托关系机械核验；类中立封闭 | `--action delegation`；模板路径解析 + 清单豁免 | `ledger-reconciler.md` C-8 / C-9 / C-10 | `test_delegation_classes.py`（全绿 + 改类转红） |
