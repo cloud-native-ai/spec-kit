@@ -167,3 +167,91 @@ tests/unit/test_flow_class_check.py::test_check_and_lookup_are_read_only
 
 **判据声明**：本文件只冻结「实现前红」的事实与逐条 node id；转绿后必须在同一文件追加绿跑（命令、
 输出摘要、退出码），不得覆盖本节。
+
+---
+
+# Green run — 069a US1 定向转绿与取证（T012）
+
+**Captured**: 2026-10-24T13:55:52Z | **Branch**: `069-execution-expression-sdd` | **HEAD**: `e39cb05ba3a068f46690e94d0afad3a7fc0c6c5f`（实现提交见本条段末 `git log -1`）
+**Interpreter**: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（pytest 9.1.1）；真实运行 `python3` = 3.9.6（系统解释器，引擎按 ≥3.8 stdlib-only 编写）
+
+## 8. 三支 US1 测试转绿
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_flow_class_ledger.py \
+  tests/contract/test_flow_class_correctness.py \
+  tests/unit/test_flow_class_check.py \
+  -q -p no:cacheprovider
+# exit code: 0
+# 39 passed in 7.55s
+```
+
+实现前基线为 `30 failed, 9 passed`（owner 已在 T007/T008 落盘，故 owner 族 6 支已绿；其余 30 支全因引擎缺失）
+→ 实现后 `39 passed`。正确性测试的变异断言（`test_mutating_one_class_turns_the_same_comparison_red`）
+随同一批转绿：改错一类转红、改回回绿。
+
+## 9. 引擎实跑（真实仓库，无 `--repo`，验证 C-5 自定位）
+
+```bash
+$ python3 scripts/python/flow-class-check.py --action check --format json
+{
+  "action": "check",
+  "checked_at": "2026-10-24T13:55:34Z",
+  "repo": "/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit",
+  "units": 78,
+  "inventory": {"commands": 27, "skills": 51, "floors": {"commands": 27, "skills": 51}},
+  "findings": [],
+  "error": null
+}
+# exit code: 0
+
+$ python3 scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.docs" --format json
+{
+  "action": "lookup", "checked_at": "2026-10-24T13:55:34Z", "unit_id": "/speckit.docs",
+  "flow_class": "expression", "source": "ledger", "marker": null,
+  "basis": "reader-oracle", "neutral": false, "error": null
+}
+# exit code: 0
+
+$ python3 scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.never-registered" --format json
+{
+  "action": "lookup", "checked_at": "2026-10-24T13:55:35Z", "unit_id": "/speckit.never-registered",
+  "flow_class": "execution", "source": "default", "marker": "未声明·按默认",
+  "basis": null, "neutral": false, "error": null
+}
+# exit code: 0
+```
+
+降级分支实测（临时空树，无 owner）：
+
+```bash
+$ python3 scripts/python/flow-class-check.py --action lookup --repo "$TMPD" --unit-id "/speckit.docs" --format json
+owner-unavailable: owner document unreadable: <TMPD>/shared/definitions/flow-class-definitions.md (...)
+{ "flow_class": "execution", "source": "default", "marker": null, "basis": null,
+  "error": {"label": "owner-unavailable", ...} }
+# exit code: 2  —— 默认类语义保留、marker 为 null、与「未登记」的 未声明·按默认 标记互斥
+```
+
+## 10. T010 定案的两处边界（实现即裁定）
+
+1. **降级标签统一为 `owner-unavailable`**（§6.1 遗留项）：owner 不可解析/缺席 → stderr `owner-unavailable`
+   + 默认类语义 + `marker=null`；「未登记」→ `source=default` + `marker=未声明·按默认`。
+   测试、契约 C-7、data-model E9、tasks T006/T010/T027、feature-ref FR-016 已同步为单一标签，语义不变。
+2. **表头缺失 vs 行级缺陷**：整张表/必选列缺失 → `check` exit 2（C-13 解析错误）；
+   列数不符 / 必选值为空 / 单元 id 非规范 / `basis` 越界 → `row-malformed`（exit 1），且该行不进单元集
+   （不再被二次判为 missing/unknown/invalid-class）。
+
+## 11. 未关闭项（本段不修，按任务归属登记）
+
+| 项 | 现状 | 归属 |
+|----|------|------|
+| 镜像漂移 `test_mirror_parity_suite` | `scripts/python/flow-class-check.py` 与 `shared/definitions/flow-class-definitions.md` 两对镜像缺失 → 2 failed / 726 passed（实跑） | T033（镜像义务段） |
+| US2（文档型门禁与接线） | 未进入；T013+ 保持未勾选 | T013 起 |
+| `validate-tasks.py` / 条款覆盖核对 | 本段未重跑；T004–T008 勾选状态由前段负责 | T034 / 收尾 |
+
+## 12. 本段提交
+
+commit: 见 `git log -1 --format=%H` 于 `069-execution-expression-sdd`（本文件与引擎、三支测试、
+契约 C-7、data-model E9、feature-ref FR-016、tasks T006/T009–T012 同一提交）。

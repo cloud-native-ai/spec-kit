@@ -567,10 +567,9 @@ def test_lookup_unregistered_keeps_the_marker_non_empty(tmp_path):
         "the unregistered path must carry the fixed marker; got %r" % record.get("marker")
     )
     assert record.get("basis") is None
-    for label in ("owner-unavailable", "owner-unparsable"):
-        assert label not in proc.stderr, (
-            "the unregistered path must not emit the owner degradation label %r" % label
-        )
+    assert "owner-unavailable" not in proc.stderr, (
+        "the unregistered path must not emit the owner degradation label 'owner-unavailable'"
+    )
 
 
 def test_lookup_owner_missing_keeps_default_semantics(tmp_path):
@@ -586,12 +585,9 @@ def test_lookup_owner_missing_keeps_default_semantics(tmp_path):
     assert record.get("marker") is None, (
         "the owner-degradation path must NOT carry the unregistered marker (mutually exclusive)"
     )
-    assert any(
-        label in proc.stderr for label in ("owner-unparsable", "owner-unavailable")
-    ), (
-        "the degradation must be visible on stderr (C-7 names 'owner-unparsable'; "
-        "data-model E9 names 'owner-unavailable' — either label satisfies the branch); "
-        "stderr=%r" % proc.stderr
+    assert "owner-unavailable" in proc.stderr, (
+        "the degradation must be visible on stderr as 'owner-unavailable' "
+        "(single unified label, C-7 / data-model E9); stderr=%r" % proc.stderr
     )
 
 
@@ -603,7 +599,7 @@ def test_lookup_owner_without_ledger_table_keeps_default_semantics(tmp_path):
     record = _json(proc)
     assert record.get(STR_003) == STR_001
     assert record.get("marker") is None
-    assert any(label in proc.stderr for label in ("owner-unparsable", "owner-unavailable"))
+    assert "owner-unavailable" in proc.stderr
 
 
 def test_default_marker_and_owner_degradation_label_are_mutually_exclusive(tmp_path):
@@ -611,7 +607,7 @@ def test_default_marker_and_owner_degradation_label_are_mutually_exclusive(tmp_p
     _build_repo(parsed_owner)
     unregistered = _lookup(parsed_owner, "/speckit.never-registered")
     assert _json(unregistered).get("marker") == STR_004
-    assert "owner-unparsable" not in unregistered.stderr
+    assert "owner-unavailable" not in unregistered.stderr
 
     unparsable_owner = tmp_path / "unparsable"
     _build_repo(unparsable_owner)
@@ -621,7 +617,7 @@ def test_default_marker_and_owner_degradation_label_are_mutually_exclusive(tmp_p
     assert degraded.returncode == 2
     assert degraded_record.get("marker") is None
     assert degraded_record.get("source") == "default"
-    assert any(label in degraded.stderr for label in ("owner-unparsable", "owner-unavailable"))
+    assert "owner-unavailable" in degraded.stderr
     assert degraded_record.get("marker") != STR_004, (
         "the two degradation labels must never be presented together"
     )

@@ -57,7 +57,7 @@
 
 未登记单元 `--action lookup` MUST 返回类别键（[[STR-003]]）取值 `[[STR-001]]`、`source = default`、`marker = [[STR-004]]`，退出码 0（不中断流程）。
 已登记单元 MUST 返回 `source = ledger`、`marker = null`——不得把已判定伪装成默认，也不得把默认伪装成已判定。
-owner 不可解析 / 版本不兼容（如台账表头缺失）时，`lookup` MUST 保留默认类语义并在 stderr 报 `owner-unparsable`，此时 `marker` MUST 为 null——两个降级标签互斥（FR-016）：`[[STR-004]]` 只用于「owner 可解析但单元未登记」那一条路径；MUST NOT 静默切换门禁集。
+owner 不可解析 / 版本不兼容（如台账表头缺失）时，`lookup` MUST 保留默认类语义并在 stderr 报 `owner-unavailable`，此时 `marker` MUST 为 null——两个降级标签互斥（FR-016）：`[[STR-004]]` 只用于「owner 可解析但单元未登记」那一条路径；MUST NOT 静默切换门禁集。
 - 引用组：(FR-009, FR-016)
 
 - **C-8** 类中立封闭清单

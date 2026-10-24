@@ -380,11 +380,10 @@ def test_lookup_unregistered_unit_returns_default_with_marker():
             "an unregistered unit has no oracle basis; got %r" % record.get("basis")
         )
         assert record.get("neutral") is False
-        for label in ("owner-unavailable", "owner-unparsable"):
-            assert label not in proc.stderr, (
-                "the unregistered path must not emit the owner-degradation label %r "
-                "(the two labels are mutually exclusive)" % label
-            )
+        assert "owner-unavailable" not in proc.stderr, (
+            "the unregistered path must not emit the owner-degradation label "
+            "'owner-unavailable' (the two labels are mutually exclusive)"
+        )
 
 
 def test_lookup_registered_unit_returns_ledger_source_without_marker():

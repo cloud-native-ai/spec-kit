@@ -163,7 +163,7 @@ E8 是每特性一份的 Markdown 记录（随规格入库）。
 | `neutral` | bool | 是否命中类中立清单 |
 
 **Exit codes**: 0 = 解析成功（含默认降级）；2 = 单元 id 形态非法或 owner 不可解析。
-**Invariant**: `source: default` 且 `marker` 非 null 只对应「owner 可解析但单元未登记」这一条路径——这是 FR-009「默认必须可见」的机械面；owner/引擎不可解析或缺席时仍返回默认类语义，但 `marker` 为 null 并报 `owner-unavailable`/`owner-unparsable`（两标签互斥，FR-016）。
+**Invariant**: `source: default` 且 `marker` 非 null 只对应「owner 可解析但单元未登记」这一条路径——这是 FR-009「默认必须可见」的机械面；owner/引擎不可解析或缺席时仍返回默认类语义，但 `marker` 为 null 并报 `owner-unavailable`（两标签互斥，FR-016）。
 **Degradation labels（互斥）**: `source: default` + `marker` 用于「owner 可解析但单元未登记」；`owner-unavailable`（stderr / 调用点输出）用于「owner 或引擎不可解析 / 缺席」，此时仍返回默认类语义但 `marker` 为 null。同一运行 MUST NOT 把两个标签当作并列的判别结果。
 
 ---
