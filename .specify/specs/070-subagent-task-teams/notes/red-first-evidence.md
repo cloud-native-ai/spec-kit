@@ -353,3 +353,16 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
 - **No-team assertion**: `test_no_team_directory_is_created` snapshots the repository `.specify/teams/` tree and a temporary project root before and after the adapter projection plus a full simulated stage; both are unchanged, `team_directory is None`, and no `team.md` appears.
 - **Quickstart Scenario G (no-team half)**: `python3 -m pytest -q tests/integration/test_wp_coordination_dry_runs.py -k "nested_driver or no_team_directory"` → `2 passed, 11 deselected`.
 - **E3 stage-status row**: appended to `test-evidence/implement-stage-status.jsonl` (`substage=impl-s5-us4-preset`).
+
+## T027 — coordination report metrics unit tests (red)
+
+- **Date**: 2026-10-25T00:20Z (segment impl-s5)
+- **Host**: Linux 5.10.134-15.2.al8.x86_64 x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed path (test-only)**: `tests/unit/test_wp_report.py` (new; OR-04…OR-13 behavior, `not_evaluated`, Markdown/JSON parity, no transcripts, no spine writes)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/unit/test_wp_report.py
+  ```
+- **Real output**: `19 failed in 0.25s`; exit code `1`.
+- **Failing group (real)**: every case fails on `AssertionError: missing report script: .../wp-report.py` — the report script does not exist yet. The first red run (`18 failed, 1 passed`) contained one accidental green (`test_report_rejects_negative_intervention_inputs`, rc 2 from the missing file); the run helper now asserts the script exists, so that case is red too and no accidental green is cited.
+- **Red-first claim**: wall-clock, critical path, efficiency, concurrency/overlap, stage-execution rate, retry counts, intervention rate, token cost, `not_evaluated` on deleted timestamps, no-plan decisions, integration order, parity, spine immutability, unknown-event handling, and input exits are all red before T028.
