@@ -118,3 +118,42 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
 - **Quickstart Scenario B**: the plan-check portion rejects a cyclic, orphaned fixture with `cycle` + `orphan-output`, exit `1` (pinned in `test_wp_gate.py::test_dependency_cycle_rejects` and `test_orphan_required_output_rejects`). The third expected finding, `path-overlap`, belongs to `--check preflight` (WG-15) and is recorded as deferred to T017 (US2); the current build exits `2` for that check by design, which the driver treats as `decomposition-unavailable`, never as a plan rejection.
 - **Disclosed coverage boundary**: the OR-03…OR-16 pins in the model contract test are anti-drift assertions on the already-landed owner contract and E4/E11/E12 schema; behavioural metric computation is exercised by `tests/unit/test_wp_report.py` in T027/T028. They are not cited as evidence for the plan-gate behaviour.
 - **E3 stage-status row**: appended to `test-evidence/implement-stage-status.jsonl` with this command, the selected paths, rc 0, 98 passed, and the E2 baseline pointer.
+
+## T014 — SD-01…SD-16 coordination contract tests (red)
+
+- **Date**: 2026-10-25T01:40Z
+- **Host**: Linux x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed path (new, test-only)**: `tests/contract/test_sdd_loop_driver_wp_coordination.py`
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_coordination.py
+  ```
+- **Real output (summary)**: `17 failed, 17 passed in 0.22s`; exit code `1`.
+- **Failing groups (real)**: `test_model_doc_carries_the_runtime_projection` (the scheduler/retry sections do not exist yet) and the 16 `test_sd_01…test_sd_16` behavioural cases (`wp_driver_sim.schedule` is a T018 stub raising `NotImplementedError`; the preflight-dependent SD-14 case also exits 2 in the current build).
+- **Disclosed greens**: the 16 parametrized `test_sd_contract_clause_keeps_its_normative_content` cases plus `test_sd_contract_file_covers_the_closed_clause_set` pin the already-landed `contracts/scheduler-and-dispatch.md`; they discriminate on owner edits but are not cited as new-behaviour evidence.
+
+## T015 — coordination integration dry runs (red)
+
+- **Date**: 2026-10-25T01:41Z
+- **Host**: Linux x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed path (new, test-only)**: `tests/integration/test_wp_coordination_dry_runs.py`
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/integration/test_wp_coordination_dry_runs.py
+  ```
+- **Real output**: `5 failed in 0.09s`; exit code `1`.
+- **Failing cases (real)**: `test_concurrent_read_only_dispatch_overlaps_intervals`, `test_write_serialization_holds_for_the_dependent_write`, `test_ownership_path_rejection_blocks_dispatch`, `test_dependency_unlocks_only_on_a_pass_verdict`, `test_failure_isolation_leaves_unrelated_work_complete` — all blocked on the `wp_driver_sim.schedule` T018 stub; the ownership case additionally depends on the T017 preflight check.
+
+## T016 — preflight and retry gate unit tests (red)
+
+- **Date**: 2026-10-25T01:42Z
+- **Host**: Linux x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed path (test-only)**: `tests/unit/test_wp_gate.py` (T016 section)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/unit/test_wp_gate.py
+  ```
+- **Real output (summary)**: `39 failed, 44 passed in 3.17s`; exit code `1`. The 44 passing cases are the 41 pre-existing T006/T010 unit cases plus 3 disclosed accidental greens.
+- **Failing groups (real)**: 12 preflight cases (coverage/forbidden/normalization, write-write and read-write overlap, ordered allow, slot cap, isolation, plan-check inclusion) and 27 retry cases (attempt-1 admission, unchanged, budget/scope/topology deltas, malformed delta, exhaustion, split inheritance and split-depth-one).
+- **Disclosed accidental greens (not evidence)**: `test_preflight_exit_two_for_unreadable_manifest`, `test_preflight_exit_two_for_malformed_manifest`, and `test_retry_attempt_must_be_positive` pass only because the current build exits 2 unconditionally for `--check preflight|retry`; after T017 they still discriminate through the explicit input guards. No green here is cited for preflight or retry behaviour.
+
