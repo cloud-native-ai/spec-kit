@@ -1,7 +1,7 @@
-# Decomposition Model — Runtime Owner (Parts 1–4)
+# Decomposition Model — Runtime Owner (Parts 1–5)
 
 **Feature**: 070 — Task Decomposition & Team Coordination for Subagent-Driven SDD
-**Status**: runtime-owner projection, parts 1–4: the Work Package model, the scheduler/retry procedure, independent verification/integration, and the stage-team preset/adapter. The observability section (T029) lands with its owning task row; this file does not pre-empt it.
+**Status**: runtime-owner projection, parts 1–5: the Work Package model, the scheduler/retry procedure, independent verification/integration, the stage-team preset/adapter, and observability/metrics. The design authority remains the contracts and `data-model.md`.
 
 **Design authority**: the seven contracts under `.specify/specs/070-subagent-task-teams/contracts/` and `.specify/specs/070-subagent-task-teams/data-model.md`. This document owns *how the driver applies* those clauses at runtime. Where a field name, check code, path pattern, or event field is fixed, the contract clause is authoritative; this file points to it instead of restating its table.
 
@@ -274,6 +274,38 @@ The adapter binds the preset and the package graph into the run-scoped plan fenc
 
 The preset's provenance records that its shape derives from the Feature 070 measured baseline and the existing Role × Stage × Type vocabulary, not from a create-team catalog run, and states the first-run evidence obligation: the first decomposed stage's coordination report path is recorded in the spine when that stage closes (ST-11). A fixture dry run asserts that no team directory appears (ST-09; `test_no_team_directory_is_created`).
 
-## 18. Non-regression boundaries
+## 18. Observability, metrics, and stage close (OR-03…OR-16)
+
+The ledger is the only metric source. There is no second statistics store, no derived database, and no counter file (OR-01, OR-14). The ledger event set and the per-event required fields are owned by `data-model.md` E4 and OR-01; this section records how the driver and `wp-report.py` apply them.
+
+### 18.1 Stage close and report pointers (OR-03, OR-11, OR-12)
+
+After integration the driver runs the unchanged stage U4, then `wp-report.py`, then appends the `stage-close` event. The `stage-close` field set is owned by OR-03, and `report_ptr` references both report files (V-REP.5). A failed stage writes `wp_failed` and enters U5 instead of a `stage-close`.
+
+`wp-report.py` accepts the OR-11 CLI (`--spine`, `--stage`, optional `--stage-attempt`, `--out-dir`, `--stage-u4-at`, `--manual-interventions`, `--sessions`), writes `<line>-<stage>-a<N>-coordination.md` and `.json` under the state directory's reports directory, prints the derived metrics JSON, and never writes the spine. The U4 time and the two run-record counts are optional inputs because they are not derivable from the ledger before stage close; when `--stage-u4-at` is absent the report reads a recorded `stage-close` event for the same stage attempt, and otherwise reports `not_evaluated` (OR-04).
+
+Both reports carry the OR-12 content: decision, pattern, slot cap, dispatch order, integration order, wall-clock, critical path, parallelism efficiency, max concurrency, retry counts, the stage-execution rate, manual interventions, the session count and per-session rate, token cost when available, per-package verdicts with evidence pointers, and the parallel-overlap flag. They carry paths, never raw transcripts, full logs, or fabricated prose metrics.
+
+### 18.2 Metric derivation (OR-04…OR-09)
+
+The formulas are owned by OR-04…OR-09; the runtime application is:
+
+- **Wall-clock** — the stage U4 epoch minus the first package dispatch epoch for the stage attempt. A missing timestamp makes it `not_evaluated`; commit timestamps and transcripts are never used.
+- **Critical path** — the duration-weighted longest path over the effective plan's dependency graph, using each package's verified attempt interval. Failed attempts remain in wall-clock and retry counts but not in the path. A missing duration on any candidate path makes it `not_evaluated`.
+- **Parallelism efficiency** — summed verified package durations divided by the product of wall-clock and maximum concurrent package count; verifier executions are excluded. A non-positive wall-clock, a missing duration, or an undecidable interval sweep makes it `not_evaluated`.
+- **Stage executions per canonical stage** — `stage_attempts / 8`, where `stage_attempts` counts the distinct `(stage, stage_attempt)` pairs that dispatched at least one package in the run (V-CLOSE.3). A post-repair `plan` event, an amendment, or a re-run gate check never increments the numerator; package retries never enter it. The per-stage report therefore carries the run-level count, which is the same quantity the run-level SC-002 rate needs.
+- **Retry counts** — `retries_package` counts `retry` events in the stage attempt; `retries_stage = stage_attempt - 1` (OR-08). A package retry does not consume the stage retry budget before escalation (section 14).
+- **Manual interventions** — count and session count come from the run record through the two optional CLI inputs; the per-session rate is their quotient. Either input missing makes the rate `not_evaluated` while a present count is still reported (OR-09).
+- **Token cost** — summed only when every dispatch in the stage attempt carries a numeric value; otherwise the literal `not_evaluated` (never zero).
+
+`settle` and `verdict` events carry no stage attempt (E4); the report pairs each with the oldest unpaired `dispatch` record of the same `wp_id` in ledger order. Because the ledger is append-only, that pairing reconstructs the attempt that produced the event. A split child is a distinct `wp_id`, so its evidence remains attributable.
+
+### 18.3 `not_evaluated` and closure (OR-10, FR-023)
+
+Every metric whose source record is missing is the literal string `not_evaluated` in the spine and in both report files. It is never `0`, an estimate, a range midpoint, or another stage's value. A parallel-execution claim requires at least two genuinely overlapping package intervals; otherwise the report records `overlap=false` and the claim is invalid (V-REP.2).
+
+An all-`not_evaluated` benchmark must not close the feature. Closure is blocked until a comparable benchmark exists, unless the user records an explicit waiver naming SC-001 and/or SC-002 and its reason; the met result or the recorded waiver is carried into the verification and closure evidence. The benchmark method — a comparable feature, at least three samples per measured stage on the same host class and topology, the OR-04 interval, and the conservative dated anchor — is owned by OR-13 and is applied by the benchmark record (T038); this file does not restate the anchor values.
+
+## 19. Non-regression boundaries
 
 This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage chain, U4 independent verification, watcher verdicts/exit codes, stall handling, the fast lane, the two-slot test budget, the plan minor-fix constraint, Feature 064's registry/ownership/worktree/integration semantics, Feature 067's part brief and test economics, or Feature 068's feedback channel. Preserved-behavior obligations are owned by `contracts/fallback-and-nonregression.md` FN-09…FN-16 and are cited here, not restated.

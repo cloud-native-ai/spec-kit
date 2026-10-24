@@ -366,3 +366,48 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
 - **Real output**: `19 failed in 0.25s`; exit code `1`.
 - **Failing group (real)**: every case fails on `AssertionError: missing report script: .../wp-report.py` — the report script does not exist yet. The first red run (`18 failed, 1 passed`) contained one accidental green (`test_report_rejects_negative_intervention_inputs`, rc 2 from the missing file); the run helper now asserts the script exists, so that case is red too and no accidental green is cited.
 - **Red-first claim**: wall-clock, critical path, efficiency, concurrency/overlap, stage-execution rate, retry counts, intervention rate, token cost, `not_evaluated` on deleted timestamps, no-plan decisions, integration order, parity, spine immutability, unknown-event handling, and input exits are all red before T028.
+
+## T028 — wp-report.py implementation (green)
+
+- **Date**: 2026-10-25T00:35Z (segment impl-s5)
+- **Host**: Linux 5.10.134-15.2.al8.x86_64 x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed path (implementation)**: `skills/external/sdd-loop-driver/scripts/wp-report.py` (new; stdlib only: argparse, copy, json, re, sys, pathlib)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/unit/test_wp_report.py
+  ```
+- **Real output**: `19 passed in 0.80s`; exit code `0`.
+- **Red-to-green**: T027 `19 failed` (missing script) → T028 `19 passed`.
+- **Implementation notes (disclosed)**: settle/verdict events carry no stage attempt (E4), so the report pairs each with the oldest unpaired dispatch of the same `wp_id` in ledger order; `stage_attempts` is run-level per V-CLOSE.3/OR-07, so a single-stage run reports `1/8 = 0.125`; the concurrency sweep includes every resolved executor interval in the attempt while the efficiency numerator uses each package's verified attempt; a `stage-close` event supplies `stage_u4_at` only when the CLI input is absent; unknown ledger event types are ignored and never copied into the report.
+
+## T029 — observability and metrics runtime-owner section (green)
+
+- **Date**: 2026-10-25T00:40Z (segment impl-s5)
+- **Changed path**: `skills/external/sdd-loop-driver/references/decomposition-model.md` (§18 observability/metrics/stage close/retry accounting; former §18 non-regression → §19; header parts 1–5)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/unit/test_wp_report.py tests/contract/test_sdd_loop_driver_wp_model.py
+  ```
+- **Real output**: `76 passed in 2.29s`; exit code `0` (19 report unit + 57 model contract).
+- **Coverage**: stage-close/report pointers (OR-03/OR-11/OR-12), metric derivation OR-04…OR-09 with the stage-attempt numerator and per-session intervention rate, `not_evaluated`/closure rule OR-10/FR-023, retry accounting pointer to §14/OR-14…OR-16, and the no-raw-transcript rule. The benchmark anchor values are cited to OR-13 rather than restated (Constitution XIV).
+
+## T030 — US5 verification (green)
+
+- **Date**: 2026-10-25T00:45Z (segment impl-s5)
+- **Command 1**:
+  ```sh
+  python3 -m pytest -q tests/unit/test_wp_report.py
+  ```
+- **Real output**: `19 passed in 0.81s`; exit code `0`.
+- **Scenario E unit selector**: `python3 -m pytest -q tests/unit/test_wp_report.py -k "not_evaluated or missing_timestamps"` → `1 passed, 18 deselected in 0.09s`.
+- **Scenario E literal run** (fixture spine `/tmp/wp-demo-e/state.md`, line `line`, two packages, `--stage-u4-at 1790000300 --manual-interventions 0 --sessions 1`):
+  ```sh
+  python3 skills/external/sdd-loop-driver/scripts/wp-report.py \
+    --spine /tmp/wp-demo-e/state.md --stage plan --stage-attempt 1 \
+    --stage-u4-at 1790000300 --manual-interventions 0 --sessions 1 \
+    --out-dir /tmp/wp-demo-e/reports
+  ```
+  → rc 0; `line-plan-a1-coordination.md` and `.json` written; `wall_clock_seconds=200`, `critical_path_seconds=130`, `parallelism_efficiency=0.575`, `max_concurrent=2`, `overlap=true`, `stage_executions_per_canonical=0.125`, `manual_interventions_per_session=0.0`.
+- **Deleted-timestamp variant** (copied spine, `plan-wp02` settle `ended_at` removed): rc 0; `wall_clock_seconds=200` (int) while `critical_path_seconds`, `parallelism_efficiency`, and `max_concurrent` are the literal `"not_evaluated"` — not zero.
+- **Missing-session variant** (same spine, no `--sessions`): rc 0; `manual_interventions=0` is still reported while `sessions` and `manual_interventions_per_session` are `"not_evaluated"`.
+- **E3 stage-status row**: appended to `test-evidence/implement-stage-status.jsonl` (`substage=impl-s5-us5-report`).
