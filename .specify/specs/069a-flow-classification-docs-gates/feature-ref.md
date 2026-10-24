@@ -11,7 +11,7 @@
 | Slice | `069a-flow-classification-docs-gates` |
 | Registry row | `.specify/memory/features.md`（069 行，本阶段 Draft → Planned；零新增行） |
 | Detail file | `.specify/memory/features/069.md`（本阶段追加切片计划记录） |
-| Spec path | `.specify/specs/069a-flow-classification-docs-gates/requirements.md`（**零改动**） |
+| Spec path | `.specify/specs/069a-flow-classification-docs-gates/requirements.md`（本阶段零改动；最小接线由 FR-015「判定前从唯一所有者读取」与 FR-025「只允许按 FR-018 补强」授权，不新增/不削弱条款） |
 | Parent authority | `.specify/specs/069-execution-expression-sdd/requirements.md`（父规格的 FR / SC 定义不变；定义数以父文件为准） |
 
 ## Requirement → Feature stamp
@@ -34,21 +34,45 @@
 | FR-010 | owner § 类中立清单 | C-8 | `test_flow_class_ledger`（清单封闭 / 枚举 / rationale） |
 | FR-011 | owner 抬头（所有权归框架） | C-14 | `test_flow_class_ledger`（客户项目侧形态） |
 | FR-012 | `expression-gates.md` § 阶段不变量 | C-10 / C-11 | `test_expression_gates_doc` |
-| FR-013 | `expression-gates.md` § 阶段算子表（只换算子） | `expression-gate-operators.md` C-1 / C-2 / C-3 | 同上 |
+| FR-013 | `expression-gates.md` § 阶段算子表（只换算子）+ § 调用点表（入口 → 阶段 → 算子） | `expression-gate-operators.md` C-1 / C-2 / C-3 / C-14 | `test_expression_gates_doc` |
 | FR-014 | 同上 § 阶段完整性不读类别 | C-11 | 同上（负向：无跳过表述） |
-| FR-015 | `flow-class-check.py --action lookup` 为唯一读取点 | `flow-class-ledger.md` C-9 | `test_flow_class_ledger`（模板/技能零类别字面量） |
-| FR-016 | `lookup` 降级分支（`source=default` + `marker` + stderr `owner-unparsable`） | C-7 | `test_flow_class_ledger` |
+| FR-015 | `flow-class-check.py --action lookup` 为唯一读取点；两个命令入口在判定前调用（W1/W2），两个技能只引 owner（W3/W4） | `flow-class-ledger.md` C-9 / C-15 | `test_flow_class_ledger`（零类别字面量）+ `test_expression_gate_wiring`（A1–A6） |
+| FR-016 | `lookup` 降级分支（`source=default` + `marker` + stderr `owner-unparsable`）+ 调用点降级（`owner-unavailable`，保持既有门禁） | C-7 + `expression-gate-operators.md` C-15 | `test_flow_class_ledger` + `test_expression_gate_wiring`（降级字面量在场） |
 | FR-017 | owner § 变更记录 | C-12 | `test_flow_class_ledger`（变更记录行形态） |
-| FR-018 | `expression-gates.md` § 六面 | `expression-gate-operators.md` C-1 | `test_expression_gates_doc` |
-| FR-019 | 同上 § 读者声明；检查器 `reader` 面 | C-4 + `doc-consistency-checker.md` C-4 | `test_doc_consistency_checker`（缺失即阻断） |
+| FR-018 | `expression-gates.md` § 六面 + § 调用点表；`/speckit.docs` 与 `create-docs` R6 实际执行文档型算子 | C-1 + C-14 | `test_expression_gates_doc` + `test_expression_gate_wiring`（A1/A3） |
+| FR-019 | 同上 § 读者声明；检查器 `reader` 面；docs 路径实际调用检查器 | C-4 + `doc-consistency-checker.md` C-4 / C-10 | `test_doc_consistency_checker`（缺失即阻断）+ `test_expression_gate_wiring`（docs 含 checker） |
 | FR-020 | 同上 § 证据等级与 as-of；检查器 `evidence` 面 | C-5 + `doc-consistency-checker.md` C-3 | `test_doc_consistency_checker`（配对 / 畸形 / 过期） |
 | FR-021 | 同上 § 构建只是必要条件 | C-6 | `test_expression_gates_doc`（负向条款在场） |
 | FR-022 | 同上 § 事实唯一性；检查器 `duplicate` 面 | C-7 + `doc-consistency-checker.md` C-5 | `test_doc_consistency_checker`（副本聚类 + 修复方向） |
-| FR-023 | 同上 § 评审面 | C-8 | `test_expression_gates_doc` |
+| FR-023 | 同上 § 评审面；humanize 最小集保留 `062-reviewer-report` | C-8 + C-14 | `test_expression_gates_doc` + `test_expression_gate_wiring`（A2/A3：062 保真与报告不被削弱） |
 | FR-024 | 同上 § 三项基线；记录形态 E8 | C-9 | `test_expression_gates_doc` + 场景 3 |
-| FR-025 | owner 首批成员两行；零改动约束 | C-11 + `expression-gate-operators.md` C-12 + `compatibility-distribution.md` C-5 | `test_expression_compatibility` |
+| FR-025 | owner 首批成员两行 + 最小指定接线（4 入口，见 § Wiring Points）；既有门禁不削弱 | C-11 + C-15 + `expression-gate-operators.md` C-12 / C-14 + `compatibility-distribution.md` C-5 / C-6 / C-10 | `test_expression_gate_wiring` + `test_expression_compatibility` |
 | FR-026 | 只引用前序三特性 | `compatibility-distribution.md` C-5 / C-9 | `test_expression_compatibility`（三份哈希） |
 | FR-027 | 复用既有通道 | `compatibility-distribution.md` C-8 | `test_expression_compatibility`（无新存储路径） |
+
+## Wiring Points（本切片唯一的既有表面改动）
+
+分类与门禁必须被入口读取才成立。四处接线（形态与禁止项见 plan § Minimal Designated Wiring 与 `flow-class-ledger.md` C-15）：
+
+| # | 入口 | 时点 | 增补（封闭清单） | 钉住它的测试 |
+|---|------|------|------------------|--------------|
+| W1 | `templates/commands/docs.md` | `## Outline` 内、分派之前 | lookup `/speckit.docs` + 两个 owner 指针（含 docs 调用点行 → `doc-consistency-check.py`） | `test_expression_gate_wiring` A1 |
+| W2 | `templates/commands/humanize.md` | `## Outline` 内、委派之前 | lookup `/speckit.humanize` + 两个 owner 指针（humanize 最小算子集） | A2 |
+| W3 | `skills/external/create-docs/SKILL.md` | R6 verify（reconcile + authoring） | owner 指针 + checker 调用要求 | A3 |
+| W4 | `skills/external/humanize/SKILL.md` | Stage 6 保真自检 | owner 指针（062 细则不变） | A3 |
+
+生成物：8 个每工具命令副本由 `regen-command-copies.py` 从 W1/W2 重生成（A6）。接线封闭：其余 25 模板与 49 技能零调用点（A5）。
+
+## Test Mapping（FR/SC → 测试文件）
+
+| 测试文件 | 覆盖的 FR/SC | 形式 |
+|----------|--------------|------|
+| `tests/contract/test_flow_class_ledger.py` | FR-001/002/005/007/008/009/010/011/015/016/017/025；SC-001/SC-002 | 契约（静态 + 台账对账夹具） |
+| `tests/contract/test_expression_gates_doc.py` | FR-012/013/014/018/021/023/024 | 契约（owner 结构 + 调用点表） |
+| `tests/contract/test_doc_consistency_checker.py` | FR-019/020/022；SC-007 | 契约（注入夹具） |
+| `tests/contract/test_expression_gate_wiring.py` | FR-015/016/018/019/023/025；SC-002 | 契约（接线点 + 副本内容 + 接线封闭） |
+| `tests/contract/test_expression_compatibility.py` | FR-011/025/026/027；SC-008 | 契约（哈希 + 文件集 + 白名单） |
+| `tests/unit/test_flow_class_check.py` / `tests/unit/test_doc_consistency_rules.py` | 引擎实现细则（C-13 退出码、C-3/C-6 归一化与降级） | 单元 |
 
 ## SC → Measurement Mapping
 

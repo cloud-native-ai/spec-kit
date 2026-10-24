@@ -1,8 +1,8 @@
 # Contract: 文档型门禁算子集（Expression-Class Document-Form Gates）
 
-**Feature**: 069a（父 069） | **File scope**: `shared/workflow/expression-gates.md` | **FR served**: FR-012、FR-013、FR-014、FR-018、FR-019、FR-020、FR-021、FR-022、FR-023、FR-024、FR-025、FR-026、FR-027
+**Feature**: 069a（父 069） | **File scope**: `shared/workflow/expression-gates.md`（owner）+ 接线点 `templates/commands/docs.md`、`templates/commands/humanize.md`、`skills/external/create-docs/SKILL.md`、`skills/external/humanize/SKILL.md`（只含指针） | **FR served**: FR-012、FR-013、FR-014、FR-018、FR-019、FR-020、FR-021、FR-022、FR-023、FR-024、FR-025、FR-026、FR-027
 
-本契约钉住「六面 + 逐阶段算子 + 阻断级别 + 语法 + 基线协议」的**结构**；每面的判据正文归其单一 owner，本契约与门禁 owner 都 MUST NOT 复制。
+本契约钉住「六面 + 逐阶段算子 + 调用点 + 阻断级别 + 语法 + 基线协议」的**结构**；每面的判据正文归其单一 owner，本契约与门禁 owner 都 MUST NOT 复制。
 
 - **C-1** 六面齐全且每面单一 owner
 
@@ -28,9 +28,10 @@
 
 - **C-3** 阻断级别不降
 
-六面中任一面 MUST 至少有一个 `blocking` 算子。
+六面中任一面 MUST 至少有一个 `blocking` 算子——该底线的作用对象是**六面全集**（即 `/speckit.docs` 调用点及其文档型特性路径）。
 不得因为「属表达类」把既有 P0/P1 判定降为 advisory；不得把本门禁集表达为「更宽松的通道」。
 需求清晰度、事实一致性、评审三面 MUST 各至少一个 `blocking` 算子；读者声明缺失 MUST 阻断（FR-019），不是警告。
+`/speckit.humanize` 调用点只执行最小算子集（C-14），**不继承**六面的阻断底线，也 MUST NOT 被读作把六面降级——它是另一条调用点行，不是同一集合的子集声明。
 
 - **C-4** 读者声明形态
 
@@ -88,10 +89,37 @@
 
 - **C-12** 首批成员只补强、不削弱
 
-`/speckit.docs` 与 `/speckit.humanize` 的既有门禁 MUST NOT 被本门禁集削弱；只允许按 C-1…C-10 补强。
-本切片 MUST NOT 修改两者的模板与技能文件（与 `flow-class-ledger.md` C-11 同一约束），MUST NOT 新增 `/speckit.*` 命令。
+`/speckit.docs` 与 `/speckit.humanize` 的既有门禁 MUST NOT 被本门禁集削弱；只允许按 C-1…C-11 补强，且补强形态**封闭**为
+各自入口的最小接线（C-14/C-15）：命令模板与技能只出现 lookup 调用与 owner 指针，不出现算子表副本、不改写既有行为。
+本切片 MUST NOT 新增 `/speckit.*` 命令；062 的保真底线、默认零写入与报告契约 MUST 原样保留。
 
 - **C-13** 与其他轴的边界
 
 门禁集 MUST 声明与复杂度轴（决定 wrap-up 面有无，owner：`shared/workflow/feedback-step.md`）正交：本门禁集选择算子，复杂度轴决定是否有 wrap-up 面，两轴 MUST NOT 互相推导。
 `shared/workflow/feedback-step.md` 只需一行指针指向分类 owner，MUST NOT 在该文件中复制判据或台账。
+
+- **C-14** 命令/技能调用点表（call-site registry）
+
+门禁 owner MUST 含一张调用点表，回答「哪个入口、在什么阶段、执行哪些算子、阻断与否」。本切片的行集合固定为：
+
+| 调用点 | 时点 | 类别读取 | 执行算子 | 阻断 |
+|--------|------|----------|----------|------|
+| `/speckit.docs`（W1） | `## Outline` 内、目标声明协调与分派之前 | `flow-class-check.py --action lookup --unit-id "/speckit.docs"` | 六面：需求清晰度（`validate-requirements.py`，规格面存在时）· 读者/目的 + 证据/as-of + 事实一致性（`doc-consistency-check.py --action verify` 的 `reader` / `evidence` / `duplicate` 三面；`count` 面委派 `pre-analyze-check.py`）· 结构/链接/构建（`docs-utils.py --action validate`，零新增）· 评审（既有 `/speckit.review`） | 每面 ≥ 1 blocking（C-3） |
+| `skill:create-docs`（W3） | Reconcile Loop 的 R6 verify + Authoring Flow 的 R6 验证（两处） | 沿用调用方已解析结果；无调用方（standalone）时不新读 | 读者/目的 + 证据/as-of + 事实一致性 → `doc-consistency-check.py --action verify`（对受触文档）；结构/链接/构建 → `docs-utils.py --action validate` | blocking：发现即报告并阻止「收敛完成」结论 |
+| `/speckit.humanize`（W2） | `## Outline` 内、委派技能之前 | `flow-class-check.py --action lookup --unit-id "/speckit.humanize"` | 最小集（**不按六面登记**，归属 062 域）：`062-stage6-fidelity`（受保护内容与事实逐字不变）· `062-stage6-entailment`（不新增输入未蕴含的断言）· `062-stage5-audience-report`（语气/受众应用与限制报告）· `062-reviewer-report`（调用者复核会话报告：冲突/未处理项/注入提示） | `062-stage6-fidelity` 与 `062-stage6-entailment` blocking；其余为 062 既有报告义务 |
+| `skill:humanize`（W4） | Stage 6 保真自检 + Stage 7 报告 | 沿用调用方解析结果（不新读） | 同上一行；执行细则由 `skills/external/humanize/SKILL.md` 承载，owner 只登记调用点、算子名与阻断级别 | 同上 |
+
+规则：
+- 本表是「入口 → 阶段 → 算子」的**唯一登记处**；命令模板与技能 MUST NOT 复制本表，只可出现 lookup 调用与本文件（门禁 owner）指针。
+- `docs` 行 MUST 含 `doc-consistency-check.py --action verify`；`humanize` 行 MUST NOT 出现六面全集（尤其 MUST NOT 出现 `structure-links-build` 与 `requirements-clarity`——一次改写没有这两个面的对象），且 MUST NOT 被表述为「六面的子集/精简版」。
+- 面名（`reader-purpose` / `evidence-asof` / `structure-links-build` / `fact-consistency` / `review` / 需求清晰度）沿用 C-1 的六个 face id；`062-*` 是 humanize 域的算子名，不是第七面，MUST NOT 被六面表吸收。
+- 新增调用点属契约变更（须同步 `flow-class-ledger.md` C-15 的接线封闭集），MUST NOT 由模板或技能自行扩面。
+
+- **C-15** 调用点执行时机与降级
+
+1. lookup MUST 先于该入口的任何门禁判定执行，且同一次运行只执行一次（同一产物变更不重复读取）。
+2. 降级一律可见：`source: default` → 原样显示固定标记（未声明·按默认）；owner 不可解析或引擎缺席（文件不存在 / 退出码 2）→ 显示 `owner-unavailable`，
+   并**保持既有门禁不变**；MUST NOT 中断流程、MUST NOT 静默切换门禁集、MUST NOT 把降级当作通过。
+3. 无调用方的技能运行（独立调用）不新读类别；按默认处理并在输出中带同一标记。
+4. 接线 MUST NOT 造成算子重复执行：命令与技能在同一个产物变更上重叠时（如 `/speckit.docs` → `create-docs` R6 都跑 checker），以一次执行为准并复用其输出（C-10 去重纪律）。
+5. 接线 MUST NOT 改变判定阈值、阶段集合或 P0/P1 定义——它只决定「用哪套算子证明同一不变量」。

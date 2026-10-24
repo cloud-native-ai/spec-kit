@@ -100,3 +100,17 @@ MUST NOT 以 0 退出同时携带 finding。
 | 把一处派生计数改成手打且与定义数不符 | `count` / `count-mismatch`（经委派） |
 
 漏报数 MUST 为 0；多报（排除项误报）也 MUST 为 0，二者分别断言。
+
+- **C-10** 调用点
+
+本检查器由下列入口调用（接线封闭集见 `flow-class-ledger.md` C-15；调用点表见 `expression-gate-operators.md` C-14）：
+
+| 调用点 | 时点 | 调用形态 |
+|--------|------|----------|
+| `/speckit.docs`（W1） | 分派前解析类别之后、收敛/写作判定之前 | `--path <每个受触文档>`；规格面存在时另加 `--spec-dir <spec dir>` |
+| `skill:create-docs`（W3） | Reconcile Loop R6 verify 与 Authoring Flow R6 验证 | 同一形态；命令侧已执行时复用其输出，不重复执行 |
+
+规则：
+- 检查器 MUST NOT 读取流程类别；「要不要跑」由调用点按类别决定，检查器只负责执行被点名面。
+- 其他命令模板与技能 MUST NOT 调用本检查器（接线封闭）。
+- 调用点缺席（引擎或 owner 未刷新）时，调用方 MUST 显式跳过并标注，MUST NOT 以「没跑 = 通过」呈现。

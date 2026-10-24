@@ -10,10 +10,11 @@
 其他任何位置 MUST NOT 以表格、YAML、JSON 或代码常量的形式再声明一份「单元 → 类别」的映射（镜像除外）。
 仓库中 MUST NOT 出现第二份分类数据文件。
 
-- **C-2** 判据不被复述
+- **C-2** 判据与算子表不被复述
 
 凡消费分类的文档 MUST 以路径 + 章节锚引用所有者，MUST NOT 复述判据句或取值定义。
-合同测试 MUST 以「owner 中的判据段落是否在消费方被逐字/近逐字重现」为负向断言；命中即失败。
+同一约束适用于门禁侧：命令模板与技能 MUST NOT 复述六面算子表、阶段算子表或调用点表，只引用门禁 owner。
+合同测试 MUST 以「owner 中的判据段落 / 算子表是否在消费方被逐字/近逐字重现」为负向断言；命中即失败。
 
 - **C-3** 取值与命名空间键
 
@@ -59,11 +60,15 @@ owner 不可解析 / 版本不兼容（如台账表头缺失）时，`lookup` MU
 清单外出现 `neutral: yes` → `neutral-unlisted`；清单内的技能 MUST 存在于技能清单。
 类中立只豁免「命令与其委托技能同类」这一条约束，**不豁免任何门禁**（FR-010 后半句）。本合同不定义命令↔技能的机械核验形态（该形态由 069b 承接）。
 
-- **C-9** 读取点与模板零副本
+- **C-9** 读取点与指定接线（designated wiring）
 
-门禁在判定之前 MUST 经 `flow-class-check.py --action lookup` 读取类别。
-`templates/commands/**` 与 `skills/**/SKILL.md` MUST NOT 出现类别赋值字面量（`flow_class = <value>`、`flow_class: <value>` 形态）；
-出现即失败。类别 MUST 在无 wrap-up 面的流程（如 `/speckit.humanize`）中同样可读——读取不经 wrap-up，故该断言由「模板零副本 + lookup 可用」共同满足。
+门禁在判定之前 MUST 经 `flow-class-check.py --action lookup` 读取类别；读取点 MUST 落在一个**已接线的入口**内
+（本切片 = `/speckit.docs` 与 `/speckit.humanize` 两个命令模板，见 C-15）。
+接线只允许三种形态：① lookup 调用（脚本路径 + `--action lookup` + `--unit-id`）；② owner 指针（分类 owner 路径 + 门禁 owner 路径）；
+③ 门禁 owner 调用点表点名的检查器调用（仅 docs 侧：`doc-consistency-check.py --action verify`；技能侧不新增分类读取）。
+`templates/commands/**` 与 `skills/**/SKILL.md` MUST NOT 出现类别赋值字面量（`flow_class = <value>`、`flow_class: <value>` 形态，或「unit id ‖ 类别取值」的台账样式行）；
+出现即失败。接线小节内 MUST NOT 出现任一类别取值字面量（owner 路径 `expression-gates.md` 的文件名本身除外），也 MUST NOT 断言本单元属某类（中文类名同样算）——类别只能由 lookup 的运行结果给出。
+类别 MUST 在无 wrap-up 面的流程（如 `/speckit.humanize`）中同样可读——读取挂在入口的输入/分派前，不挂 wrap-up。
 
 - **C-10** 阶段不变量
 
@@ -73,8 +78,11 @@ owner 不可解析 / 版本不兼容（如台账表头缺失）时，`lookup` MU
 
 - **C-11** 首批成员
 
-台账 MUST 登记 `/speckit.docs` 与 `/speckit.humanize` 为 `[[STR-002]]`，且二者的既有门禁与行为不被本切片修改：
-`templates/commands/docs.md`、`templates/commands/humanize.md`、`skills/external/create-docs/**`、`skills/external/humanize/**` 在本切片中 MUST 零改动。
+台账 MUST 登记 `/speckit.docs` 与 `/speckit.humanize` 为 `[[STR-002]]`，且二者的既有门禁与行为 MUST NOT 被本切片削弱：
+`templates/commands/docs.md`、`templates/commands/humanize.md`、`skills/external/create-docs/**`、`skills/external/humanize/**`
+只允许 C-15 的**最小接线**（lookup + owner 指针 + docs 侧的 checker 调用要求）；
+其余内容 MUST 字节不变——062 的保真底线、输入解析、默认零写入与报告契约不受影响，docs 的 reconcile/authoring 流程与确认门不受影响。
+接线后 `/speckit.docs` 的文档型算子集与 `/speckit.humanize` 的最小算子集 MUST 由门禁 owner 的调用点表给出，模板与技能 MUST NOT 自行列举。
 
 - **C-12** 变更审计
 
@@ -97,3 +105,18 @@ python3 scripts/python/flow-class-check.py --action lookup --unit-id <id> [--rep
 
 分类所有权归框架；客户项目 MUST NOT 覆盖框架流程的类别。
 `--action check` 在客户项目中运行时报 `unknown`/`inventory-truncated` 而非"通过"——客户项目没有 `templates/commands` 源树，属预期形态；客户自建技能的类别声明面本切片不提供（父 A7 / FR-011 的 `MAY` 留给后续特性）。
+
+- **C-15** 接线封闭集（closed wiring set）
+
+允许调用两个引擎的入口，本切片**只有**四个既有文件：
+
+| # | 入口 | 允许增补 |
+|---|------|----------|
+| W1 | `templates/commands/docs.md` | lookup 调用 + owner 指针（含门禁 owner 的 docs 调用点行） |
+| W2 | `templates/commands/humanize.md` | lookup 调用 + owner 指针（含门禁 owner 的 humanize 调用点行） |
+| W3 | `skills/external/create-docs/SKILL.md` | owner 指针 + R6 verify 的 checker 调用要求 |
+| W4 | `skills/external/humanize/SKILL.md` | owner 指针（Stage 6） |
+
+其余命令模板与技能 MUST NOT 引用 `flow-class-check.py` / `expression-gates.md` / `doc-consistency-check.py`；
+出现即失败（接线扩面）。每工具命令副本由 `regen-command-copies.py` 从 W1/W2 生成，MUST NOT 手写（手写副本 = 第二来源）。
+接线 MUST NOT 改写既有章节结构：`docs.md` 的 `## ` 顶级章节序列不变、`humanize.md` 仍为 Simple 形态（无 `## Wrap-up`）。

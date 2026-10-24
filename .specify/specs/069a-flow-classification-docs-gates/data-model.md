@@ -4,7 +4,7 @@
 判据正文、取值语义、门禁规则归各自 owner（`shared/definitions/flow-class-definitions.md`、`shared/workflow/expression-gates.md`），本文件不复制。
 `[[STR-001]]` / `[[STR-002]]` / `[[STR-004]]` 是 `requirements.md` § Shared Strings 的引用记号，字面量只在该表维护。
 
-存储形态说明：本切片**没有数据库、没有项目侧数据文件**。E1–E5、E9 是「文档内声明 + 派生解析」；E6–E7 是「文档内的标注 + 检查器输出」；
+存储形态说明：本切片**没有数据库、没有项目侧数据文件**。E1–E5、E9、E10 是「文档内声明 + 派生解析」；E6–E7 是「文档内的标注 + 检查器输出」；
 E8 是每特性一份的 Markdown 记录（随规格入库）。
 
 ---
@@ -164,3 +164,25 @@ E8 是每特性一份的 Markdown 记录（随规格入库）。
 
 **Exit codes**: 0 = 解析成功（含默认降级）；2 = 单元 id 形态非法或 owner 不可解析。
 **Invariant**: `source: default` 时 `marker` MUST 非 null——这是 FR-016「不得静默切换」的机械面。
+
+---
+
+## E10 — Gate Call Site（门禁调用点）
+
+某个入口在某个时点执行哪些门禁算子的登记行。**落盘**于 `shared/workflow/expression-gates.md` § 调用点表；
+它是 E4（单个算子）到「谁在什么时候跑它」的绑定，不重复 E4 的面与阻断级别。
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `entry` | string | 必选 | 单元 id（`/speckit.docs`、`skill:create-docs`、`/speckit.humanize`、`skill:humanize`）——与 E1 同形 |
+| `site` | string | 必选 | 入口内的时点：`docs` = `## Outline` 内分派之前；`create-docs` = R6 verify（两处）；`humanize` = Stage 6/Stage 7 |
+| `lookup` | string | 条件必选 | 命令入口必选（`flow-class-check.py --action lookup --unit-id <id>`）；技能入口沿用调用方结果时可写 `inherit` |
+| `operators` | list | 必选 | 本调用点执行的算子名（E4 引用）；docs 行为六面全集，humanize 行为 `062-*` 最小集 |
+| `blocking` | enum | 必选 | `blocking` \| `advisory`；humanize 行以 062 的保真两项为 blocking |
+| `owner_pointer` | string | 必选 | 门禁 owner 路径 + 章节锚（`shared/workflow/expression-gates.md`） |
+
+**Invariants**
+- 调用点集合 MUST 等于接线封闭集（`flow-class-ledger.md` C-15）的四个入口；新增行 = 扩面。
+- 同一 `entry` 只登记一行（`create-docs` 的两处 R6 合成一行，`site` 注明两处）。
+- `operators` MUST NOT 被命令模板或技能复制；模板只出现 `lookup` 与 `owner_pointer`。
+- docs 行的算子集合 MUST 覆盖六面（C-3 的阻断底线作用于该行）；humanize 行 MUST NOT 含六面全集。

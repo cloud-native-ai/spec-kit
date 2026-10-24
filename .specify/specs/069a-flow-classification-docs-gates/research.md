@@ -60,6 +60,11 @@
 
 **Rejected**: 在两份命令模板里各写一行 `flow_class: expression`。除了复制即漂移，还会把 062 的 C-1..C-10 表面断言（`tests/contract/test_humanize_command_surface.py`）暴露在无关改动下。
 
+**Revision（2026-10-24，接线修订）**: 原稿「模板零改动」使分类与门禁**没有任何读取点**——引擎与 owner 只是文档与脚本，不构成可门禁能力，也与 FR-015「门禁在判定之前从唯一所有者读取类别」不符。修订为**最小指定接线**：
+两个命令模板各加一个 `###` 小节，只含 lookup 调用与 owner 指针；`create-docs` 技能另加一句 checker 调用要求，`humanize` 技能加一句 owner 指针。
+类别字面量仍被禁止（被禁的是副本，不是读取）；算子表仍只在门禁 owner（模板不复述）。
+既有表面约束由既有测试继续钉住：`docs.md` 的 `## ` 顶级章节序列（`test_c3_section_order`）、`humanize.md` 的唯一一处 `SKILL.md` 与无 `## Wrap-up` 及非表格行 ≤ 120（`test_c01`/`test_c02`）。
+
 ---
 
 ## R5 — 命名空间：`flow_class`，与 Agent Execution 消歧
@@ -148,9 +153,11 @@
 - `scripts/python/sync-mirrors.py:82` `MIRROR_PAIRS` 实测：`shared → .specify/shared`、`scripts → .specify/scripts`（strict extras）、`templates → .specify/templates`（排除 `commands`）。
 - `src/specify_cli/__init__.py:2462` 起为 `shared` 拷贝段；`pyproject.toml` 的 `[tool.hatch.build.targets.wheel.force-include]` 显式包含 `scripts` 与 `shared`。
 - 镜像基线实测：`python3 scripts/python/sync-mirrors.py --check` → 六对全部 `ok`、命令副本 `OK`（exit 0）。故镜像判据可写「零新增漂移」。
-- 未刷新项目行为不变：无任何命令/技能消费新引擎（R4 决定不改模板），因此客户项目里新引擎缺席时没有调用点。
+- 命令副本来源实测：`scripts/python/regen-command-copies.py` 由 `templates/commands/*.md` 经 `src/specify_cli.generate_commands()` 重生成到 `.claude/commands`、`.github/prompts`、`.opencode/command`、`.qoder/commands`（副本首行自带 `AUTO-GENERATED ... do not edit` 标记）；`pyproject.toml` 的 force-include 同时打包 `templates`、`shared`、`scripts`，技能由 `src/hatch_build.py` 阶段拷入。
+- **兼容语义（修订）**: 未刷新项目 = 旧命令副本 + 旧技能 + 无 owner/引擎 → 无调用点、行为不变；刷新时四类载荷由同一发行包一次到位 → 接线生效。因此「旧项目行为不变」的判据是**载荷与调用点同源同包**，不是「永远没有调用点」。投影不完整时 lookup 失败按默认类 + 标记降级（显式，不中断）。
 
 **Rejected**: 在客户项目写入分类数据。与父 A7（旧项目不迁移、只降级）冲突。
+**Rejected**: 「零调用点」方案。它让 FR-015 在所有入口处落空，且使本切片的门禁不可执行。
 
 ---
 

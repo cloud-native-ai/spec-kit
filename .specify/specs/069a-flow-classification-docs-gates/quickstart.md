@@ -3,7 +3,7 @@
 **Phase 1 output**（`/speckit.plan`，2026-10-24）。6 个场景按「先能证明基线 → 再证明新机制 → 最后证明兼容」排列。
 每个命令示例标注核验路由：**(a)** = 本阶段已对真实工具执行，输出已贴；**(b)** = 由契约测试钉住有效性（实现落地时按断言核验），并逐例列出**前提**（premises）供 `/speckit.tasks` 与 `/speckit.implement` 重测而非继承。
 
-**本阶段不实现任何运行时行为**：两个引擎（`flow-class-check.py`、`doc-consistency-check.py`）尚不存在，场景 1–3 的 route (b) 示例即为待实现面。
+**本阶段不实现任何运行时行为**：两个引擎（`flow-class-check.py`、`doc-consistency-check.py`）与四个接线点均尚不存在，场景 1–2 与 4 的 route (b) 示例即为待实现面。
 
 ---
 
@@ -136,7 +136,7 @@ git log -1 --format=%cs -- .specify/specs/069a-flow-classification-docs-gates/re
 
 ---
 
-## 场景 4 — 兼容与分发（route a）
+## 场景 4 — 兼容与分发（route a：基线；route b：接线的兼容语义）
 
 ```bash
 # (a) 前序规格字节不变（SC-008 的分母，编辑前后必须相同）
@@ -147,17 +147,44 @@ shasum -a 256 .specify/specs/062-humanize-command/requirements.md \
 #     29e26b70…1a0cd   067
 #     ec20d5e2…b45af7  068
 
-# (a) 命令副本零漂移（本切片不改模板，故必须保持 OK）
+# (a) 接线前基线：副本与模板一致
 python3 scripts/python/regen-command-copies.py --check
 #   → OK（exit 0）
 
-# (b) 分发面：写入后源与镜像同字节（sync-mirrors --check 零新增差异）
-python3 scripts/python/sync-mirrors.py --write --only shared,scripts
+# (b) 改完两个模板后**必须**重生成副本，再验零漂移
+python3 scripts/python/regen-command-copies.py          # 生成 8 个副本（docs/humanize × 4 工具）
+python3 scripts/python/regen-command-copies.py --check
+#   判据：OK（判的是「生成物 = 源模板」，不是「模板未改」）
+
+# (b) 镜像：源与镜像同字节（含两个技能的新增行）
+python3 scripts/python/sync-mirrors.py --write --only shared,scripts,skills
 python3 scripts/python/sync-mirrors.py --check
+
+# (b) 接线本身（由 tests/contract/test_expression_gate_wiring.py 钉住；此处给人工复核形态）
+grep -n "flow-class-check.py\|expression-gates.md\|flow-class-definitions.md" \
+     templates/commands/docs.md templates/commands/humanize.md
+#   → 两个模板各命中：lookup 调用 + 两个 owner 指针
+grep -n "doc-consistency-check.py" templates/commands/docs.md
+#   → docs 路径命中 doc 检查器；humanize 模板 MUST NOT 命中（最小集不套六面）
+grep -c "SKILL.md" templates/commands/humanize.md
+#   → 1（062 的单一委派断言；接线文字不得再提技能路径）
+grep -rn "flow-class-check.py\|expression-gates.md\|doc-consistency-check.py" \
+     templates/commands/*.md skills/*/*/SKILL.md | grep -v -e "commands/docs.md" -e "commands/humanize.md" \
+     -e "create-docs/SKILL.md" -e "humanize/SKILL.md"
+#   → 空（接线封闭集之外零调用点）
 ```
 
+**兼容语义（本场景要证明的命题）**
+
+| 状态 | 构成 | 行为 |
+|------|------|------|
+| 未刷新项目 | 旧命令副本 + 旧技能；`.specify/shared/` 无两份 owner、`.specify/scripts/` 无两个引擎 | 副本不含 lookup → **零调用点**，行为与接线前逐字一致 |
+| 已刷新项目 | 新副本 + 新技能 + 两份 owner + 两个引擎（同一发行包） | 两个入口在判定前各执行一次 lookup，接线生效 |
+| 异常态（只拷了模板/只拷了脚本） | 调用点存在但目标缺失 | lookup 失败 → 默认类 + 固定标记（或 `owner-unavailable`），保持既有门禁、不中断、不静默切门禁集 |
+
 **前提**：① 三个哈希是**当前**值，`tests/contract/test_expression_compatibility.py` 以同样方式重算并比对；
-② `sync-mirrors.py --only` 接受逗号分隔前缀（`pair_subprefixes` 实测语义）；③ `.specify/` 侧不得手改。
+② `sync-mirrors.py --only` 接受逗号分隔前缀（`pair_subprefixes` 实测语义）；③ `.specify/` 侧不得手改；
+④ 每工具命令副本是生成物——只改模板不重生成 = 假绿，由 `test_expression_gate_wiring.py` 的副本内容断言兜住。
 
 ---
 
