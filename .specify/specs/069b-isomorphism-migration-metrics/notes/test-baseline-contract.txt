@@ -1,7 +1,7 @@
 # Contract test baseline (name-level) — 069b
-# measured 2026-10-25 at HEAD f0df3d0b (branch 069b-isomorphism-migration-metrics)
-# command: SPECKIT_PYTHON=/Users/liuqiming.lqm/project/profiles/.venv/bin/python bash scripts/bash/run-tests.sh --names-out <out> tests/contract -q --tb=no -p no:cacheprovider
-# result: 33 failed, 4277 passed, 5 skipped, 1 warning in 238.53s (0:03:58)
+# measured 2026-10-25 at HEAD 47106762 (branch 069b-isomorphism-migration-metrics)
+# command: SPECKIT_PYTHON=/Users/liuqiming.lqm/project/profiles/.venv/bin/python bash scripts/bash/run-tests.sh --names-out <out> tests/contract tests/unit -q --tb=no -p no:cacheprovider
+# result: 33 failed, 5091 passed, 5 skipped, 4 warnings in 392.31s (0:06:32)
 # criterion: zero NEW failing node ids against this list (never "all green").
 # owner of the count and the names: THIS FILE only — plan/tasks/verification cite it, never restate numbers.
 
