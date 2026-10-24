@@ -53,6 +53,8 @@ The target declaration uses `skills/external/create-docs/assets/docs-target-stru
 
 ## Three-Stage Execution Flow
 
+Before stage 1, the command performs one classification read and then the document-form gate operators; the class ledger and the operator set are owned by `.specify/shared/definitions/flow-class-definitions.md` and `.specify/shared/workflow/expression-gates.md`, and this reference does not restate them.
+
 1. **Establish or load the target**: create the declaration once, ask at most three necessary questions when evidence is insufficient, reuse it without churn, and propose evidence-backed redesign when project reality changes.
 2. **Diff and decompose**: apply the tolerance band first, then emit typed actions carrying target, owner, evidence/source, and confirmation tier.
 3. **Dispatch and report**: route structure to `create-docs`, content to `improve-docs`, preserve existing confirmation tiers, audit every run, and group residuals by owner.
