@@ -170,3 +170,7 @@
 | Detached Stage Execution | 脱离式阶段执行, detached execution | 子代理在独立进程组/会话 + 四件套 + Registry + reservation + lease 下的执行形态,生命周期独立于主会话并可重新接线;真源 data-model.md § E6/references | auto | proposed |
 | 反馈通道 (Feedback Channel) | - | /speckit.feedback 经 068 升级后的通用框架反馈机制:客户项目经打包把反馈内容(feedback 条目 + exec-quant 载荷等一等载荷)随包收回 spec-kit 上游,人工投递、零自动传输;通道即『打包→手动送达→接收分流→本地消化/汇总』的整条路径。与三捕获机制中的 Feedback Entry(单条改进反思)对象不同。真源 .specify/specs/068-exec-quant-feedback-channel/requirements.md | auto | proposed |
 | 执行量化载荷 (Exec-Quant Payload) | - | 反馈包内 exec-quant 记录副本的统称(068):源项目身份 + 逐条执行量化记录(含遗留形态)+ 载荷级降级计数,在 MANIFEST 显式声明为一等包组成;由打包流程一次写入后不可变,接收侧解出到 spec-kit 聚合层。真源 .specify/specs/068-exec-quant-feedback-channel/requirements.md | auto | proposed |
+| 执行类流程 | 执行类, execution class, execution flow | 主交付物由「机器执行/运行后可观测的行为」验收的流程,未声明类别时的默认类(需求 069);与既有复杂度轴(复杂/简单命令)无关,与 Agent Execution(子代理执行层)同名不同义 | auto | proposed |
+| 表达类流程 | 表达类, expression class, expression flow | 主交付物由「人阅读后的理解与外部事实相符」验收的流程,/speckit.docs 与 /speckit.humanize 为首批成员(需求 069);保留 SDD 全阶段,只换门禁算子集 | auto | proposed |
+| 同构 | isomorphism, 同构映射, 代码文档同构 | 代码与文档在结构(实体/关系/边界)、流程(SDD 八阶段)、逻辑(证据/契约/验收/版本/所有权)三面上的可核对对应;每行须有强制门禁或「已声明未强制」标注,并附不可同构边界清单(验收 oracle/验证算子/失败可见性/语义 oracle 不可互换)(需求 069) | auto | proposed |
+| 文档型门禁 | document-form gate, 文档门禁, 文档型质量门禁 | 表达类流程使用的六面质量门禁:需求清晰度、读者/目的/边界、证据分级与 as-of、结构/链接/构建、事实一致性、评审;构建通过只是必要条件,人工评审不可省(需求 069) | auto | proposed |
