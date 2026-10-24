@@ -33,8 +33,10 @@ python3 scripts/python/doc-consistency-check.py --action verify \
 | `as-of-malformed` | `as-of` 值不匹配 `YYYY-MM-DD` | blocking |
 | `as-of-stale` | `as-of` 早于该文件最后一次提交日期（`git log -1 --format=%cs -- <path>`） | blocking |
 | `grade-invalid` | 等级不在封闭三值 `实测` / `推断` / `引用` | blocking |
+| `source-missing` | 该行有等级（或 `as-of`）但缺 `source`，或 `source` 值为空 | blocking |
 
-证据等级与 `as-of` 的语义归 `expression-gate-operators.md` C-5；本面只做语法与配对判定，MUST NOT 重新定义取值。
+证据等级、`as-of` 与 `source` 的语义归 `expression-gate-operators.md` C-5；本面只做语法与配对判定，MUST NOT 重新定义取值。
+`source-missing` 是 FR-020「证据必须可复算」的机械面：`实测` / `推断` 的 `source` MUST 含命令或退出状态，`引用` 的 `source` MUST 是引文出处——本面只判「在不在、空不空」，内容充分性由评审面判定（不越界成语义判断）。
 `as-of-stale` 在非 git 环境或该文件无提交历史时 MUST 输出 `not-evaluated`（附 `reason`），MUST NOT 判为通过。
 
 - **C-4** `reader` 面规则
@@ -50,6 +52,7 @@ python3 scripts/python/doc-consistency-check.py --action verify \
 2. 命中条件：归一化后**完全相等**且长度 ≥ 24 字符；或 `difflib.SequenceMatcher(None, a, b).ratio() >= 0.90` 且长度 ≥ 40 字符。
 3. 同一归一化行出现在 **≥ 2 个不同文件** → 一条 `duplicate-fact`，`path/line` 取字典序首处，`counterpart` 取第二处。
 4. 同一文件内重复不报（不是跨处手写）。
+5. 命中阈值是**检测下限**（FR-022 已承认的让步）：低于阈值的近副本不被机械报出，本面 MUST NOT 因此被读作「判据放宽」——低于下限的重复仍由评审面按 FR-022 判定。
 
 `fix_direction` 恒为「改为对唯一 owner 的引用」。本面 MUST NOT 试图改写文本、MUST NOT 推荐「改措辞使其一致」。
 

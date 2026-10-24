@@ -1,24 +1,24 @@
 # Contract: 文档型门禁算子集（Expression-Class Document-Form Gates）
 
-**Feature**: 069a（父 069） | **File scope**: `shared/workflow/expression-gates.md`（owner）+ 接线点 `templates/commands/docs.md`、`templates/commands/humanize.md`、`skills/external/create-docs/SKILL.md`、`skills/external/humanize/SKILL.md`（只含指针） | **FR served**: FR-012、FR-013、FR-014、FR-018、FR-019、FR-020、FR-021、FR-022、FR-023、FR-024、FR-025、FR-026、FR-027
+**Feature**: 069a（父 069） | **File scope**: `shared/workflow/expression-gates.md`（owner）+ 接线点 `templates/commands/docs.md`、`templates/commands/humanize.md`（仅指针）、`skills/external/create-docs/SKILL.md`、`skills/external/humanize/SKILL.md`（指针 + 唯一 lookup） | **FR served**: FR-012、FR-013、FR-014、FR-018、FR-019、FR-020、FR-021、FR-022、FR-023、FR-024、FR-025、FR-026、FR-027
 
 本契约钉住「六面 + 逐阶段算子 + 调用点 + 阻断级别 + 语法 + 基线协议」的**结构**；每面的判据正文归其单一 owner，本契约与门禁 owner 都 MUST NOT 复制。
 
 - **C-1** 六面齐全且每面单一 owner
 
-门禁集 MUST 覆盖六面：需求清晰度、读者/目的/边界、证据分级与 as-of、结构/链接/构建、事实一致性、评审。
-每面 MUST 登记且仅登记一个 `owner_pointer`（路径 + 章节锚），该指针 MUST 在仓库中可解析。六面的 owner 指针为：
+门禁集 MUST **恰好覆盖六面**（封闭集，FR-018 / requirements SA-7；新增面须由后续特性修订本 owner，MUST NOT 由消费方就地扩面）。
+每面 MUST 登记且仅登记一个 `owner_pointer`（路径 + 章节锚），该指针 MUST 在仓库中可解析；每个面 MUST 有且只有一个机器名（face id），面 id 与中文面名一一对应。六面的 owner 指针与 face id 为：
 
-| 面 | owner_pointer |
-|----|---------------|
-| 需求清晰度 | `scripts/python/validate-requirements.py`（五项结构检查）+ `shared/guidelines/requirements-guidelines.md` |
-| 读者/目的/边界 | `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 |
-| 证据分级与 as-of | 本门禁 owner（本切片新增面） |
-| 结构/链接/构建 | `skills/external/create-docs/SKILL.md` § Desired-State Baseline（执行体 `skills/external/create-docs/scripts/docs-utils.py`） |
-| 事实一致性 | `shared/guidelines/one-source-of-truth.md` |
-| 评审 | `skills/internal/review-sdd-process/SKILL.md` + `templates/review-template.md` |
+| 面（中文） | face id | owner_pointer |
+|----|---------|---------------|
+| 需求清晰度 | `requirements-clarity` | `scripts/python/validate-requirements.py`（五项结构检查）+ `shared/guidelines/requirements-guidelines.md` |
+| 读者/目的/边界 | `reader-purpose` | `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 |
+| 证据分级与 as-of | `evidence-asof` | 本门禁 owner（本切片新增面） |
+| 结构/链接/构建 | `structure-links-build` | `skills/external/create-docs/SKILL.md` § Desired-State Baseline（执行体 `skills/external/create-docs/scripts/docs-utils.py`） |
+| 事实一致性 | `fact-consistency` | `shared/guidelines/one-source-of-truth.md` |
+| 评审 | `review` | `skills/internal/review-sdd-process/SKILL.md` + `templates/review-template.md` |
 
-同一面出现两个 owner_pointer → 失败（第二副本）。新增面之外，门禁 owner MUST NOT 复述这些 owner 的判据句。
+同一面出现两个 owner_pointer 或第二个 face id → 失败（第二副本）。面数 MUST = 6（多于 6 = 扩面，少于 6 = 缺面）。新增面之外，门禁 owner MUST NOT 复述这些 owner 的判据句。
 
 - **C-2** 逐阶段算子表
 
@@ -31,7 +31,7 @@
 六面中任一面 MUST 至少有一个 `blocking` 算子——该底线的作用对象是**六面全集**（即 `/speckit.docs` 调用点及其文档型特性路径）。
 不得因为「属表达类」把既有 P0/P1 判定降为 advisory；不得把本门禁集表达为「更宽松的通道」。
 需求清晰度、事实一致性、评审三面 MUST 各至少一个 `blocking` 算子；读者声明缺失 MUST 阻断（FR-019），不是警告。
-`/speckit.humanize` 调用点只执行最小算子集（C-14），**不继承**六面的阻断底线，也 MUST NOT 被读作把六面降级——它是另一条调用点行，不是同一集合的子集声明。
+`skill:humanize` 调用点只执行最小算子集（C-14），**不继承**六面的阻断底线，也 MUST NOT 被读作把六面降级——它是另一条调用点行，不是同一集合的子集声明；`/speckit.humanize` 命令行只声明 owner 指针与归口，不执行算子（requirements SA-8）。
 
 - **C-4** 读者声明形态
 
@@ -41,9 +41,9 @@
 
 - **C-5** 证据等级与 as-of 语法
 
-证据等级取封闭三值：`实测` / `推断` / `引用`。`as-of` 取 `YYYY-MM-DD`。
-配对规则：一条事实性断言只要出现等级或 `as-of` 任一，另一项 MUST 同时出现。
-语法校验 MUST 由 `doc-consistency-check.py` 的 `evidence` 面执行（§ `doc-consistency-checker.md` C-3）。
+证据等级取封闭三值：`实测` / `推断` / `引用`。`as-of` 取 `YYYY-MM-DD`。来源（`source`）**必填**：`实测` / `推断` 时是可复算命令或退出状态，`引用` 时是引文出处（URL / 文档路径 + 章节）。
+配对规则：一条事实性断言只要出现等级或 `as-of` 任一，等级、`as-of`、`source` 三项 MUST 同时出现（三件套成组，FR-020）。
+语法校验 MUST 由 `doc-consistency-check.py` 的 `evidence` 面执行（§ `doc-consistency-checker.md` C-3，含 `source-missing`）。
 本面的**对象**是文档断言；`shared/workflow/evidence-step.md` 的七态与 `shared/guidelines/single-run-evidence.md` 的记录留存 MUST NOT 被本面重定义、收窄或并入。
 
 - **C-6** 结构/链接/构建只是必要条件
@@ -106,20 +106,21 @@
 |--------|------|----------|----------|------|
 | `/speckit.docs`（W1） | `## Outline` 内、目标声明协调与分派之前 | `flow-class-check.py --action lookup --unit-id "/speckit.docs"` | 六面：需求清晰度（`validate-requirements.py`，规格面存在时）· 读者/目的 + 证据/as-of + 事实一致性（`doc-consistency-check.py --action verify` 的 `reader` / `evidence` / `duplicate` 三面；`count` 面委派 `pre-analyze-check.py`）· 结构/链接/构建（`docs-utils.py --action validate`，零新增）· 评审（既有 `/speckit.review`） | 每面 ≥ 1 blocking（C-3） |
 | `skill:create-docs`（W3） | Reconcile Loop 的 R6 verify + Authoring Flow 的 R6 验证（两处） | 沿用调用方已解析结果；无调用方（standalone）时不新读 | 读者/目的 + 证据/as-of + 事实一致性 → `doc-consistency-check.py --action verify`（对受触文档）；结构/链接/构建 → `docs-utils.py --action validate` | blocking：发现即报告并阻止「收敛完成」结论 |
-| `/speckit.humanize`（W2） | `## Outline` 内、委派技能之前 | `flow-class-check.py --action lookup --unit-id "/speckit.humanize"` | 最小集（**不按六面登记**，归属 062 域）：`062-stage6-fidelity`（受保护内容与事实逐字不变）· `062-stage6-entailment`（不新增输入未蕴含的断言）· `062-stage5-audience-report`（语气/受众应用与限制报告）· `062-reviewer-report`（调用者复核会话报告：冲突/未处理项/注入提示） | `062-stage6-fidelity` 与 `062-stage6-entailment` blocking；其余为 062 既有报告义务 |
-| `skill:humanize`（W4） | Stage 6 保真自检 + Stage 7 报告 | 沿用调用方解析结果（不新读） | 同上一行；执行细则由 `skills/external/humanize/SKILL.md` 承载，owner 只登记调用点、算子名与阻断级别 | 同上 |
+| `/speckit.humanize`（W2） | `## Outline` 内、委派技能之前 | **不读取**：命令模板只给两个 owner 指针、不调用脚本（保持 Simple，requirements SA-8 / FR-025） | 无（模板不执行算子） | 不适用（本行只声明指针与归口） |
+| `skill:humanize`（W4） | Stage 6 保真自检之前（读取一次）→ Stage 6 + Stage 7 | `flow-class-check.py --action lookup --unit-id "/speckit.humanize"`（该流程唯一的类别读取） | 最小集（**不按六面登记**，归属 062 域）：`062-stage6-fidelity`（受保护内容与事实逐字不变）· `062-stage6-entailment`（不新增输入未蕴含的断言）· `062-stage5-audience-report`（语气/受众应用与限制报告）· `062-reviewer-report`（调用者复核会话报告：冲突/未处理项/注入提示） | `062-stage6-fidelity` 与 `062-stage6-entailment` blocking；其余为 062 既有报告义务 |
 
 规则：
-- 本表是「入口 → 阶段 → 算子」的**唯一登记处**；命令模板与技能 MUST NOT 复制本表，只可出现 lookup 调用与本文件（门禁 owner）指针。
-- `docs` 行 MUST 含 `doc-consistency-check.py --action verify`；`humanize` 行 MUST NOT 出现六面全集（尤其 MUST NOT 出现 `structure-links-build` 与 `requirements-clarity`——一次改写没有这两个面的对象），且 MUST NOT 被表述为「六面的子集/精简版」。
-- 面名（`reader-purpose` / `evidence-asof` / `structure-links-build` / `fact-consistency` / `review` / 需求清晰度）沿用 C-1 的六个 face id；`062-*` 是 humanize 域的算子名，不是第七面，MUST NOT 被六面表吸收。
+- 本表是「入口 → 阶段 → 算子」的**唯一登记处**；命令模板与技能 MUST NOT 复制本表，只可出现 owner 指针与各自被允许的调用形态（`/speckit.humanize` 连 lookup 都不出现；`skill:humanize` 出现 lookup）。
+- `docs` 行 MUST 含 `doc-consistency-check.py --action verify`；`skill:humanize` 行 MUST NOT 出现六面全集（尤其 MUST NOT 出现 `structure-links-build` 与 `requirements-clarity`——一次改写没有这两个面的对象），且 MUST NOT 被表述为「六面的子集/精简版」。
+- 类别键（[[STR-003]]）与两个取值（[[STR-001]] / [[STR-002]]）MUST NOT 出现在命令模板的接线文本内；本表只登记读取**动作**与**归口**，不登记任何单元的类别取值。
+- face id（`requirements-clarity` / `reader-purpose` / `evidence-asof` / `structure-links-build` / `fact-consistency` / `review`）沿用 C-1 的六个 id；`062-*` 是 humanize 域的算子名，不是第七面，MUST NOT 被六面表吸收。
 - 新增调用点属契约变更（须同步 `flow-class-ledger.md` C-15 的接线封闭集），MUST NOT 由模板或技能自行扩面。
 
 - **C-15** 调用点执行时机与降级
 
-1. lookup MUST 先于该入口的任何门禁判定执行，且同一次运行只执行一次（同一产物变更不重复读取）。
+1. lookup MUST 先于该入口的任何门禁判定执行，且同一次运行只执行一次（同一产物变更不重复读取）。`/speckit.docs` 的读取在命令模板分派前；`/speckit.humanize` 的读取在其委派技能的 Stage 6 之前——命令模板本身不读取。
 2. 降级一律可见：`source: default` → 原样显示固定标记（未声明·按默认）；owner 不可解析或引擎缺席（文件不存在 / 退出码 2）→ 显示 `owner-unavailable`，
    并**保持既有门禁不变**；MUST NOT 中断流程、MUST NOT 静默切换门禁集、MUST NOT 把降级当作通过。
-3. 无调用方的技能运行（独立调用）不新读类别；按默认处理并在输出中带同一标记。
+3. 技能被独立调用（无命令调用方）时，仍按其调用点行执行读取（`skill:humanize` 在 Stage 6 读取一次）；owner 或引擎缺席时按默认类处理并在输出中带同一标记或 `owner-unavailable`。
 4. 接线 MUST NOT 造成算子重复执行：命令与技能在同一个产物变更上重叠时（如 `/speckit.docs` → `create-docs` R6 都跑 checker），以一次执行为准并复用其输出（C-10 去重纪律）。
 5. 接线 MUST NOT 改变判定阈值、阶段集合或 P0/P1 定义——它只决定「用哪套算子证明同一不变量」。

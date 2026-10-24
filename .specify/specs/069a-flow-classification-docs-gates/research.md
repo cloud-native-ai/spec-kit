@@ -61,9 +61,10 @@
 **Rejected**: 在两份命令模板里各写一行 `flow_class: expression`。除了复制即漂移，还会把 062 的 C-1..C-10 表面断言（`tests/contract/test_humanize_command_surface.py`）暴露在无关改动下。
 
 **Revision（2026-10-24，接线修订）**: 原稿「模板零改动」使分类与门禁**没有任何读取点**——引擎与 owner 只是文档与脚本，不构成可门禁能力，也与 FR-015「门禁在判定之前从唯一所有者读取类别」不符。修订为**最小指定接线**：
-两个命令模板各加一个 `###` 小节，只含 lookup 调用与 owner 指针；`create-docs` 技能另加一句 checker 调用要求，`humanize` 技能加一句 owner 指针。
+`docs` 命令模板加一个 `###` 小节（lookup 调用 + owner 指针）；`create-docs` 技能加一句 checker 调用要求。
+`humanize` 侧的形态在**checklist 修复轮**再次修订：命令模板只加 **owner 指针**、不调用脚本（命令调用脚本即 Complex，与 `test_c01_thin_entry_shape` 的 Simple 形态及复杂度判据 owner `shared/workflow/feedback-step.md` 冲突，见 requirements SA-8）；该流程唯一的类别读取与最小算子集执行落在 `skills/external/humanize/SKILL.md` 的 Stage 6。
 类别字面量仍被禁止（被禁的是副本，不是读取）；算子表仍只在门禁 owner（模板不复述）。
-既有表面约束由既有测试继续钉住：`docs.md` 的 `## ` 顶级章节序列（`test_c3_section_order`）、`humanize.md` 的唯一一处 `SKILL.md` 与无 `## Wrap-up` 及非表格行数 ≤ 120（`test_c01`/`test_c02`）。
+既有表面约束由既有测试继续钉住：`docs.md` 的 `## ` 顶级章节序列（`test_c3_section_order`）、`humanize.md` 的唯一一处 `SKILL.md` 与无 `## Wrap-up` 及非表格行数 ≤ 120（`test_c01`/`test_c02`）；本轮复跑 `test_humanize_command_surface.py` = 10 passed，模板实测非表格行 40 条、零 `flow-class-check` 引用。
 
 ---
 
@@ -81,7 +82,7 @@
 
 ## R6 — 六面门禁的落点：每面一个既有 owner，只补两面
 
-**Decision**: 门禁算子集 owner = 新文件 `shared/workflow/expression-gates.md`；六面各自指向既有 owner，仅「证据分级与 as-of」「事实一致性」两面由本切片新增实现。
+**Decision**: 门禁算子集 owner = 新文件 `shared/workflow/expression-gates.md`；六面各自指向既有 owner，仅「证据分级与 as-of」「事实一致性」两面由本切片新增实现。六面是**封闭集（恰好 6）**，每面一个机器名（face id）；新增面须由后续特性修订 owner（requirements SA-7）。
 
 | 面 | 既有 owner（不改写） | 本切片新增 |
 |----|---------------------|-----------|
@@ -104,7 +105,7 @@
 ## R7 — 证据等级与 as-of 的语法（新面）
 
 **Decision**: 等级取封闭三值 `实测 / 推断 / 引用`；`as-of` 取 ISO 日期 `YYYY-MM-DD`；**成对规则**——
-一条事实性断言只要出现等级或 `as-of` 任一项，另一项必须同时出现。
+一条事实性断言只要出现等级或 `as-of` 任一项，另一项必须同时出现。**补充（checklist 修复轮）**：来源（`source`）必填——`实测` / `推断` 的 source 是可复算命令或退出状态，`引用` 的 source 是引文出处；机械面为三件套成组（FR-020），检查器新增 `source-missing` 规则。
 
 **Evidence**:
 - 判据可机械化的最小集合：三值封闭枚举可校验（不在集合内即 `grade-invalid`）；ISO 日期可解析；「成对」使「只写 as-of 不写等级」和「只写等级不写 as-of」都成为可报缺陷。

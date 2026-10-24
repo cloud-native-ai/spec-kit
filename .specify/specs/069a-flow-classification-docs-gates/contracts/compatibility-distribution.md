@@ -34,7 +34,7 @@
 
 1. **未刷新项目**：命令副本仍是旧版（含 `docs` / `humanize`），技能仍是旧版，`.specify/shared/` 无两份 owner、`.specify/scripts/` 无两个引擎。
    旧副本不含 lookup 调用，故**没有调用点**——行为与接线前逐字一致，不因框架升级而在本地产生新读取。
-2. **已刷新项目**：一次刷新同时带来新命令副本、新技能、两份 owner 与两个引擎；接线生效，`/speckit.docs` 与 `/speckit.humanize` 在判定前各执行一次 lookup。
+2. **已刷新项目**：一次刷新同时带来新命令副本、新技能、两份 owner 与两个引擎；接线生效，`/speckit.docs` 在命令分派前、`/speckit.humanize` 在其委派技能的 Stage 6 各执行一次 lookup（命令模板本身不调用脚本）。
    两类载荷同包下发，故「有调用点但无 owner/引擎」不是正常状态。
 
 **异常态（投影或手工拷贝造成的不一致）**：lookup 目标缺失或退出码为 2 时，接线 MUST 按默认类 + 固定标记（或 `owner-unavailable`）降级，
@@ -49,9 +49,9 @@
 | 允许改动 | 允许内容 | 不允许 |
 |----------|----------|--------|
 | `templates/commands/docs.md` | lookup 调用 + 两个 owner 指针（`###` 小节，`## Outline` 内、分派之前） | 类别字面量；判据/算子表副本；新增 `## ` 顶级章节 |
-| `templates/commands/humanize.md` | lookup 调用 + 两个 owner 指针（`###` 小节，`## Outline` 内、委派之前） | 类别字面量；第二处 `SKILL.md` 提及；`## Wrap-up`；六面算子表 |
+| `templates/commands/humanize.md` | **仅两个 owner 指针**（`###` 小节，`## Outline` 内、委派之前） | lookup 或任何脚本调用（会把 Simple 变 Complex）；类别字面量；第二处 `SKILL.md` 提及；`## Wrap-up`；六面算子表 |
 | `skills/external/create-docs/SKILL.md` | R6 verify 的 checker 调用要求 + owner 指针 | 复制门禁规则；把 checker 变成无条件硬依赖 |
-| `skills/external/humanize/SKILL.md` | Stage 6 的 owner 指针 | 复制算子表；改变 062 默认输出/报告契约；回指命令模板路径 |
+| `skills/external/humanize/SKILL.md` | Stage 6 的 lookup 调用（该流程唯一的类别读取）+ owner 指针 | 复制算子表；改变 062 默认输出/报告契约；回指命令模板路径 |
 
 下列路径在本切片中 MUST 零改动（内容哈希不变）：
 
@@ -70,9 +70,9 @@
 |------|----------|
 | `shared/workflow/feedback-step.md` | 仅新增一行指针：声明复杂度轴与类别轴正交，指向 `shared/definitions/flow-class-definitions.md`（既有判据/红线段落零改动） |
 | `templates/commands/docs.md` | C-5 的接线小节 |
-| `templates/commands/humanize.md` | C-5 的接线小节 |
+| `templates/commands/humanize.md` | C-5 的**仅 owner 指针**小节（无 lookup、无脚本调用） |
 | `skills/external/create-docs/SKILL.md` | C-5 的 R6 指针与 checker 调用要求 |
-| `skills/external/humanize/SKILL.md` | C-5 的 Stage 6 指针 |
+| `skills/external/humanize/SKILL.md` | C-5 的 Stage 6 lookup + owner 指针 |
 
 五个文件之外，MUST NOT 修改任何既有源文件（生成物除外：命令副本由重生成更新；`.specify/` 镜像由 `sync-mirrors.py` 投影）。
 
@@ -82,7 +82,7 @@
 |------|------|
 | `python3 scripts/python/sync-mirrors.py --check` | 与编辑前基线比较「零新增差异」；本切片涉及的 7 个源文件（3 份 `shared/`、2 个 `scripts/`、2 个技能）在改动后 MUST 与其镜像同字节 |
 | `python3 scripts/python/regen-command-copies.py --check` | 在**重生成之后** MUST 为 `OK`；判据是「生成物 = 源模板」，不是「模板未改动」 |
-| 生成副本内容 | `.claude/commands`、`.github/prompts`、`.opencode/command`、`.qoder/commands` 下 docs 与 humanize 共 8 个副本 MUST 含接线（lookup 与 owner 指针），证明重生成真的发生 |
+| 生成副本内容 | `.claude/commands`、`.github/prompts`、`.opencode/command`、`.qoder/commands` 下 8 个副本 MUST 含接线，证明重生成真的发生：docs 副本含 lookup 与 owner 指针；humanize 副本含 owner 指针（无 lookup / 无脚本调用，与其源模板一致） |
 | `python3 skills/external/create-docs/scripts/docs-utils.py --action validate --root .` | `violations` 计数与 kind 集合 MUST 零新增（基线 3：`broken-link` 2 + `note-frontmatter` 1） |
 | `pytest tests/contract -q` | 与 `notes/test-baseline-contract.txt` 比较，MUST 零新增失败名字（既有 31 失败不修、不掩盖） |
 
@@ -105,9 +105,9 @@ MUST NOT 新建统计系统、评分体系或计量台账（FR-027）。基线�
 | `templates/commands/` 文件集不变（27 个，名字集合逐个比对） | `test_expression_compatibility.py` |
 | 除 C-5/C-6 白名单外，其余模板与技能的内容哈希不变 | `test_expression_compatibility.py` |
 | 其余 25 个模板与 49 个技能不含 `flow-class-check.py` / `expression-gates.md` / `doc-consistency-check.py` 引用（接线封闭） | 两者共同 |
-| 四个接线点存在且位置正确（`docs.md` 的 `## ` 章节序列不变；`humanize.md` 仍无 `## Wrap-up` 且只有一处 `SKILL.md`） | `test_expression_gate_wiring.py` |
+| 四个接线点存在且位置正确（`docs.md` 的 `## ` 章节序列不变；`humanize.md` 仍无 `## Wrap-up`、只有一处 `SKILL.md`、且不含任何脚本调用） | `test_expression_gate_wiring.py` |
 | 8 个生成副本含接线（证明 `regen-command-copies.py` 已执行） | `test_expression_gate_wiring.py` |
-| `docs` 路径调用 `doc-consistency-check.py`；`humanize` 路径保留 062 保真检查并引用门禁 owner | `test_expression_gate_wiring.py` |
+| `docs` 路径调用 `doc-consistency-check.py`；`humanize` 技能含唯一的 lookup 并保留 062 保真检查与门禁 owner 引用 | `test_expression_gate_wiring.py` |
 | 062 / 067 / 068 `requirements.md` sha256 与冻结值一致 | `test_expression_compatibility.py` |
 
 任一断言失败即视为接线越界（回归 069b 或扩面）；修复方向是收窄接线，不是放宽断言。

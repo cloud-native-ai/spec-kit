@@ -35,7 +35,7 @@ python3 skills/external/create-docs/scripts/docs-utils.py --action validate --ro
 # (a) 需求面基线
 python3 scripts/python/validate-requirements.py .specify/specs/069a-flow-classification-docs-gates/requirements.md
 #   → status: ok / id-contiguous, doc-order, ref-resolvable, marker-count, dup-id 全 pass
-#     251 lines, 35 definition rows, 3 shared strings, 0 error(s), 0 warning(s) (exit 0)
+#     267 lines, 35 definition rows, 4 shared strings, 0 error(s), 0 warning(s) (exit 0)
 
 # (a) 测试基线（名字级）
 python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
@@ -78,8 +78,23 @@ python3 scripts/python/flow-class-check.py --action check --format json
 ```
 
 **前提（逐例）**：① 动作名 `check` / `lookup` 与 `--unit-id` / `--repo` / `--format` 旗标（契约 `flow-class-ledger.md` C-13）；
-② `lookup` 的 JSON 键集合（`data-model.md` E9）；③ 默认标记字面量与 `requirements.md` § Shared Strings 的 `STR-004` 同值（测试固定副本）；
+② `lookup` 的 JSON 键集合（`data-model.md` E9；示例输出里的键名与取值是**输出样例**，属防漂移固定副本，规范字面量见 requirements §Shared Strings 的 `[[STR-003]]` / `[[STR-001]]` / `[[STR-002]]`）；
+③ 默认标记字面量与 `requirements.md` § Shared Strings 的 `STR-004` 同值（测试固定副本）；
 ④ 台账行语法（契约 C-4）与反空真下限 27/51（契约 C-5）。四条全部由契约测试断言；演练用 `--repo` 指向临时夹具，不改本仓台账。
+
+**分类正确性（route b：`tests/contract/test_flow_class_correctness.py` 钉住）**
+
+```bash
+# 固定 fixture：≥10 个流程单元（两类 ≥3 / 未声明 ≥1 / 类中立 ≥1 / 混合 oracle ≥1）
+#   逐单元断言 lookup 的 flow_class / source / basis / marker 与 oracle 相符
+#   → 断言全绿（不是"文件在场"这类结构断言）
+
+# 变异断言：把 fixture 中一个单元的类别改错后重跑同一比对
+#   → 比对 MUST 转红（证明该测试能证伪；改对后回绿）
+```
+
+**前提（逐例）**：① oracle 是测试内的固定期望表（与台账同源、独立书写，避免用被测实现生成期望）；
+② 变异在临时副本上做，不改本仓台账；③ 该测试是 SC-001 的机械核验面，两人判定演练为并列人工证据。
 
 ---
 
@@ -164,8 +179,14 @@ python3 scripts/python/sync-mirrors.py --check
 
 # (b) 接线本身（由 tests/contract/test_expression_gate_wiring.py 钉住；此处给人工复核形态）
 grep -n "flow-class-check.py\|expression-gates.md\|flow-class-definitions.md" \
-     templates/commands/docs.md templates/commands/humanize.md
-#   → 两个模板各命中：lookup 调用 + 两个 owner 指针
+     templates/commands/docs.md
+#   → docs 模板命中：lookup 调用 + 两个 owner 指针
+grep -n "flow-class-definitions.md\|expression-gates.md" templates/commands/humanize.md
+#   → 只命中两个 owner 指针
+grep -n "flow-class-check.py\|--action lookup\|doc-consistency-check.py" templates/commands/humanize.md
+#   → 空（humanize 命令保持 Simple：零脚本调用；类别读取在技能执行体）
+grep -n "flow-class-check.py\|--action lookup" skills/external/humanize/SKILL.md
+#   → 命中（该流程唯一的类别读取，位于 Stage 6）
 grep -n "doc-consistency-check.py" templates/commands/docs.md
 #   → docs 路径命中 doc 检查器；humanize 模板 MUST NOT 命中（最小集不套六面）
 grep -c "SKILL.md" templates/commands/humanize.md
@@ -174,6 +195,15 @@ grep -rn "flow-class-check.py\|expression-gates.md\|doc-consistency-check.py" \
      templates/commands/*.md skills/*/*/SKILL.md | grep -v -e "commands/docs.md" -e "commands/humanize.md" \
      -e "create-docs/SKILL.md" -e "humanize/SKILL.md"
 #   → 空（接线封闭集之外零调用点）
+```
+
+**Simple 形态的既有回归（route a，本次实跑）**
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_humanize_command_surface.py -q -p no:cacheprovider
+#   → 10 passed（2026-10-24；含 test_c01_thin_entry_shape / test_c02_single_skill_delegation）
+#   模板当前形态实测：非表格行 40 条（上限 120）、无 ## Wrap-up、SKILL.md 唯一一处、零 flow-class-check 引用
 ```
 
 **兼容语义（本场景要证明的命题）**

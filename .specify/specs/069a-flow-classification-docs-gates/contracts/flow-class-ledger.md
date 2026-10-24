@@ -18,20 +18,21 @@
 
 - **C-3** 取值与命名空间键
 
-`flow_class` 是机器可读键（列名、JSON 键、CLI 参数统一用它）。取值仅两个：`[[STR-001]]` 与 `[[STR-002]]`。
-`execution` 出现在 `flow_class` 之外的语境时不得被读作本分类（与 Agent Execution 同词异义，消歧归 owner § 命名空间）。
-`[[STR-001]]` / `[[STR-002]]` / `[[STR-004]]` 的字面量唯一落 `requirements.md` § Shared Strings；实现与测试引用该表（测试内固定字面量属「防漂移的固定副本」，合法）。
+`[[STR-003]]` 是机器可读键（列名、JSON 键、CLI 参数统一用它）。取值仅两个：`[[STR-001]]` 与 `[[STR-002]]`。
+`[[STR-001]]` 出现在 `[[STR-003]]` 之外的语境时不得被读作本分类（与 Agent Execution 同词异义，消歧归 owner § 命名空间）。
+`[[STR-001]]` / `[[STR-002]]` / `[[STR-003]]` / `[[STR-004]]` 的字面量唯一落 `requirements.md` § Shared Strings（`STR-003` 的父来源见 requirements SA-3）；实现与测试引用该表（测试内固定字面量属「防漂移的固定副本」，合法）。
 
 - **C-4** 台账行语法
 
 台账是一张 Markdown 表，**一行一个流程单元**，首格为该单元 id：
 
 ```text
-| unit_id | flow_class | basis | neutral | notes |
+| unit_id | [[STR-003]] | basis | neutral | notes |
 ```
 
 - `unit_id`：命令为 `/speckit.<stem>`，技能为 `skill:<dir-name>`。
-- `basis`：`behavior-oracle` / `reader-oracle` / `mixed-oracle`。
+- 类别列头 MUST 逐字取 `[[STR-003]]` 的字面量（台账列头是该键的消费方之一）。
+- `basis`：`behavior-oracle` / `reader-oracle` / `mixed-oracle`（FR-002 的判定依据列）。
 - `neutral`：`yes` 或缺省。
 - 列数不符、缺必选列、单元 id 形态非法 → `row-malformed`。解析器 MUST NOT 猜列。
 
@@ -50,7 +51,7 @@
 
 - **C-7** 未声明默认与标记
 
-未登记单元 `--action lookup` MUST 返回 `flow_class = [[STR-001]]`、`source = default`、`marker = [[STR-004]]`，退出码 0（不中断流程）。
+未登记单元 `--action lookup` MUST 返回类别键（[[STR-003]]）取值 `[[STR-001]]`、`source = default`、`marker = [[STR-004]]`，退出码 0（不中断流程）。
 已登记单元 MUST 返回 `source = ledger`、`marker = null`——不得把已判定伪装成默认，也不得把默认伪装成已判定。
 owner 不可解析 / 版本不兼容（如台账表头缺失）时，`lookup` MUST 降级为默认并保留 `marker`，同时在 stderr 报 `owner-unparsable`；MUST NOT 静默切换门禁集。
 
@@ -63,12 +64,13 @@ owner 不可解析 / 版本不兼容（如台账表头缺失）时，`lookup` MU
 - **C-9** 读取点与指定接线（designated wiring）
 
 门禁在判定之前 MUST 经 `flow-class-check.py --action lookup` 读取类别；读取点 MUST 落在一个**已接线的入口**内
-（本切片 = `/speckit.docs` 与 `/speckit.humanize` 两个命令模板，见 C-15）。
+（本切片 = `/speckit.docs` 的命令模板，以及 `/speckit.humanize` 的委派技能执行体；见 C-15）。
 接线只允许三种形态：① lookup 调用（脚本路径 + `--action lookup` + `--unit-id`）；② owner 指针（分类 owner 路径 + 门禁 owner 路径）；
-③ 门禁 owner 调用点表点名的检查器调用（仅 docs 侧：`doc-consistency-check.py --action verify`；技能侧不新增分类读取）。
-`templates/commands/**` 与 `skills/**/SKILL.md` MUST NOT 出现类别赋值字面量（`flow_class = <value>`、`flow_class: <value>` 形态，或「unit id ‖ 类别取值」的台账样式行）；
+③ 门禁 owner 调用点表点名的检查器调用（仅 docs 侧：`doc-consistency-check.py --action verify`；`create-docs` 侧沿用调用方结果、不新增分类读取；`humanize` 技能侧的读取是 W4 的 lookup，属形态 ①）。
+`templates/commands/**` 与 `skills/**/SKILL.md` MUST NOT 出现类别赋值字面量（`<键> = <value>`、`<键>: <value>` 形态，键名取自 `[[STR-003]]`；或「unit id ‖ 类别取值」的台账样式行）；
 出现即失败。接线小节内 MUST NOT 出现任一类别取值字面量（owner 路径 `expression-gates.md` 的文件名本身除外），也 MUST NOT 断言本单元属某类（中文类名同样算）——类别只能由 lookup 的运行结果给出。
-类别 MUST 在无 wrap-up 面的流程（如 `/speckit.humanize`）中同样可读——读取挂在入口的输入/分派前，不挂 wrap-up。
+类别 MUST 在无 wrap-up 面的流程（如 `/speckit.humanize`）中同样可读——**读取挂在委派技能的执行体（Stage 6）**，不挂命令模板的 wrap-up，也不在命令模板内调用脚本：
+复杂度判据 owner（`shared/workflow/feedback-step.md`：命令调用脚本 ⇒ Complex）与 `test_c01_thin_entry_shape` 共同要求该命令保持 Simple（requirements SA-8 / FR-025）。
 
 - **C-10** 阶段不变量
 
@@ -80,7 +82,7 @@ owner 不可解析 / 版本不兼容（如台账表头缺失）时，`lookup` MU
 
 台账 MUST 登记 `/speckit.docs` 与 `/speckit.humanize` 为 `[[STR-002]]`，且二者的既有门禁与行为 MUST NOT 被本切片削弱：
 `templates/commands/docs.md`、`templates/commands/humanize.md`、`skills/external/create-docs/**`、`skills/external/humanize/**`
-只允许 C-15 的**最小接线**（lookup + owner 指针 + docs 侧的 checker 调用要求）；
+只允许 C-15 的**最小接线**（W1 lookup + owner 指针；W2 仅 owner 指针；W3 checker 调用要求 + 指针；W4 lookup + 指针）；
 其余内容 MUST 字节不变——062 的保真底线、输入解析、默认零写入与报告契约不受影响，docs 的 reconcile/authoring 流程与确认门不受影响。
 接线后 `/speckit.docs` 的文档型算子集与 `/speckit.humanize` 的最小算子集 MUST 由门禁 owner 的调用点表给出，模板与技能 MUST NOT 自行列举。
 
@@ -98,7 +100,7 @@ python3 scripts/python/flow-class-check.py --action lookup --unit-id <id> [--rep
 
 - `check`：0 = 零 finding；1 = 任一 finding（`missing/unknown/duplicate/dual-class/invalid-class/row-malformed/neutral-unlisted/inventory-truncated`）；2 = 输入或解析错误（owner 文件缺失、表头缺失）。
 - `lookup`：0 = 解析成功（含默认降级）；2 = 单元 id 非法或 owner 不可解析。
-- `--format json` 的输出 MUST 至少含 `action`、`findings[]`（或 `unit_id/flow_class/source/marker`）与 `checked_at`（ISO-8601 Z）。
+- `--format json` 的输出 MUST 至少含 `action`、`findings[]`（或 `unit_id` / 类别键（[[STR-003]]） / `source` / `marker`）与 `checked_at`（ISO-8601 Z）。
 - 两个动作 MUST 只读：不写任何文件、不修改台账。
 
 - **C-14** 客户项目侧的所有权
@@ -113,10 +115,11 @@ python3 scripts/python/flow-class-check.py --action lookup --unit-id <id> [--rep
 | # | 入口 | 允许增补 |
 |---|------|----------|
 | W1 | `templates/commands/docs.md` | lookup 调用 + owner 指针（含门禁 owner 的 docs 调用点行） |
-| W2 | `templates/commands/humanize.md` | lookup 调用 + owner 指针（含门禁 owner 的 humanize 调用点行） |
+| W2 | `templates/commands/humanize.md` | **仅 owner 指针**（分类 owner + 门禁 owner 各一条路径）；MUST NOT 出现 lookup 调用或任何脚本调用（保持 Simple，requirements SA-8） |
 | W3 | `skills/external/create-docs/SKILL.md` | owner 指针 + R6 verify 的 checker 调用要求 |
-| W4 | `skills/external/humanize/SKILL.md` | owner 指针（Stage 6） |
+| W4 | `skills/external/humanize/SKILL.md` | lookup 调用（`--unit-id "/speckit.humanize"`）+ owner 指针（Stage 6；承载该流程唯一的类别读取） |
 
 其余命令模板与技能 MUST NOT 引用 `flow-class-check.py` / `expression-gates.md` / `doc-consistency-check.py`；
 出现即失败（接线扩面）。每工具命令副本由 `regen-command-copies.py` 从 W1/W2 生成，MUST NOT 手写（手写副本 = 第二来源）。
-接线 MUST NOT 改写既有章节结构：`docs.md` 的 `## ` 顶级章节序列不变、`humanize.md` 仍为 Simple 形态（无 `## Wrap-up`）。
+接线 MUST NOT 改写既有章节结构：`docs.md` 的 `## ` 顶级章节序列不变、`humanize.md` 仍为 Simple 形态（无 `## Wrap-up`、无脚本调用）。
+W2 与 W4 的读取义务是**同一件事的两半**：命令模板声明「类别与门禁归谁」，技能执行体完成读取与门禁执行——不得把 lookup 同时放到两处（同一次运行只读一次，C-14 去重纪律）。
