@@ -169,16 +169,18 @@ EXIT=0        # 两个载荷均在包内
 |---|------|-----------|-----------------------------------------------|--------|--------|-----------|------|
 | 1 | xuanji-agent | `3f68b62` | `PYTHONPATH=<snap>/src <proj>/.venv/bin/python -m pytest tests/ -q --tb=no -rf -p no:cacheprovider` | 0 nodeid（250 passed） | 0 nodeid（250 passed） | 空 | 零新增 |
 | 2 | xuanji-cli | `a0c476d` | `go test ./... -json` | 2 nodeid | 2 nodeid | 空 | 零新增 |
-| 3 | xuanji-function | `a2fad18` | `<proj>/.venv/bin/python -m pytest -q --tb=no -rf -p no:cacheprovider` | 套件未启动（collection 7 errors） | 套件未启动（同左） | not-evaluated（本机缺 `cws-lib-python`：`CWS_LIB_PYTHON_HOME` 未设、`cws_py_test` 不存在；`import cws_common / asiops / cws_daemon` 均 `ModuleNotFoundError`） | not-evaluated |
+| 3 | xuanji-function | `a2fad18` | `<proj>/.venv/bin/python -m pytest -q --tb=no -rfE -p no:cacheprovider`（前置：`CWS_LIB_PYTHON_HOME` 指向 `cws-lib-python`，PYTHONPATH 只加其 `src`；见 `migration-samples.md` 第二条更正） | 12 nodeid | 12 nodeid | 空 | 零新增 |
 
 逐项目 nodeid 名集（`comm -13` 的输入）：
 
 - **xuanji-agent**：before = ∅，after = ∅ → `comm -13` 输出 0 行。套件输出 `250 passed in 3.44s`（before）/ `250 passed in 2.97s`（after）。
 - **xuanji-cli**：before 与 after 都是同一集合 `xuanji-cli/cmd/xuanji-cli::TestLoginDefaultIsBucSilentChain` +
   `xuanji-cli/cmd/xuanji-cli::package`（`go test -json` 的两个 fail 事件：一个测试、一个包级失败）→ `comm -13` 输出 0 行。
-- **xuanji-function**：刷新前后都以 `Interrupted: 7 errors during collection` 退出 2，**没有任何测试 nodeid**；
-  按契约 C-8 记 `not-evaluated` + reason，**不记 0 新增失败**（套件入口依赖的 `cws-lib-python` 不在本机，
-  冻结命令与项目自有 wrapper 都不可启动；不以人工 `cp` 或换套件冒充刷新）。
+- **xuanji-function**：before 与 after 都是同一 12 个 nodeid（2 个 `FAILED` + 10 个 `ERROR`；10 条 MySQL fixture
+  error + 2 条既有失败）→ `comm -13` 输出 0 行；套件输出 `2 failed, 165 passed, 1 skipped, 10 errors`
+  （before 2.04s / after 2.09s）。套件 MUST 用项目自己的 cws-lib 环境启动（`CWS_LIB_PYTHON_HOME` + 只取
+  `cws-lib-python/src`，**不取 `lib`**——其 vendored `platformdirs` 缺 `pytest_plugin.py`，会遮住 pytest 9.x 的插件入口），
+  否则以 `ModuleNotFoundError: cws_common` 拒绝启动；环境细节见 `migration-samples.md` 的 2026-10-25 第二条更正。
 
 刷新执行（同一发行包；三项目都用其既有 AI 工具 `qoder`）：
 
@@ -201,5 +203,7 @@ owner 内 `同构映射（8 阶段 × 3 面）` 命中 2（开篇 owns 项 + 章
   `contracts/ledger-reconciler.md` C-7。`:47` 的「规范条款归 069b」属 069a 的 § 判定依据表（判据正文），
   且 069b 已落盘，不再是悬空指针——按「不改 069a 判据正文」保留。
 - **P2 的 `:19` 交接行**已由 US1 的 T006 删除，本阶段未再触碰。
-- **xuanji-function 的 `not-evaluated` 是环境事实，不是零回归证据**：C-8 明确允许该降级，且禁止把
-  「套件没跑起来」记成 0 新增失败；SC-002 的机器侧结论因此是 2 个 measured + 1 个 not-evaluated。
+- **xuanji-function 需要项目自己的环境入口**：冻结的 `.venv/bin/python -m pytest -q` 只有在
+  `CWS_LIB_PYTHON_HOME` 指向本机 `cws-lib-python` 且 PYTHONPATH 只取 `src`（不取 `lib`）时才能启动；
+  这是套件通道的环境事实，不改冻结样本、不记 `not-evaluated`，也不以人工拷贝冒充刷新。
+  SC-002 的机器侧结论因此是 **3 个 measured（`comm -13` 均为空）**。

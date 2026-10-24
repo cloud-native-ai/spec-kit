@@ -64,3 +64,22 @@ comm -13 before.txt after.txt   # MUST be empty
    （`--target` 目录优先于 profiles venv 里的旧 `specify_cli`；profiles venv 提供 httpx / typer / rich 等运行时依赖；
    `--force` 跳过非空目录确认，`--ai` 避免交互式选择）。wheel 构建 / 安装 / init 不可执行时按 C-8 记
    `not-evaluated` + reason，MUST NOT 用人工 `cp` / 逐文件复制冒充刷新。
+
+## 2026-10-25 第二条跑测机制更正（xuanji-function 的启动环境与错误采集）
+
+上面的冻结表仍是权威样本（HEAD / 分支 / 脏文件数 / 载荷状态 / 套件命令均不变）；本节只补 `xuanji-function`
+在快照里如何真跑——原「跑测前提」只写了 `.venv/bin/python` 与 `pytest.ini`，不足以让套件启动：
+
+1. **必须建立项目自己的 cws-lib 环境**：测试模块导入 `cws_common` / `cws_daemon`（来自本机
+   `/Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-python/src`）与 `asiops`（来自项目 `handler/event`）。
+   冻结命令本身不变，但执行前 MUST 设置 `CWS_LIB_PYTHON_HOME=<本机 cws-lib-python>`，并把 PYTHONPATH 设为
+   `<snap>/handler/event:<snap>/cmdline:<snap>/src/data:<snap>/src:<snap>:<cws-lib-python>/src`。
+2. **不取 `cws-lib-python/lib`**：该目录的 vendored `platformdirs` 没有 `pytest_plugin.py`，一旦被 PYTHONPATH 前置
+   就会遮住 venv 内 pytest 9.x 的同名插件入口，套件在 collection 阶段以
+   `ModuleNotFoundError: No module named 'platformdirs.pytest_plugin'` 退出。项目运行依赖（fastapi / sqlalchemy 等）
+   由项目 `.venv` 提供，不需要 vendored `lib`。
+3. **错误也计入名字集**：该套件正常状态下有 10 个 MySQL fixture error 与 2 个既有失败；采集命令用
+   `-q --tb=no -rfE`，nodeid 名集 = `FAILED <nodeid>` ∪ `ERROR <nodeid>`。这是 C-7「按该套件原生失败输出采集
+   nodeid 名集」在 pytest 上的超集实现，仍按**名字**而非条数比对。
+4. **判读**：套件在刷新前后给出同一 12 个 nodeid、`comm -13` 为空 → `xuanji-function` 的结论是 measured 的
+   「零新增失败」，不是 `not-evaluated`；本更正不得被读成重选样本或替换套件命令。
