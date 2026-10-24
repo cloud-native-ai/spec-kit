@@ -1,0 +1,7 @@
+# command: python3 -m pytest -q tests/unit/test_decomposition_check.py tests/unit/test_pre_analyze_check.py tests/unit/test_overlap_check.py tests/contract/test_sdd_loop_driver_gates.py tests/contract/test_sdd_loop_driver_skill.py
+# date: 2026-10-24T15:51:18Z
+# host: Linux 5.10.134-15.2.al8.x86_64 x86_64 / Python 3.11.11 / pytest pytest 8.4.2
+# wall: 17s
+# exit: 0
+.................................................................        [100%]
+65 passed in 17.02s
