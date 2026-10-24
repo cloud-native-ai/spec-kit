@@ -98,3 +98,9 @@
 - 状态机：`Draft → Planned`（canonical state machine，`.specify/templates/feature-details-template.md` § Canonical Status State Machine）；
   本阶段**不得**落 `Implemented`（该转移属 `/speckit.implement`）。判据满足：`plan.md` / `data-model.md` / `contracts/` / `quickstart.md` 四件齐备 + Constitution Check 无未证成 Fail。
 - 069b **不预建**：本阶段不创建 `069b-isomorphism-migration-metrics` 目录、不复制其 FR 正文（SA-6）。
+
+### tasks 阶段复核（2026-10-24）
+
+- `/speckit.tasks` 再次复核 Feature list：零新增、零废弃、零合并；Feature 069 的注册行与详情文件本阶段零改动（`tasks.md` 指针由 T035 在实现期回填）。
+- 任务规模 35 任务行（Setup 3 · US1 8 · US2 15 · US3 4 · Polish 5）；四份契约共 50 条款，每条恰被一个 `[green:]` 行认领（`account-clause-coverage.py` 实测 claimed = 50）。
+- 状态仍为 `Planned`：`tasks.md` 落盘不推进生命周期，`Implemented` 转移属 `/speckit.implement`。
