@@ -225,3 +225,174 @@ def test_nested_driver_prompt_is_blocked_and_not_dispatched():
     assert "plan-wp02" in result["dispatch_order"]
     assert "plan-wp03" in result["blocked"]
     assert result["stage_gate"] == "fail"
+
+
+# ---------------------------------------------------------------------------
+# Verification and integration dry runs — VI-01…VI-13 (T021)
+# ---------------------------------------------------------------------------
+
+
+def _shared_output_plan() -> dict:
+    """Two verified read-only packages that claim the same output path."""
+    first = wp_fixtures.make_package(
+        "plan-wp01", outputs=["findings/shared.md"]
+    )
+    second = wp_fixtures.make_package(
+        "plan-wp02", outputs=["findings/shared.md"]
+    )
+    return wp_fixtures.make_plan(
+        packages=[first, second],
+        required_outputs=["findings/shared.md"],
+    )
+
+
+def test_missing_output_stops_integration():
+    """VI-06/VI-08: a verified package with a missing output fails the gate."""
+    plan = wp_driver_sim.sim_plan()
+    run = wp_driver_sim.run_stage(plan, outputs={"plan-wp02": []})
+    integration = run["integration"]
+
+    assert run["dispatch"]["stage_gate"] == "pass"
+    assert integration["aggregate"]["missing_outputs"] == [
+        "findings/read-b.md"
+    ]
+    assert integration["conflict"] is True
+    assert integration["commit"] is None
+    assert integration["commits"]["closing"] is None
+    assert integration["stage_gate"] == "fail"
+    finding = next(
+        item
+        for item in integration["findings"]
+        if item["code"] == "output-missing"
+    )
+    assert finding["wp_id"] == "plan-wp02"
+    assert len(set(finding["evidence_refs"])) >= 2
+
+
+def test_contradictory_outputs_stop_integration():
+    """VI-06/VI-08: different content for one path is surfaced with both pointers."""
+    plan = _shared_output_plan()
+    run = wp_driver_sim.run_stage(
+        plan,
+        contents={
+            "findings/shared.md": {
+                "plan-wp01": "one",
+                "plan-wp02": "two",
+            }
+        },
+    )
+    integration = run["integration"]
+
+    assert integration["aggregate"]["contradictions"] == [
+        "findings/shared.md"
+    ]
+    assert integration["conflict"] is True
+    assert integration["stage_gate"] == "fail"
+    finding = next(
+        item
+        for item in integration["findings"]
+        if item["code"] == "output-contradiction"
+    )
+    assert len(finding["evidence_refs"]) == 2
+    assert len(set(finding["evidence_refs"])) == 2
+
+
+def test_integration_order_is_deterministic_not_dispatch_order():
+    """VI-07: integration follows the declared graph order across runs."""
+    plan = wp_driver_sim.sim_plan()
+    first = wp_driver_sim.run_stage(plan)["integration"]
+    second = wp_driver_sim.run_stage(plan)["integration"]
+
+    assert first["integration_order"] == [
+        "plan-wp01",
+        "plan-wp02",
+        "plan-wp03",
+    ]
+    assert first["integration_order"] == second["integration_order"]
+    assert first["integrate_event"]["order"] == first["integration_order"]
+
+    reentry = wp_driver_sim.schedule(plan, completed={"plan-wp01"})
+    assert reentry["dispatch_order"] == ["plan-wp03", "plan-wp02"]
+    assert first["integration_order"] != reentry["dispatch_order"]
+
+
+def test_package_sentinel_is_not_a_stage_sentinel():
+    """VI-12: package sentinels never satisfy the stage requirement."""
+    plan = wp_driver_sim.sim_plan()
+    package_sentinel = wp_fixtures.sentinel_for("plan-wp03")
+    run = wp_driver_sim.run_stage(
+        plan, integrator_last_line=package_sentinel
+    )
+    integration = run["integration"]
+
+    assert {
+        settle["sentinel"] for settle in run["dispatch"]["settles"]
+    } == {
+        "WP-PLAN-WP01-DONE",
+        "WP-PLAN-WP02-DONE",
+        "WP-PLAN-WP03-DONE",
+    }
+    assert integration["stage_u4"]["sentinel"] == package_sentinel
+    assert integration["stage_u4"]["sentinel_ok"] is False
+    assert integration["stage_gate"] == "fail"
+
+    clean = wp_driver_sim.run_stage(plan)["integration"]
+    assert clean["stage_u4"]["sentinel"] == "PLAN-DONE"
+    assert clean["stage_u4"]["sentinel_ok"] is True
+
+
+def test_stage_u4_runs_after_integration():
+    """VI-11/VI-13: the integrator settles, then the unchanged U4 runs."""
+    integration = wp_driver_sim.run_stage(wp_driver_sim.sim_plan())[
+        "integration"
+    ]
+
+    assert integration["integrate_event"]["at"] == (
+        integration["integrator"]["ended_at"]
+    )
+    assert integration["integrator"]["ended_at"] < integration["stage_u4"][
+        "at"
+    ]
+    assert integration["stage_u4"]["artifact_verification"] == "pass"
+    assert integration["stage_u4"]["discipline_checks"] == "pass"
+    assert integration["stage_u4"]["gate"] == "pass"
+    assert integration["stage_gate"] == "pass"
+
+    failed = wp_driver_sim.run_stage(
+        wp_driver_sim.sim_plan(), u4={"artifact_verification": "fail"}
+    )["integration"]
+    assert failed["stage_u4"]["at"] > failed["integrator"]["ended_at"]
+    assert failed["stage_u4"]["sentinel_ok"] is True
+    assert failed["stage_u4"]["gate"] == "fail"
+    assert failed["stage_gate"] == "fail"
+
+
+def test_driver_u4_capability_fallback_is_recorded():
+    """VI-01: a host without subagents falls back to a recorded driver-u4 run."""
+    plan = wp_driver_sim.sim_plan()
+    dispatch = wp_driver_sim.schedule(plan)
+    results = wp_driver_sim.results_from_schedule(dispatch)
+    verification = wp_driver_sim.verify(
+        plan, results, host_can_spawn=False
+    )
+    executors = {
+        item["wp_id"]: item["executor_execution"]
+        for item in dispatch["dispatches"]
+    }
+
+    assert {
+        item["kind"] for item in verification["verifier_executions"]
+    } == {"driver-u4"}
+    for verifier in verification["verifier_executions"]:
+        assert verifier["fresh_context"] is False
+        assert verifier["fallback_reason"] == "host-no-subagent"
+        assert verifier["execution_id"] != executors[verifier["wp_id"]]
+    for event in verification["verdict_events"]:
+        assert event["verification_fallback"] == "host-no-subagent"
+    assert verification["stage_gate"] == "pass"
+
+    integration = wp_driver_sim.integrate(
+        plan, verification, results=results
+    )
+    assert integration["conflict"] is False
+    assert integration["stage_gate"] == "pass"

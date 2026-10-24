@@ -229,3 +229,30 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
 
 
 
+
+## T020 — VI-01…VI-14 contract pins and behavior tests (red)
+
+- **Date**: 2026-10-24T17:45Z
+- **Host**: Linux x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed path (test)**: `tests/contract/test_sdd_loop_driver_wp_coordination.py` (VI contract pins, model-doc projection, fourteen behavioral cases)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_coordination.py -k "vi_"
+  ```
+- **Real output (summary)**: `18 failed, 15 passed, 34 deselected in 0.31s`; exit code `1`.
+- **Failing groups (real)**: the model-doc projection (the runtime owner has no verification/integration section) and every behavioral VI case — `results_from_schedule`, `verify`, `integrate`, and `run_stage` do not exist yet (`AttributeError`), so VI-01…VI-14 behavior is unimplemented.
+- **Disclosed non-evidence greens**: the 15 passing cases are the fourteen clause-content pins and the closed-clause-set pin. They read the unchanged owner contract, so they pass before implementation by design and are anti-drift pins, not new-behaviour evidence.
+- **Red-first claim**: every VI behavior assertion fails for a missing implementation, not for a weak or skipped assertion.
+
+## T021 — verification/integration dry runs (red)
+
+- **Date**: 2026-10-24T17:46Z
+- **Host**: Linux x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed path (test)**: `tests/integration/test_wp_coordination_dry_runs.py` (missing output, contradictory output, deterministic integration order, package-sentinel non-promotion, post-integration U4, driver-u4 capability fallback)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/integration/test_wp_coordination_dry_runs.py -k "missing_output or contradictory or integration_order_is_deterministic or package_sentinel or stage_u4_runs or driver_u4"
+  ```
+- **Real output**: `6 failed, 6 deselected in 0.08s`; exit code `1`.
+- **Failing group (real)**: every case fails with `AttributeError: module 'fixtures.wp_driver_sim' has no attribute 'results_from_schedule'` (or `run_stage`/`verify`/`integrate`); the verification/integration dry-run path is unimplemented.
+- **Red-first claim**: all six scenario assertions are red before T022 and none is skipped or weakened.

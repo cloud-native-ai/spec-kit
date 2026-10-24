@@ -1,21 +1,22 @@
-"""Contract tests for the scheduler and dispatch layer — SD-01…SD-16.
+"""Contract tests for the scheduler, dispatch, and verification layers.
 
 Layer under test
 ----------------
-The clause text is owned by ``contracts/scheduler-and-dispatch.md``. The
-runtime projection is ``references/decomposition-model.md`` (scheduler and
-retry sections) plus the deterministic, test-only simulator
-``tests/fixtures/wp_driver_sim.py``. This file pins both: every SD clause keeps
-its normative content in the owner, and the simulator demonstrates the
-mechanical rules (readiness, slot cap, write-alone, deterministic order,
-failure isolation, collection, topology, anti-nesting, re-entry).
-
-Verification/integration (VI-01…VI-14) extends this file in T020.
+The clause text is owned by ``contracts/scheduler-and-dispatch.md`` (SD-01…SD-16)
+and ``contracts/verification-and-integration.md`` (VI-01…VI-14). The runtime
+projection is ``references/decomposition-model.md`` (scheduler, retry, and
+verification/integration sections) plus the deterministic, test-only simulator
+``tests/fixtures/wp_driver_sim.py``. This file pins both: every clause keeps its
+normative content in the owner, and the simulator demonstrates the mechanical
+rules (readiness, slot cap, write-alone, deterministic order, failure
+isolation, collection, topology, anti-nesting, re-entry, independent verdicts,
+aggregation, and deterministic integration).
 """
 from __future__ import annotations
 
 import copy
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -669,3 +670,535 @@ def test_sd_16_reentry_never_redispatches_a_completed_package():
     text = _model_text()
     assert "watch-target.sh --once" in text
     assert "never redispatches a completed package" in text
+
+
+# ---------------------------------------------------------------------------
+# VI-01…VI-14 — independent verification and integration (T020)
+# ---------------------------------------------------------------------------
+
+VI_CONTRACT_PINS = {
+    "VI-01": (
+        "exactly one fresh-context verifier execution",
+        "not the package's executor",
+        "driver-u4",
+        "structurally independent of the executor",
+    ),
+    "VI-02": (
+        "read-only with respect to repository content",
+        "`targeted-set-v1`",
+        "MUST NOT run a full suite",
+    ),
+    "VI-03": (
+        "`checks[]` (id, kind, command, result, evidence_ref)",
+        "`evidence_refs[]`",
+        "cover every acceptance criterion",
+        "`verified_at`",
+    ),
+    "VI-04": (
+        "missing, unreadable, malformed, or ambiguous verdict counts as `fail`",
+        "never inferred from a package self-report",
+    ),
+    "VI-05": (
+        "appends a `verdict` ledger event",
+        "verifier_execution, evidence_ptr, at",
+        "A package without that event is not verified.",
+    ),
+    "VI-06": (
+        "aggregates the verified verdict set",
+        "`required_outputs` minus `integrator_outputs`",
+        "both evidence pointers",
+    ),
+    "VI-07": (
+        "topological layers, each layer sorted by `wp_id` lexicographic",
+        "recorded in the `integrate` event",
+        "not the dispatch order",
+    ),
+    "VI-08": (
+        "stops integration, fails the stage gate",
+        "no partial commit presented as a complete stage deliverable",
+    ),
+    "VI-09": (
+        "package executors do not commit",
+        "single stage-closing commit",
+    ),
+    "VI-10": (
+        "067 part-commit discipline is preserved",
+        "MUST NOT rewrite, squash, or bypass the part commits",
+    ),
+    "VI-11": (
+        "one integrator execution per stage attempt",
+        "`stage-integrator` seat",
+        "emits `<STAGE>-DONE` as its last non-empty line",
+        "never dispatches a package, never re-plans, and never loads the driver",
+    ),
+    "VI-12": (
+        "never satisfies the stage sentinel",
+        "Only the integrator's `<STAGE>-DONE`",
+    ),
+    "VI-13": (
+        "unchanged stage-level U4",
+        "Package verdicts are inputs and never substitutes",
+    ),
+    "VI-14": (
+        "does not push, force-merge, or auto-merge",
+        "remain driver-owned",
+    ),
+}
+
+
+def _scheduled(plan, **kwargs):
+    dispatch = wp_driver_sim.schedule(plan, **kwargs)
+    return dispatch, wp_driver_sim.results_from_schedule(dispatch)
+
+
+def _clarify_plan() -> dict:
+    """Two read-only investigation packages plus an integrator write-back."""
+    first = wp_fixtures.make_package(
+        "clarify-wp01",
+        stage="clarify",
+        outputs=["findings/clarify-a.md"],
+    )
+    second = wp_fixtures.make_package(
+        "clarify-wp02",
+        stage="clarify",
+        outputs=["findings/clarify-b.md"],
+    )
+    return wp_fixtures.make_plan(
+        packages=[first, second],
+        stage="clarify",
+        decision="decomposed",
+        gate_verdict="admit",
+        rule="decompose-investigation-v1",
+        required_outputs=[
+            "findings/clarify-a.md",
+            "findings/clarify-b.md",
+            "clarifications.md",
+        ],
+        integrator_outputs=["clarifications.md"],
+    )
+
+
+def _shared_output_plan() -> dict:
+    """Two verified packages that claim the same output path."""
+    first = wp_fixtures.make_package(
+        "plan-wp01", outputs=["findings/shared.md"]
+    )
+    second = wp_fixtures.make_package(
+        "plan-wp02", outputs=["findings/shared.md"]
+    )
+    return wp_fixtures.make_plan(
+        packages=[first, second],
+        required_outputs=["findings/shared.md"],
+    )
+
+
+@pytest.mark.parametrize(
+    "clause", sorted(VI_CONTRACT_PINS), ids=sorted(VI_CONTRACT_PINS)
+)
+def test_vi_contract_clause_keeps_its_normative_content(clause):
+    """Each VI clause keeps its rule in the owner contract."""
+    contract = _contract("verification-and-integration.md")
+    for snippet in VI_CONTRACT_PINS[clause]:
+        assert snippet in contract, (clause, snippet)
+
+
+def test_vi_contract_file_covers_the_closed_clause_set():
+    text = _contract("verification-and-integration.md")
+    for index in range(1, 15):
+        assert "VI-%02d" % index in text
+
+
+def test_vi_model_doc_carries_the_runtime_projection():
+    text = _model_text()
+    for index in range(1, 15):
+        assert "VI-%02d" % index in text, index
+    for token in (
+        "stage-verifier",
+        "stage-integrator",
+        "verdict.json",
+        "driver-u4",
+        "integrator_outputs",
+        "closing commit",
+        "stage U4",
+        "never promoted",
+    ):
+        assert token in text, token
+
+
+def test_vi_01_one_independent_verifier_per_settled_package():
+    """VI-01: one fresh-context verifier, never the executor."""
+    plan = wp_driver_sim.sim_plan()
+    dispatch, results = _scheduled(plan)
+    verification = wp_driver_sim.verify(plan, results)
+
+    executors = {
+        item["wp_id"]: item["executor_execution"]
+        for item in dispatch["dispatches"]
+    }
+    verifiers = verification["verifier_executions"]
+    assert sorted(item["wp_id"] for item in verifiers) == [
+        "plan-wp01",
+        "plan-wp02",
+        "plan-wp03",
+    ]
+    assert len({item["execution_id"] for item in verifiers}) == 3
+    for item in verifiers:
+        assert item["fresh_context"] is True
+        assert item["independent"] is True
+        assert item["execution_id"] != executors[item["wp_id"]]
+    assert verification["stage_gate"] == "pass"
+
+
+def test_vi_02_verifier_is_read_only_and_targeted():
+    """VI-02: the verifier reads, may run targeted tests, never a full suite."""
+    plan = wp_driver_sim.sim_plan()
+    _, results = _scheduled(plan)
+    verification = wp_driver_sim.verify(plan, results)
+
+    assert verification["repository_writes"] == []
+    assert verification["full_suite_runs"] == 0
+    assert verification["targeted_tests_only"] is True
+    for item in verification["verifier_executions"]:
+        assert item["read_only"] is True
+    text = _model_text()
+    for token in (
+        "read-only with respect to repository content",
+        "targeted tests",
+        "never a full suite",
+    ):
+        assert token in text, token
+
+
+def test_vi_03_verdict_record_pins_the_schema(tmp_path):
+    """VI-03: the verdict file carries every required field and every criterion."""
+    plan = wp_driver_sim.sim_plan()
+    _, results = _scheduled(plan)
+    verification = wp_driver_sim.verify(plan, results, state_dir=tmp_path)
+
+    record = next(
+        item
+        for item in verification["verdicts"]
+        if item["wp_id"] == "plan-wp01"
+    )
+    for field in (
+        "schema_version",
+        "wp_id",
+        "stage",
+        "stage_attempt",
+        "wp_attempt",
+        "verdict",
+        "checks",
+        "evidence_refs",
+        "execution_id",
+        "verified_at",
+    ):
+        assert field in record, field
+    assert record["schema_version"] == 1
+    assert record["verdict"] == "pass"
+    assert record["path"] == (
+        "wp/line-demo-plan-plan-wp01-a1w1.verdict.json"
+    )
+    package = next(
+        item for item in plan["packages"] if item["wp_id"] == "plan-wp01"
+    )
+    assert {check["id"] for check in record["checks"]} == {
+        item["id"] for item in package["acceptance"]
+    }
+    for check in record["checks"]:
+        assert check["kind"] in (
+            "artifact",
+            "contract",
+            "test",
+            "adversarial",
+            "ownership",
+        )
+        assert check["result"] in ("pass", "fail")
+        assert "evidence_ref" in check
+    assert re.fullmatch(
+        r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", record["verified_at"]
+    )
+    on_disk = json.loads(
+        (tmp_path / record["path"]).read_text(encoding="utf-8")
+    )
+    assert on_disk["wp_id"] == "plan-wp01"
+    assert on_disk["verdict"] == "pass"
+    assert "path" not in on_disk
+
+
+@pytest.mark.parametrize(
+    "value,code",
+    [
+        ("missing", "verdict-missing"),
+        ("unreadable", "verdict-unreadable"),
+        ("malformed", "verdict-malformed"),
+        ("ambiguous", "verdict-ambiguous"),
+    ],
+)
+def test_vi_04_an_unusable_verdict_counts_as_fail(value, code):
+    """VI-04: missing, unreadable, malformed, and ambiguous all fail."""
+    plan = wp_driver_sim.sim_plan()
+    _, results = _scheduled(plan)
+    verification = wp_driver_sim.verify(
+        plan, results, verdicts={"plan-wp01": value}
+    )
+
+    assert "plan-wp01" in verification["unverified"]
+    assert "plan-wp01" not in verification["verified"]
+    event = next(
+        item
+        for item in verification["verdict_events"]
+        if item["wp_id"] == "plan-wp01"
+    )
+    assert event["verdict"] == "fail"
+    codes = {
+        finding["code"]
+        for finding in verification["findings"]
+        if finding["wp_id"] == "plan-wp01"
+    }
+    assert code in codes, codes
+    assert verification["stage_gate"] == "fail"
+
+
+def test_vi_05_a_verdict_event_follows_each_settle():
+    """VI-05: the ledger event is the only proof that a package was verified."""
+    plan = wp_driver_sim.sim_plan()
+    dispatch, results = _scheduled(plan)
+    verification = wp_driver_sim.verify(plan, results)
+
+    settles = {
+        item["wp_id"]: item["ended_at"] for item in dispatch["settles"]
+    }
+    events = verification["verdict_events"]
+    assert {item["wp_id"] for item in events} == set(settles)
+    for event in events:
+        assert event["event"] == "verdict"
+        for field in (
+            "wp_id",
+            "verdict",
+            "verifier_execution",
+            "evidence_ptr",
+            "at",
+        ):
+            assert field in event, field
+        assert event["at"] >= settles[event["wp_id"]]
+        assert event["verdict"] == "pass"
+    assert verification["verified"] == sorted(settles)
+
+
+def test_vi_06_aggregation_assigns_integrator_outputs_outside_coverage():
+    """VI-06: package coverage excludes integrator_outputs; the seat owns them."""
+    plan = _clarify_plan()
+    run = wp_driver_sim.run_stage(plan)
+    integration = run["integration"]
+    aggregate = integration["aggregate"]
+
+    assert aggregate["required_package_outputs"] == [
+        "findings/clarify-a.md",
+        "findings/clarify-b.md",
+    ]
+    assert aggregate["integrator_outputs_expected"] == [
+        "clarifications.md"
+    ]
+    produced = {
+        output
+        for outputs in aggregate["package_outputs"].values()
+        for output in outputs
+    }
+    assert produced == {
+        "findings/clarify-a.md",
+        "findings/clarify-b.md",
+    }
+    assert integration["integrator"]["integrator_outputs"] == [
+        "clarifications.md"
+    ]
+    assert aggregate["coverage_ok"] is True
+    assert aggregate["missing_outputs"] == []
+    assert integration["conflict"] is False
+    assert integration["stage_gate"] == "pass"
+
+
+def test_vi_07_integration_order_is_declared_not_dispatched():
+    """VI-07: re-entry dispatches out of order; integration keeps graph order."""
+    plan = wp_driver_sim.sim_plan()
+    reentry = wp_driver_sim.schedule(plan, completed={"plan-wp01"})
+    assert reentry["dispatch_order"] == ["plan-wp03", "plan-wp02"]
+
+    verification = {
+        "verified": ["plan-wp01", "plan-wp02", "plan-wp03"],
+        "failed": [],
+        "unverified": [],
+        "verdicts": [],
+        "verdict_events": [],
+        "stage_gate": "pass",
+    }
+    first = wp_driver_sim.integrate(plan, verification)
+    second = wp_driver_sim.integrate(
+        copy.deepcopy(plan), copy.deepcopy(verification)
+    )
+
+    assert first["integration_order"] == [
+        "plan-wp01",
+        "plan-wp02",
+        "plan-wp03",
+    ]
+    assert first["integration_order"] == second["integration_order"]
+    assert first["integration_order"] != reentry["dispatch_order"]
+    assert first["integrate_event"]["order"] == first["integration_order"]
+
+
+def test_vi_08_conflict_stops_integration_without_a_partial_commit():
+    """VI-08: contradictory outputs stop integration and leave no commit."""
+    plan = _shared_output_plan()
+    run = wp_driver_sim.run_stage(
+        plan,
+        contents={
+            "findings/shared.md": {
+                "plan-wp01": "alpha",
+                "plan-wp02": "beta",
+            }
+        },
+    )
+    integration = run["integration"]
+
+    assert integration["conflict"] is True
+    assert integration["commit"] is None
+    assert integration["commits"]["closing"] is None
+    assert integration["integrator"]["committed"] is False
+    assert integration["integrator"]["last_non_empty_line"] != "PLAN-DONE"
+    assert integration["stage_gate"] == "fail"
+    finding = next(
+        item
+        for item in integration["findings"]
+        if item["code"] == "output-contradiction"
+    )
+    assert len(finding["evidence_refs"]) == 2
+
+
+def test_vi_09_plan_stage_has_one_closing_commit_and_no_package_commit():
+    """VI-09: non-implement executors never commit; the integrator commits once."""
+    plan = wp_driver_sim.sim_plan()
+    run = wp_driver_sim.run_stage(plan)
+    commits = run["integration"]["commits"]
+
+    assert commits["package_commits"] == []
+    assert commits["part_commits"] == []
+    assert commits["closing"]
+    assert commits["closing"] not in commits["part_commits"]
+    assert run["integration"]["integrator"]["committed"] is True
+
+    results = run["results"]
+    results["plan-wp02"]["commits"] = ["package-commit"]
+    verification = wp_driver_sim.verify(plan, results)
+    forbidden = wp_driver_sim.integrate(plan, verification, results=results)
+    assert forbidden["conflict"] is True
+    assert "package-commit-forbidden" in {
+        item["code"] for item in forbidden["findings"]
+    }
+
+
+def test_vi_10_implement_part_commits_are_preserved():
+    """VI-10: 067 part commits survive; one closing commit follows."""
+    first = wp_fixtures.make_write_package(
+        "implement-wp01",
+        stage="implement",
+        owned_paths=["src/first/"],
+        outputs=["src/first/a.md"],
+    )
+    second = wp_fixtures.make_write_package(
+        "implement-wp02",
+        stage="implement",
+        owned_paths=["src/second/"],
+        outputs=["src/second/b.md"],
+    )
+    plan = wp_fixtures.make_plan(
+        packages=[first, second], stage="implement", pattern="serial"
+    )
+    _, results = _scheduled(plan)
+    results["implement-wp01"]["commits"] = ["part-1", "part-2"]
+    results["implement-wp02"]["commits"] = ["part-3"]
+    verification = wp_driver_sim.verify(plan, results)
+    integration = wp_driver_sim.integrate(
+        plan, verification, results=results
+    )
+
+    commits = integration["commits"]
+    assert commits["part_commits"] == ["part-1", "part-2", "part-3"]
+    assert commits["closing"]
+    assert commits["closing"] not in commits["part_commits"]
+    assert commits["rewritten"] == []
+    assert commits["squashed"] is False
+
+
+def test_vi_11_one_integrator_seat_owns_its_outputs_and_sentinel():
+    """VI-11: one integrator execution per attempt, owning its sentinel."""
+    plan = _clarify_plan()
+    run = wp_driver_sim.run_stage(plan)
+    integrator = run["integration"]["integrator"]
+
+    assert integrator["seat"] == "stage-integrator"
+    assert integrator["execution_id"] == "integrator-clarify-a1"
+    assert integrator["integrator_outputs"] == ["clarifications.md"]
+    assert integrator["last_non_empty_line"] == "CLARIFY-DONE"
+    assert integrator["dispatched_packages"] == []
+    assert integrator["replanned"] is False
+    assert integrator["loaded_driver"] is False
+    assert run["integration"]["integrate_event"]["order"] == [
+        "clarify-wp01",
+        "clarify-wp02",
+    ]
+
+
+def test_vi_12_package_sentinels_are_never_promoted():
+    """VI-12: only the integrator's stage sentinel satisfies the stage."""
+    plan = wp_driver_sim.sim_plan()
+    normal = wp_driver_sim.run_stage(plan)["integration"]
+    assert normal["stage_u4"]["sentinel_ok"] is True
+
+    package_sentinel = wp_fixtures.sentinel_for("plan-wp01")
+    assert package_sentinel == "WP-PLAN-WP01-DONE"
+    promoted = wp_driver_sim.run_stage(
+        plan, integrator_last_line=package_sentinel
+    )["integration"]
+
+    assert promoted["stage_u4"]["sentinel"] == package_sentinel
+    assert promoted["stage_u4"]["sentinel_ok"] is False
+    assert promoted["stage_gate"] == "fail"
+
+
+def test_vi_13_stage_u4_runs_after_integration_and_is_not_substituted():
+    """VI-13: unchanged U4 follows integration; pass verdicts do not replace it."""
+    plan = wp_driver_sim.sim_plan()
+    run = wp_driver_sim.run_stage(plan)
+    integration = run["integration"]
+
+    assert all(
+        item["verdict"] == "pass" for item in run["verification"]["verdicts"]
+    )
+    assert integration["stage_u4"]["at"] > integration["at"]
+    assert integration["stage_u4"]["package_verdicts_substitute"] is False
+    assert integration["stage_u4"]["gate"] == "pass"
+
+    for key in ("artifact_verification", "discipline_checks"):
+        failed = wp_driver_sim.run_stage(plan, u4={key: "fail"})[
+            "integration"
+        ]
+        assert failed["stage_u4"]["sentinel_ok"] is True
+        assert failed["stage_u4"]["gate"] == "fail"
+        assert failed["stage_gate"] == "fail"
+
+
+def test_vi_14_closure_and_merge_stay_driver_owned():
+    """VI-14: no push or merge is introduced; confirmation gates are preserved."""
+    integration = wp_driver_sim.run_stage(wp_driver_sim.sim_plan())[
+        "integration"
+    ]
+    assert integration["closure"] == {
+        "owner": "driver",
+        "push": False,
+        "force_merge": False,
+        "auto_merge": False,
+        "confirmation_gates": "preserved",
+    }
+    text = _model_text()
+    for token in ("does not push", "force-merge", "driver-owned"):
+        assert token in text, token
