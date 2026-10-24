@@ -42,7 +42,7 @@
 
 <!-- 本节的探测结论是单一落点：任何任务行只引用本节，不复述环境判定。 -->
 
-- pytest 解释器: **available（仅 profiles/.venv）** — probe: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest --version` → `pytest 9.1.1`；本仓 `.venv/bin/python -m pytest --version` → `No module named pytest` @ 2026-10-24; affected: T004、T005、T011、T012、T013、T018、T019、T020、T026、T028、T029、T033。
+- pytest 解释器: **available（仅 profiles/.venv）** — probe: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest --version` → `pytest 9.1.1`；本仓 `.venv/bin/python -m pytest --version` → `No module named pytest` @ 2026-10-24; affected: T004、T005、T011、T012、T013、T014、T019、T020、T026、T028、T029、T033。
 - git: **available** — probe: `git log -1 --format=%cs -- .specify/specs/069a-flow-classification-docs-gates/requirements.md` → `2026-10-24`（`as-of` 面的时钟来源与兼容面哈希比对均依赖它）@ 2026-10-24; affected: T019、T028、T029、T033。
 - 容器 / 镜像仓库 / 集群 / 外网: **none** — 本切片的检查全为本地文件、`git` 与本地 pytest；无构建、无拉取、无网络 @ 2026-10-24; affected: none。
 - 镜像漂移基线: **clean（判据 = 相对该基线零新增差异，不是绝对全绿）** — probe: `python3 scripts/python/sync-mirrors.py --check` → 六对 `ok`（`templates/` 22 files、`skills/external/` 396 files、`skills/internal/` 136 files、`agents/` 3 files、`scripts/` 109 files、`shared/` 51 files）+ 命令副本 `OK`，exit 0 @ 2026-10-24; affected: T025、T032、T033。
@@ -52,7 +52,7 @@
 - **[P]**: 可与同阶段其它 `[P]` 行并行（写目标不同、无未完成依赖）。
 - **[Story]**: 用户故事标签（`[US1]`…`[US3]`），只在用户故事阶段的任务行出现；Setup 与 Polish 阶段零 `[US` 标记。
 - **[blockedBy: T001,T002]**: 显式依赖标签；被列任务全部 `[X]` 前不得开始本行。仅阶段顺序关系时不写。
-- **[green: <contract>#<clause>]**：绿点认领——本行是使该条款转绿的那一行；契约路径相对本文件目录解析。50 条款分区：flow-class-ledger C-1…C-3→T006、C-4…C-6→T008、C-7→T009、C-8→T010、C-9→T021、C-10/C-11→T026、C-12…C-15→T033；expression-gate-operators C-1→T014、C-2/C-3→T015、C-4…C-10→T016、C-11…C-15→T017；doc-consistency-checker C-1…C-4→T019、C-5…C-8→T020、C-9/C-10→T026；compatibility-distribution C-1…C-3→T029、C-4…C-10→T033。每条恰一行认领，`validate-tasks.py` 四项 green 检查 + `account-clause-coverage.py` 核对。
+- **[green: <contract>#<clause>]**：绿点认领——本行是使该条款转绿的那一行；契约路径相对本文件目录解析。50 条款分区：flow-class-ledger C-1…C-3→T006、C-4…C-6→T008、C-7→T009、C-8→T010、C-9→T021、C-10/C-11→T026、C-12…C-15→T033；expression-gate-operators C-1→T015、C-2/C-3→T016、C-4…C-10→T017、C-11…C-15→T018；doc-consistency-checker C-1…C-4→T019、C-5…C-8→T020、C-9/C-10→T026；compatibility-distribution C-1…C-3→T029、C-4…C-10→T033。每条恰一行认领，`validate-tasks.py` 四项 green 检查 + `account-clause-coverage.py` 核对。
 - 每行必须单行完成（含文件路径），不得换行续写。
 
 ### Task State Sigil (REQUIRED)
@@ -94,7 +94,7 @@
 | FR-001 | T006、T007、T008 |
 | FR-002 | T006 |
 | FR-003 | T006 |
-| FR-004 | T027 |
+| FR-004 | T028 |
 | FR-005 | T006、T011、T026 |
 | FR-006 | T006、T034 |
 | FR-007 | T007、T008、T011 |
@@ -102,32 +102,32 @@
 | FR-009 | T009、T011 |
 | FR-010 | T010、T011 |
 | FR-011 | T006、T029 |
-| FR-012 | T017、T030 |
-| FR-013 | T015、T016 |
-| FR-014 | T017、T030 |
+| FR-012 | T018、T030 |
+| FR-013 | T016、T017 |
+| FR-014 | T018、T030 |
 | FR-015 | T021、T023、T026 |
 | FR-016 | T009、T021、T023、T026 |
 | FR-017 | T006、T033 |
-| FR-018 | T014、T015 |
-| FR-019 | T016、T019、T021 |
-| FR-020 | T016、T019 |
-| FR-021 | T016、T017 |
-| FR-022 | T016、T020 |
-| FR-023 | T016、T017、T023、T024 |
-| FR-024 | T016、T034 |
-| FR-025 | T007、T021、T022、T023、T024、T026 |
-| FR-026 | T028、T029、T033 |
-| FR-027 | T016、T033 |
+| FR-018 | T015、T016 |
+| FR-019 | T017、T019、T021 |
+| FR-020 | T017、T019 |
+| FR-021 | T017 |
+| FR-022 | T017、T020 |
+| FR-023 | T017、T018、T023、T024 |
+| FR-024 | T017、T034 |
+| FR-025 | T007、T018、T021、T022、T023、T024、T026 |
+| FR-026 | T027、T029、T033 |
+| FR-027 | T017、T033 |
 | SC-001 | T007、T008、T034 |
 | SC-002 | T008、T009、T011、T026 |
 | SC-003 | T030、T034 |
-| SC-004 | T016、T034 |
-| SC-005 | T016、T034 |
-| SC-006 | T016、T034 |
+| SC-004 | T017、T034 |
+| SC-005 | T017、T034 |
+| SC-006 | T017、T034 |
 | SC-007 | T013、T020、T026、T033 |
-| SC-008 | T028、T029、T033、T034 |
+| SC-008 | T027、T029、T033、T034 |
 
-T001 / T002 / T003（改前基线）、T005（引擎单测）、T012（门禁文档测试）、T018（接线测试）、T025 / T032（镜像与副本）、T031 / T035（文档与特性登记）是流程与镜像义务行，按设计不直接映射 FR/SC。`[[STR-001]]` / `[[STR-002]]` / `[[STR-004]]` 一律按 requirements.md § Shared Strings 解析，实现与测试不得在 wiring 文本内内联类别字面量。
+T001 / T002 / T003（改前基线）、T005（引擎单测）、T012（门禁文档测试）、T014（接线测试）、T025 / T032（镜像与副本）、T031 / T035（文档与特性登记）是流程与镜像义务行，按设计不直接映射 FR/SC。`[[STR-001]]` / `[[STR-002]]` / `[[STR-004]]` 一律按 requirements.md § Shared Strings 解析，实现与测试不得在 wiring 文本内内联类别字面量。
 
 **Task Distribution**: Setup 3 · US1 8 · US2 15 · US3 4 · Polish 5 · 任务行合计 35。
 
@@ -183,17 +183,17 @@ T001 / T002 / T003（改前基线）、T005（引擎单测）、T012（门禁文
 
 - [ ] T012 [US2] 红先编写契约测试到 `tests/contract/test_expression_gates_doc.py`：六面齐全且每面恰一个可解析 `owner_pointer`（路径 + 章节锚）、逐阶段算子表覆盖 8 阶段且行数 ≥ 8、调用点表覆盖 W1–W4 且 docs 行含 `doc-consistency-check.py --action verify`、humanize 行不含 `structure-links-build` 与需求清晰度且不被表述为六面子集、六面各 ≥ 1 blocking 且读者声明缺失为阻断、证据等级封闭三值与 `YYYY-MM-DD` as-of 成对规则在场、结构面「零新增」与 `not-applicable` 明文在场、三项基线来源表在场、全文与台账无「表达类可跳过/缩短/改判阶段」表述；运行红跑并写入 `notes/red-first-evidence.md`。
 - [ ] T013 [US2] 红先编写 `tests/contract/test_doc_consistency_checker.py` 与 `tests/unit/test_doc_consistency_rules.py`：三面规则在夹具上红/绿、SC-007 三类注入（引用改 owner 原文副本 / `as-of` 改旧 / 派生计数手打）各被报出一次且漏报 = 0、排除项（`notes/`、`review.md`、`verification.md`、fence 内行、表格分隔行、纯链接行、短行、纯日期/版本行）零误报、计数面委派不可用时 `count_check.status=not-run` 显式且 `--strict` 下计失败、归一化与相似度阈值边界（完全相等 ≥ 24 字符 / ratio ≥ 0.90 且 ≥ 40 字符）、`--spec-dir` 与 `--path` 双缺 → 退出码 2；运行红跑并写入 `notes/red-first-evidence.md`。
-- [ ] T018 [US2] 红先编写契约测试到 `tests/contract/test_expression_gate_wiring.py`（A1–A7）：W1 接线小节含 `flow-class-check.py` / `--action lookup` / `"/speckit.docs"` / 两个 owner 路径 / `doc-consistency-check.py` 且位于 `## Outline` 之后 `## Wrap-up` 之前；W2 同一组字面量（unit id `"/speckit.humanize"`）、不含 `doc-consistency-check.py`、全文仅一处 `SKILL.md`、无 `## Wrap-up`、非表格行 ≤ 120 字符；W3/W4 技能含门禁 owner 引用且 `create-docs` 含 checker、`humanize` 保留 `Stage 6 — 保真自检` 段与 `diff_protected.py` 引用；接线文本剔除 owner 路径后无独立 `expression` / `execution` 词与归属断言、全文无 `flow_class` 赋值形态与「unit id ‖ 类别取值」台账样式行；其余 25 个模板与 49 个技能零引用（接线封闭）；8 个命令副本各含 lookup 与 owner 指针；062 / 067 / 068 的 `requirements.md` sha256 与冻结值一致。
+- [ ] T014 [US2] 红先编写契约测试到 `tests/contract/test_expression_gate_wiring.py`（A1–A7）：W1 接线小节含 `flow-class-check.py` / `--action lookup` / `"/speckit.docs"` / 两个 owner 路径 / `doc-consistency-check.py` 且位于 `## Outline` 之后 `## Wrap-up` 之前；W2 同一组字面量（unit id `"/speckit.humanize"`）、不含 `doc-consistency-check.py`、全文仅一处 `SKILL.md`、无 `## Wrap-up`、非表格行 ≤ 120 字符；W3/W4 技能含门禁 owner 引用且 `create-docs` 含 checker、`humanize` 保留 `Stage 6 — 保真自检` 段与 `diff_protected.py` 引用；接线文本剔除 owner 路径后无独立 `expression` / `execution` 词与归属断言、全文无 `flow_class` 赋值形态与「unit id ‖ 类别取值」台账样式行；其余 25 个模板与 49 个技能零引用（接线封闭）；8 个命令副本各含 lookup 与 owner 指针；062 / 067 / 068 的 `requirements.md` sha256 与冻结值一致。
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] 新建 `shared/workflow/expression-gates.md` 的六面清单：六面（需求清晰度、读者/目的/边界、证据分级与 as-of、结构/链接/构建、事实一致性、评审）各登记且仅登记一个 `owner_pointer`——需求清晰度 → `scripts/python/validate-requirements.py` + `shared/guidelines/requirements-guidelines.md`；读者/目的/边界 → `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议；证据分级与 as-of → 本文件新增面；结构/链接/构建 → `skills/external/create-docs/SKILL.md` § Desired-State Baseline + `skills/external/create-docs/scripts/docs-utils.py`；事实一致性 → `shared/guidelines/one-source-of-truth.md`；评审 → `skills/internal/review-sdd-process/SKILL.md` + `templates/review-template.md`；声明新增面之外不复述这些 owner 的判据句。 [blockedBy: T012] [green: contracts/expression-gate-operators.md#C-1]
-- [ ] T015 [US2] 在 `shared/workflow/expression-gates.md` 增补逐阶段算子表与阻断级别：8 阶段（requirements → clarify → plan → tasks → checklist → analyze → implement → review）各至少一行「阶段 | 执行算子 | 对应面 | 阻断级别」且行数 ≥ 8；六面各至少一个 `blocking` 算子、需求清晰度/事实一致性/评审三面必有 blocking、读者声明缺失为阻断；写入「不得把表达类读作更宽松通道 / 不得把既有 P0/P1 降为 advisory」的负向条款；humanize 调用点只执行最小算子集且 MUST NOT 被写成六面的子集或精简版。 [blockedBy: T014] [green: contracts/expression-gate-operators.md#C-2] [green: contracts/expression-gate-operators.md#C-3]
-- [ ] T016 [US2] 在 `shared/workflow/expression-gates.md` 增补规则面：读者声明两行形态（前 40 个非空行内 `**Readers**:` / `**Reading scenario**:`，缺失或空值即 `reader-declaration-missing` 阻断，沿用基准读者不新建第二套）；证据等级封闭三值（实测 / 推断 / 引用）与 `YYYY-MM-DD` as-of 的成对规则 + 对象边界（不重定义 `shared/workflow/evidence-step.md` 七态、不并入 `shared/guidelines/single-run-evidence.md`）；结构/链接/构建通过只是必要条件、判据写「零新增违规」、站点层缺席记 `not-applicable`；同一事实唯一 owner、≥2 处手写即缺陷、修复方向是改为引用、派生计数由制品导出且手工计数交由既有计数判定；评审按读者基准且在 analyze 与 review 两阶段在场；三项基线（门禁调用次数 / 人工确认次数 / requirements→analyze 墙钟）的来源命令表与「无来源记 null」规则；算子去重规则（同一产物变更同算子只跑一次、不继承代码型算子、去重不减面数与阻断级别）。 [blockedBy: T015] [green: contracts/expression-gate-operators.md#C-4] [green: contracts/expression-gate-operators.md#C-5] [green: contracts/expression-gate-operators.md#C-6] [green: contracts/expression-gate-operators.md#C-7] [green: contracts/expression-gate-operators.md#C-8] [green: contracts/expression-gate-operators.md#C-9] [green: contracts/expression-gate-operators.md#C-10]
-- [ ] T017 [US2] 在 `shared/workflow/expression-gates.md` 增补不变量与调用点表：阶段完整性由既有阶段记录判定、类别 MUST NOT 参与、analyze 与 review 调用率 100%、以表达类为由跳过/缩短/改判的请求被明文拒绝且无例外；首批成员 `/speckit.docs` 与 `/speckit.humanize` 只补强不削弱；与复杂度轴正交（`shared/workflow/feedback-step.md` 只加一行指针，不改其判据段落）；调用点表四行（W1 `/speckit.docs`、W3 `skill:create-docs`、W2 `/speckit.humanize`、W4 `skill:humanize`）给出时点 / 类别读取 / 执行算子 / 阻断，docs 行覆盖六面、humanize 行登记 `062-*` 最小集且不含六面全集；调用时机与降级（lookup 先于判定且同一产物变更只读一次、`source: default` 原样显示标记、owner 或引擎缺席显示 `owner-unavailable` 并保持既有门禁、standalone 技能不新读、命令与技能重叠时复用一次执行、不改判定阈值/阶段集合/P0-P1）。 [blockedBy: T016] [green: contracts/expression-gate-operators.md#C-11] [green: contracts/expression-gate-operators.md#C-12] [green: contracts/expression-gate-operators.md#C-13] [green: contracts/expression-gate-operators.md#C-14] [green: contracts/expression-gate-operators.md#C-15]
+- [ ] T015 [US2] 新建 `shared/workflow/expression-gates.md` 的六面清单：六面（需求清晰度、读者/目的/边界、证据分级与 as-of、结构/链接/构建、事实一致性、评审）各登记且仅登记一个 `owner_pointer`——需求清晰度 → `scripts/python/validate-requirements.py` + `shared/guidelines/requirements-guidelines.md`；读者/目的/边界 → `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议；证据分级与 as-of → 本文件新增面；结构/链接/构建 → `skills/external/create-docs/SKILL.md` § Desired-State Baseline + `skills/external/create-docs/scripts/docs-utils.py`；事实一致性 → `shared/guidelines/one-source-of-truth.md`；评审 → `skills/internal/review-sdd-process/SKILL.md` + `templates/review-template.md`；声明新增面之外不复述这些 owner 的判据句。 [blockedBy: T012] [green: contracts/expression-gate-operators.md#C-1]
+- [ ] T016 [US2] 在 `shared/workflow/expression-gates.md` 增补逐阶段算子表与阻断级别：8 阶段（requirements → clarify → plan → tasks → checklist → analyze → implement → review）各至少一行「阶段 | 执行算子 | 对应面 | 阻断级别」且行数 ≥ 8；六面各至少一个 `blocking` 算子、需求清晰度/事实一致性/评审三面必有 blocking、读者声明缺失为阻断；写入「不得把表达类读作更宽松通道 / 不得把既有 P0/P1 降为 advisory」的负向条款；humanize 调用点只执行最小算子集且 MUST NOT 被写成六面的子集或精简版。 [blockedBy: T015] [green: contracts/expression-gate-operators.md#C-2] [green: contracts/expression-gate-operators.md#C-3]
+- [ ] T017 [US2] 在 `shared/workflow/expression-gates.md` 增补规则面：读者声明两行形态（前 40 个非空行内 `**Readers**:` / `**Reading scenario**:`，缺失或空值即 `reader-declaration-missing` 阻断，沿用基准读者不新建第二套）；证据等级封闭三值（实测 / 推断 / 引用）与 `YYYY-MM-DD` as-of 的成对规则 + 对象边界（不重定义 `shared/workflow/evidence-step.md` 七态、不并入 `shared/guidelines/single-run-evidence.md`）；结构/链接/构建通过只是必要条件、判据写「零新增违规」、站点层缺席记 `not-applicable`；同一事实唯一 owner、≥2 处手写即缺陷、修复方向是改为引用、派生计数由制品导出且手工计数交由既有计数判定；评审按读者基准且在 analyze 与 review 两阶段在场；三项基线（门禁调用次数 / 人工确认次数 / requirements→analyze 墙钟）的来源命令表与「无来源记 null」规则；算子去重规则（同一产物变更同算子只跑一次、不继承代码型算子、去重不减面数与阻断级别）。 [blockedBy: T016] [green: contracts/expression-gate-operators.md#C-4] [green: contracts/expression-gate-operators.md#C-5] [green: contracts/expression-gate-operators.md#C-6] [green: contracts/expression-gate-operators.md#C-7] [green: contracts/expression-gate-operators.md#C-8] [green: contracts/expression-gate-operators.md#C-9] [green: contracts/expression-gate-operators.md#C-10]
+- [ ] T018 [US2] 在 `shared/workflow/expression-gates.md` 增补不变量与调用点表：阶段完整性由既有阶段记录判定、类别 MUST NOT 参与、analyze 与 review 调用率 100%、以表达类为由跳过/缩短/改判的请求被明文拒绝且无例外；首批成员 `/speckit.docs` 与 `/speckit.humanize` 只补强不削弱；与复杂度轴正交（`shared/workflow/feedback-step.md` 只加一行指针，不改其判据段落）；调用点表四行（W1 `/speckit.docs`、W3 `skill:create-docs`、W2 `/speckit.humanize`、W4 `skill:humanize`）给出时点 / 类别读取 / 执行算子 / 阻断，docs 行覆盖六面、humanize 行登记 `062-*` 最小集且不含六面全集；调用时机与降级（lookup 先于判定且同一产物变更只读一次、`source: default` 原样显示标记、owner 或引擎缺席显示 `owner-unavailable` 并保持既有门禁、standalone 技能不新读、命令与技能重叠时复用一次执行、不改判定阈值/阶段集合/P0-P1）。 [blockedBy: T017] [green: contracts/expression-gate-operators.md#C-11] [green: contracts/expression-gate-operators.md#C-12] [green: contracts/expression-gate-operators.md#C-13] [green: contracts/expression-gate-operators.md#C-14] [green: contracts/expression-gate-operators.md#C-15]
 - [ ] T019 [US2] 新建 `scripts/python/doc-consistency-check.py` 并实现命令面与 `reader` / `evidence` 两面：`--action verify` + `--spec-dir` / `--path`（至少给一个，双缺退出码 2）+ `--faces`（缺省 `reader,evidence,duplicate,count`，未知面名退出码 2）+ `--strict` / `--format` / `--json-out`；S1 形式产物集合、S2 显式文档、S3 判据 owner 路径常量，排除项写成实现常量闭集；`reader` 面前 40 非空行两行声明、`--path` 缺省时输出 `not-applicable`；`evidence` 面 `grade-asof-unpaired` / `as-of-malformed` / `as-of-stale`（时钟取 `git log -1 --format=%cs -- <path>`，非 git 或无提交历史输出 `not-evaluated` + reason）/ `grade-invalid` 四条 blocking 规则；只读、不写除 `--json-out` 外的任何文件。 [blockedBy: T013] [green: contracts/doc-consistency-checker.md#C-1] [green: contracts/doc-consistency-checker.md#C-2] [green: contracts/doc-consistency-checker.md#C-3] [green: contracts/doc-consistency-checker.md#C-4]
 - [ ] T020 [US2] 在 `scripts/python/doc-consistency-check.py` 实现 `duplicate` / `count` 两面与输出契约：归一化（去列表/引用前缀、压连续空白、去行尾标点、ASCII 大小写折叠）与命中条件（完全相等且 ≥ 24 字符，或 `difflib.SequenceMatcher` ratio ≥ 0.90 且 ≥ 40 字符），跨 ≥ 2 个不同文件才报、同文件内重复不报，`path/line` 取字典序首处 + `counterpart` 取第二处 + `fix_direction` 恒为「改为对唯一 owner 的引用」；`count` 面委派 `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py`（`--spec-dir --stage <plan|tasks> --json-out`）并把 count 类 finding 映射为 `count-mismatch`，委派目标缺席或返回码 2 时输出 `count_check.status=not-run` + reason；JSON 输出 schema（`action` / `checked_at` / `scope` / `faces` / `findings[]` / `count_check`）；退出码 0/1/2 且不得 0 退出同时带 finding、`--strict` 把 `not-evaluated` 升级为 1。 [blockedBy: T019] [green: contracts/doc-consistency-checker.md#C-5] [green: contracts/doc-consistency-checker.md#C-6] [green: contracts/doc-consistency-checker.md#C-7] [green: contracts/doc-consistency-checker.md#C-8]
-- [ ] T021 [US2] 接线 W1：在 `templates/commands/docs.md` 的 `## Outline` 内、`### 技能输入` 之前新增一个 `###` 小节（不改既有 `## ` 顶级章节序列）：① 判定前执行一次 `python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.docs"`；② 指针到 `shared/definitions/flow-class-definitions.md` 与 `shared/workflow/expression-gates.md`，并按门禁 owner 的 `/speckit.docs` 调用点行执行文档型算子（含 `doc-consistency-check.py --action verify`）；③ 降级可见：`source: default` 原样显示 `marker`，脚本缺席或退出码 2 显示 `owner-unavailable` 并保持既有门禁、不中断、不静默切换门禁集；小节内禁类别字面量与归属断言、禁判据或算子表副本。 [blockedBy: T009,T017,T020] [green: contracts/flow-class-ledger.md#C-9]
+- [ ] T021 [US2] 接线 W1：在 `templates/commands/docs.md` 的 `## Outline` 内、`### 技能输入` 之前新增一个 `###` 小节（不改既有 `## ` 顶级章节序列）：① 判定前执行一次 `python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.docs"`；② 指针到 `shared/definitions/flow-class-definitions.md` 与 `shared/workflow/expression-gates.md`，并按门禁 owner 的 `/speckit.docs` 调用点行执行文档型算子（含 `doc-consistency-check.py --action verify`）；③ 降级可见：`source: default` 原样显示 `marker`，脚本缺席或退出码 2 显示 `owner-unavailable` 并保持既有门禁、不中断、不静默切换门禁集；小节内禁类别字面量与归属断言、禁判据或算子表副本。 [blockedBy: T009,T018,T020] [green: contracts/flow-class-ledger.md#C-9]
 - [ ] T022 [US2] 接线 W3：在 `skills/external/create-docs/SKILL.md` 的 `### Reconcile Loop` R6 verify 与 `### Authoring Flow` R6 验证两处各补同一句（`### Desired-State Baseline` 是结构/链接/构建面的既有 owner，不向其加内容）：指针到 `shared/workflow/expression-gates.md`，并写明「当调用方已解析为文档型算子集时，对受触文档执行 `doc-consistency-check.py --action verify`；owner 或引擎缺席时显式跳过」；不得复制门禁规则、不得把 checker 变成无条件硬依赖、不得断言类别归属。 [blockedBy: T021]
 - [ ] T023 [US2] 接线 W2：在 `templates/commands/humanize.md` 的 `## Outline` 内、委派段之前新增一个 `###` 小节：lookup `--unit-id "/speckit.humanize"` 一次 + 两个 owner 指针 + 按门禁 owner 的 humanize 调用点行执行最小算子集（保真与蕴含两项 blocking、其余为既有报告义务）；禁止出现 `doc-consistency-check.py`、第二处 `SKILL.md` 提及、`## Wrap-up`、六面算子表与类别归属断言，非表格行仍 ≤ 120 字符。 [blockedBy: T022]
 - [ ] T024 [US2] 接线 W4：在 `skills/external/humanize/SKILL.md` 的 `### Stage 6 — 保真自检（交付前）` 段末加一句 owner 指针（本技能参与的门禁算子集登记在门禁 owner 的 humanize 调用点；执行细则仍以本文件 Non-negotiables 与 Stage 6 为准）；不得复制算子表、不得断言类别归属、不改 062 的默认输出与报告契约、不回指命令模板路径。 [blockedBy: T023]
@@ -214,12 +214,12 @@ T001 / T002 / T003（改前基线）、T005（引擎单测）、T012（门禁文
 
 > **NOTE: 先写这些测试并确认其失败，再进入实现。**
 
-- [ ] T028 [US3] 红先编写契约测试到 `tests/contract/test_expression_compatibility.py`：`templates/commands/` 文件集 = 27 个名字集合不变、`skills/{external,internal}/*/SKILL.md` = 51 个名字集合不变；`notes/pre-change-file-hashes.txt` 里 25 个非接线模板 + 49 个非接线技能 sha256 全部不变；062 / 067 / 068 的 `requirements.md` sha256 与冻结值一致；`src/specify_cli/`、`AGENTS.md`、`.specify/instructions.md` 相对基线哈希零改动；零新增命令；仓库内零新增项目侧存储路径（`.specify/memory/` 下无分类数据文件）；接线封闭集之外零引擎/owner 引用；`.specify/` 镜像与源同字节；运行红跑并写入 `notes/red-first-evidence.md`。 [blockedBy: T001]
+- [ ] T027 [US3] 红先编写契约测试到 `tests/contract/test_expression_compatibility.py`：`templates/commands/` 文件集 = 27 个名字集合不变、`skills/{external,internal}/*/SKILL.md` = 51 个名字集合不变；`notes/pre-change-file-hashes.txt` 里 25 个非接线模板 + 49 个非接线技能 sha256 全部不变；062 / 067 / 068 的 `requirements.md` sha256 与冻结值一致；`src/specify_cli/`、`AGENTS.md`、`.specify/instructions.md` 相对基线哈希零改动；零新增命令；仓库内零新增项目侧存储路径（`.specify/memory/` 下无分类数据文件）；接线封闭集之外零引擎/owner 引用；`.specify/` 镜像与源同字节；运行红跑并写入 `notes/red-first-evidence.md`。 [blockedBy: T001]
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] 在 `shared/workflow/feedback-step.md` 增补一行正交指针（既有复杂度判据与红线段落零改动）：声明复杂度轴决定 wrap-up 面有无、类别轴决定门禁算子集、两轴不互相推导，判据与台账归 `shared/definitions/flow-class-definitions.md`；该文件不得复制判据或台账。 [blockedBy: T006]
-- [ ] T029 [US3] 兼容面转绿并取证：运行 `tests/contract/test_expression_compatibility.py` 至全绿（只读执行），绿证据追加 `notes/red-first-evidence.md`；另实测「未刷新项目」形态——`git show <改前 HEAD>:templates/commands/docs.md` 与同法 humanize 模板不含 `flow-class-check.py`（零调用点、行为与接线前逐字一致），并核对 `pyproject.toml` 的 `force-include` 与 `src/hatch_build.py` 覆盖四类载荷（`shared/`、`scripts/`、`templates/`、`skills/`）以证同包原子性；`<改前 HEAD>` 取 `notes/pre-change-measurements.md` 记录值。 [blockedBy: T028] [green: contracts/compatibility-distribution.md#C-1] [green: contracts/compatibility-distribution.md#C-2] [green: contracts/compatibility-distribution.md#C-3]
+- [ ] T028 [US3] 在 `shared/workflow/feedback-step.md` 增补一行正交指针（既有复杂度判据与红线段落零改动）：声明复杂度轴决定 wrap-up 面有无、类别轴决定门禁算子集、两轴不互相推导，判据与台账归 `shared/definitions/flow-class-definitions.md`；该文件不得复制判据或台账。 [blockedBy: T006]
+- [ ] T029 [US3] 兼容面转绿并取证：运行 `tests/contract/test_expression_compatibility.py` 至全绿（只读执行），绿证据追加 `notes/red-first-evidence.md`；另实测「未刷新项目」形态——`git show <改前 HEAD>:templates/commands/docs.md` 与同法 humanize 模板不含 `flow-class-check.py`（零调用点、行为与接线前逐字一致），并核对 `pyproject.toml` 的 `force-include` 与 `src/hatch_build.py` 覆盖四类载荷（`shared/`、`scripts/`、`templates/`、`skills/`）以证同包原子性；`<改前 HEAD>` 取 `notes/pre-change-measurements.md` 记录值。 [blockedBy: T027] [green: contracts/compatibility-distribution.md#C-1] [green: contracts/compatibility-distribution.md#C-2] [green: contracts/compatibility-distribution.md#C-3]
 - [ ] T030 [US3] 防滥用审计（只读核对并留证）：① 在 `shared/definitions/flow-class-definitions.md` 与 `shared/workflow/expression-gates.md` 检索「跳过 / 缩短 / skip / exempt」类表述，确认唯一命中是拒绝规则本身且不带例外；② 确认阶段完整性判定段落不出现 `flow_class` 读取（命中即判缺陷）；③ 确认 analyze 与 review 调用率 100% 的明文在场；④ 用 `grep -c` 记录两个命令模板的类别赋值字面量为 0；把四条命令与真实输出写入 `notes/red-first-evidence.md` 的防滥用小节。 [blockedBy: T029]
 
 **Checkpoint**: US3 独立可验收——正交声明与阶段不变量在读面上无漏洞、前序三规格字节不变、零新命令与零项目侧存储成立、接线面封闭可机械核对。
@@ -244,8 +244,8 @@ T001 / T002 / T003（改前基线）、T005（引擎单测）、T012（门禁文
 
 - **Setup (Phase 1)**: 无依赖，可立即开始——但它是后续所有「相对基线零新增」判据的分母。
 - **User Story 1 (Phase 2)**: 依赖 Setup 的基线落盘；故事内部严格 TDD（红 → 实现 → 转绿）。
-- **User Story 2 (Phase 3)**: 依赖 Setup；`T021`（W1）显式依赖 `T009`（lookup 引擎）、`T017`（调用点表）与 `T020`（checker），因此 US2 在 US1 之后自然串行。
-- **User Story 3 (Phase 4)**: 依赖 US2 的接线面存在（`T028` 依赖 Setup 的哈希清单；`T029` / `T030` 以 US2 的落盘为核对对象）。
+- **User Story 2 (Phase 3)**: 依赖 Setup；`T021`（W1）显式依赖 `T009`（lookup 引擎）、`T018`（调用点表）与 `T020`（checker），因此 US2 在 US1 之后自然串行。
+- **User Story 3 (Phase 4)**: 依赖 US2 的接线面存在（`T027` 依赖 Setup 的哈希清单；`T029` / `T030` 以 US2 的落盘为核对对象）。
 - **Polish (Phase 5)**: 依赖全部故事完成；`T033` 依赖 `T032`（镜像先同步再全量核验）。
 
 **本特性无 Foundational 阶段**：US1 与 US2 的写目标不重叠（分类侧 = owner + 台账 + `flow-class-check.py`；门禁侧 = gates owner + `doc-consistency-check.py` + 四个接线点），唯一共享前提（基线与哈希清单）已在 Setup 落盘；按模板规则整段省略并顺延阶段编号，避免留空章节。
@@ -254,14 +254,14 @@ T001 / T002 / T003（改前基线）、T005（引擎单测）、T012（门禁文
 
 - 测试行先写并确认红，再进入实现行；转绿行在该故事末尾统一取证。
 - US1：owner 判据骨架 → 台账 → 引擎 `check` → 引擎 `lookup` → 类中立清单 → 转绿。
-- US2：三支红测试 → 门禁 owner 三段（面 → 阶段表 → 规则 → 不变量与调用点）→ 检查器两面 → 接线 W1/W3/W2/W4 → 副本重生成 → 转绿。
+- US2：三支红测试 → 门禁 owner 四段（面 → 阶段表 → 规则 → 不变量与调用点）→ 检查器两面 → 接线 W1/W3/W2/W4 → 副本重生成 → 转绿。
 - US3：红测试 → 正交指针 → 兼容转绿 → 防滥用审计。
 
 ### Parallel Opportunities
 
 - Setup：`T002`（覆盖基线）与 `T003`（契约失败基线重采）可并行；`T001` 先落盘以免与二者抢同一文件。
 - US1 内部：`T004` 与 `T005` 写不同测试文件，可并行；`T006` 起为串行（同一 owner 文件与同一引擎文件）。
-- US2 内部：`T012`、`T013`、`T018` 三支红测试写不同文件，可并行；`T019` / `T020` 串行同一引擎文件；四个接线点串行（`T021`→`T022`→`T023`→`T024`），因其后续断言相互依赖。
+- US2 内部：`T012`、`T013`、`T014` 三支红测试写不同文件，可并行；`T019` / `T020` 串行同一引擎文件；四个接线点串行（`T021`→`T022`→`T023`→`T024`），因其后续断言相互依赖。
 - Polish：`T031`（docs）与 `T032`（镜像）可并行；`T033` 之后 `T034`、`T035` 串行。
 
 ## Parallel Example: Phase 1 Setup
