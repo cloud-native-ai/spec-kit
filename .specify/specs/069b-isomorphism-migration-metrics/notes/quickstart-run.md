@@ -348,6 +348,18 @@ owner 内 `同构映射（8 阶段 × 3 面）` 命中 2（开篇 owns 项 + 章
 
 ### 逐篇判定（Conclude）
 
+取数（第一段输出：涉及分类 / 门禁的页面；第二段输出：是否存在引擎参考面）：
+
+```bash
+$ grep -rlnE 'flow\.class|flow_class|类别|expression-gates|文档型|执行类|表达类' docs/reference docs/concepts
+docs/reference/commands/docs.md
+docs/concepts/overview.md
+$ grep -rn 'flow-class-check' docs/
+（无输出）
+```
+
+`overview.md` 的唯一命中是一张文件计数表（与分类无关），下表据此逐篇判定。
+
 | 页面 | 是否失真 | 判定 |
 |------|----------|------|
 | `docs/reference/commands/docs.md` | 否 | 该页第 56 行的指针（069a 落盘）只声明「命令在阶段 1 之前做一次类别读取并执行文档型门禁算子」，并把台账与算子集的 owner 指到 `flow-class-definitions.md` / `expression-gates.md`；069b 改的是这两个 owner 的内部结构（映射、边界、台账版本、引擎动作），指针仍解析、未复述任何判据 → 无需改动 |
