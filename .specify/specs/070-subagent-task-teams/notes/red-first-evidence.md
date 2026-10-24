@@ -206,5 +206,26 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
   - Write priority is absolute: a ready write dispatches before newly available reads, including on re-entry when its dependency is already verified from the spine.
   - A prompt that fails SD-13 is not dispatched and is marked failed; its dependents stay blocked and the block is recorded.
 
+## T019 — US2 verification (green)
+
+- **Date**: 2026-10-25T02:15Z
+- **Host**: Linux x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_coordination.py tests/integration/test_wp_coordination_dry_runs.py tests/unit/test_wp_gate.py
+  ```
+- **Real output**: `123 passed in 3.07s`; exit code `0`.
+- **Red-to-green**: T014 `17 failed, 17 passed` + T015 `5 failed` + T016 `39 failed, 44 passed` → `123 passed` after T017/T018.
+- **Quickstart Scenario C**:
+  ```sh
+  python3 -m pytest -q tests/integration/test_wp_coordination_dry_runs.py -k "concurrent_read_only or write_serialization"
+  ```
+  → `2 passed, 4 deselected in 0.03s`; the interval assertion reads at least two overlapping read-only intervals and a write interval that begins after every read interval ends.
+- **US2 green points**: SD-01 sole coordinator, SD-02 verified readiness, SD-03 write-alone, SD-04 slot cap, SD-05 deterministic order, SD-06 no starvation, SD-07 local native/serial fallback, SD-08 detached runners, SD-09 result collection, SD-10 verifier dispatch, SD-11 failure isolation, SD-12 pass-only unlock, SD-13 anti-nesting, SD-14 resource isolation, SD-15 no new mechanism, SD-16 re-entry; WG-14 manifest coverage/forbidden, WG-15 territory overlaps, WG-16 slot cap/isolation, WG-17 retry admission/delta/inheritance/exhaustion.
+- **Adjacent green (already recorded above)**: gate + model contract `68 passed`; existing driver targeted suite `65 passed`, identical to baseline.
+- **Disclosed coverage boundary**: VI-01…VI-14 (T020…T022), the report metrics (T027…T030), the preset/adapter (T024…T026), and fallback/non-regression (T034…T036) remain deferred and are not claimed green here.
+- **E3 stage-status row**: appended to `test-evidence/implement-stage-status.jsonl` (`substage=impl-s3-us2-coordination`, command above, rc 0, 123 passed, E2 baseline pointer).
+
+
 
 
