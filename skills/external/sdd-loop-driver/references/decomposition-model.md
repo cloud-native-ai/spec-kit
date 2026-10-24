@@ -1,7 +1,7 @@
-# Decomposition Model — Runtime Owner (Part 1)
+# Decomposition Model — Runtime Owner (Parts 1–2)
 
 **Feature**: 070 — Task Decomposition & Team Coordination for Subagent-Driven SDD
-**Status**: runtime-owner projection, part 1. The scheduler, verification/integration, preset-adapter, and observability sections land with their owning task rows (T018, T022, T025, T029); this file does not pre-empt them.
+**Status**: runtime-owner projection, parts 1–2: the Work Package model and the scheduler/retry procedure. The verification/integration (T022), preset-adapter (T025), and observability (T029) sections land with their owning task rows; this file does not pre-empt them.
 
 **Design authority**: the seven contracts under `.specify/specs/070-subagent-task-teams/contracts/` and `.specify/specs/070-subagent-task-teams/data-model.md`. This document owns *how the driver applies* those clauses at runtime. Where a field name, check code, path pattern, or event field is fixed, the contract clause is authoritative; this file points to it instead of restating its table.
 
@@ -155,6 +155,56 @@ The gate is `skills/external/sdd-loop-driver/scripts/wp-gate.py`: deterministic,
 - One repair is allowed (split, serialize, or reduce to one package), recorded as an amendment. A second reject falls back to `single-package` with `decision=fallback`, `reason=gate-reject`, and the finding list as evidence. Exit 2 falls back with `reason=decomposition-unavailable`. The fallback verdict mapping is owned by FN-08 and WG-18.
 - The gate's verdict is appended to the ledger's `plan` event before the first dispatch. The plan fence itself is never edited by the gate and remains the canonical decision record.
 
-## 13. Non-regression boundaries
+## 13. Scheduler and dispatch (SD-01…SD-16)
+
+The scheduler is **driver prompt logic**, not a runtime engine. The driver is the sole coordinator: it selects the ready set, enforces the slot cap, dispatches packages, collects results, reads verifiers, records the ledger, and decides the stage gate. Package executors never dispatch other packages, never spawn a driver, and never edit the plan (SD-01, FR-015).
+
+### 13.1 Readiness and the write-alone rule (SD-02, SD-03, SD-06)
+
+A package is **ready** when every `depends_on` entry has a ledger `verdict=pass` with an evidence pointer in the current stage attempt. A failed, missing, or malformed verdict keeps the dependent `blocked`; the driver records it instead of dropping it. The dependency status is re-read from the ledger after every settlement, never from session memory.
+
+Every write package is dispatched **write-alone**: if a write is ready, the driver stops launching new read-only packages, waits for every running package to settle, dispatches exactly one write package, and only after it settles resumes the read-only queue. A ready write is never deferred behind newly launched reads. Its effective concurrency is 1.
+
+### 13.2 Read-only concurrency and the slot cap (SD-04, SD-05)
+
+Up to `slot_cap` read-only packages run concurrently; the default and the ceiling are owned by SD-04 and enforced by WG-16. When the local host cannot issue parallel native calls, the driver records `parallel_requested=yes`, `effective=serial`, `reason=host-no-parallel-native` and dispatches serially (SD-07); the effective concurrency is recorded on every dispatch event (V-LED.10).
+
+The ready set is ordered by topological layer and then `wp_id` lexicographic, the declared tie-break (WP-04). The ledger records the actual `dispatch_order` counter separately; integration uses the declared order, never the dispatch timing order (SD-05).
+
+### 13.3 Collection, verifier dispatch, and failure isolation (SD-09…SD-12)
+
+A package **settles** only when the runner's terminal status (`exit`, `sentinel`) and the last non-empty log line agree on the WP sentinel. The driver then reads the attempt-scoped result file. `INCOMPLETE`, a missing result file, a missing sentinel, or an `ANOMALY` line means the package did not complete and is not verified.
+
+After a complete result, the driver dispatches one independent verifier and waits for the verdict before treating the package as verified (SD-10; VI-01 owns independence). A dependency unlocks only on `verdict=pass` with an evidence pointer. A failed, stalled, or budget-exhausted package never cancels unrelated running packages; its dependents remain blocked, unrelated ready packages continue and are recorded, and the failure is surfaced (SD-11). A package that fails twice appends `wp_failed` and the stage enters the unchanged U5 path (SD-12).
+
+### 13.4 Dispatch topologies (SD-07, SD-08, SD-15)
+
+Local: one native host subagent per package through the existing `run-agent` dispatch path. No external CLI is launched locally; when the host cannot issue parallel native calls, the serial fallback above applies. Remote: one detached `stage-runner.sh` per package with the unique label `<stage>-<wp_id>` and the package sentinel; each package keeps its own pid/status/log/heartbeat set, and no runner or sentinel is shared.
+
+SD-15 owns the closed list of mechanisms this layer does not add; the runtime rule here is simply **no dispatcher** — the scheduler loop is the driver's prompt logic, and both dispatch forms are the existing ones.
+
+Before dispatch the driver applies SD-13: the outgoing prompt must not name or load `sdd-loop-driver`, must not instruct the subagent to load any skill, and must contain no loop logic. A failing prompt is not dispatched and the block is recorded. The check is `run-agent` dispatch governance, cited here, not redefined.
+
+### 13.5 Resource isolation and re-entry (SD-14, SD-16)
+
+WG-16 is the preflight check for resource isolation: every concurrently dispatchable package declares an isolated port block, temporary directory, cache directory, or a non-empty shared read-only resource; no package starts a global service or writes a shared mutable cache.
+
+On re-entry the driver reads the spine, re-runs `watch-target.sh --once` for any detached runners, and **never redispatches a completed package**. A U5 stage retry starts a new `stage_attempt` with a fresh plan fence, a fresh plan hash, and a fresh per-package attempt counter; earlier records remain in the spine.
+
+## 14. Retry, delta, and escalation (OR-14…OR-16)
+
+The per-package retry counter is derived by counting ledger `dispatch` events for `(stage, stage_attempt, wp_id)`; there is no counter file (OR-14). Attempt 1 is admitted without a delta. Attempt 2 requires a `retry_delta` naming `scope`, `budget`, or `topology` (OR-15); `wp-gate.py --check retry` validates it. Attempt 3, a package already at two attempts, a split child's further attempt, and any proposed split of a child are `retry-exhausted`.
+
+A split is permitted once per lineage. The parent record keeps its attempt history and gains `superseded_by`; the children inherit the parent's attempt count — their sole dispatch is the lineage's retry attempt — and split depth is one, so a child is never split again or retried. A child failure fails the stage gate without a further automatic retry.
+
+A scope change strictly decreases `bounded_by.count` or splits into children with distinct outputs. A budget change strictly increases `max_turns` and carries a dispatch-level `evidence_ref`; an identical same-budget rerun is `retry-unchanged`. A topology change uses the closed OR-15 value set and must change the value. The three finding codes the driver routes on are `retry-unchanged`, `retry-delta-invalid`, and `retry-exhausted`.
+
+A package failing twice, or a split child failing at all, records `wp_failed` with its attempt history and verdict evidence, fails the stage gate, and enters the unchanged U5 stage-retry path (OR-16). Package retries never consume the stage-level retry budget before that escalation.
+
+### 14.1 Simulator limitation
+
+`tests/fixtures/wp_driver_sim.py` is a **test-only** deterministic model of the algorithm above. It proves the mechanical rules (readiness, ordering, slot cap, write-alone, collection, isolation, re-entry), not an LLM's adherence to the prompt; live claims require spine evidence (research.md R4, plan.md R-12).
+
+## 15. Non-regression boundaries
 
 This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage chain, U4 independent verification, watcher verdicts/exit codes, stall handling, the fast lane, the two-slot test budget, the plan minor-fix constraint, Feature 064's registry/ownership/worktree/integration semantics, Feature 067's part brief and test economics, or Feature 068's feedback channel. Preserved-behavior obligations are owned by `contracts/fallback-and-nonregression.md` FN-09…FN-16 and are cited here, not restated.

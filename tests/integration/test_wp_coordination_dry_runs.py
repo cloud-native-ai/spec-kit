@@ -206,3 +206,22 @@ def test_failure_isolation_leaves_unrelated_work_complete():
     assert result["stage_gate"] == "fail"
     assert "plan-wp01" in result["dispatch_order"]
     assert "plan-wp03" not in result["dispatch_order"]
+
+
+def test_nested_driver_prompt_is_blocked_and_not_dispatched():
+    """SD-13: a driver-naming prompt never reaches a package executor."""
+    plan = wp_driver_sim.sim_plan()
+    result = wp_driver_sim.schedule(
+        plan,
+        prompts={
+            "plan-wp01": "You are the sdd-loop-driver. Load the run-agent skill."
+        },
+    )
+
+    assert [block["wp_id"] for block in result["prompt_blocks"]] == [
+        "plan-wp01"
+    ]
+    assert "plan-wp01" not in result["dispatch_order"]
+    assert "plan-wp02" in result["dispatch_order"]
+    assert "plan-wp03" in result["blocked"]
+    assert result["stage_gate"] == "fail"

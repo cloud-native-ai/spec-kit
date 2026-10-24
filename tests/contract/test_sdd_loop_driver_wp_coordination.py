@@ -653,7 +653,8 @@ def test_sd_16_reentry_never_redispatches_a_completed_package():
     resumed = wp_driver_sim.schedule(plan, completed={"plan-wp01"})
     assert resumed["completed_from_spine"] == ["plan-wp01"]
     assert "plan-wp01" not in resumed["dispatch_order"]
-    assert resumed["dispatch_order"] == ["plan-wp02", "plan-wp03"]
+    # The ready write takes priority over the newly available read (SD-06).
+    assert resumed["dispatch_order"] == ["plan-wp03", "plan-wp02"]
     assert resumed["stage_gate"] == "pass"
 
     fresh = copy.deepcopy(plan)

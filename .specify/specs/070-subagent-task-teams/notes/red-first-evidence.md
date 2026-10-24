@@ -178,4 +178,33 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
 - **Quickstart Scenario D (manual, retry portion)**: with one dispatch in the ledger, attempt 2 without a delta → `retry-unchanged`, rc `1`; attempt 3 → `retry-exhausted`, rc `1`.
 - **Disclosed in-scope contract mapping**: WG-06's `slot_cap` schema predicate now checks the type only; WG-16 owns the `1..ceiling` bound, matching the clause split. No plan-owned or contract artifact changed.
 
+## T018 — scheduler model and coordination simulator (green)
+
+- **Date**: 2026-10-25T02:10Z
+- **Host**: Linux x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed paths (implementation)**:
+  - `tests/fixtures/wp_driver_sim.py` (SD-01…SD-12 logical-clock scheduler, SD-13 prompt check, SD-16 re-entry; `verify`/`integrate` remain T022 stubs)
+  - `skills/external/sdd-loop-driver/references/decomposition-model.md` (§13 scheduler/dispatch, §14 retry/escalation, §15 non-regression)
+  - `tests/contract/test_sdd_loop_driver_wp_coordination.py` (re-entry order corrected to write priority)
+  - `tests/integration/test_wp_coordination_dry_runs.py` (SC-008 nested-driver dry run)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_coordination.py tests/integration/test_wp_coordination_dry_runs.py tests/unit/test_wp_gate.py tests/contract/test_sdd_loop_driver_wp_model.py tests/contract/test_sdd_loop_driver_wp_gate.py
+  ```
+- **Real output**: `191 passed in 5.03s`; exit code `0`.
+- **Transition**: T014 `17 failed, 17 passed` and T015 `5 failed` → the two US2 files report `40 passed` (34 coordination contract + 6 dry runs).
+- **Quickstart Scenario C**:
+  ```sh
+  python3 -m pytest -q tests/integration/test_wp_coordination_dry_runs.py -k "concurrent_read_only or write_serialization"
+  ```
+  → `2 passed, 4 deselected in 0.03s`; the read-only intervals overlap and the write starts after every read ends.
+- **Quickstart Scenario G (nested-driver half)**: `-k "nested_driver"` → `1 passed, 5 deselected`; the `no_team_directory` half lands with T026.
+- **Non-regression**: the existing driver targeted suite → `65 passed in 17.03s`, identical to the pre-change baseline.
+- **Simulator interpretations (disclosed)**:
+  - Durations are deterministic logical ticks (default 10); E1 declares no duration field, and every assertion is an interval relation, not wall-clock.
+  - SD-10 verification is modeled as an instantaneous step with a fresh `verifier-N` execution id after a complete result. It proves dispatch/wait ordering only; VI-01…VI-06 independence remains the T022 implementation (`verify()` still raises `NotImplementedError`).
+  - Write priority is absolute: a ready write dispatches before newly available reads, including on re-entry when its dependency is already verified from the spine.
+  - A prompt that fails SD-13 is not dispatched and is marked failed; its dependents stay blocked and the block is recorded.
+
+
 
