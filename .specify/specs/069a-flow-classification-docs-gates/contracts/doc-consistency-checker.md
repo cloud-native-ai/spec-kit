@@ -59,6 +59,7 @@ python3 scripts/python/doc-consistency-check.py --action verify \
 - **C-6** `count` 面规则（委派，不重写）
 
 `count` 面 MUST 委派给 `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py`（或其 `.specify/skills/` 镜像），以 `--spec-dir --stage <plan|tasks> --json-out` 形式调用，把其 `count` 类 finding 映射为 `count-mismatch`。
+`--json-out` 可省：该引擎的 stdout 就是同一份 JSON 记录，读回无需临时文件（C-1 只读优先于这一形式细节）。
 本检查器 MUST NOT 自行实现「FR/SC/任务计数与定义数比对」的规则（同一规则两个实现必然漂移）。
 委派目标不存在、不可执行或返回码 2 时，输出 `count_check: {"status": "not-run", "reason": ...}`：
 `--strict` 下该状态计为失败；非 strict 下计为 `not-evaluated`（不是通过）。
@@ -75,11 +76,14 @@ python3 scripts/python/doc-consistency-check.py --action verify \
   "faces": {"reader": "pass|fail|not-applicable", "evidence": "...", "duplicate": "...", "count": "..."},
   "findings": [{"face": "duplicate", "rule": "duplicate-fact", "path": "...", "line": 12,
                 "snippet": "...", "counterpart": "...", "fix_direction": "..."}],
-  "count_check": {"status": "delegated|not-run", "reason": null}
+  "count_check": {"status": "delegated|not-run", "reason": null},
+  "degradations": [{"face": "evidence", "status": "not-evaluated", "path": "...",
+                    "line": 12, "reason": "..."}]
 }
 ```
 
 `findings[]` 的字段集合由 `data-model.md` E7 拥有；本契约不新增字段。
+`degradations[]` 是 C-3 / C-8 所要求的 `not-evaluated` 理由的载体（`faces` 的取值保持三态字符串，原因不塞进它的值里）；它不改变退出码，`--strict` 的升级判据仍由 C-8 拥有。
 
 - **C-8** 退出码
 

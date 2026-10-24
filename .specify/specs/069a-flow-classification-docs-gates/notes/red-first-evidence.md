@@ -405,3 +405,106 @@ A5 依赖 `_wiring_texts()`（接线出现前无从取样），A7 依赖重生�
   T016 原文本来也只给路径），修复后 `test_one_source_of_truth.py` 33 passed。
 
 结论：除上述 6 条镜像类（T033 义务）外，**零新增失败**；既有 33 红按纪律不修、不掩盖。
+
+---
+
+# Green run — 069a US2 检查器（T020 / T021）
+
+**Feature**: 069a-flow-classification-docs-gates（父 069） | **Scope**: `scripts/python/doc-consistency-check.py`（四面）+ 契约 C-6/C-7 两处补全
+**Branch**: `069-execution-expression-sdd` | **HEAD（本段开始）**: `854caf1a`
+**Interpreter**: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（pytest 9.1.1；Python 3.14）
+**Captured**: 2026-10-24T14:30:00Z
+
+## 19. 绿跑：T014 的两支测试 39 支全绿
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_doc_consistency_checker.py \
+  tests/unit/test_doc_consistency_rules.py \
+  -q --tb=short -p no:cacheprovider
+# exit code: 0
+# 39 passed in 3.85s
+```
+
+逐文件：
+
+```text
+tests/contract/test_doc_consistency_checker.py   25 passed in 2.84s   （T020 C-1…C-4 + T021 C-5…C-8 的契约面）
+tests/unit/test_doc_consistency_rules.py         14 passed in 1.23s   （归一化/阈值/排除项/委派降级/--faces/--json-out）
+pytest --collect-only -q <两文件>                → 39 tests collected (exit 0)
+python3 -m py_compile scripts/python/doc-consistency-check.py → COMPILE-OK
+```
+
+解释器覆盖面：测试解释器为 Python 3.14；另有系统 `python3`（3.9.6）实跑四支 CLI 冒烟（reader/evidence/
+count/strict），行为一致——引擎只用 `argparse/json/re/subprocess/time/collections/difflib/pathlib`，符合
+plan § Language/Version 的 Python ≥ 3.8 下限。
+
+## 20. 本段自行裁决的实现接口（测试即规格，记录以便 T022+ 复用）
+
+1. **测试侧缺一件辅助函数（Fast Fail 的 in-passing 修复，披露于此）**：首次绿跑为 `1 failed, 38 passed`，
+   失败不是引擎行为而是 `test_c05_s3_owner_set_is_the_reference_side_only` 调用的 `_duplicates()` 在
+   `tests/contract/` 内未定义（`NameError`；单元测试文件有同名实现）。按最小修正补入同名 helper
+   （`[f for f in _findings(doc) if f.get("rule") == "duplicate-fact"]`），语义由该测试名与其文档串唯一确定，
+   未改断言、未放宽阈值。修正后 39/39。
+2. **委派不带 `--json-out`**：C-1 的「除 `--json-out` 外零写入」与 C-6 的调用形式在「回收 delegate 报告」上冲突；
+   该引擎的 stdout 就是同一份 JSON 记录，故按只读优先执行，并把这一条写回 C-6（契约补全，不改语义）。
+3. **`not-evaluated` 的理由载体**：C-3/C-8 要求降级「附 `reason`」，而 C-7 的报文字段里没有位置。实现输出
+   顶层 `degradations[]`（`face/status/path/line/reason`），`faces` 的取值仍是三态字符串；契约 C-7 同步补一行。
+4. **`evidence` 面的对象边界**：`shared/workflow/evidence-step.md` 与 `shared/guidelines/single-run-evidence.md`
+   是另两套证据取值域的 owner（data-model E6 的 object boundary），显式排除在 evidence 面之外。
+5. **S3 只作对照侧**：`duplicate` 面比较 `S1∪S2 ↔ S1∪S2` 与 `S1∪S2 ↔ S3`，从不做 S3 自比对——owner 之间
+   合法的机器重生成块（如编译后的 Wrap-up 步骤表）因此不会被误报为手写副本。
+6. **`path` 口径**：仓库内文件用仓库相对路径（E7 的 `path` 定义），仓库外（测试夹具在 `tmp_path`）用绝对路径；
+   字典序取首处/第二处因此确定且可复现。
+7. **`count` 的阶段选择**：有 `plan.md` 走 `--stage plan`，仅有 `tasks.md` 走 `--stage tasks`（由 delegate 自己
+   以 exit 2 报缺 `plan.md`，其 stderr 落进 `count_check.reason`）；**不**回退 `--stage requirements`——那会让
+   「只有 requirements.md」的夹具静默变绿，正是 C-6 要挡的假通过。
+8. **`reader` 窗口**：前 40 个**非空行**（围栏代码行计入行数、但不在其中解析声明），两行任一缺失或值为空即
+   `reader-declaration-missing`。
+
+## 21. 真实仓库实跑（只读，自证不误报）
+
+```bash
+python3 scripts/python/doc-consistency-check.py --action verify \
+  --spec-dir .specify/specs/069a-flow-classification-docs-gates --format json
+# exit code: 0    （12 files；findings: 0）
+# faces: reader=not-applicable evidence=pass duplicate=pass count=pass
+# count_check: {"status": "delegated", "reason": null, "stage": "plan",
+#               "delegate": "skills/external/sdd-loop-driver/scripts/pre-analyze-check.py"}
+```
+
+即本特性自己的 12 份形式产物同时通过四个面（含对 9 个 owner 对照侧的跨文件手写副本比对），
+检查器不是「只会红」的夹具级实现。
+
+## 22. 全量契约套件对照（相对 `notes/test-baseline-contract.txt`）
+
+本段只新增/修改两个文件，可影响的结构面测试仅「脚本集 × 镜像」三类。用「移走新脚本再跑」的方式做
+归因测量（同一棵树、同一解释器）：
+
+```text
+不带 scripts/python/doc-consistency-check.py：
+  test_scripts_distribution_parity.py           1 failed   （US1 三处镜像缺失，本段之前已红）
+  test_trigger_engine.py::test_c2_..._clean     1 failed   （同上）
+  test_mirror_parity_suite.py                   3 failed   （flow-class-check.py / flow-class-definitions.md / expression-gates.md）
+带该脚本：
+  同上 5 条 + test_mirror_parity_suite.py::test_mirror_file_byte_identical[
+      scripts/python/doc-consistency-check.py->.specify/scripts/python/doc-consistency-check.py]
+```
+
+结论：本段相对「本段开始时的树」只新增 **1 条**失败 node id，且它是 `.specify/scripts/python/` 镜像尚未
+生成所致——与 US1、US2-前半留下的三处镜像漂移同源，归属 T033（镜像同步先于 T034 全量核验）。按任务边界
+（不做接线、不写镜像）本段不生成该镜像。
+
+## 23. 未关闭项（本段不修，按任务归属登记）
+
+| 项 | 现状 | 归属 |
+|----|------|------|
+| `doc-consistency-check.py` 的 `.specify/scripts/` 镜像 | 不存在；parity 套件因此多 1 条红 | T033 |
+| W1–W4 接线与 8 个命令副本 | 未动；`test_expression_gate_wiring.py` 的 8 支保持红属预期 | T022–T027 |
+| `--strict` 对 `reader=not-applicable` | 不升级为失败：C-4 明写 `not-applicable` 是「没有 `--path`」的显式态，不是 `not-evaluated` | 已有裁定，无需后续动作 |
+
+## 24. 本段提交
+
+本段唯一提交含：检查器（新）、契约测试的一件 helper 修正、契约 C-6/C-7 两处补全、`tasks.md` 的
+T020/T021 勾选与本文件。commit 见 `git log -1 --format=%H`（分支 `069-execution-expression-sdd`）。

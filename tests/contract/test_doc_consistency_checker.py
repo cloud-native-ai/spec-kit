@@ -112,6 +112,10 @@ def _rules(doc: dict) -> list[str]:
     return [finding.get("rule", "") for finding in _findings(doc)]
 
 
+def _duplicates(doc: dict) -> list[dict]:
+    return [f for f in _findings(doc) if f.get("rule") == "duplicate-fact"]
+
+
 def _facet(doc: dict, face: str) -> str:
     faces = doc.get("faces")
     assert isinstance(faces, dict), "JSON output lacks a faces object: %r" % doc
