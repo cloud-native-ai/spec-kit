@@ -1,0 +1,5 @@
+# decomposition-check.py — tasks mode
+# command: python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/070-subagent-task-teams/requirements.md --tasks .specify/specs/070-subagent-task-teams/tasks.md
+# run_at: 2026-10-24T16:04:20Z
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 30, "task_count": 39, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-24T16:04:20Z"}
+exit_code=0

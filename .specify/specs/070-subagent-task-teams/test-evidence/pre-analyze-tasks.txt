@@ -1,0 +1,11 @@
+# command: python3 /home/agent/sdd-070/tools/pre-analyze-check.py --spec-dir .specify/specs/070-subagent-task-teams --stage tasks --repo . --waive count-claim:requirements.md:46 --waive count-claim:requirements.md:195 --waive count-claim:data-model.md:371 --json-out .specify/specs/070-subagent-task-teams/test-evidence/pre-analyze-tasks.json
+# date: 2026-10-25 (local; 2026-10-24T16:04Z)
+# exit: 0
+# summary: decision=pass errors=0 advisories=126 waived=3 fr=30 sc=8 tasks=39 clauses=110 files=15
+# finding classes: count-claim=3 (all waived), missing-path=126 (all planned new deliverables)
+# waivers:
+#   count-claim:requirements.md:46  — pre-existing per-package "at most eight tasks per dispatch" bound, not a total-count claim
+#   count-claim:requirements.md:195 — pre-existing per-package "at most eight tasks for implement" bound, not a total-count claim
+#   count-claim:data-model.md:371   — pre-existing "task groups of at most eight tasks" bound, not a total-count claim
+# note: the raw run without waivers exits 1 with exactly these three count-claim findings; no upstream artifact was rewritten.
+# note: the 126 missing-path advisories name the planned new scripts, tests, reference, preset, and evidence files; they disappear as implement creates them.

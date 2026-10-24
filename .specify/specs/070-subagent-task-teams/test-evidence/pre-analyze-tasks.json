@@ -1,0 +1,923 @@
+{
+  "stage": "tasks",
+  "decision": "pass",
+  "findings": [
+    {
+      "check": "count-claim",
+      "severity": "error",
+      "path": "requirements.md",
+      "line": 46,
+      "message": "claims 8 tasks but the artifacts define 39",
+      "waived": true
+    },
+    {
+      "check": "count-claim",
+      "severity": "error",
+      "path": "requirements.md",
+      "line": 195,
+      "message": "claims 8 tasks but the artifacts define 39",
+      "waived": true
+    },
+    {
+      "check": "count-claim",
+      "severity": "error",
+      "path": "data-model.md",
+      "line": 371,
+      "message": "claims 8 tasks but the artifacts define 39",
+      "waived": true
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 123,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 123,
+      "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 124,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/templates/stage-team-preset.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 124,
+      "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/templates/stage-team-preset.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 125,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 125,
+      "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/scripts/wp-gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 126,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 126,
+      "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/scripts/wp-report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 171,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 200,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/templates/stage-team-preset.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 253,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 253,
+      "message": "path does not exist under the repo: tests/unit/test_wp_report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 255,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 255,
+      "message": "path does not exist under the repo: tests/fixtures/wp_driver_sim.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 256,
+      "message": "path does not exist under the repo: tests/contract/test_non_regression_070.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 257,
+      "message": "path does not exist under the repo: tests/contract/test_wp_mutation_drills.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 19,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 20,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 37,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_model.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 157,
+      "message": "path does not exist under the repo: tests/fixtures/wp_fixtures.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 158,
+      "message": "path does not exist under the repo: tests/fixtures/wp_driver_sim.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 159,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 160,
+      "message": "path does not exist under the repo: tests/unit/test_wp_report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 161,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_model.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 162,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 163,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_coordination.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 164,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_preset.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 165,
+      "message": "path does not exist under the repo: tests/contract/test_non_regression_070.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 166,
+      "message": "path does not exist under the repo: tests/contract/test_wp_mutation_drills.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 168,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 185,
+      "message": "path does not exist under the repo: tests/fixtures/wp_fixtures.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 185,
+      "message": "path does not exist under the repo: tests/fixtures/wp_driver_sim.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 185,
+      "message": "path does not exist under the repo: tests/fixtures/wp_fixtures.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 185,
+      "message": "path does not exist under the repo: tests/fixtures/wp_driver_sim.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 195,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 196,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 197,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 197,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 197,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 214,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_model.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 215,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 219,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 219,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 220,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 220,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_model.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 220,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 237,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_coordination.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 238,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 238,
+      "message": "path does not exist under the repo: tests/fixtures/wp_driver_sim.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 238,
+      "message": "path does not exist under the repo: tests/fixtures/wp_fixtures.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 239,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 243,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 243,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 244,
+      "message": "path does not exist under the repo: tests/fixtures/wp_driver_sim.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 244,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_coordination.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 244,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 261,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_coordination.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 262,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 266,
+      "message": "path does not exist under the repo: tests/fixtures/wp_driver_sim.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 283,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_preset.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 287,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/templates/stage-team-preset.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 287,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_preset.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 288,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_preset.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 288,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 304,
+      "message": "path does not exist under the repo: tests/unit/test_wp_report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 308,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 308,
+      "message": "path does not exist under the repo: tests/unit/test_wp_report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 309,
+      "message": "path does not exist under the repo: tests/unit/test_wp_report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 309,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_model.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 309,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 310,
+      "message": "path does not exist under the repo: tests/unit/test_wp_report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 322,
+      "message": "path does not exist under the repo: tests/contract/test_non_regression_070.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 323,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_coordination.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 323,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 324,
+      "message": "path does not exist under the repo: tests/fixtures/wp_driver_sim.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 325,
+      "message": "path does not exist under the repo: tests/contract/test_wp_mutation_drills.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 7,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 262,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/templates/stage-team-preset.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 23,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 23,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 40,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 40,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 54,
+      "message": "path does not exist under the repo: tests/fixtures/wp_driver_sim.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 55,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 55,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_coordination.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 72,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 72,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 89,
+      "message": "path does not exist under the repo: tests/unit/test_wp_report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 89,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_model.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 101,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_coordination.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 101,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 116,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 116,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_preset.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 130,
+      "message": "path does not exist under the repo: tests/contract/test_non_regression_070.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 39,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 59,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/templates/stage-team-preset.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 26,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 27,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/templates/stage-team-preset.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 28,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 29,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 30,
+      "message": "path does not exist under the repo: tests/fixtures/wp_fixtures.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 31,
+      "message": "path does not exist under the repo: tests/fixtures/wp_driver_sim.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 32,
+      "message": "path does not exist under the repo: tests/unit/test_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 33,
+      "message": "path does not exist under the repo: tests/unit/test_wp_report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 34,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_model.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 35,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 36,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_coordination.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 37,
+      "message": "path does not exist under the repo: tests/contract/test_sdd_loop_driver_wp_preset.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 38,
+      "message": "path does not exist under the repo: tests/contract/test_non_regression_070.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 39,
+      "message": "path does not exist under the repo: tests/contract/test_wp_mutation_drills.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 40,
+      "message": "path does not exist under the repo: tests/integration/test_wp_coordination_dry_runs.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 99,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 120,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 120,
+      "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 121,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/templates/stage-team-preset.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 121,
+      "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/templates/stage-team-preset.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 122,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 122,
+      "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/scripts/wp-gate.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 123,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 123,
+      "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/scripts/wp-report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/observability-and-retry.md",
+      "line": 4,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-report.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/scheduler-and-dispatch.md",
+      "line": 4,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/stage-team-adapter.md",
+      "line": 4,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/templates/stage-team-preset.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/verification-and-integration.md",
+      "line": 4,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/work-package-model.md",
+      "line": 4,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/wp-gate.md",
+      "line": 4,
+      "message": "path does not exist under the repo: skills/external/sdd-loop-driver/scripts/wp-gate.py"
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "advisories": 126,
+    "waived": 3,
+    "fr": 30,
+    "sc": 8,
+    "tasks": 39,
+    "clauses": 110,
+    "files": 15
+  },
+  "checked_at": "2026-10-24T16:04:20Z"
+}

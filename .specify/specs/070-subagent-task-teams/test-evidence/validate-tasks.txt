@@ -1,0 +1,5 @@
+# command: python3 scripts/python/validate-tasks.py .specify/specs/070-subagent-task-teams/tasks.md
+# date: 2026-10-25 (local; 2026-10-24T16:03Z)
+# exit: 0
+# task rows: 39
+PASS: .specify/specs/070-subagent-task-teams/tasks.md — 0 error(s), 0 warning(s)
