@@ -78,14 +78,14 @@ Expected: the first fixture (no delta) returns `retry-unchanged`, exit 1. The se
 ```sh
 python3 skills/external/sdd-loop-driver/scripts/wp-report.py \
   --spine /tmp/wp-demo/state.md --stage plan --stage-attempt 1 \
-  --stage-u4-at 1790000000 --manual-interventions 0 \
+  --stage-u4-at 1790000000 --manual-interventions 0 --sessions 1 \
   --out-dir /tmp/wp-demo/reports
 ```
 
-Expected: the command prints the metrics JSON and writes `line-plan-a1-coordination.md` and `.json`. Deleting a package `ended_at` from a copied spine makes `critical_path_seconds` and `parallelism_efficiency` equal to the literal `not_evaluated`; `wall_clock_seconds` remains computable if the first `started_at` and `stage_u4_at` exist.
+Expected: the command prints the metrics JSON and writes `line-plan-a1-coordination.md` and `.json`. Deleting a package `ended_at` from a copied spine makes `critical_path_seconds` and `parallelism_efficiency` equal to the literal `not_evaluated`; `wall_clock_seconds` remains computable if the first `started_at` and `stage_u4_at` exist. Deleting `--sessions` makes `manual_interventions_per_session` `not_evaluated` while the intervention count is still reported.
 
 - **Execution status**: not run.
-- **Premises**: the fixture spine contains `plan`, `dispatch`, `settle`, `verdict`, and `integrate` events with epoch timestamps; `--stage-u4-at` and `--manual-interventions` are accepted (OR-11 / DR6); the report paths follow WP-11.
+- **Premises**: the fixture spine contains `plan`, `dispatch`, `settle`, `verdict`, and `integrate` events with epoch timestamps; `--stage-u4-at`, `--manual-interventions`, and `--sessions` are accepted (OR-11 / DR6); the report paths follow WP-11.
 - **Pinned by**: `tests/unit/test_wp_report.py` and `tests/contract/test_sdd_loop_driver_wp_model.py`.
 
 ## Scenario F — Opt out and single-package fallback

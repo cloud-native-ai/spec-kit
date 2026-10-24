@@ -171,34 +171,27 @@ The following refinements are design-level additions inside the fixed FR/SC scop
 | DR3 | Plan gains optional `topology: native|detached`; absent means `native`. | Retry topology checks need the dispatch form; native is the local default. | WP-01 / OR-15 |
 | DR4 | Amendment records carry `wp_id`, `wp_attempt`, and `retry_delta` directly. | Makes a retry mechanically addressable without scanning prose. | WP-07 |
 | DR5 | The `plan` ledger event may repeat with `supersedes_plan_hash`; a `wp_failed` event is added. | Records a post-repair gate verdict and the escalation fact D6.4 requires. | WP-10 |
-| DR6 | `wp-report.py` gains optional `--stage-u4-at` and `--manual-interventions`, and prints the derived metrics JSON. | The U4 time and intervention count are not derivable from the ledger before stage close. | OR-11 |
+| DR6 | `wp-report.py` gains optional `--stage-u4-at`, `--manual-interventions`, and `--sessions`, and prints the derived metrics JSON. | The U4 time, intervention count, and session count are not derivable from the ledger before stage close. | OR-11 |
 | DR7 | A `not-beneficial` advisory finding makes the gate return `single-package` for an `auto` stage with no benefit. | Makes D8.2's “beneficial decomposition” mechanical. | WG-13 |
 | DR8 | Sentinel rendering: `WP-<WP_ID_UPPER>-DONE` (for example `WP-PLAN-WP03-DONE`), where the wp_id already carries the stage; runner label is `<stage>-<wp_id>` as declared. | Avoids a duplicated stage segment while preserving the declared uniqueness rule. | WP-03 / SD-08 |
 | DR9 | Result and verdict JSONs gain `wp_attempt` and `attempt_id`. | Matches the attempt-scoped paths and ledger `attempt_id`. | WP-11 / VI-03 |
-| DR10 | Single-package stages write a plan fence with exactly one synthetic package and a `single-package` gate verdict. | FR-005 and SC-005 require a recorded decision and acceptance evidence. | WP-13 |
+| DR10 | Single-package stages write a plan fence with exactly one synthetic package and the gate verdict `single-package`; `disabled`/`fallback` stages record `no-gate-run`. | FR-005 and SC-005 require a recorded decision, a truthful gate verdict, and acceptance evidence. | WP-13 |
 | DR11 | Verifier capability fallback to driver verification (`driver-u4`) when no fresh subagent is available. | Hosts without subagents still need a structurally independent verdict. | VI-01 |
 | DR12 | `implement` with 070 off keeps the 067 part discipline; the single-package decision is a 070-layer boundary. | Reconciles FR-005 with FR-025 without changing either. | FN-05 / FN-12 |
 
 No refinement adds an FR, changes an SC, or defers a 070b item.
 
-## R18 — Stage required-output inventories used by the decomposition rules
+## R18 — Stage required-output inventories (rationale; owner: `data-model.md` E13)
 
-The rules in FR-002 are made concrete by a closed inventory per stage. The inventory is the coverage baseline for `wp-gate --check plan` and for the integrator.
+**Decision**: the closed per-stage required-output inventory and the package-shape guidance are owned by `data-model.md` E13 (`DecompositionRule`); that table is the sole authoritative copy. This section is the dated 2026-10-24 Phase 0 rationale for why an inventory exists and MUST NOT restate the rows.
 
-| Stage | Rule id | Required outputs (first slice) | Package shape |
-|-------|---------|-------------------------------|---------------|
-| `plan` | `decompose-plan-v1` | `plan.md`, `research.md`, `data-model.md`, `contracts/` (at least one file), `quickstart.md`, `feature-ref.md`, feature registry row and feature detail update | design-artifact packages (write), research and verification packages (read-only) |
-| `implement` | `decompose-implement-v1` | task-owned paths from `tasks.md`, `verification.md`, baseline/closure evidence rows | task-group packages (write, ≤8 tasks each), verification packages |
-| `review` | `decompose-review-v1` | `review.md` and review evidence | review-dimension packages (read-only), finding-repair packages (write), bounded iteration |
-| `analyze` | `decompose-investigation-v1` | findings report and evidence files | read-only investigation packages (explicit opt-in only) |
-| `clarify` | `decompose-investigation-v1` | clarification write-back and notes | read-only investigation packages (explicit opt-in only); the integrator performs the write-back |
-| `requirements`, `tasks`, `checklist` | none | n/a | single-subagent only in the first slice |
+**Why**: the rules in FR-002 need a concrete coverage baseline for `wp-gate --check plan` and for the integrator, and the per-stage shape guidance records what a sensible package boundary looks like. Keeping the inventory in one owner avoids the duplicated authored copies that Constitution XIV forbids; WP-15, the runtime owner document, and the task rows reference the owner instead of copying it.
 
-The inventories are design inputs; the plan's `required_outputs` field is the run-specific instance and must cover the inventory or the gate rejects the plan.
+**Consequence**: the plan's run-specific `required_outputs` field must cover the E13 inventory for its stage, or the gate rejects the plan (`orphan-output`); the `integrator_outputs` field names the outputs the integrator owns (at minimum clarify's write-back) so they are accounted for exactly once.
 
 ## R19 — Baseline and benchmark method
 
-The measured baseline in `requirements.md` is the brief's dated record, not a re-measurement (A9). The conservative anchor is plan 70 minutes and review 37 minutes; a 20% reduction means ≤56 minutes and ≤29.6 minutes respectively. A median claim requires at least three comparable samples on the same host class and topology; fewer samples, or a host-class mismatch, yields `not_evaluated`. This host (Linux x86_64, Python 3.11.11) is not the 067 baseline host, so absolute test durations are not used; the benchmark record must either re-measure the baseline on this host or record `not_evaluated` for SC-001.
+The measured baseline in `requirements.md` is the brief's dated record, not a re-measurement (A9). The conservative anchor is plan 70 minutes and review 37 minutes; a 20% reduction means ≤56 minutes and ≤29.6 minutes respectively, measured over the OR-04 interval (first package dispatch to stage U4 completion). The anchor is the dated whole-stage range's upper bound used as a conservative proxy; a re-measured baseline MUST use the OR-04 interval and replaces the anchor. A median claim requires at least three comparable samples on the same host class and topology; fewer samples, or a host-class mismatch, yields `not_evaluated`. This host (Linux x86_64, Python 3.11.11) is not the 067 baseline host, so absolute test durations are not used; the benchmark record must either re-measure the baseline on this host or record `not_evaluated` for SC-001. An all-`not_evaluated` benchmark blocks closure unless the user records an explicit waiver naming SC-001/SC-002 (FR-023).
 
 ## R20 — Open items and their disposition
 

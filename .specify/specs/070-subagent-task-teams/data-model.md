@@ -78,11 +78,13 @@ The stage decomposition record written before the first package dispatch (FR-004
 | `run_id` | string | yes | Run id from the line envelope. |
 | `stage` | enum | yes | One of the five decomposed stages. |
 | `stage_attempt` | integer | yes | ≥ 1. |
-| `decision` | enum | yes | `decomposed`, `single-package`, `disabled`, `fallback`. |
+| `decision` | enum | yes | `decomposed`, `single-package`, `disabled`, `fallback`. The plan fence is the **canonical decision record**; the ledger `plan` event references it by `plan_hash`. |
+| `gate_verdict` | enum | yes | `admit`, `single-package`, or `no-gate-run`, projected from FN-08: `decomposed` → `admit`; `single-package` → `single-package`; `disabled` and `fallback` → `no-gate-run` (the reason records the cause; any prior reject evidence is referenced). A rejected candidate never becomes the effective plan; `reject` appears only on the ledger `plan` event before the repair supersedes it. |
 | `reason` | string | yes | One line; for fallback one of `gate-reject`, `decomposition-unavailable`, `not-beneficial`. |
 | `rule` | enum/null | yes | `decompose-plan-v1`, `decompose-implement-v1`, `decompose-review-v1`, `decompose-investigation-v1`, or `null` for non-decomposed decisions. |
 | `source_artifacts` | string[] | yes | Repo-relative paths the decomposition was derived from (non-empty for `decomposed`). |
 | `required_outputs` | string[] | yes | Run-specific coverage inventory (non-empty for `decomposed`). |
+| `integrator_outputs` | string[] | yes | Required outputs owned by the integrator seat instead of a package (subset of `required_outputs`); empty when the integrator only assembles package outputs. For `decision=decomposed` on `clarify` it MUST include the clarification write-back. |
 | `pattern` | enum | yes | `parallel`, `serial`, or `iteration`. |
 | `tie_break` | enum | yes | Exactly `wp_id-lexicographic` in the first slice. |
 | `slot_cap` | integer | yes | 1..min(4, line remaining allowance). |
@@ -96,17 +98,18 @@ The stage decomposition record written before the first package dispatch (FR-004
 **Validation rules**
 
 - **V-PLAN.1**: `schema_version=1`; `stage` and `decision` are in their closed sets; `stage_attempt ≥ 1`.
-- **V-PLAN.2**: `decision=decomposed` requires a non-null `rule`, at least two packages, non-empty `source_artifacts` and `required_outputs`. A non-decomposed decision requires `rule=null` and exactly one package.
+- **V-PLAN.2**: `decision=decomposed` requires a non-null `rule`, at least two packages, non-empty `source_artifacts` and `required_outputs`, and `gate_verdict=admit`. `decision=single-package` requires `rule=null`, exactly one package, `integrator_outputs=[]`, and `gate_verdict=single-package`. `decision=disabled` or `fallback` requires `rule=null`, exactly one package, `integrator_outputs=[]`, and `gate_verdict=no-gate-run`; `reason` names the cause.
 - **V-PLAN.3**: `pattern=iteration` iff `repair_loop` is present. `repair_loop.max_iterations` is positive, and `stop_condition` and `findings_source` are non-empty. `continuous` is never valid.
 - **V-PLAN.4**: `tie_break` is exactly `wp_id-lexicographic`.
 - **V-PLAN.5**: `1 ≤ slot_cap ≤ slot_cap_ceiling`; `slot_cap ≥ 2` when `pattern=parallel`; a single-package plan uses `slot_cap=1`.
-- **V-PLAN.6**: The package graph is acyclic and every required output is covered exactly once; these are the WG-07/WG-08 checks.
+- **V-PLAN.6**: The package graph is acyclic; package outputs cover `required_outputs` minus `integrator_outputs` exactly once (the WG-07/WG-08 checks).
 - **V-PLAN.7**: `plan_hash` is the SHA-256 of the canonical JSON (sorted keys, UTF-8, separators `,` and `:`, `ensure_ascii=false`) of the effective plan with `plan_hash`, `slot_cap_requested`, `slot_cap_ceiling`, and every key ending in `_at` (or named `at`) removed. The same artifacts and rule yield the same hash on replay.
 - **V-PLAN.8**: `source_artifacts` paths are repo-relative and exist at plan time; a missing source is `schema-missing` or a recorded fallback cause.
 - **V-PLAN.9**: The effective plan is the original plan with amendments applied in `seq` order; the latest `plan_hash` wins.
 - **V-PLAN.10**: A plan written for a stage other than the five enumerated stages is invalid.
 - **V-PLAN.11**: `slot_cap_requested` above the ceiling is clamped before writing; the recorded `slot_cap` is the clamped value and `reason` names the clamp.
 - **V-PLAN.12**: For `decision=decomposed`, `pattern=parallel` requires every package to be `read-only` and independent; otherwise `serial` (or `iteration` under V-PLAN.3) is required.
+- **V-PLAN.13**: `integrator_outputs` is a subset of `required_outputs`, is disjoint from every package's `outputs`, and each entry is owned by the single integrator seat; an `integrator_outputs` entry also claimed by a package is `duplicate-output`, and one not covered by `required_outputs` is `schema-missing`. For `decision=decomposed` on `clarify` the clarification write-back MUST be listed.
 
 ## E3 — PlanAmendment
 
@@ -131,7 +134,7 @@ Append-only correction to a plan (WP-07, WP-08).
 - **V-AMD.1**: `seq` is strictly increasing; duplicate or out-of-order seq → `schema-missing`.
 - **V-AMD.2**: `supersedes_plan_hash` must equal the previous effective hash; a mismatch → `plan-hash-mismatch`.
 - **V-AMD.3**: A package record in `packages` either matches an existing `wp_id` (replacement) or is a new child with a distinct id and distinct outputs.
-- **V-AMD.4**: A split parent keeps its original record with `superseded_by` listing every child; dependents' `depends_on` are rewritten to all children.
+- **V-AMD.4**: A split parent keeps its original record with `superseded_by` listing every child; dependents' `depends_on` are rewritten to all children. The children inherit the parent's attempt count: their sole dispatch is the lineage's retry attempt, split depth is one (a child is never split again), and a child failure fails the stage gate without a further automatic retry.
 - **V-AMD.5**: A retry amendment carries `wp_id`, `wp_attempt=2`, and a valid `retry_delta` (OR-15).
 - **V-AMD.6**: The original plan fence is never edited; amendments are separate fences.
 - **V-AMD.7**: `plan_hash` in the amendment covers the effective plan after the amendment, including all prior amendments.
@@ -149,7 +152,7 @@ One JSON object per line inside `<!-- wp-ledger:begin -->` … `<!-- wp-ledger:e
 | `verdict` | `wp_id`, `verdict`, `verifier_execution`, `evidence_ptr`, `at` |
 | `retry` | `wp_id`, `wp_attempt`, `retry_delta`, `gate_evidence`, `at` |
 | `integrate` | `stage_attempt`, `order[]`, `at`, `conflict`, `commit` |
-| `stage-close` | `stage_attempt`, `stage_u4_at`, `wall_clock_seconds`, `critical_path_seconds`, `parallelism_efficiency`, `retries_package`, `retries_stage`, `stage_attempts`, `canonical_stages`, `stage_executions_per_canonical`, `manual_interventions`, `token_cost`, `report_ptr` |
+| `stage-close` | `stage_attempt`, `stage_u4_at`, `wall_clock_seconds`, `critical_path_seconds`, `parallelism_efficiency`, `retries_package`, `retries_stage`, `stage_attempts`, `canonical_stages`, `stage_executions_per_canonical`, `manual_interventions`, `sessions`, `token_cost`, `report_ptr` |
 | `wp_failed` | `wp_id`, `attempts`, `verdict_evidence`, `at` |
 
 **Validation rules**
@@ -164,6 +167,7 @@ One JSON object per line inside `<!-- wp-ledger:begin -->` … `<!-- wp-ledger:e
 - **V-LED.8**: A `stage-close` event appears once per stage attempt, after the stage U4; a failed stage writes `wp_failed` and enters U5 instead.
 - **V-LED.9**: `implement` dispatch events carry every 067 field; an unavailable quantity is the literal `not_evaluated`, never a fabricated number.
 - **V-LED.10**: A dispatch event's `effective_concurrency` is the number of packages actually running concurrently after the dispatch (1 for a write package).
+- **V-LED.11**: A `plan` event's `verdict` is the gate verdict projected from the plan fence — `admit`, `single-package`, `reject`, or `no-gate-run` — and its `plan_hash` references the fence, the canonical decision record. A post-repair `plan` event does not create a new stage attempt and never increments `stage_attempts`.
 
 ## E5 — WPResult
 
@@ -254,8 +258,9 @@ One JSON object per line inside `<!-- wp-ledger:begin -->` … `<!-- wp-ledger:e
 - **V-DEC.2**: Otherwise the stage-attempt override wins over the stage map, which wins over the built-in defaults.
 - **V-DEC.3**: Built-in defaults: `plan`, `implement`, `review` = `auto`; `analyze`, `clarify` = `off`; `requirements`, `tasks`, `checklist` = `off`.
 - **V-DEC.4**: `auto` resolves to `decomposed` only when the gate verdict is `admit`, at least two packages exist, and the benefit test (WG-13) holds; otherwise it resolves to `single-package` with `reason=not-beneficial`.
-- **V-DEC.5**: `off` resolves to `disabled`; a gate rejection or unavailable layer resolves to `fallback` with a named cause.
+- **V-DEC.5**: `off` resolves to `disabled`; a gate rejection or unavailable layer resolves to `fallback` with a named cause. Both record `gate_verdict=no-gate-run`.
 - **V-DEC.6**: For a concurrently dispatchable set, every package declares an isolated port block, temporary directory, or cache directory, or a non-empty `shared_readonly`; otherwise the plan is rejected.
+- **V-DEC.7**: The plan fence is the canonical decision record: it carries `decision`, `reason`, and `gate_verdict`, and the ledger `plan` event references it by `plan_hash` rather than creating a second decision of record. The decision-to-verdict mapping is owned by FN-08; a `disabled`/`fallback` plan MUST NOT claim an authentic `admit` or `single-package` verdict.
 
 ## E9 — StageTeamPreset
 
@@ -317,8 +322,10 @@ One JSON object per line inside `<!-- wp-ledger:begin -->` … `<!-- wp-ledger:e
 | `parallelism_efficiency` | number or `not_evaluated` | `sum(durations) / (wall_clock × max_concurrent)`. |
 | `max_concurrent` | integer or `not_evaluated` | Sweep result. |
 | `retries_package` / `retries_stage` | integer or `not_evaluated` | Counts. |
-| `stage_executions_per_canonical` | number or `not_evaluated` | `stage_attempts / canonical_stages`. |
-| `manual_interventions` | integer or `not_evaluated` | Optional input. |
+| `stage_executions_per_canonical` | number or `not_evaluated` | `stage_attempts / canonical_stages`; `stage_attempts` counts distinct `(stage, stage_attempt)` pairs that dispatched at least one package, never `plan` events. |
+| `manual_interventions` | integer or `not_evaluated` | Count per run, from the run record. |
+| `sessions` | integer or `not_evaluated` | Driver sessions in the run, from the run record. |
+| `manual_interventions_per_session` | number or `not_evaluated` | `manual_interventions / sessions`; `not_evaluated` when either input is missing. |
 | `token_cost` | number or `not_evaluated` | Sum only when every dispatch has a value. |
 | `verdicts` | object[] | Per package verdict and evidence path. |
 | `evidence_refs` | string[] | Paths only; no raw transcripts. |
@@ -331,6 +338,7 @@ One JSON object per line inside `<!-- wp-ledger:begin -->` … `<!-- wp-ledger:e
 - **V-REP.4**: The Markdown and JSON reports carry the same values.
 - **V-REP.5**: `stage-close` references both report files through `report_ptr`.
 - **V-REP.6**: A report written for a stage without a plan fence reports `decision=not_evaluated` and does not invent a decomposition.
+- **V-REP.7**: The per-session intervention rate is `manual_interventions / sessions`; if either input is missing, the rate is `not_evaluated` (the present count is still reported). A report whose efficiency criteria are all `not_evaluated` cannot support feature closure without a recorded user waiver naming SC-001 and/or SC-002 (FR-023, OR-10).
 
 ## E12 — StageCloseRecord
 
@@ -340,8 +348,9 @@ The `stage-close` ledger event (OR-03). Fields are fixed by E4 and D7.1.
 
 - **V-CLOSE.1**: `stage_u4_at` is not earlier than the first `started_at`.
 - **V-CLOSE.2**: `retries_stage = stage_attempt - 1` for the stage; `retries_package` is the count of `retry` events in the stage attempt.
-- **V-CLOSE.3**: `stage_attempts` is the count of plan events for the stage in the run; `canonical_stages = 8`.
+- **V-CLOSE.3**: `stage_attempts` is the count of distinct `(stage, stage_attempt)` pairs that dispatched at least one package in the run; a post-repair `plan` event does not increment it. `canonical_stages = 8`.
 - **V-CLOSE.4**: A missing metric is `not_evaluated`; a stage-close is written once per successful stage attempt.
+- **V-CLOSE.5**: `sessions` is the run's driver-session count from the run record; `manual_interventions` and `sessions` are supplied together, and either one missing makes `manual_interventions_per_session` `not_evaluated`.
 
 ## E13 — RetryDelta and DecompositionRule
 
@@ -359,21 +368,24 @@ The `stage-close` ledger event (OR-03). Fields are fixed by E4 and D7.1.
 ```
 
 - **V-DELTA.1**: `changed` is a non-empty subset of `scope`, `budget`, `topology`; only the named keys are required.
-- **V-DELTA.2**: A scope change strictly decreases `bounded_by.count`, or splits into child packages with distinct outputs.
+- **V-DELTA.2**: A scope change strictly decreases `bounded_by.count`, or splits into child packages with distinct outputs. A split is permitted only once per lineage (the parent's attempt 1 → 2); the children inherit the parent's attempt count, their sole dispatch is the lineage's retry attempt, and split depth is one.
 - **V-DELTA.3**: A budget change strictly increases `max_turns` and carries a non-empty `evidence_ref` that resolves to dispatch-level evidence.
 - **V-DELTA.4**: A topology change uses the closed value set `parallel-native`, `serial-native`, `detached-runner`, `split-serial-children` and the `to` value differs from `from`.
+- **V-DELTA.5**: A split child is never split again and never retried automatically; a child's further attempt is `retry-exhausted` and fails the stage gate into U5.
 
 **DecompositionRule**:
+
+**Owner declaration**: the table below is the sole authoritative owner of the per-stage required-output inventory and package-shape guidance (Constitution XIV). `research.md` R18 is the dated rationale; the runtime owner document, `contracts/work-package-model.md` WP-15, and the task rows reference this table and MUST NOT restate it.
 
 | Rule id | Stage | Package derivation | Required-output inventory |
 |---------|-------|--------------------|---------------------------|
 | `decompose-plan-v1` | plan | design artifacts, research, registry update, verification | plan.md, research.md, data-model.md, contracts/ (≥1 file), quickstart.md, feature-ref.md, feature registry row, feature detail update |
 | `decompose-implement-v1` | implement | task groups (ceiling of 8 tasks per group), verification | task-owned paths, verification.md, baseline/closure evidence |
 | `decompose-review-v1` | review | review dimensions (read-only), finding repair (write, bounded iteration) | review.md, review evidence |
-| `decompose-investigation-v1` | analyze, clarify | read-only investigation | findings report/evidence; for clarify the integrator performs the write-back |
+| `decompose-investigation-v1` | analyze, clarify | read-only investigation | findings report/evidence; for clarify the clarification write-back is the integrator's `integrator_outputs`, not a package output |
 
 - **V-RULE.1**: A rule is replayable: the same source artifacts and rule yield the same package set and ids.
-- **V-RULE.2**: A rule's run-specific `required_outputs` must cover its inventory; an uncovered inventory item is `orphan-output`.
+- **V-RULE.2**: A rule's run-specific `required_outputs` must cover its inventory; an uncovered inventory item is `orphan-output`. An item named in the plan's `integrator_outputs` is covered by the integrator seat, not by a package (V-PLAN.13).
 - **V-RULE.3**: A stage with no rule is single-subagent only and never produces a decomposed plan.
 
 ## State transitions
@@ -381,7 +393,7 @@ The `stage-close` ledger event (OR-03). Fields are fixed by E4 and D7.1.
 | Subject | From | To | Trigger |
 |---------|------|----|---------|
 | Stage decision | unresolved | `decomposed` | gate `admit` + benefit test |
-| Stage decision | unresolved | `single-package` | `auto` without benefit, one package, or explicit stage `off` resolution |
+| Stage decision | unresolved | `single-package` | `auto` without benefit or with one package |
 | Stage decision | unresolved | `disabled` | feature-level `off` |
 | Stage decision | unresolved | `fallback` | gate reject after one repair, exit 2, or unrepresentable contract |
 | Package | planned | ready | every dependency has a `verdict=pass` |

@@ -20,7 +20,7 @@ The design is carried by seven contracts and one data model. Exact schemas, chec
 **Testing**: pytest (`tests/unit`, `tests/contract`, `tests/integration`) with the repository's canonical runner `scripts/bash/run-tests.sh`. Tests Mode = **ON**: red-first evidence, contract tests, fixture dry runs, mutation drills, and regression tests. The plan stage changes documentation only and runs the deterministic pre-checks; the two full-suite slots remain implement-baseline and closure.
 **Target Platform**: macOS/Linux driver hosts; local native topology, or remote `ssh` + `su` + detached runner topology. The same WP model applies to both.
 **Project Type**: SDD framework plus a self-contained external driver skill.
-**Performance Goals**: a median stage wall-clock reduction of at least 20% for comparable decomposed `plan` and `review` stages, at most 1.5 stage executions per canonical stage, and zero gate regressions. These are relative targets only; a result without a comparable benchmark is `not_evaluated`. No absolute wall-clock promise is made.
+**Performance Goals**: a median stage wall-clock reduction of at least 20% for comparable decomposed `plan` and `review` stages against the conservative anchor, using the OR-04 interval; at most 1.5 stage dispatch attempts per canonical stage (one per stage attempt, not per plan event); and zero gate regressions. These are relative targets only; a result without a comparable benchmark is `not_evaluated`, and an all-`not_evaluated` benchmark blocks closure unless the user records an explicit waiver naming SC-001/SC-002. No absolute wall-clock promise is made.
 **Constraints**: 30 FRs at the decomposition ceiling; a task budget of 35 planned steps against a ceiling of 40; read-only concurrency only; write packages serialized; no stage-command change; no second registry/ownership model/integration queue/ledger/brief; no persisted team; no push; no new runtime dependency, service, daemon, or model API.
 **Scale/Scope**: one line, the canonical 8-stage chain; decomposition by default for `plan`, `implement`, and `review`; `analyze`/`clarify` only on explicit opt-in; slot cap default 2 with a ceiling of `min(4, line remaining allowance)`; package size bounded by 8 tasks or 40 clauses.
 
@@ -113,9 +113,11 @@ tests/
     └── test_wp_coordination_dry_runs.py        # NEW fixture dry runs
 ```
 
-**Structure Decision**: this feature extends the existing self-contained external skill `skills/external/sdd-loop-driver/` with one owner document, one preset, and two scripts, plus their tests and one docs entry. No new top-level directory, command template, agent role, or runtime package is introduced.
+**Structure Decision**: this feature extends the existing self-contained external skill `skills/external/sdd-loop-driver/` with one owner document, one preset, and two scripts, plus their tests and one docs entry. No new top-level directory, command template, agent role, or runtime package is introduced. The feature registry row and feature detail update required by the `data-model.md` E13 `plan` inventory are governance bookkeeping outside FR-027's delivery surface (they are neither driver source, documentation page, nor canonical test suite).
 
 ### Mirror Obligations
+
+**Owner declaration**: this section is the sole owner of the mirror source/mirror/verify obligations for this feature. `feature-ref.md` §7, `tasks.md` § Mirror Obligations, and the runtime owner document reference this section and MUST NOT restate its table (Constitution XIV).
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
@@ -164,7 +166,7 @@ Per-package evidence is attempt-scoped (DR1): `wp/<line>-<stage>-<wp_id>-a<N>w<M
 
 For `implement`, the WP record is the 067 part brief extended, and the `dispatch` event carries the 067 fields (`part_id`, `task_ids[]`, `turns`, `test_delta`, `commit`, `outcome`, `duration_seconds`, `token_cost`) (WP-12). There is no second brief or dispatch log.
 
-A non-decomposed stage still writes a plan fence: one synthetic package, the stage sentinel, and a `single-package` gate verdict, so every stage has a recorded decision (WP-13, FN-08, SC-005). For `implement`, the 070 single-package boundary does not remove the pre-existing 067 part discipline (FN-05, FN-12, DR12).
+A non-decomposed stage still writes a plan fence: one synthetic package, the stage sentinel, and the gate verdict fixed by WP-13 / FN-08, so every stage has a recorded decision (WP-13, FN-08, SC-005). The plan fence is the canonical decision record; the ledger `plan` event references it by `plan_hash`. For `implement`, the 070 single-package boundary does not remove the pre-existing 067 part discipline (FN-05, FN-12, DR12).
 
 ### 2. Decomposition gate `wp-gate.py`
 
@@ -176,7 +178,7 @@ A non-decomposed stage still writes a plan fence: one synthetic package, the sta
 
 `--check retry` counts ledger dispatches per `(stage, stage_attempt, wp_id)`, admits attempt 1, validates the attempt-2 delta, and rejects attempt 3 as exhausted (WG-17, OR-14…OR-16).
 
-The driver records the gate verdict in the ledger's `plan` event before the first dispatch. A reject blocks dispatch; the driver may repair once (split, serialize, or reduce to one package) as an amendment and re-run the gate; a second reject falls back with `decision=fallback`, `reason=gate-reject`. Exit 2 falls back with `reason=decomposition-unavailable` (WG-18).
+The driver records the gate verdict in the ledger's `plan` event before the first dispatch. A reject blocks dispatch; the driver may repair once (split, serialize, or reduce to one package) as an amendment and re-run the gate; a second reject falls back with `decision=fallback` and `reason=gate-reject`, and the plan fence records the FN-08 fallback verdict with a reference to the reject evidence. Exit 2 falls back with `reason=decomposition-unavailable` and the same FN-08 fallback verdict (WG-18).
 
 ### 3. Scheduler and coordination
 
@@ -213,7 +215,7 @@ The evidence layout is attempt-scoped: `wp/<line>-<stage>-<wp_id>-a<N>w<M>.verdi
 
 ### 6. Integration and stage close
 
-After every package verifies, the driver dispatches one integrator execution for the stage attempt (VI-11). It receives the plan, the verified outputs, and the stage authority artifacts; it aggregates in topological-layer and `wp_id` lexicographic order, detects missing or contradictory outputs, makes the single stage-closing commit, and emits `<STAGE>-DONE` as its last non-empty line (VI-07, VI-09, VI-11).
+After every package verifies, the driver dispatches one integrator execution for the stage attempt (VI-11). It receives the plan, the verified outputs, and the stage authority artifacts; it aggregates in topological-layer and `wp_id` lexicographic order, detects missing or contradictory outputs, produces the plan's `integrator_outputs` (for `clarify`, the clarification write-back), makes the single stage-closing commit, and emits `<STAGE>-DONE` as its last non-empty line (VI-07, VI-09, VI-11). `integrator_outputs` are owned by the integrator seat, excluded from package output coverage, and verified by the unchanged stage U4 (FR-003(b), SC-004, WP-15).
 
 Integration stops on a conflict or missing output; no partial commit is presented as a complete stage deliverable (VI-08). For stages without a part-commit discipline, package executors do not commit; the integrator's commit is the only stage commit. For `implement`, part commits are preserved and not rewritten or squashed (VI-10).
 
@@ -221,7 +223,7 @@ Package sentinels are never promoted: only the integrator's `<STAGE>-DONE` (or t
 
 ### 7. Retry and escalation
 
-The per-package counter is derived from the ledger's `dispatch` events for `(stage, stage_attempt, wp_id)`; there is no counter file (OR-14). Attempt 1 needs no delta. Attempt 2 requires a `retry_delta` changing scope, budget, or topology; `wp-gate.py --check retry` validates the delta: scope strictly smaller or a split into distinct children, budget strictly larger with dispatch-level evidence, or a materially different topology (OR-15). An unchanged same-budget rerun is rejected even if reworded (WG-17).
+The per-package counter is derived from the ledger's `dispatch` events for `(stage, stage_attempt, wp_id)`; there is no counter file (OR-14). Attempt 1 needs no delta. Attempt 2 requires a `retry_delta` changing scope, budget, or topology; `wp-gate.py --check retry` validates the delta: scope strictly smaller or a split into distinct children, budget strictly larger with dispatch-level evidence, or a materially different topology (OR-15). A split is permitted once per lineage: children inherit the parent's attempt count (their sole dispatch is the lineage's retry attempt), split depth is one, and a child is never split again or retried (WG-17, OR-15). An unchanged same-budget rerun is rejected even if reworded (WG-17).
 
 A second failure (or attempt 3) records `wp_failed` with the attempt history and verdict evidence, fails the stage gate, and enters the unchanged U5 stage-retry path; WP retries do not consume the stage retry budget before that escalation (OR-16). A U5 retry starts a new stage attempt with a fresh plan, plan hash, and per-package counter; earlier records remain in the spine (SD-16).
 
@@ -232,19 +234,19 @@ The ledger fields are fixed in `data-model.md` E4 and OR-01. The metric definiti
 - **Stage wall-clock**: `stage_u4_at - first started_at`.
 - **Critical path**: the duration-weighted longest path through the dependency DAG, using verified executor intervals.
 - **Parallelism efficiency**: `sum(package durations) / (wall_clock × max_concurrent)` (the product is in the denominator).
-- **Stage executions per canonical stage**: `stage_attempts / 8`.
+- **Stage executions per canonical stage**: `stage_attempts / 8`, where `stage_attempts` counts distinct `(stage, stage_attempt)` pairs that dispatched at least one package; a repair `plan` event never adds an attempt.
 - **Retry counts**: package and stage separately.
-- **Manual interventions**: user continue/retry/status messages; optional input, otherwise `not_evaluated`.
+- **Manual interventions**: user continue/retry/status messages per run and the run's driver-session count; both are optional inputs, and the reported rate is per session; otherwise `not_evaluated`.
 
-`wp-report.py` writes the Markdown and JSON reports and prints the derived metrics, accepting `--stage-u4-at` and `--manual-interventions` because those values are not derivable before stage close (OR-11, DR6). Both reports carry decisions, pattern, slot cap, order, metrics, retries, verdicts, and evidence paths, never raw transcripts (OR-12).
+`wp-report.py` writes the Markdown and JSON reports and prints the derived metrics, accepting `--stage-u4-at`, `--manual-interventions`, and `--sessions` because those values are not derivable before stage close (OR-11, DR6). Both reports carry decisions, pattern, slot cap, order, metrics, retries, verdicts, and evidence paths, never raw transcripts (OR-12).
 
-Any missing source is the literal `not_evaluated`; it is never zero or an estimate, and an SC whose metric is `not_evaluated` is not claimed as met (OR-10). The benchmark anchor is the conservative upper bound of the dated baseline (plan 70 min, review 37 min); a median requires at least three comparable samples; a re-measured baseline replaces the anchor and sources are never mixed (OR-13).
+Any missing source is the literal `not_evaluated`; it is never zero or an estimate, and an SC whose metric is `not_evaluated` is not claimed as met (OR-10). An all-`not_evaluated` benchmark blocks feature closure until a comparable benchmark exists or the user records an explicit waiver naming SC-001 and/or SC-002 (FR-023, OR-10). The benchmark anchor is the conservative upper bound of the dated baseline (plan 70 min, review 37 min); a median requires at least three comparable samples on the same host class and topology; a re-measured baseline uses the OR-04 interval and replaces the anchor, and sources are never mixed (OR-13).
 
 ### 9. Opt-out and fallback
 
 The U0 entry declaration carries `decomposition: auto|off`, `decomposition_stages`, and `decomposition_slot_cap`; the stage attempt may carry `decomposition_override` (FN-01). Precedence: feature-level `off` (hard) > stage-attempt override > stage map > built-in defaults (FN-02). Defaults: `plan`/`implement`/`review` = `auto`; `analyze`/`clarify` = `off`; the rest = `off` (FN-03).
 
-`auto` admits decomposition only with a gate `admit`, at least two packages, and the benefit test; otherwise it records `single-package` with `reason=not-beneficial` (FN-04). `off` records `disabled`; a gate reject after the one repair, an unavailable layer (exit 2), or an unrepresentable stage contract records `fallback` with a named cause (FN-06). A fallback never runs a partial package set; it runs the standard single-subagent stage path with the unchanged prompt, dispatch, sentinel, and U4 (FN-05, FN-07). Every stage records one decision, and a silent run is a gate failure (FN-08).
+`auto` admits decomposition only with a gate `admit`, at least two packages, and the benefit test; otherwise it records `single-package` with `reason=not-beneficial` (FN-04). `off` records `disabled`; a gate reject after the one repair, an unavailable layer (exit 2), or an unrepresentable stage contract records `fallback` with a named cause; both carry the verdict FN-08 assigns to a non-run decision (FN-06). A fallback never runs a partial package set; it runs the standard single-subagent stage path with the unchanged prompt, dispatch, sentinel, and U4 (FN-05, FN-07). Every stage records one decision in the plan fence, the canonical decision record, and the ledger `plan` event references it; a silent run is a gate failure (FN-08, SC-005).
 
 ### 10. Tests and evidence
 
@@ -315,6 +317,6 @@ Filled after the Phase 1 artifacts landed on disk (counts measured from the file
 | Data model | [`data-model.md`] | 13 entities (E1–E13), 91 validation rules |
 | Contracts | [`contracts/`] | 7 files, 110 clauses: `work-package-model.md` (WP-01…WP-18), `wp-gate.md` (WG-01…WG-18), `scheduler-and-dispatch.md` (SD-01…SD-16), `verification-and-integration.md` (VI-01…VI-14), `stage-team-adapter.md` (ST-01…ST-12), `observability-and-retry.md` (OR-01…OR-16), `fallback-and-nonregression.md` (FN-01…FN-16) |
 | Quickstart | [`quickstart.md`] | 7 scenarios (A–G) plus the regression/evidence command block; every new-script example carries an execution-status note and premises |
-| Feature reference | [`feature-ref.md`] | Binding, delivered surface, FR 30/30 and SC 8/8 coverage, overlap adjudication, mirror obligations |
+| Feature reference | [`feature-ref.md`] | Binding, delivered surface, FR 30/30 and SC 8/8 coverage, overlap adjudication, mirror-obligations pointer (owner: this file § Mirror Obligations), required-output-inventory pointer (owner: `data-model.md` E13) |
 
 **Drift from the Phase 0 expectation**: none. The contract count is 7 and the clause count is 110; the data model carries 13 entities and 91 validation rules. The plan deliberately keeps the exact schemas in the contracts and data model rather than duplicating them here.
