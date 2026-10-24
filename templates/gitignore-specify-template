@@ -25,3 +25,6 @@ memory/sanitize/
 # Proactive-flow per-turn telemetry (churns every turn); learning state
 # memory/trigger/index.json stays tracked
 memory/trigger/telemetry.jsonl
+
+# Agent-created scratch (temp-directory discipline); cleaned up when the work item completes
+.tmp/

@@ -55,7 +55,8 @@ For larger batches, extract to a temp directory first (faster, avoids repeated u
 overhead):
 
 ```bash
-tmpdir=$(mktemp -d)
+mkdir -p .specify/.tmp
+tmpdir=$(mktemp -d .specify/.tmp/feedback-batch.XXXXXX)
 for z in feedback/feedback-*.zip; do unzip -o -d "$tmpdir/$(basename $z .zip)" "$z"; done
 # then read files with standard file-reading tools
 ```
@@ -199,8 +200,8 @@ rm feedback/feedback-<ts>.zip   # each processed bundle in this batch
   An orphan the report did not name is not deleted.
 - **Orphan preserve-first precondition**: before deleting ANY orphan-marked bundle,
   copy it to the standard preserve path
-  `${TMPDIR:-/tmp}/speckit-feedback-preserve/<zip-name>` (a grace copy for the current
-  session — `${TMPDIR}` is ephemeral across reboots; anyone needing longer retention
+  `.specify/.tmp/feedback-preserve/<zip-name>` (a grace copy for the current
+  session — the scratch root is transient across reboots; anyone needing longer retention
   moves it and records the final location). An orphan whose preserve copy failed is
   not deleted. The consume-log Cleanup column MUST record the preserve path for every
   orphan.

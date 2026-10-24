@@ -66,6 +66,11 @@ Never store anything derivable from project state — code, architecture, file l
 history, or anything already in the constitution / features / tools registries. Memory is
 only for **non-derivable** context.
 
+The universal recording obligation and the repeated-emphasis promotion trigger are owned by
+`shared/guidelines/knowledge-promotion.md`; the answer-landing table is owned by
+`shared/guidelines/ask-record-repeat.md`. This document owns the store mechanics and does not
+restate those rules.
+
 ## Engine: `memory-utils.py`
 
 The engine is a shared, standard-library-only script at

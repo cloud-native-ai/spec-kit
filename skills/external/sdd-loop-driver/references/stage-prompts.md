@@ -415,7 +415,7 @@ CLI 行为知识的唯一落点是 `references/cli/`（schema owner：`reference
 
 ### 本地拓扑（本地简报先行）
 
-项目在本机时：runner 直接以本地项目为工作目录（无 ssh/su 层）；**需求上下文先写成简报文件**（如 `/tmp/<topic>-sdd-brief.md`），子代理提示词只说「先完整阅读简报，再执行 /speckit.requirements」——文件承载的上下文比内联进提示词更稳（不失真、可复查、可复用）。
+项目在本机时：runner 直接以本地项目为工作目录（无 ssh/su 层）；**需求上下文先写成简报文件**（如 `~/tmp/<project>/<topic>-sdd-brief.md`），子代理提示词只说「先完整阅读简报，再执行 /speckit.requirements」——文件承载的上下文比内联进提示词更稳（不失真、可复查、可复用）。
 
 ### 构建固化变体（按角色分线）
 

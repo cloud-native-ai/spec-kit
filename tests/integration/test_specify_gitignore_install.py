@@ -8,6 +8,8 @@ root `.gitignore`.
 
 from pathlib import Path
 
+import subprocess
+
 from specify_cli import copy_local_templates
 
 TEMPLATE_NAME = "gitignore-specify-template"
@@ -32,6 +34,9 @@ TEMPLATE_BODY = (
     "\n"
     "# Proactive-flow telemetry\n"
     "memory/trigger/telemetry.jsonl\n"
+    "\n"
+    "# Agent-created scratch (temp-directory discipline)\n"
+    ".tmp/\n"
 )
 
 
@@ -63,6 +68,7 @@ def test_fresh_init_ships_specify_gitignore(monkeypatch, tmp_path: Path):
     assert "history/.work/" in body
     assert "teams/.work/" in body
     assert "memory/trigger/telemetry.jsonl" in body
+    assert ".tmp/" in body
 
 
 def test_reinit_refreshes_specify_gitignore(monkeypatch, tmp_path: Path):
@@ -77,3 +83,24 @@ def test_reinit_refreshes_specify_gitignore(monkeypatch, tmp_path: Path):
     installed = project / ".specify" / ".gitignore"
     assert installed.is_file()
     assert "teams/.work/" in installed.read_text(encoding="utf-8")
+
+
+def test_fresh_init_gitignores_specify_tmp(monkeypatch, tmp_path: Path):
+    """A fresh project's .specify/.gitignore must cover .specify/.tmp/."""
+    resource = _make_resource(tmp_path)
+    monkeypatch.setattr("specify_cli.get_resource_path", lambda: resource)
+
+    project = tmp_path / "proj"
+    copy_local_templates(project, "claude", "sh")
+    subprocess.run(["git", "init", "-q"], cwd=project, check=True)
+
+    probe = project / ".specify" / ".tmp" / "probe"
+    probe.parent.mkdir(parents=True)
+    probe.write_text("x", encoding="utf-8")
+    result = subprocess.run(
+        ["git", "check-ignore", "-q", ".specify/.tmp/probe"],
+        cwd=project,
+    )
+    assert result.returncode == 0, (
+        "fresh init must ship a .specify/.gitignore rule that ignores .specify/.tmp/"
+    )

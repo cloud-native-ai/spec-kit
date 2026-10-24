@@ -25,7 +25,7 @@ Generate or update project instructions and compatibility symlinks, ensuring a c
 
 2. **Preserve & decompose existing instructions** (only if instructions already existed):
    - Reads the pre-run backup snapshot (never a file the run already overwrote)
-   - Semantically splits it into topic blocks (governance rules, conventions, registries, tribal knowledge, etc.) written to temp files under `.specify/tmp/instructions-preserve/`
+   - Semantically splits it into topic blocks (governance rules, conventions, registries, tribal knowledge, etc.) written to temp files under `.specify/.tmp/instructions-preserve/`
    - Classifies each block by provenance (`auto-generated` / `user-authored` / `mixed`) so hand-authored knowledge is flagged must-keep
 
 3. **Analyze project context**:
