@@ -282,3 +282,23 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
   - `driver-u4` is produced only under `host_can_spawn=False`; `execution_id` remains distinct from the executor and the fallback is recorded on the verdict event.
   - `implement` part commits are read from E5 `commits`; a non-implement result carrying commits is `package-commit-forbidden`. The closing commit is a deterministic simulator token; the live stage performs the actual git commit under VI-09/VI-10.
 - **Mirror note**: `skills/external/sdd-loop-driver/` is the source of truth; `.specify/skills/sdd-loop-driver/` is generated and remains unsynced until T037 (existing drift from S2/S3 is unchanged by this row).
+
+## T023 — US3 verification (green)
+
+- **Date**: 2026-10-24T18:02Z
+- **Host**: Linux x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_coordination.py tests/integration/test_wp_coordination_dry_runs.py
+  ```
+- **Real output**: `79 passed in 0.24s`; exit code `0` (67 contract: 34 SD + 33 VI; 12 dry runs: 6 SD + 6 verification/integration).
+- **Red-to-green**: T020 `18 failed, 15 passed` + T021 `6 failed` → T022 `79 passed`; re-run for T023 is identical.
+- **US3 green points**: VI-01 verifier independence and `driver-u4` fallback; VI-02 read-only/targeted scope; VI-03 verdict schema and attempt-scoped path; VI-04 missing/unreadable/malformed/ambiguous = fail; VI-05 verdict event; VI-06 aggregation with `integrator_outputs` excluded from package coverage; VI-07 declared integration order; VI-08 conflict/missing-output stop with no partial commit; VI-09 one closing commit and no package commit; VI-10 implement part commits preserved; VI-11 integrator seat, owned outputs, and sentinel; VI-12 package sentinels never promoted; VI-13 post-integration unchanged U4; VI-14 driver-owned closure and merge.
+- **Quickstart Scenario D (retry and escalation)**:
+  ```sh
+  python3 -m pytest -q tests/unit/test_wp_gate.py -k "retry"
+  python3 -m pytest -q tests/integration/test_wp_coordination_dry_runs.py -k "dependency_unlocks or failure_isolation"
+  ```
+  → `28 passed, 55 deselected in 1.03s`; `2 passed, 10 deselected in 0.03s`. The no-delta, split-admission, third-attempt-`retry-exhausted`, and child-exhaustion assertions all pass; the dependency-block and stage-gate-fail dry runs pass.
+- **Quickstart Scenario F (opt out and single-package fallback) — recorded reason**: no assertion exists in the US3 files, by design. Decision resolution and the single-package/fallback runs are owned by FN-01…FN-08 with their green-point rows T034/T035 (US5), which are outside this segment's T020–T023 scope. No VI clause depends on the decision resolver; `driver-u4` is a verifier-capability fallback, not the decomposition fallback, and Scenario F remains open for T035.
+- **E3 stage-status row**: appended to `test-evidence/implement-stage-status.jsonl` (`substage=impl-s4-us3-verification`, command above, rc 0, 79 passed, E2 baseline pointer).
