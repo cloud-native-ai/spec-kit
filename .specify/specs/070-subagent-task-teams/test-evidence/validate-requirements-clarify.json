@@ -1,0 +1,38 @@
+{
+  "file": ".specify/specs/070-subagent-task-teams/requirements.md",
+  "status": "ok",
+  "checks": [
+    {
+      "label": "id-contiguous",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "doc-order",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "ref-resolvable",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "marker-count",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "dup-id",
+      "status": "pass",
+      "count": 0
+    }
+  ],
+  "errors": 0,
+  "warnings": 0,
+  "scanned": {
+    "lines": 320,
+    "definition_rows": 38,
+    "shared_strings": 0
+  }
+}
