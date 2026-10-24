@@ -37,7 +37,7 @@
 2. **已刷新项目**：一次刷新同时带来新命令副本、新技能、两份 owner 与两个引擎；接线生效，`/speckit.docs` 在命令分派前、`/speckit.humanize` 在其委派技能的 Stage 6 各执行一次 lookup（命令模板本身不调用脚本）。
    两类载荷同包下发，故「有调用点但无 owner/引擎」不是正常状态。
 
-**异常态（投影或手工拷贝造成的不一致）**：lookup 目标缺失或退出码为 2 时，接线 MUST 按默认类 + 固定标记（或 `owner-unavailable`）降级，
+**异常态（投影或手工拷贝造成的不一致）**：lookup 目标缺失或退出码为 2 时，接线 MUST 按默认类语义 + `owner-unavailable` 降级（`marker` 为 null，两个降级标签互斥，见 `expression-gate-operators.md` C-15 与 `flow-class-ledger.md` C-7），
 保持既有门禁、不中断流程、不静默切换门禁集（`expression-gate-operators.md` C-15）。
 本切片 MUST NOT 引入需要客户项目主动执行的迁移步骤（父 A7），也 MUST NOT 写入项目侧注册表或缓存。
 
@@ -95,6 +95,7 @@ MUST NOT 新建统计系统、评分体系或计量台账（FR-027）。基线�
 
 062（humanize）、067（循环效率加固）、068（执行量化通道）的条款 MUST 只被引用，MUST NOT 被复述或改写；
 三份 `requirements.md` 的字节不变由 C-5 与 `tests/contract/test_expression_compatibility.py` 共同钉住。
+- 引用组：(FR-026)
 
 - **C-10** 兼容面的测试判据
 

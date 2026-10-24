@@ -37,7 +37,7 @@
 | FR-013 | `expression-gates.md` § 阶段算子表（只换算子）+ § 调用点表（入口 → 阶段 → 算子） | `expression-gate-operators.md` C-1 / C-2 / C-3 / C-14 | `test_expression_gates_doc` |
 | FR-014 | 同上 § 阶段完整性不读类别 | C-11 | 同上（负向：无跳过表述） |
 | FR-015 | `flow-class-check.py --action lookup` 为唯一读取点；`/speckit.docs` 在命令模板内调用（W1），`/speckit.humanize` 在其委派技能 Stage 6 调用（W4，命令模板只给 owner 指针 W2），`create-docs` 技能只引 owner（W3） | `flow-class-ledger.md` C-9 / C-15 | `test_flow_class_ledger`（零类别字面量）+ `test_expression_gate_wiring`（A1–A6，含 humanize 模板零脚本调用） |
-| FR-016 | `lookup` 降级分支（`source=default` + `marker` + stderr `owner-unparsable`）+ 调用点降级（`owner-unavailable`，保持既有门禁） | C-7 + `expression-gate-operators.md` C-15 | `test_flow_class_ledger` + `test_expression_gate_wiring`（降级字面量在场） |
+| FR-016 | `lookup` 两条互斥降级路径（未登记：`source=default` + `marker`；owner 不可解析：默认类语义 + `marker` null + stderr `owner-unparsable`）+ 调用点降级（`owner-unavailable`，保持既有门禁） | C-7 + `expression-gate-operators.md` C-15 | `test_flow_class_ledger` + `test_expression_gate_wiring`（降级字面量在场） |
 | FR-017 | owner § 变更记录 | C-12 | `test_flow_class_ledger`（变更记录行形态） |
 | FR-018 | `expression-gates.md` § 六面（封闭，恰好 6，每面一个 face id）+ § 调用点表；`/speckit.docs` 与 `create-docs` R6 实际执行文档型算子 | C-1 + C-14 | `test_expression_gates_doc`（exactly 6 + face id 一一对应）+ `test_expression_gate_wiring`（A1/A3） |
 | FR-019 | 同上 § 读者声明；检查器 `reader` 面；docs 路径实际调用检查器 | C-4 + `doc-consistency-checker.md` C-4 / C-10 | `test_doc_consistency_checker`（缺失即阻断）+ `test_expression_gate_wiring`（docs 含 checker） |

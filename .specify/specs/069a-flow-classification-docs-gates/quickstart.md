@@ -212,7 +212,7 @@ grep -rn "flow-class-check.py\|expression-gates.md\|doc-consistency-check.py" \
 |------|------|------|
 | 未刷新项目 | 旧命令副本 + 旧技能；`.specify/shared/` 无两份 owner、`.specify/scripts/` 无两个引擎 | 副本不含 lookup → **零调用点**，行为与接线前逐字一致 |
 | 已刷新项目 | 新副本 + 新技能 + 两份 owner + 两个引擎（同一发行包） | 两个入口在判定前各执行一次 lookup，接线生效 |
-| 异常态（只拷了模板/只拷了脚本） | 调用点存在但目标缺失 | lookup 失败 → 默认类 + 固定标记（或 `owner-unavailable`），保持既有门禁、不中断、不静默切门禁集 |
+| 异常态（只拷了模板/只拷了脚本） | 调用点存在但目标缺失 | lookup 失败 → 默认类语义 + `owner-unavailable`（`marker` 为 null，两标签互斥），保持既有门禁、不中断、不静默切门禁集 |
 
 **前提**：① 三个哈希是**当前**值，`tests/contract/test_expression_compatibility.py` 以同样方式重算并比对；
 ② `sync-mirrors.py --only` 是**可重复旗标**（`action="append"`，实测 `--only shared,scripts,skills` 作为单个前缀返回 exit 2 `--only prefix matches no mirror pair or regen surface`）；③ `.specify/` 侧不得手改；

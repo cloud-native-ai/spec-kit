@@ -155,7 +155,7 @@
 - `src/specify_cli/__init__.py:2462` 起为 `shared` 拷贝段；`pyproject.toml` 的 `[tool.hatch.build.targets.wheel.force-include]` 显式包含 `scripts` 与 `shared`。
 - 镜像基线实测：`python3 scripts/python/sync-mirrors.py --check` → 六对全部 `ok`、命令副本 `OK`（exit 0）。故镜像判据可写「零新增漂移」。
 - 命令副本来源实测：`scripts/python/regen-command-copies.py` 由 `templates/commands/*.md` 经 `src/specify_cli.generate_commands()` 重生成到 `.claude/commands`、`.github/prompts`、`.opencode/command`、`.qoder/commands`（副本首行自带 `AUTO-GENERATED ... do not edit` 标记）；`pyproject.toml` 的 force-include 同时打包 `templates`、`shared`、`scripts`，技能由 `src/hatch_build.py` 阶段拷入。
-- **兼容语义（修订）**: 未刷新项目 = 旧命令副本 + 旧技能 + 无 owner/引擎 → 无调用点、行为不变；刷新时四类载荷由同一发行包一次到位 → 接线生效。因此「旧项目行为不变」的判据是**载荷与调用点同源同包**，不是「永远没有调用点」。投影不完整时 lookup 失败按默认类 + 标记降级（显式，不中断）。
+- **兼容语义（修订）**: 未刷新项目 = 旧命令副本 + 旧技能 + 无 owner/引擎 → 无调用点、行为不变；刷新时四类载荷由同一发行包一次到位 → 接线生效。因此「旧项目行为不变」的判据是**载荷与调用点同源同包**，不是「永远没有调用点」。投影不完整时 lookup 失败按默认类语义降级并报 `owner-unavailable`（`marker` 为 null，两标签互斥；显式，不中断）。
 
 **Rejected**: 在客户项目写入分类数据。与父 A7（旧项目不迁移、只降级）冲突。
 **Rejected**: 「零调用点」方案。它让 FR-015 在所有入口处落空，且使本切片的门禁不可执行。

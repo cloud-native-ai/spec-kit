@@ -149,7 +149,7 @@ tests/unit/test_doc_consistency_rules.py       # 新增：归一化、排除项�
 - **门禁不变量**：阶段集合、门禁数量、P0/P1 定义、analyze/review 调用率 100% 全部**不读类别**；类别只选算子集。
 - **六面落点**：四面复用既有 owner（`validate-requirements.py` / `user-facing-comprehension.md` + `create-docs` Authoring Flow / `docs-utils.py` / `one-source-of-truth.md` / 评审流程），两面新增（证据等级与 as-of、事实一致性检查器）；六面为**封闭集**（恰好 6，每面一个 face id，requirements SA-7）。
 - **首批成员**：`/speckit.docs` 与 `/speckit.humanize` 登记进台账并做**最小接线**：docs 在命令模板加 lookup + owner 指针，`create-docs` 技能加 owner/checker 指针；humanize 的**命令模板只加 owner 指针**（保持 Simple），lookup 与门禁执行落在 `humanize` 技能的 Stage 6（requirements SA-8）。062 的表面断言与「不削弱既有行为」同时被保住：humanize 只引用门禁 owner，保真细则仍归 062 技能（见 § Minimal Designated Wiring）。
-- **兼容与分发**：两份 owner 文档与两个引擎随 `shared/` + `scripts/` 经 `specify init` 到达；不新增项目侧存储。未刷新项目只有旧命令副本与旧技能（无 lookup、无 owner、无引擎）→ **没有调用点、行为不变**；刷新时命令副本与 `shared/` + `scripts/` 由同一发行包一次到位，接线生效；投影/刷新不完整时 lookup 失败即按默认类 + 标记降级并显式报告（不中断、不静默切门禁集）。
+- **兼容与分发**：两份 owner 文档与两个引擎随 `shared/` + `scripts/` 经 `specify init` 到达；不新增项目侧存储。未刷新项目只有旧命令副本与旧技能（无 lookup、无 owner、无引擎）→ **没有调用点、行为不变**；刷新时命令副本与 `shared/` + `scripts/` 由同一发行包一次到位，接线生效；投影/刷新不完整时 lookup 失败即按默认类语义降级并报 `owner-unavailable`（`marker` 为 null，两标签互斥，不中断、不静默切门禁集）。
 
 **No standalone requirement leftovers**: `requirements.md` 无 `[NEEDS CLARIFICATION]`；`pre-analyze-check.py --stage requirements` 实测 `decision=pass`（errors=0 / advisories=0 / fr=27 / sc=8）。advisories 一行是 requirements 阶段（设计产物落盘前）的值；设计产物落盘后同命令复测为 79 条 `missing-path` advisory（全部指向尚待创建的新文件），`decision` 仍为 `pass`（2026-10-24 checklist 阶段复测）。
 
@@ -182,7 +182,7 @@ Phase 1 产物与边界（判据正文在各自 owner，本计划不复述）：
 
 1. **先读数、后判定**：lookup 在**执行门禁的那个入口**内先于判定执行一次——`/speckit.docs` 在其命令模板分派前，`/speckit.humanize` 在其委派技能的 Stage 6 自检前。类别取值/判据/台账的唯一所有者是分类 owner，门禁算子集的唯一所有者是门禁 owner——模板与技能只给调用与指针。
 2. **按 owner 的调用点行执行**：入口不自行列举算子；它加载门禁 owner 的调用点表，执行该入口登记的行（docs = 六面文档型算子；humanize = 最小集）。
-3. **降级可见**：lookup 返回 `source: default`（未登记）或 owner 不可解析/脚本缺席（退出码 2）时，原样显示 `marker`（未声明·按默认）或 `owner-unavailable`，**保持既有门禁不变**、不中断流程、不静默切换门禁集（FR-009 / FR-016）。
+3. **降级可见**：lookup 返回 `source: default`（未登记）时原样显示 `marker`（未声明·按默认）；owner 不可解析或脚本缺席（退出码 2）时显示 `owner-unavailable` 且 `marker` 为 null（两标签互斥），**保持既有门禁不变**、不中断流程、不静默切换门禁集（FR-009 / FR-016）。
 4. **命令模板不因接线改变复杂度类别**：`/speckit.humanize` 的模板 MUST NOT 出现任何脚本调用；`/speckit.docs` 保持 Complex（已有脚本/产物消费面），lookup 不放宽也不收紧其门禁。
 
 **既有表面契约的硬约束（实现期必须遵守，违反即已有测试转红）**

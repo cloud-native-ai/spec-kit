@@ -25,6 +25,7 @@
 门禁 owner MUST 含一张表，覆盖全部 8 个阶段：requirements → clarify → plan → tasks → checklist → analyze → implement → review。
 每行 MUST 给出：阶段、执行算子（可执行入口或点名的既有流程）、对应面、阻断级别。
 任一阶段无算子 → 失败；算子行不得为空表头行（反空真：行数 ≥ 8）。
+- 引用组：(FR-013)
 
 - **C-3** 阻断级别不降
 
@@ -51,6 +52,7 @@
 结构、链接、构建通过 MUST NOT 被援引为内容正确性的证据；门禁 owner MUST 含这一负向条款。
 结构面判据 MUST 写成「零**新增**违规」：既有基线（2026-10-24 实测 `violations=3`：`broken-link` 2 + `note-frontmatter` 1）不因本特性被继承为失败，也不因本特性被顺手修复。
 站点层不存在时，构建算子记为 `not-applicable`（显式），不得记为通过。
+- 引用组：(FR-021)
 
 - **C-7** 事实唯一性与修复方向
 
@@ -62,6 +64,7 @@
 
 表达类的评审 MUST 保留且 MUST 按声明的读者基准判定（C-4），MUST NOT 复用代码评审的判定对象（编译/测试/覆盖率），MUST NOT 由分类免除。
 评审面 MUST 至少一条 `blocking` 算子，且在 analyze 与 review 两个阶段都在场。
+- 引用组：(FR-023)
 
 - **C-9** 三项基线的冻结与对照
 
@@ -86,6 +89,7 @@
 
 门禁集 MUST 声明：阶段完整性由既有阶段记录判定，类别 MUST NOT 参与该判定；analyze 与 review 的调用率 MUST 为 100%。
 任何以「本流程属表达类」为由跳过、缩短或改判阶段的请求 MUST 被拒绝——该拒绝规则 MUST 在门禁 owner 中有一条明文，且 MUST NOT 附带例外。
+- 引用组：(FR-014)
 
 - **C-12** 首批成员只补强、不削弱
 
@@ -97,6 +101,7 @@
 
 门禁集 MUST 声明与复杂度轴（决定 wrap-up 面有无，owner：`shared/workflow/feedback-step.md`）正交：本门禁集选择算子，复杂度轴决定是否有 wrap-up 面，两轴 MUST NOT 互相推导。
 `shared/workflow/feedback-step.md` 只需一行指针指向分类 owner，MUST NOT 在该文件中复制判据或台账。
+- 引用组：(FR-004)
 
 - **C-14** 命令/技能调用点表（call-site registry）
 
