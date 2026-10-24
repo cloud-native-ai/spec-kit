@@ -323,3 +323,33 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
 - **Real output**: `1 failed, 12 deselected in 0.06s`; exit code `1`.
 - **Failing group (real)**: `AttributeError: module 'fixtures.wp_driver_sim' has no attribute 'adapt_stage_team'` — the run-scoped adapter projection does not exist yet.
 - **Red-first claim**: the preset existence/frontmatter/body/seat/pattern/adapter/no-team assertions and the no-team dry run are red before T025, with no assertion skipped or weakened.
+
+## T025 — stage-team preset and run-scoped adapter (green)
+
+- **Date**: 2026-10-25T00:10Z (segment impl-s5)
+- **Host**: Linux 5.10.134-15.2.al8.x86_64 x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed paths (implementation)**:
+  - `skills/external/sdd-loop-driver/templates/stage-team-preset.md` (new; ST-02/ST-03/ST-04/ST-11 frontmatter, six body sections, four seats, provenance)
+  - `skills/external/sdd-loop-driver/references/decomposition-model.md` (§17 preset/seats/pattern/adapter; former §17 non-regression → §18)
+  - `tests/fixtures/wp_driver_sim.py` (`stage_team_pattern`, `adapt_stage_team`; pure, no filesystem writes)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_preset.py tests/integration/test_wp_coordination_dry_runs.py -k "preset or no_team_directory"
+  ```
+- **Real output**: `15 passed, 12 deselected in 0.08s`; exit code `0`.
+- **Red-to-green**: T024 `13 failed, 1 passed` + the no-team dry run `1 failed` → `14 passed` (preset file) and `1 passed` (dry run).
+- **ST green points**: ST-01 explicit path/not catalogued; ST-02 frontmatter; ST-03 six sections + run-scoped Instantiation; ST-04 four seats; ST-05 seat-to-execution mapping and adapter lifetimes; ST-06 graph-derived pattern selection; ST-07 `continuous` excluded; ST-08 run-scoped projection fields; ST-09 no persisted team; ST-10 create-team/run-team untouched; ST-11 provenance; ST-12 graph over preset.
+- **Adapter interpretations (disclosed)**: `stage_team_pattern` treats `parallel` as requiring at least two packages, no dependency edge, and every package read-only; any `repair_loop` selects `iteration` first; `continuous` is unrepresentable. The projection is a pure function in the test-only simulator; the live adapter writes the same fields into the plan fence as driver prompt logic.
+
+## T026 — US4 verification (green)
+
+- **Date**: 2026-10-25T00:12Z (segment impl-s5)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_preset.py tests/integration/test_wp_coordination_dry_runs.py
+  ```
+- **Real output**: `27 passed in 0.12s`; exit code `0` (14 preset contract + 13 dry runs, including `test_no_team_directory_is_created`).
+- **Red-to-green**: T024 preset `13 failed, 1 passed` and no-team dry run `1 failed` → T025 `15 passed` → T026 `27 passed`.
+- **No-team assertion**: `test_no_team_directory_is_created` snapshots the repository `.specify/teams/` tree and a temporary project root before and after the adapter projection plus a full simulated stage; both are unchanged, `team_directory is None`, and no `team.md` appears.
+- **Quickstart Scenario G (no-team half)**: `python3 -m pytest -q tests/integration/test_wp_coordination_dry_runs.py -k "nested_driver or no_team_directory"` → `2 passed, 11 deselected`.
+- **E3 stage-status row**: appended to `test-evidence/implement-stage-status.jsonl` (`substage=impl-s5-us4-preset`).

@@ -1,7 +1,7 @@
-# Decomposition Model — Runtime Owner (Parts 1–3)
+# Decomposition Model — Runtime Owner (Parts 1–4)
 
 **Feature**: 070 — Task Decomposition & Team Coordination for Subagent-Driven SDD
-**Status**: runtime-owner projection, parts 1–3: the Work Package model, the scheduler/retry procedure, and independent verification/integration. The preset-adapter (T025) and observability (T029) sections land with their owning task rows; this file does not pre-empt them.
+**Status**: runtime-owner projection, parts 1–4: the Work Package model, the scheduler/retry procedure, independent verification/integration, and the stage-team preset/adapter. The observability section (T029) lands with its owning task row; this file does not pre-empt it.
 
 **Design authority**: the seven contracts under `.specify/specs/070-subagent-task-teams/contracts/` and `.specify/specs/070-subagent-task-teams/data-model.md`. This document owns *how the driver applies* those clauses at runtime. Where a field name, check code, path pattern, or event field is fixed, the contract clause is authoritative; this file points to it instead of restating its table.
 
@@ -245,6 +245,35 @@ Closure and merge stay driver-owned under 058 and 064: this layer does not push,
 
 The deterministic simulator in `tests/fixtures/wp_driver_sim.py` models this part as `verify()` plus `integrate()`; like section 14.1 it proves the mechanical rules, not an LLM's adherence.
 
-## 17. Non-regression boundaries
+## 17. Stage-team preset and adapter (ST-01…ST-12)
+
+The preset is `skills/external/sdd-loop-driver/templates/stage-team-preset.md`. The driver loads it by explicit path, not through the create-team catalog (ST-01). It is field-compatible with `skills/internal/create-team/references/team-presets.md` but it is not registered there; `match-team-preset.py`, `create-team`, `run-team`, their templates, presets, and run reports are unchanged (ST-10).
+
+### 17.1 Seats and seat-to-execution mapping (ST-04, ST-05)
+
+The roster has exactly four seats, each derived from the existing Role × Stage × Type vocabulary:
+
+| Seat | Filled by | Lifetime |
+|------|-----------|----------|
+| `stage-planner` | the driver itself (decomposition, gate invocation, scheduling, spine writes); it never dispatches another coordinator | stage |
+| `stage-worker` | one execution per Work Package: a fresh native subagent locally, one detached `stage-runner.sh` remotely | one package |
+| `stage-verifier` | one fresh-context read-only execution per verdict, never the package executor | one verdict |
+| `stage-integrator` | one execution per decomposed stage attempt, after every package verifies | one stage attempt |
+
+Each package's `seat` field carries its derived Role × Stage × Type tuple (E10), and a package has exactly one accountable seat. The verifier execution does not consume the slot cap and is excluded from package durations (E7).
+
+### 17.2 Pattern selection (ST-06, ST-07, ST-12)
+
+The selected pattern is graph-derived and always takes precedence over the preset's declared default. `iteration` requires a complete `repair_loop` (a positive maximum, a stop condition, and a findings source). Otherwise `parallel` applies only when every package is read-only and two or more packages are independent. Otherwise `serial` applies when any write package or any dependency edge exists. A serial stage may still run independent ready read-only packages concurrently under SD-04. `continuous` is excluded: it is never selected and never appears as an adapter flow.
+
+The preset's declared pattern and slot cap are starting values only. The graph-derived pattern, the resolved slot cap, and the per-package seat mapping are recorded in the plan and take precedence (ST-12).
+
+### 17.3 Run-scoped adapter (ST-08, ST-09, ST-11)
+
+The adapter binds the preset and the package graph into the run-scoped plan fence. It substitutes the stage, the line, the plan hash, the slot cap, the selected pattern, and the package-to-seat mapping; it creates no side artifacts of its own. There is no team directory: no `.specify/teams/<slug>/team.md` is created per stage, per attempt, or per run, no goal binding is established, and no team run report is produced.
+
+The preset's provenance records that its shape derives from the Feature 070 measured baseline and the existing Role × Stage × Type vocabulary, not from a create-team catalog run, and states the first-run evidence obligation: the first decomposed stage's coordination report path is recorded in the spine when that stage closes (ST-11). A fixture dry run asserts that no team directory appears (ST-09; `test_no_team_directory_is_created`).
+
+## 18. Non-regression boundaries
 
 This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage chain, U4 independent verification, watcher verdicts/exit codes, stall handling, the fast lane, the two-slot test budget, the plan minor-fix constraint, Feature 064's registry/ownership/worktree/integration semantics, Feature 067's part brief and test economics, or Feature 068's feedback channel. Preserved-behavior obligations are owned by `contracts/fallback-and-nonregression.md` FN-09…FN-16 and are cited here, not restated.

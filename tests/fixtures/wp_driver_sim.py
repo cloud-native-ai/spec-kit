@@ -119,6 +119,85 @@ def dispatch_layers(plan: dict) -> list:
     ]
 
 
+def stage_team_pattern(plan: dict) -> str:
+    """ST-06: graph-derived pattern; ``continuous`` is never selected."""
+    packages = plan.get("packages") or []
+    if plan.get("repair_loop"):
+        return "iteration"
+    independent = not any(package.get("depends_on") for package in packages)
+    all_read_only = all(
+        package.get("kind") == "read-only" for package in packages
+    )
+    if len(packages) >= 2 and independent and all_read_only:
+        return "parallel"
+    return "serial"
+
+
+def adapt_stage_team(plan: dict) -> dict:
+    """ST-08/ST-12: project the preset plus the graph into a run-scoped plan.
+
+    Pure function: it writes no file, creates no team directory, and has no
+    goal binding or run report. The graph-derived pattern, the resolved slot
+    cap, and the per-package seat mapping take precedence over the preset's
+    declared defaults.
+    """
+    topology = plan.get("topology", "native")
+    execution_form = (
+        "detached-runner" if topology == "detached" else "native"
+    )
+    seats = [
+        {
+            "wp_id": package["wp_id"],
+            "role": "stage-worker",
+            "stage": "executor",
+            "type": "Worker",
+            "execution_form": execution_form,
+            "lifetime": "one-package",
+        }
+        for package in plan.get("packages", [])
+    ]
+    seats.extend(
+        [
+            {
+                "wp_id": None,
+                "role": "stage-planner",
+                "stage": "executor",
+                "type": "Worker",
+                "execution_form": "driver",
+                "lifetime": "stage",
+            },
+            {
+                "wp_id": None,
+                "role": "stage-verifier",
+                "stage": "evaluator",
+                "type": "Worker",
+                "execution_form": "fresh-context",
+                "lifetime": "one-verdict",
+            },
+            {
+                "wp_id": None,
+                "role": "stage-integrator",
+                "stage": "executor",
+                "type": "Worker",
+                "execution_form": "integrator",
+                "lifetime": "one-stage-attempt",
+            },
+        ]
+    )
+    return {
+        "schema_version": 1,
+        "preset_id": "sdd-stage-team",
+        "stage": plan.get("stage"),
+        "line_id": plan.get("line_id"),
+        "plan_hash": plan.get("plan_hash"),
+        "pattern": stage_team_pattern(plan),
+        "slot_cap": plan.get("slot_cap", 1),
+        "topology": topology,
+        "seats": seats,
+        "team_directory": None,
+    }
+
+
 def check_dispatch_prompt(prompt: str) -> dict:
     """SD-13's three prohibitions, applied before a package is dispatched."""
     text = prompt or ""
